@@ -25,11 +25,11 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 		fHubAddress(hubAddress),
 		fHubPort(hubPort)
 {
-	TRACE(("USB Device %d: creating device\n", fDeviceAddress));
+	TRACE("creating device\n");
 
 	fDefaultPipe = new(std::nothrow) ControlPipe(this);
 	if (!fDefaultPipe) {
-		TRACE_ERROR(("USB Device %d: could not allocate default pipe\n", fDeviceAddress));
+		TRACE_ERROR("could not allocate default pipe\n");
 		return;
 	}
 
@@ -43,32 +43,31 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 		(void *)&fDeviceDescriptor, sizeof(fDeviceDescriptor), &actualLength);
 
 	if (status < B_OK || actualLength != sizeof(fDeviceDescriptor)) {
-		TRACE_ERROR(("USB Device %d: error while getting the device descriptor\n", fDeviceAddress));
+		TRACE_ERROR("error while getting the device descriptor\n");
 		return;
 	}
 
-	TRACE(("full device descriptor for device %d:\n", fDeviceAddress));
-	TRACE(("\tlength:..............%d\n", fDeviceDescriptor.length));
-	TRACE(("\tdescriptor_type:.....0x%04x\n", fDeviceDescriptor.descriptor_type));
-	TRACE(("\tusb_version:.........0x%04x\n", fDeviceDescriptor.usb_version));
-	TRACE(("\tdevice_class:........0x%02x\n", fDeviceDescriptor.device_class));
-	TRACE(("\tdevice_subclass:.....0x%02x\n", fDeviceDescriptor.device_subclass));
-	TRACE(("\tdevice_protocol:.....0x%02x\n", fDeviceDescriptor.device_protocol));
-	TRACE(("\tmax_packet_size_0:...%d\n", fDeviceDescriptor.max_packet_size_0));
-	TRACE(("\tvendor_id:...........0x%04x\n", fDeviceDescriptor.vendor_id));
-	TRACE(("\tproduct_id:..........0x%04x\n", fDeviceDescriptor.product_id));
-	TRACE(("\tdevice_version:......0x%04x\n", fDeviceDescriptor.device_version));
-	TRACE(("\tmanufacturer:........0x%02x\n", fDeviceDescriptor.manufacturer));
-	TRACE(("\tproduct:.............0x%02x\n", fDeviceDescriptor.product));
-	TRACE(("\tserial_number:.......0x%02x\n", fDeviceDescriptor.serial_number));
-	TRACE(("\tnum_configurations:..%d\n", fDeviceDescriptor.num_configurations));
+	TRACE("full device descriptor for device %d:\n", fDeviceAddress);
+	TRACE("\tlength:..............%d\n", fDeviceDescriptor.length);
+	TRACE("\tdescriptor_type:.....0x%04x\n", fDeviceDescriptor.descriptor_type);
+	TRACE("\tusb_version:.........0x%04x\n", fDeviceDescriptor.usb_version);
+	TRACE("\tdevice_class:........0x%02x\n", fDeviceDescriptor.device_class);
+	TRACE("\tdevice_subclass:.....0x%02x\n", fDeviceDescriptor.device_subclass);
+	TRACE("\tdevice_protocol:.....0x%02x\n", fDeviceDescriptor.device_protocol);
+	TRACE("\tmax_packet_size_0:...%d\n", fDeviceDescriptor.max_packet_size_0);
+	TRACE("\tvendor_id:...........0x%04x\n", fDeviceDescriptor.vendor_id);
+	TRACE("\tproduct_id:..........0x%04x\n", fDeviceDescriptor.product_id);
+	TRACE("\tdevice_version:......0x%04x\n", fDeviceDescriptor.device_version);
+	TRACE("\tmanufacturer:........0x%02x\n", fDeviceDescriptor.manufacturer);
+	TRACE("\tproduct:.............0x%02x\n", fDeviceDescriptor.product);
+	TRACE("\tserial_number:.......0x%02x\n", fDeviceDescriptor.serial_number);
+	TRACE("\tnum_configurations:..%d\n", fDeviceDescriptor.num_configurations);
 
 	// Get the configurations
 	fConfigurations = (usb_configuration_info *)malloc(
 		fDeviceDescriptor.num_configurations * sizeof(usb_configuration_info));
 	if (fConfigurations == NULL) {
-		TRACE_ERROR(("USB Device %d: out of memory during config creations!\n",
-			fDeviceAddress));
+		TRACE_ERROR("out of memory during config creations!\n");
 		return;
 	}
 
@@ -81,25 +80,23 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 			&actualLength);
 
 		if (status < B_OK || actualLength != sizeof(usb_configuration_descriptor)) {
-			TRACE_ERROR(("USB Device %d: error fetching configuration %ld\n",
-				fDeviceAddress, i));
+			TRACE_ERROR("error fetching configuration %ld\n", i);
 			return;
 		}
 
-		TRACE(("USB Device %d: configuration %ld\n", fDeviceAddress, i));
-		TRACE(("\tlength:..............%d\n", configDescriptor.length));
-		TRACE(("\tdescriptor_type:.....0x%02x\n", configDescriptor.descriptor_type));
-		TRACE(("\ttotal_length:........%d\n", configDescriptor.total_length));
-		TRACE(("\tnumber_interfaces:...%d\n", configDescriptor.number_interfaces));
-		TRACE(("\tconfiguration_value:.0x%02x\n", configDescriptor.configuration_value));
-		TRACE(("\tconfiguration:.......0x%02x\n", configDescriptor.configuration));
-		TRACE(("\tattributes:..........0x%02x\n", configDescriptor.attributes));
-		TRACE(("\tmax_power:...........%d\n", configDescriptor.max_power));
+		TRACE("configuration %ld\n", i);
+		TRACE("\tlength:..............%d\n", configDescriptor.length);
+		TRACE("\tdescriptor_type:.....0x%02x\n", configDescriptor.descriptor_type);
+		TRACE("\ttotal_length:........%d\n", configDescriptor.total_length);
+		TRACE("\tnumber_interfaces:...%d\n", configDescriptor.number_interfaces);
+		TRACE("\tconfiguration_value:.0x%02x\n", configDescriptor.configuration_value);
+		TRACE("\tconfiguration:.......0x%02x\n", configDescriptor.configuration);
+		TRACE("\tattributes:..........0x%02x\n", configDescriptor.attributes);
+		TRACE("\tmax_power:...........%d\n", configDescriptor.max_power);
 
 		uint8 *configData = (uint8 *)malloc(configDescriptor.total_length);
 		if (configData == NULL) {
-			TRACE_ERROR(("USB Device %d: out of memory when reading config\n",
-				fDeviceAddress));
+			TRACE_ERROR("out of memory when reading config\n");
 			return;
 		}
 
@@ -107,9 +104,9 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 			(void *)configData, configDescriptor.total_length, &actualLength);
 
 		if (status < B_OK || actualLength != configDescriptor.total_length) {
-			TRACE_ERROR(("USB Device %d: error fetching full configuration"
-				" descriptor %ld got %lu expected %u\n", fDeviceAddress, i,
-				actualLength, configDescriptor.total_length));
+			TRACE_ERROR("error fetching full configuration"
+				" descriptor %ld got %lu expected %u\n", i,
+				actualLength, configDescriptor.total_length);
 			free(configData);
 			return;
 		}
@@ -121,8 +118,7 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 		fConfigurations[i].interface = (usb_interface_list *)malloc(
 			configuration->number_interfaces * sizeof(usb_interface_list));
 		if (fConfigurations[i].interface == NULL) {
-			TRACE_ERROR(("USB Device %d: out of memory when creating interfaces\n",
-				fDeviceAddress));
+			TRACE_ERROR("out of memory when creating interfaces\n");
 			return;
 		}
 
@@ -134,18 +130,18 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 		while (descriptorStart < actualLength) {
 			switch (configData[descriptorStart + 1]) {
 				case USB_DESCRIPTOR_INTERFACE: {
-					TRACE(("USB Device %d: got interface descriptor\n", fDeviceAddress));
+					TRACE("got interface descriptor\n");
 					usb_interface_descriptor *interfaceDescriptor
 						= (usb_interface_descriptor *)&configData[descriptorStart];
-					TRACE(("\tlength:.............%d\n", interfaceDescriptor->length));
-					TRACE(("\tdescriptor_type:....0x%02x\n", interfaceDescriptor->descriptor_type));
-					TRACE(("\tinterface_number:...%d\n", interfaceDescriptor->interface_number));
-					TRACE(("\talternate_setting:..%d\n", interfaceDescriptor->alternate_setting));
-					TRACE(("\tnum_endpoints:......%d\n", interfaceDescriptor->num_endpoints));
-					TRACE(("\tinterface_class:....0x%02x\n", interfaceDescriptor->interface_class));
-					TRACE(("\tinterface_subclass:.0x%02x\n", interfaceDescriptor->interface_subclass));
-					TRACE(("\tinterface_protocol:.0x%02x\n", interfaceDescriptor->interface_protocol));
-					TRACE(("\tinterface:..........%d\n", interfaceDescriptor->interface));
+					TRACE("\tlength:.............%d\n", interfaceDescriptor->length);
+					TRACE("\tdescriptor_type:....0x%02x\n", interfaceDescriptor->descriptor_type);
+					TRACE("\tinterface_number:...%d\n", interfaceDescriptor->interface_number);
+					TRACE("\talternate_setting:..%d\n", interfaceDescriptor->alternate_setting);
+					TRACE("\tnum_endpoints:......%d\n", interfaceDescriptor->num_endpoints);
+					TRACE("\tinterface_class:....0x%02x\n", interfaceDescriptor->interface_class);
+					TRACE("\tinterface_subclass:.0x%02x\n", interfaceDescriptor->interface_subclass);
+					TRACE("\tinterface_protocol:.0x%02x\n", interfaceDescriptor->interface_protocol);
+					TRACE("\tinterface:..........%d\n", interfaceDescriptor->interface);
 
 					usb_interface_list *interfaceList
 						= &fConfigurations[i].interface[interfaceDescriptor->interface_number];
@@ -156,8 +152,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 						= (usb_interface_info *)realloc(interfaceList->alt,
 						interfaceList->alt_count * sizeof(usb_interface_info));
 					if (newAlternates == NULL) {
-						TRACE_ERROR(("USB Device %d: out of memory allocating"
-							" alternate interface\n", fDeviceAddress));
+						TRACE_ERROR("out of memory allocating"
+							" alternate interface\n");
 						interfaceList->alt_count--;
 						return;
 					}
@@ -179,8 +175,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 					Interface *interface = new(std::nothrow) Interface(this,
 						interfaceDescriptor->interface_number);
 					if (interface == NULL) {
-						TRACE_ERROR(("USB Device %d: failed to allocate"
-							" interface object\n", fDeviceAddress));
+						TRACE_ERROR("failed to allocate"
+							" interface object\n");
 						return;
 					}
 
@@ -190,15 +186,15 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 				}
 
 				case USB_DESCRIPTOR_ENDPOINT: {
-					TRACE(("USB Device %d: got endpoint descriptor\n", fDeviceAddress));
+					TRACE("got endpoint descriptor\n");
 					usb_endpoint_descriptor *endpointDescriptor
 						= (usb_endpoint_descriptor *)&configData[descriptorStart];
-					TRACE(("\tlength:.............%d\n", endpointDescriptor->length));
-					TRACE(("\tdescriptor_type:....0x%02x\n", endpointDescriptor->descriptor_type));
-					TRACE(("\tendpoint_address:...0x%02x\n", endpointDescriptor->endpoint_address));
-					TRACE(("\tattributes:.........0x%02x\n", endpointDescriptor->attributes));
-					TRACE(("\tmax_packet_size:....%d\n", endpointDescriptor->max_packet_size));
-					TRACE(("\tinterval:...........%d\n", endpointDescriptor->interval));
+					TRACE("\tlength:.............%d\n", endpointDescriptor->length);
+					TRACE("\tdescriptor_type:....0x%02x\n", endpointDescriptor->descriptor_type);
+					TRACE("\tendpoint_address:...0x%02x\n", endpointDescriptor->endpoint_address);
+					TRACE("\tattributes:.........0x%02x\n", endpointDescriptor->attributes);
+					TRACE("\tmax_packet_size:....%d\n", endpointDescriptor->max_packet_size);
+					TRACE("\tinterval:...........%d\n", endpointDescriptor->interval);
 
 					if (!currentInterface)
 						break;
@@ -211,8 +207,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 						currentInterface->endpoint_count
 						* sizeof(usb_endpoint_info));
 					if (newEndpoints == NULL) {
-						TRACE_ERROR(("USB Device %d: out of memory allocating"
-							" new endpoint\n", fDeviceAddress));
+						TRACE_ERROR("out of memory allocating"
+							" new endpoint\n");
 						currentInterface->endpoint_count--;
 						return;
 					}
@@ -228,11 +224,11 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 				}
 
 				default:
-					TRACE(("USB Device %d: got generic descriptor\n", fDeviceAddress));
+					TRACE("got generic descriptor\n");
 					usb_generic_descriptor *genericDescriptor
 						= (usb_generic_descriptor *)&configData[descriptorStart];
-					TRACE(("\tlength:.............%d\n", genericDescriptor->length));
-					TRACE(("\tdescriptor_type:....0x%02x\n", genericDescriptor->descriptor_type));
+					TRACE("\tlength:.............%d\n", genericDescriptor->length);
+					TRACE("\tdescriptor_type:....0x%02x\n", genericDescriptor->descriptor_type);
 
 					if (!currentInterface)
 						break;
@@ -244,8 +240,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 						currentInterface->generic_count
 						* sizeof(usb_descriptor *));
 					if (newGenerics == NULL) {
-						TRACE_ERROR(("USB Device %d: out of memory allocating"
-							" generic descriptor\n", fDeviceAddress));
+						TRACE_ERROR("out of memory allocating"
+							" generic descriptor\n");
 						currentInterface->generic_count--;
 						return;
 					}
@@ -263,10 +259,9 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	// Set default configuration
-	TRACE(("USB Device %d: setting default configuration\n", fDeviceAddress));
+	TRACE("setting default configuration\n");
 	if (SetConfigurationAt(0) < B_OK) {
-		TRACE_ERROR(("USB Device %d: failed to set default configuration\n",
-			fDeviceAddress));
+		TRACE_ERROR("failed to set default configuration\n");
 		return;
 	}
 
@@ -468,8 +463,7 @@ Device::InitEndpoints(int32 interfaceIndex)
 			}
 
 			if (pipe == NULL) {
-				TRACE_ERROR(("USB Device %d: failed to allocate pipe\n",
-					fDeviceAddress));
+				TRACE_ERROR("failed to allocate pipe\n");
 				endpoint->handle = 0;
 				continue;
 			}
@@ -584,7 +578,7 @@ Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
 	usb_driver_cookie **cookies, bool added, bool recursive)
 {
-	TRACE(("USB Device %d: reporting device\n", fDeviceAddress));
+	TRACE("reporting device\n");
 	bool supported = false;
 	if (supportDescriptorCount == 0 || supportDescriptors == NULL)
 		supported = true;
@@ -685,6 +679,7 @@ Device::SetFeature(uint16 selector)
 	if (!fAvailable)
 		return B_ERROR;
 
+	TRACE("set feature %u\n", selector);
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_SET_FEATURE,
@@ -703,6 +698,7 @@ Device::ClearFeature(uint16 selector)
 	if (!fAvailable)
 		return B_ERROR;
 
+	TRACE("clear feature %u\n", selector);
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
@@ -721,6 +717,7 @@ Device::GetStatus(uint16 *status)
 	if (!fAvailable)
 		return B_ERROR;
 
+	TRACE("get status\n");
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_IN,
 		USB_REQUEST_GET_STATUS,

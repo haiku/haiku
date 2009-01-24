@@ -12,6 +12,7 @@
 
 BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
+		fStack(stack),
 		fRootHub(NULL)
 {
 	mutex_init(&fLock, "usb busmanager lock");
@@ -86,7 +87,7 @@ BusManager::AllocateAddress()
 		address = (address + 1) % 127;
 	}
 
-	TRACE_ERROR(("USB BusManager: the busmanager has run out of device addresses\n"));
+	TRACE_ERROR("the busmanager has run out of device addresses\n");
 	Unlock();
 	return -1;
 }
@@ -103,7 +104,7 @@ BusManager::FreeAddress(int8 address)
 		return;
 
 	if (!fDeviceMap[address]) {
-		TRACE_ERROR(("USB BusManager: freeing address %d which was not allocated\n", address));
+		TRACE_ERROR("freeing address %d which was not allocated\n", address);
 	}
 
 	fDeviceMap[address] = false;
@@ -118,15 +119,15 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
 	if (deviceAddress < 0) {
-		TRACE_ERROR(("USB BusManager: could not allocate an address\n"));
+		TRACE_ERROR("could not allocate an address\n");
 		return NULL;
 	}
 
-	TRACE(("USB BusManager: setting device address to %d\n", deviceAddress));
+	TRACE("setting device address to %d\n", deviceAddress);
 	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
 
 	if (!defaultPipe) {
-		TRACE_ERROR(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
+		TRACE_ERROR("error getting the default pipe for speed %d\n", speed);
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
@@ -153,7 +154,7 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	if (result < B_OK) {
-		TRACE_ERROR(("USB BusManager: error while setting device address\n"));
+		TRACE_ERROR("error while setting device address\n");
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
@@ -173,7 +174,7 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	size_t actualLength = 0;
 	usb_device_descriptor deviceDescriptor;
 
-	TRACE(("USB BusManager: getting the device descriptor\n"));
+	TRACE("getting the device descriptor\n");
 	pipe.SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
@@ -185,33 +186,33 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		&actualLength);										// actual length
 
 	if (actualLength != 8) {
-		TRACE_ERROR(("USB BusManager: error while getting the device descriptor\n"));
+		TRACE_ERROR("error while getting the device descriptor\n");
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
 
-	TRACE(("short device descriptor for device %d:\n", deviceAddress));
-	TRACE(("\tlength:..............%d\n", deviceDescriptor.length));
-	TRACE(("\tdescriptor_type:.....0x%04x\n", deviceDescriptor.descriptor_type));
-	TRACE(("\tusb_version:.........0x%04x\n", deviceDescriptor.usb_version));
-	TRACE(("\tdevice_class:........0x%02x\n", deviceDescriptor.device_class));
-	TRACE(("\tdevice_subclass:.....0x%02x\n", deviceDescriptor.device_subclass));
-	TRACE(("\tdevice_protocol:.....0x%02x\n", deviceDescriptor.device_protocol));
-	TRACE(("\tmax_packet_size_0:...%d\n", deviceDescriptor.max_packet_size_0));
+	TRACE("short device descriptor for device %d:\n", deviceAddress);
+	TRACE("\tlength:..............%d\n", deviceDescriptor.length);
+	TRACE("\tdescriptor_type:.....0x%04x\n", deviceDescriptor.descriptor_type);
+	TRACE("\tusb_version:.........0x%04x\n", deviceDescriptor.usb_version);
+	TRACE("\tdevice_class:........0x%02x\n", deviceDescriptor.device_class);
+	TRACE("\tdevice_subclass:.....0x%02x\n", deviceDescriptor.device_subclass);
+	TRACE("\tdevice_protocol:.....0x%02x\n", deviceDescriptor.device_protocol);
+	TRACE("\tmax_packet_size_0:...%d\n", deviceDescriptor.max_packet_size_0);
 
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
-		TRACE(("USB BusManager: creating new hub\n"));
+		TRACE("creating new hub\n");
 		Hub *hub = new(std::nothrow) Hub(parent, hubAddress, hubPort,
 			deviceDescriptor, deviceAddress, speed, false);
 		if (!hub) {
-			TRACE_ERROR(("USB BusManager: no memory to allocate hub\n"));
+			TRACE_ERROR("no memory to allocate hub\n");
 			FreeAddress(deviceAddress);
 			return NULL;
 		}
 
 		if (hub->InitCheck() < B_OK) {
-			TRACE_ERROR(("USB BusManager: hub failed init check\n"));
+			TRACE_ERROR("hub failed init check\n");
 			FreeAddress(deviceAddress);
 			delete hub;
 			return NULL;
@@ -220,17 +221,17 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		return (Device *)hub;
 	}
 
-	TRACE(("USB BusManager: creating new device\n"));
+	TRACE("creating new device\n");
 	Device *device = new(std::nothrow) Device(parent, hubAddress, hubPort,
 		deviceDescriptor, deviceAddress, speed, false);
 	if (!device) {
-		TRACE_ERROR(("USB BusManager: no memory to allocate device\n"));
+		TRACE_ERROR("no memory to allocate device\n");
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
 
 	if (device->InitCheck() < B_OK) {
-		TRACE_ERROR(("USB BusManager: device failed init check\n"));
+		TRACE_ERROR("device failed init check\n");
 		FreeAddress(deviceAddress);
 		delete device;
 		return NULL;
@@ -298,7 +299,7 @@ BusManager::_GetDefaultPipe(usb_speed speed)
 	}
 
 	if (!fDefaultPipes[speed]) {
-		TRACE_ERROR(("USB BusManager: failed to allocate default pipe for speed %d\n", speed));
+		TRACE_ERROR("failed to allocate default pipe for speed %d\n", speed);
 	}
 
 	Unlock();

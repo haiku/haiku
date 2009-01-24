@@ -8,6 +8,8 @@
 
 #include "ehci.h"
 
+#define USB_MODULE_NAME "ehci roothub"
+
 static usb_device_descriptor sEHCIRootHubDevice =
 {
 	18,								// Descriptor length
@@ -135,7 +137,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
-	TRACE(("usb_ehci_roothub: request: %d\n", request->Request));
+	TRACE_MODULE("request: %d\n", request->Request);
 
 	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
@@ -169,12 +171,12 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 				break;
 			}
 
-			TRACE(("usb_ehci_roothub: set address: %d\n", request->Value));
+			TRACE_MODULE("set address: %d\n", request->Value);
 			status = B_OK;
 			break;
 
 		case USB_REQUEST_GET_DESCRIPTOR:
-			TRACE(("usb_ehci_roothub: get descriptor: %d\n", request->Value >> 8));
+			TRACE_MODULE("get descriptor: %d\n", request->Value >> 8);
 
 			switch (request->Value >> 8) {
 				case USB_DESCRIPTOR_DEVICE: {
@@ -228,11 +230,11 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 		case USB_REQUEST_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("usb_ehci_roothub: clear feature: no hub changes\n"));
+				TRACE_MODULE_ERROR("clear feature: no hub changes\n");
 				break;
 			}
 
-			TRACE(("usb_ehci_roothub: clear feature: %d\n", request->Value));
+			TRACE_MODULE("clear feature: %d\n", request->Value);
 			if (ehci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
@@ -241,11 +243,11 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 		case USB_REQUEST_SET_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("usb_ehci_roothub: set feature: no hub changes\n"));
+				TRACE_MODULE_ERROR("set feature: no hub changes\n");
 				break;
 			}
 
-			TRACE(("usb_ehci_roothub: set feature: %d\n", request->Value));
+			TRACE_MODULE("set feature: %d\n", request->Value);
 			if (ehci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;

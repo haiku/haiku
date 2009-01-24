@@ -26,7 +26,7 @@ Stack::Stack()
 		fObjectArray(NULL),
 		fDriverList(NULL)
 {
-	TRACE(("USB Stack: stack init\n"));
+	TRACE("stack init\n");
 
 	mutex_init(&fStackLock, "usb stack lock");
 	mutex_init(&fExploreLock, "usb explore lock");
@@ -34,7 +34,7 @@ Stack::Stack()
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
 	if (fObjectArray == NULL) {
-		TRACE_ERROR(("USB Stack: failed to allocate object array\n"));
+		TRACE_ERROR("failed to allocate object array\n");
 		return;
 	}
 
@@ -43,7 +43,7 @@ Stack::Stack()
 	fAllocator = new(std::nothrow) PhysicalMemoryAllocator("USB Stack Allocator",
 		8, B_PAGE_SIZE * 4, 64);
 	if (!fAllocator || fAllocator->InitCheck() < B_OK) {
-		TRACE_ERROR(("USB Stack: failed to allocate the allocator\n"));
+		TRACE_ERROR("failed to allocate the allocator\n");
 		delete fAllocator;
 		fAllocator = NULL;
 		return;
@@ -66,25 +66,25 @@ Stack::Stack()
 		NULL
 	};
 
-	TRACE(("USB Stack: looking for host controller modules\n"));
+	TRACE("looking for host controller modules\n");
 	for (uint32 i = 0; moduleNames[i]; i++) {
-		TRACE(("USB Stack: looking for module %s\n", moduleNames[i]));
+		TRACE("looking for module %s\n", moduleNames[i]);
 
 		usb_host_controller_info *module = NULL;
 		if (get_module(moduleNames[i], (module_info **)&module) != B_OK)
 			continue;
 
-		TRACE(("USB Stack: adding module %s\n", moduleNames[i]));
+		TRACE("adding module %s\n", moduleNames[i]);
 		if (module->add_to(this) < B_OK) {
 			put_module(moduleNames[i]);
 			continue;
 		}
 
-		TRACE(("USB Stack: module %s successfully loaded\n", moduleNames[i]));
+		TRACE("module %s successfully loaded\n", moduleNames[i]);
 	}
 
 	if (fBusManagers.Count() == 0) {
-		TRACE_ERROR(("USB Stack: no bus managers available\n"));
+		TRACE_ERROR("no bus managers available\n");
 		return;
 	}
 
@@ -164,7 +164,7 @@ Stack::GetUSBID(Object *object)
 		id = (id + 1) % fObjectMaxCount;
 	}
 
-	TRACE_ERROR(("USB Stack: the stack did run out of usb_ids\n"));
+	TRACE_ERROR("the stack did run out of usb_ids\n");
 	Unlock();
 	return 0;
 }
@@ -177,7 +177,7 @@ Stack::PutUSBID(usb_id id)
 		return;
 
 	if (id >= fObjectMaxCount) {
-		TRACE_ERROR(("USB Stack: tried to put an invalid usb_id\n"));
+		TRACE_ERROR("tried to put an invalid usb_id\n");
 		Unlock();
 		return;
 	}
@@ -194,7 +194,7 @@ Stack::GetObject(usb_id id)
 		return NULL;
 
 	if (id >= fObjectMaxCount) {
-		TRACE_ERROR(("USB Stack: tried to get object with invalid usb_id\n"));
+		TRACE_ERROR("tried to get object with invalid usb_id\n");
 		Unlock();
 		return NULL;
 	}
@@ -285,7 +285,7 @@ area_id
 Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	const char *name)
 {
-	TRACE(("USB Stack: allocating %ld bytes for %s\n", size, name));
+	TRACE("allocating %ld bytes for %s\n", size, name);
 
 	void *logAddress;
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
@@ -293,7 +293,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 		B_CONTIGUOUS, 0);
 
 	if (area < B_OK) {
-		TRACE_ERROR(("USB Stack: couldn't allocate area %s\n", name));
+		TRACE_ERROR("couldn't allocate area %s\n", name);
 		return B_ERROR;
 	}
 
@@ -301,7 +301,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	status_t result = get_memory_map(logAddress, size, &physicalEntry, 1);
 	if (result < B_OK) {
 		delete_area(area);
-		TRACE_ERROR(("USB Stack: couldn't map area %s\n", name));
+		TRACE_ERROR("couldn't map area %s\n", name);
 		return B_ERROR;
 	}
 
@@ -312,8 +312,8 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	if (physicalAddress)
 		*physicalAddress = physicalEntry.address;
 
-	TRACE(("USB Stack: area = 0x%08lx, size = %ld, log = 0x%08lx, phy = 0x%08lx\n",
-		area, size, logAddress, physicalEntry.address));
+	TRACE("area = %ld, size = %ld, log = %p, phy = %p\n",
+		area, size, logAddress, physicalEntry.address);
 	return area;
 }
 
@@ -321,7 +321,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 void
 Stack::NotifyDeviceChange(Device *device, rescan_item **rescanList, bool added)
 {
-	TRACE(("USB Stack: device %s\n", added ? "added" : "removed"));
+	TRACE("device %s\n", added ? "added" : "removed");
 
 	usb_driver_info *element = fDriverList;
 	while (element) {
@@ -393,7 +393,7 @@ Stack::RegisterDriver(const char *driverName,
 	const usb_support_descriptor *descriptors,
 	size_t descriptorCount, const char *republishDriverName)
 {
-	TRACE(("USB Stack: register driver \"%s\"\n", driverName));
+	TRACE("register driver \"%s\"\n", driverName);
 	if (!driverName)
 		return B_BAD_VALUE;
 
@@ -457,7 +457,7 @@ Stack::RegisterDriver(const char *driverName,
 status_t
 Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 {
-	TRACE(("USB Stack: installing notify hooks for driver \"%s\"\n", driverName));
+	TRACE("installing notify hooks for driver \"%s\"\n", driverName);
 
 	usb_driver_info *element = fDriverList;
 	while (element) {
@@ -492,7 +492,7 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 status_t
 Stack::UninstallNotify(const char *driverName)
 {
-	TRACE(("USB Stack: uninstalling notify hooks for driver \"%s\"\n", driverName));
+	TRACE("uninstalling notify hooks for driver \"%s\"\n", driverName);
 
 	usb_driver_info *element = fDriverList;
 	while (element) {

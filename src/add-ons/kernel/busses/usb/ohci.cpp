@@ -15,6 +15,8 @@
 
 #include "ohci.h"
 
+#define USB_MODULE_NAME "ohci"
+
 pci_module_info *OHCI::sPCIModule = NULL;
 
 
@@ -23,10 +25,10 @@ ohci_std_ops(int32 op, ...)
 {
 	switch (op)	{
 		case B_MODULE_INIT:
-			TRACE(("usb_ohci_module: init module\n"));
+			TRACE_MODULE("init module\n");
 			return B_OK;
 		case B_MODULE_UNINIT:
-			TRACE(("usb_ohci_module: uninit module\n"));
+			TRACE_MODULE("uninit module\n");
 			return B_OK;
 	}
 
@@ -73,11 +75,11 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fPortCount(0)
 {
 	if (!fInitOK) {
-		TRACE_ERROR(("usb_ohci: bus manager failed to init\n"));
+		TRACE_ERROR("bus manager failed to init\n");
 		return;
 	}
 
-	TRACE(("usb_ohci: constructing new OHCI Host Controller Driver\n"));
+	TRACE("constructing new OHCI host controller driver\n");
 	fInitOK = false;
 
 	mutex_init(&fEndpointLock, "ohci endpoint lock");
@@ -95,26 +97,25 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 offset = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_base_registers, 4);
 	offset &= PCI_address_memory_32_mask;
-	TRACE(("usb_ohci: iospace offset: 0x%lx\n", offset));
+	TRACE_ALWAYS("iospace offset: 0x%lx\n", offset);
 	fRegisterArea = map_physical_memory("OHCI memory mapped registers",
 		(void *)offset,	B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
 		(void **)&fOperationalRegisters);
 	if (fRegisterArea < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to map register memory\n"));
+		TRACE_ERROR("failed to map register memory\n");
 		return;
 	}
 
-	TRACE(("usb_ohci: mapped operational registers: %p\n",
-		fOperationalRegisters));
+	TRACE("mapped operational registers: %p\n", fOperationalRegisters);
 
 	// Check the revision of the controller, which should be 10h
 	uint32 revision = _ReadReg(OHCI_REVISION) & 0xff;
-	TRACE(("usb_ohci: version %ld.%ld%s\n", OHCI_REVISION_HIGH(revision),
+	TRACE("version %ld.%ld%s\n", OHCI_REVISION_HIGH(revision),
 		OHCI_REVISION_LOW(revision), OHCI_REVISION_LEGACY(revision)
-		? ", legacy support" : ""));
+		? ", legacy support" : "");
 	if (OHCI_REVISION_HIGH(revision) != 1 || OHCI_REVISION_LOW(revision) != 0) {
-		TRACE_ERROR(("usb_ohci: unsupported OHCI revision\n"));
+		TRACE_ERROR("unsupported OHCI revision\n");
 		return;
 	}
 
@@ -123,7 +124,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		sizeof(ohci_hcca), "USB OHCI Host Controller Communication Area");
 
 	if (fHccaArea < B_OK) {
-		TRACE_ERROR(("usb_ohci: unable to create the HCCA block area\n"));
+		TRACE_ERROR("unable to create the HCCA block area\n");
 		return;
 	}
 
@@ -152,7 +153,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fInterruptEndpoints = new(std::nothrow)
 		ohci_endpoint_descriptor *[OHCI_STATIC_ENDPOINT_COUNT];
 	if (!fInterruptEndpoints) {
-		TRACE_ERROR(("ohci_usb: failed to allocate memory for interrupt endpoints\n"));
+		TRACE_ERROR("failed to allocate memory for interrupt endpoints\n");
 		_FreeEndpoint(fDummyControl);
 		_FreeEndpoint(fDummyBulk);
 		_FreeEndpoint(fDummyIsochronous);
@@ -162,7 +163,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < OHCI_STATIC_ENDPOINT_COUNT; i++) {
 		fInterruptEndpoints[i] = _AllocateEndpoint();
 		if (!fInterruptEndpoints[i]) {
-			TRACE_ERROR(("ohci_usb: failed to allocate interrupt endpoint %ld", i));
+			TRACE_ERROR("failed to allocate interrupt endpoint %ld", i);
 			while (--i >= 0)
 				_FreeEndpoint(fInterruptEndpoints[i]);
 			_FreeEndpoint(fDummyBulk);
@@ -204,7 +205,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if (control & OHCI_INTERRUPT_ROUTING) {
-		TRACE(("usb_ohci: smm is in control of the host controller\n"));
+		TRACE_ALWAYS("smm is in control of the host controller\n");
 		uint32 status = _ReadReg(OHCI_COMMAND_STATUS);
 		_WriteReg(OHCI_COMMAND_STATUS, status | OHCI_OWNERSHIP_CHANGE_REQUEST);
 		for (uint32 i = 0; i < 100 && (control & OHCI_INTERRUPT_ROUTING); i++) {
@@ -213,13 +214,13 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		}
 
 		if ((control & OHCI_INTERRUPT_ROUTING) != 0) {
-			TRACE_ERROR(("usb_ohci: smm does not respond. resetting...\n"));
+			TRACE_ERROR("smm does not respond. resetting...\n");
 			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 			snooze(USB_DELAY_BUS_RESET);
 		} else
-			TRACE(("usb_ohci: ownership change successful\n"));
+			TRACE_ALWAYS("ownership change successful\n");
 	} else {
-		TRACE(("usb_ohci: cold started\n"));
+		TRACE("cold started\n");
 		snooze(USB_DELAY_BUS_RESET);
 	}
 
@@ -244,7 +245,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	if (reset) {
-		TRACE_ERROR(("usb_ohci: Error resetting the host controller (timeout)\n"));
+		TRACE_ERROR("error resetting the host controller (timeout)\n");
 		return;
 	}
 
@@ -293,12 +294,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	if (numberOfPorts > OHCI_MAX_PORT_COUNT)
 		numberOfPorts = OHCI_MAX_PORT_COUNT;
 	fPortCount = numberOfPorts;
-	TRACE(("usb_ohci: port count is %d\n", fPortCount));
+	TRACE("port count is %d\n", fPortCount);
 
 	// Create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "OHCI Finish Transfers");
 	if (fFinishTransfersSem < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to create semaphore\n"));
+		TRACE_ERROR("failed to create semaphore\n");
 		return;
 	}
 
@@ -308,7 +309,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	resume_thread(fFinishThread);
 
 	// Install the interrupt handler
-	TRACE(("usb_ohci: installing interrupt handler\n"));
+	TRACE("installing interrupt handler\n");
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		_InterruptHandler, (void *)this, 0);
 
@@ -316,7 +317,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
 		| OHCI_MASTER_INTERRUPT_ENABLE);
 
-	TRACE(("usb_ohci: OHCI Host Controller Driver constructed\n"));
+	TRACE("OHCI host controller driver constructed\n");
 	fInitOK = true;
 }
 
@@ -355,31 +356,30 @@ OHCI::~OHCI()
 status_t
 OHCI::Start()
 {
-	TRACE(("usb_ohci: starting OHCI Host Controller\n"));
+	TRACE("starting OHCI host controller\n");
 
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
 		!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
-		TRACE_ERROR(("usb_ohci: Controller not started (0x%08lx)!\n",
-			control));
+		TRACE_ERROR("controller not started (0x%08lx)!\n", control);
 		return B_ERROR;
 	} else
-		TRACE(("usb_ohci: Controller is operational!\n"));
+		TRACE("controller is operational!\n");
 
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) OHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
-		TRACE_ERROR(("usb_ohci: no memory to allocate root hub\n"));
+		TRACE_ERROR("no memory to allocate root hub\n");
 		return B_NO_MEMORY;
 	}
 
 	if (fRootHub->InitCheck() < B_OK) {
-		TRACE_ERROR(("usb_ohci: root hub failed init check\n"));
+		TRACE_ERROR("root hub failed init check\n");
 		return B_ERROR;
 	}
 
 	SetRootHub(fRootHub);
-	dprintf("usb_ohci: successfully started the controller\n");
+	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
 }
 
@@ -393,23 +393,22 @@ OHCI::SubmitTransfer(Transfer *transfer)
 
 	uint32 type = transfer->TransferPipe()->Type();
 	if (type & USB_OBJECT_CONTROL_PIPE) {
-		TRACE(("usb_ohci: submitting request\n"));
+		TRACE("submitting request\n");
 		return _SubmitRequest(transfer);
 	}
 
 	if ((type & USB_OBJECT_BULK_PIPE) || (type & USB_OBJECT_INTERRUPT_PIPE)) {
-		TRACE(("usb_ohci: submitting %s transfer\n",
-			(type & USB_OBJECT_BULK_PIPE) ? "bulk" : "interrupt"));
+		TRACE("submitting %s transfer\n",
+			(type & USB_OBJECT_BULK_PIPE) ? "bulk" : "interrupt");
 		return _SubmitTransfer(transfer);
 	}
 
 	if (type & USB_OBJECT_ISO_PIPE) {
-		TRACE(("usb_ohci: submitting isochronous transfer\n"));
+		TRACE("submitting isochronous transfer\n");
 		return _SubmitIsochronousTransfer(transfer);
 	}
 
-	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknown pipe"
-		" type %lu\n", type));
+	TRACE_ERROR("tried to submit transfer for unknown pipe type %lu\n", type);
 	return B_ERROR;
 }
 
@@ -481,7 +480,7 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 status_t
 OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
-	TRACE(("usb_ohci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
+	TRACE("pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe);
 	if (pipe->DeviceAddress() == fRootHubAddress) {
 		// no need to insert/remove endpoint descriptors for the root hub
 		return B_OK;
@@ -495,11 +494,11 @@ OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 			return _RemoveEndpointForPipe(pipe);
 
 		case USB_CHANGE_PIPE_POLICY_CHANGED:
-			TRACE(("usb_ohci: pipe policy changing unhandled!\n"));
+			TRACE("pipe policy changing unhandled!\n");
 			break;
 
 		default:
-			TRACE_ERROR(("usb_ohci: unknown pipe change!\n"));
+			TRACE_ERROR("unknown pipe change!\n");
 			return B_ERROR;
 	}
 
@@ -520,13 +519,12 @@ OHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_ERROR(("usb_ohci: getting pci module failed! 0x%08lx\n",
-				status));
+			TRACE_MODULE_ERROR("getting pci module failed! 0x%08lx\n", status);
 			return status;
 		}
 	}
 
-	TRACE(("usb_ohci: searching devices\n"));
+	TRACE_MODULE("searching devices\n");
 	bool found = false;
 	pci_info *item = new(std::nothrow) pci_info;
 	if (!item) {
@@ -540,13 +538,13 @@ OHCI::AddTo(Stack *stack)
 			&& item->class_api == PCI_usb_ohci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_ERROR(("usb_ohci: found device with invalid IRQ -"
-					" check IRQ assignement\n"));
+				TRACE_MODULE_ERROR("found device with invalid IRQ -"
+					" check IRQ assignement\n");
 				continue;
 			}
 
-			TRACE(("usb_ohci: found device at IRQ %u\n",
-				item->u.h0.interrupt_line));
+			TRACE_MODULE("found device at IRQ %u\n",
+				item->u.h0.interrupt_line);
 			OHCI *bus = new(std::nothrow) OHCI(item, stack);
 			if (!bus) {
 				delete item;
@@ -556,7 +554,7 @@ OHCI::AddTo(Stack *stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_ohci: bus failed init check\n"));
+				TRACE_MODULE_ERROR("bus failed init check\n");
 				delete bus;
 				continue;
 			}
@@ -571,7 +569,7 @@ OHCI::AddTo(Stack *stack)
 	}
 
 	if (!found) {
-		TRACE_ERROR(("usb_ohci: no devices found\n"));
+		TRACE_MODULE_ERROR("no devices found\n");
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
@@ -587,7 +585,7 @@ status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
 	if (index >= fPortCount) {
-		TRACE_ERROR(("usb_ohci: get port status for invalid port %u\n", index));
+		TRACE_ERROR("get port status for invalid port %u\n", index);
 		return B_BAD_INDEX;
 	}
 
@@ -622,8 +620,8 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 	if (portStatus & OHCI_RH_PORTSTATUS_PRSC)
 		status->change |= PORT_STATUS_RESET;
 
-	TRACE(("usb_ohci: port %u status 0x%04x change 0x%04x\n", index,
-		status->status, status->change));
+	TRACE("port %u status 0x%04x change 0x%04x\n", index,
+		status->status, status->change);
 	return B_OK;
 }
 
@@ -631,7 +629,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 status_t
 OHCI::SetPortFeature(uint8 index, uint16 feature)
 {
-	TRACE(("usb_ohci: set port feature index %u feature %u\n", index, feature));
+	TRACE("set port feature index %u feature %u\n", index, feature);
 	if (index > fPortCount)
 		return B_BAD_INDEX;
 
@@ -660,7 +658,7 @@ OHCI::SetPortFeature(uint8 index, uint16 feature)
 status_t
 OHCI::ClearPortFeature(uint8 index, uint16 feature)
 {
-	TRACE(("usb_ohci: clear port feature index %u feature %u\n", index, feature));
+	TRACE("clear port feature index %u feature %u\n", index, feature);
 	if (index > fPortCount)
 		return B_BAD_INDEX;
 
@@ -746,12 +744,12 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_SCHEDULING_OVERRUN) {
-		TRACE(("usb_ohci: scheduling overrun occured\n"));
+		TRACE_MODULE("scheduling overrun occured\n");
 		acknowledge |= OHCI_SCHEDULING_OVERRUN;
 	}
 
 	if (status & OHCI_WRITEBACK_DONE_HEAD) {
-		TRACE(("usb_ohci: transfer descriptors processed\n"));
+		TRACE_MODULE("transfer descriptors processed\n");
 		fHcca->done_head = 0;
 		acknowledge |= OHCI_WRITEBACK_DONE_HEAD;
 		result = B_INVOKE_SCHEDULER;
@@ -759,18 +757,18 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_RESUME_DETECTED) {
-		TRACE(("usb_ohci: resume detected\n"));
+		TRACE_MODULE("resume detected\n");
 		acknowledge |= OHCI_RESUME_DETECTED;
 	}
 
 	if (status & OHCI_UNRECOVERABLE_ERROR) {
-		TRACE_ERROR(("usb_ohci: unrecoverable error - controller halted\n"));
+		TRACE_MODULE_ERROR("unrecoverable error - controller halted\n");
 		_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 		// TODO: clear all pending transfers, reset and resetup the controller
 	}
 
 	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
-		TRACE(("usb_ohci: root hub status change\n"));
+		TRACE_MODULE("root hub status change\n");
 		// Disable the interrupt as it will otherwise be retriggered until the
 		// port has been reset and the change is cleared explicitly.
 		// TODO: renable it once we use status changes instead of polling
@@ -879,8 +877,8 @@ OHCI::_FinishTransfers()
 		if (!Lock())
 			continue;
 
-		TRACE(("usb_ohci: finishing transfers (first transfer: %p; last"
-			" transfer: %p)\n", fFirstTransfer, fLastTransfer));
+		TRACE("finishing transfers (first transfer: %p; last"
+			" transfer: %p)\n", fFirstTransfer, fLastTransfer);
 		transfer_data *lastTransfer = NULL;
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
@@ -894,7 +892,7 @@ OHCI::_FinishTransfers()
 				uint32 status = OHCI_TD_GET_CONDITION_CODE(descriptor->flags);
 				if (status == OHCI_TD_CONDITION_NOT_ACCESSED) {
 					// td is still active
-					TRACE(("usb_ohci: td %p still active\n", descriptor));
+					TRACE("td %p still active\n", descriptor);
 					break;
 				}
 
@@ -908,7 +906,7 @@ OHCI::_FinishTransfers()
 						// was halted because of this td, but we do not need
 						// to know, as when it was halted by another td this
 						// still ensures that this td was handled before).
-						TRACE_ERROR(("usb_ohci: td error: 0x%08lx\n", status));
+						TRACE_ERROR("td error: 0x%08lx\n", status);
 
 						switch (status) {
 							case OHCI_TD_CONDITION_CRC_ERROR:
@@ -959,13 +957,13 @@ OHCI::_FinishTransfers()
 					} else {
 						// an error occured but the endpoint is not halted so
 						// the td is in fact still active
-						TRACE(("usb_ohci: td %p active with error\n", descriptor));
+						TRACE("td %p active with error\n", descriptor);
 						break;
 					}
 				}
 
 				// the td has complete without an error
-				TRACE(("usb_ohci: td %p done\n", descriptor));
+				TRACE("td %p done\n", descriptor);
 
 				if (descriptor == transfer->last_descriptor
 					|| descriptor->buffer_physical != 0) {
@@ -1013,8 +1011,8 @@ OHCI::_FinishTransfers()
 
 			// break the descriptor chain on the last descriptor
 			transfer->last_descriptor->next_logical_descriptor = NULL;
-			TRACE(("usb_ohci: transfer %p done with status 0x%08lx\n",
-				transfer, callbackStatus));
+			TRACE("transfer %p done with status 0x%08lx\n",
+				transfer, callbackStatus);
 
 			// if canceled the callback has already been called
 			if (!transfer->canceled) {
@@ -1037,11 +1035,11 @@ OHCI::_FinishTransfers()
 
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
-						TRACE(("usb_ohci: advancing fragmented transfer\n"));
+						TRACE("advancing fragmented transfer\n");
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
-							TRACE(("usb_ohci: still %ld bytes left on transfer\n",
-								transfer->transfer->VectorLength()));
+							TRACE("still %ld bytes left on transfer\n",
+								transfer->transfer->VectorLength());
 							// TODO actually resubmit the transfer
 						}
 
@@ -1080,7 +1078,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 	ohci_general_td *setupDescriptor
 		= _CreateGeneralDescriptor(sizeof(usb_request_data));
 	if (!setupDescriptor) {
-		TRACE_ERROR(("usb_ohci: failed to allocate setup descriptor\n"));
+		TRACE_ERROR("failed to allocate setup descriptor\n");
 		return B_NO_MEMORY;
 	}
 
@@ -1091,7 +1089,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 
 	ohci_general_td *statusDescriptor = _CreateGeneralDescriptor(0);
 	if (!statusDescriptor) {
-		TRACE_ERROR(("usb_ohci: failed to allocate status descriptor\n"));
+		TRACE_ERROR("failed to allocate status descriptor\n");
 		_FreeGeneralDescriptor(setupDescriptor);
 		return B_NO_MEMORY;
 	}
@@ -1137,7 +1135,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 	result = _AddPendingTransfer(transfer, endpoint, setupDescriptor,
 		dataDescriptor, statusDescriptor, directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
+		TRACE_ERROR("failed to add pending transfer\n");
 		_FreeDescriptorChain(setupDescriptor);
 		return result;
 	}
@@ -1183,7 +1181,7 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 	result = _AddPendingTransfer(transfer, endpoint, firstDescriptor,
 		firstDescriptor, lastDescriptor, directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
+		TRACE_ERROR("failed to add pending transfer\n");
 		_FreeDescriptorChain(firstDescriptor);
 		return result;
 	}
@@ -1289,7 +1287,7 @@ OHCI::_AllocateEndpoint()
 	// Allocate memory chunk
 	if (fStack->AllocateChunk((void **)&endpoint, &physicalAddress,
 		sizeof(ohci_endpoint_descriptor)) < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to allocate endpoint descriptor\n"));
+		TRACE_ERROR("failed to allocate endpoint descriptor\n");
 		return NULL;
 	}
 
@@ -1318,12 +1316,12 @@ OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 status_t
 OHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
-	TRACE(("usb_ohci: inserting endpoint for device %u endpoint %u\n",
-		pipe->DeviceAddress(), pipe->EndpointAddress()));
+	TRACE("inserting endpoint for device %u endpoint %u\n",
+		pipe->DeviceAddress(), pipe->EndpointAddress());
 
 	ohci_endpoint_descriptor *endpoint = _AllocateEndpoint();
 	if (!endpoint) {
-		TRACE_ERROR(("usb_ohci: cannot allocate memory for endpoint\n"));
+		TRACE_ERROR("cannot allocate memory for endpoint\n");
 		return B_NO_MEMORY;
 	}
 
@@ -1348,7 +1346,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			break;
 
 		default:
-			TRACE_ERROR(("usb_ohci: direction unknown\n"));
+			TRACE_ERROR("direction unknown\n");
 			_FreeEndpoint(endpoint);
 			return B_ERROR;
 	}
@@ -1364,7 +1362,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			break;
 
 		default:
-			TRACE_ERROR(("usb_ohci: unaccetable speed\n"));
+			TRACE_ERROR("unaccetable speed\n");
 			_FreeEndpoint(endpoint);
 			return B_ERROR;
 	}
@@ -1385,10 +1383,10 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	else if (type & USB_OBJECT_ISO_PIPE)
 		head = fDummyIsochronous;
 	else
-		TRACE_ERROR(("usb_ohci: unknown pipe type\n"));
+		TRACE_ERROR("unknown pipe type\n");
 
 	if (head == NULL) {
-		TRACE_ERROR(("usb_ohci: no list found for endpoint\n"));
+		TRACE_ERROR("no list found for endpoint\n");
 		_FreeEndpoint(endpoint);
 		return B_ERROR;
 	}
@@ -1431,8 +1429,8 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 status_t
 OHCI::_RemoveEndpointForPipe(Pipe *pipe)
 {
-	TRACE(("usb_ohci: removing endpoint for device %u endpoint %u\n",
-		pipe->DeviceAddress(), pipe->EndpointAddress()));
+	TRACE("removing endpoint for device %u endpoint %u\n",
+		pipe->DeviceAddress(), pipe->EndpointAddress());
 
 	ohci_endpoint_descriptor *endpoint
 		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
@@ -1470,7 +1468,7 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 
 	if (fStack->AllocateChunk((void **)&descriptor, &physicalAddress,
 		sizeof(ohci_general_td)) != B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to allocate general descriptor\n"));
+		TRACE_ERROR("failed to allocate general descriptor\n");
 		return NULL;
 	}
 
@@ -1487,7 +1485,7 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 
 	if (fStack->AllocateChunk(&descriptor->buffer_logical,
 		(void **)&descriptor->buffer_physical, bufferSize) != B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to allocate space for buffer\n"));
+		TRACE_ERROR("failed to allocate space for buffer\n");
 		fStack->FreeChunk(descriptor, (void *)descriptor->physical_address,
 			sizeof(ohci_general_td));
 		return NULL;
@@ -1589,9 +1587,9 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 			size_t length = min_c(current->buffer_size - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_ohci: copying %ld bytes to bufferOffset %ld from"
+			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
-				vectorOffset, vectorIndex, vectorCount));
+				vectorOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)current->buffer_logical + bufferOffset,
 				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
 
@@ -1601,8 +1599,8 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ohci: wrote descriptor chain (%ld bytes, no"
-						" more vectors)\n", actualLength));
+					TRACE("wrote descriptor chain (%ld bytes, no"
+						" more vectors)\n", actualLength);
 					return actualLength;
 				}
 
@@ -1621,7 +1619,7 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 		current = (ohci_general_td *)current->next_logical_descriptor;
 	}
 
-	TRACE(("usb_ohci: wrote descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("wrote descriptor chain (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -1651,9 +1649,9 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 			size_t length = min_c(bufferSize - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_ohci: copying %ld bytes to vectorOffset %ld from"
+			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
-				bufferOffset, vectorIndex, vectorCount));
+				bufferOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
 				(uint8 *)current->buffer_logical + bufferOffset, length);
 
@@ -1663,7 +1661,8 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ohci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
+					TRACE("read descriptor chain (%ld bytes, no more vectors)\n",
+						actualLength);
 					return actualLength;
 				}
 
@@ -1679,7 +1678,7 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 		current = (ohci_general_td *)current->next_logical_descriptor;
 	}
 
-	TRACE(("usb_ohci: read descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("read descriptor chain (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -1702,7 +1701,7 @@ OHCI::_ReadActualLength(ohci_general_td *topDescriptor)
 		current = (ohci_general_td *)current->next_logical_descriptor;
 	}
 
-	TRACE(("usb_ohci: read actual length (%ld bytes)\n", actualLength));
+	TRACE("read actual length (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -1761,7 +1760,7 @@ OHCI::_ReadReg(uint32 reg)
 void
 OHCI::_PrintEndpoint(ohci_endpoint_descriptor *endpoint)
 {
-	dprintf("usb_ohci: endpoint %p\n", endpoint);
+	TRACE_ALWAYS("endpoint %p\n", endpoint);
 	dprintf("\tflags........... 0x%08lx\n", endpoint->flags);
 	dprintf("\ttail_physical... 0x%08lx\n", endpoint->tail_physical_descriptor);
 	dprintf("\thead_physical... 0x%08lx\n", endpoint->head_physical_descriptor);
@@ -1776,7 +1775,7 @@ void
 OHCI::_PrintDescriptorChain(ohci_general_td *topDescriptor)
 {
 	while (topDescriptor) {
-		dprintf("usb_ohci: descriptor %p\n", topDescriptor);
+		TRACE_ALWAYS("descriptor %p\n", topDescriptor);
 		dprintf("\tflags........... 0x%08lx\n", topDescriptor->flags);
 		dprintf("\tbuffer_physical. 0x%08lx\n", topDescriptor->buffer_physical);
 		dprintf("\tnext_physical... 0x%08lx\n", topDescriptor->next_physical_descriptor);

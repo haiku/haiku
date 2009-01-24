@@ -55,6 +55,7 @@ static	status_t					AddTo(Stack *stack);
 
 		status_t					ResetPort(uint8 index);
 
+virtual	const char *				TypeName() { return "ohci"; };
 
 private:
 		// Interrupt functions

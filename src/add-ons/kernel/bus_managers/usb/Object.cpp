@@ -37,7 +37,7 @@ status_t
 Object::SetFeature(uint16 selector)
 {
 	// to be implemented in subclasses
-	TRACE_ERROR(("USB Object: set feature called\n"));
+	TRACE_ERROR("set feature called\n");
 	return B_ERROR;
 }
 
@@ -46,7 +46,7 @@ status_t
 Object::ClearFeature(uint16 selector)
 {
 	// to be implemented in subclasses
-	TRACE_ERROR(("USB Object: clear feature called\n"));
+	TRACE_ERROR("clear feature called\n");
 	return B_ERROR;
 }
 
@@ -55,6 +55,6 @@ status_t
 Object::GetStatus(uint16 *status)
 {
 	// to be implemented in subclasses
-	TRACE_ERROR(("USB Object: get status called\n"));
+	TRACE_ERROR("get status called\n");
 	return B_ERROR;
 }

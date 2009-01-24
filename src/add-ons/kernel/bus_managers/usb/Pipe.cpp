@@ -69,6 +69,7 @@ Pipe::CancelQueuedTransfers(bool force)
 status_t
 Pipe::SetFeature(uint16 selector)
 {
+	TRACE("set feature %u\n", selector);
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_SET_FEATURE,
@@ -89,6 +90,7 @@ Pipe::ClearFeature(uint16 selector)
 	if (selector == USB_FEATURE_ENDPOINT_HALT)
 		SetDataToggle(false);
 
+	TRACE("clear feature %u\n", selector);
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
@@ -105,6 +107,7 @@ Pipe::ClearFeature(uint16 selector)
 status_t
 Pipe::GetStatus(uint16 *status)
 {
+	TRACE("get status\n");
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
 		USB_REQUEST_GET_STATUS,
@@ -336,7 +339,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	// The sem will be released unconditionally in the callback after the
 	// result data was filled in. Use a 1 second timeout for control transfers.
 	if (acquire_sem_etc(fNotifySem, 1, B_RELATIVE_TIMEOUT, 1000000) < B_OK) {
-		TRACE_ERROR(("USB ControlPipe: timeout waiting for queued request to complete\n"));
+		TRACE_ERROR("timeout waiting for queued request to complete\n");
 
 		CancelQueuedTransfers(false);
 

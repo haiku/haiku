@@ -10,6 +10,8 @@
 
 #include "ohci.h"
 
+#define USB_MODULE_NAME "ohci roothub"
+
 static usb_device_descriptor sOHCIRootHubDevice =
 {
 	18,								// Descriptor length
@@ -137,7 +139,7 @@ OHCIRootHub::ProcessTransfer(OHCI *ohci, Transfer *transfer)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
-	TRACE(("usb_ohci_roothub: request: %d\n", request->Request));
+	TRACE_MODULE("request: %d\n", request->Request);
 
 	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
@@ -171,12 +173,12 @@ OHCIRootHub::ProcessTransfer(OHCI *ohci, Transfer *transfer)
 				break;
 			}
 
-			TRACE(("usb_ohci_roothub: set address: %d\n", request->Value));
+			TRACE_MODULE("set address: %d\n", request->Value);
 			status = B_OK;
 			break;
 
 		case USB_REQUEST_GET_DESCRIPTOR:
-			TRACE(("usb_ohci_roothub: get descriptor: %d\n", request->Value >> 8));
+			TRACE_MODULE("get descriptor: %d\n", request->Value >> 8);
 
 			switch (request->Value >> 8) {
 				case USB_DESCRIPTOR_DEVICE: {
@@ -230,11 +232,11 @@ OHCIRootHub::ProcessTransfer(OHCI *ohci, Transfer *transfer)
 		case USB_REQUEST_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("usb_ohci_roothub: clear feature: no hub changes\n"));
+				TRACE_MODULE_ERROR("clear feature: no hub changes\n");
 				break;
 			}
 
-			TRACE(("usb_ohci_roothub: clear feature: %d\n", request->Value));
+			TRACE_MODULE("clear feature: %d\n", request->Value);
 			if (ohci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
@@ -243,11 +245,11 @@ OHCIRootHub::ProcessTransfer(OHCI *ohci, Transfer *transfer)
 		case USB_REQUEST_SET_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("usb_ohci_roothub: set feature: no hub changes\n"));
+				TRACE_MODULE_ERROR("set feature: no hub changes\n");
 				break;
 			}
 
-			TRACE(("usb_ohci_roothub: set feature: %d\n", request->Value));
+			TRACE_MODULE("set feature: %d\n", request->Value);
 			if (ohci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;

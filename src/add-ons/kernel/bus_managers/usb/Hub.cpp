@@ -18,14 +18,14 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 			isRootHub),
 		fInterruptPipe(NULL)
 {
-	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));
+	TRACE("creating hub\n");
 
 	memset(&fHubDescriptor, 0, sizeof(fHubDescriptor));
 	for (int32 i = 0; i < USB_MAX_PORT_COUNT; i++)
 		fChildren[i] = NULL;
 
 	if (!fInitOK) {
-		TRACE_ERROR(("USB Hub %d: device failed to initialize\n", DeviceAddress()));
+		TRACE_ERROR("device failed to initialize\n");
 		return;
 	}
 
@@ -33,33 +33,33 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 	fInitOK = false;
 
 	if (fDeviceDescriptor.device_class != 9) {
-		TRACE_ERROR(("USB Hub %d: wrong class! bailing out\n", DeviceAddress()));
+		TRACE_ERROR("wrong class! bailing out\n");
 		return;
 	}
 
-	TRACE(("USB Hub %d: Getting hub descriptor...\n", DeviceAddress()));
+	TRACE("getting hub descriptor...\n");
 	size_t actualLength;
 	status_t status = GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
 		(void *)&fHubDescriptor, sizeof(usb_hub_descriptor), &actualLength);
 
 	// we need at least 8 bytes
 	if (status < B_OK || actualLength < 8) {
-		TRACE_ERROR(("USB Hub %d: Error getting hub descriptor\n", DeviceAddress()));
+		TRACE_ERROR("error getting hub descriptor\n");
 		return;
 	}
 
-	TRACE(("USB Hub %d: hub descriptor (%ld bytes):\n", DeviceAddress(), actualLength));
-	TRACE(("\tlength:..............%d\n", fHubDescriptor.length));
-	TRACE(("\tdescriptor_type:.....0x%02x\n", fHubDescriptor.descriptor_type));
-	TRACE(("\tnum_ports:...........%d\n", fHubDescriptor.num_ports));
-	TRACE(("\tcharacteristics:.....0x%04x\n", fHubDescriptor.characteristics));
-	TRACE(("\tpower_on_to_power_g:.%d\n", fHubDescriptor.power_on_to_power_good));
-	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
-	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
+	TRACE("hub descriptor (%ld bytes):\n", actualLength);
+	TRACE("\tlength:..............%d\n", fHubDescriptor.length);
+	TRACE("\tdescriptor_type:.....0x%02x\n", fHubDescriptor.descriptor_type);
+	TRACE("\tnum_ports:...........%d\n", fHubDescriptor.num_ports);
+	TRACE("\tcharacteristics:.....0x%04x\n", fHubDescriptor.characteristics);
+	TRACE("\tpower_on_to_power_g:.%d\n", fHubDescriptor.power_on_to_power_good);
+	TRACE("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable);
+	TRACE("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask);
 
 	if (fHubDescriptor.num_ports > USB_MAX_PORT_COUNT) {
-		TRACE_ERROR(("USB Hub %d: hub supports more ports than we do (%d vs. %d)\n",
-			DeviceAddress(), fHubDescriptor.num_ports, USB_MAX_PORT_COUNT));
+		TRACE_ALWAYS("hub supports more ports than we do (%d vs. %d)\n",
+			fHubDescriptor.num_ports, USB_MAX_PORT_COUNT);
 		fHubDescriptor.num_ports = USB_MAX_PORT_COUNT;
 	}
 
@@ -70,7 +70,7 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 		fInterruptPipe->QueueInterrupt(fInterruptStatus,
 			sizeof(fInterruptStatus), InterruptCallback, this);
 	} else {
-		TRACE_ERROR(("USB Hub %d: no interrupt pipe found\n", DeviceAddress()));
+		TRACE_ALWAYS("no interrupt pipe found\n");
 	}
 
 	// Wait some time before powering up the ports
@@ -83,14 +83,14 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 			USB_REQUEST_SET_FEATURE, PORT_POWER, i + 1, 0, NULL, 0, NULL);
 
 		if (status < B_OK)
-			TRACE_ERROR(("USB Hub %d: power up failed on port %ld\n", DeviceAddress(), i));
+			TRACE_ERROR("power up failed on port %ld\n", i);
 	}
 
 	// Wait for power to stabilize
 	snooze(fHubDescriptor.power_on_to_power_good * 2000);
 
 	fInitOK = true;
-	TRACE(("USB Hub %d: initialised ok\n", DeviceAddress()));
+	TRACE("initialised ok\n");
 }
 
 
@@ -129,7 +129,7 @@ Hub::UpdatePortStatus(uint8 index)
 		4, &actualLength);
 
 	if (result < B_OK || actualLength < 4) {
-		TRACE_ERROR(("USB Hub %d: error updating port status\n", DeviceAddress()));
+		TRACE_ERROR("error updating port status\n");
 		return B_ERROR;
 	}
 
@@ -160,7 +160,7 @@ Hub::ResetPort(uint8 index)
 	}
 
 	if ((fPortStatus[index].change & C_PORT_RESET) == 0) {
-		TRACE_ERROR(("USB Hub %d: port %d won't reset\n", DeviceAddress(), index));
+		TRACE_ERROR("port %d won't reset\n", index);
 		return B_ERROR;
 	}
 
@@ -172,7 +172,7 @@ Hub::ResetPort(uint8 index)
 
 	// wait for reset recovery
 	snooze(USB_DELAY_PORT_RESET_RECOVERY);
-	TRACE(("USB Hub %d: port %d was reset successfully\n", DeviceAddress(), index));
+	TRACE("port %d was reset successfully\n", index);
 	return B_OK;
 }
 
@@ -197,8 +197,10 @@ Hub::Explore(change_item **changeList)
 
 #ifdef TRACE_USB
 		if (fPortStatus[i].change) {
-			TRACE(("USB Hub %d: port %ld: status: 0x%04x; change: 0x%04x\n", DeviceAddress(), i, fPortStatus[i].status, fPortStatus[i].change));
-			TRACE(("USB Hub %d: device at port %ld: 0x%08lx\n", DeviceAddress(), i, fChildren[i]));
+			TRACE("port %ld: status: 0x%04x; change: 0x%04x\n", i,
+				fPortStatus[i].status, fPortStatus[i].change);
+			TRACE("device at port %ld: %p (%ld)\n", i, fChildren[i],
+				fChildren[i] != NULL ? fChildren[i]->USBID() : 0);
 		}
 #endif
 
@@ -210,7 +212,7 @@ Hub::Explore(change_item **changeList)
 
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!
-				TRACE(("USB Hub %d: new device connected\n", DeviceAddress()));
+				TRACE_ALWAYS("port %ld: new device connected\n", i);
 
 				// wait some time for the device to power up
 				snooze(USB_DELAY_DEVICE_POWER_UP);
@@ -218,7 +220,7 @@ Hub::Explore(change_item **changeList)
 				// reset the port, this will also enable it
 				result = ResetPort(i);
 				if (result < B_OK) {
-					TRACE_ERROR(("USB Hub %d: resetting port %ld failed\n", DeviceAddress(), i));
+					TRACE_ERROR("resetting port %ld failed\n", i);
 					continue;
 				}
 
@@ -228,12 +230,12 @@ Hub::Explore(change_item **changeList)
 
 				if ((fPortStatus[i].status & PORT_STATUS_CONNECTION) == 0) {
 					// device has vanished after reset, ignore
-					TRACE(("USB Hub %d: device disappeared on reset\n", DeviceAddress()));
+					TRACE("device disappeared on reset\n");
 					continue;
 				}
 
-				if (fChildren[i]) {
-					TRACE_ERROR(("USB Hub %d: new device on a port that is already in use\n", DeviceAddress()));
+				if (fChildren[i] != NULL) {
+					TRACE_ERROR("new device on a port that is already in use\n");
 					fChildren[i]->Changed(changeList, false);
 					fChildren[i] = NULL;
 				}
@@ -251,7 +253,7 @@ Hub::Explore(change_item **changeList)
 				int8 hubAddress = HubAddress();
 				uint8 hubPort = HubPort();
 				if (Speed() == USB_SPEED_HIGHSPEED) {
-					hubAddress = DeviceAddress();
+					hubAddress = USBID();
 					hubPort = i + 1;
 				}
 
@@ -269,9 +271,9 @@ Hub::Explore(change_item **changeList)
 				}
 			} else {
 				// Device removed...
-				TRACE(("USB Hub %d: device removed\n", DeviceAddress()));
-				if (fChildren[i]) {
-					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
+				TRACE_ALWAYS("port %ld: device removed\n", i);
+				if (fChildren[i] != NULL) {
+					TRACE("removing device %p\n", fChildren[i]);
 					fChildren[i]->Changed(changeList, false);
 					fChildren[i] = NULL;
 				}
@@ -280,28 +282,28 @@ Hub::Explore(change_item **changeList)
 
 		// other port changes we do not really handle, report and clear them
 		if (fPortStatus[i].change & PORT_STATUS_ENABLE) {
-			TRACE_ERROR(("USB Hub %d: port %ld %sabled\n", DeviceAddress(), i, (fPortStatus[i].status & PORT_STATUS_ENABLE) ? "en" : "dis"));
+			TRACE_ALWAYS("port %ld %sabled\n", i, (fPortStatus[i].status & PORT_STATUS_ENABLE) ? "en" : "dis");
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_ENABLE, i + 1,
 				0, NULL, 0, NULL);
 		}
 
 		if (fPortStatus[i].change & PORT_STATUS_SUSPEND) {
-			TRACE_ERROR(("USB Hub %d: port %ld is %ssuspended\n", DeviceAddress(), i, (fPortStatus[i].status & PORT_STATUS_SUSPEND) ? "" : "not "));
+			TRACE_ALWAYS("port %ld is %ssuspended\n", i, (fPortStatus[i].status & PORT_STATUS_SUSPEND) ? "" : "not ");
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_SUSPEND, i + 1,
 				0, NULL, 0, NULL);
 		}
 
 		if (fPortStatus[i].change & PORT_STATUS_OVER_CURRENT) {
-			TRACE_ERROR(("USB Hub %d: port %ld is %sin an over current state\n", DeviceAddress(), i, (fPortStatus[i].status & PORT_STATUS_OVER_CURRENT) ? "" : "not "));
+			TRACE_ALWAYS("port %ld is %sin an over current state\n", i, (fPortStatus[i].status & PORT_STATUS_OVER_CURRENT) ? "" : "not ");
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_OVER_CURRENT, i + 1,
 				0, NULL, 0, NULL);
 		}
 
 		if (fPortStatus[i].change & PORT_RESET) {
-			TRACE_ERROR(("USB Hub %d: port %ld was reset\n", DeviceAddress(), i));
+			TRACE_ALWAYS("port %ld was reset\n", i);
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, i + 1,
 				0, NULL, 0, NULL);
@@ -322,7 +324,7 @@ void
 Hub::InterruptCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
-	TRACE(("USB Hub %d: interrupt callback!\n", ((Hub *)data)->DeviceAddress()));
+	TRACE_STATIC((Hub *)cookie, "interrupt callback!\n");
 }
 
 
@@ -347,7 +349,7 @@ Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
 	usb_driver_cookie **cookies, bool added, bool recursive)
 {
-	TRACE(("USB Hub %d: reporting hub\n", DeviceAddress()));
+	TRACE("reporting hub\n");
 
 	// Report ourselfs first
 	status_t result = Device::ReportDevice(supportDescriptors,

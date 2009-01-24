@@ -13,6 +13,8 @@
 
 #include "ehci.h"
 
+#define USB_MODULE_NAME	"ehci"
+
 pci_module_info *EHCI::sPCIModule = NULL;
 
 
@@ -21,10 +23,10 @@ ehci_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			TRACE(("usb_ehci_module: init module\n"));
+			TRACE_MODULE("ehci init module\n");
 			return B_OK;
 		case B_MODULE_UNINIT:
-			TRACE(("usb_ehci_module: uninit module\n"));
+			TRACE_MODULE("ehci uninit module\n");
 			return B_OK;
 	}
 
@@ -124,11 +126,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPortSuspendChange(0)
 {
 	if (BusManager::InitCheck() < B_OK) {
-		TRACE_ERROR(("usb_ehci: bus manager failed to init\n"));
+		TRACE_ERROR("bus manager failed to init\n");
 		return;
 	}
 
-	TRACE(("usb_ehci: constructing new EHCI Host Controller Driver\n"));
+	TRACE("constructing new EHCI host controller driver\n");
 	fInitOK = false;
 
 	// enable busmaster and memory mapped access
@@ -146,23 +148,26 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
 		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE(("usb_ehci: map physical memory 0x%08lx (base: 0x%08lx; offset: %lx); size: %ld\n", fPCIInfo->u.h0.base_registers[0], physicalAddress, offset, fPCIInfo->u.h0.base_register_sizes[0]));
+	TRACE("map physical memory 0x%08lx (base: 0x%08lx; offset: %lx); size: %ld\n",
+		fPCIInfo->u.h0.base_registers[0], physicalAddress, offset,
+		fPCIInfo->u.h0.base_register_sizes[0]);
+
 	fRegisterArea = map_physical_memory("EHCI memory mapped registers",
 		(void *)physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
 		(void **)&fCapabilityRegisters);
 	if (fRegisterArea < B_OK) {
-		TRACE(("usb_ehci: failed to map register memory\n"));
+		TRACE("failed to map register memory\n");
 		return;
 	}
 
 	fCapabilityRegisters += offset;
 	fOperationalRegisters = fCapabilityRegisters + ReadCapReg8(EHCI_CAPLENGTH);
-	TRACE(("usb_ehci: mapped capability registers: 0x%08lx\n", (uint32)fCapabilityRegisters));
-	TRACE(("usb_ehci: mapped operational registers: 0x%08lx\n", (uint32)fOperationalRegisters));
+	TRACE("mapped capability registers: 0x%08lx\n", (uint32)fCapabilityRegisters);
+	TRACE("mapped operational registers: 0x%08lx\n", (uint32)fOperationalRegisters);
 
-	TRACE(("usb_ehci: structural parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCSPARAMS)));
-	TRACE(("usb_ehci: capability parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCCPARAMS)));
+	TRACE("structural parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCSPARAMS));
+	TRACE("capability parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCCPARAMS));
 
 	// read port count from capability register
 	fPortCount = ReadCapReg32(EHCI_HCSPARAMS) & 0x0f;
@@ -170,15 +175,15 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	uint32 extendedCapPointer = ReadCapReg32(EHCI_HCCPARAMS) >> EHCI_ECP_SHIFT;
 	extendedCapPointer &= EHCI_ECP_MASK;
 	if (extendedCapPointer > 0) {
-		TRACE(("usb_ehci: extended capabilities register at %ld\n", extendedCapPointer));
+		TRACE("extended capabilities register at %ld\n", extendedCapPointer);
 
 		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 		if ((legacySupport & EHCI_LEGSUP_CAPID_MASK) == EHCI_LEGSUP_CAPID) {
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED)
-				dprintf("usb_ehci: the host controller is bios owned\n");
+				TRACE_ALWAYS("the host controller is bios owned\n");
 
-			dprintf("usb_ehci: claiming ownership of the host controller\n");
+			TRACE_ALWAYS("claiming ownership of the host controller\n");
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function, extendedCapPointer + 3, 1, 1);
 
@@ -187,14 +192,14 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 					fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 
 				if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-					dprintf("usb_ehci: controller is still bios owned, waiting\n");
+					TRACE_ALWAYS("controller is still bios owned, waiting\n");
 					snooze(50000);
 				} else
 					break;
 			}
 
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-				TRACE_ERROR(("usb_ehci: bios won't give up control over the host controller (ignoring)\n"));
+				TRACE_ERROR("bios won't give up control over the host controller (ignoring)\n");
 
 				// turn off the BIOS owned flag, clear all SMIs and continue
 				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
@@ -202,13 +207,13 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 					fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
-				dprintf("usb_ehci: successfully took ownership of the host controller\n");
+				TRACE_ALWAYS("successfully took ownership of the host controller\n");
 			}
 		} else {
-			TRACE(("usb_ehci: extended capability is not a legacy support register\n"));
+			TRACE("extended capability is not a legacy support register\n");
 		}
 	} else {
-		TRACE(("usb_ehci: no extended capabilities register\n"));
+		TRACE("no extended capabilities register\n");
 	}
 
 	// disable interrupts
@@ -216,7 +221,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	// reset the host controller
 	if (ControllerReset() < B_OK) {
-		TRACE_ERROR(("usb_ehci: host controller failed to reset\n"));
+		TRACE_ERROR("host controller failed to reset\n");
 		return;
 	}
 
@@ -229,7 +234,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fCleanupSem = create_sem(0, "EHCI Cleanup");
 	if (fFinishTransfersSem < B_OK || fAsyncAdvanceSem < B_OK
 		|| fCleanupSem < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to create semaphores\n"));
+		TRACE_ERROR("failed to create semaphores\n");
 		return;
 	}
 
@@ -254,7 +259,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
 		(void **)&physicalAddress, B_PAGE_SIZE * 2, "USB EHCI Periodic Framelist");
 	if (fPeriodicFrameListArea < B_OK) {
-		TRACE_ERROR(("usb_ehci: unable to allocate periodic framelist\n"));
+		TRACE_ERROR("unable to allocate periodic framelist\n");
 		return;
 	}
 
@@ -262,7 +267,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	WriteOpReg(EHCI_PERIODICLISTBASE, (uint32)physicalAddress);
 
 	// create the interrupt entries to support different polling intervals
-	TRACE(("usb_ehci: creating interrupt entries\n"));
+	TRACE("creating interrupt entries\n");
 	addr_t physicalBase = physicalAddress + B_PAGE_SIZE;
 	uint8 *logicalBase = (uint8 *)fPeriodicFrameList + B_PAGE_SIZE;
 	memset(logicalBase, 0, B_PAGE_SIZE);
@@ -287,7 +292,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	}
 
 	// build flat interrupt tree
-	TRACE(("usb_ehci: build up interrupt links\n"));
+	TRACE("build up interrupt links\n");
 	uint32 interval = 1024;
 	uint32 intervalIndex = 10;
 	while (interval > 1) {
@@ -320,7 +325,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// allocate a queue head that will always stay in the async frame list
 	fAsyncQueueHead = CreateQueueHead();
 	if (!fAsyncQueueHead) {
-		TRACE_ERROR(("usb_ehci: unable to allocate stray async queue head\n"));
+		TRACE_ERROR("unable to allocate stray async queue head\n");
 		return;
 	}
 
@@ -334,16 +339,16 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	WriteOpReg(EHCI_ASYNCLISTADDR, (uint32)fAsyncQueueHead->this_phy
 		| EHCI_QH_TYPE_QH);
-	TRACE(("usb_ehci: set the async list addr to 0x%08lx\n", ReadOpReg(EHCI_ASYNCLISTADDR)));
+	TRACE("set the async list addr to 0x%08lx\n", ReadOpReg(EHCI_ASYNCLISTADDR));
 
 	fInitOK = true;
-	TRACE(("usb_ehci: EHCI Host Controller Driver constructed\n"));
+	TRACE("EHCI host controller driver constructed\n");
 }
 
 
 EHCI::~EHCI()
 {
-	TRACE(("usb_ehci: tear down EHCI Host Controller Driver\n"));
+	TRACE("tear down EHCI host controller driver\n");
 
 	WriteOpReg(EHCI_USBCMD, 0);
 	WriteOpReg(EHCI_CONFIGFLAG, 0);
@@ -366,8 +371,8 @@ EHCI::~EHCI()
 status_t
 EHCI::Start()
 {
-	TRACE(("usb_ehci: starting EHCI Host Controller\n"));
-	TRACE(("usb_ehci: usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS)));
+	TRACE("starting EHCI host controller\n");
+	TRACE("usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD), ReadOpReg(EHCI_USBSTS));
 
 	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
@@ -379,7 +384,7 @@ EHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint32 status = ReadOpReg(EHCI_USBSTS);
-		TRACE(("usb_ehci: try %ld: status 0x%08lx\n", i, status));
+		TRACE("try %ld: status 0x%08lx\n", i, status);
 
 		if (status & EHCI_USBSTS_HCHALTED) {
 			snooze(10000);
@@ -390,7 +395,7 @@ EHCI::Start()
 	}
 
 	if (!running) {
-		TRACE(("usb_ehci: Host Controller didn't start\n"));
+		TRACE("host controller didn't start\n");
 		return B_ERROR;
 	}
 
@@ -401,17 +406,17 @@ EHCI::Start()
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) EHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
-		TRACE_ERROR(("usb_ehci: no memory to allocate root hub\n"));
+		TRACE_ERROR("no memory to allocate root hub\n");
 		return B_NO_MEMORY;
 	}
 
 	if (fRootHub->InitCheck() < B_OK) {
-		TRACE_ERROR(("usb_ehci: root hub failed init check\n"));
+		TRACE_ERROR("root hub failed init check\n");
 		return fRootHub->InitCheck();
 	}
 
 	SetRootHub(fRootHub);
-	dprintf("usb_ehci: successfully started the controller\n");
+	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
 }
 
@@ -431,13 +436,13 @@ EHCI::SubmitTransfer(Transfer *transfer)
 
 	ehci_qh *queueHead = CreateQueueHead();
 	if (!queueHead) {
-		TRACE_ERROR(("usb_ehci: failed to allocate queue head\n"));
+		TRACE_ERROR("failed to allocate queue head\n");
 		return B_NO_MEMORY;
 	}
 
 	status_t result = InitQueueHead(queueHead, pipe);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to init queue head\n"));
+		TRACE_ERROR("failed to init queue head\n");
 		FreeQueueHead(queueHead);
 		return result;
 	}
@@ -453,20 +458,20 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	}
 
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to fill transfer queue with data\n"));
+		TRACE_ERROR("failed to fill transfer queue with data\n");
 		FreeQueueHead(queueHead);
 		return result;
 	}
 
 	result = AddPendingTransfer(transfer, queueHead, dataDescriptor, directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to add pending transfer\n"));
+		TRACE_ERROR("failed to add pending transfer\n");
 		FreeQueueHead(queueHead);
 		return result;
 	}
 
 #ifdef TRACE_USB
-	TRACE(("usb_ehci: linking queue\n"));
+	TRACE("linking queue\n");
 	print_queue(queueHead);
 #endif
 
@@ -476,7 +481,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 		result = LinkQueueHead(queueHead);
 
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to link queue head\n"));
+		TRACE_ERROR("failed to link queue head\n");
 		FreeQueueHead(queueHead);
 		return result;
 	}
@@ -488,7 +493,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 status_t
 EHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
-	TRACE(("usb_ehci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
+	TRACE("pipe change %d for pipe %p\n", change, pipe);
 	switch (change) {
 		case USB_CHANGE_CREATED:
 		case USB_CHANGE_DESTROYED: {
@@ -521,12 +526,12 @@ EHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_ERROR(("usb_ehci: getting pci module failed! 0x%08lx\n", status));
+			TRACE_MODULE_ERROR("getting pci module failed! 0x%08lx\n", status);
 			return status;
 		}
 	}
 
-	TRACE(("usb_ehci: searching devices\n"));
+	TRACE_MODULE("searching devices\n");
 	bool found = false;
 	pci_info *item = new(std::nothrow) pci_info;
 	if (!item) {
@@ -540,11 +545,11 @@ EHCI::AddTo(Stack *stack)
 			&& item->class_api == PCI_usb_ehci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_ERROR(("usb_ehci: found device with invalid IRQ - check IRQ assignement\n"));
+				TRACE_MODULE_ERROR("found device with invalid IRQ - check IRQ assignement\n");
 				continue;
 			}
 
-			TRACE(("usb_ehci: found device at IRQ %u\n", item->u.h0.interrupt_line));
+			TRACE_MODULE("found device at IRQ %u\n", item->u.h0.interrupt_line);
 			EHCI *bus = new(std::nothrow) EHCI(item, stack);
 			if (!bus) {
 				delete item;
@@ -554,7 +559,7 @@ EHCI::AddTo(Stack *stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_ehci: bus failed init check\n"));
+				TRACE_MODULE_ERROR("bus failed init check\n");
 				delete bus;
 				continue;
 			}
@@ -569,7 +574,7 @@ EHCI::AddTo(Stack *stack)
 	}
 
 	if (!found) {
-		TRACE_ERROR(("usb_ehci: no devices found\n"));
+		TRACE_MODULE_ERROR("no devices found\n");
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
@@ -697,12 +702,12 @@ EHCI::ClearPortFeature(uint8 index, uint16 feature)
 status_t
 EHCI::ResetPort(uint8 index)
 {
-	TRACE(("usb_ehci: reset port %d\n", index));
+	TRACE("reset port %d\n", index);
 	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
 	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
 
 	if (portStatus & EHCI_PORTSC_DMINUS) {
-		dprintf("usb_ehci: lowspeed device connected, giving up port ownership\n");
+		TRACE_ALWAYS("lowspeed device connected, giving up port ownership\n");
 		// there is a lowspeed device connected.
 		// we give the ownership to a companion controller.
 		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
@@ -721,12 +726,12 @@ EHCI::ResetPort(uint8 index)
 
 	portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
 	if (portStatus & EHCI_PORTSC_PORTRESET) {
-		TRACE_ERROR(("usb_ehci: port reset won't complete\n"));
+		TRACE_ERROR("port reset won't complete\n");
 		return B_ERROR;
 	}
 
 	if ((portStatus & EHCI_PORTSC_ENABLE) == 0) {
-		dprintf("usb_ehci: fullspeed device connected, giving up port ownership\n");
+		TRACE_ALWAYS("fullspeed device connected, giving up port ownership\n");
 		// the port was not enabled, this means that no high speed device is
 		// attached to this port. we give up ownership to a companion controler
 		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
@@ -802,33 +807,33 @@ EHCI::Interrupt()
 	int32 result = B_HANDLED_INTERRUPT;
 
 	if (status & EHCI_USBSTS_USBINT) {
-		TRACE(("usb_ehci: transfer finished\n"));
+		TRACE("transfer finished\n");
 		acknowledge |= EHCI_USBSTS_USBINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & EHCI_USBSTS_USBERRINT) {
-		TRACE(("usb_ehci: transfer error\n"));
+		TRACE("transfer error\n");
 		acknowledge |= EHCI_USBSTS_USBERRINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & EHCI_USBSTS_PORTCHANGE) {
-		TRACE(("usb_ehci: port change detected\n"));
+		TRACE("port change detected\n");
 		acknowledge |= EHCI_USBSTS_PORTCHANGE;
 	}
 
 	if (status & EHCI_USBSTS_INTONAA) {
-		TRACE(("usb_ehci: interrupt on async advance\n"));
+		TRACE("interrupt on async advance\n");
 		acknowledge |= EHCI_USBSTS_INTONAA;
 		asyncAdvance = true;
 		result = B_INVOKE_SCHEDULER;
 	}
 
 	if (status & EHCI_USBSTS_HOSTSYSERR) {
-		TRACE_ERROR(("usb_ehci: host system error!\n"));
+		TRACE_ERROR("host system error!\n");
 		acknowledge |= EHCI_USBSTS_HOSTSYSERR;
 	}
 
@@ -989,7 +994,7 @@ EHCI::FinishTransfers()
 		if (!Lock())
 			continue;
 
-		TRACE(("usb_ehci: finishing transfers\n"));
+		TRACE("finishing transfers\n");
 		transfer_data *lastTransfer = NULL;
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
@@ -1003,13 +1008,13 @@ EHCI::FinishTransfers()
 				uint32 status = descriptor->token;
 				if (status & EHCI_QTD_STATUS_ACTIVE) {
 					// still in progress
-					TRACE(("usb_ehci: qtd (0x%08lx) still active\n", descriptor->this_phy));
+					TRACE("qtd (0x%08lx) still active\n", descriptor->this_phy);
 					break;
 				}
 
 				if (status & EHCI_QTD_STATUS_ERRMASK) {
 					// a transfer error occured
-					TRACE_ERROR(("usb_ehci: qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
+					TRACE_ERROR("qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status);
 
 					uint8 errorCount = status >> EHCI_QTD_ERRCOUNT_SHIFT;
 					errorCount &= EHCI_QTD_ERRCOUNT_MASK;
@@ -1043,7 +1048,7 @@ EHCI::FinishTransfers()
 
 				if (descriptor->next_phy & EHCI_QTD_TERMINATE) {
 					// we arrived at the last (stray) descriptor, we're done
-					TRACE(("usb_ehci: qtd (0x%08lx) done\n", descriptor->this_phy));
+					TRACE("qtd (0x%08lx) done\n", descriptor->this_phy);
 					callbackStatus = B_OK;
 					transferDone = true;
 					break;
@@ -1188,7 +1193,7 @@ EHCI::CreateQueueHead()
 	void *physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_qh)) < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to allocate queue head\n"));
+		TRACE_ERROR("failed to allocate queue head\n");
 		return NULL;
 	}
 
@@ -1199,7 +1204,7 @@ EHCI::CreateQueueHead()
 
 	ehci_qtd *descriptor = CreateDescriptor(0, 0);
 	if (!descriptor) {
-		TRACE_ERROR(("usb_ehci: failed to allocate initial qtd for queue head\n"));
+		TRACE_ERROR("failed to allocate initial qtd for queue head\n");
 		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(ehci_qh));
 		return NULL;
 	}
@@ -1234,7 +1239,7 @@ EHCI::InitQueueHead(ehci_qh *queueHead, Pipe *pipe)
 			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_HIGH;
 			break;
 		default:
-			TRACE_ERROR(("usb_ehci: unknown pipe speed\n"));
+			TRACE_ERROR("unknown pipe speed\n");
 			return B_ERROR;
 	}
 
@@ -1377,7 +1382,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 		directionIn ? EHCI_QTD_PID_OUT : EHCI_QTD_PID_IN);
 
 	if (!setupDescriptor || !statusDescriptor) {
-		TRACE_ERROR(("usb_ehci: failed to allocate descriptors\n"));
+		TRACE_ERROR("failed to allocate descriptors\n");
 		FreeDescriptor(setupDescriptor);
 		FreeDescriptor(statusDescriptor);
 		return B_NO_MEMORY;
@@ -1467,7 +1472,7 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 	void *physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_qtd)) < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to allocate a qtd\n"));
+		TRACE_ERROR("failed to allocate a qtd\n");
 		return NULL;
 	}
 
@@ -1493,7 +1498,7 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 
 	if (fStack->AllocateChunk(&result->buffer_log, &physicalAddress,
 		bufferSize) < B_OK) {
-		TRACE_ERROR(("usb_ehci: unable to allocate qtd buffer\n"));
+		TRACE_ERROR("unable to allocate qtd buffer\n");
 		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(ehci_qtd));
 		return NULL;
 	}
@@ -1621,7 +1626,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ehci: wrote descriptor chain (%ld bytes, no more vectors)\n", actualLength));
+					TRACE("wrote descriptor chain (%ld bytes, no more vectors)\n", actualLength);
 					return actualLength;
 				}
 
@@ -1640,7 +1645,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: wrote descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("wrote descriptor chain (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -1677,7 +1682,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_ehci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
+					TRACE("read descriptor chain (%ld bytes, no more vectors)\n", actualLength);
 					*nextDataToggle = dataToggle > 0 ? true : false;
 					return actualLength;
 				}
@@ -1697,7 +1702,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, iovec *vector,
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: read descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("read descriptor chain (%ld bytes)\n", actualLength);
 	*nextDataToggle = dataToggle > 0 ? true : false;
 	return actualLength;
 }
@@ -1722,7 +1727,7 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, bool *nextDataToggle)
 		current = (ehci_qtd *)current->next_log;
 	}
 
-	TRACE(("usb_ehci: read actual length (%ld bytes)\n", actualLength));
+	TRACE("read actual length (%ld bytes)\n", actualLength);
 	*nextDataToggle = dataToggle > 0 ? true : false;
 	return actualLength;
 }

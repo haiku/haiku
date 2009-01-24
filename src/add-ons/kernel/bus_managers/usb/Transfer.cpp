@@ -71,7 +71,7 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 	// Calculate the bandwidth (only if it is not a bulk transfer)
 	if (!(fPipe->Type() & USB_OBJECT_BULK_PIPE)) {
 		if (_CalculateBandwidth() < B_OK)
-			TRACE_ERROR(("USB Transfer: can't calculate bandwidth\n"));
+			TRACE_ERROR("can't calculate bandwidth\n");
 	}
 }
 
@@ -135,8 +135,7 @@ Transfer::InitKernelAccess()
 		if (IS_USER_ADDRESS(vector[i].iov_base)) {
 			fUserArea = area_for(vector[i].iov_base);
 			if (fUserArea < B_OK) {
-				TRACE_ERROR(("USB Transfer: failed to find area for user"
-					" space buffer!\n"));
+				TRACE_ERROR("failed to find area for user space buffer!\n");
 				return B_BAD_ADDRESS;
 			}
 			break;
@@ -149,7 +148,7 @@ Transfer::InitKernelAccess()
 
 	area_info areaInfo;
 	if (fUserArea < B_OK || get_area_info(fUserArea, &areaInfo) < B_OK) {
-		TRACE_ERROR(("USB Transfer: couldn't get user area info\n"));
+		TRACE_ERROR("couldn't get user area info\n");
 		return B_BAD_ADDRESS;
 	}
 
@@ -158,7 +157,7 @@ Transfer::InitKernelAccess()
 
 		if ((size_t)vector[i].iov_base > areaInfo.size
 			|| (size_t)vector[i].iov_base + vector[i].iov_len > areaInfo.size) {
-			TRACE_ERROR(("USB Transfer: data buffer spans across multiple areas!\n"));
+			TRACE_ERROR("data buffer spans across multiple areas!\n");
 			return B_BAD_ADDRESS;
 		}
 	}
@@ -264,7 +263,7 @@ Transfer::_CalculateBandwidth()
 
 		default:
 			// We should never get here
-			TRACE(("USB Transfer: speed unknown"));
+			TRACE("speed unknown");
 			return B_ERROR;
 	}
 

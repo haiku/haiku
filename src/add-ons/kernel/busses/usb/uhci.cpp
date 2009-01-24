@@ -15,6 +15,8 @@
 
 #include "uhci.h"
 
+#define USB_MODULE_NAME "uhci"
+
 pci_module_info *UHCI::sPCIModule = NULL;
 
 
@@ -23,10 +25,10 @@ uhci_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			TRACE(("usb_uhci_module: init module\n"));
+			TRACE_MODULE("init module\n");
 			return B_OK;
 		case B_MODULE_UNINIT:
-			TRACE(("usb_uhci_module: uninit module\n"));
+			TRACE_MODULE("uninit module\n");
 			break;
 		default:
 			return EINVAL;
@@ -166,7 +168,7 @@ Queue::TerminateByStrayDescriptor()
 	status_t result = fStack->AllocateChunk((void **)&fStrayDescriptor,
 		&physicalAddress, sizeof(uhci_td));
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to allocate a stray transfer descriptor\n"));
+		TRACE_ERROR("failed to allocate a stray transfer descriptor\n");
 		return result;
 	}
 
@@ -271,7 +273,7 @@ void
 Queue::PrintToStream()
 {
 #ifdef TRACE_USB
-	dprintf("USB UHCI Queue:\n");
+	TRACE("queue:\n");
 	dprintf("link phy: 0x%08lx; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
 	dprintf("elem phy: 0x%08lx; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
 #endif
@@ -310,21 +312,21 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fPortResetChange(0)
 {
 	if (!fInitOK) {
-		TRACE_ERROR(("usb_uhci: bus manager failed to init\n"));
+		TRACE_ERROR("bus manager failed to init\n");
 		return;
 	}
 
-	TRACE(("usb_uhci: constructing new UHCI Host Controller Driver\n"));
+	TRACE("constructing new UHCI host controller driver\n");
 	fInitOK = false;
 
 	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
 	fRegisterBase &= PCI_address_io_mask;
-	TRACE(("usb_uhci: iospace offset: 0x%08lx\n", fRegisterBase));
+	TRACE("iospace offset: 0x%08lx\n", fRegisterBase);
 
 	if (fRegisterBase == 0) {
 		fRegisterBase = fPCIInfo->u.h0.base_registers[0];
-		TRACE_ERROR(("usb_uhci: register base: 0x%08lx\n", fRegisterBase));
+		TRACE_ALWAYS("register base: 0x%08lx\n", fRegisterBase);
 	}
 
 	// enable pci address access
@@ -346,7 +348,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// do a global and host reset
 	GlobalReset();
 	if (ControllerReset() < B_OK) {
-		TRACE_ERROR(("usb_uhci: host failed to reset\n"));
+		TRACE_ERROR("host failed to reset\n");
 		return;
 	}
 
@@ -356,7 +358,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		(void **)&physicalAddress, 4096, "USB UHCI framelist");
 
 	if (fFrameArea < B_OK) {
-		TRACE_ERROR(("usb_uhci: unable to create an area for the frame pointer list\n"));
+		TRACE_ERROR("unable to create an area for the frame pointer list\n");
 		return;
 	}
 
@@ -383,7 +385,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < fQueueCount; i++) {
 		fQueues[i] = new(std::nothrow) Queue(fStack);
 		if (!fQueues[i] || fQueues[i]->InitCheck() < B_OK) {
-			TRACE_ERROR(("usb_uhci: cannot create queues\n"));
+			TRACE_ERROR("cannot create queues\n");
 			delete_area(fFrameArea);
 			return;
 		}
@@ -401,12 +403,13 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// Create lists for managing isochronous transfer descriptors
 	fFirstIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
 	if (!fFirstIsochronousDescriptor) {
-		TRACE_ERROR(("usb_uhci: cannot allocate memory\n"));
+		TRACE_ERROR("faild to allocate memory for first isochronous descriptor\n");
 		return;
 	}
+
 	fLastIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
 	if (!fLastIsochronousDescriptor) {
-		TRACE_ERROR(("usb_uhci: cannot allocate memory\n"));
+		TRACE_ERROR("failed to allocate memory for last isochronous descriptor\n");
 		delete [] fFirstIsochronousDescriptor;
 		return;
 	}
@@ -422,7 +425,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// Create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "UHCI Finish Transfers");
 	if (fFinishTransfersSem < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to create semaphore\n"));
+		TRACE_ERROR("failed to create finisher semaphore\n");
 		return;
 	}
 
@@ -438,7 +441,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	fFinishIsochronousTransfersSem = create_sem(0,
 		"UHCI Isochronous Finish Transfers");
 	if (fFinishIsochronousTransfersSem < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to create semaphore\n"));
+		TRACE_ERROR("failed to create isochronous finisher semaphore\n");
 		return;
 	}
 
@@ -449,7 +452,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	resume_thread(fFinishIsochronousThread);
 
 	// Install the interrupt handler
-	TRACE(("usb_uhci: installing interrupt handler\n"));
+	TRACE("installing interrupt handler\n");
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
 
@@ -459,7 +462,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_IOC
 		| UHCI_USBINTR_SHORT);
 
-	TRACE(("usb_uhci: UHCI Host Controller Driver constructed\n"));
+	TRACE("UHCI host controller driver constructed\n");
 	fInitOK = true;
 }
 
@@ -513,9 +516,9 @@ status_t
 UHCI::Start()
 {
 	// Start the host controller, then start the Busmanager
-	TRACE(("usb_uhci: starting UHCI BusManager\n"));
-	TRACE(("usb_uhci: usbcmd reg 0x%04x, usbsts reg 0x%04x\n",
-		ReadReg16(UHCI_USBCMD), ReadReg16(UHCI_USBSTS)));
+	TRACE("starting UHCI BusManager\n");
+	TRACE("usbcmd reg 0x%04x, usbsts reg 0x%04x\n",
+		ReadReg16(UHCI_USBCMD), ReadReg16(UHCI_USBSTS));
 
 	// Set the run bit in the command register
 	WriteReg16(UHCI_USBCMD, ReadReg16(UHCI_USBCMD) | UHCI_USBCMD_RS);
@@ -523,7 +526,7 @@ UHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint16 status = ReadReg16(UHCI_USBSTS);
-		TRACE(("usb_uhci: current loop %ld, status 0x%04x\n", i, status));
+		TRACE("current loop %ld, status 0x%04x\n", i, status);
 
 		if (status & UHCI_USBSTS_HCHALT)
 			snooze(10000);
@@ -534,28 +537,28 @@ UHCI::Start()
 	}
 
 	if (!running) {
-		TRACE_ERROR(("usb_uhci: controller won't start running\n"));
+		TRACE_ERROR("controller won't start running\n");
 		return B_ERROR;
 	}
 
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) UHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
-		TRACE_ERROR(("usb_uhci: no memory to allocate root hub\n"));
+		TRACE_ERROR("no memory to allocate root hub\n");
 		return B_NO_MEMORY;
 	}
 
 	if (fRootHub->InitCheck() < B_OK) {
-		TRACE_ERROR(("usb_uhci: root hub failed init check\n"));
+		TRACE_ERROR("root hub failed init check\n");
 		delete fRootHub;
 		return B_ERROR;
 	}
 
 	SetRootHub(fRootHub);
 
-	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
-		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
-	dprintf("usb_uhci: successfully started the controller\n");
+	TRACE("controller is started. status: %u curframe: %u\n",
+		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM));
+	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
 }
 
@@ -568,8 +571,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (pipe->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
-	TRACE(("usb_uhci: submit transfer called for device %d\n",
-		pipe->DeviceAddress()));
+	TRACE("submit transfer called for device %d\n", pipe->DeviceAddress());
 	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
@@ -594,7 +596,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	result = AddPendingTransfer(transfer, queue, transferQueue,
 		firstDescriptor, firstDescriptor, directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to add pending transfer\n"));
+		TRACE_ERROR("failed to add pending transfer\n");
 		FreeDescriptorChain(firstDescriptor);
 		FreeTransferQueue(transferQueue);
 		return result;
@@ -689,7 +691,7 @@ UHCI::CancelQueuedIsochronousTransfers(Pipe *pipe, bool force)
 		current = current->link;
 	}
 
-	TRACE_ERROR(("usb_uhci: no isochronous transfer found!\n"));
+	TRACE_ERROR("no isochronous transfer found!\n");
 	return B_ERROR;
 }
 
@@ -708,7 +710,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 		directionIn ? TD_TOKEN_OUT : TD_TOKEN_IN, 0);
 
 	if (!setupDescriptor || !statusDescriptor) {
-		TRACE_ERROR(("usb_uhci: failed to allocate descriptors\n"));
+		TRACE_ERROR("failed to allocate descriptors\n");
 		FreeDescriptor(setupDescriptor);
 		FreeDescriptor(statusDescriptor);
 		return B_NO_MEMORY;
@@ -759,7 +761,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 	status_t result = AddPendingTransfer(transfer, queue, transferQueue,
 		setupDescriptor, dataDescriptor, directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to add pending transfer\n"));
+		TRACE_ERROR("failed to add pending transfer\n");
 		FreeDescriptorChain(setupDescriptor);
 		FreeTransferQueue(transferQueue);
 		return result;
@@ -867,8 +869,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	uint16 currentFrame;
 
 	if (packetSize > pipe->MaxPacketSize()) {
-		TRACE_ERROR(("usb_uhci: isochronous packetSize is bigger"
-			" than pipe MaxPacketSize\n"));
+		TRACE_ERROR("isochronous packetSize is bigger than pipe MaxPacketSize\n");
 		return B_BAD_VALUE;
 	}
 
@@ -876,8 +877,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	// The overhead is not worthy.
 	uint16 bandwidth = transfer->Bandwidth() / isochronousData->packet_count;
 
-	TRACE(("usb_uhci: isochronous transfer descriptor bandwdith = %d\n",
-		bandwidth));
+	TRACE("isochronous transfer descriptor bandwdith %d\n", bandwidth);
 
 	// The following holds the list of transfer descriptor of the
 	// isochronous request. It is used to quickly remove all the isochronous
@@ -886,7 +886,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	uhci_td **isoRequest
 		= new(std::nothrow) uhci_td *[isochronousData->packet_count];
 	if (isoRequest == NULL) {
-		TRACE(("usb_uhci: failed to create isoRequest array!\n"));
+		TRACE("failed to create isoRequest array!\n");
 		return B_NO_MEMORY;
 	}
 
@@ -932,9 +932,9 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 		}
 	}
 
-	TRACE(("usb_uhci: isochronous submitted size=%ld bytes, TDs=%ld, "
+	TRACE("isochronous submitted size=%ld bytes, TDs=%ld, "
 		"packetSize=%ld, restSize=%ld\n", transfer->DataLength(),
-		isochronousData->packet_count, packetSize, restSize));
+		isochronousData->packet_count, packetSize, restSize);
 
 	// Find the entry where to start inserting the first Isochronous descriptor
 	if (isochronousData->flags & USB_ISO_ASAP ||
@@ -963,8 +963,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	while (fFrameBandwidth[currentFrame] < bandwidth) {
 		currentFrame = (currentFrame + 1) % NUMBER_OF_FRAMES;
 		if (currentFrame == startSeekingFromFrame) {
-			TRACE_ERROR(("usb_uhci: Not enough bandwidth to queue the"
-				" isochronous request. Try again later!\n"));
+			TRACE_ERROR("not enough bandwidth to queue the isochronous request");
 			for (uint32 i = 0; i < isochronousData->packet_count; i++)
 				FreeDescriptor(isoRequest[i]);
 			delete [] isoRequest;
@@ -979,15 +978,15 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	status_t result = AddPendingIsochronousTransfer(transfer, isoRequest,
 		directionIn);
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to add pending isochronous transfer\n"));
+		TRACE_ERROR("failed to add pending isochronous transfer\n");
 		for (uint32 i = 0; i < isochronousData->packet_count; i++)
 			FreeDescriptor(isoRequest[i]);
 		delete [] isoRequest;
 		return result;
 	}
 
-	TRACE(("usb_uhci: appended isochronous transfer by starting at frame"
-		" number %d\n", currentFrame));
+	TRACE("appended isochronous transfer by starting at frame number %d\n",
+		currentFrame);
 
 	// Insert the Transfer Descriptor by starting at
 	// the starting_frame_number entry
@@ -995,7 +994,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	for (uint32 i = 0; i < isochronousData->packet_count; i++) {
 		result = LinkIsochronousDescriptor(isoRequest[i], currentFrame);
 		if (result < B_OK) {
-			TRACE_ERROR(("usb_uhci: failed to add pending isochronous transfer\n"));
+			TRACE_ERROR("failed to add pending isochronous transfer\n");
 			for (uint32 i = 0; i < isochronousData->packet_count; i++)
 				FreeDescriptor(isoRequest[i]);
 			delete [] isoRequest;
@@ -1111,9 +1110,9 @@ UHCI::FinishTransfers()
 		if (!Lock())
 			continue;
 
-		TRACE(("usb_uhci: finishing transfers (first transfer: 0x%08lx; last"
+		TRACE("finishing transfers (first transfer: 0x%08lx; last"
 			" transfer: 0x%08lx)\n", (uint32)fFirstTransfer,
-			(uint32)fLastTransfer));
+			(uint32)fLastTransfer);
 		transfer_data *lastTransfer = NULL;
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
@@ -1127,15 +1126,15 @@ UHCI::FinishTransfers()
 				uint32 status = descriptor->status;
 				if (status & TD_STATUS_ACTIVE) {
 					// still in progress
-					TRACE(("usb_uhci: td (0x%08lx) still active\n", descriptor->this_phy));
+					TRACE("td (0x%08lx) still active\n", descriptor->this_phy);
 					break;
 				}
 
 				if (status & TD_ERROR_MASK) {
 					// an error occured
-					TRACE_ERROR(("usb_uhci: td (0x%08lx) error: status: 0x%08lx;"
+					TRACE_ERROR("td (0x%08lx) error: status: 0x%08lx;"
 						" token: 0x%08lx;\n", descriptor->this_phy, status,
-						descriptor->token));
+						descriptor->token);
 
 					uint8 errorCount = status >> TD_ERROR_COUNT_SHIFT;
 					errorCount &= TD_ERROR_COUNT_MASK;
@@ -1179,7 +1178,7 @@ UHCI::FinishTransfers()
 					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
 					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
 					// all descriptors are done, or we have a short packet
-					TRACE(("usb_uhci: td (0x%08lx) ok\n", descriptor->this_phy));
+					TRACE("td (0x%08lx) ok\n", descriptor->this_phy);
 					callbackStatus = B_OK;
 					transferDone = true;
 					break;
@@ -1235,11 +1234,11 @@ UHCI::FinishTransfers()
 
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
-						TRACE(("usb_uhci: advancing fragmented transfer\n"));
+						TRACE("advancing fragmented transfer\n");
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
-							TRACE(("usb_uhci: still %ld bytes left on transfer\n",
-								transfer->transfer->VectorLength()));
+							TRACE("still %ld bytes left on transfer\n",
+								transfer->transfer->VectorLength());
 
 							// free the used descriptors
 							transfer->queue->RemoveTransfer(transfer->transfer_queue);
@@ -1497,7 +1496,7 @@ UHCI::ResetPort(uint8 index)
 	if (index > 1)
 		return B_BAD_INDEX;
 
-	TRACE(("usb_uhci: reset port %d\n", index));
+	TRACE("reset port %d\n", index);
 
 	uint32 port = UHCI_PORTSC1 + index * 2;
 	uint16 status = ReadReg16(port);
@@ -1540,7 +1539,7 @@ UHCI::ResetPort(uint8 index)
 	}
 
 	fPortResetChange |= (1 << index);
-	TRACE(("usb_uhci: port was reset: 0x%04x\n", ReadReg16(port)));
+	TRACE("port was reset: 0x%04x\n", ReadReg16(port));
 	return B_OK;
 }
 
@@ -1570,36 +1569,36 @@ UHCI::Interrupt()
 	int32 result = B_HANDLED_INTERRUPT;
 
 	if (status & UHCI_USBSTS_USBINT) {
-		TRACE(("usb_uhci: transfer finished\n"));
+		TRACE_MODULE("transfer finished\n");
 		acknowledge |= UHCI_USBSTS_USBINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & UHCI_USBSTS_ERRINT) {
-		TRACE(("usb_uhci: transfer error\n"));
+		TRACE_MODULE("transfer error\n");
 		acknowledge |= UHCI_USBSTS_ERRINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & UHCI_USBSTS_RESDET) {
-		TRACE(("usb_uhci: resume detected\n"));
+		TRACE_MODULE("resume detected\n");
 		acknowledge |= UHCI_USBSTS_RESDET;
 	}
 
 	if (status & UHCI_USBSTS_HOSTERR) {
-		TRACE(("usb_uhci: host system error\n"));
+		TRACE_MODULE("host system error\n");
 		acknowledge |= UHCI_USBSTS_HOSTERR;
 	}
 
 	if (status & UHCI_USBSTS_HCPRERR) {
-		TRACE(("usb_uhci: process error\n"));
+		TRACE_MODULE("process error\n");
 		acknowledge |= UHCI_USBSTS_HCPRERR;
 	}
 
 	if (status & UHCI_USBSTS_HCHALT) {
-		TRACE_ERROR(("usb_uhci: host controller halted\n"));
+		TRACE_MODULE_ERROR("host controller halted\n");
 		// at least disable interrupts so we do not flood the system
 		WriteReg16(UHCI_USBINTR, 0);
 		fEnabledInterrupts = 0;
@@ -1632,13 +1631,13 @@ UHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_ERROR(("usb_uhci: AddTo(): getting pci module failed! 0x%08lx\n",
-				status));
+			TRACE_MODULE_ERROR("AddTo(): getting pci module failed! 0x%08lx\n",
+				status);
 			return status;
 		}
 	}
 
-	TRACE(("usb_uhci: AddTo(): setting up hardware\n"));
+	TRACE_MODULE("AddTo(): setting up hardware\n");
 
 	bool found = false;
 	pci_info *item = new(std::nothrow) pci_info;
@@ -1654,12 +1653,12 @@ UHCI::AddTo(Stack *stack)
 			&& item->class_api == PCI_usb_uhci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_ERROR(("usb_uhci: AddTo(): found with invalid IRQ - check IRQ assignement\n"));
+				TRACE_MODULE_ERROR("AddTo(): found with invalid IRQ - check IRQ assignement\n");
 				continue;
 			}
 
-			TRACE(("usb_uhci: AddTo(): found at IRQ %u\n",
-				item->u.h0.interrupt_line));
+			TRACE_MODULE("AddTo(): found at IRQ %u\n",
+				item->u.h0.interrupt_line);
 			UHCI *bus = new(std::nothrow) UHCI(item, stack);
 			if (!bus) {
 				delete item;
@@ -1669,8 +1668,8 @@ UHCI::AddTo(Stack *stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_uhci: AddTo(): InitCheck() failed 0x%08lx\n",
-					bus->InitCheck()));
+				TRACE_MODULE_ERROR("AddTo(): InitCheck() failed 0x%08lx\n",
+					bus->InitCheck());
 				delete bus;
 				continue;
 			}
@@ -1685,7 +1684,7 @@ UHCI::AddTo(Stack *stack)
 	}
 
 	if (!found) {
-		TRACE_ERROR(("usb_uhci: no devices found\n"));
+		TRACE_MODULE_ERROR("no devices found\n");
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
@@ -1769,7 +1768,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(uhci_td)) < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to allocate a transfer descriptor\n"));
+		TRACE_ERROR("failed to allocate a transfer descriptor\n");
 		return NULL;
 	}
 
@@ -1804,7 +1803,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 
 	if (fStack->AllocateChunk(&result->buffer_log, (void **)&result->buffer_phy,
 		bufferSize) < B_OK) {
-		TRACE_ERROR(("usb_uhci: unable to allocate space for the buffer\n"));
+		TRACE_ERROR("unable to allocate space for the buffer\n");
 		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(uhci_td));
 		return NULL;
 	}
@@ -1909,9 +1908,9 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 			size_t length = min_c(current->buffer_size - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_uhci: copying %ld bytes to bufferOffset %ld from"
+			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
-				vectorOffset, vectorIndex, vectorCount));
+				vectorOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)current->buffer_log + bufferOffset,
 				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
 
@@ -1921,8 +1920,8 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_uhci: wrote descriptor chain (%ld bytes, no"
-						" more vectors)\n", actualLength));
+					TRACE("wrote descriptor chain (%ld bytes, no more vectors)\n",
+						actualLength);
 					return actualLength;
 				}
 
@@ -1941,7 +1940,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 		current = (uhci_td *)current->link_log;
 	}
 
-	TRACE(("usb_uhci: wrote descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("wrote descriptor chain (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -1970,9 +1969,9 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 			size_t length = min_c(bufferSize - bufferOffset,
 				vector[vectorIndex].iov_len - vectorOffset);
 
-			TRACE(("usb_uhci: copying %ld bytes to vectorOffset %ld from"
+			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
-				bufferOffset, vectorIndex, vectorCount));
+				bufferOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
 				(uint8 *)current->buffer_log + bufferOffset, length);
 
@@ -1982,7 +1981,8 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 			if (vectorOffset >= vector[vectorIndex].iov_len) {
 				if (++vectorIndex >= vectorCount) {
-					TRACE(("usb_uhci: read descriptor chain (%ld bytes, no more vectors)\n", actualLength));
+					TRACE("read descriptor chain (%ld bytes, no more vectors)\n",
+						actualLength);
 					if (lastDataToggle)
 						*lastDataToggle = dataToggle;
 					return actualLength;
@@ -2006,7 +2006,7 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle;
 
-	TRACE(("usb_uhci: read descriptor chain (%ld bytes)\n", actualLength));
+	TRACE("read descriptor chain (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 
@@ -2035,7 +2035,7 @@ UHCI::ReadActualLength(uhci_td *topDescriptor, uint8 *lastDataToggle)
 	if (lastDataToggle)
 		*lastDataToggle = dataToggle;
 
-	TRACE(("usb_uhci: read actual length (%ld bytes)\n", actualLength));
+	TRACE("read actual length (%ld bytes)\n", actualLength);
 	return actualLength;
 }
 

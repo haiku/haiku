@@ -46,6 +46,9 @@ public:
 
 		void						PrintToStream();
 
+		usb_id						USBID() { return 0; };
+		const char *				TypeName() { return "uhci"; };
+
 private:
 		status_t					fStatus;
 		Stack						*fStack;
@@ -104,6 +107,8 @@ static	status_t					AddTo(Stack *stack);
 		status_t					ClearPortFeature(uint8 index, uint16 feature);
 
 		status_t					ResetPort(uint8 index);
+
+virtual	const char *				TypeName() { return "uhci"; };
 
 private:
 		// Controller resets

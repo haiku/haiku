@@ -14,15 +14,28 @@
 #include "usbspec_p.h"
 #include <lock.h>
 
+
+#define TRACE_OUTPUT(x, y, z...) \
+	{ \
+		dprintf("usb %s%s %ld: ", y, (x)->TypeName(), (x)->USBID()); \
+		dprintf(z); \
+	}
+
 //#define TRACE_USB
 #ifdef TRACE_USB
-#define TRACE(x)		dprintf x
-#define TRACE_ERROR(x)	dprintf x
+#define TRACE(x...)					TRACE_OUTPUT(this, "", x)
+#define TRACE_STATIC(x, y...)		TRACE_OUTPUT(x, "", y)
+#define TRACE_MODULE(x...)			dprintf("usb "USB_MODULE_NAME": "x)
 #else
-#define TRACE(x)		/* nothing */
-#define TRACE_ERROR(x)	dprintf x
+#define TRACE(x...)					/* nothing */
+#define TRACE_STATIC(x, y...)		/* nothing */
+#define TRACE_MODULE(x...)			/* nothing */
 #endif
 
+#define TRACE_ALWAYS(x...)			TRACE_OUTPUT(this, "", x)
+#define TRACE_ERROR(x...)			TRACE_OUTPUT(this, "error ", x)
+#define TRACE_MODULE_ALWAYS(x...)	dprintf("usb "USB_MODULE_NAME": "x)
+#define TRACE_MODULE_ERROR(x...)	dprintf("usb "USB_MODULE_NAME": "x)
 
 class Hub;
 class Stack;
@@ -36,40 +49,40 @@ class PhysicalMemoryAllocator;
 
 
 struct usb_host_controller_info {
-	module_info		info;
-	status_t		(*control)(uint32 op, void *data, size_t length);
-	status_t		(*add_to)(Stack *stack);
+	module_info info;
+	status_t (*control)(uint32 op, void *data, size_t length);
+	status_t (*add_to)(Stack *stack);
 };
 
 
 struct usb_driver_cookie {
-	usb_id							device;
-	void							*cookie;
-	usb_driver_cookie				*link;
+	usb_id device;
+	void *cookie;
+	usb_driver_cookie *link;
 };
 
 
 struct usb_driver_info {
-	const char						*driver_name;
-	usb_support_descriptor			*support_descriptors;
-	uint32							support_descriptor_count;
-	const char						*republish_driver_name;
-	usb_notify_hooks				notify_hooks;
-	usb_driver_cookie				*cookies;
-	usb_driver_info					*link;
+	const char *driver_name;
+	usb_support_descriptor *support_descriptors;
+	uint32 support_descriptor_count;
+	const char *republish_driver_name;
+	usb_notify_hooks notify_hooks;
+	usb_driver_cookie *cookies;
+	usb_driver_info *link;
 };
 
 
 struct change_item {
-	bool							added;
-	Device 							*device;
-	change_item						*link;
+	bool added;
+	Device *device;
+	change_item *link;
 };
 
 
 struct rescan_item {
-	const char						*name;
-	rescan_item						*link;
+	const char *name;
+	rescan_item *link;
 };
 
 
@@ -111,11 +124,11 @@ public:
 
 		usb_id							GetUSBID(Object *object);
 		void							PutUSBID(usb_id id);
-		Object							*GetObject(usb_id id);
+		Object *						GetObject(usb_id id);
 
 		void							AddBusManager(BusManager *bus);
 		int32							IndexOfBusManager(BusManager *bus);
-		BusManager						*BusManagerAt(int32 index);
+		BusManager *					BusManagerAt(int32 index);
 
 		status_t						AllocateChunk(void **logicalAddress,
 											void **physicalAddress, size_t size);
@@ -141,6 +154,9 @@ public:
 											const usb_notify_hooks *hooks);
 		status_t						UninstallNotify(const char *driverName);
 
+		usb_id							USBID() { return 0; };
+		const char *					TypeName() { return "stack"; };
+
 private:
 static	int32							ExploreThread(void *data);
 
@@ -151,13 +167,13 @@ static	int32							ExploreThread(void *data);
 
 		mutex							fStackLock;
 		mutex							fExploreLock;
-		PhysicalMemoryAllocator			*fAllocator;
+		PhysicalMemoryAllocator *		fAllocator;
 
 		uint32							fObjectIndex;
 		uint32							fObjectMaxCount;
-		Object							**fObjectArray;
+		Object **						fObjectArray;
 
-		usb_driver_info					*fDriverList;
+		usb_driver_info *				fDriverList;
 };
 
 
@@ -179,7 +195,7 @@ virtual	status_t						InitCheck();
 		int8							AllocateAddress();
 		void							FreeAddress(int8 address);
 
-		Device							*AllocateDevice(Hub *parent,
+		Device *						AllocateDevice(Hub *parent,
 											int8 hubAddress, uint8 hubPort,
 											usb_speed speed);
 		void							FreeDevice(Device *device);
@@ -194,25 +210,29 @@ virtual	status_t						CancelQueuedTransfers(Pipe *pipe,
 virtual	status_t						NotifyPipeChange(Pipe *pipe,
 											usb_change change);
 
-		Object							*RootObject() { return fRootObject; };
+		Object *						RootObject() { return fRootObject; };
 
-		Hub								*GetRootHub() { return fRootHub; };
+		Hub *							GetRootHub() { return fRootHub; };
 		void							SetRootHub(Hub *hub) { fRootHub = hub; };
+
+		usb_id							USBID() { return fStack->IndexOfBusManager(this); };
+virtual	const char *					TypeName() = 0;
 
 protected:
 		bool							fInitOK;
 
 private:
-		ControlPipe 					*_GetDefaultPipe(usb_speed);
+		ControlPipe *					_GetDefaultPipe(usb_speed);
 
 		mutex							fLock;
 
 		bool							fDeviceMap[128];
 		int8							fDeviceIndex;
 
-		ControlPipe						*fDefaultPipes[USB_SPEED_MAX + 1];
-		Hub								*fRootHub;
-		Object							*fRootObject;
+		Stack *							fStack;
+		ControlPipe *					fDefaultPipes[USB_SPEED_MAX + 1];
+		Hub *							fRootHub;
+		Object *						fRootObject;
 };
 
 
@@ -222,13 +242,14 @@ public:
 										Object(Object *parent);
 virtual									~Object();
 
-		Object							*Parent() { return fParent; };
+		Object *						Parent() { return fParent; };
 
-		BusManager						*GetBusManager() { return fBusManager; };
-		Stack							*GetStack() { return fStack; };
+		BusManager *					GetBusManager() { return fBusManager; };
+		Stack *							GetStack() { return fStack; };
 
 		usb_id							USBID() { return fUSBID; };
 virtual	uint32							Type() { return USB_OBJECT_NONE; };
+virtual	const char *					TypeName() { return "object"; };
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -236,9 +257,9 @@ virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
 
 private:
-		Object							*fParent;
-		BusManager						*fBusManager;
-		Stack							*fStack;
+		Object *						fParent;
+		BusManager *					fBusManager;
+		Stack *							fStack;
 		usb_id							fUSBID;
 };
 
@@ -263,6 +284,7 @@ virtual									~Pipe();
 											int8 hubAddress, uint8 hubPort);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE; };
+virtual	const char *					TypeName() { return "pipe"; };
 
 		int8							DeviceAddress() { return fDeviceAddress; };
 		usb_speed						Speed() { return fSpeed; };
@@ -283,7 +305,7 @@ virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
 		status_t						CancelQueuedTransfers(bool force);
 
 		void							SetControllerCookie(void *cookie) { fControllerCookie = cookie; };
-		void							*ControllerCookie() { return fControllerCookie; };
+		void *							ControllerCookie() { return fControllerCookie; };
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -300,7 +322,7 @@ private:
 		int8							fHubAddress;
 		uint8							fHubPort;
 		bool							fDataToggle;
-		void							*fControllerCookie;
+		void *							fControllerCookie;
 };
 
 
@@ -310,6 +332,7 @@ public:
 virtual									~ControlPipe();
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
+virtual	const char *					TypeName() { return "control pipe"; };
 
 										// The data toggle is not relevant
 										// for control transfers, as they are
@@ -348,6 +371,7 @@ public:
 										InterruptPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
+virtual	const char *					TypeName() { return "interrupt pipe"; };
 
 		status_t						QueueInterrupt(void *data,
 											size_t dataLength,
@@ -361,6 +385,7 @@ public:
 										BulkPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
+virtual	const char *					TypeName() { return "bulk pipe"; };
 
 		status_t						QueueBulk(void *data,
 											size_t dataLength,
@@ -378,6 +403,7 @@ public:
 										IsochronousPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
+virtual	const char *					TypeName() { return "iso pipe"; };
 
 		status_t						QueueIsochronous(void *data,
 											size_t dataLength,
@@ -408,6 +434,7 @@ public:
 											uint8 interfaceIndex);
 
 virtual	uint32							Type() { return USB_OBJECT_INTERFACE; };
+virtual	const char *					TypeName() { return "interface"; };
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -434,8 +461,9 @@ virtual	status_t						Changed(change_item **changeList,
 											bool added);
 
 virtual	uint32							Type() { return USB_OBJECT_DEVICE; };
+virtual	const char *					TypeName() { return "device"; };
 
-		ControlPipe						*DefaultPipe() { return fDefaultPipe; };
+		ControlPipe *					DefaultPipe() { return fDefaultPipe; };
 
 virtual	status_t						GetDescriptor(uint8 descriptorType,
 											uint8 index, uint16 languageID,
@@ -443,11 +471,11 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 											size_t *actualLength);
 
 		int8							DeviceAddress() const { return fDeviceAddress; };
-		const usb_device_descriptor		*DeviceDescriptor() const;
+		const usb_device_descriptor *	DeviceDescriptor() const;
 		usb_speed						Speed() const { return fSpeed; };
 
-		const usb_configuration_info	*Configuration() const;
-		const usb_configuration_info	*ConfigurationAt(uint8 index) const;
+		const usb_configuration_info *	Configuration() const;
+		const usb_configuration_info *	ConfigurationAt(uint8 index) const;
 		status_t						SetConfiguration(const usb_configuration_info *configuration);
 		status_t						SetConfigurationAt(uint8 index);
 		status_t						Unconfigure(bool atDeviceLevel);
@@ -482,13 +510,13 @@ protected:
 private:
 		bool							fAvailable;
 		bool							fIsRootHub;
-		usb_configuration_info			*fConfigurations;
-		usb_configuration_info			*fCurrentConfiguration;
+		usb_configuration_info *		fConfigurations;
+		usb_configuration_info *		fCurrentConfiguration;
 		usb_speed						fSpeed;
 		int8							fDeviceAddress;
 		int8							fHubAddress;
 		uint8							fHubPort;
-		ControlPipe						*fDefaultPipe;
+		ControlPipe *					fDefaultPipe;
 };
 
 
@@ -505,13 +533,14 @@ virtual	status_t						Changed(change_item **changeList,
 											bool added);
 
 virtual	uint32							Type() { return USB_OBJECT_DEVICE | USB_OBJECT_HUB; };
+virtual	const char *					TypeName() { return "hub"; };
 
 virtual	status_t						GetDescriptor(uint8 descriptorType,
 											uint8 index, uint16 languageID,
 											void *data, size_t dataLength,
 											size_t *actualLength);
 
-		Device							*ChildAt(uint8 index)
+		Device *						ChildAt(uint8 index)
 											{ return fChildren[index]; };
 
 		status_t						UpdatePortStatus(uint8 index);
@@ -534,12 +563,12 @@ virtual	status_t						BuildDeviceName(char *string,
 											Device *device);
 
 private:
-		InterruptPipe					*fInterruptPipe;
+		InterruptPipe *					fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 
 		usb_port_status					fInterruptStatus[USB_MAX_PORT_COUNT];
 		usb_port_status					fPortStatus[USB_MAX_PORT_COUNT];
-		Device							*fChildren[USB_MAX_PORT_COUNT];
+		Device *						fChildren[USB_MAX_PORT_COUNT];
 };
 
 
@@ -559,20 +588,20 @@ public:
 									Transfer(Pipe *pipe);
 									~Transfer();
 
-		Pipe						*TransferPipe() { return fPipe; };
+		Pipe *						TransferPipe() { return fPipe; };
 
 		void						SetRequestData(usb_request_data *data);
-		usb_request_data			*RequestData() { return fRequestData; };
+		usb_request_data *			RequestData() { return fRequestData; };
 
 		void						SetIsochronousData(usb_isochronous_data *data);
-		usb_isochronous_data		*IsochronousData() { return fIsochronousData; };
+		usb_isochronous_data *		IsochronousData() { return fIsochronousData; };
 
 		void						SetData(uint8 *buffer, size_t length);
-		uint8						*Data() { return (uint8 *)fData.iov_base; };
+		uint8 *						Data() { return (uint8 *)fData.iov_base; };
 		size_t						DataLength() { return fData.iov_len; };
 
 		void						SetVector(iovec *vector, size_t vectorCount);
-		iovec						*Vector() { return fVector; };
+		iovec *						Vector() { return fVector; };
 		size_t						VectorCount() { return fVectorCount; };
 		size_t						VectorLength();
 
@@ -589,28 +618,31 @@ public:
 
 		void						Finished(uint32 status, size_t actualLength);
 
+		usb_id						USBID() { return 0; };
+		const char *				TypeName() { return "transfer"; };
+
 private:
 		status_t					_CalculateBandwidth();
 
 		// Data that is related to the transfer
-		Pipe						*fPipe;
+		Pipe *						fPipe;
 		iovec						fData;
-		iovec						*fVector;
+		iovec *						fVector;
 		size_t						fVectorCount;
-		void						*fBaseAddress;
+		void *						fBaseAddress;
 		bool						fFragmented;
 		size_t						fActualLength;
 		area_id						fUserArea;
 		area_id						fClonedArea;
 
 		usb_callback_func			fCallback;
-		void						*fCallbackCookie;
+		void *						fCallbackCookie;
 
 		// For control transfers
-		usb_request_data			*fRequestData;
+		usb_request_data *			fRequestData;
 
 		// For isochronous transfers
-		usb_isochronous_data		*fIsochronousData;
+		usb_isochronous_data *		fIsochronousData;
 
 		// For bandwidth management.
 		// It contains the bandwidth necessary in microseconds

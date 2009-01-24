@@ -13,12 +13,14 @@ Interface::Interface(Object *parent, uint8 interfaceIndex)
 	:	Object(parent),
 		fInterfaceIndex(interfaceIndex)
 {
+	TRACE("creating interface\n");
 }
 
 
 status_t
 Interface::SetFeature(uint16 selector)
 {
+	TRACE("set feature %u\n", selector);
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_SET_FEATURE,
@@ -34,6 +36,7 @@ Interface::SetFeature(uint16 selector)
 status_t
 Interface::ClearFeature(uint16 selector)
 {
+	TRACE("clear feature %u\n", selector);
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
@@ -49,6 +52,7 @@ Interface::ClearFeature(uint16 selector)
 status_t
 Interface::GetStatus(uint16 *status)
 {
+	TRACE("get status\n");
 	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_INTERFACE_IN,
 		USB_REQUEST_GET_STATUS,
