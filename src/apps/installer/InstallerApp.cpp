@@ -38,11 +38,14 @@ InstallerApp::InstallerApp()
 	BView *parent = alertView->Parent();
 	alertView->RemoveSelf();
 	alertView->MoveBy(3, 7);
-	alertView->ResizeTo(460, 283);
-	alertView->SetResizingMode(B_FOLLOW_ALL_SIDES);
-	alert->ResizeTo(500, 350);
-	BScrollView *scroll = new BScrollView("", alertView, B_FOLLOW_ALL_SIDES, B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
-	parent->AddChild(scroll);
+	alertView->ResizeTo(500, 288);
+	alertView->SetText(EULA_TEXT);
+	alertView->SetTextRect(alertView->Bounds().InsetBySelf(2, 2));
+	alert->ResizeTo(525, 350);
+	BBox *box = new BBox(alertView->Frame().InsetBySelf(-2,-2));
+	alertView->MoveTo(2, 2);
+	box->AddChild(alertView);
+	parent->AddChild(box);
 	BRect alertFrame = alert->Frame();
 	alertFrame.OffsetTo((frame.Width() - alertFrame.Width()) / 2,
 		(frame.Height() - alertFrame.Height()) / 2);
