@@ -25,7 +25,7 @@ BinCommand rc :
 
 	# these two are needed for R5 only
 	$(strlSources)
-	: librdef.a $(TARGET_LIBSTDC++) be $(TARGET_LIBSUPC++)
+	: librdef.a $(TARGET_LIBSTDC++) be
 ;
 
 SEARCH on [ FGristFiles $(strlSources) ]
