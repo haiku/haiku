@@ -214,6 +214,7 @@ hoardSbrk(long size)
 
 	if (resize_area(sHeapArea, pageSize) < B_OK) {
 		// out of memory - ToDo: as a fall back, we could try to allocate another area
+		sFreeHeapSize = oldHeapSize;
 		hoardUnlock(sHeapLock);
 		return NULL;
 	}
