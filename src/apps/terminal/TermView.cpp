@@ -25,10 +25,10 @@
 #include <new>
 
 #include <Alert.h>
-#include <Directory.h>
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
+#include <Directory.h>
 #include <Dragger.h>
 #include <Input.h>
 #include <MenuItem.h>
@@ -1590,7 +1590,7 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 {
 	// Launch menu to choose what is to do with the msg data
 	BPoint point;
-	if (msg->FindPoint("_drop_point_", &point) < B_OK)
+	if (msg->FindPoint("_drop_point_", &point) != B_OK)
 		return;
 
 	BMessage* insertMessage = new BMessage(*msg);
