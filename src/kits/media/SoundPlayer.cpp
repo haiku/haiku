@@ -335,6 +335,11 @@ BSoundPlayer::Start()
 		return B_ERROR;
 	}
 
+	if (!fPlayerNode->TimeSource()->IsRunning()) {
+		roster->StartTimeSource(fPlayerNode->TimeSource()->Node(),
+			fPlayerNode->TimeSource()->RealTime());
+	}
+
 	// Add latency and a few ms to the nodes current time to	
 	// make sure that we give the producer enough time to run
 	// buffers through the node chain, otherwise it'll start
@@ -345,7 +350,11 @@ BSoundPlayer::Start()
 		TRACE("BSoundPlayer::Start: StartNode failed, %ld", err);
 		return err;
 	}
+
+	if (fNotifierFunc)
+		fNotifierFunc(fCookie, B_STARTED, this);
 		
+	SetHasData(true);
 	atomic_or(&fFlags, F_IS_STARTED);
 	
 	return B_OK;
@@ -389,6 +398,10 @@ BSoundPlayer::Stop(bool block,
 		// wait until all buffers on the way to the physical output have been played		
 		snooze(Latency() + 2000);
 	}
+
+	if (fNotifierFunc)
+		fNotifierFunc(fCookie, B_STOPPED, this);
+
 }
 
 
