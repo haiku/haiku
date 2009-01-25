@@ -119,7 +119,7 @@ puts(const char *string)
 
 #endif	// __GNUC__ >= 3
 
-#if __GNUC__ >= 4
+#if __GNUC__ >= 4 && !defined(USING_LIBGCC)
 
 extern "C"
 void
