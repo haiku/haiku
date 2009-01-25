@@ -134,6 +134,8 @@ private:
 
 			void			_DoPrint(BRect updateRect);
 			void			_UpdateScrollBarRange();
+			void			_SecondaryMouseButtonDropped(BMessage* msg);
+			void			_DoSecondaryMouseDropAction(BMessage* msg);
 			void			_DoFileDrop(entry_ref &ref);
 
 			void			_SynchronizeWithTextBuffer(int32 visibleDirtyTop,

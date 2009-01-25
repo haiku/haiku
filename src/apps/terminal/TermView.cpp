@@ -9,6 +9,7 @@
  *		Kian Duffy, myob@users.sourceforge.net
  *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Clemens Zeidler <haiku@Clemens-Zeidler.de>
  */
 
 
@@ -24,13 +25,16 @@
 #include <new>
 
 #include <Alert.h>
+#include <Directory.h>
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Dragger.h>
 #include <Input.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <Node.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <PropertyInfo.h>
@@ -106,6 +110,18 @@ static const rgb_color kBlackColor = { 0, 0, 0, 255 };
 static const rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
 static const char* kDefaultSpecialWordChars = ":@-./_~";
+static const char* kEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
+
+// secondary mouse button drop
+const int32 kSecondaryMouseDropAction = 'SMDA';
+
+enum {
+	kInsert,
+	kChangeDirectory,
+	kLinkFiles,
+	kMoveFiles,
+	kCopyFiles
+};
 
 
 template<typename Type>
@@ -1306,8 +1322,18 @@ TermView::MessageReceived(BMessage *msg)
 		//rgb_color *color;
 
 		int32 i = 0;
-
+				
 		if (msg->FindRef("refs", i++, &ref) == B_OK) {
+			// first check if secondary mouse button is pressed
+			int32 buttons = 0;
+			msg->FindInt32("buttons", &buttons);
+		
+			if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+				// start popup menu
+				_SecondaryMouseButtonDropped(msg);
+				return;
+			}
+			
 			_DoFileDrop(ref);
 
 			while (msg->FindRef("refs", i++, &ref) == B_OK) {
@@ -1441,6 +1467,9 @@ TermView::MessageReceived(BMessage *msg)
 		case kAutoScroll:
 			_AutoScrollUpdate();
 			break;
+		case kSecondaryMouseDropAction:
+			_DoSecondaryMouseDropAction(msg);
+			break;
 		case MSG_TERMINAL_BUFFER_CHANGED:
 		{
 			BAutolock _(fTextBuffer);
@@ -1556,6 +1585,154 @@ TermView::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 }
 
 
+void
+TermView::_SecondaryMouseButtonDropped(BMessage* msg)
+{
+	// Launch menu to choose what is to do with the msg data
+	BPoint point;
+	if (msg->FindPoint("_drop_point_", &point) < B_OK)
+		return;
+
+	BMessage* insertMessage = new BMessage(*msg);
+	insertMessage->what = kSecondaryMouseDropAction;
+	insertMessage->AddInt8("action", kInsert);
+	
+	BMessage* cdMessage = new BMessage(*msg);
+	cdMessage->what = kSecondaryMouseDropAction;
+	cdMessage->AddInt8("action", kChangeDirectory);
+	
+	BMessage* lnMessage = new BMessage(*msg);
+	lnMessage->what = kSecondaryMouseDropAction;
+	lnMessage->AddInt8("action", kLinkFiles);
+	
+	BMessage* mvMessage = new BMessage(*msg);
+	mvMessage->what = kSecondaryMouseDropAction;
+	mvMessage->AddInt8("action", kMoveFiles);
+	
+	BMessage* cpMessage = new BMessage(*msg);
+	cpMessage->what = kSecondaryMouseDropAction;
+	cpMessage->AddInt8("action", kCopyFiles);
+		
+	BMenuItem* insertItem = new BMenuItem("Insert Path", insertMessage);
+	BMenuItem* cdItem = new BMenuItem("Change Directory", cdMessage);
+	BMenuItem* lnItem = new BMenuItem("Create Link Here", lnMessage);
+	BMenuItem* mvItem = new BMenuItem("Move Here", mvMessage);
+	BMenuItem* cpItem = new BMenuItem("Copy Here", cpMessage);
+	BMenuItem* chItem = new BMenuItem("Cancel", NULL);
+	
+	// if the refs point to different directorys disable the cd menu item
+	bool differentDirs = false;
+	BDirectory firstDir;
+	entry_ref ref;
+	int i = 0;
+	while (msg->FindRef("refs", i++, &ref) == B_OK) {
+		BNode node(&ref);
+		BEntry entry(&ref);
+		BDirectory dir;
+		if (node.IsDirectory())
+			dir.SetTo(&ref);
+		else
+			entry.GetParent(&dir);
+				
+		if (i == 1) {
+			node_ref nodeRef;
+			dir.GetNodeRef(&nodeRef);
+			firstDir.SetTo(&nodeRef);
+		} else if (firstDir != dir) {
+			differentDirs = true;
+			break;	
+		}
+	}
+	if (differentDirs)
+		cdItem->SetEnabled(false);
+
+	BPopUpMenu *menu = new BPopUpMenu("Secondary Mouse Button Drop Menu");
+	menu->SetAsyncAutoDestruct(true);
+	menu->AddItem(insertItem);
+	menu->AddSeparatorItem();
+	menu->AddItem(cdItem);
+	menu->AddItem(lnItem);
+	menu->AddItem(mvItem);
+	menu->AddItem(cpItem);
+	menu->AddSeparatorItem();
+	menu->AddItem(chItem);
+	menu->SetTargetForItems(this);
+	menu->Go(point, true, true, true);
+}
+
+
+void
+TermView::_DoSecondaryMouseDropAction(BMessage* msg)
+{
+	int8 action = -1;
+	msg->FindInt8("action", &action);
+	
+	BString outString = "";
+	BString itemString = "";
+	
+	switch (action) {
+		case kInsert:
+			break;
+		case kChangeDirectory:
+			outString = "cd ";
+			break;
+		case kLinkFiles:
+			outString = "ln -s ";
+			break;
+		case kMoveFiles:
+			outString = "mv ";
+			break;
+		case kCopyFiles:
+			outString = "cp ";
+			break;
+
+		default:
+			return;
+	}
+	
+	bool listContainsDirectory = false;
+	entry_ref ref;
+	int32 i = 0;			
+	while (msg->FindRef("refs", i++, &ref) == B_OK) {
+		BEntry ent(&ref);
+		BNode node(&ref);
+		BPath path(&ent);
+		BString string(path.Path());
+		
+		if (node.IsDirectory())
+			listContainsDirectory = true;
+		
+		if (i > 1)
+			itemString += " ";
+				
+		if (action == kChangeDirectory) {
+			if (!node.IsDirectory()) {
+				int32 slash = string.FindLast("/");
+				string.Truncate(slash);
+			}
+			string.CharacterEscape(kEscapeCharacters, '\\');
+			itemString += string;
+			break;
+		}
+		string.CharacterEscape(kEscapeCharacters, '\\');
+		itemString += string;
+	}
+	
+	if (listContainsDirectory && action == kCopyFiles)
+		outString += " -R";
+
+	outString += itemString;
+	
+	if (action == kLinkFiles || action == kMoveFiles || action == kCopyFiles)
+		outString += " .";
+	
+	if (action != kInsert)
+		outString += "\n";
+		
+	_WritePTY(outString.String(), outString.Length());
+}
+
+
 //! Gets dropped file full path and display it at cursor position.
 void
 TermView::_DoFileDrop(entry_ref& ref)
@@ -1564,7 +1741,7 @@ TermView::_DoFileDrop(entry_ref& ref)
 	BPath path(&ent);
 	BString string(path.Path());
 
-	string.CharacterEscape(" ~`#$&*()\\|[]{};'\"<>?!",'\\');
+	string.CharacterEscape(kEscapeCharacters, '\\');
 	_WritePTY(string.String(), string.Length());
 }
 
