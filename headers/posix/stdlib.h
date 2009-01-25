@@ -64,6 +64,7 @@ extern int		daemon(int nochdir, int noclose);
 extern int		system(const char *command);
 
 extern char		*mktemp(char *name);
+extern char		*mkdtemp(char *templat);
 extern int		mkstemp(char *templat);
 
 extern char		*ecvt(double value, int digits, int *_decimalPoint, int *_sign);
