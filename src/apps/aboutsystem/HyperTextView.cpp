@@ -106,6 +106,8 @@ void
 HyperTextView::MouseDown(BPoint where)
 {
 	// We eat all mouse button events.
+
+	BTextView::MouseDown(where);
 }
 
 
@@ -117,6 +119,8 @@ HyperTextView::MouseUp(BPoint where)
 	HyperTextAction* action = _ActionAt(where);
 	if (action != NULL)
 		action->Clicked(this, where, message);
+
+	BTextView::MouseUp(where);
 }
 
 
