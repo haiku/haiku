@@ -76,6 +76,8 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/ftpcmd.y,v 1.66 2007/04/18 22:43:39 yar Exp
 #include "extern.h"
 #include "pathnames.h"
 
+#include "ftpcmd.h"
+
 extern	union sockunion data_dest, his_addr;
 extern	int hostinfo;
 extern	int logged_in;
