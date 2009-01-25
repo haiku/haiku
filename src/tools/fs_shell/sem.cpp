@@ -5,6 +5,8 @@
 
 #include "compatibility.h"
 
+#include <string.h>
+
 #include <OS.h>
 
 #include "fssh_errors.h"
