@@ -366,9 +366,9 @@ SettingsItem::DrawItem(BView *owner, BRect rect, bool drawEverything)
 
 		font_height fheight;
 		owner->GetFontHeight(&fheight);
-		owner->MovePenTo(rect.left + 4, rect.top + fheight.ascent + 2 + floorf(fheight.leading / 2));
 
-		owner->DrawString(Text());
+		owner->DrawString(Text(), BPoint(rect.left + 4, rect.top 
+			+ fheight.ascent + 2 + floorf(fheight.leading / 2)));
 
 		owner->SetHighColor(kBlack);
 		owner->SetLowColor(owner->ViewColor());
