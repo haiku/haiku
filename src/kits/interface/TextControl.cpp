@@ -11,8 +11,6 @@
 /*!	BTextControl displays text that can act like a control. */
 
 
-#include <stdio.h>
-
 #include <AbstractLayoutItem.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -27,6 +25,7 @@
 
 //#define TRACE_TEXT_CONTROL
 #ifdef TRACE_TEXT_CONTROL
+#	include <stdio.h>
 #	include <FunctionTracer.h>
 	static int32 sFunctionDepth = -1;
 #	define CALLED(x...)	FunctionTracer _ft("BTextControl", __FUNCTION__, \
@@ -512,10 +511,7 @@ BTextControl::SetFlags(uint32 flags)
 		if (flags & B_NAVIGABLE)
 			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
 	}
-
-	// Don't make this one navigable
-	flags &= ~B_NAVIGABLE;
-
+	
 	BView::SetFlags(flags);
 }
 
@@ -929,8 +925,6 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fDivider = floorf(bounds.Width() / 2.0f);
 
 	uint32 navigableFlags = Flags() & B_NAVIGABLE;
-	if (navigableFlags != 0)
-		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 
 	if (archive)
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));

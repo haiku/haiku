@@ -344,10 +344,13 @@ BControl::SetEnabled(bool enabled)
 
 	fEnabled = enabled;
 
-	if (fEnabled)
-		BView::SetFlags(Flags() | B_NAVIGABLE);
-	else
-		BView::SetFlags(Flags() & ~B_NAVIGABLE);
+	if (fEnabled && fWantsNav)
+		SetFlags(Flags() | B_NAVIGABLE);
+	else if (!fEnabled && (Flags() & B_NAVIGABLE)) {
+		fWantsNav = true;
+		SetFlags(Flags() & ~B_NAVIGABLE);
+	} else
+		fWantsNav = false;
 
 	if (Window()) {
 		Invalidate(Bounds());
@@ -552,7 +555,7 @@ BControl::InitData(BMessage *data)
 	fEnabled = true;
 	fFocusChanging = false;
 	fTracking = false;
-	fWantsNav = true;
+	fWantsNav = Flags() & B_NAVIGABLE;
 
 	if (data && data->HasString("_fname"))
 		SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE);
