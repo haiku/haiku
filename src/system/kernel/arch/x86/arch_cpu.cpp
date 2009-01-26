@@ -213,7 +213,7 @@ x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 }
 
 
-static void
+extern "C" void
 init_sse(void)
 {
 	if (!x86_check_feature(IA32_FEATURE_SSE, FEATURE_COMMON)

@@ -42,6 +42,7 @@ static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 extern bool gUsingIOAPIC;
+extern void init_sse(void);
 
 static uint32
 apic_read(uint32 offset)
@@ -195,6 +196,8 @@ arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 	// set up the local apic on the current cpu
 	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %ld\n", cpu));
 	setup_apic(args, cpu);
+
+	init_sse();
 
 	return B_OK;
 }
