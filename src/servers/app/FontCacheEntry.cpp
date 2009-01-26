@@ -49,6 +49,18 @@ class FontCacheEntry::GlyphCachePool {
 		memset(fGlyphs, 0, sizeof(fGlyphs));
 	}
 
+	~GlyphCachePool()
+	{
+		for (int i = 0; i < 256; i++) {
+			GlyphCache** cache = fGlyphs[i];
+			if (cache == NULL)
+				continue;
+			for (int j = 0; j < 256; j++)
+				delete cache[j];
+			delete[] cache;
+		}
+	}
+
 	const GlyphCache* FindGlyph(uint16 glyphCode) const
 	{
 		unsigned msb = (glyphCode >> 8) & 0xFF;
@@ -71,11 +83,14 @@ class FontCacheEntry::GlyphCachePool {
 
 		unsigned lsb = glyphCode & 0xFF;
 		if (fGlyphs[msb][lsb])
-			return 0; // already exists, do not overwrite
+			return NULL; // already exists, do not overwrite
 
 		GlyphCache* glyph
 			= (GlyphCache*)fAllocator.allocate(sizeof(GlyphCache),
 					sizeof(double));
+
+		if (glyph == NULL)
+			return NULL;
 
 		glyph->glyph_index = glyphIndex;
 		glyph->data = fAllocator.allocate(dataSize);
