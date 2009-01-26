@@ -264,6 +264,15 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			:
 		;
 	}
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) = 1 {
+		# gcc and binutils
+		local baseURL = http://haiku.mlotz.ch ;
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090125
+			: $(baseURL)/gcc-4.3.3-haiku-090125.zip
+			:
+		;
+	}
 }
 
 
