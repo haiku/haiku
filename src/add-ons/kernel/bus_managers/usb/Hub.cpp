@@ -153,13 +153,13 @@ Hub::ResetPort(uint8 index)
 		if (result < B_OK)
 			return result;
 
-		if (fPortStatus[index].change & C_PORT_RESET) {
+		if (fPortStatus[index].change & PORT_STATUS_RESET) {
 			// reset is done
 			break;
 		}
 	}
 
-	if ((fPortStatus[index].change & C_PORT_RESET) == 0) {
+	if ((fPortStatus[index].change & PORT_STATUS_RESET) == 0) {
 		TRACE_ERROR("port %d won't reset\n", index);
 		return B_ERROR;
 	}
@@ -302,7 +302,7 @@ Hub::Explore(change_item **changeList)
 				0, NULL, 0, NULL);
 		}
 
-		if (fPortStatus[i].change & PORT_RESET) {
+		if (fPortStatus[i].change & PORT_STATUS_RESET) {
 			TRACE_ALWAYS("port %ld was reset\n", i);
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, i + 1,
