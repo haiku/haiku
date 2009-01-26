@@ -81,7 +81,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	bounds.bottom += 1;
 	bounds.right += 1;
 	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+		B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
 	AddChild(fBackBox);
 
 	BRect logoRect = fBackBox->Bounds();
