@@ -113,7 +113,7 @@ copy_headers()
 	done
 }
 
-copy_headers $haikuSourceDir/headers/os $tmpIncludeDir/be
+copy_headers $haikuSourceDir/headers/os $tmpIncludeDir/os
 copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 
 # configure gcc
