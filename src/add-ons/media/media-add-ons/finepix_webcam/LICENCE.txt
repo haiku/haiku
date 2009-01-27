@@ -1,0 +1,21 @@
+Here is the author's authorization to use the MIT licence for the part he wrote:
+
+From Øyvind Smestad (o.smestad AT gmail.com):
+
+When it comes to licencing, the media addon part is heavily based on
+the VideoProducer sample code from Be (I don't remember their exact
+licensing terms, but they were quite liberal weren't they?). The
+driver part is partially based on the Linux FinePix driver by Frank
+Zago (http://www.zago.net/v4l2/finepix/ -
+http://sourceforge.net/projects/fpix/), that is where the Linux JPEG
+code came from and also where I got the device IDs. If the JPEG part
+is removed I don't think there should be enough left there to break
+the GPL, as the rest of the code is probably more "inspired by" than
+"copied from" the Linux driver. At least I remember having to monitor
+the USB traffic under Windows to get the setup commands right, and I
+also think there were some articles on writing a BeOS webcam driver
+and on using the USBKit that I used as references.
+
+I hope that made it a bit more clear!
+As for what I did, I'm more than happy for it to be under MIT licence.
+

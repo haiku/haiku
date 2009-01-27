@@ -1,0 +1,55 @@
+Driver for FujiFilm FinePix digital cameras in PcCam (WebCam) mode. Version 0.1.1
+
+This driver is for FinePix cameras with a USB connection.
+
+It should hopefully work with the following cameras under Zeta:
+
+Fujifilm FinePix 4800
+Fujifilm FinePix A202
+Fujifilm FinePix A203
+Fujifilm FinePix A204
+Fujifilm FinePix A205
+Fujifilm FinePix A210
+Fujifilm FinePix A303
+Fujifilm FinePix A310
+Fujifilm FinePix F401
+Fujifilm FinePix F402
+Fujifilm FinePix F410
+Fujifilm FinePix F601
+Fujifilm FinePix F700
+Fujifilm FinePix M603
+Fujifilm FinePix S3000
+Fujifilm FinePix S304
+Fujifilm FinePix S5000
+Fujifilm FinePix S602
+Fujifilm FinePix S7000
+
+, only tested with FinePix S602Zoom on Zeta 1.1 though.
+
+TEST
+You can test if it works with your camera by connecting the camera and running FinePixTest in the Terminal. It should output lots of debug info and save one image in the same folder it's run from. (PS the test might not work after the media addon is installed, as that then takes control over the camera.)
+
+INSTALLATION
+Drop the FinePix.media_addon on the "Drop media_addon here to install" link, or copy manually to /boot/home/config/add-ons/media. Then Restart Media Services in the Media preferences, and the FinePixProducer should appear as a Video Input under Video Settings.
+
+USAGE
+Should (hopefully) work with all applications that accept video input, tested with CodyCam and Cortex.
+
+REMOVAL
+Delete FinePix.media_addon from /boot/home/config/add-ons/media
+
+KNOWN BUGS
+Might crash the media_addon_server if camera is disconnected while in use or if application tries to access a camera that is not connected. This can be cleared up by restarting the media services in Media preferences.
+
+IMPLEMENTATION DETAILS
+Uses the USBKit. The media addon part is heavily based on the VideoProducer sample code from Be, and the driver is partially based on the Linux FinePix driver by Frank Zago and information gathered with the handy SnoopyPro USB Sniffer tool for Windows.
+
+FUTURE PLANS
+Make it harder to crash :-) Maybe move from USBKit to kernel mode for the actual driver part.
+
+Made by:
+Øyvind Smestad
+o.smestad@gmail.com
+
+PS
+For transfering pictures taken with the camera (DSC mode) use the USB Storage Module by Siarzhuk Zharski (http://bebits.com/app/3889)
