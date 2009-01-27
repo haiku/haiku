@@ -2614,15 +2614,33 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 	window_info info;
 	window->GetInfo(info);
 
+	float tabSize = 0.0;
+	float borderSize = 0.0;
+	::Window* tmp = window->Window();
+	if (tmp) {
+		BMessage message;
+		if (tmp->GetDecoratorSettings(&message)) {
+			BRect tabFrame;
+			message.FindRect("tab frame", &tabFrame);
+			tabSize = tabFrame.bottom - tabFrame.top;
+			message.FindFloat("border width", &borderSize);
+		}
+	}
+
+	int32 decoratorInfo = 2 * sizeof(float);
 	int32 length = window->Title() ? strlen(window->Title()) : 0;
 
 	sender.StartMessage(B_OK);
-	sender.Attach<int32>(sizeof(window_info) + length + 1);
+	sender.Attach<int32>(sizeof(window_info) + decoratorInfo + length + 1);
 	sender.Attach(&info, sizeof(window_info));
+	sender.Attach<float>(tabSize);
+	sender.Attach<float>(borderSize);
+
 	if (length > 0)
 		sender.Attach(window->Title(), length + 1);
 	else
 		sender.Attach<char>('\0');
+
 	sender.Flush();
 }
 

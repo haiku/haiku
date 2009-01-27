@@ -34,6 +34,8 @@ struct window_info {
 } _PACKED;
 
 struct client_window_info : window_info {
+	float		tab_height;
+	float		border_size;
 	char		name[1];
 } _PACKED;
 
