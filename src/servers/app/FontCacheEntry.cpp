@@ -49,18 +49,6 @@ class FontCacheEntry::GlyphCachePool {
 		memset(fGlyphs, 0, sizeof(fGlyphs));
 	}
 
-	~GlyphCachePool()
-	{
-		for (int i = 0; i < 256; i++) {
-			GlyphCache** cache = fGlyphs[i];
-			if (cache == NULL)
-				continue;
-			for (int j = 0; j < 256; j++)
-				delete cache[j];
-			delete[] cache;
-		}
-	}
-
 	const GlyphCache* FindGlyph(uint16 glyphCode) const
 	{
 		unsigned msb = (glyphCode >> 8) & 0xFF;
