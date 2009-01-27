@@ -641,7 +641,7 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 
 	int32* tokens;
 	int32 tokenCount;
-	status_t status = BPrivate::get_window_order(B_CURRENT_WORKSPACE, &tokens,
+	status_t status = BPrivate::get_window_order(current_workspace(), &tokens,
 		&tokenCount);
 	if (status != B_OK || !tokens || tokenCount < 1)
 		return B_ERROR;
@@ -656,14 +656,12 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 			frame->bottom = windowInfo->window_bottom;
 
 			status = B_OK;
-			free(windowInfo);
-
 			if (fIncludeBorder) {
-				// TODO: that's wrong for windows without titlebar, change once
-				//		 we can access the decorator or get it via window info
-				frame->InsetBy(-5.0, -5.0);
-				frame->top -= 22.0;
+				float border = (windowInfo->border_size);
+				frame->InsetBy(-(border), -(border));
+				frame->top -= windowInfo->tab_height;
 			}
+			free(windowInfo);
 
 			BRect screenFrame(BScreen(this).Frame());
 			if (frame->left < screenFrame.left)
