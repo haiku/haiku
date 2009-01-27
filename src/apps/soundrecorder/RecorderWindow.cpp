@@ -242,20 +242,20 @@ RecorderWindow::InitWindow()
 		BRect r(Bounds());
 		r.bottom = r.top + 175;
 		BBox *background = new BBox(r, "_background", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-			B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
+			B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP, B_NO_BORDER);
 		AddChild(background);
 
 
 
 		r = background->Bounds();
-		r.left = 2;
-		r.right = r.left + 37;
+		r.left = 0;
+		r.right = r.left + 35;
 		r.bottom = r.top + 104;
 		fVUView = new VUView(r, B_FOLLOW_LEFT|B_FOLLOW_TOP);
 		background->AddChild(fVUView);
 
 		r = background->Bounds();
-		r.left = r.left + 40;
+		r.left = r.left + 38;
 		r.bottom = r.top + 104;
 		fScopeView = new ScopeView(r, B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
 		background->AddChild(fScopeView);
@@ -731,7 +731,8 @@ RecorderWindow::Save(BMessage * message)
 	entry_ref ref;
 	pItem->Entry().GetRef(&ref);
 
-	saveMsg.AddPointer("sound list item", pItem);
+	if (saveMsg.AddPointer("sound list item", pItem) != B_OK)
+		fprintf(stderr, "failed to add pItem\n");
 	fSavePanel->SetSaveText(filename);
 	fSavePanel->SetMessage(&saveMsg);
 	fSavePanel->Show();
@@ -930,7 +931,7 @@ RecorderWindow::StopRecording()
 
 		wave_struct header;
 		header.riff.riff_id = FOURCC('R','I','F','F');
-		header.riff.len = fRecSize + 36;
+		header.riff.len = fRecSize + sizeof(header) - 8;
 		header.riff.wave_id = FOURCC('W','A','V','E');
 		header.format_chunk.fourcc = FOURCC('f','m','t',' ');
 		header.format_chunk.len = sizeof(header.format);
@@ -1305,7 +1306,7 @@ RecorderWindow::CopyTarget(BMessage *msg)
 
 				wave_struct header;
 				header.riff.riff_id = FOURCC('R','I','F','F');
-				header.riff.len = (frameSize * framesToWrite)  + 36;
+				header.riff.len = (frameSize * framesToWrite) + sizeof(header) - 8;
 				header.riff.wave_id = FOURCC('W','A','V','E');
 				header.format_chunk.fourcc = FOURCC('f','m','t',' ');
 				header.format_chunk.len = sizeof(header.format);
