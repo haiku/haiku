@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -81,7 +81,7 @@ struct intel_info {
 	size_t		gtt_entries;
 	size_t		gtt_stolen_entries;
 
-	uint32		*registers;
+	vuint32		*registers;
 	area_id		registers_area;
 
 	addr_t		aperture_base;
@@ -233,17 +233,6 @@ intel_unmap(intel_info &info)
 static status_t
 intel_map(intel_info &info)
 {
-	info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
-
-	size_t gttSize, stolenSize;
-	determine_memory_sizes(info, gttSize, stolenSize);
-
-	info.gtt_entries = gttSize / 4096;
-	info.gtt_stolen_entries = stolenSize / 4096;
-
-	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
-		gttSize, info.gtt_entries, stolenSize);
-
 	int fbIndex = 0;
 	int mmioIndex = 1;
 	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
@@ -251,15 +240,6 @@ intel_map(intel_info &info)
 		// with the introduction of the i9xx family
 		mmioIndex = 0;
 		fbIndex = 2;
-	}
-
-	AreaKeeper gttMapper;
-	info.gtt_area = gttMapper.Map("intel GMCH gtt",
-		(void *)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.gtt_base);
-	if (gttMapper.InitCheck() < B_OK) {
-		dprintf("agp_intel: could not map GTT!\n");
-		return info.gtt_area;
 	}
 
 	AreaKeeper mmioMapper;
@@ -271,6 +251,11 @@ intel_map(intel_info &info)
 		dprintf("agp_intel: could not map memory I/O!\n");
 		return info.registers_area;
 	}
+
+	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
+	set_pci_config(info.display, PCI_command, 2,
+		get_pci_config(info.display, PCI_command, 2)
+			| PCI_command_io | PCI_command_memory | PCI_command_master);
 
 	void *scratchAddress;
 	AreaKeeper scratchCreator;
@@ -286,14 +271,46 @@ intel_map(intel_info &info)
 	if (get_memory_map(scratchAddress, B_PAGE_SIZE, &entry, 1) != B_OK)
 		return B_ERROR;
 
+	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
+		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+	else {
+		info.gtt_physical_base = read32(info.registers
+			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
+		if (info.gtt_physical_base == 0) {
+			// TODO: not sure how this is supposed to work under Linux/FreeBSD,
+			// but on my i865, this code is needed for Haiku.
+			dprintf("intel_gart: Use GTT address fallback.\n");
+			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
+				+ i830_GTT_BASE;
+		}
+	}
+
+	size_t gttSize, stolenSize;
+	determine_memory_sizes(info, gttSize, stolenSize);
+
+	info.gtt_entries = gttSize / 4096;
+	info.gtt_stolen_entries = stolenSize / 4096;
+
+	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
+		gttSize, info.gtt_entries, stolenSize);
+
+	AreaKeeper gttMapper;
+	info.gtt_area = gttMapper.Map("intel GMCH gtt",
+		(void *)info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&info.gtt_base);
+	if (gttMapper.InitCheck() < B_OK) {
+		dprintf("intel_gart: could not map GTT!\n");
+		return info.gtt_area;
+	}
+
 	info.aperture_physical_base = info.display.u.h0.base_registers[fbIndex];
 	info.aperture_stolen_size = stolenSize;
 	if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
-	dprintf("intel_gart: detected %ld MB of stolen memory, aperture size %ld "
-		"MB, GTT size %ld KB\n", stolenSize >> 20, info.aperture_size >> 20,
-		gttSize >> 10);
+	dprintf("intel_gart: detected %ld MB of stolen memory, aperture "
+		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
+		info.aperture_size >> 20, gttSize >> 10);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
@@ -348,7 +365,7 @@ intel_create_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
 		INTEL_GRAPHICS_MEMORY_CONTROL, 2) | MEMORY_CONTROL_ENABLED;
 	set_pci_config(sInfo.bridge, INTEL_GRAPHICS_MEMORY_CONTROL, 2, gmchControl);
 
-	write32(sInfo.registers + INTEL_PAGE_TABLE_CONTROL, 
+	write32(sInfo.registers + INTEL_PAGE_TABLE_CONTROL,
 		sInfo.gtt_physical_base | PAGE_TABLE_ENABLED);
 	read32(sInfo.registers + INTEL_PAGE_TABLE_CONTROL);
 
@@ -398,7 +415,7 @@ intel_set_aperture_size(void *aperture, size_t size)
 static status_t
 intel_bind_page(void *aperture, uint32 offset, addr_t physicalAddress)
 {
-	TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
+	//TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
 
 	set_gtt_entry(sInfo, offset, physicalAddress);
 	return B_OK;
@@ -408,7 +425,7 @@ intel_bind_page(void *aperture, uint32 offset, addr_t physicalAddress)
 static status_t
 intel_unbind_page(void *aperture, uint32 offset)
 {
-	TRACE("unbind_page(offset %lx)\n", offset);
+	//TRACE("unbind_page(offset %lx)\n", offset);
 
 	if (sInfo.scratch_page != 0)
 		set_gtt_entry(sInfo, offset, sInfo.scratch_page);
