@@ -119,7 +119,8 @@ standard_gcc_settings()
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
 	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
-	HAIKU_GCC_HEADERS_DIR=${gccdir}/include
+	HAIKU_GCC_HEADERS_DIR="${gccdir}/include
+		${gccdir}/include-fixed"
 	HAIKU_GCC_LIBGCC_OBJECTS=`$HAIKU_AR t ${HAIKU_GCC_LIBGCC} | grep -v eabi.o`
 		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
 		# neither needed nor wanted.
