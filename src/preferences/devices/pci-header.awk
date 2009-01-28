@@ -30,7 +30,7 @@ BEGIN {
 	print "#endif" > ofile
 
 	# and we start with vendors..
-	print "\ntypedef struct _PCI_VENTABLE\n{\n\tunsigned short\tVenId ;\n\tchar *\tVenFull ;\n\tchar *\tVenShort ;\n}  PCI_VENTABLE, *PPCI_VENTABLE ;\n" > ofile
+	print "\ntypedef struct _PCI_VENTABLE\n{\n\tunsigned short\tVenId ;\n\tconst char *\tVenFull ;\n\tconst char *\tVenShort ;\n}  PCI_VENTABLE, *PPCI_VENTABLE ;\n" > ofile
 	print "PCI_VENTABLE\tPciVenTable [] =\n{" > ofile
 }
 
@@ -49,7 +49,7 @@ BEGIN {
 	vendor = substr($0, 7)
 	gsub( /\"/, "\\\"", vendor )
 
-	printf formatting "\t{ 0x" vendorid ", \"" vendor "\" }" > ofile
+	printf formatting "\t{ 0x" vendorid ", \"" vendor "\", \"\" }" > ofile
 }
 
 # matches device 
@@ -129,7 +129,7 @@ END {
 
 	if ( devicecount > 0 ) {
 
-		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tunsigned short\tSubVenId ;\n\tunsigned short\tSubDevId ;\n\tchar *\tChipDesc ;\n\tchar *\tChip;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
+		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tunsigned short\tSubVenId ;\n\tunsigned short\tSubDevId ;\n\tconst char *\tChipDesc ;\n\tconst char *\tChip;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
 		print "PCI_DEVTABLE\tPciDevTable [] =\n{" > ofile
 		for (i = 1; i <= devicecount; i++) {
 
@@ -146,7 +146,7 @@ END {
 	
 	if ( classcount > 0 ) {
 		print "typedef struct _PCI_CLASSCODETABLE\n{\n\tunsigned char	BaseClass ;\n\tunsigned char	SubClass ;\n\tunsigned char	ProgIf ;" > ofile
-		print "\tchar *\t\tBaseDesc ;\n\tchar *\t\tSubDesc ;\n\tchar *\t\tProgDesc ;\n}  PCI_CLASSCODETABLE, *PPCI_CLASSCODETABLE ;\n" > ofile
+		print "\tconst char *\t\tBaseDesc ;\n\tconst char *\t\tSubDesc ;\n\tconst char *\t\tProgDesc ;\n}  PCI_CLASSCODETABLE, *PPCI_CLASSCODETABLE ;\n" > ofile
 		print "PCI_CLASSCODETABLE PciClassCodeTable [] =\n{" > ofile
 		currentclass = classes[1, 1]
 		for (i = 1; i <= classcount; i++) {
@@ -174,11 +174,11 @@ END {
 	}
 
 	# this is rather ugly, maybe we should include this in a seperate file, and pull it in ?
-	print "char *\tPciCommandFlags [] =\n{\n\t\"I/O Access\",\n\t\"Memory Access\",\n\t\"Bus Mastering\",\n\t\"Special Cycles\",\n\t\"Memory Write & Invalidate\",\n\t\"Palette Snoop\",\n\t\"Parity Errors\",\n\t\"Wait Cycles\",\n\t\"System Errors\",\n\t\"Fast Back-To-Back\",\n\t\"Reserved 10\",\n\t\"Reserved 11\",\n\t\"Reserved 12\",\n\t\"Reserved 13\",\n\t\"Reserved 14\",\n\t\"Reserved 15\"\n} ;\n" > ofile
+	print "const char *\tPciCommandFlags [] =\n{\n\t\"I/O Access\",\n\t\"Memory Access\",\n\t\"Bus Mastering\",\n\t\"Special Cycles\",\n\t\"Memory Write & Invalidate\",\n\t\"Palette Snoop\",\n\t\"Parity Errors\",\n\t\"Wait Cycles\",\n\t\"System Errors\",\n\t\"Fast Back-To-Back\",\n\t\"Reserved 10\",\n\t\"Reserved 11\",\n\t\"Reserved 12\",\n\t\"Reserved 13\",\n\t\"Reserved 14\",\n\t\"Reserved 15\"\n} ;\n" > ofile
 	print "// Use this value for loop control during searching:\n#define	PCI_COMMANDFLAGS_LEN	(sizeof(PciCommandFlags)/sizeof(char *))\n" > ofile
-	print "char *\tPciStatusFlags [] =\n{\n\t\"Reserved 0\",\n\t\"Reserved 1\",\n\t\"Reserved 2\",\n\t\"Reserved 3\",\n\t\"Reserved 4\",\n\t\"66 MHz Capable\",\n\t\"User-Defined Features\",\n\t\"Fast Back-To-Back\",\n\t\"Data Parity Reported\",\n\t\"\",\n\t\"\",\n\t\"Signalled Target Abort\",\n\t\"Received Target Abort\",\n\t\"Received Master Abort\",\n\t\"Signalled System Error\",\n\t\"Detected Parity Error\"\n} ;\n" > ofile
+	print "const char *\tPciStatusFlags [] =\n{\n\t\"Reserved 0\",\n\t\"Reserved 1\",\n\t\"Reserved 2\",\n\t\"Reserved 3\",\n\t\"Reserved 4\",\n\t\"66 MHz Capable\",\n\t\"User-Defined Features\",\n\t\"Fast Back-To-Back\",\n\t\"Data Parity Reported\",\n\t\"\",\n\t\"\",\n\t\"Signalled Target Abort\",\n\t\"Received Target Abort\",\n\t\"Received Master Abort\",\n\t\"Signalled System Error\",\n\t\"Detected Parity Error\"\n} ;\n" > ofile
 	print "// Use this value for loop control during searching:\n#define	PCI_STATUSFLAGS_LEN	(sizeof(PciStatusFlags)/sizeof(char *))\n" > ofile
-	print "char *\tPciDevSelFlags [] =\n{\n\t\"Fast Devsel Speed\",\n\t\"Medium Devsel Speed\",\n\t\"Slow Devsel Speed\",\n\t\"Reserved 9&10\"\n} ;\n" > ofile
+	print "const char *\tPciDevSelFlags [] =\n{\n\t\"Fast Devsel Speed\",\n\t\"Medium Devsel Speed\",\n\t\"Slow Devsel Speed\",\n\t\"Reserved 9&10\"\n} ;\n" > ofile
 	print "// Use this value for loop control during searching:\n#define	PCI_DEVSELFLAGS_LEN	(sizeof(PciDevSelFlags)/sizeof(char *))\n\n" > ofile
 
 	close(ofile)
