@@ -2627,11 +2627,10 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 		}
 	}
 
-	int32 decoratorInfo = 2 * sizeof(float);
 	int32 length = window->Title() ? strlen(window->Title()) : 0;
 
 	sender.StartMessage(B_OK);
-	sender.Attach<int32>(sizeof(window_info) + decoratorInfo + length + 1);
+	sender.Attach<int32>(sizeof(client_window_info) + length);
 	sender.Attach(&info, sizeof(window_info));
 	sender.Attach<float>(tabSize);
 	sender.Attach<float>(borderSize);
