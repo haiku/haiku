@@ -30,8 +30,7 @@ class HCIDelegate {
 				status = ioctl(fFD, GET_HCI_ID, &fHID, 0);
 				printf("%s: hid retrieved %lx status=%ld\n", __FUNCTION__, 
 					fHID, status);
-			}
-			else {
+			} else {
 				printf("%s: Device driver could not be opened %ld\n", __FUNCTION__, 
 					fHID);
 				fHID = B_ERROR;
@@ -72,7 +71,7 @@ class HCIDelegate {
 		status_t QueueCommand(raw_command rc, size_t size) 
 		{
 			// TODO: this is suposed to queue the command in a queue so all
-			//  are actually send to HW
+			//  are actually send to HW to implement HCI FlowControl requeriments
 			return IssueCommand(rc, size);
 		}
 
