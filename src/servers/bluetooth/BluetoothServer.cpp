@@ -77,7 +77,10 @@ void BluetoothServer::ArgvReceived(int32 argc, char **argv)
 
 void BluetoothServer::ReadyToRun(void)
 {
-	fDeviceManager->StartMonitoringDevice("bluetooth/h2generic");
+	fDeviceManager->StartMonitoringDevice("bluetooth/h2");
+	fDeviceManager->StartMonitoringDevice("bluetooth/h3");
+	fDeviceManager->StartMonitoringDevice("bluetooth/h4");
+	fDeviceManager->StartMonitoringDevice("bluetooth/h5");
 	// Launch the notifier thread
 	if ( resume_thread(fEventListener) != B_OK ) 
 	{

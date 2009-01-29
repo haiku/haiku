@@ -9,16 +9,11 @@
 #define _DEVICE_MANAGER_H
 
 // Manager for devices monitoring
-
 #include <Handler.h>
 #include <Node.h>
 #include <Looper.h>
 #include <Locker.h>
-/*#include <InputServerDevice.h>
-#include <InputServerFilter.h>
-#include <InputServerMethod.h>
-#include "TList.h"
-*/
+
 
 class DeviceManager : public BLooper {
 	public:
@@ -28,14 +23,15 @@ class DeviceManager : public BLooper {
 		void		LoadState();
 		void		SaveState();
 		
-		status_t StartMonitoringDevice(const char *device);
-		status_t StopMonitoringDevice(const char *device);
+		status_t StartMonitoringDevice(const char* device);
+		status_t StopMonitoringDevice(const char* device);
 
 		void MessageReceived(BMessage *msg);
 		
 	private:
-		status_t AddDirectory(node_ref *nref);
-		status_t RemoveDirectory(node_ref *nref);
+		status_t AddDirectory(node_ref* nref);
+		status_t RemoveDirectory(node_ref* nref);
+		status_t AddDevice(entry_ref* nref);
 		
 		BLocker fLock;
 };
