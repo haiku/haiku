@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src preferences tracker ;
+
+Preference <preference>Tracker :
+	TrackerPreferences.cpp
+	: be
+	: TrackerPreferences.rdef
+	;

@@ -56,7 +56,7 @@ BEOS_APPS = AboutSystem ActivityMonitor CodyCam DeskCalc DiskProbe DiskUsage
 ;
 BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
-	ScreenSaver Sounds Time Touchpad VirtualMemory
+	ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs
