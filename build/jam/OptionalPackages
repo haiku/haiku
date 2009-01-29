@@ -268,10 +268,19 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) = 1 {
 		# gcc and binutils
 		local baseURL = http://haiku.mlotz.ch ;
-		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090125
-			: $(baseURL)/gcc-4.3.3-haiku-090125.zip
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090129
+			: $(baseURL)/gcc-4.3.3-haiku-090129.zip
 			:
 		;
+
+		# Setup the proper gnupro symlink. Both packages provide one and on
+		# a GCC2 based hybrid the GCC4 package will overwrite the one present.
+		# Since we want to use GCC2 as the host compiler on a GCC2 base we have
+		# to correct this again.
+		if $(HAIKU_GCC_VERSION[1]) = 2 {
+			AddSymlinkToHaikuImage develop tools
+				: /boot/develop/tools/gcc-2.95.3-haiku-081024 : gnupro ;
+		}
 	}
 }
 
