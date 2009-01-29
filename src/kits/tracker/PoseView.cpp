@@ -4347,21 +4347,21 @@ CopySelectionListToBListAsEntryRefs(const PoseList *original, BObjectList<entry_
 
 void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
-	bool forceCopy, bool createLink, bool relativeLink)
+	bool forceCopy, bool forceMove, bool createLink, bool relativeLink)
 {
 	uint32 buttons;
 	BPoint loc;
 	GetMouse(&loc, &buttons);
 	MoveSelectionInto(destFolder, srcWindow, dynamic_cast<BContainerWindow*>(Window()),
-		buttons, loc, forceCopy, createLink, relativeLink);
+		buttons, loc, forceCopy, forceMove, createLink, relativeLink);
 }
 
 
 void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	BContainerWindow *destWindow, uint32 buttons, BPoint loc, bool forceCopy,
-	bool createLink, bool relativeLink)
-{
+	bool forceMove, bool createLink, bool relativeLink)
+{	
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
 		return;
@@ -4387,6 +4387,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 				break;
 
 			case kMoveSelectionTo:
+				forceMove = true;
 				break;
 
 			case kCopySelectionTo:
@@ -4445,6 +4446,8 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		uint32 moveMode;
 		if (forceCopy)
 			moveMode = kCopySelectionTo;
+		else if (forceMove)
+			moveMode = kMoveSelectionTo;
 		else if (createRelativeLink)
 			moveMode = kCreateRelativeLink;
 		else if (createLink)
@@ -4490,6 +4493,7 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	bool createLink = false;
  	bool forceCopy = false;
+ 	bool forceMove = false;
  	bool createRelativeLink = false;
 	bool dropOnGrid = (modifiers() & B_COMMAND_KEY) != 0;
 
@@ -4505,6 +4509,7 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 				break;
 
 			case kMoveSelectionTo:
+				forceMove = true;
 				break;
 
 			case kCopySelectionTo:
@@ -4599,6 +4604,8 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 			uint32 moveMode;
 			if (forceCopy)
 				moveMode = kCopySelectionTo;
+			else if (forceMove)
+				moveMode = kMoveSelectionTo;
 			else if (createRelativeLink)
 				moveMode = kCreateRelativeLink;
 			else if (createLink)

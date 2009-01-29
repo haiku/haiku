@@ -1438,7 +1438,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 			if (model.InitCheck() != B_OK)
 				break;
 
-			PoseView()->MoveSelectionInto(&model, this, false);
+			PoseView()->MoveSelectionInto(&model, this, false, true);
 			break;
 		}
 

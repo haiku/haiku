@@ -329,10 +329,10 @@ class BPoseView : public BView {
 		virtual	void DragSelectionRect(BPoint, bool extendSelection);
 
 		void MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
-			bool forceCopy, bool createLink = false, bool relativeLink = false);
+			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
 		static void MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			BContainerWindow *destWindow, uint32 buttons, BPoint loc,
-			bool forceCopy, bool createLink = false, bool relativeLink = false);
+			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
 
 		bool UpdateDropTarget(BPoint, const BMessage *, bool trackingContextMenu);
 			// return true if drop target changed
