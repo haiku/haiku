@@ -4449,9 +4449,17 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			moveMode = kCreateRelativeLink;
 		else if (createLink)
 			moveMode = kCreateLink;
-		else
+		else {
 			moveMode = kMoveSelectionTo;
+			entry_ref *srcRef = srcList->ItemAt(0);
+			BDirectory destDir (destEntry);
+			struct stat deststat;
+			destDir.GetStat(&deststat);
 
+			if (srcRef->device != deststat.st_dev) 	
+				moveMode = kCopySelectionTo;
+		}
+		
 		FSMoveToFolder(srcList, destEntry, moveMode);
 		return;
 	}
@@ -4595,8 +4603,16 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 				moveMode = kCreateRelativeLink;
 			else if (createLink)
 				moveMode = kCreateLink;
-			else
+			else {
 				moveMode = kMoveSelectionTo;
+				entry_ref *srcRef = srcList->ItemAt(0);
+				BDirectory destDir (destEntry);
+				struct stat deststat;
+				destDir.GetStat(&deststat);
+
+				if (srcRef->device != deststat.st_dev) 	
+					moveMode = kCopySelectionTo;
+			}
 			FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		} else {
 			if (pointList) {
