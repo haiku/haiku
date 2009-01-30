@@ -4368,11 +4368,6 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 
 	ASSERT(srcWindow->PoseView()->TargetModel());
 
-	// make sure source and destination folders are different
-	if (!createLink && (*srcWindow->PoseView()->TargetModel()->NodeRef()
-		== *destFolder->NodeRef()))
-		return;
-
 	bool createRelativeLink = relativeLink;
 	if (((buttons & B_SECONDARY_MOUSE_BUTTON)
 		|| (modifiers() & B_CONTROL_KEY)) && destWindow) {
@@ -4400,6 +4395,43 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 				return;
 		}
 	}
+
+	// make sure source and destination folders are different
+	if (!createLink && !createRelativeLink && (*srcWindow->PoseView()->TargetModel()->NodeRef()
+		== *destFolder->NodeRef())) {
+		BPoseView *targetView = srcWindow->PoseView();
+
+		if (targetView->ViewMode() == kListMode)                    // can't move in list view
+			return;
+		
+			
+		bool dropOnGrid = (modifiers() & B_COMMAND_KEY) != 0;
+		int32 count = targetView->fSelectionList->CountItems();
+		for (int32 index = 0; index < count; index++) {
+			BPose *pose = targetView->fSelectionList->ItemAt(index);
+
+			// remove pose from VSlist before changing location
+			// so that we "find" the correct pose to remove
+			// need to do this because bsearch uses top of pose
+			// to locate pose to remove
+			targetView->RemoveFromVSList(pose);
+
+			BRect oldBounds(pose->CalcRect(targetView));
+			if (dropOnGrid)
+				loc = targetView->PinToGrid(loc, targetView->fGrid, targetView->fOffset);
+
+				pose->MoveTo(loc, targetView);
+
+				targetView->RemoveFromExtent(oldBounds);
+				targetView->AddToExtent(pose->CalcRect(targetView));
+
+				// remove and reinsert pose to keep VSlist sorted
+				targetView->AddToVSList(pose);
+			}
+
+		return;
+	}
+
 
 	BEntry *destEntry = new BEntry(destFolder->EntryRef());
 	bool destIsTrash = FSIsTrashDir(destEntry);
