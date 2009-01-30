@@ -538,7 +538,7 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 static status_t
 InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread, 
 	BVolume *dstVol, BDirectory *destDir, entry_ref *destRef,
-	bool preflightNameCheck, int32 *collisionCount, ConflictCheckResult *preflightResult)
+	bool preflightNameCheck, bool needSizeCalculation, int32 *collisionCount, ConflictCheckResult *preflightResult)
 {
 	if (dstVol->IsReadOnly()) {
 		if (gStatusWindow)
@@ -596,14 +596,16 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 
 				int32 totalItems = 0;
 				off_t totalSize = 0;
-				if (CalcItemsAndSize(srcList, &totalItems, &totalSize) != B_OK)
-					return B_ERROR;
+				if (needSizeCalculation) {
+					if (CalcItemsAndSize(srcList, &totalItems, &totalSize) != B_OK)
+						return B_ERROR;
 
-				// check for free space before starting copy
-				if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
-					(new BAlert("", kNoFreeSpace, "Cancel", 0, 0,
-						B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
-					return B_ERROR;
+					// check for free space before starting copy
+					if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
+						(new BAlert("", kNoFreeSpace, "Cancel", 0, 0,
+							B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+						return B_ERROR;
+					}
 				}
 
 				if (gStatusWindow)
@@ -665,7 +667,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	bool destIsTrash = false;
 	BDirectory destDir;
 	BDirectory *destDirToCheck = NULL;
-	bool needPreflightNameCheck = false;
+	bool needPreflightNameCheck = false; 
 	bool sourceIsReadOnly = volume.IsReadOnly();
 	volume.Unset();
 	
@@ -711,6 +713,10 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	if (moveMode == kMoveSelectionTo && sourceIsReadOnly)
 		moveMode = kCopySelectionTo;
 
+	bool needSizeCalculation = true;
+	if ((moveMode == kMoveSelectionTo && srcVolumeDevice == destVolumeDevice) || destIsTrash)
+		needSizeCalculation = false;
+
 	// we need the undo object later on, so we create it no matter
 	// if we really need it or not (it's very lightweight)
 	MoveCopyUndo undo(srcList, destDir, pointList, moveMode);
@@ -721,7 +727,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	ConflictCheckResult conflictCheckResult = kPrompt;
 	int32 collisionCount = 0;
 	status_t result = InitCopy(moveMode, srcList, thread, &volume, destDirToCheck,
-		&destRef, needPreflightNameCheck, &collisionCount, &conflictCheckResult);
+		&destRef, needPreflightNameCheck, needSizeCalculation, &collisionCount, &conflictCheckResult);
 	
 	int32 count = srcList->CountItems();
 	if (result == B_OK) {
