@@ -6,6 +6,9 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <GridLayout.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
@@ -15,6 +18,7 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <scheduler.h>
+#include <SpaceLayoutItem.h>
 #include <TabView.h>
 #include <TextControl.h>
 #include <TimeSource.h>
@@ -39,7 +43,7 @@ const int32 kMenuHeight = 15;
 const int32 kButtonHeight = 15;
 const int32 kSliderViewRectHeight = 40;
 
-static void ErrorAlert(const char* message, status_t err);
+static void ErrorAlert(const char* message, status_t err, BWindow *window);
 static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
 
 #define	CALL		printf
@@ -51,12 +55,22 @@ static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
 // Utility functions
 
 static void
-ErrorAlert(const char* message, status_t err)
+ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
-	(new BAlert("", message, "Quit"))->Go();
+	BAlert *alert = new BAlert("", message, "OK");
+	if (window != NULL) {
+		alert->MoveTo(
+			window->Frame().left +
+				window->Bounds().right / 2 -
+				alert->Bounds().right / 2,
+			window->Frame().top +
+				window->Bounds().bottom / 2 -
+				alert->Bounds().bottom / 2);
+	}
+	alert->Go();
 
 	printf("%s\n%s [%lx]", message, strerror(err), err);
-	be_app->PostMessage(B_QUIT_REQUESTED);
+//	be_app->PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -145,9 +159,9 @@ void
 CodyCam::ReadyToRun()
 {
 	/* create the window for the app */
-	fWindow = new VideoWindow(BRect(28, 28, 28 + (WINDOW_SIZE_X - 1),
-		28 + (WINDOW_SIZE_Y - 1)), (const char*)"CodyCam", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, &fPort);
+	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
+		(const char*) "CodyCam", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
 	/* set up the node connections */
 	status_t status = _SetUpNodes();
@@ -243,14 +257,14 @@ CodyCam::_SetUpNodes()
 	/* find the media roster */
 	fMediaRoster = BMediaRoster::Roster(&status);
 	if (status != B_OK) {
-		ErrorAlert("Can't find the media roster", status);
+		ErrorAlert("Can't find the media roster", status, fWindow);
 		return status;
 	}
 
 	/* find the time source */
 	status = fMediaRoster->GetTimeSource(&fTimeSourceNode);
 	if (status != B_OK) {
-		ErrorAlert("Can't get a time source", status);
+		ErrorAlert("Can't get a time source", status, fWindow);
 		return status;
 	}
 
@@ -258,7 +272,7 @@ CodyCam::_SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		ErrorAlert("Can't find a video source. You need a webcam to use CodyCam.", status);
+		ErrorAlert("Can't find a video source. You need a webcam to use CodyCam.", status, fWindow);
 		return status;
 	}
 
@@ -266,14 +280,14 @@ CodyCam::_SetUpNodes()
 	fVideoConsumer = new VideoConsumer("CodyCam", ((VideoWindow*)fWindow)->VideoView(),
 		((VideoWindow*)fWindow)->StatusLine(), NULL, 0);
 	if (!fVideoConsumer) {
-		ErrorAlert("Can't create a video window", B_ERROR);
+		ErrorAlert("Can't create a video window", B_ERROR, fWindow);
 		return B_ERROR;
 	}
 
 	/* register the node */
 	status = fMediaRoster->RegisterNode(fVideoConsumer);
 	if (status != B_OK) {
-		ErrorAlert("Can't register the video window", status);
+		ErrorAlert("Can't register the video window", status, fWindow);
 		return status;
 	}
 	fPort = fVideoConsumer->ControlPort();
@@ -284,7 +298,7 @@ CodyCam::_SetUpNodes()
 		B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert("Can't find an available video stream", status);
+		ErrorAlert("Can't find an available video stream", status, fWindow);
 		return status;
 	}
 
@@ -294,7 +308,7 @@ CodyCam::_SetUpNodes()
 		&cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert("Can't find an available connection to the video window", status);
+		ErrorAlert("Can't find an available connection to the video window", status, fWindow);
 		return status;
 	}
 
@@ -436,7 +450,6 @@ VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint
 	_SetUpSettings("codycam", "");	
 
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "menu bar");
-	AddChild(menuBar);
 	
 	BMenuItem* menuItem;
 	BMenu* menu = new BMenu("File");
@@ -470,23 +483,15 @@ VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint
 	menuBar->AddItem(menu);
 
 	/* give it a gray background view */
-	BRect aRect;
-	aRect = Frame();
-	aRect.OffsetTo(B_ORIGIN);
-	aRect.top += menuBar->Frame().Height() + 1;
-	fView	= new BView(aRect, "Background View", B_FOLLOW_ALL, B_WILL_DRAW);
-	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fView);
-	
+	fView = new BView("Background View", B_WILL_DRAW, NULL);
+ 	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
 	/* add some controls */
 	_BuildCaptureControls(fView);
 	
-	/* add another view to hold the video image */
-	aRect = BRect(0, 0, VIDEO_SIZE_X - 1, VIDEO_SIZE_Y - 1);
-	aRect.OffsetBy((WINDOW_SIZE_X - VIDEO_SIZE_X) / 2, kYBuffer);
-	
-	fVideoView	= new BView(aRect, "Video View", B_FOLLOW_ALL, B_WILL_DRAW);
-	fView->AddChild(fVideoView);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(menuBar);
+	AddChild(fView);
 
 	Show();
 }
@@ -665,32 +670,22 @@ VideoWindow::StatusLine()
 void
 VideoWindow::_BuildCaptureControls(BView* theView)
 {
-	BRect aFrame, theFrame;
+	// a view to hold the video image
+	fVideoView = new BView("Video View", B_WILL_DRAW);
+	fVideoView->SetExplicitMinSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
+	fVideoView->SetExplicitMaxSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
 
-	theFrame = theView->Bounds();
-	theFrame.top += VIDEO_SIZE_Y + 2 * kYBuffer + 40;
-	theFrame.left += kXBuffer;
-	theFrame.right -= (WINDOW_SIZE_X / 2 + 5);
-	theFrame.bottom -= kXBuffer;
+	// Capture controls
+	fCaptureSetupBox = new BBox("Capture Controls", B_WILL_DRAW);
+	fCaptureSetupBox->SetLabel("Capture controls");
 
-	fCaptureSetupBox = new BBox(theFrame, "Capture Controls", B_FOLLOW_ALL, B_WILL_DRAW);
-	fCaptureSetupBox->SetLabel("Capture Controls");
-	theView->AddChild(fCaptureSetupBox);
-
-	aFrame = fCaptureSetupBox->Bounds();
-	aFrame.InsetBy(kXBuffer, kYBuffer);	
-	aFrame.top += kYBuffer / 2;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
-	fFileName = new BTextControl(aFrame, "File Name", "File Name:",
+	BGridLayout *controlsLayout = new BGridLayout(kXBuffer, 0);
+	controlsLayout->SetInsets(10, 15, 5, 5);
+	fCaptureSetupBox->SetLayout(controlsLayout);
+	
+	fFileName = new BTextControl("File Name", "File name:",
 		fFilenameSetting->Value(), new BMessage(msg_filename));
-
 	fFileName->SetTarget(BMessenger(NULL, this));
-	fFileName->SetDivider(fFileName->Divider() - 30);
-	fCaptureSetupBox->AddChild(fFileName);	
-
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
 
 	fImageFormatMenu = new BPopUpMenu("Image Format Menu");	
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
@@ -705,13 +700,9 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	else
 		fImageFormatMenu->ItemAt(0)->SetMarked(true);
 
-	fImageFormatSelector = new BMenuField(aFrame, "Format", "Format:", fImageFormatMenu);
-	fImageFormatSelector->SetDivider(fImageFormatSelector->Divider() - 30);
-	fCaptureSetupBox->AddChild(fImageFormatSelector);
+	fImageFormatSelector = new BMenuField("Format", "Format:",
+		fImageFormatMenu, NULL);
 	
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
 	fCaptureRateMenu = new BPopUpMenu("Capture Rate Menu");
 	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 seconds", new BMessage(msg_rate_15s)));
 	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 seconds", new BMessage(msg_rate_30s)));
@@ -728,17 +719,20 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	fCaptureRateMenu->AddItem(new BMenuItem("Never", new BMessage(msg_rate_never)));
 	fCaptureRateMenu->SetTargetForItems(this);
 	fCaptureRateMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
-	fCaptureRateSelector = new BMenuField(aFrame, "Rate", "Rate:", fCaptureRateMenu);
-	fCaptureRateSelector->SetDivider(fCaptureRateSelector->Divider() - 30);
-	fCaptureSetupBox->AddChild(fCaptureRateSelector);
+	fCaptureRateSelector = new BMenuField("Rate", "Rate:",
+		fCaptureRateMenu, NULL);
 
-	aFrame = theView->Bounds();
-	aFrame.top += VIDEO_SIZE_Y + 2 * kYBuffer + 40;
-	aFrame.left += WINDOW_SIZE_X / 2 + 5;
-	aFrame.right -= kXBuffer;
-	aFrame.bottom -= kYBuffer;
+	controlsLayout->AddItem(fFileName->CreateLabelLayoutItem(), 0, 0);
+	controlsLayout->AddItem(fFileName->CreateTextViewLayoutItem(), 1, 0);
+	controlsLayout->AddItem(fImageFormatSelector->CreateLabelLayoutItem(), 0, 1);
+	controlsLayout->AddItem(fImageFormatSelector->CreateMenuBarLayoutItem(), 1, 1);
+	controlsLayout->AddItem(fCaptureRateSelector->CreateLabelLayoutItem(), 0, 2);
+	controlsLayout->AddItem(fCaptureRateSelector->CreateMenuBarLayoutItem(), 1, 2);
+	controlsLayout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, 3, 2);
 
-	fFtpSetupBox = new BBox(aFrame, "Ftp Setup", B_FOLLOW_ALL, B_WILL_DRAW);
+	// FTP setup box
+	fFtpSetupBox = new BBox("Ftp Setup", B_WILL_DRAW);
+
 	fUploadClientMenu = new BPopUpMenu("Send to" B_UTF8_ELLIPSIS);
 	for (int i = 0; kUploadClient[i]; i++) {
 		BMessage *m = new BMessage(msg_upl_client);
@@ -747,78 +741,74 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	}
 	fUploadClientMenu->SetTargetForItems(this);
 	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
-	fUploadClientSelector = new BMenuField(aFrame, "UploadClient", "", fUploadClientMenu);
-	fUploadClientSelector->SetDivider(0.0);
+	fUploadClientSelector = new BMenuField("UploadClient", NULL,
+		fUploadClientMenu, NULL);
 
-	fFtpSetupBox->SetLabel(fUploadClientSelector);
-	theView->AddChild(fFtpSetupBox);
+	fFtpSetupBox->SetLabel("FTP");
+	// this doesn't work with the layout manager
+//	fFtpSetupBox->SetLabel(fUploadClientSelector);
+fUploadClientSelector->SetLabel("Type:");
 
-	aFrame = fFtpSetupBox->Bounds();
-	aFrame.InsetBy(kXBuffer,kYBuffer);	
-	aFrame.top += kYBuffer/2;
-	aFrame.bottom = aFrame.top + kMenuHeight;	
-	aFrame.right = aFrame.left + 160;
+	BGridLayout *ftpLayout = new BGridLayout(kXBuffer, 0);
+	ftpLayout->SetInsets(10, 15, 5, 5);
+	fFtpSetupBox->SetLayout(ftpLayout);
 
-	fServerName = new BTextControl(aFrame, "Server", "Server:", fServerSetting->Value(),
-		new BMessage(msg_server));
+	fServerName = new BTextControl("Server", "Server:",
+		fServerSetting->Value(), new BMessage(msg_server));
 	fServerName->SetTarget(this);
-	fServerName->SetDivider(fServerName->Divider() - 30);
-	fFtpSetupBox->AddChild(fServerName);	
 
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
-	fLoginId = new BTextControl(aFrame, "Login", "Login:", fLoginSetting->Value(),
-		new BMessage(msg_login));
+	fLoginId = new BTextControl("Login", "Login:",
+		fLoginSetting->Value(), new BMessage(msg_login));
 	fLoginId->SetTarget(this);
-	fLoginId->SetDivider(fLoginId->Divider() - 30);
-	fFtpSetupBox->AddChild(fLoginId);	
 
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
-	fPassword = new BTextControl(aFrame, "Password", "Password:",
+	fPassword = new BTextControl("Password", "Password:",
 		fPasswordSetting->Value(), new BMessage(msg_password));
 	fPassword->SetTarget(this);
-	fPassword->SetDivider(fPassword->Divider() - 30);
 	fPassword->TextView()->HideTyping(true);
 	// BeOS HideTyping() seems broken, it empties the text
 	fPassword->SetText(fPasswordSetting->Value());
-	fFtpSetupBox->AddChild(fPassword);	
 
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
-	fDirectory = new BTextControl(aFrame, "Directory", "Directory:",
+	fDirectory = new BTextControl("Directory", "Directory:",
 		fDirectorySetting->Value(), new BMessage(msg_directory));
 	fDirectory->SetTarget(this);
-	fDirectory->SetDivider(fDirectory->Divider() - 30);
-	fFtpSetupBox->AddChild(fDirectory);	
 
-	aFrame.top = aFrame.bottom + kYBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight;
-
-	fPassiveFtp = new BCheckBox(aFrame, "Passive ftp", "Passive ftp",
+	fPassiveFtp = new BCheckBox("Passive ftp", "Passive FTP",
 		new BMessage(msg_passiveftp));
 	fPassiveFtp->SetTarget(this);
 	fPassiveFtp->SetValue(fPassiveFtpSetting->Value());
-	fFtpSetupBox->AddChild(fPassiveFtp);	
 
-	aFrame = theView->Bounds();
-	aFrame.top += VIDEO_SIZE_Y + 2 * kYBuffer;
-	aFrame.left += kXBuffer;
-	aFrame.right -= kXBuffer;
-	aFrame.bottom = aFrame.top + kMenuHeight + 2 * kYBuffer;
-
-	fStatusBox = new BBox(aFrame, "Status", B_FOLLOW_ALL, B_WILL_DRAW);
-	fStatusBox->SetLabel("Status");
-	theView->AddChild(fStatusBox);
-
-	aFrame = fStatusBox->Bounds();
-	aFrame.InsetBy(kXBuffer, kYBuffer);	
-
-	fStatusLine = new BStringView(aFrame, "Status Line", "Waiting" B_UTF8_ELLIPSIS);
-	fStatusBox->AddChild(fStatusLine);
+	ftpLayout->AddItem(fUploadClientSelector->CreateLabelLayoutItem(), 0, 0);
+	ftpLayout->AddItem(fUploadClientSelector->CreateMenuBarLayoutItem(), 1, 0);
+	ftpLayout->AddItem(fServerName->CreateLabelLayoutItem(), 0, 1);
+	ftpLayout->AddItem(fServerName->CreateTextViewLayoutItem(), 1, 1);
+	ftpLayout->AddItem(fLoginId->CreateLabelLayoutItem(), 0, 2);
+	ftpLayout->AddItem(fLoginId->CreateTextViewLayoutItem(), 1, 2);
+	ftpLayout->AddItem(fPassword->CreateLabelLayoutItem(), 0, 3);
+	ftpLayout->AddItem(fPassword->CreateTextViewLayoutItem(), 1, 3);
+	ftpLayout->AddItem(fDirectory->CreateLabelLayoutItem(), 0, 4);
+	ftpLayout->AddItem(fDirectory->CreateTextViewLayoutItem(), 1, 4);
+	ftpLayout->AddView(fPassiveFtp, 0, 5, 2);
+	
+	fStatusLine = new BStringView("Status Line", "Waiting" B_UTF8_ELLIPSIS);
+	
+	BGroupLayout *groupLayout = new BGroupLayout(B_VERTICAL);
+	groupLayout->SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer);
+	
+	theView->SetLayout(groupLayout);
+	
+	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
+	theView->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(BSpaceLayoutItem::CreateHorizontalStrut(0.0))
+		.Add(fVideoView)
+		.Add(BSpaceLayoutItem::CreateHorizontalStrut(0.0))
+	);
+	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
+	theView->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, kXBuffer)
+		.Add(fCaptureSetupBox)
+		.Add(fFtpSetupBox)
+	);
+	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
+	theView->AddChild(fStatusLine);
 }
 
 
