@@ -332,7 +332,8 @@ class BPoseView : public BView {
 			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
 		static void MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			BContainerWindow *destWindow, uint32 buttons, BPoint loc,
-			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
+			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false,
+			BPoint clickPt = BPoint(0, 0), bool pinToGrid = false);
 
 		bool UpdateDropTarget(BPoint, const BMessage *, bool trackingContextMenu);
 			// return true if drop target changed
