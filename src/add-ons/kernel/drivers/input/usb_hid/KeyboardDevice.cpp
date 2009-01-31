@@ -324,51 +324,51 @@ KeyboardDevice::_InterpretBuffer()
 	uint8 *compare = fTransferBuffer;
 	for (int32 twice = 0; twice < 2; twice++) {
 		for (size_t i = 2; i < fTotalReportSize; i++) {
-			if (current[i] != 0x00 && current[i] != 0x01) {
-				bool found = false;
-				for (size_t j = 2; j < fTotalReportSize; j++) {
-					if (compare[j] == current[i]) {
-						found = true;
-						break;
-					}
+			if (current[i] == 0x00 || current[i] == 0x01)
+				continue;
+
+			bool found = false;
+			for (size_t j = 2; j < fTotalReportSize; j++) {
+				if (compare[j] == current[i]) {
+					found = true;
+					break;
 				}
+			}
 
-				if (found)
-					continue;
+			if (found)
+				continue;
 
-				// a change occured
-				uint32 key = 0;
-				if (current[i] < sKeyTableSize)
-					key = sKeyTable[current[i]];
+			// a change occured
+			uint32 key = 0;
+			if (current[i] < sKeyTableSize)
+				key = sKeyTable[current[i]];
 
-				if (key == KEY_Pause && (current[0] & 1))
-					key = KEY_Break;
-				else if (key == 0xe && (current[0] & 1))
-					key = KEY_SysRq;
+			if (key == KEY_Pause && (current[0] & 1))
+				key = KEY_Break;
+			else if (key == 0xe && (current[0] & 1))
+				key = KEY_SysRq;
 #if 0
-				else if (keyDown && key == 0x0d) // ToDo: remove again
-					panic("keyboard requested halt.\n");
+			else if (keyDown && key == 0x0d) // ToDo: remove again
+				panic("keyboard requested halt.\n");
 #endif
-				else if (key == 0) {
-					// unmapped key
-					key = 0x200000 + current[i];
-				}
+			else if (key == 0) {
+				// unmapped key
+				key = 0x200000 + current[i];
+			}
 
-				_WriteKey(key, keyDown);
+			_WriteKey(key, keyDown);
 
-				if (keyDown) {
-					// repeat handling
-					fCurrentRepeatKey = key;
-					fCurrentRepeatDelay = fRepeatDelay;
-				} else {
-					// cancel the repeats if they are for this key
-					if (fCurrentRepeatKey == key) {
-						fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
-						fCurrentRepeatKey = 0;
-					}
+			if (keyDown) {
+				// repeat handling
+				fCurrentRepeatKey = key;
+				fCurrentRepeatDelay = fRepeatDelay;
+			} else {
+				// cancel the repeats if they are for this key
+				if (fCurrentRepeatKey == key) {
+					fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
+					fCurrentRepeatKey = 0;
 				}
-			} else
-				break;
+			}
 		}
 
 		current = fTransferBuffer;
