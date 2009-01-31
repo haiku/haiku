@@ -4470,6 +4470,8 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 
 	if (okToMove) {
 		PoseList *selectionList = srcWindow->PoseView()->SelectionList();
+		BList *pointList = destWindow->PoseView()->GetDropPointList(clickPt, loc, selectionList,
+			srcWindow->PoseView()->ViewMode() == kListMode, dropOnGrid);
 		BObjectList<entry_ref> *srcList = new BObjectList<entry_ref>(
 			selectionList->CountItems(), true);
 		CopySelectionListToBListAsEntryRefs(selectionList, srcList);
@@ -4494,7 +4496,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 				moveMode = kCopySelectionTo;
 		}
 		
-		FSMoveToFolder(srcList, destEntry, moveMode);
+		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		return;
 	}
 
