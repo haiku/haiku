@@ -439,6 +439,7 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 	// is used directly)
 	region->IntersectWith(&VisibleContentRegion());
 	if (region->CountRects() > 0) {
+		// Constrain to content region at destination
 		region->OffsetBy(xOffset, yOffset);
 		region->IntersectWith(&fVisibleContentRegion);
 		if (region->CountRects() > 0) {
@@ -448,7 +449,16 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 			// the part which we can copy is not dirty
 			newDirty->Exclude(region);
 
-			fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+			BRegion* copyRegion = fRegionPool.GetRegion(*region);
+			if (copyRegion != NULL) {
+				copyRegion->Exclude(&fPendingUpdateSession->DirtyRegion());
+				copyRegion->Exclude(&fCurrentUpdateSession->DirtyRegion());
+				copyRegion->Exclude(&fDirtyRegion);
+				fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
+				fRegionPool.Recycle(copyRegion);
+			} else {
+				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+			}
 
 			// move along the already dirty regions that are common
 			// with the region that we could copy
