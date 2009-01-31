@@ -17,6 +17,7 @@ public:
 			SetLayout(base);
 
 			BView* view = new BView("", B_WILL_DRAW, NULL);
+			view->SetViewColor(255, 0, 0, 255);
 			view->SetExplicitMinSize(BSize(B_SIZE_UNSET, 200));
 
 			fScrollView = new BScrollView("mit", view, B_NAVIGABLE_JUMP, true,
@@ -24,6 +25,7 @@ public:
 
 			BView* view2 = new BView(BRect(0, 0, 200, 200), "", B_FOLLOW_ALL,
 				B_WILL_DRAW);
+			view2->SetViewColor(255, 0, 0, 255);
 
 			fScrollView2 = new BScrollView("ohne", view2, B_FOLLOW_ALL,
 				B_NAVIGABLE_JUMP, true, true, B_NO_BORDER);
@@ -78,7 +80,7 @@ public:
 		void PrintToStream()
 		{
 			BView* view = fScrollView->Target();
-			BView* view2 = fScrollView->Target();
+			BView* view2 = fScrollView2->Target();
 
 			view->Bounds().PrintToStream();
 			view->Frame().PrintToStream();
