@@ -47,7 +47,7 @@ UnitTestLib libinterfacetest.so
 		RegionInclude.cpp
 		RegionIntersect.cpp
 		RegionOffsetBy.cpp
-		
+
 	: be $(TARGET_LIBSTDC++)
 ;
 
@@ -141,6 +141,12 @@ SimpleTest SetDiskModeTest :
 	: be
 ;
 
+SimpleTest SetBorderScrollViewTest :
+	ScrollViewSetBorderTest.cpp
+	ScrollView.cpp
+	: be
+;
+
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp Slider.cpp Control.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits interface ] ;
@@ -153,4 +159,3 @@ SubInclude HAIKU_TOP src tests kits interface layout ;
 SubInclude HAIKU_TOP src tests kits interface look ;
 SubInclude HAIKU_TOP src tests kits interface picture ;
 SubInclude HAIKU_TOP src tests kits interface pictureprint ;
-
