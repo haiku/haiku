@@ -77,9 +77,13 @@ SVGExporter::Export(const Icon* icon, BPositionIO* stream)
 
 	// image size
 	if (ret >= B_OK) {
-		helper << "<svg width=\"" << 64 << "\""
+		helper << "<svg version=\"1.1\" width=\"" << 64 << "\""
 			   << " height=\"" << 64 << "\""
-			   << " color-interpolation=\"linearRGB\">\n";
+			   << " color-interpolation=\"linearRGB\"\n"
+			   << "     xmlns:svg=\"http://www.w3.org/2000/svg\""
+// Should be needed when exporting inline images:
+//			   << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""
+			   << " xmlns=\"http://www.w3.org/2000/svg\">\n";
 		ret = write_line(stream, helper);
 	}
 
