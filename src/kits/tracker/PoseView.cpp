@@ -4360,7 +4360,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	BContainerWindow *destWindow, uint32 buttons, BPoint loc, bool forceCopy,
-	bool forceMove, bool createLink, bool relativeLink)
+	bool forceMove, bool createLink, bool relativeLink, BPoint clickPt, bool dropOnGrid)
 {	
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -4404,8 +4404,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		if (targetView->ViewMode() == kListMode)                    // can't move in list view
 			return;
 		
-			
-		bool dropOnGrid = (modifiers() & B_COMMAND_KEY) != 0;
+		BPoint delta = loc - clickPt;			
 		int32 count = targetView->fSelectionList->CountItems();
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = targetView->fSelectionList->ItemAt(index);
@@ -4415,19 +4414,19 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			// need to do this because bsearch uses top of pose
 			// to locate pose to remove
 			targetView->RemoveFromVSList(pose);
-
+			BPoint location (pose->Location() + delta);
 			BRect oldBounds(pose->CalcRect(targetView));
 			if (dropOnGrid)
-				loc = targetView->PinToGrid(loc, targetView->fGrid, targetView->fOffset);
+				location = targetView->PinToGrid(location, targetView->fGrid, targetView->fOffset);
 
-				pose->MoveTo(loc, targetView);
+			pose->MoveTo(location, targetView);
 
-				targetView->RemoveFromExtent(oldBounds);
-				targetView->AddToExtent(pose->CalcRect(targetView));
+			targetView->RemoveFromExtent(oldBounds);
+			targetView->AddToExtent(pose->CalcRect(targetView));
 
-				// remove and reinsert pose to keep VSlist sorted
-				targetView->AddToVSList(pose);
-			}
+			// remove and reinsert pose to keep VSlist sorted
+			targetView->AddToVSList(pose);
+		}
 
 		return;
 	}
@@ -4521,7 +4520,9 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 		return;
 
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
-	MoveSelectionInto(TargetModel(), srcWindow, window, buttons, dropPt, false);
+	bool pinToGrid = (modifiers() & B_COMMAND_KEY) != 0;
+	MoveSelectionInto(TargetModel(), srcWindow, window, buttons, dropPt, 
+		false, false, false, false, clickPt, pinToGrid);
 }
 
 
