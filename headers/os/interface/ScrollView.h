@@ -92,6 +92,8 @@ private:
 			BRect			_InnerFrame() const;
 			BSize			_ComputeSize(BSize targetSize) const;
 			BRect			_ComputeFrame(BRect targetRect) const;
+			void			_AlignScrollBars(bool horizontal, bool vertical,
+								BRect targetFrame);
 
 	static	BRect			_ComputeFrame(BRect frame, bool horizontal,
 								bool vertical, border_style border);

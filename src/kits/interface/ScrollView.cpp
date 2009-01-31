@@ -115,38 +115,18 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	}
 
 	if (horizontal) {
-		BRect rect = targetFrame;
-		rect.top = rect.bottom + 1;
-		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
-		if (fBorder != B_NO_BORDER || vertical) {
-			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
-			rect.right++;
-		}
-		if (fBorder != B_NO_BORDER) {
-			// the scrollbar draws part of the surrounding frame on the left
-			rect.left--;
-		}
-		fHorizontalScrollBar = new BScrollBar(rect, "_HSB_", fTarget, 0, 1000,
-			B_HORIZONTAL);
+		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",
+			fTarget, 0, 1000, B_HORIZONTAL);
 		AddChild(fHorizontalScrollBar);
 	}
 
 	if (vertical) {
-		BRect rect = targetFrame;
-		rect.left = rect.right + 1;
-		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
-		if (fBorder != B_NO_BORDER || horizontal) {
-			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
-			rect.bottom++;
-		}
-		if (fBorder != B_NO_BORDER) {
-			// the scrollbar draws part of the surrounding frame on the left
-			rect.top--;
-		}
-		fVerticalScrollBar = new BScrollBar(rect, "_VSB_", fTarget, 0, 1000,
-			B_VERTICAL);
+		fVerticalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_VSB_",
+			fTarget, 0, 1000, B_VERTICAL);
 		AddChild(fVerticalScrollBar);
 	}
+
+	_AlignScrollBars(horizontal, vertical, targetFrame);
 
 	fPreviousWidth = uint16(Bounds().Width());
 	fPreviousHeight = uint16(Bounds().Height());
@@ -283,6 +263,18 @@ BScrollView::SetBorder(border_style border)
 	if (fBorder == border)
 		return;
 
+	if (Flags() & B_SUPPORTS_LAYOUT) {
+		fBorder = border;
+		SetFlags(_ModifyFlags(Flags(), border));
+
+		DoLayout();
+
+		BRect bounds(Bounds());
+		Invalidate(BRect(bounds.LeftTop(), bounds.RightBottom()));
+		Invalidate(BRect(bounds.LeftBottom(), bounds.RightBottom()));
+		return;
+	}
+
 	float offset = _BorderSize() - _BorderSize(border);
 	float resize = 2 * offset;
 
@@ -388,7 +380,7 @@ BScrollView::SetTarget(BView *target)
 	if (target != NULL) {
 		target->MoveTo(_BorderSize(), _BorderSize());
 		BRect innerFrame = _InnerFrame();
-		target->ResizeTo(innerFrame.Width(), innerFrame.Height());
+		target->ResizeTo(innerFrame.Width() - 1, innerFrame.Height() - 1);
 		target->TargetedByScrollView(this);
 
 		AddChild(target, ChildAt(0));
@@ -559,6 +551,49 @@ BScrollView::_ComputeFrame(BRect targetRect) const
 }
 
 
+void
+BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
+{
+	if (horizontal) {
+		BRect rect = targetFrame;
+		rect.top = rect.bottom + 1;
+		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
+		if (fBorder != B_NO_BORDER || vertical) {
+			// extend scrollbar so that it overlaps one pixel with vertical
+			// scrollbar
+			rect.right++;
+		}
+
+		if (fBorder != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
+			rect.left--;
+		}
+
+		fHorizontalScrollBar->MoveTo(rect.left, rect.top);
+		fHorizontalScrollBar->ResizeTo(rect.Width(), rect.Height());
+	}
+
+	if (vertical) {
+		BRect rect = targetFrame;
+		rect.left = rect.right + 1;
+		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+		if (fBorder != B_NO_BORDER || horizontal) {
+			// extend scrollbar so that it overlaps one pixel with vertical
+			// scrollbar
+			rect.bottom++;
+		}
+
+		if (fBorder != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
+			rect.top--;
+		}
+
+		fVerticalScrollBar->MoveTo(rect.left, rect.top);
+		fVerticalScrollBar->ResizeTo(rect.Width(), rect.Height());
+	}
+}
+
+
 /*!	This static method is used to calculate the frame that the
 	ScrollView will cover depending on the frame of its target
 	and which border style is used.
@@ -690,8 +725,7 @@ BScrollView::DoLayout()
 	if (!(Flags() & B_SUPPORTS_LAYOUT))
 		return;
 
-	// If the user set a layout, we let the base class version call its
-	// hook.
+	// If the user set a layout, we let the base class version call its hook.
 	if (GetLayout()) {
 		BView::DoLayout();
 		return;
@@ -706,17 +740,8 @@ BScrollView::DoLayout()
 		//BLayoutUtils::AlignInFrame(fTarget, fTarget->Bounds());
 	}
 
-	if (fHorizontalScrollBar != NULL) {
-		fHorizontalScrollBar->MoveTo(innerFrame.left, innerFrame.bottom);
-		fHorizontalScrollBar->ResizeTo(innerFrame.Width(),
-			fHorizontalScrollBar->Bounds().Height());
-	}
-
-	if (fVerticalScrollBar != NULL) {
-		fVerticalScrollBar->MoveTo(innerFrame.right, innerFrame.top);
-		fVerticalScrollBar->ResizeTo(fVerticalScrollBar->Bounds().Width(),
-			innerFrame.Height());
-	}
+	_AlignScrollBars(fHorizontalScrollBar != NULL, fVerticalScrollBar != NULL,
+		innerFrame);
 }
 
 
