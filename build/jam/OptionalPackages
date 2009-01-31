@@ -378,9 +378,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage openssl-0.9.8g-gcc2-2008-03-28
-			: $(baseURL)/openssl-0.9.8g-gcc2-2008-03-28.zip
-			: home
+		InstallOptionalHaikuImagePackage openssl-0.9.8j-gcc2-2009-01-28
+			: $(baseURL)/openssl-0.9.8j-gcc2-2009-01-28.zip
+			:
 		;
 	}
 }

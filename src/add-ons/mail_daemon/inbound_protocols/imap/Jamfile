@@ -14,7 +14,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 if $(USE_SSL) {
 	SubDirC++Flags -DUSE_SSL ;
 	if ! $(SSL_DIR) {
-		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl config ] ;
+		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
 	} else {
 		sslDir = $(SSL_DIR) ;
 	}
