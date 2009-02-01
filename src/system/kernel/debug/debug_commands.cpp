@@ -499,23 +499,15 @@ print_debugger_command_usage(const char* commandName)
 //	#pragma mark - public API
 
 int
-#if __GNUC__ > 2
 add_debugger_command(const char *name, int (*func)(int, char **),
 	const char *desc)
-#else
-add_debugger_command(char *name, int (*func)(int, char **), char *desc)
-#endif
 {
 	return add_debugger_command_etc(name, func, desc, NULL, 0);
 }
 
 
 int
-#if __GNUC__ > 2
 remove_debugger_command(const char * name, int (*func)(int, char **))
-#else
-remove_debugger_command(char * name, int (*func)(int, char **))
-#endif
 {
 	struct debugger_command *cmd = sCommands;
 	struct debugger_command *prev = NULL;

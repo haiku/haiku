@@ -174,16 +174,10 @@ extern void			panic(const char *format, ...) _PRINTFLIKE(1, 2);
 extern void			kernel_debugger(const char *message);
 extern uint64		parse_expression(const char *string);
 
-#if __GNUC__ > 2
 extern int			add_debugger_command(const char *name,
 						debugger_command_hook hook, const char *help);
 extern int			remove_debugger_command(const char *name,
 						debugger_command_hook hook);
-#else
-extern int			add_debugger_command(char *name, debugger_command_hook hook, char *help);
-extern int			remove_debugger_command(char *name,
-						debugger_command_hook hook);
-#endif
 
 /* Miscellaneous */
 extern void			spin(bigtime_t microseconds);
