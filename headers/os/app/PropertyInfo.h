@@ -48,10 +48,16 @@ struct compound_type {
 };
 
 struct property_info {
+#if __GNUC__ > 2
+	const 
+#endif
 	char			*name;
 	uint32			commands[10];
 	uint32			specifiers[10];
-	char			*usage;
+#if __GNUC__ > 2
+	const 
+#endif
+	char 			*usage;
 	uint32			extra_data;
 	uint32			types[10];
 	compound_type	ctypes[3];
