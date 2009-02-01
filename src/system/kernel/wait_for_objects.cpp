@@ -564,7 +564,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		int fd = fds[i].fd;
 
 		// initialize events masks
-		sync->set[i].selected_events = fds[i].events & ~POLLNVAL
+		sync->set[i].selected_events = (fds[i].events & ~POLLNVAL)
 			| POLLERR | POLLHUP;
 		sync->set[i].events = 0;
 

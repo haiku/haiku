@@ -2049,9 +2049,9 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 	if (_symbolCount == NULL || _stringTableSize == NULL)
 		return B_BAD_VALUE;
 	if (!IS_USER_ADDRESS(_symbolCount) || !IS_USER_ADDRESS(_stringTableSize)
-		|| _imageDelta != NULL && !IS_USER_ADDRESS(_imageDelta)
-		|| symbolTable != NULL && !IS_USER_ADDRESS(symbolTable)
-		|| stringTable != NULL && !IS_USER_ADDRESS(stringTable)) {
+		|| (_imageDelta != NULL && !IS_USER_ADDRESS(_imageDelta))
+		|| (symbolTable != NULL && !IS_USER_ADDRESS(symbolTable))
+		|| (stringTable != NULL && !IS_USER_ADDRESS(stringTable))) {
 		return B_BAD_ADDRESS;
 	}
 
@@ -2120,8 +2120,8 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 	if (user_memcpy(_symbolCount, &symbolCount, sizeof(symbolCount)) != B_OK
 		|| user_memcpy(_stringTableSize, &stringTableSize,
 				sizeof(stringTableSize)) != B_OK
-		|| _imageDelta != NULL && user_memcpy(_imageDelta, &imageDelta,
-				sizeof(imageDelta)) != B_OK) {
+		|| (_imageDelta != NULL && user_memcpy(_imageDelta, &imageDelta,
+				sizeof(imageDelta)) != B_OK)) {
 		return B_BAD_ADDRESS;
 	}
 

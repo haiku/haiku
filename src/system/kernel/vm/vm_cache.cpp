@@ -389,7 +389,8 @@ status_t
 VMCache::Init(uint32 cacheType)
 {
 	mutex_init(&fLock, "vm_cache");
-	list_init_etc(&consumers, offsetof(VMCache, consumer_link));
+	VMCache dummyCache;
+	list_init_etc(&consumers, offset_of_member(dummyCache, consumer_link));
 	areas = NULL;
 	fRefCount = 1;
 	source = NULL;

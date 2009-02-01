@@ -611,7 +611,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 	}
 
 	// create our callback
-	WriteCallback* callback = (flags & B_VIP_IO_REQUEST != 0)
+	WriteCallback* callback = (flags & B_VIP_IO_REQUEST) != 0
  		? new(vip_io_alloc) WriteCallback(this, _callback)
 		: new(std::nothrow) WriteCallback(this, _callback);
 	if (callback == NULL) {
@@ -1211,7 +1211,7 @@ swap_init_post_modules()
 
 	close(fd);
 
-	error = swap_file_add("/var/swap");
+	error = swap_file_add((char *)"/var/swap");
 	if (error != B_OK)
 		dprintf("Failed to add swap file /var/swap: %s\n", strerror(error));
 }

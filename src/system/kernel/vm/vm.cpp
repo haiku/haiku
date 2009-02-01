@@ -418,7 +418,7 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
 	if (area != NULL
 		&& (area->address_space->id == team
-			|| allowKernel && team == vm_kernel_address_space_id())) {
+			|| (allowKernel && team == vm_kernel_address_space_id()))) {
 		fSpace = area->address_space;
 		atomic_add(&fSpace->ref_count, 1);
 	}
@@ -1358,9 +1358,9 @@ set_area_page_protection(vm_area* area, addr_t pageAddress, uint32 protection)
 	uint32 pageIndex = (pageAddress - area->base) / B_PAGE_SIZE;
 	uint8& entry = area->page_protections[pageIndex / 2];
 	if (pageIndex % 2 == 0)
-		entry = entry & 0xf0 | protection;
+		entry = (entry & 0xf0) | protection;
 	else
-		entry = entry & 0x0f | (protection << 4);
+		entry = (entry & 0x0f) | (protection << 4);
 }
 
 
@@ -2280,9 +2280,9 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	// The FD must open for reading at any rate. For shared mapping with write
 	// access, additionally the FD must be open for writing.
 	if ((openMode & O_ACCMODE) == O_WRONLY
-		|| mapping == REGION_NO_PRIVATE_MAP
+		|| (mapping == REGION_NO_PRIVATE_MAP
 			&& (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
-			&& (openMode & O_ACCMODE) == O_RDONLY) {
+			&& (openMode & O_ACCMODE) == O_RDONLY)) {
 		return EACCES;
 	}
 
@@ -3459,7 +3459,7 @@ dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
 	if (level == 0)
 		kprintf("/%lu", info.page_count);
 
-	if (cache->type == CACHE_TYPE_RAM || level == 0 && info.committed > 0) {
+	if (cache->type == CACHE_TYPE_RAM || (level == 0 && info.committed > 0)) {
 		kprintf(", committed: %lld", cache->committed_size);
 
 		if (level == 0)
@@ -3704,9 +3704,9 @@ dump_area(int argc, char **argv)
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
 		if ((area->name != NULL && !strcmp(argv[index], area->name))
-			|| num != 0
+			|| (num != 0
 				&& ((addr_t)area->id == num
-					|| area->base <= num && area->base + area->size > num)) {
+					|| (area->base <= num && area->base + area->size > num)))) {
 			dump_area_struct(area, mappings);
 			found = true;
 		}
@@ -3736,8 +3736,8 @@ dump_area_list(int argc, char **argv)
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-		if (id != 0 && area->address_space->id != id
-			|| name != NULL && strstr(area->name, name) == NULL)
+		if ((id != 0 && area->address_space->id != id)
+			|| (name != NULL && strstr(area->name, name) == NULL))
 			continue;
 
 		kprintf("%p %5lx  %p\t%p %4lx\t%4d  %s\n", area, area->id, (void *)area->base,
@@ -6347,7 +6347,7 @@ _user_sync_memory(void *_address, size_t size, int flags)
 	if (writeSync && writeAsync)
 		return B_BAD_VALUE;
 
-	if (size == 0 || !writeSync && !writeAsync)
+	if (size == 0 || (!writeSync && !writeAsync))
 		return B_OK;
 
 	// iterate through the range and sync all concerned areas

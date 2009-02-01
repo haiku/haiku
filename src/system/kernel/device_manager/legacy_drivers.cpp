@@ -481,7 +481,7 @@ find_driver(dev_t device, ino_t node)
 	while (true) {
 		driver = (legacy_driver *)hash_next(sDriverHash, &iterator);
 		if (driver == NULL
-			|| driver->device == device && driver->node == node)
+			|| (driver->device == device && driver->node == node))
 			break;
 	}
 
@@ -1372,8 +1372,10 @@ legacy_driver_probe(const char* subPath)
 extern "C" status_t
 legacy_driver_init(void)
 {
-	sDriverHash = hash_init(DRIVER_HASH_SIZE, offsetof(legacy_driver, next),
-		&driver_entry_compare, &driver_entry_hash);
+	legacy_driver dummyDriver;
+	sDriverHash = hash_init(DRIVER_HASH_SIZE,
+		offset_of_member(dummyDriver, next), &driver_entry_compare,
+		&driver_entry_hash);
 	if (sDriverHash == NULL)
 		return B_NO_MEMORY;
 

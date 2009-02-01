@@ -1852,8 +1852,8 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 				if (vnodeToDisconnect != NULL) {
 					if (vnode == vnodeToDisconnect)
 						disconnect_fd(descriptor);
-				} else if (vnode != NULL && vnode->mount == mount
-					|| vnode == NULL && descriptor->u.mount == mount)
+				} else if ((vnode != NULL && vnode->mount == mount)
+					|| (vnode == NULL && descriptor->u.mount == mount))
 					disconnect_fd(descriptor);
 
 				put_fd(descriptor);
@@ -4842,15 +4842,17 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 status_t
 vfs_init(kernel_args *args)
 {
-	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, offsetof(struct vnode, next),
-		&vnode_compare, &vnode_hash);
+	struct vnode dummyVnode;
+	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE,
+		offset_of_member(dummyVnode, next), &vnode_compare, &vnode_hash);
 	if (sVnodeTable == NULL)
 		panic("vfs_init: error creating vnode hash table\n");
 
-	list_init_etc(&sUnusedVnodeList, offsetof(struct vnode, unused_link));
+	list_init_etc(&sUnusedVnodeList, offset_of_member(dummyVnode, unused_link));
 
-	sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, offsetof(struct fs_mount, next),
-		&mount_compare, &mount_hash);
+	struct fs_mount dummyMount;
+	sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE,
+		offset_of_member(dummyMount, next), &mount_compare, &mount_hash);
 	if (sMountsTable == NULL)
 		panic("vfs_init: error creating mounts hash table\n");
 
@@ -5752,10 +5754,10 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = release_advisory_lock(vnode, &flock);
 			} else {
 				// the open mode must match the lock type
-				if ((descriptor->open_mode & O_RWMASK) == O_RDONLY
-						&& flock.l_type == F_WRLCK
-					|| (descriptor->open_mode & O_RWMASK) == O_WRONLY
-						&& flock.l_type == F_RDLCK)
+				if (((descriptor->open_mode & O_RWMASK) == O_RDONLY
+						&& flock.l_type == F_WRLCK)
+					|| ((descriptor->open_mode & O_RWMASK) == O_WRONLY
+						&& flock.l_type == F_RDLCK))
 					status = B_FILE_ERROR;
 				else {
 					status = acquire_advisory_lock(vnode, -1,
@@ -6725,7 +6727,7 @@ static dev_t
 fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	const char* args, bool kernel)
 {
-	struct fs_mount* mount;
+	struct ::fs_mount* mount;
 	status_t status = 0;
 
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
@@ -6840,7 +6842,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		}
 	}
 
-	mount = new(std::nothrow) struct ::fs_mount;
+	mount = new(std::nothrow) (struct ::fs_mount);
 	if (mount == NULL)
 		return B_NO_MEMORY;
 
@@ -8390,7 +8392,7 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 		return B_BAD_ADDRESS;
 
 	// open the parent dir
-	int parentFD = dir_open(fd, "..", kernel);
+	int parentFD = dir_open(fd, (char*)"..", kernel);
 	if (parentFD < 0)
 		return parentFD;
 	FDCloser fdCloser(parentFD, kernel);

@@ -1238,11 +1238,11 @@ page_writer(void* /*unused*/)
 			// until we're low on pages. Also avoid writing temporary pages that
 			// are active.
 			if (page->wired_count > 0
-				|| cache->temporary
+				|| (cache->temporary
 #if ENABLE_SWAP_SUPPORT
 					&& (!lowOnPages /*|| page->usage_count > 0*/)
 #endif
-				) {
+				)) {
 				continue;
 			}
 
@@ -1444,9 +1444,9 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 		InterruptsSpinLocker locker(sPageLock);
 
-		if (reserve && sReservedPages <= free_page_queue_count()
+		if ((reserve && sReservedPages <= free_page_queue_count())
 			|| count == 0
-			|| !reserve && (sInactivePageQueue.count > 0
+			|| ((!reserve && (sInactivePageQueue.count > 0))
 				|| free_page_queue_count() > sReservedPages))
 			return stolen;
 

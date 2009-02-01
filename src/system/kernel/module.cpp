@@ -2182,8 +2182,8 @@ get_module(const char* path, module_info** _info)
 	module = (struct module*)hash_lookup(sModulesHash, path);
 
 	// if we don't have it cached yet, search for it
-	if (module == NULL || (module->flags & B_BUILT_IN_MODULE) == 0
-			&& module->module_image == NULL) {
+	if (module == NULL || ((module->flags & B_BUILT_IN_MODULE) == 0
+			&& module->module_image == NULL)) {
 		module = search_module(path, &moduleImage);
 		if (module == NULL) {
 			FATAL(("module: Search for %s failed.\n", path));

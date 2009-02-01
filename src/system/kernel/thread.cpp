@@ -2724,8 +2724,8 @@ _user_spawn_thread(thread_creation_attributes* userAttributes)
 	thread_id threadID;
 
 	if (!IS_USER_ADDRESS(attributes.entry) || attributes.entry == NULL
-		|| attributes.stack_address != NULL
-			&& !IS_USER_ADDRESS(attributes.stack_address)
+		|| (attributes.stack_address != NULL
+			&& !IS_USER_ADDRESS(attributes.stack_address))
 		|| (attributes.name != NULL && (!IS_USER_ADDRESS(attributes.name)
 			|| user_strlcpy(name, attributes.name, B_OS_NAME_LENGTH) < 0)))
 		return B_BAD_ADDRESS;

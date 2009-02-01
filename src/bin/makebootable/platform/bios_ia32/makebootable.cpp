@@ -611,7 +611,7 @@ main(int argc, const char *const *argv)
 
 		// write the boot code
 		printf("Writing boot code to \"%s\" (partition offset: %lld bytes, "
-			"start offset = %d) "
+			"start offset = %lld) "
 			"...\n", fileName, partitionOffset, startOffset);
 
 		write_boot_code_part(fileName, fd, startOffset, bootCodeData, 0,

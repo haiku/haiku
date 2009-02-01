@@ -47,7 +47,6 @@
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
 
-
 static const bigtime_t kTransactionIdleTime = 2000000LL;
 	// a transaction is considered idle after 2 seconds of inactivity
 
@@ -605,8 +604,8 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 	while (iterator.HasNext()) {
 		cache_listener* listener = iterator.Next();
 
-		bool remove = isClosing && !is_written_event(listener->events)
-			|| isWritten && is_written_event(listener->events);
+		bool remove = (isClosing && !is_written_event(listener->events))
+			|| (isWritten && is_written_event(listener->events));
 		if (remove)
 			iterator.Remove();
 
@@ -804,12 +803,14 @@ block_cache::Init()
 	if (buffer_cache == NULL)
 		return B_NO_MEMORY;
 
-	hash = hash_init(1024, offsetof(cached_block, next), &cached_block::Compare,
-		&cached_block::Hash);
+	cached_block dummyBlock;
+	hash = hash_init(1024, offset_of_member(dummyBlock, next),
+		&cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
 		return B_NO_MEMORY;
 
-	transaction_hash = hash_init(16, offsetof(cache_transaction, next),
+	cache_transaction dummyTransaction;
+	transaction_hash = hash_init(16, offset_of_member(dummyTransaction, next),
 		&transaction_compare, &::transaction_hash);
 	if (transaction_hash == NULL)
 		return B_NO_MEMORY;

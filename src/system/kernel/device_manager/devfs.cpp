@@ -1746,8 +1746,8 @@ devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
 	bool isWrite = request->IsWrite();
 
 	if (!S_ISCHR(vnode->stream.type)
-		|| ((isWrite && !vnode->stream.u.dev.device->HasWrite()
-				|| !isWrite && !vnode->stream.u.dev.device->HasRead())
+		|| (((isWrite && !vnode->stream.u.dev.device->HasWrite())
+				|| (!isWrite && !vnode->stream.u.dev.device->HasRead()))
 			&& !vnode->stream.u.dev.device->HasIO())
 		|| cookie == NULL) {
 		return B_NOT_ALLOWED;

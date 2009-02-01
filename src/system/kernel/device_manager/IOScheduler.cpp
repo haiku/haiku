@@ -513,7 +513,7 @@ struct OperationComparator {
 		off_t offsetA = a->Offset();
 		off_t offsetB = b->Offset();
 		return offsetA < offsetB
-			|| offsetA == offsetB && a->Length() > b->Length();
+			|| (offsetA == offsetB && a->Length() > b->Length());
 	}
 };
 

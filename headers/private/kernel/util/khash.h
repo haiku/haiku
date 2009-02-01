@@ -11,6 +11,12 @@
 
 #include <SupportDefs.h>
 
+// The use of offsetof() on non-PODs is invalid. Since many structs use
+// templated members (i.e. DoublyLinkedList) which makes them non-PODs we
+// can't use offsetof() anymore. This macro does the same, but requires an
+// instance of the object in question.
+#define offset_of_member(OBJECT, MEMBER) \
+	((size_t)((char*)&OBJECT.MEMBER - (char*)&OBJECT))
 
 // can be allocated on the stack
 typedef struct hash_iterator {

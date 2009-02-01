@@ -57,7 +57,7 @@ void
 UserMessagingMessageSender::SendMessage(const KMessage* message, port_id port,
 	int32 token)
 {
-	if (message != fMessage && fMessage != NULL
+	if ((message != fMessage && fMessage != NULL)
 		|| fTargetCount == MAX_MESSAGING_TARGET_COUNT) {
 		FlushMessage();
 	}

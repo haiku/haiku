@@ -83,7 +83,7 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 	if (function == NULL || frequency < 1)
 		return B_BAD_VALUE;
 
-	struct daemon* daemon = new(std::nothrow) struct ::daemon;
+	struct ::daemon* daemon = new(std::nothrow) (struct ::daemon);
 	if (daemon == NULL)
 		return B_NO_MEMORY;
 

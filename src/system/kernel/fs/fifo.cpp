@@ -364,7 +364,7 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 	while (dataSize > 0) {
 		// Wait until enough space in the buffer is available.
 		while (!fActive
-				|| fBuffer.Writable() < minToWrite && fReaderCount > 0) {
+				|| (fBuffer.Writable() < minToWrite && fReaderCount > 0)) {
 			if (nonBlocking)
 				return B_WOULD_BLOCK;
 
@@ -639,9 +639,9 @@ Inode::Select(uint8 event, selectsync *sync, int openMode)
 
 	// signal right away, if the condition holds already
 	if (writer) {
-		if (event == B_SELECT_WRITE
-				&& (fBuffer.Writable() > 0 || fReaderCount == 0)
-			|| event == B_SELECT_ERROR && fReaderCount == 0) {
+		if ((event == B_SELECT_WRITE
+				&& (fBuffer.Writable() > 0 || fReaderCount == 0))
+			|| (event == B_SELECT_ERROR && fReaderCount == 0)) {
 			return notify_select_event(sync, event);
 		}
 	} else {

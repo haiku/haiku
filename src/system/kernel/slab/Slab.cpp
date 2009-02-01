@@ -26,6 +26,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
+#include <util/khash.h>
 #include <vm.h>
 #include <vm_address_space.h>
 
@@ -597,8 +598,12 @@ object_cache_low_memory(void *_self, uint32 resources, int32 level)
 static void
 object_cache_return_object_wrapper(object_depot *depot, void *object)
 {
+	// TODO: the offset calculation might be wrong because we hardcode a
+	// SmallObjectCache instead of a base object_cache. Also this must
+	// have an unacceptable overhead.
+	SmallObjectCache dummyCache;
 	object_cache *cache = (object_cache *)(((uint8 *)depot)
-		- offsetof(object_cache, depot));
+		- offset_of_member(dummyCache, depot));
 
 	object_cache_free(cache, object);
 }

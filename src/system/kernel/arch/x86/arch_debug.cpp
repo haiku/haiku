@@ -367,10 +367,10 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 	if (thread == NULL)
 		return IS_KERNEL_ADDRESS(address);
 
-	return address >= thread->kernel_stack_base
-			&& address < thread->kernel_stack_top
-		|| thread->cpu != NULL
-			&& is_double_fault_stack_address(thread->cpu->cpu_num, address);
+	return (address >= thread->kernel_stack_base
+			&& address < thread->kernel_stack_top)
+		|| (thread->cpu != NULL
+			&& is_double_fault_stack_address(thread->cpu->cpu_num, address));
 }
 
 
@@ -508,7 +508,8 @@ stack_trace(int argc, char **argv)
 		threadIndex++;
 	}
 
-	if (argc > threadIndex + 1 || argc == 2 && strcmp(argv[1], "--help") == 0) {
+	if (argc > threadIndex + 1
+		|| (argc == 2 && strcmp(argv[1], "--help") == 0)) {
 		kprintf(usage, argv[0]);
 		return 0;
 	}

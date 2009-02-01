@@ -242,7 +242,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 		if (lastExtent != NULL) {
 			if (lastExtent->disk.offset + lastExtent->disk.length
 					== vecs[i].offset
-				|| lastExtent->disk.offset == -1 && vecs[i].offset == -1) {
+				|| (lastExtent->disk.offset == -1 && vecs[i].offset == -1)) {
 				lastExtent->disk.length += vecs[i].length;
 				offset += vecs[i].length;
 				start--;
@@ -368,8 +368,8 @@ FileMap::SetMode(uint32 mode)
 
 	MutexLocker _(fLock);
 
-	if (mode == FILE_MAP_CACHE_ALL && fCacheAll
-		|| mode == FILE_MAP_CACHE_ON_DEMAND && !fCacheAll)
+	if ((mode == FILE_MAP_CACHE_ALL && fCacheAll)
+		|| (mode == FILE_MAP_CACHE_ON_DEMAND && !fCacheAll))
 		return B_OK;
 
 	if (mode == FILE_MAP_CACHE_ALL) {

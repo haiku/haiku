@@ -119,9 +119,9 @@ copy_address_to_userland(const void* address, socklen_t addressLength,
 	// copy address size and address back to userland
 	if (user_memcpy(userAddressLength, &addressLength,
 			sizeof(socklen_t)) != B_OK
-		|| userAddress != NULL
+		|| (userAddress != NULL
 			&& user_memcpy(userAddress, address,
-				min_c(addressLength, userAddressBufferSize)) != B_OK) {
+				min_c(addressLength, userAddressBufferSize)) != B_OK)) {
 		return B_BAD_ADDRESS;
 	}
 
@@ -973,10 +973,10 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 	message.msg_name = userAddress;
 	message.msg_iov = userVecs;
 	message.msg_control = userAncillary;
-	if (userAddress != NULL && user_memcpy(userAddress, address,
-				message.msg_namelen) != B_OK
-		|| userAncillary != NULL && user_memcpy(userAncillary, ancillary,
-				message.msg_controllen) != B_OK
+	if ((userAddress != NULL && user_memcpy(userAddress, address,
+				message.msg_namelen) != B_OK)
+		|| (userAncillary != NULL && user_memcpy(userAncillary, ancillary,
+				message.msg_controllen) != B_OK)
 		|| user_memcpy(userMessage, &message, sizeof(msghdr)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
