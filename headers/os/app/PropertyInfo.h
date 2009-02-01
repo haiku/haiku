@@ -70,9 +70,15 @@ enum value_kind {
 };
 
 struct value_info {
+#if __GNUC__ > 2
+	const 
+#endif
 	char			*name;
 	uint32			value;
 	value_kind		kind;
+#if __GNUC__ > 2
+	const 
+#endif
 	char			*usage;
 	uint32			extra_data;
 	uint32			_reserved[10];
