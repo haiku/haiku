@@ -2141,10 +2141,9 @@ load_program(char const *path, void **_entry)
 	if (status < B_OK)
 		goto err;
 
-	// Set RTLD_GLOBAL on all libraries, but clear it on the program image.
+	// Set RTLD_GLOBAL on all libraries including the program.
 	// This results in the desired symbol resolution for dlopen()ed libraries.
 	set_image_flags_recursively(sProgramImage, RTLD_GLOBAL);
-	sProgramImage->flags &= ~RTLD_GLOBAL;
 
 	status = relocate_dependencies(sProgramImage);
 	if (status < B_OK)
