@@ -1,78 +1,281 @@
-H1 {
-	text-align: center;
-	font-family: Arial, Helvetica, sans-serif;
+/*
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol <revol@free.fr>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Braden Ewing <brewin@gmail.com>
+ *		Humdinger <humdingerb@gmail.com>
+ */
+
+/*  This is the Doxygen standard (messy) CSS updated with Haiku stuff.
+    All tags which are lower case have custom CSS, all upper case tags are the original.
+    I did some reordering.
+    - nielx 
+ */
+
+html {
+	margin: 0px;
+	padding: 0px;
 }
-H2 {
-	font-family: Arial, Helvetica, sans-serif;
-}
-CAPTION { font-weight: bold }
-DIV.qindex { width: 100%;
-			 font-family: Arial, Helvetica, sans-serif;
-             background-color: white;
-             border: 1px solid black;
-			 padding: 2px;
-             text-align: center;
-             margin-bottom: 2px
-}
-A.qindex { text-decoration: none; font-weight: bold; color: #2222aa }
-A.qindex:visited { text-decoration: none; font-weight: bold; color: #2222aa }
-A.qindex:hover { text-decoration: none; background-color: #f0f0e0 }
-A.qindexHL { text-decoration: underlined; font-weight: bold;
-             background-color: #e0e0d0 /*#111199;*/
-             color: black; /*#cccccc*/
-           }
-A.qindexHL:hover { text-decoration: none; background-color: #111199; color: #ffffff }
-/*A.qindexHL:visited { text-decoration: none; color: #000060 }*/
-A.el { text-decoration: underline; font-weight: bold; color: #2222aa }
-A.elRef { font-weight: bold }
-A { text-decoration: underline; color: #2222aa }
-A.codeRef { text-decoration: underline; font-weight: normal; color: #2222aa }
-A:hover { text-decoration: underline; background-color: #e0e0d0 }
-A.el:visited { text-decoration: underline; color: #000060 }
-DL.el { margin-left: -1cm }
-DIV.fragment {
-	width: 98%;
-	border: 1px solid #CCCCCC;
-	background-color: #f5f5f5;
-	padding-left: 4px;
-	margin: 4px;
-}
-DIV.ah { background-color: black; font-weight: bold; color: #ffffff; margin-bottom: 3px; margin-top: 3px }
-TD.md { background-color: #ffffff; font-weight: bold; }
-TD.mdname1 { background-color: #ffffff; font-weight: bold; color: #602020; }
-TD.mdname { background-color: #ffffff; font-weight: bold; color: #602020; width: 600px; }
-DIV.groupHeader { margin-left: 16px; margin-top: 12px; margin-bottom: 6px; font-weight: bold }
-DIV.groupText { margin-left: 16px; font-style: italic; font-size: smaller }
-BODY {
- 	font-family: Arial, Helvetica, sans-serif;
+
+body {
+	font-family: "DejaVu Sans",Arial,Helvetica,sans-serif;
 	background: white;
-	color: black;
-	margin-right: 20px;
+	color: #333333;
+	font-size: 90%;
+	margin: 0px;
+	padding: 0px;
+}
+
+h1 {
+	font-size: 1.3em;
+	font-weight: normal;
+	color: #0c3762;
+	border-bottom: dotted thin #e0e0e0;
+}
+
+h2 {
+	font-size: 1.2em;
+	font-weight: normal;
+	color: #0c3762;
+	border-bottom: dotted thin #e0e0e0;
+	margin-top: 10px;
+}
+
+h3 {
+	font-size: 1.1em;
+	font-weight: normal;
+	color: #0c3762;
+	margin-top: 10px;
+}
+
+h4 {
+	font-size: 1.0em;
+	font-weight: lighter;
+	color: #0c3762;
+	margin-top: 10px;
+}
+
+p {
+	text-align: justify;
+	line-height: 1.3;
+}
+
+/* link colors and text decoration */
+
+a:link {
+	font-weight: bold; 
+	text-decoration: none;
+	color: #dc3c01;
+}
+
+a:visited {
+	font-weight: bold; 
+	text-decoration: none; 
+	color: #892601;
+}
+
+a:hover, a:active { 
+	text-decoration: underline; 
+	color: #ff4500;
+}
+
+/* Some headers act as anchors, don't give them a hover effect */
+
+h1 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+h2 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+h3 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+h4 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+/* Custom Header */
+
+div.logo {
+	position: relative;
+	left: 0px;
+	top: 0px;
+	background: #efefef;
+}
+
+div.logo img {
 	margin-left: 20px;
 }
-TD.indexkey { 
-   background-color: white;
-   font-weight: bold; 
-   padding-right  : 10px; 
-   padding-top    : 2px; 
-   padding-left   : 10px; 
-   padding-bottom : 2px; 
-   margin-left    : 0px; 
-   margin-right   : 0px; 
-   margin-top     : 2px; 
-   margin-bottom  : 2px  
+
+div.title {
+	position: absolute;
+	top: 54px;
+	right: 40px;
+	font-size: 1.2em;
 }
-TD.indexvalue { 
-   background-color: white;
-   font-style: italic; 
-   padding-right  : 10px; 
-   padding-top    : 2px; 
-   padding-left   : 10px; 
-   padding-bottom : 2px; 
-   margin-left    : 0px; 
-   margin-right   : 0px; 
-   margin-top     : 2px; 
-   margin-bottom  : 2px  
+
+/* Navigation Tabs */
+div.tabs {
+	width: 100%;
+	background: #e0e0e0;
+}
+
+div.tabs ul {
+	margin: 0px;
+	padding-left: 10px;
+	list-style: none;
+}
+
+div.tabs li {
+	display: inline;
+	margin: 0px;
+	padding: 0px;
+	font-size: 0,8em;
+}
+
+div.tabs span {
+	display: inline;
+	padding: 5px 9px;
+	white-space: nowrap;
+}
+
+div.tabs li.current a {
+	color: black;
+	text-decoration: none;
+}
+
+/* Contents div */
+
+div.contents {
+	padding: 50px 40px;	
+}
+
+/* Continue with the rest of the standard Doxygen stuff... */
+
+CAPTION { font-weight: bold }
+DIV.qindex {
+	width: 100%;
+	background-color: #e8eef2;
+	border: 1px solid #84b0c7;
+	text-align: center;
+	margin: 2px;
+	padding: 2px;
+	line-height: 140%;
+}
+DIV.nav {
+	width: 100%;
+	background-color: #e8eef2;
+	border: 1px solid #84b0c7;
+	text-align: center;
+	margin: 2px;
+	padding: 2px;
+	line-height: 140%;
+}
+DIV.navtab {
+       background-color: #e8eef2;
+       border: 1px solid #84b0c7;
+       text-align: center;
+       margin: 2px;
+       margin-right: 15px;
+       padding: 2px;
+}
+TD.navtab {
+       font-size: 70%;
+}
+A.qindex {
+       text-decoration: none;
+       font-weight: bold;
+       color: #1A419D;
+}
+A.qindex:visited {
+       text-decoration: none;
+       font-weight: bold;
+       color: #1A419D
+}
+A.qindex:hover {
+	text-decoration: none;
+	background-color: #ddddff;
+}
+A.qindexHL {
+	text-decoration: none;
+	font-weight: bold;
+	background-color: #6666cc;
+	color: #ffffff;
+	border: 1px double #9295C2;
+}
+A.qindexHL:hover {
+	text-decoration: none;
+	background-color: #6666cc;
+	color: #ffffff;
+}
+A.qindexHL:visited { text-decoration: none; background-color: #6666cc; color: #ffffff }
+A.elRef { font-weight: bold }
+A.code:link { text-decoration: none; font-weight: normal; color: #0000FF}
+A.code:visited { text-decoration: none; font-weight: normal; color: #0000FF}
+A.codeRef:link { font-weight: normal; color: #0000FF}
+A.codeRef:visited { font-weight: normal; color: #0000FF}
+DL.el { margin-left: -1cm }
+.fragment {
+       font-family: monospace, fixed;
+       font-size: 95%;
+}
+PRE.fragment {
+	border: 1px solid #CCCCCC;
+	background-color: #f5f5f5;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	margin-left: 2px;
+	margin-right: 8px;
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+DIV.ah { background-color: black; font-weight: bold; color: #ffffff; margin-bottom: 3px; margin-top: 3px }
+
+DIV.groupHeader {
+       margin-left: 16px;
+       margin-top: 12px;
+       margin-bottom: 6px;
+       font-weight: bold;
+}
+DIV.groupText { margin-left: 16px; font-style: italic; font-size: 90% }
+
+TD.indexkey {
+	background-color: #e8eef2;
+	font-weight: bold;
+	padding-right  : 10px;
+	padding-top    : 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	margin-left    : 0px;
+	margin-right   : 0px;
+	margin-top     : 2px;
+	margin-bottom  : 2px;
+	border: 1px solid #CCCCCC;
+}
+TD.indexvalue {
+	background-color: #e8eef2;
+	font-style: italic;
+	padding-right  : 10px;
+	padding-top    : 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	margin-left    : 0px;
+	margin-right   : 0px;
+	margin-top     : 2px;
+	margin-bottom  : 2px;
+	border: 1px solid #CCCCCC;
 }
 TR.memlist {
    background-color: #f0f0f0; 
@@ -87,29 +290,11 @@ SPAN.comment       { color: #800000 }
 SPAN.preprocessor  { color: #806020 }
 SPAN.stringliteral { color: #002080 }
 SPAN.charliteral   { color: #008080 }
-
-/* this violates anything which is good style - but it seem to work... */
-EM.none { font-style: italic; }
-EM, SPAN.var { 
-	font-weight: bold; 
-	font-family: Arial, sans-serif; 
-	font-style: italic; 
-	color: #602020; 
-}
-CODE { color: #3333aa; }
-
-.mdTable {
-	border: 4px ridge #868686;
-	background-color: #ffffff;
-}
-.mdRow {
-	padding: 8px 20px;
-}
 .mdescLeft {
-	font-size: smaller;
-	font-family: Arial, Helvetica, sans-serif;
+       padding: 0px 8px 4px 8px;
+	font-size: 80%;
+	font-style: italic;
 	background-color: #FAFAFA;
-	padding-left: 8px;
 	border-top: 1px none #E0E0E0;
 	border-right: 1px none #E0E0E0;
 	border-bottom: 1px none #E0E0E0;
@@ -117,18 +302,15 @@ CODE { color: #3333aa; }
 	margin: 0px;
 }
 .mdescRight {
-	font-size: smaller;
-	font-family: Arial, Helvetica, sans-serif;
+       padding: 0px 8px 4px 8px;
+	font-size: 80%;
 	font-style: italic;
 	background-color: #FAFAFA;
-	padding-left: 4px;
 	border-top: 1px none #E0E0E0;
 	border-right: 1px none #E0E0E0;
 	border-bottom: 1px none #E0E0E0;
 	border-left: 1px none #E0E0E0;
 	margin: 0px;
-	padding-bottom: 0px;
-	padding-right: 8px;
 }
 .memItemLeft {
 	padding: 1px 0px 0px 8px;
@@ -137,38 +319,91 @@ CODE { color: #3333aa; }
 	border-right-width: 1px;
 	border-bottom-width: 1px;
 	border-left-width: 1px;
-	border-top-style: solid;
 	border-top-color: #E0E0E0;
 	border-right-color: #E0E0E0;
 	border-bottom-color: #E0E0E0;
 	border-left-color: #E0E0E0;
+	border-top-style: solid;
 	border-right-style: none;
 	border-bottom-style: none;
 	border-left-style: none;
 	background-color: #FAFAFA;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 12px;
+	font-size: 80%;
 }
 .memItemRight {
+	padding: 1px 8px 0px 8px;
+	margin: 4px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: #E0E0E0;
+	border-right-color: #E0E0E0;
+	border-bottom-color: #E0E0E0;
+	border-left-color: #E0E0E0;
+	border-top-style: solid;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	background-color: #FAFAFA;
+	font-size: 80%;
+}
+.memTemplItemLeft {
 	padding: 1px 0px 0px 8px;
 	margin: 4px;
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
 	border-left-width: 1px;
-	border-top-style: solid;
 	border-top-color: #E0E0E0;
 	border-right-color: #E0E0E0;
 	border-bottom-color: #E0E0E0;
 	border-left-color: #E0E0E0;
+	border-top-style: none;
 	border-right-style: none;
 	border-bottom-style: none;
 	border-left-style: none;
 	background-color: #FAFAFA;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 13px;
+	font-size: 80%;
 }
-.search     { color: #0000ee;
+.memTemplItemRight {
+	padding: 1px 8px 0px 8px;
+	margin: 4px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: #E0E0E0;
+	border-right-color: #E0E0E0;
+	border-bottom-color: #E0E0E0;
+	border-left-color: #E0E0E0;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	background-color: #FAFAFA;
+	font-size: 80%;
+}
+.memTemplParams {
+	padding: 1px 0px 0px 8px;
+	margin: 4px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: #E0E0E0;
+	border-right-color: #E0E0E0;
+	border-bottom-color: #E0E0E0;
+	border-left-color: #E0E0E0;
+	border-top-style: solid;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+       color: #606060;
+	background-color: #FAFAFA;
+	font-size: 80%;
+}
+.search     { color: #003399;
               font-weight: bold;
 }
 FORM.search {
@@ -178,7 +413,82 @@ FORM.search {
 INPUT.search { font-size: 75%;
                color: #000080;
                font-weight: normal;
-               background-color: #eeeeff;
+               background-color: #e8eef2;
 }
 TD.tiny      { font-size: 75%;
 }
+
+.dirtab { padding: 4px;
+          border-collapse: collapse;
+          border: 1px solid #84b0c7;
+}
+TH.dirtab { background: #e8eef2;
+            font-weight: bold;
+}
+HR { height: 1px;
+     border: none;
+     border-top: 1px solid black;
+}
+
+/* Style for detailed member documentation */
+.memtemplate {
+  font-size: 80%;
+  color: #606060;
+  font-weight: normal;
+} 
+.memnav { 
+  background-color: #e8eef2;
+  border: 1px solid #84b0c7;
+  text-align: center;
+  margin: 2px;
+  margin-right: 15px;
+  padding: 2px;
+}
+.memitem {
+  padding: 4px;
+  background-color: #eef3f5;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dedeee;
+  -moz-border-radius: 8px 8px 8px 8px;
+}
+.memname {
+  white-space: nowrap;
+  font-weight: bold;
+}
+.memdoc{
+  padding-left: 10px;
+}
+.memproto {
+  background-color: #d5e1e8;
+  width: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #84b0c7;
+  font-weight: bold;
+  -moz-border-radius: 8px 8px 8px 8px;
+}
+.paramkey {
+  text-align: right;
+}
+.paramtype {
+  white-space: nowrap;
+}
+.paramname {
+  color: #602020;
+  font-style: italic;
+  white-space: nowrap;
+}
+/* End Styling for detailed member documentation */
+
+/* for the tree view */
+.ftvtree {
+	font-family: sans-serif;
+	margin:0.5em;
+}
+.directory { font-size: 9pt; font-weight: bold; }
+.directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
+.directory > h3 { margin-top: 0; }
+.directory p { margin: 0px; white-space: nowrap; }
+.directory div { display: none; margin: 0px; }
+.directory img { vertical-align: -30%; }
