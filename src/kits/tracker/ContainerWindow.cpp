@@ -1453,13 +1453,13 @@ BContainerWindow::MessageReceived(BMessage *message)
 				if (model.InitCheck() != B_OK)
 					break;
 
-				PoseView()->MoveSelectionInto(&model, this, false, true,
-					message->what == kCreateRelativeLink);
+				PoseView()->MoveSelectionInto(&model, this, false, false,
+					message->what == kCreateLink, message->what == kCreateRelativeLink);
 			} else {
 				// no destination specified, create link in same dir as item
 				if (!TargetModel()->IsQuery())
-					PoseView()->MoveSelectionInto(TargetModel(), this, false, true,
-						(message->what == kCreateRelativeLink));
+					PoseView()->MoveSelectionInto(TargetModel(), this, false, false,
+						message->what == kCreateLink, message->what == kCreateRelativeLink);
 			}
 			break;
 		}
