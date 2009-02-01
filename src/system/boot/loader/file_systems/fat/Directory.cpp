@@ -282,7 +282,7 @@ Directory::GetNextEntry(void *cookie, uint8 mask, uint8 match)
 			continue;
 		if (c->entry.Flags() == 0x0f) // LFN entry
 			continue;
-		if (c->entry.Flags() & (FAT_VOLUME|FAT_SUBDIR) == FAT_VOLUME) {
+		if ((c->entry.Flags() & (FAT_VOLUME|FAT_SUBDIR)) == FAT_VOLUME) {
 			// TODO handle Volume name (set fVolume's name)
 			continue;
 		}

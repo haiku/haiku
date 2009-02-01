@@ -335,7 +335,7 @@ CalcView::Draw(BRect updateRect)
 		FillRect(updateRect & keypadRect);
 		
 		// render key main grid
-		BeginLineArray((fColums + fRows) << 1 + 1);
+		BeginLineArray(((fColums + fRows) << 1) + 1);
 		
 		// render cols
 		AddLine(BPoint(0.0, sizeDisp),

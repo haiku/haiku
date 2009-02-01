@@ -746,7 +746,7 @@ PDFWriter::CreatePattern()
 		for (int8 y = 0; y <= 7; y ++, data ++) {
 			uint8  d = *data;
 			for (int8 x = 0; x <= 7; x ++, d >>= 1) {
-				if (d & 1 == 1) { // foreground
+				if ((d & 1) == 1) { // foreground
 					if (pass != kPassForeground) continue;
 				} else { // background
 					if (pass != kPassBackground) continue;
@@ -1059,7 +1059,7 @@ PDFWriter::IsTransparentRGBA15(uint8* in)
 	// 01234567 01234567
 	// 01201234 00123434
 	// GGGBBBBB ARRRRRGG
-	return in[1] & 1 == 0 || IsTransparentRGB15(in);
+	return (in[1] & 1) == 0 || IsTransparentRGB15(in);
 }
 
 
@@ -1070,7 +1070,7 @@ PDFWriter::IsTransparentRGBA15_BIG(uint8* in)
 	// 01234567 01234567
 	// 00123434 01201234
 	// ARRRRRGG GGGBBBBB
-	return in[0] & 1 == 0 || IsTransparentRGB15_BIG(in);
+	return (in[0] & 1) == 0 || IsTransparentRGB15_BIG(in);
 }
 
 

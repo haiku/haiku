@@ -172,10 +172,10 @@ ScreenBlanker::_QueueTurnOffScreen()
 		return;
 
 	if (fSettings.OffTime() == fSettings.SuspendTime()
-		&& (flags & (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)) == ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)
+		&& (flags & (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)) == (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND))
 		flags &= ~ENABLE_DPMS_SUSPEND;
 	if (fSettings.SuspendTime() == fSettings.StandByTime()
-		&& (flags & (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)) == ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)
+		&& (flags & (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)) == (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY))
 		flags &= ~ENABLE_DPMS_STAND_BY;
 
 	// start them off again

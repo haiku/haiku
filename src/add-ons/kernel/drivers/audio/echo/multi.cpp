@@ -740,7 +740,7 @@ echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 		if ((stream->state & ECHO_STATE_STARTED) != 0)
 			continue;
 		echo_stream_start(stream, 
-			(stream->use & ECHO_USE_PLAY == 0) ? echo_record_inth : echo_play_inth, stream);
+			((stream->use & ECHO_USE_PLAY) == 0) ? echo_record_inth : echo_play_inth, stream);
 	}
 	
 	if (acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)

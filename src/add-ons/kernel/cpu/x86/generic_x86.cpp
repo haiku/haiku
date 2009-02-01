@@ -139,7 +139,7 @@ generic_mtrr_compute_physical_mask(void)
 
 	cpuid_info cpuInfo;
 	if (get_current_cpuid(&cpuInfo, 0x80000000) == B_OK
-		&& cpuInfo.eax_0.max_eax & 0xff >= 8) {
+		&& (cpuInfo.eax_0.max_eax & 0xff) >= 8) {
 		get_current_cpuid(&cpuInfo, 0x80000008);
 		bits = cpuInfo.regs.eax & 0xff;
 

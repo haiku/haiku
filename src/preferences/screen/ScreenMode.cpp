@@ -31,7 +31,7 @@
 static combine_mode
 get_combine_mode(display_mode& mode)
 {
-	if (mode.flags & B_SCROLL == 0)
+	if ((mode.flags & B_SCROLL) == 0)
 		return kCombineDisable;
 
 	if (mode.virtual_width == mode.timing.h_display * 2)

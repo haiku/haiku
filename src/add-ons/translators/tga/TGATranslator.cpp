@@ -328,7 +328,7 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 	imagespec.descriptor = buf[17];
 	// images ordered from Right to Left (rather than Left to Right)
 	// are not supported
-	if (imagespec.descriptor & TGA_ORIGIN_HORZ_BIT == TGA_ORIGIN_RIGHT)
+	if ((imagespec.descriptor & TGA_ORIGIN_HORZ_BIT) == TGA_ORIGIN_RIGHT)
 		return B_NO_TRANSLATOR;
 	// unused descriptor bits, these bits must be zero
 	if (imagespec.descriptor & TGA_DESC_BITS76)
@@ -336,23 +336,23 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 	if ((fileheader.imagetype == TGA_NOCOMP_TRUECOLOR ||
 		fileheader.imagetype == TGA_RLE_TRUECOLOR) &&
 		imagespec.depth == 32 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 8 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 0)
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 8 &&
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 0)
 		return B_NO_TRANSLATOR;
 	if ((fileheader.imagetype == TGA_NOCOMP_TRUECOLOR ||
 		fileheader.imagetype == TGA_RLE_TRUECOLOR) &&
 		imagespec.depth == 24 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 0)
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 0)
 		return B_NO_TRANSLATOR;
 	if ((fileheader.imagetype == TGA_NOCOMP_TRUECOLOR ||
 		fileheader.imagetype == TGA_RLE_TRUECOLOR) &&
 		imagespec.depth == 16 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 1 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 0)
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 1 &&
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 0)
 	if ((fileheader.imagetype == TGA_NOCOMP_TRUECOLOR ||
 		fileheader.imagetype == TGA_RLE_TRUECOLOR) &&
 		imagespec.depth == 15 &&
-		imagespec.descriptor & TGA_DESC_ALPHABITS != 0)
+		(imagespec.descriptor & TGA_DESC_ALPHABITS) != 0)
 		return B_NO_TRANSLATOR;
 		
 	// Fill in headers passed to this function

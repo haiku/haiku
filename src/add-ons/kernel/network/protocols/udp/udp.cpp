@@ -389,14 +389,14 @@ UdpDomainSupport::_Bind(UdpEndpoint *endpoint, const sockaddr *address)
 
 		if (otherEndpoint->LocalAddress().EqualPorts(address)) {
 			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
-			if (otherEndpoint->Socket()->options & (SO_REUSEADDR | SO_REUSEPORT) == 0
-				|| socketOptions & (SO_REUSEADDR | SO_REUSEPORT) == 0)
+			if ((otherEndpoint->Socket()->options & (SO_REUSEADDR | SO_REUSEPORT)) == 0
+				|| (socketOptions & (SO_REUSEADDR | SO_REUSEPORT)) == 0)
 				return EADDRINUSE;
 
 			// if both addresses are the same, SO_REUSEPORT is required:
 			if (otherEndpoint->LocalAddress().EqualTo(address, false)
-				&& (otherEndpoint->Socket()->options & SO_REUSEPORT == 0
-					|| socketOptions & SO_REUSEPORT == 0))
+				&& ((otherEndpoint->Socket()->options & SO_REUSEPORT) == 0
+					|| (socketOptions & SO_REUSEPORT) == 0))
 				return EADDRINUSE;
 		}
 	}

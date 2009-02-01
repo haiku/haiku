@@ -253,7 +253,7 @@ Volume::IsValidCluster(uint32 cluster) const
 bool
 Volume::IsLastCluster(uint32 cluster) const
 {
-	if (cluster >= fTotalClusters && (cluster & 0xff8 == 0xff8))
+	if (cluster >= fTotalClusters && ((cluster & 0xff8) == 0xff8))
 		return true;
 	return false;	
 }
