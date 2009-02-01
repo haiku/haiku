@@ -359,8 +359,8 @@ PathHandler::_EntryCreated(BMessage* message)
 		}
 
 		// a new directory to watch for us
-		if (!entryContained && !_CloserToPath(entry)
-			|| parentContained && !_WatchRecursively()
+		if ((!entryContained && !_CloserToPath(entry))
+			|| (parentContained && !_WatchRecursively())
 			|| _AddDirectory(entry, true) != B_OK
 			|| _WatchFilesOnly())
 			notify = parentContained;
@@ -446,7 +446,7 @@ PathHandler::_EntryMoved(BMessage* message)
 				&& (entryContained || _CloserToPath(entry))) {
 				// there is a new directory to watch for us
 				if (entryContained
-					|| parentContained && !_WatchRecursively()) {
+					|| (parentContained && !_WatchRecursively())) {
 					_AddDirectory(entry, true);
 					// NOTE: entry is toast now!
 				} else if (_GetClosest(fPath.Path(), false,

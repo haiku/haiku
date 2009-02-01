@@ -1033,15 +1033,12 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 			: $(scope) ;
 	}
 } else {
-# TODO: Enable after updating to a newer gcc 4 version that supports -Wno-error!
 	# -Wuninitialized gives too many false positives.
-#	rule EnableWerror dirTokens : scope {
-#		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
-#			: -Werror -Wno-error=uninitialized : $(scope) ;
-#		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
-#			: -Werror -Wno-error=uninitialized : $(scope) ;
-#	}
 	rule EnableWerror dirTokens : scope {
+		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
+			: -Werror -Wno-error=uninitialized : $(scope) ;
+		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
+			: -Werror -Wno-error=uninitialized : $(scope) ;
 	}
 }
 

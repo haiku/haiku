@@ -54,7 +54,7 @@ typedef enum TokenType {
 	CharacterString,
 	Integer,
 	FloatingPoint
-};
+} TokenType;
 
 /*! \brief Returns a NULL-terminated string contating the
 		   name of the given token type

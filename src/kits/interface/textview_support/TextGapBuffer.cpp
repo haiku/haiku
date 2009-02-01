@@ -172,7 +172,7 @@ TextGapBuffer::SizeGapTo(long inCount)
 const char *
 TextGapBuffer::GetString(int32 fromOffset, int32 *_numBytes)
 {
-	char *result = "";
+	char *result = (char *)"";
 	if (_numBytes == NULL)
 		return result;
 

@@ -390,8 +390,8 @@ BPath::operator==(const BPath &item) const
 bool
 BPath::operator==(const char *path) const
 {
-	return (InitCheck() != B_OK && path == NULL
-			|| fName && path && strcmp(fName, path) == 0);
+	return ((InitCheck() != B_OK && path == NULL)
+			|| (fName != NULL && path != NULL && strcmp(fName, path) == 0));
 }
 
 //! Performs a simple (string-wise) comparison of paths.

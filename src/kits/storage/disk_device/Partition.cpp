@@ -1543,7 +1543,7 @@ BPartition::_SupportsOperation(uint32 flag, uint32 whileMountedFlag,
 bool
 BPartition::_SupportsChildOperation(const BPartition* child, uint32 flag) const
 {
-	if (!fDelegate || child && !child->fDelegate)
+	if (!fDelegate || (child && !child->fDelegate))
 		return false;
 
 	uint32 supported = fDelegate->SupportedChildOperations(

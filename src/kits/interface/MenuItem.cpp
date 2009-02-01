@@ -755,7 +755,7 @@ BMenuItem::_DrawShortcutSymbol()
 		where.x -= fBounds.Height() - 3;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
-	if (fShortcutChar < B_SPACE && kUTF8ControlMap[fShortcutChar])
+	if (fShortcutChar < B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
 		_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
 	else
 		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
@@ -849,8 +849,8 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 	// TODO: If needed, take another font for the control characters
 	//	(or have font overlays in the app_server!)
 	const char* symbol = " ";
-	if (kUTF8ControlMap[fShortcutChar])
-		symbol = kUTF8ControlMap[fShortcutChar];
+	if (kUTF8ControlMap[(int)fShortcutChar])
+		symbol = kUTF8ControlMap[(int)fShortcutChar];
 
 	fSuper->DrawString(symbol, where);
 }

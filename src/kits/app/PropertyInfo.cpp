@@ -501,15 +501,15 @@ BPropertyInfo::FreeMem()
 
 	if (fPropInfo != NULL) {
 		for (i = 0; i < fPropCount; i++) {
-			free(fPropInfo[i].name);
-			free(fPropInfo[i].usage);
+			free((char *)fPropInfo[i].name);
+			free((char *)fPropInfo[i].usage);
 
 			for (j = 0; j < 3; j++) {
 				for (k = 0; k < 5; k++) {
 					if (fPropInfo[i].ctypes[j].pairs[k].name == NULL)
 						break;
 
-					free(fPropInfo[i].ctypes[j].pairs[k].name);
+					free((char *)fPropInfo[i].ctypes[j].pairs[k].name);
 				}
 
 				if (fPropInfo[i].ctypes[j].pairs[0].name == NULL)
@@ -523,8 +523,8 @@ BPropertyInfo::FreeMem()
 
 	if (fValueInfo != NULL) {
 		for (i = 0; i < fValueCount; i++) {
-			free(fValueInfo[i].name);
-			free(fValueInfo[i].usage);
+			free((char *)fValueInfo[i].name);
+			free((char *)fValueInfo[i].usage);
 		}
 		free(fValueInfo);
 		fValueInfo = NULL;

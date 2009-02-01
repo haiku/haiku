@@ -135,8 +135,8 @@ entry_ref::operator==(const entry_ref &ref) const
 	return (device == ref.device
 			&& directory == ref.directory
 			&& (name == ref.name
-				|| name != NULL && ref.name != NULL
-					&& strcmp(name, ref.name) == 0));
+				|| (name != NULL && ref.name != NULL
+					&& strcmp(name, ref.name) == 0)));
 }
 
 /*! \brief Compares the entry_ref with another entry_ref, returning true if they are not equal.
@@ -1095,11 +1095,7 @@ operator<(const entry_ref & a, const entry_ref & b)
 		|| (a.device == b.device
 			&& (a.directory < b.directory
 			|| (a.directory == b.directory
-				&& (a.name == NULL && b.name != NULL
+				&& ((a.name == NULL && b.name != NULL)
 				|| (a.name != NULL && b.name != NULL
 					&& strcmp(a.name, b.name) < 0))))));
 }
-
-
-
-

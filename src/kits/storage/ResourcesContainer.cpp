@@ -143,9 +143,9 @@ ResourcesContainer::IndexOf(type_code type, const char *name) const
 	for (int32 i = 0; index == -1 && i < count; i++) {
 		ResourceItem *item = ResourceAt(i);
 		const char *itemName = item->Name();
-		if (item->Type() == type && (name == NULL && itemName == NULL
-									 || name != NULL && itemName != NULL
-										&& !strcmp(name, itemName))) {
+		if (item->Type() == type && ((name == NULL && itemName == NULL)
+									 || (name != NULL && itemName != NULL
+										&& strcmp(name, itemName) == 0))) {
 			index = i;
 		}
 	}

@@ -260,7 +260,7 @@ TokenStream::SetTo(const std::string &string) {
 		tsssEscapeOneOctal,
 		tsssEscapeTwoOctal,
 		tsssEscapeOneHex,
-	};
+	} TokenStreamScannerState;
 	
 	TokenStreamScannerState state = tsssStart;
 	TokenStreamScannerState escapedState = tsssStart;

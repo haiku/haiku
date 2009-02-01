@@ -2626,8 +2626,8 @@ BMenu::_OkToProceed(BMenuItem* item)
 	// TODO: I added the check for BMenuBar to solve a problem with Deskbar.
 	// BeOS seems to do something similar. This could also be a bug in Deskbar, though.
 	if ((buttons != 0 && stickyMode)
-		|| (dynamic_cast<BMenuBar *>(this) == NULL
-			&& (buttons == 0 && !stickyMode) || _HitTestItems(where) != item))
+		|| ((dynamic_cast<BMenuBar *>(this) == NULL
+			&& (buttons == 0 && !stickyMode)) || _HitTestItems(where) != item))
 		return false;
 
 	return true;

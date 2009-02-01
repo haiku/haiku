@@ -572,11 +572,11 @@ operator<(const BMessenger &_a, const BMessenger &_b)
 	// 3. fPreferredTarget
 	// fTeam is insignificant
 	return (a.Port() < b.Port()
-			|| a.Port() == b.Port()
+			|| (a.Port() == b.Port()
 				&& (a.Token() < b.Token()
-					|| a.Token() == b.Token()
+					|| (a.Token() == b.Token()
 						&& !a.IsPreferredTarget()
-						&& b.IsPreferredTarget()));
+						&& b.IsPreferredTarget()))));
 }
 
 

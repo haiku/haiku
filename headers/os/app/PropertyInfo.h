@@ -42,7 +42,7 @@ struct _oproperty_info_;
 struct compound_type {
 	struct field_pair {
 #if __GNUC__ > 2
-	const
+		const
 #endif
 		char		*name;			// name of entry in message
 		type_code	type;			// type_code of entry in message

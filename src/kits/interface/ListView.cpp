@@ -1527,7 +1527,7 @@ BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 bool
 BListView::_TryInitiateDrag(BPoint where)
 {
-	if (!fTrack->try_drag | fTrack->item_index < 0)
+	if (!fTrack->try_drag || fTrack->item_index < 0)
 		return false;
 
 	BPoint offset = where - fTrack->drag_start;

@@ -563,8 +563,8 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 
 	// Things shouldn't be draggable, if we have a >= max layout.
 	BSize size = _SubtractInsets(View()->Frame().Size());
-	if (fOrientation == B_HORIZONTAL && size.width >= fMax.width
-		|| fOrientation == B_VERTICAL && size.height >= fMax.height) {
+	if ((fOrientation == B_HORIZONTAL && size.width >= fMax.width)
+		|| (fOrientation == B_VERTICAL && size.height >= fMax.height)) {
 		return false;
 	}
 
@@ -1133,8 +1133,8 @@ void
 BSplitLayout::_InternalGetHeightForWidth(float width, bool realLayout,
 	float* minHeight, float* maxHeight, float* preferredHeight)
 {
-	if (realLayout && fHeightForWidthVerticalLayouterWidth != width
-		|| !realLayout && fCachedHeightForWidthWidth != width) {
+	if ((realLayout && fHeightForWidthVerticalLayouterWidth != width)
+		|| (!realLayout && fCachedHeightForWidthWidth != width)) {
 		// The general strategy is to clone the vertical layouter, which only
 		// knows the general min/max constraints, do a horizontal layout for the
 		// given width, and add the children's height for width constraints to

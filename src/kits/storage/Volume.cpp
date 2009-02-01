@@ -493,7 +493,7 @@ BVolume::KnowsQuery(void) const
 bool
 BVolume::operator==(const BVolume &volume) const
 {
-	return (InitCheck() != B_OK && volume.InitCheck() != B_OK
+	return ((InitCheck() != B_OK && volume.InitCheck() != B_OK)
 			|| fDevice == volume.fDevice);
 }
 

@@ -288,10 +288,10 @@ BResources::SetToImage(const void *codeOrDataPointer, bool clobber)
 	int32 cookie = 0;
 
 	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
-		if ((addr_t)info.text <= address
-				&& address - (addr_t)info.text < (addr_t)info.text_size
-			|| (addr_t)info.data <= address
-				&& address - (addr_t)info.data < (addr_t)info.data_size) {
+		if (((addr_t)info.text <= address
+				&& address - (addr_t)info.text < (addr_t)info.text_size)
+			|| ((addr_t)info.data <= address
+				&& address - (addr_t)info.data < (addr_t)info.data_size)) {
 			return SetTo(info.name, clobber);
 		}
 	}

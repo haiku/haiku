@@ -874,10 +874,12 @@ BSlider::DrawBar()
 		barColor.red	= (fBarColor.red + no_tint.red) / 2;
 		barColor.green	= (fBarColor.green + no_tint.green) / 2;
 		barColor.blue	= (fBarColor.blue + no_tint.blue) / 2;
+		barColor.alpha	= 255;
 
 		fillColor.red	= (fFillColor.red + no_tint.red) / 2;
 		fillColor.green	= (fFillColor.green + no_tint.green) / 2;
 		fillColor.blue	= (fFillColor.blue + no_tint.blue) / 2;
+		fillColor.alpha	= 255;
 	}
 
 	// exclude the block thumb from the bar filling
@@ -1172,8 +1174,8 @@ BSlider::UpdateTextChanged()
 
 	const char* oldUpdateText = fUpdateText;
 	fUpdateText = UpdateText();
-	bool updateTextOnOff = fUpdateText == NULL && oldUpdateText != NULL
-		|| fUpdateText != NULL && oldUpdateText == NULL;
+	bool updateTextOnOff = (fUpdateText == NULL && oldUpdateText != NULL)
+		|| (fUpdateText != NULL && oldUpdateText == NULL);
 
 	float newWidth = 0.0;
 	if (fUpdateText != NULL)

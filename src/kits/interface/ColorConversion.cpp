@@ -250,7 +250,7 @@ inline
 uint8
 PaletteConverter::IndexForRGB16(uint16 rgb) const
 {
-	return fColorMap->index_map[(rgb >> 1) & 0x7fe0 | rgb & 0x1f];
+	return fColorMap->index_map[((rgb >> 1) & 0x7fe0) | (rgb & 0x1f)];
 }
 
 
@@ -487,7 +487,7 @@ ReadRGB24(const uint8 **source, int32 index)
 void
 WriteGray8(uint8 **dest, uint8 *data, int32 index)
 {
-	**dest = data[2] * 308 + data[1] * 600 + data[0] * 116 >> 10;
+	**dest = (data[2] * 308 + data[1] * 600 + data[0] * 116) >> 10;
 	// this would boost the speed but is less accurate:
 	//*dest = (data[2] << 8) + (data[1] << 9) + (data[0] << 8) >> 10;
 	(*dest)++;
@@ -584,9 +584,9 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 	}
 
 	srcBits = (srcByte*)((uint8*)srcBits + (srcOffsetY * srcBitsPerRow + srcOffsetX
-		* srcBitsPerPixel >> 3));
+		* (srcBitsPerPixel >> 3)));
 	dstBits = (dstByte*)((uint8*)dstBits + (dstOffsetY * dstBitsPerRow + dstOffsetX
-		* dstBitsPerPixel >> 3));
+		* (dstBitsPerPixel >> 3)));
 
 	// Ensure that the width fits
 	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
