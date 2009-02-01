@@ -41,6 +41,9 @@ struct _oproperty_info_;
 
 struct compound_type {
 	struct field_pair {
+#if __GNUC__ > 2
+	const
+#endif
 		char		*name;			// name of entry in message
 		type_code	type;			// type_code of entry in message
 	};
@@ -49,13 +52,13 @@ struct compound_type {
 
 struct property_info {
 #if __GNUC__ > 2
-	const 
+	const
 #endif
 	char			*name;
 	uint32			commands[10];
 	uint32			specifiers[10];
 #if __GNUC__ > 2
-	const 
+	const
 #endif
 	char 			*usage;
 	uint32			extra_data;
