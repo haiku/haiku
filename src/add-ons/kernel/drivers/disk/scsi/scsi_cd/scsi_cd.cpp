@@ -349,7 +349,7 @@ play_msf(cd_driver_info *info, const scsi_play_position *position)
 	cmd.end_frame = position->end_f;
 
 	return sSCSIPeripheral->simple_exec(info->scsi_periph_device,
-		&cmd, sizeof(cmd), NULL, 0, 0);
+		&cmd, sizeof(cmd), NULL, 0, SCSI_DIR_NONE);
 }
 
 
@@ -414,7 +414,7 @@ stop_audio(cd_driver_info *info)
 	cmd.opcode = SCSI_OP_STOP_PLAY;
 
 	return sSCSIPeripheral->simple_exec(info->scsi_periph_device,
-		&cmd, sizeof(cmd), NULL, 0, 0);
+		&cmd, sizeof(cmd), NULL, 0, SCSI_DIR_NONE);
 }
 
 
@@ -430,7 +430,7 @@ pause_resume(cd_driver_info *info, bool resume)
 	cmd.resume = resume;
 
 	return sSCSIPeripheral->simple_exec(info->scsi_periph_device,
-		&cmd, sizeof(cmd), NULL, 0, 0);
+		&cmd, sizeof(cmd), NULL, 0, SCSI_DIR_NONE);
 }
 
 
@@ -479,7 +479,7 @@ scan(cd_driver_info *info, const scsi_scan *buf)
 	*/
 
 	return sSCSIPeripheral->simple_exec(info->scsi_periph_device,
-		&cmd, sizeof(cmd), NULL, 0, 0);
+		&cmd, sizeof(cmd), NULL, 0, SCSI_DIR_NONE);
 }
 
 
