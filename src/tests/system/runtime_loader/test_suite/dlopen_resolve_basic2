@@ -60,7 +60,7 @@ main()
 EOI
 
 # build
-gcc -o program program.c ./libb.so $libdl -Xlinker -rpath -Xlinker .
+gcc -o program program.c ./libb.so $libdl -Wl,-rpath,.,--export-dynamic
 
 # run
 test_run_ok ./program 1

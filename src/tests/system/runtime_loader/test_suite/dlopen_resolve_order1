@@ -6,8 +6,8 @@
 # libb.so
 # liba.so
 #
-# Expected: Undefined symbol in liba.so resolves to symbol in libb.so, not
-# to symbol in program, since program image is ignored.
+# Expected: Undefined symbol in liba.so resolves to symbol in program, not
+# to symbol in libb.so.
 
 
 . test_setup
@@ -70,8 +70,8 @@ main()
 EOI
 
 # build
-gcc -o program program.c $libdl -Xlinker -rpath -Xlinker .
+gcc -o program program.c $libdl -Wl,-rpath,.,--export-dynamic
 
 # run
-test_run_ok ./program 2
+test_run_ok ./program 1
 
