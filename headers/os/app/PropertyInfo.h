@@ -41,26 +41,17 @@ struct _oproperty_info_;
 
 struct compound_type {
 	struct field_pair {
-#if __GNUC__ > 2
-		const
-#endif
-		char		*name;			// name of entry in message
+		const char	*name;			// name of entry in message
 		type_code	type;			// type_code of entry in message
 	};
 	field_pair	pairs[5];
 };
 
 struct property_info {
-#if __GNUC__ > 2
-	const
-#endif
-	char			*name;
+	const char		*name;
 	uint32			commands[10];
 	uint32			specifiers[10];
-#if __GNUC__ > 2
-	const
-#endif
-	char 			*usage;
+	const char 		*usage;
 	uint32			extra_data;
 	uint32			types[10];
 	compound_type	ctypes[3];
@@ -73,16 +64,10 @@ enum value_kind {
 };
 
 struct value_info {
-#if __GNUC__ > 2
-	const 
-#endif
-	char			*name;
+	const  char		*name;
 	uint32			value;
 	value_kind		kind;
-#if __GNUC__ > 2
-	const 
-#endif
-	char			*usage;
+	const char		*usage;
 	uint32			extra_data;
 	uint32			_reserved[10];
 };
