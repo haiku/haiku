@@ -583,10 +583,10 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 		dstOffsetY = 0;
 	}
 
-	srcBits = (srcByte*)((uint8*)srcBits + (srcOffsetY * srcBitsPerRow + srcOffsetX
-		* (srcBitsPerPixel >> 3)));
-	dstBits = (dstByte*)((uint8*)dstBits + (dstOffsetY * dstBitsPerRow + dstOffsetX
-		* (dstBitsPerPixel >> 3)));
+	srcBits = (srcByte*)((uint8*)srcBits + ((srcOffsetY * srcBitsPerRow + srcOffsetX
+		* srcBitsPerPixel) >> 3));
+	dstBits = (dstByte*)((uint8*)dstBits + ((dstOffsetY * dstBitsPerRow + dstOffsetX
+		* dstBitsPerPixel) >> 3));
 
 	// Ensure that the width fits
 	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
