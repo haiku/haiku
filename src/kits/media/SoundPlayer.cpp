@@ -80,7 +80,7 @@ BSoundPlayer::BSoundPlayer(const media_node & toNode,
 	
 	TRACE("BSoundPlayer::BSoundPlayer: multi audio format constructor used\n");
 	
-	if (toNode.kind & B_BUFFER_CONSUMER == 0)
+	if ((toNode.kind & B_BUFFER_CONSUMER) == 0)
 		debugger("BSoundPlayer: toNode must have B_BUFFER_CONSUMER kind!\n");
 
 #if DEBUG > 0
