@@ -1143,6 +1143,11 @@ void BColumnListView::ScrollTo(const BRow* Row)
 	fOutlineView->ScrollTo(Row);
 }
 
+void BColumnListView::ScrollTo(BPoint point)
+{
+	fOutlineView->ScrollTo(point);
+}
+
 void BColumnListView::Clear()
 {
 	fOutlineView->Clear();
