@@ -76,6 +76,19 @@ environment variables:
                               Defaults to "ru".
   HAIKU_UNARFLAGS             The flags passed to HAIKU_AR for unarchiving.
                               Defaults to "x".
+                              
+Non-standard output directories:
+  By default all objects, build configuration, and other related files are 
+  stored in /path/to/haiku_source/generated.  To store objects in a non-default
+  location, run "../../relative/path/to/haiku_source/configure <options>" from 
+  within your non-default location.  "jam [ options ] targets" can then be run 
+  directly inside your non-default location.  Another option is to invoke "jam 
+  [ options ] targets" from within haiku_source.  This can be accomplished by 
+  either "export HAIKU_OUTPUT_DIR=your non-default location" before invoking 
+  jam or by creating a symlink of haiku_source/generated pointing to your 
+  non-default location and running jam.
+
+
 EOF
 }
 
