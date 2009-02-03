@@ -326,6 +326,7 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = groundtable;
 
+	int width = 1;
 	BAutolock locker(fBuffer);
 
 	while (!fQuitting) {
@@ -358,6 +359,8 @@ TermParse::EscParse()
 				case B_EUC_CONVERSION:
 				case B_EUC_KR_CONVERSION:
 				case B_JIS_CONVERSION:
+				case B_GBK_CONVERSION:
+				case B_BIG5_CONVERSION:
 					groundtable = gISO8859GroundTable;
 					break;
 				case M_UTF8:
@@ -378,10 +381,14 @@ TermParse::EscParse()
 			case CASE_PRINT_GR:
 				/* case iso8859 gr character, or euc */
 				ptr = cbuf;
-				if (now_coding == B_EUC_CONVERSION || now_coding == B_EUC_KR_CONVERSION
-					|| now_coding == B_JIS_CONVERSION) {
+				if (now_coding == B_EUC_CONVERSION 
+					|| now_coding == B_EUC_KR_CONVERSION
+					|| now_coding == B_JIS_CONVERSION
+					|| now_coding == B_GBK_CONVERSION
+					|| now_coding == B_BIG5_CONVERSION) {
 					switch (parsestate[curess]) {
 						case CASE_SS2:		/* JIS X 0201 */
+							width = 1;
 							*ptr++ = curess;
 							*ptr++ = c;
 							*ptr = 0;
@@ -389,6 +396,7 @@ TermParse::EscParse()
 							break;
 
 						case CASE_SS3:		/* JIS X 0212 */
+							width = 1;
 							*ptr++ = curess;
 							*ptr++ = c;
 							_NextParseChar(c);
@@ -398,6 +406,7 @@ TermParse::EscParse()
 							break;
 
 						default:		/* JIS X 0208 */
+							width = 2;
 							*ptr++ = c;
 							_NextParseChar(c);
 							*ptr++ = c;
@@ -417,7 +426,7 @@ TermParse::EscParse()
 						B_EUC_CONVERSION);
 				}
 
-				fBuffer->InsertChar(dstbuf, 4, attr);
+				fBuffer->InsertChar(dstbuf, 4, width, attr);
 				break;
 
 			case CASE_PRINT_CS96:

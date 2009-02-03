@@ -537,11 +537,12 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 
 
 void
-BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
+BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
-	int width = CodeConv::UTF8GetFontWidth(c.bytes);
+	// TODO: Check if this method can be removed completely
+	//int width = CodeConv::UTF8GetFontWidth(c.bytes);
 	if (width == FULL_WIDTH)
 		attributes |= A_WIDTH;
 

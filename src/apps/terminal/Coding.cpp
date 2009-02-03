@@ -30,11 +30,11 @@ const static etable kEncodingTable[] =
 	{"Shift-JIS", "SJIS", 'S', B_SJIS_CONVERSION},
 	{"EUC-jp", "EUCJ", 'E', B_EUC_CONVERSION},
 	{"EUC-kr", "EUCK", 'K', B_EUC_KR_CONVERSION},
-
+	{"GB18030", "GB18030", 'G', B_GBK_CONVERSION},
+	{"Big5", "Big5", 'B', B_BIG5_CONVERSION},
 
 	/* Not Implemented.
 	{"EUC-tw", "EUCT", "T", M_EUC_TW},
-	{"Big5", "Big5", 'B', M_BIG5},
 	{"ISO-2022-cn", "ISOC", 'C', M_ISO_2022_CN},
 	{"ISO-2022-kr", "ISOK", 'R', M_ISO_2022_KR},
 	*/  

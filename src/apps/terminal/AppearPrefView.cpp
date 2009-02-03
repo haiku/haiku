@@ -18,7 +18,32 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 
+#include <stdio.h>
 #include <stdlib.h>
+
+
+static bool
+IsFontUsable(const BFont &font)
+{
+	// TODO: If BFont::IsFullAndHalfFixed() was implemented, we could
+	// use that. But I don't think it's easily implementable using
+	// Freetype.
+
+	if (font.IsFixed())
+		return true;
+
+	bool widthOk = true;
+	int lastWidth;
+	for (int c = 0x20 ; c <= 0x7e; c++){
+		char buf[4];
+		snprintf(buf, sizeof(buf), "%c", c);
+		int tmpWidth = (int)font.StringWidth(buf);
+		if (c > 0x20 &&(tmpWidth != lastWidth))
+			widthOk = false;
+		lastWidth = tmpWidth;
+	}
+	return widthOk;
+}
 
 
 AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
@@ -170,7 +195,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 		if (get_font_family(i, &family, &flags) == B_OK) {
 			BFont font;
 			font.SetFamilyAndStyle(family, NULL);
-			if (font.IsFixed()) {
+			if (IsFontUsable(font)) {
 				BMenuItem *item = new BMenuItem(family, new BMessage(command));
 				menu->AddItem(item);
 				if (!strcmp(defaultFontName, family))

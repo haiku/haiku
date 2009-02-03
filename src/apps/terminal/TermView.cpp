@@ -1025,6 +1025,9 @@ TermView::Draw(BRect updateRect)
 				continue;
 			}
 
+			if (IS_WIDTH(attr))
+				count = 2;
+
 			_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
 				attr, buf, count, insideSelection, false, this);
 			i += count;

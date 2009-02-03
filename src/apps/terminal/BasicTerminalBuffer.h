@@ -96,9 +96,14 @@ public:
 									TermPos& matchEnd) const;
 
 			// insert chars/lines
-			void				InsertChar(UTF8Char c, uint32 attributes);
-	inline	void				InsertChar(const char* c, int32 length,
-									uint32 attributes);
+		inline  void                            InsertChar(UTF8Char c, uint32 attributes);
+			void                            InsertChar(UTF8Char c, uint32 width,
+									 uint32 attributes);
+		inline  void                            InsertChar(const char* c, int32 length,
+									 uint32 attributes);
+		inline  void                            InsertChar(const char* c, int32 length,
+									 uint32 width, uint32 attributes);
+
 			void				InsertCR();
 			void				InsertLF();
 			void				SetInsertMode(int flag);
@@ -210,9 +215,23 @@ BasicTerminalBuffer::HistoryCapacity() const
 
 
 void
+BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
+{
+	return InsertChar(c, 1, attributes);
+}
+
+
+void
 BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 attributes)
 {
-	return InsertChar(UTF8Char(c, length), attributes);
+	return InsertChar(UTF8Char(c, length), 1, attributes);
+}
+
+
+void
+BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 width, uint32 attributes)
+{
+	return InsertChar(UTF8Char(c, length), width, attributes);
 }
 
 
