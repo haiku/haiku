@@ -761,7 +761,7 @@ OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
 	BColumn *relationColumn = new BColumn("Relation", 180, 100, B_ALIGN_LEFT,
 		kAttrOpenWithRelation, B_STRING_TYPE, false, false);
 	fColumnList->AddItem(relationColumn);
-	fColumnList->AddItem(new BColumn("Path", 290, 225, B_ALIGN_LEFT,
+	fColumnList->AddItem(new BColumn("Location", 290, 225, B_ALIGN_LEFT,
 		kAttrPath, B_STRING_TYPE, true, false));
 	fColumnList->AddItem(new BColumn("Version", 525, 70, B_ALIGN_LEFT,
 		kAttrAppVersion, B_STRING_TYPE, false, false));

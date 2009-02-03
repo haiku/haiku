@@ -3040,7 +3040,7 @@ BContainerWindow::NewAttributeMenu(BMenu *menu)
 		menu->AddItem(NewAttributeMenuItem ("Original name", kAttrOriginalPath, B_STRING_TYPE,
 			225, B_ALIGN_LEFT, false, false));
 	else
-		menu->AddItem(NewAttributeMenuItem ("Path", kAttrPath, B_STRING_TYPE,
+		menu->AddItem(NewAttributeMenuItem ("Location", kAttrPath, B_STRING_TYPE,
 			225, B_ALIGN_LEFT, false, false));
 
 #ifdef OWNER_GROUP_ATTRIBUTES

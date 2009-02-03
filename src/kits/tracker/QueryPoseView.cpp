@@ -115,7 +115,7 @@ BQueryPoseView::SetUpDefaultColumnsIfNeeded()
 
 	fColumnList->AddItem(new BColumn("Name", kColumnStart, 145, B_ALIGN_LEFT,
 		kAttrStatName, B_STRING_TYPE, true, true));
-	fColumnList->AddItem(new BColumn("Path", 200, 225, B_ALIGN_LEFT,
+	fColumnList->AddItem(new BColumn("Location", 200, 225, B_ALIGN_LEFT,
 		kAttrPath, B_STRING_TYPE, true, false));
 	fColumnList->AddItem(new BColumn("Size", 440, 80, B_ALIGN_RIGHT,
 		kAttrStatSize, B_OFF_T_TYPE, true, false));

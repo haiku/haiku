@@ -1746,9 +1746,9 @@ AttributeView::Draw(BRect)
 	GetFont(&normalFont);
 
 	// Path
-	MovePenTo(BPoint(fDivider - (StringWidth("Path:")), lineBase));
+	MovePenTo(BPoint(fDivider - (StringWidth("Location:")), lineBase));
 	SetHighColor(kAttrTitleColor);
-	DrawString("Path:");
+	DrawString("Location:");
 
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
 	SetHighColor(kLinkColor);
