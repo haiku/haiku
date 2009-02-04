@@ -451,6 +451,10 @@ BTextControl::SetEnabled(bool enabled)
 
 	if (Window()) {
 		fText->MakeEditable(enabled);
+		if (enabled)
+			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
+		else
+			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
 
 		_UpdateTextViewColors(enabled);
 
@@ -512,6 +516,9 @@ BTextControl::SetFlags(uint32 flags)
 			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
 	}
 	
+	// Don't make this one navigable
+	flags &= ~B_NAVIGABLE;
+
 	BView::SetFlags(flags);
 }
 
@@ -925,6 +932,8 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fDivider = floorf(bounds.Width() / 2.0f);
 
 	uint32 navigableFlags = Flags() & B_NAVIGABLE;
+	if (navigableFlags != 0) 	 
+		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 
 	if (archive)
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
