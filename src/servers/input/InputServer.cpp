@@ -729,7 +729,7 @@ status_t
 InputServer::HandleGetModifierKey(BMessage* message, BMessage* reply)
 {
 	int32 modifier;
-	
+
 	if (message->FindInt32("modifier", &modifier) == B_OK) {
 		switch (modifier) {
 			case B_CAPS_LOCK:
@@ -1451,24 +1451,83 @@ InputServer::_EventLoop()
 
 		if (_SanitizeEvents(events)
 			&& _MethodizeEvents(events)
-			&& _FilterEvents(events))
+			&& _FilterEvents(events)) {
+			_UpdateMouseAndKeys(events);
 			_DispatchEvents(events);
+		}
+	}
+}
+
+
+/*!	Updates the internal mouse position and keyboard info. */
+void
+InputServer::_UpdateMouseAndKeys(EventList& events)
+{
+	for (int32 index = 0;BMessage* event = (BMessage*)events.ItemAt(index);
+			index++) {
+		switch (event->what) {
+			case B_MOUSE_DOWN:
+			case B_MOUSE_UP:
+			case B_MOUSE_MOVED:
+				event->FindPoint("where", &fMousePos);
+				break;
+
+			case B_KEY_DOWN:
+			case B_UNMAPPED_KEY_DOWN:
+				// update modifiers
+				uint32 modifiers;
+				if (event->FindInt32("modifiers", (int32*)&modifiers) == B_OK)
+					fKeyInfo.modifiers = modifiers;
+
+				// update key states
+				const uint8 *data;
+				ssize_t size;
+				if (event->FindData("states", B_UINT8_TYPE,
+						(const void**)&data, &size) == B_OK) {
+					PRINT(("updated keyinfo\n"));
+					if (size == sizeof(fKeyInfo.key_states))
+						memcpy(fKeyInfo.key_states, data, size);
+				}
+
+				if (fActiveMethod == NULL)
+					break;
+
+				// we scan for Alt+Space key down events which means we change
+				// to next input method
+				// (pressing "shift" will let us switch to the previous method)
+
+				PRINT(("SanitizeEvents: %lx, %x\n", fKeyInfo.modifiers,
+					fKeyInfo.key_states[KEY_Spacebar >> 3]));
+
+				uint8 byte;
+				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
+					byte = 0;
+
+				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
+					|| byte == B_ZENKAKU_HANKAKU) {
+					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
+
+					// this event isn't sent to the user
+					events.RemoveItemAt(index);
+					delete event;
+					continue;
+				}
+				break;
+		}
 	}
 }
 
 
 /*!	Frees events from unwanted fields, adds missing fields, and removes
 	unwanted events altogether.
-	As a side effect, it will also update the internal mouse states.
 */
 bool
 InputServer::_SanitizeEvents(EventList& events)
 {
 	CALLED();
-	int32 index = 0;
-	BMessage *event;
 
-	while ((event = (BMessage*)events.ItemAt(index)) != NULL) {
+	for (int32 index = 0; BMessage* event = (BMessage*)events.ItemAt(index);
+			index++) {
 		switch (event->what) {
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	   		case IS_SCREEN_BOUNDS_UPDATED:
@@ -1509,39 +1568,37 @@ InputServer::_SanitizeEvents(EventList& events)
 
 				if (event->FindInt32("x", &x) == B_OK
 					&& event->FindInt32("y", &y) == B_OK) {
-					fMousePos.x += x;
-					fMousePos.y -= y;
-					fMousePos.ConstrainTo(fFrame);
+					where.x = fMousePos.x + x;
+					where.y = fMousePos.y - y;
+					where.ConstrainTo(fFrame);
 
 					event->RemoveName("x");
 					event->RemoveName("y");
-					event->AddPoint("where", fMousePos);
+					event->AddPoint("where", where);
 					event->AddInt32("be:delta_x", x);
 					event->AddInt32("be:delta_y", y);
 
 					PRINT(("new position: %f, %f, %ld, %ld\n",
-						fMousePos.x, fMousePos.y, x, y));
+						where.x, where.y, x, y));
 				} else if (event->FindFloat("x", &absX) == B_OK
 					&& event->FindFloat("y", &absY) == B_OK) {
-				// device gives us absolute screen coords
-				// in range 0..1
-				// convert to absolute screen pos
-				// (the message is supposed to contain the original
-				// absolute coordinates as "be:tablet_x/y")
-					fMousePos.x = absX * fFrame.Width();
-					fMousePos.y = absY * fFrame.Height();
-					fMousePos.ConstrainTo(fFrame);
+					// The device gives us absolute screen coords in range 0..1;
+					// convert them to absolute screen position
+					// (the message is supposed to contain the original
+					// absolute coordinates as "be:tablet_x/y").
+					where.x = absX * fFrame.Width();
+					where.y = absY * fFrame.Height();
+					where.ConstrainTo(fFrame);
 
 					event->RemoveName("x");
 					event->RemoveName("y");
-					event->AddPoint("where", fMousePos);
-					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
+					event->AddPoint("where", where);
+					PRINT(("new position : %f, %f\n", where.x, where.y));
 				} else if (event->FindPoint("where", &where) == B_OK) {
-					fMousePos = where;
-					fMousePos.ConstrainTo(fFrame);
+					where.ConstrainTo(fFrame);
 
-					event->ReplacePoint("where", fMousePos);
-					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
+					event->ReplacePoint("where", where);
+					PRINT(("new position : %f, %f\n", where.x, where.y));
 				}
 
 				if (!event->HasInt64("when"))
@@ -1552,52 +1609,17 @@ InputServer::_SanitizeEvents(EventList& events)
 	   		}
 			case B_KEY_DOWN:
 			case B_UNMAPPED_KEY_DOWN:
-				// update or add modifiers
-				uint32 modifiers;
-				if (event->FindInt32("modifiers", (int32*)&modifiers) == B_OK)
-					fKeyInfo.modifiers = modifiers;
-				else
+				// add modifiers
+				if (!event->HasInt32("modifiers"))
 					event->AddInt32("modifiers", fKeyInfo.modifiers);
 
-				// update or add key states
-				const uint8 *data;
-				ssize_t size;
-				if (event->FindData("states", B_UINT8_TYPE,
-						(const void**)&data, &size) == B_OK) {
-					PRINT(("updated keyinfo\n"));
-					if (size == sizeof(fKeyInfo.key_states))
-						memcpy(fKeyInfo.key_states, data, size);
-				} else {
+				// add key states
+				if (!event->HasData("states", B_UINT8_TYPE)) {
 					event->AddData("states", B_UINT8_TYPE, fKeyInfo.key_states,
 						sizeof(fKeyInfo.key_states));
 				}
-				if (fActiveMethod == NULL)
-					break;
-
-				// we scan for Alt+Space key down events which means we change
-				// to next input method
-				// (pressing "shift" will let us switch to the previous method)
-
-				PRINT(("SanitizeEvents: %lx, %x\n", fKeyInfo.modifiers,
-					fKeyInfo.key_states[KEY_Spacebar >> 3]));
-
-				uint8 byte;
-				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
-					byte = 0;
-
-				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| byte == B_ZENKAKU_HANKAKU) {
-					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
-
-					// this event isn't sent to the user
-					events.RemoveItemAt(index);
-					delete event;
-					continue;
-				}
 				break;
 		}
-
-		index++;
 	}
 
 	return true;
