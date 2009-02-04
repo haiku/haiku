@@ -101,7 +101,7 @@ function dev() {
 		#export PS1='\[\033]0;['$1':\W]\a\]\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
 		#export PS1='\033]0;['$1':\W]\a\033[1m[\u@\h \w]\033[0m\$ '
 		export PS1='\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
-		export PROMPT_COMMAND='echo -e "\033]0;['$1':${PWD##*/}]\a"'
+		export PROMPT_COMMAND='echo -en "\033]0;['$1':${PWD##*/}]\a"'
 		;;
 	esac
 	# lower priority so background builds don't slow the GUI too much
