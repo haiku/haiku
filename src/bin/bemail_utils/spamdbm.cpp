@@ -2612,7 +2612,7 @@ status_t ABSApp::AddPositionIOToDatabase (
     sprintf (ErrorMessage, "The database is full!  There are %lu messages in "
       "it and we can't add any more without overflowing the maximum integer "
       "representation in 32 bits", NewAge);
-    return ENOMEM;
+    return B_NO_MEMORY;
   }
 
   /* Check that this file hasn't already been added to the database. */
@@ -2724,7 +2724,7 @@ status_t ABSApp::AddPositionIOToDatabase (
         sprintf (ErrorMessage, "Failed to insert new database entry for "
           "word \"%s\", while processing file \"%s\"",
           WordIter->c_str (), OptionalFileName);
-        return ENOMEM;
+        return B_NO_MEMORY;
       }
       DataIter = InsertResult.first;
       m_WordCount++;

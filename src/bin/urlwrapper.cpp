@@ -102,7 +102,7 @@ status_t Url::ParseAndSplit()
 
 	v = FindFirst(":");
 	if (v < 0)
-		return EINVAL;
+		return B_BAD_VALUE;
 	
 	// TODO: proto and host should be lowercased.
 	// see http://en.wikipedia.org/wiki/URL_normalization
