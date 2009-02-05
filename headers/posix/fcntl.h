@@ -46,6 +46,7 @@
 /* flags for open() and fcntl() */
 #define O_CLOEXEC		0x00000040	/* close on exec */
 #define	O_NONBLOCK		0x00000080	/* non blocking io */
+#define	O_NDELAY		O_NONBLOCK
 #define O_APPEND		0x00000800	/* to end of file */
 #define O_TEXT			0x00004000	/* CR-LF translation */
 #define O_BINARY		0x00008000	/* no translation */
