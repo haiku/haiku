@@ -34,7 +34,8 @@
 #define _POSIX_JOB_CONTROL		1
 #define _POSIX_NO_TRUNC			0
 #define _POSIX_SAVED_IDS		1
-#define _POSIX_VDISABLE			((char) - 2)	/* TODO: Check this! */
+#define _POSIX_VDISABLE			((unsigned char)-2)
+	/* TODO: Check this! */
 #define _POSIX_SEMAPHORES		(200112L)
 #define _POSIX_THREADS			(200112L)
 
