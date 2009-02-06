@@ -158,6 +158,14 @@ LoginView::MessageReceived(BMessage *message)
 			break;
 		case kAttemptLogin:
 		{
+			// if no pass specified and we were selecting the user,
+			// give a chance to enter the password
+			// else we might want to enter an empty password.
+			if (strlen(fPasswordControl->Text()) < 1 
+				&& (fUserList->IsFocus() || fLoginControl->IsFocus())) {
+				fPasswordControl->MakeFocus();
+				break;
+			}
 			BMessage *m = new BMessage(kAttemptLogin);
 			m->AddString("login", fLoginControl->Text());
 			m->AddString("password", fPasswordControl->Text());
