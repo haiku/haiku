@@ -837,7 +837,8 @@ DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
 				pathBuffer.UnlockBuffer();
 				pathBuffer.Append("kernel");
 				AddPath(pathBuffer.Path(), subPath);
-			}
+			} else
+				pathBuffer.UnlockBuffer();
 		}
 	} else
 		AddPath(path, subPath);
@@ -1359,7 +1360,8 @@ legacy_driver_probe(const char* subPath)
 
 				start_watching(path.Path(), "dev");
 				start_watching(path.Path(), "bin");
-			}
+			} else
+				path.UnlockBuffer();
 		}
 
 		sWatching = true;
