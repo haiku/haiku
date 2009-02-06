@@ -35,6 +35,7 @@ private:
 	DesktopWindow*	fDesktopWindow;
 	LoginWindow*	fLoginWindow;
 	bool			fEditShelfMode;
+	bool			fModalMode;
 };
 
 #endif	// _LOGINAPP_H_

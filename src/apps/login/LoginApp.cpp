@@ -30,7 +30,8 @@ const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 
 LoginApp::LoginApp()
 	: BApplication(kLoginAppSig),
-	  fEditShelfMode(false)
+	  fEditShelfMode(false),
+	  fModalMode(true)
 {
 }
 
@@ -107,9 +108,22 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 {
 	int i;
 	for (i = 1; i < argc; i++) {
-		printf("[%d]: %s\n", i, argv[i]);
-		if (argv[i] == BString("--edit"))
+		BString arg(argv[i]);
+		//printf("[%d]: %s\n", i, argv[i]);
+		if (arg == "--edit")
 			fEditShelfMode = true;
+		else if (arg == "--nonmodal")
+			fModalMode = false;
+		else /*if (arg == "--help")*/ {
+			printf("Login application for Haiku\nUsage:\n");
+			printf("%s [--nonmodal] [--edit]\n", argv[0]);
+			printf("--nonmodal	Do not make the window modal\n");
+			printf("--edit	Launch in Shelf editting mode to "
+				"allow customizing the desktop.\n");
+			// just return to the shell
+			exit((arg == "--help") ? 0 : 1);
+			return;
+		}
 	}
 }
 
