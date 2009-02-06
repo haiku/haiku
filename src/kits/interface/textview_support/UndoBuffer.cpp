@@ -111,8 +111,8 @@ BTextView::CutUndoBuffer::RedoSelf(BClipboard* clipboard)
 		if ((clip = clipboard->Data())) {
 			clip->AddData("text/plain", B_MIME_TYPE, fTextData, fTextLength);
 			if (fRunArray)
-				clip->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
-					fRunArray, fRunArrayLength);
+				clip->AddData("application/x-vnd.Be-text_run_array",
+					B_MIME_TYPE, fRunArray, fRunArrayLength);
 			clipboard->Commit();
 		}
 		clipboard->Unlock();
