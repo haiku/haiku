@@ -81,6 +81,8 @@ InitParamsPanel::InitParamsPanel(BWindow* window)
 	AddCommonFilter(fEscapeFilter);
 
 	fNameTC = new BTextControl("Name", NULL, NULL);
+	// TODO find out what is the max length for this specific FS partition name
+	fNameTC->TextView()->SetMaxBytes(31);
 
 	BPopUpMenu* blocksizeMenu = new BPopUpMenu("Blocksize");
 	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
