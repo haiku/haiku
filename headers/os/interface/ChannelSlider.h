@@ -121,7 +121,7 @@ virtual	void				_Reserved_BChannelSlider_7(void* , ...);
 		uint32				_reserved_[12];
 
 		void				_InitData();
-		void				_FinishChange();
+		void				_FinishChange(bool update = false);
 		void				_UpdateFontDimens();
 		void				_DrawThumbs();
 		void				_DrawGrooveFrame(BView* where, const BRect& area);

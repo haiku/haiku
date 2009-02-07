@@ -677,7 +677,7 @@ BChannelSlider::_InitData()
 
 
 void
-BChannelSlider::_FinishChange()
+BChannelSlider::_FinishChange(bool update)
 {
 	if (fInitialValues != NULL) {
 		bool *inMask = NULL;
@@ -690,11 +690,13 @@ BChannelSlider::_FinishChange()
 				inMask[fCurrentChannel] = true;
 			}
 		}
-		InvokeChannel(NULL, 0, numChannels, inMask);
+		InvokeChannel(update ? NULL : ModificationMessage(), 0, numChannels, inMask);
 	}
 
-	SetTracking(false);
-	_Redraw();
+	if (!update) {
+		SetTracking(false);
+		_Redraw();
+	}
 }
 
 
@@ -862,6 +864,9 @@ BChannelSlider::_MouseMovedCommon(BPoint point, BPoint point2)
 		SetAllValue(value);
 	else
 		SetValueFor(fCurrentChannel, value);
+
+	if (ModificationMessage()) 
+		_FinishChange(true);
 
 	_DrawThumbs();
 }
