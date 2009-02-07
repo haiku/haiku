@@ -690,7 +690,7 @@ BChannelSlider::_FinishChange(bool update)
 				inMask[fCurrentChannel] = true;
 			}
 		}
-		InvokeChannel(update ? NULL : ModificationMessage(), 0, numChannels, inMask);
+		InvokeChannel(update ? ModificationMessage() : NULL, 0, numChannels, inMask);
 	}
 
 	if (!update) {
