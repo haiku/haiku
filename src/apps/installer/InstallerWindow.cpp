@@ -370,28 +370,31 @@ void
 InstallerWindow::AdjustMenus()
 {
 	PartitionMenuItem *item1 = (PartitionMenuItem *)fSrcMenu->FindMarked();
+	BString label;
 	if (item1) {
-		fSrcMenuField->MenuItem()->SetLabel(item1->MenuLabel());
+		label = item1->MenuLabel();
 	} else {
 		if (fSrcMenu->CountItems() == 0)
-			fSrcMenuField->MenuItem()->SetLabel("<none>");
+			label = "<none>";
 		else {
-			fSrcMenuField->MenuItem()->SetLabel(
-				((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel());
+			label = ((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel();
 		}
 	}
+	fSrcMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
+	fSrcMenuField->MenuItem()->SetLabel(label.String());
 
 	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
 	if (item2) {
-		fDestMenuField->MenuItem()->SetLabel(item2->MenuLabel());
+		label = item2->MenuLabel();
 	} else {
 		if (fDestMenu->CountItems() == 0)
-			fDestMenuField->MenuItem()->SetLabel("<none>");
+			label = "<none>";
 		else {
-			fDestMenuField->MenuItem()->SetLabel(
-				((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel());
+			label = ((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel();
 		}
 	}
+	fDestMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
+	fDestMenuField->MenuItem()->SetLabel(label.String());
 	char message[255];
 	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
 		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
