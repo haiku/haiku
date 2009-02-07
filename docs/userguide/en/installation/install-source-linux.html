@@ -198,7 +198,13 @@ line).</p>
 
 <p>Now the Haiku image is built and installed on the partition:</p>
 
+<pre class="terminal">jam -q @disk</pre>
+
+<p>This takes some time and will abort at some point, because some root permissions are needed. That's OK, we'll continue with:</p>
+
 <pre class="terminal">sudo jam -q @disk</pre>
+
+<p>If you do it all in one go by going straight with the <tt>sudo</tt>-line, some files are created under the "root" user, among them the image itself. This would then have to be rededicate with <tt>chown</tt> etc., so best to stick with the 2-stage approach as described.</p>
 
 <p>Installing to its own partition offers some interesting possibilities:</p>
 <pre class="terminal">sudo jam -q @disk update-all</pre>
@@ -214,11 +220,10 @@ line).</p>
 <h4><a id="build_vmimage" name="build_vmimage">Building a VMWare Image</a></h4>
 
 <p>Just enter:</p>
-<pre class="terminal">sudo jam -q @vmware</pre>
+<pre class="terminal">jam -q @vmware
+sudo jam -q @vmware</pre>
 
-<p>You'll now have to rededicate the generated image to satisfy the VMPlayer, before you can run it with an associated <a href="http://haiku-files.org/files/haiku.vmx">.vmx</a> file (There's also a <tt>.vmx</tt> file in <tt>haiku/3rdparty/vmware/</tt>):</p>
-
-<pre class="terminal">sudo chown [YourUsername] haiku.image</pre>
+<p>The created image can be run in VMPlayer with an associated <a href="http://haiku-files.org/files/haiku.vmx">.vmx</a> file (There's also a <tt>.vmx</tt> file in <tt>haiku/3rdparty/vmware/</tt>).</p>
 
 
 <h1>Booting with GRUB</h1>
