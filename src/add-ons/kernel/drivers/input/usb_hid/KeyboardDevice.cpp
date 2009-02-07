@@ -65,6 +65,8 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
 		case KB_READ:
+		{
+			bigtime_t enterTime = system_time();
 			while (_RingBufferReadable() == 0) {
 				if (!_IsTransferUnprocessed()) {
 					status_t result = _ScheduleTransfer();
@@ -82,24 +84,69 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 					_SetTransferProcessed();
 					if (result != B_OK)
 						return result;
-				} else if (result == B_TIMED_OUT && IsOpen()) {
-					// this case is for handling key repeats, it means
-					// no interrupt transfer has happened
+				} else if (result != B_TIMED_OUT)
+					return result;
+
+				if (!IsOpen())
+					return B_ERROR;
+
+				if (_RingBufferReadable() == 0 && fCurrentRepeatKey != 0
+					&& system_time() - enterTime > fCurrentRepeatDelay) {
+					// this case is for handling key repeats, it means no
+					// interrupt transfer has happened or it didn't produce any
+					// new key events, but a repeated key down is due
 					_WriteKey(fCurrentRepeatKey, true);
+
 					// the next timeout is reduced to the repeat_rate
 					fCurrentRepeatDelay = fRepeatRate;
 					break;
-				} else
-					return result;
+				}
 			}
 
 			// process what is in the ring_buffer, it could be written
 			// there because we handled an interrupt transfer or because
 			// we wrote the current repeat key
 			return _RingBufferRead(buffer, sizeof(raw_key_info));
+		}
 
 		case KB_SET_LEDS:
-			return _SetLEDs((uint8 *)buffer);
+		{
+			uint8 ledData[4];
+			if (user_memcpy(ledData, buffer, sizeof(ledData)) != B_OK)
+				return B_BAD_ADDRESS;
+			return _SetLEDs(ledData);
+		}
+
+		case KB_SET_KEY_REPEAT_RATE:
+		{
+			int32 repeatRate;
+			if (user_memcpy(&repeatRate, buffer, sizeof(repeatRate)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			if (repeatRate == 0 || repeatRate > 1000000)
+				return B_BAD_VALUE;
+
+			fRepeatRate = 10000000 / repeatRate;
+			return B_OK;
+		}
+
+		case KB_GET_KEY_REPEAT_RATE:
+		{
+			int32 repeatRate = 10000000 / fRepeatRate;
+			if (user_memcpy(buffer, &repeatRate, sizeof(repeatRate)) != B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
+
+		case KB_SET_KEY_REPEAT_DELAY:
+			if (user_memcpy(&fRepeatDelay, buffer, sizeof(fRepeatDelay)) != B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+
+		case KB_GET_KEY_REPEAT_DELAY:
+			if (user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay)) != B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
 	}
 
 	TRACE_ALWAYS("keyboard device unhandled control 0x%08lx\n", op);
@@ -317,6 +364,22 @@ KeyboardDevice::_InterpretBuffer()
 	for (uint8 i = 0; modifierChange; i++, modifierChange >>= 1) {
 		if (modifierChange & 1)
 			_WriteKey(sModifierTable[i], (fTransferBuffer[0] >> i) & 1);
+	}
+
+	bool phantomState = true;
+	for (size_t i = 2; i < fTotalReportSize; i++) {
+		if (fTransferBuffer[i] != 0x01) {
+			phantomState = false;
+			break;
+		}
+	}
+
+	if (phantomState) {
+		// no valid key information is present in this state and we don't
+		// want to overwrite our last buffer as otherwise we generate
+		// spurious key ups now and spurious key downs when leaving the
+		// phantom state again
+		return B_OK;
 	}
 
 	bool keyDown = false;
