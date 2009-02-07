@@ -88,7 +88,7 @@ MergeObject posix_gnu_libio.o :
 	vasprintf.c
 	vscanf.c
 	vsnprintf.c
-	wfile_stubs.c
+#	wfile_stubs.c
 
 	# wide character
 
@@ -115,8 +115,8 @@ MergeObject posix_gnu_libio.o :
 	vswprintf.c
 	vwprintf.c
 #	vwscanf.c
-#	wfiledoalloc.c
-#	wfileops.c
+	wfiledoalloc.c
+	wfileops.c
 	wgenops.c
 	wprintf.c
 #	wscanf.c

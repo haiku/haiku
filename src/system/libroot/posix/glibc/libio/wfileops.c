@@ -292,6 +292,7 @@ _IO_wfile_underflow (fp)
 INTDEF(_IO_wfile_underflow)
 
 
+#ifdef HAVE_MMAP
 static wint_t
 _IO_wfile_underflow_mmap (_IO_FILE *fp)
 {
@@ -365,6 +366,7 @@ _IO_wfile_underflow_maybe_mmap (_IO_FILE *fp)
 
   return _IO_WUNDERFLOW (fp);
 }
+#endif
 
 
 wint_t
@@ -882,6 +884,7 @@ struct _IO_jump_t _IO_wfile_jumps =
 INTVARDEF(_IO_wfile_jumps)
 
 
+#ifdef HAVE_MMAP
 struct _IO_jump_t _IO_wfile_jumps_mmap =
 {
   JUMP_INIT_DUMMY,
@@ -929,3 +932,4 @@ struct _IO_jump_t _IO_wfile_jumps_maybe_mmap =
   JUMP_INIT(showmanyc, _IO_default_showmanyc),
   JUMP_INIT(imbue, _IO_default_imbue)
 };
+#endif
