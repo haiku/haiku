@@ -250,7 +250,7 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 
 	float value = 0.0;
 	fDontBeep = dontBeep;
-	const char *errString;
+	const char *errString = NULL;
 	fMixerControl = new MixerControl(volumeWhich, &value, &errString);
 	
 	BBox *box = new BBox(Bounds(), "sliderbox", B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -381,8 +381,7 @@ SliderView::Draw(BRect updateRect)
 	SetHighColor(156,154,156);
 	FillRect(BRect(position,3,192,13));
 
-	BFont font;
-	float width = font.StringWidth(fTitle);
+	float width = be_plain_font->StringWidth(fTitle);
 
 	SetHighColor(49,154,49);
 	DrawString(fTitle, BPoint(11 + (192-11-width)/2, 12));
