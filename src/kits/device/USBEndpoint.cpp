@@ -223,7 +223,7 @@ BUSBEndpoint::IsStalled() const
 	uint16 status = 0;
 	Device()->ControlTransfer(USB_REQTYPE_ENDPOINT_IN,
 		USB_REQUEST_GET_STATUS, USB_FEATURE_ENDPOINT_HALT,
-		fDescriptor.endpoint_address & 0x0f, sizeof(status), &status);
+		fDescriptor.endpoint_address, sizeof(status), &status);
 	return status != 0;
 }
 
@@ -233,5 +233,5 @@ BUSBEndpoint::ClearStall() const
 {
 	return Device()->ControlTransfer(USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_CLEAR_FEATURE, USB_FEATURE_ENDPOINT_HALT,
-		fDescriptor.endpoint_address & 0x0f, 0, NULL);
+		fDescriptor.endpoint_address, 0, NULL);
 }
