@@ -236,6 +236,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	}
 
 	# other tools
+	local baseURL = http://haiku-files.org/files/optional-packages ;
 	InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
 		: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip
 		:
