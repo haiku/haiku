@@ -57,6 +57,13 @@ rule UserBuildConfigRulePostImage			{ }
 	if $(userBuildConfig) {
 		include $(userBuildConfig) ;
 	}
+
+	# allow for a separate UserBuildConfig per output directory
+	local userBuildConfig
+		= [ GLOB $(HAIKU_OUTPUT_DIR) : UserBuildConfig ] ;
+	if $(userBuildConfig) {
+		include $(userBuildConfig) ;
+	}
 }
 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ReleaseBuildProfiles ] ;
