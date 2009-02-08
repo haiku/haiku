@@ -230,57 +230,49 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: $(baseURL)/gcc-2.95.3-haiku-081024.zip
 			:
 		;
-		# other tools
-		InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
-			: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-11-06
-			: $(baseURL)/automake-1.10.1-gcc2-2008-11-06.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
-			: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
-			: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
-			: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage libtool-2.2.6a-gcc2-2008-11-09
-			: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
-			: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
-			:
-		;
-		InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
-			: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip
-			:
-		;
 	}
 
-	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) = 1 {
+	# other tools
+	InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
+		: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-11-06
+		: $(baseURL)/automake-1.10.1-gcc2-2008-11-06.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
+		: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
+		: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
+		: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage libtool-2.2.6a-gcc2-2008-11-09
+		: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
+		: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
+		:
+	;
+	InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
+		: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip
+		:
+	;
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 {
 		# gcc and binutils
 		local baseURL = http://haiku.mlotz.ch ;
 		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090129
 			: $(baseURL)/gcc-4.3.3-haiku-090129.zip
 			:
 		;
-
-		# Setup the proper gnupro symlink. Both packages provide one and on
-		# a GCC2 based hybrid the GCC4 package will overwrite the one present.
-		# Since we want to use GCC2 as the host compiler on a GCC2 base we have
-		# to correct this again.
-		if $(HAIKU_GCC_VERSION[1]) = 2 {
-			AddSymlinkToHaikuImage develop tools
-				: /boot/develop/tools/gcc-2.95.3-haiku-081024 : gnupro ;
-		}
 	}
 }
 
