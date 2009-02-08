@@ -648,7 +648,7 @@ class BPoseView : public BView {
 		bool fIsDesktopWindow : 1;
 		bool fIsWatchingDateFormatChange : 1;
 		bool fHasPosesInClipboard : 1;
-
+		bool fCursorCheck : 1;
 		BRect fStartFrame;
 		BRect fSelectionRect;
 

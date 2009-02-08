@@ -131,6 +131,18 @@ const BPoint kTransparentDragThreshold(256, 192);
 	// maximum size of the transparent drag bitmap, use a drag rect
 	// if larger in any direction
 
+const unsigned char kCopyCursor[] = { 16, 1, 1, 1,
+	0x00, 0x00, 0x70, 0x00, 0x48, 0x00, 0x48, 0x00,
+	0x27, 0xc0, 0x24, 0xb8, 0x12, 0x54, 0x10, 0x02,
+	0x79, 0xe2, 0x99, 0x22, 0x85, 0x7a, 0x61, 0x4a,
+	0x19, 0xca, 0x04, 0x4a, 0x02, 0x78, 0x00, 0x00,
+
+	0x00, 0x00, 0x70, 0x00, 0x78, 0x00, 0x78, 0x00,
+	0x3f, 0xc0, 0x3f, 0xf8, 0x1f, 0xfc, 0x1f, 0xfe,
+	0x7f, 0xfe, 0xff, 0xfe, 0xff, 0xfe, 0x7f, 0xfe,
+	0x1f, 0xfe, 0x07, 0xfe, 0x03, 0xf8, 0x00, 0x00 
+};
+
 const char *kNoCopyToTrashStr = "Sorry, you can't copy items to the Trash.";
 const char *kNoLinkToTrashStr = "Sorry, you can't create links in the Trash.";
 const char *kNoCopyToRootStr = "You must drop items on one of the disk icons "
@@ -217,6 +229,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fIsDesktopWindow(false),
 	fIsWatchingDateFormatChange(false),
 	fHasPosesInClipboard(false),
+	fCursorCheck(false),
 	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1)
@@ -3854,6 +3867,10 @@ bool
 BPoseView::HandleMessageDropped(BMessage *message)
 {
 	ASSERT(message->WasDropped());
+	
+	// reset system cursor in case it was altered by drag and drop
+	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+	fCursorCheck = false;
 
 	if (!fDropEnabled)
 		return false;
@@ -4345,6 +4362,18 @@ CopySelectionListToBListAsEntryRefs(const PoseList *original, BObjectList<entry_
 }
 
 
+static bool
+CheckDevicesEqual(const entry_ref *srcRef, Model *targetModel)
+{
+	BDirectory destDir (targetModel->EntryRef());
+	struct stat deststat;
+	destDir.GetStat(&deststat);
+
+	return srcRef->device == deststat.st_dev;
+
+}
+
+
 void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	bool forceCopy, bool forceMove, bool createLink, bool relativeLink)
@@ -4487,12 +4516,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			moveMode = kCreateLink;
 		else {
 			moveMode = kMoveSelectionTo;
-			entry_ref *srcRef = srcList->ItemAt(0);
-			BDirectory destDir (destEntry);
-			struct stat deststat;
-			destDir.GetStat(&deststat);
-
-			if (srcRef->device != deststat.st_dev) 	
+			if (!CheckDevicesEqual(srcList->ItemAt(0), destFolder))
 				moveMode = kCopySelectionTo;
 		}
 		
@@ -7556,7 +7580,7 @@ BPoseView::SendSelectionAsRefs(uint32 what, bool onlyQueries)
 
 	if (onlyQueries)
 		// this is used to make query templates come up in a special edit window
-		message.AddBool("editQueryOnPose", &onlyQueries);
+		message.AddBool("editQueryOnPose", onlyQueries);
 
 	BMessenger(kTrackerSignature).SendMessage(&message);
 }
@@ -8604,6 +8628,9 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 		}
 
 		case B_EXITED_VIEW:
+			// reset cursor in case we set it to the copy cursor in UpdateDropTarget
+			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+			fCursorCheck = false;
 			// TODO: autoscroll here
 			if (!window->ContextMenu()) {
 				HiliteDropTarget(false);
@@ -8623,11 +8650,12 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 	int32 index;
 	BPose *targetPose = FindPose(mouseLoc, &index);
 
-	if (targetPose == fDropTarget
+	if (fCursorCheck && targetPose == fDropTarget
 		|| (trackingContextMenu && !targetPose))
 		// no change
 		return false;
-
+	
+	fCursorCheck = true;
 	if (fDropTarget && !DragSelectionContains(fDropTarget, dragMessage))
 		HiliteDropTarget(false);
 
@@ -8645,10 +8673,24 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
 	if (targetPose && CanHandleDragSelection(targetModel, dragMessage, ignoreTypes)) {
 		// new target is valid, select it
-		HiliteDropTarget(true);
-	} else
+		HiliteDropTarget(true);	 
+	} else {
 		fDropTarget = NULL;
+		if (targetPose == NULL)
+			targetModel = TargetModel();
+	}
 
+	entry_ref srcRef;
+	if (targetModel->IsDirectory() && dragMessage->HasRef("refs") 
+			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
+		if (!CheckDevicesEqual(&srcRef, targetModel)) {
+			BCursor copyCursor(kCopyCursor);
+			SetViewCursor(&copyCursor);
+			return true;
+		}
+	}
+	
+	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	return true;
 }
 
