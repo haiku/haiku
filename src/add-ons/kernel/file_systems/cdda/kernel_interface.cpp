@@ -508,10 +508,13 @@ Volume::Volume(fs_volume* fsVolume)
 
 Volume::~Volume()
 {
-	_StoreAttributes();
-	_StoreSharedAttributes();
+	if (fRootNode) {
+		_StoreAttributes();
+		_StoreSharedAttributes();
+	}
 
-	close(fDevice);
+	if (fDevice >= 0)
+		close(fDevice);
 
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
