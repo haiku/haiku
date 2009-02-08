@@ -211,25 +211,28 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
-	if $(HAIKU_GCC_VERSION[1]) > 2 {
-		# gcc 4
-
-		# symlink cpp to g++'s headers
-		AddSymlinkToHaikuImage develop headers
-			: /boot/develop/tools/gnupro/include/g++ : cpp ;
-	} else {
-		# gcc 2.95.3
-
-		AddHeaderDirectoryToHaikuImage cpp ;
-	}
-
-	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) = 1 {
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# gcc and binutils
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024
 			: $(baseURL)/gcc-2.95.3-haiku-081024.zip
 			:
 		;
+
+		AddHeaderDirectoryToHaikuImage cpp ;
+	}
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 {
+		# gcc and binutils
+		local baseURL = http://haiku.mlotz.ch ;
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090129
+			: $(baseURL)/gcc-4.3.3-haiku-090129.zip
+			:
+		;
+
+		# symlink cpp to g++'s headers
+		AddSymlinkToHaikuImage develop headers
+			: /boot/develop/tools/gnupro/include/g++ : cpp ;
 	}
 
 	# other tools
@@ -265,15 +268,6 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 		: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip
 		:
 	;
-
-	if $(HAIKU_GCC_VERSION[1]) = 4 {
-		# gcc and binutils
-		local baseURL = http://haiku.mlotz.ch ;
-		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090129
-			: $(baseURL)/gcc-4.3.3-haiku-090129.zip
-			:
-		;
-	}
 }
 
 
