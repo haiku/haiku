@@ -5351,6 +5351,22 @@ CopyPoseOneAsEntry(BPose *pose, BObjectList<entry_ref> *trashList,
 }
 
 
+static bool
+CheckVolumeReadOnly(const entry_ref *ref)
+{
+	BVolume volume (ref->device);
+	if (volume.IsReadOnly()) {
+		BAlert *alert (new BAlert ("", "Files cannot be moved or deleted "
+			"from a read-only volume.", "Cancel", NULL, NULL, 
+			B_WIDTH_AS_USUAL, B_STOP_ALERT));
+		alert->Go();
+		return false;
+	}
+	
+	return true;
+}
+
+
 void
 BPoseView::MoveSelectionOrEntryToTrash(const entry_ref *ref, bool selectNext)
 {
@@ -5361,9 +5377,13 @@ BPoseView::MoveSelectionOrEntryToTrash(const entry_ref *ref, bool selectNext)
 	std::map<int32, bool> deviceHasTrash;
 
 	if (ref) {
+		if (!CheckVolumeReadOnly(ref))
+			return;
 		CopyOneTrashedRefAsEntry(ref, entriesToTrash, entriesToDeleteOnTheSpot,
 			&deviceHasTrash);
 	} else {
+		if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef()))
+			return;
 		EachListItem(fSelectionList, CopyPoseOneAsEntry, entriesToTrash,
 			entriesToDeleteOnTheSpot, &deviceHasTrash);
 	}
@@ -5414,6 +5434,9 @@ BPoseView::DeleteSelection(bool selectNext, bool askUser)
 {
 	int32 count = fSelectionList -> CountItems();
 	if (count <= 0)
+		return;
+
+	if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef()))
 		return;
 
 	BObjectList<entry_ref> *entriesToDelete = new BObjectList<entry_ref>(count, true);
