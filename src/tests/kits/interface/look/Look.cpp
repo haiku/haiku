@@ -38,12 +38,16 @@ add_controls(BGridLayout* layout, int32& row)
 	ControlType* control1 = new ControlType("Enabled", NULL);
 	ControlType* control2 = new ControlType("Disabled", NULL);
 	control2->SetEnabled(false);
-	ControlType* control3 = new ControlType("On", NULL);
+	ControlType* control3 = new ControlType("Enabled", NULL);
 	control3->SetValue(B_CONTROL_ON);
+	ControlType* control4 = new ControlType("Disabled", NULL);
+	control4->SetValue(B_CONTROL_ON);
+	control4->SetEnabled(false);
 
 	layout->AddView(control1, 0, row);
 	layout->AddView(control2, 1, row);
 	layout->AddView(control3, 2, row);
+	layout->AddView(control4, 3, row);
 
 	row++;
 }
@@ -58,9 +62,8 @@ add_menu_fields(BGridLayout* layout, int32& row)
 	BMenuField* control2 = new BMenuField("Disabled", menu2, NULL);
 	control2->SetEnabled(false);
 
-	layout->AddView(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-		.Add(control1)
-		.Add(control2), 0, row, 3);
+	layout->AddView(control1, 0, row, 2);
+	layout->AddView(control2, 2, row, 2);
 
 	row++;
 }
@@ -73,9 +76,8 @@ add_text_controls(BGridLayout* layout, int32& row)
 	BTextControl* control2 = new BTextControl("Disabled", "More Text", NULL);
 	control2->SetEnabled(false);
 
-	layout->AddView(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-		.Add(control1)
-		.Add(control2), 0, row, 3);
+	layout->AddView(control1, 0, row, 2);
+	layout->AddView(control2, 2, row, 2);
 
 	row++;
 }
@@ -95,9 +97,8 @@ add_sliders(BGridLayout* layout, int32& row)
 	control2->SetHashMarkCount(10);
 	control2->SetHashMarks(B_HASH_MARKS_BOTTOM);
 
-	layout->AddView(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-		.Add(control1)
-		.Add(control2), 0, row, 3);
+	layout->AddView(control1, 0, row, 2);
+	layout->AddView(control2, 2, row, 2);
 
 	row++;
 
@@ -107,12 +108,55 @@ add_sliders(BGridLayout* layout, int32& row)
 		B_HORIZONTAL, B_TRIANGLE_THUMB);
 	control2->SetEnabled(false);
 
-	control1->SetLimitLabels("Min", "Max");
-	control2->SetLimitLabels("1", "100");
+	rgb_color fillColor = (rgb_color){ 255, 115, 0, 255 };
 
-	layout->AddView(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-		.Add(control1)
-		.Add(control2), 0, row, 3);
+	control1->SetLimitLabels("Min", "Max");
+	control1->UseFillColor(true, &fillColor);
+	control1->SetValue(20);
+
+	control2->SetLimitLabels("1", "100");
+	control2->UseFillColor(true, &fillColor);
+	control2->SetValue(10);
+
+	layout->AddView(control1, 0, row, 2);
+	layout->AddView(control2, 2, row, 2);
+
+	row++;
+}
+
+
+void
+add_status_bars(BGridLayout* layout, int32& row)
+{
+	BBox* box = new BBox(B_FANCY_BORDER, NULL);
+	box->SetLabel("Info");
+
+	BGroupLayout* boxLayout = new BGroupLayout(B_VERTICAL, 5);
+	boxLayout->SetInsets(8, 8 + box->TopBorderOffset(), 8, 8);
+	box->SetLayout(boxLayout);
+
+	BStatusBar* statusBar = new BStatusBar("status bar", "Status",
+		"Completed");
+	statusBar->SetMaxValue(100);
+	statusBar->SetTo(0);
+	statusBar->SetBarHeight(12);
+	boxLayout->AddView(statusBar);
+
+	statusBar = new BStatusBar("status bar", "Progress",
+		"Completed");
+	statusBar->SetMaxValue(100);
+	statusBar->SetTo(40);
+	statusBar->SetBarHeight(12);
+	boxLayout->AddView(statusBar);
+
+	statusBar = new BStatusBar("status bar", "Lifespan of capitalism",
+		"Completed");
+	statusBar->SetMaxValue(100);
+	statusBar->SetTo(100);
+	statusBar->SetBarHeight(12);
+	boxLayout->AddView(statusBar);
+
+	layout->AddView(box, 0, row, 4);
 
 	row++;
 }
@@ -133,11 +177,14 @@ main(int argc, char** argv)
 	// create some controls
 
 	BListView* listView = new BListView();
-	listView->AddItem(new BStringItem("List Item 1"));
-	listView->AddItem(new BStringItem("List Item 2"));
+	for (int32 i = 0; i < 20; i++) {
+		BString itemLabel("List Item ");
+		itemLabel << i + 1;
+		listView->AddItem(new BStringItem(itemLabel.String()));
+	}
 	BScrollView* scrollView = new BScrollView("scroller", listView, 0,
 		true, true);
-	scrollView->SetExplicitMinSize(BSize(300, 80));
+	scrollView->SetExplicitMinSize(BSize(300, 140));
 
 	BGridView* controls = new BGridView(5.0f, 5.0f);
 	BGridLayout* layout = controls->GridLayout();
@@ -150,19 +197,11 @@ main(int argc, char** argv)
 	add_menu_fields(layout, row);
 	add_text_controls(layout, row);
 	add_sliders(layout, row);
-
-	BStatusBar* statusBar = new BStatusBar("status bar", "Status",
-		"Completed");
-	statusBar->SetMaxValue(100);
-	statusBar->SetTo(40);
-	statusBar->SetBarHeight(12);
-	layout->AddView(statusBar, 0, row, 3);
-
-	row++;
+	add_status_bars(layout, row);
 
 	BColorControl* colorControl = new BColorControl(B_ORIGIN, B_CELLS_32x8,
 		8.0f, "color control");
-	layout->AddView(colorControl, 0, row, 3);
+	layout->AddView(colorControl, 0, row, 4);
 
 	BTabView* tabView = new BTabView("tab view", B_WIDTH_FROM_WIDEST);
 	BView* content = BGroupLayoutBuilder(B_VERTICAL, 5)
