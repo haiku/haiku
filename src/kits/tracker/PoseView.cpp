@@ -8704,6 +8704,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		// new target is valid, select it
 		HiliteDropTarget(true);	 
 	} else {
+		fCursorCheck = false;
 		fDropTarget = NULL;
 		if (targetPose == NULL)
 			targetModel = TargetModel();
