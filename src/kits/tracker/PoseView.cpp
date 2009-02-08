@@ -5377,13 +5377,19 @@ BPoseView::MoveSelectionOrEntryToTrash(const entry_ref *ref, bool selectNext)
 	std::map<int32, bool> deviceHasTrash;
 
 	if (ref) {
-		if (!CheckVolumeReadOnly(ref))
+		if (!CheckVolumeReadOnly(ref)) {
+			delete entriesToTrash;
+			delete entriesToDeleteOnTheSpot;
 			return;
+		}
 		CopyOneTrashedRefAsEntry(ref, entriesToTrash, entriesToDeleteOnTheSpot,
 			&deviceHasTrash);
 	} else {
-		if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef()))
+		if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef())) {
+			delete entriesToTrash;
+			delete entriesToDeleteOnTheSpot;
 			return;
+		}
 		EachListItem(fSelectionList, CopyPoseOneAsEntry, entriesToTrash,
 			entriesToDeleteOnTheSpot, &deviceHasTrash);
 	}
