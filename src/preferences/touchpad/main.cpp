@@ -27,7 +27,7 @@ class TouchpadPrefWindow : public BWindow
 int 
 main(int argc, char* argv[])
 {
-	BApplication	*app = new BApplication("application/touchpadpref");
+	BApplication	*app = new BApplication("application/x-vnd.Haiku-Touchpad");
 	TouchpadPrefWindow *window = new TouchpadPrefWindow(BRect(50, 50, 450, 350),"Touchpad", B_TITLED_WINDOW,
 			 	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS);
 	window->AddChild(new TouchpadPrefView(window->Bounds(), "TouchpadPrefView"));
