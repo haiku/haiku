@@ -125,7 +125,7 @@ next_line(void)
 		// output
 		const char *text = in_command_invocation()
 			? "Press key to continue, Q to quit, S to skip output"
-			: "Press key to continue, Q or S to skip output";
+			: "Press key to continue, S to skip output, P to disable paging";
 		int32 length = strlen(text);
 		if (sScreen.x + length > sScreen.columns) {
 			// make sure we don't overwrite too much
@@ -142,10 +142,11 @@ next_line(void)
 		char c = blue_screen_getchar();
 		if (c == 's') {
 			sScreen.ignore_output = true;
-		} else if (c == 'q') {
-			abortCommand = in_command_invocation();
+		} else if (c == 'q' && in_command_invocation()) {
+			abortCommand = true;
 			sScreen.ignore_output = true;
-		}
+		} else if (c == 'p' && !in_command_invocation())
+			sScreen.paging = false;
 
 		// remove on screen text again
 		sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
