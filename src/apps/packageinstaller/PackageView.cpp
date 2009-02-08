@@ -71,18 +71,6 @@ PackageView::PackageView(BRect frame, const entry_ref *ref)
 	status_t ret = fInfo.InitCheck();
 	if (ret == B_OK) 
 		_InitProfiles();
-	else if (ret != B_NO_INIT) {
-		BAlert *warning = new BAlert(T("parsing_failed"),
-			T("I was unable to read the given package file.\nOne of the possible "
-				"reasons for this might be that the requested file is not a valid "
-				"BeOS .pkg package."), T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
-		warning->Go();
-
-		BWindow *parent = Window();
-		if (parent && parent->Lock())
-			parent->Quit();
-	}
 
 	ResizeTo(Bounds().Width(), fInstall->Frame().bottom + 4);
 }
@@ -97,6 +85,19 @@ PackageView::~PackageView()
 void
 PackageView::AttachedToWindow()
 {
+	status_t ret = fInfo.InitCheck();
+	if (ret != B_OK && ret != B_NO_INIT) {
+		BAlert *warning = new BAlert(T("parsing_failed"),
+				T("I was unable to read the given package file.\nOne of the possible "
+				"reasons for this might be that the requested file is not a valid "
+				"BeOS .pkg package."), T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
+		warning->Go();
+
+		Window()->PostMessage(B_QUIT_REQUESTED);
+		return;
+	}
+
 	// Set the window title
 	BWindow *parent = Window();
 	BString title;
@@ -170,12 +171,14 @@ PackageView::MessageReceived(BMessage *msg)
 			else if (ret == B_FILE_EXISTS)
 				notify = new BAlert("installation_aborted",
 					T("The installation of the package has been aborted."), T("OK"));
-			else
+			else {
 				notify = new BAlert("installation_failed", // TODO: Review this
 					T("The requested package failed to install on your system. This "
 						"might be a problem with the target package file. Please consult "
 						"this issue with the package distributor."), T("OK"), NULL, 
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				fprintf(stderr, "Error while installing the package : %s\n", strerror(ret));
+			}
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -267,12 +270,16 @@ PackageView::Install()
 		if (reinstall->Go() == 0) {
 			// Uninstall the package
 			err = packageInfo.Uninstall();
-			if (err != B_OK)
+			if (err != B_OK) {
+				fprintf(stderr, "Error on uninstall\n");
 				return err;
+			}
 
 			err = packageInfo.SetTo(fInfo.GetName(), fInfo.GetVersion(), true);
-			if (err != B_OK)
+			if (err != B_OK) {
+				fprintf(stderr, "Error on SetTo\n");
 				return err;
+			}
 		}
 		else {
 			// Abort the installation
@@ -281,13 +288,17 @@ PackageView::Install()
 	}
 	else if (err == B_ENTRY_NOT_FOUND) {
 		err = packageInfo.SetTo(fInfo.GetName(), fInfo.GetVersion(), true);
-		if (err != B_OK)
+		if (err != B_OK) {
+			fprintf(stderr, "Error on SetTo\n");
 			return err;
+		}
 	}
 	else if (fStatusWindow->Stopped())
 		return B_FILE_EXISTS;
-	else
+	else {
+		fprintf(stderr, "returning on error\n");
 		return err;
+	}
 
 	fStatusWindow->StageStep(1, "Installing files and directories");
 
@@ -310,11 +321,13 @@ PackageView::Install()
 	packageInfo.SetDescription(description.String());
 	packageInfo.SetSpaceNeeded(type->space_needed);
 
-	for (i = 0;i < n;i++) {
+	for (i = 0; i < n; i++) {
 		iter = static_cast<PkgItem *>(type->items.ItemAt(i));
 		err = iter->WriteToPath(fCurrentPath.Path(), &installedTo);
-		if (err != B_OK)
+		if (err != B_OK) {
+			fprintf(stderr, "Error while writing path %s\n", fCurrentPath.Path());
 			return err;
+		}
 		if (fStatusWindow->Stopped())
 			return B_FILE_EXISTS;
 		label = "";
