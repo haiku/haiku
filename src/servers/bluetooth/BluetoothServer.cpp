@@ -226,7 +226,7 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 	ssize_t size;
 	bdaddr_t bdaddr;
 	LocalDeviceImpl* ldi = NULL;
-	int32 index = 0;
+	static int32 lastIndex = 0;
 	
 	if (message->FindInt32("hci_id", &hid) == B_OK)
 	{
@@ -239,38 +239,56 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		/* Try to find out when the user specified the address */
 		Output::Instance()->Post("GetLocalDevice requested with bdaddr\n", 
 						BLACKBOARD_KIT);
-		for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
-			bdaddr_t local;
-			ldi = fLocalDevicesList.ItemAt(index);
-			// TODO: Only if the property is available
+		for (lastIndex = 0; lastIndex < fLocalDevicesList.CountItems(); lastIndex ++) {
+			//TODO: Only possible if the property is available
+			//bdaddr_t local;
+			//ldi = fLocalDevicesList.ItemAt(lastIndex);
 			//if ((ldi->GetAddress(&local, message) == B_OK) 
 			//	&& bacmp(&local, &bdaddr))  {
 			//    break;
 			//}
 		}
 
-		} else	{
-			/* Careless, any device not performing operations will be fine */
-			Output::Instance()->Post("GetLocalDevice requested\n", BLACKBOARD_KIT);
-			for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
+	} else	{
+		// Careless, any device not performing operations will be fine
+		Output::Instance()->Post("GetLocalDevice plain request\n", BLACKBOARD_KIT);
+		// from last assigned till end
+		for ( int index  = lastIndex + 1; index < fLocalDevicesList.CountItems(); index ++) {
+			ldi = fLocalDevicesList.ItemAt(index);
+			printf("Requesting local device %ld\n", ldi->GetID());
+			if (ldi != NULL && ldi->Available())
+			{
+				Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", ldi->GetID());
+				lastIndex = index;
+				break;
+			}
+		}	
+
+		// from starting till last assigned if not yet found
+		if (ldi == NULL) {
+			for ( int index = 0; index <= lastIndex ; index ++) {
 				ldi = fLocalDevicesList.ItemAt(index);
 				printf("Requesting local device %ld\n", ldi->GetID());
 				if (ldi != NULL && ldi->Available())
 				{
-					printf("dev ours %ld\n", ldi->GetID());
+					Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", ldi->GetID());
+					lastIndex = index;
 					break;
 				}
-			}	
+			}
 		}
-	
-	if (index <= fLocalDevicesList.CountItems() && ldi != NULL && ldi->Available()) {
-		Output::Instance()->Post("Device acquired\n", BLACKBOARD_KIT);
-		ldi->Acquire();
-		return reply->AddInt32("hci_id", hid);
 	}
 	
+	if (lastIndex <= fLocalDevicesList.CountItems() && ldi != NULL && ldi->Available()) {
+		hid = ldi->GetID();
+		ldi->Acquire();
+		
+		Output::Instance()->Postf(BLACKBOARD_KIT, "Device acquired %lx\n", hid);
+		return reply->AddInt32("hci_id", hid);
+	}
+
 	return B_ERROR;
-	
+
 }
 
 
