@@ -88,7 +88,7 @@ PackageView::AttachedToWindow()
 	status_t ret = fInfo.InitCheck();
 	if (ret != B_OK && ret != B_NO_INIT) {
 		BAlert *warning = new BAlert(T("parsing_failed"),
-				T("I was unable to read the given package file.\nOne of the possible "
+				T("The package file is not readable.\nOne of the possible "
 				"reasons for this might be that the requested file is not a valid "
 				"BeOS .pkg package."), T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
