@@ -537,8 +537,15 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		
 		/* Check specific node ids declared as inputs as beepers */
 		switch ((audioGroup->codec->vendor_id << 16) | audioGroup->codec->product_id) {
+			case 0x11d41882:
+			case 0x11d41883:
+			case 0x11d41884:
+			case 0x11d4194a:
+			case 0x11d4194b:
+			case 0x11d41987:
 			case 0x11d41988:
 			case 0x11d4198b:
+			case 0x11d4989b:
 				if (nodeID == 26)
 					widget.type = WT_BEEP_GENERATOR;
 				break;
