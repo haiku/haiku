@@ -294,7 +294,7 @@ Volume::GetKeyOffsetForName(const char *name, int len, uint64 *result)
 status_t
 Volume::GetVNode(ino_t id, VNode **node)
 {
-	return get_vnode(GetFSVolume(), id, (void**)node);
+	return get_vnode(GetFSVolume(), id, (void**)node, NULL);
 }
 
 // PutVNode

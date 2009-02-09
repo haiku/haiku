@@ -284,8 +284,7 @@ remove_node(struct rootfs *fs, struct rootfs_vnode *directory,
 {
 	// schedule this vnode to be removed when it's ref goes to zero
 
-	void* dummy;
-	bool gotNode = (get_vnode(fs->volume, vnode->id, &dummy) == B_OK);
+	bool gotNode = (get_vnode(fs->volume, vnode->id, NULL, NULL) == B_OK);
 
 	status_t status = B_OK;
 	if (gotNode)
@@ -432,7 +431,7 @@ rootfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 {
 	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
 	struct rootfs_vnode *dir = (struct rootfs_vnode *)_dir->private_node;
-	struct rootfs_vnode *vnode,*vdummy;
+	struct rootfs_vnode *vnode;
 	status_t status;
 
 	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
@@ -448,7 +447,7 @@ rootfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 		goto err;
 	}
 
-	status = get_vnode(fs->volume, vnode->id, (void**)&vdummy);
+	status = get_vnode(fs->volume, vnode->id, NULL, NULL);
 	if (status < B_OK)
 		goto err;
 

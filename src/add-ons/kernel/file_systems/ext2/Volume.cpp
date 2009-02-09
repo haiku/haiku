@@ -310,7 +310,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
-	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode);
+	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode, NULL);
 	if (status != B_OK) {
 		TRACE("could not create root node: get_vnode() failed!\n");
 		return status;

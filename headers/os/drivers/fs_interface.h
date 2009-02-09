@@ -43,6 +43,7 @@ struct file_io_vec {
 // flags for publish_vnode() and fs_volume_ops::get_vnode()
 #define B_VNODE_PUBLISH_REMOVED					0x01
 #define B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE	0x02
+#define B_VNODE_WANTS_OVERLAY_SUB_NODE			0x04
 
 
 #ifdef __cplusplus
@@ -307,7 +308,7 @@ extern status_t publish_vnode(fs_volume *volume, ino_t vnodeID,
 					void *privateNode, fs_vnode_ops *ops, int type,
 					uint32 flags);
 extern status_t get_vnode(fs_volume *volume, ino_t vnodeID,
-					void **_privateNode);
+					void **_privateNode, fs_vnode_ops **_vnodeOps);
 extern status_t put_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t acquire_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t remove_vnode(fs_volume *volume, ino_t vnodeID);

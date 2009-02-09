@@ -224,12 +224,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 		// base directory
 		TRACE(("fs_walk - found \".\" file.\n"));
 		*_vnodeID = baseNode->id;
-		return get_vnode(_vol, *_vnodeID, (void **)&newNode);
+		return get_vnode(_vol, *_vnodeID, NULL, NULL);
 	} else if (strcmp(file, "..") == 0) {
 		// parent directory
 		TRACE(("fs_walk - found \"..\" file.\n"));
 		*_vnodeID = baseNode->parID;
-		return get_vnode(_vol, *_vnodeID, (void **)&newNode);
+		return get_vnode(_vol, *_vnodeID, NULL, NULL);
 	}
 
 	// look up file in the directory
@@ -272,7 +272,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 						TRACE(("fs_walk - New vnode id is %Ld\n", *_vnodeID));
 
 						result = get_vnode(_vol, *_vnodeID,
-							(void **)&newNode);
+							(void **)&newNode, NULL);
 						if (result == B_OK) {
 							newNode->parID = baseNode->id;
 							done = true;
@@ -349,7 +349,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	_node->private_node = newNode;
 	_node->ops = &gISO9660VnodeOps;
 	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode & ~(S_IWUSR | S_IWGRP | S_IWOTH);
-	*_flags = 0;
+	*_flags = B_VNODE_WANTS_OVERLAY_SUB_NODE;
 
 	if ((newNode->flags & ISO_ISDIR) == 0) {
 		newNode->cache = file_cache_create(ns->id, vnodeID,

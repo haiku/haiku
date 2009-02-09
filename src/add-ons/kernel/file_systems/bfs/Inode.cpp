@@ -2701,7 +2701,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
 		if (get_vnode(volume->FSVolume(), volume->ToVnode(fInode->Attributes()),
-				(void**)&fAttributes) != B_OK) {
+				(void**)&fAttributes, NULL) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n", fInode->ID(), name));
 			return B_ENTRY_NOT_FOUND;

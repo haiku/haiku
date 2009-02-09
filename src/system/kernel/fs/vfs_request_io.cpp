@@ -401,14 +401,16 @@ synchronous_io(io_request* request, DoIO& io)
 status_t
 vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request)
 {
-	if (!HAS_FS_CALL(vnode, io)) {
+	status_t result = B_ERROR;
+	if (!HAS_FS_CALL(vnode, io)
+		|| (result = FS_CALL(vnode, io, cookie, request)) == B_UNSUPPORTED) {
 		// no io() call -- fall back to synchronous I/O
 		IOBuffer* buffer = request->Buffer();
 		VnodeIO io(request->IsWrite(), buffer->IsPhysical(), vnode, cookie);
 		return synchronous_io(request, io);
 	}
 
-	return FS_CALL(vnode, io, cookie, request);
+	return result;
 }
 
 

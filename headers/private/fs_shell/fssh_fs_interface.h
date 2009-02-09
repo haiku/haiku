@@ -344,7 +344,8 @@ extern fssh_status_t fssh_publish_vnode(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID, void *privateNode,
 				fssh_fs_vnode_ops *ops, int type, uint32_t flags);
 extern fssh_status_t fssh_get_vnode(fssh_fs_volume *volume,
-				fssh_vnode_id vnodeID, void **_privateNode);
+				fssh_vnode_id vnodeID, void **_privateNode,
+				fssh_fs_vnode_ops **_vnodeOps);
 extern fssh_status_t fssh_put_vnode(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID);
 extern fssh_status_t fssh_acquire_vnode(fssh_fs_volume *volume,

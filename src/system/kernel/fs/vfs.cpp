@@ -54,6 +54,7 @@
 
 #include "fifo.h"
 #include "io_requests.h"
+#include "overlay.h"
 
 
 //#define TRACE_VFS
@@ -1180,6 +1181,9 @@ create_special_sub_node(struct vnode* vnode, uint32 flags)
 	if (S_ISFIFO(vnode->type))
 		return create_fifo_vnode(vnode->mount->volume, vnode);
 
+	if ((flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
+		return create_overlay_vnode(vnode->mount->volume, vnode);
+
 	return B_BAD_VALUE;
 }
 
@@ -1253,7 +1257,8 @@ restart:
 		bool publishSpecialSubNode = false;
 		if (gotNode) {
 			vnode->type = type;
-			publishSpecialSubNode = is_special_node_type(type)
+			publishSpecialSubNode = (is_special_node_type(type)
+				|| (flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
 				&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 		}
 
@@ -2485,8 +2490,9 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
 
 	if (HAS_FS_CALL(vnode, get_vnode_name)) {
 		// The FS supports getting the name of a vnode.
-		return FS_CALL(vnode, get_vnode_name, buffer->d_name,
-			(char*)buffer + bufferSize - buffer->d_name);
+		if (FS_CALL(vnode, get_vnode_name, buffer->d_name,
+			(char*)buffer + bufferSize - buffer->d_name) == B_OK)
+			return B_OK;
 	}
 
 	// The FS doesn't support getting the name of a vnode. So we search the
@@ -3584,7 +3590,8 @@ publish_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 
 
 extern "C" status_t
-get_vnode(fs_volume *volume, ino_t vnodeID, void **_fsNode)
+get_vnode(fs_volume *volume, ino_t vnodeID, void **_privateNode,
+	fs_vnode_ops **_vnodeOps)
 {
 	struct vnode *vnode;
 
@@ -3608,10 +3615,16 @@ get_vnode(fs_volume *volume, ino_t vnodeID, void **_fsNode)
 			return status;
 		}
 
-		if (_fsNode != NULL)
-			*_fsNode = resolvedNode.private_node;
-	} else if (_fsNode != NULL)
-		*_fsNode = vnode->private_node;
+		if (_privateNode != NULL)
+			*_privateNode = resolvedNode.private_node;
+		if (_vnodeOps != NULL)
+			*_vnodeOps = resolvedNode.ops;
+	} else {
+		if (_privateNode != NULL)
+			*_privateNode = vnode->private_node;
+		if (_vnodeOps != NULL)
+			*_vnodeOps = vnode->ops;
+	}
 
 	return B_OK;
 }
@@ -4005,7 +4018,7 @@ vfs_get_fs_node_from_path(fs_volume *volume, const char *path, bool kernel,
 	}
 
 	// Use get_vnode() to resolve the cookie for the right layer.
-	status = get_vnode(volume, vnode->id, _node);
+	status = get_vnode(volume, vnode->id, _node, NULL);
 	put_vnode(vnode);
 
 	return status;

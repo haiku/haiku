@@ -1493,7 +1493,7 @@ cdda_lookup(fs_volume* _volume, fs_vnode* _dir, const char* name, ino_t* _id)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	status = get_vnode(volume->FSVolume(), inode->ID(), NULL);
+	status = get_vnode(volume->FSVolume(), inode->ID(), NULL, NULL);
 	if (status < B_OK)
 		return status;
 

@@ -354,7 +354,8 @@ public:
 	{
 		Unset();
 
-		return fStatus = get_vnode(volume->FSVolume(), id, (void**)&fInode);
+		return fStatus = get_vnode(volume->FSVolume(), id, (void**)&fInode,
+			NULL);
 	}
 
 	status_t SetTo(Volume* volume, block_run run)

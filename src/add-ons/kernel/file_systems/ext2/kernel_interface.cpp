@@ -319,7 +319,7 @@ ext2_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 			break;
 	}
 
-	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
+	return get_vnode(volume->FSVolume(), *_vnodeID, NULL, NULL);
 }
 
 
