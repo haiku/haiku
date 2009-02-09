@@ -1028,7 +1028,7 @@ FrameMoved(origin);
 
 		case B_KEY_DOWN:
 		{
-			if (!_HandleKeyDown(msg)) {
+			if (!fActive || !_HandleKeyDown(msg)) {
 				if (BView* view = dynamic_cast<BView*>(target)) {
 					// TODO: cannot use "string" here if we support having different
 					//	font encoding per view (it's supposed to be converted by
@@ -3400,8 +3400,8 @@ BWindow::_HandleKeyDown(BMessage* event)
 		}
 	}
 
-	// Handle shortcuts when window is active
-	if ((modifiers & B_COMMAND_KEY) != 0 && fActive) {
+	// Handle shortcuts
+	if ((modifiers & B_COMMAND_KEY) != 0) {
 		// Command+q has been pressed, so, we will quit
 		// the shortcut mechanism doesn't allow handlers outside the window
 		if (!fNoQuitShortcut && (key == 'Q' || key == 'q')) {
