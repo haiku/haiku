@@ -3400,8 +3400,8 @@ BWindow::_HandleKeyDown(BMessage* event)
 		}
 	}
 
-	// Handle shortcuts
-	if ((modifiers & B_COMMAND_KEY) != 0) {
+	// Handle shortcuts when window is active
+	if ((modifiers & B_COMMAND_KEY) != 0 && fActive) {
 		// Command+q has been pressed, so, we will quit
 		// the shortcut mechanism doesn't allow handlers outside the window
 		if (!fNoQuitShortcut && (key == 'Q' || key == 'q')) {
