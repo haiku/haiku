@@ -61,6 +61,10 @@ typedef int socklen_t;
 #	define B_FIRST_REAL_TIME_PRIORITY B_REAL_TIME_DISPLAY_PRIORITY
 #endif
 
+#ifndef B_SPINLOCK_INITIALIZER
+#	define B_SPINLOCK_INITIALIZER 0
+#endif
+
 #if __GNUC__
 #	define _PRINTFLIKE(_format_, _args_) \
 		__attribute__((format(__printf__, _format_, _args_)))
