@@ -789,8 +789,14 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: init_corb_rirb_pos failed\n");
 		goto corb_rirb_failed;
 	}
-	
-	controller->Write16(HDAC_WAKE_ENABLE, 0x7fff);
+
+	/*
+         * Don't enable codec state change interrupts. We don't handle
+         * them, as we want to use the STATE_STATUS register to identify
+         * available codecs. We'd have to clear that register in the interrupt
+         * handler to 'ack' the codec change.
+         */
+	controller->Write16(HDAC_WAKE_ENABLE, 0x0);
 
 	/* Enable controller interrupts */
 	controller->Write32(HDAC_INTR_CONTROL, INTR_CONTROL_GLOBAL_ENABLE
