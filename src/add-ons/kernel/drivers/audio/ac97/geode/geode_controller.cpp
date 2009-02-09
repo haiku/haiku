@@ -425,6 +425,10 @@ geode_hw_init(geode_controller* controller)
 		
 	snooze(1000);
 
+	controller->multi = (geode_multi*)calloc(1, sizeof(geode_multi));
+        if (controller->multi == NULL)
+                return B_NO_MEMORY;
+
 	controller->playback_stream = geode_stream_new(controller, STREAM_PLAYBACK);
         controller->record_stream = geode_stream_new(controller, STREAM_RECORD);
 
@@ -481,6 +485,8 @@ geode_hw_uninit(geode_controller* controller)
 		controller->regs_area = B_ERROR;
 		controller->regs = NULL;
 	}
+
+	free(controller->multi);
 
 	geode_stream_delete(controller->playback_stream);
         geode_stream_delete(controller->record_stream);

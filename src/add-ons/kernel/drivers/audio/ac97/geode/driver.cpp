@@ -55,8 +55,10 @@ init_driver(void)
 
 	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK
 			&& gNumCards < MAX_CARDS; i++) {
-		if (info.vendor_id == AMD_VENDOR_ID
-			&& info.device_id == AMD_CS5536_AUDIO_DEVICE_ID) {
+		if ((info.vendor_id == AMD_VENDOR_ID
+			&& info.device_id == AMD_CS5536_AUDIO_DEVICE_ID)
+			|| (info.vendor_id == NS_VENDOR_ID
+				&& info.device_id == NS_CS5535_AUDIO_DEVICE_ID)) {
 			memset(&gCards[gNumCards], 0, sizeof(geode_controller));
 			gCards[gNumCards].pci_info = info;
 			gCards[gNumCards].opened = 0;
