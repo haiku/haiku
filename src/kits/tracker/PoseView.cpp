@@ -8700,16 +8700,18 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		targetModel = &tmpTarget;
 
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
-	if (targetPose && CanHandleDragSelection(targetModel, dragMessage, ignoreTypes)) {
-		// new target is valid, select it
-		HiliteDropTarget(true);	 
-	} else {
-		fCursorCheck = false;
-		fDropTarget = NULL;
-		if (targetPose == NULL)
-			targetModel = TargetModel();
-	}
-
+	if (targetPose) {
+		if (CanHandleDragSelection(targetModel, dragMessage, ignoreTypes)) {
+			// new target is valid, select it
+			HiliteDropTarget(true);
+		} else {
+			fDropTarget = NULL;
+			fCursorCheck = false;
+		}
+	} 
+	if (targetModel == NULL)
+		targetModel = TargetModel();
+	
 	entry_ref srcRef;
 	if (targetModel->IsDirectory() && dragMessage->HasRef("refs") 
 			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
