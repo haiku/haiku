@@ -295,12 +295,12 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		r.Set(windowRect.Width() - widestCharacterSet -
 			StringWidth(ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
 			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
-		field = new BMenuField (r, "encoding", ENCODING_TEXT, fEncodingMenu,
+		BMenuField *encodingField = new BMenuField (r, "encoding", ENCODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetDivider(field->StringWidth(ENCODING_TEXT) + 5);
-		AddChild(field);
+		encodingField->SetDivider(encodingField->StringWidth(ENCODING_TEXT) + 5);
+		AddChild(encodingField);
 
 		// And now the "from account" pop-up menu, on the left side, taking the
 		// remaining space.
@@ -353,7 +353,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		AddChild(field);
+		AddChild(field, encodingField);
 		field->SetDivider(x - 12 - SEPARATOR_MARGIN + kMenuFieldDividerOffset);
 		field->SetAlignment(B_ALIGN_RIGHT);
 #ifndef __HAIKU__
