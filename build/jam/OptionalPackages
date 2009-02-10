@@ -31,6 +31,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Pe
 #	Perl
 #	Subversion
+#	Tar
 #	Vision
 #	VLC
 #	Welcome
@@ -445,6 +446,20 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 			: home
 		;
 	}
+}
+
+
+# Tar
+if [ IsOptionalHaikuImagePackageAdded Tar ] {
+        if $(TARGET_ARCH) != x86 {
+                Echo "No optional package Tar available for $(TARGET_ARCH)" ;
+        } else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+                InstallOptionalHaikuImagePackage tar-1.21-gcc2-2009-02-08
+                        : $(baseURL)/tar-1.21-gcc2-2009-02-08.zip
+                        : 
+                ;
+        }
 }
 
 
