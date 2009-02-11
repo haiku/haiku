@@ -615,6 +615,11 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				}
 				break;
 
+			case WT_VOLUME_KNOB:
+				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
+					VID_SET_VOLUME_KNOB_CONTROL, 0x0);
+				hda_send_verbs(audioGroup->codec, verbs, NULL, 1);
+				break;
 			default:
 				break;
 		}

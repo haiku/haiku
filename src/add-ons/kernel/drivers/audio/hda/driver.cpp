@@ -61,10 +61,11 @@ init_driver(void)
 			sprintf(path, DEVFS_PATH_FORMAT, gNumCards);
 			gCards[gNumCards++].devfs_path = strdup(path);
 
-			dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, type %04x/%04x\n",
+			dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, type %04x/%04x (%04x/%04x)\n",
 				info.bus, info.device, info.function,
 				info.u.h0.interrupt_line,
-				info.vendor_id, info.device_id);
+				info.vendor_id, info.device_id,
+				info.u.h0.subsystem_vendor_id, info.u.h0.subsystem_id);
 		}
 	}
 
