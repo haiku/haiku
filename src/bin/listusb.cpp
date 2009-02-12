@@ -6,6 +6,10 @@
  * Copyright 2007-2008, Haiku Inc. All rights reserved.
  */
 
+#include <Directory.h>
+#include <Entry.h>
+#include <Path.h>
+#include <String.h>
 #include <USBKit.h>
 #include <stdio.h>
 
@@ -89,43 +93,104 @@ DumpConfiguration(const BUSBConfiguration *configuration)
 
 
 static void
-DumpInfo(BUSBDevice &device)
+DumpInfo(BUSBDevice &device, bool verbose)
 {
-	printf("[Device]\n");
-	printf("    Class .................. 0x%02x\n", device.Class());
-	printf("    Subclass ............... 0x%02x\n", device.Subclass());
-	printf("    Protocol ............... 0x%02x\n", device.Protocol());
-	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
-	printf("    USB Version ............ 0x%04x\n", device.USBVersion());
-	printf("    Vendor ID .............. 0x%04x\n", device.VendorID());
-	printf("    Product ID ............. 0x%04x\n", device.ProductID());
-	printf("    Product Version ........ 0x%04x\n", device.Version());
-	printf("    Manufacturer String .... \"%s\"\n", device.ManufacturerString());
-	printf("    Product String ......... \"%s\"\n", device.ProductString());
-	printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());
-
-	for (uint32 i = 0; i < device.CountConfigurations(); i++) {
-		printf("    [Configuration %lu]\n", i);
-		DumpConfiguration(device.ConfigurationAt(i));
+	if (verbose) {
+		printf("[Device %s]\n", device.Location());
+		printf("    Class .................. 0x%02x\n", device.Class());
+		printf("    Subclass ............... 0x%02x\n", device.Subclass());
+		printf("    Protocol ............... 0x%02x\n", device.Protocol());
+		printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
+		printf("    USB Version ............ 0x%04x\n", device.USBVersion());
+		printf("    Vendor ID .............. 0x%04x\n", device.VendorID());
+		printf("    Product ID ............. 0x%04x\n", device.ProductID());
+		printf("    Product Version ........ 0x%04x\n", device.Version());
+		printf("    Manufacturer String .... \"%s\"\n", device.ManufacturerString());
+		printf("    Product String ......... \"%s\"\n", device.ProductString());
+		printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());
+	
+		for (uint32 i = 0; i < device.CountConfigurations(); i++) {
+			printf("    [Configuration %lu]\n", i);
+			DumpConfiguration(device.ConfigurationAt(i));
+		}
+	} else {
+		printf("%04x:%04x %s %s (version %04x)\n", device.VendorID(), device.ProductID(), device.ManufacturerString(), device.ProductString(), device.Version());
 	}
+}
+
+class DumpRoster : public BUSBRoster
+{
+		public:
+			DumpRoster(bool verbose);
+			~DumpRoster();
+			
+			virtual status_t DeviceAdded(BUSBDevice *device);
+			virtual void DeviceRemoved(BUSBDevice *device);
+			
+		private:
+			bool fVerbose;
+};
+
+
+DumpRoster::DumpRoster(bool verbose)
+	: BUSBRoster(),
+	  fVerbose(verbose)
+{
+}
+
+
+DumpRoster::~DumpRoster()
+{
+}
+
+status_t
+DumpRoster::DeviceAdded(BUSBDevice *device)
+{
+	DumpInfo(*device, fVerbose);
+	return B_OK;
+}
+
+void
+DumpRoster::DeviceRemoved(BUSBDevice *)
+{
 }
 
 
 int
 main(int argc, char *argv[])
 {
-	if(argc == 2) {
-		BUSBDevice device(argv[1]);
-
+	bool verbose = false;
+	BString devname = "";
+	for (int i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			if (argv[i][1] == 'v')
+				verbose = true;
+			else {
+				printf("Usage: listusb [-v] [device]");
+				printf("-v: Show more detailed information including interfaces, configurations, etc.\n\n");
+				printf("If a device is not specified, all devices found on the bus will be listed\n");
+				return 1;
+			}
+		} else {
+			devname = argv[i];
+		}
+	}
+	
+	if (devname.Length() > 0) {
+		BUSBDevice device(devname.String());
 		if (device.InitCheck() < B_OK) {
-			printf("Cannot open USB device: %s\n", argv[1]);
+			printf("Cannot open USB device: %s\n", devname.String());
 			return 1;
 		} else {
-			DumpInfo(device);
-			return 0;
+				DumpInfo(device, verbose);
+				return 0;
 		}
 	} else {
-		printf("Usage: info <device>\n");
-		return 1;
-	}
+		DumpRoster *roster = new DumpRoster(verbose);
+		roster->Start();
+		roster->Stop();
+		delete roster;
+	} 
+	
+	return 0;
 }

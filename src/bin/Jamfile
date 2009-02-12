@@ -150,7 +150,7 @@ StdBinCommands
 
 # standard commands that need libbe.so, libdevice.so
 StdBinCommands
-	usb_dev_info.cpp
+	listusb.cpp
 	: be libdevice.so : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbluetooth.so, due the Bluetooth Kit

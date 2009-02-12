@@ -30,7 +30,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	isvolume
 	join
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
-	listport listres listsem ln locate logger login logname ls lsindex
+	listport listres listsem listusb ln locate logger login logname ls lsindex
 	make makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
 	modifiers mount mount_nfs mountvolume mv
 	nc netstat nl nohup od open passwd paste
@@ -43,7 +43,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
 	traceroute translate true tsort tty
 	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
-	uptime urlwrapper usb_dev_info useradd uudecode uuencode
+	uptime urlwrapper useradd uudecode uuencode
 	vdir version vim vmstat waitfor wc wget whoami xargs xres yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
