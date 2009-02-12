@@ -130,13 +130,12 @@ dump_widget_amplifier_capabilities(hda_widget& widget, bool input)
 	if (capabilities == 0)
 		return;
 
-	dprintf("\t%s Amp: %sstep size: %ld dB, # steps: %ld, offset to 0 dB: "
+	dprintf("\t%s Amp: %sstep size: %f dB, # steps: %ld, offset to 0 dB: "
 		"%ld\n", input ? "In" : "Out",
 		(capabilities & AMP_CAP_MUTE) != 0 ? "supports mute, " : "",
-		(((capabilities & AMP_CAP_STEP_SIZE_MASK)
-			>> AMP_CAP_STEP_SIZE_SHIFT) + 1) / 4,
-		(capabilities & AMP_CAP_NUM_STEPS_MASK) >> AMP_CAP_NUM_STEPS_SHIFT,
-		capabilities & AMP_CAP_OFFSET_MASK);
+		AMP_CAP_STEP_SIZE(capabilities),
+		AMP_CAP_NUM_STEPS(capabilities),
+		AMP_CAP_OFFSET(capabilities));
 }
 
 
@@ -989,19 +988,18 @@ dprintf("ENABLE EAPD pin widget %ld\n", widget.node_id);
 
 			if (widget.capabilities.output_amplifier != 0) {
 dprintf("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
-	widget.capabilities.output_amplifier & AMP_CAP_OFFSET_MASK);
+	AMP_CAP_OFFSET(widget.capabilities.output_amplifier));
 				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
 					VID_SET_AMPLIFIER_GAIN_MUTE,
 					AMP_SET_OUTPUT | AMP_SET_LEFT_CHANNEL
 						| AMP_SET_RIGHT_CHANNEL
-						| (widget.capabilities.output_amplifier
-							& AMP_CAP_OFFSET_MASK));
+						| AMP_CAP_OFFSET(widget.capabilities.output_amplifier));
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
 			if (widget.capabilities.input_amplifier != 0) {
 dprintf("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
-	widget.capabilities.input_amplifier & AMP_CAP_OFFSET_MASK);
+	AMP_CAP_OFFSET(widget.capabilities.input_amplifier));
 				for (uint32 i = 0; i < widget.num_inputs; i++) {
 					uint32 verb = MAKE_VERB(audioGroup->codec->addr,
 						widget.node_id,
@@ -1009,8 +1007,7 @@ dprintf("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 						AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
 							| AMP_SET_RIGHT_CHANNEL
 							| AMP_SET_INPUT_INDEX(i)
-							| (widget.capabilities.input_amplifier
-								& AMP_CAP_OFFSET_MASK));
+							| AMP_CAP_OFFSET(widget.capabilities.input_amplifier));
 					hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 				}
 			}
