@@ -117,8 +117,10 @@ WatchedEntry::~WatchedEntry()
 		}
 	}
 
-	if (fDevice)
+	if (fDevice) {
 		fRoster->DeviceRemoved(fDevice);
+		delete fDevice;
+	}
 }
 
 
