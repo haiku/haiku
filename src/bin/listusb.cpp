@@ -95,65 +95,54 @@ DumpConfiguration(const BUSBConfiguration *configuration)
 static void
 DumpInfo(BUSBDevice &device, bool verbose)
 {
-	if (verbose) {
-		printf("[Device %s]\n", device.Location());
-		printf("    Class .................. 0x%02x\n", device.Class());
-		printf("    Subclass ............... 0x%02x\n", device.Subclass());
-		printf("    Protocol ............... 0x%02x\n", device.Protocol());
-		printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
-		printf("    USB Version ............ 0x%04x\n", device.USBVersion());
-		printf("    Vendor ID .............. 0x%04x\n", device.VendorID());
-		printf("    Product ID ............. 0x%04x\n", device.ProductID());
-		printf("    Product Version ........ 0x%04x\n", device.Version());
-		printf("    Manufacturer String .... \"%s\"\n", device.ManufacturerString());
-		printf("    Product String ......... \"%s\"\n", device.ProductString());
-		printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());
-	
-		for (uint32 i = 0; i < device.CountConfigurations(); i++) {
-			printf("    [Configuration %lu]\n", i);
-			DumpConfiguration(device.ConfigurationAt(i));
-		}
-	} else {
-		printf("%04x:%04x %s %s (version %04x)\n", device.VendorID(), device.ProductID(), device.ManufacturerString(), device.ProductString(), device.Version());
+	if (!verbose) {
+		printf("%04x:%04x /dev/bus/usb%s \"%s\" \"%s\" ver. %04x\n",
+			device.VendorID(), device.ProductID(), device.Location(),
+			device.ManufacturerString(), device.ProductString(),
+			device.Version());
+		return;
+	}
+
+	printf("[Device /dev/bus/usb%s]\n", device.Location());
+	printf("    Class .................. 0x%02x\n", device.Class());
+	printf("    Subclass ............... 0x%02x\n", device.Subclass());
+	printf("    Protocol ............... 0x%02x\n", device.Protocol());
+	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
+	printf("    USB Version ............ 0x%04x\n", device.USBVersion());
+	printf("    Vendor ID .............. 0x%04x\n", device.VendorID());
+	printf("    Product ID ............. 0x%04x\n", device.ProductID());
+	printf("    Product Version ........ 0x%04x\n", device.Version());
+	printf("    Manufacturer String .... \"%s\"\n", device.ManufacturerString());
+	printf("    Product String ......... \"%s\"\n", device.ProductString());
+	printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());
+
+	for (uint32 i = 0; i < device.CountConfigurations(); i++) {
+		printf("    [Configuration %lu]\n", i);
+		DumpConfiguration(device.ConfigurationAt(i));
 	}
 }
 
-class DumpRoster : public BUSBRoster
-{
-		public:
-			DumpRoster(bool verbose);
-			~DumpRoster();
-			
-			virtual status_t DeviceAdded(BUSBDevice *device);
-			virtual void DeviceRemoved(BUSBDevice *device);
-			
-		private:
-			bool fVerbose;
+
+class DumpRoster : public BUSBRoster {
+public:
+					DumpRoster(bool verbose)
+						:	fVerbose(verbose)
+					{
+					}
+
+virtual	status_t	DeviceAdded(BUSBDevice *device)
+					{
+						DumpInfo(*device, fVerbose);
+						return B_OK;
+					}
+
+virtual	void		DeviceRemoved(BUSBDevice *device)
+					{
+					}
+
+private:
+		bool		fVerbose;
 };
-
-
-DumpRoster::DumpRoster(bool verbose)
-	: BUSBRoster(),
-	  fVerbose(verbose)
-{
-}
-
-
-DumpRoster::~DumpRoster()
-{
-}
-
-status_t
-DumpRoster::DeviceAdded(BUSBDevice *device)
-{
-	DumpInfo(*device, fVerbose);
-	return B_OK;
-}
-
-void
-DumpRoster::DeviceRemoved(BUSBDevice *)
-{
-}
 
 
 int
@@ -175,7 +164,7 @@ main(int argc, char *argv[])
 			devname = argv[i];
 		}
 	}
-	
+
 	if (devname.Length() > 0) {
 		BUSBDevice device(devname.String());
 		if (device.InitCheck() < B_OK) {
@@ -186,11 +175,10 @@ main(int argc, char *argv[])
 				return 0;
 		}
 	} else {
-		DumpRoster *roster = new DumpRoster(verbose);
-		roster->Start();
-		roster->Stop();
-		delete roster;
+		DumpRoster roster(verbose);
+		roster.Start();
+		roster.Stop();
 	} 
-	
+
 	return 0;
 }
