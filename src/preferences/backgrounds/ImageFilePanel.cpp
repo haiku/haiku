@@ -121,7 +121,6 @@ ImageFilePanel::SelectionChanged()
 				fResolutionView->SetText(resolution.String());
 				delete bitmap;
 
-				BNode node(&ref);
 				BNodeInfo nodeInfo(&node);
 				char type[B_MIME_TYPE_LENGTH];
 				if (nodeInfo.GetType(type) == B_OK) {

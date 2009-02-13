@@ -528,7 +528,7 @@ BackgroundsView::UpdateWithCurrent(void)
 	if (!fCurrentInfo) {
 		fImageMenu->FindItem(kMsgNoImage)->SetMarked(true);
 		fPlacementMenu->FindItem(kMsgManualPlacement)->SetMarked(true);
-		fIconLabelOutline->SetValue(B_CONTROL_OFF);
+		fIconLabelOutline->SetValue(B_CONTROL_ON);
 	} else {
 		fIconLabelOutline->SetValue(fCurrentInfo->fTextWidgetLabelOutline
 			? B_CONTROL_ON : B_CONTROL_OFF);
@@ -772,7 +772,6 @@ BackgroundsView::SaveSettings(void)
 
 		entry_ref ref;
 		BEntry entry;
-		BPath path;
 
 		fPanel->GetPanelDirectory(&ref);
 		entry.SetTo(&ref);
@@ -829,7 +828,7 @@ BackgroundsView::LoadSettings()
 		if (index == 0)
 			fWorkspaceMenu->AddSeparatorItem();
 
-		BPath path(string.String());
+		path.SetTo(string.String());
 		int32 i = AddPath(path);
 		BString s;
 		s << "Folder: " << path.Leaf();
@@ -859,6 +858,8 @@ BackgroundsView::UpdatePreview()
 		fPlacementMenu->SetEnabled(imageEnabled);
 	if (fIconLabelOutline->IsEnabled() ^ imageEnabled)
 		fIconLabelOutline->SetEnabled(imageEnabled);
+	if (!imageEnabled)
+		fIconLabelOutline->SetValue(B_CONTROL_ON);
 
 	bool textEnabled = (fPlacementMenu->FindItem(kMsgManualPlacement)->IsMarked())
 		&& imageEnabled;
