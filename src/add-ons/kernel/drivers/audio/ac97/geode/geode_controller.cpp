@@ -92,7 +92,7 @@ geode_codec_write(geode_controller *controller, uint8 regno, uint16 value)
 	    (value & ACC_CODEC_CNTL_CMD_DATA_MASK));
 
 	if (geode_codec_wait(controller) != B_OK) {
-		dprintf("codec busy (2)\n");
+		dprintf("codec busy (4)\n");
 	}
 }
 
@@ -154,6 +154,13 @@ geode_interrupt_handler(geode_controller* controller)
 static status_t
 reset_controller(geode_controller* controller)
 {
+	controller->Write32(ACC_CODEC_CNTL, ACC_CODEC_CNTL_LNK_WRM_RST
+	    | ACC_CODEC_CNTL_CMD_NEW);
+
+	if (geode_codec_wait(controller) != B_OK) {
+		dprintf("codec reset busy (1)\n");
+	}
+
 	// stop streams
 
 	// stop DMA
