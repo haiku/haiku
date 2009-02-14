@@ -259,7 +259,8 @@ DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
 		}
 
 		if (partition->ContentType() != NULL
-			&& !strcmp(partition->ContentType(), "Be File System")) {
+			&& (!strcmp(partition->ContentType(), "Be File System")
+			|| !strcmp(partition->ContentType(), "ISO9660 File System"))) {
 			return true;
 		}
 	}
