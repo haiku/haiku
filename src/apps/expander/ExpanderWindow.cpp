@@ -183,6 +183,7 @@ bool
 ExpanderWindow::ValidateDest()
 {
 	BEntry entry(fDestText->Text(), true);
+	BVolume volume;
 	if (!entry.Exists()) {
 		BAlert *alert = new BAlert("destAlert", "The destination"
 			" directory does not exist.", "Cancel", NULL, NULL,
@@ -190,10 +191,14 @@ ExpanderWindow::ValidateDest()
 		alert->Go();
 		return false;
 	} else if (!entry.IsDirectory()) {
-		BAlert *alert = new BAlert("destAlert", "The destination"
+		(new BAlert("destAlert", "The destination"
 			" is not a directory.", "Cancel", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-		alert->Go();
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT))->Go();
+		return false;
+	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
+		(new BAlert("destAlert", "The destination is read only.",
+			"Cancel", NULL, NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING,
+			B_WARNING_ALERT))->Go();
 		return false;
 	} else {
 		entry.GetRef(&fDestRef);
