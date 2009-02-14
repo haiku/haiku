@@ -66,9 +66,10 @@ CalcFreeSpace(BVolume *volume)
 // everything else, like the attributes, etc. is retrieved directly from the
 // symlink itself
 
-BPose::BPose(Model *model, BPoseView *view, bool selected)
+BPose::BPose(Model *model, BPoseView *view, uint32 clipboardMode, bool selected)
 	:	fModel(model),
 		fWidgetList(4, true),
+		fClipboardMode(clipboardMode),
 		fPercent(-1),
 		fIsSelected(selected),
 		fDelayedEdit(true),
@@ -107,11 +108,6 @@ BPose::BPose(Model *model, BPoseView *view, bool selected)
 				delete volume;
 		} else
 			delete volume;
-	}
-
-	if ((fClipboardMode = FSClipboardFindNodeMode(model,true)) != 0
-		&& !view->HasPosesInClipboard()) {
-		view->SetHasPosesInClipboard(true);
 	}
 }
 

@@ -90,6 +90,6 @@ uint32 FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 mov
 uint32 FSClipboardRemovePoses(const node_ref *directory, PoseList *list);
 bool FSClipboardPaste(Model *model, uint32 linksMode = 0);
 void FSClipboardRemove(Model *model);
-uint32 FSClipboardFindNodeMode(Model *model, bool updateRefIfNeeded);
+uint32 FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded);
 
 #endif	/* FS_CLIPBOARD_H */

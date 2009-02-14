@@ -504,54 +504,56 @@ FSClipboardPaste(Model *model, uint32 linksMode)
  */
 
 uint32
-FSClipboardFindNodeMode(Model *model, bool updateRefIfNeeded)
+FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded)
 {
 	int32 moveMode = 0;
+	if (autoLock) {
+		if (!be_clipboard->Lock())
+			return 0;
+	}
+	bool remove = false;
+	bool change = false;
 
-	if (be_clipboard->Lock()) {
-		bool remove = false;
-		bool change = false;
-
-		BMessage *clip = be_clipboard->Data();
-		if (clip != NULL) {
-			const node_ref *node = model->NodeRef();
-			char modeName[64];
-			MakeModeName(modeName, node);
-			if ((clip->FindInt32(modeName, &moveMode) == B_OK)) {
-				const entry_ref *ref = model->EntryRef();
-				entry_ref clipref;
-				char refName[64];
-				MakeRefName(refName, node);
-				if ((clip->FindRef(refName, &clipref) == B_OK)) {
-					if (clipref != *ref) {
-						if (updateRefIfNeeded) {
-							clip->ReplaceRef(refName, ref);
-							change = true;
-						} else {
-							clip->RemoveName(refName);
-							clip->RemoveName(modeName);
-							change = true;
-							remove = true;
-							moveMode = 0;
-						}
+	BMessage *clip = be_clipboard->Data();
+	if (clip != NULL) {
+		const node_ref *node = model->NodeRef();
+		char modeName[64];
+		MakeModeName(modeName, node);
+		if ((clip->FindInt32(modeName, &moveMode) == B_OK)) {
+			const entry_ref *ref = model->EntryRef();
+			entry_ref clipref;
+			char refName[64];
+			MakeRefName(refName, node);
+			if ((clip->FindRef(refName, &clipref) == B_OK)) {
+				if (clipref != *ref) {
+					if (updateRefIfNeeded) {
+						clip->ReplaceRef(refName, ref);
+						change = true;
+					} else {
+						clip->RemoveName(refName);
+						clip->RemoveName(modeName);
+						change = true;
+						remove = true;
+						moveMode = 0;
 					}
-				} else {
-					clip->RemoveName(modeName);
-					change = true;
-					remove = true;
-					moveMode = 0;
 				}
+			} else {
+				clip->RemoveName(modeName);
+				change = true;
+				remove = true;
+				moveMode = 0;
 			}
 		}
-		if (change)
-			be_clipboard->Commit();
-
+	}
+	if (change)
+		be_clipboard->Commit();
+	
+	if (autoLock)
 		be_clipboard->Unlock();
 
-		if (remove)
-			FSClipboardRemove(model);
-	}
-	
+	if (remove)
+		FSClipboardRemove(model);
+
 	return (uint32)moveMode;
 }
 

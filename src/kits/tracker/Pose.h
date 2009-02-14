@@ -54,7 +54,7 @@ enum {
 
 class BPose {
 	public:
-		BPose(Model *adopt, BPoseView *, bool selected = false);
+		BPose(Model *adopt, BPoseView *, uint32 clipboardMode, bool selected = false);
 		virtual ~BPose();
 
 		BTextWidget *AddWidget(BPoseView *, BColumn *);
