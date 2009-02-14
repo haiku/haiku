@@ -3539,7 +3539,8 @@ publish_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 	if (status == B_OK) {
 		vnode->type = type;
 		vnode->remove = (flags & B_VNODE_PUBLISH_REMOVED) != 0;
-		publishSpecialSubNode = is_special_node_type(type)
+		publishSpecialSubNode = (is_special_node_type(type)
+			|| (flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
 			&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 	}
 
