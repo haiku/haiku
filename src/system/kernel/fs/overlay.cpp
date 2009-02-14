@@ -819,7 +819,23 @@ static status_t
 overlay_read_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
-	OVERLAY_CALL(read_dir, cookie, buffer, bufferSize, num)
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	fs_vnode *superVnode = node->SuperVnode();
+	if (superVnode->ops->read_dir != NULL) {
+		status_t result = superVnode->ops->read_dir(volume, superVnode, cookie,
+			buffer, bufferSize, num);
+
+		// TODO: handle multiple records
+		if (result == B_OK && strcmp(buffer->d_name,
+			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME) == 0) {
+			// skip over the attribute directory
+			return superVnode->ops->read_dir(volume, superVnode, cookie,
+				buffer, bufferSize, num);
+		}
+
+		return result;
+	}
+
 	return B_UNSUPPORTED;
 }
 
