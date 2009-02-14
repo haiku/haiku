@@ -43,7 +43,6 @@ struct file_io_vec {
 // flags for publish_vnode() and fs_volume_ops::get_vnode()
 #define B_VNODE_PUBLISH_REMOVED					0x01
 #define B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE	0x02
-#define B_VNODE_WANTS_OVERLAY_SUB_NODE			0x04
 
 
 #ifdef __cplusplus
@@ -54,16 +53,18 @@ typedef struct fs_volume fs_volume;
 typedef struct fs_volume_ops fs_volume_ops;
 typedef struct fs_vnode fs_vnode;
 typedef struct fs_vnode_ops fs_vnode_ops;
-
+typedef struct file_system_module_info file_system_module_info;
 
 struct fs_volume {
-	dev_t			id;
-	partition_id	partition;
-	int32			layer;
-	void*			private_volume;
-	fs_volume_ops*	ops;
-	fs_volume*		sub_volume;
-	fs_volume*		super_volume;
+	dev_t						id;
+	partition_id				partition;
+	int32						layer;
+	void*						private_volume;
+	fs_volume_ops*				ops;
+	fs_volume*					sub_volume;
+	fs_volume*					super_volume;
+	file_system_module_info*	file_system;
+	char*						file_system_name;
 };
 
 struct fs_vnode {
@@ -240,7 +241,7 @@ struct fs_vnode_ops {
 				fs_volume *superVolume, fs_vnode *superVnode);
 };
 
-typedef struct file_system_module_info {
+struct file_system_module_info {
 	struct module_info	info;
 	const char*			short_name;
 	const char*			pretty_name;
@@ -290,7 +291,7 @@ typedef struct file_system_module_info {
 				const char *parameters, disk_job_id job);
 	status_t (*initialize)(int fd, partition_id partition, const char *name,
 				const char *parameters, off_t partitionSize, disk_job_id job);
-} file_system_module_info;
+};
 
 
 /* file system add-ons only prototypes */

@@ -54,7 +54,6 @@
 
 #include "fifo.h"
 #include "io_requests.h"
-#include "overlay.h"
 
 
 //#define TRACE_VFS
@@ -304,8 +303,7 @@ struct fs_mount {
 	fs_mount()
 		:
 		volume(NULL),
-		device_name(NULL),
-		fs_name(NULL)
+		device_name(NULL)
 	{
 		recursive_lock_init(&rlock, "mount rlock");
 	}
@@ -314,16 +312,23 @@ struct fs_mount {
 	{
 		recursive_lock_destroy(&rlock);
 		free(device_name);
-		free(fs_name);
-		free(volume);
+
+		while (volume) {
+			fs_volume* superVolume = volume->super_volume;
+
+			if (volume->file_system != NULL)
+				put_module(volume->file_system->info.name);
+
+			free(volume->file_system_name);
+			free(volume);
+			volume = superVolume;
+		}
 	}
 
 	struct fs_mount* next;
-	file_system_module_info* fs;
 	dev_t			id;
 	fs_volume*		volume;
 	char*			device_name;
-	char*			fs_name;
 	recursive_lock	rlock;	// guards the vnodes list
 	struct vnode*	root_vnode;
 	struct vnode*	covers_vnode;
@@ -865,13 +870,6 @@ put_mount(struct fs_mount *mount)
 }
 
 
-static status_t
-put_file_system(file_system_module_info *fs)
-{
-	return put_module(fs->info.name);
-}
-
-
 /*!	Tries to open the specified file system module.
 	Accepts a file system name of the form "bfs" or "file_systems/bfs/v1".
 	Returns a pointer to file system module interface, or NULL if it
@@ -900,7 +898,7 @@ get_file_system(const char *fsName)
 	and returns a compatible fs_info.fsh_name name ("bfs" in both cases).
 	The name is allocated for you, and you have to free() it when you're
 	done with it.
-	Returns NULL if the required memory is no available.
+	Returns NULL if the required memory is not available.
 */
 static char *
 get_file_system_name(const char *fsName)
@@ -927,6 +925,39 @@ get_file_system_name(const char *fsName)
 
 	strlcpy(name, fsName, end + 1 - fsName);
 	return name;
+}
+
+
+/*!	Accepts a list of file system names separated by a colon, one for each
+	layer and returns the file system name for the specified layer.
+	The name is allocated for you, and you have to free() it when you're
+	done with it.
+	Returns NULL if the required memory is not available or if there is no
+	name for the specified layer.
+*/
+static char *
+get_file_system_name_for_layer(const char *fsNames, int32 layer)
+{
+	while (layer >= 0) {
+		const char *end = strchr(fsNames, ':');
+		if (end == NULL) {
+			if (layer == 0)
+				return strdup(fsNames);
+			return NULL;
+		}
+
+		if (layer == 0) {
+			size_t length = end - fsNames + 1;
+			char *result = (char *)malloc(length);
+			strlcpy(result, fsNames, length);
+			return result;
+		}
+
+		fsNames = end + 1;
+		layer--;
+	}
+
+	return NULL;
 }
 
 
@@ -1181,9 +1212,6 @@ create_special_sub_node(struct vnode* vnode, uint32 flags)
 	if (S_ISFIFO(vnode->type))
 		return create_fifo_vnode(vnode->mount->volume, vnode);
 
-	if ((flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
-		return create_overlay_vnode(vnode->mount->volume, vnode);
-
 	return B_BAD_VALUE;
 }
 
@@ -1257,8 +1285,7 @@ restart:
 		bool publishSpecialSubNode = false;
 		if (gotNode) {
 			vnode->type = type;
-			publishSpecialSubNode = (is_special_node_type(type)
-				|| (flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
+			publishSpecialSubNode = is_special_node_type(type)
 				&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 		}
 
@@ -2987,7 +3014,6 @@ _dump_mount(struct fs_mount *mount)
 	kprintf("MOUNT: %p\n", mount);
 	kprintf(" id:            %ld\n", mount->id);
 	kprintf(" device_name:   %s\n", mount->device_name);
-	kprintf(" fs_name:       %s\n", mount->fs_name);
 	kprintf(" root_vnode:    %p\n", mount->root_vnode);
 	kprintf(" covers_vnode:  %p\n", mount->covers_vnode);
 	kprintf(" partition:     %p\n", mount->partition);
@@ -2998,9 +3024,11 @@ _dump_mount(struct fs_mount *mount)
 	fs_volume *volume = mount->volume;
 	while (volume != NULL) {
 		kprintf(" volume %p:\n", volume);
-		kprintf("  layer:          %ld\n", volume->layer);
-		kprintf("  private_volume: %p\n", volume->private_volume);
-		kprintf("  ops:            %p\n", volume->ops);
+		kprintf("  layer:            %ld\n", volume->layer);
+		kprintf("  private_volume:   %p\n", volume->private_volume);
+		kprintf("  ops:              %p\n", volume->ops);
+		kprintf("  file_system:      %p\n", volume->file_system);
+		kprintf("  file_system_name: %s\n", volume->file_system_name);
 		volume = volume->super_volume;
 	}
 
@@ -3076,7 +3104,15 @@ dump_mounts(int argc, char **argv)
 	hash_open(sMountsTable, &iterator);
 	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iterator)) != NULL) {
 		kprintf("%p%4ld %p %p %p %s\n", mount, mount->id, mount->root_vnode,
-			mount->covers_vnode, mount->volume->private_volume, mount->fs_name);
+			mount->covers_vnode, mount->volume->private_volume,
+			mount->volume->file_system_name);
+
+		fs_volume* volume = mount->volume;
+		while (volume->super_volume != NULL) {
+			volume = volume->super_volume;
+			kprintf("                                     %p %s\n",
+				volume->private_volume, volume->file_system_name);
+		}
 	}
 
 	hash_close(sMountsTable, &iterator, false);
@@ -3539,8 +3575,7 @@ publish_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 	if (status == B_OK) {
 		vnode->type = type;
 		vnode->remove = (flags & B_VNODE_PUBLISH_REMOVED) != 0;
-		publishSpecialSubNode = (is_special_node_type(type)
-			|| (flags & B_VNODE_WANTS_OVERLAY_SUB_NODE) != 0)
+		publishSpecialSubNode = is_special_node_type(type)
 			&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 	}
 
@@ -6742,7 +6777,9 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	const char* args, bool kernel)
 {
 	struct ::fs_mount* mount;
-	status_t status = 0;
+	status_t status = B_OK;
+	fs_volume* volume = NULL;
+	int32 layer = 0;
 
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
 
@@ -6860,30 +6897,12 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	if (mount == NULL)
 		return B_NO_MEMORY;
 
-	mount->volume = (fs_volume*)malloc(sizeof(fs_volume));
-	if (mount->volume == NULL) {
-		delete mount;
-		return B_NO_MEMORY;
-	}
-
-	mount->fs_name = get_file_system_name(fsName);
-	if (mount->fs_name == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-
 	mount->device_name = strdup(device);
 		// "device" can be NULL
 
 	status = mount->entry_cache.Init();
 	if (status != B_OK)
 		goto err1;
-
-	mount->fs = get_file_system(fsName);
-	if (mount->fs == NULL) {
-		status = ENODEV;
-		goto err1;
-	}
 
 	// initialize structure
 	mount->id = sNextMountID++;
@@ -6892,14 +6911,62 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	mount->covers_vnode = NULL;
 	mount->unmounting = false;
 	mount->owns_file_device = false;
+	mount->volume = NULL;
 
-	mount->volume->id = mount->id;
-	mount->volume->partition = partition != NULL ? partition->ID() : -1;
-	mount->volume->layer = 0;
-	mount->volume->private_volume = NULL;
-	mount->volume->ops = NULL;
-	mount->volume->sub_volume = NULL;
-	mount->volume->super_volume = NULL;
+	// build up the volume(s)
+	while (true) {
+		char* layerFSName = get_file_system_name_for_layer(fsName, layer);
+		if (layerFSName == NULL) {
+			if (layer == 0) {
+				status = B_NO_MEMORY;
+				goto err1;
+			}
+
+			break;
+		}
+
+		volume = (fs_volume*)malloc(sizeof(fs_volume));
+		if (volume == NULL) {
+			status = B_NO_MEMORY;
+			free(layerFSName);
+			goto err1;
+		}
+
+		volume->id = mount->id;
+		volume->partition = partition != NULL ? partition->ID() : -1;
+		volume->layer = layer++;
+		volume->private_volume = NULL;
+		volume->ops = NULL;
+		volume->sub_volume = NULL;
+		volume->super_volume = NULL;
+		volume->file_system = NULL;
+		volume->file_system_name = NULL;
+
+		volume->file_system_name = get_file_system_name(layerFSName);
+		if (volume->file_system_name == NULL) {
+			status = B_NO_MEMORY;
+			free(layerFSName);
+			free(volume);
+			goto err1;
+		}
+
+		volume->file_system = get_file_system(layerFSName);
+		if (volume->file_system == NULL) {
+			status = ENODEV;
+			free(layerFSName);
+			free(volume->file_system_name);
+			free(volume);
+			goto err1;
+		}
+
+		if (mount->volume == NULL)
+			mount->volume = volume;
+		else {
+			volume->super_volume = mount->volume;
+			mount->volume->sub_volume = volume;
+			mount->volume = volume;
+		}
+	}
 
 	// insert mount struct into list before we call FS's mount() function
 	// so that vnodes can be created for this mount
@@ -6916,7 +6983,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			goto err2;
 		}
 
-		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
+		status = mount->volume->file_system->mount(mount->volume, device, flags,
+			args, &rootID);
 		if (status < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//status = ERR_VFS_GENERAL;
@@ -6942,10 +7010,19 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		mount->covers_vnode = coveredVnode;
 
-		// mount it
-		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
-		if (status < B_OK)
-			goto err3;
+		// mount it/them
+		fs_volume* volume = mount->volume;
+		while (volume) {
+			status = volume->file_system->mount(volume, device, flags, args,
+				&rootID);
+			if (status < B_OK) {
+				if (volume->sub_volume)
+					goto err4;
+				goto err3;
+			}
+
+			volume = volume->super_volume;
+		}
 	}
 
 	// the root node is supposed to be owned by the file system - it must
@@ -6998,8 +7075,6 @@ err2:
 	mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
-
-	put_file_system(mount->fs);
 err1:
 	delete mount;
 
@@ -7174,9 +7249,6 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 	notify_unmount(mount->id);
 
-	// release the file system
-	put_file_system(mount->fs);
-
 	// dereference the partition and mark it unmounted
 	if (partition) {
 		partition->SetVolumeID(-1);
@@ -7283,7 +7355,12 @@ fs_read_info(dev_t device, struct fs_info *info)
 	if (status == B_OK) {
 		info->dev = mount->id;
 		info->root = mount->root_vnode->id;
-		strlcpy(info->fsh_name, mount->fs_name, sizeof(info->fsh_name));
+
+		fs_volume* volume = mount->volume;
+		while (volume->super_volume != NULL)
+			volume = volume->super_volume;
+
+		strlcpy(info->fsh_name, volume->file_system_name, sizeof(info->fsh_name));
 		if (mount->device_name != NULL) {
 			strlcpy(info->device_name, mount->device_name,
 				sizeof(info->device_name));

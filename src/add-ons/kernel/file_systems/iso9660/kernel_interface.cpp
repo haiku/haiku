@@ -137,8 +137,8 @@ fs_mount(fs_volume *_volume, const char *device, uint32 flags,
 		volume->id = _volume->id;
 
 		result = publish_vnode(_volume, *_rootID, &volume->rootDirRec,
-			&gISO9660VnodeOps, volume->rootDirRec.attr.stat[FS_DATA_FORMAT].st_mode,
-			B_VNODE_WANTS_OVERLAY_SUB_NODE);
+			&gISO9660VnodeOps,
+			volume->rootDirRec.attr.stat[FS_DATA_FORMAT].st_mode, 0);
 		if (result != B_OK) {
 			block_cache_delete(volume->fBlockCache, false);
 			free(volume);
@@ -350,7 +350,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	_node->private_node = newNode;
 	_node->ops = &gISO9660VnodeOps;
 	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode & ~(S_IWUSR | S_IWGRP | S_IWOTH);
-	*_flags = B_VNODE_WANTS_OVERLAY_SUB_NODE;
+	*_flags = 0;
 
 	if ((newNode->flags & ISO_ISDIR) == 0) {
 		newNode->cache = file_cache_create(ns->id, vnodeID,
