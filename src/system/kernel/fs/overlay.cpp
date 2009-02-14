@@ -12,6 +12,8 @@
 
 #include <dirent.h>
 
+#include <fs_info.h>
+
 #include <debug.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
@@ -22,9 +24,11 @@
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
 #define TRACE(x...)			dprintf("overlay: " x)
+#define TRACE_VOLUME(x...)	dprintf("overlay: " x)
 #define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
 #else
 #define TRACE(x...)			/* nothing */
+#define TRACE_VOLUME(x...)	/* nothing */
 #define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
 #endif
 
@@ -43,12 +47,13 @@ public:
 
 		status_t			InitCheck();
 
+		fs_volume *			SuperVolume() { return fSuperVolume; }
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 
 		AttributeFile *		GetAttributeFile();
 
 private:
-		fs_volume			fSuperVolume;
+		fs_volume *			fSuperVolume;
 		fs_vnode			fSuperVnode;
 		AttributeFile *		fAttributeFile;
 };
@@ -129,7 +134,7 @@ private:
 
 
 OverlayInode::OverlayInode(fs_volume *superVolume, fs_vnode *superVnode)
-	:	fSuperVolume(*superVolume),
+	:	fSuperVolume(superVolume),
 		fSuperVnode(*superVnode),
 		fAttributeFile(NULL)
 {
@@ -155,7 +160,7 @@ AttributeFile *
 OverlayInode::GetAttributeFile()
 {
 	if (fAttributeFile == NULL) {
-		fAttributeFile = new(std::nothrow) AttributeFile(&fSuperVolume,
+		fAttributeFile = new(std::nothrow) AttributeFile(fSuperVolume,
 			&fSuperVnode);
 		if (fAttributeFile == NULL) {
 			TRACE_ALWAYS("no memory to allocate attribute file\n");
@@ -472,7 +477,15 @@ AttributeEntry::ReadStat(struct stat *stat)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - VNode ops
+
+
+#define OVERLAY_CALL(op, params...) \
+	TRACE("relaying op: " #op "\n"); \
+	OverlayInode *node = (OverlayInode *)vnode->private_node; \
+	fs_vnode *superVnode = node->SuperVnode(); \
+	if (superVnode->ops->op != NULL) \
+		return superVnode->ops->op(volume->super_volume, superVnode, params);
 
 
 static status_t
@@ -482,8 +495,10 @@ overlay_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 	fs_vnode *superVnode = node->SuperVnode();
 
 	status_t result = B_OK;
-	if (superVnode->ops->put_vnode != NULL)
-		result = superVnode->ops->put_vnode(volume, superVnode, reenter);
+	if (superVnode->ops->put_vnode != NULL) {
+		result = superVnode->ops->put_vnode(volume->super_volume, superVnode,
+			reenter);
+	}
 
 	delete node;
 	return result;
@@ -497,8 +512,10 @@ overlay_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 	fs_vnode *superVnode = node->SuperVnode();
 
 	status_t result = B_OK;
-	if (superVnode->ops->remove_vnode != NULL)
-		result = superVnode->ops->remove_vnode(volume, superVnode, reenter);
+	if (superVnode->ops->remove_vnode != NULL) {
+		result = superVnode->ops->remove_vnode(volume->super_volume, superVnode,
+			reenter);
+	}
 
 	delete node;
 	return result;
@@ -513,24 +530,13 @@ overlay_get_super_vnode(fs_volume *volume, fs_vnode *vnode,
 	fs_vnode *superVnode = node->SuperVnode();
 
 	if (superVnode->ops->get_super_vnode != NULL) {
-		return superVnode->ops->get_super_vnode(volume, superVnode, superVolume,
-			_superVnode);
+		return superVnode->ops->get_super_vnode(volume->super_volume,
+			superVnode, superVolume, _superVnode);
 	}
 
 	*_superVnode = *superVnode;
 	return B_OK;
 }
-
-
-//	#pragma mark -
-
-
-#define OVERLAY_CALL(op, params...) \
-	TRACE("relaying op: " #op "\n"); \
-	OverlayInode *node = (OverlayInode *)vnode->private_node; \
-	fs_vnode *superVnode = node->SuperVnode(); \
-	if (superVnode->ops->op != NULL) \
-		return superVnode->ops->op(volume, superVnode, params);
 
 
 static status_t
@@ -648,7 +654,7 @@ overlay_fsync(fs_volume *volume, fs_vnode *vnode)
 	fs_vnode *superVnode = node->SuperVnode();
 
 	if (superVnode->ops->fsync != NULL)
-		return superVnode->ops->fsync(volume, superVnode);
+		return superVnode->ops->fsync(volume->super_volume, superVnode);
 
 	return B_OK;
 }
@@ -819,18 +825,19 @@ static status_t
 overlay_read_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
+	TRACE("relaying op: read_dir\n");
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	fs_vnode *superVnode = node->SuperVnode();
 	if (superVnode->ops->read_dir != NULL) {
-		status_t result = superVnode->ops->read_dir(volume, superVnode, cookie,
-			buffer, bufferSize, num);
+		status_t result = superVnode->ops->read_dir(volume->super_volume,
+			superVnode, cookie, buffer, bufferSize, num);
 
 		// TODO: handle multiple records
-		if (result == B_OK && strcmp(buffer->d_name,
+		if (result == B_OK && *num == 1 && strcmp(buffer->d_name,
 			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME) == 0) {
 			// skip over the attribute directory
-			return superVnode->ops->read_dir(volume, superVnode, cookie,
-				buffer, bufferSize, num);
+			return superVnode->ops->read_dir(volume->super_volume, superVnode,
+				cookie, buffer, bufferSize, num);
 		}
 
 		return result;
@@ -1005,9 +1012,6 @@ overlay_create_special_node(fs_volume *volume, fs_vnode *vnode,
 }
 
 
-//	#pragma mark -
-
-
 static fs_vnode_ops sOverlayVnodeOps = {
 	&overlay_lookup,
 	&overlay_get_vnode_name,
@@ -1086,18 +1090,209 @@ static fs_vnode_ops sOverlayVnodeOps = {
 };
 
 
-}	// namespace _overlay
-
-using namespace overlay;
+//	#pragma mark - Volume Ops
 
 
-// #pragma mark -
+#define OVERLAY_VOLUME_CALL(op, params...) \
+	TRACE_VOLUME("relaying volume op: " #op "\n"); \
+	if (volume->super_volume->ops->op != NULL) \
+		return volume->super_volume->ops->op(volume->super_volume, params);
 
 
-status_t
-create_overlay_vnode(fs_volume *superVolume, fs_vnode *vnode)
+static status_t
+overlay_unmount(fs_volume *volume)
 {
-	OverlayInode *node = new(std::nothrow) OverlayInode(superVolume, vnode);
+	TRACE_VOLUME("relaying volume op: unmount\n");
+	if (volume->super_volume->ops->unmount != NULL)
+		return volume->super_volume->ops->unmount(volume->super_volume);
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_read_fs_info(fs_volume *volume, struct fs_info *info)
+{
+	TRACE_VOLUME("relaying volume op: read_fs_info\n");
+	status_t result = B_UNSUPPORTED;
+	if (volume->super_volume->ops->read_fs_info != NULL) {
+		result = volume->super_volume->ops->read_fs_info(volume->super_volume,
+			info);
+		if (result != B_OK)
+			return result;
+
+		info->flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR | B_FS_HAS_QUERY;
+		return B_OK;
+	}
+
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_write_fs_info(fs_volume *volume, const struct fs_info *info,
+	uint32 mask)
+{
+	OVERLAY_VOLUME_CALL(write_fs_info, info, mask)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_sync(fs_volume *volume)
+{
+	TRACE_VOLUME("relaying volume op: sync\n");
+	if (volume->super_volume->ops->sync != NULL)
+		return volume->super_volume->ops->sync(volume->super_volume);
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_get_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode, int *_type,
+	uint32 *_flags, bool reenter)
+{
+	TRACE_VOLUME("relaying volume op: get_vnode\n");
+	if (volume->super_volume->ops->get_vnode != NULL) {
+		status_t status = volume->super_volume->ops->get_vnode(
+			volume->super_volume, id, vnode, _type, _flags, reenter);
+		if (status != B_OK)
+			return status;
+
+		OverlayInode *node = new(std::nothrow) OverlayInode(
+			volume->super_volume, vnode);
+		if (node == NULL) {
+			vnode->ops->put_vnode(volume->super_volume, vnode, reenter);
+			return B_NO_MEMORY;
+		}
+
+		status = node->InitCheck();
+		if (status != B_OK) {
+			delete node;
+			return status;
+		}
+
+		vnode->private_node = node;
+		vnode->ops = &sOverlayVnodeOps;
+		return B_OK;
+	}
+
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_open_index_dir(fs_volume *volume, void **cookie)
+{
+	OVERLAY_VOLUME_CALL(open_index_dir, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_close_index_dir(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(close_index_dir, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_free_index_dir_cookie(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(free_index_dir_cookie, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_read_index_dir(fs_volume *volume, void *cookie, struct dirent *buffer,
+	size_t bufferSize, uint32 *_num)
+{
+	OVERLAY_VOLUME_CALL(read_index_dir, cookie, buffer, bufferSize, _num)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_rewind_index_dir(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(rewind_index_dir, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_create_index(fs_volume *volume, const char *name, uint32 type,
+	uint32 flags)
+{
+	OVERLAY_VOLUME_CALL(create_index, name, type, flags)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_remove_index(fs_volume *volume, const char *name)
+{
+	OVERLAY_VOLUME_CALL(remove_index, name)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_read_index_stat(fs_volume *volume, const char *name, struct stat *stat)
+{
+	OVERLAY_VOLUME_CALL(read_index_stat, name, stat)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_open_query(fs_volume *volume, const char *query, uint32 flags,
+	port_id port, uint32 token, void **_cookie)
+{
+	OVERLAY_VOLUME_CALL(open_query, query, flags, port, token, _cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_close_query(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(close_query, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_free_query_cookie(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(free_query_cookie, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_read_query(fs_volume *volume, void *cookie, struct dirent *buffer,
+	size_t bufferSize, uint32 *_num)
+{
+	OVERLAY_VOLUME_CALL(read_query, cookie, buffer, bufferSize, _num)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_rewind_query(fs_volume *volume, void *cookie)
+{
+	OVERLAY_VOLUME_CALL(rewind_query, cookie)
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+overlay_create_sub_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode)
+{
+	OverlayInode *node = new(std::nothrow) OverlayInode(volume->super_volume,
+		vnode);
 	if (node == NULL)
 		return B_NO_MEMORY;
 
@@ -1109,5 +1304,59 @@ create_overlay_vnode(fs_volume *superVolume, fs_vnode *vnode)
 
 	vnode->private_node = node;
 	vnode->ops = &sOverlayVnodeOps;
+	return B_OK;
+}
+
+
+static status_t
+overlay_delete_sub_vnode(fs_volume *volume, fs_vnode *vnode)
+{
+	delete (OverlayInode *)vnode;
+	return B_OK;
+}
+
+
+static fs_volume_ops sOverlayVolumeOps = {
+	&overlay_unmount,
+
+	&overlay_read_fs_info,
+	&overlay_write_fs_info,
+	&overlay_sync,
+
+	&overlay_get_vnode,
+	&overlay_open_index_dir,
+	&overlay_close_index_dir,
+	&overlay_free_index_dir_cookie,
+	&overlay_read_index_dir,
+	&overlay_rewind_index_dir,
+
+	&overlay_create_index,
+	&overlay_remove_index,
+	&overlay_read_index_stat,
+
+	&overlay_open_query,
+	&overlay_close_query,
+	&overlay_free_query_cookie,
+	&overlay_read_query,
+	&overlay_rewind_query,
+
+	&overlay_create_sub_vnode,
+	&overlay_delete_sub_vnode
+};
+
+}	// namespace _overlay
+
+using namespace overlay;
+
+
+// #pragma mark -
+
+
+status_t
+mount_overlay(fs_volume *volume, const char *device, uint32 flags,
+	const char *args, ino_t *rootID)
+{
+	TRACE_VOLUME("mounting overlay\n");
+	volume->ops = &sOverlayVolumeOps;
 	return B_OK;
 }

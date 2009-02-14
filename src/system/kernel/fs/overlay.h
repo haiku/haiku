@@ -11,6 +11,7 @@
 
 #include <fs_interface.h>
 
-status_t	create_overlay_vnode(fs_volume *superVolume, fs_vnode *vnode);
+status_t	mount_overlay(fs_volume *volume, const char *device, uint32 flags,
+				const char *args, ino_t *rootID);
 
 #endif	// _VFS_OVERLAY_H
