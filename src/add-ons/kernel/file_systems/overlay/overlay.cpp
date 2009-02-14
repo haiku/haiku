@@ -477,7 +477,7 @@ AttributeEntry::ReadStat(struct stat *stat)
 }
 
 
-//	#pragma mark - VNode ops
+//	#pragma mark - vnode ops
 
 
 #define OVERLAY_CALL(op, params...) \
@@ -1090,7 +1090,7 @@ static fs_vnode_ops sOverlayVnodeOps = {
 };
 
 
-//	#pragma mark - Volume Ops
+//	#pragma mark - volume ops
 
 
 #define OVERLAY_VOLUME_CALL(op, params...) \
@@ -1344,19 +1344,80 @@ static fs_volume_ops sOverlayVolumeOps = {
 	&overlay_delete_sub_vnode
 };
 
-}	// namespace _overlay
 
-using namespace overlay;
-
-
-// #pragma mark -
+//	#pragma mark - filesystem module
 
 
-status_t
-mount_overlay(fs_volume *volume, const char *device, uint32 flags,
+static status_t
+overlay_mount(fs_volume *volume, const char *device, uint32 flags,
 	const char *args, ino_t *rootID)
 {
 	TRACE_VOLUME("mounting overlay\n");
 	volume->ops = &sOverlayVolumeOps;
 	return B_OK;
 }
+
+
+static status_t
+overlay_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		case B_MODULE_UNINIT:
+			return B_OK;
+		default:
+			return B_ERROR;
+	}
+}
+
+
+static file_system_module_info sOverlayFileSystem = {
+	{
+		"file_systems/overlay"B_CURRENT_FS_API_VERSION,
+		0,
+		overlay_std_ops,
+	},
+
+	"overlay",					// short_name
+	"Overlay File System",		// pretty_name
+	0,							// DDM flags
+
+	// scanning
+	NULL, // identify_partition
+	NULL, // scan_partition
+	NULL, // free_identify_partition_cookie
+	NULL, // free_partition_content_cookie
+
+	// general operations
+	&overlay_mount,
+
+	// capability querying
+	NULL, // get_supported_operations
+
+	NULL, // validate_resize
+	NULL, // validate_move
+	NULL, // validate_set_content_name
+	NULL, // validate_set_content_parameters
+	NULL, // validate_initialize
+
+	// shadow partition modification
+	NULL, // shadow_changed
+
+	// writing
+	NULL, // defragment
+	NULL, // repair
+	NULL, // resize
+	NULL, // move
+	NULL, // set_content_name
+	NULL, // set_content_parameters
+	NULL // initialize
+};
+
+}	// namespace _overlay
+
+using namespace overlay;
+
+module_info *modules[] = {
+	(module_info *)&sOverlayFileSystem,
+	NULL,
+};

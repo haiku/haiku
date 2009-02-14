@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems overlay ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon overlay :
+	overlay.cpp
+	;

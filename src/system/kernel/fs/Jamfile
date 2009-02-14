@@ -12,7 +12,6 @@ KernelMergeObject kernel_fs.o :
 	fifo.cpp
 	KPath.cpp
 	node_monitor.cpp
-	overlay.cpp
 	rootfs.cpp
 	socket.cpp
 	vfs.cpp
