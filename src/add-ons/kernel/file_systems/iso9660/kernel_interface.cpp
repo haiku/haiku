@@ -137,7 +137,8 @@ fs_mount(fs_volume *_volume, const char *device, uint32 flags,
 		volume->id = _volume->id;
 
 		result = publish_vnode(_volume, *_rootID, &volume->rootDirRec,
-			&gISO9660VnodeOps, volume->rootDirRec.attr.stat[FS_DATA_FORMAT].st_mode, 0);
+			&gISO9660VnodeOps, volume->rootDirRec.attr.stat[FS_DATA_FORMAT].st_mode,
+			B_VNODE_WANTS_OVERLAY_SUB_NODE);
 		if (result != B_OK) {
 			block_cache_delete(volume->fBlockCache, false);
 			free(volume);
