@@ -442,8 +442,12 @@ vfs_mount_boot_file_system(kernel_args *args)
 		if (bootPartition->GetPath(&path) != B_OK)
 			panic("could not get boot device!\n");
 
+		const char *fsName = NULL;
+		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0)
+			fsName = "iso9660:overlay";
+
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
-		gBootDevice = _kern_mount("/boot", path.Path(), NULL, 0, NULL, 0);
+		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
 		if (gBootDevice >= B_OK)
 			break;
 	}
