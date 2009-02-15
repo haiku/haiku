@@ -418,7 +418,7 @@ _kern_open_parent_dir(int fd, char *name, size_t nameLength)
 {
 	// get a usable path
 	string realPath;
-	status_t error = get_path(fd, name, realPath);
+	status_t error = get_path(fd, NULL, realPath);
 	if (error != B_OK)
 		return error;
 
