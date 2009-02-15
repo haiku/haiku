@@ -715,8 +715,14 @@ DefaultDecorator::_DoLayout()
 	}
 
 	// calculate resize rect
-	fResizeRect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
-		fBottomBorder.right, fBottomBorder.bottom);
+	if (fBorderWidth > 1) {
+		fResizeRect.Set(fBottomBorder.right - 18.0,
+			fBottomBorder.bottom - 18.0, fBottomBorder.right,
+			fBottomBorder.bottom);
+	} else {
+		// no border or one pixel border (menus and such)
+		fResizeRect.Set(0, 0, -1, -1);
+	}
 
 	if (hasTab) {
 		// make sure fTabOffset is within limits and apply it to
