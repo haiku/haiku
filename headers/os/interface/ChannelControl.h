@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008 Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright (C) 2008-2009 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef _CHANNEL_CONTROL_H
 #define _CHANNEL_CONTROL_H
@@ -18,6 +18,10 @@ public:
 									int32 channelCount = 1,
 									uint32 resizeFlags
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 viewFlags = B_WILL_DRAW);
+								BChannelControl(const char* name,
+									const char* label, BMessage* model,
+									int32 channelCount = 1,
 									uint32 viewFlags = B_WILL_DRAW);
 								BChannelControl(BMessage* archive);
 	virtual						~BChannelControl();

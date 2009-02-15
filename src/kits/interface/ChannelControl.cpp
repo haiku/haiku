@@ -1,5 +1,5 @@
 /* 
- * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,6 +37,29 @@ sPropertyInfo[] = {
 BChannelControl::BChannelControl(BRect frame, const char *name, const char *label,
 	BMessage *model, int32 channel_count, uint32 resizeMode, uint32 flags)
 	: BControl(frame, name, label, model, resizeMode, flags),
+	fChannelCount(channel_count),
+	fCurrentChannel(0),
+	fChannelMin(NULL),
+	fChannelMax(NULL),
+	fChannelValues(NULL),
+	fMultiLabels(NULL),
+	fModificationMsg(NULL)
+{
+	fChannelMin = new int32[channel_count];
+	memset(fChannelMin, 0, sizeof(int32) * channel_count);
+	
+	fChannelMax = new int32[channel_count];
+	for (int32 i = 0; i < channel_count; i++)
+		fChannelMax[i] = 100;
+
+	fChannelValues = new int32[channel_count];
+	memset(fChannelValues, 0, sizeof(int32) * channel_count);
+}
+
+
+BChannelControl::BChannelControl(const char *name, const char *label,
+	BMessage *model, int32 channel_count, uint32 flags)
+	: BControl(name, label, model, flags),
 	fChannelCount(channel_count),
 	fCurrentChannel(0),
 	fChannelMin(NULL),
