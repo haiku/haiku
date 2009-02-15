@@ -143,62 +143,64 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		switch (*pointer) {
 			case MP_BASE_PROCESSOR:
 			{
+				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
+				pointer += sizeof(struct mp_base_processor);
+
 				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
 					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
-					pointer += sizeof(struct mp_base_processor);
-					break;
+					continue;
 				}
 
-				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
+				/* skip if the processor is not enabled. */
+                if(!(processor->cpu_flags & 0x1)) {
+					TRACE(("smp: skip apic id %d: disabled\n", processor->apic_id));
+					continue;
+                }
 
-				/* is processor enabled? */
-				if(processor->cpu_flags & 0x1) {
-
-					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
-					gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
-					gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
+				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
 
 #ifdef TRACE_SMP
-					const char *cpuFamily[] = { "", "", "", "", "Intel 486",
-						"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
+				const char *cpuFamily[] = { "", "", "", "", "Intel 486",
+					"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
 #endif
-					TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
-						gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
-						processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
-						", BSP" : ""));
+				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
+					gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
+					processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
+					", BSP" : ""));
 
-					gKernelArgs.num_cpus++;
-				}
-				
-				pointer += sizeof(struct mp_base_processor);
+				gKernelArgs.num_cpus++;
 				break;
 			}
 			case MP_BASE_BUS:
 			{
 				struct mp_base_bus *bus = (struct mp_base_bus *)pointer;
+				pointer += sizeof(struct mp_base_bus);
 
 				TRACE(("smp: bus %d: %c%c%c%c%c%c\n", bus->bus_id,
 					bus->name[0], bus->name[1], bus->name[2], bus->name[3],
 					bus->name[4], bus->name[5]));
 
-				pointer += sizeof(struct mp_base_bus);
 				break;
 			}
 			case MP_BASE_IO_APIC:
 			{
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
+				pointer += sizeof(struct mp_base_ioapic);
+
 				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
 
-				pointer += sizeof(struct mp_base_ioapic);
 				break;
 			}
 			case MP_BASE_IO_INTR:
 			case MP_BASE_LOCAL_INTR:
 			{
 				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)pointer;
+				pointer += sizeof(struct mp_base_interrupt);
 
 				dprintf("smp: %s int: type %d, source bus %d, irq %3d, dest apic %d, int %3d, polarity %d, trigger mode %d\n",
 					interrupt->type == MP_BASE_IO_INTR ? "I/O" : "local",
@@ -206,7 +208,6 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 					interrupt->source_bus_irq, interrupt->dest_apic_id,
 					interrupt->dest_apic_int, interrupt->polarity,
 					interrupt->trigger_mode);
-				pointer += sizeof(struct mp_base_interrupt);
 				break;
 			}
 		}
