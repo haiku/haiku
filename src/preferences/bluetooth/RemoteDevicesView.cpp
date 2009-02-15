@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 
+#include "InquiryPanel.h"
 #include "BluetoothWindow.h"
 #include "defs.h"
 
@@ -28,7 +29,7 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add" B_UTF8_ELLIPSIS, 
+	addButton = new BButton(BRect(5,5,5,5), "add", "Add" B_UTF8_ELLIPSIS, 
 										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
 	
 	BButton* removeButton = new BButton(BRect(5,5,5,5), "remove", "Remove", 
@@ -86,6 +87,7 @@ void
 RemoteDevicesView::AttachedToWindow(void)
 {
 	fAttrList->SetTarget(this);
+	addButton->SetTarget(this);
 
 	LoadSettings();
 	fAttrList->Select(0);
@@ -104,7 +106,12 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 	}
 
 	switch(msg->what) {
-
+		case kMsgAddDevices:
+		{
+			InquiryPanel* iPanel = new InquiryPanel(BRect(0,0,50,50));
+			iPanel->Show();
+		}
+		break;
 		default:
 			BView::MessageReceived(msg);
 			break;

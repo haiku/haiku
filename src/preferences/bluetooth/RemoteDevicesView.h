@@ -39,8 +39,9 @@ protected:
 	void	UpdateControls();
 	void	UpdateAllColors();
 
-	BListView		*fAttrList;	
-	BScrollView		*fScrollView;
+	BButton*		addButton;
+	BListView*		fAttrList;	
+	BScrollView*	fScrollView;
 	
 
 };

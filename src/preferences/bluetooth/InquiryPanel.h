@@ -11,28 +11,23 @@
 #include <Message.h>
 #include <TabView.h>
 
+class BStatusBar;
+class BButton;
+class BTextView;
 
-#include "InquirySettingsView.h"
-
-class RemoteDevicesView;
-class ConnChanView;
-
-class InquiryWindow : public BWindow 
+class InquiryPanel : public BWindow 
 {
 public:
-			InquiryWindow(BRect frame); 
+			InquiryPanel(BRect frame); 
 	bool	QuitRequested(void);
 	void	MessageReceived(BMessage *message);
 	
-private:
-		RemoteDevicesView*		fRemoteDevices;
-		ConnChanView*			fConnChan;
-		BButton*				fDefaultsButton;
-		BButton*				fRevertButton;
-		BMenuBar*				fMenubar;
+private:		
+		BStatusBar*				fScanProgress;
+		BButton*				fAddButton;
+		BButton*				fInquiryButton;
+		BTextView*				fMessage;
 
 };
-
-
 
 #endif
