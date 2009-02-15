@@ -31,6 +31,9 @@
 #include <Window.h>
 
 
+static const float kInset = 8.0f;
+
+
 template <class ControlType>
 void
 add_controls(BGridLayout* layout, int32& row)
@@ -131,8 +134,9 @@ add_status_bars(BGridLayout* layout, int32& row)
 	BBox* box = new BBox(B_FANCY_BORDER, NULL);
 	box->SetLabel("Info");
 
-	BGroupLayout* boxLayout = new BGroupLayout(B_VERTICAL, 5);
-	boxLayout->SetInsets(8, 8 + box->TopBorderOffset(), 8, 8);
+	BGroupLayout* boxLayout = new BGroupLayout(B_VERTICAL, kInset);
+	boxLayout->SetInsets(kInset, kInset + box->TopBorderOffset(), kInset,
+		kInset);
 	box->SetLayout(boxLayout);
 
 	BStatusBar* statusBar = new BStatusBar("status bar", "Status",
@@ -186,7 +190,7 @@ main(int argc, char** argv)
 		true, true);
 	scrollView->SetExplicitMinSize(BSize(300, 140));
 
-	BGridView* controls = new BGridView(5.0f, 5.0f);
+	BGridView* controls = new BGridView(kInset, kInset);
 	BGridLayout* layout = controls->GridLayout();
 	controls->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
@@ -204,21 +208,25 @@ main(int argc, char** argv)
 	layout->AddView(colorControl, 0, row, 4);
 
 	BTabView* tabView = new BTabView("tab view", B_WIDTH_FROM_WIDEST);
-	BView* content = BGroupLayoutBuilder(B_VERTICAL, 5)
+	BView* content = BGroupLayoutBuilder(B_VERTICAL, kInset)
 		.Add(scrollView)
 		.Add(controls)
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(kInset, kInset, kInset, kInset);
 
 	content->SetName("Tab 1");
 
 	tabView->AddTab(content);
-	tabView->AddTab(new BView("Tab 2", 0));
+	BView* tab2 = new BView("Tab 2", 0);
+	tab2->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	tabView->AddTab(tab2);
 	tabView->AddTab(new BView("Tab 3", 0));
 
 	BMenuBar* menuBar = new BMenuBar("menu bar");
 	BMenu* menu = new BMenu("File");
-	BMenuItem* item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED));
-	menu->AddItem(item);
+	menu->AddItem(new BMenuItem("Click me!", NULL));
+	menu->AddItem(new BMenuItem("Another Option", NULL));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
 	menuBar->AddItem(menu);
 	menu = new BMenu("Edit");
 	menu->SetEnabled(false);
@@ -227,20 +235,30 @@ main(int argc, char** argv)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Past", NULL));
 	menuBar->AddItem(menu);
+	menu = new BMenu("One Item");
+	menu->AddItem(new BMenuItem("Only", NULL));
+	menuBar->AddItem(menu);
+	menu = new BMenu("Sub Menu");
+	BMenu* subMenu = new BMenu("Click Me");
+	subMenu->AddItem(new BMenuItem("Either", NULL));
+	subMenu->AddItem(new BMenuItem("Or", NULL));
+	subMenu->SetRadioMode(true);
+	menu->AddItem(subMenu);
+	menuBar->AddItem(menu);
 
 	BButton* okButton = new BButton("Ok", new BMessage(B_QUIT_REQUESTED));
 
 	window->AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(menuBar)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, 5)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, kInset)
 			.Add(tabView)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, kInset)
 				.Add(new BButton("Revert", NULL))
 				.Add(BSpaceLayoutItem::CreateGlue())
 				.Add(new BButton("Cancel", NULL))
 				.Add(okButton)
 			)
-			.SetInsets(5, 5, 5, 5)
+			.SetInsets(kInset, kInset, kInset, kInset)
 		)
 	);
 
