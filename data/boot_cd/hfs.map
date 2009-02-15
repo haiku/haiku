@@ -2,7 +2,6 @@
 # from treating everything like a text file (ugly!)
 #
 # EXTN	XLate	CREATOR	TYPE	Comment
-#.b	Raw	'UNIX'	'tbxi'	"bootstrap"
-#boot_loader_openfirmware	Raw	'UNIX'	'boot'	"bootstrap"
-boot_loader_openfirmware	Raw	'UNIX'	'tbxi'	"bootstrap"
+.b	Raw	'UNIX'	'tbxi'	"bootstrap"
+boot_loader_openfirmware	Raw	'UNIX'	'boot'	"bootstrap"
 *	Raw	'UNIX'	'UNIX'	"unix"
