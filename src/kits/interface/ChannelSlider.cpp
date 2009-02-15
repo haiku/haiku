@@ -4,8 +4,10 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <Bitmap.h>
 #include <ChannelSlider.h>
+
+#include <Bitmap.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <PropertyInfo.h>
 #include <Screen.h>
@@ -79,12 +81,24 @@ BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
 
 
 BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
-	BMessage *model, orientation o, int32 channels, uint32 resizeMode, uint32 flags)
+	BMessage *model, enum orientation orientation, int32 channels,
+		uint32 resizeMode, uint32 flags)
 	: BChannelControl(area, name, label, model, channels, resizeMode, flags)
 
 {
 	_InitData();
-	SetOrientation(o);
+	SetOrientation(orientation);
+}
+
+
+BChannelSlider::BChannelSlider(const char *name, const char *label,
+	BMessage *model, enum orientation orientation, int32 channels,
+		uint32 flags)
+	: BChannelControl(name, label, model, channels, flags)
+
+{
+	_InitData();
+	SetOrientation(orientation);
 }
 
 
@@ -138,9 +152,9 @@ BChannelSlider::Orientation() const
 
 
 void
-BChannelSlider::SetOrientation(orientation _orientation)
+BChannelSlider::SetOrientation(enum orientation orientation)
 {
-	bool isVertical = _orientation == B_VERTICAL;
+	bool isVertical = orientation == B_VERTICAL;
 	if (isVertical != _Vertical()) {
 		fVertical = isVertical;
 		Invalidate(Bounds());
@@ -415,6 +429,10 @@ void
 BChannelSlider::FrameResized(float newWidth, float newHeight)
 {
 	BChannelControl::FrameResized(newWidth, newHeight);
+
+	delete fBacking;
+	fBacking = NULL;
+
 	Invalidate(Bounds());
 }
 
@@ -533,6 +551,20 @@ BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint leftTop,
 	ASSERT(into != NULL);
 	BRect rect(leftTop, bottomRight);
 
+	if (be_control_look != NULL) {
+		rect.InsetBy(-2.5, -2.5);
+		rect.left = floorf(rect.left);
+		rect.top = floorf(rect.top);
+		rect.right = floorf(rect.right);
+		rect.bottom = floorf(rect.bottom);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		rgb_color barColor = be_control_look->SliderBarColor(base);
+		uint32 flags = 0;
+		be_control_look->DrawSliderBar(into, rect, rect, base,
+			barColor, flags, Orientation());
+		return;
+	}
+
 	_DrawGrooveFrame(fBackingView, rect.InsetByCopy(-2.5, -2.5));
 
 	rect.InsetBy(-0.5, -0.5);
@@ -552,6 +584,22 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where, bool pressed
 	BRect bitmapBounds(thumb->Bounds());
 	where.x -= bitmapBounds.right / 2.0;
 	where.y -= bitmapBounds.bottom / 2.0;
+
+
+	if (be_control_look != NULL) {
+		BRect rect(bitmapBounds.OffsetToCopy(where));
+		rect.InsetBy(1, 1);
+		rect.left = floorf(rect.left);
+		rect.top = floorf(rect.top);
+		rect.right = ceilf(rect.right + 0.5);
+		rect.bottom = ceilf(rect.bottom + 0.5);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = 0;
+		be_control_look->DrawSliderThumb(into, rect, rect, base,
+			flags, Orientation());
+		return;
+	}
+
 
 	into->PushState();
 

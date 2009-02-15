@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Layout.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -53,8 +54,7 @@ BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 
 
 BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
-	: BView(BRect(0, 0, -1, -1), name, B_FOLLOW_NONE,
-		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT),
+	: BView(name, flags | B_WILL_DRAW | B_FRAME_EVENTS),
 	  fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -68,8 +68,7 @@ BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
 
 
 BBox::BBox(border_style border, BView* child)
-	: BView(BRect(0, 0, -1, -1), NULL, B_FOLLOW_NONE,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_SUPPORTS_LAYOUT),
+	: BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
 	  fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -639,15 +638,27 @@ BBox::_DrawPlain(BRect labelBox)
 	BRect rect = Bounds();
 	rect.top += TopBorderOffset();
 
-	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
+	float lightTint;
+	float shadowTint;
+	if (be_control_look != NULL) {
+		lightTint = B_LIGHTEN_1_TINT;
+		shadowTint = B_DARKEN_1_TINT;
+	} else {
+		lightTint = B_LIGHTEN_MAX_TINT;
+		shadowTint = B_DARKEN_3_TINT;
+	}
 
 	if (rect.Height() == 0.0 || rect.Width() == 0.0) {
 		// used as separator
+		rgb_color shadow = tint_color(ViewColor(), B_DARKEN_2_TINT);
+
 		SetHighColor(shadow);
 		StrokeLine(rect.LeftTop(),rect.RightBottom());
 	} else {
 		// used as box
-		rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
+		rgb_color light = tint_color(ViewColor(), lightTint);
+		rgb_color shadow = tint_color(ViewColor(), shadowTint);
+
 		BeginLineArray(4);
 			AddLine(BPoint(rect.left, rect.bottom),
 					BPoint(rect.left, rect.top), light);
@@ -667,6 +678,23 @@ BBox::_DrawFancy(BRect labelBox)
 {
 	BRect rect = Bounds();
 	rect.top += TopBorderOffset();
+
+	if (be_control_look != NULL) {
+		rgb_color base = ViewColor();
+		if (rect.Height() == 1.0) {
+			// used as horizontal separator
+			be_control_look->DrawGroupFrame(this, rect, rect, base,
+				BControlLook::B_TOP_BORDER);
+		} else if (rect.Width() == 1.0) {
+			// used as vertical separator
+			be_control_look->DrawGroupFrame(this, rect, rect, base,
+				BControlLook::B_LEFT_BORDER);
+		} else {
+			// used as box
+			be_control_look->DrawGroupFrame(this, rect, rect, base);
+		}
+		return;
+	}
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);

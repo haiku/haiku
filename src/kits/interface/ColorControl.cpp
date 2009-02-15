@@ -11,11 +11,12 @@
 
 /**	BColorControl displays a palette of selectable colors. */
 
+#include <ColorControl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <ColorControl.h>
+#include <ControlLook.h>
 #include <Bitmap.h>
 #include <TextControl.h>
 #include <Region.h>
@@ -391,16 +392,12 @@ BColorControl::Draw(BRect updateRect)
 		if (!fBitmap->Lock())
 			return;
 
-		if (fOffscreenView->Bounds().Intersects(updateRect)) {
-			BRegion region(updateRect);
-			ConstrainClippingRegion(&region);
+		if (fOffscreenView->Bounds().Intersects(updateRect))
 			DrawBitmap(fBitmap, B_ORIGIN);
-			ConstrainClippingRegion(NULL);
-		}
 
 		fBitmap->Unlock();
 		_DrawSelectors(this);
-		
+
 	} else {
 		_DrawColorArea(this, updateRect);
 		_DrawSelectors(this);
@@ -413,44 +410,56 @@ BColorControl::_DrawColorArea(BView* target, BRect update)
 {
 	BRegion region(update);
 	target->ConstrainClippingRegion(&region);
-	
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
-	rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
-	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
-	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
-	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
-		
+
 	BRect bevelRect = fPaletteFrame.InsetByCopy(-2.0,-2.0);	//bevel
-
 	bool enabled = IsEnabled();
-		
-	// First bevel
-	if (enabled)
-		target->SetHighColor(darken1);
-	else
+
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (!enabled)
+			flags |= BControlLook::B_DISABLED;
+		be_control_look->DrawTextControlBorder(target, bevelRect, update,
+			noTint, flags);
+	} else {
+		rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
+		rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+		rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
+		rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
+			
+		// First bevel
+		if (enabled)
+			target->SetHighColor(darken1);
+		else
+			target->SetHighColor(noTint);
+		target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
+		target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
+		if (enabled)
+			target->SetHighColor(lightenmax);
+		else
+			target->SetHighColor(lighten1);
+		target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom),
+			bevelRect.RightBottom());
+		target->StrokeLine(bevelRect.RightBottom(),
+			BPoint(bevelRect.right, bevelRect.top + 1.0f));
+	
+		bevelRect.InsetBy(1.0f, 1.0f);
+	
+		// Second bevel
+		if (enabled)
+			target->SetHighColor(darken4);
+		else
+			target->SetHighColor(darken2);
+		target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
+		target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
 		target->SetHighColor(noTint);
-	target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
-	target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
-	if (enabled)
-		target->SetHighColor(lightenmax);
-	else
-		target->SetHighColor(lighten1);
-	target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom), bevelRect.RightBottom());
-	target->StrokeLine(bevelRect.RightBottom(), BPoint(bevelRect.right, bevelRect.top + 1.0f));
-
-	bevelRect.InsetBy(1.0f, 1.0f);
-
-	// Second bevel
-	if (enabled)
-		target->SetHighColor(darken4);
-	else
-		target->SetHighColor(darken2);
-	target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
-	target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
-	target->SetHighColor(noTint);
-	target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom), bevelRect.RightBottom());
-	target->StrokeLine(bevelRect.RightBottom(), BPoint(bevelRect.right, bevelRect.top + 1.0f));
+		target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom),
+			bevelRect.RightBottom());
+		target->StrokeLine(bevelRect.RightBottom(),
+			BPoint(bevelRect.right, bevelRect.top + 1.0f));
+	}
 	
 	if (fPaletteMode) {
 		int colBegin = max_c(0, -1 + int(update.left) / int(fCellSize));
@@ -501,7 +510,7 @@ BColorControl::_DrawColorArea(BView* target, BRect update)
 		_ColorRamp(_RampFrame(3), target, blue, compColor, 0, false, update);	
 	}
 	
-	ConstrainClippingRegion(NULL);
+	target->ConstrainClippingRegion(NULL);
 }
 
 

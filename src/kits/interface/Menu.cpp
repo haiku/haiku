@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -926,6 +927,7 @@ BMenu::Draw(BRect updateRect)
 		return;
 	}
 
+
 	DrawBackground(updateRect);
 	_DrawItems(updateRect);
 }
@@ -1295,6 +1297,19 @@ BMenu::AddDynamicItem(add_state state)
 void
 BMenu::DrawBackground(BRect update)
 {
+	if (be_control_look != NULL) {
+		rgb_color base = sMenuInfo.background_color;
+		uint32 flags = 0;
+		if (!IsEnabled())
+			flags |= BControlLook::B_DISABLED;
+		if (IsFocus())
+			flags |= BControlLook::B_FOCUSED;
+		BRect rect = Bounds();
+		be_control_look->DrawMenuBackground(this, rect, update, base);
+
+		return;
+	}
+
 	rgb_color oldColor = HighColor();
 	SetHighColor(sMenuInfo.background_color);
 	FillRect(Bounds() & update, B_SOLID_HIGH);
@@ -1409,12 +1424,6 @@ BMenu::_Show(bool selectFirstItem)
 				window->Unlock();
 			return false;
 		}
-
-		// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
-		// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
-		// This is needed to be able to draw the frame around the BMenu.
-		if (dynamic_cast<BMenuWindow *>(window) != NULL)
-			MoveTo(1, 1);
 
 		_UpdateWindowViewSize(true);
 		window->Show();
@@ -2584,19 +2593,19 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 
 	if (fItems.CountItems() > 0) {
 		if (!scroll) {
-			window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+			window->ResizeTo(Bounds().Width(), Bounds().Height());
 		} else {
 			BScreen screen(window);
 
 			// If we need scrolling, resize the window to fit the screen and
 			// attach scrollers to our cached BMenuWindow.
 			if (dynamic_cast<BMenuBar *>(Supermenu()) == NULL) {
-				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom);
+				window->ResizeTo(Bounds().Width(), screen.Frame().bottom);
 				frame.top = 0;
 			} else {
 				// Or, in case our parent was a BMenuBar enable scrolling with
 				// normal size.
-				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom
+				window->ResizeTo(Bounds().Width(), screen.Frame().bottom
 					- frame.top);
 			}
 

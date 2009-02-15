@@ -51,7 +51,7 @@ class OffscreenBitmap;
 
 const int32 kTitleViewHeight = 16;
 const int32 kEdgeSize = 6;
-const int32 kTitleColumnLeftExtraMargin = 10;
+const int32 kTitleColumnLeftExtraMargin = 11;
 const int32 kTitleColumnRightExtraMargin = 5;
 const int32 kTitleColumnExtraMargin = kTitleColumnLeftExtraMargin
 	+ kTitleColumnRightExtraMargin;

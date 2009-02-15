@@ -167,6 +167,12 @@ BDragger::Draw(BRect update)
 			// TODO: should draw it differently ?
 		}
 	} else if (IsVisibilityChanging()) {
+
+//uint32 flags = Parent()->Flags();
+//Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
+//Parent()->Draw(Frame());
+//Parent()->SetFlags(flags);
+
 		if (Parent())
 			Parent()->Invalidate(Frame());
 		
@@ -204,7 +210,7 @@ BDragger::MouseDown(BPoint where)
 
 		while (true) {
 			BPoint mousePoint;
-			GetMouse(&mousePoint, &buttons);
+			GetMouse(&mousePoint, &buttons, false);
 
 			if (!buttons || system_time() > time + clickSpeed)
 				break;
@@ -226,10 +232,10 @@ BDragger::MouseDown(BPoint where)
 				Archive(&archive);
 			else {
 				if (fTarget->Archive(&archive)) {
-					BMessage widget(B_ARCHIVED_OBJECT);
+					BMessage archivedSelf(B_ARCHIVED_OBJECT);
 
-					if (Archive(&widget))
-						archive.AddMessage("__widget", &widget);
+					if (Archive(&archivedSelf))
+						archive.AddMessage("__widget", &archivedSelf);
 				}
 			}
 
@@ -280,7 +286,7 @@ BDragger::MessageReceived(BMessage *msg)
 		// this code is used whenever the "are draggers drawn" option is changed
 		if (fRelation == TARGET_IS_CHILD) {
 			fTransition = true;
-			Invalidate();
+			Draw(Bounds());
 			Flush();
 			fTransition = false;
 		} else {

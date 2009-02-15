@@ -15,6 +15,7 @@
 
 #include <RadioButton.h>
 
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Box.h>
 #include <LayoutUtils.h>
@@ -87,6 +88,27 @@ BRadioButton::Draw(BRect updateRect)
 	// its size depends on the text height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
+
+	if (be_control_look) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		uint32 flags = be_control_look->Flags(this);
+		if (fOutlined)
+			flags |= BControlLook::B_CLICKED;
+
+		BRect knobRect(_KnobFrame(fontHeight));
+		BRect rect(knobRect);
+		be_control_look->DrawRadioButton(this, rect, updateRect, base, flags);
+
+		BRect labelRect(Bounds());
+		labelRect.left = knobRect.right
+			+ be_control_look->DefaultLabelSpacing();
+
+		be_control_look->DrawLabel(this, Label(), labelRect, updateRect,
+			base, flags);
+		return;
+	}
+
 	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
 
 	// layout the rect for the dot
@@ -573,6 +595,12 @@ BRadioButton::_KnobFrame() const
 BRect
 BRadioButton::_KnobFrame(const font_height& fontHeight) const
 {
+	if (be_control_look != NULL) {
+		// Same as BCheckBox...
+		return BRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
+			ceilf(5.0f + fontHeight.ascent));
+	}
+
 	// layout the rect for the dot
 	BRect rect(Bounds());
 

@@ -9,11 +9,12 @@
 
 //!	BMenuWindow is a custom BWindow for BMenus.
 
+#include <MenuWindow.h>
+
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Menu.h>
-
 #include <MenuPrivate.h>
-#include <MenuWindow.h>
 #include <WindowPrivate.h>
 
 
@@ -194,15 +195,22 @@ void
 BMenuFrame::Draw(BRect updateRect)
 {
 	if (fMenu != NULL && fMenu->CountItems() == 0) {
-		// TODO: Review this as it's a bit hacky.
-		// Menu has a size of 0, 0, since there are no items in it.
-		// So the BMenuFrame class has to fake it and draw an empty item.
-		// Note that we can't add a real "empty" item because then we couldn't
-		// tell if the item was added by us or not.
-		// See also BMenu::UpdateWindowViewSize()
-		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
-		SetLowColor(HighColor());
-		FillRect(updateRect);
+		if (be_control_look != NULL) {
+			BRect rect(Bounds());
+			be_control_look->DrawMenuBackground(this, rect, updateRect,
+				ui_color(B_MENU_BACKGROUND_COLOR));
+			SetDrawingMode(B_OP_OVER);
+		} else {
+			// TODO: Review this as it's a bit hacky.
+			// Menu has a size of 0, 0, since there are no items in it.
+			// So the BMenuFrame class has to fake it and draw an empty item.
+			// Note that we can't add a real "empty" item because then we couldn't
+			// tell if the item was added by us or not.
+			// See also BMenu::UpdateWindowViewSize()
+			SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
+			SetLowColor(HighColor());
+			FillRect(updateRect);
+		}
 
 		font_height height;
 		GetFontHeight(&height);
@@ -211,7 +219,10 @@ BMenuFrame::Draw(BRect updateRect)
 		DrawString(kEmptyMenuLabel, where);
 	}
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
+	if (be_control_look != NULL)
+		return;
+
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	BRect bounds(Bounds());
 
 	StrokeLine(BPoint(bounds.right, bounds.top),
@@ -234,6 +245,7 @@ BMenuWindow::BMenuWindow(const char *name)
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)
 {
+	SetSizeLimits(2, 10000, 2, 10000);
 }
 
 
@@ -375,7 +387,7 @@ BMenuWindow::_Scroll(const BPoint &where)
 	} else
 		return false;
 
-	snooze(10000);
+	snooze(5000);
 
 	return true;
 }

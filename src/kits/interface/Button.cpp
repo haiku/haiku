@@ -15,6 +15,7 @@
 
 #include <new>
 
+#include <ControlLook.h>
 #include <Font.h>
 #include <LayoutUtils.h>
 #include <String.h>
@@ -102,6 +103,24 @@ BButton::Archive(BMessage* archive, bool deep) const
 void
 BButton::Draw(BRect updateRect)
 {
+	if (be_control_look != NULL) {
+		BRect rect(Bounds());
+		rgb_color base = LowColor();
+		uint32 flags = be_control_look->Flags(this);
+		if (IsDefault())
+			flags |= BControlLook::B_DEFAULT_BUTTON;
+		be_control_look->DrawButtonFrame(this, rect, updateRect,
+			base, flags);
+		be_control_look->DrawButtonBackground(this, rect, updateRect,
+			base, flags);
+
+		// always leave some room around the label
+		rect.InsetBy(3.0, 3.0);
+		be_control_look->DrawLabel(this, Label(), rect, updateRect,
+			base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+		return;
+	}
+
 	font_height fh;
 	GetFontHeight(&fh);
 

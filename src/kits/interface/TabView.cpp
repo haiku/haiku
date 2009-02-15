@@ -14,12 +14,14 @@
 #include <string.h>
 
 #include <CardLayout.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <LayoutUtils.h>
 #include <List.h>
 #include <Message.h>
 #include <PropertyInfo.h>
 #include <Rect.h>
+#include <Region.h>
 #include <String.h>
 
 
@@ -251,6 +253,7 @@ BTab::DrawLabel(BView *owner, BRect frame)
 		owner->GetFontHeight(&fh);
 	}
 
+	owner->SetDrawingMode(B_OP_OVER);
 	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 	owner->DrawString(label.String(),
 		BPoint((frame.left + frame.right - width) / 2.0,
@@ -263,6 +266,38 @@ void
 BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	if (be_control_look != NULL) {
+//		uint32 borders = BControlLook::B_RIGHT_BORDER
+//			| BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
+//		if (frame.left == owner->Bounds().left)
+//			borders |= BControlLook::B_LEFT_BORDER;
+//		be_control_look->DrawButtonFrame(owner, frame, frame,
+//			no_tint, 0, borders);
+//		if (position == B_TAB_FRONT)
+//			no_tint = tint_color(no_tint, B_DARKEN_2_TINT);
+//		be_control_look->DrawButtonBackground(owner, frame, frame, no_tint);
+
+		uint32 borders = BControlLook::B_TOP_BORDER
+			| BControlLook::B_BOTTOM_BORDER;
+		if (frame.left == owner->Bounds().left)
+			borders |= BControlLook::B_LEFT_BORDER;
+		if (frame.right == owner->Bounds().right)
+			borders |= BControlLook::B_RIGHT_BORDER;
+
+		if (position == B_TAB_FRONT) {
+			frame.bottom += 1;
+			be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
+				borders);
+		} else {
+			be_control_look->DrawInctiveTab(owner, frame, frame, no_tint, 0,
+				borders);
+		}
+		
+		DrawLabel(owner, frame);
+		return;
+	}
+
 	rgb_color lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT);
 	rgb_color darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
 	rgb_color darken3 = tint_color(no_tint, B_DARKEN_3_TINT);
@@ -782,7 +817,11 @@ BTabView::FocusTab() const
 void
 BTabView::Draw(BRect updateRect)
 {
-	DrawBox(DrawTabs());
+	if (be_control_look != NULL) {
+		DrawBox(TabFrame(fSelection));
+		DrawTabs();
+	} else
+		DrawBox(DrawTabs());
 
 	if (IsFocus() && fFocus != -1)
 		TabAt(fFocus)->DrawFocusMark(this, TabFrame(fFocus));
@@ -792,10 +831,34 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
+	if (be_control_look != NULL) {
+//		BRect rect(Bounds());
+//		rect.bottom = rect.top + fTabHeight;
+//		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+//		be_control_look->DrawButtonFrame(this, rect, rect, base);
+//		be_control_look->DrawButtonBackground(this, rect, rect, base);
+	}
+
+	float left = 0;
+
 	for (int32 i = 0; i < CountTabs(); i++) {
-		TabAt(i)->DrawTab(this, TabFrame(i),
+		BRect tabFrame = TabFrame(i);
+		TabAt(i)->DrawTab(this, tabFrame,
 			i == fSelection ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			i + 1 != fSelection);
+		left = tabFrame.right;
+	}
+
+	if (be_control_look != NULL) {
+		BRect frame(Bounds());
+		frame.left = left;
+		frame.bottom = fTabHeight;
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 borders = BControlLook::B_TOP_BORDER
+			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
+		if (left == 0)
+			borders |= BControlLook::B_LEFT_BORDER;
+		be_control_look->DrawInctiveTab(this, frame, frame, base, 0, borders);
 	}
 
 	if (fSelection < CountTabs())
@@ -808,6 +871,24 @@ BTabView::DrawTabs()
 void
 BTabView::DrawBox(BRect selTabRect)
 {
+	if (be_control_look != NULL) {
+		BRect rect(Bounds());
+		rect.top = selTabRect.bottom;
+
+//		BRegion clipping(Bounds());
+//		selTabRect.left += 2;
+//		selTabRect.right -= 2;
+//		clipping.Exclude(selTabRect);
+//		ConstrainClippingRegion(&clipping);
+
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		be_control_look->DrawGroupFrame(this, rect, rect, base);
+
+//		ConstrainClippingRegion(NULL);
+
+		return;
+	}
+
 	BRect rect = Bounds();
 	BRect lastTabRect = TabFrame(CountTabs() - 1);
 
@@ -869,6 +950,38 @@ BTabView::DrawBox(BRect selTabRect)
 BRect
 BTabView::TabFrame(int32 tab_index) const
 {
+	if (be_control_look != NULL) {
+		float width = 100.0;
+		float height = fTabHeight;;
+		switch (fTabWidthSetting) {
+			case B_WIDTH_FROM_LABEL:
+			{
+				float x = 0.0;
+				for (int32 i = 0; i < tab_index; i++){
+					x += StringWidth(TabAt(i)->Label()) + 20.0;
+				}
+	
+				return BRect(x, 0.0,
+					x + StringWidth(TabAt(tab_index)->Label()) + 20.0,
+					height);
+			}
+	
+			case B_WIDTH_FROM_WIDEST:
+				width = 0.0;
+				for (int32 i = 0; i < CountTabs(); i++) {
+					float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0;
+					if (tabWidth > width)
+						width = tabWidth;
+				}
+				// fall through
+
+			case B_WIDTH_AS_USUAL:
+			default:
+				return BRect(tab_index * width, 0.0,
+					tab_index * width + width, height);
+		}
+	}
+
 	// TODO: fix to remove "offset" in DrawTab and DrawLabel ...
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
@@ -1128,7 +1241,8 @@ BTabView::ViewForTab(int32 tabIndex) const
 void
 BTabView::_InitObject(bool layouted, button_width width)
 {
-	SetFont(be_bold_font);
+	if (!be_control_look)
+		SetFont(be_bold_font);
 
 	fTabList = new BList;
 
@@ -1149,7 +1263,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 	if (layouted) {
 		BGroupLayout* layout = new(std::nothrow) BGroupLayout(B_HORIZONTAL);
 		if (layout) {
-			layout->SetInsets(3.0, 3.0 + TabHeight(), 3.0, 3.0);
+			layout->SetInsets(3.0, 3.0 + TabHeight() - 1, 3.0, 3.0);
 			SetLayout(layout);
 		}
 

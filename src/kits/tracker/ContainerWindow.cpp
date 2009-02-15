@@ -39,6 +39,7 @@ All rights reserved.
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -499,11 +500,18 @@ DraggableContainerIcon::FrameMoved(BPoint /*newLocation*/)
 
 
 void
-DraggableContainerIcon::Draw(BRect /*updateRect*/)
+DraggableContainerIcon::Draw(BRect updateRect)
 {
 	BContainerWindow *window = dynamic_cast<BContainerWindow *>(Window());
 	if (window == NULL)
 		return;
+
+	if (be_control_look != NULL) {
+		BRect rect(Bounds());
+		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+		be_control_look->DrawMenuBarBackground(this, rect, updateRect, base,
+			0);
+	}
 
 	// Draw the icon, straddling the border
 #ifdef __HAIKU__
@@ -910,8 +918,8 @@ BContainerWindow::Init(const BMessage *message)
 		fPoseView->MoveTo(BPoint(0, navigatorDelta + y_delta));
 		fPoseView->ResizeBy(0, -(y_delta));
 		if (fPoseView->VScrollBar()) {
-			fPoseView->VScrollBar()->MoveBy(0, KeyMenuBar()->Bounds().Height() + 1);
-			fPoseView->VScrollBar()->ResizeBy(0, -(KeyMenuBar()->Bounds().Height() + 1));
+			fPoseView->VScrollBar()->MoveBy(0, KeyMenuBar()->Bounds().Height());
+			fPoseView->VScrollBar()->ResizeBy(0, -(KeyMenuBar()->Bounds().Height()));
 		}
 
 		// add folder icon to menu bar

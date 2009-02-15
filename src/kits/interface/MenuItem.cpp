@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Bitmap.h>
 #include <MenuItem.h>
 #include <Shape.h>
@@ -478,27 +479,44 @@ BMenuItem::Draw()
 	bool enabled = IsEnabled();
 	bool selected = IsSelected();
 
-//	rgb_color noTint = ui_color(B_MENU_BACKGROUND_COLOR);
-// TODO: the above is currently broken, because ui_color is
-// not informed of changes to the app_server palette yet
 	rgb_color noTint = fSuper->LowColor();
 	rgb_color bgColor = noTint;
 
+	if (be_control_look != NULL)
+		fSuper->SetDrawingMode(B_OP_OVER);
+
 	// set low color and fill background if selected
-	if (selected && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
-//		bgColor = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
-// see above
+	bool activated = selected && (enabled || Submenu())
+		/*&& fSuper->fRedrawAfterSticky*/;
+	if (activated) {
 		bgColor = tint_color(bgColor, B_DARKEN_3_TINT);
+		if (be_control_look != NULL) {
+			BRect rect = Frame();
+			be_control_look->DrawMenuItemBackground(fSuper, rect, rect,
+				noTint, BControlLook::B_ACTIVATED);
+		} else {
+			fSuper->SetLowColor(bgColor);
+			fSuper->FillRect(Frame(), B_SOLID_LOW);
+		}
+	} else {
 		fSuper->SetLowColor(bgColor);
-		fSuper->FillRect(Frame(), B_SOLID_LOW);
-	} else
-		fSuper->SetLowColor(bgColor);
+	}
 
 	// set high color
-	if (enabled)
-		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	else
-		fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
+	if (be_control_look != NULL) {
+		if (enabled) {
+			fSuper->SetHighColor(tint_color(fSuper->LowColor(),
+				B_DARKEN_MAX_TINT));
+		} else {
+			fSuper->SetHighColor(tint_color(fSuper->LowColor(),
+				B_DISABLED_LABEL_TINT));
+		}
+	} else {
+		if (enabled)
+			fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+		else
+			fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
+	}
 
 	// draw content
 	fSuper->MovePenTo(ContentLocation());
@@ -719,9 +737,6 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 	r.left = floorf(center.x - size / 2 + 0.5);
 	r.right = floorf(center.x + size / 2 + 0.5);
 
-	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
-	fSuper->FillRoundRect(r, 2, 2);
-
 	BShape arrowShape;
 	center.x += 0.5;
 	center.y += 0.5;
@@ -818,9 +833,6 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 	r.bottom = floorf(center.y + size / 2 + 0.5);
 	r.left = floorf(center.x - size / 2 + 0.5);
 	r.right = floorf(center.x + size / 2 + 0.5);
-
-	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
-	fSuper->FillRoundRect(r, 2, 2);
 
 	BShape arrowShape;
 	center.x += 0.5;

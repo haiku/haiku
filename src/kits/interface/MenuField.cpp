@@ -8,13 +8,15 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
+#include <MenuField.h>
+
 #include <stdlib.h>
 #include <string.h>
 
 #include <AbstractLayoutItem.h>
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
-#include <MenuField.h>
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
@@ -259,14 +261,23 @@ void
 BMenuField::Draw(BRect update)
 {
 	BRect bounds(Bounds());
-	bool active = false;
-
-	if (IsFocus())
-		active = Window()->IsActive();
+	bool active = IsFocus() && Window()->IsActive();
 
 	DrawLabel(bounds, update);
 
 	BRect frame(fMenuBar->Frame());
+
+	if (be_control_look != NULL) {
+		frame.InsetBy(-kVMargin, -kVMargin);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = 0;
+		if (!fMenuBar->IsEnabled())
+			flags |= BControlLook::B_DISABLED;
+		if (active)
+			flags |= BControlLook::B_FOCUSED;
+		be_control_look->DrawButtonFrame(this, frame, update, base, flags);
+		return;
+	}
 
 	if (frame.InsetByCopy(-kVMargin, -kVMargin).Intersects(update)) {
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));

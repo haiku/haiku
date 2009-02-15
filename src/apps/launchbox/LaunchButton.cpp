@@ -253,8 +253,8 @@ LaunchButton::PreferredSize()
 	float minWidth = fIconSize;
 	float minHeight = fIconSize;
 
-	float hPadding = max_c(4.0, ceilf(minHeight / 4.0));
-	float vPadding = max_c(4.0, ceilf(minWidth / 4.0));
+	float hPadding = max_c(6.0, ceilf(minHeight / 3.0));
+	float vPadding = max_c(6.0, ceilf(minWidth / 3.0));
 
 	if (fLabel.CountChars() > 0) {
 		font_height fh;

@@ -647,7 +647,7 @@ BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 	// Check if it's a "click'n'move
 	if (_PerformMouseMoved(where, code))
 		return;
-		
+
 	bool sync = false;
 	switch (code) {
 		// We force a sync when the mouse enters the view

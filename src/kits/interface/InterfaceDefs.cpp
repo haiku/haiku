@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
@@ -932,6 +933,9 @@ _init_interface_kit_()
 	if (status < B_OK)
 		return status;
 
+	// TODO: Could support different themes here in the future.
+	be_control_look = new BControlLook();
+
 	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
 
 	_init_global_fonts_();
@@ -957,6 +961,9 @@ _fini_interface_kit_()
 {
 	delete BPrivate::gWidthBuffer;
 	BPrivate::gWidthBuffer = NULL;
+
+	delete be_control_look;
+	be_control_look = NULL;
 
 	// TODO: Anything else?
 

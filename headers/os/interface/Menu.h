@@ -206,8 +206,10 @@ private:
 
 			BRect			_CalcFrame(BPoint where, bool* scrollOn);
 
+protected:
 			void			_DrawItems(BRect updateRect);
 
+private:
 			bool			_OverSuper(BPoint loc);
 			bool			_OverSubmenu(BMenuItem* item, BPoint loc);
 			BPrivate::BMenuWindow* _MenuWindow();

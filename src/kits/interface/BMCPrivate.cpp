@@ -7,9 +7,11 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include <BMCPrivate.h>
+
 #include <stdio.h>
 
-#include <BMCPrivate.h>
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -122,12 +124,44 @@ _BMCMenuBar_::AttachedToWindow()
 	if (fFixedSize)
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	Window()->SetKeyMenuBar(menuBar);
+
+	float left, top, right, bottom;
+	GetItemMargins(&left, &top, &right, &bottom);
+
+	// TODO: Better fix would be to make BMenuItem draw text properly
+	// centered
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	top = ceilf((Bounds().Height() - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2) + 1;
+	bottom = top - 1;
+
+	if (be_control_look)
+		left = right = be_control_look->DefaultLabelSpacing();
+
+	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);
 }
 
 
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
+	if (be_control_look != NULL) {
+		BRect rect(Bounds());
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = 0;
+		if (!IsEnabled())
+			flags |= BControlLook::B_DISABLED;
+		if (IsFocus())
+			flags |= BControlLook::B_FOCUSED;
+		be_control_look->DrawMenuFieldBackground(this, rect,
+			updateRect, base, fShowPopUpMarker, flags);
+
+		_DrawItems(updateRect);		
+
+		return;
+	}
+
 	if (!fShowPopUpMarker) {
 		BMenuBar::Draw(updateRect);
 		return;

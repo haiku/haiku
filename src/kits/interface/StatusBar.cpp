@@ -15,11 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Message.h>
-#include <Region.h>
-
+#include <ControlLook.h>
 #include <Layout.h>
 #include <LayoutUtils.h>
+#include <Message.h>
+#include <Region.h>
 
 #include <binary_compatibility/Interface.h>
 
@@ -265,6 +265,12 @@ BStatusBar::Draw(BRect updateRect)
 
 	rect = outerFrame;
 
+	if (be_control_look != NULL) {
+		be_control_look->DrawStatusBar(this, rect, updateRect,
+			backgroundColor, fBarColor, _BarPosition(barFrame));
+		return;
+	}
+
 	// First bevel
 	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_1_TINT));
 	StrokeLine(rect.LeftBottom(), rect.LeftTop());
@@ -410,6 +416,10 @@ BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 		update.left = floorf(max_c(newPosition - 1, update.left));
 		update.right = ceilf(oldPosition);
 	}
+
+	// TODO: Ask the BControlLook in the first place about dirty rect.
+	if (be_control_look)
+		update.InsetBy(-1, -1);
 
 	Invalidate(update);
 }
@@ -794,6 +804,7 @@ BStatusBar::_BarPosition(const BRect& barFrame) const
 	if (fCurrent == 0)
 		return barFrame.left - 1;
 
-	return roundf(barFrame.left + ceilf(fCurrent * barFrame.Width() / fMax));
+	return roundf(barFrame.left - 1
+		+ (fCurrent * (barFrame.Width() + 3) / fMax));
 }
 

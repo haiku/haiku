@@ -177,6 +177,7 @@ class BSlider : public BControl {
 
 				BSlider&	operator=(const BSlider &);
 
+				void		_InitBarColor();
 				void		_InitObject();
 
 	private:

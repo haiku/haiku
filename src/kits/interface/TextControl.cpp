@@ -10,12 +10,13 @@
 
 /*!	BTextControl displays text that can act like a control. */
 
+#include <TextControl.h>
 
 #include <AbstractLayoutItem.h>
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <Region.h>
-#include <TextControl.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -316,6 +317,34 @@ BTextControl::Divider() const
 void
 BTextControl::Draw(BRect updateRect)
 {
+	bool enabled = IsEnabled();
+	bool active = fText->IsFocus() && Window()->IsActive();
+
+	BRect rect = fText->Frame();
+	rect.InsetBy(-2, -2);
+
+	if (be_control_look != NULL) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = 0;
+		if (!enabled)
+			flags |= BControlLook::B_DISABLED;
+		if (active)
+			flags |= BControlLook::B_FOCUSED;
+		be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
+			flags);
+
+		rect = Bounds();
+		rect.right = fDivider - kLabelInputSpacing;
+//		rect.right = fText->Frame().left - 2;
+//		rect.right -= 3;//be_control_look->DefaultLabelSpacing();
+		be_control_look->DrawLabel(this, Label(), rect, updateRect,
+			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
+
+		return;
+	}
+
+	// outer bevel
+
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
 	rgb_color lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
@@ -324,17 +353,6 @@ BTextControl::Draw(BRect updateRect)
 	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
 	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-
-	bool enabled = IsEnabled();
-	bool active = false;
-
-	if (fText->IsFocus() && Window()->IsActive())
-		active = true;
-
-	// outer bevel
-
-	BRect rect = fText->Frame();
-	rect.InsetBy(-2, -2);
 
 	if (enabled)
 		SetHighColor(darken1);

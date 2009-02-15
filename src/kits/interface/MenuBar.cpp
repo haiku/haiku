@@ -1,18 +1,20 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
-
-#include <math.h>
 
 #include <MenuBar.h>
 
+#include <math.h>
+
 #include <Application.h>
 #include <Autolock.h>
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuItem.h>
 #include <Window.h>
@@ -146,6 +148,20 @@ BMenuBar::Draw(BRect updateRect)
 {
 	if (_RelayoutIfNeeded()) {
 		Invalidate();
+		return;
+	}
+
+	if (be_control_look != NULL) {
+		BRect rect(Bounds());
+		rgb_color base = LowColor();
+		uint32 flags = 0;
+
+		be_control_look->DrawBorder(this, rect, updateRect, base,
+			B_PLAIN_BORDER, flags, BControlLook::B_BOTTOM_BORDER);
+
+		be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
+
+		_DrawItems(updateRect);
 		return;
 	}
 

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <InterfaceDefs.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -168,7 +169,12 @@ _BTextInput_::AlignTextRect()
 	BRect textRect(Bounds());
 	textRect.left = 0.0;
 	float vInset = max_c(1, floorf((textRect.Height() - LineHeight(0)) / 2.0));
-	textRect.InsetBy(2, vInset);
+	float hInset = 2;
+
+	if (be_control_look)
+		hInset = be_control_look->DefaultLabelSpacing();
+
+	textRect.InsetBy(hInset, vInset);
 	SetTextRect(textRect);
 }
 

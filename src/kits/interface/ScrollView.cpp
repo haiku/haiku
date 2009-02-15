@@ -2,12 +2,14 @@
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <ScrollView.h>
 
 #include <stdio.h>
 
+#include <ControlLook.h>
 #include <LayoutUtils.h>
-#include <ScrollView.h>
 #include <Message.h>
+#include <Region.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -89,6 +91,9 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	fHorizontalScrollBar = NULL;
 	fVerticalScrollBar = NULL;
 	fHighlighted = false;
+
+	if (be_control_look != NULL)
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BRect targetFrame;
 	if (fTarget) {
@@ -218,6 +223,43 @@ BScrollView::AllDetached()
 void
 BScrollView::Draw(BRect updateRect)
 {
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (fHighlighted && Window()->IsActive())
+			flags |= BControlLook::B_FOCUSED;
+		BRect rect(Bounds());
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		if (fBorder == B_FANCY_BORDER
+			&& fHorizontalScrollBar && fVerticalScrollBar) {
+			BRect scrollCornerRect(rect);
+			scrollCornerRect.left = fHorizontalScrollBar->Frame().right + 2;
+			scrollCornerRect.top = fVerticalScrollBar->Frame().bottom + 2;
+			BRegion region(rect);
+			region.Exclude(scrollCornerRect);
+			ConstrainClippingRegion(&region);
+		}
+
+		be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
+			flags);
+
+		if (fBorder == B_FANCY_BORDER
+			&& fHorizontalScrollBar && fVerticalScrollBar) {
+			ConstrainClippingRegion(NULL);
+
+			rect = Bounds().InsetByCopy(1, 1);
+			rect.right = fHorizontalScrollBar->Frame().right + 1;
+			be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
+				flags, BControlLook::B_RIGHT_BORDER);
+
+			rect = Bounds().InsetByCopy(1, 1);
+			rect.bottom = fVerticalScrollBar->Frame().bottom + 1;
+			be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
+				flags, BControlLook::B_BOTTOM_BORDER);
+		}
+
+		return;
+	}
+
 	if (fBorder == B_PLAIN_BORDER) {
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 		StrokeRect(Bounds());
@@ -339,7 +381,15 @@ BScrollView::SetBorderHighlighted(bool state)
 
 	fHighlighted = state;
 
+	if (fHorizontalScrollBar != NULL)
+		fHorizontalScrollBar->SetBorderHighlighted(state);
+	if (fVerticalScrollBar != NULL)
+		fVerticalScrollBar->SetBorderHighlighted(state);
+
 	BRect bounds = Bounds();
+	if (be_control_look != NULL)
+		bounds.InsetBy(1, 1);
+
 	Invalidate(BRect(bounds.left, bounds.top, bounds.right, bounds.top));
 	Invalidate(BRect(bounds.left, bounds.top + 1, bounds.left,
 		bounds.bottom - 1));
@@ -444,10 +494,21 @@ BScrollView::FrameResized(float width, float height)
 	if (fBorder == B_NO_BORDER)
 		return;
 
-	// changes in width
-
 	BRect bounds = Bounds();
 	float border = _BorderSize() - 1;
+
+	if (be_control_look && fHorizontalScrollBar && fVerticalScrollBar) {
+		BRect scrollCorner(bounds);
+		scrollCorner.left = min_c(
+			fPreviousWidth - fVerticalScrollBar->Frame().Height(),
+			fHorizontalScrollBar->Frame().right + 1);
+		scrollCorner.top = min_c(
+			fPreviousHeight - fHorizontalScrollBar->Frame().Width(),
+			fVerticalScrollBar->Frame().bottom + 1);
+		Invalidate(scrollCorner);
+	}
+
+	// changes in width
 
 	if (bounds.Width() > fPreviousWidth) {
 		// invalidate the region between the old and the new right border

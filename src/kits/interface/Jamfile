@@ -55,6 +55,7 @@ MergeObject <libbe>interface_kit.o :
 	ColorControl.cpp
 	ColorTools.cpp
 	Control.cpp
+	ControlLook.cpp
 	Deskbar.cpp
 	Dragger.cpp
 	Font.cpp

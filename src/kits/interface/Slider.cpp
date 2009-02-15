@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Errors.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -48,10 +49,7 @@ BSlider::BSlider(BRect frame, const char* name, const char* label,
 	fOrientation(B_HORIZONTAL),
 	fBarThickness(6.0)
 {
-	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT));
-
-	UseFillColor(false, NULL);
+	_InitBarColor();
 
 	_InitObject();
 	SetValue(0);
@@ -81,10 +79,7 @@ BSlider::BSlider(BRect frame, const char *name, const char *label,
 	fOrientation(posture),
 	fBarThickness(6.0)
 {
-	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT));
-
-	UseFillColor(false, NULL);
+	_InitBarColor();
 
 	_InitObject();
 	SetValue(0);
@@ -113,10 +108,7 @@ BSlider::BSlider(const char *name, const char *label, BMessage *message,
 	fOrientation(posture),
 	fBarThickness(6.0)
 {
-	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT));
-
-	UseFillColor(false, NULL);
+	_InitBarColor();
 
 	_InitObject();
 	SetValue(0);
@@ -209,6 +201,21 @@ BSlider::~BSlider()
 	delete fModificationMessage;
 	free(fMinLimitLabel);
 	free(fMaxLimitLabel);
+}
+
+
+void
+BSlider::_InitBarColor()
+{
+	if (be_control_look != NULL) {
+		SetBarColor(be_control_look->SliderBarColor(
+			ui_color(B_PANEL_BACKGROUND_COLOR)));
+	} else {
+		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_4_TINT));
+	}
+
+	UseFillColor(false, NULL);
 }
 
 
@@ -791,8 +798,17 @@ BSlider::Draw(BRect updateRect)
 	// ToDo: the triangle thumb doesn't delete its background, so we still have
 	// to do it Note, this also creates a different behaviour for subclasses,
 	// depending on the thumb style - if possible this should be avoided.
-	if (Style() == B_BLOCK_THUMB)
-		background.Exclude(ThumbFrame());
+	if (Style() == B_BLOCK_THUMB) {
+		BRect thumbFrame = ThumbFrame();
+		if (be_control_look != NULL) {
+			// fill background where shadow will be...
+			// TODO: Such drawint dependent behavior should be moved into
+			// BControlLook of course.
+			thumbFrame.right--;
+			thumbFrame.bottom--;
+		}
+		background.Exclude(thumbFrame);
+	}
 
 #if USE_OFF_SCREEN_VIEW
 	if (!fOffScreenBits)
@@ -848,6 +864,16 @@ BSlider::DrawBar()
 {
 	BRect frame = BarFrame();
 	BView *view = OffscreenView();
+
+	if (be_control_look != NULL) {
+		uint32 flags = be_control_look->Flags(this);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		rgb_color rightFillColor = fBarColor;
+		rgb_color leftFillColor = fUseFillColor ? fFillColor : fBarColor;
+		be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
+			rightFillColor, Position(), flags, fOrientation);
+		return;
+	}
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lightenmax;
@@ -973,6 +999,14 @@ BSlider::DrawHashMarks()
 
 	BRect frame = HashMarksFrame();
 	BView* view = OffscreenView();
+
+	if (be_control_look) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = be_control_look->Flags(this);
+		be_control_look->DrawSliderHashMarks(view, frame, frame, base,
+			fHashMarkCount, fHashMarks, flags, fOrientation);
+		return;
+	}
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lightenmax;
@@ -1685,6 +1719,14 @@ BSlider::_DrawBlockThumb()
 	BRect frame = ThumbFrame();
 	BView *view = OffscreenView();
 
+	if (be_control_look != NULL) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = be_control_look->Flags(this);
+		be_control_look->DrawSliderThumb(view, frame, frame, base, flags,
+			fOrientation);
+		return;
+	}
+
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lighten2;
 	rgb_color lighten1;
@@ -1810,6 +1852,14 @@ BSlider::_DrawTriangleThumb()
 {
 	BRect frame = ThumbFrame();
 	BView *view = OffscreenView();
+
+	if (be_control_look != NULL) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		uint32 flags = be_control_look->Flags(this);
+		be_control_look->DrawSliderTriangle(view, frame, frame, base, flags,
+			fOrientation);
+		return;
+	}
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lightenmax;

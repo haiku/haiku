@@ -56,6 +56,13 @@ public:
 			void				SetOrientation(enum orientation orientation);
 			orientation			Orientation() const;
 
+			// TODO: make this a virtual method, it should be one,
+			// but it's not important right now. This is supposed
+			// to be used in case the BScrollBar should draw part of
+			// the focus indication of the target view for aesthetical
+			// reasons. BScrollView will forward this method.
+			status_t			SetBorderHighlighted(bool state);
+
 	virtual void				MessageReceived(BMessage* message);
 	virtual	void				MouseDown(BPoint pt);
 	virtual	void				MouseUp(BPoint pt);

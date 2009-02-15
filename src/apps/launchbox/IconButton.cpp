@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Control.h>
+#include <ControlLook.h>
 #include <Entry.h>
 #include <Looper.h>
 #include <Message.h>
@@ -80,8 +81,47 @@ IconButton::Draw(BRect area)
 	rgb_color background = LowColor();
 	if (BView* parent = Parent())
 		background = parent->LowColor();
-	rgb_color lightShadow, shadow, darkShadow, light;
+
 	BRect r(Bounds());
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		BBitmap* bitmap = fNormalBitmap;
+		if (!IsEnabled()) {
+			flags |= BControlLook::B_DISABLED;
+			bitmap = fDisabledBitmap;
+		}
+		if (_HasFlags(STATE_PRESSED) || _HasFlags(STATE_FORCE_PRESSED))
+			flags |= BControlLook::B_ACTIVATED;
+
+		if (DrawBorder()) {
+			be_control_look->DrawButtonFrame(this, r, area, background, flags);
+			be_control_look->DrawButtonBackground(this, r, area, background,
+				flags);
+		} else {
+			SetHighColor(background);
+			FillRect(r);
+		}
+
+		if (bitmap && bitmap->IsValid()) {
+			float x = r.left + floorf((r.Width()
+				- bitmap->Bounds().Width()) / 2.0 + 0.5);
+			float y = r.top + floorf((r.Height()
+				- bitmap->Bounds().Height()) / 2.0 + 0.5);
+			BPoint point(x, y);
+			if (_HasFlags(STATE_PRESSED) || _HasFlags(STATE_FORCE_PRESSED))
+				point += BPoint(1.0, 1.0);
+			if (bitmap->ColorSpace() == B_RGBA32
+				|| bitmap->ColorSpace() == B_RGBA32_BIG) {
+				SetDrawingMode(B_OP_ALPHA);
+				SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+			}
+			DrawBitmap(bitmap, point);
+		}
+		return;
+	}
+
+	rgb_color lightShadow, shadow, darkShadow, light;
 	BBitmap* bitmap = fNormalBitmap;
 	// adjust colors and bitmap according to flags
 	if (IsEnabled()) {
@@ -151,7 +191,7 @@ IconButton::Draw(BRect area)
 	// background
 	SetDrawingMode(B_OP_COPY);
 	FillRect(r, B_SOLID_LOW);
-	ConstrainClippingRegion(&originalClippingRegion);
+	ConstrainClippingRegion(NULL);
 	// label
 	if (fLabel.CountChars() > 0) {
 		SetDrawingMode(B_OP_COPY);
@@ -243,8 +283,8 @@ IconButton::GetPreferredSize(float* width, float* height)
 	if (minHeight < MIN_SPACE)
 		minHeight = MIN_SPACE;
 
-	float hPadding = max_c(4.0, ceilf(minHeight / 4.0));
-	float vPadding = max_c(4.0, ceilf(minWidth / 4.0));
+	float hPadding = max_c(6.0, ceilf(minHeight / 4.0));
+	float vPadding = max_c(6.0, ceilf(minWidth / 4.0));
 
 	if (fLabel.CountChars() > 0) {
 		font_height fh;

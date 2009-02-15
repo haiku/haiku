@@ -11,6 +11,7 @@
 
 #include <CheckBox.h>
 
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <Window.h>
 
@@ -82,6 +83,26 @@ BCheckBox::Archive(BMessage *archive, bool deep) const
 void
 BCheckBox::Draw(BRect updateRect)
 {
+	if (be_control_look) {
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		uint32 flags = be_control_look->Flags(this);
+		if (fOutlined)
+			flags |= BControlLook::B_CLICKED;
+
+		BRect checkBoxRect(_CheckBoxFrame());
+		BRect rect(checkBoxRect);
+		be_control_look->DrawCheckBox(this, rect, updateRect,base, flags);
+
+		BRect labelRect(Bounds());
+		labelRect.left = checkBoxRect.right
+			+ be_control_look->DefaultLabelSpacing();
+
+		be_control_look->DrawLabel(this, Label(), labelRect, updateRect,
+			base, flags);
+		return;
+	}
+
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
@@ -551,7 +572,7 @@ BCheckBox::_CheckBoxFrame() const
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	return BRect(1.0f, 3.0f, ceilf(3.0f + fontHeight.ascent),
+	return BRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
 		ceilf(5.0f + fontHeight.ascent));
 }
 

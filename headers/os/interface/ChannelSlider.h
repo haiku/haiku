@@ -17,58 +17,67 @@
 #include <ChannelControl.h>
 
 
-class BChannelSlider : public BChannelControl
-{
+class BChannelSlider : public BChannelControl {
 public:
-							BChannelSlider(BRect area, const char* name,
-								const char* label, BMessage* message,
-								int32 channels = 1,
-								uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW);
-							BChannelSlider(BRect area, const char* name,
-								const char* label, BMessage* message,
-								orientation o, int32 channels = 1,
-								uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW);
-							BChannelSlider(BMessage* archive);
-virtual						~BChannelSlider();
+								BChannelSlider(BRect area, const char* name,
+									const char* label, BMessage* message,
+									int32 channels = 1,
+									uint32 resizeMode
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW);
+								BChannelSlider(BRect area, const char* name,
+									const char* label, BMessage* message,
+									enum orientation orientation,
+									int32 channels = 1,
+									uint32 resizeMode
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW);
+								BChannelSlider(const char* name,
+									const char* label, BMessage* message,
+									enum orientation orientation,
+									int32 channels = 1,
+									uint32 flags = B_WILL_DRAW);
+								BChannelSlider(BMessage* archive);
+	virtual						~BChannelSlider();
 
-static	BArchivable*		Instantiate(BMessage* from);
-virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 
-virtual	orientation			Orientation() const;
-		void				SetOrientation(orientation o);
+	virtual	orientation			Orientation() const;
+			void				SetOrientation(enum orientation orientation);
 
-virtual	int32				MaxChannelCount() const;
-virtual	bool				SupportsIndividualLimits() const;
+	virtual	int32				MaxChannelCount() const;
+	virtual	bool				SupportsIndividualLimits() const;
 
-virtual	void				AttachedToWindow();
-virtual	void				AllAttached();
-virtual	void				DetachedFromWindow();
-virtual	void				AllDetached();
+	virtual	void				AttachedToWindow();
+	virtual	void				AllAttached();
+	virtual	void				DetachedFromWindow();
+	virtual	void				AllDetached();
 
-virtual	void				MessageReceived(BMessage* msg);
+	virtual	void				MessageReceived(BMessage* message);
 
-virtual	void				Draw(BRect area);
-virtual	void				MouseDown(BPoint where);
-virtual	void				MouseUp(BPoint pt);
-virtual	void				MouseMoved(BPoint pt,uint32 code,
-								const BMessage* message);
-virtual	void				WindowActivated(bool state);
-virtual	void				KeyDown(const char* bytes, int32 numBytes);
-virtual	void				KeyUp(const char* bytes, int32 numBytes);
-virtual	void				FrameResized(float width, float height);
+	virtual	void				Draw(BRect area);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+	virtual	void				WindowActivated(bool state);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				KeyUp(const char* bytes, int32 numBytes);
+	virtual	void				FrameResized(float width, float height);
 
-virtual	void				SetFont(const BFont* font, uint32 mask = B_FONT_ALL);
-virtual	void				MakeFocus(bool focusState = true);
+	virtual	void				SetFont(const BFont* font,
+									uint32 mask = B_FONT_ALL);
+	virtual	void				MakeFocus(bool focusState = true);
 
-virtual	void				SetEnabled(bool on);
+	virtual	void				SetEnabled(bool on);
 
-virtual	void				GetPreferredSize(float* width, float* height);
+	virtual	void				GetPreferredSize(float* _width, float* _height);
 
-virtual	BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
-								BMessage* specifier, int32 form, const char* p);
-virtual	status_t			GetSupportedSuites(BMessage* data);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 form,
+									const char* p);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 							// Perform rendering for an entire slider channel.
 virtual	void				DrawChannel(BView* into, int32 channel, BRect area,

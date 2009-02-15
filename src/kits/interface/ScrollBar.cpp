@@ -12,6 +12,7 @@
 
 #include <ScrollBar.h>
 
+#include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <OS.h>
@@ -74,6 +75,7 @@ public:
 		fStopValue(0.0),
 		fUpArrowsEnabled(true),
 		fDownArrowsEnabled(true),
+		fBorderHighlighted(false),
 		fButtonDown(NOARROW)
 	{
 		#ifdef TEST_MODE
@@ -122,6 +124,8 @@ public:
 
 	bool				fUpArrowsEnabled;
 	bool				fDownArrowsEnabled;
+
+	bool				fBorderHighlighted;
 
 	int8				fButtonDown;
 };
@@ -584,6 +588,26 @@ BScrollBar::Orientation() const
 }
 
 
+status_t
+BScrollBar::SetBorderHighlighted(bool state)
+{
+	if (fPrivateData->fBorderHighlighted == state)
+		return B_OK;
+
+	fPrivateData->fBorderHighlighted = state;
+
+	BRect dirty(Bounds());
+	if (fOrientation == B_HORIZONTAL)
+		dirty.bottom = dirty.top;
+	else
+		dirty.right = dirty.left;
+
+	Invalidate(dirty);
+
+	return B_OK;
+}
+
+
 void
 BScrollBar::MessageReceived(BMessage* message)
 {
@@ -751,8 +775,33 @@ BScrollBar::Draw(BRect updateRect)
 
 	// stroke a dark frame arround the entire scrollbar
 	// (independent of enabled state)
+	// take care of border highlighting (scroll target is focus view)
 	SetHighColor(tint_color(normal, B_DARKEN_2_TINT));
-	StrokeRect(bounds);
+	if (fPrivateData->fBorderHighlighted && fPrivateData->fEnabled) {
+		rgb_color borderColor = HighColor();
+		rgb_color highlightColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+		BeginLineArray(4);
+		AddLine(BPoint(bounds.left + 1, bounds.bottom),
+			BPoint(bounds.right, bounds.bottom), borderColor);
+		AddLine(BPoint(bounds.right, bounds.top + 1),
+			BPoint(bounds.right, bounds.bottom - 1), borderColor);
+		if (fOrientation == B_HORIZONTAL) {
+			AddLine(BPoint(bounds.left, bounds.top + 1),
+				BPoint(bounds.left, bounds.bottom), borderColor);
+		} else {
+			AddLine(BPoint(bounds.left, bounds.top),
+				BPoint(bounds.left, bounds.bottom), highlightColor);
+		}
+		if (fOrientation == B_HORIZONTAL) {
+			AddLine(BPoint(bounds.left, bounds.top),
+				BPoint(bounds.right, bounds.top), highlightColor);
+		} else {
+			AddLine(BPoint(bounds.left + 1, bounds.top),
+				BPoint(bounds.right, bounds.top), borderColor);
+		}
+		EndLineArray();
+	} else
+		StrokeRect(bounds);
 	bounds.InsetBy(1.0, 1.0);
 
 	bool enabled = fPrivateData->fEnabled && fMin < fMax
@@ -842,163 +891,176 @@ BScrollBar::Draw(BRect updateRect)
 	// background for thumb area
 	BRect rect(fPrivateData->fThumbFrame);
 
-	// frame
-	if (fOrientation == B_HORIZONTAL) {
-		int32 totalLines = 0;
-		if (rect.left > thumbBG.left)
-			totalLines += 1;
-		if (rect.left > thumbBG.left + 1)
-			totalLines += 3;
-		if (rect.right < thumbBG.right - 1)
-			totalLines += 3;
-		if (rect.right < thumbBG.right)
-			totalLines += 1;
-
-		if (totalLines > 0) {
-			BeginLineArray(totalLines);
-				if (rect.left > thumbBG.left) {
-					AddLine(BPoint(thumbBG.left, thumbBG.bottom),
-							BPoint(thumbBG.left, thumbBG.top),
-							rect.left > thumbBG.left + 1 ? dark4 : dark);
-				}
-				if (rect.left > thumbBG.left + 1) {
-					AddLine(BPoint(thumbBG.left + 1, thumbBG.top + 1),
-							BPoint(thumbBG.left + 1, thumbBG.bottom), dark2);
-					AddLine(BPoint(thumbBG.left + 1, thumbBG.top),
-							BPoint(rect.left - 1, thumbBG.top), dark2);
-					AddLine(BPoint(rect.left - 1, thumbBG.bottom),
-							BPoint(thumbBG.left + 2, thumbBG.bottom), normal);
-				}
-
-				if (rect.right < thumbBG.right - 1) {
-					AddLine(BPoint(rect.right + 2, thumbBG.top + 1),
-							BPoint(rect.right + 2, thumbBG.bottom), dark2);
-					AddLine(BPoint(rect.right + 1, thumbBG.top),
-							BPoint(thumbBG.right, thumbBG.top), dark2);
-					AddLine(BPoint(thumbBG.right - 1, thumbBG.bottom),
-							BPoint(rect.right + 3, thumbBG.bottom), normal);
-				}
-				if (rect.right < thumbBG.right) {
-					AddLine(BPoint(thumbBG.right, thumbBG.top),
-							BPoint(thumbBG.right, thumbBG.bottom), dark);
-				}
+	if (be_control_look == NULL) {
+		if (fOrientation == B_HORIZONTAL) {
+			BeginLineArray(8);
+	
+			if (rect.left > thumbBG.left) {
+				AddLine(BPoint(thumbBG.left, thumbBG.bottom),
+						BPoint(thumbBG.left, thumbBG.top),
+						rect.left > thumbBG.left + 1 ? dark4 : dark);
+			}
+			if (rect.left > thumbBG.left + 1) {
+				AddLine(BPoint(thumbBG.left + 1, thumbBG.top + 1),
+						BPoint(thumbBG.left + 1, thumbBG.bottom), dark2);
+				AddLine(BPoint(thumbBG.left + 1, thumbBG.top),
+						BPoint(rect.left - 1, thumbBG.top), dark2);
+				AddLine(BPoint(rect.left - 1, thumbBG.bottom),
+						BPoint(thumbBG.left + 2, thumbBG.bottom), normal);
+			}
+	
+			if (rect.right < thumbBG.right - 1) {
+				AddLine(BPoint(rect.right + 2, thumbBG.top + 1),
+						BPoint(rect.right + 2, thumbBG.bottom), dark2);
+				AddLine(BPoint(rect.right + 1, thumbBG.top),
+						BPoint(thumbBG.right, thumbBG.top), dark2);
+				AddLine(BPoint(thumbBG.right - 1, thumbBG.bottom),
+						BPoint(rect.right + 3, thumbBG.bottom), normal);
+			}
+			if (rect.right < thumbBG.right) {
+				AddLine(BPoint(thumbBG.right, thumbBG.top),
+						BPoint(thumbBG.right, thumbBG.bottom), dark);
+			}
+	
 			EndLineArray();
-		}
-	} else {
-		int32 totalLines = 0;
-		if (rect.top > thumbBG.top)
-			totalLines += 1;
-		if (rect.top > thumbBG.top + 1)
-			totalLines += 3;
-		if (rect.bottom < thumbBG.bottom - 1)
-			totalLines += 3;
-		if (rect.bottom < thumbBG.bottom)
-			totalLines += 1;
-
-		if (totalLines > 0) {
-			BeginLineArray(totalLines);
-				if (rect.top > thumbBG.top) {
-					AddLine(BPoint(thumbBG.left, thumbBG.top),
-							BPoint(thumbBG.right, thumbBG.top),
-							rect.top > thumbBG.top + 1 ? dark4 : dark);
-				}
-				if (rect.top > thumbBG.top + 1) {
-					AddLine(BPoint(thumbBG.left + 1, thumbBG.top + 1),
-							BPoint(thumbBG.right, thumbBG.top + 1), dark2);
-					AddLine(BPoint(thumbBG.left, rect.top - 1),
-							BPoint(thumbBG.left, thumbBG.top + 1), dark2);
-					AddLine(BPoint(thumbBG.right, rect.top - 1),
-							BPoint(thumbBG.right, thumbBG.top + 2), normal);
-				}
-
-				if (rect.bottom < thumbBG.bottom - 1) {
-					AddLine(BPoint(thumbBG.left + 1, rect.bottom + 2),
-							BPoint(thumbBG.right, rect.bottom + 2), dark2);
-					AddLine(BPoint(thumbBG.left, rect.bottom + 1),
-							BPoint(thumbBG.left, thumbBG.bottom - 1), dark2);
-					AddLine(BPoint(thumbBG.right, rect.bottom + 3),
-							BPoint(thumbBG.right, thumbBG.bottom - 1), normal);
-				}
-				if (rect.bottom < thumbBG.bottom) {
-					AddLine(BPoint(thumbBG.left, thumbBG.bottom),
-							BPoint(thumbBG.right, thumbBG.bottom), dark);
-				}
+		} else {
+			BeginLineArray(8);
+	
+			if (rect.top > thumbBG.top) {
+				AddLine(BPoint(thumbBG.left, thumbBG.top),
+						BPoint(thumbBG.right, thumbBG.top),
+						rect.top > thumbBG.top + 1 ? dark4 : dark);
+			}
+			if (rect.top > thumbBG.top + 1) {
+				AddLine(BPoint(thumbBG.left + 1, thumbBG.top + 1),
+						BPoint(thumbBG.right, thumbBG.top + 1), dark2);
+				AddLine(BPoint(thumbBG.left, rect.top - 1),
+						BPoint(thumbBG.left, thumbBG.top + 1), dark2);
+				AddLine(BPoint(thumbBG.right, rect.top - 1),
+						BPoint(thumbBG.right, thumbBG.top + 2), normal);
+			}
+	
+			if (rect.bottom < thumbBG.bottom - 1) {
+				AddLine(BPoint(thumbBG.left + 1, rect.bottom + 2),
+						BPoint(thumbBG.right, rect.bottom + 2), dark2);
+				AddLine(BPoint(thumbBG.left, rect.bottom + 1),
+						BPoint(thumbBG.left, thumbBG.bottom - 1), dark2);
+				AddLine(BPoint(thumbBG.right, rect.bottom + 3),
+						BPoint(thumbBG.right, thumbBG.bottom - 1), normal);
+			}
+			if (rect.bottom < thumbBG.bottom) {
+				AddLine(BPoint(thumbBG.left, thumbBG.bottom),
+						BPoint(thumbBG.right, thumbBG.bottom), dark);
+			}
+	
 			EndLineArray();
 		}
 	}
-
 	SetHighColor(dark1);
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (!enabled)
+			flags |= BControlLook::B_DISABLED;
+
+		// fill background besides the thumb
+		if (fOrientation == B_HORIZONTAL) {
+			BRect leftOfThumb(thumbBG.left, thumbBG.top, rect.left - 1,
+				thumbBG.bottom);
+			BRect rightOfThumb(rect.right + 1, thumbBG.top, thumbBG.right,
+				thumbBG.bottom);
+
+			be_control_look->DrawScrollBarBackground(this, leftOfThumb,
+				rightOfThumb, updateRect, normal, flags, fOrientation);
+		} else {
+			BRect topOfThumb(thumbBG.left, thumbBG.top,
+				thumbBG.right, rect.top - 1);
+
+			BRect bottomOfThumb(thumbBG.left, rect.bottom + 1,
+				thumbBG.right, thumbBG.bottom);
+
+			be_control_look->DrawScrollBarBackground(this, topOfThumb,
+				bottomOfThumb, updateRect, normal, flags, fOrientation);
+		}
+	}
 
 	// Draw scroll thumb
 	if (enabled) {
-		// fill and additional dark lines
-		thumbBG.InsetBy(1.0, 1.0);
-		if (fOrientation == B_HORIZONTAL) {
-			BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1,
-				thumbBG.bottom);
-			if (leftOfThumb.IsValid())
-				FillRect(leftOfThumb);
-
-			BRect rightOfThumb(rect.right + 3, thumbBG.top, thumbBG.right,
-				thumbBG.bottom);
-			if (rightOfThumb.IsValid())
-				FillRect(rightOfThumb);
-
-			// dark lines before and after thumb
-			if (rect.left > thumbBG.left) {
-				SetHighColor(dark);
-				StrokeLine(BPoint(rect.left - 1, rect.top),
-					BPoint(rect.left - 1, rect.bottom));
-			}
-			if (rect.right < thumbBG.right) {
-				SetHighColor(dark4);
-				StrokeLine(BPoint(rect.right + 1, rect.top),
-					BPoint(rect.right + 1, rect.bottom));
-			}
-		} else {
-			BRect topOfThumb(thumbBG.left, thumbBG.top + 1,
-				thumbBG.right, rect.top - 1);
-			if (topOfThumb.IsValid())
-				FillRect(topOfThumb);
-
-			BRect bottomOfThumb(thumbBG.left, rect.bottom + 3,
-				thumbBG.right, thumbBG.bottom);
-			if (bottomOfThumb.IsValid())
-				FillRect(bottomOfThumb);
-
-			// dark lines before and after thumb
-			if (rect.top > thumbBG.top) {
-				SetHighColor(dark);
-				StrokeLine(BPoint(rect.left, rect.top - 1),
-					BPoint(rect.right, rect.top - 1));
-			}
-			if (rect.bottom < thumbBG.bottom) {
-				SetHighColor(dark4);
-				StrokeLine(BPoint(rect.left, rect.bottom + 1),
-					BPoint(rect.right, rect.bottom + 1));
+		if (be_control_look == NULL) {
+			// fill and additional dark lines
+			thumbBG.InsetBy(1.0, 1.0);
+			if (fOrientation == B_HORIZONTAL) {
+				BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1,
+					thumbBG.bottom);
+				if (leftOfThumb.IsValid())
+					FillRect(leftOfThumb);
+	
+				BRect rightOfThumb(rect.right + 3, thumbBG.top, thumbBG.right,
+					thumbBG.bottom);
+				if (rightOfThumb.IsValid())
+					FillRect(rightOfThumb);
+	
+				// dark lines before and after thumb
+				if (rect.left > thumbBG.left) {
+					SetHighColor(dark);
+					StrokeLine(BPoint(rect.left - 1, rect.top),
+						BPoint(rect.left - 1, rect.bottom));
+				}
+				if (rect.right < thumbBG.right) {
+					SetHighColor(dark4);
+					StrokeLine(BPoint(rect.right + 1, rect.top),
+						BPoint(rect.right + 1, rect.bottom));
+				}
+			} else {
+				BRect topOfThumb(thumbBG.left, thumbBG.top + 1,
+					thumbBG.right, rect.top - 1);
+				if (topOfThumb.IsValid())
+					FillRect(topOfThumb);
+	
+				BRect bottomOfThumb(thumbBG.left, rect.bottom + 3,
+					thumbBG.right, thumbBG.bottom);
+				if (bottomOfThumb.IsValid())
+					FillRect(bottomOfThumb);
+	
+				// dark lines before and after thumb
+				if (rect.top > thumbBG.top) {
+					SetHighColor(dark);
+					StrokeLine(BPoint(rect.left, rect.top - 1),
+						BPoint(rect.right, rect.top - 1));
+				}
+				if (rect.bottom < thumbBG.bottom) {
+					SetHighColor(dark4);
+					StrokeLine(BPoint(rect.left, rect.bottom + 1),
+						BPoint(rect.right, rect.bottom + 1));
+				}
 			}
 		}
 
-		BeginLineArray(4);
-			AddLine(BPoint(rect.left, rect.bottom),
-					BPoint(rect.left, rect.top), light);
-			AddLine(BPoint(rect.left + 1, rect.top),
-					BPoint(rect.right, rect.top), light);
-			AddLine(BPoint(rect.right, rect.top + 1),
-					BPoint(rect.right, rect.bottom), dark1);
-			AddLine(BPoint(rect.right - 1, rect.bottom),
-					BPoint(rect.left + 1, rect.bottom), dark1);
-		EndLineArray();
-
-		// fill
-		rect.InsetBy(1.0, 1.0);
-		/*if (fPrivateData->fButtonDown == THUMB)
-			SetHighColor(tint_color(normal, (B_NO_TINT + B_DARKEN_1_TINT) / 2));
-		else*/
-			SetHighColor(normal);
-
-		FillRect(rect);
-
+		// fill the clickable surface of the thumb
+		if (be_control_look) {
+			be_control_look->DrawButtonBackground(this, rect, updateRect,
+				normal, 0, BControlLook::B_ALL_BORDERS, fOrientation);
+		} else {
+			BeginLineArray(4);
+				AddLine(BPoint(rect.left, rect.bottom),
+						BPoint(rect.left, rect.top), light);
+				AddLine(BPoint(rect.left + 1, rect.top),
+						BPoint(rect.right, rect.top), light);
+				AddLine(BPoint(rect.right, rect.top + 1),
+						BPoint(rect.right, rect.bottom), dark1);
+				AddLine(BPoint(rect.right - 1, rect.bottom),
+						BPoint(rect.left + 1, rect.bottom), dark1);
+			EndLineArray();
+	
+			// fill
+			rect.InsetBy(1.0, 1.0);
+			/*if (fPrivateData->fButtonDown == THUMB)
+				SetHighColor(tint_color(normal, (B_NO_TINT + B_DARKEN_1_TINT) / 2));
+			else*/
+				SetHighColor(normal);
+	
+			FillRect(rect);
+		}
 		// TODO: Add the other thumb styles - dots and lines
 	} else {
 		if (fMin >= fMax || fProportion >= 1.0 || fProportion < 0.0) {
@@ -1708,8 +1770,18 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	}
 
 	r.InsetBy(-(hInset - 1), -(vInset - 1));
-	SetHighColor(normal);
-	FillRect(r);
+	if (be_control_look != NULL) {
+		BRect temp(r.InsetByCopy(-1, -1));
+		uint32 flags = 0;
+		if (down)
+			flags |= BControlLook::B_ACTIVATED;
+		be_control_look->DrawButtonBackground(this, temp, updateRect,
+			down ? c : normal, flags, BControlLook::B_ALL_BORDERS,
+			fOrientation);
+	} else {
+		SetHighColor(normal);
+		FillRect(r);
+	}
 
 	BShape arrowShape;
 	arrowShape.MoveTo(tri1);
@@ -1720,6 +1792,9 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	SetPenSize(ceilf(hInset / 2.0));
 	StrokeShape(&arrowShape);
 	SetPenSize(1.0);
+
+	if (be_control_look != NULL)
+		return;
 
 	r.InsetBy(-1, -1);
 	BeginLineArray(4);

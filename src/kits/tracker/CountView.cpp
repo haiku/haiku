@@ -37,6 +37,7 @@ All rights reserved.
 #include "CountView.h"
 
 #include <Application.h>
+#include <ControlLook.h>
 
 #include "AutoLock.h"
 #include "Bitmaps.h"
@@ -179,9 +180,19 @@ BCountView::CheckCount()
 
 
 void
-BCountView::Draw(BRect)
+BCountView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
+
+	if (be_control_look != NULL) {
+		rgb_color base = ViewColor();
+		SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+		StrokeLine(bounds.LeftTop(), bounds.RightTop());
+		bounds.top++;
+		be_control_look->DrawMenuBarBackground(this, bounds, updateRect,
+			ViewColor());
+	}
+
 	BString itemString;
 	if (!IsTypingAhead()) {
 		if (fLastCount == 0) 
@@ -214,13 +225,16 @@ BCountView::Draw(BRect)
 	rgb_color lightShadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
 
 	BeginLineArray(fShowingBarberPole && !fStartSpinningAfter ? 9 : 5);
-	AddLine(bounds.LeftTop(), bounds.RightTop(), light);
-	AddLine(bounds.LeftTop(), bounds.LeftBottom(), light);
-	bounds.top--;
 
-	AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
-	AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(), lightShadow);
-	AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
+	if (be_control_look == NULL) {
+		AddLine(bounds.LeftTop(), bounds.RightTop(), light);
+		AddLine(bounds.LeftTop(), bounds.LeftBottom(), light);
+		bounds.top--;
+	
+		AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
+		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(), lightShadow);
+		AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
+	}
 
 	if (!fShowingBarberPole || fStartSpinningAfter) {
 		EndLineArray();
