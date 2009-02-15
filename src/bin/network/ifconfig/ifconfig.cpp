@@ -210,7 +210,8 @@ bool
 prepare_request(struct ifreq& request, const char* name)
 {
 	if (strlen(name) > IF_NAMESIZE) {
-		fprintf(stderr, "%s: interface name \"%s\" is too long.\n", kProgramName, name);
+		fprintf(stderr, "%s: interface name \"%s\" is too long.\n", kProgramName,
+			name);
 		return false;
 	}
 
@@ -259,7 +260,8 @@ list_interface(int socket, const char* name)
 		return;
 
 	if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) < 0) {
-		fprintf(stderr, "%s: Interface \"%s\" does not exist.\n", kProgramName, name);
+		fprintf(stderr, "%s: Interface \"%s\" does not exist.\n", kProgramName,
+			name);
 		return;
 	}
 
@@ -282,7 +284,8 @@ list_interface(int socket, const char* name)
 
 		if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) == 0) {
 			prepare_request(request, request.ifr_parameter.device);
-			if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) == 0) {
+			if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
+					== 0) {
 				sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
 
 				switch (link.sdl_type) {
@@ -715,13 +718,11 @@ configure_interface(int socket, const char* name, char* const* args,
 
 	// set flags
 
-	if (hasAddress || hasMask || hasBroadcast || hasPeer) {
+	if (hasAddress || hasMask || hasBroadcast || hasPeer)
 		removeFlags = IFF_AUTO_CONFIGURED | IFF_CONFIGURING;
-	}
-printf("set flags: current %x, remove %x, add %x\n", currentFlags, removeFlags, addFlags);
+
 	if (addFlags || removeFlags) {
 		request.ifr_flags = (currentFlags & ~removeFlags) | addFlags;
-printf(" --> set %x\n", request.ifr_flags);
 		if (ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
 			fprintf(stderr, "%s: Setting flags failed: %s\n", kProgramName,
 				strerror(errno));
