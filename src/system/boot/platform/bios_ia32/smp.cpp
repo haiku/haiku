@@ -151,6 +151,10 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 
 				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
 
+				/* skip if the processor is not enabled. */
+				if(!(processor->cpu_flags & 0x1))
+					break;
+					
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
 				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
 				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
