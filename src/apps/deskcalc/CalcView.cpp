@@ -39,6 +39,7 @@
 
 const uint8 K_COLOR_OFFSET		= 32;
 const float K_FONT_YPROP		= 0.6f;
+const float K_FONT_XPROP		= 0.6f;
 const float K_DISPLAY_YPROP		= 0.2f;
 
 enum {
@@ -374,7 +375,13 @@ CalcView::Draw(BRect updateRect)
 		SetHighColor(fButtonTextColor);
 		SetLowColor(fBaseColor);
 		SetDrawingMode(B_OP_COPY);
-		SetFontSize(((fHeight - sizeDisp) / (float)fRows) * K_FONT_YPROP);
+
+		float fontSize =
+			min_c(((fHeight - sizeDisp) / (float)fRows) * K_FONT_YPROP,
+			(fWidth / (float)fColums) * K_FONT_XPROP);
+
+		SetFontSize(fontSize);
+
 		float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
 								* (1.0 - K_FONT_YPROP) * 0.5;
 		CalcKey *key = fKeypad;
