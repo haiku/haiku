@@ -41,7 +41,7 @@ BuildPlatformMain <build>data_to_source : data_to_source.cpp
 	: $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>generate_attribute_stores
-	: generate_attribute_stores.cpp : $(HOST_LIBBE) ;
+	: generate_attribute_stores.cpp : $(HOST_LIBBE) $(HOST_LIBSUPC++) ;
 
 UsePrivateObjectHeaders generate_boot_screen.cpp : shared : : true ;
 UsePrivateObjectHeaders ColorQuantizer.cpp : shared : : true ;
