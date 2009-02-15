@@ -249,13 +249,13 @@ RecorderWindow::InitWindow()
 
 		r = background->Bounds();
 		r.left = 0;
-		r.right = r.left + 35;
+		r.right = r.left + 38;
 		r.bottom = r.top + 104;
 		fVUView = new VUView(r, B_FOLLOW_LEFT|B_FOLLOW_TOP);
 		background->AddChild(fVUView);
 
 		r = background->Bounds();
-		r.left = r.left + 38;
+		r.left = r.left + 40;
 		r.bottom = r.top + 104;
 		fScopeView = new ScopeView(r, B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
 		background->AddChild(fScopeView);
