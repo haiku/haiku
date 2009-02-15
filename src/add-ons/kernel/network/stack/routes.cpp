@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -164,7 +164,8 @@ find_route(net_domain *_domain, const sockaddr *address)
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	net_route_private *candidate = NULL;
 
-	TRACE(("test address %s for routes...\n", AddressString(domain, address).Data()));
+	TRACE(("test address %s for routes...\n",
+		AddressString(domain, address).Data()));
 
 	// TODO: alternate equal default routes
 
@@ -182,14 +183,18 @@ find_route(net_domain *_domain, const sockaddr *address)
 				route->destination))
 			continue;
 
-		TRACE(("  found route: %s, flags %lx\n",
-			AddressString(domain, route->destination).Data(), route->flags));
-
 		// neglect routes that point to devices that have no link
 		if ((route->interface->device->flags & IFF_LINK) == 0) {
-			candidate = route;
+			if (candidate == NULL) {
+				TRACE(("  found candidate: %s, flags %lx\n", AddressString(
+					domain, route->destination).Data(), route->flags));
+				candidate = route;
+			}
 			continue;
 		}
+
+		TRACE(("  found route: %s, flags %lx\n",
+			AddressString(domain, route->destination).Data(), route->flags));
 
 		return route;
 	}
