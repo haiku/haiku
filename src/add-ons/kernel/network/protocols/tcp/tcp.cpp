@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,30 +50,34 @@ net_socket_module_info *gSocketModule;
 net_stack_module_info *gStackModule;
 
 
-// TODO we need to think of a better way to do this. It would be
-//      nice if we registered a per EndpointManager receiving
-//      protocol cookie, so we don't have to go through the list
-//      for each segment.
-typedef DoublyLinkedList<EndpointManager> EndpointManagerList;
-static mutex sEndpointManagersLock;
-static EndpointManagerList sEndpointManagers;
+static EndpointManager* sEndpointManagers[AF_MAX];
+static rw_lock sEndpointManagersLock;
 
 
 // The TCP header length is at most 64 bytes.
 static const int kMaxOptionSize = 64 - sizeof(tcp_header);
 
 
-static EndpointManager *
-endpoint_manager_for(net_domain *domain)
+/*!	Returns an endpoint manager for the specified domain, if any.
+	You need to hold the sEndpointManagersLock when calling this function.
+*/
+static inline EndpointManager*
+endpoint_manager_for_locked(int family)
 {
-	EndpointManagerList::Iterator iterator = sEndpointManagers.GetIterator();
-	while (iterator.HasNext()) {
-		EndpointManager *endpointManager = iterator.Next();
-		if (endpointManager->Domain() == domain)
-			return endpointManager;
-	}
+	if (family >= AF_MAX || family < 0)
+		return NULL;
 
-	return NULL;
+	return sEndpointManagers[family];
+}
+
+
+/*!	Returns an endpoint manager for the specified domain, if any */
+static inline EndpointManager*
+endpoint_manager_for(net_domain* domain)
+{
+	ReadLocker _(sEndpointManagersLock);
+
+	return endpoint_manager_for_locked(domain->family);
 }
 
 
@@ -251,10 +255,11 @@ dump_tcp_header(tcp_header &header)
 static int
 dump_endpoints(int argc, char** argv)
 {
-	EndpointManagerList::Iterator iterator = sEndpointManagers.GetIterator();
-
-	while (iterator.HasNext())
-		iterator.Next()->Dump();
+	for (int i = 0; i < AF_MAX; i++) {
+		EndpointManager* manager = sEndpointManagers[i];
+		if (manager != NULL)
+			manager->Dump();
+	}
 
 	return 0;
 }
@@ -278,14 +283,27 @@ dump_endpoint(int argc, char** argv)
 //	#pragma mark - internal API
 
 
+/*!	Creates a new endpoint manager for the specified domain, or returns
+	an existing one for this domain.
+*/
 EndpointManager*
 get_endpoint_manager(net_domain* domain)
 {
-	EndpointManager *endpointManager = endpoint_manager_for(domain);
-	if (endpointManager)
+	// See if there is one already
+	EndpointManager* endpointManager = endpoint_manager_for(domain);
+	if (endpointManager != NULL)
 		return endpointManager;
 
-	endpointManager = new (std::nothrow) EndpointManager(domain);
+	WriteLocker _(sEndpointManagersLock);
+
+	endpointManager = endpoint_manager_for_locked(domain->family);
+	if (endpointManager != NULL)
+		return endpointManager;
+
+	// There is no endpoint manager for this domain yet, so we need
+	// to create one.
+
+	endpointManager = new(std::nothrow) EndpointManager(domain);
 	if (endpointManager == NULL)
 		return NULL;
 
@@ -294,7 +312,7 @@ get_endpoint_manager(net_domain* domain)
 		return NULL;
 	}
 
-	sEndpointManagers.Add(endpointManager);
+	sEndpointManagers[domain->family] = endpointManager;
 	return endpointManager;
 }
 
@@ -302,9 +320,9 @@ get_endpoint_manager(net_domain* domain)
 void
 put_endpoint_manager(EndpointManager* endpointManager)
 {
-	// TODO: when the connection and endpoint count reach zero
-	// we should remove the endpoint manager from the endpoints
-	// list and delete it.
+	// TODO: we may want to use reference counting instead of only discarding
+	// them on unload. But since there is likely only IPv4/v6 there is not much
+	// point to it.
 }
 
 
@@ -386,7 +404,7 @@ add_tcp_header(net_address_module_info* addressModule,
 			optionsLength);
 	}
 
-	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, up %lu, "
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, up %u, "
 		"win %u\n", buffer, segment.flags, segment.sequence,
 		segment.acknowledge, segment.urgent_offset, segment.advertised_window));
 
@@ -680,11 +698,11 @@ tcp_receive_data(net_buffer* buffer)
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around
 
-	MutexLocker _(sEndpointManagersLock);
-
 	EndpointManager* endpointManager = endpoint_manager_for(domain);
-	if (endpointManager == NULL)
+	if (endpointManager == NULL) {
+		TRACE(("  No endpoint manager!\n"));
 		return B_ERROR;
+	}
 
 	int32 segmentAction = DROP;
 
@@ -695,11 +713,11 @@ tcp_receive_data(net_buffer* buffer)
 	else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 
-	if (segmentAction & RESET) {
+	if ((segmentAction & RESET) != 0) {
 		// send reset
 		endpointManager->ReplyWithReset(segment, buffer);
 	}
-	if (segmentAction & DROP)
+	if ((segmentAction & DROP) != 0)
 		gBufferModule->free(buffer);
 
 	return B_OK;
@@ -727,7 +745,7 @@ tcp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 static status_t
 tcp_init()
 {
-	mutex_init(&sEndpointManagersLock, "endpoint managers lock");
+	rw_lock_init(&sEndpointManagersLock, "endpoint managers");
 
 	status_t status = gStackModule->register_domain_protocols(AF_INET,
 		SOCK_STREAM, 0,
@@ -764,7 +782,13 @@ tcp_uninit()
 {
 	remove_debugger_command("tcp_endpoint", dump_endpoint);
 	remove_debugger_command("tcp_endpoints", dump_endpoints);
-	mutex_destroy(&sEndpointManagersLock);
+
+	rw_lock_destroy(&sEndpointManagersLock);
+
+	for (int i = 0; i < AF_MAX; i++) {
+		delete sEndpointManagers[i];
+	}
+
 	return B_OK;
 }
 

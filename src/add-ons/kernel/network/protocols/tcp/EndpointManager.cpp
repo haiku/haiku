@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,6 @@
 #include <KernelExport.h>
 
 #include <NetUtilities.h>
-#include <util/AutoLock.h>
 #include <tracing.h>
 
 #include "TCPEndpoint.h"
@@ -221,13 +220,13 @@ EndpointManager::EndpointManager(net_domain* domain)
 	fConnectionHash(this),
 	fLastPort(kFirstEphemeralPort)
 {
-	mutex_init(&fLock, "endpoint manager");
+	rw_lock_init(&fLock, "TCP endpoint manager");
 }
 
 
 EndpointManager::~EndpointManager()
 {
-	mutex_destroy(&fLock);
+	rw_lock_destroy(&fLock);
 }
 
 
@@ -246,7 +245,8 @@ EndpointManager::Init()
 
 
 /*!	Returns the endpoint matching the connection.
-	You must hold the manager's lock when calling this method.
+	You must hold the manager's lock when calling this method (either read or
+	write).
 */
 TCPEndpoint*
 EndpointManager::_LookupConnection(const sockaddr* local, const sockaddr* peer)
@@ -261,7 +261,7 @@ EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
 {
 	TRACE(("EndpointManager::SetConnection(%p)\n", endpoint));
 
-	MutexLocker _(fLock);
+	WriteLocker _(fLock);
 
 	SocketAddressStorage local(AddressModule());
 	local.SetTo(_local);
@@ -287,7 +287,7 @@ EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
 status_t
 EndpointManager::SetPassive(TCPEndpoint* endpoint)
 {
-	MutexLocker _(fLock);
+	WriteLocker _(fLock);
 
 	if (!endpoint->IsBound()) {
 		// if the socket is unbound first bind it to ephemeral
@@ -314,7 +314,7 @@ EndpointManager::SetPassive(TCPEndpoint* endpoint)
 TCPEndpoint*
 EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 {
-	MutexLocker _(fLock);
+	ReadLocker _(fLock);
 
 	TCPEndpoint *endpoint = _LookupConnection(local, peer);
 	if (endpoint != NULL) {
@@ -356,31 +356,31 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 status_t
 EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 {
-	// TODO check the family:
-	//
+	// TODO: check the family:
 	// if (!AddressModule()->is_understandable(address))
 	//	return EAFNOSUPPORT;
 
-	MutexLocker _(fLock);
+	WriteLocker locker(fLock);
 
 	if (AddressModule()->get_port(address) == 0)
 		return _BindToEphemeral(endpoint, address);
 
-	return _BindToAddress(endpoint, address);
+	return _BindToAddress(locker, endpoint, address);
 }
 
 
 status_t
 EndpointManager::BindChild(TCPEndpoint* endpoint)
 {
-	MutexLocker _(fLock);
+	WriteLocker _(fLock);
 	return _Bind(endpoint, *endpoint->LocalAddress());
 }
 
 
-/*! You must hold fLock when calling this method. */
+/*! You must have fLock write locked when calling this method. */
 status_t
-EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
+EndpointManager::_BindToAddress(WriteLocker& locker, TCPEndpoint* endpoint,
+	const sockaddr* _address)
 {
 	ConstSocketAddress address(AddressModule(), _address);
 	uint16 port = address.Port();
@@ -388,8 +388,8 @@ EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 	TRACE(("EndpointManager::BindToAddress(%p)\n", endpoint));
 	T(Bind(endpoint, address, false));
 
-	// TODO this check follows very typical UNIX semantics
-	//      and generally should be improved.
+	// TODO: this check follows very typical UNIX semantics
+	// and generally should be improved.
 	if (ntohs(port) <= kLastReservedPort && geteuid() != 0)
 		return B_PERMISSION_DENIED;
 
@@ -414,9 +414,9 @@ EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 					&& (userState > ESTABLISHED || userState == CLOSED)) {
 					// This is a closing local connection - wait until it's
 					// gone away for real
-					mutex_unlock(&fLock);
+					locker.Unlock();
 					snooze(10000);
-					mutex_lock(&fLock);
+					locker.Lock();
 						// TODO: make this better
 					if (!retrying) {
 						retrying = true;
@@ -438,7 +438,7 @@ EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 }
 
 
-/*! You must hold fLock when calling this method. */
+/*! You must have fLock write locked when calling this method. */
 status_t
 EndpointManager::_BindToEphemeral(TCPEndpoint* endpoint,
 	const sockaddr* address)
@@ -509,7 +509,7 @@ EndpointManager::Unbind(TCPEndpoint* endpoint)
 		return B_BAD_VALUE;
 	}
 
-	MutexLocker _(fLock);
+	WriteLocker _(fLock);
 
 	if (!fEndpointHash.Remove(endpoint))
 		panic("bound endpoint %p not in hash!", endpoint);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,7 @@
 #include <AddressUtilities.h>
 
 #include <lock.h>
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/MultiHashTable.h>
 #include <util/OpenHashTable.h>
@@ -98,15 +99,15 @@ private:
 								const sockaddr* peer);
 			status_t		_Bind(TCPEndpoint* endpoint,
 								const sockaddr* address);
-			status_t		_BindToAddress(TCPEndpoint* endpoint,
-								const sockaddr* address);
+			status_t		_BindToAddress(WriteLocker& locker,
+								TCPEndpoint* endpoint, const sockaddr* address);
 			status_t		_BindToEphemeral(TCPEndpoint* endpoint,
 								const sockaddr* address);
 
 	typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
 	typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
 
-	mutex					fLock;
+	rw_lock					fLock;
 	net_domain*				fDomain;
 	ConnectionTable			fConnectionHash;
 	EndpointTable			fEndpointHash;
