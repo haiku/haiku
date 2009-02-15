@@ -152,10 +152,10 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				}
 
 				/* skip if the processor is not enabled. */
-                if(!(processor->cpu_flags & 0x1)) {
+				if (!(processor->cpu_flags & 0x1)) {
 					TRACE(("smp: skip apic id %d: disabled\n", processor->apic_id));
 					continue;
-                }
+				}
 
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
 				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
