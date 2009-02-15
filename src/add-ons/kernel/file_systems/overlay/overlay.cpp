@@ -13,12 +13,11 @@
 #include <dirent.h>
 
 #include <fs_info.h>
+#include <fs_interface.h>
 
 #include <debug.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
-
-#include "overlay.h"
 
 
 //#define TRACE_OVERLAY
