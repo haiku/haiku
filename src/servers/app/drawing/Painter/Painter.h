@@ -144,6 +144,14 @@ class Painter {
 			// fills a solid rect with color c, no blending
 			void				FillRect(const BRect& r,
 									const rgb_color& c) const;
+			
+			// fills a rect with a linear gradient, the caller should be
+			// sure that the gradient is indeed vertical. The start point of
+			// the gradient should be above the end point, or this function
+			// will not draw anything.
+			void				FillRectVerticalGradient(BRect r,
+									const BGradientLinear& gradient) const;
+			
 			// fills a solid rect with color c, no blending, no clipping
 			void				FillRectNoClipping(const clipping_rect& r,
 									const rgb_color& c) const;
@@ -278,6 +286,11 @@ class Painter {
 			void				_CalcLinearGradientTransform(BPoint startPoint,
 									BPoint endPoint, agg::trans_affine& mtx,
 									float gradient_d2 = 100.0f) const;
+
+			void				_MakeGradient(const BGradient& gradient,
+									int32 colorCount, uint32* colors,
+									int32 arrayOffset, int32 arraySize) const;
+			
 			template<class Array>
 			void				_MakeGradient(Array& array,
 									const BGradient& gradient) const;

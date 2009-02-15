@@ -864,20 +864,36 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
 	_Transform(&a, false);
 	_Transform(&b, false);
-	
+
+	// first, try an optimized version
+	if (gradient.GetType() == BGradient::TYPE_LINEAR
+		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+		const BGradientLinear* linearGradient
+			= dynamic_cast<const BGradientLinear*>(&gradient);
+		if (linearGradient->Start().x == linearGradient->End().x
+			// TODO: Remove this second check once the optimized method
+			// handled "upside down" gradients as well...
+			&& linearGradient->Start().y <= linearGradient->End().y) {
+			// a vertical gradient
+			BRect rect(a, b);
+			FillRectVerticalGradient(rect, *linearGradient);
+			return _Clipped(rect);
+		}
+	}
+
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
 	// to the bottom-right (.9999, .9999) corner of pixels
 	b.x += 1.0;
 	b.y += 1.0;
-	
+
 	fPath.remove_all();
 	fPath.move_to(a.x, a.y);
 	fPath.line_to(b.x, a.y);
 	fPath.line_to(b.x, b.y);
 	fPath.line_to(a.x, b.y);
 	fPath.close_polygon();
-	
+
 	return _FillPath(fPath, gradient);
 }
 
@@ -920,32 +936,37 @@ gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
 	} while (fBaseRenderer.next_clip_box());
 }
 
-#if 0
 // FillRectVerticalGradient
 void
-Painter::FillRectVerticalGradient(const BRect& r,
+Painter::FillRectVerticalGradient(BRect r,
 	const BGradientLinear& gradient) const
 {
 	if (!fValidClipping)
 		return;
 
+	// Make sure the color array is no larger than the screen height.
+	r = r & fClippingRegion->Frame();
+
 	int32 gradientArraySize = r.IntegerHeight() + 1;
-	rgb_color gradientArray[gradientArraySize];
-	for (int32 i = 0; i < gradientArraySize; i++) {
+	uint32 gradientArray[gradientArraySize];
+	int32 gradientTop = gradient.Start().y;
+	int32 gradientBottom = gradient.End().y;
+	int32 colorCount = gradientBottom - gradientTop + 1;
+	if (colorCount < 0) {
+		// Gradient is upside down. That's currently not supported by this
+		// method.
+		return;
 	}
 
+	_MakeGradient(gradient, colorCount, gradientArray,
+		gradientTop - (int32)r.top, gradientArraySize);
+	
 	uint8* dst = fBuffer.row_ptr(0);
 	uint32 bpr = fBuffer.stride();
 	int32 left = (int32)r.left;
 	int32 top = (int32)r.top;
 	int32 right = (int32)r.right;
 	int32 bottom = (int32)r.bottom;
-	// get a 32 bit pixel ready with the color
-	pixel32 color;
-	color.data8[0] = c.blue;
-	color.data8[1] = c.green;
-	color.data8[2] = c.red;
-	color.data8[3] = c.alpha;
 	// fill rects, iterate over clipping boxes
 	fBaseRenderer.first_clip_box();
 	do {
@@ -958,14 +979,13 @@ Painter::FillRectVerticalGradient(const BRect& r,
 			for (; y1 <= y2; y1++) {
 //					uint32* handle = (uint32*)(offset + y1 * bpr);
 //					for (int32 x = x1; x <= x2; x++) {
-//						*handle++ = color.data32;
+//						*handle++ = gradientArray[y1 - top];
 //					}
-gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
+gfxset32(offset + y1 * bpr, gradientArray[y1 - top], (x2 - x1 + 1) * 4);
 			}
 		}
 	} while (fBaseRenderer.next_clip_box());
 }
-#endif
 
 // FillRectNoClipping
 void
@@ -2606,6 +2626,85 @@ Painter::_FillPath(VertexSource& path, const BGradient& gradient) const
 	}
 
 	return _Clipped(_BoundingBox(path));
+}
+
+// _MakeGradient
+void
+Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
+	uint32* colors, int32 arrayOffset, int32 arraySize) const
+{
+	BGradient::ColorStop* from = gradient.ColorStopAt(0);
+
+	if (!from)
+		return;
+
+	// current index into "colors" array
+//	int32 index = (int32)floorf(colorCount * from->offset + 0.5)
+//		+ arrayOffset;
+	int32 index = (int32)floorf(colorCount * from->offset / 255 + 0.5)
+		+ arrayOffset;
+	if (index > arraySize)
+		index = arraySize;
+	// Make sure we fill the entire array in case the gradient is outside.
+	if (index > 0) {
+		uint8* c = (uint8*)&colors[0];
+		for (int32 i = 0; i < index; i++) {
+			c[0] = from->color.blue;
+			c[1] = from->color.green;
+			c[2] = from->color.red;
+			c[3] = from->color.alpha;
+			c += 4;
+		}
+	}
+
+	// interpolate "from" to "to"
+	int32 stopCount = gradient.CountColorStops();
+	for (int32 i = 1; i < stopCount; i++) {
+		// find the step with the next offset
+		BGradient::ColorStop* to = gradient.ColorStopAtFast(i);
+
+		// interpolate
+//		int32 offset = (int32)floorf((colorCount - 1) * to->offset + 0.5);
+		int32 offset = (int32)floorf((colorCount - 1)
+			* to->offset / 255 + 0.5);
+		if (offset > colorCount - 1)
+			offset = colorCount - 1;
+		offset += arrayOffset;
+		int32 dist = offset - index;
+		if (dist >= 0) {
+			int32 startIndex = max_c(index, 0);
+			int32 stopIndex = min_c(offset, arraySize - 1);
+			uint8* c = (uint8*)&colors[startIndex];
+			for (int32 i = startIndex; i <= stopIndex; i++) {
+				float f = (float)(offset - i) / (float)(dist + 1);
+				float t = 1.0 - f;
+				c[0] = (uint8)floorf(from->color.blue * f
+					+ to->color.blue * t + 0.5);
+				c[1] = (uint8)floorf(from->color.green * f
+					+ to->color.green * t + 0.5);
+				c[2] = (uint8)floorf(from->color.red * f
+					+ to->color.red * t + 0.5);
+				c[3] = (uint8)floorf(from->color.alpha * f
+					+ to->color.alpha * t + 0.5);
+				c += 4;
+			}
+		}
+		index = offset + 1;
+		// the current "to" will be the "from" in the next interpolation
+		from = to;
+	}
+	//  make sure we fill the entire array
+	if (index < arraySize - 1) {
+		int32 startIndex = max_c(index, 0);
+		uint8* c = (uint8*)&colors[startIndex];
+		for (int32 i = startIndex; i < arraySize; i++) {
+			c[0] = from->color.red;
+			c[1] = from->color.green;
+			c[2] = from->color.blue;
+			c[3] = from->color.alpha;
+			c += 4;
+		}
+	}
 }
 
 // _MakeGradient
