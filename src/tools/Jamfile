@@ -8,6 +8,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
 local tools =
 	<build>catattr
 	<build>copyattr
+	<build>generate_attribute_stores
 	<build>listattr
 	<build>mimeset
 	<build>mkindex
