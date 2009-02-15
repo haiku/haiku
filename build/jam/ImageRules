@@ -1048,6 +1048,14 @@ rule BuildFloppyBootImage image : zbeos : archive
 	Depends $(image) : $(archive) ;
 	#MakeLocateDebug $(image) ;
 	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+
+	# TODO: the GCC4 archive is too large for a 1.44 floppy image
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		FLOPPY_IMAGE_BLOCK_SIZE on $(image) = 1 ;
+	} else {
+		FLOPPY_IMAGE_BLOCK_SIZE on $(image) = 2 ;
+	}
+
 	BuildFloppyBootImage1 $(image) : $(zbeos) $(archive) ;
 }
 
@@ -1055,7 +1063,7 @@ actions BuildFloppyBootImage1
 {
 	$(RM) $(<)
 	# make an empty image
-	dd if=/dev/zero of=$(<) bs=1k count=1440
+	dd if=/dev/zero of=$(<) bs=$(FLOPPY_IMAGE_BLOCK_SIZE)k count=1440
 	# add zbeos
 	dd if=$(>[1]) of=$(<) conv=notrunc
 	# add the boot drivers tgz archive
