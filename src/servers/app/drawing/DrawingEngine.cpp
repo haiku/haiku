@@ -639,8 +639,7 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		fPainter->FillArcGradient(center, xRadius, yRadius, angle, span,
-								  gradient);
+		fPainter->FillArc(center, xRadius, yRadius, angle, span, gradient);
 
 		_CopyToFront(clipped);
 	}
@@ -669,7 +668,7 @@ DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
 	// TODO: figure out bounds and hide cursor depending on that
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
-	BRect touched = fPainter->FillBezierGradient(pts, gradient);
+	BRect touched = fPainter->FillBezier(pts, gradient);
 
 	_CopyToFront(touched);
 }
@@ -723,7 +722,7 @@ DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
-		fPainter->FillEllipseGradient(r, gradient);
+		fPainter->FillEllipse(r, gradient);
 
 		_CopyToFront(clipped);
 	}
@@ -761,7 +760,7 @@ DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	if (bounds.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
 
-		fPainter->FillPolygonGradient(ptlist, numpts, gradient, closed);
+		fPainter->FillPolygon(ptlist, numpts, gradient, closed);
 
 		_CopyToFront(bounds);
 	}
@@ -979,7 +978,7 @@ DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 
 	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
 
-	fPainter->FillRectGradient(r, gradient);
+	fPainter->FillRect(r, gradient);
 
 	_CopyToFront(r);
 }
@@ -1049,11 +1048,11 @@ DrawingEngine::FillRegion(BRegion& r, const BGradient& gradient)
 
 	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
 
-	BRect touched = fPainter->FillRectGradient(r.RectAt(0), gradient);
+	BRect touched = fPainter->FillRect(r.RectAt(0), gradient);
 
 	int32 count = r.CountRects();
 	for (int32 i = 1; i < count; i++)
-		touched = touched | fPainter->FillRectGradient(r.RectAt(i), gradient);
+		touched = touched | fPainter->FillRect(r.RectAt(i), gradient);
 
 	_CopyToFront(r.Frame());
 }
@@ -1104,7 +1103,7 @@ DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
-		BRect touched = fPainter->FillRoundRectGradient(r, xrad, yrad, gradient);
+		BRect touched = fPainter->FillRoundRect(r, xrad, yrad, gradient);
 
 		_CopyToFront(touched);
 	}
@@ -1140,7 +1139,7 @@ DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	// shape is drawn on screen, TODO: optimize
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
-	BRect touched = fPainter->FillShapeGradient(opCount, opList, ptCount,
+	BRect touched = fPainter->FillShape(opCount, opList, ptCount,
 												ptList, gradient);
 
 	_CopyToFront(touched);
@@ -1179,7 +1178,7 @@ DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
-		fPainter->FillTriangleGradient(pts[0], pts[1], pts[2], gradient);
+		fPainter->FillTriangle(pts[0], pts[1], pts[2], gradient);
 
 		_CopyToFront(clipped);
 	}

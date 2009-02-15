@@ -33,8 +33,8 @@ Gradient::Gradient(bool empty)
 	  fInheritTransformation(true)
 {
 	if (!empty) {
-		AddColor(BGradient::color_step(0, 0, 0, 255, 0.0), 0);
-		AddColor(BGradient::color_step(255, 255, 255, 255, 1.0), 1);
+		AddColor(BGradient::ColorStop(0, 0, 0, 255, 0.0), 0);
+		AddColor(BGradient::ColorStop(255, 255, 255, 255, 1.0), 1);
 	}
 }
 
@@ -63,7 +63,7 @@ Gradient::Gradient(BMessage* archive)
 		LoadFrom((const double*)matrix);
 
 	// color steps
-	BGradient::color_step step;
+	BGradient::ColorStop step;
 	for (int32 i = 0; archive->FindFloat("offset", i, &step.offset) >= B_OK; i++) {
 		if (archive->FindInt32("color", i, (int32*)&step.color) >= B_OK)
 			AddColor(step, i);
@@ -97,7 +97,7 @@ Gradient::Gradient(const Gradient& other)
 	  fInterpolation(other.fInterpolation),
 	  fInheritTransformation(other.fInheritTransformation)
 {
-	for (int32 i = 0; BGradient::color_step* step = other.ColorAt(i); i++) {
+	for (int32 i = 0; BGradient::ColorStop* step = other.ColorAt(i); i++) {
 		AddColor(*step, i);
 	}
 }
@@ -126,7 +126,7 @@ Gradient::Archive(BMessage* into, bool deep) const
 
 	// color steps
 	if (ret >= B_OK) {
-		for (int32 i = 0; BGradient::color_step* step = ColorAt(i); i++) {
+		for (int32 i = 0; BGradient::ColorStop* step = ColorAt(i); i++) {
 			ret = into->AddInt32("color", (const uint32&)step->color);
 			if (ret < B_OK)
 				break;
@@ -198,8 +198,8 @@ Gradient::ColorStepsAreEqual(const Gradient& other) const
 
 		bool equal = true;
 		for (int32 i = 0; i < count; i++) {
-			BGradient::color_step* ourStep = ColorAtFast(i);
-			BGradient::color_step* otherStep = other.ColorAtFast(i);
+			BGradient::ColorStop* ourStep = ColorAtFast(i);
+			BGradient::ColorStop* otherStep = other.ColorAtFast(i);
 			if (*ourStep != *otherStep) {
 				equal = false;
 				break;
@@ -219,7 +219,7 @@ Gradient::SetColors(const Gradient& other)
 #endif
 
 	_MakeEmpty();
-	for (int32 i = 0; BGradient::color_step* step = other.ColorAt(i); i++)
+	for (int32 i = 0; BGradient::ColorStop* step = other.ColorAt(i); i++)
 		AddColor(*step, i);
 
 	Notify();
@@ -232,11 +232,11 @@ int32
 Gradient::AddColor(const rgb_color& color, float offset)
 {
 	// find the correct index (sorted by offset)
-	BGradient::color_step* step = new BGradient::color_step(color, offset);
+	BGradient::ColorStop* step = new BGradient::ColorStop(color, offset);
 	int32 index = 0;
 	int32 count = CountColors();
 	for (; index < count; index++) {
-		BGradient::color_step* s = ColorAtFast(index);
+		BGradient::ColorStop* s = ColorAtFast(index);
 		if (s->offset > step->offset)
 			break;
 	}
@@ -250,9 +250,9 @@ Gradient::AddColor(const rgb_color& color, float offset)
 
 // AddColor
 bool
-Gradient::AddColor(const BGradient::color_step& color, int32 index)
+Gradient::AddColor(const BGradient::ColorStop& color, int32 index)
 {
-	BGradient::color_step* step = new BGradient::color_step(color);
+	BGradient::ColorStop* step = new BGradient::ColorStop(color);
 	if (!fColors.AddItem((void*)step, index)) {
 		delete step;
 		return false;
@@ -265,8 +265,8 @@ Gradient::AddColor(const BGradient::color_step& color, int32 index)
 bool
 Gradient::RemoveColor(int32 index)
 {
-	BGradient::color_step* step
-		= (BGradient::color_step*)fColors.RemoveItem(index);
+	BGradient::ColorStop* step
+		= (BGradient::ColorStop*)fColors.RemoveItem(index);
 	if (!step) {
 		return false;
 	}
@@ -279,9 +279,9 @@ Gradient::RemoveColor(int32 index)
 
 // SetColor
 bool
-Gradient::SetColor(int32 index, const BGradient::color_step& color)
+Gradient::SetColor(int32 index, const BGradient::ColorStop& color)
 {
-	if (BGradient::color_step* step = ColorAt(index)) {
+	if (BGradient::ColorStop* step = ColorAt(index)) {
 		if (*step != color) {
 			step->color = color.color;
 			step->offset = color.offset;
@@ -296,7 +296,7 @@ Gradient::SetColor(int32 index, const BGradient::color_step& color)
 bool
 Gradient::SetColor(int32 index, const rgb_color& color)
 {
-	if (BGradient::color_step* step = ColorAt(index)) {
+	if (BGradient::ColorStop* step = ColorAt(index)) {
 		if ((uint32&)step->color != (uint32&)color) {
 			step->color = color;
 			Notify();
@@ -310,7 +310,7 @@ Gradient::SetColor(int32 index, const rgb_color& color)
 bool
 Gradient::SetOffset(int32 index, float offset)
 {
-	BGradient::color_step* step = ColorAt(index);
+	BGradient::ColorStop* step = ColorAt(index);
 	if (step && step->offset != offset) {
 		step->offset = offset;
 		Notify();
@@ -329,17 +329,17 @@ Gradient::CountColors() const
 }
 
 // ColorAt
-BGradient::color_step*
+BGradient::ColorStop*
 Gradient::ColorAt(int32 index) const
 {
-	return (BGradient::color_step*)fColors.ItemAt(index);
+	return (BGradient::ColorStop*)fColors.ItemAt(index);
 }
 
 // ColorAtFast
-BGradient::color_step*
+BGradient::ColorStop*
 Gradient::ColorAtFast(int32 index) const
 {
-	return (BGradient::color_step*)fColors.ItemAtFast(index);
+	return (BGradient::ColorStop*)fColors.ItemAtFast(index);
 }
 
 // #pragma mark -
@@ -395,13 +395,13 @@ gauss(double f)
 void
 Gradient::MakeGradient(uint32* colors, int32 count) const
 {
-	BGradient::color_step* from = ColorAt(0);
+	BGradient::ColorStop* from = ColorAt(0);
 	
 	if (!from)
 		return;
 
 	// find the step with the lowest offset
-	for (int32 i = 0; BGradient::color_step* step = ColorAt(i); i++) {
+	for (int32 i = 0; BGradient::ColorStop* step = ColorAt(i); i++) {
 		if (step->offset < from->offset)
 			from = step;
 	}
@@ -426,7 +426,7 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 
 	// put all steps that we need to interpolate to into a list
 	BList nextSteps(fColors.CountItems() - 1);
-	for (int32 i = 0; BGradient::color_step* step = ColorAt(i); i++) {
+	for (int32 i = 0; BGradient::ColorStop* step = ColorAt(i); i++) {
 		if (step != from)
 			nextSteps.AddItem((void*)step);
 	}
@@ -435,10 +435,10 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 	while (!nextSteps.IsEmpty()) {
 
 		// find the step with the next offset
-		BGradient::color_step* to = NULL;
+		BGradient::ColorStop* to = NULL;
 		float nextOffsetDist = 2.0;
-		for (int32 i = 0; BGradient::color_step* step
-				= (BGradient::color_step*)nextSteps.ItemAt(i); i++) {
+		for (int32 i = 0; BGradient::ColorStop* step
+				= (BGradient::ColorStop*)nextSteps.ItemAt(i); i++) {
 			float d = step->offset - from->offset;
 			if (d < nextOffsetDist && d >= 0) {
 				to = step;
@@ -588,7 +588,7 @@ Gradient::PrintToStream() const
 		   string_for_type(fType),
 		   string_for_interpolation(fInterpolation),
 		   fInheritTransformation);
-	for (int32 i = 0; BGradient::color_step* step = ColorAt(i); i++) {
+	for (int32 i = 0; BGradient::ColorStop* step = ColorAt(i); i++) {
 		printf("  %ld: offset: %.1f -> color(%d, %d, %d, %d)\n",
 			   i, step->offset,
 			   step->color.red,

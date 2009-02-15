@@ -814,7 +814,7 @@ View::ConvertToScreenForDrawing(BRegion* region) const
 void
 View::ConvertToScreenForDrawing(BGradient* gradient) const
 {
-	switch(gradient->Type()) {
+	switch(gradient->GetType()) {
 		case BGradient::TYPE_LINEAR: {
 			BGradientLinear* linear = (BGradientLinear*) gradient;
 			BPoint start = linear->Start();
@@ -825,7 +825,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			ConvertToScreen(&end);
 			linear->SetStart(start);
 			linear->SetEnd(end);
-			linear->SortColorStepsByOffset();
+			linear->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_RADIAL: {
@@ -834,7 +834,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			radial->SetCenter(center);
-			radial->SortColorStepsByOffset();
+			radial->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_RADIAL_FOCUS: {
@@ -847,7 +847,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			ConvertToScreen(&focal);
 			radialFocus->SetCenter(center);
 			radialFocus->SetFocal(focal);
-			radialFocus->SortColorStepsByOffset();
+			radialFocus->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_DIAMOND: {
@@ -856,7 +856,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			diamond->SetCenter(center);
-			diamond->SortColorStepsByOffset();
+			diamond->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_CONIC: {
@@ -865,7 +865,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			conic->SetCenter(center);
-			conic->SortColorStepsByOffset();
+			conic->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_NONE: {

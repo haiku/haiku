@@ -164,7 +164,7 @@ GradientControl::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMe
 	float offset = _OffsetFor(where);
 
 	if (fDraggingStepIndex >= 0) {
-		BGradient::color_step* step = fGradient->ColorAt(fDraggingStepIndex);
+		BGradient::ColorStop* step = fGradient->ColorAt(fDraggingStepIndex);
 		if (step) {
 			if (fGradient->SetOffset(fDraggingStepIndex, offset)) {
 				_UpdateColors();
@@ -201,7 +201,7 @@ GradientControl::MessageReceived(BMessage* message)
 				if (restore_color_from_message(message, color, 0) >= B_OK) {
 					bool update = false;
 					if (fDropIndex >= 0) {
-						if (BGradient::color_step* step
+						if (BGradient::ColorStop* step
 								= fGradient->ColorAt(fDropIndex)) {
 							color.alpha = step->color.alpha;
 						}
@@ -250,12 +250,12 @@ GradientControl::KeyDown(const char* bytes, int32 numBytes)
 						_UpdateCurrentColor();
 					}
 					break;
-	
+
 				case B_HOME:
 				case B_END:
 				case B_LEFT_ARROW:
 				case B_RIGHT_ARROW: {
-					if (BGradient::color_step* step
+					if (BGradient::ColorStop* step
 							= fGradient->ColorAt(fCurrentStepIndex)) {
 						BRect r = _GradientBitmapRect();
 						float x = r.left + r.Width() * step->offset;
@@ -282,7 +282,7 @@ GradientControl::KeyDown(const char* bytes, int32 numBytes)
 					}
 					break;
 				}
-	
+
 				case B_UP_ARROW:
 					// previous step
 					fCurrentStepIndex--;
@@ -299,7 +299,7 @@ GradientControl::KeyDown(const char* bytes, int32 numBytes)
 					}
 					_UpdateCurrentColor();
 					break;
-	
+
 				default:
 					handled = false;
 					break;
@@ -381,7 +381,7 @@ GradientControl::Draw(BRect updateRect)
 	markerPos.y = b.bottom + 4.0;
 	BPoint leftBottom(-6.0, 6.0);
 	BPoint rightBottom(6.0, 6.0);
-	for (int32 i = 0; BGradient::color_step* step = fGradient->ColorAt(i);
+	for (int32 i = 0; BGradient::ColorStop* step = fGradient->ColorAt(i);
 			i++) {
 		markerPos.x = b.left + (b.Width() * step->offset);
 
@@ -426,7 +426,7 @@ GradientControl::FrameResized(float width, float height)
 	_AllocBitmap(r.IntegerWidth() + 1, r.IntegerHeight() + 1);
 	_UpdateColors();
 	Invalidate();
-	
+
 }
 
 // SetGradient
@@ -463,7 +463,7 @@ GradientControl::SetCurrentStop(const rgb_color& color)
 bool
 GradientControl::GetCurrentStop(rgb_color* color) const
 {
-	BGradient::color_step* stop
+	BGradient::ColorStop* stop
 		= fGradient->ColorAt(fCurrentStepIndex);
 	if (stop && color) {
 		*color = stop->color;
@@ -617,7 +617,7 @@ GradientControl::_StepIndexFor(BPoint where) const
 	int32 index = -1;
 	BRect r = _GradientBitmapRect();
 	BRect markerFrame(Bounds());
-	for (int32 i = 0; BGradient::color_step* step
+	for (int32 i = 0; BGradient::ColorStop* step
 			= fGradient->ColorAt(i); i++) {
 		markerFrame.left = markerFrame.right = r.left
 			+ (r.Width() * step->offset);
@@ -648,7 +648,7 @@ GradientControl::_UpdateCurrentColor() const
 	if (!fMessage || !fTarget || !fTarget->Looper())
 		return;
 	// set the CanvasView current color
-	if (BGradient::color_step* step = fGradient->ColorAt(fCurrentStepIndex)) {
+	if (BGradient::ColorStop* step = fGradient->ColorAt(fCurrentStepIndex)) {
 		BMessage message(*fMessage);
 		store_color_in_message(&message, step->color);
 		fTarget->Looper()->PostMessage(&message, fTarget);

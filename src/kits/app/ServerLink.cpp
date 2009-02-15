@@ -126,15 +126,16 @@ status_t
 ServerLink::AttachGradient(const BGradient &gradient)
 {
 	GTRACE(("ServerLink::AttachGradient\n"));
-	BGradient::gradient_type gradientType = gradient.Type();
-	int32 colorsCount = gradient.CountColors();
-	GTRACE(("ServerLink::AttachGradient> colors count == %d\n", (int)colorsCount));
-	fSender->Attach(&gradientType, sizeof(BGradient::gradient_type));
-	fSender->Attach(&colorsCount, sizeof(int32));
-	if (colorsCount > 0) {
-		for (int i = 0; i < colorsCount; i++) {
-			fSender->Attach(gradient.ColorAtFast(i),
-				sizeof(BGradient::color_step));
+	BGradient::Type gradientType = gradient.GetType();
+	int32 stopCount = gradient.CountColorStops();
+	GTRACE(("ServerLink::AttachGradient> color stop count == %d\n",
+		(int)stopCount));
+	fSender->Attach(&gradientType, sizeof(BGradient::Type));
+	fSender->Attach(&stopCount, sizeof(int32));
+	if (stopCount > 0) {
+		for (int i = 0; i < stopCount; i++) {
+			fSender->Attach(gradient.ColorStopAtFast(i),
+				sizeof(BGradient::ColorStop));
 		}
 	}
 	

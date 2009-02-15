@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,7 +21,7 @@ class BRect;
 
 class BGradient : public BArchivable {
 public:
-	enum gradient_type {
+	enum Type {
 		TYPE_LINEAR = 0,
 		TYPE_RADIAL,
 		TYPE_RADIAL_FOCUS,
@@ -30,13 +30,13 @@ public:
 		TYPE_NONE
 	};
 
-	struct color_step {
-		color_step(const rgb_color c, float o);
-		color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o);
-		color_step(const color_step& other);
-		color_step();
+	struct ColorStop {
+		ColorStop(const rgb_color c, float o);
+		ColorStop(uint8 r, uint8 g, uint8 b, uint8 a, float o);
+		ColorStop(const ColorStop& other);
+		ColorStop();
 		
-		bool operator!=(const color_step& other) const;
+		bool operator!=(const ColorStop& other) const;
 		
 		rgb_color		color;
 		float			offset;
@@ -53,26 +53,26 @@ public:
 	
 	bool				operator==(const BGradient& other) const;
 	bool				operator!=(const BGradient& other) const;
-	bool				ColorStepsAreEqual(const BGradient& other) const;
+	bool				ColorStopsAreEqual(const BGradient& other) const;
 	
-	void				SetColors(const BGradient& other);
+	void				SetColorStops(const BGradient& other);
 	
 	int32				AddColor(const rgb_color& color, float offset);
-	bool				AddColor(const color_step& color, int32 index);
+	bool				AddColorStop(const ColorStop& colorStop, int32 index);
 	
 	bool				RemoveColor(int32 index);
 	
-	bool				SetColor(int32 index, const color_step& step);
+	bool				SetColorStop(int32 index, const ColorStop& colorStop);
 	bool				SetColor(int32 index, const rgb_color& color);
 	bool				SetOffset(int32 index, float offset);
 	
-	int32				CountColors() const;
-	color_step*			ColorAt(int32 index) const;
-	color_step*			ColorAtFast(int32 index) const;
-	color_step*			Colors() const;
-	void				SortColorStepsByOffset();
+	int32				CountColorStops() const;
+	ColorStop*			ColorStopAt(int32 index) const;
+	ColorStop*			ColorStopAtFast(int32 index) const;
+	ColorStop*			ColorStops() const;
+	void				SortColorStopsByOffset();
 	
-	gradient_type		Type() const
+	Type				GetType() const
 							{ return fType; }
 	
 	void				MakeEmpty();
@@ -102,8 +102,8 @@ private:
 		} conic;
 	} fData;
 
-	BList				fColors;
-	gradient_type		fType;
+	BList				fColorStops;
+	Type				fType;
 };
 
 #endif // _GRADIENT_H

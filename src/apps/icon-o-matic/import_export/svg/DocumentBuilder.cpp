@@ -10,8 +10,8 @@
 // Anti-Grain Geometry - Version 2.2
 // Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
 //
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
 // This software is provided "as is" without express or implied
 // warranty, and with no claim as to its suitability for any purpose.
 //
@@ -157,7 +157,7 @@ DocumentBuilder::curve3(double x, double y, bool rel)		   // T, t
 // curve4
 void
 DocumentBuilder::curve4(double x1, double y1,				   // C, c
-						double x2, double y2, 
+						double x2, double y2,
 						double x,  double y, bool rel)
 {
 	if (rel) {
@@ -392,7 +392,7 @@ DocumentBuilder::parse_path(PathTokenizer& tok)
 			case 'H': case 'h':
 				hline_to(tok.last_number(), cmd == 'h');
 				break;
-			
+
 			case 'Q': case 'q':
 				arg[0] = tok.last_number();
 				for(i = 1; i < 4; i++) {
@@ -697,12 +697,12 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 				int32 start = path->CountPoints() - 1;
 				BPoint from;
 				path->GetPointAt(start, from);
-				
+
 				double cx2 = (1.0/3.0) * from.x + (2.0/3.0) * x1;
 				double cy2 = (1.0/3.0) * from.y + (2.0/3.0) * y1;
 				double cx3 = (2.0/3.0) * x1 + (1.0/3.0) * x2;
 				double cy3 = (2.0/3.0) * y1 + (1.0/3.0) * y2;
-				
+
 				path->SetPointOut(start, BPoint(cx2, cy2));
 
 				if (!path->AddPoint(BPoint(x2, y2)))
@@ -778,7 +778,7 @@ DocumentBuilder::_AddShape(path_attributes& attributes, bool outline,
 			stroke->line_cap(attributes.line_cap);
 			stroke->line_join(attributes.line_join);
 		}
-	
+
 		if (!shape->AddTransformer(stroke)) {
 			delete stroke;
 			stroke = NULL;
@@ -802,8 +802,8 @@ DocumentBuilder::_AddShape(path_attributes& attributes, bool outline,
 	ObjectDeleter<Gradient> gradientDeleter(gradient);
 
 	rgb_color color;
-	
-	BGradient::color_step* step;
+
+	BGradient::ColorStop* step;
 	if (gradient && (step = gradient->ColorAt(0))) {
 		color.red		= step->color.red;
 		color.green		= step->color.green;

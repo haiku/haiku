@@ -506,10 +506,10 @@ Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 	return _DrawTriangle(pt1, pt2, pt3, true);
 }
 
-// FillTriangleGradient
+// FillTriangle
 BRect
-Painter::FillTriangleGradient(BPoint pt1, BPoint pt2, BPoint pt3,
-					  const BGradient& gradient) const
+Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+	const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -525,7 +525,7 @@ Painter::FillTriangleGradient(BPoint pt1, BPoint pt2, BPoint pt3,
 	
 	fPath.close_polygon();
 	
-	return _FillPathGradient(fPath, gradient);
+	return _FillPath(fPath, gradient);
 }
 
 // DrawPolygon
@@ -559,9 +559,9 @@ Painter::DrawPolygon(BPoint* p, int32 numPts,
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
-// FillPolygonGradient
+// FillPolygon
 BRect
-Painter::FillPolygonGradient(BPoint* p, int32 numPts,
+Painter::FillPolygon(BPoint* p, int32 numPts,
 					 const BGradient& gradient, bool closed) const
 {
 	CHECK_CLIPPING
@@ -582,7 +582,7 @@ Painter::FillPolygonGradient(BPoint* p, int32 numPts,
 		if (closed)
 			fPath.close_polygon();
 		
-		return _FillPathGradient(fPath, gradient);
+		return _FillPath(fPath, gradient);
 	}
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
@@ -614,9 +614,9 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 	}
 }
 
-// FillBezierGradient
+// FillBezier
 BRect
-Painter::FillBezierGradient(BPoint* p, const BGradient& gradient) const
+Painter::FillBezier(BPoint* p, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -634,15 +634,14 @@ Painter::FillBezierGradient(BPoint* p, const BGradient& gradient) const
 	
 	
 	fPath.close_polygon();
-	return _FillPathGradient(fCurve, gradient);
+	return _FillPath(fCurve, gradient);
 }
 
 
 // DrawShape
 BRect
 Painter::DrawShape(const int32& opCount, const uint32* opList,
-				   const int32& ptCount, const BPoint* points,
-				   bool filled) const
+	const int32& ptCount, const BPoint* points, bool filled) const
 {
 	CHECK_CLIPPING
 
@@ -686,11 +685,11 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		return _StrokePath(fCurve);
 }
 
-// FillShapeGradient
+// FillShape
 BRect
-Painter::FillShapeGradient(const int32& opCount, const uint32* opList,
-				   const int32& ptCount, const BPoint* points,
-				   const BGradient& gradient) const
+Painter::FillShape(const int32& opCount, const uint32* opList,
+	const int32& ptCount, const BPoint* points,
+	const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -728,7 +727,7 @@ Painter::FillShapeGradient(const int32& opCount, const uint32* opList,
 			fPath.close_polygon();
 	}
 	
-	return _FillPathGradient(fCurve, gradient);
+	return _FillPath(fCurve, gradient);
 }
 
 // StrokeRect
@@ -854,9 +853,9 @@ Painter::FillRect(const BRect& r) const
 	return _FillPath(fPath);
 }
 
-// FillRectGradient
+// FillRect
 BRect
-Painter::FillRectGradient(const BRect& r, const BGradient& gradient) const
+Painter::FillRect(const BRect& r, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -879,7 +878,7 @@ Painter::FillRectGradient(const BRect& r, const BGradient& gradient) const
 	fPath.line_to(a.x, b.y);
 	fPath.close_polygon();
 	
-	return _FillPathGradient(fPath, gradient);
+	return _FillPath(fPath, gradient);
 }
 
 // FillRect
@@ -920,6 +919,53 @@ gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
 		}
 	} while (fBaseRenderer.next_clip_box());
 }
+
+#if 0
+// FillRectVerticalGradient
+void
+Painter::FillRectVerticalGradient(const BRect& r,
+	const BGradientLinear& gradient) const
+{
+	if (!fValidClipping)
+		return;
+
+	int32 gradientArraySize = r.IntegerHeight() + 1;
+	rgb_color gradientArray[gradientArraySize];
+	for (int32 i = 0; i < gradientArraySize; i++) {
+	}
+
+	uint8* dst = fBuffer.row_ptr(0);
+	uint32 bpr = fBuffer.stride();
+	int32 left = (int32)r.left;
+	int32 top = (int32)r.top;
+	int32 right = (int32)r.right;
+	int32 bottom = (int32)r.bottom;
+	// get a 32 bit pixel ready with the color
+	pixel32 color;
+	color.data8[0] = c.blue;
+	color.data8[1] = c.green;
+	color.data8[2] = c.red;
+	color.data8[3] = c.alpha;
+	// fill rects, iterate over clipping boxes
+	fBaseRenderer.first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		int32 x2 = min_c(fBaseRenderer.xmax(), right);
+		if (x1 <= x2) {
+			int32 y1 = max_c(fBaseRenderer.ymin(), top);
+			int32 y2 = min_c(fBaseRenderer.ymax(), bottom);
+			uint8* offset = dst + x1 * 4;
+			for (; y1 <= y2; y1++) {
+//					uint32* handle = (uint32*)(offset + y1 * bpr);
+//					for (int32 x = x1; x <= x2; x++) {
+//						*handle++ = color.data32;
+//					}
+gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
+			}
+		}
+	} while (fBaseRenderer.next_clip_box());
+}
+#endif
 
 // FillRectNoClipping
 void
@@ -970,10 +1016,11 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		return _StrokePath(rect);
 	} else {
 		// NOTE: This implementation might seem a little strange, but it makes
-		// stroked round rects look like on R5. A more correct way would be to use
-		// _StrokePath() as above (independent from fPenSize).
+		// stroked round rects look like on R5. A more correct way would be to
+		// use _StrokePath() as above (independent from fPenSize).
 		// The fact that the bounding box of the round rect is not enlarged
-		// by fPenSize/2 is actually on purpose, though one could argue it is unexpected.
+		// by fPenSize/2 is actually on purpose, though one could argue it is
+		// unexpected.
 
 		// enclose the right and bottom edge
 		rb.x++;
@@ -987,8 +1034,9 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 			fSubpixRasterizer.reset();
 			fSubpixRasterizer.add_path(outer);
 			
-			// don't add an inner hole if the "size is negative", this avoids some
-			// defects that can be observed on R5 and could be regarded as a bug.
+			// don't add an inner hole if the "size is negative", this avoids
+			// some defects that can be observed on R5 and could be regarded
+			// as a bug.
 			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
 				agg::rounded_rect inner;
 				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
@@ -1014,8 +1062,9 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 			fRasterizer.reset();
 			fRasterizer.add_path(outer);
 
-			// don't add an inner hole if the "size is negative", this avoids some
-			// defects that can be observed on R5 and could be regarded as a bug.
+			// don't add an inner hole if the "size is negative", this avoids
+			// some defects that can be observed on R5 and could be regarded as
+			// a bug.
 			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
 				agg::rounded_rect inner;
 				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
@@ -1066,10 +1115,10 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 	return _FillPath(rect);
 }
 
-// FillRoundRectGradient
+// FillRoundRect
 BRect
-Painter::FillRoundRectGradient(const BRect& r, float xRadius, float yRadius,
-							   const BGradient& gradient) const
+Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
+	 const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -1088,7 +1137,7 @@ Painter::FillRoundRectGradient(const BRect& r, float xRadius, float yRadius,
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 	
-	return _FillPathGradient(rect, gradient);
+	return _FillPath(rect, gradient);
 }
 
 // AlignEllipseRect
@@ -1183,9 +1232,9 @@ Painter::DrawEllipse(BRect r, bool fill) const
 	}
 }
 
-// FillEllipseGradient
+// FillEllipse
 BRect
-Painter::FillEllipseGradient(BRect r, const BGradient& gradient) const
+Painter::FillEllipse(BRect r, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -1203,7 +1252,7 @@ Painter::FillEllipseGradient(BRect r, const BGradient& gradient) const
 	
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 		
-	return _FillPathGradient(path, gradient);
+	return _FillPath(path, gradient);
 }
 
 // StrokeArc
@@ -1262,10 +1311,10 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 	return _FillPath(fPath);
 }
 
-// FillArcGradient
+// FillArc
 BRect
-Painter::FillArcGradient(BPoint center, float xRadius, float yRadius, float angle,
-				 float span, const BGradient& gradient) const
+Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
+	float span, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
@@ -1295,7 +1344,7 @@ Painter::FillArcGradient(BPoint center, float xRadius, float yRadius, float angl
 	
 	fPath.close_polygon();
 	
-	return _FillPathGradient(fPath, gradient);
+	return _FillPath(fPath, gradient);
 }
 
 // #pragma mark -
@@ -1404,17 +1453,17 @@ Painter::FillRegion(const BRegion* region) const
 	return touched;
 }
 
-// FillRegionGradient
+// FillRegion
 BRect
-Painter::FillRegionGradient(const BRegion* region, const BGradient& gradient) const
+Painter::FillRegion(const BRegion* region, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 	
 	BRegion copy(*region);
 	int32 count = copy.CountRects();
-	BRect touched = FillRectGradient(copy.RectAt(0), gradient);
+	BRect touched = FillRect(copy.RectAt(0), gradient);
 	for (int32 i = 1; i < count; i++) {
-		touched = touched | FillRectGradient(copy.RectAt(i), gradient);
+		touched = touched | FillRect(copy.RectAt(i), gradient);
 	}
 	return touched;
 }
@@ -2513,16 +2562,16 @@ Painter::_FillPath(VertexSource& path) const
 	return _Clipped(_BoundingBox(path));
 }
 
-// _FillPathGradient
+// _FillPath
 template<class VertexSource>
 BRect
-Painter::_FillPathGradient(VertexSource& path, const BGradient& gradient) const
+Painter::_FillPath(VertexSource& path, const BGradient& gradient) const
 {
-	GTRACE("Painter::_FillPathGradient\n");
+	GTRACE("Painter::_FillPath\n");
 	
-	switch(gradient.Type()) {
+	switch(gradient.GetType()) {
 		case BGradient::TYPE_LINEAR: {
-			GTRACE(("Painter::_FillPathGradient> type == TYPE_LINEAR\n"));
+			GTRACE(("Painter::_FillPath> type == TYPE_LINEAR\n"));
 			_FillPathGradientLinear(path, *((const BGradientLinear*) &gradient));
 			break;
 		}
@@ -2564,9 +2613,9 @@ template<class Array>
 void
 Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 {
-	for (int i = 0; i < gradient.CountColors() - 1; i++) {
-		BGradient::color_step* from = gradient.ColorAtFast(i);
-		BGradient::color_step* to = gradient.ColorAtFast(i + 1);
+	for (int i = 0; i < gradient.CountColorStops() - 1; i++) {
+		BGradient::ColorStop* from = gradient.ColorStopAtFast(i);
+		BGradient::ColorStop* to = gradient.ColorStopAtFast(i + 1);
 		agg::rgba8 fromColor(from->color.red, from->color.green,
 							 from->color.blue, from->color.alpha);
 		agg::rgba8 toColor(to->color.red, to->color.green,

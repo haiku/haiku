@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,7 @@
 
 
 // constructor
-BGradient::color_step::color_step(const rgb_color c, float o)
+BGradient::ColorStop::ColorStop(const rgb_color c, float o)
 {
 	color.red = c.red;
 	color.green = c.green;
@@ -27,7 +27,7 @@ BGradient::color_step::color_step(const rgb_color c, float o)
 
 
 // constructor
-BGradient::color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
+BGradient::ColorStop::ColorStop(uint8 r, uint8 g, uint8 b, uint8 a, float o)
 {
 	color.red = r;
 	color.green = g;
@@ -38,7 +38,7 @@ BGradient::color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
 
 
 // constructor
-BGradient::color_step::color_step(const color_step& other)
+BGradient::ColorStop::ColorStop(const ColorStop& other)
 {
 	color.red = other.color.red;
 	color.green = other.color.green;
@@ -49,7 +49,7 @@ BGradient::color_step::color_step(const color_step& other)
 
 
 // constructor
-BGradient::color_step::color_step()
+BGradient::ColorStop::ColorStop()
 {
 	color.red = 0;
 	color.green = 0;
@@ -61,7 +61,7 @@ BGradient::color_step::color_step()
 
 // operator!=
 bool
-BGradient::color_step::operator!=(const color_step& other) const
+BGradient::ColorStop::operator!=(const ColorStop& other) const
 {
 	return color.red != other.color.red ||
 	color.green != other.color.green ||
@@ -72,10 +72,10 @@ BGradient::color_step::operator!=(const color_step& other) const
 
 
 static int
-sort_color_steps_by_offset(const void* _left, const void* _right)
+sort_color_stops_by_offset(const void* _left, const void* _right)
 {
-	const BGradient::color_step** left = (const BGradient::color_step**)_left;
-	const BGradient::color_step** right = (const BGradient::color_step**)_right;
+	const BGradient::ColorStop** left = (const BGradient::ColorStop**)_left;
+	const BGradient::ColorStop** right = (const BGradient::ColorStop**)_right;
 	if ((*left)->offset > (*right)->offset)
 		return 1;
 	else if ((*left)->offset < (*right)->offset)
@@ -90,7 +90,7 @@ sort_color_steps_by_offset(const void* _left, const void* _right)
 // constructor
 BGradient::BGradient()
 	: BArchivable(),
-	fColors(4),
+	fColorStops(4),
 	fType(TYPE_NONE)
 {
 }
@@ -99,17 +99,17 @@ BGradient::BGradient()
 // constructor
 BGradient::BGradient(BMessage* archive)
 	: BArchivable(archive),
-	fColors(4),
+	fColorStops(4),
 	fType(TYPE_NONE)
 {
 	if (!archive)
 		return;
 
-	// color steps
-	color_step step;
-	for (int32 i = 0; archive->FindFloat("offset", i, &step.offset) >= B_OK; i++) {
-		if (archive->FindInt32("color", i, (int32*)&step.color) >= B_OK)
-			AddColor(step, i);
+	// color stops
+	ColorStop stop;
+	for (int32 i = 0; archive->FindFloat("offset", i, &stop.offset) >= B_OK; i++) {
+		if (archive->FindInt32("color", i, (int32*)&stop.color) >= B_OK)
+			AddColorStop(stop, i);
 		else
 			break;
 	}
@@ -177,11 +177,11 @@ BGradient::Archive(BMessage* into, bool deep) const
 
 	// color steps
 	if (ret >= B_OK) {
-		for (int32 i = 0; color_step* step = ColorAt(i); i++) {
-			ret = into->AddInt32("color", (const uint32&)step->color);
+		for (int32 i = 0; ColorStop* stop = ColorStopAt(i); i++) {
+			ret = into->AddInt32("color", (const uint32&)stop->color);
 			if (ret < B_OK)
 				break;
-			ret = into->AddFloat("offset", step->offset);
+			ret = into->AddFloat("offset", stop->offset);
 			if (ret < B_OK)
 				break;
 		}
@@ -246,7 +246,7 @@ BGradient::Archive(BMessage* into, bool deep) const
 BGradient&
 BGradient::operator=(const BGradient& other)
 {
-	SetColors(other);
+	SetColorStops(other);
 	fType = other.fType;
 	return *this;
 }
@@ -256,7 +256,7 @@ BGradient::operator=(const BGradient& other)
 bool
 BGradient::operator==(const BGradient& other) const
 {
-	return ((other.Type() == Type()) && ColorStepsAreEqual(other));
+	return ((other.GetType() == GetType()) && ColorStopsAreEqual(other));
 }
 
 
@@ -268,19 +268,19 @@ BGradient::operator!=(const BGradient& other) const
 }
 
 
-// ColorStepsAreEqual
+// ColorStopsAreEqual
 bool
-BGradient::ColorStepsAreEqual(const BGradient& other) const
+BGradient::ColorStopsAreEqual(const BGradient& other) const
 {
-	int32 count = CountColors();
-	if (count == other.CountColors() &&
+	int32 count = CountColorStops();
+	if (count == other.CountColorStops() &&
 		fType == other.fType) {
 		
 		bool equal = true;
 		for (int32 i = 0; i < count; i++) {
-			color_step* ourStep = ColorAtFast(i);
-			color_step* otherStep = other.ColorAtFast(i);
-			if (*ourStep != *otherStep) {
+			ColorStop* ourStop = ColorStopAtFast(i);
+			ColorStop* otherStop = other.ColorStopAtFast(i);
+			if (*ourStop != *otherStop) {
 				equal = false;
 				break;
 			}
@@ -291,13 +291,13 @@ BGradient::ColorStepsAreEqual(const BGradient& other) const
 }
 
 
-// SetColors
+// SetColorStops
 void
-BGradient::SetColors(const BGradient& other)
+BGradient::SetColorStops(const BGradient& other)
 {
 	MakeEmpty();
-	for (int32 i = 0; color_step* step = other.ColorAt(i); i++)
-		AddColor(*step, i);
+	for (int32 i = 0; ColorStop* stop = other.ColorStopAt(i); i++)
+		AddColorStop(*stop, i);
 }
 
 
@@ -306,29 +306,29 @@ int32
 BGradient::AddColor(const rgb_color& color, float offset)
 {
 	// find the correct index (sorted by offset)
-	color_step* step = new color_step(color, offset);
+	ColorStop* stop = new ColorStop(color, offset);
 	int32 index = 0;
-	int32 count = CountColors();
+	int32 count = CountColorStops();
 	for (; index < count; index++) {
-		color_step* s = ColorAtFast(index);
-		if (s->offset > step->offset)
+		ColorStop* s = ColorStopAtFast(index);
+		if (s->offset > stop->offset)
 			break;
 	}
-	if (!fColors.AddItem((void*)step, index)) {
-		delete step;
+	if (!fColorStops.AddItem((void*)stop, index)) {
+		delete stop;
 		return -1;
 	}
 	return index;
 }
 
 
-// AddColor
+// AddColorStop
 bool
-BGradient::AddColor(const color_step& color, int32 index)
+BGradient::AddColorStop(const ColorStop& colorStop, int32 index)
 {
-	color_step* step = new color_step(color);
-	if (!fColors.AddItem((void*)step, index)) {
-		delete step;
+	ColorStop* stop = new ColorStop(colorStop);
+	if (!fColorStops.AddItem((void*)stop, index)) {
+		delete stop;
 		return false;
 	}
 	return true;
@@ -339,23 +339,23 @@ BGradient::AddColor(const color_step& color, int32 index)
 bool
 BGradient::RemoveColor(int32 index)
 {
-	color_step* step = (color_step*)fColors.RemoveItem(index);
-	if (!step) {
+	ColorStop* stop = (ColorStop*)fColorStops.RemoveItem(index);
+	if (!stop) {
 		return false;
 	}
-	delete step;
+	delete stop;
 	return true;
 }
 
 
-// SetColor
+// SetColorStop
 bool
-BGradient::SetColor(int32 index, const color_step& color)
+BGradient::SetColorStop(int32 index, const ColorStop& color)
 {
-	if (color_step* step = ColorAt(index)) {
-		if (*step != color) {
-			step->color = color.color;
-			step->offset = color.offset;
+	if (ColorStop* stop = ColorStopAt(index)) {
+		if (*stop != color) {
+			stop->color = color.color;
+			stop->offset = color.offset;
 			return true;
 		}
 	}
@@ -367,11 +367,10 @@ BGradient::SetColor(int32 index, const color_step& color)
 bool
 BGradient::SetColor(int32 index, const rgb_color& color)
 {
-	if (color_step* step = ColorAt(index)) {
-		if ((uint32&)step->color != (uint32&)color) {
-			step->color = color;
-			return true;
-		}
+	ColorStop* stop = ColorStopAt(index);
+	if (stop && stop->color != color) {
+		stop->color = color;
+		return true;
 	}
 	return false;
 }
@@ -381,55 +380,55 @@ BGradient::SetColor(int32 index, const rgb_color& color)
 bool
 BGradient::SetOffset(int32 index, float offset)
 {
-	color_step* step = ColorAt(index);
-	if (step && step->offset != offset) {
-		step->offset = offset;
+	ColorStop* stop = ColorStopAt(index);
+	if (stop && stop->offset != offset) {
+		stop->offset = offset;
 		return true;
 	}
 	return false;
 }
 
 
-// CountColors
+// CountColorStops
 int32
-BGradient::CountColors() const
+BGradient::CountColorStops() const
 {
-	return fColors.CountItems();
+	return fColorStops.CountItems();
 }
 
 
-// ColorAt
-BGradient::color_step*
-BGradient::ColorAt(int32 index) const
+// ColorStopAt
+BGradient::ColorStop*
+BGradient::ColorStopAt(int32 index) const
 {
-	return (color_step*)fColors.ItemAt(index);
+	return (ColorStop*)fColorStops.ItemAt(index);
 }
 
 
-// ColorAtFast
-BGradient::color_step*
-BGradient::ColorAtFast(int32 index) const
+// ColorStopAtFast
+BGradient::ColorStop*
+BGradient::ColorStopAtFast(int32 index) const
 {
-	return (color_step*)fColors.ItemAtFast(index);
+	return (ColorStop*)fColorStops.ItemAtFast(index);
 }
 
 
-// Colors
-BGradient::color_step*
-BGradient::Colors() const
+// ColorStops
+BGradient::ColorStop*
+BGradient::ColorStops() const
 {
-	if (CountColors() > 0) {
-		return (color_step*) fColors.Items();
+	if (CountColorStops() > 0) {
+		return (ColorStop*) fColorStops.Items();
 	}
 	return NULL;
 }
 
 
-// SortColorStepsByOffset
+// SortColorStopsByOffset
 void
-BGradient::SortColorStepsByOffset()
+BGradient::SortColorStopsByOffset()
 {
-	fColors.SortItems(sort_color_steps_by_offset);
+	fColorStops.SortItems(sort_color_stops_by_offset);
 }
 
 
@@ -437,8 +436,8 @@ BGradient::SortColorStepsByOffset()
 void
 BGradient::MakeEmpty()
 {
-	int32 count = CountColors();
+	int32 count = CountColorStops();
 	for (int32 i = 0; i < count; i++)
-		delete ColorAtFast(i);
-	fColors.MakeEmpty();
+		delete ColorStopAtFast(i);
+	fColorStops.MakeEmpty();
 }

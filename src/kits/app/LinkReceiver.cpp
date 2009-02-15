@@ -471,7 +471,7 @@ LinkReceiver::ReadRegion(BRegion* region)
 
 
 static BGradient*
-gradient_for_type(BGradient::gradient_type type)
+gradient_for_type(BGradient::Type type)
 {
 	switch (type) {
 		case BGradient::TYPE_LINEAR:
@@ -495,10 +495,10 @@ status_t
 LinkReceiver::ReadGradient(BGradient** _gradient)
 {
 	GTRACE(("LinkReceiver::ReadGradient\n"));
-	BGradient::gradient_type gradientType;
+	BGradient::Type gradientType;
 	int32 colorsCount;
 	status_t ret;
-	if ((ret = Read(&gradientType, sizeof(BGradient::gradient_type))) != B_OK)
+	if ((ret = Read(&gradientType, sizeof(BGradient::Type))) != B_OK)
 		return ret;
 	if ((ret = Read(&colorsCount, sizeof(int32))) != B_OK)
 		return ret;
@@ -509,11 +509,11 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 	*_gradient = gradient;
 	
 	if (colorsCount > 0) {
-		BGradient::color_step step;
+		BGradient::ColorStop stop;
 		for (int i = 0; i < colorsCount; i++) {
-			if ((ret = Read(&step, sizeof(BGradient::color_step))) != B_OK)
+			if ((ret = Read(&stop, sizeof(BGradient::ColorStop))) != B_OK)
 				return ret; 
-			if (!gradient->AddColor(step, i))
+			if (!gradient->AddColorStop(stop, i))
 				return B_NO_MEMORY;
 		}
 	}

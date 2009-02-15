@@ -241,7 +241,7 @@ FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer,
 					styleType = STYLE_TYPE_SOLID_COLOR;
 			}
 		}
-		
+
 		if (!buffer.Write(styleType))
 			return B_NO_MEMORY;
 
@@ -527,7 +527,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, Shape* shape,
 		shapeFlags |= SHAPE_FLAG_LOD_SCALE;
 	if (transformerCount > 0)
 		shapeFlags |= SHAPE_FLAG_HAS_TRANSFORMERS;
-	
+
 	if (!buffer.Write((uint8)shapeFlags))
 		return false;
 
@@ -555,7 +555,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, Shape* shape,
 		// transformers
 		if (!buffer.Write(transformerCount))
 			return false;
-	
+
 		for (uint32 i = 0; i < transformerCount; i++) {
 			Transformer* transformer = shape->TransformerAtFast(i);
 			if (!_WriteTransformer(buffer, transformer))
@@ -606,7 +606,7 @@ FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
 	bool alpha = false;
 	bool gray = true;
 	for (int32 i = 0; i < gradientStopCount; i++) {
-		BGradient::color_step* step = gradient->ColorAtFast(i);
+		BGradient::ColorStop* step = gradient->ColorAtFast(i);
 		if (step->color.alpha < 255)
 			alpha = true;
 		if (step->color.red != step->color.green
@@ -632,7 +632,7 @@ FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
 	}
 
 	for (int32 i = 0; i < gradientStopCount; i++) {
-		BGradient::color_step* step = gradient->ColorAtFast(i);
+		BGradient::ColorStop* step = gradient->ColorAtFast(i);
 		uint8 stopOffset = (uint8)(step->offset * 255.0);
 		uint32 color = (uint32&)step->color;
 		if (!buffer.Write(stopOffset))

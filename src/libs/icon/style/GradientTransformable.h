@@ -73,19 +73,19 @@ class Gradient : public Transformable {
 
 
 			int32				AddColor(const rgb_color& color, float offset);
-			bool				AddColor(const BGradient::color_step& color,
+			bool				AddColor(const BGradient::ColorStop& color,
 									int32 index);
 
 			bool				RemoveColor(int32 index);
 
 			bool				SetColor(int32 index,
-									const BGradient::color_step& step);
+									const BGradient::ColorStop& step);
 			bool				SetColor(int32 index, const rgb_color& color);
 			bool				SetOffset(int32 index, float offset);
 
 			int32				CountColors() const;
-			BGradient::color_step* ColorAt(int32 index) const;
-			BGradient::color_step* ColorAtFast(int32 index) const;
+			BGradient::ColorStop* ColorAt(int32 index) const;
+			BGradient::ColorStop* ColorAtFast(int32 index) const;
 
 			void				SetType(gradients_type type);
 			gradients_type		Type() const
