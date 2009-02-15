@@ -12,6 +12,8 @@
 
 #include <dirent.h>
 
+#include <util/kernel_cpp.h>
+
 #include <fs_info.h>
 #include <fs_interface.h>
 
