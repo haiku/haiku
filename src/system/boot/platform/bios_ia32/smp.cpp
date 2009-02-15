@@ -151,24 +151,25 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 
 				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
 
-				/* skip if the processor is not enabled. */
-				if(!(processor->cpu_flags & 0x1))
-					break;
-					
-				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
-				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
+				/* is processor enabled? */
+				if(processor->cpu_flags & 0x1) {
+
+					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
+					gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
+					gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
 
 #ifdef TRACE_SMP
-				const char *cpuFamily[] = { "", "", "", "", "Intel 486",
-					"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
+					const char *cpuFamily[] = { "", "", "", "", "Intel 486",
+						"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
 #endif
-				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
-					gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
-					processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
-					", BSP" : ""));
+					TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
+						gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
+						processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
+						", BSP" : ""));
 
-				gKernelArgs.num_cpus++;
+					gKernelArgs.num_cpus++;
+				}
+				
 				pointer += sizeof(struct mp_base_processor);
 				break;
 			}
