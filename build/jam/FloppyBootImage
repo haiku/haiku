@@ -163,6 +163,9 @@ MakeLocate $(HAIKU_BOOT_FLOPPY) : $(HAIKU_OUTPUT_DIR) ;
 
 BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : zbeos : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 
+# remove the archive
+RmTemps $(HAIKU_BOOT_FLOPPY) : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
+
 NotFile haiku-boot-floppy ;
 Depends haiku-boot-floppy : $(HAIKU_BOOT_FLOPPY) ;
 

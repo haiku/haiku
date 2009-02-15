@@ -150,4 +150,4 @@ echo "Building CD image ..."
 mkisofs -b `basename $cdBootFloppy` -U -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
 
 # cleanup output dir
-#$rmAttrs -rf "$outputDir"
+$rmAttrs -rf "$outputDir"

@@ -36,18 +36,6 @@ if $(optionalPackageDescriptions) {
 		: optionalPackageDescriptions ;
 }
 
-
-# create the other scripts
-HAIKU_CD_MAKE_DIRS_SCRIPT = <HaikuCD>haiku.cd-make-dirs ;
-HAIKU_CD_COPY_FILES_SCRIPT = <HaikuCD>haiku.cd-copy-files ;
-HAIKU_CD_UNZIP_FILES_SCRIPT = <HaikuCD>haiku.cd-unzip-files ;
-MakeLocate $(HAIKU_CD_MAKE_DIRS_SCRIPT) $(HAIKU_CD_COPY_FILES_SCRIPT)
-	$(HAIKU_CD_UNZIP_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
-
-CreateHaikuImageMakeDirectoriesScript $(HAIKU_CD_MAKE_DIRS_SCRIPT) ;
-CreateHaikuImageCopyFilesScript $(HAIKU_CD_COPY_FILES_SCRIPT) ;
-CreateHaikuImageUnzipFilesScript $(HAIKU_CD_UNZIP_FILES_SCRIPT) ;
-
 # Convenience wrapper rule around BuildHaikuCD.
 rule _BuildHaikuCD haikuCD : bootFloppy
 {
@@ -55,23 +43,23 @@ rule _BuildHaikuCD haikuCD : bootFloppy
 	#
 
 	# build the cd
-	# HAIKU_CD_EARLY_USER_SCRIPTS, HAIKU_CD_LATE_USER_SCRIPTS can be
+	# HAIKU_IMAGE_EARLY_USER_SCRIPTS, HAIKU_IMAGE_LATE_USER_SCRIPTS can be
 	# specified by the user.
 	BuildHaikuCD $(haikuCD) : $(bootFloppy) :
 		$(HAIKU_CD_INIT_VARIABLES_SCRIPT)
-		$(HAIKU_CD_EARLY_USER_SCRIPTS)
-		$(HAIKU_CD_MAKE_DIRS_SCRIPT)
-		$(HAIKU_CD_COPY_FILES_SCRIPT)
-		$(HAIKU_CD_UNZIP_FILES_SCRIPT)
-		$(HAIKU_CD_LATE_USER_SCRIPTS)
+		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
+		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
 	;
 
 	# remove the scripts we have generated
 	RmTemps $(haikuCD) :
 		$(HAIKU_CD_INIT_VARIABLES_SCRIPT)
-		$(HAIKU_CD_MAKE_DIRS_SCRIPT)
-		$(HAIKU_CD_COPY_FILES_SCRIPT)
-		$(HAIKU_CD_UNZIP_FILES_SCRIPT)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
 	;
 }
 
@@ -79,6 +67,8 @@ rule _BuildHaikuCD haikuCD : bootFloppy
 _BuildHaikuCD $(HAIKU_CD) : $(HAIKU_BOOT_FLOPPY) ;
 NotFile haiku-cd ;
 Depends haiku-cd : $(HAIKU_CD) ;
+
+RmTemps $(HAIKU_CD) : $(HAIKU_BOOT_FLOPPY) ;
 
 # Execute post-image user config rules.
 UserBuildConfigRulePostImage ;
