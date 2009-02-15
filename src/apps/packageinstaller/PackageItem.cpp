@@ -337,7 +337,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		fPackage->Read(*attrName, length);
 		(*attrName)[length] = 0;
 
-		parser_debug(" (%d) = %s\n", length, *attrName);
+		parser_debug(" (%ld) = %s\n", length, *attrName);
 	}
 	else if (!memcmp(buffer, "BeAT", 5)) {
 		if (!*attrStarted) {

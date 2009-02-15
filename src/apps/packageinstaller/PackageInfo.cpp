@@ -1055,8 +1055,11 @@ PackageInfo::Parse()
 			}
 
 			element = P_NONE;
-		}
-		else {
+		} else if (!memcmp(buffer, "PkgA", 5)) {
+			parser_debug("PkgA\n");
+			break;
+		} else {
+			fprintf(stderr, "Unknown file tag %s", buffer);
 			fStatus = B_ERROR;
 			return fStatus;
 		}
