@@ -1,0 +1,153 @@
+#!/bin/sh
+
+# The first argument is the shell script that initializes the variables:
+# sourceDir
+# outputDir
+# tmpDir
+# addBuildCompatibilityLibDir
+#
+# addattr
+# copyattr
+# resattr
+# rc
+# rmAttrs
+# unzip
+# generate_attribute_stores
+#
+if [ $# -gt 0 ]; then
+	. $1
+	shift
+fi
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+outputDir=$tmpDir/cdsource
+
+sPrefix=
+tPrefix="$outputDir/"
+cd=cd
+scd=:
+cp="$copyattr -d"
+copyAttrs="$copyattr"
+ln=ln
+mkdir=mkdir
+rm=rm
+
+
+unzipFile()
+{
+	# unzipFile <archive> <directory>
+	zipFile=$1
+	targetUnzipDir=$2
+
+	echo "Unzipping $zipFile ..."
+
+	unzipDir=$tmpDir/unzip
+	$rmAttrs -rf "$unzipDir"
+	mkdir -p "$unzipDir"
+
+	$unzip -q -d "$unzipDir" "$zipFile"
+
+	if [ -f $unzipDir/.OptionalPackageDescription ]; then
+		cat $unzipDir/.OptionalPackageDescription >> $copyrightsFile
+		echo >> $copyrightsFile
+		rm $unzipDir/.OptionalPackageDescription
+	fi
+
+	$cp -r "$unzipDir/." "${tPrefix}$targetUnzipDir"
+
+	$rmAttrs -rf "$unzipDir"
+}
+
+
+mkdir -p $tmpDir
+copyrightsFile=$tmpDir/copyrights
+$rmAttrs -f $copyrightsFile
+if [ "$optionalPackageDescriptions" ]; then
+	cp "$optionalPackageDescriptions" $copyrightsFile
+fi
+
+# setup output dir
+$rmAttrs -rf "$outputDir"
+mkdir -p "$outputDir"
+
+echo "Populating CD ..."
+while [ $# -gt 0 ]; do
+	. $1
+	shift
+done
+
+
+# install MIME database
+# TODO: It should be possible to do that in the build system too.
+
+mimeDBSource=$sourceDir/src/data/beos_mime
+mimeDBDest=${tPrefix}home/config/settings/beos_mime
+
+$rm -rf $mimeDBDest
+$mkdir -p $mimeDBDest
+mimeTmpDir=$tmpDir/mime
+mimeDBTmpDir=$tmpDir/mime/db
+mimeTmpIndex=0
+mimeTmpFile=$mimeTmpDir/mimedb$$.rsrc
+
+# create tmp dir for the MIME conversion stuff
+mkdir -p $mimeDBTmpDir
+
+echo "Installing MIME database ..."
+
+for inSuperFile in $mimeDBSource/*.super; do
+	superType=$(basename $inSuperFile .super)
+	tmpSuperDir=$mimeDBTmpDir/$superType
+
+	# compile rdef to rsrc file and the rsrc file to attributes
+	$rc -o $mimeTmpFile $inSuperFile
+	mkdir -p $tmpSuperDir
+	$resattr -O -o $tmpSuperDir $mimeTmpFile
+	$rmAttrs $mimeTmpFile
+
+	# iterate through the sub types
+	for inSubFile in $mimeDBSource/$superType/*; do
+		# check, if the type exists
+		if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
+			subType=$(basename $inSubFile)
+			tmpSubFile=$mimeDBTmpDir/$superType/$subType
+
+			# compile rdef to rsrc file and the rsrc file to attributes
+			$rc -o $mimeTmpFile $inSubFile
+			$resattr -O -o $tmpSubFile $mimeTmpFile
+			$rmAttrs $mimeTmpFile
+		fi
+	done
+done
+
+$cp -r $mimeDBTmpDir/. $mimeDBDest
+
+# cleanup tmp dir
+$rmAttrs -rf $mimeTmpDir
+
+
+# add the concatenated copyrights as an attribute to AboutSystem
+
+if [ -f $copyrightsFile ]; then
+	copyrightAttrs=$tmpDir/copyrightAttrs
+	$rmAttrs -f $copyrightAttrs
+	touch $copyrightAttrs
+	$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
+	$copyAttrs $copyrightAttrs ${tPrefix}beos/apps/AboutSystem
+fi
+
+# generate the attribute stores
+echo "Generating attribute stores ..."
+$generate_attribute_stores "$tPrefix"
+
+echo "Copying boot image ..."
+$cp "$cdBootFloppy" "$outputDir"
+
+# build the iso image
+echo "Building CD image ..."
+mkisofs -b `basename $cdBootFloppy` -U -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
+
+# cleanup output dir
+#$rmAttrs -rf "$outputDir"

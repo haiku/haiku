@@ -1,0 +1,18 @@
+rule BuildHaikuCD haikuCD : bootFloppy : scripts
+{
+	# BuildHaikuCD <haiku cd> : <bootFloppy> : <scripts> ;
+
+	local mainScript = build_haiku_cd ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	Depends $(haikuCD) : $(mainScript) $(scripts) ;
+	Depends $(haikuCD) : $(bootFloppy) ;
+	BuildHaikuCD1 $(haikuCD) : $(bootFloppy) $(mainScript) $(scripts) ;
+}
+
+actions BuildHaikuCD1
+{
+	export cdImagePath="$(1)"
+	export cdBootFloppy="$(2[1])"
+	$(2[2]) $(2[3-])
+}

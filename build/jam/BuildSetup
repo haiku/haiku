@@ -59,6 +59,11 @@ HAIKU_DEFAULT_INSTALL_DIR = /Haiku ;
 HAIKU_DEFAULT_IMAGE_SIZE ?= 128 ; # 128 MB
 HAIKU_DEFAULT_IMAGE_LABEL ?= Haiku ;
 
+# Haiku CD defaults
+HAIKU_DEFAULT_CD_NAME = haiku-cd.iso ;
+HAIKU_DEFAULT_CD_DIR = $(HAIKU_OUTPUT_DIR) ;
+HAIKU_DEFAULT_CD_LABEL = Haiku ;
+
 # analyze an optionally replace jam's target parameters
 HAIKU_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
 HAIKU_BUILD_PROFILE = ;
