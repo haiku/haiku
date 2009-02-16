@@ -1216,40 +1216,6 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 }
 
 
-#if 0
-static void
-_MakeTabShape(BShape& shape, const BRect& rect, float cornerRadius,
-	float slopeRadius)
-{
-	BPoint curve[3];
-
-	shape.Clear();
-	shape.MoveTo(BPoint(rect.left, rect.bottom));
-	shape.LineTo(BPoint(rect.left, rect.top + cornerRadius));
-
-	curve[0].x = rect.left;
-	curve[0].y = rect.top + 0.56 * cornerRadius;
-	curve[1].x = rect.left + 0.56 * cornerRadius;
-	curve[1].y = rect.top;
-	curve[2].x = rect.left + cornerRadius;
-	curve[2].y = rect.top;
-
-	shape.BezierTo(curve);
-
-	shape.LineTo(BPoint(rect.right - slopeRadius, rect.top));
-
-	curve[0].x = rect.right - slopeRadius / 5;
-	curve[0].y = rect.top;
-	curve[1].x = rect.right;
-	curve[1].y = rect.bottom - slopeRadius / 5;
-	curve[2].x = rect.right;
-	curve[2].y = rect.bottom;
-
-	shape.BezierTo(curve);
-}
-#endif
-
-
 void
 BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, uint32 borders)
@@ -1286,7 +1252,7 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 		fillGradient.AddColor(tint_color(base, 0.75), 0);
 		fillGradient.AddColor(tint_color(base, 1.03), 255);
 	}
-#if 1
+
 	static const float kRoundCornerRadius = 4;
 
 	// left/top corner
@@ -1316,7 +1282,6 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
 		edgeLightColor,
 		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
-//		B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
 	if ((borders & B_LEFT_BORDER) == 0)
 		rect.left++;
 	if ((borders & B_RIGHT_BORDER) == 0)
@@ -1331,42 +1296,6 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	view->FillRect(rect, fillGradient);
 
 	view->ConstrainClippingRegion(NULL);
-#else
-
-	view->MovePenTo(B_ORIGIN);
-
-	uint32 viewFlags = view->Flags();
-	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
-
-	rect.InsetBy(0.5, 0.5);
-
-	float cornerRadius = 4;
-	float slopeRadius = 20;
-	BShape shape;
-
-	_MakeTabShape(shape, rect, cornerRadius, slopeRadius);
-	view->SetHighColor(edgeShadowColor);
-	view->StrokeShape(&shape);
-
-	rect.left += 1;
-	rect.top += 1;
-	rect.right -= 1;
-	cornerRadius -= 1;
-
-	_MakeTabShape(shape, rect, cornerRadius, slopeRadius);
-	view->SetHighColor(frameLightColor);
-	view->StrokeShape(&shape);
-
-	rect.left += 0.5;
-	rect.top += 0.5;
-	rect.right -= 0.5;
-	cornerRadius -= 1;
-	
-	_MakeTabShape(shape, rect, cornerRadius, slopeRadius);
-	view->FillShape(&shape, fillGradient);
-
-	view->SetFlags(viewFlags);
-#endif
 }
 
 
@@ -1401,7 +1330,7 @@ BControlLook::DrawInctiveTab(BView* view, BRect& rect, const BRect& updateRect,
 		edgeLightColor = tint_color(base, 0.80);
 		frameShadowColor = tint_color(base, 1.30);
 		frameLightColor = tint_color(base, 1.30);
-		bevelShadowColor = tint_color(base, 1.15);
+		bevelShadowColor = tint_color(base, 1.17);
 		bevelLightColor = tint_color(base, 1.10);
 		fillGradient.AddColor(tint_color(base, 1.12), 0);
 		fillGradient.AddColor(tint_color(base, 1.08), 255);
@@ -1419,13 +1348,10 @@ BControlLook::DrawInctiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
 		frameShadowColor,
-		//B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
 		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
 
-	_DrawFrame(view, rect, bevelLightColor, bevelLightColor, bevelShadowColor,
-		bevelShadowColor,
-		//B_BOTTOM_BORDER);
-		0);
+	_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor, bevelLightColor,
+		bevelLightColor, B_LEFT_BORDER & ~borders);
 
 	view->FillRect(rect, fillGradient);
 }
