@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,28 +31,28 @@
 
 
 struct datalink_protocol : net_protocol {
-	struct net_domain_private *domain;
+	struct net_domain_private* domain;
 };
 
 struct interface_protocol : net_datalink_protocol {
-	struct net_device_module_info *device_module;
-	struct net_device *device;
+	struct net_device_module_info* device_module;
+	struct net_device* device;
 };
 
 
 static status_t
-device_reader_thread(void *_interface)
+device_reader_thread(void* _interface)
 {
-	net_device_interface *interface = (net_device_interface *)_interface;
-	net_device *device = interface->device;
+	net_device_interface* interface = (net_device_interface*)_interface;
+	net_device* device = interface->device;
 	status_t status = B_OK;
 
-	RecursiveLocker locker(interface->rx_lock);
+	RecursiveLocker locker(interface->receive_lock);
 
-	while (device->flags & IFF_UP) {
+	while ((device->flags & IFF_UP) != 0) {
 		locker.Unlock();
 
-		net_buffer *buffer;
+		net_buffer* buffer;
 		status = device->module->receive_data(device, &buffer);
 
 		locker.Lock();
@@ -61,8 +61,7 @@ device_reader_thread(void *_interface)
 			// feed device monitors
 			DeviceMonitorList::Iterator iterator =
 				interface->monitor_funcs.GetIterator();
-			while (iterator.HasNext()) {
-				net_device_monitor *monitor = iterator.Next();
+			while (net_device_monitor* monitor = iterator.Next()) {
 				monitor->receive(monitor, buffer);
 			}
 
@@ -76,26 +75,17 @@ device_reader_thread(void *_interface)
 			fifo_enqueue_buffer(&interface->receive_queue, buffer);
 		} else {
 			// In case of error, give the other threads some
-			// time to run since this is a near real time thread.
-			//
-			// TODO: can this value be lower? 1000 works fine in
-			//       my system. 10ms seems a bit too much and adds
-			//       as latency.
+			// time to run since this is a high priority time thread.
 			snooze(10000);
 		}
-
-		// if the interface went down IFF_UP was removed
-		// and the receive_data() above should have been
-		// interrupted. One check should be enough, specially
-		// considering the snooze above.
 	}
 
 	return status;
 }
 
 
-static struct sockaddr **
-interface_address(net_interface *interface, int32 option)
+static struct sockaddr**
+interface_address(net_interface* interface, int32 option)
 {
 	switch (option) {
 		case SIOCSIFADDR:
@@ -118,8 +108,8 @@ interface_address(net_interface *interface, int32 option)
 }
 
 
-void
-remove_default_routes(net_interface_private *interface, int32 option)
+static void
+remove_default_routes(net_interface_private* interface, int32 option)
 {
 	net_route route;
 	route.destination = interface->address;
@@ -141,8 +131,8 @@ remove_default_routes(net_interface_private *interface, int32 option)
 }
 
 
-void
-add_default_routes(net_interface_private *interface, int32 option)
+static void
+add_default_routes(net_interface_private* interface, int32 option)
 {
 	net_route route;
 	route.destination = interface->address;
@@ -164,16 +154,16 @@ add_default_routes(net_interface_private *interface, int32 option)
 }
 
 
-sockaddr *
-reallocate_address(sockaddr **_address, uint32 size)
+static sockaddr*
+reallocate_address(sockaddr** _address, uint32 size)
 {
-	sockaddr *address = *_address;
+	sockaddr* address = *_address;
 
 	size = max_c(size, sizeof(struct sockaddr));
 	if (address != NULL && address->sa_len >= size)
 		return address;
 
-	address = (sockaddr *)malloc(size);
+	address = (sockaddr*)malloc(size);
 	if (address == NULL)
 		return NULL;
 
@@ -185,8 +175,8 @@ reallocate_address(sockaddr **_address, uint32 size)
 
 
 static status_t
-datalink_control_interface(net_domain_private *domain, int32 option,
-	void *value, size_t *_length, size_t expected, bool getByName)
+datalink_control_interface(net_domain_private* domain, int32 option,
+	void* value, size_t* _length, size_t expected, bool getByName)
 {
 	if (*_length < expected)
 		return B_BAD_VALUE;
@@ -198,14 +188,14 @@ datalink_control_interface(net_domain_private *domain, int32 option,
 		return B_BAD_ADDRESS;
 
 	MutexLocker _(domain->lock);
-	net_interface *interface = NULL;
+	net_interface* interface = NULL;
 
 	if (getByName)
 		interface = find_interface(domain, request.ifr_name);
 	else
 		interface = find_interface(domain, request.ifr_index);
 
-	status_t status = (interface == NULL) ? ENODEV : B_OK;
+	status_t status = interface == NULL ? ENODEV : B_OK;
 
 	switch (option) {
 		case SIOCGIFINDEX:
@@ -234,10 +224,10 @@ datalink_control_interface(net_domain_private *domain, int32 option,
 
 
 status_t
-datalink_control(net_domain *_domain, int32 option, void *value,
-	size_t *_length)
+datalink_control(net_domain* _domain, int32 option, void* value,
+	size_t* _length)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	if (domain == NULL || domain->family == AF_LINK) {
 		// the AF_LINK family is already handled completely in the link protocol
 		return B_BAD_VALUE;
@@ -288,7 +278,7 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 				return B_BAD_ADDRESS;
 
 			status_t result = list_domain_interfaces(config.ifc_buf,
-				(size_t *)&config.ifc_len);
+				(size_t*)&config.ifc_len);
 			if (result != B_OK)
 				return result;
 
@@ -324,7 +314,7 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 
 			MutexLocker _(domain->lock);
 
-			net_interface *interface = find_interface(domain,
+			net_interface* interface = find_interface(domain,
 				request.ifr_name);
 			if (interface == NULL)
 				return B_BAD_VALUE;
@@ -339,10 +329,10 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 
 
 status_t
-datalink_send_data(struct net_route *route, net_buffer *buffer)
+datalink_send_data(struct net_route* route, net_buffer* buffer)
 {
-	net_interface_private *interface =
-		(net_interface_private *)route->interface;
+	net_interface_private* interface =
+		(net_interface_private*)route->interface;
 
 	//dprintf("send buffer (%ld bytes) to interface %s (route flags %lx)\n",
 	//	buffer->size, interface->name, route->flags);
@@ -373,19 +363,19 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 
 
 status_t
-datalink_send_datagram(net_protocol *protocol, net_domain *domain,
-	net_buffer *buffer)
+datalink_send_datagram(net_protocol* protocol, net_domain* domain,
+	net_buffer* buffer)
 {
 	if (protocol == NULL && domain == NULL)
 		return B_BAD_VALUE;
 
-	net_protocol_module_info *module = protocol ? protocol->module
+	net_protocol_module_info* module = protocol ? protocol->module
 		: domain->module;
 
 	if (domain == NULL)
 		domain = protocol->module->get_domain(protocol);
 
-	net_route *route = NULL;
+	net_route* route = NULL;
 	status_t status;
 	if (protocol != NULL && protocol->socket->bound_to_device > 0) {
 		status = get_device_route(domain, protocol->socket->bound_to_device,
@@ -408,21 +398,21 @@ datalink_send_datagram(net_protocol *protocol, net_domain *domain,
 	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
 */
 bool
-datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
-	net_interface **_interface, uint32 *_matchedType)
+datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
+	net_interface** _interface, uint32* _matchedType)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	if (domain == NULL || address == NULL)
 		return false;
 
 	MutexLocker locker(domain->lock);
 
-	net_interface *interface = NULL;
-	net_interface *fallback = NULL;
+	net_interface* interface = NULL;
+	net_interface* fallback = NULL;
 	uint32 matchedType = 0;
 
 	while (true) {
-		interface = (net_interface *)list_get_next_item(
+		interface = (net_interface*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -460,20 +450,20 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 }
 
 
-net_interface *
-datalink_get_interface_with_address(net_domain *_domain,
-	const sockaddr *address)
+net_interface* 
+datalink_get_interface_with_address(net_domain* _domain,
+	const sockaddr* address)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	if (domain == NULL)
 		return NULL;
 
 	MutexLocker _(domain->lock);
 
-	net_interface *interface = NULL;
+	net_interface* interface = NULL;
 
 	while (true) {
-		interface = (net_interface *)list_get_next_item(
+		interface = (net_interface*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -490,8 +480,8 @@ datalink_get_interface_with_address(net_domain *_domain,
 }
 
 
-net_interface *
-datalink_get_interface(net_domain *domain, uint32 index)
+net_interface* 
+datalink_get_interface(net_domain* domain, uint32 index)
 {
 	if (index == 0)
 		return datalink_get_interface_with_address(domain, NULL);
@@ -518,12 +508,12 @@ datalink_std_ops(int32 op, ...)
 
 
 status_t
-interface_protocol_init(struct net_interface *_interface,
-	net_datalink_protocol **_protocol)
+interface_protocol_init(struct net_interface* _interface,
+	net_datalink_protocol** _protocol)
 {
-	net_interface_private *interface = (net_interface_private *)_interface;
+	net_interface_private* interface = (net_interface_private*)_interface;
 
-	interface_protocol *protocol = new (std::nothrow) interface_protocol;
+	interface_protocol* protocol = new (std::nothrow) interface_protocol;
 	if (protocol == NULL)
 		return B_NO_MEMORY;
 
@@ -536,7 +526,7 @@ interface_protocol_init(struct net_interface *_interface,
 
 
 status_t
-interface_protocol_uninit(net_datalink_protocol *protocol)
+interface_protocol_uninit(net_datalink_protocol* protocol)
 {
 	delete protocol;
 	return B_OK;
@@ -544,12 +534,12 @@ interface_protocol_uninit(net_datalink_protocol *protocol)
 
 
 status_t
-interface_protocol_send_data(net_datalink_protocol *_protocol,
-	net_buffer *buffer)
+interface_protocol_send_data(net_datalink_protocol* _protocol,
+	net_buffer* buffer)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
-	net_interface_private *interface
-		= (net_interface_private *)protocol->interface;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
+	net_interface_private* interface
+		= (net_interface_private*)protocol->interface;
 
 	// TODO: Need to think about this locking. We can't obtain the
 	//       RX Lock here (nor would it make sense) as the ARP
@@ -560,7 +550,7 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 	DeviceMonitorList::Iterator iterator =
 		interface->device_interface->monitor_funcs.GetIterator();
 	while (iterator.HasNext()) {
-		net_device_monitor *monitor = iterator.Next();
+		net_device_monitor* monitor = iterator.Next();
 		monitor->receive(monitor, buffer);
 	}
 
@@ -569,12 +559,12 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 
 
 status_t
-interface_protocol_up(net_datalink_protocol *_protocol)
+interface_protocol_up(net_datalink_protocol* _protocol)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
-	net_device_interface *deviceInterface =
-		((net_interface_private *)protocol->interface)->device_interface;
-	net_device *device = protocol->device;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
+	net_device_interface* deviceInterface =
+		((net_interface_private*)protocol->interface)->device_interface;
+	net_device* device = protocol->device;
 
 	// This function is called with the RX lock held.
 
@@ -610,11 +600,11 @@ interface_protocol_up(net_datalink_protocol *_protocol)
 
 
 void
-interface_protocol_down(net_datalink_protocol *_protocol)
+interface_protocol_down(net_datalink_protocol* _protocol)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
-	net_device_interface *deviceInterface =
-		((net_interface_private *)protocol->interface)->device_interface;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
+	net_device_interface* deviceInterface =
+		((net_interface_private*)protocol->interface)->device_interface;
 
 	// This function is called with the RX lock held.
 	if (deviceInterface->up_count == 0)
@@ -632,11 +622,12 @@ interface_protocol_down(net_datalink_protocol *_protocol)
 
 
 status_t
-interface_protocol_control(net_datalink_protocol *_protocol,
-	int32 option, void *argument, size_t length)
+interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
+	void* argument, size_t length)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
-	net_interface_private *interface = (net_interface_private *)protocol->interface;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
+	net_interface_private* interface
+		= (net_interface_private*)protocol->interface;
 
 	switch (option) {
 		case SIOCSIFADDR:
@@ -649,12 +640,12 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			sockaddr **_address = interface_address(interface, option);
+			sockaddr** _address = interface_address(interface, option);
 			if (_address == NULL)
 				return B_BAD_VALUE;
 
 			// allocate new address if needed
-			sockaddr *address = reallocate_address(_address,
+			sockaddr* address = reallocate_address(_address,
 				request.ifr_addr.sa_len);
 
 			// copy new address over
@@ -664,15 +655,15 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 
 				if (option == SIOCSIFADDR || option == SIOCSIFNETMASK) {
 					// reset netmask and broadcast addresses to defaults
-					sockaddr *netmask = NULL;
-					sockaddr *oldNetmask = NULL;
+					sockaddr* netmask = NULL;
+					sockaddr* oldNetmask = NULL;
 					if (option == SIOCSIFADDR) {
 						netmask = reallocate_address(&interface->mask,
 							request.ifr_addr.sa_len);
 					} else
 						oldNetmask = address;
 
-					sockaddr *broadcast = reallocate_address(
+					sockaddr* broadcast = reallocate_address(
 						&interface->destination, request.ifr_addr.sa_len);
 
 					interface->domain->address_module->set_to_defaults(
@@ -691,13 +682,13 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 		case SIOCGIFDSTADDR:
 		{
 			// get logical interface address
-			sockaddr **_address = interface_address(interface, option);
+			sockaddr** _address = interface_address(interface, option);
 			if (_address == NULL)
 				return B_BAD_VALUE;
 
 			struct ifreq request;
 
-			sockaddr *address = *_address;
+			sockaddr* address = *_address;
 			if (address != NULL)
 				memcpy(&request.ifr_addr, address, address->sa_len);
 			else {
@@ -706,7 +697,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			}
 
 			// copy address over
-			return user_memcpy(&((struct ifreq *)argument)->ifr_addr,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_addr,
 				&request.ifr_addr, request.ifr_addr.sa_len);
 		}
 
@@ -716,7 +707,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			struct ifreq request;
 			request.ifr_flags = interface->flags | interface->device->flags;
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_flags,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_flags,
 				&request.ifr_flags, sizeof(request.ifr_flags));
 		}
 
@@ -730,14 +721,14 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			request.ifr_parameter.sub_type = 0;
 				// TODO: for now, we ignore the sub type...
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_parameter,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_parameter,
 				&request.ifr_parameter, sizeof(request.ifr_parameter));
 		}
 
 		case SIOCGIFSTATS:
 		{
 			// get stats
-			return user_memcpy(&((struct ifreq *)argument)->ifr_stats,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_stats,
 				&interface->device_interface->device->stats,
 				sizeof(struct ifreq_stats));
 		}
@@ -748,7 +739,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			struct ifreq request;
 			request.ifr_type = interface->type;
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_type,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_type,
 				&request.ifr_type, sizeof(request.ifr_type));
 		}
 
@@ -758,7 +749,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			struct ifreq request;
 			request.ifr_mtu = interface->mtu;
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_mtu,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_mtu,
 				&request.ifr_mtu, sizeof(request.ifr_mtu));
 		}
 		case SIOCSIFMTU:
@@ -793,7 +784,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			struct ifreq request;
 			request.ifr_media = interface->device->media;
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_media,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_media,
 				&request.ifr_media, sizeof(request.ifr_media));
 		}
 
@@ -803,7 +794,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			struct ifreq request;
 			request.ifr_metric = interface->metric;
 
-			return user_memcpy(&((struct ifreq *)argument)->ifr_metric,
+			return user_memcpy(&((struct ifreq*)argument)->ifr_metric,
 				&request.ifr_metric, sizeof(request.ifr_metric));
 		}
 		case SIOCSIFMETRIC:
@@ -829,20 +820,20 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 
 
 static status_t
-interface_protocol_join_multicast(net_datalink_protocol *_protocol,
-	const sockaddr *address)
+interface_protocol_join_multicast(net_datalink_protocol* _protocol,
+	const sockaddr* address)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
 
 	return protocol->device_module->add_multicast(protocol->device, address);
 }
 
 
 static status_t
-interface_protocol_leave_multicast(net_datalink_protocol *_protocol,
-	const sockaddr *address)
+interface_protocol_leave_multicast(net_datalink_protocol* _protocol,
+	const sockaddr* address)
 {
-	interface_protocol *protocol = (interface_protocol *)_protocol;
+	interface_protocol* protocol = (interface_protocol*)_protocol;
 
 	return protocol->device_module->remove_multicast(protocol->device,
 		address);

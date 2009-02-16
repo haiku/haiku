@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,12 +40,12 @@ static list sDomains;
 	Scans the domain list for the specified family.
 	You need to hold the sDomainLock when calling this function.
 */
-static net_domain_private *
+static net_domain_private* 
 lookup_domain(int family)
 {
-	net_domain_private *domain = NULL;
+	net_domain_private* domain = NULL;
 	while (true) {
-		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
 		if (domain == NULL)
 			break;
 
@@ -63,7 +63,7 @@ lookup_domain(int family)
 /*!
 	Gets the domain of the specified family.
 */
-net_domain *
+net_domain* 
 get_domain(int family)
 {
 	MutexLocker locker(sDomainLock);
@@ -76,17 +76,17 @@ count_domain_interfaces()
 {
 	MutexLocker locker(sDomainLock);
 
-	net_domain_private *domain = NULL;
+	net_domain_private* domain = NULL;
 	uint32 count = 0;
 
 	while (true) {
-		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
 		if (domain == NULL)
 			break;
 
-		net_interface *interface = NULL;
+		net_interface* interface = NULL;
 		while (true) {
-			interface = (net_interface *)list_get_next_item(&domain->interfaces,
+			interface = (net_interface*)list_get_next_item(&domain->interfaces,
 				interface);
 			if (interface == NULL)
 				break;
@@ -105,23 +105,23 @@ count_domain_interfaces()
 	returned.
 */
 status_t
-list_domain_interfaces(void *_buffer, size_t *bufferSize)
+list_domain_interfaces(void* _buffer, size_t* bufferSize)
 {
 	MutexLocker locker(sDomainLock);
 
 	UserBuffer buffer(_buffer, *bufferSize);
-	net_domain_private *domain = NULL;
+	net_domain_private* domain = NULL;
 
 	while (true) {
-		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
 		if (domain == NULL)
 			break;
 
 		MutexLocker locker(domain->lock);
 
-		net_interface *interface = NULL;
+		net_interface* interface = NULL;
 		while (true) {
-			interface = (net_interface *)list_get_next_item(&domain->interfaces,
+			interface = (net_interface*)list_get_next_item(&domain->interfaces,
 				interface);
 			if (interface == NULL)
 				break;
@@ -149,23 +149,23 @@ list_domain_interfaces(void *_buffer, size_t *bufferSize)
 
 
 status_t
-add_interface_to_domain(net_domain *_domain,
+add_interface_to_domain(net_domain* _domain,
 	struct ifreq& request)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 
-	const char *deviceName = request.ifr_parameter.device[0]
+	const char* deviceName = request.ifr_parameter.device[0]
 		? request.ifr_parameter.device : request.ifr_name;
-	const char *baseName = request.ifr_parameter.base_name[0]
+	const char* baseName = request.ifr_parameter.base_name[0]
 		? request.ifr_parameter.base_name : request.ifr_name;
 
-	net_device_interface *deviceInterface = get_device_interface(deviceName);
+	net_device_interface* deviceInterface = get_device_interface(deviceName);
 	if (deviceInterface == NULL)
 		return ENODEV;
 
 	MutexLocker locker(domain->lock);
 
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 	status_t status;
 
 	if (find_interface(domain, request.ifr_name) == NULL) {
@@ -200,140 +200,129 @@ add_interface_to_domain(net_domain *_domain,
 	You need to hold the domain's lock when calling this function.
 */
 status_t
-remove_interface_from_domain(net_interface *interface)
+remove_interface_from_domain(net_interface* interface)
 {
-	net_domain_private *domain = (net_domain_private *)interface->domain;
+	net_domain_private* domain = (net_domain_private*)interface->domain;
 
 	list_remove_item(&domain->interfaces, interface);
 	notify_interface_removed(interface);
-	delete_interface((net_interface_private *)interface);
+	delete_interface((net_interface_private*)interface);
 	return B_OK;
 }
 
 
 status_t
-domain_interface_control(net_domain_private *domain, int32 option,
-	ifreq *request)
+domain_interface_control(net_domain_private* domain, int32 option,
+	ifreq* request)
 {
-	const char *name = request->ifr_name;
+	const char* name = request->ifr_name;
 	status_t status = B_OK;
 
-	net_device_interface *device = get_device_interface(name, false);
+	net_device_interface* device = get_device_interface(name, false);
 	if (device == NULL)
 		return ENODEV;
-	else {
-		// The locking protocol dictates that if both the RX lock
-		// and domain locks are required, we MUST obtain the RX
-		// lock before the domain lock. This order MUST NOT ever
-		// be reversed under the penalty of deadlock.
-		RecursiveLocker _1(device->rx_lock);
-		MutexLocker _2(domain->lock);
 
-		net_interface *interface = find_interface(domain, name);
-		if (interface != NULL) {
-			switch (option) {
-				case SIOCDIFADDR:
-					remove_interface_from_domain(interface);
-					break;
+	// The locking protocol dictates that if both the receive lock
+	// and domain locks are required, we MUST obtain the receive
+	// lock before the domain lock.
+	RecursiveLocker _1(device->receive_lock);
+	MutexLocker _2(domain->lock);
 
-				case SIOCSIFFLAGS:
-				{
-					uint32 requestFlags = request->ifr_flags;
-					request->ifr_flags &= ~(IFF_UP | IFF_LINK | IFF_BROADCAST);
+	net_interface* interface = find_interface(domain, name);
+	if (interface != NULL) {
+		switch (option) {
+			case SIOCDIFADDR:
+				remove_interface_from_domain(interface);
+				break;
 
-					if ((requestFlags & IFF_UP) != (interface->flags & IFF_UP)) {
-						if (requestFlags & IFF_UP) {
-							status = interface->first_info->interface_up(
-								interface->first_protocol);
-							if (status == B_OK)
-								interface->flags |= IFF_UP;
-						} else {
-							interface_set_down(interface);
-						}
+			case SIOCSIFFLAGS:
+			{
+				uint32 requestFlags = request->ifr_flags;
+				request->ifr_flags &= ~(IFF_UP | IFF_LINK | IFF_BROADCAST);
+
+				if ((requestFlags & IFF_UP) != (interface->flags & IFF_UP)) {
+					if (requestFlags & IFF_UP) {
+						status = interface->first_info->interface_up(
+							interface->first_protocol);
+						if (status == B_OK)
+							interface->flags |= IFF_UP;
+					} else {
+						interface_set_down(interface);
 					}
-
-					if (status == B_OK) {
-						// TODO: why shouldn't we able to delete IFF_BROADCAST?
-						interface->flags &= IFF_UP | IFF_LINK | IFF_BROADCAST;
-						interface->flags |= request->ifr_flags;
-					}
-					break;
 				}
+
+				if (status == B_OK) {
+					// TODO: why shouldn't we able to delete IFF_BROADCAST?
+					interface->flags &= IFF_UP | IFF_LINK | IFF_BROADCAST;
+					interface->flags |= request->ifr_flags;
+				}
+				break;
 			}
 		}
 	}
 
-	// If the SIOCDIFADDR call above removed the last interface
-	// associated with the device interface, this put_() will
-	// effectively remove the interface
+	// If the SIOCDIFADDR call above removed the last interface associated with
+	// the device interface, this will effectively remove the interface
 	put_device_interface(device);
 
 	return status;
 }
 
 
+/*!	You need to hold the domain lock when calling this function. */
 void
-domain_interface_went_down(net_interface *interface)
+domain_interface_went_down(net_interface* interface)
 {
-	// the domain should be locked here. always check
-	// all callers to be sure. We get here via
-	// interface_set_down().
+	ASSERT_LOCKED_MUTEX(&((net_domain_private*)interface->domain)->lock);
 
-	dprintf("domain_interface_went_down(%i, %s)\n",
-		interface->domain->family, interface->name);
+	TRACE(("domain_interface_went_down(%i, %s)\n",
+		interface->domain->family, interface->name));
 
-	// domain might have been locked by:
-	//  - domain_removed_device_interface() <--- here
-	//     remove_interface_from_domain()
-	//      delete_interface()
-	//       interface_set_down()
-	//  - datalink_control() <--- here
-	//     interface_set_down()
 	invalidate_routes(interface->domain, interface);
 }
 
 
 void
-domain_removed_device_interface(net_device_interface *interface)
+domain_removed_device_interface(net_device_interface* deviceInterface)
 {
 	MutexLocker locker(sDomainLock);
 
-	net_domain_private *domain = NULL;
+	net_domain_private* domain = NULL;
 	while (true) {
-		domain = (net_domain_private *)list_get_next_item(&sDomains, domain);
+		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
 		if (domain == NULL)
 			break;
 
 		MutexLocker locker(domain->lock);
 
-		net_interface_private *priv = find_interface(domain,
-			interface->device->name);
-		if (priv == NULL)
+		net_interface_private* interface = find_interface(domain,
+			deviceInterface->device->name);
+		if (interface == NULL)
 			continue;
 
-		remove_interface_from_domain(priv);
+		remove_interface_from_domain(interface);
 	}
 }
 
 
 status_t
-register_domain(int family, const char *name,
-	struct net_protocol_module_info *module,
-	struct net_address_module_info *addressModule,
-	net_domain **_domain)
+register_domain(int family, const char* name,
+	struct net_protocol_module_info* module,
+	struct net_address_module_info* addressModule,
+	net_domain** _domain)
 {
 	TRACE(("register_domain(%d, %s)\n", family, name));
 	MutexLocker locker(sDomainLock);
 
-	struct net_domain_private *domain = lookup_domain(family);
+	struct net_domain_private* domain = lookup_domain(family);
 	if (domain != NULL)
 		return B_NAME_IN_USE;
 
-	domain = new (std::nothrow) net_domain_private;
+	domain = new(std::nothrow) net_domain_private;
 	if (domain == NULL)
 		return B_NO_MEMORY;
 
-	mutex_init_etc(&domain->lock, name, MUTEX_FLAG_CLONE_NAME);
+	mutex_init(&domain->lock, name);
 
 	domain->family = family;
 	domain->name = name;
@@ -350,18 +339,20 @@ register_domain(int family, const char *name,
 
 
 status_t
-unregister_domain(net_domain *_domain)
+unregister_domain(net_domain* _domain)
 {
-	TRACE(("unregister_domain(%p, %d, %s)\n", _domain, _domain->family, _domain->name));
+	TRACE(("unregister_domain(%p, %d, %s)\n", _domain, _domain->family,
+		_domain->name));
 
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(sDomainLock);
 
 	list_remove_item(&sDomains, domain);
 
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 	while (true) {
-		interface = (net_interface_private *)list_remove_head_item(&domain->interfaces);
+		interface = (net_interface_private*)list_remove_head_item(
+			&domain->interfaces);
 		if (interface == NULL)
 			break;
 

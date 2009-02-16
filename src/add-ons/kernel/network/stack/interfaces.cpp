@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,11 +41,11 @@ static uint32 sDeviceIndex;
 
 
 static status_t
-device_consumer_thread(void *_interface)
+device_consumer_thread(void* _interface)
 {
-	net_device_interface *interface = (net_device_interface *)_interface;
-	net_device *device = interface->device;
-	net_buffer *buffer;
+	net_device_interface* interface = (net_device_interface*)_interface;
+	net_device* device = interface->device;
+	net_buffer* buffer;
 
 	while (true) {
 		ssize_t status = fifo_dequeue_buffer(&interface->receive_queue, 0,
@@ -56,19 +56,16 @@ device_consumer_thread(void *_interface)
 			break;
 
 		if (buffer->interface != NULL) {
-			// if the interface is already specified this buffer was
+			// if the interface is already specified, this buffer was
 			// delivered locally.
-
-			net_domain *domain = buffer->interface->domain;
-
-			if (domain->module->receive_data(buffer) == B_OK)
+			if (buffer->interface->domain->module->receive_data(buffer) == B_OK)
 				buffer = NULL;
 		} else {
 			// find handler for this packet
-			DeviceHandlerList::Iterator it2 =
+			DeviceHandlerList::Iterator iterator =
 				interface->receive_funcs.GetIterator();
-			while (buffer && it2.HasNext()) {
-				net_device_handler *handler = it2.Next();
+			while (buffer && iterator.HasNext()) {
+				net_device_handler* handler = iterator.Next();
 
 				// if the handler returns B_OK, it consumed the buffer
 				if (handler->type == buffer->type
@@ -77,7 +74,7 @@ device_consumer_thread(void *_interface)
 			}
 		}
 
-		if (buffer)
+		if (buffer != NULL)
 			gNetBufferModule.free(buffer);
 	}
 
@@ -85,14 +82,12 @@ device_consumer_thread(void *_interface)
 }
 
 
-static net_device_interface *
-find_device_interface(const char *name)
+static net_device_interface*
+find_device_interface(const char* name)
 {
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 
-	while (iterator.HasNext()) {
-		net_device_interface *interface = iterator.Next();
-
+	while (net_device_interface* interface = iterator.Next()) {
 		if (!strcmp(interface->device->name, name))
 			return interface;
 	}
@@ -101,30 +96,33 @@ find_device_interface(const char *name)
 }
 
 
+/*!	The domain's device receive handler - this will inject the net_buffers into
+	the protocol layer (the domain's registered receive handler).
+*/
 static status_t
-domain_receive_adapter(void *cookie, net_device *device, net_buffer *buffer)
+domain_receive_adapter(void* cookie, net_device* device, net_buffer* buffer)
 {
-	net_domain_private *domain = (net_domain_private *)cookie;
+	net_domain_private* domain = (net_domain_private*)cookie;
 
 	buffer->interface = find_interface(domain, device->index);
 	return domain->module->receive_data(buffer);
 }
 
 
-static net_device_interface *
-allocate_device_interface(net_device *device, net_device_module_info *module)
+static net_device_interface*
+allocate_device_interface(net_device* device, net_device_module_info* module)
 {
-	net_device_interface *interface = new (std::nothrow) net_device_interface;
+	net_device_interface* interface = new(std::nothrow) net_device_interface;
 	if (interface == NULL)
-		goto error_0;
+		return NULL;
 
-	recursive_lock_init(&interface->rx_lock, "rx lock");
+	recursive_lock_init(&interface->receive_lock, "interface receive lock");
 
 	char name[128];
 	snprintf(name, sizeof(name), "%s receive queue", device->name);
 
 	if (init_fifo(&interface->receive_queue, name, 16 * 1024 * 1024) < B_OK)
-		goto error_2;
+		goto error1;
 
 	interface->device = device;
 	interface->up_count = 0;
@@ -138,7 +136,7 @@ allocate_device_interface(net_device *device, net_device_module_info *module)
 	interface->consumer_thread = spawn_kernel_thread(device_consumer_thread,
 		name, B_DISPLAY_PRIORITY, interface);
 	if (interface->consumer_thread < B_OK)
-		goto error_3;
+		goto error2;
 	resume_thread(interface->consumer_thread);
 
 	// TODO: proper interface index allocation
@@ -148,20 +146,18 @@ allocate_device_interface(net_device *device, net_device_module_info *module)
 	sInterfaces.Add(interface);
 	return interface;
 
-error_3:
+error2:
 	uninit_fifo(&interface->receive_queue);
-
-error_2:
-	recursive_lock_destroy(&interface->rx_lock);
+error1:
+	recursive_lock_destroy(&interface->receive_lock);
 	delete interface;
 
-error_0:
 	return NULL;
 }
 
 
-net_device_interface *
-grab_device_interface(net_device_interface *interface)
+static net_device_interface*
+acquire_device_interface(net_device_interface* interface)
 {
 	if (interface == NULL || atomic_add(&interface->ref_count, 1) == 0)
 		return NULL;
@@ -171,14 +167,12 @@ grab_device_interface(net_device_interface *interface)
 
 
 static void
-notify_device_monitors(net_device_interface *interface, int32 event)
+notify_device_monitors(net_device_interface* interface, int32 event)
 {
-	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		// when we call Next() the next item in the list is obtained
-		// so it's safe for the "current" item to remove itself.
-		net_device_monitor *monitor = iterator.Next();
-
+	DeviceMonitorList::Iterator iterator
+		= interface->monitor_funcs.GetIterator();
+	while (net_device_monitor* monitor = iterator.Next()) {
+		// it's safe for the "current" item to remove itself.
 		monitor->event(monitor, event);
 	}
 }
@@ -187,17 +181,16 @@ notify_device_monitors(net_device_interface *interface, int32 event)
 //	#pragma mark - interfaces
 
 
-/*!
-	Searches for a specific interface in a domain by name.
+/*!	Searches for a specific interface in a domain by name.
 	You need to have the domain's lock hold when calling this function.
 */
-struct net_interface_private *
-find_interface(struct net_domain *domain, const char *name)
+struct net_interface_private*
+find_interface(struct net_domain* domain, const char* name)
 {
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 
 	while (true) {
-		interface = (net_interface_private *)list_get_next_item(
+		interface = (net_interface_private*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -210,17 +203,16 @@ find_interface(struct net_domain *domain, const char *name)
 }
 
 
-/*!
-	Searches for a specific interface in a domain by index.
+/*!	Searches for a specific interface in a domain by index.
 	You need to have the domain's lock hold when calling this function.
 */
-struct net_interface_private *
-find_interface(struct net_domain *domain, uint32 index)
+struct net_interface_private*
+find_interface(struct net_domain* domain, uint32 index)
 {
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 
 	while (true) {
-		interface = (net_interface_private *)list_get_next_item(
+		interface = (net_interface_private*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -234,11 +226,10 @@ find_interface(struct net_domain *domain, uint32 index)
 
 
 status_t
-create_interface(net_domain *domain, const char *name, const char *baseName,
-	net_device_interface *deviceInterface, net_interface_private **_interface)
+create_interface(net_domain* domain, const char* name, const char* baseName,
+	net_device_interface* deviceInterface, net_interface_private** _interface)
 {
-	net_interface_private *interface =
-		new (std::nothrow) net_interface_private;
+	net_interface_private* interface = new(std::nothrow) net_interface_private;
 	if (interface == NULL)
 		return B_NO_MEMORY;
 
@@ -256,7 +247,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 	interface->type = 0;
 	interface->mtu = deviceInterface->device->mtu;
 	interface->metric = 0;
-	interface->device_interface = grab_device_interface(deviceInterface);
+	interface->device_interface = acquire_device_interface(deviceInterface);
 
 	// setup direct route for bound devices
 	interface->direct_route.destination = NULL;
@@ -276,7 +267,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 
 	// Grab a reference to the networking stack, to make sure it won't be
 	// unloaded as long as an interface exists
-	module_info *module;
+	module_info* module;
 	get_module(gNetStackInterfaceModule.info.name, &module);
 
 	*_interface = interface;
@@ -285,7 +276,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 
 
 void
-interface_set_down(net_interface *interface)
+interface_set_down(net_interface* interface)
 {
 	if ((interface->flags & IFF_UP) == 0)
 		return;
@@ -296,7 +287,7 @@ interface_set_down(net_interface *interface)
 
 
 void
-delete_interface(net_interface_private *interface)
+delete_interface(net_interface_private* interface)
 {
 	// deleting an interface is fairly complex as we need
 	// to clear all references to it throughout the stack
@@ -332,23 +323,23 @@ delete_interface(net_interface_private *interface)
 
 
 void
-put_interface(struct net_interface_private *interface)
+put_interface(struct net_interface_private* interface)
 {
 	// TODO: reference counting
 	// TODO: better locking scheme
-	mutex_unlock(&((net_domain_private *)interface->domain)->lock);
+	mutex_unlock(&((net_domain_private*)interface->domain)->lock);
 }
 
 
-struct net_interface_private *
-get_interface(net_domain *_domain, const char *name)
+struct net_interface_private*
+get_interface(net_domain* _domain, const char* name)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	mutex_lock(&domain->lock);
 
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 	while (true) {
-		interface = (net_interface_private *)list_get_next_item(
+		interface = (net_interface_private*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -366,9 +357,9 @@ get_interface(net_domain *_domain, const char *name)
 
 
 void
-get_device_interface_address(net_device_interface *interface, sockaddr *_address)
+get_device_interface_address(net_device_interface* interface, sockaddr* _address)
 {
-	sockaddr_dl &address = *(sockaddr_dl *)_address;
+	sockaddr_dl &address = *(sockaddr_dl*)_address;
 
 	address.sdl_family = AF_LINK;
 	address.sdl_index = interface->device->index;
@@ -402,28 +393,24 @@ count_device_interfaces()
 }
 
 
-/*!
-	Dumps a list of all interfaces into the supplied userland buffer.
+/*!	Dumps a list of all interfaces into the supplied userland buffer.
 	If the interfaces don't fit into the buffer, an error (\c ENOBUFS) is
 	returned.
 */
 status_t
-list_device_interfaces(void *_buffer, size_t *bufferSize)
+list_device_interfaces(void* _buffer, size_t* bufferSize)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	UserBuffer buffer(_buffer, *bufferSize);
 
-	while (iterator.HasNext()) {
-		net_device_interface *interface = iterator.Next();
-
+	while (net_device_interface* interface = iterator.Next()) {
 		ifreq request;
 		strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
 		get_device_interface_address(interface, &request.ifr_addr);
 
-		if (buffer.Copy(&request, IF_NAMESIZE
-				+ request.ifr_addr.sa_len) == NULL)
+		if (buffer.Copy(&request, IF_NAMESIZE + request.ifr_addr.sa_len) == NULL)
 			return buffer.Status();
 	}
 
@@ -432,12 +419,11 @@ list_device_interfaces(void *_buffer, size_t *bufferSize)
 }
 
 
-/*!
-	Releases the reference for the interface. When all references are
+/*!	Releases the reference for the interface. When all references are
 	released, the interface is removed.
 */
 void
-put_device_interface(struct net_device_interface *interface)
+put_device_interface(struct net_device_interface* interface)
 {
 	if (atomic_add(&interface->ref_count, -1) != 1)
 		return;
@@ -451,28 +437,27 @@ put_device_interface(struct net_device_interface *interface)
 	status_t status;
 	wait_for_thread(interface->consumer_thread, &status);
 
-	net_device *device = interface->device;
+	net_device* device = interface->device;
 	const char* moduleName = device->module->info.name;
+
 	device->module->uninit_device(device);
 	put_module(moduleName);
 
-	recursive_lock_destroy(&interface->rx_lock);
+	recursive_lock_destroy(&interface->receive_lock);
 	delete interface;
 }
 
 
-/*!
-	Finds an interface by the specified index and grabs a reference to it.
+/*!	Finds an interface by the specified index and acquires a reference to it.
 */
-struct net_device_interface *
+struct net_device_interface*
 get_device_interface(uint32 index)
 {
 	MutexLocker locker(sInterfaceLock);
+
+	// TODO: maintain an array of all device interfaces instead
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
-
-	while (iterator.HasNext()) {
-		net_device_interface *interface = iterator.Next();
-
+	while (net_device_interface* interface = iterator.Next()) {
 		if (interface->device->index == index) {
 			if (atomic_add(&interface->ref_count, 1) != 0)
 				return interface;
@@ -483,16 +468,15 @@ get_device_interface(uint32 index)
 }
 
 
-/*!
-	Finds an interface by the specified name and grabs a reference to it.
+/*!	Finds an interface by the specified name and grabs a reference to it.
 	If the interface does not yet exist, a new one is created.
 */
-struct net_device_interface *
-get_device_interface(const char *name, bool create)
+struct net_device_interface*
+get_device_interface(const char* name, bool create)
 {
 	MutexLocker locker(sInterfaceLock);
 
-	net_device_interface *interface = find_device_interface(name);
+	net_device_interface* interface = find_device_interface(name);
 	if (interface != NULL) {
 		if (atomic_add(&interface->ref_count, 1) != 0)
 			return interface;
@@ -503,7 +487,7 @@ get_device_interface(const char *name, bool create)
 	if (!create)
 		return NULL;
 
-	void *cookie = open_module_list("network/devices");
+	void* cookie = open_module_list("network/devices");
 	if (cookie == NULL)
 		return NULL;
 
@@ -515,14 +499,15 @@ get_device_interface(const char *name, bool create)
 
 		TRACE(("get_device_interface: ask \"%s\" for %s\n", moduleName, name));
 
-		net_device_module_info *module;
-		if (get_module(moduleName, (module_info **)&module) == B_OK) {
-			net_device *device;
+		net_device_module_info* module;
+		if (get_module(moduleName, (module_info**)&module) == B_OK) {
+			net_device* device;
 			status_t status = module->init_device(name, &device);
 			if (status == B_OK) {
 				interface = allocate_device_interface(device, module);
-				if (interface)
+				if (interface != NULL)
 					return interface;
+
 				module->uninit_device(device);
 			}
 			put_module(moduleName);
@@ -534,9 +519,9 @@ get_device_interface(const char *name, bool create)
 
 
 void
-down_device_interface(net_device_interface *interface)
+down_device_interface(net_device_interface* interface)
 {
-	// RX lock must be held when calling down_device_interface.
+	// Receive lock must be held when calling down_device_interface.
 	// Known callers are `interface_protocol_down' which gets
 	// here via one of the following paths:
 	//
@@ -549,7 +534,7 @@ down_device_interface(net_device_interface *interface)
 	//     delete_interface()
 	//      interface_set_down()
 
-	net_device *device = interface->device;
+	net_device* device = interface->device;
 
 	device->flags &= ~IFF_UP;
 	device->module->down(device);
@@ -557,42 +542,36 @@ down_device_interface(net_device_interface *interface)
 	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
 
 	if (device->module->receive_data != NULL) {
-		thread_id reader_thread = interface->reader_thread;
-
-		// TODO when setting the interface down,
-		//      should we clear the receive queue?
+		thread_id readerThread = interface->reader_thread;
 
 		// one of the callers must hold a reference to the net_device_interface
 		// usually it is one of the net_interfaces.
-		recursive_lock_unlock(&interface->rx_lock);
+		recursive_lock_unlock(&interface->receive_lock);
 
 		// make sure the reader thread is gone before shutting down the interface
 		status_t status;
-		wait_for_thread(reader_thread, &status);
+		wait_for_thread(readerThread, &status);
 
-		recursive_lock_lock(&interface->rx_lock);
+		recursive_lock_lock(&interface->receive_lock);
 	}
 }
 
 
-//	#pragma mark - devices
+//	#pragma mark - devices stack API
 
 
-/*!
-	Unregisters a previously registered deframer function.
-	This function is part of the net_manager_module_info API.
-*/
+/*!	Unregisters a previously registered deframer function. */
 status_t
-unregister_device_deframer(net_device *device)
+unregister_device_deframer(net_device* device)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
 	if (--interface->deframe_ref_count == 0)
 		interface->deframe_func = NULL;
@@ -601,29 +580,27 @@ unregister_device_deframer(net_device *device)
 }
 
 
-/*!
-	Registers the deframer function for the specified \a device.
+/*!	Registers the deframer function for the specified \a device.
 	Note, however, that right now, you can only register one single
 	deframer function per device.
 
 	If the need arises, we might want to lift that limitation at a
 	later time (which would require a slight API change, though).
-
-	This function is part of the net_manager_module_info API.
 */
 status_t
-register_device_deframer(net_device *device, net_deframe_func deframeFunc)
+register_device_deframer(net_device* device, net_deframe_func deframeFunc)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
-	if (interface->deframe_func != NULL && interface->deframe_func != deframeFunc)
+	if (interface->deframe_func != NULL
+		&& interface->deframe_func != deframeFunc)
 		return B_ERROR;
 
 	interface->deframe_func = deframeFunc;
@@ -632,44 +609,46 @@ register_device_deframer(net_device *device, net_deframe_func deframeFunc)
 }
 
 
+/*!	Registers a domain to receive net_buffers from the specified \a device. */
 status_t
-register_domain_device_handler(struct net_device *device, int32 type,
-	struct net_domain *_domain)
+register_domain_device_handler(struct net_device* device, int32 type,
+	struct net_domain* _domain)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 	if (domain->module == NULL || domain->module->receive_data == NULL)
 		return B_BAD_VALUE;
 
-	return register_device_handler(device, type, &domain_receive_adapter, domain);
+	return register_device_handler(device, type, &domain_receive_adapter,
+		domain);
 }
 
 
+/*!	Registers a receiving function callback for the specified \a device. */
 status_t
-register_device_handler(struct net_device *device, int32 type,
-	net_receive_func receiveFunc, void *cookie)
+register_device_handler(struct net_device* device, int32 type,
+	net_receive_func receiveFunc, void* cookie)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
 	// see if such a handler already for this device
 
-	DeviceHandlerList::Iterator iterator = interface->receive_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		net_device_handler *handler = iterator.Next();
-
+	DeviceHandlerList::Iterator iterator
+		= interface->receive_funcs.GetIterator();
+	while (net_device_handler* handler = iterator.Next()) {
 		if (handler->type == type)
 			return B_ERROR;
 	}
 
 	// Add new handler
 
-	net_device_handler *handler = new (std::nothrow) net_device_handler;
+	net_device_handler* handler = new(std::nothrow) net_device_handler;
 	if (handler == NULL)
 		return B_NO_MEMORY;
 
@@ -681,24 +660,24 @@ register_device_handler(struct net_device *device, int32 type,
 }
 
 
+/*!	Unregisters a previously registered device handler. */
 status_t
-unregister_device_handler(struct net_device *device, int32 type)
+unregister_device_handler(struct net_device* device, int32 type)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
 	// search for the handler
 
-	DeviceHandlerList::Iterator iterator = interface->receive_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		net_device_handler *handler = iterator.Next();
-
+	DeviceHandlerList::Iterator iterator
+		= interface->receive_funcs.GetIterator();
+	while (net_device_handler* handler = iterator.Next()) {
 		if (handler->type == type) {
 			// found it
 			iterator.Remove();
@@ -711,8 +690,9 @@ unregister_device_handler(struct net_device *device, int32 type)
 }
 
 
+/*!	Registers a device monitor for the specified device. */
 status_t
-register_device_monitor(net_device *device, net_device_monitor *monitor)
+register_device_monitor(net_device* device, net_device_monitor* monitor)
 {
 	if (monitor->receive == NULL || monitor->event == NULL)
 		return B_BAD_VALUE;
@@ -720,27 +700,28 @@ register_device_monitor(net_device *device, net_device_monitor *monitor)
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 	interface->monitor_funcs.Add(monitor);
 	return B_OK;
 }
 
 
+/*!	Unregisters a previously registered device monitor. */
 status_t
-unregister_device_monitor(net_device *device, net_device_monitor *monitor)
+unregister_device_monitor(net_device* device, net_device_monitor* monitor)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
-	net_device_interface *interface = find_device_interface(device->name);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return ENODEV;
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
 	// search for the monitor
 
@@ -756,32 +737,29 @@ unregister_device_monitor(net_device *device, net_device_monitor *monitor)
 }
 
 
-/*!
-	This function is called by device modules in case their link
+/*!	This function is called by device modules in case their link
 	state changed, ie. if an ethernet cable was plugged in or
 	removed.
 */
 status_t
-device_link_changed(net_device *device)
+device_link_changed(net_device* device)
 {
 	notify_link_changed(device);
 	return B_OK;
 }
 
 
-/*!
-	This function is called by device modules once their device got
+/*!	This function is called by device modules once their device got
 	physically removed, ie. a USB networking card is unplugged.
-	It is part of the net_manager_module_info API.
 */
 status_t
-device_removed(net_device *device)
+device_removed(net_device* device)
 {
 	MutexLocker locker(sInterfaceLock);
 
 	// hold a reference to the device interface being removed
 	// so our put_() will (eventually) do the final cleanup
-	net_device_interface *interface = get_device_interface(device->name, false);
+	net_device_interface* interface = get_device_interface(device->name, false);
 	if (interface == NULL)
 		return ENODEV;
 
@@ -789,7 +767,7 @@ device_removed(net_device *device)
 	// This is very complex, refer to delete_interface() for
 	// further details.
 
-	RecursiveLocker _(interface->rx_lock);
+	RecursiveLocker _(interface->receive_lock);
 
 	// this will possibly call:
 	//  remove_interface_from_domain() [domain gets locked]
@@ -804,7 +782,7 @@ device_removed(net_device *device)
 	interface->monitor_funcs.RemoveAll();
 
 	// All of the readers should be gone as well since we are out of
-	// interfaces and `put_domain_datalink_protocols' is called for
+	// interfaces and put_domain_datalink_protocols() is called for
 	// each delete_interface().
 
 	put_device_interface(interface);
@@ -814,10 +792,9 @@ device_removed(net_device *device)
 
 
 status_t
-device_enqueue_buffer(net_device *device, net_buffer *buffer)
+device_enqueue_buffer(net_device* device, net_buffer* buffer)
 {
-	net_device_interface *interface = get_device_interface(device->index);
-
+	net_device_interface* interface = get_device_interface(device->index);
 	if (interface == NULL)
 		return ENODEV;
 
