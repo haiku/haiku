@@ -61,7 +61,7 @@ public:
 	virtual float				DefaultLabelSpacing() const;
 			uint32				Flags(BControl* control) const;
 
-	virtual void				DrawButtonFrame(BView* view, BRect& rect,
+	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
 									uint32 flags = 0,
@@ -78,6 +78,12 @@ public:
 	virtual void				DrawMenuBarBackground(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
+									uint32 borders = B_ALL_BORDERS);
+
+	virtual	void				DrawMenuFieldFrame(BView* view, BRect& rect,
+									const BRect& updateRect,
+									const rgb_color& base,
+									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
 	virtual void				DrawMenuFieldBackground(BView* view,
@@ -203,6 +209,13 @@ public:
 									const BAlignment& alignment);
 
 protected:
+			void				_DrawButtonFrame(BView* view, BRect& rect,
+									const BRect& updateRect,
+									const rgb_color& base,
+									float contrast, float brightness = 1.0,
+									uint32 flags = 0,
+									uint32 borders = B_ALL_BORDERS);
+
 			void				_DrawOuterResessedFrame(BView* view,
 									BRect& rect, const rgb_color& base,
 									float contrast = 1.0f,

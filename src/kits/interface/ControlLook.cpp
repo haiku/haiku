@@ -68,68 +68,7 @@ void
 BControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, uint32 borders)
 {
-	// colors
-	rgb_color dark1BorderColor;
-	rgb_color dark2BorderColor;
-
-	if ((flags & B_DISABLED) == 0) {
-		dark1BorderColor = tint_color(base, 1.33);
-		dark2BorderColor = tint_color(base, 1.45);
-
-		if (flags & B_DEFAULT_BUTTON) {
-			dark2BorderColor = tint_color(dark1BorderColor, 1.5);
-			dark1BorderColor = tint_color(dark1BorderColor, 1.35);
-		}
-	} else {
-		dark1BorderColor = tint_color(base, 1.147);
-		dark2BorderColor = tint_color(base, 1.24);
-
-		if (flags & B_DEFAULT_BUTTON) {
-			dark1BorderColor = tint_color(dark1BorderColor, 1.12);
-			dark2BorderColor = tint_color(dark1BorderColor, 1.16);
-		}
-	}
-
-	if (flags & B_ACTIVATED) {
-		rgb_color temp = dark2BorderColor;
-		dark2BorderColor = dark1BorderColor;
-		dark1BorderColor = temp;
-	}
-
-	// indicate focus by changing main button border
-	if (flags & B_FOCUSED) {
-		dark1BorderColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-		dark2BorderColor = dark1BorderColor;
-	}
-
-	if (flags & B_DEFAULT_BUTTON) {
-		float focusTint = 1.2;
-		if (flags & B_DISABLED)
-			focusTint = (B_NO_TINT + focusTint) / 2;
-
-		rgb_color focusColor = tint_color(base, focusTint);
-		view->SetHighColor(base);
-
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
-
-		view->SetHighColor(focusColor);
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
-		view->StrokeRect(rect);
-		rect.InsetBy(1.0, 1.0);
-
-		// bevel around external border
-		_DrawOuterResessedFrame(view, rect, focusColor,
-			(flags & B_DISABLED) ? 0.5 : 0.8, 0.9, borders);
-	} else {
-		// bevel around external border
-		_DrawOuterResessedFrame(view, rect, base,
-			(flags & B_DISABLED) ? 0.0 : 1.0, 1.0, borders);
-	}
-
-	_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
-		dark2BorderColor, dark2BorderColor, borders);
+	_DrawButtonFrame(view, rect, updateRect, base, 1.0, 1.0, flags, borders);
 }
 
 
@@ -264,6 +203,14 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 
 
 void
+BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect, const BRect& updateRect,
+	const rgb_color& base, uint32 flags, uint32 borders)
+{
+	_DrawButtonFrame(view, rect, updateRect, base, 0.6, 1.0, flags, borders);
+}
+
+
+void
 BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, bool popupIndicator,
 	uint32 flags)
@@ -282,10 +229,10 @@ BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 		rgb_color markColor;
 		if (flags & B_DISABLED) {
 			indicatorBase = tint_color(base, 1.05);
-			markColor = tint_color(base, B_DARKEN_3_TINT);
+			markColor = tint_color(base, 1.35);
 		} else {
-			indicatorBase = tint_color(base, 1.09);
-			markColor = tint_color(base, B_DARKEN_4_TINT);
+			indicatorBase = tint_color(base, 1.12);
+			markColor = tint_color(base, 1.65);
 		}
 
 		DrawMenuFieldBackground(view, rightRect, updateRect, indicatorBase,
@@ -1545,6 +1492,78 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 
 
 // #pragma mark -
+
+
+void
+BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base,
+	float contrast, float brightness, uint32 flags, uint32 borders)
+{
+	// colors
+	rgb_color dark1BorderColor;
+	rgb_color dark2BorderColor;
+
+	if ((flags & B_DISABLED) == 0) {
+		dark1BorderColor = tint_color(base, 1.33);
+		dark2BorderColor = tint_color(base, 1.45);
+
+		if (flags & B_DEFAULT_BUTTON) {
+			dark2BorderColor = tint_color(dark1BorderColor, 1.5);
+			dark1BorderColor = tint_color(dark1BorderColor, 1.35);
+		}
+	} else {
+		dark1BorderColor = tint_color(base, 1.147);
+		dark2BorderColor = tint_color(base, 1.24);
+
+		if (flags & B_DEFAULT_BUTTON) {
+			dark1BorderColor = tint_color(dark1BorderColor, 1.12);
+			dark2BorderColor = tint_color(dark1BorderColor, 1.16);
+		}
+	}
+
+	if (flags & B_ACTIVATED) {
+		rgb_color temp = dark2BorderColor;
+		dark2BorderColor = dark1BorderColor;
+		dark1BorderColor = temp;
+	}
+
+	// indicate focus by changing main button border
+	if (flags & B_FOCUSED) {
+		dark1BorderColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+		dark2BorderColor = dark1BorderColor;
+	}
+
+	if (flags & B_DEFAULT_BUTTON) {
+		float focusTint = 1.2;
+		if (flags & B_DISABLED)
+			focusTint = (B_NO_TINT + focusTint) / 2;
+
+		rgb_color focusColor = tint_color(base, focusTint);
+		view->SetHighColor(base);
+
+		view->StrokeRect(rect);
+		rect.InsetBy(1.0, 1.0);
+
+		view->SetHighColor(focusColor);
+		view->StrokeRect(rect);
+		rect.InsetBy(1.0, 1.0);
+		view->StrokeRect(rect);
+		rect.InsetBy(1.0, 1.0);
+
+		// bevel around external border
+		_DrawOuterResessedFrame(view, rect, focusColor,
+			contrast * (((flags & B_DISABLED) ? 0.5 : 0.8)), brightness * 0.9,
+			borders);
+	} else {
+		// bevel around external border
+		_DrawOuterResessedFrame(view, rect, base,
+			contrast * ((flags & B_DISABLED) ? 0.0 : 1.0), brightness * 1.0,
+			borders);
+	}
+
+	_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
+		dark2BorderColor, dark2BorderColor, borders);
+}
 
 
 void

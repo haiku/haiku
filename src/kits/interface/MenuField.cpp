@@ -275,7 +275,7 @@ BMenuField::Draw(BRect update)
 			flags |= BControlLook::B_DISABLED;
 		if (active)
 			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawButtonFrame(this, frame, update, base, flags);
+		be_control_look->DrawMenuFieldFrame(this, frame, update, base, flags);
 		return;
 	}
 
