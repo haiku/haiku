@@ -236,37 +236,30 @@ void MidiPlayerWindow::CreateViews()
 	// Set up needed views
 	scopeView = new ScopeView;
 
-	showScope = new BCheckBox(
-		BRect(0, 0, 1, 1), "showScope", "Scope",
-		new BMessage(MSG_SHOW_SCOPE), B_FOLLOW_LEFT);
+	showScope = new BCheckBox("showScope", "Scope",
+		new BMessage(MSG_SHOW_SCOPE));
 	showScope->SetValue(B_CONTROL_ON);
 
 	CreateInputMenu();
 	CreateReverbMenu();
 	
-	volumeSlider = new BSlider(
-		BRect(0, 0, 1, 1), "volumeSlider", NULL, NULL,
-		0, 100, B_TRIANGLE_THUMB);
+	volumeSlider = new BSlider("volumeSlider", NULL, NULL, 0, 100,
+		B_HORIZONTAL);
 	rgb_color col = { 152, 152, 255 };
 	volumeSlider->UseFillColor(true, &col);
 	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
 
-	playButton = new BButton(
-		BRect(0, 1, 80, 1), "playButton", "Play", new BMessage(MSG_PLAY_STOP),
-		B_FOLLOW_RIGHT);
+	playButton = new BButton("playButton", "Play", new BMessage(MSG_PLAY_STOP));
 	playButton->SetEnabled(false);
 
-	BBox* divider = new BBox(
-		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES, 
-		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER); 
+	BBox* divider = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
+		B_FANCY_BORDER); 
 	divider->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, 1));
 
-	BStringView* volumeLabel = new BStringView(
-					BRect(0, 0, 1, 1), NULL, "Volume:");
+	BStringView* volumeLabel = new BStringView(NULL, "Volume:");
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
-	volumeLabel->SetExplicitMaxSize(
-		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	volumeLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
