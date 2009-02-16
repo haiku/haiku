@@ -69,7 +69,7 @@ AutoconfigLooper::_Configure()
 
 	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0) {
 		request.ifr_flags |= IFF_CONFIGURING;
-		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)));
+		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq));
 	}
 
 	// remove current handler
