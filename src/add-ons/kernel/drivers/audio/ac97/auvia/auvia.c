@@ -162,7 +162,7 @@ auvia_stream_commit_parms(auvia_stream *stream)
 	
 	page = stream->dmaops_log_base;
 	
-	for(i=0; i<stream->bufcount; i++) {
+	for(i = 0; i < stream->bufcount; i++) {
 		page[2*i] = ((uint32)stream->buffer->phy_base) + 
 			i * stream->blksize;
 		page[2*i + 1] = AUVIA_DMAOP_FLAG | stream->blksize;

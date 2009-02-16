@@ -459,19 +459,19 @@ hda_create_controls_list(hda_multi *multi)
 
 
 static status_t
-list_mix_controls(hda_audio_group* audioGroup, multi_mix_control_info* MMCI)
+list_mix_controls(hda_audio_group* audioGroup, multi_mix_control_info* mmci)
 {
-	multi_mix_control *MMC = MMCI->controls;
-	if (MMCI->control_count < 24)
+	multi_mix_control *mmc = mmci->controls;
+	if (mmci->control_count < 24)
 		return B_ERROR;
 			
 	if (hda_create_controls_list(audioGroup->multi) < B_OK)
 		return B_ERROR;
-	for (uint32 i = 0; i<audioGroup->multi->control_count; i++) {
-		MMC[i] = audioGroup->multi->controls[i].mix_control;
+	for (uint32 i = 0; i < audioGroup->multi->control_count; i++) {
+		mmc[i] = audioGroup->multi->controls[i].mix_control;
 	}
 	
-	MMCI->control_count = audioGroup->multi->control_count;
+	mmci->control_count = audioGroup->multi->control_count;
 	return B_OK;
 }
 
@@ -511,12 +511,12 @@ get_control_gain_mute(hda_audio_group* audioGroup, hda_multi_mixer_control *cont
 
 
 static status_t 
-get_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
+get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
 	uint32 id;
 	hda_multi_mixer_control *control = NULL;
-	for (int32 i = 0; i < MMVI->item_count; i++) {
-		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (int32 i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= audioGroup->multi->control_count) {
 			dprintf("hda: get_mix : invalid control id requested : %li\n", id);
 			continue;
@@ -527,17 +527,17 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 			uint32 resp[2];
 			get_control_gain_mute(audioGroup, control, resp);
 			if (control->mix_control.flags & B_MULTI_MIX_ENABLE) {
-				MMVI->values[i].enable = (resp[0] & AMP_MUTE) != 0;
-				TRACE("get_mix: %ld mute: %d\n", control->nid, MMVI->values[i].enable);
+				mmvi->values[i].enable = (resp[0] & AMP_MUTE) != 0;
+				TRACE("get_mix: %ld mute: %d\n", control->nid, mmvi->values[i].enable);
 			} else if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 				uint32 value;
 				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
 					value = resp[0] & AMP_GAIN_MASK;
 				else
 					value = resp[1] & AMP_GAIN_MASK;
-				MMVI->values[i].gain = (0.0 + value - AMP_CAP_OFFSET(control->capabilities))
+				mmvi->values[i].gain = (0.0 + value - AMP_CAP_OFFSET(control->capabilities))
 						* AMP_CAP_STEP_SIZE(control->capabilities);
-				TRACE("get_mix: %ld gain: %f (%ld)\n", control->nid, MMVI->values[i].gain, value);
+				TRACE("get_mix: %ld gain: %f (%ld)\n", control->nid, mmvi->values[i].gain, value);
 			}
 
 			
@@ -546,7 +546,7 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 		/*if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(audioGroup, control, values);
-			MMVI->values[i].mux = (int32)values[0];
+			mmvi->values[i].mux = (int32)values[0];
 		}*/
 	}
 	return B_OK;
@@ -554,12 +554,12 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 
 
 static status_t 
-set_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
+set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
 	uint32 id;
 	hda_multi_mixer_control *control = NULL;
-	for (int32 i = 0; i < MMVI->item_count; i++) {
-		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (int32 i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= audioGroup->multi->control_count) {
 			dprintf("set_mix : invalid control id requested : %li\n", id);
 			continue;
@@ -567,7 +567,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 		control = &audioGroup->multi->controls[id];
 					
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE) {
-			control->mute = (MMVI->values[i].enable ? AMP_MUTE : 0);
+			control->mute = (mmvi->values[i].enable ? AMP_MUTE : 0);
 			TRACE("set_mix: %ld mute: %lx\n", control->nid, control->mute);
 			uint32 resp[2];
 			get_control_gain_mute(audioGroup, control, resp);
@@ -601,8 +601,8 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 			hda_send_verbs(audioGroup->codec, verb, NULL, 2);
 		} else if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			hda_multi_mixer_control *control2 = NULL;
-			if (i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - MULTI_CONTROL_FIRSTID;
+			if (i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= audioGroup->multi->control_count) {
 					dprintf("set_mix : invalid control id requested : %li\n", id);
 				} else {
@@ -613,11 +613,11 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 			}
 			
 			if (control->mix_control.master == MULTI_CONTROL_MASTERID)
-				control->gain = (uint32)(MMVI->values[i].gain / AMP_CAP_STEP_SIZE(control->capabilities)
+				control->gain = (uint32)(mmvi->values[i].gain / AMP_CAP_STEP_SIZE(control->capabilities)
 					+ AMP_CAP_OFFSET(control->capabilities));
 				
 			if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
-				control2->gain = (uint32)(MMVI->values[i+1].gain / AMP_CAP_STEP_SIZE(control2->capabilities)
+				control2->gain = (uint32)(mmvi->values[i+1].gain / AMP_CAP_STEP_SIZE(control2->capabilities)
 					+ AMP_CAP_OFFSET(control2->capabilities));
 			TRACE("set_mix: %ld gain: %lx and %ld gain: %lx\n", 
 				control->nid, control->gain, control2->nid, control2->gain);
@@ -664,7 +664,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * MMVI)
 		/*if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].mux;
+			values[0] = (float)mmvi->values[i].mux;
 			control->set(card, control->channel, control->type, values);
 		}*/
 	}

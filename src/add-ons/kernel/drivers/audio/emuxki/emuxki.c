@@ -1473,7 +1473,7 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * (stream->stereo ? 2 : 1);
 	
-	for (i=0; i<nvoices; i++) {
+	for (i = 0; i < nvoices; i++) {
 		voice = emuxki_voice_new(stream, stream->use, i);
 		if (voice) {
 			if (!stream->first_voice)
@@ -1709,15 +1709,15 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 		case EMU_MIX_MUTE:
 			gpr->mute = (values[0] == 1.0);
 			if (gpr->mute) {
-				for (i=0; i<count; i++)
+				for (i = 0; i < count; i++)
 					emuxki_write_gpr(&card->config, gpr->gpr + i, 0);
 				break;
 			}
-			for (i=0; i<count; i++) {
+			for (i = 0; i < count; i++) {
 				values[i] = gpr->current[i];
 			}	
 		case EMU_MIX_GAIN:
-			for (i=0; i<count; i++) {
+			for (i = 0; i < count; i++) {
 				if (values[i]>gpr->max_gain || values[i]<gpr->min_gain)
 					return;
 				index = (int32)(values[i] / gpr->granularity);
@@ -1746,7 +1746,7 @@ emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	
 	switch(type) {
 		case EMU_MIX_GAIN:
-			for (i=0; i<count; i++) {
+			for (i = 0; i < count; i++) {
 				values[i] = gpr->current[i];
 			}
 			break;

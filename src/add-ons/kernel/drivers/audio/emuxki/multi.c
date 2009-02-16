@@ -262,7 +262,7 @@ emuxki_create_controls_list(multi_dev *multi)
 			
 	parent = emuxki_create_group_control(multi, &index, 0, 0, "Playback");
 		
-	for (i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
+	for (i = EMU_GPR_FIRST_MIX; i < card->gpr_count; i++) {
 		const emuxki_gpr *gpr = &card->gpr[i];
 		if ((gpr->type & EMU_MIX_PLAYBACK) == 0)
 			continue;
@@ -276,7 +276,7 @@ emuxki_create_controls_list(multi_dev *multi)
 	
 	parent = emuxki_create_group_control(multi, &index, 0, 0, "Record");
 		
-	for (i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
+	for (i = EMU_GPR_FIRST_MIX; i < card->gpr_count; i++) {
 		const emuxki_gpr *gpr = &card->gpr[i];
 		if ((gpr->type & EMU_MIX_RECORD) == 0)
 			continue;
@@ -401,7 +401,7 @@ emuxki_create_controls_list(multi_dev *multi)
 	if (!IS_LIVE_5_1(&card->config) && !IS_AUDIGY(&card->config))
 		count--;
 		
-	for (i=1; i < count ; i++) {
+	for (i = 1; i < count ; i++) {
 		info = &source_info[i];
 		PRINT(("name : %s\n", info->name));
 			
@@ -520,13 +520,13 @@ emuxki_create_controls_list(multi_dev *multi)
 }
 
 static status_t 
-emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
+emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for (i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for (i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("emuxki_get_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -538,35 +538,35 @@ emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 				float values[2];
 				control->get(card, control->cookie, control->type, values);
 				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					MMVI->values[i].u.gain = values[0];
+					mmvi->values[i].u.gain = values[0];
 				else
-					MMVI->values[i].u.gain = values[1];
+					mmvi->values[i].u.gain = values[1];
 			}			
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.enable = (values[0] == 1.0);
+			mmvi->values[i].u.enable = (values[0] == 1.0);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.mux = (int32)values[0];
+			mmvi->values[i].u.mux = (int32)values[0];
 		}
 	}
 	return B_OK;
 }
 
 static status_t 
-emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
+emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for (i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for (i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -575,8 +575,8 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 					
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if (i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
+			if (i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
 				} else {
@@ -592,12 +592,12 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 				values[1] = 0.0;
 
 				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					values[0] = MMVI->values[i].u.gain;
+					values[0] = mmvi->values[i].u.gain;
 				else
-					values[1] = MMVI->values[i].u.gain;
+					values[1] = mmvi->values[i].u.gain;
 					
 				if (control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
-					values[1] = MMVI->values[i+1].u.gain;
+					values[1] = mmvi->values[i+1].u.gain;
 					
 				control->set(card, control->cookie, control->type, values);
 			}
@@ -609,14 +609,14 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
-			values[0] = MMVI->values[i].u.enable ? 1.0 : 0.0;
+			values[0] = mmvi->values[i].u.enable ? 1.0 : 0.0;
 			control->set(card, control->cookie, control->type, values);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].u.mux;
+			values[0] = (float)mmvi->values[i].u.mux;
 			control->set(card, control->cookie, control->type, values);
 		}
 	}
@@ -624,22 +624,22 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 }
 
 static status_t 
-emuxki_list_mix_controls(emuxki_dev *card, multi_mix_control_info * MMCI)
+emuxki_list_mix_controls(emuxki_dev *card, multi_mix_control_info * mmci)
 {
-	multi_mix_control	*MMC;
+	multi_mix_control	*mmc;
 	uint32 i;
 	
-	MMC = MMCI->controls;
-	if (MMCI->control_count < EMU_MULTICONTROLSNUM)
+	mmc = mmci->controls;
+	if (mmci->control_count < EMU_MULTICONTROLSNUM)
 		return B_ERROR;
 			
 	if (emuxki_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for (i=0; i<card->multi.control_count; i++) {
-		MMC[i] = card->multi.controls[i].mix_control;
+	for (i = 0; i < card->multi.control_count; i++) {
+		mmc[i] = card->multi.controls[i].mix_control;
 	}
 	
-	MMCI->control_count = card->multi.control_count;	
+	mmci->control_count = card->multi.control_count;	
 	return B_OK;
 }
 
@@ -719,7 +719,7 @@ emuxki_create_channels_list(multi_dev *multi)
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for (i=0; i<nchannels; i++) {
+			for (i = 0; i < nchannels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == EMU_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -921,13 +921,13 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	data->return_playback_channels = pchannels + pchannels2;		/* playback_buffers[][c] */
 	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
-	for (i=0; i<current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++)
 		for (j=0; j<pchannels; j++)
 			emuxki_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
 				&data->playback_buffers[i][j].stride);
 		
-	for (i=0; i<current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++)
 		for (j=0; j<pchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->pstream2, j, i, 
 				&data->playback_buffers[i][pchannels + j].base,
@@ -937,13 +937,13 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	data->return_record_channels = rchannels + rchannels2;
 	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 
-	for (i=0; i<current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++)
 		for (j=0; j<rchannels; j++)
 			emuxki_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,
 				&data->record_buffers[i][j].stride);
 		
-	for (i=0; i<current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++)
 		for (j=0; j<rchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->rstream2, j, i, 
 				&data->record_buffers[i][rchannels + j].base,

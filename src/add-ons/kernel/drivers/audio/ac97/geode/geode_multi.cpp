@@ -344,7 +344,7 @@ create_controls_list(geode_multi *multi)
 	count = source_info_size;
 	//Note that we ignore first item in source_info
 	//It's for recording, but do match this with ac97.c's source_info
-	for (i=1; i < count ; i++) {
+	for (i = 1; i < count ; i++) {
 		info = &source_info[i];
 		TRACE("name : %s\n", info->name);
 			
@@ -525,19 +525,19 @@ create_controls_list(geode_multi *multi)
 
 
 static status_t
-list_mix_controls(geode_controller* controller, multi_mix_control_info* MMCI)
+list_mix_controls(geode_controller* controller, multi_mix_control_info* mmci)
 {
-	multi_mix_control* MMC = MMCI->controls;
-	if (MMCI->control_count < 24)
+	multi_mix_control* mmc = mmci->controls;
+	if (mmci->control_count < 24)
 		return B_ERROR;
 			
 	if (create_controls_list(controller->multi) < B_OK)
 		return B_ERROR;
 	for (uint32 i = 0; i < controller->multi->control_count; i++) {
-		MMC[i] = controller->multi->controls[i].mix_control;
+		mmc[i] = controller->multi->controls[i].mix_control;
 	}
 	
-	MMCI->control_count = controller->multi->control_count;	
+	mmci->control_count = controller->multi->control_count;	
 	return B_OK;
 }
 
@@ -559,10 +559,10 @@ list_mix_channels(geode_controller* controller, multi_mix_channel_info *data)
 
 
 static status_t 
-get_mix(geode_controller *controller, multi_mix_value_info * MMVI)
+get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 {
-	for (int32 i = 0; i < MMVI->item_count; i++) {
-		uint32 id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (int32 i = 0; i < mmvi->item_count; i++) {
+		uint32 id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= controller->multi->control_count) {
 			dprintf("geode_get_mix : invalid control id requested : %li\n", id);
 			continue;
@@ -574,22 +574,22 @@ get_mix(geode_controller *controller, multi_mix_value_info * MMVI)
 				float values[2];
 				control->get(controller, control->cookie, control->type, values);
 				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
-					MMVI->values[i].gain = values[0];
+					mmvi->values[i].gain = values[0];
 				else
-					MMVI->values[i].gain = values[1];
+					mmvi->values[i].gain = values[1];
 			}			
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(controller, control->cookie, control->type, values);
-			MMVI->values[i].enable = (values[0] == 1.0);
+			mmvi->values[i].enable = (values[0] == 1.0);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(controller, control->cookie, control->type, values);
-			MMVI->values[i].mux = (int32)values[0];
+			mmvi->values[i].mux = (int32)values[0];
 		}
 	}
 	return B_OK;
@@ -597,11 +597,11 @@ get_mix(geode_controller *controller, multi_mix_value_info * MMVI)
 
 
 static status_t 
-set_mix(geode_controller *controller, multi_mix_value_info * MMVI)
+set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 {
 	geode_multi *multi = controller->multi;
-	for (int32 i = 0; i < MMVI->item_count; i++) {
-		uint32 id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (int32 i = 0; i < mmvi->item_count; i++) {
+		uint32 id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= multi->control_count) {
 			dprintf("geode_set_mix : invalid control id requested : %li\n", id);
 			continue;
@@ -610,8 +610,8 @@ set_mix(geode_controller *controller, multi_mix_value_info * MMVI)
 					
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if (i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - MULTI_CONTROL_FIRSTID;
+			if (i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= multi->control_count) {
 					dprintf("geode_set_mix : invalid control id requested : %li\n", id);
 				} else {
@@ -627,12 +627,12 @@ set_mix(geode_controller *controller, multi_mix_value_info * MMVI)
 				values[1] = 0.0;
 
 				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
-					values[0] = MMVI->values[i].gain;
+					values[0] = mmvi->values[i].gain;
 				else
-					values[1] = MMVI->values[i].gain;
+					values[1] = mmvi->values[i].gain;
 					
 				if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
-					values[1] = MMVI->values[i+1].gain;
+					values[1] = mmvi->values[i+1].gain;
 					
 				control->set(controller, control->cookie, control->type, values);
 			}
@@ -644,14 +644,14 @@ set_mix(geode_controller *controller, multi_mix_value_info * MMVI)
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
-			values[0] = MMVI->values[i].enable ? 1.0 : 0.0;
+			values[0] = mmvi->values[i].enable ? 1.0 : 0.0;
 			control->set(controller, control->cookie, control->type, values);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].mux;
+			values[0] = (float)mmvi->values[i].mux;
 			control->set(controller, control->cookie, control->type, values);
 		}
 	}

@@ -262,7 +262,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	
 	uint32 dwNumFreeEntries = 0;
 
-	for (i=0; i<stream->bufcount; i++) {
+	for (i = 0; i < stream->bufcount; i++) {
 		duck->AddMapping(((uint32)stream->buffer->phy_base) + 
 			i * stream->blksize, stream->blksize, 0, TRUE, dwNumFreeEntries);
 	}

@@ -221,7 +221,7 @@ echo_create_controls_list(multi_dev *multi)
 	MIXER_AUDIO_CHANNEL channel;
 	channel.wCardId = 0;
 	channel.dwType = ECHO_BUS_OUT;
-	for (i=0; i < card->caps.wNumBussesOut / 2; i++) {
+	for (i = 0; i < card->caps.wNumBussesOut / 2; i++) {
 		channel.wChannel = i * 2;
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Output");
 
@@ -232,7 +232,7 @@ echo_create_controls_list(multi_dev *multi)
 	parent = echo_create_group_control(multi, &index, 0, S_INPUT, NULL);
 
 	channel.dwType = ECHO_BUS_IN;
-	for (i=0; i < card->caps.wNumBussesIn / 2; i++) {
+	for (i = 0; i < card->caps.wNumBussesIn / 2; i++) {
 		channel.wChannel = i * 2;
 		
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Input");
@@ -247,13 +247,13 @@ echo_create_controls_list(multi_dev *multi)
 }
 
 static status_t 
-echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
+echo_get_mix(echo_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for (i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("echo_get_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -265,22 +265,22 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
 				float values[2];
 				control->get(card, control->channel, control->type, values);
 				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
-					MMVI->values[i].gain = values[0];
+					mmvi->values[i].gain = values[0];
 				else
-					MMVI->values[i].gain = values[1];
+					mmvi->values[i].gain = values[1];
 			}			
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->channel, control->type, values);
-			MMVI->values[i].enable = (values[0] == 1.0);
+			mmvi->values[i].enable = (values[0] == 1.0);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->channel, control->type, values);
-			MMVI->values[i].mux = (int32)values[0];
+			mmvi->values[i].mux = (int32)values[0];
 		}
 	}
 	return B_OK;
@@ -288,13 +288,13 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
 
 
 static status_t 
-echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
+echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for (i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
+	for (i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -303,8 +303,8 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 					
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if (i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - MULTI_CONTROL_FIRSTID;
+			if (i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 				} else {
@@ -320,12 +320,12 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 				values[1] = 0.0;
 
 				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
-					values[0] = MMVI->values[i].gain;
+					values[0] = mmvi->values[i].gain;
 				else
-					values[1] = MMVI->values[i].gain;
+					values[1] = mmvi->values[i].gain;
 					
 				if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
-					values[1] = MMVI->values[i+1].gain;
+					values[1] = mmvi->values[i+1].gain;
 					
 				control->set(card, control->channel, control->type, values);
 			}
@@ -337,14 +337,14 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
-			values[0] = MMVI->values[i].enable ? 1.0 : 0.0;
+			values[0] = mmvi->values[i].enable ? 1.0 : 0.0;
 			control->set(card, control->channel, control->type, values);
 		}
 		
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].mux;
+			values[0] = (float)mmvi->values[i].mux;
 			control->set(card, control->channel, control->type, values);
 		}
 	}
@@ -353,22 +353,22 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 
 
 static status_t 
-echo_list_mix_controls(echo_dev *card, multi_mix_control_info * MMCI)
+echo_list_mix_controls(echo_dev *card, multi_mix_control_info * mmci)
 {
-	multi_mix_control	*MMC;
+	multi_mix_control	*mmc;
 	uint32 i;
 	
-	MMC = MMCI->controls;
-	if (MMCI->control_count < 24)
+	mmc = mmci->controls;
+	if (mmci->control_count < 24)
 		return B_ERROR;
 			
 	if (echo_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for (i=0; i<card->multi.control_count; i++) {
-		MMC[i] = card->multi.controls[i].mix_control;
+	for (i = 0; i < card->multi.control_count; i++) {
+		mmc[i] = card->multi.controls[i].mix_control;
 	}
 	
-	MMCI->control_count = card->multi.control_count;	
+	mmci->control_count = card->multi.control_count;	
 	return B_OK;
 }
 
@@ -449,7 +449,7 @@ echo_create_channels_list(multi_dev *multi)
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for (i=0; i<stream->channels; i++) {
+			for (i = 0; i < stream->channels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == ECHO_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -645,7 +645,7 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_playback_channels < data->return_playback_channels) {
 			LOG(("not enough channels\n"));
 		}	
-		for (i=0; i<current_settings.buffer_count; i++)
+		for (i = 0; i < current_settings.buffer_count; i++)
 			for (j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->playback_buffers[i][channels+j].base,
@@ -665,7 +665,7 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_record_channels < data->return_record_channels) {
 			LOG(("not enough channels\n"));
 		}
-		for (i=0; i<current_settings.buffer_count; i++)
+		for (i = 0; i < current_settings.buffer_count; i++)
 			for (j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->record_buffers[i][channels+j].base,
@@ -926,7 +926,7 @@ echo_open(const char *name, uint32 flags, void** cookie)
 		}
 	}
 #else
-	for (i=0; i<num_cards; i++) {
+	for (i = 0; i < num_cards; i++) {
 		if (!strcmp(cards[i].name, name)) {
 			card = &cards[i];
 		}

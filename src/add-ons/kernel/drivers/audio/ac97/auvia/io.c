@@ -83,7 +83,7 @@ auvia_codec_waitready(device_config *config)
 	int i;
 	
 	/* poll until codec not busy */
-	for(i=0; (i<AUVIA_TIMEOUT) && (pci->read_io_32(config->nabmbar 
+	for(i = 0; (i < AUVIA_TIMEOUT) && (pci->read_io_32(config->nabmbar 
 		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_BUSY) ; i++)
 		spin(1);
 	if(i>=AUVIA_TIMEOUT) {
@@ -99,7 +99,7 @@ auvia_codec_waitvalid(device_config *config)
 	int i;
 	
 	/* poll until codec valid */
-	for(i=0; (i<AUVIA_TIMEOUT) && !(pci->read_io_32(config->nabmbar 
+	for(i = 0; (i < AUVIA_TIMEOUT) && !(pci->read_io_32(config->nabmbar 
 		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_PRIVALID) ; i++)
 		spin(1);
 	if(i>=AUVIA_TIMEOUT) {

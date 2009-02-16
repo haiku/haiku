@@ -309,7 +309,7 @@ auvia_create_controls_list(multi_dev *multi)
 	count = source_info_size;
 	count--;	
 	
-	for(i=1; i < count ; i++) {
+	for(i = 1; i < count ; i++) {
 		info = &source_info[i];
 		PRINT(("name : %s\n", info->name));
 			
@@ -386,12 +386,12 @@ auvia_create_controls_list(multi_dev *multi)
 }
 
 static status_t 
-auvia_get_mix(auvia_dev *card, multi_mix_value_info * MMVI)
+auvia_get_mix(auvia_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for(i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
 			PRINT(("auvia_get_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -403,34 +403,34 @@ auvia_get_mix(auvia_dev *card, multi_mix_value_info * MMVI)
 				float values[2];
 				control->get(card, control->cookie, control->type, values);
 				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					MMVI->values[i].u.gain = values[0];
+					mmvi->values[i].u.gain = values[0];
 				else
-					MMVI->values[i].u.gain = values[1];
+					mmvi->values[i].u.gain = values[1];
 			}			
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.enable = (values[0] == 1.0);
+			mmvi->values[i].u.enable = (values[0] == 1.0);
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.mux = (int32)values[0];
+			mmvi->values[i].u.mux = (int32)values[0];
 		}
 	}
 	return B_OK;
 }
 
 static status_t 
-auvia_set_mix(auvia_dev *card, multi_mix_value_info * MMVI)
+auvia_set_mix(auvia_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for(i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
 			PRINT(("auvia_set_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -439,8 +439,8 @@ auvia_set_mix(auvia_dev *card, multi_mix_value_info * MMVI)
 					
 		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if(i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
+			if(i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
 				if(id < 0 || id >= card->multi.control_count) {
 					PRINT(("auvia_set_mix : invalid control id requested : %li\n", id));
 				} else {
@@ -456,12 +456,12 @@ auvia_set_mix(auvia_dev *card, multi_mix_value_info * MMVI)
 				values[1] = 0.0;
 
 				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					values[0] = MMVI->values[i].u.gain;
+					values[0] = mmvi->values[i].u.gain;
 				else
-					values[1] = MMVI->values[i].u.gain;
+					values[1] = mmvi->values[i].u.gain;
 					
 				if(control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
-					values[1] = MMVI->values[i+1].u.gain;
+					values[1] = mmvi->values[i+1].u.gain;
 					
 				control->set(card, control->cookie, control->type, values);
 			}
@@ -473,14 +473,14 @@ auvia_set_mix(auvia_dev *card, multi_mix_value_info * MMVI)
 		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
-			values[0] = MMVI->values[i].u.enable ? 1.0 : 0.0;
+			values[0] = mmvi->values[i].u.enable ? 1.0 : 0.0;
 			control->set(card, control->cookie, control->type, values);
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].u.mux;
+			values[0] = (float)mmvi->values[i].u.mux;
 			control->set(card, control->cookie, control->type, values);
 		}
 	}
@@ -488,22 +488,22 @@ auvia_set_mix(auvia_dev *card, multi_mix_value_info * MMVI)
 }
 
 static status_t 
-auvia_list_mix_controls(auvia_dev *card, multi_mix_control_info * MMCI)
+auvia_list_mix_controls(auvia_dev *card, multi_mix_control_info * mmci)
 {
-	multi_mix_control	*MMC;
+	multi_mix_control	*mmc;
 	int32 i;
 	
-	MMC = MMCI->controls;
-	if(MMCI->control_count < 24)
+	mmc = mmci->controls;
+	if(mmci->control_count < 24)
 		return B_ERROR;
 			
 	if(auvia_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for(i=0; i<card->multi.control_count; i++) {
-		MMC[i] = card->multi.controls[i].mix_control;
+	for(i = 0; i < card->multi.control_count; i++) {
+		mmc[i] = card->multi.controls[i].mix_control;
 	}
 	
-	MMCI->control_count = card->multi.control_count;	
+	mmci->control_count = card->multi.control_count;	
 	return B_OK;
 }
 
@@ -581,7 +581,7 @@ auvia_create_channels_list(multi_dev *multi)
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for(i=0; i<stream->channels; i++) {
+			for(i = 0; i < stream->channels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == AUVIA_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -794,7 +794,7 @@ auvia_get_buffers(auvia_dev *card, multi_buffer_list *data)
 	data->return_playback_channels = pchannels;		/* playback_buffers[][c] */
 	data->return_playback_buffer_size = BUFFER_FRAMES;		/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i = 0; i < BUFFER_COUNT; i++)
 		for(j=0; j<pchannels; j++)
 			auvia_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
@@ -804,7 +804,7 @@ auvia_get_buffers(auvia_dev *card, multi_buffer_list *data)
 	data->return_record_channels = rchannels;
 	data->return_record_buffer_size = BUFFER_FRAMES;	/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i = 0; i < BUFFER_COUNT; i++)
 		for(j=0; j<rchannels; j++)
 			auvia_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,
