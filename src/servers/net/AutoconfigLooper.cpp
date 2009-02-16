@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -63,16 +63,14 @@ AutoconfigLooper::_Configure()
 
 	// set IFF_CONFIGURING flag on interface
 
-	int socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return;
 
 	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0) {
 		request.ifr_flags |= IFF_CONFIGURING;
-		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq));
+		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)));
 	}
-
-	close(socket);
 
 	// remove current handler
 
@@ -83,8 +81,10 @@ AutoconfigLooper::_Configure()
 	fCurrentClient = new DHCPClient(fTarget, fDevice.String());
 	AddHandler(fCurrentClient);
 
-	if (fCurrentClient->Initialize() == B_OK)
+	if (fCurrentClient->Initialize() == B_OK) {
+		close(socket);
 		return;
+	}
 
 	_RemoveClient();
 
@@ -93,6 +93,15 @@ AutoconfigLooper::_Configure()
 	// DHCP obviously didn't work out, take some default values for now
 	// TODO: have a look at zeroconf
 	// TODO: this could also be done add-on based
+
+	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0
+		&& (request.ifr_flags & IFF_CONFIGURING) == 0) {
+		// Someone else configured the interface in the mean time
+		close(socket);
+		return;
+	}
+
+	close(socket);
 
 	BMessage interface(kMsgConfigureInterface);
 	interface.AddString("device", fDevice.String());

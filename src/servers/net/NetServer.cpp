@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -660,7 +660,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 		// set flags
 
 		if (flags != 0) {
-			request.ifr_flags = currentFlags | flags;
+			request.ifr_flags = (currentFlags & ~IFF_CONFIGURING) | flags;
 			if (ioctl(familySocket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0)
 				fprintf(stderr, "%s: Setting flags failed: %s\n", Name(), strerror(errno));
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -788,7 +788,8 @@ DHCPClient::_ToString(in_addr_t address) const
 
 
 status_t
-DHCPClient::_SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const
+DHCPClient::_SendMessage(int socket, dhcp_message& message,
+	sockaddr_in& address) const
 {
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
 		address.sin_addr.s_addr == INADDR_BROADCAST ? MSG_BCAST : 0,
