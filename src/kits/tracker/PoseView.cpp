@@ -1622,8 +1622,8 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 	float listViewScrollBy = 0;
 	for (int32 modelIndex = 0; modelIndex < count; modelIndex++) {
 		Model *model = models[modelIndex];
-		ASSERT(!FindPose(model));
-		if (FindZombie(model->NodeRef())) {
+		
+		if (FindPose(model) || FindZombie(model->NodeRef())) { 
 			// we already have this pose, don't add it
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
 			delete model;
