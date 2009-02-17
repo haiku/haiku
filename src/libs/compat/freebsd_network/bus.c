@@ -17,6 +17,8 @@
 #include <compat/sys/bus.h>
 #include <compat/sys/rman.h>
 
+// private kernel header to get B_NO_HANDLED_INFO
+#include <int.h>
 
 //#define DEBUG_BUS_SPACE_RW
 #ifdef DEBUG_BUS_SPACE_RW
@@ -313,10 +315,10 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 
 	if (filter != NULL) {
 		status = install_io_interrupt_handler(intr->irq,
-			(interrupt_handler)intr->filter, intr->arg, 0);
+			(interrupt_handler)intr->filter, intr->arg, B_NO_HANDLED_INFO);
 	} else if (flags & INTR_FAST) {
 		status = install_io_interrupt_handler(intr->irq,
-			intr_fast_wrapper, intr, 0);
+			intr_fast_wrapper, intr, B_NO_HANDLED_INFO);
 	} else {
 		snprintf(semName, sizeof(semName), "%s intr", dev->device_name);
 
@@ -337,7 +339,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		}
 
 		status = install_io_interrupt_handler(intr->irq,
-			intr_wrapper, intr, 0);
+			intr_wrapper, intr, B_NO_HANDLED_INFO);
 	}
 
 	if (status < B_OK) {
