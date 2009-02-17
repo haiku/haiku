@@ -33,14 +33,14 @@
 
 struct io_handler {
 	struct io_handler	*next;
-	struct io_handler	*prev;
 	interrupt_handler	func;
 	void				*data;
 	bool				use_enable_counter;
+	bool				no_handled_info;
 };
 
 struct io_vector {
-	struct io_handler	handler_list;
+	struct io_handler *	handler_list;
 	spinlock			vector_lock;
 	int32				enable_count;
 	bool				no_lock_vector;
@@ -67,18 +67,16 @@ dump_int_statistics(int argc, char **argv)
 			&& sVectors[i].enable_count == 0
 			&& sVectors[i].handled_count == 0
 			&& sVectors[i].unhandled_count == 0
-			&& sVectors[i].handler_list.next == &sVectors[i].handler_list)
+			&& sVectors[i].handler_list == NULL)
 			continue;
 
 		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
 			i, sVectors[i].enable_count, sVectors[i].handled_count,
 			sVectors[i].unhandled_count,
 			B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock) ? ", ACTIVE" : "",
-			sVectors[i].handler_list.next == &sVectors[i].handler_list
-				? ", no handler" : "");
+			sVectors[i].handler_list == NULL ? ", no handler" : "");
 
-		for (io = sVectors[i].handler_list.next;
-				io != &sVectors[i].handler_list; io = io->next) {
+		for (io = sVectors[i].handler_list; io != NULL; io = io->next) {
 			const char *symbol, *imageName;
 			bool exactMatch;
 
@@ -134,7 +132,7 @@ int_init_post_vm(kernel_args *args)
 		sVectors[i].trigger_count = 0;
 		sVectors[i].ignored_count = 0;
 #endif
-		initque(&sVectors[i].handler_list);	/* initialize handler queue */
+		sVectors[i].handler_list = NULL;
 	}
 
 #if DEBUG_INTERRUPTS
@@ -168,13 +166,15 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	if (!sVectors[vector].no_lock_vector)
 		acquire_spinlock(&sVectors[vector].vector_lock);
 
+#if !DEBUG_INTERRUPTS
 	// The list can be empty at this place
-	if (sVectors[vector].handler_list.next == &sVectors[vector].handler_list) {
+	if (sVectors[vector].handler_list == NULL) {
 		dprintf("unhandled io interrupt %d\n", vector);
 		if (!sVectors[vector].no_lock_vector)
 			release_spinlock(&sVectors[vector].vector_lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
+#endif
 
 	/* For level-triggered interrupts, we actually handle the return
 	 * value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
@@ -185,9 +185,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
 	 */
 
-	for (io = sVectors[vector].handler_list.next;
-			io != &sVectors[vector].handler_list;
-			io = io->next) {
+	for (io = sVectors[vector].handler_list; io != NULL; io = io->next) {
 		status = io->func(io->data);
 
 		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
@@ -210,16 +208,27 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 
 	if (sVectors[vector].trigger_count > 10000) {
 		if (sVectors[vector].ignored_count > 9900) {
-			if (sVectors[vector].handler_list.next == NULL
-				|| sVectors[vector].handler_list.next->next == NULL) {
-				// this interrupt vector is not shared, disable it
-				sVectors[vector].enable_count = -100;
-				arch_int_disable_io_interrupt(vector);
-				dprintf("Disabling unhandled io interrupt %d\n", vector);
+			struct io_handler *last = sVectors[vector].handler_list;
+			while (last && last->next)
+				last = last->next;
+
+			if (last != NULL && last->no_handled_info) {
+				// we have an interrupt handler installed that does not
+				// know whether or not it has actually handled the interrupt,
+				// so this unhandled count is inaccurate and we can't just
+				// disable
 			} else {
-				// this is a shared interrupt vector, we cannot just disable it
-				dprintf("More than 99%% interrupts of vector %d are unhandled\n",
-					vector);
+				if (sVectors[vector].handler_list == NULL
+					|| sVectors[vector].handler_list->next == NULL) {
+					// this interrupt vector is not shared, disable it
+					sVectors[vector].enable_count = -100;
+					arch_int_disable_io_interrupt(vector);
+					dprintf("Disabling unhandled io interrupt %d\n", vector);
+				} else {
+					// this is a shared interrupt vector, we cannot just disable it
+					dprintf("More than 99%% interrupts of vector %d are unhandled\n",
+						vector);
+				}
 			}
 		}
 
@@ -290,13 +299,33 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	io->func = handler;
 	io->data = data;
 	io->use_enable_counter = (flags & B_NO_ENABLE_COUNTER) == 0;
+	io->no_handled_info = (flags & B_NO_HANDLED_INFO) == 0;
 
 	// Disable the interrupts, get the spinlock for this irq only
 	// and then insert the handler
 	state = disable_interrupts();
 	acquire_spinlock(&sVectors[vector].vector_lock);
 
-	insque(io, &sVectors[vector].handler_list);
+	if ((flags & B_NO_HANDLED_INFO) != 0
+		&& sVectors[vector].handler_list != NULL) {
+		// The driver registering this interrupt handler doesn't know
+		// whether or not it actually handled the interrupt after the
+		// handler returns. This is incompatible with shared interrupts
+		// as we'd potentially steal interrupts from other handlers
+		// resulting in interrupt storms. Therefore we enqueue this interrupt
+		// handler as the very last one, meaning all other handlers will
+		// get their go at any interrupt first.
+		struct io_handler *last = sVectors[vector].handler_list;
+		while (last->next)
+			last = last->next;
+
+		io->next = NULL;
+		last->next = io;
+	} else {
+		// A normal interrupt handler, just add it to the head of the list.
+		io->next = sVectors[vector].handler_list;
+		sVectors[vector].handler_list = io;
+	}
 
 	// If B_NO_ENABLE_COUNTER is set, we're being asked to not alter
 	// whether the interrupt should be enabled or not
@@ -328,6 +357,7 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
 	status_t status = B_BAD_VALUE;
 	struct io_handler *io = NULL;
+	struct io_handler *last = NULL;
 	cpu_status state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
@@ -341,12 +371,13 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	 * We go forward through the list but this means we start with the
 	 * most recently added handlers.
 	 */
-	for (io = sVectors[vector].handler_list.next;
-	     io != &sVectors[vector].handler_list;
-	     io = io->next) {
+	for (io = sVectors[vector].handler_list; io != NULL; io = io->next) {
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
-			remque(io);
+			if (last != NULL)
+				last->next = io->next;
+			else
+				sVectors[vector].handler_list = io->next;
 
 			// Check if we need to disable the interrupt
 			if (io->use_enable_counter && --sVectors[vector].enable_count == 0)
@@ -355,6 +386,8 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 			status = B_OK;
 			break;
 		}
+
+		last = io;
 	}
 
 	release_spinlock(&sVectors[vector].vector_lock);

@@ -12,6 +12,10 @@
 #include <KernelExport.h>
 #include <arch/int.h>
 
+// private install_io_interrupt_handler() flags
+#define B_NO_LOCK_VECTOR	0x100
+#define B_NO_HANDLED_INFO	0x200
+
 struct kernel_args;
 
 

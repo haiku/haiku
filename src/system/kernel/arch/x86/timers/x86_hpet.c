@@ -11,6 +11,7 @@
 
 #include <arch/int.h>
 #include <arch/cpu.h>
+#include <int.h>
 
 #include "hpet.h"
 
