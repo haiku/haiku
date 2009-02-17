@@ -1247,7 +1247,7 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 
 void
-BControlLook::DrawInctiveTab(BView* view, BRect& rect, const BRect& updateRect,
+BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, uint32 borders)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))

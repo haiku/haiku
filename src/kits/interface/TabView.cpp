@@ -223,12 +223,12 @@ BTab::DrawFocusMark(BView *owner, BRect frame)
 	float width = owner->StringWidth(Label());
 
 	owner->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	// TODO: remove offset
-	float offset = frame.Height() / 2.0;
-	owner->StrokeLine(BPoint((frame.left + frame.right - width + offset) / 2.0,
-			frame.bottom - 3),
-		BPoint((frame.left + frame.right + width + offset) / 2.0,
-			frame.bottom - 3));
+
+	float offset = IsSelected() ? 3 : 2;
+	owner->StrokeLine(BPoint((frame.left + frame.right - width) / 2.0,
+			frame.bottom - offset),
+		BPoint((frame.left + frame.right + width) / 2.0,
+			frame.bottom - offset));
 }
 
 
@@ -290,7 +290,7 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 			be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
 				borders);
 		} else {
-			be_control_look->DrawInctiveTab(owner, frame, frame, no_tint, 0,
+			be_control_look->DrawInactiveTab(owner, frame, frame, no_tint, 0,
 				borders);
 		}
 		
@@ -858,7 +858,7 @@ BTabView::DrawTabs()
 			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
 		if (left == 0)
 			borders |= BControlLook::B_LEFT_BORDER;
-		be_control_look->DrawInctiveTab(this, frame, frame, base, 0, borders);
+		be_control_look->DrawInactiveTab(this, frame, frame, base, 0, borders);
 	}
 
 	if (fSelection < CountTabs())
