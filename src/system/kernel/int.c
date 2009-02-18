@@ -40,7 +40,7 @@ struct io_handler {
 };
 
 struct io_vector {
-	struct io_handler *	handler_list;
+	struct io_handler	*handler_list;
 	spinlock			vector_lock;
 	int32				enable_count;
 	bool				no_lock_vector;
@@ -299,7 +299,7 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	io->func = handler;
 	io->data = data;
 	io->use_enable_counter = (flags & B_NO_ENABLE_COUNTER) == 0;
-	io->no_handled_info = (flags & B_NO_HANDLED_INFO) == 0;
+	io->no_handled_info = (flags & B_NO_HANDLED_INFO) != 0;
 
 	// Disable the interrupts, get the spinlock for this irq only
 	// and then insert the handler
