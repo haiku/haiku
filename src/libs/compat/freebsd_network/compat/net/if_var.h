@@ -137,7 +137,7 @@ struct ifnet {
 	struct	bpf_if *if_bpf;		/* packet filter structure */
 	u_short	if_index;		/* numeric abbreviation for this if  */
 	short	if_timer;		/* time 'til if_watchdog called */
-	u_short	if_nvlans;		/* number of active vlans */
+	struct  ifvlantrunk *if_vlantrunk; /* pointer to 802.1q data */
 	int	if_flags;		/* up/down, broadcast, etc. */
 	int	if_capabilities;	/* interface capabilities */
 	int	if_capenable;		/* enabled features */

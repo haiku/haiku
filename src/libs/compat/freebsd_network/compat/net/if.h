@@ -26,6 +26,7 @@
 #define	IFCAP_POLLING		0x0040	/* driver supports polling */
 #define	IFCAP_VLAN_HWCSUM	0x0080
 #define	IFCAP_TSO4			0x0100	/* supports TCP segmentation offload */
+#define	IFCAP_VLAN_HWFILTER	0x10000 /* interface hw can filter vlan tag */
 
 #define IFCAP_HWCSUM		(IFCAP_RXCSUM | IFCAP_TXCSUM)
 

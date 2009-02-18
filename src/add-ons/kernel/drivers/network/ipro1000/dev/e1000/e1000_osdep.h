@@ -73,9 +73,9 @@
 
 #define STATIC			static
 #define FALSE			0
-#define false			FALSE /* shared code stupidity */
+//#define false			FALSE /* shared code stupidity */
 #define TRUE			1
-#define true			TRUE
+//#define true			TRUE
 #define CMD_MEM_WRT_INVALIDATE	0x0010  /* BIT_4 */
 #define PCI_COMMAND_REGISTER	PCIR_COMMAND
 
@@ -91,7 +91,7 @@ typedef int64_t		s64;
 typedef int32_t		s32;
 typedef int16_t		s16;
 typedef int8_t		s8;
-typedef boolean_t	bool;
+//typedef boolean_t	bool;
 
 #define __le16		u16
 #define __le32		u32

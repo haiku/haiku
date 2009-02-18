@@ -15,6 +15,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	compat.c
 	device.c
 	driver.c
+	eventhandler.c
 	fbsd_busdma_x86.c
 	fbsd_ether.c
 	fbsd_if_media.c

@@ -2703,7 +2703,7 @@ static int
 em_allocate_pci_resources(struct adapter *adapter)
 {
 	device_t	dev = adapter->dev;
-	int		val, rid, error = E1000_SUCCESS;
+	int		i, val, rid, error = E1000_SUCCESS;
 
 	rid = PCIR_BAR(0);
 	adapter->memory = bus_alloc_resource_any(dev, SYS_RES_MEMORY,
@@ -2755,7 +2755,7 @@ em_allocate_pci_resources(struct adapter *adapter)
 	** Init the resource arrays
 	**  used by MSIX setup 
 	*/
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		adapter->rid[i] = i + 1; /* MSI/X RID starts at 1 */
 		adapter->tag[i] = NULL;
 		adapter->res[i] = NULL;
@@ -2853,13 +2853,13 @@ int
 em_allocate_msix(struct adapter *adapter)
 {
 	device_t dev = adapter->dev;
-	int error;
+	int error, i;
 
 	/* Make sure all interrupts are disabled */
 	E1000_WRITE_REG(&adapter->hw, E1000_IMC, 0xffffffff);
 
 	/* First get the resources */
-	for (int i = 0; i < adapter->msi; i++) {
+	for (i = 0; i < adapter->msi; i++) {
 		adapter->res[i] = bus_alloc_resource_any(dev,
 		    SYS_RES_IRQ, &adapter->rid[i], RF_ACTIVE);
 		if (adapter->res[i] == NULL) {
@@ -2928,6 +2928,7 @@ static void
 em_free_pci_resources(struct adapter *adapter)
 {
 	device_t dev = adapter->dev;
+	int i;
 
 	/* Make sure the for loop below runs once */
 	if (adapter->msi == 0)
@@ -2939,7 +2940,7 @@ em_free_pci_resources(struct adapter *adapter)
 	 *      in an array we can do the same logic
 	 *      whether its MSIX or just legacy.
 	 */
-	for (int i = 0; i < adapter->msi; i++) {
+	for (i = 0; i < adapter->msi; i++) {
 		if (adapter->tag[i] != NULL) {
 			bus_teardown_intr(dev, adapter->res[i],
 			    adapter->tag[i]);
@@ -3357,7 +3358,7 @@ em_allocate_transmit_structures(struct adapter *adapter)
 {
 	device_t dev = adapter->dev;
 	struct em_buffer *tx_buffer;
-	int error;
+	int error, i;
 
 	/*
 	 * Create DMA tags for tx descriptors
@@ -3391,7 +3392,7 @@ em_allocate_transmit_structures(struct adapter *adapter)
 	}
 
 	/* Create the descriptor buffer dma maps */
-	for (int i = 0; i < adapter->num_tx_desc; i++) {
+	for (i = 0; i < adapter->num_tx_desc; i++) {
 		tx_buffer = &adapter->tx_buffer_area[i];
 		error = bus_dmamap_create(adapter->txtag, 0, &tx_buffer->map);
 		if (error != 0) {
@@ -3416,13 +3417,14 @@ static void
 em_setup_transmit_structures(struct adapter *adapter)
 {
 	struct em_buffer *tx_buffer;
+	int i;
 
 	/* Clear the old ring contents */
 	bzero(adapter->tx_desc_base,
 	    (sizeof(struct e1000_tx_desc)) * adapter->num_tx_desc);
 
 	/* Free any existing TX buffers */
-	for (int i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
+	for (i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
 		tx_buffer = &adapter->tx_buffer_area[i];
 		bus_dmamap_sync(adapter->txtag, tx_buffer->map,
 		    BUS_DMASYNC_POSTWRITE);
@@ -3542,11 +3544,12 @@ static void
 em_free_transmit_structures(struct adapter *adapter)
 {
 	struct em_buffer *tx_buffer;
+	int i;
 
 	INIT_DEBUGOUT("free_transmit_structures: begin");
 
 	if (adapter->tx_buffer_area != NULL) {
-		for (int i = 0; i < adapter->num_tx_desc; i++) {
+		for (i = 0; i < adapter->num_tx_desc; i++) {
 			tx_buffer = &adapter->tx_buffer_area[i];
 			if (tx_buffer->m_head != NULL) {
 				bus_dmamap_sync(adapter->txtag, tx_buffer->map,
@@ -4199,6 +4202,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 	struct ifnet	*ifp = adapter->ifp;
 	u64	bus_addr;
 	u32	rctl, rxcsum;
+	int i;
 
 	INIT_DEBUGOUT("em_initialize_receive_unit: begin");
 
@@ -4224,7 +4228,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 	** using the EITR register (82574 only)
 	*/
 	if (adapter->msix)
-		for (int i = 0; i < 4; i++)
+		for (i = 0; i < 4; i++)
 			E1000_WRITE_REG(&adapter->hw,
 			    E1000_EITR_82574(i), DEFAULT_ITR);
 
@@ -4375,7 +4379,7 @@ em_free_receive_structures(struct adapter *adapter)
 static int
 em_rxeof(struct adapter *adapter, int count)
 {
-	struct ifnet	*ifp = adapter->ifp;;
+	struct ifnet	*ifp = adapter->ifp;
 	struct mbuf	*mp;
 	u8		status, accept_frame = 0, eop = 0;
 	u16 		len, desc_len, prev_len_adj;
