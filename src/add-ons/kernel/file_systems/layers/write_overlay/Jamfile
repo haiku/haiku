@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems layers write_overlay ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon write_overlay :
+	write_overlay.cpp
+	;

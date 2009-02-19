@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems layers ;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems layers attribute_overlay ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems layers write_overlay ;

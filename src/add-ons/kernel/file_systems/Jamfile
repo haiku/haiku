@@ -7,10 +7,11 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems fat ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems googlefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems nfs ;
-SubInclude HAIKU_TOP src add-ons kernel file_systems overlay ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ramfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems udf ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel file_systems ntfs ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel file_systems reiserfs ;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems layers ;
