@@ -34,11 +34,7 @@
 #endif
 
 
-namespace overlay {
-
-class AttributeFile;
-class AttributeEntry;
-
+namespace write_overlay {
 
 struct open_cookie {
 	int				open_mode;
@@ -52,27 +48,17 @@ struct write_buffer {
 	uint8			buffer[1];
 };
 
-struct attribute_dir_cookie {
-	AttributeFile *	file;
-	uint32			index;
-};
-
 
 class OverlayVolume {
 public:
 							OverlayVolume(fs_volume *volume);
 							~OverlayVolume();
 
-		status_t			AllLayersMounted();
-
 		fs_volume *			Volume() { return fVolume; }
 		fs_volume *			SuperVolume() { return fVolume->super_volume; }
 
-		bool				WriteSupport() { return fWriteSupport; }
-
 private:
 		fs_volume *			fVolume;
-		bool				fWriteSupport;
 };
 
 
@@ -89,9 +75,6 @@ public:
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 		ino_t				InodeNumber() { return fInodeNumber; }
 
-		status_t			GetAttributeFile(AttributeFile **attributeFile);
-		status_t			WriteAttributeFile();
-
 		status_t			ReadStat(struct stat *stat);
 
 		status_t			Open(int openMode, void **cookie);
@@ -106,7 +89,6 @@ private:
 		OverlayVolume *		fVolume;
 		fs_vnode			fSuperVnode;
 		ino_t				fInodeNumber;
-		AttributeFile *		fAttributeFile;
 		write_buffer *		fWriteBuffers;
 		off_t				fOriginalNodeLength;
 		off_t				fCurrentNodeLength;
@@ -114,136 +96,17 @@ private:
 };
 
 
-class AttributeFile {
-public:
-							AttributeFile(fs_volume *overlay, fs_volume *volume,
-								fs_vnode *vnode);
-							~AttributeFile();
-
-		status_t			InitCheck() { return fStatus; }
-
-		dev_t				VolumeID() { return fVolumeID; }
-		ino_t				FileInode() { return fFileInode; }
-
-		status_t			CreateEmpty();
-		status_t			WriteAttributeFile(fs_volume *overlay,
-								fs_volume *volume, fs_vnode *vnode);
-
-		status_t			ReadAttributeDir(struct dirent *dirent,
-								size_t bufferSize, uint32 *numEntries,
-								uint32 *index);
-
-		uint32				CountAttributes();
-		AttributeEntry *	FindAttribute(const char *name,
-								uint32 *index = NULL);
-
-		status_t			CreateAttribute(const char *name, type_code type,
-								int openMode, AttributeEntry **entry);
-		status_t			OpenAttribute(const char *name, int openMode,
-								AttributeEntry **entry);
-		status_t			RemoveAttribute(const char *name,
-								AttributeEntry **entry);
-		status_t			AddAttribute(AttributeEntry *entry);
-
-private:
-		#define ATTRIBUTE_OVERLAY_FILE_MAGIC			'attr'
-		#define ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME	"_HAIKU"
-
-		struct attribute_file {
-			uint32			magic; // 'attr'
-			uint32			entry_count;
-			uint8			entries[1];
-		} _PACKED;
-
-		status_t			fStatus;
-		dev_t				fVolumeID;
-		ino_t				fFileInode;
-		ino_t				fDirectoryInode;
-		ino_t				fAttributeDirInode;
-		ino_t				fAttributeFileInode;
-		attribute_file *	fFile;
-		uint32				fAttributeDirIndex;
-		AttributeEntry **	fEntries;
-};
-
-
-class AttributeEntry {
-public:
-							AttributeEntry(AttributeFile *parent,
-								uint8 *buffer);
-							AttributeEntry(AttributeFile *parent,
-								const char *name, type_code type);
-							~AttributeEntry();
-
-		status_t			InitCheck() { return fStatus; }
-
-		uint8 *				Entry() { return (uint8 *)fEntry; }
-		size_t				EntrySize();
-		uint8 *				Data() { return fData; }
-		size_t				DataSize() { return fEntry->size; }
-
-		status_t			SetType(type_code type);
-		type_code			Type() { return fEntry->type; }
-
-		status_t			SetSize(size_t size);
-		uint32				Size() { return fEntry->size; }
-
-		status_t			SetName(const char *name);
-		const char *		Name() { return fEntry->name; }
-		uint8				NameLength() { return fEntry->name_length; }
-
-		status_t			FillDirent(struct dirent *dirent,
-								size_t bufferSize, uint32 *numEntries);
-
-		status_t			Read(off_t position, void *buffer, size_t *length);
-		status_t			Write(off_t position, const void *buffer,
-								size_t *length);
-
-		status_t			ReadStat(struct stat *stat);
-		status_t			WriteStat(const struct stat *stat, uint32 statMask);
-
-private:
-		struct attribute_entry {
-			type_code		type;
-			uint32			size;
-			uint8			name_length; // including 0 byte
-			char			name[1]; // 0 terminated, followed by data
-		} _PACKED;
-
-		AttributeFile *		fParent;
-		attribute_entry *	fEntry;
-		uint8 *				fData;
-		status_t			fStatus;
-		bool				fAllocatedEntry;
-		bool				fAllocatedData;
-};
-
-
 //	#pragma mark OverlayVolume
 
 
 OverlayVolume::OverlayVolume(fs_volume *volume)
-	:	fVolume(volume),
-		fWriteSupport(false)
+	:	fVolume(volume)
 {
 }
 
 
 OverlayVolume::~OverlayVolume()
 {
-}
-
-
-status_t
-OverlayVolume::AllLayersMounted()
-{
-	fs_info info;
-	fs_volume *superVolume = fVolume->super_volume;
-	if (superVolume->ops->read_fs_info != NULL
-		&& superVolume->ops->read_fs_info(superVolume, &info) == B_OK)
-		fWriteSupport = (info.flags & B_FS_IS_READONLY) != 0;
-
-	return B_OK;
 }
 
 
@@ -255,7 +118,6 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 	:	fVolume(volume),
 		fSuperVnode(*superVnode),
 		fInodeNumber(inodeNumber),
-		fAttributeFile(NULL),
 		fWriteBuffers(NULL),
 		fOriginalNodeLength(-1),
 		fCurrentNodeLength(-1)
@@ -267,8 +129,6 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 OverlayInode::~OverlayInode()
 {
 	TRACE("inode destroyed\n");
-	delete fAttributeFile;
-
 	write_buffer *element = fWriteBuffers;
 	while (element) {
 		write_buffer *next = element->next;
@@ -286,50 +146,6 @@ OverlayInode::InitCheck()
 
 
 status_t
-OverlayInode::GetAttributeFile(AttributeFile **attributeFile)
-{
-	if (fAttributeFile == NULL) {
-		fAttributeFile = new(std::nothrow) AttributeFile(Volume(),
-			SuperVolume(), &fSuperVnode);
-		if (fAttributeFile == NULL) {
-			TRACE_ALWAYS("no memory to allocate attribute file\n");
-			return B_NO_MEMORY;
-		}
-	}
-
-	status_t result = fAttributeFile->InitCheck();
-	if (result != B_OK) {
-		if (result == B_ENTRY_NOT_FOUND) {
-			// TODO: need to check if we're able to create the file
-			// but at least allow virtual attributes for now
-		}
-
-		result = fAttributeFile->CreateEmpty();
-		if (result != B_OK)
-			return result;
-	}
-
-	*attributeFile = fAttributeFile;
-	return B_OK;
-}
-
-
-status_t
-OverlayInode::WriteAttributeFile()
-{
-	if (fAttributeFile == NULL)
-		return B_NO_INIT;
-
-	status_t result = fAttributeFile->InitCheck();
-	if (result != B_OK)
-		return result;
-
-	return fAttributeFile->WriteAttributeFile(Volume(), SuperVolume(),
-		&fSuperVnode);
-}
-
-
-status_t
 OverlayInode::ReadStat(struct stat *stat)
 {
 	if (fSuperVnode.ops->read_stat == NULL)
@@ -340,7 +156,7 @@ OverlayInode::ReadStat(struct stat *stat)
 	if (result != B_OK)
 		return result;
 
-	if (fVolume->WriteSupport() && fCurrentNodeLength >= 0) {
+	if (fCurrentNodeLength >= 0) {
 		stat->st_size = fCurrentNodeLength;
 		stat->st_blocks = (stat->st_size + stat->st_blksize - 1)
 			/ stat->st_blksize;
@@ -357,110 +173,100 @@ OverlayInode::Open(int openMode, void **_cookie)
 	if (fSuperVnode.ops->open == NULL)
 		return B_UNSUPPORTED;
 
-	if (fVolume->WriteSupport()) {
-		open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
-		if (cookie == NULL)
-			return B_NO_MEMORY;
+	open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
+	if (cookie == NULL)
+		return B_NO_MEMORY;
 
-		if (fOriginalNodeLength < 0) {
-			struct stat stat;
-			status_t result = fSuperVnode.ops->read_stat(SuperVolume(),
-				&fSuperVnode, &stat);
-			if (result != B_OK)
-				return result;
-
-			fOriginalNodeLength = stat.st_size;
-			fCurrentNodeLength = stat.st_size;
-			fModificationTime = stat.st_mtime;
+	if (fOriginalNodeLength < 0) {
+		struct stat stat;
+		status_t result = fSuperVnode.ops->read_stat(SuperVolume(),
+			&fSuperVnode, &stat);
+		if (result != B_OK) {
+			free(cookie);
+			return result;
 		}
 
-		cookie->open_mode = openMode;
-		*_cookie = cookie;
-
-		if (openMode & O_TRUNC)
-			fCurrentNodeLength = 0;
-
-		openMode &= ~(O_RDWR | O_WRONLY | O_TRUNC | O_CREAT);
-		return fSuperVnode.ops->open(SuperVolume(), &fSuperVnode, openMode,
-			&cookie->super_cookie);
+		fOriginalNodeLength = stat.st_size;
+		fCurrentNodeLength = stat.st_size;
+		fModificationTime = stat.st_mtime;
 	}
 
-	return fSuperVnode.ops->open(SuperVolume(), &fSuperVnode, openMode,
-		_cookie);
+	cookie->open_mode = openMode;
+	*_cookie = cookie;
+
+	if (openMode & O_TRUNC)
+		fCurrentNodeLength = 0;
+
+	openMode &= ~(O_RDWR | O_WRONLY | O_TRUNC | O_CREAT);
+	status_t result = fSuperVnode.ops->open(SuperVolume(), &fSuperVnode,
+		openMode, &cookie->super_cookie);
+	if (result != B_OK) {
+		free(cookie);
+		return result;
+	}
+
+	return B_OK;
 }
 
 
 status_t
 OverlayInode::Close(void *_cookie)
 {
-	if (fVolume->WriteSupport()) {
-		open_cookie *cookie = (open_cookie *)_cookie;
-		return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode,
-			cookie->super_cookie);
-	}
-
-	return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode, _cookie);
+	open_cookie *cookie = (open_cookie *)_cookie;
+	return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode,
+		cookie->super_cookie);
 }
 
 
 status_t
 OverlayInode::FreeCookie(void *_cookie)
 {
-	if (fVolume->WriteSupport()) {
-		open_cookie *cookie = (open_cookie *)_cookie;
-		status_t result = fSuperVnode.ops->free_cookie(SuperVolume(),
-			&fSuperVnode, cookie->super_cookie);
-		free(cookie);
-		return result;
-	}
-
-	return fSuperVnode.ops->free_cookie(SuperVolume(), &fSuperVnode, _cookie);
+	open_cookie *cookie = (open_cookie *)_cookie;
+	status_t result = fSuperVnode.ops->free_cookie(SuperVolume(),
+		&fSuperVnode, cookie->super_cookie);
+	free(cookie);
+	return result;
 }
 
 
 status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 {
-	if (fVolume->WriteSupport()) {
-		if (position >= fCurrentNodeLength) {
-			*length = 0;
-			return B_OK;
-		}
-
-		if (position < fOriginalNodeLength) {
-			open_cookie *cookie = (open_cookie *)_cookie;
-			size_t readLength = MIN(fOriginalNodeLength - position, *length);
-			status_t result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
-				cookie->super_cookie, position, buffer, &readLength);
-			if (result != B_OK)
-				return result;
-		}
-
-		// overlay the read with whatever chunks we have written
-		write_buffer *element = fWriteBuffers;
-		*length = MIN(fCurrentNodeLength - position, *length);
-		off_t end = position + *length;
-		while (element) {
-			if (element->position > end)
-				break;
-
-			off_t elementEnd = element->position + element->length;
-			if (elementEnd > position) {
-				off_t copyPosition = MAX(position, element->position);
-				size_t copyLength = MIN(elementEnd - position, *length);
-				memcpy((uint8 *)buffer + (copyPosition - position),
-					element->buffer + (copyPosition - element->position),
-					copyLength);
-			}
-
-			element = element->next;
-		}
-
+	if (position >= fCurrentNodeLength) {
+		*length = 0;
 		return B_OK;
 	}
 
-	return fSuperVnode.ops->read(SuperVolume(), &fSuperVnode, _cookie,
-		position, buffer, length);
+	if (position < fOriginalNodeLength) {
+		open_cookie *cookie = (open_cookie *)_cookie;
+		size_t readLength = MIN(fOriginalNodeLength - position, *length);
+		status_t result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
+			cookie->super_cookie, position, buffer, &readLength);
+		if (result != B_OK)
+			return result;
+	}
+
+	// overlay the read with whatever chunks we have written
+	write_buffer *element = fWriteBuffers;
+	*length = MIN(fCurrentNodeLength - position, *length);
+	off_t end = position + *length;
+	while (element) {
+		if (element->position > end)
+			break;
+
+		off_t elementEnd = element->position + element->length;
+		if (elementEnd > position) {
+			off_t copyPosition = MAX(position, element->position);
+			size_t copyLength = MIN(elementEnd - position, *length);
+			memcpy((uint8 *)buffer + (copyPosition - position),
+				element->buffer + (copyPosition - element->position),
+				copyLength);
+		}
+
+		element = element->next;
+	}
+
+	return B_OK;
 }
 
 
@@ -468,802 +274,91 @@ status_t
 OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	size_t *length)
 {
-	if (fVolume->WriteSupport()) {
-		// find insertion point
-		write_buffer **link = &fWriteBuffers;
-		write_buffer *other = fWriteBuffers;
-		write_buffer *swallow = NULL;
-		off_t newPosition = position;
-		size_t newLength = *length;
-		uint32 swallowCount = 0;
+	// find insertion point
+	write_buffer **link = &fWriteBuffers;
+	write_buffer *other = fWriteBuffers;
+	write_buffer *swallow = NULL;
+	off_t newPosition = position;
+	size_t newLength = *length;
+	uint32 swallowCount = 0;
 
-		while (other) {
-			off_t newEnd = newPosition + newLength;
-			off_t otherEnd = other->position + other->length;
-			if (otherEnd < newPosition) {
-				// other is completely before us
-				link = &other->next;
-				other = other->next;
-				continue;
-			}
-
-			if (other->position > newEnd) {
-				// other is completely past us
-				break;
-			}
-
-			swallowCount++;
-			if (swallow == NULL)
-				swallow = other;
-
-			if (other->position <= newPosition) {
-				if (swallowCount == 1 && otherEnd >= newEnd) {
-					// other chunk completely covers us, just copy
-					memcpy(other->buffer + (newPosition - other->position),
-						buffer, *length);
-
-					fModificationTime = time(NULL);
-					notify_stat_changed(SuperVolume()->id, fInodeNumber,
-						B_STAT_MODIFICATION_TIME);
-					return B_OK;
-				}
-
-				newLength += newPosition - other->position;
-				newPosition = other->position;
-			}
-
-			if (otherEnd > newEnd)
-				newLength += otherEnd - newEnd;
-
-			other = other->next;
-		}
-
-		write_buffer *element = (write_buffer *)malloc(sizeof(write_buffer) - 1
-			+ newLength);
-		if (element == NULL)
-			return B_NO_MEMORY;
-
-		element->next = *link;
-		element->position = newPosition;
-		element->length = newLength;
-		*link = element;
-
-		bool sizeChanged = false;
+	while (other) {
 		off_t newEnd = newPosition + newLength;
-		if (newEnd > fCurrentNodeLength) {
-			fCurrentNodeLength = newEnd;
-			sizeChanged = true;
+		off_t otherEnd = other->position + other->length;
+		if (otherEnd < newPosition) {
+			// other is completely before us
+			link = &other->next;
+			other = other->next;
+			continue;
 		}
 
-		// populate the buffer with the existing chunks
-		if (swallowCount > 0) {
-			while (swallowCount-- > 0) {
-				memcpy(element->buffer + (swallow->position - newPosition),
-					swallow->buffer, swallow->length);
+		if (other->position > newEnd) {
+			// other is completely past us
+			break;
+		}
 
-				element->next = swallow->next;
-				free(swallow);
-				swallow = element->next;
+		swallowCount++;
+		if (swallow == NULL)
+			swallow = other;
+
+		if (other->position <= newPosition) {
+			if (swallowCount == 1 && otherEnd >= newEnd) {
+				// other chunk completely covers us, just copy
+				memcpy(other->buffer + (newPosition - other->position),
+					buffer, *length);
+
+				fModificationTime = time(NULL);
+				notify_stat_changed(SuperVolume()->id, fInodeNumber,
+					B_STAT_MODIFICATION_TIME);
+				return B_OK;
 			}
+
+			newLength += newPosition - other->position;
+			newPosition = other->position;
 		}
 
-		memcpy(element->buffer + (position - newPosition), buffer, *length);
+		if (otherEnd > newEnd)
+			newLength += otherEnd - newEnd;
 
-		fModificationTime = time(NULL);
-		notify_stat_changed(SuperVolume()->id, fInodeNumber,
-			B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
-
-		return B_OK;
+		other = other->next;
 	}
 
-	return fSuperVnode.ops->write(SuperVolume(), &fSuperVnode, _cookie,
-		position, buffer, length);
-}
-
-
-//	#pragma mark AttributeFile
-
-
-AttributeFile::AttributeFile(fs_volume *overlay, fs_volume *volume,
-	fs_vnode *vnode)
-	:	fStatus(B_NO_INIT),
-		fVolumeID(volume->id),
-		fFileInode(0),
-		fDirectoryInode(0),
-		fAttributeDirInode(0),
-		fAttributeFileInode(0),
-		fFile(NULL),
-		fAttributeDirIndex(0),
-		fEntries(NULL)
-{
-	if (vnode->ops->get_vnode_name == NULL) {
-		TRACE_ALWAYS("cannot get vnode name, hook missing\n");
-		fStatus = B_UNSUPPORTED;
-		return;
-	}
-
-	char nameBuffer[B_FILE_NAME_LENGTH];
-	nameBuffer[sizeof(nameBuffer) - 1] = 0;
-	fStatus = vnode->ops->get_vnode_name(volume, vnode, nameBuffer,
-		sizeof(nameBuffer) - 1);
-	if (fStatus != B_OK) {
-		TRACE_ALWAYS("failed to get vnode name: %s\n", strerror(fStatus));
-		return;
-	}
-
-	if (strcmp(nameBuffer, ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME) == 0) {
-		// we don't want attribute overlays on the attribute dir itself
-		fStatus = B_UNSUPPORTED;
-		return;
-	}
-
-	struct stat stat;
-	if (vnode->ops->read_stat != NULL
-		&& vnode->ops->read_stat(volume, vnode, &stat) == B_OK) {
-		fFileInode = stat.st_ino;
-	}
-
-	// TODO: the ".." lookup is not actually valid for non-directory vnodes.
-	// we make use of the fact that a filesystem probably still provides the
-	// lookup hook and has hardcoded ".." to resolve to the parent entry. if we
-	// wanted to do this correctly we need some other way to relate this vnode
-	// to its parent directory vnode.
-	const char *lookup[]
-		= { "..", ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME, nameBuffer };
-	int32 lookupCount = sizeof(lookup) / sizeof(lookup[0]);
-	fs_vnode currentVnode = *vnode;
-	ino_t lastInodeNumber = 0;
-
-	for (int32 i = 0; i < lookupCount; i++) {
-		if (currentVnode.ops->lookup == NULL) {
-			TRACE_ALWAYS("lookup not possible, lookup hook missing\n");
-			fStatus = B_UNSUPPORTED;
-			if (i > 0)
-				put_vnode(volume, lastInodeNumber);
-			return;
-		}
-
-		ino_t inodeNumber;
-		fStatus = currentVnode.ops->lookup(volume, &currentVnode, lookup[i],
-			&inodeNumber);
-
-		if (i > 0)
-			put_vnode(volume, lastInodeNumber);
-
-		if (fStatus != B_OK) {
-			if (fStatus != B_ENTRY_NOT_FOUND) {
-				TRACE_ALWAYS("lookup of \"%s\" failed: %s\n", lookup[i],
-					strerror(fStatus));
-			}
-			return;
-		}
-
-		if (i == 0)
-			fDirectoryInode = inodeNumber;
-		else if (i == 1)
-			fAttributeDirInode = inodeNumber;
-		else if (i == 2)
-			fAttributeFileInode = inodeNumber;
-
-		OverlayInode *overlayInode = NULL;
-		fStatus = get_vnode(overlay, inodeNumber, (void **)&overlayInode);
-		if (fStatus != B_OK) {
-			TRACE_ALWAYS("getting vnode failed: %s\n", strerror(fStatus));
-			return;
-		}
-
-		currentVnode = *overlayInode->SuperVnode();
-		lastInodeNumber = inodeNumber;
-	}
-
-	if (currentVnode.ops->read_stat == NULL || currentVnode.ops->open == NULL
-		|| currentVnode.ops->read == NULL) {
-		TRACE_ALWAYS("can't use attribute file, hooks missing\n");
-		put_vnode(volume, lastInodeNumber);
-		fStatus = B_UNSUPPORTED;
-		return;
-	}
-
-	fStatus = currentVnode.ops->read_stat(volume, &currentVnode, &stat);
-	if (fStatus != B_OK) {
-		TRACE_ALWAYS("failed to stat attribute file: %s\n", strerror(fStatus));
-		put_vnode(volume, lastInodeNumber);
-		return;
-	}
-
-	void *attrFileCookie = NULL;
-	fStatus = currentVnode.ops->open(volume, &currentVnode, O_RDONLY,
-		&attrFileCookie);
-	if (fStatus != B_OK) {
-		TRACE_ALWAYS("failed to open attribute file: %s\n", strerror(fStatus));
-		put_vnode(volume, lastInodeNumber);
-		return;
-	}
-
-	size_t readLength = stat.st_size;
-	uint8 *buffer = (uint8 *)malloc(readLength);
-	if (buffer == NULL) {
-		TRACE_ALWAYS("cannot allocate memory for read buffer\n");
-		put_vnode(volume, lastInodeNumber);
-		fStatus = B_NO_MEMORY;
-		return;
-	}
-
-	fStatus = currentVnode.ops->read(volume, &currentVnode, attrFileCookie, 0,
-		buffer, &readLength);
-	if (fStatus != B_OK) {
-		TRACE_ALWAYS("failed to read from file: %s\n", strerror(fStatus));
-		put_vnode(volume, lastInodeNumber);
-		return;
-	}
-
-	if (currentVnode.ops->close != NULL)
-		currentVnode.ops->close(volume, &currentVnode, attrFileCookie);
-	if (currentVnode.ops->free_cookie != NULL)
-		currentVnode.ops->free_cookie(volume, &currentVnode, attrFileCookie);
-
-	put_vnode(volume, lastInodeNumber);
-
-	fFile = (attribute_file *)buffer;
-	if (fFile->magic != ATTRIBUTE_OVERLAY_FILE_MAGIC) {
-		TRACE_ALWAYS("attribute file has bad magic\n");
-		fStatus = B_BAD_VALUE;
-		return;
-	}
-
-	fEntries = (AttributeEntry **)malloc(fFile->entry_count
-		* sizeof(AttributeEntry *));
-	if (fEntries == NULL) {
-		TRACE_ALWAYS("no memory to allocate entry pointers\n");
-		fStatus = B_NO_MEMORY;
-		return;
-	}
-
-	for (uint32 i = 0; i < fFile->entry_count; i++)
-		fEntries[i] = NULL;
-
-	size_t totalSize = 0;
-	readLength -= sizeof(attribute_file) - 1;
-	for (uint32 i = 0; i < fFile->entry_count; i++) {
-		fEntries[i] = new(std::nothrow) AttributeEntry(this,
-			fFile->entries + totalSize);
-		if (fEntries[i] == NULL) {
-			TRACE_ALWAYS("no memory to allocate attribute entry\n");
-			fStatus = B_NO_MEMORY;
-			return;
-		}
-
-		totalSize += fEntries[i]->EntrySize() + fEntries[i]->DataSize();
-		if (totalSize > readLength) {
-			TRACE_ALWAYS("attribute entries are too large for buffer\n");
-			fStatus = B_BAD_VALUE;
-			return;
-		}
-	}
-}
-
-
-AttributeFile::~AttributeFile()
-{
-	if (fFile == NULL)
-		return;
-
-	if (fEntries != NULL) {
-		for (uint32 i = 0; i < fFile->entry_count; i++)
-			delete fEntries[i];
-
-		free(fEntries);
-	}
-
-	free(fFile);
-}
-
-
-status_t
-AttributeFile::CreateEmpty()
-{
-	if (fFile == NULL) {
-		fFile = (attribute_file *)malloc(sizeof(attribute_file) - 1);
-		if (fFile == NULL) {
-			TRACE_ALWAYS("failed to allocate file buffer\n");
-			fStatus = B_NO_MEMORY;
-			return fStatus;
-		}
-
-		fFile->entry_count = 0;
-		fFile->magic = ATTRIBUTE_OVERLAY_FILE_MAGIC;
-	}
-
-	fStatus = B_OK;
-	return B_OK;
-}
-
-
-status_t
-AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
-	fs_vnode *vnode)
-{
-	if (fFile == NULL)
-		return B_NO_INIT;
-
-	if (fDirectoryInode == 0) {
-		TRACE_ALWAYS("directory inode not known\n");
-		return B_NO_INIT;
-	}
-
-	char nameBuffer[B_FILE_NAME_LENGTH];
-	nameBuffer[sizeof(nameBuffer) - 1] = 0;
-	status_t result = vnode->ops->get_vnode_name(volume, vnode, nameBuffer,
-		sizeof(nameBuffer) - 1);
-	if (result != B_OK) {
-		TRACE_ALWAYS("failed to get vnode name: %s\n", strerror(result));
-		return result;
-	}
-
-	fs_vnode currentVnode;
-	OverlayInode *overlayInode = NULL;
-	if (fAttributeDirInode == 0) {
-		result = get_vnode(overlay, fDirectoryInode, (void **)&overlayInode);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to get directory vnode: %s\n",
-				strerror(result));
-			return result;
-		}
-
-		currentVnode = *overlayInode->SuperVnode();
-
-		// create the attribute directory
-		result = currentVnode.ops->create_dir(volume, &currentVnode,
-			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME, S_IRWXU | S_IRWXG | S_IRWXO,
-			&fAttributeDirInode);
-
-		put_vnode(volume, fDirectoryInode);
-
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to create attribute directory: %s\n",
-				strerror(result));
-			fAttributeDirInode = 0;
-			return result;
-		}
-	}
-
-	void *attrFileCookie = NULL;
-	if (fAttributeFileInode == 0) {
-		result = get_vnode(overlay, fAttributeDirInode, (void **)&overlayInode);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to get attribute directory vnode: %s\n",
-				strerror(result));
-			return result;
-		}
-
-		currentVnode = *overlayInode->SuperVnode();
-
-		// create the attribute file
-		result = currentVnode.ops->create(volume, &currentVnode,
-			nameBuffer, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP
-			| S_IWGRP | S_IROTH | S_IWOTH, &attrFileCookie,
-			&fAttributeFileInode);
-
-		put_vnode(volume, fAttributeDirInode);
-
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to create attribute file: %s\n",
-				strerror(result));
-			return result;
-		}
-
-		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
-		if (result != B_OK) {
-			TRACE_ALWAYS("getting attribute file vnode after create failed: %s\n",
-				strerror(result));
-			return result;
-		}
-
-		currentVnode = *overlayInode->SuperVnode();
-	} else {
-		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
-		if (result != B_OK) {
-			TRACE_ALWAYS("getting attribute file vnode failed: %s\n",
-				strerror(result));
-			return result;
-		}
-
-		currentVnode = *overlayInode->SuperVnode();
-
-		// open the attribute file
-		result = currentVnode.ops->open(volume, &currentVnode, O_RDWR | O_TRUNC,
-			&attrFileCookie);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to open attribute file for writing: %s\n",
-				strerror(result));
-			put_vnode(volume, fAttributeFileInode);
-			return result;
-		}
-	}
-
-	off_t position = 0;
-	size_t writeLength = sizeof(attribute_file) - 1;
-	result = currentVnode.ops->write(volume, &currentVnode, attrFileCookie,
-		position, fFile, &writeLength);
-	if (result != B_OK) {
-		TRACE_ALWAYS("failed to write to attribute file: %s\n",
-			strerror(result));
-		goto close_and_put;
-	}
-
-	for (uint32 i = 0; i < fFile->entry_count; i++) {
-		writeLength = fEntries[i]->EntrySize();
-		result = currentVnode.ops->write(volume, &currentVnode, attrFileCookie,
-			position, fEntries[i]->Entry(), &writeLength);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to write to attribute file: %s\n",
-				strerror(result));
-			goto close_and_put;
-		}
-
-		writeLength = fEntries[i]->DataSize();
-		result = currentVnode.ops->write(volume, &currentVnode, attrFileCookie,
-			position, fEntries[i]->Data(), &writeLength);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to write to attribute file: %s\n",
-				strerror(result));
-			goto close_and_put;
-		}
-	}
-
-close_and_put:
-	if (currentVnode.ops->close != NULL)
-		currentVnode.ops->close(volume, &currentVnode, attrFileCookie);
-	if (currentVnode.ops->free_cookie != NULL)
-		currentVnode.ops->free_cookie(volume, &currentVnode, attrFileCookie);
-
-	put_vnode(volume, fAttributeFileInode);
-	return B_OK;
-}
-
-
-uint32
-AttributeFile::CountAttributes()
-{
-	if (fFile == NULL)
-		return 0;
-
-	return fFile->entry_count;
-}
-
-
-AttributeEntry *
-AttributeFile::FindAttribute(const char *name, uint32 *index)
-{
-	for (uint32 i = 0; i < fFile->entry_count; i++) {
-		if (strncmp(fEntries[i]->Name(), name, fEntries[i]->NameLength()) == 0) {
-			if (index)
-				*index = i;
-
-			return fEntries[i];
-		}
-	}
-
-	return NULL;
-}
-
-
-status_t
-AttributeFile::CreateAttribute(const char *name, type_code type, int openMode,
-	AttributeEntry **_entry)
-{
-	AttributeEntry *existing = FindAttribute(name);
-	if (existing != NULL) {
-		if (openMode & O_TRUNC)
-			existing->SetSize(0);
-
-		// attribute already exists, only allow if the attribute type is
-		// compatible or the attribute size is 0
-		if (existing->Type() != type) {
-			if (existing->Size() != 0)
-				return B_FILE_EXISTS;
-			existing->SetType(type);
-		}
-
-		if (existing->InitCheck() == B_OK) {
-			*_entry = existing;
-			return B_OK;
-		}
-
-		// we tried to change the existing item but failed, try to just
-		// remove it instead and creating a new one
-		RemoveAttribute(name, NULL);
-	}
-
-	AttributeEntry *entry = new(std::nothrow) AttributeEntry(this, name, type);
-	if (entry == NULL)
+	write_buffer *element = (write_buffer *)malloc(sizeof(write_buffer) - 1
+		+ newLength);
+	if (element == NULL)
 		return B_NO_MEMORY;
 
-	status_t result = AddAttribute(entry);
-	if (result != B_OK) {
-		delete entry;
-		return result;
+	element->next = *link;
+	element->position = newPosition;
+	element->length = newLength;
+	*link = element;
+
+	bool sizeChanged = false;
+	off_t newEnd = newPosition + newLength;
+	if (newEnd > fCurrentNodeLength) {
+		fCurrentNodeLength = newEnd;
+		sizeChanged = true;
 	}
 
-	*_entry = entry;
-	return B_OK;
-}
+	// populate the buffer with the existing chunks
+	if (swallowCount > 0) {
+		while (swallowCount-- > 0) {
+			memcpy(element->buffer + (swallow->position - newPosition),
+				swallow->buffer, swallow->length);
 
-
-status_t
-AttributeFile::OpenAttribute(const char *name, int openMode,
-	AttributeEntry **_entry)
-{
-	AttributeEntry *entry = FindAttribute(name);
-	if (entry == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	if (openMode & O_TRUNC)
-		entry->SetSize(0);
-
-	*_entry = entry;
-	return B_OK;
-}
-
-
-status_t
-AttributeFile::RemoveAttribute(const char *name, AttributeEntry **_entry)
-{
-	uint32 index = 0;
-	AttributeEntry *entry = FindAttribute(name, &index);
-	if (entry == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	for (uint32 i = index + 1; i < fFile->entry_count; i++)
-		fEntries[i - 1] = fEntries[i];
-	fFile->entry_count--;
-
-	if (_entry)
-		*_entry = entry;
-	else
-		delete entry;
-
-	notify_attribute_changed(fVolumeID, fFileInode, name, B_ATTR_REMOVED);
-	return B_OK;
-}
-
-
-status_t
-AttributeFile::AddAttribute(AttributeEntry *entry)
-{
-	status_t result = entry->InitCheck();
-	if (result != B_OK)
-		return result;
-
-	if (FindAttribute(entry->Name()) != NULL)
-		return B_FILE_EXISTS;
-
-	AttributeEntry **newEntries = (AttributeEntry **)realloc(fEntries,
-		(fFile->entry_count + 1) * sizeof(AttributeEntry *));
-	if (newEntries == NULL)
-		return B_NO_MEMORY;
-
-	fEntries = newEntries;
-	fEntries[fFile->entry_count++] = entry;
-
-	notify_attribute_changed(fVolumeID, fFileInode, entry->Name(),
-		B_ATTR_CREATED);
-
-	return B_OK;
-}
-
-
-status_t
-AttributeFile::ReadAttributeDir(struct dirent *dirent, size_t bufferSize,
-	uint32 *numEntries, uint32 *index)
-{
-	if (fFile == NULL || *index >= fFile->entry_count) {
-		*numEntries = 0;
-		return B_OK;
-	}
-
-	return fEntries[(*index)++]->FillDirent(dirent, bufferSize, numEntries);
-}
-
-
-//	#pragma mark AttributeEntry
-
-
-AttributeEntry::AttributeEntry(AttributeFile *parent, uint8 *buffer)
-	:	fParent(parent),
-		fEntry(NULL),
-		fData(NULL),
-		fStatus(B_NO_INIT),
-		fAllocatedEntry(false),
-		fAllocatedData(false)
-{
-	if (buffer == NULL)
-		return;
-
-	fEntry = (attribute_entry *)buffer;
-	fData = (uint8 *)fEntry->name + fEntry->name_length;
-	fStatus = B_OK;
-}
-
-
-AttributeEntry::AttributeEntry(AttributeFile *parent, const char *name,
-	type_code type)
-	:	fParent(parent),
-		fEntry(NULL),
-		fData(NULL),
-		fStatus(B_NO_INIT),
-		fAllocatedEntry(false),
-		fAllocatedData(false)
-{
-	fStatus = SetName(name);
-	if (fStatus != B_OK)
-		return;
-
-	fEntry->type = type;
-	fEntry->size = 0;
-}
-
-
-AttributeEntry::~AttributeEntry()
-{
-	if (fAllocatedEntry)
-		free(fEntry);
-	if (fAllocatedData)
-		free(fData);
-}
-
-
-size_t
-AttributeEntry::EntrySize()
-{
-	return sizeof(attribute_entry) - 1 + fEntry->name_length;
-}
-
-
-status_t
-AttributeEntry::SetType(type_code type)
-{
-	fEntry->type = type;
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::SetSize(size_t size)
-{
-	if (size <= fEntry->size) {
-		fEntry->size = size;
-		return B_OK;
-	}
-
-	if (fAllocatedData) {
-		uint8 *newData = (uint8 *)realloc(fData, size);
-		if (newData == NULL) {
-			fStatus = B_NO_MEMORY;
-			return fStatus;
-		}
-
-		fData = newData;
-		fEntry->size = size;
-		return B_OK;
-	}
-
-	uint8 *newData = (uint8 *)malloc(size);
-	if (newData == NULL) {
-		fStatus = B_NO_MEMORY;
-		return fStatus;
-	}
-
-	memcpy(newData, fData, min_c(fEntry->size, size));
-	fEntry->size = size;
-	fAllocatedData = true;
-	fData = newData;
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::SetName(const char *name)
-{
-	size_t nameLength = strlen(name) + 1;
-	if (nameLength > 255) {
-		fStatus = B_NAME_TOO_LONG;
-		return fStatus;
-	}
-
-	if (!fAllocatedEntry || fEntry->name_length < nameLength) {
-		attribute_entry *newEntry = (attribute_entry *)malloc(
-			sizeof(attribute_entry) - 1 + nameLength);
-		if (newEntry == NULL) {
-			fStatus = B_NO_MEMORY;
-			return fStatus;
-		}
-
-		if (fEntry != NULL)
-			memcpy(newEntry, fEntry, sizeof(attribute_entry) - 1);
-		if (fAllocatedEntry)
-			free(fEntry);
-
-		fAllocatedEntry = true;
-		fEntry = newEntry;
-	}
-
-	fEntry->name_length = nameLength;
-	strlcpy(fEntry->name, name, nameLength);
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::FillDirent(struct dirent *dirent, size_t bufferSize,
-	uint32 *numEntries)
-{
-	dirent->d_dev = dirent->d_pdev = fParent->VolumeID();
-	dirent->d_ino = (ino_t)this;
-	dirent->d_pino = fParent->FileInode();
-	dirent->d_reclen = sizeof(struct dirent) + fEntry->name_length;
-	if (bufferSize < dirent->d_reclen) {
-		*numEntries = 0;
-		return B_BAD_VALUE;
-	}
-
-	strncpy(dirent->d_name, fEntry->name, fEntry->name_length);
-	dirent->d_name[fEntry->name_length - 1] = 0;
-	*numEntries = 1;
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::Read(off_t position, void *buffer, size_t *length)
-{
-	*length = min_c(*length, fEntry->size - position);
-	memcpy(buffer, fData + position, *length);
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::Write(off_t position, const void *buffer, size_t *length)
-{
-	size_t neededSize = position + *length;
-	if (neededSize > fEntry->size) {
-		status_t result = SetSize(neededSize);
-		if (result != B_OK) {
-			*length = 0;
-			return result;
+			element->next = swallow->next;
+			free(swallow);
+			swallow = element->next;
 		}
 	}
 
-	memcpy(fData + position, buffer, *length);
-	notify_attribute_changed(fParent->VolumeID(), fParent->FileInode(),
-		fEntry->name, B_ATTR_CHANGED);
+	memcpy(element->buffer + (position - newPosition), buffer, *length);
+
+	fModificationTime = time(NULL);
+	notify_stat_changed(SuperVolume()->id, fInodeNumber,
+		B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
+
 	return B_OK;
-}
-
-
-status_t
-AttributeEntry::ReadStat(struct stat *stat)
-{
-	stat->st_dev = fParent->VolumeID();
-	stat->st_ino = (ino_t)this;
-	stat->st_nlink = 1;
-	stat->st_blksize = 512;
-	stat->st_uid = 1;
-	stat->st_gid = 1;
-	stat->st_size = fEntry->size;
-	stat->st_mode = S_ATTR | 0x0777;
-	stat->st_type = fEntry->type;
-	stat->st_atime = stat->st_mtime = stat->st_crtime = time(NULL);
-	stat->st_blocks = (fEntry->size + stat->st_blksize - 1) / stat->st_blksize;
-	return B_OK;
-}
-
-
-status_t
-AttributeEntry::WriteStat(const struct stat *stat, uint32 statMask)
-{
-	return B_UNSUPPORTED;
 }
 
 
@@ -1616,24 +711,7 @@ static status_t
 overlay_read_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
-	TRACE("relaying op: read_dir\n");
-	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	fs_vnode *superVnode = node->SuperVnode();
-	if (superVnode->ops->read_dir != NULL) {
-		status_t result = superVnode->ops->read_dir(volume->super_volume,
-			superVnode, cookie, buffer, bufferSize, num);
-
-		// TODO: handle multiple records
-		if (result == B_OK && *num == 1 && strcmp(buffer->d_name,
-			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME) == 0) {
-			// skip over the attribute directory
-			return superVnode->ops->read_dir(volume->super_volume, superVnode,
-				cookie, buffer, bufferSize, num);
-		}
-
-		return result;
-	}
-
+	OVERLAY_CALL(read_dir, cookie, buffer, bufferSize, num)
 	return B_UNSUPPORTED;
 }
 
@@ -1650,21 +728,7 @@ static status_t
 overlay_open_attr_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
 	OVERLAY_CALL(open_attr_dir, cookie)
-
-	AttributeFile *attributeFile = NULL;
-	status_t result = node->GetAttributeFile(&attributeFile);
-	if (result != B_OK)
-		return result;
-
-	attribute_dir_cookie *dirCookie = (attribute_dir_cookie *)malloc(
-		sizeof(attribute_dir_cookie));
-	if (dirCookie == NULL)
-		return B_NO_MEMORY;
-
-	dirCookie->file = attributeFile;
-	dirCookie->index = 0;
-	*cookie = dirCookie;
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1672,7 +736,7 @@ static status_t
 overlay_close_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(close_attr_dir, cookie)
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1680,8 +744,7 @@ static status_t
 overlay_free_attr_dir_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(free_attr_dir_cookie, cookie)
-	free(cookie);
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1690,9 +753,7 @@ overlay_read_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
 	OVERLAY_CALL(read_attr_dir, cookie, buffer, bufferSize, num)
-	attribute_dir_cookie *dirCookie = (attribute_dir_cookie *)cookie;
-	return dirCookie->file->ReadAttributeDir(buffer, bufferSize, num,
-		&dirCookie->index);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1700,9 +761,7 @@ static status_t
 overlay_rewind_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(rewind_attr_dir, cookie)
-	attribute_dir_cookie *dirCookie = (attribute_dir_cookie *)cookie;
-	dirCookie->index = 0;
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1711,14 +770,7 @@ overlay_create_attr(fs_volume *volume, fs_vnode *vnode, const char *name,
 	uint32 type, int openMode, void **cookie)
 {
 	OVERLAY_CALL(create_attr, name, type, openMode, cookie)
-
-	AttributeFile *attributeFile = NULL;
-	status_t result = node->GetAttributeFile(&attributeFile);
-	if (result != B_OK)
-		return result;
-
-	return attributeFile->CreateAttribute(name, type, openMode,
-		(AttributeEntry **)cookie);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1727,14 +779,7 @@ overlay_open_attr(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int openMode, void **cookie)
 {
 	OVERLAY_CALL(open_attr, name, openMode, cookie)
-
-	AttributeFile *attributeFile = NULL;
-	status_t result = node->GetAttributeFile(&attributeFile);
-	if (result != B_OK)
-		return result;
-
-	return attributeFile->OpenAttribute(name, openMode,
-		(AttributeEntry **)cookie);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1742,7 +787,7 @@ static status_t
 overlay_close_attr(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(close_attr, cookie)
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1750,7 +795,7 @@ static status_t
 overlay_free_attr_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(free_attr_cookie, cookie)
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1759,8 +804,7 @@ overlay_read_attr(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
 	OVERLAY_CALL(read_attr, cookie, pos, buffer, length)
-	AttributeEntry *entry = (AttributeEntry *)cookie;
-	return entry->Read(pos, buffer, length);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1769,8 +813,7 @@ overlay_write_attr(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const void *buffer, size_t *length)
 {
 	OVERLAY_CALL(write_attr, cookie, pos, buffer, length)
-	AttributeEntry *entry = (AttributeEntry *)cookie;
-	return entry->Write(pos, buffer, length);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1779,8 +822,7 @@ overlay_read_attr_stat(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct stat *stat)
 {
 	OVERLAY_CALL(read_attr_stat, cookie, stat)
-	AttributeEntry *entry = (AttributeEntry *)cookie;
-	return entry->ReadStat(stat);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1789,8 +831,7 @@ overlay_write_attr_stat(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	const struct stat *stat, int statMask)
 {
 	OVERLAY_CALL(write_attr_stat, cookie, stat, statMask)
-	AttributeEntry *entry = (AttributeEntry *)cookie;
-	return entry->WriteStat(stat, statMask);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1799,41 +840,7 @@ overlay_rename_attr(fs_volume *volume, fs_vnode *vnode,
 	const char *fromName, fs_vnode *toVnode, const char *toName)
 {
 	OVERLAY_CALL(rename_attr, fromName, toVnode, toName)
-
-	AttributeFile *attributeFile = NULL;
-	status_t result = node->GetAttributeFile(&attributeFile);
-	if (result != B_OK)
-		return B_OK;
-
-	AttributeFile *toAttributeFile = attributeFile;
-	if (vnode->private_node != toVnode->private_node) {
-		OverlayInode *toNode = (OverlayInode *)toVnode->private_node;
-		result = toNode->GetAttributeFile(&toAttributeFile);
-		if (result != B_OK)
-			return result;
-	}
-
-	AttributeEntry *entry = NULL;
-	result = attributeFile->RemoveAttribute(fromName, &entry);
-	if (result != B_OK)
-		return result;
-
-	result = entry->SetName(toName);
-	if (result != B_OK) {
-		if (attributeFile->AddAttribute(entry) != B_OK)
-			delete entry;
-		return result;
-	}
-
-	result = toAttributeFile->AddAttribute(entry);
-	if (result != B_OK) {
-		if (entry->SetName(fromName) != B_OK
-			|| attributeFile->AddAttribute(entry) != B_OK)
-			delete entry;
-		return result;
-	}
-
-	return B_OK;
+	return B_UNSUPPORTED;
 }
 
 
@@ -1841,13 +848,7 @@ static status_t
 overlay_remove_attr(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
 	OVERLAY_CALL(remove_attr, name)
-
-	AttributeFile *attributeFile = NULL;
-	status_t result = node->GetAttributeFile(&attributeFile);
-	if (result != B_OK)
-		return result;
-
-	return attributeFile->RemoveAttribute(name, NULL);
+	return B_UNSUPPORTED;
 }
 
 
@@ -1973,10 +974,7 @@ overlay_read_fs_info(fs_volume *volume, struct fs_info *info)
 		if (result != B_OK)
 			return result;
 
-		OverlayVolume *overlayVolume = (OverlayVolume *)volume->private_volume;
-		if (overlayVolume->WriteSupport())
-			info->flags &= ~B_FS_IS_READONLY;
-		info->flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR /*| B_FS_HAS_QUERY*/;
+		info->flags &= ~(B_FS_IS_READONLY | B_FS_IS_PERSISTENT);
 		return B_OK;
 	}
 
@@ -2147,7 +1145,7 @@ overlay_rewind_query(fs_volume *volume, void *cookie)
 static status_t
 overlay_all_layers_mounted(fs_volume *volume)
 {
-	return ((OverlayVolume *)volume->private_volume)->AllLayersMounted();
+	return B_OK;
 }
 
 
@@ -2216,7 +1214,7 @@ static status_t
 overlay_mount(fs_volume *volume, const char *device, uint32 flags,
 	const char *args, ino_t *rootID)
 {
-	TRACE_VOLUME("mounting overlay\n");
+	TRACE_VOLUME("mounting write overlay\n");
 	volume->private_volume = new(std::nothrow) OverlayVolume(volume);
 	if (volume->private_volume == NULL)
 		return B_NO_MEMORY;
@@ -2241,14 +1239,14 @@ overlay_std_ops(int32 op, ...)
 
 static file_system_module_info sOverlayFileSystem = {
 	{
-		"file_systems/overlay"B_CURRENT_FS_API_VERSION,
+		"file_systems/write_overlay"B_CURRENT_FS_API_VERSION,
 		0,
 		overlay_std_ops,
 	},
 
-	"overlay",					// short_name
-	"Overlay File System",		// pretty_name
-	0,							// DDM flags
+	"write_overlay",				// short_name
+	"Write Overlay File System",	// pretty_name
+	0,								// DDM flags
 
 	// scanning
 	NULL, // identify_partition
@@ -2281,9 +1279,9 @@ static file_system_module_info sOverlayFileSystem = {
 	NULL // initialize
 };
 
-}	// namespace _overlay
+}	// namespace write_overlay
 
-using namespace overlay;
+using namespace write_overlay;
 
 module_info *modules[] = {
 	(module_info *)&sOverlayFileSystem,
