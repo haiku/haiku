@@ -40,31 +40,75 @@ class AttributeFile;
 class AttributeEntry;
 
 
+struct open_cookie {
+	int				open_mode;
+	void *			super_cookie;
+};
+
+struct write_buffer {
+	write_buffer *	next;
+	off_t			position;
+	size_t			length;
+	uint8			buffer[1];
+};
+
 struct attribute_dir_cookie {
 	AttributeFile *	file;
 	uint32			index;
 };
 
 
+class OverlayVolume {
+public:
+							OverlayVolume(fs_volume *volume);
+							~OverlayVolume();
+
+		status_t			AllLayersMounted();
+
+		fs_volume *			SuperVolume() { return fVolume->super_volume; }
+
+		bool				WriteSupport() { return fWriteSupport; }
+
+private:
+		fs_volume *			fVolume;
+		bool				fWriteSupport;
+};
+
+
 class OverlayInode {
 public:
-							OverlayInode(fs_volume *superVolume,
-								fs_vnode *superVnode);
+							OverlayInode(OverlayVolume *volume,
+								fs_vnode *superVnode, ino_t inodeNumber);
 							~OverlayInode();
 
 		status_t			InitCheck();
 
-		fs_volume *			SuperVolume() { return fSuperVolume; }
+		fs_volume *			SuperVolume() { return fVolume->SuperVolume(); }
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
+		ino_t				InodeNumber() { return fInodeNumber; }
 
 		status_t			GetAttributeFile(AttributeFile **attributeFile);
 		status_t			WriteAttributeFile();
 
+		status_t			ReadStat(struct stat *stat);
+
+		status_t			Open(int openMode, void **cookie);
+		status_t			Close(void *cookie);
+		status_t			FreeCookie(void *cookie);
+		status_t			Read(void *cookie, off_t position, void *buffer,
+								size_t *length);
+		status_t			Write(void *cookie, off_t position,
+								const void *buffer, size_t *length);
+
 private:
-		fs_volume *			fSuperVolume;
+		OverlayVolume *		fVolume;
 		fs_vnode			fSuperVnode;
+		ino_t				fInodeNumber;
 		AttributeFile *		fAttributeFile;
-		bool				fAttributeFileMissing;
+		write_buffer *		fWriteBuffers;
+		off_t				fOriginalNodeLength;
+		off_t				fCurrentNodeLength;
+		time_t				fModificationTime;
 };
 
 
@@ -172,14 +216,46 @@ private:
 };
 
 
+//	#pragma mark OverlayVolume
+
+
+OverlayVolume::OverlayVolume(fs_volume *volume)
+	:	fVolume(volume),
+		fWriteSupport(false)
+{
+}
+
+
+OverlayVolume::~OverlayVolume()
+{
+}
+
+
+status_t
+OverlayVolume::AllLayersMounted()
+{
+	fs_info info;
+	fs_volume *superVolume = fVolume->super_volume;
+	if (superVolume->ops->read_fs_info != NULL
+		&& superVolume->ops->read_fs_info(superVolume, &info) == B_OK)
+		fWriteSupport = (info.flags & B_FS_IS_READONLY) != 0;
+
+	return B_OK;
+}
+
+
 //	#pragma mark OverlayInode
 
 
-OverlayInode::OverlayInode(fs_volume *superVolume, fs_vnode *superVnode)
-	:	fSuperVolume(superVolume),
+OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
+	ino_t inodeNumber)
+	:	fVolume(volume),
 		fSuperVnode(*superVnode),
+		fInodeNumber(inodeNumber),
 		fAttributeFile(NULL),
-		fAttributeFileMissing(false)
+		fWriteBuffers(NULL),
+		fOriginalNodeLength(-1),
+		fCurrentNodeLength(-1)
 {
 	TRACE("inode created\n");
 }
@@ -189,6 +265,13 @@ OverlayInode::~OverlayInode()
 {
 	TRACE("inode destroyed\n");
 	delete fAttributeFile;
+
+	write_buffer *element = fWriteBuffers;
+	while (element) {
+		write_buffer *next = element->next;
+		free(element);
+		element = next;
+	}
 }
 
 
@@ -203,7 +286,7 @@ status_t
 OverlayInode::GetAttributeFile(AttributeFile **attributeFile)
 {
 	if (fAttributeFile == NULL) {
-		fAttributeFile = new(std::nothrow) AttributeFile(fSuperVolume,
+		fAttributeFile = new(std::nothrow) AttributeFile(SuperVolume(),
 			&fSuperVnode);
 		if (fAttributeFile == NULL) {
 			TRACE_ALWAYS("no memory to allocate attribute file\n");
@@ -238,7 +321,232 @@ OverlayInode::WriteAttributeFile()
 	if (result != B_OK)
 		return result;
 
-	return fAttributeFile->WriteAttributeFile(fSuperVolume, &fSuperVnode);
+	return fAttributeFile->WriteAttributeFile(SuperVolume(), &fSuperVnode);
+}
+
+
+status_t
+OverlayInode::ReadStat(struct stat *stat)
+{
+	if (fSuperVnode.ops->read_stat == NULL)
+		return B_UNSUPPORTED;
+
+	status_t result = fSuperVnode.ops->read_stat(SuperVolume(), &fSuperVnode,
+		stat);
+	if (result != B_OK)
+		return result;
+
+	if (fVolume->WriteSupport() && fCurrentNodeLength >= 0) {
+		stat->st_size = fCurrentNodeLength;
+		stat->st_blocks = (stat->st_size + stat->st_blksize - 1)
+			/ stat->st_blksize;
+		stat->st_mtime = fModificationTime;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::Open(int openMode, void **_cookie)
+{
+	if (fSuperVnode.ops->open == NULL)
+		return B_UNSUPPORTED;
+
+	if (fVolume->WriteSupport()) {
+		open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
+		if (cookie == NULL)
+			return B_NO_MEMORY;
+
+		if (fOriginalNodeLength < 0) {
+			struct stat stat;
+			status_t result = fSuperVnode.ops->read_stat(SuperVolume(),
+				&fSuperVnode, &stat);
+			if (result != B_OK)
+				return result;
+
+			fOriginalNodeLength = stat.st_size;
+			fCurrentNodeLength = stat.st_size;
+			fModificationTime = stat.st_mtime;
+		}
+
+		cookie->open_mode = openMode;
+		*_cookie = cookie;
+
+		if (openMode & O_TRUNC)
+			fCurrentNodeLength = 0;
+
+		openMode &= ~(O_RDWR | O_WRONLY | O_TRUNC | O_CREAT);
+		return fSuperVnode.ops->open(SuperVolume(), &fSuperVnode, openMode,
+			&cookie->super_cookie);
+	}
+
+	return fSuperVnode.ops->open(SuperVolume(), &fSuperVnode, openMode,
+		_cookie);
+}
+
+
+status_t
+OverlayInode::Close(void *_cookie)
+{
+	if (fVolume->WriteSupport()) {
+		open_cookie *cookie = (open_cookie *)_cookie;
+		return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode,
+			cookie->super_cookie);
+	}
+
+	return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode, _cookie);
+}
+
+
+status_t
+OverlayInode::FreeCookie(void *_cookie)
+{
+	if (fVolume->WriteSupport()) {
+		open_cookie *cookie = (open_cookie *)_cookie;
+		status_t result = fSuperVnode.ops->free_cookie(SuperVolume(),
+			&fSuperVnode, cookie->super_cookie);
+		free(cookie);
+		return result;
+	}
+
+	return fSuperVnode.ops->free_cookie(SuperVolume(), &fSuperVnode, _cookie);
+}
+
+
+status_t
+OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
+{
+	if (fVolume->WriteSupport()) {
+		if (position < fOriginalNodeLength) {
+			open_cookie *cookie = (open_cookie *)_cookie;
+			size_t readLength = MIN(fOriginalNodeLength - position, *length);
+			status_t result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
+				cookie->super_cookie, position, buffer, &readLength);
+			if (result != B_OK)
+				return result;
+		}
+
+		// overlay the read with whatever chunks we have written
+		write_buffer *element = fWriteBuffers;
+		*length = MIN(fCurrentNodeLength - position, *length);
+		off_t end = position + *length;
+		while (element) {
+			off_t elementEnd = element->position + element->length;
+			if (elementEnd > position && element->position < end) {
+				off_t copyPosition = MAX(position, element->position);
+				size_t copyLength = MIN(elementEnd - position, *length);
+				memcpy((uint8 *)buffer + (copyPosition - position),
+					element->buffer + (copyPosition - element->position),
+					copyLength);
+			}
+
+			element = element->next;
+		}
+
+		return B_OK;
+	}
+
+	return fSuperVnode.ops->read(SuperVolume(), &fSuperVnode, _cookie,
+		position, buffer, length);
+}
+
+
+status_t
+OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
+	size_t *length)
+{
+	if (fVolume->WriteSupport()) {
+		// find insertion point
+		write_buffer **link = &fWriteBuffers;
+		write_buffer *other = fWriteBuffers;
+		write_buffer *swallow = NULL;
+		off_t newPosition = position;
+		size_t newLength = *length;
+		uint32 swallowCount = 0;
+
+		while (other) {
+			off_t newEnd = newPosition + newLength;
+			off_t otherEnd = other->position + other->length;
+			if (otherEnd < newPosition) {
+				// other completely before us
+				link = &other->next;
+				other = other->next;
+				continue;
+			}
+
+			if (other->position > newEnd) {
+				// other is completely past us
+				break;
+			}
+
+			swallowCount++;
+			if (swallow == NULL)
+				swallow = other;
+
+			if (other->position <= newPosition) {
+				// other chunk overlaps us or is adjacent
+				if (otherEnd < newEnd) {
+					// extend the chunk to completely overlap us
+					newPosition = other->position;
+					newLength = other->length + (newEnd - otherEnd);
+				} else {
+					// other chunk completely overlaps us already
+				}
+
+				other = other->next;
+				continue;
+			}
+
+			// we overlap the other chunk - swallow it
+			if (otherEnd > newEnd)
+				newLength += otherEnd - newEnd;
+
+			other = other->next;
+		}
+
+		write_buffer *element = (write_buffer *)malloc(sizeof(write_buffer) - 1
+			+ newLength);
+		if (element == NULL)
+			return B_NO_MEMORY;
+
+		element->next = *link;
+		element->position = newPosition;
+		element->length = newLength;
+		*link = element;
+
+		bool sizeChanged = false;
+		off_t newEnd = newPosition + newLength;
+		if (newEnd > fCurrentNodeLength) {
+			fCurrentNodeLength = newEnd;
+			sizeChanged = true;
+		}
+
+		// populate the buffer with the existing chunks
+		if (swallowCount > 0) {
+			while (swallowCount-- > 0) {
+				off_t swallowEnd = swallow->position + swallow->length;
+				if (swallow->position < position || swallowEnd > newEnd) {
+					memcpy(element->buffer + (swallow->position - newPosition),
+						swallow->buffer, swallow->length);
+				}
+
+				element->next = swallow->next;
+				free(swallow);
+			}
+		}
+
+		memcpy(element->buffer + (position - newPosition), buffer, *length);
+
+		fModificationTime = time(NULL);
+		notify_stat_changed(SuperVolume()->id, fInodeNumber,
+			B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
+
+		return B_OK;
+	}
+
+	return fSuperVnode.ops->write(SuperVolume(), &fSuperVnode, _cookie,
+		position, buffer, length);
 }
 
 
@@ -696,6 +1004,7 @@ AttributeFile::RemoveAttribute(const char *name, AttributeEntry **_entry)
 	else
 		delete entry;
 
+	notify_attribute_changed(fVolumeID, fFileInode, name, B_ATTR_REMOVED);
 	return B_OK;
 }
 
@@ -717,6 +1026,10 @@ AttributeFile::AddAttribute(AttributeEntry *entry)
 
 	fEntries = newEntries;
 	fEntries[fFile->entry_count++] = entry;
+
+	notify_attribute_changed(fVolumeID, fFileInode, entry->Name(),
+		B_ATTR_CREATED);
+
 	return B_OK;
 }
 
@@ -903,6 +1216,8 @@ AttributeEntry::Write(off_t position, const void *buffer, size_t *length)
 	}
 
 	memcpy(fData + position, buffer, *length);
+	notify_attribute_changed(fParent->VolumeID(), fParent->FileInode(),
+		fEntry->name, B_ATTR_CHANGED);
 	return B_OK;
 }
 
@@ -1170,8 +1485,7 @@ overlay_access(fs_volume *volume, fs_vnode *vnode, int mode)
 static status_t
 overlay_read_stat(fs_volume *volume, fs_vnode *vnode, struct stat *stat)
 {
-	OVERLAY_CALL(read_stat, stat)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->ReadStat(stat);
 }
 
 
@@ -1196,24 +1510,21 @@ overlay_create(fs_volume *volume, fs_vnode *vnode, const char *name,
 static status_t
 overlay_open(fs_volume *volume, fs_vnode *vnode, int openMode, void **cookie)
 {
-	OVERLAY_CALL(open, openMode, cookie)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->Open(openMode, cookie);
 }
 
 
 static status_t
 overlay_close(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(close, cookie)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->Close(cookie);
 }
 
 
 static status_t
 overlay_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(free_cookie, cookie)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->FreeCookie(cookie);
 }
 
 
@@ -1221,8 +1532,8 @@ static status_t
 overlay_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
-	OVERLAY_CALL(read, cookie, pos, buffer, length)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->Read(cookie, pos, buffer,
+		length);
 }
 
 
@@ -1230,8 +1541,8 @@ static status_t
 overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const void *buffer, size_t *length)
 {
-	OVERLAY_CALL(write, cookie, pos, buffer, length)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->Write(cookie, pos, buffer,
+		length);
 }
 
 
@@ -1616,9 +1927,13 @@ static status_t
 overlay_unmount(fs_volume *volume)
 {
 	TRACE_VOLUME("relaying volume op: unmount\n");
-	if (volume->super_volume->ops->unmount != NULL)
-		return volume->super_volume->ops->unmount(volume->super_volume);
-	return B_UNSUPPORTED;
+	if (volume->super_volume != NULL
+		&& volume->super_volume->ops != NULL
+		&& volume->super_volume->ops->unmount != NULL)
+		volume->super_volume->ops->unmount(volume->super_volume);
+
+	delete (OverlayVolume *)volume->private_volume;
+	return B_OK;
 }
 
 
@@ -1633,7 +1948,10 @@ overlay_read_fs_info(fs_volume *volume, struct fs_info *info)
 		if (result != B_OK)
 			return result;
 
-		info->flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR | B_FS_HAS_QUERY;
+		OverlayVolume *overlayVolume = (OverlayVolume *)volume->private_volume;
+		if (overlayVolume->WriteSupport())
+			info->flags &= ~B_FS_IS_READONLY;
+		info->flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR /*| B_FS_HAS_QUERY*/;
 		return B_OK;
 	}
 
@@ -1672,7 +1990,7 @@ overlay_get_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode, int *_type,
 			return status;
 
 		OverlayInode *node = new(std::nothrow) OverlayInode(
-			volume->super_volume, vnode);
+			(OverlayVolume *)volume->private_volume, vnode, id);
 		if (node == NULL) {
 			vnode->ops->put_vnode(volume->super_volume, vnode, reenter);
 			return B_NO_MEMORY;
@@ -1802,10 +2120,17 @@ overlay_rewind_query(fs_volume *volume, void *cookie)
 
 
 static status_t
+overlay_all_layers_mounted(fs_volume *volume)
+{
+	return ((OverlayVolume *)volume->private_volume)->AllLayersMounted();
+}
+
+
+static status_t
 overlay_create_sub_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode)
 {
-	OverlayInode *node = new(std::nothrow) OverlayInode(volume->super_volume,
-		vnode);
+	OverlayInode *node = new(std::nothrow) OverlayInode(
+		(OverlayVolume *)volume->private_volume, vnode, id);
 	if (node == NULL)
 		return B_NO_MEMORY;
 
@@ -1853,6 +2178,7 @@ static fs_volume_ops sOverlayVolumeOps = {
 	&overlay_read_query,
 	&overlay_rewind_query,
 
+	&overlay_all_layers_mounted,
 	&overlay_create_sub_vnode,
 	&overlay_delete_sub_vnode
 };
@@ -1866,6 +2192,10 @@ overlay_mount(fs_volume *volume, const char *device, uint32 flags,
 	const char *args, ino_t *rootID)
 {
 	TRACE_VOLUME("mounting overlay\n");
+	volume->private_volume = new(std::nothrow) OverlayVolume(volume);
+	if (volume->private_volume == NULL)
+		return B_NO_MEMORY;
+
 	volume->ops = &sOverlayVolumeOps;
 	return B_OK;
 }
