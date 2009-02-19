@@ -24,13 +24,13 @@
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-#define TRACE(x...)			dprintf("overlay: " x)
-#define TRACE_VOLUME(x...)	dprintf("overlay: " x)
-#define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
+#define TRACE(x...)			dprintf("attribute_overlay: " x)
+#define TRACE_VOLUME(x...)	dprintf("attribute_overlay: " x)
+#define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
 #else
 #define TRACE(x...)			/* nothing */
 #define TRACE_VOLUME(x...)	/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
+#define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
 #endif
 
 
@@ -1926,7 +1926,7 @@ static status_t
 overlay_mount(fs_volume *volume, const char *device, uint32 flags,
 	const char *args, ino_t *rootID)
 {
-	TRACE_VOLUME("mounting overlay\n");
+	TRACE_VOLUME("mounting attribute overlay\n");
 	volume->private_volume = new(std::nothrow) OverlayVolume(volume);
 	if (volume->private_volume == NULL)
 		return B_NO_MEMORY;

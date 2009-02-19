@@ -24,13 +24,13 @@
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-#define TRACE(x...)			dprintf("overlay: " x)
-#define TRACE_VOLUME(x...)	dprintf("overlay: " x)
-#define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
+#define TRACE(x...)			dprintf("write_overlay: " x)
+#define TRACE_VOLUME(x...)	dprintf("write_overlay: " x)
+#define TRACE_ALWAYS(x...)	dprintf("write_overlay: " x)
 #else
 #define TRACE(x...)			/* nothing */
 #define TRACE_VOLUME(x...)	/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf("overlay: " x)
+#define TRACE_ALWAYS(x...)	dprintf("write_overlay: " x)
 #endif
 
 
