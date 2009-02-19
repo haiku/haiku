@@ -8146,7 +8146,7 @@ dev_t
 _user_mount(const char *userPath, const char *userDevice, const char *userFileSystem,
 	uint32 flags, const char *userArgs, size_t argsLength)
 {
-	char fileSystem[B_OS_NAME_LENGTH];
+	char fileSystem[B_FILE_NAME_LENGTH];
 	KPath path, device;
 	char *args = NULL;
 	status_t status;
