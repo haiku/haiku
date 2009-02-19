@@ -7023,6 +7023,13 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 			volume = volume->super_volume;
 		}
+
+		volume = mount->volume;
+		while (volume) {
+			if (volume->ops->all_layers_mounted != NULL)
+				volume->ops->all_layers_mounted(volume);
+			volume = volume->super_volume;
+		}
 	}
 
 	// the root node is supposed to be owned by the file system - it must

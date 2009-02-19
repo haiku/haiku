@@ -107,6 +107,7 @@ struct fs_volume_ops {
 	status_t (*rewind_query)(fs_volume *volume, void *cookie);
 
 	/* support for FS layers */
+	status_t (*all_layers_mounted)(fs_volume *volume);
 	status_t (*create_sub_vnode)(fs_volume *volume, ino_t id, fs_vnode *vnode);
 	status_t (*delete_sub_vnode)(fs_volume *volume, fs_vnode *vnode);
 };
