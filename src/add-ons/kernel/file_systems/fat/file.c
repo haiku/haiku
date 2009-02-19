@@ -890,7 +890,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		*vnid = dummy.vnid;
 		dummy.magic = ~VNODE_MAGIC;
 
-		result = get_vnode(_vol, *vnid, (void **)&file, NULL);
+		result = get_vnode(_vol, *vnid, (void **)&file);
 		if (result < B_OK) {
 			if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 				_dosfs_sync(vol);
@@ -1155,7 +1155,7 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 			if (vnid == vol->root_vnode.vnid)
 				break;
 
-			result = get_vnode(_vol, vnid, (void **)&dir, NULL);
+			result = get_vnode(_vol, vnid, (void **)&dir);
 			if (result < B_OK)
 				goto bi1;
 			parent = dir->dir_vnid;

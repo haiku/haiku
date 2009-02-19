@@ -433,7 +433,7 @@ findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 		if (vnid)
 			*vnid = found_vnid;
 		if (node)
-			result = get_vnode(vol->volume, found_vnid, (void **)node, NULL);
+			result = get_vnode(vol->volume, found_vnid, (void **)node);
 		result = B_OK;
 	} else {
 		result = ENOENT;

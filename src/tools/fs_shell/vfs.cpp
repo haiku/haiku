@@ -1986,7 +1986,7 @@ fssh_publish_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
 
 extern "C" fssh_status_t
 fssh_get_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
-	void **privateNode, fssh_fs_vnode_ops **vnodeOps)
+	void **privateNode)
 {
 	struct vnode *vnode;
 
@@ -2012,14 +2012,8 @@ fssh_get_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
 
 		if (privateNode != NULL)
 			*privateNode = resolvedNode.private_node;
-		if (vnodeOps != NULL)
-			*vnodeOps = resolvedNode.ops;
-	} else {
-		if (privateNode != NULL)
-			*privateNode = vnode->private_node;
-		if (vnodeOps != NULL)
-			*vnodeOps = vnode->ops;
-	}
+	} else if (privateNode != NULL)
+		*privateNode = vnode->private_node;
 
 	return FSSH_B_OK;
 }
@@ -2451,7 +2445,7 @@ vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path, bool kernel,
 	}
 
 	// Use get_vnode() to resolve the cookie for the right layer.
-	status = ::fssh_get_vnode(volume, vnode->id, _node, NULL);
+	status = ::fssh_get_vnode(volume, vnode->id, _node);
 	put_vnode(vnode);
 
 	return FSSH_B_OK;

@@ -225,12 +225,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 		// base directory
 		TRACE(("fs_walk - found \".\" file.\n"));
 		*_vnodeID = baseNode->id;
-		return get_vnode(_vol, *_vnodeID, NULL, NULL);
+		return get_vnode(_vol, *_vnodeID, NULL);
 	} else if (strcmp(file, "..") == 0) {
 		// parent directory
 		TRACE(("fs_walk - found \"..\" file.\n"));
 		*_vnodeID = baseNode->parID;
-		return get_vnode(_vol, *_vnodeID, NULL, NULL);
+		return get_vnode(_vol, *_vnodeID, NULL);
 	}
 
 	// look up file in the directory
@@ -273,7 +273,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 						TRACE(("fs_walk - New vnode id is %Ld\n", *_vnodeID));
 
 						result = get_vnode(_vol, *_vnodeID,
-							(void **)&newNode, NULL);
+							(void **)&newNode);
 						if (result == B_OK) {
 							newNode->parID = baseNode->id;
 							done = true;

@@ -556,7 +556,7 @@ bfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* file,
 	locker.Unlock();
 
 	Inode* inode;
-	status = get_vnode(volume->FSVolume(), *_vnodeID, (void**)&inode, NULL);
+	status = get_vnode(volume->FSVolume(), *_vnodeID, (void**)&inode);
 	if (status != B_OK) {
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;

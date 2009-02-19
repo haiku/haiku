@@ -898,7 +898,7 @@ fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 		isLink=S_ISLNK(st.st_mode);
 	}
 
-	if ((result=get_vnode (_volume,*vnid,(void **)&dummy,NULL))<B_OK)
+	if ((result=get_vnode (_volume,*vnid,(void **)&dummy))<B_OK)
 		return result;
 
 	return B_OK;
@@ -1755,7 +1755,7 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 
 		*vnid=st.st_ino;
 
-		if ((result=get_vnode(_volume,*vnid,&dummy,NULL))<B_OK)
+		if ((result=get_vnode(_volume,*vnid,&dummy))<B_OK)
 			return result;
 
 		if (S_ISDIR(st.st_mode))
@@ -1901,7 +1901,7 @@ fs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 
 	insert_node (ns,newNode);
 
-	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy,NULL))<B_OK)
+	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
 	{
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
@@ -2195,7 +2195,7 @@ fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 
 	insert_node (ns,newNode);
 
-	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy,NULL))<B_OK)
+	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
 	{
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
@@ -2341,7 +2341,7 @@ fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name, const char *pat
 	if (result==B_OK)
 	{
 		void *dummy;
-		if ((result=get_vnode(_volume,st.st_ino,&dummy,NULL))<B_OK)
+		if ((result=get_vnode(_volume,st.st_ino,&dummy))<B_OK)
 			return result;
 
 		XDRInPacketDestroy (&reply);

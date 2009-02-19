@@ -65,6 +65,7 @@ public:
 
 		status_t			AllLayersMounted();
 
+		fs_volume *			Volume() { return fVolume; }
 		fs_volume *			SuperVolume() { return fVolume->super_volume; }
 
 		bool				WriteSupport() { return fWriteSupport; }
@@ -83,6 +84,7 @@ public:
 
 		status_t			InitCheck();
 
+		fs_volume *			Volume() { return fVolume->Volume(); }
 		fs_volume *			SuperVolume() { return fVolume->SuperVolume(); }
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 		ino_t				InodeNumber() { return fInodeNumber; }
@@ -114,7 +116,8 @@ private:
 
 class AttributeFile {
 public:
-							AttributeFile(fs_volume *volume, fs_vnode *vnode);
+							AttributeFile(fs_volume *overlay, fs_volume *volume,
+								fs_vnode *vnode);
 							~AttributeFile();
 
 		status_t			InitCheck() { return fStatus; }
@@ -123,8 +126,8 @@ public:
 		ino_t				FileInode() { return fFileInode; }
 
 		status_t			CreateEmpty();
-		status_t			WriteAttributeFile(fs_volume *volume,
-								fs_vnode *vnode);
+		status_t			WriteAttributeFile(fs_volume *overlay,
+								fs_volume *volume, fs_vnode *vnode);
 
 		status_t			ReadAttributeDir(struct dirent *dirent,
 								size_t bufferSize, uint32 *numEntries,
@@ -286,8 +289,8 @@ status_t
 OverlayInode::GetAttributeFile(AttributeFile **attributeFile)
 {
 	if (fAttributeFile == NULL) {
-		fAttributeFile = new(std::nothrow) AttributeFile(SuperVolume(),
-			&fSuperVnode);
+		fAttributeFile = new(std::nothrow) AttributeFile(Volume(),
+			SuperVolume(), &fSuperVnode);
 		if (fAttributeFile == NULL) {
 			TRACE_ALWAYS("no memory to allocate attribute file\n");
 			return B_NO_MEMORY;
@@ -321,7 +324,8 @@ OverlayInode::WriteAttributeFile()
 	if (result != B_OK)
 		return result;
 
-	return fAttributeFile->WriteAttributeFile(SuperVolume(), &fSuperVnode);
+	return fAttributeFile->WriteAttributeFile(Volume(), SuperVolume(),
+		&fSuperVnode);
 }
 
 
@@ -553,7 +557,8 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 //	#pragma mark AttributeFile
 
 
-AttributeFile::AttributeFile(fs_volume *volume, fs_vnode *vnode)
+AttributeFile::AttributeFile(fs_volume *overlay, fs_volume *volume,
+	fs_vnode *vnode)
 	:	fStatus(B_NO_INIT),
 		fVolumeID(volume->id),
 		fFileInode(0),
@@ -633,13 +638,14 @@ AttributeFile::AttributeFile(fs_volume *volume, fs_vnode *vnode)
 		else if (i == 2)
 			fAttributeFileInode = inodeNumber;
 
-		fStatus = get_vnode(volume, inodeNumber, &currentVnode.private_node,
-			&currentVnode.ops);
+		OverlayInode *overlayInode = NULL;
+		fStatus = get_vnode(overlay, inodeNumber, (void **)&overlayInode);
 		if (fStatus != B_OK) {
 			TRACE_ALWAYS("getting vnode failed: %s\n", strerror(fStatus));
 			return;
 		}
 
+		currentVnode = *overlayInode->SuperVnode();
 		lastInodeNumber = inodeNumber;
 	}
 
@@ -767,7 +773,8 @@ AttributeFile::CreateEmpty()
 
 
 status_t
-AttributeFile::WriteAttributeFile(fs_volume *volume, fs_vnode *vnode)
+AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
+	fs_vnode *vnode)
 {
 	if (fFile == NULL)
 		return B_NO_INIT;
@@ -787,14 +794,16 @@ AttributeFile::WriteAttributeFile(fs_volume *volume, fs_vnode *vnode)
 	}
 
 	fs_vnode currentVnode;
+	OverlayInode *overlayInode = NULL;
 	if (fAttributeDirInode == 0) {
-		result = get_vnode(volume, fDirectoryInode,
-			&currentVnode.private_node, &currentVnode.ops);
+		result = get_vnode(overlay, fDirectoryInode, (void **)&overlayInode);
 		if (result != B_OK) {
 			TRACE_ALWAYS("failed to get directory vnode: %s\n",
 				strerror(result));
 			return result;
 		}
+
+		currentVnode = *overlayInode->SuperVnode();
 
 		// create the attribute directory
 		result = currentVnode.ops->create_dir(volume, &currentVnode,
@@ -813,13 +822,14 @@ AttributeFile::WriteAttributeFile(fs_volume *volume, fs_vnode *vnode)
 
 	void *attrFileCookie = NULL;
 	if (fAttributeFileInode == 0) {
-		result = get_vnode(volume, fAttributeDirInode,
-			&currentVnode.private_node, &currentVnode.ops);
+		result = get_vnode(overlay, fAttributeDirInode, (void **)&overlayInode);
 		if (result != B_OK) {
 			TRACE_ALWAYS("failed to get attribute directory vnode: %s\n",
 				strerror(result));
 			return result;
 		}
+
+		currentVnode = *overlayInode->SuperVnode();
 
 		// create the attribute file
 		result = currentVnode.ops->create(volume, &currentVnode,
@@ -835,21 +845,23 @@ AttributeFile::WriteAttributeFile(fs_volume *volume, fs_vnode *vnode)
 			return result;
 		}
 
-		result = get_vnode(volume, fAttributeFileInode,
-			&currentVnode.private_node, &currentVnode.ops);
+		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
 		if (result != B_OK) {
 			TRACE_ALWAYS("getting attribute file vnode after create failed: %s\n",
 				strerror(result));
 			return result;
 		}
+
+		currentVnode = *overlayInode->SuperVnode();
 	} else {
-		result = get_vnode(volume, fAttributeFileInode,
-			&currentVnode.private_node, &currentVnode.ops);
+		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
 		if (result != B_OK) {
 			TRACE_ALWAYS("getting attribute file vnode failed: %s\n",
 				strerror(result));
 			return result;
 		}
+
+		currentVnode = *overlayInode->SuperVnode();
 
 		// open the attribute file
 		result = currentVnode.ops->open(volume, &currentVnode, O_RDWR | O_TRUNC,
@@ -1296,6 +1308,11 @@ static status_t
 overlay_get_super_vnode(fs_volume *volume, fs_vnode *vnode,
 	fs_volume *superVolume, fs_vnode *_superVnode)
 {
+	if (volume == superVolume) {
+		*_superVnode = *vnode;
+		return B_OK;
+	}
+
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	fs_vnode *superVnode = node->SuperVnode();
 

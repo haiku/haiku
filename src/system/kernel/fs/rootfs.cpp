@@ -284,7 +284,7 @@ remove_node(struct rootfs *fs, struct rootfs_vnode *directory,
 {
 	// schedule this vnode to be removed when it's ref goes to zero
 
-	bool gotNode = (get_vnode(fs->volume, vnode->id, NULL, NULL) == B_OK);
+	bool gotNode = (get_vnode(fs->volume, vnode->id, NULL) == B_OK);
 
 	status_t status = B_OK;
 	if (gotNode)
@@ -447,7 +447,7 @@ rootfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 		goto err;
 	}
 
-	status = get_vnode(fs->volume, vnode->id, NULL, NULL);
+	status = get_vnode(fs->volume, vnode->id, NULL);
 	if (status < B_OK)
 		goto err;
 

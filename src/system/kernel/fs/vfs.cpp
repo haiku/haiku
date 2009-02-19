@@ -3626,8 +3626,7 @@ publish_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 
 
 extern "C" status_t
-get_vnode(fs_volume *volume, ino_t vnodeID, void **_privateNode,
-	fs_vnode_ops **_vnodeOps)
+get_vnode(fs_volume *volume, ino_t vnodeID, void **_privateNode)
 {
 	struct vnode *vnode;
 
@@ -3653,14 +3652,8 @@ get_vnode(fs_volume *volume, ino_t vnodeID, void **_privateNode,
 
 		if (_privateNode != NULL)
 			*_privateNode = resolvedNode.private_node;
-		if (_vnodeOps != NULL)
-			*_vnodeOps = resolvedNode.ops;
-	} else {
-		if (_privateNode != NULL)
-			*_privateNode = vnode->private_node;
-		if (_vnodeOps != NULL)
-			*_vnodeOps = vnode->ops;
-	}
+	} else if (_privateNode != NULL)
+		*_privateNode = vnode->private_node;
 
 	return B_OK;
 }
@@ -4054,7 +4047,7 @@ vfs_get_fs_node_from_path(fs_volume *volume, const char *path, bool kernel,
 	}
 
 	// Use get_vnode() to resolve the cookie for the right layer.
-	status = get_vnode(volume, vnode->id, _node, NULL);
+	status = get_vnode(volume, vnode->id, _node);
 	put_vnode(vnode);
 
 	return status;

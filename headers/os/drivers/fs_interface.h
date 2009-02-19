@@ -310,7 +310,7 @@ extern status_t publish_vnode(fs_volume *volume, ino_t vnodeID,
 					void *privateNode, fs_vnode_ops *ops, int type,
 					uint32 flags);
 extern status_t get_vnode(fs_volume *volume, ino_t vnodeID,
-					void **_privateNode, fs_vnode_ops **_vnodeOps);
+					void **_privateNode);
 extern status_t put_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t acquire_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t remove_vnode(fs_volume *volume, ino_t vnodeID);

@@ -407,8 +407,7 @@ add_partition(struct devfs* fs, struct devfs_vnode* device, const char* name,
 
 	// increase reference count of raw device -
 	// the partition device really needs it
-	status = get_vnode(fs->volume, device->id, (void**)&partition->raw_device,
-		NULL);
+	status = get_vnode(fs->volume, device->id, (void**)&partition->raw_device);
 	if (status < B_OK)
 		goto err1;
 
@@ -959,7 +958,7 @@ devfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	status = get_vnode(fs->volume, vnode->id, NULL, NULL);
+	status = get_vnode(fs->volume, vnode->id, NULL);
 	if (status < B_OK)
 		return status;
 
@@ -1063,7 +1062,7 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 	if (openMode & O_EXCL)
 		return B_FILE_EXISTS;
 
-	status = get_vnode(fs->volume, vnode->id, NULL, NULL);
+	status = get_vnode(fs->volume, vnode->id, NULL);
 	if (status < B_OK)
 		return status;
 
@@ -2092,7 +2091,7 @@ devfs_unpublish_device(BaseDevice* device, bool disconnect)
 {
 	devfs_vnode* node;
 	status_t status = get_vnode(sDeviceFileSystem->volume, device->ID(),
-		(void**)&node, NULL);
+		(void**)&node);
 	if (status != B_OK)
 		return status;
 
