@@ -76,6 +76,7 @@ public:
 		ino_t				InodeNumber() { return fInodeNumber; }
 
 		status_t			ReadStat(struct stat *stat);
+		status_t			WriteStat(const struct stat *stat, uint32 statMask);
 
 		status_t			Open(int openMode, void **cookie);
 		status_t			Close(void *cookie);
@@ -91,8 +92,8 @@ private:
 		ino_t				fInodeNumber;
 		write_buffer *		fWriteBuffers;
 		off_t				fOriginalNodeLength;
-		off_t				fCurrentNodeLength;
-		time_t				fModificationTime;
+		struct stat			fStat;
+		bool				fHasStat;
 };
 
 
@@ -120,7 +121,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 		fInodeNumber(inodeNumber),
 		fWriteBuffers(NULL),
 		fOriginalNodeLength(-1),
-		fCurrentNodeLength(-1)
+		fHasStat(false)
 {
 	TRACE("inode created\n");
 }
@@ -148,21 +149,55 @@ OverlayInode::InitCheck()
 status_t
 OverlayInode::ReadStat(struct stat *stat)
 {
-	if (fSuperVnode.ops->read_stat == NULL)
-		return B_UNSUPPORTED;
+	if (!fHasStat) {
+		if (fSuperVnode.ops->read_stat == NULL)
+			return B_UNSUPPORTED;
 
-	status_t result = fSuperVnode.ops->read_stat(SuperVolume(), &fSuperVnode,
-		stat);
-	if (result != B_OK)
-		return result;
+		status_t result = fSuperVnode.ops->read_stat(SuperVolume(),
+			&fSuperVnode, &fStat);
+		if (result != B_OK)
+			return result;
 
-	if (fCurrentNodeLength >= 0) {
-		stat->st_size = fCurrentNodeLength;
-		stat->st_blocks = (stat->st_size + stat->st_blksize - 1)
-			/ stat->st_blksize;
-		stat->st_mtime = fModificationTime;
+		fHasStat = true;
 	}
 
+	if (stat == NULL)
+		return B_OK;
+
+	memcpy(stat, &fStat, sizeof(struct stat));
+	stat->st_blocks = (stat->st_size + stat->st_blksize - 1) / stat->st_blksize;
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
+{
+	if (!fHasStat)
+		ReadStat(NULL);
+
+	if (statMask & B_STAT_SIZE)
+		fStat.st_size = stat->st_size;
+
+	if (statMask & B_STAT_MODE)
+		fStat.st_mode = stat->st_mode;
+	if (statMask & B_STAT_UID)
+		fStat.st_uid = stat->st_uid;
+	if (statMask & B_STAT_GID)
+		fStat.st_gid = stat->st_gid;
+
+	if (statMask & B_STAT_MODIFICATION_TIME)
+		fStat.st_mtime = stat->st_mtime;
+	if (statMask & B_STAT_CREATION_TIME)
+		fStat.st_crtime = stat->st_crtime;
+
+	if ((statMask & (B_STAT_MODE | B_STAT_UID | B_STAT_GID)) != 0
+		&& (statMask & B_STAT_MODIFICATION_TIME) == 0) {
+		fStat.st_mtime = time(NULL);
+		statMask |= B_STAT_MODIFICATION_TIME;
+	}
+
+	notify_stat_changed(SuperVolume()->id, fInodeNumber, statMask);
 	return B_OK;
 }
 
@@ -181,21 +216,17 @@ OverlayInode::Open(int openMode, void **_cookie)
 		struct stat stat;
 		status_t result = fSuperVnode.ops->read_stat(SuperVolume(),
 			&fSuperVnode, &stat);
-		if (result != B_OK) {
-			free(cookie);
+		if (result != B_OK)
 			return result;
-		}
 
 		fOriginalNodeLength = stat.st_size;
-		fCurrentNodeLength = stat.st_size;
-		fModificationTime = stat.st_mtime;
 	}
 
 	cookie->open_mode = openMode;
 	*_cookie = cookie;
 
 	if (openMode & O_TRUNC)
-		fCurrentNodeLength = 0;
+		fStat.st_size = 0;
 
 	openMode &= ~(O_RDWR | O_WRONLY | O_TRUNC | O_CREAT);
 	status_t result = fSuperVnode.ops->open(SuperVolume(), &fSuperVnode,
@@ -232,7 +263,7 @@ OverlayInode::FreeCookie(void *_cookie)
 status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 {
-	if (position >= fCurrentNodeLength) {
+	if (position >= fStat.st_size) {
 		*length = 0;
 		return B_OK;
 	}
@@ -244,11 +275,15 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 			cookie->super_cookie, position, buffer, &readLength);
 		if (result != B_OK)
 			return result;
-	}
+
+		if (readLength < *length)
+			memset((uint8 *)buffer + readLength, 0, *length - readLength);
+	} else
+		memset(buffer, 0, *length);
 
 	// overlay the read with whatever chunks we have written
 	write_buffer *element = fWriteBuffers;
-	*length = MIN(fCurrentNodeLength - position, *length);
+	*length = MIN(fStat.st_size - position, *length);
 	off_t end = position + *length;
 	while (element) {
 		if (element->position > end)
@@ -307,7 +342,7 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 				memcpy(other->buffer + (newPosition - other->position),
 					buffer, *length);
 
-				fModificationTime = time(NULL);
+				fStat.st_mtime = time(NULL);
 				notify_stat_changed(SuperVolume()->id, fInodeNumber,
 					B_STAT_MODIFICATION_TIME);
 				return B_OK;
@@ -335,8 +370,8 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 
 	bool sizeChanged = false;
 	off_t newEnd = newPosition + newLength;
-	if (newEnd > fCurrentNodeLength) {
-		fCurrentNodeLength = newEnd;
+	if (newEnd > fStat.st_size) {
+		fStat.st_size = newEnd;
 		sizeChanged = true;
 	}
 
@@ -354,10 +389,9 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 
 	memcpy(element->buffer + (position - newPosition), buffer, *length);
 
-	fModificationTime = time(NULL);
+	fStat.st_mtime = time(NULL);
 	notify_stat_changed(SuperVolume()->id, fInodeNumber,
 		B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
-
 	return B_OK;
 }
 
@@ -613,8 +647,7 @@ static status_t
 overlay_write_stat(fs_volume *volume, fs_vnode *vnode, const struct stat *stat,
 	uint32 statMask)
 {
-	OVERLAY_CALL(write_stat, stat, statMask)
-	return B_UNSUPPORTED;
+	return ((OverlayInode *)vnode->private_node)->WriteStat(stat, statMask);
 }
 
 
@@ -974,7 +1007,7 @@ overlay_read_fs_info(fs_volume *volume, struct fs_info *info)
 		if (result != B_OK)
 			return result;
 
-		info->flags &= ~(B_FS_IS_READONLY | B_FS_IS_PERSISTENT);
+		info->flags &= ~B_FS_IS_READONLY;
 		return B_OK;
 	}
 
