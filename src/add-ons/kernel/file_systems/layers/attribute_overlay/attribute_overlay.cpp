@@ -1366,8 +1366,7 @@ overlay_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 static status_t
 overlay_open_attr_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
-	OVERLAY_CALL(open_attr_dir, cookie)
-
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	AttributeFile *attributeFile = NULL;
 	status_t result = node->GetAttributeFile(&attributeFile);
 	if (result != B_OK)
@@ -1388,7 +1387,6 @@ overlay_open_attr_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 static status_t
 overlay_close_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(close_attr_dir, cookie)
 	return B_OK;
 }
 
@@ -1396,7 +1394,6 @@ overlay_close_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 static status_t
 overlay_free_attr_dir_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(free_attr_dir_cookie, cookie)
 	free(cookie);
 	return B_OK;
 }
@@ -1406,7 +1403,6 @@ static status_t
 overlay_read_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
-	OVERLAY_CALL(read_attr_dir, cookie, buffer, bufferSize, num)
 	attribute_dir_cookie *dirCookie = (attribute_dir_cookie *)cookie;
 	return dirCookie->file->ReadAttributeDir(buffer, bufferSize, num,
 		&dirCookie->index);
@@ -1416,7 +1412,6 @@ overlay_read_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 static status_t
 overlay_rewind_attr_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(rewind_attr_dir, cookie)
 	attribute_dir_cookie *dirCookie = (attribute_dir_cookie *)cookie;
 	dirCookie->index = 0;
 	return B_OK;
@@ -1427,8 +1422,7 @@ static status_t
 overlay_create_attr(fs_volume *volume, fs_vnode *vnode, const char *name,
 	uint32 type, int openMode, void **cookie)
 {
-	OVERLAY_CALL(create_attr, name, type, openMode, cookie)
-
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	AttributeFile *attributeFile = NULL;
 	status_t result = node->GetAttributeFile(&attributeFile);
 	if (result != B_OK)
@@ -1443,8 +1437,7 @@ static status_t
 overlay_open_attr(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int openMode, void **cookie)
 {
-	OVERLAY_CALL(open_attr, name, openMode, cookie)
-
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	AttributeFile *attributeFile = NULL;
 	status_t result = node->GetAttributeFile(&attributeFile);
 	if (result != B_OK)
@@ -1458,7 +1451,6 @@ overlay_open_attr(fs_volume *volume, fs_vnode *vnode, const char *name,
 static status_t
 overlay_close_attr(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(close_attr, cookie)
 	return B_OK;
 }
 
@@ -1466,7 +1458,6 @@ overlay_close_attr(fs_volume *volume, fs_vnode *vnode, void *cookie)
 static status_t
 overlay_free_attr_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(free_attr_cookie, cookie)
 	return B_OK;
 }
 
@@ -1475,7 +1466,6 @@ static status_t
 overlay_read_attr(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
-	OVERLAY_CALL(read_attr, cookie, pos, buffer, length)
 	return ((AttributeEntry *)cookie)->Read(pos, buffer, length);
 }
 
@@ -1484,7 +1474,6 @@ static status_t
 overlay_write_attr(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const void *buffer, size_t *length)
 {
-	OVERLAY_CALL(write_attr, cookie, pos, buffer, length)
 	return ((AttributeEntry *)cookie)->Write(pos, buffer, length);
 }
 
@@ -1493,7 +1482,6 @@ static status_t
 overlay_read_attr_stat(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct stat *stat)
 {
-	OVERLAY_CALL(read_attr_stat, cookie, stat)
 	return ((AttributeEntry *)cookie)->ReadStat(stat);
 }
 
@@ -1502,7 +1490,6 @@ static status_t
 overlay_write_attr_stat(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	const struct stat *stat, int statMask)
 {
-	OVERLAY_CALL(write_attr_stat, cookie, stat, statMask)
 	return ((AttributeEntry *)cookie)->WriteStat(stat, statMask);
 }
 
@@ -1511,8 +1498,7 @@ static status_t
 overlay_rename_attr(fs_volume *volume, fs_vnode *vnode,
 	const char *fromName, fs_vnode *toVnode, const char *toName)
 {
-	OVERLAY_CALL(rename_attr, fromName, toVnode, toName)
-
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	AttributeFile *attributeFile = NULL;
 	status_t result = node->GetAttributeFile(&attributeFile);
 	if (result != B_OK)
@@ -1553,8 +1539,7 @@ overlay_rename_attr(fs_volume *volume, fs_vnode *vnode,
 static status_t
 overlay_remove_attr(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
-	OVERLAY_CALL(remove_attr, name)
-
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	AttributeFile *attributeFile = NULL;
 	status_t result = node->GetAttributeFile(&attributeFile);
 	if (result != B_OK)
