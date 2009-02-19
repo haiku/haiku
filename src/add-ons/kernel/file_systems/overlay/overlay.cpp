@@ -422,6 +422,11 @@ status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 {
 	if (fVolume->WriteSupport()) {
+		if (position >= fCurrentNodeLength) {
+			*length = 0;
+			return B_OK;
+		}
+
 		if (position < fOriginalNodeLength) {
 			open_cookie *cookie = (open_cookie *)_cookie;
 			size_t readLength = MIN(fOriginalNodeLength - position, *length);
@@ -436,8 +441,11 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 		*length = MIN(fCurrentNodeLength - position, *length);
 		off_t end = position + *length;
 		while (element) {
+			if (element->position > end)
+				break;
+
 			off_t elementEnd = element->position + element->length;
-			if (elementEnd > position && element->position < end) {
+			if (elementEnd > position) {
 				off_t copyPosition = MAX(position, element->position);
 				size_t copyLength = MIN(elementEnd - position, *length);
 				memcpy((uint8 *)buffer + (copyPosition - position),
@@ -473,7 +481,7 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 			off_t newEnd = newPosition + newLength;
 			off_t otherEnd = other->position + other->length;
 			if (otherEnd < newPosition) {
-				// other completely before us
+				// other is completely before us
 				link = &other->next;
 				other = other->next;
 				continue;
@@ -489,20 +497,21 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 				swallow = other;
 
 			if (other->position <= newPosition) {
-				// other chunk overlaps us or is adjacent
-				if (otherEnd < newEnd) {
-					// extend the chunk to completely overlap us
-					newPosition = other->position;
-					newLength = other->length + (newEnd - otherEnd);
-				} else {
-					// other chunk completely overlaps us already
+				if (swallowCount == 1 && otherEnd >= newEnd) {
+					// other chunk completely covers us, just copy
+					memcpy(other->buffer + (newPosition - other->position),
+						buffer, *length);
+
+					fModificationTime = time(NULL);
+					notify_stat_changed(SuperVolume()->id, fInodeNumber,
+						B_STAT_MODIFICATION_TIME);
+					return B_OK;
 				}
 
-				other = other->next;
-				continue;
+				newLength += newPosition - other->position;
+				newPosition = other->position;
 			}
 
-			// we overlap the other chunk - swallow it
 			if (otherEnd > newEnd)
 				newLength += otherEnd - newEnd;
 
@@ -529,14 +538,12 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 		// populate the buffer with the existing chunks
 		if (swallowCount > 0) {
 			while (swallowCount-- > 0) {
-				off_t swallowEnd = swallow->position + swallow->length;
-				if (swallow->position < position || swallowEnd > newEnd) {
-					memcpy(element->buffer + (swallow->position - newPosition),
-						swallow->buffer, swallow->length);
-				}
+				memcpy(element->buffer + (swallow->position - newPosition),
+					swallow->buffer, swallow->length);
 
 				element->next = swallow->next;
 				free(swallow);
+				swallow = element->next;
 			}
 		}
 
@@ -1148,6 +1155,7 @@ AttributeEntry::SetSize(size_t size)
 	}
 
 	memcpy(newData, fData, min_c(fEntry->size, size));
+	fEntry->size = size;
 	fAllocatedData = true;
 	fData = newData;
 	return B_OK;
