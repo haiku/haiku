@@ -33,7 +33,7 @@ BOOT_ADD_ONS_NET =
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs iso9660 overlay ;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 #cdda fat googlefs nfs ;
 
 
