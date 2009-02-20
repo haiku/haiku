@@ -36,7 +36,7 @@ DiscoveryAgent::RetrieveDevices(int option)
 status_t
 DiscoveryAgent::StartInquiry(int accessCode, DiscoveryListener* listener)
 {
-    return StartInquiry(accessCode, listener, BT_DEFAULT_INQUIRY_TIME);
+    return StartInquiry(accessCode, listener, GetInquiryTime());
 }
 
 

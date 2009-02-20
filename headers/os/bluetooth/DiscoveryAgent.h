@@ -7,6 +7,7 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DiscoveryListener.h>
+#include <bluetooth/RemoteDevice.h>
 
 
 #define BT_CACHED 0x00
@@ -17,13 +18,15 @@
 #define BT_LIAC 0x9E8B00
 
 #define BT_MAX_RESPONSES		(32)
+
 #define BT_BASE_INQUIRY_TIME	(1.28)
-#define BT_DEFAULT_INQUIRY_TIME	(0x15*BT_BASE_INQUIRY_TIME)  /* TODO: REVIEW SPECS! */
+#define BT_DEFAULT_INQUIRY_TIME	(0x0A)
+#define BT_MIN_INQUIRY_TIME	(0x01) //  1.18 secs
+#define BT_MAX_INQUIRY_TIME	(0x30) // 61.44 secs
 
 namespace Bluetooth {
 
-class DiscoveryListener;
-class RemoteDevice;
+class LocalDevice;
 
 class DiscoveryAgent {
 

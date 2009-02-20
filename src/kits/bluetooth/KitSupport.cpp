@@ -4,15 +4,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  */
-
-
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/DiscoveryAgent.h>
+
 #include <bluetoothserver_p.h>
 
 #include "KitSupport.h"
-
-
-
 
 BMessenger* _RetrieveBluetoothMessenger(void)
 {
@@ -23,4 +20,17 @@ BMessenger* _RetrieveBluetoothMessenger(void)
     	return NULL;
     else
     	return fMessenger;
+}
+
+
+uint8 GetInquiryTime()
+{
+	return BT_DEFAULT_INQUIRY_TIME;
+}
+
+
+void SetInquiryTime(uint8 time)
+{
+	((void)(time));
+
 }

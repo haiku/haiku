@@ -8,6 +8,7 @@
 #include <Looper.h>
 #include <ObjectList.h>
 
+#include <bluetooth/DeviceClass.h>
 #include <bluetooth/RemoteDevice.h>
 
 
@@ -20,8 +21,6 @@ namespace Bluetooth {
 
 typedef BObjectList<RemoteDevice> RemoteDevicesList;
 
-class RemoteDevice;
-class DeviceClass;
 class LocalDevice;
 
 class DiscoveryListener : public BLooper {

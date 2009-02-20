@@ -5,3 +5,6 @@
 #include <Messenger.h>
 
 BMessenger* _RetrieveBluetoothMessenger(void);
+
+uint8 GetInquiryTime();
+void SetInquiryTime(uint8 time);
