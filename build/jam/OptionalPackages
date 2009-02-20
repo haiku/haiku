@@ -280,12 +280,12 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Firefox available for gcc4" ;
 	} else {
- 		InstallOptionalHaikuImagePackage Firefox-2.0.0.17
-			: http://www.yellowbites.com/downloads/Firefox-2.0.0.17.zip
+		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
+			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
  			: apps
  		;
  		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Firefox/Firefox ;
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	}
 }
 
