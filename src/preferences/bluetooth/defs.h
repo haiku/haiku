@@ -1,14 +1,7 @@
 #ifndef DEFS_H_
 #define DEFS_H_
 
-// If these paths are changed, ensure that they all end in a '/' character
-/*
-#define SETTINGS_DIR "/boot/home/config/settings/app_server/"
-#define COLOR_SET_DIR "/boot/home/config/settings/color_sets/"
-#define CURSOR_SET_DIR "/boot/home/config/settings/cursor_sets/"
-#define DECORATORS_DIR "/boot/home/config/add-ons/decorators/"
-#define COLOR_SETTINGS_NAME "system_colors"
-*/
+#include <bluetooth/LocalDevice.h>
 
 #define BLUETOOTH_APP_SIGNATURE "application/x-vnd.haiku-BluetoothPrefs"
 
@@ -32,5 +25,7 @@
 // user interface
 const uint32 kBorderSpace = 10;
 const uint32 kItemSpace = 7;
+
+extern LocalDevice* ActiveLocalDevice;
 
 #endif

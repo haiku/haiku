@@ -10,6 +10,8 @@
 #include "BluetoothWindow.h"
 #include "defs.h"
 
+
+
 BluetoothApplication::BluetoothApplication(void)
  :	BApplication(BLUETOOTH_APP_SIGNATURE)
 {

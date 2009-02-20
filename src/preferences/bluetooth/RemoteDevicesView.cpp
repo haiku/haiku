@@ -2,7 +2,7 @@
  * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "RemoteDevicesView.h"
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Directory.h>
@@ -13,15 +13,14 @@
 #include <Path.h>
 #include <SpaceLayoutItem.h>
 
-#include <stdio.h>
 
+#include "defs.h"
 #include "InquiryPanel.h"
 #include "BluetoothWindow.h"
-#include "defs.h"
+
+#include "RemoteDevicesView.h"
 
 static const uint32 kMsgAddDevices = 'ddDv';
-
-
 
 
 RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
@@ -75,7 +74,7 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 		.SetInsets(5, 5, 5, 100)
 	);
 
-	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
+	fAttrList->SetSelectionMessage(NULL);
 }
 
 RemoteDevicesView::~RemoteDevicesView(void)
@@ -108,7 +107,7 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 	switch(msg->what) {
 		case kMsgAddDevices:
 		{
-			InquiryPanel* iPanel = new InquiryPanel(BRect(0,0,50,50));
+			InquiryPanel* iPanel = new InquiryPanel(BRect(100,100,400,400), ActiveLocalDevice);
 			iPanel->Show();
 		}
 		break;

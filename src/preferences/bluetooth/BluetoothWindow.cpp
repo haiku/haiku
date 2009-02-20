@@ -11,10 +11,9 @@
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
 
-
+#include <bluetooth/LocalDevice.h>
 #include "RemoteDevicesView.h"
 
-//#include "ConnChanView.h"
 #include "defs.h"
 
 static const uint32 kMsgSetDefaults = 'dflt';
@@ -23,6 +22,8 @@ static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgStartServices = 'SrSR';
 static const uint32 kMsgStopServices = 'StST';
 static const uint32 kMsgShowDebug = 'ShDG';
+
+LocalDevice* ActiveLocalDevice = NULL;
 
 
 BluetoothWindow::BluetoothWindow(BRect frame)

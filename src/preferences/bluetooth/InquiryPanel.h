@@ -14,20 +14,35 @@
 class BStatusBar;
 class BButton;
 class BTextView;
+class BListView;
+class LocalDevice;
+class DiscoveryAgent;
+class DiscoveryListener;
 
 class InquiryPanel : public BWindow 
 {
 public:
-			InquiryPanel(BRect frame); 
+			InquiryPanel(BRect frame, LocalDevice* lDevice = NULL); 
 	bool	QuitRequested(void);
 	void	MessageReceived(BMessage *message);
 	
 private:		
-		BStatusBar*				fScanProgress;
-		BButton*				fAddButton;
-		BButton*				fInquiryButton;
-		BTextView*				fMessage;
+	BStatusBar*				fScanProgress;
+	BButton*				fAddButton;
+	BButton*				fInquiryButton;
+	BTextView*				fMessage;
+	BListView*				fRemoteList;
+	BMessageRunner*			fRunner;
+	
+	bool					fScanning;
+	LocalDevice*			fLocalDevice;
+	DiscoveryAgent*			fDiscoveryAgent;
+	DiscoveryListener*		fDiscoveryListener;
 
+	
+	void UpdateUIStatus(void);
+
+	rgb_color				activeColor;
 };
 
 #endif

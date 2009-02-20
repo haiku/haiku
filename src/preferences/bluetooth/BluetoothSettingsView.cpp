@@ -21,6 +21,7 @@
 #include <bluetooth/LocalDevice.h>
 #include "ExtendedLocalDeviceView.h"
 
+#include "defs.h"
 #include "BluetoothWindow.h"
 	
 static const int32 kMsgSetAntialiasing = 'anti';
@@ -119,35 +120,13 @@ void
 BluetoothSettingsView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case kMsgSetAntialiasing:
-		{
-/*			bool subpixelAntialiasing;
-			if (msg->FindBool("antialiasing", &subpixelAntialiasing) != B_OK 
-				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
-				break;
-			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
-			fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
-
-			Window()->PostMessage(kMsgUpdate);
-*/			break;
-		}
-		case kMsgSetHinting:
-		{
-/*			bool hinting;
-			if (msg->FindBool("hinting", &hinting) != B_OK 
-				|| hinting == fCurrentHinting)
-				break;
-			fCurrentHinting = hinting;
-
-			Window()->PostMessage(kMsgUpdate);
-*/			break;
-		}
 		case kMsgLocalSwitched:
 		{
 			LocalDevice* lDevice;
 			if (msg->FindPointer("LocalDevice", (void**) &lDevice) == B_OK) {
 				// Device integrity should be rechecked
-				fExtDeviceView->SetLocalDevice(lDevice);				
+				fExtDeviceView->SetLocalDevice(lDevice);
+				ActiveLocalDevice = lDevice;			
 			}	
 			break;
 		}
