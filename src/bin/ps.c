@@ -104,13 +104,7 @@ int main(int argc, char **argv)
 
 	// TODO: parse command line
 	// Possible command line options:
-	// 		-h	show help
-	// 			ps			- by default it only shows all team info
-	// 			ps [team]	- shows info about this team with all its threads
 	// 		-t	pstree like output
-	// 		-a	show threads too (by default only teams are displayed)
-	// 		-s	show semaphore info
-	// 		-i	show system info
 	
 	if (argc == 2 && (printSystemInfo||printThreads))
 		string_to_match = NULL;
