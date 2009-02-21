@@ -16,8 +16,8 @@
 #include <SupportDefs.h>
 
 // TODO: Maybe merge TermParse and Shell classes ?
+class TerminalBuffer;
 class TermParse;
-class TermView;
 
 class Shell {
 public:
@@ -40,8 +40,8 @@ public:
 	int			FD() const;
 	pid_t		ProcessID() const	{ return fProcessID; }
 	
-	virtual	void	ViewAttached(TermView *view);
-	virtual void	ViewDetached();
+	virtual	void	AttachBuffer(TerminalBuffer *buffer);
+	virtual void	DetachBuffer();
 	
 private:
 	int		fFd;

@@ -720,7 +720,7 @@ TermView::_AttachShell(Shell *shell)
 		return B_BAD_VALUE;
 
 	fShell = shell;
-	fShell->ViewAttached(this);
+	fShell->AttachBuffer(TextBuffer());
 
 	return B_OK;
 }
@@ -729,7 +729,7 @@ TermView::_AttachShell(Shell *shell)
 void
 TermView::_DetachShell()
 {
-	fShell->ViewDetached();
+	fShell->DetachBuffer();
 	fShell = NULL;
 }
 

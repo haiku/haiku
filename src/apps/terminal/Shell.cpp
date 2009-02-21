@@ -30,9 +30,8 @@
 
 #include "TermConst.h"
 #include "TermParse.h"
-#include "TermView.h"
-	// TODO: Fix dependency!
-
+#include "TerminalBuffer.h"
+	
 
 #ifndef CEOF
 #define CEOF ('D'&037)
@@ -227,17 +226,16 @@ Shell::FD() const
 }
 
 
-// TODO: Fix this dependency!
 void
-Shell::ViewAttached(TermView *view)
+Shell::AttachBuffer(TerminalBuffer *buffer)
 {
 	if (fAttached)
 		return;
 
-	status_t status = fTermParse->StartThreads(view->TextBuffer());
+	status_t status = fTermParse->StartThreads(buffer);
 	if (status < B_OK) {
 		// TODO: What can we do here ?
-		fprintf(stderr, "Shell:ViewAttached():"
+		fprintf(stderr, "Shell:AttachBuffer():"
 				" cannot start parser threads: %s",
 				strerror(status));
 	}
@@ -245,7 +243,7 @@ Shell::ViewAttached(TermView *view)
 
 
 void
-Shell::ViewDetached()
+Shell::DetachBuffer()
 {
 	if (fAttached)
 		fTermParse->StopThreads();
