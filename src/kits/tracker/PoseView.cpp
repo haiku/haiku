@@ -4380,7 +4380,6 @@ CheckDevicesEqual(const entry_ref *srcRef, Model *targetModel)
 	destDir.GetStat(&deststat);
 
 	return srcRef->device == deststat.st_dev;
-
 }
 
 
@@ -8725,7 +8724,10 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 	entry_ref srcRef;
 	if (targetModel->IsDirectory() && dragMessage->HasRef("refs") 
 			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
-		if (!CheckDevicesEqual(&srcRef, targetModel)) {
+		Model srcModel (&srcRef);
+		if (!CheckDevicesEqual(&srcRef, targetModel) 
+			&& !srcModel.IsVolume() 
+			&& !srcModel.IsRoot()) {
 			BCursor copyCursor(kCopyCursor);
 			SetViewCursor(&copyCursor);
 			return true;
