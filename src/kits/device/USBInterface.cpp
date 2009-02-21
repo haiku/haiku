@@ -127,7 +127,7 @@ status_t
 BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 	size_t length) const
 {
-	if (length > 0 && descriptor == NULL)
+	if (length <= 0 && descriptor == NULL)
 		return B_BAD_VALUE;
 
 	usb_raw_command command;
@@ -137,7 +137,7 @@ BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 	command.generic_etc.alternate_index = fAlternate;
 	command.generic_etc.generic_index = index;
 	command.generic_etc.length = length;
-	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR, &command,
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR_ETC, &command,
 		sizeof(command)) || command.generic.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
 
