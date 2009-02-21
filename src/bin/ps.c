@@ -15,22 +15,27 @@
 
 #define SNOOZE_TIME 100000
 
-char *states[] = {"run", "rdy", "msg", "zzz", "sus", "wait" };
+char *sStates[] = {"run", "rdy", "msg", "zzz", "sus", "wait" };
 
-void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo); 
-void printTeamInfo(team_info *teamInfo, bool printHeader);
+static void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo); 
+static void printTeamInfo(team_info *teamInfo, bool printHeader);
 
-void printTeamInfo(team_info *teamInfo, bool printHeader)
+static void
+printTeamInfo(team_info *teamInfo, bool printHeader)
 {
 	// Print team info
 	if (printHeader)
-		printf("%-49s %5s %8s %4s %4s\n", "Team", "Id", "#Threads", "Gid", "Uid");
+		printf("%-50s %5s %8s %4s %4s\n", "Team", "Id", "#Threads", "Gid", \
+			"Uid");
 		
-	printf("%-49s %5ld %8ld %4d %4d\n", teamInfo->args, teamInfo->team,
+	printf("%-50s %5ld %8ld %4d %4d\n", teamInfo->args, teamInfo->team,
 		teamInfo->thread_count, teamInfo->uid, teamInfo->gid);
 }
 
-void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo) {
+
+static void
+printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo)
+{
 	char *threadState;
 	uint32 threadCookie = 0;
 	sem_info semaphoreInfo;
@@ -44,9 +49,9 @@ void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo) {
 			// This should never happen
 			threadState = "???";
 		else
-			threadState = states[threadInfo.state - 1];
+			threadState = sStates[threadInfo.state - 1];
 
-		printf("%-29s %5ld %8s %4ld %8llu %8llu ",
+		printf("%-37s %5ld %8s %4ld %8llu %8llu ",
 			threadInfo.name, threadInfo.thread, threadState,
 			threadInfo.priority, (threadInfo.user_time / 1000),
 			(threadInfo.kernel_time / 1000));
@@ -60,13 +65,13 @@ void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo) {
 					printf("%s(%ld)\n", strerror(status), threadInfo.sem);
 			} else
 				puts("");
-		}
-		else
+		} else
 			puts("");
 	}
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	team_info teamInfo;
 	uint32 teamCookie = 0;
@@ -90,7 +95,8 @@ int main(int argc, char **argv)
 			   			"-h : show help\n"
 			   			"-i : show system info\n"
 			   			"-s : show semaphore info\n"
-			   			"-a : show threads too (by default only teams are displayed)\n");
+			   			"-a : show threads too (by default only teams are " \
+			   				"displayed)\n");
 				return 0;
 				break;
 			case 'a':
@@ -117,14 +123,15 @@ int main(int argc, char **argv)
 			printTeamInfo(&teamInfo,printHeader);
 			printHeader = false;
 			if (printThreads) {
-				printf("\n%-29s %5s %8s %4s %8s %8s\n", "Thread", "Id", "State","Prio", "UTime", "KTime");
+				printf("\n%-37s %5s %8s %4s %8s %8s\n", "Thread", "Id", \
+					"State", "Prio", "UTime", "KTime");
 				printTeamThreads(&teamInfo,printSemaphoreInfo);
-				printf("--------------------------------------------------------------------------\n");
+				printf("----------------------------------------------" \
+					"-----------------------------\n");
 				printHeader = true;
 			}
 		}
-	}
-	else {
+	} else {
 		while (get_next_team_info(&teamCookie, &teamInfo) >= B_OK) {
 			char *p;
 			p = teamInfo.args;
@@ -136,7 +143,8 @@ int main(int argc, char **argv)
 			if (strstr(p, string_to_match) == NULL)
 				continue;
 			printTeamInfo(&teamInfo,true);
-			printf("\n%-29s %5s %8s %4s %8s %8s\n", "Thread", "Id", "State","Prio", "UTime", "KTime");
+			printf("\n%-37s %5s %8s %4s %8s %8s\n", "Thread", "Id", "State", \
+				"Prio", "UTime", "KTime");
 			printTeamThreads(&teamInfo,printSemaphoreInfo);
 		}
 	}
