@@ -50,7 +50,7 @@ Scripts can range from simply executing a few commands in a specific order to so
 If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
 
 <h2><a id="userbootscript" name="userbootscript">The UserBootscript</a></h2>
-<p><tt>/boot/home/config/boot/UserBootscript</tt> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
 <pre># Start LaunchBox
 /boot/beos/apps/LaunchBox &amp;
 
@@ -59,10 +59,10 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 <p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
 
 <h2><a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h2>
-<p><tt>/boot/home/config/boot/UserShutdownScript</tt> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
 
 <h2><a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h2>
-<p><tt>/boot/home/config/boot/UserShutdownFinishScript</tt> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
 
 
 </div>

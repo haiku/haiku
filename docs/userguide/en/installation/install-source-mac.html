@@ -79,10 +79,10 @@ buildtools and source code on it.</p>
 <p>Open a Terminal (in /Application/Utilities), and enter:</p>
 <pre class="terminal">cd /Volumes/Haiku/</pre>
 
-<p><tt>/Volumes/Haiku</tt> refers here (and in
+<p><span class="path">/Volumes/Haiku</span> refers here (and in
 all this tutorial) to the mounted disk image name. I named it "Haiku",
 so if you chose another name, use it instead of "Haiku" after
-<tt>/Volumes/</tt>.</p>
+<span class="path">/Volumes/</span>.</p>
 
 <p>Checkout the buildtools:</p>
 <pre class="terminal">svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools</pre>
@@ -94,7 +94,7 @@ so if you chose another name, use it instead of "Haiku" after
 
 <p>You should now have two folders "haiku" and "buildtools" into the mounted disk image.</p>
 
-<p>To update your code from now on, go to the <tt>haiku/trunk/</tt> folder and type:</p>
+<p>To update your code from now on, go to the <span class="path">haiku/trunk/</span> folder and type:</p>
 <pre class="terminal">svn update</pre>
 
 <h2>Step 3: Install required software</h2>
@@ -106,7 +106,7 @@ so if you chose another name, use it instead of "Haiku" after
 
 <p>You will be prompted for the administrator password of the current account - Do not worry if nothing you type shows after the Password prompt, this is intended.</p>
 
-<p>If you get an error "port: command not found", the MacPorts shell configuration is probably not taken into account. You probably have a <tt>~/.bash_profile</tt> or <tt>~/.bash_login</tt> file overwriting MacPorts config located in <tt>~/.profile</tt>. When a "login shell" starts up, it reads the file <tt>"/etc/profile"</tt> and then <tt>"~/.bash_profile"</tt> or <tt>"~/.bash_login"</tt> or <tt>"~/.profile"</tt> (whichever one exists - it only reads one of these, checking for them in the order mentioned). Check the file used by Bash (in the mentioned order) and add these lines to the used file:</p>
+<p>If you get an error "port: command not found", the MacPorts shell configuration is probably not taken into account. You probably have a <span class="path">~/.bash_profile</span> or <span class="path">~/.bash_login</span> file overwriting MacPorts config located in <span class="path">~/.profile</span>. When a "login shell" starts up, it reads the file <span class="path">"/etc/profile"</span> and then <span class="path">"~/.bash_profile"</span> or <span class="path">"~/.bash_login"</span> or <span class="path">"~/.profile"</span> (whichever one exists - it only reads one of these, checking for them in the order mentioned). Check the file used by Bash (in the mentioned order) and add these lines to the used file:</p>
 
 <pre class="terminal">nano ~/.bash_profile
 <b>or</b>
@@ -120,7 +120,7 @@ nano ~/.profile
 export MANPATH=$MANPATH:/opt/local/share/man
 export INFOPATH=$INFOPATH:/opt/local/share/info</pre>
 
-<p>To save the file and quit the editor, type <tt>CTRL-X</tt>, <tt>Y</tt> and <tt>RETURN</tt>. If you are using another shell, take a look a the shell documentation to see which file is parsed at login, and add the required commands.</p>
+<p>To save the file and quit the editor, type <span class="key">CTRL</span>&#160;<span class="key">X</span>, <span class="key">Y</span> and <span class="key">ENTER</span>. If you are using another shell, take a look a the shell documentation to see which file is parsed at login, and add the required commands.</p>
 
 <p>You can now retry the command in a new Terminal:</p>
 <pre class="terminal">sudo port install gnuregex gaw wget</pre>
@@ -140,7 +140,7 @@ cd ..</pre>
 
 <h2>Step 4: Let's Patch</h2>
 
-<p>With your favorite text editor, open the file:<br /> <tt>[Mounted Disk Image]/buildtools/legacy/gcc/config.guess</tt></p>
+<p>With your favorite text editor, open the file:<br /> <span class="path">[Mounted Disk Image]/buildtools/legacy/gcc/config.guess</span></p>
 
 <p>Go to line 522, and add this:</p>
 <pre>*:Darwin:*:*)
@@ -159,7 +159,7 @@ exit 0 ;;</pre>
 <p><b>Warning!</b> When you copy-paste preformatted text from a web page, some versions of Safari replace every space with a no-break space. You can use the search/replace function of your text editor to replaces these "spaces" with real ones. (or copy the text by hand... or use another browser).</p>
 
 <p>Save the file, and open:<br />
-<tt>[Mounted Disk Image]/buildtools/legacy/gcc/Makefile.in</tt></p>
+<span class="path">[Mounted Disk Image]/buildtools/legacy/gcc/Makefile.in</span></p>
 
 <p>Replace (line 144):</p>
 
@@ -184,7 +184,7 @@ exit 0 ;;</pre>
 
 <p>If you do not now which one you should use, choose gcc2 : Original BeOS R5 binaries (and many Haiku optional packages) will not run on a gcc4 build.</p>
 
-<p><tt>./configure</tt> has some more options, use this command to list them:</p>
+<p><span class="cli">./configure</span> has some more options, use this command to list them:</p>
 <pre class="terminal">./configure --help</pre>
 
 <p>After some time, you should get:</p>
@@ -194,9 +194,9 @@ exit 0 ;;</pre>
 
 <p>Now you could already start to build RAW or VMWare images. Before we come to that, however, let's have a look at the UserBuildConfig that can be used to customize and automate some things.</p>
 
-<p>In <tt>trunk/haiku/build/jam/</tt> there's a <tt>UserBuildConfig.ReadMe</tt> that explains various options. <b>Don't</b> simply rename it and use it as UserBuildConfig!</p>
+<p>In <span class="path">trunk/haiku/build/jam/</span> there's a <span class="cli">UserBuildConfig.ReadMe</span> that explains various options. <b>Don't</b> simply rename it and use it as UserBuildConfig!</p>
 
-You start by duplicating the <tt>UserBuildConfig.sample</tt> and the remove the .sample suffix to get your <tt>UserBuildConfig</tt>. From the .ReadMe you can copy interesting parts into your config and customize them there.
+You start by duplicating the <span class="cli">UserBuildConfig.sample</span> and the remove the .sample suffix to get your <span class="cli">UserBuildConfig</span>. From the .ReadMe you can copy interesting parts into your config and customize them there.
 
 <h2>Step 7: Building Haiku</h2>
 
@@ -208,13 +208,13 @@ You start by duplicating the <tt>UserBuildConfig.sample</tt> and the remove the 
 jam -q haiku-vmware-image</pre>
 
 <p>will build a VMWare disk image:<br />
-<tt>[Mounted Disk Image]/haiku/generated/haiku.vmdk</tt>.</p>
+<span class="path">[Mounted Disk Image]/haiku/generated/haiku.vmdk</span>.</p>
 
 <p>To use it, follow these steps:</p>
 
 <ol>
 <li>Create a folder at the root of the disk image.</li>
-<li>Copy <tt>[Mounted Disk Image]/3rdparty/vmware/haiku.vmx</tt> inside this folder, and edit the copy.</li>
+<li>Copy <span class="path">[Mounted Disk Image]/3rdparty/vmware/haiku.vmx</tt> inside this folder, and edit the copy.</li>
 <li>Change <tt>ide0:0.fileName = "haiku.vmdk"</tt> to <tt>ide0:0.fileName = "../haiku/generated/haiku.vmdk"</tt>. Save the file.</li>
 <li>Double-clicking on the file should start VMWare Fusion and launch Haiku.</li>
 </ol>
@@ -235,7 +235,7 @@ jam -q haiku-vmware-image</pre>
 <pre class="terminal">cd /Volumes/Haiku/haiku
 jam haiku-image</pre>
 
-<p>The image will be created in <tt>[Mounted Disk Image]/haiku/generated/haiku.image</tt>.</p>
+<p>The image will be created in <span class="path">[Mounted Disk Image]/haiku/generated/haiku.image</span>.</p>
 
 </div>
 

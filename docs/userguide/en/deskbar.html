@@ -45,41 +45,42 @@
 <p>A menu opens when you click on the Deskbar's uppermost part:</p>
 <img src="../images/deskbar-images/settings.png" alt="settings.png" width="521" height="309" />
 <ul>
-<li><b>About This System...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</li>
+<li><p><b>About This System...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</p></li>
 
-<li><b>Find...</b> - Opens the query dialog.</li>
-<li><b>Show Replicants</b> - Shows/hides the little Replicant widget you use to drag it around, remove or access its context menu.</li>
-<li><b>Deskbar Settings</b><ul>
-<li><i>Configure Deskbar Menu...</i> - Opens a panel to configure the Deskbar menu (see below).</li>
-    <li><i>Always on Top</i> - The Deskbar always stays above all other windows.</li>
-    <li><i>Auto Raise</i> - The Deskbar pops to the front if the mouse pointer touches it.</li>
-    <li><i>Sort Running Applications</i> - Sorts the list of running programs alphabetically.</li>
-    <li><i>Tracker always First</i> - Even if you sort alphabetically, the Tracker entry always stays first in the list.</li>
-    <li><i>24 Hour Clock</i> - Toggles between 24 and 12 hour clock.</li>
-    <li><i>Show Seconds</i> - Adds the display of seconds to the clock.</li>
-    <li><i>European Date</i> - Shows the date in European format: day-month-year</li>
-    <li><i>---- Full Date ----</i></li>
-    <li><i>Show Application Expander</i> - Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</li>
-    <li><i>Expand New Applications</i> - Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</li>
-    </ul></li>
-<li><b>Restart</b> - Restarts the system.</li>
-<li><b>Shutdown</b> - Shuts down the system.</li>
-<li><b>Recent Documents, Folders, Applications</b> - List the last recently opened documents, folders and applications (see <i>Configure Deskbar Menu...</i> below).
-<li><b>Applications, Demos, Deskbar Applets, Preferences</b> - List of installed applications, demos, applets and preferences (see <i>Configure Deskbar Menu...</i> below).</li>
+<li><p><b>Find...</b> - Opens the query dialog.</p></li>
+<li><p><b>Show Replicants</b> - Shows/hides the little Replicant widget you use to drag it around, remove or access its context menu.</p></li>
+<li><p><b>Deskbar Settings</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Configure Deskbar Menu...</span></td><td>&#160;</td><td>Opens a panel to configure the Deskbar menu (see below).</td></tr>
+<tr><td><span class="menu">Always on Top</span></td><td>&#160;</td><td>The Deskbar always stays above all other windows.</td></tr>
+<tr><td><span class="menu">Auto Raise</span></td><td>&#160;</td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+<tr><td><span class="menu">Sort Running Applications</span></td><td>&#160;</td><td>Sorts the list of running programs alphabetically.</td></tr>
+<tr><td><span class="menu">Tracker always First</span></td><td>&#160;</td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
+<tr><td><span class="menu">24 Hour Clock</span></td><td>&#160;</td><td>Toggles between 24 and 12 hour clock.</td></tr>
+<tr><td><span class="menu">Show Seconds</span></td><td>&#160;</td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">European Date</span></td><td>&#160;</td><td>Shows the date in European format: day-month-year</td></tr>
+<tr><td><span class="menu">---- Full Date ----</span></td></tr>
+<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td>&#160;</td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Expand New Applications</span></td><td>&#160;</td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+    </table></li>
+<li><p><b>Restart</b> - Restarts the system.</p></li>
+<li><p><b>Shutdown</b> - Shuts down the system.</p></li>
+<li><p><b>Recent Documents, Folders, Applications</b> - List the last recently opened documents, folders and applications (see <span class="menu">Configure Deskbar Menu...</span> below).
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - List of installed applications, demos, applets and preferences (see <span class="menu">Configure Deskbar Menu...</span> below).</p></li>
 </ul>
 
 <h3>Configure Deskbar Menu...</h3>
 <img src="../images/deskbar-images/configure.png" alt="configure.png" width="359" height="416" />
 <p>In this panel you set how many recent documents, folders and applications are shown in the Deskbar, or if you show them at all.</p>
 <p>Here, you also configure folders and their contents, which are by default Applications, Demos, Deskbar Applets, and Preferences. You can add your own entries and edit or remove items.<br />
-This part of the panel is just a representation of the folder <tt>/boot/home/config/be/</tt>. You can just as well link or copy files and folders directly in Tracker to configure your Deskbar.<br />
+This part of the panel is just a representation of the folder <span class="path">/boot/home/config/be/</span>. You can just as well link or copy files and folders directly in Tracker to configure your Deskbar.<br />
 Another method is to simply drag a file or folder and drop it where you want it into the Deskbar.</p>
 
 <h2><a id="tray" name="tray">The Tray</a></h2>
 <img src="../images/deskbar-images/calendar.png" alt="calendar.png" width="229" height="210" />
 <p>Among other things, the tray's housing the clock. Left-click it to toggle between date and time. Right-click it to hide/show it or launch the <a href="prefs-time.html">Time</a> preferences to set it.<br />
 Here you can also launch a calendar that also appears, when you hold down the left mouse button on the clock for a little time.</p>
-<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <i>ProcessController</i> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
+<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
 
 <h2><a id="list-of-apps" name="list-of-apps">The list of running programs</a></h2>
 <img src="../images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" width="229" height="306" />

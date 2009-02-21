@@ -37,7 +37,7 @@
 <h1>Getting the source</h1>
 <p><b>Note:</b> <i>All commands must be executed in the Terminal.</i></p>
 
-<p>Go to the parent directory for Haiku's repository (ex. <tt>/home/develop</tt>) and enter:</p>
+<p>Go to the parent directory for Haiku's repository (ex. <span class="path">/home/develop</span>) and enter:</p>
 
 <pre class="terminal">svn checkout svn://svn.berlios.de/haiku/haiku/trunk haiku</pre>
 
@@ -49,11 +49,11 @@
 
 
 <h1>Installing the cross-compiler</h1>
-<p>Download the <a href="http://haiku.mlotz.ch/haiku_cross_compiler_bone_2.95.3-haiku-080323.zip">Haiku cross-compiler</a> and extract it to <tt>/boot</tt> (for example by setting the <i>Destination</i> in Expander to just <tt>/boot</tt>). Then you need to configure your tree to use this cross compiler. Go to the root folder of your checked out Haiku repository and invoke the configure script with the <tt>--cross-tools-prefix</tt> option like this:</p>
+<p>Download the <a href="http://haiku.mlotz.ch/haiku_cross_compiler_bone_2.95.3-haiku-080323.zip">Haiku cross-compiler</a> and extract it to <span class="path">/boot</span> (for example by setting the <i>Destination</i> in Expander to just <span class="path">/boot</span>). Then you need to configure your tree to use this cross compiler. Go to the root folder of your checked out Haiku repository and invoke the configure script with the <span class="cli">--cross-tools-prefix</span> option like this:</p>
 
 <pre class="terminal">configure --cross-tools-prefix /boot/apps/haiku/cross-tools/bin/i586-pc-haiku-</pre>
 
-<p>Be careful to include all of the string up to and including the last dash, as all the cross compiler tools have this prefix (they are for example called <tt>i586-pc-haiku-ar</tt>). You need to specify this prefix everytime you run configure.</p>
+<p>Be careful to include all of the string up to and including the last dash, as all the cross compiler tools have this prefix (they are for example called <span class="cli">i586-pc-haiku-ar</span>). You need to specify this prefix everytime you run configure.</p>
 
 <h1>Building the source</h1>
 
@@ -61,19 +61,19 @@
 
 <pre class="terminal">jam</pre>
 
-<p style="text-indent: 15pt"><b>Note:</b> <i>this will just build any target that is found in the tree. This is usually not that useful, as many parts might not build and are not required. So optionally, a target can be specified by adding a target name. For example, </i><tt>jam app_server</tt><i> will only build the </i><tt>app_server</tt><i> target. Normally though you will want to build an image or installation using the commands below. Add the </i><tt>-a</tt><i> option to rebuild the whole source or only the specified target in case </i><tt>Jam</tt><i> didn't notice source changes.</i></p>
+<p style="text-indent: 15pt"><b>Note:</b> <i>this will just build any target that is found in the tree. This is usually not that useful, as many parts might not build and are not required. So optionally, a target can be specified by adding a target name. For example, </i><span class="cli">jam app_server</span><i> will only build the </i><tt>app_server</tt><i> target. Normally though you will want to build an image or installation using the commands below. Add the </i><span class="cli">-a</span><i> option to rebuild the whole source or only the specified target in case </i><span class="cli">jam</span><i> didn't notice source changes.</i></p>
 
 <h1>Building an image</h1>
 
 <p>You can build a Haiku image with:</p>
 <pre class="terminal">jam haiku-image</pre>
 
-<p>This will place a file named <tt>haiku.image</tt> into the <tt>generated/</tt> folder.</p>
+<p>This will place a file named <span class="cli">haiku.image</span> into the <span class="path">generated/</span> folder.</p>
 
 <p>To build an image for testing in VMWare:</p>
 <pre class="terminal">jam haiku-vmware-image</pre>
 
-<p>This will place a file named <tt>haiku.vmdk</tt> into the <tt>generated/</tt> folder.</p>
+<p>This will place a file named <span class="cli">haiku.vmdk</span> into the <span class="path">generated/</span> folder.</p>
 
 <p>Instead of building an image, you may install Haiku on a mounted partition using:</p>
 <pre class="terminal">HAIKU_INSTALL_DIR=/target_folder jam install-haiku</pre>

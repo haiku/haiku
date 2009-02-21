@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,13 +39,13 @@
 <h1><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png"
 width="64" height="64" />StyledEdit</h1>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Applications</i></td></tr>
-<tr><td>Location:</td><td></td><td><tt>/boot/beos/apps/StyledEdit</tt></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/beos/apps/StyledEdit</span></td></tr>
 <tr><td>Settings:</td><td></td><td>no settings</td></tr>
 </table>
 <p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
 <img src="../../images/apps-images/stylededit.png" alt="stylededit.png" width="525" height="438" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <tt>listattr</tt>:</p>
+<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
 <pre class="terminal">~> listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -58,13 +58,12 @@ MIME String         11  "BEOS:TYPE"
 
 1071 bytes total in attributes.</pre>
 <p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<p><i>Note:</i> Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text
-file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</p>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <tt>ReadMe.txt</tt>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <i>Font</i> menu. Line wrapping and alignment from the <i>Document</i> menu only work on the whole file.</p>
+<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
+<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
+<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
 
 </div>
-<!--
+
 <div class="bottomnav">
 	<p>
 		<a href="../applications.html">Applications</a>
@@ -74,6 +73,6 @@ file, it also follows, that the formatting will be lost when a file is stored on
 		Next: <a href="apps-terminal.html">Terminal</a>
 	</p>
 </div>
--->
+
 </body>
 </html>

@@ -38,7 +38,7 @@
 <p>If you can't or don't want to go through building from source, you can also install an already built image. You'll have to <a href="http://www.haiku-files.org/raw">download a raw image</a> for that, not a VMWare image. Note that these are test images, they are not complete distributions that include a lot of software, both to keep the size and complexity of building them down.</p>
 
 <h1>Installing on a partition</h1>
-<p>After you have downloaded the raw image, you need to get this image to the partition or medium you intend to install it to. Under BeOS, Linux or basically everything except Windows you can use <tt>dd</tt> to just copy it over, using the partition or drive as a target.</p>
+<p>After you have downloaded the raw image, you need to get this image to the partition or medium you intend to install it to. Under BeOS, Linux or basically everything except Windows you can use <span class="cli">dd</span> to just copy it over, using the partition or drive as a target.</p>
 
 <p>Under BeOS to partition X on the master on the first channel:</p>
 <pre class="terminal">dd if=/path/to/image of=/dev/disk/ide/ata/0/master/X</pre>
@@ -49,48 +49,48 @@
 <p>Under Linux to partition X on the first hard disk:</p>
 <pre class="terminal">dd if=/path/to/image of=/dev/hdaX</pre>
 
-<p>Make extra sure that you have the right partition picked there, as these commands are destructive. Recheck with a partitioning tool to verify for example. Note that you'll probably need administrative rights under Linux, so use <tt>sudo</tt> or <tt>su</tt> to execute these commands.</p>
+<p>Make extra sure that you have the right partition picked there, as these commands are destructive. Recheck with a partitioning tool to verify for example. Note that you'll probably need administrative rights under Linux, so use <span class="cli">sudo</span> or <span class="cli">su</span> to execute these commands.</p>
 
-<p>If you want to put the image at the absolute start of the drive (so that you don't need an additional boot manager), make sure that you write to the whole raw drive and not to a partition. You do that by specifying a raw device instead of a partition. Under Linux you would for example omit the partition number resulting in <tt>sdb</tt> instead of <tt>sdb1</tt>. Under BeOS you would pick the <tt>.../raw</tt> path instead of one with a number. If you use such a command, you overwrite the MBR containing the partition table. This means, that all the partitions on that drive will become inaccessible (not only the first part of the drive). So be sure that you want to do such a destructive operation!</p>
+<p>If you want to put the image at the absolute start of the drive (so that you don't need an additional boot manager), make sure that you write to the whole raw drive and not to a partition. You do that by specifying a raw device instead of a partition. Under Linux you would for example omit the partition number resulting in <tt>sdb</tt> instead of <tt>sdb1</tt>. Under BeOS you would pick the <span class="path">.../raw</span> path instead of one with a number. If you use such a command, you overwrite the MBR containing the partition table. This means, that all the partitions on that drive will become inaccessible (not only the first part of the drive). So be sure that you want to do such a destructive operation!</p>
 
-<p>Under Windows things are sadly a bit more complicated. You can try <tt>dd</tt> for Windows or use a tool like <a href="http://shounen.ru/soft/flashnul">Flashnul</a> to get the image to a partition or USB drive. You should find the tools on the Internet, go back to the <a href="installation-usb.html">USB section</a> to learn how to use <i>Flashnul</i> to copy a Haiku image.</p>
+<p>Under Windows things are sadly a bit more complicated. You can try <span class="cli">dd</span> for Windows or use a tool like <a href="http://shounen.ru/soft/flashnul">Flashnul</a> to get the image to a partition or USB drive. You should find the tools on the Internet, go back to the <a href="installation-usb.html">USB section</a> to learn how to use <span class="app">Flashnul</span> to copy a Haiku image.</p>
 
 <p>Note that when you just copy over an image to a partition or drive, you won't be able to use the full size of the target partition/drive. The image was built with a certain size (256MB currently) which is the size of the filesystem inside the image. So there's no real point in making a 10GB partition available for it, it won't be usable.</p>
 	
 <h1>Copying the contents of a pre-built image</h1>
-<p>Instead of copying the image itself you can also make a separate BFS partition yourself and then copy over the contents of the image to that partition. You will need a platform supporting BFS to do that obviously, which leaves you with two possible options. Either you use a version of BeOS to do the setup with <i>DriveSetup</i> or <tt>mkbfs</tt> or you use Haiku itself with <i>Installer</i> or <i>DriveSetup</i>.<br />
-Once you've created and initialized the target partition you can mount the image (using tools like <i>Mount Image</i> or through the Terminal) and copy over all the files. If you are under Haiku, you can just as well use <i>Installer</i> to make a duplicate of your currently booted installation.</p>
+<p>Instead of copying the image itself you can also make a separate BFS partition yourself and then copy over the contents of the image to that partition. You will need a platform supporting BFS to do that obviously, which leaves you with two possible options. Either you use a version of BeOS to do the setup with <span class="app">DriveSetup</span> or <span class="cli">mkbfs</span> or you use Haiku itself with <span class="app">Installer</span> or <span class="app">DriveSetup</span>.<br />
+Once you've created and initialized the target partition you can mount the image (using tools like <span class="app">Mount Image</span> or through the Terminal) and copy over all the files. If you are under Haiku, you can just as well use <span class="app">Installer</span> to make a duplicate of your currently booted installation.</p>
 
 <h1>Making it bootable</h1>
 <p>When you just create a plain partition and initialize it to a BFS filesystem or if you copy over a complete Haiku image, this doesn't necessarily make the partition bootable. The partition boot record may be missing, or the partition offset could be misconfigured. The prebuilt images for example contain a partition offset of 0 for example, since they are not actually partitioned. They only consist of a direct BFS filesystem, so the offset to that is 0. This will work in exactly one case, where you don't actually put it into a partition. If you for example copy such an image directly to a USB drive starting from 0, overwriting the MBR (destroying all partitions already there), then this will boot. If you however copy an image to the first partition on your hard disk, this will not work out of the box, as the boot code in the partition boot record won't find the desired filesystem at offset 0 (that's where the MBR still is).</p>
 
-<p>To make sure a partition boot record is there and it contains the right partition offset, you can use the tool <tt>makebootable</tt>. It will do both, write the partition boot code to the beginning of the partition and detect and write the partition offset to where it is needed. You can use the <tt>makebootable</tt> from BeOS if you have a BeOS installation that has access to the partition in question. To do that, mount the volume you have Haiku installed to and use:</p>
+<p>To make sure a partition boot record is there and it contains the right partition offset, you can use the tool <span class="cli">makebootable</span>. It will do both, write the partition boot code to the beginning of the partition and detect and write the partition offset to where it is needed. You can use the <span class="cli">makebootable</span> from BeOS if you have a BeOS installation that has access to the partition in question. To do that, mount the volume you have Haiku installed to and use:</p>
 
 <pre class="terminal">makebootable /HaikuMountpoint</pre>
 
-<p>Where <tt>/HaikuMountpoint</tt> is where you have mounted your Haiku volume to. Note that the BeOS' <tt>makebootable</tt> can be used, because the partition boot record does only load the zbeos boot loader. As Haiku does provide a zbeos as well and there is no information passed from the partition boot code to the boot loader, this is compatible between BeOS and Haiku and you can use a BeOS' <tt>makebootable</tt> with a Haiku boot loader and the other way around.</p>
+<p>Where <span class="path">/HaikuMountpoint</span> is where you have mounted your Haiku volume to. Note that the BeOS' <span class="cli">makebootable</span> can be used, because the partition boot record does only load the zbeos boot loader. As Haiku does provide a zbeos as well and there is no information passed from the partition boot code to the boot loader, this is compatible between BeOS and Haiku and you can use a BeOS' <span class="cli">makebootable</span> with a Haiku boot loader and the other way around.</p>
 
-<p>If you already have some Haiku medium capable of booting Haiku (like a USB drive) you could also boot into Haiku and run <tt>makebootable</tt> from there. Note that there is currently a bug that will require you to run it from the location it resides in like so:</p>
+<p>If you already have some Haiku medium capable of booting Haiku (like a USB drive) you could also boot into Haiku and run <span class="cli">makebootable</span> from there. Note that there is currently a bug that will require you to run it from the location it resides in like so:</p>
 
 <pre class="terminal">cd /bin
 makebootable /MountpointOfNewHaikuInstallation</pre>
 
-<p>If you are on Linux or another build platform that has support for <tt>makebootable</tt> and have the sources available you can run:</p>
+<p>If you are on Linux or another build platform that has support for <span class="cli">makebootable</span> and have the sources available you can run:</p>
 
 <pre class="terminal">jam run ":&lt;build&gt;makebootable" /dev/sdaX</pre>
 
-<p>Where the <tt>/dev/sdaX</tt> is the partition that is supposed to be made bootable. Under Windows this is currently not possible.</p>
+<p>Where the <span class="path">/dev/sdaX</span> is the partition that is supposed to be made bootable. Under Windows this is currently not possible.</p>
 
 <h1>Configuring the boot manager</h1>
-<p>When the partition itself is bootable, i.e. contains a partition boot record and the correct partition offset, there needs to be a way to get it executed. If you use a boot manager like GRUB, you need to instruct it to load from that partition. You do that for GRUB by adding an entry to its <tt>menu.lst</tt> usually located at <tt>/boot/grub/menu.lst</tt>. The following would instruct it to switch to the partition and then just chainload the partition boot record:</p>
+<p>When the partition itself is bootable, i.e. contains a partition boot record and the correct partition offset, there needs to be a way to get it executed. If you use a boot manager like GRUB, you need to instruct it to load from that partition. You do that for GRUB by adding an entry to its <span class="cli">menu.lst</span> usually located at <span class="path">/boot/grub/menu.lst</span>. The following would instruct it to switch to the partition and then just chainload the partition boot record:</p>
 
 <pre>title Haiku
 rootnoverify (hd0,3)
 chainloader +1</pre>
 
-<p>That would work if you installed to disk "0" and partition "3". Note that the GRUB naming is one-off the Linux one, so if you have it installed to <tt>/dev/sda4</tt> that would translate to disk "0" (sda == 0, sdb == 1, ...) and partition "3" (4 - 1).</p>
+<p>That would work if you installed to disk "0" and partition "3". Note that the GRUB naming is one-off the Linux one, so if you have it installed to <span class="path">/dev/sda4</span> that would translate to disk "0" (sda == 0, sdb == 1, ...) and partition "3" (4 - 1).</p>
 
-<p>In case you are using the BeOS boot manager, just re-run the <tt>bootman</tt> command and add the new Haiku partition to the boot menu.</p>
+<p>In case you are using the BeOS boot manager, just re-run the <span class="cli">bootman</span> command and add the new Haiku partition to the boot menu.</p>
 
 <p>If you have another boot manager consult its documentation on how to chainload partitions, most should support such a thing, possibly named a bit different. In doubt just add an entry for the partition, probably this will cause it to chainload, even if not explicitly named so.</p>
 

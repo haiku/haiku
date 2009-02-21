@@ -96,17 +96,17 @@ TODO:
 <h1>Using disk images</h1>
 
 <h2>VMWare:</h2>
-<p>To use Haiku under Vmware, simply unzip the archive and execute the included <tt>*.vmx</tt> file.</p>
+<p>To use Haiku under Vmware, simply unzip the archive and execute the included <span class="cli">*.vmx</span> file.</p>
 
 <h2>VirtualBox:</h2>
 <p><b>Note:</b> <i>Use the latest version of VirtualBox for the best compatibility, but emulating Haiku in VirtualBox isn't totally supported. Some settings will require you have a specific processor to work. If it isn't the case, you will either have to wait for upgrades (from Haiku and/or VirtualBox) or get a free version of VMWare.</i></p>
 
-<p>To use the VMWare disk image under Virtual Box, create a virtual machine (click <i>New</i>) and press next. First name your image (ex. Haiku r28888). Under the <i>Operating System</i> tab, select "other", and for the <i>Version</i> tab, select "other" again. Next, you will have to chose the amount of RAM you wish to allocate to Haiku (512 MB through 1 GB should be enough). Remember your host OS will be deprived from this amount of memory.<br />
-Now in the <i>Virtual Hard Disk</i> section, enable <i>Boot Hard Disk (Primary Master)</i>, then click <i>Existing...</i>, click <i>Add</i>, navigate to your VMWare (.vmdk) image and click <i>Open</i>. Select it in the list, and click <i>Select</i>. Now your done creating your Virtual Machine, but you will have to tweak some settings.</p>
+<p>To use the VMWare disk image under Virtual Box, create a virtual machine (click <span class="button">New</span>) and press next. First name your image (ex. Haiku r28888). Under the <span class="menu">Operating System</span> tab, select "other", and for the <span class="menu">Version</span> tab, select "other" again. Next, you will have to chose the amount of RAM you wish to allocate to Haiku (512 MB through 1 GB should be enough). Remember your host OS will be deprived from this amount of memory.<br />
+Now in the <span class="menu">Virtual Hard Disk</span> section, enable <span class="menu">Boot Hard Disk (Primary Master)</span>, then click <span class="button">Existing...</span>, click <span class="button">Add</span>, navigate to your VMWare (.vmdk) image and click <span class="button">Open</span>. Select it in the list, and click <span class="button">Select</span>. Now your done creating your Virtual Machine, but you will have to tweak some settings.</p>
 	
-<p>With your new virtual machine selected, click on <i>Settings</i>. Here you can tweak your VM to your likings. Haiku will not boot if the "VT-x/AMD-V" option isn't on. Go to <i>General > Advanced > Enable VT-x/AMD-V</i> and activate the option. Your processor might not support this option, if so, your out of luck for VirtualBox emulation.</p>
+<p>With your new virtual machine selected, click on <span class="menu">Settings</span>. Here you can tweak your VM to your likings. Haiku will not boot if the "VT-x/AMD-V" option isn't on. Go to <span class="menu">General > Advanced > Enable VT-x/AMD-V</span> and activate the option. Your processor might not support this option, if so, your out of luck for VirtualBox emulation.</p>
 
-<p>In order to get networking running under Haiku in Virtual Box, under the <i>Network > Adapter 1</i> tab, change the adapter type to "Intel Pro/1000 MT (82540OEM)". You can use either "NAT" or "Host Interface" under the <i>attached to</i> option. If you choose "Host Interface", you'll then have to select your desired network card in the bottom window ("Host Interfaces")</p>
+<p>In order to get networking running under Haiku in Virtual Box, under the <span class="menu">Network > Adapter 1</span> tab, change the adapter type to "Intel Pro/1000 MT (82540OEM)". You can use either "NAT" or "Host Interface" under the <i>attached to</i> option. If you choose "Host Interface", you'll then have to select your desired network card in the bottom window ("Host Interfaces")</p>
 
 <p>Sound doesn't work when emulating Haiku in VirtualBox, so you might as well disable it. I haven't tested the USB ports, but it should work. For more information on the various options you have, refer to (the very complete) VirtualBox User Manual.</p>
 
@@ -114,16 +114,16 @@ Now in the <i>Virtual Hard Disk</i> section, enable <i>Boot Hard Disk (Primary M
 <p><b>Note:</b> <i>These instructions have been posted in the forums, they are not guaranteed to work, and some issues might arise (like networking). Visit the forums for more information.</i></p>
 <ul>
 <li><p>Download a nightly build from the Haiku Build Factory and extract the tar.bz2 file.</p></li>
-<li><p>Move the extracted <tt>haiku.image</tt> file to the desired directory. Open terminal and navigate to that directory. Type:</p>
+<li><p>Move the extracted <span class="cli">haiku.image</span> file to the desired directory. Open terminal and navigate to that directory. Type:</p>
 <pre class="terminal">dd if=/dev/zero of=haiku.image bs=1024 count=1 conv=notrunc seek=408600</pre></li>
-<li><p>Rename the <tt>haiku.image</tt> file to <tt>haiku.hdd</tt>.</p></li>
+<li><p>Rename the <span class="cli">haiku.image</span> file to <span class="cli">haiku.hdd</span>.</p></li>
 <li><p>Use ImageTool to resize the haiku.hdd file to 120MB.</p></li>
 <li><p>Create a new virtual machine in Parallels, with <i>Guest OS Type</i> as Windows.</p></li>
-<li><p>Set the <i>Hard Drive</i> to the <tt>haiku.hdd</tt> file that you downloaded.</p></li>
+<li><p>Set the <i>Hard Drive</i> to the <span class="cli">haiku.hdd</span> file that you downloaded.</p></li>
 </ul>
 
 <h2>Qemu:</h2>
-<p>For Qemu, rename the raw disk image to <tt>haiku.img</tt> and manually configure a virtual machine using that disk image.</p>
+<p>For Qemu, rename the raw disk image to <span class="cli">haiku.img</span> and manually configure a virtual machine using that disk image.</p>
 
 <h1>Increasing disk image space - Creating and formatting disks</h1>
 <p>The disk images provided come as 250MB fixed disk images. The disk image's size can't be increased, but one can easily create a new disk with an increased capacity. Under the emulators GUI and virtual machine's settings, you should find an option to add another hard disk.<br />
@@ -132,15 +132,15 @@ Choose which type of disk you would like to create. There are two options:</p>
 <li><p>Fixed disk: This means the disk's space will be pre-allocated, i.e if you choose to create a 10GB fixed disk, the disk image will occupy 10GB of data on your hard drive.</p></li>
 <li><p>Expanding disk: If you choose to create a 10GB disk image, the disk will appear as it's 10GB under Haiku, but will only actually be as big as the space that's used within Haiku (it grows).</p></li>
 </ul>
-<p>Once you've created the disk image to a size of your choice, add the secondary disk to your virtual machine and boot Haiku. The disk won't show up until you have formatted it. Navigate to Haiku's <i>DiskSetup</i> application - the disk should be shown (see a 1GB disk added in the screenshot below).</p>
+<p>Once you've created the disk image to a size of your choice, add the secondary disk to your virtual machine and boot Haiku. The disk won't show up until you have formatted it. Navigate to Haiku's <span class="app">DiskSetup</span> application - the disk should be shown (see a 1GB disk added in the screenshot below).</p>
 <br />
 <a href="../../images/installation-images/haiku.jpg"><img style="border: 0px solid ; width: 200px; height: 175px;" alt="" src="../../images/installation-images/haiku.jpg" /></a><br />
 <br />
-<p>Select the disk, and then select <i>Partition | Initialize | Be File System</i>. Select the default variables, and accept the alert messages. Return to the menu and select <i>Partition  Mount</i> - another Haiku disk should now be on your desktop (without the leaf logo). Now simply open a Tracker window on the boot disk, and a Tracker window on your newly created disk and copy the contents over (over-writing the <tt>home</tt> folder on the new disk).</p>
+<p>Select the disk, and then select <span class="menu">Partition | Initialize | Be File System</span>. Select the default variables, and accept the alert messages. Return to the menu and select <i>Partition  Mount</i> - another Haiku disk should now be on your desktop (without the leaf logo). Now simply open a Tracker window on the boot disk, and a Tracker window on your newly created disk and copy the contents over (over-writing the <span class="path">home</span> folder on the new disk).</p>
 
 <p>One final step: Open a Terminal and type:</p>
 <pre class ="terminal">df</pre>
-<p>to see the disk space size &amp; usage on each disk. After selecting the correct disk (probably <tt>/Haiku1</tt>) type:</p>
+<p>to see the disk space size &amp; usage on each disk. After selecting the correct disk (probably <span class="path">/Haiku1</span>) type:</p>
 <pre class="terminal">makebootable Haiku1</pre>
 <p>You can now shutdown the Haiku virtual machine, remove the primary disk image (the Haiku disk image you downloaded) in your virtual machine's preferences, and make sure that the new disk you created is your primary disk now.</p>
 
@@ -149,11 +149,11 @@ Choose which type of disk you would like to create. There are two options:</p>
 <h1>Transferring files between your host computer and a Haiku virtual machine</h1>
 <p>There are several ways you can transfer files between the host and guest machines on your computer. Since there is no 'Vmware tools installer' for Haiku, file-sharing between the host and guest isn't built-in, and there's no clipboard sharing. Here are a couple of ways you could share files.</p>
 <ul>
-<li><p><b><i>Transfer files using a disk image</i></b>: create a disk image with the files you'd like to transfer from your PC to Haiku. In Windows use a utility like <i>Burn At Once</i>, in OS X you could use the the hard drisk utility to make an ISO i.e create a folder called 'test' on your desktop, put the files you want into that folder and execute the command:</p>
+<li><p><b><i>Transfer files using a disk image</i></b>: create a disk image with the files you'd like to transfer from your PC to Haiku. In Windows use a utility like <span class="app">Burn At Once</span>, in OS X you could use the the hard drisk utility to make an ISO i.e create a folder called 'test' on your desktop, put the files you want into that folder and execute the command:</p>
 <pre class="terminal">hdiutil makehybrid -o /Users/myusername/Desktop/test.iso /Users/myusername/Desktop/test -iso -joliet'</pre>
 <p>(replacing "myusername" with your username). Attach the resultant ISO images in place of your optical disk in your virtual machine preferences.</p></li>
-<li><p><b><i>Transfer files over the internet</i></b>: upload files to an online server you have, and then download them internally through Haiku. Note, Haiku doesn't yet have a web browser included, however, you can use <tt>wget</tt>.</p></li>
-<li><p><b><i>Transfer files between the host and machine</i></b>: First you'll need to setup a FTP server on your host machine. OS X users can easily do this under their sharing preferences tab. As suggested, you can use <tt>wget</tt> to download files from your host machine. You could use <a href="http://www.haikuware.com/view-details/internet-&amp;-network/ftp/wput">wput</a> to upload files to your host machine, alternatively, you could use a grahphical client like <a href="http://www.haikuware.com/view-details/internet-&amp;-network/ftp/netpenguin">NetPenguin</a>.</p></li>
+<li><p><b><i>Transfer files over the internet</i></b>: upload files to an online server you have, and then download them internally through Haiku. Note, Haiku doesn't yet have a web browser included, however, you can use <span class="cli">wget</span>.</p></li>
+<li><p><b><i>Transfer files between the host and machine</i></b>: First you'll need to setup a FTP server on your host machine. OS X users can easily do this under their sharing preferences tab. As suggested, you can use <span class="cli">wget</span> to download files from your host machine. You could use <a href="http://www.haikuware.com/view-details/internet-&amp;-network/ftp/wput">wput</a> to upload files to your host machine, alternatively, you could use a grahphical client like <a href="http://www.haikuware.com/view-details/internet-&amp;-network/ftp/netpenguin">NetPenguin</a>.</p></li>
 </ul>
 
 </div>

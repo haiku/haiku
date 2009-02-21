@@ -60,13 +60,13 @@ TODO
 <p> You will need a small USB memory stick (512MB should be more than enough) that you are ready to erase and a recent <a href="http://haiku-files.org/raw/index.php">HDD raw image</a>. Note that these are test images, they are not complete distributions that include a lot of software. Future releases will include a more complete set of software, obviously. Your motherboard should also support booting from USB Drives (most recent computers do).</p>
 
 <h2><a id="unix" name="unix">Using a Unix system (Linux, Mac OS X, FreeBSD etc.)</a></h2>
-<p>Now that you've downloaded the raw image, you will need to expand this image on your USB Drive you intend to install it to. You will first need to know the name of your drive (something like <tt>/dev/sdb</tt>, <tt>/dev/disk1</tt> or a variant).</p>
+<p>Now that you've downloaded the raw image, you will need to expand this image on your USB Drive you intend to install it to. You will first need to know the name of your drive (something like <span class="path">/dev/sdb</span>, <span class="path">/dev/disk1</span> or a variant).</p>
 
 <p>First connect your flash drive.</p>
 <p>Under Linux, open your shell and type:</p>
 <pre class="terminal">fdisk -l</pre>
 
-<p>On Mac OS X, open the terminal (<i>Utilities > Terminal</i>) and type:</p>
+<p>On Mac OS X, open the terminal (<span class="menu">Utilities > Terminal</span>) and type:</p>
 <pre class="terminal">df -hl</pre>
 
 <p>The output should resemble something like,</p>
@@ -92,33 +92,33 @@ or
 /dev/disk0s2  186Gi  112Gi   74Gi    61%    /
 <b>/dev/disk1s1  1.9Gi  265Mi  1.6Gi    14%    /Volumes/KINGSTON</b></pre>
 
-<p>Now you need to use the <tt>dd</tt> tool to extract the raw image to your USB Key. Make sure you have the right drive selected here, since this will erase all data on the specified location. Recheck with a partition tool to verify for example. You might need administrative rights, so add the <tt>sudo</tt> or <tt>su</tt> command before the next step to run the process as administrator (a password will be required).</p>
+<p>Now you need to use the <span class="cli">dd</span> tool to extract the raw image to your USB Key. Make sure you have the right drive selected here, since this will erase all data on the specified location. Recheck with a partition tool to verify for example. You might need administrative rights, so add the <span class="cli">sudo</span> or <span class="cli">su</span> command before the next step to run the process as administrator (a password will be required).</p>
 
-<p><b>Note:</b> <i>You will want to put the image at the absolute start of the drive, make sure that you write to the whole raw drive and not to a partition. You do that by specifying a raw device instead of a partition. Under Linux you would for example omit the partition number resulting in</i> <tt>sdb</tt> <i>instead of</i> <tt>sdb1</tt><i>. Under BeOS you would pick the</i> <tt>.../raw</tt> <i>path instead of one with a number. If you use such a command, you overwrite the MBR containing the partition table of your USB memory stick. This means, that all the partitions on that drive will become inaccessible (not only the first part of the drive). So be sure that you want to do such a destructive operation!</i></p>
+<p><b>Note:</b> <i>You will want to put the image at the absolute start of the drive, make sure that you write to the whole raw drive and not to a partition. You do that by specifying a raw device instead of a partition. Under Linux you would for example omit the partition number resulting in</i> <span class="cli">sdb</span> <i>instead of</i> <span class="cli">sdb1</span><i>. Under BeOS you would pick the</i> <span class="cli">.../raw</span> <i>path instead of one with a number. If you use such a command, you overwrite the MBR containing the partition table of your USB memory stick. This means, that all the partitions on that drive will become inaccessible (not only the first part of the drive). So be sure that you want to do such a destructive operation!</i></p>
 
 <p>Still in the terminal, enter:</p>
 <pre class="terminal">dd if=/path/to/image of=/dev/sdb</pre>
 
-<p>Where <tt>/dev/sdb</tt> stands for your USB memory stick's name found earlier.</p>
+<p>Where <span class="path">/dev/sdb</span> stands for your USB memory stick's name found earlier.</p>
 
 <p>Congratualtions! You have just installed Haiku to a USB memory stick. You can now restart your computer to boot from Haiku. Note that you will probably have to enable USB drive booting in your BIOS and change the hard drive boot priority order. If Haiku's splash screen stops in the middle of the icons, and then sends you to <i>Kernel Debug Land</i>, you might have to disable the <i>Plug and Play OS</i> option in your BIOS.</p>
 
 <h2><a id="windows" name="windows">Using Windows</a></h2>
-<p>You will need basic knowledge of your command prompt to go through this step-by-step guide. You can type <tt>help</tt> inside your command prompt to get some information on the required navigation commands.</p>
+<p>You will need basic knowledge of your command prompt to go through this step-by-step guide. You can type <span class="cli">help</span> inside your command prompt to get some information on the required navigation commands.</p>
 
 <p>You have to download and install the latest <a href="http://shounen.ru/soft/flashnul">Flashnul</a> utility.</p>
 
-<p><b>Note:</b><i>The <i>Flashnul</i> website isn't in English. You can simply click on the "Download" link and then select the upper-most entry (the latest version) to download.</i></p>
+<p><b>Note:</b><i>The <span class="app">Flashnul</span> website isn't in English. You can simply click on the "Download" link and then select the upper-most entry (the latest version) to download.</i></p>
 
-<p>Extract your raw image zip file and the <i>Flashnul</i> program in the same directory (ex. <tt>c:\haiku</tt>). Rename the raw image's extension to <tt>.img</tt> (ex. <tt>haiku.img</tt>).</p>
+<p>Extract your raw image zip file and the <span class="app">Flashnul</span> program in the same directory (ex. <span class="path">c:\haiku</span>). Rename the raw image's extension to <span class="cli">.img</span> (ex. <span class="cli">haiku.img</span>).</p>
 
-<p>Open your command prompt (go to <i>Start > Run</i>, then type <tt>cmd</tt>  and press <tt>ENTER</tt>). You will see a black window with a blinking cursor, this is your command line editor (commonly named command prompt or shell).</p>
+<p>Open your command prompt (go to <span class="menu">Start > Run</span>, then type <span class="cli">cmd</span>  and press <span class="key">ENTER</span>). You will see a black window with a blinking cursor, this is your command line editor (commonly named command prompt or shell).</p>
 
 <p><b>Note:</b><i>If you are using Windows Vista, you will need administrator rights to see the available physical drives. To run the command prompt in administrator mode, go to </i>Start > All Programs > Accessories > Command prompt<i>, right click on the program and select </i>Run as Administrator.</p>
 
-<p>Navigate to the directory containing your raw image and the <i>Flashnul</i> utility. For example,</p>
+<p>Navigate to the directory containing your raw image and the <span class="app">Flashnul</span> utility. For example,</p>
 <pre class="terminal">cd \haiku</pre>
-<p>if the directory is <tt>c:\haiku</tt></p>
+<p>if the directory is <span class="path">c:\haiku</span></p>
 
 <p>You need to find the number of your USB flash drive. This is very important, because if you do not select the right drive, your whole hard drive <b><i>will be erased</i></b>. To find out your flashdrive's name, in the command prompt, type:</p>
 <pre class="terminal">flashnul -p</pre>
