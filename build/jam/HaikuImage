@@ -119,7 +119,7 @@ BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS Spider Message ;
-BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki ; #hda
+BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
 BEOS_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme

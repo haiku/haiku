@@ -512,6 +512,9 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage beos documentation
 		: [ FDirName $(HAIKU_TOP) docs userguide ]
 		: userguide : -x .svn ;
+	AddFilesToHaikuImage beos documentation
+		: [ FDirName $(HAIKU_TOP) docs Haiku-doc.css ]
+		: Haiku-doc.css ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/beos/documentation/welcome/welcome.html : Welcome ;
 }
