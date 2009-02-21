@@ -36,10 +36,27 @@
 
 namespace write_overlay {
 
+status_t publish_overlay_vnode(fs_volume *volume, ino_t inodeNumber,
+	void *privateNode, int type);
+
+class OverlayInode;
+
 struct open_cookie {
 	int				open_mode;
 	void *			super_cookie;
 };
+
+
+struct open_dir_cookie {
+	uint32			index;
+};
+
+
+struct overlay_dirent {
+	ino_t			inode_number;
+	char *			name;
+};
+
 
 struct write_buffer {
 	write_buffer *	next;
@@ -57,27 +74,38 @@ public:
 		fs_volume *			Volume() { return fVolume; }
 		fs_volume *			SuperVolume() { return fVolume->super_volume; }
 
+		ino_t				BuildInodeNumber() { return fCurrentInodeNumber++; }
+
 private:
 		fs_volume *			fVolume;
+		ino_t				fCurrentInodeNumber;
 };
 
 
 class OverlayInode {
 public:
 							OverlayInode(OverlayVolume *volume,
-								fs_vnode *superVnode, ino_t inodeNumber);
+								fs_vnode *superVnode, ino_t inodeNumber,
+								OverlayInode *parentDir = NULL,
+								mode_t mode = 0);
 							~OverlayInode();
 
 		status_t			InitCheck();
+
+		bool				IsVirtual() { return fIsVirtual; }
 
 		fs_volume *			Volume() { return fVolume->Volume(); }
 		fs_volume *			SuperVolume() { return fVolume->SuperVolume(); }
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 		ino_t				InodeNumber() { return fInodeNumber; }
 
+		status_t			Lookup(const char *name, ino_t *inodeNumber);
+
 		status_t			ReadStat(struct stat *stat);
 		status_t			WriteStat(const struct stat *stat, uint32 statMask);
 
+		status_t			Create(const char *name, int openMode, int perms,
+								void **cookie, ino_t *newInodeNumber);
 		status_t			Open(int openMode, void **cookie);
 		status_t			Close(void *cookie);
 		status_t			FreeCookie(void *cookie);
@@ -86,14 +114,41 @@ public:
 		status_t			Write(void *cookie, off_t position,
 								const void *buffer, size_t *length);
 
+		status_t			CreateDir(const char *name,
+								int perms, ino_t *newInodeNumber);
+		status_t			RemoveDir(const char *name);
+		status_t			OpenDir(void **cookie);
+		status_t			CloseDir(void *cookie);
+		status_t			FreeDirCookie(void *cookie);
+		status_t			ReadDir(void *cookie, struct dirent *buffer,
+								size_t bufferSize, uint32 *num);
+		status_t			RewindDir(void *cookie);
+
+		status_t			CreateSymlink(const char *name, const char *path,
+								int mode);
+		status_t			ReadSymlink(char *buffer, size_t *bufferSize);
+
+		status_t			AddEntry(overlay_dirent *entry);
+		status_t			RemoveEntry(const char *name,
+								overlay_dirent **entry);
+
 private:
+		status_t			_PopulateDirents();
+		status_t			_CreateCommon(const char *name, int type, int perms,
+								ino_t *newInodeNumber, OverlayInode **node);
+
 		OverlayVolume *		fVolume;
+		OverlayInode *		fParentDir;
 		fs_vnode			fSuperVnode;
 		ino_t				fInodeNumber;
 		write_buffer *		fWriteBuffers;
 		off_t				fOriginalNodeLength;
+		overlay_dirent **	fDirents;
+		uint32				fDirentCount;
 		struct stat			fStat;
 		bool				fHasStat;
+		bool				fHasDirents;
+		bool				fIsVirtual;
 };
 
 
@@ -101,7 +156,8 @@ private:
 
 
 OverlayVolume::OverlayVolume(fs_volume *volume)
-	:	fVolume(volume)
+	:	fVolume(volume),
+		fCurrentInodeNumber((ino_t)1 << 32)
 {
 }
 
@@ -115,27 +171,53 @@ OverlayVolume::~OverlayVolume()
 
 
 OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
-	ino_t inodeNumber)
+	ino_t inodeNumber, OverlayInode *parentDir, mode_t mode)
 	:	fVolume(volume),
-		fSuperVnode(*superVnode),
+		fParentDir(parentDir),
 		fInodeNumber(inodeNumber),
 		fWriteBuffers(NULL),
 		fOriginalNodeLength(-1),
-		fHasStat(false)
+		fDirents(NULL),
+		fDirentCount(0),
+		fHasStat(false),
+		fHasDirents(false),
+		fIsVirtual(superVnode == NULL)
 {
-	TRACE("inode created\n");
+	TRACE("inode created %lld\n", fInodeNumber);
+
+	if (superVnode != NULL)
+		fSuperVnode = *superVnode;
+	else {
+		fStat.st_dev = SuperVolume()->id;
+		fStat.st_ino = fInodeNumber;
+		fStat.st_mode = mode;
+		fStat.st_nlink = 1;
+		fStat.st_uid = 0;
+		fStat.st_gid = 0;
+		fStat.st_size = 0;
+		fStat.st_rdev = 0;
+		fStat.st_blksize = 1024;
+		fStat.st_atime = fStat.st_mtime = fStat.st_ctime = fStat.st_crtime
+			= time(NULL);
+		fStat.st_type = 0;
+		fHasStat = true;
+	}
 }
 
 
 OverlayInode::~OverlayInode()
 {
-	TRACE("inode destroyed\n");
+	TRACE("inode destroyed %lld\n", fInodeNumber);
 	write_buffer *element = fWriteBuffers;
 	while (element) {
 		write_buffer *next = element->next;
 		free(element);
 		element = next;
 	}
+
+	for (uint32 i = 0; i < fDirentCount; i++)
+		free(fDirents[i]);
+	free(fDirents);
 }
 
 
@@ -143,6 +225,35 @@ status_t
 OverlayInode::InitCheck()
 {
 	return B_OK;
+}
+
+
+status_t
+OverlayInode::Lookup(const char *name, ino_t *inodeNumber)
+{
+	if (strcmp(name, ".") == 0) {
+		*inodeNumber = fInodeNumber;
+		return get_vnode(SuperVolume(), *inodeNumber, NULL);
+	}
+
+	if (fIsVirtual && strcmp(name, "..") == 0) {
+		*inodeNumber = fParentDir->InodeNumber();
+		return get_vnode(Volume(), *inodeNumber, NULL);
+	}
+
+	for (uint32 i = 0; i < fDirentCount; i++) {
+		if (strcmp(fDirents[i]->name, name) == 0) {
+			*inodeNumber = fDirents[i]->inode_number;
+			return get_vnode(SuperVolume(), *inodeNumber, NULL);
+		}
+	}
+
+	if (!fHasDirents && !fIsVirtual && fSuperVnode.ops->lookup != NULL) {
+		return fSuperVnode.ops->lookup(SuperVolume(), &fSuperVnode, name,
+			inodeNumber);
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -180,7 +291,7 @@ OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 		fStat.st_size = stat->st_size;
 
 	if (statMask & B_STAT_MODE)
-		fStat.st_mode = stat->st_mode;
+		fStat.st_mode = (fStat.st_mode & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
 	if (statMask & B_STAT_UID)
 		fStat.st_uid = stat->st_uid;
 	if (statMask & B_STAT_GID)
@@ -203,8 +314,30 @@ OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 
 
 status_t
+OverlayInode::Create(const char *name, int openMode, int perms, void **cookie,
+	ino_t *newInodeNumber)
+{
+	OverlayInode *newNode = NULL;
+	status_t result = _CreateCommon(name, S_IFREG, perms, newInodeNumber,
+		&newNode);
+	if (result != B_OK)
+		return result;
+
+	return newNode->Open(openMode, cookie);
+}
+
+
+status_t
 OverlayInode::Open(int openMode, void **_cookie)
 {
+	if (fIsVirtual) {
+		if (openMode & O_TRUNC)
+			fStat.st_size = 0;
+
+		*_cookie = NULL;
+		return B_OK;
+	}
+
 	if (fSuperVnode.ops->open == NULL)
 		return B_UNSUPPORTED;
 
@@ -243,6 +376,9 @@ OverlayInode::Open(int openMode, void **_cookie)
 status_t
 OverlayInode::Close(void *_cookie)
 {
+	if (fIsVirtual)
+		return B_OK;
+
 	open_cookie *cookie = (open_cookie *)_cookie;
 	return fSuperVnode.ops->close(SuperVolume(), &fSuperVnode,
 		cookie->super_cookie);
@@ -252,6 +388,9 @@ OverlayInode::Close(void *_cookie)
 status_t
 OverlayInode::FreeCookie(void *_cookie)
 {
+	if (fIsVirtual)
+		return B_OK;
+
 	open_cookie *cookie = (open_cookie *)_cookie;
 	status_t result = fSuperVnode.ops->free_cookie(SuperVolume(),
 		&fSuperVnode, cookie->super_cookie);
@@ -396,12 +535,325 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 }
 
 
+status_t
+OverlayInode::CreateDir(const char *name, int perms, ino_t *newInodeNumber)
+{
+	return _CreateCommon(name, S_IFDIR, perms, newInodeNumber, NULL);
+}
+
+
+status_t
+OverlayInode::RemoveDir(const char *name)
+{
+	return RemoveEntry(name, NULL);
+}
+
+
+status_t
+OverlayInode::OpenDir(void **cookie)
+{
+	if (!fHasDirents)
+		_PopulateDirents();
+
+	open_dir_cookie *dirCookie = (open_dir_cookie *)malloc(
+		sizeof(open_dir_cookie));
+	if (dirCookie == NULL)
+		return B_NO_MEMORY;
+
+	dirCookie->index = 0;
+	*cookie = dirCookie;
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::CloseDir(void *cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::FreeDirCookie(void *cookie)
+{
+	free(cookie);
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::ReadDir(void *cookie, struct dirent *buffer, size_t bufferSize,
+	uint32 *num)
+{
+	open_dir_cookie *dirCookie = (open_dir_cookie *)cookie;
+	if (dirCookie->index >= fDirentCount) {
+		*num = 0;
+		return B_OK;
+	}
+
+	overlay_dirent *dirent = fDirents[dirCookie->index++];
+	size_t nameLength = MIN(strlen(dirent->name),
+		bufferSize - sizeof(struct dirent)) + 1;
+
+	buffer->d_dev = SuperVolume()->id;
+	buffer->d_pdev = 0;
+	buffer->d_ino = dirent->inode_number;
+	buffer->d_pino = 0;
+	buffer->d_reclen = sizeof(struct dirent) + nameLength;
+	strlcpy(buffer->d_name, dirent->name, nameLength);
+
+	*num = 1;
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::RewindDir(void *cookie)
+{
+	open_dir_cookie *dirCookie = (open_dir_cookie *)cookie;
+	dirCookie->index = 0;
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::CreateSymlink(const char *name, const char *path, int perms)
+{
+	OverlayInode *newNode = NULL;
+	status_t result = _CreateCommon(name, S_IFLNK, perms, NULL, &newNode);
+	if (result != B_OK)
+		return result;
+
+	size_t writeLength = strlen(path);
+	return newNode->Write(NULL, 0, path, &writeLength);
+}
+
+
+status_t
+OverlayInode::ReadSymlink(char *buffer, size_t *bufferSize)
+{
+	if (fIsVirtual) {
+		if (!S_ISLNK(fStat.st_mode))
+			return B_BAD_VALUE;
+
+		return Read(NULL, 0, buffer, bufferSize);
+	}
+
+	if (fSuperVnode.ops->read_symlink == NULL)
+		return B_UNSUPPORTED;
+
+	return fSuperVnode.ops->read_symlink(SuperVolume(), &fSuperVnode, buffer,
+		bufferSize);
+}
+
+
+status_t
+OverlayInode::AddEntry(overlay_dirent *entry)
+{
+	if (!fHasDirents)
+		_PopulateDirents();
+
+	for (uint32 i = 0; i < fDirentCount; i++)
+		if (strcmp(fDirents[i]->name, entry->name) == 0)
+			return B_FILE_EXISTS;
+
+	overlay_dirent **newDirents = (overlay_dirent **)realloc(fDirents,
+		sizeof(overlay_dirent *) * (fDirentCount + 1));
+	if (newDirents == NULL)
+		return B_NO_MEMORY;
+
+	fDirents = newDirents;
+	fDirents[fDirentCount++] = entry;
+
+	notify_entry_created(SuperVolume()->id, fInodeNumber, entry->name,
+		entry->inode_number);
+
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
+{
+	if (!fHasDirents)
+		_PopulateDirents();
+
+	for (uint32 i = 0; i < fDirentCount; i++) {
+		overlay_dirent *entry = fDirents[i];
+		if (strcmp(entry->name, name) == 0) {
+			for (uint32 j = i + 1; j < fDirentCount; j++)
+				fDirents[j - 1] = fDirents[j];
+			fDirentCount--;
+
+			notify_entry_removed(SuperVolume()->id, fInodeNumber, entry->name,
+				entry->inode_number);
+
+			if (_entry != NULL)
+				*_entry = entry;
+			else {
+				free(entry->name);
+				free(entry);
+			}
+
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+OverlayInode::_PopulateDirents()
+{
+	if (fHasDirents)
+		return B_OK;
+
+	if (fIsVirtual || fSuperVnode.ops->open_dir == NULL
+		|| fSuperVnode.ops->read_dir == NULL) {
+		fDirents = (overlay_dirent **)malloc(sizeof(overlay_dirent *) * 2);
+		if (fDirents == NULL)
+			return B_NO_MEMORY;
+
+		const char *names[] = { ".", ".." };
+		ino_t inodes[] = { fInodeNumber,
+			fParentDir != NULL ? fParentDir->InodeNumber() : 0 };
+		for (uint32 i = 0; i < 2; i++) {
+			fDirents[i] = (overlay_dirent *)malloc(sizeof(overlay_dirent));
+			if (fDirents[i] == NULL)
+				return B_NO_MEMORY;
+
+			fDirents[i]->inode_number = inodes[i];
+			fDirents[i]->name = strdup(names[i]);
+			if (fDirents[i]->name == NULL) {
+				free(fDirents[i]);
+				return B_NO_MEMORY;
+			}
+
+			fDirentCount++;
+		}
+
+		fHasDirents = true;
+		return B_OK;
+	}
+
+	fHasDirents = true;
+	void *superCookie = NULL;
+	status_t result = fSuperVnode.ops->open_dir(SuperVolume(),
+		&fSuperVnode, &superCookie);
+	if (result != B_OK)
+		return result;
+
+	size_t bufferSize = sizeof(struct dirent) + B_FILE_NAME_LENGTH;
+	struct dirent *buffer = (struct dirent *)malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	while (result == B_OK) {
+		uint32 num = 1;
+		result = fSuperVnode.ops->read_dir(SuperVolume(),
+			&fSuperVnode, superCookie, buffer, bufferSize, &num);
+		if (result != B_OK || num == 0)
+			break;
+
+		overlay_dirent **newDirents = (overlay_dirent **)realloc(fDirents,
+			sizeof(overlay_dirent *) * (fDirentCount + num));
+		if (newDirents == NULL)
+			break;
+
+		fDirents = newDirents;
+		struct dirent *dirent = buffer;
+		for (uint32 i = 0; i < num; i++) {
+			overlay_dirent *entry = (overlay_dirent *)malloc(
+				sizeof(overlay_dirent));
+			if (entry == NULL)
+				break;
+
+			entry->inode_number = dirent->d_ino;
+			entry->name = strdup(dirent->d_name);
+			if (entry->name == NULL) {
+				free(entry);
+				break;
+			}
+
+			fDirents[fDirentCount++] = entry;
+			dirent = (struct dirent *)((uint8 *)dirent + dirent->d_reclen);
+		}
+	}
+
+	if (fSuperVnode.ops->close_dir != NULL)
+		fSuperVnode.ops->close_dir(SuperVolume(), &fSuperVnode, superCookie);
+
+	if (fSuperVnode.ops->free_dir_cookie != NULL)
+		fSuperVnode.ops->free_dir_cookie(SuperVolume(), &fSuperVnode, superCookie);
+
+	free(buffer);
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::_CreateCommon(const char *name, int type, int perms,
+	ino_t *newInodeNumber, OverlayInode **_node)
+{
+	if (!fHasStat)
+		ReadStat(NULL);
+
+	if (!S_ISDIR(fStat.st_mode))
+		return B_NOT_A_DIRECTORY;
+
+	overlay_dirent *entry = (overlay_dirent *)malloc(sizeof(overlay_dirent));
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	entry->name = strdup(name);
+	if (entry->name == NULL) {
+		free(entry);
+		return B_NO_MEMORY;
+	}
+
+	entry->inode_number = fVolume->BuildInodeNumber();
+
+	OverlayInode *node = new(std::nothrow) OverlayInode(fVolume, NULL,
+		entry->inode_number, this, perms | type);
+	if (node == NULL) {
+		free(entry->name);
+		free(entry);
+		return B_NO_MEMORY;
+	}
+
+	status_t result = AddEntry(entry);
+	if (result != B_OK) {
+		free(entry->name);
+		free(entry);
+		delete node;
+	}
+
+	result = publish_overlay_vnode(fVolume->Volume(), entry->inode_number,
+		node, type);
+	if (result != B_OK) {
+		RemoveEntry(entry->name, NULL);
+		delete node;
+		return result;
+	}
+
+	if (newInodeNumber != NULL)
+		*newInodeNumber = entry->inode_number;
+	if (_node != NULL)
+		*_node = node;
+
+	return B_OK;
+}
+
+
 //	#pragma mark - vnode ops
 
 
 #define OVERLAY_CALL(op, params...) \
 	TRACE("relaying op: " #op "\n"); \
 	OverlayInode *node = (OverlayInode *)vnode->private_node; \
+	if (node->IsVirtual()) \
+		return B_UNSUPPORTED; \
 	fs_vnode *superVnode = node->SuperVnode(); \
 	if (superVnode->ops->op != NULL) \
 		return superVnode->ops->op(volume->super_volume, superVnode, params);
@@ -410,10 +862,15 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 static status_t
 overlay_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 {
+	TRACE("put_vnode\n");
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	fs_vnode *superVnode = node->SuperVnode();
+	if (node->IsVirtual()) {
+		delete node;
+		return B_OK;
+	}
 
 	status_t result = B_OK;
+	fs_vnode *superVnode = node->SuperVnode();
 	if (superVnode->ops->put_vnode != NULL) {
 		result = superVnode->ops->put_vnode(volume->super_volume, superVnode,
 			reenter);
@@ -427,10 +884,15 @@ overlay_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 static status_t
 overlay_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 {
+	TRACE("remove_vnode\n");
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	fs_vnode *superVnode = node->SuperVnode();
+	if (node->IsVirtual()) {
+		delete node;
+		return B_OK;
+	}
 
 	status_t result = B_OK;
+	fs_vnode *superVnode = node->SuperVnode();
 	if (superVnode->ops->remove_vnode != NULL) {
 		result = superVnode->ops->remove_vnode(volume->super_volume, superVnode,
 			reenter);
@@ -451,8 +913,12 @@ overlay_get_super_vnode(fs_volume *volume, fs_vnode *vnode,
 	}
 
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	fs_vnode *superVnode = node->SuperVnode();
+	if (node->IsVirtual()) {
+		*_superVnode = *vnode;
+		return B_OK;
+	}
 
+	fs_vnode *superVnode = node->SuperVnode();
 	if (superVnode->ops->get_super_vnode != NULL) {
 		return superVnode->ops->get_super_vnode(volume->super_volume,
 			superVnode, superVolume, _superVnode);
@@ -466,8 +932,8 @@ overlay_get_super_vnode(fs_volume *volume, fs_vnode *vnode,
 static status_t
 overlay_lookup(fs_volume *volume, fs_vnode *vnode, const char *name, ino_t *id)
 {
-	OVERLAY_CALL(lookup, name, id)
-	return B_UNSUPPORTED;
+	TRACE("lookup: \"%s\"\n", name);
+	return ((OverlayInode *)vnode->private_node)->Lookup(name, id);
 }
 
 
@@ -574,12 +1040,6 @@ overlay_deselect(fs_volume *volume, fs_vnode *vnode, void *cookie, uint8 event,
 static status_t
 overlay_fsync(fs_volume *volume, fs_vnode *vnode)
 {
-	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	fs_vnode *superVnode = node->SuperVnode();
-
-	if (superVnode->ops->fsync != NULL)
-		return superVnode->ops->fsync(volume->super_volume, superVnode);
-
 	return B_OK;
 }
 
@@ -588,8 +1048,9 @@ static status_t
 overlay_read_symlink(fs_volume *volume, fs_vnode *vnode, char *buffer,
 	size_t *bufferSize)
 {
-	OVERLAY_CALL(read_symlink, buffer, bufferSize)
-	return B_UNSUPPORTED;
+	TRACE("read_symlink\n");
+	return ((OverlayInode *)vnode->private_node)->ReadSymlink(buffer,
+		bufferSize);
 }
 
 
@@ -597,8 +1058,9 @@ static status_t
 overlay_create_symlink(fs_volume *volume, fs_vnode *vnode, const char *name,
 	const char *path, int mode)
 {
-	OVERLAY_CALL(create_symlink, name, path, mode)
-	return B_UNSUPPORTED;
+	TRACE("create_symlink: \"%s\" -> \"%s\"\n", name, path);
+	return ((OverlayInode *)vnode->private_node)->CreateSymlink(name, path,
+		mode);
 }
 
 
@@ -606,7 +1068,6 @@ static status_t
 overlay_link(fs_volume *volume, fs_vnode *vnode, const char *name,
 	fs_vnode *target)
 {
-	OVERLAY_CALL(link, name, target)
 	return B_UNSUPPORTED;
 }
 
@@ -614,31 +1075,64 @@ overlay_link(fs_volume *volume, fs_vnode *vnode, const char *name,
 static status_t
 overlay_unlink(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
-	OVERLAY_CALL(unlink, name)
-	return B_UNSUPPORTED;
+	TRACE("unlink: \"%s\"\n", name);
+	return ((OverlayInode *)vnode->private_node)->RemoveEntry(name, NULL);
 }
 
 
 static status_t
 overlay_rename(fs_volume *volume, fs_vnode *vnode,
-	const char *fromName, fs_vnode *toDir, const char *toName)
+	const char *fromName, fs_vnode *toVnode, const char *toName)
 {
-	OVERLAY_CALL(rename, fromName, toDir, toName)
-	return B_UNSUPPORTED;
+	TRACE("rename: \"%s\" -> \"%s\"\n", fromName, toName);
+	OverlayInode *fromNode = (OverlayInode *)vnode->private_node;
+	OverlayInode *toNode = (OverlayInode *)toVnode->private_node;
+	overlay_dirent *entry = NULL;
+
+	status_t result = fromNode->RemoveEntry(fromName, &entry);
+	if (result != B_OK)
+		return result;
+
+	char *oldName = entry->name;
+	entry->name = strdup(toName);
+	if (entry->name == NULL) {
+		entry->name = oldName;
+		if (fromNode->AddEntry(entry) != B_OK) {
+			free(entry->name);
+			free(entry);
+		}
+
+		return B_NO_MEMORY;
+	}
+
+	result = toNode->AddEntry(entry);
+	if (result != B_OK) {
+		free(entry->name);
+		entry->name = oldName;
+		if (fromNode->AddEntry(entry) != B_OK) {
+			free(entry->name);
+			free(entry);
+		}
+
+		return result;
+	}
+
+	return B_OK;
 }
 
 
 static status_t
 overlay_access(fs_volume *volume, fs_vnode *vnode, int mode)
 {
-	OVERLAY_CALL(access, mode)
-	return B_UNSUPPORTED;
+	// TODO: implement
+	return B_OK;
 }
 
 
 static status_t
 overlay_read_stat(fs_volume *volume, fs_vnode *vnode, struct stat *stat)
 {
+	TRACE("read_stat\n");
 	return ((OverlayInode *)vnode->private_node)->ReadStat(stat);
 }
 
@@ -647,6 +1141,7 @@ static status_t
 overlay_write_stat(fs_volume *volume, fs_vnode *vnode, const struct stat *stat,
 	uint32 statMask)
 {
+	TRACE("write_stat\n");
 	return ((OverlayInode *)vnode->private_node)->WriteStat(stat, statMask);
 }
 
@@ -655,14 +1150,16 @@ static status_t
 overlay_create(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int openMode, int perms, void **cookie, ino_t *newVnodeID)
 {
-	OVERLAY_CALL(create, name, openMode, perms, cookie, newVnodeID)
-	return B_UNSUPPORTED;
+	TRACE("create: \"%s\"\n", name);
+	return ((OverlayInode *)vnode->private_node)->Create(name, openMode,
+		perms, cookie, newVnodeID);
 }
 
 
 static status_t
 overlay_open(fs_volume *volume, fs_vnode *vnode, int openMode, void **cookie)
 {
+	TRACE("open\n");
 	return ((OverlayInode *)vnode->private_node)->Open(openMode, cookie);
 }
 
@@ -670,6 +1167,7 @@ overlay_open(fs_volume *volume, fs_vnode *vnode, int openMode, void **cookie)
 static status_t
 overlay_close(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
+	TRACE("close\n");
 	return ((OverlayInode *)vnode->private_node)->Close(cookie);
 }
 
@@ -677,6 +1175,7 @@ overlay_close(fs_volume *volume, fs_vnode *vnode, void *cookie)
 static status_t
 overlay_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
+	TRACE("free_cookie\n");
 	return ((OverlayInode *)vnode->private_node)->FreeCookie(cookie);
 }
 
@@ -685,6 +1184,7 @@ static status_t
 overlay_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
+	TRACE("read\n");
 	return ((OverlayInode *)vnode->private_node)->Read(cookie, pos, buffer,
 		length);
 }
@@ -694,6 +1194,7 @@ static status_t
 overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const void *buffer, size_t *length)
 {
+	TRACE("write\n");
 	return ((OverlayInode *)vnode->private_node)->Write(cookie, pos, buffer,
 		length);
 }
@@ -703,40 +1204,41 @@ static status_t
 overlay_create_dir(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int perms, ino_t *newVnodeID)
 {
-	OVERLAY_CALL(create_dir, name, perms, newVnodeID)
-	return B_UNSUPPORTED;
+	TRACE("create_dir: \"%s\"\n", name);
+	return ((OverlayInode *)vnode->private_node)->CreateDir(name, perms,
+		newVnodeID);
 }
 
 
 static status_t
 overlay_remove_dir(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
-	OVERLAY_CALL(remove_dir, name)
-	return B_UNSUPPORTED;
+	TRACE("remove_dir: \"%s\"\n", name);
+	return ((OverlayInode *)vnode->private_node)->RemoveDir(name);
 }
 
 
 static status_t
 overlay_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
-	OVERLAY_CALL(open_dir, cookie)
-	return B_UNSUPPORTED;
+	TRACE("open_dir\n");
+	return ((OverlayInode *)vnode->private_node)->OpenDir(cookie);
 }
 
 
 static status_t
 overlay_close_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(close_dir, cookie)
-	return B_UNSUPPORTED;
+	TRACE("close_dir\n");
+	return ((OverlayInode *)vnode->private_node)->CloseDir(cookie);
 }
 
 
 static status_t
 overlay_free_dir_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(free_dir_cookie, cookie)
-	return B_UNSUPPORTED;
+	TRACE("free_dir_cookie\n");
+	return ((OverlayInode *)vnode->private_node)->FreeDirCookie(cookie);
 }
 
 
@@ -744,16 +1246,17 @@ static status_t
 overlay_read_dir(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
-	OVERLAY_CALL(read_dir, cookie, buffer, bufferSize, num)
-	return B_UNSUPPORTED;
+	TRACE("read_dir\n");
+	return ((OverlayInode *)vnode->private_node)->ReadDir(cookie, buffer,
+		bufferSize, num);
 }
 
 
 static status_t
 overlay_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(rewind_dir, cookie)
-	return B_UNSUPPORTED;
+	TRACE("rewind_dir\n");
+	return ((OverlayInode *)vnode->private_node)->RewindDir(cookie);
 }
 
 
@@ -1311,6 +1814,15 @@ static file_system_module_info sOverlayFileSystem = {
 	NULL, // set_content_parameters
 	NULL // initialize
 };
+
+
+status_t
+publish_overlay_vnode(fs_volume *volume, ino_t inodeNumber, void *privateNode,
+	int type)
+{
+	return publish_vnode(volume, inodeNumber, privateNode, &sOverlayVnodeOps,
+		type, 0);
+}
 
 }	// namespace write_overlay
 
