@@ -127,7 +127,7 @@ status_t
 BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 	size_t length) const
 {
-	if (length <= 0 && descriptor == NULL)
+	if (length <= 0 || descriptor == NULL)
 		return B_BAD_VALUE;
 
 	usb_raw_command command;
