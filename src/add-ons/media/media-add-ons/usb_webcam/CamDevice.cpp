@@ -35,6 +35,8 @@ struct { const char *name; SensorInstFunc instfunc; } kSensorTable[] = {
 CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	: fInitStatus(B_NO_INIT),
 	  fSensor(NULL),
+	  fBulkIn(NULL),
+	  fIsoIn(NULL),
 	  fLastParameterChanges(0),
 	  fCamDeviceAddon(_addon),
 	  fDevice(_device),
@@ -104,6 +106,7 @@ CamDevice::Unplugged()
 {
 	fDevice = NULL;
 	fBulkIn = NULL;
+	fIsoIn = NULL;
 }
 
 
@@ -539,7 +542,7 @@ CamDevice::DataPumpThread()
 #endif
 
 			if (len <= 0) {
-				PRINT((CH ": BulkIn: %s" CT, strerror(len)));
+				PRINT((CH ": IsoIn: %s" CT, strerror(len)));
 				break;
 			}
 
