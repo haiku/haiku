@@ -84,6 +84,7 @@ DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 viewMode,
 	uint32 resizeMask)
 	:	BPoseView(model, frame, viewMode, resizeMask)
 {
+	SetWidgetTextOutline(true);
 }
 
 
