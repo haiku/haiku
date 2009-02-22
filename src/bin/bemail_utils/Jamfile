@@ -28,7 +28,7 @@ Package haiku-maildaemon-cvs :
 
 StdBinCommands
 	spamdbm.cpp
-	: be tracker stdc++.r4 libmail.so
+	: be tracker $(TARGET_LIBSTDC++) libmail.so
 	: spamdbm.rdef
 	;
 Package haiku-maildaemon-cvs :
