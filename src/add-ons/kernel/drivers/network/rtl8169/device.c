@@ -24,6 +24,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <driver_settings.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	#include <net/if_media.h>
+#endif
+
 
 #include "debug.h"
 #include "device.h"
@@ -379,6 +383,55 @@ rtl8169_rx_int(rtl8169_device *device)
 }
 
 
+static status_t
+rtl8169_get_link_state(rtl8169_device *device)
+{
+	bool link_ok = false; 
+	bool full_duplex = false;
+	uint32 speed = 0; 
+	bool linkStateChange = false;
+	uint32 phy;
+	
+	dump_phy_stat(device);
+	print_link_status(device);
+
+	phy = read8(REG_PHY_STAT);
+	if (phy & PHY_STAT_EnTBI) {
+		link_ok = (read32(REG_TBICSR) & TBICSR_TBILinkOk);
+		if (link_ok) {
+			speed = 1000000;
+			full_duplex = true;
+		}
+	} else {
+		if (phy & PHY_STAT_LinkSts) {
+			link_ok = true;
+			if (phy & PHY_STAT_1000MF) {
+				speed = 1000000;
+				full_duplex = true;
+			} else {
+				speed = (phy & PHY_STAT_100M) ? 100000 : 10000;
+				full_duplex = (phy & PHY_STAT_FullDup);
+			}
+		}
+	}
+	
+	linkStateChange = (link_ok != device->link_ok
+		|| full_duplex != device->full_duplex 
+		|| speed != device->speed);
+		
+	device->link_ok = link_ok;
+	device->full_duplex = full_duplex;
+	device->speed = speed;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (linkStateChange && device->linkChangeSem >= B_OK)
+		release_sem_etc(device->linkChangeSem, 1, B_DO_NOT_RESCHEDULE);
+#endif
+
+	return B_OK;
+}
+
+
 static int32
 rtl8169_int(void *data)
 {
@@ -406,8 +459,7 @@ rtl8169_int(void *data)
 	}
 
 	if (stat & INT_PUN) {
-		dump_phy_stat(device);
-		print_link_status(device);
+		rtl8169_get_link_state(device);
 	}
 
 	if (stat & (INT_TOK | INT_TER)) {
@@ -571,8 +623,11 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	// configure PHY
 	phy_config(device);
 
-	dump_phy_stat(device);
-	print_link_status(device);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	device->linkChangeSem = -1;
+#endif
+
+	rtl8169_get_link_state(device);
 
 	// initialize MAC address
 	for (i = 0; i < 6; i++)
@@ -913,6 +968,37 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 			TRACE("rtl8169_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)\n", device->maxframesize,  device->maxframesize - 14);
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		case ETHER_GET_LINK_STATE:
+		{
+			ether_link_state_t state;
+			
+			state.media = IFM_ETHER;
+			state.media |= (device->link_ok ? IFM_ACTIVE : 0);
+			state.media |= (device->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
+			if (device->speed == 1000000)
+				state.media |= IFM_1000_T;
+			else if (device->speed == 100000)
+				state.media |= IFM_100_TX;
+			else if (device->speed == 10000)
+				state.media |= IFM_10_T;
+		
+			state.speed = device->speed;
+			state.quality = 1000;
+
+			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
+		}
+
+		case ETHER_SET_LINK_STATE_SEM:
+		{
+			if (user_memcpy(&device->linkChangeSem, arg, sizeof(sem_id)) < B_OK) {
+				device->linkChangeSem = -1;
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
+		}
+#endif
 
 		default:
 			TRACE("rtl8169_control() Invalid command\n");

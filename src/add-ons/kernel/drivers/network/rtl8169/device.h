@@ -92,6 +92,15 @@ typedef struct {
 	int					maxframesize;
 	int					mac_version;
 	int					phy_version;
+	
+	bool				link_ok;
+	uint32				speed;
+	bool				full_duplex;
+	
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	sem_id				linkChangeSem;
+#endif
+	
 } rtl8169_device;
 
 #define read8(offset)			(*(volatile uint8 *) ((char *)(device->regAddr) + (offset)))
