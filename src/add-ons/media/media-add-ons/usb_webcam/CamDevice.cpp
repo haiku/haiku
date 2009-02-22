@@ -640,6 +640,7 @@ CamDeviceAddon::Sniff(BUSBDevice *device)
 			supported = true;
 		}
 
+#ifdef __HAIKU__
 		// we have to check all interfaces for matching class/subclass/protocol
 		for (uint32 j = 0; !supported && j < device->CountConfigurations(); j++) {
 			const BUSBConfiguration* cfg = device->ConfigurationAt(j);
@@ -658,6 +659,7 @@ CamDeviceAddon::Sniff(BUSBDevice *device)
 				}
 			}
 		}
+#endif
 
 		if (supported)
 			return i;
