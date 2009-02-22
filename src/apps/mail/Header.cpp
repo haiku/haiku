@@ -351,7 +351,6 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		}
 		r.Set(SEPARATOR_MARGIN, y - 2,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
-		r.PrintToStream();
 		field = new BMenuField(r, "account", FROM_TEXT, fAccountMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
