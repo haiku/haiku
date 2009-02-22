@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <Application.h>
 #include <Accelerant.h>
 #include <Screen.h>

@@ -494,6 +494,8 @@ static long long atoll (const char *str) {
 #include <string>
 #include <vector>
 
+using namespace std;
+
 /* BeOS (Be Operating System) headers. */
 
 #include <Alert.h>
@@ -1184,6 +1186,11 @@ private:
 };
 
 
+/* Various message codes for various buttons etc. */
+static const uint32 MSG_LINE_DOWN = 'LnDn';
+static const uint32 MSG_LINE_UP = 'LnUp';
+static const uint32 MSG_PAGE_DOWN = 'PgDn';
+static const uint32 MSG_PAGE_UP = 'PgUp';
 
 /******************************************************************************
  * This view contains the list of words.  It displays as many as can fit in the
@@ -1207,12 +1214,6 @@ public:
   virtual void Pulse ();
 
 private:
-  /* Various message codes for various buttons etc. */
-  static const uint32 MSG_LINE_DOWN = 'LnDn';
-  static const uint32 MSG_LINE_UP = 'LnUp';
-  static const uint32 MSG_PAGE_DOWN = 'PgDn';
-  static const uint32 MSG_PAGE_UP = 'PgUp';
-
   /* Our member functions. */
   void MoveTextUpOrDown (uint32 MovementType);
   void RefsDroppedHere (BMessage *MessagePntr);
@@ -1524,7 +1525,7 @@ static void DisplayErrorMessage (
  * result on the given output stream.
  */
 
-static void WrapTextToStream (ostream& OutputStream, char *TextPntr)
+static void WrapTextToStream (ostream& OutputStream, const char *TextPntr)
 {
   const int LineLength = 79;
   char     *StringPntr;

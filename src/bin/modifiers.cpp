@@ -11,29 +11,33 @@
 #include <strings.h>
 #include <InterfaceDefs.h>
 
+
 int32 modifier_bits[] = {
-B_SHIFT_KEY,
-B_COMMAND_KEY,
-B_CONTROL_KEY,
-B_CAPS_LOCK,
-B_SCROLL_LOCK,
-B_NUM_LOCK,
-B_OPTION_KEY,
-B_MENU_KEY,
-B_LEFT_SHIFT_KEY,
-B_RIGHT_SHIFT_KEY,
-B_LEFT_COMMAND_KEY,
-B_RIGHT_COMMAND_KEY,
-B_LEFT_CONTROL_KEY,
-B_RIGHT_CONTROL_KEY,
-B_LEFT_OPTION_KEY,
-B_RIGHT_OPTION_KEY,
-0
+	B_SHIFT_KEY,
+	B_COMMAND_KEY,
+	B_CONTROL_KEY,
+	B_CAPS_LOCK,
+	B_SCROLL_LOCK,
+	B_NUM_LOCK,
+	B_OPTION_KEY,
+	B_MENU_KEY,
+	B_LEFT_SHIFT_KEY,
+	B_RIGHT_SHIFT_KEY,
+	B_LEFT_COMMAND_KEY,
+	B_RIGHT_COMMAND_KEY,
+	B_LEFT_CONTROL_KEY,
+	B_RIGHT_CONTROL_KEY,
+	B_LEFT_OPTION_KEY,
+	B_RIGHT_OPTION_KEY,
+	0
 };
+
 
 const char *modifier_names[] = { "shift", "command", "control", "capslock", "scrolllock", "numlock", "option", "menu", "lshift", "rshift", "lcommand", "rcommand", "lcontrol", "rcontrol", "loption", "roption", NULL };
 
-int usage(char *progname, int error)
+
+int
+usage(char *progname, int error)
 {
 	FILE *outstr;
 	outstr = error?stderr:stdout;
@@ -43,7 +47,9 @@ int usage(char *progname, int error)
 	return error;
 }
 
-int list_modifiers(int mods)
+
+int
+list_modifiers(int mods)
 {
 	int i;
 	int gotone = 0;
@@ -61,7 +67,9 @@ int list_modifiers(int mods)
 	return 0;
 }
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
 	int32 mods;
 	int32 mask_xor = 0x0;
@@ -69,7 +77,6 @@ int main(int argc, char **argv)
 	int i, j;
 
 	mods = modifiers();
-//	printf("mods = 0x%08lx\n", mods);
 	if (argc == 1)
 		return usage(argv[0], 1);
 	for (i=1; i<argc; i++) {

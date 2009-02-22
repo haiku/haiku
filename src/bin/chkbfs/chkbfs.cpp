@@ -1,3 +1,4 @@
+#include <StorageDefs.h>
 #include "bfs_control.h"
 
 #include <fs_info.h>
