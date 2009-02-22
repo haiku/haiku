@@ -1,0 +1,92 @@
+/*
+ * Copyright 2009, Ithamar Adema, <ithamar.adema@team-embedded.nl>.
+ * Distributed under the terms of the MIT License.
+ */
+
+#ifndef _USB_VIDEO_H
+#define _USB_VIDEO_H
+
+/* Class/Subclass/Protocol */
+#define CC_VIDEO			0xE
+#define SC_UNDEFINED			0x0
+#define SC_VIDEOCONTROL			0x1
+#define SC_VIDEOSTREAMING		0x2
+#define SC_VIDEO_INTERFACE_COLLECTION	0x3
+#define PC_PROTOCOL_UNDEFINED		0x0
+
+#define CS_UNDEFINED			0x20
+#define CS_DEVICE			0x21
+#define CS_CONFIGURATION		0x22
+#define CS_STRING			0x23
+#define CS_INTERFACE			0x24
+#define CS_ENDPOINT			0x25
+
+/* Video Control Class Descriptors */
+#define VC_DESCRIPTOR_UNDEFINED		0x0
+#define VC_HEADER			0x1
+#define VC_INPUT_TERMINAL		0x2
+#define VC_OUTPUT_TERMINAL		0x3
+#define VC_SELECTOR_UNIT		0x4
+#define VC_PROCESSING_UNIT		0x5
+#define VC_EXTENSION_UNIT		0x6
+
+/* Video Streaming Class Descriptors */
+#define VS_UNDEFINED			0x00
+#define VS_INPUT_HEADER			0x01
+#define VS_OUTPUT_HEADER		0x02
+#define VS_STILL_IMAGE_FRAME		0x03
+#define VS_FORMAT_UNCOMPRESSED		0x04
+#define VS_FRAME_UNCOMPRESSED		0x05
+#define VS_FORMAT_MJPEG			0x06
+#define VS_FRAME_MJPEG			0x07
+#define VS_FORMAT_MPEG2TS		0x0a
+#define VS_FORMAT_DV			0x0c
+#define VS_COLORFORMAT			0x0d
+#define VS_FORMAT_FRAME_BASED		0x10
+#define VS_FRAME_FRAME_BASED		0x11
+#define VS_FORMAT_STREAM_BASED		0x12
+
+#define EP_UNDEFINED			0x0
+#define EP_GENERAL			0x1
+#define EP_ENDPOINT			0x2
+#define EP_INTERRUPT			0x3
+
+#define RC_UNDEFINED			0x00
+#define SET_CUR				0x01
+#define GET_CUR				0x81
+#define GET_MIN				0x82
+#define GET_MAX				0x83
+#define GET_RES				0x84
+#define GET_LEN				0x85
+#define GET_INFO			0x86
+#define GET_DEF				0x87
+
+#define VC_CONTROL_UNDEFINED		0x0
+#define VC_VIDEO_POWER_MODE_CONTROL	0x1
+#define VC_REQUEST_ERROR_CODE_CONTROL	0x2
+
+#define TE_CONTROL_UNDEFINED		0x0
+
+#define SU_CONTROL_UNDEFINED		0x0
+#define SU_INPUT_SELECT_CONTROL		0x1
+
+#define CT_CONTROL_UNDEFINED		0x0
+#define CT_SCANNING_MODE_CONTROL	0x1
+#define CT_AE_MODE_CONTROL		0x2
+#define CT_AE_PRIORITY_CONTROL		0x3
+#define CT_EXPOSURE_TIME_ABSOLUTE_CONTROL	0x4
+#define CT_EXPOSURE_TIME_RELATIVE_CONTROL	0x5
+#define CT_FOCUS_ABSOLUTE_CONTROL	0x6
+#define CT_FOCUS_RELATIVE_CONTROL	0x7
+#define CT_FOCUS_AUTO_CONTROL		0x8
+#define CT_IRIS_ABSOLUTE_CONTROL	0x9
+#define CT_IRIS_RELATIVE_CONTROL	0xa
+#define CT_ZOOM_ABSOLUTE_CONTROL	0xb
+#define CT_ZOOM_RELATIVE_CONTROL	0xc
+#define CT_PANTILT_ABSOLUTE_CONTROL	0xd
+#define CT_PANTILT_RELATIVE_CONTROL	0xe
+#define CT_ROLL_ABSOLUTE_CONTROL	0xf
+#define CT_ROLL_RELATIVE_CONTROL	0x10
+#define CT_PRIVACY_CONTROL		0x11
+
+#endif /* _USB_VIDEO_H */
