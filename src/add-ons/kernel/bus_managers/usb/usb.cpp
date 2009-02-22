@@ -16,6 +16,25 @@
 Stack *gUSBStack = NULL;
 
 
+static int
+debug_get_pipe_for_id(int argc, char **argv)
+{
+	if (gUSBStack == NULL)
+		return 1;
+
+	if (!is_debug_variable_defined("_usbPipeID"))
+		return 2;
+
+	uint64 id = get_debug_variable("_usbPipeID", 0);
+	Object *object = gUSBStack->GetObjectNoLock((usb_id)id);
+	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
+		return 3;
+
+	set_debug_variable("_usbPipe", (uint64)object);
+	return 0;
+}
+
+
 static int32
 bus_std_ops(int32 op, ...)
 {
@@ -58,6 +77,9 @@ bus_std_ops(int32 op, ...)
 			}
 
 			gUSBStack = stack;
+			add_debugger_command("get_usb_pipe_for_id",
+				&debug_get_pipe_for_id,
+				"Gets the config for a USB pipe");
 #ifndef __HAIKU__
 			// Plain R5 workaround, see comment above.
 			shared = create_area("shared usb stack", &address,
@@ -73,6 +95,8 @@ bus_std_ops(int32 op, ...)
 			TRACE_MODULE("uninit\n");
 			delete gUSBStack;
 			gUSBStack = NULL;
+			remove_debugger_command("get_usb_pipe_for_id",
+				&debug_get_pipe_for_id);
 			break;
 
 		default:

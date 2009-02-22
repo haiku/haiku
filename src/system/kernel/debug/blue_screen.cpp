@@ -9,6 +9,7 @@
 #include <KernelExport.h>
 #include <frame_buffer_console.h>
 #include <console.h>
+#include <debug.h>
 #include <arch/debug_console.h>
 
 #include <string.h>
@@ -139,7 +140,7 @@ next_line(void)
 				text[i], sScreen.boot_debug_output ? 0x6f : 0xf6);
 		}
 
-		char c = blue_screen_getchar();
+		char c = kgetc();
 		if (c == 's') {
 			sScreen.ignore_output = true;
 		} else if (c == 'q' && in_command_invocation()) {

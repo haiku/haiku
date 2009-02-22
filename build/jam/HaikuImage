@@ -156,7 +156,8 @@ AddFilesToHaikuImage beos system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage beos system add-ons kernel debugger
-	: $(X86_ONLY)<kdebug>disasm <kdebug>hangman <kdebug>invalidate_on_exit ;
+	: $(X86_ONLY)<kdebug>disasm <kdebug>hangman <kdebug>invalidate_on_exit
+	<kdebug>usb_keyboard ;
 AddFilesToHaikuImage beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage beos system add-ons kernel generic

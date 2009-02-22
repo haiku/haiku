@@ -10,9 +10,24 @@
 #include "KeyboardDevice.h"
 #include <string.h>
 #include <usb/USB_hid.h>
+#include <debug.h>
 
 // input server private for raw_key_info, KB_READ, etc...
 #include "kb_mouse_driver.h"
+
+
+static usb_id sDebugKeyboardPipe = 0;
+static size_t sDebugKeyboardReportSize = 0;
+static int32 sDebuggerCommandAdded = 0;
+
+
+static int
+debug_get_keyboard_config(int argc, char **argv)
+{
+	set_debug_variable("_usbPipeID", (uint64)sDebugKeyboardPipe);
+	set_debug_variable("_usbReportSize", (uint64)sDebugKeyboardReportSize);
+	return 0;
+}
 
 
 KeyboardDevice::KeyboardDevice(usb_device device, usb_pipe interruptPipe,
@@ -34,12 +49,23 @@ KeyboardDevice::KeyboardDevice(usb_device device, usb_pipe interruptPipe,
 	}
 
 	SetBaseName("input/keyboard/usb/");
+
+	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
+		add_debugger_command("get_usb_keyboard_config",
+			&debug_get_keyboard_config,
+			"Gets the required config of the USB keyboard");
+	}
 }
 
 
 KeyboardDevice::~KeyboardDevice()
 {
 	free(fLastTransferBuffer);
+
+	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
+		remove_debugger_command("get_usb_keyboard_config",
+			&debug_get_keyboard_config);
+	}
 }
 
 
@@ -410,9 +436,13 @@ KeyboardDevice::_InterpretBuffer()
 				key = KEY_Break;
 			else if (key == 0xe && (current[0] & 1))
 				key = KEY_SysRq;
-#if 0
-			else if (keyDown && key == 0x0d) // ToDo: remove again
+#if 1
+			else if (keyDown && key == 0x0d) {
+				// ToDo: remove again
+				sDebugKeyboardPipe = fInterruptPipe;
+				sDebugKeyboardReportSize = fTotalReportSize;
 				panic("keyboard requested halt.\n");
+			}
 #endif
 			else if (key == 0) {
 				// unmapped key

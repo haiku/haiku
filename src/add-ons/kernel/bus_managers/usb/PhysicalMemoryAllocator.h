@@ -57,6 +57,12 @@ private:
 		size_t						*fArrayLength;
 		size_t						*fArrayOffset;
 		uint8						**fArray;
+
+#if KDEBUG
+		uint32						fDebugBase;
+		uint32						fDebugChunkSize;
+		uint64						fDebugUseMap;
+#endif
 };
 
 #endif // !_PHYSICAL_MEMORY_ALLOCATOR_H_

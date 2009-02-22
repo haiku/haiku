@@ -408,27 +408,8 @@ read_line(char* buffer, int32 maxLength,
 	bool done = false;
 	char c = 0;
 
-	char (*readChar)(void);
-	if (sBlueScreenOutput)
-		readChar = blue_screen_getchar;
-	else
-		readChar = arch_debug_serial_getchar;
-
 	while (!done) {
-		bool hasChar = false;
-		for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
-			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
-				int getChar = sDebuggerModules[i]->debugger_getchar();
-				if (getChar >= 0) {
-					hasChar = true;
-					c = (char)getChar;
-					break;
-				}
-			}
-		}
-
-		if (!hasChar)
-			c = readChar();
+		c = kgetc();
 
 		switch (c) {
 			case '\n':
@@ -487,12 +468,12 @@ read_line(char* buffer, int32 maxLength,
 				}
 				break;
 			case 27: // escape sequence
-				c = readChar();
+				c = kgetc();
 				if (c != '[') {
 					// ignore broken escape sequence
 					break;
 				}
-				c = readChar();
+				c = kgetc();
 				switch (c) {
 					case 'C': // right arrow
 						if (position < length) {
@@ -548,7 +529,7 @@ read_line(char* buffer, int32 maxLength,
 					case '5':	// if "5~", it's PAGE UP
 					case '6':	// if "6~", it's PAGE DOWN
 					{
-						if (readChar() != '~')
+						if (kgetc() != '~')
 							break;
 
 						// PAGE UP: search backward, PAGE DOWN: forward
@@ -603,7 +584,7 @@ read_line(char* buffer, int32 maxLength,
 					}
 					case '3':	// if "3~", it's DEL
 					{
-						if (readChar() != '~')
+						if (kgetc() != '~')
 							break;
 
 						if (position < length)
@@ -646,6 +627,25 @@ read_line(char* buffer, int32 maxLength,
 	}
 
 	return length;
+}
+
+
+char
+kgetc(void)
+{
+	// give the kernel debugger modules a chance first
+	for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
+			int getChar = sDebuggerModules[i]->debugger_getchar();
+			if (getChar >= 0)
+				return (char)getChar;
+		}
+	}
+
+	if (sBlueScreenOutput)
+		return blue_screen_getchar();
+
+	return arch_debug_serial_getchar();
 }
 
 

@@ -206,6 +206,15 @@ Stack::GetObject(usb_id id)
 }
 
 
+Object *
+Stack::GetObjectNoLock(usb_id id)
+{
+	if (id >= fObjectMaxCount)
+		return NULL;
+	return fObjectArray[id];
+}
+
+
 int32
 Stack::ExploreThread(void *data)
 {

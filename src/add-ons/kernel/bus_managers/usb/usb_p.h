@@ -126,6 +126,9 @@ public:
 		void							PutUSBID(usb_id id);
 		Object *						GetObject(usb_id id);
 
+		// only for the kernel debugger
+		Object *						GetObjectNoLock(usb_id id);
+
 		void							AddBusManager(BusManager *bus);
 		int32							IndexOfBusManager(BusManager *bus);
 		BusManager *					BusManagerAt(int32 index);

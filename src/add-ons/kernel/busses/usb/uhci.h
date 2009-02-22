@@ -20,6 +20,7 @@
 #define UHCI_FULL_SPEED_CONTROL_QUEUE		2
 #define UHCI_BULK_QUEUE						3
 #define UHCI_BANDWIDTH_RECLAMATION_QUEUE	4
+#define UHCI_DEBUG_QUEUE					4
 
 struct pci_info;
 struct pci_module_info;
@@ -39,8 +40,10 @@ public:
 		status_t					LinkTo(Queue *other);
 		status_t					TerminateByStrayDescriptor();
 
-		status_t					AppendTransfer(uhci_qh *transfer);
-		status_t					RemoveTransfer(uhci_qh *transfer);
+		status_t					AppendTransfer(uhci_qh *transfer,
+										bool lock = true);
+		status_t					RemoveTransfer(uhci_qh *transfer,
+										bool lock = true);
 
 		addr_t						PhysicalAddress();
 
@@ -94,6 +97,7 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
+		status_t					ProcessDebugTransfer(Transfer *transfer);
 virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
 		status_t					SubmitRequest(Transfer *transfer);

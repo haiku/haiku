@@ -19,6 +19,33 @@
 
 pci_module_info *UHCI::sPCIModule = NULL;
 
+static int32 sDebuggerCommandAdded = 0;
+
+
+static int
+debug_process_transfer(int argc, char **argv)
+{
+	Pipe *pipe = (Pipe *)get_debug_variable("_usbPipe", 0);
+	if (pipe == NULL)
+		return 2;
+
+	// check if we have a UHCI bus at all
+	if (pipe->GetBusManager()->TypeName()[0] != 'u')
+		return 3;
+
+	uint8 *data = (uint8 *)get_debug_variable("_usbTransferData", 0);
+	if (data == NULL)
+		return 4;
+
+	size_t length = (size_t)get_debug_variable("_usbTransferLength", 0);
+	if (length == 0)
+		return 5;
+
+	Transfer transfer(pipe);
+	transfer.SetData(data, length);
+	return ((UHCI *)pipe->GetBusManager())->ProcessDebugTransfer(&transfer);
+}
+
 
 static int32
 uhci_std_ops(int32 op, ...)
@@ -197,9 +224,9 @@ Queue::TerminateByStrayDescriptor()
 
 
 status_t
-Queue::AppendTransfer(uhci_qh *transfer)
+Queue::AppendTransfer(uhci_qh *transfer, bool lock)
 {
-	if (!Lock())
+	if (lock && !Lock())
 		return B_ERROR;
 
 	transfer->link_log = NULL;
@@ -219,15 +246,16 @@ Queue::AppendTransfer(uhci_qh *transfer)
 		element->link_phy = transfer->this_phy | QH_NEXT_IS_QH;
 	}
 
-	Unlock();
+	if (lock)
+		Unlock();
 	return B_OK;
 }
 
 
 status_t
-Queue::RemoveTransfer(uhci_qh *transfer)
+Queue::RemoveTransfer(uhci_qh *transfer, bool lock)
 {
-	if (!Lock())
+	if (lock && !Lock())
 		return B_ERROR;
 
 	if (fQueueTop == transfer) {
@@ -241,7 +269,8 @@ Queue::RemoveTransfer(uhci_qh *transfer)
 			fQueueHead->element_phy = transfer->link_phy;
 		}
 
-		Unlock();
+		if (lock)
+			Unlock();
 		return B_OK;
 	} else {
 		uhci_qh *element = fQueueTop;
@@ -249,7 +278,8 @@ Queue::RemoveTransfer(uhci_qh *transfer)
 			if (element->link_log == transfer) {
 				element->link_log = transfer->link_log;
 				element->link_phy = transfer->link_phy;
-				Unlock();
+				if (lock)
+					Unlock();
 				return B_OK;
 			}
 
@@ -257,7 +287,8 @@ Queue::RemoveTransfer(uhci_qh *transfer)
 		}
 	}
 
-	Unlock();
+	if (lock)
+		Unlock();
 	return B_BAD_VALUE;
 }
 
@@ -374,8 +405,9 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// 1: low speed control transfers
 	// 2: full speed control transfers
 	// 3: bulk transfers
+	// 4: debug queue
 	// TODO: 4: bandwidth reclamation queue
-	fQueueCount = 4;
+	fQueueCount = 5;
 	fQueues = new(std::nothrow) Queue *[fQueueCount];
 	if (!fQueues) {
 		delete_area(fFrameArea);
@@ -462,6 +494,12 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_IOC
 		| UHCI_USBINTR_SHORT);
 
+	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
+		add_debugger_command("uhci_process_transfer",
+			&debug_process_transfer,
+			"Processes a USB transfer with the given variables");
+	}
+
 	TRACE("UHCI host controller driver constructed\n");
 	fInitOK = true;
 }
@@ -469,6 +507,11 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 UHCI::~UHCI()
 {
+	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
+		remove_debugger_command("uhci_process_transfer",
+			&debug_process_transfer);
+	}
+
 	int32 result = 0;
 	fStopFinishThread = true;
 	fStopFinishIsochronousThread = true;
@@ -604,6 +647,77 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 	queue->AppendTransfer(transferQueue);
 	return B_OK;
+}
+
+
+status_t
+UHCI::ProcessDebugTransfer(Transfer *transfer)
+{
+	uhci_td *firstDescriptor = NULL;
+	uhci_qh *transferQueue = NULL;
+	status_t result = CreateFilledTransfer(transfer, &firstDescriptor,
+		&transferQueue);
+	if (result < B_OK)
+		return result;
+
+	fQueues[UHCI_DEBUG_QUEUE]->AppendTransfer(transferQueue, false);
+
+	while (true) {
+		bool transferOK = false;
+		bool transferError = false;
+		uhci_td *descriptor = firstDescriptor;
+
+		while (descriptor) {
+			uint32 status = descriptor->status;
+			if (status & TD_STATUS_ACTIVE)
+				break;
+
+			if (status & TD_ERROR_MASK) {
+				transferError = true;
+				break;
+			}
+
+			if ((descriptor->link_phy & TD_TERMINATE)
+				|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
+				< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
+				transferOK = true;
+				break;
+			}
+
+			descriptor = (uhci_td *)descriptor->link_log;
+		}
+
+		if (!transferOK && !transferError) {
+			spin(200);
+			continue;
+		}
+
+		if (transferOK) {
+			size_t actualLength = 0;
+			uint8 lastDataToggle = 0;
+			if (transfer->TransferPipe()->Direction() == Pipe::In) {
+				// data to read out
+				iovec *vector = transfer->Vector();
+				size_t vectorCount = transfer->VectorCount();
+
+				actualLength = ReadDescriptorChain(firstDescriptor,
+					vector, vectorCount, &lastDataToggle);
+			} else {
+				// read the actual length that was sent
+				actualLength = ReadActualLength(firstDescriptor,
+					&lastDataToggle);
+			}
+
+			transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
+		}
+
+		fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transferQueue, false);
+		FreeDescriptorChain(firstDescriptor);
+		FreeTransferQueue(transferQueue);
+		return transferOK ? B_OK : B_IO_ERROR;
+	}
+
+	return B_ERROR;
 }
 
 
