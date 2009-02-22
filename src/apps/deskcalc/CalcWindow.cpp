@@ -24,7 +24,7 @@
 static const char* kWindowTitle		= "DeskCalc";
 
 
-CalcWindow::CalcWindow(BRect frame)
+CalcWindow::CalcWindow(BRect frame, BMessage *settings)
 	: BWindow(frame, kWindowTitle, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	// create calculator view with calculator description and
@@ -32,8 +32,10 @@ CalcWindow::CalcWindow(BRect frame)
 	BScreen screen(this);
 	rgb_color baseColor = screen.DesktopColor();
 
+	SetSizeLimits(100.0, 400.0, 100.0, 400.0);
+
 	frame.OffsetTo(B_ORIGIN);
-	fCalcView = new CalcView(frame, baseColor);
+	fCalcView = new CalcView(frame, baseColor, settings);
 	
 	// create replicant dragger
 	frame.top = frame.bottom - 7.0f;
@@ -45,7 +47,11 @@ CalcWindow::CalcWindow(BRect frame)
 	AddChild(fCalcView);
 	fCalcView->AddChild(dragger);
 
-	SetSizeLimits(100.0, 400.0, 100.0, 400.0);
+	BRect rect;
+	if (settings->FindRect("window frame", &rect) == B_OK)
+		SetFrame(rect);
+	else
+		SetFrame(frame, true);
 }
 
 
@@ -75,25 +81,6 @@ CalcWindow::QuitRequested()
 	// NOTE: don't quit, since the app needs us
 	// for saving settings yet...
 	return false;
-}
-
-
-bool
-CalcWindow::LoadSettings(BMessage* archive)
-{
-	status_t ret = fCalcView->LoadSettings(archive);
-
-	if (ret < B_OK)
-		return false;
-
-	BRect frame;
-	ret = archive->FindRect("window frame", &frame);
-	if (ret < B_OK)
-		return false;
-
-	SetFrame(frame);
-
-	return true;
 }
 
 

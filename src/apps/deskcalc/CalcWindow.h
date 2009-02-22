@@ -18,13 +18,12 @@ class CalcView;
 
 class CalcWindow : public BWindow {
  public:
-								CalcWindow(BRect frame);
+								CalcWindow(BRect frame, BMessage *settings);
 	virtual						~CalcWindow();
 
 	virtual	void				Show();
 	virtual	bool				QuitRequested();
 
-			bool				LoadSettings(BMessage* archive);
 			status_t			SaveSettings(BMessage* archive) const;
 
 			void				SetFrame(BRect frame,

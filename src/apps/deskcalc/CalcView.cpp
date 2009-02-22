@@ -74,7 +74,7 @@ CalcView *CalcView::Instantiate(BMessage *archive)
 }
 
 
-CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
+CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage *settings)
 	: BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
 			B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	  fColums(5),
@@ -108,6 +108,8 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
 	AddChild(fExpressionTextView);
 
+	_LoadSettings(settings);
+
 	// tell the app server not to erase our b/g
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -116,7 +118,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	
 	// colorize based on base color.
 	_Colorize();
-	
+
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
@@ -158,7 +160,7 @@ CalcView::CalcView(BMessage* archive)
 	AddChild(fExpressionTextView);
 
 	// read data from archive
-	LoadSettings(archive);
+	_LoadSettings(archive);
 	
 	// create pop-up menu system
 	_CreatePopUpMenu();
@@ -184,14 +186,13 @@ CalcView::AttachedToWindow()
 	FrameResized(frame.Width(), frame.Height());
 
 	fPopUpMenu->SetTargetForItems(this);
+	_ShowKeypad(fOptions->show_keypad);
 }
 
 
 void
 CalcView::MessageReceived(BMessage* message)
 {
-	//message->PrintToStream();
-	
 	// check if message was dropped
 	if (message->WasDropped()) {
 		// pass message on to paste
@@ -412,7 +413,8 @@ CalcView::MouseDown(BPoint point)
 	// display popup menu if not primary mouse button
 	if ((B_PRIMARY_MOUSE_BUTTON & buttons) == 0) {
 		BMenuItem* selected;
-		if ((selected = fPopUpMenu->Go(ConvertToScreen(point))) != NULL)
+		if ((selected = fPopUpMenu->Go(ConvertToScreen(point))) != NULL
+			&& selected->Message() != NULL)
 			MessageReceived(selected->Message());
 		return;
 	}
@@ -654,7 +656,7 @@ CalcView::Paste(BMessage *message)
 
 
 status_t
-CalcView::LoadSettings(BMessage* archive)
+CalcView::_LoadSettings(BMessage* archive)
 {
 	if (!archive)
 		return B_BAD_VALUE;
@@ -697,7 +699,6 @@ CalcView::LoadSettings(BMessage* archive)
 	
 	// load options
 	fOptions->LoadSettings(archive);
-	fShowKeypad = fOptions->show_keypad;
 
 	// load display text
 	const char* display;
@@ -727,13 +728,13 @@ CalcView::SaveSettings(BMessage* archive) const
 	status_t ret = archive ? B_OK : B_BAD_VALUE;
 
 	// record grid dimensions
-    if (ret == B_OK)
+	if (ret == B_OK)
 		ret = archive->AddInt16("cols", fColums);
-    if (ret == B_OK)
+	if (ret == B_OK)
 		ret = archive->AddInt16("rows", fRows);
 	
 	// record color scheme
-    if (ret == B_OK)
+	if (ret == B_OK)
 		ret = archive->AddData("rgbBaseColor", B_RGB_COLOR_TYPE,
 							   &fBaseColor, sizeof(rgb_color));
 	if (ret == B_OK)
@@ -953,7 +954,7 @@ CalcView::_CreatePopUpMenu()
 	// construct items
 	fAutoNumlockItem = new BMenuItem("Enable Num Lock on start up",
 		new BMessage(K_OPTIONS_AUTO_NUM_LOCK));
-	fAudioFeedbackItem = new BMenuItem("Audio Feedback" B_UTF8_ELLIPSIS,
+	fAudioFeedbackItem = new BMenuItem("Audio Feedback",
 		new BMessage(K_OPTIONS_AUDIO_FEEDBACK));
 	fShowKeypadItem = new BMenuItem("Show Keypad",
 		new BMessage(K_OPTIONS_SHOW_KEYPAD));
@@ -1007,15 +1008,20 @@ CalcView::_ShowKeypad(bool show)
 		return;
 
 	fShowKeypad = show;
+	if (fShowKeypadItem && fShowKeypadItem->IsMarked() ^ fShowKeypad)
+			fShowKeypadItem->SetMarked(fShowKeypad);
 
 	float height = fShowKeypad ? fHeight / K_DISPLAY_YPROP
 							   : fHeight * K_DISPLAY_YPROP;
 
 	BWindow* window = Window();
-	if (window->Bounds() == Frame())
-		window->ResizeTo(fWidth, height);
-	else
-		ResizeTo(fWidth, height);
+	if (window) {
+		if (window->Bounds() == Frame()) {
+			window->ResizeTo(fWidth, height);
+			window->SetSizeLimits(100.0, 400.0, fShowKeypad ? 100.0 : 20.0, 400.0);
+		} else
+			ResizeTo(fWidth, height);
+	}
 }
 
  

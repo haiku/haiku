@@ -44,11 +44,11 @@ CalcApplication::~CalcApplication()
 void
 CalcApplication::ReadyToRun()
 {
-	BRect frame(0, 0, kDefaultWindowWidth - 1, kDefaultWindowHeight - 1);
-	fCalcWindow = new CalcWindow(frame);
+	BMessage settings;
+	_LoadSettings(settings);
 
-	if (!_LoadSettings())
-		fCalcWindow->SetFrame(frame, true);
+	BRect frame(0, 0, kDefaultWindowWidth - 1, kDefaultWindowHeight - 1);
+	fCalcWindow = new CalcWindow(frame, &settings);
 
 	// reveal window
 	fCalcWindow->Show();
@@ -76,25 +76,20 @@ CalcApplication::QuitRequested()
 // #pragma mark -
 
 
-bool
-CalcApplication::_LoadSettings()
+void
+CalcApplication::_LoadSettings(BMessage &archive)
 {
 	// locate preferences file
 	BFile prefsFile;
 	if (_InitSettingsFile(&prefsFile, false) < B_OK) {
 		printf("no preference file found.\n");
-		return false;
+		return;
 	}
 
 	// unflatten settings data
-	BMessage archive;
 	if (archive.Unflatten(&prefsFile) < B_OK) {
 		printf("error unflattening settings.\n");
-		return false;
 	}
-
-	// apply settings
-	return fCalcWindow->LoadSettings(&archive);
 }
 
 

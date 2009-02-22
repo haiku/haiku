@@ -28,7 +28,8 @@ class CalcView : public BView {
 		
 		
 								CalcView(BRect frame,
-										 rgb_color rgbBaseColor);
+										rgb_color rgbBaseColor,
+										BMessage *settings);
 
 								CalcView(BMessage* archive);
 
@@ -57,8 +58,7 @@ class CalcView : public BView {
 			// Paste contents of system clipboard to view.
 			void				Paste(BMessage *message);
 
-			// Load/Save current settings
-			status_t			LoadSettings(BMessage* archive);
+			// Save current settings
 			status_t			SaveSettings(BMessage* archive) const;
 
 			void				Evaluate();
@@ -86,6 +86,8 @@ class CalcView : public BView {
 
 			void				_ShowKeypad(bool show);
 			void				_FetchAppIcon(BBitmap* into);
+
+			status_t			_LoadSettings(BMessage* archive);
 
 			// grid dimensions
 			int16				fColums;
