@@ -38,8 +38,8 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	printf profile ps ptx pwd query quit rc readlink release renice rescan rlog
 	rm rmattr rmindex rmdir roster route
 	safemode screen_blanker screenmode sed setdecor settype setversion setvolume
-	seq sh sha1sum shar shred shuf shutdown sleep sort split stat strace stty su
-	sum sync sysinfo
+	seq sh sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
+	stty su sum sync sysinfo
 	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
 	traceroute translate true tsort tty
 	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb

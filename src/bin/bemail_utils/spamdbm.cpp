@@ -544,11 +544,11 @@ directory, available from http://sourceforge.net/projects/bemaildaemon/ */
  */
 
 static float g_MarginBetweenControls; /* Space of a letter "M" between them. */
-//static float g_LineOfTextHeight;      /* Height of text the current font. */
+static float g_LineOfTextHeight;      /* Height of text the current font. */
 static float g_StringViewHeight;      /* Height of a string view text box. */
 static float g_ButtonHeight;          /* How many pixels tall buttons are. */
 static float g_CheckBoxHeight;        /* Same for check boxes. */
-//static float g_RadioButtonHeight;     /* Also for radio buttons. */
+static float g_RadioButtonHeight;     /* Also for radio buttons. */
 static float g_PopUpMenuHeight;       /* Again for pop-up menus. */
 static float g_TextBoxHeight;         /* Ditto for editable text controls. */
 
@@ -1689,7 +1689,7 @@ ostream& PrintUsage (ostream& OutputStream)
         OutputStream << "Buggy Command: " << PropInfoPntr->name << endl;
         break;
     }
-    WrapTextToStream (OutputStream, PropInfoPntr->usage);
+    WrapTextToStream (OutputStream, (char *)PropInfoPntr->usage);
     OutputStream << endl;
   }
 
@@ -4762,8 +4762,6 @@ status_t ABSApp::PurgeOldWords (char *ErrorMessage)
 
 void ABSApp::ReadyToRun ()
 {
-
-#if 0
   DatabaseWindow *DatabaseWindowPntr;
   float           JunkFloat;
   BButton        *TempButtonPntr;
@@ -4914,13 +4912,11 @@ void ABSApp::ReadyToRun ()
       DisplayErrorMessage ("Unable to create window.");
       g_QuitCountdown = 0;
     }
-    else
+    else {
       DatabaseWindowPntr->Show (); /* Starts the window's message loop. */
+	  DatabaseWindowPntr->Minimize (g_ServerMode);
+    }
   }
-
-#endif 	// end all the unnecessary #if 0'ed code
-
-  SetPulseRate (500000);
 
   g_AppReadyToRunCompleted = true;
 }
@@ -7071,14 +7067,6 @@ DatabaseWindow::DatabaseWindow ()
   if (m_WordsViewPntr == NULL)
     goto ErrorExit;
   AddChild (m_WordsViewPntr);
-
-
-  /* Minimize the window if we are starting up in server mode.  This is done
-  before the window is open so it doesn't flash onto the screen, and possibly
-  steal a keystroke or two.  The ControlsView will further update the minimize
-  mode when it detects changes in the server mode. */
-
-  Minimize (g_ServerMode);
 
   return;
 

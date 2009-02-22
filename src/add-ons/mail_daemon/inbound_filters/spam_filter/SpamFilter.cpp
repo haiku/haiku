@@ -126,7 +126,7 @@ static const char *kAGMSBayesBeepGenuineName = "SpamFilter-Genuine";
 static const char *kAGMSBayesBeepSpamName = "SpamFilter-Spam";
 static const char *kAGMSBayesBeepUncertainName = "SpamFilter-Uncertain";
 
-static const char *kServerSignature = "application/x-vnd.agmsmith.AGMSBayesianSpamServer";
+static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 
 AGMSBayesianSpamFilter::AGMSBayesianSpamFilter (BMessage *settings)
@@ -237,7 +237,7 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("AGMSBayesianSpamServer");
+					path.Append("spamdbm");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);
