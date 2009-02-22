@@ -491,7 +491,7 @@ CamDevice::DataPumpThread()
 			len = fBulkIn->BulkTransfer(fBuffer, fBufferLen);
 #endif
 			
-			PRINT((CH ": got %d bytes" CT, len));
+			PRINT((CH ": got %ld bytes" CT, len));
 #ifdef DEBUG_WRITE_DUMP
 			write(fDumpFD, fBuffer, len);
 #endif
@@ -618,23 +618,48 @@ CamDeviceAddon::Sniff(BUSBDevice *device)
 		return ENODEV;
 	if (!device)
 		return EINVAL;
-	for (uint32 i = 0; fSupportedDevices[i].vendor; i++)
+
+	bool supported = false;
+	for (uint32 i = 0; !supported && fSupportedDevices[i].vendor; i++)
 	{
-/*		PRINT((CH "{%u,%u,%u,0x%x,0x%x} <> {%u,%u,%u,0x%x,0x%x}" CT,
-			device.Class(), device.Subclass(), device.Protocol(), device.VendorID(), device.ProductID(),
-			fSupportedDevices[i].desc.dev_class, fSupportedDevices[i].desc.dev_subclass, fSupportedDevices[i].desc.dev_protocol, fSupportedDevices[i].desc.vendor, fSupportedDevices[i].desc.product));*/
-/*		if (device.Class() != fSupportedDevices[i].desc.dev_class)
+		if ((fSupportedDevices[i].desc.vendor != 0
+			&& device->VendorID() != fSupportedDevices[i].desc.vendor)
+			|| (fSupportedDevices[i].desc.product != 0
+			&& device->ProductID() != fSupportedDevices[i].desc.product))
 			continue;
-		if (device.Subclass() != fSupportedDevices[i].desc.dev_subclass)
-			continue;
-		if (device.Protocol() != fSupportedDevices[i].desc.dev_protocol)
-			continue;*/
-		if (device->VendorID() != fSupportedDevices[i].desc.vendor)
-			continue;
-		if (device->ProductID() != fSupportedDevices[i].desc.product)
-			continue;
-		return i;
+
+		if ((fSupportedDevices[i].desc.dev_class == 0
+			|| device->Class() == fSupportedDevices[i].desc.dev_class)
+			&& (fSupportedDevices[i].desc.dev_subclass == 0
+			|| device->Subclass() == fSupportedDevices[i].desc.dev_subclass)
+			&& (fSupportedDevices[i].desc.dev_protocol == 0
+			|| device->Protocol() == fSupportedDevices[i].desc.dev_protocol)) {
+			supported = true;
+		}
+
+		// we have to check all interfaces for matching class/subclass/protocol
+		for (uint32 j = 0; !supported && j < device->CountConfigurations(); j++) {
+			const BUSBConfiguration* cfg = device->ConfigurationAt(j);
+			for (uint32 k = 0; !supported && k < cfg->CountInterfaces(); k++) {
+				const BUSBInterface* intf = cfg->InterfaceAt(k);
+				for (uint32 l = 0; !supported && l < intf->CountAlternates(); l++) {
+					const BUSBInterface* alt = intf->AlternateAt(l);
+					if ((fSupportedDevices[i].desc.dev_class == 0
+						|| alt->Class() == fSupportedDevices[i].desc.dev_class)
+						&& (fSupportedDevices[i].desc.dev_subclass == 0
+						|| alt->Subclass() == fSupportedDevices[i].desc.dev_subclass)
+						&& (fSupportedDevices[i].desc.dev_protocol == 0
+						|| alt->Protocol() == fSupportedDevices[i].desc.dev_protocol)) {
+						supported = true;
+					}
+				}
+			}
+		}
+
+		if (supported)
+			return i;
 	}
+
 	return ENODEV;
 }
 

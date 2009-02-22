@@ -88,7 +88,7 @@ CamRoster::CountCameras()
 {
 	int32 count;
 	fLocker.Lock();
-	PRINT((CH "(): %d cameras" CT, fCameras.CountItems()));
+	PRINT((CH "(): %ld cameras" CT, fCameras.CountItems()));
 	count = fCameras.CountItems();
 	fLocker.Unlock();
 	return count;
