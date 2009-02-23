@@ -176,7 +176,8 @@ typedef enum {
 											// thread
 
 	B_DEBUGGER_MESSAGE_HANDED_OVER,			// the debugged team has been
-											// handed over to another debugger
+											// handed over to another debugger,
+											// sent to both debuggers
 } debug_debugger_message;
 
 
@@ -589,6 +590,9 @@ typedef struct {
 									// (asynchronous message)
 	team_id			debugger;		// the new debugger
 	port_id			debugger_port;	// the port the new debugger uses
+	thread_id		causing_thread;	// the thread that caused entering the
+									// debugger in the first place, -1 if the
+									// debugger wasn't attached automatically
 } debug_handed_over;
 
 // union of all messages structures sent to the debugger

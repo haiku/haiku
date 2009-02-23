@@ -54,6 +54,9 @@ struct team_debug_info {
 	sem_id		debugger_write_lock;
 		// synchronizes writes to the debugger port with the setting (but not
 		// clearing) of the B_TEAM_DEBUG_DEBUGGER_HANDOVER flag
+	thread_id	causing_thread;
+		// thread that caused the debugger to be attached; -1 for manual
+		// debugger attachment (or no debugger installed)
 	vint32		image_event;
 		// counter incremented whenever an image is created/deleted
 
@@ -123,13 +126,14 @@ struct thread_debug_info {
 
 // team debugging flags (user-specifiable flags are in <debugger.h>)
 enum {
-	B_TEAM_DEBUG_DEBUGGER_INSTALLED	= 0x0001,
-	B_TEAM_DEBUG_DEBUGGER_HANDOVER	= 0x0002,
-	B_TEAM_DEBUG_DEBUGGER_DISABLED	= 0x0004,
+	B_TEAM_DEBUG_DEBUGGER_INSTALLED		= 0x0001,
+	B_TEAM_DEBUG_DEBUGGER_HANDOVER		= 0x0002,	// marked for hand-over
+	B_TEAM_DEBUG_DEBUGGER_HANDING_OVER	= 0x0004,	// handing over
+	B_TEAM_DEBUG_DEBUGGER_DISABLED		= 0x0008,
 
-	B_TEAM_DEBUG_KERNEL_FLAG_MASK	= 0xffff,
+	B_TEAM_DEBUG_KERNEL_FLAG_MASK		= 0xffff,
 
-	B_TEAM_DEBUG_DEFAULT_FLAGS		= 0,
+	B_TEAM_DEBUG_DEFAULT_FLAGS			= 0,
 };
 
 // thread debugging flags (user-specifiable flags are in <debugger.h>)

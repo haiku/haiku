@@ -50,7 +50,7 @@ static timer sProfilingTimers[B_MAX_CPU_COUNT];
 static void schedule_profiling_timer(struct thread* thread,
 	bigtime_t interval);
 static int32 profiling_event(timer* unused);
-static status_t ensure_debugger_installed(team_id teamID, port_id *port = NULL);
+static status_t ensure_debugger_installed();
 static void get_team_debug_info(team_debug_info &teamDebugInfo);
 
 
@@ -219,6 +219,7 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
 		info->nub_thread = -1;
 		info->nub_port = -1;
 		info->debugger_write_lock = -1;
+		info->causing_thread = -1;
 		info->image_event = 0;
 
 		if (initLock)
@@ -270,6 +271,7 @@ destroy_team_debug_info(struct team_debug_info *info)
 		atomic_set(&info->flags, 0);
 		info->debugger_team = -1;
 		info->debugger_port = -1;
+		info->causing_thread = -1;
 		info->image_event = -1;
 	}
 }
@@ -694,6 +696,24 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 }
 
 
+static status_t
+thread_hit_serious_debug_event(debug_debugger_message event,
+	const void *message, int32 messageSize)
+{
+	// ensure that a debugger is installed for this team
+	status_t error = ensure_debugger_installed();
+	if (error != B_OK) {
+		struct thread *thread = thread_get_current_thread();
+		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return true;
+	}
+
+	// enter the debug loop
+	return thread_hit_debug_event(event, message, messageSize, true);
+}
+
+
 void
 user_debug_pre_syscall(uint32 syscall, void *args)
 {
@@ -782,23 +802,13 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 		return true;
 	}
 
-	// ensure that a debugger is installed for this team
-	struct thread *thread = thread_get_current_thread();
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_exception_occurred(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
-		return true;
-	}
-
 	// prepare the message
 	debug_exception_occurred message;
 	message.exception = exception;
 	message.signal = signal;
 
-	status_t result = thread_hit_debug_event(
-		B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED, &message, sizeof(message), true);
+	status_t result = thread_hit_serious_debug_event(
+		B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED, &message, sizeof(message));
 	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
 }
 
@@ -829,21 +839,11 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 void
 user_debug_stop_thread()
 {
-	// ensure that a debugger is installed for this team
-	struct thread *thread = thread_get_current_thread();
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_stop_thread(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
-		return;
-	}
-
 	// prepare the message
 	debug_thread_debugged message;
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
-		sizeof(message), true);
+	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
+		sizeof(message));
 }
 
 
@@ -1106,67 +1106,37 @@ user_debug_image_deleted(const image_info *imageInfo)
 void
 user_debug_breakpoint_hit(bool software)
 {
-	// ensure that a debugger is installed for this team
-	struct thread *thread = thread_get_current_thread();
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_breakpoint_hit(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
-		return;
-	}
-
 	// prepare the message
 	debug_breakpoint_hit message;
 	message.software = software;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_BREAKPOINT_HIT, &message,
-		sizeof(message), true);
+	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_BREAKPOINT_HIT, &message,
+		sizeof(message));
 }
 
 
 void
 user_debug_watchpoint_hit()
 {
-	// ensure that a debugger is installed for this team
-	struct thread *thread = thread_get_current_thread();
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_watchpoint_hit(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
-		return;
-	}
-
 	// prepare the message
 	debug_watchpoint_hit message;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_WATCHPOINT_HIT, &message,
-		sizeof(message), true);
+	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_WATCHPOINT_HIT, &message,
+		sizeof(message));
 }
 
 
 void
 user_debug_single_stepped()
 {
-	// ensure that a debugger is installed for this team
-	struct thread *thread = thread_get_current_thread();
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_watchpoint_hit(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread->id, strerror(error));
-		return;
-	}
-
 	// prepare the message
 	debug_single_step message;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_SINGLE_STEP, &message,
-		sizeof(message), true);
+	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_SINGLE_STEP, &message,
+		sizeof(message));
 }
 
 
@@ -2449,7 +2419,7 @@ debug_nub_thread(void *)
 static void
 install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	port_id debuggerPort, port_id nubPort, thread_id nubThread,
-	sem_id debuggerPortWriteLock)
+	sem_id debuggerPortWriteLock, thread_id causingThread)
 {
 	atomic_set(&team->debug_info.flags,
 		B_TEAM_DEBUG_DEFAULT_FLAGS | B_TEAM_DEBUG_DEBUGGER_INSTALLED);
@@ -2458,6 +2428,7 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	team->debug_info.debugger_team = debuggerTeam;
 	team->debug_info.debugger_port = debuggerPort;
 	team->debug_info.debugger_write_lock = debuggerPortWriteLock;
+	team->debug_info.causing_thread = causingThread;
 
 	arch_clear_team_debug_info(&team->debug_info.arch_info);
 
@@ -2491,11 +2462,11 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 
 
 static port_id
-install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
-	bool dontFail)
+install_team_debugger(team_id teamID, port_id debuggerPort,
+	thread_id causingThread, bool useDefault, bool dontReplace)
 {
 	TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
-		"dontFail: %d)\n", teamID, debuggerPort, useDefault, dontFail));
+		"dontReplace: %d)\n", teamID, debuggerPort, useDefault, dontReplace));
 
 	if (useDefault)
 		debuggerPort = atomic_get(&sDefaultDebuggerPort);
@@ -2547,37 +2518,54 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 			// don't allow to debug the kernel
 			error = B_NOT_ALLOWED;
 		} else if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+			// There's already a debugger installed.
 			if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDOVER) {
-				// a handover to another debugger is requested
-				// clear the flag
-				atomic_and(& team->debug_info.flags,
-					~B_TEAM_DEBUG_DEBUGGER_HANDOVER);
+				if (dontReplace) {
+					// We're fine with already having a debugger.
+					error = B_OK;
+					done = true;
+					result = team->debug_info.nub_port;
+				} else if (
+					teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) {
+					// Another debugger is in the process of installing itself
+					// as the team's debugger.
+					error = (dontReplace ? B_OK : B_BAD_VALUE);
+					done = true;
+					result = team->debug_info.nub_port;
+				} else {
+					// a handover to another debugger is requested
+					// Set the handing-over flag -- we'll clear both flags after
+					// having sent the handed-over message to the new debugger.
+					atomic_or(&team->debug_info.flags,
+						B_TEAM_DEBUG_DEBUGGER_HANDING_OVER);
 
-				oldDebuggerPort = team->debug_info.debugger_port;
-				result = nubPort = team->debug_info.nub_port;
+					oldDebuggerPort = team->debug_info.debugger_port;
+					result = nubPort = team->debug_info.nub_port;
+					if (causingThread < 0)
+						causingThread = team->debug_info.causing_thread;
 
-				// set the new debugger
-				install_team_debugger_init_debug_infos(team, debuggerTeam,
-					debuggerPort, nubPort, team->debug_info.nub_thread,
-					team->debug_info.debugger_write_lock);
+					// set the new debugger
+					install_team_debugger_init_debug_infos(team, debuggerTeam,
+						debuggerPort, nubPort, team->debug_info.nub_thread,
+						team->debug_info.debugger_write_lock, causingThread);
 
-				releaseDebugInfoLock = false;
-				handOver = true;
-				done = true;
+					releaseDebugInfoLock = false;
+					handOver = true;
+					done = true;
 
-				// finally set the new port owner
-				if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
-					// The old debugger must just have died. Just proceed as
-					// if there was no debugger installed. We may still be too
-					// early, in which case we'll fail, but this race condition
-					// should be unbelievably rare and relatively harmless.
-					handOver = false;
-					done = false;
+					// finally set the new port owner
+					if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
+						// The old debugger must just have died. Just proceed as
+						// if there was no debugger installed. We may still be too
+						// early, in which case we'll fail, but this race condition
+						// should be unbelievably rare and relatively harmless.
+						handOver = false;
+						done = false;
+					}
 				}
-
 			} else {
 				// there's already a debugger installed
-				error = (dontFail ? B_OK : B_BAD_VALUE);
+				error = (dontReplace ? B_OK : B_BAD_VALUE);
 				done = true;
 				result = team->debug_info.nub_port;
 			}
@@ -2598,18 +2586,55 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 	restore_interrupts(state);
 
 	if (handOver) {
-		// notify the nub thread
-		kill_interruptable_write_port(nubPort, B_DEBUG_MESSAGE_HANDED_OVER,
-			NULL, 0);
-
-		// notify the old debugger
+		// prepare the handed-over message
 		debug_handed_over notification;
 		notification.origin.thread = -1;
 		notification.origin.team = teamID;
 		notification.origin.nub_port = nubPort;
 		notification.debugger = debuggerTeam;
 		notification.debugger_port = debuggerPort;
+		notification.causing_thread = causingThread;
 
+		// notify the new debugger
+		error = write_port_etc(debuggerPort,
+			B_DEBUGGER_MESSAGE_HANDED_OVER, &notification,
+			sizeof(notification), B_RELATIVE_TIMEOUT, 0);
+		if (error != B_OK) {
+			dprintf("install_team_debugger(): Failed to send message to new "
+				"debugger: %s\n", strerror(error));
+		}
+
+		// clear the handed-over and handing-over flags
+		cpu_status state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+
+		team = team_get_team_struct_locked(teamID);
+
+		if (team) {
+			GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+			int32 teamDebugFlags = team->debug_info.flags;
+
+			if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) != 0
+				&& (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) != 0
+				&& team->debug_info.debugger_port == debuggerPort) {
+				// Everything is as we left it above, so just clear the flags.
+				atomic_and(&team->debug_info.flags,
+					~(B_TEAM_DEBUG_DEBUGGER_HANDOVER
+						| B_TEAM_DEBUG_DEBUGGER_HANDING_OVER));
+			}
+
+			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+		}
+
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		// notify the nub thread
+		kill_interruptable_write_port(nubPort, B_DEBUG_MESSAGE_HANDED_OVER,
+			NULL, 0);
+
+		// notify the old debugger
 		error = write_port_etc(oldDebuggerPort,
 			B_DEBUGGER_MESSAGE_HANDED_OVER, &notification,
 			sizeof(notification), B_RELATIVE_TIMEOUT, 0);
@@ -2676,14 +2701,15 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 
 			if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
 				// there's already a debugger installed
-				error = (dontFail ? B_OK : B_BAD_VALUE);
+				error = (dontReplace ? B_OK : B_BAD_VALUE);
 				done = true;
 				result = team->debug_info.nub_port;
 
 				RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 			} else {
 				install_team_debugger_init_debug_infos(team, debuggerTeam,
-					debuggerPort, nubPort, nubThread, debuggerWriteLock);
+					debuggerPort, nubPort, nubThread, debuggerWriteLock,
+					causingThread);
 			}
 		} else
 			error = B_BAD_TEAM_ID;
@@ -2714,15 +2740,11 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 
 
 static status_t
-ensure_debugger_installed(team_id teamID, port_id *_port)
+ensure_debugger_installed()
 {
-	port_id port = install_team_debugger(teamID, -1, true, true);
-	if (port < 0)
-		return port;
-
-	if (_port)
-		*_port = port;
-	return B_OK;
+	port_id port = install_team_debugger(B_CURRENT_TEAM, -1,
+		thread_get_current_thread_id(), true, true);
+	return port >= 0 ? B_OK : port;
 }
 
 
@@ -2733,8 +2755,7 @@ void
 _user_debugger(const char *userMessage)
 {
 	// install the default debugger, if there is none yet
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	status_t error = ensure_debugger_installed();
 	if (error != B_OK) {
 		// time to commit suicide
 		char buffer[128];
@@ -2809,7 +2830,7 @@ _user_install_default_debugger(port_id debuggerPort)
 port_id
 _user_install_team_debugger(team_id teamID, port_id debuggerPort)
 {
-	return install_team_debugger(teamID, debuggerPort, false, false);
+	return install_team_debugger(teamID, debuggerPort, -1, false, false);
 }
 
 
