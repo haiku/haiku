@@ -11,6 +11,8 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
+local sslDir ;
+
 if $(USE_SSL) {
 	SubDirC++Flags -DUSE_SSL ;
 	if ! $(SSL_DIR) {
