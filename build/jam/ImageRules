@@ -698,16 +698,33 @@ rule AddBootModuleSymlinksToHaikuImage targets
 
 rule AddOptionalHaikuImagePackages packages
 {
-	HAIKU_OPTIONAL_PACKAGE_ADDED on $(packages) = 1 ;
+	local package ;
+	for package in $(packages) {
+		if ! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] {
+			HAIKU_OPTIONAL_PACKAGE_ADDED on $(package) = 1 ;
+			HAIKU_ADDED_OPTIONAL_PACKAGES += $(package) ;
+		}
+	}
 }
 
 rule IsOptionalHaikuImagePackageAdded package
 {
+	if ! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_EXISTS) ] {
+		HAIKU_OPTIONAL_PACKAGE_EXISTS on $(package) = 1 ;
+		HAIKU_EXISTING_OPTIONAL_PACKAGES += $(package) ;
+	}
+
 	if [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] {
 		return 1 ;
 	}
 
-	return $(HAIKU_ADD_ALL_OPTIONAL_PACKAGES) ;
+	# If all optional packages are installed, make sure this one is added, too.
+	if $(HAIKU_ADD_ALL_OPTIONAL_PACKAGES) {
+		AddOptionalHaikuImagePackages $(package) ;
+		return 1 ;
+	}
+
+	return ;
 }
 
 rule OptionalPackageDependencies package : dependencies

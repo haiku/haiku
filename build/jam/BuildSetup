@@ -64,58 +64,8 @@ HAIKU_DEFAULT_CD_NAME = haiku-cd.iso ;
 HAIKU_DEFAULT_CD_DIR = $(HAIKU_OUTPUT_DIR) ;
 HAIKU_DEFAULT_CD_LABEL = Haiku ;
 
-# analyze an optionally replace jam's target parameters
-HAIKU_ORIGINAL_JAM_TARGETS = $(JAM_TARGETS) ;
-HAIKU_BUILD_PROFILE = ;
-if $(JAM_TARGETS) {
-	switch $(JAM_TARGETS[1]) {
-		# If the target to be built is "all" (i.e. the default) and we're in
-		# the output directory, the root directory of the build system, or
-		# in "src/", we change the target to be built to "haiku-image".
-		case all : {
-			if ! $(INVOCATION_SUBDIR) || $(INVOCATION_SUBDIR) = src {
-				JAM_TARGETS = haiku-image ;
-			}
-		}
-
-		# The "run" target allows for running arbitrary command lines containing
-		# build system targets, which are built and replaced accordingly.
-		case run : {
-			if $(JAM_TARGETS[2]) {
-				JAM_TARGETS = [ RunCommandLine $(JAM_TARGETS[2-]) ] ;
-			} else {
-				Exit "\"jam run\" requires parameters!" ;
-			}
-		}
-
-		# A target starting with "@" is a build profile.
-		case @* : {
-			HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
-			HAIKU_BUILD_PROFILE_ACTION = $(JAM_TARGETS[2]:E=build) ;
-			HAIKU_BUILD_PROFILE_PARAMETERS = $(JAM_TARGETS[3-]) ;
-			HAIKU_BUILD_PROFILE_DEFINED = ;
-		}
-
-		case * : {
-			# "update-image", "update-vmware-image", and "update-install"
-			# targets allow for updating only specific targets in the
-			# image/installation dir.
-			if $(JAM_TARGETS[1]) in update-image update-vmware-image
-					update-install {
-				SetUpdateHaikuImageOnly 1 ;
-				HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
-
-				if $(JAM_TARGETS[1]) = update-image {
-					JAM_TARGETS = haiku-image ;
-				} else if $(JAM_TARGETS[1]) = update-vmware-image {
-					JAM_TARGETS = haiku-vmware-image ;
-				} else {
-					JAM_TARGETS = install-haiku ;
-				}
-			}
-		}
-	}
-}
+# analyze and optionally replace jam's target parameters
+ProcessCommandLineArguments ;
 
 
 # include Timezones/libgccObjects

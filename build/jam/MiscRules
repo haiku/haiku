@@ -254,6 +254,11 @@ rule DefineBuildProfile name : type : path {
 	#          HAIKU_IMAGE_DIR, respectively HAIKU_INSTALL_DIR or their default
 	#          values will be used instead.
 
+	if [ on $(name) return $(HAIKU_BUILD_PROFILE_SPECIFIED) ] {
+		Exit "ERROR: Build profile \"$(name)\" defined twice!" ;
+	}
+	HAIKU_BUILD_PROFILE_SPECIFIED on $(name) = 1 ;
+
 	if ! $(HAIKU_BUILD_PROFILE) || $(HAIKU_BUILD_PROFILE) != $(name) {
 		return ;
 	}

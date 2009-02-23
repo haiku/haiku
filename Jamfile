@@ -161,3 +161,17 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootPPCImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuCD ] ;
+
+# Check whether all requested optional packages do actually exist.
+local package ;
+local packageError ;
+for package in $(HAIKU_ADDED_OPTIONAL_PACKAGES) {
+	if ! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_EXISTS) ] {
+		Echo "ERROR: Requested optional package \"$(package)\" does not"
+			"exist." ;
+		packageError = 1 ;
+	}
+}
+if $(packageError) {
+	Exit ;
+}
