@@ -5644,7 +5644,9 @@ dir_remove(int fd, char *path, bool kernel)
 				// "name/" -> "name", or "name/." -> "name"
 				lastSlash[0] = '\0';
 			}
-		} else if (!strcmp(path, ".") || !strcmp(path, ".."))
+		}
+
+		if (!strcmp(path, ".") || !strcmp(path, ".."))
 			return B_NOT_ALLOWED;
 	}
 
