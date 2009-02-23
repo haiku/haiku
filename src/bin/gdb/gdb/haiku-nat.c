@@ -280,7 +280,7 @@ haiku_cleanup_thread_list(team_debug_info *teamDebugInfo)
 		thread_debug_info *thread = teamDebugInfo->threads;
 		teamDebugInfo->threads = thread->next;
 		xfree(thread);
-	}	
+	}
 
 	// clear gdb's thread DB
 	init_thread_list();
@@ -380,7 +380,7 @@ haiku_cleanup_image_list(team_debug_info *teamDebugInfo)
 		extended_image_info *image = teamDebugInfo->images;
 		teamDebugInfo->images = image->next;
 		xfree(image);
-	}	
+	}
 }
 
 
@@ -577,7 +577,7 @@ haiku_cleanup_team_debug_info()
 	delete_port(sTeamDebugInfo.debugger_port);
 	sTeamDebugInfo.debugger_port = -1;
 	sTeamDebugInfo.team = -1;
-	
+
 	haiku_cleanup_thread_list(&sTeamDebugInfo);
 	haiku_cleanup_image_list(&sTeamDebugInfo);
 }
@@ -759,7 +759,7 @@ haiku_stop_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 	// We should check, whether we really got an event for the thread in
 	// question, but the only possible other event is that the team has
 	// been delete, which ends the game anyway.
-	
+
 	// TODO: That's actually not true. We also get messages when an add-on
 	// has been loaded/unloaded, a signal arrives, or a thread calls the
 	// debugger.
@@ -1008,7 +1008,7 @@ haiku_child_resume (ptid_t ptid, int step, enum target_signal sig)
 
 static ptid_t
 haiku_child_wait_internal (team_debug_info *teamDebugInfo, ptid_t ptid,
-	struct target_waitstatus *ourstatus, bool *ignore)
+	struct target_waitstatus *ourstatus, bool *ignore, bool *selectThread)
 {
 	team_id teamID = ptid_get_pid(ptid);
 	team_id threadID = ptid_get_tid(ptid);
@@ -1018,6 +1018,8 @@ haiku_child_wait_internal (team_debug_info *teamDebugInfo, ptid_t ptid,
 	int pendingSignal = -1;
 	pending_signal_status pendingSignalStatus = SIGNAL_FAKED;
 	int reprocessEvent = -1;
+
+	*selectThread = false;
 
 	if (teamID < 0 || threadID == 0)
 		threadID = -1;
@@ -1253,6 +1255,23 @@ TRACE(("haiku_child_wait_internal(): B_APP_IMAGE created, reprocess -> exec\n"))
 			ourstatus->value.integer = 0;
 			break;
 
+		case B_DEBUGGER_MESSAGE_HANDED_OVER:
+		{
+TRACE(("haiku_child_wait_internal(): B_DEBUGGER_MESSAGE_HANDED_OVER: causing "
+"thread: %ld\n", event->data.handed_over.causing_thread));
+			// The debugged team has been handed over to us by another debugger
+			// (likely the debug server). This event also tells us, which
+			// thread has caused the original debugger to be installed (if any).
+			// So, if we're not looking for any particular thread, select that
+			// thread.
+			if (threadID < 0 && event->data.handed_over.causing_thread >= 0) {
+				*selectThread = true;
+				retval = ptid_build(event->data.origin.team, 0,
+					event->data.handed_over.causing_thread);
+			}
+			*ignore = true;
+		}
+
 		default:
 			// unknown message, ignore
 			*ignore = true;
@@ -1294,13 +1313,16 @@ haiku_child_wait (ptid_t ptid, struct target_waitstatus *ourstatus)
 {
 	ptid_t retval;
 	bool ignore = true;
+	bool selectThread = false;
 
 	TRACE(("haiku_child_wait(`%s', %p)\n",
 		haiku_pid_to_str(ptid), ourstatus));
 
 	do {
 		retval = haiku_child_wait_internal(&sTeamDebugInfo, ptid, ourstatus,
-			&ignore);
+			&ignore, &selectThread);
+		if (selectThread)
+			ptid = retval;
 	} while (ignore);
 
 	TRACE(("haiku_child_wait() done: `%s'\n", haiku_pid_to_str(retval)));
@@ -1556,7 +1578,7 @@ haiku_init_debug_create_inferior(int pid)
 //"message\n"));
 //			break;
 //		}
-//		
+//
 //		resume (0, stop_signal);
 //	}
 }
