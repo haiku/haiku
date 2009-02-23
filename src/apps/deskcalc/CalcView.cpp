@@ -161,6 +161,8 @@ CalcView::CalcView(BMessage* archive)
 
 	// read data from archive
 	_LoadSettings(archive);
+	// replicant means size and window limit dont need changes
+	fShowKeypad = fOptions->show_keypad;
 	
 	// create pop-up menu system
 	_CreatePopUpMenu();
