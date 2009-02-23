@@ -419,7 +419,6 @@ TeamDebugHandler::_PopMessage(DebugMessage *&message)
 }
 
 // _EnterDebugger
-
 thread_id
 TeamDebugHandler::_EnterDebugger()
 {
@@ -798,12 +797,12 @@ TeamDebugHandler::_HandlerThread()
 	if (kill) {
 		// kill the team
 		_KillTeam();
-
-		// remove this handler from the roster and delete it
-		TeamDebugHandlerRoster::Default()->RemoveHandler(fTeam);
-
-		delete this;
 	}
+
+	// remove this handler from the roster and delete it
+	TeamDebugHandlerRoster::Default()->RemoveHandler(fTeam);
+
+	delete this;
 
 	return B_OK;
 }
