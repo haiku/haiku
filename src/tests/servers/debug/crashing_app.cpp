@@ -23,6 +23,7 @@ static const char *kUsage =
 	"Options:\n"
 	"  -d                   - call disable_debugger() first\n"
 	"  -h, --help           - print this info text\n"
+	"  --multi              - crash in multiple threads\n"
 	"  --signal             - crash in a signal handler\n"
 	"  --thread             - crash in a separate thread\n"
 	"\n"
@@ -123,6 +124,7 @@ struct Options {
 	Options()
 		:
 		inThread(false),
+		multipleThreads(false),
 		inSignalHandler(false),
 		disableDebugger(false)
 	{
@@ -130,6 +132,7 @@ struct Options {
 
 	crash_function_t*	function;
 	bool				inThread;
+	bool				multipleThreads;
 	bool				inSignalHandler;
 	bool				disableDebugger;
 };
@@ -204,6 +207,9 @@ main(int argc, const char* const* argv)
 				print_usage_and_exit(false);
 			} else if (strcmp(arg, "-d") == 0) {
 				sOptions.disableDebugger = true;
+			} else if (strcmp(arg, "--multi") == 0) {
+				sOptions.inThread = true;
+				sOptions.multipleThreads = true;
 			} else if (strcmp(arg, "--signal") == 0) {
 				sOptions.inSignalHandler = true;
 			} else if (strcmp(arg, "--thread") == 0) {
@@ -236,8 +242,14 @@ main(int argc, const char* const* argv)
 		}
 
 		resume_thread(thread);
-		status_t result;
-		while (wait_for_thread(thread, &result) == B_INTERRUPTED) {
+
+		if (sOptions.multipleThreads) {
+			snooze(200000);
+			do_crash();
+		} else {
+			status_t result;
+			while (wait_for_thread(thread, &result) == B_INTERRUPTED) {
+			}
 		}
 	} else {
 		do_crash();
