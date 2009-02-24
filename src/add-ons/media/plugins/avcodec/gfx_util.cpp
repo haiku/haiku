@@ -68,6 +68,10 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				}
 			}
 			
+			if (pixelFormat == PIX_FMT_YUV422P || pixelFormat == PIX_FMT_YUVJ422P) {
+				return gfx_conv_YCbCr422_RGB32_c;
+			}
+
 			TRACE("resolve_colorspace: %s => B_RGB32: NULL\n", pixfmt_to_string(pixelFormat));
 			return NULL;
 
@@ -120,7 +124,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				}
 			}
 			
-			if (pixelFormat == PIX_FMT_YUV422) {
+			if (pixelFormat == PIX_FMT_YUV422 || PIX_FMT_YUVJ422P) {
 				#if INCLUDE_MMX
 				if (mmx) {
 					TRACE("resolve_colorspace: PIX_FMT_YUV422 => B_YCbCr422: gfx_conv_null_mmx\n");
@@ -134,7 +138,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 			}
 			
 			TRACE("resolve_colorspace: %s => B_YCbCr422: NULL\n", pixfmt_to_string(pixelFormat));
-			return NULL;
+			return gfx_conv_null_c;
 		
 		default:
 			TRACE("resolve_colorspace: default: NULL !!!\n");
@@ -159,6 +163,8 @@ const char *pixfmt_to_string(int p)
 		return "PIX_FMT_BGR24";
 	case PIX_FMT_YUV422P:
 		return "PIX_FMT_YUV422P";
+	case PIX_FMT_YUVJ422P:
+		return "PIX_FMT_YUVJ422P - YUV422P (Jpeg)";
 	case PIX_FMT_YUV444P:
 		return "PIX_FMT_YUV444P";
 	case PIX_FMT_RGBA32:

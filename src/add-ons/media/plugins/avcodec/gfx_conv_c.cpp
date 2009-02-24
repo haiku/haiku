@@ -268,3 +268,64 @@ void gfx_conv_YCbCr420p_RGB32_c(AVFrame *in, AVFrame *out, int width, int height
 }
 
 #endif
+
+#define CLIP(a) if (0xffffff00 & (uint32)a) { if (a < 0) a = 0; else a = 255; }
+
+// http://en.wikipedia.org/wiki/YUV
+uint32 YUV444TORGBA8888(uint8 y, uint8 u, uint8 v) 
+{
+	uint32 pixel = 0;
+	int32 c, d, e;
+	int32 r,g,b;
+
+	c = y - 16;
+	d = u - 128;
+	e = v - 128;
+	
+   	r = (298 * c + 409 * e + 128) >> 8;
+	g = (298 * c - 100 * d - 208 * e + 128) >> 8;
+   	b = (298 * c + 516 * d + 128) >> 8;
+
+	CLIP(r);
+	CLIP(g);
+	CLIP(b);
+    
+	pixel = (r << 16) | (g << 8) | b;
+	
+	return pixel;
+}
+
+void gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
+{
+	uint8 *ybase = (uint8 *)in->data[0];
+	uint8 *ubase = (uint8 *)in->data[1];
+	uint8 *vbase = (uint8 *)in->data[2];
+	
+	uint32 *rgbbase = (uint32 *)out->data[0];
+
+	int uv_index;
+
+	for (uint32 i = 0; i < height; i++) {
+
+		uv_index = 0;
+
+		for (uint32 j=0; j < width; j+=2) {
+			rgbbase[j]   = YUV444TORGBA8888(ybase[j]  ,ubase[uv_index],vbase[uv_index]);
+			rgbbase[j+1] = YUV444TORGBA8888(ybase[j+1],ubase[uv_index],vbase[uv_index]);
+    	
+    		uv_index++;
+		}
+		
+		ybase += in->linesize[0];
+		ubase += in->linesize[1];
+		vbase += in->linesize[2];
+		
+		rgbbase += out->linesize[0] / 4;
+	}
+
+	if (height & 1) {
+		// XXX special case for last line if height not multiple of 2 goes here
+		memset((height - 1) * out->linesize[0] + (uint8 *)out->data[0], 0, width * 4);
+	}
+
+}
