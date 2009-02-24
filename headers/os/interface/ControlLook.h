@@ -153,9 +153,15 @@ public:
 									const rgb_color& base, uint32 flags,
 									enum orientation orientation);
 
-	virtual	void				DrawSliderTriangle(BView* view, BRect& rect,
+			void				DrawSliderTriangle(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
+									enum orientation orientation);
+
+	virtual	void				DrawSliderTriangle(BView* view, BRect& rect,
+									const BRect& updateRect,
+									const rgb_color& base,
+									const rgb_color& fill, uint32 flags,
 									enum orientation orientation);
 
 	virtual	void				DrawSliderHashMarks(BView* view, BRect& rect,

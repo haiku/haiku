@@ -932,6 +932,15 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	enum orientation orientation)
 {
+	DrawSliderTriangle(view, rect, updateRect, base, base, flags, orientation);
+}
+
+
+void
+BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, const rgb_color& fill,
+	uint32 flags, enum orientation orientation)
+{
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
@@ -980,93 +989,52 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 		frameShadowColor = tint_color(base, frameShadowTint);
 	}
 
-//	BRect originalRect(rect);
-//	rect.right--;
-//	rect.bottom--;
-
-	float center = (rect.left + rect.right) / 2;
-
-//	BShape shape;
-//	shape.MoveTo(BPoint(rect.left + 0.5, rect.bottom + 0.5));
-//	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom + 0.5));
-//	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5));
-//	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5));
-//	shape.LineTo(BPoint(center + 0.5, rect.top + 0.5));
-//	shape.LineTo(BPoint(rect.left + 0.5, rect.bottom - 1 + 0.5));
-//	shape.Close();
-//
-//	BGradientLinear gradient;
-//	gradient.AddColor(frameLightColor, 0);
-//	gradient.AddColor(frameShadowColor, 255);
-//	gradient.SetStart(rect.LeftTop());
-//	gradient.SetEnd(rect.RightBottom());
-//
-//	view->SetHighColor(frameLightColor);
-//	view->StrokeShape(&shape);
-//
-//	view->StrokeRect(rect);
+	// make room for the shadow
+	rect.right--;
+	rect.bottom--;
 
 	uint32 viewFlags = view->Flags();
 	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
 	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 
-	BPoint triangle[3];
-	triangle[0] = BPoint(rect.left + 0.5, rect.bottom - 1 + 0.5);
-	triangle[1] = BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5);
-	triangle[2] = BPoint(center + 0.5, rect.top + 0.5);
+	float center = (rect.left + rect.right) / 2;
 
+	BShape shape;
+	shape.MoveTo(BPoint(rect.left + 0.5, rect.bottom + 0.5));
+	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom + 0.5));
+	shape.LineTo(BPoint(rect.right + 0.5, rect.bottom - 1 + 0.5));
+	shape.LineTo(BPoint(center + 0.5, rect.top + 0.5));
+	shape.LineTo(BPoint(rect.left + 0.5, rect.bottom - 1 + 0.5));
+	shape.Close();
+
+	view->MovePenTo(BPoint(1, 1));
+
+	view->SetDrawingMode(B_OP_ALPHA);
+	view->SetHighColor(shadowColor);
+	view->StrokeShape(&shape);
+
+	view->MovePenTo(B_ORIGIN);
+
+	view->SetDrawingMode(B_OP_COPY);
 	view->SetHighColor(frameLightColor);
-	view->StrokeTriangle(triangle[0], triangle[1], triangle[2]);
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.right + 1, rect.bottom));
+	view->StrokeShape(&shape);
 
 	rect.InsetBy(1, 1);
-
-	triangle[0] = BPoint(rect.left, rect.bottom);
-	triangle[1] = BPoint(rect.right + 1, rect.bottom);
-	triangle[2] = BPoint(center, rect.top);
+	shape.Clear();
+	shape.MoveTo(BPoint(rect.left, rect.bottom + 1));
+	shape.LineTo(BPoint(rect.right + 1, rect.bottom + 1));
+	shape.LineTo(BPoint(center + 0.5, rect.top));
+	shape.Close();
 
 	BGradientLinear gradient;
 	if (flags & B_DISABLED) {
-		_MakeGradient(gradient, rect, base, topTint, bottomTint);
+		_MakeGradient(gradient, rect, fill, topTint, bottomTint);
 	} else {
-		_MakeGlossyGradient(gradient, rect, base, topTint, middleTint1,
+		_MakeGlossyGradient(gradient, rect, fill, topTint, middleTint1,
 			middleTint2, bottomTint);
 	}
 
-	view->FillTriangle(triangle[0], triangle[1], triangle[2], gradient);
-
-
-//
-//	_DrawFrame(view, rect, frameLightColor, frameLightColor,
-//		frameShadowColor, frameShadowColor);
-//
-//	flags &= ~B_ACTIVATED;
-//	DrawButtonBackground(view, rect, updateRect, base, flags);
-//
-//	// thumb shadow
-//	view->SetDrawingMode(B_OP_ALPHA);
-//	view->SetHighColor(shadowColor);
-//	originalRect.left++;
-//	originalRect.top++;
-//	view->StrokeLine(originalRect.LeftBottom(), originalRect.RightBottom());
-//	originalRect.bottom--;
-//	view->StrokeLine(originalRect.RightTop(), originalRect.RightBottom());
-//
-//	// thumb edge
-//	rect.InsetBy(0, 2);
-//	rect.left = floorf((rect.left + rect.right) / 2);
-//	rect.right = rect.left + 1;
-//	shadowColor = tint_color(base, B_DARKEN_2_TINT);
-//	shadowColor.alpha = 128;
-//	view->SetHighColor(shadowColor);
-//	view->StrokeLine(rect.LeftTop(), rect.LeftBottom());
-//	rgb_color lightColor = tint_color(base, B_LIGHTEN_2_TINT);
-//	lightColor.alpha = 128;
-//	view->SetHighColor(lightColor);
-//	view->StrokeLine(rect.RightTop(), rect.RightBottom());
-//
-//	view->SetDrawingMode(B_OP_COPY);
+	view->FillShape(&shape, gradient);
 
 	view->SetFlags(viewFlags);
 }
