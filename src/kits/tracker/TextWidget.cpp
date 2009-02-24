@@ -517,33 +517,55 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
-		// two passes are used to achive a blur effect
 		drawView->SetDrawingMode(B_OP_ALPHA);
 		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 
 		BFont font;
 		drawView->GetFont(&font);
-// NOTE: commented out first pass for halo, since just a plain
-// outline looks better IMHO -stippi
-//		font.SetFalseBoldWidth(2.0);
-//		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
 		rgb_color textColor = drawView->HighColor();
-		rgb_color glow = textColor.red
-			+ textColor.green + textColor.blue > 128 * 3 ? kBlack : kWhite;
-//		glow.alpha = 40;
-//		drawView->SetHighColor(glow);
+		rgb_color outlineColor;
+		if (textColor.red + textColor.green + textColor.blue < 128 * 3) {
+			// dark text on light outline
+			rgb_color glowColor = kWhite;
 
-//		drawView->DrawString(fittingText, loc);
+			font.SetFalseBoldWidth(2.0);
+			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+			glowColor.alpha = 30;
+			drawView->SetHighColor(glowColor);
 
-		font.SetFalseBoldWidth(1.0);
-		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
-		glow.alpha = 220;
-		drawView->SetHighColor(glow);
+			drawView->DrawString(fittingText, loc);
 
-		drawView->DrawString(fittingText, loc);
+			font.SetFalseBoldWidth(1.0);
+			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+			glowColor.alpha = 65;
+			drawView->SetHighColor(glowColor);
 
-		font.SetFalseBoldWidth(0.0);
-		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+			drawView->DrawString(fittingText, loc);
+
+			font.SetFalseBoldWidth(0.0);
+			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+		} else {
+			// light text on dark outline
+			rgb_color outlineColor = kBlack;
+
+			font.SetFalseBoldWidth(1.0);
+			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+			outlineColor.alpha = 30;
+			drawView->SetHighColor(outlineColor);
+
+			drawView->DrawString(fittingText, loc);
+
+			font.SetFalseBoldWidth(0.0);
+			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+			outlineColor.alpha = 200;
+			drawView->SetHighColor(outlineColor);
+	
+			drawView->DrawString(fittingText, loc + BPoint(1, 1));
+		}
+
+		drawView->SetDrawingMode(B_OP_OVER);
 		drawView->SetHighColor(textColor);
 	}
 #endif // __HAIKU__
