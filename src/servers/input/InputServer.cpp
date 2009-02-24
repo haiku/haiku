@@ -1570,11 +1570,9 @@ InputServer::_SanitizeEvents(EventList& events)
 					&& event->FindInt32("y", &y) == B_OK) {
 					where.x = fMousePos.x + x;
 					where.y = fMousePos.y - y;
-					where.ConstrainTo(fFrame);
 
 					event->RemoveName("x");
 					event->RemoveName("y");
-					event->AddPoint("where", where);
 					event->AddInt32("be:delta_x", x);
 					event->AddInt32("be:delta_y", y);
 
@@ -1588,18 +1586,21 @@ InputServer::_SanitizeEvents(EventList& events)
 					// absolute coordinates as "be:tablet_x/y").
 					where.x = absX * fFrame.Width();
 					where.y = absY * fFrame.Height();
-					where.ConstrainTo(fFrame);
 
 					event->RemoveName("x");
 					event->RemoveName("y");
-					event->AddPoint("where", where);
 					PRINT(("new position : %f, %f\n", where.x, where.y));
 				} else if (event->FindPoint("where", &where) == B_OK) {
-					where.ConstrainTo(fFrame);
-
-					event->ReplacePoint("where", where);
 					PRINT(("new position : %f, %f\n", where.x, where.y));
 				}
+
+				// Constrain and filter the mouse coords and add the final
+				// point to the message.
+				where.x = roundf(where.x);
+				where.y = roundf(where.y);
+				where.ConstrainTo(fFrame);
+				if (event->ReplacePoint("where", where) != B_OK)
+					event->AddPoint("where", where);
 
 				if (!event->HasInt64("when"))
 					event->AddInt64("when", system_time());
