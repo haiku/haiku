@@ -42,6 +42,67 @@
 #endif
 
 
+OpenDMLStream::OpenDMLStream()
+	:
+	is_audio(false),
+	is_video(false),
+	is_subtitle(false),
+	stream_header_valid(false),
+	audio_format_valid(false),
+	audio_format(NULL),
+	audio_format_size(0),
+	video_format_valid(false),
+	odml_index_start(0),
+	odml_index_size(0),
+	duration(0),
+	frame_count(0),
+	frames_per_sec_rate(1),
+	frames_per_sec_scale(1)
+{
+}
+
+
+OpenDMLStream::OpenDMLStream(const OpenDMLStream& other)
+{
+	*this = other;
+}
+
+
+OpenDMLStream::~OpenDMLStream()
+{
+}
+
+
+OpenDMLStream&
+OpenDMLStream::operator=(const OpenDMLStream& other)
+{
+	// TODO: implement for real
+	if (&other != this)
+		memcpy(this, &other, sizeof(OpenDMLStream));
+	return *this;
+}
+
+
+bool
+OpenDMLStream::operator==(const OpenDMLStream& other) const
+{
+	// TODO: should probably check "valid" flags
+	if (this == &other)
+		return true;
+	return memcmp(this, &other, sizeof(OpenDMLStream)) == 0;
+}
+
+
+bool
+OpenDMLStream::operator!=(const OpenDMLStream& other) const
+{
+	return !(*this == other);
+}
+
+
+// #pragma mark -
+
+
 OpenDMLParser::OpenDMLParser(BPositionIO *source)
  :	fSource(source),
  	fSize(source->Seek(0, SEEK_END)),
@@ -111,22 +172,9 @@ void
 OpenDMLParser::CreateNewStreamInfo()
 {
 	OpenDMLStream info;
-
-	info.is_audio = false;
-	info.is_video = false;
-	info.stream_header_valid = false;
-	info.audio_format = 0;
-	info.video_format_valid = false;
-	info.odml_index_start = 0;
-	info.odml_index_size = 0;
-	info.duration = 0;
-	info.frame_count = 0;
-	info.frames_per_sec_rate = 1;
-	info.frames_per_sec_scale = 1;
-	
 	fStreams.push_back(info);
 	
-	fCurrentStream = fStreams.last();
+	fCurrentStream = &fStreams[fStreams.size() - 1];// fStreams.last();
 }
 
 status_t

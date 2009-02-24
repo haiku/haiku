@@ -30,100 +30,103 @@
 
 #include "avi.h"
 
-class OpenDMLStream
-{
+class OpenDMLStream {
 public:
-			OpenDMLStream();
-			~OpenDMLStream();
+								OpenDMLStream();
+								OpenDMLStream(const OpenDMLStream& other);
+	virtual						~OpenDMLStream();
+
+			OpenDMLStream&		operator=(const OpenDMLStream& other);
+			bool				operator==(const OpenDMLStream& other) const;
+			bool				operator!=(const OpenDMLStream& other) const;
 			
-	bool				is_audio;
-	bool				is_video;
-	bool				is_subtitle;
+			bool				is_audio;
+			bool				is_video;
+			bool				is_subtitle;
 	
-	bool				stream_header_valid;
-	avi_stream_header	stream_header;
+			bool				stream_header_valid;
+			avi_stream_header	stream_header;
 	
-	bool				audio_format_valid;
-	wave_format_ex		*audio_format;
-	size_t				audio_format_size;
+			bool				audio_format_valid;
+			wave_format_ex*		audio_format;
+			size_t				audio_format_size;
 	
-	bool 				video_format_valid;
-	bitmap_info_header	video_format;
+			bool 				video_format_valid;
+			bitmap_info_header	video_format;
 	
-	int64				odml_index_start;
-	uint32				odml_index_size;
+			int64				odml_index_start;
+			uint32				odml_index_size;
 	
-	bigtime_t 			duration;
-	int64				frame_count;
-	uint32				frames_per_sec_rate;
-	uint32				frames_per_sec_scale;
+			bigtime_t 			duration;
+			int64				frame_count;
+			uint32				frames_per_sec_rate;
+			uint32				frames_per_sec_scale;
 };
 
-class OpenDMLParser
-{
+class OpenDMLParser {
 public:
-					OpenDMLParser(BPositionIO *source);
-					~OpenDMLParser();
+								OpenDMLParser(BPositionIO *source);
+	virtual						~OpenDMLParser();
 
-	status_t 		Init();
+			status_t 			Init();
 	
-	int				StreamCount();
+			int					StreamCount();
 
-	const OpenDMLStream * StreamInfo(int index);
+			const OpenDMLStream* StreamInfo(int index);
 	
-	int64			StandardIndexStart();
-	uint32			StandardIndexSize();
+			int64				StandardIndexStart();
+			uint32				StandardIndexSize();
 	
-	int64			MovieListStart();
-	uint32			MovieListSize() {return fMovieListSize;};
+			int64				MovieListStart();
+			uint32				MovieListSize() {return fMovieListSize;};
 
-	const avi_main_header * AviMainHeader();
-	const odml_extended_header * OdmlExtendedHeader();
-
-private:
-	status_t 		Parse();
-	status_t		ParseChunk_AVI(int number, uint64 start, uint32 size);
-	status_t		ParseChunk_LIST(uint64 start, uint32 size);
-	status_t		ParseChunk_idx1(uint64 start, uint32 size);
-	status_t		ParseChunk_indx(uint64 start, uint32 size);
-	status_t		ParseChunk_avih(uint64 start, uint32 size);
-	status_t		ParseChunk_strh(uint64 start, uint32 size);
-	status_t		ParseChunk_strf(uint64 start, uint32 size);
-	status_t		ParseChunk_strn(uint64 start, uint32 size);
-	status_t		ParseChunk_dmlh(uint64 start, uint32 size);
-	status_t		ParseList_movi(uint64 start, uint32 size);
-	status_t		ParseList_generic(uint64 start, uint32 size);
-	status_t		ParseList_INFO(uint64 start, uint32 size);
-	status_t		ParseList_strl(uint64 start, uint32 size);
-
-	void			CreateNewStreamInfo();
-	void			SetupStreamLength(OpenDMLStream *stream);
-	void			SetupAudioStreamLength(OpenDMLStream *stream);
-	void			SetupVideoStreamLength(OpenDMLStream *stream);
+			const avi_main_header* AviMainHeader();
+			const odml_extended_header* OdmlExtendedHeader();
 
 private:
+			status_t 			Parse();
+			status_t			ParseChunk_AVI(int number, uint64 start,
+									uint32 size);
+			status_t			ParseChunk_LIST(uint64 start, uint32 size);
+			status_t			ParseChunk_idx1(uint64 start, uint32 size);
+			status_t			ParseChunk_indx(uint64 start, uint32 size);
+			status_t			ParseChunk_avih(uint64 start, uint32 size);
+			status_t			ParseChunk_strh(uint64 start, uint32 size);
+			status_t			ParseChunk_strf(uint64 start, uint32 size);
+			status_t			ParseChunk_strn(uint64 start, uint32 size);
+			status_t			ParseChunk_dmlh(uint64 start, uint32 size);
+			status_t			ParseList_movi(uint64 start, uint32 size);
+			status_t			ParseList_generic(uint64 start, uint32 size);
+			status_t			ParseList_INFO(uint64 start, uint32 size);
+			status_t			ParseList_strl(uint64 start, uint32 size);
 
-	BPositionIO *	fSource;
-	int64 			fSize;
+			void				CreateNewStreamInfo();
+			void				SetupStreamLength(OpenDMLStream *stream);
+			void				SetupAudioStreamLength(OpenDMLStream *stream);
+			void				SetupVideoStreamLength(OpenDMLStream *stream);
+
+private:
+			BPositionIO*		fSource;
+			int64 				fSize;
 	
-	// TODO can be multiple Movi Lists
-	int64			fMovieListStart;
-	uint32			fMovieListSize;
+			// TODO can be multiple Movi Lists
+			int64				fMovieListStart;
+			uint32				fMovieListSize;
 	
-	int64			fStandardIndexStart;
-	uint32			fStandardIndexSize;
+			int64				fStandardIndexStart;
+			uint32				fStandardIndexSize;
 	
-	int				fStreamCount;
-	int				fMovieChunkCount;
+			int					fStreamCount;
+			int					fMovieChunkCount;
 	
-	avi_main_header fAviMainHeader;
-	bool			fAviMainHeaderValid;
+			avi_main_header		fAviMainHeader;
+			bool				fAviMainHeaderValid;
 	
-	odml_extended_header fOdmlExtendedHeader;
-	bool			fOdmlExtendedHeaderValid;
+			odml_extended_header fOdmlExtendedHeader;
+			bool				fOdmlExtendedHeaderValid;
 	
-	vector<OpenDMLStream>	fStreams;
-	OpenDMLStream *		fCurrentStream;
+			std::vector<OpenDMLStream>	fStreams;
+			OpenDMLStream *		fCurrentStream;
 };
 
 #endif
