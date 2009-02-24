@@ -333,7 +333,7 @@ View::CountChildren(bool deep) const
 			count += child->CountChildren(deep);
 		}
 	}
-	return count;	
+	return count;
 }
 
 
@@ -490,7 +490,7 @@ void
 View::SetUserClipping(const BRegion* region)
 {
 	fDrawState->SetClippingRegion(region);
-	
+
 	// rebuild clipping (for just this view)
 	RebuildClipping(false);
 }
@@ -667,7 +667,7 @@ View::ConvertFromParent(BRegion* region) const
 		fScrollingOffset.y - fFrame.top);
 }
 
-//! converts a point from local to screen coordinate system 
+//! converts a point from local to screen coordinate system
 void
 View::ConvertToScreen(BPoint* pt) const
 {
@@ -678,7 +678,7 @@ View::ConvertToScreen(BPoint* pt) const
 }
 
 
-//! converts a point from local to screen coordinate system 
+//! converts a point from local to screen coordinate system
 void
 View::ConvertToScreen(IntPoint* pt) const
 {
@@ -689,7 +689,7 @@ View::ConvertToScreen(IntPoint* pt) const
 }
 
 
-//! converts a rect from local to screen coordinate system 
+//! converts a rect from local to screen coordinate system
 void
 View::ConvertToScreen(BRect* rect) const
 {
@@ -700,7 +700,7 @@ View::ConvertToScreen(BRect* rect) const
 }
 
 
-//! converts a rect from local to screen coordinate system 
+//! converts a rect from local to screen coordinate system
 void
 View::ConvertToScreen(IntRect* rect) const
 {
@@ -711,7 +711,7 @@ View::ConvertToScreen(IntRect* rect) const
 }
 
 
-//! converts a region from local to screen coordinate system 
+//! converts a region from local to screen coordinate system
 void
 View::ConvertToScreen(BRegion* region) const
 {
@@ -722,7 +722,7 @@ View::ConvertToScreen(BRegion* region) const
 }
 
 
-//! converts a point from screen to local coordinate system 
+//! converts a point from screen to local coordinate system
 void
 View::ConvertFromScreen(BPoint* pt) const
 {
@@ -733,7 +733,7 @@ View::ConvertFromScreen(BPoint* pt) const
 }
 
 
-//! converts a point from screen to local coordinate system 
+//! converts a point from screen to local coordinate system
 void
 View::ConvertFromScreen(IntPoint* pt) const
 {
@@ -744,7 +744,7 @@ View::ConvertFromScreen(IntPoint* pt) const
 }
 
 
-//! converts a rect from screen to local coordinate system 
+//! converts a rect from screen to local coordinate system
 void
 View::ConvertFromScreen(BRect* rect) const
 {
@@ -755,7 +755,7 @@ View::ConvertFromScreen(BRect* rect) const
 }
 
 
-//! converts a rect from screen to local coordinate system 
+//! converts a rect from screen to local coordinate system
 void
 View::ConvertFromScreen(IntRect* rect) const
 {
@@ -766,7 +766,7 @@ View::ConvertFromScreen(IntRect* rect) const
 }
 
 
-//! converts a region from screen to local coordinate system 
+//! converts a region from screen to local coordinate system
 void
 View::ConvertFromScreen(BRegion* region) const
 {
@@ -777,7 +777,7 @@ View::ConvertFromScreen(BRegion* region) const
 }
 
 
-//! converts a point from local *drawing* to screen coordinate system 
+//! converts a point from local *drawing* to screen coordinate system
 void
 View::ConvertToScreenForDrawing(BPoint* point) const
 {
@@ -788,7 +788,7 @@ View::ConvertToScreenForDrawing(BPoint* point) const
 }
 
 
-//! converts a rect from local *drawing* to screen coordinate system 
+//! converts a rect from local *drawing* to screen coordinate system
 void
 View::ConvertToScreenForDrawing(BRect* rect) const
 {
@@ -875,7 +875,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 }
 
 
-//! converts points from local *drawing* to screen coordinate system 
+//! converts points from local *drawing* to screen coordinate system
 void
 View::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
 {
@@ -892,7 +892,7 @@ View::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
 }
 
 
-//! converts rects from local *drawing* to screen coordinate system 
+//! converts rects from local *drawing* to screen coordinate system
 void
 View::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
 {
@@ -909,7 +909,7 @@ View::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
 }
 
 
-//! converts regions from local *drawing* to screen coordinate system 
+//! converts regions from local *drawing* to screen coordinate system
 void
 View::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
 {
@@ -926,7 +926,7 @@ View::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) con
 }
 
 
-//! converts a point from screen to local coordinate system 
+//! converts a point from screen to local coordinate system
 void
 View::ConvertFromScreenForDrawing(BPoint* point) const
 {
@@ -1352,6 +1352,9 @@ View::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			if (rect.IsValid()/* && drawingEngine->Lock()*/) {
 				drawingEngine->ConstrainClippingRegion(redraw);
 
+				drawing_mode oldMode;
+				drawingEngine->SetDrawingMode(B_OP_COPY, oldMode);
+
 				if (fBitmapOptions & B_TILE_BITMAP) {
 					// tile across entire view
 
@@ -1397,6 +1400,8 @@ View::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 						rect);
 					redraw->Exclude(rect);
 				}
+
+				drawingEngine->SetDrawingMode(oldMode);
 
 				// NOTE: It is ok not to reset the clipping, that
 				// would only waste time
