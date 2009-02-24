@@ -205,8 +205,9 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 
 
 status_t
-avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
-			  bigtime_t in_requiredTime, bigtime_t *inout_time)
+avCodec::Seek(uint32 seekTo,
+				 int64 seekFrame, int64 *frame,
+				 bigtime_t seekTime, bigtime_t *time)
 {
 	// reset the ffmpeg codec
 	// to flush buffers, so we keep the sync
@@ -215,7 +216,25 @@ avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
 		avcodec_close(ffc);
 		fCodecInitDone = (avcodec_open(ffc, fCodec) >= 0);
 	}
-	fFrame = *inout_frame;
+	
+	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
+		TRACE("avCodec::Seek by time ");
+		TRACE("from frame %Ld and time %.6f TO Required Time %.6f. ", fFrame, fStartTime / 1000000.0, seekTime / 1000000.0);
+
+		*frame = (int64)(seekTime * fOutputFrameRate / 1000000LL);
+		*time = seekTime;
+	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
+		TRACE("avCodec::Seek by Frame ");
+		TRACE("from time %.6f and frame %Ld TO Required Frame %Ld. ", fStartTime / 1000000.0, fFrame, seekFrame);
+
+		*time = (bigtime_t)(seekFrame * 1000000LL / fOutputFrameRate);
+		*frame = seekFrame;
+	} else
+		return B_BAD_VALUE;
+
+	fFrame = *frame;
+	fStartTime = *time;
+	TRACE("so new frame is %Ld at time %.6f\n", *frame, *time / 1000000.0);
 	return B_OK;
 }
 
@@ -300,6 +319,8 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 //		ffc->frame_rate = (int)(fOutputVideoFormat.field_rate
 //			* ffc->frame_rate_base);
 		
+		fOutputFrameRate = fOutputVideoFormat.field_rate;
+		
 		if (fInputFormat.MetaDataSize() > 0) {
 			ffc->extradata = (uint8_t *)fInputFormat.MetaData();
 			ffc->extradata_size = fInputFormat.MetaDataSize();
@@ -331,6 +352,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 			// XXX set n-th ffc->pix_fmt here
 			if (avcodec_open(ffc, fCodec) >= 0) {
 				fCodecInitDone = true;
+
 				conv_func = resolve_colorspace(
 					fOutputVideoFormat.display.format, ffc->pix_fmt);
 			}
@@ -339,11 +361,12 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		}
 
 		if (!fCodecInitDone) {
-			TRACE("avcodec_open() failed!\n");
+			TRACE("avcodec_open() failed to init codec!\n");
 			return B_ERROR;
 		}
+
 		if (!conv_func) {
-			TRACE("no conv_func!\n");
+			TRACE("no conv_func found!\n");
 			return B_ERROR;
 		}
 
@@ -393,9 +416,9 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 //	TRACE("[%c] avCodec::Decode()\n", isAudio?('a'):('v'));
 
-	if (isAudio) {
+	mh->start_time = fStartTime;
 
-		mh->start_time = fStartTime;
+	if (isAudio) {
 
 //		TRACE("audio start_time %.6f\n", mh->start_time / 1000000.0);
 
@@ -462,6 +485,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				fOutputBufferSize = out_size;			
 			}
 		}
+		fFrame += *out_frameCount;
 
 	} else {	// Video
 
@@ -477,9 +501,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 		}
 
 		mh->type = B_MEDIA_RAW_VIDEO;
-//		mh->start_time = (bigtime_t) (1000000.0 * fFrame
-//			/ fOutputVideoFormat.field_rate);
-		mh->start_time = chunk_mh.start_time;
+//		mh->start_time = chunk_mh.start_time;
 		mh->file_pos = 0;
 		mh->orig_size = 0;
 		mh->u.raw_video.field_gamma = 1.0;
@@ -561,6 +583,9 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #endif
 		}
 	}
+
+	fStartTime = (bigtime_t) (1000000LL * fFrame / fOutputFrameRate);
+
 //	TRACE("END of avCodec::Decode()\n");
 	return B_OK;
 }

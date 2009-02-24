@@ -45,9 +45,8 @@ class avCodec : public Decoder
 		virtual status_t Decode(void *out_buffer, int64 *out_frameCount,
 							    media_header *mh, media_decode_info *info);
 	
-		virtual status_t Seek(uint32 in_towhat,
-							   int64 in_requiredFrame, int64 *inout_frame,
-							   bigtime_t in_requiredTime, bigtime_t *inout_time);
+		virtual status_t Seek(uint32 seekTo, int64 seekFrame, int64 *frame,
+							 bigtime_t seekTime, bigtime_t *time);
 	
 	
 	protected:
