@@ -65,6 +65,13 @@ struct avi_cookie
 	
 	// video only:
 	uint32		line_count;
+	
+	// audio only:
+	uint32		sample_size;
+	uint32		frame_size;
+	int64		byte_pos;
+	uint16		bytes_per_second;
+	bool		is_vbr;
 };
 
 
@@ -150,6 +157,9 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	cookie->buffer_size = 0;
 	cookie->is_audio = false;
 	cookie->is_video = false;
+	cookie->byte_pos = 0;
+	cookie->is_vbr = false;
+	cookie->bytes_per_second = 0;
 
 	BMediaFormats formats;
 	media_format *format = &cookie->format;
@@ -182,6 +192,9 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 
 		TRACE("audio frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6);
 
+		cookie->bytes_per_second = audio_format->avg_bytes_per_sec;
+		cookie->sample_size = stream_header->sample_size == 0 ? audio_format->bits_per_sample / 8 * audio_format->channels : stream_header->sample_size;
+
 		if (audio_format->format_tag == 0x0001) {
 			// a raw PCM format
 			description.family = B_BEOS_FORMAT_FAMILY;
@@ -205,6 +218,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
 			format->u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
 			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
+			cookie->frame_size = cookie->sample_size;
 		} else {
 			// some encoded format
 			description.family = B_WAV_FORMAT_FAMILY;
@@ -214,11 +228,18 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->u.encoded_audio.bit_rate = 8 * audio_format->avg_bytes_per_sec;
 			format->u.encoded_audio.output.frame_rate = audio_format->frames_per_sec;
 			format->u.encoded_audio.output.channel_count = audio_format->channels;
-			TRACE("audio: bit_rate %.3f, frame_rate %.1f, channel_count %lu\n",
+			cookie->frame_size = audio_format->block_align == 0 ? 1 : audio_format->block_align;
+			
+			// detect vbr audio in avi hack
+			cookie->is_vbr = cookie->frame_size >= 960;
+
+			TRACE("audio: bit_rate %.3f, frame_rate %.1f, channel_count %lu, frame_size %ld, is vbr %s\n",
 				  format->u.encoded_audio.bit_rate,
 				  format->u.encoded_audio.output.frame_rate,
-				  format->u.encoded_audio.output.channel_count);
+				  format->u.encoded_audio.output.channel_count,
+				  cookie->frame_size, cookie->is_vbr ? "true" : "false");
 		}
+		
 		// TODO: this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audio_format->format_tag; format->user_data[4] = 0;
@@ -252,6 +273,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frames_per_sec_rate = fFile->StreamInfo(streamNumber)->frames_per_sec_rate;
 		cookie->frames_per_sec_scale =  fFile->StreamInfo(streamNumber)->frames_per_sec_scale;
 		cookie->line_count = fFile->AviMainHeader()->height;
+		cookie->frame_size = 1;
 		
 		TRACE("video frame_count %Ld, duration %.6f\n", cookie->frame_count,
 			cookie->duration / 1E6);
@@ -338,9 +360,10 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 status_t
 aviReader::Seek(void *_cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 {
+	// Seek changes the position of the stream
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
-	TRACE("aviReader::Seek: stream %d, seekTo%s%s%s%s, time %Ld, frame %Ld\n",
+	TRACE("aviReader::Seek: stream %d, seekTo%s%s%s%s, time %.6f, frame %Ld\n",
 		cookie->stream,
 		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
 		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
@@ -348,25 +371,29 @@ aviReader::Seek(void *_cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 			" B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ?
 			" B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		*time, *frame);
+		*time / 1000000.0, *frame);
 
 	status_t rv = fFile->Seek(cookie->stream, seekTo, frame, time, false);
 	if (rv == B_OK) {
 		cookie->frame_pos = *frame;
-		TRACE("aviReader::Seek: stream %d, success, setting frame_pos "
-			"to %lld\n", cookie->stream, cookie->frame_pos);
+		if (cookie->is_audio && !cookie->is_vbr) {
+			// calculate byte_pos from time
+			cookie->byte_pos = *time * cookie->bytes_per_second / 1000000LL;
+		}
+		TRACE("aviReader::Seek: stream %d, success, frame_pos = %Ld, time = %.6f\n", cookie->stream, cookie->frame_pos, *time / 1000000.0);
 	}
+
 	return rv;
 }
 
 
 status_t
-aviReader::FindKeyFrame(void *_cookie, uint32 flags, int64 *frame,
-	bigtime_t *time)
+aviReader::FindKeyFrame(void *_cookie, uint32 flags, int64 *frame, bigtime_t *time)
 {
+	// FindKeyFrame does not change the position of the stream
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
-	TRACE("aviReader::FindKeyFrame: stream %d, flags%s%s%s%s, time %Ld, "
+	TRACE("aviReader::FindKeyFrame: stream %d, flags%s%s%s%s, time %.6f, "
 		"frame %Ld\n",
 		cookie->stream,
 		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
@@ -375,12 +402,11 @@ aviReader::FindKeyFrame(void *_cookie, uint32 flags, int64 *frame,
 			" B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ?
 			" B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		*time, *frame);
+		*time / 1000000.0, *frame);
 
 	status_t rv = fFile->Seek(cookie->stream, flags, frame, time, true);
 	if (rv == B_OK) {
-		TRACE("aviReader::FindKeyFrame: stream %d, success\n",
-			cookie->stream);
+		TRACE("aviReader::FindKeyFrame: stream %d, success\n", cookie->stream);
 	}
 	return rv;
 }
@@ -393,6 +419,7 @@ aviReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
 	int64 start; uint32 size; bool keyframe;
+	
 	if (fFile->GetNextChunkInfo(cookie->stream, &start, &size,
 			&keyframe) < B_OK)
 		return B_LAST_BUFFER_ERROR;
@@ -412,30 +439,41 @@ aviReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 		}
 	}
 
-	mediaHeader->start_time = (cookie->frame_pos * 1000000
+	mediaHeader->start_time = (cookie->frame_pos * 1000000LL
 		* cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
 	
+	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%, frame %Ld chunk size %ld\n", 
+		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
+		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0
+		/ cookie->frame_count, cookie->frame_pos, size);
+
 	if (cookie->is_audio) {
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ?
 			B_MEDIA_KEY_FRAME : 0;
-		cookie->frame_pos += size;
+
+		cookie->frame_pos += (uint64)(ceil((double)size / (double)cookie->frame_size)) * cookie->frames_per_sec_scale;
+		cookie->byte_pos += size;
+		// frame_pos is sample no for vbr encoded audio and byte position for everything else
+//		if (cookie->is_vbr) {
+			// advance by frame_size
+//		} else {
+//			cookie->frame_pos += (uint64)(ceil((double)size / (double)cookie->frame_size)) * cookie->frames_per_sec / cookie->avg_bytes_per_sec;
+			// advance by bytes in chunk and calculate frame_pos
+//			time = cookie->byte_pos * 1000000LL / cookie->bytes_per_second;
+//			cookie->frame_pos = time * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale / 1000000LL;
+//		}
 	} else if (cookie->is_video) {
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
 		mediaHeader->u.encoded_video.field_flags = keyframe ?
 			B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
-		cookie->frame_pos += 1;
+		cookie->frame_pos += cookie->frame_size;
 	} else {
 		return B_BAD_VALUE;
 	}
 	
-//	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%\n", 
-//		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
-//		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0
-//		/ cookie->frame_count);
-
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;
 	return (int)size == fFile->Source()->ReadAt(start, cookie->buffer, size) ?

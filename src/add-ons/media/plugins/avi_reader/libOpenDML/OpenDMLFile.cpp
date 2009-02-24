@@ -108,6 +108,7 @@ OpenDMLFile::Init()
 			fIndex = NULL;
 		}
 	}
+	
 	if (!fIndex && fParser->StandardIndexSize() != 0) {
 		fIndex = new StandardIndex(fSource, fParser);
 		if (fIndex->Init() < B_OK) {
@@ -115,6 +116,7 @@ OpenDMLFile::Init()
 			fIndex = NULL;
 		}
 	}
+	
 	if (!fIndex) {
 		fIndex = new FallbackIndex(fSource, fParser);
 		if (fIndex->Init() < B_OK) {
@@ -124,6 +126,8 @@ OpenDMLFile::Init()
 			return B_ERROR;
 		}
 	}
+	
+//	fIndex->DumpIndex(1);
 	
 	TRACE("OpenDMLFile::SetTo: this is a %s AVI file with %d streams\n", fParser->OdmlExtendedHeader() ? "OpenDML" : "standard", fParser->StreamCount());
 
@@ -385,7 +389,7 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 
 
 status_t
-OpenDMLFile::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size,
+OpenDMLFile::GetNextChunkInfo(int stream_index, off_t *start, uint32 *size,
 	bool *keyframe)
 {
 	return fIndex->GetNextChunkInfo(stream_index, start, size, keyframe);
@@ -470,7 +474,7 @@ OpenDMLFile::StreamFormat(int stream_index)
 		&fParser->StreamInfo(stream_index)->stream_header : 0;
 }
 
-const stream_info *
+const OpenDMLStream *
 OpenDMLFile::StreamInfo(int index)
 {
 	return fParser->StreamInfo(index);

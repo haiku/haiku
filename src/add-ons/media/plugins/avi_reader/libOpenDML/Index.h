@@ -25,12 +25,45 @@
 #ifndef _INDEX_H
 #define _INDEX_H
 
-
 #include <SupportDefs.h>
+#include <vector>
+
+/*
+	This class handles all indexing of an AVI file
+	Subclasses should override Init and create index entries based on the
+	specialised index.
+	
+	Seek and GetNextChunk will then work.
+	
+	Current known subclasses are:
+		Standard Index - Original AVI index idx1
+		OpenDMLIndex - Open DML Standard Index
+		FallBackIndex - Index created from the movi chunk
+*/
+
 
 class BPositionIO;
 class OpenDMLParser;
 
+class IndexEntry {
+public:
+	IndexEntry() {frame_no = 0;position=0;size=0;pts=0;keyframe=false;};
+	
+	uint64			frame_no;		// frame_no or sample_no
+	off_t			position;		// The offset in the stream where the frame is
+	uint32			size;			// The size of the data available
+	bigtime_t		pts;			// Presentation Time Stamp for this frame
+	bool			keyframe;		// Is this a keyframe.
+};
+
+class MediaStream {
+public:
+	MediaStream() {seek_index_next=0;current_chunk=0;} ;
+	~MediaStream() {seek_index.clear();};
+	std::vector<IndexEntry>	seek_index;
+	uint64			seek_index_next;
+	uint64			current_chunk;
+};
 
 class Index {
 public:
@@ -39,14 +72,22 @@ public:
 
 	virtual status_t	Init() = 0;
 
-	virtual status_t	GetNextChunkInfo(int stream_index, int64 *start,
-							uint32 *size, bool *keyframe) = 0;
-	virtual status_t	Seek(int stream_index, uint32 seekTo, int64 *frame,
-							bigtime_t *time, bool readOnly) = 0;
+	status_t			GetNextChunkInfo(int stream_index, off_t *start,
+							uint32 *size, bool *keyframe);
+
+	status_t			Seek(int stream_index, uint32 seekTo, int64 *frame,
+							bigtime_t *time, bool readOnly);
+
+	void				AddIndex(int stream_index, off_t position, uint32 size, uint64 frame, bigtime_t pts, bool keyframe);
+	void				DumpIndex(int stream_index);
 
 protected:
 	BPositionIO *		fSource;
 	OpenDMLParser *		fParser;
+	int					fStreamCount;
+
+private:
+	std::vector<MediaStream>	fStreamData;
 };
 
 #endif	// _INDEX_H

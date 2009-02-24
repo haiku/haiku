@@ -36,37 +36,9 @@ public:
 
 	status_t			Init();
 
-	status_t			GetNextChunkInfo(int stream_index, int64* start,
-							uint32* size, bool* keyframe);
-	status_t			Seek(int stream_index, uint32 seekTo, int64* frame,
-							bigtime_t* time, bool readOnly);
-
 private:
-	void				DumpIndex();
-
-private:
-	struct seek_hint
-	{
-		uint64			stream_pos;
-		uint32			index_pos;
-	};
-
-	struct stream_data
-	{
-		uint32			chunk_id;
-		uint32			chunk_count;
-		uint32			keyframe_count;
-		uint32			stream_pos;
-		uint64			stream_size;		
-		seek_hint *		seek_hints;
-		int				seek_hints_count;
-		uint32			seek_hints_next;
-	};
-		
 	avi_standard_index_entry *fIndex;
 	uint32				fIndexSize;
-	stream_data *		fStreamData;
-	int					fStreamCount;
 	int64				fDataOffset;
 };
 

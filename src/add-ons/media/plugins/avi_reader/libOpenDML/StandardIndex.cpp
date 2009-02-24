@@ -25,9 +25,9 @@
  */
 #include <SupportDefs.h>
 #include <DataIO.h>
+#include <math.h>
 #include <stdio.h>
 #include <new>
-#include "ReaderPlugin.h" // B_MEDIA_*
 #include "StandardIndex.h"
 #include "OpenDMLParser.h"
 
@@ -48,8 +48,6 @@ StandardIndex::StandardIndex(BPositionIO *source, OpenDMLParser *parser)
  :	Index(source, parser)
  ,	fIndex(NULL)
  ,	fIndexSize(0)
- ,	fStreamData(NULL)
- ,	fStreamCount(parser->StreamCount())
  ,	fDataOffset(parser->MovieListStart() - 4)
 {
 }
@@ -58,11 +56,6 @@ StandardIndex::StandardIndex(BPositionIO *source, OpenDMLParser *parser)
 StandardIndex::~StandardIndex()
 {
 	delete [] fIndex;
-	if (fStreamData) {
-		for (int i = 0; i < fStreamCount; i++)
-			delete [] fStreamData[i].seek_hints;
-	}
-	delete [] fStreamData;
 }
 
 
@@ -72,12 +65,7 @@ StandardIndex::Init()
 	uint32 indexBytes = fParser->StandardIndexSize();
 	fIndexSize = indexBytes / sizeof(avi_standard_index_entry);
 	indexBytes = fIndexSize * sizeof(avi_standard_index_entry);
-	uint32 seekHintsStride = 1800 * fStreamCount;
-	uint32 seekHintsMax = fIndexSize / seekHintsStride;
 	
-	TRACE("StandardIndex::Init: seekHintsStride %lu\n", seekHintsStride);
-	TRACE("StandardIndex::Init: seekHintsMax %lu\n", seekHintsMax);
-
 #ifdef TRACE_START_INDEX
 { BStopWatch w("StandardIndex::Init: malloc");
 #endif
@@ -114,216 +102,78 @@ StandardIndex::Init()
 	//DumpIndex();
 #endif
 
-	fStreamData = new stream_data[fStreamCount];
-	for (int i = 0; i < fStreamCount; i++) {
-		fStreamData[i].chunk_id = i / 10 + '0' + (i % 10 + '0') * 256;
-		fStreamData[i].chunk_count = 0;
-		fStreamData[i].keyframe_count = 0;
-		fStreamData[i].stream_pos = 0;
-		fStreamData[i].stream_size = 0;
-		fStreamData[i].seek_hints = new seek_hint[seekHintsMax];
-		fStreamData[i].seek_hints_count = 0;
-		fStreamData[i].seek_hints_next = seekHintsStride;
-	}
-
 #ifdef TRACE_START_INDEX
 { BStopWatch w("StandardIndex::Init: scan index");
 #endif
 	
-	for (int stream = 0; stream < fStreamCount; stream++) {
-		uint32 chunk_id = fStreamData[stream].chunk_id;
-		uint64 stream_size = 0;
-		uint32 chunk_count = 0;
-		uint32 keyframe_count = 0;
-		uint32 seek_hints_next = seekHintsStride;
-		uint32 seek_hints_count = 0;
-		for (uint32 i = 0; i < fIndexSize; i++) {
-			if ((fIndex[i].chunk_id & 0xffff) == chunk_id) {
-				stream_size += fIndex[i].chunk_length;
-				chunk_count++;
-				keyframe_count += (fIndex[i].flags >> AVIIF_KEYFRAME_SHIFT) & 1;
-
-				if (i >= seek_hints_next) {
-					seek_hints_next = i + seekHintsStride;
-					seek_hint *hint = &fStreamData[stream].seek_hints[
-						seek_hints_count++];
-					hint->stream_pos = fIndex[i].chunk_offset;
-					hint->index_pos = i;
-				}
-			}
-		}
-		fStreamData[stream].stream_size = stream_size;
-		fStreamData[stream].chunk_count = chunk_count;
-		fStreamData[stream].keyframe_count = keyframe_count;
-		fStreamData[stream].seek_hints_count = seek_hints_count;
-	}
-#ifdef TRACE_START_INDEX
-}
-
-	for (int i = 0; i < fStreamCount; i++) {
-		printf("stream %d, stream_size %llu\n", i, fStreamData[i].stream_size);
-		printf("stream %d, chunk_count %lu\n", i, fStreamData[i].chunk_count);
-		printf("stream %d, keyframe_count %lu\n", i,
-			fStreamData[i].keyframe_count);
-		printf("stream %d, seek_hints_count %lu\n", i,
-			fStreamData[i].seek_hints_count);
-		for (int j = 0; j < fStreamData[i].seek_hints_count; j++) {
-			printf("  seek_hint %3d, index_pos %6lu, stream_pos %lld\n", j,
-				fStreamData[i].seek_hints[j].index_pos, 
-				fStreamData[i].seek_hints[j].stream_pos);
-		}
-	}
-#endif // TRACE_START_INDEX
-
-	return B_OK;
-}
-
-
-void 
-StandardIndex::DumpIndex()
-{
-	uint32 chunk = fIndex->chunk_id;
-	int count = 0;
-	int pos = 0;
-
-	printf("StandardIndex::DumpIndex %lu entries\n", fIndexSize);
-	for (uint32 i = 0; i < fIndexSize; i++) {
-		count++;
-		if (chunk != fIndex[i].chunk_id) {
-			printf("%3d %c%c%c%c", count, FOURCC_PARAM(chunk));
-			chunk = fIndex[i].chunk_id;
-			count = 0;
-			if (++pos % 8 == 0)
-				printf("\n");			
-		}
-	}
-	if (count)
-		printf("%3d %c%c%c%c", count, FOURCC_PARAM(chunk));
-	printf("\n");			
-}
-
-
-status_t
-StandardIndex::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size,
-	bool *keyframe)
-{
-	stream_data *data = &fStreamData[stream_index];
-	while (data->stream_pos < fIndexSize) {
-		if ((fIndex[data->stream_pos].chunk_id & 0xffff) == data->chunk_id) {
-			*keyframe = fIndex[data->stream_pos].flags & AVIIF_KEYFRAME;
-			*start = fDataOffset + fIndex[data->stream_pos].chunk_offset + 8; 
-				// skip 8 bytes (chunk id + chunk size)
-			*size = fIndex[data->stream_pos].chunk_length;
-			data->stream_pos++;
-			return B_OK;
-		}
-		data->stream_pos++;
-	}
-
-	return B_ERROR;
-}
-
-
-status_t
-StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
-	bigtime_t *time, bool readOnly)
-{
-	TRACE("StandardIndex::Seek: stream %d, seekTo%s%s%s%s, time %Ld, "
-		"frame %Ld\n", stream_index,
-		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
-		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ?
-			" B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ?
-			" B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		*time, *frame);
+	int stream_index;
+	off_t position;
+	uint32 size;
+	uint64 frame[fStreamCount];
+	uint64 frame_no;
+	bigtime_t pts = 0;
+	bool keyframe;
+	uint32 sample_size;
 	
-	const stream_info *stream = fParser->StreamInfo(stream_index);
-	stream_data *data = &fStreamData[stream_index];
+	const OpenDMLStream *stream;
 
-	int64 frame_pos;
-	if (seekTo & B_MEDIA_SEEK_TO_FRAME)
-		frame_pos = *frame;
-	else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		frame_pos = (*time * stream->frames_per_sec_rate)
-			/ (1000000 * stream->frames_per_sec_scale);
-	} else
-		return B_BAD_VALUE;
+	for (uint32 i=0;i < fStreamCount; i++) {
+		frame[i] = 0;
+	}
 
-	if (stream->is_audio) {
-		// TODO: Actually take keyframe flags into account!
-		int64 bytes = 0;
-		for (uint32 i = 0; i < fIndexSize; i++) {
-			if ((fIndex[i].chunk_id & 0xffff) == data->chunk_id) {
-				int64 bytesNext = bytes + fIndex[i].chunk_length;
-				if (bytes <= frame_pos && bytesNext > frame_pos) {
-					if (!readOnly)
-						data->stream_pos = i;
-					goto done;
-				}
-				bytes = bytesNext;
-			}
-		}
-	} else if (stream->is_video) {
-		// iterate over all index entries of the stream,
-		// there is one entry per frame (TODO: actually one per field,
-		// if I interprete the documentation correctly...)
-		int pos = 0;
-		int lastKeyframePos = 0;
-		int lastKeyframeIndex = 0;
-		for (uint32 i = 0; i < fIndexSize; i++) {
-			// ignore index entries which are not for this stream
-			if ((fIndex[i].chunk_id & 0xffff) != data->chunk_id)
-				continue;
+	for (uint32 i = 0; i < fIndexSize; i++) {
+		
+		stream_index = ((fIndex[i].chunk_id & 0xff) - '0') * 10;
+        stream_index += ((fIndex[i].chunk_id >> 8) & 0xff) - '0';
 
-			// remember the last known keyframe index/frame
-			if (fIndex[i].flags & AVIIF_KEYFRAME) {
-				lastKeyframePos = pos;
-				lastKeyframeIndex = i;
-				TRACE("keyframe at index %ld, frame %ld (seek: %ld)\n", i,
-					pos, frame_pos);
-			}
+		stream = fParser->StreamInfo(stream_index);
+        
+        keyframe = (fIndex[i].flags >> AVIIF_KEYFRAME_SHIFT) & 1;
+        size = fIndex[i].chunk_length;
+        
+        // Some muxers write chunk_offset as non-relative, need to handle this case.
+        position = fDataOffset + fIndex[i].chunk_offset;
+		frame_no = frame[stream_index];
 
-			if (seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
-				// use the index and frame of the last keyframe
-				if (pos == frame_pos) {
-					frame_pos = lastKeyframePos;
-					if (!readOnly)
-						data->stream_pos = lastKeyframeIndex;
-					goto done;
-				}
-			} else if (seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) {
-				// use the index and frame of the last keyframe
-				// if this frame is a keyframe and we at or past
-				// the seek position
-				if (pos >= frame_pos && pos == lastKeyframePos) {
-					frame_pos = lastKeyframePos;
-					if (!readOnly)
-						data->stream_pos = lastKeyframeIndex;
-					goto done;
+		if (stream->is_video) {
+			// Video is easy enough, it is always 1 frame = 1 index
+			pts = frame[stream_index] * 1000000LL * stream->frames_per_sec_scale / stream->frames_per_sec_rate;
+			frame[stream_index]++;
+		} else if (stream->is_audio) {
+
+			pts = frame[stream_index] * 1000000LL / stream->audio_format->frames_per_sec;
+
+			// Audio varies based on many different hacks over the years
+			// The simplest is chunk size / sample size = no of samples in the chunk for uncompressed audio
+			// ABR Compressed audio is more difficult and VBR Compressed audio is even harder
+			// What follows is what I have worked out from various sources across the internet.
+			if (stream->audio_format->format_tag != 0x0001) {
+				// VBR audio is detected as having a block_align >= 960
+				if (stream->audio_format->block_align >= 960) {
+					// VBR Audio so block_align is the largest no of samples in a chunk
+					// scale is the no of samples in a frame
+					// rate is the sample rate
+					// but we must round up when calculating no of frames in a chunk
+					frame[stream_index] += (uint64)(ceil((double)size / (double)stream->audio_format->block_align)) * stream->frames_per_sec_scale;
+				} else {
+					// ABR Audio so use Chunk Size and average bytes per second to determine how many samples there are in the chunk
+					frame[stream_index] += (uint64)(ceil((double)size / (double)stream->audio_format->block_align)) * stream->audio_format->frames_per_sec / stream->audio_format->avg_bytes_per_sec;
 				}
 			} else {
-				// ignore keyframes
-				if (pos == frame_pos) {
-					if (!readOnly)
-						data->stream_pos = i;
-					goto done;
+				// sample size can be corrupt
+				if (stream->stream_header.sample_size > 0) {
+					sample_size = stream->stream_header.sample_size;
+				} else {
+					// compute sample size
+					sample_size = stream->audio_format->bits_per_sample * stream->audio_format->channels / 8;
 				}
+				frame[stream_index] += size / stream->stream_header.sample_size;
 			}
-			pos++;
 		}
-	} else {
-		return B_BAD_VALUE;
+        
+        AddIndex(stream_index, position, size, frame_no, pts, keyframe);
 	}
 
-	ERROR("libOpenDML: seek failed, position not found\n");
-	return B_ERROR;
-
-done:
-	TRACE("seek done: index: pos %d, size  %d\n", data->stream_pos, fIndexSize);
-	*frame = frame_pos;
-	*time = (frame_pos * 1000000 * stream->frames_per_sec_scale)
-		/ stream->frames_per_sec_rate;
 	return B_OK;
 }
 

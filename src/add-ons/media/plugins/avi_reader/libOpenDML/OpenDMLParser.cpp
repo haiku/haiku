@@ -27,7 +27,7 @@
 #include "OpenDMLParser.h"
 #include "avi.h"
 
-//#define TRACE_ODML_PARSER
+#define TRACE_ODML_PARSER
 #ifdef TRACE_ODML_PARSER
   #define TRACE printf
 #else
@@ -68,16 +68,13 @@ OpenDMLParser::StreamCount()
 	return fStreamCount;
 }
 
-const stream_info *
+const OpenDMLStream *
 OpenDMLParser::StreamInfo(int index)
 {
 	if (index < 0 || index >= fStreamCount)
 		return NULL;
 	
-	stream_info *info = fStreams;
-	while (index--)
-		info = info->next;
-	return info;
+	return &fStreams[index];
 }
 
 int64
@@ -113,30 +110,23 @@ OpenDMLParser::OdmlExtendedHeader()
 void
 OpenDMLParser::CreateNewStreamInfo()
 {
-	stream_info *info = new stream_info;
-	info->next = 0;
-	info->is_audio = false;
-	info->is_video = false;
-	info->stream_header_valid = false;
-	info->audio_format = 0;
-	info->video_format_valid = false;
-	info->odml_index_start = 0;
-	info->odml_index_size = 0;
-	info->duration = 0;
-	info->frame_count = 0;
-	info->frames_per_sec_rate = 1;
-	info->frames_per_sec_scale = 1;
+	OpenDMLStream info;
+
+	info.is_audio = false;
+	info.is_video = false;
+	info.stream_header_valid = false;
+	info.audio_format = 0;
+	info.video_format_valid = false;
+	info.odml_index_start = 0;
+	info.odml_index_size = 0;
+	info.duration = 0;
+	info.frame_count = 0;
+	info.frames_per_sec_rate = 1;
+	info.frames_per_sec_scale = 1;
 	
-	// append the new stream_info to the fStreams list and point fCurrentStream to it
-	if (fStreams) {
-		stream_info *cur = fStreams;
-		while (cur->next)
-			cur = cur->next;
-		cur->next = info;
-	} else {
-		fStreams = info;
-	}
-	fCurrentStream = info;
+	fStreams.push_back(info);
+	
+	fCurrentStream = fStreams.last();
 }
 
 status_t
@@ -176,13 +166,13 @@ OpenDMLParser::Init()
 #endif
 	
 	for (int i = 0; i < fStreamCount; i++) {
-		SetupStreamLength(const_cast<stream_info *>(StreamInfo(i)));
+		SetupStreamLength(const_cast<OpenDMLStream *>(StreamInfo(i)));
 	}
 	return B_OK;
 }
 
 void
-OpenDMLParser::SetupStreamLength(stream_info *stream)
+OpenDMLParser::SetupStreamLength(OpenDMLStream *stream)
 {
 	if (stream->is_audio)
 		SetupAudioStreamLength(stream);
@@ -193,7 +183,7 @@ OpenDMLParser::SetupStreamLength(stream_info *stream)
 // F:\avi-info\Information on AVI file.htm
 
 void
-OpenDMLParser::SetupAudioStreamLength(stream_info *stream)
+OpenDMLParser::SetupAudioStreamLength(OpenDMLStream *stream)
 {
 	stream->frame_count = stream->stream_header.length;
 
@@ -201,43 +191,50 @@ OpenDMLParser::SetupAudioStreamLength(stream_info *stream)
 	  && stream->stream_header.sample_size != 0
 	  && stream->stream_header.sample_size != 1) { // PCM
 		stream->frame_count /= (stream->stream_header.sample_size + 7) / 8;
-		TRACE("audio: messing up PCM frame_count?\n");
+		TRACE("audio: messed up PCM frame_count?\n");
 	}
 
 	if (stream->stream_header.rate && stream->stream_header.scale) {
 		stream->frames_per_sec_rate = stream->stream_header.rate;
 		stream->frames_per_sec_scale = stream->stream_header.scale;
-		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000) / stream->frames_per_sec_rate;
-		TRACE("audio: using rate+scale\n");
+		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000LL) / stream->frames_per_sec_rate;
+		TRACE("audio: duration calculated using rate+scale\n");
 	} else if (stream->audio_format->avg_bytes_per_sec) {
 		stream->frames_per_sec_rate = stream->audio_format->avg_bytes_per_sec;
 		stream->frames_per_sec_scale = 1;
-		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000) / stream->frames_per_sec_rate;
-		TRACE("audio: using avg_bytes_per_sec\n");
+		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000LL) / stream->frames_per_sec_rate;
+		TRACE("audio: duration calculated using avg_bytes_per_sec\n");
 	} else if (AviMainHeader()->micro_sec_per_frame) {
 		uint32 video_frame_count = OdmlExtendedHeader() ? OdmlExtendedHeader()->total_frames : AviMainHeader()->total_frames;
 		stream->duration = video_frame_count * AviMainHeader()->micro_sec_per_frame;
-		stream->frames_per_sec_rate = (stream->frame_count * 1000 * 1000000) / stream->duration;
+		stream->frames_per_sec_rate = (stream->frame_count * 1000 * 1000000LL) / stream->duration;
 		stream->frames_per_sec_scale = 1000;
-		TRACE("audio: using micro_sec_per_frame\n");
+		TRACE("audio: duration calculated using micro_sec_per_frame\n");
 	} else {
-		TRACE("audio: no idea what to do\n");
+		TRACE("audio: duration could not be calculated no idea what to do\n");
 	}
 
-	if (stream->audio_format->avg_bytes_per_sec) {
-		int64 expectedFrameCount
-			= (stream->duration * stream->audio_format->avg_bytes_per_sec)
-				/ 1000000;
-		TRACE("audio: expected frame_count %lld, calculated stream "
-			"frame_count %lld\n", expectedFrameCount, stream->frame_count);
-		if (expectedFrameCount * 9 > stream->frame_count * 10) {
-			TRACE("audio: something is wrong, ignoring calculated stream "
-				"frame_count, rate and scale\n");
-			stream->frame_count = expectedFrameCount;
-			stream->frames_per_sec_rate
-				= stream->audio_format->avg_bytes_per_sec;
+	// The stream details are often wrong, if there is a audio format structure we attempt to use that
+	if (stream->audio_format->format_tag == 0x0001) {	// RAW PCM
+		if (stream->audio_format->avg_bytes_per_sec) {
+			int64 expectedFrameCount
+				= (stream->duration * stream->audio_format->avg_bytes_per_sec)
+					/ 1000000;
+			TRACE("audio: expected frame_count %lld, stream "
+				"frame_count %lld\n", expectedFrameCount, stream->frame_count);
+			if (expectedFrameCount * 9 > stream->frame_count * 10) {
+				TRACE("audio: something is wrong, ignoring stream frame_count\n");
+				stream->frame_count = expectedFrameCount;
+			}
+
+			stream->frames_per_sec_rate	= stream->audio_format->avg_bytes_per_sec;
 			stream->frames_per_sec_scale = 1;
 		}
+	} else {
+		// encoded format usually has audio format details correct so always use them
+//		stream->frames_per_sec_rate	= stream->audio_format->frames_per_sec;
+//		stream->frames_per_sec_scale = 1;
+		stream->frame_count = stream->duration * stream->audio_format->frames_per_sec / 1000000LL;
 	}
 
 	TRACE("audio: frame_count %lld, duration %.6f, fps %.3f\n", 
@@ -246,7 +243,7 @@ OpenDMLParser::SetupAudioStreamLength(stream_info *stream)
 }
 
 void
-OpenDMLParser::SetupVideoStreamLength(stream_info *stream)
+OpenDMLParser::SetupVideoStreamLength(OpenDMLStream *stream)
 {
 	stream->frame_count = stream->stream_header.length;
 	if (stream->stream_header.rate && stream->stream_header.scale) {
@@ -410,8 +407,8 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 		}
 
 		if (Chunksize == 0) {
-			ERROR("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
-			return B_ERROR;
+			TRACE("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
+			return B_OK;
 		}
 
 		if (Chunkfcc == FOURCC('L','I','S','T')) {
@@ -893,8 +890,10 @@ OpenDMLParser::ParseList_movi(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseList_movi, size %lu\n", size);
 
-	if (fMovieListStart == 0)
+	if (fMovieListStart == 0) {
 		fMovieListStart = start;
+		fMovieListSize = size;
+	}
 	
 	fMovieChunkCount++;
 	return B_OK;

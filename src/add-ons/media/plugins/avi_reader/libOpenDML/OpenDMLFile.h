@@ -41,7 +41,7 @@ public:
 	
 	int					StreamCount();
 
-	const stream_info * StreamInfo(int index);
+	const OpenDMLStream * StreamInfo(int index);
 	
 /*
 	bigtime_t			Duration();
@@ -57,7 +57,7 @@ public:
 	const bitmap_info_header *	VideoFormat(int stream_index);
 	const avi_stream_header *	StreamFormat(int stream_index);
 	
-	status_t			GetNextChunkInfo(int stream_index, int64 *start,
+	status_t			GetNextChunkInfo(int stream_index, off_t *start,
 							uint32 *size, bool *keyframe);
 	status_t			Seek(int stream_index, uint32 seekTo, int64 *frame,
 							bigtime_t *time, bool readOnly);
