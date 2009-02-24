@@ -1,5 +1,7 @@
-// Requests.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_REQUESTS_H
 #define USERLAND_FS_REQUESTS_H
 
@@ -227,7 +229,7 @@ class VolumeRequest : public Request {
 public:
 	VolumeRequest(uint32 type) : Request(type) {}
 
-	fs_volume	volume;
+	void*		volume;
 };
 
 // NodeRequest
@@ -235,7 +237,7 @@ class NodeRequest : public VolumeRequest {
 public:
 	NodeRequest(uint32 type) : VolumeRequest(type) {}
 
-	fs_vnode	node;
+	void*		node;
 };
 
 // FileRequest
@@ -243,7 +245,7 @@ class FileRequest : public NodeRequest {
 public:
 	FileRequest(uint32 type) : NodeRequest(type) {}
 
-	fs_cookie	fileCookie;
+	void*		fileCookie;
 };
 
 // DirRequest
@@ -251,7 +253,7 @@ class DirRequest : public NodeRequest {
 public:
 	DirRequest(uint32 type) : NodeRequest(type) {}
 
-	fs_cookie	dirCookie;
+	void*		dirCookie;
 };
 
 // AttrDirRequest
@@ -259,7 +261,7 @@ class AttrDirRequest : public NodeRequest {
 public:
 	AttrDirRequest(uint32 type) : NodeRequest(type) {}
 
-	fs_cookie	attrDirCookie;
+	void*		attrDirCookie;
 };
 
 // AttributeRequest
@@ -267,7 +269,7 @@ class AttributeRequest : public NodeRequest {
 public:
 	AttributeRequest(uint32 type) : NodeRequest(type) {}
 
-	fs_cookie	attrCookie;
+	void*		attrCookie;
 };
 
 // IndexDirRequest
@@ -275,7 +277,7 @@ class IndexDirRequest : public VolumeRequest {
 public:
 	IndexDirRequest(uint32 type) : VolumeRequest(type) {}
 
-	fs_cookie	indexDirCookie;
+	void*		indexDirCookie;
 };
 
 // QueryRequest
@@ -283,7 +285,7 @@ class QueryRequest : public VolumeRequest {
 public:
 	QueryRequest(uint32 type) : VolumeRequest(type) {}
 
-	fs_cookie	queryCookie;
+	void*		queryCookie;
 };
 
 
@@ -339,7 +341,7 @@ public:
 	MountVolumeReply() : ReplyRequest(MOUNT_VOLUME_REPLY) {}
 
 	ino_t		rootID;
-	fs_volume	volume;
+	void*		volume;
 };
 
 // UnmountVolumeRequest
@@ -431,7 +433,6 @@ public:
 	LookupReply() : ReplyRequest(LOOKUP_REPLY) {}
 
 	ino_t		vnid;
-	int			type;
 };
 
 // GetVNodeNameRequest
@@ -465,7 +466,9 @@ class ReadVNodeReply : public ReplyRequest {
 public:
 	ReadVNodeReply() : ReplyRequest(READ_VNODE_REPLY) {}
 
-	fs_vnode	node;
+	void*		node;
+	int			type;
+	uint32		flags;
 };
 
 // WriteVNodeRequest
@@ -625,7 +628,7 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		name;
-	fs_vnode	target;
+	void*		target;
 };
 
 // LinkReply
@@ -655,9 +658,9 @@ public:
 	RenameRequest() : VolumeRequest(RENAME_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	fs_vnode	oldDir;
+	void*		oldDir;
 	Address		oldName;
-	fs_vnode	newDir;
+	void*		newDir;
 	Address		newName;
 };
 
@@ -731,7 +734,7 @@ public:
 	CreateReply() : ReplyRequest(CREATE_REPLY) {}
 
 	ino_t		vnid;
-	fs_cookie	fileCookie;
+	void*		fileCookie;
 };
 
 // OpenRequest
@@ -747,7 +750,7 @@ class OpenReply : public ReplyRequest {
 public:
 	OpenReply() : ReplyRequest(OPEN_REPLY) {}
 
-	fs_cookie	fileCookie;
+	void*		fileCookie;
 };
 
 // CloseRequest
@@ -859,7 +862,7 @@ class OpenDirReply : public ReplyRequest {
 public:
 	OpenDirReply() : ReplyRequest(OPEN_DIR_REPLY) {}
 
-	fs_cookie	dirCookie;
+	void*		dirCookie;
 };
 
 // CloseDirRequest
@@ -932,7 +935,7 @@ class OpenAttrDirReply : public ReplyRequest {
 public:
 	OpenAttrDirReply() : ReplyRequest(OPEN_ATTR_DIR_REPLY) {}
 
-	fs_cookie	attrDirCookie;
+	void*		attrDirCookie;
 };
 
 // CloseAttrDirRequest
@@ -1010,7 +1013,7 @@ class CreateAttrReply : public ReplyRequest {
 public:
 	CreateAttrReply() : ReplyRequest(CREATE_ATTR_REPLY) {}
 
-	fs_cookie	attrCookie;
+	void*		attrCookie;
 };
 
 // OpenAttrRequest
@@ -1028,7 +1031,7 @@ class OpenAttrReply : public ReplyRequest {
 public:
 	OpenAttrReply() : ReplyRequest(OPEN_ATTR_REPLY) {}
 
-	fs_cookie	attrCookie;
+	void*		attrCookie;
 };
 
 // CloseAttrRequest
@@ -1128,8 +1131,8 @@ public:
 	RenameAttrRequest() : VolumeRequest(RENAME_ATTR_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	fs_vnode	oldNode;
-	fs_vnode	newNode;
+	void*		oldNode;
+	void*		newNode;
 	Address		oldName;
 	Address		newName;
 };
@@ -1170,7 +1173,7 @@ class OpenIndexDirReply : public ReplyRequest {
 public:
 	OpenIndexDirReply() : ReplyRequest(OPEN_INDEX_DIR_REPLY) {}
 
-	fs_cookie	indexDirCookie;
+	void*		indexDirCookie;
 };
 
 // CloseIndexDirRequest
@@ -1299,7 +1302,7 @@ class OpenQueryReply : public ReplyRequest {
 public:
 	OpenQueryReply() : ReplyRequest(OPEN_QUERY_REPLY) {}
 
-	fs_cookie	queryCookie;
+	void*		queryCookie;
 };
 
 // CloseQueryRequest
@@ -1442,7 +1445,7 @@ class GetVNodeReply : public ReplyRequest {
 public:
 	GetVNodeReply() : ReplyRequest(GET_VNODE_REPLY) {}
 
-	fs_vnode	node;
+	void*		node;
 };
 
 // PutVNodeRequest
@@ -1467,7 +1470,7 @@ public:
 
 	dev_t		nsid;
 	ino_t		vnid;
-	fs_vnode	node;
+	void*		node;
 };
 
 // NewVNodeReply
@@ -1483,7 +1486,9 @@ public:
 
 	dev_t		nsid;
 	ino_t		vnid;
-	fs_vnode	node;
+	void*		node;
+	int			type;
+	uint32		flags;
 };
 
 // PublishVNodeReply

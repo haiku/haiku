@@ -1,4 +1,7 @@
-// KernelRequestHandler.h
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef USERLAND_FS_KERNEL_REQUEST_HANDLER_H
 #define USERLAND_FS_KERNEL_REQUEST_HANDLER_H

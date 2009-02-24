@@ -1,5 +1,7 @@
-// FileSystem.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_FILE_SYSTEM_H
 #define USERLAND_FS_FILE_SYSTEM_H
 
@@ -35,7 +37,7 @@ public:
 
 			RequestPortPool*	GetPortPool();
 
-			status_t			Mount(dev_t id, const char* device,
+			status_t			Mount(fs_volume* fsVolume, const char* device,
 									ulong flags, const char* parameters,
 									Volume** volume);
 //			status_t		 	Initialize(const char* deviceName,

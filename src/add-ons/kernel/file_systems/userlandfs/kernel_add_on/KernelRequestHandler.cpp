@@ -1,4 +1,7 @@
-// KernelRequestHandler.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "Compatibility.h"
 #include "Debug.h"
@@ -121,7 +124,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 				if (!oldName) {
 					ERROR(("NotifyListenerRequest: NULL oldName for "
 						"B_ENTRY_MOVED\n"));
-					result = B_BAD_VALUE; 
+					result = B_BAD_VALUE;
 					break;
 				}
 				// fall through...
@@ -131,7 +134,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 				if (!name) {
 					ERROR(("NotifyListenerRequest: NULL name for opcode: %ld\n",
 						request->operation));
-					result = B_BAD_VALUE; 
+					result = B_BAD_VALUE;
 				}
 				break;
 			case B_STAT_CHANGED:
@@ -183,7 +186,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 			default:
 				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
 					request->operation));
-				result = B_BAD_VALUE; 
+				result = B_BAD_VALUE;
 				break;
 		}
 	}
@@ -249,7 +252,7 @@ KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 	int32 nameLen = request->name.GetSize();
 	if (!name || nameLen <= 0) {
 		ERROR(("NotifyQueryRequest: NULL name!\n"));
-		result = B_BAD_VALUE; 
+		result = B_BAD_VALUE;
 	} else
 		name[nameLen - 1] = '\0';	// NULL-terminate to be safe
 
@@ -278,7 +281,7 @@ KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 			default:
 				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
 					request->operation));
-				result = B_BAD_VALUE; 
+				result = B_BAD_VALUE;
 				break;
 		}
 	}
@@ -372,8 +375,10 @@ KernelRequestHandler::_HandleRequest(PublishVNodeRequest* request)
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
-	if (result == B_OK)
-		result = volume->PublishVNode(request->vnid, request->node);
+	if (result == B_OK) {
+		result = volume->PublishVNode(request->vnid, request->node,
+			request->type, request->flags);
+	}
 
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());

@@ -1,4 +1,7 @@
-// FileSystem.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "AutoLocker.h"
 #include "Compatibility.h"
@@ -179,7 +182,7 @@ FileSystem::GetPortPool()
 
 // Mount
 status_t
-FileSystem::Mount(dev_t id, const char* device, uint32 flags,
+FileSystem::Mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	const char* parameters, Volume** _volume)
 {
 	// check initialization and parameters
@@ -187,7 +190,7 @@ FileSystem::Mount(dev_t id, const char* device, uint32 flags,
 		return B_BAD_VALUE;
 
 	// create volume
-	Volume* volume = new(nothrow) Volume(this, id);
+	Volume* volume = new(nothrow) Volume(this, fsVolume);
 	if (!volume)
 		return B_NO_MEMORY;
 

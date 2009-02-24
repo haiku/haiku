@@ -1,4 +1,7 @@
-// Volume.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "Volume.h"
 
@@ -13,6 +16,7 @@
 #include "FileSystem.h"
 #include "HashMap.h"
 #include "IOCtlInfo.h"
+#include "kernel_interface.h"
 #include "KernelRequestHandler.h"
 #include "PortReleaser.h"
 #include "RequestAllocator.h"
@@ -66,10 +70,10 @@ private:
 };
 
 // constructor
-Volume::Volume(FileSystem* fileSystem, dev_t id)
+Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
 	: Referencable(true),
 	  fFileSystem(fileSystem),
-	  fID(id),
+	  fFSVolume(fsVolume),
 	  fUserlandVolume(NULL),
 	  fRootID(0),
 	  fRootNode(NULL),
@@ -95,13 +99,6 @@ FileSystem*
 Volume::GetFileSystem() const
 {
 	return fFileSystem;
-}
-
-// GetID
-dev_t
-Volume::GetID() const
-{
-	return fID;
 }
 
 // GetUserlandVolume
@@ -130,14 +127,14 @@ Volume::IsMounting() const
 
 // GetVNode
 status_t
-Volume::GetVNode(ino_t vnid, fs_vnode* node)
+Volume::GetVNode(ino_t vnid, void** node)
 {
-PRINT(("get_vnode(%ld, %lld)\n", fID, vnid));
+PRINT(("get_vnode(%ld, %lld)\n", GetID(), vnid));
 	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
 		ERROR(("Volume::GetVNode(): get_vnode() invoked for unknown vnode "
 			"while mounting!\n"));
 	}
-	status_t error = get_vnode(fID, vnid, node);
+	status_t error = get_vnode(fFSVolume, vnid, node);
 	if (error == B_OK)
 		_IncrementVNodeCount(vnid);
 	return error;
@@ -147,8 +144,8 @@ PRINT(("get_vnode(%ld, %lld)\n", fID, vnid));
 status_t
 Volume::PutVNode(ino_t vnid)
 {
-PRINT(("put_vnode(%ld, %lld)\n", fID, vnid));
-	status_t error = put_vnode(fID, vnid);
+PRINT(("put_vnode(%ld, %lld)\n", GetID(), vnid));
+	status_t error = put_vnode(fFSVolume, vnid);
 	if (error == B_OK)
 		_DecrementVNodeCount(vnid);
 	return error;
@@ -156,18 +153,19 @@ PRINT(("put_vnode(%ld, %lld)\n", fID, vnid));
 
 // NewVNode
 status_t
-Volume::NewVNode(ino_t vnid, fs_vnode node)
+Volume::NewVNode(ino_t vnid, void* node)
 {
-PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
-	status_t error = new_vnode(fID, vnid, node);
+PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
+	status_t error = new_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps);
 	if (error == B_OK) {
 		if (IsMounting()) {
 			error = fMountVNodes->Put(vnid, node);
 			if (error != B_OK) {
 				ERROR(("Volume::NewVNode(): Failed to add vnode to mount "
 					"vnode map!\n"));
-				publish_vnode(fID, vnid, node);
-				put_vnode(fID, vnid);
+				publish_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps,
+					S_IFDIR, 0);	// dummy type and flags
+				put_vnode(fFSVolume, vnid);
 				return error;
 			}
 		}
@@ -179,17 +177,18 @@ PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
 
 // PublishVNode
 status_t
-Volume::PublishVNode(ino_t vnid, fs_vnode node)
+Volume::PublishVNode(ino_t vnid, void* node, int type, uint32 flags)
 {
-PRINT(("publish_vnode(%ld, %lld, %p)\n", fID, vnid, node));
-	status_t error = publish_vnode(fID, vnid, node);
+PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, node));
+	status_t error = publish_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps,
+		type, flags);
 	if (error == B_OK) {
 		if (IsMounting()) {
 			error = fMountVNodes->Put(vnid, node);
 			if (error != B_OK) {
 				ERROR(("Volume::PublishVNode(): Failed to add vnode to mount "
 					"vnode map!\n"));
-				put_vnode(fID, vnid);
+				put_vnode(fFSVolume, vnid);
 				return error;
 			}
 		}
@@ -202,24 +201,24 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", fID, vnid, node));
 status_t
 Volume::RemoveVNode(ino_t vnid)
 {
-PRINT(("remove_vnode(%ld, %lld)\n", fID, vnid));
-	return remove_vnode(fID, vnid);
+PRINT(("remove_vnode(%ld, %lld)\n", GetID(), vnid));
+	return remove_vnode(fFSVolume, vnid);
 }
 
 // UnremoveVNode
 status_t
 Volume::UnremoveVNode(ino_t vnid)
 {
-PRINT(("unremove_vnode(%ld, %lld)\n", fID, vnid));
-	return unremove_vnode(fID, vnid);
+PRINT(("unremove_vnode(%ld, %lld)\n", GetID(), vnid));
+	return unremove_vnode(fFSVolume, vnid);
 }
 
 // GetVNodeRemoved
 status_t
 Volume::GetVNodeRemoved(ino_t vnid, bool* removed)
 {
-PRINT(("get_vnode_removed(%ld, %lld, %p)\n", fID, vnid, removed));
-	return get_vnode_removed(fID, vnid, removed);
+PRINT(("get_vnode_removed(%ld, %lld, %p)\n", GetID(), vnid, removed));
+	return get_vnode_removed(fFSVolume, vnid, removed);
 }
 
 
@@ -323,7 +322,7 @@ Volume::ReadFSInfo(fs_info* info)
 	// read_fs_info() requests manually.
 	status_t error = _ReadFSInfo(info);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
-		WARN(("Volume::Lookup(): connection lost, emulating lookup `.'\n"));
+		WARN(("Volume::ReadFSInfo(): connection lost, emulating lookup `.'\n"));
 
 		info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
 		info->block_size = 512;
@@ -384,11 +383,11 @@ Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 
 // Lookup
 status_t
-Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
+Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 {
 	// When the connection to the userland server is lost, we serve
 	// lookup(fRootNode, `.') requests manually to allow clean unmounting.
-	status_t error = _Lookup(dir, entryName, vnid, type);
+	status_t error = _Lookup(dir, entryName, vnid);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()
 		&& dir == fRootNode && strcmp(entryName, ".") == 0) {
 		WARN(("Volume::Lookup(): connection lost, emulating lookup `.'\n"));
@@ -396,7 +395,6 @@ Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 		if (GetVNode(fRootID, &entryNode) != B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
 		*vnid = fRootID;
-		*type = S_IFDIR;
 		// The VFS will balance the get_vnode() call for the FS.
 		_DecrementVNodeCount(*vnid);
 		return B_OK;
@@ -406,7 +404,7 @@ Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 
 // GetVNodeName
 status_t
-Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 {
 	// We don't check the capability -- if not implemented by the client FS,
 	// the functionality is emulated in userland.
@@ -455,7 +453,8 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
+Volume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
+	uint32* flags)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -486,12 +485,14 @@ Volume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
 	if (reply->error != B_OK)
 		return reply->error;
 	*node = reply->node;
+	*type = reply->type;
+	*flags = reply->flags;
 	return error;
 }
 
 // WriteVNode
 status_t
-Volume::WriteVNode(fs_vnode node, bool reenter)
+Volume::WriteVNode(void* node, bool reenter)
 {
 	status_t error = _WriteVNode(node, reenter);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -506,7 +507,7 @@ Volume::WriteVNode(fs_vnode node, bool reenter)
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(fs_vnode node, bool reenter)
+Volume::RemoveVNode(void* node, bool reenter)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -545,7 +546,7 @@ Volume::RemoveVNode(fs_vnode node, bool reenter)
 
 // IOCtl
 status_t
-Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
+Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 	size_t len)
 {
 	// check the command and its parameters
@@ -691,7 +692,7 @@ Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 
 // SetFlags
 status_t
-Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
+Volume::SetFlags(void* node, void* cookie, int flags)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_SET_FLAGS))
@@ -731,8 +732,7 @@ Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 
 // Select
 status_t
-Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
-	selectsync* sync)
+Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_SELECT)) {
@@ -784,7 +784,7 @@ Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 
 // Deselect
 status_t
-Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
+Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_DESELECT))
@@ -834,7 +834,7 @@ Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
 
 // FSync
 status_t
-Volume::FSync(fs_vnode node)
+Volume::FSync(void* node)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FSYNC))
@@ -872,7 +872,7 @@ Volume::FSync(fs_vnode node)
 
 // ReadSymlink
 status_t
-Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
 	*bytesRead = 0;
@@ -923,7 +923,7 @@ Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
 
 // CreateSymlink
 status_t
-Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
+Volume::CreateSymlink(void* dir, const char* name, const char* target,
 	int mode)
 {
 	// check capability
@@ -968,7 +968,7 @@ Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
 
 // Link
 status_t
-Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
+Volume::Link(void* dir, const char* name, void* node)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_LINK))
@@ -1010,7 +1010,7 @@ Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
 
 // Unlink
 status_t
-Volume::Unlink(fs_vnode dir, const char* name)
+Volume::Unlink(void* dir, const char* name)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_UNLINK))
@@ -1051,7 +1051,7 @@ Volume::Unlink(fs_vnode dir, const char* name)
 
 // Rename
 status_t
-Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
+Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	// check capability
@@ -1096,7 +1096,7 @@ Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 
 // Access
 status_t
-Volume::Access(fs_vnode node, int mode)
+Volume::Access(void* node, int mode)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_ACCESS))
@@ -1135,7 +1135,7 @@ Volume::Access(fs_vnode node, int mode)
 
 // ReadStat
 status_t
-Volume::ReadStat(fs_vnode node, struct stat* st)
+Volume::ReadStat(void* node, struct stat* st)
 {
 	// When the connection to the userland server is lost, we serve
 	// read_stat(fRootNode) requests manually to allow clean unmounting.
@@ -1145,7 +1145,7 @@ Volume::ReadStat(fs_vnode node, struct stat* st)
 		WARN(("Volume::ReadStat(): connection lost, emulating stat for the "
 			"root node\n"));
 
-		st->st_dev = fID;
+		st->st_dev = GetID();
 		st->st_ino = fRootID;
 		st->st_mode = ACCESSPERMS;
 		st->st_nlink = 1;
@@ -1165,7 +1165,7 @@ Volume::ReadStat(fs_vnode node, struct stat* st)
 
 // WriteStat
 status_t
-Volume::WriteStat(fs_vnode node, const struct stat* st, uint32 mask)
+Volume::WriteStat(void* node, const struct stat* st, uint32 mask)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_STAT))
@@ -1208,7 +1208,7 @@ Volume::WriteStat(fs_vnode node, const struct stat* st, uint32 mask)
 
 // Create
 status_t
-Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
+Volume::Create(void* dir, const char* name, int openMode, int mode,
 	void** cookie, ino_t* vnid)
 {
 	// check capability
@@ -1259,7 +1259,7 @@ Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 
 // Open
 status_t
-Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+Volume::Open(void* node, int openMode, void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN))
@@ -1300,7 +1300,7 @@ Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
 
 // Close
 status_t
-Volume::Close(fs_vnode node, fs_cookie cookie)
+Volume::Close(void* node, void* cookie)
 {
 	status_t error = _Close(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1315,7 +1315,7 @@ Volume::Close(fs_vnode node, fs_cookie cookie)
 
 // FreeCookie
 status_t
-Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
+Volume::FreeCookie(void* node, void* cookie)
 {
 	status_t error = _FreeCookie(node, cookie);
 	bool disconnected = false;
@@ -1335,7 +1335,7 @@ Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
 
 // Read
 status_t
-Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	*bytesRead = 0;
@@ -1388,7 +1388,7 @@ Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
 
 // Write
 status_t
-Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
+Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 	size_t size, size_t* bytesWritten)
 {
 	*bytesWritten = 0;
@@ -1438,7 +1438,7 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(fs_vnode dir, const char* name, int mode, ino_t *newDir)
+Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_DIR))
@@ -1481,7 +1481,7 @@ Volume::CreateDir(fs_vnode dir, const char* name, int mode, ino_t *newDir)
 
 // RemoveDir
 status_t
-Volume::RemoveDir(fs_vnode dir, const char* name)
+Volume::RemoveDir(void* dir, const char* name)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_DIR))
@@ -1522,7 +1522,7 @@ Volume::RemoveDir(fs_vnode dir, const char* name)
 
 // OpenDir
 status_t
-Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
+Volume::OpenDir(void* node, void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_DIR))
@@ -1563,7 +1563,7 @@ Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
 
 // CloseDir
 status_t
-Volume::CloseDir(fs_vnode node, fs_vnode cookie)
+Volume::CloseDir(void* node, void* cookie)
 {
 	status_t error = _CloseDir(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1598,7 +1598,7 @@ Volume::FreeDirCookie(void* node, void* cookie)
 
 // ReadDir
 status_t
-Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
+Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
@@ -1660,7 +1660,7 @@ reply->buffer.GetSize()));
 
 // RewindDir
 status_t
-Volume::RewindDir(fs_vnode node, fs_vnode cookie)
+Volume::RewindDir(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_DIR))
@@ -1703,7 +1703,7 @@ Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 
 // OpenAttrDir
 status_t
-Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
+Volume::OpenAttrDir(void* node, void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR_DIR))
@@ -1744,7 +1744,7 @@ Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
 
 // CloseAttrDir
 status_t
-Volume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
+Volume::CloseAttrDir(void* node, void* cookie)
 {
 	status_t error = _CloseAttrDir(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1781,7 +1781,7 @@ Volume::FreeAttrDirCookie(void* node, void* cookie)
 
 // ReadAttrDir
 status_t
-Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	// check capability
@@ -1840,7 +1840,7 @@ Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 
 // RewindAttrDir
 status_t
-Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
+Volume::RewindAttrDir(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_ATTR_DIR))
@@ -1882,8 +1882,8 @@ Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 
 // CreateAttr
 status_t
-Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
-	fs_cookie* cookie)
+Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
+	void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_ATTR))
@@ -1929,8 +1929,8 @@ Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
 
 // OpenAttr
 status_t
-Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
-	fs_cookie* cookie)
+Volume::OpenAttr(void* node, const char* name, int openMode,
+	void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR))
@@ -1975,7 +1975,7 @@ Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
 
 // CloseAttr
 status_t
-Volume::CloseAttr(fs_vnode node, fs_cookie cookie)
+Volume::CloseAttr(void* node, void* cookie)
 {
 	status_t error = _CloseAttr(node, cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -1990,7 +1990,7 @@ Volume::CloseAttr(fs_vnode node, fs_cookie cookie)
 
 // FreeAttrCookie
 status_t
-Volume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+Volume::FreeAttrCookie(void* node, void* cookie)
 {
 	status_t error = _FreeAttrCookie(node, cookie);
 	bool disconnected = false;
@@ -2011,7 +2011,7 @@ Volume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
 
 // ReadAttr
 status_t
-Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+Volume::ReadAttr(void* node, void* cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
 	*bytesRead = 0;
@@ -2064,7 +2064,7 @@ Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 // WriteAttr
 status_t
-Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+Volume::WriteAttr(void* node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	*bytesWritten = 0;
@@ -2111,7 +2111,7 @@ Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 // ReadAttrStat
 status_t
-Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
+Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR_STAT))
@@ -2151,7 +2151,7 @@ Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
 
 // WriteAttrStat
 status_t
-Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat *st,
+Volume::WriteAttrStat(void* node, void* cookie, const struct stat *st,
 	int statMask)
 {
 	// check capability
@@ -2193,7 +2193,7 @@ Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat *st,
 
 // RenameAttr
 status_t
-Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
+Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
 	const char* newName)
 {
 	// check capability
@@ -2238,7 +2238,7 @@ Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
 
 // RemoveAttr
 status_t
-Volume::RemoveAttr(fs_vnode node, const char* name)
+Volume::RemoveAttr(void* node, const char* name)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_ATTR))
@@ -2283,7 +2283,7 @@ Volume::RemoveAttr(fs_vnode node, const char* name)
 
 // OpenIndexDir
 status_t
-Volume::OpenIndexDir(fs_cookie *cookie)
+Volume::OpenIndexDir(void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_INDEX_DIR))
@@ -2323,7 +2323,7 @@ Volume::OpenIndexDir(fs_cookie *cookie)
 
 // CloseIndexDir
 status_t
-Volume::CloseIndexDir(fs_cookie cookie)
+Volume::CloseIndexDir(void* cookie)
 {
 	status_t error = _CloseIndexDir(cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -2339,7 +2339,7 @@ Volume::CloseIndexDir(fs_cookie cookie)
 
 // FreeIndexDirCookie
 status_t
-Volume::FreeIndexDirCookie(fs_cookie cookie)
+Volume::FreeIndexDirCookie(void* cookie)
 {
 	status_t error = _FreeIndexDirCookie(cookie);
 	bool disconnected = false;
@@ -2360,7 +2360,7 @@ Volume::FreeIndexDirCookie(fs_cookie cookie)
 
 // ReadIndexDir
 status_t
-Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
+Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
@@ -2419,7 +2419,7 @@ Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
 
 // RewindIndexDir
 status_t
-Volume::RewindIndexDir(fs_cookie cookie)
+Volume::RewindIndexDir(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_INDEX_DIR))
@@ -2585,7 +2585,7 @@ Volume::ReadIndexStat(const char* name, struct stat *st)
 // OpenQuery
 status_t
 Volume::OpenQuery(const char* queryString, uint32 flags, port_id targetPort,
-	uint32 token, fs_cookie *cookie)
+	uint32 token, void** cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_QUERY))
@@ -2631,7 +2631,7 @@ Volume::OpenQuery(const char* queryString, uint32 flags, port_id targetPort,
 
 // CloseQuery
 status_t
-Volume::CloseQuery(fs_cookie cookie)
+Volume::CloseQuery(void* cookie)
 {
 	status_t error = _CloseQuery(cookie);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
@@ -2646,7 +2646,7 @@ Volume::CloseQuery(fs_cookie cookie)
 
 // FreeQueryCookie
 status_t
-Volume::FreeQueryCookie(fs_cookie cookie)
+Volume::FreeQueryCookie(void* cookie)
 {
 	status_t error = _FreeQueryCookie(cookie);
 	bool disconnected = false;
@@ -2667,7 +2667,7 @@ Volume::FreeQueryCookie(fs_cookie cookie)
 
 // ReadQuery
 status_t
-Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	*countRead = 0;
@@ -2726,7 +2726,7 @@ Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 
 // RewindQuery
 status_t
-Volume::RewindQuery(fs_cookie cookie)
+Volume::RewindQuery(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_QUERY))
@@ -2787,7 +2787,7 @@ Volume::_Mount(const char* device, uint32 flags, const char* parameters)
 	if (error != B_OK)
 		return error;
 
-	request->nsid = fID;
+	request->nsid = GetID();
 	error = allocator.AllocateString(request->cwd, cwd);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->device, device);
@@ -2893,7 +2893,7 @@ Volume::_ReadFSInfo(fs_info* info)
 
 // _Lookup
 status_t
-Volume::_Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
+Volume::_Lookup(void* dir, const char* entryName, ino_t* vnid)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -2925,7 +2925,6 @@ Volume::_Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 	if (reply->error != B_OK)
 		return reply->error;
 	*vnid = reply->vnid;
-	*type = reply->type;
 
 	// The VFS will balance the get_vnode() call for the FS.
 	_DecrementVNodeCount(*vnid);
@@ -2934,7 +2933,7 @@ Volume::_Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 
 // _WriteVNode
 status_t
-Volume::_WriteVNode(fs_vnode node, bool reenter)
+Volume::_WriteVNode(void* node, bool reenter)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -2968,7 +2967,7 @@ Volume::_WriteVNode(fs_vnode node, bool reenter)
 
 // _ReadStat
 status_t
-Volume::_ReadStat(fs_vnode node, struct stat* st)
+Volume::_ReadStat(void* node, struct stat* st)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_STAT))
@@ -3007,7 +3006,7 @@ Volume::_ReadStat(fs_vnode node, struct stat* st)
 
 // _Close
 status_t
-Volume::_Close(fs_vnode node, fs_cookie cookie)
+Volume::_Close(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE))
@@ -3046,7 +3045,7 @@ Volume::_Close(fs_vnode node, fs_cookie cookie)
 
 // _FreeCookie
 status_t
-Volume::_FreeCookie(fs_vnode node, fs_cookie cookie)
+Volume::_FreeCookie(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_COOKIE))
@@ -3085,7 +3084,7 @@ Volume::_FreeCookie(fs_vnode node, fs_cookie cookie)
 
 // _CloseDir
 status_t
-Volume::_CloseDir(fs_vnode node, fs_vnode cookie)
+Volume::_CloseDir(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_DIR))
@@ -3124,7 +3123,7 @@ Volume::_CloseDir(fs_vnode node, fs_vnode cookie)
 
 // _FreeDirCookie
 status_t
-Volume::_FreeDirCookie(fs_vnode node, fs_vnode cookie)
+Volume::_FreeDirCookie(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_DIR_COOKIE))
@@ -3163,7 +3162,7 @@ Volume::_FreeDirCookie(fs_vnode node, fs_vnode cookie)
 
 // _CloseAttrDir
 status_t
-Volume::_CloseAttrDir(fs_vnode node, fs_cookie cookie)
+Volume::_CloseAttrDir(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR_DIR))
@@ -3202,7 +3201,7 @@ Volume::_CloseAttrDir(fs_vnode node, fs_cookie cookie)
 
 // _FreeAttrDirCookie
 status_t
-Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
+Volume::_FreeAttrDirCookie(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_DIR_COOKIE))
@@ -3241,7 +3240,7 @@ Volume::_FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 
 // _CloseAttr
 status_t
-Volume::_CloseAttr(fs_vnode node, fs_cookie cookie)
+Volume::_CloseAttr(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR))
@@ -3280,7 +3279,7 @@ Volume::_CloseAttr(fs_vnode node, fs_cookie cookie)
 
 // _FreeAttrCookie
 status_t
-Volume::_FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+Volume::_FreeAttrCookie(void* node, void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_COOKIE))
@@ -3319,7 +3318,7 @@ Volume::_FreeAttrCookie(fs_vnode node, fs_cookie cookie)
 
 // _CloseIndexDir
 status_t
-Volume::_CloseIndexDir(fs_cookie cookie)
+Volume::_CloseIndexDir(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_INDEX_DIR))
@@ -3357,7 +3356,7 @@ Volume::_CloseIndexDir(fs_cookie cookie)
 
 // _FreeIndexDirCookie
 status_t
-Volume::_FreeIndexDirCookie(fs_cookie cookie)
+Volume::_FreeIndexDirCookie(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_INDEX_DIR_COOKIE))
@@ -3395,7 +3394,7 @@ Volume::_FreeIndexDirCookie(fs_cookie cookie)
 
 // _CloseQuery
 status_t
-Volume::_CloseQuery(fs_cookie cookie)
+Volume::_CloseQuery(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_QUERY))
@@ -3433,7 +3432,7 @@ Volume::_CloseQuery(fs_cookie cookie)
 
 // _FreeQueryCookie
 status_t
-Volume::_FreeQueryCookie(fs_cookie cookie)
+Volume::_FreeQueryCookie(void* cookie)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_QUERY_COOKIE))
