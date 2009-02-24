@@ -76,16 +76,16 @@ environment variables:
                               Defaults to "ru".
   HAIKU_UNARFLAGS             The flags passed to HAIKU_AR for unarchiving.
                               Defaults to "x".
-                              
+
 Non-standard output directories:
-  By default all objects, build configuration, and other related files are 
+  By default all objects, build configuration, and other related files are
   stored in /path/to/haiku_source/generated.  To store objects in a non-default
-  location, run "../../relative/path/to/haiku_source/configure <options>" from 
-  within your non-default location.  "jam [ options ] targets" can then be run 
-  directly inside your non-default location.  Another option is to invoke "jam 
-  [ options ] targets" from within haiku_source.  This can be accomplished by 
-  either "export HAIKU_OUTPUT_DIR=your non-default location" before invoking 
-  jam or by creating a symlink of haiku_source/generated pointing to your 
+  location, run "../../relative/path/to/haiku_source/configure <options>" from
+  within your non-default location.  "jam [ options ] targets" can then be run
+  directly inside your non-default location.  Another option is to invoke "jam
+  [ options ] targets" from within haiku_source.  This can be accomplished by
+  either "export HAIKU_OUTPUT_DIR=your non-default location" before invoking
+  jam or by creating a symlink of haiku_source/generated pointing to your
   non-default location and running jam.
 
 
@@ -238,7 +238,7 @@ cd "$currentDir"
 # default parameter values
 #
 platform=`uname`
-platform_machine=`uname  -m`
+platformMachine=`uname  -m`
 haikuGCCVersion=
 haikuGCCMachine=i586-pc-haiku
 haikuStaticLibStdCxx=
@@ -247,15 +247,15 @@ haikuStaticLibSupCxx=
 haikuSharedLibSupCxx=
 haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
-bochs_debug=0
-include_gpl_addons=0
-include_3rdparty=0
-enable_multiuser=0
+bochsDebug=0
+includeGPLAddOns=0
+include3rdParty=0
+enableMultiuser=0
 distroCompatibility=default
 target=haiku
-use_gcc_pipe=0
-use_32bit=0
-use_xattr=0
+useGCCPipe=0
+use32bit=0
+useXattr=0
 crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
@@ -282,7 +282,7 @@ set_default_value HAIKU_UNARFLAGS	x
 #
 while [ $# -gt 0 ] ; do
 	case "$1" in
-		--bochs-debug)	bochs_debug=1; shift 1;;
+		--bochs-debug)	bochsDebug=1; shift 1;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4)
 			assertparams "$1" 2 $#
@@ -312,9 +312,9 @@ while [ $# -gt 0 ] ; do
 			shift 2
 			;;
 		--help | -h)	usage; exit 0;;
-		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
-		--include-3rdparty)	include_3rdparty=1; shift 1;;
-		--enable-multiuser)	enable_multiuser=1; shift 1;;
+		--include-gpl-addons)	includeGPLAddOns=1; shift 1;;
+		--include-3rdparty)	include3rdParty=1; shift 1;;
+		--enable-multiuser)	enableMultiuser=1; shift 1;;
 		--distro-compatibility)
 			assertparam "$1" $#
 			distroCompatibility=$2
@@ -329,18 +329,18 @@ while [ $# -gt 0 ] ; do
 			shift 2
 			;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
-		--use-gcc-pipe)	use_gcc_pipe=1; shift 1;;
-		--use-32bit)	use_32bit=1; shift 1;;
-		--use-xattr)	use_xattr=1; shift 1;;
+		--use-gcc-pipe)	useGCCPipe=1; shift 1;;
+		--use-32bit)	use32bit=1; shift 1;;
+		--use-xattr)	useXattr=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
 
 # check for a 64bit platform
-case "${platform_machine}" in
-	x86_64)	use_32bit=1 ;;
-	*)	echo Assuming 32-bit machine: "$platform_machine"
-		use_32bit=0 ;;
+case "${platformMachine}" in
+	x86_64)	use32bit=1 ;;
+	*)	echo Assuming 32-bit machine: "$platformMachine"
+		use32bit=0 ;;
 esac
 
 # detect the build platform
@@ -357,9 +357,9 @@ case "${platform}" in
 			;;
 	Darwin)	buildPlatform=darwin ;;
 	FreeBSD)	buildPlatform=freebsd
-				if [ "$use_32bit" = 1 ] ; then 
-					echo Unsupported platform: FreeBSD ${platform_machine}
-					exit 1 
+				if [ "$use32bit" = 1 ] ; then
+					echo Unsupported platform: FreeBSD ${platformMachine}
+					exit 1
 				fi	;;
 	Haiku)	buildPlatform=haiku_host ;;
 	Linux)	buildPlatform=linux ;;
@@ -418,14 +418,14 @@ cat << EOF > "$buildOutputDir/BuildConfig"
 TARGET_PLATFORM 			?= "${target}" ;
 HOST_PLATFORM				?= "${buildPlatform}" ;
 
-BOCHS_DEBUG_HACK					?= "${bochs_debug}" ;
-INCLUDE_GPL_ADDONS					?= "${include_gpl_addons}" ;
-HAIKU_INCLUDE_3RDPARTY				?= "${include_3rdparty}" ;
-HAIKU_ENABLE_MULTIUSER				?= "${enable_multiuser}" ;
+BOCHS_DEBUG_HACK					?= "${bochsDebug}" ;
+INCLUDE_GPL_ADDONS					?= "${includeGPLAddOns}" ;
+HAIKU_INCLUDE_3RDPARTY				?= "${include3rdParty}" ;
+HAIKU_ENABLE_MULTIUSER				?= "${enableMultiuser}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${distroCompatibility}" ;
-HAIKU_USE_GCC_PIPE					?= "${use_gcc_pipe}" ;
-HAIKU_HOST_USE_32BIT				?= "${use_32bit}" ;
-HAIKU_HOST_USE_XATTR				?= "${use_xattr}" ;
+HAIKU_USE_GCC_PIPE					?= "${useGCCPipe}" ;
+HAIKU_HOST_USE_32BIT				?= "${use32bit}" ;
+HAIKU_HOST_USE_XATTR				?= "${useXattr}" ;
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${alternativeGCCOutputDir} ;
 
 HAIKU_GCC_RAW_VERSION		?= ${haikuGCCVersion} ;
