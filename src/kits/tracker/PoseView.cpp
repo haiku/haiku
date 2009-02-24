@@ -6735,17 +6735,11 @@ BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
 		return;
 	}
 
-	// BRegion doesn't like non-integral values, see below
-	startPoint.x = roundf(startPoint.x);
-	startPoint.y = roundf(startPoint.y);
-
 	// clearing the selection could take a while so poll the mouse again
 	BPoint newMousePoint;
 	uint32 button;
 	GetMouse(&newMousePoint, &button);
-	newMousePoint.x = roundf(newMousePoint.x);
-	newMousePoint.y = roundf(newMousePoint.y);
-	
+
 	// draw initial empty selection rectangle
 	BRect lastSelectionRect;
 	fSelectionRect = lastSelectionRect = BRect(startPoint, startPoint - BPoint(1, 1));
@@ -6761,8 +6755,6 @@ BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
 	BPoint oldMousePoint(startPoint);
 	while (button) {
 		GetMouse(&newMousePoint, &button, false);
-		newMousePoint.x = roundf(newMousePoint.x);
-		newMousePoint.y = roundf(newMousePoint.y);
 
 		if (newMousePoint != oldMousePoint) {
 			oldMousePoint = newMousePoint;
