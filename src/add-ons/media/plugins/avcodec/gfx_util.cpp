@@ -124,7 +124,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				}
 			}
 			
-			if (pixelFormat == PIX_FMT_YUV422 || PIX_FMT_YUVJ422P) {
+			if (pixelFormat == PIX_FMT_YUV422) {
 				#if INCLUDE_MMX
 				if (mmx) {
 					TRACE("resolve_colorspace: PIX_FMT_YUV422 => B_YCbCr422: gfx_conv_null_mmx\n");
