@@ -103,6 +103,7 @@ mp3Decoder::mp3Decoder()
 	fOutputBufferSize = 0;
 	fNeedSync = true; // some files start with garbage
 	fDecodingError = false;
+	fSampleNo = 0;
 }
 
 
@@ -163,18 +164,19 @@ mp3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 	
-	int frame_size = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
+	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
 	if (ioDecodedFormat->u.raw_audio.buffer_size == 0)
 		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(ioDecodedFormat->u.raw_audio);
 	else
-		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / frame_size) * frame_size;
+		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / fFrameSize) * fFrameSize;
 
 	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
 		ioDecodedFormat->u.raw_audio.channel_mask = (fChannelCount == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 
 	// setup rest of the needed variables
-	fFrameSize = frame_size;
 	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
+
+	TRACE("mp3Decoder::NegotiateOutputFormat: BufferSize %d, FrameSize %d\n", fOutputBufferSize, fFrameSize);
 
 	return B_OK;
 }
@@ -187,22 +189,24 @@ mp3Decoder::Seek(uint32 seekTo,
 {
 	fNeedSync = true;
 	
-	TRACE("MP3Decoder::Seek called\n");
-
 	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
 		TRACE("MP3Decoder::Seek by time ");
-		TRACE("from frame %Ld and time %Ld TO Required Time %Ld. ", *frame, *time, seekTime);
+		TRACE("from frame %Ld and time %.6f TO Required Time %.6f. ", fSampleNo, fStartTime / 1000000.0, seekTime / 1000000.0);
 
-		*frame = (int64)(*time / (fFrameSize * 1000000.0 / fFrameRate));
+		*frame = (int64)(seekTime * fFrameRate / 1000000LL);
+		*time = seekTime;
 	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
 		TRACE("MP3Decoder::Seek by Frame ");
-		TRACE("from Current Time %Ld and frame %Ld TO Required Frame %Ld. ", *time, *frame, seekFrame);
+		TRACE("from time %.6f and frame %Ld TO Required Frame %Ld. ", fStartTime / 1000000.0, fSampleNo, seekFrame);
 
-		*time = (bigtime_t)(*frame * fFrameSize * 1000000.0 / fFrameRate);
+		*time = (bigtime_t)(seekFrame * 1000000LL / fFrameRate);
+		*frame = seekFrame;
 	} else
 		return B_BAD_VALUE;
 
-	TRACE("so new frame is %Ld at time %Ld\n", *frame, *time);
+	fSampleNo = *frame;
+	fStartTime = *time;
+	TRACE("so new frame is %Ld at time %.6f\n", *frame, *time / 1000000.0);
 
 	return B_OK;
 }
@@ -217,8 +221,8 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 	int32	out_bytes_needed = fOutputBufferSize;
 	int32	out_bytes = 0;
 
+	fStartTime = (bigtime_t)(fSampleNo *1000000LL / fFrameRate);
 	mediaHeader->start_time = fStartTime;
-	//TRACE("mp3Decoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 
 	while (out_bytes_needed > 0) {
 
@@ -228,7 +232,6 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			InitMP3(&fMpgLibPrivate);
 			fDecodingError = false;
 			fResidualBytes = 0;
-			mediaHeader->start_time = -1;
 			// fNeedSync is reset in DecodeNextChunk
 		}
 
@@ -244,9 +247,6 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			out_bytes += bytes;
 			out_bytes_needed -= bytes;
 			
-			fStartTime += (1000000LL * (bytes / fFrameSize)) / fFrameRate;
-
-			//TRACE("mp3Decoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 			continue;
 		}
 		
@@ -255,13 +255,12 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			fDecodingError = true;
 			break;
 		}
-		if (mediaHeader->start_time == -1)
-			mediaHeader->start_time = fStartTime;
 	}
 
 	*frameCount = out_bytes / fFrameSize;
+	fSampleNo += *frameCount;
 
-	TRACE("framecount %Ld, time %Ld\n",*frameCount, mediaHeader->start_time);
+	TRACE("framecount %Ld, time %.6f\n", *frameCount, mediaHeader->start_time / 1000000.0);
 	return (out_bytes > 0) ? B_OK : last_err;
 }
 

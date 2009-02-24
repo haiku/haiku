@@ -67,6 +67,7 @@ private:
 	int				fOutputBufferSize;
 	bool			fNeedSync;
 	bool			fDecodingError;
+	uint64			fSampleNo;
 };
 
 
