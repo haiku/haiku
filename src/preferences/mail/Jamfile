@@ -10,6 +10,12 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
+# TODO(bga): E-mail preferences does not really need to link against the
+# OpenSSL libraries. Remove this after problems with the runtile loader are
+# sorted up. Details here:
+#
+# http://www.freelists.org/post/haiku-development/Runtime-loader-problem
+
 local sslDir ;
 
 if $(USE_SSL) {
