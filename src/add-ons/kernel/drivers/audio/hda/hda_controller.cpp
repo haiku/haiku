@@ -109,7 +109,7 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	stream->real_time = system_time();
 	stream->frames_count += stream->buffer_length;
-	stream->buffer_cycle = 1 - (position / (bufferSize + 1)); // added 1 to avoid having 2
+	stream->buffer_cycle = ((position / bufferSize) + 1) % stream->num_buffers;
 
 	release_spinlock(&stream->lock);
 
@@ -523,13 +523,18 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->buffer_descriptors_area = B_ERROR;
 	}
 
+	// Stream interrupts seem to arrive too early on most HDA
+	// so we adjust buffer descriptors to take this into account
+	// TODO compute this value based on sample rate and depending on the hardware
+	uint32 offset = 1 * (stream->sample_size * stream->num_channels);
+
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
 	bufferSize = ALIGN(bufferSize, 128);
 
-	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld ****************\n",
-		stream->sample_size, stream->num_channels, stream->buffer_length);
+	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, offset %ld **********\n",
+		stream->sample_size, stream->num_channels, stream->buffer_length, offset);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
 	alloc = bufferSize * stream->num_buffers;
@@ -561,7 +566,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Now allocate BDL for buffer range */
-	alloc = stream->num_buffers * sizeof(bdl_entry_t);
+	alloc = (stream->num_buffers + ((offset > 0) ? 1 : 0)) * sizeof(bdl_entry_t);
 	alloc = PAGE_ALIGN(alloc);
 
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
@@ -585,13 +590,29 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
 
+	uint32 fragments = 0;
+	if (offset > 0) {
+		bufferDescriptors->lower = stream->physical_buffers[0];
+		bufferDescriptors->upper = 0;
+		bufferDescriptors->length = offset;
+		bufferDescriptors->ioc = 1;
+		bufferDescriptors++;
+		fragments++;
+	}
+
 	/* Setup buffer descriptor list (BDL) entries */
 	for (index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
-		bufferDescriptors->lower = stream->physical_buffers[index];
+		bufferDescriptors->lower = stream->physical_buffers[index] + offset;
 		bufferDescriptors->upper = 0;
-		bufferDescriptors->length = bufferSize;
-		bufferDescriptors->ioc = 1;
+		fragments++;
+		if (index == (stream->num_buffers - 1) && offset > 0) {
+			bufferDescriptors->length = bufferSize - offset;
+			bufferDescriptors->ioc = 0;
+		} else {
+			bufferDescriptors->length = bufferSize;
+			bufferDescriptors->ioc = 1;
 			// we want an interrupt after every buffer
+		}
 	}
 
 	/* Configure stream registers */
@@ -624,7 +645,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
 		stream->physical_buffer_descriptors);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER, 0);
-	stream->Write16(HDAC_STREAM_LAST_VALID, stream->num_buffers - 1);
+	stream->Write16(HDAC_STREAM_LAST_VALID, fragments);
 	/* total cyclic buffer size in _bytes_ */
 	stream->Write32(HDAC_STREAM_BUFFER_SIZE, bufferSize
 		* stream->num_buffers);
