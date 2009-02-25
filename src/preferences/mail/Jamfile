@@ -7,17 +7,35 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders mail ;
+
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
+
+local sslDir ;
+
+if $(USE_SSL) {
+	SubDirC++Flags -DUSE_SSL ;
+	if ! $(SSL_DIR) {
+		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
+	} else {
+		sslDir = $(SSL_DIR) ;
+	}
+	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
+}
+
 
 Preference E-mail :
 	Account.cpp
 	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
-	main.cpp 
-	: be libmail.so
+	main.cpp
+	: be libmail.so 
 	: e-mail.rdef
 	;
+
+if $(USE_SSL) {
+	LinkAgainst E-mail : $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
+}
 
 Package haiku-maildaemon-cvs :
 	E-mail : 
