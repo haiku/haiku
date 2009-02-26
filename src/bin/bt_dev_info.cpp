@@ -27,8 +27,6 @@ DumpInfo(LocalDevice* device)
 	classString << " |";
 	cod.GetMinorDeviceClass(classString);
 	printf("\t\t%s: \n", classString.String());
-
-	printf("Discovery %ld\n", device->SetDiscoverable(3));
 }
 
 static status_t
