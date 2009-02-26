@@ -33,15 +33,15 @@ Application UserlandFSServer
 	  SingleReplyRequestHandler.cpp
 	  String.cpp
 
-	  beos_fs_cache.c
+#	  beos_fs_cache.c
 
-	  beos_lock.cpp
-	  BeOSKernelFileSystem.cpp
-	  BeOSKernelVolume.cpp
+#	  beos_lock.cpp
+#	  BeOSKernelFileSystem.cpp
+#	  BeOSKernelVolume.cpp
 	  DispatcherFileSystem.cpp
 	  FileSystem.cpp
-	  haiku_block_cache.cpp
-	  haiku_file_cache.cpp
+#	  haiku_block_cache.cpp
+#	  haiku_file_cache.cpp
 	  haiku_hash.cpp
 	  haiku_lock.cpp
 	  HaikuKernelFileSystem.cpp

@@ -282,7 +282,7 @@ status_t
 Volume::Sync()
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_SYNC))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_SYNC))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -343,7 +343,7 @@ status_t
 Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_FS_INFO))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_WRITE_FS_INFO))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -635,7 +635,7 @@ Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 	}
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_IOCTL))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_IOCTL))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -695,7 +695,7 @@ status_t
 Volume::SetFlags(void* node, void* cookie, int flags)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_SET_FLAGS))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_SET_FLAGS))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -735,7 +735,7 @@ status_t
 Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_SELECT)) {
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_SELECT)) {
 		notify_select_event(sync, event);
 		return B_OK;
 	}
@@ -787,7 +787,7 @@ status_t
 Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_DESELECT))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_DESELECT))
 		return B_OK;
 
 	struct SyncRemover {
@@ -837,7 +837,7 @@ status_t
 Volume::FSync(void* node)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FSYNC))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FSYNC))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -878,7 +878,7 @@ Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 	*bytesRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_SYMLINK))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_SYMLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -927,7 +927,7 @@ Volume::CreateSymlink(void* dir, const char* name, const char* target,
 	int mode)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_SYMLINK))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE_SYMLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -971,7 +971,7 @@ status_t
 Volume::Link(void* dir, const char* name, void* node)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_LINK))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_LINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1013,7 +1013,7 @@ status_t
 Volume::Unlink(void* dir, const char* name)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_UNLINK))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_UNLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1055,7 +1055,7 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_RENAME))
+	if (!HasVNodeCapability(oldDir, FS_VNODE_CAPABILITY_RENAME))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1099,7 +1099,7 @@ status_t
 Volume::Access(void* node, int mode)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_ACCESS))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_ACCESS))
 		return B_OK;
 
 	// get a free port
@@ -1168,7 +1168,7 @@ status_t
 Volume::WriteStat(void* node, const struct stat* st, uint32 mask)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_STAT))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1212,7 +1212,7 @@ Volume::Create(void* dir, const char* name, int openMode, int mode,
 	void** cookie, ino_t* vnid)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1262,7 +1262,7 @@ status_t
 Volume::Open(void* node, int openMode, void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1341,7 +1341,7 @@ Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	*bytesRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1394,7 +1394,7 @@ Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 	*bytesWritten = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1441,7 +1441,7 @@ status_t
 Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_DIR))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1484,7 +1484,7 @@ status_t
 Volume::RemoveDir(void* dir, const char* name)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_DIR))
+	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_REMOVE_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1525,7 +1525,7 @@ status_t
 Volume::OpenDir(void* node, void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1604,7 +1604,7 @@ Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	*countRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1663,7 +1663,7 @@ status_t
 Volume::RewindDir(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REWIND_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1706,7 +1706,7 @@ status_t
 Volume::OpenAttrDir(void* node, void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1785,7 +1785,7 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	*countRead = 0;
@@ -1843,7 +1843,7 @@ status_t
 Volume::RewindAttrDir(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_ATTR_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REWIND_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1886,7 +1886,7 @@ Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
 	void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CREATE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1933,7 +1933,7 @@ Volume::OpenAttr(void* node, const char* name, int openMode,
 	void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2017,7 +2017,7 @@ Volume::ReadAttr(void* node, void* cookie, off_t pos,
 	*bytesRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2070,7 +2070,7 @@ Volume::WriteAttr(void* node, void* cookie, off_t pos,
 	*bytesWritten = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2114,7 +2114,7 @@ status_t
 Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_ATTR_STAT))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2155,7 +2155,7 @@ Volume::WriteAttrStat(void* node, void* cookie, const struct stat *st,
 	int statMask)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_WRITE_ATTR_STAT))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_ATTR_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2197,7 +2197,7 @@ Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
 	const char* newName)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_RENAME_ATTR))
+	if (!HasVNodeCapability(oldNode, FS_VNODE_CAPABILITY_RENAME_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2241,7 +2241,7 @@ status_t
 Volume::RemoveAttr(void* node, const char* name)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REMOVE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2286,7 +2286,7 @@ status_t
 Volume::OpenIndexDir(void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_INDEX_DIR))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_OPEN_INDEX_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2366,7 +2366,7 @@ Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
 	*countRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_INDEX_DIR))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_READ_INDEX_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2422,7 +2422,7 @@ status_t
 Volume::RewindIndexDir(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_INDEX_DIR))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_REWIND_INDEX_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2460,7 +2460,7 @@ status_t
 Volume::CreateIndex(const char* name, uint32 type, uint32 flags)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_INDEX))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_CREATE_INDEX))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2502,7 +2502,7 @@ status_t
 Volume::RemoveIndex(const char* name)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REMOVE_INDEX))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_REMOVE_INDEX))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2542,7 +2542,7 @@ status_t
 Volume::ReadIndexStat(const char* name, struct stat *st)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_INDEX_STAT))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_READ_INDEX_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2588,7 +2588,7 @@ Volume::OpenQuery(const char* queryString, uint32 flags, port_id targetPort,
 	uint32 token, void** cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_OPEN_QUERY))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_OPEN_QUERY))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2673,7 +2673,7 @@ Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	*countRead = 0;
 
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_QUERY))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_READ_QUERY))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2729,7 +2729,7 @@ status_t
 Volume::RewindQuery(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_REWIND_QUERY))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_REWIND_QUERY))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2810,6 +2810,7 @@ Volume::_Mount(const char* device, uint32 flags, const char* parameters)
 		return reply->error;
 	fRootID = reply->rootID;
 	fUserlandVolume = reply->volume;
+	fCapabilities = reply->capabilities;
 
 	// enable vnode counting
 	fVNodeCountMap = new(nothrow) VNodeCountMap;
@@ -2858,7 +2859,7 @@ status_t
 Volume::_ReadFSInfo(fs_info* info)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_FS_INFO))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_READ_FS_INFO))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2970,7 +2971,7 @@ status_t
 Volume::_ReadStat(void* node, struct stat* st)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_READ_STAT))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -3009,7 +3010,7 @@ status_t
 Volume::_Close(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE))
 		return B_OK;
 
 	// get a free port
@@ -3048,7 +3049,7 @@ status_t
 Volume::_FreeCookie(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_COOKIE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3087,7 +3088,7 @@ status_t
 Volume::_CloseDir(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_DIR))
 		return B_OK;
 
 	// get a free port
@@ -3126,7 +3127,7 @@ status_t
 Volume::_FreeDirCookie(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_DIR_COOKIE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_DIR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3165,7 +3166,7 @@ status_t
 Volume::_CloseAttrDir(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR_DIR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR))
 		return B_OK;
 
 	// get a free port
@@ -3204,7 +3205,7 @@ status_t
 Volume::_FreeAttrDirCookie(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_DIR_COOKIE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3243,7 +3244,7 @@ status_t
 Volume::_CloseAttr(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_ATTR))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_ATTR))
 		return B_OK;
 
 	// get a free port
@@ -3282,7 +3283,7 @@ status_t
 Volume::_FreeAttrCookie(void* node, void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_ATTR_COOKIE))
+	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3321,7 +3322,7 @@ status_t
 Volume::_CloseIndexDir(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_INDEX_DIR))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_CLOSE_INDEX_DIR))
 		return B_OK;
 
 	// get a free port
@@ -3359,7 +3360,7 @@ status_t
 Volume::_FreeIndexDirCookie(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_INDEX_DIR_COOKIE))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_FREE_INDEX_DIR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3397,7 +3398,7 @@ status_t
 Volume::_CloseQuery(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_CLOSE_QUERY))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_CLOSE_QUERY))
 		return B_OK;
 
 	// get a free port
@@ -3435,7 +3436,7 @@ status_t
 Volume::_FreeQueryCookie(void* cookie)
 {
 	// check capability
-	if (!fFileSystem->HasCapability(FS_CAPABILITY_FREE_QUERY_COOKIE))
+	if (!HasCapability(FS_VOLUME_CAPABILITY_FREE_QUERY_COOKIE))
 		return B_OK;
 
 	// get a free port

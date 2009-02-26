@@ -316,6 +316,7 @@ public:
 	Address			portInfos;
 	int32			portInfoCount;
 	FSCapabilities	capabilities;
+	client_fs_type	clientFSType;
 };
 
 
@@ -340,8 +341,9 @@ class MountVolumeReply : public ReplyRequest {
 public:
 	MountVolumeReply() : ReplyRequest(MOUNT_VOLUME_REPLY) {}
 
-	ino_t		rootID;
-	void*		volume;
+	ino_t					rootID;
+	void*					volume;
+	FSVolumeCapabilities	capabilities;
 };
 
 // UnmountVolumeRequest

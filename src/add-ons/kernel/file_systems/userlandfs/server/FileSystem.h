@@ -23,9 +23,12 @@ public:
 			void				GetCapabilities(
 									FSCapabilities& capabilities) const
 									{ capabilities = fCapabilities; }
+			client_fs_type		GetClientFSType() const
+									{ return fClientFSType; }
 
 protected:
 			FSCapabilities		fCapabilities;
+			client_fs_type		fClientFSType;
 };
 
 }	// namespace UserlandFS

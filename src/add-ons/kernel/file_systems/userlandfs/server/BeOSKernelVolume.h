@@ -26,12 +26,12 @@ public:
 
 	// vnodes
 	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
-									ino_t* vnid, int* type);
+									ino_t* vnid);
 	virtual	status_t			LookupNoType(fs_vnode dir,
 									const char* entryName, ino_t* vnid);
 									// not required
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
-									fs_vnode* node);
+									fs_vnode* node, int* type, uint32* flags);
 	virtual	status_t			WriteVNode(fs_vnode node, bool reenter);
 	virtual	status_t			RemoveVNode(fs_vnode node, bool reenter);
 
@@ -41,7 +41,7 @@ public:
 	virtual	status_t			SetFlags(fs_vnode node, fs_cookie cookie,
 									int flags);
 	virtual	status_t			Select(fs_vnode node, fs_cookie cookie,
-									uint8 event, uint32 ref, selectsync* sync);
+									uint8 event, selectsync* sync);
 	virtual	status_t			Deselect(fs_vnode node, fs_cookie cookie,
 									uint8 event, selectsync* sync);
 

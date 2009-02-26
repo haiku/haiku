@@ -10,15 +10,25 @@
 #include "Debug.h"
 #include "kernel_emu.h"
 #include "haiku_fs_cache.h"
+#include "HaikuKernelNode.h"
 
 
 // constructor
 HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	file_system_module_info* fsModule)
 	: Volume(fileSystem, id),
-	  fFSModule(fsModule),
-	  fVolumeCookie(NULL)
+	  fFSModule(fsModule)
 {
+	fVolume.id = id;
+	fVolume.partition = -1;
+	fVolume.layer = 0;
+	fVolume.private_volume = NULL;		// filled in by the FS
+	fVolume.ops = NULL;					// filled in by the FS
+	fVolume.sub_volume = NULL;
+	fVolume.super_volume = NULL;
+	fVolume.file_system = fFSModule;
+	fVolume.file_system_name = "dummy";	// TODO: Init correctly!
+	fVolume.haikuVolume = this;
 }
 
 // destructor
@@ -37,19 +47,20 @@ HaikuKernelVolume::Mount(const char* device, uint32 flags,
 	if (!fFSModule->mount)
 		return B_BAD_VALUE;
 
-	// make the volume know to the file cache emulation
+	// make the volume known to the file cache emulation
 	status_t error
 		= UserlandFS::HaikuKernelEmu::file_cache_register_volume(this);
 	if (error != B_OK)
 		return error;
 
 	// mount
-	error = fFSModule->mount(GetID(), device, flags, parameters,
-		&fVolumeCookie, rootID);
+	error = fFSModule->mount(&fVolume, device, flags, parameters, rootID);
 	if (error != B_OK) {
 		UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
 		return error;
 	}
+
+	_InitCapabilities();
 
 	return B_OK;
 }
@@ -58,11 +69,11 @@ HaikuKernelVolume::Mount(const char* device, uint32 flags,
 status_t
 HaikuKernelVolume::Unmount()
 {
-	if (!fFSModule->unmount)
+	if (!fVolume.ops->unmount)
 		return B_BAD_VALUE;
 
 	// unmount
-	status_t error = fFSModule->unmount(fVolumeCookie);
+	status_t error = fVolume.ops->unmount(&fVolume);
 
 	// unregister with the file cache emulation
 	UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
@@ -74,27 +85,27 @@ HaikuKernelVolume::Unmount()
 status_t
 HaikuKernelVolume::Sync()
 {
-	if (!fFSModule->sync)
+	if (!fVolume.ops->sync)
 		return B_BAD_VALUE;
-	return fFSModule->sync(fVolumeCookie);
+	return fVolume.ops->sync(&fVolume);
 }
 
 // ReadFSInfo
 status_t
 HaikuKernelVolume::ReadFSInfo(fs_info* info)
 {
-	if (!fFSModule->read_fs_info)
+	if (!fVolume.ops->read_fs_info)
 		return B_BAD_VALUE;
-	return fFSModule->read_fs_info(fVolumeCookie, info);
+	return fVolume.ops->read_fs_info(&fVolume, info);
 }
 
 // WriteFSInfo
 status_t
 HaikuKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 {
-	if (!fFSModule->write_fs_info)
+	if (!fVolume.ops->write_fs_info)
 		return B_BAD_VALUE;
-	return fFSModule->write_fs_info(fVolumeCookie, info, mask);
+	return fVolume.ops->write_fs_info(&fVolume, info, mask);
 }
 
 
@@ -103,12 +114,14 @@ HaikuKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // GetFileMap
 status_t
-HaikuKernelVolume::GetFileMap(fs_vnode node, off_t offset, size_t size,
+HaikuKernelVolume::GetFileMap(void* _node, off_t offset, size_t size,
 	struct file_io_vec* vecs, size_t* count)
 {
-	if (!fFSModule->get_file_map)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->get_file_map)
 		return B_BAD_VALUE;
-	return fFSModule->get_file_map(fVolumeCookie, node, offset, size, vecs,
+	return node->ops->get_file_map(&fVolume, node, offset, size, vecs,
 		count);
 }
 
@@ -118,50 +131,79 @@ HaikuKernelVolume::GetFileMap(fs_vnode node, off_t offset, size_t size,
 
 // Lookup
 status_t
-HaikuKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid,
-	int* type)
+HaikuKernelVolume::Lookup(void* _dir, const char* entryName, ino_t* vnid)
 {
-	if (!fFSModule->lookup)
+	HaikuKernelNode* dir = (HaikuKernelNode*)_dir;
+
+	if (!dir->ops->lookup)
 		return B_BAD_VALUE;
-	return fFSModule->lookup(fVolumeCookie, dir, entryName, vnid, type);
+	return dir->ops->lookup(&fVolume, dir, entryName, vnid);
+
 }
 
 // GetVNodeName
 status_t
-HaikuKernelVolume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+HaikuKernelVolume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 {
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
 	// If not implemented by the client file system, we invoke our super class
 	// version, which emulates the functionality.
-	if (!fFSModule->get_vnode_name)
-		return Volume::GetVNodeName(node, buffer, bufferSize);
-	return fFSModule->get_vnode_name(fVolumeCookie, node, buffer, bufferSize);
+	if (!node->ops->get_vnode_name)
+		return Volume::GetVNodeName(_node, buffer, bufferSize);
+	return node->ops->get_vnode_name(&fVolume, node, buffer, bufferSize);
 }
 
 // ReadVNode
 status_t
-HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
+HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
+	uint32* flags)
 {
-	if (!fFSModule->get_vnode)
+	if (!fVolume.ops->get_vnode)
 		return B_BAD_VALUE;
-	return fFSModule->get_vnode(fVolumeCookie, vnid, node, reenter);
+
+	// create a new wrapper node
+	HaikuKernelNode* node = new(std::nothrow) HaikuKernelNode;
+	if (node == NULL)
+		return B_NO_MEMORY;
+	node->volume = this;
+
+	// get the node
+	status_t error = fVolume.ops->get_vnode(&fVolume, vnid, node, type, flags,
+		reenter);
+	if (error != B_OK) {
+		delete node;
+		return error;
+	}
+
+	*_node = node;
+	return B_OK;
 }
 
 // WriteVNode
 status_t
-HaikuKernelVolume::WriteVNode(fs_vnode node, bool reenter)
+HaikuKernelVolume::WriteVNode(void* _node, bool reenter)
 {
-	if (!fFSModule->put_vnode)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->put_vnode)
 		return B_BAD_VALUE;
-	return fFSModule->put_vnode(fVolumeCookie, node, reenter);
+	status_t error = node->ops->put_vnode(&fVolume, node, reenter);
+
+	delete node;
+
+	return error;
 }
 
 // RemoveVNode
 status_t
-HaikuKernelVolume::RemoveVNode(fs_vnode node, bool reenter)
+HaikuKernelVolume::RemoveVNode(void* _node, bool reenter)
 {
-	if (!fFSModule->remove_vnode)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->remove_vnode)
 		return B_BAD_VALUE;
-	return fFSModule->remove_vnode(fVolumeCookie, node, reenter);
+	return node->ops->remove_vnode(&fVolume, node, reenter);
 }
 
 
@@ -170,131 +212,150 @@ HaikuKernelVolume::RemoveVNode(fs_vnode node, bool reenter)
 
 // IOCtl
 status_t
-HaikuKernelVolume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command,
+HaikuKernelVolume::IOCtl(void* _node, void* cookie, uint32 command,
 	void* buffer, size_t size)
 {
-	if (!fFSModule->ioctl)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->ioctl)
 		return B_BAD_VALUE;
-	return fFSModule->ioctl(fVolumeCookie, node, cookie, command, buffer,
+	return node->ops->ioctl(&fVolume, node, cookie, command, buffer,
 		size);
 }
 
 // SetFlags
 status_t
-HaikuKernelVolume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
+HaikuKernelVolume::SetFlags(void* _node, void* cookie, int flags)
 {
-	if (!fFSModule->set_flags)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->set_flags)
 		return B_BAD_VALUE;
-	return fFSModule->set_flags(fVolumeCookie, node, cookie, flags);
+	return node->ops->set_flags(&fVolume, node, cookie, flags);
 }
 
 // Select
 status_t
-HaikuKernelVolume::Select(fs_vnode node, fs_cookie cookie, uint8 event,
-	uint32 ref, selectsync* sync)
+HaikuKernelVolume::Select(void* _node, void* cookie, uint8 event,
+	selectsync* sync)
 {
-	if (!fFSModule->select) {
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->select) {
 		UserlandFS::KernelEmu::notify_select_event(sync, event, false);
 		return B_OK;
 	}
-	return fFSModule->select(fVolumeCookie, node, cookie, event, ref, sync);
+	return node->ops->select(&fVolume, node, cookie, event, sync);
 }
 
 // Deselect
 status_t
-HaikuKernelVolume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event,
+HaikuKernelVolume::Deselect(void* _node, void* cookie, uint8 event,
 	selectsync* sync)
 {
-	if (!fFSModule->select || !fFSModule->deselect)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->select || !node->ops->deselect)
 		return B_OK;
-	return fFSModule->deselect(fVolumeCookie, node, cookie, event, sync);
+	return node->ops->deselect(&fVolume, node, cookie, event, sync);
 }
 
 // FSync
 status_t
-HaikuKernelVolume::FSync(fs_vnode node)
+HaikuKernelVolume::FSync(void* _node)
 {
-	if (!fFSModule->fsync)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->fsync)
 		return B_BAD_VALUE;
-	return fFSModule->fsync(fVolumeCookie, node);
+	return node->ops->fsync(&fVolume, node);
 }
 
 // ReadSymlink
 status_t
-HaikuKernelVolume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+HaikuKernelVolume::ReadSymlink(void* _node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
-	if (!fFSModule->read_symlink)
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->read_symlink)
 		return B_BAD_VALUE;
 
 	*bytesRead = bufferSize;
 
-	return fFSModule->read_symlink(fVolumeCookie, node, buffer, bytesRead);
+	return node->ops->read_symlink(&fVolume, node, buffer, bytesRead);
 }
 
 // CreateSymlink
 status_t
-HaikuKernelVolume::CreateSymlink(fs_vnode dir, const char* name,
+HaikuKernelVolume::CreateSymlink(void* _dir, const char* name,
 	const char* target, int mode)
 {
-	if (!fFSModule->create_symlink)
+	HaikuKernelNode* dir = (HaikuKernelNode*)_dir;
+
+	if (!dir->ops->create_symlink)
 		return B_BAD_VALUE;
-	return fFSModule->create_symlink(fVolumeCookie, dir, name, target, mode);
+	return dir->ops->create_symlink(&fVolume, dir, name, target, mode);
 }
 
 // Link
 status_t
-HaikuKernelVolume::Link(fs_vnode dir, const char* name, fs_vnode node)
+HaikuKernelVolume::Link(void* _dir, const char* name, void* _node)
 {
-	if (!fFSModule->link)
+	HaikuKernelNode* dir = (HaikuKernelNode*)_dir;
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!dir->ops->link)
 		return B_BAD_VALUE;
-	return fFSModule->link(fVolumeCookie, dir, name, node);
+	return dir->ops->link(&fVolume, dir, name, node);
 }
 
 // Unlink
 status_t
-HaikuKernelVolume::Unlink(fs_vnode dir, const char* name)
+HaikuKernelVolume::Unlink(void* _dir, const char* name)
 {
-	if (!fFSModule->unlink)
+	HaikuKernelNode* dir = (HaikuKernelNode*)_dir;
+
+	if (!dir->ops->unlink)
 		return B_BAD_VALUE;
-	return fFSModule->unlink(fVolumeCookie, dir, name);
+	return dir->ops->unlink(&fVolume, dir, name);
 }
 
 // Rename
 status_t
-HaikuKernelVolume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
+HaikuKernelVolume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	if (!fFSModule->rename)
 		return B_BAD_VALUE;
-	return fFSModule->rename(fVolumeCookie, oldDir, oldName, newDir, newName);
+	return fFSModule->rename(&fVolume, oldDir, oldName, newDir, newName);
 }
 
 // Access
 status_t
-HaikuKernelVolume::Access(fs_vnode node, int mode)
+HaikuKernelVolume::Access(void* node, int mode)
 {
 	if (!fFSModule->access)
 		return B_OK;
-	return fFSModule->access(fVolumeCookie, node, mode);
+	return fFSModule->access(&fVolume, node, mode);
 }
 
 // ReadStat
 status_t
-HaikuKernelVolume::ReadStat(fs_vnode node, struct stat* st)
+HaikuKernelVolume::ReadStat(void* node, struct stat* st)
 {
 	if (!fFSModule->read_stat)
 		return B_BAD_VALUE;
-	return fFSModule->read_stat(fVolumeCookie, node, st);
+	return fFSModule->read_stat(&fVolume, node, st);
 }
 
 // WriteStat
 status_t
-HaikuKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
+HaikuKernelVolume::WriteStat(void* node, const struct stat *st, uint32 mask)
 {
 	if (!fFSModule->write_stat)
 		return B_BAD_VALUE;
-	return fFSModule->write_stat(fVolumeCookie, node, st, mask);
+	return fFSModule->write_stat(&fVolume, node, st, mask);
 }
 
 
@@ -303,45 +364,45 @@ HaikuKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 
 // Create
 status_t
-HaikuKernelVolume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, ino_t* vnid)
+HaikuKernelVolume::Create(void* dir, const char* name, int openMode, int mode,
+	void** cookie, ino_t* vnid)
 {
 	if (!fFSModule->create)
 		return B_BAD_VALUE;
-	return fFSModule->create(fVolumeCookie, dir, name, openMode, mode, cookie,
+	return fFSModule->create(&fVolume, dir, name, openMode, mode, cookie,
 		vnid);
 }
 
 // Open
 status_t
-HaikuKernelVolume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+HaikuKernelVolume::Open(void* node, int openMode, void** cookie)
 {
 	if (!fFSModule->open)
 		return B_BAD_VALUE;
-	return fFSModule->open(fVolumeCookie, node, openMode, cookie);
+	return fFSModule->open(&fVolume, node, openMode, cookie);
 }
 
 // Close
 status_t
-HaikuKernelVolume::Close(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::Close(void* node, void* cookie)
 {
 	if (!fFSModule->close)
 		return B_OK;
-	return fFSModule->close(fVolumeCookie, node, cookie);
+	return fFSModule->close(&fVolume, node, cookie);
 }
 
 // FreeCookie
 status_t
-HaikuKernelVolume::FreeCookie(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::FreeCookie(void* node, void* cookie)
 {
 	if (!fFSModule->free_cookie)
 		return B_OK;
-	return fFSModule->free_cookie(fVolumeCookie, node, cookie);
+	return fFSModule->free_cookie(&fVolume, node, cookie);
 }
 
 // Read
 status_t
-HaikuKernelVolume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+HaikuKernelVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	if (!fFSModule->read)
@@ -349,12 +410,12 @@ HaikuKernelVolume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer
 
 	*bytesRead = bufferSize;
 
-	return fFSModule->read(fVolumeCookie, node, cookie, pos, buffer, bytesRead);
+	return fFSModule->read(&fVolume, node, cookie, pos, buffer, bytesRead);
 }
 
 // Write
 status_t
-HaikuKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
+HaikuKernelVolume::Write(void* node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	if (!fFSModule->write)
@@ -362,7 +423,7 @@ HaikuKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
 
 	*bytesWritten = bufferSize;
 
-	return fFSModule->write(fVolumeCookie, node, cookie, pos, buffer,
+	return fFSModule->write(&fVolume, node, cookie, pos, buffer,
 		bytesWritten);
 }
 
@@ -372,53 +433,53 @@ HaikuKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
 
 // CreateDir
 status_t
-HaikuKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
+HaikuKernelVolume::CreateDir(void* dir, const char* name, int mode,
 	ino_t *newDir)
 {
 	if (!fFSModule->create_dir)
 		return B_BAD_VALUE;
-	return fFSModule->create_dir(fVolumeCookie, dir, name, mode, newDir);
+	return fFSModule->create_dir(&fVolume, dir, name, mode, newDir);
 }
 
 // RemoveDir
 status_t
-HaikuKernelVolume::RemoveDir(fs_vnode dir, const char* name)
+HaikuKernelVolume::RemoveDir(void* dir, const char* name)
 {
 	if (!fFSModule->remove_dir)
 		return B_BAD_VALUE;
-	return fFSModule->remove_dir(fVolumeCookie, dir, name);
+	return fFSModule->remove_dir(&fVolume, dir, name);
 }
 
 // OpenDir
 status_t
-HaikuKernelVolume::OpenDir(fs_vnode node, fs_cookie* cookie)
+HaikuKernelVolume::OpenDir(void* node, void** cookie)
 {
 	if (!fFSModule->open_dir)
 		return B_BAD_VALUE;
-	return fFSModule->open_dir(fVolumeCookie, node, cookie);
+	return fFSModule->open_dir(&fVolume, node, cookie);
 }
 
 // CloseDir
 status_t
-HaikuKernelVolume::CloseDir(fs_vnode node, fs_vnode cookie)
+HaikuKernelVolume::CloseDir(void* node, void* cookie)
 {
 	if (!fFSModule->close_dir)
 		return B_OK;
-	return fFSModule->close_dir(fVolumeCookie, node, cookie);
+	return fFSModule->close_dir(&fVolume, node, cookie);
 }
 
 // FreeDirCookie
 status_t
-HaikuKernelVolume::FreeDirCookie(fs_vnode node, fs_vnode cookie)
+HaikuKernelVolume::FreeDirCookie(void* node, void* cookie)
 {
 	if (!fFSModule->free_dir_cookie)
 		return B_OK;
-	return fFSModule->free_dir_cookie(fVolumeCookie, node, cookie);
+	return fFSModule->free_dir_cookie(&fVolume, node, cookie);
 }
 
 // ReadDir
 status_t
-HaikuKernelVolume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer,
+HaikuKernelVolume::ReadDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	if (!fFSModule->read_dir)
@@ -426,17 +487,17 @@ HaikuKernelVolume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer,
 
 	*countRead = count;
 
-	return fFSModule->read_dir(fVolumeCookie, node, cookie,
+	return fFSModule->read_dir(&fVolume, node, cookie,
 		(struct dirent*)buffer, bufferSize, countRead);
 }
 
 // RewindDir
 status_t
-HaikuKernelVolume::RewindDir(fs_vnode node, fs_vnode cookie)
+HaikuKernelVolume::RewindDir(void* node, void* cookie)
 {
 	if (!fFSModule->rewind_dir)
 		return B_BAD_VALUE;
-	return fFSModule->rewind_dir(fVolumeCookie, node, cookie);
+	return fFSModule->rewind_dir(&fVolume, node, cookie);
 }
 
 
@@ -445,34 +506,34 @@ HaikuKernelVolume::RewindDir(fs_vnode node, fs_vnode cookie)
 
 // OpenAttrDir
 status_t
-HaikuKernelVolume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
+HaikuKernelVolume::OpenAttrDir(void* node, void** cookie)
 {
 	if (!fFSModule->open_attr_dir)
 		return B_BAD_VALUE;
-	return fFSModule->open_attr_dir(fVolumeCookie, node, cookie);
+	return fFSModule->open_attr_dir(&fVolume, node, cookie);
 }
 
 // CloseAttrDir
 status_t
-HaikuKernelVolume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::CloseAttrDir(void* node, void* cookie)
 {
 	if (!fFSModule->close_attr_dir)
 		return B_OK;
-	return fFSModule->close_attr_dir(fVolumeCookie, node, cookie);
+	return fFSModule->close_attr_dir(&fVolume, node, cookie);
 }
 
 // FreeAttrDirCookie
 status_t
-HaikuKernelVolume::FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::FreeAttrDirCookie(void* node, void* cookie)
 {
 	if (!fFSModule->free_attr_dir_cookie)
 		return B_OK;
-	return fFSModule->free_attr_dir_cookie(fVolumeCookie, node, cookie);
+	return fFSModule->free_attr_dir_cookie(&fVolume, node, cookie);
 }
 
 // ReadAttrDir
 status_t
-HaikuKernelVolume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+HaikuKernelVolume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	if (!fFSModule->read_attr_dir)
@@ -480,17 +541,17 @@ HaikuKernelVolume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 
 	*countRead = count;
 
-	return fFSModule->read_attr_dir(fVolumeCookie, node, cookie,
+	return fFSModule->read_attr_dir(&fVolume, node, cookie,
 		(struct dirent*)buffer, bufferSize, countRead);
 }
 
 // RewindAttrDir
 status_t
-HaikuKernelVolume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::RewindAttrDir(void* node, void* cookie)
 {
 	if (!fFSModule->rewind_attr_dir)
 		return B_BAD_VALUE;
-	return fFSModule->rewind_attr_dir(fVolumeCookie, node, cookie);
+	return fFSModule->rewind_attr_dir(&fVolume, node, cookie);
 }
 
 
@@ -499,46 +560,46 @@ HaikuKernelVolume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 
 // CreateAttr
 status_t
-HaikuKernelVolume::CreateAttr(fs_vnode node, const char* name, uint32 type,
-	int openMode, fs_cookie* cookie)
+HaikuKernelVolume::CreateAttr(void* node, const char* name, uint32 type,
+	int openMode, void** cookie)
 {
 	if (!fFSModule->create_attr)
 		return B_BAD_VALUE;
-	return fFSModule->create_attr(fVolumeCookie, node, name, type, openMode,
+	return fFSModule->create_attr(&fVolume, node, name, type, openMode,
 		cookie);
 }
 
 // OpenAttr
 status_t
-HaikuKernelVolume::OpenAttr(fs_vnode node, const char* name, int openMode,
-	fs_cookie* cookie)
+HaikuKernelVolume::OpenAttr(void* node, const char* name, int openMode,
+	void** cookie)
 {
 	if (!fFSModule->open_attr)
 		return B_BAD_VALUE;
-	return fFSModule->open_attr(fVolumeCookie, node, name, openMode, cookie);
+	return fFSModule->open_attr(&fVolume, node, name, openMode, cookie);
 }
 
 // CloseAttr
 status_t
-HaikuKernelVolume::CloseAttr(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::CloseAttr(void* node, void* cookie)
 {
 	if (!fFSModule->close_attr)
 		return B_OK;
-	return fFSModule->close_attr(fVolumeCookie, node, cookie);
+	return fFSModule->close_attr(&fVolume, node, cookie);
 }
 
 // FreeAttrCookie
 status_t
-HaikuKernelVolume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+HaikuKernelVolume::FreeAttrCookie(void* node, void* cookie)
 {
 	if (!fFSModule->free_attr_cookie)
 		return B_OK;
-	return fFSModule->free_attr_cookie(fVolumeCookie, node, cookie);
+	return fFSModule->free_attr_cookie(&fVolume, node, cookie);
 }
 
 // ReadAttr
 status_t
-HaikuKernelVolume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+HaikuKernelVolume::ReadAttr(void* node, void* cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
 	if (!fFSModule->read_attr)
@@ -546,13 +607,13 @@ HaikuKernelVolume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 	*bytesRead = bufferSize;
 
-	return fFSModule->read_attr(fVolumeCookie, node, cookie, pos, buffer,
+	return fFSModule->read_attr(&fVolume, node, cookie, pos, buffer,
 		bytesRead);
 }
 
 // WriteAttr
 status_t
-HaikuKernelVolume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+HaikuKernelVolume::WriteAttr(void* node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	if (!fFSModule->write_attr)
@@ -560,49 +621,49 @@ HaikuKernelVolume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 	*bytesWritten = bufferSize;
 
-	return fFSModule->write_attr(fVolumeCookie, node, cookie, pos, buffer,
+	return fFSModule->write_attr(&fVolume, node, cookie, pos, buffer,
 		bytesWritten);
 }
 
 // ReadAttrStat
 status_t
-HaikuKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie cookie,
+HaikuKernelVolume::ReadAttrStat(void* node, void* cookie,
 	struct stat *st)
 {
 	if (!fFSModule->read_attr_stat)
 		return B_BAD_VALUE;
-	return fFSModule->read_attr_stat(fVolumeCookie, node, cookie, st);
+	return fFSModule->read_attr_stat(&fVolume, node, cookie, st);
 }
 
 // WriteAttrStat
 status_t
-HaikuKernelVolume::WriteAttrStat(fs_vnode node, fs_cookie cookie,
+HaikuKernelVolume::WriteAttrStat(void* node, void* cookie,
 	const struct stat* st, int statMask)
 {
 	if (!fFSModule->write_attr_stat)
 		return B_BAD_VALUE;
-	return fFSModule->write_attr_stat(fVolumeCookie, node, cookie, st,
+	return fFSModule->write_attr_stat(&fVolume, node, cookie, st,
 		statMask);
 }
 
 // RenameAttr
 status_t
-HaikuKernelVolume::RenameAttr(fs_vnode oldNode, const char* oldName,
-	fs_vnode newNode, const char* newName)
+HaikuKernelVolume::RenameAttr(void* oldNode, const char* oldName,
+	void* newNode, const char* newName)
 {
 	if (!fFSModule->rename_attr)
 		return B_BAD_VALUE;
-	return fFSModule->rename_attr(fVolumeCookie, oldNode, oldName, newNode,
+	return fFSModule->rename_attr(&fVolume, oldNode, oldName, newNode,
 		newName);
 }
 
 // RemoveAttr
 status_t
-HaikuKernelVolume::RemoveAttr(fs_vnode node, const char* name)
+HaikuKernelVolume::RemoveAttr(void* node, const char* name)
 {
 	if (!fFSModule->remove_attr)
 		return B_BAD_VALUE;
-	return fFSModule->remove_attr(fVolumeCookie, node, name);
+	return fFSModule->remove_attr(&fVolume, node, name);
 }
 
 
@@ -611,79 +672,79 @@ HaikuKernelVolume::RemoveAttr(fs_vnode node, const char* name)
 
 // OpenIndexDir
 status_t
-HaikuKernelVolume::OpenIndexDir(fs_cookie *cookie)
+HaikuKernelVolume::OpenIndexDir(void** cookie)
 {
-	if (!fFSModule->open_index_dir)
+	if (!fVolume.ops->open_index_dir)
 		return B_BAD_VALUE;
-	return fFSModule->open_index_dir(fVolumeCookie, cookie);
+	return fVolume.ops->open_index_dir(&fVolume, cookie);
 }
 
 // CloseIndexDir
 status_t
-HaikuKernelVolume::CloseIndexDir(fs_cookie cookie)
+HaikuKernelVolume::CloseIndexDir(void* cookie)
 {
-	if (!fFSModule->close_index_dir)
+	if (!fVolume.ops->close_index_dir)
 		return B_OK;
-	return fFSModule->close_index_dir(fVolumeCookie, cookie);
+	return fVolume.ops->close_index_dir(&fVolume, cookie);
 }
 
 // FreeIndexDirCookie
 status_t
-HaikuKernelVolume::FreeIndexDirCookie(fs_cookie cookie)
+HaikuKernelVolume::FreeIndexDirCookie(void* cookie)
 {
-	if (!fFSModule->free_index_dir_cookie)
+	if (!fVolume.ops->free_index_dir_cookie)
 		return B_OK;
-	return fFSModule->free_index_dir_cookie(fVolumeCookie, cookie);
+	return fVolume.ops->free_index_dir_cookie(&fVolume, cookie);
 }
 
 // ReadIndexDir
 status_t
-HaikuKernelVolume::ReadIndexDir(fs_cookie cookie, void* buffer,
+HaikuKernelVolume::ReadIndexDir(void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
-	if (!fFSModule->read_index_dir)
+	if (!fVolume.ops->read_index_dir)
 		return B_BAD_VALUE;
 
 	*countRead = count;
 
-	return fFSModule->read_index_dir(fVolumeCookie, cookie,
+	return fVolume.ops->read_index_dir(&fVolume, cookie,
 		(struct dirent*)buffer, bufferSize, countRead);
 }
 
 // RewindIndexDir
 status_t
-HaikuKernelVolume::RewindIndexDir(fs_cookie cookie)
+HaikuKernelVolume::RewindIndexDir(void* cookie)
 {
-	if (!fFSModule->rewind_index_dir)
+	if (!fVolume.ops->rewind_index_dir)
 		return B_BAD_VALUE;
-	return fFSModule->rewind_index_dir(fVolumeCookie, cookie);
+	return fVolume.ops->rewind_index_dir(&fVolume, cookie);
 }
 
 // CreateIndex
 status_t
 HaikuKernelVolume::CreateIndex(const char* name, uint32 type, uint32 flags)
 {
-	if (!fFSModule->create_index)
+	if (!fVolume.ops->create_index)
 		return B_BAD_VALUE;
-	return fFSModule->create_index(fVolumeCookie, name, type, flags);
+	return fVolume.ops->create_index(&fVolume, name, type, flags);
 }
 
 // RemoveIndex
 status_t
 HaikuKernelVolume::RemoveIndex(const char* name)
 {
-	if (!fFSModule->remove_index)
+	if (!fVolume.ops->remove_index)
 		return B_BAD_VALUE;
-	return fFSModule->remove_index(fVolumeCookie, name);
+	return fVolume.ops->remove_index(&fVolume, name);
 }
 
 // StatIndex
 status_t
 HaikuKernelVolume::ReadIndexStat(const char *name, struct stat *st)
 {
-	if (!fFSModule->read_index_stat)
+	if (!fVolume.ops->read_index_stat)
 		return B_BAD_VALUE;
-	return fFSModule->read_index_stat(fVolumeCookie, name, st);
+	return fVolume.ops->read_index_stat(&fVolume, name, st);
 }
 
 
@@ -693,52 +754,176 @@ HaikuKernelVolume::ReadIndexStat(const char *name, struct stat *st)
 // OpenQuery
 status_t
 HaikuKernelVolume::OpenQuery(const char* queryString, uint32 flags,
-	port_id port, uint32 token, fs_cookie *cookie)
+	port_id port, uint32 token, void** cookie)
 {
-	if (!fFSModule->open_query)
+	if (!fVolume.ops->open_query)
 		return B_BAD_VALUE;
-	return fFSModule->open_query(fVolumeCookie, queryString, flags, port,
+	return fVolume.ops->open_query(&fVolume, queryString, flags, port,
 		token, cookie);
 }
 
 // CloseQuery
 status_t
-HaikuKernelVolume::CloseQuery(fs_cookie cookie)
+HaikuKernelVolume::CloseQuery(void* cookie)
 {
-	if (!fFSModule->close_query)
+	if (!fVolume.ops->close_query)
 		return B_OK;
-	return fFSModule->close_query(fVolumeCookie, cookie);
+	return fVolume.ops->close_query(&fVolume, cookie);
 }
 
 // FreeQueryCookie
 status_t
-HaikuKernelVolume::FreeQueryCookie(fs_cookie cookie)
+HaikuKernelVolume::FreeQueryCookie(void* cookie)
 {
-	if (!fFSModule->free_query_cookie)
+	if (!fVolume.ops->free_query_cookie)
 		return B_OK;
-	return fFSModule->free_query_cookie(fVolumeCookie, cookie);
+	return fVolume.ops->free_query_cookie(&fVolume, cookie);
 }
 
 // ReadQuery
 status_t
-HaikuKernelVolume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+HaikuKernelVolume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
-	if (!fFSModule->read_query)
+	if (!fVolume.ops->read_query)
 		return B_BAD_VALUE;
 
 	*countRead = count;
 
-	return fFSModule->read_query(fVolumeCookie, cookie, (struct dirent*)buffer,
+	return fVolume.ops->read_query(&fVolume, cookie, (struct dirent*)buffer,
 		bufferSize, countRead);
 }
 
 // RewindQuery
 status_t
-HaikuKernelVolume::RewindQuery(fs_cookie cookie)
+HaikuKernelVolume::RewindQuery(void* cookie)
 {
-	if (!fFSModule->rewind_query)
+	if (!fVolume.ops->rewind_query)
 		return B_BAD_VALUE;
-	return fFSModule->rewind_query(fVolumeCookie, cookie);
+	return fVolume.ops->rewind_query(&fVolume, cookie);
 }
 
+// _InitCapabilities
+void
+HaikuKernelVolume::_InitCapabilities()
+{
+	fCapabilities.ClearAll();
+
+	// FS operations
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_UNMOUNT, fVolume.ops->unmount);
+
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_READ_FS_INFO,
+		fVolume.ops->read_fs_info);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_WRITE_FS_INFO,
+		fVolume.ops->write_fs_info);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fVolume.ops->sync);
+
+	// vnode operations
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_GET_VNODE, fVolume.ops->get_vnode);
+
+	// index directory & index operations
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_OPEN_INDEX_DIR,
+		fVolume.ops->open_index_dir);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_CLOSE_INDEX_DIR,
+		fVolume.ops->close_index_dir);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_FREE_INDEX_DIR_COOKIE,
+		fVolume.ops->free_index_dir_cookie);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_READ_INDEX_DIR,
+		fVolume.ops->read_index_dir);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_REWIND_INDEX_DIR,
+		fVolume.ops->rewind_index_dir);
+
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_CREATE_INDEX,
+		fVolume.ops->create_index);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_REMOVE_INDEX,
+		fVolume.ops->remove_index);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_READ_INDEX_STAT,
+		fVolume.ops->read_index_stat);
+
+	// query operations
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_OPEN_QUERY, fVolume.ops->open_query);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_CLOSE_QUERY,
+		fVolume.ops->close_query);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_FREE_QUERY_COOKIE,
+		fVolume.ops->free_query_cookie);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_READ_QUERY, fVolume.ops->read_query);
+	fCapabilities.Set(FS_VOLUME_CAPABILITY_REWIND_QUERY,
+		fVolume.ops->rewind_query);
+
+
+#if 0
+	// vnode operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_LOOKUP, fFSModule->lookup);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE_NAME, fFSModule->get_vnode_name);
+
+	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE, fFSModule->get_vnode);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_PUT_VNODE, fFSModule->put_vnode);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_VNODE, fFSModule->remove_vnode);
+
+	// VM file access
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CAN_PAGE, fFSModule->can_page);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_PAGES, fFSModule->read_pages);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_PAGES, fFSModule->write_pages);
+
+	// cache file access
+	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_FILE_MAP, fFSModule->get_file_map);
+
+	// common operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_IOCTL, fFSModule->ioctl);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_SET_FLAGS, fFSModule->set_flags);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_SELECT, fFSModule->select);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_DESELECT, fFSModule->deselect);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFSModule->fsync);
+
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFSModule->read_symlink);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFSModule->create_symlink);
+
+	fCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFSModule->link);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fFSModule->unlink);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFSModule->rename);
+
+	fCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fFSModule->access);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFSModule->read_stat);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT, fFSModule->write_stat);
+
+	// file operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fFSModule->create);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFSModule->open);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFSModule->close);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFSModule->free_cookie);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ, fFSModule->read);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fFSModule->write);
+
+	// directory operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fFSModule->create_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fFSModule->remove_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, fFSModule->open_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_DIR, fFSModule->close_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, fFSModule->free_dir_cookie);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, fFSModule->read_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, fFSModule->rewind_dir);
+
+	// attribute directory operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, fFSModule->open_attr_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR, fFSModule->close_attr_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
+		fFSModule->free_attr_dir_cookie);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, fFSModule->read_attr_dir);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, fFSModule->rewind_attr_dir);
+
+	// attribute operations
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, fFSModule->create_attr);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, fFSModule->open_attr);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR, fFSModule->close_attr);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE,
+		fFSModule->free_attr_cookie);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFSModule->read_attr);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fFSModule->write_attr);
+
+	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT, fFSModule->read_attr_stat);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR_STAT,
+		fFSModule->write_attr_stat);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFSModule->rename_attr);
+	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFSModule->remove_attr);
+#endif
+}

@@ -1168,12 +1168,10 @@ fs_vnode_ops gUserlandFSVnodeOps = {
 	&userlandfs_put_vnode,
 	&userlandfs_remove_vnode,
 
-
 	// VM file access
 	NULL,	// &userlandfs_can_page,
 	NULL,	// &userlandfs_read_pages,
 	NULL,	// &userlandfs_write_pages,
-
 
 	// asynchronous I/O
 	NULL,	// &userlandfs_io

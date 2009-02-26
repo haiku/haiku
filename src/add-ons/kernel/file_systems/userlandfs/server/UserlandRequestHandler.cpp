@@ -254,6 +254,7 @@ UserlandRequestHandler::_HandleRequest(MountVolumeRequest* request)
 	reply->error = result;
 	reply->volume = volume;
 	reply->rootID = rootID;
+	reply->capabilities = volume->GetCapabilities();
 
 	// send the reply
 	return _SendReply(allocator, false);
@@ -378,11 +379,10 @@ UserlandRequestHandler::_HandleRequest(LookupRequest* request)
 		result = B_BAD_VALUE;
 
 	ino_t vnid = 0;
-	int type = 0;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Lookup(request->node,
-			(const char*)request->entryName.GetData(), &vnid, &type);
+			(const char*)request->entryName.GetData(), &vnid);
 	}
 
 	// prepare the reply

@@ -357,6 +357,7 @@ UserlandFSDispatcher::_ProcessRequests()
 				info->GetInfos(), info->GetInfosSize(), sizeof(Port::Info));
 			reply->portInfoCount = info->CountInfos();
 			reply->capabilities = info->GetCapabilities();
+			reply->clientFSType = info->GetClientFSType();
 			_PutFileSystem(fileSystem);
 		}
 		reply->error = result;

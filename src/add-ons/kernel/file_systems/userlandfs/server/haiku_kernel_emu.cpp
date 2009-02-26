@@ -111,51 +111,117 @@ notify_query_entry_removed(port_id port, int32 token, dev_t device,
 
 // new_vnode
 status_t
-new_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
+new_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
+	fs_vnode_ops *ops)
 {
-	return UserlandFS::KernelEmu::publish_vnode(mountID, vnodeID, privateNode);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	// translate to a wrapper node
+	HaikuKernelNode* node;
+	status_t error = volume->NewVNode(vnodeID, privateNode, ops, &node);
+	if (error != B_OK)
+		return error;
+
+	// announce the new node
+	error = UserlandFS::KernelEmu::new_vnode(volume->GetID(), vnodeID, node);
+	if (error != B_OK)
+		volume->UndoNewVNode(node);
+
+	return error;
 }
 
 // publish_vnode
 status_t
-publish_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
+publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
+	fs_vnode_ops *ops, int type, uint32 flags)
 {
-	return UserlandFS::KernelEmu::publish_vnode(mountID, vnodeID, privateNode);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	// translate to a wrapper node
+	HaikuKernelNode* node;
+	status_t error = volume->PublishVNode(vnodeID, privateNode, ops, type,
+		flags, &node);
+	if (error != B_OK)
+		return error;
+
+	// publish the new node
+	error = UserlandFS::KernelEmu::publish_vnode(volume, vnodeID, node, type,
+		flags);
+	if (error != B_OK)
+		volume->UndoPublishVNode(node);
+
+	return error;
 }
 
 // get_vnode
 status_t
-get_vnode(dev_t mountID, ino_t vnodeID, fs_vnode *privateNode)
+get_vnode(defs_volume *_volume, ino_t vnodeID, fs_vnode *privateNode)
 {
-	return UserlandFS::KernelEmu::get_vnode(mountID, vnodeID, privateNode);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	// get the node
+	void* foundNode;
+	status_t error = UserlandFS::KernelEmu::get_vnode(volume, vnodeID,
+		&foundNode);
+	if (error != B_OK)
+		return error;
+
+	((HaikuKernelNode*)foundNode)->GetFSNode(privateNode);
+
+	return B_OK;
 }
 
 // put_vnode
 status_t
-put_vnode(dev_t mountID, ino_t vnodeID)
+put_vnode(fs_volume *_volume, ino_t vnodeID)
 {
-	return UserlandFS::KernelEmu::put_vnode(mountID, vnodeID);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	return UserlandFS::KernelEmu::put_vnode(volume->GetID(), vnodeID);
+}
+
+// acquire_vnode
+status_t
+acquire_vnode(fs_volume *_volume, ino_t vnodeID)
+{
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	return UserlandFS::KernelEmu::acquire_vnode(volume->GetID(), vnodeID);
 }
 
 // remove_vnode
 status_t
-remove_vnode(dev_t mountID, ino_t vnodeID)
+remove_vnode(fs_volume *_volume, ino_t vnodeID)
 {
-	return UserlandFS::KernelEmu::remove_vnode(mountID, vnodeID);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	return UserlandFS::KernelEmu::remove_vnode(volume->GetID(), vnodeID);
 }
 
 // unremove_vnode
 status_t
-unremove_vnode(dev_t mountID, ino_t vnodeID)
+unremove_vnode(fs_volume *_volume, ino_t vnodeID)
 {
-	return UserlandFS::KernelEmu::unremove_vnode(mountID, vnodeID);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	return UserlandFS::KernelEmu::unremove_vnode(volume->GetID(), vnodeID);
 }
 
 // get_vnode_removed
 status_t
-get_vnode_removed(dev_t mountID, ino_t vnodeID, bool* removed)
+get_vnode_removed(fs_volume *_volume, ino_t vnodeID, bool* removed)
 {
-	return UserlandFS::KernelEmu::get_vnode_removed(mountID, vnodeID, removed);
+	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
+
+	return UserlandFS::KernelEmu::get_vnode_removed(volume->GetID(), vnodeID,
+		removed);
+}
+
+// volume_for_vnode
+fs_volume*
+volume_for_vnode(fs_vnode *vnode)
+{
+	return HaikuKernelNode::GetNode(vnode)->GetVolume();
 }
 
 

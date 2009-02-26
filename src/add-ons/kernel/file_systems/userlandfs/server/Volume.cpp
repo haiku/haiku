@@ -80,14 +80,14 @@ Volume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // Lookup
 status_t
-Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
+Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 {
 	return B_BAD_VALUE;
 }
 
 // LookupNoType
 status_t
-Volume::LookupNoType(fs_vnode dir, const char* entryName, ino_t* vnid)
+Volume::LookupNoType(void* dir, const char* entryName, ino_t* vnid)
 {
 	int type;
 	return Lookup(dir, entryName, vnid, &type);
@@ -95,7 +95,7 @@ Volume::LookupNoType(fs_vnode dir, const char* entryName, ino_t* vnid)
 
 // GetVNodeName
 status_t
-Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
+Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 {
 	// stat the node to get its ID
 	struct stat st;
@@ -110,7 +110,7 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 		return error;
 
 	// get the parent node handle
-	fs_vnode parentNode;
+	void* parentNode;
 	error = UserlandFS::KernelEmu::get_vnode(GetID(), parentID, &parentNode);
 	// Lookup() has already called get_vnode() for us, so we need to put it once
 	UserlandFS::KernelEmu::put_vnode(GetID(), parentID);
@@ -118,7 +118,7 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 		return error;
 
 	// open the parent dir
-	fs_cookie cookie;
+	void* cookie;
 	error = OpenDir(parentNode, &cookie);
 	if (error == B_OK) {
 
@@ -163,21 +163,22 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
+Volume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
+	uint32* flags)
 {
 	return B_BAD_VALUE;
 }
 
 // WriteVNode
 status_t
-Volume::WriteVNode(fs_vnode node, bool reenter)
+Volume::WriteVNode(void* node, bool reenter)
 {
 	return B_BAD_VALUE;
 }
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(fs_vnode node, bool reenter)
+Volume::RemoveVNode(void* node, bool reenter)
 {
 	return B_BAD_VALUE;
 }
@@ -188,7 +189,7 @@ Volume::RemoveVNode(fs_vnode node, bool reenter)
 
 // IOCtl
 status_t
-Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
+Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 	size_t size)
 {
 	return B_BAD_VALUE;
@@ -196,36 +197,35 @@ Volume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command, void *buffer,
 
 // SetFlags
 status_t
-Volume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
+Volume::SetFlags(void* node, void* cookie, int flags)
 {
 	return B_BAD_VALUE;
 }
 
 // Select
 status_t
-Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
-	selectsync* sync)
+Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	return B_BAD_VALUE;
 }
 
 // Deselect
 status_t
-Volume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event, selectsync* sync)
+Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	return B_BAD_VALUE;
 }
 
 // FSync
 status_t
-Volume::FSync(fs_vnode node)
+Volume::FSync(void* node)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadSymlink
 status_t
-Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
 	return B_BAD_VALUE;
@@ -233,7 +233,7 @@ Volume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
 
 // CreateSymlink
 status_t
-Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
+Volume::CreateSymlink(void* dir, const char* name, const char* target,
 	int mode)
 {
 	return B_BAD_VALUE;
@@ -241,21 +241,21 @@ Volume::CreateSymlink(fs_vnode dir, const char* name, const char* target,
 
 // Link
 status_t
-Volume::Link(fs_vnode dir, const char* name, fs_vnode node)
+Volume::Link(void* dir, const char* name, void* node)
 {
 	return B_BAD_VALUE;
 }
 
 // Unlink
 status_t
-Volume::Unlink(fs_vnode dir, const char* name)
+Volume::Unlink(void* dir, const char* name)
 {
 	return B_BAD_VALUE;
 }
 
 // Rename
 status_t
-Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
+Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	return B_BAD_VALUE;
@@ -263,21 +263,21 @@ Volume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 
 // Access
 status_t
-Volume::Access(fs_vnode node, int mode)
+Volume::Access(void* node, int mode)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadStat
 status_t
-Volume::ReadStat(fs_vnode node, struct stat* st)
+Volume::ReadStat(void* node, struct stat* st)
 {
 	return B_BAD_VALUE;
 }
 
 // WriteStat
 status_t
-Volume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
+Volume::WriteStat(void* node, const struct stat *st, uint32 mask)
 {
 	return B_BAD_VALUE;
 }
@@ -288,36 +288,36 @@ Volume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 
 // Create
 status_t
-Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, ino_t* vnid)
+Volume::Create(void* dir, const char* name, int openMode, int mode,
+	void** cookie, ino_t* vnid)
 {
 	return B_BAD_VALUE;
 }
 
 // Open
 status_t
-Volume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+Volume::Open(void* node, int openMode, void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // Close
 status_t
-Volume::Close(fs_vnode node, fs_cookie cookie)
+Volume::Close(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeCookie
 status_t
-Volume::FreeCookie(fs_vnode node, fs_cookie cookie)
+Volume::FreeCookie(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // Read
 status_t
-Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	return B_BAD_VALUE;
@@ -325,7 +325,7 @@ Volume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
 
 // Write
 status_t
-Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
+Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 	size_t bufferSize, size_t* bytesWritten)
 {
 	return B_BAD_VALUE;
@@ -337,42 +337,42 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(fs_vnode dir, const char* name, int mode, ino_t *newDir)
+Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
 {
 	return B_BAD_VALUE;
 }
 
 // RemoveDir
 status_t
-Volume::RemoveDir(fs_vnode dir, const char* name)
+Volume::RemoveDir(void* dir, const char* name)
 {
 	return B_BAD_VALUE;
 }
 
 // OpenDir
 status_t
-Volume::OpenDir(fs_vnode node, fs_cookie* cookie)
+Volume::OpenDir(void* node, void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseDir
 status_t
-Volume::CloseDir(fs_vnode node, fs_vnode cookie)
+Volume::CloseDir(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeDirCookie
 status_t
-Volume::FreeDirCookie(fs_vnode node, fs_vnode cookie)
+Volume::FreeDirCookie(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadDir
 status_t
-Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
+Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
@@ -380,7 +380,7 @@ Volume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer, size_t bufferSize,
 
 // RewindDir
 status_t
-Volume::RewindDir(fs_vnode node, fs_vnode cookie)
+Volume::RewindDir(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
@@ -391,28 +391,28 @@ Volume::RewindDir(fs_vnode node, fs_vnode cookie)
 
 // OpenAttrDir
 status_t
-Volume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
+Volume::OpenAttrDir(void* node, void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseAttrDir
 status_t
-Volume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
+Volume::CloseAttrDir(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeAttrDirCookie
 status_t
-Volume::FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
+Volume::FreeAttrDirCookie(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadAttrDir
 status_t
-Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
@@ -420,7 +420,7 @@ Volume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 
 // RewindAttrDir
 status_t
-Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
+Volume::RewindAttrDir(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
@@ -431,37 +431,37 @@ Volume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 
 // CreateAttr
 status_t
-Volume::CreateAttr(fs_vnode node, const char* name, uint32 type, int openMode,
-	fs_cookie* cookie)
+Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
+	void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // OpenAttr
 status_t
-Volume::OpenAttr(fs_vnode node, const char* name, int openMode,
-	fs_cookie* cookie)
+Volume::OpenAttr(void* node, const char* name, int openMode,
+	void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseAttr
 status_t
-Volume::CloseAttr(fs_vnode node, fs_cookie cookie)
+Volume::CloseAttr(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeAttrCookie
 status_t
-Volume::FreeAttrCookie(fs_vnode node, fs_cookie cookie)
+Volume::FreeAttrCookie(void* node, void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadAttr
 status_t
-Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+Volume::ReadAttr(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	return B_BAD_VALUE;
@@ -469,7 +469,7 @@ Volume::ReadAttr(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
 
 // WriteAttr
 status_t
-Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
+Volume::WriteAttr(void* node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	return B_BAD_VALUE;
@@ -477,14 +477,14 @@ Volume::WriteAttr(fs_vnode node, fs_cookie cookie, off_t pos,
 
 // ReadAttrStat
 status_t
-Volume::ReadAttrStat(fs_vnode node, fs_cookie cookie, struct stat *st)
+Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
 {
 	return B_BAD_VALUE;
 }
 
 // WriteAttrStat
 status_t
-Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat* st,
+Volume::WriteAttrStat(void* node, void* cookie, const struct stat* st,
 	int statMask)
 {
 	return B_BAD_VALUE;
@@ -492,7 +492,7 @@ Volume::WriteAttrStat(fs_vnode node, fs_cookie cookie, const struct stat* st,
 
 // RenameAttr
 status_t
-Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
+Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
 	const char* newName)
 {
 	return B_BAD_VALUE;
@@ -500,7 +500,7 @@ Volume::RenameAttr(fs_vnode oldNode, const char* oldName, fs_vnode newNode,
 
 // RemoveAttr
 status_t
-Volume::RemoveAttr(fs_vnode node, const char* name)
+Volume::RemoveAttr(void* node, const char* name)
 {
 	return B_BAD_VALUE;
 }
@@ -511,28 +511,28 @@ Volume::RemoveAttr(fs_vnode node, const char* name)
 
 // OpenIndexDir
 status_t
-Volume::OpenIndexDir(fs_cookie *cookie)
+Volume::OpenIndexDir(void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseIndexDir
 status_t
-Volume::CloseIndexDir(fs_cookie cookie)
+Volume::CloseIndexDir(void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeIndexDirCookie
 status_t
-Volume::FreeIndexDirCookie(fs_cookie cookie)
+Volume::FreeIndexDirCookie(void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadIndexDir
 status_t
-Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
+Volume::ReadIndexDir(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
@@ -540,7 +540,7 @@ Volume::ReadIndexDir(fs_cookie cookie, void* buffer, size_t bufferSize,
 
 // RewindIndexDir
 status_t
-Volume::RewindIndexDir(fs_cookie cookie)
+Volume::RewindIndexDir(void* cookie)
 {
 	return B_BAD_VALUE;
 }
@@ -573,28 +573,28 @@ Volume::ReadIndexStat(const char *name, struct stat *st)
 // OpenQuery
 status_t
 Volume::OpenQuery(const char* queryString, uint32 flags, port_id port,
-	uint32 token, fs_cookie *cookie)
+	uint32 token, void** cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // CloseQuery
 status_t
-Volume::CloseQuery(fs_cookie cookie)
+Volume::CloseQuery(void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // FreeQueryCookie
 status_t
-Volume::FreeQueryCookie(fs_cookie cookie)
+Volume::FreeQueryCookie(void* cookie)
 {
 	return B_BAD_VALUE;
 }
 
 // ReadQuery
 status_t
-Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+Volume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	return B_BAD_VALUE;
@@ -602,7 +602,7 @@ Volume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 
 // RewindQuery
 status_t
-Volume::RewindQuery(fs_cookie cookie)
+Volume::RewindQuery(void* cookie)
 {
 	return B_BAD_VALUE;
 }

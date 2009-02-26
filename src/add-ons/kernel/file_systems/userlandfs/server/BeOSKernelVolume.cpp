@@ -114,8 +114,7 @@ BeOSKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // Lookup
 status_t
-BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid,
-	int* type)
+BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid)
 {
 	if (!fFSOps->walk)
 		return B_BAD_VALUE;
@@ -147,7 +146,7 @@ BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid,
 	if (error == B_OK)
 		*type = (st.st_mode & S_IFMT);
 
-	// put the node for our get_vnode()	
+	// put the node for our get_vnode()
 	UserlandFS::KernelEmu::put_vnode(GetID(), *vnid);
 
 	// on error put the node for walk()'s get_vnode()
@@ -169,8 +168,10 @@ BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
 
 // ReadVNode
 status_t
-BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
+BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node, int* type,
+	uint32* flags)
 {
+#error Return type and flags!
 	if (!fFSOps->read_vnode)
 		return B_BAD_VALUE;
 	return fFSOps->read_vnode(fVolumeCookie, vnid, (char)reenter, node);
@@ -221,13 +222,13 @@ BeOSKernelVolume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 // Select
 status_t
 BeOSKernelVolume::Select(fs_vnode node, fs_cookie cookie, uint8 event,
-	uint32 ref, selectsync* sync)
+	selectsync* sync)
 {
 	if (!fFSOps->select) {
 		UserlandFS::KernelEmu::notify_select_event(sync, event, false);
 		return B_OK;
 	}
-	return fFSOps->select(fVolumeCookie, node, cookie, event, ref, sync);
+	return fFSOps->select(fVolumeCookie, node, cookie, event, 0, sync);
 }
 
 // Deselect
@@ -326,7 +327,7 @@ BeOSKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 {
 	if (!fFSOps->wstat)
 		return B_BAD_VALUE;
-	
+
 	// Haiku's struct stat has an additional st_type field (for an attribute
 	// type), but that doesn't matter here
 	return fFSOps->wstat(fVolumeCookie, node, (struct beos_stat*)st,
@@ -472,7 +473,7 @@ BeOSKernelVolume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer,
 		return B_BAD_VALUE;
 
 	*countRead = count;
-	
+
 	// Haiku's struct dirent equals BeOS's version
 	return fFSOps->readdir(fVolumeCookie, node, cookie, (long*)countRead,
 		(beos_dirent*)buffer, bufferSize);

@@ -7,6 +7,7 @@
 
 #include <fs_interface.h>
 
+#include "FSCapabilities.h"
 #include "Referencable.h"
 
 namespace UserlandFSUtil {
@@ -19,6 +20,7 @@ struct userlandfs_ioctl;
 
 }
 
+using UserlandFSUtil::FSVolumeCapabilities;
 using UserlandFSUtil::Request;
 using UserlandFSUtil::RequestAllocator;
 using UserlandFSUtil::RequestHandler;
@@ -35,6 +37,10 @@ public:
 
 			FileSystem*			GetFileSystem() const;
 	inline	dev_t				GetID() const;
+
+	inline	bool				HasCapability(int capability) const;
+	inline	bool				HasVNodeCapability(void* vnode,
+									int capability) const;
 
 			void*				GetUserlandVolume() const;
 			ino_t				GetRootID() const;
@@ -226,6 +232,7 @@ private:
 
 			FileSystem*			fFileSystem;
 			fs_volume*			fFSVolume;
+			FSVolumeCapabilities fCapabilities;
 			void*				fUserlandVolume;
 			ino_t				fRootID;
 			void*				fRootNode;
@@ -249,6 +256,21 @@ inline dev_t
 Volume::GetID() const
 {
 	return fFSVolume->id;
+}
+
+
+inline bool
+Volume::HasCapability(int capability) const
+{
+	return fCapabilities.Get(capability);
+}
+
+
+inline bool
+Volume::HasVNodeCapability(void* vnode, int capability) const
+{
+	// TODO: Implement for real!
+	return true;
 }
 
 

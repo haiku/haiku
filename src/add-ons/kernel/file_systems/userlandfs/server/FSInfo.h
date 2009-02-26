@@ -27,12 +27,12 @@ public:
 	}
 
 	FSInfo(const char* fsName, const Port::Info* infos, int32 count,
-		const FSCapabilities& capabilities)
+		const FSCapabilities& capabilities, client_fs_type clientFSType)
 		: fName(),
 		  fInfos(NULL),
 		  fCount(0)
 	{
-		SetTo(fsName, infos, count, capabilities);
+		SetTo(fsName, infos, count, capabilities, clientFSType);
 	}
 
 	FSInfo(const BMessage* message)
@@ -48,7 +48,8 @@ public:
 		  fInfos(NULL),
 		  fCount(0)
 	{
-		SetTo(other.GetName(), other.fInfos, other.fCount, other.fCapabilities);
+		SetTo(other.GetName(), other.fInfos, other.fCount, other.fCapabilities,
+			other.fClientFSType);
 	}
 
 	~FSInfo()
@@ -57,7 +58,7 @@ public:
 	}
 
 	status_t SetTo(const char* fsName, const Port::Info* infos, int32 count,
-		const FSCapabilities& capabilities)
+		const FSCapabilities& capabilities, client_fs_type clientFSType)
 	{
 		Unset();
 
@@ -73,7 +74,8 @@ public:
 		memcpy(fInfos, infos, sizeof(Port::Info) * count);
 
 		fCapabilities = capabilities;
-		
+		fClientFSType = clientFSType;
+
 		fCount = count;
 		return B_OK;
 	}
@@ -90,16 +92,19 @@ public:
 		const char* fsName;
 		const void* capabilities;
 		ssize_t capabilitiesSize;
-		
+		int32 clientFSType;
+
 		if (message->FindData("infos", B_RAW_TYPE, &infos, &size) != B_OK
 			|| size < 0 || message->FindString("fsName", &fsName) != B_OK
 			|| message->FindData("capabilities", B_RAW_TYPE, &capabilities,
 				&capabilitiesSize) != B_OK
-			|| capabilitiesSize != sizeof(FSCapabilities)) {
+			|| capabilitiesSize != sizeof(FSCapabilities)
+			|| message->FindInt32("clientFSType", &clientFSType) != B_OK) {
 			return B_BAD_VALUE;
 		}
 		return SetTo(fsName, (const Port::Info*)infos,
-			size / sizeof(Port::Info), *(const FSCapabilities*)capabilities);
+			size / sizeof(Port::Info), *(const FSCapabilities*)capabilities,
+			(client_fs_type)clientFSType);
 	}
 
 	void Unset()
@@ -135,6 +140,11 @@ public:
 		return fCapabilities;
 	}
 
+	client_fs_type GetClientFSType() const
+	{
+		return fClientFSType;
+	}
+
 	status_t Archive(BMessage* archive)
 	{
 		if (!fName.GetString() || !fInfos)
@@ -149,8 +159,12 @@ public:
 		if (error != B_OK)
 			return error;
 
-		return archive->AddData("capabilities", B_RAW_TYPE, &fCapabilities,
+		error = archive->AddData("capabilities", B_RAW_TYPE, &fCapabilities,
 			sizeof(FSCapabilities));
+		if (error != B_OK)
+			return error;
+
+		return archive->AddInt32("clientFSType", fClientFSType);
 	}
 
 private:
@@ -158,6 +172,7 @@ private:
 	Port::Info*		fInfos;
 	int32			fCount;
 	FSCapabilities	fCapabilities;
+	client_fs_type	fClientFSType;
 };
 
 }	// namespace UserlandFS
