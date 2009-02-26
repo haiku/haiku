@@ -142,7 +142,7 @@ status_t FolderFilter::ProcessMailMessage(BPositionIO**io, BEntry* e, BMessage* 
 		else
 			path.Append(string);
 	} else if (loc != NULL && loc->Path() != NULL && strcmp(loc->Path(),"") != 0) // --- Don't append folder names to overridden paths
-		path.Append(loc->Path());
+		path.Append(loc->Leaf());
 
 	create_directory(path.Path(),0777);
 	dir.SetTo(path.Path());
