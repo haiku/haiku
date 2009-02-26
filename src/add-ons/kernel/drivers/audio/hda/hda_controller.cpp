@@ -504,14 +504,13 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	const char* desc)
 {
 	uint32 bufferSize, bufferPhysicalAddress, alloc;
-	uint32 response[2], index;
+	uint32 response[2];
 	physical_entry pe;
 	bdl_entry_t* bufferDescriptors;
 	corb_t verb[2];
 	uint8* buffer;
 	status_t rc;
-	uint16 format;
-
+	
 	/* Clear previously allocated memory */
 	if (stream->buffer_area >= B_OK) {
 		delete_area(stream->buffer_area);
@@ -523,10 +522,34 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->buffer_descriptors_area = B_ERROR;
 	}
 
+	/* Find out stream format and sample rate */
+	uint16 format = (stream->num_channels - 1) & 0xf;
+	switch (stream->sample_format) {
+		case B_FMT_8BIT_S:	format |= FORMAT_8BIT; stream->bps = 8; break;
+		case B_FMT_16BIT:	format |= FORMAT_16BIT; stream->bps = 16; break;
+		case B_FMT_20BIT:	format |= FORMAT_20BIT; stream->bps = 20; break;
+		case B_FMT_24BIT:	format |= FORMAT_24BIT; stream->bps = 24; break;
+		case B_FMT_32BIT:	format |= FORMAT_32BIT; stream->bps = 32; break;
+
+		default:
+			dprintf("hda: Invalid sample format: 0x%lx\n",
+				stream->sample_format);
+			break;
+	}
+
+	for (uint32 index = 0; index < sizeof(kRates) / sizeof(kRates[0]); index++) {
+		if (kRates[index].multi_rate == stream->sample_rate) {
+			format |= kRates[index].hw_rate;
+			stream->rate = kRates[index].rate;
+			break;
+		}
+	}
+	
 	// Stream interrupts seem to arrive too early on most HDA
 	// so we adjust buffer descriptors to take this into account
-	// TODO compute this value based on sample rate and depending on the hardware
-	uint32 offset = 1 * (stream->sample_size * stream->num_channels);
+	uint32 offset = (stream->sample_size * stream->num_channels) * stream->rate / 48000;
+	if (stream->controller->pci_info.vendor_id != INTEL_VENDORID)
+		offset *= 32;
 
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	bufferSize = stream->sample_size * stream->num_channels
@@ -535,6 +558,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, offset %ld **********\n",
 		stream->sample_size, stream->num_channels, stream->buffer_length, offset);
+	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x\n", __func__, stream->id,
+		stream->rate, stream->bps, format);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
 	alloc = bufferSize * stream->num_buffers;
@@ -559,7 +584,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		alloc, stream->num_buffers);
 
 	/* Store pointers (both virtual/physical) */
-	for (index = 0; index < stream->num_buffers; index++) {
+	for (uint32 index = 0; index < stream->num_buffers; index++) {
 		stream->buffers[index] = buffer + (index * bufferSize);
 		stream->physical_buffers[index] = bufferPhysicalAddress
 			+ (index * bufferSize);
@@ -601,7 +626,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Setup buffer descriptor list (BDL) entries */
-	for (index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
+	for (uint32 index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
 		bufferDescriptors->lower = stream->physical_buffers[index] + offset;
 		bufferDescriptors->upper = 0;
 		fragments++;
@@ -616,31 +641,6 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Configure stream registers */
-	format = (stream->num_channels - 1) & 0xf;
-	switch (stream->sample_format) {
-		case B_FMT_8BIT_S:	format |= FORMAT_8BIT; stream->bps = 8; break;
-		case B_FMT_16BIT:	format |= FORMAT_16BIT; stream->bps = 16; break;
-		case B_FMT_20BIT:	format |= FORMAT_20BIT; stream->bps = 20; break;
-		case B_FMT_24BIT:	format |= FORMAT_24BIT; stream->bps = 24; break;
-		case B_FMT_32BIT:	format |= FORMAT_32BIT; stream->bps = 32; break;
-
-		default:
-			dprintf("hda: Invalid sample format: 0x%lx\n",
-				stream->sample_format);
-			break;
-	}
-
-	for (index = 0; index < sizeof(kRates) / sizeof(kRates[0]); index++) {
-		if (kRates[index].multi_rate == stream->sample_rate) {
-			format |= kRates[index].hw_rate;
-			stream->rate = kRates[index].rate;
-			break;
-		}
-	}
-
-	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x\n", __func__, stream->id,
-		stream->rate, stream->bps, format);
-
 	stream->Write16(HDAC_STREAM_FORMAT, format);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
 		stream->physical_buffer_descriptors);
