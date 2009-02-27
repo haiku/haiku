@@ -237,7 +237,7 @@ AC3Decoder::Setup(media_format *ioEncodedFormat,
 	}
 
 	// Currently the liba52 library will remix for us
-	// When AudioChannelConverter can handle more than 1 or 2 channels the below code can be removed
+	// TODO When AudioChannelConverter can handle more than 1 or 2 channels the below code can be removed
 
 	fFlags = A52_STEREO & A52_CHANNEL_MASK;
 	fChannelCount = 2;
