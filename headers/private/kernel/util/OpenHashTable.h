@@ -6,8 +6,12 @@
 #define _KERNEL_UTIL_OPEN_HASH_TABLE_H
 
 
-#include <KernelExport.h>
-#include <util/kernel_cpp.h>
+#include <OS.h>
+
+#ifdef _KERNEL_MODE
+#	include <KernelExport.h>
+#	include <util/kernel_cpp.h>
+#endif
 
 
 /*!
@@ -116,8 +120,13 @@ public:
 
 	void InsertUnchecked(ValueType *value)
 	{
-		if (CheckDuplicates && _ExhaustiveSearch(value))
+		if (CheckDuplicates && _ExhaustiveSearch(value)) {
+#ifdef _KERNEL_MODE
 			panic("Hash Table: value already in table.");
+#else
+			debugger("Hash Table: value already in table.");
+#endif
+		}
 
 		_Insert(fTable, fTableSize, value);
 		fItemCount++;
@@ -160,8 +169,13 @@ public:
 		if (slot == NULL)
 			return false;
 
-		if (CheckDuplicates && _ExhaustiveSearch(value))
+		if (CheckDuplicates && _ExhaustiveSearch(value)) {
+#ifdef _KERNEL_MODE
 			panic("Hash Table: duplicate detected.");
+#else
+			debugger("Hash Table: duplicate detected.");
+#endif
+		}
 
 		fItemCount--;
 		return true;
