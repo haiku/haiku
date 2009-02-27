@@ -254,7 +254,7 @@ UserlandRequestHandler::_HandleRequest(MountVolumeRequest* request)
 	reply->error = result;
 	reply->volume = volume;
 	reply->rootID = rootID;
-	reply->capabilities = volume->GetCapabilities();
+	volume->GetCapabilities(reply->capabilities);
 
 	// send the reply
 	return _SendReply(allocator, false);
@@ -393,7 +393,6 @@ UserlandRequestHandler::_HandleRequest(LookupRequest* request)
 		RETURN_ERROR(error);
 
 	reply->vnid = vnid;
-	reply->type = type;
 	reply->error = result;
 
 	// send the reply
@@ -449,10 +448,13 @@ UserlandRequestHandler::_HandleRequest(ReadVNodeRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_vnode node;
+	void* node;
+	int type;
+	uint32 flags;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
-		result = volume->ReadVNode(request->vnid, request->reenter, &node);
+		result = volume->ReadVNode(request->vnid, request->reenter, &node,
+			&type, &flags);
 	}
 
 	// prepare the reply
@@ -464,6 +466,8 @@ UserlandRequestHandler::_HandleRequest(ReadVNodeRequest* request)
 
 	reply->error = result;
 	reply->node = node;
+	reply->type = type;
+	reply->flags = flags;
 
 	// send the reply
 	return _SendReply(allocator, false);
@@ -627,7 +631,7 @@ UserlandRequestHandler::_HandleRequest(SelectRequest* request)
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Select(request->node, request->fileCookie,
-			request->event, 0, request->sync);
+			request->event, request->sync);
 	}
 
 	// prepare the reply
@@ -960,7 +964,7 @@ UserlandRequestHandler::_HandleRequest(CreateRequest* request)
 		result = B_BAD_VALUE;
 
 	ino_t vnid;
-	fs_cookie fileCookie;
+	void* fileCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Create(request->node,
@@ -993,7 +997,7 @@ UserlandRequestHandler::_HandleRequest(OpenRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie fileCookie;
+	void* fileCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Open(request->node, request->openMode, &fileCookie);
@@ -1079,8 +1083,8 @@ UserlandRequestHandler::_HandleRequest(ReadRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_vnode node = request->node;
-	fs_cookie fileCookie = request->fileCookie;
+	void* node = request->node;
+	void* fileCookie = request->fileCookie;
 	off_t pos = request->pos;
 	size_t size = request->size;
 
@@ -1219,7 +1223,7 @@ UserlandRequestHandler::_HandleRequest(OpenDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie dirCookie = NULL;
+	void* dirCookie = NULL;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->OpenDir(request->node, &dirCookie);
@@ -1305,8 +1309,8 @@ UserlandRequestHandler::_HandleRequest(ReadDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_vnode node = request->node;
-	fs_vnode dirCookie = request->dirCookie;
+	void* node = request->node;
+	void* dirCookie = request->dirCookie;
 	size_t bufferSize = request->bufferSize;
 	uint32 count = request->count;
 
@@ -1392,7 +1396,7 @@ UserlandRequestHandler::_HandleRequest(OpenAttrDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie attrDirCookie;
+	void* attrDirCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->OpenAttrDir(request->node, &attrDirCookie);
@@ -1479,8 +1483,8 @@ UserlandRequestHandler::_HandleRequest(ReadAttrDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_vnode node = request->node;
-	fs_cookie attrDirCookie = request->attrDirCookie;
+	void* node = request->node;
+	void* attrDirCookie = request->attrDirCookie;
 	size_t bufferSize = request->bufferSize;
 	uint32 count = request->count;
 
@@ -1556,7 +1560,7 @@ UserlandRequestHandler::_HandleRequest(CreateAttrRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie attrCookie;
+	void* attrCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->CreateAttr(request->node,
@@ -1588,7 +1592,7 @@ UserlandRequestHandler::_HandleRequest(OpenAttrRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie attrCookie;
+	void* attrCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->OpenAttr(request->node,
@@ -1677,7 +1681,7 @@ UserlandRequestHandler::_HandleRequest(ReadAttrRequest* request)
 		result = B_BAD_VALUE;
 
 	void* node = request->node;
-	fs_cookie attrCookie = request->attrCookie;
+	void* attrCookie = request->attrCookie;
 	off_t pos = request->pos;
 	size_t size = request->size;
 
@@ -1876,7 +1880,7 @@ UserlandRequestHandler::_HandleRequest(OpenIndexDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie indexDirCookie;
+	void* indexDirCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->OpenIndexDir(&indexDirCookie);
@@ -1962,7 +1966,7 @@ UserlandRequestHandler::_HandleRequest(ReadIndexDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie indexDirCookie = request->indexDirCookie;
+	void* indexDirCookie = request->indexDirCookie;
 	size_t bufferSize = request->bufferSize;
 	uint32 count = request->count;
 
@@ -2126,7 +2130,7 @@ UserlandRequestHandler::_HandleRequest(OpenQueryRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie queryCookie;
+	void* queryCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->OpenQuery((const char*)request->queryString.GetData(),
@@ -2213,7 +2217,7 @@ UserlandRequestHandler::_HandleRequest(ReadQueryRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	fs_cookie queryCookie = request->queryCookie;
+	void* queryCookie = request->queryCookie;
 	size_t bufferSize = request->bufferSize;
 	uint32 count = request->count;
 

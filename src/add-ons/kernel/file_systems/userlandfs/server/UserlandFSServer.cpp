@@ -111,7 +111,7 @@ UserlandFSServer::Init(const char* fileSystem)
 		error = fRequestThreads[i].Init(fFileSystem);
 		if (error != B_OK)
 			RETURN_ERROR(error);
-	} 
+	}
 
 	// run the threads
 	for (int32 i = 0; i < kRequestThreadCount; i++)
@@ -185,7 +185,7 @@ UserlandFSServer::_RegisterWithDispatcher(const char* fsName)
 	// init an FS info
 	FSInfo info;
 	status_t error = info.SetTo(fsName, infos, kRequestThreadCount + 1,
-		capabilities);
+		capabilities, fFileSystem->GetClientFSType());
 
 	// prepare the message
 	BMessage message(UFS_REGISTER_FS);
