@@ -1804,7 +1804,7 @@ wait_for_notifications(block_cache* cache)
 }
 
 
-extern "C" status_t
+status_t
 block_cache_init(void)
 {
 	sBlockCache = create_object_cache_etc("cached blocks", sizeof(cached_block),
@@ -1842,7 +1842,7 @@ block_cache_init(void)
 }
 
 
-extern "C" size_t
+size_t
 block_cache_used_memory()
 {
 	size_t usedMemory = 0;
@@ -1866,7 +1866,7 @@ block_cache_used_memory()
 //	#pragma mark - public transaction API
 
 
-extern "C" int32
+int32
 cache_start_transaction(void* _cache)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -1893,7 +1893,7 @@ cache_start_transaction(void* _cache)
 }
 
 
-extern "C" status_t
+status_t
 cache_sync_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -1961,7 +1961,7 @@ cache_sync_transaction(void* _cache, int32 id)
 }
 
 
-extern "C" status_t
+status_t
 cache_end_transaction(void* _cache, int32 id,
 	transaction_notification_hook hook, void* data)
 {
@@ -2026,7 +2026,7 @@ cache_end_transaction(void* _cache, int32 id,
 }
 
 
-extern "C" status_t
+status_t
 cache_abort_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2078,7 +2078,7 @@ cache_abort_transaction(void* _cache, int32 id)
 	from its sub transaction.
 	The new transaction also gets a new transaction ID.
 */
-extern "C" int32
+int32
 cache_detach_sub_transaction(void* _cache, int32 id,
 	transaction_notification_hook hook, void* data)
 {
@@ -2173,7 +2173,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 }
 
 
-extern "C" status_t
+status_t
 cache_abort_sub_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2226,7 +2226,7 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 }
 
 
-extern "C" status_t
+status_t
 cache_start_sub_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2337,7 +2337,7 @@ cache_remove_transaction_listener(void* _cache, int32 id,
 }
 
 
-extern "C" status_t
+status_t
 cache_next_block_in_transaction(void* _cache, int32 id, bool mainOnly,
 	long* _cookie, off_t* _blockNumber, void** _data, void** _unchangedData)
 {
@@ -2382,7 +2382,7 @@ cache_next_block_in_transaction(void* _cache, int32 id, bool mainOnly,
 }
 
 
-extern "C" int32
+int32
 cache_blocks_in_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2396,7 +2396,7 @@ cache_blocks_in_transaction(void* _cache, int32 id)
 }
 
 
-extern "C" int32
+int32
 cache_blocks_in_main_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2410,7 +2410,7 @@ cache_blocks_in_main_transaction(void* _cache, int32 id)
 }
 
 
-extern "C" int32
+int32
 cache_blocks_in_sub_transaction(void* _cache, int32 id)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2427,7 +2427,7 @@ cache_blocks_in_sub_transaction(void* _cache, int32 id)
 //	#pragma mark - public block cache API
 
 
-extern "C" void
+void
 block_cache_delete(void* _cache, bool allowWrites)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2463,7 +2463,7 @@ block_cache_delete(void* _cache, bool allowWrites)
 }
 
 
-extern "C" void*
+void*
 block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 {
 	block_cache* cache = new(nothrow) block_cache(fd, numBlocks, blockSize,
@@ -2483,7 +2483,7 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 }
 
 
-extern "C" status_t
+status_t
 block_cache_sync(void* _cache)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2515,7 +2515,7 @@ block_cache_sync(void* _cache)
 }
 
 
-extern "C" status_t
+status_t
 block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2554,7 +2554,7 @@ block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 }
 
 
-extern "C" void
+void
 block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2586,7 +2586,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 }
 
 
-extern "C" status_t
+status_t
 block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2607,7 +2607,7 @@ block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 }
 
 
-extern "C" void*
+void*
 block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
 	off_t length, int32 transaction)
 {
@@ -2624,7 +2624,7 @@ block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
 }
 
 
-extern "C" void*
+void*
 block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
 	return block_cache_get_writable_etc(_cache, blockNumber,
@@ -2632,7 +2632,7 @@ block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
 }
 
 
-extern "C" void*
+void*
 block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2648,7 +2648,7 @@ block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 }
 
 
-extern "C" const void*
+const void*
 block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length)
 {
 	block_cache* cache = (block_cache*)_cache;
@@ -2671,7 +2671,7 @@ block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length)
 }
 
 
-extern "C" const void*
+const void*
 block_cache_get(void* _cache, off_t blockNumber)
 {
 	return block_cache_get_etc(_cache, blockNumber, blockNumber, 1);
@@ -2685,7 +2685,7 @@ block_cache_get(void* _cache, off_t blockNumber)
 	Note, you must only use this function on blocks that were acquired
 	writable!
 */
-extern "C" status_t
+status_t
 block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
 	int32 transaction)
 {
@@ -2709,7 +2709,7 @@ block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
 }
 
 
-extern "C" void
+void
 block_cache_put(void* _cache, off_t blockNumber)
 {
 	block_cache* cache = (block_cache*)_cache;
