@@ -1,0 +1,45 @@
+; poke script
+; dump 16C952 ID regs
+
+outb b803 bf
+outb b802 10
+outb b803 00
+; serial_icr_write(off,val)
+; outb b807 off
+; outb b805 val
+; serial_icr_read(off)
+; outb b807 00
+; outb b805 40
+; outb b807 off
+; inb b805
+; outb b807 00
+; outb b805 00
+
+outb b807 00
+outb b805 40
+; id1
+outb b807 08
+inb b805
+; id2
+outb b807 09
+inb b805
+; id3
+outb b807 0a
+inb b805
+; rev
+outb b807 0b
+inb b805
+
+; 
+outb b807 00
+inb b805
+
+
+outb b807 00
+outb b805 00
+
+
+; disable enhanced control bit
+outb b803 bf
+outb b802 00
+outb b803 00

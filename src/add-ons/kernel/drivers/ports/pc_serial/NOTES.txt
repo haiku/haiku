@@ -1,4 +1,10 @@
 
 references:
 http://www.beyondlogic.org/serial/serial.htm
+http://jamesthornton.com/freebsd/articles/serial-uart/
+http://dugeem.net/david/work/freebsd-serial.html
+http://dugeem.net/david/work/etc/sio.c
+
+if you can understand it:
+http://lxr.linux.no/linux+v2.6.28.7/drivers/serial/
 

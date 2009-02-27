@@ -7,7 +7,6 @@
  */
 #include "Tracing.h"
 #include "Driver.h"
-#include "USB3.h"
 
 #include <stdio.h> //sprintf
 #include <unistd.h> //posix file i/o - create, write, close

@@ -5,8 +5,8 @@
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _USB_SERIAL_TRACING_H_
-#define _USB_SERIAL_TRACING_H_
+#ifndef _PC_SERIAL_TRACING_H_
+#define _PC_SERIAL_TRACING_H_
 
 void load_settings();
 void create_log_file();
@@ -36,4 +36,4 @@ void trace_str(struct str *str);
 void trace_winsize(struct winsize *ws);
 void trace_tty(struct tty *tty);
 
-#endif //_USB_SERIAL_TRACING_H_
+#endif //_PC_SERIAL_TRACING_H_

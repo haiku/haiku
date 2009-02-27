@@ -1,0 +1,36 @@
+PCI bus, device #4: Communication Device (Serial) [7|0|6]
+Current configuration: irq [18]
+  io range:  min b800 max b800 align 0 len 8
+  io range:  min bc00 max bc00 align 0 len 8
+  io range:  min c000 max c000 align 0 len 20
+  mem range: min 0 max 0 align 0 len 80201000
+  mem range: min 0 max 0 align 0 len 80201000
+1 configurations
+
+Possible configuration #0: irq [18]
+  io range:  min b800 max b800 align 0 len 8
+  io range:  min bc00 max bc00 align 0 len 8
+  io range:  min c000 max c000 align 0 len 20
+  mem range: min 0 max 0 align 0 len 80201000
+  mem range: min 0 max 0 align 0 len 80201000
+
+Bus-dependent information:
+vendor id: 1415, device id: 1501
+
+PCI bus, device #5: Communication Device (Parallel) [7|1|1]
+Current configuration: irq [18]
+  io range:  min c400 max c400 align 0 len 8
+  io range:  min c800 max c800 align 0 len 4
+  io range:  min cc00 max cc00 align 0 len 20
+  mem range: min 0 max 0 align 0 len 80201000
+1 configurations
+
+Possible configuration #0: irq [18]
+  io range:  min c400 max c400 align 0 len 8
+  io range:  min c800 max c800 align 0 len 4
+  io range:  min cc00 max cc00 align 0 len 20
+  mem range: min 0 max 0 align 0 len 80201000
+
+Bus-dependent information:
+vendor id: 1415, device id: 1503
+

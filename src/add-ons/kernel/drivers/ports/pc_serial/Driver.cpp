@@ -14,15 +14,113 @@
 #include "Driver.h"
 #include "SerialDevice.h"
 
-static const char *sDeviceBaseName = "ports/serial";
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+static const char *sDeviceBaseName = DEVFS_BASE;
 SerialDevice *gSerialDevices[DEVICES_COUNT];
 char *gDeviceNames[DEVICES_COUNT + 1];
-usb_module_info *gUSBModule = NULL;
+config_manager_for_driver_module_info *gConfigManagerModule = NULL;
+isa_module_info *gISAModule = NULL;
+pci_module_info *gPCIModule = NULL;
 tty_module_info *gTTYModule = NULL;
 struct ddomain gSerialDomain;
 sem_id gDriverLock = -1;
 
+// 24 MHz clock
+static const uint32 sDefaultRates[] = {
+		0,		//B0
+		2304,	//B50
+		1536,	//B75
+		1047,	//B110
+		857,	//B134
+		768,	//B150
+		512,	//B200
+		384,	//B300
+		192,	//B600
+		0,		//B1200
+		0,		//B1800
+		48,		//B2400
+		24,		//B4800
+		12,		//B9600
+		6,		//B19200
+		3,		//B38400
+		2,		//B57600
+		1,		//B115200
+		0,		//B230400
+		4, //460800 !? B31250!
+		0, //921600 !?
+};
 
+// 8MHz clock on serial3 and 4 on the BeBox
+#if 0
+static const uint32 sBeBoxRates[] = {
+		0,		//B0
+		//...
+};
+#endif
+
+static const struct serial_support_descriptor sSupportedDevices[] = {
+
+#ifdef HANDLE_ISA_COM
+	// ISA devices
+	{ B_ISA_BUS, "Generic 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16550 } },
+#endif
+	// PCI devices
+
+	// vendor/device matches first
+
+/*
+	{ B_PCI_BUS, "OxfordSemi 16950 Serial Port", sDefaultRates, NULL, { 32, 32, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
+		0x1415, 0x9501 } },
+*/
+	// generic fallback matches
+	/*
+	{ B_PCI_BUS, "Generic XT Serial Port", NULL },
+	  { PCI_INVAL, PCI_INVAL, PCI_simple_communications,
+		PCI_serial, PCI_serial_xt } },
+		
+	{ B_PCI_BUS, "Generic 16450 Serial Port", NULL },
+	  { PCI_INVAL, PCI_INVAL, PCI_simple_communications,
+		PCI_serial, PCI_serial_16450 } },
+		
+	*/
+	{ B_PCI_BUS, "Generic 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
+		PCI_INVAL, PCI_INVAL } },
+
+//XXX
+
+	{ B_PCI_BUS, "Generic 16950 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
+		PCI_INVAL, PCI_INVAL } },
+
+//XXX DEBUG! HACK HACK HACK 
+//XXX for testing probing
+#if 0
+	{ B_PCI_BUS, "My BadIDE controller", sDefaultRates, NULL, { 8, 32, 8 },
+	  { 1, 1, 0x8a,
+		0x1002, 0x434a } },
+	{ B_PCI_BUS, "My GoodIDE controller", sDefaultRates, NULL, { 8, 32, 8 },
+	  { 1, 1, 0x8a,
+		0x1002, 0x4349 } },
+	{ B_PCI_BUS, "My IDE controller", sDefaultRates, NULL, { 8, 32, 8 },
+	  { 1, 1, 0x8a,
+		PCI_INVAL, PCI_INVAL } },
+#endif
+
+	// non PCI_serial devices
+
+	// beos zz driver supported that one
+	{ B_PCI_BUS, "Lucent Modem", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_simple_communications_other, 0x00, 
+		0x11C1, 0x0480 } }, 
+
+	{ B_PCI_BUS, NULL, NULL, NULL, {0}, {0} }
+};
+
+
+#if 0
 status_t
 pc_serial_device_added(pc_device device, void **cookie)
 {
@@ -101,6 +199,323 @@ pc_serial_device_removed(void *cookie)
 	TRACE_FUNCRET("< pc_serial_device_removed() returns\n");
 	return B_OK;
 }
+#endif
+
+//#pragma mark -
+
+status_t
+pc_serial_insert_device(SerialDevice *device)
+{
+	status_t status = B_OK;
+
+	//XXX fix leaks!
+	acquire_sem(gDriverLock);
+	for (int32 i = 0; i < DEVICES_COUNT; i++) {
+		if (gSerialDevices[i] != NULL)
+			continue;
+
+		status = device->Init();
+		if (status < B_OK) {
+			delete device;
+			//return status;
+			break;
+		}
+
+		gSerialDevices[i] = device;
+
+		release_sem(gDriverLock);
+		TRACE_ALWAYS("%s added\n", device->Description());
+		return B_OK;
+	}
+
+	release_sem(gDriverLock);
+	return B_ERROR;
+}
+
+
+// probe devices with config_manager
+static status_t
+scan_bus(bus_type bus)
+{
+	const char *bus_name = "Unknown";
+	uint64 cookie = 0;
+	status_t status;
+	struct {
+		device_info di;
+		pci_info pi;
+	} big_info;
+	struct device_info &dinfo = big_info.di;
+	
+	switch (bus) {
+	case B_ISA_BUS:
+		bus_name = "ISA";
+		break;
+	case B_PCI_BUS:
+		bus_name = "PCI";
+		break;
+	case B_PCMCIA_BUS:
+	default:
+		return EINVAL;
+	}
+	TRACE_ALWAYS("scanning %s bus...\n", bus_name);
+
+//XXX: clean up this mess
+
+	while ((gConfigManagerModule->get_next_device_info(bus, 
+		&cookie, &big_info.di, sizeof(big_info)) == B_OK)) {
+		// skip disabled devices
+		if (dinfo.flags & B_DEVICE_INFO_ENABLED == 0)
+			continue;
+		// skip non configured devices
+		if (dinfo.flags & B_DEVICE_INFO_CONFIGURED == 0)
+			continue;
+		// and devices in error
+		if (dinfo.config_status < B_OK)
+			continue;
+
+		
+		/*
+		TRACE_ALWAYS("device: 0x%08lx 0x%08lx 0x%08lx 0x%08lx\n",
+		dinfo.id[0], dinfo.id[1], dinfo.id[2], dinfo.id[3]);
+		*/
+
+		/*
+		if (bus == B_PCI_BUS) {
+			pci_info *pcii = (pci_info *)(((char *)&dinfo) + 
+				dinfo.bus_dependent_info_offset);
+			TRACE_ALWAYS("pci: %04x:%04x\n",
+				pcii->vendor_id, pcii->device_id);
+			if ((pcii->header_type & PCI_header_type_mask) == 
+				PCI_header_type_generic) {
+				TRACE_ALWAYS("subsys: %04x:%04x\n",
+					pcii->u.h0.subsystem_vendor_id, pcii->u.h0.subsystem_id);
+			}
+		}
+		*/
+		
+		const struct serial_support_descriptor *supported = NULL;
+		for (int i = 0; sSupportedDevices[i].name; i++) {
+			if (sSupportedDevices[i].bus != bus)
+				continue;
+			if (sSupportedDevices[i].match.class_base != PCI_undefined &&
+				sSupportedDevices[i].match.class_base != dinfo.devtype.base)
+				continue;
+			if (sSupportedDevices[i].match.class_sub != PCI_undefined &&
+				sSupportedDevices[i].match.class_sub != dinfo.devtype.subtype)
+				continue;
+			if (sSupportedDevices[i].match.class_api != PCI_undefined &&
+				sSupportedDevices[i].match.class_api != dinfo.devtype.interface)
+				continue;
+
+#if 0
+			// either this way
+			if (bus == B_PCI_BUS) {
+				pci_info *pcii = (pci_info *)(((char *)&dinfo) + 
+					dinfo.bus_dependent_info_offset);
+				if (sSupportedDevices[i].match.vendor_id != PCI_INVAL &&
+					sSupportedDevices[i].match.vendor_id != pcii->vendor_id)
+					continue;
+				if (sSupportedDevices[i].match.device_id != PCI_INVAL &&
+					sSupportedDevices[i].match.device_id != pcii->device_id)
+					continue;
+			}
+#endif
+			// or this one:
+			// .id[0] = vendor_id and .id[1] = device_id
+			// .id[3?] = subsys_vendor_id and .id[2?] = subsys_device_id
+			if (bus == B_PCI_BUS &&
+				sSupportedDevices[i].match.vendor_id != PCI_INVAL &&
+				sSupportedDevices[i].match.vendor_id != dinfo.id[0])
+				continue;
+
+			if (bus == B_PCI_BUS &&
+				sSupportedDevices[i].match.device_id != PCI_INVAL &&
+				sSupportedDevices[i].match.device_id != dinfo.id[1])
+				continue;
+
+
+			supported = &sSupportedDevices[i];
+			break;
+		}
+		if (supported == NULL)
+			continue;
+
+		struct {
+			struct device_configuration c;
+			resource_descriptor res[16];
+		} config;
+		if (gConfigManagerModule->get_size_of_current_configuration_for(
+			cookie) > sizeof(config)) {
+			TRACE_ALWAYS("config size too big for device\n");
+			continue;
+		}
+			
+		if (gConfigManagerModule->get_current_configuration_for(cookie,
+			&config.c, sizeof(config)) < B_OK) {
+			TRACE_ALWAYS("can't get config for device\n");
+			continue;
+			
+		}
+
+		TRACE_ALWAYS("device %Ld resources: %d irq %d dma %d io %d mem\n",
+			cookie,
+			gConfigManagerModule->count_resource_descriptors_of_type(
+				&config.c, B_IRQ_RESOURCE),
+			gConfigManagerModule->count_resource_descriptors_of_type(
+				&config.c, B_DMA_RESOURCE),
+			gConfigManagerModule->count_resource_descriptors_of_type(
+				&config.c, B_IO_PORT_RESOURCE),
+			gConfigManagerModule->count_resource_descriptors_of_type(
+				&config.c, B_MEMORY_RESOURCE));
+
+
+		// we first need the IRQ
+		resource_descriptor irqdesc;
+		if (gConfigManagerModule->get_nth_resource_descriptor_of_type(
+			&config.c, 0, B_IRQ_RESOURCE, &irqdesc, sizeof(irqdesc)) < B_OK) {
+			TRACE_ALWAYS("can't find IRQ for device\n");
+			continue;
+		}
+		int irq;
+		// XXX: what about APIC lines ?
+		for (irq = 0; irq < 32; irq++) {
+			if (irqdesc.d.m.mask & (1 << irq))
+				break;
+		}
+		TRACE_ALWAYS("irq %d\n", irq);
+		//TRACE_ALWAYS("irq: %lx,%lx,%lx\n", irqdesc.d.m.mask, irqdesc.d.m.flags, irqdesc.d.m.cookie);
+
+		TRACE_ALWAYS("found %s device %Ld [%x|%x|%x] "
+			/*"ID: '%16.16s'"*/" flags: %08lx status: %s\n",
+			bus_name, cookie, dinfo.devtype.base, dinfo.devtype.subtype,
+			dinfo.devtype.interface, /*dinfo.id,*/ dinfo.flags,
+			strerror(dinfo.config_status));
+
+		// force enable I/O ports on PCI devices
+#if 0
+		if (bus == B_PCI_BUS) {
+			pci_info *pcii = (pci_info *)(((char *)&dinfo) + 
+				dinfo.bus_dependent_info_offset);
+			
+			uint32 cmd = gPCIModule->read_pci_config(pcii->bus, pcii->device,
+				pcii->function, PCI_command, 2);
+			TRACE_ALWAYS("PCI_command: 0x%04lx\n", cmd);
+			cmd |= PCI_command_io;
+			gPCIModule->write_pci_config(pcii->bus, pcii->device, 
+				pcii->function, PCI_command, 2, cmd);
+		}
+#endif
+
+		// instanciate devices on IO ports
+		resource_descriptor iodesc;
+		SerialDevice *master = NULL;
+		for (int i = 0;
+			gConfigManagerModule->get_nth_resource_descriptor_of_type(
+			&config.c, i, B_IO_PORT_RESOURCE, &iodesc, sizeof(iodesc)) == B_OK;
+			i++) {
+			TRACE_ALWAYS("io at 0x%04lx len 0x%04lx\n", iodesc.d.r.minbase, 
+				iodesc.d.r.len);
+
+			if (iodesc.d.r.len < supported->constraints.minsize)
+				continue;
+			if (iodesc.d.r.len > supported->constraints.maxsize)
+				continue;
+			SerialDevice *device;
+			uint32 ioport = iodesc.d.r.minbase;
+next_split:
+			// no more to split
+			if ((ioport - iodesc.d.r.minbase) >= iodesc.d.r.len)
+				continue;
+		
+			TRACE_ALWAYS("inserting device at io 0x%04lx as %s\n", ioport, 
+				supported->name);
+
+			
+			device = new SerialDevice(supported, ioport, irq, master);
+			if (pc_serial_insert_device(device) < B_OK) {
+				TRACE_ALWAYS("can't insert device\n");
+				continue;
+			}
+			if (master == NULL)
+				master = device;
+			
+			ioport += supported->constraints.split;
+			goto next_split;
+			// try next part of the I/O range now
+		}
+		// we have at least one device
+		if (master) {
+			// hook up the irq
+#if 0
+			status = install_io_interrupt_handler(irq, pc_serial_interrupt, 
+				master, 0);
+			TRACE_ALWAYS("installing irq %d handler: %s\n", irq, strerror(status));
+#endif
+		}
+	}
+}
+
+// this version doesn't use config_manager, but can't probe the IRQ yet
+status_t
+scan_pci_alt()
+{
+	pci_info info;
+	int ix;
+	// probe PCI devices
+	for (ix = 0; (*gPCIModule->get_nth_pci_info)(ix, &info) == B_OK; ix++) {
+		// sanity check
+		if (info.header_type & PCI_header_type_mask != PCI_header_type_generic)
+			continue;
+		TRACE_ALWAYS("probing PCI device %2d [%x|%x|%x] %04x:%04x\n",
+			ix, info.class_base, info.class_sub, info.class_api,
+			info.vendor_id, info.device_id);
+
+		const struct serial_support_descriptor *supported = NULL;
+		for (int i = 0; sSupportedDevices[i].name; i++) {
+			if (sSupportedDevices[i].bus != B_PCI_BUS)
+				continue;
+			if (info.class_base != sSupportedDevices[i].match.class_base)
+				continue;
+			if (info.class_sub != sSupportedDevices[i].match.class_sub)
+				continue;
+			if (info.class_api != sSupportedDevices[i].match.class_api)
+				continue;
+			if (sSupportedDevices[i].match.vendor_id != PCI_INVAL
+				&& info.vendor_id != sSupportedDevices[i].match.vendor_id)
+				continue;
+			if (sSupportedDevices[i].match.device_id != PCI_INVAL
+				&& info.device_id != sSupportedDevices[i].match.device_id)
+				continue;
+			supported = &sSupportedDevices[i];
+		}
+		if (supported == NULL)
+			continue;
+
+		TRACE_ALWAYS("found PCI device %2d [%x|%x|%x] %04x:%04x as %s\n",
+			ix, info.class_base, info.class_sub, info.class_api,
+			info.vendor_id, info.device_id, supported->name);
+
+		// find I/O ports
+		for (int r = 0; r < 6; r++) {
+			TRACE_ALWAYS("range at 0x%08lx len 0x%lx flags 0x%02x\n",
+				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r],
+				info.u.h0.base_register_flags[r]);
+			
+			// not I/O
+			if (info.u.h0.base_register_flags[r] & PCI_address_space == 0)
+				continue;
+			//
+			TRACE_ALWAYS("regs at 0x%08lx len 0x%lx\n",
+				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r]);
+			//&PCI_address_io_mask
+		}
+		// XXX: interrupt_line doesn't seem to 
+		TRACE_ALWAYS("irq line %d, pin %d\n",
+			info.u.h0.interrupt_line, info.u.h0.interrupt_pin);
+	}
+
+	return B_OK;
+}
 
 
 //#pragma mark -
@@ -119,20 +534,28 @@ init_hardware()
 status_t
 init_driver()
 {
+	status_t status;
 	load_settings();
 	create_log_file();
 
 	TRACE_FUNCALLS("> init_driver()\n");
 
-	status_t status = get_module(B_TTY_MODULE_NAME, (module_info **)&gTTYModule);
+	status = get_module(B_TTY_MODULE_NAME, (module_info **)&gTTYModule);
 	if (status < B_OK)
-		return status;
+		goto err_tty;
 
-	status = get_module(B_USB_MODULE_NAME, (module_info **)&gUSBModule);
-	if (status < B_OK) {
-		put_module(B_TTY_MODULE_NAME);
-		return status;
-	}
+	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule);
+	if (status < B_OK)
+		goto err_pci;
+
+	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gISAModule);
+	if (status < B_OK)
+		goto err_isa;
+
+	status = get_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME, 
+		(module_info **)&gConfigManagerModule);
+	if (status < B_OK)
+		goto err_cm;
 
 	for (int32 i = 0; i < DEVICES_COUNT; i++)
 		gSerialDevices[i] = NULL;
@@ -141,20 +564,40 @@ init_driver()
 
 	gDriverLock = create_sem(1, DRIVER_NAME"_devices_table_lock");
 	if (gDriverLock < B_OK) {
-		put_module(B_USB_MODULE_NAME);
-		put_module(B_TTY_MODULE_NAME);
-		return gDriverLock;
+		status = gDriverLock;
+		goto err_sem;
 	}
 
-	static pc_notify_hooks notifyHooks = {
-		&pc_serial_device_added,
-		&pc_serial_device_removed
-	};
+	status = ENOENT;
 
-	gUSBModule->register_driver(DRIVER_NAME, NULL, 0, NULL);
-	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
+	memset(&gSerialDomain, 0, sizeof(gSerialDomain));
+	ddbackground(&gSerialDomain);
+
+
+	scan_bus(B_ISA_BUS);
+	scan_bus(B_PCI_BUS);
+
+
+	// XXX: ISA cards
+	// XXX: pcmcia
+	
+	
 	TRACE_FUNCRET("< init_driver() returns\n");
 	return B_OK;
+
+err_none:
+	delete_sem(gDriverLock);
+err_sem:
+	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
+err_cm:
+	put_module(B_ISA_MODULE_NAME);
+err_isa:
+	put_module(B_PCI_MODULE_NAME);
+err_pci:
+	put_module(B_TTY_MODULE_NAME);
+err_tty:
+	TRACE_FUNCRET("< init_driver() returns %s\n", strerror(status));
+	return status;
 }
 
 
@@ -164,11 +607,16 @@ uninit_driver()
 {
 	TRACE_FUNCALLS("> uninit_driver()\n");
 
-	gUSBModule->uninstall_notify(DRIVER_NAME);
+	//gUSBModule->uninstall_notify(DRIVER_NAME);
 	acquire_sem(gDriverLock);
 
 	for (int32 i = 0; i < DEVICES_COUNT; i++) {
 		if (gSerialDevices[i]) {
+			/*
+			if (gSerialDevices[i]->Master() == gSerialDevices[i])
+				remove_io_interrupt_handler(gSerialDevices[i]->IRQ(), 
+					pc_serial_interrupt, gSerialDevices[i]);
+			*/
 			delete gSerialDevices[i];
 			gSerialDevices[i] = NULL;
 		}
@@ -178,7 +626,9 @@ uninit_driver()
 		free(gDeviceNames[i]);
 
 	delete_sem(gDriverLock);
-	put_module(B_USB_MODULE_NAME);
+	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
+	put_module(B_ISA_MODULE_NAME);
+	put_module(B_PCI_MODULE_NAME);
 	put_module(B_TTY_MODULE_NAME);
 
 	TRACE_FUNCRET("< uninit_driver() returns\n");
@@ -199,6 +649,36 @@ pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags)
 
 	TRACE_FUNCRET("< pc_serial_service() returns: false\n");
 	return false;
+}
+
+
+int32
+pc_serial_interrupt(void *arg)
+{
+	int32 ret;
+	SerialDevice *master = (SerialDevice *)arg;
+	TRACE_FUNCALLS("> pc_serial_interrupt(%p)\n", arg);
+
+	if (!master)
+		return B_UNHANDLED_INTERRUPT;
+
+	ret = master->InterruptHandler();
+	return ret;
+
+
+	for (int32 i = 0; i < DEVICES_COUNT; i++) {
+		if (gSerialDevices[i] && gSerialDevices[i]->Master() == master) {
+			ret = gSerialDevices[i]->InterruptHandler();
+			// XXX: handle more than 1 ?
+			if (ret != B_UNHANDLED_INTERRUPT) {
+				TRACE_FUNCRET("< pc_serial_interrupt() returns: true\n");
+				return ret;
+			}
+		}
+	}
+
+	TRACE_FUNCRET("< pc_serial_interrupt() returns: unhandled\n");
+	return B_UNHANDLED_INTERRUPT;
 }
 
 

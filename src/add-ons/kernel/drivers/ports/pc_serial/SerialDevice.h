@@ -12,29 +12,26 @@
 
 class SerialDevice {
 public:
-								SerialDevice(usb_device device,
-									uint16 vendorID, uint16 productID,
-									const char *description);
+/*								SerialDevice(struct serial_config_descriptor 
+									*device, uint32 ioBase, uint32 irq, SerialDevice *master=NULL);*/
+								SerialDevice(const struct serial_support_descriptor 
+									*device, uint32 ioBase, uint32 irq, const SerialDevice *master=NULL);
 virtual							~SerialDevice();
 
-static	SerialDevice *			MakeDevice(usb_device device, uint16 vendorID,
-									uint16 productID);
+static	SerialDevice *			MakeDevice(struct serial_config_descriptor 
+									*device);
 
 		status_t				Init();
 
-		usb_device				Device() { return fDevice; };
-		uint16					ProductID() { return fProductID; };
-		uint16					VendorID() { return fVendorID; };
-		const char *			Description() { return fDescription; };
+		const struct serial_support_descriptor	*SupportDescriptor() const 
+									{ return fSupportDescriptor; };
+		struct serial_config_descriptor	*ConfigDescriptor() const 
+									{ return fDevice; };
+		//uint16					ProductID() const { return fProductID; };
+		//uint16					VendorID() const { return fVendorID; };
+		const char *			Description() const { return fDescription; };
 
-		void					SetControlPipe(usb_pipe handle);
-		usb_pipe				ControlPipe() { return fControlPipe; };
-
-		void					SetReadPipe(usb_pipe handle);
-		usb_pipe				ReadPipe() { return fReadPipe; };
-
-		void					SetWritePipe(usb_pipe handle);
-		usb_pipe				WritePipe() { return fWritePipe; }
+		const SerialDevice *	Master() const { return fMaster ? fMaster : this; };
 
 		char *					ReadBuffer() { return fReadBuffer; };
 		size_t					ReadBufferSize() { return fReadBufferSize; };
@@ -45,6 +42,8 @@ static	SerialDevice *			MakeDevice(usb_device device, uint16 vendorID,
 		void					SetModes();
 		bool					Service(struct tty *ptty, struct ddrover *ddr,
 									uint flags);
+
+		int32					InterruptHandler();
 
 		status_t				Open(uint32 flags);
 		status_t				Read(char *buffer, size_t *numBytes);
@@ -60,17 +59,20 @@ static	SerialDevice *			MakeDevice(usb_device device, uint16 vendorID,
 		bool					IsRemoved() { return fDeviceRemoved; };
 
 		/* virtual interface to be overriden as necessary */
-virtual	status_t				AddDevice(const usb_configuration_info *config);
+virtual	status_t				AddDevice(const struct serial_config_descriptor *device);
 
 virtual	status_t				ResetDevice();
 
-virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
+//virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
 virtual	status_t				SetControlLineState(uint16 state);
 
 virtual	void					OnRead(char **buffer, size_t *numBytes);
 virtual	void					OnWrite(const char *buffer, size_t *numBytes, 
 									size_t *packetBytes);
 virtual	void					OnClose();
+
+		uint32					IOBase() const { return fIOBase; };
+		uint32					IRQ() const { return fIRQ; };
 
 protected:
 		void					SetReadBufferSize(size_t size) { fReadBufferSize = size; };
@@ -89,20 +91,25 @@ static	void					InterruptCallbackFunction(void *cookie,
 									int32 status, void *data,
 									uint32 actualLength);
 
-		usb_device				fDevice;		// USB device handle
-		uint16					fVendorID;
-		uint16					fProductID;
+		uint8					ReadReg8(int reg);
+		void					WriteReg8(int reg, uint8 value);
+		void					OrReg8(int reg, uint8 value);
+		void					AndReg8(int reg, uint8 value);
+		void					MaskReg8(int reg, uint8 value);
+
+		const struct serial_support_descriptor	*fSupportDescriptor;
+		struct serial_config_descriptor		*fDevice;		// USB device handle
 		const char *			fDescription;	// informational description
 		bool					fDeviceOpen;
 		bool					fDeviceRemoved;
 
-		/* communication pipes */
-		usb_pipe				fControlPipe;
-		usb_pipe				fReadPipe;
-		usb_pipe				fWritePipe;
+		bus_type				fBus;
+		uint32					fIOBase;
+		uint32					fIRQ;
+		const SerialDevice *	fMaster;
 
 		/* line coding */
-		usb_serial_line_coding	fLineCoding;
+		//usb_serial_line_coding	fLineCoding;
 
 		/* data buffers */
 		area_id					fBufferArea;
@@ -129,6 +136,7 @@ static	void					InterruptCallbackFunction(void *cookie,
 		bool					fInputStopped;
 		struct ttyfile			fTTYFile;
 		struct tty				fTTY;
+		struct ddrover			fRover;
 
 		/* device thread management */
 		thread_id				fDeviceThread;

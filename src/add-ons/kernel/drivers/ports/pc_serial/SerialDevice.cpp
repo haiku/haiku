@@ -6,24 +6,23 @@
  * Distributed under the terms of the MIT License.
  */
 #include "SerialDevice.h"
-#include "USB3.h"
+#include "UART.h"
 
-#include "ACM.h"
-#include "FTDI.h"
-#include "KLSI.h"
-#include "Prolific.h"
-
-SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
-	uint16 productID, const char *description)
-	:	fDevice(device),
-		fVendorID(vendorID),
-		fProductID(productID),
-		fDescription(description),
+SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
+	uint32 ioBase, uint32 irq, const SerialDevice *master)
+	:	/*fSupportDescriptor(device->descriptor),
+		fDevice(device),
+		fDescription(device->descriptor->name),*/
+		fSupportDescriptor(device),
+		fDevice(NULL),
+		fDescription(device->name),
+		//
 		fDeviceOpen(false),
 		fDeviceRemoved(false),
-		fControlPipe(0),
-		fReadPipe(0),
-		fWritePipe(0),
+		fBus(device->bus),
+		fIOBase(ioBase),
+		fIRQ(irq),
+		fMaster(master),
 		fBufferArea(-1),
 		fReadBuffer(NULL),
 		fReadBufferSize(ROUNDUP(DEF_BUFFER_SIZE, 16)),
@@ -40,6 +39,7 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 {
 	memset(&fTTYFile, 0, sizeof(ttyfile));
 	memset(&fTTY, 0, sizeof(tty));
+	memset(&fRover, 0, sizeof(ddrover));
 }
 
 
@@ -75,28 +75,11 @@ SerialDevice::Init()
 
 	fWriteBuffer = fReadBuffer + fReadBufferSize;
 	fInterruptBuffer = fWriteBuffer + fWriteBufferSize;
+
+	// disable DLAB
+	WriteReg8(LCR, 0);
+
 	return B_OK;
-}
-
-
-void
-SerialDevice::SetControlPipe(usb_pipe handle)
-{
-	fControlPipe = handle;
-}
-
-
-void
-SerialDevice::SetReadPipe(usb_pipe handle)
-{
-	fReadPipe = handle;
-}
-
-
-void
-SerialDevice::SetWritePipe(usb_pipe handle)
-{
-	fWritePipe = handle;
 }
 
 
@@ -105,8 +88,66 @@ SerialDevice::SetModes()
 {
 	struct termios tios;
 	memcpy(&tios, &fTTY.t, sizeof(struct termios));
+	//TRACE_FUNCRES(trace_termios, &tios);
+	spin(10000);
+	uint32 baudIndex = tios.c_cflag & CBAUD;
+	if (baudIndex > BLAST)
+		baudIndex = BLAST;
+
+	uint8 lcr = 0;
+	uint16 divisor = SupportDescriptor()->bauds[baudIndex];
+
+	switch (tios.c_cflag & CSIZE) {
+#if	CS5 != CS7
+	// in case someday...
+	case CS5:
+		lcr |= LCR_5BIT;
+		break;
+	case CS6:
+		lcr |= LCR_6BIT;
+		break;
+#endif
+	case CS7:
+		lcr |= LCR_7BIT;
+		break;
+	case CS8:
+	default:
+		lcr |= LCR_8BIT;
+		break;
+	}
+
+	if (tios.c_cflag & CSTOPB)
+		lcr |= LCR_2STOP;
+	if (tios.c_cflag & PARENB)
+		lcr |= LCR_P_EN;
+	if (tios.c_cflag & PARODD == 0)
+		lcr |= LCR_P_EVEN;
+
+	if (baudIndex == B0) {
+		// disable
+		MaskReg8(MCR, MCR_DTR);
+	} else {
+		// set FCR now, 
+		// 16650 and later chips have another reg at 2 when DLAB=1
+		uint8 fcr = FCR_ENABLE | FCR_RX_RST | FCR_TX_RST | FCR_F_8;
+		// enable fifo
+		//fcr = 0;
+		WriteReg8(FCR, fcr);
+
+		// unmask the divisor latch regs
+		WriteReg8(LCR, LCR_DLAB);
+		// set divisor
+		WriteReg8(DLLB, divisor & 0x00ff);
+		WriteReg8(DLHB, divisor >> 8);
+		//WriteReg8(2,0);
+
+	}
+	// set control lines, and disable divisor latch reg
+	WriteReg8(LCR, lcr);
+
+
+#if 0
 	uint16 newControl = fControlOut;
-	TRACE_FUNCRES(trace_termios, &tios);
 
 	static uint32 baudRates[] = {
 		0x00000000, //B0
@@ -131,11 +172,6 @@ SerialDevice::SetModes()
 		0x00070800, //460800
 		0x000E1000, //921600
 	};
-
-	uint32 baudCount = sizeof(baudRates) / sizeof(baudRates[0]);
-	uint32 baudIndex = tios.c_cflag & CBAUD;
-	if (baudIndex > baudCount)
-		baudIndex = baudCount - 1;
 
 	usb_serial_line_coding lineCoding;
 	lineCoding.speed = baudRates[baudIndex];
@@ -172,64 +208,103 @@ SerialDevice::SetModes()
 			fLineCoding.parity);
 		SetLineCoding(&fLineCoding);
 	}
+#endif
 }
 
 
 bool
 SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 {
+	uint8 msr;
+	status_t err;
+
 	if (&fTTY != ptty)
 		return false;
+
+	TRACE_ALWAYS("%s(,,0x%08lx)\n", __FUNCTION__, flags);
 
 	if (flags <= TTYGETSIGNALS) {
 		switch (flags) {
 			case TTYENABLE:
 				TRACE("TTYENABLE\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, false);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				fControlOut = CLS_LINE_DTR | CLS_LINE_RTS;
-				SetControlLineState(fControlOut);
+				
+				SetModes();
+				err = install_io_interrupt_handler(IRQ(), pc_serial_interrupt, this, 0);
+				TRACE_ALWAYS("installing irq handler for %d: %s\n", IRQ(), strerror(err));
+				msr = ReadReg8(MSR);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
+				// 
+				WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
+				// enable irqs
+				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
+				//WriteReg8(IER, IER_RDA);
 				break;
 
 			case TTYDISABLE:
 				TRACE("TTYDISABLE\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, false);
-				fControlOut = 0x0;
-				SetControlLineState(fControlOut);
+				// remove the handler
+				remove_io_interrupt_handler(IRQ(), pc_serial_interrupt, this);
+				// disable IRQ
+				WriteReg8(IER, 0);
+				WriteReg8(MCR, 0);
+				msr = ReadReg8(MSR);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
 				break;
 
 			case TTYISTOP:
 				TRACE("TTYISTOP\n");
-				fInputStopped = true;
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
+				MaskReg8(MCR, MCR_RTS);
+				//fInputStopped = true;
+				//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
 				break;
 
 			case TTYIRESUME:
 				TRACE("TTYIRESUME\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				fInputStopped = false;
+				OrReg8(MCR, MCR_RTS);
+				//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
+				//fInputStopped = false;
 				break;
 
 			case TTYGETSIGNALS:
 				TRACE("TTYGETSIGNALS\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, true);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDSR, false);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWRI, false);
+				msr = ReadReg8(MSR);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDSR, msr & MSR_DSR);
+				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWRI, msr & MSR_RI);
 				break;
 
 			case TTYSETMODES:
 				TRACE("TTYSETMODES\n");
 				SetModes();
+//WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
 				break;
 
 			case TTYOSTART:
+				TRACE("TTYOSTART\n");
+				// enable irqs
+				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA | IER_THRE);
+				break;
 			case TTYOSYNC:
+				TRACE("TTYOSYNC\n");
+				return (ReadReg8(LSR) & (LSR_THRE | LSR_TSRE)) == (LSR_THRE | LSR_TSRE);
+				break;
 			case TTYSETBREAK:
+				TRACE("TTYSETBREAK\n");
+				OrReg8(LCR, LCR_BREAK);
+				break;
 			case TTYCLRBREAK:
+				TRACE("TTYCLRBREAK\n");
+				MaskReg8(LCR, LCR_BREAK);
+				break;
 			case TTYSETDTR:
+				TRACE("TTYSETDTR\n");
+				OrReg8(MCR, MCR_DTR);
+				break;
 			case TTYCLRDTR:
-				TRACE("TTY other\n");
+				TRACE("TTYCLRDTR\n");
+				MaskReg8(MCR, MCR_DTR);
 				break;
 		}
 
@@ -237,6 +312,86 @@ SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 	}
 
 	return false;
+}
+
+
+int32
+SerialDevice::InterruptHandler()
+{
+	int32 ret = B_UNHANDLED_INTERRUPT;
+	gTTYModule->ddrstart(&fRover);
+	gTTYModule->ttyilock(&fTTY, &fRover, true);
+
+	uint8 iir, lsr, msr;
+	int count;
+
+	while (((iir = ReadReg8(IIR)) & IIR_PENDING) == 0) { // 0 means yes
+		int fifoavail = 1;
+		
+		//DEBUG
+//		for (count = 0; ReadReg8(LSR) & LSR_DR; count++)
+//			gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
+
+		switch (iir & (IIR_IMASK | IIR_TO)) {
+		case IIR_THRE:
+			dprintf("IIR_THRE\n");
+			// check how much fifo we can use
+			//XXX: move to Init() ?
+			if (iir & IIR_FMASK == IIR_FMASK)
+				fifoavail = 16;
+			if (iir & IIR_F64EN)
+				fifoavail = 64;
+			for (int i = 0; i < fifoavail; i++) {
+				int chr = gTTYModule->ttyout(&fTTY, &fRover);
+				if (chr < 0) {
+					//WriteReg8(THB, (uint8)chr);
+					break;
+				}
+				WriteReg8(THB, (uint8)chr);
+			}
+			break;
+		case IIR_TO:
+		case IIR_TO | IIR_RDA:
+			// timeout: FALLTHROUGH
+		case IIR_RDA:
+			dprintf("IIR_TO/RDA\n");
+			// while data is ready... get it
+			while (ReadReg8(LSR) & LSR_DR)
+				gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
+			break;
+		case IIR_RLS:
+			dprintf("IIR_RLS\n");
+			// ack
+			lsr = ReadReg8(LSR);
+			//XXX: handle this somehow
+			break;
+		case IIR_MS:
+			dprintf("IIR_MS\n");
+			// modem signals changed
+			msr = ReadReg8(MSR);
+			if (msr & MSR_DDCD)
+				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWDCD, msr & MSR_DCD);
+			if (msr & MSR_DCTS)
+				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWCTS, msr & MSR_CTS);
+			if (msr & MSR_DDSR)
+				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWDSR, msr & MSR_DSR);
+			if (msr & MSR_TERI)
+				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWRI, msr & MSR_RI);
+			break;
+		default:
+			dprintf("IIR_?\n");
+			// something happened
+			break;
+		}
+		ret = B_HANDLED_INTERRUPT;
+		dprintf("IRQ:h\n");
+	}
+
+
+	gTTYModule->ttyilock(&fTTY, &fRover, false);
+	gTTYModule->ddrdone(&fRover);
+	dprintf("IRQ:r\n");
+	return ret;
 }
 
 
@@ -249,7 +404,7 @@ SerialDevice::Open(uint32 flags)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	gTTYModule->ttyinit(&fTTY, true);
+	gTTYModule->ttyinit(&fTTY, false);
 	fTTYFile.tty = &fTTY;
 	fTTYFile.flags = flags;
 	ResetDevice();
@@ -259,7 +414,7 @@ SerialDevice::Open(uint32 flags)
 		return B_NO_MEMORY;
 
 	gTTYModule->ddacquire(ddr, &gSerialDomain);
-	status_t status = gTTYModule->ttyopen(&fTTYFile, ddr, usb_serial_service);
+	status_t status = gTTYModule->ttyopen(&fTTYFile, ddr, pc_serial_service);
 	gTTYModule->ddrdone(ddr);
 
 	if (status < B_OK) {
@@ -267,6 +422,7 @@ SerialDevice::Open(uint32 flags)
 		return status;
 	}
 
+#if 0
 	fDeviceThread = spawn_kernel_thread(DeviceThread, "usb_serial device thread",
 		B_NORMAL_PRIORITY, this);
 
@@ -285,6 +441,7 @@ SerialDevice::Open(uint32 flags)
 	if (status < B_OK)
 		TRACE_ALWAYS("failed to queue initial interrupt\n");
 
+#endif
 	fDeviceOpen = true;
 	return B_OK;
 }
@@ -298,24 +455,31 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 		return B_DEV_NOT_READY;
 	}
 
+	status_t status;
+#if 0
 	status_t status = mutex_lock(&fReadLock);
 	if (status != B_OK) {
 		TRACE_ALWAYS("read: failed to get read lock\n");
 		*numBytes = 0;
 		return status;
 	}
+#endif
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr) {
 		*numBytes = 0;
+#if 0
 		mutex_unlock(&fReadLock);
+#endif
 		return B_NO_MEMORY;
 	}
 
 	status = gTTYModule->ttyread(&fTTYFile, ddr, buffer, numBytes);
 	gTTYModule->ddrdone(ddr);
 
+#if 0
 	mutex_unlock(&fReadLock);
+#endif
 	return status;
 }
 
@@ -324,8 +488,19 @@ status_t
 SerialDevice::Write(const char *buffer, size_t *numBytes)
 {
 	size_t bytesLeft = *numBytes;
-	*numBytes = 0;
+	//*numBytes = 0;
 
+	status_t status = EINVAL;
+	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
+	if (!ddr) {
+		*numBytes = 0;
+		return B_ERROR;
+	}
+
+	status = gTTYModule->ttywrite(&fTTYFile, ddr, buffer, numBytes);
+	gTTYModule->ddrdone(ddr);
+
+#if 0
 	status_t status = mutex_lock(&fWriteLock);
 	if (status != B_OK) {
 		TRACE_ALWAYS("write: failed to get write lock\n");
@@ -373,6 +548,7 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 	}
 
 	mutex_unlock(&fWriteLock);
+#endif
 	return status;
 }
 
@@ -431,9 +607,11 @@ SerialDevice::Close()
 	OnClose();
 
 	if (!fDeviceRemoved) {
+#if 0
 		gUSBModule->cancel_queued_transfers(fReadPipe);
 		gUSBModule->cancel_queued_transfers(fWritePipe);
 		gUSBModule->cancel_queued_transfers(fControlPipe);
+#endif
 	}
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
@@ -473,12 +651,14 @@ SerialDevice::Removed()
 	// we need to ensure that we do not use the device anymore
 	fStopDeviceThread = true;
 	fInputStopped = false;
+#if 0
 	gUSBModule->cancel_queued_transfers(fReadPipe);
 	gUSBModule->cancel_queued_transfers(fWritePipe);
 	gUSBModule->cancel_queued_transfers(fControlPipe);
+#endif
 
 	int32 result = B_OK;
-	wait_for_thread(fDeviceThread, &result);
+	//wait_for_thread(fDeviceThread, &result);
 	fDeviceThread = -1;
 
 	mutex_lock(&fWriteLock);
@@ -487,7 +667,7 @@ SerialDevice::Removed()
 
 
 status_t
-SerialDevice::AddDevice(const usb_configuration_info *config)
+SerialDevice::AddDevice(const serial_config_descriptor *config)
 {
 	// default implementation - does nothing
 	return B_ERROR;
@@ -502,13 +682,14 @@ SerialDevice::ResetDevice()
 }
 
 
+#if 0
 status_t
 SerialDevice::SetLineCoding(usb_serial_line_coding *coding)
 {
 	// default implementation - does nothing
 	return B_OK;
 }
-
+#endif
 
 status_t
 SerialDevice::SetControlLineState(uint16 state)
@@ -543,6 +724,7 @@ int32
 SerialDevice::DeviceThread(void *data)
 {
 	SerialDevice *device = (SerialDevice *)data;
+#if 0
 
 	while (!device->fStopDeviceThread) {
 		status_t status = gUSBModule->queue_bulk(device->fReadPipe,
@@ -592,6 +774,7 @@ SerialDevice::DeviceThread(void *data)
 		gTTYModule->ddrdone(ddr);
 	}
 
+#endif
 	return B_OK;
 }
 
@@ -638,14 +821,17 @@ SerialDevice::InterruptCallbackFunction(void *cookie, int32 status,
 	// ToDo: maybe handle those somehow?
 
 	if (status == B_OK && !device->fDeviceRemoved) {
+#if 0
 		status = gUSBModule->queue_interrupt(device->fControlPipe,
 			device->fInterruptBuffer, device->fInterruptBufferSize,
 			device->InterruptCallbackFunction, device);
+#endif
 	}
 }
 
 
 
+#if 0
 SerialDevice *
 SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 	uint16 productID)
@@ -710,4 +896,67 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 	}
 
 	return new ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
+}
+#endif
+
+
+uint8
+SerialDevice::ReadReg8(int reg)
+{
+	uint8 ret;
+	switch (fBus) {
+	case B_ISA_BUS:
+		ret = gISAModule->read_io_8(IOBase() + reg);
+		break;
+	case B_PCI_BUS:
+		ret = gPCIModule->read_io_8(IOBase() + reg);
+		break;
+	default:
+		TRACE_ALWAYS("%s: unknown bus!\n", __FUNCTION__);
+		ret = 0;
+	//XXX:pcmcia ?
+	}
+	TRACE_ALWAYS("RR8(%d) = %d [%02x]\n", reg, ret, ret);
+	//spin(1000);
+	return ret;
+}
+
+void
+SerialDevice::WriteReg8(int reg, uint8 value)
+{
+//	TRACE_ALWAYS("WR8(0x%04x+%d, %d [0x%x])\n", IOBase(), reg, value, value);
+	TRACE_ALWAYS("WR8(%d, %d [0x%x])\n", reg, value, value);
+	switch (fBus) {
+	case B_ISA_BUS:
+		gISAModule->write_io_8(IOBase() + reg, value);
+		break;
+	case B_PCI_BUS:
+		gPCIModule->write_io_8(IOBase() + reg, value);
+		break;
+	default:
+		TRACE_ALWAYS("%s: unknown bus!\n", __FUNCTION__);
+	//XXX:pcmcia ?
+	}
+	//spin(10000);
+}
+
+
+void
+SerialDevice::OrReg8(int reg, uint8 value)
+{
+	WriteReg8(reg, ReadReg8(reg) | value);
+}
+
+
+void
+SerialDevice::AndReg8(int reg, uint8 value)
+{
+	WriteReg8(reg, ReadReg8(reg) & value);
+}
+
+
+void
+SerialDevice::MaskReg8(int reg, uint8 value)
+{
+	WriteReg8(reg, ReadReg8(reg) & ~value);
 }

@@ -11,6 +11,9 @@
 #include <OS.h>
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <ISA.h>
+#include <PCI.h>
+#include <config_manager.h>
 #include <string.h>
 
 #ifdef __HAIKU__
@@ -25,8 +28,70 @@ extern "C" {
 #include <ttylayer.h>
 }
 
+
+// whether we should handle default COM ports
+#define HANDLE_ISA_COM
+
 #define DRIVER_NAME		"pc_serial"		// driver name for debug output
 #define DEVICES_COUNT	20				// max simultaneously open devices
+
+#ifdef HANDLE_ISA_COM
+#define DEVFS_BASE		"ports/my_serial"
+#else
+// avoid clashing with BeOS zz driver
+#define DEVFS_BASE		"ports/pc_serial"
+#endif
+
+
+// no user serviceable part beyond this point
+
+// more PCI serial APIs
+#ifndef PCI_serial_16650
+#define PCI_serial_16650        0x03                    /* 16650-compatible serial controller */
+#define PCI_serial_16750        0x04                    /* 16750-compatible serial controller */
+#define PCI_serial_16850        0x05                    /* 16850-compatible serial controller */
+#define PCI_serial_16950        0x06                    /* 16950-compatible serial controller */
+#endif
+
+class SerialDevice;
+
+struct port_constraints {
+	uint32 minsize;
+	uint32 maxsize;
+	uint32 split;		// range to split I/O ports for each device
+};
+
+#define PCI_INVAL 0xffff
+struct serial_support_descriptor {
+	bus_type bus;	// B_*_BUS
+	const char *name;
+	const uint32 *bauds;
+	// not yet used
+	SerialDevice *(*instanciator)(struct serial_support_descriptor *desc);
+	// I/O port constrains (which ranges to use, how to split them)
+	struct port_constraints constraints;
+	// bus specific stuff here...
+	struct {
+		// for both ISA & PCI
+		uchar	class_base;
+		uchar	class_sub;
+		uchar	class_api;	// or PCI_undefined
+		// for PCI: if PCI_INVAL then match class
+		ushort	vendor_id;
+		ushort	device_id;
+	} match;
+};
+typedef struct serial_support_descriptor serial_support_descriptor;
+
+
+struct serial_config_descriptor {
+	bus_type bus;	// B_*_BUS
+	struct serial_support_descriptor *descriptor;
+	union {
+		struct pci_info pci;
+	} d;
+};
+
 
 /* Some usefull helper defines ... */
 #define SIZEOF(array) (sizeof(array) / sizeof(array[0])) /* size of array */
@@ -34,6 +99,9 @@ extern "C" {
 #define ROUNDUP(size, seg) (((size) + (seg) - 1) & ~((seg) - 1))
 /* Default device buffer size */
 #define DEF_BUFFER_SIZE	0x200
+
+// XXX: sort up the mess in termios.h on B* !
+#define BLAST B230400
 
 /* line coding defines ... Come from CDC USB specs? */
 #define LC_STOP_BIT_1			0
@@ -55,42 +123,18 @@ typedef struct pc_serial_line_coding_s {
 #define CLS_LINE_DTR			0x0001
 #define CLS_LINE_RTS			0x0002
 
-/* attributes etc ...*/
-#ifndef USB_EP_ADDR_DIR_IN
-#define USB_EP_ADDR_DIR_IN		0x80
-#define USB_EP_ADDR_DIR_OUT		0x00
-#endif
-
-#ifndef USB_EP_ATTR_CONTROL
-#define USB_EP_ATTR_CONTROL		0x00
-#define USB_EP_ATTR_ISOCHRONOUS	0x01
-#define USB_EP_ATTR_BULK		0x02
-#define USB_EP_ATTR_INTERRUPT	0x03
-#endif
-
-/* USB class - communication devices */
-#define USB_DEV_CLASS_COMM		0x02
-#define USB_INT_CLASS_CDC		0x02
-#define USB_INT_SUBCLASS_ACM	0x02
-#define USB_INT_CLASS_CDC_DATA	0x0a
-#define USB_INT_SUBCLASS_DATA	0x00
-
-// communication device subtypes
-#define FUNCTIONAL_SUBTYPE_UNION	0x06
-
+extern config_manager_for_driver_module_info *gConfigManagerModule;
 extern isa_module_info *gISAModule;
 extern pci_module_info *gPCIModule;
 extern tty_module_info *gTTYModule;
 extern struct ddomain gSerialDomain;
 
 extern "C" {
-status_t	pc_serial_device_added(pc_device device, void **cookie);
-status_t	pc_serial_device_removed(void *cookie);
-
 status_t	init_hardware();
 void		uninit_driver();
 
 bool		pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags);
+int32		pc_serial_interrupt(void *arg);
 
 status_t	pc_serial_open(const char *name, uint32 flags, void **cookie);
 status_t	pc_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes);
