@@ -3308,7 +3308,9 @@ dump_vnode_usage(int argc, char **argv)
 
 #endif	// ADD_DEBUGGER_COMMANDS
 
-//!	Clears an iovec array of physical pages.
+/*!	Clears an iovec array of physical pages.
+	Returns in \a _bytes the number of bytes successfully cleared.
+*/
 static status_t
 zero_pages(const iovec* vecs, size_t vecCount, size_t* _bytes)
 {
@@ -3321,14 +3323,13 @@ zero_pages(const iovec* vecs, size_t vecCount, size_t* _bytes)
 		status_t status = vm_memset_physical((addr_t)vecs[index].iov_base, 0,
 			length);
 		if (status != B_OK) {
-			*_bytes = bytes;
+			*_bytes -= bytes;
 			return status;
 		}
 
 		bytes -= length;
 	}
 
-	*_bytes = bytes;
 	return B_OK;
 }
 
@@ -3359,8 +3360,9 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
 
-		size = fileVecs[0].length;
-		if (size > numBytes)
+		if (fileVecs[0].length < numBytes)
+			size = fileVecs[0].length;
+		else
 			size = numBytes;
 
 		if (fileVecs[0].offset >= 0) {
@@ -8548,7 +8550,7 @@ _user_flock(int fd, int operation)
 		case LOCK_SH:
 		case LOCK_EX:
 			break;
-		
+
 		default:
 			return B_BAD_VALUE;
 	}
