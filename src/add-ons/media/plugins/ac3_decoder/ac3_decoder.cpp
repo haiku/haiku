@@ -42,24 +42,31 @@ AC3Decoder::AC3Decoder()
  ,	fChannelMask(0)
 {
 	fInputBuffer = malloc(INPUT_BUFFER_MAX_SIZE);
+	strcpy(fChannelInfo,"Unknown");
 	
 	fState = a52_init(0);
-	fSamples = a52_samples(fState);
+	if (fState) {
+		fSamples = a52_samples(fState);
+	}
 }
 
 
 AC3Decoder::~AC3Decoder()
 {
 	free(fInputBuffer);
-	a52_free(fState);
+	if (fState) {
+		a52_free(fState);
+	}
 }
 
 
 void
 AC3Decoder::GetCodecInfo(media_codec_info *info)
 {
-	strcpy(info->short_name, "AC-3");
-	strcpy(info->pretty_name, "AC-3 audio decoder (liba52)");
+	if (info) {
+		strcpy(info->short_name, "AC-3");
+		sprintf(info->pretty_name,"%s AC-3 decoded by liba52",fChannelInfo);
+	}
 }
 
 
@@ -67,22 +74,17 @@ status_t
 AC3Decoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, size_t infoSize)
 {
-	return B_OK;
-}
+	if (!fState) {
+		return B_ERROR;
+	}
 
-
-status_t
-AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
-{
 	if (!fHasStreamInfo)
 		fHasStreamInfo = GetStreamInfo();
 	if (!fHasStreamInfo) {
-		TRACE("AC3Decoder::NegotiateOutputFormat: couldn't get stream info\n");
-		return false;
+		TRACE("AC3Decoder::Setup: couldn't get stream info\n");
+		return B_ERROR;
 	}
-
-	TRACE("AC3Decoder::NegotiateOutputFormat: fFlags 0x%x, fFrameRate %d, fBitRate %d\n", fFlags, fFrameRate, fBitRate);
-
+	
 	// Sample offsets of the output buffer are stored in fInterleaveOffset
 	// When a channel is not present, it is skipped, the rest is shifted left
 	// The block of samples order presented by liba52 is
@@ -104,6 +106,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	switch (fFlags & A52_CHANNEL_MASK) {
 		case A52_CHANNEL: // XXX two independant mono channels
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"2.1 Channel");
+			} else {
+				strcpy(fChannelInfo,"2 Channel");
+			}
 			fChannelCount += 2;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 			static int lfe_offsets[6] = { 2, 0, 1 };
@@ -112,6 +119,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 			break;
 		}
 		case A52_MONO: {
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"Mono + Sub");
+			} else {
+				strcpy(fChannelInfo,"Mono");
+			}
 			fChannelCount += 1;
 			fChannelMask |= B_CHANNEL_LEFT;
 			static int lfe_offsets[6] = { 1, 0 };
@@ -121,6 +133,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_STEREO:
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"Stereo + Sub");
+			} else {
+				strcpy(fChannelInfo,"Stereo");
+			}
 			fChannelCount += 2;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 			static int lfe_offsets[6] = { 2, 0, 1 };
@@ -130,6 +147,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_3F: // 3 front channels (left, center, right)
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"3.1 front Channel");
+			} else {
+				strcpy(fChannelInfo,"3 front Channel");
+			}
 			fChannelCount += 3;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_CENTER;
 			static int lfe_offsets[6] = { 3, 0, 2, 1 };
@@ -139,6 +161,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_2F1R: // 2 front, 1 rear surround channel (L, R, S)
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"2.1 front 1 rear Channel");
+			} else {
+				strcpy(fChannelInfo,"2 front 1 rear Channel");
+			}
 			fChannelCount += 3;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_BACK_CENTER;
 			static int lfe_offsets[6] = { 2, 0, 3, 1 };
@@ -149,6 +176,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 
 		case A52_3F1R: // 3 front, 1 rear surround channel (L, C, R, S)
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"3.1 front 1 rear Channel");
+			} else {
+				strcpy(fChannelInfo,"3 front 1 rear Channel");
+			}
 			fChannelCount += 4;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_CENTER | B_CHANNEL_BACK_CENTER;
 			static int lfe_offsets[6] = { 3, 0, 2, 1, 4 };
@@ -158,6 +190,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_2F2R: // 2 front, 2 rear surround channels (L, R, LS, RS)
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"2.1 front 2 rear Channel");
+			} else {
+				strcpy(fChannelInfo,"2 front 2 rear Channel");
+			}
 			fChannelCount += 4;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
 			static int lfe_offsets[6] = { 2, 0, 1, 3, 4};
@@ -167,6 +204,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_3F2R: // 3 front, 2 rear surround channels (L, C, R, LS, RS)
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"3.1 front 2 rear Channel");
+			} else {
+				strcpy(fChannelInfo,"3 front 2 rear Channel");
+			}
 			fChannelCount += 5;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_CENTER | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
 			static int lfe_offsets[6] = { 3, 0, 2, 1, 4, 5 };
@@ -176,6 +218,11 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		}
 		case A52_DOLBY:
 		{
+			if (fFlags & A52_LFE) {
+				strcpy(fChannelInfo,"Dolby stereo + Sub");
+			} else {
+				strcpy(fChannelInfo,"Dolby stereo");
+			}
 			fChannelCount += 2;
 			fChannelMask |= B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 			static int lfe_offsets[6] = { 2, 0, 1 };
@@ -189,16 +236,35 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 			return B_ERROR;
 	}
 
+	// Currently the liba52 library will remix for us
+	// When AudioChannelConverter can handle more than 1 or 2 channels the below code can be removed
+
+	fFlags = A52_STEREO & A52_CHANNEL_MASK;
+	fChannelCount = 2;
+	fChannelMask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+	static int nrm_offsets[6] = { 0, 1 };
+	fInterleaveOffset = nrm_offsets;
+
+	return B_OK;
+}
+
+
+status_t
+AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
+{
 	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
 	ioDecodedFormat->u.raw_audio.frame_rate = fFrameRate;
 	ioDecodedFormat->u.raw_audio.channel_count = fChannelCount;
 	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	ioDecodedFormat->u.raw_audio.buffer_size = 6 * 256 * fChannelCount * sizeof(float);
+
+	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
+
+	ioDecodedFormat->u.raw_audio.buffer_size = 6 * 256 * fFrameSize;
 	ioDecodedFormat->u.raw_audio.channel_mask = fChannelMask;
 	
-	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
-	
+	TRACE("AC3Decoder::NegotiateOutputFormat: fFlags 0x%x, fFrameRate %d, fBitRate %d, fChannelCount %d, fFrameSize %d\n", fFlags, fFrameRate, fBitRate, fChannelCount, fFrameSize);
+
 	return B_OK;
 }
 
@@ -236,14 +302,6 @@ status_t
 AC3Decoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info)
 {
-//	bigtime_t start = system_time();
-
-	mediaHeader->start_time = fStartTime;
-	
-//	printf("AC3Decoder::Decode: start time %Ld\n", fStartTime);
-	
-	set_thread_priority(find_thread(0), 7);
-
 	if (!DecodeNext()) {
 		TRACE("AC3Decoder::Decode: DecodeNext failed\n");
 		return B_ERROR;
@@ -272,10 +330,13 @@ AC3Decoder::Decode(void *buffer, int64 *frameCount,
 		}
 	}
 	
+	mediaHeader->start_time = fStartTime;
+	mediaHeader->type = B_MEDIA_RAW_AUDIO;
+	mediaHeader->size_used = 6 * 256 * fFrameSize;
+	mediaHeader->data_offset = 0;
+
 	fStartTime += 6 * 256 * 1000000LL / fFrameRate;
 	*frameCount = 6 * 256;
-
-//	printf("AC3Decoder::Decode: finished, %Ld usec\n", system_time() - start);
 
 	return B_OK;
 }
@@ -355,6 +416,8 @@ AC3Decoder::DecodeNext()
 			InputRemoveData(1);
 			continue;
 		}
+
+		TRACE("AC3Decoder::DecodeNext: %d, %d\n",sample_rate, bit_rate);
 
 		if (!InputGetData(&input, bytes)) {
 			TRACE("AC3Decoder::DecodeNext: can't get %d data bytes\n", bytes);

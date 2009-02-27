@@ -76,6 +76,8 @@ private:
 	int			fChannelCount;
 	int			fChannelMask;
 	int			*fInterleaveOffset;
+	
+	char		fChannelInfo[120];
 };
 
 
