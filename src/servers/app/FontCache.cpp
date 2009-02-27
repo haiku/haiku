@@ -52,8 +52,9 @@ FontCache::Default()
 FontCacheEntry*
 FontCache::FontCacheEntryFor(const ServerFont& font)
 {
-	char signature[512];
-	FontCacheEntry::GenerateSignature(signature, font);
+	static const size_t signatureSize = 512;
+	char signature[signatureSize];
+	FontCacheEntry::GenerateSignature(signature, signatureSize, font);
 
 	AutoReadLocker readLocker(this);
 

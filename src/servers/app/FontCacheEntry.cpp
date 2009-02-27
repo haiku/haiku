@@ -217,7 +217,8 @@ FontCacheEntry::GetKerning(uint16 glyphCode1, uint16 glyphCode2,
 
 // GenerateSignature
 /*static*/ void
-FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
+FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
+	const ServerFont& font)
 {
 	glyph_rendering renderingType = _RenderTypeFor(font);
 
@@ -226,7 +227,7 @@ FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 	bool hinting = font.Hinting();
 	uint8 averageWeight = gSubpixelAverageWeight;
 
-	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d,%d",
+	snprintf(signature, signatureSize, "%ld,%u,%d,%d,%.1f,%d,%d",
 		font.GetFamilyAndStyle(), charMap,
 		font.Face(), int(renderingType), font.Size(), hinting, averageWeight);
 }

@@ -93,6 +93,7 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 									uint16 glyphCode2, double* x, double* y);
 
 	static	void				GenerateSignature(char* signature,
+									size_t signatureSize,
 									const ServerFont& font);
 
 	// private to FontCache class:
