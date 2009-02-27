@@ -11,6 +11,8 @@
 
 #include "Debug.h"
 #include "haiku_fs_cache.h"
+#include "HaikuKernelNode.h"
+#include "HaikuKernelVolume.h"
 #include "kernel_emu.h"
 
 
@@ -145,8 +147,8 @@ publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 		return error;
 
 	// publish the new node
-	error = UserlandFS::KernelEmu::publish_vnode(volume, vnodeID, node, type,
-		flags);
+	error = UserlandFS::KernelEmu::publish_vnode(volume->GetID(), vnodeID, node,
+		type, flags);
 	if (error != B_OK)
 		volume->UndoPublishVNode(node);
 
@@ -155,18 +157,18 @@ publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 
 // get_vnode
 status_t
-get_vnode(defs_volume *_volume, ino_t vnodeID, fs_vnode *privateNode)
+get_vnode(fs_volume *_volume, ino_t vnodeID, fs_vnode *privateNode)
 {
 	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
 
 	// get the node
 	void* foundNode;
-	status_t error = UserlandFS::KernelEmu::get_vnode(volume, vnodeID,
+	status_t error = UserlandFS::KernelEmu::get_vnode(volume->GetID(), vnodeID,
 		&foundNode);
 	if (error != B_OK)
 		return error;
 
-	((HaikuKernelNode*)foundNode)->GetFSNode(privateNode);
+	*privateNode = *(HaikuKernelNode*)foundNode;
 
 	return B_OK;
 }
@@ -221,7 +223,7 @@ get_vnode_removed(fs_volume *_volume, ino_t vnodeID, bool* removed)
 fs_volume*
 volume_for_vnode(fs_vnode *vnode)
 {
-	return HaikuKernelNode::GetNode(vnode)->GetVolume();
+	return HaikuKernelNode::GetNode(vnode)->GetVolume()->GetFSVolume();
 }
 
 
@@ -520,7 +522,7 @@ remove_debugger_command(char *name, debugger_command_hook hook)
 }
 
 // parse_expression
-uint32
+uint64
 parse_expression(const char *string)
 {
 	return UserlandFS::KernelEmu::parse_expression(string);

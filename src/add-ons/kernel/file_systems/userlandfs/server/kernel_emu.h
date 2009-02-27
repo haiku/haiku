@@ -22,6 +22,7 @@ status_t notify_query(port_id port, int32 token, int32 operation,
 
 status_t get_vnode(dev_t nsid, ino_t vnid, void** node);
 status_t put_vnode(dev_t nsid, ino_t vnid);
+status_t acquire_vnode(dev_t nsid, ino_t vnodeID);
 status_t new_vnode(dev_t nsid, ino_t vnid, void* data);
 status_t publish_vnode(dev_t nsid, ino_t vnid, void* data, int type,
 	uint32 flags);

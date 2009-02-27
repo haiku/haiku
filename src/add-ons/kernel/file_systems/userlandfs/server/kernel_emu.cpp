@@ -324,6 +324,14 @@ UserlandFS::KernelEmu::put_vnode(dev_t nsid, ino_t vnid)
 	return error;
 }
 
+// acquire_vnode
+status_t
+UserlandFS::KernelEmu::acquire_vnode(dev_t nsid, ino_t vnodeID)
+{
+	// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
 // new_vnode
 status_t
 UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, void* data)
