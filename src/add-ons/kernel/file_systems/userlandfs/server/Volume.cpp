@@ -85,14 +85,6 @@ Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 	return B_BAD_VALUE;
 }
 
-// LookupNoType
-status_t
-Volume::LookupNoType(void* dir, const char* entryName, ino_t* vnid)
-{
-	int type;
-	return Lookup(dir, entryName, vnid, &type);
-}
-
 // GetVNodeName
 status_t
 Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
@@ -105,7 +97,7 @@ Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 
 	// look up the parent directory
 	ino_t parentID;
-	error = LookupNoType(node, "..", &parentID);
+	error = Lookup(node, "..", &parentID);
 	if (error != B_OK)
 		return error;
 

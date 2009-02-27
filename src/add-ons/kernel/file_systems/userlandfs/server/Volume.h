@@ -38,9 +38,6 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(void* dir, const char* entryName,
 									ino_t* vnid);
-	virtual	status_t			LookupNoType(void* dir,
-									const char* entryName, ino_t* vnid);
-									// not required
 	virtual	status_t			GetVNodeName(void* node, char* buffer,
 									size_t bufferSize);
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
