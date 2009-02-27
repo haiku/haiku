@@ -23,7 +23,8 @@
 #include "DispatcherDefs.h"
 #include "FileSystem.h"
 #include "FSInfo.h"
-#include "haiku_block_cache_priv.h"
+#include "haiku_block_cache.h"
+#include "haiku_condition_variable.h"
 #include "haiku_fs_cache.h"
 #include "HaikuKernelFileSystem.h"
 #include "RequestThread.h"
@@ -276,6 +277,11 @@ UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<HaikuKernelFileSystem> fsDeleter(fileSystem);
+
+	// init condition variables
+	error = UserlandFS::HaikuKernelEmu::condition_variable_init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// init block cache
 	error = UserlandFS::HaikuKernelEmu::block_cache_init();

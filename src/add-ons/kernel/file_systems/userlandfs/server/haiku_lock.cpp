@@ -20,33 +20,35 @@ namespace UserlandFS {
 namespace HaikuKernelEmu {
 
 
-int32
-recursive_lock_get_recursion(recursive_lock *lock)
+sem_id
+_init_semaphore(int32 count, const char* name)
 {
-	if (lock->holder == find_thread(NULL))
-		return lock->recursion;
-
-	return -1;
+	sem_id sem = create_sem(count, name);
+	if (sem < 0)
+		panic("_init_semaphore(): Failed to create semaphore!\n");
+	return sem;
 }
 
 
-status_t
+void
 recursive_lock_init(recursive_lock *lock, const char *name)
 {
+	recursive_lock_init_etc(lock, name, 0);
+}
+
+
+void
+recursive_lock_init_etc(recursive_lock *lock, const char *name, uint32 flags)
+{
 	if (lock == NULL)
-		return B_BAD_VALUE;
+		panic("recursive_lock_init_etc(): NULL lock\n");
 
 	if (name == NULL)
 		name = "recursive lock";
 
 	lock->holder = -1;
 	lock->recursion = 0;
-	lock->sem = create_sem(1, name);
-
-	if (lock->sem >= B_OK)
-		return B_OK;
-
-	return lock->sem;
+	lock->sem = _init_semaphore(1, name);
 }
 
 
@@ -78,6 +80,23 @@ recursive_lock_lock(recursive_lock *lock)
 }
 
 
+status_t
+recursive_lock_trylock(recursive_lock *lock)
+{
+	thread_id thread = find_thread(NULL);
+
+	if (thread != lock->holder) {
+		status_t status = acquire_sem_etc(lock->sem, 1, B_RELATIVE_TIMEOUT, 0);
+		if (status < B_OK)
+			return status;
+
+		lock->holder = thread;
+	}
+	lock->recursion++;
+	return B_OK;
+}
+
+
 void
 recursive_lock_unlock(recursive_lock *lock)
 {
@@ -91,25 +110,38 @@ recursive_lock_unlock(recursive_lock *lock)
 }
 
 
+int32
+recursive_lock_get_recursion(recursive_lock *lock)
+{
+	if (lock->holder == find_thread(NULL))
+		return lock->recursion;
+
+	return -1;
+}
+
+
 //	#pragma mark -
 
 
-status_t
-mutex_init(mutex *m, const char *name)
+void
+mutex_init(mutex *lock, const char *name)
 {
-	if (m == NULL)
-		return EINVAL;
+	mutex_init_etc(lock, name, 0);
+}
+
+
+void
+mutex_init_etc(mutex* lock, const char* name, uint32 flags)
+{
+	if (lock == NULL)
+		panic("mutex_init_etc(): NULL lock\n");
 
 	if (name == NULL)
 		name = "mutex_sem";
 
-	m->holder = -1;
+	lock->holder = -1;
 
-	m->sem = create_sem(1, name);
-	if (m->sem >= B_OK)
-		return B_OK;
-
-	return m->sem;
+	lock->sem = _init_semaphore(1, name);
 }
 
 
@@ -145,6 +177,24 @@ mutex_lock(mutex *mutex)
 }
 
 
+status_t
+mutex_trylock(mutex *mutex)
+{
+	thread_id me = find_thread(NULL);
+	status_t status;
+
+	status = acquire_sem_etc(mutex->sem, 1, B_RELATIVE_TIMEOUT, 0);
+	if (status < B_OK)
+		return status;
+
+	if (me == mutex->holder)
+		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
+
+	mutex->holder = me;
+	return B_OK;
+}
+
+
 void
 mutex_unlock(mutex *mutex)
 {
@@ -163,46 +213,23 @@ mutex_unlock(mutex *mutex)
 //	#pragma mark -
 
 
-status_t
-benaphore_init(benaphore *ben, const char *name)
+void
+rw_lock_init(rw_lock *lock, const char *name)
 {
-	if (ben == NULL || name == NULL)
-		return B_BAD_VALUE;
-
-	ben->count = 1;
-	ben->sem = create_sem(0, name);
-	if (ben->sem >= B_OK)
-		return B_OK;
-
-	return ben->sem;
+	rw_lock_init_etc(lock, name, 0);
 }
 
 
 void
-benaphore_destroy(benaphore *ben)
-{
-	delete_sem(ben->sem);
-	ben->sem = -1;
-}
-
-
-//	#pragma mark -
-
-
-status_t
-rw_lock_init(rw_lock *lock, const char *name)
+rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 {
 	if (lock == NULL)
-		return B_BAD_VALUE;
+		panic("rw_lock_init_etc(): NULL lock\n");
 
 	if (name == NULL)
 		name = "r/w lock";
 
-	lock->sem = create_sem(RW_MAX_READERS, name);
-	if (lock->sem >= B_OK)
-		return B_OK;
-
-	return lock->sem;
+	lock->sem = _init_semaphore(RW_MAX_READERS, name);
 }
 
 
