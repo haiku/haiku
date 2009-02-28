@@ -56,6 +56,7 @@
 #define EHCI_USBSTS_PORTCHANGE	(1 << 2)	// Port Change Detected
 #define EHCI_USBSTS_USBERRINT	(1 << 1)	// USB Error Interrupt
 #define EHCI_USBSTS_USBINT		(1 << 0)	// USB Interrupt
+#define EHCI_USBSTS_INTMASK		0x3f
 
 
 // USB Interrupt Enable Register (EHCI Spec 2.3.3)

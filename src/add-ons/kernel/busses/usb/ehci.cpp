@@ -795,51 +795,49 @@ EHCI::Interrupt()
 	acquire_spinlock(&lock);
 
 	// check if any interrupt was generated
-	uint32 status = ReadOpReg(EHCI_USBSTS);
+	uint32 status = ReadOpReg(EHCI_USBSTS) & EHCI_USBSTS_INTMASK;
 	if ((status & fEnabledInterrupts) == 0) {
+		if (status != 0) {
+			TRACE("discarding not enabled interrupts 0x%08lx\n", status);
+			WriteOpReg(EHCI_USBSTS, status);
+		}
+
 		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
 
-	uint32 acknowledge = 0;
 	bool asyncAdvance = false;
 	bool finishTransfers = false;
 	int32 result = B_HANDLED_INTERRUPT;
 
 	if (status & EHCI_USBSTS_USBINT) {
 		TRACE("transfer finished\n");
-		acknowledge |= EHCI_USBSTS_USBINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & EHCI_USBSTS_USBERRINT) {
 		TRACE("transfer error\n");
-		acknowledge |= EHCI_USBSTS_USBERRINT;
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
-	if (status & EHCI_USBSTS_PORTCHANGE) {
+	if (status & EHCI_USBSTS_FLROLLOVER)
+		TRACE("frame list rollover\n");
+
+	if (status & EHCI_USBSTS_PORTCHANGE)
 		TRACE("port change detected\n");
-		acknowledge |= EHCI_USBSTS_PORTCHANGE;
-	}
 
 	if (status & EHCI_USBSTS_INTONAA) {
 		TRACE("interrupt on async advance\n");
-		acknowledge |= EHCI_USBSTS_INTONAA;
 		asyncAdvance = true;
 		result = B_INVOKE_SCHEDULER;
 	}
 
-	if (status & EHCI_USBSTS_HOSTSYSERR) {
+	if (status & EHCI_USBSTS_HOSTSYSERR)
 		TRACE_ERROR("host system error!\n");
-		acknowledge |= EHCI_USBSTS_HOSTSYSERR;
-	}
 
-	if (acknowledge)
-		WriteOpReg(EHCI_USBSTS, acknowledge);
-
+	WriteOpReg(EHCI_USBSTS, status);
 	release_spinlock(&lock);
 
 	if (asyncAdvance)
