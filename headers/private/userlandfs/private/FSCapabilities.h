@@ -222,5 +222,7 @@ typedef FSCapabilitiesBase<FS_VNODE_CAPABILITY_COUNT>	FSVNodeCapabilities;
 }	// namespace UserlandFSUtil
 
 using UserlandFSUtil::FSCapabilities;
+using UserlandFSUtil::FSVolumeCapabilities;
+using UserlandFSUtil::FSVNodeCapabilities;
 
 #endif	// USERLAND_FS_FS_CAPABILITIES_H
