@@ -3,7 +3,7 @@
 #ifndef USERLAND_FS_HAIKU_KERNEL_FILE_SYSTEM_H
 #define USERLAND_FS_HAIKU_KERNEL_FILE_SYSTEM_H
 
-#include "FileSystem.h"
+#include "../FileSystem.h"
 
 struct file_system_module_info;
 

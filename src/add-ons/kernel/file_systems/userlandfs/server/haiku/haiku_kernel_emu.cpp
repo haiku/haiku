@@ -10,9 +10,11 @@
 #include <NodeMonitor.h>
 
 #include "Debug.h"
+
+#include "../kernel_emu.h"
+
 #include "HaikuKernelNode.h"
 #include "HaikuKernelVolume.h"
-#include "kernel_emu.h"
 #include "vfs.h"
 
 

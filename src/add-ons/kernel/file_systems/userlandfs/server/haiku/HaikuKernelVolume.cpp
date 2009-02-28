@@ -8,7 +8,9 @@
 #include <unistd.h>
 
 #include "Debug.h"
-#include "kernel_emu.h"
+
+#include "../kernel_emu.h"
+
 #include "HaikuKernelNode.h"
 
 
