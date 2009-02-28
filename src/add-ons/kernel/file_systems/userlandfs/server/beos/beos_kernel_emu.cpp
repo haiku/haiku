@@ -14,8 +14,8 @@
 
 #include "../kernel_emu.h"
 
-#include "beos_fs_cache.h"
-#include "beos_lock.h"
+#include "fs_cache.h"
+#include "lock.h"
 
 
 // #pragma mark - Paths

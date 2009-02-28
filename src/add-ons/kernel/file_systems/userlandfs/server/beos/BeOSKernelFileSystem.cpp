@@ -4,8 +4,8 @@
 
 #include <new>
 
-#include "beos_fs_interface.h"
 #include "BeOSKernelVolume.h"
+#include "fs_interface.h"
 
 using std::nothrow;
 

@@ -1,5 +1,5 @@
 
-#include "beos_lock.h"
+#include "lock.h"
 
 int
 beos_new_lock(beos_lock *l, const char *name)

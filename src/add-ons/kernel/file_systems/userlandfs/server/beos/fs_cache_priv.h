@@ -6,7 +6,7 @@
 #ifndef USERLAND_FS_BEOS_FS_CACHE_PRIV_H
 #define USERLAND_FS_BEOS_FS_CACHE_PRIV_H
 
-#include "beos_lock.h"
+#include "lock.h"
 
 #ifndef _IMPEXP_KERNEL
 #define _IMPEXP_KERNEL

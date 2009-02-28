@@ -25,8 +25,8 @@
    while listening to "Welcome to SkyValley" by Kyuss as well as an
    ambient collection on the German label FAX.  Music helps a lot when
    writing code.
-  
-   THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED 
+
+   THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED
    OR IMPLIED.  YOU MAY USE THIS CODE AND FREELY DISTRIBUTE IT FOR
    NON-COMMERCIAL USE AS LONG AS THIS NOTICE REMAINS ATTACHED.
 
@@ -34,7 +34,7 @@
 
    Dominic Giampaolo
    dbg@be.com
-*/   
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,9 +50,9 @@
 #include <OS.h>
 #include <KernelExport.h>
 
-#include "beos_fs_cache.h"
-#include "beos_fs_cache_priv.h"
-#include "beos_lock.h"
+#include "fs_cache.h"
+#include "fs_cache_priv.h"
+#include "lock.h"
 
 
 
@@ -83,7 +83,7 @@ static void
 beos_panic(const char *format, ...)
 {
     va_list     ap;
-    
+
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
@@ -108,7 +108,7 @@ beos_read_phys_blocks(int fd, fs_off_t bnum, void *data, uint num_blocks, int bs
             ret = read_pos(fd, (bnum * bsize) + sum, data, CHUNK);
             if (ret != CHUNK)
                 break;
-        
+
             data = (void *)((char *)data + CHUNK);
         }
 
@@ -145,7 +145,7 @@ beos_write_phys_blocks(int fd, fs_off_t bnum, void *data, uint num_blocks, int b
             ret = write_pos(fd, (bnum * bsize) + sum, data, CHUNK);
             if (ret != CHUNK)
                 break;
-        
+
             data = (void *)((char *)data + CHUNK);
         }
 
@@ -256,7 +256,7 @@ grow_hash_table(hash_table *ht)
     int        i, omax, newsize, newmask;
     fs_off_t      hash;
     hash_ent **new_table, *he, *next;
-    
+
     if (ht->max & ht->mask) {
         printf("*** hashtable size %d or mask %d looks weird!\n", ht->max,
                ht->mask);
@@ -274,17 +274,17 @@ grow_hash_table(hash_table *ht)
         for(he=ht->table[i]; he; he=next) {
             hash = he->hash_val & newmask;
             next = he->next;
-            
+
             he->next        = new_table[hash];
             new_table[hash] = he;
         }
     }
-    
+
     free(ht->table);
     ht->table = new_table;
     ht->max   = newsize;
     ht->mask  = newmask;
-        
+
     return 0;
 }
 
@@ -312,7 +312,7 @@ hash_insert(hash_table *ht, int dev, fs_off_t bnum, void *data)
     he = new_hash_ent(dev, bnum, data);
     if (he == NULL)
         return ENOMEM;
-    
+
     he->next        = ht->table[hash];
     ht->table[hash] = he;
 
@@ -384,7 +384,7 @@ hash_delete(hash_table *ht, int dev, fs_off_t bnum)
 
 /*
   These are the global variables for the cache.
-*/  
+*/
 static block_cache  bc;
 
 #define       MAX_IOVECS  64           /* # of iovecs for use by cache code */
@@ -427,7 +427,7 @@ beos_init_block_cache(int max_blocks, int flags)
 
     if (beos_new_lock(&iovec_lock, "iovec_lock") != 0)
         goto err;
-    
+
     /* allocate two of these up front so vm won't accidently re-enter itself */
     iovec_pool[0] = (struct iovec *)malloc(sizeof(struct iovec)*NUM_FLUSH_BLOCKS);
     iovec_pool[1] = (struct iovec *)malloc(sizeof(struct iovec)*NUM_FLUSH_BLOCKS);
@@ -472,7 +472,7 @@ get_iovec_array(void)
     if (i >= MAX_IOVECS)       /* uh-oh */
         beos_panic("cache: ran out of iovecs (pool 0x%x, used 0x%x)!\n",
               &iovec_pool[0], &iovec_used[0]);
-    
+
     if (iovec_pool[i] == NULL) {
         iovec_pool[i] = (struct iovec *)malloc(sizeof(struct iovec)*NUM_FLUSH_BLOCKS);
         if (iovec_pool == NULL)
@@ -504,7 +504,7 @@ release_iovec_array(struct iovec *iov)
         iovec_used[i] = 0;
     else                     /* uh-oh */
         printf("cache: released an iovec I don't own (iov %p)\n", iov);
-    
+
 
     UNLOCK(iovec_lock);
 }
@@ -516,7 +516,7 @@ static void
 real_dump_cache_list(cache_ent_list *cel)
 {
     cache_ent *ce;
-    
+
     kprintf("starting from LRU end:\n");
 
     for (ce = cel->lru; ce; ce = ce->next) {
@@ -574,7 +574,7 @@ static void
 dump_lists(void)
 {
     cache_ent *nce;
-    
+
     printf("LOCKED 0x%x  (tail 0x%x, head 0x%x)\n", &bc.locked,
            bc.locked.lru, bc.locked.mru);
     for(nce=bc.locked.lru; nce; nce=nce->next)
@@ -596,7 +596,7 @@ check_lists(void)
 {
     cache_ent *ce, *prev, *oce;
     cache_ent_list *cel;
-    
+
     cel = &bc.normal;
     for(ce=cel->lru,prev=NULL; ce; prev=ce, ce=ce->next) {
         for(oce=bc.locked.lru; oce; oce=oce->next) {
@@ -712,7 +712,7 @@ do_find_data(int argc, char **argv)
 
 /*
   this function detaches the cache_ent from the list.
-*/  
+*/
 static void
 delete_from_list(cache_ent_list *cel, cache_ent *ce)
 {
@@ -736,14 +736,14 @@ delete_from_list(cache_ent_list *cel, cache_ent *ce)
   this function adds the cache_ent ce to the head of the
   list (i.e. the MRU end).  the cache_ent should *not*
   be in any lists.
-*/  
+*/
 static void
 add_to_head(cache_ent_list *cel, cache_ent *ce)
 {
 if (ce->next != NULL || ce->prev != NULL) {
     beos_panic("*** ath: ce has non-null next/prev ptr (ce 0x%x nxt 0x%x, prv 0x%x)\n",
            ce, ce->next, ce->prev);
-}   
+}
 
     ce->next = NULL;
     ce->prev = cel->mru;
@@ -761,14 +761,14 @@ if (ce->next != NULL || ce->prev != NULL) {
   this function adds the cache_ent ce to the tail of the
   list (i.e. the MRU end).  the cache_ent should *not*
   be in any lists.
-*/  
+*/
 static void
 add_to_tail(cache_ent_list *cel, cache_ent *ce)
 {
 if (ce->next != NULL || ce->prev != NULL) {
     beos_panic("*** att: ce has non-null next/prev ptr (ce 0x%x nxt 0x%x, prv 0x%x)\n",
            ce, ce->next, ce->prev);
-}   
+}
 
     ce->next = cel->lru;
     ce->prev = NULL;
@@ -819,7 +819,7 @@ cache_flusher(void *arg, int phase)
     LOCK(bc.lock);
 
     ce = bc.normal.lru;
-    
+
     for(num_ents=0; ce && num_ents < NUM_FLUSH_BLOCKS; ce=ce->next) {
         if (ce->flags & CE_BUSY)
             continue;
@@ -876,7 +876,7 @@ flush_cache_ent(cache_ent *ce)
 {
     int   ret = 0;
     void *data;
-    
+
     /* if true, then there's nothing to flush */
     if ((ce->flags & CE_DIRTY) == 0 && ce->clone == NULL)
         return 0;
@@ -919,7 +919,7 @@ flush_ents(cache_ent **ents, int n_ents)
     int    i, j, k, ret = 0, bsize, iocnt, do_again = 0;
     fs_off_t  start_bnum;
     struct iovec *iov;
-    
+
     iov = get_iovec_array();
     if (iov == NULL)
         return ENOMEM;
@@ -934,7 +934,7 @@ restart:
         if (ents[i]->clone == NULL && ents[i]->lock != 0)
             continue;
 
-        
+
         bsize      = ents[i]->bsize;
         start_bnum = ents[i]->block_num;
 
@@ -946,7 +946,7 @@ restart:
             if (ents[j]->clone == NULL && ents[j]->lock != 0)
                 break;
         }
-        
+
         if (j == i+1) {           /* only one block, just flush it directly */
             if ((ret = flush_cache_ent(ents[i])) != 0)
                 break;
@@ -966,7 +966,7 @@ restart:
 		if (chatty_io)
 	        printf("writev @ %Ld for %d blocks\n", start_bnum, iocnt);
 
-        ret = writev_pos(ents[i]->dev, start_bnum * (fs_off_t)bsize, 
+        ret = writev_pos(ents[i]->dev, start_bnum * (fs_off_t)bsize,
                          &iov[0], iocnt);
         if (ret != iocnt*bsize) {
             int idx;
@@ -999,7 +999,7 @@ restart:
                 ents[k]->flags &= ~CE_DIRTY;
             }
         }
-            
+
 
         i = j - 1;  /* i gets incremented by the outer for loop */
     }
@@ -1016,7 +1016,7 @@ restart:
        there are we go back to the top of the function and do the whole
        thing over.  Kind of grody but it is necessary to insure the
        correctness of the log for the Be file system.
-    */   
+    */
     if (do_again == 0) {
         for(i=0; i < n_ents; i++) {
             if ((ents[i]->flags & CE_DIRTY) == 0 || ents[i]->lock)
@@ -1029,7 +1029,7 @@ restart:
         if (do_again)
             goto restart;
     }
-    
+
     release_iovec_array(iov);
 
 
@@ -1041,7 +1041,7 @@ delete_cache_list(cache_ent_list *cel)
 {
     void      *junk;
     cache_ent *ce, *next;
-   
+
     for (ce = cel->lru; ce; ce = next) {
         next = ce->next;
         if (ce->lock != 0) {
@@ -1065,11 +1065,11 @@ delete_cache_list(cache_ent_list *cel)
         if (ce->clone)
             free(ce->clone);
         ce->clone = NULL;
-        
+
         if (ce->data)
             free(ce->data);
         ce->data = NULL;
-        
+
         if ((junk = hash_delete(&bc.ht, ce->dev, ce->block_num)) != ce) {
             printf("*** free_device_cache: bad hash table entry %Ld "
                    "%p != %p\n", ce->block_num, junk, ce);
@@ -1117,7 +1117,7 @@ int
 beos_init_cache_for_device(int fd, fs_off_t max_blocks)
 {
     int ret = 0;
-    
+
     if (fd >= MAX_DEVICES)
         return -1;
 
@@ -1139,7 +1139,7 @@ beos_init_cache_for_device(int fd, fs_off_t max_blocks)
 
 /*
    this routine assumes that bc.lock has been acquired
-*/   
+*/
 static cache_ent *
 block_lookup(int dev, fs_off_t bnum)
 {
@@ -1183,7 +1183,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
     cache_ent *ents[NUM_FLUSH_BLOCKS];
 
     LOCK(bc.lock);
-    
+
 
     for(i=0, cur=0; i < nblocks; i++) {
 
@@ -1234,7 +1234,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
             }
         }
     }
-    
+
 
     if (cur != 0) {
         UNLOCK(bc.lock);
@@ -1266,12 +1266,12 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
             beos_panic("*** set_block_info non-null callback on bnum %Ld\n",
                     ce->block_num);
         }
-        
+
         if (ce->clone != NULL) {
             beos_panic("*** ce->clone == %p, not NULL in set_block_info\n",
                     ce->clone);
         }
-        
+
         ce->clone = (void *)malloc(ce->bsize);
         if (ce->clone == NULL)
             beos_panic("*** can't clone bnum %Ld (bsize %d)\n",
@@ -1282,7 +1282,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
 
         ce->func   = func;
         ce->arg    = arg;
-        
+
         ce->logged_bnum = blocks[i];
 
         ce->lock--;
@@ -1308,13 +1308,13 @@ static void
 do_flush(cache_ent **ents, int max)
 {
     int i;
-    
+
     for(i=0; i < max; i++) {
         ents[i]->flags |= CE_BUSY;
     }
-                
+
     UNLOCK(bc.lock);
-                
+
     qsort(ents, max, sizeof(cache_ent **), cache_ent_cmp);
     flush_ents(ents, max);
 
@@ -1330,7 +1330,7 @@ beos_flush_device(int dev, int warn_locked)
     int cur;
     cache_ent *ce;
     cache_ent *ents[NUM_FLUSH_BLOCKS];
-    
+
     LOCK(bc.lock);
 
     cur = 0;
@@ -1340,7 +1340,7 @@ beos_flush_device(int dev, int warn_locked)
             ce = ce->next;
             continue;
         }
-        
+
         if ((ce->flags & CE_DIRTY) || ce->clone) {
             ents[cur++] = ce;
             if (cur >= NUM_FLUSH_BLOCKS) {
@@ -1365,7 +1365,7 @@ beos_flush_device(int dev, int warn_locked)
             ce = ce->next;
             continue;
         }
-        
+
         if (ce->clone) {
             ents[cur++] = ce;
             if (cur >= NUM_FLUSH_BLOCKS) {
@@ -1394,7 +1394,7 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
 {
     void      *junk;
     cache_ent *ce, *next = NULL;
-    
+
     for(ce=cel->lru; ce; ce=next) {
         next = ce->next;
 
@@ -1407,7 +1407,7 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
                    "0x%x! ce @ 0x%lx\n", ce->block_num, ce->lock, ce->flags,
                    (ulong)ce);
         }
-        
+
         if (allow_writes == ALLOW_WRITES &&
             ((ce->flags & CE_DIRTY) || ce->clone)) {
             ce->flags |= CE_BUSY;
@@ -1421,7 +1421,7 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
 
         if (cel->mru == ce)
             cel->mru = ce->prev;
-                    
+
         if (ce->prev)
             ce->prev->next = ce->next;
         if (ce->next)
@@ -1430,11 +1430,11 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
         if (ce->clone)
             free(ce->clone);
         ce->clone = NULL;
-        
+
         if (ce->data)
             free(ce->data);
         ce->data = NULL;
-        
+
         if ((junk = hash_delete(&bc.ht, ce->dev, ce->block_num)) != ce) {
             beos_panic("*** remove_cached_device: bad hash table entry %ld "
                    "0x%lx != 0x%lx\n", ce->block_num, (ulong)junk, (ulong)ce);
@@ -1475,13 +1475,13 @@ beos_flush_blocks(int dev, fs_off_t bnum, int nblocks)
         return 0;
 
     LOCK(bc.lock);
-    
+
     cur = 0;
     for(; nblocks > 0; nblocks--, bnum++) {
         ce = block_lookup(dev, bnum);
         if (ce == NULL)
             continue;
-            
+
         if (bnum != ce->block_num || dev != ce->dev) {
             UNLOCK(bc.lock);
             beos_panic("error2: looked up dev %d block %ld but found %d %ld\n",
@@ -1533,12 +1533,12 @@ beos_mark_blocks_dirty(int dev, fs_off_t bnum, int nblocks)
     cache_ent *ce;
 
     LOCK(bc.lock);
-    
+
     while(nblocks > 0) {
         ce = block_lookup(dev, bnum);
         if (ce) {
             ce->flags |= CE_DIRTY;
-            bnum      += 1;         
+            bnum      += 1;
             nblocks   -= 1;
         } else {     /* hmmm, that's odd, didn't find it */
             printf("** mark_blocks_diry couldn't find block %Ld (len %d)\n",
@@ -1547,7 +1547,7 @@ beos_mark_blocks_dirty(int dev, fs_off_t bnum, int nblocks)
             break;
         }
     }
-    
+
     UNLOCK(bc.lock);
 
     return ret;
@@ -1562,7 +1562,7 @@ beos_release_block(int dev, fs_off_t bnum)
 
     /* printf("rlsb: %ld\n", bnum); */
     LOCK(bc.lock);
-    
+
     ce = block_lookup(dev, bnum);
     if (ce) {
         if (bnum != ce->block_num || dev != ce->dev) {
@@ -1578,7 +1578,7 @@ beos_release_block(int dev, fs_off_t bnum)
             printf("rlsb: whoa nellie! ce %Ld has lock == %d\n",
                    ce->block_num, ce->lock);
         }
-            
+
         if (ce->lock == 0) {
             delete_from_list(&bc.locked, ce);
             add_to_head(&bc.normal, ce);
@@ -1588,7 +1588,7 @@ beos_release_block(int dev, fs_off_t bnum)
         beos_panic("** release_block asked to find %ld but it's not here\n",
                bnum);
     }
-    
+
     UNLOCK(bc.lock);
 
     return 0;
@@ -1605,7 +1605,7 @@ new_cache_ent(int bsize)
         beos_panic("*** error: cache can't allocate memory!\n");
         return NULL;
     }
-                
+
     ce->data = malloc(bsize);
     if (ce->data == NULL) {
         free(ce);
@@ -1613,7 +1613,7 @@ new_cache_ent(int bsize)
         UNLOCK(bc.lock);
         return NULL;
     }
-                
+
     ce->dev       = -1;
     ce->block_num = -1;
 
@@ -1626,7 +1626,7 @@ get_ents(cache_ent **ents, int num_needed, int max, int *num_gotten, int bsize)
 {
     int        cur, retry_counter = 0, max_retry = num_needed * 256;
     cache_ent *ce;
-    
+
     if (num_needed > max)
         beos_panic("get_ents: num_needed %d but max %d (doh!)\n", num_needed, max);
 
@@ -1658,7 +1658,7 @@ get_ents(cache_ent **ents, int num_needed, int max, int *num_gotten, int bsize)
             retry_counter++;
         }
     }
-    
+
     if (cur < num_needed && retry_counter >= max_retry) {  /* oh shit! */
         dump_cache_list();
         UNLOCK(bc.lock);
@@ -1679,7 +1679,7 @@ get_ents(cache_ent **ents, int num_needed, int max, int *num_gotten, int bsize)
 
             if (ce->lock)
                 beos_panic("get_ents:2 dirty list has locked blocks (ce 0x%x)\n",ce);
-                
+
             ce->flags   |= CE_BUSY;
             ents[cur++]  = ce;
         }
@@ -1734,7 +1734,7 @@ op_to_str(int op)
     if (op & CACHE_READ)
         strcpy(buff, "READ");
     else if (op & CACHE_WRITE)
-        strcpy(buff, "WRITE"); 
+        strcpy(buff, "WRITE");
     else if (op & CACHE_NOOP)
         strcpy(buff, "NOP");
 
@@ -1765,13 +1765,13 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
     if (num_blocks == 0)
         beos_panic("cache_io: bnum %Ld has num_blocks == 0!\n", bnum);
-    
+
     if (data == NULL && dataptr == NULL) {
         printf("major butthead move: null data and dataptr! bnum %Ld:%Ld\n",
                 bnum, num_blocks);
         return ENOMEM;
     }
-        
+
     if (data == NULL) {
         if (num_blocks != 1)    /* get_block() should never do that */
             beos_panic("cache_io: num_blocks %Ld but should be 1\n",
@@ -1818,7 +1818,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 /*
                     if we find a block in the cache we have to copy its
                     data just in case it is more recent than what we just
-                    read from disk (which could happen if someone wrote 
+                    read from disk (which could happen if someone wrote
                     these blocks after we did the read but before we locked
                     the cache and entered this loop).
                 */
@@ -1829,7 +1829,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                                 "found %d %Ld\n", dev, tmp, ce->dev,
                                 ce->block_num);
                     }
-                    
+
                     memcpy(ptr, ce->data, bsize);
                 }
             }
@@ -1861,7 +1861,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                     memcpy(ce->data, ptr, bsize);
                 }
             }
-            
+
             UNLOCK(bc.lock);
 
             if (beos_write_phys_blocks(dev, bnum, data, num_blocks, bsize) != 0) {
@@ -1880,7 +1880,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
     LOCK(bc.lock);
     while(num_blocks) {
-    
+
         ce = block_lookup(dev, bnum);
         if (ce) {
             if (bnum != ce->block_num || dev != ce->dev) {
@@ -1900,13 +1900,13 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 cel = &bc.locked;
             else
                 cel = &bc.normal;
-                
+
             delete_from_list(cel, ce);
 
             if (op & CACHE_READ) {
                 if (data && data != ce->data) {
                     memcpy(data, ce->data, bsize);
-                } else if (dataptr) { 
+                } else if (dataptr) {
                     *dataptr = ce->data;
                 } else {
                     printf("cbio:data %p dptr %p ce @ %p ce->data %p\n",
@@ -1921,7 +1921,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 memset(ce->data, 0, bsize);
                 if (data)
                     memset(data, 0, bsize);
-                
+
                 if (dataptr)
                     *dataptr = ce->data;
 
@@ -1937,7 +1937,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 cel = &bc.locked;
             else
                 cel = &bc.normal;
-                
+
             /* now put this ent at the head of the appropriate list */
             add_to_head(cel, ce);
 
@@ -1956,13 +1956,13 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                here we find out how many additional blocks in this request
                are not in the cache.  the idea is that then we can do one
                big i/o on that many blocks at once.
-            */   
+            */
             for(cur_nblocks=1;
                 cur_nblocks < num_blocks && cur_nblocks < NUM_FLUSH_BLOCKS;
                 cur_nblocks++) {
 
                 /* we can call hash_lookup() directly instead of
-                   block_lookup() because we don't care about the 
+                   block_lookup() because we don't care about the
                    state of the busy bit of the block at this point
                 */
                 if (hash_lookup(&bc.ht, dev, bnum + cur_nblocks))
@@ -1972,7 +1972,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             /*
               here we try to figure out how many extra blocks we should read
               for read-ahead.  we want to read as many as possible that are
-              not already in the cache and that don't cause us to try and 
+              not already in the cache and that don't cause us to try and
               read beyond the end of the disk.
             */
             if ((op & CACHE_READ) && (op & CACHE_READ_AHEAD_OK) &&
@@ -1994,7 +1994,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
             /* this will get us pointers to a bunch of cache_ents we can use */
             get_ents(ents, num_needed, NUM_FLUSH_BLOCKS, &real_nblocks, bsize);
-            
+
             if (real_nblocks < num_needed) {
                 beos_panic("don't have enough cache ents (need %d got %d %ld::%d)\n",
                       num_needed, real_nblocks, bnum, num_blocks);
@@ -2013,15 +2013,15 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
               always on writes) cur_nblocks == num_needed.
 
               Below, we sort the list of ents so that when we flush them
-              they go out in order. 
+              they go out in order.
             */
-            
+
             qsort(ents, real_nblocks, sizeof(cache_ent **), cache_ent_cmp);
 
             /*
               delete each ent from its list because it will change.  also
               count up how many dirty blocks there are and insert into the
-              hash table any new blocks so that no one else will try to 
+              hash table any new blocks so that no one else will try to
               read them in when we release the cache semaphore to do our I/O.
             */
             for(cur=0,num_dirty=0; cur < real_nblocks; cur++) {
@@ -2030,7 +2030,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                 /*
                    insert the new block into the hash table with its new block
-                   number. note that the block is still in the hash table for 
+                   number. note that the block is still in the hash table for
                    its old block number -- and it has to be until we are done
                    flushing it from the cache (to prevent someone else from
                    sneaking in in front of us and trying to read the same
@@ -2044,7 +2044,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                 if (ce->dev == -1)
                     continue;
-                
+
                 if ((ce->flags & CE_DIRTY) || ce->clone)
                     num_dirty++;
 
@@ -2052,7 +2052,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                     beos_panic("cbio: can't use locked blocks here ce @ 0x%x\n",ce);
                 else
                     cel = &bc.normal;
-                
+
                 delete_from_list(cel, ce);
             }
             ce = NULL;
@@ -2068,16 +2068,16 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             */
             if (num_dirty || (op & CACHE_READ)) {
                 UNLOCK(bc.lock);
-                
+
                 /* this flushes any blocks we're kicking out that are dirty */
                 if (num_dirty && (err = flush_ents(ents, real_nblocks)) != 0) {
                     printf("flush ents failed (ents @ 0x%lx, nblocks %d!\n",
                            (ulong)ents, cur_nblocks);
                     goto handle_err;
                 }
-                
+
             }
-            
+
             /*
                now that everything is flushed to disk, go through and
                make sure that the data blocks we're going to use are
@@ -2100,13 +2100,13 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                     }
                 }
             }
-                
+
             for(cur=0; cur < num_needed; cur++) {
                 if (ents[cur]->data == NULL) {
                     ents[cur]->data  = (void *)malloc(bsize);
                     ents[cur]->bsize = bsize;
                 }
-                
+
                 if (ents[cur]->data == NULL) {
                     printf("cache: no memory for block (bsize %d)!\n",
                            bsize);
@@ -2124,7 +2124,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             if (err) {
                 for(cur=0; cur < num_needed; cur++) {
                     cache_ent *tmp_ce;
-                    
+
                     tmp_ce = (cache_ent *)hash_delete(&bc.ht,dev,bnum+cur);
                     if (tmp_ce != ents[cur]) {
                         beos_panic("hash_del0: %d %ld got 0x%lx, not 0x%lx\n",
@@ -2139,7 +2139,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                                 ents[cur]->dev, ents[cur]->block_num, (ulong)tmp_ce,
                                 (ulong)ents[cur]);
                     }
-                    
+
                     ents[cur]->flags &= ~CE_BUSY;
                     if (ents[cur]->data)
                         free(ents[cur]->data);
@@ -2162,7 +2162,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                 return ENOMEM;
             }
-                
+
 
             /*
                If we go into this if statement, the block cache lock
@@ -2187,19 +2187,19 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 }
 
                 /*
-                   acquire the semaphore here so that we can go on mucking 
-                   with the cache data structures.  We need to delete old 
-                   block numbers from the hash table and set the new block 
-                   number's for the blocks we just read in.  We also put the 
+                   acquire the semaphore here so that we can go on mucking
+                   with the cache data structures.  We need to delete old
+                   block numbers from the hash table and set the new block
+                   number's for the blocks we just read in.  We also put the
                    read-ahead blocks at the head of mru list.
-                */   
+                */
 
                 LOCK(bc.lock);
             }
 
             for(cur=0; cur < num_needed; cur++) {
                 cache_ent *tmp_ce;
-                
+
                 ce = ents[cur];
                 if (ce->dev != -1) {
                     tmp_ce = hash_delete(&bc.ht, ce->dev, ce->block_num);
@@ -2224,21 +2224,21 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             */
             for(; cur < real_nblocks; cur++) {
                 ents[cur]->flags &= ~CE_BUSY;
-                
+
                 if (ents[cur]->lock)
                     beos_panic("should not have locked blocks here (ce 0x%x)\n",
                           ents[cur]);
-                
+
                 add_to_tail(&bc.normal, ents[cur]);
             }
 
             if (err) {   /* then we have some cleanup to do */
                 for(cur=0; cur < num_needed; cur++) {
                     cache_ent *tmp_ce;
-                    
+
                     /* we delete all blocks from the cache so we don't
                        leave partially written blocks in the cache */
-                    
+
                     tmp_ce = (cache_ent *)hash_delete(&bc.ht,dev,bnum+cur);
                     if (tmp_ce != ents[cur]) {
                         beos_panic("hash_del: %d %ld got 0x%lx, not 0x%lx\n",
@@ -2248,7 +2248,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                     ce = ents[cur];
                     ce->flags &= ~CE_BUSY;
-                
+
                     free(ce->data);
                     ce->data = NULL;
 
@@ -2267,10 +2267,10 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             /*
                last step: go through and make sure all the cache_ent
                structures have the right data in them, delete old guys, etc.
-            */   
+            */
             for(cur=0; cur < cur_nblocks; cur++) {
                 ce = ents[cur];
-                
+
                 if (ce->dev != -1) {   /* then clean this guy up */
                     if (ce->next || ce->prev)
                         beos_panic("ce @ 0x%x should not be in a list yet!\n", ce);
@@ -2319,18 +2319,18 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if (dataptr) {
                     *dataptr = ce->data;
                 }
-                
+
                 if (data != NULL)
                     data = (void *)((char *)data + bsize);
                 else if (cur_nblocks != 1)
                     beos_panic("cache can't handle setting data_ptr twice!\n");
             }  /* end of for(cur=0; cur < cur_nblocks; cur++) */
-                
+
             bnum       += cur_nblocks;
             num_blocks -= cur_nblocks;
 
         }   /* end of else it's not in the cache */
-        
+
     }   /* end of while(num_blocks) */
 
     UNLOCK(bc.lock);
@@ -2394,18 +2394,18 @@ beos_force_cache_flush(int dev, int prefer_log_blocks)
     cache_ent *ce;
     cache_ent *ents[NUM_FLUSH_BLOCKS];
 
-    
+
     LOCK(bc.lock);
 
     for(ce=bc.normal.lru; ce; ce=ce->next) {
         if ((ce->dev == dev) &&
             (ce->flags & CE_BUSY) == 0 &&
-            ((ce->flags & CE_DIRTY) || ce->clone) && 
+            ((ce->flags & CE_DIRTY) || ce->clone) &&
             ((prefer_log_blocks && ce->func) || (prefer_log_blocks == 0))) {
 
             ce->flags |= CE_BUSY;
             ents[count++] = ce;
-            
+
             if (count >= NUM_FLUSH_BLOCKS) {
                 break;
             }
@@ -2418,10 +2418,10 @@ beos_force_cache_flush(int dev, int prefer_log_blocks)
             if ((ce->dev == dev) &&
                 (ce->flags & CE_BUSY) == 0 &&
                 (ce->clone)) {
-                
+
                 ce->flags |= CE_BUSY;
                 ents[count++] = ce;
-            
+
                 if (count >= NUM_FLUSH_BLOCKS) {
                     break;
                 }

@@ -18,10 +18,10 @@ DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 # the library providing the BeOS kernel interface for add-ons
 SharedLibrary libuserlandfs_beos_kernel.so
 	:
-	beos_kernel_emu.cpp
+	fs_cache.c
+	lock.cpp
 
-	beos_fs_cache.c
-	beos_lock.cpp
+	beos_kernel_emu.cpp
 	BeOSKernelFileSystem.cpp
 	BeOSKernelVolume.cpp
 
