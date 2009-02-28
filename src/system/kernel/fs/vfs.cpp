@@ -480,7 +480,7 @@ static status_t attr_close(struct file_descriptor* descriptor);
 static status_t attr_read_stat(struct file_descriptor* descriptor,
 	struct stat* statData);
 static status_t attr_write_stat(struct file_descriptor* descriptor,
-	const struct stat* descriptor, int statMask);
+	const struct stat* stat, int statMask);
 static status_t index_dir_read(struct io_context* context,
 	struct file_descriptor* descriptor, struct dirent* buffer, size_t bufferSize,
 	uint32* _count);
