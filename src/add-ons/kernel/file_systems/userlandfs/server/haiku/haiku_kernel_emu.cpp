@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <disk_device_manager.h>
 #include <fs_cache.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
@@ -159,7 +160,7 @@ publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 
 // get_vnode
 status_t
-get_vnode(fs_volume *_volume, ino_t vnodeID, fs_vnode *privateNode)
+get_vnode(fs_volume *_volume, ino_t vnodeID, void **privateNode)
 {
 	HaikuKernelVolume* volume = HaikuKernelVolume::GetVolume(_volume);
 
@@ -170,7 +171,7 @@ get_vnode(fs_volume *_volume, ino_t vnodeID, fs_vnode *privateNode)
 	if (error != B_OK)
 		return error;
 
-	*privateNode = *(HaikuKernelNode*)foundNode;
+	*privateNode = ((HaikuKernelNode*)foundNode)->private_node;
 
 	return B_OK;
 }
@@ -226,6 +227,20 @@ fs_volume*
 volume_for_vnode(fs_vnode *vnode)
 {
 	return HaikuKernelNode::GetNode(vnode)->GetVolume()->GetFSVolume();
+}
+
+
+// #pragma mark - Disk Device Manager
+
+
+// get_default_partition_content_name
+status_t
+get_default_partition_content_name(partition_id partitionID,
+	const char* fileSystemName, char* buffer, size_t bufferSize)
+{
+	// TODO: Improve!
+	snprintf(buffer, bufferSize, "%s Volume", fileSystemName);
+	return B_OK;
 }
 
 
