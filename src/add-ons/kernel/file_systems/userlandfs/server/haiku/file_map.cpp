@@ -14,7 +14,7 @@
 
 #include <kernel/util/DoublyLinkedList.h>
 
-#include "haiku_lock.h"
+#include "lock.h"
 #include "vfs.h"
 
 

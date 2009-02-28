@@ -4,7 +4,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include "haiku_hash.h"
+#include "khash.h"
 
 #include <stdlib.h>
 #include <string.h>

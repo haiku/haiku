@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "haiku_block_cache.h"
+#include "block_cache.h"
 
 #include <new>
 
@@ -14,14 +14,14 @@
 
 #include <Debug.h>
 #include <KernelExport.h>
+#include <fs_cache.h>
 
 #include <kernel/util/DoublyLinkedList.h>
 
-#include "haiku_condition_variable.h"
-#include "haiku_fs_cache.h"
-#include "haiku_hash.h"
-#include "haiku_lock.h"
-#include "haiku_slab.h"
+#include "condition_variable.h"
+#include "khash.h"
+#include "lock.h"
+#include "slab.h"
 
 
 // TODO: this is a naive but growing implementation to test the API:

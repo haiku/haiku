@@ -1,9 +1,9 @@
 /*
- * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-#include "haiku_slab.h"
+#include "slab.h"
 
 #include <stdlib.h>
 

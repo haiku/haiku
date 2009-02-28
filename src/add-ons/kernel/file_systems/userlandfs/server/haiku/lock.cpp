@@ -8,7 +8,7 @@
 
 /* Mutex and recursive_lock code */
 
-#include "haiku_lock.h"
+#include "lock.h"
 
 #include <KernelExport.h>
 

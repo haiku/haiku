@@ -22,18 +22,17 @@ DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 # the library providing the Haiku kernel interface for add-ons
 SharedLibrary libuserlandfs_haiku_kernel.so
 	:
-	haiku_kernel_emu.cpp
-
-	haiku_block_cache.cpp
-	haiku_condition_variable.cpp
-	haiku_hash.cpp
-	haiku_lock.cpp
-	haiku_slab.cpp
-	HaikuKernelFileSystem.cpp
-	HaikuKernelVolume.cpp
-
+	block_cache.cpp
+	condition_variable.cpp
 	file_cache.cpp
 	file_map.cpp
+	khash.cpp
+	lock.cpp
+	slab.cpp
+
+	haiku_kernel_emu.cpp
+	HaikuKernelFileSystem.cpp
+	HaikuKernelVolume.cpp
 
 	:
 	<nogrist>UserlandFSServer

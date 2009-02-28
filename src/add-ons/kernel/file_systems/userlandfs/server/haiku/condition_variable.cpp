@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "haiku_condition_variable.h"
+#include "condition_variable.h"
 
 #include <new>
 #include <stdlib.h>
@@ -19,7 +19,7 @@
 #include <syscalls.h>
 #include <user_thread_defs.h>
 
-#include "haiku_lock.h"
+#include "lock.h"
 
 
 #define STATUS_ADDED	1
