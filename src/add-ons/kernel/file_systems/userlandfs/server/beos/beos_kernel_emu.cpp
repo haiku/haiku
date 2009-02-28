@@ -10,10 +10,12 @@
 #include <legacy/fsproto.h>
 #include <legacy/lock.h>
 
+#include "Debug.h"
+
+#include "../kernel_emu.h"
+
 #include "beos_fs_cache.h"
 #include "beos_lock.h"
-#include "Debug.h"
-#include "kernel_emu.h"
 
 
 // #pragma mark - Paths
@@ -145,7 +147,9 @@ new_vnode(nspace_id nsid, ino_t vnid, void *data)
 {
 	// The semantics of new_vnode() has changed. The new publish_vnode()
 	// should work like the former new_vnode().
-	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
+// TODO: Implement correctly! Get the type!
+//	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
+return B_BAD_VALUE;
 }
 
 // remove_vnode

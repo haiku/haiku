@@ -9,7 +9,8 @@
 
 #include "beos_fs_interface.h"
 #include "Debug.h"
-#include "kernel_emu.h"
+
+#include "../kernel_emu.h"
 
 
 using std::nothrow;
@@ -114,52 +115,7 @@ BeOSKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // Lookup
 status_t
-BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid)
-{
-	if (!fFSOps->walk)
-		return B_BAD_VALUE;
-
-	status_t error = fFSOps->walk(fVolumeCookie, dir, entryName, NULL, vnid);
-	if (error != B_OK)
-		return error;
-
-	// We need to get the node stat to return the node's type.
-// TODO: This is quite expensive. get_vnode() and put_vnode() cause trips to
-// the kernel. If it is implemented properly walk() has already called
-// get_vnode() for our node. Introducing a mechanism that would allow us to
-// temporarily track the {get,put,new}_vnode() calls of our thread would save
-// those two kernel trips.
-
-	// get the vnode
-	fs_vnode node;
-	error = UserlandFS::KernelEmu::get_vnode(GetID(), *vnid, &node);
-	if (error != B_OK) {
-		// walk() has called get_vnode() for the caller, so we need to put the
-		// node
-		UserlandFS::KernelEmu::put_vnode(GetID(), *vnid);
-		return error;
-	}
-
-	// get the node's stat
-	struct stat st;
-	error = ReadStat(node, &st);
-	if (error == B_OK)
-		*type = (st.st_mode & S_IFMT);
-
-	// put the node for our get_vnode()
-	UserlandFS::KernelEmu::put_vnode(GetID(), *vnid);
-
-	// on error put the node for walk()'s get_vnode()
-	if (error != B_OK)
-		UserlandFS::KernelEmu::put_vnode(GetID(), *vnid);
-
-	return error;
-}
-
-// LookupNoType
-status_t
-BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
-	ino_t* vnid)
+BeOSKernelVolume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 {
 	if (!fFSOps->walk)
 		return B_BAD_VALUE;
@@ -168,18 +124,35 @@ BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
 
 // ReadVNode
 status_t
-BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node, int* type,
+BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
 	uint32* flags)
 {
-#error Return type and flags!
 	if (!fFSOps->read_vnode)
 		return B_BAD_VALUE;
-	return fFSOps->read_vnode(fVolumeCookie, vnid, (char)reenter, node);
+
+	// get the node
+	status_t error = fFSOps->read_vnode(fVolumeCookie, vnid, (char)reenter,
+		node);
+	if (error != B_OK)
+		return error;
+
+	// stat it -- we need to get the node type
+	struct stat st;
+	error = ReadStat(node, &st);
+	if (error != B_OK) {
+		WriteVNode(node, reenter);
+		return error;
+	}
+
+	*type = (st.st_mode & S_IFMT);
+	*flags = 0;
+
+	return B_OK;
 }
 
 // WriteVNode
 status_t
-BeOSKernelVolume::WriteVNode(fs_vnode node, bool reenter)
+BeOSKernelVolume::WriteVNode(void* node, bool reenter)
 {
 	if (!fFSOps->write_vnode)
 		return B_BAD_VALUE;
@@ -188,7 +161,7 @@ BeOSKernelVolume::WriteVNode(fs_vnode node, bool reenter)
 
 // RemoveVNode
 status_t
-BeOSKernelVolume::RemoveVNode(fs_vnode node, bool reenter)
+BeOSKernelVolume::RemoveVNode(void* node, bool reenter)
 {
 	if (!fFSOps->remove_vnode)
 		return B_BAD_VALUE;
@@ -201,7 +174,7 @@ BeOSKernelVolume::RemoveVNode(fs_vnode node, bool reenter)
 
 // IOCtl
 status_t
-BeOSKernelVolume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command,
+BeOSKernelVolume::IOCtl(void* node, void* cookie, uint32 command,
 	void* buffer, size_t size)
 {
 	if (!fFSOps->ioctl)
@@ -212,7 +185,7 @@ BeOSKernelVolume::IOCtl(fs_vnode node, fs_cookie cookie, uint32 command,
 
 // SetFlags
 status_t
-BeOSKernelVolume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
+BeOSKernelVolume::SetFlags(void* node, void* cookie, int flags)
 {
 	if (!fFSOps->setflags)
 		return B_BAD_VALUE;
@@ -221,7 +194,7 @@ BeOSKernelVolume::SetFlags(fs_vnode node, fs_cookie cookie, int flags)
 
 // Select
 status_t
-BeOSKernelVolume::Select(fs_vnode node, fs_cookie cookie, uint8 event,
+BeOSKernelVolume::Select(void* node, void* cookie, uint8 event,
 	selectsync* sync)
 {
 	if (!fFSOps->select) {
@@ -233,7 +206,7 @@ BeOSKernelVolume::Select(fs_vnode node, fs_cookie cookie, uint8 event,
 
 // Deselect
 status_t
-BeOSKernelVolume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event,
+BeOSKernelVolume::Deselect(void* node, void* cookie, uint8 event,
 	selectsync* sync)
 {
 	if (!fFSOps->select || !fFSOps->deselect)
@@ -243,7 +216,7 @@ BeOSKernelVolume::Deselect(fs_vnode node, fs_cookie cookie, uint8 event,
 
 // FSync
 status_t
-BeOSKernelVolume::FSync(fs_vnode node)
+BeOSKernelVolume::FSync(void* node)
 {
 	if (!fFSOps->fsync)
 		return B_BAD_VALUE;
@@ -252,7 +225,7 @@ BeOSKernelVolume::FSync(fs_vnode node)
 
 // ReadSymlink
 status_t
-BeOSKernelVolume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
+BeOSKernelVolume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
 	if (!fFSOps->readlink)
@@ -263,7 +236,7 @@ BeOSKernelVolume::ReadSymlink(fs_vnode node, char* buffer, size_t bufferSize,
 
 // CreateSymlink
 status_t
-BeOSKernelVolume::CreateSymlink(fs_vnode dir, const char* name,
+BeOSKernelVolume::CreateSymlink(void* dir, const char* name,
 	const char* target, int mode)
 {
 	if (!fFSOps->symlink)
@@ -274,7 +247,7 @@ BeOSKernelVolume::CreateSymlink(fs_vnode dir, const char* name,
 
 // Link
 status_t
-BeOSKernelVolume::Link(fs_vnode dir, const char* name, fs_vnode node)
+BeOSKernelVolume::Link(void* dir, const char* name, void* node)
 {
 	if (!fFSOps->link)
 		return B_BAD_VALUE;
@@ -283,7 +256,7 @@ BeOSKernelVolume::Link(fs_vnode dir, const char* name, fs_vnode node)
 
 // Unlink
 status_t
-BeOSKernelVolume::Unlink(fs_vnode dir, const char* name)
+BeOSKernelVolume::Unlink(void* dir, const char* name)
 {
 	if (!fFSOps->unlink)
 		return B_BAD_VALUE;
@@ -292,7 +265,7 @@ BeOSKernelVolume::Unlink(fs_vnode dir, const char* name)
 
 // Rename
 status_t
-BeOSKernelVolume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
+BeOSKernelVolume::Rename(void* oldDir, const char* oldName, void* newDir,
 	const char* newName)
 {
 	if (!fFSOps->rename)
@@ -302,7 +275,7 @@ BeOSKernelVolume::Rename(fs_vnode oldDir, const char* oldName, fs_vnode newDir,
 
 // Access
 status_t
-BeOSKernelVolume::Access(fs_vnode node, int mode)
+BeOSKernelVolume::Access(void* node, int mode)
 {
 	if (!fFSOps->access)
 		return B_OK;
@@ -311,7 +284,7 @@ BeOSKernelVolume::Access(fs_vnode node, int mode)
 
 // ReadStat
 status_t
-BeOSKernelVolume::ReadStat(fs_vnode node, struct stat* st)
+BeOSKernelVolume::ReadStat(void* node, struct stat* st)
 {
 	if (!fFSOps->rstat)
 		return B_BAD_VALUE;
@@ -323,7 +296,7 @@ BeOSKernelVolume::ReadStat(fs_vnode node, struct stat* st)
 
 // WriteStat
 status_t
-BeOSKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
+BeOSKernelVolume::WriteStat(void* node, const struct stat *st, uint32 mask)
 {
 	if (!fFSOps->wstat)
 		return B_BAD_VALUE;
@@ -340,8 +313,8 @@ BeOSKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 
 // Create
 status_t
-BeOSKernelVolume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, ino_t* vnid)
+BeOSKernelVolume::Create(void* dir, const char* name, int openMode, int mode,
+	void** cookie, ino_t* vnid)
 {
 	if (!fFSOps->create)
 		return B_BAD_VALUE;
@@ -351,7 +324,7 @@ BeOSKernelVolume::Create(fs_vnode dir, const char* name, int openMode, int mode,
 
 // Open
 status_t
-BeOSKernelVolume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
+BeOSKernelVolume::Open(void* node, int openMode, void** cookie)
 {
 	if (!fFSOps->open)
 		return B_BAD_VALUE;
@@ -360,7 +333,7 @@ BeOSKernelVolume::Open(fs_vnode node, int openMode, fs_cookie* cookie)
 
 // Close
 status_t
-BeOSKernelVolume::Close(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::Close(void* node, void* cookie)
 {
 	if (!fFSOps->close)
 		return B_OK;
@@ -369,7 +342,7 @@ BeOSKernelVolume::Close(fs_vnode node, fs_cookie cookie)
 
 // FreeCookie
 status_t
-BeOSKernelVolume::FreeCookie(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::FreeCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_cookie)
 		return B_OK;
@@ -378,7 +351,7 @@ BeOSKernelVolume::FreeCookie(fs_vnode node, fs_cookie cookie)
 
 // Read
 status_t
-BeOSKernelVolume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
+BeOSKernelVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
 	if (!fFSOps->read)
@@ -389,7 +362,7 @@ BeOSKernelVolume::Read(fs_vnode node, fs_cookie cookie, off_t pos, void* buffer,
 
 // Write
 status_t
-BeOSKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
+BeOSKernelVolume::Write(void* node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	if (!fFSOps->write)
@@ -405,7 +378,7 @@ BeOSKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
 
 // CreateDir
 status_t
-BeOSKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
+BeOSKernelVolume::CreateDir(void* dir, const char* name, int mode,
 	ino_t *newDir)
 {
 	if (!fFSOps->mkdir || !fFSOps->walk)	// we need walk() too
@@ -430,7 +403,7 @@ BeOSKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
 
 // RemoveDir
 status_t
-BeOSKernelVolume::RemoveDir(fs_vnode dir, const char* name)
+BeOSKernelVolume::RemoveDir(void* dir, const char* name)
 {
 	if (!fFSOps->rmdir)
 		return B_BAD_VALUE;
@@ -439,7 +412,7 @@ BeOSKernelVolume::RemoveDir(fs_vnode dir, const char* name)
 
 // OpenDir
 status_t
-BeOSKernelVolume::OpenDir(fs_vnode node, fs_cookie* cookie)
+BeOSKernelVolume::OpenDir(void* node, void** cookie)
 {
 	if (!fFSOps->opendir)
 		return B_BAD_VALUE;
@@ -448,7 +421,7 @@ BeOSKernelVolume::OpenDir(fs_vnode node, fs_cookie* cookie)
 
 // CloseDir
 status_t
-BeOSKernelVolume::CloseDir(fs_vnode node, fs_vnode cookie)
+BeOSKernelVolume::CloseDir(void* node, void* cookie)
 {
 	if (!fFSOps->closedir)
 		return B_OK;
@@ -457,7 +430,7 @@ BeOSKernelVolume::CloseDir(fs_vnode node, fs_vnode cookie)
 
 // FreeDirCookie
 status_t
-BeOSKernelVolume::FreeDirCookie(fs_vnode node, fs_vnode cookie)
+BeOSKernelVolume::FreeDirCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_dircookie)
 		return B_OK;
@@ -466,7 +439,7 @@ BeOSKernelVolume::FreeDirCookie(fs_vnode node, fs_vnode cookie)
 
 // ReadDir
 status_t
-BeOSKernelVolume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer,
+BeOSKernelVolume::ReadDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	if (!fFSOps->readdir)
@@ -481,7 +454,7 @@ BeOSKernelVolume::ReadDir(fs_vnode node, fs_vnode cookie, void* buffer,
 
 // RewindDir
 status_t
-BeOSKernelVolume::RewindDir(fs_vnode node, fs_vnode cookie)
+BeOSKernelVolume::RewindDir(void* node, void* cookie)
 {
 	if (!fFSOps->rewinddir)
 		return B_BAD_VALUE;
@@ -494,7 +467,7 @@ BeOSKernelVolume::RewindDir(fs_vnode node, fs_vnode cookie)
 
 // OpenAttrDir
 status_t
-BeOSKernelVolume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
+BeOSKernelVolume::OpenAttrDir(void* node, void** cookie)
 {
 	if (!fFSOps->open_attrdir)
 		return B_BAD_VALUE;
@@ -503,7 +476,7 @@ BeOSKernelVolume::OpenAttrDir(fs_vnode node, fs_cookie *cookie)
 
 // CloseAttrDir
 status_t
-BeOSKernelVolume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::CloseAttrDir(void* node, void* cookie)
 {
 	if (!fFSOps->close_attrdir)
 		return B_OK;
@@ -512,7 +485,7 @@ BeOSKernelVolume::CloseAttrDir(fs_vnode node, fs_cookie cookie)
 
 // FreeAttrDirCookie
 status_t
-BeOSKernelVolume::FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::FreeAttrDirCookie(void* node, void* cookie)
 {
 	if (!fFSOps->free_attrdircookie)
 		return B_OK;
@@ -521,7 +494,7 @@ BeOSKernelVolume::FreeAttrDirCookie(fs_vnode node, fs_cookie cookie)
 
 // ReadAttrDir
 status_t
-BeOSKernelVolume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
+BeOSKernelVolume::ReadAttrDir(void* node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	if (!fFSOps->read_attrdir)
@@ -536,7 +509,7 @@ BeOSKernelVolume::ReadAttrDir(fs_vnode node, fs_cookie cookie, void* buffer,
 
 // RewindAttrDir
 status_t
-BeOSKernelVolume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::RewindAttrDir(void* node, void* cookie)
 {
 	if (!fFSOps->rewind_attrdir)
 		return B_BAD_VALUE;
@@ -549,30 +522,30 @@ BeOSKernelVolume::RewindAttrDir(fs_vnode node, fs_cookie cookie)
 
 // CreateAttr
 status_t
-BeOSKernelVolume::CreateAttr(fs_vnode node, const char* name, uint32 type,
-	int openMode, fs_cookie* cookie)
+BeOSKernelVolume::CreateAttr(void* node, const char* name, uint32 type,
+	int openMode, void** cookie)
 {
 	return _OpenAttr(node, name, type, openMode, true, cookie);
 }
 
 // OpenAttr
 status_t
-BeOSKernelVolume::OpenAttr(fs_vnode node, const char* name, int openMode,
-	fs_cookie* cookie)
+BeOSKernelVolume::OpenAttr(void* node, const char* name, int openMode,
+	void** cookie)
 {
 	return _OpenAttr(node, name, 0, openMode, false, cookie);
 }
 
 // CloseAttr
 status_t
-BeOSKernelVolume::CloseAttr(fs_vnode node, fs_cookie cookie)
+BeOSKernelVolume::CloseAttr(void* node, void* cookie)
 {
 	return B_OK;
 }
 
 // FreeAttrCookie
 status_t
-BeOSKernelVolume::FreeAttrCookie(fs_vnode node, fs_cookie _cookie)
+BeOSKernelVolume::FreeAttrCookie(void* node, void* _cookie)
 {
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
@@ -587,7 +560,7 @@ BeOSKernelVolume::FreeAttrCookie(fs_vnode node, fs_cookie _cookie)
 
 // ReadAttr
 status_t
-BeOSKernelVolume::ReadAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
+BeOSKernelVolume::ReadAttr(void* node, void* _cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
@@ -607,7 +580,7 @@ BeOSKernelVolume::ReadAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
 
 // WriteAttr
 status_t
-BeOSKernelVolume::WriteAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
+BeOSKernelVolume::WriteAttr(void* node, void* _cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
@@ -627,7 +600,7 @@ BeOSKernelVolume::WriteAttr(fs_vnode node, fs_cookie _cookie, off_t pos,
 
 // ReadAttrStat
 status_t
-BeOSKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie _cookie,
+BeOSKernelVolume::ReadAttrStat(void* node, void* _cookie,
 	struct stat *st)
 {
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
@@ -651,8 +624,8 @@ BeOSKernelVolume::ReadAttrStat(fs_vnode node, fs_cookie _cookie,
 
 // RenameAttr
 status_t
-BeOSKernelVolume::RenameAttr(fs_vnode oldNode, const char* oldName,
-	fs_vnode newNode, const char* newName)
+BeOSKernelVolume::RenameAttr(void* oldNode, const char* oldName,
+	void* newNode, const char* newName)
 {
 	if (!fFSOps->rename_attr)
 		return B_BAD_VALUE;
@@ -664,7 +637,7 @@ BeOSKernelVolume::RenameAttr(fs_vnode oldNode, const char* oldName,
 
 // RemoveAttr
 status_t
-BeOSKernelVolume::RemoveAttr(fs_vnode node, const char* name)
+BeOSKernelVolume::RemoveAttr(void* node, const char* name)
 {
 	if (!fFSOps->remove_attr)
 		return B_BAD_VALUE;
@@ -677,7 +650,7 @@ BeOSKernelVolume::RemoveAttr(fs_vnode node, const char* name)
 
 // OpenIndexDir
 status_t
-BeOSKernelVolume::OpenIndexDir(fs_cookie *cookie)
+BeOSKernelVolume::OpenIndexDir(void** cookie)
 {
 	if (!fFSOps->open_indexdir)
 		return B_BAD_VALUE;
@@ -686,7 +659,7 @@ BeOSKernelVolume::OpenIndexDir(fs_cookie *cookie)
 
 // CloseIndexDir
 status_t
-BeOSKernelVolume::CloseIndexDir(fs_cookie cookie)
+BeOSKernelVolume::CloseIndexDir(void* cookie)
 {
 	if (!fFSOps->close_indexdir)
 		return B_OK;
@@ -695,7 +668,7 @@ BeOSKernelVolume::CloseIndexDir(fs_cookie cookie)
 
 // FreeIndexDirCookie
 status_t
-BeOSKernelVolume::FreeIndexDirCookie(fs_cookie cookie)
+BeOSKernelVolume::FreeIndexDirCookie(void* cookie)
 {
 	if (!fFSOps->free_indexdircookie)
 		return B_OK;
@@ -704,7 +677,7 @@ BeOSKernelVolume::FreeIndexDirCookie(fs_cookie cookie)
 
 // ReadIndexDir
 status_t
-BeOSKernelVolume::ReadIndexDir(fs_cookie cookie, void* buffer,
+BeOSKernelVolume::ReadIndexDir(void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
 	if (!fFSOps->read_indexdir)
@@ -719,7 +692,7 @@ BeOSKernelVolume::ReadIndexDir(fs_cookie cookie, void* buffer,
 
 // RewindIndexDir
 status_t
-BeOSKernelVolume::RewindIndexDir(fs_cookie cookie)
+BeOSKernelVolume::RewindIndexDir(void* cookie)
 {
 	if (!fFSOps->rewind_indexdir)
 		return B_BAD_VALUE;
@@ -774,7 +747,7 @@ BeOSKernelVolume::ReadIndexStat(const char *name, struct stat *st)
 // OpenQuery
 status_t
 BeOSKernelVolume::OpenQuery(const char* queryString, uint32 flags, port_id port,
-	uint32 token, fs_cookie *cookie)
+	uint32 token, void** cookie)
 {
 	if (!fFSOps->open_query)
 		return B_BAD_VALUE;
@@ -784,7 +757,7 @@ BeOSKernelVolume::OpenQuery(const char* queryString, uint32 flags, port_id port,
 
 // CloseQuery
 status_t
-BeOSKernelVolume::CloseQuery(fs_cookie cookie)
+BeOSKernelVolume::CloseQuery(void* cookie)
 {
 	if (!fFSOps->close_query)
 		return B_OK;
@@ -793,7 +766,7 @@ BeOSKernelVolume::CloseQuery(fs_cookie cookie)
 
 // FreeQueryCookie
 status_t
-BeOSKernelVolume::FreeQueryCookie(fs_cookie cookie)
+BeOSKernelVolume::FreeQueryCookie(void* cookie)
 {
 	if (!fFSOps->free_querycookie)
 		return B_OK;
@@ -802,7 +775,7 @@ BeOSKernelVolume::FreeQueryCookie(fs_cookie cookie)
 
 // ReadQuery
 status_t
-BeOSKernelVolume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
+BeOSKernelVolume::ReadQuery(void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
 	if (!fFSOps->read_query)
@@ -821,8 +794,8 @@ BeOSKernelVolume::ReadQuery(fs_cookie cookie, void* buffer, size_t bufferSize,
 
 // _OpenAttr
 status_t
-BeOSKernelVolume::_OpenAttr(fs_vnode node, const char* name, uint32 type,
-	int openMode, bool create, fs_cookie* _cookie)
+BeOSKernelVolume::_OpenAttr(void* node, const char* name, uint32 type,
+	int openMode, bool create, void** _cookie)
 {
 	// check permissions first
 	int accessMode = open_mode_to_access(openMode) | (create ? W_OK : 0);
