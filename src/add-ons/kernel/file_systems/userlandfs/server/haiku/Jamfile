@@ -33,6 +33,8 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	HaikuKernelFileSystem.cpp
 	HaikuKernelVolume.cpp
 
+	file_map.cpp
+
 	:
 	<nogrist>UserlandFSServer
 ;

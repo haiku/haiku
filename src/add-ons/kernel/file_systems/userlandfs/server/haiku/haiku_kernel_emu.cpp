@@ -13,6 +13,7 @@
 #include "HaikuKernelNode.h"
 #include "HaikuKernelVolume.h"
 #include "kernel_emu.h"
+#include "vfs.h"
 
 
 // #pragma mark - Notifications
@@ -223,6 +224,26 @@ fs_volume*
 volume_for_vnode(fs_vnode *vnode)
 {
 	return HaikuKernelNode::GetNode(vnode)->GetVolume()->GetFSVolume();
+}
+
+
+// #pragma mark - VFS private
+
+
+status_t
+vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
+	struct file_io_vec *vecs, size_t *_count)
+{
+	// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+status_t
+vfs_lookup_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode)
+{
+	// TODO: Implement!
+	return B_BAD_VALUE;
 }
 
 
