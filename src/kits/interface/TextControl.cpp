@@ -547,8 +547,12 @@ BTextControl::MessageReceived(BMessage *msg)
 	switch(msg->what) {
 		case B_SET_PROPERTY:
 		case B_GET_PROPERTY:
-			// TODO
-			break;
+			// TODO: implement these.
+			
+			// fall through and pass to BControl
+			// until implemented - note that we will still
+			// need to pass these up the chain for any scripting
+			// messages we don't handle ourselves regardless.
 		default:
 			BControl::MessageReceived(msg);
 			break;
