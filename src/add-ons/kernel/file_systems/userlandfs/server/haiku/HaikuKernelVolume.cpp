@@ -47,18 +47,11 @@ HaikuKernelVolume::Mount(const char* device, uint32 flags,
 	if (!fFSModule->mount)
 		return B_BAD_VALUE;
 
-	// make the volume known to the file cache emulation
-	status_t error
-		= UserlandFS::HaikuKernelEmu::file_cache_register_volume(this);
+	// mount
+	status_t error = fFSModule->mount(&fVolume, device, flags, parameters,
+		rootID);
 	if (error != B_OK)
 		return error;
-
-	// mount
-	error = fFSModule->mount(&fVolume, device, flags, parameters, rootID);
-	if (error != B_OK) {
-		UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
-		return error;
-	}
 
 	_InitCapabilities();
 
@@ -72,13 +65,7 @@ HaikuKernelVolume::Unmount()
 	if (!fVolume.ops->unmount)
 		return B_BAD_VALUE;
 
-	// unmount
-	status_t error = fVolume.ops->unmount(&fVolume);
-
-	// unregister with the file cache emulation
-	UserlandFS::HaikuKernelEmu::file_cache_unregister_volume(this);
-
-	return error;
+	return fVolume.ops->unmount(&fVolume);
 }
 
 // Sync

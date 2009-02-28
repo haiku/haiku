@@ -26,13 +26,13 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 
 	haiku_block_cache.cpp
 	haiku_condition_variable.cpp
-#	haiku_file_cache.cpp
 	haiku_hash.cpp
 	haiku_lock.cpp
 	haiku_slab.cpp
 	HaikuKernelFileSystem.cpp
 	HaikuKernelVolume.cpp
 
+	file_cache.cpp
 	file_map.cpp
 
 	:
