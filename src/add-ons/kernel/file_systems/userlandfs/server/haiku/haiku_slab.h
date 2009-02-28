@@ -11,10 +11,6 @@
 #include <OS.h>
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
-
-
 enum {
 	/* create_object_cache_etc flags */
 	CACHE_NO_DEPOT			= 1 << 0,
@@ -34,6 +30,8 @@ typedef status_t (*object_cache_constructor)(void *cookie, void *object);
 typedef void (*object_cache_destructor)(void *cookie, void *object);
 typedef void (*object_cache_reclaimer)(void *cookie, int32 level);
 
+
+extern "C" {
 
 object_cache *create_object_cache(const char *name, size_t object_size,
 	size_t alignment, void *cookie, object_cache_constructor constructor,
@@ -56,7 +54,6 @@ status_t object_cache_reserve(object_cache *cache, size_t object_count,
 
 void object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory);
 
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS
+}	// extern "C"
 
 #endif	// USERLAND_FS_HAIKU_SLAB_SLAB_H

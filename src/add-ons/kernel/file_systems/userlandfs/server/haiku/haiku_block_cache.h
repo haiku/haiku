@@ -9,14 +9,12 @@
 #include <SupportDefs.h>
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
+extern "C" {
 
 status_t block_cache_init(void);
 size_t block_cache_used_memory();
 
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS
+}
 
 
 #endif	// USERLAND_FS_HAIKU_BLOCK_CACHE_H

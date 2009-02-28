@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <Debug.h>
+#include <KernelExport.h>
 
 #include <kernel/util/DoublyLinkedList.h>
 
@@ -21,7 +22,6 @@
 #include "haiku_hash.h"
 #include "haiku_lock.h"
 #include "haiku_slab.h"
-#include "kernel_emu.h"
 
 
 // TODO: this is a naive but growing implementation to test the API:
@@ -44,15 +44,6 @@
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
-
-
-using UserlandFS::KernelEmu::dprintf;
-using UserlandFS::KernelEmu::dump_block;
-using UserlandFS::KernelEmu::panic;
-using UserlandFS::KernelEmu::spawn_kernel_thread;
-
-namespace UserlandFS {
-namespace HaikuKernelEmu {
 
 
 static const bigtime_t kTransactionIdleTime = 2000000LL;
@@ -813,7 +804,7 @@ block_cache::Init()
 
 	cache_transaction dummyTransaction;
 	transaction_hash = hash_init(16, offset_of_member(dummyTransaction, next),
-		&transaction_compare, &UserlandFS::HaikuKernelEmu::transaction_hash);
+		&transaction_compare, &::transaction_hash);
 	if (transaction_hash == NULL)
 		return B_NO_MEMORY;
 
@@ -2343,7 +2334,7 @@ block_cache_delete(void* _cache, bool allowWrites)
 	block_cache* cache = (block_cache*)_cache;
 
 	if (allowWrites)
-		UserlandFS::HaikuKernelEmu::block_cache_sync(cache);
+		block_cache_sync(cache);
 
 	mutex_lock(&sCachesLock);
 	sCaches.Remove(cache);
@@ -2627,6 +2618,3 @@ block_cache_put(void* _cache, off_t blockNumber)
 
 	put_cached_block(cache, blockNumber);
 }
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS

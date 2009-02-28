@@ -10,14 +10,7 @@
 
 #include "haiku_lock.h"
 
-#include <OS.h>
-
-#include "kernel_emu.h"
-
-using UserlandFS::KernelEmu::panic;
-
-namespace UserlandFS {
-namespace HaikuKernelEmu {
+#include <KernelExport.h>
 
 
 sem_id
@@ -269,6 +262,3 @@ rw_lock_write_unlock(rw_lock *lock)
 {
 	return release_sem_etc(lock->sem, RW_MAX_READERS, 0);
 }
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS

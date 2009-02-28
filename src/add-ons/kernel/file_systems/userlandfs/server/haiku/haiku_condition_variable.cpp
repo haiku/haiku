@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <Debug.h>
+#include <KernelExport.h>
 
 // libroot
 #include <user_thread.h>
@@ -18,18 +19,11 @@
 #include <syscalls.h>
 #include <user_thread_defs.h>
 
-#include "kernel_emu.h"
 #include "haiku_lock.h"
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
-
 #define STATUS_ADDED	1
 #define STATUS_WAITING	2
-
-using UserlandFS::KernelEmu::dprintf;
-using UserlandFS::KernelEmu::panic;
 
 
 static const int kConditionVariableHashSize = 512;
@@ -258,6 +252,3 @@ condition_variable_init()
 
 	return error;
 }
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS

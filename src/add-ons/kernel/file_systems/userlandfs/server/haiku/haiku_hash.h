@@ -10,8 +10,6 @@
 
 #include <SupportDefs.h>
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
 
 // The use of offsetof() on non-PODs is invalid. Since many structs use
 // templated members (i.e. DoublyLinkedList) which makes them non-PODs we
@@ -27,6 +25,8 @@ typedef struct hash_iterator {
 } hash_iterator;
 
 typedef struct hash_table hash_table;
+
+extern "C" {
 
 struct hash_table *hash_init(uint32 table_size, int next_ptr_offset,
 	int compare_func(void *element, const void *key),
@@ -60,7 +60,6 @@ void hash_dump_table(struct hash_table* table);
 
 uint32 hash_hash_string(const char *str);
 
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS
+}	// extern "C"
 
 #endif	/* USERLAND_FS_HAIKU_HASH_H */

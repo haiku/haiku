@@ -10,10 +10,6 @@
 #include <new>
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
-
-
 struct object_cache {
 	object_cache(const char *name, size_t objectSize,
 		size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
@@ -92,6 +88,3 @@ void object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
 {
 	*_allocatedMemory = 0;
 }
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS

@@ -11,10 +11,6 @@
 #include <kernel/util/OpenHashTable.h>
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
-
-
 class ConditionVariable;
 
 
@@ -94,8 +90,5 @@ ConditionVariable::NotifyAll(bool threadsLocked)
 
 status_t condition_variable_init();
 
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS
 
 #endif	// USERLAND_FS_HAIKU_CONDITION_VARIABLE_H

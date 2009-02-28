@@ -11,8 +11,8 @@
 
 #include <Debug.h>
 #include <Errors.h>
+#include <KernelExport.h>
 
-#include "kernel_emu.h"
 
 #undef TRACE
 #define TRACE_HASH 0
@@ -21,12 +21,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-using UserlandFS::KernelEmu::dprintf;
-using UserlandFS::KernelEmu::panic;
-
-namespace UserlandFS {
-namespace HaikuKernelEmu {
 
 
 // TODO: the hashtable is not expanded when necessary (no load factor, nothing)
@@ -438,6 +432,3 @@ hash_dump_table(struct hash_table* table)
 		}
 	}
 }
-
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS

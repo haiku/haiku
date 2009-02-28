@@ -11,9 +11,6 @@
 #include <OS.h>
 
 
-namespace UserlandFS {
-namespace HaikuKernelEmu {
-
 typedef struct recursive_lock {
 	sem_id		sem;
 	thread_id	holder;
@@ -49,6 +46,9 @@ typedef struct rw_lock {
 #define RECURSIVE_LOCK_INITIALIZER(name)	{ _init_semaphore(1, name), -1, 0 }
 #define RW_LOCK_INITIALIZER(name)			\
 	{ _init_semaphore(RW_MAX_READERS, name) }
+
+
+extern "C" {
 
 
 sem_id _init_semaphore(int32 count, const char* name);
@@ -93,6 +93,9 @@ extern status_t rw_lock_write_lock(rw_lock* lock);
 extern status_t rw_lock_write_unlock(rw_lock* lock);
 
 
+}	// extern "C"
+
+
 /* C++ Auto Locking */
 
 #include "AutoLocker.h"
@@ -132,10 +135,5 @@ public:
 // RecursiveLocker
 typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
 
-}	// namespace HaikuKernelEmu
-}	// namespace UserlandFS
-
-using UserlandFS::HaikuKernelEmu::MutexLocker;
-using UserlandFS::HaikuKernelEmu::RecursiveLocker;
 
 #endif	/* USERLAND_FS_HAIKU_LOCK_H */
