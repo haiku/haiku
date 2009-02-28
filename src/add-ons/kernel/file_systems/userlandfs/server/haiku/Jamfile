@@ -1,0 +1,37 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems userlandfs server haiku ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
+	file_systems userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+UsePrivateSystemHeaders ;
+UsePrivateHeaders libroot ;
+
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"libuserlandfs_haiku\\\"" ;
+DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
+
+# the library providing the Haiku kernel interface for add-ons
+SharedLibrary libuserlandfs_haiku_kernel.so
+	:
+	haiku_kernel_emu.cpp
+
+	haiku_block_cache.cpp
+	haiku_condition_variable.cpp
+#	haiku_file_cache.cpp
+	haiku_hash.cpp
+	haiku_lock.cpp
+	haiku_slab.cpp
+	HaikuKernelFileSystem.cpp
+	HaikuKernelVolume.cpp
+
+	:
+	<nogrist>UserlandFSServer
+;

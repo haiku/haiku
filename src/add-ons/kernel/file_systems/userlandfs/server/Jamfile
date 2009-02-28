@@ -8,9 +8,6 @@ SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
-UsePrivateSystemHeaders ;
-UsePrivateHeaders libroot ;
-
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
@@ -19,57 +16,38 @@ DEFINES += DEBUG_APP="\\\"UserlandFSServer\\\"" ;
 DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 
 Application UserlandFSServer
-	: AreaSupport.cpp
-	  Debug.cpp
-	  DispatcherDefs.cpp
-	  driver_settings.c
-	  LazyInitializable.cpp
-	  Locker.cpp
-	  ObjectTracker.cpp
-	  Port.cpp
-	  Referencable.cpp
-	  Request.cpp
-	  RequestAllocator.cpp
-	  RequestHandler.cpp
-	  RequestPort.cpp
-	  Requests.cpp
-	  SingleReplyRequestHandler.cpp
-	  String.cpp
+	:
+	AreaSupport.cpp
+	Debug.cpp
+	DispatcherDefs.cpp
+	driver_settings.c
+	LazyInitializable.cpp
+	Locker.cpp
+	ObjectTracker.cpp
+	Port.cpp
+	Referencable.cpp
+	Request.cpp
+	RequestAllocator.cpp
+	RequestHandler.cpp
+	RequestPort.cpp
+	Requests.cpp
+	SingleReplyRequestHandler.cpp
+	String.cpp
 
-#	  beos_fs_cache.c
+	DispatcherFileSystem.cpp
+	FileSystem.cpp
+	kernel_emu.cpp
+	main.cpp
+	RequestThread.cpp
+	ServerDefs.cpp
+	UserlandFSDispatcher.cpp
+	UserlandFSServer.cpp
+	UserlandRequestHandler.cpp
+	Volume.cpp
 
-#	  beos_lock.cpp
-#	  BeOSKernelFileSystem.cpp
-#	  BeOSKernelVolume.cpp
-	  DispatcherFileSystem.cpp
-	  FileSystem.cpp
-	  haiku_block_cache.cpp
-	  haiku_condition_variable.cpp
-#	  haiku_file_cache.cpp
-	  haiku_hash.cpp
-	  haiku_lock.cpp
-	  haiku_slab.cpp
-	  HaikuKernelFileSystem.cpp
-	  HaikuKernelVolume.cpp
-	  kernel_emu.cpp
-	  main.cpp
-	  RequestThread.cpp
-	  ServerDefs.cpp
-	  UserlandFSDispatcher.cpp
-	  UserlandFSServer.cpp
-	  UserlandRequestHandler.cpp
-	  Volume.cpp
-	: be
+	:
+	be
 ;
 
-# the library providing the BeOS kernel interface for add-ons
-SharedLibrary libuserlandfs_beos_kernel.so
-	: beos_kernel_emu.cpp
-	: <nogrist>UserlandFSServer
-;
-
-# the library providing the Haiku kernel interface for add-ons
-SharedLibrary libuserlandfs_haiku_kernel.so
-	: haiku_kernel_emu.cpp
-	: <nogrist>UserlandFSServer
-;
+HaikuSubInclude beos ;
+HaikuSubInclude haiku ;
