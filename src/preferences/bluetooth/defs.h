@@ -26,6 +26,8 @@
 const uint32 kBorderSpace = 10;
 const uint32 kItemSpace = 7;
 
+static const uint32 kMsgAddToRemoteList = 'aDdL';
+
 extern LocalDevice* ActiveLocalDevice;
 
 #endif

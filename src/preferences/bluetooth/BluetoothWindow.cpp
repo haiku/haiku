@@ -10,6 +10,8 @@
 #include <Messenger.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
+#include <Roster.h>
+#include <stdio.h>
 
 #include <bluetooth/LocalDevice.h>
 #include "RemoteDevicesView.h"
@@ -105,6 +107,25 @@ BluetoothWindow::MessageReceived(BMessage *message)
 								|| fAntialiasingSettings->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 */			break;
+		case kMsgStartServices:
+			printf("kMsgStartServices\n");
+			if (!be_roster->IsRunning("application/x-vnd.Be-bluetooth_server"))
+			{
+				printf("kMsgStopServices: %s\n", strerror(be_roster->Launch("application/x-vnd.Be-bluetooth_server")));
+			}
+			break;
+		case kMsgStopServices:
+			printf("kMsgStopServices\n");
+			if (be_roster->IsRunning("application/x-vnd.Be-bluetooth_server"))
+			{
+				printf("kMsgStopServices: %s\n", strerror(BMessenger("application/x-vnd.Be-bluetooth_server").SendMessage(B_QUIT_REQUESTED)));
+			}
+			break;
+		case kMsgAddToRemoteList:
+			{
+				PostMessage(message, fRemoteDevices);
+			}
+			break;
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(message);
 		break;

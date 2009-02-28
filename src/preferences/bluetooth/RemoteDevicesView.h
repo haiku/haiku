@@ -40,7 +40,11 @@ protected:
 	void	UpdateAllColors();
 
 	BButton*		addButton;
-	BListView*		fAttrList;	
+	BButton*		removeButton;
+	BButton*		trustButton;
+	BButton*		blockButton;
+	BButton*		availButton;
+	BListView*		fDeviceList;	
 	BScrollView*	fScrollView;
 	
 

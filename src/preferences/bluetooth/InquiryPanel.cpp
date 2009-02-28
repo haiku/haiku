@@ -21,8 +21,9 @@
 
 #include "InquiryPanel.h"
 #include "DeviceListItem.h"
+#include "defs.h"
 
-using namespace bluetooth;
+using Bluetooth::DeviceListItem;
 
 // private funcionaility provided by kit
 extern uint8 GetInquiryTime();
@@ -34,7 +35,6 @@ static const uint32 kMsgShowDebug = 'ShDG';
 static const uint32 kMsgInquiry = 'iQbt';
 static const uint32 kMsgAddListDevice = 'aDdv';
 
-static const uint32 kMsgAddToRemoteList = 'aDdL';
 static const uint32 kMsgSecond = 'sCMs';
 
 
@@ -52,7 +52,8 @@ public:
 	DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 	{
 		BMessage* message = new BMessage(kMsgAddListDevice);
-		message->AddPointer("remote", btDevice);
+		
+		message->AddPointer("remoteItem", new DeviceListItem(btDevice->GetBluetoothAddress(), cod));
 		
 		fInquiryPanel->PostMessage(message);
 	}
@@ -85,18 +86,17 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
  		B_ALL_WORKSPACES ), fScanning(false)
  						  , fLocalDevice(lDevice)
 {
-	BRect iDontCare(0,0,0,0);
+//	BRect iDontCare(0,0,0,0);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fScanProgress = new BStatusBar(iDontCare, "status", "Scanning progress", "");
+	fScanProgress = new BStatusBar("status", "Scanning progress", "");
 	activeColor = fScanProgress->BarColor();
 
 	if (fLocalDevice == NULL)
 		fLocalDevice = LocalDevice::GetLocalDevice();
 
-	fMessage = new BTextView(iDontCare, "description",
-		iDontCare, B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
+	fMessage = new BTextView("description", B_WILL_DRAW);
 	fMessage->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fMessage->SetLowColor(fMessage->ViewColor());
 	fMessage->MakeEditable(false);
@@ -167,11 +167,24 @@ InquiryPanel::MessageReceived(BMessage *message)
 		
 		case kMsgAddListDevice:
 		{
-			RemoteDevice* rDevice;
+			DeviceListItem* listItem;
 			
-			message->FindPointer("remote", (void **)&rDevice);	
+			message->FindPointer("remoteItem", (void **)&listItem);	
 			
-			fRemoteList->AddItem(new RangeItem(0,1,bdaddrUtils::ToString(rDevice->GetBluetoothAddress())));		
+			fRemoteList->AddItem(listItem);		
+		}
+		break;
+
+		case kMsgAddToRemoteList:
+		{
+			message->PrintToStream();
+			int32 index = fRemoteList->CurrentSelection(0);
+			DeviceListItem* item = (DeviceListItem*) fRemoteList->ItemAt(index);
+
+			BMessage message(kMsgAddToRemoteList);
+			message.AddPointer("device", item);
+
+			be_app->PostMessage(&message);
 		}
 		break;
 
@@ -205,7 +218,7 @@ InquiryPanel::MessageReceived(BMessage *message)
 				scanningTime = scanningTime + 1;
 			}
 			
-			if (fRemoteList->CurrentSelection() < 0)
+			if (fRemoteList->CurrentSelection() < 0 || fScanning)
 				fAddButton->SetEnabled(false);
 			else
 				fAddButton->SetEnabled(true);

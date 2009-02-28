@@ -24,45 +24,48 @@ void
 BluetoothApplication::AboutRequested()
 {
 	
-	(new BAlert("about", "Haiku Bluetooth System, (ARCE)
-
-Created by Oliver Ruiz Dorantes
-
-With support of:
-	- Mika Lindqvist
-	- Maksym Yevmenkin
-
-Thanks to the individuals who helped...
-
-Shipping/donating hardware:
-	- Henry Jair Abril Florez(el Colombian)
-		 & Stefanie Bartolich
-	- Dennis d'Entremont
-	- Luroh
-	- Pieter Panman
-
-Economically:
-	- Karl von Dorf, Andrea Bernardi (OSDrawer),
-	- Matt M, Doug F, Hubert H,
-	- Sebastian B, Andrew M, Jared E,
-	- Frederik H, Tom S, Ferry B,
-	- Greg G, David F, Richard S, Martin W:
-
-With patches:
-	- Fredrik Ekdahl
-	- Andreas Färber
-
-Testing:
-	- Petter H. Juliussen
-	- Raynald Lesieur
-	- Adrien Destugues
-	- Jörg Meyer
-	
-Who gave me all the knowledge:
-	- the yellowTAB team", "OK"))->Go();
+	(new BAlert("about", "Haiku Bluetooth System, (ARCE)\n\n"
+                             "Created by Oliver Ruiz Dorantes\n\n"
+                             "With support of:\n"
+                             "	- Mika Lindqvist\n"
+                             "	- Maksym Yevmenkin\n\n"
+                             "Thanks to the individuals who helped...\n\n"
+                             "Shipping/donating hardware:\n"
+                             "	- Henry Jair Abril Florez(el Colombian)\n"
+                             "		 & Stefanie Bartolich\n"
+                             "	- Dennis d'Entremont\n"
+                             "	- Luroh\n"
+                             "	- Pieter Panman\n\n"
+                             "Economically:\n"
+                             "	- Karl von Dorf, Andrea Bernardi (OSDrawer),\n"
+                             "	- Matt M, Doug F, Hubert H,\n"
+                             "	- Sebastian B, Andrew M, Jared E,\n"
+                             "	- Frederik H, Tom S, Ferry B,\n"
+                             "	- Greg G, David F, Richard S, Martin W:\n\n"
+                             "With patches:\n"
+                             "	- Fredrik Ekdahl\n"
+                             "	- Andreas Färber\n\n"
+                             "Testing:\n"
+                             "	- Petter H. Juliussen\n"
+                             "	- Raynald Lesieur\n"
+                             "	- Adrien Destugues\n"
+                             "	- Jörg Meyer\n\n"
+                             "Who gave me all the knowledge:\n"
+                             "	- the yellowTAB team", "OK"))->Go();
 	
 }
 
+void
+BluetoothApplication::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgAddToRemoteList:
+			fWindow->PostMessage(message);
+			break;
+		default:
+			BApplication::MessageReceived(message);
+	}
+}
 
 int
 main(int, char**)

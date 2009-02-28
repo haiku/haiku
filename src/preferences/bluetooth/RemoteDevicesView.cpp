@@ -21,36 +21,39 @@
 #include "RemoteDevicesView.h"
 
 static const uint32 kMsgAddDevices = 'ddDv';
-
+static const uint32 kMsgRemoveDevice = 'rmDv';
+static const uint32 kMsgTrustDevice = 'trDv';
+static const uint32 kMsgBlockDevice = 'blDv';
+static const uint32 kMsgRefreshDevices = 'rfDv';
 
 RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
  :	BView(name, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	addButton = new BButton(BRect(5,5,5,5), "add", "Add" B_UTF8_ELLIPSIS, 
-										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
+	addButton = new BButton("add", "Add" B_UTF8_ELLIPSIS, 
+										new BMessage(kMsgAddDevices));
 	
-	BButton* removeButton = new BButton(BRect(5,5,5,5), "remove", "Remove", 
-										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
+	removeButton = new BButton("remove", "Remove", 
+										new BMessage(kMsgRemoveDevice));
 
-	BButton* trustButton = new BButton(BRect(5,5,5,5), "trust", "As Trusted", 
-										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
-
-
-	BButton* blockButton = new BButton(BRect(5,5,5,5), "trust", "As Blocked", 
-										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
+	trustButton = new BButton("trust", "As Trusted", 
+										new BMessage(kMsgTrustDevice));
 
 
-	BButton* availButton = new BButton(BRect(5,5,5,5), "check", "Refresh" B_UTF8_ELLIPSIS, 
-										new BMessage(kMsgAddDevices), B_FOLLOW_RIGHT);
+	blockButton = new BButton("trust", "As Blocked", 
+										new BMessage(kMsgBlockDevice));
+
+
+	availButton = new BButton("check", "Refresh" B_UTF8_ELLIPSIS, 
+										new BMessage(kMsgRefreshDevices));
 
 	
 		
-	// Set up list of color attributes
-	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
+	// Set up device list
+	fDeviceList = new BListView("DeviceList", B_SINGLE_SELECTION_LIST);
 	
-	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
+	fScrollView = new BScrollView("ScrollView", fDeviceList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -74,7 +77,7 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 		.SetInsets(5, 5, 5, 100)
 	);
 
-	fAttrList->SetSelectionMessage(NULL);
+	fDeviceList->SetSelectionMessage(NULL);
 }
 
 RemoteDevicesView::~RemoteDevicesView(void)
@@ -85,30 +88,37 @@ RemoteDevicesView::~RemoteDevicesView(void)
 void
 RemoteDevicesView::AttachedToWindow(void)
 {
-	fAttrList->SetTarget(this);
+	fDeviceList->SetTarget(this);
 	addButton->SetTarget(this);
+	removeButton->SetTarget(this);
+	trustButton->SetTarget(this);
+	blockButton->SetTarget(this);
+	availButton->SetTarget(this);
 
 	LoadSettings();
-	fAttrList->Select(0);
+	fDeviceList->Select(0);
 }
 
 void
 RemoteDevicesView::MessageReceived(BMessage *msg)
 {
-	if (msg->WasDropped()) {
-		rgb_color *color;
-		ssize_t size;
-		
-		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color, &size) == B_OK) {
-
-		}
-	}
-
+	printf("what = %ld\n", msg->what);
 	switch(msg->what) {
 		case kMsgAddDevices:
 		{
 			InquiryPanel* iPanel = new InquiryPanel(BRect(100,100,400,400), ActiveLocalDevice);
 			iPanel->Show();
+		}
+		break;
+		case kMsgRemoveDevice:
+			printf("kMsgRemoveDevice: %ld\n", fDeviceList->CurrentSelection(0));
+			fDeviceList->RemoveItem(fDeviceList->CurrentSelection(0));
+		break;
+		case kMsgAddToRemoteList:
+		{
+			BListItem* device;
+			msg->FindPointer("device", (void**)&device);
+			fDeviceList->AddItem(device);
 		}
 		break;
 		default:

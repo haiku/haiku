@@ -6,20 +6,37 @@
 #define DEVICELISTITEM_H_
 
 #include <ListItem.h>
+#include <String.h>
 
-namespace bluetooth {
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/DeviceClass.h>
 
-// TODO: Implement a BluetoothDeviceListItem class, this one is stolen from somewhere .....
-class RangeItem : public BListItem
+class BluetoothDevice;
+
+namespace Bluetooth {
+
+class DeviceListItem : public BListItem
 {
 	public:
-		RangeItem(uint32 lowAddress, uint32 highAddress, const char* name);
-		~RangeItem();
-		virtual void DrawItem(BView *, BRect, bool = false);
+		DeviceListItem(BluetoothDevice*	bDevice);
+		DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32	rssi = 0);
+		
+		~DeviceListItem();
+		
+		void DrawItem(BView *, BRect, bool = false);
+		void Update(BView *owner, const BFont *font);
+		
 		static int Compare(const void *firstArg, const void *secondArg);
+
 	private:
-		char* fName;
-		uint32 fLowAddress, fHighAddress;
+		void SetDevice(BluetoothDevice* bDevice);
+
+		BluetoothDevice*	fDevice;
+		bdaddr_t			fAddress;
+		DeviceClass			fClass;
+		BString				fName;
+		int32				fRSSI;
+
 };
 
 }
