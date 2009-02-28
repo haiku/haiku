@@ -14,6 +14,8 @@ public:
 								BeOSKernelFileSystem(beos_vnode_ops* fsOps);
 	virtual						~BeOSKernelFileSystem();
 
+			status_t			Init();
+
 	virtual	status_t			CreateVolume(Volume** volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
@@ -31,6 +33,7 @@ private:
 			beos_vnode_ops*		fFSOps;
 			FSVolumeCapabilities fVolumeCapabilities;
 			FSVNodeCapabilities	fNodeCapabilities;
+			bool				fBlockCacheInitialized;
 };
 
 }	// namespace UserlandFS

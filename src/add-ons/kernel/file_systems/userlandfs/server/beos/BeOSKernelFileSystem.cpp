@@ -5,22 +5,45 @@
 #include <new>
 
 #include "BeOSKernelVolume.h"
+#include "fs_cache.h"
 #include "fs_interface.h"
 
-using std::nothrow;
+
+static const int32 kMaxBlockCacheBlocks = 16384;
+
 
 // constructor
 BeOSKernelFileSystem::BeOSKernelFileSystem(beos_vnode_ops* fsOps)
-	: FileSystem(),
-	  fFSOps(fsOps)
+	:
+	FileSystem(),
+	fFSOps(fsOps),
+	fBlockCacheInitialized(false)
 {
 	_InitCapabilities();
 }
 
+
 // destructor
 BeOSKernelFileSystem::~BeOSKernelFileSystem()
 {
+	if (fBlockCacheInitialized)
+		beos_shutdown_block_cache();
 }
+
+
+// Init
+status_t
+BeOSKernelFileSystem::Init()
+{
+	// init the block cache
+	status_t error = beos_init_block_cache(kMaxBlockCacheBlocks, 0);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	fBlockCacheInitialized = true;
+	return B_OK;
+}
+
 
 // CreateVolume
 status_t
@@ -31,7 +54,7 @@ BeOSKernelFileSystem::CreateVolume(Volume** volume, dev_t id)
 		return B_BAD_VALUE;
 
 	// create the volume
-	*volume = new(nothrow) BeOSKernelVolume(this, id, fFSOps);
+	*volume = new(std::nothrow) BeOSKernelVolume(this, id, fFSOps);
 	if (!*volume)
 		return B_NO_MEMORY;
 	return B_OK;
@@ -180,4 +203,44 @@ BeOSKernelFileSystem::_InitCapabilities()
 	// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFSOps->rename_attr);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFSOps->remove_attr);
+}
+
+
+// #pragma mark - bootstrapping
+
+
+status_t
+userlandfs_create_file_system(const char* fsName, image_id image,
+	FileSystem** _fileSystem)
+{
+	// get the symbols "fs_entry" and "api_version"
+	beos_vnode_ops* fsOps;
+	status_t error = get_image_symbol(image, "fs_entry", B_SYMBOL_TYPE_DATA,
+		(void**)&fsOps);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	int32* apiVersion;
+	error = get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
+		(void**)&apiVersion);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// check api version
+	if (*apiVersion != BEOS_FS_API_VERSION)
+		RETURN_ERROR(B_ERROR);
+
+	// create the file system
+	BeOSKernelFileSystem* fileSystem
+		= new(std::nothrow) BeOSKernelFileSystem(fsOps);
+	if (!fileSystem)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	error = fileSystem->Init();
+	if (error != B_OK) {
+		delete fileSystem;
+		return error;
+	}
+
+	*_fileSystem = fileSystem;
+	return B_OK;
 }

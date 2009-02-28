@@ -4,7 +4,8 @@
 #define USERLAND_FS_FILE_SYSTEM_H
 
 #include <fs_interface.h>
-#include <SupportDefs.h>
+#include <image.h>
+#include <OS.h>
 
 #include "FSCapabilities.h"
 
@@ -34,5 +35,10 @@ protected:
 }	// namespace UserlandFS
 
 using UserlandFS::FileSystem;
+
+
+// implemented by the interface implementations
+extern "C" status_t userlandfs_create_file_system(const char* fsName,
+	image_id image, FileSystem** _fileSystem);
 
 #endif	// USERLAND_FS_FILE_SYSTEM_H
