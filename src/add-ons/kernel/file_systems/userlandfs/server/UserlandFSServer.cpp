@@ -15,20 +15,24 @@
 
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
-#include "beos_fs_cache.h"
-#include "beos_fs_interface.h"
-#include "BeOSKernelFileSystem.h"
 #include "Compatibility.h"
 #include "Debug.h"
 #include "DispatcherDefs.h"
 #include "FileSystem.h"
 #include "FSInfo.h"
+#include "RequestThread.h"
+#include "ServerDefs.h"
+
+#if 0
+#include "beos_fs_cache.h"
+#include "beos_fs_interface.h"
+#include "BeOSKernelFileSystem.h"
 #include "haiku_block_cache.h"
 #include "haiku_condition_variable.h"
 #include "haiku_fs_cache.h"
 #include "HaikuKernelFileSystem.h"
-#include "RequestThread.h"
-#include "ServerDefs.h"
+#endif
+
 
 static const int32 kRequestThreadCount = 10;
 
@@ -57,8 +61,11 @@ UserlandFSServer::~UserlandFSServer()
 	}
 	delete fNotificationRequestPort;
 	delete fFileSystem;
+// TODO:...
+#if 0
 	if (fBlockCacheInitialized)
 		beos_shutdown_block_cache();
+#endif
 	if (fAddOnImage >= 0)
 		unload_add_on(fAddOnImage);
 }
@@ -210,6 +217,8 @@ status_t
 UserlandFSServer::_CreateBeOSKernelInterface(const char* fsName, image_id image,
 	FileSystem** _fileSystem)
 {
+// TODO: Implement!
+#if 0
 	// get the symbols "fs_entry" and "api_version"
 	beos_vnode_ops* fsOps;
 	status_t error = get_image_symbol(image, "fs_entry", B_SYMBOL_TYPE_DATA,
@@ -242,6 +251,8 @@ UserlandFSServer::_CreateBeOSKernelInterface(const char* fsName, image_id image,
 	fsDeleter.Detach();
 	*_fileSystem = fileSystem;
 	return B_OK;
+#endif
+	return B_ERROR;
 }
 
 // _CreateHaikuKernelInterface
@@ -249,6 +260,8 @@ status_t
 UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
 	image_id image, FileSystem** _fileSystem)
 {
+// TODO: Implement!
+#if 0
 	// get the modules
 	module_info** modules;
 	status_t error = get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
@@ -302,4 +315,6 @@ UserlandFSServer::_CreateHaikuKernelInterface(const char* fsName,
 	fsDeleter.Detach();
 	*_fileSystem = fileSystem;
 	return B_OK;
+#endif
+	return B_ERROR;
 }
