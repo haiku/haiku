@@ -28,7 +28,7 @@ struct rld_export {
 	image_id (*load_library)(char const *path, uint32 flags, void **_handle);
 	status_t (*unload_library)(void* handle);
 	status_t (*get_image_symbol)(image_id imageID, char const *symbolName,
-		int32 symbolType, void **_location);
+		int32 symbolType, bool recursive, image_id *_inImage, void **_location);
 	status_t (*get_library_symbol)(void* handle, void* caller,
 		const char* symbolName, void **_location);
 	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char *symbolName,

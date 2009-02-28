@@ -3,17 +3,18 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <image.h>
+#include <image_private.h>
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <OS.h>
 
 #include <libroot_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 #include <user_runtime.h>
-
-#include <OS.h>
-#include <image.h>
-
-#include <stdlib.h>
-#include <string.h>
 
 
 thread_id
@@ -81,9 +82,20 @@ unload_add_on(image_id id)
 
 
 status_t
-get_image_symbol(image_id id, char const *symbolName, int32 symbolType, void **_location)
+get_image_symbol(image_id id, char const *symbolName, int32 symbolType,
+	void **_location)
 {
-	return __gRuntimeLoader->get_image_symbol(id, symbolName, symbolType, _location);
+	return __gRuntimeLoader->get_image_symbol(id, symbolName, symbolType,
+		false, NULL, _location);
+}
+
+
+status_t
+get_image_symbol_etc(image_id id, char const *symbolName, int32 symbolType,
+	bool recursive, image_id *_inImage, void **_location)
+{
+	return __gRuntimeLoader->get_image_symbol(id, symbolName, symbolType,
+		recursive, _inImage, _location);
 }
 
 

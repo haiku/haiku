@@ -2421,7 +2421,7 @@ out:
 
 status_t
 get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
-	void **_location)
+	bool recursive, image_id *_inImage, void **_location)
 {
 	status_t status = B_OK;
 	image_t *image;
@@ -2436,9 +2436,17 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 
 	// get the image from those who have been already initialized
 	image = find_loaded_image_by_id(imageID);
-	if (image != NULL)
-		status = find_symbol(image, symbolName, symbolType, _location);
-	else
+	if (image != NULL) {
+		if (recursive) {
+			// breadth-first search in the given image and its dependencies
+			status = find_symbol_breadth_first(image, symbolName, symbolType,
+				&image, _location);
+		} else
+			status = find_symbol(image, symbolName, symbolType, _location);
+
+		if (status == B_OK && _inImage != NULL)
+			*_inImage = image->id;
+	} else
 		status = B_BAD_IMAGE_ID;
 
 	rld_unlock();

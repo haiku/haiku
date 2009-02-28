@@ -35,7 +35,7 @@ status_t unload_library(void* handle, image_id imageID, bool addOn);
 status_t get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 	int32 *_nameLength, int32 *_type, void **_location);
 status_t get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
-	void **_location);
+	bool recursive, image_id *_inImage, void **_location);
 status_t get_library_symbol(void* handle, void* caller, const char* symbolName,
 	void **_location);
 status_t get_next_image_dependency(image_id id, uint32 *cookie,
