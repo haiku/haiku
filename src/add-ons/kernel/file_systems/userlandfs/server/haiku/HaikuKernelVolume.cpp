@@ -9,7 +9,6 @@
 
 #include "Debug.h"
 #include "kernel_emu.h"
-#include "haiku_fs_cache.h"
 #include "HaikuKernelNode.h"
 
 
@@ -35,6 +34,45 @@ HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 HaikuKernelVolume::~HaikuKernelVolume()
 {
 }
+
+
+// NewVNode
+status_t
+HaikuKernelVolume::NewVNode(ino_t vnodeID, void* privateNode, fs_vnode_ops* ops,
+	HaikuKernelNode** node)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// PublishVNode
+status_t
+HaikuKernelVolume::PublishVNode(ino_t vnodeID, void* privateNode,
+	fs_vnode_ops* ops, int type, uint32 flags, HaikuKernelNode** node)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// UndoNewVNode
+status_t
+HaikuKernelVolume::UndoNewVNode(HaikuKernelNode* node)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// UndoPublishVNode
+status_t
+HaikuKernelVolume::UndoPublishVNode(HaikuKernelNode* node)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
 
 // #pragma mark -
 // #pragma mark ----- FS -----
