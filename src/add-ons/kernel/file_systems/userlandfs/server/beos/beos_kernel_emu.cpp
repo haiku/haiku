@@ -147,9 +147,7 @@ new_vnode(nspace_id nsid, ino_t vnid, void *data)
 {
 	// The semantics of new_vnode() has changed. The new publish_vnode()
 	// should work like the former new_vnode().
-// TODO: Implement correctly! Get the type!
-//	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
-return B_BAD_VALUE;
+	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
 }
 
 // remove_vnode

@@ -43,9 +43,11 @@ public:
 // constructor
 BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, dev_t id,
 	beos_vnode_ops* fsOps)
-	: Volume(fileSystem, id),
-	  fFSOps(fsOps),
-	  fVolumeCookie(NULL)
+	:
+	Volume(fileSystem, id),
+	fFSOps(fsOps),
+	fVolumeCookie(NULL),
+	fMounted(false)
 {
 }
 
@@ -66,8 +68,13 @@ BeOSKernelVolume::Mount(const char* device, uint32 flags,
 		return B_BAD_VALUE;
 
 	size_t len = (parameters ? strlen(parameters) : 0);
-	return fFSOps->mount(GetID(), device, flags, (void*)parameters, len,
-		&fVolumeCookie, rootID);
+	status_t error = fFSOps->mount(GetID(), device, flags, (void*)parameters,
+		len, &fVolumeCookie, rootID);
+	if (error != B_OK)
+		return error;
+
+	fMounted = true;
+	return B_OK;
 }
 
 // Unmount
@@ -122,6 +129,35 @@ BeOSKernelVolume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 		return B_BAD_VALUE;
 	return fFSOps->walk(fVolumeCookie, dir, entryName, NULL, vnid);
 }
+
+
+// GetVNodeType
+status_t
+BeOSKernelVolume::GetVNodeType(void* node, int* type)
+{
+	if (fMounted) {
+		// The volume is mounted. We can stat() the node to get its type.
+		struct stat st;
+		status_t error = ReadStat(node, &st);
+		if (error != B_OK)
+			return error;
+
+		*type = st.st_mode & S_IFMT;
+	} else {
+		// Not mounted yet. That particularly means we don't have a volume
+		// cookie yet and cannot use calls into the FS to get the node type.
+		// Just assume the node is a directory. That definitely is the case for
+		// the root node and shouldn't do harm for the index directory or
+		// indices, which could get published while mounting as well.
+		*type = S_IFDIR;
+			// TODO: Store the concerned nodes and check their type as soon as
+			// possible (at the end of Mount()). The incorrect ones could be
+			// corrected in the kernel: remove_vnode(), x*put_vnode() (catching
+			// the "remove_vnode()" callback), publish_vnode(),
+			// (x-1)*get_vnode().
+	}
+}
+
 
 // ReadVNode
 status_t

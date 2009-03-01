@@ -27,6 +27,10 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(void* dir, const char* entryName,
 									ino_t* vnid);
+	virtual	status_t			GetVNodeType(void* node, int* type);
+									// Only needs to be implemented when
+									// the three parameters publish_vnode() is
+									// used.
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
 									void** node, int* type, uint32* flags);
 	virtual	status_t			WriteVNode(void* node, bool reenter);
@@ -153,6 +157,7 @@ private:
 private:
 			beos_vnode_ops*		fFSOps;
 			void*				fVolumeCookie;
+			bool				fMounted;
 };
 
 }	// namespace UserlandFS

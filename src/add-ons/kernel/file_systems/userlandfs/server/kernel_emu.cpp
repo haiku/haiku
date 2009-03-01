@@ -6,11 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "FileSystem.h"
 #include "RequestPort.h"
 #include "Requests.h"
 #include "RequestThread.h"
 #include "UserlandFSServer.h"
 #include "UserlandRequestHandler.h"
+#include "Volume.h"
 
 
 // Taken from the Haiku Storage Kit (storage_support.cpp)
@@ -406,6 +408,28 @@ UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data,
 		return reply->error;
 	return error;
 }
+
+
+// publish_vnode
+status_t
+UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data)
+{
+	// get the volume
+	Volume* volume = FileSystem::GetInstance()->VolumeWithID(nsid);
+	if (volume == NULL)
+		return B_BAD_VALUE;
+
+	// stat() the node to get its type
+// TODO: This must not be called while mounting!
+	int type;
+	status_t error = volume->GetVNodeType(data, &type);
+	if (error != B_OK)
+		return error;
+
+	// publish the node
+	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data, type, 0);
+}
+
 
 // remove_vnode
 status_t

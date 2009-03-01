@@ -6,18 +6,22 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "FileSystem.h"
 #include "kernel_emu.h"
+
 
 // constructor
 Volume::Volume(FileSystem* fileSystem, dev_t id)
 	: fFileSystem(fileSystem),
 	  fID(id)
 {
+	fFileSystem->RegisterVolume(this);
 }
 
 // destructor
 Volume::~Volume()
 {
+	fFileSystem->UnregisterVolume(this);
 }
 
 // GetFileSystem
@@ -84,6 +88,15 @@ Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 {
 	return B_BAD_VALUE;
 }
+
+
+// GetVNodeType
+status_t
+Volume::GetVNodeType(void* node, int* type)
+{
+	return B_NOT_SUPPORTED;
+}
+
 
 // GetVNodeName
 status_t

@@ -6,7 +6,10 @@
 #include <fs_interface.h>
 #include <SupportDefs.h>
 
+#include <kernel/util/DoublyLinkedList.h>
+
 #include "FSCapabilities.h"
+
 
 namespace UserlandFS {
 
@@ -14,7 +17,7 @@ class FileSystem;
 
 using UserlandFSUtil::FSVolumeCapabilities;
 
-class Volume {
+class Volume : public DoublyLinkedListLinkImpl<Volume> {
 public:
 								Volume(FileSystem* fileSystem, dev_t id);
 	virtual						~Volume();
@@ -38,6 +41,10 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(void* dir, const char* entryName,
 									ino_t* vnid);
+	virtual	status_t			GetVNodeType(void* node, int* type);
+									// Only needs to be implemented when
+									// the three parameters publish_vnode() is
+									// used.
 	virtual	status_t			GetVNodeName(void* node, char* buffer,
 									size_t bufferSize);
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,

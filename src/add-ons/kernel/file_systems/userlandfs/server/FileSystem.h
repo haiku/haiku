@@ -7,7 +7,11 @@
 #include <image.h>
 #include <OS.h>
 
+#include <kernel/util/DoublyLinkedList.h>
+
 #include "FSCapabilities.h"
+#include "Locker.h"
+
 
 namespace UserlandFS {
 
@@ -18,8 +22,14 @@ public:
 								FileSystem();
 	virtual						~FileSystem();
 
+	static	FileSystem*			GetInstance();
+
 	virtual	status_t			CreateVolume(Volume** volume, dev_t id) = 0;
 	virtual	status_t			DeleteVolume(Volume* volume) = 0;
+
+			void				RegisterVolume(Volume* volume);
+			void				UnregisterVolume(Volume* volume);
+			Volume*				VolumeWithID(dev_t id);
 
 			void				GetCapabilities(
 									FSCapabilities& capabilities) const
@@ -28,8 +38,15 @@ public:
 									{ return fClientFSType; }
 
 protected:
+			typedef DoublyLinkedList<Volume> VolumeList;
+
+protected:
+			Locker				fLock;
+			VolumeList			fVolumes;
 			FSCapabilities		fCapabilities;
 			client_fs_type		fClientFSType;
+
+	static	FileSystem*			sInstance;
 };
 
 }	// namespace UserlandFS

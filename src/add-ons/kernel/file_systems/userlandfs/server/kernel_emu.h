@@ -26,6 +26,7 @@ status_t acquire_vnode(dev_t nsid, ino_t vnodeID);
 status_t new_vnode(dev_t nsid, ino_t vnid, void* data);
 status_t publish_vnode(dev_t nsid, ino_t vnid, void* data, int type,
 	uint32 flags);
+status_t publish_vnode(dev_t nsid, ino_t vnid, void* data);
 status_t remove_vnode(dev_t nsid, ino_t vnid);
 status_t unremove_vnode(dev_t nsid, ino_t vnid);
 status_t get_vnode_removed(dev_t nsid, ino_t vnid, bool* removed);
