@@ -102,7 +102,7 @@ BTrackReader::BTrackReader(BFile *file, media_raw_audio_format const &format) :
 		if (track == 0 || track->InitCheck() != B_OK)
 			continue;
 		media_format fmt;
-		if (track->EncodedFormat(&fmt) != B_OK)
+		if (track->DecodedFormat(&fmt) != B_OK)
 			continue;
 		if (fmt.type == B_MEDIA_RAW_AUDIO) {
 			audiotrack = track;
