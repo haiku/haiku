@@ -27,10 +27,9 @@ class DeviceListItem : public BListItem
 		void Update(BView *owner, const BFont *font);
 		
 		static int Compare(const void *firstArg, const void *secondArg);
-
-	private:
 		void SetDevice(BluetoothDevice* bDevice);
 
+	private:
 		BluetoothDevice*	fDevice;
 		bdaddr_t			fAddress;
 		DeviceClass			fClass;

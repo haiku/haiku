@@ -85,6 +85,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
  :	BWindow(frame, "Bluetooth", B_FLOATING_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
  		B_ALL_WORKSPACES ), fScanning(false)
+ 						  , fRetrieving(false)
  						  , fLocalDevice(lDevice)
 {
 //	BRect iDontCare(0,0,0,0);
@@ -157,6 +158,7 @@ InquiryPanel::MessageReceived(BMessage *message)
 {
 	static float timer = 0; // expected time of the inquiry process
 	static float scanningTime = 0;
+	static int32 retrievalIndex = 0;
 	
 	switch (message->what) {
 		case kMsgInquiry:
@@ -194,19 +196,19 @@ InquiryPanel::MessageReceived(BMessage *message)
 
 		case kMsgStart:
 			fRemoteList->MakeEmpty();
-			fScanProgress->Reset();
-			
+			fScanProgress->Reset();			
 			scanningTime = 0;			
-			fScanning = true;			
-			UpdateUIStatus();
+			fScanning = true;
 			
+			UpdateUIStatus();
 		break;
 
 		case kMsgFinish:
-			
+			retrievalIndex = 0;
 			fScanning = false;
+			fRetrieving = true;
+
 			UpdateUIStatus();
-			
 		break;
 		
 		case kMsgSecond:
@@ -221,11 +223,28 @@ InquiryPanel::MessageReceived(BMessage *message)
 
 				scanningTime = scanningTime + 1;
 			}
-			
-			if (fRemoteList->CurrentSelection() < 0 || fScanning)
-				fAddButton->SetEnabled(false);
-			else
-				fAddButton->SetEnabled(true);
+				
+			if (fRetrieving) {
+				
+				if (retrievalIndex < fDiscoveryAgent->RetrieveDevices(0).CountItems()) {
+					
+					((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))->
+        				SetDevice((BluetoothDevice*)fDiscoveryAgent->RetrieveDevices(0).ItemAt(retrievalIndex));
+
+        			fRemoteList->Invalidate();
+        			retrievalIndex++;
+        			
+				} else {
+					
+					fRetrieving = false;
+					retrievalIndex = 0;
+					
+					fScanProgress->SetBarColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+					fScanProgress->SetTrailingText("Scanning completed ...");
+				}
+			}
+
+			UpdateUIStatus();
 		}
 		break;
 
@@ -244,12 +263,19 @@ InquiryPanel::UpdateUIStatus(void)
 		fInquiryButton->SetEnabled(false);
 		fScanProgress->SetBarColor(activeColor);
 			
-	} else {
+	} else if (fRetrieving) {
 		fInquiryButton->SetEnabled(true);
-		fScanProgress->SetBarColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fScanProgress->SetTo(100);
-		fScanProgress->SetText("Scan completed");		
+		fScanProgress->SetTrailingText("Retrieving names ...");
+	} else {
+
 	}
+	
+	if (fRemoteList->CurrentSelection() < 0 || fScanning)
+		fAddButton->SetEnabled(false);
+	else
+		fAddButton->SetEnabled(true);
+
 }
 
 

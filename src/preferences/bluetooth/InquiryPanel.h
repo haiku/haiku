@@ -37,6 +37,7 @@ private:
 	BMessageRunner*			fRunner;
 	
 	bool					fScanning;
+	bool					fRetrieving;
 	LocalDevice*			fLocalDevice;
 	DiscoveryAgent*			fDiscoveryAgent;
 	DiscoveryListener*		fDiscoveryListener;
