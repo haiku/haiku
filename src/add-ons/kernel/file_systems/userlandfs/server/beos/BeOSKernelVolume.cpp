@@ -156,6 +156,8 @@ BeOSKernelVolume::GetVNodeType(void* node, int* type)
 			// the "remove_vnode()" callback), publish_vnode(),
 			// (x-1)*get_vnode().
 	}
+
+	return B_OK;
 }
 
 
