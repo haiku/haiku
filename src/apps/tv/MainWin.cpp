@@ -132,6 +132,8 @@ MainWin::MainWin(BRect frame_rect)
 	SetChannelMenuMarker();
 
 	VideoFormatChange(fSourceWidth, fSourceHeight, fWidthScale, fHeightScale);
+
+	CenterWindow();
 }
 
 
@@ -1174,4 +1176,26 @@ MainWin::MessageReceived(BMessage *msg)
 				break;
 			}
 	}
+}
+
+
+void
+MainWin::CenterWindow()
+{
+	BScreen screen(this);
+	if (!screen.IsValid())
+		return;
+		
+	BRect frame = screen.Frame();
+	BRect windowFrame = Frame();
+	
+	float left = floor((frame.Width() - windowFrame.Width()) / 2);
+	float top = floor((frame.Height() - windowFrame.Height()) / 2);
+	
+	if (left < 20)
+		left = 20;
+	if (top < 20)
+		top = 20;
+	
+	MoveTo(left, top);	
 }

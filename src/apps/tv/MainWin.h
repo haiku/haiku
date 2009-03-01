@@ -61,7 +61,7 @@ public:
 
 	void				SetInterfaceMenuMarker();
 	void				SetChannelMenuMarker();
-	
+
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
 
 	void				UpdateWindowTitle();
@@ -75,7 +75,8 @@ public:
 	void				ToggleNoBorder();
 	void				ToggleNoMenu();
 	void				ToggleNoBorderNoMenu();
-	
+	void				CenterWindow();
+
 	void				ShowContextMenu(const BPoint &screen_point);
 	
 	BMenuBar *			fMenuBar;
