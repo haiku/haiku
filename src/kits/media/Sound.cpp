@@ -207,6 +207,8 @@ BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
 				indirectSize - bufferOffset);
 			if (outUsed != NULL)
 				*outUsed = indirectSize - bufferOffset;
+
+			free(buffer);
 		} else if (outUsed != NULL)
 			*outUsed = 0;
 

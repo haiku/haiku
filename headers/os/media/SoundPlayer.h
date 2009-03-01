@@ -123,6 +123,8 @@ protected:
 				status_t in_error);
 
 private:
+static	void _SoundPlayBufferFunc(void *cookie, void *buffer, size_t size,
+			const media_raw_audio_format &format);
 
 virtual	status_t _Reserved_SoundPlayer_0(void *, ...);
 virtual	status_t _Reserved_SoundPlayer_1(void *, ...);
@@ -134,16 +136,19 @@ virtual	status_t _Reserved_SoundPlayer_6(void *, ...);
 virtual	status_t _Reserved_SoundPlayer_7(void *, ...);
  
 		_SoundPlayNode * fPlayerNode;
+
 		struct _playing_sound {
-			_playing_sound * next;
-			off_t cur_offset;
-			BSound * sound;
+			_playing_sound *next;
+			off_t current_offset;
+			BSound *sound;
 			play_id id;
 			int32 delta;
 			int32 rate;
+			sem_id wait_sem;
 			float volume;
 		};
-		_playing_sound * _m_sounds;
+		_playing_sound *fPlayingSounds;
+
 		struct _waiting_sound {
 			_waiting_sound * next;
 			bigtime_t start_time;
@@ -152,7 +157,8 @@ virtual	status_t _Reserved_SoundPlayer_7(void *, ...);
 			int32 rate;
 			float volume;
 		};
-		_waiting_sound * _m_waiting;
+		_waiting_sound *fWaitingSounds;
+
 		void (*fPlayBufferFunc)(void * cookie, void * buffer, size_t size, const media_raw_audio_format & format);
 		void (*fNotifierFunc)(void * cookie, sound_player_notification what, ...);
 		BLocker fLocker;
