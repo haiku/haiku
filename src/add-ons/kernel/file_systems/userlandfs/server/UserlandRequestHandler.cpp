@@ -254,7 +254,8 @@ UserlandRequestHandler::_HandleRequest(MountVolumeRequest* request)
 	reply->error = result;
 	reply->volume = volume;
 	reply->rootID = rootID;
-	volume->GetCapabilities(reply->capabilities);
+	if (volume != NULL)
+		volume->GetCapabilities(reply->capabilities);
 
 	// send the reply
 	return _SendReply(allocator, false);
