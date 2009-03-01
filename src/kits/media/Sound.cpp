@@ -1,182 +1,252 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: Sound.cpp
- *  DESCR: 
- ***********************************************************************/
+/*
+ * Copyright 2009, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
+ *		Michael Lotz <mmlr@mlotz.ch>
+ */
 
 #include <Sound.h>
-#include "debug.h"
+#include <File.h>
 
-/*************************************************************
- * public BSound
- *************************************************************/
+#include "TrackReader.h"
 
-BSound::BSound(	void * data,
-				size_t size,
-				const media_raw_audio_format & format,
-				bool free_when_done)
+#include <debug.h>
+#include <new>
+#include <string.h>
+
+
+BSound::BSound(void *data, size_t size, const media_raw_audio_format &format,
+	bool freeWhenDone)
+	:	fData(data),
+		fDataSize(size),
+		fFile(NULL),
+		fRefCount(1),
+		fStatus(B_NO_INIT),
+		fFormat(format),
+		fFreeWhenDone(freeWhenDone),
+		fTrackReader(NULL)
 {
+	if (fData == NULL)
+		return;
+
+	fStatus = B_OK;
+}
+
+
+BSound::BSound(const entry_ref *soundFile, bool loadIntoMemory)
+	:	fData(NULL),
+		fDataSize(0),
+		fFile(new(std::nothrow) BFile(soundFile, B_READ_ONLY)),
+		fRefCount(1),
+		fStatus(B_NO_INIT),
+		fFreeWhenDone(false),
+		fTrackReader(NULL)
+{
+	if (fFile == NULL) {
+		fStatus = B_NO_MEMORY;
+		return;
+	}
+
+	fStatus = fFile->InitCheck();
+	if (fStatus != B_OK)
+		return;
+
+	memset(&fFormat, 0, sizeof(fFormat));
+	fTrackReader = new(std::nothrow) BPrivate::BTrackReader(fFile, fFormat);
+	if (fTrackReader == NULL) {
+		fStatus = B_NO_MEMORY;
+		return;
+	}
+
+	fStatus = fTrackReader->InitCheck();
+	if (fStatus != B_OK)
+		return;
+
+	fFormat = fTrackReader->Format();
+	fStatus = B_OK;
+}
+
+
+BSound::BSound(const media_raw_audio_format &format)
+	:	fData(NULL),
+		fDataSize(0),
+		fFile(NULL),
+		fRefCount(1),
+		fStatus(B_ERROR),
+		fFormat(format),
+		fFreeWhenDone(false),
+		fTrackReader(NULL)
+{
+	// unimplemented protected constructor
 	UNIMPLEMENTED();
 }
 
-BSound::BSound(	const entry_ref * sound_file,
-				bool load_into_memory)
+
+BSound::~BSound()
 {
-	UNIMPLEMENTED();
+	delete fTrackReader;
+	delete fFile;
+
+	if (fFreeWhenDone)
+		free(fData);
 }
 
-status_t 
+
+status_t
 BSound::InitCheck()
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	return fStatus;
 }
 
-BSound * 
+
+BSound *
 BSound::AcquireRef()
 {
-	UNIMPLEMENTED();
-	return NULL;
+	atomic_add(&fRefCount, 1);
+	return this;
 }
 
-bool 
+bool
 BSound::ReleaseRef()
 {
-	UNIMPLEMENTED();
-	return false;
+	if (atomic_add(&fRefCount, -1) == 1) {
+		delete this;
+		return false;
+	}
+
+	// TODO: verify those returns
+	return true;
 }
 
-int32 
+
+int32
 BSound::RefCount() const
 {
-	UNIMPLEMENTED();
-	return 0;
-}	// unreliable!
+	return fRefCount;
+}
 
-/* virtual */ bigtime_t 
+
+bigtime_t
 BSound::Duration() const
 {
 	UNIMPLEMENTED();
 	return 0;
 }
 
-/* virtual */ const media_raw_audio_format & 
+
+const media_raw_audio_format &
 BSound::Format() const
 {
-	UNIMPLEMENTED();	
-	return _m_format;
+	return fFormat;
 }
 
-/* virtual */ const void * 
+
+const void *
 BSound::Data() const
 {
-	UNIMPLEMENTED();
-	return NULL;
-}	/* returns NULL for files */
+	return fData;
+}
 
-/* virtual */ off_t 
+
+off_t
 BSound::Size() const
 {
-	UNIMPLEMENTED();
-	return 0;
+	if (fFile != NULL) {
+		off_t result = 0;
+		fFile->GetSize(&result);
+		return result;
+	}
+
+	return fDataSize;
 }
 
-/* virtual */ bool 
-BSound::GetDataAt(off_t offset,
-				  void * into_buffer,
-				  size_t buffer_size,
-				  size_t * out_used)
-{
-	UNIMPLEMENTED();
-	return false;
-}
-
-/*************************************************************
- * protected BSound
- *************************************************************/
-
-BSound::BSound(const media_raw_audio_format & format)
-{
-	UNIMPLEMENTED();
-}
-
-/* virtual */ status_t 
-BSound::Perform(int32 code,...)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-/*************************************************************
- * private BSound
- *************************************************************/
-
-/*
-BSound::BSound(const BSound &);	//	unimplemented
-BSound & BSound::operator=(const BSound &);	//	unimplemented
-*/
-
-void 
-BSound::Reset()
-{
-	UNIMPLEMENTED();
-}
-
-/* virtual */ 
-BSound::~BSound()
-{
-	UNIMPLEMENTED();
-}
-
-void 
-BSound::free_data()
-{
-	UNIMPLEMENTED();
-}
-
-/* static */ status_t 
-BSound::load_entry(void * arg)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-void 
-BSound::loader_thread()
-{
-	UNIMPLEMENTED();
-}
 
 bool 
-BSound::check_stop()
+BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
+	size_t *outUsed)
 {
-	UNIMPLEMENTED();
+	if (intoBuffer == NULL)
+		return false;
+
+	if (fData != NULL) {
+		size_t copySize = MIN(bufferSize, fDataSize - offset);
+		memcpy(intoBuffer, (uint8 *)fData + offset, copySize);
+		if (outUsed != NULL)
+			*outUsed = copySize;
+		return true;
+	}
+
+	if (fTrackReader != NULL) {
+		int32 frameSize = fTrackReader->FrameSize();
+		int64 frameCount = fTrackReader->CountFrames();
+		int64 startFrame = offset / frameSize;
+		if (startFrame > frameCount)
+			return false;
+
+		if (fTrackReader->SeekToFrame(&startFrame) != B_OK)
+			return false;
+
+		off_t bufferOffset = offset - startFrame * frameSize;
+		int64 directStartFrame = (offset + frameSize - 1) / frameSize;
+		int64 directFrameCount = (offset + bufferSize - directStartFrame
+			* frameSize) / frameSize;
+
+		if (bufferOffset != 0) {
+			int64 indirectFrameCount = directStartFrame - startFrame;
+			size_t indirectSize = indirectFrameCount * frameSize;
+			void *buffer = malloc(indirectSize);
+			if (buffer == NULL)
+				return false;
+
+			if (fTrackReader->ReadFrames(buffer, indirectFrameCount) != B_OK)
+				return false;
+
+			memcpy(intoBuffer, (uint8 *)buffer + bufferOffset,
+				indirectSize - bufferOffset);
+			if (outUsed != NULL)
+				*outUsed = indirectSize - bufferOffset;
+		} else if (outUsed != NULL)
+			*outUsed = 0;
+
+		if (fTrackReader->ReadFrames((uint8 *)intoBuffer + bufferOffset,
+			directFrameCount) != B_OK)
+			return false;
+
+		if (outUsed != NULL)
+			*outUsed += directFrameCount * frameSize;
+
+		return true;
+	}
+
 	return false;
 }
 
-/*************************************************************
- * public BSound
- *************************************************************/
 
-/* virtual */ status_t 
-BSound::BindTo(BSoundPlayer * player,
-			   const media_raw_audio_format & format)
+status_t
+BSound::BindTo(BSoundPlayer *player, const media_raw_audio_format &format)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
 }
 
-/* virtual */ status_t 
-BSound::UnbindFrom(BSoundPlayer * player)
+
+status_t
+BSound::UnbindFrom(BSoundPlayer *player)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
 }
 
-/*************************************************************
- * private BSound
- *************************************************************/
+
+status_t
+BSound::Perform(int32 code, ...)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
 
 status_t BSound::_Reserved_Sound_0(void *) { return B_ERROR; }
 status_t BSound::_Reserved_Sound_1(void *) { return B_ERROR; }
@@ -184,4 +254,3 @@ status_t BSound::_Reserved_Sound_2(void *) { return B_ERROR; }
 status_t BSound::_Reserved_Sound_3(void *) { return B_ERROR; }
 status_t BSound::_Reserved_Sound_4(void *) { return B_ERROR; }
 status_t BSound::_Reserved_Sound_5(void *) { return B_ERROR; }
-

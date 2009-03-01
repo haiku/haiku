@@ -8,6 +8,8 @@
 #if !defined(_TRACK_READER_H_)
 #define _TRACK_READER_H_
 
+#include <MediaTrack.h>
+
 namespace BPrivate
 {
 
