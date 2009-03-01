@@ -72,8 +72,8 @@ static status_t
 userlandfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	const char* args, ino_t* rootVnodeID)
 {
-	PRINT(("userlandfs_mount(%p (%ld), %s, 0x%lx, %s, %p, %p)\n", fsVolume,
-		fsVolume->id, device, flags, args, fsCookie, rootVnodeID));
+	PRINT(("userlandfs_mount(%p (%ld), %s, 0x%lx, %s, %p)\n", fsVolume,
+		fsVolume->id, device, flags, args, rootVnodeID));
 
 	status_t error = B_OK;
 
@@ -108,7 +108,7 @@ userlandfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	fsVolume->ops = &gUserlandFSVolumeOps;
 	*rootVnodeID = volume->GetRootID();
 
-	PRINT(("userlandfs_mount() done: %p, %lld\n", *fsVolume->private_volume,
+	PRINT(("userlandfs_mount() done: %p, %lld\n", fsVolume->private_volume,
 		*rootVnodeID));
 
 	return error;
@@ -292,8 +292,8 @@ userlandfs_set_flags(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	int flags)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_set_flags(%p, %p, %p, %d)\n", fs, fsNode->private_node,
-		cookie, flags));
+	PRINT(("userlandfs_set_flags(%p, %p, %p, %d)\n", volume,
+		fsNode->private_node, cookie, flags));
 	status_t error = volume->SetFlags(fsNode->private_node, cookie, flags);
 	PRINT(("userlandfs_set_flags() done: (%lx)\n", error));
 	return error;
@@ -372,7 +372,7 @@ userlandfs_link(fs_volume* fsVolume, fs_vnode* fsDir, const char* name,
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_link(%p, %p, `%s', %p)\n", volume,
-		fsDir->private_node, name, node));
+		fsDir->private_node, name, fsNode->private_node));
 	status_t error = volume->Link(fsDir->private_node, name,
 		fsNode->private_node);
 	PRINT(("userlandfs_link() done: (%lx)\n", error));
