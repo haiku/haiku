@@ -118,6 +118,7 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 			BListItem* device;
 			msg->FindPointer("device", (void**)&device);
 			fDeviceList->AddItem(device);
+			fDeviceList->Invalidate();
 		}
 		break;
 		default:

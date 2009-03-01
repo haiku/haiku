@@ -19,7 +19,7 @@ class DeviceListItem : public BListItem
 {
 	public:
 		DeviceListItem(BluetoothDevice*	bDevice);
-		DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32	rssi = 0);
+		DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi = 0);
 		
 		~DeviceListItem();
 		

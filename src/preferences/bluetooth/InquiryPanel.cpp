@@ -184,8 +184,8 @@ InquiryPanel::MessageReceived(BMessage *message)
 		{
 			message->PrintToStream();
 			int32 index = fRemoteList->CurrentSelection(0);
-			DeviceListItem* item = (DeviceListItem*) fRemoteList->ItemAt(index);
-
+			DeviceListItem* item = (DeviceListItem*) fRemoteList->RemoveItem(index);;
+			
 			BMessage message(kMsgAddToRemoteList);
 			message.AddPointer("device", item);
 

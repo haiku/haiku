@@ -27,7 +27,7 @@ DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice)
 }	
 
 
-DeviceListItem::DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32	rssi = 0)
+DeviceListItem::DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi)
 				:	BListItem(),				 
 				fDevice(NULL),
 				fAddress(bdaddr),
