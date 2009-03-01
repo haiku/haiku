@@ -15,6 +15,7 @@ class BStatusBar;
 class BButton;
 class BTextView;
 class BListView;
+class BScrollView;
 class LocalDevice;
 class DiscoveryAgent;
 class DiscoveryListener;
@@ -32,6 +33,7 @@ private:
 	BButton*				fInquiryButton;
 	BTextView*				fMessage;
 	BListView*				fRemoteList;
+	BScrollView*			fScrollView;
 	BMessageRunner*			fRunner;
 	
 	bool					fScanning;

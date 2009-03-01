@@ -58,8 +58,7 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	// TODO: Make list view and scroller use all the additional height
-	// available!
+	// TODO: use all the additional height
 	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 		.Add(fScrollView)
 		//.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
@@ -106,7 +105,7 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 	switch(msg->what) {
 		case kMsgAddDevices:
 		{
-			InquiryPanel* iPanel = new InquiryPanel(BRect(100,100,400,400), ActiveLocalDevice);
+			InquiryPanel* iPanel = new InquiryPanel(BRect(100,100,450,450), ActiveLocalDevice);
 			iPanel->Show();
 		}
 		break;

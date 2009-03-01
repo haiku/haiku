@@ -6,13 +6,14 @@
 #include <Alert.h>
 #include <Button.h>
 #include <GroupLayoutBuilder.h>
+#include <ListView.h>
+#include <ListItem.h>
+#include <MessageRunner.h>
+#include <ScrollView.h>
 #include <StatusBar.h>
 #include <SpaceLayoutItem.h>
 #include <TextView.h>
 #include <TabView.h>
-#include <ListView.h>
-#include <ListItem.h>
-#include <MessageRunner.h>
 
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
@@ -82,7 +83,7 @@ private:
 
 InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
  :	BWindow(frame, "Bluetooth", B_FLOATING_WINDOW,
- 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+ 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
  		B_ALL_WORKSPACES ), fScanning(false)
  						  , fLocalDevice(lDevice)
 {
@@ -111,6 +112,8 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 
 	fRemoteList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
 
+	fScrollView = new BScrollView("ScrollView", fRemoteList, 0, false, true);
+	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	if (fLocalDevice != NULL) {	
 		fMessage->SetText("Check that the bluetooth capabilities of your remote device"
@@ -137,7 +140,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(fScanProgress)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		.Add(fRemoteList)
+		.Add(fScrollView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 			.Add(fAddButton)
@@ -185,6 +188,7 @@ InquiryPanel::MessageReceived(BMessage *message)
 			message.AddPointer("device", item);
 
 			be_app->PostMessage(&message);
+			// TODO: all others listitems can be deleted
 		}
 		break;
 

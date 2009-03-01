@@ -14,7 +14,7 @@
 
 
 #define PIXELS_FOR_ICON 32
-#define INSETS  2
+#define INSETS  5
 #define TEXT_ROWS  2
 
 namespace Bluetooth {
@@ -83,12 +83,19 @@ DeviceListItem::DrawItem(BView *owner, BRect itemRect, bool	complete)
 	font_height			finfo; 
 	be_plain_font->GetHeight(&finfo);	
      				 
-	BPoint point = BPoint(itemRect.left	+	PIXELS_FOR_ICON + INSETS,	itemRect.bottom	-	finfo.descent	+	1);	
+	BPoint point = BPoint(itemRect.left	+ PIXELS_FOR_ICON + INSETS,	itemRect.bottom	-	finfo.descent	+	1);	
 	owner->SetFont(be_fixed_font); 
 	owner->SetHighColor(kBlack); 
 	owner->MovePenTo(point); 
 	
-	owner->DrawString(bdaddrUtils::ToString(fAddress));	 
+	BString secondLine;
+	
+	secondLine << bdaddrUtils::ToString(fAddress) << "   ";
+	fClass.GetMajorDeviceClass(secondLine);
+	secondLine << " / ";
+	fClass.GetMinorDeviceClass(secondLine);
+	
+	owner->DrawString(secondLine.String());	 
 
 	point	-= BPoint(0, (finfo.ascent + finfo.descent + finfo.leading)); 
 
@@ -97,8 +104,10 @@ DeviceListItem::DrawItem(BView *owner, BRect itemRect, bool	complete)
 	owner->DrawString(fName.String()); 
 	
 	// TODO: Stroke icon
-	
+	owner->StrokeRect(BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
+							itemRect.left + PIXELS_FOR_ICON, itemRect.top + PIXELS_FOR_ICON));
 	// TODO: Draw rssi
+	
 } 
 
 
@@ -109,7 +118,6 @@ DeviceListItem::Update(BView *owner, const BFont *font)
 
    	font_height height;
 	font->GetHeight(&height);
-	//SetHeight(finfo.leading*TEXT_ROWS + TEXT_ROWS*INSETS + 50);
 	SetHeight((height.ascent + height.descent + height.leading) * TEXT_ROWS + TEXT_ROWS*INSETS);
 	
 
