@@ -5,3 +5,4 @@ SubInclude HAIKU_TOP src add-ons kernel network protocols ipv4 ;
 SubInclude HAIKU_TOP src add-ons kernel network protocols tcp ;
 SubInclude HAIKU_TOP src add-ons kernel network protocols udp ;
 SubInclude HAIKU_TOP src add-ons kernel network protocols unix ;
+SubInclude HAIKU_TOP src add-ons kernel network protocols l2cap ;

@@ -146,6 +146,10 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddDriversToHaikuImage bluetooth : $(bluetoothDrivers) ;
 	AddFilesToHaikuImage beos system servers : bluetooth_server ;
 	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
+	AddFilesToHaikuImage beos system add-ons kernel network devices : bluetooth ;
+	AddFilesToHaikuImage beos system add-ons kernel network protocols : l2cap ;
+	AddFilesToHaikuImage beos system add-ons kernel bluetooth : btCoreData ;
+	AddFilesToHaikuImage beos preferences : Bluetooth ;
 	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
 
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
