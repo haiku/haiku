@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-6/2008.
+	Rudolf Cornelissen 10/2002-3/2009.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -205,7 +205,7 @@ typedef	struct {
 	uint32 size;
 } int_buf_info;
 
-typedef struct { // apsed, see comments in nv.settings
+typedef struct { // apsed, see comments in nvidia.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
 	char   primary[B_FILE_NAME_LENGTH];
@@ -224,6 +224,7 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   vga_on_tv;
 	bool   force_sync;
 	bool   force_ws;
+	bool   block_acc;
 	uint32 gpu_clk;
 	uint32 ram_clk;
 } nv_settings;

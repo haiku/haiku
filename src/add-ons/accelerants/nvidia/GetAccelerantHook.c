@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2006
+	Rudolf Cornelissen 10/2002-3/2009
 */
 
 #define MODULE_BIT 0x08000000
@@ -227,8 +227,8 @@ status_t check_acc_capability(uint32 feature)
 	}
 
 	/* hardware acceleration is only supported in modes with upto a certain
-	 * memory pitch.. */
-	if (si->acc_mode)
+	 * memory pitch.. and acceleration must not be blocked */
+	if (si->acc_mode && !si->settings.block_acc)
 	{
 		LOG(4, ("Acc: Exporting hook %s.\n", msg));
 		return B_OK;

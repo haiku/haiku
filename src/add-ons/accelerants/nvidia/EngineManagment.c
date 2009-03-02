@@ -4,7 +4,7 @@
 
 	other authors:
 	Mark Watson
-	Rudolf Cornelissen 3/2004-2/2005
+	Rudolf Cornelissen 3/2004-3/2009
 */
 
 /*
@@ -34,8 +34,8 @@ status_t ACQUIRE_ENGINE_PIO(uint32 capabilities, uint32 max_wait, sync_token *st
 	/* sync if required */
 	if (st) SYNC_TO_TOKEN(st);
 
-	/* make sure all needed engine cmd's are mapped to the FIFO */
-	nv_acc_assert_fifo();
+	/* make sure all needed engine cmd's are mapped to the FIFO if acceleration isn't blocked */
+	if (!si->settings.block_acc) nv_acc_assert_fifo();
 
 	/* return an engine token */
 	*et = &nv_engine_token;
@@ -49,8 +49,8 @@ status_t ACQUIRE_ENGINE_DMA(uint32 capabilities, uint32 max_wait, sync_token *st
 	/* sync if required */
 	if (st) SYNC_TO_TOKEN(st);
 
-	/* make sure all needed engine cmd's are mapped to the FIFO */
-	nv_acc_assert_fifo_dma();
+	/* make sure all needed engine cmd's are mapped to the FIFO if acceleration isn't blocked */
+	if (!si->settings.block_acc) nv_acc_assert_fifo_dma();
 
 	/* return an engine token */
 	*et = &nv_engine_token;
@@ -69,6 +69,9 @@ status_t RELEASE_ENGINE(engine_token *et, sync_token *st)
 
 void WAIT_ENGINE_IDLE(void)
 {
+	/* do nothing if acceleration is te be blocked */
+	if (si->settings.block_acc) return;
+
 	/*wait for the engine to be totally idle*/
 	if (!si->settings.dma_acc)
 		nv_acc_wait_idle();

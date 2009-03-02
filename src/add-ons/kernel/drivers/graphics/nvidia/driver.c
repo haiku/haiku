@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-6/2008.
+	Rudolf Cornelissen 3/2002-3/2009.
 */
 
 
@@ -383,6 +383,7 @@ static nv_settings sSettings = { // see comments in nvidia.settings
 	false,					// vga_on_tv
 	false,					// force_sync
 	true,					// force_ws
+	false,					// block_acc
 	0,						// gpu_clk
 	0,						// ram_clk
 };
@@ -1441,6 +1442,8 @@ init_driver(void)
 			"force_sync", false, false);
 		sSettings.force_ws = get_driver_boolean_parameter(settings,
 			"force_ws", false, false);
+		sSettings.block_acc = get_driver_boolean_parameter(settings,
+			"block_acc", false, false);
 
 		item = get_driver_parameter(settings, "gpu_clk", "0", "0");
 		value = strtoul(item, &end, 0);
