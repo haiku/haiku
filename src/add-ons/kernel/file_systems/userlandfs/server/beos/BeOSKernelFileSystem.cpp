@@ -54,7 +54,8 @@ BeOSKernelFileSystem::CreateVolume(Volume** volume, dev_t id)
 		return B_BAD_VALUE;
 
 	// create the volume
-	*volume = new(std::nothrow) BeOSKernelVolume(this, id, fFSOps);
+	*volume = new(std::nothrow) BeOSKernelVolume(this, id, fFSOps,
+		fVolumeCapabilities);
 	if (!*volume)
 		return B_NO_MEMORY;
 	return B_OK;

@@ -42,13 +42,14 @@ public:
 
 // constructor
 BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, dev_t id,
-	beos_vnode_ops* fsOps)
+	beos_vnode_ops* fsOps, const FSVolumeCapabilities& capabilities)
 	:
 	Volume(fileSystem, id),
 	fFSOps(fsOps),
 	fVolumeCookie(NULL),
 	fMounted(false)
 {
+	fCapabilities = capabilities;
 }
 
 // destructor

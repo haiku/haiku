@@ -12,7 +12,8 @@ namespace UserlandFS {
 class BeOSKernelVolume : public Volume {
 public:
 								BeOSKernelVolume(FileSystem* fileSystem,
-									dev_t id, beos_vnode_ops* fsOps);
+									dev_t id, beos_vnode_ops* fsOps,
+									const FSVolumeCapabilities& capabilities);
 	virtual						~BeOSKernelVolume();
 
 	// FS
