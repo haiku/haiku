@@ -13,10 +13,10 @@ SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 DEFINES += USER=1 ;
-DEFINES += DEBUG_APP="\\\"UserlandFSServer\\\"" ;
+DEFINES += DEBUG_APP="\\\"userlandfs_server\\\"" ;
 DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 
-Application UserlandFSServer
+Application userlandfs_server
 	:
 	AreaSupport.cpp
 	Debug.cpp
@@ -41,7 +41,7 @@ Application UserlandFSServer
 	main.cpp
 	RequestThread.cpp
 	ServerDefs.cpp
-	UserlandFSDispatcher.cpp
+#	UserlandFSDispatcher.cpp
 	UserlandFSServer.cpp
 	UserlandRequestHandler.cpp
 	Volume.cpp

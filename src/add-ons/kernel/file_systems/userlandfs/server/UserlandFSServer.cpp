@@ -39,6 +39,7 @@ UserlandFSServer::UserlandFSServer(const char* signature)
 {
 }
 
+
 // destructor
 UserlandFSServer::~UserlandFSServer()
 {
@@ -55,9 +56,10 @@ UserlandFSServer::~UserlandFSServer()
 		unload_add_on(fAddOnImage);
 }
 
+
 // Init
 status_t
-UserlandFSServer::Init(const char* fileSystem)
+UserlandFSServer::Init(const char* fileSystem, port_id port)
 {
 	// get the add-on path
 	BPath addOnPath;
@@ -118,10 +120,11 @@ UserlandFSServer::Init(const char* fileSystem)
 	if (gServerSettings.ShallEnterDebugger())
 		debugger("File system ready to use.");
 
-	// finally register with the dispatcher
-	error = _RegisterWithDispatcher(fileSystem);
+	// finally announce our existence
+	error = _Announce(fileSystem, port);
 	RETURN_ERROR(error);
 }
+
 
 // GetNotificationRequestPort
 RequestPort*
@@ -132,6 +135,7 @@ UserlandFSServer::GetNotificationRequestPort()
 	return NULL;
 }
 
+
 // GetFileSystem
 FileSystem*
 UserlandFSServer::GetFileSystem()
@@ -141,62 +145,37 @@ UserlandFSServer::GetFileSystem()
 	return NULL;
 }
 
-// _RegisterWithDispatcher
+
+// _Announce
 status_t
-UserlandFSServer::_RegisterWithDispatcher(const char* fsName)
+UserlandFSServer::_Announce(const char* fsName, port_id port)
 {
-	// get the dispatcher messenger from the clipboard
-	BMessenger messenger;
-	BClipboard clipboard(kUserlandFSDispatcherClipboardName);
-	if (AutoLocker<BClipboard> locker = clipboard) {
-		status_t error = B_OK;
-		if (BMessage* data = clipboard.Data()) {
-			error = data->FindMessenger("messenger", &messenger);
-			if (error != B_OK) {
-				ERROR(("No dispatcher messenger in clipboard.\n"));
-				return error;
-			}
-			if (!messenger.IsValid()) {
-				ERROR(("Found dispatcher messenger not valid.\n"));
-				return B_ERROR;
-			}
-		} else {
-			ERROR(("Failed to get clipboard data container\n"));
-			return B_ERROR;
-		}
-	} else {
-		ERROR(("Failed to lock the clipboard.\n"));
-		return B_ERROR;
+	// if not given, create a port
+	if (port < 0) {
+		char portName[B_OS_NAME_LENGTH];
+		snprintf(portName, sizeof(portName), "_userlandfs_%s", fsName);
+
+		port = create_port(1, portName);
+		if (port < 0)
+			RETURN_ERROR(port);
 	}
+
+	// allocate stack space for the FS initialization info
+	const size_t bufferSize = sizeof(fs_init_info)
+		+ sizeof(Port::Info) * (kRequestThreadCount + 1);
+	char buffer[bufferSize];
+	fs_init_info* info = (fs_init_info*)buffer;
 
 	// get the port infos
-	Port::Info infos[kRequestThreadCount + 1];
-	infos[0] = *fNotificationRequestPort->GetPortInfo();
+	info->portInfoCount = kRequestThreadCount + 1;
+	info->portInfos[0] = *fNotificationRequestPort->GetPortInfo();
 	for (int32 i = 0; i < kRequestThreadCount; i++)
-		infos[i + 1] = *fRequestThreads[i].GetPortInfo();
+		info->portInfos[i + 1] = *fRequestThreads[i].GetPortInfo();
 
 	// FS capabilities
-	FSCapabilities capabilities;
-	fFileSystem->GetCapabilities(capabilities);
+	fFileSystem->GetCapabilities(info->capabilities);
+	info->clientFSType = fFileSystem->GetClientFSType();
 
-	// init an FS info
-	FSInfo info;
-	status_t error = info.SetTo(fsName, infos, kRequestThreadCount + 1,
-		capabilities, fFileSystem->GetClientFSType());
-
-	// prepare the message
-	BMessage message(UFS_REGISTER_FS);
-	if (error == B_OK)
-		error = message.AddInt32("team", Team());
-	if (error == B_OK)
-		error = info.Archive(&message);
-
-	// send the message
-	BMessage reply;
-	error = messenger.SendMessage(&message, &reply);
-	if (error == B_OK && reply.what != UFS_REGISTER_FS_ACK) {
-		ERROR(("FS registration failed.\n"));
-		error = B_ERROR;
-	}
-	return error;
+	// send the info to our port
+	RETURN_ERROR(write_port(port, 0, buffer, bufferSize));
 }

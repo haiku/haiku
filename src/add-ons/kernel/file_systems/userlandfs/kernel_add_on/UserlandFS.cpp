@@ -1,4 +1,7 @@
-// UserlandFS.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "UserlandFS.h"
 
@@ -18,9 +21,9 @@ UserlandFS* UserlandFS::sUserlandFS = NULL;
 
 // constructor
 UserlandFS::UserlandFS()
-	: fPort(NULL),
-	  fFileSystems(NULL),
-	  fDebuggerCommandsAdded(false)
+	:
+	fFileSystems(NULL),
+	fDebuggerCommandsAdded(false)
 {
 }
 
@@ -28,19 +31,6 @@ UserlandFS::UserlandFS()
 UserlandFS::~UserlandFS()
 {
 PRINT(("UserlandFS::~UserlandFS()\n"))
-	if (fPort) {
-		// send a disconnect request
-		RequestAllocator allocator(fPort->GetPort());
-		UFSDisconnectRequest* request;
-		if (AllocateRequest(allocator, &request) == B_OK) {
-			if (fPort->SendRequest(&allocator) != B_OK)
-				PRINT(("  failed to send disconnect request\n"));
-		} else
-			PRINT(("  failed to allocate disconnect request\n"));
-		delete fPort;
-	} else
-		PRINT(("  no port\n"));
-
 	delete fFileSystems;
 	if (fDebuggerCommandsAdded)
 		KernelDebug::RemoveDebuggerCommands();
@@ -99,8 +89,8 @@ UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 		if (fileSystemInitializer) {
 			fileSystemInitializer->AddReference();
 		} else {
-			fileSystemInitializer = new(nothrow) FileSystemInitializer(name,
-				fPort);
+			fileSystemInitializer = new(nothrow) FileSystemInitializer(name/*,
+				fPort*/);
 			if (!fileSystemInitializer)
 				return B_NO_MEMORY;
 
@@ -156,40 +146,7 @@ UserlandFS::_Init()
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// find the dispatcher ports
-	port_id port = find_port(kUserlandFSDispatcherPortName);
-	if (port < 0)
-		RETURN_ERROR(B_ERROR);
-	port_id replyPort = find_port(kUserlandFSDispatcherReplyPortName);
-	if (replyPort < 0)
-		RETURN_ERROR(B_ERROR);
-
-	// create a reply port
-	// send a connection request
-	error = write_port(port, UFS_DISPATCHER_CONNECT, NULL, 0);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// receive the reply
-	int32 replyCode;
-	Port::Info portInfo;
-	ssize_t bytesRead = read_port(replyPort, &replyCode, &portInfo,
-		sizeof(Port::Info));
-	if (bytesRead < 0)
-		RETURN_ERROR(bytesRead);
-	if (replyCode != UFS_DISPATCHER_CONNECT_ACK)
-		RETURN_ERROR(B_BAD_DATA);
-	if (bytesRead != sizeof(Port::Info))
-		RETURN_ERROR(B_BAD_DATA);
-
-	// create a request port
-	fPort = new(nothrow) RequestPort(&portInfo);
-	if (!fPort)
-		RETURN_ERROR(B_NO_MEMORY);
-	if ((error = fPort->InitCheck()) != B_OK)
-		RETURN_ERROR(error);
-
-	RETURN_ERROR(error);
+	return B_OK;
 }
 
 // _UnregisterFileSystem

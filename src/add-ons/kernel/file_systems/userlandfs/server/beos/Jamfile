@@ -26,5 +26,5 @@ SharedLibrary libuserlandfs_beos_kernel.so
 	BeOSKernelVolume.cpp
 
 	:
-	<nogrist>UserlandFSServer
+	<nogrist>userlandfs_server
 ;

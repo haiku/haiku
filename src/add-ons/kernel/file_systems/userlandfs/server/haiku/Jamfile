@@ -34,5 +34,5 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	HaikuKernelVolume.cpp
 
 	:
-	<nogrist>UserlandFSServer
+	<nogrist>userlandfs_server
 ;

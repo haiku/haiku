@@ -1,11 +1,13 @@
 // main.cpp
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include <new>
 
 #include "Debug.h"
 #include "ServerDefs.h"
-#include "UserlandFSDispatcher.h"
 #include "UserlandFSServer.h"
 
 // server signature
@@ -14,19 +16,19 @@ static const char* kServerSignature
 
 // usage
 static const char* kUsage =
-"Usage: %s <options>\n"
-"       %s <options> <file system>\n"
+"Usage: %s <options> <file system> [ <port> ]\n"
 "\n"
-"The first version runs the server as the dispatcher, i.e. as the singleton\n"
-"app the kernel add-on contacts when it is looking for a file system.\n"
-"The dispatcher uses the second version to start a server for a specific file\n"
-"system.\n"
+"Runs the userlandfs server for a given file system. Typically this is done\n"
+"automatically by the kernel module when a volume is requested to be mounted,\n"
+"but running the server manually can be useful for debugging purposes. The\n"
+"<file system> argument specifies the name of the file system to be loaded.\n"
+"<port> should not be given when starting the server manually; it is used by\n"
+"the kernel module only.\n"
 "\n"
 "Options:\n"
 "  --debug     - the file system server enters the debugger after the\n"
 "                userland file system add-on has been loaded and is\n"
-"                ready to be used. If specified for the dispatcher, it\n"
-"                passes the flag to all file system servers it starts.\n"
+"                ready to be used.\n"
 "  -h, --help  - print this text\n"
 ;
 
@@ -80,37 +82,36 @@ main(int argc, char** argv)
 		fileSystem = argv[argi++];
 		dispatcher = false;
 	}
+
+	// get the port, if any
+	int32 port = -1;
+	if (argi < argc) {
+		port = atol(argv[argi++]);
+		if (port <= 0) {
+			print_usage();
+			return 1;
+		}
+	}
+
 	if (argi < argc) {
 		print_usage();
 		return 1;
 	}
 
 	// create and init the application
-	BApplication* app = NULL;
 	status_t error = B_OK;
-	if (dispatcher) {
-		UserlandFSDispatcher* dispatcher
-			= new(nothrow) UserlandFSDispatcher(kServerSignature);
-		if (!dispatcher) {
-			fprintf(stderr, "Failed to create dispatcher.\n");
-			return 1;
-		}
-		error = dispatcher->Init();
-		app = dispatcher;
-	} else {
-		UserlandFSServer* server
-			= new(nothrow) UserlandFSServer(kServerSignature);
-		if (!server) {
-			fprintf(stderr, "Failed to create server.\n");
-			return 1;
-		}
-		error = server->Init(fileSystem);
-		app = server;
+	UserlandFSServer* server
+		= new(std::nothrow) UserlandFSServer(kServerSignature);
+	if (!server) {
+		fprintf(stderr, "Failed to create server.\n");
+		return 1;
 	}
+	error = server->Init(fileSystem, port);
 
 	// run it, if everything went fine
 	if (error == B_OK)
-		app->Run();
-	delete app;
+		server->Run();
+
+	delete server;
 	return 0;
 }

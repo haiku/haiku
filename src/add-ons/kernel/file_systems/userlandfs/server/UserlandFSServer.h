@@ -21,13 +21,13 @@ public:
 								UserlandFSServer(const char* signature);
 	virtual						~UserlandFSServer();
 
-			status_t			Init(const char* fileSystem);
+			status_t			Init(const char* fileSystem, port_id port);
 
 	static	RequestPort*		GetNotificationRequestPort();
 	static	FileSystem*			GetFileSystem();
 
 private:
-			status_t			_RegisterWithDispatcher(const char* fsName);
+			status_t			_Announce(const char* fsName, port_id port);
 
 private:
 			image_id			fAddOnImage;
