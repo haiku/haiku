@@ -10,6 +10,8 @@
 
 #include <MediaTrack.h>
 
+class BMediaFile;
+
 namespace BPrivate
 {
 
