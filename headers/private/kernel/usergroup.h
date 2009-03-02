@@ -21,6 +21,8 @@ extern "C" {
 
 void		inherit_parent_user_and_group(struct team* team,
 				struct team* parent);
+void		inherit_parent_user_and_group_locked(struct team* team,
+				struct team* parent);
 status_t	update_set_id_user_and_group(struct team* team, const char* file);
 
 // syscalls

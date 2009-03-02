@@ -4595,9 +4595,8 @@ vfs_unlock_vnode_if_locked(struct file_descriptor* descriptor)
 	have the O_CLOEXEC flag set.
 */
 void
-vfs_exec_io_context(void* _context)
+vfs_exec_io_context(io_context* context)
 {
-	struct io_context* context = (struct io_context*)_context;
 	uint32 i;
 
 	for (i = 0; i < context->table_size; i++) {
@@ -4626,23 +4625,24 @@ vfs_exec_io_context(void* _context)
 /*! Sets up a new io_control structure, and inherits the properties
 	of the parent io_control if it is given.
 */
-void*
-vfs_new_io_context(void* _parentContext)
+io_context*
+vfs_new_io_context(io_context* parentContext)
 {
 	size_t tableSize;
 	struct io_context* context;
-	struct io_context* parentContext;
 
 	context = (io_context*)malloc(sizeof(struct io_context));
 	if (context == NULL)
 		return NULL;
 
 	memset(context, 0, sizeof(struct io_context));
+	context->ref_count = 1;
 
-	parentContext = (struct io_context*)_parentContext;
-	if (parentContext)
+	MutexLocker parentLocker;
+	if (parentContext) {
+		parentLocker.SetTo(parentContext->io_mutex, false);
 		tableSize = parentContext->table_size;
-	else
+	} else
 		tableSize = DEFAULT_FD_TABLE_SIZE;
 
 	// allocate space for FDs and their close-on-exec flag
@@ -4669,8 +4669,6 @@ vfs_new_io_context(void* _parentContext)
 	if (parentContext) {
 		size_t i;
 
-		mutex_lock(&parentContext->io_mutex);
-
 		mutex_lock(&sIOContextRootLock);
 		context->root = parentContext->root;
 		if (context->root)
@@ -4695,7 +4693,7 @@ vfs_new_io_context(void* _parentContext)
 			}
 		}
 
-		mutex_unlock(&parentContext->io_mutex);
+		parentLocker.Unlock();
 	} else {
 		context->root = sRoot;
 		context->cwd = sRoot;
@@ -4716,10 +4714,9 @@ vfs_new_io_context(void* _parentContext)
 }
 
 
-status_t
-vfs_free_io_context(void* _ioContext)
+static status_t
+vfs_free_io_context(io_context* context)
 {
-	struct io_context* context = (struct io_context*)_ioContext;
 	uint32 i;
 
 	if (context->root)
@@ -4747,13 +4744,26 @@ vfs_free_io_context(void* _ioContext)
 }
 
 
+void vfs_get_io_context(io_context *context)
+{
+	atomic_add(&context->ref_count, 1);
+}
+
+
+void vfs_put_io_context(io_context *context)
+{
+	if (atomic_add(&context->ref_count, -1) == 1)
+		vfs_free_io_context(context);
+}
+
+
 static status_t
 vfs_resize_fd_table(struct io_context* context, const int newSize)
 {
 	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
 		return EINVAL;
 
-	MutexLocker(context->io_mutex);
+	MutexLocker _(context->io_mutex);
 
 	int oldSize = context->table_size;
 	int oldCloseOnExitBitmapSize = (oldSize + 7) / 8;

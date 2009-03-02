@@ -243,10 +243,8 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 
 
 void
-inherit_parent_user_and_group(struct team* team, struct team* parent)
+inherit_parent_user_and_group_locked(struct team* team, struct team* parent)
 {
-	InterruptsSpinLocker _(gTeamSpinlock);
-
 	team->saved_set_uid = parent->saved_set_uid;
 	team->real_uid = parent->real_uid;
 	team->effective_uid = parent->effective_uid;
@@ -257,6 +255,14 @@ inherit_parent_user_and_group(struct team* team, struct team* parent)
 	malloc_referenced_acquire(parent->supplementary_groups);
 	team->supplementary_groups = parent->supplementary_groups;
 	team->supplementary_group_count = parent->supplementary_group_count;
+}
+
+
+void
+inherit_parent_user_and_group(struct team* team, struct team* parent)
+{
+	InterruptsSpinLocker _(gTeamSpinlock);
+	inherit_parent_user_and_group_locked(team, parent);
 }
 
 

@@ -1085,36 +1085,32 @@ team_create_thread_start(void *args)
 }
 
 
-/*!	The BeOS kernel exports a function with this name, but most probably with
-	different parameters; we should not make it public.
-*/
 static thread_id
-load_image_etc(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
-	int32 envCount, int32 priority, uint32 flags, port_id errorPort,
-	uint32 errorToken)
+load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
+	int32 envCount, int32 priority, team_id parentID, uint32 flags,
+	port_id errorPort, uint32 errorToken)
 {
 	char** flatArgs = _flatArgs;
-	struct team *team, *parent;
+	struct team *team;
 	const char *threadName;
 	thread_id thread;
 	status_t status;
 	cpu_status state;
 	struct team_arg *teamArgs;
 	struct team_loading_info loadingInfo;
+	io_context* parentIOContext = NULL;
 
 	if (flatArgs == NULL || argCount == 0)
 		return B_BAD_VALUE;
 
 	const char* path = flatArgs[0];
 
-	TRACE(("load_image_etc: name '%s', args = %p, argCount = %ld\n",
+	TRACE(("load_image_internal: name '%s', args = %p, argCount = %ld\n",
 		path, flatArgs, argCount));
 
 	team = create_team_struct(path, false);
 	if (team == NULL)
 		return B_NO_MEMORY;
-
-	parent = thread_get_current_thread()->team;
 
 	if (flags & B_WAIT_TILL_LOADED) {
 		loadingInfo.thread = thread_get_current_thread();
@@ -1123,21 +1119,38 @@ load_image_etc(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		team->loading_info = &loadingInfo;
 	}
 
-	// Inherit the parent's user/group, but also check the executable's
-	// set-user/group-id permission
-	inherit_parent_user_and_group(team, parent);
-	update_set_id_user_and_group(team, path);
+ 	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	// get the parent team
+	struct team* parent;
+
+	if (parentID == B_CURRENT_TEAM)
+		parent = thread_get_current_thread()->team;
+	else
+		parent = team_get_team_struct_locked(parentID);
+
+	if (parent == NULL) {
+		teamLocker.Unlock();
+		status = B_BAD_TEAM_ID;
+		goto err0;
+	}
+
+	// inherit the parent's user/group
+	inherit_parent_user_and_group_locked(team, parent);
 
 	hash_insert(sTeamHash, team);
 	insert_team_into_parent(parent, team);
 	insert_team_into_group(parent->group, team);
 	sUsedTeams++;
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	// get a reference to the parent's I/O context -- we need it to create ours
+	parentIOContext = parent->io_context;
+	vfs_get_io_context(parentIOContext);
+
+	teamLocker.Unlock();
+
+	// check the executable's set-user/group-id permission
+	update_set_id_user_and_group(team, path);
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
 		envCount, errorPort, errorToken);
@@ -1149,11 +1162,15 @@ load_image_etc(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// args are owned by the team_arg structure now
 
 	// create a new io_context for this team
-	team->io_context = vfs_new_io_context(parent->io_context);
+	team->io_context = vfs_new_io_context(parentIOContext);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
 	}
+
+	// We don't need the parent's I/O context any longer.
+	vfs_put_io_context(parentIOContext);
+	parentIOContext = NULL;
 
 	// remove any fds that have the CLOEXEC flag set (emulating BeOS behaviour)
 	vfs_exec_io_context(team->io_context);
@@ -1229,21 +1246,25 @@ err5:
 err4:
 	vm_put_address_space(team->address_space);
 err3:
-	vfs_free_io_context(team->io_context);
+	vfs_put_io_context(team->io_context);
 err2:
 	free_team_arg(teamArgs);
 err1:
+	if (parentIOContext != NULL)
+		vfs_put_io_context(parentIOContext);
+
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	remove_team_from_group(team);
-	remove_team_from_parent(parent, team);
+	remove_team_from_parent(team->parent, team);
 	hash_remove(sTeamHash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
+err0:
 	delete_team_struct(team);
 
 	return status;
@@ -1431,7 +1452,8 @@ fork_team(void)
 		return B_NOT_ALLOWED;
 
 	// create a new team
-	// ToDo: this is very similar to team_create_team() - maybe we can do something about it :)
+	// TODO: this is very similar to load_image_internal() - maybe we can do
+	// something about it :)
 
 	team = create_team_struct(parentTeam->name, false);
 	if (team == NULL)
@@ -1562,7 +1584,7 @@ err4:
 err3:
 	delete_realtime_sem_context(team->realtime_sem_context);
 err25:
-	vfs_free_io_context(team->io_context);
+	vfs_put_io_context(team->io_context);
 err2:
 	free(forkArgs);
 err1:
@@ -2354,7 +2376,7 @@ team_delete_team(struct team *team)
 
 	// free team resources
 
-	vfs_free_io_context(team->io_context);
+	vfs_put_io_context(team->io_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
 	xsi_sem_undo(team);
 	delete_owned_ports(teamID);
@@ -2639,6 +2661,15 @@ team_free_user_thread(struct thread* thread)
 thread_id
 load_image(int32 argCount, const char **args, const char **env)
 {
+	return load_image_etc(argCount, args, env, B_NORMAL_PRIORITY,
+		B_CURRENT_TEAM, B_WAIT_TILL_LOADED);
+}
+
+
+thread_id
+load_image_etc(int32 argCount, const char* const* args,
+	const char* const* env, int32 priority, team_id parentID, uint32 flags)
+{
 	// we need to flatten the args and environment
 
 	if (args == NULL)
@@ -2685,11 +2716,11 @@ load_image(int32 argCount, const char **args, const char **env)
 
 	*slot++ = NULL;
 
-	thread_id thread = load_image_etc(flatArgs, size, argCount, envCount,
-		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, -1, 0);
+	thread_id thread = load_image_internal(flatArgs, size, argCount, envCount,
+		B_NORMAL_PRIORITY, parentID, B_WAIT_TILL_LOADED, -1, 0);
 
 	free(flatArgs);
-		// load_image_etc() unset our variable if it took over ownership
+		// load_image_internal() unset our variable if it took over ownership
 
 	return thread;
 }
@@ -3277,7 +3308,7 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 	int32 argCount, int32 envCount, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken)
 {
-	TRACE(("_user_load_image_etc: argc = %ld\n", argCount));
+	TRACE(("_user_load_image: argc = %ld\n", argCount));
 
 	if (argCount < 1)
 		return B_BAD_VALUE;
@@ -3289,11 +3320,12 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 	if (error != B_OK)
 		return error;
 
-	thread_id thread = load_image_etc(flatArgs, _ALIGN(flatArgsSize), argCount,
-		envCount, priority, flags, errorPort, errorToken);
+	thread_id thread = load_image_internal(flatArgs, _ALIGN(flatArgsSize),
+		argCount, envCount, priority, B_CURRENT_TEAM, flags, errorPort,
+		errorToken);
 
 	free(flatArgs);
-		// load_image_etc() unset our variable if it took over ownership
+		// load_image_internal() unset our variable if it took over ownership
 
 	return thread;
 }

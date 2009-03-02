@@ -14,8 +14,6 @@ extern "C" {
 #endif
 
 status_t team_init(struct kernel_args *args);
-team_id team_create_team(const char *path, const char *name, char **args,
-			int argc, char **envp, int envc, int priority);
 status_t wait_for_team(team_id id, status_t *returnCode);
 void team_remove_team(struct team *team);
 void team_delete_team(struct team *team);
@@ -35,6 +33,9 @@ bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
+
+thread_id load_image_etc(int32 argCount, const char* const* args,
+	const char* const* env, int32 priority, team_id parentID, uint32 flags);
 
 void team_set_job_control_state(struct team* team, job_control_state newState,
 			int signal, bool threadsLocked);

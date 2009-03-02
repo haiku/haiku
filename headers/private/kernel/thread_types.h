@@ -54,6 +54,7 @@ typedef enum job_control_state {
 
 
 struct image;					// defined in image.c
+struct io_context;
 struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
@@ -172,7 +173,7 @@ struct team {
 	int				num_threads;	// number of threads in this team
 	int				state;			// current team state, see above
 	int32			flags;
-	void			*io_context;
+	struct io_context *io_context;
 	struct realtime_sem_context	*realtime_sem_context;
 	struct xsi_sem_context *xsi_sem_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
