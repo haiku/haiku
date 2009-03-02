@@ -297,7 +297,7 @@ get_fd_locked(struct io_context *context, int fd)
 struct file_descriptor *
 get_fd(struct io_context *context, int fd)
 {
-	MutexLocker(context->io_mutex);
+	MutexLocker _(context->io_mutex);
 
 	return get_fd_locked(context, fd);
 }
@@ -306,7 +306,7 @@ get_fd(struct io_context *context, int fd)
 struct file_descriptor *
 get_open_fd(struct io_context *context, int fd)
 {
-	MutexLocker(context->io_mutex);
+	MutexLocker _(context->io_mutex);
 
 	file_descriptor *descriptor = get_fd_locked(context, fd);
 	if (descriptor == NULL)

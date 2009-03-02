@@ -4744,13 +4744,15 @@ vfs_free_io_context(io_context* context)
 }
 
 
-void vfs_get_io_context(io_context *context)
+void
+vfs_get_io_context(io_context* context)
 {
 	atomic_add(&context->ref_count, 1);
 }
 
 
-void vfs_put_io_context(io_context *context)
+void
+vfs_put_io_context(io_context* context)
 {
 	if (atomic_add(&context->ref_count, -1) == 1)
 		vfs_free_io_context(context);
