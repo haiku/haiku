@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -284,10 +284,8 @@ SettingsWindow::_Update()
 status_t
 SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 {
-	// minimum size is the installed memory
-	system_info info;
-	get_system_info(&info);
-	minSize = (off_t)info.max_pages * B_PAGE_SIZE;
+	// minimum size is an arbitrarily chosen MB
+	minSize = kMegaByte;
 
 	// maximum size is the free space on the current volume
 	// (minus some safety offset, depending on the disk size)
