@@ -56,13 +56,13 @@ net_route_private::~net_route_private()
 
 #if 0
 static void
-dump_routes(net_domain_private *domain)
+dump_routes(net_domain_private* domain)
 {
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	uint32 count = 1;
 
 	while (iterator.HasNext()) {
-		net_route_private *route = iterator.Next();
+		net_route_private* route = iterator.Next();
 
 		dprintf("  [%lu] dest %s, mask %s, gw %s, flags %lx\n", count++,
 			AddressString(domain, route->destination ? route->destination : NULL).Data(),
@@ -75,7 +75,7 @@ dump_routes(net_domain_private *domain)
 
 
 static status_t
-user_copy_address(const sockaddr *from, sockaddr **to)
+user_copy_address(const sockaddr* from, sockaddr** to)
 {
 	if (from == NULL) {
 		*to = NULL;
@@ -86,7 +86,7 @@ user_copy_address(const sockaddr *from, sockaddr **to)
 	if (user_memcpy(&address, from, sizeof(struct sockaddr)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	*to = (sockaddr *)malloc(address.sa_len);
+	*to = (sockaddr*)malloc(address.sa_len);
 	if (*to == NULL)
 		return B_NO_MEMORY;
 
@@ -101,7 +101,7 @@ user_copy_address(const sockaddr *from, sockaddr **to)
 
 
 static status_t
-user_copy_address(const sockaddr *from, sockaddr_storage *to)
+user_copy_address(const sockaddr* from, sockaddr_storage* to)
 {
 	if (from == NULL)
 		return B_BAD_ADDRESS;
@@ -120,14 +120,14 @@ user_copy_address(const sockaddr *from, sockaddr_storage *to)
 }
 
 
-static net_route_private *
-find_route(struct net_domain *_domain, const net_route *description)
+static net_route_private*
+find_route(struct net_domain* _domain, const net_route* description)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 
 	while (iterator.HasNext()) {
-		net_route_private *route = iterator.Next();
+		net_route_private* route = iterator.Next();
 
 		if ((route->flags & RTF_DEFAULT) != 0
 			&& (description->flags & RTF_DEFAULT) != 0) {
@@ -154,15 +154,15 @@ find_route(struct net_domain *_domain, const net_route *description)
 }
 
 
-static net_route_private *
-find_route(net_domain *_domain, const sockaddr *address)
+static net_route_private*
+find_route(net_domain* _domain, const sockaddr* address)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 
 	// find last matching route
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
-	net_route_private *candidate = NULL;
+	net_route_private* candidate = NULL;
 
 	TRACE(("test address %s for routes...\n",
 		AddressString(domain, address).Data()));
@@ -170,7 +170,7 @@ find_route(net_domain *_domain, const sockaddr *address)
 	// TODO: alternate equal default routes
 
 	while (iterator.HasNext()) {
-		net_route_private *route = iterator.Next();
+		net_route_private* route = iterator.Next();
 
 		if (route->mask) {
 			sockaddr maskedAddress;
@@ -204,9 +204,9 @@ find_route(net_domain *_domain, const sockaddr *address)
 
 
 static void
-put_route_internal(struct net_domain_private *domain, net_route *_route)
+put_route_internal(struct net_domain_private* domain, net_route* _route)
 {
-	net_route_private *route = (net_route_private *)_route;
+	net_route_private* route = (net_route_private*)_route;
 	if (route == NULL || atomic_add(&route->ref_count, -1) != 1)
 		return;
 
@@ -217,11 +217,11 @@ put_route_internal(struct net_domain_private *domain, net_route *_route)
 }
 
 
-static struct net_route *
-get_route_internal(struct net_domain_private *domain,
-	const struct sockaddr *address)
+static struct net_route*
+get_route_internal(struct net_domain_private* domain,
+	const struct sockaddr* address)
 {
-	net_route_private *route = NULL;
+	net_route_private* route = NULL;
 
 	if (address->sa_family == AF_LINK) {
 		// special address to find an interface directly
@@ -254,12 +254,12 @@ get_route_internal(struct net_domain_private *domain,
 
 
 static void
-update_route_infos(struct net_domain_private *domain)
+update_route_infos(struct net_domain_private* domain)
 {
 	RouteInfoList::Iterator iterator = domain->route_infos.GetIterator();
 
 	while (iterator.HasNext()) {
-		net_route_info *info = iterator.Next();
+		net_route_info* info = iterator.Next();
 
 		put_route_internal(domain, info->route);
 		info->route = get_route_internal(domain, &info->address);
@@ -267,21 +267,21 @@ update_route_infos(struct net_domain_private *domain)
 }
 
 
-static sockaddr *
-copy_address(UserBuffer &buffer, sockaddr *address)
+static sockaddr*
+copy_address(UserBuffer& buffer, sockaddr* address)
 {
 	if (address == NULL)
 		return NULL;
 
-	return (sockaddr *)buffer.Copy(address, address->sa_len);
+	return (sockaddr*)buffer.Copy(address, address->sa_len);
 }
 
 
 static status_t
-fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
-		 net_route *route)
+fill_route_entry(route_entry* target, void* _buffer, size_t bufferSize,
+	net_route* route)
 {
-	UserBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
+	UserBuffer buffer(((uint8*)_buffer) + sizeof(route_entry),
 		bufferSize - sizeof(route_entry));
 
 	target->destination = copy_address(buffer, route->destination);
@@ -298,19 +298,18 @@ fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
 //	#pragma mark - exported functions
 
 
-/*!
-	Determines the size of a buffer large enough to contain the whole
+/*!	Determines the size of a buffer large enough to contain the whole
 	routing table.
 */
 uint32
-route_table_size(net_domain_private *domain)
+route_table_size(net_domain_private* domain)
 {
 	MutexLocker locker(domain->lock);
 	uint32 size = 0;
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	while (iterator.HasNext()) {
-		net_route_private *route = iterator.Next();
+		net_route_private* route = iterator.Next();
 		size += IF_NAMESIZE + sizeof(route_entry);
 
 		if (route->destination)
@@ -325,13 +324,12 @@ route_table_size(net_domain_private *domain)
 }
 
 
-/*!
-	Dumps a list of all routes into the supplied userland buffer.
+/*!	Dumps a list of all routes into the supplied userland buffer.
 	If the routes don't fit into the buffer, an error (\c ENOBUFS) is
 	returned.
 */
 status_t
-list_routes(net_domain_private *domain, void *buffer, size_t size)
+list_routes(net_domain_private* domain, void* buffer, size_t size)
 {
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	size_t spaceLeft = size;
@@ -342,27 +340,27 @@ list_routes(net_domain_private *domain, void *buffer, size_t size)
 	zeros.sa_len = sizeof(sockaddr);
 
 	while (iterator.HasNext()) {
-		net_route *route = iterator.Next();
+		net_route* route = iterator.Next();
 
 		size = IF_NAMESIZE + sizeof(route_entry);
 
-		sockaddr *destination = NULL;
-		sockaddr *mask = NULL;
-		sockaddr *gateway = NULL;
-		uint8 *next = (uint8 *)buffer + size;
+		sockaddr* destination = NULL;
+		sockaddr* mask = NULL;
+		sockaddr* gateway = NULL;
+		uint8* next = (uint8*)buffer + size;
 
 		if (route->destination != NULL) {
-			destination = (sockaddr *)next;
+			destination = (sockaddr*)next;
 			next += route->destination->sa_len;
 			size += route->destination->sa_len;
 		}
 		if (route->mask != NULL) {
-			mask = (sockaddr *)next;
+			mask = (sockaddr*)next;
 			next += route->mask->sa_len;
 			size += route->mask->sa_len;
 		}
 		if (route->gateway != NULL) {
-			gateway = (sockaddr *)next;
+			gateway = (sockaddr*)next;
 			next += route->gateway->sa_len;
 			size += route->gateway->sa_len;
 		}
@@ -389,7 +387,7 @@ list_routes(net_domain_private *domain, void *buffer, size_t size)
 					route->gateway, route->gateway->sa_len) < B_OK))
 			return B_BAD_ADDRESS;
 
-		buffer = (void *)next;
+		buffer = (void*)next;
 		spaceLeft -= size;
 	}
 
@@ -398,10 +396,10 @@ list_routes(net_domain_private *domain, void *buffer, size_t size)
 
 
 status_t
-control_routes(struct net_interface *interface, int32 option, void *argument,
+control_routes(struct net_interface* interface, int32 option, void* argument,
 	size_t length)
 {
-	net_domain_private *domain = (net_domain_private *)interface->domain;
+	net_domain_private* domain = (net_domain_private*)interface->domain;
 
 	switch (option) {
 		case SIOCADDRT:
@@ -412,7 +410,7 @@ control_routes(struct net_interface *interface, int32 option, void *argument,
 				return B_BAD_VALUE;
 
 			route_entry entry;
-			if (user_memcpy(&entry, &((ifreq *)argument)->ifr_route,
+			if (user_memcpy(&entry, &((ifreq*)argument)->ifr_route,
 					sizeof(route_entry)) != B_OK)
 				return B_BAD_ADDRESS;
 
@@ -440,9 +438,9 @@ control_routes(struct net_interface *interface, int32 option, void *argument,
 
 
 status_t
-add_route(struct net_domain *_domain, const struct net_route *newRoute)
+add_route(struct net_domain* _domain, const struct net_route* newRoute)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 
 	TRACE(("add route to domain %s: dest %s, mask %s, gw %s, flags %lx\n",
 		domain->name,
@@ -458,7 +456,7 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 		|| !domain->address_module->check_mask(newRoute->mask))
 		return B_BAD_VALUE;
 
-	net_route_private *route = find_route(domain, newRoute);
+	net_route_private* route = find_route(domain, newRoute);
 	if (route != NULL)
 		return B_FILE_EXISTS;
 
@@ -488,7 +486,7 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 	// Insert the route sorted by completeness of its mask
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
-	net_route_private *before = NULL;
+	net_route_private* before = NULL;
 
 	while ((before = iterator.Next()) != NULL) {
 		// if the before mask is less specific than the one of the route,
@@ -515,9 +513,9 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 
 
 status_t
-remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
+remove_route(struct net_domain* _domain, const struct net_route* removeRoute)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 
 	TRACE(("remove route from domain %s: dest %s, mask %s, gw %s, flags %lx\n",
 		domain->name,
@@ -529,7 +527,7 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 	// TODO: for now...
 	//MutexLocker locker(domain->lock);
 
-	net_route_private *route = find_route(domain, removeRoute);
+	net_route_private* route = find_route(domain, removeRoute);
 	if (route == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -541,9 +539,9 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 
 
 status_t
-get_route_information(struct net_domain *_domain, void *value, size_t length)
+get_route_information(struct net_domain* _domain, void* value, size_t length)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 
 	if (length < sizeof(route_entry))
 		return B_BAD_VALUE;
@@ -559,7 +557,7 @@ get_route_information(struct net_domain *_domain, void *value, size_t length)
 
 	MutexLocker locker(domain->lock);
 
-	net_route_private *route = find_route(domain, (sockaddr *)&destination);
+	net_route_private* route = find_route(domain, (sockaddr*)&destination);
 	if (route == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -572,17 +570,17 @@ get_route_information(struct net_domain *_domain, void *value, size_t length)
 
 
 void
-invalidate_routes(net_domain *_domain, net_interface *interface)
+invalidate_routes(net_domain* _domain, net_interface* interface)
 {
 	// this function is called with the domain locked
 	// (see domain_interface_went_down)
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 
 	dprintf("invalidate_routes(%i, %s)\n", domain->family, interface->name);
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	while (iterator.HasNext()) {
-		net_route *route = iterator.Next();
+		net_route* route = iterator.Next();
 
 		// TODO If we are removing the interface this will bork.
 		//      Consider the following case:
@@ -603,10 +601,10 @@ invalidate_routes(net_domain *_domain, net_interface *interface)
 }
 
 
-struct net_route *
-get_route(struct net_domain *_domain, const struct sockaddr *address)
+struct net_route*
+get_route(struct net_domain* _domain, const struct sockaddr* address)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(domain->lock);
 
 	return get_route_internal(domain, address);
@@ -614,16 +612,16 @@ get_route(struct net_domain *_domain, const struct sockaddr *address)
 
 
 status_t
-get_device_route(struct net_domain *_domain, uint32 index, net_route **_route)
+get_device_route(struct net_domain* _domain, uint32 index, net_route** _route)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 
 	MutexLocker _(domain->lock);
 
-	net_interface_private *interface = NULL;
+	net_interface_private* interface = NULL;
 
 	while (true) {
-		interface = (net_interface_private *)list_get_next_item(
+		interface = (net_interface_private*)list_get_next_item(
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
@@ -640,25 +638,25 @@ get_device_route(struct net_domain *_domain, uint32 index, net_route **_route)
 
 
 status_t
-get_buffer_route(net_domain *_domain, net_buffer *buffer, net_route **_route)
+get_buffer_route(net_domain* _domain, net_buffer* buffer, net_route** _route)
 {
-	net_domain_private *domain = (net_domain_private *)_domain;
+	net_domain_private* domain = (net_domain_private*)_domain;
 
 	MutexLocker _(domain->lock);
 
-	net_route *route = get_route_internal(domain, buffer->destination);
+	net_route* route = get_route_internal(domain, buffer->destination);
 	if (route == NULL)
 		return ENETUNREACH;
 
 	status_t status = B_OK;
-	sockaddr *source = buffer->source;
+	sockaddr* source = buffer->source;
 
 	// TODO we are quite relaxed in the address checking here
 	//      as we might proceed with srcaddr=INADDR_ANY.
 
 	if (route->interface && route->interface->address) {
-		sockaddr *interfaceAddress = route->interface->address;
-		net_address_module_info *addressModule = domain->address_module;
+		sockaddr* interfaceAddress = route->interface->address;
+		net_address_module_info* addressModule = domain->address_module;
 
 		if (addressModule->is_empty_address(source, true))
 			addressModule->set_to(source, interfaceAddress);
@@ -676,19 +674,19 @@ get_buffer_route(net_domain *_domain, net_buffer *buffer, net_route **_route)
 
 
 void
-put_route(struct net_domain *_domain, net_route *route)
+put_route(struct net_domain* _domain, net_route* route)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(domain->lock);
 
-	put_route_internal(domain, (net_route *)route);
+	put_route_internal(domain, (net_route*)route);
 }
 
 
 status_t
-register_route_info(struct net_domain *_domain, struct net_route_info *info)
+register_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(domain->lock);
 
 	domain->route_infos.Add(info);
@@ -699,9 +697,9 @@ register_route_info(struct net_domain *_domain, struct net_route_info *info)
 
 
 status_t
-unregister_route_info(struct net_domain *_domain, struct net_route_info *info)
+unregister_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(domain->lock);
 
 	domain->route_infos.Remove(info);
@@ -713,9 +711,9 @@ unregister_route_info(struct net_domain *_domain, struct net_route_info *info)
 
 
 status_t
-update_route_info(struct net_domain *_domain, struct net_route_info *info)
+update_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(domain->lock);
 
 	put_route_internal(domain, info->route);

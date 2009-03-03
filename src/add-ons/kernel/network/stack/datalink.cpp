@@ -40,6 +40,10 @@ struct interface_protocol : net_datalink_protocol {
 };
 
 
+/*!	A service thread for each device interface. It just reads as many packets
+	as availabe, deframes them, and puts them into the receive queue of the
+	device interface.
+*/
 static status_t
 device_reader_thread(void* _interface)
 {
@@ -108,6 +112,7 @@ interface_address(net_interface* interface, int32 option)
 }
 
 
+/*!	Removes the default routes as set by add_default_routes() again. */
 static void
 remove_default_routes(net_interface_private* interface, int32 option)
 {
@@ -131,6 +136,9 @@ remove_default_routes(net_interface_private* interface, int32 option)
 }
 
 
+/*!	Adds the default routes that every interface needs, ie. the local host
+	route, and one for the subnet (if set).
+*/
 static void
 add_default_routes(net_interface_private* interface, int32 option)
 {
@@ -450,7 +458,7 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 }
 
 
-net_interface* 
+net_interface*
 datalink_get_interface_with_address(net_domain* _domain,
 	const sockaddr* address)
 {
@@ -480,7 +488,7 @@ datalink_get_interface_with_address(net_domain* _domain,
 }
 
 
-net_interface* 
+net_interface*
 datalink_get_interface(net_domain* domain, uint32 index)
 {
 	if (index == 0)
