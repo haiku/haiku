@@ -44,6 +44,7 @@ private:
 
 	
 	void UpdateUIStatus(void);
+	void UpdateListStatus(void);
 
 	rgb_color				activeColor;
 };

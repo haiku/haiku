@@ -36,6 +36,7 @@ static const uint32 kMsgShowDebug = 'ShDG';
 static const uint32 kMsgInquiry = 'iQbt';
 static const uint32 kMsgAddListDevice = 'aDdv';
 
+static const uint32 kMsgSelected = 'isLt';
 static const uint32 kMsgSecond = 'sCMs';
 
 
@@ -112,6 +113,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fAddButton->SetEnabled(false);
 
 	fRemoteList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
+	fRemoteList->SetSelectionMessage(new BMessage(kMsgSelected));
 
 	fScrollView = new BScrollView("ScrollView", fRemoteList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -133,7 +135,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		fInquiryButton->SetEnabled(false);
 	}
 
-	fRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgSecond), 1000000L, -1);
+	fRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgSecond), 1000000L);
 
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
@@ -193,6 +195,10 @@ InquiryPanel::MessageReceived(BMessage *message)
 			// TODO: all others listitems can be deleted
 		}
 		break;
+		
+		case kMsgSelected:
+			UpdateListStatus();
+		break;
 
 		case kMsgStart:
 			fRemoteList->MakeEmpty();
@@ -208,6 +214,7 @@ InquiryPanel::MessageReceived(BMessage *message)
 			fScanning = false;
 			fRetrieving = true;
 
+			UpdateListStatus();
 			UpdateUIStatus();
 		break;
 		
@@ -227,7 +234,7 @@ InquiryPanel::MessageReceived(BMessage *message)
 			if (fRetrieving) {
 				
 				if (retrievalIndex < fDiscoveryAgent->RetrieveDevices(0).CountItems()) {
-					
+										
 					((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))->
         				SetDevice((BluetoothDevice*)fDiscoveryAgent->RetrieveDevices(0).ItemAt(retrievalIndex));
 
@@ -262,6 +269,7 @@ InquiryPanel::UpdateUIStatus(void)
 		fAddButton->SetEnabled(false);
 		fInquiryButton->SetEnabled(false);
 		fScanProgress->SetBarColor(activeColor);
+		fAddButton->SetEnabled(false);
 			
 	} else if (fRetrieving) {
 		fInquiryButton->SetEnabled(true);
@@ -270,12 +278,16 @@ InquiryPanel::UpdateUIStatus(void)
 	} else {
 
 	}
-	
-	if (fRemoteList->CurrentSelection() < 0 || fScanning)
+}
+
+
+void
+InquiryPanel::UpdateListStatus(void)
+{
+	if (fRemoteList->CurrentSelection() < 0 || fScanning || fRetrieving)
 		fAddButton->SetEnabled(false);
 	else
 		fAddButton->SetEnabled(true);
-
 }
 
 
