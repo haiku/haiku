@@ -36,11 +36,10 @@ static mutex sDomainLock;
 static list sDomains;
 
 
-/*!
-	Scans the domain list for the specified family.
+/*!	Scans the domain list for the specified family.
 	You need to hold the sDomainLock when calling this function.
 */
-static net_domain_private* 
+static net_domain_private*
 lookup_domain(int family)
 {
 	net_domain_private* domain = NULL;
@@ -60,10 +59,9 @@ lookup_domain(int family)
 //	#pragma mark -
 
 
-/*!
-	Gets the domain of the specified family.
+/*!	Gets the domain of the specified family.
 */
-net_domain* 
+net_domain*
 get_domain(int family)
 {
 	MutexLocker locker(sDomainLock);
@@ -117,7 +115,7 @@ list_domain_interfaces(void* _buffer, size_t* bufferSize)
 		if (domain == NULL)
 			break;
 
-		MutexLocker locker(domain->lock);
+		RecursiveLocker locker(domain->lock);
 
 		net_interface* interface = NULL;
 		while (true) {
@@ -163,7 +161,7 @@ add_interface_to_domain(net_domain* _domain,
 	if (deviceInterface == NULL)
 		return ENODEV;
 
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	net_interface_private* interface = NULL;
 	status_t status;
@@ -226,7 +224,7 @@ domain_interface_control(net_domain_private* domain, int32 option,
 	// and domain locks are required, we MUST obtain the receive
 	// lock before the domain lock.
 	RecursiveLocker _1(device->receive_lock);
-	MutexLocker _2(domain->lock);
+	RecursiveLocker _2(domain->lock);
 
 	net_interface* interface = find_interface(domain, name);
 	if (interface != NULL) {
@@ -273,7 +271,7 @@ domain_interface_control(net_domain_private* domain, int32 option,
 void
 domain_interface_went_down(net_interface* interface)
 {
-	ASSERT_LOCKED_MUTEX(&((net_domain_private*)interface->domain)->lock);
+	ASSERT_LOCKED_RECURSIVE(&((net_domain_private*)interface->domain)->lock);
 
 	TRACE(("domain_interface_went_down(%i, %s)\n",
 		interface->domain->family, interface->name));
@@ -293,7 +291,7 @@ domain_removed_device_interface(net_device_interface* deviceInterface)
 		if (domain == NULL)
 			break;
 
-		MutexLocker locker(domain->lock);
+		RecursiveLocker locker(domain->lock);
 
 		net_interface_private* interface = find_interface(domain,
 			deviceInterface->device->name);
@@ -322,7 +320,7 @@ register_domain(int family, const char* name,
 	if (domain == NULL)
 		return B_NO_MEMORY;
 
-	mutex_init(&domain->lock, name);
+	recursive_lock_init(&domain->lock, name);
 
 	domain->family = family;
 	domain->name = name;
@@ -359,7 +357,7 @@ unregister_domain(net_domain* _domain)
 		delete_interface(interface);
 	}
 
-	mutex_destroy(&domain->lock);
+	recursive_lock_destroy(&domain->lock);
 	delete domain;
 	return B_OK;
 }

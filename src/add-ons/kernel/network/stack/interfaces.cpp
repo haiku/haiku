@@ -327,7 +327,7 @@ put_interface(struct net_interface_private* interface)
 {
 	// TODO: reference counting
 	// TODO: better locking scheme
-	mutex_unlock(&((net_domain_private*)interface->domain)->lock);
+	recursive_lock_unlock(&((net_domain_private*)interface->domain)->lock);
 }
 
 
@@ -335,7 +335,7 @@ struct net_interface_private*
 get_interface(net_domain* _domain, const char* name)
 {
 	net_domain_private* domain = (net_domain_private*)_domain;
-	mutex_lock(&domain->lock);
+	recursive_lock_lock(&domain->lock);
 
 	net_interface_private* interface = NULL;
 	while (true) {
@@ -344,11 +344,12 @@ get_interface(net_domain* _domain, const char* name)
 		if (interface == NULL)
 			break;
 
+		// TODO: We keep the domain locked for now
 		if (!strcmp(interface->name, name))
 			return interface;
 	}
 
-	mutex_unlock(&domain->lock);
+	recursive_lock_unlock(&domain->lock);
 	return NULL;
 }
 

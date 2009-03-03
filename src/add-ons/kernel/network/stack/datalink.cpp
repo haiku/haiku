@@ -195,7 +195,7 @@ datalink_control_interface(net_domain_private* domain, int32 option,
 	if (user_memcpy(&request, value, expected) < B_OK)
 		return B_BAD_ADDRESS;
 
-	MutexLocker _(domain->lock);
+	RecursiveLocker _(domain->lock);
 	net_interface* interface = NULL;
 
 	if (getByName)
@@ -320,7 +320,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			MutexLocker _(domain->lock);
+			RecursiveLocker _(domain->lock);
 
 			net_interface* interface = find_interface(domain,
 				request.ifr_name);
@@ -413,7 +413,7 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 	if (domain == NULL || address == NULL)
 		return false;
 
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	net_interface* interface = NULL;
 	net_interface* fallback = NULL;
@@ -466,7 +466,7 @@ datalink_get_interface_with_address(net_domain* _domain,
 	if (domain == NULL)
 		return NULL;
 
-	MutexLocker _(domain->lock);
+	RecursiveLocker _(domain->lock);
 
 	net_interface* interface = NULL;
 

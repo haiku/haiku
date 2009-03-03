@@ -206,13 +206,17 @@ find_route(net_domain* _domain, const sockaddr* address)
 static void
 put_route_internal(struct net_domain_private* domain, net_route* _route)
 {
+	ASSERT_LOCKED_RECURSIVE(&domain->lock);
+
 	net_route_private* route = (net_route_private*)_route;
 	if (route == NULL || atomic_add(&route->ref_count, -1) != 1)
 		return;
 
-	// remove route
+	// delete route - it must already have been removed at this point
 
-	domain->routes.Remove(route);
+	ASSERT(route->GetDoublyLinkedListLink()->next == NULL
+		&& route->GetDoublyLinkedListLink()->previous == NULL);
+
 	delete route;
 }
 
@@ -221,6 +225,7 @@ static struct net_route*
 get_route_internal(struct net_domain_private* domain,
 	const struct sockaddr* address)
 {
+	ASSERT_LOCKED_RECURSIVE(&domain->lock);
 	net_route_private* route = NULL;
 
 	if (address->sa_family == AF_LINK) {
@@ -256,6 +261,7 @@ get_route_internal(struct net_domain_private* domain,
 static void
 update_route_infos(struct net_domain_private* domain)
 {
+	ASSERT_LOCKED_RECURSIVE(&domain->lock);
 	RouteInfoList::Iterator iterator = domain->route_infos.GetIterator();
 
 	while (iterator.HasNext()) {
@@ -304,7 +310,7 @@ fill_route_entry(route_entry* target, void* _buffer, size_t bufferSize,
 uint32
 route_table_size(net_domain_private* domain)
 {
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 	uint32 size = 0;
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
@@ -331,6 +337,8 @@ route_table_size(net_domain_private* domain)
 status_t
 list_routes(net_domain_private* domain, void* buffer, size_t size)
 {
+	RecursiveLocker _(domain->lock);
+
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	size_t spaceLeft = size;
 
@@ -456,6 +464,8 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 		|| !domain->address_module->check_mask(newRoute->mask))
 		return B_BAD_VALUE;
 
+	RecursiveLocker _(domain->lock);
+
 	net_route_private* route = find_route(domain, newRoute);
 	if (route != NULL)
 		return B_FILE_EXISTS;
@@ -479,9 +489,6 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 	route->interface = newRoute->interface;
 	route->mtu = 0;
 	route->ref_count = 1;
-
-	// TODO: for now...
-	//MutexLocker locker(domain->lock);
 
 	// Insert the route sorted by completeness of its mask
 
@@ -524,12 +531,13 @@ remove_route(struct net_domain* _domain, const struct net_route* removeRoute)
 		AddressString(domain, removeRoute->gateway ? removeRoute->gateway : NULL).Data(),
 		removeRoute->flags));
 
-	// TODO: for now...
-	//MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	net_route_private* route = find_route(domain, removeRoute);
 	if (route == NULL)
 		return B_ENTRY_NOT_FOUND;
+
+	domain->routes.Remove(route);
 
 	put_route_internal(domain, route);
 	update_route_infos(domain);
@@ -555,7 +563,7 @@ get_route_information(struct net_domain* _domain, void* value, size_t length)
 	if (status != B_OK)
 		return status;
 
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	net_route_private* route = find_route(domain, (sockaddr*)&destination);
 	if (route == NULL)
@@ -582,19 +590,6 @@ invalidate_routes(net_domain* _domain, net_interface* interface)
 	while (iterator.HasNext()) {
 		net_route* route = iterator.Next();
 
-		// TODO If we are removing the interface this will bork.
-		//      Consider the following case:
-		//      [thread 1] ipv4_send_data()
-		//      [thread 1]  get_route() [domain locked, unlocked] <- route
-		//      [thread 2] ... [domain locked]
-		//      [thread 2]  invalidate_routes()
-		//      [thread 2]   remove_route() <- route
-		//      [thread 1] ... ipv4_send_data() accesses `route'. Bork bork.
-		//
-		//      We could either add per-route locks (expensive) or
-		//      lock the domain throughout the send_data() routine.
-		//      These are the easy solutions, need to think about this. -hugo
-
 		if (route->interface->index == interface->index)
 			remove_route(domain, route);
 	}
@@ -605,7 +600,7 @@ struct net_route*
 get_route(struct net_domain* _domain, const struct sockaddr* address)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	return get_route_internal(domain, address);
 }
@@ -616,7 +611,7 @@ get_device_route(struct net_domain* _domain, uint32 index, net_route** _route)
 {
 	net_domain_private* domain = (net_domain_private*)_domain;
 
-	MutexLocker _(domain->lock);
+	RecursiveLocker _(domain->lock);
 
 	net_interface_private* interface = NULL;
 
@@ -642,7 +637,7 @@ get_buffer_route(net_domain* _domain, net_buffer* buffer, net_route** _route)
 {
 	net_domain_private* domain = (net_domain_private*)_domain;
 
-	MutexLocker _(domain->lock);
+	RecursiveLocker _(domain->lock);
 
 	net_route* route = get_route_internal(domain, buffer->destination);
 	if (route == NULL)
@@ -677,7 +672,7 @@ void
 put_route(struct net_domain* _domain, net_route* route)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	put_route_internal(domain, (net_route*)route);
 }
@@ -687,7 +682,7 @@ status_t
 register_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	domain->route_infos.Add(info);
 	info->route = get_route_internal(domain, &info->address);
@@ -700,7 +695,7 @@ status_t
 unregister_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	domain->route_infos.Remove(info);
 	if (info->route != NULL)
@@ -714,7 +709,7 @@ status_t
 update_route_info(struct net_domain* _domain, struct net_route_info* info)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
-	MutexLocker locker(domain->lock);
+	RecursiveLocker locker(domain->lock);
 
 	put_route_internal(domain, info->route);
 	info->route = get_route_internal(domain, &info->address);

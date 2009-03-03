@@ -15,7 +15,8 @@
 #include <util/DoublyLinkedList.h>
 
 
-struct net_route_private : net_route, public DoublyLinkedListLinkImpl<net_route_private> {
+struct net_route_private
+	: net_route, DoublyLinkedListLinkImpl<net_route_private> {
 	int32	ref_count;
 
 	net_route_private();
