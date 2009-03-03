@@ -240,7 +240,7 @@ l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 
 	ch->dcid = dcid;
 	ch->ident = ident;
-		
+
 	status_t indicationStatus = l2cap_l2ca_con_ind(ch);
 
 	if ( indicationStatus == B_OK ) {
@@ -450,7 +450,7 @@ l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	respond = L2CAP_OPT_CFLAG(le16toh(command->flags));
 
     command.Remove(); // pull configuration header
-    
+
 	/* Check if we have this channel and it is in valid state */
 	channel = btCoreData->ChannelBySourceID(conn, dcid);
 	if (channel == NULL) {
@@ -508,7 +508,7 @@ l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 
 	debugf("Pulled %ld of configuration fields respond=%d remaining=%ld\n", off, respond, buffer->size);
 	gBufferModule->remove_header(buffer, off);
-	
+
 	/*
 	 * Now check and see if we have to respond. If everything was OK then
 	 * respond contain "C flag" and (if set) we will respond with empty
@@ -626,7 +626,7 @@ l2cap_process_cfg_rsp(HciConnection *conn, uint8 ident, net_buffer *buffer)
 				break;
 
 			case L2CAP_OPT_QOS:
-				memcpy(&val.flow, &cmd->channel->configuration->oflow, 
+				memcpy(&val.flow, &cmd->channel->configuration->oflow,
                        	sizeof(cmd->channel->configuration->oflow));
 			break;
 
@@ -710,21 +710,24 @@ l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	/* Check if we have this channel and it is in valid state */
 	ch = btCoreData->ChannelBySourceID(conn, dcid);
 	if (ch == NULL) {
-		debugf("unexpected L2CAP_DisconnectReq message.Channel does not exist, cid=%d\n", dcid);
+		debugf("unexpected L2CAP_DisconnectReq message.Channel does not exist, "
+			"cid=%d\n", dcid);
 		goto reject;
 	}
 
 	/* XXX Verify channel state and reject if invalid -- is that true? */
 	if (ch->state != L2CAP_CHAN_OPEN && ch->state != L2CAP_CHAN_CONFIG &&
 		ch->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
-		debugf("unexpected L2CAP_DisconnectReq. Invalid channel state, cid=%d, state=%d\n", dcid, ch->state);
+		debugf("unexpected L2CAP_DisconnectReq. Invalid channel state, cid=%d, "
+			"state=%d\n", dcid, ch->state);
 		goto reject;
 	}
 
 	/* Match destination channel ID */
 	if (ch->dcid != scid || ch->scid != dcid) {
-		debugf("unexpected L2CAP_DisconnectReq. Channel IDs does not match, channel: scid=%d, dcid=%d,
-		request: scid=%d, dcid=%d\n", ch->scid, ch->dcid, scid, dcid);
+		debugf("unexpected L2CAP_DisconnectReq. Channel IDs does not match, "
+			"channel: scid=%d, dcid=%d, request: scid=%d, dcid=%d\n",
+			ch->scid, ch->dcid, scid, dcid);
 		goto reject;
 	}
 
@@ -928,7 +931,7 @@ l2cap_process_info_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	command->result = le16toh(command->result);
 
 	command.Remove();
-	
+
 	/* Check if we have pending command descriptor */
 	cmd = btCoreData->SignalByIdent(conn, ident);
 	if (cmd == NULL) {
@@ -983,9 +986,9 @@ l2cap_process_cmd_rej(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	}
 
 	command->reason = le16toh(command->reason);
-	
+
 	command.Remove();
-	
+
 	/* Check if we have pending command descriptor */
 	cmd = btCoreData->SignalByIdent(conn, ident);
 	if (cmd != NULL) {
@@ -1076,7 +1079,7 @@ send_l2cap_cfg_rsp(HciConnection* conn, uint8 ident, uint16 scid, uint16 result,
 {
 	L2capFrame*	cmd = NULL;
 
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cfg_rsp(ident, scid, 0, result, opt), 
+	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cfg_rsp(ident, scid, 0, result, opt),
 									ident, L2CAP_CFG_RSP);
 	if (cmd == NULL) {
 		gBufferModule->free(opt);
