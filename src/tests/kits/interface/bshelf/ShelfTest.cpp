@@ -24,7 +24,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Shelf.h>
-#include <byteorder.h>
+#include <ByteOrder.h>
 
 #define MAGIC_1	'pjpp'
 #define MAGIC_2	'jahh'
@@ -162,7 +162,7 @@ void TWindow::Quit()
 {
 	delete fShelf;	// by deleting the Shelf we'll save the state
 	fShelf = NULL;
-	inherited::Quit();
+	BWindow::Quit();
 }
 
 /*------------------------------------------------------------*/

@@ -12,7 +12,6 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest ShelfTest :
         ShelfTest.cpp
-        Shelf.cpp
         : be
         ;
 
