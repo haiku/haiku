@@ -1,4 +1,7 @@
-// UserlandFSServer.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "UserlandFSServer.h"
 
@@ -19,11 +22,10 @@
 #include "AutoLocker.h"
 #include "Compatibility.h"
 #include "Debug.h"
-#include "DispatcherDefs.h"
 #include "FileSystem.h"
-#include "FSInfo.h"
 #include "RequestThread.h"
 #include "ServerDefs.h"
+#include "UserlandFSDefs.h"
 
 
 static const int32 kRequestThreadCount = 10;

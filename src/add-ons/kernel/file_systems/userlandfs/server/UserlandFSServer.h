@@ -1,5 +1,7 @@
-// UserlandFSServer.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_SERVER_H
 #define USERLAND_FS_SERVER_H
 

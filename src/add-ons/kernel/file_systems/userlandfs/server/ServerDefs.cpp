@@ -1,4 +1,7 @@
-// ServerDefs.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "ServerDefs.h"
 
@@ -29,7 +32,3 @@ ServerSettings::ShallEnterDebugger() const
 
 // the global settings
 ServerSettings UserlandFS::gServerSettings;
-
-const char* UserlandFS::kUserlandFSDispatcherClipboardName
-	= "userland fs dispatcher";
-

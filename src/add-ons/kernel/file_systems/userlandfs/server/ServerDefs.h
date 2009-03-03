@@ -1,5 +1,7 @@
-// ServerDefs.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_SERVER_DEFS_H
 #define USERLAND_FS_SERVER_DEFS_H
 
@@ -21,21 +23,12 @@ private:
 
 extern ServerSettings gServerSettings;
 
-enum {
-	UFS_REGISTER_FS				= 'rgfs',
-	UFS_REGISTER_FS_ACK			= 'rfsa',
-	UFS_REGISTER_FS_DENIED		= 'rfsd',
-};
-
-extern const char* kUserlandFSDispatcherClipboardName;
-
 static const int32 kRequestPortSize = B_PAGE_SIZE;
 
 }	// namespace UserlandFS
 
 using UserlandFS::ServerSettings;
 using UserlandFS::gServerSettings;
-using UserlandFS::kUserlandFSDispatcherClipboardName;
 using UserlandFS::kRequestPortSize;
 
 #endif	// USERLAND_FS_SERVER_DEFS_H

@@ -16,7 +16,6 @@ DEFINES += DEBUG_APP="\\\"userlandfs\\\"" ;
 KernelAddon userlandfs
 	: AreaSupport.cpp
 	  Debug.cpp
-	  DispatcherDefs.cpp
 	  LazyInitializable.cpp
 	  Locker.cpp
 	  ObjectTracker.cpp

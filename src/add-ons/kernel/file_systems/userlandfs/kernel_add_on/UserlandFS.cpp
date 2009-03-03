@@ -9,12 +9,12 @@
 
 #include "Compatibility.h"
 #include "Debug.h"
-#include "DispatcherDefs.h"
 #include "FileSystem.h"
 #include "FileSystemInitializer.h"
 #include "KernelDebug.h"
 #include "RequestPort.h"
 #include "Requests.h"
+#include "UserlandFSDefs.h"
 
 
 UserlandFS* UserlandFS::sUserlandFS = NULL;

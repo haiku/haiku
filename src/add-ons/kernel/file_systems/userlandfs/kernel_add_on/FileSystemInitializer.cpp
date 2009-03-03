@@ -15,12 +15,12 @@
 
 #include "AutoDeleter.h"
 
-#include "DispatcherDefs.h"
 #include "FileSystem.h"
 #include "RequestAllocator.h"
 #include "RequestPort.h"
 #include "Requests.h"
 #include "SingleReplyRequestHandler.h"
+#include "UserlandFSDefs.h"
 
 
 // constructor

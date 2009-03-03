@@ -20,7 +20,6 @@ Application userlandfs_server
 	:
 	AreaSupport.cpp
 	Debug.cpp
-	DispatcherDefs.cpp
 	driver_settings.c
 	LazyInitializable.cpp
 	Locker.cpp
@@ -35,13 +34,11 @@ Application userlandfs_server
 	SingleReplyRequestHandler.cpp
 	String.cpp
 
-	DispatcherFileSystem.cpp
 	FileSystem.cpp
 	kernel_emu.cpp
 	main.cpp
 	RequestThread.cpp
 	ServerDefs.cpp
-#	UserlandFSDispatcher.cpp
 	UserlandFSServer.cpp
 	UserlandRequestHandler.cpp
 	Volume.cpp
