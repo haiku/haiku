@@ -57,6 +57,8 @@ typedef struct fwohci_softc {
 		struct fwdma_alloc_multi *am;
 #ifndef __HAIKU__
 		bus_dma_tag_t dmat;
+#else
+		area_id Area;
 #endif
 	} arrq, arrs, atrq, atrs, it[OHCI_DMA_ITCH], ir[OHCI_DMA_IRCH];
 	u_int maxrec;

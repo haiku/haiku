@@ -340,7 +340,6 @@ struct fwohcidb_tr{
 	caddr_t buf;
 	bus_addr_t bus_addr;
 	int dbcnt;
-	area_id Area;
 };
 
 /*

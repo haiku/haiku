@@ -134,7 +134,7 @@ static int fwohci_itx_disable (struct firewire_comm *, int);
 static void fwohci_timeout (void *);
 static void fwohci_set_intr (struct firewire_comm *, int);
 
-static int fwohci_add_rx_buf (struct fwohci_dbch *, struct fwohcidb_tr *, int, struct fwdma_alloc *);
+static inline void fwohci_set_rx_buf(struct fw_xferq *, struct fwohcidb_tr *, bus_addr_t dbuf[], int dsiz[]);
 static int fwohci_add_tx_buf (struct fwohci_dbch *, struct fwohcidb_tr *, int);
 static void	dump_db (struct fwohci_softc *, uint32_t);
 static void 	print_db (struct fwohcidb_tr *, struct fwohcidb *, uint32_t , uint32_t);
@@ -1217,26 +1217,26 @@ static void
 fwohci_db_free(struct fwohci_dbch *dbch)
 {
 	struct fwohcidb_tr *db_tr;
-	int idb;
+//	int idb;
 
 	if ((dbch->flags & FWOHCI_DBCH_INIT) == 0)
 		return;
 
-	for(db_tr = STAILQ_FIRST(&dbch->db_trq), idb = 0; idb < dbch->ndb;
+/*	for(db_tr = STAILQ_FIRST(&dbch->db_trq), idb = 0; idb < dbch->ndb;
 			db_tr = STAILQ_NEXT(db_tr, link), idb++){
-/*		if ((dbch->xferq.flag & FWXFERQ_EXTBUF) == 0 &&
+		if ((dbch->xferq.flag & FWXFERQ_EXTBUF) == 0 &&
 					db_tr->buf != NULL) {
 			fwdma_free_size(dbch->dmat, db_tr->dma_map,
 					db_tr->buf, dbch->xferq.psize);
-			db_tr->buf = NULL;*/
-		if ((dbch->xferq.flag & FWXFERQ_EXTBUF) == 0 &&
-					db_tr->Area > B_OK) {
-			delete_area(db_tr->Area);
-			db_tr->Area = -1;
+			db_tr->buf = NULL;
+		else if (db_tr->dma_map != NULL)
+			bus_dmamap_destroy(dbch->dmat, db_tr->dma_map);
+	}*/
+	if ((dbch->xferq.flag & FWXFERQ_EXTBUF) == 0 &&
+				dbch->Area > B_OK) {
+		delete_area(dbch->Area);
+		dbch->Area = -1;
 
-		}
-/*		else if (db_tr->dma_map != NULL)
-			bus_dmamap_destroy(dbch->dmat, db_tr->dma_map);*/
 	}
 	dbch->ndb = 0;
 	db_tr = STAILQ_FIRST(&dbch->db_trq);
@@ -1438,6 +1438,10 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 	uint32_t off = 0;
 	struct fwohcidb_tr *db_tr;
 	struct fwohcidb *db;
+	void *buf_virt, *buf_phy;
+	struct fw_xferq *ir;
+	bus_addr_t dbuf[2];
+	int dsiz[2];
 
 	z = dbch->ndesc;
 	if(&sc->arrq == dbch){
@@ -1471,8 +1475,39 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 		dbch->bottom = STAILQ_NEXT(dbch->bottom, link);
 	}
 	db_tr = dbch->top;
+
+	ir = &dbch->xferq;
+	if(ir->buf == NULL && (ir->flag & FWXFERQ_EXTBUF) == 0) {
+		dbch->Area = alloc_mem(&buf_virt, &buf_phy, 
+				ir->psize * dbch->ndb, 0, "fw rx Area");
+		if(dbch->Area < B_OK)
+			return(ENOMEM);
+	}
+	
 	for (idb = 0; idb < dbch->ndb; idb ++) {
-		fwohci_add_rx_buf(dbch, db_tr, idb, &sc->dummy_dma);
+		//fwohci_add_rx_buf(dbch, db_tr, idb, &sc->dummy_dma);
+		if(ir->buf == NULL && (ir->flag & FWXFERQ_EXTBUF) == 0) {
+			db_tr->buf = (caddr_t)buf_virt;
+			dbuf[0] = (bus_addr_t)buf_phy;
+
+			db_tr->dbcnt = 1;
+			dsiz[0] = ir->psize;
+			buf_virt += ir->psize;
+			buf_phy += ir->psize;
+		} else {
+			db_tr->dbcnt = 0;
+			dsiz[db_tr->dbcnt] = sizeof(uint32_t);
+			dbuf[db_tr->dbcnt++] = sc->dummy_dma.bus_addr;
+			dsiz[db_tr->dbcnt] = ir->psize;
+			if (ir->buf != NULL) {
+				db_tr->buf = fwdma_v_addr(ir->buf, idb);
+				dbuf[db_tr->dbcnt] = fwdma_bus_addr(
+						ir->buf, idb);
+			}
+			db_tr->dbcnt++;
+		}
+		fwohci_set_rx_buf(ir, db_tr, dbuf, dsiz);
+
 		if (STAILQ_NEXT(db_tr, link) == NULL)
 			break;
 		db = db_tr->db;
@@ -2566,47 +2601,13 @@ fwohci_add_tx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
 	return 0;
 }
 
-int
-fwohci_add_rx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
-		int poffset, struct fwdma_alloc *dummy_dma)
+static inline void
+fwohci_set_rx_buf(struct fw_xferq *ir, struct fwohcidb_tr *db_tr, 
+		bus_addr_t dbuf[], int dsiz[])
 {
-	struct fwohcidb *db = db_tr->db;
-	struct fw_xferq *ir;
 	int i, ldesc;
-	bus_addr_t dbuf[2];
-	int dsiz[2];
-	void * buf_virt, *buf_phy;
+	struct fwohcidb *db = db_tr->db;
 
-	ir = &dbch->xferq;
-	if (ir->buf == NULL && (dbch->xferq.flag & FWXFERQ_EXTBUF) == 0) {
-/*		db_tr->buf = fwdma_malloc_size(dbch->dmat, &db_tr->dma_map,
-			ir->psize, &dbuf[0], BUS_DMA_NOWAIT);
-		if (db_tr->buf == NULL)
-			return(ENOMEM);*/
-		db_tr->Area = alloc_mem(&buf_virt, &buf_phy, 
-				MIN(ir->psize, MAX_REQCOUNT), 0, "fw ir Area");
-		if(db_tr->Area < B_OK)
-			return(ENOMEM);
-		db_tr->buf = (caddr_t)buf_virt;
-		dbuf[0] = (bus_addr_t)buf_phy;
-
-		db_tr->dbcnt = 1;
-		dsiz[0] = ir->psize;
-/*		bus_dmamap_sync(dbch->dmat, db_tr->dma_map,
-			BUS_DMASYNC_PREREAD);*/
-	} else {
-		db_tr->dbcnt = 0;
-		if (dummy_dma != NULL) {
-			dsiz[db_tr->dbcnt] = sizeof(uint32_t);
-			dbuf[db_tr->dbcnt++] = dummy_dma->bus_addr;
-		}
-		dsiz[db_tr->dbcnt] = ir->psize;
-		if (ir->buf != NULL) {
-			db_tr->buf = fwdma_v_addr(ir->buf, poffset);
-			dbuf[db_tr->dbcnt] = fwdma_bus_addr( ir->buf, poffset);
-		}
-		db_tr->dbcnt++;
-	}
 	for(i = 0 ; i < db_tr->dbcnt ; i++){
 		FWOHCI_DMA_WRITE(db[i].db.desc.addr, dbuf[i]);
 		FWOHCI_DMA_WRITE(db[i].db.desc.cmd, OHCI_INPUT_MORE | dsiz[i]);
@@ -2620,7 +2621,6 @@ fwohci_add_rx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
 		FWOHCI_DMA_SET(db[ldesc].db.desc.cmd, OHCI_INPUT_LAST);
 	}
 	FWOHCI_DMA_SET(db[ldesc].db.desc.cmd, OHCI_BRANCH_ALWAYS);
-	return 0;
 }
 
 
