@@ -125,7 +125,7 @@ div.bottomnav p {
 	padding: 15px 15px 15px 80px;
 	margin-bottom: 15px;
 	margin-top: 15px;
-	min-height: 70px;
+	min-height: 32px;
 }
 .box-info {
 	background: #e4ffde url(userguide/images/alert_info_32.png) 15px 15px no-repeat;
