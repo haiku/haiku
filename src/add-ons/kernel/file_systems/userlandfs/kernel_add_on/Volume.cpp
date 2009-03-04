@@ -151,6 +151,24 @@ PRINT(("put_vnode(%ld, %lld)\n", GetID(), vnid));
 	return error;
 }
 
+
+// AcquireVNode
+status_t
+Volume::AcquireVNode(ino_t vnid)
+{
+PRINT(("acquire_vnode(%ld, %lld)\n", GetID(), vnid));
+	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
+		ERROR(("Volume::AcquireVNode(): acquire_vnode() invoked for unknown "
+			"vnode while mounting!\n"));
+	}
+
+	status_t error = acquire_vnode(fFSVolume, vnid);
+	if (error == B_OK)
+		_IncrementVNodeCount(vnid);
+	return error;
+}
+
+
 // NewVNode
 status_t
 Volume::NewVNode(ino_t vnid, void* node)

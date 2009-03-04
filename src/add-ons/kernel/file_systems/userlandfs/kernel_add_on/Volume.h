@@ -49,6 +49,7 @@ public:
 			// client methods
 			status_t			GetVNode(ino_t vnid, void** node);
 			status_t			PutVNode(ino_t vnid);
+			status_t			AcquireVNode(ino_t vnid);
 			status_t			NewVNode(ino_t vnid, void* node);
 			status_t			PublishVNode(ino_t vnid, void* node,
 									int type, uint32 flags);

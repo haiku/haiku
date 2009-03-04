@@ -192,6 +192,8 @@ enum {
 	GET_VNODE_REPLY,
 	PUT_VNODE_REQUEST,
 	PUT_VNODE_REPLY,
+	ACQUIRE_VNODE_REQUEST,
+	ACQUIRE_VNODE_REPLY,
 	NEW_VNODE_REQUEST,
 	NEW_VNODE_REPLY,
 	PUBLISH_VNODE_REQUEST,
@@ -1465,6 +1467,21 @@ public:
 	PutVNodeReply() : ReplyRequest(PUT_VNODE_REPLY) {}
 };
 
+// AcquireVNodeRequest
+class AcquireVNodeRequest : public Request {
+public:
+	AcquireVNodeRequest() : Request(ACQUIRE_VNODE_REQUEST) {}
+
+	dev_t		nsid;
+	ino_t		vnid;
+};
+
+// AcquireVNodeReply
+class AcquireVNodeReply : public ReplyRequest {
+public:
+	AcquireVNodeReply() : ReplyRequest(ACQUIRE_VNODE_REPLY) {}
+};
+
 // NewVNodeRequest
 class NewVNodeRequest : public Request {
 public:
@@ -2073,6 +2090,8 @@ using UserlandFSUtil::GetVNodeRequest;
 using UserlandFSUtil::GetVNodeReply;
 using UserlandFSUtil::PutVNodeRequest;
 using UserlandFSUtil::PutVNodeReply;
+using UserlandFSUtil::AcquireVNodeRequest;
+using UserlandFSUtil::AcquireVNodeReply;
 using UserlandFSUtil::NewVNodeRequest;
 using UserlandFSUtil::NewVNodeReply;
 using UserlandFSUtil::PublishVNodeRequest;

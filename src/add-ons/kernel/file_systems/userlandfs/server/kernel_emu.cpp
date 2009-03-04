@@ -328,10 +328,37 @@ UserlandFS::KernelEmu::put_vnode(dev_t nsid, ino_t vnid)
 
 // acquire_vnode
 status_t
-UserlandFS::KernelEmu::acquire_vnode(dev_t nsid, ino_t vnodeID)
+UserlandFS::KernelEmu::acquire_vnode(dev_t nsid, ino_t vnid)
 {
-	// TODO: Implement!
-	return B_BAD_VALUE;
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	AcquireVNodeRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = nsid;
+	request->vnid = vnid;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, ACQUIRE_VNODE_REPLY);
+	AcquireVNodeReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return error;
 }
 
 // new_vnode
@@ -420,7 +447,6 @@ UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data)
 		return B_BAD_VALUE;
 
 	// stat() the node to get its type
-// TODO: This must not be called while mounting!
 	int type;
 	status_t error = volume->GetVNodeType(data, &type);
 	if (error != B_OK)

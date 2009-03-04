@@ -12,6 +12,7 @@
 
 namespace UserlandFSUtil {
 
+class AcquireVNodeRequest;
 class GetVNodeRemovedRequest;
 class GetVNodeRequest;
 class NewVNodeRequest;
@@ -25,6 +26,7 @@ class UnremoveVNodeRequest;
 
 }
 
+using UserlandFSUtil::AcquireVNodeRequest;
 using UserlandFSUtil::GetVNodeRemovedRequest;
 using UserlandFSUtil::GetVNodeRequest;
 using UserlandFSUtil::NewVNodeRequest;
@@ -57,6 +59,7 @@ private:
 			// vnodes
 			status_t			_HandleRequest(GetVNodeRequest* request);
 			status_t			_HandleRequest(PutVNodeRequest* request);
+			status_t			_HandleRequest(AcquireVNodeRequest* request);
 			status_t			_HandleRequest(NewVNodeRequest* request);
 			status_t			_HandleRequest(PublishVNodeRequest* request);
 			status_t			_HandleRequest(RemoveVNodeRequest* request);
