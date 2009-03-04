@@ -205,6 +205,22 @@ enum {
 	GET_VNODE_REMOVED_REQUEST,
 	GET_VNODE_REMOVED_REPLY,
 
+	// file cache
+	FILE_CACHE_CREATE_REQUEST,
+	FILE_CACHE_CREATE_REPLY,
+	FILE_CACHE_DELETE_REQUEST,
+	FILE_CACHE_DELETE_REPLY,
+	FILE_CACHE_SET_ENABLED_REQUEST,
+	FILE_CACHE_SET_ENABLED_REPLY,
+	FILE_CACHE_SET_SIZE_REQUEST,
+	FILE_CACHE_SET_SIZE_REPLY,
+	FILE_CACHE_SYNC_REQUEST,
+	FILE_CACHE_SYNC_REPLY,
+	FILE_CACHE_READ_REQUEST,
+	FILE_CACHE_READ_REPLY,
+	FILE_CACHE_WRITE_REQUEST,
+	FILE_CACHE_WRITE_REPLY,
+
 	// general reply
 	RECEIPT_ACK_REPLY,
 
@@ -288,6 +304,15 @@ public:
 	QueryRequest(uint32 type) : VolumeRequest(type) {}
 
 	void*		queryCookie;
+};
+
+// FileCacheRequest
+class FileCacheRequest : public Request {
+public:
+	FileCacheRequest(uint32 type) : Request(type) {}
+
+	dev_t		volumeID;
+	ino_t		vnodeID;
 };
 
 
@@ -1564,6 +1589,118 @@ public:
 };
 
 
+// #pragma mark - file cache
+
+
+// FileCacheCreateRequest
+class FileCacheCreateRequest : public FileCacheRequest {
+public:
+	FileCacheCreateRequest() : FileCacheRequest(FILE_CACHE_CREATE_REQUEST) {}
+
+	size_t		size;
+};
+
+// FileCacheCreateReply
+class FileCacheCreateReply : public ReplyRequest {
+public:
+	FileCacheCreateReply() : ReplyRequest(FILE_CACHE_CREATE_REPLY) {}
+};
+
+// FileCacheDeleteRequest
+class FileCacheDeleteRequest : public FileCacheRequest {
+public:
+	FileCacheDeleteRequest() : FileCacheRequest(FILE_CACHE_DELETE_REQUEST) {}
+};
+
+// FileCacheDeleteReply
+class FileCacheDeleteReply : public ReplyRequest {
+public:
+	FileCacheDeleteReply() : ReplyRequest(FILE_CACHE_DELETE_REPLY) {}
+};
+
+// FileCacheSetEnabledRequest
+class FileCacheSetEnabledRequest : public FileCacheRequest {
+public:
+	FileCacheSetEnabledRequest()
+		: FileCacheRequest(FILE_CACHE_SET_ENABLED_REQUEST) {}
+
+	bool		enabled;
+};
+
+// FileCacheSetEnabledReply
+class FileCacheSetEnabledReply : public ReplyRequest {
+public:
+	FileCacheSetEnabledReply() : ReplyRequest(FILE_CACHE_SET_ENABLED_REPLY) {}
+};
+
+// FileCacheSetSizeRequest
+class FileCacheSetSizeRequest : public FileCacheRequest {
+public:
+	FileCacheSetSizeRequest() : FileCacheRequest(FILE_CACHE_SET_SIZE_REQUEST) {}
+
+	size_t		size;
+};
+
+// FileCacheSetSizeReply
+class FileCacheSetSizeReply : public ReplyRequest {
+public:
+	FileCacheSetSizeReply() : ReplyRequest(FILE_CACHE_SET_SIZE_REPLY) {}
+};
+
+
+// FileCacheSyncRequest
+class FileCacheSyncRequest : public FileCacheRequest {
+public:
+	FileCacheSyncRequest() : FileCacheRequest(FILE_CACHE_SYNC_REQUEST) {}
+};
+
+// FileCacheSyncReply
+class FileCacheSyncReply : public ReplyRequest {
+public:
+	FileCacheSyncReply() : ReplyRequest(FILE_CACHE_SYNC_REPLY) {}
+};
+
+
+// FileCacheReadRequest
+class FileCacheReadRequest : public FileCacheRequest {
+public:
+	FileCacheReadRequest() : FileCacheRequest(FILE_CACHE_READ_REQUEST) {}
+
+	void*		cookie;
+	off_t		pos;
+	size_t		size;
+};
+
+// FileCacheReadReply
+class FileCacheReadReply : public ReplyRequest {
+public:
+	FileCacheReadReply() : ReplyRequest(FILE_CACHE_READ_REPLY) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+	size_t		bytesRead;
+};
+
+// FileCacheWriteRequest
+class FileCacheWriteRequest : public FileCacheRequest {
+public:
+	FileCacheWriteRequest() : FileCacheRequest(FILE_CACHE_WRITE_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	void*		cookie;
+	Address		buffer;
+	off_t		pos;
+};
+
+// FileCacheWriteReply
+class FileCacheWriteReply : public ReplyRequest {
+public:
+	FileCacheWriteReply() : ReplyRequest(FILE_CACHE_WRITE_REPLY) {}
+
+	size_t		bytesWritten;
+};
+
+
 //////////////////
 // General Reply
 
@@ -1887,6 +2024,10 @@ do_for_request(Request* request, Task& task)
 			return task((PutVNodeRequest*)request);
 		case PUT_VNODE_REPLY:
 			return task((PutVNodeReply*)request);
+		case ACQUIRE_VNODE_REQUEST:
+			return task((PutVNodeRequest*)request);
+		case ACQUIRE_VNODE_REPLY:
+			return task((AcquireVNodeReply*)request);
 		case NEW_VNODE_REQUEST:
 			return task((NewVNodeRequest*)request);
 		case NEW_VNODE_REPLY:
@@ -1907,6 +2048,35 @@ do_for_request(Request* request, Task& task)
 			return task((GetVNodeRemovedRequest*)request);
 		case GET_VNODE_REMOVED_REPLY:
 			return task((GetVNodeRemovedReply*)request);
+		// file cache
+		case FILE_CACHE_CREATE_REQUEST:
+			return task((FileCacheCreateRequest*)request);
+		case FILE_CACHE_CREATE_REPLY:
+			return task((FileCacheCreateReply*)request);
+		case FILE_CACHE_DELETE_REQUEST:
+			return task((FileCacheDeleteRequest*)request);
+		case FILE_CACHE_DELETE_REPLY:
+			return task((FileCacheDeleteReply*)request);
+		case FILE_CACHE_SET_ENABLED_REQUEST:
+			return task((FileCacheSetEnabledRequest*)request);
+		case FILE_CACHE_SET_ENABLED_REPLY:
+			return task((FileCacheSetEnabledReply*)request);
+		case FILE_CACHE_SET_SIZE_REQUEST:
+			return task((FileCacheSetSizeRequest*)request);
+		case FILE_CACHE_SET_SIZE_REPLY:
+			return task((FileCacheSetSizeReply*)request);
+		case FILE_CACHE_SYNC_REQUEST:
+			return task((FileCacheSyncRequest*)request);
+		case FILE_CACHE_SYNC_REPLY:
+			return task((FileCacheSyncReply*)request);
+		case FILE_CACHE_READ_REQUEST:
+			return task((FileCacheReadRequest*)request);
+		case FILE_CACHE_READ_REPLY:
+			return task((FileCacheReadReply*)request);
+		case FILE_CACHE_WRITE_REQUEST:
+			return task((FileCacheWriteRequest*)request);
+		case FILE_CACHE_WRITE_REPLY:
+			return task((FileCacheWriteReply*)request);
 		// general reply
 		case RECEIPT_ACK_REPLY:
 			return task((ReceiptAckReply*)request);
@@ -2102,6 +2272,21 @@ using UserlandFSUtil::UnremoveVNodeRequest;
 using UserlandFSUtil::UnremoveVNodeReply;
 using UserlandFSUtil::GetVNodeRemovedRequest;
 using UserlandFSUtil::GetVNodeRemovedReply;
+// file cache
+using UserlandFSUtil::FileCacheCreateRequest;
+using UserlandFSUtil::FileCacheCreateReply;
+using UserlandFSUtil::FileCacheDeleteRequest;
+using UserlandFSUtil::FileCacheDeleteReply;
+using UserlandFSUtil::FileCacheSetEnabledRequest;
+using UserlandFSUtil::FileCacheSetEnabledReply;
+using UserlandFSUtil::FileCacheSetSizeRequest;
+using UserlandFSUtil::FileCacheSetSizeReply;
+using UserlandFSUtil::FileCacheSyncRequest;
+using UserlandFSUtil::FileCacheSyncReply;
+using UserlandFSUtil::FileCacheReadRequest;
+using UserlandFSUtil::FileCacheReadReply;
+using UserlandFSUtil::FileCacheWriteRequest;
+using UserlandFSUtil::FileCacheWriteReply;
 // general reply
 using UserlandFSUtil::ReceiptAckReply;
 

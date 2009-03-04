@@ -297,6 +297,22 @@ NotifyQueryRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
+// FileCacheReadReply
+status_t
+FileCacheReadReply::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(buffer);
+	return B_OK;
+}
+
+// FileCacheWriteRequest
+status_t
+FileCacheWriteRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(buffer);
+	return B_OK;
+}
+
 
 // #pragma mark -
 
