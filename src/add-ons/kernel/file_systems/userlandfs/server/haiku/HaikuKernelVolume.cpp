@@ -7,18 +7,29 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "AutoDeleter.h"
+#include "AutoLocker.h"
 #include "Debug.h"
+#include "HashMap.h"
 
 #include "../kernel_emu.h"
 
 #include "HaikuKernelNode.h"
 
 
+// NodeMap
+class HaikuKernelVolume::NodeMap
+	: public SynchronizedHashMap<HashKey64<ino_t>, HaikuKernelNode*> {
+};
+
+
 // constructor
 HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	file_system_module_info* fsModule)
-	: Volume(fileSystem, id),
-	  fFSModule(fsModule)
+	:
+	Volume(fileSystem, id),
+	fFSModule(fsModule),
+	fNodes(NULL)
 {
 	fVolume.id = id;
 	fVolume.partition = -1;
@@ -38,41 +49,98 @@ HaikuKernelVolume::~HaikuKernelVolume()
 }
 
 
+// Init
+status_t
+HaikuKernelVolume::Init()
+{
+	fNodes = new(std::nothrow) NodeMap;
+	if (fNodes == NULL)
+		return B_NO_MEMORY;
+
+	return fNodes->InitCheck();
+}
+
+
 // NewVNode
 status_t
 HaikuKernelVolume::NewVNode(ino_t vnodeID, void* privateNode, fs_vnode_ops* ops,
-	HaikuKernelNode** node)
+	HaikuKernelNode** _node)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	AutoLocker<NodeMap> _(fNodes);
+
+	// check whether we do already know the node
+	HaikuKernelNode* node = fNodes->Get(vnodeID);
+	if (node != NULL)
+		return B_BAD_VALUE;
+
+	// create a new node
+	node = new(std::nothrow) HaikuKernelNode(this, vnodeID, privateNode, ops);
+	if (node == NULL)
+		return B_NO_MEMORY;
+
+	// add to map
+	status_t error = fNodes->Put(vnodeID, node);
+	if (error != B_OK) {
+		delete node;
+		return error;
+	}
+
+	*_node = node;
+
+	return B_OK;
 }
 
 
 // PublishVNode
 status_t
 HaikuKernelVolume::PublishVNode(ino_t vnodeID, void* privateNode,
-	fs_vnode_ops* ops, int type, uint32 flags, HaikuKernelNode** node)
+	fs_vnode_ops* ops, int type, uint32 flags, HaikuKernelNode** _node)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	AutoLocker<NodeMap> _(fNodes);
+
+	// check whether we do already know the node
+	HaikuKernelNode* node = fNodes->Get(vnodeID);
+	if (node != NULL) {
+		if (node->published)
+			return B_BAD_VALUE;
+	} else {
+		// create a new node
+		node = new(std::nothrow) HaikuKernelNode(this, vnodeID, privateNode,
+			ops);
+		if (node == NULL)
+			return B_NO_MEMORY;
+
+		// add to map
+		status_t error = fNodes->Put(vnodeID, node);
+		if (error != B_OK) {
+			delete node;
+			return error;
+		}
+	}
+
+	node->published = true;
+
+	*_node = node;
+
+	return B_OK;
 }
 
 
 // UndoNewVNode
-status_t
+void
 HaikuKernelVolume::UndoNewVNode(HaikuKernelNode* node)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	fNodes->Remove(node->id);
+	delete node;
 }
 
 
 // UndoPublishVNode
-status_t
+void
 HaikuKernelVolume::UndoPublishVNode(HaikuKernelNode* node)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	fNodes->Remove(node->id);
+	delete node;
 }
 
 
@@ -189,21 +257,37 @@ HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 	if (!fVolume.ops->get_vnode)
 		return B_BAD_VALUE;
 
-	// create a new wrapper node
-	HaikuKernelNode* node = new(std::nothrow) HaikuKernelNode;
+	// create a new wrapper node and add it to the map
+	HaikuKernelNode* node = new(std::nothrow) HaikuKernelNode(this, vnid, NULL,
+		NULL);
 	if (node == NULL)
 		return B_NO_MEMORY;
-	node->volume = this;
+	ObjectDeleter<HaikuKernelNode> nodeDeleter(node);
+
+	AutoLocker<NodeMap> locker(fNodes);
+	if (fNodes->Get(vnid) != NULL)
+		return B_BAD_VALUE;
+
+	status_t error = fNodes->Put(vnid, node);
+	if (error != B_OK)
+		return error;
+
+	locker.Unlock();
 
 	// get the node
-	status_t error = fVolume.ops->get_vnode(&fVolume, vnid, node, type, flags,
-		reenter);
+	error = fVolume.ops->get_vnode(&fVolume, vnid, node, type, flags, reenter);
 	if (error != B_OK) {
-		delete node;
+		locker.Lock();
+		fNodes->Remove(vnid);
 		return error;
 	}
 
+	locker.Lock();
+	node->published = true;
+	nodeDeleter.Detach();
+
 	*_node = node;
+
 	return B_OK;
 }
 
@@ -212,6 +296,8 @@ status_t
 HaikuKernelVolume::WriteVNode(void* _node, bool reenter)
 {
 	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	fNodes->Remove(node->id);
 
 	if (!node->ops->put_vnode)
 		return B_BAD_VALUE;
@@ -227,6 +313,8 @@ status_t
 HaikuKernelVolume::RemoveVNode(void* _node, bool reenter)
 {
 	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	fNodes->Remove(node->id);
 
 	if (!node->ops->remove_vnode)
 		return B_BAD_VALUE;

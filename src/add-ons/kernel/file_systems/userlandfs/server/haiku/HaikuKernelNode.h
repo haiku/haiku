@@ -18,13 +18,31 @@ using UserlandFSUtil::FSVNodeCapabilities;
 
 
 struct HaikuKernelNode : fs_vnode {
+			ino_t				id;
 			HaikuKernelVolume*	volume;
+			bool				published;
 
 public:
+	inline						HaikuKernelNode(HaikuKernelVolume* volume,
+									ino_t vnodeID, void* privateNode,
+									fs_vnode_ops* ops);
+
 	static	HaikuKernelNode*	GetNode(fs_vnode* node);
 
 			HaikuKernelVolume*	GetVolume() const	{ return volume; }
 };
+
+
+HaikuKernelNode::HaikuKernelNode(HaikuKernelVolume* volume, ino_t vnodeID,
+	void* privateNode, fs_vnode_ops* ops)
+	:
+	id(vnodeID),
+	volume(volume),
+	published(false)
+{
+	this->private_node = privateNode;
+	this->ops = ops;
+}
 
 
 /*static*/ inline HaikuKernelNode*

@@ -59,16 +59,24 @@ HaikuKernelFileSystem::Init()
 
 // CreateVolume
 status_t
-HaikuKernelFileSystem::CreateVolume(Volume** volume, dev_t id)
+HaikuKernelFileSystem::CreateVolume(Volume** _volume, dev_t id)
 {
 	// check initialization and parameters
-	if (!fFSModule || !volume)
+	if (!fFSModule || !_volume)
 		return B_BAD_VALUE;
 
-	// create the volume
-	*volume = new(std::nothrow) HaikuKernelVolume(this, id, fFSModule);
-	if (!*volume)
+	// create and init the volume
+	HaikuKernelVolume* volume
+		= new(std::nothrow) HaikuKernelVolume(this, id, fFSModule);
+	if (!volume)
 		return B_NO_MEMORY;
+
+	status_t error = volume->Init();
+	if (error != B_OK) {
+		delete volume;
+		return error;
+	}
+
 	return B_OK;
 }
 

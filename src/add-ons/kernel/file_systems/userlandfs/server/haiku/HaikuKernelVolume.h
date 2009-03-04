@@ -23,13 +23,15 @@ public:
 
 	inline	fs_volume*			GetFSVolume()	{ return &fVolume; }
 
+			status_t			Init();
+
 			status_t			NewVNode(ino_t vnodeID, void* privateNode,
 									fs_vnode_ops* ops, HaikuKernelNode** node);
 			status_t			PublishVNode(ino_t vnodeID, void* privateNode,
 									fs_vnode_ops* ops, int type, uint32 flags,
 									HaikuKernelNode** node);
-			status_t			UndoNewVNode(HaikuKernelNode* node);
-			status_t			UndoPublishVNode(HaikuKernelNode* node);
+			void				UndoNewVNode(HaikuKernelNode* node);
+			void				UndoPublishVNode(HaikuKernelNode* node);
 
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
@@ -173,12 +175,15 @@ private:
 		HaikuKernelVolume*	haikuVolume;
 	};
 
+	class NodeMap;
+
 private:
 			void				_InitCapabilities();
 
 private:
 			file_system_module_info* fFSModule;
 			FSVolume			fVolume;
+			NodeMap*			fNodes;
 };
 
 
