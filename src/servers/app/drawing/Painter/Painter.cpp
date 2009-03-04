@@ -1979,6 +1979,26 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 	uint32 srcWidth = srcBuffer.width();
 	uint32 srcHeight = srcBuffer.height();
 
+	// Do not calculate more filter weights than necessary and also
+	// keep the stack based allocations reasonably sized
+	if (fClippingRegion->Frame().IntegerWidth() + 1 < dstWidth)
+		dstWidth = fClippingRegion->Frame().IntegerWidth() + 1;
+	if (fClippingRegion->Frame().IntegerHeight() + 1 < dstHeight)
+		dstHeight = fClippingRegion->Frame().IntegerHeight() + 1;
+
+	// When calculating less filter weights than specified by viewRect,
+	// we need to compensate the offset.
+	uint32 filterWeightXIndexOffset = 0;
+	uint32 filterWeightYIndexOffset = 0;
+	if (fClippingRegion->Frame().left > viewRect.left) {
+		filterWeightXIndexOffset = fClippingRegion->Frame().left
+			- viewRect.left;
+	}
+	if (fClippingRegion->Frame().top > viewRect.top) {
+		filterWeightYIndexOffset = fClippingRegion->Frame().top
+			- viewRect.top;
+	}
+
 	// should not pose a problem with stack overflows
 	// (needs around 6Kb for 1920x1200)
 	uint16 xIndices[dstWidth];
@@ -1992,7 +2012,8 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 
 	for (uint32 i = 0; i < dstWidth; i++) {
 		// index into source
-		uint16 index = (uint16)(i * srcWidth / (srcWidth * xScale));
+		uint16 index = (uint16)((i + filterWeightXIndexOffset) * srcWidth
+			/ (srcWidth * xScale));
 		// round down to get the left pixel
 		xIndices[i] = index;
 		// handle cropped source bitmap
@@ -2003,7 +2024,8 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 
 	for (uint32 i = 0; i < dstHeight; i++) {
 		// index into source
-		uint16 index = (uint16)(i * srcHeight / (srcHeight * yScale));
+		uint16 index = (uint16)((i + filterWeightYIndexOffset) * srcHeight
+			/ (srcHeight * yScale));
 		// round down to get the top pixel
 		yIndices[i] = index;
 		// handle cropped source bitmap
@@ -2041,10 +2063,10 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 
 		// x and y are needed as indeces into the wheight arrays, so the
 		// offset into the target buffer needs to be compensated
-		const int32 xIndexL = x1 - left;
-		const int32 xIndexR = x2 - left;
-		y1 -= top;
-		y2 -= top;
+		const int32 xIndexL = x1 - left - filterWeightXIndexOffset;
+		const int32 xIndexR = x2 - left - filterWeightXIndexOffset;
+		y1 -= top + filterWeightYIndexOffset;
+		y2 -= top + filterWeightYIndexOffset;
 
 //printf("x: %ld - %ld\n", xIndexL, xIndexR);
 //printf("y: %ld - %ld\n", y1, y2);
@@ -2077,6 +2099,26 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	uint32 dstHeight = viewRect.IntegerHeight() + 1;
 	uint32 srcWidth = srcBuffer.width();
 	uint32 srcHeight = srcBuffer.height();
+
+	// Do not calculate more filter weights than necessary and also
+	// keep the stack based allocations reasonably sized
+	if (fClippingRegion->Frame().IntegerWidth() + 1 < dstWidth)
+		dstWidth = fClippingRegion->Frame().IntegerWidth() + 1;
+	if (fClippingRegion->Frame().IntegerHeight() + 1 < dstHeight)
+		dstHeight = fClippingRegion->Frame().IntegerHeight() + 1;
+
+	// When calculating less filter weights than specified by viewRect,
+	// we need to compensate the offset.
+	uint32 filterWeightXIndexOffset = 0;
+	uint32 filterWeightYIndexOffset = 0;
+	if (fClippingRegion->Frame().left > viewRect.left) {
+		filterWeightXIndexOffset = fClippingRegion->Frame().left
+			- viewRect.left;
+	}
+	if (fClippingRegion->Frame().top > viewRect.top) {
+		filterWeightYIndexOffset = fClippingRegion->Frame().top
+			- viewRect.top;
+	}
 
 	struct FilterInfo {
 		uint16 index;	// index into source bitmap row/column
@@ -2114,7 +2156,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		// to access the rightmost pixel of the source with a weighting
 		// of 255. This in turn will trigger an optimization in the loop
 		// that also prevents out of bounds access.
-		float index = i * (srcWidth - 1) / (srcWidth * xScale - 1);
+		float index = (i + filterWeightXIndexOffset) * (srcWidth - 1)
+			/ (srcWidth * xScale - 1);
 		// round down to get the left pixel
 		xWeights[i].index = (uint16)index;
 		xWeights[i].weight = 255 - (uint16)((index - xWeights[i].index) * 255);
@@ -2132,7 +2175,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		// to access the bottommost pixel of the source with a weighting
 		// of 255. This in turn will trigger an optimization in the loop
 		// that also prevents out of bounds access.
-		float index = i * (srcHeight - 1) / (srcHeight * yScale - 1);
+		float index = (i + filterWeightYIndexOffset) * (srcHeight - 1)
+			/ (srcHeight * yScale - 1);
 		// round down to get the top pixel
 		yWeights[i].index = (uint16)index;
 		yWeights[i].weight = 255 - (uint16)((index - yWeights[i].index) * 255);
@@ -2179,10 +2223,10 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 
 		// x and y are needed as indeces into the wheight arrays, so the
 		// offset into the target buffer needs to be compensated
-		const int32 xIndexL = x1 - left;
-		const int32 xIndexR = x2 - left;
-		y1 -= top;
-		y2 -= top;
+		const int32 xIndexL = x1 - left - filterWeightXIndexOffset;
+		const int32 xIndexR = x2 - left - filterWeightXIndexOffset;
+		y1 -= top + filterWeightYIndexOffset;
+		y2 -= top + filterWeightYIndexOffset;
 
 //printf("x: %ld - %ld\n", xIndexL, xIndexR);
 //printf("y: %ld - %ld\n", y1, y2);
