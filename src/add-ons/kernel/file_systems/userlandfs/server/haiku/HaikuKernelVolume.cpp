@@ -144,6 +144,14 @@ HaikuKernelVolume::UndoPublishVNode(HaikuKernelNode* node)
 }
 
 
+// NodeWithID
+HaikuKernelNode*
+HaikuKernelVolume::NodeWithID(ino_t vnodeID) const
+{
+	return fNodes->Get(vnodeID);
+}
+
+
 // #pragma mark -
 // #pragma mark ----- FS -----
 

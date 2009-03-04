@@ -33,6 +33,8 @@ public:
 			void				UndoNewVNode(HaikuKernelNode* node);
 			void				UndoPublishVNode(HaikuKernelNode* node);
 
+			HaikuKernelNode*	NodeWithID(ino_t vnodeID) const;
+
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
 									const char* parameters, ino_t* rootID);

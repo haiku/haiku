@@ -1,4 +1,7 @@
-// beos_kernel_emu.cpp
+/*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -12,6 +15,7 @@
 
 #include "Debug.h"
 
+#include "../FileSystem.h"
 #include "../kernel_emu.h"
 
 #include "HaikuKernelNode.h"
@@ -251,16 +255,29 @@ status_t
 vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
 	struct file_io_vec *vecs, size_t *_count)
 {
-	// TODO: Implement!
-	return B_BAD_VALUE;
+	HaikuKernelNode* node = (HaikuKernelNode*)vnode;
+
+	return node->volume->GetFileMap(node, offset, size, vecs, _count);
 }
 
 
 status_t
 vfs_lookup_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode)
 {
-	// TODO: Implement!
-	return B_BAD_VALUE;
+	// get the volume
+	HaikuKernelVolume* volume = dynamic_cast<HaikuKernelVolume*>(
+		FileSystem::GetInstance()->VolumeWithID(mountID));
+	if (volume == NULL)
+		return B_BAD_VALUE;
+
+	// get the node
+	HaikuKernelNode* node = volume->NodeWithID(vnodeID);
+	if (node == NULL)
+		return B_BAD_VALUE;
+
+	*_vnode = (struct vnode*)node;
+
+	return B_OK;
 }
 
 
