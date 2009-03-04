@@ -175,6 +175,15 @@ AddPosesResult::ReleaseModels(void)
 }
 
 
+static BPose *
+BSearch(PoseList *table, const BPose* key, BPoseView *view,
+	int (*cmp)(const BPose *, const BPose *, BPoseView *), 
+	bool returnClosest = true);
+
+static int
+PoseCompareAddWidget(const BPose *p1, const BPose *p2, BPoseView *view);
+
+
 // #pragma mark -
 
 
@@ -1622,11 +1631,18 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 	float listViewScrollBy = 0;
 	for (int32 modelIndex = 0; modelIndex < count; modelIndex++) {
 		Model *model = models[modelIndex];
-		
-		if (FindPose(model) || FindZombie(model->NodeRef())) { 
-			// we already have this pose, don't add it
+
+		model->OpenNode();
+		ASSERT(model->IsNodeOpen());
+		PoseInfo *poseInfo = &poseInfoArray[modelIndex];
+
+		// pose adopts model and deletes it when done
+		BPose *pose = new BPose(model, this, clipboardMode);
+
+		if (BSearch(fPoseList, pose, this, PoseCompareAddWidget, false) != NULL 
+			|| FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
-			delete model;
+			delete pose;
 			if (resultingPoses)
 				resultingPoses[modelIndex] = NULL;
 			continue;
@@ -1636,13 +1652,6 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			&& !HasPosesInClipboard()) {
 			SetHasPosesInClipboard(true);
 		}
-
-		model->OpenNode();
-		ASSERT(model->IsNodeOpen());
-		PoseInfo *poseInfo = &poseInfoArray[modelIndex];
-
-		// pose adopts model and deletes it when done
-		BPose *pose = new BPose(model, this, clipboardMode);
 
 		if (resultingPoses)
 			resultingPoses[modelIndex] = pose;
@@ -8326,7 +8335,7 @@ PoseCompareAddWidget(const BPose *p1, const BPose *p2, BPoseView *view)
 
 static BPose *
 BSearch(PoseList *table, const BPose* key, BPoseView *view,
-	int (*cmp)(const BPose *, const BPose *, BPoseView *))
+	int (*cmp)(const BPose *, const BPose *, BPoseView *), bool returnClosest)
 {
 	int32 r = table->CountItems();
 	BPose *result = 0;
@@ -8343,8 +8352,9 @@ BSearch(PoseList *table, const BPose* key, BPoseView *view,
 		else
 			r = m - 1;
 	}
-
-	return result;
+	if (returnClosest)
+		return result;
+	return NULL;
 }
 
 
