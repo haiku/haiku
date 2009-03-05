@@ -139,7 +139,7 @@ BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
-	write_overlay $(GPL_ONLY)reiserfs ;
+	write_overlay ;
 #googlefs $(GPL_ONLY)ntfs ;
 
 
