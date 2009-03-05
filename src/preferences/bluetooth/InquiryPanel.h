@@ -34,7 +34,9 @@ private:
 	BTextView*				fMessage;
 	BListView*				fRemoteList;
 	BScrollView*			fScrollView;
-	BMessageRunner*			fRunner;
+	BMessage*				fRetrieveMessage;
+	BMessage*				fSecondsMessage;
+	BMessenger				fMessenger;
 	
 	bool					fScanning;
 	bool					fRetrieving;
@@ -42,8 +44,6 @@ private:
 	DiscoveryAgent*			fDiscoveryAgent;
 	DiscoveryListener*		fDiscoveryListener;
 
-	
-	void UpdateUIStatus(void);
 	void UpdateListStatus(void);
 
 	rgb_color				activeColor;

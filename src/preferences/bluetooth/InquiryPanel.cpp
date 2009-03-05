@@ -38,6 +38,7 @@ static const uint32 kMsgAddListDevice = 'aDdv';
 
 static const uint32 kMsgSelected = 'isLt';
 static const uint32 kMsgSecond = 'sCMs';
+static const uint32 kMsgRetrieve = 'IrEt';
 
 
 class PanelDiscoveryListener : public DiscoveryListener {
@@ -85,12 +86,12 @@ private:
 InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
  :	BWindow(frame, "Bluetooth", B_FLOATING_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
- 		B_ALL_WORKSPACES ), fScanning(false)
+ 		B_ALL_WORKSPACES ), fMessenger(this)
+ 						  , fScanning(false)
  						  , fRetrieving(false)
  						  , fLocalDevice(lDevice)
+ 						  
 {
-//	BRect iDontCare(0,0,0,0);
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	fScanProgress = new BStatusBar("status", "Scanning progress", "");
@@ -135,8 +136,9 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		fInquiryButton->SetEnabled(false);
 	}
 
-	fRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgSecond), 1000000L);
-
+	fRetrieveMessage = new BMessage(kMsgRetrieve);
+	fSecondsMessage = new BMessage(kMsgSecond);
+	
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fMessage)
@@ -161,13 +163,14 @@ InquiryPanel::MessageReceived(BMessage *message)
 	static float timer = 0; // expected time of the inquiry process
 	static float scanningTime = 0;
 	static int32 retrievalIndex = 0;
+	static bool labelPlaced = false;
 	
 	switch (message->what) {
 		case kMsgInquiry:
 			
 			fDiscoveryAgent->StartInquiry(BT_GIAC, fDiscoveryListener, GetInquiryTime());
 			
-			timer = BT_BASE_INQUIRY_TIME * GetInquiryTime();			
+			timer = BT_BASE_INQUIRY_TIME * GetInquiryTime() + 1;			
 			fScanProgress->SetMaxValue(timer); // does it works as expected?
 
 		break;
@@ -202,25 +205,35 @@ InquiryPanel::MessageReceived(BMessage *message)
 
 		case kMsgStart:
 			fRemoteList->MakeEmpty();
-			fScanProgress->Reset();			
-			scanningTime = 0;			
+			fScanProgress->Reset();
+			fScanProgress->SetTo(1);
+			fScanProgress->SetTrailingText("Starting scan...");
+			fScanProgress->SetBarColor(activeColor);
+
+			fAddButton->SetEnabled(false);
+			fInquiryButton->SetEnabled(false);
+
+			BMessageRunner::StartSending(fMessenger, fSecondsMessage, 1000000, timer);
+
+			scanningTime = 1;			
 			fScanning = true;
-			
-			UpdateUIStatus();
+
 		break;
 
 		case kMsgFinish:
+
 			retrievalIndex = 0;
 			fScanning = false;
 			fRetrieving = true;
+			labelPlaced = false;						
+			fScanProgress->SetTo(100);
+			fScanProgress->SetTrailingText("Retrieving names...");
+			BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 1000000, 1);
 
-			UpdateListStatus();
-			UpdateUIStatus();
 		break;
 		
 		case kMsgSecond:
-		{
-			if (fScanning) {
+			if (fScanning && scanningTime < timer) {
 				BString elapsedTime = "Remaining ";
 				
 				fScanProgress->SetTo(scanningTime*100/timer); // TODO should not be needed if SetMaxValue works...
@@ -230,16 +243,34 @@ InquiryPanel::MessageReceived(BMessage *message)
 
 				scanningTime = scanningTime + 1;
 			}
-				
+		break;
+
+		case kMsgRetrieve:
+		
 			if (fRetrieving) {
 				
 				if (retrievalIndex < fDiscoveryAgent->RetrieveDevices(0).CountItems()) {
+					
+					if (!labelPlaced) {
+						
+						labelPlaced = true;
+						BString progressText = "Retrieving name of ";
+						progressText << bdaddrUtils::ToString(fDiscoveryAgent->RetrieveDevices(0).ItemAt(
+										retrievalIndex)->GetBluetoothAddress());
+						fScanProgress->SetTrailingText(progressText.String());						
+						
+					} else {
+						// Really erally expensive operation should be done in a separate thread
+						// once Haiku gets a BarberPole in API replacing the progress bar
+						((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))->SetDevice((BluetoothDevice*)
+									fDiscoveryAgent->RetrieveDevices(0).ItemAt(retrievalIndex));
+        				fRemoteList->InvalidateItem(retrievalIndex);
+        				
+        				retrievalIndex++;
+        				labelPlaced = false;
+					}
 										
-					((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))->
-        				SetDevice((BluetoothDevice*)fDiscoveryAgent->RetrieveDevices(0).ItemAt(retrievalIndex));
-
-        			fRemoteList->Invalidate();
-        			retrievalIndex++;
+					BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 500000, 1);
         			
 				} else {
 					
@@ -247,36 +278,17 @@ InquiryPanel::MessageReceived(BMessage *message)
 					retrievalIndex = 0;
 					
 					fScanProgress->SetBarColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-					fScanProgress->SetTrailingText("Scanning completed ...");
+					fScanProgress->SetTrailingText("Scanning completed.");
+					fInquiryButton->SetEnabled(true);
+					UpdateListStatus();
 				}
 			}
 
-			UpdateUIStatus();
-		}
 		break;
 
 		default:
 			BWindow::MessageReceived(message);
 			break;
-	}
-}
-
-
-void
-InquiryPanel::UpdateUIStatus(void)
-{
-	if (fScanning) {
-		fAddButton->SetEnabled(false);
-		fInquiryButton->SetEnabled(false);
-		fScanProgress->SetBarColor(activeColor);
-		fAddButton->SetEnabled(false);
-			
-	} else if (fRetrieving) {
-		fInquiryButton->SetEnabled(true);
-		fScanProgress->SetTo(100);
-		fScanProgress->SetTrailingText("Retrieving names ...");
-	} else {
-
 	}
 }
 
