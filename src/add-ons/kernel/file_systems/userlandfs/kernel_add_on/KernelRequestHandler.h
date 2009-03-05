@@ -65,6 +65,14 @@ private:
 			status_t			_HandleRequest(RemoveVNodeRequest* request);
 			status_t			_HandleRequest(UnremoveVNodeRequest* request);
 			status_t			_HandleRequest(GetVNodeRemovedRequest* request);
+			// file cache
+			status_t			_HandleRequest(FileCacheCreateRequest* request);
+			status_t			_HandleRequest(FileCacheDeleteRequest* request);
+			status_t			_HandleRequest(FileCacheSetEnabledRequest* request);
+			status_t			_HandleRequest(FileCacheSetSizeRequest* request);
+			status_t			_HandleRequest(FileCacheSyncRequest* request);
+			status_t			_HandleRequest(FileCacheReadRequest* request);
+			status_t			_HandleRequest(FileCacheWriteRequest* request);
 
 			status_t			_GetVolume(dev_t id, Volume** volume);
 

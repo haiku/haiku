@@ -240,6 +240,71 @@ PRINT(("get_vnode_removed(%ld, %lld, %p)\n", GetID(), vnid, removed));
 }
 
 
+// CreateFileCache
+status_t
+Volume::CreateFileCache(ino_t vnodeID, off_t size)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// DeleteFileCache
+status_t
+Volume::DeleteFileCache(ino_t vnodeID)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// SetFileCacheEnabled
+status_t
+Volume::SetFileCacheEnabled(ino_t vnodeID, bool enabled)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// SetFileCacheSize
+status_t
+Volume::SetFileCacheSize(ino_t vnodeID, off_t size)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// SyncFileCache
+status_t
+Volume::SyncFileCache(ino_t vnodeID)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// ReadFileCache
+status_t
+Volume::ReadFileCache(ino_t vnodeID, void* cookie,
+	off_t offset, void* buffer, size_t* _size)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
+// WriteFileCache
+status_t
+Volume::WriteFileCache(ino_t vnodeID, void* cookie,
+	off_t offset, const void *buffer, size_t *_size)
+{
+	// TODO: Implement!
+	return B_NOT_SUPPORTED;
+}
+
+
 // #pragma mark - FS
 
 

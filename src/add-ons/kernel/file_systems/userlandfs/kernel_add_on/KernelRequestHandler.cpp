@@ -9,6 +9,7 @@
 #include "KernelRequestHandler.h"
 #include "RequestPort.h"
 #include "Requests.h"
+#include "SingleReplyRequestHandler.h"
 #include "Volume.h"
 
 #include <NodeMonitor.h>
@@ -84,6 +85,21 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((UnremoveVNodeRequest*)request);
 		case GET_VNODE_REMOVED_REQUEST:
 			return _HandleRequest((GetVNodeRemovedRequest*)request);
+		// file cache
+		case FILE_CACHE_CREATE_REQUEST:
+			return _HandleRequest((FileCacheCreateRequest*)request);
+		case FILE_CACHE_DELETE_REQUEST:
+			return _HandleRequest((FileCacheDeleteRequest*)request);
+		case FILE_CACHE_SET_ENABLED_REQUEST:
+			return _HandleRequest((FileCacheSetEnabledRequest*)request);
+		case FILE_CACHE_SET_SIZE_REQUEST:
+			return _HandleRequest((FileCacheSetSizeRequest*)request);
+		case FILE_CACHE_SYNC_REQUEST:
+			return _HandleRequest((FileCacheSyncRequest*)request);
+		case FILE_CACHE_READ_REQUEST:
+			return _HandleRequest((FileCacheReadRequest*)request);
+		case FILE_CACHE_WRITE_REQUEST:
+			return _HandleRequest((FileCacheWriteRequest*)request);
 	}
 PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -97,7 +113,7 @@ request->GetType()));
 status_t
 KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	status_t result = B_OK;
 	if (fVolume && request->device != fVolume->GetID())
 		result = B_BAD_VALUE;
@@ -210,7 +226,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(NotifySelectEventRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	status_t result = B_OK;
 	if (fFileSystem->KnowsSelectSyncEntry(request->sync)) {
 		if (request->unspecifiedEvent) {
@@ -244,7 +260,7 @@ KernelRequestHandler::_HandleRequest(NotifySelectEventRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	status_t result = B_OK;
 	if (fVolume && request->device != fVolume->GetID())
 		result = B_BAD_VALUE;
@@ -308,7 +324,7 @@ KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(GetVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -331,7 +347,7 @@ KernelRequestHandler::_HandleRequest(GetVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(PutVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -353,7 +369,7 @@ KernelRequestHandler::_HandleRequest(PutVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(AcquireVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -377,7 +393,7 @@ KernelRequestHandler::_HandleRequest(AcquireVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(NewVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -398,7 +414,7 @@ KernelRequestHandler::_HandleRequest(NewVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(PublishVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -424,7 +440,7 @@ KernelRequestHandler::_HandleRequest(PublishVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(RemoveVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -445,7 +461,7 @@ KernelRequestHandler::_HandleRequest(RemoveVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(UnremoveVNodeRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -466,7 +482,7 @@ KernelRequestHandler::_HandleRequest(UnremoveVNodeRequest* request)
 status_t
 KernelRequestHandler::_HandleRequest(GetVNodeRemovedRequest* request)
 {
-	// check and executed the request
+	// check and execute the request
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
@@ -487,6 +503,206 @@ KernelRequestHandler::_HandleRequest(GetVNodeRemovedRequest* request)
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheCreateRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->CreateFileCache(request->vnid, request->size);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheCreateReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheDeleteRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->DeleteFileCache(request->vnid);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheDeleteReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheSetEnabledRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->SetFileCacheEnabled(request->vnid, request->enabled);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheSetEnabledReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheSetSizeRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->SetFileCacheSize(request->vnid, request->size);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheSetSizeReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheSyncRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->SyncFileCache(request->vnid);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheSyncReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheReadRequest* request)
+{
+	// check the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	size_t size = request->size;
+
+	// allocate the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheReadReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	void* buffer;
+	if (result == B_OK) {
+		result = allocator.AllocateAddress(reply->buffer, size, 1, &buffer,
+			true);
+	}
+
+	// execute the request
+	if (result == B_OK) {
+		result = volume->ReadFileCache(request->vnid, request->cookie,
+			request->pos, buffer, &size);
+	}
+
+	// prepare the reply
+	reply->error = result;
+	reply->bytesRead = size;
+
+	// send the reply
+	if (reply->error == B_OK && reply->bytesRead > 0) {
+		SingleReplyRequestHandler handler(RECEIPT_ACK_REPLY);
+		return fPort->SendRequest(&allocator, &handler);
+	}
+
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(FileCacheWriteRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	size_t size = 0;
+	if (result == B_OK) {
+		size = request->buffer.GetSize();
+		result = volume->WriteFileCache(request->vnid, request->cookie,
+			request->pos, request->buffer.GetData(), &size);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	FileCacheWriteReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+	reply->bytesWritten = size;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
 
 // _GetVolume
 status_t

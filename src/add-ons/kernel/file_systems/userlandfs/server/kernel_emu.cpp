@@ -764,7 +764,6 @@ UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
 	request->nsid = mountID;
 	request->vnid = vnodeID;
 	request->cookie = cookie;
-		// TODO: cookie can only be NULL!
 	request->pos = offset;
 	request->size = *_size;
 
@@ -780,7 +779,7 @@ UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
 	if (reply->error != B_OK)
 		return reply->error;
 
-	if (reply->buffer.GetSize() > 0) {
+	if (reply->bytesRead > 0) {
 		memcpy(bufferBase, reply->buffer.GetData(), reply->buffer.GetSize());
 
 		// send receipt-ack
@@ -790,7 +789,7 @@ UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
 			port->SendRequest(&receiptAckAllocator);
 	}
 
-	*_size = reply->buffer.GetSize();
+	*_size = reply->bytesRead;
 
 	return B_OK;
 }
@@ -818,7 +817,6 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 	request->nsid = mountID;
 	request->vnid = vnodeID;
 	request->cookie = cookie;
-		// TODO: cookie can only be NULL!
 	request->pos = offset;
 
 	error = allocator.AllocateData(request->buffer, buffer, *_size, 1, false);

@@ -1678,6 +1678,7 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		buffer;
+	size_t		bytesRead;
 };
 
 // FileCacheWriteRequest

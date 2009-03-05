@@ -57,6 +57,18 @@ public:
 			status_t			UnremoveVNode(ino_t vnid);
 			status_t			GetVNodeRemoved(ino_t vnid, bool* removed);
 
+			status_t			CreateFileCache(ino_t vnodeID, off_t size);
+			status_t			DeleteFileCache(ino_t vnodeID);
+			status_t			SetFileCacheEnabled(ino_t vnodeID,
+									bool enabled);
+			status_t			SetFileCacheSize(ino_t vnodeID, off_t size);
+			status_t			SyncFileCache(ino_t vnodeID);
+			status_t			ReadFileCache(ino_t vnodeID, void* cookie,
+									off_t offset, void* buffer, size_t* _size);
+			status_t			WriteFileCache(ino_t vnodeID, void* cookie,
+									off_t offset, const void *buffer,
+									size_t *_size);
+
 			// FS
 			status_t			Mount(const char* device, uint32 flags,
 									const char* parameters);
