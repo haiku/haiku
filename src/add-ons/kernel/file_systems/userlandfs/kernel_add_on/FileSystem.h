@@ -10,7 +10,6 @@
 #include "FSCapabilities.h"
 #include "LazyInitializable.h"
 #include "Locker.h"
-#include "Referencable.h"
 #include "RequestPort.h"
 #include "RequestPortPool.h"
 #include "String.h"

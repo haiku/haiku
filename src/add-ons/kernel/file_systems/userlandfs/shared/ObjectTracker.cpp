@@ -3,7 +3,8 @@
 #include <new>
 #include <typeinfo>
 
-#include "AutoLocker.h"
+#include <AutoLocker.h>
+
 #include "Debug.h"
 #include "ObjectTracker.h"
 
@@ -34,7 +35,7 @@ ObjectTracker::ObjectTracker()
 // destructor
 ObjectTracker::~ObjectTracker()
 {
-	ObjectTrackable* trackable = fTrackables.GetFirst();
+	ObjectTrackable* trackable = fTrackables.First();
 	if (trackable) {
 		WARN(("ObjectTracker: WARNING: There are still undeleted objects:\n"));
 		for (; trackable; trackable = fTrackables.GetNext(trackable)) {

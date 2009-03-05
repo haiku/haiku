@@ -1,9 +1,12 @@
-// ObjectTracker.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_OBJECT_TRACKER_H
 #define USERLAND_FS_OBJECT_TRACKER_H
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
+
 #include "Locker.h"
 
 namespace UserlandFSUtil {
@@ -21,18 +24,18 @@ private:
 	friend class ObjectTracker;
 	friend class GetObjectTrackableLink;
 
-			DLListLink<ObjectTrackable> fLink;
+			DoublyLinkedListLink<ObjectTrackable> fLink;
 };
 
 // GetObjectTrackableLink
 struct GetObjectTrackableLink {
-	inline DLListLink<ObjectTrackable> *operator()(
+	inline DoublyLinkedListLink<ObjectTrackable> *operator()(
 		ObjectTrackable* trackable) const
 	{
 		return &trackable->fLink;
 	}
 
-	inline const DLListLink<ObjectTrackable> *operator()(
+	inline const DoublyLinkedListLink<ObjectTrackable> *operator()(
 		const ObjectTrackable* trackable) const
 	{
 		return &trackable->fLink;
@@ -59,7 +62,8 @@ private:
 
 private:
 			Locker				fLock;
-			DLList<ObjectTrackable, GetObjectTrackableLink> fTrackables;
+			DoublyLinkedList<ObjectTrackable, GetObjectTrackableLink>
+				fTrackables;
 
 	static	ObjectTracker*		sTracker;
 };

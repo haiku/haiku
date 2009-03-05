@@ -7,8 +7,9 @@
 
 #include <fs_interface.h>
 
+#include <Referenceable.h>
+
 #include "FSCapabilities.h"
-#include "Referencable.h"
 
 namespace UserlandFSUtil {
 
@@ -29,7 +30,7 @@ using UserlandFSUtil::userlandfs_ioctl;
 
 class FileSystem;
 
-class Volume : public Referencable {
+class Volume : public Referenceable {
 public:
 								Volume(FileSystem* fileSystem,
 									fs_volume* fsVolume);

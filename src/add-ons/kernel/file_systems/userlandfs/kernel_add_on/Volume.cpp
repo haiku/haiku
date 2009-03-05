@@ -71,7 +71,7 @@ private:
 
 // constructor
 Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
-	: Referencable(true),
+	: Referenceable(true),
 	  fFileSystem(fileSystem),
 	  fFSVolume(fsVolume),
 	  fUserlandVolume(NULL),

@@ -5,8 +5,9 @@
 #ifndef USERLAND_FS_FILE_SYSTEM_INITIALIZER_H
 #define USERLAND_FS_FILE_SYSTEM_INITIALIZER_H
 
+#include <Referenceable.h>
+
 #include "LazyInitializable.h"
-#include "Referencable.h"
 
 
 namespace UserlandFSUtil {
@@ -19,7 +20,7 @@ using UserlandFSUtil::RequestPort;
 
 class FileSystem;
 
-class FileSystemInitializer : public LazyInitializable, public Referencable {
+class FileSystemInitializer : public LazyInitializable, public Referenceable {
 public:
 								FileSystemInitializer(const char* name);
 								~FileSystemInitializer();

@@ -5,7 +5,7 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
 SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
-UsePrivateHeaders libroot ;
+UsePrivateHeaders kernel libroot shared ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
@@ -25,7 +25,6 @@ Application userlandfs_server
 	Locker.cpp
 	ObjectTracker.cpp
 	Port.cpp
-	Referencable.cpp
 	Request.cpp
 	RequestAllocator.cpp
 	RequestHandler.cpp

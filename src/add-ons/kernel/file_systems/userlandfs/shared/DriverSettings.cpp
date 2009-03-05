@@ -6,8 +6,9 @@
 
 #include <driver_settings.h>
 
+#include <Referenceable.h>
+
 #include "DriverSettings.h"
-#include "Referencable.h"
 #include "String.h"
 
 // The parameter values that shall be evaluated to true.
@@ -21,9 +22,9 @@ static const int32 kTrueValueStringCount
 // #pragma mark ----- DriverParameterIterator -----
 
 // Delegate
-class DriverParameterIterator::Delegate : public Referencable {
+class DriverParameterIterator::Delegate : public Referenceable {
 public:
-								Delegate() : Referencable(true) {}
+								Delegate() : Referenceable(true) {}
 	virtual						~Delegate() {}
 
 	virtual	Delegate*			Clone() const = 0;
@@ -222,7 +223,7 @@ DriverParameterContainer::CountParameters() const
 {
 	int32 count;
 	return (GetParametersAndCount(&count) ? count : 0);
-	
+
 }
 
 // GetParameters

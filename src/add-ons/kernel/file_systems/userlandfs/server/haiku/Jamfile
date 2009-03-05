@@ -9,7 +9,7 @@ SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
 UsePrivateSystemHeaders ;
-UsePrivateHeaders libroot ;
+UsePrivateHeaders libroot shared ;
 
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
