@@ -3,11 +3,13 @@
 #ifndef BLOCK_ALLOCATOR_AREA_H
 #define BLOCK_ALLOCATOR_AREA_H
 
+#include <util/DoublyLinkedList.h>
+
 #include "BlockAllocator.h"
 #include "BlockAllocatorMisc.h"
-#include "DLList.h"
 
-class BlockAllocator::Area : public DLListLinkImpl<Area> {
+
+class BlockAllocator::Area : public DoublyLinkedListLinkImpl<Area> {
 public:
 	static Area *Create(size_t size);
 	void Delete();

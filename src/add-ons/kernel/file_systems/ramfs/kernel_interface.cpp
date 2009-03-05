@@ -40,10 +40,11 @@
 #include <NodeMonitor.h>
 #include <TypeConstants.h>
 
+#include <AutoDeleter.h>
+
 #include "AllocationInfo.h"
 #include "AttributeIndex.h"
 #include "AttributeIterator.h"
-#include "AutoDeleter.h"
 #include "Debug.h"
 #include "Directory.h"
 #include "Entry.h"

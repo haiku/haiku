@@ -12,7 +12,8 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
+
 #include "Index.h"
 #include "Stack.h"
 #include "ramfs.h"
@@ -92,7 +93,7 @@ class Expression {
 		Term *fTerm;
 };
 
-class Query : public DLListLinkImpl<Query> {
+class Query : public DoublyLinkedListLinkImpl<Query> {
 	public:
 		Query(Volume *volume, Expression *expression, uint32 flags);
 		~Query();

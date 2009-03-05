@@ -5,12 +5,13 @@
 
 #include <SupportDefs.h>
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
+
 
 class Attribute;
 class Node;
 
-class AttributeIterator : public DLListLinkImpl<AttributeIterator> {
+class AttributeIterator : public DoublyLinkedListLinkImpl<AttributeIterator> {
 public:
 	AttributeIterator(Node *node = NULL);
 	~AttributeIterator();

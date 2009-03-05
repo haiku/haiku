@@ -6,7 +6,8 @@
 #include <fs_interface.h>
 #include <SupportDefs.h>
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
+
 #include "String.h"
 
 class AllocationInfo;
@@ -14,7 +15,7 @@ class Directory;
 class EntryIterator;
 class Node;
 
-class Entry : public DLListLinkImpl<Entry> {
+class Entry : public DoublyLinkedListLinkImpl<Entry> {
 public:
 	Entry(const char *name, Node *node = NULL, Directory *parent = NULL);
 	~Entry();
@@ -33,13 +34,14 @@ public:
 	inline const char *GetName() const			{ return fName.GetString(); }
 
 //	inline Volume *GetVolume() const			{ return fVolume; }
-	
-	inline DLListLink<Entry> *GetReferrerLink()	{ return &fReferrerLink; }
+
+	inline DoublyLinkedListLink<Entry> *GetReferrerLink()
+		{ return &fReferrerLink; }
 
 	// entry iterator management
 	void AttachEntryIterator(EntryIterator *iterator);
 	void DetachEntryIterator(EntryIterator *iterator);
-	inline DLList<EntryIterator> *GetEntryIteratorList()
+	inline DoublyLinkedList<EntryIterator> *GetEntryIteratorList()
 		{ return &fIterators; }
 
 	// debugging
@@ -49,15 +51,15 @@ private:
 	Directory				*fParent;
 	Node					*fNode;
 	String					fName;
-	DLListLink<Entry>		fReferrerLink;
+	DoublyLinkedListLink<Entry>		fReferrerLink;
 	// iterator management
-	DLList<EntryIterator>	fIterators;
+	DoublyLinkedList<EntryIterator>	fIterators;
 };
 
 // GetNodeReferrerLink
 class GetNodeReferrerLink {
 private:
-	typedef DLListLink<Entry> Link;
+	typedef DoublyLinkedListLink<Entry> Link;
 
 public:
 	inline Link *operator()(Entry *entry) const

@@ -29,7 +29,7 @@ enum {
 	ACCESS_X	= S_IXOTH,
 };
 
-class Node : public DLListLinkImpl<Node> {
+class Node : public DoublyLinkedListLinkImpl<Node> {
 public:
 	Node(Volume *volume, uint8 type);
 	virtual ~Node();
@@ -121,11 +121,11 @@ private:
 	bool					fIsKnownToVFS;
 
 	// attribute management
-	DLList<Attribute>		fAttributes;
+	DoublyLinkedList<Attribute>		fAttributes;
 
 protected:
 	// entries referring to this node
-	DLList<Entry, GetNodeReferrerLink>	fReferrers;
+	DoublyLinkedList<Entry, GetNodeReferrerLink>	fReferrers;
 };
 
 // MarkUnmodified

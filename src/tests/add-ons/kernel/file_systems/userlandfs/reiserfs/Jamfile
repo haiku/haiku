@@ -14,9 +14,8 @@ SEARCH_SOURCE += $(reiserFSTop) ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 Addon <userland>reiserfs
-	: 
+	:
 	Debug.cpp
-	Locker.cpp
 	String.cpp
 
 	Block.cpp
@@ -29,9 +28,10 @@ Addon <userland>reiserfs
 	SuperBlock.cpp
 	Tree.cpp
 	VNode.cpp
-	Volume.cpp 
+	Volume.cpp
 
 	: libuserlandfs_haiku_kernel.so
+	  be	# for BLocker only
 ;
 
 HaikuSubInclude beos_interface ;

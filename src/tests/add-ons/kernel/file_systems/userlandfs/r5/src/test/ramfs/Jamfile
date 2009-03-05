@@ -25,7 +25,6 @@ SEARCH_SOURCE += [ FDirName $(userlandFSTop) src shared ] ;
 
 Addon <test>ramfs
 	: Debug.cpp
-	  Locker.cpp
 	  String.cpp
 
 	  AllocationInfo.cpp

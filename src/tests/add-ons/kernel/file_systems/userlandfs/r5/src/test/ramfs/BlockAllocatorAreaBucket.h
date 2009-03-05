@@ -3,10 +3,12 @@
 #ifndef BLOCK_ALLOCATOR_AREA_BUCKET_H
 #define BLOCK_ALLOCATOR_AREA_BUCKET_H
 
+#include <util/DoublyLinkedList.h>
+
 #include "BlockAllocator.h"
 #include "BlockAllocatorArea.h"
 #include "Debug.h"
-#include "DLList.h"
+
 
 class BlockAllocator::AreaBucket {
 public:
@@ -23,8 +25,8 @@ public:
 	inline void AddArea(Area *area);
 	inline void RemoveArea(Area *area);
 
-	inline Area *GetFirstArea() const	{ return fAreas.GetFirst(); }
-	inline Area *GetLastArea() const	{ return fAreas.GetLast(); }
+	inline Area *GetFirstArea() const	{ return fAreas.First(); }
+	inline Area *GetLastArea() const	{ return fAreas.Last(); }
 	inline Area *GetNextArea(Area* area) const;
 
 	inline bool IsEmpty() const			{ return fAreas.IsEmpty(); }
@@ -33,7 +35,7 @@ public:
 	bool SanityCheck(bool deep = false) const;
 
 private:
-	DLList<Area>	fAreas;
+	DoublyLinkedList<Area>	fAreas;
 	int32			fIndex;
 	size_t			fMinSize;
 	size_t			fMaxSize;

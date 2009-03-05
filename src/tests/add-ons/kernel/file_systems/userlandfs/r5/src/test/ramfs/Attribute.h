@@ -3,17 +3,19 @@
 #ifndef ATTRIBUTE_H
 #define ATTRIBUTE_H
 
+#include <util/DoublyLinkedList.h>
+
 #include "AttributeIndex.h"
 #include "AttributeIterator.h"
 #include "DataContainer.h"
-#include "DLList.h"
 #include "String.h"
 
 class AllocationInfo;
 class Node;
 class Volume;
 
-class Attribute : public DataContainer, public DLListLinkImpl<Attribute> {
+class Attribute : public DataContainer,
+	public DoublyLinkedListLinkImpl<Attribute> {
 public:
 	Attribute(Volume *volume, Node *node, const char *name, uint32 type = 0);
 	~Attribute();
@@ -41,7 +43,7 @@ public:
 	// iterator management
 	void AttachAttributeIterator(AttributeIterator *iterator);
 	void DetachAttributeIterator(AttributeIterator *iterator);
-	inline DLList<AttributeIterator> *GetAttributeIteratorList()
+	inline DoublyLinkedList<AttributeIterator> *GetAttributeIteratorList()
 		{ return &fIterators; }
 
 	// debugging
@@ -55,7 +57,7 @@ private:
 	bool						fInIndex;
 
 	// iterator management
-	DLList<AttributeIterator>	fIterators;
+	DoublyLinkedList<AttributeIterator>	fIterators;
 };
 
 #endif	// ATTRIBUTE_H

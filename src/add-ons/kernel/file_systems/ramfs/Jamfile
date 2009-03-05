@@ -4,7 +4,7 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-UsePrivateHeaders kernel ;	# for <util/*>
+UsePrivateHeaders kernel shared ;
 
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
@@ -14,7 +14,6 @@ DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
 
 KernelAddon ramfs
 	: Debug.cpp
-	  Locker.cpp
 	  String.cpp
 
 	  AllocationInfo.cpp

@@ -20,7 +20,7 @@ Directory::Directory(Volume *volume)
 Directory::~Directory()
 {
 	// delete all entries
-	while (Entry *entry = fEntries.GetFirst()) {
+	while (Entry *entry = fEntries.First()) {
 		if (DeleteEntry(entry) != B_OK) {
 			FATAL(("Could not delete all entries in directory.\n"));
 			break;
@@ -41,7 +41,7 @@ Directory::Link(Entry *entry)
 status_t
 Directory::Unlink(Entry *entry)
 {
-	if (entry == fReferrers.GetFirst())
+	if (entry == fReferrers.First())
 		return Node::Unlink(entry);
 	return B_BAD_VALUE;
 }
@@ -64,7 +64,7 @@ Directory::GetSize() const
 Directory *
 Directory::GetParent() const
 {
-	Entry *entry = fReferrers.GetFirst();
+	Entry *entry = fReferrers.First();
 	return (entry ? entry->GetParent() : NULL);
 }
 
@@ -190,8 +190,9 @@ Directory::RemoveEntry(Entry *entry)
 		if (GetVolume()->IteratorLock()) {
 			// set the iterators' current entry
 			Entry *nextEntry = fEntries.GetNext(entry);
-			DLList<EntryIterator> *iterators = entry->GetEntryIteratorList();
-			for (EntryIterator *iterator = iterators->GetFirst();
+			DoublyLinkedList<EntryIterator> *iterators
+				= entry->GetEntryIteratorList();
+			for (EntryIterator *iterator = iterators->First();
 				 iterator;
 				 iterator = iterators->GetNext(iterator)) {
 				iterator->SetCurrent(nextEntry, true);
@@ -199,7 +200,7 @@ Directory::RemoveEntry(Entry *entry)
 			// Move the iterators from one list to the other, or just remove
 			// them, if there is no next entry.
 			if (nextEntry) {
-				DLList<EntryIterator> *nextIterators
+				DoublyLinkedList<EntryIterator> *nextIterators
 					= nextEntry->GetEntryIteratorList();
 				nextIterators->MoveFrom(iterators);
 			} else
@@ -292,7 +293,7 @@ Directory::GetPreviousEntry(Entry **entry) const
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		if (!*entry)
-			*entry = fEntries.GetLast();
+			*entry = fEntries.Last();
 		else if ((*entry)->GetParent() == this)
 			*entry = fEntries.GetPrevious(*entry);
 		else
@@ -310,7 +311,7 @@ Directory::GetNextEntry(Entry **entry) const
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		if (!*entry)
-			*entry = fEntries.GetFirst();
+			*entry = fEntries.First();
 		else if ((*entry)->GetParent() == this)
 			*entry = fEntries.GetNext(*entry);
 		else

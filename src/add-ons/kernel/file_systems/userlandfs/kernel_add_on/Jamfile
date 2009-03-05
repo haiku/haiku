@@ -18,7 +18,6 @@ KernelAddon userlandfs
 	: AreaSupport.cpp
 	  Debug.cpp
 	  LazyInitializable.cpp
-	  Locker.cpp
 	  ObjectTracker.cpp
 	  Port.cpp
 	  Request.cpp

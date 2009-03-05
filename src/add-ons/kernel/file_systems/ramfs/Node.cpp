@@ -64,7 +64,7 @@ Node::Node(Volume *volume, uint8 type)
 Node::~Node()
 {
 	// delete all attributes
-	while (Attribute *attribute = fAttributes.GetFirst()) {
+	while (Attribute *attribute = fAttributes.First()) {
 		status_t error = DeleteAttribute(attribute);
 		if (error != B_OK) {
 			FATAL(("Node::~Node(): Failed to delete attribute!\n"));
@@ -96,7 +96,7 @@ Node::AddReference()
 
 	return B_OK;
 }
-	
+
 // RemoveReference
 void
 Node::RemoveReference()
@@ -234,9 +234,9 @@ Node::RemoveAttribute(Attribute *attribute)
 		if (GetVolume()->IteratorLock()) {
 			// set the iterators' current entry
 			Attribute *nextAttr = fAttributes.GetNext(attribute);
-			DLList<AttributeIterator> *iterators
+			DoublyLinkedList<AttributeIterator> *iterators
 				= attribute->GetAttributeIteratorList();
-			for (AttributeIterator *iterator = iterators->GetFirst();
+			for (AttributeIterator *iterator = iterators->First();
 				 iterator;
 				 iterator = iterators->GetNext(iterator)) {
 				iterator->SetCurrent(nextAttr, true);
@@ -244,7 +244,7 @@ Node::RemoveAttribute(Attribute *attribute)
 			// Move the iterators from one list to the other, or just remove
 			// them, if there is no next attribute.
 			if (nextAttr) {
-				DLList<AttributeIterator> *nextIterators
+				DoublyLinkedList<AttributeIterator> *nextIterators
 					= nextAttr->GetAttributeIteratorList();
 				nextIterators->MoveFrom(iterators);
 			} else
@@ -293,7 +293,7 @@ Node::GetPreviousAttribute(Attribute **attribute) const
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		if (!*attribute)
-			*attribute = fAttributes.GetLast();
+			*attribute = fAttributes.Last();
 		else if ((*attribute)->GetNode() == this)
 			*attribute = fAttributes.GetPrevious(*attribute);
 		else
@@ -311,7 +311,7 @@ Node::GetNextAttribute(Attribute **attribute) const
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		if (!*attribute)
-			*attribute = fAttributes.GetFirst();
+			*attribute = fAttributes.First();
 		else if ((*attribute)->GetNode() == this)
 			*attribute = fAttributes.GetNext(*attribute);
 		else
@@ -326,14 +326,14 @@ Node::GetNextAttribute(Attribute **attribute) const
 Entry *
 Node::GetFirstReferrer() const
 {
-	return fReferrers.GetHead();
+	return fReferrers.First();
 }
 
 // GetLastReferrer
 Entry *
 Node::GetLastReferrer() const
 {
-	return fReferrers.GetTail();
+	return fReferrers.Last();
 }
 
 // GetPreviousReferrer

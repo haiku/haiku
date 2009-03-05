@@ -5,12 +5,12 @@
 
 #include <SupportDefs.h>
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
 
 class Directory;
 class Entry;
 
-class EntryIterator : public DLListLinkImpl<EntryIterator> {
+class EntryIterator : public DoublyLinkedListLinkImpl<EntryIterator> {
 public:
 	EntryIterator(Directory *directory = NULL);
 	~EntryIterator();

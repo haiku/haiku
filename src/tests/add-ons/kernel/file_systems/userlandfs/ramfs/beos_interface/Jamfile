@@ -7,6 +7,8 @@ local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 local ramFSTop = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
 	file_systems userlandfs r5 src test ramfs ] ;
 
+UsePrivateHeaders kernel shared ;
+
 DEFINES += USER=1 ;
 
 # avoid inclusion of <drivers/Select.h>
@@ -25,7 +27,6 @@ SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 Addon <userland-beos>ramfs
 	: Debug.cpp
-	  Locker.cpp
 	  String.cpp
 
 	  AllocationInfo.cpp
@@ -57,4 +58,5 @@ Addon <userland-beos>ramfs
 	  SymLink.cpp
 	  Volume.cpp
 	: libuserlandfs_beos_kernel.so
+	  be	# for BLocker only
 ;

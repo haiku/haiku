@@ -3,8 +3,10 @@
 #ifndef DIRECTORY_H
 #define DIRECTORY_H
 
-#include "DLList.h"
+#include <util/DoublyLinkedList.h>
+
 #include "Node.h"
+
 
 class Entry;
 class File;
@@ -50,7 +52,7 @@ private:
 	status_t _CreateCommon(Node *node, const char *name);
 
 private:
-	DLList<Entry>	fEntries;
+	DoublyLinkedList<Entry>	fEntries;
 };
 
 #endif	// DIRECTORY_H

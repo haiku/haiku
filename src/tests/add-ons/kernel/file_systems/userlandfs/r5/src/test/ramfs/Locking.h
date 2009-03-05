@@ -3,7 +3,7 @@
 #ifndef LOCKING_H
 #define LOCKING_H
 
-#include "AutoLocker.h"
+#include <AutoLocker.h>
 
 class Volume;
 

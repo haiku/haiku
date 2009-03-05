@@ -66,13 +66,13 @@ class LastModifiedIndex::NodeTree : public _NodeTree {};
 
 
 // IteratorList
-class LastModifiedIndex::IteratorList : public DLList<Iterator> {};
+class LastModifiedIndex::IteratorList : public DoublyLinkedList<Iterator> {};
 
 
 // Iterator
 class LastModifiedIndex::Iterator
 	: public NodeEntryIterator<LastModifiedIndex::NodeTree::Iterator>,
-	  public DLListLinkImpl<Iterator>, public EntryListener,
+	  public DoublyLinkedListLinkImpl<Iterator>, public EntryListener,
 	  public NodeListener {
 public:
 	Iterator();
@@ -122,7 +122,7 @@ LastModifiedIndex::~LastModifiedIndex()
 		fVolume->RemoveNodeListener(this, NULL);
 	if (fIterators) {
 		// unset the iterators
-		for (Iterator *iterator = fIterators->GetFirst();
+		for (Iterator *iterator = fIterators->First();
 			 iterator;
 			 iterator = fIterators->GetNext(iterator)) {
 			iterator->SetTo(NULL, 0);
@@ -151,7 +151,7 @@ LastModifiedIndex::Changed(Node *node, time_t oldModified)
 			oldModified), node, &it);
 		if (foundNode && *foundNode == node) {
 			// update the iterators
-			for (Iterator *iterator = fIterators->GetFirst();
+			for (Iterator *iterator = fIterators->First();
 				 iterator;
 				 iterator = fIterators->GetNext(iterator)) {
 				if (iterator->GetCurrentNode() == node)

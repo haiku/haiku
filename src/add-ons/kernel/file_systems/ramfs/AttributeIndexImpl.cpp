@@ -153,7 +153,7 @@ public:
 class AttributeIndexImpl::Iterator
 	: public NodeEntryIterator<
 		AttributeNodeIterator<AttributeTree::Iterator> >,
-	  public DLListLinkImpl<Iterator>, public EntryListener,
+	  public DoublyLinkedListLinkImpl<Iterator>, public EntryListener,
 	  public NodeListener {
 public:
 	Iterator();
@@ -182,7 +182,7 @@ private:
 
 
 // IteratorList
-class AttributeIndexImpl::IteratorList : public DLList<Iterator> {};
+class AttributeIndexImpl::IteratorList : public DoublyLinkedList<Iterator> {};
 
 
 // AttributeIndexImpl
@@ -203,7 +203,7 @@ AttributeIndexImpl::~AttributeIndexImpl()
 {
 	if (fIterators) {
 		// unset the iterators
-		for (Iterator *iterator = fIterators->GetFirst();
+		for (Iterator *iterator = fIterators->First();
 			 iterator;
 			 iterator = fIterators->GetNext(iterator)) {
 			iterator->SetTo(NULL, NULL, 0);
@@ -243,7 +243,7 @@ AttributeIndexImpl::Changed(Attribute *attribute, const uint8 *oldKey,
 			if (foundAttribute && *foundAttribute == attribute) {
 				Node *node = attribute->GetNode();
 				// update the iterators
-				for (Iterator *iterator = fIterators->GetFirst();
+				for (Iterator *iterator = fIterators->First();
 					 iterator;
 					 iterator = fIterators->GetNext(iterator)) {
 					if (iterator->GetCurrentNode() == node)

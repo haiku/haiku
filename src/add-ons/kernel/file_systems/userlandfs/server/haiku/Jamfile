@@ -35,4 +35,5 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 
 	:
 	<nogrist>userlandfs_server
+	be	# for BLocker only
 ;

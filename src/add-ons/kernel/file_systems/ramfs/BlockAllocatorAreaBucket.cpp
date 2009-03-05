@@ -14,7 +14,7 @@ BlockAllocator::AreaBucket::AreaBucket()
 // destructor
 BlockAllocator::AreaBucket::~AreaBucket()
 {
-	while (Area *area = fAreas.GetFirst()) {
+	while (Area *area = fAreas.First()) {
 		RemoveArea(area);
 		area->Delete();
 	}

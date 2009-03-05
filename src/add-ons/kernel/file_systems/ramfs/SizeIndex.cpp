@@ -65,13 +65,13 @@ class SizeIndex::NodeTree : public _NodeTree {};
 
 
 // IteratorList
-class SizeIndex::IteratorList : public DLList<Iterator> {};
+class SizeIndex::IteratorList : public DoublyLinkedList<Iterator> {};
 
 
 // Iterator
 class SizeIndex::Iterator
 	: public NodeEntryIterator<SizeIndex::NodeTree::Iterator>,
-	  public DLListLinkImpl<Iterator>, public EntryListener,
+	  public DoublyLinkedListLinkImpl<Iterator>, public EntryListener,
 	  public NodeListener {
 public:
 	Iterator();
@@ -120,7 +120,7 @@ SizeIndex::~SizeIndex()
 		fVolume->RemoveNodeListener(this, NULL);
 	if (fIterators) {
 		// unset the iterators
-		for (Iterator *iterator = fIterators->GetFirst();
+		for (Iterator *iterator = fIterators->First();
 			 iterator;
 			 iterator = fIterators->GetNext(iterator)) {
 			iterator->SetTo(NULL, 0);
@@ -149,7 +149,7 @@ SizeIndex::Changed(Node *node, off_t oldSize)
 										node, &it);
 		if (foundNode && *foundNode == node) {
 			// update the iterators
-			for (Iterator *iterator = fIterators->GetFirst();
+			for (Iterator *iterator = fIterators->First();
 				 iterator;
 				 iterator = fIterators->GetNext(iterator)) {
 				if (iterator->GetCurrentNode() == node)
