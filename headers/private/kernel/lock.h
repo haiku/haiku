@@ -88,6 +88,13 @@ typedef struct rw_lock {
 #define RW_LOCK_INITIALIZER(name)			{ name, NULL, -1, 0, 0, 0 }
 
 
+#if KDEBUG
+#	define RECURSIVE_LOCK_HOLDER(recursiveLock)	((recursiveLock)->lock.holder)
+#else
+#	define RECURSIVE_LOCK_HOLDER(recursiveLock)	((recursiveLock)->holder)
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

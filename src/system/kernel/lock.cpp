@@ -43,13 +43,6 @@ struct rw_lock_waiter {
 #define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
 
-#if KDEBUG
-#	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->lock.holder)
-#else
-#	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->holder)
-#endif
-
-
 int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
