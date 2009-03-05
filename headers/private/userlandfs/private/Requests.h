@@ -311,8 +311,8 @@ class FileCacheRequest : public Request {
 public:
 	FileCacheRequest(uint32 type) : Request(type) {}
 
-	dev_t		volumeID;
-	ino_t		vnodeID;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 
@@ -1597,7 +1597,7 @@ class FileCacheCreateRequest : public FileCacheRequest {
 public:
 	FileCacheCreateRequest() : FileCacheRequest(FILE_CACHE_CREATE_REQUEST) {}
 
-	size_t		size;
+	off_t		size;
 };
 
 // FileCacheCreateReply
@@ -1678,7 +1678,6 @@ public:
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	Address		buffer;
-	size_t		bytesRead;
 };
 
 // FileCacheWriteRequest

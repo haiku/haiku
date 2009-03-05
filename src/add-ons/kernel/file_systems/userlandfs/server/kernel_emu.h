@@ -31,6 +31,18 @@ status_t remove_vnode(dev_t nsid, ino_t vnid);
 status_t unremove_vnode(dev_t nsid, ino_t vnid);
 status_t get_vnode_removed(dev_t nsid, ino_t vnid, bool* removed);
 
+extern status_t file_cache_create(dev_t mountID, ino_t vnodeID, off_t size);
+extern status_t file_cache_delete(dev_t mountID, ino_t vnodeID);
+extern status_t file_cache_set_enabled(dev_t mountID, ino_t vnodeID,
+	bool enabled);
+extern status_t file_cache_set_size(dev_t mountID, ino_t vnodeID, off_t size);
+extern status_t file_cache_sync(dev_t mountID, ino_t vnodeID);
+
+extern status_t file_cache_read(dev_t mountID, ino_t vnodeID, void *cookie,
+	off_t offset, void *bufferBase, size_t *_size);
+extern status_t file_cache_write(dev_t mountID, ino_t vnodeID, void *cookie,
+	off_t offset, const void *buffer, size_t *_size);
+
 void kernel_debugger(const char *message);
 void vpanic(const char *format, va_list args);
 void panic(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));

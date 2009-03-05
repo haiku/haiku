@@ -562,7 +562,285 @@ UserlandFS::KernelEmu::get_vnode_removed(dev_t nsid, ino_t vnid,
 	return reply->error;
 }
 
+
+// #pragma mark - file cache
+
+
+// file_cache_create
+status_t
+UserlandFS::KernelEmu::file_cache_create(dev_t mountID, ino_t vnodeID,
+	off_t size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheCreateRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+	request->size = size;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_CREATE_REPLY);
+	FileCacheCreateReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+// file_cache_delete
+status_t
+UserlandFS::KernelEmu::file_cache_delete(dev_t mountID, ino_t vnodeID)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheDeleteRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_DELETE_REPLY);
+	FileCacheDeleteReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+// file_cache_set_enable
+status_t
+UserlandFS::KernelEmu::file_cache_set_enabled(dev_t mountID, ino_t vnodeID,
+	bool enabled)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheSetEnabledRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+	request->enabled = enabled;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_SET_ENABLED_REPLY);
+	FileCacheSetEnabledReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+// file_cache_set_size
+status_t
+UserlandFS::KernelEmu::file_cache_set_size(dev_t mountID, ino_t vnodeID,
+	off_t size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheSetSizeRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+	request->size = size;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_SET_SIZE_REPLY);
+	FileCacheSetSizeReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+// file_cache_sync
+status_t
+UserlandFS::KernelEmu::file_cache_sync(dev_t mountID, ino_t vnodeID)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheSyncRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_SYNC_REPLY);
+	FileCacheSyncReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+// file_cache_read
+status_t
+UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
+	void *cookie, off_t offset, void *bufferBase, size_t *_size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheReadRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+	request->cookie = cookie;
+		// TODO: cookie can only be NULL!
+	request->pos = offset;
+	request->size = *_size;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_READ_REPLY);
+	FileCacheReadReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+
+	if (reply->buffer.GetSize() > 0) {
+		memcpy(bufferBase, reply->buffer.GetData(), reply->buffer.GetSize());
+
+		// send receipt-ack
+		RequestAllocator receiptAckAllocator(port->GetPort());
+		ReceiptAckReply* receiptAck;
+		if (AllocateRequest(receiptAckAllocator, &receiptAck) == B_OK)
+			port->SendRequest(&receiptAckAllocator);
+	}
+
+	*_size = reply->buffer.GetSize();
+
+	return B_OK;
+}
+
+
+// file_cache_write
+status_t
+UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
+	void *cookie, off_t offset, const void *buffer, size_t *_size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	FileCacheWriteRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = mountID;
+	request->vnid = vnodeID;
+	request->cookie = cookie;
+		// TODO: cookie can only be NULL!
+	request->pos = offset;
+
+	error = allocator.AllocateData(request->buffer, buffer, *_size, 1, false);
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, FILE_CACHE_WRITE_REPLY);
+	FileCacheWriteReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	*_size = reply->bytesWritten;
+	return reply->error;
+}
+
+
 // #pragma mark -
+
 
 // kernel_debugger
 void
