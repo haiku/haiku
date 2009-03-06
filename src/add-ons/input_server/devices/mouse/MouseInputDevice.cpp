@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku.
+ * Copyright 2004-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -373,8 +373,21 @@ MouseDevice::_ControlThread()
 	float historyDeltaX = 0.0;
 	float historyDeltaY = 0.0;
 
+	static const bigtime_t kTransferDelay = 1000000 / 125;
+		// 125 transfers per second should be more than enough
+#define USE_REGULAR_INTERVAL 0
+#if USE_REGULAR_INTERVAL
+	bigtime_t nextTransferTime = system_time() + kTransferDelay;
+#endif
+
 	while (fActive) {
 		mouse_movement movements;
+
+#if USE_REGULAR_INTERVAL
+		snooze_until(nextTransferTime, B_SYSTEM_TIMEBASE);
+		nextTransferTime += kTransferDelay;
+#endif
+
 		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
@@ -450,6 +463,10 @@ MouseDevice::_ControlThread()
 			else
 				delete message;
 		}
+
+#if !USE_REGULAR_INTERVAL
+		snooze(kTransferDelay);
+#endif
 	}
 }
 
