@@ -30,6 +30,7 @@ public:
 
 	area_id ID() const;
 	int32 Size() const;
+	bool IsEmpty() const;
 
 	void *AllocateCommand(uint32 commandWhat, int32 dataSize, bool &wasEmpty);
 	void CommitCommand();

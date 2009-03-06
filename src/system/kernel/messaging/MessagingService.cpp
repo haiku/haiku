@@ -138,6 +138,14 @@ MessagingArea::Size() const
 }
 
 
+// Empty
+bool
+MessagingArea::IsEmpty() const
+{
+	return fHeader->command_count == 0;
+}
+
+
 // AllocateCommand
 void *
 MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
@@ -445,7 +453,7 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 	while (fFirstArea != fLastArea) {
 		area = fFirstArea;
 		area->Lock();
-		if (area->Size() != 0) {
+		if (!area->IsEmpty()) {
 			area->Unlock();
 			break;
 		}
