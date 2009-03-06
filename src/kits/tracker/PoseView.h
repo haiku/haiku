@@ -57,10 +57,20 @@ All rights reserved.
 #include <String.h>
 #include <ScrollBar.h>
 #include <View.h>
+#include <hash_set>
 #include <set>
+
 
 class BRefFilter;
 class BList;
+
+__STL_TEMPLATE_NULL struct std::hash<node_ref>
+{
+	size_t operator()(node_ref ref) const { 
+		return ref.node;
+	}
+};
+
 
 namespace BPrivate {
 
@@ -598,6 +608,7 @@ class BPoseView : public BView {
 		PoseList *fPoseList;
 		PoseList *fVSPoseList;
 		PoseList *fSelectionList;
+		std::hash_set<node_ref, std::hash<node_ref> > fInsertedNodes;
 		BObjectList<BString> fMimeTypesInSelectionCache;
 			// used for mime string based icon highliting during a drag
 		BObjectList<Model> *fZombieList;

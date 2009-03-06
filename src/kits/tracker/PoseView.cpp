@@ -99,7 +99,7 @@ const float kCountViewWidth = 62;
 
 const uint32 kAddNewPoses = 'Tanp';
 const uint32 kAddPosesCompleted = 'Tapc';
-const int32 kMaxAddPosesChunk = 10;
+const int32 kMaxAddPosesChunk = 50;
 
 namespace BPrivate {
 extern bool delete_point(void *);
@@ -1632,26 +1632,29 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 	for (int32 modelIndex = 0; modelIndex < count; modelIndex++) {
 		Model *model = models[modelIndex];
 
-		model->OpenNode();
-		ASSERT(model->IsNodeOpen());
-		PoseInfo *poseInfo = &poseInfoArray[modelIndex];
 
 		// pose adopts model and deletes it when done
-		BPose *pose = new BPose(model, this, clipboardMode);
 
-		if (BSearch(fPoseList, pose, this, PoseCompareAddWidget, false) != NULL 
+		if (fInsertedNodes.find(*(model->NodeRef())) != fInsertedNodes.end() 
 			|| FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
-			delete pose;
+			delete model;
 			if (resultingPoses)
 				resultingPoses[modelIndex] = NULL;
 			continue;
+		} else {
+			fInsertedNodes.insert(*(model->NodeRef()));
 		}
 
 		if ((clipboardMode = FSClipboardFindNodeMode(model,false,true)) != 0
 			&& !HasPosesInClipboard()) {
 			SetHasPosesInClipboard(true);
 		}
+
+		model->OpenNode();
+		ASSERT(model->IsNodeOpen());
+		PoseInfo *poseInfo = &poseInfoArray[modelIndex];
+		BPose *pose = new BPose(model, this, clipboardMode);
 
 		if (resultingPoses)
 			resultingPoses[modelIndex] = pose;
