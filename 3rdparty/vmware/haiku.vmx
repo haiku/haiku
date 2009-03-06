@@ -25,7 +25,7 @@ serial0.fileType = "file"
 serial0.fileName = "haiku-serial-port.txt"
 serial0.tryNoRxLoss = "FALSE"
 
-usb.present = "FALSE"
+usb.present = "TRUE"
 
 sound.present = "FALSE"
 
