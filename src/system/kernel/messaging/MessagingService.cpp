@@ -183,7 +183,7 @@ MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
 		}
 
 		// find space for the command
-		if (firstCommandOffset < lastCommandOffset) {
+		if (firstCommandOffset <= lastCommandOffset) {
 			// not wrapped
 			// try to allocate after the last command
 			if (size <= fSize - (lastCommandOffset + lastCommandSize)) {
@@ -260,7 +260,7 @@ MessagingArea::_CheckCommand(int32 offset, int32 &size)
 	size = command->size;
 	if (size < (int32)sizeof(messaging_command))
 		return NULL;
-	size = (size + 3) & 0x3;	// align
+	size = (size + 3) & ~0x3;	// align
 	if (offset + size > fSize)
 		return NULL;
 
