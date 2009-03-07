@@ -108,19 +108,25 @@ AudioProducer::AudioProducer(const char* name, AudioSupplier* supplier,
 	fPreferredFormat.u.raw_audio.format
 		= media_raw_audio_format::B_AUDIO_FLOAT;
 //		= media_raw_audio_format::B_AUDIO_SHORT;
-	fPreferredFormat.u.raw_audio.channel_count = 2;
-	fPreferredFormat.u.raw_audio.frame_rate = 44100.0;
 	fPreferredFormat.u.raw_audio.byte_order
 		= (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
+#if 0
+	fPreferredFormat.u.raw_audio.channel_count = 2;
+	fPreferredFormat.u.raw_audio.frame_rate = 44100.0;
 
 	// NOTE: the (buffer_size * 1000000) needs to be dividable by
 	// fPreferredFormat.u.raw_audio.frame_rate!
-	fPreferredFormat.u.raw_audio.buffer_size = 441 * 2
+	fPreferredFormat.u.raw_audio.buffer_size = 441 * 4
 		* (fPreferredFormat.u.raw_audio.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 
 	if (!fLowLatency)
-		fPreferredFormat.u.raw_audio.buffer_size *= 6;
+		fPreferredFormat.u.raw_audio.buffer_size *= 3;
+#else
+	fPreferredFormat.u.raw_audio.channel_count = 0;
+	fPreferredFormat.u.raw_audio.frame_rate = 0.0;
+	fPreferredFormat.u.raw_audio.buffer_size = 0;
+#endif
 
 	// we're not connected yet
 	fOutput.destination = media_destination::null;
@@ -340,21 +346,36 @@ AudioProducer::PrepareToConnect(const media_source& what,
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	// !!! validate all other fields except for buffer_size here, because the
-	// consumer might have supplied different values from AcceptFormat()?
+	if (format->u.raw_audio.channel_count
+		== media_raw_audio_format::wildcard.channel_count) {
+		format->u.raw_audio.channel_count = 2;
+		printf("  -> adjusting channel count, it was wildcard\n");
+	}
+	if (format->u.raw_audio.frame_rate
+		== media_raw_audio_format::wildcard.frame_rate) {
+		format->u.raw_audio.frame_rate = 44100.0;
+		printf("  -> adjusting frame rate, it was wildcard\n");
+	}
 
 	// check the buffer size, which may still be wildcarded
 	if (format->u.raw_audio.buffer_size
 		== media_raw_audio_format::wildcard.buffer_size) {
 		// pick something comfortable to suggest
-		// NOTE: the (buffer_size * 1000000) needs to be dividable by
-		// fPreferredFormat.u.raw_audio.frame_rate!
-		// TODO: this needs to depend on the other parameters
-		// (but it doesn't matter sincer the AudioProducer is not
-		// currently used like that)
 		TRACE("  -> adjusting buffer size, it was wildcard\n");
-		format->u.raw_audio.buffer_size = 441 * 2 * sizeof(float);
-	}	
+		printf("  -> adjusting buffer size, it was wildcard\n");
+
+		// NOTE: the (buffer_size * 1000000) needs to be dividable by
+		// format->u.raw_audio.frame_rate! (We assume frame rate is a multiple of
+		// 25, which it usually is.)
+		format->u.raw_audio.buffer_size
+			= uint32(format->u.raw_audio.frame_rate / 25.0)
+				* (format->u.raw_audio.format
+					& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+	
+		if (!fLowLatency)
+			format->u.raw_audio.buffer_size *= 3;
+
+	}
 
 	// Now reserve the connection, and return information about it
 	fOutput.destination = where;
