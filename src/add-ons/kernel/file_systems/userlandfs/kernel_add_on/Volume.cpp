@@ -346,13 +346,15 @@ Volume::Unmount()
 	status_t error = _Unmount();
 	// free the memory associated with the vnode count map
 	if (fVNodeCountMap) {
-		AutoLocker<VNodeCountMap> _(fVNodeCountMap);
+		AutoLocker<VNodeCountMap> locker(fVNodeCountMap);
 		fVNodeCountingEnabled = false;
 		for (VNodeCountMap::Iterator it = fVNodeCountMap->GetIterator();
 			 it.HasNext();) {
 			VNodeCountMap::Entry entry = it.Next();
 			delete entry.value;
 		}
+
+		locker.Detach();
 		delete fVNodeCountMap;
 		fVNodeCountMap = NULL;
 	}
