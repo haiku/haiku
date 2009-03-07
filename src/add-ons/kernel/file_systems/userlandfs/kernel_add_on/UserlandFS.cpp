@@ -89,8 +89,7 @@ UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 		if (fileSystemInitializer) {
 			fileSystemInitializer->AddReference();
 		} else {
-			fileSystemInitializer = new(nothrow) FileSystemInitializer(name/*,
-				fPort*/);
+			fileSystemInitializer = new(nothrow) FileSystemInitializer(name);
 			if (!fileSystemInitializer)
 				return B_NO_MEMORY;
 
