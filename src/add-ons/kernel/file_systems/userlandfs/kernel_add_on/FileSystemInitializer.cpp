@@ -26,6 +26,7 @@
 // constructor
 FileSystemInitializer::FileSystemInitializer(const char* name)
 	:
+	Referenceable(false),
 	fName(name),
 	fFileSystem(NULL)
 {
