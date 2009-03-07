@@ -90,6 +90,16 @@ public:
 		return B_OK;
 	}
 
+	size_t TableSize() const
+	{
+		return fTableSize;
+	}
+
+	size_t CountElements() const
+	{
+		return fItemCount;
+	}
+
 	ValueType *Lookup(const KeyType &key) const
 	{
 		if (fTableSize == 0)
@@ -180,6 +190,42 @@ public:
 
 		fItemCount--;
 		return true;
+	}
+
+	/*!	Removes all elements from the hash table. No resizing happens. The
+		elements are not deleted. If \a returnElements is \c true, the method
+		returns all elements chained via their hash table link.
+	*/
+	ValueType* Clear(bool returnElements = false)
+	{
+		if (this->fItemCount == 0)
+			return NULL;
+
+		ValueType* result = NULL;
+
+		if (returnElements) {
+			ValueType** nextPointer = &result;
+
+			// iterate through all buckets
+			for (size_t i = 0; i < fTableSize; i++) {
+				ValueType* element = fTable[i];
+				if (element != NULL) {
+					// add the bucket to the list
+					*nextPointer = element;
+
+					// update nextPointer to point to the fNext of the last
+					// element in the bucket
+					while (element != NULL) {
+						nextPointer = &_Link(element)->fNext;
+						element = *nextPointer;
+					}
+				}
+			}
+		}
+
+		memset(this->fTable, 0, sizeof(ValueType*) * this->fTableSize);
+
+		return result;
 	}
 
 	/*!	If the table needs resizing, the number of bytes for the required
