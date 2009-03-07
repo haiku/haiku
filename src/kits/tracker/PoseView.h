@@ -64,12 +64,22 @@ All rights reserved.
 class BRefFilter;
 class BList;
 
-__STL_TEMPLATE_NULL struct std::hash<node_ref>
+#if __GNUC__ > 2
+namespace __gnu_cxx {
+template<>
+struct hash<node_ref>
+#else
+template<>
+struct std::hash<node_ref>
+#endif
 {
 	size_t operator()(node_ref ref) const { 
 		return ref.node;
 	}
 };
+#if __GNUC__ > 2
+} // namespace __gnu_cxx
+#endif
 
 
 namespace BPrivate {
@@ -608,7 +618,11 @@ class BPoseView : public BView {
 		PoseList *fPoseList;
 		PoseList *fVSPoseList;
 		PoseList *fSelectionList;
+#if __GNUC__ > 2
+		__gnu_cxx::hash_set<node_ref, __gnu_cxx::hash<node_ref> > fInsertedNodes;
+#else
 		std::hash_set<node_ref, std::hash<node_ref> > fInsertedNodes;
+#endif
 		BObjectList<BString> fMimeTypesInSelectionCache;
 			// used for mime string based icon highliting during a drag
 		BObjectList<Model> *fZombieList;
