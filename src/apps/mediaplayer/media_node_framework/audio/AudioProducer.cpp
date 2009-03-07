@@ -349,12 +349,12 @@ AudioProducer::PrepareToConnect(const media_source& what,
 	if (format->u.raw_audio.channel_count
 		== media_raw_audio_format::wildcard.channel_count) {
 		format->u.raw_audio.channel_count = 2;
-		printf("  -> adjusting channel count, it was wildcard\n");
+		TRACE("  -> adjusting channel count, it was wildcard\n");
 	}
 	if (format->u.raw_audio.frame_rate
 		== media_raw_audio_format::wildcard.frame_rate) {
 		format->u.raw_audio.frame_rate = 44100.0;
-		printf("  -> adjusting frame rate, it was wildcard\n");
+		TRACE("  -> adjusting frame rate, it was wildcard\n");
 	}
 
 	// check the buffer size, which may still be wildcarded
@@ -362,7 +362,6 @@ AudioProducer::PrepareToConnect(const media_source& what,
 		== media_raw_audio_format::wildcard.buffer_size) {
 		// pick something comfortable to suggest
 		TRACE("  -> adjusting buffer size, it was wildcard\n");
-		printf("  -> adjusting buffer size, it was wildcard\n");
 
 		// NOTE: the (buffer_size * 1000000) needs to be dividable by
 		// format->u.raw_audio.frame_rate! (We assume frame rate is a multiple of
