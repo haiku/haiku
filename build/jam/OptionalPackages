@@ -282,7 +282,14 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package Firefox available for gcc4" ;
+		InstallOptionalHaikuImagePackage BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
+			: http://haiku-files.org/files/optional-packages/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
+ 			: apps
+ 		;
+ 		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+
+
 	} else {
 		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
 			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
@@ -413,8 +420,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Pe available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3
-			: http://www.yellowbites.com/downloads/pe-2.4.1-x86.zip
+		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-05
+			: http://haiku-files.org/files/optional-packages/pe-2.4.1-x86-rc3-gcc2-2009-03-05.zip
 			: apps
 		;
 
