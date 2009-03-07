@@ -7467,6 +7467,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 	// the new add_poses thread will then set fAddPosesThread to its ID and it
 	// will be allowed to add icons
 	fAddPosesThreads.clear();
+	fInsertedNodes.clear();
 
 	delete fModel;
 	fModel = model;
