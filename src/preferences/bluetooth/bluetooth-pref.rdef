@@ -2,7 +2,7 @@
  * bluetooth_pref.rdef
  */
 
-resource app_signature "application/x-vnd.Be-bluetooth_pref";
+resource app_signature "application/x-vnd.haiku-BluetoothPrefs";
 
 resource app_flags B_SINGLE_LAUNCH;
 
