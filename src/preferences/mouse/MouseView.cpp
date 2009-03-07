@@ -1,38 +1,31 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			MouseView.cpp
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003 - 2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Axel Dörfler (axeld@pinc-software.de)
+ */
+#include "MouseView.h"
 
-#include <InterfaceDefs.h>
-#include <Button.h>
-#include <Box.h>
 #include <Bitmap.h>
-#include <TranslationUtils.h>
-#include <TextControl.h>
-#include <Slider.h>
-#include <PopUpMenu.h>
+#include <Box.h>
+#include <Button.h>
+#include <Debug.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <Debug.h>
+#include <PopUpMenu.h>
+#include <Region.h>
+#include <Slider.h>
+#include <TextControl.h>
+#include <TranslationUtils.h>
 #include <Window.h>
 
-#include "MouseView.h"
-#include "MouseWindow.h"
-#include "MouseConstants.h"
 #include "MouseBitmap.h"
+#include "MouseConstants.h"
 #include "MouseSettings.h"
+#include "MouseWindow.h"
 
 
 static const int32 kOneButtonOffsets[4] = {0, 55};
@@ -144,6 +137,11 @@ MouseView::MouseDown(BPoint where)
 			fButtons = B_SECONDARY_MOUSE_BUTTON;
 	}
 
+	// Get the current clipping region before requesting any updates.
+	// Otherwise those parts would be excluded from the region.
+	BRegion clipping;
+	GetClippingRegion(&clipping);
+
 	if (fOldButtons != fButtons) {
 		Invalidate(BRect(0, kButtonTop,
 			fMouseDownBounds.Width(), kButtonTop + fMouseDownBounds.Height()));
@@ -163,23 +161,27 @@ MouseView::MouseDown(BPoint where)
 	if (button < 0)
 		return;
 
-	button = ConvertFromVisualOrder(button);
-
-	BPopUpMenu menu("Mouse Map Menu");
-	BMessage message(kMsgMouseMap);
-	message.AddInt32("button", button);
-
-	menu.AddItem(new BMenuItem("1", new BMessage(message)));
-	menu.AddItem(new BMenuItem("2", new BMessage(message)));
-	menu.AddItem(new BMenuItem("3", new BMessage(message)));
-
-	menu.ItemAt(getMappingNumber(fSettings.Mapping(button)))->SetMarked(true);
-	menu.SetTargetForItems(Window());
-
-	ConvertToScreen(&where);
-	menu.Go(where, true);
-
-	Invalidate();
+	// We are setup to receive all mouse events, even if our window
+	// is not active, so make sure that we don't display the menu when
+	// the user clicked inside our view, but another window is on top.
+	if (clipping.Contains(where)) {
+		button = ConvertFromVisualOrder(button);
+	
+		BPopUpMenu menu("Mouse Map Menu");
+		BMessage message(kMsgMouseMap);
+		message.AddInt32("button", button);
+	
+		menu.AddItem(new BMenuItem("1", new BMessage(message)));
+		menu.AddItem(new BMenuItem("2", new BMessage(message)));
+		menu.AddItem(new BMenuItem("3", new BMessage(message)));
+	
+		menu.ItemAt(getMappingNumber(fSettings.Mapping(button)))
+			->SetMarked(true);
+		menu.SetTargetForItems(Window());
+	
+		ConvertToScreen(&where);
+		menu.Go(where, true);
+	}
 }
 
 
@@ -259,9 +261,6 @@ MouseView::Draw(BRect updateFrame)
 		DrawString(number,
 			BPoint(border.left + (border.Width() - StringWidth(number)) / 2, kButtonTop + 18));
 	}
-
-	Sync();
-	SetDrawingMode(B_OP_COPY);
 }
 
 

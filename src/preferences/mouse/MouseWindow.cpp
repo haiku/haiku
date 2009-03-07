@@ -41,7 +41,7 @@ MouseWindow::MouseWindow(BRect _rect)
 	AddChild(view);
 
 	// Add the main settings view
-	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1),
+	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace, kBorderSpace),
 		fSettings);
 	view->AddChild(fSettingsView);
 
