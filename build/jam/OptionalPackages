@@ -420,8 +420,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Pe available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-05
-			: http://haiku-files.org/files/optional-packages/pe-2.4.1-x86-rc3-gcc2-2009-03-05.zip
+		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-07
+			: http://haiku-files.org/files/optional-packages/pe-2.4.1-x86-rc3-gcc2-2009-03-07.zip
 			: apps
 		;
 
