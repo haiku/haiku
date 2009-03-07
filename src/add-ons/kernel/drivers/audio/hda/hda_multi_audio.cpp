@@ -672,6 +672,40 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 }
 
 
+static uint32
+default_buffer_length_for_rate(uint32 rate)
+{
+	// keep the latency about the same as 2048 frames per buffer at 44100 kHz
+	switch (rate) {
+	case B_SR_8000:
+		return 512;
+	case B_SR_11025:
+		return 512;
+	case B_SR_16000:
+		return 1024;
+	case B_SR_22050:
+		return 1024;
+	case B_SR_32000:
+		return 2048;
+	case B_SR_44100:
+		return 2048;
+	case B_SR_48000:
+		return 2048;
+	case B_SR_88200:
+		return 4096;
+	case B_SR_96000:
+		return 6144;
+	case B_SR_176400:
+		return 8192;
+	case B_SR_192000:
+		return 10240;
+	case B_SR_384000:
+		return 16384;
+	}
+	return 2048;
+};
+
+
 static status_t
 get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 {
@@ -702,11 +736,15 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		|| data->return_record_buffers < STREAM_MIN_BUFFERS)
 		data->return_record_buffers = STREAM_MIN_BUFFERS;
 
-	if (data->return_playback_buffer_size == 0)
-		data->return_playback_buffer_size = DEFAULT_FRAMES_PER_BUFFER;
+	if (data->return_playback_buffer_size == 0) {
+		data->return_playback_buffer_size = default_buffer_length_for_rate(
+			audioGroup->playback_stream->sample_rate);
+	}
 
-	if (data->return_record_buffer_size == 0)
-		data->return_record_buffer_size = DEFAULT_FRAMES_PER_BUFFER;
+	if (data->return_record_buffer_size == 0) {
+		data->return_record_buffer_size = default_buffer_length_for_rate(
+				audioGroup->record_stream->sample_rate);
+	}
 
 	/* ... from here on, we can assume again that a reasonable request is
 	   being made */

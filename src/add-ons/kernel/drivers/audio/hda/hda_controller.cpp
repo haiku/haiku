@@ -45,6 +45,8 @@ static const struct {
 	{B_SR_96000, MAKE_RATE(48000, 2, 1), 96000},
 	{B_SR_176400, MAKE_RATE(44100, 4, 1), 176400},
 	{B_SR_192000, MAKE_RATE(48000, 4, 1), 192000},
+// TODO: What about this one?
+//	{B_SR_384000, MAKE_RATE(44100, ??, ??), 384000},
 };
 
 
