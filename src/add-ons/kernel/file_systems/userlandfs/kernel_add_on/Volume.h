@@ -66,8 +66,8 @@ public:
 			status_t			ReadFileCache(ino_t vnodeID, void* cookie,
 									off_t offset, void* buffer, size_t* _size);
 			status_t			WriteFileCache(ino_t vnodeID, void* cookie,
-									off_t offset, const void *buffer,
-									size_t *_size);
+									off_t offset, const void* buffer,
+									size_t* _size);
 
 			// FS
 			status_t			Mount(const char* device, uint32 flags,

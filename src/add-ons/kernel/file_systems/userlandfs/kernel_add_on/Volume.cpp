@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <fs_cache.h>
+
 #include <util/AutoLock.h>
 #include <util/OpenHashTable.h>
 
@@ -41,14 +43,25 @@ static const bigtime_t kUserlandServerlandPortTimeout = 10000000;	// 10s
 struct Volume::VNode : HashTableLink<VNode> {
 	ino_t	id;
 	void*	clientNode;
+	void*	fileCache;
 	int32	useCount;
 
 	VNode(ino_t id, void* clientNode)
 		:
 		id(id),
 		clientNode(clientNode),
+		fileCache(NULL),
 		useCount(0)
 	{
+	}
+
+	~VNode()
+	{
+		if (fileCache != NULL)
+		{
+			ERROR(("VNode %lld still has a file cache!\n", id));
+			file_cache_delete(fileCache);
+		}
 	}
 };
 
@@ -295,8 +308,31 @@ PRINT(("get_vnode_removed(%ld, %lld, %p)\n", GetID(), vnid, removed));
 status_t
 Volume::CreateFileCache(ino_t vnodeID, off_t size)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node already have a file cache?
+	if (vnode->fileCache != NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// create the file cache
+	locker.Unlock();
+	void* fileCache = file_cache_create(GetID(), vnodeID, size);
+	locker.Lock();
+
+	// re-check whether the node still lives
+	vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL) {
+		file_cache_delete(fileCache);
+		RETURN_ERROR(B_BAD_VALUE);
+	}
+
+	vnode->fileCache = fileCache;
+
+	return B_OK;
 }
 
 
@@ -304,8 +340,24 @@ Volume::CreateFileCache(ino_t vnodeID, off_t size)
 status_t
 Volume::DeleteFileCache(ino_t vnodeID)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	vnode->fileCache = NULL;
+
+	locker.Unlock();
+
+	file_cache_delete(fileCache);
+
+	return B_OK;
 }
 
 
@@ -313,8 +365,29 @@ Volume::DeleteFileCache(ino_t vnodeID)
 status_t
 Volume::SetFileCacheEnabled(ino_t vnodeID, bool enabled)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	locker.Unlock();
+// TODO: We should use some kind of ref counting to avoid that another thread
+// deletes the file cache now that we have dropped the lock. Applies to the
+// other file cache operations as well.
+
+	// enable/disable the file cache
+	if (enabled) {
+		file_cache_enable(fileCache);
+		return B_OK;
+	}
+
+	return file_cache_disable(fileCache);
 }
 
 
@@ -322,8 +395,21 @@ Volume::SetFileCacheEnabled(ino_t vnodeID, bool enabled)
 status_t
 Volume::SetFileCacheSize(ino_t vnodeID, off_t size)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	locker.Unlock();
+
+	// set the size
+	return file_cache_set_size(fileCache, size);
 }
 
 
@@ -331,8 +417,21 @@ Volume::SetFileCacheSize(ino_t vnodeID, off_t size)
 status_t
 Volume::SyncFileCache(ino_t vnodeID)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	locker.Unlock();
+
+	// sync
+	return file_cache_sync(fileCache);
 }
 
 
@@ -341,18 +440,44 @@ status_t
 Volume::ReadFileCache(ino_t vnodeID, void* cookie,
 	off_t offset, void* buffer, size_t* _size)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	locker.Unlock();
+
+	// read
+	return file_cache_read(fileCache, cookie, offset, buffer, _size);
 }
 
 
 // WriteFileCache
 status_t
 Volume::WriteFileCache(ino_t vnodeID, void* cookie,
-	off_t offset, const void *buffer, size_t *_size)
+	off_t offset, const void* buffer, size_t* _size)
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* vnode = fVNodes->Lookup(vnodeID);
+	if (vnode == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// does the node have a file cache
+	if (vnode->fileCache == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	void* fileCache = vnode->fileCache;
+	locker.Unlock();
+
+	// read
+	return file_cache_write(fileCache, cookie, offset, buffer, _size);
 }
 
 
