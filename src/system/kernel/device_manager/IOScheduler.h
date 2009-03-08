@@ -14,7 +14,7 @@
 #include <util/OpenHashTable.h>
 
 #include "dma_resources.h"
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 class IOCallback {

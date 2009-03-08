@@ -11,7 +11,7 @@
 #include <kernel.h>
 #include <util/AutoLock.h>
 
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 //#define TRACE_DMA_RESOURCE

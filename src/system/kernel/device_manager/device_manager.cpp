@@ -30,7 +30,7 @@
 #include "BaseDevice.h"
 #include "devfs_private.h"
 #include "id_generator.h"
-#include "io_requests.h"
+#include "IORequest.h"
 #include "io_resources.h"
 #include "IOScheduler.h"
 

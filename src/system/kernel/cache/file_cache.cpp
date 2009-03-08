@@ -25,7 +25,7 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 //#define TRACE_FILE_CACHE

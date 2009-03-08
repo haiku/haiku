@@ -16,6 +16,7 @@ KernelMergeObject kernel_device_manager.o :
 
 	dma_resources.cpp
 	io_requests.cpp
+	IORequest.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;

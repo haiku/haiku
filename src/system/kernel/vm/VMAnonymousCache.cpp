@@ -38,7 +38,7 @@
 #include <vm_page.h>
 #include <vm_priv.h>
 
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 #if	ENABLE_SWAP_SUPPORT

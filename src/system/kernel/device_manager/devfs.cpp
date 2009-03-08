@@ -36,7 +36,7 @@
 #include <vm.h>
 
 #include "BaseDevice.h"
-#include "io_requests.h"
+#include "IORequest.h"
 #include "legacy_drivers.h"
 
 

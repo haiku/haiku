@@ -12,7 +12,7 @@
 #include <scsi.h>
 
 #include "dma_resources.h"
-#include "io_requests.h"
+#include "IORequest.h"
 #include "IOScheduler.h"
 
 

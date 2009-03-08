@@ -3,8 +3,8 @@
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef IO_REQUESTS_H
-#define IO_REQUESTS_H
+#ifndef IO_REQUEST_H
+#define IO_REQUEST_H
 
 #include <sys/uio.h>
 
@@ -371,4 +371,4 @@ operator new[](size_t size, const vip_io_alloc_t& vip_io_alloc) throw ()
 }
 
 
-#endif	// IO_REQUESTS_H
+#endif	// IO_REQUEST_H

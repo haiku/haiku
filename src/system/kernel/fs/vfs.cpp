@@ -53,7 +53,7 @@
 #include <vm_cache.h>
 
 #include "fifo.h"
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 //#define TRACE_VFS

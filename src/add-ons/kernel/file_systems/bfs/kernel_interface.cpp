@@ -18,7 +18,7 @@
 
 // TODO: temporary solution as long as there is no public I/O requests API
 #ifndef BFS_SHELL
-#	include "io_requests.h"
+#	include <io_requests.h>
 #endif
 
 #define BFS_IO_SIZE	65536
@@ -458,7 +458,7 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	Inode* inode = (Inode*)_node->private_node;
 
 #ifndef BFS_SHELL
-	if (request->IsWrite() && volume->IsReadOnly())
+	if (io_request_is_write(request) && volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 #endif
 

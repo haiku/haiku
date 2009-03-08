@@ -32,8 +32,8 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 
+#include "IORequest.h"
 #include "PageCacheLocker.h"
-#include "io_requests.h"
 
 
 //#define TRACE_VM_PAGE

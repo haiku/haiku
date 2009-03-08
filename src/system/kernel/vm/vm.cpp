@@ -46,7 +46,7 @@
 #include <vm_priv.h>
 
 #include "VMAnonymousCache.h"
-#include "io_requests.h"
+#include "IORequest.h"
 
 
 //#define TRACE_VM

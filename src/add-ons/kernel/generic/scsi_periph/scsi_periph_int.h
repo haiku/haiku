@@ -12,7 +12,7 @@
 #include <scsi_periph.h>
 #include <device_manager.h>
 
-#include "io_requests.h"
+#include "IORequest.h"
 #include "wrapper.h"
 
 
