@@ -19,6 +19,7 @@
 static struct option const kLongOptions[] = {
 	{"fall-back", no_argument, 0, 'f'},
 	{"short", no_argument, 0, 's'},
+	{"list", no_argument, 0, 'l'},
 	{"help", no_argument, 0, 'h'},
 	{NULL}
 };
@@ -57,7 +58,8 @@ usage(int status)
 		"      --fall-back\tchanges to the standard fallback mode, and displays a\n"
 		"\t\t\tnotification requester.\n"
 		"  -s  --short\t\twhen no mode is given the current screen mode is\n"
-		"\t\t\tprinted in short form.\n",
+		"\t\t\tprinted in short form.\n"
+		"  -l  --list\t\tdisplay a list of the available modes\n",
 		kProgramName);
 
 	exit(status);
@@ -70,6 +72,7 @@ main(int argc, char** argv)
 	bool fallbackMode = false;
 	bool setMode = false;
 	bool shortOutput = false;
+	bool listModes = false;
 	int width = -1;
 	int height = -1;
 	int depth = -1;
@@ -79,7 +82,7 @@ main(int argc, char** argv)
 	// the display resolution!
 
 	int c;
-	while ((c = getopt_long(argc, argv, "sh", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "shlf", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 0:
 				break;
@@ -89,6 +92,9 @@ main(int argc, char** argv)
 				break;
 			case 's':
 				shortOutput = true;
+				break;
+			case 'l':
+				listModes = true;
 				break;
 			case 'h':
 				usage(0);
@@ -129,7 +135,7 @@ main(int argc, char** argv)
 	screen_mode currentMode;
 	screenMode.Get(currentMode);
 
-	if (!setMode) {
+	if ((!setMode) && (!listModes)) {
 		const char* format = shortOutput
 			? "%ld %ld %ld %g\n" : "Resolution: %ld %ld, %ld bits, %g Hz\n";
 		printf(format, currentMode.width, currentMode.height,
@@ -139,7 +145,19 @@ main(int argc, char** argv)
 
 	screen_mode newMode = currentMode;
 
-	if (fallbackMode) {
+        if (listModes) {
+		const int modeCount = screenMode.CountModes();
+		printf("Available screen modes :\n");
+
+		for (int modeNumber = 0; modeNumber < modeCount; modeNumber++) {
+			currentMode = screenMode.ModeAt(modeNumber);
+			const char* format = shortOutput
+				? "%ld %ld %ld %g\n" : "%ld %ld, %ld bits, %g Hz\n";
+			printf(format, currentMode.width, currentMode.height,
+				currentMode.BitsPerPixel(), currentMode.refresh);
+		}
+		return 0;
+        } else if (fallbackMode) {
 		if (currentMode.width == 800 && currentMode.height == 600) {
 			newMode.width = 640;
 			newMode.height = 480;
