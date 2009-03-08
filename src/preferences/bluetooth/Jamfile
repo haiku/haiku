@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences bluetooth ;
 
 UsePrivateHeaders shared ;
 
-AddResources bluetooth-pref : bluetooth-pref.rdef ;
+AddResources Bluetooth : bluetooth-pref.rdef ;
 
 Preference Bluetooth : 
 	BluetoothDeviceView.cpp
