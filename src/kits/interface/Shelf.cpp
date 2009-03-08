@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,11 +7,12 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval
  *		René Gollent
+ *		Alexandre Deckner, alex@zappotek.com
  */
 
 /*!	BShelf stores replicant views that are dropped onto it */
 
-
+#include <AutoLock.h>
 #include <Beep.h>
 #include <Dragger.h>
 #include <Entry.h>
@@ -103,7 +104,7 @@ namespace BPrivate {
 
 struct replicant_data {
 	replicant_data(BMessage *message, BView *view, BDragger *dragger,
-		BDragger::relation relation, unsigned long id, image_id image);
+		BDragger::relation relation, unsigned long id);
 	replicant_data();
 	~replicant_data();
 
@@ -122,7 +123,6 @@ struct replicant_data {
 	BDragger*			dragger;
 	BDragger::relation	relation;
 	unsigned long		id;
-	image_id			image;
 	status_t			error;
 	BView*				zombie_view;
 };
@@ -201,14 +201,13 @@ find_replicant(BList &list, const char *className, const char *addOn)
 
 
 replicant_data::replicant_data(BMessage *_message, BView *_view, BDragger *_dragger,
-	BDragger::relation _relation, unsigned long _id, image_id _image)
+	BDragger::relation _relation, unsigned long _id)
 	:
 	message(_message),
 	view(_view),
 	dragger(NULL),
 	relation(_relation),
 	id(_id),
-	image(_image),
 	error(B_OK),
 	zombie_view(NULL)
 {
@@ -222,7 +221,6 @@ replicant_data::replicant_data()
 	dragger(NULL),
 	relation(BDragger::TARGET_UNKNOWN),
 	id(0),
-	image(-1),
 	error(B_ERROR),
 	zombie_view(NULL)
 {
@@ -231,12 +229,6 @@ replicant_data::replicant_data()
 replicant_data::~replicant_data()
 {
 	delete message;
-	// we can't delete the view or image here since 
-	// 1 - the view may already have been deleted and thus our pointer is invalid
-	// and 2 - we don't know what order they will be deleted in, so we can't unload the image yet
-	// since the destructor code for the view might still be needed if it has not been destroyed yet.
-	// this does mean we technically leak add-on images on exit, but I don't see a way around that,
-	// and in theory they should be unloaded by team cleanup on exit anyways.
 }
 
 status_t
@@ -463,6 +455,9 @@ ReplicantViewFilter::Filter(BMessage *message, BHandler **handler)
 
 //	#pragma mark -
 
+BShelf::LoadedImageMap 	BShelf::sLoadedImages;
+BLocker					BShelf::sLoadedImageMapLocker("BShelf loaded image map");
+
 
 BShelf::BShelf(BView *view, bool allowDrags, const char *shelfType)
 	: BHandler(shelfType)
@@ -498,8 +493,11 @@ BShelf::~BShelf()
 {
 	Save();
 
-	delete fEntry;
-	delete fStream;
+	// we own fStream only when fEntry is set
+	if (fEntry) {
+		delete fEntry;
+		delete fStream;
+	}
 
 	while (fReplicants.CountItems() > 0) {
 		replicant_data *data = (replicant_data *)fReplicants.ItemAt(0);
@@ -1135,8 +1133,6 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 status_t
 BShelf::_DeleteReplicant(replicant_data* item)
 {
-	bool loadedImage = item->message->FindBool("_loaded_image_");
-
 	BView *view = item->view;
 	if (view == NULL)
 		view = item->zombie_view;
@@ -1162,13 +1158,25 @@ BShelf::_DeleteReplicant(replicant_data* item)
 		delete item->dragger;
 	}
 
-	image_id image = item->image;
+	// Update use count for image and unload if necessary
+	const char* signature = NULL;
+	if (item->message->FindString("add_on", &signature) == B_OK
+		&& signature != NULL) {
+		AutoLock<BLocker> lock(sLoadedImageMapLocker);
+		if (lock.IsLocked()) {
+			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
+
+			if (it != sLoadedImages.end()) {
+				(*it).second.second -= 1;
+				if ((*it).second.second <= 0) {
+					unload_add_on((*it).second.first);
+					sLoadedImages.erase(it);
+				}
+			}
+		}
+	}
 
 	delete item;
-
-	if (loadedImage && image >= 0)
-		unload_add_on(image);
-
 
 	return B_OK;
 }
@@ -1218,8 +1226,24 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	}
 
 	// Instantiate the object, if this fails we have a zombie
-	image_id image;
+	image_id image = -1;
 	BArchivable *archivable = _InstantiateObject(data, &image);
+
+	// Update use count for image
+	const char* signature = NULL;
+	if (data->FindString("add_on", &signature) == B_OK && signature != NULL) {
+		AutoLock<BLocker> lock(sLoadedImageMapLocker);
+		if (lock.IsLocked()) {
+			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
+
+			if (it == sLoadedImages.end())
+				sLoadedImages.insert(LoadedImageMap::value_type(
+					BString(signature), std::pair<image_id, int>(image, 1)));
+			else
+				(*it).second.second += 1;
+		}
+	}
+
 	BView *view = dynamic_cast<BView*>(archivable);
 	if (archivable != NULL && view == NULL) {
 		printf("Replicant was rejected: it's not a view!");
@@ -1247,11 +1271,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	data->RemoveName("_drop_point_");
 	data->RemoveName("_drop_offset_");
 
-	if (image >= 0)
-		data->AddBool("_loaded_image_", true);
-
 	replicant_data *item = new replicant_data(data, replicant, dragger,
-		relation, uniqueID, image);
+		relation, uniqueID);
 
 	item->error = B_OK;
 	item->zombie_view = zombie;

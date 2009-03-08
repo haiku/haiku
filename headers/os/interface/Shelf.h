@@ -1,14 +1,18 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SHELF_H
 #define _SHELF_H
 
-
 #include <Dragger.h>
 #include <Handler.h>
 #include <List.h>
+#include <Locker.h>
+#include <String.h>
+
+#include <map>
+#include <utility>
 
 class BDataIO;
 class BPoint;
@@ -122,6 +126,10 @@ class BShelf : public BHandler {
 		bool				fDisplayZombies;
 		bool				fAllowZombies;
 		bool				fTypeEnforced;
+
+		typedef std::map<BString, std::pair<image_id, int32> > LoadedImageMap;
+		static LoadedImageMap	sLoadedImages;
+		static BLocker			sLoadedImageMapLocker;
 
 		uint32				_reserved[8];
 };
