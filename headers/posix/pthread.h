@@ -6,6 +6,7 @@
 #define _PTHREAD_H_
 
 
+#include <sched.h>
 #include <stdint.h>
 #include <time.h>
 

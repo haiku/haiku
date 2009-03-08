@@ -5,6 +5,7 @@
 #ifndef _SEMAPHORE_H_
 #define _SEMAPHORE_H_
 
+#include <fcntl.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
 #include <time.h>
