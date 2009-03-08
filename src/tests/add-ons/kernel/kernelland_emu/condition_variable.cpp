@@ -1,45 +1,102 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de.
- *		Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
-#include <condition_variable.h>
+#include "condition_variable.h"
 
 #include <new>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Debug.h>
+#include <KernelExport.h>
+
+// libroot
+#include <user_thread.h>
+
+// system
+#include <syscalls.h>
+#include <user_thread_defs.h>
 
 #include <lock.h>
+#include <util/AutoLock.h>
+
+#include "thread.h"
 
 
 #define STATUS_ADDED	1
 #define STATUS_WAITING	2
 
 
-struct condition_private {
-	mutex		lock;
-	sem_id		wait_sem;
-	const void*	object;
+static const int kConditionVariableHashSize = 512;
+
+
+struct ConditionVariableHashDefinition {
+	typedef const void* KeyType;
+	typedef	ConditionVariable ValueType;
+
+	size_t HashKey(const void* key) const
+		{ return (size_t)key; }
+	size_t Hash(ConditionVariable* variable) const
+		{ return (size_t)variable->fObject; }
+	bool Compare(const void* key, ConditionVariable* variable) const
+		{ return key == variable->fObject; }
+	HashTableLink<ConditionVariable>* GetLink(ConditionVariable* variable) const
+		{ return variable; }
 };
+
+typedef OpenHashTable<ConditionVariableHashDefinition> ConditionVariableHash;
+static ConditionVariableHash sConditionVariableHash;
+static mutex sConditionVariablesLock = MUTEX_INITIALIZER("condition variables");
+
+
+// #pragma mark - ConditionVariableEntry
+
+
+bool
+ConditionVariableEntry::Add(const void* object)
+{
+	ASSERT(object != NULL);
+
+	fThread = get_current_thread();
+
+	MutexLocker _(sConditionVariablesLock);
+
+	fVariable = sConditionVariableHash.Lookup(object);
+
+	if (fVariable == NULL) {
+		fWaitStatus = B_ENTRY_NOT_FOUND;
+		return false;
+	}
+
+	fWaitStatus = STATUS_ADDED;
+	fVariable->fEntries.Add(this);
+
+	return true;
+}
 
 
 status_t
 ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 {
+	MutexLocker conditionLocker(sConditionVariablesLock);
+
 	if (fVariable == NULL)
 		return fWaitStatus;
 
-	condition_private* condition = (condition_private*)fVariable->fObject;
+	user_thread* userThread = get_user_thread();
+
+	userThread->wait_status = 1;
 	fWaitStatus = STATUS_WAITING;
 
-	status_t status;
-	do {
-		status = acquire_sem_etc(condition->wait_sem, 1, flags, timeout);
-	} while (status == B_INTERRUPTED);
+	conditionLocker.Unlock();
 
-	mutex_lock(&condition->lock);
+	status_t error;
+	while ((error = _kern_block_thread(flags, timeout)) == B_INTERRUPTED) {
+	}
+
+	conditionLocker.Lock();
 
 	// remove entry from variable, if not done yet
 	if (fVariable != NULL) {
@@ -47,39 +104,77 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 		fVariable = NULL;
 	}
 
-	mutex_unlock(&condition->lock);
+	return error;
+}
 
-	return status;
+
+status_t
+ConditionVariableEntry::Wait(const void* object, uint32 flags,
+	bigtime_t timeout)
+{
+	if (Add(object))
+		return Wait(flags, timeout);
+	return B_ENTRY_NOT_FOUND;
 }
 
 
 inline void
 ConditionVariableEntry::AddToVariable(ConditionVariable* variable)
 {
+	fThread = get_current_thread();
+
+	MutexLocker _(sConditionVariablesLock);
+
 	fVariable = variable;
 	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
 }
 
 
-//	#pragma mark -
+// #pragma mark - ConditionVariable
 
 
+/*!	Initialization method for anonymous (unpublished) condition variables.
+*/
 void
 ConditionVariable::Init(const void* object, const char* objectType)
 {
+	fObject = object;
+	fObjectType = objectType;
+	new(&fEntries) EntryList;
+}
+
+
+void
+ConditionVariable::Publish(const void* object, const char* objectType)
+{
+	ASSERT(object != NULL);
+
+	fObject = object;
 	fObjectType = objectType;
 	new(&fEntries) EntryList;
 
-	condition_private* condition = new condition_private;
-	mutex_init(&condition->lock, objectType);
-	condition->wait_sem = create_sem(0, "condition variable wait");
-	if (condition->wait_sem < B_OK)
-		panic("cannot create condition variable.");
+	MutexLocker locker(sConditionVariablesLock);
 
-	condition->object = object;
+	ASSERT(sConditionVariableHash.Lookup(object) == NULL);
 
-	fObject = condition;
+	sConditionVariableHash.InsertUnchecked(this);
+}
+
+
+void
+ConditionVariable::Unpublish(bool threadsLocked)
+{
+	ASSERT(fObject != NULL);
+
+	MutexLocker locker(sConditionVariablesLock);
+
+	sConditionVariableHash.RemoveUnchecked(this);
+	fObject = NULL;
+	fObjectType = NULL;
+
+	if (!fEntries.IsEmpty())
+		_NotifyChecked(true, B_ENTRY_NOT_FOUND);
 }
 
 
@@ -90,26 +185,60 @@ ConditionVariable::Add(ConditionVariableEntry* entry)
 }
 
 
+status_t
+ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	Add(&entry);
+	return entry.Wait(flags, timeout);
+}
+
+
 void
 ConditionVariable::_Notify(bool all, bool threadsLocked)
 {
-	condition_private* condition = (condition_private*)fObject;
-	mutex_lock(&condition->lock);
+	MutexLocker locker(sConditionVariablesLock);
 
-	uint32 count = 0;
+	if (!fEntries.IsEmpty())
+		_NotifyChecked(all, B_OK);
+}
 
+
+/*! Called with interrupts disabled and the condition variable spinlock and
+	thread lock held.
+*/
+void
+ConditionVariable::_NotifyChecked(bool all, status_t result)
+{
+	// dequeue and wake up the blocked threads
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
+
 		if (entry->fWaitStatus <= 0)
 			continue;
 
-		entry->fWaitStatus = B_OK;
-		count++;
+		if (entry->fWaitStatus == STATUS_WAITING)
+			_kern_unblock_thread(get_thread_id(entry->fThread), result);
+
+		entry->fWaitStatus = result;
 
 		if (!all)
 			break;
 	}
+}
 
-	release_sem_etc(condition->wait_sem, count, 0);
-	mutex_unlock(&condition->lock);
+
+// #pragma mark -
+
+
+status_t
+condition_variable_init()
+{
+	status_t error = sConditionVariableHash.Init(kConditionVariableHashSize);
+	if (error != B_OK) {
+		panic("condition_variable_init(): Failed to init hash table: %s",
+			strerror(error));
+	}
+
+	return error;
 }
