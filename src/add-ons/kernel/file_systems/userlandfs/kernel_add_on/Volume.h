@@ -9,6 +9,8 @@
 
 #include <Referenceable.h>
 
+#include <kernel/lock.h>
+
 #include "FSCapabilities.h"
 
 namespace UserlandFSUtil {
@@ -40,12 +42,9 @@ public:
 	inline	dev_t				GetID() const;
 
 	inline	bool				HasCapability(int capability) const;
-	inline	bool				HasVNodeCapability(void* vnode,
-									int capability) const;
 
 			void*				GetUserlandVolume() const;
 			ino_t				GetRootID() const;
-			bool				IsMounting() const;
 
 			// client methods
 			status_t			GetVNode(ino_t vnid, void** node);
@@ -203,6 +202,13 @@ public:
 			status_t			RewindQuery(void* cookie);
 
 private:
+			struct VNode;
+			struct VNodeHashDefinition;
+			struct VNodeMap;
+
+			class AutoIncrementer;
+
+private:
 			status_t			_Mount(const char* device, uint32 flags,
 									const char* parameters);
 			status_t			_Unmount();
@@ -239,28 +245,24 @@ private:
 
 			status_t			_PutAllPendingVNodes();
 
-private:
-			struct MountVNodeMap;
-			struct VNodeCountMap;
-			class AutoIncrementer;
+	inline	bool				HasVNodeCapability(VNode* vnode,
+									int capability) const;
 
+private:
+			mutex				fLock;
 			FileSystem*			fFileSystem;
 			fs_volume*			fFSVolume;
 			FSVolumeCapabilities fCapabilities;
 			void*				fUserlandVolume;
 			ino_t				fRootID;
-			void*				fRootNode;
-			MountVNodeMap*		fMountVNodes;
+			VNode*				fRootNode;
 			vint32				fOpenFiles;
 			vint32				fOpenDirectories;
 			vint32				fOpenAttributeDirectories;
 			vint32				fOpenAttributes;
 			vint32				fOpenIndexDirectories;
 			vint32				fOpenQueries;
-			VNodeCountMap*		fVNodeCountMap;
-									// Tracks the number of new/get_vnode()
-									// calls to be balanced by the FS by
-									// corresponding put_vnode()s.
+			VNodeMap*			fVNodes;
 	volatile bool				fVNodeCountingEnabled;
 };
 
@@ -281,7 +283,7 @@ Volume::HasCapability(int capability) const
 
 
 inline bool
-Volume::HasVNodeCapability(void* vnode, int capability) const
+Volume::HasVNodeCapability(VNode* vnode, int capability) const
 {
 	// TODO: Implement for real!
 	return true;

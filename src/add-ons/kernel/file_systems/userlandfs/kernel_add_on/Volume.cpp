@@ -10,11 +10,12 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "AutoLocker.h"
+#include <util/AutoLock.h>
+#include <util/OpenHashTable.h>
+
 #include "Compatibility.h"
 #include "Debug.h"
 #include "FileSystem.h"
-#include "HashMap.h"
 #include "IOCtlInfo.h"
 #include "kernel_interface.h"
 #include "KernelRequestHandler.h"
@@ -35,14 +36,44 @@
 // waiting for a reply.
 static const bigtime_t kUserlandServerlandPortTimeout = 10000000;	// 10s
 
-// MountVNodeMap
-struct Volume::MountVNodeMap : public HashMap<HashKey64<ino_t>, void*> {
+
+// VNode
+struct Volume::VNode : HashTableLink<VNode> {
+	ino_t	id;
+	void*	clientNode;
+	int32	useCount;
+
+	VNode(ino_t id, void* clientNode)
+		:
+		id(id),
+		clientNode(clientNode),
+		useCount(0)
+	{
+	}
 };
 
-// VNodeCountMap
-struct Volume::VNodeCountMap
-	: public SynchronizedHashMap<HashKey64<ino_t>, int32*> {
+
+// VNodeHashDefinition
+struct Volume::VNodeHashDefinition {
+	typedef ino_t	KeyType;
+	typedef	VNode	ValueType;
+
+	size_t HashKey(ino_t key) const
+		{ return (uint32)key ^ (uint32)(key >> 32); }
+	size_t Hash(const VNode* value) const
+		{ return HashKey(value->id); }
+	bool Compare(ino_t key, VNode* value) const
+		{ return value->id == key; }
+	HashTableLink<VNode>* GetLink(VNode* value) const
+		{ return value; }
 };
+
+
+// VNodeMap
+struct Volume::VNodeMap
+	: public OpenHashTable<VNodeHashDefinition> {
+};
+
 
 // AutoIncrementer
 class Volume::AutoIncrementer {
@@ -77,21 +108,24 @@ Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
 	  fUserlandVolume(NULL),
 	  fRootID(0),
 	  fRootNode(NULL),
-	  fMountVNodes(NULL),
 	  fOpenFiles(0),
 	  fOpenDirectories(0),
 	  fOpenAttributeDirectories(0),
 	  fOpenAttributes(0),
 	  fOpenIndexDirectories(0),
 	  fOpenQueries(0),
-	  fVNodeCountMap(NULL),
+	  fVNodes(NULL),
 	  fVNodeCountingEnabled(false)
 {
+	mutex_init(&fLock, "userlandfs volume");
 }
 
 // destructor
 Volume::~Volume()
 {
+	mutex_destroy(&fLock);
+
+	delete fVNodes;
 }
 
 // GetFileSystem
@@ -115,28 +149,20 @@ Volume::GetRootID() const
 	return fRootID;
 }
 
-// IsMounting
-bool
-Volume::IsMounting() const
-{
-	return fMountVNodes;
-}
-
-
 // #pragma mark - client methods
 
 // GetVNode
 status_t
-Volume::GetVNode(ino_t vnid, void** node)
+Volume::GetVNode(ino_t vnid, void** _node)
 {
 PRINT(("get_vnode(%ld, %lld)\n", GetID(), vnid));
-	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
-		ERROR(("Volume::GetVNode(): get_vnode() invoked for unknown vnode "
-			"while mounting!\n"));
-	}
-	status_t error = get_vnode(fFSVolume, vnid, node);
-	if (error == B_OK)
+	void* vnode;
+	status_t error = get_vnode(fFSVolume, vnid, &vnode);
+	if (error == B_OK) {
 		_IncrementVNodeCount(vnid);
+		*_node = ((VNode*)vnode)->clientNode;
+	}
+
 	return error;
 }
 
@@ -157,11 +183,6 @@ status_t
 Volume::AcquireVNode(ino_t vnid)
 {
 PRINT(("acquire_vnode(%ld, %lld)\n", GetID(), vnid));
-	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
-		ERROR(("Volume::AcquireVNode(): acquire_vnode() invoked for unknown "
-			"vnode while mounting!\n"));
-	}
-
 	status_t error = acquire_vnode(fFSVolume, vnid);
 	if (error == B_OK)
 		_IncrementVNodeCount(vnid);
@@ -171,48 +192,78 @@ PRINT(("acquire_vnode(%ld, %lld)\n", GetID(), vnid));
 
 // NewVNode
 status_t
-Volume::NewVNode(ino_t vnid, void* node)
+Volume::NewVNode(ino_t vnid, void* clientNode)
 {
 PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
-	status_t error = new_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps);
-	if (error == B_OK) {
-		if (IsMounting()) {
-			error = fMountVNodes->Put(vnid, node);
-			if (error != B_OK) {
-				ERROR(("Volume::NewVNode(): Failed to add vnode to mount "
-					"vnode map!\n"));
-				publish_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps,
-					S_IFDIR, 0);	// dummy type and flags
-				put_vnode(fFSVolume, vnid);
-				return error;
-			}
-		}
-// TODO: Check what we need to do according to the new semantics.
-//		_IncrementVNodeCount(vnid);
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* node = fVNodes->Lookup(vnid);
+	if (node != NULL) {
+		// The node is already known -- this is an error.
+		RETURN_ERROR(B_BAD_VALUE);
 	}
-	return error;
+
+	// create the node
+	node = new(std::nothrow) VNode(vnid, clientNode);
+	if (node == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	locker.Unlock();
+
+	// tell the VFS
+	status_t error = new_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps);
+	if (error != B_OK) {
+		delete node;
+		RETURN_ERROR(error);
+	}
+
+	// add the node to our map
+	locker.Lock();
+	fVNodes->Insert(node);
+
+	return B_OK;
 }
 
 // PublishVNode
 status_t
-Volume::PublishVNode(ino_t vnid, void* node, int type, uint32 flags)
+Volume::PublishVNode(ino_t vnid, void* clientNode, int type, uint32 flags)
 {
-PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, node));
+PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
+	// lookup the node
+	MutexLocker locker(fLock);
+	VNode* node = fVNodes->Lookup(vnid);
+	bool nodeKnown = node != NULL;
+
+	if (!nodeKnown) {
+		// The node is not yet known -- create it.
+		node = new(std::nothrow) VNode(vnid, clientNode);
+		if (node == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+	}
+
+	locker.Unlock();
+
+	// tell the VFS
 	status_t error = publish_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps,
 		type, flags);
-	if (error == B_OK) {
-		if (IsMounting()) {
-			error = fMountVNodes->Put(vnid, node);
-			if (error != B_OK) {
-				ERROR(("Volume::PublishVNode(): Failed to add vnode to mount "
-					"vnode map!\n"));
-				put_vnode(fFSVolume, vnid);
-				return error;
-			}
-		}
-		_IncrementVNodeCount(vnid);
+	if (error != B_OK) {
+// TODO: We should note whether the node was made known via new_vnode(). If so,
+// we should remove and delete it here!
+		if (!nodeKnown)
+			delete node;
+		RETURN_ERROR(error);
 	}
-	return error;
+
+	// add the node to our map, if not known yet
+	locker.Lock();
+	if (!nodeKnown)
+		fVNodes->Insert(node);
+
+	// increments its use count
+	if (fVNodeCountingEnabled)
+		node->useCount++;
+
+	return B_OK;
 }
 
 // RemoveVNode
@@ -312,29 +363,41 @@ Volume::WriteFileCache(ino_t vnodeID, void* cookie,
 status_t
 Volume::Mount(const char* device, uint32 flags, const char* parameters)
 {
-	// Create a map that holds ino_t->void* mappings of all vnodes
-	// created while mounting. We need it to get the root node.
-	MountVNodeMap vnodeMap;
-	status_t error = vnodeMap.InitCheck();
-	if (error != B_OK)
-		RETURN_ERROR(error);
+	// create the vnode map
+	fVNodes = new(std::nothrow) VNodeMap;
+	if (fVNodes == NULL)
+		return B_NO_MEMORY;
 
-	fMountVNodes = &vnodeMap;
+	status_t error = fVNodes->Init();
+	if (error != B_OK)
+		return error;
+
+	// enable vnode counting
+	fVNodeCountingEnabled = true;
+
+	// mount
 	error = _Mount(device, flags, parameters);
-	fMountVNodes = NULL;
+
 	if (error == B_OK) {
+		MutexLocker locker(fLock);
 		// fetch the root node, so that we can serve Walk() requests on it,
 		// after the connection to the userland server is gone
-		if (!vnodeMap.ContainsKey(fRootID)) {
+		fRootNode = fVNodes->Lookup(fRootID);
+		if (fRootNode == NULL) {
 			// The root node was not added while mounting. That's a serious
 			// problem -- not only because we don't have it, but also because
-			// the VFS requires new_vnode() to be invoked for the root node.
+			// the VFS requires publish_vnode() to be invoked for the root node.
 			ERROR(("Volume::Mount(): new_vnode() was not called for root node! "
 				"Unmounting...\n"));
+			locker.Unlock();
 			Unmount();
 			return B_ERROR;
 		}
-		fRootNode = vnodeMap.Get(fRootID);
+
+		// Decrement the root node use count. The publish_vnode() the client FS
+		// did will be balanced by the VFS.
+		if (fVNodeCountingEnabled)
+			fRootNode->useCount--;
 	}
 	return error;
 }
@@ -344,20 +407,20 @@ status_t
 Volume::Unmount()
 {
 	status_t error = _Unmount();
-	// free the memory associated with the vnode count map
-	if (fVNodeCountMap) {
-		AutoLocker<VNodeCountMap> locker(fVNodeCountMap);
-		fVNodeCountingEnabled = false;
-		for (VNodeCountMap::Iterator it = fVNodeCountMap->GetIterator();
-			 it.HasNext();) {
-			VNodeCountMap::Entry entry = it.Next();
-			delete entry.value;
-		}
 
-		locker.Detach();
-		delete fVNodeCountMap;
-		fVNodeCountMap = NULL;
+	// free the memory associated with the vnode map
+	if (fVNodes != NULL) {
+		MutexLocker _(fLock);
+		VNode* node = fVNodes->Clear();
+		while (node != NULL) {
+			VNode* nextNode = node->fNext;
+			delete node;
+			node = nextNode;
+		}
+		delete fVNodes;
+		fVNodes = NULL;
 	}
+
 	fFileSystem->VolumeUnmounted(this);
 	return error;
 }
@@ -489,10 +552,12 @@ Volume::Lookup(void* dir, const char* entryName, ino_t* vnid)
 
 // GetVNodeName
 status_t
-Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
+Volume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 {
 	// We don't check the capability -- if not implemented by the client FS,
 	// the functionality is emulated in userland.
+
+	VNode* vnode = (VNode*)_node;
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -508,7 +573,7 @@ Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->size = bufferSize;
 
 	// send the request
@@ -538,7 +603,7 @@ Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
+Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 	uint32* flags)
 {
 	// get a free port
@@ -569,10 +634,21 @@ Volume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
-	*node = reply->node;
+
+	// everything went fine so far -- add the node to our map
+	VNode* vnode = new(std::nothrow) VNode(vnid, reply->node);
+	if (vnode == NULL) {
+		WriteVNode(reply->node, reenter);
+		RETURN_ERROR(B_NO_MEMORY);
+	}
+
+	MutexLocker lock(fLock);
+	fVNodes->Insert(vnode);
+
+	*_node = vnode;
 	*type = reply->type;
 	*flags = reply->flags;
-	return error;
+	return B_OK;
 }
 
 // WriteVNode
@@ -582,7 +658,7 @@ Volume::WriteVNode(void* node, bool reenter)
 	status_t error = _WriteVNode(node, reenter);
 	if (error != B_OK && fFileSystem->GetPortPool()->IsDisconnected()) {
 		// This isn't really necessary, since the VFS basically ignores the
-		// return value -- at least OBOS. The fshell panic()s; didn't check
+		// return value -- at least Haiku. The fshell panic()s; didn't check
 		// BeOS. It doesn't harm to appear to behave nicely. :-)
 		WARN(("Volume::WriteVNode(): connection lost, forcing write vnode\n"));
 		return B_OK;
@@ -592,8 +668,18 @@ Volume::WriteVNode(void* node, bool reenter)
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(void* node, bool reenter)
+Volume::RemoveVNode(void* _node, bool reenter)
 {
+	VNode* vnode = (VNode*)_node;
+
+	// at any rate remove the vnode from our map and delete it
+	MutexLocker locker(fLock);
+	fVNodes->Remove(vnode);
+	locker.Unlock();
+
+	void* clientNode = vnode->clientNode;
+	delete vnode;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -608,7 +694,7 @@ Volume::RemoveVNode(void* node, bool reenter)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = clientNode;
 	request->reenter = reenter;
 
 	// send the request
@@ -631,9 +717,11 @@ Volume::RemoveVNode(void* node, bool reenter)
 
 // IOCtl
 status_t
-Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
+Volume::IOCtl(void* _node, void* cookie, uint32 command, void *buffer,
 	size_t len)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check the command and its parameters
 	bool isBuffer = false;
 	int32 bufferSize = 0;
@@ -720,7 +808,7 @@ Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 	}
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_IOCTL))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_IOCTL))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -737,7 +825,7 @@ Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->command = command;
 	request->bufferParameter = buffer;
@@ -777,10 +865,12 @@ Volume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
 
 // SetFlags
 status_t
-Volume::SetFlags(void* node, void* cookie, int flags)
+Volume::SetFlags(void* _node, void* cookie, int flags)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_SET_FLAGS))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_SET_FLAGS))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -797,7 +887,7 @@ Volume::SetFlags(void* node, void* cookie, int flags)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->flags = flags;
 
@@ -817,10 +907,12 @@ Volume::SetFlags(void* node, void* cookie, int flags)
 
 // Select
 status_t
-Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
+Volume::Select(void* _node, void* cookie, uint8 event, selectsync* sync)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_SELECT)) {
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_SELECT)) {
 		notify_select_event(sync, event);
 		return B_OK;
 	}
@@ -839,7 +931,7 @@ Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->event = event;
 	request->sync = sync;
@@ -869,10 +961,12 @@ Volume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
 
 // Deselect
 status_t
-Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
+Volume::Deselect(void* _node, void* cookie, uint8 event, selectsync* sync)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_DESELECT))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_DESELECT))
 		return B_OK;
 
 	struct SyncRemover {
@@ -898,7 +992,7 @@ Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->event = event;
 	request->sync = sync;
@@ -919,10 +1013,12 @@ Volume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 
 // FSync
 status_t
-Volume::FSync(void* node)
+Volume::FSync(void* _node)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FSYNC))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_FSYNC))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -939,7 +1035,7 @@ Volume::FSync(void* node)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 
 	// send the request
 	KernelRequestHandler handler(this, FSYNC_REPLY);
@@ -957,13 +1053,15 @@ Volume::FSync(void* node)
 
 // ReadSymlink
 status_t
-Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
+Volume::ReadSymlink(void* _node, char* buffer, size_t bufferSize,
 	size_t* bytesRead)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*bytesRead = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_SYMLINK))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_SYMLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -980,7 +1078,7 @@ Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->size = bufferSize;
 
 	// send the request
@@ -1008,11 +1106,13 @@ Volume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
 
 // CreateSymlink
 status_t
-Volume::CreateSymlink(void* dir, const char* name, const char* target,
+Volume::CreateSymlink(void* _dir, const char* name, const char* target,
 	int mode)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE_SYMLINK))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CREATE_SYMLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1029,7 +1129,7 @@ Volume::CreateSymlink(void* dir, const char* name, const char* target,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->target, target);
@@ -1053,10 +1153,12 @@ Volume::CreateSymlink(void* dir, const char* name, const char* target,
 
 // Link
 status_t
-Volume::Link(void* dir, const char* name, void* node)
+Volume::Link(void* _dir, const char* name, void* node)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_LINK))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_LINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1073,7 +1175,7 @@ Volume::Link(void* dir, const char* name, void* node)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	request->target = node;
 	if (error != B_OK)
@@ -1095,10 +1197,12 @@ Volume::Link(void* dir, const char* name, void* node)
 
 // Unlink
 status_t
-Volume::Unlink(void* dir, const char* name)
+Volume::Unlink(void* _dir, const char* name)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_UNLINK))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_UNLINK))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1115,7 +1219,7 @@ Volume::Unlink(void* dir, const char* name)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
@@ -1136,11 +1240,14 @@ Volume::Unlink(void* dir, const char* name)
 
 // Rename
 status_t
-Volume::Rename(void* oldDir, const char* oldName, void* newDir,
+Volume::Rename(void* _oldDir, const char* oldName, void* _newDir,
 	const char* newName)
 {
+	VNode* oldVNode = (VNode*)_oldDir;
+	VNode* newVNode = (VNode*)_newDir;
+
 	// check capability
-	if (!HasVNodeCapability(oldDir, FS_VNODE_CAPABILITY_RENAME))
+	if (!HasVNodeCapability(oldVNode, FS_VNODE_CAPABILITY_RENAME))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1157,8 +1264,8 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->oldDir = oldDir;
-	request->newDir = newDir;
+	request->oldDir = oldVNode->clientNode;
+	request->newDir = newVNode->clientNode;
 	error = allocator.AllocateString(request->oldName, oldName);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->newName, newName);
@@ -1181,10 +1288,12 @@ Volume::Rename(void* oldDir, const char* oldName, void* newDir,
 
 // Access
 status_t
-Volume::Access(void* node, int mode)
+Volume::Access(void* _node, int mode)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_ACCESS))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_ACCESS))
 		return B_OK;
 
 	// get a free port
@@ -1201,7 +1310,7 @@ Volume::Access(void* node, int mode)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->mode = mode;
 
 	// send the request
@@ -1250,10 +1359,12 @@ Volume::ReadStat(void* node, struct stat* st)
 
 // WriteStat
 status_t
-Volume::WriteStat(void* node, const struct stat* st, uint32 mask)
+Volume::WriteStat(void* _node, const struct stat* st, uint32 mask)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_STAT))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_WRITE_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1270,7 +1381,7 @@ Volume::WriteStat(void* node, const struct stat* st, uint32 mask)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->st = *st;
 	request->mask = mask;
 
@@ -1293,11 +1404,13 @@ Volume::WriteStat(void* node, const struct stat* st, uint32 mask)
 
 // Create
 status_t
-Volume::Create(void* dir, const char* name, int openMode, int mode,
+Volume::Create(void* _dir, const char* name, int openMode, int mode,
 	void** cookie, ino_t* vnid)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CREATE))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1315,7 +1428,7 @@ Volume::Create(void* dir, const char* name, int openMode, int mode,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	request->openMode = openMode;
 	request->mode = mode;
@@ -1336,7 +1449,8 @@ Volume::Create(void* dir, const char* name, int openMode, int mode,
 	incrementer.Keep();
 	*vnid = reply->vnid;
 	*cookie = reply->fileCookie;
-	// The VFS will balance the new_vnode() call for the FS.
+
+	// The VFS will balance the publish_vnode() call for the FS.
 	if (error == B_OK)
 		_DecrementVNodeCount(*vnid);
 	return error;
@@ -1344,10 +1458,12 @@ Volume::Create(void* dir, const char* name, int openMode, int mode,
 
 // Open
 status_t
-Volume::Open(void* node, int openMode, void** cookie)
+Volume::Open(void* _node, int openMode, void** cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_OPEN))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1364,7 +1480,7 @@ Volume::Open(void* node, int openMode, void** cookie)
 	if (error != B_OK)
 		return error;
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->openMode = openMode;
 
 	// send the request
@@ -1420,13 +1536,15 @@ Volume::FreeCookie(void* node, void* cookie)
 
 // Read
 status_t
-Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
+Volume::Read(void* _node, void* cookie, off_t pos, void* buffer,
 	size_t bufferSize, size_t* bytesRead)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*bytesRead = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1443,7 +1561,7 @@ Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->pos = pos;
 	request->size = bufferSize;
@@ -1473,13 +1591,15 @@ Volume::Read(void* node, void* cookie, off_t pos, void* buffer,
 
 // Write
 status_t
-Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
+Volume::Write(void* _node, void* cookie, off_t pos, const void* buffer,
 	size_t size, size_t* bytesWritten)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*bytesWritten = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_WRITE))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1496,7 +1616,7 @@ Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->pos = pos;
 	error = allocator.AllocateData(request->buffer, buffer, size, 1);
@@ -1523,10 +1643,12 @@ Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
+Volume::CreateDir(void* _dir, const char* name, int mode, ino_t *newDir)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_CREATE_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CREATE_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1543,7 +1665,7 @@ Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	request->mode = mode;
 	if (error != B_OK)
@@ -1566,10 +1688,12 @@ Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
 
 // RemoveDir
 status_t
-Volume::RemoveDir(void* dir, const char* name)
+Volume::RemoveDir(void* _dir, const char* name)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// check capability
-	if (!HasVNodeCapability(dir, FS_VNODE_CAPABILITY_REMOVE_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_REMOVE_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1586,7 +1710,7 @@ Volume::RemoveDir(void* dir, const char* name)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
@@ -1607,10 +1731,12 @@ Volume::RemoveDir(void* dir, const char* name)
 
 // OpenDir
 status_t
-Volume::OpenDir(void* node, void** cookie)
+Volume::OpenDir(void* _node, void** cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_OPEN_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1628,7 +1754,7 @@ Volume::OpenDir(void* node, void** cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 
 	// send the request
 	KernelRequestHandler handler(this, OPEN_DIR_REPLY);
@@ -1683,13 +1809,15 @@ Volume::FreeDirCookie(void* node, void* cookie)
 
 // ReadDir
 status_t
-Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
+Volume::ReadDir(void* _node, void* cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* countRead)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*countRead = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1706,7 +1834,7 @@ Volume::ReadDir(void* node, void* cookie, void* buffer, size_t bufferSize,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->dirCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
@@ -1745,10 +1873,12 @@ reply->buffer.GetSize()));
 
 // RewindDir
 status_t
-Volume::RewindDir(void* node, void* cookie)
+Volume::RewindDir(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REWIND_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_REWIND_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1765,7 +1895,7 @@ Volume::RewindDir(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->dirCookie = cookie;
 
 	// send the request
@@ -1788,10 +1918,12 @@ Volume::RewindDir(void* node, void* cookie)
 
 // OpenAttrDir
 status_t
-Volume::OpenAttrDir(void* node, void** cookie)
+Volume::OpenAttrDir(void* _node, void** cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_ATTR_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_OPEN_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1809,7 +1941,7 @@ Volume::OpenAttrDir(void* node, void** cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 
 	// send the request
 	KernelRequestHandler handler(this, OPEN_ATTR_DIR_REPLY);
@@ -1866,11 +1998,13 @@ Volume::FreeAttrDirCookie(void* node, void* cookie)
 
 // ReadAttrDir
 status_t
-Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
+Volume::ReadAttrDir(void* _node, void* cookie, void* buffer,
 	size_t bufferSize, uint32 count, uint32* countRead)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	*countRead = 0;
@@ -1888,7 +2022,7 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrDirCookie = cookie;
 	request->bufferSize = bufferSize;
 	request->count = count;
@@ -1925,10 +2059,12 @@ Volume::ReadAttrDir(void* node, void* cookie, void* buffer,
 
 // RewindAttrDir
 status_t
-Volume::RewindAttrDir(void* node, void* cookie)
+Volume::RewindAttrDir(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REWIND_ATTR_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_REWIND_ATTR_DIR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1945,7 +2081,7 @@ Volume::RewindAttrDir(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrDirCookie = cookie;
 
 	// send the request
@@ -1967,11 +2103,13 @@ Volume::RewindAttrDir(void* node, void* cookie)
 
 // CreateAttr
 status_t
-Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
+Volume::CreateAttr(void* _node, const char* name, uint32 type, int openMode,
 	void** cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CREATE_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CREATE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -1989,7 +2127,7 @@ Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	request->type = type;
 	request->openMode = openMode;
@@ -2014,11 +2152,13 @@ Volume::CreateAttr(void* node, const char* name, uint32 type, int openMode,
 
 // OpenAttr
 status_t
-Volume::OpenAttr(void* node, const char* name, int openMode,
+Volume::OpenAttr(void* _node, const char* name, int openMode,
 	void** cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_OPEN_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_OPEN_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2036,7 +2176,7 @@ Volume::OpenAttr(void* node, const char* name, int openMode,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	request->openMode = openMode;
 	if (error != B_OK)
@@ -2096,13 +2236,15 @@ Volume::FreeAttrCookie(void* node, void* cookie)
 
 // ReadAttr
 status_t
-Volume::ReadAttr(void* node, void* cookie, off_t pos,
+Volume::ReadAttr(void* _node, void* cookie, off_t pos,
 	void* buffer, size_t bufferSize, size_t* bytesRead)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*bytesRead = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2119,7 +2261,7 @@ Volume::ReadAttr(void* node, void* cookie, off_t pos,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 	request->pos = pos;
 	request->size = bufferSize;
@@ -2149,13 +2291,15 @@ Volume::ReadAttr(void* node, void* cookie, off_t pos,
 
 // WriteAttr
 status_t
-Volume::WriteAttr(void* node, void* cookie, off_t pos,
+Volume::WriteAttr(void* _node, void* cookie, off_t pos,
 	const void* buffer, size_t bufferSize, size_t* bytesWritten)
 {
+	VNode* vnode = (VNode*)_node;
+
 	*bytesWritten = 0;
 
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_WRITE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2172,7 +2316,7 @@ Volume::WriteAttr(void* node, void* cookie, off_t pos,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 	request->pos = pos;
 	error = allocator.AllocateData(request->buffer, buffer, bufferSize, 1);
@@ -2196,10 +2340,12 @@ Volume::WriteAttr(void* node, void* cookie, off_t pos,
 
 // ReadAttrStat
 status_t
-Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
+Volume::ReadAttrStat(void* _node, void* cookie, struct stat *st)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_ATTR_STAT))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_ATTR_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2216,7 +2362,7 @@ Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 
 	// send the request
@@ -2236,11 +2382,13 @@ Volume::ReadAttrStat(void* node, void* cookie, struct stat *st)
 
 // WriteAttrStat
 status_t
-Volume::WriteAttrStat(void* node, void* cookie, const struct stat *st,
+Volume::WriteAttrStat(void* _node, void* cookie, const struct stat *st,
 	int statMask)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_WRITE_ATTR_STAT))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_WRITE_ATTR_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2257,7 +2405,7 @@ Volume::WriteAttrStat(void* node, void* cookie, const struct stat *st,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 	request->st = *st;
 	request->mask = statMask;
@@ -2278,11 +2426,14 @@ Volume::WriteAttrStat(void* node, void* cookie, const struct stat *st,
 
 // RenameAttr
 status_t
-Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
+Volume::RenameAttr(void* _oldNode, const char* oldName, void* _newNode,
 	const char* newName)
 {
+	VNode* oldVNode = (VNode*)_oldNode;
+	VNode* newVNode = (VNode*)_newNode;
+
 	// check capability
-	if (!HasVNodeCapability(oldNode, FS_VNODE_CAPABILITY_RENAME_ATTR))
+	if (!HasVNodeCapability(oldVNode, FS_VNODE_CAPABILITY_RENAME_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2299,8 +2450,8 @@ Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->oldNode = oldNode;
-	request->newNode = newNode;
+	request->oldNode = oldVNode->clientNode;
+	request->newNode = newVNode->clientNode;
 	error = allocator.AllocateString(request->oldName, oldName);
 	if (error == B_OK)
 		error = allocator.AllocateString(request->newName, newName);
@@ -2323,10 +2474,12 @@ Volume::RenameAttr(void* oldNode, const char* oldName, void* newNode,
 
 // RemoveAttr
 status_t
-Volume::RemoveAttr(void* node, const char* name)
+Volume::RemoveAttr(void* _node, const char* name)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_REMOVE_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_REMOVE_ATTR))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -2343,7 +2496,7 @@ Volume::RemoveAttr(void* node, const char* name)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
 	if (error != B_OK)
 		return error;
@@ -2897,12 +3050,6 @@ Volume::_Mount(const char* device, uint32 flags, const char* parameters)
 	fUserlandVolume = reply->volume;
 	fCapabilities = reply->capabilities;
 
-	// enable vnode counting
-	fVNodeCountMap = new(nothrow) VNodeCountMap;
-	if (fVNodeCountMap)
-		fVNodeCountingEnabled = true;
-	else
-		ERROR(("Failed to allocate vnode count map."));
 	return error;
 }
 
@@ -2979,8 +3126,10 @@ Volume::_ReadFSInfo(fs_info* info)
 
 // _Lookup
 status_t
-Volume::_Lookup(void* dir, const char* entryName, ino_t* vnid)
+Volume::_Lookup(void* _dir, const char* entryName, ino_t* vnid)
 {
+	VNode* vnode = (VNode*)_dir;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -2994,7 +3143,7 @@ Volume::_Lookup(void* dir, const char* entryName, ino_t* vnid)
 	if (error != B_OK)
 		return error;
 	request->volume = fUserlandVolume;
-	request->node = dir;
+	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->entryName, entryName);
 	if (error != B_OK)
 		return error;
@@ -3019,8 +3168,18 @@ Volume::_Lookup(void* dir, const char* entryName, ino_t* vnid)
 
 // _WriteVNode
 status_t
-Volume::_WriteVNode(void* node, bool reenter)
+Volume::_WriteVNode(void* _node, bool reenter)
 {
+	VNode* vnode = (VNode*)_node;
+
+	// at any rate remove the vnode from our map and delete it
+	MutexLocker locker(fLock);
+	fVNodes->Remove(vnode);
+	locker.Unlock();
+
+	void* clientNode = vnode->clientNode;
+	delete vnode;
+
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
 	if (!port)
@@ -3034,7 +3193,7 @@ Volume::_WriteVNode(void* node, bool reenter)
 	if (error != B_OK)
 		return error;
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = clientNode;
 	request->reenter = reenter;
 
 	// send the request
@@ -3053,10 +3212,12 @@ Volume::_WriteVNode(void* node, bool reenter)
 
 // _ReadStat
 status_t
-Volume::_ReadStat(void* node, struct stat* st)
+Volume::_ReadStat(void* _node, struct stat* st)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_READ_STAT))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_READ_STAT))
 		return B_BAD_VALUE;
 
 	// get a free port
@@ -3073,7 +3234,7 @@ Volume::_ReadStat(void* node, struct stat* st)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 
 	// send the request
 	KernelRequestHandler handler(this, READ_STAT_REPLY);
@@ -3092,10 +3253,12 @@ Volume::_ReadStat(void* node, struct stat* st)
 
 // _Close
 status_t
-Volume::_Close(void* node, void* cookie)
+Volume::_Close(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CLOSE))
 		return B_OK;
 
 	// get a free port
@@ -3112,7 +3275,7 @@ Volume::_Close(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 
 	// send the request
@@ -3131,10 +3294,12 @@ Volume::_Close(void* node, void* cookie)
 
 // _FreeCookie
 status_t
-Volume::_FreeCookie(void* node, void* cookie)
+Volume::_FreeCookie(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_COOKIE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_FREE_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3151,7 +3316,7 @@ Volume::_FreeCookie(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 
 	// send the request
@@ -3170,10 +3335,12 @@ Volume::_FreeCookie(void* node, void* cookie)
 
 // _CloseDir
 status_t
-Volume::_CloseDir(void* node, void* cookie)
+Volume::_CloseDir(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CLOSE_DIR))
 		return B_OK;
 
 	// get a free port
@@ -3190,7 +3357,7 @@ Volume::_CloseDir(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->dirCookie = cookie;
 
 	// send the request
@@ -3209,10 +3376,12 @@ Volume::_CloseDir(void* node, void* cookie)
 
 // _FreeDirCookie
 status_t
-Volume::_FreeDirCookie(void* node, void* cookie)
+Volume::_FreeDirCookie(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_DIR_COOKIE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_FREE_DIR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3229,7 +3398,7 @@ Volume::_FreeDirCookie(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->dirCookie = cookie;
 
 	// send the request
@@ -3248,10 +3417,12 @@ Volume::_FreeDirCookie(void* node, void* cookie)
 
 // _CloseAttrDir
 status_t
-Volume::_CloseAttrDir(void* node, void* cookie)
+Volume::_CloseAttrDir(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR))
 		return B_OK;
 
 	// get a free port
@@ -3268,7 +3439,7 @@ Volume::_CloseAttrDir(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrDirCookie = cookie;
 
 	// send the request
@@ -3287,10 +3458,12 @@ Volume::_CloseAttrDir(void* node, void* cookie)
 
 // _FreeAttrDirCookie
 status_t
-Volume::_FreeAttrDirCookie(void* node, void* cookie)
+Volume::_FreeAttrDirCookie(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3307,7 +3480,7 @@ Volume::_FreeAttrDirCookie(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrDirCookie = cookie;
 
 	// send the request
@@ -3326,10 +3499,12 @@ Volume::_FreeAttrDirCookie(void* node, void* cookie)
 
 // _CloseAttr
 status_t
-Volume::_CloseAttr(void* node, void* cookie)
+Volume::_CloseAttr(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_CLOSE_ATTR))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CLOSE_ATTR))
 		return B_OK;
 
 	// get a free port
@@ -3346,7 +3521,7 @@ Volume::_CloseAttr(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 
 	// send the request
@@ -3365,10 +3540,12 @@ Volume::_CloseAttr(void* node, void* cookie)
 
 // _FreeAttrCookie
 status_t
-Volume::_FreeAttrCookie(void* node, void* cookie)
+Volume::_FreeAttrCookie(void* _node, void* cookie)
 {
+	VNode* vnode = (VNode*)_node;
+
 	// check capability
-	if (!HasVNodeCapability(node, FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE))
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE))
 		return B_OK;
 
 	// get a free port
@@ -3385,7 +3562,7 @@ Volume::_FreeAttrCookie(void* node, void* cookie)
 		return error;
 
 	request->volume = fUserlandVolume;
-	request->node = node;
+	request->node = vnode->clientNode;
 	request->attrCookie = cookie;
 
 	// send the request
@@ -3587,32 +3764,19 @@ Volume::_SendReceiptAck(RequestPort* port)
 void
 Volume::_IncrementVNodeCount(ino_t vnid)
 {
+	MutexLocker _(fLock);
+
 	if (!fVNodeCountingEnabled)
 		return;
-	AutoLocker<VNodeCountMap> _(fVNodeCountMap);
-	if (!fVNodeCountingEnabled)	// someone may have changed it
+
+	VNode* vnode = fVNodes->Lookup(vnid);
+	if (vnode == NULL) {
+		ERROR(("Volume::_IncrementVNodeCount(): Node with ID %lld not "
+			"known!\n", vnid));
 		return;
-	// get the counter
-	int32* count = fVNodeCountMap->Get(vnid);
-	if (!count) {
-		// vnode not known yet: create and add a new counter
-		count = new(nothrow) int32(0);
-		if (!count) {
-			ERROR(("Volume::_IncrementVNodeCount(): Failed to allocate "
-				"counter. Disabling vnode counting.\n"));
-			fVNodeCountingEnabled = false;
-			return;
-		}
-		if (fVNodeCountMap->Put(vnid, count) != B_OK) {
-			ERROR(("Volume::_IncrementVNodeCount(): Failed to add counter. "
-				"Disabling vnode counting.\n"));
-			delete count;
-			fVNodeCountingEnabled = false;
-			return;
-		}
 	}
-	// increment the counter
-	(*count)++;
+
+	vnode->useCount++;
 //PRINT(("_IncrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, *count, fVNodeCountMap->Size()));
 }
 
@@ -3620,23 +3784,19 @@ Volume::_IncrementVNodeCount(ino_t vnid)
 void
 Volume::_DecrementVNodeCount(ino_t vnid)
 {
+	MutexLocker _(fLock);
+
 	if (!fVNodeCountingEnabled)
 		return;
-	AutoLocker<VNodeCountMap> _(fVNodeCountMap);
-	if (!fVNodeCountingEnabled)	// someone may have changed it
-		return;
-	int32* count = fVNodeCountMap->Get(vnid);
-	if (!count) {
-		// that should never happen
-		ERROR(("Volume::_DecrementVNodeCount(): Failed to get counter. "
-			"Disabling vnode counting.\n"));
-		fVNodeCountingEnabled = false;
+
+	VNode* vnode = fVNodes->Lookup(vnid);
+	if (vnode == NULL) {
+		ERROR(("Volume::_DecrementVNodeCount(): Node with ID %lld not "
+			"known!\n", vnid));
 		return;
 	}
-	(*count)--;
-//int32 tmpCount = *count;
-	if (*count == 0)
-		fVNodeCountMap->Remove(vnid);
+
+	vnode->useCount--;
 //PRINT(("_DecrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, tmpCount, fVNodeCountMap->Size()));
 }
 
@@ -3667,60 +3827,77 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 		PRINT(("Volume::_PutAllPendingVNodes() failed: still connected\n"));
 		return USERLAND_IOCTL_STILL_CONNECTED;
 	}
-	if (!fVNodeCountingEnabled) {
+
+	MutexLocker locker(fLock);
+
+	if (!fVNodeCountingEnabled)	{
 		PRINT(("Volume::_PutAllPendingVNodes() failed: vnode counting "
 			"disabled\n"));
 		return USERLAND_IOCTL_VNODE_COUNTING_DISABLED;
 	}
-	{
-		AutoLocker<VNodeCountMap> _(fVNodeCountMap);
-		if (!fVNodeCountingEnabled)	{// someone may have changed it
-			PRINT(("Volume::_PutAllPendingVNodes() failed: vnode counting "
-				"disabled\n"));
-			return USERLAND_IOCTL_VNODE_COUNTING_DISABLED;
-		}
-		// Check whether there are open entities at the moment.
-		if (fOpenFiles > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open files\n"));
-			return USERLAND_IOCTL_OPEN_FILES;
-		}
-		if (fOpenDirectories > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open dirs\n"));
-			return USERLAND_IOCTL_OPEN_DIRECTORIES;
-		}
-		if (fOpenAttributeDirectories > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open attr dirs\n"));
-			return USERLAND_IOCTL_OPEN_ATTRIBUTE_DIRECTORIES;
-		}
-		if (fOpenAttributes > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open attributes\n"));
-			return USERLAND_IOCTL_OPEN_ATTRIBUTES;
-		}
-		if (fOpenIndexDirectories > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open index dirs\n"));
-			return USERLAND_IOCTL_OPEN_INDEX_DIRECTORIES;
-		}
-		if (fOpenQueries > 0) {
-			PRINT(("Volume::_PutAllPendingVNodes() failed: open queries\n"));
-			return USERLAND_IOCTL_OPEN_QUERIES;
-		}
-		// No open entities. Since the port pool is disconnected, no new
-		// entities can be opened. Disable node counting and put all pending
-		// vnodes.
-		fVNodeCountingEnabled = false;
+	// Check whether there are open entities at the moment.
+	if (fOpenFiles > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open files\n"));
+		return USERLAND_IOCTL_OPEN_FILES;
 	}
+	if (fOpenDirectories > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open dirs\n"));
+		return USERLAND_IOCTL_OPEN_DIRECTORIES;
+	}
+	if (fOpenAttributeDirectories > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open attr dirs\n"));
+		return USERLAND_IOCTL_OPEN_ATTRIBUTE_DIRECTORIES;
+	}
+	if (fOpenAttributes > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open attributes\n"));
+		return USERLAND_IOCTL_OPEN_ATTRIBUTES;
+	}
+	if (fOpenIndexDirectories > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open index dirs\n"));
+		return USERLAND_IOCTL_OPEN_INDEX_DIRECTORIES;
+	}
+	if (fOpenQueries > 0) {
+		PRINT(("Volume::_PutAllPendingVNodes() failed: open queries\n"));
+		return USERLAND_IOCTL_OPEN_QUERIES;
+	}
+	// No open entities. Since the port pool is disconnected, no new
+	// entities can be opened. Disable node counting and put all pending
+	// vnodes.
+	fVNodeCountingEnabled = false;
+
 	int32 putVNodeCount = 0;
-	for (VNodeCountMap::Iterator it = fVNodeCountMap->GetIterator();
-		 it.HasNext();) {
-		VNodeCountMap::Entry entry = it.Next();
-		int32 count = *entry.value;
-		for (int32 i = 0; i < count; i++) {
-			PutVNode(entry.key.value);
-			putVNodeCount++;
+
+	// Since the vnode map can still change, we need to iterate to the first
+	// node we need to put, drop the lock, put the node, and restart from the
+	// beginning.
+	// TODO: Optimize by extracting batches of relevant nodes to an on-stack
+	// array.
+	bool nodeFound = false;
+	do {
+		// get the next node to put
+		for (VNodeMap::Iterator it = fVNodes->GetIterator();
+				VNode* vnode = it.Next();) {
+			if (vnode->useCount > 0) {
+				ino_t vnid = vnode->id;
+				int32 count = vnode->useCount;
+
+				locker.Unlock();
+
+				for (int32 i = 0; i < count; i++) {
+					PutVNode(vnid);
+					putVNodeCount++;
+				}
+
+				locker.Lock();
+
+				nodeFound = true;
+				break;
+			}
 		}
-	}
+	} while (nodeFound);
+
 	PRINT(("Volume::_PutAllPendingVNodes() successful: Put %ld vnodes\n",
 		putVNodeCount));
+
 	return B_OK;
 }
-
