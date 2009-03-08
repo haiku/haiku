@@ -7,6 +7,7 @@
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  *		Axel Dörfler (axeld@pinc-software.de)
  */
+
 #include "MouseView.h"
 
 #include <Bitmap.h>
