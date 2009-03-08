@@ -42,6 +42,7 @@ enum {
 
 struct geode_stream;
 struct geode_multi;
+extern pci_module_info* gPci;
 
 /*!	This structure describes a controller.
 */
@@ -50,8 +51,7 @@ struct geode_controller {
 	vint32			opened;
 	const char*		devfs_path;
 
-	area_id			regs_area;
-	vuint8*			regs;
+	uint32			nabmbar;
 	uint32			irq;
 
 	uint32			num_streams;
@@ -67,32 +67,32 @@ struct geode_controller {
 
 	uint8 Read8(uint32 reg)
 	{
-		return *(regs + reg);
+		return gPci->read_io_8(nabmbar + reg);
 	}
 
 	uint16 Read16(uint32 reg)
 	{
-		return *(vuint16*)(regs + reg);
+		return gPci->read_io_16(nabmbar + reg);
 	}
 
 	uint32 Read32(uint32 reg)
 	{
-		return *(vuint32*)(regs + reg);
+		return gPci->read_io_32(nabmbar + reg);
 	}
 
 	void Write8(uint32 reg, uint8 value)
 	{
-		*(regs + reg) = value;
+		gPci->write_io_8(nabmbar + reg, value);
 	}
 
 	void Write16(uint32 reg, uint16 value)
 	{
-		*(vuint16*)(regs + reg) = value;
+		gPci->write_io_16(nabmbar + reg, value);
 	}
 
 	void Write32(uint32 reg, uint32 value)
 	{
-		*(vuint32*)(regs + reg) = value;
+		gPci->write_io_32(nabmbar + reg, value);
 	}
 };
 
@@ -194,7 +194,6 @@ struct geode_multi {
 
 /* driver.cpp */
 extern device_hooks gDriverHooks;
-extern pci_module_info* gPci;
 extern geode_controller gCards[MAX_CARDS];
 extern uint32 gNumCards;
 

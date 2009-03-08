@@ -59,7 +59,7 @@ geode_codec_read(geode_controller *controller, uint8 regno)
 	
 	if (geode_codec_wait(controller) != B_OK) {
 		dprintf("codec busy (2)\n");
-		return -1;
+		return 0xffff;
 	}
 	
 #define GCSCAUDIO_READ_CODEC_TIMEOUT	50
@@ -74,7 +74,7 @@ geode_codec_read(geode_controller *controller, uint8 regno)
 
 	if (i < 0) {
 		dprintf("codec busy (3)\n");
-		return -1;
+		return 0xffff;
 	}
 
 	return v;
@@ -363,7 +363,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 	bufferDescriptors->address = stream->physical_buffer_descriptors;
 	bufferDescriptors->ctrlsize = ACC_BMx_PRD_CTRL_JMP;
 
-	for (uint32 index = 0; index < sizeof(kRates) / sizeof(kRates[0]); index++) {
+	for (index = 0; index < sizeof(kRates) / sizeof(kRates[0]); index++) {
 		if (kRates[index].multi_rate == stream->sample_rate) {
 			stream->rate = kRates[index].rate;
 			break;
@@ -391,16 +391,6 @@ geode_hw_init(geode_controller* controller)
 	uint16 cmd;
 	status_t status;
 	
-	/* Map MMIO registers */
-	controller->regs_area = map_physical_memory("geode_hw_regs",
-		(void*)controller->pci_info.u.h0.base_registers[0],
-		controller->pci_info.u.h0.base_register_sizes[0], B_ANY_KERNEL_ADDRESS,
-		0, (void**)&controller->regs);
-	if (controller->regs_area < B_OK) {
-		status = controller->regs_area;
-		goto error;
-	}
-
 	cmd = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
@@ -410,12 +400,14 @@ geode_hw_init(geode_controller* controller)
 		dprintf("geode: enabling PCI bus mastering\n");
 	}
 
+	controller->nabmbar = controller->pci_info.u.h0.base_registers[0];
+
 	/* Absolute minimum hw is online; we can now install interrupt handler */
 	controller->irq = controller->pci_info.u.h0.interrupt_line;
 	status = install_io_interrupt_handler(controller->irq,
 		(interrupt_handler)geode_interrupt_handler, controller, 0);
 	if (status != B_OK)
-		goto no_irq;
+		goto error;
 
 	/* Get controller into valid state */
 	status = reset_controller(controller);
@@ -444,12 +436,6 @@ geode_hw_init(geode_controller* controller)
 reset_failed:
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)geode_interrupt_handler, controller);
-
-no_irq:
-	delete_area(controller->regs_area);
-	controller->regs_area = B_ERROR;
-	controller->regs = NULL;
-
 error:
 	dprintf("geode: ERROR: %s(%ld)\n", strerror(status), status);
 
@@ -485,13 +471,6 @@ geode_hw_uninit(geode_controller* controller)
 
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)geode_interrupt_handler, controller);
-
-	/* Unmap registers */
-	if (controller->regs_area >= 0) {
-		delete_area(controller->regs_area);
-		controller->regs_area = B_ERROR;
-		controller->regs = NULL;
-	}
 
 	free(controller->multi);
 
