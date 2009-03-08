@@ -8,6 +8,21 @@ local defines = [ FDefines HAVE_CONFIG_H=1 ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
+local SSL_FILES ;
+local SSL_LIBS ;
+
+if $(USE_SSL) {
+	SubDirCcFlags -DHAVE_LIBSSL ;
+	if ! $(SSL_DIR) {
+		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
+	} else {
+		sslDir = $(SSL_DIR) ;
+	}
+	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
+	SSL_FILES = openssl.c ;
+	SSL_LIBS = $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
+} 
+
 BinCommand wget :
 	cmpt.c
 	connect.c
@@ -40,5 +55,6 @@ BinCommand wget :
 	utils.c
 	version.c
 	xmalloc.c
-	: $(TARGET_NETWORK_LIBS)
+	$(SSL_FILES)
+	: $(TARGET_NETWORK_LIBS) $(SSL_LIBS)
 ;
