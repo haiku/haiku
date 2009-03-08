@@ -18,7 +18,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network 3com ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom440x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
-#SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network nforce ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;

@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network jmicron2x0 dev ;
+
+SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 dev jme ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 dev mii ;
