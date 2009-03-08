@@ -79,6 +79,9 @@ struct std::hash<node_ref>
 };
 #if __GNUC__ > 2
 } // namespace __gnu_cxx
+typedef __gnu_cxx::hash_set<node_ref, __gnu_cxx::hash<node_ref> > NodeSet;
+#else
+typedef std::hash_set<node_ref, std::hash<node_ref> > NodeSet;
 #endif
 
 
@@ -618,11 +621,7 @@ class BPoseView : public BView {
 		PoseList *fPoseList;
 		PoseList *fVSPoseList;
 		PoseList *fSelectionList;
-#if __GNUC__ > 2
-		__gnu_cxx::hash_set<node_ref, __gnu_cxx::hash<node_ref> > fInsertedNodes;
-#else
-		std::hash_set<node_ref, std::hash<node_ref> > fInsertedNodes;
-#endif
+		NodeSet fInsertedNodes;
 		BObjectList<BString> fMimeTypesInSelectionCache;
 			// used for mime string based icon highliting during a drag
 		BObjectList<Model> *fZombieList;

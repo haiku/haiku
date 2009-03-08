@@ -7146,11 +7146,12 @@ bool
 BPoseView::DeletePose(const node_ref *itemNode, BPose *pose, int32 index)
 {
 	watch_node(itemNode, B_STOP_WATCHING, this);
-
+	
 	if (!pose)
 		pose = fPoseList->FindPose(itemNode, &index);
 
 	if (pose) {
+		fInsertedNodes.erase(fInsertedNodes.find(*itemNode));
 		if (TargetModel()->IsSymLink()) {
 			Model *target = pose->TargetModel()->LinkTo();
 			if (target)
