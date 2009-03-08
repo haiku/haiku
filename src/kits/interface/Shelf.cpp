@@ -25,6 +25,7 @@
 #include <PropertyInfo.h>
 #include <Rect.h>
 #include <Shelf.h>
+#include <String.h>
 #include <View.h>
 
 #include <ViewPrivate.h>
@@ -34,6 +35,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <map>
+#include <utility>
+
+
+typedef std::map<BString, std::pair<image_id, int32> > LoadedImageMap;
+static LoadedImageMap	sLoadedImages;
+static BLocker			sLoadedImageMapLocker("BShelf loaded image map");
 
 static property_info sShelfPropertyList[] = {
 	{
@@ -454,9 +462,6 @@ ReplicantViewFilter::Filter(BMessage *message, BHandler **handler)
 
 
 //	#pragma mark -
-
-BShelf::LoadedImageMap 	BShelf::sLoadedImages;
-BLocker					BShelf::sLoadedImageMapLocker("BShelf loaded image map");
 
 
 BShelf::BShelf(BView *view, bool allowDrags, const char *shelfType)
@@ -1167,7 +1172,7 @@ BShelf::_DeleteReplicant(replicant_data* item)
 			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
 
 			if (it != sLoadedImages.end()) {
-				(*it).second.second -= 1;
+				(*it).second.second--;
 				if ((*it).second.second <= 0) {
 					unload_add_on((*it).second.first);
 					sLoadedImages.erase(it);
@@ -1229,23 +1234,11 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	image_id image = -1;
 	BArchivable *archivable = _InstantiateObject(data, &image);
 
-	// Update use count for image
-	const char* signature = NULL;
-	if (data->FindString("add_on", &signature) == B_OK && signature != NULL) {
-		AutoLock<BLocker> lock(sLoadedImageMapLocker);
-		if (lock.IsLocked()) {
-			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
-
-			if (it == sLoadedImages.end())
-				sLoadedImages.insert(LoadedImageMap::value_type(
-					BString(signature), std::pair<image_id, int>(image, 1)));
-			else
-				(*it).second.second += 1;
-		}
-	}
+	if (archivable == NULL)
+		return send_reply(data, B_ERROR, uniqueID);
 
 	BView *view = dynamic_cast<BView*>(archivable);
-	if (archivable != NULL && view == NULL) {
+	if (view == NULL) {
 		printf("Replicant was rejected: it's not a view!");
 		return send_reply(data, B_ERROR, uniqueID);
 	}
@@ -1266,6 +1259,21 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		// There was no view, and we're not allowed to have any zombies
 		// in the house
 		return send_reply(data, B_ERROR, uniqueID);
+	}
+
+	// Update use count for image
+	const char* signature = NULL;
+	if (data->FindString("add_on", &signature) == B_OK && signature != NULL) {
+		AutoLock<BLocker> lock(sLoadedImageMapLocker);
+		if (lock.IsLocked()) {
+			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
+
+			if (it == sLoadedImages.end())
+				sLoadedImages.insert(LoadedImageMap::value_type(
+					BString(signature), std::pair<image_id, int>(image, 1)));
+			else
+				(*it).second.second++;
+		}
 	}
 
 	data->RemoveName("_drop_point_");

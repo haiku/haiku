@@ -9,10 +9,6 @@
 #include <Handler.h>
 #include <List.h>
 #include <Locker.h>
-#include <String.h>
-
-#include <map>
-#include <utility>
 
 class BDataIO;
 class BPoint;
@@ -126,10 +122,6 @@ class BShelf : public BHandler {
 		bool				fDisplayZombies;
 		bool				fAllowZombies;
 		bool				fTypeEnforced;
-
-		typedef std::map<BString, std::pair<image_id, int32> > LoadedImageMap;
-		static LoadedImageMap	sLoadedImages;
-		static BLocker			sLoadedImageMapLocker;
 
 		uint32				_reserved[8];
 };
