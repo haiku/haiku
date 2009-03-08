@@ -21,12 +21,13 @@ SEARCH_SOURCE += $(bfsTop) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
-UsePrivateHeaders [ FDirName kernel ] ;
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+#UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+#UsePrivateHeaders [ FDirName storage ] ;
 
 Addon <userland>bfs
-	: 
+	:
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	Attribute.cpp

@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src tests add-ons kernel kernelland_emu ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+
+SharedLibrary libkernelland_emu.so :
+	condition_variable.cpp
+	lock.cpp
+	misc.cpp
+	module.cpp
+
+	strlcpy.c
+	khash.c
+	list.c
+
+	: be $(TARGET_LIBSTDC++) ;
+
+AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
+	: /boot/home/config/lib : false ;
+
+SEARCH on [ FGristFiles
+		strlcpy.c
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+
+SEARCH on [ FGristFiles
+		list.c khash.c
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

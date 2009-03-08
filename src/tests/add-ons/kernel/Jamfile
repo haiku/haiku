@@ -1,32 +1,9 @@
 SubDir HAIKU_TOP src tests add-ons kernel ;
 
-UsePrivateHeaders [ FDirName kernel ] ;
-UsePrivateHeaders shared ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
-
-SharedLibrary libkernelland_emu.so :
-	kernelland_emu.cpp
-	strlcpy.c
-	khash.c
-	list.c
-
-	: be $(TARGET_LIBSTDC++) ;
-
-AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
-	: /boot/home/config/lib : false ;
-
-SEARCH on [ FGristFiles
-		strlcpy.c
-	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
-
-SEARCH on [ FGristFiles
-		list.c khash.c
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
 SubInclude HAIKU_TOP src tests add-ons kernel bus_managers ;
 SubInclude HAIKU_TOP src tests add-ons kernel busses ;
 SubInclude HAIKU_TOP src tests add-ons kernel debugger ;
-# SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems ;
+SubInclude HAIKU_TOP src tests add-ons kernel kernelland_emu ;
 SubInclude HAIKU_TOP src tests add-ons kernel network ;
