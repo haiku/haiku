@@ -375,7 +375,7 @@ MouseDevice::_ControlThread()
 
 	static const bigtime_t kTransferDelay = 1000000 / 125;
 		// 125 transfers per second should be more than enough
-#define USE_REGULAR_INTERVAL 0
+#define USE_REGULAR_INTERVAL 1
 #if USE_REGULAR_INTERVAL
 	bigtime_t nextTransferTime = system_time() + kTransferDelay;
 #endif
