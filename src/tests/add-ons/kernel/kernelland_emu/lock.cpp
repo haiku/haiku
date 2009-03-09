@@ -16,46 +16,28 @@
 int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
-	thread_id thread = find_thread(NULL);
-
-#if !KDEBUG
-	if (lock->holder == thread)
+	if (RECURSIVE_LOCK_HOLDER(lock) == find_thread(NULL))
 		return lock->recursion;
-#else
-	if (lock->lock.holder == thread)
-		return lock->recursion;
-#endif
 
 	return -1;
 }
 
 
 void
-recursive_lock_init_etc(recursive_lock *lock, const char *name, uint32 flags)
+recursive_lock_init(recursive_lock *lock, const char *name)
 {
-	if (lock == NULL)
-		return;
-
-	if (name == NULL)
-		name = "recursive lock";
-
-#if !KDEBUG
-	lock->holder = -1;
-#else
-	lock->lock.holder = -1;
-#endif
+	mutex_init(&lock->lock, name != NULL ? name : "recursive lock");
+	RECURSIVE_LOCK_HOLDER(lock) = -1;
 	lock->recursion = 0;
-	lock->lock.waiters = (mutex_waiter*)create_sem(1, name);
-
-	if ((sem_id)lock->lock.waiters < B_OK)
-		panic("recursive lock creation failed: %s\n", name);
 }
 
 
 void
-recursive_lock_init(recursive_lock *lock, const char *name)
+recursive_lock_init_etc(recursive_lock *lock, const char *name, uint32 flags)
 {
-	recursive_lock_init_etc(lock, name, 0);
+	mutex_init_etc(&lock->lock, name != NULL ? name : "recursive lock", flags);
+	RECURSIVE_LOCK_HOLDER(lock) = -1;
+	lock->recursion = 0;
 }
 
 
@@ -65,8 +47,7 @@ recursive_lock_destroy(recursive_lock *lock)
 	if (lock == NULL)
 		return;
 
-	delete_sem((sem_id)lock->lock.waiters);
-	lock->lock.waiters = (mutex_waiter*)-1;
+	mutex_destroy(&lock->lock);
 }
 
 
@@ -75,29 +56,33 @@ recursive_lock_lock(recursive_lock *lock)
 {
 	thread_id thread = find_thread(NULL);
 
+	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
+		mutex_lock(&lock->lock);
 #if !KDEBUG
-	if (thread != lock->holder) {
-		status_t status;
-		do {
-			status = acquire_sem((sem_id)lock->lock.waiters);
-		} while (status == B_INTERRUPTED);
-		if (status < B_OK)
-			return status;
-
 		lock->holder = thread;
+#endif
 	}
-#else
-	if (thread != lock->lock.holder) {
-		status_t status;
-		do {
-			status = acquire_sem((sem_id)lock->lock.waiters);
-		} while (status == B_INTERRUPTED);
-		if (status < B_OK)
+
+	lock->recursion++;
+	return B_OK;
+}
+
+
+status_t
+recursive_lock_trylock(recursive_lock *lock)
+{
+	thread_id thread = find_thread(NULL);
+
+	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
+		status_t status = mutex_trylock(&lock->lock);
+		if (status != B_OK)
 			return status;
 
-		lock->lock.holder = thread;
-	}
+#if !KDEBUG
+		lock->holder = thread;
 #endif
+	}
+
 	lock->recursion++;
 	return B_OK;
 }
@@ -106,21 +91,14 @@ recursive_lock_lock(recursive_lock *lock)
 void
 recursive_lock_unlock(recursive_lock *lock)
 {
-#if !KDEBUG
-	if (find_thread(NULL) != lock->holder)
+	if (find_thread(NULL) != RECURSIVE_LOCK_HOLDER(lock))
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
-#else
-	if (find_thread(NULL) != lock->lock.holder)
-		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
-#endif
 
 	if (--lock->recursion == 0) {
 #if !KDEBUG
 		lock->holder = -1;
-#else
-		lock->lock.holder = -1;
 #endif
-		release_sem_etc((sem_id)lock->lock.waiters, 1, 0);
+		mutex_unlock(&lock->lock);
 	}
 }
 
