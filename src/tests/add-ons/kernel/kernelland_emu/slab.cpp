@@ -1,58 +1,104 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de.
- *		Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <slab/Slab.h>
 
 #include <stdlib.h>
 
+#include <new>
 
-extern "C" void *
-object_cache_alloc(object_cache *cache, uint32 flags)
+
+struct object_cache {
+	object_cache(const char *name, size_t objectSize,
+		size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
+		object_cache_constructor constructor,
+		object_cache_destructor destructor, object_cache_reclaimer reclaimer)
+		:
+		objectSize(objectSize),
+		cookie(cookie),
+		objectConstructor(constructor),
+		objectDestructor(destructor)
+	{
+	}
+
+	size_t						objectSize;
+	void*						cookie;
+	object_cache_constructor	objectConstructor;
+	object_cache_destructor		objectDestructor;
+};
+
+
+object_cache *
+create_object_cache(const char *name, size_t objectSize,
+	size_t alignment, void *cookie, object_cache_constructor constructor,
+	object_cache_destructor destructor)
 {
-	return malloc((size_t)cache);
+	return new(std::nothrow) object_cache(name, objectSize, alignment,
+		0, 0, cookie, constructor, destructor, NULL);
 }
 
 
-extern "C" void
-object_cache_free(object_cache *cache, void *object)
-{
-	free(object);
-}
-
-
-extern "C" object_cache *
+object_cache *
 create_object_cache_etc(const char *name, size_t objectSize,
 	size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	return (object_cache*)objectSize;
+	return new(std::nothrow) object_cache(name, objectSize, alignment,
+		maxByteUsage, flags, cookie, constructor, destructor, reclaimer);
 }
 
 
-extern "C" object_cache *
-create_object_cache(const char *name, size_t objectSize,
-	size_t alignment, void *cookie, object_cache_constructor constructor,
-	object_cache_destructor)
-{
-	return (object_cache*)objectSize;
-}
-
-
-extern "C" void
+void
 delete_object_cache(object_cache *cache)
 {
+	delete cache;
 }
 
 
-extern "C" void
-object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
+status_t
+object_cache_set_minimum_reserve(object_cache *cache, size_t objectCount)
 {
-	*_allocatedMemory = 100;
+	return B_OK;
+}
+
+
+void *
+object_cache_alloc(object_cache *cache, uint32 flags)
+{
+	void* object = cache != NULL ? malloc(cache->objectSize) : NULL;
+	if (object == NULL)
+		return NULL;
+
+	if (cache->objectConstructor != NULL)
+		cache->objectConstructor(cache->cookie, object);
+
+	return object;
+}
+
+
+void
+object_cache_free(object_cache *cache, void *object)
+{
+	if (object != NULL) {
+		if (cache != NULL && cache->objectDestructor != NULL)
+			cache->objectDestructor(cache->cookie, object);
+
+		free(object);
+	}
+}
+
+
+status_t
+object_cache_reserve(object_cache *cache, size_t object_count, uint32 flags)
+{
+	return B_OK;
+}
+
+
+void object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
+{
+	*_allocatedMemory = 0;
 }
