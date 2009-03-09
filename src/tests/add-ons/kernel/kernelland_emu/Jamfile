@@ -15,7 +15,6 @@ SharedLibrary libkernelland_emu.so :
 	slab.cpp
 	vm.cpp
 
-	strlcpy.c
 	khash.c
 	list.c
 
@@ -23,10 +22,6 @@ SharedLibrary libkernelland_emu.so :
 
 AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;
-
-SEARCH on [ FGristFiles
-		strlcpy.c
-	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles
 		list.c khash.c
