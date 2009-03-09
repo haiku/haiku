@@ -31,6 +31,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	misc.cpp
 	scheduler.cpp
 	slab.cpp
+	vm.cpp
 
 	# kernel
 	block_cache.cpp
@@ -38,6 +39,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	khash.c
 
 	# emulation
+	entry_cache.cpp
 	file_cache.cpp
 	haiku_kernel_emu.cpp
 
