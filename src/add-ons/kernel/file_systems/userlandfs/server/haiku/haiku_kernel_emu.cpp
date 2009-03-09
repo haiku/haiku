@@ -10,6 +10,7 @@
 #include <disk_device_manager.h>
 #include <fs_cache.h>
 #include <fs_interface.h>
+#include <io_requests.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
@@ -234,6 +235,58 @@ volume_for_vnode(fs_vnode *vnode)
 }
 
 
+// read_file_io_vec_pages
+status_t
+read_file_io_vec_pages(int fd, const struct file_io_vec *fileVecs,
+	size_t fileVecCount, const struct iovec *vecs, size_t vecCount,
+	uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
+}
+
+
+// write_file_io_vec_pages
+status_t
+write_file_io_vec_pages(int fd, const struct file_io_vec *fileVecs,
+	size_t fileVecCount, const struct iovec *vecs, size_t vecCount,
+	uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
+}
+
+
+// do_fd_io
+status_t
+do_fd_io(int fd, io_request *request)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
+}
+
+
+// do_iterative_fd_io
+status_t
+do_iterative_fd_io(int fd, io_request *request, iterative_io_get_vecs getVecs,
+	iterative_io_finished finished, void *cookie)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
+}
+
+
+// #pragma mark - I/O requests
+
+
+bool
+io_request_is_write(const io_request* request)
+{
+	// TODO: Implement!
+	return false;
+}
+
+
 // #pragma mark - Disk Device Manager
 
 
@@ -245,6 +298,24 @@ get_default_partition_content_name(partition_id partitionID,
 	// TODO: Improve!
 	snprintf(buffer, bufferSize, "%s Volume", fileSystemName);
 	return B_OK;
+}
+
+
+// scan_partition
+status_t
+scan_partition(partition_id partitionID)
+{
+	// Only needed when we decide to add disk system support.
+	return B_OK;
+}
+
+
+// update_disk_device_job_progress
+bool
+update_disk_device_job_progress(disk_job_id jobID, float progress)
+{
+	// Only needed when we decide to add disk system support.
+	return true;
 }
 
 
