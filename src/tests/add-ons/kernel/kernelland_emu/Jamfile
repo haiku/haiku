@@ -5,9 +5,15 @@ UsePrivateHeaders shared ;
 
 SharedLibrary libkernelland_emu.so :
 	condition_variable.cpp
+	debug.cpp
+	device_manager.cpp
 	lock.cpp
+	low_resource_manager.cpp
 	misc.cpp
 	module.cpp
+	scheduler.cpp
+	slab.cpp
+	vm.cpp
 
 	strlcpy.c
 	khash.c

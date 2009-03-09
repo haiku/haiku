@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Debug.h>
 #include <KernelExport.h>
 
 // libroot
@@ -231,7 +230,7 @@ ConditionVariable::_NotifyChecked(bool all, status_t result)
 // #pragma mark -
 
 
-status_t
+void
 condition_variable_init()
 {
 	status_t error = sConditionVariableHash.Init(kConditionVariableHashSize);
@@ -239,6 +238,4 @@ condition_variable_init()
 		panic("condition_variable_init(): Failed to init hash table: %s",
 			strerror(error));
 	}
-
-	return error;
 }
