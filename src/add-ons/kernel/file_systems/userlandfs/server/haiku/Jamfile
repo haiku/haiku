@@ -8,11 +8,13 @@ SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
-UsePrivateSystemHeaders ;
-UsePrivateHeaders kernel libroot shared ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders libroot shared ;
 
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tests add-ons kernel
+	kernelland_emu ] ;
 
 DEFINES += USER=1 ;
 DEFINES += DEBUG_APP="\\\"libuserlandfs_haiku\\\"" ;
@@ -21,15 +23,25 @@ DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 # the library providing the Haiku kernel interface for add-ons
 SharedLibrary libuserlandfs_haiku_kernel.so
 	:
-	block_cache.cpp
+	# kernelland_emu
 	condition_variable.cpp
-	file_cache.cpp
-	file_map.cpp
-	khash.cpp
+	debug.cpp
 	lock.cpp
+	low_resource_manager.cpp
+	misc.cpp
+	scheduler.cpp
 	slab.cpp
 
+	# kernel
+	block_cache.cpp
+	file_map.cpp
+	khash.c
+
+	# emulation
+	file_cache.cpp
 	haiku_kernel_emu.cpp
+
+	# UserlandFS server interface
 	HaikuKernelFileSystem.cpp
 	HaikuKernelVolume.cpp
 
@@ -37,3 +49,12 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	<nogrist>userlandfs_server
 	be	# for BLocker only
 ;
+
+SEARCH on [ FGristFiles
+		block_cache.cpp
+		file_map.cpp
+	] = [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
+
+SEARCH on [ FGristFiles
+		khash.c
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

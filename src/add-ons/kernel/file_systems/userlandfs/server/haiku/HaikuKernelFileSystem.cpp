@@ -8,8 +8,9 @@
 
 #include <fs_interface.h>
 
-#include "block_cache.h"
-#include "condition_variable.h"
+#include <block_cache.h>
+#include <condition_variable.h>
+
 #include "HaikuKernelVolume.h"
 
 
@@ -36,13 +37,11 @@ status_t
 HaikuKernelFileSystem::Init()
 {
 	// init condition variables
-	status_t error = condition_variable_init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
+	condition_variable_init();
 // TODO: Call the cleanup methods, if something goes wrong!
 
 	// init block cache
-	error = block_cache_init();
+	status_t error = block_cache_init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
