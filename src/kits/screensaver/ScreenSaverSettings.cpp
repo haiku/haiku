@@ -111,17 +111,28 @@ ScreenSaverSettings::Defaults()
 {
 	fWindowFrame = BRect(96.5, 77.0, 542.5, 402);
 	fWindowTab = 0;
-	fTimeFlags = SAVER_DISABLED;
-	fBlankTime = 120*1000000LL;
-	fStandByTime = 120*1000000LL;
-	fSuspendTime = 120*1000000LL;
-	fOffTime = 120*1000000LL;
+	fTimeFlags = ENABLE_SAVER;
+
+	// Times are in microseconds = seconds * 1000000LL
+	fBlankTime = 900*1000000LL; // 15 minutes
+	
+	// All these times are referenced from after the above, i.e. when the screen
+	// saver is running. So standby will start 5 minutes after the screen saver.
+	fStandByTime = 300*1000000LL; // 5 minutes
+	fSuspendTime = 300*1000000LL; // 5 minutes
+	fOffTime = 300*1000000LL; // 5 minutes
+
 	fBlankCorner = NO_CORNER;
 	fNeverBlankCorner = NO_CORNER;
+
 	fLockEnabled = false;
-	fPasswordTime = 120*1000000LL;
+	// This time is NOT referenced to when the screen saver starts, but to when
+	// idle time starts, like fBlankTime. By default it is the same as
+	// fBlankTime.
+	fPasswordTime = 900*1000000LL; // 15 minutes
 	fPassword = "";
 	fLockMethod = "custom";
+
 	fModuleName = "";
 }
 
