@@ -164,6 +164,9 @@ BMessage::operator=(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
 
+    if (this == &other)
+        return *this;
+
 	_Clear();
 
 	fHeader = (message_header *)malloc(sizeof(message_header));
@@ -2080,8 +2083,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		fHeader->flags |= MESSAGE_FLAG_REPLY_DONE;
 	}
 
-	// we need to do this last because it is possible our 
-	// message might be destroyed after it's enqueued in the 
+	// we need to do this last because it is possible our
+	// message might be destroyed after it's enqueued in the
 	// target looper. Thus we don't want to do any ops that depend on
 	// members of this after the enqueue.
 	if (direct != NULL) {
