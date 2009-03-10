@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,10 +44,24 @@ width="64" height="64" />DiskUsage</h1>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
+A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p><img id="diskusage" src="../../images/apps-images/diskusage.png" alt="diskusage.png" width="412" height="484" /></p>
+<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
+<p>Above the graphic is a drop-down menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. You can examine another volume while that scan is done in the background.</p>
+<div class="box-info"><ul>
+<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
+<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
+<li>DiskUsage ignores symbolic links.</li>
+</ul></div>
+<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
+<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
+Left-clicking a segment makes that file/folder the center circle.<br />
+Left-clicking the center circle moves you up one level.</p>
+<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
 
 </div>
-<!--
+
 <div class="bottomnav">
 	<p>
 		<a href="../applications.html">Applications</a>
@@ -57,6 +71,6 @@ width="64" height="64" />DiskUsage</h1>
 		Next: <a href="apps-drivesetup.html">DriveSetup</a>
 	</p>
 </div>
--->
+
 </body>
 </html>
