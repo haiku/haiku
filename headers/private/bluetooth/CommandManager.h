@@ -25,6 +25,7 @@ void* buildAcceptConnectionRequest(bdaddr_t bdaddr, uint8 role, size_t* outsize)
 void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize);
 
 /* OGF_INFORMATIONAL_PARAM */
+void* buildReadLocalVersionInformation(size_t* outsize);
 void* buildReadBufferSize(size_t* outsize);
 void* buildReadBdAddr(size_t* outsize);
 

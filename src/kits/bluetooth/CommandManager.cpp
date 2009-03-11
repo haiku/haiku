@@ -249,6 +249,11 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 #pragma mark - INFORMATIONAL_PARAM -
 #endif
 
+void* buildReadLocalVersionInformation(size_t* outsize)
+{
+    return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION, NULL, 0, outsize);
+}
+
 
 void* buildReadBufferSize(size_t* outsize)
 {
