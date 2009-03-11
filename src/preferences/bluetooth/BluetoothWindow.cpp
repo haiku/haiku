@@ -50,6 +50,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	menu->AddItem(new BMenuItem("Stop Bluetooth Services" B_UTF8_ELLIPSIS, new BMessage(kMsgStopServices), 0));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Show Bluetooth console" B_UTF8_ELLIPSIS, new BMessage(kMsgStartServices), 0));
+	menu->AddItem(new BMenuItem("Refresh LocalDevices" B_UTF8_ELLIPSIS, new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu("View");
@@ -121,14 +122,16 @@ BluetoothWindow::MessageReceived(BMessage *message)
 				printf("kMsgStopServices: %s\n", strerror(BMessenger("application/x-vnd.Be-bluetooth_server").SendMessage(B_QUIT_REQUESTED)));
 			}
 			break;
+		
 		case kMsgAddToRemoteList:
-			{
-				PostMessage(message, fRemoteDevices);
-			}
+			PostMessage(message, fRemoteDevices);
+			break;
+		case kMsgRefresh:
+			fSettingsView->MessageReceived(message);
 			break;
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(message);
-		break;
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;

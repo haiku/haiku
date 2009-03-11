@@ -127,9 +127,12 @@ BluetoothSettingsView::MessageReceived(BMessage *msg)
 				// Device integrity should be rechecked
 				fExtDeviceView->SetLocalDevice(lDevice);
 				ActiveLocalDevice = lDevice;			
-			}	
-			break;
+			}
 		}
+		break;
+		case kMsgRefresh:
+			_BuildLocalDevicesMenu();
+		break;
 		default:
 			BView::MessageReceived(msg);
 	}
@@ -192,12 +195,15 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 {
 	LocalDevice* lDevice;
 
-	fLocalDevicesMenu = new BPopUpMenu("Pick LocalDevice...");
+	if (!fLocalDevicesMenu)
+		fLocalDevicesMenu = new BPopUpMenu("Pick LocalDevice...");
 
     for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
 
     	lDevice = LocalDevice::GetLocalDevice();
         if (lDevice != NULL) {
+        	// TODO Check if they already exists
+        	
 			BMessage* message = new BMessage(kMsgLocalSwitched);
 			message->AddPointer("LocalDevice", lDevice);
         
