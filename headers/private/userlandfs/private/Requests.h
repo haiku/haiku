@@ -54,6 +54,12 @@ enum {
 	FS_REMOVE_VNODE_REQUEST,
 	FS_REMOVE_VNODE_REPLY,
 
+	// asynchronous I/O
+	DO_IO_REQUEST,
+	DO_IO_REPLY,
+	CANCEL_IO_REQUEST,
+	CANCEL_IO_REPLY,
+
 	// nodes
 	IOCTL_REQUEST,
 	IOCTL_REPLY,
@@ -526,6 +532,39 @@ public:
 class FSRemoveVNodeReply : public ReplyRequest {
 public:
 	FSRemoveVNodeReply() : ReplyRequest(FS_REMOVE_VNODE_REPLY) {}
+};
+
+
+// #pragma mark - asynchronous I/O
+
+
+// DoIORequest
+class DoIORequest : public FileRequest {
+public:
+	DoIORequest() : FileRequest(DO_IO_REQUEST) {}
+
+	int32		ioRequest;
+	bool		isWrite;
+};
+
+// DoIOReply
+class DoIOReply : public ReplyRequest {
+public:
+	DoIOReply() : ReplyRequest(DO_IO_REPLY) {}
+};
+
+// CancelIORequest
+class CancelIORequest : public FileRequest {
+public:
+	CancelIORequest() : FileRequest(CANCEL_IO_REQUEST) {}
+
+	int32		ioRequest;
+};
+
+// CancelIOReply
+class CancelIOReply : public ReplyRequest {
+public:
+	CancelIOReply() : ReplyRequest(CANCEL_IO_REPLY) {}
 };
 
 
@@ -1777,6 +1816,15 @@ do_for_request(Request* request, Task& task)
 			return task((FSRemoveVNodeRequest*)request);
 		case FS_REMOVE_VNODE_REPLY:
 			return task((FSRemoveVNodeReply*)request);
+		// asynchronous I/O
+		case DO_IO_REQUEST:
+			return task((DoIORequest*)request);
+		case DO_IO_REPLY:
+			return task((DoIOReply*)request);
+		case CANCEL_IO_REQUEST:
+			return task((CancelIORequest*)request);
+		case CANCEL_IO_REPLY:
+			return task((CancelIOReply*)request);
 		// nodes
 		case IOCTL_REQUEST:
 			return task((IOCtlRequest*)request);
@@ -2131,6 +2179,11 @@ using UserlandFSUtil::WriteVNodeRequest;
 using UserlandFSUtil::WriteVNodeReply;
 using UserlandFSUtil::FSRemoveVNodeRequest;
 using UserlandFSUtil::FSRemoveVNodeReply;
+// asynchronous I/O
+using UserlandFSUtil::DoIORequest;
+using UserlandFSUtil::DoIOReply;
+using UserlandFSUtil::CancelIORequest;
+using UserlandFSUtil::CancelIOReply;
 // nodes
 using UserlandFSUtil::IOCtlRequest;
 using UserlandFSUtil::IOCtlReply;
