@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -85,6 +85,7 @@ extern status_t close_fd_index(struct io_context *context, int fd);
 extern void put_fd(struct file_descriptor *descriptor);
 extern void disconnect_fd(struct file_descriptor *descriptor);
 extern void inc_fd_ref_count(struct file_descriptor *descriptor);
+extern int dup_foreign_fd(team_id fromTeam, int fd, bool kernel);
 extern status_t select_fd(int32 fd, struct select_info *info, bool kernel);
 extern status_t deselect_fd(int32 fd, struct select_info *info, bool kernel);
 extern bool fd_is_valid(int fd, bool kernel);

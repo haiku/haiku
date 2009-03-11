@@ -449,6 +449,46 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 }
 
 
+/*!	Duplicates an FD from another team to this/the kernel team.
+	\param fromTeam The team which owns the FD.
+	\param fd The FD to duplicate.
+	\param kernel If \c true, the new FD will be created in the kernel team,
+			the current userland team otherwise.
+	\return The newly created FD or an error code, if something went wrong.
+*/
+int
+dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
+{
+	// get the I/O context for the team in question
+	InterruptsSpinLocker teamsLocker(gTeamSpinlock);
+	struct team* team = team_get_team_struct_locked(fromTeam);
+	if (team == NULL)
+		return B_BAD_TEAM_ID;
+
+	io_context* fromContext = team->io_context;
+	vfs_get_io_context(fromContext);
+
+	teamsLocker.Unlock();
+
+	CObjectDeleter<io_context> _(fromContext, vfs_put_io_context);
+
+	// get the file descriptor
+	file_descriptor* descriptor = get_fd(fromContext, fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
+
+	// create a new FD in the target I/O context
+	int result = new_fd(get_current_io_context(kernel), descriptor);
+	if (result >= 0) {
+		// the descriptor reference belongs to the slot, now
+		descriptorPutter.Detach();
+	}
+
+	return result;
+}
+
+
 static status_t
 fd_ioctl(bool kernelFD, int fd, ulong op, void *buffer, size_t length)
 {
