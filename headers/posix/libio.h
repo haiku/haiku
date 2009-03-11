@@ -174,10 +174,10 @@ extern int _IO_feof_unlocked(_IO_FILE *stream);
 extern int _IO_ferror(_IO_FILE *stream);
 extern int _IO_ferror_unlocked(_IO_FILE *stream);
 extern int _IO_putc(int c, _IO_FILE *stream);
-extern int _IO_putc_unlocked(int c, _IO_FILE *stream);
+static int _IO_putc_unlocked(int c, _IO_FILE *stream);
 extern int _IO_getc(_IO_FILE *stream);
-extern int _IO_getc_unlocked(_IO_FILE *stream);
-extern int _IO_peekc_unlocked(_IO_FILE *stream);
+static int _IO_getc_unlocked(_IO_FILE *stream);
+static int _IO_peekc_unlocked(_IO_FILE *stream);
 
 extern int __underflow(_IO_FILE *stream);
 extern int __uflow(_IO_FILE *stream);
@@ -214,13 +214,8 @@ extern _IO_fpos64_t _IO_seekpos(_IO_FILE *, _IO_fpos64_t, int);
 
 extern void _IO_free_backup_area(_IO_FILE *);
 
-#ifdef __cplusplus
-#	define __INLINE inline
-#else
-#	define __INLINE extern __inline
-#endif
 
-__INLINE int
+static inline int
 _IO_getc_unlocked(_IO_FILE *stream)
 {
 	if (stream->_IO_read_ptr >= stream->_IO_read_end)
@@ -230,17 +225,18 @@ _IO_getc_unlocked(_IO_FILE *stream)
 }
 
 
-__INLINE int
+static inline int
 _IO_peekc_unlocked(_IO_FILE *stream)
 {
-	if (stream->_IO_read_ptr >= stream->_IO_read_end && __underflow(stream) == EOF)
+	if (stream->_IO_read_ptr >= stream->_IO_read_end
+		&& __underflow(stream) == EOF)
 		return EOF;
 
 	return *(unsigned char *)stream->_IO_read_ptr;
 }
 
 
-__INLINE int
+static inline int
 _IO_putc_unlocked(int c, _IO_FILE *stream)
 {
 	if (stream->_IO_write_ptr >= stream->_IO_write_end)
@@ -248,8 +244,6 @@ _IO_putc_unlocked(int c, _IO_FILE *stream)
 
 	return (unsigned char)(*stream->_IO_write_ptr++ = c);
 }
-
-#undef __INLINE
 
 #ifdef __cplusplus
 }
