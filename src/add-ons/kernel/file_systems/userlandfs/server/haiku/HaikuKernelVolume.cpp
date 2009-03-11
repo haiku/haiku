@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "HashMap.h"
 
+#include "../IORequestInfo.h"
 #include "../kernel_emu.h"
 
 #include "HaikuKernelNode.h"
@@ -23,13 +24,36 @@ class HaikuKernelVolume::NodeMap
 };
 
 
+// IORequestHashDefinition
+struct HaikuKernelVolume::IORequestHashDefinition {
+	typedef int32			KeyType;
+	typedef	IORequestInfo	ValueType;
+
+	size_t HashKey(int32 key) const
+		{ return key; }
+	size_t Hash(const IORequestInfo* value) const
+		{ return value->id; }
+	bool Compare(int32 key, const IORequestInfo* value) const
+		{ return value->id == key; }
+	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
+		{ return value; }
+};
+
+
+// IORequestTable
+struct HaikuKernelVolume::IORequestTable
+	: public OpenHashTable<IORequestHashDefinition> {
+};
+
+
 // constructor
 HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	file_system_module_info* fsModule)
 	:
 	Volume(fileSystem, id),
 	fFSModule(fsModule),
-	fNodes(NULL)
+	fNodes(NULL),
+	fIORequests(NULL)
 {
 	fVolume.id = id;
 	fVolume.partition = -1;
@@ -46,6 +70,8 @@ HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 // destructor
 HaikuKernelVolume::~HaikuKernelVolume()
 {
+	delete fNodes;
+	delete fIORequests;
 }
 
 
@@ -56,8 +82,14 @@ HaikuKernelVolume::Init()
 	fNodes = new(std::nothrow) NodeMap;
 	if (fNodes == NULL)
 		return B_NO_MEMORY;
+	status_t error = fNodes->InitCheck();
+	if (error != B_OK)
+		return error;
 
-	return fNodes->InitCheck();
+	fIORequests = new(std::nothrow) IORequestTable;
+	if (fIORequests == NULL)
+		return B_NO_MEMORY;
+	return fIORequests->Init();
 }
 
 
@@ -149,6 +181,14 @@ HaikuKernelNode*
 HaikuKernelVolume::NodeWithID(ino_t vnodeID) const
 {
 	return fNodes->Get(vnodeID);
+}
+
+
+IORequestInfo*
+HaikuKernelVolume::IORequestInfoWithID(int32 id) const
+{
+	AutoLocker<NodeMap> locker(fNodes);
+	return fIORequests->Lookup(id);
 }
 
 
@@ -327,6 +367,50 @@ HaikuKernelVolume::RemoveVNode(void* _node, bool reenter)
 	if (!node->ops->remove_vnode)
 		return B_BAD_VALUE;
 	return node->ops->remove_vnode(&fVolume, node, reenter);
+}
+
+
+// #pragma mark - asynchronous I/O
+
+
+status_t
+HaikuKernelVolume::DoIO(void* _node, void* cookie, IORequestInfo* requestInfo)
+{
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->io)
+		return B_BAD_VALUE;
+
+	// add the info to the table
+	AutoLocker<NodeMap> locker(fNodes);
+	if (fIORequests->Lookup(requestInfo->id))
+		RETURN_ERROR(B_BAD_VALUE);
+
+	fIORequests->Insert(requestInfo);
+	locker.Unlock();
+
+	// call the hook
+	status_t error = node->ops->io(&fVolume, node, cookie,
+		(io_request*)(addr_t)requestInfo->id);
+
+	// remove the info from the table
+	locker.Lock();
+	fIORequests->Remove(requestInfo);
+
+	return error;
+}
+
+
+status_t
+HaikuKernelVolume::CancelIO(void* _node, void* cookie, int32 ioRequestID)
+{
+	HaikuKernelNode* node = (HaikuKernelNode*)_node;
+
+	if (!node->ops->cancel_io)
+		return B_BAD_VALUE;
+
+	return node->ops->cancel_io(&fVolume, node, cookie,
+		(io_request*)(addr_t)ioRequestID);
 }
 
 

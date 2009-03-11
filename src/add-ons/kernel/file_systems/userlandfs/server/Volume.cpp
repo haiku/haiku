@@ -189,6 +189,23 @@ Volume::RemoveVNode(void* node, bool reenter)
 }
 
 
+// #pragma mark - asynchronous I/O
+
+
+status_t
+Volume::DoIO(void* node, void* cookie, IORequestInfo* requestInfo)
+{
+	return B_BAD_VALUE;
+}
+
+
+status_t
+Volume::CancelIO(void* node, void* cookie, int32 ioRequestID)
+{
+	return B_BAD_VALUE;
+}
+
+
 // #pragma mark - nodes
 
 

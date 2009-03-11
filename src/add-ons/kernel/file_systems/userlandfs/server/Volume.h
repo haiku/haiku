@@ -14,6 +14,7 @@
 namespace UserlandFS {
 
 class FileSystem;
+class IORequestInfo;
 
 using UserlandFSUtil::FSVolumeCapabilities;
 
@@ -51,6 +52,12 @@ public:
 									void** node, int* type, uint32* flags);
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
+
+	// asynchronous I/O
+	virtual	status_t			DoIO(void* node, void* cookie,
+									IORequestInfo* requestInfo);
+	virtual	status_t			CancelIO(void* node, void* cookie,
+									int32 ioRequestID);
 
 	// nodes
 	virtual	status_t			IOCtl(void* node, void* cookie,

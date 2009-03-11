@@ -19,6 +19,9 @@ class GetVNodeNameRequest;
 class ReadVNodeRequest;
 class WriteVNodeRequest;
 class FSRemoveVNodeRequest;
+// asynchronous I/O
+class DoIORequest;
+class CancelIORequest;
 // nodes
 class IOCtlRequest;
 class SetFlagsRequest;
@@ -114,6 +117,10 @@ private:
 			status_t			_HandleRequest(ReadVNodeRequest* request);
 			status_t			_HandleRequest(WriteVNodeRequest* request);
 			status_t			_HandleRequest(FSRemoveVNodeRequest* request);
+
+			// asynchronous I/O
+			status_t			_HandleRequest(DoIORequest* request);
+			status_t			_HandleRequest(CancelIORequest* request);
 
 			// nodes
 			status_t			_HandleRequest(IOCtlRequest* request);

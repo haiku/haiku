@@ -6,6 +6,7 @@
 #include "Compatibility.h"
 #include "Debug.h"
 #include "FileSystem.h"
+#include "IORequestInfo.h"
 #include "RequestPort.h"
 #include "Requests.h"
 #include "RequestThread.h"
@@ -68,6 +69,12 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((WriteVNodeRequest*)request);
 		case FS_REMOVE_VNODE_REQUEST:
 			return _HandleRequest((FSRemoveVNodeRequest*)request);
+
+		// asynchronous I/O
+		case DO_IO_REQUEST:
+			return _HandleRequest((DoIORequest*)request);
+		case CANCEL_IO_REQUEST:
+			return _HandleRequest((CancelIORequest*)request);
 
 		// nodes
 		case IOCTL_REQUEST:
@@ -520,6 +527,67 @@ UserlandRequestHandler::_HandleRequest(FSRemoveVNodeRequest* request)
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	FSRemoveVNodeReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+
+// #pragma mark - asynchronous I/O
+
+
+status_t
+UserlandRequestHandler::_HandleRequest(DoIORequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		IORequestInfo requestInfo(request->ioRequest, request->isWrite);
+		result = volume->DoIO(request->node, request->fileCookie, &requestInfo);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	DoIOReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+
+status_t
+UserlandRequestHandler::_HandleRequest(CancelIORequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->CancelIO(request->node, request->fileCookie,
+			request->ioRequest);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	CancelIOReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		RETURN_ERROR(error);

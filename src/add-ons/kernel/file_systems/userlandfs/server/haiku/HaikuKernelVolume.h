@@ -34,6 +34,7 @@ public:
 			void				UndoPublishVNode(HaikuKernelNode* node);
 
 			HaikuKernelNode*	NodeWithID(ino_t vnodeID) const;
+			IORequestInfo*		IORequestInfoWithID(int32 id) const;
 
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
@@ -58,6 +59,12 @@ public:
 									void** node, int* type, uint32* flags);
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
+
+	// asynchronous I/O
+	virtual	status_t			DoIO(void* node, void* cookie,
+									IORequestInfo* requestInfo);
+	virtual	status_t			CancelIO(void* node, void* cookie,
+									int32 ioRequestID);
 
 	// nodes
 	virtual	status_t			IOCtl(void* node, void* cookie,
@@ -178,6 +185,8 @@ private:
 	};
 
 	class NodeMap;
+	class IORequestHashDefinition;
+	class IORequestTable;
 
 private:
 			void				_InitCapabilities();
@@ -186,6 +195,7 @@ private:
 			file_system_module_info* fFSModule;
 			FSVolume			fVolume;
 			NodeMap*			fNodes;
+			IORequestTable*		fIORequests;
 };
 
 

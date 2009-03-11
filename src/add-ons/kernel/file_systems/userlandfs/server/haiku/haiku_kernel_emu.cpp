@@ -17,7 +17,9 @@
 #include "Debug.h"
 
 #include "../FileSystem.h"
+#include "../IORequestInfo.h"
 #include "../kernel_emu.h"
+#include "../RequestThread.h"
 
 #include "HaikuKernelNode.h"
 #include "HaikuKernelVolume.h"
@@ -282,8 +284,19 @@ do_iterative_fd_io(int fd, io_request *request, iterative_io_get_vecs getVecs,
 bool
 io_request_is_write(const io_request* request)
 {
-	// TODO: Implement!
-	return false;
+	// get the volume
+	RequestThread* thread = RequestThread::GetCurrentThread();
+	if (thread == NULL || thread->GetContext() == NULL)
+		return false;
+
+	HaikuKernelVolume* volume = dynamic_cast<HaikuKernelVolume*>(
+		thread->GetContext()->GetVolume());
+	if (volume == NULL)
+		return false;
+
+	// get the request info
+	IORequestInfo* info = volume->IORequestInfoWithID((int32)(addr_t)request);
+	return info != NULL && info->isWrite;
 }
 
 
