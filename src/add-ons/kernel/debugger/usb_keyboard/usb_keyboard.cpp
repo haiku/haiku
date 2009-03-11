@@ -150,6 +150,12 @@ static size_t sKeyTableSize = sizeof(sKeyTable) / sizeof(sKeyTable[0]);
 static void
 enter_debugger(void)
 {
+	if (!has_debugger_command("get_usb_keyboard_config")
+		|| !has_debugger_command("get_usb_pipe_for_id")
+		|| (!has_debugger_command("uhci_process_transfer")
+			&& !has_debugger_command("ohci_process_transfer")))
+		return;
+
 	evaluate_debug_command("get_usb_keyboard_config");
 	sUSBTransferLength = get_debug_variable("_usbReportSize", 0);
 	if (sUSBTransferLength == 0 || sUSBTransferLength > sizeof(sUSBTransferData))

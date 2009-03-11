@@ -496,6 +496,14 @@ print_debugger_command_usage(const char* commandName)
 }
 
 
+bool
+has_debugger_command(const char* commandName)
+{
+	bool ambiguous;
+	return find_debugger_command(commandName, false, ambiguous) != NULL;
+}
+
+
 //	#pragma mark - public API
 
 int

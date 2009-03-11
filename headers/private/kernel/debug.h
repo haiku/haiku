@@ -142,6 +142,7 @@ extern status_t	add_debugger_command_etc(const char* name,
 extern status_t	add_debugger_command_alias(const char* newName,
 					const char* oldName, const char* description);
 extern bool		print_debugger_command_usage(const char* command);
+extern bool		has_debugger_command(const char* command);
 
 extern const char *debug_demangle_symbol(const char* symbol, char* buffer,
 					size_t bufferSize, bool* _isObjectMethod);
