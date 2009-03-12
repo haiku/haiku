@@ -135,7 +135,8 @@ WidgetAttributeText::NewWidgetText(const Model *model,
 }
 
 
-WidgetAttributeText::WidgetAttributeText(const Model *model, const BColumn *column)
+WidgetAttributeText::WidgetAttributeText(const Model *model,
+		const BColumn *column)
 	:
 	fModel(const_cast<Model *>(model)),
 	fColumn(column),
@@ -389,17 +390,19 @@ TruncTimeBase(BString *result, int64 value, const View *view, float width)
 	BString timeFormat;
 
 	for (int32 index = 0; ; index++) {
-		if (TimeFormat(timeFormat, index, separator, order, clockIs24hr) != B_OK)
+		if (TimeFormat(timeFormat, index, separator, order, clockIs24hr)
+				!= B_OK)
 			break;
 		strftime(buffer, 256, timeFormat.String(), &timeData);
 		resultWidth = view->StringWidth(buffer);
 		if (resultWidth <= width)
 			break;
 	}
-	if (resultWidth > width)
+	if (resultWidth > width) {
 		// even the shortest format string didn't do it, insert ellipsis
-		resultWidth = TruncStringBase(result, buffer, (ssize_t)strlen(buffer), view, width);
-	else
+		resultWidth = TruncStringBase(result, buffer, (ssize_t)strlen(buffer),
+			view, width);
+	} else
 		*result = buffer;
 
 	return resultWidth;
@@ -407,8 +410,8 @@ TruncTimeBase(BString *result, int64 value, const View *view, float width)
 
 
 float
-WidgetAttributeText::TruncTime(BString *result, int64 value, const BPoseView *view,
-	float width)
+WidgetAttributeText::TruncTime(BString *result, int64 value,
+	const BPoseView *view, float width)
 {
 	return TruncTimeBase(result, value, view, width);
 }
@@ -484,9 +487,10 @@ WidgetAttributeText::AttrAsString(const Model *model, BString *result,
 				} else
 					tmp = "-";
 		
-				if (width > 0)
-					TruncStringBase(result, tmp.String(), tmp.Length(), view, width);
-				else
+				if (width > 0) {
+					TruncStringBase(result, tmp.String(), tmp.Length(), view,
+						width);
+				} else
 					*result = tmp.String();
 				
 				return B_OK;
@@ -513,7 +517,8 @@ WidgetAttributeText::AttrAsString(const Model *model, BString *result,
 bool
 WidgetAttributeText::IsEditable() const
 {
-	return fColumn->Editable() && !BVolume(fModel->StatBuf()->st_dev).IsReadOnly();
+	return fColumn->Editable()
+		&& !BVolume(fModel->StatBuf()->st_dev).IsReadOnly();
 }
 
 
@@ -567,8 +572,8 @@ StringAttributeText::FitValue(BString *result, const BPoseView *view)
 		ReadValue(&fFullValueText);
 	fOldWidth = fColumn->Width();
 
-	fTruncatedWidth = TruncString(result, fFullValueText.String(), fFullValueText.Length(),
-		view, fOldWidth);
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth);
 	fDirty = false;
 }
 
@@ -583,8 +588,8 @@ StringAttributeText::PreferredWidth(const BPoseView *pose) const
 int
 StringAttributeText::Compare(WidgetAttributeText &attr, BPoseView *view)
 {
-	StringAttributeText *compareTo =
-		dynamic_cast<StringAttributeText *>(&attr);
+	StringAttributeText *compareTo
+		= dynamic_cast<StringAttributeText *>(&attr);
 	ASSERT(compareTo);
 
 	if (fValueDirty)
@@ -666,8 +671,8 @@ ScalarAttributeText::PreferredWidth(const BPoseView *pose) const
 int
 ScalarAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 {
-	ScalarAttributeText *compareTo =
-		dynamic_cast<ScalarAttributeText *>(&attr);
+	ScalarAttributeText *compareTo
+		= dynamic_cast<ScalarAttributeText *>(&attr);
 	ASSERT(compareTo);
 		// make sure we're not comparing apples and oranges
 
@@ -922,7 +927,8 @@ NameAttributeText::SetSortFolderNamesFirst(bool enabled)
 
 #ifdef OWNER_GROUP_ATTRIBUTES
 
-OwnerAttributeText::OwnerAttributeText(const Model *model, const BColumn *column)
+OwnerAttributeText::OwnerAttributeText(const Model *model,
+		const BColumn *column)
 	: StringAttributeText(model, column)
 {
 }
@@ -947,7 +953,8 @@ OwnerAttributeText::ReadValue(BString *result)
 }
 
 
-GroupAttributeText::GroupAttributeText(const Model *model, const BColumn *column)
+GroupAttributeText::GroupAttributeText(const Model *model,
+		const BColumn *column)
 	: StringAttributeText(model, column)
 {
 }
@@ -1457,8 +1464,8 @@ GenericAttributeText::ValueAsText(const BPoseView *view)
 int
 GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 {
-	GenericAttributeText *compareTo =
-		dynamic_cast<GenericAttributeText *>(&attr);
+	GenericAttributeText *compareTo
+		= dynamic_cast<GenericAttributeText *>(&attr);
 	ASSERT(compareTo);
 
 	if (fValueDirty)
@@ -1467,25 +1474,25 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 		compareTo->ReadValue(&compareTo->fFullValueText);
 
 	// Sort undefined values last, regardless of the other value:
-	if (fValueIsDefined == false || compareTo->fValueIsDefined == false) {
-		return fValueIsDefined < compareTo->fValueIsDefined ?
-			1 : (fValueIsDefined == compareTo->fValueIsDefined ? 0 : -1);
-	}
+	if (!fValueIsDefined)
+		return compareTo->fValueIsDefined ? -1 : 0;
+	if (!compareTo->fValueIsDefined)
+		return 1;
 
 	switch (fColumn->AttrType()) {
 		case B_STRING_TYPE:
 			return fFullValueText.ICompare(compareTo->fFullValueText);
 
 		case B_CHAR_TYPE:
-			{
-				char vStr[2] = { static_cast<char>(fValue.uint8t), 0 };
-				char cStr[2] = { static_cast<char>(compareTo->fValue.uint8t), 0};
-			
-				BString valueStr(vStr);
-				BString compareToStr(cStr);
-			
-				return valueStr.ICompare(compareToStr);
-			}
+		{
+			char vStr[2] = { static_cast<char>(fValue.uint8t), 0 };
+			char cStr[2] = { static_cast<char>(compareTo->fValue.uint8t), 0};
+		
+			BString valueStr(vStr);
+			BString compareToStr(cStr);
+		
+			return valueStr.ICompare(compareToStr);
+		}
 
 		case B_FLOAT_TYPE:
 			return fValue.floatt >= compareTo->fValue.floatt ?
@@ -1772,8 +1779,8 @@ OpenWithRelationAttributeText::FitValue(BString *result, const BPoseView *view)
 		ReadValue();
 
 	ASSERT(view == fPoseView);
-	const OpenWithPoseView *launchWithView =
-		dynamic_cast<const OpenWithPoseView *>(view);
+	const OpenWithPoseView *launchWithView
+		= dynamic_cast<const OpenWithPoseView *>(view);
 
 	if (launchWithView)
 		launchWithView->OpenWithRelationDescription(fModel, &fRelationText);
