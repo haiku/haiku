@@ -1123,53 +1123,56 @@ free_vnode(struct vnode* vnode, bool reenter)
 	The caller must not hold the sVnodeMutex or the sMountMutex.
 
 	\param vnode the vnode.
+	\param alwaysFree don't move this vnode into the unused list, but really
+		   delete it if possible.
 	\param reenter \c true, if this function is called (indirectly) from within
-		   a file system.
+		   a file system. This will be passed to file system hooks only.
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 static status_t
 dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 {
-	mutex_lock(&sVnodeMutex);
+	MutexLocker locker(sVnodeMutex);
 
 	int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
 
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
-	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
+	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
+		vnode->ref_count));
 
-	if (oldRefCount == 1) {
-		if (vnode->busy)
-			panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
+	if (oldRefCount != 1)
+		return B_OK;
 
-		bool freeNode = false;
+	if (vnode->busy)
+		panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
 
-		// Just insert the vnode into an unused list if we don't need
-		// to delete it
-		if (vnode->remove || alwaysFree) {
+	bool freeNode = false;
+
+	// Just insert the vnode into an unused list if we don't need
+	// to delete it
+	if (vnode->remove || alwaysFree) {
+		vnode->busy = true;
+		freeNode = true;
+	} else {
+		list_add_item(&sUnusedVnodeList, vnode);
+		if (++sUnusedVnodes > kMaxUnusedVnodes
+			&& low_resource_state(
+				B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
+					!= B_NO_LOW_RESOURCE) {
+			// there are too many unused vnodes so we free the oldest one
+			// TODO: evaluate this mechanism
+			vnode = (struct vnode*)list_remove_head_item(&sUnusedVnodeList);
 			vnode->busy = true;
 			freeNode = true;
-		} else {
-			list_add_item(&sUnusedVnodeList, vnode);
-			if (++sUnusedVnodes > kMaxUnusedVnodes
-				&& low_resource_state(
-					B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
-						!= B_NO_LOW_RESOURCE) {
-				// there are too many unused vnodes so we free the oldest one
-				// TODO: evaluate this mechanism
-				vnode = (struct vnode*)list_remove_head_item(&sUnusedVnodeList);
-				vnode->busy = true;
-				freeNode = true;
-				sUnusedVnodes--;
-			}
+			sUnusedVnodes--;
 		}
+	}
 
-		mutex_unlock(&sVnodeMutex);
+	locker.Unlock();
 
-		if (freeNode)
-			free_vnode(vnode, reenter);
-	} else
-		mutex_unlock(&sVnodeMutex);
+	if (freeNode)
+		free_vnode(vnode, reenter);
 
 	return B_OK;
 }
@@ -3712,12 +3715,9 @@ put_vnode(fs_volume* volume, ino_t vnodeID)
 extern "C" status_t
 remove_vnode(fs_volume* volume, ino_t vnodeID)
 {
-	struct vnode* vnode;
-	bool remove = false;
-
 	MutexLocker locker(sVnodeMutex);
 
-	vnode = lookup_vnode(volume->id, vnodeID);
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -3727,16 +3727,18 @@ remove_vnode(fs_volume* volume, ino_t vnodeID)
 	}
 
 	vnode->remove = true;
+	bool removeUnpublished = false;
+
 	if (vnode->unpublished) {
 		// prepare the vnode for deletion
+		removeUnpublished = true;
 		vnode->busy = true;
-		remove = true;
 	}
 
 	locker.Unlock();
 
-	if (remove) {
-		// if the vnode hasn't been published yet, we delete it here
+	if (removeUnpublished) {
+		// If the vnode hasn't been published yet, we delete it here
 		atomic_add(&vnode->ref_count, -1);
 		free_vnode(vnode, true);
 	}
