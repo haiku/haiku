@@ -163,6 +163,7 @@ public:
 		{ return fJournal->TransactionID(); }
 
 	void AddInode(Inode* inode);
+	void RemoveInode(Inode* inode);
 
 private:
 	Transaction(const Transaction& other);

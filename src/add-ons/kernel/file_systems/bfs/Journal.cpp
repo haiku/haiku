@@ -1080,6 +1080,11 @@ Transaction::Start(Volume* volume, off_t refBlock)
 }
 
 
+/*!	Adds an inode to this transaction. This means that the inode will be write
+	locked until the transaction ended.
+	To ensure that the inode will stay valid until that point, an extra reference
+	is acquired to it as long as this transaction stays active.
+*/
 void
 Transaction::AddInode(Inode* inode)
 {
@@ -1098,6 +1103,19 @@ Transaction::AddInode(Inode* inode)
 		acquire_vnode(GetVolume()->FSVolume(), inode->ID());
 	rw_lock_write_lock(&inode->fLock);
 	fLockedInodes.Add(inode);
+}
+
+
+void
+Transaction::RemoveInode(Inode* inode)
+{
+	if (fJournal == NULL)
+		panic("Transaction is not running!");
+
+	fLockedInodes.Remove(inode);
+	rw_lock_write_unlock(&inode->fLock);
+	if (!GetVolume()->IsInitializing())
+		put_vnode(GetVolume()->FSVolume(), inode->ID());
 }
 
 

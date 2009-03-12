@@ -175,6 +175,8 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
+			fTransaction->RemoveInode(fInode);
+
 			remove_vnode(volume->FSVolume(), fInode->ID());
 		} else
 			volume->Free(*fTransaction, fRun);
