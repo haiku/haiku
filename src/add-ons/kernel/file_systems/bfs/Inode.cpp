@@ -132,6 +132,11 @@ private:
 #	define T(x) ;
 #endif
 
+
+/*!	A helper class used by Inode::Create() to keep track of the belongings
+	of an inode creation in progress.
+	This class will make sure everything is cleaned up properly.
+*/
 class InodeAllocator {
 public:
 							InodeAllocator(Transaction& transaction);
@@ -250,6 +255,8 @@ InodeAllocator::Keep(fs_vnode_ops* vnodeOps, uint32 publishFlags)
 		return status;
 	}
 
+	// Symbolic links are not published -- the caller needs to do this once
+	// the contents have been written.
 	if (!fInode->IsSymLink() && volume->ID() >= 0) {
 		status = publish_vnode(volume->FSVolume(), fInode->ID(), fInode,
 			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps, fInode->Mode(),

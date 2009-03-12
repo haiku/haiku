@@ -83,10 +83,6 @@ Journal::FreeLogBlocks() const
 }
 
 
-// For now, that's only a dumb class that does more or less nothing
-// else than writing the blocks directly to the real location.
-// It doesn't yet use logging.
-
 class Transaction {
 public:
 	Transaction(Volume* volume, off_t refBlock)
