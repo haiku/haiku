@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,6 @@
 
 
 DirectoryRefFilter::DirectoryRefFilter()
-	: BRefFilter()
 {
 }
 
@@ -25,7 +24,16 @@ bool
 DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
 	const char *filetype)
 {
-	return node->IsDirectory();
+	if (S_ISDIR(st->st_mode))
+		return true;
+
+	if (S_ISLNK(st->st_mode)) {
+		// Traverse symlinks
+		BEntry entry(ref, true);
+		return entry.IsDirectory();
+	}
+
+	return false;
 }
 
 
