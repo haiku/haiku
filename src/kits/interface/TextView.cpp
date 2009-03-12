@@ -3306,13 +3306,18 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 		currentMessage->FindInt32("modifiers", &mods);
 
 	bool shiftDown = mods & B_SHIFT_KEY;
+	bool ctrlDown = mods & B_CONTROL_KEY;
 	STELine* line = NULL;
 	int32 start = fSelStart, end = fSelEnd;
 
 	switch (inPageKey) {
 		case B_HOME:
 			line = (*fLines)[CurrentLine()];
-			fClickOffset = line->offset;
+			if (ctrlDown)
+				fClickOffset = 0;
+			else
+				fClickOffset = line->offset;
+
 			if (shiftDown) {
 				if (fClickOffset <= fSelStart) {
 					start = fClickOffset;
@@ -3327,20 +3332,24 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 			break;
 
 		case B_END:
-			// If we are on the last line, just go to the last
-			// character in the buffer, otherwise get the starting
-			// offset of the next line, and go to the previous character
-			if (CurrentLine() + 1 < fLines->NumLines()) {
-				line = (*fLines)[CurrentLine() + 1];
-				fClickOffset = _PreviousInitialByte(line->offset);
+			if (ctrlDown) {
+				fClickOffset = fText->Length();
 			} else {
-				// This check if needed to avoid moving the cursor
-				// when the cursor is on the last line, and that line
-				// is empty
-				if (fClickOffset != fText->Length()) {
-					fClickOffset = fText->Length();
-					if (ByteAt(fClickOffset - 1) == B_ENTER)
-						fClickOffset--;
+				// If we are on the last line, just go to the last
+				// character in the buffer, otherwise get the starting
+				// offset of the next line, and go to the previous character
+				if (CurrentLine() + 1 < fLines->NumLines()) {
+					line = (*fLines)[CurrentLine() + 1];
+					fClickOffset = _PreviousInitialByte(line->offset);
+				} else {
+					// This check if needed to avoid moving the cursor
+					// when the cursor is on the last line, and that line
+					// is empty
+					if (fClickOffset != fText->Length()) {
+						fClickOffset = fText->Length();
+						if (ByteAt(fClickOffset - 1) == B_ENTER)
+							fClickOffset--;
+					}
 				}
 			}
 
