@@ -72,6 +72,9 @@ TMainWindow::TMainWindow(BRect bound, char* name, window_type type, long flags)
 	menu->AddItem(new BMenuItem("512", new BMessage(512)));
 	menu->AddItem(new BMenuItem("768", new BMessage(768)));
 	menu->AddItem(new BMenuItem("1024", new BMessage(1024)));
+	menu->AddItem(new BMenuItem("2048", new BMessage(2048)));
+	menu->AddItem(new BMenuItem("4096", new BMessage(4096)));
+	menu->AddItem(new BMenuItem("8192", new BMessage(8192)));
 	menuBar->AddItem(menu);
 
 	item->SetMarked(true);
@@ -173,6 +176,9 @@ TMainWindow::MessageReceived(BMessage* message)
 		case 512:
 		case 768:
 		case 1024:
+		case 2048:
+		case 4096:
+		case 8192:
 			fView->set_iter(message->what);
 			break;
 

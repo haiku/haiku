@@ -150,9 +150,9 @@ TShowBit::TShowBit(BRect r, uint32 resizeMask, uint32 flags) :
 	the_bitmap = new BBitmap(bitmap_r, B_COLOR_8_BIT);
 	bits = (char *)the_bitmap->Bits();
 	memset(bits, 0x00, size_x*size_y);
-	px = -1.5;
-	py = -1.5;
-	scale = 3.0;
+	px = -2.5;
+	py = -2.0;
+	scale = 4.0;
 	set_palette(2);
 }
 
@@ -174,7 +174,7 @@ void	TShowBit::Draw(BRect update_rect)
 /*------------------------------------------------------------*/
 
 
-int iterate1(double a, double b)
+int iterate_double(double a, double b)
 {
 	double	x;
 	double	y;
@@ -203,7 +203,7 @@ int iterate1(double a, double b)
 //extern "C" int iterate(float a, float b);
 /*------------------------------------------------------------*/
 
-int iterate(float a, float b)
+int iterate_float(float a, float b)
 {
 	float	x;
 	float	y;
@@ -309,13 +309,13 @@ void	TShowBit::precompute(double vx, double vy, double sx, double sy)
 		if (scale < 0.000025 || niter != 256) {
 			for (x = 0; x < 32; x++) {
 				cx += sx;
-				pc[x][y] = iterate1(cx, cy);
+				pc[x][y] = iterate_double(cx, cy);
 			}
 		}
 		else
 		for (x = 0; x < 32; x++) {
 			cx += sx;
-			pc[x][y] = iterate(cx, cy);
+			pc[x][y] = iterate_float(cx, cy);
 		}
 	}
 }
@@ -366,14 +366,14 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 				if (scale < 0.000025 || niter != 256) {
 					for (x = bx; x < (bx+12); x++) {
 						cx += sx;
-						v = iterate1(cx, cy);
+						v = iterate_double(cx, cy);
 						*b0++ = palette[v];
 					}
 				}
 				else
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
-					v = iterate(cx, cy);
+					v = iterate_float(cx, cy);
 					*b0++ = palette[v];
 				}
 			}
@@ -428,14 +428,14 @@ void	TShowBit::manda(double vx, double vy, double sx, double sy)
 				if (scale < 0.000025 || niter != 256) {
 					for (x = bx; x < (bx+12); x++) {
 						cx += sx;
-						v = iterate1(cx, cy);
+						v = iterate_double(cx, cy);
 						*b0++ = palette[v];
 					}
 				}
 				else
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
-					v = iterate(cx, cy);
+					v = iterate_float(cx, cy);
 					*b0++ = palette[v];
 				}
 			}
