@@ -258,8 +258,12 @@ simple_reschedule(void)
 	prevThread = NULL;
 
 	if (oldThread->cpu->disabled) {
-		// CPU is disabled - just select an idle thread
+		// CPU is disabled - service any threads we may have that are pinned,
+		// otherwise just select the idle thread
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+			if (nextThread->pinned_to_cpu > 0 && 
+				nextThread->previous_cpu == oldThread->cpu)
+					break;
 			prevThread = nextThread;
 			nextThread = nextThread->queue_next;
 		}
