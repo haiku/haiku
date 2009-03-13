@@ -3696,7 +3696,11 @@ dump_area(int argc, char** argv)
 	addr_t num;
 
 	if (argc < 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: area [-m] <id|address|name>\n");
+		kprintf("usage: area [-m] [id|contains|address|name] <id|address|name>\n"
+			"All areas matching either id/address/name are listed. You can\n"
+			"force to check only a specific item by prefixing the specifier\n"
+			"with the id/contains/address/name keywords.\n"
+			"-m shows the area's mappings as well.\n");
 		return 0;
 	}
 
@@ -3705,24 +3709,47 @@ dump_area(int argc, char** argv)
 		index++;
 	}
 
-	num = parse_expression(argv[index]);
+	int32 mode = 0xf;
+	if (!strcmp(argv[index], "id"))
+		mode = 1;
+	else if (!strcmp(argv[index], "contains"))
+		mode = 2;
+	else if (!strcmp(argv[index], "name"))
+		mode = 4;
+	else if (!strcmp(argv[index], "address"))
+		mode = 0;
+	if (mode != 0xf)
+		index++;
 
-	// walk through the area list, looking for the arguments as a name
-	struct hash_iterator iter;
-
-	hash_open(sAreaHash, &iter);
-	while ((area = (vm_area*)hash_next(sAreaHash, &iter)) != NULL) {
-		if ((area->name != NULL && !strcmp(argv[index], area->name))
-			|| (num != 0
-				&& ((addr_t)area->id == num
-					|| (area->base <= num && area->base + area->size > num)))) {
-			dump_area_struct(area, mappings);
-			found = true;
-		}
+	if (index >= argc) {
+		kprintf("No area specifier given.\n");
+		return 0;
 	}
 
-	if (!found)
-		kprintf("could not find area %s (%ld)\n", argv[index], num);
+	num = parse_expression(argv[index]);
+
+	if (mode == 0) {
+		dump_area_struct((struct vm_area*)num, mappings);
+	} else {
+		// walk through the area list, looking for the arguments as a name
+		struct hash_iterator iter;
+
+		hash_open(sAreaHash, &iter);
+		while ((area = (vm_area*)hash_next(sAreaHash, &iter)) != NULL) {
+			if (((mode & 4) != 0 && area->name != NULL
+					&& !strcmp(argv[index], area->name))
+				|| (num != 0 && (((mode & 1) != 0 && (addr_t)area->id == num)
+					|| (((mode & 2) != 0 && area->base <= num
+						&& area->base + area->size > num))))) {
+				dump_area_struct(area, mappings);
+				found = true;
+			}
+		}
+
+		if (!found)
+			kprintf("could not find area %s (%ld)\n", argv[index], num);
+	}
+
 	return 0;
 }
 
