@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -12,6 +12,7 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <Screen.h>
 #include <Window.h>
 
 #include <stdio.h>
@@ -160,6 +161,11 @@ SmartTabView::AddTab(BView *target, BTab *tab)
 		// switching from "normal" to tabbed mode
 		ContainerView()->ResizeBy(0, -TabHeight());
 		ContainerView()->MoveBy(0, TabHeight());	
+
+		BScreen screen(Window());
+		if (Window()->Frame().bottom + TabHeight() > screen.Frame().bottom - 5)
+			Window()->MoveBy(0, -TabHeight());
+
 		Window()->ResizeBy(0, TabHeight());
 	}
 	
@@ -172,6 +178,9 @@ SmartTabView::RemoveTab(int32 index)
 {
 	if (CountTabs() == 2) {
 		// see above
+		BScreen screen(Window());
+		if (Window()->Frame().bottom > screen.Frame().bottom - 5 - TabHeight())
+			Window()->MoveBy(0, TabHeight());
 		Window()->ResizeBy(0, -TabHeight());
 		ContainerView()->MoveBy(0, -TabHeight());		
 		ContainerView()->ResizeBy(0, TabHeight());	
