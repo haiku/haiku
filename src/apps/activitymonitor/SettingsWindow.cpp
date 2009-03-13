@@ -6,6 +6,7 @@
 
 #include "SettingsWindow.h"
 
+#include <math.h>
 #include <stdio.h>
 
 #include <GridLayoutBuilder.h>
