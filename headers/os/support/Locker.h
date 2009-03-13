@@ -17,6 +17,8 @@ class BLocker {
 		BLocker(const char* name, bool benaphoreStyle);
 		virtual ~BLocker();
 
+		status_t InitCheck() const;
+
 		bool Lock(void);
 		status_t LockWithTimeout(bigtime_t timeout);
 		void Unlock(void);

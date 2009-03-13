@@ -93,6 +93,13 @@ BLocker::~BLocker()
 }
 
 
+status_t
+BLocker::InitCheck() const
+{
+	return fSemaphoreID >= 0 ? B_OK : fSemaphoreID;
+}
+
+
 bool
 BLocker::Lock(void)
 {
@@ -141,7 +148,7 @@ BLocker::Unlock(void)
     			release_sem(fSemaphoreID);
 	    	}
 	    }
-    }		
+    }
 }
 
 
@@ -206,7 +213,7 @@ BLocker::InitLocker(const char *name, bool benaphore)
 
 	// The lock is currently not acquired so there is no owner.
 	fLockOwner = B_ERROR;
-	
+
 	// The lock is currently not acquired so the recursive count is zero.
 	fRecursiveCount = 0;
 }
@@ -272,7 +279,7 @@ BLocker::AcquireLock(bigtime_t timeout, status_t *error)
 		}
 	}
 
-	// If the lock has successfully been acquired.	
+	// If the lock has successfully been acquired.
 	if (status == B_OK) {
 		// Set the lock owner to this thread and increment the recursive count
 		// by one.  The recursive count is incremented because one more Unlock()
