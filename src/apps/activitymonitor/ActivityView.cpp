@@ -678,7 +678,7 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 
 	while (true) {
 		DataSource* source = FindDataSource(remove);
-debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
+		//debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
 		if (source == NULL) {
 			if (removed)
 				break;
