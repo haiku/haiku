@@ -1,5 +1,12 @@
+/*
+ * Copyright 2003-2009 Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ */
+
 #include "Coding.h"
+
 #include <string.h>
+
 
 struct etable {
 	const char *name;     	// long name for menu item.
@@ -8,12 +15,10 @@ struct etable {
 	const int32 id;      	// encoding id 
 };
 
-
 /*
  * encoding_table ... use encoding menu, message, and preference keys.
  */
-const static etable kEncodingTable[] =
-{
+const static etable kEncodingTable[] = {
 	{"UTF-8", "UTF8", 'U', M_UTF8},
 	{"ISO-8859-1", "8859-1", '1', B_ISO1_CONVERSION},
 	{"ISO-8859-2", "8859-2", '2', B_ISO2_CONVERSION},
@@ -30,7 +35,7 @@ const static etable kEncodingTable[] =
 	{"Shift-JIS", "SJIS", 'S', B_SJIS_CONVERSION},
 	{"EUC-jp", "EUCJ", 'E', B_EUC_CONVERSION},
 	{"EUC-kr", "EUCK", 'K', B_EUC_KR_CONVERSION},
-	{"GB18030", "GB18030", 'G', B_GBK_CONVERSION},
+	{"GB18030", "GB18030", 0, B_GBK_CONVERSION},
 	{"Big5", "Big5", 'B', B_BIG5_CONVERSION},
 
 	/* Not Implemented.

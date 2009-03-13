@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Distributed under the terms of the MIT license.
@@ -7,19 +7,21 @@
  * Authors:
  *		Kian Duffy <myob@users.sourceforge.net>
  */
-#include <Menu.h>
-#include <string.h>
-#include <MenuItem.h>
-#include <PopUpMenu.h>
-#include <Font.h>
-#include <stdio.h>
 
 #include "MenuUtil.h"
-#include "TermConst.h"
-#include "PrefHandler.h"
-#include "Coding.h"
 
-//#define LOCALE_FILE_DIR PREF_FOLDER"menu/"
+#include <stdio.h>
+#include <string.h>
+
+#include <Font.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+
+#include "Coding.h"
+#include "PrefHandler.h"
+#include "TermConst.h"
+
 
 BPopUpMenu *
 MakeMenu(ulong msg, const char **items, const char *defaultItemName)
@@ -42,23 +44,24 @@ MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 }
 
 
-
 void
-MakeEncodingMenu(BMenu *eMenu, bool flag)
+MakeEncodingMenu(BMenu *eMenu, bool withShortcuts)
 {
 	int encoding;
 	int i = 0;
 	while (get_nth_encoding(i, &encoding) == B_OK) {
 		BMessage *msg = new BMessage(MENU_ENCODING);
 		msg->AddInt32("op", (int32)encoding);
-		if (flag)
-			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding), msg, id2shortcut(encoding)));
-		else 
+		if (withShortcuts) {
+			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding), msg,
+				id2shortcut(encoding)));
+		} else 
 			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding), msg));
-		
+
 		i++;
 	}
 }
+
 
 void
 LoadLocaleFile(PrefHandler *pref)

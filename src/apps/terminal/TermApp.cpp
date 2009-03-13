@@ -295,10 +295,12 @@ TermApp::_SwitchTerm()
 bool
 TermApp::_IsSwitchTarget(team_id id)
 {
+	uint32 currentWorkspace = 1L << current_workspace();
+
 	BMessenger app(TERM_SIGNATURE, id);
 	if (app.IsTargetLocal()) {
 		return !fTermWindow->IsMinimized()
-			&& (fTermWindow->Workspaces() & (1L << current_workspace())) != 0;
+			&& (fTermWindow->Workspaces() & currentWorkspace) != 0;
 	}
 
 	BMessage reply;
@@ -311,13 +313,11 @@ TermApp::_IsSwitchTarget(team_id id)
 		|| reply.FindInt32("workspaces", &workspaces) != B_OK)
 		return false;
 
-	return !minimized
-		&& (workspaces & (1L << current_workspace())) != 0;
+	return !minimized && (workspaces & currentWorkspace) != 0;
 }
 
 
-/*!
-	Checks if all teams that have an ID-to-team mapping in the message
+/*!	Checks if all teams that have an ID-to-team mapping in the message
 	are still running.
 	The IDs for teams that are gone will be made available again, and
 	their mapping is removed from the message.

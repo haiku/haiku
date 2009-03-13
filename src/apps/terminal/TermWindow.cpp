@@ -250,36 +250,46 @@ TermWindow::_SetupMenu()
 	
 	// Make File Menu.
 	fFilemenu = new BMenu("Terminal");
-	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
-	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(MENU_NEW_TERM), 'N'));
+	fFilemenu->AddItem(new BMenuItem("Switch Terminals",
+		new BMessage(MENU_SWITCH_TERM),'G'));
+	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS,
+		new BMessage(MENU_NEW_TERM), 'N'));
 	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
 	
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGE_SETUP)));
+	fFilemenu->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
+		new BMessage(MENU_PAGE_SETUP)));
 	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
+	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	fFilemenu->AddItem(new BMenuItem("Quit",
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenubar->AddItem(fFilemenu);
 
 	// Make Edit Menu.
-	fEditmenu = new BMenu ("Edit");
-	fEditmenu->AddItem (new BMenuItem ("Copy", new BMessage (B_COPY),'C'));
-	fEditmenu->AddItem (new BMenuItem ("Paste", new BMessage (B_PASTE),'V'));
+	fEditmenu = new BMenu("Edit");
+	fEditmenu->AddItem(new BMenuItem("Copy", new BMessage(B_COPY),'C'));
+	fEditmenu->AddItem(new BMenuItem("Paste", new BMessage(B_PASTE),'V'));
 	fEditmenu->AddSeparatorItem();
-	fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
-	fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
+	fEditmenu->AddItem(new BMenuItem("Select All",
+		new BMessage(B_SELECT_ALL), 'A'));
+	fEditmenu->AddItem(new BMenuItem("Clear All",
+		new BMessage(MENU_CLEAR_ALL), 'L'));
 	fEditmenu->AddSeparatorItem();
-	fEditmenu->AddItem (new BMenuItem ("Find" B_UTF8_ELLIPSIS, new BMessage (MENU_FIND_STRING),'F'));
-	fFindBackwardMenuItem = new BMenuItem ("Find Backward", new BMessage (MENU_FIND_BACKWARD), '[');
+	fEditmenu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS,
+		new BMessage(MENU_FIND_STRING),'F'));
+	fFindBackwardMenuItem = new BMenuItem("Find Backward",
+		new BMessage(MENU_FIND_BACKWARD), '[');
 	fEditmenu->AddItem(fFindBackwardMenuItem);
 	fFindBackwardMenuItem->SetEnabled(false);
-	fFindForwardMenuItem = new BMenuItem ("Find Forward", new BMessage (MENU_FIND_FORWARD), ']');
-	fEditmenu->AddItem (fFindForwardMenuItem);
+	fFindForwardMenuItem = new BMenuItem("Find Forward",
+		new BMessage(MENU_FIND_FORWARD), ']');
+	fEditmenu->AddItem(fFindForwardMenuItem);
 	fFindForwardMenuItem->SetEnabled(false);
 
-	fMenubar->AddItem (fEditmenu);
+	fMenubar->AddItem(fEditmenu);
 
 	// Make Help Menu.
 	fHelpmenu = new BMenu("Settings");
@@ -288,15 +298,17 @@ TermWindow::_SetupMenu()
 	
 	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
-	MakeEncodingMenu(fEncodingmenu, true);
+	MakeEncodingMenu(fEncodingmenu, false);
 	fHelpmenu->AddItem(fWindowSizeMenu);  
 	fHelpmenu->AddItem(fEncodingmenu);
 	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS, new BMessage(MENU_PREF_OPEN)));
+	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
+		new BMessage(MENU_PREF_OPEN)));
 	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem("Save as default", new BMessage(SAVE_AS_DEFAULT))); 
+	fHelpmenu->AddItem(new BMenuItem("Save as default",
+		new BMessage(SAVE_AS_DEFAULT))); 
 	fMenubar->AddItem(fHelpmenu);
-	
+
 	AddChild(fMenubar);
 }
 
@@ -320,7 +332,7 @@ TermWindow::MessageReceived(BMessage *message)
 {
 	int32 encodingId;
 	bool findresult;
-  
+
 	switch (message->what) {
 		case B_COPY:
 			_ActiveTermView()->Copy(be_clipboard);
