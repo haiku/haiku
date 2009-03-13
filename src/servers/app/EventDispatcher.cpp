@@ -555,6 +555,9 @@ EventDispatcher::_SendFakeMouseMoved(BMessage* message)
 	moved.AddInt32("_view_token", viewToken);
 		// this only belongs to the new target
 
+	moved.AddBool("_fake", true);
+		// let the view know this is fake
+
 	_SendMessage(target, &moved, kMouseTransitImportance);
 
 	fPreviousMouseTarget = eventTarget;
