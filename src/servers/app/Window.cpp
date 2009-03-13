@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -449,41 +449,53 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 			// the part which we can copy is not dirty
 			newDirty->Exclude(region);
 
+			BRegion* allDirtyRegions = fRegionPool.GetRegion(fDirtyRegion);
+			if (allDirtyRegions != NULL) {
+				if (fPendingUpdateSession->IsUsed()) {
+					allDirtyRegions->Include(
+						&fPendingUpdateSession->DirtyRegion());
+				}
+				if (fCurrentUpdateSession->IsUsed()) {
+					allDirtyRegions->Include(
+						&fCurrentUpdateSession->DirtyRegion());
+				}
+				// Get just the part of the dirty regions which is semantically
+				// copied along
+				allDirtyRegions->IntersectWith(region);
+			}
+
 			BRegion* copyRegion = fRegionPool.GetRegion(*region);
 			if (copyRegion != NULL) {
-				copyRegion->Exclude(&fPendingUpdateSession->DirtyRegion());
-				copyRegion->Exclude(&fCurrentUpdateSession->DirtyRegion());
-				copyRegion->Exclude(&fDirtyRegion);
+				// never copy what's already dirty
+				if (allDirtyRegions != NULL)
+					copyRegion->Exclude(allDirtyRegions);
+
 				fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
 				fRegionPool.Recycle(copyRegion);
 			} else {
+				// Fallback, should never be here.
 				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
 			}
 
-			// move along the already dirty regions that are common
-			// with the region that we could copy
-			_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
-			if (fPendingUpdateSession->IsUsed()) {
-				_ShiftPartOfRegion(&(fPendingUpdateSession->DirtyRegion()), region,
-					xOffset, yOffset);
-			}
-
-			if (fCurrentUpdateSession->IsUsed()) {
-				// if there are parts in the current update session
-				// that intersect with the copied region, we cannot
-				// simply shift them as with the other dirty regions
-				// - we cannot change the update rect already told to the
-				// client, that's why we transfer those parts to the
-				// new dirty region instead
-				BRegion* common = fRegionPool.GetRegion(*region);
-				// see if there is a common part at all
-				common->IntersectWith(&fCurrentUpdateSession->DirtyRegion());
-				if (common->CountRects() > 0) {
-					// cut the common part from the region
-					fCurrentUpdateSession->DirtyRegion().Exclude(common);
-					newDirty->Include(common);
-				}
-				fRegionPool.Recycle(common);
+			if (allDirtyRegions != NULL) {
+				// Move along the dirty regions and include it in the newDirty
+				// region. TODO: This is disabled for the moment, since it
+				// works fine without excluding the pending region. But there
+				// is one occasion where I observed flickering that could be
+				// explained by disabling this.
+				//allDirtyRegions->OffsetBy(xOffset, yOffset);
+				//// no need to include what's already pending anyways
+				//// NOTE: The left overs of the current update session which
+				//// have been moved are still included!
+				//if (fPendingUpdateSession->IsUsed()) {
+					//allDirtyRegions->Exclude(
+						//&fPendingUpdateSession->DirtyRegion());
+				//}
+				//allDirtyRegions->OffsetBy(-xOffset, -yOffset);
+				// include the left over of the moved dirty regions in the
+				// new dirty region
+				newDirty->Include(allDirtyRegions);
+				fRegionPool.Recycle(allDirtyRegions);
 			}
 		}
 	}
