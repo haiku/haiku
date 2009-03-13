@@ -1257,7 +1257,7 @@
 #define STDC_HEADERS 1
 
 /* Define to 1 if strerror_r returns char *. */
-#define STRERROR_R_CHAR_P 1
+/* #undef STRERROR_R_CHAR_P */
 
 /* Define to be the nanoseconds member of struct stat's st_mtim, if it exists.
    */
