@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,9 +23,11 @@
 #include "ActivityMonitor.h"
 #include "ActivityView.h"
 #include "DataSource.h"
+#include "SettingsWindow.h"
 
 
 static const uint32 kMsgAddView = 'advw';
+static const uint32 kMsgShowSettings = 'shst';
 
 
 ActivityWindow::ActivityWindow()
@@ -125,11 +127,138 @@ ActivityWindow::ActivityWindow()
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
+
+	// "Settings" menu
+	menu = new BMenu("Settings");
+	menu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgShowSettings)));
+	menu->SetTargetForItems(this);
+	menuBar->AddItem(menu);
 }
 
 
 ActivityWindow::~ActivityWindow()
 {
+}
+
+
+void
+ActivityWindow::MessageReceived(BMessage* message)
+{
+	if (message->WasDropped()) {
+		_MessageDropped(message);
+		return;
+	}
+
+	switch (message->what) {
+		case B_REFS_RECEIVED:
+		case B_SIMPLE_DATA:
+			_MessageDropped(message);
+			break;
+
+		case kMsgAddView:
+		{
+#ifdef __HAIKU__
+			BView* firstView = fLayout->View()->ChildAt(0);
+
+			_AddDefaultView();
+
+			if (firstView != NULL)
+				ResizeBy(0, firstView->Bounds().Height() + fLayout->Spacing());
+#endif
+			break;
+		}
+
+		case kMsgRemoveView:
+		{
+#ifdef __HAIKU__
+			BView* view;
+			if (message->FindPointer("view", (void**)&view) != B_OK)
+				break;
+
+			view->RemoveSelf();
+			ResizeBy(0, -view->Bounds().Height() - fLayout->Spacing());
+			delete view;
+#endif
+			break;
+		}
+
+		case kMsgShowSettings:
+		{
+			if (fSettingsWindow.IsValid()) {
+				// Just bring the window to front (via scripting)
+				BMessage toFront(B_SET_PROPERTY);
+				toFront.AddSpecifier("Active");
+				toFront.AddSpecifier("Window", "Settings");
+				toFront.AddBool("data", true);
+				fSettingsWindow.SendMessage(&toFront);
+			} else {
+				// Open new settings window
+				BWindow* window = new SettingsWindow(this);
+				window->Show();
+
+				fSettingsWindow = window;
+			}
+			break;
+		}
+
+		case kMsgTimeIntervalUpdated:
+			BroadcastToActivityViews(message);
+			break;
+
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
+}
+
+
+bool
+ActivityWindow::QuitRequested()
+{
+	_SaveSettings();
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
+}
+
+
+int32
+ActivityWindow::ActivityViewCount() const
+{
+#ifdef __HAIKU__
+	return fLayout->View()->CountChildren();
+#else
+	return 1;
+#endif
+}
+
+
+ActivityView*
+ActivityWindow::ActivityViewAt(int32 index) const
+{
+	return dynamic_cast<ActivityView*>(fLayout->View()->ChildAt(index));
+}
+
+
+void
+ActivityWindow::BroadcastToActivityViews(BMessage* message, BView* exceptToView)
+{
+	BView* view;
+	for (int32 i = 0; (view = ActivityViewAt(i)) != NULL; i++) {
+		if (view != exceptToView)
+			PostMessage(message, view);
+	}
+}
+
+
+bigtime_t
+ActivityWindow::RefreshInterval() const
+{
+	ActivityView* view = ActivityViewAt(0);
+	if (view != 0)
+		return view->RefreshInterval();
+
+	return 100000;
 }
 
 
@@ -200,27 +329,6 @@ ActivityWindow::_SaveSettings()
 }
 
 
-int32
-ActivityWindow::ActivityViewCount()
-{
-#ifdef __HAIKU__
-	return fLayout->View()->CountChildren();
-#else
-	return 1;
-#endif
-}
-
-
-void
-ActivityWindow::_MessageDropped(BMessage* message)
-{
-	entry_ref ref;
-	if (message->FindRef("refs", &ref) != B_OK) {
-		// TODO: If app, then launch it, and add ActivityView for this one?
-	}
-}
-
-
 void
 ActivityWindow::_AddDefaultView()
 {
@@ -250,57 +358,11 @@ ActivityWindow::_AddDefaultView()
 
 
 void
-ActivityWindow::MessageReceived(BMessage* message)
+ActivityWindow::_MessageDropped(BMessage* message)
 {
-	if (message->WasDropped()) {
-		_MessageDropped(message);
-		return;
-	}
-
-	switch (message->what) {
-		case B_REFS_RECEIVED:
-		case B_SIMPLE_DATA:
-			_MessageDropped(message);
-			break;
-
-		case kMsgAddView:
-		{
-#ifdef __HAIKU__
-			BView* firstView = fLayout->View()->ChildAt(0);
-
-			_AddDefaultView();
-
-			if (firstView != NULL)
-				ResizeBy(0, firstView->Bounds().Height() + fLayout->Spacing());
-#endif
-			break;
-		}
-
-		case kMsgRemoveView:
-		{
-#ifdef __HAIKU__
-			BView* view;
-			if (message->FindPointer("view", (void**)&view) != B_OK)
-				break;
-
-			view->RemoveSelf();
-			ResizeBy(0, -view->Bounds().Height() - fLayout->Spacing());
-			delete view;
-#endif
-			break;
-		}
-
-		default:
-			BWindow::MessageReceived(message);
-			break;
+	entry_ref ref;
+	if (message->FindRef("refs", &ref) != B_OK) {
+		// TODO: If app, then launch it, and add ActivityView for this one?
 	}
 }
 
-
-bool
-ActivityWindow::QuitRequested()
-{
-	_SaveSettings();
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
-}

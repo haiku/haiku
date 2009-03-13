@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 
 #include "ActivityMonitor.h"
 #include "ActivityWindow.h"
+#include "SettingsWindow.h"
 #include "SystemInfo.h"
 #include "SystemInfoHandler.h"
 
@@ -92,10 +93,11 @@ private:
 };
 #endif
 
-const bigtime_t kInitialRefreshInterval = 500000LL;
+const bigtime_t kInitialRefreshInterval = 250000LL;
 
 const uint32 kMsgToggleDataSource = 'tgds';
 const uint32 kMsgToggleLegend = 'tglg';
+const uint32 kMsgUpdateResolution = 'ures';
 
 extern const char* kSignature;
 
@@ -627,7 +629,7 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 
 	for (uint32 i = 0; i < count; i++) {
 		DataHistory* values = new(std::nothrow) DataHistory(10 * 60000000LL,
-			fRefreshInterval);
+			RefreshInterval());
 		if (values == NULL)
 			return B_NO_MEMORY;
 
@@ -874,21 +876,14 @@ ActivityView::MouseMoved(BPoint where, uint32 transit,
 	if (!fZooming)
 		return;
 
-	int32 previousResolution = fDrawResolution;
-
 	int32 shift = int32(where.x - fZoomPoint.x) / 25;
+	int32 resolution;
 	if (shift > 0)
-		fDrawResolution = fOriginalResolution << shift;
+		resolution = fOriginalResolution << shift;
 	else
-		fDrawResolution = fOriginalResolution >> -shift;
+		resolution = fOriginalResolution >> -shift;
 
-	if (fDrawResolution < 1)
-		fDrawResolution = 1;
-	if (fDrawResolution > 128)
-		fDrawResolution = 128;
-
-	if (previousResolution != fDrawResolution)
-		Invalidate();
+	_UpdateResolution(resolution);
 }
 
 
@@ -939,6 +934,32 @@ ActivityView::MessageReceived(BMessage* message)
 			ActivityMonitor::ShowAbout();
 			break;
 
+		case kMsgUpdateResolution:
+		{
+			int32 resolution;
+			if (message->FindInt32("resolution", &resolution) != B_OK)
+				break;
+
+			_UpdateResolution(resolution, false);
+			break;
+		}
+
+		case kMsgTimeIntervalUpdated:
+			bigtime_t interval;
+			if (message->FindInt64("interval", &interval) != B_OK)
+				break;
+
+			if (interval < 10000)
+				interval = 10000;
+
+			atomic_set64(&fRefreshInterval, interval);
+			
+			if (interval > 250000)
+				atomic_set64(&fDrawInterval, interval);
+			else
+				atomic_set64(&fDrawInterval, interval * 2);
+			break;
+
 		case kMsgToggleDataSource:
 		{
 			int32 index;
@@ -971,17 +992,13 @@ ActivityView::MessageReceived(BMessage* message)
 				|| deltaY == 0.0f)
 				break;
 
+			int32 resolution = fDrawResolution;
 			if (deltaY > 0)
-				fDrawResolution *= 2;
+				resolution *= 2;
 			else
-				fDrawResolution /= 2;
+				resolution /= 2;
 
-			if (fDrawResolution < 1)
-				fDrawResolution = 1;
-			if (fDrawResolution > 128)
-				fDrawResolution = 128;
-
-			Invalidate();
+			_UpdateResolution(resolution);
 			break;
 		}
 
@@ -1139,7 +1156,7 @@ ActivityView::_DrawHistory()
 
 	uint32 width = frame.IntegerWidth() - 10;
 	uint32 steps = width / step;
-	bigtime_t timeStep = fRefreshInterval * resolution;
+	bigtime_t timeStep = RefreshInterval() * resolution;
 	bigtime_t now = system_time();
 
 	// Draw scale
@@ -1161,7 +1178,7 @@ ActivityView::_DrawHistory()
 
 	// Draw values
 
-	view->SetPenSize(2);
+	view->SetPenSize(1.5);
 	BAutolock _(fSourcesLock);
 
 	for (uint32 i = fSources.CountItems(); i-- > 0;) {
@@ -1182,12 +1199,12 @@ ActivityView::_DrawHistory()
 				continue;
 
 			int64 value = values->ValueAt(time);
-			if (timeStep > fRefreshInterval) {
+			if (timeStep > RefreshInterval()) {
 				// TODO: always start with the same index, so that it always
 				// uses the same values for computation (currently it jumps)
 				uint32 count = 1;
-				for (bigtime_t offset = fRefreshInterval; offset < timeStep;
-						offset += fRefreshInterval) {
+				for (bigtime_t offset = RefreshInterval(); offset < timeStep;
+						offset += RefreshInterval()) {
 					// TODO: handle int64 overflow correctly!
 					value += values->ValueAt(time + offset);
 					count++;
@@ -1214,6 +1231,29 @@ ActivityView::_DrawHistory()
 		fOffscreen->Unlock();
 		DrawBitmap(fOffscreen);
 	}
+}
+
+
+void
+ActivityView::_UpdateResolution(int32 resolution, bool broadcast)
+{
+	if (resolution < 1)
+		resolution = 1;
+	if (resolution > 128)
+		resolution = 128;
+
+	if (resolution == fDrawResolution)
+		return;
+
+	ActivityWindow* window = dynamic_cast<ActivityWindow*>(Window());
+	if (broadcast && window != NULL) {
+		BMessage update(kMsgUpdateResolution);
+		update.AddInt32("resolution", resolution);
+		window->BroadcastToActivityViews(&update, this);
+	}
+
+	fDrawResolution = resolution;
+	Invalidate();
 }
 
 
@@ -1270,19 +1310,19 @@ ActivityView::Draw(BRect /*updateRect*/)
 void
 ActivityView::_Refresh()
 {
-	bigtime_t lastTimeout = system_time() - fRefreshInterval;
+	bigtime_t lastTimeout = system_time() - RefreshInterval();
 	BMessenger target(this);
 
 	while (true) {
 		status_t status = acquire_sem_etc(fRefreshSem, 1, B_ABSOLUTE_TIMEOUT,
-			lastTimeout + fRefreshInterval);
+			lastTimeout + RefreshInterval());
 		if (status == B_OK || status == B_BAD_SEM_ID)
 			break;
 		if (status == B_INTERRUPTED)
 			continue;
 
 		SystemInfo info(fSystemInfoHandler);
-		lastTimeout += fRefreshInterval;
+		lastTimeout += RefreshInterval();
 
 		fSourcesLock.Lock();
 
@@ -1297,7 +1337,7 @@ ActivityView::_Refresh()
 		fSourcesLock.Unlock();
 
 		bigtime_t now = info.Time();
-		if (fLastRefresh + fDrawInterval <= now) {
+		if (fLastRefresh + DrawInterval() <= now) {
 			target.SendMessage(B_INVALIDATE);
 			fLastRefresh = now;
 		}

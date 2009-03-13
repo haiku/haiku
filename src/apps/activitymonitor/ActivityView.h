@@ -74,6 +74,11 @@ public:
 			status_t	RemoveDataSource(const DataSource* source);
 			void		RemoveAllDataSources();
 
+			bigtime_t	RefreshInterval() const
+							{ return atomic_get64((vint64*)&fRefreshInterval); }
+			bigtime_t	DrawInterval() const
+							{ return atomic_get64((vint64*)&fDrawInterval); }
+
 protected:
 	virtual	void		AttachedToWindow();
 	virtual	void		DetachedFromWindow();
@@ -108,6 +113,8 @@ private:
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
 			void		_DrawHistory();
+			void		_UpdateResolution(int32 resolution,
+							bool broadcast = true);
 
 private:
 	class HistoryLayoutItem;

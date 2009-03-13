@@ -10,6 +10,7 @@ Application ActivityMonitor :
 	ActivityView.cpp
 	ActivityWindow.cpp
 	DataSource.cpp
+	SettingsWindow.cpp
 	SystemInfo.cpp
 	SystemInfoHandler.cpp
 
