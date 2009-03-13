@@ -37,6 +37,14 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 				// Fall through
 			}
 			case B_MOUSE_MOVED:
+			{
+				// ignore the initial "fake" B_MOUSE_MOVED sent by the app_server
+				bool fake = false;
+				if (message->FindBool("_fake", &fake) == B_OK && fake)
+					return B_DISPATCH_MESSAGE;
+
+				// Fall through
+			}
 			case B_MOUSE_DOWN:
 				fEnabled = false;
 				be_app->PostMessage(B_QUIT_REQUESTED);
@@ -77,21 +85,12 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 	// Ensure that this view receives keyboard input
 	fTopView->MakeFocus(true);
 	fTopView->SetEventMask(B_KEYBOARD_EVENTS, 0);
-
-	// A delay is necessary (250ms was chosen arbitrarily) before enabling the
-	// message filter because when the window first shows some mouse moved 
-	// messages are sent to it automatically.
-	BMessage enable(kMsgEnableFilter);
-	fEnableRunner = new BMessageRunner(BMessenger(this), &enable, 250000LL, 1);
-	if (fEnableRunner->InitCheck() != B_OK)
-		syslog(LOG_ERR, "Runner to enable screen saver message filtering failed!\n");
 }
 
 
 ScreenSaverWindow::~ScreenSaverWindow()
 {
 	Hide();
-	delete fEnableRunner;
 	delete fFilter;
 }
 

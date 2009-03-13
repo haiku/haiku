@@ -10,7 +10,6 @@
 
 #include <DirectWindow.h>
 #include <MessageFilter.h>
-#include <MessageRunner.h>
 
 
 const static uint32 kMsgEnableFilter = 'eflt';
@@ -20,7 +19,7 @@ class ScreenSaverFilter : public BMessageFilter {
 	public:
 		ScreenSaverFilter()
 			: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-			fEnabled(false) {}
+			fEnabled(true) {}
 
 		virtual filter_result Filter(BMessage* message, BHandler** target);
 
@@ -46,7 +45,6 @@ class ScreenSaverWindow : public BDirectWindow {
 		BView *fTopView;
 		BScreenSaver *fSaver;
 		ScreenSaverFilter *fFilter;
-		BMessageRunner *fEnableRunner;
 };
 
 #endif	// SCREEN_SAVER_WINDOW_H

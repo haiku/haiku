@@ -238,7 +238,7 @@ ScreenBlanker::MessageReceived(BMessage* message)
 
 			// Turn on the message filter again
 			BMessage enable(kMsgEnableFilter);
-			BMessenger(fWindow).SendMessage(&enable);
+			fWindow->PostMessage(&enable);
 
 			_QueueTurnOffScreen();
 			break;
