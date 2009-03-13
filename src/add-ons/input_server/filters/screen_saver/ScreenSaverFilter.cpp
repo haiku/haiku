@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2008, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 
 
@@ -19,11 +20,8 @@
 #include <Roster.h>
 #include <Screen.h>
 
-#include <Debug.h>
-
 #include <new>
-
-#define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
+#include <syslog.h>
 
 
 static const int32 kNeverBlankCornerSize = 10;
@@ -38,8 +36,7 @@ static const int32 kMsgCornerInvoke = 'Scin';
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 
 
-/** required C func to build the IS Filter */
-
+/** Required C func to build the IS Filter */
 BInputServerFilter*
 instantiate_input_filter()
 {
@@ -54,16 +51,12 @@ ScreenSaverController::ScreenSaverController(ScreenSaverFilter *filter)
 	: BLooper("screensaver controller", B_LOW_PRIORITY),
 	fFilter(filter)
 {
-	CALLED();
 }
 
 
 void
 ScreenSaverController::MessageReceived(BMessage *message)
 {
-	CALLED();
-	SERIAL_PRINT(("what %lx\n", message->what));
-
 	switch (message->what) {
 		case B_NODE_MONITOR:
 			fFilter->ReloadSettings();
@@ -76,13 +69,8 @@ ScreenSaverController::MessageReceived(BMessage *message)
 				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0) {
 				fFilter->SetEnabled(message->what == B_SOME_APP_LAUNCHED);
 			}
-			SERIAL_PRINT(("mime_sig %s\n", signature));
 			break;
 		}
-
-		case kMsgSuspendScreenSaver:
-			//fFilter->Suspend(msg);
-			break;
 
 		case kMsgCheckTime:
 			fFilter->CheckTime();
@@ -114,7 +102,6 @@ ScreenSaverFilter::ScreenSaverFilter()
 	fWatchingFile(false),
 	fEnabled(false)
 {
-	CALLED();
 	fController = new (std::nothrow) ScreenSaverController(this);
 	if (fController == NULL)
 		return;
@@ -185,40 +172,20 @@ ScreenSaverFilter::_WatchSettings()
 void
 ScreenSaverFilter::_Invoke()
 {
-	CALLED();
 	if (fCurrentCorner == fNeverBlankCorner && fNeverBlankCorner != NO_CORNER
 		|| fSettings.TimeFlags() == SAVER_DISABLED
 		|| fEnabled
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
 
-	SERIAL_PRINT(("we run screenblanker\n"));
 	if (be_roster->Launch(SCREEN_BLANKER_SIG) == B_OK)
 		fEnabled = true;
-}
-
-
-/*! Stops the running screen saver, if any */
-void
-ScreenSaverFilter::_Banish() 
-{
-	CALLED();
-	if (!fEnabled)
-		return;
-
-	SERIAL_PRINT(("we quit screenblanker\n"));
-
-	// Don't care if it fails
-	BMessenger blankerMessenger(SCREEN_BLANKER_SIG, -1, NULL);
-	blankerMessenger.SendMessage(B_QUIT_REQUESTED);
-	fEnabled = false;
 }
 
 
 void
 ScreenSaverFilter::ReloadSettings()
 {
-	CALLED();
 	BAutolock _(this);
 	bool isFirst = !fWatchingDirectory && !fWatchingFile;
 
@@ -251,7 +218,7 @@ ScreenSaverFilter::ReloadSettings()
 	fRunner = new (std::nothrow) BMessageRunner(fController, &check,
 		fSnoozeTime);
 	if (fRunner == NULL || fRunner->InitCheck() != B_OK) {
-		SERIAL_PRINT(("screen saver filter runner init failed\n"));
+		syslog(LOG_ERR, "screen saver filter runner init failed\n");
 	}
 }
 
@@ -267,7 +234,6 @@ ScreenSaverFilter::SetEnabled(bool enabled)
 void
 ScreenSaverFilter::CheckTime()
 {
-	CALLED();
 	BAutolock _(this);
 
 	bigtime_t now = system_time();
@@ -307,9 +273,6 @@ ScreenSaverFilter::CheckCornerInvoke()
 void
 ScreenSaverFilter::_UpdateRectangles()
 {
-	// TODO: make this better if possible at all (in a clean way)
-	CALLED();
-
 	fBlankRect = _ScreenCorner(fBlankCorner, kBlankCornerSize);
 	fNeverBlankRect = _ScreenCorner(fNeverBlankCorner, kNeverBlankCornerSize);
 }
@@ -382,20 +345,8 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 				fCurrentCorner = NO_CORNER;
 			break;
 		}
-
-		case B_KEY_UP:
-		case B_KEY_DOWN:
-		{
-			// we ignore the Print-Screen key to make screen shots of
-			// screen savers possible
-			int32 key;
-			if (fEnabled && message->FindInt32("key", &key) == B_OK
-				&& key == 0xe)
-				return B_DISPATCH_MESSAGE;
-		}
 	}
 
-	_Banish();
 	return B_DISPATCH_MESSAGE;
 }
 

@@ -19,8 +19,6 @@
 #include <Node.h>
 
 
-static const uint32 kMsgSuspendScreenSaver = 'susp';
-
 class BMessageRunner;
 class ScreenSaverFilter;
 
@@ -59,7 +57,6 @@ private:
 									uint32 cornerSize);
 
 			void				_Invoke();
-			void				_Banish();
 
 			ScreenSaverSettings	fSettings;
 			bigtime_t			fLastEventTime;

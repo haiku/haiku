@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2007, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 
 
@@ -58,8 +59,7 @@ void
 ScreenBlanker::ReadyToRun()
 {
 	if (!fSettings.Load()) {
-		fprintf(stderr, "could not load settings\n");
-		exit(1);
+		fprintf(stderr, "could not load settings, using defaults\n");
 	}
 
 	// create a BDirectWindow and start the render thread.
@@ -123,7 +123,8 @@ ScreenBlanker::_ShowPasswordWindow()
 		fWindow->Sync();
 			// TODO: is that needed?
 		ShowCursor();
-		fPasswordWindow->Show();
+		if (fPasswordWindow->IsHidden())
+			fPasswordWindow->Show();
 
 		fWindow->Unlock();
 	}
@@ -193,7 +194,7 @@ ScreenBlanker::_QueueTurnOffScreen()
 		fSuspendScreenRunner = new BMessageRunner(BMessenger(this), &dpms,
 			fSettings.SuspendTime(), 1);
 		if (fSuspendScreenRunner->InitCheck() != B_OK)
-			syslog(LOG_ERR, "turn off screen saver runner failed\n");
+			syslog(LOG_ERR, "suspend screen saver runner failed\n");
 	}
 
 	if (flags & ENABLE_DPMS_OFF) {
@@ -226,6 +227,7 @@ ScreenBlanker::MessageReceived(BMessage* message)
 		}
 
 		case kMsgResumeSaver:
+		{
 			if (fWindow->Lock()) {
 				HideCursor();
 				fPasswordWindow->Hide();
@@ -234,8 +236,13 @@ ScreenBlanker::MessageReceived(BMessage* message)
 				fWindow->Unlock();
 			}
 
+			// Turn on the message filter again
+			BMessage enable(kMsgEnableFilter);
+			BMessenger(fWindow).SendMessage(&enable);
+
 			_QueueTurnOffScreen();
 			break;
+		}
 
 		case kMsgTurnOffScreen:
 			_SetDPMSMode(B_DPMS_OFF);

@@ -1,10 +1,11 @@
 /*
- * Copyright 2003-2008, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 
 
@@ -14,6 +15,44 @@
 #include <View.h>
 
 #include <WindowPrivate.h>
+
+#include <syslog.h>
+
+
+/* This message filter is what will close the screensaver upon user activity. */
+filter_result
+ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
+{
+	// This guard is used to avoid sending multiple B_QUIT_REQUESTED messages
+	if (fEnabled) {
+		switch (message->what) {
+			case B_KEY_DOWN:
+			{
+				// we ignore the Print-Screen key to make screen shots of
+				// screen savers possible
+				int32 key;
+				if (message->FindInt32("key", &key) == B_OK && key == 0xe)
+					return B_DISPATCH_MESSAGE;
+
+				// Fall through
+			}
+			case B_MOUSE_MOVED:
+			case B_MOUSE_DOWN:
+				fEnabled = false;
+				be_app->PostMessage(B_QUIT_REQUESTED);
+				break;
+		}
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+void
+ScreenSaverFilter::SetEnabled(bool enabled)
+{
+	fEnabled = enabled;
+}
 
 
 /*!
@@ -29,13 +68,31 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 	frame.OffsetTo(0, 0);
 	fTopView = new BView(frame, "ScreenSaver View", B_FOLLOW_ALL, B_WILL_DRAW);
 	fTopView->SetViewColor(0, 0, 0);
+
+	fFilter = new ScreenSaverFilter();
+	fTopView->AddFilter(fFilter);
+	
 	AddChild(fTopView);
+
+	// Ensure that this view receives keyboard input
+	fTopView->MakeFocus(true);
+	fTopView->SetEventMask(B_KEYBOARD_EVENTS, 0);
+
+	// A delay is necessary (250ms was chosen arbitrarily) before enabling the
+	// message filter because when the window first shows some mouse moved 
+	// messages are sent to it automatically.
+	BMessage enable(kMsgEnableFilter);
+	fEnableRunner = new BMessageRunner(BMessenger(this), &enable, 250000LL, 1);
+	if (fEnableRunner->InitCheck() != B_OK)
+		syslog(LOG_ERR, "Runner to enable screen saver message filtering failed!\n");
 }
 
 
 ScreenSaverWindow::~ScreenSaverWindow()
 {
 	Hide();
+	delete fEnableRunner;
+	delete fFilter;
 }
 
 
@@ -43,6 +100,21 @@ void
 ScreenSaverWindow::SetSaver(BScreenSaver *saver)
 {
 	fSaver = saver;
+}
+
+
+void
+ScreenSaverWindow::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgEnableFilter:
+			fFilter->SetEnabled(true);
+			break;
+
+		default:
+			BWindow::MessageReceived(message);
+ 			break;
+	}
 }
 
 
