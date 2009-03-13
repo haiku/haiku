@@ -232,8 +232,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) = 4 {
 		# gcc and binutils
 		local baseURL = http://haiku.mlotz.ch ;
-		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090129
-			: $(baseURL)/gcc-4.3.3-haiku-090129.zip
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090313
+			: $(baseURL)/gcc-4.3.3-haiku-090313.zip
 			:
 		;
 
