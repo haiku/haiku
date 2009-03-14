@@ -196,12 +196,12 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	switch (which) {
 		/* Per volume directories */
 		case B_DESKTOP_DIRECTORY:
-			if (!strcmp(fsInfo.fsh_name, "bfs"))
+			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
 				template = "$h/Desktop";
 			break;
 		case B_TRASH_DIRECTORY:
 			// TODO: eventually put that into the file system API?
-			if (!strcmp(fsInfo.fsh_name, "bfs"))
+			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
 				template = "$h/Desktop/Trash";
 			else if (!strcmp(fsInfo.fsh_name, "dos"))
 				template = "RECYCLED/_BEOS_";
