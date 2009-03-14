@@ -38,9 +38,10 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 			}
 			case B_MOUSE_MOVED:
 			{
-				// ignore the initial "fake" B_MOUSE_MOVED sent by the app_server
-				bool fake = false;
-				if (message->FindBool("_fake", &fake) == B_OK && fake)
+				// ignore the initial B_MOUSE_MOVED sent by the app_server
+				bool transit_only = false;
+				if (message->FindBool("be:transit_only", &transit_only) == B_OK
+					&& transit_only)
 					return B_DISPATCH_MESSAGE;
 
 				// Fall through
