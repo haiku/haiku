@@ -18,6 +18,7 @@
 
 #include <WindowPrivate.h>
 
+using std::max;
 
 WorkspacesView::WorkspacesView(BRect frame, BPoint scrollingOffset,
 		const char* name, int32 token, uint32 resizeMode, uint32 flags)
