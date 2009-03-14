@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 auich ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 KernelAddon auich :
 	ac97.c

@@ -145,7 +145,7 @@ auvia_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			value = auvia_codec_read(&dev->config, info->reg);
 			value &= ~mask;
 			value |= ((values[0] == 1.0 ? 1 : 0 ) << 15 & mask);
-			if(info->reg == AC97_SURROUND_VOLUME) {
+			if(info->reg == AC97_SURR_VOLUME) {
 				// there is a independent mute for each channel
 				mask = ((1 << 1) - 1) << 7;
 				value &= ~mask;
