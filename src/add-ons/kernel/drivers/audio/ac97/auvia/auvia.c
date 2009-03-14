@@ -175,7 +175,7 @@ auvia_stream_commit_parms(auvia_stream *stream)
 		(uint32)stream->dmaops_phy_base);
 		
 	if(stream->use & AUVIA_USE_RECORD)
-		auvia_codec_write(&stream->card->config, AC97_PCM_LR_ADC_RATE, (uint16)stream->sample_rate);
+		auvia_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, (uint16)stream->sample_rate);
 	else
 		auvia_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, (uint16)stream->sample_rate);
 	
@@ -489,6 +489,8 @@ auvia_setup(auvia_dev * card)
 
 	make_device_names(card);
 	
+	card->config.subvendor_id = card->info.u.h0.subsystem_vendor_id;
+	card->config.subsystem_id = card->info.u.h0.subsystem_id;
 	card->config.nabmbar = card->info.u.h0.base_registers[0];
 	card->config.irq = card->info.u.h0.interrupt_line;
 	card->config.type = 0;
@@ -506,53 +508,18 @@ auvia_setup(auvia_dev * card)
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
 
-	/* reset the codec */	
-	PRINT(("codec reset\n"));
-	auvia_codec_write(&card->config, 0x00, 0x0000);
-	snooze(50000); // 50 ms
+	/* attach the codec */
+	PRINT(("codec attach\n"));
+	ac97_attach(&card->config.ac97, (codec_reg_read)auvia_codec_read,
+		(codec_reg_write)auvia_codec_write, &card->config,
+		card->config.subvendor_id, card->config.subsystem_id);
 
-	ac97_init(&card->config);
-	ac97_amp_enable(&card->config, true);
+	PRINT(("codec vendor id      = %#08lx\n", card->config.ac97->codec_id));
+	PRINT(("codec description     = %s\n", card->config.ac97->codec_info));
+	PRINT(("codec 3d enhancement = %s\n", card->config.ac97->codec_3d_stereo_enhancement));
 
-	PRINT(("codec vendor id      = %#08lx\n",ac97_get_vendor_id(&card->config)));
-	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
-	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
-	
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
 	install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);
-		
-	/*PRINT(("codec master output = %#04x\n",auvia_codec_read(&card->config, 0x02)));
-	PRINT(("codec aux output    = %#04x\n",auvia_codec_read(&card->config, 0x04)));
-	PRINT(("codec mono output   = %#04x\n",auvia_codec_read(&card->config, 0x06)));
-	PRINT(("codec pcm output    = %#04x\n",auvia_codec_read(&card->config, 0x18)));
-	PRINT(("codec line in	    = %#04x\n",auvia_codec_read(&card->config, 0x10)));
-	PRINT(("codec record line in= %#04x\n",auvia_codec_read(&card->config, 0x1a)));
-	PRINT(("codec record gain   = %#04x\n",auvia_codec_read(&card->config, 0x1c)));*/
-	
-	PRINT(("writing codec registers\n"));
-	// TODO : to move with AC97
-	/* enable master output */
-	auvia_codec_write(&card->config, AC97_MASTER_VOLUME, 0x0000);
-	/* enable aux output */
-	auvia_codec_write(&card->config, AC97_AUX_OUT_VOLUME, 0x0000);
-	/* enable mono output */
-	//auvia_codec_write(&card->config, AC97_MONO_VOLUME, 0x0004);
-	/* enable pcm output */
-	auvia_codec_write(&card->config, AC97_PCM_OUT_VOLUME, 0x0808);
-	/* enable line in */
-	//auvia_codec_write(&card->config, AC97_LINE_IN_VOLUME, 0x8808);
-	/* set record line in */
-	auvia_codec_write(&card->config, AC97_RECORD_SELECT, 0x0404);
-	/* set record gain */
-	//auvia_codec_write(&card->config, AC97_RECORD_GAIN, 0x0000);
-
-	PRINT(("codec master output = %#04x\n",auvia_codec_read(&card->config, AC97_MASTER_VOLUME)));
-	PRINT(("codec aux output    = %#04x\n",auvia_codec_read(&card->config, AC97_AUX_OUT_VOLUME)));
-	PRINT(("codec mono output   = %#04x\n",auvia_codec_read(&card->config, AC97_MONO_VOLUME)));
-	PRINT(("codec pcm output    = %#04x\n",auvia_codec_read(&card->config, AC97_PCM_OUT_VOLUME)));
-	PRINT(("codec line in	    = %#04x\n",auvia_codec_read(&card->config, AC97_LINE_IN_VOLUME)));
-	PRINT(("codec record line in= %#04x\n",auvia_codec_read(&card->config, AC97_RECORD_SELECT)));
-	PRINT(("codec record gain   = %#04x\n",auvia_codec_read(&card->config, AC97_RECORD_GAIN)));
 		
 	if ((err = auvia_init(card)))
 		return (err);
@@ -615,6 +582,7 @@ static void
 auvia_shutdown(auvia_dev *card)
 {
 	PRINT(("shutdown(%p)\n", card));
+	ac97_detach(card->config.ac97);
 	remove_io_interrupt_handler(card->config.irq, auvia_int, card);
 }
 

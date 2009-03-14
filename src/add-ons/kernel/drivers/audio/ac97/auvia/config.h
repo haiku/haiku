@@ -31,6 +31,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#include "ac97.h"
+
 #define NUM_CARDS 3
 #define DEVNAME 32
 
@@ -39,6 +41,11 @@ typedef struct
 	uint32	nabmbar;
 	uint32	irq;
 	uint32	type;
+
+	ushort	subvendor_id;
+	ushort	subsystem_id;
+
+	ac97_dev *ac97;
 } device_config;
 
 #define TYPE_686			0x01
