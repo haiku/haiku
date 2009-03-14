@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -52,6 +52,8 @@ public:
 	static	status_t	Identify(int fd, ext2_super_block* superBlock);
 
 private:
+	static uint32		_UnsupportedIncompatibleFeatures(
+							ext2_super_block& superBlock);
 			off_t		_GroupBlockOffset(uint32 blockIndex);
 
 private:

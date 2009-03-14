@@ -269,11 +269,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_BAD_VALUE;
 	}
 
-	if ((fSuperBlock.IncompatibleFeatures()
-			& EXT2_INCOMPATIBLE_FEATURE_COMPRESSION) != 0) {
-		dprintf("ext2: compression not supported.\n");
+	if (_UnsupportedIncompatibleFeatures(fSuperBlock) != 0)
 		return B_NOT_SUPPORTED;
-	}
 
 	// initialize short hands to the super block (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
@@ -372,6 +369,25 @@ Volume::InodeBlockIndex(ino_t id) const
 }
 
 
+/*static*/ uint32
+Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
+{
+	uint32 supportedIncompatible = EXT2_INCOMPATIBLE_FEATURE_FILE_TYPE
+		| EXT2_INCOMPATIBLE_FEATURE_RECOVER
+		| EXT2_INCOMPATIBLE_FEATURE_JOURNAL
+		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
+
+	if ((superBlock.IncompatibleFeatures() & ~supportedIncompatible) != 0) {
+		dprintf("ext2: incompatible features not supported: %lx (extents %x)\n",
+			superBlock.IncompatibleFeatures() & ~supportedIncompatible,
+			EXT2_INCOMPATIBLE_FEATURE_EXTENTS);
+		return superBlock.IncompatibleFeatures() & ~supportedIncompatible;
+	}
+
+	return 0;
+}
+
+
 off_t
 Volume::_GroupBlockOffset(uint32 blockIndex)
 {
@@ -437,6 +453,6 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 	if (!superBlock->IsValid())
 		return B_BAD_VALUE;
 
-	return B_OK;
+	return _UnsupportedIncompatibleFeatures(*superBlock) == 0;
 }
 
