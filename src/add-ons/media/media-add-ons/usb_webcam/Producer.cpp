@@ -29,7 +29,7 @@
 #define SINGLE_PARAMETER_GROUP 1
 
 // CodyCam and eXposer prefer 320x240
-//#define FORCE_320_240 1
+#define FORCE_320_240 1
 //#define FORCE_160_120 1
 //#define FORCE_MAX_FRAME 1
 

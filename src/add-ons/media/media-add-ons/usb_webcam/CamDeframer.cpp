@@ -18,8 +18,14 @@ fDevice(device),
 fState(ST_SYNC),
 fFrameSem(B_ERROR),
 fLocker("CamDeframer Framelist lock", true),
+fSOFTags(NULL),
+fEOFTags(NULL),
 fNumSOFTags(0),
-fNumEOFTags(0)
+fNumEOFTags(0),
+fLenSOFTags(0),
+fLenEOFTags(0),
+fSkipSOFTags(0),
+fSkipEOFTags(0)
 {
 	fMinFrameSize = fDevice->MinRawFrameSize();
 	fMaxFrameSize = fDevice->MaxRawFrameSize();
