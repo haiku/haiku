@@ -547,14 +547,19 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 	if (fSelectedWorkspace == Window()->Desktop()->CurrentWorkspace())
 		leftTop = fSelectedWindow->Frame().LeftTop();
 	else {
-		if (fSelectedWindow->Anchor(fSelectedWorkspace).position == kInvalidWindowPosition)
-			fSelectedWindow->Anchor(fSelectedWorkspace).position = fSelectedWindow->Frame().LeftTop();
+		if (fSelectedWindow->Anchor(fSelectedWorkspace).position
+				== kInvalidWindowPosition) {
+			fSelectedWindow->Anchor(fSelectedWorkspace).position
+				= fSelectedWindow->Frame().LeftTop();
+		}
 		leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
 	}
 
-	float diff = (fClickPoint.x - where.x) * (fClickPoint.x - where.x)
-		+ (fClickPoint.y - where.y) * (fClickPoint.y - where.y);
-	if (!fHasMoved && diff > 4)
+	// Don't treat every little mouse move as a window move - this would
+	// make it too hard to activate a workspace.
+	float diff = max(fabs(fClickPoint.x - where.x),
+		fabs(fClickPoint.y - where.y));
+	if (!fHasMoved && diff > 2)
 		fHasMoved = true;
 
 	if (fHasMoved) {
