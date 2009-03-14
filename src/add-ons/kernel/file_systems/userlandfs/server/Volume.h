@@ -55,7 +55,7 @@ public:
 
 	// asynchronous I/O
 	virtual	status_t			DoIO(void* node, void* cookie,
-									IORequestInfo* requestInfo);
+									const IORequestInfo& requestInfo);
 	virtual	status_t			CancelIO(void* node, void* cookie,
 									int32 ioRequestID);
 

@@ -193,7 +193,7 @@ Volume::RemoveVNode(void* node, bool reenter)
 
 
 status_t
-Volume::DoIO(void* node, void* cookie, IORequestInfo* requestInfo)
+Volume::DoIO(void* node, void* cookie, const IORequestInfo& requestInfo)
 {
 	return B_BAD_VALUE;
 }

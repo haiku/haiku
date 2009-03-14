@@ -9,6 +9,7 @@
 
 namespace UserlandFS {
 
+class HaikuKernelFileSystem;
 class HaikuKernelNode;
 
 
@@ -34,7 +35,6 @@ public:
 			void				UndoPublishVNode(HaikuKernelNode* node);
 
 			HaikuKernelNode*	NodeWithID(ino_t vnodeID) const;
-			IORequestInfo*		IORequestInfoWithID(int32 id) const;
 
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
@@ -62,7 +62,7 @@ public:
 
 	// asynchronous I/O
 	virtual	status_t			DoIO(void* node, void* cookie,
-									IORequestInfo* requestInfo);
+									const IORequestInfo& requestInfo);
 	virtual	status_t			CancelIO(void* node, void* cookie,
 									int32 ioRequestID);
 
@@ -185,17 +185,15 @@ private:
 	};
 
 	class NodeMap;
-	class IORequestHashDefinition;
-	class IORequestTable;
 
 private:
 			void				_InitCapabilities();
+	inline	HaikuKernelFileSystem* _FileSystem() const;
 
 private:
 			file_system_module_info* fFSModule;
 			FSVolume			fVolume;
 			NodeMap*			fNodes;
-			IORequestTable*		fIORequests;
 };
 
 

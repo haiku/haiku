@@ -552,8 +552,8 @@ UserlandRequestHandler::_HandleRequest(DoIORequest* request)
 
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
-		IORequestInfo requestInfo(request->ioRequest, request->isWrite);
-		result = volume->DoIO(request->node, request->fileCookie, &requestInfo);
+		IORequestInfo requestInfo(request->request, request->isWrite);
+		result = volume->DoIO(request->node, request->fileCookie, requestInfo);
 	}
 
 	// prepare the reply
@@ -582,7 +582,7 @@ UserlandRequestHandler::_HandleRequest(CancelIORequest* request)
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->CancelIO(request->node, request->fileCookie,
-			request->ioRequest);
+			request->request);
 	}
 
 	// prepare the reply

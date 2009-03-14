@@ -227,6 +227,10 @@ enum {
 	FILE_CACHE_WRITE_REQUEST,
 	FILE_CACHE_WRITE_REPLY,
 
+	// I/O
+	DO_ITERATIVE_FD_IO_REQUEST,
+	DO_ITERATIVE_FD_IO_REPLY,
+
 	// general reply
 	RECEIPT_ACK_REPLY,
 
@@ -543,7 +547,7 @@ class DoIORequest : public FileRequest {
 public:
 	DoIORequest() : FileRequest(DO_IO_REQUEST) {}
 
-	int32		ioRequest;
+	int32		request;
 	bool		isWrite;
 };
 
@@ -558,7 +562,7 @@ class CancelIORequest : public FileRequest {
 public:
 	CancelIORequest() : FileRequest(CANCEL_IO_REQUEST) {}
 
-	int32		ioRequest;
+	int32		request;
 };
 
 // CancelIOReply
@@ -1740,6 +1744,29 @@ public:
 };
 
 
+// #pragma mark - I/O
+
+
+// DoIterativeFDIORequest
+class DoIterativeFDIORequest : public Request {
+public:
+	DoIterativeFDIORequest() : Request(DO_ITERATIVE_FD_IO_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	int			fd;
+	int32		request;
+	void*		cookie;
+	Address		vecs;
+	uint32		vecCount;
+};
+
+// DoIterativeFDIOReply
+class DoIterativeFDIOReply : public ReplyRequest {
+public:
+	DoIterativeFDIOReply() : ReplyRequest(DO_ITERATIVE_FD_IO_REPLY) {}
+};
+
+
 //////////////////
 // General Reply
 
@@ -2125,6 +2152,11 @@ do_for_request(Request* request, Task& task)
 			return task((FileCacheWriteRequest*)request);
 		case FILE_CACHE_WRITE_REPLY:
 			return task((FileCacheWriteReply*)request);
+		// I/O
+		case DO_ITERATIVE_FD_IO_REQUEST:
+			return task((DoIterativeFDIORequest*)request);
+		case DO_ITERATIVE_FD_IO_REPLY:
+			return task((DoIterativeFDIOReply*)request);
 		// general reply
 		case RECEIPT_ACK_REPLY:
 			return task((ReceiptAckReply*)request);
@@ -2340,6 +2372,9 @@ using UserlandFSUtil::FileCacheReadRequest;
 using UserlandFSUtil::FileCacheReadReply;
 using UserlandFSUtil::FileCacheWriteRequest;
 using UserlandFSUtil::FileCacheWriteReply;
+// I/O
+using UserlandFSUtil::DoIterativeFDIORequest;
+using UserlandFSUtil::DoIterativeFDIOReply;
 // general reply
 using UserlandFSUtil::ReceiptAckReply;
 

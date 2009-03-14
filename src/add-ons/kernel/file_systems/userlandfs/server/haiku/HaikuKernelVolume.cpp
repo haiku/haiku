@@ -15,6 +15,8 @@
 #include "../IORequestInfo.h"
 #include "../kernel_emu.h"
 
+#include "HaikuKernelFileSystem.h"
+#include "HaikuKernelIORequest.h"
 #include "HaikuKernelNode.h"
 
 
@@ -24,26 +26,12 @@ class HaikuKernelVolume::NodeMap
 };
 
 
-// IORequestHashDefinition
-struct HaikuKernelVolume::IORequestHashDefinition {
-	typedef int32			KeyType;
-	typedef	IORequestInfo	ValueType;
-
-	size_t HashKey(int32 key) const
-		{ return key; }
-	size_t Hash(const IORequestInfo* value) const
-		{ return value->id; }
-	bool Compare(int32 key, const IORequestInfo* value) const
-		{ return value->id == key; }
-	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
-		{ return value; }
-};
-
-
-// IORequestTable
-struct HaikuKernelVolume::IORequestTable
-	: public OpenHashTable<IORequestHashDefinition> {
-};
+// _FileSystem
+inline HaikuKernelFileSystem*
+HaikuKernelVolume::_FileSystem() const
+{
+	return static_cast<HaikuKernelFileSystem*>(fFileSystem);
+}
 
 
 // constructor
@@ -52,8 +40,7 @@ HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	:
 	Volume(fileSystem, id),
 	fFSModule(fsModule),
-	fNodes(NULL),
-	fIORequests(NULL)
+	fNodes(NULL)
 {
 	fVolume.id = id;
 	fVolume.partition = -1;
@@ -71,7 +58,6 @@ HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 HaikuKernelVolume::~HaikuKernelVolume()
 {
 	delete fNodes;
-	delete fIORequests;
 }
 
 
@@ -82,14 +68,7 @@ HaikuKernelVolume::Init()
 	fNodes = new(std::nothrow) NodeMap;
 	if (fNodes == NULL)
 		return B_NO_MEMORY;
-	status_t error = fNodes->InitCheck();
-	if (error != B_OK)
-		return error;
-
-	fIORequests = new(std::nothrow) IORequestTable;
-	if (fIORequests == NULL)
-		return B_NO_MEMORY;
-	return fIORequests->Init();
+	return fNodes->InitCheck();
 }
 
 
@@ -181,14 +160,6 @@ HaikuKernelNode*
 HaikuKernelVolume::NodeWithID(ino_t vnodeID) const
 {
 	return fNodes->Get(vnodeID);
-}
-
-
-IORequestInfo*
-HaikuKernelVolume::IORequestInfoWithID(int32 id) const
-{
-	AutoLocker<NodeMap> locker(fNodes);
-	return fIORequests->Lookup(id);
 }
 
 
@@ -374,30 +345,39 @@ HaikuKernelVolume::RemoveVNode(void* _node, bool reenter)
 
 
 status_t
-HaikuKernelVolume::DoIO(void* _node, void* cookie, IORequestInfo* requestInfo)
+HaikuKernelVolume::DoIO(void* _node, void* cookie,
+	const IORequestInfo& requestInfo)
 {
 	HaikuKernelNode* node = (HaikuKernelNode*)_node;
 
 	if (!node->ops->io)
 		return B_BAD_VALUE;
 
-	// add the info to the table
-	AutoLocker<NodeMap> locker(fNodes);
-	if (fIORequests->Lookup(requestInfo->id))
-		RETURN_ERROR(B_BAD_VALUE);
+	// create a request object
+	HaikuKernelIORequest* request
+		= new(std::nothrow) HaikuKernelIORequest(requestInfo);
+	if (request == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
 
-	fIORequests->Insert(requestInfo);
-	locker.Unlock();
+	status_t error = _FileSystem()->AddIORequest(request);
+	if (error != B_OK) {
+		delete request;
+		RETURN_ERROR(error);
+	}
 
 	// call the hook
-	status_t error = node->ops->io(&fVolume, node, cookie,
-		(io_request*)(addr_t)requestInfo->id);
+	error = node->ops->io(&fVolume, node, cookie, (io_request*)request);
 
-	// remove the info from the table
-	locker.Lock();
-	fIORequests->Remove(requestInfo);
+	// directly put our reference to the request, if the call failed
+	if (error != B_OK) {
+		_FileSystem()->PutIORequest(request);
+		RETURN_ERROR(error);
+	}
 
-	return error;
+	// TODO: ATM we don't release our reference when the request is finished
+	// normally!
+
+	return B_OK;
 }
 
 
@@ -409,8 +389,20 @@ HaikuKernelVolume::CancelIO(void* _node, void* cookie, int32 ioRequestID)
 	if (!node->ops->cancel_io)
 		return B_BAD_VALUE;
 
-	return node->ops->cancel_io(&fVolume, node, cookie,
-		(io_request*)(addr_t)ioRequestID);
+	// get the request
+	HaikuKernelIORequest* request = _FileSystem()->GetIORequest(ioRequestID);
+	if (request == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// call the hook
+	status_t error = node->ops->cancel_io(&fVolume, node, cookie,
+		(io_request*)request);
+
+	// put the request -- once for the reference we got above, once for the
+	// reference we've got in DoIO()
+	_FileSystem()->PutIORequest(request, 2);
+
+	return error;
 }
 
 

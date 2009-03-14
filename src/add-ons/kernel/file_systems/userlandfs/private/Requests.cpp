@@ -313,6 +313,14 @@ FileCacheWriteRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
+// DoIterativeFDIORequest
+status_t
+DoIterativeFDIORequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(vecs);
+	return B_OK;
+}
+
 
 // #pragma mark -
 
@@ -531,6 +539,13 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
 			return false;
+		// asynchronous I/O
+		case DO_IO_REQUEST:
+		case CANCEL_IO_REQUEST:
+			return true;
+		case DO_IO_REPLY:
+		case CANCEL_IO_REPLY:
+			return false;
 		// nodes
 		case IOCTL_REQUEST:
 		case SET_FLAGS_REQUEST:
@@ -674,6 +689,7 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		// vnodes
 		case GET_VNODE_REQUEST:
 		case PUT_VNODE_REQUEST:
+		case ACQUIRE_VNODE_REQUEST:
 		case NEW_VNODE_REQUEST:
 		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
@@ -682,11 +698,34 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 			return false;
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
+		case ACQUIRE_VNODE_REPLY:
 		case NEW_VNODE_REPLY:
 		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
 		case GET_VNODE_REMOVED_REPLY:
+			return true;
+		// file cache
+		case FILE_CACHE_CREATE_REQUEST:
+		case FILE_CACHE_DELETE_REQUEST:
+		case FILE_CACHE_SET_ENABLED_REQUEST:
+		case FILE_CACHE_SET_SIZE_REQUEST:
+		case FILE_CACHE_SYNC_REQUEST:
+		case FILE_CACHE_READ_REQUEST:
+		case FILE_CACHE_WRITE_REQUEST:
+			return false;
+		case FILE_CACHE_CREATE_REPLY:
+		case FILE_CACHE_DELETE_REPLY:
+		case FILE_CACHE_SET_ENABLED_REPLY:
+		case FILE_CACHE_SET_SIZE_REPLY:
+		case FILE_CACHE_SYNC_REPLY:
+		case FILE_CACHE_READ_REPLY:
+		case FILE_CACHE_WRITE_REPLY:
+			return true;
+		// I/O
+		case DO_ITERATIVE_FD_IO_REQUEST:
+			return false;
+		case DO_ITERATIVE_FD_IO_REPLY:
 			return true;
 
 		// general reply
@@ -737,6 +776,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case WRITE_VNODE_REPLY:
 		case FS_REMOVE_VNODE_REPLY:
 			return true;
+		// asynchronous I/O
+		case DO_IO_REQUEST:
+		case CANCEL_IO_REQUEST:
+			return false;
+		case DO_IO_REPLY:
+		case CANCEL_IO_REPLY:
+			return true;
 		// nodes
 		case IOCTL_REQUEST:
 		case SET_FLAGS_REQUEST:
@@ -880,6 +926,7 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		// vnodes
 		case GET_VNODE_REQUEST:
 		case PUT_VNODE_REQUEST:
+		case ACQUIRE_VNODE_REQUEST:
 		case NEW_VNODE_REQUEST:
 		case PUBLISH_VNODE_REQUEST:
 		case REMOVE_VNODE_REQUEST:
@@ -888,12 +935,35 @@ UserlandFSUtil::is_userland_request(uint32 type)
 			return true;
 		case GET_VNODE_REPLY:
 		case PUT_VNODE_REPLY:
+		case ACQUIRE_VNODE_REPLY:
 		case NEW_VNODE_REPLY:
 		case PUBLISH_VNODE_REPLY:
 		case REMOVE_VNODE_REPLY:
 		case UNREMOVE_VNODE_REPLY:
 		case GET_VNODE_REMOVED_REPLY:
 			return false;
+		// file cache
+		case FILE_CACHE_CREATE_REQUEST:
+		case FILE_CACHE_DELETE_REQUEST:
+		case FILE_CACHE_SET_ENABLED_REQUEST:
+		case FILE_CACHE_SET_SIZE_REQUEST:
+		case FILE_CACHE_SYNC_REQUEST:
+		case FILE_CACHE_READ_REQUEST:
+		case FILE_CACHE_WRITE_REQUEST:
+			return true;
+		case FILE_CACHE_CREATE_REPLY:
+		case FILE_CACHE_DELETE_REPLY:
+		case FILE_CACHE_SET_ENABLED_REPLY:
+		case FILE_CACHE_SET_SIZE_REPLY:
+		case FILE_CACHE_SYNC_REPLY:
+		case FILE_CACHE_READ_REPLY:
+		case FILE_CACHE_WRITE_REPLY:
+			return false;
+		// I/O
+		case DO_ITERATIVE_FD_IO_REQUEST:
+			return false;
+		case DO_ITERATIVE_FD_IO_REPLY:
+			return true;
 
 		// general reply
 		case RECEIPT_ACK_REPLY:

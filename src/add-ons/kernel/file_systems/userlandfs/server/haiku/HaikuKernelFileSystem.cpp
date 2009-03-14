@@ -8,19 +8,49 @@
 
 #include <fs_interface.h>
 
+#include <AutoLocker.h>
+
 #include <block_cache.h>
 #include <condition_variable.h>
 
+#include "HaikuKernelIORequest.h"
 #include "HaikuKernelVolume.h"
+
+
+// IORequestHashDefinition
+struct HaikuKernelFileSystem::IORequestHashDefinition {
+	typedef int32					KeyType;
+	typedef	HaikuKernelIORequest	ValueType;
+
+	size_t HashKey(int32 key) const
+		{ return key; }
+	size_t Hash(const HaikuKernelIORequest* value) const
+		{ return value->id; }
+	bool Compare(int32 key, const HaikuKernelIORequest* value) const
+		{ return value->id == key; }
+	HashTableLink<HaikuKernelIORequest>*
+		GetLink(HaikuKernelIORequest* value) const
+			{ return value; }
+};
+
+
+// IORequestTable
+struct HaikuKernelFileSystem::IORequestTable
+	: public OpenHashTable<IORequestHashDefinition> {
+};
 
 
 // constructor
 HaikuKernelFileSystem::HaikuKernelFileSystem(file_system_module_info* fsModule)
-	: FileSystem(),
-	  fFSModule(fsModule)
+	:
+	FileSystem(),
+	fFSModule(fsModule),
+	fIORequests(NULL),
+	fLock("HaikuKernelFileSystem")
 {
 	_InitCapabilities();
 }
+
 
 // destructor
 HaikuKernelFileSystem::~HaikuKernelFileSystem()
@@ -29,19 +59,35 @@ HaikuKernelFileSystem::~HaikuKernelFileSystem()
 	if (fFSModule->info.std_ops)
 		fFSModule->info.std_ops(B_MODULE_UNINIT);
 
+	delete fIORequests;
+
 // TODO: Call the cleanup methods (condition vars, block cache)!
 }
+
 
 // Init
 status_t
 HaikuKernelFileSystem::Init()
 {
+	status_t error = fLock.InitCheck();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	// init condition variables
 	condition_variable_init();
 // TODO: Call the cleanup methods, if something goes wrong!
 
 	// init block cache
-	status_t error = block_cache_init();
+	error = block_cache_init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create I/O request map
+	fIORequests = new(std::nothrow) IORequestTable;
+	if (fIORequests == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	error = fIORequests->Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -55,6 +101,7 @@ HaikuKernelFileSystem::Init()
 
 	return B_OK;
 }
+
 
 // CreateVolume
 status_t
@@ -79,6 +126,7 @@ HaikuKernelFileSystem::CreateVolume(Volume** _volume, dev_t id)
 	return B_OK;
 }
 
+
 // DeleteVolume
 status_t
 HaikuKernelFileSystem::DeleteVolume(Volume* volume)
@@ -88,6 +136,51 @@ HaikuKernelFileSystem::DeleteVolume(Volume* volume)
 	delete volume;
 	return B_OK;
 }
+
+
+// AddIORequest
+status_t
+HaikuKernelFileSystem::AddIORequest(HaikuKernelIORequest* request)
+{
+	AutoLocker<Locker> _(fLock);
+
+	// check, if a request with that ID is already in the map
+	if (fIORequests->Lookup(request->id) != NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	fIORequests->Insert(request);
+	return B_OK;
+}
+
+
+// GetIORequest
+HaikuKernelIORequest*
+HaikuKernelFileSystem::GetIORequest(int32 requestID)
+{
+	AutoLocker<Locker> _(fLock);
+
+	HaikuKernelIORequest* request = fIORequests->Lookup(requestID);
+	if (request != NULL)
+		request->refCount++;
+
+	return request;
+}
+
+
+// PutIORequest
+void
+HaikuKernelFileSystem::PutIORequest(HaikuKernelIORequest* request,
+	int32 refCount)
+{
+	AutoLocker<Locker> locker(fLock);
+
+	if ((request->refCount -= refCount) <= 0) {
+		fIORequests->Remove(request);
+		locker.Unlock();
+		delete request;
+	}
+}
+
 
 // _InitCapabilities
 void

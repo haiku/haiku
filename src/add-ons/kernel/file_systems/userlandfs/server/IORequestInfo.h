@@ -5,12 +5,12 @@
 #ifndef USERLAND_FS_IO_REQUEST_INFO_H
 #define USERLAND_FS_IO_REQUEST_INFO_H
 
-#include <util/OpenHashTable.h>
+#include <SupportDefs.h>
 
 
 namespace UserlandFS {
 
-struct IORequestInfo : HashTableLink<IORequestInfo> {
+struct IORequestInfo {
 	int32	id;
 	bool	isWrite;
 
@@ -18,6 +18,13 @@ struct IORequestInfo : HashTableLink<IORequestInfo> {
 		:
 		id(id),
 		isWrite(isWrite)
+	{
+	}
+
+	IORequestInfo(const IORequestInfo& other)
+		:
+		id(other.id),
+		isWrite(other.isWrite)
 	{
 	}
 };

@@ -837,6 +837,53 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 }
 
 
+// #pragma mark - I/O
+
+
+status_t
+UserlandFS::KernelEmu::do_iterative_fd_io(int fd, int32 requestID, void* cookie,
+	const file_io_vec* vecs, uint32 vecCount)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	DoIterativeFDIORequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->fd = fd;
+	request->request = requestID;
+	request->cookie = cookie;
+	request->vecCount = vecCount;
+
+	if (vecCount > 0) {
+		error = allocator.AllocateData(request->vecs, vecs,
+			vecCount * sizeof(file_io_vec), sizeof(off_t), false);
+		if (error != B_OK)
+			return error;
+	}
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, DO_ITERATIVE_FD_IO_REPLY);
+	DoIterativeFDIOReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+// TODO: Up to this point we should call the finished hook or error!
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
 // #pragma mark -
 
 

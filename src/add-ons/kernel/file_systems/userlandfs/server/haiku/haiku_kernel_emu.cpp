@@ -21,6 +21,7 @@
 #include "../kernel_emu.h"
 #include "../RequestThread.h"
 
+#include "HaikuKernelIORequest.h"
 #include "HaikuKernelNode.h"
 #include "HaikuKernelVolume.h"
 #include "vfs.h"
@@ -270,11 +271,39 @@ do_fd_io(int fd, io_request *request)
 
 // do_iterative_fd_io
 status_t
-do_iterative_fd_io(int fd, io_request *request, iterative_io_get_vecs getVecs,
-	iterative_io_finished finished, void *cookie)
+do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
+	iterative_io_finished finished, void *_cookie)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+#if 0
+	// get some vecs already
+	file_io_vec fileVecs[8];
+	uint32 fileVecCount = 8;
+	status_t error = getVecs(_cookie, _request, offset, vecLength, fileVecs,
+		&fileVecCount);
+// TODO: We don't have the offset here. We should pass it along in the
+// DoIORequest.
+#endif
+
+	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
+
+	// create a cookie
+	HaikuKernelIterativeFDIOCookie* cookie
+		= new(std::nothrow) HaikuKernelIterativeFDIOCookie(fd, request, getVecs,
+			finished, _cookie);
+	if (cookie == NULL) {
+		finished(_cookie, _request, B_NO_MEMORY, false, 0);
+		return B_NO_MEMORY;
+	}
+
+	// send the request
+	status_t error = UserlandFS::KernelEmu::do_iterative_fd_io(fd, request->id,
+		cookie, NULL, 0);
+	if (error != B_OK) {
+		delete cookie;
+		return error;
+	}
+
+	return B_OK;
 }
 
 
@@ -284,19 +313,7 @@ do_iterative_fd_io(int fd, io_request *request, iterative_io_get_vecs getVecs,
 bool
 io_request_is_write(const io_request* request)
 {
-	// get the volume
-	RequestThread* thread = RequestThread::GetCurrentThread();
-	if (thread == NULL || thread->GetContext() == NULL)
-		return false;
-
-	HaikuKernelVolume* volume = dynamic_cast<HaikuKernelVolume*>(
-		thread->GetContext()->GetVolume());
-	if (volume == NULL)
-		return false;
-
-	// get the request info
-	IORequestInfo* info = volume->IORequestInfoWithID((int32)(addr_t)request);
-	return info != NULL && info->isWrite;
+	return ((HaikuKernelIORequest*)request)->isWrite;
 }
 
 
