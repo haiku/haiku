@@ -303,21 +303,21 @@ BMenuWindow::AttachScrollers()
 	
 	if (fUpperScroller == NULL) {
 		fUpperScroller = new UpperScroller(
-							BRect(0, 0, frame.right, kScrollerHeight));
+			BRect(0, 0, frame.right, kScrollerHeight - 1));
 		AddChild(fUpperScroller);
 	}
 	
 	if (fLowerScroller == NULL) {
 		fLowerScroller = new LowerScroller(
-							BRect(0, frame.bottom - kScrollerHeight,
-										frame.right, frame.bottom));
+			BRect(0, frame.bottom - kScrollerHeight + 1, frame.right,
+				frame.bottom));
 		AddChild(fLowerScroller);
 	}
 	
 	fUpperScroller->SetEnabled(false);
 	fLowerScroller->SetEnabled(true);
 
-	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight - 1);
+	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight);
 	fMenuFrame->MoveBy(0, kScrollerHeight);
 	
 	fValue = 0;

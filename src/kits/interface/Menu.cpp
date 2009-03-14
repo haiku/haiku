@@ -1305,7 +1305,19 @@ BMenu::DrawBackground(BRect update)
 		if (IsFocus())
 			flags |= BControlLook::B_FOCUSED;
 		BRect rect = Bounds();
-		be_control_look->DrawMenuBackground(this, rect, update, base);
+		uint32 borders = BControlLook::B_LEFT_BORDER
+			| BControlLook::B_RIGHT_BORDER;
+		if (Window() != NULL && Parent() != NULL) {
+			if (Parent()->Frame().top == Window()->Bounds().top)
+				borders |= BControlLook::B_TOP_BORDER;
+			if (Parent()->Frame().bottom == Window()->Bounds().bottom)
+				borders |= BControlLook::B_BOTTOM_BORDER;
+		} else {
+			borders |= BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER;
+		}
+		be_control_look->DrawMenuBackground(this, rect, update, base, 0,
+			borders);
 
 		return;
 	}
