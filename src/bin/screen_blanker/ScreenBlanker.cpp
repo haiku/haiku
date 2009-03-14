@@ -27,7 +27,6 @@
 #include <syslog.h>
 
 
-const static uint32 kMsgResumeSaver = 'RSSV';
 const static uint32 kMsgTurnOffScreen = 'tofs';
 const static uint32 kMsgSuspendScreen = 'suss';
 const static uint32 kMsgStandByScreen = 'stbs';
@@ -230,6 +229,7 @@ ScreenBlanker::MessageReceived(BMessage* message)
 		{
 			if (fWindow->Lock()) {
 				HideCursor();
+				fPasswordWindow->SetPassword("");
 				fPasswordWindow->Hide();
 
 				fRunner->Resume();

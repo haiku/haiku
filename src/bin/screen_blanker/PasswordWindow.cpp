@@ -23,7 +23,7 @@ PasswordWindow::PasswordWindow()
 	: BWindow(BRect(100, 100, 400, 230), "Enter Password",
 		B_NO_BORDER_WINDOW_LOOK, kPasswordWindowFeel
 			/* TODO: B_MODAL_APP_WINDOW_FEEL should also behave correctly */,
-		B_NOT_MOVABLE | B_NOT_CLOSABLE |B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
+		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 		| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES)
 {
 	BView* topView = new BView(Bounds(), "topView", B_FOLLOW_ALL, B_WILL_DRAW);

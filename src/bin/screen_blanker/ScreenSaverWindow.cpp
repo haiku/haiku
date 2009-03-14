@@ -9,6 +9,7 @@
  */
 
 
+#include "ScreenBlanker.h"
 #include "ScreenSaverWindow.h"
 
 #include <Application.h>
@@ -51,6 +52,11 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 				be_app->PostMessage(B_QUIT_REQUESTED);
 				break;
 		}
+	} else if (message->what == B_KEY_DOWN) {
+		// Handle the escape key when the password window is showing
+		const char *string = NULL;
+		if (message->FindString("bytes", &string) == B_OK && string[0] == B_ESCAPE)
+			be_app->PostMessage(kMsgResumeSaver);
 	}
 
 	return B_DISPATCH_MESSAGE;

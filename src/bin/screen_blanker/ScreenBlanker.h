@@ -19,6 +19,9 @@
 #include <MessageRunner.h>
 
 
+const static uint32 kMsgResumeSaver = 'RSSV';
+
+
 class ScreenBlanker : public BApplication {
 	public:
 		ScreenBlanker();
