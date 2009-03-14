@@ -1450,6 +1450,10 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 							"hidden by symbol patchers\n", symName);
 						break;
 				}
+
+				if (report_errors())
+					sErrorMessage.AddString("missing symbol", symName);
+
 				return B_MISSING_SYMBOL;
 			}
 
