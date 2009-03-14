@@ -2,7 +2,7 @@
  * Copyright 2007 Haiku, Inc.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  */
@@ -63,7 +63,7 @@ public:
 class TermViewContainerView : public BView {
 public:
 	TermViewContainerView(TermView* termView)
-		: 
+		:
 		BView(BRect(), "term view container", B_FOLLOW_ALL, 0),
 		fTermView(termView)
 	{
@@ -161,7 +161,7 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 
 TermWindow::~TermWindow()
 {
-	if (fPrefWindow) 
+	if (fPrefWindow)
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
 
 	if (fFindPanel && fFindPanel->Lock()) {
@@ -299,14 +299,14 @@ TermWindow::_SetupMenu()
 	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, false);
-	fHelpmenu->AddItem(fWindowSizeMenu);  
+	fHelpmenu->AddItem(fWindowSizeMenu);
 	fHelpmenu->AddItem(fEncodingmenu);
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_PREF_OPEN)));
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Save as default",
-		new BMessage(SAVE_AS_DEFAULT))); 
+		new BMessage(SAVE_AS_DEFAULT)));
 	fMenubar->AddItem(fHelpmenu);
 
 	AddChild(fMenubar);
@@ -358,7 +358,7 @@ TermWindow::MessageReceived(BMessage *message)
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
 
-		case MENU_NEW_TERM: 
+		case MENU_NEW_TERM:
 		{
 			app_info info;
 			be_app->GetAppInfo(&info);
@@ -396,13 +396,13 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_FIND:
 			fFindPanel->PostMessage(B_QUIT_REQUESTED);
 			message->FindBool("findselection", &fFindSelection);
-			if (!fFindSelection) 
+			if (!fFindSelection)
 				message->FindString("findstring", &fFindString);
-			else 
+			else
 				_ActiveTermView()->GetSelection(fFindString);
 
 			if (fFindString.Length() == 0) {
-				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL, 
+				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->Go();
 				fFindBackwardMenuItem->SetEnabled(false);
@@ -461,29 +461,22 @@ TermWindow::MessageReceived(BMessage *message)
 			int32 columns, rows;
 			message->FindInt32("columns", &columns);
 			message->FindInt32("rows", &rows);
-			PrefHandler::Default()->setInt32(PREF_COLS, columns);
-			PrefHandler::Default()->setInt32(PREF_ROWS, rows);
-		   	
-			_ActiveTermView()->SetTermSize(rows, columns, 0);
-		
+
+			_ActiveTermView()->SetTermSize(rows, columns, false);
+
 			_ResizeView(_ActiveTermView());
-		
-			BPath path;
-			if (PrefHandler::GetDefaultPath(path) == B_OK)
-				PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
 			break;
 		}
 		case MSG_HALF_FONT_CHANGED:
 		case MSG_FULL_FONT_CHANGED:
 		case MSG_HALF_SIZE_CHANGED:
-		case MSG_FULL_SIZE_CHANGED: 
+		case MSG_FULL_SIZE_CHANGED:
 		{
 			BFont font;
 			_GetPreferredFont(font);			
 			_ActiveTermView()->SetTermFont(&font);
-			
+
 			_ResizeView(_ActiveTermView());
-			
 			break;
 		}
 		
@@ -513,9 +506,9 @@ TermWindow::MessageReceived(BMessage *message)
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
 			break;	
-		
+
 		case MSG_FONT_CHANGED:
-	    	PostMessage(MSG_HALF_FONT_CHANGED);
+			PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
 
 		case MSG_COLOR_CHANGED:
@@ -525,7 +518,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case SAVE_AS_DEFAULT: 
+		case SAVE_AS_DEFAULT:
 		{
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
@@ -647,8 +640,8 @@ TermWindow::_SetTermColors(TermViewContainerView *containerView)
 
 
 status_t
-TermWindow::_DoPageSetup() 
-{ 
+TermWindow::_DoPageSetup()
+{
 	BPrintJob job("PageSetup");
 
 	// display the page configure panel
@@ -659,7 +652,7 @@ TermWindow::_DoPageSetup()
 
 	return status;
 }
-  
+
 
 void
 TermWindow::_DoPrint()
@@ -668,10 +661,10 @@ TermWindow::_DoPrint()
 		(new BAlert("Cancel", "Print cancelled.", "OK"))->Go();
 		return;
 	}
-  
-	BPrintJob job("Print"); 
+
+	BPrintJob job("Print");
 	job.SetSettings(new BMessage(*fPrintSettings));
- 
+
 	BRect pageRect = job.PrintableRect();
 	BRect curPageRect = pageRect;
 
@@ -690,18 +683,19 @@ TermWindow::_DoPrint()
 			curPageRect.OffsetTo(x * pWidth, y * pHeight);
 			job.DrawView(_ActiveTermView(), curPageRect, B_ORIGIN);
 			job.SpoolPage();
-    
-			if (!job.CanContinue()){
+
+			if (!job.CanContinue()) {
 				// It is likely that the only way that the job was cancelled is
-			    // because the user hit 'Cancel' in the page setup window, in which
-			    // case, the user does *not* need to be told that it was cancelled.
-			    // He/she will simply expect that it was done.
-				    return;
+				// because the user hit 'Cancel' in the page setup window, in
+				// which case, the user does *not* need to be told that it was
+				// cancelled.
+				// He/she will simply expect that it was done.
+				return;
 			}
 		}
 	}
 	
-	job.CommitJob(); 
+	job.CommitJob();
 }
 
 
@@ -716,7 +710,8 @@ TermWindow::_AddTab(Arguments *args)
 	try {
 		// Note: I don't pass the Arguments class directly to the termview,
 		// only to avoid adding it as a dependency: in other words, to keep
-		// the TermView class as agnostic as possible about the surrounding world.
+		// the TermView class as agnostic as possible about the surrounding
+		// world.
 		CustomTermView *view = new CustomTermView(
 			PrefHandler::Default()->getInt32(PREF_ROWS),
 			PrefHandler::Default()->getInt32(PREF_COLS),
@@ -883,12 +878,11 @@ TermWindow::_ResizeView(TermView *view)
 void
 TermWindow::_BuildWindowSizeMenu(BMenu *menu)
 {
-	const int32 windowSizes[5][2] = {
-		{ 80, 24 },
+	const int32 windowSizes[4][2] = {
 		{ 80, 25 },
 		{ 80, 40 },
-		{ 132, 24 },
-		{ 132, 25 }	
+		{ 132, 25 },
+		{ 132, 40 }	
 	};
 	
 	const int32 sizeNum = sizeof(windowSizes) / sizeof(windowSizes[0]);
@@ -902,9 +896,10 @@ TermWindow::_BuildWindowSizeMenu(BMenu *menu)
 		message->AddInt32("rows", rows);
 		menu->AddItem(new BMenuItem(label, message));
 	}
-	
-	menu->AddItem(new BMenuItem("Fullscreen",
-					new BMessage(FULLSCREEN), B_ENTER)); 
+
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN),
+		B_ENTER));
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -208,8 +208,8 @@ private:
 			int32			fMouseButtons;
 
 			// Terminal rows and columns.
-			int				fTermRows;
-			int				fTermColumns;
+			int				fColumns;
+			int				fRows;
 
 			int				fEncoding;
 

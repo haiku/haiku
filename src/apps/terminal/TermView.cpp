@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -47,6 +47,7 @@
 
 #include "CodeConv.h"
 #include "Globals.h"
+#include "PrefHandler.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
@@ -166,8 +167,8 @@ private:
 TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
-	fTermRows(ROWS_DEFAULT),
-	fTermColumns(COLUMNS_DEFAULT),
+	fColumns(COLUMNS_DEFAULT),
+	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fScrBufSize(historySize)
 {
@@ -179,13 +180,13 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 		int32 historySize)
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
-	fTermRows(rows),
-	fTermColumns(columns),
+	fColumns(columns),
+	fRows(rows),
 	fEncoding(M_UTF8),
 	fScrBufSize(historySize)
 {
 	_InitObject(argc, argv);
-	SetTermSize(fTermRows, fTermColumns, true);
+	SetTermSize(fRows, fColumns, true);
 
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
@@ -203,8 +204,8 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 TermView::TermView(BMessage* archive)
 	:
 	BView(archive),
-	fTermRows(ROWS_DEFAULT),
-	fTermColumns(COLUMNS_DEFAULT),
+	fColumns(COLUMNS_DEFAULT),
+	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fScrBufSize(1000)
 {
@@ -213,10 +214,10 @@ TermView::TermView(BMessage* archive)
 
 	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
-	if (archive->FindInt32("columns", (int32*)&fTermColumns) < B_OK)
-		fTermColumns = COLUMNS_DEFAULT;
-	if (archive->FindInt32("rows", (int32*)&fTermRows) < B_OK)
-		fTermRows = ROWS_DEFAULT;
+	if (archive->FindInt32("columns", (int32*)&fColumns) < B_OK)
+		fColumns = COLUMNS_DEFAULT;
+	if (archive->FindInt32("rows", (int32*)&fRows) < B_OK)
+		fRows = ROWS_DEFAULT;
 
 	int32 argc = 0;
 	if (archive->HasInt32("argc"))
@@ -235,7 +236,7 @@ TermView::TermView(BMessage* archive)
 
 
 /*!	Initializes the object for further use.
-	The members fTermRows, fTermColumns, fEncoding, and fScrBufSize must
+	The members fRows, fColumns, fEncoding, and fScrBufSize must
 	already be initialized; they are not touched by this method.
 */
 status_t
@@ -290,12 +291,12 @@ TermView::_InitObject(int32 argc, const char** argv)
 	if (fCharClassifier == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fTextBuffer->Init(fTermColumns, fTermRows, fScrBufSize);
+	status_t error = fTextBuffer->Init(fColumns, fRows, fScrBufSize);
 	if (error != B_OK)
 		return error;
 	fTextBuffer->SetEncoding(fEncoding);
 
-	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2, 0);
+	error = fVisibleTextBuffer->Init(fColumns, fRows + 2, 0);
 	if (error != B_OK)
 		return error;
 
@@ -304,10 +305,10 @@ TermView::_InitObject(int32 argc, const char** argv)
 		return B_NO_MEMORY;
 
 	SetTermFont(be_fixed_font);
-	SetTermSize(fTermRows, fTermColumns, false);
+	SetTermSize(fRows, fColumns, false);
 	//SetIMAware(false);
 
-	status_t status = fShell->Open(fTermRows, fTermColumns,
+	status_t status = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
 
 	if (status < B_OK)
@@ -360,9 +361,9 @@ TermView::Archive(BMessage* data, bool deep) const
 	if (status == B_OK)
 		status = data->AddInt32("encoding", (int32)fEncoding);
 	if (status == B_OK)
-		status = data->AddInt32("columns", (int32)fTermColumns);
+		status = data->AddInt32("columns", (int32)fColumns);
 	if (status == B_OK)
-		status = data->AddInt32("rows", (int32)fTermRows);
+		status = data->AddInt32("rows", (int32)fRows);
 
 	if (data->ReplaceString("class", "TermView") != B_OK)
 		data->AddString("class", "TermView");
@@ -422,9 +423,9 @@ void
 TermView::GetPreferredSize(float *width, float *height)
 {
 	if (width)
-		*width = fTermColumns * fFontWidth - 1;
+		*width = fColumns * fFontWidth - 1;
 	if (height)
-		*height = fTermRows * fFontHeight - 1;
+		*height = fRows * fFontHeight - 1;
 }
 
 
@@ -453,9 +454,12 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 {
 //debug_printf("TermView::SetTermSize(%d, %d)\n", rows, columns);
 	if (rows > 0)
-		fTermRows = rows;
+		fRows = rows;
 	if (columns > 0)
-		fTermColumns = columns;
+		fColumns = columns;
+
+	PrefHandler::Default()->setInt32(PREF_COLS, fColumns);
+	PrefHandler::Default()->setInt32(PREF_ROWS, fRows);
 
 	// To keep things simple, get rid of the selection first.
 	_Deselect();
@@ -469,22 +473,18 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 		}
 	}
 
-	fTermRows = rows;
-	fTermColumns = columns;
-
 //debug_printf("Invalidate()\n");
 	Invalidate();
 
 	if (fScrollBar != NULL) {
 		_UpdateScrollBarRange();
-		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
 	}
 
-	BRect rect(0, 0, fTermColumns * fFontWidth, fTermRows * fFontHeight);
+	BRect rect(0, 0, fColumns * fFontWidth, fRows * fFontHeight);
 
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
-
 
 	// synchronize the visible text buffer
 	{
@@ -593,7 +593,7 @@ TermView::SetTermFont(const BFont *font)
 
 	_ScrollTo(0, false);
 	if (fScrollBar != NULL)
-		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
 }
 
 
@@ -602,7 +602,7 @@ TermView::SetScrollBar(BScrollBar *scrollBar)
 {
 	fScrollBar = scrollBar;
 	if (fScrollBar != NULL) {
-		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
 	}
 }
 
@@ -703,10 +703,10 @@ TermView::_InvalidateTextRange(TermPos start, TermPos end)
 	if (start.y == end.y) {
 		_InvalidateTextRect(start.x, start.y, end.x, end.y);
 	} else {
-		_InvalidateTextRect(start.x, start.y, fTermColumns, start.y);
+		_InvalidateTextRect(start.x, start.y, fColumns, start.y);
 
 		if (end.y - start.y > 0)
-			_InvalidateTextRect(0, start.y + 1, fTermColumns, end.y - 1);
+			_InvalidateTextRect(0, start.y + 1, fColumns, end.y - 1);
 
 		_InvalidateTextRect(0, end.y, end.x, end.y);
 	}
@@ -891,7 +891,7 @@ TermView::_UpdateScrollBarRange()
 		historySize = fTextBuffer->HistorySize();
 	}
 
-	float viewHeight = fTermRows * fFontHeight;
+	float viewHeight = fRows * fFontHeight;
 	float historyHeight = (float)historySize * fFontHeight;
 
 //debug_printf("TermView::_UpdateScrollBarRange(): history: %ld, range: %f - 0\n",
@@ -908,7 +908,7 @@ void
 TermView::_UpdateSIGWINCH()
 {
 	if (fFrameResized) {
-		fShell->UpdateWindowSize(fTermRows, fTermColumns);
+		fShell->UpdateWindowSize(fRows, fColumns);
 		fFrameResized = false;
 	}
 }
@@ -921,7 +921,7 @@ TermView::AttachedToWindow()
 
 	MakeFocus(true);
 	if (fScrollBar) {
-		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
 		_UpdateScrollBarRange();
 	}
 
@@ -994,7 +994,7 @@ TermView::Draw(BRect updateRect)
 
 	for (int32 j = y1; j <= y2; j++) {
 		int32 k = x1;
-		char buf[fTermColumns * 4 + 1];
+		char buf[fColumns * 4 + 1];
 
 		if (fVisibleTextBuffer->IsFullWidthChar(j - firstVisible, k))
 			k--;
@@ -1233,7 +1233,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 		case B_PAGE_UP:
 			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset - fFontHeight  * fTermRows, true);
+				_ScrollTo(fScrollOffset - fFontHeight  * fRows, true);
 				return;
 			}
 			if (rawChar == B_PAGE_UP)
@@ -1242,7 +1242,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 		case B_PAGE_DOWN:
 			if (mod & B_SHIFT_KEY) {
-				_ScrollTo(fScrollOffset + fFontHeight * fTermRows, true);
+				_ScrollTo(fScrollOffset + fFontHeight * fRows, true);
 				return;
 			}
 			if (rawChar == B_PAGE_DOWN)
@@ -1281,7 +1281,7 @@ TermView::FrameResized(float width, float height)
 	int32 columns = ((int32)width + 1) / fFontWidth;
 	int32 rows = ((int32)height + 1) / fFontHeight;
 
-	if (columns == fTermColumns && rows == fTermRows)
+	if (columns == fColumns && rows == fRows)
 		return;
 
 	bool hasResizeView = fResizeRunner != NULL;
@@ -1775,7 +1775,7 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 		// been scrolled in less than a sync update period. Once we're
 		// actively considering it, the same condition will convince us to
 		// actually do it.
-		if (fScrolledSinceLastSync + linesScrolled <= fTermRows) {
+		if (fScrolledSinceLastSync + linesScrolled <= fRows) {
 			// Condition doesn't hold yet. Reset if time is up, or otherwise
 			// keep counting.
 			if (timeElapsed > kSyncUpdateGranularity) {
@@ -1808,7 +1808,7 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 		// sync time not passed yet -- keep counting
 		fScrolledSinceLastSync += linesScrolled;
 		return;
-	} else if (fScrolledSinceLastSync + linesScrolled <= fTermRows) {
+	} else if (fScrolledSinceLastSync + linesScrolled <= fRows) {
 		// time's up, but not enough happened
 		delete fSyncRunner;
 		fSyncRunner = NULL;
@@ -2194,8 +2194,8 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 
 	if (start.x < 0)
 		start.x = 0;
-	if (end.x >= fTermColumns)
-		end.x = fTermColumns;
+	if (end.x >= fColumns)
+		end.x = fColumns;
 
 	TermPos minPos(0, -fTextBuffer->HistorySize());
 	TermPos maxPos(0, fTextBuffer->Height());
@@ -2217,8 +2217,8 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 
 	if (fTextBuffer->IsFullWidthChar(end.y, end.x)) {
 		end.x++;
-		if (end.x >= fTermColumns)
-			end.x = fTermColumns;
+		if (end.x >= fColumns)
+			end.x = fColumns;
 	}
 
 	if (fSelStart != fSelEnd)
@@ -2389,10 +2389,10 @@ TermView::GetFrameSize(float *width, float *height)
 	}
 
 	if (width != NULL)
-		*width = fTermColumns * fFontWidth;
+		*width = fColumns * fFontWidth;
 
 	if (height != NULL)
-		*height = (fTermRows + historySize) * fFontHeight;
+		*height = (fRows + historySize) * fFontHeight;
 }
 
 
@@ -2483,7 +2483,7 @@ TermView::InitiateDrag()
 	if (fSelStart.y == fSelEnd.y)
 		rect.Set(start.x, start.y, end.x + fFontWidth, end.y + fFontHeight);
 	else
-		rect.Set(0, start.y, fTermColumns * fFontWidth, end.y + fFontHeight);
+		rect.Set(0, start.y, fColumns * fFontWidth, end.y + fFontHeight);
 
 	rect = rect & Bounds();
 
