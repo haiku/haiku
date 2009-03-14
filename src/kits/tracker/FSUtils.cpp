@@ -2938,9 +2938,12 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 extern "C" char** environ;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-extern "C" status_t _kern_load_image(int32 argCount, const char **args,
-	int32 envCount, const char **env, int32 priority, uint32 flags,
-	port_id errorPort, uint32 errorToken);
+extern "C" status_t _kern_load_image(const char * const *flatArgs,
+	size_t flatArgsSize, int32 argCount, int32 envCount, int32 priority,
+	uint32 flags, port_id errorPort, uint32 errorToken);
+extern "C" status_t __flatten_process_args(const char * const *args,
+	int32 argCount, const char * const *env, int32 envCount, char ***_flatArgs,
+	size_t *_flatSize);
 #else
 extern "C"
 #	if !B_BEOS_VERSION_DANO
@@ -2971,9 +2974,15 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 	while (environ[envCount] != NULL)
 		envCount++;
 
-	result = _kern_load_image(1, (const char **)argv, envCount,
-		(const char **)environ, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED,
-		errorPort, 0);
+	char** flatArgs = NULL;
+	size_t flatArgsSize;
+	result = __flatten_process_args((const char **)argv, 1,
+		environ, envCount, &flatArgs, &flatArgsSize);
+	if (result != B_OK)
+		return result;
+
+	result = _kern_load_image(flatArgs, flatArgsSize, 1, envCount,
+		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, errorPort, 0);
 	if (result == B_OK) {
 		// we weren't supposed to be able to start the application...
 		return B_ERROR;
@@ -3014,12 +3023,30 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 	if (result != B_OK)
 		return result;
 
-	const char* library;
-	for (int32 i = 0; message.FindString("missing library", i,
-			&library) == B_OK; i++) {
+	int32 errorCode = B_ERROR;
+	result = message.FindInt32("error", &errorCode);
+	if (result != B_OK)
+		return result;
+
+	const char *detailName = NULL;
+	switch (errorCode) {
+		case B_MISSING_LIBRARY:
+			detailName = "missing library";
+			break;
+
+		case B_MISSING_SYMBOL:
+			detailName = "missing symbol";
+			break;
+	}
+
+	if (detailName == NULL)
+		return B_ERROR;
+
+	const char *detail;
+	for (int32 i = 0; message.FindString(detailName, i, &detail) == B_OK; i++) {
 		if (i > 0)
 			details += ", ";
-		details += library;
+		details += detail;
 	}
 
 	return B_OK;
