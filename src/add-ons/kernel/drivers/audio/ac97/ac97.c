@@ -147,7 +147,12 @@ codec_table codecs[] =
 	{ 0x43525951,		0xffffffff, default_init,	"Cirrus Logic CS4205A" },
 	{ 0x43525961,		0xffffffff, default_init,	"Cirrus Logic CS4291A" },
 	{ 0x45838308,		0xffffffff, default_init,	"ESS Technology ES1921" },
+	{ 0x49434501,		0xffffffff, default_init,	"ICEnsemble ICE1230" },
 	{ 0x49434511,		0xffffffff, default_init,	"ICEnsemble ICE1232" },
+	{ 0x49434514,		0xffffffff, default_init,	"ICEnsemble ICE1232A" },
+	{ 0x49434551,		0xffffffff, default_init,	"Via Technologies VT1616" }, /* rebranded from ICEnsemble */
+	{ 0x49544520,		0xffffffff, default_init,	"Integrated Technology Express ITE2226E" },
+	{ 0x49544560,		0xffffffff, default_init,	"Integrated Technology Express ITE2646E" },
 	{ 0x4e534331,		0xffffffff, default_init,	"National Semiconductor LM4549" },
 	{ CODEC_ID_STAC9700,0xffffffff, default_init,	"SigmaTel STAC9700/9783/9784" },
 	{ CODEC_ID_STAC9704,0xffffffff, default_init,	"SigmaTel STAC9701/03, STAC9704/07, STAC9705 (???)" },
@@ -160,13 +165,20 @@ codec_table codecs[] =
 	{ CODEC_ID_STAC9766,0xffffffff, default_init,	"SigmaTel STAC9766/67" },
 	{ 0x53494c22,		0xffffffff, default_init,	"Silicon Laboratory Si3036" },
 	{ 0x53494c23,		0xffffffff, default_init,	"Silicon Laboratory Si3038" },
-	{ 0x54524103,		0xffffffff, default_init,	"TriTech TR?????" },
+	{ 0x54524103,		0xffffffff, default_init,	"TriTech TR28023" },
 	{ 0x54524106,		0xffffffff, default_init,	"TriTech TR28026" },
 	{ 0x54524108,		0xffffffff, tr28028_init,	"TriTech TR28028" },
 	{ 0x54524123,		0xffffffff, default_init,	"TriTech TR28602" },
+	{ 0x56494161,		0xffffffff, default_init,	"Via Technologies VIA1612A" },
+	{ 0x56494170,		0xffffffff, default_init,	"Via Technologies VIA1617A" },
 	{ 0x574d4c00,		0xffffffff, wm9701_init,	"Wolfson WM9701A" },
 	{ 0x574d4c03,		0xffffffff, wm9703_init,	"Wolfson WM9703/9704" },
-	{ 0x574d4c04,		0xffffffff, wm9704_init,	"Wolfson WM9704 (quad)" },	
+	{ 0x574d4c04,		0xffffffff, wm9704_init,	"Wolfson WM9704 (quad)" },
+	{ 0x574d4c05,		0xffffffff, wm9703_init,	"Wolfson WM9705/WM9710" },
+	{ 0x574d4d09,		0xffffffff, default_init,	"Wolfson WM9709" },
+	{ 0x574d4c12,		0xffffffff, default_init,	"Wolfson WM9711/12" },
+	{ 0x574d4c13,		0xffffffff, default_init,	"Wolfson WM9713/14" },
+	{ 0x57454301,		0xffffffff, default_init,	"Wolfson W83971D" },
 	/* Vendors only: */
 	{ 0x41445300,		0xffffff00, default_init,	"Analog Devices" },
 	{ 0x414b4d00,		0xffffff00, default_init,	"Asahi Kasei" },
@@ -175,11 +187,14 @@ codec_table codecs[] =
 	{ 0x43525900,		0xffffff00, default_init,	"Cirrus Logic" },
 	{ 0x45838300,		0xffffff00, default_init,	"ESS Technology" },
 	{ 0x49434500,		0xffffff00, default_init,	"ICEnsemble" },
+	{ 0x49544500,		0xffffff00, default_init,	"ITE, Inc." },
 	{ 0x4e534300,		0xffffff00, default_init,	"National Semiconductor" },
 	{ 0x83847600,		0xffffff00, default_init,	"SigmaTel" },
 	{ 0x53494c00,		0xffffff00, default_init,	"Silicon Laboratory" },
 	{ 0x54524100,		0xffffff00, default_init,	"TriTech" },
+	{ 0x56494100,		0xffffff00, default_init,	"VIA Technologies" },
 	{ 0x574d4c00,		0xffffff00, default_init,	"Wolfson" },
+	{ 0x594d4800,		0xffffff00, default_init,	"Yamaha" },
 	{ 0x00000000,		0x00000000, default_init,	"Unknown" } /* must be last one, matches every codec */
 };
 
@@ -269,6 +284,10 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	
 	/* set record line in */
 	ac97_reg_update(dev, AC97_RECORD_SELECT, 0x0404);
+
+	LOG(("codec vendor id      = %#08lx\n", dev->codec_id));
+	LOG(("codec description     = %s\n", dev->codec_info));
+	LOG(("codec 3d enhancement = %s\n", dev->codec_3d_stereo_enhancement));
 	
 	ac97_dump_capabilities(dev);
 }

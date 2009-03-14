@@ -706,10 +706,6 @@ auich_setup(auich_dev * card)
 		LOG(("6ch PCM output support\n"));
 	}
 
-	PRINT(("codec vendor id      = %#08lx\n", card->config.ac97->codec_id));
-	PRINT(("codec description     = %s\n", card->config.ac97->codec_info));
-	PRINT(("codec 3d enhancement = %s\n", card->config.ac97->codec_3d_stereo_enhancement));
-
 	if (current_settings.use_thread) {
 		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);
 		resume_thread(int_thread_id);
