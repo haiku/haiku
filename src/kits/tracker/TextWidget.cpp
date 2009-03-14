@@ -513,7 +513,12 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 	const char* fittingText = fText->FittingText(view);
 
 #ifdef __HAIKU__
-	if (!selected && view->WidgetTextOutline()) {
+	// TODO: Comparing view and drawView here to avoid rendering
+	// the text outline when producing a drag bitmap. The check is
+	// not fully correct, since an offscreen view is also used in some
+	// other rare cases (something to do with columns). But for now, this
+	// fixes the broken drag bitmaps when dragging icons from the Desktop.
+	if (!selected && view == drawView && view->WidgetTextOutline()) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
