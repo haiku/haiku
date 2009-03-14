@@ -7,6 +7,55 @@
 #define _COMMAND_MANAGER_H
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/HCI/btHCI_command.h>
+
+#include <malloc.h>
+#include <string.h>
+
+
+#define typed_command(type) type,sizeof(type)
+
+/* Experimental stack allocated alternative to build commands */
+template <typename Type = void, int paramSize = 0, int HeaderSize = HCI_COMMAND_HDR_SIZE>
+class BluetoothCommand {
+
+public:
+	BluetoothCommand(uint8 ogf, uint8 ocf, size_t* outsize)
+	{
+		fHeader = (struct hci_command_header*) fBuffer;
+		
+		if (paramSize != 0)
+			fContent = (Type*)(fHeader + 1);
+		else
+			fContent = (Type*)fHeader; // avoid pointing outside in case of not having parameters
+		
+		fHeader->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
+		fHeader->clen = paramSize; 
+		
+		*outsize = HeaderSize + paramSize;
+	}
+
+	Type*
+	operator->() const
+	{
+ 		return fContent;
+	}
+ 
+	void* 
+	Data() const
+	{
+		return (void*)fBuffer;
+	}
+	
+private:
+	char fBuffer[paramSize + HeaderSize];
+	Type* fContent;
+	struct hci_command_header* fHeader;
+};
+
+
+const char* GetCommand(uint16 command);
+const char* GetManufacturer(uint16 manufacturer);
 
 /* CONTROL BASEBAND */
 void* buildReset(size_t* outsize);

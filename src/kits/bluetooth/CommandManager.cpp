@@ -1,20 +1,10 @@
 /*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
-
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/HCI/btHCI_command.h>
-
-#include <malloc.h>
-#include <string.h>
-
 #include "CommandManager.h"
-
 
 inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize, size_t* outsize)
 {
@@ -267,5 +257,345 @@ void* buildReadBdAddr(size_t* outsize)
 }
 
 
+const char* bluetoothManufacturers[] = {
+	"Ericsson Technology Licensing",
+	"Nokia Mobile Phones",
+	"Intel Corp.",
+	"IBM Corp.",
+	"Toshiba Corp.",
+	"3Com",
+	"Microsoft",
+	"Lucent",
+	"Motorola",
+	"Infineon Technologies AG",
+	"Cambridge Silicon Radio",
+	"Silicon Wave",
+	"Digianswer A/S",
+	"Texas Instruments Inc.",
+	"Parthus Technologies Inc.",
+	"Broadcom Corporation",
+	"Mitel Semiconductor",
+	"Widcomm, Inc.",
+	"Zeevo, Inc.",
+	"Atmel Corporation",
+	"Mitsubishi Electric Corporation",
+	"RTX Telecom A/S",
+	"KC Technology Inc.",
+	"Newlogic",
+	"Transilica, Inc.",
+	"Rohde & Schwartz GmbH & Co. KG",
+	"TTPCom Limited",
+	"Signia Technologies, Inc.",
+	"Conexant Systems Inc.",
+	"Qualcomm",
+	"Inventel",
+	"AVM Berlin",
+	"BandSpeed, Inc.",
+	"Mansella Ltd",
+	"NEC Corporation",
+	"WavePlus Technology Co., Ltd.",
+	"Alcatel",
+	"Philips Semiconductors",
+	"C Technologies",
+	"Open Interface",
+	"R F Micro Devices",
+	"Hitachi Ltd",
+	"Symbol Technologies, Inc.",
+	"Tenovis",
+	"Macronix International Co. Ltd.",
+	"GCT Semiconductor",
+	"Norwood Systems",
+	"MewTel Technology Inc.",
+	"ST Microelectronics",
+	"Synopsys",
+	"Red-M (Communications) Ltd",
+	"Commil Ltd",
+	"Computer Access Technology Corporation (CATC)",
+	"Eclipse (HQ Espana) S.L.",
+	"Renesas Technology Corp.",
+	"Mobilian Corporation",
+	"Terax",
+	"Integﬂrated System Solution Corp.",
+	"Matsushita Electric Industrial Co., Ltd.",
+	"Gennum Corporation",
+	"Research In Motion",
+	"IPextreme, Inc.",
+	"Systems and Chips, Inc",
+	"Bluetooth SIG, Inc",
+	"Seiko Epson Corporation",
+	"Integrated Silicon Solution Taiwain, Inc.",
+	"CONWISE Technology Corporation Ltd",
+	"PARROTﬂ SA",
+	"Socket Communications",
+	"Atheros Communications, Inc.",
+	"MediaTek, Inc.",
+	"Bluegiga",	/* (tentative) */
+	"Marvell Technology Group Ltd.",
+	"3DSP Corporation",
+	"Accel Semiconductor Ltd.",
+	"Continental Automotive Systems",
+	"Apple, Inc.",
+	"Staccato Communications, Inc."
+};
 
+
+const char* linkControlCommands[] = {
+	"Inquiry",
+	"Inquiry Cancel",
+	"Periodic Inquiry Mode",
+	"Exit Periodic Inquiry Mode",
+	"Create Connection",
+	"Disconnect",
+	"Add SCO Connection", // not on 2.1
+	"Cancel Create Connection",
+	"Accept Connection Request",
+	"Reject Connection Request",
+	"Link Key Request Reply",
+	"Link Key Request Negative Reply",
+	"PIN Code Request Reply",
+	"PIN Code Request Negative Reply",
+	"Change Connection Packet Type",
+	"not on 2.1",
+	"Authentication Requested",
+	"not on 2.1",
+	"Set Connection Encryption",
+	"not on 2.1",
+	"Change Connection Link Key",
+	"not on 2.1",
+	"Master Link Key",
+	"not on 2.1",
+	"Remote Name Request",
+	"Cancel Remote Name Request",
+	"Read Remote Supported Features",
+	"Read Remote Extended Features",
+	"Read Remote Version Information",
+	"not on 2.1",
+	"Read Clock Offset",
+	"Read LMP Handle",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Setup Synchronous Connection",
+	"Accept Synchronous Connection",
+	"Reject Synchronous Connection",	
+	"IO Capability Request Reply",
+	"User Confirmation Request Reply",
+	"User Confirmation Request Negative Reply",
+	"User Passkey Request Reply",
+	"User Passkey Request Negative Reply",
+	"Remote OOB Data Request Reply",
+	"Reserved",
+	"Reserved",
+	"Remote OOB Data Request Negative Reply",
+	"IO Capabilities Response Negative Reply"
+};
+
+	
+const char* linkPolicyCommands[] = {	
+	"Hold Mode",
+	"Reserved",
+	"Sniff Mode",
+	"Exit Sniff Mode",
+	"Park State",
+	"Exit Park State",
+	"QoS Setup",
+	"Reserved",
+	"Role Discovery",
+	"Reserved",
+	"Switch Role",
+	"Read Link Policy Settings",
+	"Write Link Policy Settings",
+	"Read Default Link Policy Settings",
+	"Write Default Link Policy Settings",
+	"Flow Specification",
+	"Sniff Subrating"
+};
+
+
+const char* controllerBasebandCommands[] = {	
+	"Set Event Mask",
+	"Reserved",
+	"Reset",
+	"Reserved",	
+	"Set Event Filter",
+	"Reserved",
+	"Reserved",
+	"Flush",
+	"Read PIN Type",
+	"Write PIN Type",
+	"Create New Unit Key",
+	"Reserved",
+	"Read Stored Link Key",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Write Stored Link Key",
+	"Delete Stored Link Key",
+	"Write Local Name",
+	"Read Local Name",
+	"Read Connection Accept Timeout",
+	"Write Connection Accept Timeout",
+	"Read Page Timeout",
+	"Write Page Timeout",
+	"Read Scan Enable",
+	"Write Scan Enable",
+	"Read Page Scan Activity",
+	"Write Page Scan Activity",
+	"Read Inquiry Scan Activity",
+	"Write Inquiry Scan Activity",
+	"Read Authentication Enable",
+	"Write Authentication Enable",
+	"Read Encryption Mode", // not 2.1
+	"Write Encryption Mode",// not 2.1
+	"Read Class Of Device",
+	"Write Class Of Device",
+	"Read Voice Setting",
+	"Write Voice Setting",
+	"Read Automatic Flush Timeout",
+	"Write Automatic Flush Timeout",
+	"Read Num Broadcast Retransmissions",
+	"Write Num Broadcast Retransmissions",	
+	"Read Hold Mode Activity",
+	"Write Hold Mode Activity",
+	"Read Transmit Power Level",
+	"Read Synchronous Flow Control Enable",
+	"Write Synchronous Flow Control Enable",
+	"Reserved",
+	"Set Host Controller To Host Flow Control",
+	"Reserved",
+	"Host Buffer Size",
+	"Reserved",
+	"Host Number Of Completed Packets",
+	"Read Link Supervision Timeout",
+	"Write Link Supervision Timeout",
+	"Read Number of Supported IAC",
+	"Read Current IAC LAP",
+	"Write Current IAC LAP",
+	"Read Page Scan Period Mode", // not 2.1
+	"Write Page Scan Period Mode", // not 2.1
+	"Read Page Scan Mode",		// not 2.1
+	"Write Page Scan Mode",		// not 2.1
+	"Set AFH Channel Classification",
+	"Reserved",
+	"Reserved",
+	"Read Inquiry Scan Type",
+	"Write Inquiry Scan Type",
+	"Read Inquiry Mode",
+	"Write Inquiry Mode",
+	"Read Page Scan Type",
+	"Write Page Scan Type",
+	"Read AFH Channel Assessment Mode",
+	"Write AFH Channel Assessment Mode",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Read Extended Inquiry Response",
+	"Write Extended Inquiry Response",
+	"Refresh Encryption Key",
+	"Reserved",
+	"Read Simple Pairing Mode",
+	"Write Simple Pairing Mode",
+	"Read Local OOB Data",
+	"Read Inquiry Transmit Power Level",
+	"Write Inquiry Transmit Power Level",
+	"Read Default Erroneous Data Reporting",
+	"Write Default Erroneous Data Reporting",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Enhanced Flush",
+	"Send Keypress Notification"
+};
+
+
+const char* informationalParametersCommands[] = {	
+	"Read Local Version Information",
+	"Read Local Supported Commands",
+	"Read Local Supported Features",
+	"Read Local Extended Features",
+	"Read Buffer Size",
+	"Reserved",
+	"Read Country Code", // not 2.1
+	"Reserved",
+	"Read BD ADDR"
+};
+
+	
+const char* statusParametersCommands[] = {
+	"Read Failed Contact Counter",
+	"Reset Failed Contact Counter",
+	"Read Link Quality",
+	"Reserved",
+	"Read RSSI",
+	"Read AFH Channel Map",
+	"Read Clock",
+};
+
+
+const char* testingCommands[] = {
+	"Read Loopback Mode",
+	"Write Loopback Mode",
+	"Enable Device Under Test Mode",
+	"Write Simple Pairing Debug Mode",
+};
+
+
+const char* 
+GetCommand(uint16 command)
+{
+	// TODO: BT implementations beyond 2.1
+	// could specify new commands with OCF numbers
+	// beyond the boundaries of the arrays and crash.
+	// But only our stack could issue them so its under
+	// our control.
+	switch (GET_OPCODE_OGF(command)) {
+		case OGF_LINK_CONTROL:
+			return linkControlCommands[GET_OPCODE_OCF(command)];
+			break;
+
+		case OGF_LINK_POLICY:
+			return linkPolicyCommands[GET_OPCODE_OCF(command)];
+			break;
+
+		case OGF_CONTROL_BASEBAND:
+			return controllerBasebandCommands[GET_OPCODE_OCF(command)];
+			break;
+
+		case OGF_INFORMATIONAL_PARAM:
+			return informationalParametersCommands[GET_OPCODE_OCF(command)];
+			break;
+
+		case OGF_STATUS_PARAM:
+			return statusParametersCommands[GET_OPCODE_OCF(command)];
+			break;
+
+		case OGF_TESTING_CMD:
+			return testingCommands[GET_OPCODE_OCF(command)];
+			break;
+		default:
+			return "Unknown command";
+			break;
+	}
+
+}
+
+
+const char* 
+GetManufacturer(uint16 manufacturer) {
+	if (manufacturer < sizeof(bluetoothManufacturers)/sizeof(const char*)) {
+		return bluetoothManufacturers[manufacturer];
+	} else if (manufacturer == 0xFFFF) {
+		return "internal use";
+	} else {
+		return "not assigned";
+	}
+}
 
