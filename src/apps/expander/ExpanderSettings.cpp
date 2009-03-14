@@ -53,13 +53,24 @@
 //	4 bytes : 	window position topleft x (default : 0x4842)
 //	4 bytes : 	window position topleft y (default : 0x4842)
 
+
+template<typename T> bool
+read_data(BFile& file, T& value)
+{
+	return file.Read(&value, sizeof(T)) == (ssize_t)sizeof(T);
+}
+
+
+//	#pragma mark -
+
+
 ExpanderSettings::ExpanderSettings()
 	:
 	fMessage(kMsgExpanderSettings),
 	fUpdated(false)
 {
 	fMessage.AddBool("automatically_expand_files", false);
-	fMessage.AddBool("close_when_done", false);
+	fMessage.AddBool("close_when_done", true);
 	fMessage.AddInt8("destination_folder", 0x63);
 	entry_ref ref;
 	fMessage.AddRef("destination_folder_use", &ref);
@@ -71,49 +82,52 @@ ExpanderSettings::ExpanderSettings()
 	if (Open(&file, B_READ_ONLY) != B_OK)
 		return;
 
-	// ToDo: load/save settings as flattened BMessage - but not yet,
+	// TODO: load/save settings as flattened BMessage - but not yet,
 	//		since that will break compatibility with R5's Expander
 
 	bool unknown;
-	bool automatically_expand_files;
-	bool close_when_done;
-	int8 destination_folder;
-	bool open_destination_folder;
-	bool show_contents_listing;
+	bool automaticallyExpandFiles;
+	bool closeWhenDone;
+	int8 destinationFolder;
+	bool openDestinationFolder;
+	bool showContentsListing;
 	BPoint position;
-	int32 name_size;
-	if (
-		(file.Read(&unknown, sizeof(unknown)) == sizeof(unknown))
-		&& (file.Read(&automatically_expand_files, sizeof(automatically_expand_files)) == sizeof(automatically_expand_files))
-		&& (file.Read(&close_when_done, sizeof(close_when_done)) == sizeof(close_when_done))
-		&& (file.Read(&destination_folder, sizeof(destination_folder)) == sizeof(destination_folder))
-		&& (file.Read(&unknown, sizeof(unknown)) == sizeof(unknown))
-		&& (file.Read(&ref.device, sizeof(ref.device)) == sizeof(ref.device))
-		&& (file.Read(&ref.directory, sizeof(ref.directory)) == sizeof(ref.directory))
-		&& (file.Read(&name_size, sizeof(name_size)) == sizeof(name_size))
-		&& ((name_size <= 0) || (ref.name = (char*)malloc(name_size + 1)))
-		&& (file.Read(ref.name, name_size) == name_size)
-		&& (file.Read(&open_destination_folder, sizeof(open_destination_folder)) == sizeof(open_destination_folder))
-		&& (file.Read(&show_contents_listing, sizeof(show_contents_listing)) == sizeof(show_contents_listing))
-		&& (file.Read(&position, sizeof(position)) == sizeof(position))
-	   ) {
+	char name[B_FILE_NAME_LENGTH] = {'\0'};
+	int32 nameSize;
+	if (read_data(file, unknown)
+		&& read_data(file, automaticallyExpandFiles)
+		&& read_data(file, closeWhenDone)
+		&& read_data(file, destinationFolder)
+		&& read_data(file, unknown)
+		&& read_data(file, ref.device)
+		&& read_data(file, ref.directory)
+		&& read_data(file, nameSize)
+		&& (nameSize <= 0 || file.Read(name, nameSize) == nameSize)
+		&& read_data(file, openDestinationFolder)
+		&& read_data(file, showContentsListing)
+		&& read_data(file, position)) {	
+		if (nameSize > 0 && nameSize < B_FILE_NAME_LENGTH) {
+			name[nameSize] = '\0';
+			ref.set_name(name);
+		}
 
 		// check if the window position is on screen at all
 		BScreen screen;
 		if (screen.Frame().Contains(position))
 			fMessage.ReplacePoint("window_position", position);
 
-		fMessage.ReplaceBool("automatically_expand_files", automatically_expand_files);
-		fMessage.ReplaceBool("close_when_done", close_when_done);
-		if (destination_folder == 0x66 || destination_folder == 0x63 || destination_folder == 0x65)
-			fMessage.ReplaceInt8("destination_folder", destination_folder);
-		if (name_size > 0)
-			ref.name[name_size] = '\0';
+		fMessage.ReplaceBool("automatically_expand_files",
+			automaticallyExpandFiles);
+		fMessage.ReplaceBool("close_when_done", closeWhenDone);
+		if (destinationFolder == 0x66
+			|| destinationFolder == 0x63
+			|| destinationFolder == 0x65)
+			fMessage.ReplaceInt8("destination_folder", destinationFolder);
 		BEntry entry(&ref);
 		if (entry.Exists())
 			fMessage.ReplaceRef("destination_folder_use", &ref);
-		fMessage.ReplaceBool("open_destination_folder", open_destination_folder);
-		fMessage.ReplaceBool("show_contents_listing", show_contents_listing);
+		fMessage.ReplaceBool("open_destination_folder", openDestinationFolder);
+		fMessage.ReplaceBool("show_contents_listing", showContentsListing);
 	}
 }
 
@@ -128,41 +142,42 @@ ExpanderSettings::~ExpanderSettings()
 	if (Open(&file, B_CREATE_FILE | B_WRITE_ONLY) != B_OK)
 		return;
 
-	bool automatically_expand_files;
-	bool close_when_done;
-	int8 destination_folder;
+	bool automaticallyExpandFiles;
+	bool closeWhenDone;
+	int8 destinationFolder;
 	entry_ref ref;
-	bool open_destination_folder;
-	bool show_contents_listing;
+	bool openDestinationFolder;
+	bool showContentsListing;
 	BPoint position;
 	bool unknown = 1;
 
-	if ((fMessage.FindPoint("window_position", &position) == B_OK)
-		&& (fMessage.FindBool("automatically_expand_files", &automatically_expand_files) == B_OK)
-		&& (fMessage.FindBool("close_when_done", &close_when_done) == B_OK)
-		&& (fMessage.FindInt8("destination_folder", &destination_folder) == B_OK)
-		&& (fMessage.FindRef("destination_folder_use", &ref) == B_OK)
-		&& (fMessage.FindBool("open_destination_folder", &open_destination_folder) == B_OK)
-		&& (fMessage.FindBool("show_contents_listing", &show_contents_listing) == B_OK)) {
-
+	if (fMessage.FindPoint("window_position", &position) == B_OK
+		&& fMessage.FindBool("automatically_expand_files",
+				&automaticallyExpandFiles) == B_OK
+		&& fMessage.FindBool("close_when_done", &closeWhenDone) == B_OK
+		&& fMessage.FindInt8("destination_folder", &destinationFolder) == B_OK
+		&& fMessage.FindRef("destination_folder_use", &ref) == B_OK
+		&& fMessage.FindBool("open_destination_folder",
+				&openDestinationFolder) == B_OK
+		&& fMessage.FindBool("show_contents_listing",
+			&showContentsListing) == B_OK) {
 		file.Write(&unknown, sizeof(unknown));
-		file.Write(&automatically_expand_files, sizeof(automatically_expand_files));
-		file.Write(&close_when_done, sizeof(close_when_done));
-		file.Write(&destination_folder, sizeof(destination_folder));
+		file.Write(&automaticallyExpandFiles, sizeof(automaticallyExpandFiles));
+		file.Write(&closeWhenDone, sizeof(closeWhenDone));
+		file.Write(&destinationFolder, sizeof(destinationFolder));
 		unknown = 0;
 		file.Write(&unknown, sizeof(unknown));
 		file.Write(&ref.device, sizeof(ref.device));
 		file.Write(&ref.directory, sizeof(ref.directory));
-		int32 name_size = 0;
+		int32 nameSize = 0;
 		if (ref.name)
-			name_size = strlen(ref.name);
-		file.Write(&name_size, sizeof(name_size));
-		file.Write(ref.name, name_size);
-		file.Write(&open_destination_folder, sizeof(open_destination_folder));
-		file.Write(&show_contents_listing, sizeof(show_contents_listing));
+			nameSize = strlen(ref.name);
+		file.Write(&nameSize, sizeof(nameSize));
+		file.Write(ref.name, nameSize);
+		file.Write(&openDestinationFolder, sizeof(openDestinationFolder));
+		file.Write(&showContentsListing, sizeof(showContentsListing));
 		file.Write(&position, sizeof(position));
 	}
-
 }
 
 
@@ -182,34 +197,39 @@ ExpanderSettings::Open(BFile *file, int32 mode)
 void
 ExpanderSettings::UpdateFrom(BMessage *message)
 {
-	bool automatically_expand_files;
-	bool close_when_done;
-	int8 destination_folder;
+	bool automaticallyExpandFiles;
+	bool closeWhenDone;
+	int8 destinationFolder;
 	entry_ref ref;
-	bool open_destination_folder;
-	bool show_contents_listing;
+	bool openDestinationFolder;
+	bool showContentsListing;
 	BPoint position;
 
 	if (message->FindPoint("window_position", &position) == B_OK)
 		fMessage.ReplacePoint("window_position", position);
 
-	if (message->FindBool("automatically_expand_files", &automatically_expand_files) == B_OK)
-		fMessage.ReplaceBool("automatically_expand_files", automatically_expand_files);
+	if (message->FindBool("automatically_expand_files",
+			&automaticallyExpandFiles) == B_OK) {
+		fMessage.ReplaceBool("automatically_expand_files",
+			automaticallyExpandFiles);
+	}
 
-	if (message->FindBool("close_when_done", &close_when_done) == B_OK)
-		fMessage.ReplaceBool("close_when_done", close_when_done);
+	if (message->FindBool("close_when_done", &closeWhenDone) == B_OK)
+		fMessage.ReplaceBool("close_when_done", closeWhenDone);
 
-	if (message->FindInt8("destination_folder", &destination_folder) == B_OK)
-		fMessage.ReplaceInt8("destination_folder", destination_folder);
+	if (message->FindInt8("destination_folder", &destinationFolder) == B_OK)
+		fMessage.ReplaceInt8("destination_folder", destinationFolder);
 
 	if (message->FindRef("destination_folder_use", &ref) == B_OK)
 		fMessage.ReplaceRef("destination_folder_use", &ref);
 
-	if (message->FindBool("open_destination_folder", &open_destination_folder) == B_OK)
-		fMessage.ReplaceBool("open_destination_folder", open_destination_folder);
+	if (message->FindBool("open_destination_folder",
+			&openDestinationFolder) == B_OK)
+		fMessage.ReplaceBool("open_destination_folder", openDestinationFolder);
 
-	if (message->FindBool("show_contents_listing", &show_contents_listing) == B_OK)
-		fMessage.ReplaceBool("show_contents_listing", show_contents_listing);
+	if (message->FindBool("show_contents_listing",
+			&showContentsListing) == B_OK)
+		fMessage.ReplaceBool("show_contents_listing", showContentsListing);
 
 	fUpdated = true;
 }
