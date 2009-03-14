@@ -529,7 +529,6 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 		drawView->GetFont(&font);
 
 		rgb_color textColor = drawView->HighColor();
-		rgb_color outlineColor;
 		if (textColor.red + textColor.green + textColor.blue < 128 * 3) {
 			// dark text on light outline
 			rgb_color glowColor = kWhite;
