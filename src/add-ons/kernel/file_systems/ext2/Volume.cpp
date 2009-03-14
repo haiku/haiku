@@ -453,6 +453,7 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 	if (!superBlock->IsValid())
 		return B_BAD_VALUE;
 
-	return _UnsupportedIncompatibleFeatures(*superBlock) == 0;
+	return _UnsupportedIncompatibleFeatures(*superBlock) == 0
+		? B_OK : B_NOT_SUPPORTED;
 }
 
