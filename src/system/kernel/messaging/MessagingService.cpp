@@ -450,14 +450,7 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 	// delete the discarded areas (save one)
 	ObjectDeleter<MessagingArea> discardedAreaDeleter;
 	MessagingArea *discardedArea = NULL;
-	// TODO: this loop still has a flaw
-	// - if the first area in the list is full,
-	// we will always allocate a new area to add the next message to,
-	// even if we already have another area in the chain with enough space
-	// if the allocation fails this probably needs to walk the list
-	// and keep trying for each non-empty area it finds until it either
-	// succeeds or hits the last area. Only in the latter case should we
-	// be allocating a new one.
+
 	while (fFirstArea != fLastArea) {
 		area = fFirstArea;
 		area->Lock();
