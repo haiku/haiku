@@ -18,7 +18,6 @@
 
 #include <WindowPrivate.h>
 
-using std::max;
 
 WorkspacesView::WorkspacesView(BRect frame, BPoint scrollingOffset,
 		const char* name, int32 token, uint32 resizeMode, uint32 flags)
@@ -558,7 +557,7 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 
 	// Don't treat every little mouse move as a window move - this would
 	// make it too hard to activate a workspace.
-	float diff = max(fabs(fClickPoint.x - where.x),
+	float diff = max_c(fabs(fClickPoint.x - where.x),
 		fabs(fClickPoint.y - where.y));
 	if (!fHasMoved && diff > 2)
 		fHasMoved = true;

@@ -40,9 +40,9 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 			case B_MOUSE_MOVED:
 			{
 				// ignore the initial B_MOUSE_MOVED sent by the app_server
-				bool transit_only = false;
-				if (message->FindBool("be:transit_only", &transit_only) == B_OK
-					&& transit_only)
+				bool transitOnly = false;
+				if (message->FindBool("be:transit_only", &transitOnly) == B_OK
+					&& transitOnly)
 					return B_DISPATCH_MESSAGE;
 
 				// Fall through
