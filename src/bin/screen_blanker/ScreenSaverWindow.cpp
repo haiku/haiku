@@ -98,7 +98,6 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 ScreenSaverWindow::~ScreenSaverWindow()
 {
 	Hide();
-	delete fFilter;
 }
 
 
