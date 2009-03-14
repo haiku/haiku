@@ -125,7 +125,7 @@ es1370_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			value = es1370_codec_read(&dev->config, info->reg);
 			value &= ~mask;
 			value |= ((values[0] == 1.0 ? 1 : 0 ) << 15 & mask);
-			if(info->reg == AC97_SURROUND_VOLUME) {
+			if(info->reg == AC97_SURR_VOLUME) {
 				// there is a independent mute for each channel
 				mask = ((1 << 1) - 1) << 7;
 				value &= ~mask;
@@ -178,12 +178,12 @@ es1370_create_controls_list(multi_dev *multi)
 }
 
 static status_t 
-es1370_get_mix(es1370_dev *card, multi_mix_value_info * MMVI)
+es1370_get_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for(i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
 			PRINT(("es1370_get_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -195,34 +195,34 @@ es1370_get_mix(es1370_dev *card, multi_mix_value_info * MMVI)
 				float values[2];
 				control->get(card, control->cookie, control->type, values);
 				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					MMVI->values[i].u.gain = values[0];
+					mmvi->values[i].u.gain = values[0];
 				else
-					MMVI->values[i].u.gain = values[1];
+					mmvi->values[i].u.gain = values[1];
 			}			
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.enable = (values[0] == 1.0);
+			mmvi->values[i].u.enable = (values[0] == 1.0);
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
-			MMVI->values[i].u.mux = (int32)values[0];
+			mmvi->values[i].u.mux = (int32)values[0];
 		}
 	}
 	return B_OK;
 }
 
 static status_t 
-es1370_set_mix(es1370_dev *card, multi_mix_value_info * MMVI)
+es1370_set_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
-		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
+	for(i = 0; i < mmvi->item_count; i++) {
+		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
 			PRINT(("es1370_set_mix : invalid control id requested : %li\n", id));
 			continue;
@@ -231,8 +231,8 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * MMVI)
 					
 		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if(i+1<MMVI->item_count) {
-				id = MMVI->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
+			if(i+1<mmvi->item_count) {
+				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
 				if(id < 0 || id >= card->multi.control_count) {
 					PRINT(("es1370_set_mix : invalid control id requested : %li\n", id));
 				} else {
@@ -248,12 +248,12 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * MMVI)
 				values[1] = 0.0;
 
 				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
-					values[0] = MMVI->values[i].u.gain;
+					values[0] = mmvi->values[i].u.gain;
 				else
-					values[1] = MMVI->values[i].u.gain;
+					values[1] = mmvi->values[i].u.gain;
 					
 				if(control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
-					values[1] = MMVI->values[i+1].u.gain;
+					values[1] = mmvi->values[i+1].u.gain;
 					
 				control->set(card, control->cookie, control->type, values);
 			}
@@ -265,14 +265,14 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * MMVI)
 		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
-			values[0] = MMVI->values[i].u.enable ? 1.0 : 0.0;
+			values[0] = mmvi->values[i].u.enable ? 1.0 : 0.0;
 			control->set(card, control->cookie, control->type, values);
 		}
 		
 		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
-			values[0] = (float)MMVI->values[i].u.mux;
+			values[0] = (float)mmvi->values[i].u.mux;
 			control->set(card, control->cookie, control->type, values);
 		}
 	}
@@ -280,22 +280,22 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * MMVI)
 }
 
 static status_t 
-es1370_list_mix_controls(es1370_dev *card, multi_mix_control_info * MMCI)
+es1370_list_mix_controls(es1370_dev *card, multi_mix_control_info * mmci)
 {
-	multi_mix_control	*MMC;
+	multi_mix_control	*mmc;
 	int32 i;
 	
-	MMC = MMCI->controls;
-	if(MMCI->control_count < 24)
+	mmc = mmci->controls;
+	if(mmci->control_count < 24)
 		return B_ERROR;
 			
 	if(es1370_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for(i=0; i<card->multi.control_count; i++) {
-		MMC[i] = card->multi.controls[i].mix_control;
+	for(i = 0; i < card->multi.control_count; i++) {
+		mmc[i] = card->multi.controls[i].mix_control;
 	}
 	
-	MMCI->control_count = card->multi.control_count;	
+	mmci->control_count = card->multi.control_count;	
 	return B_OK;
 }
 
@@ -373,7 +373,7 @@ es1370_create_channels_list(multi_dev *multi)
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for(i=0; i<stream->channels; i++) {
+			for(i = 0; i < stream->channels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == ES1370_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -550,7 +550,7 @@ es1370_get_buffers(es1370_dev *card, multi_buffer_list *data)
 	if(bufcount > data->request_playback_buffers)
 		bufcount = data->request_playback_buffers;
 
-	for(i=0; i<bufcount; i++)
+	for(i = 0; i < bufcount; i++)
 		for(j=0; j<pchannels; j++)
 			es1370_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
@@ -564,7 +564,7 @@ es1370_get_buffers(es1370_dev *card, multi_buffer_list *data)
 	if(bufcount > data->request_record_buffers)
 		bufcount = data->request_record_buffers;
 
-	for(i=0; i<bufcount; i++)
+	for(i = 0; i < bufcount; i++)
 		for(j=0; j<rchannels; j++)
 			es1370_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,

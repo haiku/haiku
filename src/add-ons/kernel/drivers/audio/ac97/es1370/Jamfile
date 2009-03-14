@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 es1370 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 KernelAddon es1370 :
 	debug.c
