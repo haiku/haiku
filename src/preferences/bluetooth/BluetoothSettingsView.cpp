@@ -126,12 +126,14 @@ BluetoothSettingsView::MessageReceived(BMessage *msg)
 			if (msg->FindPointer("LocalDevice", (void**) &lDevice) == B_OK) {
 				// Device integrity should be rechecked
 				fExtDeviceView->SetLocalDevice(lDevice);
+				fExtDeviceView->SetEnabled(true);
 				ActiveLocalDevice = lDevice;			
 			}
 		}
 		break;
 		case kMsgRefresh:
 			_BuildLocalDevicesMenu();
+			fLocalDevicesMenu->SetTargetForItems(this);
 		break;
 		default:
 			BView::MessageReceived(msg);

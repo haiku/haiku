@@ -31,7 +31,8 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevi
 	fDiscoverable = new BCheckBox(iDontCare, "Discoverable","Discoverable", new BMessage(SET_DISCOVERABLE));
 	fVisible = new BCheckBox(iDontCare, "Visible", "Show Name", new BMessage(SET_VISIBLE));
 
-
+	fDiscoverable->SetEnabled(false);
+	fVisible->SetEnabled(false);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 				.Add(fDeviceView)
@@ -103,8 +104,8 @@ ExtendedLocalDeviceView::MessageReceived(BMessage *msg)
 
 			if (fVisible->Value())
 				fScanMode |= 2;
-
-			fDevice->SetDiscoverable(fScanMode);
+			if (fDevice != NULL)
+				fDevice->SetDiscoverable(fScanMode);
 
 		break;
 
@@ -118,5 +119,5 @@ ExtendedLocalDeviceView::MessageReceived(BMessage *msg)
 void
 ExtendedLocalDeviceView::SetEnabled(bool value)
 {
-
+	fDiscoverable->SetEnabled(value);
 }
