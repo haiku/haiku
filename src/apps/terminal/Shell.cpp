@@ -486,6 +486,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 #ifndef __HAIKU__
 		ioctl(0, 'pgid', getpid());
 #endif
+		set_thread_priority(find_thread(NULL), B_NORMAL_PRIORITY);
 
 		/* pty open and set termios successful. */
 		handshake.status = PTY_OK;
