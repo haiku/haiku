@@ -2316,7 +2316,7 @@ BPoseView::MessageReceived(BMessage *message)
 			bigtime_t doubleClickSpeed;
 			get_click_speed(&doubleClickSpeed);
 			if (system_time() - fLastKeyTime > (doubleClickSpeed * 2)) {
-				fCountView->SetTypeAhead(sMatchString);
+				fCountView->SetTypeAhead("");
 				delete fKeyRunner;
 				fKeyRunner = NULL;
 			}
