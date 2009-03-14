@@ -356,6 +356,9 @@ OverlayInode::Create(const char *name, int openMode, int perms, void **cookie,
 status_t
 OverlayInode::Open(int openMode, void **_cookie)
 {
+	if (!fHasStat)
+		ReadStat(NULL);
+
 	if (fIsVirtual) {
 		if (openMode & O_TRUNC)
 			fStat.st_size = 0;
