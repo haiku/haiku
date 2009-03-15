@@ -14,10 +14,10 @@
 #include <Bitmap.h>
 #include <string.h>
 
-#include "avcodec.h"
+#include "avcodecplugin.h"
 
 #undef TRACE
-//#define TRACE_AV_CODEC
+#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
@@ -353,8 +353,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 			if (avcodec_open(ffc, fCodec) >= 0) {
 				fCodecInitDone = true;
 
-				conv_func = resolve_colorspace(
-					fOutputVideoFormat.display.format, ffc->pix_fmt);
+				conv_func = resolve_colorspace(fOutputVideoFormat.display.format, ffc->pix_fmt);
 			}
 			if (conv_func != 0)
 				break;
@@ -366,8 +365,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		}
 
 		if (!conv_func) {
-			TRACE("no conv_func found!\n");
-			return B_ERROR;
+			TRACE("no conv_func found or decoder has not set the pixel format yet!\n");
 		}
 
 		if (fOutputVideoFormat.display.format == B_YCbCr422) {
@@ -465,7 +463,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			}
 			if (fOutputBufferSize == 0) {
 				int len, out_size;
-				len = avcodec_decode_audio(ffc, (short *)fOutputBuffer,
+				len = avcodec_decode_audio2(ffc, (short *)fOutputBuffer,
 					&out_size, (uint8_t*)fChunkBuffer + fChunkBufferOffset,
 					fChunkBufferSize);
 				if (len < 0) {
@@ -545,24 +543,21 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #ifdef DO_PROFILING
 			prof_t2 = system_time();
 #endif
-//			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
-//				pixfmt_to_string(ffc->pix_fmt));
-/*
-			opicture.data[0] = (uint8_t *)out_buffer;
-			opicture.linesize[0] = fOutputVideoFormat.display.bytes_per_row;
-			
-			(*conv_func)(&ffpicture, &opicture,
-				fOutputVideoFormat.display.line_width, 
-				fOutputVideoFormat.display.line_count);
-*/
+			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
+				pixfmt_to_string(ffc->pix_fmt));
+
+			// Some decoders do not set pix_fmt until they have decoded 1 frame				
+			if (conv_func == 0) {
+				conv_func = resolve_colorspace(fOutputVideoFormat.display.format, ffc->pix_fmt);
+			}
 			opicture->data[0] = (uint8_t *)out_buffer;
 			opicture->linesize[0] = fOutputVideoFormat.display.bytes_per_row;
 			
-//	TRACE("avCodec::Decode(): before conv_func()\n");
-			(*conv_func)(ffpicture, opicture,
-				fOutputVideoFormat.display.line_width,
-				fOutputVideoFormat.display.line_count);
-//	TRACE("avCodec::Decode(): after conv_func()\n");
+			if (conv_func) {
+				(*conv_func)(ffpicture, opicture,
+					fOutputVideoFormat.display.line_width,
+					fOutputVideoFormat.display.line_count);
+			}
 #ifdef DEBUG
 			dump_ffframe(ffpicture, "ffpict");
 //			dump_ffframe(opicture, "opict");

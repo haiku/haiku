@@ -21,6 +21,7 @@ Addon avcodec :
 	libswscale.a
 	be
 	libmedia.so
+	libz.a
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins avcodec libavcodec ;
