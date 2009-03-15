@@ -130,6 +130,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);
 		debug_init_post_vm(&sKernelArgs);
+		TRACE("init notification services\n");
+		notifications_init();
 		TRACE("init teams\n");
 		team_init(&sKernelArgs);
 		TRACE("init ELF loader\n");
@@ -180,8 +182,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();
-		TRACE("init notification services\n");
-		notifications_init();
 		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
 #if ENABLE_SWAP_SUPPORT

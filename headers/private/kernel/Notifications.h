@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,124 +29,213 @@
 class NotificationService;
 
 class NotificationListener {
-	public:
-		virtual ~NotificationListener();
+public:
+	virtual						~NotificationListener();
 
-		virtual void EventOccured(NotificationService& service,
-			const KMessage* event);
-		virtual void AllListenersNotified(NotificationService& service);
+	virtual void				EventOccured(NotificationService& service,
+									const KMessage* event);
+	virtual void				AllListenersNotified(
+									NotificationService& service);
 
-		virtual bool operator==(const NotificationListener& other) const;
+	virtual bool				operator==(
+									const NotificationListener& other) const;
 
-		bool operator!=(const NotificationListener& other) const
-			{ return !(*this == other); }
+			bool				operator!=(
+									const NotificationListener& other) const
+									{ return !(*this == other); }
 };
 
 class UserMessagingMessageSender {
-	public:
-		UserMessagingMessageSender();
+public:
+								UserMessagingMessageSender();
 
-		void SendMessage(const KMessage* message, port_id port, int32 token);
-		void FlushMessage();
+			void				SendMessage(const KMessage* message,
+									port_id port, int32 token);
+			void				FlushMessage();
 
-	private:
-		enum {
-			MAX_MESSAGING_TARGET_COUNT	= 16,
-		};
+private:
+	enum {
+		MAX_MESSAGING_TARGET_COUNT	= 16,
+	};
 
-		const KMessage*		fMessage;
-		messaging_target	fTargets[MAX_MESSAGING_TARGET_COUNT];
-		int32				fTargetCount;
+			const KMessage*		fMessage;
+			messaging_target	fTargets[MAX_MESSAGING_TARGET_COUNT];
+			int32				fTargetCount;
 };
 
 class UserMessagingListener : public NotificationListener {
-	public:
-		UserMessagingListener(UserMessagingMessageSender& sender, port_id port,
-			int32 token);
-		virtual ~UserMessagingListener();
+public:
+								UserMessagingListener(
+									UserMessagingMessageSender& sender,
+									port_id port, int32 token);
+	virtual						~UserMessagingListener();
 
-		virtual void EventOccured(NotificationService& service,
-			const KMessage* event);
-		virtual void AllListenersNotified(NotificationService& service);
+	virtual void				EventOccured(NotificationService& service,
+									const KMessage* event);
+	virtual void				AllListenersNotified(
+									NotificationService& service);
 
-		port_id Port() const	{ return fPort; }
-		int32 Token() const		{ return fToken; }
+			port_id				Port() const	{ return fPort; }
+			int32				Token() const	{ return fToken; }
 
-	private:
-		UserMessagingMessageSender&	fSender;
-		port_id						fPort;
-		int32						fToken;
+			bool				operator==(
+									const NotificationListener& _other) const;
+
+private:
+	UserMessagingMessageSender&	fSender;
+	port_id						fPort;
+	int32						fToken;
 };
 
+inline bool
+UserMessagingListener::operator==(const NotificationListener& _other) const
+{
+	const UserMessagingListener* other
+		= dynamic_cast<const UserMessagingListener*>(&_other);
+	return other != NULL && other->Port() == Port()
+		&& other->Token() == Token();
+}
+
 class NotificationService : public Referenceable {
-	public:
-		virtual ~NotificationService();
+public:
+	virtual						~NotificationService();
 
-		virtual status_t AddListener(const KMessage* eventSpecifier,
-			NotificationListener& listener) = 0;
-		virtual status_t RemoveListener(const KMessage* eventSpecifier,
-			NotificationListener& listener) = 0;
-		virtual status_t UpdateListener(const KMessage* eventSpecifier,
-			NotificationListener& listener) = 0;
+	virtual status_t			AddListener(const KMessage* eventSpecifier,
+									NotificationListener& listener) = 0;
+	virtual status_t			RemoveListener(const KMessage* eventSpecifier,
+									NotificationListener& listener) = 0;
+	virtual status_t			UpdateListener(const KMessage* eventSpecifier,
+									NotificationListener& listener) = 0;
 
-		virtual const char* Name() = 0;
-		HashTableLink<NotificationService>& Link() { return fLink; }
+	virtual const char*			Name() = 0;
+			HashTableLink<NotificationService>&
+								Link() { return fLink; }
 
-	private:
-		HashTableLink<NotificationService> fLink;
+private:
+			HashTableLink<NotificationService> fLink;
+};
+
+struct default_listener : public DoublyLinkedListLinkImpl<default_listener> {
+	~default_listener();
+
+	uint32	flags;
+	team_id	team;
+	NotificationListener* listener;
+};
+
+typedef DoublyLinkedList<default_listener> DefaultListenerList;
+
+
+class DefaultNotificationService : public NotificationService {
+public:
+								DefaultNotificationService(const char* name);
+	virtual						~DefaultNotificationService();
+
+			void				Notify(const KMessage& event, uint32 flags);
+
+	virtual status_t			AddListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+	virtual status_t			UpdateListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+	virtual status_t			RemoveListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+
+	virtual const char*			Name() { return fName; }
+
+protected:
+	virtual status_t			_ToFlags(const KMessage& eventSpecifier,
+									uint32& flags);
+	virtual	void				_FirstAdded();
+	virtual	void				_LastRemoved();
+
+			recursive_lock		fLock;
+			DefaultListenerList	fListeners;
+			const char*			fName;
+};
+
+class DefaultUserNotificationService : public DefaultNotificationService,
+	NotificationListener {
+public:
+								DefaultUserNotificationService(
+									const char* name);
+	virtual						~DefaultUserNotificationService();
+
+	virtual	status_t			AddListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+	virtual	status_t			UpdateListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+	virtual	status_t			RemoveListener(const KMessage* eventSpecifier,
+									NotificationListener& listener);
+
+			status_t			RemoveUserListeners(port_id port, uint32 token);
+			status_t			UpdateUserListener(uint32 flags,
+									port_id port, uint32 token);
+
+private:
+	virtual void				EventOccured(NotificationService& service,
+									const KMessage* event);
+	virtual void				AllListenersNotified(
+									NotificationService& service);
+			status_t			_AddListener(uint32 flags,
+									NotificationListener& listener);
+
+			UserMessagingMessageSender fSender;
 };
 
 class NotificationManager {
-	public:
-		static NotificationManager& Manager();
-		static status_t CreateManager();
+public:
+	static NotificationManager& Manager();
+	static status_t CreateManager();
 
-		status_t RegisterService(NotificationService& service);
-		void UnregisterService(NotificationService& service);
+			status_t			RegisterService(NotificationService& service);
+			void				UnregisterService(
+									NotificationService& service);
 
-		NotificationService* GetService(const char* name);
-		void PutService(NotificationService* service);
+			status_t			AddListener(const char* service,
+									uint32 eventMask,
+									NotificationListener& listener);
+			status_t			AddListener(const char* service,
+									const KMessage* eventSpecifier,
+									NotificationListener& listener);
 
-		status_t AddListener(const char* service, uint32 eventMask,
-			NotificationListener& listener);
-		status_t AddListener(const char* service,
-			const KMessage* eventSpecifier, NotificationListener& listener);
+			status_t			UpdateListener(const char* service,
+									uint32 eventMask,
+									NotificationListener& listener);
+			status_t			UpdateListener(const char* service,
+									const KMessage* eventSpecifier,
+									NotificationListener& listener);
 
-		status_t UpdateListener(const char* service,
-			uint32 eventMask, NotificationListener& listener);
-		status_t UpdateListener(const char* service,
-			const KMessage* eventSpecifier, NotificationListener& listener);
+			status_t			RemoveListener(const char* service,
+									const KMessage* eventSpecifier,
+									NotificationListener& listener);
 
-		status_t RemoveListener(const char* service,
-			const KMessage* eventSpecifier, NotificationListener& listener);
+private:
+								NotificationManager();
+								~NotificationManager();
 
-	private:
-		NotificationManager();
-		~NotificationManager();
+			status_t			_Init();
+			NotificationService* _ServiceFor(const char* name);
 
-		status_t _Init();
-		NotificationService* _ServiceFor(const char* name);
+	struct HashDefinition {
+		typedef const char* KeyType;
+		typedef	NotificationService ValueType;
 
-		struct HashDefinition {
-			typedef const char* KeyType;
-			typedef	NotificationService ValueType;
+		size_t HashKey(const char* key) const
+			{ return hash_hash_string(key); }
+		size_t Hash(NotificationService *service) const
+			{ return hash_hash_string(service->Name()); }
+		bool Compare(const char* key, NotificationService* service) const
+			{ return !strcmp(key, service->Name()); }
+		HashTableLink<NotificationService>* GetLink(
+				NotificationService* service) const
+			{ return &service->Link(); }
+	};
+	typedef OpenHashTable<HashDefinition> ServiceHash;
 
-			size_t HashKey(const char* key) const
-				{ return hash_hash_string(key); }
-			size_t Hash(NotificationService *service) const
-				{ return hash_hash_string(service->Name()); }
-			bool Compare(const char* key, NotificationService* service) const
-				{ return !strcmp(key, service->Name()); }
-			HashTableLink<NotificationService>* GetLink(
-					NotificationService* service) const
-				{ return &service->Link(); }
-		};
+	static	NotificationManager	sManager;
 
-		static NotificationManager sManager;
-
-		mutex fLock;
-		typedef OpenHashTable<HashDefinition> ServiceHash;
-		ServiceHash	fServiceHash;
+			mutex				fLock;
+			ServiceHash			fServiceHash;
 };
 
 extern "C" {

@@ -18,95 +18,38 @@
 #	define TRACE(x...) ;
 #endif
 
-// TODO: add possibility to remove teams/ports that are gone
 
-
-static UserMessagingMessageSender sNotificationSender;
-
-struct net_listener : public DoublyLinkedListLinkImpl<net_listener> {
-	~net_listener();
-
-	uint32	flags;
-	NotificationListener* listener;
-};
-
-typedef DoublyLinkedList<net_listener> ListenerList;
-
-class UserNetListener : public UserMessagingListener {
-public:
-	UserNetListener(port_id port, int32 token)
-		: UserMessagingListener(sNotificationSender, port, token)
-	{
-	}
-
-	bool operator==(const NotificationListener& _other) const
-	{
-		const UserNetListener* other
-			= dynamic_cast<const UserNetListener*>(&_other);
-		return other != NULL && other->Port() == Port()
-			&& other->Token() == Token();
-	}
-};
-
-class NetNotificationService : public NotificationService {
+class NetNotificationService : public DefaultUserNotificationService {
 public:
 							NetNotificationService();
 	virtual					~NetNotificationService();
 
 			void			Notify(const KMessage& event);
 
-			status_t		AddListener(const KMessage* eventSpecifier,
-								NotificationListener& listener);
-			status_t		UpdateListener(const KMessage* eventSpecifier,
-								NotificationListener& listener);
-			status_t		RemoveListener(const KMessage* eventSpecifier,
-								NotificationListener& listener);
-
-			status_t		RemoveUserListeners(port_id port, uint32 token);
-			status_t		UpdateUserListener(uint32 flags,
-								port_id port, uint32 token);
-
-	virtual const char*		Name() { return "network"; }
-
-private:
-			status_t		_AddListener(uint32 flags,
-								NotificationListener& listener);
-
-			recursive_lock	fRecursiveLock;
-			ListenerList	fListeners;
+protected:
+	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
+								uint32& flags);
+	virtual	void			_FirstAdded();
+	virtual	void			_LastRemoved();
 };
 
 static NetNotificationService sNotificationService;
-
-
-net_listener::~net_listener()
-{
-	// Only delete the listener if it's one of ours
-	if (dynamic_cast<UserNetListener*>(listener) != NULL) {
-		TRACE("delete user listener %p\n", listener);
-		delete listener;
-	}
-}
 
 
 //	#pragma mark - NetNotificationService
 
 
 NetNotificationService::NetNotificationService()
+	: DefaultUserNotificationService("network")
 {
-	recursive_lock_init(&fRecursiveLock, "net notifications");
 }
 
 
 NetNotificationService::~NetNotificationService()
 {
-	recursive_lock_destroy(&fRecursiveLock);
 }
 
 
-/*!	\brief Notifies all registered listeners.
-	\param event The message defining the event
-*/
 void
 NetNotificationService::Notify(const KMessage& event)
 {
@@ -116,170 +59,33 @@ NetNotificationService::Notify(const KMessage& event)
 
 	TRACE("notify for %lx\n", opcode);
 
-	RecursiveLocker _(fRecursiveLock);
-
-	ListenerList::Iterator iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if ((listener->flags & opcode) != 0) {
-			TRACE("  notify listener %p for %lx\n", listener, opcode);
-			listener->listener->EventOccured(*this, &event);
-		}
-	}
-
-	iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if ((listener->flags & opcode) != 0)
-			listener->listener->AllListenersNotified(*this);
-	}
+	DefaultUserNotificationService::Notify(event, opcode);
 }
 
 
 status_t
-NetNotificationService::AddListener(const KMessage* eventSpecifier,
-	NotificationListener& listener)
+NetNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
 {
-	if (eventSpecifier == NULL)
-		return B_BAD_VALUE;
-
-	uint32 flags = eventSpecifier->GetInt32("flags", 0);
-
-	return _AddListener(flags, listener);
-}
-
-
-status_t
-NetNotificationService::UpdateListener(const KMessage* eventSpecifier,
-	NotificationListener& notificationListener)
-{
-	if (eventSpecifier == NULL)
-		return B_BAD_VALUE;
-
-	uint32 flags = eventSpecifier->GetInt32("flags", 0);
-	bool addFlags = eventSpecifier->GetBool("add flags", false);
-
-	RecursiveLocker _(fRecursiveLock);
-
-	ListenerList::Iterator iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if (*listener->listener == notificationListener) {
-			if (addFlags)
-				listener->flags |= flags;
-			else
-				listener->flags = flags;
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-NetNotificationService::RemoveListener(const KMessage* eventSpecifier,
-	NotificationListener& notificationListener)
-{
-	RecursiveLocker _(fRecursiveLock);
-
-	ListenerList::Iterator iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if (listener->listener == &notificationListener) {
-			TRACE("remove listener %p\n", listener);
-			iterator.Remove();
-			delete listener;
-
-			if (fListeners.IsEmpty()) {
-				// Give up the reference _AddListener()
-				put_module(NET_NOTIFICATIONS_MODULE_NAME);
-			}
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-NetNotificationService::RemoveUserListeners(port_id port, uint32 token)
-{
-	UserNetListener userListener(port, token);
-
-	RecursiveLocker _(fRecursiveLock);
-
-	ListenerList::Iterator iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if (*listener->listener == userListener) {
-			TRACE("remove user listener %p\n", listener);
-			iterator.Remove();
-			delete listener;
-
-			if (fListeners.IsEmpty()) {
-				// Give up the reference _AddListener()
-				put_module(NET_NOTIFICATIONS_MODULE_NAME);
-			}
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-NetNotificationService::UpdateUserListener(uint32 flags, port_id port,
-	uint32 token)
-{
-	UserNetListener userListener(port, token);
-
-	RecursiveLocker _(fRecursiveLock);
-
-	ListenerList::Iterator iterator = fListeners.GetIterator();
-	while (net_listener* listener = iterator.Next()) {
-		if (*listener->listener == userListener) {
-			listener->flags |= flags;
-			return B_OK;
-		}
-	}
-
-	UserNetListener* copiedListener = new(std::nothrow) UserNetListener(
-		userListener);
-	if (copiedListener == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = _AddListener(flags, *copiedListener);
-	if (status != B_OK)
-		delete copiedListener;
-
-	return status;
-}
-
-
-status_t
-NetNotificationService::_AddListener(uint32 flags,
-	NotificationListener& notificationListener)
-{
-	net_listener* listener = new(std::nothrow) net_listener;
-	if (listener == NULL)
-		return B_NO_MEMORY;
-
-	TRACE("add %slistener %p for %lx\n",
-		dynamic_cast<UserNetListener*>(&notificationListener) != NULL
-			? "user " : "", listener, flags);
-
-	listener->flags = flags;
-	listener->listener = &notificationListener;
-
-	RecursiveLocker _(fRecursiveLock);
-
-	if (fListeners.IsEmpty()) {
-		// The reference counting doesn't work for us, as we'll have to
-		// ensure our module stays loaded.
-		module_info* dummy;
-		get_module(NET_NOTIFICATIONS_MODULE_NAME, &dummy);
-	}
-
-	fListeners.Add(listener);
+	flags = eventSpecifier.GetInt32("flags", 0);
 	return B_OK;
+}
+
+
+void
+NetNotificationService::_FirstAdded()
+{
+	// The reference counting doesn't work for us, as we'll have to
+	// ensure our module stays loaded.
+	module_info* dummy;
+	get_module(NET_NOTIFICATIONS_MODULE_NAME, &dummy);
+}
+
+
+void
+NetNotificationService::_LastRemoved()
+{
+	// Give up the reference _AddListener()
+	put_module(NET_NOTIFICATIONS_MODULE_NAME);
 }
 
 
@@ -326,7 +132,6 @@ notifications_std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			TRACE("init\n");
 
-			new(&sNotificationSender) UserMessagingMessageSender();
 			new(&sNotificationService) NetNotificationService();
 
 			register_generic_syscall(NET_NOTIFICATIONS_SYSCALLS,
@@ -338,7 +143,6 @@ notifications_std_ops(int32 op, ...)
 
 			unregister_generic_syscall(NET_NOTIFICATIONS_SYSCALLS, 1);
 
-			sNotificationSender.~UserMessagingMessageSender();
 			sNotificationService.~NetNotificationService();
 			return B_OK;
 

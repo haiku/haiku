@@ -29,6 +29,7 @@
 #include <kimage.h>
 #include <kscheduler.h>
 #include <ksignal.h>
+#include <Notifications.h>
 #include <port.h>
 #include <posix/realtime_sem.h>
 #include <posix/xsi_semaphore.h>
@@ -81,6 +82,17 @@ struct fork_arg {
 	struct arch_fork_arg arch_info;
 };
 
+class TeamNotificationService : public DefaultNotificationService {
+public:
+							TeamNotificationService();
+
+			void			Notify(uint32 opcode, team_id team);
+
+protected:
+	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
+								uint32& flags);
+};
+
 
 static hash_table *sTeamHash = NULL;
 static hash_table *sGroupHash = NULL;
@@ -90,6 +102,8 @@ static struct team *sKernelTeam = NULL;
 // memory (the limit is not yet enforced)
 static int32 sMaxTeams = 2048;
 static int32 sUsedTeams = 1;
+
+static TeamNotificationService sNotificationService;
 
 spinlock gTeamSpinlock = B_SPINLOCK_INITIALIZER;
 
@@ -287,6 +301,35 @@ private:
 #	define T(x) ;
 #endif
 
+
+//	#pragma mark - TeamNotificationService
+
+
+TeamNotificationService::TeamNotificationService()
+	: DefaultNotificationService("teams")
+{
+}
+
+
+void
+TeamNotificationService::Notify(uint32 opcode, team_id team)
+{
+	char eventBuffer[64];
+	KMessage event;
+	event.SetTo(eventBuffer, sizeof(eventBuffer), TEAM_MONITOR);
+	event.AddInt32("opcode", opcode);
+	event.AddInt32("team", team);
+
+	DefaultNotificationService::Notify(event, ~0U);
+}
+
+
+status_t
+TeamNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
+{
+	flags = ~0U;
+	return B_OK;
+}
 
 
 //	#pragma mark - Private functions
@@ -2020,7 +2063,10 @@ team_init(kernel_args *args)
 	add_debugger_command_etc("teams", &dump_teams, "List all teams",
 		"\n"
 		"Prints a list of all existing teams.\n", 0);
-	return 0;
+
+	new(&sNotificationService) TeamNotificationService();
+
+	return B_OK;
 }
 
 
@@ -2373,6 +2419,8 @@ team_delete_team(struct team *team)
 			free(watcher);
 		}
 	}
+
+	sNotificationService.Notify(TEAM_REMOVED, team->id);
 
 	// free team resources
 

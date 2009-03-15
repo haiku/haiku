@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TEAM_H
@@ -7,6 +7,12 @@
 
 
 #include <thread_types.h>
+
+
+// Team notifications
+#define TEAM_MONITOR	'_Tm_'
+#define TEAM_ADDED		1
+#define TEAM_REMOVED	2
 
 
 #ifdef __cplusplus

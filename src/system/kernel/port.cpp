@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Mark-Jan Bastian. All rights reserved.
@@ -20,6 +20,7 @@
 #include <arch/int.h>
 #include <cbuf.h>
 #include <kernel.h>
+#include <Notifications.h>
 #include <sem.h>
 #include <syscall_restart.h>
 #include <team.h>
@@ -59,6 +60,16 @@ struct port_entry {
 	struct list	msg_queue;
 };
 
+class PortNotificationService : public DefaultNotificationService {
+public:
+							PortNotificationService();
+
+			void			Notify(uint32 opcode, port_id team);
+
+protected:
+	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
+								uint32& flags);
+};
 
 #define MAX_QUEUE_LENGTH 4096
 #define PORT_MAX_MESSAGE_SIZE (256 * 1024)
@@ -73,12 +84,47 @@ static bool sPortsActive = false;
 static port_id sNextPort = 1;
 static int32 sFirstFreeSlot = 1;
 
+static PortNotificationService sNotificationService;
+
 static spinlock sPortSpinlock = B_SPINLOCK_INITIALIZER;
 
 #define GRAB_PORT_LIST_LOCK() acquire_spinlock(&sPortSpinlock)
 #define RELEASE_PORT_LIST_LOCK() release_spinlock(&sPortSpinlock)
 #define GRAB_PORT_LOCK(s) acquire_spinlock(&(s).lock)
 #define RELEASE_PORT_LOCK(s) release_spinlock(&(s).lock)
+
+
+//	#pragma mark - TeamNotificationService
+
+
+PortNotificationService::PortNotificationService()
+	: DefaultNotificationService("ports")
+{
+}
+
+
+void
+PortNotificationService::Notify(uint32 opcode, port_id port)
+{
+	char eventBuffer[64];
+	KMessage event;
+	event.SetTo(eventBuffer, sizeof(eventBuffer), PORT_MONITOR);
+	event.AddInt32("opcode", opcode);
+	event.AddInt32("port", port);
+
+	DefaultNotificationService::Notify(event, ~0U);
+}
+
+
+status_t
+PortNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
+{
+	flags = ~0U;
+	return B_OK;
+}
+
+
+//	#pragma mark -
 
 
 static int
@@ -362,6 +408,7 @@ port_init(kernel_args *args)
 		"  <name>     - Name of the port.\n"
 		"  <sem>      - ID of the port's read or write semaphore.\n", 0);
 
+	new(&sNotificationService) PortNotificationService();
 	sPortsActive = true;
 	return B_OK;
 }
@@ -380,7 +427,8 @@ create_port(int32 queueLength, const char *name)
 	team_id	owner;
 	int32 slot;
 
-	TRACE(("create_port(queueLength = %ld, name = \"%s\")\n", queueLength, name));
+	TRACE(("create_port(queueLength = %ld, name = \"%s\")\n", queueLength,
+		name));
 
 	if (!sPortsActive)
 		return B_BAD_PORT_ID;
@@ -463,13 +511,14 @@ create_port(int32 queueLength, const char *name)
 
 			TRACE(("create_port() done: port created %ld\n", id));
 
+			sNotificationService.Notify(PORT_ADDED, id);
 			return id;
 		}
 	}
 
 	// not enough ports...
 
-	// ToDo: due to sUsedPorts, this cannot happen anymore - as
+	// TODO: due to sUsedPorts, this cannot happen anymore - as
 	//		long as sMaxPorts stays constant over the kernel run
 	//		time (which it should be). IOW we could simply panic()
 	//		here.
@@ -597,6 +646,7 @@ delete_port(port_id id)
 	// read_port() will see the B_BAD_SEM_ID acq_sem() return value, and act accordingly
 	delete_sem(readSem);
 	delete_sem(writeSem);
+	sNotificationService.Notify(PORT_REMOVED, id);
 
 	return B_OK;
 }

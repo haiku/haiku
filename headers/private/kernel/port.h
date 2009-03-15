@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _KERNEL_PORT_H
@@ -22,6 +22,10 @@ enum {
 									// kernel-only; memory must be locked
 };
 
+// port notifications
+#define PORT_MONITOR	'_Pm_'
+#define PORT_ADDED		1
+#define PORT_REMOVED	2
 
 #ifdef __cplusplus
 extern "C" {
