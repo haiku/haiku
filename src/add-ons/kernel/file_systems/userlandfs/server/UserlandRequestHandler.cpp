@@ -2,6 +2,8 @@
 
 #include "UserlandRequestHandler.h"
 
+#include <algorithm>
+
 #include "AutoDeleter.h"
 #include "Compatibility.h"
 #include "Debug.h"
@@ -12,6 +14,7 @@
 #include "RequestThread.h"
 #include "SingleReplyRequestHandler.h"
 #include "Volume.h"
+
 
 // constructor
 UserlandRequestHandler::UserlandRequestHandler(FileSystem* fileSystem)
@@ -75,6 +78,10 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((DoIORequest*)request);
 		case CANCEL_IO_REQUEST:
 			return _HandleRequest((CancelIORequest*)request);
+		case ITERATIVE_IO_GET_VECS_REQUEST:
+			return _HandleRequest((IterativeIOGetVecsRequest*)request);
+		case ITERATIVE_IO_FINISHED_REQUEST:
+			return _HandleRequest((IterativeIOFinishedRequest*)request);
 
 		// nodes
 		case IOCTL_REQUEST:
@@ -552,7 +559,8 @@ UserlandRequestHandler::_HandleRequest(DoIORequest* request)
 
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
-		IORequestInfo requestInfo(request->request, request->isWrite);
+		IORequestInfo requestInfo(request->request, request->isWrite,
+			request->offset, request->length);
 		result = volume->DoIO(request->node, request->fileCookie, requestInfo);
 	}
 
@@ -588,6 +596,78 @@ UserlandRequestHandler::_HandleRequest(CancelIORequest* request)
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	CancelIOReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(IterativeIOGetVecsRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	file_io_vec vecs[IterativeIOGetVecsReply::MAX_VECS];
+	size_t vecCount = IterativeIOGetVecsReply::MAX_VECS;
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->IterativeIOGetVecs(request->cookie, request->request,
+			request->offset, request->size, vecs, &vecCount);
+		if (result == B_OK) {
+			vecCount = std::min(vecCount,
+				(uint32)IterativeIOGetVecsReply::MAX_VECS);
+		}
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	IterativeIOGetVecsReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = result;
+	if (result == B_OK) {
+		memcpy(reply->vecs, vecs, vecCount * sizeof(file_io_vec));
+		reply->vecCount = vecCount;
+	} else
+		reply->vecCount = 0;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(IterativeIOFinishedRequest* request)
+{
+	// check and execute the request
+	status_t result = B_OK;
+	Volume* volume = (Volume*)request->volume;
+	if (!volume)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		RequestThreadContext context(volume);
+		result = volume->IterativeIOFinished(request->cookie, request->request,
+			request->status, request->partialTransfer,
+			request->bytesTransferred);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	IterativeIOFinishedReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		RETURN_ERROR(error);

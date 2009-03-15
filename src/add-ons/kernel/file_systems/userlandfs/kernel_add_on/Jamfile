@@ -1,13 +1,15 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems userlandfs kernel_add_on ;
 
 local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
-	userlandfs  ] ;
+	userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
 UsePrivateHeaders shared ;
 UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src system kernel device_manager ] ;
+	# for IORequest.h
 
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;

@@ -22,6 +22,8 @@ class FSRemoveVNodeRequest;
 // asynchronous I/O
 class DoIORequest;
 class CancelIORequest;
+class IterativeIOGetVecsRequest;
+class IterativeIOFinishedRequest;
 // nodes
 class IOCtlRequest;
 class SetFlagsRequest;
@@ -121,6 +123,10 @@ private:
 			// asynchronous I/O
 			status_t			_HandleRequest(DoIORequest* request);
 			status_t			_HandleRequest(CancelIORequest* request);
+			status_t			_HandleRequest(
+									IterativeIOGetVecsRequest* request);
+			status_t			_HandleRequest(
+									IterativeIOFinishedRequest* request);
 
 			// nodes
 			status_t			_HandleRequest(IOCtlRequest* request);

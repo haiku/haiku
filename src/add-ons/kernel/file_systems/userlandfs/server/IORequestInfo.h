@@ -11,11 +11,15 @@
 namespace UserlandFS {
 
 struct IORequestInfo {
+	off_t	offset;
+	size_t	length;
 	int32	id;
 	bool	isWrite;
 
-	IORequestInfo(int32 id, bool isWrite)
+	IORequestInfo(int32 id, bool isWrite, off_t offset, size_t length)
 		:
+		offset(offset),
+		length(length),
 		id(id),
 		isWrite(isWrite)
 	{
@@ -23,6 +27,8 @@ struct IORequestInfo {
 
 	IORequestInfo(const IORequestInfo& other)
 		:
+		offset(other.offset),
+		length(other.length),
 		id(other.id),
 		isWrite(other.isWrite)
 	{

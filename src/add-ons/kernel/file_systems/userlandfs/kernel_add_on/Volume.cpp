@@ -10,12 +10,16 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <algorithm>
+
 #include <fs_cache.h>
 
 #include <util/AutoLock.h>
 #include <util/OpenHashTable.h>
 
 #include <fs/fd.h>	// kernel private
+
+#include "IORequest.h"	// kernel internal
 
 #include "Compatibility.h"
 #include "Debug.h"
@@ -157,19 +161,28 @@ struct Volume::IterativeFDIOCookie : public Referenceable {
 	int					fd;
 	int32				requestID;
 	void*				clientCookie;
+	off_t				offset;
 	const file_io_vec*	vecs;
 	uint32				vecCount;
 
 	IterativeFDIOCookie(Volume* volume, int fd, int32 requestID,
-		void* clientCookie, const file_io_vec* vecs, uint32 vecCount)
+		void* clientCookie, off_t offset, const file_io_vec* vecs,
+		uint32 vecCount)
 		:
 		volume(volume),
 		fd(fd),
 		requestID(requestID),
 		clientCookie(clientCookie),
+		offset(offset),
 		vecs(vecs),
 		vecCount(vecCount)
 	{
+	}
+
+	~IterativeFDIOCookie()
+	{
+		if (fd >= 0)
+			close(fd);
 	}
 };
 
@@ -621,7 +634,7 @@ Volume::DoIterativeFDIO(int fd, int32 requestID, void* clientCookie,
 
 	// create a cookie
 	IterativeFDIOCookie* cookie = new(std::nothrow) IterativeFDIOCookie(
-		this, fd, requestID, clientCookie, vecs, vecCount);
+		this, fd, requestID, clientCookie, request->Offset(), vecs, vecCount);
 	if (cookie == NULL) {
 		close(fd);
 		RETURN_ERROR(B_NO_MEMORY);
@@ -630,6 +643,8 @@ Volume::DoIterativeFDIO(int fd, int32 requestID, void* clientCookie,
 	// we need another reference, so we can still access the cookie below
 	cookie->AddReference();
 
+// TODO: Up to this point we're responsible for calling the finished hook on
+// error!
 	// call the kernel function
 	error = do_iterative_fd_io(fd, request, &_IterativeFDIOGetVecs,
 		&_IterativeFDIOFinished, cookie);
@@ -1067,6 +1082,8 @@ Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
 	request->node = vnode->clientNode;
 	request->fileCookie = cookie;
 	request->request = requestID;
+	request->offset = ioRequest->Offset();
+	request->length = ioRequest->Length();
 
 	// send the request
 	KernelRequestHandler handler(this, DO_IO_REPLY);
@@ -4406,18 +4423,135 @@ Volume::_FindIORequest(io_request* request, int32* requestID)
 
 
 /*static*/ status_t
-Volume::_IterativeFDIOGetVecs(void* cookie, io_request* request, off_t offset,
-	size_t size, struct file_io_vec* vecs, size_t* _count)
+Volume::_IterativeFDIOGetVecs(void* _cookie, io_request* ioRequest,
+	off_t offset, size_t size, struct file_io_vec* vecs, size_t* _count)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	IterativeFDIOCookie* cookie = (IterativeFDIOCookie*)_cookie;
+	Volume* volume = cookie->volume;
+
+	MutexLocker locker(volume->fLock);
+
+	// If there are vecs cached in the cookie and the offset matches, return
+	// those.
+	if (cookie->vecs != NULL) {
+		size_t vecCount = 0;
+		if (offset == cookie->offset) {
+			// good, copy the vecs
+			while (size > 0 && vecCount < cookie->vecCount
+					&& vecCount < *_count) {
+				off_t maxSize = std::min((off_t)size,
+					cookie->vecs[vecCount].length);
+				vecs[vecCount].offset = cookie->vecs[vecCount].offset;
+				vecs[vecCount].length = maxSize;
+
+				size -= maxSize;
+				vecCount++;
+			}
+		}
+
+		cookie->vecs = NULL;
+		cookie->vecCount = 0;
+
+		// got some vecs? -- then we're done
+		if (vecCount > 0) {
+			*_count = vecCount;
+			return B_OK;
+		}
+	}
+
+	// we have to ask the client FS
+	int32 requestID = cookie->requestID;
+	void* clientCookie = cookie->clientCookie;
+	locker.Unlock();
+
+	// get a free port
+	RequestPort* port = volume->fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(volume->fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	IterativeIOGetVecsRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = volume->fUserlandVolume;
+	request->cookie = clientCookie;
+	request->offset = offset;
+	request->request = requestID;
+	request->size = size;
+	size_t maxVecs = std::min(*_count,
+		(size_t)IterativeIOGetVecsReply::MAX_VECS);
+	request->vecCount = maxVecs;
+
+	// send the request
+	KernelRequestHandler handler(volume, ITERATIVE_IO_GET_VECS_REPLY);
+	IterativeIOGetVecsReply* reply;
+	error = volume->_SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	uint32 vecCount = reply->vecCount;
+	if (vecCount < 0 || vecCount > maxVecs)
+		return B_BAD_DATA;
+
+	memcpy(vecs, reply->vecs, vecCount * sizeof(file_io_vec));
+	*_count = vecCount;
+
+	return B_OK;
 }
 
 
 /*static*/ status_t
-Volume::_IterativeFDIOFinished(void* cookie, io_request* request,
+Volume::_IterativeFDIOFinished(void* _cookie, io_request* ioRequest,
 	status_t status, bool partialTransfer, size_t bytesTransferred)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	IterativeFDIOCookie* cookie = (IterativeFDIOCookie*)_cookie;
+	Volume* volume = cookie->volume;
+
+	// At any rate, we're done with the cookie after this call -- it will not
+	// be used anymore.
+	Reference<IterativeFDIOCookie> _(cookie, true);
+
+	// We also want to dispose of the request.
+	IORequestRemover _2(volume, cookie->requestID);
+
+	// get a free port
+	RequestPort* port = volume->fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _3(volume->fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	IterativeIOFinishedRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = volume->fUserlandVolume;
+	request->cookie = cookie->clientCookie;
+	request->request = cookie->requestID;
+	request->status = status;
+	request->partialTransfer = partialTransfer;
+	request->bytesTransferred = bytesTransferred;
+
+	// send the request
+	KernelRequestHandler handler(volume, ITERATIVE_IO_FINISHED_REPLY);
+	IterativeIOFinishedReply* reply;
+	error = volume->_SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+	return B_OK;
 }

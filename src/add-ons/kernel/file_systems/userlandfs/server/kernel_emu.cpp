@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include "FileSystem.h"
 #include "RequestPort.h"
 #include "Requests.h"
@@ -862,14 +864,12 @@ UserlandFS::KernelEmu::do_iterative_fd_io(dev_t volumeID, int fd,
 	request->fd = fd;
 	request->request = requestID;
 	request->cookie = cookie;
-	request->vecCount = vecCount;
 
 	if (vecCount > 0) {
-		error = allocator.AllocateData(request->vecs, vecs,
-			vecCount * sizeof(file_io_vec), sizeof(off_t), false);
-		if (error != B_OK)
-			return error;
+		vecCount = std::min(vecCount, (uint32)DoIterativeFDIORequest::MAX_VECS);
+		memcpy(request->vecs, vecs, sizeof(file_io_vec) * vecCount);
 	}
+	request->vecCount = vecCount;
 
 	// send the request
 	UserlandRequestHandler handler(fileSystem, DO_ITERATIVE_FD_IO_REPLY);
@@ -877,7 +877,7 @@ UserlandFS::KernelEmu::do_iterative_fd_io(dev_t volumeID, int fd,
 	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;
-// TODO: Up to this point we should call the finished hook or error!
+// TODO: Up to this point we should call the finished hook on error!
 	RequestReleaser requestReleaser(port, reply);
 
 	// process the reply

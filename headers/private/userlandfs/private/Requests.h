@@ -59,6 +59,10 @@ enum {
 	DO_IO_REPLY,
 	CANCEL_IO_REQUEST,
 	CANCEL_IO_REPLY,
+	ITERATIVE_IO_GET_VECS_REQUEST,
+	ITERATIVE_IO_GET_VECS_REPLY,
+	ITERATIVE_IO_FINISHED_REQUEST,
+	ITERATIVE_IO_FINISHED_REPLY,
 
 	// nodes
 	IOCTL_REQUEST,
@@ -547,6 +551,8 @@ class DoIORequest : public FileRequest {
 public:
 	DoIORequest() : FileRequest(DO_IO_REQUEST) {}
 
+	off_t		offset;
+	size_t		length;
 	int32		request;
 	bool		isWrite;
 };
@@ -569,6 +575,49 @@ public:
 class CancelIOReply : public ReplyRequest {
 public:
 	CancelIOReply() : ReplyRequest(CANCEL_IO_REPLY) {}
+};
+
+// IterativeIOGetVecsRequest
+class IterativeIOGetVecsRequest : public VolumeRequest {
+public:
+	IterativeIOGetVecsRequest()
+		: VolumeRequest(ITERATIVE_IO_GET_VECS_REQUEST) {}
+
+	void*		cookie;
+	off_t		offset;
+	int32		request;
+	size_t		size;
+	uint32		vecCount;
+};
+
+// IterativeIOGetVecsReply
+class IterativeIOGetVecsReply : public ReplyRequest {
+public:
+	IterativeIOGetVecsReply() : ReplyRequest(ITERATIVE_IO_GET_VECS_REPLY) {}
+
+	enum { MAX_VECS = 8 };
+
+	file_io_vec	vecs[MAX_VECS];
+	uint32		vecCount;
+};
+
+// IterativeIOFinishedRequest
+class IterativeIOFinishedRequest : public VolumeRequest {
+public:
+	IterativeIOFinishedRequest()
+		: VolumeRequest(ITERATIVE_IO_FINISHED_REQUEST) {}
+
+	void*		cookie;
+	int32		request;
+	status_t	status;
+	bool		partialTransfer;
+	size_t		bytesTransferred;
+};
+
+// IterativeIOFinishedReply
+class IterativeIOFinishedReply : public ReplyRequest {
+public:
+	IterativeIOFinishedReply() : ReplyRequest(ITERATIVE_IO_FINISHED_REPLY) {}
 };
 
 
@@ -1751,13 +1800,14 @@ public:
 class DoIterativeFDIORequest : public Request {
 public:
 	DoIterativeFDIORequest() : Request(DO_ITERATIVE_FD_IO_REQUEST) {}
-	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	enum { MAX_VECS = 8 };
 
 	dev_t		nsid;
 	int			fd;
 	int32		request;
 	void*		cookie;
-	Address		vecs;
+	file_io_vec	vecs[MAX_VECS];
 	uint32		vecCount;
 };
 
@@ -1853,6 +1903,14 @@ do_for_request(Request* request, Task& task)
 			return task((CancelIORequest*)request);
 		case CANCEL_IO_REPLY:
 			return task((CancelIOReply*)request);
+		case ITERATIVE_IO_GET_VECS_REQUEST:
+			return task((IterativeIOGetVecsRequest*)request);
+		case ITERATIVE_IO_GET_VECS_REPLY:
+			return task((IterativeIOGetVecsReply*)request);
+		case ITERATIVE_IO_FINISHED_REQUEST:
+			return task((IterativeIOFinishedRequest*)request);
+		case ITERATIVE_IO_FINISHED_REPLY:
+			return task((IterativeIOFinishedReply*)request);
 		// nodes
 		case IOCTL_REQUEST:
 			return task((IOCtlRequest*)request);
@@ -2217,6 +2275,10 @@ using UserlandFSUtil::DoIORequest;
 using UserlandFSUtil::DoIOReply;
 using UserlandFSUtil::CancelIORequest;
 using UserlandFSUtil::CancelIOReply;
+using UserlandFSUtil::IterativeIOGetVecsRequest;
+using UserlandFSUtil::IterativeIOGetVecsReply;
+using UserlandFSUtil::IterativeIOFinishedRequest;
+using UserlandFSUtil::IterativeIOFinishedReply;
 // nodes
 using UserlandFSUtil::IOCtlRequest;
 using UserlandFSUtil::IOCtlReply;

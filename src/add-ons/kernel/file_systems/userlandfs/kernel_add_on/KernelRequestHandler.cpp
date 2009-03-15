@@ -716,16 +716,13 @@ KernelRequestHandler::_HandleRequest(DoIterativeFDIORequest* request)
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
 
-	const file_io_vec* vecs = (const file_io_vec*)request->vecs.GetData();
-	size_t vecsSize = request->vecs.GetSize();
 	uint32 vecCount = request->vecCount;
-
-	if (result == B_OK && vecsSize / sizeof(file_io_vec) < vecCount)
+	if (result == B_OK && vecCount > DoIterativeFDIORequest::MAX_VECS)
 		result = B_BAD_VALUE;
 
 	if (result == B_OK) {
 		result = volume->DoIterativeFDIO(request->fd, request->request,
-			request->cookie, vecs, vecCount);
+			request->cookie, request->vecs, vecCount);
 	}
 
 	// prepare the reply

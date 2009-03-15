@@ -206,6 +206,22 @@ Volume::CancelIO(void* node, void* cookie, int32 ioRequestID)
 }
 
 
+status_t
+Volume::IterativeIOGetVecs(void* cookie, int32 requestID, off_t offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
+{
+	return B_BAD_VALUE;
+}
+
+
+status_t
+Volume::IterativeIOFinished(void* cookie, int32 requestID, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	return B_BAD_VALUE;
+}
+
+
 // #pragma mark - nodes
 
 

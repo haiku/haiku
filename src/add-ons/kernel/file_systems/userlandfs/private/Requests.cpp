@@ -313,14 +313,6 @@ FileCacheWriteRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
-// DoIterativeFDIORequest
-status_t
-DoIterativeFDIORequest::GetAddressInfos(AddressInfo* infos, int32* count)
-{
-	ADD_ADDRESS(vecs);
-	return B_OK;
-}
-
 
 // #pragma mark -
 
@@ -542,9 +534,13 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		// asynchronous I/O
 		case DO_IO_REQUEST:
 		case CANCEL_IO_REQUEST:
+		case ITERATIVE_IO_GET_VECS_REQUEST:
+		case ITERATIVE_IO_FINISHED_REQUEST:
 			return true;
 		case DO_IO_REPLY:
 		case CANCEL_IO_REPLY:
+		case ITERATIVE_IO_GET_VECS_REPLY:
+		case ITERATIVE_IO_FINISHED_REPLY:
 			return false;
 		// nodes
 		case IOCTL_REQUEST:
@@ -779,9 +775,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		// asynchronous I/O
 		case DO_IO_REQUEST:
 		case CANCEL_IO_REQUEST:
+		case ITERATIVE_IO_GET_VECS_REQUEST:
+		case ITERATIVE_IO_FINISHED_REQUEST:
 			return false;
 		case DO_IO_REPLY:
 		case CANCEL_IO_REPLY:
+		case ITERATIVE_IO_GET_VECS_REPLY:
+		case ITERATIVE_IO_FINISHED_REPLY:
 			return true;
 		// nodes
 		case IOCTL_REQUEST:

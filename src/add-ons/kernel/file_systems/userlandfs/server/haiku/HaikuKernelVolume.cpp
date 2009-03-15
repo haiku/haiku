@@ -406,6 +406,58 @@ HaikuKernelVolume::CancelIO(void* _node, void* cookie, int32 ioRequestID)
 }
 
 
+// IterativeIOGetVecs
+status_t
+HaikuKernelVolume::IterativeIOGetVecs(void* _cookie, int32 requestID,
+	off_t offset, size_t size, struct file_io_vec* vecs, size_t* _count)
+{
+	HaikuKernelIterativeFDIOCookie* cookie
+		= (HaikuKernelIterativeFDIOCookie*)_cookie;
+
+	// get the request
+	HaikuKernelIORequest* request = _FileSystem()->GetIORequest(requestID);
+	if (request == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// call the callback
+	status_t error = cookie->getVecs(cookie->cookie, (io_request*)request,
+		offset, size, vecs, _count);
+
+	// put the reference we got above
+	_FileSystem()->PutIORequest(request, 1);
+
+	return error;
+}
+
+
+// IterativeIOFinished
+status_t
+HaikuKernelVolume::IterativeIOFinished(void* _cookie, int32 requestID,
+	status_t status, bool partialTransfer, size_t bytesTransferred)
+{
+	HaikuKernelIterativeFDIOCookie* cookie
+		= (HaikuKernelIterativeFDIOCookie*)_cookie;
+
+	// we're definitely done with the cookie, now
+	ObjectDeleter<HaikuKernelIterativeFDIOCookie> _(cookie);
+
+	// get the request
+	HaikuKernelIORequest* request = _FileSystem()->GetIORequest(requestID);
+	if (request == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// call the callback
+	status_t error = cookie->finished(cookie->cookie, (io_request*)request,
+		status, partialTransfer, bytesTransferred);
+
+	// We're done with the request, too, so put the reference we got above and
+	// the one added by DoIO().
+	_FileSystem()->PutIORequest(request, 2);
+
+	return error;
+}
+
+
 // #pragma mark - nodes
 
 

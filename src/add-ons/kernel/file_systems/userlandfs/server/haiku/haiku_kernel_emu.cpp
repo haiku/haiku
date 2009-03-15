@@ -274,17 +274,16 @@ status_t
 do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
 	iterative_io_finished finished, void *_cookie)
 {
-#if 0
-	// get some vecs already
-	file_io_vec fileVecs[8];
-	uint32 fileVecCount = 8;
-	status_t error = getVecs(_cookie, _request, offset, vecLength, fileVecs,
-		&fileVecCount);
-// TODO: We don't have the offset here. We should pass it along in the
-// DoIORequest.
-#endif
-
 	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
+
+	// get the first vecs already -- this saves a guaranteed trip back from
+	// kernel to userland
+	file_io_vec fileVecs[DoIterativeFDIORequest::MAX_VECS];
+	uint32 fileVecCount = DoIterativeFDIORequest::MAX_VECS;
+	status_t error = getVecs(_cookie, _request, request->offset,
+		request->length, fileVecs, &fileVecCount);
+	if (error != B_OK)
+		return error;
 
 	// create a cookie
 	HaikuKernelIterativeFDIOCookie* cookie
@@ -296,8 +295,10 @@ do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
 	}
 
 	// send the request
-	status_t error = UserlandFS::KernelEmu::do_iterative_fd_io(
-		request->volume->GetID(), fd, request->id, cookie, NULL, 0);
+// TODO: Up to this point we should call the finished hook on error!
+	error = UserlandFS::KernelEmu::do_iterative_fd_io(
+		request->volume->GetID(), fd, request->id, cookie, fileVecs,
+		fileVecCount);
 	if (error != B_OK) {
 		delete cookie;
 		return error;

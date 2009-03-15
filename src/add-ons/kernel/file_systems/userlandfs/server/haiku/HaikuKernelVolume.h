@@ -65,6 +65,13 @@ public:
 									const IORequestInfo& requestInfo);
 	virtual	status_t			CancelIO(void* node, void* cookie,
 									int32 ioRequestID);
+	virtual	status_t			IterativeIOGetVecs(void* cookie,
+									int32 requestID, off_t offset, size_t size,
+									struct file_io_vec* vecs, size_t* _count);
+	virtual	status_t			IterativeIOFinished(void* cookie,
+									int32 requestID, status_t status,
+									bool partialTransfer,
+									size_t bytesTransferred);
 
 	// nodes
 	virtual	status_t			IOCtl(void* node, void* cookie,
