@@ -296,8 +296,8 @@ do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
 	}
 
 	// send the request
-	status_t error = UserlandFS::KernelEmu::do_iterative_fd_io(fd, request->id,
-		cookie, NULL, 0);
+	status_t error = UserlandFS::KernelEmu::do_iterative_fd_io(
+		request->volume->GetID(), fd, request->id, cookie, NULL, 0);
 	if (error != B_OK) {
 		delete cookie;
 		return error;

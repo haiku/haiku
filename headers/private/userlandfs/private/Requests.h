@@ -1753,6 +1753,7 @@ public:
 	DoIterativeFDIORequest() : Request(DO_ITERATIVE_FD_IO_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
+	dev_t		nsid;
 	int			fd;
 	int32		request;
 	void*		cookie;

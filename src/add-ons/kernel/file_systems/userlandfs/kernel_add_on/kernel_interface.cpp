@@ -248,25 +248,35 @@ userlandfs_remove_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 }
 
 
-// #pragma mark - VM file access
-
-
-// TODO: userlandfs_can_page()
-// TODO: userlandfs_read_pages()
-// TODO: userlandfs_write_pages()
-
-
 // #pragma mark - asynchronous I/O
 
 
-// TODO: userlandfs_io()
-// TODO: userlandfs_cancel_io()
+// userlandfs_io
+status_t
+userlandfs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
+	io_request* request)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	PRINT(("userlandfs_io(%p, %p, %p, %p)\n", volume, fsNode->private_node,
+		cookie, request));
+	status_t error = volume->DoIO(fsNode->private_node, cookie, request);
+	PRINT(("userlandfs_io() done: (%lx)\n", error));
+	return error;
+}
 
 
-// #pragma mark - cache file access
-
-
-// TODO: userlandfs_get_file_map()
+// userlandfs_cancel_io
+status_t
+userlandfs_cancel_io(fs_volume* fsVolume, fs_vnode* fsNode, void *cookie,
+	io_request *request)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	PRINT(("userlandfs_cancel_io(%p, %p, %p, %p)\n", volume,
+		fsNode->private_node, cookie, request));
+	status_t error = volume->CancelIO(fsNode->private_node, cookie, request);
+	PRINT(("userlandfs_cancel_io() done: (%lx)\n", error));
+	return error;
+}
 
 
 // #pragma mark - common
@@ -1169,16 +1179,16 @@ fs_vnode_ops gUserlandFSVnodeOps = {
 	&userlandfs_remove_vnode,
 
 	// VM file access
-	NULL,	// &userlandfs_can_page,
-	NULL,	// &userlandfs_read_pages,
-	NULL,	// &userlandfs_write_pages,
+	NULL,	// can_page() -- obsolete
+	NULL,	// read_pages() -- obsolete
+	NULL,	// write_pages() -- obsolete
 
 	// asynchronous I/O
-	NULL,	// &userlandfs_io
-	NULL,	// &userlandfs_cancel_io
+	&userlandfs_io,
+	&userlandfs_cancel_io,
 
 	// cache file access
-	NULL,	// &userlandfs_get_file_map
+	NULL,	// get_file_map() -- not needed
 
 	// common operations
 	&userlandfs_ioctl,

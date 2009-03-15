@@ -355,7 +355,7 @@ HaikuKernelVolume::DoIO(void* _node, void* cookie,
 
 	// create a request object
 	HaikuKernelIORequest* request
-		= new(std::nothrow) HaikuKernelIORequest(requestInfo);
+		= new(std::nothrow) HaikuKernelIORequest(this, requestInfo);
 	if (request == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 

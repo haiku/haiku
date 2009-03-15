@@ -841,8 +841,8 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 
 
 status_t
-UserlandFS::KernelEmu::do_iterative_fd_io(int fd, int32 requestID, void* cookie,
-	const file_io_vec* vecs, uint32 vecCount)
+UserlandFS::KernelEmu::do_iterative_fd_io(dev_t volumeID, int fd,
+	int32 requestID, void* cookie, const file_io_vec* vecs, uint32 vecCount)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -858,6 +858,7 @@ UserlandFS::KernelEmu::do_iterative_fd_io(int fd, int32 requestID, void* cookie,
 	if (error != B_OK)
 		return error;
 
+	request->nsid = volumeID;
 	request->fd = fd;
 	request->request = requestID;
 	request->cookie = cookie;

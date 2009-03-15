@@ -14,14 +14,18 @@
 
 namespace UserlandFS {
 
+class HaikuKernelVolume;
+
 struct HaikuKernelIORequest : HashTableLink<HaikuKernelIORequest>,
 	IORequestInfo {
 
-	int32 refCount;
+	HaikuKernelVolume*	volume;
+	int32				refCount;
 
-	HaikuKernelIORequest(const IORequestInfo& info)
+	HaikuKernelIORequest(HaikuKernelVolume* volume, const IORequestInfo& info)
 		:
 		IORequestInfo(info),
+		volume(volume),
 		refCount(1)
 	{
 	}

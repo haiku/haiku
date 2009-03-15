@@ -43,8 +43,8 @@ status_t file_cache_read(dev_t mountID, ino_t vnodeID, void *cookie,
 status_t file_cache_write(dev_t mountID, ino_t vnodeID, void *cookie,
 	off_t offset, const void *buffer, size_t *_size);
 
-status_t do_iterative_fd_io(int fd, int32 requestID, void* cookie,
-	const file_io_vec* vecs, uint32 vecCount);
+status_t do_iterative_fd_io(dev_t volumeID, int fd, int32 requestID,
+	void* cookie, const file_io_vec* vecs, uint32 vecCount);
 
 void kernel_debugger(const char *message);
 void vpanic(const char *format, va_list args);

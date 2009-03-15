@@ -69,6 +69,10 @@ public:
 									off_t offset, const void* buffer,
 									size_t* _size);
 
+			status_t			DoIterativeFDIO(int fd, int32 requestID,
+									void* cookie, const file_io_vec* vecs,
+									uint32 vecCount);
+
 			// FS
 			status_t			Mount(const char* device, uint32 flags,
 									const char* parameters);
@@ -87,6 +91,12 @@ public:
 									void** node, int* type, uint32* flags);
 			status_t			WriteVNode(void* node, bool reenter);
 			status_t			RemoveVNode(void* node, bool reenter);
+
+			// asynchronous I/O
+			status_t			DoIO(void* node, void* cookie,
+									io_request* ioRequest);
+			status_t			CancelIO(void* node, void* cookie,
+									io_request* ioRequest);
 
 			// nodes
 			status_t			IOCtl(void* node, void* cookie,
@@ -205,8 +215,16 @@ private:
 			struct VNode;
 			struct VNodeHashDefinition;
 			struct VNodeMap;
+			struct IORequestInfo;
+			struct IORequestIDHashDefinition;
+			struct IORequestStructHashDefinition;
+			struct IORequestIDMap;
+			struct IORequestStructMap;
+			struct IterativeFDIOCookie;
 
 			class AutoIncrementer;
+			class IORequestRemover;
+			friend class IORequestRemover;
 
 private:
 			status_t			_Mount(const char* device, uint32 flags,
@@ -245,6 +263,23 @@ private:
 
 			status_t			_PutAllPendingVNodes();
 
+			status_t			_RegisterIORequest(io_request* request,
+									int32* requestID);
+			status_t			_UnregisterIORequest(int32 requestID);
+			status_t 			_FindIORequest(io_request* request,
+									int32* requestID);
+			status_t 			_FindIORequest(int32 requestID,
+									io_request** request);
+
+	static	status_t			_IterativeFDIOGetVecs(void* cookie,
+									io_request* request, off_t offset,
+									size_t size, struct file_io_vec* vecs,
+									size_t* _count);
+	static	status_t			_IterativeFDIOFinished(void* cookie,
+									io_request* request, status_t status,
+									bool partialTransfer,
+									size_t bytesTransferred);
+
 	inline	bool				HasVNodeCapability(VNode* vnode,
 									int capability) const;
 
@@ -263,6 +298,9 @@ private:
 			vint32				fOpenIndexDirectories;
 			vint32				fOpenQueries;
 			VNodeMap*			fVNodes;
+			IORequestIDMap*		fIORequestInfosByID;
+			IORequestStructMap*	fIORequestInfosByStruct;
+			int32				fLastIORequestID;
 	volatile bool				fVNodeCountingEnabled;
 };
 

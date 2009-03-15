@@ -100,6 +100,9 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((FileCacheReadRequest*)request);
 		case FILE_CACHE_WRITE_REQUEST:
 			return _HandleRequest((FileCacheWriteRequest*)request);
+		// I/O
+		case DO_ITERATIVE_FD_IO_REQUEST:
+			return _HandleRequest((DoIterativeFDIORequest*)request);
 	}
 PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -698,6 +701,40 @@ KernelRequestHandler::_HandleRequest(FileCacheWriteRequest* request)
 		return error;
 	reply->error = result;
 	reply->bytesWritten = size;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(DoIterativeFDIORequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	const file_io_vec* vecs = (const file_io_vec*)request->vecs.GetData();
+	size_t vecsSize = request->vecs.GetSize();
+	uint32 vecCount = request->vecCount;
+
+	if (result == B_OK && vecsSize / sizeof(file_io_vec) < vecCount)
+		result = B_BAD_VALUE;
+
+	if (result == B_OK) {
+		result = volume->DoIterativeFDIO(request->fd, request->request,
+			request->cookie, vecs, vecCount);
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	DoIterativeFDIOReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
 
 	// send the reply
 	return fPort->SendRequest(&allocator);

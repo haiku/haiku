@@ -15,6 +15,8 @@
 #include <util/AutoLock.h>
 #include <util/OpenHashTable.h>
 
+#include <fs/fd.h>	// kernel private
+
 #include "Compatibility.h"
 #include "Debug.h"
 #include "FileSystem.h"
@@ -75,7 +77,7 @@ struct Volume::VNodeHashDefinition {
 		{ return (uint32)key ^ (uint32)(key >> 32); }
 	size_t Hash(const VNode* value) const
 		{ return HashKey(value->id); }
-	bool Compare(ino_t key, VNode* value) const
+	bool Compare(ino_t key, const VNode* value) const
 		{ return value->id == key; }
 	HashTableLink<VNode>* GetLink(VNode* value) const
 		{ return value; }
@@ -85,6 +87,90 @@ struct Volume::VNodeHashDefinition {
 // VNodeMap
 struct Volume::VNodeMap
 	: public OpenHashTable<VNodeHashDefinition> {
+};
+
+
+// IORequestInfo
+struct Volume::IORequestInfo {
+	io_request*						request;
+	int32							id;
+
+	HashTableLink<IORequestInfo>	idLink;
+	HashTableLink<IORequestInfo>	structLink;
+
+	IORequestInfo(io_request* request, int32 id)
+		:
+		request(request),
+		id(id)
+	{
+	}
+};
+
+
+// IORequestIDHashDefinition
+struct Volume::IORequestIDHashDefinition {
+	typedef int32			KeyType;
+	typedef	IORequestInfo	ValueType;
+
+	size_t HashKey(int32 key) const
+		{ return key; }
+	size_t Hash(const IORequestInfo* value) const
+		{ return HashKey(value->id); }
+	bool Compare(int32 key, const IORequestInfo* value) const
+		{ return value->id == key; }
+	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
+		{ return &value->idLink; }
+};
+
+
+// IORequestStructHashDefinition
+struct Volume::IORequestStructHashDefinition {
+	typedef io_request*		KeyType;
+	typedef	IORequestInfo	ValueType;
+
+	size_t HashKey(io_request* key) const
+		{ return (size_t)(addr_t)key; }
+	size_t Hash(const IORequestInfo* value) const
+		{ return HashKey(value->request); }
+	bool Compare(io_request* key, const IORequestInfo* value) const
+		{ return value->request == key; }
+	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
+		{ return &value->structLink; }
+};
+
+
+// IORequestIDMap
+struct Volume::IORequestIDMap
+	: public OpenHashTable<IORequestIDHashDefinition> {
+};
+
+
+// IORequestStructMap
+struct Volume::IORequestStructMap
+	: public OpenHashTable<IORequestStructHashDefinition> {
+};
+
+
+// IterativeFDIOCookie
+struct Volume::IterativeFDIOCookie : public Referenceable {
+	Volume*				volume;
+	int					fd;
+	int32				requestID;
+	void*				clientCookie;
+	const file_io_vec*	vecs;
+	uint32				vecCount;
+
+	IterativeFDIOCookie(Volume* volume, int fd, int32 requestID,
+		void* clientCookie, const file_io_vec* vecs, uint32 vecCount)
+		:
+		volume(volume),
+		fd(fd),
+		requestID(requestID),
+		clientCookie(clientCookie),
+		vecs(vecs),
+		vecCount(vecCount)
+	{
+	}
 };
 
 
@@ -113,33 +199,69 @@ private:
 	vint32*	fVariable;
 };
 
+
+// IORequestRemover
+class Volume::IORequestRemover {
+public:
+	IORequestRemover(Volume* volume, int32 requestID)
+		:
+		fVolume(volume),
+		fRequestID(requestID)
+	{
+	}
+
+	~IORequestRemover()
+	{
+		if (fVolume != NULL)
+			fVolume->_UnregisterIORequest(fRequestID);
+	}
+
+	void Detach()
+	{
+		fVolume = NULL;
+	}
+
+private:
+	Volume*	fVolume;
+	int32	fRequestID;
+};
+
+
 // constructor
 Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
-	: Referenceable(true),
-	  fFileSystem(fileSystem),
-	  fFSVolume(fsVolume),
-	  fUserlandVolume(NULL),
-	  fRootID(0),
-	  fRootNode(NULL),
-	  fOpenFiles(0),
-	  fOpenDirectories(0),
-	  fOpenAttributeDirectories(0),
-	  fOpenAttributes(0),
-	  fOpenIndexDirectories(0),
-	  fOpenQueries(0),
-	  fVNodes(NULL),
-	  fVNodeCountingEnabled(false)
+	:
+	Referenceable(true),
+	fFileSystem(fileSystem),
+	fFSVolume(fsVolume),
+	fUserlandVolume(NULL),
+	fRootID(0),
+	fRootNode(NULL),
+	fOpenFiles(0),
+	fOpenDirectories(0),
+	fOpenAttributeDirectories(0),
+	fOpenAttributes(0),
+	fOpenIndexDirectories(0),
+	fOpenQueries(0),
+	fVNodes(NULL),
+	fIORequestInfosByID(NULL),
+	fIORequestInfosByStruct(NULL),
+	fLastIORequestID(0),
+	fVNodeCountingEnabled(false)
 {
 	mutex_init(&fLock, "userlandfs volume");
 }
+
 
 // destructor
 Volume::~Volume()
 {
 	mutex_destroy(&fLock);
 
+	delete fIORequestInfosByID;
+	delete fIORequestInfosByStruct;
 	delete fVNodes;
 }
+
 
 // GetFileSystem
 FileSystem*
@@ -481,6 +603,48 @@ Volume::WriteFileCache(ino_t vnodeID, void* cookie,
 }
 
 
+// DoIterativeFDIO
+status_t
+Volume::DoIterativeFDIO(int fd, int32 requestID, void* clientCookie,
+	const file_io_vec* vecs, uint32 vecCount)
+{
+	// get the request
+	io_request* request;
+	status_t error = _FindIORequest(requestID, &request);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// copy the FD into the kernel
+	fd = dup_foreign_fd(fFileSystem->GetTeam(), fd, true);
+	if (fd < 0)
+		RETURN_ERROR(fd);
+
+	// create a cookie
+	IterativeFDIOCookie* cookie = new(std::nothrow) IterativeFDIOCookie(
+		this, fd, requestID, clientCookie, vecs, vecCount);
+	if (cookie == NULL) {
+		close(fd);
+		RETURN_ERROR(B_NO_MEMORY);
+	}
+
+	// we need another reference, so we can still access the cookie below
+	cookie->AddReference();
+
+	// call the kernel function
+	error = do_iterative_fd_io(fd, request, &_IterativeFDIOGetVecs,
+		&_IterativeFDIOFinished, cookie);
+
+	// unset the vecs -- they are on the stack an will become invalid when we
+	// return
+	MutexLocker _(fLock);
+	cookie->vecs = NULL;
+	cookie->vecCount = 0;
+	cookie->RemoveReference();
+
+	return error;
+}
+
+
 // #pragma mark - FS
 
 
@@ -488,20 +652,27 @@ Volume::WriteFileCache(ino_t vnodeID, void* cookie,
 status_t
 Volume::Mount(const char* device, uint32 flags, const char* parameters)
 {
-	// create the vnode map
+	// create the maps
 	fVNodes = new(std::nothrow) VNodeMap;
-	if (fVNodes == NULL)
-		return B_NO_MEMORY;
+	fIORequestInfosByID = new(std::nothrow) IORequestIDMap;
+	fIORequestInfosByStruct = new(std::nothrow) IORequestStructMap;
 
-	status_t error = fVNodes->Init();
-	if (error != B_OK)
-		return error;
+	if (fVNodes == NULL || fIORequestInfosByID == NULL
+		|| fIORequestInfosByStruct == NULL
+		|| fVNodes->Init() != B_OK
+		|| fIORequestInfosByID->Init() != B_OK
+		|| fIORequestInfosByStruct->Init() != B_OK) {
+		return B_NO_MEMORY;
+	}
 
 	// enable vnode counting
 	fVNodeCountingEnabled = true;
 
+	// init IORequest ID's
+	fLastIORequestID = 0;
+
 	// mount
-	error = _Mount(device, flags, parameters);
+	status_t error = _Mount(device, flags, parameters);
 
 	if (error == B_OK) {
 		MutexLocker locker(fLock);
@@ -533,17 +704,38 @@ Volume::Unmount()
 {
 	status_t error = _Unmount();
 
-	// free the memory associated with the vnode map
-	if (fVNodes != NULL) {
+	// free the memory associated with the maps
+	{
+		// vnodes
 		MutexLocker _(fLock);
-		VNode* node = fVNodes->Clear();
-		while (node != NULL) {
-			VNode* nextNode = node->fNext;
-			delete node;
-			node = nextNode;
+		if (fVNodes != NULL) {
+			VNode* node = fVNodes->Clear(true);
+			while (node != NULL) {
+				VNode* nextNode = node->fNext;
+				delete node;
+				node = nextNode;
+			}
+			delete fVNodes;
+			fVNodes = NULL;
 		}
-		delete fVNodes;
-		fVNodes = NULL;
+
+		// io request infos
+		if (fIORequestInfosByID != NULL) {
+			fIORequestInfosByID->Clear();
+			delete fIORequestInfosByID;
+			fIORequestInfosByID = NULL;
+		}
+
+		if (fIORequestInfosByStruct != NULL) {
+			IORequestInfo* info = fIORequestInfosByStruct->Clear(true);
+			while (info != NULL) {
+				IORequestInfo* nextInfo = info->structLink.fNext;
+				delete info;
+				info = nextInfo;
+			}
+			delete fIORequestInfosByStruct;
+			fIORequestInfosByStruct = NULL;
+		}
 	}
 
 	fFileSystem->VolumeUnmounted(this);
@@ -834,6 +1026,119 @@ Volume::RemoveVNode(void* _node, bool reenter)
 	if (reply->error != B_OK)
 		return reply->error;
 	return error;
+}
+
+
+// #pragma mark - asynchronous I/O
+
+
+// DoIO
+status_t
+Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
+{
+	VNode* vnode = (VNode*)_node;
+
+	// check capability
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_IO))
+		return B_BAD_VALUE;
+
+	// register the IO request
+	int32 requestID;
+	status_t error = _RegisterIORequest(ioRequest, &requestID);
+	if (error != B_OK)
+		return error;
+
+	IORequestRemover requestRemover(this, requestID);
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	DoIORequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = vnode->clientNode;
+	request->fileCookie = cookie;
+	request->request = requestID;
+
+	// send the request
+	KernelRequestHandler handler(this, DO_IO_REPLY);
+	DoIOReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+
+	requestRemover.Detach();
+
+	return B_OK;
+}
+
+
+// CancelIO
+status_t
+Volume::CancelIO(void* _node, void* cookie, io_request* ioRequest)
+{
+	VNode* vnode = (VNode*)_node;
+
+	// check capability
+	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_CANCEL_IO))
+		return B_BAD_VALUE;
+
+	// find the request
+	int32 requestID;
+	status_t error = _FindIORequest(ioRequest, &requestID);
+	if (error != B_OK)
+		return error;
+
+	IORequestRemover requestRemover(this, requestID);
+
+	// get a free port
+	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
+	if (!port)
+		return B_ERROR;
+	PortReleaser _(fFileSystem->GetPortPool(), port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	CancelIORequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->volume = fUserlandVolume;
+	request->node = vnode->clientNode;
+	request->fileCookie = cookie;
+	request->request = requestID;
+
+	// send the request
+	KernelRequestHandler handler(this, CANCEL_IO_REPLY);
+	CancelIOReply* reply;
+	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
+	if (error != B_OK) {
+		_UnregisterIORequest(requestID);
+		return error;
+	}
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK) {
+		_UnregisterIORequest(requestID);
+		return reply->error;
+	}
+
+	return B_OK;
 }
 
 
@@ -4025,4 +4330,94 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 		putVNodeCount));
 
 	return B_OK;
+}
+
+
+// _RegisterIORequest
+status_t
+Volume::_RegisterIORequest(io_request* request, int32* requestID)
+{
+	MutexLocker _(fLock);
+
+	// get the next free ID
+	while (fIORequestInfosByID->Lookup(++fLastIORequestID) != NULL) {
+	}
+
+	// allocate the info
+	IORequestInfo* info = new(std::nothrow) IORequestInfo(request,
+		++fLastIORequestID);
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	// add the info to the maps
+	fIORequestInfosByID->Insert(info);
+	fIORequestInfosByStruct->Insert(info);
+
+	*requestID = info->id;
+
+	return B_OK;
+}
+
+
+// _UnregisterIORequest
+status_t
+Volume::_UnregisterIORequest(int32 requestID)
+{
+	MutexLocker _(fLock);
+
+	if (IORequestInfo* info = fIORequestInfosByID->Lookup(requestID)) {
+		fIORequestInfosByID->Remove(info);
+		fIORequestInfosByStruct->Remove(info);
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+// _FindIORequest
+status_t
+Volume::_FindIORequest(int32 requestID, io_request** request)
+{
+	MutexLocker _(fLock);
+
+	if (IORequestInfo* info = fIORequestInfosByID->Lookup(requestID)) {
+		*request = info->request;
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+// _FindIORequest
+status_t
+Volume::_FindIORequest(io_request* request, int32* requestID)
+{
+	MutexLocker _(fLock);
+
+	if (IORequestInfo* info = fIORequestInfosByStruct->Lookup(request)) {
+		*requestID = info->id;
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+/*static*/ status_t
+Volume::_IterativeFDIOGetVecs(void* cookie, io_request* request, off_t offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
+}
+
+
+/*static*/ status_t
+Volume::_IterativeFDIOFinished(void* cookie, io_request* request,
+	status_t status, bool partialTransfer, size_t bytesTransferred)
+{
+	// TODO: Implement!
+	return B_UNSUPPORTED;
 }
