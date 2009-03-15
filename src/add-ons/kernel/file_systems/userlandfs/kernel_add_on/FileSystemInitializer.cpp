@@ -123,12 +123,18 @@ FileSystemInitializer::_Init(port_id port)
 		RETURN_ERROR(B_BAD_DATA);
 	}
 
+	// get the port's team
+	port_info portInfo;
+	status_t error = get_port_info(port, &portInfo);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	// create and init the FileSystem
 	fFileSystem = new(std::nothrow) FileSystem;
 	if (!fFileSystem)
 		return B_NO_MEMORY;
 
-	status_t error = fFileSystem->Init(fName, info->portInfos,
+	error = fFileSystem->Init(fName, portInfo.team, info->portInfos,
 		info->portInfoCount, info->capabilities);
 	if (error != B_OK)
 		RETURN_ERROR(error);

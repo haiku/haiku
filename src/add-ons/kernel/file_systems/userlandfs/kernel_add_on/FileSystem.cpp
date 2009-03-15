@@ -28,17 +28,19 @@ struct FileSystem::SelectSyncMap
 
 // constructor
 FileSystem::FileSystem()
-	: fVolumes(),
-	  fVolumeLock(),
-	  fName(),
-	  fNotificationPort(NULL),
-	  fNotificationThread(-1),
-	  fPortPool(),
-	  fSelectSyncs(NULL),
-	  fSettings(NULL),
-	  fUserlandServerTeam(-1),
-	  fInitialized(false),
-	  fTerminating(false)
+	:
+	fVolumes(),
+	fVolumeLock(),
+	fName(),
+	fTeam(-1),
+	fNotificationPort(NULL),
+	fNotificationThread(-1),
+	fPortPool(),
+	fSelectSyncs(NULL),
+	fSettings(NULL),
+	fUserlandServerTeam(-1),
+	fInitialized(false),
+	fTerminating(false)
 {
 }
 
@@ -67,7 +69,7 @@ FileSystem::~FileSystem()
 
 // Init
 status_t
-FileSystem::Init(const char* name, Port::Info* infos, int32 count,
+FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 	const FSCapabilities& capabilities)
 {
 	PRINT(("FileSystem::Init(\"%s\", %p, %ld)\n", name, infos, count));
@@ -81,6 +83,7 @@ FileSystem::Init(const char* name, Port::Info* infos, int32 count,
 	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
 
+	fTeam = team;
 	fCapabilities = capabilities;
 
 	// create the select sync entry map

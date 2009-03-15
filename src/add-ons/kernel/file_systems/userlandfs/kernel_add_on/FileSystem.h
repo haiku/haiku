@@ -25,11 +25,12 @@ public:
 								FileSystem();
 								~FileSystem();
 
-			status_t			Init(const char* name, Port::Info* infos,
-									int32 infoCount,
+			status_t			Init(const char* name, team_id team,
+									Port::Info* infos, int32 infoCount,
 									const FSCapabilities& capabilities);
 
 			const char*			GetName() const;
+			team_id				GetTeam() const	{ return fTeam; }
 
 			const FSCapabilities& GetCapabilities() const;
 	inline	bool				HasCapability(uint32 capability) const;
@@ -65,6 +66,7 @@ private:
 			Vector<Volume*>		fVolumes;
 			Locker				fVolumeLock;
 			String				fName;
+			team_id				fTeam;
 			FSCapabilities		fCapabilities;
 			RequestPort*		fNotificationPort;
 			thread_id			fNotificationThread;
