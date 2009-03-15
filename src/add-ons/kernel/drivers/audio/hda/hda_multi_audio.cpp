@@ -823,7 +823,6 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 static status_t
 buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 {
-	static int debug_buffers_exchanged = 0;
 	cpu_status status;
 	status_t err;
 	multi_buffer_info buffer_info;
@@ -881,12 +880,15 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 #else
 	memcpy(data, &buffer_info, sizeof(buffer_info));
 #endif
+
+#if 0
+	static int debug_buffers_exchanged = 0;
 	
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
 		dprintf("%s: %d buffers processed\n", __func__, debug_buffers_exchanged);
 	}
-
+#endif
 	return B_OK;
 }
 
