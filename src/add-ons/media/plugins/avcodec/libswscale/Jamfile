@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons media plugins avcodec libswscale ;
 
+SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
 
@@ -8,7 +9,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
 SubDirCcFlags -fomit-frame-pointer -DPIC ;
-SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
+#SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
 StaticLibrary libswscale.a :
 	rgb2rgb.c

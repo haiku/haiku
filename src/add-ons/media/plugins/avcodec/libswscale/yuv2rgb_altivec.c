@@ -5,18 +5,18 @@
  *
  * This file is part of FFmpeg.
  *
- * FFmpeg is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with FFmpeg; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -91,9 +91,6 @@ adjustment.
 #include <inttypes.h>
 #include <assert.h>
 #include "config.h"
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 #include "rgb2rgb.h"
 #include "swscale.h"
 #include "swscale_internal.h"
@@ -154,7 +151,7 @@ const vector unsigned char
 
 #define vec_merge3(x2,x1,x0,y0,y1,y2)       \
 do {                                        \
-    typeof(x0) o0,o2,o3;                    \
+    __typeof__(x0) o0,o2,o3;                \
         o0 = vec_mergeh (x0,x1);            \
         y0 = vec_perm (o0, x2, perm_rgb_0); \
         o2 = vec_perm (o0, x2, perm_rgb_1); \
@@ -165,7 +162,7 @@ do {                                        \
 
 #define vec_mstbgr24(x0,x1,x2,ptr)      \
 do {                                    \
-    typeof(x0) _0,_1,_2;                \
+    __typeof__(x0) _0,_1,_2;            \
     vec_merge3 (x0,x1,x2,_0,_1,_2);     \
     vec_st (_0, 0, ptr++);              \
     vec_st (_1, 0, ptr++);              \
@@ -174,7 +171,7 @@ do {                                    \
 
 #define vec_mstrgb24(x0,x1,x2,ptr)      \
 do {                                    \
-    typeof(x0) _0,_1,_2;                \
+    __typeof__(x0) _0,_1,_2;            \
     vec_merge3 (x2,x1,x0,_0,_1,_2);     \
     vec_st (_0, 0, ptr++);              \
     vec_st (_1, 0, ptr++);              \
@@ -222,12 +219,12 @@ do {                                                                          \
 
 #define vec_unh(x) \
     (vector signed short) \
-        vec_perm(x,(typeof(x)){0}, \
+        vec_perm(x,(__typeof__(x)){0}, \
                  ((vector unsigned char){0x10,0x00,0x10,0x01,0x10,0x02,0x10,0x03,\
                                          0x10,0x04,0x10,0x05,0x10,0x06,0x10,0x07}))
 #define vec_unl(x) \
     (vector signed short) \
-        vec_perm(x,(typeof(x)){0}, \
+        vec_perm(x,(__typeof__(x)){0}, \
                  ((vector unsigned char){0x10,0x08,0x10,0x09,0x10,0x0A,0x10,0x0B,\
                                          0x10,0x0C,0x10,0x0D,0x10,0x0E,0x10,0x0F}))
 
@@ -240,7 +237,7 @@ do {                                                                          \
         ((vector unsigned short)vec_max (x,((vector signed short) {0})), \
          (vector unsigned short)vec_max (y,((vector signed short) {0})))
 
-//#define out_pixels(a,b,c,ptr) vec_mstrgb32(typeof(a),((typeof (a)){0}),a,a,a,ptr)
+//#define out_pixels(a,b,c,ptr) vec_mstrgb32(__typeof__(a),((__typeof__ (a)){255}),a,a,a,ptr)
 
 
 static inline void cvtyuvtoRGB (SwsContext *c,
@@ -441,10 +438,10 @@ static int altivec_##name (SwsContext *c,                               \
 }
 
 
-#define out_abgr(a,b,c,ptr)  vec_mstrgb32(typeof(a),((typeof (a)){0}),c,b,a,ptr)
-#define out_bgra(a,b,c,ptr)  vec_mstrgb32(typeof(a),c,b,a,((typeof (a)){0}),ptr)
-#define out_rgba(a,b,c,ptr)  vec_mstrgb32(typeof(a),a,b,c,((typeof (a)){0}),ptr)
-#define out_argb(a,b,c,ptr)  vec_mstrgb32(typeof(a),((typeof (a)){0}),a,b,c,ptr)
+#define out_abgr(a,b,c,ptr)  vec_mstrgb32(__typeof__(a),((__typeof__ (a)){255}),c,b,a,ptr)
+#define out_bgra(a,b,c,ptr)  vec_mstrgb32(__typeof__(a),c,b,a,((__typeof__ (a)){255}),ptr)
+#define out_rgba(a,b,c,ptr)  vec_mstrgb32(__typeof__(a),a,b,c,((__typeof__ (a)){255}),ptr)
+#define out_argb(a,b,c,ptr)  vec_mstrgb32(__typeof__(a),((__typeof__ (a)){255}),a,b,c,ptr)
 #define out_rgb24(a,b,c,ptr) vec_mstrgb24(a,b,c,ptr)
 #define out_bgr24(a,b,c,ptr) vec_mstbgr24(a,b,c,ptr)
 
@@ -693,7 +690,7 @@ static int altivec_uyvy_rgb32 (SwsContext *c,
 
    So we just fall back to the C codes for this.
 */
-SwsFunc yuv2rgb_init_altivec (SwsContext *c)
+SwsFunc sws_yuv2rgb_init_altivec (SwsContext *c)
 {
     if (!(c->flags & SWS_CPU_CAPS_ALTIVEC))
         return NULL;
@@ -753,7 +750,7 @@ SwsFunc yuv2rgb_init_altivec (SwsContext *c)
     return NULL;
 }
 
-void yuv2rgb_altivec_init_tables (SwsContext *c, const int inv_table[4],int brightness,int contrast, int saturation)
+void sws_yuv2rgb_altivec_init_tables (SwsContext *c, const int inv_table[4],int brightness,int contrast, int saturation)
 {
     union {
         signed short tmp[8] __attribute__ ((aligned(16)));
