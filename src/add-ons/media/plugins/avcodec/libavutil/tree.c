@@ -119,15 +119,20 @@ void *av_tree_insert(AVTreeNode **tp, void *key, int (*cmp)(void *key, const voi
         return ret;
     }else{
         *tp= *next; *next= NULL;
-        (*tp)->elem= key;
-        return NULL;
+        if(*tp){
+            (*tp)->elem= key;
+            return NULL;
+        }else
+            return key;
     }
 }
 
 void av_tree_destroy(AVTreeNode *t){
-    av_tree_destroy(t->child[0]);
-    av_tree_destroy(t->child[1]);
-    av_free(t);
+    if(t){
+        av_tree_destroy(t->child[0]);
+        av_tree_destroy(t->child[1]);
+        av_free(t);
+    }
 }
 
 #if 0
@@ -188,14 +193,13 @@ int main(void){
         av_tree_insert(&root, (void*)(j+1), cmp, &node);
 
         j= (random()%86294);
-        k= av_tree_find(root, (void*)(j+1), cmp, NULL);
-        if(k){
+        {
             AVTreeNode *node2=NULL;
             av_log(NULL, AV_LOG_ERROR, "removing %4d\n", j);
             av_tree_insert(&root, (void*)(j+1), cmp, &node2);
             k= av_tree_find(root, (void*)(j+1), cmp, NULL);
             if(k)
-                av_log(NULL, AV_LOG_ERROR, "removial failure %d\n", i);
+                av_log(NULL, AV_LOG_ERROR, "removal failure %d\n", i);
         }
     }
     return 0;

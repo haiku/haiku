@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2009 Baptiste Coudurier <baptiste.coudurier@gmail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -18,17 +18,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_SHA1_H
-#define AVUTIL_SHA1_H
+#include <unistd.h>
+#include <fcntl.h>
+#include "timer.h"
+#include "random_seed.h"
 
-#include <stdint.h>
+uint32_t ff_random_get_seed(void)
+{
+    uint32_t seed;
+    int fd;
 
-extern const int av_sha1_size;
-
-struct AVSHA1;
-
-void av_sha1_init(struct AVSHA1* context);
-void av_sha1_update(struct AVSHA1* context, const uint8_t* data, unsigned int len);
-void av_sha1_final(struct AVSHA1* context, uint8_t digest[20]);
-
-#endif /* AVUTIL_SHA1_H */
+    if ((fd = open("/dev/random", O_RDONLY)) == -1)
+        fd = open("/dev/urandom", O_RDONLY);
+    if (fd != -1){
+        read(fd, &seed, 4);
+        close(fd);
+        return seed;
+    }
+#ifdef AV_READ_TIME
+    seed = AV_READ_TIME();
+#endif
+    // XXX what to do ?
+    return seed;
+}

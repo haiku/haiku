@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_LFG_H
-#define FFMPEG_LFG_H
+#ifndef AVUTIL_LFG_H
+#define AVUTIL_LFG_H
 
 typedef struct {
     unsigned int state[64];
@@ -30,7 +30,7 @@ typedef struct {
 void av_lfg_init(AVLFG *c, unsigned int seed);
 
 /**
- * Gets the next random unsigned 32bit number using a ALFG.
+ * Gets the next random unsigned 32-bit number using an ALFG.
  *
  * Please also consider a simple LCG like state= state*1664525+1013904223,
  * it may be good enough and faster for your specific use case.
@@ -41,9 +41,9 @@ static inline unsigned int av_lfg_get(AVLFG *c){
 }
 
 /**
- * Gets the next random unsigned 32bit number using a MLFG.
+ * Gets the next random unsigned 32-bit number using a MLFG.
  *
- * Please also consider the av_lfg_get() above, it is faster.
+ * Please also consider av_lfg_get() above, it is faster.
  */
 static inline unsigned int av_mlfg_get(AVLFG *c){
     unsigned int a= c->state[(c->index-55) & 63];
@@ -51,4 +51,4 @@ static inline unsigned int av_mlfg_get(AVLFG *c){
     return c->state[c->index++ & 63] = 2*a*b+a+b;
 }
 
-#endif //FFMPEG_LFG_H
+#endif /* AVUTIL_LFG_H */

@@ -1,5 +1,5 @@
 /*
- * Principal component analysis
+ * principal component analysis (PCA)
  * Copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
@@ -20,16 +20,16 @@
  */
 
 /**
- * @file pca.h
- * Principal component analysis
+ * @file libavutil/pca.h
+ * principal component analysis (PCA)
  */
 
-#ifndef FFMPEG_PCA_H
-#define FFMPEG_PCA_H
+#ifndef AVUTIL_PCA_H
+#define AVUTIL_PCA_H
 
 struct PCA *ff_pca_init(int n);
 void ff_pca_free(struct PCA *pca);
 void ff_pca_add(struct PCA *pca, double *v);
 int ff_pca(struct PCA *pca, double *eigenvector, double *eigenvalue);
 
-#endif /* FFMPEG_PCA_H */
+#endif /* AVUTIL_PCA_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2009 Baptiste Coudurier <baptiste.coudurier@gmail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -18,17 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_SHA1_H
-#define AVUTIL_SHA1_H
+#ifndef AVUTIL_RANDOM_SEED_H
+#define AVUTIL_RANDOM_SEED_H
 
 #include <stdint.h>
 
-extern const int av_sha1_size;
+/**
+ * Get a seed to use in conjuction with random functions
+ */
+uint32_t ff_random_get_seed();
 
-struct AVSHA1;
-
-void av_sha1_init(struct AVSHA1* context);
-void av_sha1_update(struct AVSHA1* context, const uint8_t* data, unsigned int len);
-void av_sha1_final(struct AVSHA1* context, uint8_t digest[20]);
-
-#endif /* AVUTIL_SHA1_H */
+#endif /* AVUTIL_RANDOM_SEED_H */

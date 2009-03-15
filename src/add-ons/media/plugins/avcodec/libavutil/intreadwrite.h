@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_INTREADWRITE_H
-#define FFMPEG_INTREADWRITE_H
+#ifndef AVUTIL_INTREADWRITE_H
+#define AVUTIL_INTREADWRITE_H
 
 #include <stdint.h>
 #include "config.h"
@@ -66,7 +66,7 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
 #define AV_RL8(x)     AV_RB8(x)
 #define AV_WL8(p, d)  AV_WB8(p, d)
 
-#ifdef HAVE_FAST_UNALIGNED
+#if HAVE_FAST_UNALIGNED
 # ifdef WORDS_BIGENDIAN
 #  define AV_RB16(x)    AV_RN16(x)
 #  define AV_WB16(p, d) AV_WN16(p, d)
@@ -189,4 +189,4 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
                     ((uint8_t*)(p))[1] = (d)>>8; \
                     ((uint8_t*)(p))[2] = (d)>>16; } while(0)
 
-#endif /* FFMPEG_INTREADWRITE_H */
+#endif /* AVUTIL_INTREADWRITE_H */
