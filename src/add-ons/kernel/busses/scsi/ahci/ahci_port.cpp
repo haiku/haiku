@@ -18,7 +18,12 @@
 
 #include "ahci_tracing.h"
 
-#define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#define TRACE_AHCI
+#ifdef TRACE_AHCI
+#	define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#else
+#	define TRACE(a...)
+#endif
 //#define FLOW(a...)	dprintf("ahci: " a)
 //#define RWTRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 #define FLOW(a...)
@@ -26,20 +31,20 @@
 
 
 AHCIPort::AHCIPort(AHCIController *controller, int index)
-	: fController(controller)
-	, fIndex(index)
-	, fRegs(&controller->fRegs->port[index])
-	, fArea(-1)
-	, fCommandsActive(0)
-	, fRequestSem(-1)
-	, fResponseSem(-1)
-	, fDevicePresent(false)
-	, fUse48BitCommands(false)
-	, fSectorSize(0)
-	, fSectorCount(0)
-	, fIsATAPI(false)
-	, fResetPort(false)
-	, fError(false)
+	: fController(controller),
+	fIndex(index),
+	fRegs(&controller->fRegs->port[index]),
+	fArea(-1),
+	fCommandsActive(0),
+	fRequestSem(-1),
+	fResponseSem(-1),
+	fDevicePresent(false),
+	fUse48BitCommands(false),
+	fSectorSize(0),
+	fSectorCount(0),
+	fIsATAPI(false),
+	fResetPort(false),
+	fError(false)
 {
 	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	fRequestSem = create_sem(1, "ahci request");
@@ -634,7 +639,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 void
 AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
 {
-	TRACE("AHCIPort::ScsiSynchronizeCache port %d\n", fIndex);
+	//TRACE("AHCIPort::ScsiSynchronizeCache port %d\n", fIndex);
 
 	sata_request *sreq = new(std::nothrow) sata_request(request);
 	sreq->set_ata_cmd(fUse48BitCommands ? 0xea : 0xe7); // Flush Cache

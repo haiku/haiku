@@ -2,6 +2,7 @@
  * Copyright 2008, Bruno G. Albuquerque. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #include <tracing.h>
 
 
