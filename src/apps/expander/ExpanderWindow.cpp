@@ -36,7 +36,7 @@ const uint32 MSG_SHOWCONTENTS = 'mSCT';
 
 
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *settings)
-	: BWindow(frame, "Expand-O-Matic", B_TITLED_WINDOW, B_NOT_ZOOMABLE),
+	: BWindow(frame, "Expander", B_TITLED_WINDOW, B_NOT_ZOOMABLE),
 	fSourceChanged(true),
 	fListingThread(NULL),
 	fListingStarted(false),

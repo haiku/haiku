@@ -18,7 +18,7 @@ const uint32 MSG_DESTTEXT = 'mDet';
 const uint32 MSG_DESTSELECT = 'mDes';
 
 ExpanderPreferences::ExpanderPreferences(BMessage *settings)
-	: BWindow(BRect(0, 0, 325, 305), "Expand-O-Matic", B_MODAL_WINDOW,
+	: BWindow(BRect(0, 0, 325, 305), "Expander", B_MODAL_WINDOW,
 		B_NOT_CLOSABLE | B_NOT_RESIZABLE),
 	fSettings(settings),
 	fUsePanel(NULL)

@@ -25,7 +25,7 @@ ExpanderApp::ExpanderApp()
 void
 ExpanderApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Expand-O-Matic\n"
+	BAlert *alert = new BAlert("about", "Expander\n"
 		"\twritten by Jérôme Duval\n"
 		"\tCopyright 2004-2006, Haiku Inc.\n\n"
 		"original Be version by \n"
