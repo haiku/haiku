@@ -1,5 +1,5 @@
 /**
- * @file huffman.c
+ * @file libavcodec/huffman.c
  * huffman tree builder and VLC generator
  * Copyright (c) 2006 Konstantin Shishkov
  *
@@ -67,7 +67,7 @@ static int build_huff_tree(VLC *vlc, Node *nodes, int head, int flags)
  * first nb_codes nodes.count must be set
  */
 int ff_huff_build_tree(AVCodecContext *avctx, VLC *vlc, int nb_codes,
-                       Node *nodes, huff_cmp_t cmp, int flags)
+                       Node *nodes, HuffCmp cmp, int flags)
 {
     int i, j;
     int cur_node;

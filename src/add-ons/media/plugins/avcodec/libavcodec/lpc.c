@@ -19,51 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "lls.h"
+#include "libavutil/lls.h"
 #include "dsputil.h"
+
+#define LPC_USE_DOUBLE
 #include "lpc.h"
 
-
-/**
- * Levinson-Durbin recursion.
- * Produces LPC coefficients from autocorrelation data.
- */
-static void compute_lpc_coefs(const double *autoc, int max_order,
-                              double lpc[][MAX_LPC_ORDER], double *ref)
-{
-    int i, j, i2;
-    double r, err, tmp;
-    double lpc_tmp[MAX_LPC_ORDER];
-
-    for(i=0; i<max_order; i++) lpc_tmp[i] = 0;
-    err = autoc[0];
-
-    for(i=0; i<max_order; i++) {
-        r = -autoc[i+1];
-        for(j=0; j<i; j++) {
-            r -= lpc_tmp[j] * autoc[i-j];
-        }
-        r /= err;
-        ref[i] = fabs(r);
-
-        err *= 1.0 - (r * r);
-
-        i2 = (i >> 1);
-        lpc_tmp[i] = r;
-        for(j=0; j<i2; j++) {
-            tmp = lpc_tmp[j];
-            lpc_tmp[j] += r * lpc_tmp[i-1-j];
-            lpc_tmp[i-1-j] += r * tmp;
-        }
-        if(i & 1) {
-            lpc_tmp[j] += lpc_tmp[j] * r;
-        }
-
-        for(j=0; j<=i; j++) {
-            lpc[i][j] = -lpc_tmp[j];
-        }
-    }
-}
 
 /**
  * Quantize LPC coefficients
@@ -110,7 +71,7 @@ static void quantize_lpc_coefs(double *lpc_in, int order, int precision,
     /* output quantized coefficients and level shift */
     error=0;
     for(i=0; i<order; i++) {
-        error += lpc_in[i] * (1 << sh);
+        error -= lpc_in[i] * (1 << sh);
         lpc_out[i] = av_clip(lrintf(error), -qmax, qmax);
         error -= lpc_out[i];
     }
@@ -133,6 +94,11 @@ static int estimate_best_order(double *ref, int min_order, int max_order)
 
 /**
  * Calculate LPC coefficients for multiple orders
+ *
+ * @param use_lpc LPC method for determining coefficients
+ * 0  = LPC with fixed pre-defined coeffs
+ * 1  = LPC with coeffs determined by Levinson-Durbin recursion
+ * 2+ = LPC with coeffs determined by Cholesky factorization using (use_lpc-1) passes.
  */
 int ff_lpc_calc_coefs(DSPContext *s,
                       const int32_t *samples, int blocksize, int min_order,
@@ -146,15 +112,18 @@ int ff_lpc_calc_coefs(DSPContext *s,
     int i, j, pass;
     int opt_order;
 
-    assert(max_order >= MIN_LPC_ORDER && max_order <= MAX_LPC_ORDER);
+    assert(max_order >= MIN_LPC_ORDER && max_order <= MAX_LPC_ORDER && use_lpc > 0);
 
     if(use_lpc == 1){
         s->flac_compute_autocorr(samples, blocksize, max_order, autoc);
 
-        compute_lpc_coefs(autoc, max_order, lpc, ref);
+        compute_lpc_coefs(autoc, max_order, &lpc[0][0], MAX_LPC_ORDER, 0, 1);
+
+        for(i=0; i<max_order; i++)
+            ref[i] = fabs(lpc[i][i]);
     }else{
         LLSModel m[2];
-        double var[MAX_LPC_ORDER+1], weight;
+        double var[MAX_LPC_ORDER+1], av_uninit(weight);
 
         for(pass=0; pass<use_lpc-1; pass++){
             av_init_lls(&m[pass&1], max_order);
@@ -183,7 +152,7 @@ int ff_lpc_calc_coefs(DSPContext *s,
 
         for(i=0; i<max_order; i++){
             for(j=0; j<max_order; j++)
-                lpc[i][j]= m[(pass-1)&1].coeff[i][j];
+                lpc[i][j]=-m[(pass-1)&1].coeff[i][j];
             ref[i]= sqrt(m[(pass-1)&1].variance[i] / weight) * (blocksize - max_order) / 4000;
         }
         for(i=max_order-1; i>0; i--)

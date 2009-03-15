@@ -60,11 +60,11 @@
  */
 
 /**
- * @file jrevdct.c
+ * @file libavcodec/jrevdct.c
  * Independent JPEG Group's LLM idct.
  */
 
-#include "common.h"
+#include "libavutil/common.h"
 #include "dsputil.h"
 
 #define EIGHT_BIT_SAMPLES

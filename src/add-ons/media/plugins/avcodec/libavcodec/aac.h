@@ -21,15 +21,16 @@
  */
 
 /**
- * @file aac.h
+ * @file libavcodec/aac.h
  * AAC definitions and structures
  * @author Oded Shimon  ( ods15 ods15 dyndns org )
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
  */
 
-#ifndef FFMPEG_AAC_H
-#define FFMPEG_AAC_H
+#ifndef AVCODEC_AAC_H
+#define AVCODEC_AAC_H
 
+#include "libavutil/internal.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpeg4audio.h"
@@ -46,7 +47,6 @@
 #define MAX_ELEM_ID 16
 
 #define TNS_MAX_ORDER 20
-#define PNS_MEAN_ENERGY 3719550720.0f // sqrt(3.0) * 1<<31
 
 enum AudioObjectType {
     AOT_NULL,
@@ -134,6 +134,20 @@ enum CouplingPoint {
 };
 
 /**
+ * Predictor State
+ */
+typedef struct {
+    float cor0;
+    float cor1;
+    float var0;
+    float var1;
+    float r0;
+    float r1;
+} PredictorState;
+
+#define MAX_PREDICTORS 672
+
+/**
  * Individual Channel Stream
  */
 typedef struct {
@@ -146,6 +160,10 @@ typedef struct {
     int num_swb;                ///< number of scalefactor window bands
     int num_windows;
     int tns_max_bands;
+    int predictor_present;
+    int predictor_initialized;
+    int predictor_reset_group;
+    uint8_t prediction_used[41];
 } IndividualChannelStream;
 
 /**
@@ -190,8 +208,8 @@ typedef struct {
     int num_coupled;       ///< number of target elements
     enum RawDataBlockType type[8];   ///< Type of channel element to be coupled - SCE or CPE.
     int id_select[8];      ///< element id
-    int ch_select[8];      /**< [0] shared list of gains; [1] list of gains for left channel;
-                            *   [2] list of gains for right channel; [3] lists of gains for both channels
+    int ch_select[8];      /**< [0] shared list of gains; [1] list of gains for right channel;
+                            *   [2] list of gains for left channel; [3] lists of gains for both channels
                             */
     float gain[16][120];
 } ChannelCoupling;
@@ -208,6 +226,7 @@ typedef struct {
     DECLARE_ALIGNED_16(float, coeffs[1024]);  ///< coefficients for IMDCT
     DECLARE_ALIGNED_16(float, saved[512]);    ///< overlap
     DECLARE_ALIGNED_16(float, ret[1024]);     ///< PCM output
+    PredictorState predictor_state[MAX_PREDICTORS];
 } SingleChannelElement;
 
 /**
@@ -234,7 +253,7 @@ typedef struct {
     DynamicRangeControl che_drc;
 
     /**
-     * @defgroup elements
+     * @defgroup elements Channel element related data.
      * @{
      */
     enum ChannelPosition che_pos[4][MAX_ELEM_ID]; /**< channel element channel mapping with the
@@ -270,6 +289,7 @@ typedef struct {
     int sf_offset;                                    ///< offset into pow2sf_tab as appropriate for dsp.float_to_int16
     /** @} */
 
+    DECLARE_ALIGNED(16, float, temp[128]);
 } AACContext;
 
-#endif /* FFMPEG_AAC_H */
+#endif /* AVCODEC_AAC_H */

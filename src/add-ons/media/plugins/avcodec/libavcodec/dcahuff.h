@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_DCAHUFF_H
-#define FFMPEG_DCAHUFF_H
+#ifndef AVCODEC_DCAHUFF_H
+#define AVCODEC_DCAHUFF_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -1021,7 +1021,7 @@ static const uint8_t bitalloc_129_bits_g[129] =
 
 static const uint8_t bitalloc_sizes[10] = { 3, 5, 7, 9, 13, 17, 25, 33, 65, 129 };
 
-static const uint8_t bitalloc_offsets[10] =
+static const int8_t bitalloc_offsets[10] =
     { -1, -2, -3, -4, -6, -8, -12, -16, -32, -64 };
 
 static const uint8_t bitalloc_maxbits[10][7] = {
@@ -1073,4 +1073,4 @@ static const uint8_t* const bitalloc_bits[10][8] = {
     bitalloc_129_bits_e, bitalloc_129_bits_f, bitalloc_129_bits_g, NULL }
 };
 
-#endif /* FFMPEG_DCAHUFF_H */
+#endif /* AVCODEC_DCAHUFF_H */

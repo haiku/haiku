@@ -20,13 +20,13 @@
  */
 
 /**
- * @file cabac.c
+ * @file libavcodec/cabac.c
  * Context Adaptive Binary Arithmetic Coder.
  */
 
 #include <string.h>
 
-#include "common.h"
+#include "libavutil/common.h"
 #include "bitstream.h"
 #include "cabac.h"
 

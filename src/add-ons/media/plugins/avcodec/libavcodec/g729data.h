@@ -19,13 +19,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_G729DATA_H
-#define FFMPEG_G729DATA_H
+#ifndef AVCODEC_G729DATA_H
+#define AVCODEC_G729DATA_H
 
 #include <stdint.h>
 
-/// Moving Average (MA) prediction order
-#define MA_NP                      4
+#define MA_NP                4  ///< Moving Average (MA) prediction order
+
+#define VQ_1ST_BITS          7  ///< first stage vector of quantizer (size in bits)
+#define VQ_2ND_BITS          5  ///< second stage vector of quantizer (size in bits)
+
+#define GC_1ST_IDX_BITS_8K   3  ///< gain codebook (first stage) index, 8k mode (size in bits)
+#define GC_2ND_IDX_BITS_8K   4  ///< gain codebook (second stage) index, 8k mode (size in bits)
+
+#define GC_1ST_IDX_BITS_6K4  3  ///< gain codebook (first stage) index, 6.4k mode (size in bits)
+#define GC_2ND_IDX_BITS_6K4  3  ///< gain codebook (second stage) index, 6.4k mode (size in bits)
 
 /**
  * first stage LSP codebook
@@ -203,4 +211,60 @@ static const int16_t cb_lsp_2nd[1<<VQ_2ND_BITS][10] =
   { -163,   674,   -11,  -886,   531, -1125,  -265,  -242,   724,   934}
 };
 
-#endif // FFMPEG_G729DATA_H
+/**
+ * gain codebook (first stage), 8k mode (3.9.2 of G.729)
+ */
+static const int16_t cb_gain_1st_8k[1<<GC_1ST_IDX_BITS_8K][2] =
+{ /*(0.14) (2.13) */
+  { 3242 ,  9949 },
+  { 1551 ,  2425 },
+  { 2678 , 27162 },
+  { 1921 ,  9291 },
+  { 1831 ,  5022 },
+  {    1 ,  1516 },
+  {  356 , 14756 },
+  {   57 ,  5404 },
+};
+
+/**
+ * gain codebook (second stage), 8k mode (3.9.2 of G.729)
+ */
+static const int16_t cb_gain_2nd_8k[1<<GC_2ND_IDX_BITS_8K][2] =
+{ /*(1.14) (1.13) */
+  {  5142 ,   592 },
+  { 17299 ,  1861 },
+  {  6160 ,  2395 },
+  { 16112 ,  3392 },
+  {   826 ,  2005 },
+  { 18973 ,  5935 },
+  {  1994 ,     0 },
+  { 15434 ,   237 },
+  { 10573 ,  2966 },
+  { 15132 ,  4914 },
+  { 11569 ,  1196 },
+  { 14194 ,  1630 },
+  {  8091 ,  4861 },
+  { 15161 , 14276 },
+  {  9120 ,   525 },
+  { 13260 ,  3256 },
+};
+
+/**
+ * 4th order Moving Average (MA) Predictor codebook (3.2.4 of G.729)
+ */
+static const int16_t cb_ma_predictor[2][MA_NP][10] =
+{ /* (0.15) */
+  {
+    { 8421,  9109,  9175,  8965,  9034,  9057,  8765,  8775,  9106,  8673},
+    { 7018,  7189,  7638,  7307,  7444,  7379,  7038,  6956,  6930,  6868},
+    { 5472,  4990,  5134,  5177,  5246,  5141,  5206,  5095,  4830,  5147},
+    { 4056,  3031,  2614,  3024,  2916,  2713,  3309,  3237,  2857,  3473}
+  },
+  {
+    { 7733,  7880,  8188,  8175,  8247,  8490,  8637,  8601,  8359,  7569},
+    { 4210,  3031,  2552,  3473,  3876,  3853,  4184,  4154,  3909,  3968},
+    { 3214,  1930,  1313,  2143,  2493,  2385,  2755,  2706,  2542,  2919},
+    { 3024,  1592,   940,  1631,  1723,  1579,  2034,  2084,  1913,  2601}
+  }
+};
+#endif /* AVCODEC_G729DATA_H */

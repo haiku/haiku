@@ -3,13 +3,14 @@
  * Copyright (C) 2007 Clemens Fruhwirth
  * Copyright (C) 2007 Alexis Ballier
  *
- * This file is part of FFmpeg.
+ * This file is based on flashsvenc.c.
  *
- * This file is based on flashsvenc.c
+ * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License, version 2.1, as published by the Free Software Foundation
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -77,7 +78,7 @@ static av_cold int qtrle_encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Unsupported colorspace.\n");
         break;
     }
-    avctx->bits_per_sample = s->pixel_size*8;
+    avctx->bits_per_coded_sample = s->pixel_size*8;
 
     s->rlecode_table = av_mallocz(s->avctx->width);
     s->skip_table    = av_mallocz(s->avctx->width);
@@ -115,7 +116,7 @@ static void qtrle_encode_line(QtrleEncContext *s, AVFrame *p, int line, uint8_t 
     unsigned int skipcount;
     /* This will be the number of consecutive equal pixels in the current
      * frame, starting from the ith one also */
-    unsigned int repeatcount;
+    unsigned int av_uninit(repeatcount);
 
     /* The cost of the three different possibilities */
     int total_bulk_cost;

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file cinepak.c
+ * @file libavcodec/cinepak.c
  * Cinepak video decoder
  * by Ewald Snel <ewald@rambo.its.tudelft.nl>
  * For more information on the Cinepak algorithm, visit:
@@ -34,13 +34,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 
 typedef struct {
     uint8_t  y0, y1, y2, y3;
     uint8_t  u, v;
-} cvid_codebook_t;
+} cvid_codebook;
 
 #define MAX_STRIPS      32
 
@@ -48,9 +49,9 @@ typedef struct {
     uint16_t          id;
     uint16_t          x1, y1;
     uint16_t          x2, y2;
-    cvid_codebook_t   v4_codebook[256];
-    cvid_codebook_t   v1_codebook[256];
-} cvid_strip_t;
+    cvid_codebook     v4_codebook[256];
+    cvid_codebook     v1_codebook[256];
+} cvid_strip;
 
 typedef struct CinepakContext {
 
@@ -63,13 +64,13 @@ typedef struct CinepakContext {
     int width, height;
 
     int palette_video;
-    cvid_strip_t strips[MAX_STRIPS];
+    cvid_strip strips[MAX_STRIPS];
 
     int sega_film_skip_bytes;
 
 } CinepakContext;
 
-static void cinepak_decode_codebook (cvid_codebook_t *codebook,
+static void cinepak_decode_codebook (cvid_codebook *codebook,
                                      int chunk_id, int size, const uint8_t *data)
 {
     const uint8_t *eod = (data + size);
@@ -77,12 +78,12 @@ static void cinepak_decode_codebook (cvid_codebook_t *codebook,
     int      i, n;
 
     /* check if this chunk contains 4- or 6-element vectors */
-    n    = (chunk_id & 0x0400) ? 4 : 6;
+    n    = (chunk_id & 0x04) ? 4 : 6;
     flag = 0;
     mask = 0;
 
     for (i=0; i < 256; i++) {
-        if ((chunk_id & 0x0100) && !(mask >>= 1)) {
+        if ((chunk_id & 0x01) && !(mask >>= 1)) {
             if ((data + 4) > eod)
                 break;
 
@@ -91,7 +92,7 @@ static void cinepak_decode_codebook (cvid_codebook_t *codebook,
             mask  = 0x80000000;
         }
 
-        if (!(chunk_id & 0x0100) || (flag & mask)) {
+        if (!(chunk_id & 0x01) || (flag & mask)) {
             if ((data + n) > eod)
                 break;
 
@@ -118,12 +119,12 @@ static void cinepak_decode_codebook (cvid_codebook_t *codebook,
     }
 }
 
-static int cinepak_decode_vectors (CinepakContext *s, cvid_strip_t *strip,
+static int cinepak_decode_vectors (CinepakContext *s, cvid_strip *strip,
                                    int chunk_id, int size, const uint8_t *data)
 {
     const uint8_t   *eod = (data + size);
     uint32_t         flag, mask;
-    cvid_codebook_t *codebook;
+    cvid_codebook   *codebook;
     unsigned int     x, y;
     uint32_t         iy[4];
     uint32_t         iu[2];
@@ -144,7 +145,7 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip_t *strip,
         iv[1] = iv[0] + s->frame.linesize[2];
 
         for (x=strip->x1; x < strip->x2; x+=4) {
-            if ((chunk_id & 0x0100) && !(mask >>= 1)) {
+            if ((chunk_id & 0x01) && !(mask >>= 1)) {
                 if ((data + 4) > eod)
                     return -1;
 
@@ -153,8 +154,8 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip_t *strip,
                 mask  = 0x80000000;
             }
 
-            if (!(chunk_id & 0x0100) || (flag & mask)) {
-                if (!(chunk_id & 0x0200) && !(mask >>= 1)) {
+            if (!(chunk_id & 0x01) || (flag & mask)) {
+                if (!(chunk_id & 0x02) && !(mask >>= 1)) {
                     if ((data + 4) > eod)
                         return -1;
 
@@ -163,7 +164,7 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip_t *strip,
                     mask  = 0x80000000;
                 }
 
-                if ((chunk_id & 0x0200) || (~flag & mask)) {
+                if ((chunk_id & 0x02) || (~flag & mask)) {
                     if (data >= eod)
                         return -1;
 
@@ -262,7 +263,7 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip_t *strip,
 }
 
 static int cinepak_decode_strip (CinepakContext *s,
-                                 cvid_strip_t *strip, const uint8_t *data, int size)
+                                 cvid_strip *strip, const uint8_t *data, int size)
 {
     const uint8_t *eod = (data + size);
     int      chunk_id, chunk_size;
@@ -274,8 +275,8 @@ static int cinepak_decode_strip (CinepakContext *s,
         return -1;
 
     while ((data + 4) <= eod) {
-        chunk_id   = AV_RB16 (&data[0]);
-        chunk_size = AV_RB16 (&data[2]) - 4;
+        chunk_id   = data[0];
+        chunk_size = AV_RB24 (&data[1]) - 4;
         if(chunk_size < 0)
             return -1;
 
@@ -284,25 +285,25 @@ static int cinepak_decode_strip (CinepakContext *s,
 
         switch (chunk_id) {
 
-        case 0x2000:
-        case 0x2100:
-        case 0x2400:
-        case 0x2500:
+        case 0x20:
+        case 0x21:
+        case 0x24:
+        case 0x25:
             cinepak_decode_codebook (strip->v4_codebook, chunk_id,
                 chunk_size, data);
             break;
 
-        case 0x2200:
-        case 0x2300:
-        case 0x2600:
-        case 0x2700:
+        case 0x22:
+        case 0x23:
+        case 0x26:
+        case 0x27:
             cinepak_decode_codebook (strip->v1_codebook, chunk_id,
                 chunk_size, data);
             break;
 
-        case 0x3000:
-        case 0x3100:
-        case 0x3200:
+        case 0x30:
+        case 0x31:
+        case 0x32:
             return cinepak_decode_vectors (s, strip, chunk_id,
                 chunk_size, data);
         }
@@ -357,13 +358,13 @@ static int cinepak_decode (CinepakContext *s)
         if ((s->data + 12) > eod)
             return -1;
 
-        s->strips[i].id = AV_RB16 (s->data);
+        s->strips[i].id = s->data[0];
         s->strips[i].y1 = y0;
         s->strips[i].x1 = 0;
         s->strips[i].y2 = y0 + AV_RB16 (&s->data[8]);
         s->strips[i].x2 = s->avctx->width;
 
-        strip_size = AV_RB16 (&s->data[2]) - 12;
+        strip_size = AV_RB24 (&s->data[1]) - 12;
         s->data   += 12;
         strip_size = ((s->data + strip_size) > eod) ? (eod - s->data) : strip_size;
 
@@ -395,7 +396,7 @@ static av_cold int cinepak_decode_init(AVCodecContext *avctx)
     s->sega_film_skip_bytes = -1;  /* uninitialized state */
 
     // check for paletted data
-    if ((avctx->palctrl == NULL) || (avctx->bits_per_sample == 40)) {
+    if ((avctx->palctrl == NULL) || (avctx->bits_per_coded_sample == 40)) {
         s->palette_video = 0;
         avctx->pix_fmt = PIX_FMT_YUV420P;
     } else {

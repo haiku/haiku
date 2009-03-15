@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Benoit Fouet <benoit.fouet@purplelabs.com>
+ * Copyright (c) 2007 Benoit Fouet <benoit.fouet@free.fr>
  *
  * This file is part of FFmpeg.
  *
@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 typedef struct H264BSFContext {

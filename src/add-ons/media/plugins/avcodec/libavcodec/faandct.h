@@ -20,14 +20,14 @@
  */
 
 /**
- * @file faandct.h
+ * @file libavcodec/faandct.h
  * @brief
  *     Floating point AAN DCT
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#ifndef FFMPEG_FAANDCT_H
-#define FFMPEG_FAANDCT_H
+#ifndef AVCODEC_FAANDCT_H
+#define AVCODEC_FAANDCT_H
 
 #include "dsputil.h"
 
@@ -36,4 +36,4 @@
 void ff_faandct(DCTELEM * data);
 void ff_faandct248(DCTELEM * data);
 
-#endif /* FFMPEG_FAANDCT_H */
+#endif /* AVCODEC_FAANDCT_H */

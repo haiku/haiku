@@ -4,6 +4,8 @@ SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libswscale ] ;
 
+UseLibraryHeaders zlib ;
+
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
@@ -19,6 +21,7 @@ StaticLibrary libavcodec.a :
 	aac_ac3_parser.c
 	aac_parser.c
 	aactab.c
+	aandcttab.c
 	aasc.c
 	ac3.c
 	ac3_parser.c
@@ -26,7 +29,6 @@ StaticLibrary libavcodec.a :
 	ac3dec_data.c
 	ac3tab.c
 	acelp_filters.c
-	acelp_math.c
 	acelp_pitch_delay.c
 	acelp_vectors.c
 	adpcm.c
@@ -39,7 +41,7 @@ StaticLibrary libavcodec.a :
 	audioconvert.c
 	avs.c
 	beosthread.c
-#	bethsoftvideo.c
+	bethsoftvideo.c
 	bfi.c
 	bitstream.c
 	bitstream_filter.c
@@ -50,6 +52,8 @@ StaticLibrary libavcodec.a :
 	cavs_parser.c
 	cavsdec.c
 	cavsdsp.c
+	celp_filters.c
+	celp_math.c
 	cinepak.c
 	cljr.c
 	cook.c
@@ -70,21 +74,25 @@ StaticLibrary libavcodec.a :
 	dvbsubdec.c
 	dvdsub_parser.c
 	dvdsubdec.c
-#	dxa.c
+	dxa.c
 	eac3dec.c
 	eacmv.c
-#	eatgv.c
+	eaidct.c
+	eatgq.c
+	eatgv.c
+	eatqi.c
 	elbg.c
 	error_resilience.c
 	escape124.c
 	eval.c
 	faandct.c
 	faanidct.c
+	faxcompr.c
 	fdctref.c
 	fft.c
 	ffv1.c
-	flac.c
-#	flashsv.c
+	flacdec.c
+	flashsv.c
 	flicvideo.c
 	fraps.c
 	g726.c
@@ -109,7 +117,6 @@ StaticLibrary libavcodec.a :
 	idcinvideo.c
 	imc.c
 	imgconvert.c
-	imgresample.c
 	imx_dump_header_bsf.c
 	indeo2.c
 	indeo3.c
@@ -126,7 +133,6 @@ StaticLibrary libavcodec.a :
 #	lclenc.c
 #	ljpegenc.c
 	loco.c
-	lowpass.c
 	lpc.c
 	lsp.c
 	lzw.c
@@ -143,7 +149,7 @@ StaticLibrary libavcodec.a :
 	mlp.c
 	mlp_parser.c
 	mlpdec.c
-#	mmvideo.c
+	mmvideo.c
 	motion_est.c
 	motionpixels.c
 	movsub_bsf.c
@@ -166,22 +172,26 @@ StaticLibrary libavcodec.a :
 	msmpeg4.c
 	msmpeg4data.c
 	msrle.c
+	msrledec.c
 	msvideo1.c
 	nellymoser.c
 	nellymoserdec.c
 	noise_bsf.c
 	nuv.c
 	opt.c
+	options.c
 	parser.c
 	pcm.c
 	pcx.c
 	png.c
-#	pngdec.c
+	pngdec.c
 	pnm.c
 	pnm_parser.c
 #	pnmenc.c
 	pthread.c
 	ptx.c
+	qcelp_lsp.c
+	qcelpdec.c
 	qdm2.c
 	qdrw.c
 	qpeg.c
@@ -189,9 +199,10 @@ StaticLibrary libavcodec.a :
 	ra144.c
 	ra288.c
 	rangecoder.c
-#	ratecontrol.c
+	ratecontrol.c
 	raw.c
 	rawdec.c
+	rdft.c
 	remove_extradata_bsf.c
 	resample.c
 	resample2.c
@@ -204,10 +215,11 @@ StaticLibrary libavcodec.a :
 	rpza.c
 	rtjpeg.c
 	rv10.c
-#	rv30.c
-#	rv30dsp.c
-#	rv34.c
+	rv30.c
+	rv30dsp.c
+	rv34.c
 	rv40.c
+	rv40dsp.c
 	s3tc.c
 	sgidec.c
 	shorten.c
@@ -217,20 +229,20 @@ StaticLibrary libavcodec.a :
 #	snow.c
 	sonic.c
 	sp5xdec.c
-#	sunrast.c
+	sunrast.c
 	svq1.c
 	svq1dec.c
 #	svq3.c	- Included by h264
-#	targa.c
-#	tiertexseqv.c
-#	tiff.c
+	targa.c
+	tiertexseqv.c
+	tiff.c
 #	tiffenc.c
 	truemotion1.c
 	truemotion2.c
 	truespeech.c
-#	tscc.c
-#	tta.c
-#	txd.c
+	tscc.c
+	tta.c
+	txd.c
 	ulti.c
 	utils.c
 	vb.c
@@ -240,7 +252,7 @@ StaticLibrary libavcodec.a :
 	vc1dsp.c
 	vcr1.c
 	vmdav.c
-#	vmnc.c
+	vmnc.c
 	vorbis.c
 	vorbis_data.c
 	vorbis_dec.c
@@ -251,16 +263,18 @@ StaticLibrary libavcodec.a :
 	vp56.c
 	vp56data.c
 	vp6.c
-#	vqavideo.c
+	vp6dsp.c
+	vqavideo.c
 	wavpack.c
 	wma.c
 	wmadec.c
 	wmv2.c
 	wmv2dec.c
 	wnv1.c
-#	ws-snd1.c
-#	xan.c
+	ws-snd1.c
+	xan.c
 	xiph.c
-#	xl.c
-#	xsubdec.c
+	xl.c
+	xsubdec.c
+	zmbv.c
 ;

@@ -21,7 +21,7 @@
  */
 
 /**
-* @file libdiracenc.c
+* @file libavcodec/libdiracenc.c
 * Dirac encoding support via libdirac library; more details about the
 * Dirac project can be found at http://dirac.sourceforge.net/.
 * The libdirac_encoder library implements Dirac specification version 2.2
@@ -127,7 +127,7 @@ static VideoFormat GetDiracVideoFormatPreset (AVCodecContext *avccontext)
                  ff_dirac_video_formats[idx] : VIDEO_FORMAT_CUSTOM;
 }
 
-static int libdirac_encode_init(AVCodecContext *avccontext)
+static av_cold int libdirac_encode_init(AVCodecContext *avccontext)
 {
 
     FfmpegDiracEncoderParams* p_dirac_params = avccontext->priv_data;
@@ -175,9 +175,11 @@ static int libdirac_encode_init(AVCodecContext *avccontext)
     }
 
     /* Intra-only sequence */
-    if (avccontext->gop_size == 0 )
+    if (avccontext->gop_size == 0 ) {
         p_dirac_params->enc_ctx.enc_params.num_L1 = 0;
-    else
+        if (avccontext->coder_type == FF_CODER_TYPE_VLC)
+            p_dirac_params->enc_ctx.enc_params.using_ac = 0;
+    } else
         avccontext->has_b_frames = 1;
 
     if (avccontext->flags & CODEC_FLAG_QSCALE) {
@@ -384,7 +386,7 @@ static int libdirac_encode_frame(AVCodecContext *avccontext,
     return enc_size;
 }
 
-static int libdirac_encode_close(AVCodecContext *avccontext)
+static av_cold int libdirac_encode_close(AVCodecContext *avccontext)
 {
     FfmpegDiracEncoderParams* p_dirac_params  = avccontext->priv_data;
 
@@ -415,6 +417,6 @@ AVCodec libdirac_encoder = {
     libdirac_encode_frame,
     libdirac_encode_close,
    .capabilities= CODEC_CAP_DELAY,
-   .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_YUV444P, -1},
+   .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_YUV444P, PIX_FMT_NONE},
    .long_name= NULL_IF_CONFIG_SMALL("libdirac Dirac 2.2"),
 } ;

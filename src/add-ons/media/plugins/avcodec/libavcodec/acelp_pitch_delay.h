@@ -20,10 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_ACELP_PITCH_DELAY_H
-#define FFMPEG_ACELP_PITCH_DELAY_H
+#ifndef AVCODEC_ACELP_PITCH_DELAY_H
+#define AVCODEC_ACELP_PITCH_DELAY_H
 
 #include <stdint.h>
+#include "dsputil.h"
 
 #define PITCH_DELAY_MIN             20
 #define PITCH_DELAY_MAX             143
@@ -140,6 +141,7 @@ void ff_acelp_update_past_gain(
 /**
  * \brief Decode the adaptive codebook gain and add
  *        correction (4.1.5 and 3.9.1 of G.729).
+ * \param dsp initialized dsputil context
  * \param gain_corr_factor gain correction factor (2.13)
  * \param fc_v fixed-codebook vector (2.13)
  * \param mr_energy mean innovation energy and fixed-point correction (7.13)
@@ -209,6 +211,7 @@ void ff_acelp_update_past_gain(
  * \remark The routine is used in G.729 and AMR (all modes).
  */
 int16_t ff_acelp_decode_gain_code(
+    DSPContext *dsp,
     int gain_corr_factor,
     const int16_t* fc_v,
     int mr_energy,
@@ -217,4 +220,4 @@ int16_t ff_acelp_decode_gain_code(
     int subframe_size,
     int max_pred_order);
 
-#endif /* FFMPEG_ACELP_PITCH_DELAY_H */
+#endif /* AVCODEC_ACELP_PITCH_DELAY_H */

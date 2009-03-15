@@ -64,13 +64,13 @@
  */
 
 /**
- * @file jfdctfst.c
+ * @file libavcodec/jfdctfst.c
  * Independent JPEG Group's fast AAN dct.
  */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "common.h"
+#include "libavutil/common.h"
 #include "dsputil.h"
 
 #define DCTSIZE 8

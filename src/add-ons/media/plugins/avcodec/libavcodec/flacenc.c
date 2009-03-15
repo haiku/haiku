@@ -21,6 +21,7 @@
 
 #include "libavutil/crc.h"
 #include "libavutil/lls.h"
+#include "libavutil/md5.h"
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
@@ -94,12 +95,18 @@ typedef struct FlacEncodeContext {
     int ch_code;
     int samplerate;
     int sr_code[2];
+    int min_framesize;
+    int min_encoded_framesize;
     int max_framesize;
+    int max_encoded_framesize;
     uint32_t frame_count;
+    uint64_t sample_count;
+    uint8_t md5sum[16];
     FlacFrame frame;
     CompressionOptions options;
     AVCodecContext *avctx;
     DSPContext dsp;
+    struct AVMD5 *md5ctx;
 } FlacEncodeContext;
 
 static const int flac_samplerates[16] = {
@@ -129,14 +136,16 @@ static void write_streaminfo(FlacEncodeContext *s, uint8_t *header)
     /* streaminfo metadata block */
     put_bits(&pb, 16, s->avctx->frame_size);
     put_bits(&pb, 16, s->avctx->frame_size);
-    put_bits(&pb, 24, 0);
+    put_bits(&pb, 24, s->min_framesize);
     put_bits(&pb, 24, s->max_framesize);
     put_bits(&pb, 20, s->samplerate);
     put_bits(&pb, 3, s->channels-1);
     put_bits(&pb, 5, 15);       /* bits per sample - 1 */
+    /* write 36-bit sample count in 2 put_bits() calls */
+    put_bits(&pb, 24, (s->sample_count & 0xFFFFFF000LL) >> 12);
+    put_bits(&pb, 12,  s->sample_count & 0x000000FFFLL);
     flush_put_bits(&pb);
-    /* total samples = 0 */
-    /* MD5 signature = 0 */
+    memcpy(&header[18], s->md5sum, 16);
 }
 
 /**
@@ -368,6 +377,13 @@ static av_cold int flac_encode_init(AVCodecContext *avctx)
     } else {
         s->max_framesize = 14 + (s->avctx->frame_size * s->channels * 2);
     }
+    s->min_encoded_framesize = 0xFFFFFF;
+
+    /* initialize MD5 context */
+    s->md5ctx = av_malloc(av_md5_size);
+    if(!s->md5ctx)
+        return AVERROR_NOMEM;
+    av_md5_init(s->md5ctx);
 
     streaminfo = av_malloc(FLAC_STREAMINFO_SIZE);
     write_streaminfo(s, streaminfo);
@@ -759,7 +775,7 @@ static void encode_residual_lpc(int32_t *res, const int32_t *smp, int n,
     for(i=0; i<order; i++) {
         res[i] = smp[i];
     }
-#ifdef CONFIG_SMALL
+#if CONFIG_SMALL
     for(i=order; i<n; i+=2) {
         int j;
         int s = smp[i];
@@ -1235,6 +1251,19 @@ static void output_frame_footer(FlacEncodeContext *s)
     flush_put_bits(&s->pb);
 }
 
+static void update_md5_sum(FlacEncodeContext *s, int16_t *samples)
+{
+#ifdef WORDS_BIGENDIAN
+    int i;
+    for(i = 0; i < s->frame.blocksize*s->channels; i++) {
+        int16_t smp = le2me_16(samples[i]);
+        av_md5_update(s->md5ctx, (uint8_t *)&smp, 2);
+    }
+#else
+    av_md5_update(s->md5ctx, (uint8_t *)samples, s->frame.blocksize*s->channels*2);
+#endif
+}
+
 static int flac_encode_frame(AVCodecContext *avctx, uint8_t *frame,
                              int buf_size, void *data)
 {
@@ -1248,6 +1277,15 @@ static int flac_encode_frame(AVCodecContext *avctx, uint8_t *frame,
 
     if(buf_size < s->max_framesize*2) {
         av_log(avctx, AV_LOG_ERROR, "output buffer too small\n");
+        return 0;
+    }
+
+    /* when the last block is reached, update the header in extradata */
+    if (!data) {
+        s->min_framesize = s->min_encoded_framesize;
+        s->max_framesize = s->max_encoded_framesize;
+        av_md5_final(s->md5ctx, s->md5sum);
+        write_streaminfo(s, avctx->extradata);
         return 0;
     }
 
@@ -1284,11 +1322,22 @@ write_frame:
     }
 
     s->frame_count++;
+    s->sample_count += avctx->frame_size;
+    update_md5_sum(s, samples);
+    if (out_bytes > s->max_encoded_framesize)
+        s->max_encoded_framesize = out_bytes;
+    if (out_bytes < s->min_encoded_framesize)
+        s->min_encoded_framesize = out_bytes;
+
     return out_bytes;
 }
 
 static av_cold int flac_encode_close(AVCodecContext *avctx)
 {
+    if (avctx->priv_data) {
+        FlacEncodeContext *s = avctx->priv_data;
+        av_freep(&s->md5ctx);
+    }
     av_freep(&avctx->extradata);
     avctx->extradata_size = 0;
     av_freep(&avctx->coded_frame);
@@ -1304,7 +1353,7 @@ AVCodec flac_encoder = {
     flac_encode_frame,
     flac_encode_close,
     NULL,
-    .capabilities = CODEC_CAP_SMALL_LAST_FRAME,
+    .capabilities = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
     .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
 };

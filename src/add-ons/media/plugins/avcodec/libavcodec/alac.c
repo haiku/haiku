@@ -20,7 +20,7 @@
  */
 
 /**
- * @file alac.c
+ * @file libavcodec/alac.c
  * ALAC (Apple Lossless Audio Codec) decoder
  * @author 2005 David Hammerton
  *
@@ -597,7 +597,7 @@ static av_cold int alac_decode_init(AVCodecContext * avctx)
     alac->context_initialized = 0;
 
     alac->numchannels = alac->avctx->channels;
-    alac->bytespersample = (avctx->bits_per_sample / 8) * alac->numchannels;
+    alac->bytespersample = 2 * alac->numchannels;
     avctx->sample_fmt = SAMPLE_FMT_S16;
 
     return 0;

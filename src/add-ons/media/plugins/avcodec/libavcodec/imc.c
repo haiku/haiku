@@ -22,7 +22,7 @@
  */
 
 /**
- *  @file imc.c IMC - Intel Music Coder
+ *  @file libavcodec/imc.c IMC - Intel Music Coder
  *  A mdct based codec using a 256 points large transform
  *  divied into 32 bands with some mix of scale factors.
  *  Only mono is supported.
@@ -143,7 +143,7 @@ static av_cold int imc_decode_init(AVCodecContext * avctx)
     /* initialize the VLC tables */
     for(i = 0; i < 4 ; i++) {
         for(j = 0; j < 4; j++) {
-            huffman_vlc[i][j].table = vlc_tables[vlc_offsets[i * 4 + j]];
+            huffman_vlc[i][j].table = &vlc_tables[vlc_offsets[i * 4 + j]];
             huffman_vlc[i][j].table_allocated = vlc_offsets[i * 4 + j + 1] - vlc_offsets[i * 4 + j];
             init_vlc(&huffman_vlc[i][j], 9, imc_huffman_sizes[i],
                      imc_huffman_lens[i][j], 1, 1,
@@ -155,6 +155,7 @@ static av_cold int imc_decode_init(AVCodecContext * avctx)
     ff_fft_init(&q->fft, 7, 1);
     dsputil_init(&q->dsp, avctx);
     avctx->sample_fmt = SAMPLE_FMT_S16;
+    avctx->channel_layout = (avctx->channels==2) ? CH_LAYOUT_STEREO : CH_LAYOUT_MONO;
     return 0;
 }
 

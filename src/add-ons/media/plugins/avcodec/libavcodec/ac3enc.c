@@ -1,6 +1,6 @@
 /*
  * The simplest AC-3 encoder
- * Copyright (c) 2000 Fabrice Bellard.
+ * Copyright (c) 2000 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +20,7 @@
  */
 
 /**
- * @file ac3enc.c
+ * @file libavcodec/ac3enc.c
  * The simplest AC-3 encoder.
  */
 //#define DEBUG
@@ -88,7 +88,7 @@ typedef struct IComplex {
     short re,im;
 } IComplex;
 
-static void fft_init(int ln)
+static av_cold void fft_init(int ln)
 {
     int i, n;
     float alpha;
@@ -1365,5 +1365,5 @@ AVCodec ac3_encoder = {
     AC3_encode_close,
     NULL,
     .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
-    .long_name = NULL_IF_CONFIG_SMALL("ATSC A/52 (AC-3, E-AC-3)"),
+    .long_name = NULL_IF_CONFIG_SMALL("ATSC A/52A (AC-3)"),
 };

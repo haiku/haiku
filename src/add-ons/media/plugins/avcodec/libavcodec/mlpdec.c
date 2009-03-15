@@ -20,7 +20,7 @@
  */
 
 /**
- * @file mlpdec.c
+ * @file libavcodec/mlpdec.c
  * MLP decoder
  */
 
@@ -40,7 +40,7 @@
 
 static const char* sample_message =
     "Please file a bug report following the instructions at "
-    "http://ffmpeg.mplayerhq.hu/bugreports.html and include "
+    "http://ffmpeg.org/bugreports.html and include "
     "a sample of this file.";
 
 typedef struct SubStream {
@@ -141,7 +141,7 @@ static VLC huff_vlc[3];
 
 /** Initialize static data, constant between all invocations of the codec. */
 
-static av_cold void init_static()
+static av_cold void init_static(void)
 {
     INIT_VLC_STATIC(&huff_vlc[0], VLC_BITS, 18,
                 &ff_mlp_huffman_tables[0][0][1], 2, 1,
@@ -222,7 +222,7 @@ static av_cold int mlp_decode_init(AVCodecContext *avctx)
     m->avctx = avctx;
     for (substr = 0; substr < MAX_SUBSTREAMS; substr++)
         m->substream[substr].lossless_check_data = 0xffffffff;
-    avctx->sample_fmt = SAMPLE_FMT_S16;
+
     return 0;
 }
 
@@ -296,12 +296,11 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
     m->avctx->sample_rate    = mh.group1_samplerate;
     m->avctx->frame_size     = mh.access_unit_size;
 
-#ifdef CONFIG_AUDIO_NONSHORT
-    m->avctx->bits_per_sample = mh.group1_bits;
-    if (mh.group1_bits > 16) {
+    m->avctx->bits_per_raw_sample = mh.group1_bits;
+    if (mh.group1_bits > 16)
         m->avctx->sample_fmt = SAMPLE_FMT_S32;
-    }
-#endif
+    else
+        m->avctx->sample_fmt = SAMPLE_FMT_S16;
 
     m->params_valid = 1;
     for (substr = 0; substr < MAX_SUBSTREAMS; substr++)
@@ -1048,6 +1047,6 @@ AVCodec mlp_decoder = {
     NULL,
     NULL,
     read_access_unit,
-    .long_name = NULL_IF_CONFIG_SMALL("Meridian Lossless Packing"),
+    .long_name = NULL_IF_CONFIG_SMALL("MLP (Meridian Lossless Packing)/TrueHD"),
 };
 

@@ -19,20 +19,20 @@
  */
 
 /**
- * @file bitstream.h
+ * @file libavcodec/bitstream.h
  * bitstream api header.
  */
 
-#ifndef FFMPEG_BITSTREAM_H
-#define FFMPEG_BITSTREAM_H
+#ifndef AVCODEC_BITSTREAM_H
+#define AVCODEC_BITSTREAM_H
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "bswap.h"
-#include "common.h"
-#include "intreadwrite.h"
-#include "log.h"
+#include "libavutil/bswap.h"
+#include "libavutil/common.h"
+#include "libavutil/intreadwrite.h"
+#include "libavutil/log.h"
 
 #if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
 #   define ALT_BITSTREAM_READER
@@ -41,7 +41,7 @@
 //#define ALT_BITSTREAM_WRITER
 //#define ALIGNED_BITSTREAM_WRITER
 #if !defined(LIBMPEG2_BITSTREAM_READER) && !defined(A32_BITSTREAM_READER) && !defined(ALT_BITSTREAM_READER)
-#   ifdef ARCH_ARMV4L
+#   if ARCH_ARM
 #       define A32_BITSTREAM_READER
 #   else
 #       define ALT_BITSTREAM_READER
@@ -52,17 +52,17 @@
 
 extern const uint8_t ff_reverse[256];
 
-#if defined(ARCH_X86)
+#if ARCH_X86
 // avoid +32 for shift optimization (gcc should do that ...)
 static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
-    asm ("sarl %1, %0\n\t"
+    __asm__ ("sarl %1, %0\n\t"
          : "+r" (a)
          : "ic" ((uint8_t)(-s))
     );
     return a;
 }
 static inline uint32_t NEG_USR32(uint32_t a, int8_t s){
-    asm ("shrl %1, %0\n\t"
+    __asm__ ("shrl %1, %0\n\t"
          : "+r" (a)
          : "ic" ((uint8_t)(-s))
     );
@@ -85,6 +85,7 @@ typedef struct PutBitContext {
     int bit_left;
     uint8_t *buf, *buf_ptr, *buf_end;
 #endif
+    int size_in_bits;
 } PutBitContext;
 
 static inline void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_size)
@@ -94,6 +95,7 @@ static inline void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_s
         buffer = NULL;
     }
 
+    s->size_in_bits= 8*buffer_size;
     s->buf = buffer;
     s->buf_end = s->buf + buffer_size;
 #ifdef ALT_BITSTREAM_WRITER
@@ -123,11 +125,18 @@ static inline void flush_put_bits(PutBitContext *s)
 #ifdef ALT_BITSTREAM_WRITER
     align_put_bits(s);
 #else
+#ifndef BITSTREAM_WRITER_LE
     s->bit_buf<<= s->bit_left;
+#endif
     while (s->bit_left < 32) {
         /* XXX: should test end of buffer */
+#ifdef BITSTREAM_WRITER_LE
+        *s->buf_ptr++=s->bit_buf;
+        s->bit_buf>>=8;
+#else
         *s->buf_ptr++=s->bit_buf >> 24;
         s->bit_buf<<=8;
+#endif
         s->bit_left+=8;
     }
     s->bit_left=32;
@@ -172,10 +181,6 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS) || defined(ARCH_BFIN)
-#define UNALIGNED_STORES_ARE_BAD
-#endif
-
 #ifndef ALT_BITSTREAM_WRITER
 static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 {
@@ -190,18 +195,30 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 
     //    printf("n=%d value=%x cnt=%d buf=%x\n", n, value, bit_cnt, bit_buf);
     /* XXX: optimize */
+#ifdef BITSTREAM_WRITER_LE
+    bit_buf |= value << (32 - bit_left);
+    if (n >= bit_left) {
+#if !HAVE_FAST_UNALIGNED
+        if (3 & (intptr_t) s->buf_ptr) {
+            AV_WL32(s->buf_ptr, bit_buf);
+        } else
+#endif
+        *(uint32_t *)s->buf_ptr = le2me_32(bit_buf);
+        s->buf_ptr+=4;
+        bit_buf = (bit_left==32)?0:value >> bit_left;
+        bit_left+=32;
+    }
+    bit_left-=n;
+#else
     if (n < bit_left) {
         bit_buf = (bit_buf<<n) | value;
         bit_left-=n;
     } else {
         bit_buf<<=bit_left;
         bit_buf |= value >> (n - bit_left);
-#ifdef UNALIGNED_STORES_ARE_BAD
+#if !HAVE_FAST_UNALIGNED
         if (3 & (intptr_t) s->buf_ptr) {
-            s->buf_ptr[0] = bit_buf >> 24;
-            s->buf_ptr[1] = bit_buf >> 16;
-            s->buf_ptr[2] = bit_buf >>  8;
-            s->buf_ptr[3] = bit_buf      ;
+            AV_WB32(s->buf_ptr, bit_buf);
         } else
 #endif
         *(uint32_t *)s->buf_ptr = be2me_32(bit_buf);
@@ -210,6 +227,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
         bit_left+=32 - n;
         bit_buf = value;
     }
+#endif
 
     s->bit_buf = bit_buf;
     s->bit_left = bit_left;
@@ -221,8 +239,8 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 {
 #    ifdef ALIGNED_BITSTREAM_WRITER
-#        if defined(ARCH_X86)
-    asm volatile(
+#        if ARCH_X86
+    __asm__ volatile(
         "movl %0, %%ecx                 \n\t"
         "xorl %%eax, %%eax              \n\t"
         "shrdl %%cl, %1, %%eax          \n\t"
@@ -252,8 +270,8 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     s->index= index;
 #        endif
 #    else //ALIGNED_BITSTREAM_WRITER
-#        if defined(ARCH_X86)
-    asm volatile(
+#        if ARCH_X86
+    __asm__ volatile(
         "movl $7, %%ecx                 \n\t"
         "andl %0, %%ecx                 \n\t"
         "addl %3, %%ecx                 \n\t"
@@ -338,7 +356,7 @@ static inline void set_put_bits_buffer_size(PutBitContext *s, int size){
 
 /* Bitstream reader API docs:
 name
-    abritary name which is used as prefix for the internal variables
+    arbitrary name which is used as prefix for the internal variables
 
 gb
     getbitcontext
@@ -528,9 +546,9 @@ static inline void skip_bits_long(GetBitContext *s, int n){
         name##_bit_count-= 32;\
     }\
 
-#if defined(ARCH_X86)
+#if ARCH_X86
 #   define SKIP_CACHE(name, gb, num)\
-        asm(\
+        __asm__(\
             "shldl %2, %1, %0          \n\t"\
             "shll %2, %1               \n\t"\
             : "+r" (name##_cache0), "+r" (name##_cache1)\
@@ -928,4 +946,4 @@ static inline int decode210(GetBitContext *gb){
         return 2 - get_bits1(gb);
 }
 
-#endif /* FFMPEG_BITSTREAM_H */
+#endif /* AVCODEC_BITSTREAM_H */

@@ -20,7 +20,7 @@
  */
 
 /**
-* @file libschroedingerdec.c
+* @file libavcodec/libschroedingerdec.c
 * Dirac decoder support via libschroedinger-1.0 libraries. More details about
 * the Schroedinger project can be found at http://www.diracvideo.org/.
 * The library implements Dirac Specification Version 2.2.
@@ -135,7 +135,7 @@ static enum PixelFormat GetFfmpegChromaFormat(SchroChromaFormat schro_pix_fmt)
     return PIX_FMT_NONE;
 }
 
-static int libschroedinger_decode_init(AVCodecContext *avccontext)
+static av_cold int libschroedinger_decode_init(AVCodecContext *avccontext)
 {
 
     FfmpegSchroDecoderParams *p_schro_params = avccontext->priv_data ;
@@ -235,6 +235,9 @@ static int libschroedinger_decode_frame(AVCodecContext *avccontext,
     do {
         if ((enc_buf = FfmpegFindNextSchroParseUnit(&parse_ctx))) {
             /* Push buffer into decoder. */
+            if (SCHRO_PARSE_CODE_IS_PICTURE(enc_buf->data[4]) &&
+                SCHRO_PARSE_CODE_NUM_REFS(enc_buf->data[4]) > 0)
+                avccontext->has_b_frames = 1;
             state = schro_decoder_push (decoder, enc_buf);
             if (state == SCHRO_DECODER_FIRST_ACCESS_UNIT)
                   libschroedinger_handle_first_access_unit(avccontext);
@@ -322,7 +325,7 @@ static int libschroedinger_decode_frame(AVCodecContext *avccontext,
 }
 
 
-static int libschroedinger_decode_close(AVCodecContext *avccontext)
+static av_cold int libschroedinger_decode_close(AVCodecContext *avccontext)
 {
     FfmpegSchroDecoderParams *p_schro_params = avccontext->priv_data;
     /* Free the decoder. */

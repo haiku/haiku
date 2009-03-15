@@ -19,13 +19,13 @@
  */
 
 /**
- * @file cbook_gen.c
+ * @file libavcodec/elbg.c
  * Codebook Generator using the ELBG algorithm
  */
 
 #include <string.h>
 
-#include "random.h"
+#include "libavutil/random.h"
 #include "elbg.h"
 #include "avcodec.h"
 

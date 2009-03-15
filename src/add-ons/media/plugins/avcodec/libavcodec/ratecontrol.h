@@ -1,6 +1,6 @@
 /*
  * Ratecontrol
- * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2000, 2001, 2002 Fabrice Bellard
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
  * This file is part of FFmpeg.
@@ -20,11 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_RATECONTROL_H
-#define FFMPEG_RATECONTROL_H
+#ifndef AVCODEC_RATECONTROL_H
+#define AVCODEC_RATECONTROL_H
 
 /**
- * @file ratecontrol.h
+ * @file libavcodec/ratecontrol.h
  * ratecontrol header.
  */
 
@@ -101,5 +101,5 @@ int ff_xvid_rate_control_init(struct MpegEncContext *s);
 void ff_xvid_rate_control_uninit(struct MpegEncContext *s);
 float ff_xvid_rate_estimate_qscale(struct MpegEncContext *s, int dry_run);
 
-#endif /* FFMPEG_RATECONTROL_H */
+#endif /* AVCODEC_RATECONTROL_H */
 

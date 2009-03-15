@@ -1,7 +1,7 @@
 /*
  * Audio and Video frame extraction
- * Copyright (c) 2003 Fabrice Bellard.
- * Copyright (c) 2003 Michael Niedermayer.
+ * Copyright (c) 2003 Fabrice Bellard
+ * Copyright (c) 2003 Michael Niedermayer
  *
  * This file is part of FFmpeg.
  *
@@ -22,7 +22,7 @@
 
 #include "parser.h"
 
-AVCodecParser *av_first_parser = NULL;
+static AVCodecParser *av_first_parser = NULL;
 
 AVCodecParser* av_parser_next(AVCodecParser *p){
     if(p) return p->next;
@@ -73,6 +73,11 @@ AVCodecParserContext *av_parser_init(int codec_id)
     }
     s->fetch_timestamp=1;
     s->pict_type = FF_I_TYPE;
+    s->key_frame = -1;
+    s->convergence_duration = AV_NOPTS_VALUE;
+    s->dts_sync_point       = INT_MIN;
+    s->dts_ref_dts_delta    = INT_MIN;
+    s->pts_dts_delta        = INT_MIN;
     return s;
 }
 
@@ -274,6 +279,7 @@ int ff_combine_frame(ParseContext *pc, int next, const uint8_t **buf, int *buf_s
     /* store overread bytes */
     for(;next < 0; next++){
         pc->state = (pc->state<<8) | pc->buffer[pc->last_index + next];
+        pc->state64 = (pc->state64<<8) | pc->buffer[pc->last_index + next];
         pc->overread++;
     }
 
@@ -291,7 +297,7 @@ void ff_parse_close(AVCodecParserContext *s)
 {
     ParseContext *pc = s->priv_data;
 
-    av_free(pc->buffer);
+    av_freep(&pc->buffer);
 }
 
 void ff_parse1_close(AVCodecParserContext *s)

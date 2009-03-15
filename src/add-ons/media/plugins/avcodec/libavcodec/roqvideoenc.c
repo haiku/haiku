@@ -23,7 +23,7 @@
  */
 
 /**
- * @file roqvideoenc.c
+ * @file libavcodec/roqvideoenc.c
  * id RoQ encoder by Vitor. Based on the Switchblade3 library and the
  * Switchblade3 FFmpeg glue by Eric Lasota.
  */
@@ -60,6 +60,7 @@
 #include "roqvideo.h"
 #include "bytestream.h"
 #include "elbg.h"
+#include "mathops.h"
 
 #define CHROMA_BIAS 1
 
@@ -190,20 +191,20 @@ typedef struct
     int subCels[4];
     motion_vect motion;
     int cbEntry;
-} subcel_evaluation_t;
+} SubcelEvaluation;
 
 typedef struct
 {
     int eval_dist[4];
     int best_coding;
 
-    subcel_evaluation_t subCels[4];
+    SubcelEvaluation subCels[4];
 
     motion_vect motion;
     int cbEntry;
 
     int sourceX, sourceY;
-} cel_evaluation_t;
+} CelEvaluation;
 
 typedef struct
 {
@@ -214,14 +215,14 @@ typedef struct
     uint8_t unpacked_cb2[MAX_CBS_2x2*2*2*3];
     uint8_t unpacked_cb4[MAX_CBS_4x4*4*4*3];
     uint8_t unpacked_cb4_enlarged[MAX_CBS_4x4*8*8*3];
-} roq_codebooks_t;
+} RoqCodebooks;
 
 /**
  * Temporary vars
  */
-typedef struct
+typedef struct RoqTempData
 {
-    cel_evaluation_t *cel_evals;
+    CelEvaluation *cel_evals;
 
     int f2i4[MAX_CBS_4x4];
     int i2f4[MAX_CBS_4x4];
@@ -233,20 +234,20 @@ typedef struct
     int numCB4;
     int numCB2;
 
-    roq_codebooks_t codebooks;
+    RoqCodebooks codebooks;
 
     int *closest_cb2;
     int used_option[4];
-} roq_tempdata_t;
+} RoqTempdata;
 
 /**
  * Initializes cel evaluators and sets their source coordinates
  */
-static void create_cel_evals(RoqContext *enc, roq_tempdata_t *tempData)
+static void create_cel_evals(RoqContext *enc, RoqTempdata *tempData)
 {
     int n=0, x, y, i;
 
-    tempData->cel_evals = av_malloc(enc->width*enc->height/64 * sizeof(cel_evaluation_t));
+    tempData->cel_evals = av_malloc(enc->width*enc->height/64 * sizeof(CelEvaluation));
 
     /* Map to the ROQ quadtree order */
     for (y=0; y<enc->height; y+=16)
@@ -395,8 +396,8 @@ static void motion_search(RoqContext *enc, int blocksize)
 /**
  * Gets distortion for all options available to a subcel
  */
-static void gather_data_for_subcel(subcel_evaluation_t *subcel, int x,
-                                   int y, RoqContext *enc, roq_tempdata_t *tempData)
+static void gather_data_for_subcel(SubcelEvaluation *subcel, int x,
+                                   int y, RoqContext *enc, RoqTempdata *tempData)
 {
     uint8_t mb4[4*4*3];
     uint8_t mb2[2*2*3];
@@ -459,8 +460,8 @@ static void gather_data_for_subcel(subcel_evaluation_t *subcel, int x,
 /**
  * Gets distortion for all options available to a cel
  */
-static void gather_data_for_cel(cel_evaluation_t *cel, RoqContext *enc,
-                                roq_tempdata_t *tempData)
+static void gather_data_for_cel(CelEvaluation *cel, RoqContext *enc,
+                                RoqTempdata *tempData)
 {
     uint8_t mb8[8*8*3];
     int index = cel->sourceY*enc->width/64 + cel->sourceX/8;
@@ -533,7 +534,7 @@ static void gather_data_for_cel(cel_evaluation_t *cel, RoqContext *enc,
         }
 }
 
-static void remap_codebooks(RoqContext *enc, roq_tempdata_t *tempData)
+static void remap_codebooks(RoqContext *enc, RoqTempdata *tempData)
 {
     int i, j, idx=0;
 
@@ -565,7 +566,7 @@ static void remap_codebooks(RoqContext *enc, roq_tempdata_t *tempData)
 /**
  * Write codebook chunk
  */
-static void write_codebooks(RoqContext *enc, roq_tempdata_t *tempData)
+static void write_codebooks(RoqContext *enc, RoqTempdata *tempData)
 {
     int i, j;
     uint8_t **outp= &enc->out_buf;
@@ -620,7 +621,7 @@ static void write_typecode(CodingSpool *s, uint8_t type)
     }
 }
 
-static void reconstruct_and_encode_image(RoqContext *enc, roq_tempdata_t *tempData, int w, int h, int numBlocks)
+static void reconstruct_and_encode_image(RoqContext *enc, RoqTempdata *tempData, int w, int h, int numBlocks)
 {
     int i, j, k;
     int x, y;
@@ -628,7 +629,7 @@ static void reconstruct_and_encode_image(RoqContext *enc, roq_tempdata_t *tempDa
     int dist=0;
 
     roq_qcell *qcell;
-    cel_evaluation_t *eval;
+    CelEvaluation *eval;
 
     CodingSpool spool;
 
@@ -789,7 +790,7 @@ static void create_clusters(AVFrame *frame, int w, int h, uint8_t *yuvClusters)
         }
 }
 
-static void generate_codebook(RoqContext *enc, roq_tempdata_t *tempdata,
+static void generate_codebook(RoqContext *enc, RoqTempdata *tempdata,
                               int *points, int inputCount, roq_cell *results,
                               int size, int cbsize)
 {
@@ -824,10 +825,10 @@ static void generate_codebook(RoqContext *enc, roq_tempdata_t *tempdata,
     av_free(codebook);
 }
 
-static void generate_new_codebooks(RoqContext *enc, roq_tempdata_t *tempData)
+static void generate_new_codebooks(RoqContext *enc, RoqTempdata *tempData)
 {
     int i,j;
-    roq_codebooks_t *codebooks = &tempData->codebooks;
+    RoqCodebooks *codebooks = &tempData->codebooks;
     int max = enc->width*enc->height/16;
     uint8_t mb2[3*4];
     roq_cell *results4 = av_malloc(sizeof(roq_cell)*MAX_CBS_4x4*4);
@@ -880,14 +881,14 @@ static void generate_new_codebooks(RoqContext *enc, roq_tempdata_t *tempData)
 
 static void roq_encode_video(RoqContext *enc)
 {
-    roq_tempdata_t tempData;
+    RoqTempdata *tempData = enc->tmpData;
     int i;
 
-    memset(&tempData, 0, sizeof(tempData));
+    memset(tempData, 0, sizeof(*tempData));
 
-    create_cel_evals(enc, &tempData);
+    create_cel_evals(enc, tempData);
 
-    generate_new_codebooks(enc, &tempData);
+    generate_new_codebooks(enc, tempData);
 
     if (enc->framesSinceKeyframe >= 1) {
         motion_search(enc, 8);
@@ -896,19 +897,19 @@ static void roq_encode_video(RoqContext *enc)
 
  retry_encode:
     for (i=0; i<enc->width*enc->height/64; i++)
-        gather_data_for_cel(tempData.cel_evals + i, enc, &tempData);
+        gather_data_for_cel(tempData->cel_evals + i, enc, tempData);
 
     /* Quake 3 can't handle chunks bigger than 65536 bytes */
-    if (tempData.mainChunkSize/8 > 65536) {
+    if (tempData->mainChunkSize/8 > 65536) {
         enc->lambda *= .8;
         goto retry_encode;
     }
 
-    remap_codebooks(enc, &tempData);
+    remap_codebooks(enc, tempData);
 
-    write_codebooks(enc, &tempData);
+    write_codebooks(enc, tempData);
 
-    reconstruct_and_encode_image(enc, &tempData, enc->width, enc->height,
+    reconstruct_and_encode_image(enc, tempData, enc->width, enc->height,
                                  enc->width*enc->height/64);
 
     enc->avctx->coded_frame = enc->current_frame;
@@ -918,8 +919,8 @@ static void roq_encode_video(RoqContext *enc)
     FFSWAP(motion_vect *, enc->last_motion4, enc->this_motion4);
     FFSWAP(motion_vect *, enc->last_motion8, enc->this_motion8);
 
-    av_free(tempData.cel_evals);
-    av_free(tempData.closest_cb2);
+    av_free(tempData->cel_evals);
+    av_free(tempData->closest_cb2);
 
     enc->framesSinceKeyframe++;
 }
@@ -928,7 +929,7 @@ static int roq_encode_init(AVCodecContext *avctx)
 {
     RoqContext *enc = avctx->priv_data;
 
-    av_init_random(1, &enc->randctx);
+    av_random_init(&enc->randctx, 1);
 
     enc->framesSinceKeyframe = 0;
     if ((avctx->width & 0xf) || (avctx->height & 0xf)) {
@@ -953,6 +954,8 @@ static int roq_encode_init(AVCodecContext *avctx)
 
     enc->last_frame    = &enc->frames[0];
     enc->current_frame = &enc->frames[1];
+
+    enc->tmpData      = av_malloc(sizeof(RoqTempdata));
 
     enc->this_motion4 =
         av_mallocz((enc->width*enc->height/16)*sizeof(motion_vect));
@@ -1049,6 +1052,7 @@ static int roq_encode_end(AVCodecContext *avctx)
     avctx->release_buffer(avctx, enc->last_frame);
     avctx->release_buffer(avctx, enc->current_frame);
 
+    av_free(enc->tmpData);
     av_free(enc->this_motion4);
     av_free(enc->last_motion4);
     av_free(enc->this_motion8);

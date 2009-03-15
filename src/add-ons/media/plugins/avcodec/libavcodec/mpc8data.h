@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_MPC8DATA_H
-#define FFMPEG_MPC8DATA_H
+#ifndef AVCODEC_MPC8DATA_H
+#define AVCODEC_MPC8DATA_H
 
 #include <stdint.h>
 
@@ -77,7 +77,7 @@ static const uint32_t mpc8_cnk[16][32] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17, 153, 969, 4845, 20349, 74613, 245157, 735471, 2042975, 5311735, 13037895, 30421755, 67863915, 145422675, 300540195}
 };
 
-const static uint8_t mpc8_cnk_len[16][33] =
+static const uint8_t mpc8_cnk_len[16][33] =
 {
     {0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6},
     {0, 0, 2, 3, 4, 4, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0},
@@ -98,7 +98,7 @@ const static uint8_t mpc8_cnk_len[16][33] =
 
 };
 
-const static uint32_t mpc8_cnk_lost[16][33] =
+static const uint32_t mpc8_cnk_lost[16][33] =
 {
     {0, 0, 1, 0, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 31},
     {0, 0, 1, 2, 6, 1, 11, 4, 28, 19, 9, 62, 50, 37, 23, 8, 120, 103, 85, 66, 46, 25, 3, 236, 212, 187, 161, 134, 106, 77, 47, 16, 0},
@@ -118,4 +118,4 @@ const static uint32_t mpc8_cnk_lost[16][33] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 103, 55, 3347, 12419, 56459, 16987, 313105, 54177, 3076873, 3739321, 3132677, 66353813, 123012781, 236330717, 0}
 };
 
-#endif /* FFMPEG_MPC8DATA_H */
+#endif /* AVCODEC_MPC8DATA_H */

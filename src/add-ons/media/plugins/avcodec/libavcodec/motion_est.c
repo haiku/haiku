@@ -1,6 +1,6 @@
 /*
  * Motion estimation
- * Copyright (c) 2000,2001 Fabrice Bellard.
+ * Copyright (c) 2000,2001 Fabrice Bellard
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
  * new motion estimation (X1/EPZS) by Michael Niedermayer <michaelni@gmx.at>
@@ -23,7 +23,7 @@
  */
 
 /**
- * @file motion_est.c
+ * @file libavcodec/motion_est.c
  * Motion estimation.
  */
 
@@ -32,6 +32,7 @@
 #include <limits.h>
 #include "avcodec.h"
 #include "dsputil.h"
+#include "mathops.h"
 #include "mpegvideo.h"
 
 #undef NDEBUG
@@ -240,6 +241,11 @@ int ff_init_me(MpegEncContext *s){
         av_log(s->avctx, AV_LOG_ERROR, "ME_MAP size is too small for SAB diamond\n");
         return -1;
     }
+    //special case of snow is needed because snow uses its own iterative ME code
+    if(s->me_method!=ME_ZERO && s->me_method!=ME_EPZS && s->me_method!=ME_X1 && s->avctx->codec_id != CODEC_ID_SNOW){
+        av_log(s->avctx, AV_LOG_ERROR, "me_method is only allowed to be set to zero and epzs; for hex,umh,full and others see dia_size\n");
+        return -1;
+    }
 
     c->avctx= s->avctx;
 
@@ -301,8 +307,6 @@ int ff_init_me(MpegEncContext *s){
     if(s->codec_id == CODEC_ID_H261){
         c->sub_motion_search= no_sub_motion_search;
     }
-
-    c->temp= c->scratchpad;
 
     return 0;
 }

@@ -18,15 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_LIBXVID_INTERNAL_H
-#define FFMPEG_LIBXVID_INTERNAL_H
+#ifndef AVCODEC_LIBXVID_INTERNAL_H
+#define AVCODEC_LIBXVID_INTERNAL_H
 
 /**
- * @file libxvid_internal.h
+ * @file libavcodec/libxvid_internal.h
  * common functions for use with the Xvid wrappers
  */
 
 
 int av_tempfile(char *prefix, char **filename);
 
-#endif /* FFMPEG_LIBXVID_INTERNAL_H */
+#endif /* AVCODEC_LIBXVID_INTERNAL_H */

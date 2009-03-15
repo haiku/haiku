@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_ROQVIDEO_H
-#define FFMPEG_ROQVIDEO_H
+#ifndef AVCODEC_ROQVIDEO_H
+#define AVCODEC_ROQVIDEO_H
 
 #include "libavutil/random.h"
 #include "avcodec.h"
@@ -38,6 +38,8 @@ typedef struct {
 typedef struct {
     int d[2];
 } motion_vect;
+
+struct RoqTempData;
 
 typedef struct RoqContext {
 
@@ -69,6 +71,7 @@ typedef struct RoqContext {
 
     AVFrame *frame_to_enc;
     uint8_t *out_buf;
+    struct RoqTempData *tmpData;
 } RoqContext;
 
 #define RoQ_INFO              0x1001
@@ -89,4 +92,4 @@ void ff_apply_motion_4x4(RoqContext *ri, int x, int y, int deltax, int deltay);
 
 void ff_apply_motion_8x8(RoqContext *ri, int x, int y, int deltax, int deltay);
 
-#endif /* FFMPEG_ROQVIDEO_H */
+#endif /* AVCODEC_ROQVIDEO_H */

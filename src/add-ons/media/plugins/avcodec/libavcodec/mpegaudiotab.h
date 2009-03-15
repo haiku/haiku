@@ -2,7 +2,7 @@
  * mpeg audio layer 2 tables. Most of them come from the mpeg audio
  * specification.
  *
- * Copyright (c) 2000, 2001 Fabrice Bellard.
+ * Copyright (c) 2000, 2001 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -22,13 +22,13 @@
  */
 
 /**
- * @file mpegaudiotab.h
+ * @file libavcodec/mpegaudiotab.h
  * mpeg audio layer 2 tables.
  * Most of them come from the mpeg audio specification.
  */
 
-#ifndef FFMPEG_MPEGAUDIOTAB_H
-#define FFMPEG_MPEGAUDIOTAB_H
+#ifndef AVCODEC_MPEGAUDIOTAB_H
+#define AVCODEC_MPEGAUDIOTAB_H
 
 #include <stdint.h>
 #include "mpegaudio.h"
@@ -115,4 +115,4 @@ static const float fixed_smr[SBLIMIT] =  {
 
 static const unsigned char nb_scale_factors[4] = { 3, 2, 1, 2 };
 
-#endif /* FFMPEG_MPEGAUDIOTAB_H */
+#endif /* AVCODEC_MPEGAUDIOTAB_H */

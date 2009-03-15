@@ -20,12 +20,12 @@
  */
 
 /**
- * @file mpegaudiodectab.h
+ * @file libavcodec/mpegaudiodectab.h
  * mpeg audio layer decoder tables.
  */
 
-#ifndef FFMPEG_MPEGAUDIODECTAB_H
-#define FFMPEG_MPEGAUDIODECTAB_H
+#ifndef AVCODEC_MPEGAUDIODECTAB_H
+#define AVCODEC_MPEGAUDIODECTAB_H
 
 #include <stdint.h>
 #include "mpegaudio.h"
@@ -603,4 +603,4 @@ static const float ci_table[8] = {
     -0.6, -0.535, -0.33, -0.185, -0.095, -0.041, -0.0142, -0.0037,
 };
 
-#endif /* FFMPEG_MPEGAUDIODECTAB_H */
+#endif /* AVCODEC_MPEGAUDIODECTAB_H */

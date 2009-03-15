@@ -1,5 +1,5 @@
 /**
- * @file huffman.h
+ * @file libavcodec/huffman.h
  * huffman tree builder and VLC generator
  * Copyright (C) 2007  Aurelien Jacobs <aurel@gnuage.org>
  *
@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_HUFFMAN_H
-#define FFMPEG_HUFFMAN_H
+#ifndef AVCODEC_HUFFMAN_H
+#define AVCODEC_HUFFMAN_H
 
 #include "avcodec.h"
 #include "bitstream.h"
@@ -35,8 +35,8 @@ typedef struct {
 #define FF_HUFFMAN_FLAG_HNODE_FIRST 0x01
 #define FF_HUFFMAN_FLAG_ZERO_COUNT  0x02
 
-typedef int (*huff_cmp_t)(const void *va, const void *vb);
+typedef int (*HuffCmp)(const void *va, const void *vb);
 int ff_huff_build_tree(AVCodecContext *avctx, VLC *vlc, int nb_codes,
-                       Node *nodes, huff_cmp_t cmp, int flags);
+                       Node *nodes, HuffCmp cmp, int flags);
 
-#endif /* FFMPEG_HUFFMAN_H */
+#endif /* AVCODEC_HUFFMAN_H */

@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_MLP_H
-#define FFMPEG_MLP_H
+#ifndef AVCODEC_MLP_H
+#define AVCODEC_MLP_H
 
 #include <stdint.h>
 
@@ -106,9 +106,7 @@ uint8_t ff_mlp_restart_checksum(const uint8_t *buf, unsigned int bit_size);
  */
 uint8_t ff_mlp_calculate_parity(const uint8_t *buf, unsigned int buf_size);
 
-int ff_mlp_init_crc2D(AVCodecParserContext *s);
-
-void ff_mlp_init_crc();
+void ff_mlp_init_crc(void);
 
 /** XOR four bytes into one. */
 static inline uint8_t xor_32_to_8(uint32_t value)
@@ -118,4 +116,4 @@ static inline uint8_t xor_32_to_8(uint32_t value)
     return value;
 }
 
-#endif /* FFMPEG_MLP_H */
+#endif /* AVCODEC_MLP_H */

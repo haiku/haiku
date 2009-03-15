@@ -1,6 +1,6 @@
 /*
  * G.726 ADPCM audio codec
- * Copyright (c) 2004 Roman Shaposhnik.
+ * Copyright (c) 2004 Roman Shaposhnik
  *
  * This is a very straightforward rendition of the G.726
  * Section 4 "Computational Details".
@@ -285,7 +285,7 @@ static av_cold int g726_reset(G726Context* c, int index)
     return 0;
 }
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_ADPCM_G726_ENCODER
 static int16_t g726_encode(G726Context* c, int16_t sig)
 {
     uint8_t i;
@@ -301,7 +301,14 @@ static int16_t g726_encode(G726Context* c, int16_t sig)
 static av_cold int g726_init(AVCodecContext * avctx)
 {
     G726Context* c = avctx->priv_data;
-    unsigned int index= (avctx->bit_rate + avctx->sample_rate/2) / avctx->sample_rate - 2;
+    unsigned int index;
+
+    if (avctx->sample_rate <= 0) {
+        av_log(avctx, AV_LOG_ERROR, "Samplerate is invalid\n");
+        return -1;
+    }
+
+    index = (avctx->bit_rate + avctx->sample_rate/2) / avctx->sample_rate - 2;
 
     if (avctx->bit_rate % avctx->sample_rate && avctx->codec->encode) {
         av_log(avctx, AV_LOG_ERROR, "Bitrate - Samplerate combination is invalid\n");
@@ -335,7 +342,7 @@ static av_cold int g726_close(AVCodecContext *avctx)
     return 0;
 }
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_ADPCM_G726_ENCODER
 static int g726_encode_frame(AVCodecContext *avctx,
                             uint8_t *dst, int buf_size, void *data)
 {
@@ -374,7 +381,7 @@ static int g726_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_ADPCM_G726_ENCODER
 AVCodec adpcm_g726_encoder = {
     "g726",
     CODEC_TYPE_AUDIO,
@@ -387,7 +394,7 @@ AVCodec adpcm_g726_encoder = {
     .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("G.726 ADPCM"),
 };
-#endif //CONFIG_ENCODERS
+#endif
 
 AVCodec adpcm_g726_decoder = {
     "g726",

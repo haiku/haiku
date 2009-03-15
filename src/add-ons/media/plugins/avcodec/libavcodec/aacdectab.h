@@ -21,14 +21,14 @@
  */
 
 /**
- * @file aacdectab.h
+ * @file libavcodec/aacdectab.h
  * AAC decoder data
  * @author Oded Shimon  ( ods15 ods15 dyndns org )
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
  */
 
-#ifndef FFMPEG_AACDECTAB_H
-#define FFMPEG_AACDECTAB_H
+#ifndef AVCODEC_AACDECTAB_H
+#define AVCODEC_AACDECTAB_H
 
 #include "aac.h"
 
@@ -142,7 +142,8 @@ static const uint16_t *swb_offset_1024[] = {
     swb_offset_1024_96, swb_offset_1024_96, swb_offset_1024_64,
     swb_offset_1024_48, swb_offset_1024_48, swb_offset_1024_32,
     swb_offset_1024_24, swb_offset_1024_24, swb_offset_1024_16,
-    swb_offset_1024_16, swb_offset_1024_16, swb_offset_1024_8
+    swb_offset_1024_16, swb_offset_1024_16, swb_offset_1024_8,
+    swb_offset_1024_8
 };
 
 static const uint16_t *swb_offset_128[] = {
@@ -151,7 +152,8 @@ static const uint16_t *swb_offset_128[] = {
     swb_offset_128_96, swb_offset_128_96, swb_offset_128_96,
     swb_offset_128_48, swb_offset_128_48, swb_offset_128_48,
     swb_offset_128_24, swb_offset_128_24, swb_offset_128_16,
-    swb_offset_128_16, swb_offset_128_16, swb_offset_128_8
+    swb_offset_128_16, swb_offset_128_16, swb_offset_128_8,
+    swb_offset_128_8
 };
 
 // @}
@@ -163,11 +165,11 @@ static const uint16_t *swb_offset_128[] = {
  * @{
  */
 static const uint8_t tns_max_bands_1024[] = {
-    31, 31, 34, 40, 42, 51, 46, 46, 42, 42, 42, 39
+    31, 31, 34, 40, 42, 51, 46, 46, 42, 42, 42, 39, 39
 };
 
 static const uint8_t tns_max_bands_128[] = {
-    9, 9, 10, 14, 14, 14, 14, 14, 14, 14, 14, 14
+    9, 9, 10, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
 };
 // @}
 
@@ -178,27 +180,27 @@ static const uint8_t tns_max_bands_128[] = {
  * @{
  */
 static const float tns_tmp2_map_1_3[4] = {
-     0.00000000,  0.43388373, -0.64278758, -0.34202015,
+     0.00000000, -0.43388373,  0.64278758,  0.34202015,
 };
 
 static const float tns_tmp2_map_0_3[8] = {
-     0.00000000,  0.43388373,  0.78183150,  0.97492790,
-    -0.98480773, -0.86602539, -0.64278758, -0.34202015,
+     0.00000000, -0.43388373, -0.78183150, -0.97492790,
+     0.98480773,  0.86602539,  0.64278758,  0.34202015,
 };
 
 static const float tns_tmp2_map_1_4[8] = {
-     0.00000000,  0.20791170,  0.40673664,  0.58778524,
-    -0.67369562, -0.52643216, -0.36124167, -0.18374951,
+     0.00000000, -0.20791170, -0.40673664, -0.58778524,
+     0.67369562,  0.52643216,  0.36124167,  0.18374951,
 };
 
 static const float tns_tmp2_map_0_4[16] = {
-     0.00000000,  0.20791170,  0.40673664,  0.58778524,
-     0.74314481,  0.86602539,  0.95105654,  0.99452192,
-    -0.99573416, -0.96182561, -0.89516330, -0.79801720,
-    -0.67369562, -0.52643216, -0.36124167, -0.18374951,
+     0.00000000, -0.20791170, -0.40673664, -0.58778524,
+    -0.74314481, -0.86602539, -0.95105654, -0.99452192,
+     0.99573416,  0.96182561,  0.89516330,  0.79801720,
+     0.67369562,  0.52643216,  0.36124167,  0.18374951,
 };
 
-static const float *tns_tmp2_map[4] = {
+static const float * const tns_tmp2_map[4] = {
     tns_tmp2_map_0_3,
     tns_tmp2_map_0_4,
     tns_tmp2_map_1_3,
@@ -206,4 +208,4 @@ static const float *tns_tmp2_map[4] = {
 };
 // @}
 
-#endif /* FFMPEG_AACDECTAB_H */
+#endif /* AVCODEC_AACDECTAB_H */

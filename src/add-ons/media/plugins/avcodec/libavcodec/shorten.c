@@ -20,7 +20,7 @@
  */
 
 /**
- * @file shorten.c
+ * @file libavcodec/shorten.c
  * Shorten decoder
  * @author Jeff Muizelaar
  *
@@ -228,9 +228,9 @@ static int decode_wave_header(AVCodecContext *avctx, uint8_t *header, int header
     avctx->sample_rate = get_le32(&hb);
     avctx->bit_rate = get_le32(&hb) * 8;
     avctx->block_align = get_le16(&hb);
-    avctx->bits_per_sample = get_le16(&hb);
+    avctx->bits_per_coded_sample = get_le16(&hb);
 
-    if (avctx->bits_per_sample != 16) {
+    if (avctx->bits_per_coded_sample != 16) {
         av_log(avctx, AV_LOG_ERROR, "unsupported number of bits per sample\n");
         return -1;
     }
@@ -305,7 +305,7 @@ static int shorten_decode_frame(AVCodecContext *avctx,
     {
         int maxnlpc = 0;
         /* shorten signature */
-        if (get_bits_long(&s->gb, 32) != bswap_32(ff_get_fourcc("ajkg"))) {
+        if (get_bits_long(&s->gb, 32) != AV_RB32("ajkg")) {
             av_log(s->avctx, AV_LOG_ERROR, "missing shorten magic 'ajkg'\n");
             return -1;
         }

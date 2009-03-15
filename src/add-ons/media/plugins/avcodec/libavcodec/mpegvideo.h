@@ -1,6 +1,6 @@
 /*
  * Generic DCT based hybrid video encoder
- * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2000, 2001, 2002 Fabrice Bellard
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
  * This file is part of FFmpeg.
@@ -21,12 +21,12 @@
  */
 
 /**
- * @file mpegvideo.h
+ * @file libavcodec/mpegvideo.h
  * mpegvideo header.
  */
 
-#ifndef FFMPEG_MPEGVIDEO_H
-#define FFMPEG_MPEGVIDEO_H
+#ifndef AVCODEC_MPEGVIDEO_H
+#define AVCODEC_MPEGVIDEO_H
 
 #include "dsputil.h"
 #include "bitstream.h"
@@ -120,6 +120,7 @@ typedef struct Picture{
     int long_ref;               ///< 1->long term reference 0->short term reference
     int ref_poc[2][2][16];      ///< h264 POCs of the frames used as reference (FIXME need per slice)
     int ref_count[2][2];        ///< number of entries in ref_poc              (FIXME need per slice)
+    int mbaff;                  ///< h264 1 -> MBAFF frame 0-> not MBAFF
 
     int mb_var_sum;             ///< sum of MB variance for current frame
     int mc_mb_var_sum;          ///< motion compensated MB variance for current frame
@@ -200,6 +201,7 @@ typedef struct MpegEncContext {
     int bit_rate;     ///< wanted bit rate
     enum OutputFormat out_format; ///< output format
     int h263_pred;    ///< use mpeg4/h263 ac/dc predictions
+    int pb_frame;     ///< PB frame mode (0 = none, 1 = base, 2 = improved)
 
 /* the following codec id fields are deprecated in favor of codec_id */
     int h263_plus;    ///< h263 plus headers
@@ -479,13 +481,14 @@ typedef struct MpegEncContext {
     GetBitContext last_resync_gb;    ///< used to search for the next resync marker
     int mb_num_left;                 ///< number of MBs left in this video packet (for partitioned Slices only)
     int next_p_frame_damaged;        ///< set if the next p frame is damaged, to avoid showing trashed b frames
-    int error_resilience;
+    int error_recognition;
 
     ParseContext parse_context;
 
     /* H.263 specific */
     int gob_index;
     int obmc;                       ///< overlapped block motion compensation
+    int showed_packed_warning;      ///< flag for having shown the warning about divxs invalid b frames
 
     /* H.263+ specific */
     int umvplus;                    ///< == H263+ && unrestricted_mv
@@ -544,6 +547,9 @@ typedef struct MpegEncContext {
     int mpeg_quant;
     int t_frame;                       ///< time distance of first I -> B, used for interlaced b frames
     int padding_bug_score;             ///< used to detect the VERY common padding bug in MPEG4
+    int cplx_estimation_trash_i;
+    int cplx_estimation_trash_p;
+    int cplx_estimation_trash_b;
 
     /* divx specific, used to workaround (many) bugs in divx5 */
     int divx_version;
@@ -594,7 +600,7 @@ typedef struct MpegEncContext {
     int broken_link;         ///< no_output_of_prior_pics_flag
     uint8_t *vbv_delay_ptr;  ///< pointer to vbv_delay in the bitstream
 
-    /* MPEG2 specific - I wish I had not to support this mess. */
+    /* MPEG-2-specific - I wished not to have to support this mess. */
     int progressive_sequence;
     int mpeg_f_code[2][2];
     int picture_structure;
@@ -629,8 +635,8 @@ typedef struct MpegEncContext {
     int rtp_mode;
 
     uint8_t *ptr_lastgob;
-    int swap_uv;//vcr2 codec is mpeg2 varint with UV swaped
-    short * pblocks[12];
+    int swap_uv;             //vcr2 codec is an MPEG-2 variant with U and V swapped
+    DCTELEM (*pblocks[12])[64];
 
     DCTELEM (*block)[64]; ///< points to one of the following blocks
     DCTELEM (*blocks)[8][64]; // for HQ mode we need to keep the best block
@@ -679,7 +685,7 @@ void MPV_common_init_mmx(MpegEncContext *s);
 void MPV_common_init_axp(MpegEncContext *s);
 void MPV_common_init_mlib(MpegEncContext *s);
 void MPV_common_init_mmi(MpegEncContext *s);
-void MPV_common_init_armv4l(MpegEncContext *s);
+void MPV_common_init_arm(MpegEncContext *s);
 void MPV_common_init_altivec(MpegEncContext *s);
 void ff_clean_intra_table_entries(MpegEncContext *s);
 void ff_draw_horiz_band(MpegEncContext *s, int y, int h);
@@ -700,6 +706,10 @@ void ff_convert_matrix(DSPContext *dsp, int (*qmat)[64], uint16_t (*qmat16)[2][6
                        const uint16_t *quant_matrix, int bias, int qmin, int qmax, int intra);
 
 void ff_init_block_index(MpegEncContext *s);
+void ff_copy_picture(Picture *dst, Picture *src);
+
+extern const enum PixelFormat ff_pixfmt_list_420[];
+extern const enum PixelFormat ff_hwaccel_pixfmt_list_420[];
 
 static inline void ff_update_block_index(MpegEncContext *s){
     const int block_size= 8>>s->avctx->lowres;
@@ -829,6 +839,7 @@ void ff_clean_h263_qscales(MpegEncContext *s);
 int ff_mpeg4_decode_partitions(MpegEncContext *s);
 int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s);
 int ff_h263_resync(MpegEncContext *s);
+const uint8_t *ff_h263_find_resync_marker(const uint8_t *p, const uint8_t *end);
 int ff_h263_get_gob_height(MpegEncContext *s);
 void ff_mpeg4_init_direct_mv(MpegEncContext *s);
 int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my);
@@ -863,5 +874,5 @@ void ff_wmv2_encode_mb(MpegEncContext * s,
                        DCTELEM block[6][64],
                        int motion_x, int motion_y);
 
-#endif /* FFMPEG_MPEGVIDEO_H */
+#endif /* AVCODEC_MPEGVIDEO_H */
 

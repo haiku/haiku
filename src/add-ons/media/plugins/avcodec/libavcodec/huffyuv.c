@@ -24,7 +24,7 @@
  */
 
 /**
- * @file huffyuv.c
+ * @file libavcodec/huffyuv.c
  * huffyuv codec for libavcodec.
  */
 
@@ -147,23 +147,6 @@ static inline int add_left_prediction(uint8_t *dst, uint8_t *src, int w, int acc
     return acc;
 }
 
-static inline void add_median_prediction(uint8_t *dst, uint8_t *src1, uint8_t *diff, int w, int *left, int *left_top){
-    int i;
-    uint8_t l, lt;
-
-    l= *left;
-    lt= *left_top;
-
-    for(i=0; i<w; i++){
-        l= mid_pred(l, src1[i], (l + src1[i] - lt)&0xFF) + diff[i];
-        lt= src1[i];
-        dst[i]= l;
-    }
-
-    *left= l;
-    *left_top= lt;
-}
-
 static inline void add_left_prediction_bgr32(uint8_t *dst, uint8_t *src, int w, int *red, int *green, int *blue){
     int i;
     int r,g,b;
@@ -261,20 +244,20 @@ static int generate_bits_table(uint32_t *dst, uint8_t *len_table){
     return 0;
 }
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER
 typedef struct {
     uint64_t val;
     int name;
-} heap_elem_t;
+} HeapElem;
 
-static void heap_sift(heap_elem_t *h, int root, int size)
+static void heap_sift(HeapElem *h, int root, int size)
 {
     while(root*2+1 < size) {
         int child = root*2+1;
         if(child < size-1 && h[child].val > h[child+1].val)
             child++;
         if(h[root].val > h[child].val) {
-            FFSWAP(heap_elem_t, h[root], h[child]);
+            FFSWAP(HeapElem, h[root], h[child]);
             root = child;
         } else
             break;
@@ -282,7 +265,7 @@ static void heap_sift(heap_elem_t *h, int root, int size)
 }
 
 static void generate_len_table(uint8_t *dst, uint64_t *stats, int size){
-    heap_elem_t h[size];
+    HeapElem h[size];
     int up[2*size];
     int len[2*size];
     int offset, i, next;
@@ -317,7 +300,7 @@ static void generate_len_table(uint8_t *dst, uint64_t *stats, int size){
         if(i==size) break;
     }
 }
-#endif /* CONFIG_ENCODERS */
+#endif /* CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER */
 
 static void generate_joint_tables(HYuvContext *s){
     uint16_t symbols[1<<VLC_BITS];
@@ -448,7 +431,7 @@ static int read_old_huffman_tables(HYuvContext *s){
 #endif
 }
 
-static void alloc_temp(HYuvContext *s){
+static av_cold void alloc_temp(HYuvContext *s){
     int i;
 
     if(s->bitstream_bpp<24){
@@ -462,7 +445,7 @@ static void alloc_temp(HYuvContext *s){
     }
 }
 
-static int common_init(AVCodecContext *avctx){
+static av_cold int common_init(AVCodecContext *avctx){
     HYuvContext *s = avctx->priv_data;
 
     s->avctx= avctx;
@@ -477,7 +460,7 @@ static int common_init(AVCodecContext *avctx){
     return 0;
 }
 
-#ifdef CONFIG_DECODERS
+#if CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER
 static av_cold int decode_init(AVCodecContext *avctx)
 {
     HYuvContext *s = avctx->priv_data;
@@ -492,7 +475,7 @@ s->bgr32=1;
 //if(avctx->extradata)
 //  printf("extradata:%X, extradata_size:%d\n", *(uint32_t*)avctx->extradata, avctx->extradata_size);
     if(avctx->extradata_size){
-        if((avctx->bits_per_sample&7) && avctx->bits_per_sample != 12)
+        if((avctx->bits_per_coded_sample&7) && avctx->bits_per_coded_sample != 12)
             s->version=1; // do such files exist at all?
         else
             s->version=2;
@@ -507,7 +490,7 @@ s->bgr32=1;
         s->predictor= method&63;
         s->bitstream_bpp= ((uint8_t*)avctx->extradata)[1];
         if(s->bitstream_bpp==0)
-            s->bitstream_bpp= avctx->bits_per_sample&~7;
+            s->bitstream_bpp= avctx->bits_per_coded_sample&~7;
         interlace= (((uint8_t*)avctx->extradata)[2] & 0x30) >> 4;
         s->interlaced= (interlace==1) ? 1 : (interlace==2) ? 0 : s->interlaced;
         s->context= ((uint8_t*)avctx->extradata)[2] & 0x40 ? 1 : 0;
@@ -515,7 +498,7 @@ s->bgr32=1;
         if(read_huffman_tables(s, ((uint8_t*)avctx->extradata)+4, avctx->extradata_size) < 0)
             return -1;
     }else{
-        switch(avctx->bits_per_sample&7){
+        switch(avctx->bits_per_coded_sample&7){
         case 1:
             s->predictor= LEFT;
             s->decorrelate= 0;
@@ -526,7 +509,7 @@ s->bgr32=1;
             break;
         case 3:
             s->predictor= PLANE;
-            s->decorrelate= avctx->bits_per_sample >= 24;
+            s->decorrelate= avctx->bits_per_coded_sample >= 24;
             break;
         case 4:
             s->predictor= MEDIAN;
@@ -537,7 +520,7 @@ s->bgr32=1;
             s->decorrelate= 0;
             break;
         }
-        s->bitstream_bpp= avctx->bits_per_sample & ~7;
+        s->bitstream_bpp= avctx->bits_per_coded_sample & ~7;
         s->context= 0;
 
         if(read_old_huffman_tables(s) < 0)
@@ -569,13 +552,13 @@ s->bgr32=1;
 
     alloc_temp(s);
 
-//    av_log(NULL, AV_LOG_DEBUG, "pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
+//    av_log(NULL, AV_LOG_DEBUG, "pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_coded_sample, s->interlaced);
 
     return 0;
 }
-#endif
+#endif /* CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER */
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER
 static int store_table(HYuvContext *s, uint8_t *len, uint8_t *buf){
     int i;
     int index= 0;
@@ -626,7 +609,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "format not supported\n");
         return -1;
     }
-    avctx->bits_per_sample= s->bitstream_bpp;
+    avctx->bits_per_coded_sample= s->bitstream_bpp;
     s->decorrelate= s->bitstream_bpp >= 24;
     s->predictor= avctx->prediction_method;
     s->interlaced= avctx->flags&CODEC_FLAG_INTERLACED_ME ? 1 : 0;
@@ -717,7 +700,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
                 s->stats[i][j]= 0;
     }
 
-//    printf("pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
+//    printf("pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_coded_sample, s->interlaced);
 
     alloc_temp(s);
 
@@ -725,7 +708,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     return 0;
 }
-#endif /* CONFIG_ENCODERS */
+#endif /* CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER */
 
 /* TODO instead of restarting the read when the code isn't in the first level
  * of the joint table, jump into the 2nd level of the individual table. */
@@ -761,7 +744,7 @@ static void decode_gray_bitstream(HYuvContext *s, int count){
     }
 }
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER
 static int encode_422_bitstream(HYuvContext *s, int count){
     int i;
 
@@ -854,7 +837,7 @@ static int encode_gray_bitstream(HYuvContext *s, int count){
     }
     return 0;
 }
-#endif /* CONFIG_ENCODERS */
+#endif /* CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER */
 
 static av_always_inline void decode_bgr_1(HYuvContext *s, int count, int decorrelate, int alpha){
     int i;
@@ -931,7 +914,7 @@ static int encode_bgr_bitstream(HYuvContext *s, int count){
     return 0;
 }
 
-#ifdef CONFIG_DECODERS
+#if CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER
 static void draw_slice(HYuvContext *s, int y){
     int h, cy;
     int offset[4];
@@ -1105,12 +1088,12 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const
                 /* next line except the first 4 pixels is median predicted */
                 lefttopy= p->data[0][3];
                 decode_422_bitstream(s, width-4);
-                add_median_prediction(p->data[0] + fake_ystride+4, p->data[0]+4, s->temp[0], width-4, &lefty, &lefttopy);
+                s->dsp.add_hfyu_median_prediction(p->data[0] + fake_ystride+4, p->data[0]+4, s->temp[0], width-4, &lefty, &lefttopy);
                 if(!(s->flags&CODEC_FLAG_GRAY)){
                     lefttopu= p->data[1][1];
                     lefttopv= p->data[2][1];
-                    add_median_prediction(p->data[1] + fake_ustride+2, p->data[1]+2, s->temp[1], width2-2, &leftu, &lefttopu);
-                    add_median_prediction(p->data[2] + fake_vstride+2, p->data[2]+2, s->temp[2], width2-2, &leftv, &lefttopv);
+                    s->dsp.add_hfyu_median_prediction(p->data[1] + fake_ustride+2, p->data[1]+2, s->temp[1], width2-2, &leftu, &lefttopu);
+                    s->dsp.add_hfyu_median_prediction(p->data[2] + fake_vstride+2, p->data[2]+2, s->temp[2], width2-2, &leftv, &lefttopv);
                 }
                 y++; cy++;
 
@@ -1121,7 +1104,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const
                         while(2*cy > y){
                             decode_gray_bitstream(s, width);
                             ydst= p->data[0] + p->linesize[0]*y;
-                            add_median_prediction(ydst, ydst - fake_ystride, s->temp[0], width, &lefty, &lefttopy);
+                            s->dsp.add_hfyu_median_prediction(ydst, ydst - fake_ystride, s->temp[0], width, &lefty, &lefttopy);
                             y++;
                         }
                         if(y>=height) break;
@@ -1134,10 +1117,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const
                     udst= p->data[1] + p->linesize[1]*cy;
                     vdst= p->data[2] + p->linesize[2]*cy;
 
-                    add_median_prediction(ydst, ydst - fake_ystride, s->temp[0], width, &lefty, &lefttopy);
+                    s->dsp.add_hfyu_median_prediction(ydst, ydst - fake_ystride, s->temp[0], width, &lefty, &lefttopy);
                     if(!(s->flags&CODEC_FLAG_GRAY)){
-                        add_median_prediction(udst, udst - fake_ustride, s->temp[1], width2, &leftu, &lefttopu);
-                        add_median_prediction(vdst, vdst - fake_vstride, s->temp[2], width2, &leftv, &lefttopv);
+                        s->dsp.add_hfyu_median_prediction(udst, udst - fake_ustride, s->temp[1], width2, &leftu, &lefttopu);
+                        s->dsp.add_hfyu_median_prediction(vdst, vdst - fake_vstride, s->temp[2], width2, &leftv, &lefttopv);
                     }
                 }
 
@@ -1198,7 +1181,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const
 
     return (get_bits_count(&s->gb)+31)/32*4 + table_size;
 }
-#endif
+#endif /* CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER */
 
 static int common_end(HYuvContext *s){
     int i;
@@ -1209,7 +1192,7 @@ static int common_end(HYuvContext *s){
     return 0;
 }
 
-#ifdef CONFIG_DECODERS
+#if CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER
 static av_cold int decode_end(AVCodecContext *avctx)
 {
     HYuvContext *s = avctx->priv_data;
@@ -1224,9 +1207,9 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
     return 0;
 }
-#endif
+#endif /* CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER */
 
-#ifdef CONFIG_ENCODERS
+#if CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER
 static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size, void *data){
     HYuvContext *s = avctx->priv_data;
     AVFrame *pict = data;
@@ -1431,9 +1414,9 @@ static av_cold int encode_end(AVCodecContext *avctx)
 
     return 0;
 }
-#endif /* CONFIG_ENCODERS */
+#endif /* CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER */
 
-#ifdef CONFIG_DECODERS
+#if CONFIG_HUFFYUV_DECODER
 AVCodec huffyuv_decoder = {
     "huffyuv",
     CODEC_TYPE_VIDEO,
@@ -1447,7 +1430,9 @@ AVCodec huffyuv_decoder = {
     NULL,
     .long_name = NULL_IF_CONFIG_SMALL("Huffyuv / HuffYUV"),
 };
+#endif
 
+#if CONFIG_FFVHUFF_DECODER
 AVCodec ffvhuff_decoder = {
     "ffvhuff",
     CODEC_TYPE_VIDEO,
@@ -1463,8 +1448,7 @@ AVCodec ffvhuff_decoder = {
 };
 #endif
 
-#ifdef CONFIG_ENCODERS
-
+#if CONFIG_HUFFYUV_ENCODER
 AVCodec huffyuv_encoder = {
     "huffyuv",
     CODEC_TYPE_VIDEO,
@@ -1476,7 +1460,9 @@ AVCodec huffyuv_encoder = {
     .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Huffyuv / HuffYUV"),
 };
+#endif
 
+#if CONFIG_FFVHUFF_ENCODER
 AVCodec ffvhuff_encoder = {
     "ffvhuff",
     CODEC_TYPE_VIDEO,
@@ -1488,5 +1474,4 @@ AVCodec ffvhuff_encoder = {
     .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Huffyuv FFmpeg variant"),
 };
-
-#endif //CONFIG_ENCODERS
+#endif

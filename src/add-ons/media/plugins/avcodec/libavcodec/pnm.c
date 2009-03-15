@@ -1,6 +1,6 @@
 /*
  * PNM image format
- * Copyright (c) 2002, 2003 Fabrice Bellard.
+ * Copyright (c) 2002, 2003 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -106,7 +106,13 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s){
             else
                 avctx->pix_fmt = PIX_FMT_GRAY8;
         } else if (depth == 3) {
+            if (maxval < 256) {
             avctx->pix_fmt = PIX_FMT_RGB24;
+            } else {
+                av_log(avctx, AV_LOG_ERROR, "16-bit components are only supported for grayscale\n");
+                avctx->pix_fmt = PIX_FMT_NONE;
+                return -1;
+            }
         } else if (depth == 4) {
             avctx->pix_fmt = PIX_FMT_RGB32;
         } else {
@@ -127,10 +133,19 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s){
     if (avctx->pix_fmt != PIX_FMT_MONOWHITE) {
         pnm_get(s, buf1, sizeof(buf1));
         s->maxval = atoi(buf1);
-        if(s->maxval >= 256 && avctx->pix_fmt == PIX_FMT_GRAY8) {
-            avctx->pix_fmt = PIX_FMT_GRAY16BE;
-            if (s->maxval != 65535)
-                avctx->pix_fmt = PIX_FMT_GRAY16;
+        if (s->maxval >= 256) {
+            if (avctx->pix_fmt == PIX_FMT_GRAY8) {
+                avctx->pix_fmt = PIX_FMT_GRAY16BE;
+                if (s->maxval != 65535)
+                    avctx->pix_fmt = PIX_FMT_GRAY16;
+            } if (avctx->pix_fmt == PIX_FMT_RGB24) {
+                if (s->maxval > 255)
+                    avctx->pix_fmt = PIX_FMT_RGB48BE;
+            } else {
+                av_log(avctx, AV_LOG_ERROR, "Unsupported pixel format\n");
+                avctx->pix_fmt = PIX_FMT_NONE;
+                return -1;
+            }
         }
     }
     /* more check if YUV420 */

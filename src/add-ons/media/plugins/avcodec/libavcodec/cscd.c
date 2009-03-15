@@ -23,10 +23,10 @@
 
 #include "avcodec.h"
 
-#ifdef CONFIG_ZLIB
+#if CONFIG_ZLIB
 #include <zlib.h>
 #endif
-#include "lzo.h"
+#include "libavutil/lzo.h"
 
 typedef struct {
     AVFrame pic;
@@ -158,12 +158,12 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     switch ((buf[0] >> 1) & 7) {
         case 0: { // lzo compression
             int outlen = c->decomp_size, inlen = buf_size - 2;
-            if (lzo1x_decode(c->decomp_buf, &outlen, &buf[2], &inlen))
+            if (av_lzo1x_decode(c->decomp_buf, &outlen, &buf[2], &inlen))
                 av_log(avctx, AV_LOG_ERROR, "error during lzo decompression\n");
             break;
         }
         case 1: { // zlib compression
-#ifdef CONFIG_ZLIB
+#if CONFIG_ZLIB
             unsigned long dlen = c->decomp_size;
             if (uncompress(c->decomp_buf, &dlen, &buf[2], buf_size - 2) != Z_OK)
                 av_log(avctx, AV_LOG_ERROR, "error during zlib decompression\n");
@@ -217,22 +217,22 @@ static av_cold int decode_init(AVCodecContext *avctx) {
     if (avcodec_check_dimensions(avctx, avctx->height, avctx->width) < 0) {
         return 1;
     }
-    switch (avctx->bits_per_sample) {
+    switch (avctx->bits_per_coded_sample) {
         case 16: avctx->pix_fmt = PIX_FMT_RGB555; break;
         case 24: avctx->pix_fmt = PIX_FMT_BGR24; break;
         case 32: avctx->pix_fmt = PIX_FMT_RGB32; break;
         default:
             av_log(avctx, AV_LOG_ERROR,
                    "CamStudio codec error: invalid depth %i bpp\n",
-                   avctx->bits_per_sample);
+                   avctx->bits_per_coded_sample);
              return 1;
     }
-    c->bpp = avctx->bits_per_sample;
+    c->bpp = avctx->bits_per_coded_sample;
     c->pic.data[0] = NULL;
-    c->linelen = avctx->width * avctx->bits_per_sample / 8;
+    c->linelen = avctx->width * avctx->bits_per_coded_sample / 8;
     c->height = avctx->height;
     c->decomp_size = c->height * c->linelen;
-    c->decomp_buf = av_malloc(c->decomp_size + LZO_OUTPUT_PADDING);
+    c->decomp_buf = av_malloc(c->decomp_size + AV_LZO_OUTPUT_PADDING);
     if (!c->decomp_buf) {
         av_log(avctx, AV_LOG_ERROR, "Can't allocate decompression buffer.\n");
         return 1;

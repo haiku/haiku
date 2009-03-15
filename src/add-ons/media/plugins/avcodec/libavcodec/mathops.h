@@ -1,6 +1,6 @@
 /*
  * simple math operations
- * Copyright (c) 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2001, 2002 Fabrice Bellard
  * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at> et al
  *
  * This file is part of FFmpeg.
@@ -19,24 +19,24 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef FFMPEG_MATHOPS_H
-#define FFMPEG_MATHOPS_H
+#ifndef AVCODEC_MATHOPS_H
+#define AVCODEC_MATHOPS_H
 
-#include "common.h"
+#include "libavutil/common.h"
 
-#ifdef ARCH_X86_32
+#if   ARCH_X86
 
-#include "i386/mathops.h"
+#include "x86/mathops.h"
 
-#elif defined(ARCH_ARMV4L)
+#elif ARCH_ARM
 
-#include "armv4l/mathops.h"
+#include "arm/mathops.h"
 
-#elif defined(ARCH_POWERPC)
+#elif ARCH_PPC
 
 #include "ppc/mathops.h"
 
-#elif defined(ARCH_BFIN)
+#elif ARCH_BFIN
 
 #include "bfin/mathops.h"
 
@@ -45,7 +45,7 @@
 /* generic implementation */
 
 #ifndef MULL
-#   define MULL(a,b) (((int64_t)(a) * (int64_t)(b)) >> FRAC_BITS)
+#   define MULL(a,b,s) (((int64_t)(a) * (int64_t)(b)) >> (s))
 #endif
 
 #ifndef MULH
@@ -83,5 +83,35 @@ static av_always_inline int MULH(int a, int b){
 #   define MLS16(rt, ra, rb) ((rt) -= (ra) * (rb))
 #endif
 
-#endif /* FFMPEG_MATHOPS_H */
+/* median of 3 */
+#ifndef mid_pred
+#define mid_pred mid_pred
+static inline av_const int mid_pred(int a, int b, int c)
+{
+#if 0
+    int t= (a-b)&((a-b)>>31);
+    a-=t;
+    b+=t;
+    b-= (b-c)&((b-c)>>31);
+    b+= (a-b)&((a-b)>>31);
+
+    return b;
+#else
+    if(a>b){
+        if(c>b){
+            if(c>a) b=a;
+            else    b=c;
+        }
+    }else{
+        if(b>c){
+            if(c>a) b=c;
+            else    b=a;
+        }
+    }
+    return b;
+#endif
+}
+#endif
+
+#endif /* AVCODEC_MATHOPS_H */
 

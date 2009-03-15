@@ -1,7 +1,7 @@
 /*
  * AC-3 parser prototypes
- * Copyright (c) 2003 Fabrice Bellard.
- * Copyright (c) 2003 Michael Niedermayer.
+ * Copyright (c) 2003 Fabrice Bellard
+ * Copyright (c) 2003 Michael Niedermayer
  *
  * This file is part of FFmpeg.
  *
@@ -20,20 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_AC3_PARSER_H
-#define FFMPEG_AC3_PARSER_H
+#ifndef AVCODEC_AC3_PARSER_H
+#define AVCODEC_AC3_PARSER_H
 
 #include "ac3.h"
 #include "bitstream.h"
-
-typedef enum {
-    AC3_PARSE_ERROR_SYNC        = -1,
-    AC3_PARSE_ERROR_BSID        = -2,
-    AC3_PARSE_ERROR_SAMPLE_RATE = -3,
-    AC3_PARSE_ERROR_FRAME_SIZE  = -4,
-    AC3_PARSE_ERROR_FRAME_TYPE  = -5,
-    AC3_PARSE_ERROR_CRC         = -6,
-} AC3ParseError;
 
 /**
  * Parses AC-3 frame header.
@@ -58,4 +49,4 @@ int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr);
  */
 int ff_ac3_parse_header_full(GetBitContext *gbc, AC3HeaderInfo *hdr);
 
-#endif /* FFMPEG_AC3_PARSER_H */
+#endif /* AVCODEC_AC3_PARSER_H */

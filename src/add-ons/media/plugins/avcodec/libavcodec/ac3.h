@@ -1,6 +1,6 @@
 /*
  * Common code between the AC-3 encoder and decoder
- * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2000, 2001, 2002 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -20,12 +20,12 @@
  */
 
 /**
- * @file ac3.h
+ * @file libavcodec/ac3.h
  * Common code between the AC-3 encoder and decoder.
  */
 
-#ifndef FFMPEG_AC3_H
-#define FFMPEG_AC3_H
+#ifndef AVCODEC_AC3_H
+#define AVCODEC_AC3_H
 
 #include "ac3tab.h"
 
@@ -149,12 +149,13 @@ void ff_ac3_bit_alloc_calc_psd(int8_t *exp, int start, int end, int16_t *psd,
  * @param[in]  dba_lengths  length of each segment
  * @param[in]  dba_values   delta bit allocation for each segment
  * @param[out] mask         calculated masking curve
+ * @return returns 0 for success, non-zero for error
  */
-void ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *band_psd,
-                                int start, int end, int fast_gain, int is_lfe,
-                                int dba_mode, int dba_nsegs, uint8_t *dba_offsets,
-                                uint8_t *dba_lengths, uint8_t *dba_values,
-                                int16_t *mask);
+int ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *band_psd,
+                               int start, int end, int fast_gain, int is_lfe,
+                               int dba_mode, int dba_nsegs, uint8_t *dba_offsets,
+                               uint8_t *dba_lengths, uint8_t *dba_values,
+                               int16_t *mask);
 
 /**
  * Calculates bit allocation pointers.
@@ -182,4 +183,4 @@ void ac3_parametric_bit_allocation(AC3BitAllocParameters *s, uint8_t *bap,
                                    uint8_t *dba_offsets, uint8_t *dba_lengths,
                                    uint8_t *dba_values);
 
-#endif /* FFMPEG_AC3_H */
+#endif /* AVCODEC_AC3_H */

@@ -57,13 +57,13 @@
  */
 
 /**
- * @file jfdctint.c
+ * @file libavcodec/jfdctint.c
  * Independent JPEG Group's slow & accurate dct.
  */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "common.h"
+#include "libavutil/common.h"
 #include "dsputil.h"
 
 #define SHIFT_TEMPS

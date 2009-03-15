@@ -20,14 +20,15 @@
  */
 
 /**
- * @file ac3.h
+ * @file libavcodec/ac3.h
  * Common code between the AC-3 and E-AC-3 decoders.
  */
 
-#ifndef FFMPEG_AC3DEC_H
-#define FFMPEG_AC3DEC_H
+#ifndef AVCODEC_AC3DEC_H
+#define AVCODEC_AC3DEC_H
 
-#include "lfg.h"
+#include "libavutil/internal.h"
+#include "libavutil/lfg.h"
 #include "ac3.h"
 #include "bitstream.h"
 #include "dsputil.h"
@@ -82,7 +83,7 @@ typedef struct {
     int phase_flags[18];                    ///< phase flags                            (phsflg)
     int num_cpl_subbands;                   ///< number of coupling sub bands           (ncplsubnd)
     int num_cpl_bands;                      ///< number of coupling bands               (ncplbnd)
-    int cpl_band_struct[18];                ///< coupling band structure                (cplbndstrc)
+    uint8_t cpl_band_struct[18];            ///< coupling band structure                (cplbndstrc)
     int firstchincpl;                       ///< first channel in coupling
     int first_cpl_coords[AC3_MAX_CHANNELS]; ///< first coupling coordinates states      (firstcplcos)
     int cpl_coords[AC3_MAX_CHANNELS][18];   ///< coupling coordinates                   (cplco)
@@ -140,7 +141,6 @@ typedef struct {
 ///@}
 
 ///@defgroup dithering zero-mantissa dithering
-    int dither_all;                         ///< true if all channels are dithered
     int dither_flag[AC3_MAX_CHANNELS];      ///< dither flags                           (dithflg)
     AVLFG dith_state;                       ///< for dither generation
 ///@}
@@ -168,4 +168,16 @@ typedef struct {
 ///@}
 } AC3DecodeContext;
 
-#endif /* FFMPEG_AC3DEC_H */
+/**
+ * Parse the E-AC-3 frame header.
+ * This parses both the bit stream info and audio frame header.
+ */
+int ff_eac3_parse_header(AC3DecodeContext *s);
+
+/**
+ * Decode mantissas in a single channel for the entire frame.
+ * This is used when AHT mode is enabled.
+ */
+void ff_eac3_decode_transform_coeffs_aht_ch(AC3DecodeContext *s, int ch);
+
+#endif /* AVCODEC_AC3DEC_H */

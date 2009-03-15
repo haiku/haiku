@@ -19,7 +19,7 @@
  */
 
 /**
- * @file motion_test.c
+ * @file libavcodec/motion-test.c
  * motion test.
  */
 
@@ -30,8 +30,6 @@
 #include <unistd.h>
 
 #include "dsputil.h"
-
-#include "i386/mmx.h"
 
 #undef exit
 #undef printf

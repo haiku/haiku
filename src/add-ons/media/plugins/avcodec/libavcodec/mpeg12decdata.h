@@ -21,12 +21,12 @@
  */
 
 /**
- * @file mpeg12decdata.h
+ * @file libavcodec/mpeg12decdata.h
  * MPEG1/2 decoder tables.
  */
 
-#ifndef FFMPEG_MPEG12DECDATA_H
-#define FFMPEG_MPEG12DECDATA_H
+#ifndef AVCODEC_MPEG12DECDATA_H
+#define AVCODEC_MPEG12DECDATA_H
 
 #include <stdint.h>
 #include "mpegvideo.h"
@@ -121,4 +121,4 @@ static const uint8_t * const mpeg2_dc_scale_table[4]={
     mpeg2_dc_scale_table3,
 };
 
-#endif /* FFMPEG_MPEG12DECDATA_H */
+#endif /* AVCODEC_MPEG12DECDATA_H */

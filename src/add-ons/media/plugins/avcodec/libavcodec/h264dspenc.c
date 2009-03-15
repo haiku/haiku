@@ -21,15 +21,12 @@
  */
 
 /**
- * @file h264dspenc.c
+ * @file libavcodec/h264dspenc.c
  * H.264 encoder related DSP utils
  *
  */
 
 #include "dsputil.h"
-
-extern const uint8_t ff_div6[52];
-extern const uint8_t ff_rem6[52];
 
 #define  H264_DCT_PART1(X) \
          a = block[0][X]+block[3][X]; \

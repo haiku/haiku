@@ -75,69 +75,12 @@ void ff_acelp_interpolate(
             i++;
             v += in[n - i] * filter_coeffs[idx - frac_pos];
         }
-        out[n] = av_clip_int16(v >> 15);
+        if(av_clip_int16(v>>15) != (v>>15))
+            av_log(NULL, AV_LOG_WARNING, "overflow that would need cliping in ff_acelp_interpolate()\n");
+        out[n] = v >> 15;
     }
 }
 
-void ff_acelp_convolve_circ(
-        int16_t* fc_out,
-        const int16_t* fc_in,
-        const int16_t* filter,
-        int len)
-{
-    int i, k;
-
-    memset(fc_out, 0, len * sizeof(int16_t));
-
-    /* Since there are few pulses over an entire subframe (i.e. almost
-       all fc_in[i] are zero) it is faster to loop over fc_in first. */
-    for(i=0; i<len; i++)
-    {
-        if(fc_in[i])
-        {
-            for(k=0; k<i; k++)
-                fc_out[k] += (fc_in[i] * filter[len + k - i]) >> 15;
-
-            for(k=i; k<len; k++)
-                fc_out[k] += (fc_in[i] * filter[      k - i]) >> 15;
-        }
-    }
-}
-
-int ff_acelp_lp_synthesis_filter(
-        int16_t *out,
-        const int16_t* filter_coeffs,
-        const int16_t* in,
-        int buffer_length,
-        int filter_length,
-        int stop_on_overflow,
-        int rounder)
-{
-    int i,n;
-
-    // These two lines are to avoid a -1 subtraction in the main loop
-    filter_length++;
-    filter_coeffs--;
-
-    for(n=0; n<buffer_length; n++)
-    {
-        int sum = rounder;
-        for(i=1; i<filter_length; i++)
-            sum -= filter_coeffs[i] * out[n-i];
-
-        sum = (sum >> 12) + in[n];
-
-        if(sum + 0x8000 > 0xFFFFU)
-        {
-            if(stop_on_overflow)
-                return 1;
-            sum = (sum >> 31) ^ 32767;
-        }
-        out[n] = sum;
-    }
-
-    return 0;
-}
 
 void ff_acelp_high_pass_filter(
         int16_t* out,
@@ -150,11 +93,13 @@ void ff_acelp_high_pass_filter(
 
     for(i=0; i<length; i++)
     {
-        tmp =  (hpf_f[0]* 15836LL)>>13;                   /* (14.13) = (13.13) * (1.13) */
-        tmp += (hpf_f[1]* -7667LL)>>13;                   /* (13.13) = (13.13) * (0.13) */
-        tmp += 7699 * (in[i] - 2*in[i-1] + in[i-2]); /* (14.13) =  (0.13) * (14.0) */
+        tmp =  (hpf_f[0]* 15836LL)>>13;
+        tmp += (hpf_f[1]* -7667LL)>>13;
+        tmp += 7699 * (in[i] - 2*in[i-1] + in[i-2]);
 
-        out[i] = av_clip_int16((tmp + 0x800) >> 12);      /* (15.0) = 2 * (13.13) = (14.13) */
+        /* With "+0x800" rounding, clipping is needed
+           for ALGTHM and SPEECH tests. */
+        out[i] = av_clip_int16((tmp + 0x800) >> 12);
 
         hpf_f[1] = hpf_f[0];
         hpf_f[0] = tmp;

@@ -20,13 +20,14 @@
  */
 
 /**
- * @file zmbvenc.c
+ * @file libavcodec/zmbvenc.c
  * Zip Motion Blocks Video encoder
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 #include <zlib.h>
@@ -299,6 +300,8 @@ static av_cold int encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
         return -1;
     }
+
+    avctx->coded_frame = (AVFrame*)&c->pic;
 
     return 0;
 }

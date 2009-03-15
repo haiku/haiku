@@ -1,7 +1,7 @@
 /*
  * LZW decoder
- * Copyright (c) 2003 Fabrice Bellard.
- * Copyright (c) 2006 Konstantin Shishkov.
+ * Copyright (c) 2003 Fabrice Bellard
+ * Copyright (c) 2006 Konstantin Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -21,14 +21,14 @@
  */
 
 /**
- * @file lzw.h
+ * @file libavcodec/lzw.h
  * @brief LZW decoding routines
  * @author Fabrice Bellard
  * Modified for use in TIFF by Konstantin Shishkov
  */
 
-#ifndef FFMPEG_LZW_H
-#define FFMPEG_LZW_H
+#ifndef AVCODEC_LZW_H
+#define AVCODEC_LZW_H
 
 #include "bitstream.h"
 
@@ -56,4 +56,4 @@ void ff_lzw_encode_init(struct LZWEncodeState * s, uint8_t * outbuf, int outsize
 int ff_lzw_encode(struct LZWEncodeState * s, const uint8_t * inbuf, int insize);
 int ff_lzw_encode_flush(struct LZWEncodeState * s);
 
-#endif /* FFMPEG_LZW_H */
+#endif /* AVCODEC_LZW_H */

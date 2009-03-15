@@ -20,12 +20,12 @@
  */
 
 /**
- * @file rv40vlc2.h
+ * @file libavcodec/rv40vlc2.h
  * RV40 VLC tables used for macroblock information decoding
  */
 
-#ifndef FFMPEG_RV40VLC2_H
-#define FFMPEG_RV40VLC2_H
+#ifndef AVCODEC_RV40VLC2_H
+#define AVCODEC_RV40VLC2_H
 
 #include <stdint.h>
 
@@ -703,4 +703,4 @@ static const uint8_t block_num_to_btype_vlc_num[12] = {
  0, 1, 0, 0, 2, 3, 0, 5, 0, 0, 4, 0
 };
 //@}
-#endif /* FFMPEG_RV40VLC2_H */
+#endif /* AVCODEC_RV40VLC2_H */

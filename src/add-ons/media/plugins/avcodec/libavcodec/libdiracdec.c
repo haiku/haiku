@@ -21,7 +21,7 @@
  */
 
 /**
-* @file libdiracdec.c
+* @file libavcodec/libdiracdec.c
 * Dirac decoder support via libdirac library; more details about the Dirac
 * project can be found at http://dirac.sourceforge.net/.
 * The libdirac_decoder library implements Dirac specification version 2.2
@@ -63,7 +63,7 @@ static enum PixelFormat GetFfmpegChromaFormat(dirac_chroma_t dirac_pix_fmt)
     return PIX_FMT_NONE;
 }
 
-static int libdirac_decode_init(AVCodecContext *avccontext)
+static av_cold int libdirac_decode_init(AVCodecContext *avccontext)
 {
 
     FfmpegDiracDecoderParams *p_dirac_params = avccontext->priv_data ;
@@ -88,10 +88,12 @@ static int libdirac_decode_frame(AVCodecContext *avccontext,
 
     *data_size = 0;
 
-    if (buf_size>0)
+    if (buf_size>0) {
         /* set data to decode into buffer */
         dirac_buffer (p_dirac_params->p_decoder, buf, buf+buf_size);
-
+        if ((buf[4] &0x08) == 0x08 && (buf[4] & 0x03))
+            avccontext->has_b_frames = 1;
+    }
     while (1) {
          /* parse data and process result */
         DecoderState state = dirac_parse (p_dirac_params->p_decoder);
@@ -172,7 +174,7 @@ static int libdirac_decode_frame(AVCodecContext *avccontext,
 }
 
 
-static int libdirac_decode_close(AVCodecContext *avccontext)
+static av_cold int libdirac_decode_close(AVCodecContext *avccontext)
 {
     FfmpegDiracDecoderParams *p_dirac_params = avccontext->priv_data;
     dirac_decoder_close (p_dirac_params->p_decoder);

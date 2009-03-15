@@ -1,6 +1,6 @@
 /*
  * WMA compatible decoder
- * Copyright (c) 2002 The FFmpeg Project.
+ * Copyright (c) 2002 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +20,7 @@
  */
 
 /**
- * @file wmadec.c
+ * @file libavcodec/wmadec.c
  * WMA compatible decoder.
  * This decoder handles Microsoft Windows Media Audio data, versions 1 & 2.
  * WMA v1 is identified by audio format 0x160 in Microsoft media files
@@ -689,18 +689,12 @@ next:
         n4 = s->block_len / 2;
         if(s->channel_coded[ch]){
             ff_imdct_calc(&s->mdct_ctx[bsize], s->output, s->coefs[ch]);
-        }else
+        }else if(!(s->ms_stereo && ch==1))
             memset(s->output, 0, sizeof(s->output));
 
         /* multiply by the window and add in the frame */
         index = (s->frame_len / 2) + s->block_pos - n4;
         wma_window(s, &s->frame_out[ch][index]);
-
-        /* specific fast case for ms-stereo : add to second
-            channel if it is not coded */
-        if (s->ms_stereo && !s->channel_coded[1]) {
-            wma_window(s, &s->frame_out[1][index]);
-        }
     }
 
     /* update block number */

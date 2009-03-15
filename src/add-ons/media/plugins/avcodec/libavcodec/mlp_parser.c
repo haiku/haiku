@@ -20,7 +20,7 @@
  */
 
 /**
- * @file mlp_parser.c
+ * @file libavcodec/mlp_parser.c
  * MLP parser
  */
 
@@ -150,6 +150,12 @@ typedef struct MLPParseContext
     int num_substreams;
 } MLPParseContext;
 
+static av_cold int mlp_init(AVCodecParserContext *s)
+{
+    ff_mlp_init_crc();
+    return 0;
+}
+
 static int mlp_parse(AVCodecParserContext *s,
                      AVCodecContext *avctx,
                      const uint8_t **poutbuf, int *poutbuf_size,
@@ -245,11 +251,11 @@ static int mlp_parse(AVCodecParserContext *s,
         if (ff_mlp_read_major_sync(avctx, &mh, &gb) < 0)
             goto lost_sync;
 
-#ifdef CONFIG_AUDIO_NONSHORT
-        avctx->bits_per_sample = mh.group1_bits;
-        if (avctx->bits_per_sample > 16)
+        avctx->bits_per_raw_sample = mh.group1_bits;
+        if (avctx->bits_per_raw_sample > 16)
             avctx->sample_fmt = SAMPLE_FMT_S32;
-#endif
+        else
+            avctx->sample_fmt = SAMPLE_FMT_S16;
         avctx->sample_rate = mh.group1_samplerate;
         avctx->frame_size = mh.access_unit_size;
 
@@ -283,7 +289,7 @@ lost_sync:
 AVCodecParser mlp_parser = {
     { CODEC_ID_MLP },
     sizeof(MLPParseContext),
-    ff_mlp_init_crc2D,
+    mlp_init,
     mlp_parse,
     NULL,
 };
