@@ -217,7 +217,19 @@ extern void _IO_free_backup_area(_IO_FILE *);
 #ifdef __cplusplus
 #	define __INLINE inline
 #else
-#	define __INLINE extern __inline
+/* GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
+   inline semantics.  */
+//#if __GNUC_PREREQ(4, 3)  // <- Gives parse error. Don't know why.
+#	if 4 < __GNUC__ || (4 == __GNUC__ && 3 <= __GNUC_MINOR__)
+#		ifdef __STDC__VERSION__
+#			if __STDC__VERSION__ + 0 > 199900
+#				define __INLINE __attribute__((__extern_inline__)) __inline
+#			endif
+#		endif
+#	endif
+#	ifndef __INLINE
+#		define __INLINE extern __inline
+#	endif
 #endif
 
 __INLINE int
