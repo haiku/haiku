@@ -80,8 +80,10 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 	uint64 bytes_read = 0, read = P_CHUNK_SIZE, write = 0;
 
 	ret = inflateInit(&stream);
-	if (ret != Z_OK)
+	if (ret != Z_OK) {
+		parser_debug("inflate_file_to_file: inflateInit failed\n");
 		return B_ERROR;
+	}
 
 	do {
 		bytes_read += P_CHUNK_SIZE;
@@ -92,6 +94,7 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 
 		stream.avail_in = in->Read(buffer_in, read);
 		if (stream.avail_in != read) {
+			parser_debug("inflate_file_to_file: read failed\n");
 			(void)inflateEnd(&stream);
 			return B_ERROR;
 		}
@@ -103,12 +106,14 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 
 			ret = inflate(&stream, Z_NO_FLUSH);
 			if (ret != Z_OK && ret != Z_STREAM_END && ret != Z_BUF_ERROR) {
+				parser_debug("inflate_file_to_file: inflate failed\n");
 				(void)inflateEnd(&stream);
 				return B_ERROR;
 			}
 
 			write = P_CHUNK_SIZE - stream.avail_out;
 			if (static_cast<uint64>(out->Write(buffer_out, write)) != write) {
+				parser_debug("inflate_file_to_file: write failed\n");
 				(void)inflateEnd(&stream);
 				return B_ERROR;
 			}
@@ -439,20 +444,24 @@ PkgDirectory::_ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 				originalSize);
 
 		if (original != originalSize) {
-			ret = B_ERROR; // File size missmatch
+			parser_debug(" File size mismatch\n");
+			ret = B_ERROR; // File size mismatch
 			return ret;
 		}
 		parser_debug(" Still good...\n");
 
 		if (fPackage->Read(buffer, 4) != 4) {
+			parser_debug(" Read(buffer, 4) failed\n");
 			ret = B_ERROR;
 			return ret;
 		}
 		parser_debug(" Still good...\n");
 
 		ret = inflate_file_to_file(fPackage, compressed, file, original);
-		if (ret != B_OK)
+		if (ret != B_OK) {
+			parser_debug(" inflate_file_to_file failed\n");
 			return ret;
+		}
 		parser_debug(" File data inflation complete!\n");
 	}
 	else if (!memcmp(buffer, padding, 7)) {
@@ -655,16 +664,22 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 
 	ret = dir.InitCheck();
 	if (ret == B_ENTRY_NOT_FOUND) {
-		if (create_directory(destination.Path(), kDefaultMode) != B_OK)
+		if ((ret = create_directory(dirPath.Path(), kDefaultMode)) != B_OK) {
+			parser_debug("create_directory()) failed\n");
 			return B_ERROR;
+		}
 	}
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		parser_debug("destination InitCheck failed %s for %s\n", strerror(ret), dirPath.Path());
 		return ret;
+	}
 
 	BSymLink symlink;
 	ret = dir.CreateSymLink(linkName.String(), fLink.String(), &symlink);
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		parser_debug("CreateSymLink failed\n");
 		return ret;
+	}
 
 	parser_debug(" Symlink created!\n");
 
