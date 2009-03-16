@@ -47,8 +47,10 @@ inflate_data(uint8 *in, uint32 in_size, uint8 *out, uint32 out_size)
 	status_t ret;
 
 	ret = inflateInit(&stream);
-	if (ret != Z_OK)
+	if (ret != Z_OK) {
+		parser_debug("inflatInit failed\n");
 		return B_ERROR;
+	}
 
 	stream.avail_out = out_size;
 	stream.next_out = out;
@@ -225,15 +227,19 @@ PkgDirectory::_InitPath(const char *path, BPath *destination)
 	status_t ret = B_OK;
 
 	if (fPathType == P_INSTALL_PATH) {
-		if (!path)
+		if (!path) {
+			parser_debug("_InitPath path is NULL\n");
 			return B_ERROR;
+		}
 		ret = destination->SetTo(path, fPath.String());
 	}
 	else if (fPathType == P_SYSTEM_PATH)
 		ret = destination->SetTo(fPath.String());
 	else {
-		if (!path)
+		if (!path) {
+			parser_debug("_InitPath path is NULL\n");
 			return B_ERROR;
+		}
 
 		BVolume volume(dev_for_path(path));
 		ret = volume.InitCheck();
@@ -294,8 +300,11 @@ PkgDirectory::_HandleAttributes(BPath *destination, BNode *node,
 			ret = _ParseAttribute(buffer, node, &attrName, &nameSize, &attrType,
 					&attrData, &dataSize, &temp, &tempSize, &attrCSize, &attrOSize, 
 					&attrStarted, &done);
-			if (ret != B_OK || done)
+			if (ret != B_OK || done) {
+				if (ret != B_OK)
+					parser_debug("_ParseAttribute failed for %s\n", destination->Path());
 				break;
+			}
 		}
 
 		delete[] attrData;
@@ -404,8 +413,8 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		ssize_t wrote = node->WriteAttr(*attrName, *attrType, 0, *attrData, 
 			*attrOSize);
 		if(wrote != static_cast<ssize_t>(*attrOSize)) {
-			ret = B_ERROR;
-			return ret;
+			parser_debug("Failed to write attribute %s %s\n", *attrName, strerror(wrote));
+			return B_ERROR;
 		}
 
 		*attrStarted = false;
@@ -415,8 +424,8 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		*attrOSize = 0;
 
 		parser_debug(" > Attribute added.\n");
-	}
-	else {
+	} else {
+		parser_debug(" Unknown attribute\n");
 		ret = B_ERROR;
 	}
 
@@ -445,15 +454,13 @@ PkgDirectory::_ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 
 		if (original != originalSize) {
 			parser_debug(" File size mismatch\n");
-			ret = B_ERROR; // File size mismatch
-			return ret;
+			return B_ERROR; // File size mismatch
 		}
 		parser_debug(" Still good...\n");
 
 		if (fPackage->Read(buffer, 4) != 4) {
 			parser_debug(" Read(buffer, 4) failed\n");
-			ret = B_ERROR;
-			return ret;
+			return B_ERROR;
 		}
 		parser_debug(" Still good...\n");
 
@@ -469,6 +476,7 @@ PkgDirectory::_ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 		return ret;
 	}
 	else {
+		parser_debug("_ParseData unknown tag\n");
 		ret = B_ERROR;
 	}
 
@@ -531,18 +539,17 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 		ret = file.SetTo(destination.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 		if (ret != B_OK)
 			return ret;
-	}
-	else if (ret != B_OK)
+	} else if (ret != B_OK)
 		return ret;
 
 	parser_debug(" File created!\n");
 
 	// Set the file permissions, creation and modification times
 	ret = file.SetPermissions(static_cast<mode_t>(fMode));
-	if (fCreationTime)
-		ret |= file.SetCreationTime(static_cast<time_t>(fCreationTime));
-	if (fModificationTime)
-		ret |= file.SetModificationTime(static_cast<time_t>(fModificationTime));
+	if (fCreationTime && ret == B_OK)
+		ret = file.SetCreationTime(static_cast<time_t>(fCreationTime));
+	if (fModificationTime && ret == B_OK)
+		ret = file.SetModificationTime(static_cast<time_t>(fModificationTime));
 
 	if (ret != B_OK)
 		return ret;
@@ -675,7 +682,7 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 	}
 
 	BSymLink symlink;
-	ret = dir.CreateSymLink(linkName.String(), fLink.String(), &symlink);
+	ret = dir.CreateSymLink(destination.Path(), fLink.String(), &symlink);
 	if (ret != B_OK) {
 		parser_debug("CreateSymLink failed\n");
 		return ret;
@@ -685,18 +692,20 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 
 	ret = symlink.SetPermissions(static_cast<mode_t>(fMode));
 
-	if (fCreationTime)
-		ret |= symlink.SetCreationTime(static_cast<time_t>(fCreationTime));
+	if (fCreationTime && ret == B_OK)
+		ret = symlink.SetCreationTime(static_cast<time_t>(fCreationTime));
 	
-	if (fModificationTime)
-		ret |= symlink.SetModificationTime(static_cast<time_t>(fModificationTime));
+	if (fModificationTime && ret == B_OK)
+		ret = symlink.SetModificationTime(static_cast<time_t>(fModificationTime));
 
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		parser_debug("Failed to set symlink attributes\n");
 		return ret;
+	}
 
 	if (fOffset) {
-		// Simlinks also seem to have attributes - so parse them
-		ret = _HandleAttributes(&destination, &dir, "LnDa");
+		// Symlinks also seem to have attributes - so parse them
+		ret = _HandleAttributes(&destination, &symlink, "LnDa");
 	}
 
 	if (final) {
