@@ -92,9 +92,9 @@ RequestPort::SendRequest(RequestAllocator* allocator)
 	}
 #else
 	if (!is_kernel_request(allocator->GetRequest()->GetType())) {
-		ERROR(("RequestPort::SendRequest(%lu): request is not a userland "
+		ERROR(("RequestPort::SendRequest(%lu): request is not a kernel "
 			"request\n", allocator->GetRequest()->GetType()));
-		debugger("Request is not a userland request.");
+		debugger("Request is not a kernel request.");
 	}
 #endif
 	RETURN_ERROR(fPort.Send(allocator->GetRequestSize()));
