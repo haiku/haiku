@@ -578,14 +578,14 @@ UserlandFS::KernelEmu::file_cache_create(dev_t mountID, ino_t vnodeID,
 	FileSystem* fileSystem;
 	status_t error = get_port_and_fs(&port, &fileSystem);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	FileCacheCreateRequest* request;
 	error = AllocateRequest(allocator, &request);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	request->nsid = mountID;
 	request->vnid = vnodeID;
@@ -596,11 +596,11 @@ UserlandFS::KernelEmu::file_cache_create(dev_t mountID, ino_t vnodeID,
 	FileCacheCreateReply* reply;
 	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 	RequestReleaser requestReleaser(port, reply);
 
 	// process the reply
-	return reply->error;
+	RETURN_ERROR(reply->error);
 }
 
 
