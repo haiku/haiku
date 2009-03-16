@@ -961,9 +961,9 @@ UserlandFSUtil::is_userland_request(uint32 type)
 			return false;
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
-			return false;
-		case DO_ITERATIVE_FD_IO_REPLY:
 			return true;
+		case DO_ITERATIVE_FD_IO_REPLY:
+			return false;
 
 		// general reply
 		case RECEIPT_ACK_REPLY:
