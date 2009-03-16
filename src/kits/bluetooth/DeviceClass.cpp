@@ -1,26 +1,11 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
-//#include <bluetooth/DiscoveryAgent.h>
-//#include <bluetooth/DiscoveryListener.h>
-//#include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
-//#include <bluetooth/bluetooth_error.h>
-//#include <bluetooth/HCI/btHCI_command.h>
-//#include <bluetooth/HCI/btHCI_event.h>
-//
-//#include <bluetoothserver_p.h>
-//#include <CommandManager.h>
-//
-//
-//#include "KitSupport.h"
 
 namespace Bluetooth {
-
 
 void
 DeviceClass::GetServiceClass(BString& serviceClass)
