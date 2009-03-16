@@ -315,7 +315,7 @@ const char* bluetoothManufacturers[] = {
 	"Renesas Technology Corp.",
 	"Mobilian Corporation",
 	"Terax",
-	"Integerated System Solution Corp.",
+	"Integrated System Solution Corp.",
 	"Matsushita Electric Industrial Co., Ltd.",
 	"Gennum Corporation",
 	"Research In Motion",
