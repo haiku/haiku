@@ -257,6 +257,7 @@ private:
 
 			void				_IncrementVNodeCount(ino_t vnid);
 			void				_DecrementVNodeCount(ino_t vnid);
+			void				_RemoveInvalidVNode(ino_t vnid);
 
 			status_t			_InternalIOCtl(userlandfs_ioctl* buffer,
 									int32 bufferSize);

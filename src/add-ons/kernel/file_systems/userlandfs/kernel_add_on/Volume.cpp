@@ -51,13 +51,15 @@ struct Volume::VNode : HashTableLink<VNode> {
 	void*	clientNode;
 	void*	fileCache;
 	int32	useCount;
+	bool	valid;
 
 	VNode(ino_t id, void* clientNode)
 		:
 		id(id),
 		clientNode(clientNode),
 		fileCache(NULL),
-		useCount(0)
+		useCount(0),
+		valid(true)
 	{
 	}
 
@@ -955,27 +957,36 @@ Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 	request->vnid = vnid;
 	request->reenter = reenter;
 
+	// add the uninitialized node to our map
+	VNode* vnode = new(std::nothrow) VNode(vnid, NULL);
+	if (vnode == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	vnode->valid = false;
+
+	MutexLocker locker(fLock);
+	fVNodes->Insert(vnode);
+	locker.Unlock();
+
 	// send the request
 	KernelRequestHandler handler(this, READ_VNODE_REPLY);
 	ReadVNodeReply* reply;
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
-	if (error != B_OK)
+	if (error != B_OK) {
+		_RemoveInvalidVNode(vnid);
 		return error;
+	}
 	RequestReleaser requestReleaser(port, reply);
 
 	// process the reply
-	if (reply->error != B_OK)
+	if (reply->error != B_OK) {
+		_RemoveInvalidVNode(vnid);
 		return reply->error;
-
-	// everything went fine so far -- add the node to our map
-	VNode* vnode = new(std::nothrow) VNode(vnid, reply->node);
-	if (vnode == NULL) {
-		WriteVNode(reply->node, reenter);
-		RETURN_ERROR(B_NO_MEMORY);
 	}
 
-	MutexLocker lock(fLock);
-	fVNodes->Insert(vnode);
+	// everything went fine -- mark the node valid
+	locker.Lock();
+	vnode->clientNode = reply->node;
+	vnode->valid = true;
 
 	*_node = vnode;
 	*type = reply->type;
@@ -4227,6 +4238,7 @@ Volume::_IncrementVNodeCount(ino_t vnid)
 //PRINT(("_IncrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, *count, fVNodeCountMap->Size()));
 }
 
+
 // _DecrementVNodeCount
 void
 Volume::_DecrementVNodeCount(ino_t vnid)
@@ -4246,6 +4258,31 @@ Volume::_DecrementVNodeCount(ino_t vnid)
 	vnode->useCount--;
 //PRINT(("_DecrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, tmpCount, fVNodeCountMap->Size()));
 }
+
+
+// _RemoveInvalidVNode
+void
+Volume::_RemoveInvalidVNode(ino_t vnid)
+{
+	MutexLocker locker(fLock);
+
+	VNode* vnode = fVNodes->Lookup(vnid);
+	if (vnode == NULL) {
+		ERROR(("Volume::_RemoveInvalidVNode(): Node with ID %lld not known!\n",
+			vnid));
+		return;
+	}
+
+	fVNodes->Remove(vnode);
+	locker.Unlock();
+
+	// release all references acquired so far
+	for (; vnode->useCount > 0; vnode->useCount--)
+		put_vnode(fFSVolume, vnid);
+
+	delete vnode;
+}
+
 
 // _InternalIOCtl
 status_t
