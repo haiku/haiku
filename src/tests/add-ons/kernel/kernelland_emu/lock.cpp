@@ -154,11 +154,13 @@ mutex_destroy(mutex *mutex)
 status_t
 _mutex_trylock(mutex *mutex)
 {
-	status_t status;
-	do {
-		status = acquire_sem_etc((sem_id)mutex->waiters, 1, B_RELATIVE_TIMEOUT,
-			0);
-	} while (status == B_INTERRUPTED);
+	status_t status = acquire_sem_etc((sem_id)mutex->waiters, 1,
+		B_RELATIVE_TIMEOUT, 0);
+
+#if KDEBUG
+	if (status == B_OK)
+		mutex->holder = find_thread(NULL);
+#endif
 	return status;
 }
 
