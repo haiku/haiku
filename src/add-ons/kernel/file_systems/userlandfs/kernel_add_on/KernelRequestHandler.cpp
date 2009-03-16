@@ -671,10 +671,13 @@ KernelRequestHandler::_HandleRequest(FileCacheReadRequest* request)
 	}
 #else
 	// allocate a buffer
-	void* buffer = malloc(size);
-		// TODO: Limit size!
-	if (buffer == NULL)
-		result = B_NO_MEMORY;
+	void* buffer = NULL;
+	if (result == B_OK) {
+		buffer = malloc(size);
+			// TODO: Limit size!
+		if (buffer == NULL)
+			result = B_NO_MEMORY;
+	}
 	MemoryDeleter _2(buffer);
 
 	// execute the request
