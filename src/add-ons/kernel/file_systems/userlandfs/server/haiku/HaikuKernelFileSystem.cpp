@@ -123,6 +123,7 @@ HaikuKernelFileSystem::CreateVolume(Volume** _volume, dev_t id)
 		return error;
 	}
 
+	*_volume = volume;
 	return B_OK;
 }
 
