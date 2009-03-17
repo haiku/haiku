@@ -2048,12 +2048,12 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if ((ce->flags & CE_DIRTY) || ce->clone)
                     num_dirty++;
 
-                if (ce->lock)
+                if (ce->lock) {
                     beos_panic("cbio: can't use locked blocks here ce @ 0x%x\n",ce);
-                else
+                } else {
                     cel = &bc.normal;
-
-                delete_from_list(cel, ce);
+	                delete_from_list(cel, ce);
+				}
             }
             ce = NULL;
 
