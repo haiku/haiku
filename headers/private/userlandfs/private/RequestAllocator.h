@@ -1,5 +1,7 @@
-// RequestAllocator.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_REQUEST_ALLOCATOR_H
 #define USERLAND_FS_REQUEST_ALLOCATOR_H
 
@@ -28,7 +30,7 @@ public:
 			void				FinishDeferredInit();
 
 			status_t			AllocateRequest(int32 size);
-			status_t			ReadRequest();
+			status_t			ReadRequest(bigtime_t timeout);
 
 			Request*			GetRequest() const;
 			int32				GetRequestSize() const;

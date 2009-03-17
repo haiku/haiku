@@ -1,6 +1,11 @@
-// Port.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <new>
+
+#include <AutoDeleter.h>
 
 #include "AreaSupport.h"
 #include "Compatibility.h"
@@ -160,46 +165,62 @@ Port::Send(int32 size)
 	return (fInitStatus = error);
 }
 
-// SendAndReceive
-status_t
-Port::SendAndReceive(int32 size)
-{
-	status_t error = Send(size);
-	if (error != B_OK)
-		return error;
-	return Receive();
-}
 
 // Receive
 status_t
-Port::Receive(bigtime_t timeout)
+Port::Receive(void** _message, size_t* _size, bigtime_t timeout)
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
-	port_id port = (fOwner ? fInfo.owner_port : fInfo.client_port);
-	status_t error = B_OK;
-	do {
-		int32 code;
-		ssize_t bytesRead;
-		if (timeout >= 0) {
-			bytesRead = read_port_etc(port, &code, fBuffer, fCapacity,
-				B_RELATIVE_TIMEOUT, timeout);
-		} else
-			bytesRead = read_port(port, &code, fBuffer, fCapacity);
-		if (bytesRead < 0)
-			error = bytesRead;
-		else
-			fMessageSize = bytesRead;
-	} while (error == B_INTERRUPTED);
-	if (error == B_TIMED_OUT || error == B_WOULD_BLOCK) {
-		return error;
+
+	// convert to timeout to flags + timeout we can use in the loop
+	uint32 timeoutFlags = 0;
+	if (timeout < 0) {
+		timeout = 0;
+	} else if (timeout == 0) {
+		timeoutFlags = B_RELATIVE_TIMEOUT;
+	} else if (timeout >= 0) {
+		timeout += system_time();
+		timeoutFlags = B_ABSOLUTE_TIMEOUT;
 	}
+
+	port_id port = (fOwner ? fInfo.owner_port : fInfo.client_port);
+
+	// wait for the next message
+	status_t error = B_OK;
+	ssize_t bufferSize;
+	do {
+		// TODO: When compiling for userland, we might want to save this syscall
+		// by using read_port_etc() directly, using a sufficiently large
+		// on-stack buffer and copying onto the heap.
+		bufferSize = port_buffer_size_etc(port, timeoutFlags, timeout);
+		if (bufferSize < 0)
+			error = bufferSize;
+	} while (error == B_INTERRUPTED);
+
+	if (error == B_TIMED_OUT || error == B_WOULD_BLOCK)
+		return error;
 	if (error != B_OK)
 		return (fInitStatus = error);
-	if (fMessageSize <= 0 || fMessageSize > fCapacity) {
-		fMessageSize = 0;
-		return B_BAD_DATA;
-	}
+
+	// allocate memory for the message
+	void* message = malloc(bufferSize);
+	if (message == NULL)
+		return (fInitStatus = B_NO_MEMORY);
+	MemoryDeleter messageDeleter(message);
+
+	// read the message
+	int32 code;
+	ssize_t bytesRead = read_port_etc(port, &code, message, bufferSize,
+		B_RELATIVE_TIMEOUT, 0);
+	if (bytesRead < 0)
+		return fInitStatus = bytesRead;
+	if (bytesRead != bufferSize)
+		return fInitStatus = B_BAD_DATA;
+
+	messageDeleter.Detach();
+	*_message = message;
+	*_size = bytesRead;
+
 	return B_OK;
 }
-

@@ -122,22 +122,25 @@ RequestPort::ReceiveRequest(Request** request, bigtime_t timeout)
 		RETURN_ERROR(InitCheck());
 	if (!request)
 		RETURN_ERROR(B_BAD_VALUE);
+
 	// allocate a request allocator
 	AllocatorNode* node = new(nothrow) AllocatorNode(&fPort);
 	if (!node)
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<AllocatorNode> deleter(node);
+
 	// receive the message
-	status_t error = fPort.Receive(timeout);
+	status_t error = node->allocator.ReadRequest(timeout);
 	if (error != B_OK) {
 		if (error != B_TIMED_OUT && error != B_WOULD_BLOCK)
 			RETURN_ERROR(error);
 		return error;
 	}
+
 	// allocate the request
-	error = node->allocator.ReadRequest();
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
 	// everything went fine: push the allocator
 	*request = node->allocator.GetRequest();
 	node->previous = fCurrentAllocatorNode;

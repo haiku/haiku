@@ -1,5 +1,7 @@
-// Port.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_PORT_H
 #define USERLAND_FS_PORT_H
 
@@ -38,8 +40,8 @@ public:
 			int32				GetMessageSize() const;
 
 			status_t			Send(int32 size);
-			status_t			SendAndReceive(int32 size);
-			status_t			Receive(bigtime_t timeout = -1);
+			status_t			Receive(void** _message, size_t* _size,
+									bigtime_t timeout = -1);
 
 private:
 			friend class ::KernelDebug;

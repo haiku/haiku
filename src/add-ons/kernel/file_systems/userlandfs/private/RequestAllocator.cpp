@@ -1,6 +1,9 @@
-// RequestAllocator.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <new>
+#include <stdlib.h>
 
 #include "AreaSupport.h"
 #include "Compatibility.h"
@@ -8,7 +11,6 @@
 #include "Port.h"
 #include "RequestAllocator.h"
 
-using std::nothrow;
 
 // constructor
 RequestAllocator::RequestAllocator(Port* port)
@@ -46,13 +48,13 @@ void
 RequestAllocator::Uninit()
 {
 	if (!fRequestInPortBuffer)
-		delete[] (uint8*)fRequest;
+		free(fRequest);
 	for (int32 i = 0; i < fAllocatedAreaCount; i++)
 		delete_area(fAllocatedAreas[i]);
 	fAllocatedAreaCount = 0;
 	for (int32 i = 0; i < fDeferredInitInfoCount; i++) {
 		if (fDeferredInitInfos[i].inPortBuffer)
-			delete[] fDeferredInitInfos[i].data;
+			free(fDeferredInitInfos[i].data);
 	}
 	fDeferredInitInfoCount = 0;
 	fError = B_NO_INIT;
@@ -79,7 +81,7 @@ RequestAllocator::FinishDeferredInit()
 		if (info.inPortBuffer) {
 			if (info.size > 0)
 				memcpy((uint8*)fRequest + info.offset, info.data, info.size);
-			delete[] info.data;
+			free(info.data);
 		}
 		PRINT(("RequestAllocator::FinishDeferredInit(): area: %ld, "
 			"offset: %ld, size: %ld\n", info.area, info.offset, info.size));
@@ -104,19 +106,32 @@ RequestAllocator::AllocateRequest(int32 size)
 
 // ReadRequest
 status_t
-RequestAllocator::ReadRequest()
+RequestAllocator::ReadRequest(bigtime_t timeout)
 {
 	if (fError != B_OK)
 		RETURN_ERROR(fError);
-	if (fPort->GetMessageSize() < (int32)sizeof(Request))
+
+	// read the message from the port
+	void* message;
+	size_t messageSize;
+	status_t error = fPort->Receive(&message, &messageSize, timeout);
+	if (error != B_OK) {
+		if (error != B_TIMED_OUT && error != B_WOULD_BLOCK)
+			RETURN_ERROR(fError = error);
+		return error;
+	}
+
+	// shouldn't be shorter than the base Request
+	if (messageSize < (int32)sizeof(Request)) {
+		free(message);
 		RETURN_ERROR(fError = B_BAD_DATA);
-	// clone the request
-	fRequest = (Request*)new(nothrow) uint8[fPort->GetMessageSize()];
-	if (!fRequest)
-		RETURN_ERROR(fError = B_NO_MEMORY);
-	memcpy(fRequest, fPort->GetMessage(), fPort->GetMessageSize());
-	fRequestSize = fPort->GetMessageSize();
+	}
+
+	// init the request
+	fRequest = (Request*)message;
+	fRequestSize = messageSize;
 	fRequestInPortBuffer = false;
+
 	// relocate the request
 	fError = relocate_request(fRequest, fRequestSize, fAllocatedAreas,
 		&fAllocatedAreaCount);
@@ -177,7 +192,7 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 			DeferredInitInfo& info
 				= fDeferredInitInfos[fDeferredInitInfoCount];
 			if (size > 0) {
-				info.data = new(nothrow) uint8[size];
+				info.data = (uint8*)malloc(size);
 				if (!info.data)
 					RETURN_ERROR(B_NO_MEMORY);
 			} else
@@ -219,7 +234,7 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 			info.target = &address;
 			fDeferredInitInfoCount++;
 PRINT(("  RequestAllocator::AllocateAddress(): deferred allocated area: "
-"%ld, size: %ld (%ld), data: %p\n", area, size, areaSize, *data)); 
+"%ld, size: %ld (%ld), data: %p\n", area, size, areaSize, *data));
 		} else
 			address.SetTo(area, 0, size);
 	}
