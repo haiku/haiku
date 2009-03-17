@@ -11,17 +11,18 @@
 #include "Compatibility.h"
 #include "Port.h"
 
+
 using std::nothrow;
 
 // minimal and maximal port size
 static const int32 kMinPortSize = 1024;			// 1 kB
 static const int32 kMaxPortSize = 64 * 1024;	// 64 kB
 
+
 // constructor
 Port::Port(int32 size)
 	: fBuffer(NULL),
 	  fCapacity(0),
-	  fMessageSize(0),
 	  fInitStatus(B_NO_INIT),
 	  fOwner(true)
 {
@@ -53,11 +54,11 @@ Port::Port(int32 size)
 	fInitStatus = B_OK;
 }
 
+
 // constructor
 Port::Port(const Info* info)
 	: fBuffer(NULL),
 	  fCapacity(0),
-	  fMessageSize(0),
 	  fInitStatus(B_NO_INIT),
 	  fOwner(false)
 {
@@ -81,12 +82,14 @@ Port::Port(const Info* info)
 	fInitStatus = B_OK;
 }
 
+
 // destructor
 Port::~Port()
 {
 	Close();
 	delete[] fBuffer;
 }
+
 
 // Close
 void
@@ -106,12 +109,14 @@ Port::Close()
 	fInfo.client_port = -1;
 }
 
+
 // InitCheck
 status_t
 Port::InitCheck() const
 {
 	return fInitStatus;
 }
+
 
 // GetInfo
 const Port::Info*
@@ -120,12 +125,14 @@ Port::GetInfo() const
 	return &fInfo;
 }
 
+
 // GetBuffer
 void*
 Port::GetBuffer() const
 {
 	return fBuffer;
 }
+
 
 // GetCapacity
 int32
@@ -134,19 +141,6 @@ Port::GetCapacity() const
 	return fCapacity;
 }
 
-// GetMessage
-void*
-Port::GetMessage() const
-{
-	return (fInitStatus == B_OK && fMessageSize > 0 ? fBuffer : NULL);
-}
-
-// GetMessageSize
-int32
-Port::GetMessageSize() const
-{
-	return (fInitStatus == B_OK ? fMessageSize : 0);
-}
 
 // Send
 status_t
@@ -156,7 +150,6 @@ Port::Send(int32 size)
 		return fInitStatus;
 	if (size <= 0 || size > fCapacity)
 		return B_BAD_VALUE;
-	fMessageSize = 0;
 	port_id port = (fOwner ? fInfo.client_port : fInfo.owner_port);
 	status_t error;
 	do {

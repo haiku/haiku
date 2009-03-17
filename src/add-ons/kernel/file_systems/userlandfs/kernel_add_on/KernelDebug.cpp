@@ -77,7 +77,6 @@ KernelDebug::DebugPort(int argc, char** argv)
 	kprintf("  client port:  %ld\n", port->fPort.fInfo.client_port);
 	kprintf("  size:         %ld\n", port->fPort.fInfo.size);
 	kprintf("  capacity:     %ld\n", port->fPort.fCapacity);
-	kprintf("  message size: %ld\n", port->fPort.fMessageSize);
 	kprintf("  buffer:       %p\n", port->fPort.fBuffer);
 	return 0;
 }

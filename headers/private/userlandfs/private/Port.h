@@ -36,9 +36,6 @@ public:
 			void*				GetBuffer() const;
 			int32				GetCapacity() const;
 
-			void*				GetMessage() const;
-			int32				GetMessageSize() const;
-
 			status_t			Send(int32 size);
 			status_t			Receive(void** _message, size_t* _size,
 									bigtime_t timeout = -1);
@@ -49,7 +46,6 @@ private:
 			Info				fInfo;
 			uint8*				fBuffer;
 			int32				fCapacity;
-			int32				fMessageSize;
 			status_t			fInitStatus;
 			bool				fOwner;
 };
