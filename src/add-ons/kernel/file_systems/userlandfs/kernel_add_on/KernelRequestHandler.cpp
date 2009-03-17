@@ -403,8 +403,11 @@ KernelRequestHandler::_HandleRequest(NewVNodeRequest* request)
 	Volume* volume = NULL;
 	status_t result = _GetVolume(request->nsid, &volume);
 	VolumePutter _(volume);
-	if (result == B_OK)
-		result = volume->NewVNode(request->vnid, request->node);
+	if (result == B_OK) {
+		result = volume->NewVNode(request->vnid, request->node,
+			request->capabilities);
+	}
+
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	NewVNodeReply* reply;
@@ -412,6 +415,7 @@ KernelRequestHandler::_HandleRequest(NewVNodeRequest* request)
 	if (error != B_OK)
 		return error;
 	reply->error = result;
+
 	// send the reply
 	return fPort->SendRequest(&allocator);
 }
@@ -426,7 +430,7 @@ KernelRequestHandler::_HandleRequest(PublishVNodeRequest* request)
 	VolumePutter _(volume);
 	if (result == B_OK) {
 		result = volume->PublishVNode(request->vnid, request->node,
-			request->type, request->flags);
+			request->type, request->flags, request->capabilities);
 	}
 
 	// prepare the reply

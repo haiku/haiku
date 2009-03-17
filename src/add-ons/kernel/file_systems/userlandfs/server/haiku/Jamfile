@@ -45,6 +45,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 
 	# UserlandFS server interface
 	HaikuKernelFileSystem.cpp
+	HaikuKernelNode.cpp
 	HaikuKernelVolume.cpp
 
 	:

@@ -1,4 +1,7 @@
-// Volume.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "Volume.h"
 
@@ -169,7 +172,7 @@ Volume::GetVNodeName(void* node, char* buffer, size_t bufferSize)
 // ReadVNode
 status_t
 Volume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
-	uint32* flags)
+	uint32* flags, FSVNodeCapabilities* _capabilities)
 {
 	return B_BAD_VALUE;
 }

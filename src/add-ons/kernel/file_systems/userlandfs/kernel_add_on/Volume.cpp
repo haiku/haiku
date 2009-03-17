@@ -47,22 +47,32 @@ static const bigtime_t kUserlandServerlandPortTimeout = 10000000;	// 10s
 
 // VNode
 struct Volume::VNode : HashTableLink<VNode> {
-	ino_t	id;
-	void*	clientNode;
-	void*	fileCache;
-	int32	useCount;
-	bool	valid;
+	ino_t		id;
+	void*		clientNode;
+	void*		fileCache;
+	VNodeOps*	ops;
+	int32		useCount;
+	bool		valid;
 
-	VNode(ino_t id, void* clientNode)
+	VNode(ino_t id, void* clientNode, VNodeOps* ops)
 		:
 		id(id),
 		clientNode(clientNode),
 		fileCache(NULL),
+		ops(ops),
 		useCount(0),
 		valid(true)
 	{
 	}
 
+	void Delete(Volume* volume)
+	{
+		if (ops != NULL)
+			volume->GetFileSystem()->PutVNodeOps(ops);
+		delete this;
+	}
+
+protected:	// should be private, but gcc 2.95.3 issues a warning
 	~VNode()
 	{
 		if (fileCache != NULL)
@@ -278,27 +288,6 @@ Volume::~Volume()
 }
 
 
-// GetFileSystem
-FileSystem*
-Volume::GetFileSystem() const
-{
-	return fFileSystem;
-}
-
-// GetUserlandVolume
-void*
-Volume::GetUserlandVolume() const
-{
-	return fUserlandVolume;
-}
-
-// GetRootID
-ino_t
-Volume::GetRootID() const
-{
-	return fRootID;
-}
-
 // #pragma mark - client methods
 
 // GetVNode
@@ -342,7 +331,8 @@ PRINT(("acquire_vnode(%ld, %lld)\n", GetID(), vnid));
 
 // NewVNode
 status_t
-Volume::NewVNode(ino_t vnid, void* clientNode)
+Volume::NewVNode(ino_t vnid, void* clientNode,
+	const FSVNodeCapabilities& capabilities)
 {
 PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
 	// lookup the node
@@ -353,17 +343,24 @@ PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	// create the node
-	node = new(std::nothrow) VNode(vnid, clientNode);
-	if (node == NULL)
+	// get the ops vector for the node
+	VNodeOps* ops = fFileSystem->GetVNodeOps(capabilities);
+	if (ops == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+
+	// create the node
+	node = new(std::nothrow) VNode(vnid, clientNode, ops);
+	if (node == NULL) {
+		fFileSystem->PutVNodeOps(ops);
+		RETURN_ERROR(B_NO_MEMORY);
+	}
 
 	locker.Unlock();
 
 	// tell the VFS
-	status_t error = new_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps);
+	status_t error = new_vnode(fFSVolume, vnid, node, node->ops->ops);
 	if (error != B_OK) {
-		delete node;
+		node->Delete(this);
 		RETURN_ERROR(error);
 	}
 
@@ -376,7 +373,8 @@ PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
 
 // PublishVNode
 status_t
-Volume::PublishVNode(ino_t vnid, void* clientNode, int type, uint32 flags)
+Volume::PublishVNode(ino_t vnid, void* clientNode, int type, uint32 flags,
+	const FSVNodeCapabilities& capabilities)
 {
 PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 	// lookup the node
@@ -386,21 +384,30 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 
 	if (!nodeKnown) {
 		// The node is not yet known -- create it.
-		node = new(std::nothrow) VNode(vnid, clientNode);
-		if (node == NULL)
+
+		// get the ops vector for the node
+		VNodeOps* ops = fFileSystem->GetVNodeOps(capabilities);
+		if (ops == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
+
+		// create the node
+		node = new(std::nothrow) VNode(vnid, clientNode, ops);
+		if (node == NULL) {
+			fFileSystem->PutVNodeOps(ops);
+			RETURN_ERROR(B_NO_MEMORY);
+		}
 	}
 
 	locker.Unlock();
 
 	// tell the VFS
-	status_t error = publish_vnode(fFSVolume, vnid, node, &gUserlandFSVnodeOps,
+	status_t error = publish_vnode(fFSVolume, vnid, node, node->ops->ops,
 		type, flags);
 	if (error != B_OK) {
 // TODO: We should note whether the node was made known via new_vnode(). If so,
 // we should remove and delete it here!
 		if (!nodeKnown)
-			delete node;
+			node->Delete(this);
 		RETURN_ERROR(error);
 	}
 
@@ -690,29 +697,33 @@ Volume::Mount(const char* device, uint32 flags, const char* parameters)
 
 	// mount
 	status_t error = _Mount(device, flags, parameters);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
-	if (error == B_OK) {
-		MutexLocker locker(fLock);
-		// fetch the root node, so that we can serve Walk() requests on it,
-		// after the connection to the userland server is gone
-		fRootNode = fVNodes->Lookup(fRootID);
-		if (fRootNode == NULL) {
-			// The root node was not added while mounting. That's a serious
-			// problem -- not only because we don't have it, but also because
-			// the VFS requires publish_vnode() to be invoked for the root node.
-			ERROR(("Volume::Mount(): new_vnode() was not called for root node! "
-				"Unmounting...\n"));
-			locker.Unlock();
-			Unmount();
-			return B_ERROR;
-		}
-
-		// Decrement the root node use count. The publish_vnode() the client FS
-		// did will be balanced by the VFS.
-		if (fVNodeCountingEnabled)
-			fRootNode->useCount--;
+	MutexLocker locker(fLock);
+	// fetch the root node, so that we can serve Walk() requests on it,
+	// after the connection to the userland server is gone
+	fRootNode = fVNodes->Lookup(fRootID);
+	if (fRootNode == NULL) {
+		// The root node was not added while mounting. That's a serious
+		// problem -- not only because we don't have it, but also because
+		// the VFS requires publish_vnode() to be invoked for the root node.
+		ERROR(("Volume::Mount(): new_vnode() was not called for root node! "
+			"Unmounting...\n"));
+		locker.Unlock();
+		Unmount();
+		return B_ERROR;
 	}
-	return error;
+
+	// Decrement the root node use count. The publish_vnode() the client FS
+	// did will be balanced by the VFS.
+	if (fVNodeCountingEnabled)
+		fRootNode->useCount--;
+
+	// init the volume ops vector we'll give the VFS
+	_InitVolumeOps();
+
+	return B_OK;
 }
 
 // Unmount
@@ -729,7 +740,7 @@ Volume::Unmount()
 			VNode* node = fVNodes->Clear(true);
 			while (node != NULL) {
 				VNode* nextNode = node->fNext;
-				delete node;
+				node->Delete(this);
 				node = nextNode;
 			}
 			delete fVNodes;
@@ -937,8 +948,8 @@ Volume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
-	uint32* flags)
+Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, fs_vnode_ops** _ops,
+	int* type, uint32* flags)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -958,7 +969,7 @@ Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 	request->reenter = reenter;
 
 	// add the uninitialized node to our map
-	VNode* vnode = new(std::nothrow) VNode(vnid, NULL);
+	VNode* vnode = new(std::nothrow) VNode(vnid, NULL, NULL);
 	if (vnode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	vnode->valid = false;
@@ -983,14 +994,23 @@ Volume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 		return reply->error;
 	}
 
+	// get the ops vector for the node
+	VNodeOps* ops = fFileSystem->GetVNodeOps(reply->capabilities);
+	if (ops == NULL) {
+		_RemoveInvalidVNode(vnid);
+		RETURN_ERROR(B_NO_MEMORY);
+	}
+
 	// everything went fine -- mark the node valid
 	locker.Lock();
 	vnode->clientNode = reply->node;
+	vnode->ops = ops;
 	vnode->valid = true;
 
 	*_node = vnode;
 	*type = reply->type;
 	*flags = reply->flags;
+	*_ops = ops->ops;
 	return B_OK;
 }
 
@@ -1021,7 +1041,7 @@ Volume::RemoveVNode(void* _node, bool reenter)
 	locker.Unlock();
 
 	void* clientNode = vnode->clientNode;
-	delete vnode;
+	vnode->Delete(this);
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -3461,6 +3481,60 @@ Volume::RewindQuery(void* cookie)
 // #pragma mark -
 // #pragma mark ----- private implementations -----
 
+
+// _InitVolumeOps
+void
+Volume::_InitVolumeOps()
+{
+	memcpy(&fVolumeOps, &gUserlandFSVolumeOps, sizeof(fs_volume_ops));
+
+	#undef CLEAR_UNSUPPORTED
+	#define CLEAR_UNSUPPORTED(capability, op) 	\
+		if (!fCapabilities.Get(capability))				\
+			fVolumeOps.op = NULL
+
+	// FS operations
+	// FS_VOLUME_CAPABILITY_UNMOUNT: unmount
+		// always needed
+
+	// FS_VOLUME_CAPABILITY_READ_FS_INFO: read_fs_info
+		// always needed
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_WRITE_FS_INFO, write_fs_info);
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_SYNC, sync);
+
+	// vnode operations
+	// FS_VOLUME_CAPABILITY_GET_VNODE: get_vnode
+		// always needed
+
+	// index directory & index operations
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_OPEN_INDEX_DIR, open_index_dir);
+	// FS_VOLUME_CAPABILITY_CLOSE_INDEX_DIR: close_index_dir
+		// always needed
+	// FS_VOLUME_CAPABILITY_FREE_INDEX_DIR_COOKIE: free_index_dir_cookie
+		// always needed
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_READ_INDEX_DIR, read_index_dir);
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_REWIND_INDEX_DIR, rewind_index_dir);
+
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_CREATE_INDEX, create_index);
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_REMOVE_INDEX, remove_index);
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_READ_INDEX_STAT, read_index_stat);
+
+	// query operations
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_OPEN_QUERY, open_query);
+	// FS_VOLUME_CAPABILITY_CLOSE_QUERY: close_query
+		// always needed
+	// FS_VOLUME_CAPABILITY_FREE_QUERY_COOKIE: free_query_cookie
+		// always needed
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_READ_QUERY, read_query);
+	CLEAR_UNSUPPORTED(FS_VOLUME_CAPABILITY_REWIND_QUERY, rewind_query);
+
+	#undef CLEAR_UNSUPPORTED
+}
+
+
+// #pragma mark -
+
+
 // _Mount
 status_t
 Volume::_Mount(const char* device, uint32 flags, const char* parameters)
@@ -3636,7 +3710,7 @@ Volume::_WriteVNode(void* _node, bool reenter)
 	locker.Unlock();
 
 	void* clientNode = vnode->clientNode;
-	delete vnode;
+	vnode->Delete(this);
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -4280,7 +4354,7 @@ Volume::_RemoveInvalidVNode(ino_t vnid)
 	for (; vnode->useCount > 0; vnode->useCount--)
 		put_vnode(fFSVolume, vnid);
 
-	delete vnode;
+	vnode->Delete(this);
 }
 
 

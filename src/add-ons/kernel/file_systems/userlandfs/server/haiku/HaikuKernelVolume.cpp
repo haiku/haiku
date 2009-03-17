@@ -1,4 +1,7 @@
-// HaikuKernelVolume.cpp
+/*
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "HaikuKernelVolume.h"
 
@@ -84,10 +87,19 @@ HaikuKernelVolume::NewVNode(ino_t vnodeID, void* privateNode, fs_vnode_ops* ops,
 	if (node != NULL)
 		return B_BAD_VALUE;
 
-	// create a new node
-	node = new(std::nothrow) HaikuKernelNode(this, vnodeID, privateNode, ops);
-	if (node == NULL)
+	// get node capabilities
+	HaikuKernelNode::Capabilities* capabilities
+		= _FileSystem()->GetNodeCapabilities(ops);
+	if (capabilities == NULL)
 		return B_NO_MEMORY;
+
+	// create a new node
+	node = new(std::nothrow) HaikuKernelNode(this, vnodeID, privateNode, ops,
+		capabilities);
+	if (node == NULL) {
+		_FileSystem()->PutNodeCapabilities(capabilities);
+		return B_NO_MEMORY;
+	}
 
 	// add to map
 	status_t error = fNodes->Put(vnodeID, node);
@@ -115,11 +127,19 @@ HaikuKernelVolume::PublishVNode(ino_t vnodeID, void* privateNode,
 		if (node->published)
 			return B_BAD_VALUE;
 	} else {
+		// get node capabilities
+		HaikuKernelNode::Capabilities* capabilities
+			= _FileSystem()->GetNodeCapabilities(ops);
+		if (capabilities == NULL)
+			return B_NO_MEMORY;
+
 		// create a new node
 		node = new(std::nothrow) HaikuKernelNode(this, vnodeID, privateNode,
-			ops);
-		if (node == NULL)
+			ops, capabilities);
+		if (node == NULL) {
+			_FileSystem()->PutNodeCapabilities(capabilities);
 			return B_NO_MEMORY;
+		}
 
 		// add to map
 		status_t error = fNodes->Put(vnodeID, node);
@@ -271,14 +291,14 @@ HaikuKernelVolume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 // ReadVNode
 status_t
 HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
-	uint32* flags)
+	uint32* flags, FSVNodeCapabilities* _capabilities)
 {
 	if (!fVolume.ops->get_vnode)
 		return B_BAD_VALUE;
 
 	// create a new wrapper node and add it to the map
 	HaikuKernelNode* node = new(std::nothrow) HaikuKernelNode(this, vnid, NULL,
-		NULL);
+		NULL, NULL);
 	if (node == NULL)
 		return B_NO_MEMORY;
 	ObjectDeleter<HaikuKernelNode> nodeDeleter(node);
@@ -301,11 +321,23 @@ HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 		return error;
 	}
 
+	// get node capabilities
+	HaikuKernelNode::Capabilities* capabilities
+		= _FileSystem()->GetNodeCapabilities(node->ops);
+	if (capabilities == NULL) {
+		node->ops->put_vnode(&fVolume, node, reenter);
+		locker.Lock();
+		fNodes->Remove(vnid);
+		return B_NO_MEMORY;
+	}
+
 	locker.Lock();
+	node->capabilities = capabilities;
 	node->published = true;
 	nodeDeleter.Detach();
 
 	*_node = node;
+	*_capabilities = capabilities->capabilities;
 
 	return B_OK;
 }
@@ -1166,81 +1198,4 @@ HaikuKernelVolume::_InitCapabilities()
 	fCapabilities.Set(FS_VOLUME_CAPABILITY_READ_QUERY, fVolume.ops->read_query);
 	fCapabilities.Set(FS_VOLUME_CAPABILITY_REWIND_QUERY,
 		fVolume.ops->rewind_query);
-
-
-#if 0
-	// vnode operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_LOOKUP, fFSModule->lookup);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE_NAME, fFSModule->get_vnode_name);
-
-	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE, fFSModule->get_vnode);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_PUT_VNODE, fFSModule->put_vnode);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_VNODE, fFSModule->remove_vnode);
-
-	// VM file access
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CAN_PAGE, fFSModule->can_page);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_PAGES, fFSModule->read_pages);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_PAGES, fFSModule->write_pages);
-
-	// cache file access
-	fCapabilities.Set(FS_VNODE_CAPABILITY_GET_FILE_MAP, fFSModule->get_file_map);
-
-	// common operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_IOCTL, fFSModule->ioctl);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_SET_FLAGS, fFSModule->set_flags);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_SELECT, fFSModule->select);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_DESELECT, fFSModule->deselect);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFSModule->fsync);
-
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFSModule->read_symlink);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFSModule->create_symlink);
-
-	fCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFSModule->link);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fFSModule->unlink);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFSModule->rename);
-
-	fCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fFSModule->access);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFSModule->read_stat);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT, fFSModule->write_stat);
-
-	// file operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fFSModule->create);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFSModule->open);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFSModule->close);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFSModule->free_cookie);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ, fFSModule->read);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fFSModule->write);
-
-	// directory operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fFSModule->create_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fFSModule->remove_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, fFSModule->open_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_DIR, fFSModule->close_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, fFSModule->free_dir_cookie);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, fFSModule->read_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, fFSModule->rewind_dir);
-
-	// attribute directory operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, fFSModule->open_attr_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR, fFSModule->close_attr_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
-		fFSModule->free_attr_dir_cookie);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, fFSModule->read_attr_dir);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, fFSModule->rewind_attr_dir);
-
-	// attribute operations
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, fFSModule->create_attr);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, fFSModule->open_attr);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR, fFSModule->close_attr);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE,
-		fFSModule->free_attr_cookie);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFSModule->read_attr);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fFSModule->write_attr);
-
-	fCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT, fFSModule->read_attr_stat);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR_STAT,
-		fFSModule->write_attr_stat);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFSModule->rename_attr);
-	fCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFSModule->remove_attr);
-#endif
 }

@@ -466,10 +466,11 @@ UserlandRequestHandler::_HandleRequest(ReadVNodeRequest* request)
 	void* node;
 	int type;
 	uint32 flags;
+	FSVNodeCapabilities capabilities;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->ReadVNode(request->vnid, request->reenter, &node,
-			&type, &flags);
+			&type, &flags, &capabilities);
 	}
 
 	// prepare the reply
@@ -483,6 +484,7 @@ UserlandRequestHandler::_HandleRequest(ReadVNodeRequest* request)
 	reply->node = node;
 	reply->type = type;
 	reply->flags = flags;
+	reply->capabilities = capabilities;
 
 	// send the reply
 	return _SendReply(allocator, false);

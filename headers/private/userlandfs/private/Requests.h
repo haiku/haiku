@@ -509,9 +509,10 @@ class ReadVNodeReply : public ReplyRequest {
 public:
 	ReadVNodeReply() : ReplyRequest(READ_VNODE_REPLY) {}
 
-	void*		node;
-	int			type;
-	uint32		flags;
+	void*				node;
+	int					type;
+	uint32				flags;
+	FSVNodeCapabilities	capabilities;
 };
 
 // WriteVNodeRequest
@@ -1604,9 +1605,10 @@ class NewVNodeRequest : public Request {
 public:
 	NewVNodeRequest() : Request(NEW_VNODE_REQUEST) {}
 
-	dev_t		nsid;
-	ino_t		vnid;
-	void*		node;
+	dev_t				nsid;
+	ino_t				vnid;
+	void*				node;
+	FSVNodeCapabilities	capabilities;
 };
 
 // NewVNodeReply
@@ -1620,11 +1622,12 @@ class PublishVNodeRequest : public Request {
 public:
 	PublishVNodeRequest() : Request(PUBLISH_VNODE_REQUEST) {}
 
-	dev_t		nsid;
-	ino_t		vnid;
-	void*		node;
-	int			type;
-	uint32		flags;
+	dev_t				nsid;
+	ino_t				vnid;
+	void*				node;
+	int					type;
+	uint32				flags;
+	FSVNodeCapabilities	capabilities;
 };
 
 // PublishVNodeReply

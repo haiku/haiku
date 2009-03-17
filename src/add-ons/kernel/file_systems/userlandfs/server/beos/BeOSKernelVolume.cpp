@@ -1,4 +1,7 @@
-// BeOSKernelVolume.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "BeOSKernelVolume.h"
 
@@ -11,6 +14,7 @@
 
 #include "../kernel_emu.h"
 
+#include "BeOSKernelFileSystem.h"
 #include "fs_interface.h"
 
 
@@ -38,6 +42,14 @@ public:
 	bool	fExists;
 	bool	fCreate;
 };
+
+
+// _FileSystem
+inline BeOSKernelFileSystem*
+BeOSKernelVolume::_FileSystem() const
+{
+	return static_cast<BeOSKernelFileSystem*>(fFileSystem);
+}
 
 
 // constructor
@@ -165,7 +177,7 @@ BeOSKernelVolume::GetVNodeType(void* node, int* type)
 // ReadVNode
 status_t
 BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
-	uint32* flags)
+	uint32* flags, FSVNodeCapabilities* _capabilities)
 {
 	if (!fFSOps->read_vnode)
 		return B_BAD_VALUE;
@@ -186,6 +198,7 @@ BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
 
 	*type = (st.st_mode & S_IFMT);
 	*flags = 0;
+	_FileSystem()->GetNodeCapabilities(*_capabilities);
 
 	return B_OK;
 }

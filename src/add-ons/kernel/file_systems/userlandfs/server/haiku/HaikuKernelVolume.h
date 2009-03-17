@@ -1,5 +1,7 @@
-// HaikuKernelVolume.h
-
+/*
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_HAIKU_KERNEL_VOLUME_H
 #define USERLAND_FS_HAIKU_KERNEL_VOLUME_H
 
@@ -56,7 +58,8 @@ public:
 	virtual	status_t			GetVNodeName(void* node, char* buffer,
 									size_t bufferSize);
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
-									void** node, int* type, uint32* flags);
+									void** node, int* type, uint32* flags,
+									FSVNodeCapabilities* _capabilities);
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
 

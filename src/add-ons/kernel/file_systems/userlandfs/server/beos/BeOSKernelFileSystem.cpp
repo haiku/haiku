@@ -4,6 +4,7 @@
 
 #include <new>
 
+#include "beos_kernel_emu.h"
 #include "BeOSKernelVolume.h"
 #include "fs_cache.h"
 #include "fs_interface.h"
@@ -76,6 +77,8 @@ void
 BeOSKernelFileSystem::_InitCapabilities()
 {
 	fCapabilities.ClearAll();
+	fVolumeCapabilities.ClearAll();
+	fNodeCapabilities.ClearAll();
 
 	// FS interface type
 	fClientFSType = CLIENT_FS_BEOS_KERNEL;
@@ -204,6 +207,21 @@ BeOSKernelFileSystem::_InitCapabilities()
 	// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFSOps->rename_attr);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFSOps->remove_attr);
+}
+
+
+// #pragma mark -
+
+
+// get_beos_file_system_node_capabilities
+//
+// Service function for beos_kernel_emu.cpp. Declared in beos_kernel_emu.h.
+void
+get_beos_file_system_node_capabilities(FSVNodeCapabilities& capabilities)
+{
+	BeOSKernelFileSystem* fileSystem
+		= static_cast<BeOSKernelFileSystem*>(FileSystem::GetInstance());
+	fileSystem->GetNodeCapabilities(capabilities);
 }
 
 

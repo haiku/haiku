@@ -136,7 +136,8 @@ new_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 		return error;
 
 	// announce the new node
-	error = UserlandFS::KernelEmu::new_vnode(volume->GetID(), vnodeID, node);
+	error = UserlandFS::KernelEmu::new_vnode(volume->GetID(), vnodeID, node,
+		node->capabilities->capabilities);
 	if (error != B_OK)
 		volume->UndoNewVNode(node);
 
@@ -159,7 +160,7 @@ publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 
 	// publish the new node
 	error = UserlandFS::KernelEmu::publish_vnode(volume->GetID(), vnodeID, node,
-		type, flags);
+		type, flags, node->capabilities->capabilities);
 	if (error != B_OK)
 		volume->UndoPublishVNode(node);
 

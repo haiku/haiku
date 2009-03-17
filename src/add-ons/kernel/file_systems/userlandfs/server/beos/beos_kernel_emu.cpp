@@ -1,5 +1,7 @@
 // beos_kernel_emu.cpp
 
+#include "beos_kernel_emu.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,9 +147,14 @@ put_vnode(nspace_id nsid, ino_t vnid)
 int
 new_vnode(nspace_id nsid, ino_t vnid, void *data)
 {
+	// get the node capabilities
+	FSVNodeCapabilities capabilities;
+	get_beos_file_system_node_capabilities(capabilities);
+
 	// The semantics of new_vnode() has changed. The new publish_vnode()
 	// should work like the former new_vnode().
-	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data);
+	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data,
+		capabilities);
 }
 
 // remove_vnode

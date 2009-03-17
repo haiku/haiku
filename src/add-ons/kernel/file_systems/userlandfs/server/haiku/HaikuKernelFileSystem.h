@@ -1,13 +1,19 @@
-// HaikuKernelFileSystem.h
-
+/*
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_HAIKU_KERNEL_FILE_SYSTEM_H
 #define USERLAND_FS_HAIKU_KERNEL_FILE_SYSTEM_H
 
 #include "Locker.h"
 
+#include "HaikuKernelNode.h"
+
 #include "../FileSystem.h"
 
+
 struct file_system_module_info;
+
 
 namespace UserlandFS {
 
@@ -29,16 +35,27 @@ public:
 			void				PutIORequest(HaikuKernelIORequest* request,
 									int32 refCount = 1);
 
+			HaikuKernelNode::Capabilities* GetNodeCapabilities(
+									fs_vnode_ops* ops);
+			void				PutNodeCapabilities(
+									HaikuKernelNode::Capabilities*
+										capabilities);
+
 private:
-	class IORequestHashDefinition;
-	class IORequestTable;
+	struct IORequestHashDefinition;
+	struct IORequestTable;
+	struct NodeCapabilitiesHashDefinition;
+	struct NodeCapabilitiesTable;
 
 private:
 			void				_InitCapabilities();
+	static	void				_InitNodeCapabilities(fs_vnode_ops* ops,
+									FSVNodeCapabilities& capabilities);
 
 private:
 			file_system_module_info* fFSModule;
 			IORequestTable*		fIORequests;
+			NodeCapabilitiesTable* fNodeCapabilities;
 			Locker				fLock;
 };
 

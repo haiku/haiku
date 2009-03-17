@@ -8,7 +8,10 @@
 #include <fs_interface.h>
 #include <SupportDefs.h>
 
+#include <util/OpenHashTable.h>
+
 #include "FSCapabilities.h"
+
 
 namespace UserlandFS {
 
@@ -18,14 +21,19 @@ using UserlandFSUtil::FSVNodeCapabilities;
 
 
 struct HaikuKernelNode : fs_vnode {
+	struct Capabilities;
+
 			ino_t				id;
 			HaikuKernelVolume*	volume;
+			Capabilities*		capabilities;
 			bool				published;
 
 public:
 	inline						HaikuKernelNode(HaikuKernelVolume* volume,
 									ino_t vnodeID, void* privateNode,
-									fs_vnode_ops* ops);
+									fs_vnode_ops* ops,
+									Capabilities* capabilities);
+								~HaikuKernelNode();
 
 	static	HaikuKernelNode*	GetNode(fs_vnode* node);
 
@@ -33,11 +41,27 @@ public:
 };
 
 
+struct HaikuKernelNode::Capabilities : HashTableLink<Capabilities> {
+	int32				refCount;
+	fs_vnode_ops*		ops;
+	FSVNodeCapabilities	capabilities;
+
+	Capabilities(fs_vnode_ops* ops, FSVNodeCapabilities	capabilities)
+		:
+		refCount(1),
+		ops(ops),
+		capabilities(capabilities)
+	{
+	}
+};
+
+
 HaikuKernelNode::HaikuKernelNode(HaikuKernelVolume* volume, ino_t vnodeID,
-	void* privateNode, fs_vnode_ops* ops)
+	void* privateNode, fs_vnode_ops* ops, Capabilities* capabilities)
 	:
 	id(vnodeID),
 	volume(volume),
+	capabilities(capabilities),
 	published(false)
 {
 	this->private_node = privateNode;

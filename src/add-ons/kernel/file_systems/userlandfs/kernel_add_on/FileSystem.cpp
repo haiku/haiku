@@ -3,18 +3,22 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "Volume.h"
+
+#include <util/AutoLock.h>
+
 #include "AutoLocker.h"
 #include "Compatibility.h"
 #include "Debug.h"
 #include "FileSystem.h"
 #include "HashMap.h"
+#include "kernel_interface.h"
 #include "KernelRequestHandler.h"
 #include "PortReleaser.h"
 #include "RequestAllocator.h"
 #include "Requests.h"
 #include "Settings.h"
 #include "SingleReplyRequestHandler.h"
-#include "Volume.h"
 
 // The time after which the notification thread times out at the port and
 // restarts the loop. Of interest only when the FS is deleted. It is the
@@ -30,7 +34,6 @@ struct FileSystem::SelectSyncMap
 FileSystem::FileSystem()
 	:
 	fVolumes(),
-	fVolumeLock(),
 	fName(),
 	fTeam(-1),
 	fNotificationPort(NULL),
@@ -42,6 +45,8 @@ FileSystem::FileSystem()
 	fInitialized(false),
 	fTerminating(false)
 {
+	mutex_init(&fVolumeLock, "userlandfs volumes");
+	mutex_init(&fVNodeOpsLock, "userlandfs vnode ops");
 }
 
 // destructor
@@ -65,6 +70,18 @@ FileSystem::~FileSystem()
 		delete fSelectSyncs;
 	}
 	delete fSettings;
+
+	// delete vnode ops vectors -- there shouldn't be any left, though
+	VNodeOps* ops = fVNodeOps.Clear();
+	int32 count = 0;
+	while (ops != NULL) {
+		count++;
+		VNodeOps* next = ops->fNext;
+		free(ops);
+		ops = next;
+	}
+	if (count > 0)
+		WARN(("Deleted %ld vnode ops vectors!\n", count));
 }
 
 // Init
@@ -83,6 +100,11 @@ FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 	if (!fName.SetTo(name))
 		return B_NO_MEMORY;
 
+	// init VNodeOps map
+	status_t error = fVNodeOps.Init();
+	if (error != B_OK)
+		return error;
+
 	fTeam = team;
 	fCapabilities = capabilities;
 
@@ -96,7 +118,7 @@ FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 	fNotificationPort = new(nothrow) RequestPort(infos);
 	if (!fNotificationPort)
 		RETURN_ERROR(B_NO_MEMORY);
-	status_t error = fNotificationPort->InitCheck();
+	error = fNotificationPort->InitCheck();
 	if (error != B_OK)
 		return error;
 
@@ -198,18 +220,18 @@ FileSystem::Mount(fs_volume* fsVolume, const char* device, uint32 flags,
 		return B_NO_MEMORY;
 
 	// add volume to the volume list
-	fVolumeLock.Lock();
+	MutexLocker locker(fVolumeLock);
 	status_t error = fVolumes.PushBack(volume);
-	fVolumeLock.Unlock();
+	locker.Unlock();
 	if (error != B_OK)
 		return error;
 
 	// mount volume
 	error = volume->Mount(device, flags, parameters);
 	if (error != B_OK) {
-		fVolumeLock.Lock();
+		MutexLocker locker(fVolumeLock);
 		fVolumes.Remove(volume);
-		fVolumeLock.Unlock();
+		locker.Unlock();
 		volume->RemoveReference();
 		return error;
 	}
@@ -256,16 +278,15 @@ FileSystem::Initialize(const char* deviceName, const char* parameters,
 void
 FileSystem::VolumeUnmounted(Volume* volume)
 {
-	fVolumeLock.Lock();
+	MutexLocker locker(fVolumeLock);
 	fVolumes.Remove(volume);
-	fVolumeLock.Unlock();
 }
 
 // GetVolume
 Volume*
 FileSystem::GetVolume(dev_t id)
 {
-	AutoLocker<Locker> _(fVolumeLock);
+	MutexLocker _(fVolumeLock);
 	for (Vector<Volume*>::Iterator it = fVolumes.Begin();
 		 it != fVolumes.End();
 		 it++) {
@@ -318,12 +339,61 @@ FileSystem::RemoveSelectSyncEntry(selectsync* sync)
 	}
 }
 
+
 // KnowsSelectSyncEntry
 bool
 FileSystem::KnowsSelectSyncEntry(selectsync* sync)
 {
 	return fSelectSyncs->ContainsKey(sync);
 }
+
+
+// GetVNodeOps
+VNodeOps*
+FileSystem::GetVNodeOps(const FSVNodeCapabilities& capabilities)
+{
+	MutexLocker locker(fVNodeOpsLock);
+
+	// do we already have ops for those capabilities
+	VNodeOps* ops = fVNodeOps.Lookup(capabilities);
+	if (ops != NULL) {
+		ops->refCount++;
+		return ops;
+	}
+
+	// no, create a new object
+	fs_vnode_ops* opsVector = new(std::nothrow) fs_vnode_ops;
+	if (opsVector == NULL)
+		return NULL;
+
+	// set the operations
+	_InitVNodeOpsVector(opsVector, capabilities);
+
+	// create the VNodeOps object
+	ops = new(std::nothrow) VNodeOps(capabilities, opsVector);
+	if (ops == NULL) {
+		delete opsVector;
+		return NULL;
+	}
+
+	fVNodeOps.Insert(ops);
+
+	return ops;
+}
+
+
+// PutVNodeOps
+void
+FileSystem::PutVNodeOps(VNodeOps* ops)
+{
+	MutexLocker locker(fVNodeOpsLock);
+
+	if (--ops->refCount == 0) {
+		fVNodeOps.Remove(ops);
+		delete ops;
+	}
+}
+
 
 // IsUserlandServerThread
 bool
@@ -334,12 +404,115 @@ FileSystem::IsUserlandServerThread() const
 	return (info.team == fUserlandServerTeam);
 }
 
+
+// _InitVNodeOpsVector
+void
+FileSystem::_InitVNodeOpsVector(fs_vnode_ops* ops,
+	const FSVNodeCapabilities& capabilities)
+{
+	memcpy(ops, &gUserlandFSVnodeOps, sizeof(fs_vnode_ops));
+
+	#undef CLEAR_UNSUPPORTED
+	#define CLEAR_UNSUPPORTED(capability, op) 	\
+		if (!capabilities.Get(capability))				\
+			ops->op = NULL
+
+	// vnode operations
+	// FS_VNODE_CAPABILITY_LOOKUP: lookup
+	// FS_VNODE_CAPABILITY_GET_VNODE_NAME: get_vnode_name
+		// emulated in userland
+	// FS_VNODE_CAPABILITY_PUT_VNODE: put_vnode
+	// FS_VNODE_CAPABILITY_REMOVE_VNODE: remove_vnode
+		// needed by Volume to clean up
+
+	// asynchronous I/O
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_IO, io);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CANCEL_IO, cancel_io);
+
+	// cache file access
+	ops->get_file_map = NULL;	// never used
+
+	// common operations
+	// FS_VNODE_CAPABILITY_IOCTL: ioctl
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_SET_FLAGS, set_flags);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_SELECT, select);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_DESELECT, deselect);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_FSYNC, fsync);
+
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ_SYMLINK, read_symlink);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE_SYMLINK, create_symlink);
+
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_LINK, link);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_UNLINK, unlink);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_RENAME, rename);
+
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_ACCESS, access);
+	// FS_VNODE_CAPABILITY_READ_STAT: read_stat
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_WRITE_STAT, write_stat);
+
+	// file operations
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE, create);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN, open);
+	// FS_VNODE_CAPABILITY_CLOSE: close
+		// needed by Volume
+	// FS_VNODE_CAPABILITY_FREE_COOKIE: free_cookie
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ, read);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_WRITE, write);
+
+	// directory operations
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE_DIR, create_dir);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_REMOVE_DIR, remove_dir);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN_DIR, open_dir);
+	// FS_VNODE_CAPABILITY_CLOSE_DIR: close_dir
+		// needed by Volume
+	// FS_VNODE_CAPABILITY_FREE_DIR_COOKIE: free_dir_cookie
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ_DIR, read_dir);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_REWIND_DIR, rewind_dir);
+
+	// attribute directory operations
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, open_attr_dir);
+	// FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR: close_attr_dir
+		// needed by Volume
+	// FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE: free_attr_dir_cookie
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ_ATTR_DIR, read_attr_dir);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, rewind_attr_dir);
+
+	// attribute operations
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE_ATTR, create_attr);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN_ATTR, open_attr);
+	// FS_VNODE_CAPABILITY_CLOSE_ATTR: close_attr
+		// needed by Volume
+	// FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE: free_attr_cookie
+		// needed by Volume
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ_ATTR, read_attr);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_WRITE_ATTR, write_attr);
+
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_READ_ATTR_STAT, read_attr_stat);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_WRITE_ATTR_STAT, write_attr_stat);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_RENAME_ATTR, rename_attr);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_REMOVE_ATTR, remove_attr);
+
+	// support for node and FS layers
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE_SPECIAL_NODE,
+		create_special_node);
+	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_GET_SUPER_VNODE, get_super_vnode);
+
+	#undef CLEAR_UNSUPPORTED
+}
+
+
 // _NotificationThreadEntry
 int32
 FileSystem::_NotificationThreadEntry(void* data)
 {
 	return ((FileSystem*)data)->_NotificationThread();
 }
+
 
 // _NotificationThread
 int32

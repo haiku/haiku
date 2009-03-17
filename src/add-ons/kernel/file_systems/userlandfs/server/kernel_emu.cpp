@@ -365,7 +365,8 @@ UserlandFS::KernelEmu::acquire_vnode(dev_t nsid, ino_t vnid)
 
 // new_vnode
 status_t
-UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, void* data)
+UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, void* data,
+	const FSVNodeCapabilities& capabilities)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -384,6 +385,7 @@ UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, void* data)
 	request->nsid = nsid;
 	request->vnid = vnid;
 	request->node = data;
+	request->capabilities = capabilities;
 
 	// send the request
 	UserlandRequestHandler handler(fileSystem, NEW_VNODE_REPLY);
@@ -402,7 +404,7 @@ UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, void* data)
 // publish_vnode
 status_t
 UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data,
-	int type, uint32 flags)
+	int type, uint32 flags, const FSVNodeCapabilities& capabilities)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -423,6 +425,7 @@ UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data,
 	request->node = data;
 	request->type = type;
 	request->flags = flags;
+	request->capabilities = capabilities;
 
 	// send the request
 	UserlandRequestHandler handler(fileSystem, PUBLISH_VNODE_REPLY);
@@ -441,7 +444,8 @@ UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data,
 
 // publish_vnode
 status_t
-UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data)
+UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data,
+	const FSVNodeCapabilities& capabilities)
 {
 	// get the volume
 	Volume* volume = FileSystem::GetInstance()->VolumeWithID(nsid);
@@ -455,7 +459,8 @@ UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid, void* data)
 		return error;
 
 	// publish the node
-	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data, type, 0);
+	return UserlandFS::KernelEmu::publish_vnode(nsid, vnid, data, type, 0,
+		capabilities);
 }
 
 

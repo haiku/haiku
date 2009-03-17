@@ -38,21 +38,24 @@ public:
 									fs_volume* fsVolume);
 								~Volume();
 
-			FileSystem*			GetFileSystem() const;
+	inline	FileSystem*			GetFileSystem() const;
 	inline	dev_t				GetID() const;
 
+	inline	fs_volume_ops*		GetVolumeOps()		{ return &fVolumeOps; }
 	inline	bool				HasCapability(int capability) const;
 
-			void*				GetUserlandVolume() const;
-			ino_t				GetRootID() const;
+	inline	void*				GetUserlandVolume() const;
+	inline	ino_t				GetRootID() const;
 
 			// client methods
 			status_t			GetVNode(ino_t vnid, void** node);
 			status_t			PutVNode(ino_t vnid);
 			status_t			AcquireVNode(ino_t vnid);
-			status_t			NewVNode(ino_t vnid, void* node);
+			status_t			NewVNode(ino_t vnid, void* node,
+									const FSVNodeCapabilities& capabilities);
 			status_t			PublishVNode(ino_t vnid, void* node,
-									int type, uint32 flags);
+									int type, uint32 flags,
+									const FSVNodeCapabilities& capabilities);
 			status_t			RemoveVNode(ino_t vnid);
 			status_t			UnremoveVNode(ino_t vnid);
 			status_t			GetVNodeRemoved(ino_t vnid, bool* removed);
@@ -88,7 +91,8 @@ public:
 			status_t			GetVNodeName(void* node, char* buffer,
 									size_t bufferSize);
 			status_t			ReadVNode(ino_t vnid, bool reenter,
-									void** node, int* type, uint32* flags);
+									void** node, fs_vnode_ops** _ops, int* type,
+									uint32* flags);
 			status_t			WriteVNode(void* node, bool reenter);
 			status_t			RemoveVNode(void* node, bool reenter);
 
@@ -227,6 +231,8 @@ private:
 			friend class IORequestRemover;
 
 private:
+			void				_InitVolumeOps();
+
 			status_t			_Mount(const char* device, uint32 flags,
 									const char* parameters);
 			status_t			_Unmount();
@@ -289,6 +295,7 @@ private:
 			FileSystem*			fFileSystem;
 			fs_volume*			fFSVolume;
 			FSVolumeCapabilities fCapabilities;
+			fs_volume_ops		fVolumeOps;
 			void*				fUserlandVolume;
 			ino_t				fRootID;
 			VNode*				fRootNode;
@@ -314,10 +321,35 @@ Volume::GetID() const
 }
 
 
+// GetFileSystem
+inline FileSystem*
+Volume::GetFileSystem() const
+{
+	return fFileSystem;
+}
+
+
+// HasCapability
 inline bool
 Volume::HasCapability(int capability) const
 {
 	return fCapabilities.Get(capability);
+}
+
+
+// GetUserlandVolume
+inline void*
+Volume::GetUserlandVolume() const
+{
+	return fUserlandVolume;
+}
+
+
+// GetRootID
+inline ino_t
+Volume::GetRootID() const
+{
+	return fRootID;
 }
 
 

@@ -4,6 +4,9 @@
 
 #include <OS.h>
 
+#include "FSCapabilities.h"
+
+
 struct selectsync;
 struct file_io_vec;
 
@@ -24,10 +27,12 @@ status_t notify_query(port_id port, int32 token, int32 operation,
 status_t get_vnode(dev_t nsid, ino_t vnid, void** node);
 status_t put_vnode(dev_t nsid, ino_t vnid);
 status_t acquire_vnode(dev_t nsid, ino_t vnodeID);
-status_t new_vnode(dev_t nsid, ino_t vnid, void* data);
+status_t new_vnode(dev_t nsid, ino_t vnid, void* data,
+	const FSVNodeCapabilities& capabilities);
 status_t publish_vnode(dev_t nsid, ino_t vnid, void* data, int type,
-	uint32 flags);
-status_t publish_vnode(dev_t nsid, ino_t vnid, void* data);
+	uint32 flags, const FSVNodeCapabilities& capabilities);
+status_t publish_vnode(dev_t nsid, ino_t vnid, void* data,
+	const FSVNodeCapabilities& capabilities);
 status_t remove_vnode(dev_t nsid, ino_t vnid);
 status_t unremove_vnode(dev_t nsid, ino_t vnid);
 status_t get_vnode_removed(dev_t nsid, ino_t vnid, bool* removed);

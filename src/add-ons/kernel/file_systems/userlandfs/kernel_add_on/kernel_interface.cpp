@@ -105,7 +105,7 @@ userlandfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	}
 
 	fsVolume->private_volume = volume;
-	fsVolume->ops = &gUserlandFSVolumeOps;
+	fsVolume->ops = volume->GetVolumeOps();
 	*rootVnodeID = volume->GetRootID();
 
 	PRINT(("userlandfs_mount() done: %p, %lld\n", fsVolume->private_volume,
@@ -207,10 +207,12 @@ userlandfs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 	PRINT(("userlandfs_get_vnode(%p, %lld, %p, %d)\n", volume, vnid,
 		fsNode->private_node, reenter));
 	void* node;
-	status_t error = volume->ReadVNode(vnid, reenter, &node, _type, _flags);
+	fs_vnode_ops* ops;
+	status_t error = volume->ReadVNode(vnid, reenter, &node, &ops, _type,
+		_flags);
 	if (error == B_OK) {
 		fsNode->private_node = node;
-		fsNode->ops = &gUserlandFSVnodeOps;
+		fsNode->ops = ops;
 	}
 
 	PRINT(("userlandfs_get_vnode() done: (%lx, %p)\n", error, node));

@@ -1,5 +1,7 @@
-// BeOSKernelVolume.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_BEOS_KERNEL_VOLUME_H
 #define USERLAND_FS_BEOS_KERNEL_VOLUME_H
 
@@ -8,6 +10,9 @@
 struct beos_vnode_ops;
 
 namespace UserlandFS {
+
+class BeOSKernelFileSystem;
+
 
 class BeOSKernelVolume : public Volume {
 public:
@@ -33,7 +38,8 @@ public:
 									// the three parameters publish_vnode() is
 									// used.
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
-									void** node, int* type, uint32* flags);
+									void** node, int* type, uint32* flags,
+									FSVNodeCapabilities* _capabilities);
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
 
@@ -154,6 +160,7 @@ private:
 			status_t			_OpenAttr(void* node, const char* name,
 									uint32 type, int openMode, bool create,
 									void** cookie);
+	inline	BeOSKernelFileSystem* _FileSystem() const;
 
 private:
 			beos_vnode_ops*		fFSOps;
