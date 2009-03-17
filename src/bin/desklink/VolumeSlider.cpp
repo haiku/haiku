@@ -323,6 +323,7 @@ SliderView::SliderView(BRect rect, BMessage *msg, const char *title,
 	fButtonBitmap.SetBits(kButtonBits, kButtonWidth * kButtonHeight, 0, B_CMAP8);
 
 	SetValue(value);
+	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
@@ -381,8 +382,10 @@ SliderView::Draw(BRect updateRect)
 void
 SliderView::MouseDown(BPoint point)
 {
-	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-	SetTracking(true);
+	if (Bounds().Contains(point)) 
+		SetTracking(true);
+	else 
+		Invoke();
 }
 
 
