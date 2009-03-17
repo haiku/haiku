@@ -33,10 +33,14 @@ public:
 
 			const Info*			GetInfo() const;
 
-			void*				GetBuffer() const;
-			int32				GetCapacity() const;
+			void*				GetBuffer() const	{ return fBuffer; }
+			int32				GetCapacity() const	{ return fCapacity; }
 
-			status_t			Send(int32 size);
+			void				Reserve(int32 endOffset);
+			void				Unreserve(int32 endOffset);
+			int32				ReservedSize() const { return fReservedSize; }
+
+			status_t			Send(const void* message, int32 size);
 			status_t			Receive(void** _message, size_t* _size,
 									bigtime_t timeout = -1);
 
@@ -46,6 +50,7 @@ private:
 			Info				fInfo;
 			uint8*				fBuffer;
 			int32				fCapacity;
+			int32				fReservedSize;
 			status_t			fInitStatus;
 			bool				fOwner;
 };

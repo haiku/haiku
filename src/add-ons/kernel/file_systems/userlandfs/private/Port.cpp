@@ -21,10 +21,12 @@ static const int32 kMaxPortSize = 64 * 1024;	// 64 kB
 
 // constructor
 Port::Port(int32 size)
-	: fBuffer(NULL),
-	  fCapacity(0),
-	  fInitStatus(B_NO_INIT),
-	  fOwner(true)
+	:
+	fBuffer(NULL),
+	fCapacity(0),
+	fReservedSize(0),
+	fInitStatus(B_NO_INIT),
+	fOwner(true)
 {
 	// adjust size to be within the sane bounds
 	if (size < kMinPortSize)
@@ -57,10 +59,12 @@ Port::Port(int32 size)
 
 // constructor
 Port::Port(const Info* info)
-	: fBuffer(NULL),
-	  fCapacity(0),
-	  fInitStatus(B_NO_INIT),
-	  fOwner(false)
+	:
+	fBuffer(NULL),
+	fCapacity(0),
+	fReservedSize(0),
+	fInitStatus(B_NO_INIT),
+	fOwner(false)
 {
 	// check parameters
 	if (!info || info->owner_port < 0 || info->client_port < 0
@@ -126,35 +130,39 @@ Port::GetInfo() const
 }
 
 
-// GetBuffer
-void*
-Port::GetBuffer() const
+// Reserve
+void
+Port::Reserve(int32 endOffset)
 {
-	return fBuffer;
+	if (endOffset > fReservedSize)
+		fReservedSize = endOffset;
 }
 
 
-// GetCapacity
-int32
-Port::GetCapacity() const
+// Unreserve
+void
+Port::Unreserve(int32 endOffset)
 {
-	return fCapacity;
+	if (endOffset < fReservedSize)
+		fReservedSize = endOffset;
 }
 
 
 // Send
 status_t
-Port::Send(int32 size)
+Port::Send(const void* message, int32 size)
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
-	if (size <= 0 || size > fCapacity)
+	if (size <= 0)
 		return B_BAD_VALUE;
+
 	port_id port = (fOwner ? fInfo.client_port : fInfo.owner_port);
 	status_t error;
 	do {
-		error = write_port(port, 0, fBuffer, size);
+		error = write_port(port, 0, message, size);
 	} while (error == B_INTERRUPTED);
+
 	return (fInitStatus = error);
 }
 

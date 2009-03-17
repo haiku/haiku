@@ -61,6 +61,8 @@ private:
 			Port*				fPort;
 			Request*			fRequest;
 			int32				fRequestSize;
+			int32				fPortReservedOffset;
+			int32				fRequestOffset;
 			area_id				fAllocatedAreas[MAX_REQUEST_ADDRESS_COUNT];
 			int32				fAllocatedAreaCount;
 			DeferredInitInfo	fDeferredInitInfos[MAX_REQUEST_ADDRESS_COUNT];

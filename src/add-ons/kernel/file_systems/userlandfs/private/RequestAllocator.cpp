@@ -14,13 +14,15 @@
 
 // constructor
 RequestAllocator::RequestAllocator(Port* port)
-	: fError(B_NO_INIT),
-	  fPort(NULL),
-	  fRequest(NULL),
-	  fRequestSize(0),
-	  fAllocatedAreaCount(0),
-	  fDeferredInitInfoCount(0),
-	  fRequestInPortBuffer(false)
+	:
+	fError(B_NO_INIT),
+	fPort(NULL),
+	fRequest(NULL),
+	fRequestSize(0),
+	fPortReservedOffset(0),
+	fAllocatedAreaCount(0),
+	fDeferredInitInfoCount(0),
+	fRequestInPortBuffer(false)
 {
 	Init(port);
 }
@@ -39,6 +41,7 @@ RequestAllocator::Init(Port* port)
 	if (port) {
 		fPort = port;
 		fError = fPort->InitCheck();
+		fPortReservedOffset = fPort->ReservedSize();
 	}
 	return fError;
 }
@@ -47,20 +50,26 @@ RequestAllocator::Init(Port* port)
 void
 RequestAllocator::Uninit()
 {
-	if (!fRequestInPortBuffer)
+	if (fRequestInPortBuffer)
+		fPort->Unreserve(fPortReservedOffset);
+	else
 		free(fRequest);
+
 	for (int32 i = 0; i < fAllocatedAreaCount; i++)
 		delete_area(fAllocatedAreas[i]);
 	fAllocatedAreaCount = 0;
+
 	for (int32 i = 0; i < fDeferredInitInfoCount; i++) {
 		if (fDeferredInitInfos[i].inPortBuffer)
 			free(fDeferredInitInfos[i].data);
 	}
+
 	fDeferredInitInfoCount = 0;
 	fError = B_NO_INIT;
 	fPort = NULL;
 	fRequest = NULL;
 	fRequestSize = 0;
+	fPortReservedOffset = 0;
 }
 
 // Error
@@ -96,11 +105,18 @@ RequestAllocator::AllocateRequest(int32 size)
 {
 	if (fError != B_OK)
 		RETURN_ERROR(fError);
-	if (size < (int32)sizeof(Request) || size > fPort->GetCapacity())
+
+	fRequestOffset = (fPortReservedOffset + 7) / 8 * 8;
+
+	if (size < (int32)sizeof(Request)
+		|| fRequestOffset + size > fPort->GetCapacity()) {
 		RETURN_ERROR(fError = B_BAD_VALUE);
-	fRequest = (Request*)fPort->GetBuffer();
+	}
+
+	fRequest = (Request*)((uint8*)fPort->GetBuffer() + fRequestOffset);
 	fRequestSize = size;
 	fRequestInPortBuffer = true;
+	fPort->Reserve(fRequestOffset + fRequestSize);
 	return B_OK;
 }
 
@@ -129,6 +145,7 @@ RequestAllocator::ReadRequest(bigtime_t timeout)
 
 	// init the request
 	fRequest = (Request*)message;
+	fRequestOffset = 0;
 	fRequestSize = messageSize;
 	fRequestInPortBuffer = false;
 
@@ -185,9 +202,10 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 	// get the next free aligned offset in the port buffer
 	int32 offset = (fRequestSize + align - 1) / align * align;
 	// allocate the data
-	if (offset + size <= fPort->GetCapacity()) {
+	if (fRequestOffset + offset + size <= fPort->GetCapacity()) {
 		// there's enough free space in the port buffer
 		fRequestSize = offset + size;
+		fPort->Reserve(fRequestOffset + fRequestSize);
 		if (deferredInit) {
 			DeferredInitInfo& info
 				= fDeferredInitInfos[fDeferredInitInfoCount];

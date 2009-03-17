@@ -77,9 +77,8 @@ RequestPort::SendRequest(RequestAllocator* allocator)
 	// check initialization and parameters
 	if (InitCheck() != B_OK)
 		RETURN_ERROR(InitCheck());
-	if (!allocator || allocator->GetRequest() != fPort.GetBuffer()
-		|| allocator->GetRequestSize() < (int32)sizeof(Request)
-		|| allocator->GetRequestSize() > fPort.GetCapacity()) {
+	if (!allocator || allocator->GetRequest() == NULL
+		|| allocator->GetRequestSize() < (int32)sizeof(Request)) {
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 	allocator->FinishDeferredInit();
@@ -97,7 +96,8 @@ RequestPort::SendRequest(RequestAllocator* allocator)
 		debugger("Request is not a kernel request.");
 	}
 #endif
-	RETURN_ERROR(fPort.Send(allocator->GetRequestSize()));
+	RETURN_ERROR(fPort.Send(allocator->GetRequest(),
+		allocator->GetRequestSize()));
 }
 
 // SendRequest
