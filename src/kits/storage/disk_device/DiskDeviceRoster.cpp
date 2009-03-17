@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,12 +7,13 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+#include <DiskDeviceRoster.h>
+
 #include <new>
 
 #include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
-#include <DiskDeviceRoster.h>
 #include <DiskSystem.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -24,7 +25,6 @@
 #include <syscalls.h>
 #include <ddm_userland_interface_defs.h>
 
-//#include "AddOnImage.h"
 
 /*!	\class BDiskDeviceRoster
 	\brief An interface for iterating through the disk devices known to the
@@ -35,7 +35,7 @@
 /*!	\brief find_directory constants of the add-on dirs to be searched. */
 static const directory_which kAddOnDirs[] = {
 	B_USER_ADDONS_DIRECTORY,
-//	B_COMMON_ADDONS_DIRECTORY,
+	B_COMMON_ADDONS_DIRECTORY,
 	B_BEOS_ADDONS_DIRECTORY
 };
 /*!	\brief Size of the kAddOnDirs array. */
@@ -43,7 +43,6 @@ static const int32 kAddOnDirCount
 	= sizeof(kAddOnDirs) / sizeof(directory_which);
 
 
-// constructor
 /*!	\brief Creates a BDiskDeviceRoster object.
 
 	The object is ready to be used after construction.
@@ -59,7 +58,7 @@ BDiskDeviceRoster::BDiskDeviceRoster()
 {
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with the object.
 */
 BDiskDeviceRoster::~BDiskDeviceRoster()
@@ -70,7 +69,7 @@ BDiskDeviceRoster::~BDiskDeviceRoster()
 //		delete fFSAddOnDir;
 }
 
-// GetNextDevice
+
 /*!	\brief Returns the next BDiskDevice.
 	\param device Pointer to a pre-allocated BDiskDevice to be initialized to
 		   represent the next device.
@@ -81,19 +80,21 @@ BDiskDeviceRoster::~BDiskDeviceRoster()
 	- another error code
 */
 status_t
-BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
+BDiskDeviceRoster::GetNextDevice(BDiskDevice* device)
 {
 	if (!device)
 		return B_BAD_VALUE;
+
 	size_t neededSize = 0;
 	partition_id id = _kern_get_next_disk_device_id(&fDeviceCookie,
 		&neededSize);
 	if (id < 0)
 		return id;
+
 	return device->_SetTo(id, true, neededSize);
 }
 
-// RewindDevices
+
 /*!	\brief Rewinds the device list iterator.
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
@@ -147,23 +148,23 @@ BDiskDeviceRoster::GetDiskSystem(BDiskSystem* system, const char* name)
 
 
 partition_id
-BDiskDeviceRoster::RegisterFileDevice(const char *filename)
+BDiskDeviceRoster::RegisterFileDevice(const char* filename)
 {
 	if (!filename)
 		return B_BAD_VALUE;
 	return _kern_register_file_device(filename);
 }
 
-// UnregisterFileDevice
+
 status_t
-BDiskDeviceRoster::UnregisterFileDevice(const char *filename)
+BDiskDeviceRoster::UnregisterFileDevice(const char* filename)
 {
 	if (!filename)
 		return B_BAD_VALUE;
 	return _kern_unregister_file_device(-1, filename);
 }
 
-// UnregisterFileDevice
+
 status_t
 BDiskDeviceRoster::UnregisterFileDevice(partition_id device)
 {
@@ -172,7 +173,7 @@ BDiskDeviceRoster::UnregisterFileDevice(partition_id device)
 	return _kern_unregister_file_device(device, NULL);
 }
 
-// VisitEachDevice
+
 /*!	\brief Iterates through the all devices.
 
 	The supplied visitor's Visit(BDiskDevice*) is invoked for each device.
@@ -186,15 +187,15 @@ BDiskDeviceRoster::UnregisterFileDevice(partition_id device)
 	\return \c true, if the iteration was terminated, \c false otherwise.
 */
 bool
-BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
-	BDiskDevice *device)
+BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor* visitor,
+	BDiskDevice* device)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
 		int32 oldCookie = fDeviceCookie;
 		fDeviceCookie = 0;
 		BDiskDevice deviceOnStack;
-		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
+		BDiskDevice* useDevice = device ? device : &deviceOnStack;
 		while (!terminatedEarly && GetNextDevice(useDevice) == B_OK)
 			terminatedEarly = visitor->Visit(useDevice);
 		fDeviceCookie = oldCookie;
@@ -204,7 +205,7 @@ BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 	return terminatedEarly;
 }
 
-// VisitEachPartition
+
 /*!	\brief Pre-order traverses the trees spanned by the BDiskDevices and their
 		   subobjects.
 
@@ -224,16 +225,16 @@ BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 	\return \c true, if the iteration was terminated, \c false otherwise.
 */
 bool
-BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
-	BDiskDevice *device, BPartition **partition)
+BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor* visitor,
+	BDiskDevice* device, BPartition** partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
 		int32 oldCookie = fDeviceCookie;
 		fDeviceCookie = 0;
 		BDiskDevice deviceOnStack;
-		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
-		BPartition *foundPartition = NULL;
+		BDiskDevice* useDevice = device ? device : &deviceOnStack;
+		BPartition* foundPartition = NULL;
 		while (GetNextDevice(useDevice) == B_OK) {
 			foundPartition = useDevice->VisitEachDescendant(visitor);
 			if (foundPartition) {
@@ -250,7 +251,7 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 	return terminatedEarly;
 }
 
-// VisitEachMountedPartition
+
 /*!	\brief Iterates through the all devices' partitions that are mounted.
 
 	The supplied visitor's Visit(BPartition*) is invoked for each mounted
@@ -269,8 +270,8 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 	\return \c true, if the iteration was terminated, \c false otherwise.
 */
 bool
-BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
-	BDiskDevice *device, BPartition **partition)
+BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor* visitor,
+	BDiskDevice* device, BPartition** partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -285,7 +286,7 @@ BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 	return terminatedEarly;
 }
 
-// VisitEachMountablePartition
+
 /*!	\brief Iterates through the all devices' partitions that are mountable.
 
 	The supplied visitor's Visit(BPartition*) is invoked for each mountable
@@ -304,8 +305,8 @@ BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 	\return \c true, if the iteration was terminated, \c false otherwise.
 */
 bool
-BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
-	BDiskDevice *device, BPartition **partition)
+BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor* visitor,
+	BDiskDevice* device, BPartition** partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -386,14 +387,14 @@ BDiskDeviceRoster::FindPartitionByMountPoint(const char* mountPoint,
 	- other error codes
 */
 status_t
-BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice *device) const
+BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice* device) const
 {
 	if (!device)
 		return B_BAD_VALUE;
 	return device->_SetTo(id, true, 0);
 }
 
-// GetPartitionWithID
+
 /*!	\brief Returns a BPartition for a given ID.
 
 	The supplied \a device is initialized to the device the partition
@@ -411,53 +412,61 @@ BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice *device) const
 	- other error codes
 */
 status_t
-BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
-									  BPartition **partition) const
+BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice* device,
+	BPartition** partition) const
 {
 	if (!device || !partition)
 		return B_BAD_VALUE;
-	// download the device data
+
+	// retrieve the device data
 	status_t error = device->_SetTo(id, false, 0);
 	if (error != B_OK)
 		return error;
+
 	// find the partition object
 	*partition = device->FindDescendant(id);
 	if (!*partition)	// should never happen!
 		return B_ENTRY_NOT_FOUND;
+
 	return B_OK;
 }
 
 
 status_t
-BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device)
+BDiskDeviceRoster::GetDeviceForPath(const char* filename, BDiskDevice* device)
 {
 	if (!filename || !device)
 		return B_BAD_VALUE;
+
 	// get the device ID
 	size_t neededSize = 0;
 	partition_id id = _kern_find_disk_device(filename, &neededSize);
 	if (id < 0)
 		return id;
-	// download the device data
+
+	// retrieve the device data
 	return device->_SetTo(id, true, neededSize);
 }
 
 
 status_t
-BDiskDeviceRoster::GetPartitionForPath(const char *filename,
-	BDiskDevice *device, BPartition **partition)
+BDiskDeviceRoster::GetPartitionForPath(const char* filename,
+	BDiskDevice* device, BPartition** partition)
 {
 	if (!filename || !device || !partition)
 		return B_BAD_VALUE;
+
 	// get the partition ID
 	size_t neededSize = 0;
 	partition_id id = _kern_find_partition(filename, &neededSize);
 	if (id < 0)
 		return id;
-	// download the device data
+
+	// retrieve the device data
 	status_t error = device->_SetTo(id, false, neededSize);
 	if (error != B_OK)
 		return error;
+
 	// find the partition object
 	*partition = device->FindDescendant(id);
 	if (!*partition)	// should never happen!
@@ -467,8 +476,8 @@ BDiskDeviceRoster::GetPartitionForPath(const char *filename,
 
 
 status_t
-BDiskDeviceRoster::GetFileDeviceForPath(const char *filename,
-	BDiskDevice *device)
+BDiskDeviceRoster::GetFileDeviceForPath(const char* filename,
+	BDiskDevice* device)
 {
 	if (!filename || !device)
 		return B_BAD_VALUE;
@@ -479,12 +488,11 @@ BDiskDeviceRoster::GetFileDeviceForPath(const char *filename,
 	if (id < 0)
 		return id;
 
-	// download the device data
+	// retrieve the device data
 	return device->_SetTo(id, true, neededSize);
 }
 
 
-// StartWatching
 /*!	\brief Adds a target to the list of targets to be notified on disk device
 		   events.
 
@@ -503,33 +511,11 @@ BDiskDeviceRoster::GetFileDeviceForPath(const char *filename,
 status_t
 BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 {
-/*	status_t error = B_OK;
-	// compose request message
-	BMessage request(B_REG_DEVICE_START_WATCHING);
-	if (error == B_OK)
-		error = request.AddMessenger("target", target);
-	if (error == B_OK)
-		error = request.AddInt32("events", (int32)eventMask);
-	// send request
-	BMessage reply;
-	if (error == B_OK)
-		error = fManager.SendMessage(&request, &reply);
-	// analyze reply
-	if (error == B_OK) {
-		// result
-		status_t result = B_OK;
-		error = reply.FindInt32("result", &result);
-		if (error == B_OK)
-			error = result;
-	}
-	return error;
-*/
 	// not implemented
 	return B_ERROR;
 }
 
 
-// StopWatching
 /*!	\brief Remove a target from the list of targets to be notified on disk
 		   device events.
 	\param target A BMessenger identifying the target to which notfication
@@ -539,33 +525,12 @@ BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 status_t
 BDiskDeviceRoster::StopWatching(BMessenger target)
 {
-/*	status_t error = B_OK;
-	// compose request message
-	BMessage request(B_REG_DEVICE_STOP_WATCHING);
-	if (error == B_OK)
-		error = request.AddMessenger("target", target);
-	// send request
-	BMessage reply;
-	if (error == B_OK)
-		error = fManager.SendMessage(&request, &reply);
-	// analyze reply
-	if (error == B_OK) {
-		// result
-		status_t result = B_OK;
-		error = reply.FindInt32("result", &result);
-		if (error == B_OK)
-			error = result;
-	}
-	return error;
-*/
 	// not implemented
 	return B_ERROR;
 }
 
-
 #if 0
 
-// GetNextPartitioningSystem
 /*!	\brief Returns the next partitioning system capable of partitioning.
 
 	The returned \a shortName can be passed to BSession::Partition().
@@ -626,7 +591,7 @@ BDiskDeviceRoster::GetNextPartitioningSystem(char *shortName, char *longName)
 	return error;
 }
 
-// GetNextFileSystem
+
 /*!	\brief Returns the next file system capable of initializing.
 
 	The returned \a shortName can be passed to BPartition::Initialize().
@@ -685,7 +650,7 @@ BDiskDeviceRoster::GetNextFileSystem(char *shortName, char *longName)
 	return error;
 }
 
-// RewindPartitiningSystems
+
 /*!	\brief Rewinds the partitioning system list iterator.
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
@@ -700,7 +665,7 @@ BDiskDeviceRoster::RewindPartitiningSystems()
 	return B_OK;
 }
 
-// RewindFileSystems
+
 /*!	\brief Rewinds the file system list iterator.
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
@@ -715,7 +680,7 @@ BDiskDeviceRoster::RewindFileSystems()
 	return B_OK;
 }
 
-// _GetObjectWithID
+
 /*!	\brief Returns a BDiskDevice for a given device, session or partition ID.
 
 	The supplied \a device is initialized to the device the object identified
@@ -734,7 +699,7 @@ BDiskDeviceRoster::RewindFileSystems()
 */
 status_t
 BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
-									BDiskDevice *device) const
+	BDiskDevice *device) const
 {
 	status_t error = (device ? B_OK : B_BAD_VALUE);
 	// compose request message
@@ -763,7 +728,6 @@ BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
 }
 
 
-// _GetNextAddOn
 /*!	\brief Finds and loads the next add-on of an add-on subdirectory.
 	\param directory The add-on directory.
 	\param image Pointer to an image_id into which the image ID of the loaded
@@ -775,7 +739,7 @@ BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
 */
 status_t
 BDiskDeviceRoster::_GetNextAddOn(BDirectory **directory, int32 *index,
-								 const char *subdir, AddOnImage *image)
+	const char *subdir, AddOnImage *image)
 {
 	status_t error = (directory && index && subdir && image
 					  ? B_OK : B_BAD_VALUE);
@@ -797,7 +761,7 @@ BDiskDeviceRoster::_GetNextAddOn(BDirectory **directory, int32 *index,
 	return error;
 }
 
-// _GetNextAddOn
+
 /*!	\brief Finds and loads the next add-on of an add-on subdirectory.
 	\param directory The add-on directory.
 	\param image Pointer to an image_id into which the image ID of the loaded
@@ -825,7 +789,7 @@ BDiskDeviceRoster::_GetNextAddOn(BDirectory *directory, AddOnImage *image)
 	return error;
 }
 
-// _GetNextAddOnDir
+
 /*!	\brief Gets the next add-on directory path.
 	\param path Pointer to a BPath to be set to the found directory.
 	\param index Pointer to an index into the kAddOnDirs array indicating
@@ -839,7 +803,7 @@ BDiskDeviceRoster::_GetNextAddOn(BDirectory *directory, AddOnImage *image)
 */
 status_t
 BDiskDeviceRoster::_GetNextAddOnDir(BPath *path, int32 *index,
-									const char *subdir)
+	const char *subdir)
 {
 	status_t error = (*index < kAddOnDirCount ? B_OK : B_ENTRY_NOT_FOUND);
 	// get the add-on dir path
@@ -858,7 +822,7 @@ printf("  next add-on dir: `%s'\n", path->Path());
 	return error;
 }
 
-// _GetNextAddOnDir
+
 /*!	\brief Gets the next add-on directory.
 	\param directory Pointer to a BDirectory* to be set to the found directory.
 	\param index Pointer to an index into the kAddOnDirs array indicating
@@ -872,7 +836,7 @@ printf("  next add-on dir: `%s'\n", path->Path());
 */
 status_t
 BDiskDeviceRoster::_GetNextAddOnDir(BDirectory **directory, int32 *index,
-									const char *subdir)
+	const char *subdir)
 {
 	BPath path;
 	status_t error = _GetNextAddOnDir(&path, index, subdir);
@@ -893,14 +857,14 @@ BDiskDeviceRoster::_GetNextAddOnDir(BDirectory **directory, int32 *index,
 	return error;
 }
 
-// _LoadPartitionAddOn
+
 status_t
 BDiskDeviceRoster::_LoadPartitionAddOn(const char *partitioningSystem,
-									   AddOnImage *image,
-									   BDiskScannerPartitionAddOn **_addOn)
+	AddOnImage *image, BDiskScannerPartitionAddOn **_addOn)
 {
-	status_t error = (partitioningSystem && image && _addOn
-		? B_OK : B_BAD_VALUE);
+	status_t error = partitioningSystem && image && _addOn
+		? B_OK : B_BAD_VALUE;
+
 	// load the image
 	bool found = false;
 	BPath path;
