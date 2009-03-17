@@ -322,28 +322,12 @@ SliderView::SliderView(BRect rect, BMessage *msg, const char *title,
 	fRightBitmap.SetBits(kRightBits, kRightWidth * kRightHeight, 0, B_CMAP8);
 	fButtonBitmap.SetBits(kButtonBits, kButtonWidth * kButtonHeight, 0, B_CMAP8);
 
-	SetTracking(true);
 	SetValue(value);
-	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
 SliderView::~SliderView()
 {
-}
-
-
-void
-SliderView::Pulse()
-{
-	uint32 mouseButtons;
-	BPoint where;
-	GetMouse(&where, &mouseButtons, true);
-	// button not pressed, exit
-	if (!(mouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
-		SetTracking(false);
-		Invoke();
-	}
 }
 
 
@@ -391,6 +375,14 @@ SliderView::Draw(BRect updateRect)
 	Sync();
 
 	SetDrawingMode(B_OP_COPY);
+}
+
+
+void
+SliderView::MouseDown(BPoint point)
+{
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	SetTracking(true);
 }
 
 
