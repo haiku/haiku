@@ -155,8 +155,15 @@ struct FSCapabilitiesBase {
 	inline	void				Clear(uint32 capability);
 	inline	bool				Get(uint32 capability) const;
 
+	inline	uint32				GetHashCode() const;
+
+	inline	bool				operator==(
+									const FSCapabilitiesBase<CapabilityCount>&
+										other) const;
+
 	inline	void				Dump() const;
 };
+
 
 // ClearAll
 template<const int CapabilityCount>
@@ -165,6 +172,7 @@ FSCapabilitiesBase<CapabilityCount>::ClearAll()
 {
 	memset(capabilities, 0, sizeof(capabilities));
 }
+
 
 // Set
 template<const int CapabilityCount>
@@ -181,6 +189,7 @@ FSCapabilitiesBase<CapabilityCount>::Set(uint32 capability, bool set)
 		capabilities[capability / 8] &= ~flag;
 }
 
+
 // Clear
 template<const int CapabilityCount>
 inline void
@@ -188,6 +197,7 @@ FSCapabilitiesBase<CapabilityCount>::Clear(uint32 capability)
 {
 	Set(capability, false);
 }
+
 
 // Get
 template<const int CapabilityCount>
@@ -200,6 +210,37 @@ FSCapabilitiesBase<CapabilityCount>::Get(uint32 capability) const
 	uint8 flag = uint8(1 << (capability % 8));
 	return (capabilities[capability / 8] & flag);
 }
+
+
+// GetHashCode
+template<const int CapabilityCount>
+inline uint32
+FSCapabilitiesBase<CapabilityCount>::GetHashCode() const
+{
+	uint32 hashCode = 0;
+	int byteCount = sizeof(capabilities);
+	for (int i = 0; i < byteCount; i++)
+		hashCode = hashCode * 37 + capabilities[i];
+
+	return hashCode;
+}
+
+
+// ==
+template<const int CapabilityCount>
+inline bool
+FSCapabilitiesBase<CapabilityCount>::operator==(
+	const FSCapabilitiesBase<CapabilityCount>& other) const
+{
+	int byteCount = sizeof(capabilities);
+	for (int i = 0; i < byteCount; i++) {
+		if (capabilities[i] != other.capabilities[i])
+			return false;
+	}
+
+	return true;
+}
+
 
 // Dump
 template<const int CapabilityCount>
