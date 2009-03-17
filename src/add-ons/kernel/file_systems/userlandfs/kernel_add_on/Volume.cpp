@@ -53,6 +53,7 @@ struct Volume::VNode : HashTableLink<VNode> {
 	VNodeOps*	ops;
 	int32		useCount;
 	bool		valid;
+	bool		published;
 
 	VNode(ino_t id, void* clientNode, VNodeOps* ops)
 		:
@@ -61,7 +62,8 @@ struct Volume::VNode : HashTableLink<VNode> {
 		fileCache(NULL),
 		ops(ops),
 		useCount(0),
-		valid(true)
+		valid(true),
+		published(true)
 	{
 	}
 
@@ -355,6 +357,8 @@ PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
 		RETURN_ERROR(B_NO_MEMORY);
 	}
 
+	node->published = false;
+
 	locker.Unlock();
 
 	// tell the VFS
@@ -367,6 +371,12 @@ PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
 	// add the node to our map
 	locker.Lock();
 	fVNodes->Insert(node);
+
+	// Increment its use count. After new_vnode() the caller has a reference,
+	// but a subsequent publish_vnode() won't get another one. We handle that
+	// there.
+	if (fVNodeCountingEnabled)
+		node->useCount++;
 
 	return B_OK;
 }
@@ -382,7 +392,13 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 	VNode* node = fVNodes->Lookup(vnid);
 	bool nodeKnown = node != NULL;
 
-	if (!nodeKnown) {
+	if (nodeKnown) {
+		if (node->published) {
+			WARN(("publish_vnode(): vnode (%ld, %lld) already published!\n",
+				GetID(), vnid));
+			RETURN_ERROR(B_BAD_VALUE);
+		}
+	} else if (!nodeKnown) {
 		// The node is not yet known -- create it.
 
 		// get the ops vector for the node
@@ -404,21 +420,29 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 	status_t error = publish_vnode(fFSVolume, vnid, node, node->ops->ops,
 		type, flags);
 	if (error != B_OK) {
-// TODO: We should note whether the node was made known via new_vnode(). If so,
-// we should remove and delete it here!
-		if (!nodeKnown)
+		if (nodeKnown) {
+			// The node was known, i.e. it had been made known via new_vnode()
+			// and thus already had a use count of 1. Decrement that use count
+			// and remove the node completely.
+			_DecrementVNodeCount(vnid);
+			_RemoveInvalidVNode(vnid);
+		} else
 			node->Delete(this);
 		RETURN_ERROR(error);
 	}
 
 	// add the node to our map, if not known yet
 	locker.Lock();
-	if (!nodeKnown)
+	if (nodeKnown) {
+		// The node is now published. Don't increment its use count. It already
+		// has 1 from new_vnode() and this publish_vnode() didn't increment it.
+		node->published = true;
+	} else {
+		// New node: increment its use count and add it to the map.
+		if (fVNodeCountingEnabled)
+			node->useCount++;
 		fVNodes->Insert(node);
-
-	// increments its use count
-	if (fVNodeCountingEnabled)
-		node->useCount++;
+	}
 
 	return B_OK;
 }
@@ -4351,8 +4375,10 @@ Volume::_RemoveInvalidVNode(ino_t vnid)
 	locker.Unlock();
 
 	// release all references acquired so far
-	for (; vnode->useCount > 0; vnode->useCount--)
-		put_vnode(fFSVolume, vnid);
+	if (fVNodeCountingEnabled) {
+		for (; vnode->useCount > 0; vnode->useCount--)
+			put_vnode(fFSVolume, vnid);
+	}
 
 	vnode->Delete(this);
 }
@@ -4430,16 +4456,27 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 	// beginning.
 	// TODO: Optimize by extracting batches of relevant nodes to an on-stack
 	// array.
-	bool nodeFound = false;
+	bool nodeFound;
 	do {
+		nodeFound = false;
+
 		// get the next node to put
 		for (VNodeMap::Iterator it = fVNodes->GetIterator();
 				VNode* vnode = it.Next();) {
 			if (vnode->useCount > 0) {
 				ino_t vnid = vnode->id;
 				int32 count = vnode->useCount;
+				vnode->useCount = 0;
+				fs_vnode_ops* ops = vnode->ops->ops;
+				bool published = vnode->published;
 
 				locker.Unlock();
+
+				// If the node has not yet been published, we have to do that
+				// before putting otherwise the VFS will complain that the node
+				// is busy when the last reference is gone.
+				if (!published)
+					publish_vnode(fFSVolume, vnid, vnode, ops, S_IFDIR, 0);
 
 				for (int32 i = 0; i < count; i++) {
 					PutVNode(vnid);
