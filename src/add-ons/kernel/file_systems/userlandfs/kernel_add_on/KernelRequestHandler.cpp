@@ -647,10 +647,6 @@ KernelRequestHandler::_HandleRequest(FileCacheReadRequest* request)
 
 	size_t size = request->size;
 
-// TODO: Allocating the reply and the buffer first now would save an allocation
-// and copying the buffer, but since Volume::ReadFileCache() will reenter the
-// file system (io() hook) our allocation would be overwritten.
-#if 0
 	// allocate the reply
 	RequestAllocator allocator(fPort->GetPort());
 	FileCacheReadReply* reply;
@@ -669,34 +665,6 @@ KernelRequestHandler::_HandleRequest(FileCacheReadRequest* request)
 		result = volume->ReadFileCache(request->vnid, request->cookie,
 			request->pos, buffer, &size);
 	}
-#else
-	// allocate a buffer
-	void* buffer = NULL;
-	if (result == B_OK) {
-		buffer = malloc(size);
-			// TODO: Limit size!
-		if (buffer == NULL)
-			result = B_NO_MEMORY;
-	}
-	MemoryDeleter _2(buffer);
-
-	// execute the request
-	if (result == B_OK) {
-		result = volume->ReadFileCache(request->vnid, request->cookie,
-			request->pos, buffer, &size);
-	}
-
-	// allocate the reply
-	RequestAllocator allocator(fPort->GetPort());
-	FileCacheReadReply* reply;
-	status_t error = AllocateRequest(allocator, &reply);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	error = allocator.AllocateData(reply->buffer, buffer, size, 1, false);
-	if (error != B_OK)
-		return error;
-#endif
 
 	// prepare the reply
 	reply->error = result;
@@ -724,8 +692,6 @@ KernelRequestHandler::_HandleRequest(FileCacheWriteRequest* request)
 	size_t size = 0;
 	if (result == B_OK) {
 		size = request->buffer.GetSize();
-// TODO: WriteFileCache() will reenter the file system (io() hook) which will
-// overwrite the request and the buffer!
 		result = volume->WriteFileCache(request->vnid, request->cookie,
 			request->pos, request->buffer.GetData(), &size);
 	}
