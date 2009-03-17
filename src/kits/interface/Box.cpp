@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -180,7 +180,7 @@ BBox::InnerFrame()
 
 void
 BBox::SetLabel(const char *string)
-{ 
+{
 	_ClearLabel();
 
 	if (string)
@@ -319,9 +319,9 @@ BBox::FrameResized(float width, float height)
 	// invalidate the regions that the app_server did not
 	// (for removing the previous or drawing the new border)
 	if (fStyle != B_NO_BORDER) {
-	
-		int32 borderSize = fStyle == B_PLAIN_BORDER ? 0 : 1;
-	
+		// TODO: this must be made part of the be_control_look stuff!
+		int32 borderSize = fStyle == B_PLAIN_BORDER ? 0 : 2;
+
 		BRect invalid(bounds);
 		if (fBounds.right < bounds.right) {
 			// enlarging
@@ -335,7 +335,7 @@ BBox::FrameResized(float width, float height)
 
 			Invalidate(invalid);
 		}
-	
+
 		invalid = bounds;
 		if (fBounds.bottom < bounds.bottom) {
 			// enlarging
@@ -594,7 +594,7 @@ void
 BBox::_InitObject(BMessage* archive)
 {
 	fBounds = Bounds();
-	
+
 	fLabel = NULL;
 	fLabelView = NULL;
 	fLayoutData = new LayoutData;
@@ -611,7 +611,7 @@ BBox::_InitObject(BMessage* archive)
 
 	if (flags != 0)
 		SetFont(&font, flags);
-	
+
 	if (archive != NULL) {
 		const char *string;
 		if (archive->FindString("_label", &string) == B_OK)
@@ -726,9 +726,9 @@ BBox::_DrawFancy(BRect labelBox)
 					BPoint(rect.right, rect.bottom), light);
 			AddLine(BPoint(rect.right, rect.bottom - 1.0),
 					BPoint(rect.right, rect.top), light);
-	
+
 			rect.InsetBy(1.0, 1.0);
-	
+
 			AddLine(BPoint(rect.left, rect.bottom - 1.0),
 					BPoint(rect.left, rect.top), light);
 			AddLine(BPoint(rect.left + 1.0, rect.top),
@@ -816,7 +816,7 @@ BBox::_ValidateLayoutData()
 
 	// total number of pixel the border adds
 	float addWidth = fLayoutData->insets.left + fLayoutData->insets.right;
-	float addHeight = fLayoutData->insets.top + fLayoutData->insets.bottom; 
+	float addHeight = fLayoutData->insets.top + fLayoutData->insets.bottom;
 
 	// compute the minimal width induced by the label
 	float minWidth;
