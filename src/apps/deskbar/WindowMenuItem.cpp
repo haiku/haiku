@@ -203,8 +203,8 @@ TWindowMenuItem::Draw()
 
 		DrawContent();
 		menu->PopState();
-	}
-	BMenuItem::Draw();
+	} else
+		BMenuItem::Draw();
 }
 
 
@@ -218,7 +218,6 @@ TWindowMenuItem::DrawContent()
 	BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
 //	if (fExpanded)
 //		contLoc.x += kHPad;
-	menu->SetDrawingMode(B_OP_COPY);
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
@@ -235,18 +234,20 @@ TWindowMenuItem::DrawContent()
 			contLoc.x += 8;
 
 		contLoc.x += kIconRect.Width() + kLabelOffset;
-
-		menu->SetDrawingMode(B_OP_COPY);
 	}
+
+	menu->SetDrawingMode(B_OP_COPY);
+
 	contLoc.y = frame.top
 		+ ((frame.Height() - fTitleAscent - fTitleDescent) / 2) + 1.0f;
-	menu->PopState();
 
 	menu->MovePenTo(contLoc);
 	// Set the pen color so that the label is always visible.
 	menu->SetHighColor(0, 0, 0);
 
 	BMenuItem::DrawContent();
+
+	menu->PopState();
 }
 
 
