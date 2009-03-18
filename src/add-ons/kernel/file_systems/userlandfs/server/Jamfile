@@ -46,4 +46,5 @@ Application userlandfs_server
 ;
 
 HaikuSubInclude beos ;
+HaikuSubInclude fuse ;
 HaikuSubInclude haiku ;
