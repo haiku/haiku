@@ -119,6 +119,9 @@ file_cache_disable(void *cacheRef)
 status_t
 file_cache_set_size(void *cacheRef, off_t size)
 {
+	if (cacheRef == NULL)
+		return B_BAD_VALUE;
+
 	PRINT(("file_cache_set_size(%p)\n", cacheRef));
 
 	FileCache* fileCache = (FileCache*)cacheRef;
@@ -131,6 +134,9 @@ file_cache_set_size(void *cacheRef, off_t size)
 status_t
 file_cache_sync(void *cacheRef)
 {
+	if (cacheRef == NULL)
+		return B_BAD_VALUE;
+
 	PRINT(("file_cache_sync(%p)\n", cacheRef));
 
 	FileCache* fileCache = (FileCache*)cacheRef;
