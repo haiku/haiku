@@ -406,13 +406,16 @@ static status_t
 control_device_manager(const char* subsystem, uint32 function, void* buffer,
 	size_t bufferSize)
 {
+	// TODO: this function passes pointers to userland, and uses pointers
+	// to device nodes that came from userland - this is completely unsafe
+	// and should be changed.
 	switch (function) {
 		case DM_GET_ROOT:
 		{
 			device_node_cookie cookie;
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(device_node_cookie))
+			if (bufferSize != sizeof(device_node_cookie))
 				return B_BAD_VALUE;
 			cookie = (device_node_cookie)sRootNode;
 
@@ -424,7 +427,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 		{
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(device_node_cookie))
+			if (bufferSize != sizeof(device_node_cookie))
 				return B_BAD_VALUE;
 
 			device_node_cookie cookie;
@@ -448,7 +451,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 		{
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(device_node_cookie))
+			if (bufferSize != sizeof(device_node_cookie))
 				return B_BAD_VALUE;
 
 			device_node_cookie cookie;
@@ -458,7 +461,9 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			device_node* last = (device_node*)cookie;
 			if (!last->Parent())
 				return B_ENTRY_NOT_FOUND;
-			NodeList::ConstIterator iterator = last->Parent()->Children().GetIterator();
+
+			NodeList::ConstIterator iterator
+				= last->Parent()->Children().GetIterator();
 
 			// skip those we already traversed
 			while (iterator.HasNext()) {
@@ -479,16 +484,16 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 
 		case DM_GET_NEXT_ATTRIBUTE:
 		{
-			struct device_attr_info attr_info;
+			struct device_attr_info attrInfo;
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(struct device_attr_info))
+			if (bufferSize != sizeof(device_attr_info))
 				return B_BAD_VALUE;
-			if (user_memcpy(&attr_info, buffer, sizeof(struct device_attr_info)) < B_OK)
+			if (user_memcpy(&attrInfo, buffer, sizeof(device_attr_info)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			device_node* node = (device_node*)attr_info.node_cookie;
-			device_attr* last = (device_attr*)attr_info.cookie;
+			device_node* node = (device_node*)attrInfo.node_cookie;
+			device_attr* last = (device_attr*)attrInfo.cookie;
 			AttributeList::Iterator iterator = node->Attributes().GetIterator();
 			// skip those we already traversed
 			while (iterator.HasNext() && last != NULL) {
@@ -499,25 +504,30 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			}
 
 			if (!iterator.HasNext()) {
-				attr_info.cookie = 0;
+				attrInfo.cookie = 0;
 				return B_ENTRY_NOT_FOUND;
 			}
 
 			device_attr* attr = iterator.Next();
-			attr_info.cookie = (device_node_cookie)attr;
-			strlcpy(attr_info.name, attr->name, 254);
-			attr_info.type = attr->type;
-			switch (attr_info.type) {
+			attrInfo.cookie = (device_node_cookie)attr;
+			strlcpy(attrInfo.name, attr->name, 254);
+			attrInfo.type = attr->type;
+			switch (attrInfo.type) {
 				case B_UINT8_TYPE:
-					attr_info.value.ui8 = attr->value.ui8; break;
+					attrInfo.value.ui8 = attr->value.ui8;
+					break;
 				case B_UINT16_TYPE:
-					attr_info.value.ui16 = attr->value.ui16; break;
+					attrInfo.value.ui16 = attr->value.ui16;
+					break;
 				case B_UINT32_TYPE:
-					attr_info.value.ui32 = attr->value.ui32; break;
+					attrInfo.value.ui32 = attr->value.ui32;
+					break;
 				case B_UINT64_TYPE:
-					attr_info.value.ui64 = attr->value.ui64; break;
+					attrInfo.value.ui64 = attr->value.ui64;
+					break;
 				case B_STRING_TYPE:
-					strlcpy(attr_info.value.string, attr->value.string, 254); break;
+					strlcpy(attrInfo.value.string, attr->value.string, 254);
+					break;
 				/*case B_RAW_TYPE:
 					if (attr.value.raw.length > attr_info->attr.value.raw.length)
 						attr.value.raw.length = attr_info->attr.value.raw.length;
@@ -527,7 +537,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			}
 
 			// copy back to user space
-			return user_memcpy(buffer, &attr_info, sizeof(struct device_attr_info));
+			return user_memcpy(buffer, &attrInfo, sizeof(device_attr_info));
 		}
 	}
 
