@@ -439,7 +439,9 @@ BMenuItem::DrawContent()
 	BPoint lineStart = fSuper->PenLocation();
 
 	float labelWidth, labelHeight;
-	GetContentSize(&labelWidth, &labelHeight);		
+	GetContentSize(&labelWidth, &labelHeight);
+
+	fSuper->SetDrawingMode(B_OP_OVER);
 
 	// truncate if needed
 	// TODO: Actually, this is still never triggered
@@ -481,9 +483,6 @@ BMenuItem::Draw()
 
 	rgb_color noTint = fSuper->LowColor();
 	rgb_color bgColor = noTint;
-
-	if (be_control_look != NULL)
-		fSuper->SetDrawingMode(B_OP_OVER);
 
 	// set low color and fill background if selected
 	bool activated = selected && (enabled || Submenu())
