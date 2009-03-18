@@ -8,6 +8,7 @@
 #include <new>
 
 #include <fcntl.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "AutoDeleter.h"
@@ -53,7 +54,7 @@ HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	fVolume.sub_volume = NULL;
 	fVolume.super_volume = NULL;
 	fVolume.file_system = fFSModule;
-	fVolume.file_system_name = "dummy";	// TODO: Init correctly!
+	fVolume.file_system_name = strdup("dummy");	// TODO: Init correctly!
 	fVolume.haikuVolume = this;
 }
 

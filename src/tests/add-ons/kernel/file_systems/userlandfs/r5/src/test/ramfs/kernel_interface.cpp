@@ -7,12 +7,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -30,6 +30,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/stat.h>
+
+#include <new>
 
 #include <fs_index.h>
 #include <fs_query.h>
@@ -272,7 +274,7 @@ ramfs_mount(nspace_id nsid, const char */*device*/, ulong flags,
 	// allocate and init the volume
 	Volume *volume = NULL;
 	if (error == B_OK) {
-		volume = new(nothrow) Volume;
+		volume = new(std::nothrow) Volume;
 		if (!volume)
 			SET_ERROR(error, B_NO_MEMORY);
 		if (error == B_OK)
@@ -312,7 +314,7 @@ ramfs_unmount(void *ns)
 
 // ramfs_initialize
 static
-int 
+int
 ramfs_initialize(const char */*deviceName*/, void */*parameters*/,
 				 size_t /*len*/)
 {
@@ -630,7 +632,7 @@ ramfs_create(void *ns, void *_dir, const char *name, int openMode,
 		// create the file cookie
 		FileCookie *cookie = NULL;
 		if (error == B_OK) {
-			cookie = new(nothrow) FileCookie(openMode);
+			cookie = new(std::nothrow) FileCookie(openMode);
 			if (!cookie)
 				SET_ERROR(error, B_NO_MEMORY);
 		}
@@ -713,7 +715,7 @@ FUNCTION(("node: %Ld\n", node->GetID()));
 		// create the cookie
 		FileCookie *cookie = NULL;
 		if (error == B_OK) {
-			cookie = new(nothrow) FileCookie(openMode);
+			cookie = new(std::nothrow) FileCookie(openMode);
 			if (!cookie)
 				SET_ERROR(error, B_NO_MEMORY);
 		}
@@ -1275,7 +1277,7 @@ FUNCTION(("dir: (%Lu)\n", node->GetID()));
 	}
 	// create a DirectoryCookie
 	if (error == B_OK) {
-		DirectoryCookie *cookie = new(nothrow) DirectoryCookie(dir);
+		DirectoryCookie *cookie = new(std::nothrow) DirectoryCookie(dir);
 		if (cookie) {
 			error = cookie->Suspend();
 			if (error == B_OK)
@@ -1343,7 +1345,7 @@ ramfs_rewind_dir(void */*ns*/, void */*_node*/, void *_cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Directory is guaranteed to live at this
-	// time and for iterators there is a separate locking. 
+	// time and for iterators there is a separate locking.
 	DirectoryCookie *cookie = (DirectoryCookie*)_cookie;
 	// no need to Resume(), iterator remains suspended
 	status_t error = cookie->Rewind();
@@ -1358,7 +1360,7 @@ ramfs_close_dir(void */*ns*/, void *DARG(_node), void *_cookie)
 	FUNCTION_START();
 FUNCTION(("dir: (%Lu)\n", ((Node*)_node)->GetID()));
 	// No locking needed, since the Directory is guaranteed to live at this
-	// time and for iterators there is a separate locking. 
+	// time and for iterators there is a separate locking.
 	DirectoryCookie *cookie = (DirectoryCookie*)_cookie;
 	cookie->Unset();
 	return B_OK;
@@ -1514,7 +1516,7 @@ ramfs_read_link(void *ns, void *_node, char *buffer, size_t *bufferSize)
 
 // ramfs_open_attrdir
 static
-int 
+int
 ramfs_open_attrdir(void *ns, void *_node, void **cookie)
 {
 	FUNCTION_START();
@@ -1527,7 +1529,7 @@ ramfs_open_attrdir(void *ns, void *_node, void **cookie)
 		// create iterator
 		AttributeIterator *iterator = NULL;
 		if (error == B_OK) {
-			iterator = new(nothrow) AttributeIterator(node);
+			iterator = new(std::nothrow) AttributeIterator(node);
 			if (iterator)
 				error = iterator->Suspend();
 			else
@@ -1550,7 +1552,7 @@ ramfs_close_attrdir(void */*ns*/, void */*_node*/, void *cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	iterator->Unset();
 	return B_OK;
@@ -1563,7 +1565,7 @@ ramfs_free_attrdir_cookie(void */*ns*/, void */*_node*/, void *cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	delete iterator;
 	return B_OK;
@@ -1576,7 +1578,7 @@ ramfs_rewind_attrdir(void */*ns*/, void */*_node*/, void *cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	// no need to Resume(), iterator remains suspended
 	status_t error = iterator->Rewind();
@@ -1585,7 +1587,7 @@ ramfs_rewind_attrdir(void */*ns*/, void */*_node*/, void *cookie)
 
 // ramfs_read_attrdir
 static
-int 
+int
 ramfs_read_attrdir(void *ns, void */*_node*/, void *cookie, long *count,
 				   struct dirent *buffer, size_t bufferSize)
 {
@@ -1782,7 +1784,7 @@ ramfs_open_indexdir(void *ns, void **_cookie)
 	if (VolumeReadLocker locker = volume) {
 		// check whether an index directory exists
 		if (volume->GetIndexDirectory()) {
-			IndexDirCookie *cookie = new(nothrow) IndexDirCookie;
+			IndexDirCookie *cookie = new(std::nothrow) IndexDirCookie;
 			if (cookie)
 				*_cookie = cookie;
 			else

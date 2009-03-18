@@ -8,7 +8,9 @@
  */
 
 #include <signal.h>
-#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <KernelExport.h>
 

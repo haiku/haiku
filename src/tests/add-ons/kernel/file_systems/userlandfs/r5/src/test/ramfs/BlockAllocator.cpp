@@ -3,6 +3,8 @@
 // debugging
 #define BA_DEFINE_INLINES	1
 
+#include <new>
+
 #include "AllocationInfo.h"
 #include "BlockAllocator.h"
 #include "BlockAllocatorArea.h"
@@ -23,7 +25,7 @@ BlockAllocator::BlockAllocator(size_t areaSize)
 {
 	// create and init buckets
 	fBucketCount = bucket_containing_size(areaSize) + 1;
-	fBuckets = new(nothrow) AreaBucket[fBucketCount];
+	fBuckets = new(std::nothrow) AreaBucket[fBucketCount];
 	size_t minSize = 0;
 	for (int32 i = 0; i < fBucketCount; i++) {
 		size_t maxSize = (1 << i) * kMinNetBlockSize;

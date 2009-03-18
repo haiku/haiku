@@ -130,9 +130,9 @@ public:
 		friend class HashMap<Key, Value>;
 		typedef OpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
 
-		HashMap<Key, Value>*	fMap;
-		ElementTable::Iterator	fIterator;
-		Element*				fElement;
+		HashMap<Key, Value>*			fMap;
+		typename ElementTable::Iterator	fIterator;
+		Element*						fElement;
 	};
 
 	HashMap();

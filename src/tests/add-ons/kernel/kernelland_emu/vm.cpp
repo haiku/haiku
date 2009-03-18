@@ -7,7 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
-#include <string>
+#include <string.h>
 
 #include <KernelExport.h>
 

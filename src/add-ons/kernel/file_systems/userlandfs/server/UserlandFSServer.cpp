@@ -97,7 +97,7 @@ UserlandFSServer::Init(const char* fileSystem, port_id port)
 		RETURN_ERROR(error);
 
 	// create the notification request port
-	fNotificationRequestPort = new(nothrow) RequestPort(kRequestPortSize);
+	fNotificationRequestPort = new(std::nothrow) RequestPort(kRequestPortSize);
 	if (!fNotificationRequestPort)
 		RETURN_ERROR(B_NO_MEMORY);
 	error = fNotificationRequestPort->InitCheck();
@@ -105,7 +105,7 @@ UserlandFSServer::Init(const char* fileSystem, port_id port)
 		RETURN_ERROR(error);
 
 	// now create the request threads
-	fRequestThreads = new(nothrow) RequestThread[kRequestThreadCount];
+	fRequestThreads = new(std::nothrow) RequestThread[kRequestThreadCount];
 	if (!fRequestThreads)
 		RETURN_ERROR(B_NO_MEMORY);
 	for (int32 i = 0; i < kRequestThreadCount; i++) {

@@ -1,5 +1,7 @@
 // Directory.cpp
 
+#include <new>
+
 #include "AllocationInfo.h"
 #include "Debug.h"
 #include "Directory.h"
@@ -75,7 +77,7 @@ Directory::CreateDirectory(const char *name, Directory **directory)
 	status_t error = (name && directory ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create directory
-		if (Directory *node = new(nothrow) Directory(GetVolume())) {
+		if (Directory *node = new(std::nothrow) Directory(GetVolume())) {
 			error = _CreateCommon(node, name);
 				// deletes the node on failure
 			if (error == B_OK)
@@ -93,7 +95,7 @@ Directory::CreateFile(const char *name, File **file)
 	status_t error = (name && file ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create file
-		if (File *node = new(nothrow) File(GetVolume())) {
+		if (File *node = new(std::nothrow) File(GetVolume())) {
 			error = _CreateCommon(node, name);
 				// deletes the node on failure
 			if (error == B_OK)
@@ -111,7 +113,7 @@ Directory::CreateSymLink(const char *name, const char *path, SymLink **symLink)
 	status_t error = (name && symLink ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create symlink
-		if (SymLink *node = new(nothrow) SymLink(GetVolume())) {
+		if (SymLink *node = new(std::nothrow) SymLink(GetVolume())) {
 			error = node->SetLinkedPath(path);
 			if (error == B_OK) {
 				error = _CreateCommon(node, name);
@@ -152,7 +154,7 @@ Directory::CreateEntry(Node *node, const char *name, Entry **_entry)
 	status_t error = (node ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		// create an entry
-		Entry *entry = new(nothrow) Entry(name);
+		Entry *entry = new(std::nothrow) Entry(name);
 		if (entry) {
 			error = entry->InitCheck();
 			if (error == B_OK) {
