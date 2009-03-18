@@ -225,10 +225,8 @@ private:
 				waiters.Remove(waiter);
 				owner = waiter->thread;
 
-				if (waiter->userThread->wait_status > 0) {
-					waiter->userThread->wait_status = B_OK;
+				if (waiter->userThread->wait_status > 0)
 					_kern_unblock_thread(waiter->thread, B_OK);
-				}
 			}
 			return;
 		}
@@ -248,7 +246,6 @@ private:
 				waiters.Remove(waiter);
 
 				if (waiter->userThread->wait_status > 0) {
-					waiter->userThread->wait_status = B_OK;
 					readers[readerCount++] = waiter->thread;
 					reader_count++;
 				}

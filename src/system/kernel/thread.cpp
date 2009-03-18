@@ -2286,7 +2286,10 @@ user_unblock_thread(thread_id threadID, status_t status)
 	if (thread->user_thread == NULL)
 		return B_NOT_ALLOWED;
 
-	thread_unblock_locked(thread, status);
+	if (thread->user_thread->wait_status > 0) {
+		thread->user_thread->wait_status = status;
+		thread_unblock_locked(thread, status);
+	}
 
 	return B_OK;
 }
