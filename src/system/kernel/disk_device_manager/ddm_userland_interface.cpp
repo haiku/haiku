@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,7 +40,6 @@ using namespace BPrivate::DiskDevice;
 // TODO: Add user address checks and check return values of user_memcpy()!
 
 
-// ddm_strlcpy
 /*! \brief Wrapper around user_strlcpy() that returns a status_t
 	indicating appropriate success or failure.
 
@@ -61,7 +60,6 @@ ddm_strlcpy(char *to, const char *from, size_t size,
 }
 
 
-// copy_from_user_value
 template<typename Type>
 static inline status_t
 copy_from_user_value(Type& value, const Type* userValue)
@@ -76,7 +74,6 @@ copy_from_user_value(Type& value, const Type* userValue)
 }
 
 
-// copy_to_user_value
 template<typename Type>
 static inline status_t
 copy_to_user_value(Type* userValue, const Type& value)
@@ -91,7 +88,6 @@ copy_to_user_value(Type* userValue, const Type& value)
 }
 
 
-// UserStringParameter
 template<bool kAllowsNull>
 struct UserStringParameter {
 	char*	value;
@@ -144,7 +140,6 @@ struct UserStringParameter {
 };
 
 
-// UserMemoryParameter
 template<typename Type, bool kAllowsNull>
 struct UserMemoryParameter {
 	Type*	value;
@@ -190,7 +185,6 @@ struct UserMemoryParameter {
 
 
 #if 0
-// move_descendants
 static void
 move_descendants(KPartition *partition, off_t moveBy)
 {
@@ -203,7 +197,6 @@ move_descendants(KPartition *partition, off_t moveBy)
 }
 
 
-// move_descendants_contents
 static status_t
 move_descendants_contents(KPartition *partition)
 {
@@ -228,7 +221,6 @@ move_descendants_contents(KPartition *partition)
 #endif // 0
 
 
-// _user_get_next_disk_device_id
 partition_id
 _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 {
@@ -262,7 +254,6 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 }
 
 
-// _user_find_disk_device
 partition_id
 _user_find_disk_device(const char *_filename, size_t *neededSize)
 {
@@ -293,7 +284,6 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 }
 
 
-// _user_find_partition
 partition_id
 _user_find_partition(const char *_filename, size_t *neededSize)
 {
@@ -362,7 +352,6 @@ _user_find_file_disk_device(const char *_filename, size_t *neededSize)
 }
 
 
-// _user_get_disk_device_data
 /*!	\brief Writes data describing the disk device identified by ID and all
 		   its partitions into the supplied buffer.
 
@@ -454,7 +443,6 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly,
 }
 
 
-// _user_register_file_device
 partition_id
 _user_register_file_device(const char *_filename)
 {
@@ -475,7 +463,6 @@ _user_register_file_device(const char *_filename)
 }
 
 
-// _user_unregister_file_device
 status_t
 _user_unregister_file_device(partition_id deviceID, const char *_filename)
 {
@@ -520,7 +507,6 @@ _user_get_file_disk_device_path(partition_id id, char* buffer,
 }
 
 
-// _user_get_disk_system_info
 status_t
 _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 {
@@ -539,7 +525,6 @@ _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 }
 
 
-// _user_get_next_disk_system_info
 status_t
 _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 {
@@ -562,7 +547,6 @@ _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 }
 
 
-// _user_find_disk_system
 status_t
 _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 {
@@ -585,7 +569,6 @@ _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 }
 
 
-// _user_defragment_partition
 status_t
 _user_defragment_partition(partition_id partitionID, int32* _changeCounter)
 {
@@ -640,7 +623,6 @@ _user_defragment_partition(partition_id partitionID, int32* _changeCounter)
 }
 
 
-// _user_repair_partition
 status_t
 _user_repair_partition(partition_id partitionID, int32* _changeCounter,
 	bool checkOnly)
@@ -696,7 +678,6 @@ _user_repair_partition(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_resize_partition
 status_t
 _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 	partition_id childID, int32* _childChangeCounter, off_t size,
@@ -792,7 +773,6 @@ _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_move_partition
 status_t
 _user_move_partition(partition_id partitionID, int32* changeCounter,
 	partition_id childID, int32* childChangeCounter, off_t newOffset,
@@ -834,7 +814,6 @@ return B_BAD_VALUE;
 }
 
 
-// _user_set_partition_name
 status_t
 _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 	partition_id childID, int32* _childChangeCounter, const char* _name)
@@ -915,7 +894,6 @@ _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_set_partition_content_name
 status_t
 _user_set_partition_content_name(partition_id partitionID,
 	int32* _changeCounter, const char* _name)
@@ -975,7 +953,6 @@ _user_set_partition_content_name(partition_id partitionID,
 }
 
 
-// _user_set_partition_type
 status_t
 _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 	partition_id childID, int32* _childChangeCounter, const char* _type)
@@ -1056,7 +1033,6 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_set_partition_parameters
 status_t
 _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 	partition_id childID, int32* _childChangeCounter, const char* _parameters,
@@ -1139,7 +1115,6 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_set_partition_content_parameters
 status_t
 _user_set_partition_content_parameters(partition_id partitionID,
 	int32* _changeCounter, const char* _parameters, size_t parametersSize)
@@ -1201,7 +1176,6 @@ _user_set_partition_content_parameters(partition_id partitionID,
 }
 
 
-// _user_initialize_partition
 status_t
 _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 	const char* _diskSystemName, const char* _name, const char* _parameters,
@@ -1276,7 +1250,6 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_uninitialize_partition
 status_t
 _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 {
@@ -1328,7 +1301,6 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 }
 
 
-// _user_create_child_partition
 status_t
 _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 	off_t offset, off_t size, const char* _type, const char* _name,
@@ -1404,7 +1376,6 @@ _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 }
 
 
-// _user_delete_child_partition
 status_t
 _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 	partition_id childID, int32 childChangeCounter)
@@ -1473,3 +1444,20 @@ _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 
 	return B_OK;
 }
+
+
+status_t
+_user_start_watching_disks(uint32 eventMask, port_id port, int32 token)
+{
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+	return manager->Notifications().UpdateUserListener(eventMask, port, token);
+}
+
+
+status_t
+_user_stop_watching_disks(port_id port, int32 token)
+{
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+	return manager->Notifications().RemoveUserListeners(port, token);
+}
+

@@ -22,6 +22,8 @@
 #include <Path.h>
 #include <Volume.h>
 
+#include <MessengerPrivate.h>
+
 #include <syscalls.h>
 #include <ddm_userland_interface_defs.h>
 
@@ -511,8 +513,14 @@ BDiskDeviceRoster::GetFileDeviceForPath(const char* filename,
 status_t
 BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 {
-	// not implemented
-	return B_ERROR;
+	if (eventMask == 0)
+		return B_BAD_VALUE;
+
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+
+	return _kern_start_watching_disks(eventMask, port, token);
 }
 
 
@@ -525,8 +533,11 @@ BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 status_t
 BDiskDeviceRoster::StopWatching(BMessenger target)
 {
-	// not implemented
-	return B_ERROR;
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+
+	return _kern_stop_watching_disks(port, token);
 }
 
 #if 0

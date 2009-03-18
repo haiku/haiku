@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYSTEM_SYSCALLS_H
@@ -512,15 +512,10 @@ extern status_t		_kern_delete_child_partition(partition_id partitionID,
 						int32* changeCounter, partition_id childID,
 						int32 childChangeCounter);
 
-#if 0
-
-// watching
-status_t start_disk_device_watching(port_id, int32 token, uint32 flags);
-status_t start_disk_device_job_watching(disk_job_id job, port_id, int32 token,
-										uint32 flags);
-status_t stop_disk_device_watching(port_id, int32 token);
-
-#endif	// 0
+// disk change notification
+extern status_t		_kern_start_watching_disks(uint32 eventMask, port_id port,
+						int32 token);
+extern status_t		_kern_stop_watching_disks(port_id port, int32 token);
 
 
 // The end mark for gensyscallinfos.

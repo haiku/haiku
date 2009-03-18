@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -10,6 +10,7 @@
 
 #include <disk_device_manager.h>
 #include <Locker.h>
+#include <Notifications.h>
 
 
 namespace BPrivate {
@@ -39,6 +40,9 @@ public:
 	void Unlock();
 
 	// Disk Device / Partition Management
+
+	DefaultUserNotificationService& Notifications();
+	void Notify(const KMessage& event, uint32 eventMask);
 
 	// manager must be locked
 	KDiskDevice *FindDevice(const char *path);
@@ -104,6 +108,7 @@ private:
 	struct PartitionSet;
 	class DiskSystemWatcher;
 	class DeviceWatcher;
+	class DiskNotifications;
 
 	static status_t _CheckMediaStatusDaemon(void* self);
 	status_t _CheckMediaStatus();
@@ -126,6 +131,8 @@ private:
 
 	status_t _AddRemoveMonitoring(const char *path, bool add);
 
+	void _NotifyDeviceEvent(KDiskDevice* device, int32 event, uint32 mask);
+
 	BLocker						fLock;
 	DeviceMap					*fDevices;
 	PartitionMap				*fPartitions;
@@ -135,6 +142,7 @@ private:
 	volatile bool				fTerminating;
 	DiskSystemWatcher			*fDiskSystemWatcher;
 	DeviceWatcher				*fDeviceWatcher;
+	DiskNotifications*			fNotifications;
 
 	static KDiskDeviceManager	*sDefaultManager;
 };

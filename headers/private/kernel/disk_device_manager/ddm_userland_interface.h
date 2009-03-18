@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku Inc.
+ * Copyright 2003-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -89,6 +89,10 @@ status_t _user_create_child_partition(partition_id partitionID,
 status_t _user_delete_child_partition(partition_id partitionID,
 				int32* changeCounter, partition_id childID,
 				int32 childChangeCounter);
+
+// change notification
+status_t _user_start_watching_disks(uint32 eventMask, port_id port, int32 token);
+status_t _user_stop_watching_disks(port_id port, int32 token);
 
 #ifdef __cplusplus
 }

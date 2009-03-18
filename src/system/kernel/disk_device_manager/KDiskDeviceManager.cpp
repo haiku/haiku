@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -20,6 +20,7 @@
 #include <VectorMap.h>
 #include <VectorSet.h>
 
+#include <DiskDeviceRoster.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
@@ -183,19 +184,42 @@ private:
 };
 
 
+class KDiskDeviceManager::DiskNotifications
+	: public DefaultUserNotificationService {
+public:
+	DiskNotifications()
+		: DefaultUserNotificationService("disk devices")
+	{
+	}
+
+	virtual ~DiskNotifications()
+	{
+	}
+
+protected:
+	status_t _ToFlags(const KMessage& eventSpecifier, uint32& flags)
+	{
+		flags = eventSpecifier.GetInt32("flags", 0);
+		return B_OK;
+	}
+};
+
+
 //	#pragma mark -
 
 
 KDiskDeviceManager::KDiskDeviceManager()
-	: fLock("disk device manager"),
-	  fDevices(new(nothrow) DeviceMap),
-	  fPartitions(new(nothrow) PartitionMap),
-	  fDiskSystems(new(nothrow) DiskSystemMap),
-	  fObsoletePartitions(new(nothrow) PartitionSet),
-	  fMediaChecker(-1),
-	  fTerminating(false),
-	  fDiskSystemWatcher(NULL),
-	  fDeviceWatcher(new(nothrow) DeviceWatcher(this))
+	:
+	fLock("disk device manager"),
+	fDevices(new(nothrow) DeviceMap),
+	fPartitions(new(nothrow) PartitionMap),
+	fDiskSystems(new(nothrow) DiskSystemMap),
+	fObsoletePartitions(new(nothrow) PartitionSet),
+	fMediaChecker(-1),
+	fTerminating(false),
+	fDiskSystemWatcher(NULL),
+	fDeviceWatcher(new(nothrow) DeviceWatcher(this)),
+	fNotifications(new(nothrow) DiskNotifications)
 {
 	if (InitCheck() != B_OK)
 		return;
@@ -267,7 +291,8 @@ KDiskDeviceManager::~KDiskDeviceManager()
 status_t
 KDiskDeviceManager::InitCheck() const
 {
-	if (!fPartitions || !fDevices || !fDiskSystems || !fObsoletePartitions)
+	if (fPartitions == NULL || fDevices == NULL || fDiskSystems == NULL
+		|| fObsoletePartitions == NULL || fNotifications == NULL)
 		return B_NO_MEMORY;
 
 	return fLock.Sem() >= 0 ? B_OK : fLock.Sem();
@@ -320,6 +345,20 @@ void
 KDiskDeviceManager::Unlock()
 {
 	fLock.Unlock();
+}
+
+
+DefaultUserNotificationService&
+KDiskDeviceManager::Notifications()
+{
+	return *fNotifications;
+}
+
+
+void
+KDiskDeviceManager::Notify(const KMessage& event, uint32 eventMask)
+{
+	fNotifications->Notify(event, eventMask);
 }
 
 
@@ -637,6 +676,9 @@ KDiskDeviceManager::CreateDevice(const char* path, bool* newlyCreated)
 			_ScanPartition(device, false);
 			device->UnmarkBusy(true);
 
+			_NotifyDeviceEvent(device, B_DEVICE_ADDED,
+				B_DEVICE_REQUEST_DEVICE_LIST);
+
 			if (newlyCreated)
 				*newlyCreated = true;
 
@@ -709,6 +751,9 @@ KDiskDeviceManager::CreateFileDevice(const char* filePath, bool* newlyCreated)
 			_ScanPartition(device, false);
 			device->UnmarkBusy(true);
 
+			_NotifyDeviceEvent(device, B_DEVICE_ADDED,
+				B_DEVICE_REQUEST_DEVICE_LIST);
+
 			if (newlyCreated)
 				*newlyCreated = true;
 
@@ -765,6 +810,7 @@ KDiskDeviceManager::NextDevice(int32* cookie)
 {
 	if (!cookie)
 		return NULL;
+
 	DeviceMap::Iterator it = fDevices->FindClose(*cookie, false);
 	if (it != fDevices->End()) {
 		KDiskDevice* device = it->Value();
@@ -787,7 +833,7 @@ KDiskDeviceManager::PartitionRemoved(KPartition* partition)
 {
 	if (partition && partition->PrepareForRemoval()
 		&& fPartitions->Remove(partition->ID())) {
-		// If adding the partition to the obsolete list fails (due to lack
+		// TODO: If adding the partition to the obsolete list fails (due to lack
 		// of memory), we can't do anything about it. We will leak memory then.
 		fObsoletePartitions->Insert(partition);
 		partition->MarkObsolete();
@@ -1091,8 +1137,14 @@ KDiskDeviceManager::_AddDevice(KDiskDevice* device)
 bool
 KDiskDeviceManager::_RemoveDevice(KDiskDevice* device)
 {
-	return (device && fDevices->Remove(device->ID())
-			&& PartitionRemoved(device));
+	if (device != NULL && fDevices->Remove(device->ID())
+		&& PartitionRemoved(device)) {
+		_NotifyDeviceEvent(device, B_DEVICE_REMOVED,
+			B_DEVICE_REQUEST_DEVICE_LIST);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1433,6 +1485,8 @@ KDiskDeviceManager::_CheckMediaStatus()
 				dprintf("Media changed from %s\n", device->Path());
 				device->UpdateGeometry();
 				_ScanPartition(device, false);
+				_NotifyDeviceEvent(device, B_DEVICE_MEDIA_CHANGED,
+					B_DEVICE_REQUEST_DEVICE);
 			} else if (!device->HasMedia() && hadMedia) {
 				dprintf("Media removed from %s\n", device->Path());
 			}
@@ -1452,3 +1506,19 @@ KDiskDeviceManager::_CheckMediaStatusDaemon(void* self)
 {
 	return ((KDiskDeviceManager*)self)->_CheckMediaStatus();
 }
+
+
+void
+KDiskDeviceManager::_NotifyDeviceEvent(KDiskDevice* device, int32 event,
+	uint32 mask)
+{
+	char messageBuffer[512];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_DEVICE_UPDATE);
+	message.AddInt32("event", event);
+	message.AddInt32("id", device->ID());
+	message.AddString("device", device->Path());
+
+	fNotifications->Notify(message, mask);
+}
+
