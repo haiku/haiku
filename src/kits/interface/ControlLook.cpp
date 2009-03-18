@@ -174,7 +174,8 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 
 void
 BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
-	const BRect& updateRect, const rgb_color& base, uint32 borders)
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders)
 {
 	if (!rect.IsValid() || !updateRect.Intersects(rect))
 		return;
@@ -182,21 +183,37 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	// the surface edges
 
 	// colors
-	rgb_color cornerColor = tint_color(base, 0.9);
-	rgb_color bevelColor1 = tint_color(base, 0.5);
-	rgb_color bevelColor2 = tint_color(base, 0.7);
-	rgb_color bevelColor3 = tint_color(base, 1.08);
+	float topTint;
+	float bottomTint;
 
-	_DrawFrame(view, rect,
-		bevelColor2, bevelColor1,
-		bevelColor3, bevelColor3,
-		cornerColor, cornerColor,
-		borders);
+	if (flags & B_ACTIVATED) {
+		rgb_color bevelColor1 = tint_color(base, 1.40);
+		rgb_color bevelColor2 = tint_color(base, 1.25);
+
+		topTint = 1.25;
+		bottomTint = 1.20;
+
+		_DrawFrame(view, rect,
+			bevelColor1, bevelColor1,
+			bevelColor2, bevelColor2,
+			borders & B_TOP_BORDER);
+	} else {
+		rgb_color cornerColor = tint_color(base, 0.9);
+		rgb_color bevelColorTop = tint_color(base, 0.5);
+		rgb_color bevelColorLeft = tint_color(base, 0.7);
+		rgb_color bevelColorRightBottom = tint_color(base, 1.08);
+
+		topTint = 0.69;
+		bottomTint = 1.03;
+
+		_DrawFrame(view, rect,
+			bevelColorLeft, bevelColorTop,
+			bevelColorRightBottom, bevelColorRightBottom,
+			cornerColor, cornerColor,
+			borders);
+	}
 
 	// the actual surface top
-
-	float topTint = 0.69;
-	float bottomTint = 1.03;
 
 	_FillGradient(view, rect, base, topTint, bottomTint);
 }

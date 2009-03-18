@@ -78,6 +78,7 @@ public:
 	virtual void				DrawMenuBarBackground(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
+									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
 	virtual	void				DrawMenuFieldFrame(BView* view, BRect& rect,
