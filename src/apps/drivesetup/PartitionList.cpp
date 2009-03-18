@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Haiku Inc. All rights reserved.
+ * Copyright 2006-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -18,8 +18,8 @@
 
 
 BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
-	: Inherited(string)
-	, fBitmap(bitmap)
+	: Inherited(string),
+	fBitmap(bitmap)
 {
 }
 
@@ -114,7 +114,7 @@ PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
 	} else if (stringField) {
 
 		float width = rect.Width() - (2 * fTextMargin);
-	
+
 		if (width != stringField->Width()) {
 			BString truncatedString(stringField->String());
 
@@ -156,7 +156,7 @@ PartitionColumn::GetPreferredWidth(BField *_field, BView* parent) const
 }
 
 
-bool 
+bool
 PartitionColumn::AcceptsField(const BField* field) const
 {
 	return dynamic_cast<const BStringField*>(field) != NULL;
@@ -178,11 +178,11 @@ enum {
 
 
 PartitionListRow::PartitionListRow(BPartition* partition)
-	: Inherited()
-	, fPartitionID(partition->ID())
-	, fParentID(partition->Parent() ? partition->Parent()->ID() : -1)
-	, fOffset(partition->Offset())
-	, fSize(partition->Size())
+	: Inherited(),
+	fPartitionID(partition->ID()),
+	fParentID(partition->Parent() ? partition->Parent()->ID() : -1),
+	fOffset(partition->Offset()),
+	fSize(partition->Size())
 {
 	BPath path;
 	partition->GetPath(&path);
@@ -206,7 +206,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
-	
+
 	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK) {
 		SetField(new BStringField(path.Path()),  kMountedAtColumn);
 	} else {
@@ -221,18 +221,18 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 		off_t offset, off_t size)
-	: Inherited()
-	, fPartitionID(id)
-	, fParentID(parentID)
-	, fOffset(offset)
-	, fSize(size)
+	: Inherited(),
+	fPartitionID(id),
+	fParentID(parentID),
+	fOffset(offset),
+	fSize(size)
 {
 	// TODO: design icon for spaces on partitions
 	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
 	SetField(new BStringField("<empty>"), kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
-	
+
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
 
 	char sizeString[1024];
@@ -282,11 +282,11 @@ PartitionListRow*
 PartitionListView::AddPartition(BPartition* partition)
 {
 	PartitionListRow* partitionrow = FindRow(partition->ID());
-	
+
 	// forget about it if this partition is already in the listview
 	if (partitionrow != NULL)
 		return partitionrow;
-	
+
 	// create the row for this partition
 	partitionrow = new PartitionListRow(partition);
 
@@ -311,7 +311,7 @@ PartitionListView::AddPartition(BPartition* partition)
 
 	// make sure the row is initially expanded
 	ExpandOrCollapse(partitionrow, true);
-	
+
 	return partitionrow;
 }
 
@@ -324,7 +324,7 @@ PartitionListView::AddSpace(partition_id parentID, partition_id id,
 	PartitionListRow* parent = FindRow(parentID);
 	if (!parent)
 		return NULL;
-	
+
 	// create the row for this partition
 	PartitionListRow* partitionrow = new PartitionListRow(parentID,
 		id, offset, size);
@@ -337,7 +337,7 @@ PartitionListView::AddSpace(partition_id parentID, partition_id id,
 
 	// make sure the row is initially expanded
 	ExpandOrCollapse(partitionrow, true);
-	
+
 	return partitionrow;
 }
 

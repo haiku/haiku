@@ -1,10 +1,11 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 #include "InitParamsPanel.h"
 
 #include <stdio.h>
@@ -27,7 +28,7 @@ class InitParamsPanel::EscapeFilter : public BMessageFilter {
 public:
 	EscapeFilter(InitParamsPanel* target)
 		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-		  fPanel(target)
+		fPanel(target)
 	{
 	}
 	virtual	~EscapeFilter()
@@ -68,15 +69,14 @@ enum {
 };
 
 
-
 InitParamsPanel::InitParamsPanel(BWindow* window)
 	: BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
-	, fEscapeFilter(new EscapeFilter(this))
-	, fExitSemaphore(create_sem(0, "InitParamsPanel exit"))
-	, fWindow(window)
-	, fReturnValue(GO_CANCELED)
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fEscapeFilter(new EscapeFilter(this)),
+	fExitSemaphore(create_sem(0, "InitParamsPanel exit")),
+	fWindow(window),
+	fReturnValue(GO_CANCELED)
 {
 	AddCommonFilter(fEscapeFilter);
 
@@ -211,7 +211,7 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 50000);
 		if (err != B_TIMED_OUT && err != B_INTERRUPTED)
 			break;
-		fWindow->UpdateIfNeeded();	
+		fWindow->UpdateIfNeeded();
 	}
 
 	if (!Lock())
@@ -226,7 +226,7 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 			if (!message || message->FindString("size", &size) < B_OK)
 				size = "2048";
 			// TODO: use libroot driver settings API
-			parameters << "block_size " << size << ";\n"; 
+			parameters << "block_size " << size << ";\n";
 		}
 	}
 
@@ -245,9 +245,3 @@ InitParamsPanel::Cancel()
 	fReturnValue = GO_CANCELED;
 	release_sem(fExitSemaphore);
 }
-
-
-
-
-
-

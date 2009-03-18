@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 Haiku Inc. All rights reserved.
+ * Copyright 2002-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 #include "MainWindow.h"
 #include "DiskView.h"
 #include "InitParamsPanel.h"
@@ -37,9 +38,10 @@ class ListPopulatorVisitor : public BDiskDeviceVisitor {
 public:
 	ListPopulatorVisitor(PartitionListView* list, int32& diskCount,
 			SpaceIDMap& spaceIDMap)
-		: fPartitionList(list)
-		, fDiskCount(diskCount)
-		, fSpaceIDMap(spaceIDMap)
+		:
+		fPartitionList(list),
+		fDiskCount(diskCount),
+		fSpaceIDMap(spaceIDMap)
 	{
 		fDiskCount = 0;
 		fSpaceIDMap.Clear();
@@ -88,7 +90,7 @@ private:
 				// TODO: remove again once Disk Device API is fixed
 				if (!is_valid_partitionable_space(size))
 					continue;
-				// 
+				//
 				partition_id id = fSpaceIDMap.SpaceIDFor(parentID, offset);
 				fPartitionList->AddSpace(parentID, id, offset, size);
 			}
@@ -145,10 +147,10 @@ enum {
 
 MainWindow::MainWindow(BRect frame)
 	: BWindow(frame, "DriveSetup", B_DOCUMENT_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
-	, fCurrentDisk(NULL)
-	, fCurrentPartitionID(-1)
-	, fSpaceIDMap()
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
+	fCurrentDisk(NULL),
+	fCurrentPartitionID(-1),
+	fSpaceIDMap()
 {
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
@@ -161,7 +163,7 @@ MainWindow::MainWindow(BRect frame)
 
 	fDeleteMI = new BMenuItem("Delete (not implemented)",
 		new BMessage(MSG_DELETE));
-fDeleteMI->SetEnabled(false);
+	fDeleteMI->SetEnabled(false);
 
 	fMountMI = new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M');
 	fUnmountMI = new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U');
@@ -170,37 +172,36 @@ fDeleteMI->SetEnabled(false);
 
 	// Disk menu
 	fDiskMenu = new BMenu("Disk");
-		fDiskMenu->AddItem(fFormatMI);
-		fDiskMenu->AddItem(fEjectMI);
-		fDiskMenu->AddItem(fSurfaceTestMI);
+	fDiskMenu->AddItem(fFormatMI);
+	fDiskMenu->AddItem(fEjectMI);
+	fDiskMenu->AddItem(fSurfaceTestMI);
 
-		fDiskMenu->AddSeparatorItem();
+	fDiskMenu->AddSeparatorItem();
 
-		fDiskMenu->AddItem(fRescanMI);
+	fDiskMenu->AddItem(fRescanMI);
 	menuBar->AddItem(fDiskMenu);
 
 	// Parition menu
 	fPartitionMenu = new BMenu("Partition");
-		fCreateMenu = new BMenu("Create (not implemented)");
-		fPartitionMenu->AddItem(fCreateMenu);
+	fCreateMenu = new BMenu("Create (not implemented)");
+	fPartitionMenu->AddItem(fCreateMenu);
 
-		fInitMenu = new BMenu("Initialize");
-		fPartitionMenu->AddItem(fInitMenu);
+	fInitMenu = new BMenu("Initialize");
+	fPartitionMenu->AddItem(fInitMenu);
 
-		fPartitionMenu->AddItem(fDeleteMI);
+	fPartitionMenu->AddItem(fDeleteMI);
 
-		fPartitionMenu->AddSeparatorItem();
+	fPartitionMenu->AddSeparatorItem();
 
-		fPartitionMenu->AddItem(fMountMI);
-		fPartitionMenu->AddItem(fUnmountMI);
+	fPartitionMenu->AddItem(fMountMI);
+	fPartitionMenu->AddItem(fUnmountMI);
 
-		fPartitionMenu->AddSeparatorItem();
+	fPartitionMenu->AddSeparatorItem();
 
-		fPartitionMenu->AddItem(fMountAllMI);
+	fPartitionMenu->AddItem(fMountAllMI);
 	menuBar->AddItem(fPartitionMenu);
 
 	AddChild(menuBar);
-
 
 	// add DiskView
 	BRect r(Bounds());
@@ -221,6 +222,8 @@ fDeleteMI->SetEnabled(false);
 	fListView->SetSelectionMessage(new BMessage(MSG_PARTITION_ROW_SELECTED));
 	fListView->SetTarget(this);
 
+	BDiskDeviceRoster().StartWatching(this);
+
 	// populate the Initialiaze menu with the available file systems
 	_ScanFileSystems();
 
@@ -231,6 +234,7 @@ fDeleteMI->SetEnabled(false);
 
 MainWindow::~MainWindow()
 {
+	BDiskDeviceRoster().StopWatching(this);
 	delete fCurrentDisk;
 }
 
@@ -281,6 +285,9 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SURFACE_TEST:
 			printf("MSG_SURFACE_TEST\n");
 			break;
+
+		// TODO: this could probably be done better!
+		case B_DEVICE_UPDATE:
 		case MSG_RESCAN:
 			_ScanDrives();
 			break;
@@ -309,7 +316,7 @@ MainWindow::MessageReceived(BMessage* message)
 }
 
 
-bool 
+bool
 MainWindow::QuitRequested()
 {
 	// TODO: ask about any unsaved changes
@@ -327,7 +334,7 @@ MainWindow::StoreSettings(BMessage* archive) const
 {
 	if (archive->ReplaceRect("window frame", Frame()) < B_OK)
 		archive->AddRect("window frame", Frame());
-	
+
 	BMessage columnSettings;
 	fListView->SaveState(&columnSettings);
 	if (archive->ReplaceMessage("column settings", &columnSettings) < B_OK)
@@ -425,7 +432,7 @@ MainWindow::_AdaptToSelectedPartition()
 			= dynamic_cast<PartitionListRow*>(_topLevelRow);
 		PartitionListRow* selectedRow
 			= dynamic_cast<PartitionListRow*>(_selectedRow);
-	
+
 		if (topLevelRow)
 			diskID = topLevelRow->ID();
 		if (selectedRow) {
@@ -482,10 +489,10 @@ MainWindow::_EnabledDisableMenuItems(BDiskDevice* disk,
 		fPartitionMenu->SetEnabled(false);
 	} else {
 //		fFormatMI->SetEnabled(true);
-fFormatMI->SetEnabled(false);
+		fFormatMI->SetEnabled(false);
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
-fSurfaceTestMI->SetEnabled(false);
+		fSurfaceTestMI->SetEnabled(false);
 
 		// Create menu and items
 		fPartitionMenu->SetEnabled(true);
@@ -524,16 +531,16 @@ fSurfaceTestMI->SetEnabled(false);
 		if (partition) {
 			fInitMenu->SetEnabled(!partition->IsMounted());
 //			fDeleteMI->SetEnabled(!partition->IsMounted());
-fDeleteMI->SetEnabled(false);
+			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(!partition->IsMounted());
 
 			bool unMountable = false;
 			if (partition->IsMounted()) {
 				// see if this partition is the boot volume
-				BVolume volume; 
-				BVolume bootVolume; 
+				BVolume volume;
+				BVolume bootVolume;
 				if (BVolumeRoster().GetBootVolume(&bootVolume) == B_OK
-					&& partition->GetVolume(&volume) == B_OK) { 
+					&& partition->GetVolume(&volume) == B_OK) {
 					unMountable = volume != bootVolume;
 				} else
 					unMountable = true;
@@ -555,7 +562,7 @@ MainWindow::_DisplayPartitionError(BString _message,
 	const BPartition* partition, status_t error) const
 {
 	char message[1024];
-	
+
 	if (partition && _message.FindFirst("%s") >= 0) {
 		BString name;
 		name << " \"" << partition->ContentName() << "\"";
@@ -659,8 +666,9 @@ MainWindow::_MountAll()
 class ModificationPreparer {
 public:
 	ModificationPreparer(BDiskDevice* disk)
-		: fDisk(disk)
-		, fModificationStatus(fDisk->PrepareModifications())
+		:
+		fDisk(disk),
+		fModificationStatus(fDisk->PrepareModifications())
 	{
 	}
 	~ModificationPreparer()

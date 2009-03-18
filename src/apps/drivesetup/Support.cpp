@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 #include "Support.h"
 
 #include <Partition.h>
@@ -78,11 +79,12 @@ is_valid_partitionable_space(size_t size)
 }
 
 
-// #pragma mark -SpaceIDMap
+// #pragma mark - SpaceIDMap
+
 
 SpaceIDMap::SpaceIDMap()
-	: HashMap<HashString, partition_id>()
-	, fNextSpaceID(-2)
+	: HashMap<HashString, partition_id>(),
+	fNextSpaceID(-2)
 {
 }
 
@@ -106,5 +108,4 @@ SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
 
 	return newID;
 }
-
 

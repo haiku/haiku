@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2008 Haiku Inc. All rights reserved.
+ * Copyright 2007-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 #include "DiskView.h"
 #include "MainWindow.h"
 
@@ -28,14 +29,14 @@ class PartitionView : public BView {
 public:
 	PartitionView(const char* name, float weight, off_t offset,
 			int32 level, partition_id id)
-		: BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE)
-		, fID(id)
-		, fWeight(weight)
-		, fOffset(offset)
-		, fLevel(level)
-		, fSelected(false)
-		, fMouseOver(false)
-		, fGroupLayout(new BGroupLayout(B_HORIZONTAL, kLayoutInset))
+		: BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE),
+		fID(id),
+		fWeight(weight),
+		fOffset(offset),
+		fLevel(level),
+		fSelected(false),
+		fMouseOver(false),
+		fGroupLayout(new BGroupLayout(B_HORIZONTAL, kLayoutInset))
 	{
 		SetLayout(fGroupLayout);
 
@@ -184,10 +185,11 @@ private:
 class DiskView::PartitionLayout : public BDiskDeviceVisitor {
 public:
 	PartitionLayout(BView* view, SpaceIDMap& spaceIDMap)
-		: fView(view)
-		, fViewMap()
-		, fSelectedPartition(-1)
-		, fSpaceIDMap(spaceIDMap)
+		:
+		fView(view),
+		fViewMap(),
+		fSelectedPartition(-1),
+		fSpaceIDMap(spaceIDMap)
 	{
 	}
 
@@ -273,7 +275,7 @@ public:
 				// TODO: remove again once Disk Device API is fixed
 				if (!is_valid_partitionable_space(size))
 					continue;
-				// 
+				//
 				double scale = (double)size / parentSize;
 				partition_id id
 					= fSpaceIDMap.SpaceIDFor(partition->ID(), offset);
@@ -319,11 +321,11 @@ public:
 DiskView::DiskView(const BRect& frame, uint32 resizeMode,
 		SpaceIDMap& spaceIDMap)
 	: Inherited(frame, "diskview", resizeMode,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
-	, fDiskCount(0)
-	, fDisk(NULL)
-	, fSpaceIDMap(spaceIDMap)
-	, fPartitionLayout(new PartitionLayout(this, fSpaceIDMap))
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fDiskCount(0),
+	fDisk(NULL),
+	fSpaceIDMap(spaceIDMap),
+	fPartitionLayout(new PartitionLayout(this, fSpaceIDMap))
 {
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, kLayoutInset);
 	SetLayout(layout);
@@ -414,6 +416,7 @@ DiskView::SetDiskCount(int32 count)
 {
 	fDiskCount = count;
 }
+
 
 void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)

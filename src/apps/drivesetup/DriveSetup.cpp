@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 #include "DriveSetup.h"
 #include "MainWindow.h"
 
@@ -18,22 +19,10 @@
 #include <Path.h>
 
 
-int
-main(int, char**)
-{
-	DriveSetup app;
-	app.Run();
-	return 0;
-}
-
-
-// #pragma mark -
-
-
 DriveSetup::DriveSetup()
-	: BApplication("application/x-vnd.Haiku-DriveSetup")
-	, fWindow(NULL)
-	, fSettings(0UL)
+	: BApplication("application/x-vnd.Haiku-DriveSetup"),
+	fWindow(NULL),
+	fSettings(0UL)
 {
 }
 
@@ -152,3 +141,13 @@ DriveSetup::_GetSettingsFile(BFile& file, bool forWriting) const
 }
 
 
+// #pragma mark -
+
+
+int
+main(int, char**)
+{
+	DriveSetup app;
+	app.Run();
+	return 0;
+}
