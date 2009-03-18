@@ -33,6 +33,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Perl
 #	Subversion
 #	Tar
+#	UserlandFS
 #	Vision
 #	VLC
 #	Welcome
@@ -413,14 +414,14 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	} else {
 		InstallOptionalHaikuImagePackage p7zip-4.61-gcc2-2008-12-03
 			: http://haiku-files.org/files/optional-packages/p7zip-4.61-gcc2-2008-12-03.zip
-			: 
+			:
 		;
-		
+
 		actions BuildHaikuImageExpanderRules
 		{
 			echo "\"application/x-7z-compressed\"\t.7z\t\"7za l \0045s\"\t\"7za x -y \0045s\"" > $(1)
 		}
-		
+
 		Always expander.rules ;
 		MakeLocate expander.rules : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 		BuildHaikuImageExpanderRules expander.rules ;
@@ -486,9 +487,18 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
                 InstallOptionalHaikuImagePackage tar-1.21-gcc2-2009-02-08
                         : $(baseURL)/tar-1.21-gcc2-2009-02-08.zip
-                        : 
+                        :
                 ;
         }
+}
+
+
+# UserlandFS
+if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
+	AddFilesToHaikuImage beos system add-ons kernel file_systems : userlandfs ;
+	AddFilesToHaikuImage beos system servers : userlandfs_server ;
+	AddFilesToHaikuImage beos system lib
+		: libuserlandfs_beos_kernel.so libuserlandfs_haiku_kernel.so ;
 }
 
 
