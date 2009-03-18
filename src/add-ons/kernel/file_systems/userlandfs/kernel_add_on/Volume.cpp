@@ -254,6 +254,33 @@ private:
 };
 
 
+// VNodeRemover
+class Volume::VNodeRemover {
+public:
+	VNodeRemover(Volume* volume, VNode* node)
+		:
+		fVolume(volume),
+		fNode(node)
+	{
+	}
+
+	~VNodeRemover()
+	{
+		if (fNode != NULL) {
+			MutexLocker locker(fVolume->fLock);
+			fVolume->fVNodes->Remove(fNode);
+			locker.Unlock();
+
+			fNode->Delete(fVolume);
+		}
+	}
+
+private:
+	Volume*	fVolume;
+	VNode*	fNode;
+};
+
+
 // constructor
 Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
 	:
@@ -1062,13 +1089,12 @@ Volume::RemoveVNode(void* _node, bool reenter)
 {
 	VNode* vnode = (VNode*)_node;
 
-	// at any rate remove the vnode from our map and delete it
-	MutexLocker locker(fLock);
-	fVNodes->Remove(vnode);
-	locker.Unlock();
+	// At any rate remove the vnode from our map and delete it. We don't do that
+	// right now, though, since we might still need to serve file cache requests
+	// from the client FS.
+	VNodeRemover nodeRemover(this, vnode);
 
 	void* clientNode = vnode->clientNode;
-	vnode->Delete(this);
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -3731,13 +3757,12 @@ Volume::_WriteVNode(void* _node, bool reenter)
 {
 	VNode* vnode = (VNode*)_node;
 
-	// at any rate remove the vnode from our map and delete it
-	MutexLocker locker(fLock);
-	fVNodes->Remove(vnode);
-	locker.Unlock();
+	// At any rate remove the vnode from our map and delete it. We don't do that
+	// right now, though, since we might still need to serve file cache requests
+	// from the client FS.
+	VNodeRemover nodeRemover(this, vnode);
 
 	void* clientNode = vnode->clientNode;
-	vnode->Delete(this);
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();

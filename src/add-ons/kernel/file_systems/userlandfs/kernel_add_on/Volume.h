@@ -229,6 +229,8 @@ private:
 			class AutoIncrementer;
 			class IORequestRemover;
 			friend class IORequestRemover;
+			class VNodeRemover;
+			friend class VNodeRemover;
 
 private:
 			void				_InitVolumeOps();
