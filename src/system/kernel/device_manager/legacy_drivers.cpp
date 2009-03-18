@@ -185,6 +185,8 @@ static hash_table* sDriverHash;
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEvents;
 static DoublyLinkedList<path_entry> sDriversToAdd;
+static DoublyLinkedList<path_entry> sDriversToRemove;
+static mutex sDriversListLock = MUTEX_INITIALIZER("driversList");
 static DirectoryWatcher sDirectoryWatcher;
 static DirectoryNodeHash sDirectoryNodeHash;
 static recursive_lock sLock;
@@ -620,13 +622,30 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 	// something happened, let's see what it was
 
 	RecursiveLocker locker(sLock);
+	MutexLocker _(sDriversListLock);
 
 	while (true) {
 		path_entry* path = sDriversToAdd.RemoveHead();
 		if (path == NULL)
 			break;
 
-		legacy_driver_add(path->path);
+		legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+			get_leaf(path->path));
+		if (driver == NULL)
+			legacy_driver_add(path->path);
+		else if (get_priority(path->path) >= driver->priority)
+			driver->binary_updated = true;
+		delete path;
+	}
+	while (true) {
+		path_entry* path = sDriversToRemove.RemoveHead();
+		if (path == NULL)
+			break;
+
+		legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+			get_leaf(path->path));
+		if (driver != NULL && get_priority(path->path) >= driver->priority)
+			driver->binary_updated = true;
 		delete path;
 	}
 
@@ -645,51 +664,6 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 	}
 
 	hash_close(sDriverHash, &iterator, false);
-}
-
-
-static void
-driver_added(const char* path)
-{
-	int32 priority = get_priority(path);
-	RecursiveLocker locker(sLock);
-
-	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
-		get_leaf(path));
-
-	if (driver == NULL) {
-		// Add the driver to our list
-		path_entry* entry = new(std::nothrow) path_entry;
-		if (entry == NULL)
-			return;
-
-		strlcpy(entry->path, path, sizeof(entry->path));
-		sDriversToAdd.Add(entry);
-	} else {
-		// Update the driver if it is affected by the new entry
-		if (priority < driver->priority)
-			return;
-
-		driver->binary_updated = true;
-	}
-
-	atomic_add(&sDriverEvents, 1);
-}
-
-
-static void
-driver_removed(const char* path)
-{
-	int32 priority = get_priority(path);
-	RecursiveLocker locker(sLock);
-
-	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
-		get_leaf(path));
-	if (driver == NULL || priority < driver->priority)
-		return;
-
-	driver->binary_updated = true;
-	atomic_add(&sDriverEvents, 1);
 }
 
 
@@ -974,14 +948,22 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 	dprintf("driver \"%s\" %s\n", path.Leaf(),
 		opcode == B_ENTRY_CREATED ? "added" : "removed");
 
+	path_entry* entry = new(std::nothrow) path_entry;
+	if (entry == NULL)
+		return;
+
+	strlcpy(entry->path, path.Path(), sizeof(entry->path));
+	MutexLocker _(sDriversListLock);
+
 	switch (opcode) {
 		case B_ENTRY_CREATED:
-			driver_added(path.Path());
+			sDriversToAdd.Add(entry);
 			break;
 		case B_ENTRY_REMOVED:
-			driver_removed(path.Path());
+			sDriversToRemove.Add(entry);
 			break;
 	}
+	atomic_add(&sDriverEvents, 1);
 }
 
 
