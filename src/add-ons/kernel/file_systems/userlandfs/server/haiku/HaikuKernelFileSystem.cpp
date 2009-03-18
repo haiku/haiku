@@ -15,6 +15,7 @@
 
 #include <block_cache.h>
 #include <condition_variable.h>
+#include <file_cache.h>
 
 #include "HaikuKernelIORequest.h"
 #include "HaikuKernelVolume.h"
@@ -118,6 +119,11 @@ HaikuKernelFileSystem::Init()
 
 	// init block cache
 	error = block_cache_init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// init file map
+	error = file_map_init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
