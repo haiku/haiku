@@ -153,7 +153,11 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	//if_printf(ifp, "compat_write(%lld, %p, [%lu])\n", position,
 	//	buffer, *numBytes);
 
-	mb = m_getcl(0, MT_DATA, M_PKTHDR);
+	if (*numBytes > MHLEN)
+		mb = m_getcl(0, MT_DATA, M_PKTHDR);
+	else
+		mb = m_gethdr(0, MT_DATA);
+
 	if (mb == NULL)
 		return ENOBUFS;
 
