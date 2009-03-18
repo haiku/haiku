@@ -32,14 +32,17 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <string.h>
 #include <Debug.h>
+
+#include "BarMenuBar.h"
+
+#include <string.h>
+
 #include <Bitmap.h>
 #include <NodeInfo.h>
 
 #include "icons.h"
 #include "icons_logo.h"
-#include "BarMenuBar.h"
 #include "BarWindow.h"
 #include "BeMenu.h"
 #include "DeskBarUtils.h"

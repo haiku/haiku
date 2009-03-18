@@ -32,13 +32,16 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Debug.h>
+
+#include "BarView.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
-#include <Debug.h>
 #include <Directory.h>
 #include <NodeInfo.h>
 #include <Roster.h>
@@ -47,7 +50,6 @@ All rights reserved.
 
 #include "icons.h"
 #include "BarApp.h"
-#include "BarView.h"
 #include "BarMenuBar.h"
 #include "BarWindow.h"
 #include "BeMenu.h"
@@ -139,7 +141,8 @@ TBarView::Draw(BRect)
 	if (Vertical() && Expando()) {
 		SetHighColor(hilite);
 		BRect frame(fExpando->Frame());
-		StrokeLine(frame.LeftTop() + BPoint(0, -1), frame.RightTop() + BPoint(0, -1));
+		StrokeLine(BPoint(frame.left, frame.top - 1),
+			BPoint(frame.right, frame.top -1));
 	}
 }
 
