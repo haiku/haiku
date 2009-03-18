@@ -2697,6 +2697,11 @@ team_free_user_thread(struct thread* thread)
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
+	// detach from thread
+	SpinLocker threadLocker(gThreadSpinlock);
+	thread->user_thread = NULL;
+	threadLocker.Unlock();
+
 	entry->thread = userThread;
 	entry->next = thread->team->free_user_threads;
 	thread->team->free_user_threads = entry;
