@@ -312,10 +312,13 @@ status_t
 Volume::PutVNode(ino_t vnid)
 {
 PRINT(("put_vnode(%ld, %lld)\n", GetID(), vnid));
-	status_t error = put_vnode(fFSVolume, vnid);
-	if (error == B_OK)
-		_DecrementVNodeCount(vnid);
-	return error;
+	// Decrement the count first. We might not have another chance, since
+	// put_vnode() could put the last reference, thus causing the node to be
+	// removed from our map. This is all not very dramatic, but this way we
+	// avoid an erroneous error message from _DecrementVNodeCount().
+	_DecrementVNodeCount(vnid);
+
+	return put_vnode(fFSVolume, vnid);
 }
 
 
