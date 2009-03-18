@@ -85,12 +85,14 @@ AutoMounter::AutoMounter()
 		fRemovableMode = kNoVolumes;
 	}
 
+	BDiskDeviceRoster().StartWatching(this, B_DEVICE_REQUEST_DEVICE);
 	PostMessage(kMsgInitialScan);
 }
 
 
 AutoMounter::~AutoMounter()
 {
+	BDiskDeviceRoster().StopWatching(this);
 }
 
 
@@ -627,6 +629,16 @@ AutoMounter::MessageReceived(BMessage* message)
 
 		case kMountAllNow:
 			_MountVolumes(kAllVolumes, kAllVolumes, false);
+			break;
+
+		case B_DEVICE_UPDATE:
+			message->PrintToStream();
+			int32 event;
+			if (message->FindInt32("event", &event) != B_OK
+				|| event != B_DEVICE_MEDIA_CHANGED)
+				break;
+
+			_MountVolumes(kNoVolumes, fRemovableMode, false);
 			break;
 
 #if 0
