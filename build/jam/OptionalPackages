@@ -495,10 +495,43 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 
 # UserlandFS
 if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
+	# kernel module
 	AddFilesToHaikuImage beos system add-ons kernel file_systems : userlandfs ;
+
+	# server
 	AddFilesToHaikuImage beos system servers : userlandfs_server ;
-	AddFilesToHaikuImage beos system lib
-		: libuserlandfs_beos_kernel.so libuserlandfs_haiku_kernel.so ;
+
+	# libs
+	local userlandfsLibs =
+		libuserlandfs_beos_kernel.so
+		libuserlandfs_haiku_kernel.so
+		libuserlandfs_fuse.so
+	;
+	AddFilesToHaikuImage beos system lib : $(userlandfsLibs) ;
+
+	# development goodies
+	if [ IsOptionalHaikuImagePackageAdded Development ] {
+		# library symlinks
+		local lib ;
+		for lib in $(userlandfsLibs) {
+			AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
+		}
+
+		# FUSE headers
+		local fuseHeaders =
+			fuse_common_compat.h
+			fuse_common.h
+			fuse_compat.h
+			fuse.h
+			fuse_lowlevel_compat.h
+			fuse_lowlevel.h
+			fuse_opt.h
+		;
+		fuseHeaders = $(fuseHeaders:G=userlandfs!fuse) ;
+		SEARCH on $(fuseHeaders)
+			= [ FDirName $(HAIKU_TOP) headers private userlandfs fuse ] ;
+		AddFilesToHaikuImage develop headers userlandfs fuse : $(fuseHeaders) ;
+	}
 }
 
 
