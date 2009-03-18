@@ -1,6 +1,6 @@
 /*
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -28,12 +28,12 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	struct ifreq ifr;
 	int i;
 
-	for (i = 0; gDeviceNameList[i] != NULL; i++) {
-		if (strcmp(gDeviceNameList[i], name) == 0)
+	for (i = 0; i < MAX_DEVICES; i++) {
+		if (gDevices[i] != NULL && !strcmp(gDevices[i]->device_name, name))
 			break;
 	}
 
-	if (gDeviceNameList[i] == NULL)
+	if (i == MAX_DEVICES)
 		return B_ERROR;
 
 	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
@@ -85,7 +85,7 @@ compat_free(void *cookie)
 
 	if_printf(ifp, "compat_free()\n");
 
-	/* TODO: empty out the send queue */
+	// TODO: empty out the send queue
 
 	atomic_and(&ifp->open_count, 0);
 	put_module(NET_STACK_MODULE_NAME);
@@ -161,7 +161,7 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	if (mb == NULL)
 		return ENOBUFS;
 
-	/* if we waited, check after if the ifp is still valid */
+	// if we waited, check after if the ifp is still valid
 
 	mb->m_pkthdr.len = mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
 	memcpy(mtod(mb, void *), buffer, mb->m_len);

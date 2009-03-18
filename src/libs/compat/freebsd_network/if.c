@@ -1,6 +1,6 @@
 /*
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -24,10 +24,52 @@
 #include <compat/net/ethernet.h>
 
 
+static void
+insert_into_device_name_list(struct ifnet* ifp)
+{
+	int i;
+	for (i = 0; i < MAX_DEVICES; i++) {
+		if (gDeviceNameList[i] == NULL) {
+			gDeviceNameList[i] = ifp->device_name;
+			return;
+		}
+	}
+
+	panic("too many devices");
+}
+
+
+static void
+remove_from_device_name_list(struct ifnet* ifp)
+{
+	int i;
+	for (i = 0; i < MAX_DEVICES; i++) {
+		if (ifp->device_name == gDeviceNameList[i]) {
+			int last;
+			for (last = i + 1; last < MAX_DEVICES; last++) {
+				if (gDeviceNameList[last] == NULL)
+					break;
+			}
+			last--;
+
+			if (i == last)
+				gDeviceNameList[i] = NULL;
+			else {
+				// switch positions with the last entry
+				gDeviceNameList[i] = gDeviceNameList[last];
+				gDeviceNameList[last] = NULL;
+			}
+			break;
+		}
+	}
+}
+
+
 struct ifnet *
 if_alloc(u_char type)
 {
 	char semName[64];
+	int i;
 
 	struct ifnet *ifp = _kernel_malloc(sizeof(struct ifnet), M_ZERO);
 	if (ifp == NULL)
@@ -50,9 +92,24 @@ if_alloc(u_char type)
 	ifp->link_state_sem = -1;
 	ifp->open_count = 0;
 	ifp->flags = 0;
+	ifp->if_type = type;
 	ifq_init(&ifp->receive_queue, semName);
 
-	ifp->if_type = type;
+	// Search for the first free device slot, and use that one
+	for (i = 0; i < MAX_DEVICES; i++) {
+		if (gDevices[i] == NULL) {
+			ifp->if_index = i;
+			gDevices[i] = ifp;
+			gDeviceCount++;
+			break;
+		}
+	}
+
+	if (i == MAX_DEVICES) {
+		panic("too many devices");
+		return NULL;
+	}
+
 	IF_ADDR_LOCK_INIT(ifp);
 	return ifp;
 
@@ -67,6 +124,11 @@ err1:
 void
 if_free(struct ifnet *ifp)
 {
+	remove_from_device_name_list(ifp);
+
+	gDevices[ifp->if_index] = NULL;
+	gDeviceCount--;
+
 	IF_ADDR_LOCK_DESTROY(ifp);
 	if (ifp->if_type == IFT_ETHER)
 		_kernel_free(ifp->if_l2com);
@@ -83,15 +145,11 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 {
 	dprintf("if_initname(%p, %s, %d)\n", ifp, name, unit);
 
-	if (name == NULL)
-		panic("interface goes unamed");
-
-	if (gDeviceCount >= MAX_DEVICES)
-		panic("unit too large");
+	if (name == NULL || name[0] == '\0')
+		panic("interface goes unnamed");
 
 	ifp->if_dname = name;
 	ifp->if_dunit = unit;
-	ifp->if_index = gDeviceCount++;
 
 	strlcpy(ifp->if_xname, name, sizeof(ifp->if_xname));
 
@@ -100,8 +158,7 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 
 	driver_printf("%s: /dev/%s\n", gDriverName, ifp->device_name);
 
-	gDeviceNameList[ifp->if_index] = ifp->device_name;
-	gDevices[ifp->if_index] = ifp;
+	insert_into_device_name_list(ifp);
 
 	ifp->root_device = find_root_device(unit);
 }
