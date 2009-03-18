@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps deskbar ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders app interface shared tracker ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
@@ -47,8 +46,3 @@ Application Deskbar :
 	$(targetSource)
 	: be tracker $(targetLib)
 	;
-
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Deskbar
-		: tests!apps ;
-}
