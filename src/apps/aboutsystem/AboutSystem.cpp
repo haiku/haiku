@@ -788,6 +788,11 @@ AboutView::AboutView(const BRect &rect)
 		"All rights reserved.",
 		"http://tc.umn.edu/~ringx004");
 
+	// MkDepend 1.7 copyright (Makefile dependency generator)
+	AddCopyrightEntry("MkDepend",
+		"Copyright " B_UTF8_COPYRIGHT "1995-2001 Lars Düning. "
+		"All rights reserved.");
+
 // OpenSound
 //	AddCopyrightEntry("OpenSound",
 //		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 4Front Technologies ",

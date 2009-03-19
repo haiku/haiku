@@ -197,6 +197,21 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# cc and c++ wrapper scripts
 	AddFilesToHaikuImage beos bin : cc c++ ;
 
+	# mkdepend build tool, which is part of the Haiku source tree
+	# (same as make, but make is already included independent of the
+	# Development package)
+	AddFilesToHaikuImage beos bin : mkdepend ;
+
+	# skeleton makefile and makefile-engine
+	local makefileEngineFiles =
+		<makefile-engine>makefile
+		<makefile-engine>makefile-engine
+	;
+	SEARCH on $(makefileEngineFiles)
+		= [ FDirName $(HAIKU_TOP) data develop ] ;
+	AddFilesToHaikuImage develop etc
+		: $(makefileEngineFiles) ;
+
 	# headers
 	AddHeaderDirectoryToHaikuImage gnu : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage os ;
