@@ -69,7 +69,7 @@ This is also how you update the code in the future.</p></li>
 ./configure --build-cross-tools ../buildtools/</pre>
 <p>To build with GCC 4.x the configure line changes to:</p>
 <pre class="terminal">./configure  --build-cross-tools-gcc4 x86 ../buildtools/</pre>
-<p>But keep in mind this will produce binaries which are not compatible with BeOS.</p></li>
+<p>But keep in mind this will produce a Haiku installation which is not compatible with BeOS.</p></li>
 </ol>
 
 <p><br /></p>
@@ -81,10 +81,10 @@ This is also how you update the code in the future.</p></li>
 <p>Now you could already start to build RAW or VMWare images. Before we come to that, however, let's have a look at the <span class="cli">UserBuildConfig</span> that can be used to customize and automate some things.</p>
 
 <p>In <span class="path">trunk/haiku/build/jam/</span> there's a <span class="cli">UserBuildConfig.ReadMe</span> that explains various options.  <b>Don't</b> simply rename it and use it as <span class="cli">UserBuildConfig</span>!</p>
-<p>You start by duplicating the <span class="cli">UserBuildConfig.sample</span> and the remove the<span class="cli">.sample</span> suffix to get your <span class="cli">UserBuildConfig</span>. From the <span class="cli">.ReadMe</span> you can copy interesting parts into your config and customize them there.</p>
+<p>You start by duplicating the <span class="cli">UserBuildConfig.sample</span> and removing the <span class="cli">.sample</span> suffix to get your <span class="cli">UserBuildConfig</span>. From the <span class="cli">.ReadMe</span> you can copy interesting parts into your config and customize them there.</p>
 
 <ol>
-<li><p>First, the line is needed for the optional "OpenSSH" package:</p>
+<li><p>First, this line is needed for the optional "OpenSSH" package:</p>
 <pre>HAIKU_IMAGE_HOST_NAME = "TEST" ;</pre>
 </li>
 <li><p>There are several optional software packages available, that are dowloaded at build time if they haven't been so already. For a list of all available packages, see <span class="path">haiku/trunk/build/jam/OptionalPackages</span>. Here's an example:</p>
@@ -107,7 +107,7 @@ AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : German 
 	: Key_map ;</pre></li> 
-<li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files with their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
+<li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files and their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
 For example:</p>
 
 <pre># Zip up your emails between each system update and place the archive into the
@@ -125,12 +125,12 @@ DefineBuildProfile vmware : vmware-image ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 	}
 
 
 	case "vmware" : {
 		HAIKU_IMAGE_SIZE = 900 ;
-		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 	}
 
 }</pre>
@@ -172,17 +172,17 @@ DefineBuildProfile vmware : vmware-image ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 	}
 
 
 	case "vmware" : {
 		HAIKU_IMAGE_SIZE = 900 ;
-		HAIKU_DONT_CLEAR_IMAGE = 1 ;
 	}
 
 }</pre>
 
-<p><b>Note:</b> <i>when building an a USB memory stick, you wouldn't specify the partition number in the disk entry (ex. </i><span class="path">/dev/sdb</span><i> instead of </i><span class="path">/dev/sdb1</span><i>). This will erase your whole flash drive and it's partitions, so be cautious to use the correct drive name!</i></p>
+<p><b>Note:</b> <i>When building onto a USB memory stick, you wouldn't specify the partition number in the disk entry (ex. </i><span class="path">/dev/sdb</span><i> instead of </i><span class="path">/dev/sdb1</span><i>). This will erase your whole flash drive and it's partitions, so be cautious to use the correct drive name!</i></p>
 
 <p>Besides these user build profiles, there are also official release profiles, see <span class="cli">ReleaseBuildProfiles</span> in the same folder. The profiles <i>alpha-raw</i> and <i>alpha-vmware</i> will build all officially planned components for the alpha release. They are invoked just like the user profiles, see <a href="#build_vmimage">Building a VMWare Image</a> a bit further down.
 </p>
@@ -203,7 +203,7 @@ sudo chmod o+rw /dev/sda7
 <p>Note that the read permission is set for the whole disk (1st line) while the write permission is limited to one specific partition (2nd line).</p>
 
 <p>When installing to a USB flashdrive, replace the drive name, and type:</p>
-<pre class="terminal">sudo chmod o+r /dev/sda</pre>
+<pre class="terminal">sudo chmod o+rw /dev/sdb</pre>
 <br />
 
 <p>Now the Haiku image is built and installed on the partition:</p>
@@ -213,7 +213,7 @@ sudo chmod o+rw /dev/sda7
 <p>Installing to its own partition offers some interesting possibilities:</p>
 <pre class="terminal">jam -q @disk update-all</pre>
 
-<p>This updates all of the system, but leaves the home folder untouched, so all your data will still be there.</p>
+<p>This updates all of the system, but leaves the home folder untouched, so all your data and settings will still be there. Note that optional packages will not be updated in this install mode.</p>
 
 <p>You can also decide to only update certain components:</p>
 <pre class="terminal">jam -q @disk update {components}</pre>
@@ -223,7 +223,7 @@ sudo chmod o+rw /dev/sda7
 
 <h4><a id="build_vmimage" name="build_vmimage">Building a VMWare Image</a></h4>
 
-<p>Just enter:</p>
+<p>If you are using the <span class="cli">UserBuildConfig</span> from above, just enter:</p>
 <pre class="terminal">jam -q @vmware</pre>
 
 <p>The resulting image can be run in VMPlayer with an associated <a href="http://haiku-files.org/files/haiku.vmx">.vmx</a> file (There's also a <span class="cli">.vmx</span> file in <span class="path">haiku/3rdparty/vmware/</span>).</p>
@@ -243,7 +243,7 @@ sudo chmod o+rw /dev/sda7
 <p>All harddisks start with "<i>hd</i>"<br />
 "<i>N</i>" is the hard disk number, starting with "0".<br />
 "<i>n</i> is the partition number, also starting with "0".<br />
-The first logical partition always have the number 4, regardless of the number of primary partitions.</p>
+The first logical partition always has the number 4, regardless of the number of primary partitions.</p>
 
 <p>If you're still unsure, check out the <a href="http://www.gnu.org/software/grub/manual/grub.html#Naming-convention">GRUB manual</a>.</p>
 
@@ -263,7 +263,7 @@ chainloader	+1</pre>
 
 <h1>Accessing images/partitions</h1>
 
-<p>Using build profiles has another advantage: You can mount a VMWare image or the partition of a Haiku installation to transfer data. Navigate to <span class="path">haiku/trunk/</span> and simply enter:</p>
+<p>Using build profiles has another advantage: You can mount a VMWare image or the partition of a Haiku installation to transfer data. If you were using the <span class="cli">UserBuildConfig</span> above, you could navigate to <span class="path">haiku/trunk/</span> and simply enter:</p>
 <pre class="terminal">jam @disk mount</pre>
 
 <p>or</p>
@@ -284,7 +284,7 @@ query            - query for files
 quit             - quit the shell
 rm               - remove files and directories
 sync             - syncs the file system</pre>
-<p>It all works pretty much like in your normal bash shell (besides there's sadly no tab-completion).<br />
+<p>It all works pretty much like in your normal bash shell (besides there's sadly neither tab-completion nor command history).<br />
 
 The one thing to remember: You have to prefix every local path (your Linux partition) with a "<tt>:</tt>".</p>
 <p>Here's an example to copy the file <span class="cli">.bash_history</span> from Haiku to your Linux partition:</p>
