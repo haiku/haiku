@@ -21,6 +21,8 @@ DEFINES += _FILE_OFFSET_BITS=64 ;
 SharedLibrary libuserlandfs_fuse.so
 	:
 	fuse_main.cpp
+	FUSEFileSystem.cpp
+	FUSEVolume.cpp
 
 	:
 	<nogrist>userlandfs_server
