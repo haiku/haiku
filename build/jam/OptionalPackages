@@ -562,12 +562,12 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Vision-0.9.7-H-090301/Vision ;
 	} else {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090301
-			: http://vision.sf.net/Vision-0.9.7-H-090301.zip
+		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090319
+			: http://vision.sf.net/Vision-0.9.7-H-090319.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090301/Vision ;
+			: /boot/apps/Vision-0.9.7-H-090319/Vision ;
 	}
 }
 
