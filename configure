@@ -34,6 +34,13 @@ options:
                               a gcc 4 Haiku or vice versa). <dir> specifies the
                               output directory of the other gcc. The directory
                               must already be fully configured.
+                              Note, that a sub-jam will be executed when
+                              building Haiku. When using a jam that is not
+                              simply invoked by "jam", the JAM build variable
+                              needs to be set accordingly.
+                              To disable building the alternative libraries
+                              the variable HAIKU_ADD_ALTERNATIVE_GCC_LIBS can be
+                              unset in the UserBuildConfig file.
   --cross-tools-prefix <prefix>
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
@@ -261,6 +268,7 @@ buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
 alternativeGCCOutputDir=
+addAlternativeGCCLibs=
 
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-081024"
 export haikuRequiredLegacyGCCVersion
@@ -303,6 +311,7 @@ while [ $# -gt 0 ] ; do
 			assertparam "$1" $#
 			cd $2 || exit 1
 			alternativeGCCOutputDir=`pwd`
+			addAlternativeGCCLibs=1
 			cd $currentDir
 			shift 2
 			;;
@@ -427,6 +436,7 @@ HAIKU_USE_GCC_PIPE					?= "${useGCCPipe}" ;
 HAIKU_HOST_USE_32BIT				?= "${use32bit}" ;
 HAIKU_HOST_USE_XATTR				?= "${useXattr}" ;
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${alternativeGCCOutputDir} ;
+HAIKU_ADD_ALTERNATIVE_GCC_LIBS		?= ${addAlternativeGCCLibs} ;
 
 HAIKU_GCC_RAW_VERSION		?= ${haikuGCCVersion} ;
 HAIKU_GCC_MACHINE			?= ${haikuGCCMachine} ;

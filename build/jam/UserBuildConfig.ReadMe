@@ -128,12 +128,13 @@ AddOptionalHaikuImagePackages WonderBrush ;
 # Add all available optional packages.
 HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
 
-# Add the libraries built with the alternative gcc version. The alternative
-# gcc generated directory must have been specified via the configure option
-# --alternative-gcc-output-dir. Note, that a sub-jam will be executed. When
-# using a jam that is not simply invoked by "jam", set the JAM build variable
-# accordingly.
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS = 1 ;
+# Don't add the libraries built with the alternative gcc version.
+# If the alternative gcc generated directory has been specified via the
+# configure option --alternative-gcc-output-dir, the libraries for the
+# alternative gcc version are added by default. Unsetting this variable disables
+# building and adding the libraries. Ignored, if --alternative-gcc-output-dir
+# was not specified.
+HAIKU_ADD_ALTERNATIVE_GCC_LIBS = ;
 
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto

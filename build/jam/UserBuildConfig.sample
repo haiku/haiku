@@ -20,7 +20,7 @@
 # Add symlink/file (timezone and keymap settings) to the image.
 #AddSymlinkToHaikuImage home config settings
 #	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
-#AddFilesToHaikuImage home config settings : <keymap>US-International 
+#AddFilesToHaikuImage home config settings : <keymap>US-International
 #	: Key_map ;
 
 # Copy artwork to the image.
@@ -33,5 +33,5 @@
 # Add all available optional packages.
 #HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
 
-# Add the libraries built with the alternative gcc version.
-#HAIKU_ADD_ALTERNATIVE_GCC_LIBS = 1 ;
+# Don't add the libraries built with the alternative gcc version.
+#HAIKU_ADD_ALTERNATIVE_GCC_LIBS = ;
