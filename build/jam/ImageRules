@@ -718,12 +718,6 @@ rule IsOptionalHaikuImagePackageAdded package
 		return 1 ;
 	}
 
-	# If all optional packages are installed, make sure this one is added, too.
-	if $(HAIKU_ADD_ALL_OPTIONAL_PACKAGES) {
-		AddOptionalHaikuImagePackages $(package) ;
-		return 1 ;
-	}
-
 	return ;
 }
 

@@ -125,9 +125,6 @@ UnzipArchiveToHaikuImage develop tools
 # via wget (i.e. wget must be installed).
 AddOptionalHaikuImagePackages WonderBrush ;
 
-# Add all available optional packages.
-HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
-
 # Don't add the libraries built with the alternative gcc version.
 # If the alternative gcc generated directory has been specified via the
 # configure option --alternative-gcc-output-dir, the libraries for the
@@ -167,8 +164,9 @@ AddGroupToHaikuImage party : 101 : baron walter ;
 
 # A build profile is a named set of settings for building a Haiku image or
 # installation. The following lines define five different build profiles:
-# disk    - Installation on device /dev/sda57. All optional packages will be
-#           included. Profile type "disk" implies "HAIKU_DONT_CLEAR_IMAGE = 1".
+# disk    - Installation on device /dev/sda57. A lengthy list of optional
+#           packages will be included. Profile type "disk" implies
+#           "HAIKU_DONT_CLEAR_IMAGE = 1".
 # qemu    - A plain 200 MB disk image (type "image") named "haiku-qemu.image".
 #           Since only the image name is given, the default location will be
 #           chosen for the image, unless HAIKU_IMAGE_DIR has been set
@@ -192,7 +190,10 @@ DefineBuildProfile install : install : /Haiku2 ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
-		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+		AddOptionalHaikuImagePackages Beam BeBook BeHappy BePDF Bluetooth CVS
+			Development FirefoxLibLayout Links NetSurf OpenSound OpenSSH OpenSSL
+			P7zip Pe Perl Subversion UserlandFS Vision VLC Welcome WonderBrush
+			Yasm ;
 	}
 
 	case "qemu" : {
