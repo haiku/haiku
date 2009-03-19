@@ -10,8 +10,10 @@ FileSystem* FileSystem::sInstance = NULL;
 
 
 // constructor
-FileSystem::FileSystem()
+FileSystem::FileSystem(const char* fsName)
 {
+	strlcpy(fName, fsName, sizeof(fName));
+
 	sInstance = this;
 }
 

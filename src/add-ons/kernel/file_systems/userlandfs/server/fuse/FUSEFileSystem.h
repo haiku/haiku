@@ -12,7 +12,7 @@ namespace UserlandFS {
 
 class FUSEFileSystem : public FileSystem {
 public:
-								FUSEFileSystem(
+								FUSEFileSystem(const char* fsName,
 									int (*mainFunction)(int,
 										const char* const*));
 	virtual						~FUSEFileSystem();

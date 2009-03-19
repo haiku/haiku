@@ -114,9 +114,10 @@ private:
 };
 
 
-FUSEFileSystem::FUSEFileSystem(int (*mainFunction)(int, const char* const*))
+FUSEFileSystem::FUSEFileSystem(const char* fsName,
+	int (*mainFunction)(int, const char* const*))
 	:
-	FileSystem(),
+	FileSystem(fsName),
 	fMainFunction(mainFunction)
 {
 }
@@ -154,7 +155,7 @@ FUSEFileSystem::InitClientFS(const char* parameters)
 {
 	// parse the parameters
 	ArgumentVector args;
-	status_t error = args.Init("FUSE", parameters);
+	status_t error = args.Init(GetName(), parameters);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -184,7 +185,8 @@ printf("userlandfs_create_file_system()\n");
 printf("userlandfs_create_file_system(): found main: %p\n", mainFunction);
 
 	// create the file system
-	FUSEFileSystem* fileSystem = new(std::nothrow) FUSEFileSystem(mainFunction);
+	FUSEFileSystem* fileSystem = new(std::nothrow) FUSEFileSystem(fsName,
+		mainFunction);
 	if (fileSystem == NULL)
 		return B_NO_MEMORY;
 

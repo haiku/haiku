@@ -79,9 +79,10 @@ struct HaikuKernelFileSystem::NodeCapabilitiesTable
 
 
 // constructor
-HaikuKernelFileSystem::HaikuKernelFileSystem(file_system_module_info* fsModule)
+HaikuKernelFileSystem::HaikuKernelFileSystem(const char* fsName,
+	file_system_module_info* fsModule)
 	:
-	FileSystem(),
+	FileSystem(fsName),
 	fFSModule(fsModule),
 	fIORequests(NULL),
 	fNodeCapabilities(NULL),
@@ -410,7 +411,7 @@ userlandfs_create_file_system(const char* fsName, image_id image,
 
 	// create the file system
 	HaikuKernelFileSystem* fileSystem
-		= new(std::nothrow) HaikuKernelFileSystem(module);
+		= new(std::nothrow) HaikuKernelFileSystem(fsName, module);
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
 

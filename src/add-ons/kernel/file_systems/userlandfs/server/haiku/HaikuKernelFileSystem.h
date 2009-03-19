@@ -21,7 +21,7 @@ struct HaikuKernelIORequest;
 
 class HaikuKernelFileSystem : public FileSystem {
 public:
-								HaikuKernelFileSystem(
+								HaikuKernelFileSystem(const char* fsName,
 									file_system_module_info* fsModule);
 	virtual						~HaikuKernelFileSystem();
 

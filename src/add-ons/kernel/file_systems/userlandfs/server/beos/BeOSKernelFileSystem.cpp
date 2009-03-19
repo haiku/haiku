@@ -14,9 +14,10 @@ static const int32 kMaxBlockCacheBlocks = 16384;
 
 
 // constructor
-BeOSKernelFileSystem::BeOSKernelFileSystem(beos_vnode_ops* fsOps)
+BeOSKernelFileSystem::BeOSKernelFileSystem(const char* fsName,
+	beos_vnode_ops* fsOps)
 	:
-	FileSystem(),
+	FileSystem(fsName),
 	fFSOps(fsOps),
 	fBlockCacheInitialized(false)
 {
@@ -250,7 +251,7 @@ userlandfs_create_file_system(const char* fsName, image_id image,
 
 	// create the file system
 	BeOSKernelFileSystem* fileSystem
-		= new(std::nothrow) BeOSKernelFileSystem(fsOps);
+		= new(std::nothrow) BeOSKernelFileSystem(fsName, fsOps);
 	if (!fileSystem)
 		RETURN_ERROR(B_NO_MEMORY);
 

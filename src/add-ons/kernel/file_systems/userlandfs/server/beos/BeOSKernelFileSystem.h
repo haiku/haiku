@@ -11,7 +11,8 @@ namespace UserlandFS {
 
 class BeOSKernelFileSystem : public FileSystem {
 public:
-								BeOSKernelFileSystem(beos_vnode_ops* fsOps);
+								BeOSKernelFileSystem(const char* fsName,
+									beos_vnode_ops* fsOps);
 	virtual						~BeOSKernelFileSystem();
 
 			status_t			Init();

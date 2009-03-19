@@ -19,10 +19,12 @@ class Volume;
 
 class FileSystem {
 public:
-								FileSystem();
+								FileSystem(const char* fsName);
 	virtual						~FileSystem();
 
 	static	FileSystem*			GetInstance();
+
+			const char*			GetName() const	{ return fName; }
 
 	virtual	status_t			CreateVolume(Volume** volume, dev_t id) = 0;
 	virtual	status_t			DeleteVolume(Volume* volume) = 0;
@@ -45,6 +47,7 @@ protected:
 			VolumeList			fVolumes;
 			FSCapabilities		fCapabilities;
 			client_fs_type		fClientFSType;
+			char				fName[B_FILE_NAME_LENGTH];
 
 	static	FileSystem*			sInstance;
 };
