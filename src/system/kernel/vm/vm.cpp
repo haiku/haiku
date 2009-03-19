@@ -1187,8 +1187,12 @@ second_chance:
 				// TODO: it would make sense to start with the biggest of them
 				next = addressSpace->areas;
 				last = NULL;
-				for (last = NULL; next; next = next->address_space_next,
-						last = next) {
+				for (last = NULL; next; next = next->address_space_next) {
+					if (next->id != RESERVED_AREA_ID) {
+						last = next;
+						continue;
+					}
+
 					// TODO: take free space after the reserved area into
 					// account!
 					if (next->base == ROUNDUP(next->base, alignment)
@@ -1216,6 +1220,8 @@ second_chance:
 						area->base = next->base + next->size;
 						break;
 					}
+
+					last = next;
 				}
 			}
 			break;
