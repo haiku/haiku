@@ -505,15 +505,17 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 	switch (signal) {
 		case SIGKILL:
 		{
-			struct thread *mainThread = thread->team->main_thread;
 			// Forward KILLTHR to the main thread of the team
+			struct thread *mainThread = thread->team->main_thread;
+			atomic_or(&mainThread->sig_pending, SIGNAL_TO_MASK(SIGKILLTHR));
 
-			mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
 			// Wake up main thread
 			if (mainThread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(mainThread);
 			else
 				thread_interrupt(mainThread, true);
+
+			update_thread_signals_flag(mainThread);
 
 			// Supposed to fall through
 		}
