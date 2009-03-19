@@ -7,22 +7,27 @@
 
 #include <stdio.h>
 
-#include <fuse.h>
+#include "fuse_api.h"
+#include "FUSEFileSystem.h"
 
 
 int
 fuse_main_real(int argc, char* argv[], const struct fuse_operations* op,
-	size_t op_size, void *user_data)
+	size_t opSize, void* userData)
 {
-printf("fuse_main_real(%d, %p, %p, %ld, %p)\n", argc, argv, op, op_size,
-user_data);
-	// TODO: Implement!
-	return 0;
+printf("fuse_main_real(%d, %p, %p, %ld, %p)\n", argc, argv, op, opSize,
+userData);
+
+	// run the main loop
+	status_t error = FUSEFileSystem::GetInstance()->FinishInitClientFS(op,
+		opSize, userData);
+
+	return error == B_OK ? 0 : 1;
 }
 
 
 int
-fuse_is_lib_option(const char *opt)
+fuse_is_lib_option(const char* opt)
 {
 printf("fuse_is_lib_option(\"%s\")\n", opt);
 	// TODO: Implement!

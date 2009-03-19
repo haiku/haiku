@@ -39,6 +39,8 @@ printf("FUSEVolume::Mount()\n");
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	_FileSystem()->ExitClientFS(B_UNSUPPORTED);
+
 	return B_UNSUPPORTED;
 }
 

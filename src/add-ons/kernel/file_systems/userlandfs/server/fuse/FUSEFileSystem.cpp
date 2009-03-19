@@ -118,13 +118,27 @@ FUSEFileSystem::FUSEFileSystem(const char* fsName,
 	int (*mainFunction)(int, const char* const*))
 	:
 	FileSystem(fsName),
-	fMainFunction(mainFunction)
+	fMainFunction(mainFunction),
+	fInitThread(-1),
+	fInitStatus(B_NO_INIT),
+	fInitSemaphore(-1),
+	fExitSemaphore(-1),
+	fInitParameters(NULL),
+	fFS(NULL)
 {
 }
 
 
 FUSEFileSystem::~FUSEFileSystem()
 {
+	if (fInitSemaphore >= 0)
+		delete_sem(fInitSemaphore);
+
+	if (fExitSemaphore >= 0)
+		delete_sem(fExitSemaphore);
+
+	if (fInitThread >= 0)
+		wait_for_thread(fInitThread, NULL);
 }
 
 
@@ -132,6 +146,10 @@ status_t
 FUSEFileSystem::CreateVolume(Volume** _volume, dev_t id)
 {
 printf("FUSEFileSystem::CreateVolume()\n");
+	// Only one volume is possible
+	if (!fVolumes.IsEmpty())
+		RETURN_ERROR(B_BUSY);
+
 	// create the volume
 	FUSEVolume* volume = new(std::nothrow) FUSEVolume(this, id);
 	if (volume == NULL)
@@ -153,16 +171,130 @@ FUSEFileSystem::DeleteVolume(Volume* volume)
 status_t
 FUSEFileSystem::InitClientFS(const char* parameters)
 {
+	// create the semaphores we need
+	fInitSemaphore = create_sem(0, "FUSE init sem");
+	if (fInitSemaphore < 0)
+		RETURN_ERROR(fInitSemaphore);
+
+	fExitSemaphore = create_sem(0, "FUSE exit sem");
+	if (fExitSemaphore < 0)
+		RETURN_ERROR(fExitSemaphore);
+
+	fInitStatus = 1;
+	fInitParameters = parameters;
+
+	// Start the initialization thread -- it will call main() and won't return
+	// until unmounting.
+	fInitThread = spawn_thread(&_InitializationThreadEntry,
+		"FUSE init", B_NORMAL_PRIORITY, this);
+	if (fInitThread < 0)
+		RETURN_ERROR(fInitThread);
+
+	resume_thread(fInitThread);
+
+	// wait for the initialization to finish
+	while (acquire_sem(fInitSemaphore) == B_INTERRUPTED) {
+	}
+
+	fInitSemaphore = -1;
+
+	if (fInitStatus > 0)
+		RETURN_ERROR(B_ERROR);
+	if (fInitStatus != B_OK)
+		RETURN_ERROR(fInitStatus);
+
+	// initialization went fine
+	return B_OK;
+}
+
+
+void
+FUSEFileSystem::ExitClientFS(status_t status)
+{
+	// set the exit status and notify the initialization thread
+	fExitStatus = status;
+	if (fExitSemaphore >= 0)
+		delete_sem(fExitSemaphore);
+}
+
+
+status_t
+FUSEFileSystem::FinishInitClientFS(const fuse_operations* ops, size_t opSize,
+	void* userData)
+{
+	fExitStatus = B_ERROR;
+
+	// do the initialization
+	status_t error = _InitClientFS(ops, opSize, userData);
+
+	// notify the mount thread
+	fInitStatus = error;
+	delete_sem(fInitSemaphore);
+
+	// loop until unmounting
+	while (acquire_sem(fExitSemaphore) == B_INTERRUPTED) {
+	}
+
+	fExitSemaphore = -1;
+
+	if (error == B_OK)
+		fuse_fs_destroy(fFS);
+
+	return error;
+}
+
+
+/*static*/ status_t
+FUSEFileSystem::_InitializationThreadEntry(void* data)
+{
+	return ((FUSEFileSystem*)data)->_InitializationThread();
+}
+
+
+status_t
+FUSEFileSystem::_InitializationThread()
+{
 	// parse the parameters
 	ArgumentVector args;
-	status_t error = args.Init(GetName(), parameters);
-	if (error != B_OK)
-		RETURN_ERROR(error);
+	status_t error = args.Init(GetName(), fInitParameters);
+	if (error != B_OK) {
+		fInitStatus = error;
+		delete_sem(fInitSemaphore);
+		return B_OK;
+	}
 
-	// call main
+	// call main -- should not return until unmounting
 	fMainFunction(args.ArgumentCount(), args.Arguments());
+printf("FUSEFileSystem::_InitializationThread(): main() returned!\n");
 
-// TODO: Check whether everything went fine!
+	if (fInitStatus > 0 && fInitSemaphore >= 0) {
+		// something went wrong early -- main() returned without calling
+		// fuse_main()
+		fInitStatus = B_ERROR;
+		delete_sem(fInitSemaphore);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FUSEFileSystem::_InitClientFS(const fuse_operations* ops, size_t opSize,
+	void* userData)
+{
+	// create a fuse_fs object
+	fFS = fuse_fs_new(ops, opSize, userData);
+	if (fFS == NULL)
+		return B_ERROR;
+
+	// init connection info
+	fConnectionInfo.proto_major = 0;
+	fConnectionInfo.proto_minor = 0;
+	fConnectionInfo.async_read = false;
+	fConnectionInfo.max_write = 64 * 1024;
+	fConnectionInfo.max_readahead = 64 * 1024;
+
+	fuse_fs_init(fFS, &fConnectionInfo);
 
 	return B_OK;
 }

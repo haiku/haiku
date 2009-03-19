@@ -7,6 +7,8 @@
 
 #include "../FileSystem.h"
 
+#include "fuse_api.h"
+
 
 namespace UserlandFS {
 
@@ -17,21 +19,50 @@ public:
 										const char* const*));
 	virtual						~FUSEFileSystem();
 
+	static	FUSEFileSystem*		GetInstance();
+
 	virtual	status_t			CreateVolume(Volume** _volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
 			status_t			InitClientFS(const char* parameters);
+			void				ExitClientFS(status_t status);
+
+			status_t			FinishInitClientFS(const fuse_operations* ops,
+									size_t opSize, void* userData);
 
 private:
 			class ArgumentVector;
 
 private:
+	static	status_t			_InitializationThreadEntry(void* data);
+			status_t			_InitializationThread();
+
+			status_t			_InitClientFS(const fuse_operations* ops,
+									size_t opSize, void* userData);
+
+private:
 			int					(*fMainFunction)(int, const char* const*);
+			thread_id			fInitThread;
+			status_t			fInitStatus;
+			status_t			fExitStatus;
+			sem_id				fInitSemaphore;
+			sem_id				fExitSemaphore;
+			fuse_operations		fOps;
+			const char*			fInitParameters;
+			fuse_fs*			fFS;
+			fuse_conn_info		fConnectionInfo;
 };
 
 }	// namespace UserlandFS
 
 using UserlandFS::FUSEFileSystem;
+
+
+/*static*/ inline FUSEFileSystem*
+FUSEFileSystem::GetInstance()
+{
+	return static_cast<FUSEFileSystem*>(sInstance);
+}
 
 
 #endif	// USERLAND_FS_FUSE_FILE_SYSTEM_H
