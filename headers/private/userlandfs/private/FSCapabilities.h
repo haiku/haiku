@@ -13,6 +13,7 @@
 enum client_fs_type {
 	CLIENT_FS_BEOS_KERNEL = 0,
 	CLIENT_FS_HAIKU_KERNEL,
+	CLIENT_FS_FUSE
 };
 
 // FS capabilities
