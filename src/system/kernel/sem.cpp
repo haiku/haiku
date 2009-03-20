@@ -298,6 +298,68 @@ fill_sem_info(struct sem_entry *sem, sem_info *info, size_t size)
 }
 
 
+static status_t
+delete_sem_internal(sem_id id, bool checkPermission)
+{
+	if (sSemsActive == false)
+		return B_NO_MORE_SEMS;
+	if (id < 0)
+		return B_BAD_SEM_ID;
+
+	int32 slot = id % sMaxSems;
+
+	cpu_status state = disable_interrupts();
+	GRAB_SEM_LOCK(sSems[slot]);
+
+	if (sSems[slot].id != id) {
+		RELEASE_SEM_LOCK(sSems[slot]);
+		restore_interrupts(state);
+		TRACE(("delete_sem: invalid sem_id %ld\n", id));
+		return B_BAD_SEM_ID;
+	}
+
+	if (checkPermission
+		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		RELEASE_SEM_LOCK(sSems[slot]);
+		restore_interrupts(state);
+		dprintf("thread %ld tried to delete kernel semaphore %ld.\n",
+			thread_get_current_thread_id(), id);
+		return B_NOT_ALLOWED;
+	}
+
+	KTRACE("delete_sem(sem: %ld)", id);
+
+	notify_sem_select_events(&sSems[slot], B_EVENT_INVALID);
+	sSems[slot].u.used.select_infos = NULL;
+
+	// free any threads waiting for this semaphore
+	GRAB_THREAD_LOCK();
+	while (queued_thread* entry = sSems[slot].queue.RemoveHead()) {
+		entry->queued = false;
+		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
+	}
+	RELEASE_THREAD_LOCK();
+
+	sSems[slot].id = -1;
+	char *name = sSems[slot].u.used.name;
+	sSems[slot].u.used.name = NULL;
+
+	RELEASE_SEM_LOCK(sSems[slot]);
+
+	// append slot to the free list
+	GRAB_SEM_LIST_LOCK();
+	free_sem_slot(slot, id + sMaxSems);
+	atomic_add(&sUsedSems, -1);
+	RELEASE_SEM_LIST_LOCK();
+
+	restore_interrupts(state);
+
+	free(name);
+
+	return B_OK;
+}
+
+ 
 //	#pragma mark - Private Kernel API
 
 
@@ -636,53 +698,7 @@ create_sem(int32 count, const char *name)
 status_t
 delete_sem(sem_id id)
 {
-	if (sSemsActive == false)
-		return B_NO_MORE_SEMS;
-	if (id < 0)
-		return B_BAD_SEM_ID;
-
-	int32 slot = id % sMaxSems;
-
-	cpu_status state = disable_interrupts();
-	GRAB_SEM_LOCK(sSems[slot]);
-
-	if (sSems[slot].id != id) {
-		RELEASE_SEM_LOCK(sSems[slot]);
-		restore_interrupts(state);
-		TRACE(("delete_sem: invalid sem_id %ld\n", id));
-		return B_BAD_SEM_ID;
-	}
-
-	KTRACE("delete_sem(sem: %ld)", id);
-
-	notify_sem_select_events(&sSems[slot], B_EVENT_INVALID);
-	sSems[slot].u.used.select_infos = NULL;
-
-	// free any threads waiting for this semaphore
-	GRAB_THREAD_LOCK();
-	while (queued_thread* entry = sSems[slot].queue.RemoveHead()) {
-		entry->queued = false;
-		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
-	}
-	RELEASE_THREAD_LOCK();
-
-	sSems[slot].id = -1;
-	char *name = sSems[slot].u.used.name;
-	sSems[slot].u.used.name = NULL;
-
-	RELEASE_SEM_LOCK(sSems[slot]);
-
-	// append slot to the free list
-	GRAB_SEM_LIST_LOCK();
-	free_sem_slot(slot, id + sMaxSems);
-	atomic_add(&sUsedSems, -1);
-	RELEASE_SEM_LIST_LOCK();
-
-	restore_interrupts(state);
-
-	free(name);
-
-	return B_OK;
+	return delete_sem_internal(id, false);
 }
 
 
@@ -741,7 +757,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		goto err;
 	}
 
-	// ToDo: the B_CHECK_PERMISSION flag should be made private, as it
+	// TODO: the B_CHECK_PERMISSION flag should be made private, as it
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
@@ -1160,7 +1176,7 @@ _user_create_sem(int32 count, const char *userName)
 status_t
 _user_delete_sem(sem_id id)
 {
-	return delete_sem(id);
+	return delete_sem_internal(id, true);
 }
 
 
