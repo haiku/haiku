@@ -454,7 +454,8 @@ FileSystem::_InitVNodeOpsVector(fs_vnode_ops* ops,
 
 	// file operations
 	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE, create);
-	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN, open);
+	// FS_VNODE_CAPABILITY_OPEN: open
+		// mandatory
 	// FS_VNODE_CAPABILITY_CLOSE: close
 		// needed by Volume
 	// FS_VNODE_CAPABILITY_FREE_COOKIE: free_cookie
@@ -465,7 +466,8 @@ FileSystem::_InitVNodeOpsVector(fs_vnode_ops* ops,
 	// directory operations
 	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_CREATE_DIR, create_dir);
 	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_REMOVE_DIR, remove_dir);
-	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_OPEN_DIR, open_dir);
+	// FS_VNODE_CAPABILITY_OPEN_DIR: open_dir
+		// mandatory
 	// FS_VNODE_CAPABILITY_CLOSE_DIR: close_dir
 		// needed by Volume
 	// FS_VNODE_CAPABILITY_FREE_DIR_COOKIE: free_dir_cookie
