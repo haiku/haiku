@@ -327,14 +327,13 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 	if (fuseError != 0)
 		return from_fuse_error(fuseError);
 
-	info->flags = ((st.f_fsid & ST_RDONLY) != 0 ? B_FS_IS_READONLY : 0)
-		| B_FS_IS_PERSISTENT;			// assume the FS is persistent
+	info->flags = B_FS_IS_PERSISTENT;	// assume the FS is persistent
 	info->block_size = st.f_bsize;
 	info->io_size = 64 * 1024;			// some value
 	info->total_blocks = st.f_blocks;
 	info->free_blocks = st.f_bfree;
 	info->total_nodes = st.f_files;
-	info->free_nodes = st.f_favail;
+	info->free_nodes = 100;				// st.f_favail is ignored by statfs()
 	info->volume_name[0] = '\0';		// no way to get the name (if any)
 
 	return B_OK;
