@@ -21,6 +21,17 @@ public:
 
 	static	FUSEFileSystem*		GetInstance();
 
+			void				GetVolumeCapabilities(
+									FSVolumeCapabilities& capabilities) const
+									{ capabilities = fVolumeCapabilities; }
+			void				GetNodeCapabilities(
+									FSVNodeCapabilities& capabilities) const
+									{ capabilities = fNodeCapabilities; }
+			const FSVNodeCapabilities& GetNodeCapabilities() const
+									{ return fNodeCapabilities; }
+
+			fuse_fs*			GetFS() const	{ return fFS; }
+
 	virtual	status_t			CreateVolume(Volume** _volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
@@ -40,6 +51,8 @@ private:
 			status_t			_InitClientFS(const fuse_operations* ops,
 									size_t opSize, void* userData);
 
+			void				_InitCapabilities();
+
 private:
 			int					(*fMainFunction)(int, const char* const*);
 			thread_id			fInitThread;
@@ -51,6 +64,9 @@ private:
 			const char*			fInitParameters;
 			fuse_fs*			fFS;
 			fuse_conn_info		fConnectionInfo;
+
+			FSVolumeCapabilities fVolumeCapabilities;
+			FSVNodeCapabilities	fNodeCapabilities;
 };
 
 }	// namespace UserlandFS

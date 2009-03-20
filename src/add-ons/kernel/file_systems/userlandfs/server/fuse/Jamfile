@@ -4,6 +4,7 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
+UsePrivateHeaders kernel shared ;
 SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
 SubDirSysHdrs [ FDirName $(userlandFSIncludes) fuse ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
@@ -26,5 +27,5 @@ SharedLibrary libuserlandfs_fuse.so
 	FUSEVolume.cpp
 
 	:
-	<nogrist>userlandfs_server
+	<nogrist>userlandfs_server be
 ;

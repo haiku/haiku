@@ -8,5 +8,6 @@
 #define FUSE_USE_VERSION FUSE_VERSION
 
 #include <fuse.h>
+#include <fuse_lowlevel.h>
 
 #endif	// USERLAND_FS_FUSE_FUSE_API_H

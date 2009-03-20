@@ -5,6 +5,13 @@
 #ifndef USERLAND_FS_FUSE_VOLUME_H
 #define USERLAND_FS_FUSE_VOLUME_H
 
+#include <AutoLocker.h>
+
+#include "Locker.h"
+
+#include "fuse_fs.h"
+#include "FUSEEntry.h"
+
 #include "../Volume.h"
 
 
@@ -19,6 +26,10 @@ public:
 									dev_t id);
 	virtual						~FUSEVolume();
 
+			status_t			Init();
+
+			void				SetFS(fuse_fs* fs)	{ fFS = fs; }
+
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
 									const char* parameters, ino_t* rootID);
@@ -31,10 +42,6 @@ public:
 	// vnodes
 	virtual	status_t			Lookup(void* dir, const char* entryName,
 									ino_t* vnid);
-	virtual	status_t			GetVNodeType(void* node, int* type);
-									// Only needs to be implemented when
-									// the three parameters publish_vnode() is
-									// used.
 	virtual	status_t			GetVNodeName(void* node, char* buffer,
 									size_t bufferSize);
 	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
@@ -112,7 +119,38 @@ public:
 	virtual	status_t			RewindDir(void* node, void* cookie);
 
 private:
+	struct DirCookie;
+	struct ReadDirBuffer;
+
+private:
 	inline	FUSEFileSystem*		_FileSystem() const;
+
+			ino_t				_GenerateNodeID();
+
+			status_t			_GetNode(FUSENode* dir, const char* entryName,
+									FUSENode** _node);
+			status_t			_InternalGetNode(FUSENode* dir,
+									const char* entryName, FUSENode** _node,
+									AutoLocker<Locker>& locker);
+			void				_PutNode(FUSENode* node);
+
+			status_t			_BuildPath(FUSENode* dir, const char* entryName,
+									char* path, size_t& pathLen);
+			status_t			_BuildPath(FUSENode* node, char* path,
+									size_t& pathLen);
+
+	static	int					_AddReadDirEntry(void* buffer, const char* name,
+									const struct stat* st, off_t offset);
+
+private:
+			Locker				fLock;
+			fuse_fs*			fFS;
+			FUSEEntryTable		fEntries;
+			FUSENodeTable		fNodes;
+			FUSENode*			fRootNode;
+			ino_t				fNextNodeID;
+			bool				fUseNodeIDs;	// TODO: Actually read the
+												// option!
 };
 
 }	// namespace UserlandFS
