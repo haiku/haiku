@@ -355,12 +355,4 @@ Volume::GetRootID() const
 }
 
 
-inline bool
-Volume::HasVNodeCapability(VNode* vnode, int capability) const
-{
-	// TODO: Implement for real!
-	return true;
-}
-
-
 #endif	// USERLAND_FS_VOLUME_H

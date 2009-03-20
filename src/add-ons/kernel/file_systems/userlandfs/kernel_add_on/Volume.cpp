@@ -281,6 +281,14 @@ private:
 };
 
 
+// HasVNodeCapability
+inline bool
+Volume::HasVNodeCapability(VNode* vnode, int capability) const
+{
+	return vnode->ops->capabilities.Get(capability);
+}
+
+
 // constructor
 Volume::Volume(FileSystem* fileSystem, fs_volume* fsVolume)
 	:
