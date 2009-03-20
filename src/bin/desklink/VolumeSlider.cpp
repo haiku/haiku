@@ -424,9 +424,10 @@ SliderView::MessageReceived(BMessage* msg)
 void
 SliderView::MouseDown(BPoint point)
 {
-	if (Bounds().Contains(point)) 
+	if (Bounds().Contains(point)) {
 		SetTracking(true);
-	else 
+		MouseMoved(point, B_INSIDE_VIEW, NULL);
+	} else
 		Invoke();
 }
 
