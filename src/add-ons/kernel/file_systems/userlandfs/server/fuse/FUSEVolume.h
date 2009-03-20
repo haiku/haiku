@@ -119,6 +119,7 @@ public:
 	virtual	status_t			RewindDir(void* node, void* cookie);
 
 private:
+	struct DirEntryCache;
 	struct DirCookie;
 	struct ReadDirBuffer;
 
@@ -141,6 +142,11 @@ private:
 
 	static	int					_AddReadDirEntry(void* buffer, const char* name,
 									const struct stat* st, off_t offset);
+	static	int					_AddReadDirEntryGetDir(fuse_dirh_t handle,
+									const char* name, int type, ino_t nodeID);
+			int					_AddReadDirEntry(ReadDirBuffer* buffer,
+									const char* name, int type, ino_t nodeID,
+									off_t offset);
 
 private:
 			Locker				fLock;

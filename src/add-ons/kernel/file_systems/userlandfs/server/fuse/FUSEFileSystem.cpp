@@ -422,12 +422,14 @@ FUSEFileSystem::_InitCapabilities()
 // 	// directory operations
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fFS->ops.mkdir);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fFS->ops.rmdir);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, fFS->ops.opendir);
+	bool readDirSupport = fFS->ops.opendir != NULL || fFS->ops.readdir != NULL
+		|| fFS->ops.getdir;
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, readDirSupport);
 //	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_DIR, true);
 		// not needed
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, true);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, fFS->ops.readdir);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, fFS->ops.readdir);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, readDirSupport);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, readDirSupport);
+ 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, readDirSupport);
 //
 // 	// attribute directory operations
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR,

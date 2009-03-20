@@ -25,12 +25,133 @@ from_fuse_error(int error)
 }
 
 
+struct FUSEVolume::DirEntryCache {
+	DirEntryCache()
+		:
+		fEntries(NULL),
+		fNames(NULL),
+		fEntryCount(0),
+		fEntryCapacity(0),
+		fNamesSize(0),
+		fNamesCapacity(0)
+	{
+	}
+
+	~DirEntryCache()
+	{
+		free(fEntries);
+		free(fNames);
+	}
+
+	status_t AddEntry(ino_t nodeID, const char* name)
+	{
+		// resize entries array, if full
+		if (fEntryCount == fEntryCapacity) {
+			// entries array full -- resize
+			uint32 newCapacity = std::max(fEntryCapacity * 2, (uint32)8);
+			Entry* newEntries = (Entry*)realloc(fEntries,
+				newCapacity * sizeof(Entry));
+			if (newEntries == NULL)
+				return B_NO_MEMORY;
+
+			fEntries = newEntries;
+			fEntryCapacity = newCapacity;
+		}
+
+		// resize names buffer, if full
+		size_t nameSize = strlen(name) + 1;
+		if (fNamesSize + nameSize > fNamesCapacity) {
+			size_t newCapacity = std::max(fNamesCapacity * 2, (size_t)256);
+			while (newCapacity < fNamesSize + nameSize)
+				newCapacity *= 2;
+
+			char* names = (char*)realloc(fNames, newCapacity);
+			if (names == NULL)
+				return B_NO_MEMORY;
+
+			fNames = names;
+			fNamesCapacity = newCapacity;
+		}
+
+		// add the entry
+		fEntries[fEntryCount].nodeID = nodeID;
+		fEntries[fEntryCount].nameOffset = fNamesSize;
+		fEntries[fEntryCount].nameSize = nameSize;
+		fEntryCount++;
+
+		memcpy(fNames + fNamesSize, name, nameSize);
+		fNamesSize += nameSize;
+
+		return B_OK;
+	}
+
+	uint32 CountEntries() const
+	{
+		return fEntryCount;
+	}
+
+	size_t DirentLength(uint32 index) const
+	{
+		const Entry& entry = fEntries[index];
+		return sizeof(dirent) + entry.nameSize - 1;
+	}
+
+	bool ReadDirent(uint32 index, dev_t volumeID, bool align, dirent* buffer,
+		size_t bufferSize) const
+	{
+		if (index >= fEntryCount)
+			return false;
+
+		const Entry& entry = fEntries[index];
+
+		// get and check the size
+		size_t size = sizeof(dirent) + entry.nameSize - 1;
+		if (size > bufferSize)
+			return false;
+
+		// align the size, if requested
+		if (align)
+			size = std::min(bufferSize, (size + 7) / 8 * 8);
+
+		// fill in the dirent
+		buffer->d_dev = volumeID;
+		buffer->d_ino = entry.nodeID;
+		memcpy(buffer->d_name, fNames + entry.nameOffset, entry.nameSize);
+		buffer->d_reclen = size;
+
+		return true;
+	}
+
+private:
+	struct Entry {
+		ino_t	nodeID;
+		uint32	nameOffset;
+		uint32	nameSize;
+	};
+
+private:
+	Entry*	fEntries;
+	char*	fNames;
+	uint32	fEntryCount;
+	uint32	fEntryCapacity;
+	size_t	fNamesSize;
+	size_t	fNamesCapacity;
+};
+
+
 struct FUSEVolume::DirCookie : fuse_file_info {
-	off_t		currentEntryOffset;
+	union {
+		off_t		currentEntryOffset;
+		uint32		currentEntryIndex;
+	};
+	DirEntryCache*	entryCache;
+	bool			getdirInterface;
 
 	DirCookie()
 		:
-		currentEntryOffset(0)
+		currentEntryOffset(0),
+		entryCache(NULL),
+		getdirInterface(false)
 	{
 		flags = 0;
 		fh_old = 0;
@@ -40,6 +161,11 @@ struct FUSEVolume::DirCookie : fuse_file_info {
 		flush = 0;
 		fh = 0;
 		lock_owner = 0;
+	}
+
+	~DirCookie()
+	{
+		delete entryCache;
 	}
 };
 
@@ -53,12 +179,12 @@ struct FUSEVolume::ReadDirBuffer {
 	size_t		usedSize;
 	uint32		entriesRead;
 	uint32		maxEntries;
-	off_t		lastOffset;
 	status_t	error;
 
 	ReadDirBuffer(FUSEVolume* volume, FUSENode* directory, DirCookie* cookie,
 		void* buffer, size_t bufferSize, uint32 maxEntries)
 		:
+		volume(volume),
 		directory(directory),
 		cookie(cookie),
 		buffer(buffer),
@@ -66,7 +192,6 @@ struct FUSEVolume::ReadDirBuffer {
 		usedSize(0),
 		entriesRead(0),
 		maxEntries(maxEntries),
-		lastOffset(0),
 		error(B_OK)
 	{
 	}
@@ -274,6 +399,9 @@ FUSEVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
 	node->refCount++;
+	*_node = node;
+	*type = node->type;
+	*flags = 0;
 	*_capabilities = _FileSystem()->GetNodeCapabilities();
 
 	return B_OK;
@@ -563,10 +691,16 @@ PRINT(("FUSEVolume::OpenDir(%p (%lld), %p)\n", node, node->id, _cookie));
 
 	locker.Unlock();
 
-	// open the dir
-	int fuseError = fuse_fs_opendir(fFS, path, cookie);
-	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+	if (fFS->ops.readdir == NULL && fFS->ops.getdir != NULL) {
+		// no open call -- the FS only supports the deprecated getdir()
+		// interface
+		cookie->getdirInterface = true;
+	} else {
+		// open the dir
+		int fuseError = fuse_fs_opendir(fFS, path, cookie);
+		if (fuseError != 0)
+			return from_fuse_error(fuseError);
+	}
 
 	cookieDeleter.Detach();
 	*_cookie = cookie;
@@ -590,6 +724,9 @@ FUSEVolume::FreeDirCookie(void* _node, void* _cookie)
 
 	ObjectDeleter<DirCookie> cookieDeleter(cookie);
 
+	if (cookie->getdirInterface)
+		return B_OK;
+
 	AutoLocker<Locker> locker(fLock);
 
 	// get a path for the node
@@ -612,47 +749,93 @@ FUSEVolume::FreeDirCookie(void* _node, void* _cookie)
 
 status_t
 FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
-	uint32 count, uint32* countRead)
+	uint32 count, uint32* _countRead)
 {
+PRINT(("FUSEVolume::ReadDir(%p, %p, %p, %lu, %ld)\n", _node, _cookie, buffer,
+bufferSize, count));
+	*_countRead = 0;
+
 	FUSENode* node = (FUSENode*)_node;
 	DirCookie* cookie = (DirCookie*)_cookie;
 
+	uint32 countRead = 0;
+	status_t readDirError = B_OK;
+
 	AutoLocker<Locker> locker(fLock);
 
-	ReadDirBuffer readDirBuffer(this, node, cookie, buffer, bufferSize, count);
+	if (cookie->entryCache == NULL) {
+		// We don't have an entry cache (yet), so we need to ask the client
+		// file system to read the directory.
+		ReadDirBuffer readDirBuffer(this, node, cookie, buffer, bufferSize,
+			count);
 
-	// get a path for the node
-	char path[B_PATH_NAME_LENGTH];
-	size_t pathLen;
-	status_t error = _BuildPath(node, path, pathLen);
-	if (error != B_OK)
-		RETURN_ERROR(error);
+		// get a path for the node
+		char path[B_PATH_NAME_LENGTH];
+		size_t pathLen;
+		status_t error = _BuildPath(node, path, pathLen);
+		if (error != B_OK)
+			RETURN_ERROR(error);
 
-	off_t offset = cookie->currentEntryOffset;
+		off_t offset = cookie->currentEntryOffset;
 
-	locker.Unlock();
+		locker.Unlock();
 
-	// read the dir
-	int fuseError = fuse_fs_readdir(fFS, path, &readDirBuffer,
-		&_AddReadDirEntry, offset, cookie);
-	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		// read the dir
+		int fuseError;
+		if (cookie->getdirInterface) {
+PRINT(("  using getdir() interface\n"));
+			fuseError = fFS->ops.getdir(path, (fuse_dirh_t)&readDirBuffer,
+				&_AddReadDirEntryGetDir);
+		} else {
+PRINT(("  using readdir() interface\n"));
+			fuseError = fuse_fs_readdir(fFS, path, &readDirBuffer,
+				&_AddReadDirEntry, offset, cookie);
+		}
+		if (fuseError != 0)
+			return from_fuse_error(fuseError);
 
-	locker.Lock();
+		locker.Lock();
 
-	// everything went fine
-	cookie->currentEntryOffset = readDirBuffer.lastOffset;
-	*countRead = readDirBuffer.entriesRead;
+		countRead = readDirBuffer.entriesRead;
+		readDirError = readDirBuffer.error;
+	}
 
-	return B_OK;
+	if (cookie->entryCache != NULL) {
+		// we're using an entry cache -- read into the buffer what we can
+		dirent* entryBuffer = (dirent*)buffer;
+		while (countRead < count
+			&& cookie->entryCache->ReadDirent(cookie->currentEntryIndex, fID,
+				countRead + 1 < count, entryBuffer, bufferSize)) {
+			countRead++;
+			cookie->currentEntryIndex++;
+			bufferSize -= entryBuffer->d_reclen;
+			entryBuffer
+				= (dirent*)((uint8*)entryBuffer + entryBuffer->d_reclen);
+		}
+	}
+
+	*_countRead = countRead;
+	return countRead > 0 ? B_OK : readDirError;
 }
 
 
 status_t
-FUSEVolume::RewindDir(void* node, void* cookie)
+FUSEVolume::RewindDir(void* _node, void* _cookie)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+PRINT(("FUSEVolume::RewindDir(%p, %p)\n", _node, _cookie));
+	DirCookie* cookie = (DirCookie*)_cookie;
+
+	AutoLocker<Locker> locker(fLock);
+
+	if (cookie->getdirInterface) {
+		delete cookie->entryCache;
+		cookie->entryCache = NULL;
+		cookie->currentEntryIndex = 0;
+	} else {
+		cookie->currentEntryOffset = 0;
+	}
+
+	return B_OK;
 }
 
 
@@ -699,6 +882,8 @@ FUSEVolume::_GetNode(FUSENode* dir, const char* entryName, FUSENode** _node)
 
 		if (privateNode != node) {
 			// weird, the node changed!
+			ERROR(("FUSEVolume::_GetNode(): cookie for node %lld changed: "
+				"expected: %p, got: %p\n", nodeID, node, privateNode));
 			UserlandFS::KernelEmu::put_vnode(fID, nodeID);
 			_PutNode(node);
 			continue;
@@ -884,48 +1069,75 @@ FUSEVolume::_AddReadDirEntry(void* _buffer, const char* name,
 	const struct stat* st, off_t offset)
 {
 	ReadDirBuffer* buffer = (ReadDirBuffer*)_buffer;
-	FUSEVolume* self = buffer->volume;
+	return buffer->volume->_AddReadDirEntry(buffer, name, st->st_mode & S_IFMT,
+		st->st_ino, offset);
+}
 
-	AutoLocker<Locker> _(self->fLock);
 
-	if (offset == 0) {
-		ERROR(("FUSEVolume::_AddReadDirEntry(): Old interface not "
-			"supported!\n"));
-		buffer->error = B_ERROR;
-		return 1;
+/*static*/ int
+FUSEVolume::_AddReadDirEntryGetDir(fuse_dirh_t handle, const char* name,
+	int type, ino_t nodeID)
+{
+	ReadDirBuffer* buffer = (ReadDirBuffer*)handle;
+	return buffer->volume->_AddReadDirEntry(buffer, name, type & S_IFMT, nodeID,
+		0);
+}
+
+
+int
+FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
+	ino_t nodeID, off_t offset)
+{
+PRINT(("FUSEVolume::_AddReadDirEntry(%p, \"%s\", %#x, %lld, %lld\n", buffer,
+name, type, nodeID, offset));
+
+	AutoLocker<Locker> _(fLock);
+
+	size_t entryLen;
+	if (offset != 0) {
+		// does the caller want more entries?
+		if (buffer->entriesRead == buffer->maxEntries)
+			return 1;
+
+		// compute the entry length and check whether the entry still fits
+		entryLen = sizeof(dirent) + strlen(name);
+		if (buffer->usedSize + entryLen > buffer->bufferSize)
+			return 1;
 	}
 
-	if (buffer->entriesRead == buffer->maxEntries)
-		return 1;
-
-	// compute the entry length and check whether the entry still fits
-	size_t nameLen = strlen(name);
-	dirent* dirEntry = (dirent*)((uint8*)buffer->buffer + buffer->usedSize);
-	size_t entryLen = dirEntry->d_name + nameLen + 1 - (char*)dirEntry;
-	if (buffer->usedSize + entryLen > buffer->bufferSize)
-		return 1;
-
 	// create a node and an entry, if necessary
-	FUSEEntry* entry = self->fEntries.Lookup(
-		FUSEEntryRef(buffer->directory->id, name));
-	if (entry == NULL) {
+	ino_t dirID = buffer->directory->id;
+	FUSEEntry* entry;
+	if (strcmp(name, ".") == 0) {
+		// current dir entry
+		nodeID = dirID;
+	} else if (strcmp(name, "..") == 0) {
+		// parent dir entry
+		FUSEEntry* parentEntry = buffer->directory->entries.Head();
+		if (parentEntry == NULL) {
+			ERROR(("FUSEVolume::_AddReadDirEntry(): dir %lld has no entry!\n",
+				dirID));
+			return 0;
+		}
+		nodeID = parentEntry->parent->id;
+	} else if ((entry = fEntries.Lookup(FUSEEntryRef(dirID, name))) == NULL) {
 		// get the node
-		ino_t nodeID = st->st_ino;
 		FUSENode* node = NULL;
-		if (self->fUseNodeIDs)
-			node = self->fNodes.Lookup(st->st_ino);
+		if (fUseNodeIDs)
+			node = fNodes.Lookup(nodeID);
 		else
-			nodeID = self->_GenerateNodeID();
+			nodeID = _GenerateNodeID();
 
 		if (node == NULL) {
 			// no node yet -- create one
-			node = new(std::nothrow) FUSENode(nodeID, st->st_mode & S_IFMT);
+			node = new(std::nothrow) FUSENode(nodeID, type);
 			if (node == NULL) {
 				buffer->error = B_NO_MEMORY;
 				return 1;
 			}
+PRINT(("  -> create node: %p, id: %lld\n", node, nodeID));
 
-			self->fNodes.Insert(node);
+			fNodes.Insert(node);
 		} else {
 			// get a node reference for the entry
 			node->refCount++;
@@ -934,34 +1146,54 @@ FUSEVolume::_AddReadDirEntry(void* _buffer, const char* name,
 		// create the entry
 		entry = FUSEEntry::Create(buffer->directory, name, node);
 		if (entry == NULL) {
-			self->_PutNode(node);
+			_PutNode(node);
 			buffer->error = B_NO_MEMORY;
 			return 1;
 		}
 
-		self->fEntries.Insert(entry);
+		fEntries.Insert(entry);
 		node->entries.Add(entry);
 	} else {
 		// TODO: Check whether the node's ID matches the one we got!
 	}
 
-	// fill in the dirent
-	dirEntry->d_dev = self->fID;
-	dirEntry->d_ino = entry->node->id;
-	strcpy(dirEntry->d_name, name);
+	if (offset == 0) {
+		// cache the entry
+		if (buffer->cookie->entryCache == NULL) {
+			// no cache yet -- create it
+			buffer->cookie->entryCache = new(std::nothrow) DirEntryCache;
+			if (buffer->cookie->entryCache == NULL) {
+				buffer->error = B_NO_MEMORY;
+				return 1;
+			}
+		}
 
-	if (buffer->entriesRead + 1 < buffer->maxEntries) {
-		// align the entry length, so the next dirent will be aligned
-		entryLen = (entryLen + 7) / 8 * 8;
-		entryLen = std::min(entryLen, buffer->bufferSize - buffer->usedSize);
+		status_t error = buffer->cookie->entryCache->AddEntry(nodeID, name);
+		if (error != B_OK) {
+			buffer->error = error;
+			return 1;
+		}
+	} else {
+		// fill in the dirent
+		dirent* dirEntry = (dirent*)((uint8*)buffer->buffer + buffer->usedSize);
+		dirEntry->d_dev = fID;
+		dirEntry->d_ino = nodeID;
+		strcpy(dirEntry->d_name, name);
+
+		if (buffer->entriesRead + 1 < buffer->maxEntries) {
+			// align the entry length, so the next dirent will be aligned
+			entryLen = (entryLen + 7) / 8 * 8;
+			entryLen = std::min(entryLen,
+				buffer->bufferSize - buffer->usedSize);
+		}
+
+		dirEntry->d_reclen = entryLen;
+
+		// update the buffer
+		buffer->usedSize += entryLen;
+		buffer->entriesRead++;
+		buffer->cookie->currentEntryOffset = offset;
 	}
-
-	dirEntry->d_reclen = entryLen;
-
-	// update the buffer
-	buffer->usedSize += entryLen;
-	buffer->entriesRead++;
-	buffer->lastOffset = offset;
 
 	return 0;
 }
