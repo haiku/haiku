@@ -380,6 +380,48 @@ SliderView::Draw(BRect updateRect)
 
 
 void
+SliderView::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			if (Value() == -1)
+				return;
+
+			// Even though the volume bar is horizontal, we use the more common
+			// vertical mouse wheel change
+			float deltaY = 0.0f;
+
+			msg->FindFloat("be:wheel_delta_y", &deltaY);
+
+			if (deltaY == 0.0f)
+				return;
+
+			int32 currentValue = Value();
+			// deltaY is generally 1 or -1, so this should increase or decrease
+			// the 0-100 volume value by 5 each time. Also -5 is used because
+			// mousewheel up is negative but should increase the volume.
+			int32 newValue = MAX(MIN(currentValue + static_cast<int32>(deltaY * -5.0), 100), 0);
+
+			if (newValue != currentValue) {
+				SetValue(newValue);
+				Draw(Bounds());
+				Flush();
+
+				if (Window())
+					Window()->PostMessage(VOLUME_UPDATED);
+			}
+
+			break;
+		}
+
+		default:
+			return BView::MessageReceived(msg);
+	}
+}
+
+
+void
 SliderView::MouseDown(BPoint point)
 {
 	if (Bounds().Contains(point)) 
@@ -437,3 +479,4 @@ SliderView::MouseUp(BPoint point)
 	Draw(Bounds());
 	Flush();
 }
+

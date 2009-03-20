@@ -40,6 +40,7 @@ class SliderView : public BControl {
 		~SliderView();
 
 		virtual void Draw(BRect);
+		virtual void MessageReceived(BMessage*);
 		virtual void MouseDown(BPoint point);
 		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
 		virtual void MouseUp(BPoint point);
