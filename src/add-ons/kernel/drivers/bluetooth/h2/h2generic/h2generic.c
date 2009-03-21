@@ -380,6 +380,9 @@ device_removed(void* cookie)
 	}
 
 	bdev->connected = false;
+	
+	// TODO: place this in the appropiated hook
+	// kill_device(bdev);
 
 	return B_OK;
 }
@@ -576,8 +579,6 @@ device_free (void *cookie)
 		/* The last client has closed, and the device is no longer
 		   connected, so remove it from the list. */
 	}
-
-	kill_device(bdev);
 
 	return err;
 }
