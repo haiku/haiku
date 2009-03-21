@@ -510,7 +510,7 @@ DraggableContainerIcon::Draw(BRect updateRect)
 		BRect rect(Bounds());
 		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 		be_control_look->DrawMenuBarBackground(this, rect, updateRect, base,
-			0);
+			0, 0);
 	}
 
 	// Draw the icon, straddling the border

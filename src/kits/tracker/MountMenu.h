@@ -46,7 +46,7 @@ public:
 
 protected:
 
-	virtual bool AddDynamicItem(add_state);
+	virtual bool AddDynamicItem(add_state state);
 
 };
 
