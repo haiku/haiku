@@ -40,7 +40,7 @@ class ApplicationTypeWindow : public BWindow {
 		void _MakeNumberTextControl(BTextControl* control);
 		void _Save();
 
-		uint32 _Flags() const;
+		bool _Flags(uint32& flags) const;
 		BMessage _SupportedTypes() const;
 		version_info _VersionInfo() const;
 
@@ -50,6 +50,7 @@ class ApplicationTypeWindow : public BWindow {
 	private:
 		struct AppInfo {
 			BString			signature;
+			bool			gotFlags;
 			uint32			flags;
 			version_info	versionInfo;
 

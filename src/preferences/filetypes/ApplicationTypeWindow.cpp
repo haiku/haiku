@@ -700,7 +700,8 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	// store original data
 
 	fOriginalInfo.signature = signature;
-	fOriginalInfo.flags = flags;
+	fOriginalInfo.gotFlags = gotFlags;
+	fOriginalInfo.flags = gotFlags ? flags : 0;
 	fOriginalInfo.versionInfo = versionInfo;
 	fOriginalInfo.supportedTypes = _SupportedTypes();
 		// The list view has the types sorted possibly differently
@@ -756,15 +757,20 @@ ApplicationTypeWindow::_Save()
 
 	// Retrieve Info
 
-	uint32 flags = _Flags();
+	uint32 flags = 0;
+	bool gotFlags = _Flags(flags);
 	BMessage supportedTypes = _SupportedTypes();
 	version_info versionInfo = _VersionInfo();
 
 	// Save
 
 	status = info.SetSignature(fSignatureControl->Text());
-	if (status == B_OK)
-		status = info.SetAppFlags(flags);
+	if (status == B_OK) {
+		if (gotFlags)
+			status = info.SetAppFlags(flags);
+		else
+			status = info.RemoveAppFlags();
+	}
 	if (status == B_OK)
 		status = info.SetVersionInfo(&versionInfo, B_APP_VERSION_KIND);
 	if (status == B_OK)
@@ -784,6 +790,7 @@ ApplicationTypeWindow::_Save()
 
 	// reset the saved info
 	fOriginalInfo.signature = fSignatureControl->Text();
+	fOriginalInfo.gotFlags = gotFlags;
 	fOriginalInfo.flags = flags;
 	fOriginalInfo.versionInfo = versionInfo;
 	fOriginalInfo.supportedTypes = supportedTypes;
@@ -825,9 +832,12 @@ ApplicationTypeWindow::_NeedsSaving(uint32 _flags) const
 	}
 
 	if (_flags & CHECK_FLAGS) {
-		if (fOriginalInfo.flags != _Flags())
+		uint32 appFlags = 0;
+		bool gotFlags = _Flags(appFlags);
+		if (fOriginalInfo.gotFlags != gotFlags
+			|| fOriginalInfo.flags != appFlags) {
 			flags |= CHECK_FLAGS;
-		else
+		} else
 			flags &= ~CHECK_FLAGS;
 	}
 
@@ -866,10 +876,10 @@ ApplicationTypeWindow::_NeedsSaving(uint32 _flags) const
 // #pragma mark -
 
 
-uint32
-ApplicationTypeWindow::_Flags() const
+bool
+ApplicationTypeWindow::_Flags(uint32& flags) const
 {
-	uint32 flags = 0;
+	flags = 0;
 	if (fFlagsCheckBox->Value() != B_CONTROL_OFF) {
 		if (fSingleLaunchButton->Value() != B_CONTROL_OFF)
 			flags |= B_SINGLE_LAUNCH;
@@ -882,8 +892,9 @@ ApplicationTypeWindow::_Flags() const
 			flags |= B_ARGV_ONLY;
 		if (fBackgroundAppCheckBox->Value() != B_CONTROL_OFF)
 			flags |= B_BACKGROUND_APP;
+		return true;
 	}
-	return flags;
+	return false;
 }
 
 
