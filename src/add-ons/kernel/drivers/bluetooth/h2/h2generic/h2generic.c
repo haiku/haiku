@@ -98,7 +98,7 @@ spawn_device(const usb_device* usb_dev)
 	/* try the allocation */
 	new_bt_dev = (bt_usb_dev*)malloc(sizeof(bt_usb_dev));
 	if ( new_bt_dev == NULL ) {
-		flowf("no memoery allocating\n");
+		flowf("no memory allocating\n");
 		goto exit;
 	}
 	memset(new_bt_dev, 0, sizeof(bt_usb_dev) );
@@ -623,7 +623,8 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 #endif
 
 		   	// TODO: Reuse from some TXcompleted queue
-		    snbuf = snb_create(size);
+		    //snbuf = snb_create(size);
+		    snbuf = snb_fetch(&bdev->snetBufferRecycleTrash, size);
 		    snb_put(snbuf, params, size);
 
 			err = submit_tx_command(bdev, snbuf);
@@ -705,6 +706,30 @@ device_write(void *cookie, off_t pos, const void *buf, size_t *count)
 #pragma mark -
 #endif
 
+
+static int
+dump_driver(int argc, char** argv)
+{
+	int i;
+	snet_buffer* item = NULL;
+	
+	for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
+
+		if (bt_usb_devices[i] != NULL) {
+			kprintf("%s : \n", bt_usb_devices[i]->name);
+			kprintf("\taclroom = %d\teventroom = %d\tcommand & events =%d\n", snb_packets(&bt_usb_devices[i]->eventRoom)
+																			, snb_packets(&bt_usb_devices[i]->aclRoom)
+																			, snb_packets(&bt_usb_devices[i]->snetBufferRecycleTrash) );
+																			
+			while ((item = list_get_next_item(&bt_usb_devices[i]->snetBufferRecycleTrash, item)) != NULL)
+				snb_dump(item);
+			}
+	}
+
+	return 0;
+}
+
+
 /* called each time the driver is loaded by the kernel */
 status_t
 init_driver(void)
@@ -767,6 +792,8 @@ init_driver(void)
 	usb->register_driver(BLUETOOTH_DEVICE_DEVFS_NAME, supported_devices, 1, NULL);
 	usb->install_notify(BLUETOOTH_DEVICE_DEVFS_NAME, &notify_hooks);
 
+	add_debugger_command("bth2generic", &dump_driver, "Lists H2 Transport device info");
+
 	return B_OK;
 
 err:	// Releasing
@@ -809,6 +836,8 @@ uninit_driver(void)
 	}
 
 	usb->uninstall_notify(BLUETOOTH_DEVICE_DEVFS_NAME);
+
+	remove_debugger_command("bth2generic", &dump_driver);
 
 	/* Releasing modules */
 	put_module(usb_name);
