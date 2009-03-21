@@ -67,6 +67,7 @@ class BAppFileInfo: public BNodeInfo {
 
 		status_t GetAppFlags(uint32 *flags) const;
 		status_t SetAppFlags(uint32 flags);
+		status_t RemoveAppFlags();
 
 		status_t GetSupportedTypes(BMessage *types) const;
 		status_t SetSupportedTypes(const BMessage *types, bool syncAll);

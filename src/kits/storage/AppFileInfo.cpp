@@ -379,10 +379,29 @@ BAppFileInfo::SetAppFlags(uint32 flags)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		// write the data
-		if (error == B_OK) {
-			error = _WriteData(kAppFlagsAttribute, kAppFlagsResourceID,
-							   B_APP_FLAGS_TYPE, &flags, sizeof(uint32));
-		}
+		error = _WriteData(kAppFlagsAttribute, kAppFlagsResourceID,
+						   B_APP_FLAGS_TYPE, &flags, sizeof(uint32));
+	}
+	return error;
+}
+
+// RemoveAppFlags
+/*!	\brief Removes the file's application flags.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- other error codes
+*/
+status_t
+BAppFileInfo::RemoveAppFlags()
+{
+	// check initialization
+	status_t error = B_OK;
+	if (error == B_OK && InitCheck() != B_OK)
+		error = B_NO_INIT;
+	if (error == B_OK) {
+		// remove the data
+		error = _RemoveData(kAppFlagsAttribute, B_APP_FLAGS_TYPE);
 	}
 	return error;
 }
