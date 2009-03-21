@@ -5,6 +5,9 @@
 #include "BluetoothDeviceView.h"
 #include <bluetooth/bdaddrUtils.h>
 
+#include <bluetooth/LocalDevice.h>
+#include <bluetooth/HCI/btHCI_command.h>
+
 
 #include <Bitmap.h>
 #include <GroupLayoutBuilder.h>
@@ -19,18 +22,22 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(0,0,0);
-	BRect iDontCare(0,0,0,0);
+	//BRect iDontCare(0,0,0,0);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	fName = new BStringView(iDontCare, "name", "");
+	fName = new BStringView("name", "");
 	fName->SetFont(be_bold_font);
 		
-	fBdaddr = new BStringView(iDontCare, "bdaddr", bdaddrUtils::ToString(bdaddrUtils::NullAddress()));
+	fBdaddr = new BStringView("bdaddr", bdaddrUtils::ToString(bdaddrUtils::NullAddress()));
 	
-	fClassService = new BStringView(iDontCare, "ServiceClass", "Service Classes: ");
+	fClassService = new BStringView("ServiceClass", "Service Classes: ");
 
-	fClass = new BStringView(iDontCare, "class", "- / -");
+	fClass = new BStringView("class", "- / -");
+
+	fHCIVersionProperties = new BStringView("version", "");
+	fLMPVersionProperties = new BStringView("lmp", "");
+	fManufacturerProperties = new BStringView("manufacturer", "");
 
 	fIcon = new BitmapView(new BBitmap(BRect(0, 0, 64 - 1, 64 - 1), B_RGBA32));
 	
@@ -49,7 +56,12 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 						.Add(fClass)
 						.AddGlue()
 						.Add(fClassService)
-						
+						.AddGlue()
+						.Add(fHCIVersionProperties)
+						.AddGlue()
+						.Add(fLMPVersionProperties)
+						.AddGlue()
+						.Add(fManufacturerProperties)												
 						.SetInsets(5, 25, 25, 25)
 					)
 				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10)
@@ -69,7 +81,7 @@ void
 BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 {
 	if (bDevice != NULL) {
-
+		
 		SetName(bDevice->GetFriendlyName().String());	
 		
 		fName->SetText(bDevice->GetFriendlyName().String());
@@ -83,7 +95,31 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		bDevice->GetDeviceClass().GetMajorDeviceClass(str);
 		str << " / ";
 		bDevice->GetDeviceClass().GetMinorDeviceClass(str);
-		fClass->SetText(str.String());	
+		fClass->SetText(str.String());
+		
+		
+		uint32 value;
+		
+		str = "";
+		if (bDevice->GetProperty("hci_version", &value) == B_OK)		
+			str << "HCI ver: " << GetHciVersion(value);
+		if (bDevice->GetProperty("hci_revision", &value) == B_OK)		
+			str << " HCI rev: " << value ;
+		
+		fHCIVersionProperties->SetText(str.String());	
+		
+		str = "";
+		if (bDevice->GetProperty("lmp_version", &value) == B_OK)		
+			str << "LMP ver: " << GetLmpVersion(value);
+		if (bDevice->GetProperty("lmp_subversion", &value) == B_OK)		
+			str << " LMP subver: " << value;
+		fLMPVersionProperties->SetText(str.String());		
+		
+		str = "";	
+		if (bDevice->GetProperty("manufacturer", &value) == B_OK)		
+			str << "Manufacturer: " <<	GetManufacturer(value);
+		fManufacturerProperties->SetText(str.String());
+		
 
 	}
 	

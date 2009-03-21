@@ -38,6 +38,12 @@ protected:
 	BStringView*		fBdaddr;
 	BStringView*		fClassService;
 	BStringView*		fClass;
+	
+	BStringView*		fHCIVersionProperties;
+	BStringView*		fLMPVersionProperties;
+	BStringView*		fManufacturerProperties;
+	
+	BStringView*		fBuffersProperties;
 
 	BitmapView*			fIcon;
 
