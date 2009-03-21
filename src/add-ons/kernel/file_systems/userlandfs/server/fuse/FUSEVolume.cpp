@@ -170,6 +170,21 @@ struct FUSEVolume::DirCookie : fuse_file_info {
 };
 
 
+struct FUSEVolume::FileCookie : fuse_file_info {
+	FileCookie(int openMode)
+	{
+		flags = openMode;
+		fh_old = 0;
+		writepage = 0;
+		direct_io = 0;
+		keep_cache = 0;
+		flush = 0;
+		fh = 0;
+		lock_owner = 0;
+	}
+};
+
+
 struct FUSEVolume::ReadDirBuffer {
 	FUSEVolume*	volume;
 	FUSENode*	directory;
@@ -398,6 +413,7 @@ FUSEVolume::ReadVNode(ino_t vnid, bool reenter, void** _node, int* type,
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
 	node->refCount++;
+
 	*_node = node;
 	*type = node->type;
 	*flags = 0;
@@ -607,26 +623,98 @@ FUSEVolume::Create(void* dir, const char* name, int openMode, int mode,
 
 
 status_t
-FUSEVolume::Open(void* node, int openMode, void** cookie)
+FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
+
+	bool truncate = (openMode & O_TRUNC) != 0;
+	openMode &= ~O_TRUNC;
+
+	// TODO: Support truncation!
+	if (truncate)
+		RETURN_ERROR(B_NOT_ALLOWED);
+
+	// allocate a file cookie
+	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<FileCookie> cookieDeleter(cookie);
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// open the dir
+	int fuseError = fuse_fs_open(fFS, path, cookie);
+	if (fuseError != 0)
+		return from_fuse_error(fuseError);
+
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
 status_t
-FUSEVolume::Close(void* node, void* cookie)
+FUSEVolume::Close(void* _node, void* _cookie)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// flush the file
+	int fuseError = fuse_fs_flush(fFS, path, cookie);
+	if (fuseError != 0)
+		return from_fuse_error(fuseError);
+
+	return B_OK;
 }
 
 
 status_t
-FUSEVolume::FreeCookie(void* node, void* cookie)
+FUSEVolume::FreeCookie(void* _node, void* _cookie)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	ObjectDeleter<FileCookie> cookieDeleter(cookie);
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// release the file
+	int fuseError = fuse_fs_release(fFS, path, cookie);
+	if (fuseError != 0)
+		return from_fuse_error(fuseError);
+
+	return B_OK;
 }
 
 
@@ -1068,8 +1156,10 @@ FUSEVolume::_AddReadDirEntry(void* _buffer, const char* name,
 	const struct stat* st, off_t offset)
 {
 	ReadDirBuffer* buffer = (ReadDirBuffer*)_buffer;
-	return buffer->volume->_AddReadDirEntry(buffer, name, st->st_mode & S_IFMT,
-		st->st_ino, offset);
+
+	ino_t nodeID = st != NULL ? st->st_ino : 0;
+	int type = st != NULL ? st->st_mode & S_IFMT : 0;
+	return buffer->volume->_AddReadDirEntry(buffer, name, type, nodeID, offset);
 }
 
 
@@ -1078,7 +1168,7 @@ FUSEVolume::_AddReadDirEntryGetDir(fuse_dirh_t handle, const char* name,
 	int type, ino_t nodeID)
 {
 	ReadDirBuffer* buffer = (ReadDirBuffer*)handle;
-	return buffer->volume->_AddReadDirEntry(buffer, name, type & S_IFMT, nodeID,
+	return buffer->volume->_AddReadDirEntry(buffer, name, type << 12, nodeID,
 		0);
 }
 
@@ -1090,7 +1180,7 @@ FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
 PRINT(("FUSEVolume::_AddReadDirEntry(%p, \"%s\", %#x, %lld, %lld\n", buffer,
 name, type, nodeID, offset));
 
-	AutoLocker<Locker> _(fLock);
+	AutoLocker<Locker> locker(fLock);
 
 	size_t entryLen;
 	if (offset != 0) {
@@ -1110,6 +1200,7 @@ name, type, nodeID, offset));
 	if (strcmp(name, ".") == 0) {
 		// current dir entry
 		nodeID = dirID;
+		type = S_IFDIR;
 	} else if (strcmp(name, "..") == 0) {
 		// parent dir entry
 		FUSEEntry* parentEntry = buffer->directory->entries.Head();
@@ -1119,6 +1210,7 @@ name, type, nodeID, offset));
 			return 0;
 		}
 		nodeID = parentEntry->parent->id;
+		type = S_IFDIR;
 	} else if ((entry = fEntries.Lookup(FUSEEntryRef(dirID, name))) == NULL) {
 		// get the node
 		FUSENode* node = NULL;
@@ -1129,6 +1221,34 @@ name, type, nodeID, offset));
 
 		if (node == NULL) {
 			// no node yet -- create one
+
+			// If we don't have a valid type, we need to stat the node first.
+			if (type == 0) {
+				char path[B_PATH_NAME_LENGTH];
+				size_t pathLen;
+				status_t error = _BuildPath(buffer->directory, name, path,
+					pathLen);
+				if (error != B_OK) {
+					buffer->error = error;
+					return 0;
+				}
+
+				locker.Unlock();
+
+				// stat the path
+				struct stat st;
+				int fuseError = fuse_fs_getattr(fFS, path, &st);
+
+				locker.Lock();
+
+				if (fuseError != 0) {
+					buffer->error = from_fuse_error(fuseError);
+					return 0;
+				}
+
+				type = st.st_mode & S_IFMT;
+			}
+
 			node = new(std::nothrow) FUSENode(nodeID, type);
 			if (node == NULL) {
 				buffer->error = B_NO_MEMORY;
@@ -1153,7 +1273,9 @@ PRINT(("  -> create node: %p, id: %lld\n", node, nodeID));
 		fEntries.Insert(entry);
 		node->entries.Add(entry);
 	} else {
-		// TODO: Check whether the node's ID matches the one we got!
+		// TODO: Check whether the node's ID matches the one we got (if any)!
+		nodeID = entry->node->id;
+		type = entry->node->type;
 	}
 
 	if (offset == 0) {

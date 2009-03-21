@@ -121,6 +121,7 @@ public:
 private:
 	struct DirEntryCache;
 	struct DirCookie;
+	struct FileCookie;
 	struct ReadDirBuffer;
 
 private:

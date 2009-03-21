@@ -413,9 +413,9 @@ FUSEFileSystem::_InitCapabilities()
 //
 // 	// file operations
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fFS->ops.create);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFS->ops.open);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFS->ops.close);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFS->ops.free_cookie);
+ 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFS->ops.open);
+ 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFS->ops.flush);
+ 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFS->ops.release);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ, fFS->ops.read);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fFS->ops.write);
 //
