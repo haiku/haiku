@@ -322,6 +322,7 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 	_CopyPartitionTable(newMBR, &oldMBR);
 	
 	int menuEntries = 0;
+	int defaultMenuEntry = 0;
 	BMessage partition;
 	int32 index;
 	for (index = 0; settings->FindMessage("partition", index, &partition) == B_OK; index ++) {
@@ -329,11 +330,13 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		partition.FindBool("show", &show);
 		if (!show)
 			continue;
+		if (index == defaultPartitionIndex)
+			defaultMenuEntry = menuEntries;
 		
 		menuEntries ++;
 	}
 	newBootLoader.WriteInt16(menuEntries);
-	newBootLoader.WriteInt16(defaultPartitionIndex);
+	newBootLoader.WriteInt16(defaultMenuEntry);
 	newBootLoader.WriteInt16(timeout);
 	
 	
