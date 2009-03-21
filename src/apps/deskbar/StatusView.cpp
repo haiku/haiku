@@ -44,9 +44,10 @@ All rights reserved.
 #include <fs_index.h>
 #include <fs_info.h>
 
-#include <Debug.h>
 #include <Application.h>
 #include <Beep.h>
+#include <Bitmap.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <MenuItem.h>
@@ -60,11 +61,13 @@ All rights reserved.
 #include <VolumeRoster.h>
 #include <Window.h>
 
+#include "icons_logo.h"
+#include "BarApp.h"
 #include "DeskBarUtils.h"
+#include "ResourceSet.h"
 #include "StatusView.h"
 #include "StatusViewShelf.h"
 #include "TimeView.h"
-#include "BarApp.h"
 
 using std::max;
 
@@ -82,6 +85,8 @@ const char *const kDeskbarSecurityCodeAttr = "be:deskbar_security_code";
 const char *const kStatusPredicate = "be:deskbar_item_status";
 const char *const kEnabledPredicate = "be:deskbar_item_status=enabled";
 const char *const kDisabledPredicate = "be:deskbar_item_status=disabled";
+
+float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
 
 static void
@@ -122,8 +127,17 @@ TReplicantTray::TReplicantTray(TBarView *parent, bool vertical)
 	fBarView(parent),
 	fShelf(new TReplicantShelf(this)),
 	fMultiRowMode(vertical),
+	fMinimumTrayWidth(kMinimumTrayWidth),
 	fAlignmentSupport(false)	
 {	
+	// init the minimum window width according to the logo.
+	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+		R_BeLogoIcon);
+	if (logoBitmap != NULL) {
+		sMinimumWindowWidth = max_c(sMinimumWindowWidth,
+			2 * (logoBitmap->Bounds().Width() + 8));
+		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
+	}
 }
 
 
@@ -138,8 +152,12 @@ TReplicantTray::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT));
+	if (be_control_look != NULL) {
+		SetViewColor(Parent()->ViewColor());
+	} else {
+		SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DARKEN_1_TINT));
+	}
 	SetDrawingMode(B_OP_COPY);
 
 	Window()->SetPulseRate(1000000);
@@ -236,7 +254,7 @@ TReplicantTray::DealWithClock(bool showClock)
 		if (!fClock) {
 			desk_settings *settings = ((TBarApp *)be_app)->Settings();
 
-			fClock = new TTimeView(kMinimumTrayWidth, kMaxReplicantHeight - 1.0,
+			fClock = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
 				settings->timeShowSeconds, settings->timeShowMil,
 				settings->timeFullDate,	settings->timeShowEuro, false);
 			AddChild(fClock);
@@ -278,7 +296,7 @@ TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 		height = kGutter + (rowCount * kMaxReplicantHeight)
 			+ ((rowCount - 1) * kIconGap) + kGutter;
 		height = max(kMinimumTrayHeight, height);
-		width = kMinimumTrayWidth;
+		width = fMinimumTrayWidth;
 	} else {
 		// if last replicant overruns clock then
 		// resize to accomodate
@@ -291,7 +309,7 @@ TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 				width = fRightBottomReplicant.right + 3;
 		}
 		// this view has a fixed minimum width
-		width = max(kMinimumTrayWidth, width);
+		width = max(fMinimumTrayWidth, width);
 	}
 
 	*preferredWidth = width;
@@ -325,6 +343,7 @@ TReplicantTray::AdjustPlacement()
 void
 TReplicantTray::Draw(BRect)
 {
+return;
 	rgb_color menuColor = ViewColor();
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
@@ -1276,7 +1295,7 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
-			BRect rect(loc.x, loc.y, loc.x + kMinimumTrayWidth - kIconGap - 2.0, loc.y + kMaxReplicantHeight);
+			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap - 2.0, loc.y + kMaxReplicantHeight);
 			if (row == 0 && fBarView->ShowingClock())
 				rect.right -= fClock->Frame().Width() + kIconGap;
 
@@ -1407,7 +1426,10 @@ void
 TDragRegion::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	if (be_control_look != NULL)
+		SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), 1.1));
+	else
+		SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	ResizeToPreferred();
 }
 
@@ -1443,6 +1465,8 @@ TDragRegion::Draw(BRect)
 {
 	rgb_color menuColor = ViewColor();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
+	rgb_color ldark = tint_color(menuColor, 1.02);
+	rgb_color dark = tint_color(menuColor, B_DARKEN_2_TINT);
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color vvdark = tint_color(menuColor, B_DARKEN_4_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
@@ -1450,23 +1474,43 @@ TDragRegion::Draw(BRect)
 	BRect frame(Bounds());
 	BeginLineArray(4);
 
-	if (fBarView->Vertical()) {
-		AddLine(frame.LeftTop(), frame.RightTop(), light);
-		AddLine(frame.LeftTop(), frame.LeftBottom(), light);
-		AddLine(frame.RightBottom(), frame.RightTop(), hilite);
-	} else if (fBarView->AcrossTop()) {
-		AddLine(frame.LeftTop()+BPoint(0, 1), frame.RightTop()+BPoint(-1, 1),
-			light);
-		AddLine(frame.RightTop(), frame.RightBottom(), vvdark);
-		AddLine(frame.RightTop()+BPoint(-1, 2),frame.RightBottom()+BPoint(-1, -1),
-			hilite);
-		AddLine(frame.LeftBottom(), frame.RightBottom()+BPoint(-1, 0), hilite);
-	} else if (fBarView->AcrossBottom()) {
-		AddLine(frame.LeftTop()+BPoint(0, 1), frame.RightTop()+BPoint(-1, 1), light);		
-		AddLine(frame.LeftBottom(), frame.RightBottom(), hilite);
-		AddLine(frame.RightTop(), frame.RightBottom(), vvdark);
-		AddLine(frame.RightTop()+BPoint(-1, 1),frame.RightBottom()+BPoint(-1, -1),
-			hilite);
+	if (be_control_look != NULL) {
+		if (fBarView->Vertical()) {
+			AddLine(frame.LeftTop(), frame.RightTop(), dark);
+			AddLine(BPoint(frame.left, frame.top + 1),
+				BPoint(frame.right, frame.top + 1), ldark);
+			AddLine(frame.LeftBottom(), frame.RightBottom(), hilite);
+		} else if (fBarView->AcrossTop() || fBarView->AcrossBottom()) {
+			AddLine(frame.LeftTop(),
+				BPoint(frame.left, frame.bottom), dark);
+			AddLine(BPoint(frame.left + 1, frame.top + 1),
+				BPoint(frame.right - 1, frame.top + 1), light);
+			AddLine(BPoint(frame.right, frame.top + 2),
+				BPoint(frame.right, frame.bottom), hilite);
+			AddLine(BPoint(frame.left + 1, frame.bottom),
+				BPoint(frame.right - 1, frame.bottom), hilite);
+		}
+	} else {
+		if (fBarView->Vertical()) {
+			AddLine(frame.LeftTop(), frame.RightTop(), light);
+			AddLine(frame.LeftTop(), frame.LeftBottom(), light);
+			AddLine(frame.RightBottom(), frame.RightTop(), hilite);
+		} else if (fBarView->AcrossTop()) {
+			AddLine(BPoint(frame.left, frame.top + 1),
+				BPoint(frame.right - 1, frame.top + 1), light);
+			AddLine(frame.RightTop(), frame.RightBottom(), vvdark);
+			AddLine(BPoint(frame.right - 1, frame.top + 2),
+				BPoint(frame.right - 1, frame.bottom - 1), hilite);
+			AddLine(frame.LeftBottom(),
+				BPoint(frame.right - 1, frame.bottom), hilite);
+		} else if (fBarView->AcrossBottom()) {
+			AddLine(BPoint(frame.left, frame.top + 1),
+				BPoint(frame.right - 1, frame.top + 1), light);		
+			AddLine(frame.LeftBottom(), frame.RightBottom(), hilite);
+			AddLine(frame.RightTop(), frame.RightBottom(), vvdark);
+			AddLine(BPoint(frame.right - 1, frame.top + 1),
+				BPoint(frame.right - 1, frame.bottom - 1), hilite);
+		}
 	}
 
 	EndLineArray();
@@ -1479,33 +1523,29 @@ TDragRegion::Draw(BRect)
 void
 TDragRegion::DrawDragRegion()
 {	
-	rgb_color menuColor = ViewColor();
-	rgb_color menuHilite = tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT);
-	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
-	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-
 	BRect dragRegion(DragRegion());
-	
-	BeginLineArray(dragRegion.IntegerHeight());
-	BPoint pt = dragRegion.LeftTop() + BPoint(1,1);
-	
-	// Draw drag region highlighted if tracking mouse
+
+	rgb_color menuColor = ViewColor();
+	rgb_color menuHilite = menuColor;
 	if (IsTracking()) {
+		// Draw drag region highlighted if tracking mouse
+		menuHilite = tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT);
 		SetHighColor(menuHilite);
 		FillRect(dragRegion);
-		while (pt.y + 1 <= dragRegion.bottom) {
-			AddLine(pt, pt, light);
-			AddLine(pt+BPoint(1,1), pt+BPoint(1,1), vdark);
-			
-			pt.y += 3;
-		}
-	} else {
-		while (pt.y + 1 <= dragRegion.bottom) {
-			AddLine(pt, pt, vdark);
-			AddLine(pt+BPoint(1,1), pt+BPoint(1,1), light);
-			
-			pt.y += 3;
-		}
+	}
+	rgb_color vdark = tint_color(menuHilite, B_DARKEN_3_TINT);
+	rgb_color light = tint_color(menuHilite, B_LIGHTEN_2_TINT);
+
+	BeginLineArray(dragRegion.IntegerHeight());
+	BPoint pt;
+	pt.x = floorf((dragRegion.left + dragRegion.right) / 2 + 0.5) - 1;
+	pt.y = dragRegion.top + 2;
+	
+	while (pt.y + 1 <= dragRegion.bottom) {
+		AddLine(pt, pt, vdark);
+		AddLine(pt + BPoint(1, 1), pt + BPoint(1, 1), light);
+		
+		pt.y += 3;
 	}
 	EndLineArray();
 }
@@ -1514,9 +1554,18 @@ TDragRegion::DrawDragRegion()
 BRect
 TDragRegion::DragRegion() const
 {
+	float kTopBottomInset = 2;
+	float kLeftRightInset = 1;
+	float kDragWidth = 3;
+	if (be_control_look != NULL) {
+		kTopBottomInset = 1;
+		kLeftRightInset = 0;
+		kDragWidth = 4;
+	}
+
 	BRect dragRegion(Bounds());
-	dragRegion.top += 2;
-	dragRegion.bottom -= 2;
+	dragRegion.top += kTopBottomInset;
+	dragRegion.bottom -= kTopBottomInset;
 
 	bool placeOnLeft=false;
 	if (fDragLocation == kAutoPlaceDragRegion) {
@@ -1530,11 +1579,11 @@ TDragRegion::DragRegion() const
 		placeOnLeft = false;
 	
 	if (placeOnLeft) {
-		dragRegion.left += 1;
-		dragRegion.right = dragRegion.left + 3;
+		dragRegion.left += kLeftRightInset;
+		dragRegion.right = dragRegion.left + kDragWidth;
 	} else {
-		dragRegion.right -= 1;
-		dragRegion.left = dragRegion.right - 3;
+		dragRegion.right -= kLeftRightInset;
+		dragRegion.left = dragRegion.right - kDragWidth;
 	}
 	
 	return dragRegion;
@@ -1612,7 +1661,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 		BRect frame = screen.Frame();
 
 		float hDivider = frame.Width() / 6;
-		hDivider = (hDivider < kMinimumWindowWidth + 10.0f) ? kMinimumWindowWidth + 10.0f : hDivider;
+		hDivider = (hDivider < sMinimumWindowWidth + 10.0f) ? sMinimumWindowWidth + 10.0f : hDivider;
 		float miniDivider = frame.top + kMiniHeight + 10.0f;
 		float vDivider = frame.Height() / 2;
 #ifdef FULL_MODE

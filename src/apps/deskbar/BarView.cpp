@@ -67,7 +67,6 @@ const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;
 
-
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		bool showInterval, uint32 state, float, bool showTime)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
@@ -86,7 +85,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fMaxRecentDocs(kDefaultRecentDocCount),
 	fMaxRecentApps(kDefaultRecentAppCount),
 	fLastDragItem(NULL)
-{		
+{
 }
 
 
@@ -94,10 +93,6 @@ TBarView::~TBarView()
 {
 	delete fDragMessage;
 	delete fCachedTypesList;
-
-	// !! this should be done in DetachedFromWindow
-	// to be symetric	
-	delete fTrackingHookData.fDragMessage;
 }
 
 
@@ -121,6 +116,14 @@ TBarView::AttachedToWindow()
 	fTrackingHookData.fTrackingHook = MenuTrackingHook;
 	fTrackingHookData.fTarget = BMessenger(this);
 	fTrackingHookData.fDragMessage = new BMessage(B_REFS_RECEIVED);
+}
+
+
+void
+TBarView::DetachedFromWindow()
+{
+	delete fTrackingHookData.fDragMessage;
+	fTrackingHookData.fDragMessage = NULL;
 }
 
 
@@ -220,7 +223,7 @@ TBarView::PlaceBeMenu()
 	if (!fBarMenuBar)
 		return;
 		
-	float width = kMinimumWindowWidth;
+	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
 	BRect menuFrame(fBarMenuBar->Frame());
 	if (fState == kFullState) {
@@ -276,7 +279,7 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 			else
 				fReplicantTray->MoveTo(2, 2);
 		} else {
-			statusLoc.x = screenFrame.Width() - fDragRegion->Bounds().Width();
+			statusLoc.x = screenFrame.right - fDragRegion->Bounds().Width();
 			statusLoc.y = -1;
 		}
 
@@ -300,21 +303,21 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 	if (fVertical) {
 		// top left/right
 		if (fTrayLocation != 0)
-			expandoFrame.top = fDragRegion->Frame().bottom + 2;
+			expandoFrame.top = fDragRegion->Frame().bottom + 1;
 		else
-			expandoFrame.top = fBarMenuBar->Frame().bottom + 2;
+			expandoFrame.top = fBarMenuBar->Frame().bottom + 1;
 
 		expandoFrame.bottom = expandoFrame.top + 1;
 		if (fState == kFullState)
 			expandoFrame.right = fBarMenuBar->Frame().Width();
 		else
-			expandoFrame.right = kMinimumWindowWidth;
+			expandoFrame.right = sMinimumWindowWidth;
 	} else {
 		// top or bottom
-		expandoFrame.top = -1;
+		expandoFrame.top = 0;
 		expandoFrame.bottom = kHModeHeight;
 		if (fTrayLocation != 0)
-			expandoFrame.right = fDragRegion->Frame().left;
+			expandoFrame.right = fDragRegion->Frame().left - 1;
 		else
 			expandoFrame.right = screenFrame.Width();
 	}
@@ -328,15 +331,15 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 void
 TBarView::GetPreferredWindowSize(BRect screenFrame, float *width, float *height)
 {
-	float windowHeight = 0;	
-	float windowWidth = kMinimumWindowWidth;
+	float windowHeight = 0;
+	float windowWidth = sMinimumWindowWidth;
 	if (fState == kFullState) {
 		windowHeight = screenFrame.bottom;
 		windowWidth = fBarMenuBar->Frame().Width();
 	} else if (fState == kExpandoState) {
 		if (fVertical) {
 			// top left or right
-			windowHeight = fExpando->Frame().bottom - 1;
+			windowHeight = fExpando->Frame().bottom;
 		} else {
 			// top or bottom, full
 			fExpando->CheckItemSizes(0);

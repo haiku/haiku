@@ -34,11 +34,14 @@ All rights reserved.
 
 #include <Debug.h>
 
+#include "TeamMenuItem.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Font.h>
 #include <Region.h>
 #include <Roster.h>
@@ -50,7 +53,6 @@ All rights reserved.
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"
 #include "TeamMenu.h"
-#include "TeamMenuItem.h"
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
 
@@ -229,12 +231,49 @@ TTeamMenuItem::Draw()
 	BRect frame(Frame());
 	BMenu *menu = Menu();
 	menu->PushState();
-	rgb_color menuColor = menu->ViewColor();
+	rgb_color menuColor = menu->LowColor();
+
+	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
+	bool canHandle = !barview->Dragging()
+		|| barview->AppCanHandleTypes(Signature());
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (_IsSelected() && canHandle)
+			flags |= BControlLook::B_ACTIVATED;
+
+		uint32 borders = BControlLook::B_TOP_BORDER;
+		if (fVertical) {
+			menu->SetHighColor(tint_color(menuColor, B_DARKEN_1_TINT));
+			borders |= BControlLook::B_LEFT_BORDER
+				| BControlLook::B_RIGHT_BORDER;
+			menu->StrokeLine(frame.LeftBottom(), frame.RightBottom());
+			frame.bottom--;
+
+			be_control_look->DrawMenuBarBackground(menu, frame, frame,
+				menuColor, flags, borders);
+		} else {
+			if (flags & BControlLook::B_ACTIVATED)
+				menu->SetHighColor(tint_color(menuColor, B_DARKEN_3_TINT));
+			else
+				menu->SetHighColor(tint_color(menuColor, 1.22));
+			borders |= BControlLook::B_BOTTOM_BORDER;
+			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
+			frame.left++;
+
+			be_control_look->DrawButtonBackground(menu, frame, frame,
+				menuColor, flags, borders);
+		}
+
+		menu->MovePenTo(ContentLocation());
+		DrawContent();
+		menu->PopState();
+		return;
+	}
 
 	//	if not selected or being tracked on, fill with gray
-	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
-	bool canHandle = !barview->Dragging() || barview->AppCanHandleTypes(Signature());
-	if (!_IsSelected() && !menu->IsRedrawAfterSticky() || !canHandle || !IsEnabled()) {
+	if (!_IsSelected() && !menu->IsRedrawAfterSticky() || !canHandle
+		|| !IsEnabled()) {
 		frame.InsetBy(1, 1);
 		menu->SetHighColor(menuColor);
 		menu->FillRect(frame);
@@ -246,8 +285,6 @@ TTeamMenuItem::Draw()
 		rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
 
 		frame = Frame();
-		if (!fVertical)
-			frame.top += 1;
 
 		menu->SetHighColor(shadow);
 		if (fVertical)
@@ -301,9 +338,6 @@ TTeamMenuItem::DrawContent()
 		}
 		BRect frame(Frame());
 
-		if (!fVertical)
-			frame.top += 1;
-
 		BRect iconBounds(fIcon->Bounds());
 		BRect dstRect(iconBounds);
 		float extra = fVertical ? 0.0f : 1.0f;
@@ -311,8 +345,6 @@ TTeamMenuItem::DrawContent()
 		dstRect.OffsetTo(BPoint(contLoc.x + kHPad, contLoc.y + 
 			((frame.Height() - iconBounds.Height()) / 2) + extra));
 		menu->DrawBitmapAsync(fIcon, dstRect);
-
-		menu->SetDrawingMode(B_OP_COPY);
 
 		float labelHeight = fLabelAscent + fLabelDescent;
 		BPoint drawLoc = contLoc + BPoint(kHPad, kVPad);
@@ -322,14 +354,16 @@ TTeamMenuItem::DrawContent()
 	}
 
 	//	set the pen to black so that either method will draw in the same color
-	//	low color is set in inherited::DrawContent, override makes sure its what we want
+	//	low color is set in inherited::DrawContent, override makes sure its
+	//  what we want
 	if (fDrawLabel) {
+		menu->SetDrawingMode(B_OP_OVER);
 		menu->SetHighColor(0, 0, 0);
 
 		//	override the drawing of the content when the item is disabled
 		//	the wrong lowcolor is used when the item is disabled since the
 		//	text color does not change
-		DrawContentLabel();			
+		DrawContentLabel();	
 	}
 
 	// Draw the expandable icon.
@@ -341,46 +375,53 @@ TTeamMenuItem::DrawContent()
 		rect.OffsetTo(BPoint(frame.right - rect.Width(),
 			ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
 
-		rgb_color outlineColor = {80, 80, 80, 255};
-		rgb_color middleColor = {200, 200, 200, 255};
-
-		menu->SetDrawingMode(B_OP_OVER);
-
-		if (!fExpanded) {
-			menu->BeginLineArray(6);
-
-			menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
-				BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-			menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
-				BPoint(rect.left + 7, rect.top + 5), outlineColor);
-			menu->AddLine(BPoint(rect.left + 7, rect.top + 5), 
-				BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-
-			menu->AddLine(BPoint(rect.left + 4, rect.top + 3), 
-				BPoint(rect.left + 4, rect.bottom - 3), middleColor);
-			menu->AddLine(BPoint(rect.left + 5, rect.top + 4), 
-				BPoint(rect.left + 5, rect.bottom - 4), middleColor);
-			menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
-				BPoint(rect.left + 6, rect.top + 5), middleColor);
-			menu->EndLineArray();
+		if (be_control_look != NULL) {
+			uint32 arrowDirection = fExpanded
+				? BControlLook::B_UP_ARROW : BControlLook::B_DOWN_ARROW;
+			be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
+				arrowDirection, 0, B_DARKEN_3_TINT);
 		} else {
-			// expanded state
-
-			menu->BeginLineArray(6);
-			menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
-				BPoint(rect.right - 3, rect.top + 3), outlineColor);
-			menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
-				BPoint(rect.left + 5, rect.top + 7), outlineColor);
-			menu->AddLine(BPoint(rect.left + 5, rect.top + 7), 
-				BPoint(rect.right - 3, rect.top + 3), outlineColor);
-
-			menu->AddLine(BPoint(rect.left + 3, rect.top + 4), 
-				BPoint(rect.right - 5, rect.top + 4), middleColor);
-			menu->AddLine(BPoint(rect.left + 4, rect.top + 5), 
-				BPoint(rect.right - 6, rect.top + 5), middleColor);
-			menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
-				BPoint(rect.left + 5, rect.top + 6), middleColor);
-			menu->EndLineArray();
+			rgb_color outlineColor = {80, 80, 80, 255};
+			rgb_color middleColor = {200, 200, 200, 255};
+	
+			menu->SetDrawingMode(B_OP_OVER);
+	
+			if (!fExpanded) {
+				menu->BeginLineArray(6);
+	
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
+					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
+					BPoint(rect.left + 7, rect.top + 5), outlineColor);
+				menu->AddLine(BPoint(rect.left + 7, rect.top + 5), 
+					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
+	
+				menu->AddLine(BPoint(rect.left + 4, rect.top + 3), 
+					BPoint(rect.left + 4, rect.bottom - 3), middleColor);
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 4), 
+					BPoint(rect.left + 5, rect.bottom - 4), middleColor);
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
+					BPoint(rect.left + 6, rect.top + 5), middleColor);
+				menu->EndLineArray();
+			} else {
+				// expanded state
+	
+				menu->BeginLineArray(6);
+				menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
+					BPoint(rect.right - 3, rect.top + 3), outlineColor);
+				menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
+					BPoint(rect.left + 5, rect.top + 7), outlineColor);
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 7), 
+					BPoint(rect.right - 3, rect.top + 3), outlineColor);
+	
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 4), 
+					BPoint(rect.right - 5, rect.top + 4), middleColor);
+				menu->AddLine(BPoint(rect.left + 4, rect.top + 5), 
+					BPoint(rect.right - 6, rect.top + 5), middleColor);
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
+					BPoint(rect.left + 5, rect.top + 6), middleColor);
+				menu->EndLineArray();
+			}
 		}
 	}
 }
@@ -391,7 +432,6 @@ TTeamMenuItem::DrawContentLabel()
 {
 	BMenu *menu = Menu();
 	menu->MovePenBy(0, fLabelAscent);
-	menu->SetDrawingMode(B_OP_COPY);
 
 	float cachedWidth = menu->StringWidth(Label());	
 	if (Submenu() && fVertical)

@@ -59,7 +59,7 @@ const float kMinimumTrayWidth = kIconGap
 		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
-const float kMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
+extern float sMinimumWindowWidth;
 
 #ifdef DB_ADDONS
 struct DeskbarItemInfo {
@@ -161,6 +161,7 @@ private:
 	int32 fLastReplicant;
 
 	bool fMultiRowMode;
+	float fMinimumTrayWidth;
 
 	bool fAlignmentSupport;		
 #ifdef DB_ADDONS

@@ -72,6 +72,7 @@ class TBarView : public BView {
 		~TBarView();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 		virtual void Draw(BRect updateRect);
 		virtual void MessageReceived(BMessage* message);
 		virtual void MouseMoved(BPoint where, uint32 transit,
@@ -148,11 +149,11 @@ class TBarView : public BView {
 		TDragRegion *fDragRegion;
 		TReplicantTray *fReplicantTray;
 
-		bool fShowInterval;
-		bool fShowClock;
-		bool fVertical;
-		bool fTop;
-		bool fLeft;
+		bool fShowInterval : 1;
+		bool fShowClock : 1;
+		bool fVertical : 1;
+		bool fTop : 1;
+		bool fLeft : 1;
 
 		int32 fState;
 

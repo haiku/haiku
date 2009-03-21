@@ -33,10 +33,13 @@ All rights reserved.
 */
 
 #include <Debug.h>
+
+#include "BarMenuTitle.h"
+
 #include <Bitmap.h>
+#include <ControlLook.h>
 
 #include "BarApp.h"
-#include "BarMenuTitle.h"
 #include "BarView.h"
 #include "BarWindow.h"
 #include "ExpandoMenuBar.h"
@@ -77,7 +80,31 @@ TBarMenuTitle::GetContentSize(float *width, float *height)
 void
 TBarMenuTitle::Draw()
 {
-	BMenuItem::Draw();
+	if (be_control_look == NULL) {
+		BMenuItem::Draw();
+		return;
+	}
+
+	// fill background if selected
+	rgb_color base = Menu()->LowColor();
+	BRect rect = Frame();
+
+	BRect windowBounds = Menu()->Window()->Bounds();
+	if (rect.right > windowBounds.right)
+		rect.right = windowBounds.right;
+
+	if (IsSelected()) {
+		be_control_look->DrawMenuItemBackground(Menu(), rect, rect, base,
+			BControlLook::B_ACTIVATED);
+	} else {
+		be_control_look->DrawButtonBackground(Menu(), rect, rect, base);
+	}
+
+	// draw content
+	DrawContent();
+
+	// make sure we restore state
+	Menu()->SetLowColor(base);
 }
 
 
@@ -86,6 +113,21 @@ TBarMenuTitle::DrawContent()
 {
 	BMenu *menu = Menu();
 	BRect frame(Frame());
+
+	if (be_control_look != NULL) {
+		menu->SetDrawingMode(B_OP_ALPHA);
+	
+		if (fIcon != NULL) {
+			BRect dstRect(fIcon->Bounds());
+			dstRect.OffsetTo(frame.LeftTop());
+			dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2) - 1.0f),
+				rintf(((frame.Height() - dstRect.Height()) / 2) - 0.0f));
+	
+			menu->DrawBitmapAsync(fIcon, dstRect);
+		}
+		return;
+	}
+
 	rgb_color menuColor = menu->ViewColor();
 	rgb_color dark = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
@@ -94,7 +136,7 @@ TBarMenuTitle::DrawContent()
 	bool inExpandoMode = dynamic_cast<TExpandoMenuBar*>(menu) != NULL;
 
 	BRect bounds(menu->Window()->Bounds());
-	if (bounds.right < frame.right) 
+	if (bounds.right < frame.right)
 		frame.right = bounds.right;
 
 	menu->SetDrawingMode(B_OP_COPY);
@@ -108,7 +150,8 @@ TBarMenuTitle::DrawContent()
 		menu->AddLine(frame.RightBottom(), frame.RightTop(), dark);
 		if (inExpandoMode) {
 			frame.top += 1;
-			menu->AddLine(frame.LeftTop(), frame.RightTop() + BPoint(-1, 0), light);
+			menu->AddLine(frame.LeftTop(), frame.RightTop() + BPoint(-1, 0),
+				light);
 		}
 
 		menu->EndLineArray();

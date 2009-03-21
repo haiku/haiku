@@ -18,7 +18,7 @@ local targetSource ;
 if $(TARGET_PLATFORM) = haiku {
 targetLib = libshared.a ;
 targetSource = CalendarMenuWindow.cpp ;
-SubDirC++Flags -D_SHOW_CALENDAR_MENU_WINDOW=1 ;
+SubDirC++Flags -D_SHOW_CALENDAR_MENU_WINDOW=1 -DMOUNT_MENU_IN_DESKBAR=1 ;
 } else {
 SubDirC++Flags -D_SHOW_CALENDAR_MENU_ITEM=1 ;
 }

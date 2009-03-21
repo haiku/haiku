@@ -33,12 +33,15 @@ All rights reserved.
 */
 
 #include <Debug.h>
+
 #include <string.h>
+
+#include <Autolock.h>
+#include <Bitmap.h>
+#include <ControlLook.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <Bitmap.h>
-#include <Autolock.h>
 
 #include "icons.h"
 #include "icons_logo.h"
@@ -55,7 +58,7 @@ All rights reserved.
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
 
-const float kBeMenuWidth = 50.0f;
+const float kDefaultBeMenuWidth = 50.0f;
 const float kSepItemWidth = 5.0f;
 
 const uint32 M_MINIMIZE_TEAM = 'mntm';
@@ -77,6 +80,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 	fIsScrolling(false),
 	fShowTeamExpander(static_cast<TBarApp *>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams),
+	fBeMenuWidth(kDefaultBeMenuWidth),
 	fBarView(bar),
 	fFirstApp(0),
 	fPreviousDragTargetItem(NULL)
@@ -88,7 +92,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
-	SetMaxContentWidth(kMinimumWindowWidth);
+	SetMaxContentWidth(sMinimumWindowWidth);
 }
 
 
@@ -106,15 +110,19 @@ TExpandoMenuBar::AttachedToWindow()
 	BMessenger self(this);
 	BList teamList;
 	TBarApp::Subscribe(self, &teamList);
-	float width = fVertical ? Frame().Width() : kMinimumWindowWidth;
+	float width = fVertical ? Frame().Width() : sMinimumWindowWidth;
 	float height = -1.0f;
 
 	// top or bottom mode, add be menu and sep for menubar tracking consistency
 	if (!fVertical) {
 		TBeMenu *beMenu = new TBeMenu(fBarView);
 		TBarWindow::SetBeMenu(beMenu);
- 		fBeMenuItem = new TBarMenuTitle(kBeMenuWidth, Frame().Height(),
- 			AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_BeLogoIcon), beMenu, true);
+		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+			R_BeLogoIcon);
+		if (logoBitmap != NULL)
+			fBeMenuWidth = logoBitmap->Bounds().Width() + 16;
+ 		fBeMenuItem = new TBarMenuTitle(fBeMenuWidth, Frame().Height(),
+ 			logoBitmap, beMenu, true);
 		AddItem(fBeMenuItem);
 
 		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, height, fVertical);
@@ -521,7 +529,7 @@ TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem **_item)
 void
 TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature)
 {
-	float itemWidth = fVertical ? fBarView->Bounds().Width() : kMinimumWindowWidth;
+	float itemWidth = fVertical ? fBarView->Bounds().Width() : sMinimumWindowWidth;
 	float itemHeight = -1.0f;
 
 	desk_settings *settings = ((TBarApp *)be_app)->Settings();
@@ -630,14 +638,14 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	int32 count = CountItems();
 	bool reset = false;
 	float newWidth = 0;
-	float fullWidth = (kMinimumWindowWidth * count);
+	float fullWidth = (sMinimumWindowWidth * count);
 
 	if (!fBarView->Vertical()) {
 		// in this case there are 2 extra items:
 		//		The Be Menu
 		//		The little separator item
-		fullWidth = fullWidth - (kMinimumWindowWidth * 2) + (kBeMenuWidth + kSepItemWidth);
-		width -= (kBeMenuWidth + kSepItemWidth);
+		fullWidth = fullWidth - (sMinimumWindowWidth * 2) + (fBeMenuWidth + kSepItemWidth);
+		width -= (fBeMenuWidth + kSepItemWidth);
 		count -= 2;
 	}
 
@@ -650,14 +658,14 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		if (fullWidth > width)
 			newWidth = floorf(width/count);
 		else
-			newWidth = kMinimumWindowWidth;
+			newWidth = sMinimumWindowWidth;
 	}
-	if (newWidth > kMinimumWindowWidth)
-		newWidth = kMinimumWindowWidth;
+	if (newWidth > sMinimumWindowWidth)
+		newWidth = sMinimumWindowWidth;
 
 	if (reset) {
 		SetMaxContentWidth(newWidth);
-		if (newWidth == kMinimumWindowWidth)
+		if (newWidth == sMinimumWindowWidth)
 			fOverflow = false;
 		InvalidateLayout();
 
@@ -691,25 +699,36 @@ TExpandoMenuBar::Draw(BRect update)
 void
 TExpandoMenuBar::DrawBackground(BRect)
 {
+	if (fVertical)
+		return;
+
 	BRect bounds(Bounds());
 	rgb_color menuColor = ViewColor();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color dark = tint_color(menuColor, B_DARKEN_2_TINT);
 	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
+
 	int32 last = CountItems() - 1;
-	float start;
-
 	if (last >= 0)
-		start = ItemAt(last)->Frame().right + 1;
+		bounds.left = ItemAt(last)->Frame().right + 1;
 	else
-		start = 0;
+		bounds.left = 0;
 
-	if (!fVertical) {
+	if (be_control_look != NULL) {
+		SetHighColor(tint_color(menuColor, 1.22));
+		StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
+		bounds.left++;
+		uint32 borders = BControlLook::B_TOP_BORDER
+			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
+
+		be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
+			0, borders);
+	} else {
 		SetHighColor(vlight);
-		StrokeLine(BPoint(start, bounds.top+1), bounds.RightTop() + BPoint(0,1));
-		StrokeLine(BPoint(start, bounds.top+1), BPoint(start, bounds.bottom));
+		StrokeLine(bounds.LeftTop(), bounds.RightTop());
+		StrokeLine(BPoint(bounds.left, bounds.top + 1), bounds.LeftBottom());
 		SetHighColor(hilite);
-		StrokeLine(BPoint(start+1, bounds.bottom), bounds.RightBottom());
+		StrokeLine(BPoint(bounds.left + 1, bounds.bottom), bounds.RightBottom());
 	}
 }
 
