@@ -154,7 +154,7 @@ class SelectTraceEntry : public AbstractTraceEntry {
 				for (int i = 0; i < fCount; i++) {
 					if (!FD_ISSET(i, set))
 						continue;
-	
+
 					if (first) {
 						out.Print("%d", i);
 						first = false;
@@ -282,7 +282,7 @@ class PollTraceEntry : public AbstractTraceEntry {
 				bool firstEvent = true;
 				for (int k = 0; kEventNames[k].name != NULL; k++) {
 					if ((fEntries[i].events & kEventNames[k].event) != 0) {
-						if (firstEvent) {	
+						if (firstEvent) {
 							out.Print("%s", kEventNames[k].name);
 							firstEvent = false;
 						} else
@@ -576,7 +576,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 			fds[i].revents = POLLNVAL;
 	}
 
-	if (count < 1) {
+	if (numFDs > 0 && count < 1) {
 		count = B_BAD_VALUE;
 		goto err;
 	}
@@ -658,7 +658,7 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 		}
 	}
 
-	if (count < 1) {
+	if (numInfos > 0 && count < 1) {
 		put_select_sync(sync);
 		return B_BAD_VALUE;
 	}
@@ -1017,10 +1017,16 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	if (numFDs < 0)
 		return B_BAD_VALUE;
 
-	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
-		return B_BAD_ADDRESS;
+	if (numFDs == 0) {
+		// special case: no FDs
+		result = common_poll(NULL, 0, timeout, false);
+		return result < 0
+			? syscall_restart_handle_timeout_post(result, timeout) : result;
+	}
 
 	// copy parameters
+	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
+		return B_BAD_ADDRESS;
 
 	fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
 	if (fds == NULL)
@@ -1034,7 +1040,7 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	result = common_poll(fds, numFDs, timeout, false);
 
 	// copy back results
-	if (result >= B_OK && user_memcpy(userfds, fds, bytes) < B_OK)
+	if (result >= 0 && numFDs > 0 && user_memcpy(userfds, fds, bytes) < B_OK)
 		result = B_BAD_ADDRESS;
 	else
 		syscall_restart_handle_timeout_post(result, timeout);
@@ -1054,6 +1060,14 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 
 	if (numInfos < 0)
 		return B_BAD_VALUE;
+
+	if (numInfos == 0) {
+		// special case: no infos
+		ssize_t result = common_wait_for_objects(NULL, 0, flags, timeout,
+			false);
+		return result < 0
+			? syscall_restart_handle_timeout_post(result, timeout) : result;
+	}
 
 	if (userInfos == NULL || !IS_USER_ADDRESS(userInfos))
 		return B_BAD_ADDRESS;
