@@ -548,6 +548,24 @@ const char* testingCommands[] = {
 };
 
 
+const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 "};
+const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 "};
+
+
+const char* 
+GetHciVersion(uint16 ver)
+{
+	return hciVersion[ver];
+}
+
+
+const char* 
+GetLmpVersion(uint16 ver)
+{
+	return lmpVersion[ver];
+}
+
+
 const char* 
 GetCommand(uint16 command)
 {

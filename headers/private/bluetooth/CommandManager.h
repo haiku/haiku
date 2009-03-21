@@ -53,10 +53,6 @@ private:
 	struct hci_command_header* fHeader;
 };
 
-
-const char* GetCommand(uint16 command);
-const char* GetManufacturer(uint16 manufacturer);
-
 /* CONTROL BASEBAND */
 void* buildReset(size_t* outsize);
 void* buildReadLocalName(size_t* outsize);

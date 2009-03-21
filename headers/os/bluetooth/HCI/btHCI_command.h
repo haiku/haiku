@@ -10,6 +10,11 @@
 
 #define HCI_COMMAND_HDR_SIZE 3
 
+const char* GetCommand(uint16 command);
+const char* GetManufacturer(uint16 manufacturer);
+const char* GetHciVersion(uint16 ver);
+const char* GetLmpVersion(uint16 ver);
+
 struct hci_command_header {
 	uint16	opcode;		/* OCF & OGF */
 	uint8	clen;
@@ -28,11 +33,11 @@ struct hci_command_header {
 	#define OCF_READ_LOCAL_VERSION		0x0001
 	struct hci_rp_read_loc_version {
 		uint8		status;
-		uint8		hci_ver;
-		uint16		hci_rev;
-		uint8		lmp_ver;
+		uint8		hci_version;
+		uint16		hci_revision;
+		uint8		lmp_version;
 		uint16		manufacturer;
-		uint16		lmp_subver;
+		uint16		lmp_subversion;
 	} __attribute__ ((packed));
 
 	#define OCF_READ_LOCAL_FEATURES		0x0003
