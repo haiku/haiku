@@ -299,6 +299,9 @@ printf("FUSEVolume::Mount()\n");
 	fNodes.Insert(node);
 	fEntries.Insert(entry);
 
+	// init the volume name
+	snprintf(fName, sizeof(fName), "%s Volume", _FileSystem()->GetName());
+
 	// publish the root node
 	error = UserlandFS::KernelEmu::publish_vnode(fID, node->id, node,
 		node->type, 0, _FileSystem()->GetNodeCapabilities());
@@ -349,7 +352,8 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 	info->free_blocks = st.f_bfree;
 	info->total_nodes = st.f_files;
 	info->free_nodes = 100;				// st.f_favail is ignored by statfs()
-	info->volume_name[0] = '\0';		// no way to get the name (if any)
+	strlcpy(info->volume_name, fName, sizeof(info->volume_name));
+		// no way to get the real name (if any)
 
 	return B_OK;
 }

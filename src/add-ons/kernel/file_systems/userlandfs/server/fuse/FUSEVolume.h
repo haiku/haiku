@@ -158,6 +158,7 @@ private:
 			ino_t				fNextNodeID;
 			bool				fUseNodeIDs;	// TODO: Actually read the
 												// option!
+			char				fName[B_OS_NAME_LENGTH];
 };
 
 }	// namespace UserlandFS
