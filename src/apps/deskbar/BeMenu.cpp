@@ -43,10 +43,11 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarView.h"
 #include "DeskBarUtils.h"
+#include "IconMenuItem.h"
+#include "MountMenu.h"
 #include "PublicCommands.h"
 #include "RecentItems.h"
 #include "StatusView.h"
-#include "IconMenuItem.h"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
@@ -56,22 +57,10 @@ void run_be_about();
 
 #ifdef MOUNT_MENU_IN_DESKBAR
 
-class MountMenu : public BMenu {
+class DeskbarMountMenu : public BPrivate::MountMenu {
 	public:
-		MountMenu(const char *name);
+		DeskbarMountMenu(const char *name);
 		virtual bool AddDynamicItem(add_state s);
-};
-
-
-class MountMenuItem : public BMenuItem {
-	public:
-		MountMenuItem(const char *label, BMessage *message, BBitmap *icon );
-		virtual ~MountMenuItem();
-		virtual void GetContentSize(float *width, float *height);	
-		virtual void DrawContent();
-
-	private:
-		BBitmap *deviceIcon;
 };
 
 #endif
@@ -261,7 +250,7 @@ TBeMenu::AddStandardBeMenuItems()
 	AddItem(item);
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-	MountMenu *mountMenu = new MountMenu("Mount Disks");
+	DeskbarMountMenu *mountMenu = new DeskbarMountMenu("Mount Disks");
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
@@ -731,87 +720,21 @@ TRecentsMenu::ResetTargets()
 
 #ifdef MOUNT_MENU_IN_DESKBAR
 
-MountMenu::MountMenu(const char *name)
-	: BMenu(name)
+DeskbarMountMenu::DeskbarMountMenu(const char *name)
+	: BPrivate::MountMenu(name)
 {
 	SetFont(be_plain_font);
 }
 
 
 bool
-MountMenu::AddDynamicItem(add_state s)
+DeskbarMountMenu::AddDynamicItem(add_state s)
 {
-	RemoveItems(0, CountItems(), true);
-
-	// Send message to tracker to get items.
-	BMessage request('gmtv');
-	BMessage reply;
-	BMessenger(kTrackerSignature).SendMessage(&request,
-		&reply);
-
-	// populate menu
-	type_code code;
-	int32 countFound;
-	reply.GetInfo("DisplayName", &code, &countFound);
-	for (int32 vol = 0; vol < countFound; vol++) {
-		// TODO: get_device_icon version that supports B_RGBA32
-		BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-		get_device_icon(reply.FindString("DeviceName", vol), icon->Bits(), B_MINI_ICON);	
-		BMessage *invokeMessage = new BMessage;
-		reply.FindMessage("InvokeMessage", vol, invokeMessage);
-		AddItem(new MountMenuItem(reply.FindString("DisplayName", vol),
-		  invokeMessage, icon));
-	}
-
-	if (countFound > 0)
-		AddSeparatorItem();
-
-	BMenuItem *mountAll = new BMenuItem("All Disks", new BMessage('mntn'));
-	AddItem(mountAll);
-	mountAll->SetEnabled(countFound > 0);
-	BMenuItem *mountSettings = new BMenuItem("Settings", new BMessage('Tram'));
-	AddItem(mountSettings);
+	BPrivate::MountMenu::AddDynamicItem(s);
 
 	SetTargetForItems(BMessenger(kTrackerSignature));
 
 	return false;
-}
-
-
-MountMenuItem::MountMenuItem(const char *label, BMessage *message, BBitmap *icon)
-	: BMenuItem(label,message),
-	deviceIcon(icon)
-{
-}
-
-
-MountMenuItem::~MountMenuItem()
-{
-	delete deviceIcon;
-}
-
-
-void
-MountMenuItem::GetContentSize(float *width, float *height)
-{
-	BMenuItem::GetContentSize(width, height);
-	*width += 20;
-	*height += 3;
-}
-
-
-void
-MountMenuItem::DrawContent()
-{
-	BPoint loc = ContentLocation();
-	loc.x += 20;
-	Menu()->MovePenTo(loc);
-	BMenuItem::DrawContent();
-	
-	BPoint where(ContentLocation());
-	where.y = Frame().top;
-	Menu()->SetDrawingMode(B_OP_OVER);
-	Menu()->DrawBitmapAsync(deviceIcon, where);
 }
 
 #endif
