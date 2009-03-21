@@ -569,6 +569,7 @@ GetLmpVersion(uint16 ver)
 const char* 
 GetCommand(uint16 command)
 {
+	
 	// TODO: BT implementations beyond 2.1
 	// could specify new commands with OCF numbers
 	// beyond the boundaries of the arrays and crash.
@@ -576,27 +577,27 @@ GetCommand(uint16 command)
 	// our control.
 	switch (GET_OPCODE_OGF(command)) {
 		case OGF_LINK_CONTROL:
-			return linkControlCommands[GET_OPCODE_OCF(command)];
+			return linkControlCommands[GET_OPCODE_OCF(command)-1];
 			break;
 
 		case OGF_LINK_POLICY:
-			return linkPolicyCommands[GET_OPCODE_OCF(command)];
+			return linkPolicyCommands[GET_OPCODE_OCF(command)-1];
 			break;
 
 		case OGF_CONTROL_BASEBAND:
-			return controllerBasebandCommands[GET_OPCODE_OCF(command)];
+			return controllerBasebandCommands[GET_OPCODE_OCF(command)-1];
 			break;
 
 		case OGF_INFORMATIONAL_PARAM:
-			return informationalParametersCommands[GET_OPCODE_OCF(command)];
+			return informationalParametersCommands[GET_OPCODE_OCF(command)-1];
 			break;
 
 		case OGF_STATUS_PARAM:
-			return statusParametersCommands[GET_OPCODE_OCF(command)];
+			return statusParametersCommands[GET_OPCODE_OCF(command)-1];
 			break;
 
 		case OGF_TESTING_CMD:
-			return testingCommands[GET_OPCODE_OCF(command)];
+			return testingCommands[GET_OPCODE_OCF(command)-1];
 			break;
 		default:
 			return "Unknown command";
