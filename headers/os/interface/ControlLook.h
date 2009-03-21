@@ -49,6 +49,13 @@ public:
 	};
 
 	enum {
+		B_LEFT_ARROW		= 0,
+		B_RIGHT_ARROW		= 1,
+		B_UP_ARROW			= 2,
+		B_DOWN_ARROW		= 3
+	};
+
+	enum {
 		B_FOCUSED			= 1 << 0,
 		B_CLICKED			= 1 << 1, // some controls activate on mouse up
 		B_ACTIVATED			= 1 << 2,
@@ -133,6 +140,13 @@ public:
 									BRect& rect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
 									enum orientation orientation);
+
+	// TODO: Make virtual before R1 release
+			void				DrawArrowShape(BView* view,
+									BRect& rect, const BRect& updateRect,
+									const rgb_color& base, uint32 direction,
+									uint32 flags = 0,
+									float tint = B_DARKEN_MAX_TINT);
 
 	virtual	rgb_color			SliderBarColor(const rgb_color& base);
 

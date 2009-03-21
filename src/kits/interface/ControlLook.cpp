@@ -686,6 +686,70 @@ BControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 }
 
 
+void
+BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
+	const rgb_color& base, uint32 direction, uint32 flags, float tint)
+{
+	BPoint tri1, tri2, tri3;
+	float hInset = rect.Width() / 3;
+	float vInset = rect.Height() / 3;
+	rect.InsetBy(hInset, vInset);
+
+	switch (direction) {
+		case B_LEFT_ARROW:
+			tri1.Set(rect.right, rect.top);
+			tri2.Set(rect.right - rect.Width() / 1.33,
+				(rect.top + rect.bottom + 1) /2 );
+			tri3.Set(rect.right, rect.bottom + 1);
+			break;
+		case B_RIGHT_ARROW:
+			tri1.Set(rect.left, rect.bottom + 1);
+			tri2.Set(rect.left + rect.Width() / 1.33,
+				(rect.top + rect.bottom + 1) / 2);
+			tri3.Set(rect.left, rect.top);
+			break;
+		case B_UP_ARROW:
+			tri1.Set(rect.left, rect.bottom);
+			tri2.Set((rect.left + rect.right + 1) / 2,
+				rect.bottom - rect.Height() / 1.33);
+			tri3.Set(rect.right + 1, rect.bottom);
+			break;
+		case B_DOWN_ARROW:
+		default:
+			tri1.Set(rect.left, rect.top);
+			tri2.Set((rect.left + rect.right + 1) / 2,
+				rect.top + rect.Height() / 1.33);
+			tri3.Set(rect.right + 1, rect.top);
+			break;
+	}
+	// offset triangle if down
+	if (flags & B_ACTIVATED)
+		view->MovePenTo(BPoint(1, 1));
+	else
+		view->MovePenTo(BPoint(0, 0));
+
+	BShape arrowShape;
+	arrowShape.MoveTo(tri1);
+	arrowShape.LineTo(tri2);
+	arrowShape.LineTo(tri3);
+
+	if (flags & B_DISABLED)
+		tint = (tint + B_NO_TINT + B_NO_TINT) / 3;
+
+	view->SetHighColor(tint_color(base, tint));
+
+	float penSize = view->PenSize();
+	drawing_mode mode = view->DrawingMode();
+
+	view->SetPenSize(ceilf(hInset / 2.0));
+	view->SetDrawingMode(B_OP_OVER);
+	view->StrokeShape(&arrowShape);
+
+	view->SetPenSize(penSize);
+	view->SetDrawingMode(mode);
+}
+
+
 rgb_color
 BControlLook::SliderBarColor(const rgb_color& base)
 {
