@@ -9,6 +9,7 @@
 
 #include <malloc.h>
 #include <string.h>
+#include <KernelExport.h>
 
 struct snet_buffer {
 	struct list_link link;
@@ -162,8 +163,7 @@ inline uint16    snb_remaining_to_pull(snet_buffer* snb)
 static snet_buffer*
 snb_attempt_reuse(snet_buffer* snb, uint16 size)
 {
-	if ( snb == NULL ||
-		((int16)snb->allocatedSize - (int16)size) < 0 ) {
+	if ( snb == NULL ||	(snb->allocatedSize < size)  ) {
 
 		/* Impossible or not worth, Creating a new one */
 		snb_free(snb);
@@ -182,11 +182,17 @@ void
 snb_park(struct list* l, snet_buffer* snb)
 {
 	snet_buffer* item = NULL;
+
 	/* insert it by order */
 	while ((item = list_get_next_item(l, item)) != NULL) {
-		if (item->allocatedSize > snb->allocatedSize)
+		/* This one has allocated more than us place us back*/
+		if (item->allocatedSize > snb->allocatedSize) {
 			list_insert_item_before(l, item, snb);
+			return;
+		}
 	}
+	/* no buffer bigger than us(or empty).. then at the end*/
+	list_add_item(l, snb);
 }
 
 
@@ -194,29 +200,42 @@ snet_buffer*
 snb_fetch(struct list* l, uint16 size)
 {
 	snet_buffer* item = NULL;
-	snet_buffer* previous = NULL;
-	
+	snet_buffer* newitem = NULL;
+
 	if (!list_is_empty(l))
 	while ((item = list_get_next_item(l, item)) != NULL) {
-		if (item->allocatedSize == size) {
+		if (item->allocatedSize >= size) {
 			/* This one is for us*/
 			break;
 		}
-		else if (item->allocatedSize > size) {
-			/* get the previous*/
-			item = previous;
-			break;
-		}
-		previous = item;
 	}
 	
-	// reusing previous pointer for another proposit
-	previous = snb_attempt_reuse(item, size); 
+	newitem = snb_attempt_reuse(item, size); 
 	
 	/* the resulting reused one is the same as we fetched? => remove it from list*/
-	if (item == previous) {
+	if (item == newitem) {
 		list_remove_item(l, item);
 	}
+
+	return newitem;
+}
+
+
+uint16
+snb_packets(struct list* l)
+{
+	uint16 count = 0;
+	snet_buffer* item = NULL;
 	
-	return previous;
+	while ((item = list_get_next_item(l, item)) != NULL)
+		count++;
+	
+	return count;
+}
+
+
+void
+snb_dump(snet_buffer* snb)
+{
+	kprintf("item=%p\tprev=%p\tnext=%p\tallocated=%d\n", snb, snb->link.prev, snb->link.next, snb->allocatedSize);
 }

@@ -1,11 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
-
 #ifndef _SNET_BUFFER_H_
 #define _SNET_BUFFER_H_
 
@@ -75,7 +71,8 @@ uint16     		snb_remaining_to_pull(snet_buffer* snb);
  */
 void			snb_park(struct list* l, snet_buffer* snb);
 snet_buffer*	snb_fetch(struct list* l, uint16 size);
+uint16			snb_packets(struct list* l);
 
-
+void			snb_dump(snet_buffer* snb);
 
 #endif
