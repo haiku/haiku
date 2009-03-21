@@ -236,18 +236,53 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 	int16   opcodeExpected;
 	BMessage reply;
-	
-    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD(GetID()));
-    Output::Instance()->Post("\n", BLACKBOARD_LD(GetID()));
-	
+		
 	// Handle command complete information
     request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
 
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
- 
+
+
+    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for command %s\n",__FUNCTION__, GetCommand(opcodeExpected));
     switch (opcodeExpected) {
+
+        case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION):
+        {
+        	struct hci_rp_read_loc_version* version = (struct hci_rp_read_loc_version*)(event+1);
+
+            if (version->status == BT_OK) {
+
+                //reply.AddData("version", B_ANY_TYPE, &version, sizeof(struct hci_rp_read_loc_version));
+                reply.AddInt8("status", version->status);
+
+                printf("Sending reply ... %ld\n", request->SendReply(&reply));
+                reply.PrintToStream();
+				
+				if (!IsPropertyAvailable("hci_version"))
+					fProperties->AddInt8("hci_version", version->hci_version);
+
+				if (!IsPropertyAvailable("hci_revision"))
+					fProperties->AddInt16("hci_revision", version->hci_revision);
+
+				if (!IsPropertyAvailable("lmp_version"))
+					fProperties->AddInt8("lmp_version", version->lmp_version);
+
+				if (!IsPropertyAvailable("lmp_subversion"))
+					fProperties->AddInt16("lmp_subversion", version->lmp_subversion);
+
+				if (!IsPropertyAvailable("manufacturer"))
+					fProperties->AddInt16("manufacturer", version->manufacturer);
+
+
+			    Output::Instance()->Postf(BLACKBOARD_KIT, "Reply for Local Version %x\n", version->status);
+            }
+
+ 			// This request is not gonna be used anymore
+            ClearWantedEvent(request);
+     	}
+        break;
 
         case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
         {
@@ -256,7 +291,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             if (readbdaddr->status == BT_OK) {
 
                 reply.AddData("bdaddr", B_ANY_TYPE, &readbdaddr->bdaddr, sizeof(bdaddr_t));
-                reply.AddInt32("status", readbdaddr->status);
+                reply.AddInt8("status", readbdaddr->status);
 
                 printf("Sending reply ... %ld\n",request->SendReply(&reply));
                 reply.PrintToStream();
@@ -273,6 +308,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
+
         
         case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV):
         {
@@ -420,6 +456,8 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
+
+    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for command %s\n",__FUNCTION__, GetCommand(opcodeExpected));
 
     switch (opcodeExpected) {
 
@@ -648,7 +686,7 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 	if (request->FindData("raw command", B_ANY_TYPE, 0, (const void **)&command, &size) == B_OK) {
 		
 		AddWantedEvent(request);
-		    
+		// LEAK: is command buffer freed within the Message?	    
 	    if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) == B_ERROR) {
 			// TODO: - Reply the request with error!
 			//       - Remove the just added request

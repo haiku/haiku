@@ -37,8 +37,8 @@ public:
 	/* Possible throwing */
 			status_t		SetDiscoverable(int mode);
 
-			BString			GetProperty(const char* property);
-			void			GetProperty(const char* property, uint32* value);
+			BString			GetProperty(const char* property);			
+			status_t 		GetProperty(const char* property, uint32* value);
 
 			int				GetDiscoverable();
 			bdaddr_t		GetBluetoothAddress();
@@ -50,7 +50,8 @@ public:
 private:
 			LocalDevice(hci_id hid);
 			virtual	~LocalDevice();
-
+			
+			status_t		ReadLocalVersion();
 			hci_id			GetID(void) {return hid;}
 	static	LocalDevice*	RequestLocalDeviceID(BMessage* request);
 

@@ -140,6 +140,10 @@ void BluetoothServer::MessageReceived(BMessage *message)
 		case BT_MSG_HANDLE_SIMPLE_REQUEST:
 			status = HandleSimpleRequest(message, &reply);
 		break;
+		case BT_MSG_GET_PROPERTY:
+			status = HandleGetProperty(message, &reply);
+		break;
+		
 		/* Handle if the bluetooth preferences is running?? */
 		case B_SOME_APP_LAUNCHED:
    		{
@@ -296,7 +300,7 @@ status_t
 BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 {
 	LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
-	BString propertyRequested;
+	const char* propertyRequested;
 
 	// Find out if there is a property being requested,
 	if (message->FindString("property", &propertyRequested) == B_OK) {
@@ -316,6 +320,49 @@ BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 
 }
 
+
+status_t
+BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
+{
+	/* User side will look for the reply in a result field
+	 * and will not care about status fields, therefore we return OK in all cases
+	 */
+	
+	LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
+	const char* propertyRequested;
+
+	// Find out if there is a property being requested,
+	if (message->FindString("property", &propertyRequested) == B_OK) {
+		
+		Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "Searching %s property...\n",
+					propertyRequested);
+
+		// Check if the property has been already retrieved
+		if (ldi->IsPropertyAvailable(propertyRequested)) {
+			if (strcmp(propertyRequested, "hci_version") == 0) {				
+				uint8 result = ldi->GetPropertiesMessage()->FindInt8(propertyRequested);
+				reply->AddInt32("result", result);
+			} else if (strcmp(propertyRequested, "hci_revision") == 0) {
+				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
+				reply->AddInt32("result", result);
+			} else if (strcmp(propertyRequested, "lmp_version") == 0) {
+				uint8 result = ldi->GetPropertiesMessage()->FindInt8(propertyRequested);
+				reply->AddInt32("result", result);
+			} else if (strcmp(propertyRequested, "lmp_subversion") == 0) {
+				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
+				reply->AddInt32("result", result);
+			} else if (strcmp(propertyRequested, "manufacturer") == 0) {
+				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
+				reply->AddInt32("result", result);
+			} else {
+				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "Property %s could not be satisfied\n",
+						propertyRequested);
+			}
+		}
+	}
+
+	return B_OK;
+}
 
 #if 0
 #pragma mark -

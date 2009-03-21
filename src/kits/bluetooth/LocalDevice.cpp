@@ -122,11 +122,26 @@ LocalDevice::GetProperty(const char* property)
 }
 
 
-void 
+status_t
 LocalDevice::GetProperty(const char* property, uint32* value)
 {
+	if (fMessenger == NULL)
+		return B_ERROR;
+	
+	BMessage request(BT_MSG_GET_PROPERTY);
+	BMessage reply;
+	
+	request.AddInt32("hci_id", hid);	
+	request.AddString("property", property);
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+		if (reply.FindInt32("result", (int32*)value ) == B_OK ) {
+			return B_OK;
+			
+		}		
+	}
 
-	*value = 0;
+	return B_ERROR;
 }
 
 
@@ -198,7 +213,6 @@ LocalDevice::GetBluetoothAddress()
 	request.AddData("raw command", B_ANY_TYPE, command, size);
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR));
-
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
 		if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &ssize) == B_OK )
@@ -276,6 +290,30 @@ LocalDevice::GetDeviceClass()
 }
 
 
+status_t 
+LocalDevice::ReadLocalVersion()
+{
+	size_t	size;
+	int8	 bt_status = BT_ERROR;
+	
+	BluetoothCommand<> localVersion(OGF_INFORMATIONAL_PARAM,OCF_READ_LOCAL_VERSION,&size);
+	
+	
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+	
+	request.AddInt32("hci_id", hid);
+	request.AddData("raw command", B_ANY_TYPE, localVersion.Data(), size);
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION));
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+}
+
+
 /*
 ServiceRecord 
 LocalDevice::getRecord(Connection notifier) {
@@ -292,6 +330,7 @@ LocalDevice::updateRecord(ServiceRecord srvRecord) {
 LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 {
 	fMessenger = _RetrieveBluetoothMessenger();
+	ReadLocalVersion();
 }
 
 

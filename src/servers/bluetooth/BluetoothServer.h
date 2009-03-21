@@ -61,9 +61,8 @@ public:
 	/* Messages reply */
 	status_t	HandleLocalDevicesCount(BMessage* message, BMessage* reply);
 	status_t    HandleAcquireLocalDevice(BMessage* message, BMessage* reply);
-	status_t    HandleGetFriendlyName(BMessage* message, BMessage* reply);
-	status_t    HandleGetAddress(BMessage* message, BMessage* reply);
-
+	
+	status_t    HandleGetProperty(BMessage* message, BMessage* reply);
 	status_t    HandleSimpleRequest(BMessage* message, BMessage* reply);
 
 

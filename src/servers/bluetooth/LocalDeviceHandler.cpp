@@ -50,12 +50,12 @@ LocalDeviceHandler::Acquire(void)
 
 
 bool
-LocalDeviceHandler::IsPropertyAvailable(const BString& property)
+LocalDeviceHandler::IsPropertyAvailable(const char* property)
 {
 	type_code typeFound;
 	int32     countFound;
 
-	return (fProperties->GetInfo(property.String(), &typeFound, &countFound) == B_OK );
+	return (fProperties->GetInfo(property, &typeFound, &countFound) == B_OK );
 }
 
 

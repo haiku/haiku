@@ -11,6 +11,7 @@
 #define BT_MSG_ACQUIRE_LOCAL_DEVICE     'btAd'
 #define BT_MSG_HANDLE_SIMPLE_REQUEST    'btsR'
 #define BT_MSG_ADD_DEVICE               'btDD'
+#define BT_MSG_GET_PROPERTY             'btgP'
 
 // Discovery
 #define BT_MSG_INQUIRY_STARTED    'IqSt'

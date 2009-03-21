@@ -187,10 +187,10 @@ RemoteDevice::GetProperty(const char* property) /* Throwing */
 }
 
 
-void
+status_t
 RemoteDevice::GetProperty(const char* property, uint32* value) /* Throwing */
 {
-
+	return B_ERROR;
 }
 
 

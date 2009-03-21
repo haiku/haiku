@@ -27,7 +27,7 @@ public:
 	status_t Launch(void);
 	
 	BMessage* 	  GetPropertiesMessage(void) { return fProperties; }
-	bool  		  IsPropertyAvailable(const BString& property);
+	bool  		  IsPropertyAvailable(const char* property);
 	
 
 protected:    

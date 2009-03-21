@@ -35,4 +35,10 @@ typedef enum { 	BT_COMMAND = 0,
 #define HCI_FEATURES_SIZE		8	/* LMP features */
 #define HCI_DEVICE_NAME_SIZE	248	/* unit name size */
 
+/* Device drivers need to take this into account
+ * when receiving ioctls. Only applies to R5 builds
+ * in deprecation process 
+ */
+#define BT_IOCTLS_PASS_SIZE
+
 #endif // _BTHCI_H_
