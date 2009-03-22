@@ -19,7 +19,7 @@ void I_step_one(struct mpstr *mp, unsigned int balloc[], unsigned int scale_inde
   unsigned int *ba=balloc;
   unsigned int *sca = (unsigned int *) scale_index;
 
-  if(fr->stereo) {
+  if(fr->stereo == 2) {
     int i;
     int jsbound = fr->jsbound;
     for (i=0;i<jsbound;i++) { 

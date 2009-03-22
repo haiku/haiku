@@ -128,8 +128,9 @@ mp3Decoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, size_t infoSize)
 {
 	// decode first chunk to initialize mpeg library
-	if (B_OK != DecodeNextChunk()) {
-		printf("mp3Decoder::Setup failed, can't decode first chunk\n");
+	status_t err = DecodeNextChunk();
+	if (B_OK != err) {
+		printf("mp3Decoder::Setup failed, can't decode first chunk %ld\n",err);
 		return B_ERROR;
 	}
 
@@ -377,10 +378,14 @@ mp3Decoder::GetFrameLength(const void *header)
 {
 	const uint8 *h = static_cast<const uint8 *>(header);
 
-	if (h[0] != 0xff)
+	if (h[0] != 0xff) {
+		TRACE("No 0xff MP3 Header in chunk %x\n",h[0]);
 		return -1;
-	if ((h[1] & 0xe0) != 0xe0)
+	}
+	if ((h[1] & 0xe0) != 0xe0) {
+		TRACE("No 0xe0 MP3 Header in chunk %x\n",h[1]);
 		return -1;
+	}
 	
 	int mpeg_version_index = (h[1] >> 3) & 0x03;
 	int layer_index = (h[1] >> 1) & 0x03;
@@ -392,8 +397,16 @@ mp3Decoder::GetFrameLength(const void *header)
 	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
 	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];
 	
-	if (!bitrate || !framerate)
+	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d",
+		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
+		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
+		(h[1] & 0x01) ? "no" : "has",
+		bitrate, framerate, padding);
+
+	if (!bitrate || !framerate) {
+		TRACE("Invalid bitrate %d or framerate %d\n",bitrate,framerate);
 		return -1;
+	}
 
 	int length;	
 	if (layer_index == 3) // layer 1
