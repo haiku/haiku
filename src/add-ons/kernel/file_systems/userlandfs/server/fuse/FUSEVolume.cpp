@@ -178,6 +178,97 @@ struct FUSEVolume::FileCookie : fuse_file_info {
 };
 
 
+struct FUSEVolume::AttrDirCookie {
+	AttrDirCookie()
+		:
+		fAttributes(NULL),
+		fAttributesSize(0),
+		fCurrentOffset(0),
+		fValid(false)
+	{
+	}
+
+	~AttrDirCookie()
+	{
+		Clear();
+	}
+
+	void Clear()
+	{
+		free(fAttributes);
+		fAttributes = NULL;
+		fAttributesSize = 0;
+		fCurrentOffset = 0;
+		fValid = false;
+	}
+
+	status_t Allocate(size_t size)
+	{
+		Clear();
+
+		if (size == 0)
+			return B_OK;
+
+		fAttributes = (char*)malloc(size);
+		if (fAttributes == NULL)
+			return B_NO_MEMORY;
+
+		fAttributesSize = size;
+		return B_OK;
+	}
+
+	bool IsValid() const
+	{
+		return fValid;
+	}
+
+	void SetValid(bool valid)
+	{
+		fValid = valid;
+	}
+
+	char* AttributesBuffer() const
+	{
+		return fAttributes;
+	}
+
+	bool ReadNextEntry(dev_t volumeID, ino_t nodeID, bool align,
+		dirent* buffer, size_t bufferSize)
+	{
+		if (fCurrentOffset >= fAttributesSize)
+			return false;
+
+		const char* name = fAttributes + fCurrentOffset;
+		size_t nameLen = strlen(name);
+
+		// get and check the size
+		size_t size = sizeof(dirent) + nameLen;
+		if (size > bufferSize)
+			return false;
+
+		// align the size, if requested
+		if (align)
+			size = std::min(bufferSize, (size + 7) / 8 * 8);
+
+		// fill in the dirent
+		buffer->d_dev = volumeID;
+		buffer->d_ino = nodeID;
+		memcpy(buffer->d_name, name, nameLen + 1);
+		buffer->d_reclen = size;
+
+		fCurrentOffset += nameLen + 1;
+
+		return true;
+	}
+
+private:
+	char*	fAttributes;
+	size_t	fAttributesSize;
+	size_t	fCurrentOffset;
+	bool	fValid;
+};
+
+
 struct FUSEVolume::ReadDirBuffer {
 	FUSEVolume*	volume;
 	FUSENode*	directory;
@@ -690,7 +781,7 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 
 	locker.Unlock();
 
-	// open the dir
+	// open the file
 	int fuseError = fuse_fs_open(fFS, path, cookie);
 	if (fuseError != 0)
 		return fuseError;
@@ -982,6 +1073,118 @@ PRINT(("FUSEVolume::RewindDir(%p, %p)\n", _node, _cookie));
 	} else {
 		cookie->currentEntryOffset = 0;
 	}
+
+	return B_OK;
+}
+
+
+// #pragma mark - attribute directories
+
+
+// OpenAttrDir
+status_t
+FUSEVolume::OpenAttrDir(void* _node, void** _cookie)
+{
+	// allocate an attribute directory cookie
+	AttrDirCookie* cookie = new(std::nothrow) AttrDirCookie;
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*_cookie = cookie;
+
+	return B_OK;
+}
+
+
+// CloseAttrDir
+status_t
+FUSEVolume::CloseAttrDir(void* node, void* cookie)
+{
+	return B_OK;
+}
+
+
+// FreeAttrDirCookie
+status_t
+FUSEVolume::FreeAttrDirCookie(void* _node, void* _cookie)
+{
+	delete (AttrDirCookie*)_cookie;
+	return B_OK;
+}
+
+
+// ReadAttrDir
+status_t
+FUSEVolume::ReadAttrDir(void* _node, void* _cookie, void* buffer,
+	size_t bufferSize, uint32 count, uint32* _countRead)
+{
+	FUSENode* node = (FUSENode*)_node;
+	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+
+	*_countRead = 0;
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	if (!cookie->IsValid()) {
+		// cookie not yet valid -- get the length of the list
+		int listSize = fuse_fs_listxattr(fFS, path, NULL, 0);
+		if (listSize < 0)
+			RETURN_ERROR(listSize);
+
+		while (true) {
+			// allocate space for the listing
+			error = cookie->Allocate(listSize);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			// read the listing
+			int bytesRead = fuse_fs_listxattr(fFS, path,
+				cookie->AttributesBuffer(), listSize);
+			if (bytesRead < 0)
+				RETURN_ERROR(bytesRead);
+
+			if (bytesRead == listSize)
+				break;
+
+			// attributes listing changed -- reread it
+			listSize = bytesRead;
+		}
+
+		cookie->SetValid(true);
+	}
+
+	// we have a valid cookie now -- get the next entries from the cookie
+	uint32 countRead = 0;
+	dirent* entryBuffer = (dirent*)buffer;
+	while (countRead < count
+		&& cookie->ReadNextEntry(fID, node->id, countRead + 1 < count,
+			entryBuffer, bufferSize)) {
+		countRead++;
+		bufferSize -= entryBuffer->d_reclen;
+		entryBuffer = (dirent*)((uint8*)entryBuffer + entryBuffer->d_reclen);
+	}
+
+	*_countRead = countRead;
+	return B_OK;
+}
+
+
+// RewindAttrDir
+status_t
+FUSEVolume::RewindAttrDir(void* _node, void* _cookie)
+{
+	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+
+	cookie->Clear();
 
 	return B_OK;
 }

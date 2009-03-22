@@ -118,10 +118,21 @@ public:
 									uint32 count, uint32* countRead);
 	virtual	status_t			RewindDir(void* node, void* cookie);
 
+	// attribute directories
+	virtual	status_t			OpenAttrDir(void* node, void** cookie);
+	virtual	status_t			CloseAttrDir(void* node, void* cookie);
+	virtual	status_t			FreeAttrDirCookie(void* node,
+									void* cookie);
+	virtual	status_t			ReadAttrDir(void* node, void* cookie,
+									void* buffer, size_t bufferSize,
+									uint32 count, uint32* countRead);
+	virtual	status_t			RewindAttrDir(void* node, void* cookie);
+
 private:
 	struct DirEntryCache;
 	struct DirCookie;
 	struct FileCookie;
+	struct AttrDirCookie;
 	struct ReadDirBuffer;
 
 private:

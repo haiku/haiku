@@ -432,16 +432,14 @@ FUSEFileSystem::_InitCapabilities()
  	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, readDirSupport);
 
 	// attribute directory operations
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR,
-// 		fFS->ops.open_attrdir);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR,
-// 		fFS->ops.close_attrdir);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
-// 		fFS->ops.free_attrdircookie);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR,
-// 		fFS->ops.read_attrdir);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR,
-// 		fFS->ops.rewind_attrdir);
+	bool hasAttributes = fFS->ops.listxattr != NULL;
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, hasAttributes);
+// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR, true);
+		// not needed
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
+		hasAttributes);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, hasAttributes);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, hasAttributes);
 
 	// attribute operations
 // 	// we emulate open_attr() and free_attr_dir_cookie() if either read_attr()
