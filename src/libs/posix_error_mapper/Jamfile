@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src libs posix_error_mapper ;
+
+StaticLibrary libposix_error_mapper.a :
+	misc.cpp
+	pthread_attr.cpp
+	pthread_condattr.cpp
+	pthread_cond.cpp
+	pthread_misc.cpp
+	pthread_mutexattr.cpp
+	pthread_mutex.cpp
+	pthread_rwlockattr.cpp
+	pthread_rwlock.cpp
+	pthread_specific.cpp
+	pthread_thread.cpp
+;

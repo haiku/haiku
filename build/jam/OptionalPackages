@@ -194,6 +194,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# static libraries
 	AddFilesToHaikuImage develop lib x86 : libncurses.a ;
 
+	# the POSIX error code mapper library
+	AddFilesToHaikuImage develop lib x86 : libposix_error_mapper.a ;
+
 	# cc and c++ wrapper scripts
 	AddFilesToHaikuImage beos bin : cc c++ ;
 

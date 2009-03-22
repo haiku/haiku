@@ -44,6 +44,7 @@ error_description(int error)
 		// General Errors
 
 		case B_NO_ERROR:
+		case B_POSIX_ENOMEM:
 			return "No error";
 		case B_ERROR:
 			return "General system error";
