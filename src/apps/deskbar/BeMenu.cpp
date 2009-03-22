@@ -250,7 +250,7 @@ TBeMenu::AddStandardBeMenuItems()
 	AddItem(item);
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-	DeskbarMountMenu *mountMenu = new DeskbarMountMenu("Mount Disks");
+	DeskbarMountMenu *mountMenu = new DeskbarMountMenu("Mount");
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
