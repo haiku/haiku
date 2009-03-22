@@ -2486,47 +2486,36 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 		// Look in the default scope, but also in the dependencies of the
 		// calling image. Return the next after the caller symbol.
 
-		// First of all, find the caller symbol and its image.
-		Elf32_Sym* callerSymbol = NULL;
+		// First of all, find the caller image.
 		image_t* callerImage = sLoadedImages.head;
 		for (; callerImage != NULL; callerImage = callerImage->next) {
 			elf_region_t& text = callerImage->regions[0];
-			if ((addr_t)caller < text.vmstart
-				|| (addr_t)caller >= text.vmstart + text.vmsize) {
-				continue;
+			if ((addr_t)caller >= text.vmstart
+				&& (addr_t)caller < text.vmstart + text.vmsize) {
+				// found the image
+				break;
 			}
-
-			// found the image -- now find the symbol
-			for (uint32 i = 0; i < callerImage->symhash[1]; i++) {
-				Elf32_Sym& symbol = callerImage->syms[i];
-				if ((ELF32_ST_TYPE(symbol.st_info) != STT_FUNC)
-					|| symbol.st_value == 0) {
-					continue;
-				}
-
-				addr_t address = symbol.st_value
-					+ callerImage->regions[0].delta;
-				if ((addr_t)caller >= address
-					&& (addr_t)caller < address + symbol.st_size) {
-					callerSymbol = &symbol;
-					break;
-				}
-			}
-
-			break;
 		}
 
-		if (callerSymbol != NULL) {
+		if (callerImage != NULL) {
 			// found the caller -- now search the global scope until we find
 			// the next symbol
+			bool hitCallerImage = false;
 			set_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
 
 			image_t* image = sLoadedImages.head;
 			for (; image != NULL; image = image->next) {
-				if (image != callerImage
-					&& (image->type == B_ADD_ON_IMAGE
-						|| (image->flags
-							& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) == 0)) {
+				// skip the caller image
+				if (image == callerImage) {
+					hitCallerImage = true;
+					continue;
+				}
+
+				// skip all images up to the caller image; also skip add-on
+				// images and those not marked above for resolution
+				if (!hitCallerImage || image->type == B_ADD_ON_IMAGE
+					|| (image->flags
+						& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) == 0) {
 					continue;
 				}
 
@@ -2535,26 +2524,18 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 				if (symbol == NULL)
 					continue;
 
-				if (callerSymbol == NULL) {
-					// already skipped the caller symbol -- so this is
-					// the one we're looking for
-					*_location = (void*)(symbol->st_value
-						+ image->regions[0].delta);
-					int32 symbolType = B_SYMBOL_TYPE_TEXT;
-					patch_defined_symbol(image, symbolName, _location,
-						&symbolType);
-					status = B_OK;
-					break;
-				}
-				if (symbol == callerSymbol) {
-					// found the caller symbol
-					callerSymbol = NULL;
-				}
+				// found the symbol
+				*_location = (void*)(symbol->st_value
+					+ image->regions[0].delta);
+				int32 symbolType = B_SYMBOL_TYPE_TEXT;
+				patch_defined_symbol(image, symbolName, _location,
+					&symbolType);
+				status = B_OK;
+				break;
 			}
 
 			clear_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
 		}
-
 	} else {
 		// breadth-first search in the given image and its dependencies
 		image_t* inImage;
