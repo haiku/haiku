@@ -1140,6 +1140,7 @@
 
     args.flags    = FT_OPEN_PATHNAME;
     args.pathname = (char*)pathname;
+    args.stream   = NULL;
 
     return FT_Open_Face( library, &args, face_index, aface );
   }
@@ -1166,6 +1167,7 @@
     args.flags       = FT_OPEN_MEMORY;
     args.memory_base = file_base;
     args.memory_size = file_size;
+    args.stream      = NULL;
 
     return FT_Open_Face( library, &args, face_index, aface );
   }
@@ -1417,7 +1419,7 @@
                                          &length,
                                          &is_sfnt_cid );
     if ( error )
-      return error;
+      goto Exit;
 
     if ( FT_Stream_Seek( stream, pos + offset ) )
       goto Exit;
@@ -1436,8 +1438,19 @@
                                    is_sfnt_cid ? "cid" : "type1",
                                    aface );
   Exit:
-    FT_Stream_Seek( stream, pos );
-    return error;
+    {
+      FT_Error  error1;
+
+
+      if ( error == FT_Err_Unknown_File_Format )
+      {
+        error1 = FT_Stream_Seek( stream, pos );
+        if ( error1 )
+          return error1;
+      }
+
+      return error;
+    }
   }
 
 
@@ -1603,6 +1616,10 @@
                                            0, NULL,
                                            aface );
     if ( !error )
+      goto Exit;
+
+    /* rewind sfnt stream before open_face_PS_from_sfnt_stream() */
+    if ( FT_Stream_Seek( stream, flag_offset + 4 ) )
       goto Exit;
 
     if ( FT_ALLOC( sfnt_data, (FT_Long)rlen ) )
@@ -2450,8 +2467,8 @@
     }
     else
     {
-      metrics->x_scale     = 1L << 22;
-      metrics->y_scale     = 1L << 22;
+      metrics->x_scale     = 1L << 16;
+      metrics->y_scale     = 1L << 16;
       metrics->ascender    = bsize->y_ppem;
       metrics->descender   = 0;
       metrics->height      = bsize->height << 6;
@@ -2562,8 +2579,8 @@
     else
     {
       FT_ZERO( metrics );
-      metrics->x_scale = 1L << 22;
-      metrics->y_scale = 1L << 22;
+      metrics->x_scale = 1L << 16;
+      metrics->y_scale = 1L << 16;
     }
   }
 
@@ -4375,29 +4392,6 @@
     }
 
     return error;
-  }
-
-
-  /* documentation is in freetype.h */
-
-  FT_EXPORT_DEF( FT_UShort )
-  FT_Get_FSType_Flags( FT_Face  face )
-  {
-    PS_FontInfoRec  font_info;
-    TT_OS2*         os2;
-
-
-    /* look at FSType before fsType for Type42 */
-
-    if ( !FT_Get_PS_Font_Info( face, &font_info ) &&
-         font_info.fs_type != 0                   )
-      return font_info.fs_type;
-
-    if ( ( os2 = (TT_OS2*)FT_Get_Sfnt_Table( face, ft_sfnt_os2 ) ) != NULL &&
-         os2->version != 0xFFFFU                                           )
-      return os2->fsType;
-
-    return 0;
   }
 
 

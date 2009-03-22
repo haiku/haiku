@@ -2,7 +2,7 @@
 
     FreeType font driver for pcf fonts
 
-  Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by
+  Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -470,7 +470,11 @@ THE SOFTWARE.
     if ( nprops & 3 )
     {
       i = 4 - ( nprops & 3 );
-      FT_Stream_Skip( stream, i );
+      if ( FT_STREAM_SKIP( i ) )
+      {
+        error = PCF_Err_Invalid_Stream_Skip;
+        goto Bail;
+      }
     }
 
     if ( PCF_BYTE_ORDER( format ) == MSBFirst )
@@ -623,7 +627,7 @@ THE SOFTWARE.
     metrics = face->metrics;
     for ( i = 0; i < nmetrics; i++ )
     {
-      pcf_get_metric( stream, format, metrics + i );
+      error = pcf_get_metric( stream, format, metrics + i );
 
       metrics[i].bits = 0;
 

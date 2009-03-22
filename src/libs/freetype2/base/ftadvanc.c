@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Quick computation of advance widths (body).                          */
 /*                                                                         */
-/*  Copyright 2008 by                                                      */
+/*  Copyright 2008, 2009 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -42,8 +42,8 @@
     else
       scale = face->size->metrics.x_scale;
 
-    /* this must be the same computation as to get linearHori/VertAdvance */
-    /* (see `FT_Load_Glyph' implementation in src/base/ftobjs.c           */
+    /* this must be the same scaling as to get linear{Hori,Vert}Advance */
+    /* (see `FT_Load_Glyph' implementation in src/base/ftobjs.c)        */
 
     for ( nn = 0; nn < count; nn++ )
       advances[nn] = FT_MulDiv( advances[nn], scale, 64 );
@@ -148,8 +148,8 @@
         break;
 
       padvances[nn] = ( flags & FT_LOAD_VERTICAL_LAYOUT )
-                      ? face->glyph->advance.x
-                      : face->glyph->advance.y;
+                      ? face->glyph->advance.y
+                      : face->glyph->advance.x;
     }
 
     if ( error )

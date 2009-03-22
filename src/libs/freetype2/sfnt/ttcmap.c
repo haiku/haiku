@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType character mapping table (cmap) support (body).              */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008 by                  */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by            */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -231,7 +231,7 @@
   /*   language    4              USHORT          Mac language code        */
   /*   keys        6              USHORT[256]     sub-header keys          */
   /*   subs        518            SUBHEAD[NSUBS]  sub-headers array        */
-  /*   glyph_ids   518+NSUB*8     USHORT[]        glyph id array           */
+  /*   glyph_ids   518+NSUB*8     USHORT[]        glyph ID array           */
   /*                                                                       */
   /* The `keys' table is used to map charcode high-bytes to sub-headers.   */
   /* The value of `NSUBS' is the number of sub-headers defined in the      */
@@ -282,7 +282,7 @@
     FT_UInt   n, max_subs;
     FT_Byte*  keys;                         /* keys table */
     FT_Byte*  subs;                         /* sub-headers */
-    FT_Byte*  glyph_ids;                    /* glyph id array */
+    FT_Byte*  glyph_ids;                    /* glyph ID array */
 
 
     if ( table + length > valid->limit || length < 6 + 512 )
@@ -605,14 +605,14 @@
   /*                                                  each segment; can be */
   /*                                                  zero                 */
   /*                                                                       */
-  /*   glyphIds      16+NUM_SEGS*8  USHORT[]          array of glyph id    */
+  /*   glyphIds      16+NUM_SEGS*8  USHORT[]          array of glyph ID    */
   /*                                                  ranges               */
   /*                                                                       */
   /* Character codes are modelled by a series of ordered (increasing)      */
   /* intervals called segments.  Each segment has start and end codes,     */
   /* provided by the `startCount' and `endCount' arrays.  Segments must    */
-  /* not be overlapping and the last segment should always contain the     */
-  /* `0xFFFF' endCount.                                                    */
+  /* not overlap, and the last segment should always contain the value     */
+  /* 0xFFFF for `endCount'.                                                */
   /*                                                                       */
   /* The fields `searchRange', `entrySelector' and `rangeShift' are better */
   /* ignored (they are traces of over-engineering in the TrueType          */
@@ -629,10 +629,10 @@
   /* the segment, and the value of `idDelta' is added to it.               */
   /*                                                                       */
   /*                                                                       */
-  /* Finally, note that certain fonts contain invalid charmaps that        */
-  /* contain end=0xFFFF, start=0xFFFF, delta=0x0001, offset=0xFFFF at the  */
-  /* of their charmaps (e.g. opens___.ttf which comes with OpenOffice.org) */
-  /* we need special code to deal with them correctly...                   */
+  /* Finally, note that a lot of fonts contain an invalid last segment,    */
+  /* where `start' and `end' are correctly set to 0xFFFF but both `delta'  */
+  /* and `offset' are incorrect (e.g., `opens___.ttf' which comes with     */
+  /* OpenOffice.org).  We need special code to deal with them correctly.   */
   /*                                                                       */
 
 #ifdef TT_CONFIG_CMAP_FORMAT_4
@@ -696,6 +696,23 @@
 
       p     += num_ranges * 2;
       offset = FT_PEEK_USHORT( p );
+
+      /* some fonts have an incorrect last segment; */
+      /* we have to catch it                        */
+      if ( range_index     >= num_ranges - 1 &&
+           cmap->cur_start == 0xFFFFU        &&
+           cmap->cur_end   == 0xFFFFU        )
+      {
+        TT_Face   face  = (TT_Face)cmap->cmap.cmap.charmap.face;
+        FT_Byte*  limit = face->cmap_table + face->cmap_size;
+
+
+        if ( offset && p + offset + 2 > limit )
+        {
+          cmap->cur_delta = 1;
+          offset          = 0;
+        }
+      }
 
       if ( offset != 0xFFFFU )
       {
@@ -862,7 +879,7 @@
     offsets   = deltas  + num_segs * 2;
     glyph_ids = offsets + num_segs * 2;
 
-    /* check last segment, its end count must be 0xFFFF */
+    /* check last segment; its end count value must be 0xFFFF */
     if ( valid->level >= FT_VALIDATE_PARANOID )
     {
       p = ends + ( num_segs - 1 ) * 2;
@@ -891,10 +908,10 @@
         if ( start > end )
           FT_INVALID_DATA;
 
-        /* this test should be performed at default validation level;  */
-        /* unfortunately, some popular Asian fonts present overlapping */
-        /* ranges in their charmaps                                    */
-        /*                                                             */
+        /* this test should be performed at default validation level; */
+        /* unfortunately, some popular Asian fonts have overlapping   */
+        /* ranges in their charmaps                                   */
+        /*                                                            */
         if ( start <= last_end && n > 0 )
         {
           if ( valid->level >= FT_VALIDATE_TIGHT )
@@ -902,7 +919,7 @@
           else
           {
             /* allow overlapping segments, provided their start points */
-            /* and end points, respectively, are in ascending order.   */
+            /* and end points, respectively, are in ascending order    */
             /*                                                         */
             if ( last_start > start || last_end > end )
               error |= TT_CMAP_FLAG_UNSORTED;
@@ -913,7 +930,7 @@
 
         if ( offset && offset != 0xFFFFU )
         {
-          p += offset;  /* start of glyph id array */
+          p += offset;  /* start of glyph ID array */
 
           /* check that we point within the glyph IDs table only */
           if ( valid->level >= FT_VALIDATE_TIGHT )
@@ -922,11 +939,18 @@
                  p + ( end - start + 1 ) * 2 > table + length )
               FT_INVALID_DATA;
           }
-          /* some fonts handle the last segment incorrectly */
-          else if ( n != num_segs - 1     ||
-                    !( start == 0xFFFFU &&
-                       end   == 0xFFFFU &&
-                       delta == 0x1U    ) )
+          /* Some fonts handle the last segment incorrectly.  In */
+          /* theory, 0xFFFF might point to an ordinary glyph --  */
+          /* a cmap 4 is versatile and could be used for any     */
+          /* encoding, not only Unicode.  However, reality shows */
+          /* that far too many fonts are sloppy and incorrectly  */
+          /* set all fields but `start' and `end' for the last   */
+          /* segment if it contains only a single character.     */
+          /*                                                     */
+          /* We thus omit the test here, delaying it to the      */
+          /* routines which actually access the cmap.            */
+          else if ( n != num_segs - 1                       ||
+                    !( start == 0xFFFFU && end == 0xFFFFU ) )
           {
             if ( p < glyph_ids                              ||
                  p + ( end - start + 1 ) * 2 > valid->limit )
@@ -957,9 +981,9 @@
           /* some fonts (erroneously?) use a range offset of 0xFFFF */
           /* to mean missing glyph in cmap table                    */
           /*                                                        */
-          if ( valid->level >= FT_VALIDATE_PARANOID                     ||
-               n != num_segs - 1                                        ||
-               !( start == 0xFFFFU && end == 0xFFFFU && delta == 0x1U ) )
+          if ( valid->level >= FT_VALIDATE_PARANOID    ||
+               n != num_segs - 1                       ||
+               !( start == 0xFFFFU && end == 0xFFFFU ) )
             FT_INVALID_DATA;
         }
 
@@ -1017,11 +1041,21 @@
           p      += num_segs2;
           offset  = TT_PEEK_USHORT( p );
 
-          /* some fonts handle the last segment incorrectly; */
-          /* we have to catch it                             */
-          if ( i >= num_segs - 1                                   &&
-               start == 0xFFFFU && end == 0xFFFFU && delta == 0x1U )
-            offset = 0;
+          /* some fonts have an incorrect last segment; */
+          /* we have to catch it                        */
+          if ( i >= num_segs - 1                  &&
+               start == 0xFFFFU && end == 0xFFFFU )
+          {
+            TT_Face   face  = (TT_Face)cmap->cmap.charmap.face;
+            FT_Byte*  limit = face->cmap_table + face->cmap_size;
+
+
+            if ( offset && p + offset + 2 > limit )
+            {
+              delta  = 1;
+              offset = 0;
+            }
+          }
 
           if ( offset == 0xFFFFU )
             continue;
@@ -1102,11 +1136,21 @@
         p     += num_segs2;
         offset = TT_PEEK_USHORT( p );
 
-        /* some fonts handle the last segment incorrectly; */
-        /* we have to catch it                             */
-        if ( mid >= num_segs - 1                                 &&
-             start == 0xFFFFU && end == 0xFFFFU && delta == 0x1U )
-          offset = 0;
+        /* some fonts have an incorrect last segment; */
+        /* we have to catch it                        */
+        if ( mid >= num_segs - 1                &&
+             start == 0xFFFFU && end == 0xFFFFU )
+        {
+          TT_Face   face  = (TT_Face)cmap->cmap.charmap.face;
+          FT_Byte*  limit = face->cmap_table + face->cmap_size;
+
+
+          if ( offset && p + offset + 2 > limit )
+          {
+            delta  = 1;
+            offset = 0;
+          }
+        }
 
         /* search the first segment containing `charcode' */
         if ( cmap->flags & TT_CMAP_FLAG_OVERLAPPING )
@@ -1572,7 +1616,7 @@
   /*                                                                       */
   /*   start       0              ULONG       first charcode               */
   /*   end         4              ULONG       last charcode                */
-  /*   startId     8              ULONG       start glyph id for the group */
+  /*   startId     8              ULONG       start glyph ID for the group */
   /*                                                                       */
 
 #ifdef TT_CONFIG_CMAP_FORMAT_8
@@ -1954,7 +1998,7 @@
   /*                                                                       */
   /*   start       0          ULONG      first charcode                    */
   /*   end         4          ULONG      last charcode                     */
-  /*   startId     8          ULONG      start glyph id for the group      */
+  /*   startId     8          ULONG      start glyph ID for the group      */
   /*                                                                       */
 
 #ifdef TT_CONFIG_CMAP_FORMAT_12

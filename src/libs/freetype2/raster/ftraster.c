@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType glyph rasterizer (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2005, 2007, 2008 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2005, 2007, 2008, 2009 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -811,10 +811,10 @@ a  };
 
 
     n = ras.num_Profs;
+    p = ras.fProfile;
 
-    if ( n > 1 )
+    if ( n > 1 && p )
     {
-      p = ras.fProfile;
       while ( n > 0 )
       {
         if ( n > 1 )

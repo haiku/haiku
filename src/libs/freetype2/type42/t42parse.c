@@ -4,7 +4,8 @@
 /*                                                                         */
 /*    Type 42 font parser (body).                                          */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Roberto Alameda. */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by            */
+/*  Roberto Alameda.                                                       */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -68,6 +69,12 @@
     T1_FIELD_BOOL  ( "isFixedPitch",       is_fixed_pitch,      0 )
     T1_FIELD_NUM   ( "UnderlinePosition",  underline_position,  0 )
     T1_FIELD_NUM   ( "UnderlineThickness", underline_thickness, 0 )
+
+#undef  FT_STRUCTURE
+#define FT_STRUCTURE  PS_FontExtraRec
+#undef  T1CODE
+#define T1CODE        T1_FIELD_LOCATION_FONT_EXTRA
+
     T1_FIELD_NUM   ( "FSType",             fs_type,             0 )
 
 #undef  FT_STRUCTURE

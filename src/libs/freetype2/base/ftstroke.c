@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType path stroker (body).                                        */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006, 2008 by                        */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2008, 2009 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -606,9 +606,6 @@
 
       if ( tags[0] & FT_STROKE_TAG_END )
       {
-        if ( in_contour == 0 )
-          goto Fail;
-
         in_contour = 0;
         num_contours++;
       }

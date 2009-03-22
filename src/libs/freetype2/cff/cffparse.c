@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CFF token stream parser (body)                                       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2007, 2008 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2007, 2008, 2009 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -244,7 +244,7 @@
         if ( !nib && !number )
           exponent_add--;
         /* Only add digit if we don't overflow. */
-        else if ( number < 0xCCCCCCCL )
+        else if ( number < 0xCCCCCCCL && fraction_length < 9 )
         {
           fraction_length++;
           number = number * 10 + nib;

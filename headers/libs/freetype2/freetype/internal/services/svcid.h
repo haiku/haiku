@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType CID font services (specification).                      */
 /*                                                                         */
-/*  Copyright 2007 by Derek Clegg.                                         */
+/*  Copyright 2007, 2009 by Derek Clegg, Michael Toftdal.                  */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -31,10 +31,19 @@ FT_BEGIN_HEADER
                                                const char*  *registry,
                                                const char*  *ordering,
                                                FT_Int       *supplement );
+  typedef FT_Error
+  (*FT_CID_GetIsInternallyCIDKeyedFunc)( FT_Face   face,
+                                         FT_Bool  *is_cid );
+  typedef FT_Error
+  (*FT_CID_GetCIDFromGlyphIndexFunc)( FT_Face   face,
+                                      FT_UInt   glyph_index,
+                                      FT_UInt  *cid );
 
   FT_DEFINE_SERVICE( CID )
   {
     FT_CID_GetRegistryOrderingSupplementFunc  get_ros;
+    FT_CID_GetIsInternallyCIDKeyedFunc        get_is_cid;
+    FT_CID_GetCIDFromGlyphIndexFunc           get_cid_from_glyph_index;
   };
 
   /* */

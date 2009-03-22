@@ -408,7 +408,7 @@
       face->ttc_header.version = 1 << 16;
       face->ttc_header.count   = 1;
 
-      if ( FT_NEW( face->ttc_header.offsets) )
+      if ( FT_NEW( face->ttc_header.offsets ) )
         return error;
 
       face->ttc_header.offsets[0] = offset;
@@ -862,12 +862,78 @@
         }
       }
 
+#ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
+
+      /*
+       *  Now allocate the root array of FT_Bitmap_Size records and
+       *  populate them.  Unfortunately, it isn't possible to indicate bit
+       *  depths in the FT_Bitmap_Size record.  This is a design error.
+       */
+      {
+        FT_UInt  i, count;
+
+
+#ifndef FT_CONFIG_OPTION_OLD_INTERNALS
+        count = face->sbit_num_strikes;
+#else
+        count = (FT_UInt)face->num_sbit_strikes;
+#endif
+
+        if ( count > 0 )
+        {
+          FT_Memory        memory   = face->root.stream->memory;
+          FT_UShort        em_size  = face->header.Units_Per_EM;
+          FT_Short         avgwidth = face->os2.xAvgCharWidth;
+          FT_Size_Metrics  metrics;
+
+
+          if ( em_size == 0 || face->os2.version == 0xFFFFU )
+          {
+            avgwidth = 0;
+            em_size = 1;
+          }
+
+          if ( FT_NEW_ARRAY( root->available_sizes, count ) )
+            goto Exit;
+
+          for ( i = 0; i < count; i++ )
+          {
+            FT_Bitmap_Size*  bsize = root->available_sizes + i;
+
+
+            error = sfnt->load_strike_metrics( face, i, &metrics );
+            if ( error )
+              goto Exit;
+
+            bsize->height = (FT_Short)( metrics.height >> 6 );
+            bsize->width = (FT_Short)(
+                ( avgwidth * metrics.x_ppem + em_size / 2 ) / em_size );
+
+            bsize->x_ppem = metrics.x_ppem << 6;
+            bsize->y_ppem = metrics.y_ppem << 6;
+
+            /* assume 72dpi */
+            bsize->size   = metrics.y_ppem << 6;
+          }
+
+          root->face_flags     |= FT_FACE_FLAG_FIXED_SIZES;
+          root->num_fixed_sizes = (FT_Int)count;
+        }
+      }
+
+#endif /* TT_CONFIG_OPTION_EMBEDDED_BITMAPS */
+
+      /* a font with no bitmaps and no outlines is scalable; */
+      /* it has only empty glyphs then                       */
+      if ( !FT_HAS_FIXED_SIZES( root ) && !FT_IS_SCALABLE( root ) )
+        root->face_flags |= FT_FACE_FLAG_SCALABLE;
+
 
       /*********************************************************************/
       /*                                                                   */
       /*  Set up metrics.                                                  */
       /*                                                                   */
-      if ( has_outline == TRUE )
+      if ( FT_IS_SCALABLE( root ) )
       {
         /* XXX What about if outline header is missing */
         /*     (e.g. sfnt wrapped bitmap)?             */
@@ -952,71 +1018,6 @@
         root->underline_thickness = face->postscript.underlineThickness;
       }
 
-#ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
-
-      /*
-       *  Now allocate the root array of FT_Bitmap_Size records and
-       *  populate them.  Unfortunately, it isn't possible to indicate bit
-       *  depths in the FT_Bitmap_Size record.  This is a design error.
-       */
-      {
-        FT_UInt  i, count;
-
-
-#ifndef FT_CONFIG_OPTION_OLD_INTERNALS
-        count = face->sbit_num_strikes;
-#else
-        count = (FT_UInt)face->num_sbit_strikes;
-#endif
-
-        if ( count > 0 )
-        {
-          FT_Memory        memory   = face->root.stream->memory;
-          FT_UShort        em_size  = face->header.Units_Per_EM;
-          FT_Short         avgwidth = face->os2.xAvgCharWidth;
-          FT_Size_Metrics  metrics;
-
-
-          if ( em_size == 0 || face->os2.version == 0xFFFFU )
-          {
-            avgwidth = 0;
-            em_size = 1;
-          }
-
-          if ( FT_NEW_ARRAY( root->available_sizes, count ) )
-            goto Exit;
-
-          for ( i = 0; i < count; i++ )
-          {
-            FT_Bitmap_Size*  bsize = root->available_sizes + i;
-
-
-            error = sfnt->load_strike_metrics( face, i, &metrics );
-            if ( error )
-              goto Exit;
-
-            bsize->height = (FT_Short)( metrics.height >> 6 );
-            bsize->width = (FT_Short)(
-                ( avgwidth * metrics.x_ppem + em_size / 2 ) / em_size );
-
-            bsize->x_ppem = metrics.x_ppem << 6;
-            bsize->y_ppem = metrics.y_ppem << 6;
-
-            /* assume 72dpi */
-            bsize->size   = metrics.y_ppem << 6;
-          }
-
-          root->face_flags     |= FT_FACE_FLAG_FIXED_SIZES;
-          root->num_fixed_sizes = (FT_Int)count;
-        }
-      }
-
-#endif /* TT_CONFIG_OPTION_EMBEDDED_BITMAPS */
-
-      /* a font with no bitmaps and no outlines is scalable; */
-      /* it has only empty glyphs then                       */
-      if ( !FT_HAS_FIXED_SIZES( root ) && !FT_IS_SCALABLE( root ) )
-        root->face_flags |= FT_FACE_FLAG_SCALABLE;
     }
 
   Exit:

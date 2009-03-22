@@ -21,8 +21,10 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = ftutil ftdbgmem ftstream ftcalc fttrigon ftgloadr ftoutln
-               ftobjs ftnames  ftrfork  ;
+    _sources = ftadvanc ftcalc   ftdbgmem ftgloadr
+               ftnames  ftobjs   ftoutln  ftrfork
+               ftstream fttrigon ftutil
+               ;
   }
   else
   {
@@ -35,11 +37,11 @@ UseFreeTypeHeaders ;
 # Add the optional/replaceable files.
 #
 {
-  local  _sources =  system  init    glyph  mm      bdf
-                     bbox    debug   xf86   type1   pfr
-                     stroke  winfnt  otval  bitmap  synth
-                     gxval   lcdfil  gasp  patent
-                     ;
+  local  _sources = bbox   bdf    bitmap debug  gasp
+                    glyph  gxval  init   lcdfil mm
+                    otval  pfr    stroke synth  system
+                    type1  winfnt xf86   patent
+                    ;
 
   FT2_Library  $(FT2_LIB) : ft$(_sources).c ;
 }

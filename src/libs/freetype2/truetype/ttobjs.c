@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -153,6 +153,7 @@
     static const char* const  trick_names[] =
     {
       "DFKaiSho-SB",     /* dfkaisb.ttf */
+      "DFKaiShu",
       "DFKai-SB",        /* kaiu.ttf */
       "HuaTianSongTi?",  /* htst3.ttf */
       "MingLiU",         /* mingliu.ttf & mingliu.ttc */

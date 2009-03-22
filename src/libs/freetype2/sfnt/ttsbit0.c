@@ -5,7 +5,7 @@
 /*    TrueType and OpenType embedded bitmap support (body).                */
 /*    This is a heap-optimized version.                                    */
 /*                                                                         */
-/*  Copyright 2005, 2006, 2007, 2008 by                                    */
+/*  Copyright 2005, 2006, 2007, 2008, 2009 by                              */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -39,65 +39,16 @@
 #define FT_COMPONENT  trace_ttsbit
 
 
-    static const FT_Frame_Field  tt_sbit_line_metrics_fields[] =
-    {
-#undef  FT_STRUCTURE
-#define FT_STRUCTURE  TT_SBit_LineMetricsRec
-
-      /* no FT_FRAME_START */
-        FT_FRAME_CHAR( ascender ),
-        FT_FRAME_CHAR( descender ),
-        FT_FRAME_BYTE( max_width ),
-
-        FT_FRAME_CHAR( caret_slope_numerator ),
-        FT_FRAME_CHAR( caret_slope_denominator ),
-        FT_FRAME_CHAR( caret_offset ),
-
-        FT_FRAME_CHAR( min_origin_SB ),
-        FT_FRAME_CHAR( min_advance_SB ),
-        FT_FRAME_CHAR( max_before_BL ),
-        FT_FRAME_CHAR( min_after_BL ),
-        FT_FRAME_CHAR( pads[0] ),
-        FT_FRAME_CHAR( pads[1] ),
-      FT_FRAME_END
-    };
-
-    static const FT_Frame_Field  tt_strike_start_fields[] =
-    {
-#undef  FT_STRUCTURE
-#define FT_STRUCTURE  TT_SBit_StrikeRec
-
-      /* no FT_FRAME_START */
-        FT_FRAME_ULONG( ranges_offset ),
-        FT_FRAME_SKIP_LONG,
-        FT_FRAME_ULONG( num_ranges ),
-        FT_FRAME_ULONG( color_ref ),
-      FT_FRAME_END
-    };
-
-    static const FT_Frame_Field  tt_strike_end_fields[] =
-    {
-      /* no FT_FRAME_START */
-        FT_FRAME_USHORT( start_glyph ),
-        FT_FRAME_USHORT( end_glyph ),
-        FT_FRAME_BYTE  ( x_ppem ),
-        FT_FRAME_BYTE  ( y_ppem ),
-        FT_FRAME_BYTE  ( bit_depth ),
-        FT_FRAME_CHAR  ( flags ),
-      FT_FRAME_END
-    };
-
-
   FT_LOCAL_DEF( FT_Error )
   tt_face_load_eblc( TT_Face    face,
                      FT_Stream  stream )
   {
-    FT_Error   error  = SFNT_Err_Ok;
-    FT_Fixed   version;
-    FT_ULong   num_strikes, table_size;
-    FT_Byte*   p;
-    FT_Byte*   p_limit;
-    FT_UInt    count;
+    FT_Error  error = SFNT_Err_Ok;
+    FT_Fixed  version;
+    FT_ULong  num_strikes, table_size;
+    FT_Byte*  p;
+    FT_Byte*  p_limit;
+    FT_UInt   count;
 
 
     face->sbit_num_strikes = 0;
@@ -111,7 +62,7 @@
 
     if ( table_size < 8 )
     {
-      FT_ERROR(( "%s: table too short!\n", "tt_face_load_sbit_strikes" ));
+      FT_ERROR(( "tt_face_load_sbit_strikes: table too short!\n" ));
       error = SFNT_Err_Invalid_File_Format;
       goto Exit;
     }
@@ -129,8 +80,7 @@
 
     if ( version != 0x00020000UL || num_strikes >= 0x10000UL )
     {
-      FT_ERROR(( "%s: invalid table version!\n",
-                 "tt_face_load_sbit_strikes" ));
+      FT_ERROR(( "tt_face_load_sbit_strikes: invalid table version!\n" ));
       error = SFNT_Err_Invalid_File_Format;
       goto Fail;
     }
@@ -182,7 +132,7 @@
                                FT_ULong          strike_index,
                                FT_Size_Metrics*  metrics )
   {
-    FT_Byte*         strike;
+    FT_Byte*  strike;
 
 
     if ( strike_index >= (FT_ULong)face->sbit_num_strikes )
@@ -374,14 +324,11 @@
     if ( p + 5 > limit )
       goto Fail;
 
-    if ( !decoder->metrics_loaded )
-    {
-      metrics->height       = p[0];
-      metrics->width        = p[1];
-      metrics->horiBearingX = (FT_Char)p[2];
-      metrics->horiBearingY = (FT_Char)p[3];
-      metrics->horiAdvance  = p[4];
-    }
+    metrics->height       = p[0];
+    metrics->width        = p[1];
+    metrics->horiBearingX = (FT_Char)p[2];
+    metrics->horiBearingY = (FT_Char)p[3];
+    metrics->horiAdvance  = p[4];
 
     p += 5;
     if ( big )
@@ -389,19 +336,16 @@
       if ( p + 3 > limit )
         goto Fail;
 
-      if ( !decoder->metrics_loaded )
-      {
-        metrics->vertBearingX = (FT_Char)p[0];
-        metrics->vertBearingY = (FT_Char)p[1];
-        metrics->vertAdvance  = p[2];
-      }
+      metrics->vertBearingX = (FT_Char)p[0];
+      metrics->vertBearingY = (FT_Char)p[1];
+      metrics->vertAdvance  = p[2];
 
       p += 3;
     }
 
     decoder->metrics_loaded = 1;
     *pp = p;
-    return 0;
+    return SFNT_Err_Ok;
 
   Fail:
     return SFNT_Err_Invalid_Argument;
@@ -507,7 +451,7 @@
         if ( w > 0 )
           wval = (FT_UInt)( wval | ( *p++ & ( 0xFF00U >> w ) ) );
 
-        /* all bits read and there are ( x_pos + w ) bits to be written */
+        /* all bits read and there are `x_pos + w' bits to be written */
 
         write[0] = (FT_Byte)( write[0] | ( wval >> x_pos ) );
 
@@ -587,7 +531,12 @@
       {
         w = ( width < 8 - x_pos ) ? width : 8 - x_pos;
 
-        if ( nbits < w )
+        if ( h == height )
+        {
+          rval  |= *p++;
+          nbits += x_pos;
+        }
+        else if ( nbits < w )
         {
           rval  |= *p++;
           nbits += 8 - w;
@@ -598,7 +547,8 @@
           nbits  -= w;
         }
 
-        *write++ |= ( ( rval >> nbits ) & 0xFF ) & ~( 0xFF << w );
+        *write++ |= ( ( rval >> nbits ) & 0xFF ) &
+                    ( ~( 0xFF << w ) << ( 8 - w - x_pos ) );
         rval    <<= 8;
 
         w = width - w;
@@ -645,6 +595,13 @@
     FT_Error  error = SFNT_Err_Ok;
     FT_UInt   num_components, nn;
 
+    FT_Char  horiBearingX = decoder->metrics->horiBearingX;
+    FT_Char  horiBearingY = decoder->metrics->horiBearingY;
+    FT_Byte  horiAdvance  = decoder->metrics->horiAdvance;
+    FT_Char  vertBearingX = decoder->metrics->vertBearingX;
+    FT_Char  vertBearingY = decoder->metrics->vertBearingY;
+    FT_Byte  vertAdvance  = decoder->metrics->vertAdvance;
+
 
     if ( p + 2 > limit )
       goto Fail;
@@ -652,6 +609,13 @@
     num_components = FT_NEXT_USHORT( p );
     if ( p + 4 * num_components > limit )
       goto Fail;
+
+    if ( !decoder->bitmap_allocated )
+    {
+      error = tt_sbit_decoder_alloc_bitmap( decoder );
+      if ( error )
+        goto Exit;
+    }
 
     for ( nn = 0; nn < num_components; nn++ )
     {
@@ -666,6 +630,15 @@
       if ( error )
         break;
     }
+
+    decoder->metrics->horiBearingX = horiBearingX;
+    decoder->metrics->horiBearingY = horiBearingY;
+    decoder->metrics->horiAdvance  = horiAdvance;
+    decoder->metrics->vertBearingX = vertBearingX;
+    decoder->metrics->vertBearingY = vertBearingY;
+    decoder->metrics->vertAdvance  = vertAdvance;
+    decoder->metrics->width        = (FT_UInt)decoder->bitmap->width;
+    decoder->metrics->height       = (FT_UInt)decoder->bitmap->rows;
 
   Exit:
     return error;

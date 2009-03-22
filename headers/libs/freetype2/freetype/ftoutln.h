@@ -5,7 +5,7 @@
 /*    Support for the FT_Outline type used to store glyph shapes of        */
 /*    most scalable font formats (specification).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2005, 2006, 2007, 2008 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -130,8 +130,7 @@ FT_BEGIN_HEADER
   /*    numContours :: The maximal number of contours within the outline.  */
   /*                                                                       */
   /* <Output>                                                              */
-  /*    anoutline   :: A handle to the new outline.  NULL in case of       */
-  /*                   error.                                              */
+  /*    anoutline   :: A handle to the new outline.                        */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
@@ -362,7 +361,7 @@ FT_BEGIN_HEADER
   /*    outline :: A pointer to the target outline descriptor.             */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    This functions toggles the bit flag @FT_OUTLINE_REVERSE_FILL in    */
+  /*    This function toggles the bit flag @FT_OUTLINE_REVERSE_FILL in     */
   /*    the outline's `flags' field.                                       */
   /*                                                                       */
   /*    It shouldn't be used by a normal client application, unless it     */
@@ -416,7 +415,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Render an outline within a bitmap using the current scan-convert.  */
-  /*    This functions uses an @FT_Raster_Params structure as an argument, */
+  /*    This function uses an @FT_Raster_Params structure as an argument,  */
   /*    allowing advanced features like direct composition, translucency,  */
   /*    etc.                                                               */
   /*                                                                       */

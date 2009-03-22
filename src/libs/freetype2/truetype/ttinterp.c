@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType bytecode interpreter (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -5099,7 +5099,7 @@
       return;
     }
 
-    if ( ( args[0] & 0x100 ) != 0 && CUR.tt_metrics.ppem < A )
+    if ( ( args[0] & 0x100 ) != 0 && CUR.tt_metrics.ppem <= A )
       CUR.GS.scan_control = TRUE;
 
     if ( ( args[0] & 0x200 ) != 0 && CUR.tt_metrics.rotated )
@@ -5108,7 +5108,7 @@
     if ( ( args[0] & 0x400 ) != 0 && CUR.tt_metrics.stretched )
       CUR.GS.scan_control = TRUE;
 
-    if ( ( args[0] & 0x800 ) != 0 && CUR.tt_metrics.ppem >= A )
+    if ( ( args[0] & 0x800 ) != 0 && CUR.tt_metrics.ppem > A )
       CUR.GS.scan_control = FALSE;
 
     if ( ( args[0] & 0x1000 ) != 0 && CUR.tt_metrics.rotated )

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType path stroker (specification).                               */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006, 2008 by                        */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2008, 2009 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -171,7 +171,7 @@ FT_BEGIN_HEADER
    *     The source outline handle.
    *
    * @return:
-   *   The border index.  @FT_STROKER_BORDER_LEFT for empty or invalid
+   *   The border index.  @FT_STROKER_BORDER_RIGHT for empty or invalid
    *   outlines.
    */
   FT_EXPORT( FT_StrokerBorder )

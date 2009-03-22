@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    High-level SFNT driver interface (body).                             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -151,10 +151,35 @@
   }
 
 
+  static FT_UInt
+  sfnt_get_name_index( TT_Face     face,
+                       FT_String*  glyph_name )
+  {
+    FT_Face  root = &face->root;
+    FT_Long  i;
+
+
+    for ( i = 0; i < root->num_glyphs; i++ )
+    {
+      FT_String*  gname;
+      FT_Error    error = tt_face_get_ps_name( face, i, &gname );
+
+
+      if ( error )
+        continue;
+
+      if ( !ft_strcmp( glyph_name, gname ) )
+        return (FT_UInt)i;
+    }
+
+    return 0;
+  }
+
+
   static const FT_Service_GlyphDictRec  sfnt_service_glyph_dict =
   {
     (FT_GlyphDict_GetNameFunc)  sfnt_get_glyph_name,
-    (FT_GlyphDict_NameIndexFunc)NULL
+    (FT_GlyphDict_NameIndexFunc)sfnt_get_name_index
   };
 
 #endif /* TT_CONFIG_OPTION_POSTSCRIPT_NAMES */

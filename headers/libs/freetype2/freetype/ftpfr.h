@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for accessing PFR-specific data (specification only).   */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2006, 2008 by                              */
+/*  Copyright 2002, 2003, 2004, 2006, 2008, 2009 by                        */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -62,8 +62,8 @@ FT_BEGIN_HEADER
   *
   * @output:
   *    aoutline_resolution ::
-  *      Outline resolution.  This is equivalent to `face->units_per_EM'.
-  *      Optional (parameter can be NULL).
+  *      Outline resolution.  This is equivalent to `face->units_per_EM'
+  *      for non-PFR fonts.  Optional (parameter can be NULL).
   *
   *    ametrics_resolution ::
   *      Metrics resolution.  This is equivalent to `outline_resolution'

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CID-keyed Type1 font loader (body).                                  */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2009 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -95,6 +95,10 @@
 
     case T1_FIELD_LOCATION_FONT_INFO:
       object = (FT_Byte*)&cid->font_info;
+      break;
+
+    case T1_FIELD_LOCATION_FONT_EXTRA:
+      object = (FT_Byte*)&face->font_extra;
       break;
 
     case T1_FIELD_LOCATION_BBOX:

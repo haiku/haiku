@@ -569,7 +569,7 @@
       if ( error )
         result = 0;
 
-      FT_Stream_Seek( stream, old_pos );
+      (void)FT_Stream_Seek( stream, old_pos );
     }
 
     return result;
