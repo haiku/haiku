@@ -18,13 +18,6 @@
 #include "../kernel_emu.h"
 
 
-static inline status_t
-from_fuse_error(int error)
-{
-	return error < 0 ? error : -error;
-}
-
-
 struct FUSEVolume::DirEntryCache {
 	DirEntryCache()
 		:
@@ -276,7 +269,7 @@ printf("FUSEVolume::Mount()\n");
 	struct stat st;
 	int fuseError = fuse_fs_getattr(fFS, "/", &st);
 	if (fuseError != 0)
-		RETURN_ERROR(from_fuse_error(fuseError));
+		RETURN_ERROR(fuseError);
 
 	if (!fUseNodeIDs)
 		st.st_ino = FUSE_ROOT_ID;
@@ -343,7 +336,7 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 	struct statvfs st;
 	int fuseError = fuse_fs_statfs(fFS, "/", &st);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	info->flags = B_FS_IS_PERSISTENT;	// assume the FS is persistent
 	info->block_size = st.f_bsize;
@@ -600,7 +593,7 @@ PRINT(("FUSEVolume::ReadStat(%p (%lld), %p)\n", node, node->id, st));
 	// stat the path
 	int fuseError = fuse_fs_getattr(fFS, path, st);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	return B_OK;
 }
@@ -659,7 +652,7 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 	// open the dir
 	int fuseError = fuse_fs_open(fFS, path, cookie);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	cookieDeleter.Detach();
 	*_cookie = cookie;
@@ -688,7 +681,7 @@ FUSEVolume::Close(void* _node, void* _cookie)
 	// flush the file
 	int fuseError = fuse_fs_flush(fFS, path, cookie);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	return B_OK;
 }
@@ -716,18 +709,41 @@ FUSEVolume::FreeCookie(void* _node, void* _cookie)
 	// release the file
 	int fuseError = fuse_fs_release(fFS, path, cookie);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	return B_OK;
 }
 
 
 status_t
-FUSEVolume::Read(void* node, void* cookie, off_t pos, void* buffer,
-	size_t bufferSize, size_t* bytesRead)
+FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
+	size_t bufferSize, size_t* _bytesRead)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	*_bytesRead = 0;
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// read the file
+
+	int bytesRead = fuse_fs_read(fFS, path, (char*)buffer, bufferSize, pos,
+		cookie);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	*_bytesRead = bytesRead;
+	return B_OK;
 }
 
 
@@ -790,7 +806,7 @@ PRINT(("FUSEVolume::OpenDir(%p (%lld), %p)\n", node, node->id, _cookie));
 		// open the dir
 		int fuseError = fuse_fs_opendir(fFS, path, cookie);
 		if (fuseError != 0)
-			return from_fuse_error(fuseError);
+			return fuseError;
 	}
 
 	cookieDeleter.Detach();
@@ -832,7 +848,7 @@ FUSEVolume::FreeDirCookie(void* _node, void* _cookie)
 	// release the dir
 	int fuseError = fuse_fs_releasedir(fFS, path, cookie);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	return B_OK;
 }
@@ -883,7 +899,7 @@ PRINT(("  using readdir() interface\n"));
 				&_AddReadDirEntry, offset, cookie);
 		}
 		if (fuseError != 0)
-			return from_fuse_error(fuseError);
+			return fuseError;
 
 		locker.Lock();
 
@@ -1040,7 +1056,7 @@ FUSEVolume::_InternalGetNode(FUSENode* dir, const char* entryName,
 	struct stat st;
 	int fuseError = fuse_fs_getattr(fFS, path, &st);
 	if (fuseError != 0)
-		return from_fuse_error(fuseError);
+		return fuseError;
 
 	locker.Lock();
 
@@ -1246,7 +1262,7 @@ name, type, nodeID, offset));
 				locker.Lock();
 
 				if (fuseError != 0) {
-					buffer->error = from_fuse_error(fuseError);
+					buffer->error = fuseError;
 					return 0;
 				}
 
