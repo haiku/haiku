@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,14 +44,14 @@
 <p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
 <p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
 
-<h2><a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
+<h1><a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h1>
 <p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
 <p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
 <p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
 <p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. Doing that you can, for example, sort your People files by company and within that order sort by contact name. See the above screenshot as an example. The secondary sort order is marked by a dotted line under the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span>&#160;<span class="key">E</span> and move between the attibutes with <span class="key">TAB</span> and <span class="key">SHIFT</span>&#160;<span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span>&#160;<span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span>&#160;<span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
 
-<h2><a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
+<h1><a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h1>
 <p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal:</p>
 <ul><li><b>listattr</b> - lists a file's attributes, but doesn't show the contents of the attributes.<br />
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
@@ -85,7 +85,7 @@ MIME String         21  &quot;BEOS:TYPE&quot;
 <ul>
 <li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>. It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<p>Note the backslash after "Clara". In Terminal you have to "escape" special characters like '"*\$?!. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</p></li>
+<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div></li>
 </ul>
 <p><br /></p>
 <ul><li><b>catattr</b> - displays the contents of a specific attribute of a file.

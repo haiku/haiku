@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,72 +39,57 @@
 <p>By default, Haiku's option key, to invoke commands from menus for example, is not the usual <span class="key">CTRL</span> key, but <span class="key">ALT</span> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually feels better as e.g. <span class="key">ALT</span>&#160;<span class="key">C</span> and <span class="key">ALT</span>&#160;<span class="key">V</span> is reached more conveniently on the keyboard and these commands seamlessly integrate into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal, where <span class="key">CTRL</span>&#160;<span class="key">C</span> quits the running process.</p>
 <p>In any case, you can switch to the maybe more familiar <span class="key">CTRL</span> key in the <a href="prefs-menu.html">Menu</a> preferences. The user guide will always describes the default configuration with option key being <span class="key">ALT</span>.</p>
 
-<h2><a id="general" name="general">General shortcuts</a></h2>
+<h1><a id="general" name="general">General shortcuts</a></h1>
 <p>Here's a table of many of the most commonly used shortcuts that are always available, even if there isn't a corresponding menu:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span>&#160;<span class="key">Fx</span></td><td style="width:15px;"></td><td>Switches to <a href="workspaces.html">Workspace</a> X (<span class="key">Fx</span> is the function key corresponding to that workspace).</td></tr>
 <tr><td><span class="key">CTRL</span>&#160;<span class="key">TAB</span></td><td></td><td>Hold down to bring up the <a href="twitcher.hml">Twitcher</a>.</td></tr>
 <tr><td><span class="key">CTRL</span>&#160;<span class="key">ALT</span>&#160;<span class="key">DEL</span></td><td></td><td>Opens the <a href="teammonitor.html">Team Monitor</a>.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">ESC</span></td><td></td><td>Enters the menu bar (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">C</span></td><td></td><td>Copies selection to clipboard.</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">X</span></td><td></td><td>Cuts selection to clipboard.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">C</span></td><td></td><td>Copies the selection to the  clipboard.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">X</span></td><td></td><td>Cuts the selection to the clipboard.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">V</span></td><td></td><td>Pastes the clipboard's contents.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">W</span></td><td></td><td>Closes the current window.</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">Q</span></td><td></td><td>Closes the whole application.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">Q</span></td><td></td><td>Quits an application.</td></tr>
 </table>
 
-<h2><a id="tracker-navigation" name="tracker-navigation">Shortcuts for Tracker navigation</a></h2>
-<p>Additionally to the general shortcuts, here are more for navigating with Tracker:</p>
+<h1><a id="tracker-navigation" name="tracker-navigation">Shortcuts for Tracker navigation</a></h1>
+<p>Additionally to the general shortcuts, here are some more for navigating with Tracker:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span>&#160;<span class="key">&uarr;</span></td><td style="width:15px;"></td><td>Opens the parent folder.</td></tr>
 <tr><td class="onelinetop"><span class="key">ALT</span>&#160;<span class="key">&darr;</span> or <span class="key">ENTER</span></td><td></td><td>Opens the selected folder.</td></tr>
-<tr><td><span class="key">WIN-KEY</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
-<tr><td><span class="key">right MENU-KEY</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>)</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, that this only works for actions on the file itself, changed attributes and permission settings can't be undone. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">SHIFT</span>&#160;<span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span>&#160;<span class="key">Z</span></td></tr>
+<tr><td><span class="key">WIN</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
+<tr><td><span class="key">right MENU</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, this only works for actions on the file itself, changed attributes and permission settings can't be undone with this. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">SHIFT</span>&#160;<span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span>&#160;<span class="key">Z</span>.</td></tr>
 </table>
 
-<h2><a id="terminal" name="terminal">Shortcuts in Terminal</a></h2>
+<h1><a id="terminal" name="terminal">Shortcuts in Terminal</a></h1>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span>&#160;<span class="key">N</span></td><td style="width:15px;"></td><td>Opens another Terminal session in a new
-window.</td></tr>
-<tr><td><span class="key">ALT</span>&#160;<span class="key">T</span></td><td></td><td>Opens another Terminal session in a new
-tab.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">N</span></td><td style="width:15px;"></td><td>Opens another Terminal session in a new window.</td></tr>
+<tr><td><span class="key">ALT</span>&#160;<span class="key">T</span></td><td></td><td>Opens another Terminal session in a new tab.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span>...</td><td></td><td>Switches to the corresponding tab.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">G</span></td><td></td><td>Switch to the next Terminal window.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">+</span>, <span class="key">-</span></td><td></td><td>Increase/Decrease font size.</td></tr>
 <tr><td><span class="key">ALT</span>&#160;<span class="key">ENTER</span></td><td></td><td>Enter/leave fullscreen mode.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span>&#160;<span class="key">&uarr;</span>/<span class="key">&darr;</span></td><td></td><td>Scrolls the Terminal
-output up/down one line.</td></tr>
-<tr><td class="onelinetop"><span class="key"> SHIFT</span>&#160;<span class="key">PAGE UP/DOWN </span></td><td></td><td> Scrolls the Terminal
-output up/down one page.</td></tr>
-<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few
-letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If
-there are more than one match, it stops where the name starts to differ
-and you have to provide some more letters to further distinguish them.
-You can also press <span class="key">TAB</span> twice to have all matches
-listed.</td></tr>
-<tr><td><span class="key">&uarr;</span>/<span class="key">&darr;</span></td><td></td><td>Moves up or down in a list of
-all previously entered commands.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span>&#160;<span class="key">&uarr;</span>/<span class="key">&darr;</span></td><td></td><td>Scrolls the Terminal output up/down one line.</td></tr>
+<tr><td class="onelinetop"><span class="key"> SHIFT</span>&#160;<span class="key">PageUP</span>/<span class="key">PageDOWN</span></td><td></td><td> Scrolls the Terminal output up/down one page.</td></tr>
+<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If there is more than one match, it stops where the name starts to differ and you have to provide some more letters to further distinguish them. You can also press <span class="key">TAB</span> twice to have all matches listed.</td></tr>
+<tr><td><span class="key">&uarr;</span>/<span class="key">&darr;</span></td><td></td><td>Moves up or down in a history of all previously entered commands.</td></tr>
 <tr><td><span class="key">CTRL</span>&#160;<span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
-are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span>&#160;<span class="key">R</span>
-and start to enter a command and you'll be provided with the first match
-from the bash history. Keep pressing <span class="key">CTRL</span>&#160;<span class="key">R</span> until you find the
-right command line and press enter to execute it.</td></tr>
-<tr><td><span class="key">CTRL</span>&#160;<span class="key">C</span></td><td></td><td>Stops the currently running
-command.</td></tr>
-<tr><td><span class="key">CTRL</span>&#160;<span class="key">D</span></td><td></td><td>Closes the current Terminal
-session.</td></tr>
+are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span>&#160;<span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span>&#160;<span class="key">R</span> until you find the right command line and press enter to execute it.</td></tr>
+<tr><td><span class="key">CTRL</span>&#160;<span class="key">C</span></td><td></td><td>Stops the currently running command.</td></tr>
+<tr><td><span class="key">CTRL</span>&#160;<span class="key">D</span></td><td></td><td>Closes the current Terminal session.</td></tr>
 </table>
 
-<h2><a id="other-combos" name="other-combos">Other key combinations</a></h2>
+<h1><a id="other-combos" name="other-combos">Other key combinations</a></h1>
 <p>You can add or remove items to/from a selection by holding down a modifier key while clicking on a entry (or file in case of Tracker).</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>This will select everything between the first selected item and the one you click on.</td></tr>
 <tr><td><span class="key">ALT</span></td><td></td><td>Adds or removes the item you're clicking on from the selection.</td></tr>
 </table>
 <p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
-The letters you type appear at the bottom-left, where normally the number of items are listed. After a second it reverts back and you could start a new incremental search.</p>
+The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.</p>
 
 </div>
 

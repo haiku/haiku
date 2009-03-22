@@ -38,7 +38,7 @@
 
 <p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in <span class="path">/boot/home/queries/</span> and by default last seven days before being purged. Note, that these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.</p>
 
-<h2><a id="find-window" name="find-window">The Find window</a></h2>
+<h1><a id="find-window" name="find-window">The Find window</a></h1>
 <p>You start a query by invoking the <span class="menu">Find...</span> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <span class="key">ALT</span>&#160;<span class="key">F</span>. You're presented with the Find window:</p>
 <img src="../images/queries-images/basic-query.png" alt="basic-query.png" width="517" height="292" />
 <ol>
@@ -58,21 +58,21 @@ types.</p></li>
 <li><p>You can drag&amp;drop the icon to save the query.</p></li>
 </ol>
 
-<h2><a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h2>
+<h1><a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h1>
 <p>If you simply want to find all files on your mounted disks that match a certain pattern, simply leave the search method at "<span class="menu">by Name</span>", enter the search term into the text box and press <span class="key">ENTER</span>.</p>
 
-<h2><a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h2>
-<p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be indexed (see <a href="index.html">Index</a>).</p>
+<h1><a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h1>
+<p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
 <img src="../images/queries-images/query-window.png" alt="query-window.png" width="441" height="172" />
-<p>You start by setting the filetype from "<span class="menu">All files and folders</span>" to "<span class="menu">text | E-mail</span>" and change the search method to "<span class="menu">by Attribute</span>.</p>
-<p>This adds a drop-down menu to the left of the textbox and the buttons "<span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With "<span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
+<p>You start by setting the filetype from "<span class="menu">All files and folders</span>" to "<span class="menu">text | E-mail</span>" and change the search method to "<span class="menu">by Attribute</span>".</p>
+<p>This adds a drop-down menu to the left of the textbox and the buttons "<span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
 <p>Let's do an email query as an example:</p>
 <img src="../images/queries-images/query-window-filled.png" alt="query-window-filled.png" width="441" height="262" />
-<p>This is your Find window when you're looking for all emails Clara Botter has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".</p>
+<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".</p>
 
-<h2><a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h2>
+<h1><a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h1>
 <p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
-<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to "<span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to "<span class="menu">by Formula</span>" mode and be overwhelmed by this one line query string:</p>
 <img src="../images/queries-images/formula-query.png" alt="formula-query.png" width="441" height="173" />
 <p>Once more as text, edited for readability:</p>
 <pre>(((((MAIL:from==&quot;*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*&quot;)
@@ -84,19 +84,19 @@ types.</p></li>
 <ul>
 <li><p>You could copy and paste the string into an email, forum or IRC for others to use or debug.</p></li>
 <li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string to use for a query in Terminal or a script.</p></li>
-<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class='external free' title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a> and maybe some scripting basics.</p></li>
+<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class='external free' title="http://en.wikipedia.org/wiki/Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
 </ul>
 
-<h2><a id="result-window" name="result-window">The result window</a></h2>
+<h1><a id="result-window" name="result-window">The result window</a></h1>
 <p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":</p>
 <img src="../images/queries-images/result-window.png" alt="result-window.png" width="704" height="359" />
-<p>Besides the grey background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
+<p>Besides the gray background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
 <ul>
 <li><p>You can open the folder a file resides in by double clicking on its path attribute.</p></li>
 <li><p>With <span class="menu">File | Edit Query</span> or <span class="key">ALT</span>&#160;<span class="key">G</span> you get back to your Find window to refine your query.</p></li>
 <li><p>A query is live, i.e. if a file that matches your search criteria appears or disappears from your system, this change is reflected in your results in real-time.</p></li>
 </ul>
-<p>You can assign a sensible attribute layout for query results of a specific filetype. Open the folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Attributes</span>.</p>
+<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Attributes</span>.</p>
 <p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores, e.g."audio_x-mp3". Open the new folder and paste in the layout with <span class="menu">Attributes | Paste Attributes</span>.</p>
 
 </div>

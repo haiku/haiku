@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,14 +39,27 @@
 <h1><img src="../../images/apps-images/expander-icon_64.png" alt="expander-icon_64.png"
 width="64" height="64" />Expander</h1>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">---</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via double-clicking a supported file.</i></td></tr>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/beos/apps/Expander</span></td></tr>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Expander_Settings</span></td></tr>
 </table>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>Expander is a small tool to quickly unpack the most common archives, among them zip, gzip, bzip2, rar and tar.gz.<br />
+Just double-click an archive to see this simple interface:</p>
+<p><img id="expander" src="../../images/apps-images/expander.png" alt="expander.png" width="480" height="257" /></p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td style="width:80px;"><span class="button">Source</span></td><td style="width:70px;"><span class="key">ALT</span>&#160;<span class="key">S</span></td><td>will open a file dialog to find an archive to unpack.</td></tr>
+<tr><td><span class="button">Destination</span></td><td><span class="key">ALT</span>&#160;<span class="key">D</span></td><td>will open a file dialog to set the destination.</td></tr>
+<tr><td><span class="button">Expand</span></td><td><span class="key">ALT</span>&#160;<span class="key">E</span></td><td>will start the unpacking. It can be aborted with <span class="key">ALT</span>&#160;<span class="key">K</span>.</td></tr>
+</table>
+<p>You can toggle the display of the file listing by un/checking <i>Show Contents</i> or pressing <span class="key">ALT</span>&#160;<span class="key">L</span>.</p>
+<div class="box-info">Expander can only unpack whole archives.<br />
+You can't select individual files to expand or add/remove files from the archive.</div>
+<p><span class="menu">Edit | Preferences...</span> or <span class="key">ALT</span>&#160;<span class="key">P</span> opens a preference panel that offers some useful settings to adjust Expander's behavior.<br />
+The options are all self-explanatory:
+<p><img id="preferences" src="../../images/apps-images/expander-preferences.png" alt="expander-preferences.png" width="362" height="327" /></p>
 
 </div>
-<!--
+
 <div class="bottomnav">
 	<p>
 		<a href="../applications.html">Applications</a>
@@ -56,6 +69,6 @@ width="64" height="64" />Expander</h1>
 		Next: <a href="apps-icon-o-matic.html">Icon-O-Matic</a>
 	</p>
 </div>
--->
+
 </body>
 </html>
