@@ -523,11 +523,35 @@ FUSEVolume::FSync(void* node)
 
 
 status_t
-FUSEVolume::ReadSymlink(void* node, char* buffer, size_t bufferSize,
-	size_t* bytesRead)
+FUSEVolume::ReadSymlink(void* _node, char* buffer, size_t bufferSize,
+	size_t* _bytesRead)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// read the symlink
+	int fuseError = fuse_fs_readlink(fFS, path, buffer, bufferSize);
+	if (fuseError != 0) {
+		*_bytesRead = 0;
+		return fuseError;
+	}
+
+	// fuse_fs_readlink() is supposed to return a NULL-terminated string, which
+	// the Haiku interface doesn't require. We have to return the string length,
+	// though.
+	*_bytesRead = strnlen(buffer, bufferSize);
+
+	return B_OK;
 }
 
 
@@ -566,10 +590,27 @@ FUSEVolume::Rename(void* oldDir, const char* oldName, void* newDir,
 
 
 status_t
-FUSEVolume::Access(void* node, int mode)
+FUSEVolume::Access(void* _node, int mode)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// call the access hook on the path
+	int fuseError = fuse_fs_access(fFS, path, mode);
+	if (fuseError != 0)
+		return fuseError;
+
+	return B_OK;
 }
 
 
