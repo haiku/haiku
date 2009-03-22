@@ -4,9 +4,16 @@
  */
 
 #include <kscheduler.h>
+#include <smp.h>
 
+#include "scheduler_affine.h"
 #include "scheduler_simple.h"
 
+// Defines which scheduler(s) to use. Possible values:
+// 0 - Auto-select scheduler based on detected core count
+// 1 - Always use the simple scheduler
+// 2 - Always use the affine scheduler
+#define SCHEDULER_TYPE 1
 
 struct scheduler_ops* gScheduler;
 
@@ -14,7 +21,21 @@ struct scheduler_ops* gScheduler;
 void
 scheduler_init(void)
 {
+	int32 cpu_count = smp_get_num_cpus();
+	dprintf("scheduler_init: found %ld logical cpus\n", cpu_count);
+#if SCHEDULER_TYPE == 0
+	if (cpu_count > 1) {
+		dprintf("scheduler_init: using affine scheduler\n");
+		scheduler_affine_init();
+	} else {
+		dprintf("scheduler_init: using simple scheduler\n");
+		scheduler_simple_init();
+	}
+#elif SCHEDULER_TYPE == 1
 	scheduler_simple_init();
+#elif SCHEDULER_TYPE == 2
+	scheduler_affine_init();
+#endif
 
 #if SCHEDULER_TRACING
 	add_debugger_command_etc("scheduler", &cmd_scheduler,
