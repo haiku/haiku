@@ -37,6 +37,8 @@ public:
 	status_t			Init();
 
 private:
+	bool				IsValidChunk(off_t position, uint32 size);
+	
 	avi_standard_index_entry *fIndex;
 	uint32				fIndexSize;
 	int64				fDataOffset;

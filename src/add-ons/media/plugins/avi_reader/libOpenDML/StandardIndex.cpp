@@ -31,8 +31,6 @@
 #include "StandardIndex.h"
 #include "OpenDMLParser.h"
 
-#include <StopWatch.h>
-
 
 //#define TRACE_START_INDEX
 #ifdef TRACE_START_INDEX
@@ -42,6 +40,11 @@
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
+
+struct chunk {
+	uint32 chunk_id;
+	uint32 size;
+};
 
 
 StandardIndex::StandardIndex(BPositionIO *source, OpenDMLParser *parser)
@@ -62,14 +65,11 @@ StandardIndex::~StandardIndex()
 status_t
 StandardIndex::Init()
 {
+	TRACE("Constructing a Standard Index\n");
 	uint32 indexBytes = fParser->StandardIndexSize();
 	fIndexSize = indexBytes / sizeof(avi_standard_index_entry);
 	indexBytes = fIndexSize * sizeof(avi_standard_index_entry);
 	
-#ifdef TRACE_START_INDEX
-{ BStopWatch w("StandardIndex::Init: malloc");
-#endif
-
 	if (indexBytes > 0x1900000) { // 25 MB
 		ERROR("libOpenDML: StandardIndex::Init index is way too big\n");
 		return B_NO_MEMORY;
@@ -85,10 +85,6 @@ StandardIndex::Init()
 		ERROR("libOpenDML: StandardIndex::Init out of memory\n");
 		return B_NO_MEMORY;
 	}
-#ifdef TRACE_START_INDEX
-}
-{ BStopWatch w("StandardIndex::Init: file read");
-#endif
 
 	if ((int32)indexBytes != fSource->ReadAt(fParser->StandardIndexStart(),
 			fIndex, indexBytes)) {
@@ -97,15 +93,7 @@ StandardIndex::Init()
 		fIndex = NULL;
 		return B_IO_ERROR;
 	}
-#ifdef TRACE_START_INDEX
-}
-	//DumpIndex();
-#endif
 
-#ifdef TRACE_START_INDEX
-{ BStopWatch w("StandardIndex::Init: scan index");
-#endif
-	
 	int stream_index;
 	off_t position;
 	uint32 size;
@@ -131,7 +119,28 @@ StandardIndex::Init()
         keyframe = (fIndex[i].flags >> AVIIF_KEYFRAME_SHIFT) & 1;
         size = fIndex[i].chunk_length;
         
-        // Some muxers write chunk_offset as non-relative, need to handle this case.
+        // Some muxers write chunk_offset as non-relative.  So we test if the first index actually points to a chunk
+        if (i == 0) {
+        	off_t here = fSource->Position();
+
+        	// first try and validate position as relative to the data chunk
+	        position = fDataOffset + fIndex[i].chunk_offset;
+	        TRACE("Validating chunk position %Ld as relative\n",position);
+			if (!IsValidChunk(position,size)) {
+			
+	        	// then try and validate position as an absolute position that points to a chunk
+				fDataOffset = 0;
+		        position = fDataOffset + fIndex[i].chunk_offset;
+		        TRACE("Validating chunk position %Ld as absolute\n",position);
+				if (!IsValidChunk(position,size)) {
+					ERROR("Index is invalid, chunk offset does not point to a chunk\n");
+					return B_ERROR;
+				}
+			}
+			
+			fSource->Seek(here, SEEK_SET);
+        }
+        
         position = fDataOffset + fIndex[i].chunk_offset;
 		frame_no = frame[stream_index];
 
@@ -177,3 +186,14 @@ StandardIndex::Init()
 	return B_OK;
 }
 
+bool
+StandardIndex::IsValidChunk(off_t position, uint32 size) {
+
+	chunk aChunk;
+
+	if ((int32)8 != fSource->ReadAt(position, &aChunk, 8)) {
+		return false;
+	}
+
+	return (aChunk.size == size);
+}

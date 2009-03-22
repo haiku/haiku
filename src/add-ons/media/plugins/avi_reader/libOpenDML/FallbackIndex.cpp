@@ -57,11 +57,10 @@ status_t
 FallbackIndex::Init()
 {
 	// Attempt to build an index by parsing the movi chunk
+	TRACE("Constructing a Fallback Index\n");
 
 	bool end_of_movi = false;
 	chunk aChunk;
-
-	TRACE("Building Fallback index\n");
 
 	int stream_index;
 	off_t position;

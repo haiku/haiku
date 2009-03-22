@@ -27,7 +27,7 @@
 #include "OpenDMLParser.h"
 #include "avi.h"
 
-#define TRACE_ODML_PARSER
+//#define TRACE_ODML_PARSER
 #ifdef TRACE_ODML_PARSER
   #define TRACE printf
 #else
@@ -636,7 +636,7 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 
 	TRACE("stream_header, Stream %d, is_audio %d, is_video %d:\n", fStreamCount - 1, fCurrentStream->is_audio, fCurrentStream->is_video);
 	TRACE("fourcc_type           = '"FOURCC_FORMAT"'\n",FOURCC_PARAM(fCurrentStream->stream_header.fourcc_type));
-	TRACE("fourcc_handler        = '"FOURCC_FORMAT"'\n",FOURCC_PARAM(fCurrentStream->stream_header.fourcc_handler));
+//	TRACE("fourcc_handler        = '"FOURCC_FORMAT"'\n",FOURCC_PARAM(fCurrentStream->stream_header.fourcc_handler));
 	TRACE("flags                 = 0x%lx\n", fCurrentStream->stream_header.flags);
 	TRACE("priority              = %u\n", fCurrentStream->stream_header.priority);
 	TRACE("language              = %u\n", fCurrentStream->stream_header.language);
