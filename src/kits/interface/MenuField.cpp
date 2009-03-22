@@ -730,8 +730,12 @@ BMenuField::CreateLabelLayoutItem()
 BLayoutItem*
 BMenuField::CreateMenuBarLayoutItem()
 {
-	if (!fLayoutData->menu_bar_layout_item)
+	if (!fLayoutData->menu_bar_layout_item) {
+		// align the menu bar in the full available space
+		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_VERTICAL_UNSET));
 		fLayoutData->menu_bar_layout_item = new MenuBarLayoutItem(this);
+	}
 	return fLayoutData->menu_bar_layout_item;
 }
 
@@ -767,7 +771,7 @@ BMenuField::Perform(perform_code code, void* _data)
 			BMenuField::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -1041,9 +1045,15 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 
 	fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
 
-	// by default align the menu bar left in the available space
-	fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-		B_ALIGN_VERTICAL_UNSET));
+	if (fixedSize) {
+		// align the menu bar left in the available space
+		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+			B_ALIGN_VERTICAL_UNSET));
+	} else {
+		// align the menu bar in the full available space
+		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_VERTICAL_UNSET));
+	}
 
 	AddChild(fMenuBar);
 	fMenuBar->AddItem(menu);
@@ -1268,14 +1278,19 @@ BMenuField::MenuBarLayoutItem::BaseMinSize()
 BSize
 BMenuField::MenuBarLayoutItem::BaseMaxSize()
 {
-	return BaseMinSize();
+	BSize size(BaseMinSize());
+	size.width = B_SIZE_UNLIMITED;
+	return size;
 }
 
 
 BSize
 BMenuField::MenuBarLayoutItem::BasePreferredSize()
 {
-	return BaseMinSize();
+	BSize size(BaseMinSize());
+	// puh, no idea...
+	size.width = 100;
+	return size;
 }
 
 

@@ -128,6 +128,7 @@ _BMCMenuBar_::AttachedToWindow()
 	float left, top, right, bottom;
 	GetItemMargins(&left, &top, &right, &bottom);
 
+#if 0
 	// TODO: Better fix would be to make BMenuItem draw text properly
 	// centered
 	font_height fontHeight;
@@ -135,6 +136,13 @@ _BMCMenuBar_::AttachedToWindow()
 	top = ceilf((Bounds().Height() - ceilf(fontHeight.ascent)
 		- ceilf(fontHeight.descent)) / 2) + 1;
 	bottom = top - 1;
+#else
+	// TODO: Fix content location properly. This is just a quick fix to
+	// make the BMenuField label and the super-item of the BMenuBar
+	// align vertically.
+	top++;
+	bottom--;
+#endif
 
 	if (be_control_look)
 		left = right = be_control_look->DefaultLabelSpacing();
@@ -267,12 +275,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 {
 	// we need to take care of resizing and cleaning up
 	// the parent menu field
-	float diff;
-	if (fFixedSize)
-		diff = width - fPreviousWidth;
-	else
-		diff = Frame().right - (fMenuField->Bounds().right - 2);
-
+	float diff = width - fPreviousWidth;
 	fPreviousWidth = width;
 
 	if (Window()) {
@@ -280,7 +283,8 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			// clean up the dirty right border of
 			// the menu field when enlarging
 			BRect dirty(fMenuField->Bounds());
-			dirty.left = dirty.right - diff - 2;
+			dirty.right = Frame().right + 2;
+			dirty.left = dirty.left - diff - 4;
 			fMenuField->Invalidate(dirty);
 			
 			// clean up the arrow part
@@ -292,7 +296,8 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			// clean up the dirty right line of
 			// the menu field when shrinking
 			BRect dirty(fMenuField->Bounds());
-			dirty.left = dirty.right - 2;
+			dirty.left = Frame().right - 2;
+			dirty.right = dirty.left - diff + 4;
 			fMenuField->Invalidate(dirty);
 			
 			// clean up the arrow part
@@ -307,6 +312,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		// of the size of the parent menu field as well
 		// NOTE: no worries about follow mode, we follow left and top
 		// in autosize mode
+		diff = Frame().right + 2 - fMenuField->Bounds().right;
 		fMenuField->ResizeBy(diff, 0.0);
 	}
 	BMenuBar::FrameResized(width, height);
