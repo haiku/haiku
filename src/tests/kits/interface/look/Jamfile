@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests kits interface look ;
 
 SimpleTest LookTest :
 	Look.cpp
-	: be
+	: be tracker
 	;	

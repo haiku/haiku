@@ -9,6 +9,7 @@
 #include <ChannelSlider.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
+#include <FilePanel.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <ListView.h>
@@ -47,6 +48,11 @@ add_controls(BGridLayout* layout, int32& row)
 	control4->SetValue(B_CONTROL_ON);
 	control4->SetEnabled(false);
 
+	control1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	control2->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	control3->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	control4->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
 	layout->AddView(control1, 0, row);
 	layout->AddView(control2, 1, row);
 	layout->AddView(control3, 2, row);
@@ -54,6 +60,9 @@ add_controls(BGridLayout* layout, int32& row)
 
 	row++;
 }
+
+
+#define USE_LAYOUT_ITEMS 0
 
 
 void
@@ -65,8 +74,15 @@ add_menu_fields(BGridLayout* layout, int32& row)
 	BMenuField* control2 = new BMenuField("Disabled", menu2, NULL);
 	control2->SetEnabled(false);
 
+#if USE_LAYOUT_ITEMS
+	layout->AddItem(control1->CreateLabelLayoutItem(), 0, row);
+	layout->AddItem(control1->CreateMenuBarLayoutItem(), 1, row);
+	layout->AddItem(control2->CreateLabelLayoutItem(), 2, row);
+	layout->AddItem(control2->CreateMenuBarLayoutItem(), 3, row);
+#else
 	layout->AddView(control1, 0, row, 2);
 	layout->AddView(control2, 2, row, 2);
+#endif
 
 	row++;
 }
@@ -79,8 +95,15 @@ add_text_controls(BGridLayout* layout, int32& row)
 	BTextControl* control2 = new BTextControl("Disabled", "More Text", NULL);
 	control2->SetEnabled(false);
 
+#if USE_LAYOUT_ITEMS
+	layout->AddItem(control1->CreateLabelLayoutItem(), 0, row);
+	layout->AddItem(control1->CreateTextViewLayoutItem(), 1, row);
+	layout->AddItem(control2->CreateLabelLayoutItem(), 2, row);
+	layout->AddItem(control2->CreateTextViewLayoutItem(), 3, row);
+#else
 	layout->AddView(control1, 0, row, 2);
 	layout->AddView(control2, 2, row, 2);
+#endif
 
 	row++;
 }
@@ -166,12 +189,39 @@ add_status_bars(BGridLayout* layout, int32& row)
 }
 
 
+static const uint32 MSG_TEST_FILE_PANEL = 'tsfp';
+
+
+class Window : public BWindow {
+public:
+	Window(BRect frame, const char* title, window_type type, uint32 flags)
+		: BWindow(frame, title, type, flags)
+	{
+	}
+
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+		case MSG_TEST_FILE_PANEL:
+			{
+				BFilePanel* panel = new BFilePanel();
+				panel->Show();
+			}
+			break;
+
+		default:
+			BWindow::MessageReceived(message);
+		}
+	}
+};
+
+
 int
 main(int argc, char** argv)
 {
 	BApplication app("application/x-vnd.haiku-look");
 
-	BWindow* window = new BWindow(BRect(50, 50, 100, 100),
+	BWindow* window = new Window(BRect(50, 50, 100, 100),
 		"Look at these pretty controls!", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_QUIT_ON_WINDOW_CLOSE);
@@ -223,6 +273,8 @@ main(int argc, char** argv)
 
 	BMenuBar* menuBar = new BMenuBar("menu bar");
 	BMenu* menu = new BMenu("File");
+	menu->AddItem(new BMenuItem("Test BFilePanel",
+		new BMessage(MSG_TEST_FILE_PANEL)));
 	menu->AddItem(new BMenuItem("Click me!", NULL));
 	menu->AddItem(new BMenuItem("Another Option", NULL));
 	menu->AddSeparatorItem();
