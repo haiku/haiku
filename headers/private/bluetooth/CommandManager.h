@@ -20,7 +20,7 @@ template <typename Type = void, int paramSize = 0, int HeaderSize = HCI_COMMAND_
 class BluetoothCommand {
 
 public:
-	BluetoothCommand(uint8 ogf, uint8 ocf, size_t* outsize)
+	BluetoothCommand(uint8 ogf, uint8 ocf)
 	{
 		fHeader = (struct hci_command_header*) fBuffer;
 		
@@ -31,8 +31,6 @@ public:
 		
 		fHeader->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
 		fHeader->clen = paramSize; 
-		
-		*outsize = HeaderSize + paramSize;
 	}
 
 	Type*
@@ -45,6 +43,11 @@ public:
 	Data() const
 	{
 		return (void*)fBuffer;
+	}
+	
+	size_t Size() const
+	{
+		return HeaderSize + paramSize;
 	}
 	
 private:

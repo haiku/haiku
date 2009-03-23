@@ -52,6 +52,8 @@ private:
 			virtual	~LocalDevice();
 			
 			status_t		ReadLocalVersion();
+			status_t		ReadBufferSize();
+			status_t		Reset();
 			hci_id			GetID(void) {return hid;}
 	static	LocalDevice*	RequestLocalDeviceID(BMessage* request);
 

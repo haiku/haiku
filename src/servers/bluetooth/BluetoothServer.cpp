@@ -35,7 +35,6 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 
 	Output::Instance()->AddTab("General", BLACKBOARD_GENERAL);
 	Output::Instance()->AddTab("Device Manager", BLACKBOARD_DEVICEMANAGER);
-	Output::Instance()->AddTab("Events", BLACKBOARD_EVENTS);
 	Output::Instance()->AddTab("Kit", BLACKBOARD_KIT);
 
 	ShowWindow(Output::Instance());
@@ -339,21 +338,23 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 
 		// Check if the property has been already retrieved
 		if (ldi->IsPropertyAvailable(propertyRequested)) {
-			if (strcmp(propertyRequested, "hci_version") == 0) {				
+			if (strcmp(propertyRequested, "hci_version") == 0
+				|| strcmp(propertyRequested, "lmp_version") == 0
+			    || strcmp(propertyRequested, "sco_mtu") == 0) {
+			    	
 				uint8 result = ldi->GetPropertiesMessage()->FindInt8(propertyRequested);
 				reply->AddInt32("result", result);
-			} else if (strcmp(propertyRequested, "hci_revision") == 0) {
+				
+			} else if (strcmp(propertyRequested, "hci_revision") == 0
+					   || strcmp(propertyRequested, "lmp_subversion") == 0
+					   || strcmp(propertyRequested, "manufacturer") == 0
+					   || strcmp(propertyRequested, "acl_mtu") == 0
+					   || strcmp(propertyRequested, "acl_max_pkt") == 0
+					   || strcmp(propertyRequested, "sco_max_pkt") == 0 ) {
+					   	
 				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
 				reply->AddInt32("result", result);
-			} else if (strcmp(propertyRequested, "lmp_version") == 0) {
-				uint8 result = ldi->GetPropertiesMessage()->FindInt8(propertyRequested);
-				reply->AddInt32("result", result);
-			} else if (strcmp(propertyRequested, "lmp_subversion") == 0) {
-				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
-				reply->AddInt32("result", result);
-			} else if (strcmp(propertyRequested, "manufacturer") == 0) {
-				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
-				reply->AddInt32("result", result);
+				
 			} else {
 				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "Property %s could not be satisfied\n",
 						propertyRequested);

@@ -66,7 +66,7 @@ BPortNot::loop()
 		 	    
          ld = ourapp->LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
 		 if (ld == NULL) {
-		    Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_EVENTS);
+		    Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_GENERAL);
 		    continue;
 		 }
 

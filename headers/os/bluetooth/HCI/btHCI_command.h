@@ -351,9 +351,14 @@ struct hci_command_header {
 #define OGF_STATUS_PARAM				0x05
 
 /* Testing commands */
-#define OGF_TESTING_CMD					0x3E
+#define OGF_TESTING_CMD					0x06
 
 /* Vendor specific commands */
 #define OGF_VENDOR_CMD					0x3F
+
+#define OCF_WRITE_BCM2035_BDADDR		0x01
+	struct hci_write_bcm2035_bdaddr {
+		bdaddr_t bdaddr;
+	} _PACKED;
 
 #endif // _BTHCI_COMMAND_H_

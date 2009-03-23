@@ -99,22 +99,28 @@ printf("### \n");
 	
 	// Check if its a requested one
 	if ( event->ecode == HCI_EVENT_CMD_COMPLETE ) {
-	
-		(Output::Instance()->Post("Incoming Command Complete\n", BLACKBOARD_EVENTS));
-		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)(event+1))->opcode, &eventIndexLocation );
+		/*	
+		(Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Command Complete, n commands %d\n",
+					((struct hci_ev_cmd_complete*)event)->ncmd));
+		*/
+		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)(event+1))->opcode, 
+					&eventIndexLocation);
 	
 	} else if ( event->ecode == HCI_EVENT_CMD_STATUS ) {
 
-		(Output::Instance()->Post("Incoming Command Status\n", BLACKBOARD_EVENTS));
-		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode, &eventIndexLocation );
+		/*(Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Command Status, n commands %d status %x\n", 
+					((struct hci_ev_cmd_status*)event)->ncmd,
+					((struct hci_ev_cmd_status*)event)->status ));
+		*/			
+		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode,
+					&eventIndexLocation);
 
-	} else 
-	{	
+	} else 	{	
 		request = FindPetition(event->ecode);
 	}
 	
 	if ( request == NULL) {
-		(Output::Instance()->Post("Event could not be understood or delivered\n", BLACKBOARD_EVENTS));
+		Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"Event %x could not be understood or delivered\n", event->ecode);
 		return;
 	}
 
@@ -245,17 +251,16 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
 
 
-    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for command %s\n",__FUNCTION__, GetCommand(opcodeExpected));
-    switch (opcodeExpected) {
-
+    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) for %s\n",__FUNCTION__, event->ncmd,GetCommand(opcodeExpected));
+    switch ((uint16)opcodeExpected) {
+    	
         case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION):
         {
         	struct hci_rp_read_loc_version* version = (struct hci_rp_read_loc_version*)(event+1);
 
+			reply.AddInt8("status", version->status);
+			                
             if (version->status == BT_OK) {
-
-                //reply.AddData("version", B_ANY_TYPE, &version, sizeof(struct hci_rp_read_loc_version));
-                reply.AddInt8("status", version->status);
 
                 printf("Sending reply ... %ld\n", request->SendReply(&reply));
                 reply.PrintToStream();
@@ -277,6 +282,37 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 
 			    Output::Instance()->Postf(BLACKBOARD_KIT, "Reply for Local Version %x\n", version->status);
+            }
+
+ 			// This request is not gonna be used anymore
+            ClearWantedEvent(request);
+     	}
+        break;
+
+        case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE):
+        {
+        	struct hci_rp_read_buffer_size* buffer = (struct hci_rp_read_buffer_size*)(event+1);
+			
+			reply.AddInt8("status", buffer->status);
+
+            if (buffer->status == BT_OK) {
+
+                printf("Sending reply ... %ld\n", request->SendReply(&reply));
+                reply.PrintToStream();
+				
+				if (!IsPropertyAvailable("acl_mtu"))
+					fProperties->AddInt16("acl_mtu", buffer->acl_mtu);
+
+				if (!IsPropertyAvailable("sco_mtu"))
+					fProperties->AddInt8("sco_mtu", buffer->sco_mtu);
+
+				if (!IsPropertyAvailable("acl_max_pkt"))
+					fProperties->AddInt16("acl_max_pkt", buffer->acl_max_pkt);
+
+				if (!IsPropertyAvailable("sco_max_pkt"))
+					fProperties->AddInt16("sco_max_pkt", buffer->sco_max_pkt);
+
+			    Output::Instance()->Postf(BLACKBOARD_KIT, "Reply for Read Buffer Size %x\n", buffer->status);
             }
 
  			// This request is not gonna be used anymore
@@ -383,6 +419,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
+        
         case PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY):
         {
         	uint8* statusReply = (uint8*)(event+1);
@@ -432,7 +469,22 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
-
+        
+        // place here all CC that just replies a uint8 status
+		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET):
+		case PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR):
+		{
+			reply.AddInt8("status", *(uint8*)(event+1));
+			
+			Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s status %x\n",
+						__FUNCTION__,GetCommand(opcodeExpected), *(uint8*)(event+1));
+			
+			request->SendReply(&reply);
+			
+			ClearWantedEvent(request);
+		}
+		break;
+		
 		default:
 		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);
 		break;
@@ -457,7 +509,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
 
-    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for command %s\n",__FUNCTION__, GetCommand(opcodeExpected));
+    Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) for command %s\n",__FUNCTION__, event->ncmd,GetCommand(opcodeExpected));
 
     switch (opcodeExpected) {
 
@@ -577,9 +629,7 @@ LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* 
 	size_t size;
 	void* command;
 
-	printf("Connection type %d from %s\n", event->link_type, bdaddrUtils::ToString(event->bdaddr));
-	(Output::Instance()->Post("Connection Incoming ...\n", BLACKBOARD_EVENTS));
-
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Connection Incoming type %x from %s...\n", event->link_type, bdaddrUtils::ToString(event->bdaddr));
 
     /* TODO: add a possible request in the queue */
 	if (true) { // Check Preferences if we are to accept this connection
@@ -598,13 +648,12 @@ LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* 
 		AddWantedEvent(newrequest);
 
 	    if ((fHCIDelegate)->IssueCommand(command, size) == B_ERROR) {
-			(Output::Instance()->Post("Command issue error for ConnAccpq\n", BLACKBOARD_EVENTS));
+			Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Command issue error for ConnAccpq\n");
 			// remove the request
 			
 		}
 		else {
-			(Output::Instance()->Post("Command issued for ConnAccp\n", BLACKBOARD_EVENTS));
-
+			Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Command issue for ConnAccpq\n");
 
 		}
 	}
@@ -690,7 +739,7 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 	    if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) == B_ERROR) {
 			// TODO: - Reply the request with error!
 			//       - Remove the just added request
-			(Output::Instance()->Post("Command issue error\n", BLACKBOARD_EVENTS));
+			(Output::Instance()->Post("Command issue error\n", BLACKBOARD_KIT));
 		}
 		else {
 
