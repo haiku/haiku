@@ -133,8 +133,8 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package BePDF available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage BePDF-1.1.0b1.x86
-			: http://haiku-files.org/files/optional-packages/BePDF-1.1.0b1.x86.zip
+		InstallOptionalHaikuImagePackage BePDF-1.1.1b1.x86
+			: http://haiku-files.org/files/optional-packages/BePDF-1.1.1b1.x86.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
