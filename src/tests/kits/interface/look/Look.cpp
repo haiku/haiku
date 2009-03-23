@@ -189,7 +189,8 @@ add_status_bars(BGridLayout* layout, int32& row)
 }
 
 
-static const uint32 MSG_TEST_FILE_PANEL = 'tsfp';
+static const uint32 MSG_TEST_OPEN_FILE_PANEL = 'tofp';
+static const uint32 MSG_TEST_SAVE_FILE_PANEL = 'tsfp';
 
 
 class Window : public BWindow {
@@ -202,9 +203,15 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
-		case MSG_TEST_FILE_PANEL:
+		case MSG_TEST_OPEN_FILE_PANEL:
 			{
 				BFilePanel* panel = new BFilePanel();
+				panel->Show();
+			}
+			break;
+		case MSG_TEST_SAVE_FILE_PANEL:
+			{
+				BFilePanel* panel = new BFilePanel(B_SAVE_PANEL);
 				panel->Show();
 			}
 			break;
@@ -273,8 +280,10 @@ main(int argc, char** argv)
 
 	BMenuBar* menuBar = new BMenuBar("menu bar");
 	BMenu* menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("Test BFilePanel",
-		new BMessage(MSG_TEST_FILE_PANEL)));
+	menu->AddItem(new BMenuItem("Test Open BFilePanel",
+		new BMessage(MSG_TEST_OPEN_FILE_PANEL)));
+	menu->AddItem(new BMenuItem("Test Save BFilePanel",
+		new BMessage(MSG_TEST_SAVE_FILE_PANEL)));
 	menu->AddItem(new BMenuItem("Click me!", NULL));
 	menu->AddItem(new BMenuItem("Another Option", NULL));
 	menu->AddSeparatorItem();
