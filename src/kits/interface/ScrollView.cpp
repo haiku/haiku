@@ -229,33 +229,17 @@ BScrollView::Draw(BRect updateRect)
 			flags |= BControlLook::B_FOCUSED;
 		BRect rect(Bounds());
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		if (fBorder == B_FANCY_BORDER
-			&& fHorizontalScrollBar && fVerticalScrollBar) {
-			BRect scrollCornerRect(rect);
-			scrollCornerRect.left = fHorizontalScrollBar->Frame().right + 2;
-			scrollCornerRect.top = fVerticalScrollBar->Frame().bottom + 2;
-			BRegion region(rect);
-			region.Exclude(scrollCornerRect);
-			ConstrainClippingRegion(&region);
-		}
 
-		be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
+		BRect verticalScrollBarFrame(0, 0, -1, -1);
+		if (fVerticalScrollBar)
+			verticalScrollBarFrame = fVerticalScrollBar->Frame();
+		BRect horizontalScrollBarFrame(0, 0, -1, -1);
+		if (fHorizontalScrollBar)
+			horizontalScrollBarFrame = fHorizontalScrollBar->Frame();
+
+		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
+			verticalScrollBarFrame, horizontalScrollBarFrame, base, fBorder,
 			flags);
-
-		if (fBorder == B_FANCY_BORDER
-			&& fHorizontalScrollBar && fVerticalScrollBar) {
-			ConstrainClippingRegion(NULL);
-
-			rect = Bounds().InsetByCopy(1, 1);
-			rect.right = fHorizontalScrollBar->Frame().right + 1;
-			be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
-				flags, BControlLook::B_RIGHT_BORDER);
-
-			rect = Bounds().InsetByCopy(1, 1);
-			rect.bottom = fVerticalScrollBar->Frame().bottom + 1;
-			be_control_look->DrawBorder(this, rect, updateRect, base, fBorder,
-				flags, BControlLook::B_BOTTOM_BORDER);
-		}
 
 		return;
 	}
