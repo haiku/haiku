@@ -573,12 +573,10 @@ BMenuField::SetDivider(float divider)
 	} else {
 		BRect dirty(fMenuBar->Frame());
 
-		fMenuBar->MoveTo(fDivider + 1, kVMargin);
+		fMenuBar->MoveTo(_MenuBarOffset(), kVMargin);
 
-		if (fFixedSizeMB) {
-			fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2,
-							   dirty.Height());
-		}
+		if (fFixedSizeMB)
+			fMenuBar->ResizeTo(_MenuBarWidthDiff(), dirty.Height());
 
 		dirty = dirty | fMenuBar->Frame();
 		dirty.InsetBy(-kVMargin, -kVMargin);
@@ -1034,7 +1032,7 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	fMenu = menu;
 	InitMenu(menu);
 
-	frame.left = fDivider + 1;
+	frame.left = _MenuBarOffset();
 	frame.top = kVMargin;
 	frame.right -= kVMargin;
 	frame.bottom -= kVMargin;
@@ -1126,9 +1124,16 @@ BMenuField::_ValidateLayoutData()
 
 
 float
+BMenuField::_MenuBarOffset() const
+{
+	return max_c(kVMargin, fDivider + 1);
+}
+
+
+float
 BMenuField::_MenuBarWidthDiff() const
 {
-	return fDivider + kVMargin + 1;
+	return _MenuBarOffset() + kVMargin;
 }
 
 

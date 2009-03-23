@@ -123,6 +123,7 @@ private:
 								BRect frame, bool fixedSize);
 
 			void			_ValidateLayoutData();
+			float			_MenuBarOffset() const;
 			float			_MenuBarWidthDiff() const;
 
 			char*			fLabel;
