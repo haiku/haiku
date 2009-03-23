@@ -37,6 +37,7 @@ All rights reserved.
 
 #include <Application.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <MessageFilter.h>
 #include <StringView.h>
@@ -109,18 +110,24 @@ TCustomButton::Draw(BRect updateRect)
 
 	if (Message()->what == kStopButton) {
 		updateRect = Bounds();
-		updateRect.InsetBy(9, 7);
+		updateRect.InsetBy(9, 8);
 		SetHighColor(0, 0, 0);
+		if (Value() == B_CONTROL_ON)
+			updateRect.OffsetBy(1, 1);
 		FillRect(updateRect);
 	} else {
 		updateRect = Bounds();
-		updateRect.InsetBy(9, 6);
+		updateRect.InsetBy(9, 7);
 		BRect rect(updateRect);
 		rect.right -= 3;
 
 		updateRect.left += 3;
 		updateRect.OffsetBy(1, 0);
 		SetHighColor(0, 0, 0);
+		if (Value() == B_CONTROL_ON) {
+			updateRect.OffsetBy(1, 1);
+			rect.OffsetBy(1, 1);
+		}
 		FillRect(updateRect);
 		FillRect(rect);
 	}
@@ -386,10 +393,13 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	SetHighColor(20, 20, 20);
 	SetDrawingMode(B_OP_OVER);
 
+	const float buttonWidth = 22;
+	const float buttonHeight = 20;
+
 	BRect rect(bounds);
 	rect.OffsetTo(B_ORIGIN);
 	rect.left += 40;
-	rect.right -= 50;
+	rect.right -= buttonWidth * 2 + 12;
 	rect.top += 6;
 	rect.bottom = rect.top + 15;
 
@@ -457,20 +467,19 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	if (id)
 	 	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, id, &fBitmap);
 
-
 	rect = Bounds();
-	rect.left = rect.right - 46;
-	rect.right = rect.left + 17;
-	rect.top += 17;
-	rect.bottom = rect.top + 10;
+	rect.left = rect.right - buttonWidth * 2 - 7;
+	rect.right = rect.left + buttonWidth;
+	rect.top = floorf((rect.top + rect.bottom) / 2 + 0.5) - buttonHeight / 2;
+	rect.bottom = rect.top + buttonHeight;
 
 	fPauseButton = new TCustomButton(rect, kPauseButton);
-	fPauseButton->ResizeTo(22, 18);
+	fPauseButton->ResizeTo(buttonWidth, buttonHeight);
 	AddChild(fPauseButton);
 
-	rect.OffsetBy(20, 0);
+	rect.OffsetBy(buttonWidth + 2, 0);
 	fStopButton = new TCustomButton(rect, kStopButton);
-	fStopButton->ResizeTo(22, 18);
+	fStopButton->ResizeTo(buttonWidth, buttonHeight);
 	AddChild(fStopButton);
 }
 
@@ -578,7 +587,8 @@ BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 				const char *statusItem = curItem != NULL 
 					? curItem : fPendingStatusString;
 
-				fStatusBar->Update((float)fItemSize / fTotalSize, statusItem, buffer.String());
+				fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,
+					buffer.String());
 
 				// we already displayed this item, clear the stash
 				fPendingStatusString[0] =  '\0';
@@ -609,6 +619,7 @@ BStatusView::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kPauseButton:
 			fIsPaused = !fIsPaused;
+			fPauseButton->SetValue(fIsPaused ? B_CONTROL_ON : B_CONTROL_OFF);
 			if (!fIsPaused) {
 				
 				// force window update
@@ -641,43 +652,50 @@ BStatusView::MessageReceived(BMessage *message)
 
 
 void
-BStatusView::Draw(BRect)
+BStatusView::Draw(BRect updateRect)
 {
-	if (fBitmap)
-		DrawBitmap(fBitmap, BPoint(4, 10));
+	if (fBitmap) {
+		BPoint location;
+		location.x = (fStatusBar->Frame().left - fBitmap->Bounds().Width()) / 2;
+		location.y = (Bounds().Height()- fBitmap->Bounds().Height()) / 2;
+		DrawBitmap(fBitmap, location);
+	}
 
 	BRect bounds(Bounds());
 
-	// draw a frame, which also separates multiple BStatusViews
-	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
-	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	BeginLineArray(4);
-		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
-				BPoint(bounds.left, bounds.top), light);
-		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
-				BPoint(bounds.right, bounds.top), light);
-		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
-				BPoint(bounds.right, bounds.bottom), shadow);
-		AddLine(BPoint(bounds.right - 1.0f, bounds.bottom),
-				BPoint(bounds.left, bounds.bottom), shadow);
-	EndLineArray();
+	if (be_control_look != NULL) {
+		be_control_look->DrawRaisedBorder(this, bounds, updateRect,
+		ViewColor());
+	} else {
+		// draw a frame, which also separates multiple BStatusViews
+		rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
+		rgb_color shadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
+		BeginLineArray(4);
+			AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
+					BPoint(bounds.left, bounds.top), light);
+			AddLine(BPoint(bounds.left + 1.0f, bounds.top),
+					BPoint(bounds.right, bounds.top), light);
+			AddLine(BPoint(bounds.right, bounds.top + 1.0f),
+					BPoint(bounds.right, bounds.bottom), shadow);
+			AddLine(BPoint(bounds.right - 1.0f, bounds.bottom),
+					BPoint(bounds.left, bounds.bottom), shadow);
+		EndLineArray();
+	}
 
 	SetHighColor(0, 0, 0);
 
 	BPoint tp = fStatusBar->Frame().LeftBottom();
 	font_height fh;
 	GetFontHeight(&fh);
-	tp.x += 2;
-	tp.y += fh.leading + fh.ascent;
-	MovePenTo(tp);
+	tp.y += ceilf(fh.leading) + ceilf(fh.ascent);
 
 	if (IsPaused())
-		DrawString("Paused: click to resume or stop");
+		DrawString("Paused: click to resume or stop", tp);
 	else if (fDestDir.Length()) {
 		BString buffer;
 		buffer << "To: " << fDestDir;
 		SetHighColor(0, 0, 0);
-		DrawString(buffer.String());
+		DrawString(buffer.String(), tp);
 	}
 }
 
