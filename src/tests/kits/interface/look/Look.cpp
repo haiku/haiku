@@ -9,6 +9,7 @@
 #include <ChannelSlider.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
+#include <ControlLook.h>
 #include <FilePanel.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
@@ -189,8 +190,11 @@ add_status_bars(BGridLayout* layout, int32& row)
 }
 
 
-static const uint32 MSG_TEST_OPEN_FILE_PANEL = 'tofp';
-static const uint32 MSG_TEST_SAVE_FILE_PANEL = 'tsfp';
+enum {
+	MSG_TEST_OPEN_FILE_PANEL = 'tofp',
+	MSG_TEST_SAVE_FILE_PANEL = 'tsfp',
+	MSG_TOGGLE_LOOK = 'tggl'
+};
 
 
 class Window : public BWindow {
@@ -198,6 +202,12 @@ public:
 	Window(BRect frame, const char* title, window_type type, uint32 flags)
 		: BWindow(frame, title, type, flags)
 	{
+		fControlLook = NULL;
+	}
+	~Window()
+	{
+		if (fControlLook != NULL)
+			be_control_look = fControlLook;
 	}
 
 	virtual void MessageReceived(BMessage* message)
@@ -215,11 +225,30 @@ public:
 				panel->Show();
 			}
 			break;
+		case MSG_TOGGLE_LOOK:
+			{
+				BControlLook* temp = fControlLook;
+				fControlLook = be_control_look;
+				be_control_look = temp;
+				_InvalidateChildrenAndView(ChildAt(0));
+			}
+			break;
 
 		default:
 			BWindow::MessageReceived(message);
 		}
 	}
+
+private:
+	void _InvalidateChildrenAndView(BView* view)
+	{
+		for (int32 i = 0; BView* child = view->ChildAt(i); i++)
+			_InvalidateChildrenAndView(child);
+		view->Invalidate();
+	}
+
+private:
+	BControlLook* fControlLook;
 };
 
 
@@ -314,7 +343,7 @@ main(int argc, char** argv)
 		.Add(BGroupLayoutBuilder(B_VERTICAL, kInset)
 			.Add(tabView)
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL, kInset)
-				.Add(new BButton("Revert", NULL))
+				.Add(new BButton("Revert", new BMessage(MSG_TOGGLE_LOOK)))
 				.Add(BSpaceLayoutItem::CreateGlue())
 				.Add(new BButton("Cancel", NULL))
 				.Add(okButton)
