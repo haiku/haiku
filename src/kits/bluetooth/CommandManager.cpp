@@ -599,6 +599,9 @@ GetCommand(uint16 command)
 		case OGF_TESTING_CMD:
 			return testingCommands[GET_OPCODE_OCF(command)-1];
 			break;
+		case OGF_VENDOR_CMD:
+			return "Vendor specific command";
+			break;
 		default:
 			return "Unknown command";
 			break;

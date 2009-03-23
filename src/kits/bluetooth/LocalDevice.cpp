@@ -293,17 +293,16 @@ LocalDevice::GetDeviceClass()
 status_t 
 LocalDevice::ReadLocalVersion()
 {
-	size_t	size;
 	int8	 bt_status = BT_ERROR;
 	
-	BluetoothCommand<> localVersion(OGF_INFORMATIONAL_PARAM,OCF_READ_LOCAL_VERSION,&size);
+	BluetoothCommand<> localVersion(OGF_INFORMATIONAL_PARAM,OCF_READ_LOCAL_VERSION);
 	
 	
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
 	request.AddInt32("hci_id", hid);
-	request.AddData("raw command", B_ANY_TYPE, localVersion.Data(), size);
+	request.AddData("raw command", B_ANY_TYPE, localVersion.Data(), localVersion.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION));
 	
@@ -313,6 +312,52 @@ LocalDevice::ReadLocalVersion()
 	return bt_status;
 }
 
+
+status_t 
+LocalDevice::ReadBufferSize()
+{
+	int8	 bt_status = BT_ERROR;
+	
+	BluetoothCommand<> BufferSize(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE);
+	
+	
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+	
+	request.AddInt32("hci_id", hid);
+	request.AddData("raw command", B_ANY_TYPE, BufferSize.Data(), BufferSize.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE));
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+}
+
+
+status_t 
+LocalDevice::Reset()
+{
+	int8	 bt_status = BT_ERROR;
+	
+	BluetoothCommand<> Reset(OGF_CONTROL_BASEBAND, OCF_RESET);
+	
+	
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+	
+	request.AddInt32("hci_id", hid);
+	request.AddData("raw command", B_ANY_TYPE, Reset.Data(), Reset.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET));
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+		
+}
 
 /*
 ServiceRecord 
@@ -331,6 +376,41 @@ LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 {
 	fMessenger = _RetrieveBluetoothMessenger();
 	ReadLocalVersion();
+	uint32 value;
+	
+	// HARDCODE -> move this to addons
+	if (GetProperty("manufacturer", &value) == B_OK
+		&& value == 15) {
+//		Reset();	// Perform a reset to Broadcom buggyland
+		
+
+//#define BT_WRITE_BDADDR_FOR_BCM2035
+#ifdef BT_WRITE_BDADDR_FOR_BCM2035
+		// try the bcm stuff
+		int8	 bt_status = BT_ERROR;
+		
+		BluetoothCommand<typed_command(hci_write_bcm2035_bdaddr)> writeAddress(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR);
+		
+		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+		BMessage reply;
+		writeAddress->bdaddr.b[0] = 0x3C;
+		writeAddress->bdaddr.b[1] = 0x19;
+		writeAddress->bdaddr.b[2] = 0x30;
+		writeAddress->bdaddr.b[3] = 0xC9;
+		writeAddress->bdaddr.b[4] = 0x03;
+		writeAddress->bdaddr.b[5] = 0x00;
+		
+		request.AddInt32("hci_id", hid);
+		request.AddData("raw command", B_ANY_TYPE, writeAddress.Data(), writeAddress.Size());
+		request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+		request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR));
+		
+		if (fMessenger->SendMessage(&request, &reply) == B_OK)
+			reply.FindInt8("status", &bt_status);
+#endif		
+	}
+	
+	ReadBufferSize();
 }
 
 
