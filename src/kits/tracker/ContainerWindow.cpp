@@ -65,6 +65,7 @@ All rights reserved.
 #include "BackgroundImage.h"
 #include "Commands.h"
 #include "ContainerWindow.h"
+#include "CountView.h"
 #include "DeskWindow.h"
 #include "FavoritesMenu.h"
 #include "FindPanel.h"
@@ -3967,9 +3968,25 @@ BackgroundView::FrameResized(float, float)
 
 
 void
-BackgroundView::PoseViewFocused(bool)
+BackgroundView::PoseViewFocused(bool focused)
 {
 	Invalidate();
+
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	if (!window)
+		return;
+
+	BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
+	if (hScrollBar != NULL)
+		hScrollBar->SetBorderHighlighted(focused);
+
+	BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
+	if (vScrollBar != NULL)
+		vScrollBar->SetBorderHighlighted(focused);
+
+	BCountView* countView = window->PoseView()->CountView();
+	if (countView != NULL)
+		countView->SetBorderHighlighted(focused);
 }
 
 
@@ -3981,18 +3998,49 @@ BackgroundView::WindowActivated(bool)
 
 
 void
-BackgroundView::Draw(BRect)
+BackgroundView::Draw(BRect updateRect)
 {
 	BContainerWindow *window = dynamic_cast<BContainerWindow *>(Window());
 	if (!window)
 		return;
 
-	BRect frame(window->PoseView()->Frame());
-
+	BPoseView* poseView = window->PoseView();
+	BRect frame(poseView->Frame());
 	frame.InsetBy(-1, -1);
 	frame.top -= kTitleViewHeight;
 	frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 	frame.right += B_V_SCROLL_BAR_WIDTH;
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (window->IsActive() && window->PoseView()->IsFocus())
+			flags |= BControlLook::B_FOCUSED;
+
+		frame.top--;
+		frame.InsetBy(-1, -1);
+		BRect rect(frame);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		BScrollBar* hScrollBar = poseView->HScrollBar();
+		BScrollBar* vScrollBar = poseView->VScrollBar();
+
+		BRect verticalScrollBarFrame(0, 0, -1, -1);
+		if (vScrollBar)
+			verticalScrollBarFrame = vScrollBar->Frame();
+		BRect horizontalScrollBarFrame(0, 0, -1, -1);
+		if (hScrollBar) {
+			horizontalScrollBarFrame = hScrollBar->Frame();
+			// CountView extends horizontal scroll bar frame:
+			horizontalScrollBarFrame.left = frame.left + 1;
+		}
+
+		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
+			verticalScrollBarFrame, horizontalScrollBarFrame, base,
+			B_FANCY_BORDER, flags);
+
+		return;
+	}
+
 	SetHighColor(100, 100, 100);
 	StrokeRect(frame);
 

@@ -189,8 +189,9 @@ class BPoseView : public BView {
 		virtual void UpdateScrollRange();
 		virtual	void SetScrollBarsTo(BPoint);
 		virtual void AddScrollBars();
-		BHScrollBar *HScrollBar() const;
-		BScrollBar *VScrollBar() const ;
+		BHScrollBar* HScrollBar() const;
+		BScrollBar* VScrollBar() const ;
+		BCountView* CountView() const;
 		void DisableScrollBars();
 		void EnableScrollBars();
 
@@ -784,6 +785,12 @@ inline BScrollBar*
 BPoseView::VScrollBar() const
 {
 	return fVScrollBar;
+}
+
+inline BCountView*
+BPoseView::CountView() const
+{
+	return fCountView;
 }
 
 inline bool

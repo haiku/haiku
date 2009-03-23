@@ -55,6 +55,7 @@ BCountView::BCountView(BRect bounds, BPoseView* view)
 	fLastCount(-1),
 	fPoseView(view),
 	fShowingBarberPole(false),
+	fBorderHighlighted(false),
 	fBarberPoleMap(NULL),
 	fLastBarberPoleOffset(5),
 	fStartSpinningAfter(0),
@@ -95,6 +96,17 @@ void
 BCountView::Pulse()
 {
 	TrySpinningBarberPole();
+}
+
+
+void
+BCountView::WindowActivated(bool active)
+{
+	if (fBorderHighlighted) {
+		BRect dirty(Bounds());
+		dirty.bottom = dirty.top;
+		Invalidate(dirty);
+	}
 }
 
 
@@ -186,7 +198,10 @@ BCountView::Draw(BRect updateRect)
 
 	if (be_control_look != NULL) {
 		rgb_color base = ViewColor();
-		SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+		if (fBorderHighlighted && Window()->IsActive())
+			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		else
+			SetHighColor(tint_color(base, B_DARKEN_2_TINT));
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
 		bounds.top++;
 		be_control_look->DrawMenuBarBackground(this, bounds, updateRect,
@@ -328,4 +343,17 @@ bool
 BCountView::IsTypingAhead() const
 {
 	return fTypeAheadString.Length() != 0;
+}
+
+
+void
+BCountView::SetBorderHighlighted(bool highlighted)
+{
+	if (fBorderHighlighted == highlighted)
+		return;
+
+	fBorderHighlighted = highlighted;
+	BRect dirty(Bounds());
+	dirty.bottom = dirty.top;
+	Invalidate(dirty);
 }

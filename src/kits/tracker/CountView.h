@@ -53,6 +53,7 @@ public:
 	virtual	void MouseDown(BPoint);
 	virtual	void AttachedToWindow();
 	virtual void Pulse();
+	virtual void WindowActivated(bool active);
 
 	void CheckCount();
 	void StartBarberPole();
@@ -61,7 +62,9 @@ public:
 	void SetTypeAhead(const char *);
 	const char *TypeAhead() const;
 	bool IsTypingAhead() const;
-	
+
+	void SetBorderHighlighted(bool highlighted);
+
 private:
 	BRect BarberPoleInnerRect() const;
 	BRect BarberPoleOuterRect() const;
@@ -71,7 +74,8 @@ private:
 
 	int32 fLastCount;
 	BPoseView *fPoseView;
-	bool fShowingBarberPole;
+	bool fShowingBarberPole : 1;
+	bool fBorderHighlighted : 1;
 	BBitmap *fBarberPoleMap;
 	float fLastBarberPoleOffset;
 	bigtime_t fStartSpinningAfter;

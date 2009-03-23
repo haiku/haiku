@@ -661,8 +661,8 @@ TFilePanel::Init(const BMessage *)
 	float f_height = ht.ascent + ht.descent + ht.leading;
 
 	BRect rect;
-	rect.top = fMenuBar->Bounds().Height() + 2;
-	rect.left = windRect.left + 9;
+	rect.top = fMenuBar->Bounds().Height() + 8;
+	rect.left = windRect.left + 8;
 	rect.right = rect.left + 300;
 	rect.bottom = rect.top + (f_height > 22 ? f_height : 22);
 
@@ -687,7 +687,7 @@ TFilePanel::Init(const BMessage *)
 	if (fIsSavePanel) {
 		BRect rect(windRect);
 		rect.top = rect.bottom - 35;
-		rect.left = 9;
+		rect.left = 8;
 		rect.right = rect.left + 170;
 		rect.bottom = rect.top + 13;
 
@@ -704,7 +704,7 @@ TFilePanel::Init(const BMessage *)
 		fButtonText = "Open";
 
 	rect = windRect;
-	rect.OffsetTo(10, fMenuBar->Bounds().Height() * 2 + 16);
+	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
 	rect.bottom = windRect.bottom - 60;
 	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;
 
@@ -725,7 +725,9 @@ TFilePanel::Init(const BMessage *)
 	PoseView()->SetSelectionHandler(this);
 	PoseView()->SetSelectionChangedHook(true);
 	PoseView()->DisableSaveLocation();
-	
+	PoseView()->VScrollBar()->MoveBy(0, -1);
+	PoseView()->VScrollBar()->ResizeBy(0, 1);
+
 
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
@@ -780,7 +782,7 @@ TFilePanel::Init(const BMessage *)
 
 	SetTitle(title.String());
 
-	SetSizeLimits(360, 10000, 200, 10000);
+	SetSizeLimits(370, 10000, 200, 10000);
 }
 
 
