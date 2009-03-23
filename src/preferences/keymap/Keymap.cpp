@@ -307,17 +307,21 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 }
 
 
-// get the char for a key given modifiers and active dead key
+//! Get the char for a key given modifiers and active dead key
 void
-Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** chars, int32* numBytes)
+Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
+	char** chars, int32* numBytes)
 {
 	int32 offset;
-	
+
 	*numBytes = 0;
 	*chars = NULL;
-	
+
+	if (keyCode > 128 || fChars == NULL)
+		return;
+
 	// here we take NUMLOCK into account
-	if (modifiers & B_NUM_LOCK)
+	if ((modifiers & B_NUM_LOCK) != 0) {
 		switch (keyCode) {
 			case 0x37:
 			case 0x38:
@@ -331,7 +335,8 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 			case 0x64:
 			case 0x65:
 				modifiers ^= B_SHIFT_KEY;
-		}	
+		}
+	}
 
 	// here we choose the right map given the modifiers
 	switch (modifiers & 0xcf) {
@@ -345,50 +350,50 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
-	
+
 	// here we get the char size
 	*numBytes = fChars[offset];
-	
 	if (!*numBytes)
 		return;
-	
+
 	// here we take an potential active dead key
-	int32 *dead_key;
-	switch(activeDeadKey) {
-		case 1: dead_key = fKeys.acute_dead_key; break;
-		case 2: dead_key = fKeys.grave_dead_key; break;
-		case 3: dead_key = fKeys.circumflex_dead_key; break;
-		case 4: dead_key = fKeys.dieresis_dead_key; break;
-		case 5: dead_key = fKeys.tilde_dead_key; break;
+	int32 *deadKey;
+	switch (activeDeadKey) {
+		case 1: deadKey = fKeys.acute_dead_key; break;
+		case 2: deadKey = fKeys.grave_dead_key; break;
+		case 3: deadKey = fKeys.circumflex_dead_key; break;
+		case 4: deadKey = fKeys.dieresis_dead_key; break;
+		case 5: deadKey = fKeys.tilde_dead_key; break;
 		default: 
 		{
 			// if not dead, we copy and return the char
 			char *str = *chars = new char[*numBytes + 1]; 
-			strncpy(str, &(fChars[offset+1]), *numBytes );
+			strncpy(str, &fChars[offset + 1], *numBytes);
 			str[*numBytes] = 0;
 			return;
 		}
 	}
 
-	// if dead key, we search for our current offset char in the dead key offset table
-	// string comparison is needed
-	for (int32 i=0; i<32; i++) {
-		if (strncmp(&(fChars[offset+1]), &(fChars[dead_key[i]+1]), *numBytes ) == 0) {
-			*numBytes = fChars[dead_key[i+1]];
-		
-			switch(*numBytes) {
+	// if dead key, we search for our current offset char in the dead key
+	// offset table string comparison is needed
+	for (int32 i = 0; i < 32; i++) {
+		if (strncmp(&fChars[offset + 1], &fChars[deadKey[i] + 1], *numBytes)
+				== 0) {
+			*numBytes = fChars[deadKey[i + 1]];
+
+			switch (*numBytes) {
 				case 0:
 					// Not mapped
 					*chars = NULL; 
 					break; 
 				default:
+				{
 					// 1-, 2-, 3-, or 4-byte UTF-8 character 
-				{ 
 					char *str = *chars = new char[*numBytes + 1]; 
-					strncpy(str, &fChars[dead_key[i+1]+1], *numBytes );
+					strncpy(str, &fChars[deadKey[i + 1] + 1], *numBytes );
 					str[*numBytes] = 0; 
-				} 
 					break; 
+				}
 			}
 			return;
 		}		
@@ -397,9 +402,8 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 
 	// if not found we return the current char mapped	
 	*chars = new char[*numBytes + 1];
-	strncpy(*chars, &(fChars[offset+1]), *numBytes );
+	strncpy(*chars, &fChars[offset + 1], *numBytes);
 	(*chars)[*numBytes] = 0; 	
-	
 }
 
 
