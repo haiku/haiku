@@ -151,7 +151,7 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 {
 	InitObject(label);
 
-	_InitMenuBar(menu, BRect(0, 0, 100, 15), false);
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
 
 	InitObject2();
 }
@@ -163,7 +163,7 @@ BMenuField::BMenuField(const char* label,
 {
 	InitObject(label);
 
-	_InitMenuBar(menu, BRect(0, 0, 100, 15), false);
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
 
 	InitObject2();
 }
@@ -576,7 +576,7 @@ BMenuField::SetDivider(float divider)
 		fMenuBar->MoveTo(_MenuBarOffset(), kVMargin);
 
 		if (fFixedSizeMB)
-			fMenuBar->ResizeTo(_MenuBarWidthDiff(), dirty.Height());
+			fMenuBar->ResizeTo(_MenuBarWidth(), dirty.Height());
 
 		dirty = dirty | fMenuBar->Frame();
 		dirty.InsetBy(-kVMargin, -kVMargin);
@@ -650,8 +650,7 @@ BMenuField::ResizeToPreferred()
 		// the menu bar is in follow left/right mode then,
 		// resizing ourselfs might have caused the menubar
 		// to be outside now
-		fMenuBar->ResizeTo(Bounds().Width() - _MenuBarWidthDiff(),
-			fMenuBar->Frame().Height());
+		fMenuBar->ResizeTo(_MenuBarWidth(), fMenuBar->Frame().Height());
 	}
 }
 
@@ -892,7 +891,7 @@ BMenuField::InitObject2()
 
 	float height;
 	fMenuBar->GetPreferredSize(NULL, &height);
-	fMenuBar->ResizeTo(Bounds().Width() - _MenuBarWidthDiff(), height);
+	fMenuBar->ResizeTo(_MenuBarWidth(), height);
 
 	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
 		fMenuBar->Frame().left, fMenuBar->Frame().top,
@@ -1044,12 +1043,12 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
 
 	if (fixedSize) {
-		// align the menu bar left in the available space
-		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-			B_ALIGN_VERTICAL_UNSET));
-	} else {
 		// align the menu bar in the full available space
 		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_VERTICAL_UNSET));
+	} else {
+		// align the menu bar left in the available space
+		fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 			B_ALIGN_VERTICAL_UNSET));
 	}
 
@@ -1131,9 +1130,9 @@ BMenuField::_MenuBarOffset() const
 
 
 float
-BMenuField::_MenuBarWidthDiff() const
+BMenuField::_MenuBarWidth() const
 {
-	return _MenuBarOffset() + kVMargin;
+	return Bounds().Width() - (_MenuBarOffset() + kVMargin);
 }
 
 

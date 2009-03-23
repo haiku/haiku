@@ -124,7 +124,7 @@ private:
 
 			void			_ValidateLayoutData();
 			float			_MenuBarOffset() const;
-			float			_MenuBarWidthDiff() const;
+			float			_MenuBarWidth() const;
 
 			char*			fLabel;
 			BMenu*			fMenu;
