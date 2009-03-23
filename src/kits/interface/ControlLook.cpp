@@ -687,6 +687,67 @@ BControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 
 
 void
+BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
+	const BRect& updateRect, BRect verticalScrollBarFrame,
+	BRect horizontalScrollBarFrame, const rgb_color& base,
+	border_style border, uint32 flags, uint32 _borders)
+{
+	if (border == B_NO_BORDER)
+		return;
+
+	bool excludeScrollCorner = border == B_FANCY_BORDER
+		&& horizontalScrollBarFrame.IsValid()
+		&& verticalScrollBarFrame.IsValid();
+
+	uint32 borders = _borders;
+	if (excludeScrollCorner) {
+		rect.bottom = horizontalScrollBarFrame.top;
+		rect.right = verticalScrollBarFrame.left;
+		borders &= ~(B_RIGHT_BORDER | B_BOTTOM_BORDER);
+	}
+
+	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
+
+	if (border == B_FANCY_BORDER)
+		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, borders);
+
+	if (flags & B_FOCUSED) {
+		rgb_color focusColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+		_DrawFrame(view, rect, focusColor, focusColor, focusColor, focusColor,
+			borders);
+	} else {
+		_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
+			scrollbarFrameColor, scrollbarFrameColor, borders);
+	}
+
+	if (excludeScrollCorner) {
+		horizontalScrollBarFrame.InsetBy(-1, -1);
+		// do not overdraw the top edge
+		horizontalScrollBarFrame.top += 2;
+		borders = _borders;
+		borders &= ~B_TOP_BORDER;
+		_DrawOuterResessedFrame(view, horizontalScrollBarFrame, base,
+			1.0, 1.0, borders);
+		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
+			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
+			borders);
+
+
+		verticalScrollBarFrame.InsetBy(-1, -1);
+		// do not overdraw the left edge
+		verticalScrollBarFrame.left += 2;
+		borders = _borders;
+		borders &= ~B_LEFT_BORDER;
+		_DrawOuterResessedFrame(view, verticalScrollBarFrame, base,
+			1.0, 1.0, borders);
+		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
+			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
+			borders);
+	}
+}
+
+
+void
 BControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 direction, uint32 flags, float tint)
 {
@@ -1565,8 +1626,8 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		dark2BorderColor = tint_color(base, 1.24);
 
 		if (flags & B_DEFAULT_BUTTON) {
-			dark1BorderColor = tint_color(dark1BorderColor, 1.12);
-			dark2BorderColor = tint_color(dark1BorderColor, 1.16);
+			dark1BorderColor = tint_color(dark1BorderColor, 1.14);
+			dark2BorderColor = tint_color(dark1BorderColor, 1.12);
 		}
 	}
 
@@ -1601,7 +1662,8 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 
 		// bevel around external border
 		_DrawOuterResessedFrame(view, rect, focusColor,
-			contrast * (((flags & B_DISABLED) ? 0.5 : 0.8)), brightness * 0.9,
+			contrast * (((flags & B_DISABLED) ? 0.3 : 0.8)),
+			brightness * (((flags & B_DISABLED) ? 1.0 : 0.9)),
 			borders);
 	} else {
 		// bevel around external border

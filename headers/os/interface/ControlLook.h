@@ -141,7 +141,16 @@ public:
 									const rgb_color& base, uint32 flags,
 									enum orientation orientation);
 
-	// TODO: Make virtual before R1 release
+	// TODO: Make all these virtual before R1 release
+			void				DrawScrollViewFrame(BView* view,
+									BRect& rect, const BRect& updateRect,
+									BRect verticalScrollBarFrame,
+									BRect horizontalScrollBarFrame,
+									const rgb_color& base,
+									border_style border,
+									uint32 flags = 0,
+									uint32 borders = B_ALL_BORDERS);
+
 			void				DrawArrowShape(BView* view,
 									BRect& rect, const BRect& updateRect,
 									const rgb_color& base, uint32 direction,
