@@ -43,6 +43,8 @@ private:
 		kSymbolKey
 	};
 
+			void			_DrawKey(BView* view, BRect updateRect, Key* key,
+								BRect frame, bool pressed);
 			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
 			const char*		_SpecialMappedKeySymbol(const char* bytes,
 								size_t numBytes);
@@ -68,6 +70,7 @@ private:
 			int32			fDeadKey;
 
 			BPoint			fClickPoint;
+			bool			fIsDragging;
 
 			BFont			fFont;
 			BFont			fSpecialFont;

@@ -6,17 +6,25 @@
 
 #include "KeyboardLayoutView.h"
 
+#include <Bitmap.h>
 #include <ControlLook.h>
 #include <Window.h>
 
 #include "Keymap.h"
 
 
+static const rgb_color kBrightColor = {230, 230, 230, 255};
+static const rgb_color kDarkColor = {200, 200, 200, 255};
+static const rgb_color kSecondDeadKeyColor = {240, 240, 150, 255};
+static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
+
+
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fKeymap(NULL),
 	fModifiers(0),
-	fDeadKey(0)
+	fDeadKey(0),
+	fIsDragging(false)
 {
 	fLayout = new KeyboardLayout;
 	memset(fKeyState, 0, sizeof(fKeyState));
@@ -108,6 +116,7 @@ void
 KeyboardLayoutView::MouseDown(BPoint point)
 {
 	fClickPoint = point;
+	fIsDragging = false;
 
 	Key* key = _KeyAt(point);
 	if (key != NULL) {
@@ -132,85 +141,74 @@ void
 KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* dragMessage)
 {
+	if (fKeymap == NULL)
+		return;
+
+	if (dragMessage != NULL) {
+#if 0
+		// TODO: check if we support this message!
+		Key* key = _KeyAt(point);
+		if (key == NULL)
+			return;
+
+		// TODO: have a mouse key state, and a current drag key!
+		memset(fKeyState, 0, sizeof(fKeyState));
+		fKeyState[key->code / 8] = (1 << (7 - (key->code & 7)));
+		_InvalidateKey(key->code);
+#endif
+	} else if (!fIsDragging && (fabs(point.x - fClickPoint.x) > 4
+		|| fabs(point.y - fClickPoint.y) > 4)) {
+		// start dragging
+		Key* key = _KeyAt(fClickPoint);
+		if (key == NULL)
+			return;
+
+		BRect frame = _FrameFor(key);
+		BPoint offset = fClickPoint - frame.LeftTop();
+		frame.OffsetTo(B_ORIGIN);
+
+		BRect rect = frame;
+		rect.right--;
+		rect.bottom--;
+		BBitmap* bitmap = new BBitmap(rect, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
+		bitmap->Lock();
+
+		BView* view = new BView(rect, "drag", 0, 0);
+		bitmap->AddChild(view);
+
+		_DrawKey(view, frame, key, frame, false);
+
+		view->Sync();
+		bitmap->RemoveChild(view);
+		bitmap->Unlock();
+
+		// Make it transparent
+		// TODO: is there a better way to do this?
+		uint8* bits = (uint8*)bitmap->Bits();
+		for (int32 i = 0; i < bitmap->BitsLength(); i += 4) {
+			bits[i + 3] = 144;
+		}
+
+		BMessage drag;
+		drag.AddInt32("key", key->code);
+
+		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
+		fIsDragging = true;
+
+		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
+		_InvalidateKey(key->code);
+	}
 }
 
 
 void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
-	static const rgb_color kBrightColor = {230, 230, 230};
-	static const rgb_color kDarkColor = {200, 200, 200};
-	static const rgb_color kSecondDeadKeyColor = {130, 180, 230};
-	static const rgb_color kDeadKeyColor = {240, 240, 150};
-
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 
-		BRect rect = _FrameFor(key);
-		rgb_color base = key->dark ? kDarkColor : kBrightColor;
-		bool pressed = _IsKeyPressed(key->code);
-		key_kind keyKind = kNormalKey;
-		int32 deadKey = 0;
-		bool secondDeadKey;
-
-		char text[32];
-		if (fKeymap != NULL) {
-			_GetKeyLabel(key, text, sizeof(text), keyKind);
-			deadKey = fKeymap->IsDeadKey(key->code, fModifiers);
-			secondDeadKey = fKeymap->IsDeadSecondKey(key->code, fModifiers,
-				fDeadKey);
-		} else {
-			// Show the key code if there is no keymap
-			snprintf(text, sizeof(text), "%02lx", key->code);
-		}
-
-		switch (keyKind) {
-			case kNormalKey:
-				fFont.SetSize(_FontSizeFor(rect, text));
-				SetFont(&fFont);
-				break;
-			case kSpecialKey:
-				fSpecialFont.SetSize(_FontSizeFor(rect, text) * 0.7);
-				SetFont(&fSpecialFont);
-				break;
-			case kSymbolKey:
-				fSpecialFont.SetSize(_FontSizeFor(rect, text) * 1.6);
-				SetFont(&fSpecialFont);
-				break;
-		}
-
-		if (secondDeadKey)
-			base = kSecondDeadKeyColor;
-		else if (deadKey > 0)
-			base = kDeadKeyColor;
-
-		if (key->shape == kRectangleKeyShape) {
-			be_control_look->DrawButtonFrame(this, rect, updateRect, base,
-				pressed ? BControlLook::B_ACTIVATED : 0);
-			be_control_look->DrawButtonBackground(this, rect, updateRect, 
-				base, pressed ? BControlLook::B_ACTIVATED : 0);
-
-			// TODO: make font size depend on key size!
-			rect.InsetBy(1, 1);
-
-			be_control_look->DrawLabel(this, text, rect, updateRect,
-				base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-		} else if (key->shape == kEnterKeyShape) {
-			// TODO: make better!
-			rect.bottom -= 20;
-			be_control_look->DrawButtonBackground(this, rect, updateRect, 
-				base, 0, BControlLook::B_LEFT_BORDER
-					| BControlLook::B_RIGHT_BORDER 
-					| BControlLook::B_TOP_BORDER);
-
-			rect = _FrameFor(key);
-			rect.top += 20;
-			rect.left += 10;
-			be_control_look->DrawButtonBackground(this, rect, updateRect, 
-				base, 0, BControlLook::B_LEFT_BORDER
-					| BControlLook::B_RIGHT_BORDER
-					| BControlLook::B_BOTTOM_BORDER);
-		}
+		_DrawKey(this, updateRect, key, _FrameFor(key),
+			_IsKeyPressed(key->code));
 	}
 }
 
@@ -232,6 +230,76 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 			break;
+	}
+}
+
+
+void
+KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, Key* key,
+	BRect rect, bool pressed)
+{
+	rgb_color base = key->dark ? kDarkColor : kBrightColor;
+	key_kind keyKind = kNormalKey;
+	int32 deadKey = 0;
+	bool secondDeadKey;
+
+	char text[32];
+	if (fKeymap != NULL) {
+		_GetKeyLabel(key, text, sizeof(text), keyKind);
+		deadKey = fKeymap->IsDeadKey(key->code, fModifiers);
+		secondDeadKey = fKeymap->IsDeadSecondKey(key->code, fModifiers,
+			fDeadKey);
+	} else {
+		// Show the key code if there is no keymap
+		snprintf(text, sizeof(text), "%02lx", key->code);
+	}
+
+	switch (keyKind) {
+		case kNormalKey:
+			fFont.SetSize(_FontSizeFor(rect, text));
+			view->SetFont(&fFont);
+			break;
+		case kSpecialKey:
+			fSpecialFont.SetSize(_FontSizeFor(rect, text) * 0.7);
+			view->SetFont(&fSpecialFont);
+			break;
+		case kSymbolKey:
+			fSpecialFont.SetSize(_FontSizeFor(rect, text) * 1.6);
+			view->SetFont(&fSpecialFont);
+			break;
+	}
+
+	if (secondDeadKey)
+		base = kSecondDeadKeyColor;
+	else if (deadKey > 0)
+		base = kDeadKeyColor;
+
+	if (key->shape == kRectangleKeyShape) {
+		be_control_look->DrawButtonFrame(view, rect, updateRect, base,
+			pressed ? BControlLook::B_ACTIVATED : 0);
+		be_control_look->DrawButtonBackground(view, rect, updateRect, 
+			base, pressed ? BControlLook::B_ACTIVATED : 0);
+
+		// TODO: make font size depend on key size!
+		rect.InsetBy(1, 1);
+
+		be_control_look->DrawLabel(view, text, rect, updateRect,
+			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+	} else if (key->shape == kEnterKeyShape) {
+		// TODO: make better!
+		rect.bottom -= 20;
+		be_control_look->DrawButtonBackground(view, rect, updateRect, 
+			base, 0, BControlLook::B_LEFT_BORDER
+				| BControlLook::B_RIGHT_BORDER 
+				| BControlLook::B_TOP_BORDER);
+
+		rect = _FrameFor(key);
+		rect.top += 20;
+		rect.left += 10;
+		be_control_look->DrawButtonBackground(view, rect, updateRect, 
+			base, 0, BControlLook::B_LEFT_BORDER
+				| BControlLook::B_RIGHT_BORDER
+				| BControlLook::B_BOTTOM_BORDER);
 	}
 }
 
