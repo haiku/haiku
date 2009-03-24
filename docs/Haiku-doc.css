@@ -73,6 +73,7 @@ div.logo {
 	position: relative;
 	left: 0px;
 	top: 0px;
+	height: 86px;
 	background: #efefef;
 }
 div.logo img {
@@ -80,7 +81,7 @@ div.logo img {
 }
 div.title {
 	position: absolute;
-	top: 54px;
+	bottom: 16px;
 	right: 40px;
 	font-size: 1.2em;
 	line-height: 1.0;
