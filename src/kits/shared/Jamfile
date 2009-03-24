@@ -6,6 +6,10 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared ;
 
+# for RWLockManager only
+UsePrivateSystemHeaders ;
+UsePrivateHeaders kernel libroot ;
+
 StaticLibrary libshared.a :
 	AboutWindow.cpp
 	AffineTransform.cpp
@@ -14,4 +18,5 @@ StaticLibrary libshared.a :
 	CommandPipe.cpp
 	DateTime.cpp
 	HashString.cpp
+	RWLockManager.cpp
 ;
