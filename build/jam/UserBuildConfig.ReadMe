@@ -191,9 +191,9 @@ DefineBuildProfile install : install : /Haiku2 ;
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
 		AddOptionalHaikuImagePackages Beam BeBook BeHappy BePDF Bluetooth CVS
-			Development FirefoxLibLayout Links NetSurf OpenSound OpenSSH OpenSSL
-			P7zip Pe Perl Subversion UserlandFS Vision VLC Welcome WonderBrush
-			Yasm ;
+			Development Firefox LibLayout Links NetSurf OpenSound OpenSSH
+			OpenSSL P7zip Pe Perl Subversion UserlandFS Vision VLC Welcome
+			WonderBrush Yasm ;
 	}
 
 	case "qemu" : {
