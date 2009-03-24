@@ -5,6 +5,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders interface ;
 
 Preference Keymap :
+	KeyboardLayout.cpp
+	KeyboardLayoutView.cpp
 	KeymapApplication.cpp
 	KeymapWindow.cpp
 	KeymapListItem.cpp

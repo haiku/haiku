@@ -1,110 +1,68 @@
 /*
- * Copyright 2004-2008 Haiku Inc. All rights reserved.
+ * Copyright 2004-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Sandor Vroemisse
  *		Jérôme Duval
  *		Alexandre Deckner, alex@zappotek.com
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
-
 #ifndef KEYMAP_WINDOW_H
 #define KEYMAP_WINDOW_H
 
-#include <Control.h>
+
 #include <FilePanel.h>
 #include <ListView.h>
-#include <MenuBar.h>
 #include <String.h>
 #include <Window.h>
 
 #include "Keymap.h"
 #include "KeymapTextView.h"
 
+class BMenuBar;
+class KeyboardLayoutView;
 class KeymapListItem;
-class BBitmap;
-
-class MapView : public BControl
-{
-public:
-	MapView(BRect rect, const char *name, Keymap *keymap);
-	~MapView();
-	
-	void Draw(BRect rect);
-	void AttachedToWindow();
-	void KeyDown(const char* bytes, int32 numBytes);
-	void KeyUp(const char* bytes, int32 numBytes);
-	void MessageReceived(BMessage *msg);
-	void SetFontFamily(const font_family family);
-	void MouseDown(BPoint point);
-	void MouseUp(BPoint point);
-	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
-		
-private:	
-	void _InvalidateKey(uint32 keyCode);	
-	void _InvalidateKeys();
-	void _DrawKey(uint32 keyCode);
-	void _DrawBackground();
-	void _DrawKeysBackground();
-	void _DrawLocksBackground();
-	void _DrawBorder(BView *view, const BRect &borderRect);
-	void _DrawLocksLights();	
-	void _InitOffscreen();
-	
-	BBitmap		*fBitmap;
-	BView		*fOffscreenView;
-	
-	key_info fOldKeyInfo;
-	BRect fKeysRect[128];
-	bool fKeysVertical[128];
-	bool fKeysToDraw[128];
-	uint8 fKeyState[16];
-	BFont fCurrentFont;
-	
-	Keymap				*fCurrentMap;
-	KeymapTextView		*fTextView;
-	uint32 fCurrentMouseKey;
-	uint8 fActiveDeadKey;		// 0 : none, 1 : acute , ...
-};
 
 
 class KeymapWindow : public BWindow {
 public:
-			KeymapWindow();
-			~KeymapWindow();
-	bool	QuitRequested();
-	void	MessageReceived( BMessage* message );
+								KeymapWindow();
+								~KeymapWindow();
+
+	virtual	bool				QuitRequested();
+	virtual void				MessageReceived(BMessage* message);
 
 protected:
-	BMenuBar			*AddMenuBar();
-	void				AddMaps(BView *placeholderView);
-	void				UseKeymap();
-	void				RevertKeymap();
-	void				UpdateButtons();
-	
-	void 				FillSystemMaps();
-	void 				FillUserMaps();
-	
-	bool				SelectCurrentMap(BListView *list);
-	BString				GetActiveKeymapName();
+			BMenuBar*			_CreateMenu();
+			BView*				_CreateMapLists();
 
-	BListView			*fSystemListView;
-	BListView			*fUserListView;
-	// the map that's currently highlighted
-	BButton				*fUseButton;
-	BButton				*fRevertButton;
-	BMenu				*fFontMenu;
-	
-	MapView				*fMapView;
-		
-	Keymap				fCurrentMap;
-	Keymap				fPreviousMap;
-	Keymap				fAppliedMap;
-	bool				fFirstTime;
-	BString				fCurrentMapName;
-			
-	BFilePanel 			*fOpenPanel;		// the file panel to open
-	BFilePanel 			*fSavePanel;		// the file panel to save
+			void				_UseKeymap();
+			void				_RevertKeymap();
+			void				_UpdateButtons();
+
+			void 				_FillSystemMaps();
+			void				_FillUserMaps();
+			void				_SetListViewSize(BListView* listView);
+
+			bool				_SelectCurrentMap(BListView *list);
+			BString				_GetActiveKeymapName();
+
+			BListView*			fSystemListView;
+			BListView*			fUserListView;
+			BButton*			fUseButton;
+			BButton*			fRevertButton;
+			//BMenu*			fFontMenu;
+			KeyboardLayoutView*	fKeyboardLayoutView;
+
+			Keymap				fCurrentMap;
+			Keymap				fPreviousMap;
+			Keymap				fAppliedMap;
+			bool				fFirstTime;
+			BString				fCurrentMapName;
+
+			BFilePanel*			fOpenPanel;
+			BFilePanel*			fSavePanel;
 };
 
-#endif // KEYMAP_WINDOW_H
+#endif	// KEYMAP_WINDOW_H
