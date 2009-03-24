@@ -6,6 +6,9 @@
 #define _AUTO_LOCKER_H
 
 
+#include <stddef.h>
+
+
 namespace BPrivate {
 
 // AutoLockerStandardLocking
@@ -61,15 +64,25 @@ private:
 	typedef AutoLocker<Lockable, Locking>	ThisClass;
 public:
 	inline AutoLocker()
-		: fLockable(NULL),
-		  fLocked(false)
+		:
+		fLockable(NULL),
+		fLocked(false)
+	{
+	}
+
+	inline AutoLocker(const Locking& locking)
+		:
+		fLockable(NULL),
+		fLocking(locking),
+		fLocked(false)
 	{
 	}
 
 	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false,
 		bool lockIfNotLocked = true)
-		: fLockable(lockable),
-		  fLocked(fLockable && alreadyLocked)
+		:
+		fLockable(lockable),
+		fLocked(fLockable && alreadyLocked)
 	{
 		if (!alreadyLocked && lockIfNotLocked)
 			Lock();
@@ -77,8 +90,9 @@ public:
 
 	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false,
 		bool lockIfNotLocked = true)
-		: fLockable(&lockable),
-		  fLocked(fLockable && alreadyLocked)
+		:
+		fLockable(&lockable),
+		fLocked(fLockable && alreadyLocked)
 	{
 		if (!alreadyLocked && lockIfNotLocked)
 			Lock();
@@ -150,8 +164,8 @@ public:
 
 protected:
 	Lockable	*fLockable;
-	bool		fLocked;
 	Locking		fLocking;
+	bool		fLocked;
 };
 
 
