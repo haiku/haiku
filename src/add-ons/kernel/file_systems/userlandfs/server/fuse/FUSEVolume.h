@@ -6,6 +6,7 @@
 #define USERLAND_FS_FUSE_VOLUME_H
 
 #include <AutoLocker.h>
+#include <RWLockManager.h>
 
 #include "Locker.h"
 
@@ -134,6 +135,14 @@ private:
 	struct FileCookie;
 	struct AttrDirCookie;
 	struct ReadDirBuffer;
+	struct RWLockableWriteLocking;
+	struct RWLockableWriteLocker;
+	struct NodeLocker;
+	struct NodeReadLocker;
+	struct NodeWriteLocker;
+
+	friend struct RWLockableWriteLocking;
+	friend struct NodeLocker;
 
 private:
 	inline	FUSEFileSystem*		_FileSystem() const;
@@ -146,6 +155,12 @@ private:
 									const char* entryName, FUSENode** _node,
 									AutoLocker<Locker>& locker);
 			void				_PutNode(FUSENode* node);
+			void				_PutNodes(FUSENode* const* nodes, int32 count);
+
+			status_t			_LockNodeChain(FUSENode* node, bool parent,
+									bool writeLock);
+			void				_UnlockNodeChain(FUSENode* node, bool parent,
+									bool writeLock);
 
 			status_t			_BuildPath(FUSENode* dir, const char* entryName,
 									char* path, size_t& pathLen);
@@ -161,6 +176,7 @@ private:
 									off_t offset);
 
 private:
+			RWLockManager		fLockManager;
 			Locker				fLock;
 			fuse_fs*			fFS;
 			FUSEEntryTable		fEntries;

@@ -132,7 +132,7 @@ private:
 };
 
 
-struct FUSEVolume::DirCookie : fuse_file_info {
+struct FUSEVolume::DirCookie : fuse_file_info, RWLockable {
 	union {
 		off_t		currentEntryOffset;
 		uint32		currentEntryIndex;
@@ -178,7 +178,7 @@ struct FUSEVolume::FileCookie : fuse_file_info {
 };
 
 
-struct FUSEVolume::AttrDirCookie {
+struct FUSEVolume::AttrDirCookie : RWLockable {
 	AttrDirCookie()
 		:
 		fAttributes(NULL),
@@ -297,6 +297,108 @@ struct FUSEVolume::ReadDirBuffer {
 };
 
 
+struct FUSEVolume::RWLockableWriteLocking {
+	RWLockableWriteLocking(FUSEVolume* volume)
+		:
+		fLockManager(volume != NULL ? &volume->fLockManager : NULL)
+	{
+	}
+
+	RWLockableWriteLocking(RWLockManager* lockManager)
+		:
+		fLockManager(lockManager)
+	{
+	}
+
+	RWLockableWriteLocking(const RWLockableWriteLocking& other)
+		:
+		fLockManager(other.fLockManager)
+	{
+	}
+
+	inline bool Lock(RWLockable* lockable)
+	{
+		return fLockManager != NULL && fLockManager->WriteLock(lockable);
+	}
+
+	inline void Unlock(RWLockable* lockable)
+	{
+		if (fLockManager != NULL)
+			fLockManager->WriteUnlock(lockable);
+	}
+
+private:
+	RWLockManager*	fLockManager;
+};
+
+
+struct FUSEVolume::RWLockableWriteLocker
+	: public AutoLocker<RWLockable, RWLockableWriteLocking> {
+
+	RWLockableWriteLocker(FUSEVolume* volume, RWLockable* lockable)
+		:
+		AutoLocker<RWLockable, RWLockableWriteLocking>(
+			RWLockableWriteLocking(volume))
+	{
+		SetTo(lockable, false);
+	}
+};
+
+
+struct FUSEVolume::NodeLocker {
+	NodeLocker(FUSEVolume* volume, FUSENode* node, bool parent, bool writeLock)
+		:
+		fVolume(volume),
+		fNode(NULL),
+		fParent(parent),
+		fWriteLock(writeLock)
+	{
+		fStatus = volume->_LockNodeChain(node, parent, writeLock);
+		if (fStatus == B_OK)
+			fNode = node;
+	}
+
+	~NodeLocker()
+	{
+		if (fNode != NULL)
+			fVolume->_UnlockNodeChain(fNode, fParent, fWriteLock);
+	}
+
+	status_t Status() const
+	{
+		return fStatus;
+	}
+
+private:
+	FUSEVolume*	fVolume;
+	FUSENode*	fNode;
+	status_t	fStatus;
+	bool		fParent;
+	bool		fWriteLock;
+};
+
+
+struct FUSEVolume::NodeReadLocker : NodeLocker {
+	NodeReadLocker(FUSEVolume* volume, FUSENode* node, bool parent)
+		:
+		NodeLocker(volume, node, parent, false)
+	{
+	}
+};
+
+
+struct FUSEVolume::NodeWriteLocker : NodeLocker {
+	NodeWriteLocker(FUSEVolume* volume, FUSENode* node, bool parent)
+		:
+		NodeLocker(volume, node, parent, true)
+	{
+	}
+};
+
+
+// #pragma mark -
+
+
 inline FUSEFileSystem*
 FUSEVolume::_FileSystem() const
 {
@@ -323,8 +425,13 @@ FUSEVolume::~FUSEVolume()
 status_t
 FUSEVolume::Init()
 {
+	// init lock manager
+	status_t error = fLockManager.Init();
+	if (error != B_OK)
+		return error;
+
 	// init entry and node tables
-	status_t error = fEntries.Init();
+	error = fEntries.Init();
 	if (error != B_OK)
 		return error;
 
@@ -458,6 +565,11 @@ status_t
 FUSEVolume::Lookup(void* _dir, const char* entryName, ino_t* vnid)
 {
 	FUSENode* dir = (FUSENode*)_dir;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
 
 	// look the node up
 	FUSENode* node;
@@ -619,6 +731,11 @@ FUSEVolume::ReadSymlink(void* _node, char* buffer, size_t bufferSize,
 {
 	FUSENode* node = (FUSENode*)_node;
 
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	AutoLocker<Locker> locker(fLock);
 
 	// get a path for the node
@@ -685,6 +802,11 @@ FUSEVolume::Access(void* _node, int mode)
 {
 	FUSENode* node = (FUSENode*)_node;
 
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	AutoLocker<Locker> locker(fLock);
 
 	// get a path for the node
@@ -710,6 +832,11 @@ FUSEVolume::ReadStat(void* _node, struct stat* st)
 {
 	FUSENode* node = (FUSENode*)_node;
 PRINT(("FUSEVolume::ReadStat(%p (%lld), %p)\n", node, node->id, st));
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -757,6 +884,11 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 	FUSENode* node = (FUSENode*)_node;
 PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	bool truncate = (openMode & O_TRUNC) != 0;
 	openMode &= ~O_TRUNC;
 
@@ -799,6 +931,11 @@ FUSEVolume::Close(void* _node, void* _cookie)
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
 
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	AutoLocker<Locker> locker(fLock);
 
 	// get a path for the node
@@ -824,6 +961,11 @@ FUSEVolume::FreeCookie(void* _node, void* _cookie)
 {
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
 
 	ObjectDeleter<FileCookie> cookieDeleter(cookie);
 
@@ -855,6 +997,11 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 	FileCookie* cookie = (FileCookie*)_cookie;
 
 	*_bytesRead = 0;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -913,6 +1060,11 @@ FUSEVolume::OpenDir(void* _node, void** _cookie)
 	FUSENode* node = (FUSENode*)_node;
 PRINT(("FUSEVolume::OpenDir(%p (%lld), %p)\n", node, node->id, _cookie));
 
+	// lock the parent directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	// allocate a dir cookie
 	DirCookie* cookie = new(std::nothrow) DirCookie;
 	if (cookie == NULL)
@@ -961,6 +1113,11 @@ FUSEVolume::FreeDirCookie(void* _node, void* _cookie)
 	FUSENode* node = (FUSENode*)_node;
 	DirCookie* cookie = (DirCookie*)_cookie;
 
+	// lock the parent directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
 	ObjectDeleter<DirCookie> cookieDeleter(cookie);
 
 	if (cookie->getdirInterface)
@@ -997,6 +1154,8 @@ bufferSize, count));
 	FUSENode* node = (FUSENode*)_node;
 	DirCookie* cookie = (DirCookie*)_cookie;
 
+	RWLockableWriteLocker cookieLocker(this, cookie);
+
 	uint32 countRead = 0;
 	status_t readDirError = B_OK;
 
@@ -1005,6 +1164,16 @@ bufferSize, count));
 	if (cookie->entryCache == NULL) {
 		// We don't have an entry cache (yet), so we need to ask the client
 		// file system to read the directory.
+
+		locker.Unlock();
+
+		// lock the directory
+		NodeReadLocker nodeLocker(this, node, false);
+		if (nodeLocker.Status() != B_OK)
+			RETURN_ERROR(nodeLocker.Status());
+
+		locker.Lock();
+
 		ReadDirBuffer readDirBuffer(this, node, cookie, buffer, bufferSize,
 			count);
 
@@ -1064,7 +1233,7 @@ FUSEVolume::RewindDir(void* _node, void* _cookie)
 PRINT(("FUSEVolume::RewindDir(%p, %p)\n", _node, _cookie));
 	DirCookie* cookie = (DirCookie*)_cookie;
 
-	AutoLocker<Locker> locker(fLock);
+	RWLockableWriteLocker cookieLocker(this, cookie);
 
 	if (cookie->getdirInterface) {
 		delete cookie->entryCache;
@@ -1121,7 +1290,14 @@ FUSEVolume::ReadAttrDir(void* _node, void* _cookie, void* buffer,
 	FUSENode* node = (FUSENode*)_node;
 	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
 
+	RWLockableWriteLocker cookieLocker(this, cookie);
+
 	*_countRead = 0;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -1183,6 +1359,8 @@ status_t
 FUSEVolume::RewindAttrDir(void* _node, void* _cookie)
 {
 	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+
+	RWLockableWriteLocker cookieLocker(this, cookie);
 
 	cookie->Clear();
 
@@ -1365,6 +1543,115 @@ FUSEVolume::_PutNode(FUSENode* node)
 	if (--node->refCount == 0) {
 		fNodes.Remove(node);
 		delete node;
+	}
+}
+
+
+void
+FUSEVolume::_PutNodes(FUSENode* const* nodes, int32 count)
+{
+	for (int32 i = 0; i < count; i++)
+		_PutNode(nodes[i]);
+}
+
+
+/*!	Locks the given node and all of its ancestors up to the root. The given
+	node is write-locked, if \a writeLock is \c true, read-locked otherwise. All
+	ancestors are always read-locked in either case.
+
+	If \a parent is \c true, the given node itself is ignored, but locking
+	starts with the parent node of the given node (\a writeLock applies to the
+	parent node then).
+
+	If the method fails, none of the nodes is locked.
+
+	The volume lock must not be held.
+*/
+status_t
+FUSEVolume::_LockNodeChain(FUSENode* node, bool parent, bool writeLock)
+{
+	AutoLocker<Locker> locker(fLock);
+
+	if (parent && node != NULL)
+		node = node->Parent();
+
+	if (node == NULL)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	FUSENode* originalNode = node;
+
+	status_t error = B_OK;
+
+	do {
+		// increment the ref count first
+		node->refCount++;
+
+		// lock the node
+		if (!fLockManager.TryGenericLock(node == originalNode && writeLock,
+				node)) {
+			// node is locked -- we need to unlock the volume and wait for
+			// the lock
+			locker.Unlock();
+			error = fLockManager.GenericLock(node == originalNode && writeLock,
+				node);
+			locker.Lock();
+
+			if (error != B_OK)
+				break;
+		}
+
+		// get the parent node
+		FUSENode* parent = node->Parent();
+		if (parent == node)
+			break;
+		node = parent;
+	} while (node != NULL);
+
+	// Fail, if we couldn't lock all nodes up to the root.
+	if (error == B_OK && node == NULL)
+		error = B_ENTRY_NOT_FOUND;
+
+	if (error != B_OK) {
+		// locking failed -- unlock and release the references of all
+		// nodes
+		FUSENode* stopNode = node;
+		node = originalNode;
+		while (node != stopNode) {
+			fLockManager.GenericUnlock(
+				node == originalNode && writeLock, node);
+			FUSENode* parent = node->Parent();
+			_PutNode(node);
+			node = parent;
+		}
+
+		if (stopNode != NULL)
+			_PutNode(stopNode);
+		RETURN_ERROR(error);
+	}
+
+	return B_OK;
+}
+
+
+void
+FUSEVolume::_UnlockNodeChain(FUSENode* node, bool parent, bool writeLock)
+{
+	AutoLocker<Locker> locker(fLock);
+
+	if (parent && node != NULL)
+		node = node->Parent();
+
+	FUSENode* originalNode = node;
+
+	while (node != NULL) {
+		FUSENode* parent = node->Parent();
+
+		fLockManager.GenericUnlock(node == originalNode && writeLock, node);
+		_PutNode(node);
+
+		if (parent == node)
+			break;
+		node = parent;
 	}
 }
 

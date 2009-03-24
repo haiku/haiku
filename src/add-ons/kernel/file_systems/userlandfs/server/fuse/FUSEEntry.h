@@ -7,6 +7,8 @@
 
 #include <new>
 
+#include <RWLockManager.h>
+
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -75,7 +77,7 @@ struct FUSEEntry : public HashTableLink<FUSEEntry>,
 typedef DoublyLinkedList<FUSEEntry> FUSEEntryList;
 
 
-struct FUSENode : public HashTableLink<FUSENode> {
+struct FUSENode : RWLockable, HashTableLink<FUSENode> {
 	ino_t			id;
 	FUSEEntryList	entries;
 	int				type;
@@ -87,6 +89,12 @@ struct FUSENode : public HashTableLink<FUSENode> {
 		type(type),
 		refCount(1)
 	{
+	}
+
+	FUSENode* Parent() const
+	{
+		FUSEEntry* entry = entries.Head();
+		return entry != NULL ? entry->parent : NULL;
 	}
 };
 
