@@ -35,9 +35,10 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 
 	fClass = new BStringView("class", "- / -");
 
-	fHCIVersionProperties = new BStringView("version", "");
+	fHCIVersionProperties = new BStringView("hci", "");
 	fLMPVersionProperties = new BStringView("lmp", "");
 	fManufacturerProperties = new BStringView("manufacturer", "");
+	fBuffersProperties = new BStringView("buffers", "");
 
 	fIcon = new BitmapView(new BBitmap(BRect(0, 0, 64 - 1, 64 - 1), B_RGBA32));
 	
@@ -61,7 +62,9 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 						.AddGlue()
 						.Add(fLMPVersionProperties)
 						.AddGlue()
-						.Add(fManufacturerProperties)												
+						.Add(fManufacturerProperties)
+						.AddGlue()
+						.Add(fBuffersProperties)
 						.SetInsets(5, 25, 25, 25)
 					)
 				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10)
@@ -119,6 +122,19 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		if (bDevice->GetProperty("manufacturer", &value) == B_OK)		
 			str << "Manufacturer: " <<	GetManufacturer(value);
 		fManufacturerProperties->SetText(str.String());
+
+		str = "";
+		if (bDevice->GetProperty("acl_mtu", &value) == B_OK)		
+			str << "ACL mtu: " << value;
+		if (bDevice->GetProperty("acl_max_pkt", &value) == B_OK)		
+			str << " packets: " << value;
+		if (bDevice->GetProperty("sco_mtu", &value) == B_OK)		
+			str << " SCO mtu: " << value;
+		if (bDevice->GetProperty("sco_max_pkt", &value) == B_OK)		
+			str << " packets: " << value;
+			
+		fBuffersProperties->SetText(str.String());
+
 		
 
 	}

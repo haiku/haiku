@@ -121,7 +121,10 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 
 	if (fLocalDevice != NULL) {	
 		fMessage->SetText("Check that the bluetooth capabilities of your remote device"
-							" are activated. Press Inquiry to start scanning");
+							" are activated. Press Inquiry to start scanning. The needed time"
+							" for the retrieval of the names is unknown, although should not"
+							" take more than 3 seconds per device. Afterwards you will be able"
+							" to add them to your main list, where you will be able to pair with them");
 		fInquiryButton->SetEnabled(true);
 		fDiscoveryAgent = fLocalDevice->GetDiscoveryAgent();
 		fDiscoveryListener = new PanelDiscoveryListener(this);
