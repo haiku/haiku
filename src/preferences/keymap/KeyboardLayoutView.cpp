@@ -107,12 +107,24 @@ KeyboardLayoutView::KeyUp(const char* bytes, int32 numBytes)
 void
 KeyboardLayoutView::MouseDown(BPoint point)
 {
+	fClickPoint = point;
+
+	Key* key = _KeyAt(point);
+	if (key != NULL) {
+		fKeyState[key->code / 8] |= (1 << (7 - (key->code & 7)));
+		_InvalidateKey(key->code);
+	}
 }
 
 
 void
 KeyboardLayoutView::MouseUp(BPoint point)
 {
+	Key* key = _KeyAt(fClickPoint);
+	if (key != NULL) {
+		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
+		_InvalidateKey(key->code);
+	}
 }
 
 
@@ -126,32 +138,51 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
-	rgb_color brightColor = {230, 230, 230};
-	rgb_color darkColor = {200, 200, 200};
+	static const rgb_color kBrightColor = {230, 230, 230};
+	static const rgb_color kDarkColor = {200, 200, 200};
+	static const rgb_color kSecondDeadKeyColor = {130, 180, 230};
+	static const rgb_color kDeadKeyColor = {240, 240, 150};
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 
 		BRect rect = _FrameFor(key);
-		rgb_color base = key->dark ? darkColor : brightColor;
+		rgb_color base = key->dark ? kDarkColor : kBrightColor;
 		bool pressed = _IsKeyPressed(key->code);
-		bool special = false;
+		key_kind keyKind = kNormalKey;
+		int32 deadKey = 0;
+		bool secondDeadKey;
 
 		char text[32];
 		if (fKeymap != NULL) {
-			_GetKeyLabel(key, text, sizeof(text), special);
+			_GetKeyLabel(key, text, sizeof(text), keyKind);
+			deadKey = fKeymap->IsDeadKey(key->code, fModifiers);
+			secondDeadKey = fKeymap->IsDeadSecondKey(key->code, fModifiers,
+				fDeadKey);
 		} else {
 			// Show the key code if there is no keymap
 			snprintf(text, sizeof(text), "%02lx", key->code);
 		}
 
-		if (special) {
-			fSpecialFont.SetSize(_FontSizeFor(rect, text) * 0.8);
-			SetFont(&fSpecialFont);
-		} else {
-			fFont.SetSize(_FontSizeFor(rect, text));
-			SetFont(&fFont);
+		switch (keyKind) {
+			case kNormalKey:
+				fFont.SetSize(_FontSizeFor(rect, text));
+				SetFont(&fFont);
+				break;
+			case kSpecialKey:
+				fSpecialFont.SetSize(_FontSizeFor(rect, text) * 0.7);
+				SetFont(&fSpecialFont);
+				break;
+			case kSymbolKey:
+				fSpecialFont.SetSize(_FontSizeFor(rect, text) * 1.6);
+				SetFont(&fSpecialFont);
+				break;
 		}
+
+		if (secondDeadKey)
+			base = kSecondDeadKeyColor;
+		else if (deadKey > 0)
+			base = kDeadKeyColor;
 
 		if (key->shape == kRectangleKeyShape) {
 			be_control_look->DrawButtonFrame(this, rect, updateRect, base,
@@ -168,16 +199,16 @@ KeyboardLayoutView::Draw(BRect updateRect)
 			// TODO: make better!
 			rect.bottom -= 20;
 			be_control_look->DrawButtonBackground(this, rect, updateRect, 
-				key->dark ? darkColor : brightColor, 0,
-				BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER 
+				base, 0, BControlLook::B_LEFT_BORDER
+					| BControlLook::B_RIGHT_BORDER 
 					| BControlLook::B_TOP_BORDER);
 
 			rect = _FrameFor(key);
 			rect.top += 20;
 			rect.left += 10;
 			be_control_look->DrawButtonBackground(this, rect, updateRect, 
-				key->dark ? darkColor : brightColor, 0,
-				BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
+				base, 0, BControlLook::B_LEFT_BORDER
+					| BControlLook::B_RIGHT_BORDER
 					| BControlLook::B_BOTTOM_BORDER);
 		}
 	}
@@ -206,7 +237,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 
 
 const char*
-KeyboardLayoutView::_ModifierKeyLabel(const key_map& map, uint32 code)
+KeyboardLayoutView::_SpecialKeyLabel(const key_map& map, uint32 code)
 {
 	if (code == map.caps_key)
 		return "CAPS LOCK";
@@ -224,38 +255,27 @@ KeyboardLayoutView::_ModifierKeyLabel(const key_map& map, uint32 code)
 		return "OPTION";
 	if (code == map.menu_key)
 		return "MENU";
+	if (code == B_PRINT_KEY)
+		return "PRINT";
+	if (code == B_PAUSE_KEY)
+		return "PAUSE";
 
 	return NULL;
 }
 
 
 const char*
-KeyboardLayoutView::_SpecialKeyLabel(const char* bytes, size_t numBytes)
+KeyboardLayoutView::_SpecialMappedKeySymbol(const char* bytes, size_t numBytes)
 {
 	if (numBytes != 1)
 		return NULL;
 
-	if (bytes[0] == B_ESCAPE)
-		return "ESC";
 	if (bytes[0] == B_TAB)
 		return "\xe2\x86\xb9";
 	if (bytes[0] == B_ENTER)
 		return "\xe2\x86\xb5";
 	if (bytes[0] == B_BACKSPACE)
 		return "back";//\xe2\x86\x92";
-
-	if (bytes[0] == B_INSERT)
-		return "INS";
-	if (bytes[0] == B_DELETE)
-		return "DEL";
-	if (bytes[0] == B_HOME)
-		return "HOME";
-	if (bytes[0] == B_END)
-		return "END";
-	if (bytes[0] == B_PAGE_UP)
-		return "PAGE \xe2\x86\x91";
-	if (bytes[0] == B_PAGE_DOWN)
-		return "PAGE \xe2\x86\x93";
 
 	if (bytes[0] == B_UP_ARROW)
 		return "\xe2\x86\x91";
@@ -270,15 +290,39 @@ KeyboardLayoutView::_SpecialKeyLabel(const char* bytes, size_t numBytes)
 }
 
 
-bool
-KeyboardLayoutView::_FunctionKeyLabel(const char* bytes, size_t numBytes,
-	char* text, size_t textSize)
+const char*
+KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes)
 {
-	if (bytes[0] != B_FUNCTION_KEY)
-		return false;
+	if (numBytes != 1)
+		return NULL;
 
-	if (bytes[1] >= B_F1_KEY && bytes[1] <= B_F12_KEY) {
-		snprintf(text, textSize, "F%d", bytes[1] + 1 - B_F1_KEY);
+	if (bytes[0] == B_ESCAPE)
+		return "ESC";
+	if (bytes[0] == B_BACKSPACE)
+		return "BACKSPACE";
+
+	if (bytes[0] == B_INSERT)
+		return "INS";
+	if (bytes[0] == B_DELETE)
+		return "DEL";
+	if (bytes[0] == B_HOME)
+		return "HOME";
+	if (bytes[0] == B_END)
+		return "END";
+	if (bytes[0] == B_PAGE_UP)
+		return "PAGE \xe2\x86\x91";
+	if (bytes[0] == B_PAGE_DOWN)
+		return "PAGE \xe2\x86\x93";
+
+	return NULL;
+}
+
+
+bool
+KeyboardLayoutView::_FunctionKeyLabel(uint32 code, char* text, size_t textSize)
+{
+	if (code >= B_F1_KEY && code <= B_F12_KEY) {
+		snprintf(text, textSize, "F%ld", code + 1 - B_F1_KEY);
 		return true;
 	}
 
@@ -288,16 +332,21 @@ KeyboardLayoutView::_FunctionKeyLabel(const char* bytes, size_t numBytes,
 
 void
 KeyboardLayoutView::_GetKeyLabel(Key* key, char* text, size_t textSize,
-	bool& specialKey)
+	key_kind& keyKind)
 {
 	const key_map& map = fKeymap->Map();
-	specialKey = false;
+	keyKind = kNormalKey;
 	text[0] = '\0';
 
-	const char* modifier = _ModifierKeyLabel(map, key->code);
-	if (modifier != NULL) {
-		strlcpy(text, modifier, textSize);
-		specialKey = true;
+	const char* special = _SpecialKeyLabel(map, key->code);
+	if (special != NULL) {
+		strlcpy(text, special, textSize);
+		keyKind = kSpecialKey;
+		return;
+	}
+
+	if (_FunctionKeyLabel(key->code, text, textSize)) {
+		keyKind = kSpecialKey;
 		return;
 	}
 
@@ -306,14 +355,17 @@ KeyboardLayoutView::_GetKeyLabel(Key* key, char* text, size_t textSize,
 	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &bytes,
 		&numBytes);
 	if (bytes != NULL) {
-		const char* special = _SpecialKeyLabel(bytes, numBytes);
+		special = _SpecialMappedKeyLabel(bytes, numBytes);
 		if (special != NULL) {
 			strlcpy(text, special, textSize);
-			specialKey = true;
+			keyKind = kSpecialKey;
 			return;
 		}
-		if (_FunctionKeyLabel(bytes, numBytes, text, textSize)) {
-			specialKey = true;
+
+		special = _SpecialMappedKeySymbol(bytes, numBytes);
+		if (special != NULL) {
+			strlcpy(text, special, textSize);
+			keyKind = kSymbolKey;
 			return;
 		}
 
@@ -341,7 +393,7 @@ Key*
 KeyboardLayoutView::_KeyForCode(int32 code)
 {
 	// TODO: have a lookup array
-	
+
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 		if (key->code == code)
@@ -366,16 +418,36 @@ KeyboardLayoutView::_KeyChanged(BMessage* message)
 {
 	const uint8* state;
 	ssize_t size;
+	int32 key;
 	if (message->FindData("states", B_UINT8_TYPE, (const void**)&state, &size)
-			!= B_OK)
+			!= B_OK
+		|| message->FindInt32("key", &key) != B_OK)
 		return;
 
 	// Update key state, and invalidate change keys
+
+	bool checkSingle = true;
+
+	if (message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN) {
+		int32 deadKey = fKeymap->IsDeadKey(key, fModifiers);
+		if (fDeadKey != deadKey) {
+			Invalidate();
+			fDeadKey = deadKey;
+			checkSingle = false;
+		} else if (fDeadKey != 0) {
+			Invalidate();
+			fDeadKey = 0;
+			checkSingle = false;
+		}
+	}
 
 	for (int32 i = 0; i < 16; i++) {
 		if (fKeyState[i] != state[i]) {
 			uint8 diff = fKeyState[i] ^ state[i];
 			fKeyState[i] = state[i];
+
+			if (!checkSingle)
+				continue;
 
 			for (int32 j = 7; diff != 0; j--, diff >>= 1) {
 				if (diff & 1) {
@@ -384,6 +456,31 @@ KeyboardLayoutView::_KeyChanged(BMessage* message)
 			}
 		}
 	}
+}
+
+
+Key*
+KeyboardLayoutView::_KeyAt(BPoint point)
+{
+	// Find key candidate
+
+	BPoint keyPoint = point;
+	keyPoint -= fOffset;
+	keyPoint.x /= fFactor;
+	keyPoint.y /= fFactor;
+
+	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
+		Key* key = fLayout->KeyAt(i);
+		if (key->frame.Contains(keyPoint)) {
+			BRect frame = _FrameFor(key);
+			if (frame.Contains(point))
+				return key;
+
+			return NULL;
+		}
+	}
+
+	return NULL;
 }
 
 

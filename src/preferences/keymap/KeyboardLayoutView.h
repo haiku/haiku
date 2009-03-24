@@ -37,34 +37,45 @@ protected:
 	virtual	void			MessageReceived(BMessage* message);
 
 private:
-			const char*		_ModifierKeyLabel(const key_map& map, uint32 code);
-			const char*		_SpecialKeyLabel(const char* bytes,
+	enum key_kind {
+		kNormalKey,
+		kSpecialKey,
+		kSymbolKey
+	};
+
+			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
+			const char*		_SpecialMappedKeySymbol(const char* bytes,
 								size_t numBytes);
-			bool			_FunctionKeyLabel(const char* bytes,
-								size_t numBytes, char* text, size_t textSize);
+			const char*		_SpecialMappedKeyLabel(const char* bytes,
+								size_t numBytes);
+			bool			_FunctionKeyLabel(uint32 code, char* text,
+								size_t textSize);
 			void			_GetKeyLabel(Key* key, char* text, size_t textSize,
-								bool& specialKey);
+								key_kind& keyKind);
 			bool			_IsKeyPressed(int32 code);
 			Key*			_KeyForCode(int32 code);
 			void			_InvalidateKey(int32 code);
 			void			_KeyChanged(BMessage* message);
+			Key*			_KeyAt(BPoint point);
 			BRect			_FrameFor(Key* key);
 			float			_FontSizeFor(BRect frame, const char* text);
 
-	KeyboardLayout*			fLayout;
-	Keymap*					fKeymap;
+			KeyboardLayout*	fLayout;
+			Keymap*			fKeymap;
 
-	uint8					fKeyState[16];
-	int32					fModifiers;
-	int32					fDeadKey;
+			uint8			fKeyState[16];
+			int32			fModifiers;
+			int32			fDeadKey;
 
-	BFont					fFont;
-	BFont					fSpecialFont;
-	float					fFontHeight;
-	float					fMaxFontSize;
-	BPoint					fOffset;
-	float					fFactor;
-	float					fGap;
+			BPoint			fClickPoint;
+
+			BFont			fFont;
+			BFont			fSpecialFont;
+			float			fFontHeight;
+			float			fMaxFontSize;
+			BPoint			fOffset;
+			float			fFactor;
+			float			fGap;
 };
 
 #endif	// KEYBOARD_LAYOUT_VIEW_H
