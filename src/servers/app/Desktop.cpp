@@ -145,13 +145,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 	if (message->what == B_KEY_DOWN
 		&& message->FindInt32("key", &key) == B_OK
 		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
-		// TODO: for some reason, one of the above is failing when pressing
-		//	a modifier key at least with the old BMessage implementation
-		//	(a message dump shows all entries, though)
-		//	Try again with BMessage4!
-
 		// Check for safe video mode (F12 + l-cmd + l-ctrl + l-shift)
-		if (key == 0x0d
+		if (key == B_F12_KEY
 			&& (modifiers & (B_LEFT_COMMAND_KEY
 					| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0) {
 			// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN.
@@ -159,8 +154,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			return B_SKIP_MESSAGE;
 		}
 
-		if (key > 0x01 && key < 0x0e) {
-			// workspace change, F1-F12
+		if (key >= B_F1_KEY && key <= B_F12_KEY) {
+			// workspace change
 
 #if !TEST_MODE
 			if (modifiers & B_COMMAND_KEY)
@@ -174,7 +169,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 				return B_SKIP_MESSAGE;
 			}
 		} if (key == 0x11 && (modifiers & B_COMMAND_KEY) != 0) {
-			// switch to previous workspace
+			// switch to previous workspace (command + `)
 			fDesktop->SetWorkspaceAsync(-1);
 		}
 	}
