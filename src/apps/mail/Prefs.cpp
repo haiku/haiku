@@ -106,33 +106,55 @@ extern BPoint	prefs_window;
 #define  ATTRIBUTE_ON_TEXT MDR_DIALECT_CHOICE ("Include BeOS Attributes in Attachments", "BeOSの属性を付ける")
 #define  ATTRIBUTE_OFF_TEXT MDR_DIALECT_CHOICE ("No BeOS Attributes, just Plain Data", "BeOSの属性を付けない（データのみ）")
 
-//====================================================================
+//#pragma mark -
 
 
-TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
-	bool *attachAttributes, bool *cquotes, uint32 *account, int32 *replyTo,
-	char **preamble, char **sig, uint32 *encoding, bool *warnUnencodable,
-	bool *spellCheckStartOn, uint8 *buttonBar)
-	:	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences","Mailの設定"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
+	bool* attachAttributes, bool* cquotes, uint32* account, int32* replyTo,
+	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
+	bool* spellCheckStartOn, uint8* buttonBar)
+	:
+	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences", "Mailの設定"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+
+	fNewWrap(wrap),
+	fWrap(*fNewWrap),
+
+	fNewAttachAttributes(attachAttributes),
+	fAttachAttributes(*fNewAttachAttributes),
+
+	fNewButtonBar(buttonBar),
+	fButtonBar(*fNewButtonBar),
+
+	fNewColoredQuotes(cquotes),
+	fColoredQuotes(*fNewColoredQuotes),
+
+	fNewAccount(account),
+	fAccount(*fNewAccount),
+
+	fNewReplyTo(replyTo),
+	fReplyTo(*fNewReplyTo),
+
+	fNewPreamble(preamble),
+
+	fNewSignature(sig),
+	fSignature((char*)malloc(strlen(*fNewSignature) + 1)),
+
+	fNewFont(font),
+	fFont(*fNewFont),
+
+	fNewEncoding(encoding),
+	fEncoding(*fNewEncoding),
+
+	fNewWarnUnencodable(warnUnencodable),
+	fWarnUnencodable(*fNewWarnUnencodable),
+
+	fNewSpellCheckStartOn(spellCheckStartOn),
+	fSpellCheckStartOn(*fNewSpellCheckStartOn)
 {
-	BMenuField *menu;
-
-	fNewFont = font;			fFont = *fNewFont;
-	fNewWrap = wrap;			fWrap = *fNewWrap;
-	fNewAttachAttributes = attachAttributes;	fAttachAttributes = *fNewAttachAttributes;
-	fNewColoredQuotes = cquotes;	fColoredQuotes = *fNewColoredQuotes;
-	fNewAccount = account;		fAccount = *fNewAccount;
-	fNewReplyTo = replyTo;		fReplyTo = *fNewReplyTo;
-	fNewEncoding = encoding;	fEncoding = *fNewEncoding;
-	fNewWarnUnencodable = warnUnencodable;	fWarnUnencodable = *fNewWarnUnencodable;
-	fNewSpellCheckStartOn = spellCheckStartOn;	fSpellCheckStartOn = *fNewSpellCheckStartOn;
-	fNewButtonBar = buttonBar;	fButtonBar = *fNewButtonBar;
-
-	fNewPreamble = preamble;
-
-	fNewSignature = sig;
-	fSignature = (char *)malloc(strlen(*fNewSignature) + 1);
 	strcpy(fSignature, *fNewSignature);
+
+	BMenuField* menu;
 
 	BRect r = Bounds();
 	BView *view = new BView(r, NULL, B_FOLLOW_ALL, B_FRAME_EVENTS);
@@ -142,19 +164,22 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	// determine font height
 	font_height fontHeight;
 	view->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 6;
-	int32 labelWidth = (int32)view->StringWidth(SPELL_CHECK_START_ON_TEXT) + SEPARATOR_MARGIN;
+	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 6;
+	int32 labelWidth = (int32)view->StringWidth(SPELL_CHECK_START_ON_TEXT)
+		+ SEPARATOR_MARGIN;
 
 	// group boxes
 
 	r.Set(8,4,Bounds().right - 8,4 + 6 * (height + ITEM_SPACE));
-	BBox *interfaceBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	interfaceBox->SetLabel(MDR_DIALECT_CHOICE ("User Interface","ユーザーインターフェース"));
+	BBox *interfaceBox = new BBox(r , NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	interfaceBox->SetLabel(MDR_DIALECT_CHOICE ("User Interface",
+		"ユーザーインターフェース"));
 	view->AddChild(interfaceBox);
 
 	r.top = r.bottom + 8;  r.bottom = r.top + 9 * (height + ITEM_SPACE);
 	BBox *mailBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	mailBox->SetLabel(MDR_DIALECT_CHOICE ("Mailing","メール関係"));
+	mailBox->SetLabel(MDR_DIALECT_CHOICE ("Mailing", "メール関係"));
 	view->AddChild(mailBox);
 
 	// revert, ok & cancel
@@ -166,51 +191,56 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	view->AddChild(button);
 
 	r.OffsetBy(-(OK_BUTTON_X2 - OK_BUTTON_X1 + 10), 0);
-	button = new BButton(r, "cancel", CANCEL_BUTTON_TEXT, new BMessage(P_CANCEL));
+	button = new BButton(r, "cancel", CANCEL_BUTTON_TEXT,
+		new BMessage(P_CANCEL));
 	view->AddChild(button);
 
 	r.left = REVERT_BUTTON_X1;  r.right = REVERT_BUTTON_X2;
-	fRevert = new BButton(r, "revert", REVERT_BUTTON_TEXT, new BMessage(P_REVERT));
+	fRevert = new BButton(r, "revert", REVERT_BUTTON_TEXT,
+		new BMessage(P_REVERT));
 	fRevert->SetEnabled(false);
 	view->AddChild(fRevert);
 
 	// User Interface
 
 	r = interfaceBox->Bounds();
-	r.left += 8;  r.right -= 8;  r.top = height;  r.bottom = r.top + height - 3;
-	fButtonBarMenu = BuildButtonBarMenu(*buttonBar);
-	menu = new BMenuField(r, "bar", BUTTONBAR_TEXT, fButtonBarMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.left += 8; 
+	r.right -= 8; 
+	r.top = height; 
+	r.bottom = r.top + height - 3;
+	fButtonBarMenu = _BuildButtonBarMenu(*buttonBar);
+	menu = new BMenuField(r, "bar", BUTTONBAR_TEXT, fButtonBarMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);	
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fFontMenu = BuildFontMenu(font);
-	menu = new BMenuField(r, "font", FONT_TEXT, fFontMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fFontMenu = _BuildFontMenu(font);
+	menu = new BMenuField(r, "font", FONT_TEXT, fFontMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fSizeMenu = BuildSizeMenu(font);
-	menu = new BMenuField(r, "size", SIZE_TEXT, fSizeMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fSizeMenu = _BuildSizeMenu(font);
+	menu = new BMenuField(r, "size", SIZE_TEXT, fSizeMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fColoredQuotesMenu = BuildColoredQuotesMenu(fColoredQuotes);
-	menu = new BMenuField(r, "cquotes", QUOTES_TEXT, fColoredQuotesMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fColoredQuotesMenu = _BuildColoredQuotesMenu(fColoredQuotes);
+	menu = new BMenuField(r, "cquotes", QUOTES_TEXT, fColoredQuotesMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fSpellCheckStartOnMenu = BuildSpellCheckStartOnMenu(fSpellCheckStartOn);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fSpellCheckStartOnMenu = _BuildSpellCheckStartOnMenu(fSpellCheckStartOn);
 	menu = new BMenuField(r, "spellCheckStartOn", SPELL_CHECK_START_ON_TEXT,
 		fSpellCheckStartOnMenu, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
@@ -222,57 +252,65 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	// Mail Accounts
 
 	r = mailBox->Bounds();
-	r.left += 8;  r.right -= 8;  r.top = height;  r.bottom = r.top + height - 3;
-	fAccountMenu = BuildAccountMenu(fAccount);
-	menu = new BMenuField(r, "account", ACCOUNT_TEXT, fAccountMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.left += 8; 
+	r.right -= 8;
+	r.top = height;
+	r.bottom = r.top + height - 3;
+	fAccountMenu = _BuildAccountMenu(fAccount);
+	menu = new BMenuField(r, "account", ACCOUNT_TEXT, fAccountMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fReplyToMenu = BuildReplyToMenu(fReplyTo);
-	menu = new BMenuField(r, "replyTo", REPLYTO_TEXT, fReplyToMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fReplyToMenu = _BuildReplyToMenu(fReplyTo);
+	menu = new BMenuField(r, "replyTo", REPLYTO_TEXT, fReplyToMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 
 	// Mail Contents
 
-	r.OffsetBy(0, height + ITEM_SPACE);		r.right -= 25;
-	fReplyPreamble = new BTextControl(r, "replytext", REPLY_PREAMBLE_TEXT, *preamble,
-		new BMessage(P_REPLY_PREAMBLE), B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	r.right -= 25;
+	fReplyPreamble = new BTextControl(r, "replytext", REPLY_PREAMBLE_TEXT,
+		*preamble, new BMessage(P_REPLY_PREAMBLE), B_FOLLOW_ALL,
+		B_WILL_DRAW | B_NAVIGABLE);
 	fReplyPreamble->SetDivider(labelWidth);
 	fReplyPreamble->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	mailBox->AddChild(fReplyPreamble);
 
 	BRect popRect = r;
-	popRect.left = r.right + 6;  r.right += 25;  popRect.right = r.right;
-	fReplyPreambleMenu = BuildReplyPreambleMenu();
-	menu = new BMenuField(popRect, "replyPreamble", B_EMPTY_STRING, fReplyPreambleMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	popRect.left = r.right + 6;
+	r.right += 25;
+	popRect.right = r.right;
+	fReplyPreambleMenu = _BuildReplyPreambleMenu();
+	menu = new BMenuField(popRect, "replyPreamble", B_EMPTY_STRING,
+		fReplyPreambleMenu, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(0);
 	mailBox->AddChild(menu);
 	
 	r.OffsetBy(0, height + ITEM_SPACE);
-	fSignatureMenu = BuildSignatureMenu(*sig);
-	menu = new BMenuField(r, "sig", SIGNATURE_TEXT, fSignatureMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	fSignatureMenu = _BuildSignatureMenu(*sig);
+	menu = new BMenuField(r, "sig", SIGNATURE_TEXT, fSignatureMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fEncodingMenu = BuildEncodingMenu(fEncoding);
-	menu = new BMenuField(r, "enc", ENCODING_TEXT, fEncodingMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fEncodingMenu = _BuildEncodingMenu(fEncoding);
+	menu = new BMenuField(r, "enc", ENCODING_TEXT, fEncodingMenu,
+		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fWarnUnencodableMenu = BuildWarnUnencodableMenu(fWarnUnencodable);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fWarnUnencodableMenu = _BuildWarnUnencodableMenu(fWarnUnencodable);
 	menu = new BMenuField(r, "warnUnencodable", WARN_UNENCODABLE_TEXT,
 		fWarnUnencodableMenu, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
@@ -280,18 +318,19 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fWrapMenu = BuildWrapMenu(*wrap);
-	menu = new BMenuField(r, "wrap", WRAP_TEXT, fWrapMenu,B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fWrapMenu = _BuildWrapMenu(*wrap);
+	menu = new BMenuField(r, "wrap", WRAP_TEXT, fWrapMenu, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
 	
-	r.OffsetBy(0,height + ITEM_SPACE);
-	fAttachAttributesMenu = BuildAttachAttributesMenu(*attachAttributes);
-	menu = new BMenuField(r, "attachAttributes", ATTACH_ATTRIBUTES_TEXT, fAttachAttributesMenu, B_FOLLOW_ALL,
-				B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fAttachAttributesMenu = _BuildAttachAttributesMenu(*attachAttributes);
+	menu = new BMenuField(r, "attachAttributes", ATTACH_ATTRIBUTES_TEXT,
+		fAttachAttributesMenu, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
@@ -311,29 +350,28 @@ TPrefsWindow::~TPrefsWindow()
 
 
 void
-TPrefsWindow::MessageReceived(BMessage *msg)
+TPrefsWindow::MessageReceived(BMessage* msg)
 {
-	bool		changed;
-	bool		revert = true;
-	const char	*family;
-	const char	*signature;
-	const char	*style;
-	char		label[256];
-	int32		new_size;
-	int32		old_size;
-	font_family	new_family;
-	font_family	old_family;
-	font_style	new_style;
-	font_style	old_style;
-	BMenuItem	*item;
-	BMessage	message;
+	bool revert = true;
+	const char* family;
+	const char* signature;
+	const char* style;
+	char label[256];
+	int32 new_size;
+	int32 old_size;
+	font_family new_family;
+	font_family old_family;
+	font_style new_style;
+	font_style old_style;
+	BMenuItem* item;
+	BMessage message;
 
 	switch (msg->what) {
 		case P_OK:
-			if (strcmp(fReplyPreamble->Text(), *fNewPreamble))
-			{
+			if (strcmp(fReplyPreamble->Text(), *fNewPreamble)) {
 				free(*fNewPreamble);
-				*fNewPreamble = (char *)malloc(strlen(fReplyPreamble->Text()) + 1);
+				*fNewPreamble
+					= (char *)malloc(strlen(fReplyPreamble->Text()) + 1);
 				strcpy(*fNewPreamble, fReplyPreamble->Text());
 			}
 			be_app->PostMessage(PREFS_CHANGED);
@@ -346,11 +384,10 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 		case P_REVERT:
 			fFont.GetFamilyAndStyle(&old_family, &old_style);
 			fNewFont->GetFamilyAndStyle(&new_family, &new_style);
-			old_size = (int32) fFont.Size();
-			new_size = (int32) fNewFont->Size();
+			old_size = (int32)fFont.Size();
+			new_size = (int32)fNewFont->Size();
 			if (strcmp(old_family, new_family) || strcmp(old_style, new_style)
-				|| old_size != new_size)
-			{
+				|| old_size != new_size) {
 				fNewFont->SetFamilyAndStyle(old_family, old_style);
 				if (revert) {
 					sprintf(label, "%s %s", old_family, old_style);
@@ -374,7 +411,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 
 			if (strcmp(fSignature, *fNewSignature)) {
 				free(*fNewSignature);
-				*fNewSignature = (char *)malloc(strlen(fSignature) + 1);
+				*fNewSignature = (char*)malloc(strlen(fSignature) + 1);
 				strcpy(*fNewSignature, fSignature);
 			}
 
@@ -386,10 +423,14 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			be_app->PostMessage(PREFS_CHANGED);
 
 			if (revert) {
-				for (int i = fAccountMenu->CountItems();i-- > 0;) {
-					if (BMenuItem *item = fAccountMenu->ItemAt(i))
-						if (item->Message()->FindInt32("id") == *(int32 *)&fAccount)
-							item->SetMarked(true);
+				for (int i = fAccountMenu->CountItems(); --i > 0;) {
+					BMenuItem *item = fAccountMenu->ItemAt(i);
+					BMessage* itemMessage = item->Message();
+					if (itemMessage != NULL
+						&& itemMessage->FindInt32("id") == *(int32 *)&fAccount) {
+						item->SetMarked(true);
+						break;
+					}
 				}
 
 				strcpy(label,fReplyTo == ACCOUNT_USE_DEFAULT
@@ -419,12 +460,12 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 
 				uint32 index = 0;
 				while ((item = fEncodingMenu->ItemAt(index++)) != NULL) {
-					BMessage * message = item->Message();
-					if (message == NULL)
+					BMessage* itemMessage = item->Message();
+					if (itemMessage == NULL)
 						continue;
 
 					int32 encoding;
-					if (message->FindInt32("encoding", &encoding) == B_OK
+					if (itemMessage->FindInt32("encoding", &encoding) == B_OK
 						&& (uint32)encoding == *fNewEncoding) {
 						item->SetMarked(true);
 						break;
@@ -454,7 +495,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			}
 
 			/* grab this little tidbit so we can set the correct Family */
-			if(msg->FindInt32("parent_index", &family_menu_index) == B_OK)
+			if (msg->FindInt32("parent_index", &family_menu_index) == B_OK)
 				fFontMenu->ItemAt(family_menu_index)->SetMarked(true);
 			break;
 
@@ -478,7 +519,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			msg->FindBool("cquotes", fNewColoredQuotes);
 			break;
 		case P_ACCOUNT:
-			msg->FindInt32("id",(int32 *)fNewAccount);
+			msg->FindInt32("id",(int32*)fNewAccount);
 			break;
 		case P_REPLYTO:
 			msg->FindInt32("replyTo", fNewReplyTo);
@@ -530,7 +571,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 	fNewFont->GetFamilyAndStyle(&new_family, &new_style);
 	old_size = (int32) fFont.Size();
 	new_size = (int32) fNewFont->Size();
-	changed = old_size != new_size
+	bool changed = old_size != new_size
 		|| fWrap != *fNewWrap
 		|| fAttachAttributes != *fNewAttachAttributes
 		|| fColoredQuotes != *fNewColoredQuotes
@@ -548,8 +589,8 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildFontMenu(BFont *font)
+BPopUpMenu*
+TPrefsWindow::_BuildFontMenu(BFont* font)
 {
 	font_family	def_family;
 	font_style	def_style;
@@ -572,13 +613,16 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 			BMessage *msg = new BMessage(P_FONT);
 			msg->AddString("font", f_family);
 			msg->AddString("style", f_style);
-			/* we send this to make setting the Family easier when things change */
+			// we send this to make setting the Family easier when things
+			// change
 			msg->AddInt32("parent_index", family_menu_index);
 
 			BMenuItem *item = new BMenuItem(f_style, msg);
 			family_menu->AddItem(item);
-			if ((strcmp(def_family, f_family) == 0) && (strcmp(def_style, f_style) == 0))
+			if ((strcmp(def_family, f_family) == 0)
+				&& (strcmp(def_style, f_style) == 0)) {
 				item->SetMarked(true);
+			}
 
 			item->SetTarget(this);
 		}
@@ -599,23 +643,25 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildLevelMenu(int32 level)
+BPopUpMenu*
+TPrefsWindow::_BuildLevelMenu(int32 level)
 {
-	BMenuItem *item;
-	BMessage *msg;
-	BPopUpMenu *menu;
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu;
 
 	menu = new BPopUpMenu("");
 	msg = new BMessage(P_LEVEL);
 	msg->AddInt32("level", L_BEGINNER);
-	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Beginner","初心者"),msg));
+	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Beginner","初心者"),
+		msg));
 	if (level == L_BEGINNER)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_LEVEL);
 	msg->AddInt32("level", L_EXPERT);
-	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Expert","上級者"),msg));
+	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Expert","上級者"),
+		msg));
 	if (level == L_EXPERT)
 		item->SetMarked(true);
 
@@ -623,11 +669,11 @@ TPrefsWindow::BuildLevelMenu(int32 level)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildAccountMenu(uint32 account)
+BPopUpMenu*
+TPrefsWindow::_BuildAccountMenu(uint32 account)
 {
-	BPopUpMenu *menu = new BPopUpMenu("");
-	BMenuItem *item;
+	BPopUpMenu* menu = new BPopUpMenu("");
+	BMenuItem* item;
 
 	//menu->SetRadioMode(true);
 	BList chains;
@@ -637,9 +683,9 @@ TPrefsWindow::BuildAccountMenu(uint32 account)
 		return menu;
 	}
 
-	BMessage *msg;
+	BMessage* msg;
 	for (int32 i = 0; i < chains.CountItems(); i++) {
-		BMailChain *chain = (BMailChain *)chains.ItemAt(i);
+		BMailChain* chain = (BMailChain*)chains.ItemAt(i);
 		item = new BMenuItem(chain->Name(), msg = new BMessage(P_ACCOUNT));
 
 		msg->AddInt32("id",chain->ID());
@@ -654,19 +700,21 @@ TPrefsWindow::BuildAccountMenu(uint32 account)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildReplyToMenu(int32 account)
+BPopUpMenu*
+TPrefsWindow::_BuildReplyToMenu(int32 account)
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING);
+	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING);
 
-	BMenuItem *item;
-	BMessage *msg;
-	menu->AddItem(item = new BMenuItem(REPLYTO_USE_DEFAULT_TEXT, msg = new BMessage(P_REPLYTO)));
+	BMenuItem* item;
+	BMessage* msg;
+	menu->AddItem(item = new BMenuItem(REPLYTO_USE_DEFAULT_TEXT,
+		msg = new BMessage(P_REPLYTO)));
 	msg->AddInt32("replyTo", ACCOUNT_USE_DEFAULT);
 	if (account == ACCOUNT_USE_DEFAULT)
 		item->SetMarked(true);
 
-	menu->AddItem(item = new BMenuItem(REPLYTO_FROM_MAIL_TEXT, msg = new BMessage(P_REPLYTO)));
+	menu->AddItem(item = new BMenuItem(REPLYTO_FROM_MAIL_TEXT,
+		msg = new BMessage(P_REPLYTO)));
 	msg->AddInt32("replyTo", ACCOUNT_FROM_MAIL);
 	if (account == ACCOUNT_FROM_MAIL)
 		item->SetMarked(true);
@@ -675,8 +723,8 @@ TPrefsWindow::BuildReplyToMenu(int32 account)
 }
 
 
-BMenu *
-TPrefsWindow::BuildReplyPreambleMenu()
+BMenu*
+TPrefsWindow::_BuildReplyPreambleMenu()
 {
 	const char *substitutes[] = {
 /* To do: Not yet working, leave out for 2.0.0 beta 4:
@@ -693,33 +741,33 @@ TPrefsWindow::BuildReplyPreambleMenu()
 
 	BMenu *menu = new BMenu(B_EMPTY_STRING);
 
-	for (int32 i = 0; substitutes[i]; i++)
-	{
-		if (*substitutes[i] == '\0')
+	for (int32 i = 0; substitutes[i]; i++) {
+		if (*substitutes[i] == '\0') {
 			menu->AddSeparatorItem();
-		else
-			menu->AddItem(new BMenuItem(substitutes[i], new BMessage(P_REPLY_PREAMBLE)));
+		} else {
+			menu->AddItem(new BMenuItem(substitutes[i],
+				new BMessage(P_REPLY_PREAMBLE)));
+		}
 	}
 
 	return menu;
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildSignatureMenu(char *sig)
+BPopUpMenu*
+TPrefsWindow::_BuildSignatureMenu(char* sig)
 {
-	char			name[B_FILE_NAME_LENGTH];
-	BEntry			entry;
-	BFile			file;
-	BMenuItem		*item;
-	BMessage		*msg;
-	BPopUpMenu		*menu;
-	BQuery			query;
-	BVolume			vol;
-	BVolumeRoster	volume;
+	char name[B_FILE_NAME_LENGTH];
+	BEntry entry;
+	BFile file;
+	BMenuItem* item;
+	BMessage* msg;
+	BQuery query;
+	BVolume vol;
+	BVolumeRoster volume;
 
-	menu = new BPopUpMenu("");
-	
+	BPopUpMenu* menu = new BPopUpMenu("");
+
 	msg = new BMessage(P_SIG);
 	msg->AddString("signature", SIG_NONE);
 	menu->AddItem(item = new BMenuItem(SIG_NONE, msg));
@@ -753,16 +801,16 @@ TPrefsWindow::BuildSignatureMenu(char *sig)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildSizeMenu(BFont *font)
+BPopUpMenu*
+TPrefsWindow::_BuildSizeMenu(BFont* font)
 {
-	char		label[16];
-	uint32		loop;
-	int32		sizes[] = {9, 10, 11, 12, 14, 18, 24};
-	float		size;
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
+	char label[16];
+	uint32 loop;
+	int32 sizes[] = {9, 10, 11, 12, 14, 18, 24};
+	float size;
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu;
 
 	menu = new BPopUpMenu("");
 	size = font->Size();
@@ -778,12 +826,12 @@ TPrefsWindow::BuildSizeMenu(BFont *font)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildBoolMenu(uint32 what,const char *boolItem,bool isTrue)
+BPopUpMenu*
+TPrefsWindow::_BuildBoolMenu(uint32 what, const char* boolItem, bool isTrue)
 {
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu;
 
 	menu = new BPopUpMenu("");
 	msg = new BMessage(what);
@@ -802,19 +850,19 @@ TPrefsWindow::BuildBoolMenu(uint32 what,const char *boolItem,bool isTrue)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildWrapMenu(bool wrap)
+BPopUpMenu*
+TPrefsWindow::_BuildWrapMenu(bool wrap)
 {
-	return BuildBoolMenu(P_WRAP,"wrap",wrap);
+	return _BuildBoolMenu(P_WRAP, "wrap", wrap);
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildAttachAttributesMenu(bool attachAttributes)
+BPopUpMenu*
+TPrefsWindow::_BuildAttachAttributesMenu(bool attachAttributes)
 {
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu;
 
 	menu = new BPopUpMenu("");
 	msg = new BMessage(P_ATTACH_ATTRIBUTES);
@@ -833,19 +881,19 @@ TPrefsWindow::BuildAttachAttributesMenu(bool attachAttributes)
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildColoredQuotesMenu(bool quote)
+BPopUpMenu*
+TPrefsWindow::_BuildColoredQuotesMenu(bool quote)
 {
-	return BuildBoolMenu(P_COLORED_QUOTES,"cquotes",quote);
+	return _BuildBoolMenu(P_COLORED_QUOTES, "cquotes", quote);
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildEncodingMenu(uint32 encoding)
+BPopUpMenu*
+TPrefsWindow::_BuildEncodingMenu(uint32 encoding)
 {
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu;
 
 	menu = new BPopUpMenu("");
 
@@ -853,57 +901,53 @@ TPrefsWindow::BuildEncodingMenu(uint32 encoding)
 	BCharacterSet charset;
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
 		BString name(charset.GetPrintName());
-		const char * mime = charset.GetMIMEName();
-		if (mime) {
+		const char* mime = charset.GetMIMEName();
+		if (mime)
 			name << " (" << mime << ")";
-		}
 		msg = new BMessage(P_ENC);
 		uint32 convert_id;
-		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0)) {
+		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0))
 			convert_id = charset.GetConversionID();
-		} else {
+		else
 			convert_id = B_MAIL_UTF8_CONVERSION;
-		}
 		msg->AddInt32("encoding", convert_id);
 		menu->AddItem(item = new BMenuItem(name.String(), msg));
-		if (convert_id == encoding) {
+		if (convert_id == encoding)
 			item->SetMarked(true);
-		}
 	}
 
 	msg = new BMessage(P_ENC);
 	msg->AddInt32("encoding", B_MAIL_US_ASCII_CONVERSION);
 	menu->AddItem(item = new BMenuItem("US-ASCII", msg));
-	if (encoding == B_MAIL_US_ASCII_CONVERSION) {
+	if (encoding == B_MAIL_US_ASCII_CONVERSION)
 		item->SetMarked(true);
-	}
 
 	return menu;
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildWarnUnencodableMenu(bool warnUnencodable)
+BPopUpMenu*
+TPrefsWindow::_BuildWarnUnencodableMenu(bool warnUnencodable)
 {
-	return BuildBoolMenu(P_WARN_UNENCODABLE,"warnUnencodable",warnUnencodable);
+	return _BuildBoolMenu(P_WARN_UNENCODABLE, "warnUnencodable",
+		warnUnencodable);
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildSpellCheckStartOnMenu(bool spellCheckStartOn)
+BPopUpMenu*
+TPrefsWindow::_BuildSpellCheckStartOnMenu(bool spellCheckStartOn)
 {
-	return BuildBoolMenu(P_SPELL_CHECK_START_ON, "spellCheckStartOn", spellCheckStartOn);
+	return _BuildBoolMenu(P_SPELL_CHECK_START_ON, "spellCheckStartOn",
+		spellCheckStartOn);
 }
 
 
-BPopUpMenu *
-TPrefsWindow::BuildButtonBarMenu(uint8 show)
+BPopUpMenu*
+TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 {
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
-
-	menu = new BPopUpMenu("");
+	BMenuItem* item;
+	BMessage* msg;
+	BPopUpMenu* menu = new BPopUpMenu("");
 
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 1);

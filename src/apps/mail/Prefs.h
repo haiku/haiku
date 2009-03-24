@@ -54,77 +54,89 @@ class BTextControl;
 #define SIG_RANDOM			MDR_DIALECT_CHOICE ("Random", "自動選択")
 
 struct EncodingItem {
-	char	*name;
-	uint32	flavor;
+			char*				name;
+			uint32				flavor;
 };
 
 extern const EncodingItem kEncodings[];
 
 
 class TPrefsWindow : public BWindow {
-	public:
-		TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *warp,
-			bool *attachAttributes, bool *cquotes, uint32 *account,
-			int32 *replyTo, char **preamble, char **sig, uint32 *encoding,
-			bool *warnUnencodable, bool *spellCheckStartOn, uint8 *buttonBar);
-		~TPrefsWindow();
+public:
+								TPrefsWindow(BRect rect, BFont* font,
+									int32* level, bool* warp,
+									bool* attachAttributes, bool* cquotes,
+									uint32* account, int32* replyTo,
+									char** preamble, char** sig,
+									uint32* encoding, bool* warnUnencodable,
+									bool* spellCheckStartOn, uint8* buttonBar);
+	virtual						~TPrefsWindow();
 
-		virtual void MessageReceived(BMessage *message);
+	virtual	void				MessageReceived(BMessage* message);
 
-	private:
-		BPopUpMenu *BuildFontMenu(BFont*);
-		BPopUpMenu *BuildLevelMenu(int32);
-		BPopUpMenu *BuildAccountMenu(uint32);
-		BPopUpMenu *BuildReplyToMenu(int32);
-		BMenu *BuildReplyPreambleMenu();
-		BPopUpMenu *BuildSignatureMenu(char*);
-		BPopUpMenu *BuildSizeMenu(BFont*);
-		BPopUpMenu *BuildWrapMenu(bool);
-		BPopUpMenu *BuildAttachAttributesMenu(bool);
-		BPopUpMenu *BuildColoredQuotesMenu(bool quote);
-		BPopUpMenu *BuildEncodingMenu(uint32 encoding);
-		BPopUpMenu *BuildWarnUnencodableMenu(bool warnUnencodable);
-		BPopUpMenu *BuildSpellCheckStartOnMenu(bool spellCheckStartOn);
-		BPopUpMenu *BuildButtonBarMenu(uint8 show);
+private:
+			BPopUpMenu*			_BuildFontMenu(BFont*);
+			BPopUpMenu*			_BuildLevelMenu(int32);
+			BPopUpMenu*			_BuildAccountMenu(uint32);
+			BPopUpMenu*			_BuildReplyToMenu(int32);
+			BMenu*				_BuildReplyPreambleMenu();
+			BPopUpMenu*			_BuildSignatureMenu(char*);
+			BPopUpMenu*			_BuildSizeMenu(BFont*);
+			BPopUpMenu*			_BuildWrapMenu(bool);
+			BPopUpMenu*			_BuildAttachAttributesMenu(bool);
+			BPopUpMenu*			_BuildColoredQuotesMenu(bool quote);
+			BPopUpMenu*			_BuildEncodingMenu(uint32 encoding);
+			BPopUpMenu*			_BuildWarnUnencodableMenu(
+									bool warnUnencodable);
+			BPopUpMenu*			_BuildSpellCheckStartOnMenu(
+									bool spellCheckStartOn);
+			BPopUpMenu*			_BuildButtonBarMenu(uint8 show);
 
-		BPopUpMenu *BuildBoolMenu(uint32 msg, const char *boolItem, bool isTrue);
+			BPopUpMenu*			_BuildBoolMenu(uint32 msg,
+									const char* boolItem, bool isTrue);
 
-		bool	fWrap;
-		bool	*fNewWrap;
-		bool	fAttachAttributes;
-		bool	*fNewAttachAttributes;
-		uint8	fButtonBar;
-		uint8	*fNewButtonBar;
-		bool	fColoredQuotes, *fNewColoredQuotes;
-		uint32	fAccount;
-		uint32	*fNewAccount;
-		int32	fReplyTo;
-		int32	*fNewReplyTo;
-		char	**fNewPreamble;
-		char	*fSignature;
-		char	**fNewSignature;
-		BFont	fFont;
-		BFont	*fNewFont;
-		uint32	fEncoding;
-		uint32	*fNewEncoding;
-		bool	fWarnUnencodable;
-		bool	*fNewWarnUnencodable;
-		bool	fSpellCheckStartOn;
-		bool	*fNewSpellCheckStartOn;
-		BButton	*fRevert;
+			bool*				fNewWrap;
+			bool				fWrap;
+			bool*				fNewAttachAttributes;
+			bool				fAttachAttributes;
+			uint8*				fNewButtonBar;
+			uint8				fButtonBar;
+			bool*				fNewColoredQuotes;
+			bool				fColoredQuotes;
+			uint32*				fNewAccount;
+			uint32				fAccount;
+			int32*				fNewReplyTo;
+			int32				fReplyTo;
 
-		BPopUpMenu *fFontMenu;
-		BPopUpMenu *fSizeMenu;
-		BPopUpMenu *fWrapMenu, *fColoredQuotesMenu;
-		BPopUpMenu *fAttachAttributesMenu;
-		BPopUpMenu *fAccountMenu, *fReplyToMenu;
-		BMenu *fReplyPreambleMenu;
-		BTextControl *fReplyPreamble;
-		BPopUpMenu *fSignatureMenu;
-		BPopUpMenu *fEncodingMenu;
-		BPopUpMenu *fWarnUnencodableMenu;
-		BPopUpMenu *fSpellCheckStartOnMenu;
-		BPopUpMenu *fButtonBarMenu;
+			char**				fNewPreamble;
+
+			char**				fNewSignature;
+			char*				fSignature;
+			BFont*				fNewFont;
+			BFont				fFont;
+			uint32*				fNewEncoding;
+			uint32				fEncoding;
+			bool*				fNewWarnUnencodable;
+			bool				fWarnUnencodable;
+			bool*				fNewSpellCheckStartOn;
+			bool				fSpellCheckStartOn;
+
+			BButton*			fRevert;
+
+			BPopUpMenu*			fFontMenu;
+			BPopUpMenu*			fSizeMenu;
+			BPopUpMenu*			fWrapMenu;
+			BPopUpMenu*			fColoredQuotesMenu;
+			BPopUpMenu*			fAttachAttributesMenu;
+			BPopUpMenu*			fAccountMenu;
+			BPopUpMenu*			fReplyToMenu;
+			BMenu*				fReplyPreambleMenu;
+			BTextControl*		fReplyPreamble;
+			BPopUpMenu*			fSignatureMenu;
+			BPopUpMenu*			fEncodingMenu;
+			BPopUpMenu*			fWarnUnencodableMenu;
+			BPopUpMenu*			fSpellCheckStartOnMenu;
+			BPopUpMenu*			fButtonBarMenu;
 };
 
 #endif	/* _PREFS_H */
