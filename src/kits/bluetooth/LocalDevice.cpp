@@ -241,8 +241,8 @@ LocalDevice::GetFriendlyName()
 
 	request.AddInt32("hci_id", hid);
 	request.AddData("raw command", B_ANY_TYPE, command, size);
-    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK &&
 		reply.FindString("friendlyname", &friendlyname) == B_OK){		
@@ -381,7 +381,9 @@ LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 	// HARDCODE -> move this to addons
 	if (GetProperty("manufacturer", &value) == B_OK
 		&& value == 15) {
-//		Reset();	// Perform a reset to Broadcom buggyland
+
+		// Uncomment this out if your Broadcom dongle is not working properly
+		// Reset();	// Perform a reset to Broadcom buggyland
 		
 
 //#define BT_WRITE_BDADDR_FOR_BCM2035

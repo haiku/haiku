@@ -548,8 +548,8 @@ const char* testingCommands[] = {
 };
 
 
-const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 "};
-const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 "};
+const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
+const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 
 
 const char* 

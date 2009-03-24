@@ -74,6 +74,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 			RemoteDevice* rd = NULL;
 			bool duplicatedFound = false;
 				
+			//  TODO: Loop for all inquiryInfo!
 			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK )
 			{
 			    // Skip duplicated replies
@@ -96,7 +97,6 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
 				if (!duplicatedFound) {
 
-		            //  TODO: DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
        	            rd = new RemoteDevice(inquiryInfo->bdaddr, (uint8*)inquiryInfo->dev_class);			        
 					fRemoteDevicesList.AddItem(rd);
 					// keep all inquiry reported data
