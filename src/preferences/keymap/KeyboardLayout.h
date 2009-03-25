@@ -52,10 +52,9 @@ public:
 
 			BRect			Bounds();
 			BSize			DefaultKeySize();
+			int32			IndexForModifier(int32 modifier);
 
 			status_t		Load(const char* path);
-
-			int32			IndexForModifier(int32 modifier);
 			
 private:
 	enum parse_mode {
