@@ -463,7 +463,7 @@ BDate::Month() const
 int32
 BDate::Difference(const BDate& date) const
 {
-	return DateToJulianDay() - date.DateToJulianDay();
+	return date.DateToJulianDay() - DateToJulianDay();
 }
 
 
@@ -857,7 +857,7 @@ BDateTime::SetTime(const BTime &time)
 uint32
 BDateTime::Time_t() const
 {
-	BDate date(1970, 1, 1);
+ 	BDate date(1970, 1, 1);
 	if (date.Difference(fDate) < 0)
 		return -1;
 
