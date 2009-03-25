@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons screen_savers debugnow ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 ScreenSaver DebugNow :
-	BuyNow.cpp : 
+	DebugNow.cpp : 
 	be libscreensaver.so ;
 
 Package haiku-screensaverkit-cvs :
