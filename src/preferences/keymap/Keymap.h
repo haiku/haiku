@@ -12,12 +12,20 @@
 
 #include <InterfaceDefs.h>
 #include <Entry.h>
+#include <Messenger.h>
 
 
 class Keymap {
 public:
+							Keymap();
+							~Keymap();
+
+			void			SetTarget(BMessenger target,
+								BMessage* modificationMessage);
+
 			status_t		Load(entry_ref& ref);
 			status_t		Save(entry_ref& ref);
+
 			void			DumpKeymap();
 			bool			IsModifierKey(uint32 keyCode);
 			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers);
@@ -43,6 +51,9 @@ private:
 			key_map			fKeys;
 			uint32			fCharsSize;
 			char			fName[B_FILE_NAME_LENGTH];
+
+			BMessenger		fTarget;
+			BMessage*		fModificationMessage;
 };
 
 

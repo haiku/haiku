@@ -36,17 +36,17 @@
 static const uint32 kMsgMenuFileOpen = 'mMFO';
 static const uint32 kMsgMenuFileSave = 'mMFS';
 static const uint32 kMsgMenuFileSaveAs = 'mMFA';
+
 static const uint32 kMsgMenuEditUndo = 'mMEU';
-static const uint32 kMsgMenuEditCut = 'mMEX';
-static const uint32 kMsgMenuEditCopy = 'mMEC';
-static const uint32 kMsgMenuEditPaste = 'mMEV';
-static const uint32 kMsgMenuEditClear = 'mMEL';
-static const uint32 kMsgMenuEditSelectAll = 'mMEA';
+
 static const uint32 kMsgMenuFontChanged = 'mMFC';
+
 static const uint32 kMsgSystemMapSelected = 'SmST';
 static const uint32 kMsgUserMapSelected = 'UmST';
+
 static const uint32 kMsgUseKeymap = 'UkyM';
 static const uint32 kMsgRevertKeymap = 'Rvrt';
+static const uint32 kMsgKeymapUpdated = 'upkM';
 
 
 KeymapWindow::KeymapWindow()
@@ -82,12 +82,15 @@ KeymapWindow::KeymapWindow()
 			.SetInsets(10, 10, 10, 10)));
 
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
+	fTextControl->MakeFocus();
 	AddCommonFilter(new KeymapMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE,
 		&fCurrentMap));
 // TODO: this does not work for some reason, investigate!
 //	fTextControl->AddFilter(fTextFilter);
 
 	_UpdateButtons();
+
+	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
 
 	// Make sure the user keymap directory exists
 	BPath path;
@@ -252,9 +255,14 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgUserMapSelected:
 		{
+			int32 index = fUserListView->CurrentSelection();
+			if (index == 0) {
+				// we can safely ignore the "(Current)" item
+				break;
+			}
+
 			KeymapListItem *keymapListItem = 
-				static_cast<KeymapListItem*>(fUserListView->ItemAt(
-					fUserListView->CurrentSelection()));
+				static_cast<KeymapListItem*>(fUserListView->ItemAt(index));
 			if (keymapListItem != NULL) {
 				fCurrentMap.Load(keymapListItem->KeymapEntry());
 
@@ -280,6 +288,12 @@ KeymapWindow::MessageReceived(BMessage* message)
 		case kMsgRevertKeymap:
 			_RevertKeymap();
 			_UpdateButtons();
+			break;
+
+		case kMsgKeymapUpdated:
+			_UpdateButtons();
+			fSystemListView->DeselectAll();
+			fUserListView->Select(0L);
 			break;
 
 		default:
@@ -381,7 +395,7 @@ KeymapWindow::_CreateMapLists()
 		fUserListView, 0, false, true);
 
 	// '(Current)'
-	KeymapListItem *currentKeymapItem
+	KeymapListItem* currentKeymapItem
 		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
 	if (currentKeymapItem != NULL)
 		fUserListView->AddItem(currentKeymapItem);
@@ -410,28 +424,31 @@ KeymapWindow::_UpdateButtons()
 }
 
 
+//!	Saves previous map to the "Key_map" file.
 void 
 KeymapWindow::_RevertKeymap()
 {
-	//saves previous map to the Key_map file
-	
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
-	
+
 	path.Append("Key_map");
 
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
 
-	status_t err;
-	if ((err = fPreviousMap.Save(ref)) != B_OK) {
-		printf("error when saving : %s", strerror(err));
+	status_t status = fPreviousMap.Save(ref);
+	if (status != B_OK) {
+		printf("error when saving keymap: %s", strerror(status));
 		return;
 	}
 
 	fPreviousMap.Use();
 	fAppliedMap.Load(ref);
+
+	// TODO: add = operator
+	fCurrentMap.Load(ref);
+	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
 	fCurrentMapName = _GetActiveKeymapName();
 
@@ -499,12 +516,12 @@ KeymapWindow::_FillUserMaps()
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
-	
+
 	path.Append("Key_map");
 
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
-	
+
 	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
 
 	fCurrentMapName = _GetActiveKeymapName();

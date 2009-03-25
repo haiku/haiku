@@ -55,6 +55,34 @@ print_key(char *chars, int32 offset)
 }
 
 
+//	#pragma mark -
+
+
+Keymap::Keymap()
+	:
+	fChars(NULL),
+	fCharsSize(0),
+	fModificationMessage(NULL)
+{
+}
+
+
+Keymap::~Keymap()
+{
+	delete fModificationMessage;
+}
+
+
+void
+Keymap::SetTarget(BMessenger target, BMessage* modificationMessage)
+{
+	delete fModificationMessage;
+
+	fTarget = target;
+	fModificationMessage = modificationMessage;
+}
+
+
 void
 Keymap::DumpKeymap()
 {
@@ -179,11 +207,13 @@ Keymap::Save(entry_ref& ref)
 
 
 bool
-Keymap::Equals(const Keymap& map) const
+Keymap::Equals(const Keymap& other) const
 {
 	// not really efficient but this is the only way i found
 	// to reliably compare keymaps (used only for apply and revert)
-	return memcmp( &map.fKeys, &fKeys, sizeof(key_map)) == 0;
+	return fCharsSize == other.fCharsSize
+		&& !memcmp(&other.fKeys, &fKeys, sizeof(key_map))
+		&& !memcmp(other.fChars, fChars, fCharsSize);
 }
 
 
@@ -421,6 +451,9 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 		return;
 
 	memcpy(&fChars[offset + 1], bytes, numBytes);
+
+	if (fModificationMessage != NULL)
+		fTarget.SendMessage(fModificationMessage);
 }
 
 
