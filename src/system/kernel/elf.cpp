@@ -2020,7 +2020,10 @@ elf_init(kernel_args *args)
 		"lookup symbol for a particular address");
 	add_debugger_command("symbols", &dump_symbols, "dump symbols for image");
 	add_debugger_command("symbol", &dump_symbol, "search symbol in images");
-	add_debugger_command("image", &dump_image, "dump image info");
+	add_debugger_command_etc("image", &dump_image, "dump image info",
+		"Prints info about the specified image.\n"
+		"  <image>  - pointer to the semaphore structure, or ID\n"
+		"           of the image to print info for.\n", 0);
 
 	sInitialized = true;
 	return B_OK;
