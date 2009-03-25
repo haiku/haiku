@@ -9,6 +9,7 @@
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <LayoutUtils.h>
+#include <Region.h>
 #include <Window.h>
 
 #include "Keymap.h"
@@ -145,8 +146,7 @@ KeyboardLayoutView::MouseUp(BPoint point)
 	if (key != NULL) {
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
 
-		if (fKeymap != NULL && _HandleDeadKey(key->code, fModifiers)
-			&& fDeadKey != 0)
+		if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
 			return;
 
 		_InvalidateKey(key);
@@ -377,13 +377,24 @@ KeyboardLayoutView::_LayoutKeyboard()
 
 
 void
+KeyboardLayoutView::_DrawKeyButton(BView* view, BRect rect, BRect updateRect,
+	rgb_color base, bool pressed)
+{
+	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
+		pressed ? BControlLook::B_ACTIVATED : 0);
+	be_control_look->DrawButtonBackground(view, rect, updateRect, 
+		base, pressed ? BControlLook::B_ACTIVATED : 0);
+}
+
+
+void
 KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	BRect rect, bool pressed)
 {
 	rgb_color base = key->dark ? kDarkColor : kBrightColor;
 	key_kind keyKind = kNormalKey;
 	int32 deadKey = 0;
-	bool secondDeadKey;
+	bool secondDeadKey = false;
 
 	char text[32];
 	if (fKeymap != NULL) {
@@ -404,31 +415,52 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		base = kDeadKeyColor;
 
 	if (key->shape == kRectangleKeyShape) {
-		be_control_look->DrawButtonFrame(view, rect, updateRect, base,
-			pressed ? BControlLook::B_ACTIVATED : 0);
-		be_control_look->DrawButtonBackground(view, rect, updateRect, 
-			base, pressed ? BControlLook::B_ACTIVATED : 0);
+		_DrawKeyButton(view, rect, updateRect, base, pressed);
 
-		// TODO: make font size depend on key size!
 		rect.InsetBy(1, 1);
 
 		be_control_look->DrawLabel(view, text, rect, updateRect,
 			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 	} else if (key->shape == kEnterKeyShape) {
-		// TODO: make better!
-		rect.bottom -= 20;
-		be_control_look->DrawButtonBackground(view, rect, updateRect, 
-			base, 0, BControlLook::B_LEFT_BORDER
-				| BControlLook::B_RIGHT_BORDER 
-				| BControlLook::B_TOP_BORDER);
+		BRegion region(rect);
+		BRect originalRect = rect;
+		BRect missingRect = rect;
+		// TODO: for some reason, this does not always equal the bottom of
+		// the other keys...
+		missingRect.top = floorf(rect.bottom - fGap + 2
+			- fLayout->DefaultKeySize().height * fFactor);
+		missingRect.right = floorf(missingRect.left
+			+ (key->frame.Width() - key->second_row) * fFactor - fGap - 2);
+		region.Exclude(missingRect);
+		ConstrainClippingRegion(&region);
 
-		rect = _FrameFor(key);
-		rect.top += 20;
-		rect.left += 10;
-		be_control_look->DrawButtonBackground(view, rect, updateRect, 
-			base, 0, BControlLook::B_LEFT_BORDER
-				| BControlLook::B_RIGHT_BORDER
-				| BControlLook::B_BOTTOM_BORDER);
+		_DrawKeyButton(view, rect, updateRect, base, pressed);
+
+		rect.left = missingRect.right;
+		be_control_look->DrawLabel(view, text, rect, updateRect,
+			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+
+		missingRect.right--;
+		missingRect.top -= 2;
+		region.Set(missingRect);
+		ConstrainClippingRegion(&region);
+
+		rect = originalRect;
+		rect.bottom = missingRect.top + 2;
+		_DrawKeyButton(view, rect, updateRect, base, pressed);
+
+		missingRect.left = missingRect.right;
+		missingRect.right++;
+		missingRect.top += 2;
+		region.Set(missingRect);
+		ConstrainClippingRegion(&region);
+
+		rect = originalRect;
+		rect.left = missingRect.right - 2;
+		rect.top = missingRect.top - 2;
+		_DrawKeyButton(view, rect, updateRect, base, pressed);
+
+		ConstrainClippingRegion(NULL);
 	}
 }
 
@@ -620,13 +652,15 @@ KeyboardLayoutView::_InvalidateKey(const Key* key)
 
 
 /*!	Updates the fDeadKey member, and invalidates the view if needed.
-	fKeymap must be valid when calling this method.
 
 	\return true if the view has been invalidated.
 */
 bool
 KeyboardLayoutView::_HandleDeadKey(int32 key, int32 modifiers)
 {
+	if (fKeymap == NULL)
+		return false;
+
 	int32 deadKey = fKeymap->IsDeadKey(key, modifiers);
 	if (fDeadKey != deadKey) {
 		Invalidate();
@@ -660,6 +694,9 @@ KeyboardLayoutView::_KeyChanged(const BMessage* message)
 	if (message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN) {
 		if (_HandleDeadKey(key, fModifiers))
 			checkSingle = false;
+
+		if (_KeyForCode(key) == NULL)
+			printf("no key for code %ld\n", key);
 	}
 
 	for (int32 i = 0; i < 16; i++) {
@@ -709,12 +746,10 @@ BRect
 KeyboardLayoutView::_FrameFor(BRect keyFrame)
 {
 	BRect rect;
-	rect.left = keyFrame.left * fFactor;
-	rect.right = (keyFrame.right - keyFrame.left) * fFactor + rect.left
-		- fGap - 1;
-	rect.top = keyFrame.top * fFactor;
-	rect.bottom = (keyFrame.bottom - keyFrame.top) * fFactor + rect.top
-		- fGap - 1;
+	rect.left = ceilf(keyFrame.left * fFactor);
+	rect.right = floorf((keyFrame.Width()) * fFactor + rect.left - fGap - 1);
+	rect.top = ceilf(keyFrame.top * fFactor);
+	rect.bottom = floorf((keyFrame.Height()) * fFactor + rect.top - fGap - 1);
 	rect.OffsetBy(fOffset);
 
 	return rect;

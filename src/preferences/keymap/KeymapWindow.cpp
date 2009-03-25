@@ -83,10 +83,8 @@ KeymapWindow::KeymapWindow()
 
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
 	fTextControl->MakeFocus();
-	AddCommonFilter(new KeymapMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE,
-		&fCurrentMap));
-// TODO: this does not work for some reason, investigate!
-//	fTextControl->AddFilter(fTextFilter);
+	fTextControl->TextView()->AddFilter(new KeymapMessageFilter(
+		B_PROGRAMMED_DELIVERY, B_ANY_SOURCE, &fCurrentMap));
 
 	_UpdateButtons();
 

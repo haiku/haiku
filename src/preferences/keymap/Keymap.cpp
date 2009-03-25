@@ -504,6 +504,9 @@ Keymap::_Offset(uint32 keyCode, uint32 modifiers, uint32* _table)
 	int32 offset;
 	uint32 table;
 
+	if (keyCode >= 128)
+		return -1;
+
 	switch (modifiers & kModifierKeys) {
 		case B_SHIFT_KEY:
 			offset = fKeys.shift_map[keyCode];
