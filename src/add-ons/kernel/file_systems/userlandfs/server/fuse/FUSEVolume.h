@@ -65,14 +65,8 @@ public:
 									size_t bytesTransferred);
 
 	// nodes
-	virtual	status_t			IOCtl(void* node, void* cookie,
-									uint32 command, void* buffer, size_t size);
 	virtual	status_t			SetFlags(void* node, void* cookie,
 									int flags);
-	virtual	status_t			Select(void* node, void* cookie,
-									uint8 event, selectsync* sync);
-	virtual	status_t			Deselect(void* node, void* cookie,
-									uint8 event, selectsync* sync);
 
 	virtual	status_t			FSync(void* node);
 
@@ -156,6 +150,9 @@ private:
 									AutoLocker<Locker>& locker);
 			void				_PutNode(FUSENode* node);
 			void				_PutNodes(FUSENode* const* nodes, int32 count);
+
+			void				_RemoveEntry(FUSEEntry* entry);
+			status_t			_RemoveEntry(FUSENode* dir, const char* name);
 
 			status_t			_LockNodeChain(FUSENode* node, bool parent,
 									bool writeLock);

@@ -483,6 +483,7 @@ printf("FUSEVolume::Mount()\n");
 		RETURN_ERROR(B_NO_MEMORY);
 	}
 
+	node->refCount++;	// for the entry
 	node->entries.Add(entry);
 	fRootNode = node;
 
@@ -685,32 +686,7 @@ FUSEVolume::IterativeIOFinished(void* cookie, int32 requestID, status_t status,
 
 
 status_t
-FUSEVolume::IOCtl(void* node, void* cookie, uint32 command, void *buffer,
-	size_t size)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
 FUSEVolume::SetFlags(void* node, void* cookie, int flags)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
-FUSEVolume::Select(void* node, void* cookie, uint8 event, selectsync* sync)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
-FUSEVolume::Deselect(void* node, void* cookie, uint8 event, selectsync* sync)
 {
 	// TODO: Implement!
 	return B_UNSUPPORTED;
@@ -764,11 +740,39 @@ FUSEVolume::ReadSymlink(void* _node, char* buffer, size_t bufferSize,
 
 
 status_t
-FUSEVolume::CreateSymlink(void* dir, const char* name, const char* target,
+FUSEVolume::CreateSymlink(void* _dir, const char* name, const char* target,
 	int mode)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+PRINT(("FUSEVolume::CreateSymlink(%p (%lld), \"%s\" -> \"%s\", %#x)\n", dir,
+dir->id, name, target, mode));
+
+	// lock the directory
+	NodeWriteLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entry
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(dir, name, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// create the dir
+	int fuseError = fuse_fs_symlink(fFS, target, path);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+// TODO: Set the mode?!
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 
@@ -781,10 +785,39 @@ FUSEVolume::Link(void* dir, const char* name, void* node)
 
 
 status_t
-FUSEVolume::Unlink(void* dir, const char* name)
+FUSEVolume::Unlink(void* _dir, const char* name)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
+
+	// lock the directory
+	NodeWriteLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entry
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(dir, name, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// unlink
+	int fuseError = fuse_fs_unlink(fFS, path);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	// remove the entry
+	locker.Lock();
+	_RemoveEntry(dir, name);
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 
@@ -904,6 +937,8 @@ openMode, mode));
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
 
+// TODO: Node monitoring!
+
 	// get the node
 	FUSENode* node;
 	error = _GetNode(dir, name, &node);
@@ -968,6 +1003,7 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 			fuse_fs_release(fFS, path, cookie);
 			RETURN_ERROR(fuseError);
 		}
+// TODO: Node monitoring!
 	}
 
 	cookieDeleter.Detach();
@@ -1067,7 +1103,6 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 	locker.Unlock();
 
 	// read the file
-
 	int bytesRead = fuse_fs_read(fFS, path, (char*)buffer, bufferSize, pos,
 		cookie);
 	if (bytesRead < 0)
@@ -1103,12 +1138,13 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 
 	locker.Unlock();
 
-	// read the file
-
+	// write the file
 	int bytesWritten = fuse_fs_write(fFS, path, (const char*)buffer, bufferSize,
 		pos, cookie);
 	if (bytesWritten < 0)
 		return bytesWritten;
+
+// TODO: Node monitoring?
 
 	*_bytesWritten = bytesWritten;
 	return B_OK;
@@ -1119,18 +1155,76 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 
 
 status_t
-FUSEVolume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
+FUSEVolume::CreateDir(void* _dir, const char* name, int mode, ino_t *newDir)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+PRINT(("FUSEVolume::CreateDir(%p (%lld), \"%s\", %#x)\n", dir, dir->id, name,
+mode));
+
+	// lock the directory
+	NodeWriteLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entry
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(dir, name, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// create the dir
+	int fuseError = fuse_fs_mkdir(fFS, path, mode);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+// TODO: Node monitoring!
+
+	*newDir = 0;
+		// TODO: This is really superfluous!
+
+	return B_OK;
 }
 
 
 status_t
-FUSEVolume::RemoveDir(void* dir, const char* name)
+FUSEVolume::RemoveDir(void* _dir, const char* name)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+PRINT(("FUSEVolume::RemoveDir(%p (%lld), \"%s\")\n", dir, dir->id, name));
+
+	// lock the directory
+	NodeWriteLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entry
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(dir, name, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// remove the dir
+	int fuseError = fuse_fs_rmdir(fFS, path);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	// remove the entry
+	locker.Lock();
+	_RemoveEntry(dir, name);
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 
@@ -1604,6 +1698,9 @@ FUSEVolume::_InternalGetNode(FUSENode* dir, const char* entryName,
 		RETURN_ERROR(B_NO_MEMORY);
 	}
 
+	dir->refCount++;
+		// dir reference for the entry
+
 	fEntries.Insert(entry);
 	node->entries.Add(entry);
 
@@ -1632,6 +1729,33 @@ FUSEVolume::_PutNodes(FUSENode* const* nodes, int32 count)
 {
 	for (int32 i = 0; i < count; i++)
 		_PutNode(nodes[i]);
+}
+
+
+/*!	Volume must be locked. The entry's directory must be write locked.
+ */
+void
+FUSEVolume::_RemoveEntry(FUSEEntry* entry)
+{
+	fEntries.Remove(entry);
+	entry->node->entries.Remove(entry);
+	_PutNode(entry->node);
+	_PutNode(entry->parent);
+	delete entry;
+}
+
+
+/*!	Volume must be locked. The directory must be write locked.
+ */
+status_t
+FUSEVolume::_RemoveEntry(FUSENode* dir, const char* name)
+{
+	FUSEEntry* entry = fEntries.Lookup(FUSEEntryRef(dir->id, name));
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_RemoveEntry(entry);
+	return B_OK;
 }
 
 
@@ -1900,6 +2024,9 @@ PRINT(("  -> create node: %p, id: %lld\n", node, nodeID));
 			buffer->error = B_NO_MEMORY;
 			return 1;
 		}
+
+		buffer->directory->refCount++;
+			// dir reference for the entry
 
 		fEntries.Insert(entry);
 		node->entries.Add(entry);
