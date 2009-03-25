@@ -42,6 +42,7 @@ void
 KeyboardLayoutView::SetKeyboardLayout(KeyboardLayout* layout)
 {
 	fLayout = layout;
+	_LayoutKeyboard();
 	Invalidate();
 }
 
@@ -55,6 +56,27 @@ KeyboardLayoutView::SetKeymap(Keymap* keymap)
 
 
 void
+KeyboardLayoutView::SetTarget(BMessenger target)
+{
+	fTarget = target;
+}
+
+
+void
+KeyboardLayoutView::SetFont(const BFont& font)
+{
+	fFont = font;
+
+	font_height fontHeight;
+	fFont.GetHeight(&fontHeight);
+	fBaseFontHeight = fontHeight.ascent + fontHeight.descent;
+	fBaseFontSize = fFont.Size();
+
+	Invalidate();
+}
+
+
+void
 KeyboardLayoutView::AttachedToWindow()
 {
 	if (Parent())
@@ -62,29 +84,17 @@ KeyboardLayoutView::AttachedToWindow()
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fFont = *be_plain_font;
+	SetFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
 
-	font_height fontHeight;
-	fFont.GetHeight(&fontHeight);
-	fFontHeight = fontHeight.ascent + fontHeight.descent;
-
-	FrameResized(0, 0);
+	_LayoutKeyboard();
 }
 
 
 void
 KeyboardLayoutView::FrameResized(float width, float height)
 {
-	float factorX = Bounds().Width() / fLayout->Bounds().Width();
-	float factorY = Bounds().Height() / fLayout->Bounds().Height();
-
-	fFactor = min_c(factorX, factorY);
-	fOffset = BPoint((Bounds().Width() - fLayout->Bounds().Width()
-			* fFactor) / 2,
-		(Bounds().Height() - fLayout->Bounds().Height() * fFactor) / 2);
-	fMaxFontSize = 14;
-	fGap = 2;
+	_LayoutKeyboard();
 }
 
 
@@ -133,6 +143,34 @@ KeyboardLayoutView::MouseUp(BPoint point)
 	if (key != NULL) {
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
 		_InvalidateKey(key->code);
+
+		if (!fIsDragging && fKeymap != NULL) {
+			// Send fake key down message to target
+			BMessage message(B_KEY_DOWN);
+			message.AddInt64("when", system_time());
+			message.AddData("states", B_UINT8_TYPE, &fKeyState,
+				sizeof(fKeyState));
+			message.AddInt32("key", key->code);
+			message.AddInt32("modifiers", fModifiers);
+
+			char* string;
+			int32 numBytes;
+			fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
+				&numBytes);
+			if (string != NULL) {
+				message.AddString("bytes", string);
+				delete[] string;
+			}
+
+			fKeymap->GetChars(key->code, 0, 0, &string, &numBytes);
+			if (string != NULL) {
+				message.AddInt32("raw_char", string[0]);
+				message.AddInt8("byte", string[0]);
+				delete[] string;
+			}
+
+			fTarget.SendMessage(&message);
+		}
 	}
 }
 
@@ -189,8 +227,17 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 			bits[i + 3] = 144;
 		}
 
-		BMessage drag;
+		BMessage drag(B_MIME_DATA);
 		drag.AddInt32("key", key->code);
+
+		char* string;
+		int32 numBytes;
+		fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
+			&numBytes);
+		if (string != NULL) {
+			drag.AddData("text/plain", B_MIME_DATA, string, numBytes);
+			delete[] string;
+		}
 
 		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
 		fIsDragging = true;
@@ -216,6 +263,25 @@ KeyboardLayoutView::Draw(BRect updateRect)
 void
 KeyboardLayoutView::MessageReceived(BMessage* message)
 {
+	if (message->WasDropped()) {
+		Key* key = _KeyAt(ConvertFromScreen(message->DropPoint()));
+		if (key != NULL && fKeymap != NULL) {
+			const char* data;
+			ssize_t size;
+			if (message->FindData("text/plain", B_MIME_DATA,
+					(const void**)&data, &size) == B_OK) {
+				// ignore trailing null bytes
+				if (data[size - 1] == '\0')
+					size--;
+
+				fKeymap->SetKey(key->code, fModifiers, fDeadKey,
+					(const char*)data, size);
+				_InvalidateKey(key->code);
+			} else
+			message->PrintToStream();
+		}
+	}
+
 	switch (message->what) {
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
@@ -231,6 +297,24 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 			BView::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+KeyboardLayoutView::_LayoutKeyboard()
+{
+	float factorX = Bounds().Width() / fLayout->Bounds().Width();
+	float factorY = Bounds().Height() / fLayout->Bounds().Height();
+
+	fFactor = min_c(factorX, factorY);
+	fOffset = BPoint((Bounds().Width() - fLayout->Bounds().Width()
+			* fFactor) / 2,
+		(Bounds().Height() - fLayout->Bounds().Height() * fFactor) / 2);
+
+	if (fLayout->DefaultKeySize().width < 11)
+		fGap = 1;
+	else
+		fGap = 2;
 }
 
 
@@ -254,20 +338,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, Key* key,
 		snprintf(text, sizeof(text), "%02lx", key->code);
 	}
 
-	switch (keyKind) {
-		case kNormalKey:
-			fFont.SetSize(_FontSizeFor(rect, text));
-			view->SetFont(&fFont);
-			break;
-		case kSpecialKey:
-			fSpecialFont.SetSize(_FontSizeFor(rect, text) * 0.7);
-			view->SetFont(&fSpecialFont);
-			break;
-		case kSymbolKey:
-			fSpecialFont.SetSize(_FontSizeFor(rect, text) * 1.6);
-			view->SetFont(&fSpecialFont);
-			break;
-	}
+	_SetFontSize(view, keyKind);
 
 	if (secondDeadKey)
 		base = kSecondDeadKeyColor;
@@ -568,17 +639,29 @@ KeyboardLayoutView::_FrameFor(Key* key)
 }
 
 
-float
-KeyboardLayoutView::_FontSizeFor(BRect frame, const char* text)
+void
+KeyboardLayoutView::_SetFontSize(BView* view, key_kind keyKind)
 {
-#if 0
-	//float stringWidth = fFont.StringWidth(text);
-	// TODO: take width into account!
+	BSize size = fLayout->DefaultKeySize();
+	float fontSize = fBaseFontSize;
+	if (fBaseFontHeight >= size.height * fFactor * 0.5) {
+		fontSize *= (size.height * fFactor * 0.5) / fBaseFontHeight;
+		if (fontSize < 8)
+			fontSize = 8;
+	}
 
-	float size = fFont.Size() * (frame.Height() - 6) / fFontHeight;
-	if (size > fMaxFontSize)
-		return fMaxFontSize;
-#endif
-
-	return 10.0f;
+	switch (keyKind) {
+		case kNormalKey:
+			fFont.SetSize(fontSize);
+			view->SetFont(&fFont);
+			break;
+		case kSpecialKey:
+			fSpecialFont.SetSize(fontSize * 0.7);
+			view->SetFont(&fSpecialFont);
+			break;
+		case kSymbolKey:
+			fSpecialFont.SetSize(fontSize * 1.6);
+			view->SetFont(&fSpecialFont);
+			break;
+	}
 }

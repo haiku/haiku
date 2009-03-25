@@ -6,6 +6,7 @@
 #define KEYBOARD_LAYOUT_VIEW_H
 
 
+#include <Messenger.h>
 #include <View.h>
 
 #include "KeyboardLayout.h"
@@ -20,6 +21,11 @@ public:
 
 			void			SetKeyboardLayout(KeyboardLayout* layout);
 			void			SetKeymap(Keymap* keymap);
+			void			SetTarget(BMessenger target);
+
+			KeyboardLayout* GetKeyboardLayout() { return fLayout; }
+
+			void			SetFont(const BFont& font);
 
 protected:
 	virtual	void			AttachedToWindow();
@@ -43,6 +49,7 @@ private:
 		kSymbolKey
 	};
 
+			void			_LayoutKeyboard();
 			void			_DrawKey(BView* view, BRect updateRect, Key* key,
 								BRect frame, bool pressed);
 			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
@@ -60,10 +67,11 @@ private:
 			void			_KeyChanged(BMessage* message);
 			Key*			_KeyAt(BPoint point);
 			BRect			_FrameFor(Key* key);
-			float			_FontSizeFor(BRect frame, const char* text);
+			void			_SetFontSize(BView* view, key_kind keyKind);
 
 			KeyboardLayout*	fLayout;
 			Keymap*			fKeymap;
+			BMessenger		fTarget;
 
 			uint8			fKeyState[16];
 			int32			fModifiers;
@@ -74,8 +82,8 @@ private:
 
 			BFont			fFont;
 			BFont			fSpecialFont;
-			float			fFontHeight;
-			float			fMaxFontSize;
+			float			fBaseFontHeight;
+			float			fBaseFontSize;
 			BPoint			fOffset;
 			float			fFactor;
 			float			fGap;
