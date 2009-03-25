@@ -18,9 +18,10 @@
 #include <Window.h>
 
 #include "Keymap.h"
-#include "KeymapTextView.h"
 
+class BMenu;
 class BMenuBar;
+class BTextControl;
 class KeyboardLayoutView;
 class KeymapListItem;
 
@@ -37,9 +38,10 @@ protected:
 			BMenuBar*			_CreateMenu();
 			BView*				_CreateMapLists();
 
+			void				_UpdateButtons();
+
 			void				_UseKeymap();
 			void				_RevertKeymap();
-			void				_UpdateButtons();
 
 			void 				_FillSystemMaps();
 			void				_FillUserMaps();
@@ -52,8 +54,9 @@ protected:
 			BListView*			fUserListView;
 			BButton*			fUseButton;
 			BButton*			fRevertButton;
-			//BMenu*			fFontMenu;
+			BMenu*				fFontMenu;
 			KeyboardLayoutView*	fKeyboardLayoutView;
+			BTextControl*		fTextControl;
 
 			Keymap				fCurrentMap;
 			Keymap				fPreviousMap;

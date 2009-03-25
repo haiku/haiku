@@ -25,10 +25,12 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <StringView.h>
+#include <TextControl.h>
 
 #include "KeyboardLayoutView.h"
-#include "KeymapListItem.h"
 #include "KeymapApplication.h"
+#include "KeymapListItem.h"
+#include "KeymapMessageFilter.h"
 
 
 static const uint32 kMsgMenuFileOpen = 'mMFO';
@@ -57,6 +59,8 @@ KeymapWindow::KeymapWindow()
 	fKeyboardLayoutView = new KeyboardLayoutView("layout");
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
+	fTextControl = new BTextControl("Sample and Clipboard:", "", NULL);
+
 	fUseButton = new BButton("useButton", "Use", new BMessage(kMsgUseKeymap));
 	fRevertButton = new BButton("revertButton", "Revert",
 		new BMessage(kMsgRevertKeymap));
@@ -68,6 +72,8 @@ KeymapWindow::KeymapWindow()
 			.Add(_CreateMapLists(), 0.25)
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(fKeyboardLayoutView)
+				//.Add(new BStringView("text label", "Sample and Clipboard:"))
+				.Add(fTextControl)
 				.AddGlue(0.0)
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.AddGlue(0.0)
@@ -75,21 +81,15 @@ KeymapWindow::KeymapWindow()
 					.Add(fRevertButton)))
 			.SetInsets(10, 10, 10, 10)));
 
-#if 0
-	BMenuItem *item = fFontMenu->FindMarked();
-	if (item) {
-		fMapView->SetFontFamily(item->Label());
-	}
-#endif
-
-	// Try and find the current map name in the two list views (if the name
-	// was read at all) - this will also load the fCurrentMap
-	if (!_SelectCurrentMap(fSystemListView)
-		&& !_SelectCurrentMap(fUserListView))
-		fUserListView->Select(0L);
+	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
+	AddCommonFilter(new KeymapMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE,
+		&fCurrentMap));
+// TODO: this does not work for some reason, investigate!
+//	fTextControl->AddFilter(fTextFilter);
 
 	_UpdateButtons();
 
+	// Make sure the user keymap directory exists
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("Keymap");
@@ -121,13 +121,26 @@ KeymapWindow::KeymapWindow()
 
 	// See if we can use a larger default size
 	if (screen.Frame().Width() > 1200) {
-		width = 1000;
+		width = 900;
 		height = 400;
 	}
 
 	// TODO: store and restore position and size!
 	ResizeTo(width, height);
 	MoveTo(BAlert::AlertPosition(width, height));
+
+	// TODO: this might be a bug in the interface kit, but scrolling to
+	// selection does not correctly work unless the window is shown.
+	Show();
+	Lock();
+
+	// Try and find the current map name in the two list views (if the name
+	// was read at all) - this will also load the fCurrentMap
+	if (!_SelectCurrentMap(fSystemListView)
+		&& !_SelectCurrentMap(fUserListView))
+		fUserListView->Select(0L);
+
+	Unlock();
 }
 
 
@@ -135,116 +148,6 @@ KeymapWindow::~KeymapWindow(void)
 {
 	delete fOpenPanel;
 	delete fSavePanel;
-}
-
-
-BMenuBar*
-KeymapWindow::_CreateMenu()
-{
-	BMenuBar* menuBar = new BMenuBar(Bounds(), "menubar");
-	BMenuItem* currentItem;
-
-	// Create the File menu
-	BMenu* menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgMenuFileOpen), 'O'));
-	menu->AddSeparatorItem();
-	currentItem = new BMenuItem("Save",
-		new BMessage(kMsgMenuFileSave), 'S');
-	currentItem->SetEnabled(false);
-	menu->AddItem(currentItem);
-	menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgMenuFileSaveAs)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Quit",
-		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	menuBar->AddItem(menu);
-
-#if 0	
-	// Create the Edit menu
-	menu = new BMenu("Edit");
-	currentItem = new BMenuItem("Undo",
-		new BMessage(kMsgMenuEditUndo), 'Z');
-	currentItem->SetEnabled(false);
-	menu->AddItem(currentItem);
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem( "Cut",
-		new BMessage(kMsgMenuEditCut), 'X'));
-	menu->AddItem(new BMenuItem( "Copy",
-		new BMessage(kMsgMenuEditCopy), 'C'));
-	menu->AddItem(new BMenuItem( "Paste",
-		new BMessage(kMsgMenuEditPaste), 'V'));
-	menu->AddItem(new BMenuItem( "Clear",
-		new BMessage(kMsgMenuEditClear)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem( "Select All",
-		new BMessage(kMsgMenuEditSelectAll), 'A'));
-	menuBar->AddItem(menu);
-
-	// Create the Font menu
-	fFontMenu = new BMenu("Font");
-	fFontMenu->SetRadioMode(true);
-	int32 numFamilies = count_font_families(); 
-	font_family family, current_family;
-	font_style current_style; 
-	uint32 flags;
-
-	be_plain_font->GetFamilyAndStyle(&current_family, &current_style);
-
-	for (int32 i = 0; i < numFamilies; i++) {
-		if (get_font_family(i, &family, &flags) == B_OK) {
-			BMenuItem *item = 
-				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
-			fFontMenu->AddItem(item);
-			if (strcmp(family, current_family) == 0)
-				item->SetMarked(true);
-		}
-	}
-	menuBar->AddItem(fFontMenu);
-#endif
-
-	return menuBar;
-}
-
-
-BView*
-KeymapWindow::_CreateMapLists()
-{
-	// The System list
-	BStringView* systemLabel = new BStringView("system", "System:");
-	fSystemListView = new BListView("systemList");
-	fSystemListView->SetSelectionMessage(new BMessage(kMsgSystemMapSelected));
-
-	BScrollView* systemScroller = new BScrollView("systemScrollList",
-		fSystemListView, 0, false, true);
-
-	// The User list
-	BStringView* userLabel = new BStringView("user", "User:");
-
-	fUserListView = new BListView("userList");
-	fUserListView->SetSelectionMessage(new BMessage(kMsgUserMapSelected));
-	BScrollView* userScroller = new BScrollView("userScrollList",
-		fUserListView, 0, false, true);
-
-	// '(Current)'
-	KeymapListItem *currentKeymapItem
-		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
-	if (currentKeymapItem != NULL)
-		fUserListView->AddItem(currentKeymapItem);
-
-	// Saved keymaps
-
-	_FillSystemMaps();
-	_FillUserMaps();
-
-	_SetListViewSize(fSystemListView);
-	_SetListViewSize(fUserListView);
-
-	return BGroupLayoutBuilder(B_VERTICAL)
-		.Add(systemLabel)
-		.Add(systemScroller, 3)
-		.Add(userLabel)
-		.Add(userScroller);
 }
 
 
@@ -273,6 +176,9 @@ KeymapWindow::MessageReceived(BMessage* message)
 			fUserListView->DeselectAll();
 			break;
 		}
+
+		case B_MIME_DATA:
+			break;
 
 		case B_SAVE_REQUESTED:
 		{
@@ -309,17 +215,17 @@ KeymapWindow::MessageReceived(BMessage* message)
 			fMapView->MessageReceived(message);
 			break;
 #endif
-#if 0
 		case kMsgMenuFontChanged:
 		{
 			BMenuItem *item = fFontMenu->FindMarked();
 			if (item != NULL) {
-				fMapView->SetFontFamily(item->Label());
-				fMapView->Invalidate();
+				BFont font;
+				font.SetFamilyAndStyle(item->Label(), NULL);
+				fKeyboardLayoutView->SetFont(font);
+				fTextControl->TextView()->SetFontAndColor(&font);
 			}
 			break;
 		}
-#endif
 
 		case kMsgSystemMapSelected:
 		{
@@ -380,6 +286,119 @@ KeymapWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+BMenuBar*
+KeymapWindow::_CreateMenu()
+{
+	BMenuBar* menuBar = new BMenuBar(Bounds(), "menubar");
+	BMenuItem* item;
+
+	// Create the File menu
+	BMenu* menu = new BMenu("File");
+	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgMenuFileOpen), 'O'));
+	menu->AddSeparatorItem();
+	item = new BMenuItem("Save", new BMessage(kMsgMenuFileSave), 'S');
+	item->SetEnabled(false);
+	menu->AddItem(item);
+	menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgMenuFileSaveAs)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Quit",
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menuBar->AddItem(menu);
+
+	// Create keyboard layout menu
+	menu = new BMenu("Layout");
+	menu->AddItem(item = new BMenuItem(
+		fKeyboardLayoutView->GetKeyboardLayout()->Name(), NULL));
+	item->SetMarked(true);
+	menuBar->AddItem(menu);
+#if 0	
+	// Create the Edit menu
+	menu = new BMenu("Edit");
+	currentItem = new BMenuItem("Undo",
+		new BMessage(kMsgMenuEditUndo), 'Z');
+	currentItem->SetEnabled(false);
+	menu->AddItem(currentItem);
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem( "Cut",
+		new BMessage(kMsgMenuEditCut), 'X'));
+	menu->AddItem(new BMenuItem( "Copy",
+		new BMessage(kMsgMenuEditCopy), 'C'));
+	menu->AddItem(new BMenuItem( "Paste",
+		new BMessage(kMsgMenuEditPaste), 'V'));
+	menu->AddItem(new BMenuItem( "Clear",
+		new BMessage(kMsgMenuEditClear)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem( "Select All",
+		new BMessage(kMsgMenuEditSelectAll), 'A'));
+	menuBar->AddItem(menu);
+#endif
+
+	// Create the Font menu
+	fFontMenu = new BMenu("Font");
+	fFontMenu->SetRadioMode(true);
+	int32 numFamilies = count_font_families();
+	font_family family, currentFamily;
+	font_style currentStyle;
+	uint32 flags;
+
+	be_plain_font->GetFamilyAndStyle(&currentFamily, &currentStyle);
+
+	for (int32 i = 0; i < numFamilies; i++) {
+		if (get_font_family(i, &family, &flags) == B_OK) {
+			BMenuItem *item = 
+				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
+			fFontMenu->AddItem(item);
+
+			if (!strcmp(family, currentFamily))
+				item->SetMarked(true);
+		}
+	}
+	menuBar->AddItem(fFontMenu);
+
+	return menuBar;
+}
+
+
+BView*
+KeymapWindow::_CreateMapLists()
+{
+	// The System list
+	fSystemListView = new BListView("systemList");
+	fSystemListView->SetSelectionMessage(new BMessage(kMsgSystemMapSelected));
+
+	BScrollView* systemScroller = new BScrollView("systemScrollList",
+		fSystemListView, 0, false, true);
+
+	// The User list
+	fUserListView = new BListView("userList");
+	fUserListView->SetSelectionMessage(new BMessage(kMsgUserMapSelected));
+	BScrollView* userScroller = new BScrollView("userScrollList",
+		fUserListView, 0, false, true);
+
+	// '(Current)'
+	KeymapListItem *currentKeymapItem
+		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
+	if (currentKeymapItem != NULL)
+		fUserListView->AddItem(currentKeymapItem);
+
+	// Saved keymaps
+
+	_FillSystemMaps();
+	_FillUserMaps();
+
+	_SetListViewSize(fSystemListView);
+	_SetListViewSize(fUserListView);
+
+	return BGroupLayoutBuilder(B_VERTICAL)
+		.Add(new BStringView("system", "System:"))
+		.Add(systemScroller, 3)
+		.Add(new BStringView("user", "User:"))
+		.Add(userScroller);
 }
 
 
