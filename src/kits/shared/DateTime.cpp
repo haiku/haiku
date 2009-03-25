@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -430,6 +430,11 @@ BDate::AddMonths(int32 months)
 		fYear--;
 		fMonth += 12;
 	}
+
+	// 'missing' days between switch julian - gregorian
+	if (fYear == 1582 && fMonth == 10 && fDay > 4 && fDay < 15)
+		fDay = (months > 0) ? 15 : 4;
+
 	fDay = min_c(fDay, DaysInMonth());
 }
 
@@ -536,10 +541,11 @@ bool
 BDate::IsLeapYear(int32 year) const
 {
 	if (year < 1582) {
-		if (year < 0) year++;
+		if (year < 0)
+			year++;
 		return (year % 4) == 0;
 	}
-	return year % 400 == 0 || year % 4 == 0 && year % 100 != 0;
+	return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
 }
 
 
@@ -777,6 +783,12 @@ BDate::_DateToJulianDay(int32 _year, int32 month, int32 day) const
 //	#pragma mark - BDateTime
 
 
+BDateTime::BDateTime()
+	: fDate(BDate()),
+	  fTime(BTime())
+{
+}
+
 BDateTime::BDateTime(const BDate &date, const BTime &time)
 	: fDate(date),
 	  fTime(time)
@@ -845,6 +857,10 @@ BDateTime::SetTime(const BTime &time)
 uint32
 BDateTime::Time_t() const
 {
+	BDate date(1970, 1, 1);
+	if (date.Difference(fDate) < 0)
+		return -1;
+
 	tm tm_struct;
 
 	tm_struct.tm_hour = fTime.Hour();
