@@ -2029,7 +2029,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	if (index > 0)
 		frame = ItemAt(index - 1)->Frame();
 	else
-		frame.Set(0, 0, 0, 0);
+		frame.Set(0, 0, 0, -1);
 
 	for (; index < fItems.CountItems(); index++) {
 		BMenuItem *item = ItemAt(index);
@@ -2048,7 +2048,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 		}
 
 		item->fBounds.left = 0.0f;
-		item->fBounds.top = frame.bottom + (index > 0 ? 1.0f : 0.0f);
+		item->fBounds.top = frame.bottom + 1.0f;
 		item->fBounds.bottom = item->fBounds.top + height + fPad.top
 			+ fPad.bottom;
 
@@ -2090,18 +2090,17 @@ BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems,
 
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);
+
 		float width, height;
-		if (item != NULL) {
-			item->GetContentSize(&width, &height);
+		item->GetContentSize(&width, &height);
 
-			item->fBounds.left = frame.right;
-			item->fBounds.top = 0.0f;
-			item->fBounds.right = item->fBounds.left + width + fPad.left
-				+ fPad.right;
+		item->fBounds.left = frame.right;
+		item->fBounds.top = 0.0f;
+		item->fBounds.right = item->fBounds.left + width + fPad.left
+			+ fPad.right;
 
-			frame.right = item->Frame().right + 1.0f;
-			frame.bottom = max_c(frame.bottom, height + fPad.top + fPad.bottom);
-		}
+		frame.right = item->Frame().right + 1.0f;
+		frame.bottom = max_c(frame.bottom, height + fPad.top + fPad.bottom);
 	}
 
 	if (moveItems) {
