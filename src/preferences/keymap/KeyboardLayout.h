@@ -8,6 +8,7 @@
 
 #include <map>
 
+#include <ObjectList.h>
 #include <Point.h>
 #include <Rect.h>
 #include <String.h>
@@ -29,6 +30,11 @@ struct Key {
 	bool		dark;
 };
 
+struct Indicator {
+	int32		modifier;
+	BRect		frame;
+};
+
 typedef std::map<BString, BString> VariableMap;
 
 class KeyboardLayout {
@@ -40,13 +46,17 @@ public:
 
 			int32			CountKeys();
 			Key*			KeyAt(int32 index);
-			Key*			KeyAt(BPoint point);
+
+			int32			CountIndicators();
+			Indicator*		IndicatorAt(int32 index);
 
 			BRect			Bounds();
 			BSize			DefaultKeySize();
 
 			status_t		Load(const char* path);
 
+			int32			IndexForModifier(int32 modifier);
+			
 private:
 	enum parse_mode {
 		kPairs,
@@ -97,6 +107,8 @@ private:
 			int32			fKeyCapacity;
 			BRect			fBounds;
 			BSize			fDefaultKeySize;
+			int32			fAlternateIndex[3];
+			BObjectList<Indicator> fIndicators;
 };
 
 #endif	// KEYBOARD_LAYOUT_H

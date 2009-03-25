@@ -11,7 +11,10 @@
 #include <vector>
 
 #include <File.h>
+#include <InterfaceDefs.h>
 
+
+#undef TRACE
 
 //#define TRACE_LAYOUT
 #ifdef TRACE_LAYOUT
@@ -25,7 +28,8 @@ KeyboardLayout::KeyboardLayout()
 	:
 	fKeys(NULL),
 	fKeyCount(0),
-	fKeyCapacity(0)
+	fKeyCapacity(0),
+	fIndicators(5, true)
 {
 	_SetDefault();
 }
@@ -61,10 +65,17 @@ KeyboardLayout::KeyAt(int32 index)
 }
 
 
-Key*
-KeyboardLayout::KeyAt(BPoint point)
+int32
+KeyboardLayout::CountIndicators()
 {
-	return NULL;
+	return fIndicators.CountItems();
+}
+
+
+Indicator*
+KeyboardLayout::IndicatorAt(int32 index)
+{
+	return fIndicators.ItemAt(index);
 }
 
 
@@ -136,7 +147,8 @@ KeyboardLayout::_SetDefault()
 		"$f = 10,20\n"
 		"$g = 13,10\n"
 		// Key rows
-		"[ 0,0; d:0x01; :-; :+4; $b:-; d:+4; $b:-; :+4; $b:-; d:+3 ]\n"
+		"[ 0,0; d:0x01; :-; :+4; $b:-; d:+4; $b:-; :+4; $b:-; d:+3; $b:-; "
+			"$g:led-num; $g:led-caps; $g:led-scroll ]\n"
 		"[ 0,20; :+13; d$c:+; $b:-; d:+3; $b:-; d:+4 ]\n"
 		"[ 0,30; d$d:0x26; :+12; $d:+1; $b:-; d:+3; $b:-; :+3; "
 			"d$f:+1 ]\n"
@@ -333,7 +345,34 @@ KeyboardLayout::_AddKeyCodes(const parse_state& state, BPoint& rowLeftTop,
 	int32 modifier = 0;
 
 	if (isalpha(data[0])) {
-		// TODO: get modifier (ie. "num")
+		bool led = false;
+		if (!strcmp("led-caps", data)) {
+			modifier = B_CAPS_LOCK;
+			led = true;
+		} else if (!strcmp("led-num", data)) {
+			modifier = B_NUM_LOCK;
+			led = true;
+		} else if (!strcmp("led-scroll", data)) {
+			modifier = B_SCROLL_LOCK;
+			led = true;
+		} else {
+			// TODO: get modifier (ie. "num")
+		}
+
+		if (led) {
+			key.frame.OffsetTo(rowLeftTop);
+			rowLeftTop.x = key.frame.right;
+			fBounds = key.frame | fBounds;
+
+			Indicator* indicator = new(std::nothrow) Indicator;
+			if (indicator != NULL) {
+				indicator->modifier = modifier;
+				indicator->frame = key.frame;
+
+				fIndicators.AddItem(indicator);
+			}
+			return true;
+		}
 	}
 
 	int32 first;

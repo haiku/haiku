@@ -18,6 +18,7 @@ static const rgb_color kBrightColor = {230, 230, 230, 255};
 static const rgb_color kDarkColor = {200, 200, 200, 255};
 static const rgb_color kSecondDeadKeyColor = {240, 240, 150, 255};
 static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
+static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
 
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
@@ -88,6 +89,7 @@ KeyboardLayoutView::AttachedToWindow()
 
 	SetFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
+	fModifiers = modifiers();
 
 	_LayoutKeyboard();
 }
@@ -227,11 +229,62 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
+	// Draw keys
+
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 
 		_DrawKey(this, updateRect, key, _FrameFor(key),
 			_IsKeyPressed(key->code));
+	}
+
+	// Draw LED indicators
+
+	for (int32 i = 0; i < fLayout->CountIndicators(); i++) {
+		Indicator* indicator = fLayout->IndicatorAt(i);
+
+		BRect rect = _FrameFor(indicator->frame);
+		float rectTop = rect.top;
+		rect.top += 2 * rect.Height() / 3;
+
+		const char* label = NULL;
+		if (indicator->modifier == B_CAPS_LOCK)
+			label = "caps";
+		else if (indicator->modifier == B_NUM_LOCK)
+			label = "num";
+		else if (indicator->modifier == B_SCROLL_LOCK)
+			label = "scroll";
+		if (label != NULL) {
+			_SetFontSize(this, kIndicator);
+
+			font_height fontHeight;
+			GetFontHeight(&fontHeight);
+			if (ceilf(rect.top - fontHeight.ascent + fontHeight.descent - 2)
+					>= rectTop) {
+				SetHighColor(0, 0, 0);
+				SetLowColor(ViewColor());
+
+				BString text(label);
+				TruncateString(&text, B_TRUNCATE_END, rect.Width());
+				DrawString(text.String(), BPoint(ceilf(rect.left + (rect.Width()
+						- StringWidth(text.String())) / 2),
+					ceilf(rect.top - fontHeight.descent - 2)));
+			}
+		}
+
+		rect.left += rect.Width() / 4;
+		rect.right -= rect.Width() / 3;
+
+		rgb_color base;
+		if ((fModifiers & indicator->modifier) != 0)
+			base = kLitIndicatorColor;
+		else
+			base = kDarkColor;
+
+		be_control_look->DrawButtonFrame(this, rect, updateRect, base,
+			BControlLook::B_DISABLED);
+		be_control_look->DrawButtonBackground(this, rect, updateRect, 
+			base, BControlLook::B_DISABLED);
 	}
 }
 
@@ -653,18 +706,25 @@ KeyboardLayoutView::_KeyAt(BPoint point)
 
 
 BRect
-KeyboardLayoutView::_FrameFor(const Key* key)
+KeyboardLayoutView::_FrameFor(BRect keyFrame)
 {
 	BRect rect;
-	rect.left = key->frame.left * fFactor;
-	rect.right = (key->frame.right - key->frame.left) * fFactor + rect.left
+	rect.left = keyFrame.left * fFactor;
+	rect.right = (keyFrame.right - keyFrame.left) * fFactor + rect.left
 		- fGap - 1;
-	rect.top = key->frame.top * fFactor;
-	rect.bottom = (key->frame.bottom - key->frame.top) * fFactor + rect.top
+	rect.top = keyFrame.top * fFactor;
+	rect.bottom = (keyFrame.bottom - keyFrame.top) * fFactor + rect.top
 		- fGap - 1;
 	rect.OffsetBy(fOffset);
 
 	return rect;
+}
+
+
+BRect
+KeyboardLayoutView::_FrameFor(const Key* key)
+{
+	return _FrameFor(key->frame);
 }
 
 
@@ -692,6 +752,14 @@ KeyboardLayoutView::_SetFontSize(BView* view, key_kind keyKind)
 			fSpecialFont.SetSize(fontSize * 1.6);
 			view->SetFont(&fSpecialFont);
 			break;
+
+		case kIndicator:
+		{
+			BFont font;
+			font.SetSize(fontSize * 0.8);
+			view->SetFont(&font);
+			break;
+		}
 	}
 }
 

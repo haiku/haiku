@@ -46,7 +46,8 @@ private:
 	enum key_kind {
 		kNormalKey,
 		kSpecialKey,
-		kSymbolKey
+		kSymbolKey,
+		kIndicator
 	};
 
 			void			_LayoutKeyboard();
@@ -68,6 +69,7 @@ private:
 			bool			_HandleDeadKey(int32 key, int32 modifiers);
 			void			_KeyChanged(const BMessage* message);
 			Key*			_KeyAt(BPoint point);
+			BRect			_FrameFor(BRect keyFrame);
 			BRect			_FrameFor(const Key* key);
 			void			_SetFontSize(BView* view, key_kind keyKind);
 			void			_EvaluateDropTarget(BPoint point);
