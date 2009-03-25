@@ -70,6 +70,7 @@ private:
 			Key*			_KeyAt(BPoint point);
 			BRect			_FrameFor(const Key* key);
 			void			_SetFontSize(BView* view, key_kind keyKind);
+			void			_EvaluateDropTarget(BPoint point);
 			void			_SendFakeKeyDown(const Key* key);
 
 			KeyboardLayout*	fLayout;
@@ -82,7 +83,9 @@ private:
 
 			BPoint			fClickPoint;
 			Key*			fDragKey;
+			int32			fDragModifiers;
 			Key*			fDropTarget;
+			BPoint			fDropPoint;
 
 			BFont			fFont;
 			BFont			fSpecialFont;

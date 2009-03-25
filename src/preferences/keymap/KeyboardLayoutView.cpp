@@ -126,6 +126,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 {
 	fClickPoint = point;
 	fDragKey = NULL;
+	fDropPoint.x = -1;
 
 	Key* key = _KeyAt(point);
 	if (key != NULL) {
@@ -165,14 +166,9 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 
 	if (dragMessage != NULL) {
 		_InvalidateKey(fDropTarget);
+		fDropPoint = point;
 
-		fDropTarget = _KeyAt(point);
-		if (fDropTarget != NULL) {
-			if (fDropTarget == fDragKey)
-				fDropTarget = NULL;
-			else
-				_InvalidateKey(fDropTarget);
-		}
+		_EvaluateDropTarget(point);
 	} else if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
@@ -220,6 +216,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 
 		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
 		fDragKey = key;
+		fDragModifiers = fModifiers;
 
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
 		_InvalidateKey(key);
@@ -252,11 +249,15 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				size--;
 
 			int32 keyCode;
+			int32 buttons;
 			if (!message->IsSourceRemote()
+				&& message->FindInt32("buttons", &buttons) == B_OK
+				&& (buttons & B_SECONDARY_MOUSE_BUTTON) != 0
 				&& message->FindInt32("key", &keyCode) == B_OK) {
 				// switch keys if the dropped object came from us
 				Key* key = _KeyForCode(keyCode);
-				if (key == NULL || key == fDropTarget)
+				if (key == NULL
+					|| (key == fDropTarget && fDragModifiers == fModifiers))
 					return;
 
 				char* string;
@@ -266,7 +267,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				if (string != NULL) {
 					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 						(const char*)data, size);
-					fKeymap->SetKey(key->code, fModifiers, fDeadKey,
+					fKeymap->SetKey(key->code, fDragModifiers, fDeadKey,
 						string, numBytes);
 					delete[] string;
 				}
@@ -281,6 +282,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 
 		_InvalidateKey(fDropTarget);
 		fDropTarget = NULL;
+		fDropPoint.x = -1;
 	}
 
 	switch (message->what) {
@@ -290,8 +292,10 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 			break;
 
 		case B_MODIFIERS_CHANGED:
-			if (message->FindInt32("modifiers", &fModifiers) == B_OK)
+			if (message->FindInt32("modifiers", &fModifiers) == B_OK) {
+				_EvaluateDropTarget(fDropPoint);
 				Invalidate();
+			}
 			break;
 
 		default:
@@ -688,6 +692,19 @@ KeyboardLayoutView::_SetFontSize(BView* view, key_kind keyKind)
 			fSpecialFont.SetSize(fontSize * 1.6);
 			view->SetFont(&fSpecialFont);
 			break;
+	}
+}
+
+
+void
+KeyboardLayoutView::_EvaluateDropTarget(BPoint point)
+{
+	fDropTarget = _KeyAt(point);
+	if (fDropTarget != NULL) {
+		if (fDropTarget == fDragKey && fModifiers == fDragModifiers)
+			fDropTarget = NULL;
+		else
+			_InvalidateKey(fDropTarget);
 	}
 }
 
