@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,27 +58,31 @@ _BMCFilter_::operator=(const _BMCFilter_ &)
 }
 
 
-_BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField *menuField)
-	: BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
+// #pragma mark -
+
+
+_BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField* menuField)
+	:
+	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
 		!fixedSize),
 	fMenuField(menuField),
 	fFixedSize(fixedSize),
 	fRunner(NULL),
 	fShowPopUpMarker(true)
 {
-	SetFlags(Flags() | B_FRAME_EVENTS);
-	SetBorder(B_BORDER_CONTENTS);
+	_Init(true);
+}
 
-	float left, top, right, bottom;
-	GetItemMargins(&left, &top, &right, &bottom);
-	// give a bit more space to draw the small thumb
-	left -= 1;
-	right += 3;
-	SetItemMargins(left, top, right, bottom);
 
-	SetMaxContentWidth(frame.Width() - (left + right));
-
-	fPreviousWidth = frame.Width();
+_BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
+	:
+	BMenuBar("_mc_mb_", B_ITEMS_IN_ROW, !fixedSize),
+	fMenuField(menuField),
+	fFixedSize(fixedSize),
+	fRunner(NULL),
+	fShowPopUpMarker(true)
+{
+	_Init(false);
 }
 
 
@@ -121,33 +125,10 @@ _BMCMenuBar_::AttachedToWindow()
 	// Don't cause the KeyMenuBar to change by being attached
 	BMenuBar *menuBar = Window()->KeyMenuBar();
 	BMenuBar::AttachedToWindow();
-	if (fFixedSize)
-		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	Window()->SetKeyMenuBar(menuBar);
 
-	float left, top, right, bottom;
-	GetItemMargins(&left, &top, &right, &bottom);
-
-#if 0
-	// TODO: Better fix would be to make BMenuItem draw text properly
-	// centered
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	top = ceilf((Bounds().Height() - ceilf(fontHeight.ascent)
-		- ceilf(fontHeight.descent)) / 2) + 1;
-	bottom = top - 1;
-#else
-	// TODO: Fix content location properly. This is just a quick fix to
-	// make the BMenuField label and the super-item of the BMenuBar
-	// align vertically.
-	top++;
-	bottom--;
-#endif
-
-	if (be_control_look)
-		left = right = be_control_look->DefaultLabelSpacing();
-
-	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);
+	if (fFixedSize && (Flags() & B_SUPPORTS_LAYOUT) == 0)
+		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 }
 
 
@@ -392,3 +373,41 @@ _BMCMenuBar_
 {
 	return *this;
 }
+
+
+void
+_BMCMenuBar_::_Init(bool setMaxContentWidth)
+{
+	SetFlags(Flags() | B_FRAME_EVENTS);
+	SetBorder(B_BORDER_CONTENTS);
+
+	float left, top, right, bottom;
+	GetItemMargins(&left, &top, &right, &bottom);
+
+#if 0
+	// TODO: Better fix would be to make BMenuItem draw text properly
+	// centered
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	top = ceilf((Bounds().Height() - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2) + 1;
+	bottom = top - 1;
+#else
+	// TODO: Fix content location properly. This is just a quick fix to
+	// make the BMenuField label and the super-item of the BMenuBar
+	// align vertically.
+	top++;
+	bottom--;
+#endif
+
+	if (be_control_look)
+		left = right = be_control_look->DefaultLabelSpacing();
+
+	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);
+
+	fPreviousWidth = Bounds().Width();
+
+	if (setMaxContentWidth)
+		SetMaxContentWidth(fPreviousWidth - (left + right));
+}
+

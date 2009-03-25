@@ -1031,16 +1031,20 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	fMenu = menu;
 	InitMenu(menu);
 
-	frame.left = _MenuBarOffset();
-	frame.top = kVMargin;
-	frame.right -= kVMargin;
-	frame.bottom -= kVMargin;
-
-	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
-		frame.left, frame.top, frame.right, frame.bottom,
-		frame.Width(), frame.Height());
-
-	fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
+	if ((Flags() & B_SUPPORTS_LAYOUT)) {
+		fMenuBar = new _BMCMenuBar_(fixedSize, this);
+	} else {
+		frame.left = _MenuBarOffset();
+		frame.top = kVMargin;
+		frame.right -= kVMargin;
+		frame.bottom -= kVMargin;
+	
+		TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
+			frame.left, frame.top, frame.right, frame.bottom,
+			frame.Width(), frame.Height());
+	
+		fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
+	}
 
 	if (fixedSize) {
 		// align the menu bar in the full available space
