@@ -105,12 +105,17 @@ BButton::Draw(BRect updateRect)
 {
 	if (be_control_look != NULL) {
 		BRect rect(Bounds());
+		rgb_color background = B_TRANSPARENT_COLOR;
+		if (Parent())
+			background = Parent()->ViewColor();
+		if (background == B_TRANSPARENT_COLOR)
+			background = ui_color(B_PANEL_BACKGROUND_COLOR);
 		rgb_color base = LowColor();
 		uint32 flags = be_control_look->Flags(this);
 		if (IsDefault())
 			flags |= BControlLook::B_DEFAULT_BUTTON;
 		be_control_look->DrawButtonFrame(this, rect, updateRect,
-			base, flags);
+			base, background, flags);
 		be_control_look->DrawButtonBackground(this, rect, updateRect,
 			base, flags);
 

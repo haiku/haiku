@@ -95,7 +95,8 @@ IconButton::Draw(BRect area)
 			flags |= BControlLook::B_ACTIVATED;
 
 		if (DrawBorder()) {
-			be_control_look->DrawButtonFrame(this, r, area, background, flags);
+			be_control_look->DrawButtonFrame(this, r, area, background,
+				background, flags);
 			be_control_look->DrawButtonBackground(this, r, area, background,
 				flags);
 		} else {

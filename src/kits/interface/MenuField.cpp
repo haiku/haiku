@@ -269,13 +269,15 @@ BMenuField::Draw(BRect update)
 
 	if (be_control_look != NULL) {
 		frame.InsetBy(-kVMargin, -kVMargin);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		rgb_color base = fMenuBar->LowColor();
+		rgb_color background = LowColor();
 		uint32 flags = 0;
 		if (!fMenuBar->IsEnabled())
 			flags |= BControlLook::B_DISABLED;
 		if (active)
 			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawMenuFieldFrame(this, frame, update, base, flags);
+		be_control_look->DrawMenuFieldFrame(this, frame, update, base,
+			background, flags);
 		return;
 	}
 

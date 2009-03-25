@@ -275,6 +275,7 @@ KeyboardLayoutView::Draw(BRect updateRect)
 		rect.left += rect.Width() / 4;
 		rect.right -= rect.Width() / 3;
 
+		rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 		rgb_color base;
 		if ((fModifiers & indicator->modifier) != 0)
 			base = kLitIndicatorColor;
@@ -282,7 +283,7 @@ KeyboardLayoutView::Draw(BRect updateRect)
 			base = kDarkColor;
 
 		be_control_look->DrawButtonFrame(this, rect, updateRect, base,
-			BControlLook::B_DISABLED);
+			background, BControlLook::B_DISABLED);
 		be_control_look->DrawButtonBackground(this, rect, updateRect, 
 			base, BControlLook::B_DISABLED);
 	}
@@ -378,10 +379,10 @@ KeyboardLayoutView::_LayoutKeyboard()
 
 void
 KeyboardLayoutView::_DrawKeyButton(BView* view, BRect rect, BRect updateRect,
-	rgb_color base, bool pressed)
+	rgb_color base, rgb_color background, bool pressed)
 {
 	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
-		pressed ? BControlLook::B_ACTIVATED : 0);
+		background, pressed ? BControlLook::B_ACTIVATED : 0);
 	be_control_look->DrawButtonBackground(view, rect, updateRect, 
 		base, pressed ? BControlLook::B_ACTIVATED : 0);
 }
@@ -392,6 +393,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	BRect rect, bool pressed)
 {
 	rgb_color base = key->dark ? kDarkColor : kBrightColor;
+	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	key_kind keyKind = kNormalKey;
 	int32 deadKey = 0;
 	bool secondDeadKey = false;
@@ -415,7 +417,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		base = kDeadKeyColor;
 
 	if (key->shape == kRectangleKeyShape) {
-		_DrawKeyButton(view, rect, updateRect, base, pressed);
+		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
 		rect.InsetBy(1, 1);
 
@@ -434,7 +436,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		region.Exclude(missingRect);
 		ConstrainClippingRegion(&region);
 
-		_DrawKeyButton(view, rect, updateRect, base, pressed);
+		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
 		rect.left = missingRect.right;
 		be_control_look->DrawLabel(view, text, rect, updateRect,
@@ -447,7 +449,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		rect = originalRect;
 		rect.bottom = missingRect.top + 2;
-		_DrawKeyButton(view, rect, updateRect, base, pressed);
+		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
 		missingRect.left = missingRect.right;
 		missingRect.right++;
@@ -458,7 +460,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		rect = originalRect;
 		rect.left = missingRect.right - 2;
 		rect.top = missingRect.top - 2;
-		_DrawKeyButton(view, rect, updateRect, base, pressed);
+		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
 		ConstrainClippingRegion(NULL);
 	}

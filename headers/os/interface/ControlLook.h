@@ -71,6 +71,7 @@ public:
 	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
+									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
@@ -91,6 +92,7 @@ public:
 	virtual	void				DrawMenuFieldFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
+									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
@@ -242,6 +244,7 @@ protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
+									const rgb_color& background,
 									float contrast, float brightness = 1.0,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);

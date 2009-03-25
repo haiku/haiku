@@ -52,7 +52,8 @@ private:
 
 			void			_LayoutKeyboard();
 			void			_DrawKeyButton(BView* view, BRect rect,
-								BRect updateRect, rgb_color base, bool pressed);
+								BRect updateRect, rgb_color base,
+								rgb_color background, bool pressed);
 			void			_DrawKey(BView* view, BRect updateRect,
 								const Key* key, BRect frame, bool pressed);
 			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);

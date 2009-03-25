@@ -129,6 +129,11 @@ _BMCMenuBar_::AttachedToWindow()
 
 	if (fFixedSize && (Flags() & B_SUPPORTS_LAYOUT) == 0)
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+
+	if (Parent() != NULL)
+		SetLowColor(Parent()->LowColor());
+	else
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 

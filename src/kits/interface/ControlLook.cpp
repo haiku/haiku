@@ -66,9 +66,11 @@ BControlLook::Flags(BControl* control) const
 
 void
 BControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders)
+	const rgb_color& base, const rgb_color& background, uint32 flags,
+	uint32 borders)
 {
-	_DrawButtonFrame(view, rect, updateRect, base, 1.0, 1.0, flags, borders);
+	_DrawButtonFrame(view, rect, updateRect, base, background, 1.0, 1.0, flags,
+		borders);
 }
 
 
@@ -220,10 +222,12 @@ BControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 
 
 void
-BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders)
+BControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base,
+	const rgb_color& background, uint32 flags, uint32 borders)
 {
-	_DrawButtonFrame(view, rect, updateRect, base, 0.6, 1.0, flags, borders);
+	_DrawButtonFrame(view, rect, updateRect, base, background, 0.6, 1.0, flags,
+		borders);
 }
 
 
@@ -1606,7 +1610,7 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 
 void
 BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
-	const BRect& updateRect, const rgb_color& base,
+	const BRect& updateRect, const rgb_color& base, const rgb_color& background,
 	float contrast, float brightness, uint32 flags, uint32 borders)
 {
 	// colors
@@ -1667,7 +1671,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			borders);
 	} else {
 		// bevel around external border
-		_DrawOuterResessedFrame(view, rect, base,
+		_DrawOuterResessedFrame(view, rect, background,
 			contrast * ((flags & B_DISABLED) ? 0.0 : 1.0), brightness * 1.0,
 			borders);
 	}
