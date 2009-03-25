@@ -8,6 +8,7 @@
 
 #include <map>
 
+#include <Entry.h>
 #include <ObjectList.h>
 #include <Point.h>
 #include <Rect.h>
@@ -55,7 +56,10 @@ public:
 			int32			IndexForModifier(int32 modifier);
 
 			status_t		Load(const char* path);
-			
+			status_t		Load(entry_ref& ref);
+
+			void			SetDefault();
+
 private:
 	enum parse_mode {
 		kPairs,
@@ -69,7 +73,6 @@ private:
 		int32		line;
 	};
 
-			void			_SetDefault();
 			void			_FreeKeys();
 			void			_Error(const parse_state& state,
 								const char* reason, ...);

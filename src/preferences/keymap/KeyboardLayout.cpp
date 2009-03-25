@@ -31,7 +31,7 @@ KeyboardLayout::KeyboardLayout()
 	fKeyCapacity(0),
 	fIndicators(5, true)
 {
-	_SetDefault();
+	SetDefault();
 }
 
 
@@ -103,8 +103,18 @@ KeyboardLayout::IndexForModifier(int32 modifier)
 status_t
 KeyboardLayout::Load(const char* path)
 {
+	entry_ref ref;
+	get_ref_for_path(path, &ref);
+
+	return Load(ref);
+}
+
+
+status_t
+KeyboardLayout::Load(entry_ref& ref)
+{
 	BFile file;
-	status_t status = file.SetTo(path, B_READ_ONLY);
+	status_t status = file.SetTo(&ref, B_READ_ONLY);
 	if (status != B_OK)
 		return status;
 
@@ -142,7 +152,7 @@ KeyboardLayout::Load(const char* path)
 
 
 void
-KeyboardLayout::_SetDefault()
+KeyboardLayout::SetDefault()
 {
 #if 1
 	static const char* kDefaultLayout104 = "name = Generic 104-key\n"

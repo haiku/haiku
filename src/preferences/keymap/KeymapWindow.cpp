@@ -37,7 +37,7 @@ static const uint32 kMsgMenuFileOpen = 'mMFO';
 static const uint32 kMsgMenuFileSave = 'mMFS';
 static const uint32 kMsgMenuFileSaveAs = 'mMFA';
 
-static const uint32 kMsgMenuEditUndo = 'mMEU';
+static const uint32 kChangeKeyboardLayout = 'cKyL';
 
 static const uint32 kMsgMenuFontChanged = 'mMFC';
 
@@ -211,6 +211,24 @@ KeymapWindow::MessageReceived(BMessage* message)
 			fSavePanel->Show();
 			break;
 
+		case kChangeKeyboardLayout:
+		{
+			entry_ref ref;
+			if (message->FindRef("ref", &ref) == B_OK
+				&& fKeyboardLayoutView->GetKeyboardLayout()->Load(ref)
+						== B_OK) {
+				fKeyboardLayoutView->SetKeyboardLayout(
+					fKeyboardLayoutView->GetKeyboardLayout());
+			} else {
+				fKeyboardLayoutView->GetKeyboardLayout()->SetDefault();
+				fLayoutMenu->ItemAt(0)->SetMarked(true);
+			}
+
+			fKeyboardLayoutView->SetKeyboardLayout(
+				fKeyboardLayoutView->GetKeyboardLayout());
+			break;
+		}
+
 		case kMsgMenuFontChanged:
 		{
 			BMenuItem *item = fFontMenu->FindMarked();
@@ -308,32 +326,15 @@ KeymapWindow::_CreateMenu()
 	menuBar->AddItem(menu);
 
 	// Create keyboard layout menu
-	menu = new BMenu("Layout");
-	menu->AddItem(item = new BMenuItem(
-		fKeyboardLayoutView->GetKeyboardLayout()->Name(), NULL));
+	fLayoutMenu = new BMenu("Layout");
+	fLayoutMenu->SetRadioMode(true);
+	fLayoutMenu->AddItem(item = new BMenuItem(
+		fKeyboardLayoutView->GetKeyboardLayout()->Name(),
+		new BMessage(kChangeKeyboardLayout)));
 	item->SetMarked(true);
-	menuBar->AddItem(menu);
-#if 0	
-	// Create the Edit menu
-	menu = new BMenu("Edit");
-	currentItem = new BMenuItem("Undo",
-		new BMessage(kMsgMenuEditUndo), 'Z');
-	currentItem->SetEnabled(false);
-	menu->AddItem(currentItem);
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem( "Cut",
-		new BMessage(kMsgMenuEditCut), 'X'));
-	menu->AddItem(new BMenuItem( "Copy",
-		new BMessage(kMsgMenuEditCopy), 'C'));
-	menu->AddItem(new BMenuItem( "Paste",
-		new BMessage(kMsgMenuEditPaste), 'V'));
-	menu->AddItem(new BMenuItem( "Clear",
-		new BMessage(kMsgMenuEditClear)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem( "Select All",
-		new BMessage(kMsgMenuEditSelectAll), 'A'));
-	menuBar->AddItem(menu);
-#endif
+
+	_AddKeyboardLayouts(fLayoutMenu);
+	menuBar->AddItem(fLayoutMenu);
 
 	// Create the Font menu
 	fFontMenu = new BMenu("Font");
@@ -377,12 +378,6 @@ KeymapWindow::_CreateMapLists()
 	BScrollView* userScroller = new BScrollView("userScrollList",
 		fUserListView, 0, false, true);
 
-	// '(Current)'
-	KeymapListItem* currentKeymapItem
-		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
-	if (currentKeymapItem != NULL)
-		fUserListView->AddItem(currentKeymapItem);
-
 	// Saved keymaps
 
 	_FillSystemMaps();
@@ -396,6 +391,40 @@ KeymapWindow::_CreateMapLists()
 		.Add(systemScroller, 3)
 		.Add(new BStringView("user", "User:"))
 		.Add(userScroller);
+}
+
+
+void
+KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
+{
+	directory_which dataDirectories[] = {
+		B_USER_DATA_DIRECTORY,
+		B_COMMON_DATA_DIRECTORY,
+		B_BEOS_DATA_DIRECTORY
+	};
+
+	for (uint32 i = 0;
+			i < sizeof(dataDirectories) / sizeof(dataDirectories[0]); i++) {
+		BPath path;
+		if (find_directory(dataDirectories[i], &path) != B_OK)
+			continue;
+
+		path.Append("KeyboardLayouts");
+
+		BDirectory directory;		
+		if (directory.SetTo(path.Path()) == B_OK) {
+			entry_ref ref;
+			while (directory.GetNextRef(&ref) == B_OK) {
+				if (menu->FindItem(ref.name) != NULL)
+					continue;
+
+				BMessage* message = new BMessage(kChangeKeyboardLayout);
+				message->AddRef("ref", &ref);
+
+				menu->AddItem(new BMenuItem(ref.name, message));
+			}
+		}
+	}
 }
 
 

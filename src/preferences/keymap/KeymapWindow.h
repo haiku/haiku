@@ -37,6 +37,7 @@ public:
 protected:
 			BMenuBar*			_CreateMenu();
 			BView*				_CreateMapLists();
+			void				_AddKeyboardLayouts(BMenu* menu);
 
 			void				_UpdateButtons();
 
@@ -56,6 +57,7 @@ protected:
 			BListView*			fUserListView;
 			BButton*			fUseButton;
 			BButton*			fRevertButton;
+			BMenu*				fLayoutMenu;
 			BMenu*				fFontMenu;
 			KeyboardLayoutView*	fKeyboardLayoutView;
 			BTextControl*		fTextControl;
