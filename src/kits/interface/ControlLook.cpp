@@ -1572,29 +1572,29 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 
 	switch (alignment.horizontal) {
 	default:
-	case B_ALIGN_LEFT:
-		location.x = rect.left;
-		break;
-	case B_ALIGN_RIGHT:
-		location.x = rect.right - width;
-		break;
-	case B_ALIGN_CENTER:
-		location.x = (rect.left + rect.right - width) / 2.0f;
-		break;
+		case B_ALIGN_LEFT:
+			location.x = rect.left;
+			break;
+		case B_ALIGN_RIGHT:
+			location.x = rect.right - width;
+			break;
+		case B_ALIGN_CENTER:
+			location.x = (rect.left + rect.right - width) / 2.0f;
+			break;
 	}
 
 	switch (alignment.vertical) {
-	case B_ALIGN_TOP:
-		location.y = rect.top + ceilf(fontHeight.ascent);
-		break;
-	default:
-	case B_ALIGN_MIDDLE:
-		location.y = floorf((rect.top + rect.bottom - height) / 2.0f + 0.5f)
-			+ ceilf(fontHeight.ascent);
-		break;
-	case B_ALIGN_BOTTOM:
-		location.y = rect.bottom - ceilf(fontHeight.descent);
-		break;
+		case B_ALIGN_TOP:
+			location.y = rect.top + ceilf(fontHeight.ascent);
+			break;
+		default:
+		case B_ALIGN_MIDDLE:
+			location.y = floorf((rect.top + rect.bottom - height) / 2.0f + 0.5f)
+				+ ceilf(fontHeight.ascent);
+			break;
+		case B_ALIGN_BOTTOM:
+			location.y = rect.bottom - ceilf(fontHeight.descent);
+			break;
 	}
 
 	view->DrawString(truncatedLabel.String(), location);
