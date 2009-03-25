@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DATE_TIME_H_
@@ -147,6 +147,7 @@ class BDate {
 
 class BDateTime {
 	public:
+							BDateTime();
 							BDateTime(const BDate &date, const BTime &time);
 							~BDateTime();
 
@@ -161,7 +162,7 @@ class BDateTime {
 		BTime				Time() const;
 		void				SetTime(const BTime &time);
 
-		uint32				Time_t() const;
+		static	uint32		Time_t(time_type type);
 
 	private:
 		BDate				fDate;

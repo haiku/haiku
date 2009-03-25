@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -536,10 +536,11 @@ bool
 BDate::IsLeapYear(int32 year) const
 {
 	if (year < 1582) {
-		if (year < 0) year++;
+		if (year < 0)
+			year++;
 		return (year % 4) == 0;
 	}
-	return year % 400 == 0 || year % 4 == 0 && year % 100 != 0;
+	return (year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0));
 }
 
 
@@ -777,6 +778,13 @@ BDate::_DateToJulianDay(int32 _year, int32 month, int32 day) const
 //	#pragma mark - BDateTime
 
 
+BDateTime::BDateTime()
+	: fDate(BDate()),
+	  fTime(BTime())
+{
+}
+
+
 BDateTime::BDateTime(const BDate &date, const BTime &time)
 	: fDate(date),
 	  fTime(time)
@@ -843,17 +851,20 @@ BDateTime::SetTime(const BTime &time)
 
 
 uint32
-BDateTime::Time_t() const
+BDateTime::Time_t(time_type type)
 {
+	BTime time = BTime::CurrentTime(type);
+	BDate date = BDate::CurrentDate(type);
+
 	tm tm_struct;
 
-	tm_struct.tm_hour = fTime.Hour();
-	tm_struct.tm_min = fTime.Minute();
-	tm_struct.tm_sec = fTime.Second();
+	tm_struct.tm_hour = time.Hour();
+	tm_struct.tm_min = time.Minute();
+	tm_struct.tm_sec = time.Second();
 
-	tm_struct.tm_year = fDate.Year() - 1900;
-	tm_struct.tm_mon = fDate.Month() - 1;
-	tm_struct.tm_mday = fDate.Day();
+	tm_struct.tm_year = date.Year() - 1900;
+	tm_struct.tm_mon = date.Month() - 1;
+	tm_struct.tm_mday = date.Day();
 
 	// set less 0 as we wan't use it
 	tm_struct.tm_isdst = -1;
