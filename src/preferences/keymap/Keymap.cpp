@@ -5,6 +5,7 @@
  * Authors:
  *		Sandor Vroemisse
  *		Jérôme Duval
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 
 #include "Keymap.h"
@@ -16,6 +17,10 @@
 #include <File.h>
 
 #include <input_globals.h>
+
+
+static const uint32 kModifierKeys = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
+	| B_CAPS_LOCK | B_OPTION_KEY | B_MENU_KEY;
 
 
 static void
@@ -121,7 +126,7 @@ Keymap::Load(entry_ref &ref)
 }
 
 
-//!	We save a map from a file
+//!	We save a map to a file
 status_t
 Keymap::Save(entry_ref& ref)
 {
@@ -203,55 +208,15 @@ Keymap::IsModifierKey(uint32 keyCode)
 }
 
 
-//! Tell if a key is a dead key, needed for draw a dead key.
+//! Checks whether a key is a dead key.
 uint8
 Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 {
 	if (fChars == NULL)
 		return 0;
 
-	int32 offset;
 	uint32 tableMask = 0;
-
-	switch (modifiers & 0xcf) {
-		case B_SHIFT_KEY:
-			offset = fKeys.shift_map[keyCode];
-			tableMask = B_SHIFT_TABLE;
-			break;
-		case B_CAPS_LOCK:
-			offset = fKeys.caps_map[keyCode];
-			tableMask = B_CAPS_TABLE;
-			break;
-		case B_CAPS_LOCK|B_SHIFT_KEY:
-			offset = fKeys.caps_shift_map[keyCode];
-			tableMask = B_CAPS_SHIFT_TABLE;
-			break;
-		case B_OPTION_KEY:
-			offset = fKeys.option_map[keyCode];
-			tableMask = B_OPTION_TABLE;
-			break;
-		case B_OPTION_KEY|B_SHIFT_KEY:
-			offset = fKeys.option_shift_map[keyCode];
-			tableMask = B_OPTION_SHIFT_TABLE;
-			break;
-		case B_OPTION_KEY|B_CAPS_LOCK:
-			offset = fKeys.option_caps_map[keyCode];
-			tableMask = B_OPTION_CAPS_TABLE;
-			break;
-		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK:
-			offset = fKeys.option_caps_shift_map[keyCode];
-			tableMask = B_OPTION_CAPS_SHIFT_TABLE;
-			break;
-		case B_CONTROL_KEY:
-			offset = fKeys.control_map[keyCode];
-			tableMask = B_CONTROL_TABLE;
-			break;
-		default:
-			offset = fKeys.normal_map[keyCode];
-			tableMask = B_NORMAL_TABLE;
-			break;
-	}
-
+	int32 offset = _Offset(keyCode, modifiers, &tableMask);
 	if (offset <= 0)
 		return 0;
 
@@ -304,22 +269,11 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 	if (!activeDeadKey)
 		return false;
 
-	int32 offset;
-
-	switch (modifiers & 0xcf) {
-		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
-		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
-		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; break;
-		case B_OPTION_KEY: offset = fKeys.option_map[keyCode]; break;
-		case B_OPTION_KEY|B_SHIFT_KEY: offset = fKeys.option_shift_map[keyCode]; break;
-		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; break;
-		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; break;
-		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
-		default: offset = fKeys.normal_map[keyCode]; break;
-	}
+	int32 offset = _Offset(keyCode, modifiers);
+	if (offset < 0)
+		return false;
 
 	uint32 numBytes = fChars[offset];
-
 	if (!numBytes)
 		return false;
 
@@ -356,8 +310,6 @@ void
 Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 	char** chars, int32* numBytes)
 {
-	int32 offset;
-
 	*numBytes = 0;
 	*chars = NULL;
 
@@ -382,18 +334,9 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 		}
 	}
 
-	// here we choose the right map given the modifiers
-	switch (modifiers & 0xcf) {
-		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
-		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
-		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; break;
-		case B_OPTION_KEY: offset = fKeys.option_map[keyCode]; break;
-		case B_OPTION_KEY|B_SHIFT_KEY: offset = fKeys.option_shift_map[keyCode]; break;
-		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; break;
-		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; break;
-		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
-		default: offset = fKeys.normal_map[keyCode]; break;
-	}
+	int32 offset = _Offset(keyCode, modifiers);
+	if (offset < 0)
+		return;
 
 	// here we get the char size
 	*numBytes = fChars[offset];
@@ -451,9 +394,86 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 }
 
 
-// we make our input server use the map in /boot/home/config/settings/Keymap
+//! We make our input server use the map in /boot/home/config/settings/Keymap
 status_t
 Keymap::Use()
 {
 	return _restore_key_map_();
+}
+
+
+void
+Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
+	const char* bytes, int32 numBytes)
+{
+	int32 offset = _Offset(keyCode, modifiers);
+	if (offset < 0)
+		return;
+
+	if (numBytes == -1)
+		numBytes = strlen(bytes);
+
+	int32 oldNumBytes = fChars[offset];
+
+	// TODO: handle dead keys!
+	// TODO!
+	if (oldNumBytes != numBytes)
+		return;
+
+	memcpy(&fChars[offset + 1], bytes, numBytes);
+}
+
+
+int32
+Keymap::_Offset(uint32 keyCode, uint32 modifiers, uint32* _table)
+{
+	int32 offset;
+	uint32 table;
+
+	switch (modifiers & kModifierKeys) {
+		case B_SHIFT_KEY:
+			offset = fKeys.shift_map[keyCode];
+			table = B_SHIFT_TABLE;
+			break;
+		case B_CAPS_LOCK:
+			offset = fKeys.caps_map[keyCode];
+			table = B_CAPS_TABLE;
+			break;
+		case B_CAPS_LOCK | B_SHIFT_KEY:
+			offset = fKeys.caps_shift_map[keyCode];
+			table = B_CAPS_SHIFT_TABLE;
+			break;
+		case B_OPTION_KEY:
+			offset = fKeys.option_map[keyCode];
+			table = B_OPTION_TABLE;
+			break;
+		case B_OPTION_KEY | B_SHIFT_KEY:
+			offset = fKeys.option_shift_map[keyCode];
+			table = B_OPTION_SHIFT_TABLE;
+			break;
+		case B_OPTION_KEY | B_CAPS_LOCK:
+			offset = fKeys.option_caps_map[keyCode];
+			table = B_OPTION_CAPS_TABLE;
+			break;
+		case B_OPTION_KEY | B_SHIFT_KEY | B_CAPS_LOCK:
+			offset = fKeys.option_caps_shift_map[keyCode];
+			table = B_OPTION_CAPS_SHIFT_TABLE;
+			break;
+		case B_CONTROL_KEY:
+			offset = fKeys.control_map[keyCode];
+			table = B_CONTROL_TABLE;
+			break;
+		default:
+			offset = fKeys.normal_map[keyCode];
+			table = B_NORMAL_TABLE;
+			break;
+	}
+
+	if (_table != NULL)
+		*_table = table;
+
+	if (offset >= (int32)fCharsSize)
+		return -1;
+
+	return offset;
 }

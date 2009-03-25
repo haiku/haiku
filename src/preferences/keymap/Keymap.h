@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jérôme Duval
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 #ifndef KEYMAP_H
 #define KEYMAP_H
@@ -28,9 +29,16 @@ public:
 			status_t		Use();
 			bool			Equals(const Keymap& map) const;
 
+			void			SetKey(uint32 keyCode, uint32 modifiers,
+								int8 deadKey, const char* bytes,
+								int32 numBytes = -1);
+
 			const key_map&	Map() const { return fKeys; }
 
 private:
+			int32			_Offset(uint32 keyCode, uint32 modifiers,
+								uint32* _table = NULL);
+
 			char*			fChars;
 			key_map			fKeys;
 			uint32			fCharsSize;
