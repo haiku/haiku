@@ -8,6 +8,7 @@
 
 #include <Bitmap.h>
 #include <ControlLook.h>
+#include <LayoutUtils.h>
 #include <Window.h>
 
 #include "Keymap.h"
@@ -24,7 +25,8 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	fKeymap(NULL),
 	fModifiers(0),
 	fDeadKey(0),
-	fIsDragging(false)
+	fIsDragging(false),
+	fDropTarget(NULL)
 {
 	fLayout = new KeyboardLayout;
 	memset(fKeyState, 0, sizeof(fKeyState));
@@ -98,15 +100,12 @@ KeyboardLayoutView::FrameResized(float width, float height)
 }
 
 
-#if 0
 BSize
 KeyboardLayoutView::MinSize()
 {
-	// TODO!
-	BSize size(100, 100);
-	return size;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(100, 50));
 }
-#endif
+
 
 void
 KeyboardLayoutView::KeyDown(const char* bytes, int32 numBytes)
@@ -131,7 +130,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	Key* key = _KeyAt(point);
 	if (key != NULL) {
 		fKeyState[key->code / 8] |= (1 << (7 - (key->code & 7)));
-		_InvalidateKey(key->code);
+		_InvalidateKey(key);
 	}
 }
 
@@ -139,10 +138,17 @@ KeyboardLayoutView::MouseDown(BPoint point)
 void
 KeyboardLayoutView::MouseUp(BPoint point)
 {
+	fDropTarget = NULL;
+
 	Key* key = _KeyAt(fClickPoint);
 	if (key != NULL) {
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
-		_InvalidateKey(key->code);
+
+		if (fKeymap != NULL && _HandleDeadKey(key->code, fModifiers)
+			&& fDeadKey != 0)
+			return;
+
+		_InvalidateKey(key);
 
 		if (!fIsDragging && fKeymap != NULL) {
 			// Send fake key down message to target
@@ -183,17 +189,11 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		return;
 
 	if (dragMessage != NULL) {
-#if 0
-		// TODO: check if we support this message!
-		Key* key = _KeyAt(point);
-		if (key == NULL)
-			return;
+		_InvalidateKey(fDropTarget);
 
-		// TODO: have a mouse key state, and a current drag key!
-		memset(fKeyState, 0, sizeof(fKeyState));
-		fKeyState[key->code / 8] = (1 << (7 - (key->code & 7)));
-		_InvalidateKey(key->code);
-#endif
+		fDropTarget = _KeyAt(point);
+		if (fDropTarget != NULL)
+			_InvalidateKey(fDropTarget);
 	} else if (!fIsDragging && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
@@ -243,7 +243,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		fIsDragging = true;
 
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
-		_InvalidateKey(key->code);
+		_InvalidateKey(key);
 	}
 }
 
@@ -264,6 +264,8 @@ void
 KeyboardLayoutView::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
+		fDropTarget = NULL;
+
 		Key* key = _KeyAt(ConvertFromScreen(message->DropPoint()));
 		if (key != NULL && fKeymap != NULL) {
 			const char* data;
@@ -276,9 +278,8 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 
 				fKeymap->SetKey(key->code, fModifiers, fDeadKey,
 					(const char*)data, size);
-				_InvalidateKey(key->code);
-			} else
-			message->PrintToStream();
+				_InvalidateKey(key);
+			}
 		}
 	}
 
@@ -524,6 +525,9 @@ KeyboardLayoutView::_IsKeyPressed(int32 code)
 	if (code >= 16 * 8)
 		return false;
 
+	if (fDropTarget != NULL && fDropTarget->code == code)
+		return true;
+
 	return (fKeyState[code / 8] & (1 << (7 - (code & 7)))) != 0;
 }
 
@@ -546,9 +550,38 @@ KeyboardLayoutView::_KeyForCode(int32 code)
 void
 KeyboardLayoutView::_InvalidateKey(int32 code)
 {
-	Key* key = _KeyForCode(code);
+	_InvalidateKey(_KeyForCode(code));
+}
+
+
+void
+KeyboardLayoutView::_InvalidateKey(Key* key)
+{
 	if (key != NULL)
 		Invalidate(_FrameFor(key));
+}
+
+
+/*!	Updates the fDeadKey member, and invalidates the view if needed.
+	fKeymap must be valid when calling this method.
+
+	\return true if the view has been invalidated.
+*/
+bool
+KeyboardLayoutView::_HandleDeadKey(int32 key, int32 modifiers)
+{
+	int32 deadKey = fKeymap->IsDeadKey(key, modifiers);
+	if (fDeadKey != deadKey) {
+		Invalidate();
+		fDeadKey = deadKey;
+		return true;
+	} else if (fDeadKey != 0) {
+		Invalidate();
+		fDeadKey = 0;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -568,16 +601,8 @@ KeyboardLayoutView::_KeyChanged(BMessage* message)
 	bool checkSingle = true;
 
 	if (message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN) {
-		int32 deadKey = fKeymap->IsDeadKey(key, fModifiers);
-		if (fDeadKey != deadKey) {
-			Invalidate();
-			fDeadKey = deadKey;
+		if (_HandleDeadKey(key, fModifiers))
 			checkSingle = false;
-		} else if (fDeadKey != 0) {
-			Invalidate();
-			fDeadKey = 0;
-			checkSingle = false;
-		}
 	}
 
 	for (int32 i = 0; i < 16; i++) {

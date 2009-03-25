@@ -30,7 +30,7 @@ public:
 protected:
 	virtual	void			AttachedToWindow();
 	virtual void			FrameResized(float width, float height);
-//	virtual	BSize			MinSize();
+	virtual	BSize			MinSize();
 
 	virtual	void			KeyDown(const char* bytes, int32 numBytes);
 	virtual	void			KeyUp(const char* bytes, int32 numBytes);
@@ -64,6 +64,8 @@ private:
 			bool			_IsKeyPressed(int32 code);
 			Key*			_KeyForCode(int32 code);
 			void			_InvalidateKey(int32 code);
+			void			_InvalidateKey(Key* key);
+			bool			_HandleDeadKey(int32 key, int32 modifiers);
 			void			_KeyChanged(BMessage* message);
 			Key*			_KeyAt(BPoint point);
 			BRect			_FrameFor(Key* key);
@@ -79,6 +81,7 @@ private:
 
 			BPoint			fClickPoint;
 			bool			fIsDragging;
+			Key*			fDropTarget;
 
 			BFont			fFont;
 			BFont			fSpecialFont;
