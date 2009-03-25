@@ -138,10 +138,15 @@ KeymapWindow::KeymapWindow()
 	Lock();
 
 	// Try and find the current map name in the two list views (if the name
-	// was read at all) - this will also load the fCurrentMap
-	if (!_SelectCurrentMap(fSystemListView)
-		&& !_SelectCurrentMap(fUserListView))
-		fUserListView->Select(0L);
+	// was read at all)
+	_SelectCurrentMap();
+
+	KeymapListItem* current
+		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
+
+	fCurrentMap.Load(current->EntryRef());
+	fPreviousMap.Load(current->EntryRef());
+	fAppliedMap.Load(current->EntryRef());
 
 	Unlock();
 }
@@ -208,16 +213,6 @@ KeymapWindow::MessageReceived(BMessage* message)
 			fSavePanel->Show();
 			break;
 
-#if 0
-		case kMsgMenuEditUndo:
-		case kMsgMenuEditCut:
-		case kMsgMenuEditCopy:
-		case kMsgMenuEditPaste:
-		case kMsgMenuEditClear:
-		case kMsgMenuEditSelectAll:
-			fMapView->MessageReceived(message);
-			break;
-#endif
 		case kMsgMenuFontChanged:
 		{
 			BMenuItem *item = fFontMenu->FindMarked();
@@ -231,51 +226,41 @@ KeymapWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgSystemMapSelected:
-		{
-			KeymapListItem *keymapListItem = 
-				static_cast<KeymapListItem*>(fSystemListView->ItemAt(
-					fSystemListView->CurrentSelection()));
-			if (keymapListItem) {
-				fCurrentMap.Load(keymapListItem->KeymapEntry());
-
-				if (fFirstTime) {
-					fPreviousMap.Load(keymapListItem->KeymapEntry());
-					fAppliedMap.Load(keymapListItem->KeymapEntry());
-					fFirstTime = false;
-				}
-
-				fKeyboardLayoutView->SetKeymap(&fCurrentMap);
-
-				// Deselect item in other BListView
-				fUserListView->DeselectAll();
-				_UpdateButtons();
-			}
-			break;
-		}
-
 		case kMsgUserMapSelected:
 		{
-			int32 index = fUserListView->CurrentSelection();
-			if (index == 0) {
+			BListView* listView;
+			BListView* otherListView;
+
+			if (message->what == kMsgSystemMapSelected) {
+				fUserListView->DeselectAll();
+				listView = fSystemListView;
+				otherListView = fUserListView;
+			} else {
+				listView = fUserListView;
+				otherListView = fSystemListView;
+			}
+
+			int32 index = listView->CurrentSelection();
+			if (index < 0)
+				break;
+
+			// Deselect item in other BListView
+			otherListView->DeselectAll();
+
+			if (index == 0 && listView == fUserListView) {
 				// we can safely ignore the "(Current)" item
 				break;
 			}
 
-			KeymapListItem *keymapListItem = 
-				static_cast<KeymapListItem*>(fUserListView->ItemAt(index));
-			if (keymapListItem != NULL) {
-				fCurrentMap.Load(keymapListItem->KeymapEntry());
-
-				if (fFirstTime) {
-					fPreviousMap.Load(keymapListItem->KeymapEntry());
-					fAppliedMap.Load(keymapListItem->KeymapEntry());
+			KeymapListItem* item
+				= static_cast<KeymapListItem*>(listView->ItemAt(index));
+			if (item != NULL) {
+				if (!fFirstTime)
+					fCurrentMap.Load(item->EntryRef());
+				else
 					fFirstTime = false;
-				}
 
 				fKeyboardLayoutView->SetKeymap(&fCurrentMap);
-
-				// Deselect item in other BListView
-				fSystemListView->DeselectAll();
 				_UpdateButtons();
 			}
 			break;
@@ -428,14 +413,8 @@ KeymapWindow::_UpdateButtons()
 void 
 KeymapWindow::_RevertKeymap()
 {
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("Key_map");
-
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
+	_GetCurrentKeymap(ref);
 
 	status_t status = fPreviousMap.Save(ref);
 	if (status != B_OK) {
@@ -451,30 +430,22 @@ KeymapWindow::_RevertKeymap()
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
 	fCurrentMapName = _GetActiveKeymapName();
-
-	if (!_SelectCurrentMap(fSystemListView)
-		&& !_SelectCurrentMap(fUserListView))
-		fUserListView->Select(0L);
+	_SelectCurrentMap();
 }
 
 
 void 
 KeymapWindow::_UseKeymap()
 {
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("Key_map");
-
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
+	_GetCurrentKeymap(ref);
 
-	status_t err;
-	if ((err = fCurrentMap.Save(ref)) != B_OK) {
-		printf("error when saving : %s", strerror(err));
+	status_t status = fCurrentMap.Save(ref);
+	if (status != B_OK) {
+		printf("error when saving : %s", strerror(status));
 		return;
 	}
+
 	fCurrentMap.Use();
 	fAppliedMap.Load(ref);
 
@@ -509,23 +480,18 @@ KeymapWindow::_FillSystemMaps()
 void 
 KeymapWindow::_FillUserMaps()
 {
-	BListItem *item;
+	BListItem* item;
 	while ((item = fUserListView->RemoveItem(static_cast<int32>(0))))
 		delete item;
 
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append("Key_map");
-
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
+	_GetCurrentKeymap(ref);
 
 	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
 
 	fCurrentMapName = _GetActiveKeymapName();
 
+	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 
@@ -555,19 +521,27 @@ KeymapWindow::_SetListViewSize(BListView* listView)
 }
 
 
+status_t
+KeymapWindow::_GetCurrentKeymap(entry_ref& ref)
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return B_ERROR;
+
+	path.Append("Key_map");
+
+	return get_ref_for_path(path.Path(), &ref);
+}
+
+
 BString
 KeymapWindow::_GetActiveKeymapName()
 {
 	BString mapName = "(Current)";	// safe default
 
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return mapName;
-
-	path.Append("Key_map");
-
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
+	_GetCurrentKeymap(ref);
+
 	BNode node(&ref);
 
 	if (node.InitCheck() == B_OK)
@@ -593,4 +567,16 @@ KeymapWindow::_SelectCurrentMap(BListView* view)
 	}
 
 	return false;
+}
+
+
+void
+KeymapWindow::_SelectCurrentMap()
+{
+	if (!_SelectCurrentMap(fSystemListView)
+		&& !_SelectCurrentMap(fUserListView)) {
+		// Select the "(Current)" entry if no name matches
+		fUserListView->Select(0L);
+		fFirstTime = false;
+	}
 }

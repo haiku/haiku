@@ -47,8 +47,10 @@ protected:
 			void				_FillUserMaps();
 			void				_SetListViewSize(BListView* listView);
 
-			bool				_SelectCurrentMap(BListView *list);
+			status_t			_GetCurrentKeymap(entry_ref& ref);
 			BString				_GetActiveKeymapName();
+			bool				_SelectCurrentMap(BListView *list);
+			void				_SelectCurrentMap();
 
 			BListView*			fSystemListView;
 			BListView*			fUserListView;
