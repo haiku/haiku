@@ -268,7 +268,8 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 		if (S_ISDIR(statbuf.st_mode)) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) == B_OK
-				&& strcmp(name, PACKAGES_DIRECTORY) == 0) {
+				&& (strcmp(name, PACKAGES_DIRECTORY) == 0
+				|| strcmp(name, VAR_DIRECTORY) == 0)) {
 				continue;
 			}
 			err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);

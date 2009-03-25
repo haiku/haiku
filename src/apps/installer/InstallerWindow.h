@@ -31,6 +31,7 @@ const uint32 STATUS_MESSAGE = 'iSTM';
 const uint32 INSTALL_FINISHED = 'iIFN';
 const uint32 RESET_INSTALL = 'iRSI';
 const char PACKAGES_DIRECTORY[] = "_packages_";
+const char VAR_DIRECTORY[] = "var";
 
 class InstallerWindow : public BWindow {
 	public:
