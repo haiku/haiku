@@ -870,11 +870,57 @@ FUSEVolume::WriteStat(void* node, const struct stat *st, uint32 mask)
 
 
 status_t
-FUSEVolume::Create(void* dir, const char* name, int openMode, int mode,
-	void** cookie, ino_t* vnid)
+FUSEVolume::Create(void* _dir, const char* name, int openMode, int mode,
+	void** _cookie, ino_t* _vnid)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+PRINT(("FUSEVolume::Create(%p (%lld), \"%s\", %#x, %#x)\n", dir, dir->id, name,
+openMode, mode));
+
+	// lock the directory
+	NodeWriteLocker nodeLocker(this, dir, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	// allocate a file cookie
+	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<FileCookie> cookieDeleter(cookie);
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(dir, name, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// create the file
+	int fuseError = fuse_fs_create(fFS, path, mode, cookie);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	// get the node
+	FUSENode* node;
+	error = _GetNode(dir, name, &node);
+	if (error != B_OK) {
+		// This is bad. We've create the file successfully, but couldn't get
+		// the node. Close the file and delete the entry.
+		fuse_fs_flush(fFS, path, cookie);
+		fuse_fs_release(fFS, path, cookie);
+		fuse_fs_unlink(fFS, path);
+		RETURN_ERROR(error);
+	}
+
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+	*_vnid = node->id;
+
+	return B_OK;
 }
 
 
@@ -891,10 +937,6 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 
 	bool truncate = (openMode & O_TRUNC) != 0;
 	openMode &= ~O_TRUNC;
-
-	// TODO: Support truncation!
-	if (truncate)
-		RETURN_ERROR(B_NOT_ALLOWED);
 
 	// allocate a file cookie
 	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
@@ -916,7 +958,17 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 	// open the file
 	int fuseError = fuse_fs_open(fFS, path, cookie);
 	if (fuseError != 0)
-		return fuseError;
+		RETURN_ERROR(fuseError);
+
+	// truncate the file, if requested
+	if (truncate) {
+		fuseError = fuse_fs_ftruncate(fFS, path, 0, cookie);
+		if (fuseError != 0) {
+			fuse_fs_flush(fFS, path, cookie);
+			fuse_fs_release(fFS, path, cookie);
+			RETURN_ERROR(fuseError);
+		}
+	}
 
 	cookieDeleter.Detach();
 	*_cookie = cookie;
@@ -1027,11 +1079,39 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 
 
 status_t
-FUSEVolume::Write(void* node, void* cookie, off_t pos, const void* buffer,
-	size_t bufferSize, size_t* bytesWritten)
+FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
+	size_t bufferSize, size_t* _bytesWritten)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	*_bytesWritten = 0;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// read the file
+
+	int bytesWritten = fuse_fs_write(fFS, path, (const char*)buffer, bufferSize,
+		pos, cookie);
+	if (bytesWritten < 0)
+		return bytesWritten;
+
+	*_bytesWritten = bytesWritten;
+	return B_OK;
 }
 
 
