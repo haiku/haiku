@@ -75,6 +75,13 @@ KeyboardLayout::Bounds()
 }
 
 
+BSize
+KeyboardLayout::DefaultKeySize()
+{
+	return fDefaultKeySize;
+}
+
+
 status_t
 KeyboardLayout::Load(const char* path)
 {
@@ -119,7 +126,7 @@ KeyboardLayout::Load(const char* path)
 void
 KeyboardLayout::_SetDefault()
 {
-	static const char* kDefaultLayout104 = "name = 104 Keys\n"
+	static const char* kDefaultLayout104 = "name = Generic 104-key\n"
 		// Size shortcuts
 		"default-size = 10,10\n"
 		"$b = 5,10\n"
