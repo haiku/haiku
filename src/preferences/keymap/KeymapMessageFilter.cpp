@@ -38,6 +38,10 @@ KeymapMessageFilter::Filter(BMessage* message, BHandler** /*_target*/)
 	if (fKeymap == NULL || message->what != B_KEY_DOWN)
 		return B_DISPATCH_MESSAGE;
 
+	void* keymap;
+	if (message->FindPointer("keymap", &keymap) == B_OK && keymap == fKeymap)
+		return B_DISPATCH_MESSAGE;
+
 	// TODO: add dead key handling!
 
 	int32 modifiers;

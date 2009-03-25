@@ -445,6 +445,12 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 
 	int32 oldNumBytes = fChars[offset];
 
+	if (oldNumBytes == numBytes
+		&& !memcmp(&fChars[offset + 1], bytes, numBytes)) {
+		// nothing to do
+		return;
+	}
+
 	// TODO: handle dead keys!
 	// TODO!
 	if (oldNumBytes != numBytes)

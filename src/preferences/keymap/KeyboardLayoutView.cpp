@@ -25,7 +25,7 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	fKeymap(NULL),
 	fModifiers(0),
 	fDeadKey(0),
-	fIsDragging(false),
+	fDragKey(NULL),
 	fDropTarget(NULL)
 {
 	fLayout = new KeyboardLayout;
@@ -125,7 +125,7 @@ void
 KeyboardLayoutView::MouseDown(BPoint point)
 {
 	fClickPoint = point;
-	fIsDragging = false;
+	fDragKey = NULL;
 
 	Key* key = _KeyAt(point);
 	if (key != NULL) {
@@ -138,8 +138,6 @@ KeyboardLayoutView::MouseDown(BPoint point)
 void
 KeyboardLayoutView::MouseUp(BPoint point)
 {
-	fDropTarget = NULL;
-
 	Key* key = _KeyAt(fClickPoint);
 	if (key != NULL) {
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
@@ -150,32 +148,9 @@ KeyboardLayoutView::MouseUp(BPoint point)
 
 		_InvalidateKey(key);
 
-		if (!fIsDragging && fKeymap != NULL) {
+		if (fDragKey == NULL && fKeymap != NULL) {
 			// Send fake key down message to target
-			BMessage message(B_KEY_DOWN);
-			message.AddInt64("when", system_time());
-			message.AddData("states", B_UINT8_TYPE, &fKeyState,
-				sizeof(fKeyState));
-			message.AddInt32("key", key->code);
-			message.AddInt32("modifiers", fModifiers);
-
-			char* string;
-			int32 numBytes;
-			fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
-				&numBytes);
-			if (string != NULL) {
-				message.AddString("bytes", string);
-				delete[] string;
-			}
-
-			fKeymap->GetChars(key->code, 0, 0, &string, &numBytes);
-			if (string != NULL) {
-				message.AddInt32("raw_char", string[0]);
-				message.AddInt8("byte", string[0]);
-				delete[] string;
-			}
-
-			fTarget.SendMessage(&message);
+			_SendFakeKeyDown(key);
 		}
 	}
 }
@@ -192,9 +167,13 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		_InvalidateKey(fDropTarget);
 
 		fDropTarget = _KeyAt(point);
-		if (fDropTarget != NULL)
-			_InvalidateKey(fDropTarget);
-	} else if (!fIsDragging && (fabs(point.x - fClickPoint.x) > 4
+		if (fDropTarget != NULL) {
+			if (fDropTarget == fDragKey)
+				fDropTarget = NULL;
+			else
+				_InvalidateKey(fDropTarget);
+		}
+	} else if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
 		Key* key = _KeyAt(fClickPoint);
@@ -240,7 +219,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		}
 
 		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
-		fIsDragging = true;
+		fDragKey = key;
 
 		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
 		_InvalidateKey(key);
@@ -263,24 +242,45 @@ KeyboardLayoutView::Draw(BRect updateRect)
 void
 KeyboardLayoutView::MessageReceived(BMessage* message)
 {
-	if (message->WasDropped()) {
-		fDropTarget = NULL;
+	if (message->WasDropped() && fDropTarget != NULL && fKeymap != NULL) {
+		const char* data;
+		ssize_t size;
+		if (message->FindData("text/plain", B_MIME_DATA,
+				(const void**)&data, &size) == B_OK) {
+			// ignore trailing null bytes
+			if (data[size - 1] == '\0')
+				size--;
 
-		Key* key = _KeyAt(ConvertFromScreen(message->DropPoint()));
-		if (key != NULL && fKeymap != NULL) {
-			const char* data;
-			ssize_t size;
-			if (message->FindData("text/plain", B_MIME_DATA,
-					(const void**)&data, &size) == B_OK) {
-				// ignore trailing null bytes
-				if (data[size - 1] == '\0')
-					size--;
+			int32 keyCode;
+			if (!message->IsSourceRemote()
+				&& message->FindInt32("key", &keyCode) == B_OK) {
+				// switch keys if the dropped object came from us
+				Key* key = _KeyForCode(keyCode);
+				if (key == NULL || key == fDropTarget)
+					return;
 
-				fKeymap->SetKey(key->code, fModifiers, fDeadKey,
+				char* string;
+				int32 numBytes;
+				fKeymap->GetChars(fDropTarget->code, fModifiers, fDeadKey,
+					&string, &numBytes);
+				if (string != NULL) {
+					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
+						(const char*)data, size);
+					fKeymap->SetKey(key->code, fModifiers, fDeadKey,
+						string, numBytes);
+					delete[] string;
+				}
+			} else {
+				// Send the old key to the target, so it's not lost entirely
+				_SendFakeKeyDown(fDropTarget);
+
+				fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 					(const char*)data, size);
-				_InvalidateKey(key);
 			}
 		}
+
+		_InvalidateKey(fDropTarget);
+		fDropTarget = NULL;
 	}
 
 	switch (message->what) {
@@ -320,7 +320,7 @@ KeyboardLayoutView::_LayoutKeyboard()
 
 
 void
-KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, Key* key,
+KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	BRect rect, bool pressed)
 {
 	rgb_color base = key->dark ? kDarkColor : kBrightColor;
@@ -471,7 +471,7 @@ KeyboardLayoutView::_FunctionKeyLabel(uint32 code, char* text, size_t textSize)
 
 
 void
-KeyboardLayoutView::_GetKeyLabel(Key* key, char* text, size_t textSize,
+KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 	key_kind& keyKind)
 {
 	const key_map& map = fKeymap->Map();
@@ -555,7 +555,7 @@ KeyboardLayoutView::_InvalidateKey(int32 code)
 
 
 void
-KeyboardLayoutView::_InvalidateKey(Key* key)
+KeyboardLayoutView::_InvalidateKey(const Key* key)
 {
 	if (key != NULL)
 		Invalidate(_FrameFor(key));
@@ -586,7 +586,7 @@ KeyboardLayoutView::_HandleDeadKey(int32 key, int32 modifiers)
 
 
 void
-KeyboardLayoutView::_KeyChanged(BMessage* message)
+KeyboardLayoutView::_KeyChanged(const BMessage* message)
 {
 	const uint8* state;
 	ssize_t size;
@@ -649,7 +649,7 @@ KeyboardLayoutView::_KeyAt(BPoint point)
 
 
 BRect
-KeyboardLayoutView::_FrameFor(Key* key)
+KeyboardLayoutView::_FrameFor(const Key* key)
 {
 	BRect rect;
 	rect.left = key->frame.left * fFactor;
@@ -689,4 +689,35 @@ KeyboardLayoutView::_SetFontSize(BView* view, key_kind keyKind)
 			view->SetFont(&fSpecialFont);
 			break;
 	}
+}
+
+
+void
+KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
+{
+	BMessage message(B_KEY_DOWN);
+	message.AddInt64("when", system_time());
+	message.AddData("states", B_UINT8_TYPE, &fKeyState,
+		sizeof(fKeyState));
+	message.AddInt32("key", key->code);
+	message.AddInt32("modifiers", fModifiers);
+	message.AddPointer("keymap", fKeymap);
+
+	char* string;
+	int32 numBytes;
+	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
+		&numBytes);
+	if (string != NULL) {
+		message.AddString("bytes", string);
+		delete[] string;
+	}
+
+	fKeymap->GetChars(key->code, 0, 0, &string, &numBytes);
+	if (string != NULL) {
+		message.AddInt32("raw_char", string[0]);
+		message.AddInt8("byte", string[0]);
+		delete[] string;
+	}
+
+	fTarget.SendMessage(&message);
 }

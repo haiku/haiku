@@ -50,8 +50,8 @@ private:
 	};
 
 			void			_LayoutKeyboard();
-			void			_DrawKey(BView* view, BRect updateRect, Key* key,
-								BRect frame, bool pressed);
+			void			_DrawKey(BView* view, BRect updateRect,
+								const Key* key, BRect frame, bool pressed);
 			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
 			const char*		_SpecialMappedKeySymbol(const char* bytes,
 								size_t numBytes);
@@ -59,17 +59,18 @@ private:
 								size_t numBytes);
 			bool			_FunctionKeyLabel(uint32 code, char* text,
 								size_t textSize);
-			void			_GetKeyLabel(Key* key, char* text, size_t textSize,
-								key_kind& keyKind);
+			void			_GetKeyLabel(const Key* key, char* text,
+								size_t textSize, key_kind& keyKind);
 			bool			_IsKeyPressed(int32 code);
 			Key*			_KeyForCode(int32 code);
 			void			_InvalidateKey(int32 code);
-			void			_InvalidateKey(Key* key);
+			void			_InvalidateKey(const Key* key);
 			bool			_HandleDeadKey(int32 key, int32 modifiers);
-			void			_KeyChanged(BMessage* message);
+			void			_KeyChanged(const BMessage* message);
 			Key*			_KeyAt(BPoint point);
-			BRect			_FrameFor(Key* key);
+			BRect			_FrameFor(const Key* key);
 			void			_SetFontSize(BView* view, key_kind keyKind);
+			void			_SendFakeKeyDown(const Key* key);
 
 			KeyboardLayout*	fLayout;
 			Keymap*			fKeymap;
@@ -80,7 +81,7 @@ private:
 			int32			fDeadKey;
 
 			BPoint			fClickPoint;
-			bool			fIsDragging;
+			Key*			fDragKey;
 			Key*			fDropTarget;
 
 			BFont			fFont;
