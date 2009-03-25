@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,10 +18,10 @@ const rgb_color kWhite = {255, 255, 255};
 
 
 // Inspired by the classic BeOS screensaver, of course
-class BuyNow : public BScreenSaver
+class DebugNow : public BScreenSaver
 {
 	public:
-					BuyNow(BMessage *archive, image_id);
+					DebugNow(BMessage *archive, image_id);
 		void		Draw(BView *view, int32 frame);
 		void		StartConfig(BView *view);
 		status_t	StartSaver(BView *view, bool preview);
@@ -36,27 +36,28 @@ class BuyNow : public BScreenSaver
 
 BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image) 
 { 
-	return new BuyNow(msg, image);
+	return new DebugNow(msg, image);
 } 
 
 
-BuyNow::BuyNow(BMessage *archive, image_id id)
+DebugNow::DebugNow(BMessage *archive, image_id id)
  :	BScreenSaver(archive, id)
- ,	fLine1("BUY")
+ ,	fLine1("DEBUG")
  ,	fLine2("NOW")
 {
 }
 
 
 void 
-BuyNow::StartConfig(BView *view) 
+DebugNow::StartConfig(BView *view) 
 { 
-	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "BUY NOW, by Ryan Leavengood"));
+	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "DEBUG NOW, "
+		"by Ryan Leavengood"));
 } 
 
 
 status_t 
-BuyNow::StartSaver(BView *view, bool preview)
+DebugNow::StartSaver(BView *view, bool preview)
 {
 	float width = view->Bounds().Width();
 	float height = view->Bounds().Height();
@@ -82,7 +83,7 @@ BuyNow::StartSaver(BView *view, bool preview)
 
 
 void 
-BuyNow::Draw(BView *view, int32 frame)
+DebugNow::Draw(BView *view, int32 frame)
 {
 	if (frame == 0) { 
 		// fill with blue on first frame
