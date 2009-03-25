@@ -10,6 +10,7 @@
 
 #include "Keymap.h"
 
+#include <new>
 #include <stdio.h>
 #include <string.h>
 
@@ -142,9 +143,10 @@ Keymap::Load(entry_ref &ref)
 	}
 
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
-	if (!fChars)
-		delete[] fChars;
+	delete[] fChars;
+
 	fChars = new char[fCharsSize];
+
 	err = file.Read(fChars, fCharsSize);
 	if (err < B_OK) {
 		fprintf(stderr, "error reading keymap chars: %s\n", strerror(err));
@@ -315,7 +317,7 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		fKeys.tilde_dead_key
 	};
 
-	int32 *deadOffset = deadOffsets[activeDeadKey-1];
+	int32 *deadOffset = deadOffsets[activeDeadKey - 1];
 
 	for (int32 i=0; i<32; i++) {
 		if (offset == deadOffset[i])
@@ -442,6 +444,8 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 
 	if (numBytes == -1)
 		numBytes = strlen(bytes);
+	if (numBytes > 6)
+		return;
 
 	int32 oldNumBytes = fChars[offset];
 
@@ -452,11 +456,42 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 	}
 
 	// TODO: handle dead keys!
-	// TODO!
-	if (oldNumBytes != numBytes)
-		return;
+
+	int32 diff = numBytes - oldNumBytes;
+	if (diff != 0) {
+		fCharsSize += diff;
+
+		if (diff > 0) {
+			// make space for the new data
+			char* chars = new(std::nothrow) char[fCharsSize];
+			if (chars != NULL) {
+				memcpy(chars, fChars, offset + oldNumBytes + 1);
+				memcpy(&chars[offset + 1 + numBytes],
+					&fChars[offset + 1 + oldNumBytes],
+					fCharsSize - 2 - offset - diff);
+				delete[] fChars;
+				fChars = chars;
+			} else
+				return;
+		} else if (diff < 0) {
+			// shrink table
+			memmove(&fChars[offset + numBytes], &fChars[offset + oldNumBytes],
+				fCharsSize - offset - 2 - diff);
+		}
+
+		// update offsets
+
+		int32* data = fKeys.control_map;
+		int32 size = sizeof(fKeys.control_map) / 4 * 9
+			+ sizeof(fKeys.acute_dead_key) / 4 * 5;
+		for (int32 i = 0; i < size; i++) {
+			if (data[i] > offset)
+				data[i] += diff;
+		}
+	}
 
 	memcpy(&fChars[offset + 1], bytes, numBytes);
+	fChars[offset] = numBytes;
 
 	if (fModificationMessage != NULL)
 		fTarget.SendMessage(fModificationMessage);
