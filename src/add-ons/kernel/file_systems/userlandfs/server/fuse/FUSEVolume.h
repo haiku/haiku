@@ -51,19 +51,6 @@ public:
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
 
-	// asynchronous I/O
-	virtual	status_t			DoIO(void* node, void* cookie,
-									const IORequestInfo& requestInfo);
-	virtual	status_t			CancelIO(void* node, void* cookie,
-									int32 ioRequestID);
-	virtual	status_t			IterativeIOGetVecs(void* cookie,
-									int32 requestID, off_t offset, size_t size,
-									struct file_io_vec* vecs, size_t* _count);
-	virtual	status_t			IterativeIOFinished(void* cookie,
-									int32 requestID, status_t status,
-									bool partialTransfer,
-									size_t bytesTransferred);
-
 	// nodes
 	virtual	status_t			SetFlags(void* node, void* cookie,
 									int flags);
@@ -129,12 +116,15 @@ private:
 	struct FileCookie;
 	struct AttrDirCookie;
 	struct ReadDirBuffer;
+	struct RWLockableReadLocking;
 	struct RWLockableWriteLocking;
+	struct RWLockableReadLocker;
 	struct RWLockableWriteLocker;
 	struct NodeLocker;
 	struct NodeReadLocker;
 	struct NodeWriteLocker;
 
+	friend struct RWLockableReadLocking;
 	friend struct RWLockableWriteLocking;
 	friend struct NodeLocker;
 

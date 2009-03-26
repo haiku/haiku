@@ -383,10 +383,11 @@ FUSEFileSystem::_InitCapabilities()
 
 	// common operations
 	// missing: FS_VNODE_CAPABILITY_IOCTL
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_SET_FLAGS, fFS->ops.setflags);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_SET_FLAGS, true);
+		// emulated
 	// missing: FS_VNODE_CAPABILITY_SELECT
 	// missing: FS_VNODE_CAPABILITY_DESELECT
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFS->ops.fsync);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFS->ops.fsync);
 
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFS->ops.readlink);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFS->ops.symlink);

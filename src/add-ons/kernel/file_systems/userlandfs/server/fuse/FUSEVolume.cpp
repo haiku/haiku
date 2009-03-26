@@ -164,7 +164,7 @@ struct FUSEVolume::DirCookie : fuse_file_info, RWLockable {
 };
 
 
-struct FUSEVolume::FileCookie : fuse_file_info {
+struct FUSEVolume::FileCookie : fuse_file_info, RWLockable {
 	FileCookie(int openMode)
 	{
 		flags = openMode;
@@ -298,6 +298,41 @@ struct FUSEVolume::ReadDirBuffer {
 };
 
 
+struct FUSEVolume::RWLockableReadLocking {
+	RWLockableReadLocking(FUSEVolume* volume)
+		:
+		fLockManager(volume != NULL ? &volume->fLockManager : NULL)
+	{
+	}
+
+	RWLockableReadLocking(RWLockManager* lockManager)
+		:
+		fLockManager(lockManager)
+	{
+	}
+
+	RWLockableReadLocking(const RWLockableReadLocking& other)
+		:
+		fLockManager(other.fLockManager)
+	{
+	}
+
+	inline bool Lock(RWLockable* lockable)
+	{
+		return fLockManager != NULL && fLockManager->ReadLock(lockable);
+	}
+
+	inline void Unlock(RWLockable* lockable)
+	{
+		if (fLockManager != NULL)
+			fLockManager->ReadUnlock(lockable);
+	}
+
+private:
+	RWLockManager*	fLockManager;
+};
+
+
 struct FUSEVolume::RWLockableWriteLocking {
 	RWLockableWriteLocking(FUSEVolume* volume)
 		:
@@ -330,6 +365,19 @@ struct FUSEVolume::RWLockableWriteLocking {
 
 private:
 	RWLockManager*	fLockManager;
+};
+
+
+struct FUSEVolume::RWLockableReadLocker
+	: public AutoLocker<RWLockable, RWLockableReadLocking> {
+
+	RWLockableReadLocker(FUSEVolume* volume, RWLockable* lockable)
+		:
+		AutoLocker<RWLockable, RWLockableReadLocking>(
+			RWLockableReadLocking(volume))
+	{
+		SetTo(lockable, false);
+	}
 };
 
 
@@ -646,59 +694,61 @@ FUSEVolume::RemoveVNode(void* node, bool reenter)
 }
 
 
-// #pragma mark - asynchronous I/O
-
-
-status_t
-FUSEVolume::DoIO(void* node, void* cookie, const IORequestInfo& requestInfo)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
-FUSEVolume::CancelIO(void* node, void* cookie, int32 ioRequestID)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
-FUSEVolume::IterativeIOGetVecs(void* cookie, int32 requestID, off_t offset,
-	size_t size, struct file_io_vec* vecs, size_t* _count)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
-status_t
-FUSEVolume::IterativeIOFinished(void* cookie, int32 requestID, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
-}
-
-
 // #pragma mark - nodes
 
 
 status_t
-FUSEVolume::SetFlags(void* node, void* cookie, int flags)
+FUSEVolume::SetFlags(void* _node, void* _cookie, int flags)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	RWLockableWriteLocker cookieLocker(this, cookie);
+
+	const int settableFlags = O_APPEND | O_NONBLOCK | O_SYNC | O_RSYNC
+		| O_DSYNC | O_DIRECT;
+
+	cookie->flags = (cookie->flags & ~settableFlags) | (flags & settableFlags);
+
+	return B_OK;
 }
 
 
 status_t
-FUSEVolume::FSync(void* node)
+FUSEVolume::FSync(void* _node)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// open, sync, and close the node
+	FileCookie cookie(O_RDONLY);
+	int fuseError = fuse_fs_open(fFS, path, &cookie);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	fuseError = fuse_fs_fsync(fFS, path, 0, &cookie);
+		// full sync, not only data
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	fuse_fs_flush(fFS, path, &cookie);
+	fuse_fs_release(fFS, path, &cookie);
+
+	return B_OK;
 }
 
 
@@ -1092,6 +1142,8 @@ FUSEVolume::Close(void* _node, void* _cookie)
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
 
+	RWLockableReadLocker cookieLocker(this, cookie);
+
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
 	if (nodeLocker.Status() != B_OK)
@@ -1122,6 +1174,8 @@ FUSEVolume::FreeCookie(void* _node, void* _cookie)
 {
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
+
+	// no need to lock the cookie here, as no-one else uses it anymore
 
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1156,6 +1210,8 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 {
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
+
+	RWLockableReadLocker cookieLocker(this, cookie);
 
 	*_bytesRead = 0;
 
@@ -1192,6 +1248,8 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 {
 	FUSENode* node = (FUSENode*)_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
+
+	RWLockableReadLocker cookieLocker(this, cookie);
 
 	*_bytesWritten = 0;
 
