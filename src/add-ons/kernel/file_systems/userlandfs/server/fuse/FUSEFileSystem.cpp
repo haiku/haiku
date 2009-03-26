@@ -400,7 +400,7 @@ FUSEFileSystem::_InitCapabilities()
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFS->ops.getattr);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT,
 		fFS->ops.chmod != NULL || fFS->ops.chown != NULL
-		|| fFS->ops.truncate != NULL | fFS->ops.utimens != NULL
+		|| fFS->ops.truncate != NULL || fFS->ops.utimens != NULL
 		|| fFS->ops.utime != NULL);
 
 	// file operations
