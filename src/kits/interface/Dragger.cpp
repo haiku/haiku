@@ -123,7 +123,8 @@ BDragger::Archive(BMessage *data, bool deep) const
 			if (ret == B_OK)
 				ret = data->AddMessage("_popup", &popupMsg);
 			fPopUp->Window()->Unlock();
-		}
+		} else
+			ret = B_ERROR;
 	}
 
 	if (ret == B_OK)
