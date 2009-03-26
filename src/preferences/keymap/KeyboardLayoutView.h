@@ -51,7 +51,7 @@ private:
 	};
 
 			void			_LayoutKeyboard();
-			void			_DrawKeyButton(BView* view, BRect rect,
+			void			_DrawKeyButton(BView* view, BRect& rect,
 								BRect updateRect, rgb_color base,
 								rgb_color background, bool pressed);
 			void			_DrawKey(BView* view, BRect updateRect,

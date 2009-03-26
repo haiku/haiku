@@ -378,7 +378,7 @@ KeyboardLayoutView::_LayoutKeyboard()
 
 
 void
-KeyboardLayoutView::_DrawKeyButton(BView* view, BRect rect, BRect updateRect,
+KeyboardLayoutView::_DrawKeyButton(BView* view, BRect& rect, BRect updateRect,
 	rgb_color base, rgb_color background, bool pressed)
 {
 	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
