@@ -392,9 +392,9 @@ FUSEFileSystem::_InitCapabilities()
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFS->ops.readlink);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFS->ops.symlink);
 
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFS->ops.link);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFS->ops.link);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fFS->ops.unlink);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFS->ops.rename);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFS->ops.rename);
 
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fFS->ops.access);
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFS->ops.getattr);

@@ -553,6 +553,51 @@ struct FUSEVolume::NodeWriteLocker : NodeLocker {
 };
 
 
+struct FUSEVolume::MultiNodeLocker {
+	MultiNodeLocker(FUSEVolume* volume, FUSENode* node1, bool lockParent1,
+		bool writeLock1, FUSENode* node2, bool lockParent2, bool writeLock2)
+		:
+		fVolume(volume),
+		fNode1(NULL),
+		fNode2(NULL),
+		fLockParent1(lockParent1),
+		fWriteLock1(writeLock1),
+		fLockParent2(lockParent2),
+		fWriteLock2(writeLock2)
+	{
+		fStatus = volume->_LockNodeChains(node1, lockParent1, writeLock1, node2,
+			lockParent2, writeLock2);
+		if (fStatus == B_OK) {
+			fNode1 = node1;
+			fNode2 = node2;
+		}
+	}
+
+	~MultiNodeLocker()
+	{
+		if (fNode1 != NULL) {
+			fVolume->_UnlockNodeChains(fNode1, fLockParent1, fWriteLock1,
+				fNode2, fLockParent2, fWriteLock2);
+		}
+	}
+
+	status_t Status() const
+	{
+		return fStatus;
+	}
+
+private:
+	FUSEVolume*	fVolume;
+	FUSENode*	fNode1;
+	FUSENode*	fNode2;
+	bool		fLockParent1;
+	bool		fWriteLock1;
+	bool		fLockParent2;
+	bool		fWriteLock2;
+	status_t	fStatus;
+};
+
+
 // #pragma mark -
 
 
@@ -936,10 +981,44 @@ dir->id, name, target, mode));
 
 
 status_t
-FUSEVolume::Link(void* dir, const char* name, void* node)
+FUSEVolume::Link(void* _dir, const char* name, void* _node)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* dir = (FUSENode*)_dir;
+	FUSENode* node = (FUSENode*)_node;
+PRINT(("FUSEVolume::Link(%p (%lld), \"%s\" -> %p (%lld))\n", dir, dir->id, name,
+node, node->id));
+
+	// lock the directories -- the target directory for writing, the node's
+	// parent for reading
+	MultiNodeLocker nodeLocker(this, dir, false, true, node, true, false);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entries
+	char oldPath[B_PATH_NAME_LENGTH];
+	size_t oldPathLen;
+	status_t error = _BuildPath(node, oldPath, oldPathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	char newPath[B_PATH_NAME_LENGTH];
+	size_t newPathLen;
+	error = _BuildPath(dir, name, newPath, newPathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// link
+	int fuseError = fuse_fs_link(fFS, oldPath, newPath);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 
@@ -981,11 +1060,48 @@ PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
 
 
 status_t
-FUSEVolume::Rename(void* oldDir, const char* oldName, void* newDir,
+FUSEVolume::Rename(void* _oldDir, const char* oldName, void* _newDir,
 	const char* newName)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* oldDir = (FUSENode*)_oldDir;
+	FUSENode* newDir = (FUSENode*)_newDir;
+PRINT(("FUSEVolume::Rename(%p (%lld), \"%s\", %p (%lld), \"%s\")\n", oldDir,
+oldDir->id, oldName, newDir, newDir->id, newName));
+
+	// lock the directories
+	MultiNodeLocker nodeLocker(this, oldDir, false, true, newDir, false, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the entries
+	char oldPath[B_PATH_NAME_LENGTH];
+	size_t oldPathLen;
+	status_t error = _BuildPath(oldDir, oldName, oldPath, oldPathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	char newPath[B_PATH_NAME_LENGTH];
+	size_t newPathLen;
+	error = _BuildPath(newDir, newName, newPath, newPathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// rename
+	int fuseError = fuse_fs_rename(fFS, oldPath, newPath);
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	// rename the entry
+	locker.Lock();
+	_RenameEntry(oldDir, oldName, newDir, newName);
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 
@@ -1995,6 +2111,43 @@ FUSEVolume::_RemoveEntry(FUSENode* dir, const char* name)
 }
 
 
+/*!	Volume must be locked. The directories must be write locked.
+ */
+status_t
+FUSEVolume::_RenameEntry(FUSENode* oldDir, const char* oldName,
+	FUSENode* newDir, const char* newName)
+{
+	FUSEEntry* entry = fEntries.Lookup(FUSEEntryRef(oldDir->id, oldName));
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get a node reference for the new entry
+	FUSENode* node = entry->node;
+	node->refCount++;
+
+	// remove the old entry
+	_RemoveEntry(entry);
+
+	// make sure there's no entry in our way
+	_RemoveEntry(newDir, newName);
+
+	// create a new entry
+	entry = FUSEEntry::Create(newDir, newName, node);
+	if (entry == NULL) {
+		_PutNode(node);
+		RETURN_ERROR(B_NO_MEMORY);
+	}
+
+	newDir->refCount++;
+		// dir reference for the entry
+
+	fEntries.Insert(entry);
+	node->entries.Add(entry);
+
+	return B_OK;
+}
+
+
 /*!	Locks the given node and all of its ancestors up to the root. The given
 	node is write-locked, if \a writeLock is \c true, read-locked otherwise. All
 	ancestors are always read-locked in either case.
@@ -2071,7 +2224,7 @@ FUSEVolume::_UnlockNodeChainInternal(FUSENode* node, bool writeLock,
 {
 	FUSENode* originalNode = node;
 
-	while (node != NULL && stopBeforeNode != stopBeforeNode) {
+	while (node != NULL && node != stopBeforeNode) {
 		FUSENode* parent = node->Parent();
 
 		fLockManager.GenericUnlock(node == originalNode && writeLock, node);
@@ -2164,7 +2317,7 @@ FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
 		bool done;
 		do {
 			bool volumeUnlocked;
-			status_t error = iterator1.LockNext(&done, &volumeUnlocked);
+			status_t error = iterator.LockNext(&done, &volumeUnlocked);
 			if (error != B_OK)
 				RETURN_ERROR(error);
 
@@ -2221,7 +2374,7 @@ FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
 			// Also recheck the common ancestor, if we have just locked it.
 			// Otherwise we can just continue to lock, since nothing below the
 			// previously locked node can have changed.
-			if (iterator1.lastLockedNode == commonAncestor) {
+			if (iterator.lastLockedNode == commonAncestor) {
 				FUSENode* newCommonParent;
 				bool newInverseLockingOrder;
 				if (!_FindCommonAncestor(node1, node2, &newCommonParent,
@@ -2240,7 +2393,7 @@ FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
 	} while (!done);
 
 	// Fail, if we couldn't lock all nodes up to the root.
-	if (iterator1.lastLockedNode != fRootNode)
+	if (iterator.lastLockedNode != fRootNode)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
 	// everything went fine
@@ -2313,16 +2466,17 @@ FUSEVolume::_FindCommonAncestor(FUSENode* node1, FUSENode* node2,
 	// find the first ancestor not common to both nodes
 	uint32 index = 0;
 	for (; index < count1 && index < count2; index++) {
-		if (ancestors1[index] != ancestors2[index]) {
-			*_commonAncestor = ancestors1[index - 1];
-			*_inverseLockingOrder
-				= ancestors1[index]->id > ancestors2[index]->id;
+		FUSENode* ancestor1 = ancestors1[count1 - index - 1];
+		FUSENode* ancestor2 = ancestors2[count2 - index - 1];
+		if (ancestor1 != ancestor2) {
+			*_commonAncestor = ancestors1[count1 - index];
+			*_inverseLockingOrder = ancestor1->id > ancestor2->id;
 			return true;
 		}
 	}
 
 	// one node is an ancestor of the other
-	*_commonAncestor = ancestors1[index - 1];
+	*_commonAncestor = ancestors1[count1 - index];
 	*_inverseLockingOrder = index == count1;
 	return true;
 }

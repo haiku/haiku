@@ -124,11 +124,13 @@ private:
 	struct NodeLocker;
 	struct NodeReadLocker;
 	struct NodeWriteLocker;
+	struct MultiNodeLocker;
 
 	friend struct LockIterator;
 	friend struct RWLockableReadLocking;
 	friend struct RWLockableWriteLocking;
 	friend struct NodeLocker;
+	friend struct MultiNodeLocker;
 
 private:
 	inline	FUSEFileSystem*		_FileSystem() const;
@@ -145,6 +147,9 @@ private:
 
 			void				_RemoveEntry(FUSEEntry* entry);
 			status_t			_RemoveEntry(FUSENode* dir, const char* name);
+			status_t			_RenameEntry(FUSENode* oldDir,
+									const char* oldName, FUSENode* newDir,
+									const char* newName);
 
 			status_t			_LockNodeChain(FUSENode* node, bool lockParent,
 									bool writeLock);
