@@ -118,9 +118,12 @@ BDragger::Archive(BMessage *data, bool deep) const
 	BMessage popupMsg;
 	
 	if (fPopUp) {
-		ret = fPopUp->Archive(&popupMsg, deep);
-		if (ret == B_OK)
-			ret = data->AddMessage("_popup", &popupMsg);
+		if (fPopUp->Window()->Lock()) {
+			ret = fPopUp->Archive(&popupMsg, deep);
+			if (ret == B_OK)
+				ret = data->AddMessage("_popup", &popupMsg);
+			fPopUp->Window()->Unlock();
+		}
 	}
 
 	if (ret == B_OK)
@@ -194,10 +197,8 @@ BDragger::MouseDown(BPoint where)
 	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
 
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-		if (!fShelf || !fTarget) {
-			beep();
+		if (!fShelf)
 			return;
-		}
 
 		_ShowPopUp(fTarget, where);
 	} else {
@@ -215,7 +216,11 @@ BDragger::MouseDown(BPoint where)
 			if (!buttons || system_time() > time + clickSpeed)
 				break;
 
-			if (mousePoint != where) {
+			float squaredDistance =
+				(mousePoint.x - where.x) * (mousePoint.x - where.x)
+				+ (mousePoint.y - where.y) * (mousePoint.y - where.y);
+  
+			if (squaredDistance >= 16) {
 				drag = true;
 				break;
 			}
@@ -242,7 +247,7 @@ BDragger::MouseDown(BPoint where)
 			archive.AddInt32("be:actions", B_TRASH_TARGET);
 
 			BPoint offset;
-			drawing_mode mode;		
+			drawing_mode mode;
 			BBitmap *bitmap = DragBitmap(&offset, &mode);
 			if (bitmap != NULL)
 				DragMessage(&archive, bitmap, mode, offset, this);
@@ -251,8 +256,12 @@ BDragger::MouseDown(BPoint where)
 					ConvertFromScreen(fTarget->ConvertToScreen(fTarget->Bounds())),
 					this);
 			}
-		} else
+		} else {
+			if (!fShelf)
+				return;
+
 			_ShowPopUp(fTarget, where);
+		}
 	}
 }
 
