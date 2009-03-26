@@ -699,6 +699,10 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 		if (status < B_OK)
 			return status;
 
+		status = index.Create(transaction, "BEOS:APP_SIG", B_STRING_TYPE);
+		if (status < B_OK)
+			return status;
+
 		status = index.Create(transaction, "last_modified", B_INT64_TYPE);
 		if (status < B_OK)
 			return status;
