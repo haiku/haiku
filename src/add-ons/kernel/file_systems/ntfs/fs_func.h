@@ -70,7 +70,7 @@ status_t	fs_close(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, void *buf, size_t *len);
 status_t	fs_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, const void *buf, size_t *len);
-status_t	fs_mkdir(fs_volume *volume, fs_vnode *parent, const char *name,	int perms, ino_t *_vnid);
+status_t	fs_mkdir(fs_volume *volume, fs_vnode *parent, const char *name,	int perms);
 status_t 	fs_rmdir(fs_volume *volume, fs_vnode *parent, const char *name);
 status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
 status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
