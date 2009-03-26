@@ -158,6 +158,10 @@ struct free_user_thread {
 	struct user_thread*			thread;
 };
 
+struct scheduler_thread_data {
+	// empty, left up to the individual schedulers to subclass / define
+};
+
 struct team {
 	struct team		*next;			// next in hash
 	struct team		*siblings_next;
@@ -248,6 +252,7 @@ struct thread {
 
 	bool			in_kernel;
 	bool			was_yielded;
+	struct scheduler_thread_data* scheduler_data;
 
 	struct user_thread*	user_thread;
 

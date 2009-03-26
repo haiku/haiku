@@ -380,6 +380,27 @@ simple_reschedule(void)
 }
 
 
+static void
+simple_on_thread_create(struct thread* thread)
+{
+	// do nothing
+}
+
+
+static void
+simple_on_thread_init(struct thread* thread)
+{
+	// do nothing
+}
+
+
+static void
+simple_on_thread_destroy(struct thread* thread)
+{
+	// do nothing
+}
+
+
 /*!	This starts the scheduler. Must be run under the context of
 	the initial idle thread.
 */
@@ -400,6 +421,9 @@ static scheduler_ops kSimpleOps = {
 	simple_enqueue_in_run_queue,
 	simple_reschedule,
 	simple_set_thread_priority,
+	simple_on_thread_create,
+	simple_on_thread_init,
+	simple_on_thread_destroy,
 	simple_start
 };
 

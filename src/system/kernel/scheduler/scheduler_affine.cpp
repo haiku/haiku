@@ -40,6 +40,23 @@ static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
+struct affine_scheduler_data : public scheduler_thread_data
+{
+	affine_scheduler_data(void) 
+	{
+		init();
+	}
+	
+	void init() 
+	{
+		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
+		fLastQuantumSlot = 0;
+	}
+	
+	int32 fLastThreadQuantums[5];
+	int16 fLastQuantumSlot;
+};
+
 
 static int
 _rand(void)
@@ -441,6 +458,29 @@ affine_reschedule(void)
 }
 
 
+static void
+affine_on_thread_create(struct thread* thread)
+{
+	thread->scheduler_data = new(std::nothrow) affine_scheduler_data();
+	if (thread->scheduler_data == NULL)
+		panic("affine_scheduler: Unable to allocate scheduling data structure for thread %ld\n", thread->id);
+}
+
+
+static void
+affine_on_thread_init(struct thread* thread)
+{
+	((affine_scheduler_data *)(thread->scheduler_data))->init();
+}
+
+
+static void
+affine_on_thread_destroy(struct thread* thread)
+{
+	delete thread->scheduler_data;
+}
+
+
 /*!	This starts the scheduler. Must be run under the context of
 	the initial idle thread.
 */
@@ -461,6 +501,9 @@ static scheduler_ops kAffineOps = {
 	affine_enqueue_in_run_queue,
 	affine_reschedule,
 	affine_set_thread_priority,
+	affine_on_thread_create,
+	affine_on_thread_init,
+	affine_on_thread_destroy,
 	affine_start
 };
 

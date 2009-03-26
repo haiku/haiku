@@ -195,6 +195,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	struct thread *thread;
 	cpu_status state;
 	char temp[64];
+	bool recycled = false;
 
 	if (inthread == NULL) {
 		// try to recycle one from the dead queue first
@@ -209,10 +210,15 @@ create_thread_struct(struct thread *inthread, const char *name,
 			thread = (struct thread *)malloc(sizeof(struct thread));
 			if (thread == NULL)
 				return NULL;
+		} else {
+			recycled = true;
 		}
 	} else {
 		thread = inthread;
 	}
+	
+	if (!recycled)
+		scheduler_on_thread_create(thread);
 
 	if (name != NULL)
 		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
@@ -253,7 +259,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->select_infos = NULL;
 	thread->post_interrupt_callback = NULL;
 	thread->post_interrupt_data = NULL;
-
+	
 	sprintf(temp, "thread_%ld_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);
 	if (thread->exit.sem < B_OK)
@@ -271,7 +277,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 
 	if (arch_thread_init_thread_struct(thread) < B_OK)
 		goto err4;
-
+	
 	return thread;
 
 err4:
@@ -282,8 +288,10 @@ err2:
 	delete_sem(thread->exit.sem);
 err1:
 	// ToDo: put them in the dead queue instead?
-	if (inthread == NULL)
+	if (inthread == NULL) {
 		free(thread);
+		scheduler_on_thread_destroy(thread);
+	}
 	return NULL;
 }
 
@@ -294,6 +302,8 @@ delete_thread_struct(struct thread *thread)
 	delete_sem(thread->exit.sem);
 	delete_sem(thread->msg.write_sem);
 	delete_sem(thread->msg.read_sem);
+
+	scheduler_on_thread_destroy(thread);
 
 	// ToDo: put them in the dead queue instead?
 	free(thread);
@@ -446,6 +456,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 	// insert into global list
 	hash_insert(sThreadHash, thread);
 	sUsedThreads++;
+	scheduler_on_thread_init(thread);
 	RELEASE_THREAD_LOCK();
 
 	GRAB_TEAM_LOCK();
