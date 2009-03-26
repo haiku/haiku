@@ -65,14 +65,14 @@ class BackgroundImage {
 	// Unlike other windows, the Desktop window can have different backgrounds
 	// for each workspace
 public:
-	
+
 	enum Mode {
 		kAtOffset,
 		kCentered,			// only works on Desktop
 		kScaledToFit,		// only works on Desktop
 		kTiled
 	};
-	
+
 	class BackgroundImageInfo {
 		// element of the per-workspace list
 	public:
@@ -87,7 +87,8 @@ public:
 		bool fTextWidgetOutline;
 	};
 
-	static BackgroundImage *GetBackgroundImage(const BNode *, bool isDesktop);
+	static BackgroundImage *GetBackgroundImage(const BNode *node,
+		bool isDesktop);
 		// create a BackgroundImage object by reading it from a node
 	virtual ~BackgroundImage();
 
@@ -98,7 +99,7 @@ public:
 
 	void WorkspaceActivated(BView *view, int32 workspace, bool state);
 		// respond to a workspace change
-	void ScreenChanged(BRect , color_space);
+	void ScreenChanged(BRect rect, color_space space);
 		// respond to a screen size change
 	static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
 		const BNode *fromNode, bool desktop, BPoseView *poseView);
@@ -118,7 +119,7 @@ private:
 	BNode fDefinedByNode;
 	BView *fView;
 	BackgroundImageInfo *fShowingBitmap;
-	
+
 	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
 };
 
