@@ -40,8 +40,7 @@ static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
-struct affine_scheduler_data : public scheduler_thread_data
-{
+struct affine_scheduler_data : scheduler_thread_data {
 	affine_scheduler_data(void) 
 	{
 		init();
