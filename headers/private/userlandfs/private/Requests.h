@@ -954,8 +954,6 @@ public:
 class CreateDirReply : public ReplyRequest {
 public:
 	CreateDirReply() : ReplyRequest(CREATE_DIR_REPLY) {}
-
-	ino_t		newDir;
 };
 
 // RemoveDirRequest

@@ -607,15 +607,15 @@ rootfs_write(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 
 static status_t
 rootfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
-	int mode, ino_t *_newID)
+	int mode)
 {
 	struct rootfs *fs = (rootfs*)_volume->private_volume;
 	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
 	struct rootfs_vnode *vnode;
 	status_t status = 0;
 
-	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n",
-		dir, name, mode,*_newID, _newID));
+	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d\n", dir, name,
+		mode));
 
 	mutex_lock(&fs->lock);
 

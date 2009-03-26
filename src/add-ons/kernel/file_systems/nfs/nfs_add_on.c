@@ -1979,7 +1979,7 @@ fs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool r)
 }
 
 static status_t
-fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms, ino_t *_newVnodeID)
+fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 {
 	fs_nspace *ns;
 	fs_node *dir;
@@ -2065,8 +2065,6 @@ fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms, ino_t 
 	newNode=(fs_node *)malloc(sizeof(fs_node));
 	newNode->fhandle=fhandle;
 	newNode->vnid=st.st_ino;
-
-	*_newVnodeID = newNode->vnid;
 
 	insert_node (ns,newNode);
 

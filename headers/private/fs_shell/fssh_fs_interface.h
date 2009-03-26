@@ -205,7 +205,7 @@ struct fssh_fs_vnode_ops {
 
 	/* directory operations */
 	fssh_status_t (*create_dir)(fssh_fs_volume *volume, fssh_fs_vnode *parent,
-				const char *name, int perms, fssh_vnode_id *_newVnodeID);
+				const char *name, int perms);
 	fssh_status_t (*remove_dir)(fssh_fs_volume *volume, fssh_fs_vnode *parent,
 				const char *name);
 	fssh_status_t (*open_dir)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,

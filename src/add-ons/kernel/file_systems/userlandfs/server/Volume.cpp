@@ -378,7 +378,7 @@ Volume::Write(void* node, void* cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(void* dir, const char* name, int mode, ino_t *newDir)
+Volume::CreateDir(void* dir, const char* name, int mode)
 {
 	return B_BAD_VALUE;
 }

@@ -184,7 +184,7 @@ struct fs_vnode_ops {
 
 	/* directory operations */
 	status_t (*create_dir)(fs_volume *volume, fs_vnode *parent,
-				const char *name, int perms, ino_t *_newVnodeID);
+				const char *name, int perms);
 	status_t (*remove_dir)(fs_volume *volume, fs_vnode *parent,
 				const char *name);
 	status_t (*open_dir)(fs_volume *volume, fs_vnode *vnode,

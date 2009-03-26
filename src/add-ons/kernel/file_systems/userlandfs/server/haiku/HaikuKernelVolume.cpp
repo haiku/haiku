@@ -738,14 +738,13 @@ HaikuKernelVolume::Write(void* _node, void* cookie, off_t pos,
 
 // CreateDir
 status_t
-HaikuKernelVolume::CreateDir(void* _dir, const char* name, int mode,
-	ino_t *newDir)
+HaikuKernelVolume::CreateDir(void* _dir, const char* name, int mode)
 {
 	HaikuKernelNode* dir = (HaikuKernelNode*)_dir;
 
 	if (!dir->ops->create_dir)
 		return B_BAD_VALUE;
-	return dir->ops->create_dir(&fVolume, dir, name, mode, newDir);
+	return dir->ops->create_dir(&fVolume, dir, name, mode);
 }
 
 // RemoveDir

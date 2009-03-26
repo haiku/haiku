@@ -121,7 +121,7 @@ public:
 
 	// directories
 	virtual	status_t			CreateDir(void* dir, const char* name,
-									int mode, ino_t *newDir);
+									int mode);
 	virtual	status_t			RemoveDir(void* dir, const char* name);
 	virtual	status_t			OpenDir(void* node, void** cookie);
 	virtual	status_t			CloseDir(void* node, void* cookie);

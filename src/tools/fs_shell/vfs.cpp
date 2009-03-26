@@ -3221,7 +3221,6 @@ static fssh_status_t
 dir_create_entry_ref(fssh_mount_id mountID, fssh_vnode_id parentID, const char *name, int perms, bool kernel)
 {
 	struct vnode *vnode;
-	fssh_vnode_id newID;
 	fssh_status_t status;
 
 	if (name == NULL || *name == '\0')
@@ -3234,7 +3233,7 @@ dir_create_entry_ref(fssh_mount_id mountID, fssh_vnode_id parentID, const char *
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir, name, perms, &newID);
+		status = FS_CALL(vnode, create_dir, name, perms);
 	else
 		status = FSSH_EROFS;
 
@@ -3248,7 +3247,6 @@ dir_create(int fd, char *path, int perms, bool kernel)
 {
 	char filename[FSSH_B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
-	fssh_vnode_id newID;
 	fssh_status_t status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
@@ -3258,7 +3256,7 @@ dir_create(int fd, char *path, int perms, bool kernel)
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir, filename, perms, &newID);
+		status = FS_CALL(vnode, create_dir, filename, perms);
 	else
 		status = FSSH_EROFS;
 

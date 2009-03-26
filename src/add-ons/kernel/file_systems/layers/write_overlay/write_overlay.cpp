@@ -118,8 +118,7 @@ public:
 		status_t			Write(void *cookie, off_t position,
 								const void *buffer, size_t *length);
 
-		status_t			CreateDir(const char *name,
-								int perms, ino_t *newInodeNumber);
+		status_t			CreateDir(const char *name, int perms);
 		status_t			RemoveDir(const char *name);
 		status_t			OpenDir(void **cookie);
 		status_t			CloseDir(void *cookie);
@@ -565,9 +564,9 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 
 
 status_t
-OverlayInode::CreateDir(const char *name, int perms, ino_t *newInodeNumber)
+OverlayInode::CreateDir(const char *name, int perms)
 {
-	return _CreateCommon(name, S_IFDIR, perms, newInodeNumber, NULL);
+	return _CreateCommon(name, S_IFDIR, perms, NULL, NULL);
 }
 
 
@@ -1247,11 +1246,10 @@ overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 
 static status_t
 overlay_create_dir(fs_volume *volume, fs_vnode *vnode, const char *name,
-	int perms, ino_t *newVnodeID)
+	int perms)
 {
 	TRACE("create_dir: \"%s\"\n", name);
-	return ((OverlayInode *)vnode->private_node)->CreateDir(name, perms,
-		newVnodeID);
+	return ((OverlayInode *)vnode->private_node)->CreateDir(name, perms);
 }
 
 

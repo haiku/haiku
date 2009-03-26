@@ -1439,7 +1439,7 @@ bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 
 static status_t
 bfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
-	int mode, ino_t* _newVnodeID)
+	int mode)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
@@ -1464,7 +1464,6 @@ bfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	status = Inode::Create(transaction, directory, name,
 		S_DIRECTORY | (mode & S_IUMSK), 0, 0, NULL, &id);
 	if (status == B_OK) {
-		*_newVnodeID = id;
 		put_vnode(volume->FSVolume(), id);
 
 		entry_cache_add(volume->ID(), directory->ID(), name, id);

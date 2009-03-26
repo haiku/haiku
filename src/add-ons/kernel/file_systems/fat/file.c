@@ -925,8 +925,7 @@ bi:	if (result != B_OK) free(cookie);
 
 
 status_t
-dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms,
-	ino_t *_vnid)
+dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *dir = (vnode *)_dir->private_node, dummy;

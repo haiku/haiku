@@ -2182,7 +2182,7 @@ Volume::Write(void* _node, void* cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(void* _dir, const char* name, int mode, ino_t *newDir)
+Volume::CreateDir(void* _dir, const char* name, int mode)
 {
 	VNode* vnode = (VNode*)_dir;
 
@@ -2221,7 +2221,6 @@ Volume::CreateDir(void* _dir, const char* name, int mode, ino_t *newDir)
 	// process the reply
 	if (reply->error != B_OK)
 		return reply->error;
-	*newDir = reply->newDir;
 	return error;
 }
 

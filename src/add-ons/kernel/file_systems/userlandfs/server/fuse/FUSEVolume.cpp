@@ -1155,7 +1155,7 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 
 
 status_t
-FUSEVolume::CreateDir(void* _dir, const char* name, int mode, ino_t *newDir)
+FUSEVolume::CreateDir(void* _dir, const char* name, int mode)
 {
 	FUSENode* dir = (FUSENode*)_dir;
 PRINT(("FUSEVolume::CreateDir(%p (%lld), \"%s\", %#x)\n", dir, dir->id, name,
@@ -1183,9 +1183,6 @@ mode));
 		RETURN_ERROR(fuseError);
 
 // TODO: Node monitoring!
-
-	*newDir = 0;
-		// TODO: This is really superfluous!
 
 	return B_OK;
 }

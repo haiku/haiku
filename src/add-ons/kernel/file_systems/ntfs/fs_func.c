@@ -410,7 +410,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *
 
 	_node->private_node = NULL;
 	_node->ops = &gNTFSVnodeOps;
-	_flags = 0;	
+	_flags = 0;
 
 	newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
 	if ( newNode != NULL ) {
@@ -1285,7 +1285,7 @@ exit:
 
 
 status_t
-fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms, ino_t *_vnid)
+fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 {
 	nspace		*ns = (nspace*)_vol->private_volume;
 	vnode		*dir = (vnode*)_dir->private_node;
@@ -1344,8 +1344,6 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms, ino_t *_v
 		set_mime(newNode, ".***");
 
 		result = publish_vnode(_vol, vnid, (void*)newNode,&gNTFSVnodeOps, 0777, 0);
-
-		*_vnid = vnid;
 
 		put_vnode(_vol, MREF(ni->mft_no));
 

@@ -431,27 +431,12 @@ BeOSKernelVolume::Write(void* node, void* cookie, off_t pos,
 
 // CreateDir
 status_t
-BeOSKernelVolume::CreateDir(void* dir, const char* name, int mode,
-	ino_t *newDir)
+BeOSKernelVolume::CreateDir(void* dir, const char* name, int mode)
 {
-	if (!fFSOps->mkdir || !fFSOps->walk)	// we need walk() too
+	if (!fFSOps->mkdir)
 		return B_BAD_VALUE;
 
-	status_t error = fFSOps->mkdir(fVolumeCookie, dir, name, mode);
-	if (error != B_OK)
-		return error;
-
-	// we need to get the node ID by invoking walk()
-	ino_t id;
-	error = fFSOps->walk(fVolumeCookie, dir, name, NULL, &id);
-	if (error != B_OK)
-		return error;
-
-	// put the node for walk()'s get_vnode()
-	UserlandFS::KernelEmu::put_vnode(GetID(), id);
-
-	*newDir = id;
-	return B_OK;
+	return fFSOps->mkdir(fVolumeCookie, dir, name, mode);
 }
 
 // RemoveDir

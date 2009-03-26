@@ -5394,7 +5394,6 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	bool kernel)
 {
 	struct vnode* vnode;
-	ino_t newID;
 	status_t status;
 
 	if (name == NULL || *name == '\0')
@@ -5408,7 +5407,7 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir, name, perms, &newID);
+		status = FS_CALL(vnode, create_dir, name, perms);
 	else
 		status = EROFS;
 
@@ -5422,7 +5421,6 @@ dir_create(int fd, char* path, int perms, bool kernel)
 {
 	char filename[B_FILE_NAME_LENGTH];
 	struct vnode* vnode;
-	ino_t newID;
 	status_t status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
@@ -5432,7 +5430,7 @@ dir_create(int fd, char* path, int perms, bool kernel)
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_dir)) {
-		status = FS_CALL(vnode, create_dir, filename, perms, &newID);
+		status = FS_CALL(vnode, create_dir, filename, perms);
 	} else
 		status = EROFS;
 

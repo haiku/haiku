@@ -147,7 +147,7 @@ public:
 
 			// directories
 			status_t			CreateDir(void* dir, const char* name,
-									int mode, ino_t *newDir);
+									int mode);
 			status_t			RemoveDir(void* dir, const char* name);
 			status_t			OpenDir(void* node, void** cookie);
 			status_t			CloseDir(void* node, void* cookie);

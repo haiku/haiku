@@ -527,8 +527,16 @@ AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
 
 		// create the attribute directory
 		result = currentVnode.ops->create_dir(volume, &currentVnode,
-			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME, S_IRWXU | S_IRWXG | S_IRWXO,
-			&fAttributeDirInode);
+			ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME, S_IRWXU | S_IRWXG | S_IRWXO);
+
+		if (result == B_OK) {
+			result = currentVnode.ops->lookup(volume, &currentVnode,
+				ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME, &fAttributeDirInode);
+
+			// lookup() got us a reference we don't need -- put it
+			if (result == B_OK)
+				put_vnode(volume, fAttributeDirInode);
+		}
 
 		put_vnode(volume, fDirectoryInode);
 
@@ -1290,9 +1298,9 @@ overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 
 static status_t
 overlay_create_dir(fs_volume *volume, fs_vnode *vnode, const char *name,
-	int perms, ino_t *newVnodeID)
+	int perms)
 {
-	OVERLAY_CALL(create_dir, name, perms, newVnodeID)
+	OVERLAY_CALL(create_dir, name, perms)
 	return B_UNSUPPORTED;
 }
 

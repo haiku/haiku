@@ -1271,7 +1271,7 @@ devfs_write(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 
 static status_t
 devfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
-	int perms, ino_t *_newVnodeID)
+	int perms)
 {
 	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir->private_node;
@@ -1294,7 +1294,6 @@ devfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	hash_insert(sDeviceFileSystem->vnode_hash, vnode);
 	devfs_insert_in_dir(dir, vnode);
 
-	*_newVnodeID = vnode->id;
 	return B_OK;
 }
 

@@ -1,4 +1,7 @@
-// UserlandRequestHandler.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "UserlandRequestHandler.h"
 
@@ -1314,11 +1317,10 @@ UserlandRequestHandler::_HandleRequest(CreateDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	ino_t newDir = 0;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->CreateDir(request->node,
-			(const char*)request->name.GetData(), request->mode, &newDir);
+			(const char*)request->name.GetData(), request->mode);
 	}
 
 	// prepare the reply
@@ -1329,7 +1331,6 @@ UserlandRequestHandler::_HandleRequest(CreateDirRequest* request)
 		RETURN_ERROR(error);
 
 	reply->error = result;
-	reply->newDir = newDir;
 
 	// send the reply
 	return _SendReply(allocator, false);

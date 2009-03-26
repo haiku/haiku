@@ -1075,8 +1075,7 @@ vint32 DirectoryCookie::fNextIteratorID = 0;
 
 // ramfs_create_dir
 static status_t
-ramfs_create_dir(fs_volume fs, fs_vnode _dir, const char *name,
-	int mode, ino_t *_vnid)
+ramfs_create_dir(fs_volume fs, fs_vnode _dir, const char *name, int mode)
 {
 	FUNCTION(("name: `%s', mode: %x\n", name, mode));
 	Volume *volume = (Volume*)fs;
@@ -1115,7 +1114,6 @@ ramfs_create_dir(fs_volume fs, fs_vnode _dir, const char *name,
 					node->SetGID(getegid());
 					// put the node
 					volume->PutVNode(node->GetID());
-					*_vnid = node->GetID();
 				}
 			}
 		}

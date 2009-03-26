@@ -545,14 +545,13 @@ userlandfs_write(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, off_t pos,
 // userlandfs_create_dir
 static status_t
 userlandfs_create_dir(fs_volume* fsVolume, fs_vnode* fsParent, const char* name,
-	int perms, ino_t* newDir)
+	int perms)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_create_dir(%p, %p, `%s', %d, %p)\n", volume,
-		fsParent->private_node, name, perms, newDir));
-	status_t error = volume->CreateDir(fsParent->private_node, name, perms,
-		newDir);
-	PRINT(("userlandfs_create_dir() done: (%lx, %lld)\n", error, *newDir));
+	PRINT(("userlandfs_create_dir(%p, %p, `%s', %#x)\n", volume,
+		fsParent->private_node, name, perms));
+	status_t error = volume->CreateDir(fsParent->private_node, name, perms);
+	PRINT(("userlandfs_create_dir() done: (%lx)\n", error));
 	return error;
 }
 

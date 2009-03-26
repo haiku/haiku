@@ -24,7 +24,7 @@ status_t	dosfs_remove_vnode(fs_volume *vol, fs_vnode *node, bool reenter);
 status_t	dosfs_create(fs_volume *vol, fs_vnode *dir, const char *name,
 				int omode, int perms, void **cookie, ino_t *vnid);
 status_t	dosfs_mkdir(fs_volume *vol, fs_vnode *dir, const char *name,
-				int perms, ino_t *_vnid);
+				int perms);
 status_t	dosfs_rename(fs_volume *vol, fs_vnode *olddir, const char *oldname,
 				fs_vnode *newdir, const char *newname);
 status_t	dosfs_unlink(fs_volume *vol, fs_vnode *dir, const char *name);
