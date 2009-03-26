@@ -139,11 +139,6 @@ if [ $isImage ]; then
 	$cd . || exit 1
 fi
 
-# create BEOS:APP_SIG index -- needed to launch apps via signature
-if [ ! $updateOnly ]; then
-	$mkindex BEOS:APP_SIG
-fi
-
 echo "Populating image ..."
 while [ $# -gt 0 ]; do
 	. $1
