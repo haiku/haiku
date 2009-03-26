@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include <fs_info.h>
+#include <NodeMonitor.h>
 
 #include <AutoDeleter.h>
 
@@ -892,10 +893,82 @@ PRINT(("FUSEVolume::ReadStat(%p (%lld), %p)\n", node, node->id, st));
 
 
 status_t
-FUSEVolume::WriteStat(void* node, const struct stat *st, uint32 mask)
+FUSEVolume::WriteStat(void* _node, const struct stat* st, uint32 mask)
 {
-	// TODO: Implement!
-	return B_UNSUPPORTED;
+	FUSENode* node = (FUSENode*)_node;
+PRINT(("FUSEVolume::WriteStat(%p (%lld), %p, %#lx)\n", node, node->id, st,
+mask));
+
+	// lock the directory
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	// permissions
+	if ((mask & B_STAT_MODE) != 0) {
+		int fuseError = fuse_fs_chmod(fFS, path, st->st_mode);
+		if (fuseError != 0)
+			RETURN_ERROR(fuseError);
+	}
+
+	// owner
+	if ((mask & (B_STAT_UID | B_STAT_GID)) != 0) {
+		uid_t uid = (mask & B_STAT_UID) != 0 ? st->st_uid : (uid_t)-1;
+		gid_t gid = (mask & B_STAT_GID) != 0 ? st->st_gid : (gid_t)-1;
+		int fuseError = fuse_fs_chown(fFS, path, uid, gid);
+		if (fuseError != 0)
+			RETURN_ERROR(fuseError);
+	}
+
+	// size
+	if ((mask & B_STAT_SIZE) != 0) {
+		// truncate
+		int fuseError = fuse_fs_truncate(fFS, path, st->st_size);
+		if (fuseError != 0)
+			RETURN_ERROR(fuseError);
+	}
+
+	// access/modification time
+	if ((mask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) != 0) {
+		timespec tv[2] = {
+			{st->st_atime, 0},
+			{st->st_mtime, 0}
+		};
+
+		// If either time is not specified, we need to stat the file to get the
+		// current value.
+		if ((mask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME))
+				!= (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) {
+			struct stat currentStat;
+			int fuseError = fuse_fs_getattr(fFS, path, &currentStat);
+			if (fuseError != 0)
+				RETURN_ERROR(fuseError);
+
+			if ((mask & B_STAT_ACCESS_TIME) == 0)
+				tv[0].tv_sec = currentStat.st_atime;
+			else
+				tv[1].tv_sec = currentStat.st_mtime;
+		}
+
+		int fuseError = fuse_fs_utimens(fFS, path, tv);
+		if (fuseError != 0)
+			RETURN_ERROR(fuseError);
+	}
+
+// TODO: Node monitoring!
+
+	return B_OK;
 }
 
 

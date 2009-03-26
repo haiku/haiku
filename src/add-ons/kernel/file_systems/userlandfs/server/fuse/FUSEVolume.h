@@ -83,7 +83,7 @@ public:
 
 	virtual	status_t			Access(void* node, int mode);
 	virtual	status_t			ReadStat(void* node, struct stat* st);
-	virtual	status_t			WriteStat(void* node, const struct stat *st,
+	virtual	status_t			WriteStat(void* node, const struct stat* st,
 									uint32 mask);
 
 	// files
