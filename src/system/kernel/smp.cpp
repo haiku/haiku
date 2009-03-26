@@ -37,6 +37,13 @@
 
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
+// These macros define the number of unsuccessful iterations in
+// acquire_spinlock() and acquire_spinlock_nocheck() after which the functions
+// panic(), assuming a deadlock.
+#define SPINLOCK_DEADLOCK_COUNT				100000000
+#define SPINLOCK_DEADLOCK_COUNT_NO_CHECK	2000000000
+
+
 struct smp_msg {
 	struct smp_msg	*next;
 	int32			message;
@@ -217,16 +224,28 @@ process_all_pending_ici(int32 currentCPU)
 void
 acquire_spinlock(spinlock *lock)
 {
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_spinlock: attempt to acquire lock %p with interrupts "
+			"enabled", lock);
+	}
+#endif
+
 	if (sNumCPUs > 1) {
 		int currentCPU = smp_get_current_cpu();
-		if (are_interrupts_enabled())
-			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 #if B_DEBUG_SPINLOCK_CONTENTION
 		while (atomic_add(&lock->lock, 1) != 0)
 			process_all_pending_ici(currentCPU);
 #else
 		while (1) {
+			uint32 count = 0;
 			while (*lock != 0) {
+				if (++count == SPINLOCK_DEADLOCK_COUNT) {
+					panic("acquire_spinlock(): Failed to acquire spinlock %p "
+						"for a long time!", lock);
+					count = 0;
+				}
+
 				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
@@ -241,12 +260,11 @@ acquire_spinlock(spinlock *lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		if (are_interrupts_enabled())
-			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 		oldValue = atomic_set((int32 *)lock, 1);
 		if (oldValue != 0) {
-			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p, value %ld)\n",
-				lock, find_lock_caller(lock), oldValue);
+			panic("acquire_spinlock: attempt to acquire lock %p twice on "
+				"non-SMP system (last caller: %p, value %ld)", lock,
+				find_lock_caller(lock), oldValue);
 		}
 
 		push_lock_caller(arch_debug_get_caller(), lock);
@@ -258,28 +276,40 @@ acquire_spinlock(spinlock *lock)
 static void
 acquire_spinlock_nocheck(spinlock *lock)
 {
-	if (sNumCPUs > 1) {
 #if DEBUG_SPINLOCKS
-		if (are_interrupts_enabled())
-			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
+	if (are_interrupts_enabled()) {
+		panic("acquire_spinlock_nocheck: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
 #endif
+
+	if (sNumCPUs > 1) {
 #if B_DEBUG_SPINLOCK_CONTENTION
 		while (atomic_add(&lock->lock, 1) != 0) {
 		}
 #else
 		while (1) {
-			while (*lock != 0)
+			uint32 count = 0;
+			while (*lock != 0) {
+				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
+					panic("acquire_spinlock(): Failed to acquire spinlock %p "
+						"for a long time!", lock);
+					count = 0;
+				}
+
 				PAUSE();
+			}
+
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (are_interrupts_enabled())
-			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
-		if (atomic_set((int32 *)lock, 1) != 0)
-			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice on non-SMP system\n", lock);
+		if (atomic_set((int32 *)lock, 1) != 0) {
+			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
+				"on non-SMP system\n", lock);
+		}
 #endif
 	}
 }
