@@ -558,19 +558,19 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090319-gcc4
-			: http://vision.sf.net/Vision-0.9.7-H-090319-gcc4.zip
+		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090326-gcc4
+			: http://vision.sf.net/Vision-0.9.7-H-090326-gcc4.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090319/Vision ;
+			: /boot/apps/Vision-0.9.7-H-090326/Vision ;
 	} else {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090319
-			: http://vision.sf.net/Vision-0.9.7-H-090319.zip
+		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090326
+			: http://vision.sf.net/Vision-0.9.7-H-090326.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090319/Vision ;
+			: /boot/apps/Vision-0.9.7-H-090326/Vision ;
 	}
 }
 
