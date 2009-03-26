@@ -116,6 +116,7 @@ private:
 	struct FileCookie;
 	struct AttrDirCookie;
 	struct ReadDirBuffer;
+	struct LockIterator;
 	struct RWLockableReadLocking;
 	struct RWLockableWriteLocking;
 	struct RWLockableReadLocker;
@@ -124,6 +125,7 @@ private:
 	struct NodeReadLocker;
 	struct NodeWriteLocker;
 
+	friend struct LockIterator;
 	friend struct RWLockableReadLocking;
 	friend struct RWLockableWriteLocking;
 	friend struct NodeLocker;
@@ -144,10 +146,31 @@ private:
 			void				_RemoveEntry(FUSEEntry* entry);
 			status_t			_RemoveEntry(FUSENode* dir, const char* name);
 
-			status_t			_LockNodeChain(FUSENode* node, bool parent,
+			status_t			_LockNodeChain(FUSENode* node, bool lockParent,
 									bool writeLock);
 			void				_UnlockNodeChain(FUSENode* node, bool parent,
 									bool writeLock);
+			void				_UnlockNodeChainInternal(FUSENode* node,
+									bool writeLock, FUSENode* stopNode,
+									FUSENode* stopBeforeNode);
+
+			status_t			_LockNodeChains(FUSENode* node1,
+									bool lockParent1, bool writeLock1,
+									FUSENode* node2, bool lockParent2,
+									bool writeLock2);
+			status_t			_LockNodeChainsInternal(FUSENode* node1,
+									bool lockParent1, bool writeLock1,
+									FUSENode* node2, bool lockParent2,
+									bool writeLock2, bool* _retry);
+			void				_UnlockNodeChains(FUSENode* node1, bool parent1,
+									bool writeLock1, FUSENode* node2,
+									bool parent2, bool writeLock2);
+
+			bool				_FindCommonAncestor(FUSENode* node1,
+									FUSENode* node2, FUSENode** _commonAncestor,
+									bool* _inverseLockingOrder);
+			bool				_GetNodeAncestors(FUSENode* node,
+									FUSENode** ancestors, uint32* _count);
 
 			status_t			_BuildPath(FUSENode* dir, const char* entryName,
 									char* path, size_t& pathLen);

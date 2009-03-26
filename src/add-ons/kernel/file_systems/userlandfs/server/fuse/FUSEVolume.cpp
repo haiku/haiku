@@ -19,6 +19,10 @@
 #include "../kernel_emu.h"
 
 
+// The maximal node tree hierarchy levels we support.
+static const uint32 kMaxNodeTreeDepth = 1024;
+
+
 struct FUSEVolume::DirEntryCache {
 	DirEntryCache()
 		:
@@ -294,6 +298,110 @@ struct FUSEVolume::ReadDirBuffer {
 		maxEntries(maxEntries),
 		error(B_OK)
 	{
+	}
+};
+
+
+struct FUSEVolume::LockIterator {
+	FUSEVolume*	volume;
+	FUSENode*	firstNode;
+	FUSENode*	lastLockedNode;
+	FUSENode*	nextNode;
+	FUSENode*	stopBeforeNode;
+	bool		writeLock;
+
+	LockIterator(FUSEVolume* volume, FUSENode* node, bool writeLock,
+		FUSENode* stopBeforeNode)
+		:
+		volume(volume),
+		firstNode(node),
+		lastLockedNode(NULL),
+		nextNode(node),
+		stopBeforeNode(stopBeforeNode),
+		writeLock(writeLock)
+	{
+	}
+
+	~LockIterator()
+	{
+		Unlock();
+	}
+
+	void SetTo(FUSEVolume* volume, FUSENode* node, bool writeLock,
+		FUSENode* stopBeforeNode)
+	{
+		Unlock();
+
+		this->volume = volume;
+		this->firstNode = node;
+		this->lastLockedNode = NULL;
+		this->nextNode = node;
+		this->stopBeforeNode = stopBeforeNode;
+		this->writeLock = writeLock;
+	}
+
+	status_t LockNext(bool* _done, bool* _volumeUnlocked)
+	{
+		// increment the ref count first
+		nextNode->refCount++;
+
+		if (volume->fLockManager.TryGenericLock(
+				nextNode == firstNode && writeLock, nextNode)) {
+			// got the lock
+			*_volumeUnlocked = false;
+		} else {
+			// node is locked -- we need to unlock the volume and wait for
+			// the lock
+			volume->fLock.Unlock();
+			status_t error = volume->fLockManager.GenericLock(
+				nextNode == firstNode && writeLock, nextNode);
+			volume->fLock.Lock();
+
+			*_volumeUnlocked = false;
+
+			if (error != B_OK) {
+				volume->_PutNode(nextNode);
+				return error;
+			}
+		}
+
+		lastLockedNode = nextNode;
+
+		// get the parent node
+		FUSENode* parent = nextNode->Parent();
+		if (parent == stopBeforeNode || parent == nextNode) {
+			if (parent == nextNode)
+				parent = NULL;
+			*_done = true;
+		} else
+			*_done = false;
+
+		nextNode = parent;
+
+		return B_OK;
+	}
+
+	void Unlock()
+	{
+		if (lastLockedNode == NULL)
+			return;
+
+		volume->_UnlockNodeChainInternal(firstNode, writeLock, lastLockedNode,
+			NULL);
+
+		lastLockedNode = NULL;
+		nextNode = firstNode;
+	}
+
+	void SetStopBeforeNode(FUSENode* stopBeforeNode)
+	{
+		this->stopBeforeNode = stopBeforeNode;
+	}
+
+	void Detach()
+	{
+		lastLockedNode = NULL;
+		nextNode = firstNode;
 	}
 };
 
@@ -1891,7 +1999,7 @@ FUSEVolume::_RemoveEntry(FUSENode* dir, const char* name)
 	node is write-locked, if \a writeLock is \c true, read-locked otherwise. All
 	ancestors are always read-locked in either case.
 
-	If \a parent is \c true, the given node itself is ignored, but locking
+	If \a lockParent is \c true, the given node itself is ignored, but locking
 	starts with the parent node of the given node (\a writeLock applies to the
 	parent node then).
 
@@ -1900,67 +2008,42 @@ FUSEVolume::_RemoveEntry(FUSENode* dir, const char* name)
 	The volume lock must not be held.
 */
 status_t
-FUSEVolume::_LockNodeChain(FUSENode* node, bool parent, bool writeLock)
+FUSEVolume::_LockNodeChain(FUSENode* node, bool lockParent, bool writeLock)
 {
 	AutoLocker<Locker> locker(fLock);
 
-	if (parent && node != NULL)
+	FUSENode* originalNode = node;
+
+	if (lockParent && node != NULL)
 		node = node->Parent();
 
 	if (node == NULL)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
-	FUSENode* originalNode = node;
+	LockIterator iterator(this, node, writeLock, NULL);
 
-	status_t error = B_OK;
-
+	bool done;
 	do {
-		// increment the ref count first
-		node->refCount++;
+		bool volumeUnlocked;
+		status_t error = iterator.LockNext(&done, &volumeUnlocked);
+		if (error != B_OK)
+			RETURN_ERROR(error);
 
-		// lock the node
-		if (!fLockManager.TryGenericLock(node == originalNode && writeLock,
-				node)) {
-			// node is locked -- we need to unlock the volume and wait for
-			// the lock
-			locker.Unlock();
-			error = fLockManager.GenericLock(node == originalNode && writeLock,
-				node);
-			locker.Lock();
-
-			if (error != B_OK)
-				break;
+		if (volumeUnlocked) {
+			// check whether we're still locking the right node
+			if (lockParent && originalNode->Parent() != node) {
+				// We don't -- unlock everything and try again.
+				node = originalNode->Parent();
+				iterator.SetTo(this, node, writeLock, NULL);
+			}
 		}
-
-		// get the parent node
-		FUSENode* parent = node->Parent();
-		if (parent == node)
-			break;
-		node = parent;
-	} while (node != NULL);
+	} while (!done);
 
 	// Fail, if we couldn't lock all nodes up to the root.
-	if (error == B_OK && node == NULL)
-		error = B_ENTRY_NOT_FOUND;
+	if (iterator.lastLockedNode != fRootNode)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
-	if (error != B_OK) {
-		// locking failed -- unlock and release the references of all
-		// nodes
-		FUSENode* stopNode = node;
-		node = originalNode;
-		while (node != stopNode) {
-			fLockManager.GenericUnlock(
-				node == originalNode && writeLock, node);
-			FUSENode* parent = node->Parent();
-			_PutNode(node);
-			node = parent;
-		}
-
-		if (stopNode != NULL)
-			_PutNode(stopNode);
-		RETURN_ERROR(error);
-	}
-
+	iterator.Detach();
 	return B_OK;
 }
 
@@ -1973,18 +2056,296 @@ FUSEVolume::_UnlockNodeChain(FUSENode* node, bool parent, bool writeLock)
 	if (parent && node != NULL)
 		node = node->Parent();
 
+	_UnlockNodeChainInternal(node, writeLock, NULL, NULL);
+}
+
+
+/*!	Unlocks all nodes from \a node up to (and including) \a stopNode (if
+	\c NULL, it is ignored). If \a stopBeforeNode is given, the method stops
+	before unlocking that node.
+	The volume lock must be held.
+ */
+void
+FUSEVolume::_UnlockNodeChainInternal(FUSENode* node, bool writeLock,
+	FUSENode* stopNode, FUSENode* stopBeforeNode)
+{
 	FUSENode* originalNode = node;
 
-	while (node != NULL) {
+	while (node != NULL && stopBeforeNode != stopBeforeNode) {
 		FUSENode* parent = node->Parent();
 
 		fLockManager.GenericUnlock(node == originalNode && writeLock, node);
 		_PutNode(node);
 
-		if (parent == node)
+		if (node == stopNode || parent == node)
 			break;
+
 		node = parent;
 	}
+}
+
+
+status_t
+FUSEVolume::_LockNodeChains(FUSENode* node1, bool lockParent1, bool writeLock1,
+	FUSENode* node2, bool lockParent2, bool writeLock2)
+{
+	// Since in this case locking is more complicated, we use a helper method.
+	// It does the main work, but simply returns telling us to retry when the
+	// node hierarchy changes.
+	bool retry;
+	do {
+		status_t error = _LockNodeChainsInternal(node1, lockParent1, writeLock1,
+			node2, lockParent2, writeLock2, &retry);
+		if (error != B_OK)
+			return error;
+	} while (retry);
+
+	return B_OK;
+}
+
+
+status_t
+FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
+	bool writeLock1, FUSENode* node2, bool lockParent2, bool writeLock2,
+	bool* _retry)
+{
+	// Locking order:
+	// * A child of a node has to be locked before its parent.
+	// * Sibling nodes have to be locked in ascending node ID order.
+	//
+	// This implies the following locking algorithm:
+	// * We find the closest common ancestor of the two given nodes (might even
+	//   be one of the given nodes).
+	// * We lock all ancestors on one branch (the one with the lower common
+	//   ancestor child node ID), but not including the common ancestor.
+	// * We lock all ancestors on the other branch, not including the common
+	//   ancestor.
+	// * We lock the common ancestor and all of its ancestors up to the root
+	//   node.
+	//
+	// When the hierarchy changes while we're waiting for a lock, we recheck the
+	// conditions and in doubt have to be restarted.
+
+	AutoLocker<Locker> locker(fLock);
+
+	FUSENode* originalNode1 = node1;
+	FUSENode* originalNode2 = node2;
+
+	if (lockParent1 && node1 != NULL)
+		node1 = node1->Parent();
+
+	if (lockParent2 && node2 != NULL)
+		node2 = node2->Parent();
+
+	if (node1 == NULL || node2 == NULL)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	// find the first common ancestor
+	FUSENode* commonAncestor;
+	bool inverseLockingOrder;
+	if (!_FindCommonAncestor(node1, node2, &commonAncestor,
+			&inverseLockingOrder)) {
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+	}
+
+	// lock the both node chains up to (but not including) the common ancestor
+	LockIterator iterator1(this, node1, writeLock1, commonAncestor);
+	LockIterator iterator2(this, node2, writeLock2, commonAncestor);
+
+	for (int i = 0; i < 2; i++) {
+		LockIterator& iterator = (i == 0) != inverseLockingOrder
+			? iterator1 : iterator2;
+
+		// If the node is the common ancestor, don't enter the "do" loop, since
+		// we don't have to lock anything here.
+		if (iterator.firstNode == commonAncestor)
+			continue;
+
+		bool done;
+		do {
+			bool volumeUnlocked;
+			status_t error = iterator1.LockNext(&done, &volumeUnlocked);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			if (volumeUnlocked) {
+				// check whether we're still locking the right nodes
+				if (lockParent1 && originalNode1->Parent() != node1
+					|| lockParent2 && originalNode2->Parent() != node2) {
+					// We don't -- unlock everything and retry.
+					*_retry = true;
+					return B_OK;
+				}
+
+				// also recheck the common ancestor
+				FUSENode* newCommonParent;
+				bool newInverseLockingOrder;
+				if (!_FindCommonAncestor(node1, node2, &newCommonParent,
+						&newInverseLockingOrder)) {
+					RETURN_ERROR(B_ENTRY_NOT_FOUND);
+				}
+
+				if (newCommonParent != commonAncestor
+					|| inverseLockingOrder != newInverseLockingOrder) {
+					// Something changed -- unlock everything and retry.
+					*_retry = true;
+					return B_OK;
+				}
+			}
+		} while (!done);
+	}
+
+	// Continue locking from the common ancestor to the root. If one of the
+	// given nodes is the common ancestor and shall be write locked, we need to
+	// use the respective iterator.
+	LockIterator& iterator = node2 == commonAncestor && writeLock2
+		? iterator2 : iterator1;
+	iterator.SetStopBeforeNode(NULL);
+
+	bool done;
+	do {
+		bool volumeUnlocked;
+		status_t error = iterator.LockNext(&done, &volumeUnlocked);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		if (volumeUnlocked) {
+			// check whether we're still locking the right nodes
+			if (lockParent1 && originalNode1->Parent() != node1
+				|| lockParent2 && originalNode2->Parent() != node2) {
+				// We don't -- unlock everything and retry.
+				*_retry = true;
+				return B_OK;
+			}
+
+			// Also recheck the common ancestor, if we have just locked it.
+			// Otherwise we can just continue to lock, since nothing below the
+			// previously locked node can have changed.
+			if (iterator1.lastLockedNode == commonAncestor) {
+				FUSENode* newCommonParent;
+				bool newInverseLockingOrder;
+				if (!_FindCommonAncestor(node1, node2, &newCommonParent,
+						&newInverseLockingOrder)) {
+					RETURN_ERROR(B_ENTRY_NOT_FOUND);
+				}
+
+				if (newCommonParent != commonAncestor
+					|| inverseLockingOrder != newInverseLockingOrder) {
+					// Something changed -- unlock everything and retry.
+					*_retry = true;
+					return B_OK;
+				}
+			}
+		}
+	} while (!done);
+
+	// Fail, if we couldn't lock all nodes up to the root.
+	if (iterator1.lastLockedNode != fRootNode)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	// everything went fine
+	iterator1.Detach();
+	iterator2.Detach();
+
+	*_retry = false;
+	return B_OK;
+}
+
+
+void
+FUSEVolume::_UnlockNodeChains(FUSENode* node1, bool lockParent1,
+	bool writeLock1, FUSENode* node2, bool lockParent2, bool writeLock2)
+{
+	AutoLocker<Locker> locker(fLock);
+
+	if (lockParent1 && node1 != NULL)
+		node1 = node1->Parent();
+
+	if (lockParent2 && node2 != NULL)
+		node2 = node2->Parent();
+
+	if (node1 == NULL || node2 == NULL)
+		return;
+
+	// find the common ancestor
+	FUSENode* commonAncestor;
+	bool inverseLockingOrder;
+	if (!_FindCommonAncestor(node1, node2, &commonAncestor,
+			&inverseLockingOrder)) {
+		return;
+	}
+
+	// Unlock one branch up to the common ancestor and then the complete other
+	// branch up to the root. If one of the given nodes is the common ancestor,
+	// we need to make sure, we write-unlock it, if requested.
+	if (node2 == commonAncestor && writeLock2) {
+		_UnlockNodeChainInternal(node1, writeLock1, NULL, commonAncestor);
+		_UnlockNodeChainInternal(node2, writeLock2, NULL, NULL);
+	} else {
+		_UnlockNodeChainInternal(node2, writeLock2, NULL, commonAncestor);
+		_UnlockNodeChainInternal(node1, writeLock1, NULL, NULL);
+	}
+}
+
+
+bool
+FUSEVolume::_FindCommonAncestor(FUSENode* node1, FUSENode* node2,
+	FUSENode** _commonAncestor, bool* _inverseLockingOrder)
+{
+	// handle trivial special case -- both nodes are the same
+	if (node1 == node2) {
+		*_commonAncestor = node1;
+		*_inverseLockingOrder = false;
+		return true;
+	}
+
+	// get the ancestors of both nodes
+	FUSENode* ancestors1[kMaxNodeTreeDepth];
+	FUSENode* ancestors2[kMaxNodeTreeDepth];
+	uint32 count1;
+	uint32 count2;
+
+	if (!_GetNodeAncestors(node1, ancestors1, &count1)
+		|| !_GetNodeAncestors(node2, ancestors2, &count2)) {
+		return false;
+	}
+
+	// find the first ancestor not common to both nodes
+	uint32 index = 0;
+	for (; index < count1 && index < count2; index++) {
+		if (ancestors1[index] != ancestors2[index]) {
+			*_commonAncestor = ancestors1[index - 1];
+			*_inverseLockingOrder
+				= ancestors1[index]->id > ancestors2[index]->id;
+			return true;
+		}
+	}
+
+	// one node is an ancestor of the other
+	*_commonAncestor = ancestors1[index - 1];
+	*_inverseLockingOrder = index == count1;
+	return true;
+}
+
+
+bool
+FUSEVolume::_GetNodeAncestors(FUSENode* node, FUSENode** ancestors,
+	uint32* _count)
+{
+	uint32 count = 0;
+	while (node != NULL && count < kMaxNodeTreeDepth) {
+		ancestors[count++] = node;
+
+		if (node == fRootNode) {
+			*_count = count;
+			return true;
+		}
+
+		node = node->Parent();
+	}
+
+	// Either the node is not in the tree or we hit the array limit.
+	return false;
 }
 
 
