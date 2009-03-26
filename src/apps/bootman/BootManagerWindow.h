@@ -24,14 +24,10 @@ public:
 	virtual void MessageReceived(BMessage* message);
 	virtual bool QuitRequested();
 	
-	virtual void WindowActivated(bool active);
-
 private:
 
 	void _CenterWindow();
 	
-	bool fWindowCentered;
-
 	BootManagerController fController;	
 	WizardView* fWizardView;
 };

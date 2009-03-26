@@ -13,6 +13,7 @@ Application bootman :
 	FileSelectionPage.cpp
 	LegacyBootDrive.cpp
 	PartitionsPage.cpp
+#	TestBootDrive.cpp
 	UninstallPage.cpp
 	WizardController.cpp
 	WizardPageView.cpp

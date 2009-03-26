@@ -22,8 +22,7 @@
 
 BootManagerWindow::BootManagerWindow()
 	: BWindow(BRect(100, 100, 500, 400), "Boot Manager", B_TITLED_WINDOW, 
-		B_ASYNCHRONOUS_CONTROLS)
-	, fWindowCentered(false)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
@@ -35,6 +34,8 @@ BootManagerWindow::BootManagerWindow()
 	fController.Initialize(fWizardView);
 	
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
+
+	_CenterWindow();
 }
 
 
@@ -74,19 +75,8 @@ BootManagerWindow::QuitRequested()
 
 
 void
-BootManagerWindow::WindowActivated(bool active)
-{
-	_CenterWindow();
-}
-
-
-void
 BootManagerWindow::_CenterWindow()
 {
-	if (fWindowCentered)
-		return;
-	fWindowCentered = true;
-	
 	BScreen screen(this);
 	if (!screen.IsValid())
 		return;
