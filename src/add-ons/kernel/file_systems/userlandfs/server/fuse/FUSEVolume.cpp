@@ -2323,8 +2323,8 @@ FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
 
 			if (volumeUnlocked) {
 				// check whether we're still locking the right nodes
-				if (lockParent1 && originalNode1->Parent() != node1
-					|| lockParent2 && originalNode2->Parent() != node2) {
+				if ((lockParent1 && originalNode1->Parent() != node1)
+					|| (lockParent2 && originalNode2->Parent() != node2)) {
 					// We don't -- unlock everything and retry.
 					*_retry = true;
 					return B_OK;
@@ -2364,8 +2364,8 @@ FUSEVolume::_LockNodeChainsInternal(FUSENode* node1, bool lockParent1,
 
 		if (volumeUnlocked) {
 			// check whether we're still locking the right nodes
-			if (lockParent1 && originalNode1->Parent() != node1
-				|| lockParent2 && originalNode2->Parent() != node2) {
+			if ((lockParent1 && originalNode1->Parent() != node1)
+				|| (lockParent2 && originalNode2->Parent() != node2)) {
 				// We don't -- unlock everything and retry.
 				*_retry = true;
 				return B_OK;
