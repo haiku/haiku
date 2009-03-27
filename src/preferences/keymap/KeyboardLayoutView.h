@@ -99,6 +99,7 @@ private:
 			Key*			fDropTarget;
 			BPoint			fDropPoint;
 
+			BSize			fOldSize;
 			BFont			fFont;
 			BFont			fSpecialFont;
 			float			fBaseFontHeight;

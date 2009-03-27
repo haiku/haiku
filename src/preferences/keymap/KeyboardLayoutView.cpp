@@ -29,7 +29,8 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	fModifiers(0),
 	fDeadKey(0),
 	fDragKey(NULL),
-	fDropTarget(NULL)
+	fDropTarget(NULL),
+	fOldSize(0, 0)
 {
 	fLayout = new KeyboardLayout;
 	memset(fKeyState, 0, sizeof(fKeyState));
@@ -90,9 +91,6 @@ KeyboardLayoutView::AttachedToWindow()
 	SetFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
 	fModifiers = modifiers();
-
-	_InitOffscreen();
-	_LayoutKeyboard();
 }
 
 
@@ -230,6 +228,11 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
+	if (fOldSize != BSize(Bounds().Width(), Bounds().Height())) {
+		_InitOffscreen();
+		_LayoutKeyboard();
+	}
+
 	BView* view;
 	if (fOffscreenBitmap != NULL) {
 		view = fOffscreenView;
@@ -396,6 +399,9 @@ KeyboardLayoutView::_LayoutKeyboard()
 		fGap = 1;
 	else
 		fGap = 2;
+
+	fOldSize.width = Bounds().Width();
+	fOldSize.height = Bounds().Height();
 }
 
 
