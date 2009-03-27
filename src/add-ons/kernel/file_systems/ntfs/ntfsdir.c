@@ -173,6 +173,7 @@ fs_readdir( fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 	 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);		
 	if(ni==NULL) {
+		ERRPRINT("fs_readdir - Dir not opened\n");
 		result = ENOENT;
 		goto exit;
 	}	 

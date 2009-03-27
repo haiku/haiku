@@ -182,7 +182,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 			newNode->vnid = *_rootID;
 			newNode->parent_vnid = -1;
 
-			result = publish_vnode( _vol, *_rootID, (void*)newNode, &gNTFSVnodeOps, 0777, 0);
+			result = publish_vnode( _vol, *_rootID, (void*)newNode, &gNTFSVnodeOps, FS_DIR_MODE, 0);
 			if ( result != B_NO_ERROR )	{
 				free( ns );
 				result = EINVAL;
@@ -330,6 +330,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 			}
 
 			*vnid = MREF( ntfs_inode_lookup_by_name(bi, unicode, len) );
+			ERRPRINT("fs_walk - VNID = %d\n",*vnid);
 
 			ntfs_inode_close(bi);
 			free(unicode);
@@ -528,7 +529,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 	stbuf->st_ino = MREF(ni->mft_no);
 
 	if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
-		stbuf->st_mode = S_IFDIR | 0777;
+		stbuf->st_mode = FS_DIR_MODE;
 		na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
 		if (na) {
 			stbuf->st_size = na->data_size;
@@ -539,7 +540,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 		stbuf->st_nlink = 1; // Needed for correct find work.
 	} else {
 		// Regular or Interix (INTX) file.
-		stbuf->st_mode = S_IFREG;
+		stbuf->st_mode = FS_FILE_MODE;
 		stbuf->st_size = ni->data_size;
 		stbuf->st_nlink = le16_to_cpu(ni->mrec->link_count);
 
@@ -572,7 +573,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 				goto exit;
 			}
 			if (intx_file->magic == INTX_SYMBOLIC_LINK)
-				stbuf->st_mode = S_IFLNK;
+				stbuf->st_mode = FS_SLNK_MODE;
 			free(intx_file);
 		}
 		ntfs_attr_close(na);
@@ -868,7 +869,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 			set_mime(newNode, name);
 
 			result = B_NO_ERROR;
-			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps, 0777, 0);
+			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps, FS_FILE_MODE, 0);
 
 			ntfs_mark_free_space_outdated(ns);
 
@@ -1036,11 +1037,7 @@ fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const vo
 		if(ntfs_attr_truncate(na, offset + size))
 			size = na->data_size - offset;
 		else
-#ifdef __HAIKU__
 			notify_stat_changed(ns->id, MREF(ni->mft_no), B_STAT_SIZE);
-#else
-			notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
-#endif
 	}
 
 	while (size) {
@@ -1214,6 +1211,7 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char 
 	int			uname_len,
 				utarget_len;
 	status_t	result = B_NO_ERROR;
+	int 		fmode;
 
 	LOCK_VOL(ns);
 
@@ -1257,12 +1255,15 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char 
 	symnode->vnid = MREF(sym->mft_no);
 	symnode->parent_vnid = MREF(bi->mft_no);
 
-	if(sym->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+	if(sym->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 			set_mime(symnode, ".***");
-	else
+			fmode = FS_DIR_MODE;
+	} else {
 			set_mime(symnode, name);
+			fmode = FS_FILE_MODE;
+	}
 
-	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,&gNTFSVnodeOps, 0777, 0)) != 0)
+	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,&gNTFSVnodeOps, FS_SLNK_MODE | fmode, 0)) != 0)
 		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(result));
 
 	put_vnode(_vol, MREF(sym->mft_no) );
@@ -1343,7 +1344,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		newNode->parent_vnid = MREF(bi->mft_no);
 		set_mime(newNode, ".***");
 
-		result = publish_vnode(_vol, vnid, (void*)newNode,&gNTFSVnodeOps, 0777, 0);
+		result = publish_vnode(_vol, vnid, (void*)newNode,&gNTFSVnodeOps, FS_DIR_MODE, 0);
 
 		put_vnode(_vol, MREF(ni->mft_no));
 

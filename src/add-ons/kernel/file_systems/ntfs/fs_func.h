@@ -42,6 +42,11 @@
 #include "lock.h"
 #include "volume_util.h"
 
+#define FS_DIR_MODE		S_IFDIR | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
+#define FS_FILE_MODE	S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
+#define FS_SLNK_MODE	S_IFLNK | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
+
+
 extern fs_vnode_ops gNTFSVnodeOps;
 extern fs_volume_ops gNTFSVolumeOps;
 
