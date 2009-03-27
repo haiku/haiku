@@ -50,12 +50,16 @@ private:
 		kIndicator
 	};
 
+			void			_InitOffscreen();
 			void			_LayoutKeyboard();
 			void			_DrawKeyButton(BView* view, BRect& rect,
 								BRect updateRect, rgb_color base,
 								rgb_color background, bool pressed);
 			void			_DrawKey(BView* view, BRect updateRect,
 								const Key* key, BRect frame, bool pressed);
+			void			_DrawIndicator(BView* view, BRect updateRect,
+								const Indicator* indicator, BRect rect,
+								bool lit);
 			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
 			const char*		_SpecialMappedKeySymbol(const char* bytes,
 								size_t numBytes);
@@ -77,6 +81,9 @@ private:
 			void			_SetFontSize(BView* view, key_kind keyKind);
 			void			_EvaluateDropTarget(BPoint point);
 			void			_SendFakeKeyDown(const Key* key);
+
+			BBitmap*		fOffscreenBitmap;
+			BView*			fOffscreenView;
 
 			KeyboardLayout*	fLayout;
 			Keymap*			fKeymap;

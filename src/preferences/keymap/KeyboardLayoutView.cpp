@@ -24,6 +24,7 @@ static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fOffscreenBitmap(NULL),
 	fKeymap(NULL),
 	fModifiers(0),
 	fDeadKey(0),
@@ -39,6 +40,7 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 
 KeyboardLayoutView::~KeyboardLayoutView()
 {
+	delete fOffscreenBitmap;
 }
 
 
@@ -83,15 +85,13 @@ KeyboardLayoutView::SetFont(const BFont& font)
 void
 KeyboardLayoutView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(B_TRANSPARENT_COLOR);
 
 	SetFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
 	fModifiers = modifiers();
 
+	_InitOffscreen();
 	_LayoutKeyboard();
 }
 
@@ -99,6 +99,7 @@ KeyboardLayoutView::AttachedToWindow()
 void
 KeyboardLayoutView::FrameResized(float width, float height)
 {
+	_InitOffscreen();
 	_LayoutKeyboard();
 }
 
@@ -229,12 +230,28 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 void
 KeyboardLayoutView::Draw(BRect updateRect)
 {
+	BView* view;
+	if (fOffscreenBitmap != NULL) {
+		view = fOffscreenView;
+		view->LockLooper();
+	} else
+		view = this;
+
+	// Draw background
+
+	if (Parent())
+		view->SetLowColor(Parent()->ViewColor());
+	else
+		view->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	view->FillRect(updateRect, B_SOLID_LOW);
+
 	// Draw keys
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
 
-		_DrawKey(this, updateRect, key, _FrameFor(key),
+		_DrawKey(view, updateRect, key, _FrameFor(key),
 			_IsKeyPressed(key->code));
 	}
 
@@ -243,49 +260,15 @@ KeyboardLayoutView::Draw(BRect updateRect)
 	for (int32 i = 0; i < fLayout->CountIndicators(); i++) {
 		Indicator* indicator = fLayout->IndicatorAt(i);
 
-		BRect rect = _FrameFor(indicator->frame);
-		float rectTop = rect.top;
-		rect.top += 2 * rect.Height() / 3;
+		_DrawIndicator(view, updateRect, indicator, _FrameFor(indicator->frame),
+			(fModifiers & indicator->modifier) != 0);
+	}
 
-		const char* label = NULL;
-		if (indicator->modifier == B_CAPS_LOCK)
-			label = "caps";
-		else if (indicator->modifier == B_NUM_LOCK)
-			label = "num";
-		else if (indicator->modifier == B_SCROLL_LOCK)
-			label = "scroll";
-		if (label != NULL) {
-			_SetFontSize(this, kIndicator);
+	if (fOffscreenBitmap != NULL) {
+		view->Sync();
+		view->UnlockLooper();
 
-			font_height fontHeight;
-			GetFontHeight(&fontHeight);
-			if (ceilf(rect.top - fontHeight.ascent + fontHeight.descent - 2)
-					>= rectTop) {
-				SetHighColor(0, 0, 0);
-				SetLowColor(ViewColor());
-
-				BString text(label);
-				TruncateString(&text, B_TRUNCATE_END, rect.Width());
-				DrawString(text.String(), BPoint(ceilf(rect.left + (rect.Width()
-						- StringWidth(text.String())) / 2),
-					ceilf(rect.top - fontHeight.descent - 2)));
-			}
-		}
-
-		rect.left += rect.Width() / 4;
-		rect.right -= rect.Width() / 3;
-
-		rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-		rgb_color base;
-		if ((fModifiers & indicator->modifier) != 0)
-			base = kLitIndicatorColor;
-		else
-			base = kDarkColor;
-
-		be_control_look->DrawButtonFrame(this, rect, updateRect, base,
-			background, BControlLook::B_DISABLED);
-		be_control_look->DrawButtonBackground(this, rect, updateRect, 
-			base, BControlLook::B_DISABLED);
+		DrawBitmapAsync(fOffscreenBitmap, BPoint(0, 0));
 	}
 }
 
@@ -346,15 +329,54 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 			break;
 
 		case B_MODIFIERS_CHANGED:
-			if (message->FindInt32("modifiers", &fModifiers) == B_OK) {
+		{
+			int32 newModifiers;
+			if (message->FindInt32("modifiers", &newModifiers) == B_OK
+				&& fModifiers != newModifiers) {
+				fModifiers = newModifiers;
 				_EvaluateDropTarget(fDropPoint);
 				Invalidate();
 			}
 			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
 			break;
+	}
+}
+
+
+void
+KeyboardLayoutView::_InitOffscreen()
+{
+	delete fOffscreenBitmap;
+	fOffscreenView = NULL;
+
+	fOffscreenBitmap = new(std::nothrow) BBitmap(Bounds(),
+		B_BITMAP_ACCEPTS_VIEWS, B_RGB32);
+	if (fOffscreenBitmap != NULL && fOffscreenBitmap->IsValid()) {
+		fOffscreenBitmap->Lock();
+		fOffscreenView = new(std::nothrow) BView(Bounds(), "offscreen view",
+			0, 0);
+		if (fOffscreenView != NULL) {
+			if (Parent() != NULL) {
+				fOffscreenView->SetViewColor(Parent()->ViewColor());
+			} else {
+				fOffscreenView->SetViewColor(
+					ui_color(B_PANEL_BACKGROUND_COLOR));
+			}
+
+			fOffscreenView->SetLowColor(fOffscreenView->ViewColor());
+			fOffscreenBitmap->AddChild(fOffscreenView);
+		}
+		fOffscreenBitmap->Unlock();
+	}
+
+	if (fOffscreenView == NULL) {
+		// something went wrong
+		delete fOffscreenBitmap;
+		fOffscreenBitmap = NULL;
 	}
 }
 
@@ -464,6 +486,52 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		ConstrainClippingRegion(NULL);
 	}
+}
+
+
+void
+KeyboardLayoutView::_DrawIndicator(BView* view, BRect updateRect,
+	const Indicator* indicator, BRect rect, bool lit)
+{
+	float rectTop = rect.top;
+	rect.top += 2 * rect.Height() / 3;
+
+	const char* label = NULL;
+	if (indicator->modifier == B_CAPS_LOCK)
+		label = "caps";
+	else if (indicator->modifier == B_NUM_LOCK)
+		label = "num";
+	else if (indicator->modifier == B_SCROLL_LOCK)
+		label = "scroll";
+	if (label != NULL) {
+		_SetFontSize(view, kIndicator);
+
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		if (ceilf(rect.top - fontHeight.ascent + fontHeight.descent - 2)
+				>= rectTop) {
+			view->SetHighColor(0, 0, 0);
+			view->SetLowColor(ViewColor());
+
+			BString text(label);
+			view->TruncateString(&text, B_TRUNCATE_END, rect.Width());
+			view->DrawString(text.String(),
+				BPoint(ceilf(rect.left + (rect.Width()
+						- StringWidth(text.String())) / 2),
+					ceilf(rect.top - fontHeight.descent - 2)));
+		}
+	}
+
+	rect.left += rect.Width() / 4;
+	rect.right -= rect.Width() / 3;
+
+	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = lit ? kLitIndicatorColor : kDarkColor;
+
+	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
+		background, BControlLook::B_DISABLED);
+	be_control_look->DrawButtonBackground(view, rect, updateRect, 
+		base, BControlLook::B_DISABLED);
 }
 
 
