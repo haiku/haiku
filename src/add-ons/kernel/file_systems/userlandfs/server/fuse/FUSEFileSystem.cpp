@@ -338,9 +338,9 @@ FUSEFileSystem::_InitCapabilities()
 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_UNMOUNT, true);
 
 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_READ_FS_INFO, fFS->ops.statfs);
-// 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_WRITE_FS_INFO,
-// 		fFS->ops.wfsstat);
-// 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fFS->ops.sync);
+	// missing: FS_VOLUME_CAPABILITY_WRITE_FS_INFO
+	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fFS->ops.fsync);
+		// emulated via fsync()
 
 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_GET_VNODE, true);
 		// emulated

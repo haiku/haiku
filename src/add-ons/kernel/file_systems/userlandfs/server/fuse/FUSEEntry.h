@@ -82,12 +82,14 @@ struct FUSENode : RWLockable, HashTableLink<FUSENode> {
 	FUSEEntryList	entries;
 	int				type;
 	int32			refCount;
+	bool			dirty;
 
 	FUSENode(ino_t id, int type)
 		:
 		id(id),
 		type(type),
-		refCount(1)
+		refCount(1),
+		dirty(false)
 	{
 	}
 

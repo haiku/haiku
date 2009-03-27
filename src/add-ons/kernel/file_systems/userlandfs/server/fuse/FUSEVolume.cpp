@@ -722,9 +722,47 @@ printf("FUSEVolume::Unmount()\n");
 status_t
 FUSEVolume::Sync()
 {
-	// TODO: Implement!
-	// NOTE: There's no hook for sync'ing the whole FS.
-	return B_UNSUPPORTED;
+	PRINT(("FUSEVolume::Sync()\n"));
+
+	// There's no FUSE hook for sync'ing the whole FS. We need to individually
+	// fsync all nodes that have been marked dirty. To keep things simple, we
+	// hold the volume lock the whole time. That's a concurrency killer, but
+	// usually sync isn't invoked that often.
+
+	AutoLocker<Locker> _(fLock);
+
+	// iterate through all nodes
+	FUSENodeTable::Iterator it = fNodes.GetIterator();
+	while (FUSENode* node = it.Next()) {
+		if (!node->dirty)
+			continue;
+
+		// node is dirty -- we have to sync it
+
+		// get a path for the node
+		char path[B_PATH_NAME_LENGTH];
+		size_t pathLen;
+		status_t error = _BuildPath(node, path, pathLen);
+		if (error != B_OK)
+			continue;
+
+		// open, sync, and close the node
+		FileCookie cookie(O_RDONLY);
+		int fuseError = fuse_fs_open(fFS, path, &cookie);
+		if (fuseError == 0) {
+			fuseError = fuse_fs_fsync(fFS, path, 0, &cookie);
+				// full sync, not only data
+			fuse_fs_flush(fFS, path, &cookie);
+			fuse_fs_release(fFS, path, &cookie);
+		}
+
+		if (fuseError == 0) {
+			// sync'ing successful -- mark the node not dirty
+			node->dirty = false;
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -750,14 +788,6 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 		// no way to get the real name (if any)
 
 	return B_OK;
-}
-
-
-status_t
-FUSEVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
-{
-	// TODO: Implement!
-	return B_UNSUPPORTED;
 }
 
 
@@ -885,21 +915,28 @@ FUSEVolume::FSync(void* _node)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	// mark the node not dirty
+	bool dirty = node->dirty;
+	node->dirty = false;
+
 	locker.Unlock();
 
 	// open, sync, and close the node
 	FileCookie cookie(O_RDONLY);
 	int fuseError = fuse_fs_open(fFS, path, &cookie);
-	if (fuseError != 0)
-		RETURN_ERROR(fuseError);
+	if (fuseError == 0) {
+		fuseError = fuse_fs_fsync(fFS, path, 0, &cookie);
+			// full sync, not only data
+		fuse_fs_flush(fFS, path, &cookie);
+		fuse_fs_release(fFS, path, &cookie);
+	}
 
-	fuseError = fuse_fs_fsync(fFS, path, 0, &cookie);
-		// full sync, not only data
-	if (fuseError != 0)
+	if (fuseError != 0) {
+		// sync'ing failed -- mark the node dirty again
+		locker.Lock();
+		node->dirty |= dirty;
 		RETURN_ERROR(fuseError);
-
-	fuse_fs_flush(fFS, path, &cookie);
-	fuse_fs_release(fFS, path, &cookie);
+	}
 
 	return B_OK;
 }
@@ -967,10 +1004,14 @@ dir->id, name, target, mode));
 
 	locker.Unlock();
 
-	// create the dir
+	// create the symlink
 	int fuseError = fuse_fs_symlink(fFS, target, path);
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
+
+	// mark the dir dirty
+	locker.Lock();
+	dir->dirty = true;
 
 // TODO: Set the mode?!
 
@@ -1016,6 +1057,11 @@ node, node->id));
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
 
+	// mark the dir and the node dirty
+	locker.Lock();
+	dir->dirty = true;
+	node->dirty = true;
+
 // TODO: Node monitoring!
 
 	return B_OK;
@@ -1052,6 +1098,9 @@ PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
 	// remove the entry
 	locker.Lock();
 	_RemoveEntry(dir, name);
+
+	// mark the dir dirty
+	dir->dirty = true;
 
 // TODO: Node monitoring!
 
@@ -1098,6 +1147,10 @@ oldDir->id, oldName, newDir, newDir->id, newName));
 	// rename the entry
 	locker.Lock();
 	_RenameEntry(oldDir, oldName, newDir, newName);
+
+	// mark the dirs dirty
+	oldDir->dirty = true;
+	newDir->dirty = true;
 
 // TODO: Node monitoring!
 
@@ -1240,6 +1293,10 @@ mask));
 			RETURN_ERROR(fuseError);
 	}
 
+	// mark the node dirty
+	locker.Lock();
+	node->dirty = true;
+
 // TODO: Node monitoring!
 
 	return B_OK;
@@ -1298,6 +1355,11 @@ openMode, mode));
 		RETURN_ERROR(error);
 	}
 
+	// mark the dir and the node dirty
+	locker.Lock();
+	dir->dirty = true;
+	node->dirty = true;
+
 	cookieDeleter.Detach();
 	*_cookie = cookie;
 	*_vnid = node->id;
@@ -1350,6 +1412,11 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 			fuse_fs_release(fFS, path, cookie);
 			RETURN_ERROR(fuseError);
 		}
+
+		// mark the node dirty
+		locker.Lock();
+		node->dirty = true;
+
 // TODO: Node monitoring!
 	}
 
@@ -1499,6 +1566,10 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 	if (bytesWritten < 0)
 		return bytesWritten;
 
+	// mark the node dirty
+	locker.Lock();
+	node->dirty = true;
+
 // TODO: Node monitoring?
 
 	*_bytesWritten = bytesWritten;
@@ -1537,6 +1608,10 @@ mode));
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
 
+	// mark the dir dirty
+	locker.Lock();
+	dir->dirty = true;
+
 // TODO: Node monitoring!
 
 	return B_OK;
@@ -1573,6 +1648,10 @@ PRINT(("FUSEVolume::RemoveDir(%p (%lld), \"%s\")\n", dir, dir->id, name));
 	// remove the entry
 	locker.Lock();
 	_RemoveEntry(dir, name);
+
+	// mark the parent dir dirty
+	locker.Lock();
+	dir->dirty = true;
 
 // TODO: Node monitoring!
 
