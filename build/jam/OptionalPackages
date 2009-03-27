@@ -454,13 +454,19 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 if [ IsOptionalHaikuImagePackageAdded Pe ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package Pe available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-07
-			: http://haiku-files.org/files/optional-packages/pe-2.4.1-x86-rc3-gcc2-2009-03-07.zip
-			: apps
-		;
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc4-2009-03-27
+				: $(baseURL)/pe-2.4.1-x86-rc3-gcc4-2009-03-27.zip
+				: apps
+			;
+		} else {
+			InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-07
+				: $(baseURL)/pe-2.4.1-x86-rc3-gcc2-2009-03-07.zip
+				: apps
+			;
+		}
 
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Pe/Pe ;
