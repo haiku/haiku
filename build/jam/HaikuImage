@@ -247,10 +247,10 @@ DESKBAR_APPLICATIONS = ActivityMonitor CodyCam CDPlayer DeskCalc DiskProbe
 	DriveSetup DiskUsage Expander Icon-O-Matic Magnify Mail MediaPlayer
 	MidiPlayer People Screenshot SoundRecorder StyledEdit Terminal TV
 ;
-local app ;
-for app in $(DESKBAR_APPLICATIONS) {
+local linkTarget ;
+for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToHaikuImage home config be Applications
-		: /boot/beos/apps/$(app) : $(app) ;
+		: /boot/beos/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Desktop Applets links
@@ -258,14 +258,30 @@ AddDirectoryToHaikuImage home config be Desktop\ Applets ;
 DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 	Workspaces
 ;
-for app in $(DESKBAR_DESKTOP_APPLETS) {
+for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 	AddSymlinkToHaikuImage home config be Desktop\ Applets
-		: /boot/beos/apps/$(app) : $(app) ;
+		: /boot/beos/apps/$(linkTarget) : $(linkTarget) ;
 }
 
-# Deskbar Preferences and Demos links
-AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
-AddSymlinkToHaikuImage home config be : /boot/beos/demos : Demos ;
+# Deskbar Preferences links
+AddDirectoryToHaikuImage home config be Preferences ;
+# TODO/NOTE: Cannot use $(BEOS_PREFERENCES) here since there is
+# "<preferences>Tracker"...
+DESKBAR_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
+	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
+	ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
+;
+for linkTarget in $(DESKBAR_PREFERENCES) {
+	AddSymlinkToHaikuImage home config be Preferences
+		: /boot/beos/preferences/$(linkTarget) : $(linkTarget) ;
+}
+
+# Deskbar Demo links
+AddDirectoryToHaikuImage home config be Demos ;
+for linkTarget in $(BEOS_DEMOS) {
+	AddSymlinkToHaikuImage home config be Demos
+		: /boot/beos/demos/$(linkTarget) : $(linkTarget) ;
+}
 
 AddSymlinkToHaikuImage beos bin : bzip2 : bunzip2 ;
 AddSymlinkToHaikuImage beos bin : less : more ;
