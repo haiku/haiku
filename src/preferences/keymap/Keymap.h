@@ -27,7 +27,11 @@ public:
 			status_t		Save(entry_ref& ref);
 
 			void			DumpKeymap();
+
 			bool			IsModifierKey(uint32 keyCode);
+			uint32			Modifier(uint32 keyCode);
+			uint32			KeyForModifier(uint32 modifier);
+
 			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers);
 			bool			IsDeadSecondKey(uint32 keyCode, uint32 modifiers,
 								uint8 activeDeadKey);

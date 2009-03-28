@@ -133,7 +133,14 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	Key* key = _KeyAt(point);
 	if (key != NULL) {
 		fKeyState[key->code / 8] |= (1 << (7 - (key->code & 7)));
-		_InvalidateKey(key);
+		
+		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+			fModifiers |= fKeymap->Modifier(key->code);
+			Invalidate();
+
+			// TODO: if possible, we could handle the lock keys for real
+		} else
+			_InvalidateKey(key);
 	}
 }
 
@@ -148,7 +155,14 @@ KeyboardLayoutView::MouseUp(BPoint point)
 		if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
 			return;
 
-		_InvalidateKey(key);
+		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+			int32 newModifiers = modifiers();
+			if (fModifiers != newModifiers) {
+				fModifiers = modifiers();
+				Invalidate();
+			}
+		} else
+			_InvalidateKey(key);
 
 		if (fDragKey == NULL && fKeymap != NULL) {
 			// Send fake key down message to target

@@ -240,6 +240,71 @@ Keymap::IsModifierKey(uint32 keyCode)
 }
 
 
+//! We need to know a modifier for a key
+uint32 
+Keymap::Modifier(uint32 keyCode)
+{
+	if (keyCode == fKeys.caps_key)
+		return B_CAPS_LOCK;
+	if (keyCode == fKeys.num_key)
+		return B_NUM_LOCK;
+	if (keyCode == fKeys.scroll_key)
+		return B_SCROLL_LOCK;
+	if (keyCode == fKeys.left_shift_key)
+		return B_LEFT_SHIFT_KEY | B_SHIFT_KEY;
+	if (keyCode == fKeys.right_shift_key)
+		return B_RIGHT_SHIFT_KEY | B_SHIFT_KEY;
+	if (keyCode == fKeys.left_command_key)
+		return B_LEFT_COMMAND_KEY | B_COMMAND_KEY;
+	if (keyCode == fKeys.right_command_key)
+		return B_RIGHT_COMMAND_KEY | B_COMMAND_KEY;
+	if (keyCode == fKeys.left_control_key)
+		return B_LEFT_CONTROL_KEY | B_CONTROL_KEY;
+	if (keyCode == fKeys.right_control_key)
+		return B_RIGHT_CONTROL_KEY | B_CONTROL_KEY;
+	if (keyCode == fKeys.left_option_key)
+		return B_LEFT_OPTION_KEY | B_OPTION_KEY;
+	if (keyCode == fKeys.right_option_key)
+		return B_RIGHT_OPTION_KEY | B_OPTION_KEY;
+	if (keyCode == fKeys.menu_key)
+		return B_MENU_KEY;
+
+	return 0;
+}
+
+
+uint32
+Keymap::KeyForModifier(uint32 modifier)
+{
+	if (modifier == B_CAPS_LOCK)
+		return fKeys.caps_key;
+	if (modifier == B_NUM_LOCK)
+		return fKeys.num_key;
+	if (modifier == B_SCROLL_LOCK)
+		return fKeys.scroll_key;
+	if (modifier == B_LEFT_SHIFT_KEY || modifier == B_SHIFT_KEY)
+		return fKeys.left_shift_key;
+	if (modifier == B_RIGHT_SHIFT_KEY)
+		return fKeys.right_shift_key;
+	if (modifier == B_LEFT_COMMAND_KEY || modifier == B_COMMAND_KEY)
+		return fKeys.left_command_key;
+	if (modifier == B_RIGHT_COMMAND_KEY)
+		return fKeys.right_command_key;
+	if (modifier == B_LEFT_CONTROL_KEY || modifier == B_CONTROL_KEY)
+		return fKeys.left_control_key;
+	if (modifier == B_RIGHT_CONTROL_KEY)
+		return fKeys.right_control_key;
+	if (modifier == B_LEFT_OPTION_KEY || modifier == B_OPTION_KEY)
+		return fKeys.left_option_key;
+	if (modifier == B_RIGHT_OPTION_KEY)
+		return fKeys.right_option_key;
+	if (modifier == B_MENU_KEY)
+		return fKeys.menu_key;
+
+	return 0;
+}
+
+
 //! Checks whether a key is a dead key.
 uint8
 Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
