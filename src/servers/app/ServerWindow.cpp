@@ -1577,8 +1577,19 @@ fDesktop->LockSingleWindow();
 		{
 			uint32 flags;
 			link.Read<uint32>(&flags);
+
+			// The views clipping changes when the B_DRAW_ON_CHILDREN flag is
+			// toggled.
+			bool updateClipping = (flags & B_DRAW_ON_CHILDREN)
+				^ (fCurrentView->Flags() & B_DRAW_ON_CHILDREN);
+
 			fCurrentView->SetFlags(flags);
 			_UpdateDrawState(fCurrentView);
+
+			if (updateClipping) {
+				fCurrentView->RebuildClipping(false);
+				fCurrentDrawingRegionValid = false;
+			}
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FLAGS: "
 				"View: %s -> flags: %lu\n", Title(), fCurrentView->Name(),
