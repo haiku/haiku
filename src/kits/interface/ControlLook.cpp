@@ -480,7 +480,7 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (flags & B_DISABLED) {
-		_DrawOuterResessedFrame(view, rect, base, 0.0);
+		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags);
 
 		dark1BorderColor = tint_color(base, 1.15);
 		dark2BorderColor = tint_color(base, 1.15);
@@ -494,7 +494,7 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 
 		dark2BorderColor = dark1BorderColor;
 	} else {
-		_DrawOuterResessedFrame(view, rect, base, 0.6);
+		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, flags);
 
 		dark1BorderColor = tint_color(base, 1.40);
 		dark2BorderColor = tint_color(base, 1.38);
@@ -713,7 +713,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
 
 	if (border == B_FANCY_BORDER)
-		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, borders);
+		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
 
 	if (flags & B_FOCUSED) {
 		rgb_color focusColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
@@ -731,7 +731,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders = _borders;
 		borders &= ~B_TOP_BORDER;
 		_DrawOuterResessedFrame(view, horizontalScrollBarFrame, base,
-			1.0, 1.0, borders);
+			1.0, 1.0, flags, borders);
 		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -743,7 +743,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders = _borders;
 		borders &= ~B_LEFT_BORDER;
 		_DrawOuterResessedFrame(view, verticalScrollBarFrame, base,
-			1.0, 1.0, borders);
+			1.0, 1.0, flags, borders);
 		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -1433,7 +1433,7 @@ BControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 		scrollbarFrameColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (border == B_FANCY_BORDER)
-		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, borders);
+		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
 
 	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
 		scrollbarFrameColor, scrollbarFrameColor, borders);
@@ -1474,24 +1474,33 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if (flags & B_DISABLED) {
-		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, borders);
+		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags, borders);
 
-		dark1BorderColor = tint_color(base, 1.15);
-		dark2BorderColor = tint_color(base, 1.15);
+		if (flags & B_BLEND_FRAME)
+			dark1BorderColor = (rgb_color){ 0, 0, 0, 40 };
+		else
+			dark1BorderColor = tint_color(base, 1.15);
+		dark2BorderColor = dark1BorderColor;
 	} else if (flags & B_CLICKED) {
 		dark1BorderColor = tint_color(base, 1.50);
 		dark2BorderColor = tint_color(base, 1.49);
 
+		// BCheckBox uses this to indicate the clicked state...
 		_DrawFrame(view, rect,
 			dark1BorderColor, dark1BorderColor,
 			dark2BorderColor, dark2BorderColor);
 
 		dark2BorderColor = dark1BorderColor;
 	} else {
-		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, borders);
+		_DrawOuterResessedFrame(view, rect, base, 0.6, 1.0, flags, borders);
 
-		dark1BorderColor = tint_color(base, 1.40);
-		dark2BorderColor = tint_color(base, 1.38);
+		if (flags & B_BLEND_FRAME) {
+			dark1BorderColor = (rgb_color){ 0, 0, 0, 102 };
+			dark2BorderColor = (rgb_color){ 0, 0, 0, 97 };
+		} else {
+			dark1BorderColor = tint_color(base, 1.40);
+			dark2BorderColor = tint_color(base, 1.38);
+		}
 	}
 
 	if ((flags & B_DISABLED) == 0 && (flags & B_FOCUSED)) {
@@ -1499,9 +1508,20 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 		dark2BorderColor = navigationColor;
 	}
 
-	_DrawFrame(view, rect,
-		dark1BorderColor, dark1BorderColor,
-		dark2BorderColor, dark2BorderColor, borders);
+	if (flags & B_BLEND_FRAME) {
+		drawing_mode oldMode = view->DrawingMode();
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		_DrawFrame(view, rect,
+			dark1BorderColor, dark1BorderColor,
+			dark2BorderColor, dark2BorderColor, borders);
+
+		view->SetDrawingMode(oldMode);
+	} else {
+		_DrawFrame(view, rect,
+			dark1BorderColor, dark1BorderColor,
+			dark2BorderColor, dark2BorderColor, borders);
+	}
 }
 
 
@@ -1618,14 +1638,21 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	rgb_color dark2BorderColor;
 
 	if ((flags & B_DISABLED) == 0) {
-		dark1BorderColor = tint_color(base, 1.33);
-		dark2BorderColor = tint_color(base, 1.45);
+		if (flags & B_BLEND_FRAME) {
+			dark1BorderColor = (rgb_color){ 0, 0, 0, 75 };
+			dark2BorderColor = (rgb_color){ 0, 0, 0, 95 };
+		} else {
+			dark1BorderColor = tint_color(base, 1.33);
+			dark2BorderColor = tint_color(base, 1.45);
+		}
 
 		if (flags & B_DEFAULT_BUTTON) {
+			// TODO: B_BLEND_FRAME
 			dark2BorderColor = tint_color(dark1BorderColor, 1.5);
 			dark1BorderColor = tint_color(dark1BorderColor, 1.35);
 		}
 	} else {
+		// TODO: B_BLEND_FRAME
 		dark1BorderColor = tint_color(base, 1.147);
 		dark2BorderColor = tint_color(base, 1.24);
 
@@ -1648,6 +1675,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	}
 
 	if (flags & B_DEFAULT_BUTTON) {
+		// TODO: B_BLEND_FRAME
 		float focusTint = 1.2;
 		if (flags & B_DISABLED)
 			focusTint = (B_NO_TINT + focusTint) / 2;
@@ -1668,49 +1696,77 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		_DrawOuterResessedFrame(view, rect, focusColor,
 			contrast * (((flags & B_DISABLED) ? 0.3 : 0.8)),
 			brightness * (((flags & B_DISABLED) ? 1.0 : 0.9)),
-			borders);
+			flags, borders);
 	} else {
 		// bevel around external border
 		_DrawOuterResessedFrame(view, rect, background,
 			contrast * ((flags & B_DISABLED) ? 0.0 : 1.0), brightness * 1.0,
-			borders);
+			flags, borders);
 	}
 
-	_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
-		dark2BorderColor, dark2BorderColor, borders);
+	if (flags & B_BLEND_FRAME) {
+		drawing_mode oldDrawingMode = view->DrawingMode();
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
+			dark2BorderColor, dark2BorderColor, borders);
+
+		view->SetDrawingMode(oldDrawingMode);
+	} else {
+		_DrawFrame(view, rect, dark1BorderColor, dark1BorderColor,
+			dark2BorderColor, dark2BorderColor, borders);
+	}
 }
 
 
 void
 BControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
-	const rgb_color& base, float contrast, float brightness, uint32 borders)
+	const rgb_color& base, float contrast, float brightness, uint32 flags,
+	uint32 borders)
 {
-	// colors
-	float tintLight = kEdgeBevelLightTint;
-	float tintShadow = kEdgeBevelShadowTint;
+	if (flags & B_BLEND_FRAME) {
+		// assumes the background has already been painted
+		drawing_mode oldDrawingMode = view->DrawingMode();
+		view->SetDrawingMode(B_OP_ALPHA);
 
-	if (contrast == 0.0) {
-		tintLight = B_NO_TINT;
-		tintShadow = B_NO_TINT;
-	} else if (contrast != 1.0) {
-		tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
-		tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
+		uint8 alpha = uint8(20 * contrast);
+		uint32 white = uint8(255 * brightness);
+
+		rgb_color borderBevelShadow = (rgb_color){ 0, 0, 0, alpha };
+		rgb_color borderBevelLight = (rgb_color){ white, white, white, alpha };
+
+		_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
+			borderBevelLight, borderBevelLight, borders);
+
+		view->SetDrawingMode(oldDrawingMode);
+	} else {
+		// colors
+		float tintLight = kEdgeBevelLightTint;
+		float tintShadow = kEdgeBevelShadowTint;
+	
+		if (contrast == 0.0) {
+			tintLight = B_NO_TINT;
+			tintShadow = B_NO_TINT;
+		} else if (contrast != 1.0) {
+			tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
+			tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
+		}
+	
+		rgb_color borderBevelShadow = tint_color(base, tintShadow);
+		rgb_color borderBevelLight = tint_color(base, tintLight);
+	
+		if (brightness < 1.0) {
+			borderBevelShadow.red = uint8(borderBevelShadow.red * brightness);
+			borderBevelShadow.green = uint8(borderBevelShadow.green * brightness);
+			borderBevelShadow.blue = uint8(borderBevelShadow.blue * brightness);
+			borderBevelLight.red = uint8(borderBevelLight.red * brightness);
+			borderBevelLight.green = uint8(borderBevelLight.green * brightness);
+			borderBevelLight.blue = uint8(borderBevelLight.blue * brightness);
+		}
+	
+		_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
+			borderBevelLight, borderBevelLight, borders);
 	}
-
-	rgb_color borderBevelShadow = tint_color(base, tintShadow);
-	rgb_color borderBevelLight = tint_color(base, tintLight);
-
-	if (brightness < 1.0) {
-		borderBevelShadow.red = uint8(borderBevelShadow.red * brightness);
-		borderBevelShadow.green = uint8(borderBevelShadow.green * brightness);
-		borderBevelShadow.blue = uint8(borderBevelShadow.blue * brightness);
-		borderBevelLight.red = uint8(borderBevelLight.red * brightness);
-		borderBevelLight.green = uint8(borderBevelLight.green * brightness);
-		borderBevelLight.blue = uint8(borderBevelLight.blue * brightness);
-	}
-
-	_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
-		borderBevelLight, borderBevelLight, borders);
 }
 
 

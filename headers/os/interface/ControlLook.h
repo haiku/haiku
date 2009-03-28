@@ -61,7 +61,9 @@ public:
 		B_ACTIVATED			= 1 << 2,
 		B_HOVER				= 1 << 3,
 		B_DISABLED			= 1 << 4,
-		B_DEFAULT_BUTTON	= 1 << 5
+		B_DEFAULT_BUTTON	= 1 << 5,
+
+		B_BLEND_FRAME		= 1 << 16
 	};
 
 	virtual BAlignment			DefaultLabelAlignment() const;
@@ -253,6 +255,7 @@ protected:
 									BRect& rect, const rgb_color& base,
 									float contrast = 1.0f,
 									float brightness = 1.0f,
+									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
 			void				_DrawFrame(BView* view, BRect& rect,
