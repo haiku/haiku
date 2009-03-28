@@ -56,13 +56,6 @@ enum {
 	B_TRACK_RECT_CORNER
 };
 
-// bitmap drawing options
-enum {
-	B_FILTER_BITMAP_BILINEAR	= 0x00000001,
-		// TODO: Make this simply "SMOOTH_SCALE" and use
-		// better quality methods the faster the computer?
-};
-
 // set font mask
 enum {
 	B_FONT_FAMILY_AND_STYLE		= 0x00000001,

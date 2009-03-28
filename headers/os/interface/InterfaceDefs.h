@@ -241,9 +241,9 @@ const float B_DEFAULT_MITER_LIMIT = 10.0F;
 // Bitmap and overlay constants
 
 enum bitmap_tiling {
-	B_TILE_BITMAP_X		= 0x00000001,
-	B_TILE_BITMAP_Y		= 0x00000002,
-	B_TILE_BITMAP		= 0x00000003
+	B_TILE_BITMAP_X				= 0x00000001,
+	B_TILE_BITMAP_Y				= 0x00000002,
+	B_TILE_BITMAP				= 0x00000003
 };
 
 enum overlay_options {
@@ -253,6 +253,11 @@ enum overlay_options {
 	B_OVERLAY_TRANSFER_CHANNEL	= 0x00080000
 };
 
+enum bitmap_filtering {
+	B_FILTER_BITMAP_BILINEAR	= 0x00000100,
+		// TODO: Make this simply "SMOOTH_SCALE" and use
+		// better quality methods the faster the computer?
+};
 
 // Default UI Colors
 
