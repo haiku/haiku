@@ -161,6 +161,7 @@ class BPoseView : public BView {
 		virtual void MakeFocus(bool = true);
 		virtual void MouseMoved(BPoint, uint32, const BMessage *);
 		virtual	void Draw(BRect update_rect);
+		virtual	void DrawAfterChildren(BRect update_rect);
 		virtual	void MouseDown(BPoint where);
 		virtual	void KeyDown(const char *, int32);
 		virtual void Pulse();

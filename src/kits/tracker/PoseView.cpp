@@ -8101,6 +8101,14 @@ BPoseView::Draw(BRect updateRect)
 	}
 	DrawViewCommon(updateRect);
 
+	if ((Flags() & B_DRAW_ON_CHILDREN) == 0)
+		DrawAfterChildren(updateRect);
+}
+
+
+void
+BPoseView::DrawAfterChildren(BRect updateRect)
+{
 	if (fTransparentSelection && fSelectionRect.IsValid()) {
 		SetDrawingMode(B_OP_ALPHA);
 		SetHighColor(255, 255, 255, 128);
