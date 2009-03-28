@@ -41,6 +41,9 @@ define("QEMU_BIN", QEMU_BASE . "/bin/qemu");
 define("QEMU_KEYMAPS", QEMU_BASE . "/share/qemu/keymaps");
 // default arguments: no network, emulate tablet, readonly image file.
 define("QEMU_ARGS", ""
+	."-daemonize " /* detach from stdin */
+	."-localtime " /* not UTC */
+	."-name 'Haiku Online Demo' "
 	."-monitor /dev/null "
 	."-serial none "
 	."-parallel none "
@@ -48,6 +51,7 @@ define("QEMU_ARGS", ""
 	."-usbdevice wacom-tablet "
 	."-vga vmware "
 	."-snapshot");
+
 // absolute path to the image.
 define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated.x86/haiku.image");
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
@@ -92,6 +96,7 @@ session_start();
 <head>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Haiku Online Demo</title>
+<link rel="shortcut icon" href="http://www.haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
 <style type="text/css">
 <!--
  /* basic style */
@@ -206,7 +211,7 @@ function vnc_port()
 
 function vnc_addr_display()
 {
-	return $_SERVER['SERVER_ADDR'] . ":" . vnc_display();
+	return $_SERVER['HTTP_HOST'] . ":" . vnc_display();
 }
 
 function vnc_url()
@@ -292,11 +297,10 @@ function output_options_form()
 	$idx = qemu_slot();
 	echo "<form method=\"get\" action=\"" . $_SERVER['PHP_SELF'] . "\">";
 	echo "<table border=\"0\" class=\"haiku_online_form\">\n";
-	echo "<tr>\n";
-	echo "<td align=\"right\">\n";
+
+	echo "<tr>\n<td align=\"right\">\n";
 	echo "Select your keymap:";
-	echo "</td>\n";
-	echo "<td>\n";
+	echo "</td>\n<td>\n";
 	echo "<select name=\"keymap\">";
 	$keymaps = list_keymaps();
 	foreach ($keymaps as $keymap) {
@@ -309,8 +313,7 @@ function output_options_form()
 		//echo "</option>";
 	}
 	echo "</select>";
-	echo "</td>\n";
-	echo "</tr>\n";
+	echo "</td>\n</tr>\n";
 
 	$modes = array("1024x768"/*, "800x600"*/);
 	echo "<tr ";
@@ -319,8 +322,7 @@ function output_options_form()
 	echo ">\n";
 	echo "<td align=\"right\">\n";
 	echo "Select display size:";
-	echo "</td>\n";
-	echo "<td>\n";
+	echo "</td>\n<td>\n";
 	echo "<select name=\"videomode\" ";
 	if (count($modes) < 2)
 		echo "disabled";
@@ -333,41 +335,42 @@ function output_options_form()
 		echo ">$mode</option>";
 	}
 	echo "</select>";
+	echo "</td>\n</tr>\n";
 
-	echo "</td>\n";
-
-	echo "</tr>\n";
 	echo "<tr ";
 	if (!$enable_sound)
 		echo "class=\"haiku_online_disabled\"";
 	echo ">\n";
 	echo "<td align=\"right\">\n";
-	echo "Click here to enable sound:";
-	echo "</td>\n";
-	echo "<td>\n";
-	echo "<input type=\"checkbox\" name=\"sound\" ";
+	echo "Check to enable sound:";
+	echo "</td>\n<td>\n";
+	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\"";
 	echo "value=\"1\" disabled ";
 	if ($enable_sound)
 		echo "checked ";
-	echo ">Sound</input>";
-	echo "</td>\n";
-	echo "</tr>\n";
-	echo "<tr>\n";
-	echo "<td align=\"right\">\n";
+	echo "><a onClick=\"o=window.document.getElementById('sound_cb');o.checked = !o.checked;\"";
+	echo ">Sound</a></input>";
+	echo "</td>\n</tr>\n";
+
+	/*
+	echo "<tr>\n<td align=\"right\">\n";
 	//out("Click here to enable sound:");
-	echo "</td>\n";
-	echo "<td>\n";
-	echo "</td>\n";
-	echo "</tr>\n";
-	echo "<tr>\n";
-	echo "<td align=\"right\">\n";
+	echo "</td>\n<td>\n";
+	echo "</td>\n</tr>\n";
+
+	echo "<tr>\n<td align=\"right\">\n";
+	//out("Click here to enable sound:");
+	echo "</td>\n<td>\n";
+	echo "</td>\n</tr>\n";
+	*/
+
+	echo "<tr>\n<td align=\"right\">\n";
 	echo "Click here to start the session:";
-	echo "</td>\n";
-	echo "<td>\n";
+	echo "</td>\n<td>\n";
 	echo "<input type=\"submit\" name=\"run\" ";
 	echo "value=\"Start!\" />";
-	echo "</td>\n";
-	echo "</tr>\n";
+	echo "</td>\n</tr>\n";
+
 	echo "</table>\n";
 	echo "</form>\n";
 	out("NOTE: You will need a Java-enabled browser to display the VNC Applet needed by this demo.");
@@ -471,6 +474,7 @@ function output_vnc_info()
 	"or enter <tt>" . vnc_addr_display() . "</tt> in your " .
 	"<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
 	">VNC viewer</a>.<br />");
+	echo "<br />\n";
 }
 
 function output_applet_code()
@@ -544,13 +548,12 @@ if (is_my_session_valid()) {
 if ($qemuidx >= 0 && !$do_kill) {
 	output_kill_form();
 	output_vnc_info();
-	echo "<br />\n";
 	output_applet_code();
 } else {
 	output_options_form();
 }
 
-
+//phpinfo();
 
 ?>
 
