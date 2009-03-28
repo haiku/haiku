@@ -208,7 +208,8 @@ fwohci_pci_attach(int index)
 	TRACE("mapped registers to %p\n", sc->regAddr);
 
 	// setup interrupt handler
-	if (install_io_interrupt_handler(sc->irq, fwohci_intr, sc, 0) < B_OK) {
+	if (install_io_interrupt_handler(sc->irq, fwohci_intr, 
+				sc, 0) < B_OK) {
 		ERROR("can't install interrupt handler\n");
 		goto err;
 	}	

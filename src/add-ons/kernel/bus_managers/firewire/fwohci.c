@@ -283,8 +283,8 @@ fwohci_set_bus_manager(struct firewire_comm *fc, u_int node)
 	if((bm & 0x3f) == 0x3f)
 		bm = node;
 	if (firewire_debug)
-		device_printf(sc->fc.dev,
-			"fw_set_bus_manager: %d->%d (loop=%d)\n", bm, node, i);
+		device_printf(sc->fc.dev, "%s: %d->%d (loop=%d)\n",
+			__func__, bm, node, i);
 
 	return(bm);
 }
@@ -309,7 +309,7 @@ again:
 	}
 	if(i >= MAX_RETRY) {
 		if (firewire_debug)
-			device_printf(sc->fc.dev, "phy read failed(1).\n");
+			device_printf(sc->fc.dev, "%s: failed(1).\n", __func__);
 		if (++retry < MAX_RETRY) {
 			DELAY(100);
 			goto again;
@@ -320,15 +320,15 @@ again:
 	if ((stat & OHCI_INT_REG_FAIL) != 0 ||
 			((fun >> PHYDEV_REGADDR) & 0xf) != addr) {
 		if (firewire_debug)
-			device_printf(sc->fc.dev, "phy read failed(2).\n");
+			device_printf(sc->fc.dev, "%s: failed(2).\n", __func__);
 		if (++retry < MAX_RETRY) {
 			DELAY(100);
 			goto again;
 		}
 	}
-	if (firewire_debug || retry >= MAX_RETRY)
-		device_printf(sc->fc.dev, 
-			"fwphy_rddata: 0x%x loop=%d, retry=%d\n", addr, i, retry);
+	if (firewire_debug > 1 || retry >= MAX_RETRY)
+		device_printf(sc->fc.dev, "%s: 0x%x loop=%d, retry=%d\n",
+			__func__, addr, i, retry);
 #undef MAX_RETRY
 	return((fun >> PHYDEV_RDDATA )& 0xff);
 }
@@ -1007,7 +1007,7 @@ txloop:
 	if (maxdesc < db_tr->dbcnt) {
 		maxdesc = db_tr->dbcnt;
 		if (firewire_debug)
-			printf("maxdesc: %d\n", maxdesc);
+			printf("%s: maxdesc %d\n", __func__, maxdesc);
 	}
 	/* last db */
 	LAST_DB(db_tr, db);
@@ -1478,10 +1478,12 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 
 	ir = &dbch->xferq;
 	if(ir->buf == NULL && (ir->flag & FWXFERQ_EXTBUF) == 0) {
-		dbch->Area = alloc_mem(&buf_virt, &buf_phy, 
+		if (dbch->Area <= 0) {
+			dbch->Area = alloc_mem(&buf_virt, &buf_phy, 
 				ir->psize * dbch->ndb, 0, "fw rx Area");
-		if(dbch->Area < B_OK)
-			return(ENOMEM);
+			if(dbch->Area < B_OK)
+				return(ENOMEM);
+		}
 	}
 	
 	for (idb = 0; idb < dbch->ndb; idb ++) {
@@ -1796,6 +1798,8 @@ fwohci_stop(struct fwohci_softc *sc)
 {
 	u_int i;
 
+	fwohci_set_intr(&sc->fc, 0);
+
 /* Now stopping all DMA channel */
 	OWRITE(sc,  OHCI_ARQCTLCLR, OHCI_CNTL_DMA_RUN);
 	OWRITE(sc,  OHCI_ARSCTLCLR, OHCI_CNTL_DMA_RUN);
@@ -1806,9 +1810,6 @@ fwohci_stop(struct fwohci_softc *sc)
 		OWRITE(sc,  OHCI_IRCTLCLR(i), OHCI_CNTL_DMA_RUN);
 		OWRITE(sc,  OHCI_ITCTLCLR(i), OHCI_CNTL_DMA_RUN);
 	}
-
-	if (sc->fc.arq !=0 && sc->fc.arq->maxq > 0)
-		fw_drain_txq(&sc->fc);
 
 #if 0 /* Let dcons(4) be accessed */  
 /* Stop interrupt */
@@ -1865,12 +1866,13 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 	struct firewire_comm *fc = (struct firewire_comm *)sc;
 	uint32_t node_id, plen;
 
+	FW_GLOCK_ASSERT(fc);
 	if ((stat & OHCI_INT_PHY_BUS_R) && (fc->status != FWBUSRESET)) {
 		fc->status = FWBUSRESET;
 		/* Disable bus reset interrupt until sid recv. */
 		OWRITE(sc, FWOHCI_INTMASKCLR,  OHCI_INT_PHY_BUS_R);
 	
-		device_printf(fc->dev, "BUS reset\n");
+		device_printf(fc->dev, "%s: BUS reset\n", __func__);
 		OWRITE(sc, FWOHCI_INTMASKCLR,  OHCI_INT_CYC_LOST);
 		OWRITE(sc, OHCI_LNKCTLCLR, OHCI_CNTL_CYCSRC);
 
@@ -1908,10 +1910,11 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 		plen = OREAD(sc, OHCI_SID_CNT);
 
 		fc->nodeid = node_id & 0x3f;
-		device_printf(fc->dev, "node_id=0x%08x, gen=%d, ",
-			node_id, (plen >> 16) & 0xff);
+		device_printf(fc->dev, "%s: node_id=0x%08x, SelfID Count=%d, ",
+			__func__, fc->nodeid, (plen >> 16) & 0xff);
 		if (!(node_id & OHCI_NODE_VALID)) {
-			printf("Bus reset failure\n");
+			device_printf(fc->dev, "%s: Bus reset failure\n",
+				__func__);
 			goto sidout;
 		}
 
@@ -2023,9 +2026,11 @@ fwohci_task_busreset(void *arg)
 {
 	struct fwohci_softc *sc = (struct fwohci_softc *)arg;
 
+	FW_GLOCK(&sc->fc);
 	fw_busreset(&sc->fc, FWBUSRESET);
 	OWRITE(sc, OHCI_CROMHDR, ntohl(sc->fc.config_rom[0]));
 	OWRITE(sc, OHCI_BUS_OPT, ntohl(sc->fc.config_rom[2]));
+	FW_GUNLOCK(&sc->fc);
 }
 
 static void
@@ -2037,6 +2042,9 @@ fwohci_task_sid(void *arg)
 	int i, plen;
 
 
+	/* We really should have locking
+	* here.  Not sure why it's not
+	*/
 	plen = OREAD(sc, OHCI_SID_CNT);
 
 	if (plen & OHCI_SID_ERR) {
@@ -2056,14 +2064,13 @@ fwohci_task_sid(void *arg)
 	}
 	for (i = 0; i < plen / 4; i ++)
 		buf[i] = FWOHCI_DMA_READ(sc->sid_buf[i+1]);
-#if 1 /* XXX needed?? */
+
 	/* pending all pre-bus_reset packets */
 	fwohci_txd(sc, &sc->atrq);
 	fwohci_txd(sc, &sc->atrs);
 	fwohci_arcv(sc, &sc->arrs, -1);
 	fwohci_arcv(sc, &sc->arrq, -1);
 	fw_drain_txq(fc);
-#endif
 	fw_sidrcv(fc, buf, plen);
 	free(buf);
 }
@@ -2088,6 +2095,7 @@ fwohci_check_stat(struct fwohci_softc *sc)
 {
 	uint32_t stat, irstat, itstat;
 
+	FW_GLOCK_ASSERT(&sc->fc);
 	stat = OREAD(sc, FWOHCI_INTSTAT);
 	if (stat == 0xffffffff) {
 		device_printf(sc->fc.dev, 
@@ -2120,16 +2128,23 @@ fwohci_check_stat(struct fwohci_softc *sc)
 int32
 fwohci_intr(void *arg)
 {
+	int32 ret;
 	struct fwohci_softc *sc = (struct fwohci_softc *)arg;
 
-	return (fwohci_check_stat(sc));
+	//FW_GLOCK(&sc->fc);
+	ret = fwohci_check_stat(sc);
+	//FW_GUNLOCK(&sc->fc);
+	return ret;
 }
 
 void
 fwohci_poll(struct firewire_comm *fc, int quick, int count)
 {
 	struct fwohci_softc *sc = (struct fwohci_softc *)fc;
+
+	FW_GLOCK(fc);
 	fwohci_check_stat(sc);
+	FW_GUNLOCK(fc);
 }
 
 static void
@@ -2479,6 +2494,7 @@ fwohci_ibr(struct firewire_comm *fc)
 	device_printf(fc->dev, "Initiate bus reset\n");
 	sc = (struct fwohci_softc *)fc;
 
+	FW_GLOCK(fc);
 	/*
 	 * Make sure our cached values from the config rom are
 	 * initialised.
@@ -2499,6 +2515,7 @@ fwohci_ibr(struct firewire_comm *fc)
 	fun |= FW_PHY_ISBR | FW_PHY_RHB;
 	fun = fwphy_wrdata(sc, FW_PHY_ISBR_REG, fun);
 #endif
+	FW_GUNLOCK(fc);
 }
 
 void
@@ -2956,7 +2973,7 @@ err:
 		db_tr = STAILQ_NEXT(db_tr, link);
 		resCount = FWOHCI_DMA_READ(db_tr->db[0].db.desc.res)
 						& OHCI_COUNT_MASK;
-	} while (resCount == 0)
+	}
 	printf(" done\n");
 	dbch->top = db_tr;
 	dbch->buf_offset = dbch->xferq.psize - resCount;

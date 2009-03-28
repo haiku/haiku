@@ -34,6 +34,10 @@
  * $FreeBSD: src/sys/dev/firewire/fwphyreg.h,v 1.3 2005/01/06 01:42:41 imp Exp $
  */
 
+/*
+ * IEEE 1394a
+ * Figure 5B - 1
+ */
 struct phyreg_base {
 #if BYTE_ORDER == BIG_ENDIAN
 	uint8_t	phy_id:6,
@@ -100,6 +104,10 @@ struct phyreg_base {
 #endif
 };
 
+/*
+ * IEEE 1394a
+ * Figure 5B - 2
+ */
 struct phyreg_page0 {
 #if BYTE_ORDER == BIG_ENDIAN
 	uint8_t	astat:2,
@@ -160,6 +168,10 @@ struct phyreg_page0 {
 #endif
 };
 
+/*
+ * IEEE 1394a
+ * Figure 5B - 3
+ */
 struct phyreg_page1 {
 	uint8_t	compliance;
 	uint8_t	:8;

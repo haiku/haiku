@@ -85,7 +85,6 @@ int fwohci_detach (struct fwohci_softc *);
 int fwohci_stop (struct fwohci_softc *);
 #else
 void fwohci_intr (void *arg);
-int fwohci_filt (void *arg);
 int fwohci_init (struct fwohci_softc *, device_t);
 void fwohci_poll (struct firewire_comm *, int, int);
 void fwohci_reset (struct fwohci_softc *, device_t);
