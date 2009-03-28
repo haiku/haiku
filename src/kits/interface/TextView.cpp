@@ -2155,6 +2155,8 @@ BTextView::SetTextRect(BRect rect)
 	if (!needsRefresh)
 		rect.bottom = fTextRect.bottom;
 
+	Invalidate();
+
 	fTextRect = rect;
 	fMinTextRectWidth = fTextRect.Width();
 		// used in auto-resizing mode to keep the text rect from
