@@ -548,6 +548,71 @@ const char* testingCommands[] = {
 };
 
 
+const char* bluetoothEvents[] = {
+"Inquiry Complete",
+"Inquiry Result",
+"Conn Complete",
+"Conn Request",
+"Disconnection Complete",
+"Auth Complete",
+"Remote Name Request Complete",
+"Encrypt Change",
+"Change Conn Link Key Complete",
+"Master Link Key Compl",
+"Rmt Features",
+"Rmt Version",
+"Qos Setup Complete",
+"Command Complete",
+"Command Status",
+"Hardware Error",
+"Flush Occur",
+"Role Change",
+"Num Comp Pkts",
+"Mode Change",
+"Return Link Keys",
+"Pin Code Req",
+"Link Key Req",
+"Link Key Notify",
+"Loopback Command",
+"Data Buffer Overflow",
+"Max Slot Change",
+"Read Clock Offset Compl",
+"Con Pkt Type Changed",
+"Qos Violation",
+"Reserved",
+"Page Scan Rep Mode Change",
+"Flow Specification",
+"Inquiry Result With Rssi",
+"Remote Extended Features",
+"Reserved",
+"Reserved",
+"Reserved",
+"Reserved",
+"Reserved",
+"Reserved",
+"Reserved",
+"Reserved",
+"Synchronous Connection Completed",
+"Synchronous Connection Changed",
+"Reserved",
+"Extended Inquiry Result",
+"Encryption Key Refersh Complete",
+"Io Capability Request",
+"Io Capability Response",
+"User Confirmation Request",
+"User Passkey Request",
+"Oob Data Request",
+"Simple Pairing Complete",
+"Reserved",
+"Link Supervision Timeout Changed",
+"Enhanced Flush Complete",
+"Reserved",
+"Reserved",
+"Keypress Notification",
+"Remote Host Supported Features Notification"
+};
+
+
 const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 
@@ -611,6 +676,16 @@ GetCommand(uint16 command)
 
 
 const char* 
+GetEvent(uint8 event) {
+	if (event < sizeof(bluetoothEvents)/sizeof(const char*)) {
+		return bluetoothEvents[event-1];
+	} else {
+		return "Event out of Range!";
+	}
+}
+
+
+const char* 
 GetManufacturer(uint16 manufacturer) {
 	if (manufacturer < sizeof(bluetoothManufacturers)/sizeof(const char*)) {
 		return bluetoothManufacturers[manufacturer];
@@ -620,4 +695,3 @@ GetManufacturer(uint16 manufacturer) {
 		return "not assigned";
 	}
 }
-

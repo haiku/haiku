@@ -73,6 +73,9 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 	}
 	printf("### \n");
 
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"Incomming %s event\n", 
+		GetEvent(event->ecode));
+
 	// Events here might have not been initated by us
 	// TODO: ML mark as handled pass a reply by parameter and reply in common
 	switch (event->ecode) {
