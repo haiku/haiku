@@ -39,6 +39,7 @@ class CalcView : public BView {
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
+	virtual	void				MouseUp(BPoint point);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				FrameResized(float width, float height);
@@ -65,18 +66,15 @@ class CalcView : public BView {
 
 			void				FlashKey(const char* bytes, int32 numBytes);
 
-			void				AddExpressionToHistory(const char* expression);
-			void				PreviousExpression();
-			void				NextExpression();
-
  private:
 			void				_ParseCalcDesc(const char* keypadDescription);
 			
 			void				_PressKey(int key);
 			void				_PressKey(const char* label);
 			int32				_KeyForLabel(const char* label) const;
-			void				_FlashKey(int32 key);
-			
+			void				_FlashKey(int32 key, uint32 flashFlags);
+			void				_AudioFeedback(bool inBackGround);
+
 			void				_Colorize();
 
 			void				_CreatePopUpMenu();

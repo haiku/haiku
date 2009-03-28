@@ -21,14 +21,17 @@
 #include <AppFileInfo.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Clipboard.h>
 #include <File.h>
 #include <Font.h>
 #include <MenuItem.h>
 #include <Message.h>
+#include <MessageRunner.h>
 #include <PlaySound.h>
 #include <Point.h>
 #include <PopUpMenu.h>
+#include <Region.h>
 #include <Roster.h>
 
 #include "CalcApplication.h"
@@ -37,15 +40,20 @@
 #include "ExpressionTextView.h"
 
 
-const uint8 K_COLOR_OFFSET		= 32;
-const float K_FONT_YPROP		= 0.6f;
-const float K_FONT_XPROP		= 0.6f;
-const float K_DISPLAY_YPROP		= 0.2f;
+//const uint8 K_COLOR_OFFSET				= 32;
+const float kFontScaleY						= 0.4f;
+const float kFontScaleX						= 0.4f;
+const float kExpressionFontScaleY			= 0.6f;
+const float kDisplayScaleY					= 0.2f;
+
+static const bigtime_t kFlashOnOffInterval	= 100000;
 
 enum {
-	K_OPTIONS_AUTO_NUM_LOCK		= 'opan',
-	K_OPTIONS_AUDIO_FEEDBACK	= 'opaf',
-	K_OPTIONS_SHOW_KEYPAD		= 'opsk'
+	MSG_OPTIONS_AUTO_NUM_LOCK				= 'opan',
+	MSG_OPTIONS_AUDIO_FEEDBACK				= 'opaf',
+	MSG_OPTIONS_SHOW_KEYPAD					= 'opsk',
+
+	MSG_UNFLASH_KEY							= 'uflk'
 };
 
 // default calculator key pad layout
@@ -56,12 +64,17 @@ const char *kDefaultKeypadDescription =
 	"0   .   BS  =   C  \n";
 
 
+enum {
+	FLAGS_FLASH_KEY							= 1 << 0,
+	FLAGS_MOUSE_DOWN						= 1 << 1
+};
+
 struct CalcView::CalcKey {
 	char		label[8];
 	char		code[8];
 	char		keymap[4];
 	uint32		flags;
-	float		width;
+//	float		width;
 };
 
 
@@ -75,34 +88,35 @@ CalcView *CalcView::Instantiate(BMessage *archive)
 
 
 CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage *settings)
-	: BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
-			B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
-	  fColums(5),
-	  fRows(4),
+	:
+	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fColums(5),
+	fRows(4),
 
-	  fBaseColor(rgbBaseColor),
-	  fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
+	fBaseColor(rgbBaseColor),
+	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
-	  fWidth(1),
-	  fHeight(1),
+	fWidth(1),
+	fHeight(1),
 
-	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
-	  fKeypad(NULL),
+	fKeypadDescription(strdup(kDefaultKeypadDescription)),
+	fKeypad(NULL),
 
 #ifdef __HAIKU__
-	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
+	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
 #else
-	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
+	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
 #endif
 
-	  fPopUpMenu(NULL),
-	  fAutoNumlockItem(NULL),
-	  fAudioFeedbackItem(NULL),
-	  fShowKeypadItem(NULL),
-	  fAboutItem(NULL),
+	fPopUpMenu(NULL),
+	fAutoNumlockItem(NULL),
+	fAudioFeedbackItem(NULL),
+	fShowKeypadItem(NULL),
+	fAboutItem(NULL),
 
-	  fOptions(new CalcOptions()),
-	  fShowKeypad(true)
+	fOptions(new CalcOptions()),
+	fShowKeypad(true)
 {
 	// create expression text view
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
@@ -127,33 +141,34 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage *settings)
 
 
 CalcView::CalcView(BMessage* archive)
-	: BView(archive),
-	  fColums(5),
-	  fRows(4),
+	:
+	BView(archive),
+	fColums(5),
+	fRows(4),
 
-	  fBaseColor((rgb_color){ 128, 128, 128, 255 }),
-	  fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
+	fBaseColor((rgb_color){ 128, 128, 128, 255 }),
+	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
-	  fWidth(1),
-	  fHeight(1),
+	fWidth(1),
+	fHeight(1),
 
-	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
-	  fKeypad(NULL),
+	fKeypadDescription(strdup(kDefaultKeypadDescription)),
+	fKeypad(NULL),
 
 #ifdef __HAIKU__
-	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
+	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
 #else
-	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
+	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
 #endif
 
-	  fPopUpMenu(NULL),
-	  fAutoNumlockItem(NULL),
-	  fAudioFeedbackItem(NULL),
-	  fShowKeypadItem(NULL),
-	  fAboutItem(NULL),
+	fPopUpMenu(NULL),
+	fAutoNumlockItem(NULL),
+	fAudioFeedbackItem(NULL),
+	fShowKeypadItem(NULL),
+	fAboutItem(NULL),
 
-	  fOptions(new CalcOptions()),
-	  fShowKeypad(true)
+	fOptions(new CalcOptions()),
+	fShowKeypad(true)
 {
 	// create expression text view
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
@@ -182,8 +197,9 @@ CalcView::~CalcView()
 void
 CalcView::AttachedToWindow()
 {
-	SetFont(be_bold_font);
-	
+	if (be_control_look == NULL)
+		SetFont(be_bold_font);
+
 	BRect frame(Frame());
 	FrameResized(frame.Width(), frame.Height());
 
@@ -219,12 +235,12 @@ CalcView::MessageReceived(BMessage* message)
 			// handle paste
 			case B_PASTE:
 				// access system clipboard
-				if (be_clipboard->Lock()){ 
+				if (be_clipboard->Lock()) { 
 					BMessage *clipper = be_clipboard->Data();
 					//clipper->PrintToStream();
 					Paste(clipper);
 					be_clipboard->Unlock(); 
-					} // end if	
+				}
 				break;
 			
 			// (replicant) about box requested
@@ -232,22 +248,30 @@ CalcView::MessageReceived(BMessage* message)
 				AboutRequested();
 				break;
 
-			case K_OPTIONS_AUTO_NUM_LOCK:
+			case MSG_OPTIONS_AUTO_NUM_LOCK:
 				fOptions->auto_num_lock = !fOptions->auto_num_lock;
 				fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
 				break;
 
-			case K_OPTIONS_AUDIO_FEEDBACK:
+			case MSG_OPTIONS_AUDIO_FEEDBACK:
 				fOptions->audio_feedback = !fOptions->audio_feedback;
 				fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
 				break;
 
-			case K_OPTIONS_SHOW_KEYPAD:
+			case MSG_OPTIONS_SHOW_KEYPAD:
 				fOptions->show_keypad = !fOptions->show_keypad;
 				fShowKeypadItem->SetMarked(fOptions->show_keypad);
 				_ShowKeypad(fOptions->show_keypad);
 				break;
-			
+
+			case MSG_UNFLASH_KEY:
+			{
+				int32 key;
+				if (message->FindInt32("key", &key) == B_OK)
+					_FlashKey(key, 0);
+				break;
+			}
+
 			default:
 				BView::MessageReceived(message);
 				break;
@@ -259,13 +283,24 @@ CalcView::MessageReceived(BMessage* message)
 void
 CalcView::Draw(BRect updateRect)
 {
+	bool drawBackground = true;
+	if (Parent() && Window()->Bounds() != Frame()) {
+		// CalcView is embedded somewhere, most likely the Tracker Desktop
+		// shelf.
+		drawBackground = false;
+	}
+
+	SetHighColor(fBaseColor);
 	BRect expressionRect(_ExpressionRect());
 	if (updateRect.Intersects(expressionRect)) {
-		if (!fShowKeypad && expressionRect.Height() >= fCalcIcon->Bounds().Height()) {
+		if (!fShowKeypad
+			&& expressionRect.Height() >= fCalcIcon->Bounds().Height()) {
 			// render calc icon
 			expressionRect.left = fExpressionTextView->Frame().right + 2;
-			SetHighColor(fBaseColor);
-			FillRect(updateRect & expressionRect);
+			if (drawBackground) {
+				SetHighColor(fBaseColor);
+				FillRect(updateRect & expressionRect);
+			}
 
 			if (fCalcIcon->ColorSpace() == B_RGBA32) {
 				SetDrawingMode(B_OP_ALPHA);
@@ -287,39 +322,55 @@ CalcView::Draw(BRect updateRect)
 		// render border around expression text view
 		expressionRect = fExpressionTextView->Frame();
 		expressionRect.InsetBy(-2, -2);
-		BeginLineArray(8);
+		if (fShowKeypad && drawBackground) {
+			expressionRect.InsetBy(-2, -2);
+			StrokeRect(expressionRect);
+			expressionRect.InsetBy(1, 1);
+			StrokeRect(expressionRect);
+			expressionRect.InsetBy(1, 1);
+		}
 
-		rgb_color lightShadow = tint_color(fBaseColor, B_DARKEN_1_TINT);
-		rgb_color darkShadow = tint_color(fBaseColor, B_DARKEN_3_TINT);
-
-		AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-				BPoint(expressionRect.left, expressionRect.top),
-				lightShadow);
-		AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-				BPoint(expressionRect.right, expressionRect.top),
-				lightShadow);
-		AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-				BPoint(expressionRect.right, expressionRect.bottom),
-				fLightColor);
-		AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-				BPoint(expressionRect.right - 1, expressionRect.bottom),
-				fLightColor);
-
-		expressionRect.InsetBy(1, 1);
-		AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-				BPoint(expressionRect.left, expressionRect.top),
-				darkShadow);
-		AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-				BPoint(expressionRect.right, expressionRect.top),
-				darkShadow);
-		AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-				BPoint(expressionRect.right, expressionRect.bottom),
-				fBaseColor);
-		AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-				BPoint(expressionRect.right - 1, expressionRect.bottom),
-				fBaseColor);
-
-		EndLineArray();
+		if (be_control_look != NULL) {
+			uint32 flags = 0;
+			if (!drawBackground)
+				flags |= BControlLook::B_BLEND_FRAME;
+			be_control_look->DrawTextControlBorder(this, expressionRect,
+				updateRect, fBaseColor, flags);
+		} else {
+			BeginLineArray(8);
+	
+			rgb_color lightShadow = tint_color(fBaseColor, B_DARKEN_1_TINT);
+			rgb_color darkShadow = tint_color(fBaseColor, B_DARKEN_3_TINT);
+	
+			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
+					BPoint(expressionRect.left, expressionRect.top),
+					lightShadow);
+			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
+					BPoint(expressionRect.right, expressionRect.top),
+					lightShadow);
+			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
+					BPoint(expressionRect.right, expressionRect.bottom),
+					fLightColor);
+			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
+					BPoint(expressionRect.right - 1, expressionRect.bottom),
+					fLightColor);
+	
+			expressionRect.InsetBy(1, 1);
+			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
+					BPoint(expressionRect.left, expressionRect.top),
+					darkShadow);
+			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
+					BPoint(expressionRect.right, expressionRect.top),
+					darkShadow);
+			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
+					BPoint(expressionRect.right, expressionRect.bottom),
+					fBaseColor);
+			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
+					BPoint(expressionRect.right - 1, expressionRect.bottom),
+					fBaseColor);
+	
+			EndLineArray();
+		}
 	}
 
 	if (!fShowKeypad)
@@ -327,75 +378,117 @@ CalcView::Draw(BRect updateRect)
 
 	// calculate grid sizes
 	BRect keypadRect(_KeypadRect());
+
+	if (be_control_look != NULL) {
+		if (drawBackground)
+			StrokeRect(keypadRect);
+		keypadRect.InsetBy(1, 1);
+	}
+
 	float sizeDisp = keypadRect.top;
-	float sizeCol = fWidth / (float)fColums;
-	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
+	float sizeCol = (keypadRect.Width() + 1) / (float)fColums;
+	float sizeRow = (keypadRect.Height() + 1) / (float)fRows;
 
-	if (updateRect.Intersects(keypadRect)) {
-		// TODO: support pressed keys
+	if (!updateRect.Intersects(keypadRect))
+		return;
 
-		// paint keypad b/g
-		SetHighColor(fBaseColor);
-		FillRect(updateRect & keypadRect);
-		
-		// render key main grid
-		BeginLineArray(((fColums + fRows) << 1) + 1);
-		
-		// render cols
-		AddLine(BPoint(0.0, sizeDisp),
-				BPoint(0.0, fHeight),
-				fLightColor);
-		for (int col = 1; col < fColums; col++) {
-			AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
-					BPoint(col * sizeCol - 1.0, fHeight),
-					fDarkColor);
-			AddLine(BPoint(col * sizeCol, sizeDisp),
-					BPoint(col * sizeCol, fHeight),
-					fLightColor);
-		}
-		AddLine(BPoint(fColums * sizeCol, sizeDisp),
-				BPoint(fColums * sizeCol, fHeight),
-				fDarkColor);
-			
-		// render rows
-		for (int row = 0; row < fRows; row++) {
-			AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
-					BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
-					fDarkColor);
-			AddLine(BPoint(0.0, sizeDisp + row * sizeRow),
-					BPoint(fWidth, sizeDisp + row * sizeRow),
-					fLightColor);
-		}
-		AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
-				BPoint(fWidth, sizeDisp + fRows * sizeRow),
-				fDarkColor);
-			
-		// main grid complete
-		EndLineArray();
-		
-		// render key symbols
-		float halfSizeCol = sizeCol * 0.5f;
-		SetHighColor(fButtonTextColor);
-		SetLowColor(fBaseColor);
-		SetDrawingMode(B_OP_COPY);
+	SetFontSize(min_c(sizeRow * kFontScaleY, sizeCol * kFontScaleX));
 
-		float fontSize =
-			min_c(((fHeight - sizeDisp) / (float)fRows) * K_FONT_YPROP,
-			(fWidth / (float)fColums) * K_FONT_XPROP);
-
-		SetFontSize(fontSize);
-
-		float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
-								* (1.0 - K_FONT_YPROP) * 0.5;
+	if (be_control_look != NULL) {
 		CalcKey *key = fKeypad;
 		for (int row = 0; row < fRows; row++) {
 			for (int col = 0; col < fColums; col++) {
-				float halfSymbolWidth = StringWidth(key->label) * 0.5f;
-				DrawString(key->label,
-						   BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
-								  sizeDisp + (row + 1) * sizeRow - baselineOffset));
+				BRect frame;
+				frame.left = keypadRect.left + col * sizeCol;
+				frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
+				frame.top = sizeDisp + row * sizeRow;
+				frame.bottom = sizeDisp + (row + 1) * sizeRow - 1;
+
+				if (drawBackground) {
+					SetHighColor(fBaseColor);
+					StrokeRect(frame);
+				}
+				frame.InsetBy(1, 1);
+
+				uint32 flags = 0;
+				if (!drawBackground)
+					flags |= BControlLook::B_BLEND_FRAME;
+				if (key->flags != 0)
+					flags |= BControlLook::B_ACTIVATED;
+
+				be_control_look->DrawButtonFrame(this, frame, updateRect,
+					fBaseColor, fBaseColor, flags);
+
+				be_control_look->DrawButtonBackground(this, frame, updateRect,
+					fBaseColor, flags);
+
+				be_control_look->DrawLabel(this, key->label, frame, updateRect,
+					fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+						B_ALIGN_VERTICAL_CENTER));
+
 				key++;
 			}
+		}
+		return;
+	}
+
+	// TODO: support pressed keys
+
+	// paint keypad b/g
+	SetHighColor(fBaseColor);
+	FillRect(updateRect & keypadRect);
+	
+	// render key main grid
+	BeginLineArray(((fColums + fRows) << 1) + 1);
+	
+	// render cols
+	AddLine(BPoint(0.0, sizeDisp),
+			BPoint(0.0, fHeight),
+			fLightColor);
+	for (int col = 1; col < fColums; col++) {
+		AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
+				BPoint(col * sizeCol - 1.0, fHeight),
+				fDarkColor);
+		AddLine(BPoint(col * sizeCol, sizeDisp),
+				BPoint(col * sizeCol, fHeight),
+				fLightColor);
+	}
+	AddLine(BPoint(fColums * sizeCol, sizeDisp),
+			BPoint(fColums * sizeCol, fHeight),
+			fDarkColor);
+		
+	// render rows
+	for (int row = 0; row < fRows; row++) {
+		AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
+				BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
+				fDarkColor);
+		AddLine(BPoint(0.0, sizeDisp + row * sizeRow),
+				BPoint(fWidth, sizeDisp + row * sizeRow),
+				fLightColor);
+	}
+	AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
+			BPoint(fWidth, sizeDisp + fRows * sizeRow),
+			fDarkColor);
+		
+	// main grid complete
+	EndLineArray();
+	
+	// render key symbols
+	float halfSizeCol = sizeCol * 0.5f;
+	SetHighColor(fButtonTextColor);
+	SetLowColor(fBaseColor);
+	SetDrawingMode(B_OP_COPY);
+
+	float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
+							* (1.0 - kFontScaleY) * 0.5;
+	CalcKey *key = fKeypad;
+	for (int row = 0; row < fRows; row++) {
+		for (int col = 0; col < fColums; col++) {
+			float halfSymbolWidth = StringWidth(key->label) * 0.5f;
+			DrawString(key->label,
+				BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
+				sizeDisp + (row + 1) * sizeRow - baselineOffset));
+			key++;
 		}
 	}
 }
@@ -421,11 +514,20 @@ CalcView::MouseDown(BPoint point)
 		return;
 	}
 
-	if (!fShowKeypad)
+	if (!fShowKeypad) {
+		if (fCalcIcon != NULL) {
+			BRect bounds(Bounds());
+			bounds.left = bounds.right - fCalcIcon->Bounds().Width();
+			if (bounds.Contains(point)) {
+				// user clicked on calculator icon
+				fExpressionTextView->ApplyChanges();
+			}
+		}
 		return;
+	}
 
 	// calculate grid sizes
-	float sizeDisp = fHeight * K_DISPLAY_YPROP;
+	float sizeDisp = fHeight * kDisplayScaleY;
 	float sizeCol = fWidth / (float)fColums;
 	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
 	
@@ -438,7 +540,25 @@ CalcView::MouseDown(BPoint point)
 		(gridRow >= 0) && (gridRow < fRows)) {
 	
 		// process key press
-		_PressKey(gridRow * fColums + gridCol);
+		int key = gridRow * fColums + gridCol;
+		_FlashKey(key, FLAGS_MOUSE_DOWN);
+		_PressKey(key);
+
+		// make sure we receive the mouse up!
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	}
+}
+
+
+void
+CalcView::MouseUp(BPoint point)
+{
+	int keys = fRows * fColums;
+	for (int i = 0; i < keys; i++) {
+		if (fKeypad[i].flags & FLAGS_MOUSE_DOWN) {
+			_FlashKey(i, 0);
+			break;
+		}
 	}
 }
 
@@ -522,7 +642,10 @@ CalcView::FrameResized(float width, float height)
 
 	// layout expression text view
 	BRect frame = _ExpressionRect();
-	frame.InsetBy(2, 2);
+	if (fShowKeypad)
+		frame.InsetBy(4, 4);
+	else
+		frame.InsetBy(2, 2);
 
 	if (!fShowKeypad)
 		frame.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
@@ -531,17 +654,15 @@ CalcView::FrameResized(float width, float height)
 	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
 
 	frame.OffsetTo(B_ORIGIN);
-	frame.InsetBy(2, 2);
+	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
+	frame.InsetBy(inset, inset);
 	fExpressionTextView->SetTextRect(frame);
 
 	// configure expression text view font size and color
-	float sizeDisp = fShowKeypad ? fHeight * K_DISPLAY_YPROP : fHeight;
+	float sizeDisp = fShowKeypad ? fHeight * kDisplayScaleY : fHeight;
 	BFont font(be_bold_font);
-	font.SetSize(sizeDisp * K_FONT_YPROP);
-//	fExpressionTextView->SetViewColor(fExpressionBGColor);
-//	fExpressionTextView->SetLowColor(fExpressionBGColor);
-//	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL, &fExpressionTextColor);
-fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
+	font.SetSize(sizeDisp * kExpressionFontScaleY);
+	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
 }
 
 
@@ -630,7 +751,7 @@ CalcView::Paste(BMessage *message)
 		BPoint dropPoint = ConvertFromScreen(message->DropPoint());
 		
 		// calculate current keypad area
-		float sizeDisp = fHeight * K_DISPLAY_YPROP;
+		float sizeDisp = fHeight * kDisplayScaleY;
 		BRect keypadRect(0.0, sizeDisp, fWidth, fHeight);
 		
 		// check location of color drop
@@ -773,13 +894,7 @@ CalcView::Evaluate()
 		return;
 	}
 
-	// audio feedback
-	if (fOptions->audio_feedback) {
-		BEntry zimp("zimp.AIFF");
-		entry_ref zimp_ref;
-		zimp.GetRef(&zimp_ref);
-		play_sound(&zimp_ref, true, false, false);
-	}
+	_AudioFeedback(false);
 
 	// evaluate expression
 	BString value;
@@ -806,7 +921,7 @@ CalcView::FlashKey(const char* bytes, int32 numBytes)
 	temp.Append(bytes, numBytes);
 	int32 key = _KeyForLabel(temp.String());
 	if (key >= 0)
-		_FlashKey(key);
+		_FlashKey(key, FLAGS_FLASH_KEY);
 }
 
 
@@ -837,11 +952,12 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 			strcpy(key->code, key->label);
 
 		// set keymap
-		if (strlen(key->label) == 1) {
+		if (strlen(key->label) == 1)
 			strcpy(key->keymap, key->label);
-		} else {
+		else
 			*key->keymap = '\0';
-		} // end if
+
+		key->flags = 0;
 
 		// add this to the expression text view, so that it
 		// will forward the respective KeyDown event to us
@@ -870,23 +986,14 @@ CalcView::_PressKey(int key)
 	} else {
 		// check for evaluation order
 		if (fKeypad[key].code[0] == '\n') {
-			Evaluate();
+			fExpressionTextView->ApplyChanges();
 		} else {
 			// insert into expression text
 			fExpressionTextView->Insert(fKeypad[key].code);
-		
-			// audio feedback
-			if (fOptions->audio_feedback) {
-				BEntry zimp("key.AIFF");
-				entry_ref zimp_ref;
-				zimp.GetRef(&zimp_ref);
-				play_sound(&zimp_ref, true, false, true);
-			}
 		}
 	}
 
-	// redraw display
-//	_InvalidateExpression();
+	_AudioFeedback(true);
 }
 
 
@@ -913,9 +1020,36 @@ CalcView::_KeyForLabel(const char *label) const
 
 
 void
-CalcView::_FlashKey(int32 key)
+CalcView::_FlashKey(int32 key, uint32 flashFlags)
 {
-	// TODO ...
+	if (flashFlags != 0)
+		fKeypad[key].flags |= flashFlags;
+	else
+		fKeypad[key].flags = 0;
+	Invalidate();
+
+	if (fKeypad[key].flags == FLAGS_FLASH_KEY) {
+		BMessage message(MSG_UNFLASH_KEY);
+		message.AddInt32("key", key);
+		BMessageRunner::StartSending(BMessenger(this), &message,
+			kFlashOnOffInterval, 1);
+	}
+}
+
+
+void
+CalcView::_AudioFeedback(bool inBackGround)
+{
+	// TODO: Use beep events... This interface is not implemented on Haiku
+	// anyways...
+#if 0
+	if (fOptions->audio_feedback) {
+		BEntry zimp("key.AIFF");
+		entry_ref zimp_ref;
+		zimp.GetRef(&zimp_ref);
+		play_sound(&zimp_ref, true, false, inBackGround);
+	}
+#endif
 }
 
 
@@ -955,11 +1089,11 @@ CalcView::_CreatePopUpMenu()
 {
 	// construct items
 	fAutoNumlockItem = new BMenuItem("Enable Num Lock on start up",
-		new BMessage(K_OPTIONS_AUTO_NUM_LOCK));
+		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem("Audio Feedback",
-		new BMessage(K_OPTIONS_AUDIO_FEEDBACK));
+		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
 	fShowKeypadItem = new BMenuItem("Show Keypad",
-		new BMessage(K_OPTIONS_SHOW_KEYPAD));
+		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
 	fAboutItem = new BMenuItem("About DeskCalc",
 		new BMessage(B_ABOUT_REQUESTED));
 
@@ -972,7 +1106,9 @@ CalcView::_CreatePopUpMenu()
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
 
 	fPopUpMenu->AddItem(fAutoNumlockItem);
-	fPopUpMenu->AddItem(fAudioFeedbackItem);
+// TODO: Enabled when we use beep events which can be configured in the Sounds
+// preflet.
+//	fPopUpMenu->AddItem(fAudioFeedbackItem);
 	fPopUpMenu->AddItem(fShowKeypadItem);
 	fPopUpMenu->AddSeparatorItem();
 	fPopUpMenu->AddItem(fAboutItem);
@@ -984,7 +1120,7 @@ CalcView::_ExpressionRect() const
 {
 	BRect r(0.0, 0.0, fWidth, fHeight);
 	if (fShowKeypad) {
-		r.bottom = floorf(fHeight * K_DISPLAY_YPROP);
+		r.bottom = floorf(fHeight * kDisplayScaleY) + 1;
 	}
 	return r;
 }
@@ -997,7 +1133,7 @@ CalcView::_KeypadRect() const
 	if (fShowKeypad) {
 		r.right = fWidth;
 		r.bottom = fHeight;
-		r.top = floorf(fHeight * K_DISPLAY_YPROP) + 1;
+		r.top = floorf(fHeight * kDisplayScaleY);
 	}
 	return r;
 }
@@ -1011,16 +1147,17 @@ CalcView::_ShowKeypad(bool show)
 
 	fShowKeypad = show;
 	if (fShowKeypadItem && fShowKeypadItem->IsMarked() ^ fShowKeypad)
-			fShowKeypadItem->SetMarked(fShowKeypad);
+		fShowKeypadItem->SetMarked(fShowKeypad);
 
-	float height = fShowKeypad ? fHeight / K_DISPLAY_YPROP
-							   : fHeight * K_DISPLAY_YPROP;
+	float height = fShowKeypad ? fHeight / kDisplayScaleY
+							   : fHeight * kDisplayScaleY;
 
 	BWindow* window = Window();
 	if (window) {
 		if (window->Bounds() == Frame()) {
+			window->SetSizeLimits(100.0, 400.0,
+				fShowKeypad ? 100.0 : 20.0, fShowKeypad ? 400.0 : 60.0);
 			window->ResizeTo(fWidth, height);
-			window->SetSizeLimits(100.0, 400.0, fShowKeypad ? 100.0 : 20.0, 400.0);
 		} else
 			ResizeTo(fWidth, height);
 	}

@@ -22,14 +22,15 @@ static const int32 kMaxPreviousExpressions = 20;
 
 
 ExpressionTextView::ExpressionTextView(BRect frame, CalcView* calcView)
-	: InputTextView(frame, "expression text view",
-					(frame.OffsetToCopy(B_ORIGIN)).InsetByCopy(2, 2),
-					B_FOLLOW_NONE, B_WILL_DRAW),
-	  fCalcView(calcView),
-	  fKeypadLabels(""),
-	  fPreviousExpressions(20),
-	  fHistoryPos(0),
-	  fCurrentExpression("")
+	:
+	InputTextView(frame, "expression text view",
+		(frame.OffsetToCopy(B_ORIGIN)).InsetByCopy(2, 2),
+		B_FOLLOW_NONE, B_WILL_DRAW),
+	fCalcView(calcView),
+	fKeypadLabels(""),
+	fPreviousExpressions(20),
+	fHistoryPos(0),
+	fCurrentExpression("")
 {
 	SetStylable(false);
 	SetDoesUndo(true);
@@ -75,12 +76,16 @@ ExpressionTextView::KeyDown(const char* bytes, int32 numBytes)
 	BString current = Text();
 
 	// handle in InputTextView, except B_TAB
-	if (bytes[0] != B_TAB)
+	if (bytes[0] == '=')
+		ApplyChanges();
+	else if (bytes[0] != B_TAB)
 		InputTextView::KeyDown(bytes, numBytes);
 
 	// pass on to CalcView if this was a label on a key
 	if (fKeypadLabels.FindFirst(bytes[0]) >= 0)
 		fCalcView->FlashKey(bytes, numBytes);
+	else if (bytes[0] == B_BACKSPACE)
+		fCalcView->FlashKey("BS", 2);
 
 	// as soon as something is typed, we are at the
 	// end of the expression history
@@ -126,6 +131,7 @@ void
 ExpressionTextView::ApplyChanges()
 {
 	AddExpressionToHistory(Text());
+	fCalcView->FlashKey("=", 1);
 	fCalcView->Evaluate();
 }
 
@@ -154,6 +160,8 @@ ExpressionTextView::BackSpace()
 {
 	const char bytes[1] = { B_BACKSPACE };
 	KeyDown(bytes, 1);
+
+	fCalcView->FlashKey("BS", 2);
 }
 
 
@@ -161,6 +169,8 @@ void
 ExpressionTextView::Clear()
 {
 	SetText("");
+
+	fCalcView->FlashKey("C", 1);
 }
 
 
@@ -266,5 +276,4 @@ ExpressionTextView::SaveSettings(BMessage* archive) const
 	}
 	return B_OK;
 }
-
 
