@@ -63,7 +63,7 @@ enum {
 	B_PAGE_DOWN			= 0x0c,
 
 	B_FUNCTION_KEY		= 0x10,
-	
+
 	B_KATAKANA_HIRAGANA	= 0xf2,
 	B_ZENKAKU_HANKAKU	= 0xf3
 };
@@ -254,7 +254,7 @@ enum overlay_options {
 };
 
 enum bitmap_filtering {
-	B_FILTER_BITMAP_BILINEAR	= 0x00000100,
+	B_FILTER_BITMAP_BILINEAR	= 0x00000100
 		// TODO: Make this simply "SMOOTH_SCALE" and use
 		// better quality methods the faster the computer?
 };
@@ -372,8 +372,8 @@ void			run_be_about();
 void			set_focus_follows_mouse(bool follow);
 bool			focus_follows_mouse();
 
-void			set_mouse_mode(mode_mouse mode);	
-mode_mouse		mouse_mode();	
+void			set_mouse_mode(mode_mouse mode);
+mode_mouse		mouse_mode();
 
 rgb_color		ui_color(color_which which);
 void			set_ui_color(const color_which& which, const rgb_color& color);
