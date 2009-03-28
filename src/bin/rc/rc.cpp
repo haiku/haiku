@@ -226,8 +226,10 @@ parse_options(int argc, char *argv[])
 		}
 	}
 
-	if (args_left < 1)
+	if (args_left < 1) {
 		error("no input files");
+		usage();
+	}
 
 	for (int i = 1; i < argc; ++i) {
 		if (argv[i] == NULL)
