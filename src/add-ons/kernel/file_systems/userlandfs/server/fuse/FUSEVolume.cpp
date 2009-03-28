@@ -19,6 +19,11 @@
 #include "../kernel_emu.h"
 
 
+// TODO: For remote/shared file systems (sshfs, nfs, etc.) we need to notice
+// that entries have been added/removed, so that we can (1) update our
+// FUSEEntry/FUSENode objects and (2) send out node monitoring messages.
+
+
 // The maximal node tree hierarchy levels we support.
 static const uint32 kMaxNodeTreeDepth = 1024;
 
@@ -1009,13 +1014,19 @@ dir->id, name, target, mode));
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
 
+	// TODO: Set the mode?!
+
 	// mark the dir dirty
 	locker.Lock();
 	dir->dirty = true;
+	locker.Unlock();
 
-// TODO: Set the mode?!
-
-// TODO: Node monitoring!
+	// send node monitoring message
+	ino_t nodeID;
+	if (_GetNodeID(dir, name, &nodeID)) {
+		UserlandFS::KernelEmu::notify_listener(B_ENTRY_CREATED, 0, fID, 0,
+			dir->id, nodeID, NULL, name);
+	}
 
 	return B_OK;
 }
@@ -1061,8 +1072,11 @@ node, node->id));
 	locker.Lock();
 	dir->dirty = true;
 	node->dirty = true;
+	locker.Unlock();
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	UserlandFS::KernelEmu::notify_listener(B_ENTRY_CREATED, 0, fID, 0, dir->id,
+		node->id, NULL, name);
 
 	return B_OK;
 }
@@ -1078,6 +1092,10 @@ PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
 	NodeWriteLocker nodeLocker(this, dir, false);
 	if (nodeLocker.Status() != B_OK)
 		RETURN_ERROR(nodeLocker.Status());
+
+	// get the node ID (for the node monitoring message)
+	ino_t nodeID;
+	bool doNodeMonitoring = _GetNodeID(dir, name, &nodeID);
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -1101,8 +1119,13 @@ PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
 
 	// mark the dir dirty
 	dir->dirty = true;
+	locker.Unlock();
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	if (doNodeMonitoring) {
+		UserlandFS::KernelEmu::notify_listener(B_ENTRY_REMOVED, 0, fID, 0,
+			dir->id, nodeID, NULL, name);
+	}
 
 	return B_OK;
 }
@@ -1152,7 +1175,12 @@ oldDir->id, oldName, newDir, newDir->id, newName));
 	oldDir->dirty = true;
 	newDir->dirty = true;
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	ino_t nodeID;
+	if (_GetNodeID(newDir, newName, &nodeID)) {
+		UserlandFS::KernelEmu::notify_listener(B_ENTRY_MOVED, 0, fID,
+			oldDir->id, newDir->id, nodeID, oldName, newName);
+	}
 
 	return B_OK;
 }
@@ -1297,7 +1325,15 @@ mask));
 	locker.Lock();
 	node->dirty = true;
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	uint32 changedFields = mask &
+		(B_STAT_MODE | B_STAT_UID | B_STAT_GID | B_STAT_SIZE
+		| B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME);
+
+	if (changedFields != 0) {
+		UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED, changedFields,
+			fID, 0, 0, node->id, NULL, NULL);
+	}
 
 	return B_OK;
 }
@@ -1341,8 +1377,6 @@ openMode, mode));
 	if (fuseError != 0)
 		RETURN_ERROR(fuseError);
 
-// TODO: Node monitoring!
-
 	// get the node
 	FUSENode* node;
 	error = _GetNode(dir, name, &node);
@@ -1359,6 +1393,11 @@ openMode, mode));
 	locker.Lock();
 	dir->dirty = true;
 	node->dirty = true;
+	locker.Unlock();
+
+	// send node monitoring message
+	UserlandFS::KernelEmu::notify_listener(B_ENTRY_CREATED, 0, fID, 0, dir->id,
+		node->id, NULL, name);
 
 	cookieDeleter.Detach();
 	*_cookie = cookie;
@@ -1417,7 +1456,10 @@ PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
 		locker.Lock();
 		node->dirty = true;
 
-// TODO: Node monitoring!
+		// send node monitoring message
+		UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED,
+			B_STAT_SIZE | B_STAT_MODIFICATION_TIME, fID, 0, 0, node->id, NULL,
+			NULL);
 	}
 
 	cookieDeleter.Detach();
@@ -1570,7 +1612,13 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 	locker.Lock();
 	node->dirty = true;
 
-// TODO: Node monitoring?
+	// send node monitoring message
+	UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED,
+		B_STAT_SIZE | B_STAT_MODIFICATION_TIME, fID, 0, 0, node->id, NULL,
+		NULL);
+		// TODO: The size possibly doesn't change.
+		// TODO: Avoid message flooding -- use a timeout and set the
+		// B_STAT_INTERIM_UPDATE flag.
 
 	*_bytesWritten = bytesWritten;
 	return B_OK;
@@ -1612,7 +1660,12 @@ mode));
 	locker.Lock();
 	dir->dirty = true;
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	ino_t nodeID;
+	if (_GetNodeID(dir, name, &nodeID)) {
+		UserlandFS::KernelEmu::notify_listener(B_ENTRY_CREATED, 0, fID, 0,
+			dir->id, nodeID, NULL, name);
+	}
 
 	return B_OK;
 }
@@ -1628,6 +1681,10 @@ PRINT(("FUSEVolume::RemoveDir(%p (%lld), \"%s\")\n", dir, dir->id, name));
 	NodeWriteLocker nodeLocker(this, dir, false);
 	if (nodeLocker.Status() != B_OK)
 		RETURN_ERROR(nodeLocker.Status());
+
+	// get the node ID (for the node monitoring message)
+	ino_t nodeID;
+	bool doNodeMonitoring = _GetNodeID(dir, name, &nodeID);
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -1650,10 +1707,13 @@ PRINT(("FUSEVolume::RemoveDir(%p (%lld), \"%s\")\n", dir, dir->id, name));
 	_RemoveEntry(dir, name);
 
 	// mark the parent dir dirty
-	locker.Lock();
 	dir->dirty = true;
 
-// TODO: Node monitoring!
+	// send node monitoring message
+	if (doNodeMonitoring) {
+		UserlandFS::KernelEmu::notify_listener(B_ENTRY_REMOVED, 0, fID, 0,
+			dir->id, nodeID, NULL, name);
+	}
 
 	return B_OK;
 }
@@ -1988,6 +2048,36 @@ FUSEVolume::_GenerateNodeID()
 }
 
 
+/*!	Gets the ID of the node the entry specified by \a dir and \a entryName
+	refers to. The ID is returned via \a _nodeID. The caller doesn't get a
+	reference to the node.
+*/
+bool
+FUSEVolume::_GetNodeID(FUSENode* dir, const char* entryName, ino_t* _nodeID)
+{
+	while (true) {
+		AutoLocker<Locker> locker(fLock);
+
+		FUSENode* node;
+		status_t error = _InternalGetNode(dir, entryName, &node, locker);
+		if (error != B_OK)
+			return false;
+
+		if (node == NULL)
+			continue;
+
+		*_nodeID = node->id;
+		_PutNode(node);
+
+		return true;
+	}
+}
+
+
+/*!	Gets the node the entry specified by \a dir and \a entryName refers to. The
+	found node is returned via \a _node. The caller gets a reference to the node
+	as well as a vnode reference.
+*/
 status_t
 FUSEVolume::_GetNode(FUSENode* dir, const char* entryName, FUSENode** _node)
 {

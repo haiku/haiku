@@ -135,6 +135,8 @@ private:
 
 			ino_t				_GenerateNodeID();
 
+			bool				_GetNodeID(FUSENode* dir, const char* entryName,
+									ino_t* _nodeID);
 			status_t			_GetNode(FUSENode* dir, const char* entryName,
 									FUSENode** _node);
 			status_t			_InternalGetNode(FUSENode* dir,
