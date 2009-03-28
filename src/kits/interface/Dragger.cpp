@@ -162,7 +162,16 @@ BDragger::Draw(BRect update)
 	BRect bounds(Bounds());
 
 	if (AreDraggersDrawn() && (!fShelf || fShelf->AllowsDragging())) {
-		BPoint where = bounds.RightBottom() - BPoint(fBitmap->Bounds().Width(), fBitmap->Bounds().Height());
+		if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
+			uint32 flags = Parent()->Flags();
+			Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
+			Parent()->Draw(Frame() & ConvertToParent(update));
+			Parent()->Flush();
+			Parent()->SetFlags(flags);
+		}
+
+		BPoint where = bounds.RightBottom() - BPoint(fBitmap->Bounds().Width(),
+			fBitmap->Bounds().Height());
 		SetDrawingMode(B_OP_OVER);
 		DrawBitmap(fBitmap, where);
 		SetDrawingMode(B_OP_COPY);
@@ -171,16 +180,14 @@ BDragger::Draw(BRect update)
 			// TODO: should draw it differently ?
 		}
 	} else if (IsVisibilityChanging()) {
-
-//uint32 flags = Parent()->Flags();
-//Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
-//Parent()->Draw(Frame());
-//Parent()->SetFlags(flags);
-
-		if (Parent())
-			Parent()->Invalidate(Frame());
-		
-		else {
+		if (Parent()) {
+			if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0) {
+				uint32 flags = Parent()->Flags();
+				Parent()->SetFlags(flags | B_DRAW_ON_CHILDREN);
+				Parent()->Invalidate(Frame() & ConvertToParent(update));
+				Parent()->SetFlags(flags);
+			}
+		} else {
 			SetHighColor(255, 255, 255);
 			FillRect(bounds);
 		}
@@ -284,30 +291,40 @@ BDragger::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 void
 BDragger::MessageReceived(BMessage *msg)
 {
-	if (msg->what == B_TRASH_TARGET) {
-		if (fShelf != NULL)
-			Window()->PostMessage(kDeleteReplicant, fTarget, NULL);
-		else {
-			(new BAlert("??",
-				"Can't delete this replicant from its original application. Life goes on.",
-				"OK", NULL, NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT))->Go(NULL);
-		}
-	} else if (msg->what == _SHOW_DRAG_HANDLES_) {
-		// this code is used whenever the "are draggers drawn" option is changed
-		if (fRelation == TARGET_IS_CHILD) {
-			fTransition = true;
-			Draw(Bounds());
-			Flush();
-			fTransition = false;
-		} else {
-			if ((fShelf && (fShelf->AllowsDragging() && AreDraggersDrawn()))
-				|| AreDraggersDrawn())
-				Show();
-			else
-				Hide();
-		}
-	} else
-		BView::MessageReceived(msg);
+	switch (msg->what) {
+		case B_TRASH_TARGET:
+			if (fShelf != NULL)
+				Window()->PostMessage(kDeleteReplicant, fTarget, NULL);
+			else {
+				(new BAlert("??",
+					"Can't delete this replicant from its original "
+					"application. Life goes on.",
+					"OK", NULL, NULL, B_WIDTH_FROM_WIDEST,
+					B_WARNING_ALERT))->Go(NULL);
+			}
+			break;
+
+		case _SHOW_DRAG_HANDLES_:
+			// This code is used whenever the "are draggers drawn" option is
+			// changed.
+			if (fRelation == TARGET_IS_CHILD) {
+				fTransition = true;
+				Draw(Bounds());
+				Flush();
+				fTransition = false;
+			} else {
+				if ((fShelf && (fShelf->AllowsDragging() && AreDraggersDrawn()))
+					|| AreDraggersDrawn())
+					Show();
+				else
+					Hide();
+			}
+			break;
+
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
 }
 
 
