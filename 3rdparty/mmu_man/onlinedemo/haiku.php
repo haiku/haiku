@@ -33,14 +33,21 @@ define("APPLET_HEIGHT", "768");
 define("VNCPORTBASE", 5900);
 
 // timeout before the demo session is killed, as argument to /bin/sleep
-define("SESSION_TIMEOUT", "10m");
+define("SESSION_TIMEOUT", "20m");
 
 // path to qemu binary
 define("QEMU_BASE", "/usr/local");
 define("QEMU_BIN", QEMU_BASE . "/bin/qemu");
 define("QEMU_KEYMAPS", QEMU_BASE . "/share/qemu/keymaps");
 // default arguments: no network, emulate tablet, readonly image file.
-define("QEMU_ARGS","-net none -usbdevice wacom-tablet -snapshot");
+define("QEMU_ARGS", ""
+	."-monitor /dev/null "
+	."-serial none "
+	."-parallel none "
+	." -net none "
+	."-usbdevice wacom-tablet "
+	."-vga vmware "
+	."-snapshot");
 // absolute path to the image.
 define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated.x86/haiku.image");
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
@@ -52,16 +59,54 @@ define("QEMU_PIDFILE_TMPL", "qemu-haiku-pid-");
 // name of session variable holding the qemu slot; not yet used correctly
 define("QEMU_IDX_VAR", "QEMU_HAIKU_SESSION_VAR");
 
+define("BGCOLOR", "#336698");
+
+$vnckeymap = "en-us";
+
+// statics
+$count = $_SESSION['compteur'];
+//$count = $GLOBALS['compteur'];
+$closing = 0;
+$do_kill = 0;
+$do_run = 0;
+
+// parse args
+if (isset($_GET['close']))
+	$closing = 1;
+
+if (isset($_GET['kill']))
+	$do_kill = 1;
+
+if (isset($_GET['run']))
+	$do_run = 1;
+
+if (isset($_GET['frame'])) {}
+
 session_start();
 
-if (isset($_GET['frame'])) {
-}
+//echo "do_run: " . $do_run . "<br>\n";
+//echo "do_kill: " . $do_kill . "<br>\n";
 
 ?>
 <html>
 <head>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Haiku Online Demo</title>
+<style type="text/css">
+<!--
+ /* basic style */
+body { background-color: <?php echo BGCOLOR; ?>; }
+a:link { color:orange; }
+a:visited { color:darkorange; }
+a:hover { color:pink; }
+.haiku_online_form { color: white; }
+.haiku_online_disabled { color: grey; }
+.haiku_online_out { color: white; }
+.haiku_online_debug { color: orange; }
+.haiku_online_error { color: red; font-weight: bold; }
+.haiku_online_applet { background-color: <?php echo BGCOLOR; ?>; }
+-->
+</style>
 </head>
 <script>
 function onPageUnload() {
@@ -70,27 +115,31 @@ function onPageUnload() {
 </script>
 <?php
 
-$vnckeymap = "en-us";
 
-// statics
-
-$count = $_SESSION['compteur'];
-//$count = $GLOBALS['compteur'];
-$closing = 0;
-if (isset($_GET['close'])) {
-	$closing = 1;
+if ($closing == 1)
 	echo "<body>";
-} else
+else
 	echo "<body onunload=\"onPageUnload();\">";
+
+function out($str)
+{
+	echo "<div class=\"haiku_online_out\">$str</div>\n";
+	ob_flush();
+	flush();
+}
 
 function dbg($str)
 {
-	echo "<div class=\"debug\">$str</div>\n";
+	echo "<div class=\"haiku_online_debug\">$str</div>\n";
+	ob_flush();
+	flush();
 }
 
 function err($str)
 {
-	echo "<div class=\"error\">$str</div>\n";
+	echo "<div class=\"haiku_online_error\">$str</div>\n";
+	ob_flush();
+	flush();
 }
 
 function make_qemu_sessionfile_name($idx)
@@ -121,6 +170,25 @@ function find_qemu_slot()
 	return -1;
 }
 
+function total_qemu_slots()
+{
+	return MAX_QEMUS;
+}
+
+
+function available_qemu_slots()
+{
+	$count = 0;
+	for ($idx = 0; $idx < MAX_QEMUS; $idx++) {
+		$pidfile = make_qemu_pidfile_name($idx);
+		$sessfile = make_qemu_sessionfile_name($idx);
+		//dbg("checking \"$pidfile\", \"$sessfile\"...");
+		if (!file_exists($pidfile) && !file_exists($sessfile))
+			$count++;
+	}
+	return $count;
+}
+
 function qemu_slot()
 {
 	return $_SESSION[QEMU_IDX_VAR];
@@ -134,6 +202,16 @@ function vnc_display()
 function vnc_port()
 {
 	return VNCPORTBASE + vnc_display();
+}
+
+function vnc_addr_display()
+{
+	return $_SERVER['SERVER_ADDR'] . ":" . vnc_display();
+}
+
+function vnc_url()
+{
+	return "vnc://" . vnc_addr_display();
 }
 
 function is_my_session_valid()
@@ -153,11 +231,40 @@ function is_my_session_valid()
 }
 
 
+function list_keymaps()
+{
+	$bads = array('.', '..', 'common', 'modifiers');
+	$keymaps = scandir(QEMU_KEYMAPS);
+	foreach ($keymaps as $key => $map) {
+		if (in_array($map, $bads))
+			unset($keymaps[$key]);
+	}
+	return $keymaps;
+}
+
+
+function in_keymaps($keymap)
+{
+	$keymaps = list_keymaps();
+
+	if ($keymap == "")
+		return false;
+	if (in_array($keymap, $keymaps))
+		return true;
+
+	return false;
+}
 
 
 function probe_keymap()
 {
 	global $vnckeymap;
+	if (is_string($_GET['keymap']) && in_keymaps($_GET['keymap']))
+	{
+		$vnckeymap = $_GET['keymap'];
+		dbg("Overriden keymap '" . $vnckeymap . "' in arguments.");
+		return;
+	}
 	// if the browser advertised a prefered lang...
 	if (!isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
 		return;
@@ -166,20 +273,128 @@ function probe_keymap()
 	$langs = str_replace(" ", "", $langs);
 	$langs = split(",", $langs);
 	//print_r($langs);
-	$keymaps = scandir(QEMU_KEYMAPS);
 	//print_r($keymaps);
 	foreach($langs as $lang)
 	{
-		foreach($keymaps as $keymap)
+		if (in_keymaps($lang))
 		{
-			if ($keymap == $lang)
-			{
-				dbg("Detected keymap '" . $keymap . "' from browser headers.");
-				$vnckeymap = $keymap;
-				return;
-			}
+			$vnckeymap = $lang;
+			dbg("Detected keymap '" . $vnckeymap . "' from browser headers.");
+			return;
 		}
 	}
+}
+
+
+function output_options_form()
+{
+	global $vnckeymap;
+	$idx = qemu_slot();
+	echo "<form method=\"get\" action=\"" . $_SERVER['PHP_SELF'] . "\">";
+	echo "<table border=\"0\" class=\"haiku_online_form\">\n";
+	echo "<tr>\n";
+	echo "<td align=\"right\">\n";
+	echo "Select your keymap:";
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "<select name=\"keymap\">";
+	$keymaps = list_keymaps();
+	foreach ($keymaps as $keymap) {
+		echo "<option name=\"keymap\" value=\"$keymap\" ";
+		if ($keymap == $vnckeymap)
+			echo "selected ";
+		echo ">$keymap</option>";
+		//echo "<option name=\"keymap\" ";
+		//echo "value=\"$keymap\">" . locale_get_display_name($keymap);
+		//echo "</option>";
+	}
+	echo "</select>";
+	echo "</td>\n";
+	echo "</tr>\n";
+
+	$modes = array("1024x768"/*, "800x600"*/);
+	echo "<tr ";
+	if (count($modes) < 2)
+		echo "class=\"haiku_online_disabled\"";
+	echo ">\n";
+	echo "<td align=\"right\">\n";
+	echo "Select display size:";
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "<select name=\"videomode\" ";
+	if (count($modes) < 2)
+		echo "disabled";
+	echo ">";
+	
+	foreach ($modes as $mode) {
+		echo "<option name=\"videomode\" value=\"$mode\" ";
+		if ($mode == $videomode)
+			echo "selected ";
+		echo ">$mode</option>";
+	}
+	echo "</select>";
+
+	echo "</td>\n";
+
+	echo "</tr>\n";
+	echo "<tr ";
+	if (!$enable_sound)
+		echo "class=\"haiku_online_disabled\"";
+	echo ">\n";
+	echo "<td align=\"right\">\n";
+	echo "Click here to enable sound:";
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "<input type=\"checkbox\" name=\"sound\" ";
+	echo "value=\"1\" disabled ";
+	if ($enable_sound)
+		echo "checked ";
+	echo ">Sound</input>";
+	echo "</td>\n";
+	echo "</tr>\n";
+	echo "<tr>\n";
+	echo "<td align=\"right\">\n";
+	//out("Click here to enable sound:");
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "</td>\n";
+	echo "</tr>\n";
+	echo "<tr>\n";
+	echo "<td align=\"right\">\n";
+	echo "Click here to start the session:";
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "<input type=\"submit\" name=\"run\" ";
+	echo "value=\"Start!\" />";
+	echo "</td>\n";
+	echo "</tr>\n";
+	echo "</table>\n";
+	echo "</form>\n";
+	out("NOTE: You will need a Java-enabled browser to display the VNC Applet needed by this demo.");
+	out("You can however use instead an external <a " .
+	    "href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
+	    ">VNC viewer</a>.");
+	ob_flush();
+	flush();
+}
+
+function output_kill_form()
+{
+	echo "<form method=\"get\" action=\"" . $_SERVER['PHP_SELF'] . "\">";
+	echo "<table border=\"0\" class=\"haiku_online_form\">\n";
+	echo "<tr>\n";
+	echo "<td>\n";
+	echo "Click here to kill the session:";
+	echo "</td>\n";
+	echo "<td>\n";
+	echo "<input type=\"submit\" name=\"kill\" ";
+	echo "value=\"Terminate\"/>";
+	echo "</td>\n";
+	echo "</tr>\n";
+	echo "</table>\n";
+	echo "</form>\n";
+	ob_flush();
+	flush();
 }
 
 
@@ -223,6 +438,40 @@ function start_qemu()
 	dbg("Ready for a " . SESSION_TIMEOUT . " session.");
 }
 
+function stop_qemu()
+{
+	$qemuidx = qemu_slot();
+	$pidfile = make_qemu_pidfile_name($qemuidx);
+	if (file_exists($pidfile)) {
+		$pid = file_get_contents($pidfile);
+		//out("PID:" . $pid);
+		system("/bin/kill -TERM " . $pid);
+		unlink($pidfile);
+	}
+	$sessionfile = make_qemu_sessionfile_name($qemuidx);
+	if (file_exists($sessionfile)) {
+		unlink($sessionfile);
+	}
+	unset($_SESSION[QEMU_IDX_VAR]);
+
+	out("reloading...");
+	sleep(1);
+	echo "<script>\n";
+	echo "<!--\n";
+	echo "window.location = \"" . $_SERVER['PHP_SELF'] . "\";\n";
+	echo "//--></script>\n";
+	out("Click <a href=\"" . $_SERVER['PHP_SELF'] .
+	    "\">here</a> to reload the page.");
+}
+
+function output_vnc_info()
+{
+	out("You can use an external VNC client, click " .
+	"<a href=\"vnc://" . vnc_addr_display() . "\">here</a> " .
+	"or enter <tt>" . vnc_addr_display() . "</tt> in your " .
+	"<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
+	">VNC viewer</a>.<br />");
+}
 
 function output_applet_code()
 {
@@ -232,40 +481,73 @@ function output_applet_code()
 	$vncjpath = VNCJAVA_PATH;
 	$jar = VNCJAR;
 	$class = VNCCLASS;
-	echo "<applet code=$class codebase=\"$vncjpath/\" archive=\"$vncjpath/$jar\" width=$w height=$h>
-	<param name=\"PORT\" value=\"$port\">
-	<!param name=\"HOST\" value=\"$HTTP_HOST\"><!-- no need -->
-	<param name=\"PORT\" value=\"$port\">
-	<param name=\"PASSWORD\" value=\"\">
-	There should be a java applet here... make sure you have a JVM and it's enabled!
-	</applet>";
+	echo "<a name=\"haiku_online_applet\">";
+	echo "<center>";
+	echo "<applet code=$class codebase=\"$vncjpath/\" ";
+	echo "archive=\"$vncjpath/$jar\" width=$w height=$h ";
+	echo "bgcolor=\"#336698\">\n";
+	//not needed
+	//echo "<param name=\"HOST\" value=\"$HTTP_HOST\">\n";
+	echo "<param name=\"PORT\" value=\"$port\">\n";
+	echo "<param name=\"PASSWORD\" value=\"\">\n";
+	//echo "<param name=\"share desktop\" value=\"no\" />";
+	echo "<param name=\"background-color\" value=\"#336698\">\n";
+	echo "<param name=\"foreground-color\" value=\"#ffffff\">\n";
+	//echo "<param name=\"background\" value=\"#336698\">\n";
+	//echo "<param name=\"foreground\" value=\"#ffffff\">\n";
+	echo "There should be a java applet here... ";
+	echo "make sure you have a JVM and it's enabled!<br />\n";
+	echo "If you do not have Java you can use an external VNC ";
+	echo "client as described above.\n";
+
+	echo "</applet>\n";
+	echo "</center>";
+	ob_flush();
+	flush();
+	// scroll to the top of the applet
+	echo "<script>\n";
+	echo "<!--\n";
+	echo "window.location.hash = \"haiku_online_applet\";";
+	echo "//--></script>\n";
+	ob_flush();
+	flush();
 }
+
+out("<div align\"right\">Available displays: " .
+    available_qemu_slots() . "/" . total_qemu_slots() .
+    "</div>");
+
+
+probe_keymap();
+
 
 dbg("Checking if session is running...");
 
+$qemuidx = -1;
 
 if (is_my_session_valid()) {
-	dbg("Session running");
+	dbg("Session running.");
 	$qemuidx = qemu_slot();
-} else if ($closing != 1) {
-	dbg("Need to start qemu");
+	if ($do_kill) {
+		dbg("closing...");
+		stop_qemu();
+	}
+} else if (!$do_kill && $do_run) {
+	dbg("Need to start qemu.");
 
-	probe_keymap();
 	$qemuidx = start_qemu();
+	out("Waiting for vnc server...");
+	sleep(5);
 }
 
-if ($qemuidx >= 0) {
-	if ($closing) {
-		dbg("closing...");
-		unlink(make_qemu_sessionfile_name($qemuidx));
-		//unlink(make_qemu_sessionfile_name($qemuidx));
-		sleep(1);
-		//echo "<script> self.close(\"closing\"); </script>";
-	} else {
-		dbg("Waiting for vnc server...");
-		sleep(5);
-		output_applet_code();
-	}
+
+if ($qemuidx >= 0 && !$do_kill) {
+	output_kill_form();
+	output_vnc_info();
+	echo "<br />\n";
+	output_applet_code();
+} else {
+	output_options_form();
 }
 
 
