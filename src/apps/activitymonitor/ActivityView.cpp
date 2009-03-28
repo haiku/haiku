@@ -1229,7 +1229,7 @@ ActivityView::_DrawHistory()
 	view->Sync();
 	if (fOffscreen != NULL) {
 		fOffscreen->Unlock();
-		DrawBitmap(fOffscreen);
+		DrawBitmap(fOffscreen, B_ORIGIN);
 	}
 }
 
