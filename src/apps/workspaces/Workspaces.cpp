@@ -89,6 +89,10 @@ class WorkspacesView : public BView {
 		static	WorkspacesView* Instantiate(BMessage* archive);
 		virtual	status_t Archive(BMessage* archive, bool deep = true) const;
 
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+		virtual void FrameMoved(BPoint newPosition);
+		virtual void FrameResized(float newWidth, float newHeight);
 		virtual void MessageReceived(BMessage* message);
 		virtual void MouseMoved(BPoint where, uint32 transit,
 			const BMessage* dragMessage);
@@ -96,6 +100,13 @@ class WorkspacesView : public BView {
 
 	private:
 		void _AboutRequested();
+
+		void _UpdateParentClipping();
+		void _ExcludeFromParentClipping();
+		void _CleanupParentClipping();
+
+		BView*	fParentWhichDrawsOnChildren;
+		BRect	fCurrentFrame;
 };
 
 class WorkspacesWindow : public BWindow {
@@ -290,7 +301,11 @@ WorkspacesSettings::SetWindowFrame(BRect frame)
 
 
 WorkspacesView::WorkspacesView(BRect frame)
-	: BView(frame, "workspaces", B_FOLLOW_ALL, kWorkspacesViewFlag)
+	:
+	BView(frame, "workspaces", B_FOLLOW_ALL,
+		kWorkspacesViewFlag | B_FRAME_EVENTS),
+	fParentWhichDrawsOnChildren(NULL),
+	fCurrentFrame(frame)
 {
 	frame.OffsetTo(B_ORIGIN);
 	frame.top = frame.bottom - 7;
@@ -302,8 +317,13 @@ WorkspacesView::WorkspacesView(BRect frame)
 
 
 WorkspacesView::WorkspacesView(BMessage* archive)
-	: BView(archive)
+	:
+	BView(archive),
+	fParentWhichDrawsOnChildren(NULL),
+	fCurrentFrame(Frame())
 {
+	// Just in case we are instantiated from an older archive...
+	SetFlags(Flags() | B_FRAME_EVENTS);
 	// Make sure the auto-raise feature didn't leave any artifacts - this is
 	// not a good idea to keep enabled for a replicant.
 	if (EventMask() != 0)
@@ -358,6 +378,75 @@ WorkspacesView::_AboutRequested()
 	view->SetFontAndColor(0, 10, &font);
 
 	alert->Go();
+}
+
+
+void
+WorkspacesView::AttachedToWindow()
+{
+	BView* parent = Parent();
+	if (parent != NULL && (parent->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+		fParentWhichDrawsOnChildren = parent;
+		_ExcludeFromParentClipping();
+	}
+}
+
+
+void
+WorkspacesView::DetachedFromWindow()
+{
+	if (fParentWhichDrawsOnChildren != NULL)
+		_CleanupParentClipping();
+}
+
+
+void
+WorkspacesView::FrameMoved(BPoint newPosition)
+{
+	_UpdateParentClipping();
+}
+
+
+void
+WorkspacesView::FrameResized(float newWidth, float newHeight)
+{
+	_UpdateParentClipping();
+}
+
+
+void
+WorkspacesView::_UpdateParentClipping()
+{
+	if (fParentWhichDrawsOnChildren != NULL) {
+		_CleanupParentClipping();
+		_ExcludeFromParentClipping();
+		fParentWhichDrawsOnChildren->Invalidate(fCurrentFrame);
+		fCurrentFrame = Frame();
+	}
+}
+
+
+void
+WorkspacesView::_ExcludeFromParentClipping()
+{
+	// Prevent the parent view to draw over us. Do so in a way that allows
+	// restoring the parent to the previous state.
+	fParentWhichDrawsOnChildren->PushState();
+
+	BRegion clipping(fParentWhichDrawsOnChildren->Bounds());
+	clipping.Exclude(Frame());
+	fParentWhichDrawsOnChildren->ConstrainClippingRegion(&clipping);
+}
+
+
+void
+WorkspacesView::_CleanupParentClipping()
+{
+	// Restore the previous parent state. NOTE: This relies on views
+	// being detached in exactly the opposite order as them being
+	// attached. Otherwise we would mess up states if a sibbling view did
+	// the same thing we did in AttachedToWindow()...
+	fParentWhichDrawsOnChildren->PopState();
 }
 
 
