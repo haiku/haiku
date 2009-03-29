@@ -357,6 +357,7 @@ class OpenWithRelationAttributeText : public ScalarAttributeText {
 	protected:
 		virtual void FitValue(BString *result, const BPoseView *);
 		virtual int64 ReadValue();
+		virtual float PreferredWidth(const BPoseView *) const;
 
 		const BPoseView *fPoseView;
 		BString fRelationText;

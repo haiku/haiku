@@ -1772,6 +1772,16 @@ OpenWithRelationAttributeText::ReadValue()
 }
 
 
+float
+OpenWithRelationAttributeText::PreferredWidth(const BPoseView *pose) const
+{
+	BString widthString;
+	TruncString(&widthString, fRelationText.String(), fRelationText.Length(),
+		pose, 500, B_TRUNCATE_END);
+	return pose->StringWidth(widthString.String());
+}
+
+
 void
 OpenWithRelationAttributeText::FitValue(BString *result, const BPoseView *view)
 {
@@ -1786,8 +1796,8 @@ OpenWithRelationAttributeText::FitValue(BString *result, const BPoseView *view)
 		launchWithView->OpenWithRelationDescription(fModel, &fRelationText);
 
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncString(result, fRelationText.String(), fRelationText.Length(),
-		view, fOldWidth, B_TRUNCATE_END);
+	fTruncatedWidth = TruncString(result, fRelationText.String(),
+		fRelationText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
 
