@@ -241,8 +241,23 @@ bool
 TTracker::QuitRequested()
 {
 	// don't allow user quitting
-	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut"))
+	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut")) {
+		// but allow quitting to hide fSettingsWindow
+		int32 index = 0;
+		BWindow *window = NULL;
+		while ((window = WindowAt(index++)) != NULL) {
+			if (window == fSettingsWindow) {
+				if (fSettingsWindow->Lock()) {
+					if (!fSettingsWindow->IsHidden()
+						&& fSettingsWindow->IsActive())
+						fSettingsWindow->Hide();
+					fSettingsWindow->Unlock();
+				}
+				break;
+			}
+		}
 		return false;
+	}
 
 	gStatusWindow->AttemptToQuit();
 		// try quitting the copy/move/empty trash threads
