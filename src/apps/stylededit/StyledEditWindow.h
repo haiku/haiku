@@ -15,7 +15,6 @@
 #include <String.h>
 #include <Message.h>
 
-
 struct entry_ref;
 
 class BMenu;
@@ -24,6 +23,7 @@ class BMenuBar;
 class BMenuItem;
 class BFilePanel;
 class BScrollView;
+class BStringView;
 class StyledEditView;
 
 
@@ -116,6 +116,7 @@ class StyledEditWindow : public BWindow {
 
 		StyledEditView	*fTextView;
 		BScrollView		*fScrollView;
+		BStringView		*fStringView;
 
 		BFilePanel		*fSavePanel;
 		BMenu			*fSavePanelEncodingMenu;

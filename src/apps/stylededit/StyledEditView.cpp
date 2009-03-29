@@ -49,8 +49,8 @@ void
 StyledEditView::Select(int32 start, int32 finish)
 {
 	fMessenger->SendMessage(start == finish ? DISABLE_ITEMS : ENABLE_ITEMS);
-
-	BTextView::Select(start, finish);
+	fMessenger->SendMessage(UPDATE_LINE);
+	BTextView::Select(start, finish);	
 }
 
 
@@ -169,6 +169,7 @@ StyledEditView::DeleteText(int32 start, int32 finish)
 		fMessenger-> SendMessage(TEXT_CHANGED);
 
 	BTextView::DeleteText(start, finish);
+	fMessenger->SendMessage(UPDATE_LINE);
 }
 
 
@@ -179,7 +180,8 @@ StyledEditView::InsertText(const char *text, int32 length, int32 offset,
 	if (!fSuppressChanges)
 		fMessenger->SendMessage(TEXT_CHANGED);
 
-	BTextView::InsertText(text, length, offset, runs);	
+	BTextView::InsertText(text, length, offset, runs);
+	fMessenger->SendMessage(UPDATE_LINE);
 }
 
 

@@ -75,5 +75,8 @@ const uint32 OPEN_AS_ENCODING			= 'FPoe';
 const uint32 SAVE_AS_ENCODING			= 'FPse';
 const uint32 SAVE_THEN_QUIT				= 'FPsq';
 
+// Update Line Info
+const uint32 UPDATE_LINE				= 'UPln';
+
 #endif	// CONSTANTS_H
 
