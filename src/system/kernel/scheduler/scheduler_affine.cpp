@@ -40,19 +40,31 @@ static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
+const int32 kMaxTrackingQuantums = 5;
+const bigtime_t kMaxThreadQuantum = 3000;
+
 struct scheduler_thread_data {
 	scheduler_thread_data(void) 
 	{
-		init();
+		Init();
 	}
 	
-	void init() 
+	
+	void Init() 
 	{
 		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 		fLastQuantumSlot = 0;
 	}
+
+	float GetAverageQuantumUsage() const
+	{
+		float quantumAverage = 0.0;
+		for (int32 i = 0; i < kMaxTrackingQuantums; i++)
+			quantumAverage += fLastThreadQuantums[i];
+		return quantumAverage / kMaxTrackingQuantums;
+	}
 	
-	int32 fLastThreadQuantums[5];
+	int32 fLastThreadQuantums[kMaxTrackingQuantums];
 	int16 fLastQuantumSlot;
 };
 
@@ -424,9 +436,16 @@ affine_reschedule(void)
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		oldThread->cpu->active_time +=
+		bigtime_t activeTime = 
 			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
 			+ (oldThread->user_time - oldThread->cpu->last_user_time);
+		oldThread->cpu->active_time += activeTime;
+		scheduler_thread_data *data = oldThread->scheduler_data;
+		data->fLastThreadQuantums[data->fLastQuantumSlot] = activeTime;
+		if (data->fLastQuantumSlot == kMaxTrackingQuantums - 1)
+			data->fLastQuantumSlot = 0;
+		else
+			data->fLastQuantumSlot++;
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
@@ -435,7 +454,7 @@ affine_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		bigtime_t quantum = 3000;	// ToDo: calculate quantum!
+		bigtime_t quantum = kMaxThreadQuantum;	// ToDo: calculate quantum!
 		timer *quantumTimer = &oldThread->cpu->quantum_timer;
 
 		if (!oldThread->cpu->preempted)
@@ -469,7 +488,7 @@ affine_on_thread_create(struct thread* thread)
 static void
 affine_on_thread_init(struct thread* thread)
 {
-	((scheduler_thread_data *)(thread->scheduler_data))->init();
+	((scheduler_thread_data *)(thread->scheduler_data))->Init();
 }
 
 
