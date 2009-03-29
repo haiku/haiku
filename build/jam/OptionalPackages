@@ -154,7 +154,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddFilesToHaikuImage beos system add-ons kernel bluetooth : btCoreData ;
 	AddFilesToHaikuImage beos preferences : Bluetooth ;
 	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
-
+	AddSymlinkToHaikuImage home config be preferences : /boot/beos/preferences/Bluetooth ;
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
 	}
