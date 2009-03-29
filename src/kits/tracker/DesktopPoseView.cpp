@@ -80,11 +80,12 @@ DesktopEntryListCollection::DesktopEntryListCollection()
 //	#pragma mark -
 
 
-DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 resizeMask,
-	uint32 flags)
-	:	BPoseView(model, frame, resizeMask, flags | B_DRAW_ON_CHILDREN)
+DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 viewMode,
+	uint32 resizeMask)
+	:	BPoseView(model, frame, viewMode, resizeMask)
 {
 	SetWidgetTextOutline(true);
+	SetFlags(Flags() | B_DRAW_ON_CHILDREN);
 }
 
 
