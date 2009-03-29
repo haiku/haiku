@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,22 +21,22 @@ class FontView;
 
 
 class MainWindow : public BWindow {
-	public:
-		MainWindow();
-		virtual ~MainWindow();
+public:
+							MainWindow();
+	virtual					~MainWindow();
 
-		virtual	bool	QuitRequested();
-		virtual	void	MessageReceived(BMessage *message);
+	virtual	bool			QuitRequested();
+	virtual	void			MessageReceived(BMessage *message);
 
-	private:
-		void			_Center();
+private:
+			void			_Center();
 
-		BMessageRunner*			fRunner;
-		FontView*				fFontsView;
-		BButton*				fDefaultsButton;
-		BButton*				fRevertButton;
+		BMessageRunner*		fRunner;
+		FontView*			fFontsView;
+		BButton*			fDefaultsButton;
+		BButton*			fRevertButton;
 
-		FontsSettings			fSettings;
+		FontsSettings		fSettings;
 };
 
 static const int32 kMsgUpdate = 'updt';

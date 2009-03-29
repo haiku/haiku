@@ -27,7 +27,7 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 MainWindow::MainWindow()
 	: BWindow(BRect(100, 100, 445, 410), "Fonts", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BRect rect = Bounds();
 	BView* view = new BView(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -89,6 +89,9 @@ MainWindow::MainWindow()
 		+ buttonHeight);
 	view->AddChild(tabView);
 	fFontsView->ResizeToPreferred();
+	
+	SetSizeLimits(Bounds().Width(), 16347,
+		Bounds().Height(), Bounds().Height());
 
 	if (fSettings.WindowCorner() == BPoint(-1, -1)) {
 		// center window on screen

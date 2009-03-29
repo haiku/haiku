@@ -67,11 +67,27 @@ _get_system_default_font_(const char* which, font_family family,
 
 
 FontSelectionView::FontSelectionView(BRect _rect, const char* name,
-	const char* label, const BFont& currentFont)
+	const char* label, const BFont* currentFont)
 	: BView(_rect, name, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
-	fSavedFont(currentFont),
-	fCurrentFont(currentFont)
+	fSavedFont(currentFont)
 {
+	if (currentFont == NULL) {
+		if (!strcmp(Name(), "plain"))
+			fCurrentFont = *be_plain_font;
+		else if (!strcmp(Name(), "bold"))
+			fCurrentFont = *be_bold_font;
+		else if (!strcmp(Name(), "fixed"))
+			fCurrentFont = *be_fixed_font;
+		else if (!strcmp(Name(), "menu")) {
+			menu_info info;
+			get_menu_info(&info);
+
+			fCurrentFont.SetFamilyAndStyle(info.f_family, info.f_style);
+			fCurrentFont.SetSize(info.font_size);
+		}
+	} else
+		fCurrentFont = *currentFont;
+
 	fDivider = StringWidth(label) + 5;
 
 	fSizesMenu = new BPopUpMenu("size menu");
@@ -90,7 +106,7 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	// size menu
 	rect.right = rect.left + StringWidth("Size: 99") + 30.0f;
 	fSizesMenuField = new BMenuField(rect, "sizes", "Size:", fSizesMenu, true,
-		B_FOLLOW_TOP);
+		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fSizesMenuField->SetDivider(StringWidth(fSizesMenuField->Label()) + 5.0f);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fSizesMenuField->ResizeToPreferred();
@@ -104,7 +120,8 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	font.SetSize(kMaxSize);
 	font_height height;
 	font.GetHeight(&height);
-	rect.bottom = rect.top + ceil(height.ascent + height.descent + height.leading) + 5;
+	rect.bottom = rect.top + ceil(height.ascent + height.descent
+		+ height.leading) + 5;
 
 	fPreviewBox = new BBox(rect, "preview", B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW | B_FRAME_EVENTS);
@@ -343,7 +360,18 @@ FontSelectionView::_UpdateSystemFont()
 	font_style style;
 	fCurrentFont.GetFamilyAndStyle(&family, &style);
 
-	_set_system_font_(Name(), family, style, fCurrentFont.Size());
+	if (!strcmp(Name(), "menu")) {
+		// The menu font is not handled as a system font
+		menu_info info;
+		get_menu_info(&info);
+
+		strlcpy(info.f_family, (const char*)family, B_FONT_FAMILY_LENGTH);
+		strlcpy(info.f_style, (const char*)style, B_FONT_STYLE_LENGTH);
+		info.font_size = fCurrentFont.Size();
+
+		set_menu_info(&info);
+	} else
+		_set_system_font_(Name(), family, style, fCurrentFont.Size());
 }
 
 
@@ -470,7 +498,8 @@ FontSelectionView::UpdateFontsMenu()
 
 			BMenuItem *item = new BMenuItem(style, message);
 
-			if (!strcmp(style, currentStyle) && !strcmp(family, currentFamily)) {
+			if (!strcmp(style, currentStyle)
+				&& !strcmp(family, currentFamily)) {
 				item->SetMarked(true);
 				familyItem->SetMarked(true);
 			}

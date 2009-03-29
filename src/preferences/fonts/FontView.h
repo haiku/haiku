@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,23 +15,24 @@
 
 
 class FontView : public BView {
-	public:
-		FontView(BRect frame);
+public:
+								FontView(BRect frame);
 
-		virtual void GetPreferredSize(float *_width, float *_height);
+	virtual void				GetPreferredSize(float *_width, float *_height);
 
-		void	SetDefaults();
-		void	Revert();
-		void	UpdateFonts();
-		void	RelayoutIfNeeded();
+			void				SetDefaults();
+			void				Revert();
+			void				UpdateFonts();
+			void				RelayoutIfNeeded();
 
-		bool	IsDefaultable();
-		bool	IsRevertable();
+			bool				IsDefaultable();
+			bool				IsRevertable();
 
-	private:
-		FontSelectionView		*fPlainView;
-		FontSelectionView		*fBoldView;
-		FontSelectionView		*fFixedView;
+private:
+			FontSelectionView*	fPlainView;
+			FontSelectionView*	fBoldView;
+			FontSelectionView*	fFixedView;
+			FontSelectionView*	fMenuView;
 };
 
 #endif	/* FONT_VIEW_H */

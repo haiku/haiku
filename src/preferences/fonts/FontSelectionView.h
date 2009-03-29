@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,46 +20,46 @@ class BStringView;
 
 
 class FontSelectionView : public BView {
-	public:
-		FontSelectionView(BRect rect, const char* name, const char* label,
-			const BFont& currentFont);
-		virtual ~FontSelectionView();
+public:
+							FontSelectionView(BRect rect, const char* name,
+								const char* label, const BFont* font = NULL);
+	virtual					~FontSelectionView();
 
-		virtual void	GetPreferredSize(float *_width, float *_height);
-		virtual void	AttachedToWindow();
-		virtual void	MessageReceived(BMessage *msg);
+	virtual void			GetPreferredSize(float *_width, float *_height);
+	virtual void			AttachedToWindow();
+	virtual void			MessageReceived(BMessage *msg);
 
-		void			SetDivider(float divider);
-		void			RelayoutIfNeeded();
+			void			SetDivider(float divider);
+			void			RelayoutIfNeeded();
 
-		void			SetDefaults();
-		void			Revert();
-		bool			IsDefaultable();
-		bool			IsRevertable();
+			void			SetDefaults();
+			void			Revert();
+			bool			IsDefaultable();
+			bool			IsRevertable();
 
-		void			UpdateFontsMenu();
+			void			UpdateFontsMenu();
 
-	private:
-		void			_SelectCurrentFont(bool select);
-		void			_SelectCurrentSize(bool select);
-		void			_UpdateFontPreview();
-		void			_UpdateSystemFont();
-		void			_BuildSizesMenu();
+private:
+			void			_SelectCurrentFont(bool select);
+			void			_SelectCurrentSize(bool select);
+			void			_UpdateFontPreview();
+			void			_UpdateSystemFont();
+			void			_BuildSizesMenu();
 
-	protected:
-		float			fDivider;
+protected:
+			float			fDivider;
 
-		BMenuField*		fFontsMenuField;
-		BMenuField*		fSizesMenuField;
-		BPopUpMenu*		fFontsMenu;
-		BPopUpMenu*		fSizesMenu;
+			BMenuField*		fFontsMenuField;
+			BMenuField*		fSizesMenuField;
+			BPopUpMenu*		fFontsMenu;
+			BPopUpMenu*		fSizesMenu;
 
-		BBox*			fPreviewBox;
-		BStringView*	fPreviewText;
+			BBox*			fPreviewBox;
+			BStringView*	fPreviewText;
 
-		BFont			fSavedFont;
-		BFont			fCurrentFont;
-		float			fMaxFontNameWidth;
+			BFont			fSavedFont;
+			BFont			fCurrentFont;
+			float			fMaxFontNameWidth;
 };
 
 #endif	/* FONT_SELECTION_VIEW_H */
