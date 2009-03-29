@@ -21,6 +21,7 @@
 
 
 struct function_profile_info;
+struct thread;
 
 // Team related debugging data.
 //
