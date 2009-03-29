@@ -37,6 +37,7 @@
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target (CPU, core, etc.).
 static struct thread* sRunQueue[B_MAX_CPU_COUNT];
+static int32 sRunQueueSize[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
@@ -167,7 +168,7 @@ affine_enqueue_in_run_queue(struct thread *thread)
 		}
 
 		T(EnqueueThread(thread, prev, curr));
-
+		sRunQueueSize[targetCPU]++;
 		thread->queue_next = curr;
 		if (prev)
 			prev->queue_next = thread;
@@ -203,6 +204,7 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 		resultThread = sRunQueue[currentCPU];
 		sRunQueue[currentCPU] = resultThread->queue_next;
 	}
+	sRunQueueSize[currentCPU]--;
 	
 	return resultThread;
 }
@@ -534,7 +536,7 @@ scheduler_affine_init()
 {
 	gScheduler = &kAffineOps;
 	memset(sRunQueue, 0, sizeof(sRunQueue));
-
+	memset(sRunQueueSize, 0, sizeof(sRunQueueSize));
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
 }
