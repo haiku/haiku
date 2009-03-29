@@ -118,7 +118,7 @@ BEOS_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
 BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-BEOS_ADD_ONS_SCREENSAVERS = DebugNow Haiku IFS Spider Message ;
+BEOS_ADD_ONS_SCREENSAVERS = DebugNow Flurry Haiku IFS Spider Message ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki ; #hda
 BEOS_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia

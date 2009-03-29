@@ -278,14 +278,14 @@ ScreenBlanker::QuitRequested()
 void
 ScreenBlanker::_Shutdown()
 {
-	delete fRunner;
-
 	if (fWindow) {
 		fWindow->Hide();
 
 		if (fWindow->Lock())
 			fWindow->Quit();
 	}
+	
+	delete fRunner;
 }
 
 
