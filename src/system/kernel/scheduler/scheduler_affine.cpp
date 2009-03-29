@@ -88,15 +88,17 @@ dump_run_queue(int argc, char **argv)
 {
 	struct thread *thread = NULL;
 
-	for (int32 i  = 0; i < smp_get_num_cpus(); i++) {
+	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		thread = sRunQueue[i];
-		if (!thread)
-			kprintf("Run queue for cpu %ld is empty!\n", i);
-		else {
-			kprintf("thread    id      priority name\n");
+		kprintf("Run queue for cpu %ld (%ld threads)\n", i, 
+			sRunQueueSize[i]);
+		if (sRunQueueSize[i] > 0) {
+			kprintf("thread      id      priority  avg. quantum  name\n");
 			while (thread) {
-				kprintf("%p  %-7ld %-8ld %s\n", thread, thread->id,
-					thread->priority, thread->name);
+				kprintf("%p  %-7ld %-8ld  %-12.2f  %s\n", thread, thread->id,
+					thread->priority, 
+					thread->scheduler_data->GetAverageQuantumUsage(),
+					thread->name);
 				thread = thread->queue_next;
 			}
 		}
