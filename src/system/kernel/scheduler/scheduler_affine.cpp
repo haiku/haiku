@@ -57,9 +57,9 @@ struct scheduler_thread_data {
 		fLastQuantumSlot = 0;
 	}
 
-	float GetAverageQuantumUsage() const
+	int32 GetAverageQuantumUsage() const
 	{
-		float quantumAverage = 0.0;
+		int32 quantumAverage = 0;
 		for (int32 i = 0; i < kMaxTrackingQuantums; i++)
 			quantumAverage += fLastThreadQuantums[i];
 		return quantumAverage / kMaxTrackingQuantums;
@@ -95,7 +95,7 @@ dump_run_queue(int argc, char **argv)
 		if (sRunQueueSize[i] > 0) {
 			kprintf("thread      id      priority  avg. quantum  name\n");
 			while (thread) {
-				kprintf("%p  %-7ld %-8ld  %-12.2f  %s\n", thread, thread->id,
+				kprintf("%p  %-7ld %-8ld  %-12ld  %s\n", thread, thread->id,
 					thread->priority, 
 					thread->scheduler_data->GetAverageQuantumUsage(),
 					thread->name);
