@@ -47,10 +47,10 @@ BluetoothApplication::AboutRequested()
                              "	- Fredrik Ekdahl\n"
                              "	- Raynald Lesieur\n"
                              "	- Andreas Färber\n\n"
+                             "	- Jörg Meyer\n"
                              "Testing:\n"
                              "	- Petter H. Juliussen\n"
-                             "	- Adrien Destugues\n"
-                             "	- Jörg Meyer\n\n"
+                             "	- Adrien Destugues\n\n"
                              "Who gave me all the knowledge:\n"
                              "	- the yellowTAB team", "OK"))->Go();
 	

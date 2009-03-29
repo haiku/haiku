@@ -8,6 +8,7 @@
 
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/BluetoothDevice.h>
+#include "../media/iconfile.h"
 
 
 #include "DeviceListItem.h"
@@ -44,7 +45,7 @@ DeviceListItem::SetDevice(BluetoothDevice* bDevice)
 {
 	fAddress = bDevice->GetBluetoothAddress();
 	fClass = bDevice->GetDeviceClass();
-	fName	=	bDevice->GetFriendlyName();
+	fName = bDevice->GetFriendlyName();
 	// AKAIR rssi	can	only be	got	at inquiry time...	
 }
 
@@ -55,41 +56,38 @@ DeviceListItem::~DeviceListItem()
 }
 
 
-/*********************************************************** 
- * DrawItem	
- ***********************************************************/	
 void 
-DeviceListItem::DrawItem(BView *owner, BRect itemRect, bool	complete)	
+DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 {	
 	rgb_color	kBlack = { 0,0,0,0 };	
 	rgb_color	kHighlight = { 156,154,156,0 };	
 	
 	if (IsSelected() ||	complete)	{	
-					rgb_color	color; 
-					if (IsSelected())	
-									color	=	kHighlight;	
-					else 
-									color	=	owner->ViewColor();	
-					 
-					owner->SetHighColor(color);	
-					owner->SetLowColor(color); 
-					owner->FillRect(itemRect); 
-					owner->SetHighColor(kBlack); 
-					 
-	}	else { 
-					owner->SetLowColor(owner->ViewColor());	
-	}	
-	 				
-	font_height			finfo; 
-	be_plain_font->GetHeight(&finfo);	
-     				 
-	BPoint point = BPoint(itemRect.left	+ PIXELS_FOR_ICON + INSETS,	itemRect.bottom	-	finfo.descent	+	1);	
-	owner->SetFont(be_fixed_font); 
-	owner->SetHighColor(kBlack); 
-	owner->MovePenTo(point); 
-	
+		rgb_color	color; 
+		if (IsSelected())	
+			color	=	kHighlight;	
+		else 
+			color	=	owner->ViewColor();	
+
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
+		owner->FillRect(itemRect);
+		owner->SetHighColor(kBlack);
+
+	} else {
+		owner->SetLowColor(owner->ViewColor());
+	}
+
+	font_height	finfo;
+	be_plain_font->GetHeight(&finfo);
+
+	BPoint point = BPoint(itemRect.left	+ PIXELS_FOR_ICON + 2*INSETS, itemRect.bottom - finfo.descent + 1);
+	owner->SetFont(be_fixed_font);
+	owner->SetHighColor(kBlack);
+	owner->MovePenTo(point);
+
 	BString secondLine;
-	
+
 	secondLine << bdaddrUtils::ToString(fAddress) << "   ";
 	fClass.GetMajorDeviceClass(secondLine);
 	secondLine << " / ";
@@ -103,9 +101,64 @@ DeviceListItem::DrawItem(BView *owner, BRect itemRect, bool	complete)
 	owner->MovePenTo(point); 
 	owner->DrawString(fName.String()); 
 	
-	// TODO: Stroke icon
-	owner->StrokeRect(BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
-							itemRect.left + PIXELS_FOR_ICON, itemRect.top + PIXELS_FOR_ICON));
+	// TODO: Generalize this		
+	switch (fClass.GetMajorDeviceClass()) {
+		case 1:
+		{
+			BRect iconRect(0,0,15,15);
+			BBitmap *icon=new BBitmap(iconRect, B_CMAP8);
+			icon->SetBits(kTVBits, kTVWidth*kTVHeight, 0, kTVColorSpace);
+			owner->DrawBitmap(icon, iconRect,BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
+				itemRect.left + INSETS + PIXELS_FOR_ICON, itemRect.top + INSETS + PIXELS_FOR_ICON));
+
+		}
+		break;
+		case 4:
+		{
+			BRect iconRect(0,0,15,15);
+			BBitmap *icon=new BBitmap(iconRect, B_CMAP8);
+			icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0, kMixerColorSpace);
+			owner->DrawBitmap(icon, iconRect,BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
+				itemRect.left + INSETS + PIXELS_FOR_ICON, itemRect.top + INSETS + PIXELS_FOR_ICON));			
+		}
+		break;
+		case 2: // phone
+			owner->StrokeRoundRect(BRect(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4),
+				 itemRect.top + INSETS + 6,
+				 itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
+			 	 itemRect.top + INSETS + PIXELS_FOR_ICON - 2), 2, 2);
+			owner->StrokeRect(BRect(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
+			 	 itemRect.top + INSETS + 10,
+				 itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
+			 	 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
+				 itemRect.top + INSETS + PIXELS_FOR_ICON - 6), 
+				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
+				 itemRect.top + INSETS + PIXELS_FOR_ICON - 6));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
+				 itemRect.top + INSETS + PIXELS_FOR_ICON - 4), 
+				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
+				 itemRect.top + INSETS + PIXELS_FOR_ICON - 4));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
+				 itemRect.top + INSETS + 2), 
+				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
+				 itemRect.top + INSETS + 6));
+			break;
+		default: // Bluetooth Logo
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4),
+				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)),
+				BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
+				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON/4)));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/2),
+				 itemRect.top + INSETS +2));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/2),
+				 itemRect.top + INSETS + PIXELS_FOR_ICON - 2));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
+				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)));
+			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4), 
+				itemRect.top + INSETS + uint(PIXELS_FOR_ICON/4)));
+	}
+
 	// TODO: Draw rssi
 	
 } 
