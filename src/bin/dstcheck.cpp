@@ -47,6 +47,7 @@ void
 TimedAlert::Show()
 {
 	fRunner = new BMessageRunner(this, new BMessage(TIMEDALERT_UPDATE), 60000000);
+	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	BAlert::Show();
 }
 
