@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -294,6 +294,7 @@ private:
 								BMenuItem* item);
 			BHandler*		_DetermineTarget(BMessage* message,
 								BHandler* target);
+			bool			_IsFocusMessage(BMessage* message);
 			bool			_UnpackMessage(unpack_cookie& state,
 								BMessage** _message, BHandler** _target,
 								bool* _usePreferred);
