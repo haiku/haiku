@@ -1028,7 +1028,7 @@ FrameMoved(origin);
 
 		case B_KEY_DOWN:
 		{
-			if (!fActive || !_HandleKeyDown(msg)) {
+			if (!_HandleKeyDown(msg)) {
 				if (BView* view = dynamic_cast<BView*>(target)) {
 					// TODO: cannot use "string" here if we support having different
 					//	font encoding per view (it's supposed to be converted by
@@ -3027,8 +3027,29 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 }
 
 
-/*!
-	\brief Distributes the message to its intended targets. This is done for
+/*!	\brief Determines whether or not this message has targeted the focus view.
+
+	This will return \c false only if the message did not go to the preferred
+	handler, or if the packed message does not contain address the focus view
+	at all.
+*/
+bool
+BWindow::_IsFocusMessage(BMessage* message)
+{
+	BMessage::Private messagePrivate(message);
+	if (!messagePrivate.UsePreferredTarget())
+		return false;
+
+	bool feedFocus;
+	if (message->HasInt32("_token")
+		&& (message->FindBool("_feed_focus", &feedFocus) != B_OK || !feedFocus))
+		return false;
+
+	return true;
+}
+
+
+/*!	\brief Distributes the message to its intended targets. This is done for
 		all messages that should go to the preferred handler.
 
 	Returns \c true in case the message should still be dispatched
@@ -3296,6 +3317,11 @@ BWindow::_TransitForMouseMoved(BView* view, BView* viewUnderMouse) const
 bool
 BWindow::_HandleKeyDown(BMessage* event)
 {
+	// Only handle special functions when the event targeted the active focus
+	// view
+	if (!_IsFocusMessage(event))
+		return false;
+
 	const char *string = NULL;
 	if (event->FindString("bytes", &string) != B_OK)
 		return false;
