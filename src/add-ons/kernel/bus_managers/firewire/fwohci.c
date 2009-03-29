@@ -580,6 +580,7 @@ fwohci_reset(struct fwohci_softc *sc)
 			| OHCI_INT_PHY_BUS_R | OHCI_INT_PW_ERR);
 	sc->intmask |=  OHCI_INT_DMA_IR | OHCI_INT_DMA_IT;
 	sc->intmask |=	OHCI_INT_CYC_LOST | OHCI_INT_PHY_INT;
+	OWRITE(sc, FWOHCI_INTSTATCLR, ~0);
 	OWRITE(sc, FWOHCI_INTMASK, sc->intmask);
 	fwohci_set_intr(&sc->fc, 1);
 
