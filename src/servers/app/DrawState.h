@@ -65,6 +65,7 @@ public:
 		void				SetClippingRegion(const BRegion* region);
 
 		bool				HasClipping() const;
+		bool				HasAdditionalClipping() const;
 		bool				GetCombinedClippingRegion(BRegion* region) const;
 
 							// coordinate transformations

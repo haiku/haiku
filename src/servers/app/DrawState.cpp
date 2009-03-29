@@ -135,7 +135,7 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 		link.Read<float>(&size);
 		fFont.SetSize(size);
 	}
-	
+
 	if (mask & B_FONT_SHEAR) {
 		float shear;
 		link.Read<float>(&shear);
@@ -246,7 +246,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	link.Attach<uint8>(fFont.Encoding());
 	link.Attach<uint16>(fFont.Face());
 	link.Attach<uint32>(fFont.Flags());
-	
+
 	// Attach view state
 	link.Attach<BPoint>(fPenLocation);
 	link.Attach<float>(fPenSize);
@@ -338,6 +338,13 @@ DrawState::HasClipping() const
 	if (fPreviousState)
 		return fPreviousState->HasClipping();
 	return false;
+}
+
+
+bool
+DrawState::HasAdditionalClipping() const
+{
+	return fClippingRegion != NULL;
 }
 
 

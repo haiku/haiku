@@ -1260,7 +1260,7 @@ View::PopState()
 		return;
 	}
 
-	bool rebuildClipping = true; //fDrawState->ClippingRegion() != NULL;
+	bool rebuildClipping = fDrawState->HasAdditionalClipping();
 
 	fDrawState = fDrawState->PopState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
