@@ -40,8 +40,8 @@ static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
-struct affine_scheduler_data : scheduler_thread_data {
-	affine_scheduler_data(void) 
+struct scheduler_thread_data {
+	scheduler_thread_data(void) 
 	{
 		init();
 	}
@@ -460,7 +460,7 @@ affine_reschedule(void)
 static void
 affine_on_thread_create(struct thread* thread)
 {
-	thread->scheduler_data = new(std::nothrow) affine_scheduler_data();
+	thread->scheduler_data = new(std::nothrow) scheduler_thread_data();
 	if (thread->scheduler_data == NULL)
 		panic("affine_scheduler: Unable to allocate scheduling data structure for thread %ld\n", thread->id);
 }
@@ -469,7 +469,7 @@ affine_on_thread_create(struct thread* thread)
 static void
 affine_on_thread_init(struct thread* thread)
 {
-	((affine_scheduler_data *)(thread->scheduler_data))->init();
+	((scheduler_thread_data *)(thread->scheduler_data))->init();
 }
 
 

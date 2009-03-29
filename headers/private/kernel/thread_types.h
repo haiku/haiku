@@ -158,9 +158,7 @@ struct free_user_thread {
 	struct user_thread*			thread;
 };
 
-struct scheduler_thread_data {
-	// empty, left up to the individual schedulers to subclass / define
-};
+struct scheduler_thread_data;
 
 struct team {
 	struct team		*next;			// next in hash
