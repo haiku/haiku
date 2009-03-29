@@ -1316,8 +1316,17 @@ View::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 	if (fViewBitmap != NULL || fViewColor != B_TRANSPARENT_COLOR) {
 		// we can only draw within our own area
-		BRegion* redraw = fWindow->GetRegion(
-			_ScreenClipping(windowContentClipping));
+		BRegion* redraw;
+		if ((fFlags & B_DRAW_ON_CHILDREN) != 0) {
+			// The client may actually want to prevent the background to
+			// be painted outside the user clipping.
+			redraw = fWindow->GetRegion(
+				ScreenAndUserClipping(windowContentClipping));
+		} else {
+			// Ignore user clipping as in BeOS for painting the background.
+			redraw = fWindow->GetRegion(
+				_ScreenClipping(windowContentClipping));
+		}
 		if (!redraw)
 			return;
 		// add the current clipping
