@@ -1775,6 +1775,7 @@ static status_t
 bfs_write_attr_stat(fs_volume* _volume, fs_vnode* file, void* cookie,
 	const struct stat* stat, int statMask)
 {
+	// TODO: Implement (at least setting the size)!
 	return EOPNOTSUPP;
 }
 
