@@ -162,7 +162,17 @@ class BDateTime {
 		BTime				Time() const;
 		void				SetTime(const BTime &time);
 
-		uint32				Time_t() const;
+		int32				Time_t() const;
+		void				SetTime_t(uint32 seconds);
+
+		bool				operator!=(const BDateTime& dateTime) const;
+		bool				operator==(const BDateTime& dateTime) const;
+
+		bool				operator<(const BDateTime& dateTime) const;
+		bool				operator<=(const BDateTime& dateTime) const;
+
+		bool				operator>(const BDateTime& dateTime) const;
+		bool				operator>=(const BDateTime& dateTime) const;
 
 	private:
 		BDate				fDate;
