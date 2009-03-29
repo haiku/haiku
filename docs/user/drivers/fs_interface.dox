@@ -8,7 +8,7 @@
  *		Axel Dörfler <axeld@pinc-software.de>
  *
  * Corresponds to:
- *		/trunk/headers/os/drivers/fs_interface.h rev 21568
+ *		/trunk/headers/os/drivers/fs_interface.h rev 29781
  */
 
 /*!
@@ -21,6 +21,8 @@
 */
 
 ///// write_stat_mask //////
+// TODO: These have been superseded by the B_STAT_* flags in <NodeMonitor.h>.
+// Move the documentation there!
 
 /*!
 	\enum write_stat_mask
@@ -65,11 +67,22 @@
 	\brief The 'creation time' should be updated.
 */
 
+/*!
+	\def B_STAT_SIZE_INSECURE
+	\brief Flag for the fs_vnode_ops::write_stat hook indicating that the FS
+		is allowed not to clear the additional space when enlarging a file.
+
+	This flag was added because BFS doesn't support sparse files. It will be
+	phased out, when it does.
+/*
+
+
 ///// FS_WRITE_FSINFO_NAME /////
 
 /*!
 	\def FS_WRITE_FSINFO_NAME
-	\brief Passed to file_system_module_info::write_fs_info().
+	\brief Passed to fs_volume_ops::write_fs_info() to indicate that the name
+		of the volume shall be changed.
 */
 
 ///// file_io_vec /////
@@ -101,6 +114,26 @@
 	\code "file_systems/myfs" B_CURRENT_FS_API_VERSION \endcode
 */
 
+
+///// B_VNODE_PUBLISH_REMOVED /////
+
+/*!
+	\def B_VNODE_PUBLISH_REMOVED
+	\brief Flag for publish_vnode() and fs_vnode_ops::create_special_node()
+		indicating that the node shall be published in removed state (i.e. no
+		entry refers to it).
+*/
+
+///// B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE /////
+
+/*!
+	\def B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE
+	\brief Flag for publish_vnode() and fs_volume_ops::get_vnode()
+		indicating that no subnodes shall be created for the node to publish
+		the node shall be published.
+*/
+
+
 ///// file_system_module_info /////
 
 
@@ -127,8 +160,8 @@
 	\var const char *file_system_module_info::pretty_name
 	\brief A NULL-terminated string with a 'pretty' name for you file system.
 
-	Note, if a system wide disk device type constant exists for your file system,
-	it should equal this identifier.
+	Note, if a system wide disk device type constant exists for your file
+	system, it should equal this identifier.
 */
 
 //! @}
@@ -172,1287 +205,39 @@
 //! @{
 
 /*!
-	\fn status_t (*file_system_module_info::mount)(ino_t id, const char *device,
-			uint32 flags, const char *args, fs_volume *_fs, ino_t *_rootVnodeID)
+	\fn status_t (*file_system_module_info::mount)(fs_volume *volume,
+			const char *device, uint32 flags, const char *args,
+			ino_t *_rootVnodeID)
+
 	\brief Mount a volume according to the specified parameters.
 
 	Invoked by the VFS when it has been requested to mount the volume. The FS is
 	supposed to perform whatever one-time initialization is necessary for the
 	volume. It is required to create a volume handle for the volume and pass it
-	back in \a _fs. Moreover it must invoke publish_vnode() for the root node
-	of the volume and pass the ID of the volume back in \a _rootVnodeID.
+	back in \a volume->private_volume and set \a volume->ops to the operation
+	vector for the volume. Moreover it must invoke publish_vnode() for the root
+	node of the volume and pass the ID of the volume back in \a _rootVnodeID.
 
 	A disk-based FS will need to check whether \a device is not \c NULL, open
-	it, and analyze whether the device or image file actually represents a volume
-	of that FS type.
+	it, and analyze whether the device or image file actually represents a
+	volume of that FS type.
 
 	If mounting the volume fails for whatever reason, the hook must return an
 	error code other than \c B_OK. In this case all resources allocated by the
 	hook must be freed before returning. If and only if \c B_OK is returned, the
 	unmount() hook will be invoked at a later point when unmounting the volume.
 
-	\param id The ID of the volume to be mounted. It should be saved in the FS's
-		volume private data (volume handle).
+	\param volume Object created by the VFS to represent the volume. Its
+		\c private_volume and \c ops members must be set by the hooks. All other
+		members are read-only for the FS.
 	\param device The path to the device (or image file) representing the volume
 		to be mounted. Can be \c NULL.
 	\param flags Flags:
 		- \c B_MOUNT_READ_ONLY: Mount the volume read-only.
 	\param args Null-terminated string in driver settings format, containing FS
 		specific parameters.
-	\param _fs Pointer to a pre-allocated variable the volume handle shall be
-		written to.
 	\param _rootVnodeID Pointer to a pre-allocated variable the ID of the
 		volume's root directory shall be written to.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::unmount)(fs_volume fs)
-	\brief Unmounts the given volume.
-
-	Invoked by the VFS when it is asked to unmount the volume. The function must
-	free all resources associated with the mounted volume, including the volume
-	handle. Although the mount() hook called publish_vnode() for the root node
-	of the volume, unmount() must not invoke put_vnode().
-
-	\param fs The volume handle.
-	\return \c B_OK if everything went fine, another error code otherwise. The
-		error code will be ignored, though.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_fs_info)(fs_volume fs,
-			struct fs_info *info)
-	\brief Retrieves general information about the volume.
-
-	The following fields of the \c fs_info structure need to be filled in:
-	- \c flags: Flags applying to the volume, e.g. \c B_FS_IS_READONLY,
-	  \c B_FS_HAS_ATTR, etc.
-	- \c block_size: The size of blocks the volume data are organized in.
-	  Meaningful mainly for disk-based FSs, other FSs should use some reasonable
-	  value for computing \c total_blocks and \c free_blocks.
-	- \c io_size: Preferred size of the buffers passed to read() and write().
-	- \c total_blocks: Total number of blocks the volume contains.
-	- \c free_blocks: Number of free blocks on the volume.
-	- \c total_nodes: Maximal number of nodes the volume can contain. If there is
-	  no such limitation use \c LONGLONG_MAX.
-	- \c free_nodes: Number of additional nodes the volume could contain. If
-	  there is no such limitation use \c LONGLONG_MAX.
-	- \c device_name: The name of the device or image file containing the volume.
-	  Non-disk-based FSs shall fill in an empty string.
-	- \c volume_name: The name of the volume.
-
-	The other values are filled in by the VFS.
-
-	\param fs The volume handle.
-	\param info Pointer to a pre-allocated variable the FS info shall be written
-		to.
-	\return \c B_OK if everything went fine, another error code otherwise. The
-		error code will be ignored, though.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write_fs_info)(fs_volume fs,
-			const struct fs_info *info, uint32 mask)
-	\brief Update filesystem information on the volume.
-
-	You are requested to update certain information on the volume \a fs. The
-	supplied \a info contains the new values filled in for the \a mask.
-	Currently, the only possible mask is solely the \c FS_WRITE_FSINFO_NAME,
-	which asks you to update the volume name represented by the value
-	\c volume_name in the \c fs_info struct.
-
-	\param fs The cookie your filesystem supplied to the volume that should be
-		updated.
-	\param info The structure that contains the new data.
-	\param mask The values of the \a info that need to be updated.
-	\return \c B_OK if everything went fine, if not, one of the error codes.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::sync)(fs_volume fs)
-	\brief Synchronize the cached data with the contents of the disk.
-
-	The VFS layer sometimes wants you to synchronize any cached values with the
-	data on the device.
-
-	This currently only happens when the POSIX sync() function is invoked, for
-	example via the "sync" command line tool.
-
-	\param fs The cookie your filesystem supplied to the volume that should be
-		updated.
-*/
-
-//! @}
-
-/*!
-	\name VNode Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::lookup)(fs_volume fs, fs_vnode dir,
-			const char *name, ino_t *_id, int *_type)
-	\brief Looks up the node a directory entry refers to.
-
-	The VFS uses this hook to resolve path names to vnodes. It is used quite
-	often and should be implemented efficiently.
-
-	If the parameter \a dir does not specify a directory, the function shall
-	fail. It shall also fail, if it is a directory, but does not contain an entry
-	with the given name \a name. Otherwise the function shall invoke get_vnode()
-	for the node the entry refers to and pass back the ID and the type of the
-	node in \a _id and \a _type respectively.
-
-	Note that a directory must contain the special entries \c "." and \c "..",
-	referring to the same directory and the parent directory respectively.
-	lookup() must resolve the nodes accordingly. \c ".." for the root directory
-	of the volume shall be resolved to the root directory itself.
-
-	\param fs The volume handle.
-	\param dir The node handle of the directory.
-	\param name The name of the directory entry.
-	\param _id Pointer to a pre-allocated variable the ID of the found node
-		shall be written to.
-	\param _type Pointer to a pre-allocated variable the type of the found node
-		shall be written to. The type is encoded as in the \c st_mode field of a
-		<tt>struct stat</tt> (bitwise anded with \c S_IFMT).
-	\retval B_OK Everything went fine.
-	\retval B_ENTRY_NOT_FOUND The given directory does not contain an entry with
-		the given name.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::get_vnode_name)(fs_volume fs,
-			fs_vnode vnode, char *buffer, size_t bufferSize)
-	\brief Return the file name of a vnode.
-
-	Note that you don't have to implement this call if it can't be easily done;
-	it's completely optional.
-	If you don't implement it, you'll have to export a NULL pointer for this
-	function in the module definition. In this case, the VFS will find the name
-	by iterating over its parent directory.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param vnode The file system provided cookie associated with this vnode.
-	\param buffer The buffer that the name can be copied into.
-	\param bufferSize The size of the buffer.
-	\retval B_OK You successfully copied the file name into the \a buffer.
-	\retval "other errors" There was some error looking up or copying the name.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::get_vnode)(fs_volume fs, ino_t id,
-			fs_vnode *_vnode, bool reenter)
-	\brief Creates the private data handle to be associated with the node
-		referred to by \a id.
-
-	Invoked by the VFS when it creates the vnode for the respective node.
-	When the VFS no longer needs the vnode in memory (for example when
-	memory is becoming tight), it will your file_system_module_info::put_vnode(),
-	or file_system_module_info::remove_vnode() in case the vnode has been
-	marked removed.
-
-	\param fs The volume handle.
-	\param id The ID of the node.
-	\param _vnode Pointer to a pre-allocated variable the node handle shall be
-		written to.
-	\param reenter \c true if the hook invocation has been caused by the FS
-		itself, e.g. by invoking ::get_vnode().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn \fn status_t (*file_system_module_info::put_vnode)(fs_volume fs,
-			fs_vnode vnode, bool reenter)
-	\brief Deletes the private data handle associated with the specified node.
-
-	Invoked by the VFS when it deletes the vnode for the respective node and the
-	node is not marked removed.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param reenter \c true if the hook invocation has been caused by the FS
-		itself, e.g. by invoking ::put_vnode().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::remove_vnode)(fs_volume fs,
-			fs_vnode vnode, bool reenter)
-	\brief Deletes the private data handle associated with the specified node.
-
-	Invoked by the VFS when it deletes the vnode for the respective node and the
-	node has been marked removed by a call to remove_vnode().
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param reenter \c true if the hook invocation has been caused by the FS
-		itself, e.g. by invoking ::put_vnode().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-//! @}
-
-/*!
-	\name VM file access
-*/
-
-//! @{
-
-/*!
-	\fn bool (*file_system_module_info::can_page)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie)
-	\brief Undocumented. TODO.
-
-	TODO: In both the dos and the bfs implementations this thing simply returns
-	false... Is there anything more to it?
-	This call might be removed in the future - it's currently unused.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_pages)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, off_t pos, const iovec *vecs, size_t count,
-			size_t *_numBytes, bool reenter)
-	\brief Undocumented. TODO.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write_pages)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, off_t pos, const iovec *vecs, size_t count,
-			size_t *_numBytes, bool reenter)
-	\brief Undocumented. TODO.
-*/
-
-//! @}
-
-/*!
-	\name Cache File Access
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::get_file_map)(fs_volume fs,
-			fs_vnode vnode, off_t offset, size_t size, struct file_io_vec *vecs,
-			size_t *_count)
-	\brief Fills the \a vecs with the extents of the file data stream.
-
-	This function is called only when you are using the file cache, but if you
-	use it, its implementation is mandatory.
-
-	TODO: complete me
-*/
-
-//! @}
-
-/*!
-	\name Standard Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::ioctl)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, ulong op, void *buffer, size_t length)
-	\brief Perform file system specific operations.
-
-	You can implement a customized API using this call. This can be extremely
-	handy for debugging purposes. There are no obligatory operations for you to
-	implement.
-
-	If you don't want to use this feature, you don't have to implement it.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param vnode The file system provided cookie associated with the vnode (if
-		applicable).
-	\param cookie The file system provided cookie associated with, for example,
-		an open file (if applicable).
-	\param op The operation code. You will have to define them yourself.
-	\param buffer A buffer (if applicable).
-	\param length The size of the buffer.
-	\return You should return any of your status codes.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::set_flags)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie, int flags)
-	\brief Set the open mode flags for an opened file.
-
-	This function should change the open flags for an opened file.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param vnode The file system provided cookie associated with the vnode.
-	\param cookie The file system provided cookie associated with the opened
-		file.
-	\param flags The new flags.
-	\return \c B_OK if the operation succeeded, or else an error code.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::select)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, uint8 event, uint32 ref, selectsync *sync)
-	\brief Selects the specified \a vnode with the specified \a events.
-
-	This function is called by the VFS whenever select() or poll() is called on
-	a file descriptor that points to your file system.
-
-	You have to check if the condition of the select() (ie. if there is data
-	available if event is B_SELECT_READ) is already satisfied, and call
-	notify_select_event() with the \a sync and \a ref arguments you retrieve
-	here.
-
-	Additionally, when a vnode is selected this way, you have to call
-	notify_select_event() whenever the condition becomes true until the
-	vnode is deselected again via file_system_module_info::deselect().
-
-	This function is optional. If you don't export it, the default implementation
-	in the VFS will call notify_select_event() directly which will be sufficient
-	for most file systems.
-
-	Note that while select() and the corresponding deselect() are invoked by the
-	same thread, notifications are usually generated by other threads. It is
-	your responsibility to make sure that notify_select_event() is never called
-	for a selectsync object for which deselect() has already returned. This is
-	commonly done by holding the same lock when invoking notify_select_event()
-	and when removing the selectsync object from the cookie in deselect().
-	Such a lock can be any lock, usually one that is associated with the node or
-	the volume.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::deselect)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, uint8 event, selectsync *sync)
-	\brief Deselects the specified \a vnode from a previous select() call.
-
-	This function is called by the VFS whenever a select() or poll() function
-	exits that previously called file_system_module_info::select() on that
-	\a vnode.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::fsync)(fs_volume fs, fs_vnode vnode)
-	\brief Synchronize the buffers with the on disk data.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param vnode The file system provided cookie associated with the vnode.
-	\return \c B_OK if the operation succeeded, or else an error code.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_symlink)(fs_volume fs,
-			fs_vnode link, char *buffer, size_t *_bufferSize)
-	\brief Read the value of a symbolic link.
-
-	If the function is successful, the symlink string shall be written to the
-	buffer. It does not need to be null-terminated. If the buffer is too small
-	to hold the complete string, only the first \c *_bufferSize bytes of the
-	string shall be written to the buffer; the buffer shall not be
-	null-terminated in this case. Furthermore the variable \a _bufferSize
-	points to shall be set to the length of the string written to the buffer,
-	not including any terminating null character (if written).
-
-	\param fs The volume handle.
-	\param link The node handle.
-	\param buffer Pointer to a pre-allocated buffer the link value shall be
-		written to.
-	\param _bufferSize Pointer to a pre-allocated variable containing the size
-		of the buffer supplied to the function. Upon successful completion the
-		hook shall store the number of bytes actually written into the buffer
-		in the variable.
-	\retval B_OK Everything went fine.
-	\retval B_BAD_VALUE \a link does not identify a symbolic link.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::create_symlink)(fs_volume fs,
-			fs_vnode dir, const char *name, const char *path, int mode)
-	\brief Create a new symbolic link.
-
-	Your implementation should check if the user has permission to perform this
-	operation.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param dir The file system provided cookie associated with the directory
-		the symbolic link should be created in.
-	\param name The name of the new symbolic link.
-	\param path The path of the original inode the symbolic link should refer to.
-	\param mode The mode that this symbolic link should be created in. (TODO
-		what exactly?)
-	\return \c B_OK if you succeeded, or an error code if you failed.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::link)(fs_volume fs, fs_vnode dir,
-			const char *name, fs_vnode vnode)
-	\brief Create a new hard link.
-
-	You should make sure the user has the proper permissions.
-
-	The virtual file system will request the creation of symbolic links with
-	create_symlink().
-
-	If you don't implement this function, the VFS will return \c EROFS
-	when a hard link is requested.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param dir The cookie associated to the directory where the link should be
-		saved.
-	\param name The name the link should have.
-	\param vnode The vnode the new link should resolve to.
-	\retval B_OK The hard link is properly created.
-	\retval B_NOT_ALLOWED The user does not have the proper permissions.
-	\retval "other errors" Another error occured.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::unlink)(fs_volume fs, fs_vnode dir,
-			const char *name)
-	\brief Remove a node or directory.
-
-	You should make sure the user has the proper permissions.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param dir The parent directory of the node that should be removed.
-	\param name The name of the node that should be deleted.
-	\retval B_OK Removal succeeded.
-	\retval B_ENTRY_NOT_FOUND The entry does not exist.
-	\retval B_NOT_ALLOWED The user does not have the proper permissions.
-	\retval B_DIRECTORY_NOT_EMPTY The \a name refers to a directory. The virtual
-		file system expects directories to be emptied before they can be unlinked.
-	\retval "other errors" Another error occured.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rename)(fs_volume fs,
-			fs_vnode fromDir, const char *fromName, fs_vnode toDir,
-			const char *toName)
-	\brief Rename and/or relocate a vnode.
-
-	The virtual file system merely relays the request, so make sure the user is
-	not changing the file name to something like '.', '..' or anything starting
-	with '/'.
-
-	This also means that it if the node is a directory, that it should not be
-	moved into one of its own children.
-
-	You should also make sure the user has the proper permissions.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param fromDir The cookie of the parent directory the vnode should be moved
-		from.
-	\param fromName The old name of the node.
-	\param toDir The cookie of the parent directory the vnode should be moved to.
-	\param toName The new name of the node.
-	\retval B_OK The renaming and relocating succeeded.
-	\retval B_BAD_VALUE One of the supplied parameters were invalid.
-	\retval B_NOT_ALLOWED The user does not have the proper permissions.
-	\retval "other errors" Another error condition was encountered.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::access)(fs_volume fs, fs_vnode vnode,
-			int mode)
-	\brief Checks whether the current user is allowed to access the node in the
-		specified way.
-
-	\a mode is a bitwise combination of:
-	- \c R_OK: Read access.
-	- \c W_OK: Write access.
-	- \c X_OK: Execution.
-
-	If the current user does not have any of the access permissions represented
-	by the set bits, the function shall return \c B_NOT_ALLOWED. As a special
-	case, if the volume is read-only and write access is requested,
-	\c B_READ_ONLY_DEVICE shall be returned. If the requested access mode
-	complies with the user's access permissions, the function shall return
-	\c B_OK.
-
-	For most FSs the permissions a user has are defined by the \c st_mode,
-	\c st_uid, and \c st_gid fields of the node's stat data. As a special
-	exception, the root user (<tt>geteuid() == 0</tt>) does always have
-	read and write permissions, execution permission only when at least one of
-	the execution permission bits are set.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param mode The access mode mask.
-	\retval B_OK The user has the permissions to access the node in the requested
-		way.
-	\retval B_READ_ONLY_DEVICE The volume is read-only, but the write access has
-		been requested.
-	\retval B_NOT_ALLOWED The user does not have all permissions to access the
-		node in the requested way.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_stat)(fs_volume fs,
-			fs_vnode vnode, struct stat *stat)
-	\brief Retrieves the stat data for a given node.
-
-	All values of the <tt>struct stat</tt> save \c st_dev, \c st_ino, \c st_rdev,
-	and \c st_type need to be filled in.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param stat Pointer to a pre-allocated variable the stat data shall be
-		written to.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write_stat)(fs_volume fs,
-			fs_vnode vnode, const struct stat *stat, uint32 statMask)
-	\brief Update the stats for a vnode.
-
-	You should make sure that the new values are valid and that the user has the
-	proper permissions to update the stats.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The cookie to the vnode.
-	\param stat The structure with the updated values.
-	\param statMask One of the #write_stat_mask enumeration, which forms a mask
-		of which of the values in \a stat should actually be updated.
-	\retval B_OK The update succeeded.
-	\retval B_NOT_ALLOWED The user does not have the proper permissions.
-	\retval "other errors" Another error condition occured.
-*/
-
-//! @}
-
-/*!
- \name File Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::create)(fs_volume fs, fs_vnode dir,
-			const char *name, int openMode, int perms, fs_cookie *_cookie,
-			ino_t *_newVnodeID)
-	\brief Create a new file.
-
-	Your implementation shall check whether it is possible to create the node.
-	You will need to take the user's permissions into account. When you create
-	a new file, you will also have to open it. This means also checking the
-	permissions the user requires to open the file according to the \a mode.
-	See \link file_system_module_info::open() open() \endlink for the possible
-	values of \a mode.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param dir The file system provided cookie associated with the directory
-		where the file should appear.
-	\param name The name of the new file.
-	\param openMode The mode associated to the file.
-	\param perms The permissions the new file should have.
-	\param[out] _cookie In case of success, the you can store your file system
-		data for this node in this variable.
-	\param[out] _newVnodeID In case of success, you can store the new vnode id
-		in this variable.
-	\return You should return \c B_OK if creating the new node succeeded, and if
-		you put data in both \a _cookie and \a _newVnodeID. Else you should return
-		an error code.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::open)(fs_volume fs, fs_vnode vnode,
-			int openMode, fs_cookie *_cookie)
-	\brief Opens the given node.
-
-	The function shall check whether it is possible to open the node according to
-	the mode specified by \c openMode (also considering the user's access
-	permissions), create a node cookie, and store it in the variable
-	\a _cookie points to.
-
-	The open mode \a openMode is encoded in the same way as the parameter of the
-	POSIX function \c open(), i.e. it is either \c O_RDONLY, \c O_WRONLY, or
-	\c O_RDWR, bitwise or'ed with flags. The only relevant flags for this hook
-	are \c O_TRUNC and \c O_NONBLOCK.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param openMode The open mode.
-	\param _cookie Pointer to a pre-allocated variable the node cookie shall be
-		written to.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie)
-	\brief Closes the given node cookie.
-
-	The hook is invoked, when closing the node has been requested. At this point
-	other threads might still use the cookie, i.e. still execute hooks to which
-	the cookie has been passed. If the FS supports blocking I/O operations, this
-	hook should make sure to unblock all currently blocking threads performing
-	an operation using the cookie, and mark the cookie such that no further
-	threads will block using it.
-
-	For many FSs this hook is a no-op - it's mandatory to be exported, though.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The node cookie as returned by open().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_cookie)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Frees the given node cookie.
-
-	The hook is invoked after close(), when no other thread uses or is going to
-	use the cookie. All resources associated with the cookie must be freed.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The node cookie as returned by open().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, off_t pos, void *buffer, size_t *length)
-	\brief Reads data from a file.
-
-	This function should fail if
-	- the node is not a file,
-	- the cookie has not been opened for reading,
-	- \a pos is negative, or
-	- some other error occurs while trying to read the data, and no data have
-	been read at all.
-
-	The number of bytes to be read is stored in the variable pointed to by
-	\a length. If less data is  available at file position \a pos, or if \a pos
-	if greater than the size of the file, only as many data as available shall
-	be read, the function shall store the number of bytes actually read into the
-	variable pointed to by \a length, and return \c B_OK.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The node cookie as returned by open().
-	\param pos The file position where to start reading data.
-	\param buffer Pointer to a pre-allocated buffer the read data shall be
-		written to.
-	\param length Pointer to a pre-allocated variable containing the size of the
-		buffer when invoked, and into which the size of the data actually read
-		shall be written.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, off_t pos, const void *buffer, size_t *length)
-	\brief Write data to a file.
-
-	This function should fail if
-	- the node is not a file,
-	- the cookie has not been opened for writing,
-	- \a pos is negative, or
-	- some other error occurs while trying to read the data, and no data have
-	been read at all.
-
-	The number of bytes to be written is stored in the variable pointed to by
-	\a length. If not all bytes could be written, that variable must be updated
-	to reflect the amount of actually written bytes. If an error prevented
-	you from writing the full amount, an appropriate error code should be
-	returned.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param vnode The file system provided cookie associated with the vnode.
-	\param cookie The file system provided cookie associated with the file.
-	\param pos The position to start writing.
-	\param buffer The buffer that contains the data that will need to be written.
-	\param length The length of the data that needs to be written.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-//! @}
-
-/*!
-	\name Directory Operations
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::create_dir)(fs_volume fs, fs_vnode
-			parent, const char *name, int perms, ino_t *_newVnodeID)
-	\brief Create a new directory.
-
-	Your implementation should make sure that the directory actually can be
-	created in the \a parent directory. You will have to check if the user has
-	permissions to actually write to the \a parent. If not, this function should
-	fail (probably with \c B_NOT_ALLOWED, or in case of a read-only filesystem,
-	with \c B_READ_ONLY_DEVICE). If the operation succeeds, you should put the
-	new vnode id in \a _newVnodeID.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param parent The file system provided cookie associated with the parent
-		node.
-	\param name The name the new directory should have.
-	\param perms The permissions the new directory should have.
-	\param[out] _newVnodeID If creating the directory succeeds, than you should
-		put the new vnode id in this variable.
-	\return If the operation succeeds and the \a _newVnodeID is populated with
-		the new vnode, then you should return \c B_OK. Else you should return with
-		an error code.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::remove_dir)(fs_volume fs, fs_vnode
-			parent, const char *name)
-	\brief Remove a directory.
-
-	You should make sure the user has the proper permissions. You should also
-	check that the directory is empty.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param parent The file system provided cookie associated with the parent
-		node.
-	\param name The \a name of the directory that needs to be removed.
-	\retval B_OK Operation succeeded.
-	\retval B_DIRECTORY_NOT_EMPTY The directory is not empty.
-	\retval B_ENTRY_NOT_FOUND There is no directory with this \a name.
-	\retval B_NOT_A_DIRECTORY The entry is not a directory.
-	\retval "other errors" Other errors occured.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::open_dir)(fs_volume fs, fs_vnode vnode,
-			fs_cookie *_cookie)
-	\brief Opens the given directory node.
-
-	If the specified node is not a directory, or if the current user does not
-	have the permissions to read the directory, the function shall fail.
-	Otherwise it shall allocate a directory cookie and store it in the variable
-	\a _cookie points to. A subsequent read_dir() using the cookie shall start
-	reading the first entry of the directory.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param _cookie Pointer to a pre-allocated variable the directory cookie shall
-		be written to.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close_dir)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Closes the given directory cookie.
-
-	Generally the situation is similar to the one described for close(). In
-	practice it is a bit, though, since directory cookies are exclusively used
-	for directory iteration, and it normally doesn't make sense to have multiple
-	threads read the same directory concurrently. Furthermore reading a directory
-	should not block. Therefore for most FSs this hook is a no-op.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The directory cookie as returned by open_dir().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_dir_cookie)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Frees the given directory cookie.
-
-	The hook is invoked after close_dir(), when no other thread uses or is going
-	to use the cookie. All resources associated with the cookie must be freed.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The directory cookie as returned by open_dir().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_dir)(fs_volume fs, fs_vnode vnode,
-			fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
-	\brief Reads the next one or more directory entries.
-
-	The number of entries to be read at maximum is stored in the variable \a _num
-	points to.
-
-	Per read \c dirent the following fields have to be filled in:
-	- \c d_dev: The volume ID.
-	- \c d_ino: The ID of the node the entry refers to.
-	- \c d_name: The null-terminated name of the entry.
-	- \c d_reclen: The size of the \c dirent structure in bytes, starting from
-	  the beginning of the structure, counting all bytes up to and including
-	  the null-termination char of the name stored in \c d_name.
-
-	If more than one entry is read, the corresponding \c dirent structures are
-	tightly packed, i.e. the second entry begins directly after the end of the
-	first one (i.e. \c d_reclen bytes after the beginning of the first one).
-	Most FSs read only one entry at a time though, even if more are requested.
-
-	When the function is invoked after the end of the directory has been reached,
-	it shall set the variable \a _num points to to \c 0 and return \c B_OK. If
-	the provided buffer is too small to contain even the single next entry,
-	\c B_BUFFER_OVERFLOW shall be returned. It shall not fail, if at least one
-	entry has been read, and the buffer is just too small to hold as many entries
-	as requested.
-
-	Note that a directory is expected to contain the special entries \c "." and
-	\c "..", referring to the same directory and the parent directory
-	respectively. The \c dirent structure returned for the \c ".." entry of the
-	volume's root directory shall refer to the root node itself.
-
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The directory cookie as returned by open_dir().
-	\param buffer Pointer to a pre-allocated buffer the directory entries shall
-		be written to.
-	\param bufferSize The size of \a buffer in bytes.
-	\param _num Pointer to a pre-allocated variable, when invoked, containing the
-		number of directory entries to be read, and into which the number of
-		entries actually read shall be written.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rewind_dir)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Resets the directory cookie to the first entry of the directory.
-	\param fs The volume handle.
-	\param vnode The node handle.
-	\param cookie The directory cookie as returned by open_dir().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-//! @}
-
-/*!
-	\name Attribute Directory Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::open_attr_dir)(fs_volume fs, fs_vnode
-			vnode, fs_cookie *_cookie)
-	\brief Open a 'directory' of attributes for a \a vnode.
-
-	See \ref concepts "Generic Concepts" on directories and iterators. Basically,
-	the VFS uses the same way of traversing through attributes as it traverses
-	through a directory.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The vnode on which the file system wants to read the attributes.
-	\param[out] _cookie Pointer where the file system can store a directory
-		cookie if the attribute directory is succesfully opened.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close_attr_dir)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Close a 'directory' of attributes for a \a vnode.
-
-	Note that you should free the cookie in the free_attr_dir_cookie() call.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The vnode on which the 'directory' was opened.
-	\param cookie The cookie associated with this 'directory'.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_attr_dir_cookie)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Free the \a cookie to an attribute 'directory'.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The vnode on which the 'directory' was opened.
-	\param cookie The cookie associated that should be freed.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_attr_dir)(fs_volume fs, fs_vnode
-			vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize,
-			uint32 *_num)
-	\brief Read the next one or more attribute directory entries.
-
-	This method should perform the same tasks as read_dir(), except that the '.'
-	and '..' entries do not have to be present.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rewind_attr_dir)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Rewind the attribute directory iterator to the first entry.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The vnode on which the 'directory' was opened.
-	\param cookie The cookie associated with this 'directory'.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-//! @}
-
-/*!
-	\name Attribute Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::create_attr)(fs_volume fs, fs_vnode
-			vnode, const char *name, uint32 type, int openMode, fs_cookie *_cookie)
-	\brief Create a new attribute.
-
-	If the attribute already exists, you should open it in truncated mode.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param name The name of the attribute.
-	\param type The \c type_code of the attribute.
-	\param openMode The openMode of the associated attribute.
-	\param[out] _cookie A pointer where you can store an associated file system
-		cookie.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::open_attr)(fs_volume fs, fs_vnode
-			vnode, const char *name, int openMode, fs_cookie *_cookie)
-	\brief Open an existing attribute.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param name The name of the attribute.
-	\param openMode The mode in which you want to open the attribute data.
-	\param[out] _cookie A pointer where you can store an associated file system
-		cookie.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close_attr)(fs_volume fs, fs_vnode
-			vnode, fs_cookie cookie)
-	\brief Close access to an attribute.
-
-	Note that you should not delete the cookie yet, you should do that when the
-	VFS calls free_attr_cookie().
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie you associated to this attribute.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_attr_cookie)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie)
-	\brief Free the cookie of an attribute.
-
-	The VFS calls this hook when all operations on the attribute have ceased.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie to the attribute that should be freed.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_attr)(fs_volume fs, fs_vnode
-			vnode, fs_cookie cookie, off_t pos, void *buffer, size_t *length)
-	\brief Read attribute data associated with \a cookie.
-
-	Read until the \a buffer with size \a length is full, or until you are out of
-	data, in which case you should update \a length.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie you associated to this attribute.
-	\param pos The position to start reading from.
-	\param buffer The buffer the data should be copied in.
-	\param length The length of the buffer. Update this variable to the actual
-		amount of bytes read.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write_attr)(fs_volume fs, fs_vnode
-			vnode, fs_cookie cookie, off_t pos, const void *buffer, size_t *length)
-	\brief Write attribute data associated with \a cookie.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie you associated with this attribute.
-	\param pos The position to start writing to.
-	\param buffer The buffer the data should be copied from.
-	\param length The size of the buffer. Update this variable to the actual
-		amount of bytes written.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_attr_stat)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie, struct stat *stat)
-	\brief Get the stats for an attribute.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie you associated with this attribute.
-	\param stat A pointer to a stat structure you should fill.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::write_attr_stat)(fs_volume fs,
-			fs_vnode vnode, fs_cookie cookie, const struct stat *stat, int statMask)
-	\brief Update the stats of an attribute.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param cookie The cookie you associated with this attribute.
-	\param stat A pointer to the new stats you should write.
-	\param statMask One or more of the values of #write_stat_mask that tell you
-		which fields of \a stat are to be updated.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rename_attr)(fs_volume fs,
-			fs_vnode fromVnode, const char *fromName, fs_vnode toVnode,
-			const char *toName)
-	\brief Rename and/or relocate an attribute.
-
-	You should make sure the user has the proper permissions.
-
-	\param fs The file system provided cookie associated with this volume.
-	\param fromVnode The cookie associated with the vnode the attribute currently
-		is related to.
-	\param fromName The old name of the attribute.
-	\param toVnode The cookie associated with the vnode the attribute should be
-		moved to. This can be the same as \a fromVnode, in which case it only means
-		the attribute should be renamed.
-	\param toName The new name of the attribute.This can be the same as
-		\a fromName, in which case it only means the attribute should be relocated.
-	\retval B_OK The renaming and/or relocating succeeded.
-	\retval B_BAD_VALUE One of the supplied parameters were invalid.
-	\retval B_NOT_ALLOWED The user does not have the proper permissions.
-	\retval "other errors" Another error condition was encountered.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::remove_attr)(fs_volume fs,
-			fs_vnode vnode, const char *name)
-	\brief Remove an attribute.
-
-	\param fs The file system provided cookie to the volume.
-	\param vnode The file system provided cookie to the vnode.
-	\param name The name of the attribute.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-//! @}
-
-/*!
-	\name Index Directory and Operation
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::open_index_dir)(fs_volume fs,
-			fs_cookie *_cookie)
-	\brief Open the list of an indeces as a directory.
-
-	See \ref concepts "Generic Concepts" on directories and iterators. Basically,
-	the VFS uses the same way of traversing through indeces as it traverses
-	through a directory.
-
-	\param fs The file system provided cookie to the volume.
-	\param[out] _cookie Pointer where the file system can store a directory
-		cookie if the index directory is succesfully opened.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close_index_dir)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Close a 'directory' of indeces.
-
-	Note that you should free the cookie in the free_index_dir_cookie() call.:
-
-	\param fs The file system provided cookie to the volume.
- 	\param cookie The cookie associated with this 'directory'.
-	\return B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_index_dir_cookie)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Free the \a cookie to the index 'directory'.
-
-	\param fs The file system provided cookie for the volume.
-	\param cookie The cookie that should be freed.
-	\return B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_index_dir)(fs_volume fs,
-			fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
-	\brief Read the next one or more index entries.
-
-	This method should perform the same task as read_dir(), except that the '.'
-	and the '..' entries don't have to be present.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rewind_index_dir)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Reset the index directory cookie to the first entry of the directory.
-
-	\param fs The file system provided handle to the volume.
-	\param cookie The directory cookie as returned by open_index_dir().
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::create_index)(fs_volume fs,
-			const char *name, uint32 type, uint32 flags)
-	\brief Create a new index.
-
-	\param fs The file system provided handle to the volume.
-	\param name The name of the new index.
-	\param type The type of index. BFS implements the following types:
-		- \c B_INT32_TYPE
-		- \c B_UINT32_TYPE
-		- \c B_INT64_TYPE
-		- \c B_UINT64_TYPE
-		- \c B_FLOAT_TYPE
-		- \c B_DOUBLE_TYPE
-		- \c B_STRING_TYPE
-		- \c B_MIME_STRING_TYPE
-	\param flags There are currently no extra flags specified. This parameter can
-		be ignored.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::remove_index)(fs_volume fs,
-			const char *name)
-	\brief Remove the index with \a name.
-
-	\param fs The file system provided handle to the volume.
-	\param name The name of the index to be removed.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_index_stat)(fs_volume fs,
-			const char *name, struct stat *stat)
-	\brief Read the \a stat of the index with a name.
-
-	\param fs The file system provided handle to the volume.
-	\param name The name of the index to be queried.
-	\param stat A pointer to a structure where you should store the values.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-//! @}
-
-/*!
-	\name Query Operations
-*/
-
-//! @{
-
-/*!
-	\fn status_t (*file_system_module_info::open_query)(fs_volume fs,
-			const char *query, uint32 flags, port_id port, uint32 token,
-			fs_cookie *_cookie)
-	\brief Open a query as a 'directory'.
-
-	TODO: query expressions should be documented and also the format for sending
-	query updates over the port should be updated.
-
-	See \ref concepts "Generic Concepts" on directories and iterators. Basically,
-	the VFS uses the same way of traversing through indeces as it traverses
-	through a directory.
-
-	\param fs The file system provided cookie to the volume.
-	\param query The string that represents a query.
-	\param flags Either one of these flags:
-		- \c #B_LIVE_QUERY The query is live. When a query is live, it is
-		  constantly updated using the \a port. In this case the file system should
-		  be pro-active.
-		- \c #B_QUERY_NON_INDEXED When this parameter is provided, the query
-		  should be carried out over the whole file system. This parameter is
-		  provided with the idea that sometimes the indeces can be out of date. If
-		  the requestor for this query requires absolutely everything to be
-		  queried, it will pass this parameter. Of course, if your indeces are
-		  always up to date, you can ignore this parameter.
-	\param port The id of the port where updates need to be sent to in case the
-		query is live.
-	\param token A token that should be attached to the messages sent over the
-		\a port.
-	\param[out] _cookie The cookie that will be used as 'directory' to traverse
-		through the results of the query.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::close_query)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Close a 'directory' of a query.
-
-	Note that you should free the cookie in the free_query_cookie() call.
-
-	\param fs The file system provided cookie to the volume.
-	\param cookie The cookie that refers to this query.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::free_query_cookie)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Free a cookie of a query.
-
-	\param fs The file system provided cookie to the volume.
-	\param cookie The cookie that should be freed.
-	\return You should return \c B_OK if the creation succeeded, or return an
-		error otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::read_query)(fs_volume fs,
-			fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
-	\brief Read the next one or more entries matching the query.
-
-	This hook function works pretty much the same way as read_dir(), with the
-	difference that it doesn't read the entries of a directory, but the entries
-	matching the given query.
-
-	\param fs The volume handle.
-	\param cookie The query cookie as returned by open_query().
-	\param buffer Pointer to a pre-allocated buffer the directory entries shall
-		be written to.
-	\param bufferSize The size of \a buffer in bytes.
-	\param _num Pointer to a pre-allocated variable, when invoked, containing the
-		number of entries to be read, and into which the number of entries
-		actually read shall be written.
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
-
-/*!
-	\fn status_t (*file_system_module_info::rewind_query)(fs_volume fs,
-			fs_cookie cookie)
-	\brief Reset the query cookie to the first entry of the results.
-
-	\param fs The file system provided handle to the volume.
-	\param cookie The query cookie as returned by open_query().
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
@@ -1598,18 +383,1410 @@
 
 //! @}
 
+
+///// fs_volume_ops /////
+
+
+/*!
+	\struct fs_volume_ops
+	\brief Operations vector for a volume.
+
+	See the \ref fs_modules "introduction to file system modules" for an
+	introduction to writing file systems.
+*/
+
+/*!
+	\name General Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_volume_ops::unmount)(fs_volume *volume)
+	\brief Unmounts the given volume.
+
+	Invoked by the VFS when it is asked to unmount the volume. The function must
+	free all resources associated with the mounted volume, including the volume
+	handle. Although the mount() hook called publish_vnode() for the root node
+	of the volume, unmount() must not invoke put_vnode().
+
+	\param volume The volume object.
+	\return \c B_OK if everything went fine, another error code otherwise. The
+		error code will be ignored, though.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::read_fs_info)(fs_volume *volume,
+			struct fs_info *info)
+	\brief Retrieves general information about the volume.
+
+	The following fields of the \c fs_info structure need to be filled in:
+	- \c flags: Flags applying to the volume, e.g. \c B_FS_IS_READONLY,
+	  \c B_FS_HAS_ATTR, etc.
+	- \c block_size: The size of blocks the volume data are organized in.
+	  Meaningful mainly for disk-based FSs, other FSs should use some reasonable
+	  value for computing \c total_blocks and \c free_blocks.
+	- \c io_size: Preferred size of the buffers passed to read() and write().
+	- \c total_blocks: Total number of blocks the volume contains.
+	- \c free_blocks: Number of free blocks on the volume.
+	- \c total_nodes: Maximal number of nodes the volume can contain. If there
+	  is no such limitation use \c LONGLONG_MAX.
+	- \c free_nodes: Number of additional nodes the volume could contain. If
+	  there is no such limitation use \c LONGLONG_MAX.
+	- \c volume_name: The name of the volume.
+
+	The other values are filled in by the VFS.
+
+	\param volume The volume object.
+	\param info Pointer to a pre-allocated variable the FS info shall be written
+		to.
+	\return \c B_OK if everything went fine, another error code otherwise. The
+		error code will be ignored, though.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::write_fs_info)(fs_volume *volume,
+			const struct fs_info *info, uint32 mask)
+	\brief Update filesystem information on the volume.
+
+	You are requested to update certain information on the given volume. The
+	supplied \a info contains the new values filled in for the \a mask.
+	Currently, the only possible mask is solely the \c FS_WRITE_FSINFO_NAME,
+	which asks you to update the volume name represented by the value
+	\c volume_name in the \c fs_info struct.
+
+	\param volume The volume object.
+	\param info The structure that contains the new data.
+	\param mask The values of the \a info that need to be updated.
+	\return \c B_OK if everything went fine, if not, one of the error codes.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::sync)(fs_volume *volume)
+	\brief Synchronize the cached data with the contents of the disk.
+
+	The VFS layer sometimes wants you to synchronize any cached values with the
+	data on the device.
+
+	This currently only happens when the POSIX sync() function is invoked, for
+	example via the "sync" command line tool.
+
+	\param volume The volume object.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::get_vnode)(fs_volume *volume, ino_t id,
+			fs_vnode *vnode, int *_type, uint32 *_flags, bool reenter)
+	\brief Creates the private data handle to be associated with the node
+		referred to by \a id.
+
+	Invoked by the VFS when it creates the vnode for the respective node.
+	When the VFS no longer needs the vnode in memory (for example when
+	memory is becoming tight), it will your file_system_module_info::put_vnode(),
+	or file_system_module_info::remove_vnode() in case the vnode has been
+	marked removed.
+
+	The hook has to initialize \a vnode->private_node with its handle created
+	for the node and \a vnode->ops with the operation vector for the node.
+
+	\param volume The volume object.
+	\param id The ID of the node.
+	\param vnode Pointer to a node object to be initialized.
+	\param reenter \c true if the hook invocation has been caused by the FS
+		itself, e.g. by invoking ::get_vnode().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Index Directory and Operation
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_volume_ops::open_index_dir)(fs_volume *volume,
+			void **_cookie)
+	\brief Open the list of an indices as a directory.
+
+	See \ref concepts "Generic Concepts" on directories and iterators.
+	Basically, the VFS uses the same way of traversing through indeces as it
+	traverses through a directory.
+
+	\param volume The volume object.
+	\param[out] _cookie Pointer where the file system can store a directory
+		cookie if the index directory is succesfully opened.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::close_index_dir)(fs_volume *volume,
+			void *cookie)
+	\brief Close a 'directory' of indices.
+
+	Note that you should free the cookie in the free_index_dir_cookie() call.
+
+	\param volume The volume object.
+ 	\param cookie The cookie associated with this 'directory'.
+	\return B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::free_index_dir_cookie)(fs_volume *volume,
+			void *cookie)
+	\brief Free the \a cookie to the index 'directory'.
+
+	\param volume The volume object.
+	\param cookie The cookie that should be freed.
+	\return B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::read_index_dir)(fs_volume *volume,
+			void *cookie, struct dirent *buffer, size_t bufferSize,
+			uint32 *_num)
+	\brief Read the next one or more index entries.
+
+	This method should perform the same task as fs_vnode_ops::read_dir(),
+	except that the '.' and the '..' entries don't have to be present.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::rewind_index_dir)(fs_volume *volume,
+			void *cookie)
+	\brief Reset the index directory cookie to the first entry of the directory.
+
+	\param volume The volume object.
+	\param cookie The directory cookie as returned by open_index_dir().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::create_index)(fs_volume *volume,
+			const char *name, uint32 type, uint32 flags)
+	\brief Create a new index.
+
+	\param volume The volume object.
+	\param name The name of the new index.
+	\param type The type of index. BFS implements the following types:
+		- \c B_INT32_TYPE
+		- \c B_UINT32_TYPE
+		- \c B_INT64_TYPE
+		- \c B_UINT64_TYPE
+		- \c B_FLOAT_TYPE
+		- \c B_DOUBLE_TYPE
+		- \c B_STRING_TYPE
+		- \c B_MIME_STRING_TYPE
+	\param flags There are currently no extra flags specified. This parameter
+		can be ignored.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::remove_index)(fs_volume *volume,
+			const char *name)
+	\brief Remove the index with \a name.
+
+	\param volume The volume object.
+	\param name The name of the index to be removed.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::read_index_stat)(fs_volume *volume,
+			const char *name, struct stat *stat)
+	\brief Read the \a stat of the index with a name.
+
+	\param volume The volume object.
+	\param name The name of the index to be queried.
+	\param stat A pointer to a structure where you should store the values.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Query Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_volume_ops::open_query)(fs_volume *volume,
+			const char *query, uint32 flags, port_id port, uint32 token,
+			void **_cookie)
+	\brief Open a query as a 'directory'.
+
+	TODO: query expressions should be documented and also the format for sending
+	query updates over the port should be updated.
+
+	See \ref concepts "Generic Concepts" on directories and iterators.
+	Basically, the VFS uses the same way of traversing through indices as it
+	traverses through a directory.
+
+	\param volume The volume object.
+	\param query The string that represents a query.
+	\param flags Any combination of none or more of these flags:
+		- \c #B_LIVE_QUERY The query is live. When a query is live, it is
+		  constantly updated using the \a port. The FS must invoke the functions
+		  notify_query_entry_created() and notify_query_entry_removed() whenever
+		  an entry starts respectively stops to match the query predicate.
+		- \c #B_QUERY_NON_INDEXED Normally at least one of the attributes used
+		  in the query string should be indexed. If none is, this hook is
+		  allowed to fail, unless this flag is specified. Usually an
+		  implementation will simply add a wildcard match for any complete
+		  index ("name", "last_modified", or "size") to the query expression.
+	\param port The id of the port where updates need to be sent to in case the
+		query is live.
+	\param token A token that should be attached to the messages sent over the
+		\a port.
+	\param[out] _cookie The cookie that will be used as 'directory' to traverse
+		through the results of the query.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::close_query)(fs_volume *volume, void *cookie)
+	\brief Close a 'directory' of a query.
+
+	Note that you should free the cookie in the free_query_cookie() call.
+
+	\param volume The volume object.
+	\param cookie The cookie that refers to this query.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::free_query_cookie)(fs_volume *volume,
+			void *cookie)
+	\brief Free a cookie of a query.
+
+	\param volume The volume object.
+	\param cookie The cookie that should be freed.
+	\return You should return \c B_OK if the creation succeeded, or return an
+		error otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::read_query)(fs_volume *volume, void *cookie,
+			struct dirent *buffer, size_t bufferSize, uint32 *_num)
+	\brief Read the next one or more entries matching the query.
+
+	This hook function works pretty much the same way as
+	fs_vnode_ops::read_dir(), with the difference that it doesn't read the
+	entries of a directory, but the entries matching the given query. Unlike the
+	fs_vnode_ops::read_dir() hook, this hook also has to fill in the
+	dirent::d_pino field.
+
+	\param volume The volume object.
+	\param cookie The query cookie as returned by open_query().
+	\param buffer Pointer to a pre-allocated buffer the directory entries shall
+		be written to.
+	\param bufferSize The size of \a buffer in bytes.
+	\param _num Pointer to a pre-allocated variable, when invoked, containing
+		the number of entries to be read, and into which the number of entries
+		actually read shall be written.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::rewind_query)(fs_volume *volume, void *cookie)
+	\brief Reset the query cookie to the first entry of the results.
+
+	\param volume The volume object.
+	\param cookie The query cookie as returned by open_query().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name FS Layer Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_volume_ops::all_layers_mounted)(fs_volume *volume)
+	\brief TODO: Document!
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::create_sub_vnode)(fs_volume *volume, ino_t id,
+			fs_vnode *vnode)
+	\brief TODO: Document!
+*/
+
+/*!
+	\fn status_t (*fs_volume_ops::delete_sub_vnode)(fs_volume *volume,
+			fs_vnode *vnode)
+	\brief TODO: Document!
+*/
+
+//! @}
+
+
+///// fs_vnode_ops /////
+
+
+/*!
+	\struct fs_vnode_ops
+	\brief Operations vector for a node.
+
+	See the \ref fs_modules "introduction to file system modules" for an
+	introduction to writing file systems.
+*/
+
+/*!
+	\name VNode Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::lookup)(fs_volume *volume, fs_vnode *dir,
+			const char *name, ino_t *_id)
+	\brief Looks up the node a directory entry refers to.
+
+	The VFS uses this hook to resolve path names to vnodes. It is used quite
+	often and should be implemented efficiently.
+
+	If the parameter \a dir does not specify a directory, the function shall
+	fail. It shall also fail, if it is a directory, but does not contain an
+	entry with the given name \a name. Otherwise the function shall invoke
+	get_vnode() for the node the entry refers to and pass back the ID of the
+	node in \a _id.
+
+	Note that a directory must contain the special entries \c "." and \c "..",
+	referring to the same directory and the parent directory respectively.
+	lookup() must resolve the nodes accordingly. \c ".." for the root directory
+	of the volume shall be resolved to the root directory itself.
+
+	\param volume The volume object.
+	\param dir The node object for the directory.
+	\param name The name of the directory entry.
+	\param _id Pointer to a pre-allocated variable the ID of the found node
+		shall be written to.
+	\retval B_OK Everything went fine.
+	\retval B_NOT_A_DIRECTORY The given node is not a directory.
+	\retval B_ENTRY_NOT_FOUND The given directory does not contain an entry with
+		the given name.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::get_vnode_name)(fs_volume *volume,
+			fs_vnode *vnode, char *buffer, size_t bufferSize)
+	\brief Return the file name of a directory vnode.
+
+	Normally file systems don't support hard links for directories, which means
+	that a directory can be addressed by a unique path. This hook returns the
+	name of the directory's entry in its parent directory.
+
+	Note that you don't have to implement this call if it can't be easily done;
+	it's completely optional.
+	If you don't implement it, you'll have to export a NULL pointer for this
+	function in the module definition. In this case, the VFS will find the name
+	by iterating over its parent directory.
+
+	If invoked for a non-directory node the hook is allowed to fail.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param buffer The buffer that the name can be copied into.
+	\param bufferSize The size of the buffer.
+	\retval B_OK You successfully copied the file name into the \a buffer.
+	\retval "other errors" There was some error looking up or copying the name.
+*/
+
+/*!
+	\fn \fn status_t (*fs_vnode_ops::put_vnode)(fs_volume *volume,
+			fs_vnode *vnode, bool reenter)
+	\brief Deletes the private data handle associated with the specified node.
+
+	Invoked by the VFS when it deletes the vnode for the respective node and the
+	node is not marked removed.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param reenter \c true if the hook invocation has been caused by the FS
+		itself, e.g. by invoking ::put_vnode().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::remove_vnode)(fs_volume *volume,
+			fs_vnode *vnode, bool reenter)
+	\brief Deletes the private data handle associated with the specified node.
+
+	Invoked by the VFS when it deletes the vnode for the respective node and the
+	node has been marked removed by a call to remove_vnode().
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param reenter \c true if the hook invocation has been caused by the FS
+		itself, e.g. by invoking ::put_vnode().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name VM file access
+*/
+
+//! @{
+
+/*!
+	\fn bool (*fs_vnode_ops::can_page)(fs_volume *volume, fs_vnode *vnode,
+		void *cookie)
+	\brief Deprecated.
+	\deprecated This is an obsolete hook that is never invoked.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_pages)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, off_t pos, const iovec *vecs, size_t count,
+			size_t *_numBytes)
+	\brief Deprecated.
+	\deprecated This is an obsolete hook that is never invoked.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::write_pages)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
+			size_t count, size_t *_numBytes)
+	\brief Deprecated.
+	\deprecated This is an obsolete hook that is never invoked.
+*/
+
+//! @}
+
+/*!
+	\name Asynchronous I/O
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::io)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, io_request *request)
+	\brief TODO: Document!
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::cancel_io)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, io_request *request)
+	\brief TODO: Document!
+*/
+
+//! @}
+
+/*!
+	\name Cache File Access
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::get_file_map)(fs_volume *volume,
+			fs_vnode *vnode, off_t offset, size_t size,
+			struct file_io_vec *vecs, size_t *_count)
+	\brief Fills the \a vecs with the extents of the file data stream.
+
+	This function is called only when you are using the file cache, but if you
+	use it, its implementation is mandatory.
+
+	TODO: complete me
+*/
+
+//! @}
+
+/*!
+	\name Standard Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::ioctl)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, ulong op, void *buffer, size_t length)
+	\brief Perform file system specific operations.
+
+	You can implement a customized API using this call. This can be extremely
+	handy for debugging purposes. There are no obligatory operations for you to
+	implement.
+
+	If you don't want to use this feature, you don't have to implement it.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The file system provided cookie associated with, for example,
+		an open file (if applicable).
+	\param op The operation code. You will have to define them yourself.
+	\param buffer A buffer (if applicable).
+	\param length The size of the buffer.
+	\return You should return any of your status codes.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::set_flags)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, int flags)
+	\brief Set the open mode flags for an opened file.
+
+	This function should change the open flags for an opened file.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The file system provided cookie associated with the opened
+		file.
+	\param flags The new flags.
+	\return \c B_OK if the operation succeeded, or else an error code.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::select)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, uint8 event, selectsync *sync)
+	\brief Selects the specified \a vnode with the specified \a events.
+
+	This function is called by the VFS whenever select() or poll() is called on
+	a file descriptor that points to your file system.
+
+	You have to check if the condition of the select() (ie. if there is data
+	available if event is B_SELECT_READ) is already satisfied, and call
+	notify_select_event() with the \a sync and \a ref arguments you retrieve
+	here.
+
+	Additionally, when a vnode is selected this way, you have to call
+	notify_select_event() whenever the condition becomes true until the
+	vnode is deselected again via file_system_module_info::deselect().
+
+	This function is optional. If you don't export it, the default
+	implementation in the VFS will call notify_select_event() directly which
+	will be sufficient for most file systems.
+
+	Note that while select() and the corresponding deselect() are invoked by the
+	same thread, notifications are usually generated by other threads. It is
+	your responsibility to make sure that notify_select_event() is never called
+	for a selectsync object for which deselect() has already returned. This is
+	commonly done by holding the same lock when invoking notify_select_event()
+	and when removing the selectsync object from the cookie in deselect().
+	Such a lock can be any lock, usually one that is associated with the node or
+	the volume.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The file system provided cookie associated with the opened
+		file.
+	\param event The event to be selected. One of:
+		- \c B_SELECT_READ: File ready for reading.
+    	- \c B_SELECT_WRITE: File ready for writing.
+    	- \c B_SELECT_ERROR: I/O error condition.
+    	- \c B_SELECT_PRI_READ: File ready for priority read.
+    	- \c B_SELECT_PRI_WRITE: File ready for priority write.
+    	- \c B_SELECT_HIGH_PRI_READ: File ready for high priority read.
+    	- \c B_SELECT_HIGH_PRI_WRITE: File ready for high priority write.
+    	- \c B_SELECT_DISCONNECTED: Socket/FIFO/... has been disconnected.
+	\param sync Opaque pointer to be passed to notify_select_event().
+	\return \c B_OK if the operation succeeded, or else an error code.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::deselect)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, uint8 event, selectsync *sync)
+	\brief Deselects the specified \a vnode from a previous select() call.
+
+	This function is called by the VFS whenever a select() or poll() function
+	exits that previously called file_system_module_info::select() on that
+	\a vnode.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The file system provided cookie associated with the opened
+		file.
+	\param event The event to be deselected.
+	\param sync Opaque pointer to be passed to notify_select_event().
+	\return \c B_OK if the operation succeeded, or else an error code.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::fsync)(fs_volume *volume, fs_vnode *vnode)
+	\brief Synchronize the buffers with the on disk data.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\return \c B_OK if the operation succeeded, or else an error code.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_symlink)(fs_volume *volume,
+			fs_vnode *link, char *buffer, size_t *_bufferSize)
+	\brief Read the value of a symbolic link.
+
+	If the function is successful, the symlink string shall be written to the
+	buffer. It does not need to be null-terminated. If the buffer is too small
+	to hold the complete string, only the first \c *_bufferSize bytes of the
+	string shall be written to the buffer; the buffer shall not be
+	null-terminated in this case. Furthermore the variable \a _bufferSize
+	points to shall be set to the length of the string written to the buffer,
+	not including any terminating null character (if written).
+
+	\param volume The volume object.
+	\param link The node object.
+	\param buffer Pointer to a pre-allocated buffer the link value shall be
+		written to.
+	\param _bufferSize Pointer to a pre-allocated variable containing the size
+		of the buffer supplied to the function. Upon successful completion the
+		hook shall store the number of bytes actually written into the buffer
+		in the variable.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a link does not identify a symbolic link.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::create_symlink)(fs_volume *volume,
+			fs_vnode *dir, const char *name, const char *path, int mode)
+	\brief Create a new symbolic link.
+
+	\param volume The volume object.
+	\param dir The node object for the directory the symbolic link should be
+		created in.
+	\param name The name of the new symbolic link.
+	\param path The path the symbolic link should refer to.
+	\param mode The permissions for the newly created symbolic link.
+	\return \c B_OK if you succeeded, or an error code if you failed.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::link)(fs_volume *volume, fs_vnode *dir,
+			const char *name, fs_vnode *vnode)
+	\brief Create a new hard link.
+
+	The virtual file system will request the creation of symbolic links with
+	create_symlink().
+
+	If you don't implement this function, the VFS will return \c EROFS
+	when a hard link is requested. So, if you don't support hard links implement
+	this hook and return an appropriate error code.
+
+	\param volume The volume object.
+	\param dir The node object for the directory where the link should be
+		created.
+	\param name The name the link should have.
+	\param vnode The vnode the new link should resolve to.
+	\retval B_OK The hard link is properly created.
+	\retval B_NOT_ALLOWED The user does not have the proper permissions.
+	\retval "other errors" Another error occured.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::unlink)(fs_volume *volume, fs_vnode *dir,
+			const char *name)
+	\brief Remove a non-directory entry.
+
+	Remove an entry that does refer to a non-directory node. For removing
+	directories the remove_dir() hook is used. If invoked on a directory, this
+	hook shall fail.
+
+	\param volume The volume object.
+	\param dir The node object for the directory containing the entry to be
+		removed.
+	\param name The name of the entry that should be removed.
+	\retval B_OK Removal succeeded.
+	\retval B_ENTRY_NOT_FOUND The entry does not exist.
+	\retval B_NOT_ALLOWED The user does not have the proper permissions.
+	\retval B_IS_A_DIRECTORY The entry refers to a directory.
+	\retval "other errors" Another error occured.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::rename)(fs_volume *volume, fs_vnode *fromDir,
+			const char *fromName, fs_vnode *toDir, const char *toName)
+	\brief Rename and/or relocate an entry.
+
+	The virtual file system merely relays the request, so make sure the user is
+	not changing the file name to something like '.', '..' or anything starting
+	with '/'.
+
+	This also means that it if the entry refers to a directory, that it should
+	not be moved into one of its own children.
+
+	\param volume The volume object.
+	\param fromDir The node object for the parent directory the entry should be
+		moved from.
+	\param fromName The old entry name.
+	\param toDir The node object for the parent directory the entry should be
+		moved to.
+	\param toName The new entry name.
+	\retval B_OK The renaming and relocating succeeded.
+	\retval B_BAD_VALUE One of the supplied parameters were invalid.
+	\retval B_NOT_ALLOWED The user does not have the proper permissions.
+	\retval "other errors" Another error condition was encountered.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::access)(fs_volume *volume, fs_vnode *vnode,
+			int mode)
+	\brief Checks whether the current user is allowed to access the node in the
+		specified way.
+
+	\a mode is a bitwise combination of:
+	- \c R_OK: Read access.
+	- \c W_OK: Write access.
+	- \c X_OK: Execution.
+
+	If the current user does not have any of the access permissions represented
+	by the set bits, the function shall return \c B_NOT_ALLOWED. As a special
+	case, if the volume is read-only and write access is requested,
+	\c B_READ_ONLY_DEVICE shall be returned. If the requested access mode
+	complies with the user's access permissions, the function shall return
+	\c B_OK.
+
+	For most FSs the permissions a user has are defined by the \c st_mode,
+	\c st_uid, and \c st_gid fields of the node's stat data. As a special
+	exception, the root user (<tt>geteuid() == 0</tt>) does always have
+	read and write permissions, execution permission only when at least one of
+	the execution permission bits are set.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param mode The access mode mask.
+	\retval B_OK The user has the permissions to access the node in the
+		requested way.
+	\retval B_READ_ONLY_DEVICE The volume is read-only, but the write access has
+		been requested.
+	\retval B_NOT_ALLOWED The user does not have all permissions to access the
+		node in the requested way.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_stat)(fs_volume *volume, fs_vnode *vnode,
+			struct stat *stat)
+	\brief Retrieves the stat data for a given node.
+
+	All values of the <tt>struct stat</tt> save \c st_dev, \c st_ino,
+	\c st_rdev, and \c st_type need to be filled in.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param stat Pointer to a pre-allocated variable the stat data shall be
+		written to.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::write_stat)(fs_volume *volume, fs_vnode *vnode,
+			const struct stat *stat, uint32 statMask)
+	\brief Update the stats for a vnode.
+
+	You should make sure that the new values are valid.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param stat The structure with the updated values.
+	\param statMask A bitwise combination of one or more of the following,
+		specifying which stat field shall be set:
+		- B_STAT_MODE: Set the node permissions.
+		- B_STAT_UID: Set the owning user.
+		- B_STAT_GID: Set the owner group.
+		- B_STAT_SIZE: Set the size of the file. If enlarged, the file is
+			padded. Normally with zero bytes, but with unspecified data, if
+			B_STAT_SIZE_INSECURE is specified, too.
+		- B_STAT_SIZE_INSECURE: Modifier for B_STAT_SIZE: When enlarging the
+			file padding can be done with arbitrary data.
+		- B_STAT_ACCESS_TIME: Set the access time.
+		- B_STAT_MODIFICATION_TIME: Set the modification time.
+		- B_STAT_CREATION_TIME: Set the creation time.
+		- B_STAT_CHANGE_TIME: Set the change time.
+	\retval B_OK The update succeeded.
+	\retval B_NOT_ALLOWED The user does not have the proper permissions.
+	\retval "other errors" Another error condition occured.
+*/
+
+//! @}
+
+/*!
+ \name File Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::create)(fs_volume *volume, fs_vnode *dir,
+			const char *name, int openMode, int perms, void **_cookie,
+			ino_t *_newVnodeID)
+	\brief Create a new file.
+
+	If an entry with the name \a name already exists in the given directory,
+	the function shall fail.
+
+	If creating the file succeeds, it also needs to be opened. See
+	\link fs_vnode_ops::open() open() \endlink.
+
+	\param volume The volume object.
+	\param dir The node object for the directory where the file should appear.
+	\param name The name of the new file.
+	\param openMode The mode associated to the file.
+	\param perms The permissions the new file should have.
+	\param[out] _cookie In case of success, the storage where you can put your
+		FS specific cookie for the open node.
+	\param[out] _newVnodeID In case of success, you can store the new vnode id
+		in this variable.
+	\return You should return \c B_OK if creating the new node succeeded, and if
+		you put data in both \a _cookie and \a _newVnodeID. Else you should
+		return an error code.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::open)(fs_volume *volume, fs_vnode *vnode,
+			int openMode, void **_cookie)
+	\brief Opens the given node.
+
+	The hook is invoked whenever a file is opened (e.g. via the open() POSIX
+	function).
+
+	The hook can create a node cookie, and store it in the variable
+	\a _cookie points to. The cookie will be passed to all hooks that operate
+	on open files.
+
+	The open mode \a openMode is encoded in the same way as the parameter of the
+	POSIX function \c open(), i.e. it is either \c O_RDONLY, \c O_WRONLY, or
+	\c O_RDWR, bitwise or'ed with flags. The only relevant flags for this hook
+	are \c O_TRUNC and \c O_NONBLOCK. You will normally want to store the open
+	mode in the file cookie, since you'll have to check in read() and write()
+	whether the the respective operation is allowed by the open mode.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param openMode The open mode.
+	\param _cookie Pointer to a pre-allocated variable the node cookie shall be
+		written to.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::close)(fs_volume *volume, fs_vnode *vnode,
+		void *cookie)
+	\brief Closes the given node cookie.
+
+	The hook is invoked, when closing the node has been requested. At this point
+	other threads might still use the cookie, i.e. still execute hooks to which
+	the cookie has been passed. If the FS supports blocking I/O operations, this
+	hook should make sure to unblock all currently blocking threads performing
+	an operation using the cookie, and mark the cookie such that no further
+	threads will block using it.
+
+	For many FSs this hook is a no-op -- it's mandatory to be exported, though.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The node cookie as returned by open().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::free_cookie)(fs_volume *volume,
+		fs_vnode *vnode, void *cookie)
+	\brief Frees the given node cookie.
+
+	The hook is invoked after close(), when no other thread uses or is going to
+	use the cookie. All resources associated with the cookie must be freed.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The node cookie as returned by open().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, off_t pos, void *buffer, size_t *length)
+	\brief Reads data from a file.
+
+	This function should fail if
+	- the node is not a file,
+	- the cookie has not been opened for reading,
+	- \a pos is negative, or
+	- some other error occurs while trying to read the data, and no data have
+		been read at all.
+
+	The number of bytes to be read is stored in the variable pointed to by
+	\a length. If less data is available at file position \a pos, or if \a pos
+	if greater than the size of the file, only as many data as available shall
+	be read, the function shall store the number of bytes actually read into the
+	variable pointed to by \a length, and return \c B_OK.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The node cookie as returned by open().
+	\param pos The file position where to start reading data.
+	\param buffer Pointer to a pre-allocated buffer the read data shall be
+		written to.
+	\param length Pointer to a pre-allocated variable containing the size of the
+		buffer when invoked, and into which the size of the data actually read
+		shall be written.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::write)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, off_t pos, const void *buffer, size_t *length)
+	\brief Write data to a file.
+
+	This function should fail if
+	- the node is not a file,
+	- the cookie has not been opened for writing,
+	- \a pos is negative, or
+	- some other error occurs while trying to write the data, and no data have
+		been written at all.
+
+	The number of bytes to be written is stored in the variable pointed to by
+	\a length. If not all bytes could be written, that variable must be updated
+	to reflect the amount of actually written bytes. If any bytes have been
+	written, the function shall not fail, if an error prevents you from
+	writing the full amount. Only when the error prevented you from writing
+	any data at all an error shall be returned.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The file system provided cookie associated with the file.
+	\param pos The position to start writing.
+	\param buffer The buffer that contains the data that will need to be
+		written.
+	\param length The length of the data that needs to be written.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Directory Operations
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::create_dir)(fs_volume *volume,
+			fs_vnode *parent, const char *name, int perms)
+	\brief Create a new directory.
+
+	\param volume The volume object.
+	\param parent The node object for the directory in which to create the new
+		directory.
+	\param name The name the new directory should have.
+	\param perms The permissions the new directory should have.
+	\return \c B_OK if the directory was created successfully, an error code
+		otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::remove_dir)(fs_volume *volume,
+			fs_vnode *parent, const char *name)
+	\brief Remove a directory.
+
+	The function shall fail, if the entry does not refer to a directory, or if
+	it refers to a directory that is not empty.
+
+	\param volume The volume object.
+	\param parent The node object for the parent directory containing the
+		directory to be removed.
+	\param name The \a name of the directory that needs to be removed.
+	\retval B_OK Operation succeeded.
+	\retval B_ENTRY_NOT_FOUND There is no entry with this \a name.
+	\retval B_NOT_A_DIRECTORY The entry is not a directory.
+	\retval B_DIRECTORY_NOT_EMPTY The directory is not empty. The virtual
+		file system expects directories to be emptied before they can be
+		removed.
+	\retval "other errors" Other errors occured.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::open_dir)(fs_volume *volume, fs_vnode *vnode,
+				void **_cookie)
+	\brief Opens the given directory node.
+
+	If the specified node is not a directory, the function shall fail.
+	Otherwise it shall allocate a directory cookie and store it in the variable
+	\a _cookie points to. A subsequent read_dir() using the cookie shall start
+	reading the first entry of the directory.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param _cookie Pointer to a pre-allocated variable the directory cookie
+		shall be written to.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::close_dir)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie)
+	\brief Closes the given directory cookie.
+
+	Generally the situation is similar to the one described for close(). In
+	practice it is a bit different, though, since directory cookies are
+	exclusively used for directory iteration, and it normally doesn't make sense
+	to have multiple threads read the same directory concurrently. Furthermore
+	usually reading a directory will not block. Therefore for most FSs this hook
+	is a no-op.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The directory cookie as returned by open_dir().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::free_dir_cookie)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie)
+	\brief Frees the given directory cookie.
+
+	The hook is invoked after close_dir(), when no other thread uses or is going
+	to use the cookie. All resources associated with the cookie must be freed.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The directory cookie as returned by open_dir().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_dir)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, struct dirent *buffer, size_t bufferSize,
+			uint32 *_num)
+	\brief Reads the next one or more directory entries.
+
+	The number of entries to be read at maximum is stored in the variable
+	\a _num points to.
+
+	Per read \c dirent the following fields have to be filled in:
+	- \c d_dev: The volume ID.
+	- \c d_ino: The ID of the node the entry refers to.
+	- \c d_name: The null-terminated name of the entry.
+	- \c d_reclen: The size of the \c dirent structure in bytes, starting from
+	  the beginning of the structure, counting all bytes up to and including
+	  the null-termination char of the name stored in \c d_name.
+
+	If more than one entry is read, the corresponding \c dirent structures are
+	tightly packed, i.e. the second entry can begin directly after the end of
+	the first one (i.e. \c d_reclen bytes after the beginning of the first one).
+	The file system should make sure that the dirents are 8-byte aligned, i.e.
+	when another entry follows, \c d_reclen of the previous one should be
+	aligned. A FS doesn't have to read more than one entry at a time, but it is
+	recommended to support that for performance reasons.
+
+	When the function is invoked after the end of the directory has been
+	reached, it shall set the variable \a _num points to to \c 0 and return
+	\c B_OK. If the provided buffer is too small to contain even the single next
+	entry, \c B_BUFFER_OVERFLOW shall be returned. It shall not fail, if at
+	least one entry has been read, and the buffer is just too small to hold as
+	many entries as requested.
+
+	Note that a directory is expected to contain the special entries \c "." and
+	\c "..", referring to the same directory and the parent directory
+	respectively. The \c dirent structure returned for the \c ".." entry of the
+	volume's root directory shall refer to the root node itself.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The directory cookie as returned by open_dir().
+	\param buffer Pointer to a pre-allocated buffer the directory entries shall
+		be written to.
+	\param bufferSize The size of \a buffer in bytes.
+	\param _num Pointer to a pre-allocated variable, when invoked, containing
+		the number of directory entries to be read, and into which the number of
+		entries actually read shall be written.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::rewind_dir)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie)
+	\brief Resets the directory cookie to the first entry of the directory.
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The directory cookie as returned by open_dir().
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Attribute Directory Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::open_attr_dir)(fs_volume *volume,
+			fs_vnode *vnode, void **_cookie)
+	\brief Open a 'directory' of attributes for a \a vnode.
+
+	See \ref concepts "Generic Concepts" on directories and iterators.
+	Basically, the VFS uses the same way of traversing through attributes as it
+	traverses through a directory.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param[out] _cookie Pointer where the file system can store a directory
+		cookie if the attribute directory is succesfully opened.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::close_attr_dir)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie)
+	\brief Close a 'directory' of attributes for a \a vnode.
+
+	Note that you should free the cookie in the free_attr_dir_cookie() call.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie associated with this 'directory'.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::free_attr_dir_cookie)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie)
+	\brief Free the \a cookie to an attribute 'directory'.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie associated that should be freed.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_attr_dir)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie, struct dirent *buffer,
+			size_t bufferSize, uint32 *_num)
+	\brief Read the next one or more attribute directory entries.
+
+	This method should perform the same tasks as read_dir(), except that the '.'
+	and '..' entries do not have to be present. Also, only the \c d_name and
+	\c d_reclen fields have to be filled in.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::rewind_attr_dir)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie)
+	\brief Rewind the attribute directory iterator to the first entry.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie associated with this 'directory'.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Attribute Operations
+*/
+
+//! @{
+
+/*!
+	\fn status_t (*fs_vnode_ops::create_attr)(fs_volume *volume,
+			fs_vnode *vnode, const char *name, uint32 type, int openMode,
+			void **_cookie)
+	\brief Create a new attribute.
+
+	If the attribute already exists, you should open it in truncated mode.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param name The name of the attribute.
+	\param type The \c type_code of the attribute.
+	\param openMode The openMode of the associated attribute.
+	\param[out] _cookie A pointer where you can store an associated file system
+		cookie.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::open_attr)(fs_volume *volume, fs_vnode *vnode,
+			const char *name, int openMode, void **_cookie)
+	\brief Open an existing attribute.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param name The name of the attribute.
+	\param openMode The mode in which you want to open the attribute data.
+	\param[out] _cookie A pointer where you can store an associated file system
+		cookie.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::close_attr)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie)
+	\brief Close access to an attribute.
+
+	Note that you should not delete the cookie yet, you should do that when the
+	VFS calls free_attr_cookie().
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie you associated with this attribute.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::free_attr_cookie)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie)
+	\brief Free the cookie of an attribute.
+
+	The VFS calls this hook when all operations on the attribute have ceased.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie to the attribute that should be freed.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_attr)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, off_t pos, void *buffer, size_t *length)
+	\brief Read attribute data.
+
+	Read until the \a buffer with size \a length is full, or until you are out
+	of data, in which case you should update \a length.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie you associated with this attribute.
+	\param pos The position to start reading from.
+	\param buffer The buffer the data should be copied in.
+	\param length The length of the buffer. Update this variable to the actual
+		amount of bytes read.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::write_attr)(fs_volume *volume, fs_vnode *vnode,
+			void *cookie, off_t pos, const void *buffer, size_t *length)
+	\brief Write attribute data.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie you associated with this attribute.
+	\param pos The position to start writing to.
+	\param buffer The buffer the data should be copied from.
+	\param length The size of the buffer. Update this variable to the actual
+		amount of bytes written.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::read_attr_stat)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie, struct stat *stat)
+	\brief Get the stats for an attribute.
+
+	Only the \c st_size and \c st_type fields need to be filled in.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie you associated with this attribute.
+	\param stat A pointer to a stat structure you should fill.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::write_attr_stat)(fs_volume *volume,
+			fs_vnode *vnode, void *cookie, const struct stat *stat,
+			int statMask)
+	\brief Update the stats of an attribute.
+
+	Currently on the attribute size (B_STAT_SIZE) can be set.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param cookie The cookie you associated with this attribute.
+	\param stat A pointer to the new stats you should write.
+	\param statMask One or more of the values of #write_stat_mask that tell you
+		which fields of \a stat are to be updated.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::rename_attr)(fs_volume *volume,
+			fs_vnode *fromVnode, const char *fromName, fs_vnode *toVnode,
+			const char *toName)
+	\brief Rename and/or relocate an attribute.
+
+	Currently there's no userland or kernel API moving an attribute from one
+	node to another. So this hook is to allowed to only support the case where
+	\a fromVnode and \a toVnode are equal and fail otherwise.
+
+	\param volume The volume object.
+	\param fromVnode The node object for the vnode the attribute currently
+		belongs to.
+	\param fromName The old name of the attribute.
+	\param toVnode The node object for the vnode the attribute should be
+		moved to. This can be the same as \a fromVnode, in which case it only
+		means the attribute should be renamed.
+	\param toName The new name of the attribute. This can be the same as
+		\a fromName, in which case it only means the attribute should be
+		relocated.
+	\retval B_OK The renaming and/or relocating succeeded.
+	\retval B_BAD_VALUE One of the supplied parameters were invalid.
+	\retval B_NOT_ALLOWED The user does not have the proper permissions.
+	\retval "other errors" Another error condition was encountered.
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::remove_attr)(fs_volume *volume,
+			fs_vnode *vnode, const char *name)
+	\brief Remove an attribute.
+
+	\param volume The volume object.
+	\param vnode The node object.
+	\param name The name of the attribute.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Node and FS Layers
+*/
+
+//! {@
+
+/*!
+	\fn status_t (*fs_vnode_ops::create_special_node)(fs_volume *volume,
+			fs_vnode *dir, const char *name, fs_vnode *subVnode, mode_t mode,
+			uint32 flags, fs_vnode *_superVnode, ino_t *_nodeID)
+	\brief TODO: Document!
+*/
+
+/*!
+	\fn status_t (*fs_vnode_ops::get_super_vnode)(fs_volume *volume,
+			fs_vnode *vnode, fs_volume *superVolume, fs_vnode *superVnode)
+	\brief TODO: Document!
+*/
+
+
+//! @}
+
+
 ///// Vnode functions /////
 
 /*!
-	\fn status_t new_vnode(dev_t mountID, ino_t vnodeID,
-			fs_vnode privateNode)
+	\fn status_t new_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
+			fs_vnode_ops *ops)
 	\brief Create the vnode with ID \a vnodeID and associates it with the
-		private data handle \a privateNode, but leaves is in an unpublished state.
+		private data handle \a privateNode, but leaves is in an unpublished
+		state.
 
 	The effect of the function is similar to publish_vnode(), but the vnode
 	remains in an unpublished state, with the effect that a subsequent
 	remove_vnode() will just delete the vnode and not invoke the file system's
-	\link file_system_module_info::remove_vnode remove_vnode() \endlink when
+	\link fs_vnode_ops::remove_vnode remove_vnode() \endlink when
 	the final reference is put down.
 
 	If the vnode shall be kept, publish_vnode() has to be invoked afterwards to
@@ -1622,15 +1799,17 @@
 
 	The function fails, if the vnode does already exist.
 
-	\param mountID The ID of the volume.
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\param privateNode The private data handle to be associated with the node.
+	\param ops The operation vector for this vnode. Is not copied and must be
+		valid through the whole life time of the vnode.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-	\fn status_t publish_vnode(dev_t mountID, ino_t vnodeID,
-			fs_vnode privateNode)
+	\fn status_t publish_vnode(fs_volume *volume, ino_t vnodeID,
+			void *privateNode, fs_vnode_ops *ops, int type, uint32 flags)
 	\brief Creates the vnode with ID \a vnodeID and associates it with the
 		private data handle \a privateNode or just marks it published.
 
@@ -1643,23 +1822,37 @@
 	sequence of new_vnode() and publish_vnode() results in just one reference as
 	well. The reference can be surrendered by calling put_vnode().
 
-	This call is equivalent to the former R5 new_vnode() function.
+	If called after a new_vnode() the \a privateNode and \a ops parameters must
+	be the same as previously passed to new_vnode().
 
-	\param mountID The ID of the volume.
+	This call is equivalent to the former BeOS R5 new_vnode() function.
+
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\param privateNode The private data handle to be associated with the node.
+	\param ops The operation vector for this vnode. Is not copied and must be
+		valid through the whole life time of the vnode.
+	\param type The type of the node as it would appear in a stat::st_mode (with
+		all non type-related bits set to 0).
+	\param flags A bitwise combination of none or more of the following:
+		- B_VNODE_PUBLISH_REMOVED: The node is published in "removed" state,
+			i.e. it has no entry referring to it and releasing the last
+			reference to the vnode will remove it.
+		- B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE: Normally for FIFO or socket type
+			nodes the VFS creates sub node providing the associated
+			functionality. This flag prevents that from happing.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-	\fn status_t get_vnode(dev_t mountID, ino_t vnodeID,
-			fs_vnode *_privateNode)
+	\fn status_t get_vnode(fs_volume *volume, ino_t vnodeID,
+			void **_privateNode)
 	\brief Retrieves the private data handle for the node with the given ID.
 
 	If the function is successful, the caller owns a reference to the vnode. The
 	reference can be surrendered by calling put_vnode().
 
-	\param mountID The ID of the volume.
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\param _privateNode Pointer to a pre-allocated variable the private data
 		handle shall be written to.
@@ -1667,15 +1860,33 @@
 */
 
 /*!
-	\fn status_t put_vnode(dev_t mountID, ino_t vnodeID)
+	\fn status_t put_vnode(fs_volume *volume, ino_t vnodeID)
 	\brief Surrenders a reference to the specified vnode.
-	\param mountID The ID of the volume.
+
+	When the last reference to the vnode has been put the VFS will call
+	fs_vnode_ops::put_vnode() (eventually), respectively, if the node has been
+	marked removed fs_vnode_ops::remove_vnode() (immediately).
+
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-	\fn status_t remove_vnode(dev_t mountID, ino_t vnodeID)
+	\fn status_t acquire_vnode(fs_volume *volume, ino_t vnodeID)
+	\brief Acquires another reference to a vnode.
+
+	Similar to get_vnode() in that the function acquires a vnode reference.
+	Unlike get_vnode() this function can also be invoked between new_vnode()
+	and publish_vnode().
+
+	\param volume The volume object.
+	\param vnodeID The ID of the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+
+/*!
+	\fn status_t remove_vnode(fs_volume *volume, ino_t vnodeID)
 	\brief Marks the specified vnode removed.
 
 	The caller must own a reference to the vnode or at least ensure that a
@@ -1683,17 +1894,16 @@
 	though.
 
 	As soon as the last reference to the vnode has been surrendered, the VFS
-	invokes the file system's
-	\link file_system_module_info::remove_vnode remove_vnode() \endlink
+	invokes the node's \link fs_vnode_ops::remove_vnode remove_vnode() \endlink
 	hook.
 
-	\param mountID The ID of the volume.
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-	\fn status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
+	\fn status_t unremove_vnode(fs_volume *volume, ino_t vnodeID)
 	\brief Clears the "removed" mark of the specified vnode.
 
 	The caller must own a reference to the vnode or at least ensure that a
@@ -1701,27 +1911,37 @@
 
 	The function is usually called when the caller, who has invoked
 	remove_vnode() before realizes that it is not possible to remove the node
-	(e.g. due to an error).
+	(e.g. due to an error). Afterwards the vnode will continue to exist as if
+	remove_vnode() had never been invoked.
 
-	\param mountID The ID of the volume.
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-	\fn status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
-			bool* removed);
+	\fn status_t get_vnode_removed(fs_volume *volume, ino_t vnodeID,
+			bool *_removed)
 	\brief Returns whether the specified vnode is marked removed.
 
 	The caller must own a reference to the vnode or at least ensure that a
 	reference to the vnode exists.
 
-	\param mountID The ID of the volume.
+	\param volume The volume object.
 	\param vnodeID The ID of the node.
-	\param removed Pointer to a pre-allocated variable set to \c true, if the
+	\param _removed Pointer to a pre-allocated variable set to \c true, if the
 		node is marked removed, to \c false otherwise.
 	\return \c B_OK if everything went fine, another error code otherwise.
 */
+
+/*!
+	\fn fs_volume* volume_for_vnode(fs_vnode *vnode)
+	\brief Returns the volume object for a given vnode.
+
+	\param vnode The node object.
+	\return The volume object for the given vnode.
+*/
+
 
 ///// Notification Functions
 
@@ -1752,36 +1972,34 @@
 	\fn status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
 			const char *fromName, ino_t toDirectory,
 			const char *toName, ino_t node)
-	\brief Notifies listeners that a file system entry has been moved to
-		another directory.
+	\brief Notifies listeners that a file system entry has been renamed and/or
+		moved to another directory.
 */
 
 /*!
 	\fn status_t notify_stat_changed(dev_t device, ino_t node,
 			uint32 statFields)
-	\brief Notifies listeners that certain \a statFields of a file system entry
-		were updated.
+	\brief Notifies listeners that certain \a statFields of a node were updated.
 */
 
 /*!
 	\fn status_t notify_attribute_changed(dev_t device, ino_t node,
 			const char *attribute, int32 cause)
-	\brief Notifies listeners that an attribute of a file system entry has been
-		changed.
+	\brief Notifies listeners that an attribute of a node has been changed.
 */
 
 /*!
 	\fn status_t notify_query_entry_created(port_id port, int32 token,
-			dev_t device, ino_t directory, const char *name,
-			ino_t node)
-	\brief Notifies listeners that an entry has entered the result set of a live query.
+			dev_t device, ino_t directory, const char *name, ino_t node)
+	\brief Notifies listeners that an entry has entered the result set of a live
+		query.
 */
 
 /*!
 	\fn status_t notify_query_entry_removed(port_id port, int32 token,
-			dev_t device, ino_t directory, const char *name,
-			ino_t node)
-	\brief Notifies listeners that an entry has left the result set of a live query.
+			dev_t device, ino_t directory, const char *name, ino_t node)
+	\brief Notifies listeners that an entry has left the result set of a live
+		query.
 */
 
 //! @}
