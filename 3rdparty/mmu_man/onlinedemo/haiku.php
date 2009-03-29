@@ -5,6 +5,10 @@
  * Copyright 2007, Francois Revol, revol@free.fr.
  */
 
+// parts inspired by the Free Live OS Zoo
+// http://www.oszoo.org/wiki/index.php/Free_Live_OS_Zoo
+
+
 // relative path to the vnc java applet jar
 // you must *copy* (apache doesn't seem to like symlinks) it there.
 
@@ -31,6 +35,9 @@ define("APPLET_WIDTH", "1024");
 define("APPLET_HEIGHT", "768");
 // vnc protocol base port.
 define("VNCPORTBASE", 5900);
+
+// base port for audio streams
+define("AUDIOPORTBASE", 8080);
 
 // timeout before the demo session is killed, as argument to /bin/sleep
 define("SESSION_TIMEOUT", "20m");
@@ -199,6 +206,11 @@ function qemu_slot()
 	return $_SESSION[QEMU_IDX_VAR];
 }
 
+function audio_port()
+{
+	return AUDIOPORTBASE + qemu_slot();
+}
+
 function vnc_display()
 {
 	return qemu_slot();
@@ -284,7 +296,8 @@ function probe_keymap()
 		if (in_keymaps($lang))
 		{
 			$vnckeymap = $lang;
-			dbg("Detected keymap '" . $vnckeymap . "' from browser headers.");
+			dbg("Detected keymap '" . $vnckeymap .
+			    "' from browser headers.");
 			return;
 		}
 	}
@@ -346,10 +359,15 @@ function output_options_form()
 	echo "</td>\n<td>\n";
 	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\"";
 	echo "value=\"1\" disabled ";
-	if ($enable_sound)
+	if ($enable_sound) {
 		echo "checked ";
-	echo "><a onClick=\"o=window.document.getElementById('sound_cb');o.checked = !o.checked;\"";
-	echo ">Sound</a></input>";
+		echo "><a onClick=\"o=window.document.getElementById('";
+		echo "sound_cb'); o.checked = !o.checked;\"";
+	}
+	echo ">Sound";
+	if ($enable_sound)
+		echo "</a>";
+	echo "</input>";
 	echo "</td>\n</tr>\n";
 
 	/*
@@ -373,7 +391,8 @@ function output_options_form()
 
 	echo "</table>\n";
 	echo "</form>\n";
-	out("NOTE: You will need a Java-enabled browser to display the VNC Applet needed by this demo.");
+	out("NOTE: You will need a Java-enabled browser to display the VNC " .
+	    "Applet needed by this demo.");
 	out("You can however use instead an external <a " .
 	    "href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
 	    ">VNC viewer</a>.");
@@ -410,7 +429,11 @@ function start_qemu()
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
-	$cmd = QEMU_BIN . " " . QEMU_ARGS . " -k " . $vnckeymap . " -vnc " . QEMU_VNC_PREFIX . vnc_display() . " -pidfile " . $pidfile . " " . QEMU_IMAGE_PATH;
+	$cmd = QEMU_BIN . " " . QEMU_ARGS .
+	  " -k " . $vnckeymap .
+	  " -vnc " . QEMU_VNC_PREFIX . vnc_display() .
+	  " -pidfile " . $pidfile .
+	  " " . QEMU_IMAGE_PATH;
 
 	if (file_exists($pidfile))
 		unlink($pidfile);
@@ -431,7 +454,10 @@ function start_qemu()
 
 	dbg("Started QEMU.");
 	$sessfile = make_qemu_sessionfile_name($idx);
-	$cmd = "(sleep " . SESSION_TIMEOUT . "; kill -9 `cat " . $pidfile . "`; rm " . $pidfile . " " . $sessfile . ") &";
+	$cmd = "(PID=`cat " . $pidfile . "`; " .
+	  "sleep " . SESSION_TIMEOUT . "; " .
+	  "kill -9 \$PID && " .
+	  "rm " . $pidfile . " " . $sessfile . ") &";
 
 	$process = proc_open($cmd, $descriptorspec, $wkpipes);
 	sleep(1);
@@ -469,15 +495,34 @@ function stop_qemu()
 
 function output_vnc_info()
 {
-	out("You can use an external VNC client, click " .
-	"<a href=\"vnc://" . vnc_addr_display() . "\">here</a> " .
-	"or enter <tt>" . vnc_addr_display() . "</tt> in your " .
-	"<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_Computing\"" .
-	">VNC viewer</a>.<br />");
+	out("You can use an external VNC client at " .
+	    "<a href=\"vnc://" . vnc_addr_display() . "\">" .
+	    "vnc://" . vnc_addr_display() . "</a> " .
+	    "or enter <tt>" . vnc_addr_display() . "</tt> in your " .
+	    "<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_" .
+	    "Computing\"" .
+	    ">VNC viewer</a>.<br />");
 	echo "<br />\n";
 }
 
-function output_applet_code()
+function output_audio_player_code($external_only=false)
+{
+	if (true)
+		return;
+
+	$port = audio_port();
+	$url = "http://" . $_SERVER['HTTP_HOST'] . ":$port/";
+	$icy = "icy://" . $_SERVER['HTTP_HOST'] . ":$port/";
+	if (!$external_only) {
+		echo "<embed src=\"$url\" type=\"audio/mpeg\" ";
+		echo "autoplay=\"true\" width=\"300\" height=\"50\" ";
+		echo "controller=\"true\" align=\"right\">";
+	}
+	out("You can use an external audio play at " .
+	    "<a href=\"$url\">$url</a> or <a href=\"$icy\">$icy</a>.");
+}
+
+function output_applet_code($external_only=false)
 {
 	$w = APPLET_WIDTH;
 	$h = APPLET_HEIGHT;
@@ -485,6 +530,8 @@ function output_applet_code()
 	$vncjpath = VNCJAVA_PATH;
 	$jar = VNCJAR;
 	$class = VNCCLASS;
+	if ($external_only)
+		return;
 	echo "<a name=\"haiku_online_applet\">";
 	echo "<center>";
 	echo "<applet code=$class codebase=\"$vncjpath/\" ";
@@ -517,7 +564,7 @@ function output_applet_code()
 	flush();
 }
 
-out("<div align\"right\">Available displays: " .
+out("<div align=\"right\">Available displays: " .
     available_qemu_slots() . "/" . total_qemu_slots() .
     "</div>");
 
@@ -547,6 +594,7 @@ if (is_my_session_valid()) {
 
 if ($qemuidx >= 0 && !$do_kill) {
 	output_kill_form();
+	output_audio_player_code();
 	output_vnc_info();
 	output_applet_code();
 } else {
