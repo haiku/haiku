@@ -188,7 +188,8 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
 		Key* key = _KeyAt(fClickPoint);
-		if (key == NULL)
+		// TODO: remove once we support moving modifier keys around
+		if (key == NULL || fKeymap->IsModifierKey(key->code))
 			return;
 
 		BRect frame = _FrameFor(key);
