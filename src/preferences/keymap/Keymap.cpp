@@ -305,6 +305,52 @@ Keymap::KeyForModifier(uint32 modifier)
 }
 
 
+status_t
+Keymap::SetModifier(uint32 keyCode, uint32 modifier)
+{
+	const uint32 kSingleKeys = B_LEFT_SHIFT_KEY | B_RIGHT_SHIFT_KEY
+		| B_LEFT_COMMAND_KEY | B_RIGHT_COMMAND_KEY | B_LEFT_CONTROL_KEY
+		| B_RIGHT_CONTROL_KEY | B_LEFT_OPTION_KEY | B_RIGHT_OPTION_KEY;
+
+	if ((modifier & kSingleKeys) != 0)
+		modifier &= kSingleKeys;
+	else if ((modifier & kModifierKeys) != 0)
+		modifier &= kModifierKeys;
+
+	if (modifier == B_CAPS_LOCK)
+		fKeys.caps_key = keyCode;
+	else if (modifier == B_NUM_LOCK)
+		fKeys.num_key = keyCode;
+	else if (modifier == B_SCROLL_LOCK)
+		fKeys.scroll_key = keyCode;
+	else if (modifier == B_LEFT_SHIFT_KEY)
+		fKeys.left_shift_key = keyCode;
+	else if (modifier == B_RIGHT_SHIFT_KEY)
+		fKeys.right_shift_key = keyCode;
+	else if (modifier == B_LEFT_COMMAND_KEY)
+		fKeys.left_command_key = keyCode;
+	else if (modifier == B_RIGHT_COMMAND_KEY)
+		fKeys.right_command_key = keyCode;
+	else if (modifier == B_LEFT_CONTROL_KEY)
+		fKeys.left_control_key = keyCode;
+	else if (modifier == B_RIGHT_CONTROL_KEY)
+		fKeys.right_control_key = keyCode;
+	else if (modifier == B_LEFT_OPTION_KEY)
+		fKeys.left_option_key = keyCode;
+	else if (modifier == B_RIGHT_OPTION_KEY)
+		fKeys.right_option_key = keyCode;
+	else if (modifier == B_MENU_KEY)
+		fKeys.menu_key = keyCode;
+	else
+		return B_BAD_VALUE;
+
+	if (fModificationMessage != NULL)
+		fTarget.SendMessage(fModificationMessage);
+
+	return B_OK;
+}
+
+
 //! Checks whether a key is a dead key.
 uint8
 Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)

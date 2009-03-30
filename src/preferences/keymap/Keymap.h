@@ -31,6 +31,7 @@ public:
 			bool			IsModifierKey(uint32 keyCode);
 			uint32			Modifier(uint32 keyCode);
 			uint32			KeyForModifier(uint32 modifier);
+			status_t		SetModifier(uint32 keyCode, uint32 modifier);
 
 			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers);
 			bool			IsDeadSecondKey(uint32 keyCode, uint32 modifiers,
@@ -46,6 +47,7 @@ public:
 								int32 numBytes = -1);
 
 			const key_map&	Map() const { return fKeys; }
+			key_map&		Map() { return fKeys; }
 
 private:
 			int32			_Offset(uint32 keyCode, uint32 modifiers,

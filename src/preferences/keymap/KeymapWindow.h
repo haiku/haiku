@@ -39,7 +39,9 @@ protected:
 			BView*				_CreateMapLists();
 			void				_AddKeyboardLayouts(BMenu* menu);
 
+			void				_UpdateShortcutButton();
 			void				_UpdateButtons();
+			void				_SwitchShortcutKeys();
 
 			void				_UseKeymap();
 			void				_RevertKeymap();
@@ -61,6 +63,7 @@ protected:
 			BMenu*				fFontMenu;
 			KeyboardLayoutView*	fKeyboardLayoutView;
 			BTextControl*		fTextControl;
+			BButton*			fSwitchShortcutsButton;
 
 			Keymap				fCurrentMap;
 			Keymap				fPreviousMap;

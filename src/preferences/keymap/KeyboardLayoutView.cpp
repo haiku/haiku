@@ -26,6 +26,7 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fOffscreenBitmap(NULL),
 	fKeymap(NULL),
+	fEditable(true),
 	fModifiers(0),
 	fDeadKey(0),
 	fDragKey(NULL),
@@ -180,16 +181,17 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		return;
 
 	if (dragMessage != NULL) {
-		_InvalidateKey(fDropTarget);
-		fDropPoint = point;
+		if (fEditable) {
+			_InvalidateKey(fDropTarget);
+			fDropPoint = point;
 
-		_EvaluateDropTarget(point);
+			_EvaluateDropTarget(point);
+		}
 	} else if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
 		Key* key = _KeyAt(fClickPoint);
-		// TODO: remove once we support moving modifier keys around
-		if (key == NULL || fKeymap->IsModifierKey(key->code))
+		if (key == NULL)
 			return;
 
 		BRect frame = _FrameFor(key);
@@ -294,7 +296,9 @@ KeyboardLayoutView::Draw(BRect updateRect)
 void
 KeyboardLayoutView::MessageReceived(BMessage* message)
 {
-	if (message->WasDropped() && fDropTarget != NULL && fKeymap != NULL) {
+	if (message->WasDropped() && fEditable && fDropTarget != NULL
+		&& fKeymap != NULL) {
+		int32 keyCode;
 		const char* data;
 		ssize_t size;
 		if (message->FindData("text/plain", B_MIME_DATA,
@@ -303,7 +307,6 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 			if (data[size - 1] == '\0')
 				size--;
 
-			int32 keyCode;
 			int32 buttons;
 			if (!message->IsSourceRemote()
 				&& message->FindInt32("buttons", &buttons) == B_OK
@@ -320,11 +323,18 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				fKeymap->GetChars(fDropTarget->code, fModifiers, fDeadKey,
 					&string, &numBytes);
 				if (string != NULL) {
+					// switch keys
 					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 						(const char*)data, size);
 					fKeymap->SetKey(key->code, fDragModifiers, fDeadKey,
 						string, numBytes);
 					delete[] string;
+				} else if (fKeymap->IsModifierKey(fDropTarget->code)) {
+					// switch key with modifier
+					fKeymap->SetModifier(key->code,
+						fKeymap->Modifier(fDropTarget->code));
+					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
+						(const char*)data, size);
 				}
 			} else {
 				// Send the old key to the target, so it's not lost entirely
@@ -332,6 +342,32 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 
 				fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 					(const char*)data, size);
+			}
+		} else if (!message->IsSourceRemote()
+			&& message->FindInt32("key", &keyCode) == B_OK) {
+			// Switch an unmapped key
+
+			Key* key = _KeyForCode(keyCode);
+			if (key != NULL && key == fDropTarget)
+				return;
+
+			uint32 modifier = fKeymap->Modifier(keyCode);
+
+			char* string;
+			int32 numBytes;
+			fKeymap->GetChars(fDropTarget->code, fModifiers, fDeadKey,
+				&string, &numBytes);
+			if (string != NULL) {
+				// switch key with modifier
+				fKeymap->SetModifier(fDropTarget->code, modifier);
+				fKeymap->SetKey(keyCode, fDragModifiers, fDeadKey,
+					string, numBytes);
+				delete[] string;
+			} else {
+				// switch modifier keys
+				fKeymap->SetModifier(keyCode,
+					fKeymap->Modifier(fDropTarget->code));
+				fKeymap->SetModifier(fDropTarget->code, modifier);
 			}
 		}
 

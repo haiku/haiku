@@ -39,6 +39,8 @@ static const uint32 kMsgMenuFileSaveAs = 'mMFA';
 
 static const uint32 kChangeKeyboardLayout = 'cKyL';
 
+static const uint32 kMsgSwitchShortcuts = 'swSc';
+
 static const uint32 kMsgMenuFontChanged = 'mMFC';
 
 static const uint32 kMsgSystemMapSelected = 'SmST';
@@ -61,6 +63,9 @@ KeymapWindow::KeymapWindow()
 
 	fTextControl = new BTextControl("Sample and Clipboard:", "", NULL);
 
+	fSwitchShortcutsButton = new BButton("switch", "",
+		new BMessage(kMsgSwitchShortcuts));
+
 	fUseButton = new BButton("useButton", "Use", new BMessage(kMsgUseKeymap));
 	fRevertButton = new BButton("revertButton", "Revert",
 		new BMessage(kMsgRevertKeymap));
@@ -73,7 +78,9 @@ KeymapWindow::KeymapWindow()
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(fKeyboardLayoutView)
 				//.Add(new BStringView("text label", "Sample and Clipboard:"))
-				.Add(fTextControl)
+				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+					.Add(fTextControl)
+					.Add(fSwitchShortcutsButton))
 				.AddGlue(0.0)
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.AddGlue(0.0)
@@ -145,6 +152,8 @@ KeymapWindow::KeymapWindow()
 	fCurrentMap.Load(current->EntryRef());
 	fPreviousMap.Load(current->EntryRef());
 	fAppliedMap.Load(current->EntryRef());
+
+	_UpdateShortcutButton();
 
 	Unlock();
 }
@@ -228,6 +237,10 @@ KeymapWindow::MessageReceived(BMessage* message)
 				fKeyboardLayoutView->GetKeyboardLayout());
 			break;
 		}
+
+		case kMsgSwitchShortcuts:
+			_SwitchShortcutKeys();
+			break;
 
 		case kMsgMenuFontChanged:
 		{
@@ -428,11 +441,54 @@ KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 }
 
 
-void 
+void
+KeymapWindow::_UpdateShortcutButton()
+{
+	const char* label = "Switch Shortcut Keys";
+	if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5d
+		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5c
+		&& fCurrentMap.KeyForModifier(B_RIGHT_OPTION_KEY) == 0x5f
+		&& fCurrentMap.KeyForModifier(B_RIGHT_CONTROL_KEY) == 0x60) {
+		label = "Switch Shortcut Keys To Windows/Linux Mode";
+	} else if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5c
+		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d
+		&& fCurrentMap.KeyForModifier(B_RIGHT_OPTION_KEY) == 0x60
+		&& fCurrentMap.KeyForModifier(B_RIGHT_CONTROL_KEY) == 0x5f) {
+		label = "Switch Shortcut Keys To Haiku Mode";
+	}
+
+	fSwitchShortcutsButton->SetLabel(label);
+}
+
+
+void
 KeymapWindow::_UpdateButtons()
 {
 	fUseButton->SetEnabled(!fCurrentMap.Equals(fAppliedMap));
 	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
+
+	_UpdateShortcutButton();
+}
+
+
+void
+KeymapWindow::_SwitchShortcutKeys()
+{
+	uint32 leftCommand = fCurrentMap.Map().left_command_key;
+	uint32 leftControl = fCurrentMap.Map().left_control_key;
+	uint32 rightOption = fCurrentMap.Map().right_option_key;
+	uint32 rightControl = fCurrentMap.Map().right_control_key;
+
+	// switch left side
+	fCurrentMap.Map().left_command_key = leftControl;
+	fCurrentMap.Map().left_control_key = leftCommand;
+
+	// switch right side
+	fCurrentMap.Map().right_option_key = rightControl;
+	fCurrentMap.Map().right_control_key = rightOption;
+
+	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+	_UpdateButtons();
 }
 
 

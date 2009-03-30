@@ -27,6 +27,8 @@ public:
 
 			void			SetFont(const BFont& font);
 
+			void			SetEditable(bool editable);
+
 protected:
 	virtual	void			AttachedToWindow();
 	virtual void			FrameResized(float width, float height);
@@ -88,6 +90,7 @@ private:
 			KeyboardLayout*	fLayout;
 			Keymap*			fKeymap;
 			BMessenger		fTarget;
+			bool			fEditable;
 
 			uint8			fKeyState[16];
 			int32			fModifiers;
