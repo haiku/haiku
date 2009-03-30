@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Rene Gollent (rene@gollent.com)
  */
+
 #include "APRView.h"
 
 #include <Alert.h>
@@ -44,7 +45,8 @@ APRView::APRView(const char *name, uint32 flags)
  	fDecorMenu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
+#if 0
 	fDecorMenu = new BMenu("Window Style");
 	int32 decorCount = BPrivate::count_decorators();
 	if (decorCount > 1) {
@@ -68,7 +70,8 @@ APRView::APRView(const char *name, uint32 flags)
 		if (marked)
 			marked->SetMarked(true);
 	}
-	
+#endif
+
 	// Set up list of color attributes
 	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
 	
@@ -92,8 +95,6 @@ APRView::APRView(const char *name, uint32 flags)
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	// TODO: Make list view and scroller use all the additional height
-	// available!
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(fScrollView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
@@ -105,15 +106,19 @@ APRView::APRView(const char *name, uint32 flags)
 		.SetInsets(10, 10, 10, 10)
 	);
 
+	fColorWell->Parent()->SetExplicitMaxSize(
+		BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));
 	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 }
 
-APRView::~APRView(void)
+
+APRView::~APRView()
 {
 }
 
+
 void
-APRView::AttachedToWindow(void)
+APRView::AttachedToWindow()
 {
 	fPicker->SetTarget(this);
 	fAttrList->SetTarget(this);
@@ -126,20 +131,23 @@ APRView::AttachedToWindow(void)
 	fAttrList->Select(0);
 }
 
+
 void
 APRView::MessageReceived(BMessage *msg)
 {
 	if (msg->WasDropped()) {
 		rgb_color *color;
 		ssize_t size;
-		
-		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color, &size) == B_OK) {
+
+		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
+				&size) == B_OK) {
 			SetCurrentColor(*color);
 		}
 	}
 
-	switch(msg->what) {
-		case DECORATOR_CHANGED: {
+	switch (msg->what) {
+		case DECORATOR_CHANGED:
+		{
 			int32 index = fDecorMenu->IndexOf(fDecorMenu->FindMarked());
 			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			if (index >= 0)
@@ -147,48 +155,50 @@ APRView::MessageReceived(BMessage *msg)
 			#endif
 			break;
 		}
-		case UPDATE_COLOR: {
+		case UPDATE_COLOR:
+		{
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
 			SetCurrentColor(color);	
-						
+			
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
-		case ATTRIBUTE_CHOSEN: {
+		case ATTRIBUTE_CHOSEN:
+		{
 			// Received when the user chooses a GUI fAttribute from the list
-			
+
 			ColorWhichItem *item = (ColorWhichItem*)
-										fAttrList->ItemAt(fAttrList->CurrentSelection());
-			
+				fAttrList->ItemAt(fAttrList->CurrentSelection());
 			if (item == NULL)
 				break;
-			
+
 			fWhich = item->ColorWhich();
 			rgb_color color = fCurrentSet.GetColor(fWhich);
 			SetCurrentColor(color);
-			
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
-		case REVERT_SETTINGS: {
+		case REVERT_SETTINGS:
+		{
 			fCurrentSet = fPrevSet;
-			
+
 			UpdateControls();
 			UpdateAllColors();
-			
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
-		case DEFAULT_SETTINGS: {
+		case DEFAULT_SETTINGS:
+		{
 			fCurrentSet = ColorSet::DefaultColorSet();
-			
+
 			UpdateControls();
 			UpdateAllColors();
 
 			BMenuItem *item = fDecorMenu->FindItem("Default");
-			if (item)
-			{
+			if (item) {
 				item->SetMarked(true);
 				#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 				BPrivate::set_decorator(fDecorMenu->IndexOf(item));
@@ -203,7 +213,9 @@ APRView::MessageReceived(BMessage *msg)
 	}
 }
 
-void APRView::LoadSettings(void)
+
+void
+APRView::LoadSettings()
 {
 	for (int32 i = 0; i < color_description_count(); i++) {
 		color_which which = get_color_description(i)->which; 
@@ -213,12 +225,16 @@ void APRView::LoadSettings(void)
 	fPrevSet = fCurrentSet;
 }
 
-bool APRView::IsDefaultable(void)
+
+bool
+APRView::IsDefaultable()
 {
 	return fCurrentSet != fDefaultSet;
 }
 
-void APRView::UpdateAllColors(void)
+
+void
+APRView::UpdateAllColors()
 {
 	for (int32 i = 0; i < color_description_count(); i++) {
 		color_which which = get_color_description(i)->which; 
@@ -228,7 +244,7 @@ void APRView::UpdateAllColors(void)
 }
 
 
-void 
+void
 APRView::SetCurrentColor(rgb_color color)
 {
 	fCurrentSet.SetColor(fWhich, color);
@@ -237,7 +253,7 @@ APRView::SetCurrentColor(rgb_color color)
 }
 
 
-void 
+void
 APRView::UpdateControls()
 {
 	rgb_color color = fCurrentSet.GetColor(fWhich);
