@@ -85,7 +85,7 @@ arch_cpu_sync_icache(void *address, size_t len)
 void
 arch_cpu_memory_read_barrier(void)
 {
-#warning PPC: is it model-dependant ?
+// WARNING PPC: is it model-dependant ?
 	asm volatile ("lwsync");
 }
 
@@ -93,7 +93,7 @@ arch_cpu_memory_read_barrier(void)
 void
 arch_cpu_memory_write_barrier(void)
 {
-#warning PPC: is it model-dependant ?
+// WARNING PPC: is it model-dependant ?
 	asm volatile ("isync");
 	asm volatile ("eieio");
 }

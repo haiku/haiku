@@ -126,7 +126,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			if (kernelDebugger) {
 				// if this thread has a fault handler, we're allowed to be here
 				struct thread *thread = thread_get_current_thread();
-				if (thread && thread->fault_handler != NULL) {
+				if (thread && thread->fault_handler != 0) {
 					iframe->srr0 = thread->fault_handler;
 					break;
 				}

@@ -20,7 +20,7 @@ void ppc_pop_iframe(struct iframe_stack *stack);
 struct iframe *ppc_get_user_iframe(void);
 
 
-extern inline struct thread *
+static inline struct thread *
 arch_thread_get_current_thread(void)
 {
     struct thread *t;
@@ -29,7 +29,7 @@ arch_thread_get_current_thread(void)
 }
 
 
-extern inline void
+static inline void
 arch_thread_set_current_thread(struct thread *t)
 {
     asm volatile("mtsprg2 %0" : : "r"(t));

@@ -89,7 +89,7 @@ mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir --target=$haikuMachine --disable-nls \
-	--disable-shared --disable-multilib || exit 1
+	--disable-shared --disable-multilib --disable-werror || exit 1
 $MAKE || exit 1
 $MAKE install || exit 1
 

@@ -29,14 +29,6 @@ status_t arch_thread_enter_userspace(struct thread *t, addr_t entry,
 void arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
 	void (*func)(void *), void *arg);
 
-// ToDo: doing this this way is an ugly hack - please fix me!
-//		(those functions are "static inline" for x86 - since
-//		"extern inline" doesn't work for "gcc -g"...)
-#ifndef ARCH_x86
-struct thread *arch_thread_get_current_thread(void);
-void arch_thread_set_current_thread(struct thread *t);
-#endif
-
 bool arch_on_signal_stack(struct thread *thread);
 status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa,
 	int signal, int signalMask);

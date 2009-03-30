@@ -471,17 +471,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#if __POWERPC__ /* atoll is missing from the PowerPC standard library. */
-static long long atoll (const char *str) {
-  long long result = 0;
-  if (!str || !str[0])
-    return 0;
-  if (sscanf (str, "%Ld", &result) != 1)
-    result = 0;
-  return result;
-}
-#endif
-
 /* Standard C++ library. */
 
 #include <iostream>

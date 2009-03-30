@@ -235,11 +235,6 @@ arch_restore_signal_frame(void)
 }
 
 
-void
-arch_check_syscall_restart(struct thread *thread)
-{
-}
-
 
 /**	Saves everything needed to restore the frame in the child fork in the
  *	arch_fork_arg structure to be passed to arch_restore_fork_frame().
