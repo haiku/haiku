@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons media plugins APE_reader ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) LibMonkeysAudio ] ;
+SubDirHdrs [ FDirName $(SUBDIR) MAClib ] ;
+
+Addon APE_reader :
+	APEReader.cpp
+	: libMonkeysAudio.a MAClib.a be libmedia.so
+;
+
+SubInclude HAIKU_TOP src add-ons media plugins APE_reader LibMonkeysAudio ;
+SubInclude HAIKU_TOP src add-ons media plugins APE_reader MAClib ;
