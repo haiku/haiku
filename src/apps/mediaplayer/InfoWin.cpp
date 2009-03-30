@@ -346,7 +346,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 
 	// audio track format information
 	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		fLabelsView->Insert("Audio\n\n\n");
+		fLabelsView->Insert("Audio\n\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_audio_format audioFormat;
@@ -431,7 +431,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			fContentsView->Insert("DrawBitmap\n");
 		
 		fLabelsView->Insert("\n");
-		fContentsView->Insert("\n\n");
+		fContentsView->Insert("\n");
 	}
 
 	if (which & INFO_TRANSPORT) {
