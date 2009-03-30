@@ -219,4 +219,105 @@
 	  Return whether the current user has the given access permissions for a
 	  node. If the hook is absent the user is considered to have all
 	  permissions.
+
+
+	\section permissions Checking Access Permission
+
+	While there is the \link fs_vnode_ops::access access() \endlink hook
+	that explicitly checks access permission for a node, it is not used by the
+	VFS to check access permissions for the other hooks. This has two reasons:
+	It could be cheaper for the FS to do that in the respective hook (at least
+	it's not more expensive), and the FS can make sure that there are no race
+	conditions between the check and the start of the operation for the hook.
+	The downside is that in most hooks the FS has to check those permissions.
+	It is possible to simplify things a bit, though:
+
+	- For operations that require the file system object in question (node,
+	  directory, index, attribute, attribute directory, query) to be open, most
+	  of the checks can already be done in the respective <tt>open*()</tt> hook.
+	  E.g. in fs_vnode_ops::read() or fs_vnode_ops::write() one only has to
+	  check, if the file has been opened for reading/writing, not whether the
+	  current process has the respective permissions.
+
+	- The core of the fs_vnode_ops::access() hook can be moved into a private
+	  function that can be easily reused in other hooks to check the permissions
+	  for the respective operations. In most cases this will reduce permission
+	  checking to one or two additional "if"s in the hooks where it is required.
+
+
+	\section node_monitoring Node Monitoring
+
+	One of the nice features of Haiku's API is an easy way to monitor
+	directories or nodes for changes. That is one can register for watching a
+	given node for certain modification events and will get a notification
+	message whenever one of those events occurs. While other parts of the
+	operating system do the actual notification message delivery, it is the
+	responsibility of each file system to announce changes. It has to use the
+	following functions to do that:
+
+	- notify_entry_created(): A directory entry has been created.
+
+	- notify_entry_removed(): A directory entry has been removed.
+
+	- notify_entry_moved(): A directory entry has been renamed and/or moved
+	  to another directory.
+
+	- notify_stat_changed(): One or more members of the stat data for node have
+	  changed. E.g. the \c st_size member changes when the file is truncated or
+	  data have been written to it beyond its former size. The modification time
+	  (\c st_mtime) changes whenever a node is write-accessed. To avoid a flood
+	  of messages for small and frequent write operations on an open file the
+	  file system can limit the number of notifications and mark them with the
+	  B_WATCH_INTERIM_STAT flag. When closing a modified file a notification
+	  without that flag should be issued.
+
+
+	- notify_attribute_changed(): An attribute of a node has been added,
+	  removed, or changed.
+
+	If the file system supports queries, it needs to call the following
+	functions to make live queries work:
+
+	- notify_query_entry_created(): A change caused an entry that didn't match
+	  the query predicate before to match now.
+
+	- notify_query_entry_removed(): A change caused an entry that matched
+	  the query predicate before to no longer match.
+
+
+	\section caches Caches
+
+	The Haiku kernel provides three kinds of caches that can be used by a
+	file system implementation to speed up file system operations:
+
+	- <em>Block cache</em>: Interesting for disk-based file systems. The device
+	  the file system volume is located on is considered to be divided in
+	  equally-sized blocks of data that can be accessed via the block cache API
+	  (e.g. block_cache_get() and block_cache_put()). As long as the system has
+	  enough memory the block cache will keep all blocks that have been accessed
+	  in memory, thus allowing further accesses to be very fast.
+	  The block cache also has transaction support, which is of interest for
+	  journaled file systems.
+
+	- <em>File cache</em>: Stores file contents. The FS can decide to create
+	  a file cache for any of its files. The fs_vnode_ops::read() and
+	  fs_vnode_ops::write() hooks can then simply be implemented by calling the
+	  file_cache_read() respectively file_cache_write() function, which will
+	  read the data from/write the data to the file cache. For reading uncached
+	  data or writing back cached data to the file, the file cache will invoke
+	  the fs_vnode_ops::io() hook.
+	  Only files for which the file cache is used, can be memory mapped (cf.
+	  mmap())
+
+	- <em>Entry cache</em>: Can be used to speed up resolving paths. Normally
+	  the VFS will call the fs_vnode_ops::lookup() hook for each element of the
+	  path to be resolved, which, depending on the file system, can be more or
+	  less expensive. When the FS uses the entry cache, those calls will be
+	  avoided most of the time. All the file system has to do is invoke the
+	  entry_cache_add() function when it encounters an entry that might not yet
+	  be known to the entry cache and entry_cache_remove() when a directory
+	  entry has been removed.
 */
+
+// TODO:
+//	* FS layers
