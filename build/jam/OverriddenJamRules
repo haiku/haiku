@@ -139,6 +139,7 @@ rule Object
 	switch $(>:S)
 	{
 	    case .asm : As $(<) : $(>) ;
+	    case .nasm : assemble_nasm $(<) : $(>) ;
 	    case .c :	Cc $(<) : $(>) ;
 	    case .C :	C++ $(<) : $(>) ;
 	    case .cc :	C++ $(<) : $(>) ;
@@ -167,6 +168,16 @@ rule Object
 					}
 	    case * :	UserObject $(<) : $(>) ;
 	}
+}
+
+rule assemble_nasm
+{
+	Depends $(<) : $(>) ;
+}
+
+actions assemble_nasm
+{
+	nasm -d $(ASFLAGS) -f elf -o $(1) $(2) 
 }
 
 rule As
