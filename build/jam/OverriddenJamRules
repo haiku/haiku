@@ -170,16 +170,6 @@ rule Object
 	}
 }
 
-rule AssembleNasm
-{
-	Depends $(<) : $(>) ;
-}
-
-actions AssembleNasm
-{
-	nasm -d $(ASFLAGS) -f elf -o $(1) $(2) 
-}
-
 rule As
 {
 	local flags ;
