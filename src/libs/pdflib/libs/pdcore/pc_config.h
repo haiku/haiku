@@ -146,7 +146,7 @@
 /* try to identify Mac OS 9 compilers */
 
 #if (defined macintosh || defined __POWERPC__ || defined __CFM68K__) && \
-	!defined MAC && !defined MACOSX && !(defined(__BEOS__) || !defined(__HAIKU__))
+	!defined MAC && !defined MACOSX && !defined(__BEOS__) && !defined(__HAIKU__)
 #define MAC
 #endif
 
