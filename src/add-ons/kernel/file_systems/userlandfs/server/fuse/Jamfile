@@ -23,6 +23,7 @@ SharedLibrary libuserlandfs_fuse.so
 	:
 	fuse_fs.cpp
 	fuse_main.cpp
+	fuse_opt.c
 	FUSEFileSystem.cpp
 	FUSEVolume.cpp
 

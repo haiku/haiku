@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 /* Versioned symbols confuse the dynamic linker in uClibc */
-#ifndef __UCLIBC__
+#if !defined(__UCLIBC__) && !defined(__HAIKU__)
 #define FUSE_SYMVER(x) __asm__(x)
 #else
 #define FUSE_SYMVER(x)
