@@ -313,7 +313,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	status_t err;
 	// video track format information
 	if ((which & INFO_VIDEO) && fController->VideoTrackCount() > 0) {
-		fLabelsView->Insert("Video\n\n\n\n");
+		fLabelsView->Insert("Video\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_video_format videoFormat;
@@ -325,9 +325,9 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_codec_info mci;
 			err = fController->GetVideoCodecInfo(&mci);
 			if (err < B_OK) {
-				s << "Haiku Media Kit:\n(" << strerror(err) << ")";
+				s << "Haiku Media Kit: " << strerror(err);
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " not supported";
+					s << (char *)format.user_data << " (not supported)";
 				}
 			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
@@ -346,7 +346,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 
 	// audio track format information
 	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		fLabelsView->Insert("Audio\n\n\n\n");
+		fLabelsView->Insert("Audio\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_audio_format audioFormat;
@@ -360,9 +360,9 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_codec_info mci;
 			err = fController->GetAudioCodecInfo(&mci);
 			if (err < 0) {
-				s << "Haiku Media Kit:\n(" << strerror(err) << ") ";
+				s << "Haiku Media Kit: " << strerror(err);
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " not supported";
+					s << (char *)format.user_data << " (not supported)";
 				}
 			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
