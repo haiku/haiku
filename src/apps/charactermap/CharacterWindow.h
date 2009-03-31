@@ -14,6 +14,7 @@ class BListView;
 class BMenu;
 class BMenuItem;
 class BSlider;
+class BStringView;
 class CharacterView;
 
 
@@ -40,6 +41,7 @@ private:
 			CharacterView*	fCharacterView;
 			BMenuItem*		fSelectedFontItem;
 			BSlider*		fFontSizeSlider;
+			BStringView*	fCodeView;
 };
 
 #endif	// CHARACTER_WINDOW_H

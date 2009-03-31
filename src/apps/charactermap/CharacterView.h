@@ -6,6 +6,7 @@
 #define CHARACTER_VIEW_H
 
 
+#include <Messenger.h>
 #include <View.h>
 
 
@@ -13,6 +14,8 @@ class CharacterView : public BView {
 public:
 							CharacterView(const char* name);
 	virtual					~CharacterView();
+
+			void			SetTarget(BMessenger target, uint32 command);
 
 			void			SetCharacterFont(const BFont& font);
 			const BFont&	CharacterFont() { return fCharacterFont; }
@@ -28,6 +31,11 @@ public:
 			bool			IsShowingBlock(int32 blockIndex) const;
 
 			void			ScrollTo(int32 blockIndex);
+
+	static	void			UnicodeToUTF8(uint32 c, char* text,
+								size_t textSize);
+	static	void			UnicodeToUTF8Hex(uint32 c, char* text,
+								size_t textSize);
 
 protected:
 	virtual	void			AttachedToWindow();
@@ -48,15 +56,25 @@ protected:
 	virtual void			DoLayout();
 
 private:
-			bool			_IncludeBlock(int32 index);
+			int32			_BlockAt(BPoint point);
+			bool 			_GetCharacterAt(BPoint point, uint32& character,
+								BRect* _frame = NULL);
 			void			_UpdateSize();
 
 private:
+			BMessenger		fTarget;
+			uint32			fTargetCommand;
+			BPoint			fClickPoint;
+			bool			fHasCharacter;
+			uint32			fCurrentCharacter;
+			BRect			fCurrentCharacterFrame;
+
 			bool			fShowPrivateBlocks;
 			bool			fShowContainedBlocksOnly;
 
 			BRect			fDataRect;
 			BFont			fCharacterFont;
+			int32			fCharactersPerLine;
 			int32			fCharacterWidth;
 			int32			fCharacterHeight;
 			int32			fCharacterBase;

@@ -21,12 +21,14 @@
 #include <ScrollView.h>
 #include <Slider.h>
 #include <SplitLayoutBuilder.h>
+#include <StringView.h>
 
 #include "CharacterView.h"
 #include "UnicodeBlocks.h"
 
 
 static const uint32 kMsgUnicodeBlockSelected = 'unbs';
+static const uint32 kMsgCharacterChanged = 'chch';
 static const uint32 kMsgFontSelected = 'fnts';
 static const uint32 kMsgFontSizeChanged = 'fsch';
 static const uint32 kMsgPrivateBlocks = 'prbl';
@@ -84,6 +86,7 @@ CharacterWindow::CharacterWindow()
 		fUnicodeBlockView, 0, false, true);
 
 	fCharacterView = new CharacterView("characters");
+	fCharacterView->SetTarget(this, kMsgCharacterChanged);
 
 	bool show;
 	if (settings.FindBool("show private blocks", &show) == B_OK)
@@ -118,13 +121,18 @@ CharacterWindow::CharacterWindow()
 		new BMessage(kMsgFontSizeChanged), kMinFontSize, kMaxFontSize);
 	fFontSizeSlider->SetValue(fontSize);
 
+	fCodeView = new BStringView("code", "-");
+	fCodeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		fCodeView->PreferredSize().Height()));
+
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(menuBar)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)//BSplitLayoutBuilder()
 			.Add(unicodeScroller)
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(characterScroller)
-				.Add(fFontSizeSlider))
+				.Add(fFontSizeSlider)
+				.Add(fCodeView))
 			.SetInsets(10, 10, 10, 10)));
 
 	// Add menu
@@ -179,6 +187,24 @@ CharacterWindow::MessageReceived(BMessage* message)
 				break;
 
 			fCharacterView->ScrollTo(index);
+			break;
+		}
+
+		case kMsgCharacterChanged:
+		{
+			uint32 character;
+			if (message->FindInt32("character", (int32*)&character) != B_OK)
+				break;
+
+			char utf8Hex[32];
+			CharacterView::UnicodeToUTF8Hex(character, utf8Hex,
+				sizeof(utf8Hex));
+
+			char text[128];
+			snprintf(text, sizeof(text), "Code: %#lx (%ld), UTF-8: %s",
+				character, character, utf8Hex);
+
+			fCodeView->SetText(text);
 			break;
 		}
 
