@@ -324,6 +324,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		if (u.HasUser())
 			cmd << "-l " << u.user << " ";
 		cmd << u.host;
+		if (u.HasPort())
+			cmd << " " << u.port;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
