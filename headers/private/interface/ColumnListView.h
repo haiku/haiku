@@ -244,10 +244,8 @@ private:
 class BColumnListView : public BView, public BInvoker {
 public:
 								BColumnListView(BRect rect,
-									const char* name,
-									uint32 resizingMode,
-									uint32 drawFlags,
-									border_style = B_NO_BORDER,
+									const char* name, uint32 resizingMode,
+									uint32 flags, border_style = B_NO_BORDER,
 									bool showHorizontalScrollbar = true);
 	virtual						~BColumnListView();
 
@@ -373,6 +371,8 @@ protected:
 	virtual	void 				Draw(BRect updateRect);
 
 private:
+			void				_Init(bool showHorizontalScrollbar);
+
 			rgb_color 			fColorList[B_COLOR_TOTAL];
 			BPrivate::TitleView* fTitleView;
 			BPrivate::OutlineView* fOutlineView;
