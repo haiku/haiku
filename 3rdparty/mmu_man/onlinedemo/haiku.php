@@ -37,7 +37,12 @@ define("APPLET_HEIGHT", "768");
 define("VNCPORTBASE", 5900);
 
 // base port for audio streams
-define("AUDIOPORTBASE", 8080);
+//define("AUDIOPORTBASE", 8080);
+define("AUDIOPORTBASE", (VNCPORTBASE + MAX_QEMUS));
+
+// base port for serial output
+//define("SERIALPORTBASE", 9000);
+define("SERIALPORTBASE", (VNCPORTBASE + MAX_QEMUS * 2));
 
 // timeout before the demo session is killed, as argument to /bin/sleep
 define("SESSION_TIMEOUT", "20m");
@@ -70,9 +75,18 @@ define("QEMU_PIDFILE_TMPL", "qemu-haiku-pid-");
 // name of session variable holding the qemu slot; not yet used correctly
 define("QEMU_IDX_VAR", "QEMU_HAIKU_SESSION_VAR");
 
+
+// uncomment if you want to pass your Sonix webcam device through
+// migth need to update VID:PID
+//define("QEMU_USB_PASSTHROUGH", "-usbdevice host:0c45:6005");
+
+
 define("BGCOLOR", "#336698");
 
+
 $vnckeymap = "en-us";
+
+$cpucount = 1;
 
 // statics
 $count = $_SESSION['compteur'];
@@ -99,9 +113,9 @@ session_start();
 //echo "do_kill: " . $do_kill . "<br>\n";
 
 ?>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Haiku Online Demo</title>
 <link rel="shortcut icon" href="http://www.haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
 <style type="text/css">
@@ -119,12 +133,12 @@ a:hover { color:pink; }
 .haiku_online_applet { background-color: <?php echo BGCOLOR; ?>; }
 -->
 </style>
-</head>
-<script>
+<script type="text/javascript">
 function onPageUnload() {
 	//window.open("<?php echo $_SERVER["SCRIPT_NAME"] . "?close"; ?>", "closing", "width=100,height=30,location=no,menubar=no,toolbar=no,scrollbars=no");
 }
 </script>
+</head>
 <?php
 
 
@@ -304,6 +318,18 @@ function probe_keymap()
 }
 
 
+function probe_options_form()
+{
+	global $cpucount;
+	$cpucount = 1;
+	if (isset($_GET['cpucount']))
+		$cpucount = (int)$_GET['cpucount'];
+	$cpucount = max(min($cpucount, 8), 1);
+	//dbg("cpucount $cpucount");
+	$cpucount = 1; // force for now
+}
+
+
 function output_options_form()
 {
 	global $vnckeymap;
@@ -311,15 +337,15 @@ function output_options_form()
 	echo "<form method=\"get\" action=\"" . $_SERVER['PHP_SELF'] . "\">";
 	echo "<table border=\"0\" class=\"haiku_online_form\">\n";
 
+	$keymaps = list_keymaps();
 	echo "<tr>\n<td align=\"right\">\n";
 	echo "Select your keymap:";
 	echo "</td>\n<td>\n";
 	echo "<select name=\"keymap\">";
-	$keymaps = list_keymaps();
 	foreach ($keymaps as $keymap) {
-		echo "<option name=\"keymap\" value=\"$keymap\" ";
+		echo "<option value=\"$keymap\" ";
 		if ($keymap == $vnckeymap)
-			echo "selected ";
+			echo "selected=\"selected\" ";
 		echo ">$keymap</option>";
 		//echo "<option name=\"keymap\" ";
 		//echo "value=\"$keymap\">" . locale_get_display_name($keymap);
@@ -328,6 +354,7 @@ function output_options_form()
 	echo "</select>";
 	echo "</td>\n</tr>\n";
 
+	
 	$modes = array("1024x768"/*, "800x600"*/);
 	echo "<tr ";
 	if (count($modes) < 2)
@@ -338,18 +365,41 @@ function output_options_form()
 	echo "</td>\n<td>\n";
 	echo "<select name=\"videomode\" ";
 	if (count($modes) < 2)
-		echo "disabled";
+		echo "disabled=\"disabled\"";
 	echo ">";
-	
 	foreach ($modes as $mode) {
-		echo "<option name=\"videomode\" value=\"$mode\" ";
+		echo "<option value=\"$mode\" ";
 		if ($mode == $videomode)
-			echo "selected ";
+			echo "selected=\"selected\" ";
 		echo ">$mode</option>";
 	}
 	echo "</select>";
 	echo "</td>\n</tr>\n";
 
+
+	$maxcpus = 8;
+	echo "<tr ";
+	if (!$enable_cpus)
+		echo "class=\"haiku_online_disabled\"";
+	echo ">\n";
+	echo "<td align=\"right\">\n";
+	echo "Select cpu count:";
+	echo "</td>\n<td>\n";
+	echo "<select name=\"cpucount\" ";
+	if (!$enable_cpus)
+		echo "disabled=\"disabled\"";
+	echo ">";
+	for ($ncpu = 1; $ncpu <= $maxcpus; $ncpu++) {
+		echo "<option value=\"$ncpu\" ";
+		if ($ncpu == 1)
+			echo "selected=\"selected\" ";
+		echo ">$ncpu</option>";
+	}
+	echo "</select>";
+	echo "</td>\n</tr>\n";
+
+	
+	$enable_sound = 0;
 	echo "<tr ";
 	if (!$enable_sound)
 		echo "class=\"haiku_online_disabled\"";
@@ -357,19 +407,66 @@ function output_options_form()
 	echo "<td align=\"right\">\n";
 	echo "Check to enable sound:";
 	echo "</td>\n<td>\n";
-	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\"";
-	echo "value=\"1\" disabled ";
+	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\" ";
+	echo "value=\"1\" ";
 	if ($enable_sound) {
-		echo "checked ";
-		echo "><a onClick=\"o=window.document.getElementById('";
+		echo "checked=\"checked\" ";
+		echo "/><a onclick=\"o=window.document.getElementById('";
 		echo "sound_cb'); o.checked = !o.checked;\"";
-	}
+	} else
+		echo "disabled=\"disabled\" /";
 	echo ">Sound";
 	if ($enable_sound)
 		echo "</a>";
-	echo "</input>";
+	//echo "</input>";
 	echo "</td>\n</tr>\n";
 
+	$enable_serial = 1;
+	echo "<tr ";
+	if (!$enable_serial)
+		echo "class=\"haiku_online_disabled\"";
+	echo ">\n";
+	echo "<td align=\"right\">\n";
+	echo "Check to enable serial output:";
+	echo "</td>\n<td>\n";
+	echo "<input type=\"checkbox\" name=\"serial\" id=\"serial_cb\" ";
+	echo "value=\"1\" "/*"disabled "*/;
+	if ($enable_serial) {
+		//echo "checked ";
+		echo "/><a onclick=\"o=window.document.getElementById('";
+		echo "serial_cb'); o.checked = !o.checked;\"";
+	} else
+		echo "/";
+	echo ">Serial";
+	if ($enable_serial)
+		echo "</a>";
+	//echo "</input>";
+	echo "</td>\n</tr>\n";
+
+	if (defined("QEMU_USB_PASSTHROUGH")) {
+
+		$enable_webcam = 1;
+		echo "<tr ";
+		if (!$enable_webcam)
+			echo "class=\"haiku_online_disabled\"";
+		echo ">\n";
+		echo "<td align=\"right\">\n";
+		echo "Check to enable webcam:";
+		echo "</td>\n<td>\n";
+		echo "<input type=\"checkbox\" name=\"webcam\" id=\"webcam_cb\" ";
+		echo "value=\"1\" "/*"disabled "*/;
+		if ($enable_webcam) {
+			//echo "checked ";
+			echo "/><a onclick=\"o=window.document.getElementById('";
+			echo "webcam_cb'); o.checked = !o.checked;\"";
+		} else
+			echo "/";
+		echo ">Webcam";
+		if ($enable_webcam)
+			echo "</a>";
+		//echo "</input>";
+		echo "</td>\n</tr>\n";
+	}	
 	/*
 	echo "<tr>\n<td align=\"right\">\n";
 	//out("Click here to enable sound:");
@@ -423,17 +520,28 @@ function output_kill_form()
 function start_qemu()
 {
 	global $vnckeymap;
+	global $cpucount;
 	$idx = find_qemu_slot();
 	if ($idx < 0) {
 		err("No available qemu slot, please try later.");
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
-	$cmd = QEMU_BIN . " " . QEMU_ARGS .
-	  " -k " . $vnckeymap .
-	  " -vnc " . QEMU_VNC_PREFIX . vnc_display() .
-	  " -pidfile " . $pidfile .
-	  " " . QEMU_IMAGE_PATH;
+	$cmd = QEMU_BIN . " " . QEMU_ARGS;
+	if ($cpucount > 1)
+		$cmd .= " -smp " . $cpucount;
+	if (isset($_GET['serial'])) {
+		$cmd .= " -serial telnet::";
+		$cmd .= (SERIALPORTBASE + qemu_slot());
+		$cmd .= ",server,nowait,nodelay";
+	}
+	if (isset($_GET['webcam']) && defined("QEMU_USB_PASSTHROUGH")) {
+		$cmd .= " " . QEMU_USB_PASSTHROUGH;
+	}
+	$cmd .= " -k " . $vnckeymap .
+		" -vnc " . QEMU_VNC_PREFIX . vnc_display() .
+		" -pidfile " . $pidfile .
+		" " . QEMU_IMAGE_PATH;
 
 	if (file_exists($pidfile))
 		unlink($pidfile);
@@ -501,8 +609,8 @@ function output_vnc_info()
 	    "or enter <tt>" . vnc_addr_display() . "</tt> in your " .
 	    "<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_" .
 	    "Computing\"" .
-	    ">VNC viewer</a>.<br />");
-	echo "<br />\n";
+	    ">VNC viewer</a>.");
+	//echo "<br />\n";
 }
 
 function output_audio_player_code($external_only=false)
@@ -532,7 +640,7 @@ function output_applet_code($external_only=false)
 	$class = VNCCLASS;
 	if ($external_only)
 		return;
-	echo "<a name=\"haiku_online_applet\">";
+	echo "<a name=\"haiku_online_applet\"></a>";
 	echo "<center>";
 	echo "<applet code=$class codebase=\"$vncjpath/\" ";
 	echo "archive=\"$vncjpath/$jar\" width=$w height=$h ";
@@ -564,13 +672,33 @@ function output_applet_code($external_only=false)
 	flush();
 }
 
-out("<div align=\"right\">Available displays: " .
+function output_serial_output_code($external_only=false)
+{
+	if (!isset($_GET['serial']))
+		return;
+	
+	$url = "telnet://" . $_SERVER['HTTP_HOST'] . ":";
+	$url .= (SERIALPORTBASE + qemu_slot()) . "/";
+	out("You can get serial output at <a href=\"$url\">$url</a>");
+	return;
+	
+	// not really http...
+	$url = "http://" . $_SERVER['HTTP_HOST'] . ":";
+	$url .= (SERIALPORTBASE + qemu_slot()) . "/";
+	echo "<center>";
+	echo "<iframe src=\"$url/\" type=\"text/plain\" width=\"100%\" ";
+	echo "height=\"200\"></iframe>";
+	echo "</center>";
+  
+}
+
+out("<div style=\"text-align:right;\">Available displays: " .
     available_qemu_slots() . "/" . total_qemu_slots() .
     "</div>");
 
 
 probe_keymap();
-
+probe_options_form();
 
 dbg("Checking if session is running...");
 
@@ -587,15 +715,18 @@ if (is_my_session_valid()) {
 	dbg("Need to start qemu.");
 
 	$qemuidx = start_qemu();
-	out("Waiting for vnc server...");
-	sleep(5);
+	//out("Waiting for vnc server...");
+	//sleep(5);
 }
 
 
 if ($qemuidx >= 0 && !$do_kill) {
 	output_kill_form();
+	output_serial_output_code();
 	output_audio_player_code();
 	output_vnc_info();
+	out("Waiting for vnc server...");
+	sleep(1);
 	output_applet_code();
 } else {
 	output_options_form();
