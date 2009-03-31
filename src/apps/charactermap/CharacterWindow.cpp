@@ -120,11 +120,12 @@ CharacterWindow::CharacterWindow()
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(menuBar)
-		.Add(BGroupLayoutBuilder()//BSplitLayoutBuilder()
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)//BSplitLayoutBuilder()
 			.Add(unicodeScroller)
-			.Add(BGroupLayoutBuilder(B_VERTICAL)
+			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(characterScroller)
-				.Add(fFontSizeSlider))));
+				.Add(fFontSizeSlider))
+			.SetInsets(10, 10, 10, 10)));
 
 	// Add menu
 

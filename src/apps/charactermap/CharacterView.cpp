@@ -166,6 +166,7 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 void
 CharacterView::MessageReceived(BMessage* message)
 {
+	BView::MessageReceived(message);
 }
 
 
@@ -303,10 +304,12 @@ CharacterView::_UpdateSize()
 	} else {
 		scroller->SetRange(0.0f, fDataRect.Height() - bounds.Height() - 1.0f);
 		scroller->SetProportion(bounds.Height () / fDataRect.Height());
+		scroller->SetSteps(fCharacterHeight,
+			Bounds().Height() - fCharacterHeight);
+
 		// scroll up if there is empty room on bottom
-		if (fDataRect.Height() < bounds.bottom) {
+		if (fDataRect.Height() < bounds.bottom)
 			ScrollBy(0.0f, bounds.bottom - fDataRect.Height());
-		}
 	}
 
 	Invalidate();
