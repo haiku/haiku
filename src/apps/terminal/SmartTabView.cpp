@@ -163,10 +163,15 @@ SmartTabView::AddTab(BView *target, BTab *tab)
 		ContainerView()->MoveBy(0, TabHeight());	
 
 		BScreen screen(Window());
-		if (Window()->Frame().bottom + TabHeight() > screen.Frame().bottom - 5)
-			Window()->MoveBy(0, -TabHeight());
-
-		Window()->ResizeBy(0, TabHeight());
+		if (Window()->DecoratorFrame().Height() + 2 * TabHeight()
+				< screen.Frame().Height()) {
+			if (Window()->Frame().bottom + TabHeight()
+				> screen.Frame().bottom - 5) {
+				Window()->MoveBy(0, -TabHeight());
+			}
+	
+			Window()->ResizeBy(0, TabHeight());
+		}
 	}
 	
 	Invalidate(TabFrame(CountTabs() - 1).InsetByCopy(-2, -2));
@@ -177,11 +182,17 @@ BTab *
 SmartTabView::RemoveTab(int32 index)
 {
 	if (CountTabs() == 2) {
-		// see above
+		// see AddTab()
 		BScreen screen(Window());
-		if (Window()->Frame().bottom > screen.Frame().bottom - 5 - TabHeight())
-			Window()->MoveBy(0, TabHeight());
-		Window()->ResizeBy(0, -TabHeight());
+		if (Window()->DecoratorFrame().Height() + 2 * TabHeight()
+				< screen.Frame().Height()) {
+			if (Window()->Frame().bottom
+				> screen.Frame().bottom - 5 - TabHeight()) {
+				Window()->MoveBy(0, TabHeight());
+			}
+			Window()->ResizeBy(0, -TabHeight());
+		}
+
 		ContainerView()->MoveBy(0, -TabHeight());		
 		ContainerView()->ResizeBy(0, TabHeight());	
 	}
