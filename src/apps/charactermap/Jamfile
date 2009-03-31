@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps charactermap ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared system ;
+
+Application CharacterMap :
+	CharacterMap.cpp
+	CharacterView.cpp
+	CharacterWindow.cpp
+	UnicodeBlocks.cpp
+
+	: be
+	: CharacterMap.rdef
+	;

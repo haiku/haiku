@@ -7,6 +7,7 @@ SubInclude HAIKU_TOP src apps autoraise ;
 SubInclude HAIKU_TOP src apps bsnow ;
 SubInclude HAIKU_TOP src apps bootman ;
 SubInclude HAIKU_TOP src apps cdplayer ;
+SubInclude HAIKU_TOP src apps charactermap ;
 SubInclude HAIKU_TOP src apps clock ;
 SubInclude HAIKU_TOP src apps codycam ;
 SubInclude HAIKU_TOP src apps cortex ;
