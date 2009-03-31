@@ -558,6 +558,28 @@ public:
 	
 };
 
+// Atom class for reading the dac3 atom
+class DAC3Atom : public DecoderConfigAtom {
+public:
+			DAC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~DAC3Atom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	void	OnOverrideAudioDescription(AudioDescription *pAudioDescription);
+	void	OnOverrideVideoDescription(VideoDescription *pVideoDescription);
+};
+
+// Atom class for reading the dec3 atom
+class DEC3Atom : public DecoderConfigAtom {
+public:
+			DEC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~DEC3Atom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	void	OnOverrideAudioDescription(AudioDescription *pAudioDescription);
+	void	OnOverrideVideoDescription(VideoDescription *pVideoDescription);
+};
+
 // Atom class for reading the Media Handler atom
 class HDLRAtom : public FullAtom {
 public:

@@ -105,8 +105,14 @@ bool AtomBase::MoveToEnd()
 uint64	AtomBase::getBytesRemaining()
 {
 	off_t EndPosition = streamOffset + atomSize;
+	off_t CurrPosition = getStream()->Position();
 	
-	return (EndPosition - getStream()->Position());
+	if (CurrPosition > EndPosition) {
+		printf("ERROR: Read past atom boundary by %Ld bytes\n",CurrPosition - EndPosition);
+		return 0;
+	}
+	
+	return (EndPosition - CurrPosition);
 }
 
 void	AtomBase::DisplayAtoms()
@@ -310,7 +316,8 @@ bool	AtomContainer::AddChild(AtomBase *pChildAtom)
 {
 	if (pChildAtom) {
 		pChildAtom->setParent(this);
-		atomChildren[TotalChildren++] = pChildAtom;
+		atomChildren.push_back(pChildAtom);
+		TotalChildren++;
 		return true;
 	}
 	return false;

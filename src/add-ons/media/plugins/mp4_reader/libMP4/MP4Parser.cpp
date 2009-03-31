@@ -197,6 +197,18 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new WAVEAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('dac3')) {
+		return new DAC3Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
+	if (aAtomType == uint32('dec3')) {
+		return new DEC3Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
+	if (aAtomType == uint32('avcC')) {
+		return new DecoderConfigAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -757,6 +769,7 @@ void STSZAtom::OnProcessMetaData()
 
 char *STSZAtom::OnGetAtomName()
 {
+	printf("SS=%ld Count=%ld ",SampleSize,SampleCount);
 	return "Sample Size Atom";
 }
 
@@ -1197,6 +1210,65 @@ void	WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 	// Nothing to override
 }
 
+DAC3Atom::DAC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : DecoderConfigAtom(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+DAC3Atom::~DAC3Atom()
+{
+}
+
+void DAC3Atom::OnProcessMetaData()
+{
+	DecoderConfigAtom::OnProcessMetaData();
+}
+
+void DAC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	pAudioDescription->codecSubType = 'dac3';
+	pAudioDescription->FrameSize = 1536;
+}
+
+void	DAC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	// Nothing to override
+}
+
+char *DAC3Atom::OnGetAtomName()
+{
+	return "Digital AC3";
+}
+
+DEC3Atom::DEC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : DecoderConfigAtom(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+DEC3Atom::~DEC3Atom()
+{
+}
+
+void DEC3Atom::OnProcessMetaData()
+{
+	DecoderConfigAtom::OnProcessMetaData();
+}
+
+void DEC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	pAudioDescription->codecSubType = 'dec3';
+	pAudioDescription->FrameSize = 1536;
+}
+
+void	DEC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	// Nothing to override
+}
+
+char *DEC3Atom::OnGetAtomName()
+{
+	return "Digital EAC3";
+}
+
+
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
@@ -1251,6 +1323,7 @@ void STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigS
 			delete aAtomBase;
 		} else {
 			// Unknown atom bad
+			printf("Unknown atom %s\n",aAtomBase->getAtomName());
 			delete aAtomBase;
 		}
 	}

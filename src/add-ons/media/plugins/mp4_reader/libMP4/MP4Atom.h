@@ -32,7 +32,7 @@
 #include <MediaFormats.h>
 #include <SupportDefs.h>
 
-#include <map>
+#include <vector>
 
 
 /*
@@ -60,7 +60,7 @@ public
 class AtomBase;
 
 typedef AtomBase* AtomBasePtr;
-typedef std::map<uint32, AtomBasePtr, std::less<uint32> > AtomArray;
+typedef std::vector<AtomBasePtr> AtomArray;
 
 class AtomBase {
 

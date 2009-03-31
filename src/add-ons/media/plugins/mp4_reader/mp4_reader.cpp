@@ -568,13 +568,13 @@ mp4Reader::Seek(void *cookie, uint32 flags, int64 *frame, bigtime_t *time)
 	if (flags & B_MEDIA_SEEK_TO_TIME) {
 		// frame = (time * rate) / fps / 1000000LL
 		*frame = ((*time * mp4cookie->frames_per_sec_rate) / (int64)mp4cookie->frames_per_sec_scale) / 1000000LL;
-		mp4cookie->frame_pos = *frame / mp4cookie->frame_size;
+		mp4cookie->frame_pos = *frame;
 	}
 	
 	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		// time = frame * 1000000LL * fps / rate
 		*time = (*frame * 1000000LL * (int64)mp4cookie->frames_per_sec_scale) / mp4cookie->frames_per_sec_rate;
-		mp4cookie->frame_pos = *frame / mp4cookie->frame_size;
+		mp4cookie->frame_pos = *frame;
 	}
 
 	TRACE("mp4Reader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",

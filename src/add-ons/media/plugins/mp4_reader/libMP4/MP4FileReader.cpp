@@ -96,7 +96,8 @@ bool
 MP4FileReader::AddChild(AtomBase *childAtom)
 {
 	if (childAtom) {
-		atomChildren[TotalChildren++] = childAtom;
+		atomChildren.push_back(childAtom);
+		TotalChildren++;
 		return true;
 	}
 	return false;
