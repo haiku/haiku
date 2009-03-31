@@ -352,7 +352,7 @@ run_menu(Menu *menu)
 	int32 selected;
 	MenuItem *item = menu->FindSelected(&selected);
 	if (item == NULL) {
-		selected = menu->CountItems() - 1;
+		selected = 0;
 		item = menu->ItemAt(selected);
 		if (item != NULL)
 			item->Select(true);
@@ -414,7 +414,7 @@ run_menu(Menu *menu)
 		} else if (key == TEXT_CONSOLE_KEY_RETURN
 			|| key == TEXT_CONSOLE_KEY_SPACE) {
 			// leave the menu
-			if (item->Submenu() != NULL) {
+			if (item->Submenu() != NULL && key == TEXT_CONSOLE_KEY_RETURN) {
 				int32 offset = sMenuOffset;
 				menu->Hide();
 
