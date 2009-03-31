@@ -7,6 +7,7 @@
 #include "CharacterWindow.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Application.h>
 #include <File.h>

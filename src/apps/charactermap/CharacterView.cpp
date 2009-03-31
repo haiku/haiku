@@ -7,6 +7,7 @@
 #include "CharacterView.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <LayoutUtils.h>
