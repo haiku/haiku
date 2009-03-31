@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _SCROLL_VIEW_H
@@ -68,6 +68,7 @@ public:
 	virtual status_t		GetSupportedSuites(BMessage* data);
 
 	virtual	BSize			MinSize();
+	virtual	BSize			MaxSize();
 	virtual	BSize			PreferredSize();
 
 	virtual	void			InvalidateLayout(bool descendants = false);

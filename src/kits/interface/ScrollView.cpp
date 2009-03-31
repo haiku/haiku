@@ -1,10 +1,10 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-#include <ScrollView.h>
 
-#include <stdio.h>
+
+#include <ScrollView.h>
 
 #include <ControlLook.h>
 #include <LayoutUtils.h>
@@ -742,6 +742,16 @@ BScrollView::MinSize()
 {
 	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MinSize()
 		: BSize(16, 16));
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BScrollView::MaxSize()
+{
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MaxSize()
+		: BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
