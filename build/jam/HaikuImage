@@ -302,6 +302,10 @@ local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript Installe
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
 
+local userBootScripts = UserBootscript.sample UserSetupEnvironment.sample ;
+SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
+AddFilesToHaikuImage home config boot : $(userBootScripts) ;
+
 local logoArtwork = "HAIKU logo - white on blue - big.png"
 	"HAIKU logo - white on blue - normal.png" ;
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;

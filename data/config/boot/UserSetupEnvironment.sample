@@ -1,0 +1,12 @@
+# Quick start for file UserSetupEnvironment.  Copy or rename this file as 
+#	"/boot/home/config/boot/UserSetupEnvironment".
+# Add custom environment variables to initialize
+
+# This file is a standard bash script.  For more information regarding shell 
+# scripts, refer to any online documentation for "bash scripting"
+
+# set Pe as the default svn editor for entering commit logs.
+# export SVN_EDITOR=lpe
+
+# Set important variables
+# export IS_COMPUTER_ON=1

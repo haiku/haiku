@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Quick start file for UserBootscript.  Copy or rename this file as 
+#	"/boot/home/config/boot/UserBootscript".  
+# Add custom commands to execute at every startup.
+
+# This file is a standard bash script.  For more information regarding shell 
+# scripts, refer to any online documentation for "bash scripting"
+
+# During boot, the commands listed in this script will be executed.
+# Typically, you will want to include a trailing '&' on each line.
+# This will allow the script to execute that command and process the next line.
+
+# Run LaunchBox
+# /boot/beos/apps/LaunchBox &
