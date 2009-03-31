@@ -8,7 +8,6 @@ resource(2, "META:S:DESC") #'MSDC' "MP4 Sound File";
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
 
 resource(4, "META:EXTENS") message(234) {
-	"extensions" = "mp4",
 	"extensions" = "m4a",
 	"type" = "audio/mp4"
 };
