@@ -236,8 +236,9 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 		UnicodeToUTF8(character, text, sizeof(text));
 
 		view->SetFont(&fCharacterFont);
-		view->DrawString(text, BPoint((fCharacterWidth - StringWidth(text)) / 2,
-			fCharacterBase));
+		view->DrawString(text,
+			BPoint((fCharacterWidth - view->StringWidth(text)) / 2,
+				fCharacterBase));
 
 		view->Sync();
 		bitmap->RemoveChild(view);
@@ -253,13 +254,6 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
 		fClickPoint.x = -1;
 	}
-}
-
-
-void
-CharacterView::MessageReceived(BMessage* message)
-{
-	BView::MessageReceived(message);
 }
 
 
@@ -408,11 +402,11 @@ CharacterView::_UpdateSize()
 	fTitleBase = (int32)ceilf(fontHeight.ascent);
 
 	// Find widest character
-	fCharacterWidth = (int32)ceilf(fCharacterFont.StringWidth("W"));
+	fCharacterWidth = (int32)ceilf(fCharacterFont.StringWidth("W") * 1.5f);
 
 	if (fCharacterFont.IsFullAndHalfFixed()) {
 		// TODO: improve this!
-		fCharacterWidth *= 2;
+		fCharacterWidth = (int32)ceilf(fCharacterWidth * 1.4);
 	}
 
 	fCharacterFont.GetHeight(&fontHeight);

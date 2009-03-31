@@ -49,8 +49,6 @@ protected:
 	virtual void			MouseMoved(BPoint where, uint32 transit,
 								const BMessage* dragMessage);
 
-	virtual void			MessageReceived(BMessage* message);
-
 	virtual void			Draw(BRect updateRect);
 
 	virtual void			DoLayout();
