@@ -146,9 +146,12 @@ CharacterWindow::CharacterWindow()
 	menu->AddItem(item = new BMenuItem("Show Private Blocks",
 		new BMessage(kMsgPrivateBlocks)));
 	item->SetMarked(fCharacterView->IsShowingPrivateBlocks());
+// TODO: this feature is not yet supported by Haiku!
+#if 0
 	menu->AddItem(item = new BMenuItem("Only Show Blocks Contained in Font",
 		new BMessage(kMsgContainedBlocks)));
 	item->SetMarked(fCharacterView->IsShowingContainedBlocksOnly());
+#endif
 	menuBar->AddItem(menu);
 
 	menuBar->AddItem(_CreateFontMenu());
@@ -339,7 +342,8 @@ CharacterWindow::_CreateFontMenu()
 
 	font_family currentFamily;
 	font_style currentStyle;
-	be_plain_font->GetFamilyAndStyle(&currentFamily, &currentStyle);
+	fCharacterView->CharacterFont().GetFamilyAndStyle(&currentFamily,
+		&currentStyle);
 
 	int32 numFamilies = count_font_families();
 
@@ -385,7 +389,7 @@ CharacterWindow::_UpdateUnicodeBlocks()
 		if (item->IsEnabled() != enabled) {
 			item->SetEnabled(enabled);
 			fUnicodeBlockView->InvalidateItem(i);
-		}	
+		}
 	}
 }
 
@@ -404,7 +408,6 @@ CharacterWindow::_CreateUnicodeBlocks()
 	}
 
 	fUnicodeBlockView->SetExplicitMinSize(BSize(minWidth / 2, 32));
-	// TODO: why is this ignored?
 	fUnicodeBlockView->SetExplicitMaxSize(BSize(minWidth, B_SIZE_UNSET));
 
 	_UpdateUnicodeBlocks();
