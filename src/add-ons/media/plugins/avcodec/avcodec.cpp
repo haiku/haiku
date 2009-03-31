@@ -17,7 +17,7 @@
 #include "avcodecplugin.h"
 
 #undef TRACE
-#define TRACE_AV_CODEC
+//#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
@@ -115,7 +115,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 	TRACE("[%c] avCodec::Setup()\n", isAudio?('a'):('v'));
 
 	if (isAudio && !fOutputBuffer)
-		fOutputBuffer = new char[100000];
+		fOutputBuffer = new char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 
 //#if DEBUG
 	char buffer[1024];
@@ -462,7 +462,8 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				continue;
 			}
 			if (fOutputBufferSize == 0) {
-				int len, out_size;
+				int len;
+				int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 				len = avcodec_decode_audio2(ffc, (short *)fOutputBuffer,
 					&out_size, (uint8_t*)fChunkBuffer + fChunkBufferOffset,
 					fChunkBufferSize);
