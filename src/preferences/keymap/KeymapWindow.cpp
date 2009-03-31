@@ -95,8 +95,6 @@ KeymapWindow::KeymapWindow()
 
 	_UpdateButtons();
 
-	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
-
 	// Make sure the user keymap directory exists
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -150,8 +148,9 @@ KeymapWindow::KeymapWindow()
 		= static_cast<KeymapListItem*>(fUserListView->FirstItem());
 
 	fCurrentMap.Load(current->EntryRef());
-	fPreviousMap.Load(current->EntryRef());
-	fAppliedMap.Load(current->EntryRef());
+	fPreviousMap = fCurrentMap;
+	fAppliedMap = fCurrentMap;
+	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
 
 	_UpdateShortcutButton();
 
@@ -506,10 +505,9 @@ KeymapWindow::_RevertKeymap()
 	}
 
 	fPreviousMap.Use();
-	fAppliedMap.Load(ref);
-
-	// TODO: add = operator
 	fCurrentMap.Load(ref);
+	fAppliedMap = fCurrentMap;
+
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
 	fCurrentMapName = _GetActiveKeymapName();

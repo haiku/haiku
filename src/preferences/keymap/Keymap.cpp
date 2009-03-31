@@ -609,6 +609,29 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 }
 
 
+Keymap&
+Keymap::operator=(const Keymap& other)
+{
+	delete[] fChars;
+	delete fModificationMessage;
+
+	fChars = new(std::nothrow) char[other.fCharsSize];
+	if (fChars != NULL) {
+		memcpy(fChars, other.fChars, other.fCharsSize);
+		fCharsSize = other.fCharsSize;
+	} else
+		fCharsSize = 0;
+
+	memcpy(&fKeys, &other.fKeys, sizeof(key_map));
+	strlcpy(fName, other.fName, sizeof(fName));
+
+	fTarget = other.fTarget;
+
+	if (other.fModificationMessage != NULL)
+		fModificationMessage = new BMessage(*other.fModificationMessage);
+}
+
+
 int32
 Keymap::_Offset(uint32 keyCode, uint32 modifiers, uint32* _table)
 {

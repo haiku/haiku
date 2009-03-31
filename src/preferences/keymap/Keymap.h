@@ -49,6 +49,8 @@ public:
 			const key_map&	Map() const { return fKeys; }
 			key_map&		Map() { return fKeys; }
 
+			Keymap&			operator=(const Keymap& other);
+
 private:
 			int32			_Offset(uint32 keyCode, uint32 modifiers,
 								uint32* _table = NULL);
@@ -63,4 +65,4 @@ private:
 };
 
 
-#endif //KEYMAP_H
+#endif	// KEYMAP_H
