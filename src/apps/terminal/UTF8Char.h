@@ -42,7 +42,7 @@ struct UTF8Char {
 	static int32 ByteCount(char firstChar)
 	{
 		// Note, this does not recognize invalid chars
-		uint32 c = firstChar;
+		uchar c = firstChar;
 		if (c < 0x80)
 			return 1;
 		if (c < 0xe0)
