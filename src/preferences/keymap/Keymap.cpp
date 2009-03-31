@@ -241,7 +241,7 @@ Keymap::IsModifierKey(uint32 keyCode)
 
 
 //! We need to know a modifier for a key
-uint32 
+uint32
 Keymap::Modifier(uint32 keyCode)
 {
 	if (keyCode == fKeys.caps_key)
@@ -612,6 +612,9 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 Keymap&
 Keymap::operator=(const Keymap& other)
 {
+	if (this == &other)
+		return *this;
+
 	delete[] fChars;
 	delete fModificationMessage;
 
@@ -629,6 +632,8 @@ Keymap::operator=(const Keymap& other)
 
 	if (other.fModificationMessage != NULL)
 		fModificationMessage = new BMessage(*other.fModificationMessage);
+
+	return *this;
 }
 
 
