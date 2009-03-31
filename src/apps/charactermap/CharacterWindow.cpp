@@ -217,6 +217,10 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 			fSelectedFontItem->SetMarked(false);
 
+			// If it's the family menu, just select the first style
+			if (item->Submenu() != NULL)
+				item = item->Submenu()->ItemAt(0);
+
 			if (item != NULL) {
 				item->SetMarked(true);
 				fSelectedFontItem = item;
