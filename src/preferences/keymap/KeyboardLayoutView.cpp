@@ -631,7 +631,7 @@ KeyboardLayoutView::_SpecialMappedKeySymbol(const char* bytes, size_t numBytes)
 	if (bytes[0] == B_ENTER)
 		return "\xe2\x86\xb5";
 	if (bytes[0] == B_BACKSPACE)
-		return "back";//\xe2\x86\x92";
+		return "\xe2\x8c\xab";
 
 	if (bytes[0] == B_UP_ARROW)
 		return "\xe2\x86\x91";
@@ -654,8 +654,6 @@ KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes)
 
 	if (bytes[0] == B_ESCAPE)
 		return "ESC";
-	if (bytes[0] == B_BACKSPACE)
-		return "BACKSPACE";
 
 	if (bytes[0] == B_INSERT)
 		return "INS";
