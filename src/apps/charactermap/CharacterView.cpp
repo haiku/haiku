@@ -235,6 +235,8 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 		char text[16];
 		UnicodeToUTF8(character, text, sizeof(text));
 
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 		view->SetFont(&fCharacterFont);
 		view->DrawString(text,
 			BPoint((fCharacterWidth - view->StringWidth(text)) / 2,
@@ -253,6 +255,9 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 
 		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
 		fClickPoint.x = -1;
+
+		fHasCharacter = false;
+		Invalidate(fCurrentCharacterFrame);
 	}
 }
 
