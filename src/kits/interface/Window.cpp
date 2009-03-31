@@ -1532,16 +1532,9 @@ BWindow::Zoom()
 		the smallest of three rectangles:
 	*/
 
-	// fallback in case retrieving the decorator settings fails (highly unlikely)
-	float borderWidth = 5.0;
-	float tabHeight = 21.0;
-	BMessage settings;
-	if (GetDecoratorSettings(&settings) == B_OK) {
-		BRect tabRect;
-		if (settings.FindRect("tab frame", &tabRect) == B_OK)
-			tabHeight = tabRect.Height();
-		settings.FindFloat("border width", &borderWidth);
-	}
+	float borderWidth;
+	float tabHeight;
+	_GetDecoratorSize(&borderWidth, &tabHeight);
 
 	// 1) the rectangle defined by SetZoomLimits(),
 	float zoomedWidth = fMaxZoomWidth;
@@ -1555,6 +1548,7 @@ BWindow::Zoom()
 
 	// 3) the screen rectangle
 	BScreen screen(this);
+	// TODO: Broken for tab on left side windows...
 	float screenWidth = screen.Frame().Width() - 2 * borderWidth;
 	float screenHeight = screen.Frame().Height() - (2 * borderWidth + tabHeight);
 	if (screenWidth < zoomedWidth)
@@ -1562,7 +1556,8 @@ BWindow::Zoom()
 	if (screenHeight < zoomedHeight)
 		zoomedHeight = screenHeight;
 
-	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth, tabHeight + borderWidth);
+	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth,
+		tabHeight + borderWidth);
 
 	// UN-ZOOM:
 	if (fPreviousFrame.IsValid()
@@ -1911,6 +1906,22 @@ BRect
 BWindow::Frame() const
 {
 	return fFrame;
+}
+
+
+BRect
+BWindow::DecoratorFrame() const
+{
+	BRect decortatorFrame(Frame());
+	float borderWidth;
+	float tabHeight;
+	_GetDecoratorSize(&borderWidth, &tabHeight);
+	// TODO: Broken for tab on left window side windows...
+	decortatorFrame.top -= tabHeight;
+	decortatorFrame.left -= borderWidth;
+	decortatorFrame.right += borderWidth;
+	decortatorFrame.bottom += borderWidth;
+	return decortatorFrame;
 }
 
 
@@ -3683,6 +3694,36 @@ bool
 BWindow::IsFilePanel() const
 {
 	return fIsFilePanel;
+}
+
+
+void
+BWindow::_GetDecoratorSize(float* _borderWidth, float* _tabHeight) const
+{
+	// fallback in case retrieving the decorator settings fails
+	// (highly unlikely)
+	float borderWidth = 5.0;
+	float tabHeight = 21.0;
+
+	BMessage settings;
+	if (GetDecoratorSettings(&settings) == B_OK) {
+		BRect tabRect;
+		if (settings.FindRect("tab frame", &tabRect) == B_OK)
+			tabHeight = tabRect.Height();
+		settings.FindFloat("border width", &borderWidth);
+	} else {
+		// probably no-border window look
+		if (fLook == B_NO_BORDER_WINDOW_LOOK) {
+			borderWidth = 0.0;
+			tabHeight = 0.0;
+		}
+		// else use fall-back values from above
+	}
+
+	if (_borderWidth != NULL)
+		*_borderWidth = borderWidth;
+	if (_tabHeight != NULL)
+		*_tabHeight = tabHeight;
 }
 
 

@@ -186,6 +186,7 @@ public:
 
 			BRect			Bounds() const;
 			BRect			Frame() const;
+			BRect			DecoratorFrame() const;
 			const char*		Title() const;
 			void			SetTitle(const char* title);
 			bool			IsFront() const;
@@ -330,6 +331,9 @@ private:
 			BView*			_FindPreviousNavigable(BView *focus, uint32 flags);
 			bool			_HandleKeyDown(BMessage* event);
 			void			_KeyboardNavigation();
+
+			void			_GetDecoratorSize(float* _borderWidth,
+								float* _tabHeight) const;
 
 private:
 			char*			fTitle;
