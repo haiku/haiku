@@ -31,7 +31,8 @@ class BRegion {
 								BRegion(const BRect rect);
 	virtual						~BRegion();	
 
-			BRegion				&operator=(const BRegion &from);
+			BRegion&			operator=(const BRegion& from);
+			bool				operator==(const BRegion& other) const;
 
 			void				Set(BRect newBounds);
 			void				Set(clipping_rect newBounds);

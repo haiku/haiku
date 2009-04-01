@@ -26,10 +26,11 @@ const static int32 kDataBlockSize = 8;
 	and its fBounds will be invalid.
 */
 BRegion::BRegion()
-	: fCount(0)
-	, fDataSize(0)
-	, fBounds((clipping_rect){ 0, 0, 0, 0 })
-	, fData(NULL)
+	:
+	fCount(0),
+	fDataSize(0),
+	fBounds((clipping_rect){ 0, 0, 0, 0 }),
+	fData(NULL)
 {
 	_SetSize(kDataBlockSize);
 }
@@ -39,10 +40,11 @@ BRegion::BRegion()
 	\param region The region to copy.
 */
 BRegion::BRegion(const BRegion& region)
-	: fCount(0)
-	, fDataSize(0)
-	, fBounds((clipping_rect){ 0, 0, 0, 0 })
-	, fData(NULL)
+	:
+	fCount(0),
+	fDataSize(0),
+	fBounds((clipping_rect){ 0, 0, 0, 0 }),
+	fData(NULL)
 {
 	*this = region;
 }
@@ -52,10 +54,11 @@ BRegion::BRegion(const BRegion& region)
 	\param rect The BRect to set the region to.
 */
 BRegion::BRegion(const BRect rect)
-	: fCount(0)
-	, fDataSize(1)
-	, fBounds((clipping_rect){ 0, 0, 0, 0 })
-	, fData(&fBounds)
+	:
+	fCount(0),
+	fDataSize(1),
+	fBounds((clipping_rect){ 0, 0, 0, 0 }),
+	fData(&fBounds)
 {
 	if (!rect.IsValid())
 		return;
@@ -94,7 +97,7 @@ BRegion::~BRegion()
 	\param region the BRegion to copy.
 	\return This function always returns \c *this.
 */
-BRegion &
+BRegion&
 BRegion::operator=(const BRegion &region)
 {
 	if (&region == this)
@@ -112,6 +115,21 @@ BRegion::operator=(const BRegion &region)
 	return *this;
 }
 
+/*!	\brief Compares this region to another (by value).
+	\param other the BRegion to compare to.
+	\return \ctrue if the two regions are the same, \cfalse otherwise.
+*/
+bool
+BRegion::operator==(const BRegion& other) const
+{
+	if (&other == this)
+		return true;
+	
+	if (fCount != other.fCount)
+		return false;
+	
+	return memcmp(fData, other.fData, fCount * sizeof(clipping_rect)) == 0;
+}
 
 /*!	\brief Set the region to contain just the given BRect.
 	\param newBounds A BRect.
