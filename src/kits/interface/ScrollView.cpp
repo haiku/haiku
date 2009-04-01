@@ -31,7 +31,7 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizingMode,
 
 BScrollView::BScrollView(const char* name, BView* target, uint32 flags,
 		bool horizontal, bool vertical, border_style border)
-	: BView(name, _ModifyFlags(flags, border) | B_SUPPORTS_LAYOUT),
+	: BView(name, _ModifyFlags(flags, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -753,7 +753,7 @@ BScrollView::MaxSize()
 	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MaxSize()
 		: BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
 
@@ -763,7 +763,7 @@ BScrollView::PreferredSize()
 	BSize size = _ComputeSize(fTarget != NULL ? fTarget->PreferredSize()
 		: BSize(32, 32));
 
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
 
 
