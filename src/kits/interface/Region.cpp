@@ -98,7 +98,7 @@ BRegion::~BRegion()
 	\return This function always returns \c *this.
 */
 BRegion&
-BRegion::operator=(const BRegion &region)
+BRegion::operator=(const BRegion& region)
 {
 	if (&region == this)
 		return *this;
@@ -115,6 +115,7 @@ BRegion::operator=(const BRegion &region)
 	return *this;
 }
 
+
 /*!	\brief Compares this region to another (by value).
 	\param other the BRegion to compare to.
 	\return \ctrue if the two regions are the same, \cfalse otherwise.
@@ -130,6 +131,7 @@ BRegion::operator==(const BRegion& other) const
 	
 	return memcmp(fData, other.fData, fCount * sizeof(clipping_rect)) == 0;
 }
+
 
 /*!	\brief Set the region to contain just the given BRect.
 	\param newBounds A BRect.
