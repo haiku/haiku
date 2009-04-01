@@ -7,6 +7,7 @@
 
 class BButton;
 class BCheckBox;
+class BColorControl;
 class BListView;
 class BMenuField;
 class BTextControl;
@@ -37,9 +38,7 @@ class ObjectWindow : public BWindow {
 
 	BMenuField*			fDrawingModeMF;
 
-	BTextControl*		fRedTC;
-	BTextControl*		fGreenTC;
-	BTextControl*		fBlueTC;
+	BColorControl*		fColorControl;
 	BTextControl*		fAlphaTC;
 
 	BCheckBox*			fFillCB;

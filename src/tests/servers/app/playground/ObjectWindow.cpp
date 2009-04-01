@@ -9,6 +9,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <ColorControl.h>
 #include <ListItem.h>
 #include <ListView.h>
 #include <Menu.h>
@@ -116,18 +117,8 @@ public:
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
-//	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-//			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
-//	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-//			  B_ASYNCHRONOUS_CONTROLS)
-//	: BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-//			  B_ASYNCHRONOUS_CONTROLS)
-//	: BWindow(frame, name, B_BORDERED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-//			  B_ASYNCHRONOUS_CONTROLS)
-//	: BWindow(frame, name, B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-//			  B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect b(Bounds());
 
@@ -147,7 +138,8 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b = Bounds();
 	b.top = menuBar->Bounds().bottom + 1;
 	b.right = ceilf((b.left + b.right) / 2.0);
-	BBox* bg = new BBox(b, "bg box", B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, B_PLAIN_BORDER);
+	BBox* bg = new BBox(b, "bg box", B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW,
+		B_PLAIN_BORDER);
 
 	AddChild(bg);
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -160,44 +152,36 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 								 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	// wrap a scroll view around the object view
 	BScrollView* scrollView = new BScrollView("object scroller", fObjectView,
-											  B_FOLLOW_ALL, 0, true, true,
-											  B_NO_BORDER);
+		B_FOLLOW_ALL, 0, true, true, B_NO_BORDER);
 
 	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_VERTICAL)) {
 		scrollBar->SetRange(0.0, fObjectView->Bounds().Height());
 		scrollBar->SetProportion(0.5);
-//		scrollBar->SetRange(0.0, 0.0);
 	}
 	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_HORIZONTAL)) {
 		scrollBar->SetRange(0.0, fObjectView->Bounds().Width());
 		scrollBar->SetProportion(0.5);
-//		scrollBar->SetRange(0.0, 0.0);
-//		b = scrollBar->Frame();
-//		b.right = b.left + 50;
-//		scrollBar->ResizeBy(-51, 0);
-//		scrollBar->MoveBy(51, 0);
-//		StatusView* statusView = new StatusView(b, scrollBar);
-//		scrollView->AddChild(statusView);
 	}
 	AddChild(scrollView);
 
 	b = bg->Bounds();
 	// controls occupy the left side of the window
 	b.InsetBy(5.0, 5.0);
-	BBox* controlGroup = new BBox(b, "controls box", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-								  B_WILL_DRAW, B_FANCY_BORDER);
+	BBox* controlGroup = new BBox(b, "controls box",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
 
 	controlGroup->SetLabel("Controls");
 	bg->AddChild(controlGroup);
 
 	b = controlGroup->Bounds();
-	b.top += 10.0;
+	b.top += controlGroup->InnerFrame().top;
 	b.bottom = b.top + 25.0;
-	b.InsetBy(5.0, 5.0);
-	b.right = b.left + b.Width() / 2.0 - 3.0;
+	b.InsetBy(10.0, 10.0);
+	b.right = b.left + b.Width() / 2.0 - 5.0;
 
 	// new button
-	fNewB = new BButton(b, "new button", "New Object", new BMessage(MSG_NEW_OBJECT));
+	fNewB = new BButton(b, "new button", "New Object",
+		new BMessage(MSG_NEW_OBJECT));
 	controlGroup->AddChild(fNewB);
 	SetDefaultButton(fNewB);
 
@@ -285,63 +269,46 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	item->SetMarked(true);
 	popupMenu->AddItem(item);
 
-	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
-	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode",
-									popupMenu);
+	b.OffsetBy(0, radioButton->Bounds().Height() + 10.0);
+	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode:",
+		popupMenu);
 
 	controlGroup->AddChild(fDrawingModeMF);
 
-	fDrawingModeMF->SetDivider(fDrawingModeMF->StringWidth(fDrawingModeMF->Label()) + 10.0);
-
-	// red text control
-	b.OffsetBy(0, fDrawingModeMF->Bounds().Height() + 5.0);
-	fRedTC = new BTextControl(b, "red text control", "Red", "",
-							  new BMessage(MSG_SET_COLOR));
-	controlGroup->AddChild(fRedTC);
-
-	// green text control
-	b.OffsetBy(0, fRedTC->Bounds().Height() + 5.0);
-	fGreenTC = new BTextControl(b, "green text control", "Green", "",
-								new BMessage(MSG_SET_COLOR));
-	controlGroup->AddChild(fGreenTC);
-
-	// blue text control
-	b.OffsetBy(0, fGreenTC->Bounds().Height() + 5.0);
-	fBlueTC = new BTextControl(b, "blue text control", "Blue", "",
-							   new BMessage(MSG_SET_COLOR));
-	controlGroup->AddChild(fBlueTC);
-
+	fDrawingModeMF->SetDivider(fDrawingModeMF->StringWidth(
+		fDrawingModeMF->Label()) + 10.0);
+	
+	// color control
+	b.OffsetBy(0, fDrawingModeMF->Bounds().Height() + 10.0);
+	fColorControl = new BColorControl(b.LeftTop(), B_CELLS_16x16, 8,
+		"color control", new BMessage(MSG_SET_COLOR));
+	controlGroup->AddChild(fColorControl);
+	
 	// alpha text control
-	b.OffsetBy(0, fBlueTC->Bounds().Height() + 5.0);
-	fAlphaTC = new BTextControl(b, "alpha text control", "Alpha", "",
-								new BMessage(MSG_SET_COLOR));
+	b.OffsetBy(0, fColorControl-> Bounds().Height() + 5.0);
+	fAlphaTC = new BTextControl(b, "alpha text control", "Alpha:", "",
+		new BMessage(MSG_SET_COLOR));
 	controlGroup->AddChild(fAlphaTC);
 
 	// divide text controls the same
-	float mWidth = fDrawingModeMF->StringWidth(fDrawingModeMF->Label());
-	float rWidth = fRedTC->StringWidth(fRedTC->Label());
-	float gWidth = fGreenTC->StringWidth(fGreenTC->Label());
-	float bWidth = fBlueTC->StringWidth(fBlueTC->Label());
-	float aWidth = fAlphaTC->StringWidth(fAlphaTC->Label());
-
-	float width = max_c(mWidth, max_c(rWidth, max_c(gWidth, max_c(bWidth, aWidth)))) + 10.0;
+    float mWidth = fDrawingModeMF->StringWidth(fDrawingModeMF->Label());
+    float aWidth = fAlphaTC->StringWidth(fAlphaTC->Label());
+    
+    float width = max_c(mWidth, aWidth) + 20.0;
 	fDrawingModeMF->SetDivider(width);
-	fRedTC->SetDivider(width);
-	fGreenTC->SetDivider(width);
-	fBlueTC->SetDivider(width);
 	fAlphaTC->SetDivider(width);
 
 	// fill check box
 	b.OffsetBy(0, fAlphaTC->Bounds().Height() + 5.0);
 	fFillCB = new BCheckBox(b, "fill check box", "Fill",
-							new BMessage(MSG_SET_FILL_OR_STROKE));
+		new BMessage(MSG_SET_FILL_OR_STROKE));
 	controlGroup->AddChild(fFillCB);
 
 	// pen size text control
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	b.bottom = b.top + 10.0;//35;
-	fPenSizeS = new BSlider(b, "width slider", "Width",
-							NULL, 1, 100, B_TRIANGLE_THUMB);
+	fPenSizeS = new BSlider(b, "width slider", "Width:", NULL, 1, 100,
+		B_TRIANGLE_THUMB);
 	fPenSizeS->SetLimitLabels("1", "100");
 	fPenSizeS->SetModificationMessage(new BMessage(MSG_SET_PEN_SIZE));
 	fPenSizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -351,42 +318,24 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	// list view with objects
 	b = controlGroup->Bounds();
-	b.top += 10.0;
-	b.InsetBy(9.0, 7.0);
+	b.top += controlGroup->InnerFrame().top;
+	b.InsetBy(10.0, 10.0);
 	b.left = b.left + b.Width() / 2.0 + 6.0;
 	b.right -= B_V_SCROLL_BAR_WIDTH;
-b.bottom = fDrawingModeMF->Frame().top - 5.0;
+    b.bottom = fDrawingModeMF->Frame().top - 10.0;
 
 	fObjectLV = new ObjectListView(b, "object list", B_SINGLE_SELECTION_LIST);
 	fObjectLV->SetSelectionMessage(new BMessage(MSG_OBJECT_SELECTED));
 
 	// wrap a scroll view around the list view
 	scrollView = new BScrollView("list scroller", fObjectLV,
-								 B_FOLLOW_NONE, 0, false, true,
-								 B_FANCY_BORDER);
+		B_FOLLOW_NONE, 0, false, true, B_FANCY_BORDER);
 	controlGroup->AddChild(scrollView);
-
-	// add a dummy tab view
-	b.top = b.bottom + 10.0;
-	b.right += B_V_SCROLL_BAR_WIDTH;
-	b.bottom = controlGroup->Bounds().bottom - 7.0;
-	BTabView* tabView = new BTabView(b, "tab view", B_WIDTH_FROM_WIDEST, 
-									 B_FOLLOW_ALL, B_FULL_UPDATE_ON_RESIZE |
-									 B_WILL_DRAW | B_NAVIGABLE_JUMP |
-									 B_FRAME_EVENTS | B_NAVIGABLE);
-	
-	BView* tabChild = new TestView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0);
-	tabView->AddTab(tabChild);
-	tabChild = new TestView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0);
-	tabView->AddTab(tabChild);
-	tabChild = new BTextControl(BRect(0, 0, 80, 40), "T", "Test", "Text", NULL);
-	tabView->AddTab(tabChild);
-	controlGroup->AddChild(tabView);
 
 	// enforce some size limits
 	float minWidth = controlGroup->Frame().Width() + 30.0;
-	float minHeight = fPenSizeS->Frame().bottom +
-					  menuBar->Bounds().Height() + 15.0;
+	float minHeight = fPenSizeS->Frame().bottom
+		+ menuBar->Bounds().Height() + 15.0;
 	float maxWidth = minWidth * 4.0;
 	float maxHeight = minHeight + 100;
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
@@ -520,17 +469,10 @@ ObjectWindow::_UpdateColorControls() const
 	rgb_color c = fObjectView->StateColor();
 	char string[32];
 
-	sprintf(string, "%d", c.red);
-	fRedTC->SetText(string);
-
-	sprintf(string, "%d", c.green);
-	fGreenTC->SetText(string);
-
-	sprintf(string, "%d", c.blue);
-	fBlueTC->SetText(string);
-
 	sprintf(string, "%d", c.alpha);
 	fAlphaTC->SetText(string);
+
+	fColorControl->SetValue(c);
 }
 
 // _GetColor
@@ -538,11 +480,10 @@ rgb_color
 ObjectWindow::_GetColor() const
 {
 	rgb_color c;
-	c.red	= max_c(0, min_c(255, atoi(fRedTC->Text())));
-	c.green	= max_c(0, min_c(255, atoi(fGreenTC->Text())));
-	c.blue	= max_c(0, min_c(255, atoi(fBlueTC->Text())));
-	c.alpha	= max_c(0, min_c(255, atoi(fAlphaTC->Text())));
-
+	
+	c = fColorControl->ValueAsColor();
+	c.alpha = max_c(0, min_c(255, atoi(fAlphaTC->Text())));
+	
 	return c;
 }
 
