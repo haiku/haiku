@@ -10,10 +10,17 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Clipboard.h>
 #include <LayoutUtils.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <ScrollBar.h>
+#include <Window.h>
 
 #include "UnicodeBlocks.h"
+
+
+static const uint32 kMsgCopyAsEscapedString = 'cesc';
 
 
 CharacterView::CharacterView(const char* name)
@@ -151,8 +158,42 @@ CharacterView::UnicodeToUTF8Hex(uint32 c, char* text, size_t textSize)
 
 
 void
+CharacterView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgCopyAsEscapedString:
+		case B_COPY:
+		{
+			uint32 character;
+			if (message->FindInt32("character", (int32*)&character) != B_OK) {
+				if (!fHasCharacter)
+					break;
+
+				character = fCurrentCharacter;
+			}
+
+			char text[16];
+			if (message->what == kMsgCopyAsEscapedString)
+				UnicodeToUTF8Hex(character, text, sizeof(text));
+			else
+				UnicodeToUTF8(character, text, sizeof(text));
+
+			_CopyToClipboard(text);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 CharacterView::AttachedToWindow()
 {
+	Window()->AddShortcut('C', B_SHIFT_KEY,
+		new BMessage(kMsgCopyAsEscapedString), this);
 }
 
 
@@ -180,7 +221,34 @@ CharacterView::FrameResized(float width, float height)
 void
 CharacterView::MouseDown(BPoint where)
 {
-	fClickPoint = where;
+	int32 buttons;
+	if (!fHasCharacter
+		|| Window()->CurrentMessage() == NULL
+		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
+		|| (buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
+		// Memorize click point for dragging
+		fClickPoint = where;
+		return;
+	}
+
+	// Open pop-up menu
+
+	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	menu->SetFont(be_plain_font);
+
+	BMessage* message =  new BMessage(B_COPY);
+	message->AddInt32("character", fCurrentCharacter);
+	menu->AddItem(new BMenuItem("Copy Character", message, 'C'));
+
+	message =  new BMessage(kMsgCopyAsEscapedString);
+	message->AddInt32("character", fCurrentCharacter);
+	menu->AddItem(new BMenuItem("Copy As Escaped Byte String",
+		message, 'C', B_SHIFT_KEY));
+
+	menu->SetTargetForItems(this);
+
+	ConvertToScreen(&where);
+	menu->Go(where, true, true, true);
 }
 
 
@@ -404,7 +472,7 @@ CharacterView::_UpdateSize()
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	fTitleHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading);
+		+ fontHeight.leading) + 2;
 	fTitleBase = (int32)ceilf(fontHeight.ascent);
 
 	// Find widest character
@@ -467,4 +535,22 @@ CharacterView::_UpdateSize()
 	}
 
 	Invalidate();
+}
+
+
+void
+CharacterView::_CopyToClipboard(const char* text)
+{
+	if (!be_clipboard->Lock())
+		return;
+
+	be_clipboard->Clear();
+
+	BMessage* clip = be_clipboard->Data();
+	if (clip != NULL) {
+		clip->AddData("text/plain", B_MIME_TYPE, text, strlen(text));
+		be_clipboard->Commit();
+	}
+
+	be_clipboard->Unlock();
 }

@@ -38,6 +38,8 @@ public:
 								size_t textSize);
 
 protected:
+	virtual void			MessageReceived(BMessage* message);
+
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
 
@@ -58,6 +60,7 @@ private:
 			bool 			_GetCharacterAt(BPoint point, uint32& character,
 								BRect* _frame = NULL);
 			void			_UpdateSize();
+			void			_CopyToClipboard(const char* text);
 
 private:
 			BMessenger		fTarget;

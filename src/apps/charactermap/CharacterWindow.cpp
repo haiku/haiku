@@ -181,6 +181,10 @@ void
 CharacterWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COPY:
+			PostMessage(message, fCharacterView);
+			break;
+
 		case kMsgUnicodeBlockSelected:
 		{
 			int32 index;
