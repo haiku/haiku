@@ -247,6 +247,9 @@ public:
 									const char* name, uint32 resizingMode,
 									uint32 flags, border_style = B_NO_BORDER,
 									bool showHorizontalScrollbar = true);
+								BColumnListView(const char* name,
+									uint32 flags, border_style = B_NO_BORDER,
+									bool showHorizontalScrollbar = true);
 	virtual						~BColumnListView();
 
 	// Interaction
@@ -370,8 +373,20 @@ protected:
 	virtual	void 				WindowActivated(bool active);
 	virtual	void 				Draw(BRect updateRect);
 
+	virtual BSize				MinSize();
+	virtual BSize				PreferredSize();
+	virtual BSize				MaxSize();
+
+	virtual	void				InvalidateLayout(bool descendants = false);
+	virtual	void				DoLayout();
+
 private:
 			void				_Init(bool showHorizontalScrollbar);
+			void				_GetChildViewRects(const BRect& bounds,
+									bool showHorizontalScrollBar,
+									BRect& titleRect, BRect& outlineRect,
+									BRect& vScrollBarRect,
+									BRect& hScrollBarRect);
 
 			rgb_color 			fColorList[B_COLOR_TOTAL];
 			BPrivate::TitleView* fTitleView;

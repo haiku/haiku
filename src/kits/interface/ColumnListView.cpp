@@ -55,6 +55,7 @@ All rights reserved.
 #include <Cursor.h>
 #include <Debug.h>
 #include <GraphicsDefs.h>
+#include <LayoutUtils.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -767,8 +768,22 @@ BColumnListView::BColumnListView(BRect rect, const char* name,
 	:
 	BView(rect, name, resizingMode,
 		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
-	fStatusView(0),
-	fSelectionMessage(0),
+	fStatusView(NULL),
+	fSelectionMessage(NULL),
+	fSortingEnabled(true),
+	fLatchWidth(kLatchWidth),
+	fBorderStyle(border)
+{
+	_Init(showHorizontalScrollbar);
+}
+
+
+BColumnListView::BColumnListView(const char* name, uint32 flags,
+	border_style border, bool showHorizontalScrollbar)
+	:
+	BView(name, flags | B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
+	fStatusView(NULL),
+	fSelectionMessage(NULL),
 	fSortingEnabled(true),
 	fLatchWidth(kLatchWidth),
 	fBorderStyle(border)
@@ -1768,6 +1783,176 @@ BColumnListView::Refresh()
 		fOutlineView->Invalidate();
 		Window()->UpdateIfNeeded();
 		UnlockLooper();
+	}
+}
+
+
+BSize
+BColumnListView::MinSize()
+{
+	BSize size;
+	size.width = 100;
+	size.height = kTitleHeight + 3 * ceilf(be_plain_font->Size());
+	if (!fHorizontalScrollBar->IsHidden())
+		size.height += fHorizontalScrollBar->Frame().Height() + 1;
+	// TODO: Take border size into account
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BColumnListView::PreferredSize()
+{
+	BSize size = MinSize();
+	size.height += ceilf(be_plain_font->Size()) * 20;
+	// TODO: size.width = entire width of title view (all columns)
+
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+BSize
+BColumnListView::MaxSize()
+{
+	BSize size(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+void
+BColumnListView::InvalidateLayout(bool descendants)
+{
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BColumnListView::DoLayout()
+{
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	BRect titleRect;
+	BRect outlineRect;
+	BRect vScrollBarRect;
+	BRect hScrollBarRect;
+	_GetChildViewRects(Bounds(), !fHorizontalScrollBar->IsHidden(),
+		titleRect, outlineRect, vScrollBarRect, hScrollBarRect);
+
+	fTitleView->MoveTo(titleRect.LeftTop());
+	fTitleView->ResizeTo(titleRect.Width(), titleRect.Height());
+
+	fOutlineView->MoveTo(outlineRect.LeftTop());
+	fOutlineView->ResizeTo(outlineRect.Width(), outlineRect.Height());
+
+	fVerticalScrollBar->MoveTo(vScrollBarRect.LeftTop());
+	fVerticalScrollBar->ResizeTo(vScrollBarRect.Width(),
+		vScrollBarRect.Height());
+	
+	fHorizontalScrollBar->MoveTo(hScrollBarRect.LeftTop());
+	fHorizontalScrollBar->ResizeTo(hScrollBarRect.Width(),
+		hScrollBarRect.Height());
+
+	fOutlineView->FixScrollBar(true);
+}
+
+
+void
+BColumnListView::_Init(bool showHorizontalScrollbar)
+{
+	SetViewColor(B_TRANSPARENT_32_BIT);
+
+	BRect bounds(Bounds());
+	if (bounds.Width() <= 0)
+		bounds.right = 100;
+	if (bounds.Height() <= 0)
+		bounds.bottom = 100;
+
+	for (int i = 0; i < (int)B_COLOR_TOTAL; i++)
+		fColorList[i] = kColor[i];
+
+	BRect titleRect;
+	BRect outlineRect;
+	BRect vScrollBarRect;
+	BRect hScrollBarRect;
+	_GetChildViewRects(bounds, showHorizontalScrollbar, titleRect, outlineRect,
+		vScrollBarRect, hScrollBarRect);
+
+	fOutlineView = new OutlineView(outlineRect, &fColumns, &fSortColumns, this);
+	AddChild(fOutlineView);
+
+
+	fTitleView = new TitleView(titleRect, fOutlineView, &fColumns,
+		&fSortColumns, this, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	AddChild(fTitleView);
+
+	fVerticalScrollBar = new BScrollBar(vScrollBarRect, "vertical_scroll_bar",
+		fOutlineView, 0.0, bounds.Height(), B_VERTICAL);
+	AddChild(fVerticalScrollBar);
+
+	fHorizontalScrollBar = new BScrollBar(hScrollBarRect,
+		"horizontal_scroll_bar", fTitleView, 0.0, bounds.Width(), B_HORIZONTAL);
+	AddChild(fHorizontalScrollBar);
+
+	if (!showHorizontalScrollbar)
+		fHorizontalScrollBar->Hide();
+
+	fOutlineView->FixScrollBar(true);
+}
+
+
+void
+BColumnListView::_GetChildViewRects(const BRect& bounds,
+	bool showHorizontalScrollbar, BRect& titleRect, BRect& outlineRect,
+	BRect& vScrollBarRect, BRect& hScrollBarRect)
+{
+	titleRect = bounds;
+	titleRect.bottom = titleRect.top + kTitleHeight;
+#if !LOWER_SCROLLBAR
+	titleRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
+#endif
+
+	outlineRect = bounds;
+	outlineRect.top = titleRect.bottom + 1.0;
+	outlineRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	if (showHorizontalScrollbar)
+		outlineRect.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+
+	vScrollBarRect = bounds;
+#if LOWER_SCROLLBAR
+	vScrollBarRect.top += kTitleHeight;
+#endif
+
+	vScrollBarRect.left = vScrollBarRect.right - B_V_SCROLL_BAR_WIDTH;
+	if (showHorizontalScrollbar)
+		vScrollBarRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
+	hScrollBarRect = bounds;
+	hScrollBarRect.top = hScrollBarRect.bottom - B_H_SCROLL_BAR_HEIGHT;
+	hScrollBarRect.right -= B_V_SCROLL_BAR_WIDTH;
+
+	// Adjust stuff so the border will fit.
+	if (fBorderStyle == B_PLAIN_BORDER) {
+		titleRect.InsetBy(1, 0);
+		titleRect.top++;
+		outlineRect.InsetBy(1, 0);
+		outlineRect.bottom--;
+
+		vScrollBarRect.OffsetBy(-1, 0);
+		vScrollBarRect.InsetBy(0, 1);
+		hScrollBarRect.OffsetBy(0, -1);
+		hScrollBarRect.InsetBy(1, 0);
+	} else if (fBorderStyle == B_FANCY_BORDER) {
+		titleRect.InsetBy(2, 0);
+		titleRect.top += 2;
+		outlineRect.InsetBy(2, 0);
+		outlineRect.bottom -= 2;
+
+		vScrollBarRect.OffsetBy(-2, 0);
+		vScrollBarRect.InsetBy(0, 2);
+		hScrollBarRect.OffsetBy(0, -2);
+		hScrollBarRect.InsetBy(2, 0);
 	}
 }
 
@@ -4552,84 +4737,4 @@ RecursiveOutlineIterator::CurrentLevel() const
 	return fCurrentListDepth;
 }
 
-
-void
-BColumnListView::_Init(bool showHorizontalScrollbar)
-{
-	SetViewColor(B_TRANSPARENT_32_BIT);
-
-	BRect bounds(Bounds());
-	
-	for (int i = 0; i < (int)B_COLOR_TOTAL; i++)
-		fColorList[i] = kColor[i];
-	
-	BRect titleRect(bounds);
-	titleRect.bottom = titleRect.top + kTitleHeight;
-#if !LOWER_SCROLLBAR
-	titleRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
-#endif
-
-	BRect outlineRect(bounds);
-	outlineRect.top = titleRect.bottom + 1.0;
-	outlineRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
-	if (showHorizontalScrollbar)
-		outlineRect.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
-
-	BRect vScrollBarRect(bounds);
-#if LOWER_SCROLLBAR
-	vScrollBarRect.top += kTitleHeight;
-#endif
-
-	vScrollBarRect.left = vScrollBarRect.right - B_V_SCROLL_BAR_WIDTH;
-	if (showHorizontalScrollbar)
-		vScrollBarRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-	BRect hScrollBarRect(bounds);
-	hScrollBarRect.top = hScrollBarRect.bottom - B_H_SCROLL_BAR_HEIGHT;
-	hScrollBarRect.right -= B_V_SCROLL_BAR_WIDTH;
-
-	// Adjust stuff so the border will fit.
-	if (fBorderStyle == B_PLAIN_BORDER) {
-		titleRect.InsetBy(1, 0);
-		titleRect.top++;
-		outlineRect.InsetBy(1, 0);
-		outlineRect.bottom--;
-
-		vScrollBarRect.OffsetBy(-1, 0);
-		vScrollBarRect.InsetBy(0, 1);
-		hScrollBarRect.OffsetBy(0, -1);
-		hScrollBarRect.InsetBy(1, 0);
-	} else if (fBorderStyle == B_FANCY_BORDER) {
-		titleRect.InsetBy(2, 0);
-		titleRect.top += 2;
-		outlineRect.InsetBy(2, 0);
-		outlineRect.bottom -= 2;
-
-		vScrollBarRect.OffsetBy(-2, 0);
-		vScrollBarRect.InsetBy(0, 2);
-		hScrollBarRect.OffsetBy(0, -2);
-		hScrollBarRect.InsetBy(2, 0);
-	}
-	
-	fOutlineView = new OutlineView(outlineRect, &fColumns, &fSortColumns, this);
-	AddChild(fOutlineView);
-
-
-	fTitleView = new TitleView(titleRect, fOutlineView, &fColumns,
-		&fSortColumns, this, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	AddChild(fTitleView);
-
-	fVerticalScrollBar = new BScrollBar(vScrollBarRect, "vertical_scroll_bar",
-		fOutlineView, 0.0, bounds.Height(), B_VERTICAL);
-	AddChild(fVerticalScrollBar);
-
-	fHorizontalScrollBar = new BScrollBar(hScrollBarRect,
-		"horizontal_scroll_bar", fTitleView, 0.0, bounds.Width(), B_HORIZONTAL);
-	AddChild(fHorizontalScrollBar);
-
-	if (!showHorizontalScrollbar)
-		fHorizontalScrollBar->Hide();
-
-	fOutlineView->FixScrollBar(true);
-}
 
