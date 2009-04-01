@@ -9,6 +9,7 @@
 #include <ChannelSlider.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
+#include <ColumnListView.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
 #include <GridLayoutBuilder.h>
@@ -266,6 +267,7 @@ main(int argc, char** argv)
 
 	// create some controls
 
+	// BListView
 	BListView* listView = new BListView();
 	for (int32 i = 0; i < 20; i++) {
 		BString itemLabel("List Item ");
@@ -275,6 +277,16 @@ main(int argc, char** argv)
 	BScrollView* scrollView = new BScrollView("scroller", listView, 0,
 		true, true);
 	scrollView->SetExplicitMinSize(BSize(300, 140));
+
+	// BColumnListView
+	BColumnListView* columnListView = new BColumnListView("clv", 0,
+		B_FANCY_BORDER);
+//	for (int32 i = 0; i < 20; i++) {
+//		BString itemLabel("List Item ");
+//		itemLabel << i + 1;
+//		columnListView->AddItem(new BStringItem(itemLabel.String()));
+//	}
+
 
 	BGridView* controls = new BGridView(kInset, kInset);
 	BGridLayout* layout = controls->GridLayout();
@@ -296,6 +308,7 @@ main(int argc, char** argv)
 	BTabView* tabView = new BTabView("tab view", B_WIDTH_FROM_WIDEST);
 	BView* content = BGroupLayoutBuilder(B_VERTICAL, kInset)
 		.Add(scrollView)
+		.Add(columnListView)
 		.Add(controls)
 		.SetInsets(kInset, kInset, kInset, kInset);
 
