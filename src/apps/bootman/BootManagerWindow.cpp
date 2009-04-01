@@ -22,7 +22,7 @@
 
 BootManagerWindow::BootManagerWindow()
 	: BWindow(BRect(100, 100, 500, 400), "Boot Manager", B_TITLED_WINDOW, 
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
