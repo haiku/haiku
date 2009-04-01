@@ -237,8 +237,8 @@ FUSEFileSystem::ExitClientFS(status_t status)
 
 
 status_t
-FUSEFileSystem::FinishInitClientFS(const fuse_operations* ops, size_t opSize,
-	void* userData)
+FUSEFileSystem::FinishInitClientFS(fuse_config* config,
+	const fuse_operations* ops, size_t opSize, void* userData)
 {
 PRINT(("FUSEFileSystem::FinishInitClientFS()\n"));
 	fExitStatus = B_ERROR;

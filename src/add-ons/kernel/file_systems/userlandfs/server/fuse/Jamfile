@@ -21,6 +21,7 @@ DEFINES += _FILE_OFFSET_BITS=64 ;
 # the library providing the FUSE interface for add-ons
 SharedLibrary libuserlandfs_fuse.so
 	:
+	fuse_config.c
 	fuse_fs.cpp
 	fuse_main.cpp
 	fuse_opt.c

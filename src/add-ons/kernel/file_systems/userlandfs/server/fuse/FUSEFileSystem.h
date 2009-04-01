@@ -10,6 +10,9 @@
 #include "fuse_api.h"
 
 
+struct fuse_config;
+
+
 namespace UserlandFS {
 
 class FUSEFileSystem : public FileSystem {
@@ -38,8 +41,9 @@ public:
 			status_t			InitClientFS(const char* parameters);
 			void				ExitClientFS(status_t status);
 
-			status_t			FinishInitClientFS(const fuse_operations* ops,
-									size_t opSize, void* userData);
+			status_t			FinishInitClientFS(fuse_config* config,
+									const fuse_operations* ops, size_t opSize,
+									void* userData);
 
 private:
 			class ArgumentVector;
