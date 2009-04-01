@@ -63,7 +63,6 @@ All rights reserved.
 
 const int32 kGenericReadBufferSize = 1024;
 
-
 template <class View>
 float
 TruncStringBase(BString *result, const char *str, int32 length,
@@ -595,7 +594,7 @@ StringAttributeText::Compare(WidgetAttributeText &attr, BPoseView *view)
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 
-	return strcasecmp(fFullValueText.String(), compareTo->ValueAsText(view));
+	return NaturalCompare(fFullValueText.String(), compareTo->ValueAsText(view));
 }
 
 
@@ -782,7 +781,7 @@ NameAttributeText::Compare(WidgetAttributeText &attr, BPoseView *view)
 	if (NameAttributeText::sSortFolderNamesFirst)
 		return fModel->CompareFolderNamesFirst(attr.TargetModel());
 
-	return strcasecmp(fFullValueText.String(), compareTo->ValueAsText(view));
+	return NaturalCompare(fFullValueText.String(), compareTo->ValueAsText(view));
 }
 
 

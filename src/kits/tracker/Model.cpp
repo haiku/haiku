@@ -321,7 +321,7 @@ Model::CompareFolderNamesFirst(const Model *compareModel) const
 	} else if (resolvedCompareModel->IsDirectory())
 		return 1;
 
-	return strcasecmp(Name(), compareModel->Name());
+	return NaturalCompare(Name(), compareModel->Name());
 }
 
 
