@@ -6,6 +6,7 @@
 
 #include "KeyboardLayoutView.h"
 
+#include <Beep.h>
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <LayoutUtils.h>
@@ -303,9 +304,40 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 		ssize_t size;
 		if (message->FindData("text/plain", B_MIME_DATA,
 				(const void**)&data, &size) == B_OK) {
-			// ignore trailing null bytes
-			if (data[size - 1] == '\0')
-				size--;
+			// Automatically convert UTF-8 escaped strings (for example from
+			// CharacterMap)
+			int32 dataSize = 0;
+			uint8 buffer[16];
+			if (size > 3 && data[0] == '\\' && data[1] == 'x') {
+				char tempBuffer[16];
+				if (size > 15)
+					size = 15;
+				memcpy(tempBuffer, data, size);
+				tempBuffer[size] = '\0';
+				data = tempBuffer;
+
+				while (size > 3 && data[0] == '\\' && data[1] == 'x') {
+					buffer[dataSize++] = strtoul(&data[2], NULL, 16);
+					if ((buffer[dataSize - 1] & 0x80) == 0)
+						break;
+
+					size -= 4;
+					data += 4;
+				}
+				data = (const char*)buffer;
+			} else if ((data[0] & 0xc0) != 0x80 && (data[0] & 0x80) != 0) {
+				// only accept the first character UTF-8 character
+				while (dataSize < size && (data[dataSize] & 0x80) != 0) {
+					dataSize++;
+				}
+			} else if ((data[0] & 0x80) == 0) {
+				// an ASCII character
+				dataSize = 1;
+			} else {
+				// no valid character
+				beep();
+				return;
+			}
 
 			int32 buttons;
 			if (!message->IsSourceRemote()
@@ -325,7 +357,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				if (string != NULL) {
 					// switch keys
 					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
-						(const char*)data, size);
+						(const char*)data, dataSize);
 					fKeymap->SetKey(key->code, fDragModifiers, fDeadKey,
 						string, numBytes);
 					delete[] string;
@@ -334,14 +366,14 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 					fKeymap->SetModifier(key->code,
 						fKeymap->Modifier(fDropTarget->code));
 					fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
-						(const char*)data, size);
+						(const char*)data, dataSize);
 				}
 			} else {
 				// Send the old key to the target, so it's not lost entirely
 				_SendFakeKeyDown(fDropTarget);
 
 				fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
-					(const char*)data, size);
+					(const char*)data, dataSize);
 			}
 		} else if (!message->IsSourceRemote()
 			&& message->FindInt32("key", &keyCode) == B_OK) {
