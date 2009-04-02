@@ -1074,7 +1074,7 @@ duplicate_buffer(net_buffer *_buffer)
 		return NULL;
 
 	TRACE(("%ld:   duplicate: %p)\n", find_thread(NULL), duplicate));
-	
+
 	// copy the data from the source buffer
 
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
@@ -1310,9 +1310,10 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		} else {
 			// we need a new place for this node
 			data_node *newNode = add_data_node(buffer, node->header);
-			if (newNode == NULL)
-// TODO: try to revert buffers to their initial state!!
+			if (newNode == NULL) {
+				// TODO: try to revert buffers to their initial state!!
 				return ENOBUFS;
+			}
 
 			last = node;
 			*newNode = *node;
@@ -1502,7 +1503,7 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		if (_contiguousBuffer)
 			*_contiguousBuffer = node->start;
 
-		// adjust offset of following nodes	
+		// adjust offset of following nodes
 		while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
 			node->offset += size;
 		}
@@ -1701,7 +1702,7 @@ remove_header(net_buffer *_buffer, size_t bytes)
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 	}
 
-	// adjust offset of following nodes	
+	// adjust offset of following nodes
 	while (node != NULL) {
 		node->offset -= bytes;
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
