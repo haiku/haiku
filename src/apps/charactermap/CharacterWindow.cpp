@@ -72,12 +72,14 @@ public:
 	{
 	}
 
-	int32 ResetMoved()
+	bool HasMoved() const
 	{
-		int32 old = fMouseMoved;
-		fMouseMoved = 0;
+		return fMouseMoved != 0;
+	}
 
-		return old;
+	void ResetMoved()
+	{
+		fMouseMoved = 0;
 	}
 
 	virtual filter_result Filter(BMessage* message, BHandler** /*_target*/)
@@ -273,7 +275,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 			fCharacterView->ScrollTo(item->BlockIndex());
 
 			// Give the filter control focus if we got here by mouse action
-			if (fMouseMovedFilter->ResetMoved())
+			if (fMouseMovedFilter->HasMoved())
 				fFilterControl->MakeFocus();
 			break;
 		}
@@ -364,12 +366,14 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 		case kMsgFilterChanged:
 			fUnicodeBlockView->SetFilter(fFilterControl->Text());
+			fMouseMovedFilter->ResetMoved();
 			break;
 
 		case kMsgFilterEntered:
-			fUnicodeBlockView->MakeFocus();
-			fUnicodeBlockView->Select(0);
-			fMouseMovedFilter->ResetMoved();
+			if (!fMouseMovedFilter->HasMoved()) {
+				fUnicodeBlockView->MakeFocus();
+				fUnicodeBlockView->Select(0);
+			}
 			break;
 
 		case kMsgClearFilter:
