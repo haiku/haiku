@@ -36,13 +36,17 @@
 
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target (CPU, core, etc.).
+// TODO: consolidate this such that HT/SMT entities on the same physical core
+// share a queue, once we have the necessary API for retrieving the topology
+// information
 static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static int32 sRunQueueSize[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
 static cpu_mask_t sIdleCPUs = 0;
 
 const int32 kMaxTrackingQuantums = 5;
-const bigtime_t kMaxThreadQuantum = 3000;
+const bigtime_t kMinThreadQuantum = 3000;
+const bigtime_t kMaxThreadQuantum = 10000;
 
 struct scheduler_thread_data {
 	scheduler_thread_data(void) 
@@ -55,6 +59,7 @@ struct scheduler_thread_data {
 	{
 		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 		fLastQuantumSlot = 0;
+		fLastQueue = -1;
 	}
 
 	int32 GetAverageQuantumUsage() const
@@ -67,6 +72,7 @@ struct scheduler_thread_data {
 	
 	int32 fLastThreadQuantums[kMaxTrackingQuantums];
 	int16 fLastQuantumSlot;
+	int32 fLastQueue;
 };
 
 
@@ -117,8 +123,7 @@ affine_get_most_idle_cpu()
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		if (gCPU[i].disabled)
 			continue;
-		if (targetCPU < 0 
-			|| gCPU[i].active_time < gCPU[targetCPU].active_time)
+		if (targetCPU < 0 || sRunQueueSize[i] < sRunQueueSize[targetCPU])
 			targetCPU = i;
 	}
 	
@@ -176,6 +181,7 @@ affine_enqueue_in_run_queue(struct thread *thread)
 			prev->queue_next = thread;
 		else
 			sRunQueue[targetCPU] = thread;
+		thread->scheduler_data->fLastQueue = targetCPU;
 	}
 	
 	thread->next_priority = thread->priority;
@@ -207,6 +213,7 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 		sRunQueue[currentCPU] = resultThread->queue_next;
 	}
 	sRunQueueSize[currentCPU]--;
+	resultThread->scheduler_data->fLastQueue = -1;
 	
 	return resultThread;
 }
@@ -223,9 +230,13 @@ static struct thread *steal_thread_from_other_cpus(int32 currentCPU)
 	// look through the active CPUs - find the one
 	// that has a) threads available to steal, and
 	// b) out of those, the one that's the most CPU-bound
+	// TODO: make this more intelligent along with enqueue
+	// - we need to try and maintain a reasonable balance
+	// in run queue sizes across CPUs, and also try to maintain
+	// an even distribution of cpu bound / interactive threads
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		// skip CPUs that have either no or only one thread
-		if (sRunQueue[i] == NULL || sRunQueue[i]->queue_next == NULL)
+		if (sRunQueueSize[i] < 2)
 			continue;
 		if (i == currentCPU)
 			continue;
@@ -233,7 +244,7 @@ static struct thread *steal_thread_from_other_cpus(int32 currentCPU)
 		// pick whichever one is generally the most CPU bound.
 		if (targetCPU < 0)
 			targetCPU = i;
-		else if (gCPU[i].active_time > gCPU[targetCPU].active_time)
+		else if (sRunQueueSize[i] > sRunQueueSize[targetCPU])
 			targetCPU = i;
 	}
 
@@ -289,18 +300,14 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 	// data pointer on the thread struct) so we only have to walk 
 	// that exact queue to find it.
 	struct thread *item = NULL, *prev = NULL;
-	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
-		for (item = sRunQueue[i], prev = NULL; item && item != thread;
-				item = item->queue_next) {
+	targetCPU = thread->scheduler_data->fLastQueue;
+	
+	for (item = sRunQueue[targetCPU], prev = NULL; item && item != thread;
+			item = item->queue_next) {
 			if (prev)
 				prev = prev->queue_next;
 			else
-				prev = sRunQueue[i];
-		}
-		if (item) {
-			targetCPU = i;
-			break;
-		}
+				prev = item;
 	}
 
 	ASSERT(item == thread);
@@ -458,7 +465,13 @@ affine_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		bigtime_t quantum = kMaxThreadQuantum;	// ToDo: calculate quantum!
+		bigtime_t quantum = kMinThreadQuantum;
+		// give CPU-bound background threads a larger quantum size
+		// to minimize unnecessary context switches if the system is idle
+		if (nextThread->scheduler_data->GetAverageQuantumUsage() 
+			> (kMinThreadQuantum >> 1) 
+			&& nextThread->priority < B_NORMAL_PRIORITY)
+			quantum = kMaxThreadQuantum;
 		timer *quantumTimer = &oldThread->cpu->quantum_timer;
 
 		if (!oldThread->cpu->preempted)
