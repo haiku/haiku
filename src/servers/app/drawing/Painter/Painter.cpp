@@ -464,7 +464,7 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	if (a.y == b.y) {
 		// horizontal
 		int32 y = (int32)a.y;
-		if (y < 0 || y >= fBuffer.height())
+		if (y < 0 || y >= (int32)fBuffer.height())
 			return true;
 
 		uint8* dst = fBuffer.row_ptr(y);
