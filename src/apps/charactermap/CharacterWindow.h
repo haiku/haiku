@@ -15,7 +15,10 @@ class BMenu;
 class BMenuItem;
 class BSlider;
 class BStringView;
+class BTextControl;
 class CharacterView;
+class MouseMovedFilter;
+class UnicodeBlockView;
 
 
 class CharacterWindow : public BWindow {
@@ -33,15 +36,15 @@ private:
 
 			void			_SetFont(const char* family, const char* style);
 			BMenu*			_CreateFontMenu();
-			void			_UpdateUnicodeBlocks();
-			void			_CreateUnicodeBlocks();
 
 private:
-			BListView*		fUnicodeBlockView;
+			BTextControl*	fFilterControl;
+			UnicodeBlockView* fUnicodeBlockView;
 			CharacterView*	fCharacterView;
 			BMenuItem*		fSelectedFontItem;
 			BSlider*		fFontSizeSlider;
 			BStringView*	fCodeView;
+			MouseMovedFilter* fMouseMovedFilter;
 };
 
 #endif	// CHARACTER_WINDOW_H

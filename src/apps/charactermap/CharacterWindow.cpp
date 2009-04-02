@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <Application.h>
+#include <Button.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayoutBuilder.h>
@@ -17,15 +18,17 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageFilter.h>
 #include <Path.h>
 #include <Roster.h>
 #include <ScrollView.h>
 #include <Slider.h>
 #include <SplitLayoutBuilder.h>
 #include <StringView.h>
+#include <TextControl.h>
 
 #include "CharacterView.h"
-#include "UnicodeBlocks.h"
+#include "UnicodeBlockView.h"
 
 
 static const uint32 kMsgUnicodeBlockSelected = 'unbs';
@@ -34,6 +37,9 @@ static const uint32 kMsgFontSelected = 'fnts';
 static const uint32 kMsgFontSizeChanged = 'fsch';
 static const uint32 kMsgPrivateBlocks = 'prbl';
 static const uint32 kMsgContainedBlocks = 'cnbl';
+static const uint32 kMsgFilterChanged = 'fltr';
+static const uint32 kMsgFilterEntered = 'flte';
+static const uint32 kMsgClearFilter = 'clrf';
 
 static const int32 kMinFontSize = 10;
 static const int32 kMaxFontSize = 72;
@@ -59,6 +65,55 @@ private:
 	mutable char	fText[32];
 };
 
+class MouseMovedFilter : public BMessageFilter {
+public:
+	MouseMovedFilter()
+		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_MOUSE_MOVED)
+	{
+	}
+
+	int32 ResetMoved()
+	{
+		int32 old = fMouseMoved;
+		fMouseMoved = 0;
+
+		return old;
+	}
+
+	virtual filter_result Filter(BMessage* message, BHandler** /*_target*/)
+	{
+		fMouseMoved++;
+		return B_DISPATCH_MESSAGE;
+	}
+
+private:
+	int32	fMouseMoved;
+};
+
+class EscapeMessageFilter : public BMessageFilter {
+public:
+	EscapeMessageFilter(uint32 command)
+		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN),
+		fCommand(command)
+	{
+	}
+
+	virtual filter_result Filter(BMessage* message, BHandler** /*_target*/)
+	{
+		const char* bytes;
+		if (message->what != B_KEY_DOWN
+			|| message->FindString("bytes", &bytes) != B_OK
+			|| bytes[0] != B_ESCAPE)
+			return B_DISPATCH_MESSAGE;
+
+		Looper()->PostMessage(fCommand);
+		return B_SKIP_MESSAGE;
+	}
+
+private:
+	uint32	fCommand;
+};
+
 
 CharacterWindow::CharacterWindow()
 	: BWindow(BRect(100, 100, 700, 550), "CharacterMap", B_TITLED_WINDOW,
@@ -80,7 +135,13 @@ CharacterWindow::CharacterWindow()
 
 	BMenuBar* menuBar = new BMenuBar("menu");
 
-	fUnicodeBlockView = new BListView("unicodeBlocks");
+	fFilterControl = new BTextControl("Filter:", NULL, new BMessage(kMsgFilterEntered));
+	fFilterControl->SetModificationMessage(new BMessage(kMsgFilterChanged));
+
+	BButton* clearButton = new BButton("clear", "Clear",
+		new BMessage(kMsgClearFilter));
+
+	fUnicodeBlockView = new UnicodeBlockView("unicodeBlocks");
 	fUnicodeBlockView->SetSelectionMessage(
 		new BMessage(kMsgUnicodeBlockSelected));
 
@@ -90,11 +151,16 @@ CharacterWindow::CharacterWindow()
 	fCharacterView = new CharacterView("characters");
 	fCharacterView->SetTarget(this, kMsgCharacterChanged);
 
+	// TODO: have a context object shared by CharacterView/UnicodeBlockView
 	bool show;
-	if (settings.FindBool("show private blocks", &show) == B_OK)
+	if (settings.FindBool("show private blocks", &show) == B_OK) {
 		fCharacterView->ShowPrivateBlocks(show);
-	if (settings.FindBool("show contained blocks only", &show) == B_OK)
+		fUnicodeBlockView->ShowPrivateBlocks(show);
+	}
+	if (settings.FindBool("show contained blocks only", &show) == B_OK) {
 		fCharacterView->ShowContainedBlocksOnly(show);
+		fUnicodeBlockView->ShowPrivateBlocks(show);
+	}
 
 	const char* family;
 	const char* style;
@@ -130,7 +196,11 @@ CharacterWindow::CharacterWindow()
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(menuBar)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)//BSplitLayoutBuilder()
-			.Add(unicodeScroller)
+			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+					.Add(fFilterControl)
+					.Add(clearButton))
+				.Add(unicodeScroller))
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(characterScroller)
 				.Add(fFontSizeSlider)
@@ -167,8 +237,14 @@ CharacterWindow::CharacterWindow()
 
 	menuBar->AddItem(_CreateFontMenu());
 
-	_CreateUnicodeBlocks();
-	InvalidateLayout();
+	AddCommonFilter(new EscapeMessageFilter(kMsgClearFilter));
+	fMouseMovedFilter = new MouseMovedFilter();
+	AddCommonFilter(fMouseMovedFilter);
+
+	// TODO: why is this needed?
+	fUnicodeBlockView->SetTarget(this);
+
+	fFilterControl->MakeFocus();
 }
 
 
@@ -192,7 +268,13 @@ CharacterWindow::MessageReceived(BMessage* message)
 				|| index < 0)
 				break;
 
-			fCharacterView->ScrollTo(index);
+			BlockListItem* item
+				= static_cast<BlockListItem*>(fUnicodeBlockView->ItemAt(index));
+			fCharacterView->ScrollTo(item->BlockIndex());
+
+			// Give the filter control focus if we got here by mouse action
+			if (fMouseMovedFilter->ResetMoved())
+				fFilterControl->MakeFocus();
 			break;
 		}
 
@@ -202,13 +284,16 @@ CharacterWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("character", (int32*)&character) != B_OK)
 				break;
 
+			char utf8[16];
+			CharacterView::UnicodeToUTF8(character, utf8, sizeof(utf8));
+
 			char utf8Hex[32];
 			CharacterView::UnicodeToUTF8Hex(character, utf8Hex,
 				sizeof(utf8Hex));
 
 			char text[128];
-			snprintf(text, sizeof(text), "Code: %#lx (%ld), UTF-8: %s",
-				character, character, utf8Hex);
+			snprintf(text, sizeof(text), "'%s' Code: %#lx (%ld), UTF-8: %s",
+				utf8, character, character, utf8Hex);
 
 			fCodeView->SetText(text);
 			break;
@@ -259,7 +344,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 			item->SetMarked(!item->IsMarked());
 
 			fCharacterView->ShowPrivateBlocks(item->IsMarked());
-			_UpdateUnicodeBlocks();
+			fUnicodeBlockView->ShowPrivateBlocks(item->IsMarked());
 			break;
 		}
 
@@ -273,9 +358,24 @@ CharacterWindow::MessageReceived(BMessage* message)
 			item->SetMarked(!item->IsMarked());
 
 			fCharacterView->ShowContainedBlocksOnly(item->IsMarked());
-			_UpdateUnicodeBlocks();
+			fUnicodeBlockView->ShowContainedBlocksOnly(item->IsMarked());
 			break;
 		}
+
+		case kMsgFilterChanged:
+			fUnicodeBlockView->SetFilter(fFilterControl->Text());
+			break;
+
+		case kMsgFilterEntered:
+			fUnicodeBlockView->MakeFocus();
+			fUnicodeBlockView->Select(0);
+			fMouseMovedFilter->ResetMoved();
+			break;
+
+		case kMsgClearFilter:
+			fFilterControl->SetText("");
+			fFilterControl->MakeFocus();
+			break;
 
 		default:
 			BWindow::MessageReceived(message);
@@ -412,41 +512,3 @@ CharacterWindow::_CreateFontMenu()
 
 	return menu;
 }
-
-
-void
-CharacterWindow::_UpdateUnicodeBlocks()
-{
-	for (int32 i = 0; i < fUnicodeBlockView->CountItems(); i++) {
-		BStringItem* item
-			= static_cast<BStringItem*>(fUnicodeBlockView->ItemAt(i));
-
-		bool enabled = fCharacterView->IsShowingBlock(i);
-
-		if (item->IsEnabled() != enabled) {
-			item->SetEnabled(enabled);
-			fUnicodeBlockView->InvalidateItem(i);
-		}
-	}
-}
-
-
-void
-CharacterWindow::_CreateUnicodeBlocks()
-{
-	float minWidth = 0;
-	for (uint32 i = 0; i < kNumUnicodeBlocks; i++) {
-		BStringItem* item = new BStringItem(kUnicodeBlocks[i].name);
-		fUnicodeBlockView->AddItem(item);
-
-		float width = fUnicodeBlockView->StringWidth(item->Text());
-		if (minWidth < width)
-			minWidth = width;
-	}
-
-	fUnicodeBlockView->SetExplicitMinSize(BSize(minWidth / 2, 32));
-	fUnicodeBlockView->SetExplicitMaxSize(BSize(minWidth, B_SIZE_UNSET));
-
-	_UpdateUnicodeBlocks();
-}
-

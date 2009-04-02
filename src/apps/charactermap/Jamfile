@@ -9,6 +9,7 @@ Application CharacterMap :
 	CharacterView.cpp
 	CharacterWindow.cpp
 	UnicodeBlocks.cpp
+	UnicodeBlockView.cpp
 
 	: be
 	: CharacterMap.rdef

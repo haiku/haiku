@@ -130,7 +130,7 @@ const struct unicode_block_entry kUnicodeBlocks[] = {
 	{"Vai", 0xa500, 0xa63f, false, kNoBlock},
 	{"Cyrillic Extended B", 0xa640, 0xa69f, false, kNoBlock},
 	{"Modifier Tone Letters", 0xa700, 0xa71f, false, kNoBlock},
-	{"Lating Extended D", 0xa720, 0xa7ff, false, kNoBlock},
+	{"Latin Extended D", 0xa720, 0xa7ff, false, kNoBlock},
 	{"Syloti Nagri", 0xa800, 0xa82f, false, kNoBlock},
 	{"Phags-pa", 0xa840, 0xa87f, false, kNoBlock},
 	{"Saurashtra", 0xa880, 0xa8df, false, kNoBlock},
