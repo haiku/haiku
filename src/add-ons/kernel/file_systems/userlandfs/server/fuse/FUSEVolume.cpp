@@ -670,6 +670,9 @@ printf("FUSEVolume::Mount()\n");
 	fFS = _FileSystem()->GetFS();
 	_FileSystem()->GetVolumeCapabilities(fCapabilities);
 
+	const fuse_config& config = _FileSystem()->GetFUSEConfig();
+	fUseNodeIDs = config.use_ino;
+
 	// get the root node
 	struct stat st;
 	int fuseError = fuse_fs_getattr(fFS, "/", &st);

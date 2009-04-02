@@ -8,9 +8,7 @@
 #include "../FileSystem.h"
 
 #include "fuse_api.h"
-
-
-struct fuse_config;
+#include "fuse_config.h"
 
 
 namespace UserlandFS {
@@ -34,6 +32,8 @@ public:
 									{ return fNodeCapabilities; }
 
 			fuse_fs*			GetFS() const	{ return fFS; }
+
+			const fuse_config&	GetFUSEConfig() const	{ return fFUSEConfig; }
 
 	virtual	status_t			CreateVolume(Volume** _volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
@@ -68,6 +68,7 @@ private:
 			const char*			fInitParameters;
 			fuse_fs*			fFS;
 			fuse_conn_info		fConnectionInfo;
+			fuse_config			fFUSEConfig;
 
 			FSVolumeCapabilities fVolumeCapabilities;
 			FSVNodeCapabilities	fNodeCapabilities;

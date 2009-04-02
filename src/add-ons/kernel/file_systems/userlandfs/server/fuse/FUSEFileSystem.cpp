@@ -243,6 +243,8 @@ FUSEFileSystem::FinishInitClientFS(fuse_config* config,
 PRINT(("FUSEFileSystem::FinishInitClientFS()\n"));
 	fExitStatus = B_ERROR;
 
+	fFUSEConfig = *config;
+
 	// do the initialization
 	status_t error = _InitClientFS(ops, opSize, userData);
 

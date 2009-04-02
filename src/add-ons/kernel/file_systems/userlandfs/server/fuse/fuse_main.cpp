@@ -3,8 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#define FUSE_USE_VERSION FUSE_VERSION
-
+#include <signal.h>
 #include <stdio.h>
 
 #include "fuse_api.h"
@@ -21,7 +20,14 @@ userData);
 
 	// parse args
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+
 	fuse_config config;
+	memset(&config, 0, sizeof(config));
+	config.entry_timeout = 1.0;
+	config.attr_timeout = 1.0;
+	config.negative_timeout = 0.0;
+	config.intr_signal = SIGUSR1;
+
 	bool success = fuse_parse_config_args(&args, &config);
 	fuse_opt_free_args(&args);
 
@@ -34,15 +40,6 @@ userData);
 
 
 	return error == B_OK ? 0 : 1;
-}
-
-
-int
-fuse_is_lib_option(const char* opt)
-{
-printf("fuse_is_lib_option(\"%s\")\n", opt);
-	// TODO: Implement!
-	return 0;
 }
 
 

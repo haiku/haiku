@@ -9,7 +9,7 @@
 #include "fuse_config.h"
 
 
-enum  {
+enum {
 	KEY_HELP,
 };
 
@@ -64,4 +64,12 @@ int
 fuse_parse_config_args(struct fuse_args* args, struct fuse_config* config)
 {
 	return fuse_opt_parse(args, config, fuse_lib_opts, fuse_lib_opt_proc) == 0;
+}
+
+
+int
+fuse_is_lib_option(const char* opt)
+{
+	return /*fuse_lowlevel_is_lib_option(opt) ||*/
+		fuse_opt_match(fuse_lib_opts, opt);
 }
