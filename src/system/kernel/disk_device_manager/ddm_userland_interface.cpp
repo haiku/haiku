@@ -12,10 +12,11 @@
  	\brief Interface for userspace calls.
 */
 
+#include <ddm_userland_interface.h>
+
 #include <stdlib.h>
 
 #include <AutoDeleter.h>
-#include <ddm_userland_interface.h>
 #include <fs/KPath.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
@@ -1282,7 +1283,7 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 	if (!partition->CheckAndMarkBusy(true))
 		return B_BUSY;
 
-// TODO: We should also check, if any partition is mounted!
+	// TODO: We should also check, if any partition is mounted!
 
 	// uninitialize
 	error = partition->UninitializeContents(true);
@@ -1306,7 +1307,6 @@ _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 	off_t offset, off_t size, const char* _type, const char* _name,
 	const char* _parameters, size_t parametersSize, partition_id* childID,
 	int32* childChangeCounter)
-
 {
 	// copy parameters in
 	UserStringParameter<false> type;
@@ -1437,12 +1437,7 @@ _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counter
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
