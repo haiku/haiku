@@ -464,6 +464,9 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	if (a.y == b.y) {
 		// horizontal
 		int32 y = (int32)a.y;
+		if (y < 0 || y >= fBuffer.height())
+			return true;
+
 		uint8* dst = fBuffer.row_ptr(y);
 		int32 x1 = (int32)min_c(a.x, b.x);
 		int32 x2 = (int32)max_c(a.x, b.x);
@@ -982,7 +985,8 @@ Painter::FillRectVerticalGradient(BRect r,
 //					for (int32 x = x1; x <= x2; x++) {
 //						*handle++ = gradientArray[y1 - top];
 //					}
-gfxset32(offset + y1 * bpr, gradientArray[y1 - top], (x2 - x1 + 1) * 4);
+				gfxset32(offset + y1 * bpr, gradientArray[y1 - top],
+					(x2 - x1 + 1) * 4);
 			}
 		}
 	} while (fBaseRenderer.next_clip_box());
@@ -1010,7 +1014,7 @@ Painter::FillRectNoClipping(const clipping_rect& r, const rgb_color& c) const
 //			for (int32 x = left; x <= right; x++) {
 //				*handle++ = color.data32;
 //			}
-gfxset32(dst, color.data32, bytes);
+		gfxset32(dst, color.data32, bytes);
 		dst += bpr;
 	}
 }
