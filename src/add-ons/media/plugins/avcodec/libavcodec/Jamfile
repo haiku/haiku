@@ -10,7 +10,11 @@ UseLibraryHeaders zlib ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-SubDirCcFlags -fomit-frame-pointer -DPIC ;
+if $(HAIKU_GCC_VERSION[1]) >= 3 {
+	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
+} else {
+	SubDirCcFlags -fomit-frame-pointer -DPIC ;
+}
 SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
 StaticLibrary libavcodec.a :
