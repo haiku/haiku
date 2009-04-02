@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
@@ -15,7 +15,9 @@
 
 
 #define TIMING	MULTI_LOCKER_TIMING
-#define DEBUG	MULTI_LOCKER_DEBUG
+#ifndef DEBUG
+#	define DEBUG	MULTI_LOCKER_DEBUG
+#endif
 
 
 const int32 LARGE_NUMBER = 100000;
@@ -100,7 +102,7 @@ MultiLocker::~MultiLocker()
 	delete_sem(fLock);
 	free(fDebugArray);
 #endif
-#if TIMING	
+#if TIMING
 	// let's produce some performance numbers
 	printf("MultiLocker Statistics:\n"
 		"Avg ReadLock: %lld\n"
@@ -130,7 +132,7 @@ MultiLocker::InitCheck()
 	where the thread's stack is located.  Each time a new writer acquires the lock,
 	its thread_id and stack_page are recorded.  IsWriteLocked gets the stack_page of the
 	current thread and sees if it is a match.  If the stack_page matches you are guaranteed
-	to have the matching thread.  If the stack page doesn't match the more traditional 
+	to have the matching thread.  If the stack page doesn't match the more traditional
 	find_thread(NULL) method of matching the thread_ids is used.
 
 	This technique is very useful when dealing with a lock that is acquired in a nested fashion.
@@ -160,7 +162,7 @@ MultiLocker::IsWriteLocked(uint32* _stackBase, thread_id* _thread)
 		// determine which page in memory this stack represents
 		// this is managed by taking the address of the item on the
 		// stack and dividing it by the size of the memory pages
-		// if it is the same as the cached stack_page, there is a match 
+		// if it is the same as the cached stack_page, there is a match
 		uint32 stackBase = (uint32)&writeLockHolder / B_PAGE_SIZE;
 		thread_id thread = 0;
 
@@ -202,7 +204,7 @@ MultiLocker::ReadLock()
 	bigtime_t start = system_time();
 #endif
 
-	bool locked = false;	
+	bool locked = false;
 
 	// the lock must be initialized
 	if (fInit == B_OK) {
@@ -212,7 +214,7 @@ MultiLocker::ReadLock()
 			locked = true;
 		} else {
 			// increment and retrieve the current count of readers
-			int32 currentCount = atomic_add(&fReadCount, 1);	
+			int32 currentCount = atomic_add(&fReadCount, 1);
 			if (currentCount < 0) {
 				// a writer holds the lock so wait for fReadSem to be released
 				status_t status;
@@ -222,7 +224,7 @@ MultiLocker::ReadLock()
 
 				locked = status == B_OK;
 			} else
-				locked = true;			
+				locked = true;
 		}
 	}
 
@@ -232,7 +234,7 @@ MultiLocker::ReadLock()
 	rl_count++;
 #endif
 
-	return locked;	
+	return locked;
 }
 
 
@@ -296,7 +298,7 @@ MultiLocker::WriteLock()
 	wl_time += (end - start);
 	wl_count++;
 #endif
-	
+
 	return locked;
 }
 
@@ -313,7 +315,7 @@ MultiLocker::ReadUnlock()
 	if (IsWriteLocked()) {
 		// writers simply decrement the nesting count
 		fWriterNest--;
-		unlocked = true;	
+		unlocked = true;
 	} else {
 		// decrement and retrieve the read counter
 		int32 current_count = atomic_add(&fReadCount, -1);
@@ -330,7 +332,7 @@ MultiLocker::ReadUnlock()
 	ru_count++;
 #endif
 
-	return unlocked;	
+	return unlocked;
 }
 
 
@@ -397,7 +399,7 @@ MultiLocker::WriteUnlock()
 bool
 MultiLocker::ReadLock()
 {
-	bool locked = false;	
+	bool locked = false;
 
 	if (fInit != B_OK)
 		debugger("lock not initialized");
@@ -427,7 +429,7 @@ MultiLocker::ReadLock()
 bool
 MultiLocker::WriteLock()
 {
-	bool locked = false;	
+	bool locked = false;
 
 	if (fInit != B_OK)
 		debugger("lock not initialized");
@@ -476,7 +478,7 @@ MultiLocker::ReadUnlock()
 		if (fWriterNest < 0)
 			debugger("ReadUnlock() - negative writer nest count");
 
-		unlocked = true;	
+		unlocked = true;
 	} else {
 		// decrement and retrieve the read counter
 		unlocked = release_sem_etc(fLock, 1, B_DO_NOT_RESCHEDULE) == B_OK;
@@ -484,7 +486,7 @@ MultiLocker::ReadUnlock()
 			_UnregisterThread();
 	}
 
-	return unlocked;	
+	return unlocked;
 }
 
 
