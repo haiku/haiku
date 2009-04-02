@@ -17,7 +17,6 @@ class BSlider;
 class BStringView;
 class BTextControl;
 class CharacterView;
-class MouseMovedFilter;
 class UnicodeBlockView;
 
 
@@ -44,7 +43,6 @@ private:
 			BMenuItem*		fSelectedFontItem;
 			BSlider*		fFontSizeSlider;
 			BStringView*	fCodeView;
-			MouseMovedFilter* fMouseMovedFilter;
 };
 
 #endif	// CHARACTER_WINDOW_H

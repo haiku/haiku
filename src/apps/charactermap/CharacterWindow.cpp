@@ -38,7 +38,6 @@ static const uint32 kMsgFontSizeChanged = 'fsch';
 static const uint32 kMsgPrivateBlocks = 'prbl';
 static const uint32 kMsgContainedBlocks = 'cnbl';
 static const uint32 kMsgFilterChanged = 'fltr';
-static const uint32 kMsgFilterEntered = 'flte';
 static const uint32 kMsgClearFilter = 'clrf';
 
 static const int32 kMinFontSize = 10;
@@ -65,31 +64,29 @@ private:
 	mutable char	fText[32];
 };
 
-class MouseMovedFilter : public BMessageFilter {
+class RedirectUpAndDownFilter : public BMessageFilter {
 public:
-	MouseMovedFilter()
-		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_MOUSE_MOVED)
+	RedirectUpAndDownFilter(BHandler* target)
+		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN),
+		fTarget(target)
 	{
 	}
 
-	bool HasMoved() const
+	virtual filter_result Filter(BMessage* message, BHandler** _target)
 	{
-		return fMouseMoved != 0;
-	}
+		const char* bytes;
+		if (message->FindString("bytes", &bytes) != B_OK)
+			return B_DISPATCH_MESSAGE;
 
-	void ResetMoved()
-	{
-		fMouseMoved = 0;
-	}
+		if (bytes[0] == B_UP_ARROW
+			|| bytes[0] == B_DOWN_ARROW)
+			*_target = fTarget;
 
-	virtual filter_result Filter(BMessage* message, BHandler** /*_target*/)
-	{
-		fMouseMoved++;
 		return B_DISPATCH_MESSAGE;
 	}
 
 private:
-	int32	fMouseMoved;
+	BHandler*	fTarget;
 };
 
 class EscapeMessageFilter : public BMessageFilter {
@@ -137,7 +134,7 @@ CharacterWindow::CharacterWindow()
 
 	BMenuBar* menuBar = new BMenuBar("menu");
 
-	fFilterControl = new BTextControl("Filter:", NULL, new BMessage(kMsgFilterEntered));
+	fFilterControl = new BTextControl("Filter:", NULL, NULL);
 	fFilterControl->SetModificationMessage(new BMessage(kMsgFilterChanged));
 
 	BButton* clearButton = new BButton("clear", "Clear",
@@ -240,8 +237,7 @@ CharacterWindow::CharacterWindow()
 	menuBar->AddItem(_CreateFontMenu());
 
 	AddCommonFilter(new EscapeMessageFilter(kMsgClearFilter));
-	fMouseMovedFilter = new MouseMovedFilter();
-	AddCommonFilter(fMouseMovedFilter);
+	AddCommonFilter(new RedirectUpAndDownFilter(fUnicodeBlockView));
 
 	// TODO: why is this needed?
 	fUnicodeBlockView->SetTarget(this);
@@ -274,9 +270,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 				= static_cast<BlockListItem*>(fUnicodeBlockView->ItemAt(index));
 			fCharacterView->ScrollTo(item->BlockIndex());
 
-			// Give the filter control focus if we got here by mouse action
-			if (fMouseMovedFilter->HasMoved())
-				fFilterControl->MakeFocus();
+			fFilterControl->MakeFocus();
 			break;
 		}
 
@@ -366,14 +360,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 		case kMsgFilterChanged:
 			fUnicodeBlockView->SetFilter(fFilterControl->Text());
-			fMouseMovedFilter->ResetMoved();
-			break;
-
-		case kMsgFilterEntered:
-			if (!fMouseMovedFilter->HasMoved()) {
-				fUnicodeBlockView->MakeFocus();
-				fUnicodeBlockView->Select(0);
-			}
+			fUnicodeBlockView->Select(0);
 			break;
 
 		case kMsgClearFilter:
