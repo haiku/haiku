@@ -861,7 +861,7 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 	// NOTE: region expected to be already clipped correctly!!
 	BRect frame = r.Frame();
 	if (!fPainter->Bounds().Contains(frame)) {
-		// NOTE: I am not quite sure yet how this can happen, but apparantly it
+		// NOTE: I am not quite sure yet how this can happen, but apparently it
 		// can (see bug #634).
 		// This function is used for internal app_server painting, in the case of
 		// bug #634, the background of views is painted. But the view region
