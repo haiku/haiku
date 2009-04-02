@@ -861,10 +861,11 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 	// NOTE: region expected to be already clipped correctly!!
 	BRect frame = r.Frame();
 	if (!fPainter->Bounds().Contains(frame)) {
-		// NOTE: I am not quite sure yet how this can happen, but appearantly it can (see bug 634)
-		// This function is used for internal app_server painting, in the case of bug 634,
-		// the background of views is painted. But the view region should never be outside the
-		// frame buffer bounds.
+		// NOTE: I am not quite sure yet how this can happen, but apparantly it
+		// can (see bug #634).
+		// This function is used for internal app_server painting, in the case of
+		// bug #634, the background of views is painted. But the view region
+		// should never be outside the frame buffer bounds.
 //		char message[1024];
 //		BRect bounds = fPainter->Bounds();
 //		sprintf(message, "FillRegion() - painter: (%d, %d)->(%d, %d), region: (%d, %d)->(%d, %d)",
