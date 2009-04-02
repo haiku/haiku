@@ -866,7 +866,7 @@ unicode_block
 BFont::Blocks() const
 {
 	// TODO: Add Block support
-	return unicode_block();
+	return unicode_block(~0LL, ~0LL);
 }
 
 
