@@ -256,10 +256,21 @@ public:
 // #pragma mark - kernel requests
 
 
-// VolumeRequest
-class VolumeRequest : public Request {
+// KernelRequest
+class KernelRequest : public Request {
 public:
-	VolumeRequest(uint32 type) : Request(type) {}
+	KernelRequest(uint32 type) : Request(type) {}
+
+	team_id		team;
+	thread_id	thread;
+	uid_t		user;
+	gid_t		group;
+};
+
+// VolumeRequest
+class VolumeRequest : public KernelRequest {
+public:
+	VolumeRequest(uint32 type) : KernelRequest(type) {}
 
 	void*		volume;
 };
@@ -365,9 +376,9 @@ public:
 
 
 // MountVolumeRequest
-class MountVolumeRequest : public Request {
+class MountVolumeRequest : public KernelRequest {
 public:
-	MountVolumeRequest() : Request(MOUNT_VOLUME_REQUEST) {}
+	MountVolumeRequest() : KernelRequest(MOUNT_VOLUME_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
 	dev_t		nsid;
@@ -2235,6 +2246,7 @@ status_t relocate_request(Request* request, int32 requestBufferSize,
 }	// namespace UserlandFSUtil
 
 using UserlandFSUtil::ReplyRequest;
+using UserlandFSUtil::KernelRequest;
 using UserlandFSUtil::VolumeRequest;
 using UserlandFSUtil::NodeRequest;
 using UserlandFSUtil::FileRequest;

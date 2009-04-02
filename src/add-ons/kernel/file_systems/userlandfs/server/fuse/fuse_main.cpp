@@ -10,6 +10,8 @@
 #include "fuse_config.h"
 #include "FUSEFileSystem.h"
 
+#include "../RequestThread.h"
+
 
 int
 fuse_main_real(int argc, char* argv[], const struct fuse_operations* op,
@@ -47,4 +49,14 @@ int
 fuse_version(void)
 {
 	return FUSE_VERSION;
+}
+
+
+struct fuse_context*
+fuse_get_context(void)
+{
+	RequestThread* requestThread = RequestThread::GetCurrentThread();
+	return requestThread != NULL
+		? (fuse_context*)requestThread->GetContext()->GetFSData()
+		: NULL;
 }

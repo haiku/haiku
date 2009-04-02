@@ -1,4 +1,7 @@
-// FileSystem.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "FileSystem.h"
 
@@ -29,6 +32,12 @@ FileSystem::~FileSystem()
 FileSystem::GetInstance()
 {
 	return sInstance;
+}
+
+
+void
+FileSystem::InitRequestThreadContext(RequestThreadContext* context)
+{
 }
 
 

@@ -17,6 +17,7 @@
 #include "FUSEFileSystem.h"
 
 #include "../kernel_emu.h"
+#include "../RequestThread.h"
 
 
 // TODO: For remote/shared file systems (sshfs, nfs, etc.) we need to notice
@@ -672,6 +673,11 @@ printf("FUSEVolume::Mount()\n");
 
 	const fuse_config& config = _FileSystem()->GetFUSEConfig();
 	fUseNodeIDs = config.use_ino;
+
+	// update the fuse_context::private_data field before calling into the FS
+	fuse_context* context = (fuse_context*)RequestThread::GetCurrentThread()
+		->GetContext()->GetFSData();
+	context->private_data = fFS->userData;
 
 	// get the root node
 	struct stat st;

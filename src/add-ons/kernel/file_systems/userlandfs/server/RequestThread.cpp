@@ -1,28 +1,39 @@
-// RequestThread.cpp
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include "RequestThread.h"
 
 #include <new>
 
 #include <TLS.h>
 
-#include "RequestThread.h"
+#include "FileSystem.h"
 #include "ServerDefs.h"
 #include "UserlandRequestHandler.h"
+#include "Volume.h"
 
-using std::nothrow;
 
 static const int32 sTLSVariable = tls_allocate();
 
+
 // constructor
-RequestThreadContext::RequestThreadContext(Volume* volume)
-	: fPreviousContext(NULL),
-	  fThread(NULL),
-	  fVolume(volume)
+RequestThreadContext::RequestThreadContext(Volume* volume,
+	KernelRequest* request)
+	:
+	fPreviousContext(NULL),
+	fThread(NULL),
+	fVolume(volume),
+	fRequest(request)
 {
 	fThread = RequestThread::GetCurrentThread();
 	if (fThread) {
 		fPreviousContext = fThread->GetContext();
 		fThread->SetContext(this);
 	}
+
+	volume->GetFileSystem()->InitRequestThreadContext(this);
 }
 
 // destructor
@@ -74,7 +85,7 @@ RequestThread::Init(FileSystem* fileSystem)
 	if (!fileSystem)
 		return B_BAD_VALUE;
 	// create the port
-	fPort = new(nothrow) RequestPort(kRequestPortSize);
+	fPort = new(std::nothrow) RequestPort(kRequestPortSize);
 	if (!fPort)
 		return B_NO_MEMORY;
 	status_t error = fPort->InitCheck();

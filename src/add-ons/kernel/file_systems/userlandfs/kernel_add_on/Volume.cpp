@@ -18,6 +18,7 @@
 #include <util/OpenHashTable.h>
 
 #include <fs/fd.h>	// kernel private
+#include <thread.h>
 
 #include "IORequest.h"	// kernel internal
 
@@ -4327,6 +4328,15 @@ status_t
 Volume::_SendRequest(RequestPort* port, RequestAllocator* allocator,
 	RequestHandler* handler, Request** reply)
 {
+	// fill in the caller info
+	KernelRequest* request = static_cast<KernelRequest*>(
+		allocator->GetRequest());
+	struct thread* thread = thread_get_current_thread();
+	request->team = thread->team->id;
+	request->thread = thread->id;
+	request->user = geteuid();
+	request->group = getegid();
+
 	if (!fFileSystem->IsUserlandServerThread())
 		return port->SendRequest(allocator, handler, reply);
 	// Here it gets dangerous: a thread of the userland server team being here

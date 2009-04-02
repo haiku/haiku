@@ -13,6 +13,8 @@
 #include "fuse_fs.h"
 #include "FUSEVolume.h"
 
+#include "../RequestThread.h"
+
 
 class FUSEFileSystem::ArgumentVector {
 private:
@@ -177,6 +179,30 @@ FUSEFileSystem::DeleteVolume(Volume* volume)
 {
 	delete volume;
 	return B_OK;
+}
+
+
+void
+FUSEFileSystem::InitRequestThreadContext(RequestThreadContext* context)
+{
+	// Statically assert that fuse_context fits in the RequestThreadContext
+	// FS data. We can't include <Debug.h> as it clashes with our "Debug.h".
+	do {
+		static const int staticAssertHolds
+			= sizeof(fuse_context) <= REQUEST_THREAD_CONTEXT_FS_DATA_SIZE;
+		struct __staticAssertStruct__ {
+			char __static_assert_failed__[2 * staticAssertHolds - 1];
+		};
+	} while (false);
+
+	// init a fuse_context
+	KernelRequest* request = context->GetRequest();
+	fuse_context* fuseContext = (fuse_context*)context->GetFSData();
+	fuseContext->fuse = (struct fuse*)this;
+	fuseContext->uid = request->user;
+	fuseContext->gid = request->group;
+	fuseContext->pid = request->team;
+	fuseContext->private_data = fFS != NULL ? fFS->userData : NULL;
 }
 
 

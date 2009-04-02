@@ -38,6 +38,9 @@ public:
 	virtual	status_t			CreateVolume(Volume** _volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
+	virtual	void				InitRequestThreadContext(
+									RequestThreadContext* context);
+
 			status_t			InitClientFS(const char* parameters);
 			void				ExitClientFS(status_t status);
 

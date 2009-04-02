@@ -1,5 +1,7 @@
-// FileSystem.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_FILE_SYSTEM_H
 #define USERLAND_FS_FILE_SYSTEM_H
 
@@ -15,7 +17,9 @@
 
 namespace UserlandFS {
 
+class RequestThreadContext;
 class Volume;
+
 
 class FileSystem {
 public:
@@ -28,6 +32,9 @@ public:
 
 	virtual	status_t			CreateVolume(Volume** volume, dev_t id) = 0;
 	virtual	status_t			DeleteVolume(Volume* volume) = 0;
+
+	virtual	void				InitRequestThreadContext(
+									RequestThreadContext* context);
 
 			void				RegisterVolume(Volume* volume);
 			void				UnregisterVolume(Volume* volume);

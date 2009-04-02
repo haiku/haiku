@@ -1,5 +1,7 @@
-// RequestThread.h
-
+/*
+ * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef USERLAND_FS_REQUEST_THREAD_H
 #define USERLAND_FS_REQUEST_THREAD_H
 
@@ -11,19 +13,26 @@ class FileSystem;
 class RequestThread;
 class Volume;
 
+#define REQUEST_THREAD_CONTEXT_FS_DATA_SIZE	256
+
 // RequestThreadContext
 class RequestThreadContext {
 public:
-								RequestThreadContext(Volume* volume);
+								RequestThreadContext(Volume* volume,
+									KernelRequest* request);
 								~RequestThreadContext();
 
 			RequestThread*		GetThread() const;
 			Volume*				GetVolume() const;
+			KernelRequest*		GetRequest() const	{ return fRequest; }
+			void*				GetFSData() 		{ return fFSData; }
 
 private:
 			RequestThreadContext*	fPreviousContext;
 			RequestThread*		fThread;
 			Volume*				fVolume;
+			KernelRequest*		fRequest;
+			uint8				fFSData[REQUEST_THREAD_CONTEXT_FS_DATA_SIZE];
 };
 
 // RequestThread
