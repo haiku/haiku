@@ -52,6 +52,7 @@ All rights reserved.
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Cursor.h>
 #include <Debug.h>
 #include <GraphicsDefs.h>
@@ -70,7 +71,7 @@ All rights reserved.
 #define SMART_REDRAW 1
 #define DRAG_TITLE_OUTLINE 1
 #define CONSTRAIN_CLIPPING_REGION 1
-#define LOWER_SCROLLBAR 1
+#define LOWER_SCROLLBAR 0
 
 namespace BPrivate {
 
@@ -172,7 +173,7 @@ static const unsigned char kDownSortArrow8x8Invert[] = {
 
 static const float kTintedLineTint = 0.7 * B_NO_TINT + 0.3 * B_DARKEN_1_TINT;
 
-static const float kTitleHeight = 17.0;
+static const float kTitleHeight = 16.0;
 static const float kLatchWidth = 15.0;
 
 
@@ -1093,7 +1094,8 @@ BColumnListView::RemoveColumn(BColumn* column)
 {
 	if (fColumns.HasItem(column)) {
 		SetColumnVisible(column, false);
-		Window()->UpdateIfNeeded();
+		if (Window() != NULL)
+			Window()->UpdateIfNeeded();
 		fColumns.RemoveItem(column);
 	}
 }
@@ -1534,7 +1536,14 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 void
 BColumnListView::MakeFocus(bool isFocus)
 {
-	Invalidate();	// Redraw focus marks around view
+	if (fBorderStyle != B_NO_BORDER) {
+		// Redraw focus marks around view
+		Invalidate();
+	}
+
+	fHorizontalScrollBar->SetBorderHighlighted(isFocus);
+	fVerticalScrollBar->SetBorderHighlighted(isFocus);
+
 	BView::MakeFocus(isFocus);
 }
 
@@ -1669,10 +1678,29 @@ BColumnListView::WindowActivated(bool active)
 
 
 void
-BColumnListView::Draw(BRect)
+BColumnListView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
-	PushState();
+
+	if (be_control_look != NULL) {
+		uint32 flags = 0;
+		if (IsFocus() && Window()->IsActive())
+			flags |= BControlLook::B_FOCUSED;
+
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		BRect verticalScrollBarFrame;
+		if (!fVerticalScrollBar->IsHidden())
+			verticalScrollBarFrame = fVerticalScrollBar->Frame();
+		BRect horizontalScrollBarFrame;
+		if (!fHorizontalScrollBar->IsHidden())
+			horizontalScrollBarFrame = fHorizontalScrollBar->Frame();
+
+		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
+			verticalScrollBarFrame, horizontalScrollBarFrame,
+			base, fBorderStyle, flags);
+		return;
+	}
 
 	BRect cornerRect(rect.right - B_V_SCROLL_BAR_WIDTH,
 		rect.bottom - B_H_SCROLL_BAR_HEIGHT, rect.right, rect.bottom);
@@ -1703,7 +1731,6 @@ BColumnListView::Draw(BRect)
 	BView::SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// fills lower right rect between scroll bars
 	FillRect(cornerRect);
-	PopState();
 }
 
 
@@ -1792,7 +1819,7 @@ BColumnListView::MinSize()
 {
 	BSize size;
 	size.width = 100;
-	size.height = kTitleHeight + 3 * ceilf(be_plain_font->Size());
+	size.height = kTitleHeight + 4 * B_H_SCROLL_BAR_HEIGHT;
 	if (!fHorizontalScrollBar->IsHidden())
 		size.height += fHorizontalScrollBar->Frame().Height() + 1;
 	// TODO: Take border size into account
@@ -1910,14 +1937,14 @@ BColumnListView::_GetChildViewRects(const BRect& bounds,
 	titleRect = bounds;
 	titleRect.bottom = titleRect.top + kTitleHeight;
 #if !LOWER_SCROLLBAR
-	titleRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	titleRect.right -= B_V_SCROLL_BAR_WIDTH;
 #endif
 
 	outlineRect = bounds;
 	outlineRect.top = titleRect.bottom + 1.0;
-	outlineRect.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	outlineRect.right -= B_V_SCROLL_BAR_WIDTH;
 	if (showHorizontalScrollbar)
-		outlineRect.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+		outlineRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
 	vScrollBarRect = bounds;
 #if LOWER_SCROLLBAR
@@ -1935,24 +1962,22 @@ BColumnListView::_GetChildViewRects(const BRect& bounds,
 	// Adjust stuff so the border will fit.
 	if (fBorderStyle == B_PLAIN_BORDER) {
 		titleRect.InsetBy(1, 0);
-		titleRect.top++;
-		outlineRect.InsetBy(1, 0);
-		outlineRect.bottom--;
-
-		vScrollBarRect.OffsetBy(-1, 0);
-		vScrollBarRect.InsetBy(0, 1);
-		hScrollBarRect.OffsetBy(0, -1);
-		hScrollBarRect.InsetBy(1, 0);
+		titleRect.OffsetBy(0, 1);
+		outlineRect.InsetBy(1, 1);
 	} else if (fBorderStyle == B_FANCY_BORDER) {
 		titleRect.InsetBy(2, 0);
-		titleRect.top += 2;
-		outlineRect.InsetBy(2, 0);
-		outlineRect.bottom -= 2;
+		titleRect.OffsetBy(0, 2);
+		outlineRect.InsetBy(2, 2);
 
-		vScrollBarRect.OffsetBy(-2, 0);
-		vScrollBarRect.InsetBy(0, 2);
-		hScrollBarRect.OffsetBy(0, -2);
-		hScrollBarRect.InsetBy(2, 0);
+		vScrollBarRect.OffsetBy(-1, 0);
+#if LOWER_SCROLLBAR
+		vScrollBarRect.top += 2;
+		vScrollBarRect.bottom -= 1;
+#else
+		vScrollBarRect.InsetBy(0, 1);
+#endif
+		hScrollBarRect.OffsetBy(0, -1);
+		hScrollBarRect.InsetBy(1, 0);
 	}
 }
 
@@ -2010,11 +2035,9 @@ TitleView::~TitleView()
 	delete fColumnPop;
 	fColumnPop = NULL;
 	
-	fDrawBuffer->Lock();
-	fDrawBufferView->RemoveSelf();
-	fDrawBuffer->Unlock();
-	delete fDrawBufferView;
+#if DOUBLE_BUFFERED_COLUMN_RESIZE
 	delete fDrawBuffer;
+#endif
 	delete fUpSortArrow;
 	delete fDownSortArrow;
 
@@ -2215,20 +2238,18 @@ TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 	float dX = fSelectedColumnRect.left + fSelectedColumn->Width()
 		 - originalEdge;
 	if (dX != 0) {
-		BRect originalRect(originalEdge, 0, 1000000.0, fVisibleRect.Height());
+		float columnHeight = fVisibleRect.Height();
+		BRect originalRect(originalEdge, 0, 1000000.0, columnHeight);
 		BRect movedRect(originalRect);
 		movedRect.OffsetBy(dX, 0);
 
 		// Update the size of the title column
-		BRect sourceRect(0, 0, fSelectedColumn->Width(), fVisibleRect.Height());
+		BRect sourceRect(0, 0, fSelectedColumn->Width(), columnHeight);
 		BRect destRect(sourceRect);
 		destRect.OffsetBy(fSelectedColumnRect.left, 0);
 
 #if DOUBLE_BUFFERED_COLUMN_RESIZE
 		fDrawBuffer->Lock();
-		fDrawBufferView->SetHighColor(
-			fMasterView->Color(B_COLOR_HEADER_BACKGROUND));
-		fDrawBufferView->FillRect(sourceRect);
 		DrawTitle(fDrawBufferView, sourceRect, fSelectedColumn, false);
 		fDrawBufferView->Sync();
 		fDrawBuffer->Unlock();
@@ -2237,8 +2258,6 @@ TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 		DrawBitmap(fDrawBuffer, sourceRect, destRect);
 #else
 		CopyBits(originalRect, movedRect);
-		SetHighColor(fMasterView->Color(B_COLOR_HEADER_BACKGROUND));
-		FillRect(destRect);
 		DrawTitle(this, destRect, fSelectedColumn, false);
 #endif
 
@@ -2313,49 +2332,77 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 	rgb_color bevelHigh;
 	rgb_color bevelLow;
 	// Want exterior borders to overlap.
-	rect.right += 1;
-	drawRect = rect;
-	drawRect.InsetBy(2, 2);
-	if (depressed) {
-		backgroundColor = mix_color(
-			fMasterView->Color(B_COLOR_HEADER_BACKGROUND),
-			make_color(0, 0, 0), 64);
-		bevelHigh = mix_color(backgroundColor, make_color(0, 0, 0), 64);
-		bevelLow = mix_color(backgroundColor, make_color(255, 255, 255), 128);
-		drawRect.left++;
-		drawRect.top++;
+	if (be_control_look == NULL) {
+		rect.right += 1;
+		drawRect = rect;
+		drawRect.InsetBy(2, 2);
+		if (depressed) {
+			backgroundColor = mix_color(
+				fMasterView->Color(B_COLOR_HEADER_BACKGROUND),
+				make_color(0, 0, 0), 64);
+			bevelHigh = mix_color(backgroundColor, make_color(0, 0, 0), 64);
+			bevelLow = mix_color(backgroundColor, make_color(255, 255, 255),
+				128);
+			drawRect.left++;
+			drawRect.top++;
+		} else {
+			backgroundColor = fMasterView->Color(B_COLOR_HEADER_BACKGROUND);
+			bevelHigh = mix_color(backgroundColor, make_color(255, 255, 255),
+				192);
+			bevelLow = mix_color(backgroundColor, make_color(0, 0, 0), 64);
+			drawRect.bottom--;
+			drawRect.right--;
+		}
 	} else {
-		backgroundColor = fMasterView->Color(B_COLOR_HEADER_BACKGROUND);
-		bevelHigh = mix_color(backgroundColor, make_color(255, 255, 255), 192);
-		bevelLow = mix_color(backgroundColor, make_color(0, 0, 0), 64);
-		drawRect.bottom--;
-		drawRect.right--;
+		drawRect = rect;
 	}
-
-	view->SetHighColor(borderColor);
-	view->StrokeRect(rect);	
-	view->BeginLineArray(4);
-	view->AddLine(BPoint(rect.left + 1, rect.top + 1),
-		BPoint(rect.right - 1, rect.top + 1), bevelHigh);
-	view->AddLine(BPoint(rect.left + 1, rect.top + 1),
-		BPoint(rect.left + 1, rect.bottom - 1), bevelHigh);
-	view->AddLine(BPoint(rect.right - 1, rect.top + 1),
-		BPoint(rect.right - 1, rect.bottom - 1), bevelLow);
-	view->AddLine(BPoint(rect.left + 2, rect.bottom-1),
-		BPoint(rect.right - 1, rect.bottom - 1), bevelLow);	
-	view->EndLineArray();
 
 	font_height fh;
 	GetFontHeight(&fh);
 	
 	float baseline = floor(drawRect.top + fh.ascent
-		+ (drawRect.Height() + 1 - (fh.ascent+fh.descent)) / 2);
+		+ (drawRect.Height() + 1 - (fh.ascent + fh.descent)) / 2);
 				   
-	view->SetHighColor(backgroundColor);
-	view->SetLowColor(backgroundColor);
+	if (be_control_look != NULL) {
+		BRect bgRect = rect;
 
-	view->FillRect(rect.InsetByCopy(2, 2));
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+		view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
 
+		bgRect.bottom--;
+		bgRect.right--;
+
+		if (depressed)
+			base = tint_color(base, B_DARKEN_1_TINT);
+
+		be_control_look->DrawButtonBackground(view, bgRect, rect, base, 0,
+			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+
+		view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_2_TINT));
+		view->StrokeLine(rect.RightTop(), rect.RightBottom());
+
+	} else {
+
+		view->SetHighColor(borderColor);
+		view->StrokeRect(rect);	
+		view->BeginLineArray(4);
+		view->AddLine(BPoint(rect.left + 1, rect.top + 1),
+			BPoint(rect.right - 1, rect.top + 1), bevelHigh);
+		view->AddLine(BPoint(rect.left + 1, rect.top + 1),
+			BPoint(rect.left + 1, rect.bottom - 1), bevelHigh);
+		view->AddLine(BPoint(rect.right - 1, rect.top + 1),
+			BPoint(rect.right - 1, rect.bottom - 1), bevelLow);
+		view->AddLine(BPoint(rect.left + 2, rect.bottom-1),
+			BPoint(rect.right - 1, rect.bottom - 1), bevelLow);	
+		view->EndLineArray();
+
+		view->SetHighColor(backgroundColor);
+		view->SetLowColor(backgroundColor);
+
+		view->FillRect(rect.InsetByCopy(2, 2));
+	}
 
 	// If no column given, nothing else to draw.
 	if (!column)
@@ -2408,19 +2455,17 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 
 	if (drawRect.right > drawRect.left) {
 #if CONSTRAIN_CLIPPING_REGION
-		BRegion clipRegion;
-		clipRegion.Set(drawRect);
-		view->ConstrainClippingRegion(&clipRegion);
+		BRegion clipRegion(drawRect);
 		view->PushState();
+		view->ConstrainClippingRegion(&clipRegion);
 #endif
 		view->MovePenTo(BPoint(drawRect.left + 8, baseline));
-		view->SetDrawingMode(B_OP_COPY);
+		view->SetDrawingMode(B_OP_OVER);
 		view->SetHighColor(fMasterView->Color(B_COLOR_HEADER_TEXT));
 		column->DrawTitle(drawRect, view);
 
 #if CONSTRAIN_CLIPPING_REGION
 		view->PopState();
-		view->ConstrainClippingRegion(NULL);
 #endif
 	}
 }
@@ -2883,11 +2928,9 @@ OutlineView::OutlineView(BRect rect, BList* visibleColumns, BList* sortColumns,
 
 OutlineView::~OutlineView()
 {
-	fDrawBuffer->Lock();
-	fDrawBufferView->RemoveSelf();
-	fDrawBuffer->Unlock();
-	delete fDrawBufferView;
+#if DOUBLE_BUFFERED_COLUMN_RESIZE
 	delete fDrawBuffer;
+#endif
 
 	Clear();
 }
@@ -3003,7 +3046,9 @@ OutlineView::RedrawColumn(BColumn* column, float leftEdge, bool isFirstColumn)
 		tintedLine = !tintedLine;
 
 		if (line + rowHeight >= fVisibleRect.top) {
+#if DOUBLE_BUFFERED_COLUMN_RESIZE
 			BRect sourceRect(0, 0, column->Width(), rowHeight);
+#endif
 			BRect destRect(leftEdge, line, leftEdge + column->Width(),
 				line + rowHeight);
 
@@ -3060,10 +3105,9 @@ OutlineView::RedrawColumn(BColumn* column, float leftEdge, bool isFirstColumn)
 					fieldRect.left += fMasterView->LatchWidth();
 
 	#if CONSTRAIN_CLIPPING_REGION
-				BRegion clipRegion;
-				clipRegion.Set(fieldRect);
-				fDrawBufferView->ConstrainClippingRegion(&clipRegion);
+				BRegion clipRegion(fieldRect);
 				fDrawBufferView->PushState();
+				fDrawBufferView->ConstrainClippingRegion(&clipRegion);
 	#endif
 				fDrawBufferView->SetHighColor(fMasterView->Color(
 					row->fNextSelected ? B_COLOR_SELECTION_TEXT
@@ -3074,7 +3118,6 @@ OutlineView::RedrawColumn(BColumn* column, float leftEdge, bool isFirstColumn)
 				column->DrawField(field, fieldRect, fDrawBufferView);
 	#if CONSTRAIN_CLIPPING_REGION
 				fDrawBufferView->PopState();
-				fDrawBufferView->ConstrainClippingRegion(NULL);
 	#endif
 			}
 
@@ -3100,26 +3143,24 @@ OutlineView::RedrawColumn(BColumn* column, float leftEdge, bool isFirstColumn)
 			BField* field = row->GetField(column->fFieldID);
 			if (field) {
 	#if CONSTRAIN_CLIPPING_REGION
-				BRegion clipRegion;
-				clipRegion.Set(destRect);
-				ConstrainClippingRegion(&clipRegion);
+				BRegion clipRegion(destRect);
 				PushState();
+				ConstrainClippingRegion(&clipRegion);
 	#endif
-				SetHighColor(fColorList[row->fNextSelected
-					? B_COLOR_SELECTION_TEXT : B_COLOR_TEXT]);
+				SetHighColor(fMasterView->Color(row->fNextSelected
+					? B_COLOR_SELECTION_TEXT : B_COLOR_TEXT));
 				float baseline = floor(destRect.top + fh.ascent
 					+ (destRect.Height() + 1 - (fh.ascent + fh.descent)) / 2);
 				MovePenTo(destRect.left + 8, baseline);
 				column->DrawField(field, destRect, this);
 	#if CONSTRAIN_CLIPPING_REGION
 				PopState();
-				ConstrainClippingRegion(NULL);
 	#endif
 			}
 
 			if (fFocusRow == row && !fEditMode && fMasterView->IsFocus()
 				&& Window()->IsActive()) {
-				SetHighColor(fColorList[B_COLOR_ROW_DIVIDER]);
+				SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
 				StrokeRect(BRect(0, destRect.top, 10000.0, destRect.bottom));
 			}
 #endif
@@ -3253,10 +3294,9 @@ OutlineView::Draw(BRect invalidBounds)
 						BField* field = row->GetField(column->fFieldID);
 						if (field) {
 #if CONSTRAIN_CLIPPING_REGION
-							BRegion clipRegion;
-							clipRegion.Set(destRect);
-							ConstrainClippingRegion(&clipRegion);
+							BRegion clipRegion(destRect);
 							PushState();
+							ConstrainClippingRegion(&clipRegion);
 #endif
 							SetHighColor(fMasterView->Color(
 								row->fNextSelected ? B_COLOR_SELECTION_TEXT
@@ -3268,7 +3308,6 @@ OutlineView::Draw(BRect invalidBounds)
 							column->DrawField(field, destRect, this);
 #if CONSTRAIN_CLIPPING_REGION
 							PopState();
-							ConstrainClippingRegion(NULL);
 #endif
 						}
 					}
