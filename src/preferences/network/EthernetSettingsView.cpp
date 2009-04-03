@@ -57,6 +57,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <NetServer.h>
+
 #include "AutoDeleter.h"
 
 
@@ -338,6 +340,7 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "DHCP") == 0);
 
+
 	fCurrentSettings->fNameservers.MakeEmpty();
 	fCurrentSettings->fNameservers.AddItem(new BString(
 		fPrimaryDNSTextControl->Text()));
@@ -355,6 +358,8 @@ EthernetSettingsView::_SaveConfiguration()
 	_ApplyControlsToConfiguration();
 	_SaveDNSConfiguration();
 	_SaveAdaptersConfiguration();
+	if (fCurrentSettings->GetAutoConfigure())
+		_TriggerAutoConfig(fCurrentSettings->GetName());
 }
 
 
@@ -428,6 +433,42 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		// all configuration is DHCP, so delete interfaces file.
 		remove(path.Path());
 	}
+}
+
+
+status_t
+EthernetSettingsView::_TriggerAutoConfig(const char* device)
+{
+	BMessenger networkServer(kNetServerSignature);
+	if (!networkServer.IsValid()) {
+		(new BAlert("error", "The net_server needs to run for the auto "
+			"configuration!", "Ok"))->Go();
+		return B_ERROR;
+	}
+
+	BMessage message(kMsgConfigureInterface);
+	message.AddString("device", device);
+	BMessage address;
+	address.AddString("family", "inet");
+	address.AddBool("auto config", true);
+	message.AddMessage("address", &address);
+
+	BMessage reply;
+	status_t status = networkServer.SendMessage(&message, &reply);
+	if (status != B_OK) {
+		BString errorMessage("Sending auto-config message failed: ");
+		errorMessage << strerror(status);
+		(new BAlert("error", errorMessage.String(), "Ok"))->Go();
+		return status;
+	} else if (reply.FindInt32("status", &status) == B_OK
+			&& status != B_OK) {
+		BString errorMessage("Auto-configuring failed: ");
+		errorMessage << strerror(status);
+		(new BAlert("error", errorMessage.String(), "Ok"))->Go();
+		return status;
+	}
+
+	return B_OK;
 }
 
 

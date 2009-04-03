@@ -45,6 +45,7 @@ private:
 				void			_SaveAdaptersConfiguration();
 				void			_ApplyControlsToConfiguration();
 				status_t		_GetPath(const char* name, BPath& path);
+				status_t		_TriggerAutoConfig(const char* device);
 private:
 		
 				BButton*		fApplyButton;
