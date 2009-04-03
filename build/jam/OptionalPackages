@@ -188,7 +188,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 
 	# library symlinks
 	local lib ;
-	for lib in $(BEOS_SYSTEM_LIBS) libglut.so {
+	for lib in $(SYSTEM_LIBS) libglut.so {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
 	}
 
