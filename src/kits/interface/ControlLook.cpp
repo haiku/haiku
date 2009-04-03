@@ -703,6 +703,14 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		&& horizontalScrollBarFrame.IsValid()
 		&& verticalScrollBarFrame.IsValid();
 
+	// calculate scroll corner rect before messing with the "rect"
+	BRect scrollCornerFillRect(rect.right, rect.bottom,
+		rect.right, rect.bottom);
+	if (horizontalScrollBarFrame.IsValid())
+		scrollCornerFillRect.left = horizontalScrollBarFrame.right + 1;
+	if (verticalScrollBarFrame.IsValid())
+		scrollCornerFillRect.top = verticalScrollBarFrame.bottom + 1;
+
 	uint32 borders = _borders;
 	if (excludeScrollCorner) {
 		rect.bottom = horizontalScrollBarFrame.top;
@@ -747,6 +755,15 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
+
+		// exclude recessed frame
+		scrollCornerFillRect.top++;
+		scrollCornerFillRect.left++;
+	}
+
+	if (scrollCornerFillRect.IsValid()) {
+		view->SetHighColor(base);
+		view->FillRect(scrollCornerFillRect);
 	}
 }
 
