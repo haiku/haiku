@@ -166,6 +166,9 @@ get_cpu_model_string(system_info *info)
 		/* Transmeta */
 		case B_CPU_TRANSMETA_CRUSOE:
 			return "Crusoe";
+		case B_CPU_TRANSMETA_EFFICEON:
+		case B_CPU_TRANSMETA_EFFICEON_2:
+			return "Efficeon";
 
 		/* IDT/VIA */
 		case B_CPU_IDT_WINCHIP_C6:

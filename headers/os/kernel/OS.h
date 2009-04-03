@@ -561,6 +561,8 @@ typedef enum cpu_types {
 	/* Transmeta */
 	B_CPU_TRANSMETA_x86					= 0x1600,
 	B_CPU_TRANSMETA_CRUSOE				= 0x1654,
+	B_CPU_TRANSMETA_EFFICEON			= 0x16f2,
+	B_CPU_TRANSMETA_EFFICEON_2			= 0x16f3,
 
 	/* Rise */
 	B_CPU_RISE_x86						= 0x1400,
