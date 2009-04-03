@@ -18,48 +18,48 @@ local NET_BOOT = 0 ;
 
 local BOOT_ADD_ONS_NET ;
 if $(NET_BOOT) = 1 {
-BOOT_ADD_ONS_NET = 
+BOOT_ADD_ONS_NET =
 #	nbd
 #	remote_disk
-#	$(BEOS_ADD_ONS_DRIVERS_NET)
+#	$(SYSTEM_ADD_ONS_DRIVERS_NET)
 #	stack socket
-#	$(BEOS_NETWORK_DEVICES)
-#	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
-#	$(BEOS_NETWORK_PPP)
-#	$(BEOS_NETWORK_PROTOCOLS)
+#	$(SYSTEM_NETWORK_DEVICES)
+#	$(SYSTEM_NETWORK_DATALINK_PROTOCOLS)
+#	$(SYSTEM_NETWORK_PPP)
+#	$(SYSTEM_NETWORK_PROTOCOLS)
 ;
 }
 
-BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
+SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 #cdda fat googlefs nfs ;
 
 
 # modules
-AddFilesToFloppyBootArchive beos system add-ons kernel bus_managers
-	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToFloppyBootArchive beos system add-ons kernel busses agp_gart
+AddFilesToFloppyBootArchive system add-ons kernel bus_managers
+	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToFloppyBootArchive system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
-AddFilesToFloppyBootArchive beos system add-ons kernel busses ide
+AddFilesToFloppyBootArchive system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
-AddFilesToFloppyBootArchive beos system add-ons kernel busses scsi
+AddFilesToFloppyBootArchive system add-ons kernel busses scsi
 	: ahci ;
-AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
-AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
-	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToFloppyBootArchive beos system add-ons kernel generic
+AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
+AddFilesToFloppyBootArchive system add-ons kernel file_systems
+	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToFloppyBootArchive system add-ons kernel generic
 	: ide_adapter locked_pool scsi_periph ;
-AddFilesToFloppyBootArchive beos system add-ons kernel partitioning_systems
+AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
-AddFilesToFloppyBootArchive beos system add-ons kernel interrupt_controllers
+AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
-AddFilesToFloppyBootArchive beos system add-ons kernel busses usb
+AddFilesToFloppyBootArchive system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 
 if $(TARGET_ARCH) = x86 {
-	AddFilesToFloppyBootArchive beos system add-ons kernel cpu : generic_x86 ;
+	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
 }
 
 # drivers
@@ -68,11 +68,11 @@ AddDriversToFloppyBootArchive disk usb	: usb_disk ;
 if $(NET_BOOT) = 1 {
 #AddDriversToFloppyBootArchive disk virtual	: nbd ;
 AddDriversToFloppyBootArchive disk virtual	: remote_disk ;
-AddDriversToFloppyBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
+AddDriversToFloppyBootArchive net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 }
 
 # kernel
-AddFilesToFloppyBootArchive beos system : <revisioned>kernel_$(TARGET_ARCH) ;
+AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # scripts and data files
 
@@ -84,21 +84,21 @@ AddFilesToFloppyBootArchive home config settings kernel drivers
 
 if $(NET_BOOT) = 1 {
 # add-ons
-AddFilesToFloppyBootArchive beos system add-ons kernel network
+AddFilesToFloppyBootArchive system add-ons kernel network
 	: stack socket ;
-AddFilesToFloppyBootArchive beos system add-ons kernel network devices
-	: $(BEOS_NETWORK_DEVICES) ;
-AddFilesToFloppyBootArchive beos system add-ons kernel network datalink_protocols
-	: $(BEOS_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToFloppyBootArchive beos system add-ons kernel network ppp
-	: $(BEOS_NETWORK_PPP) ;
-AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
-	: $(BEOS_NETWORK_PROTOCOLS) ;
+AddFilesToFloppyBootArchive system add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToFloppyBootArchive system add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToFloppyBootArchive system add-ons kernel network ppp
+	: $(SYSTEM_NETWORK_PPP) ;
+AddFilesToFloppyBootArchive system add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 }
 
 # boot module links
 AddBootModuleSymlinksToFloppyBootArchive
-	$(BEOS_ADD_ONS_BUS_MANAGERS)
+	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	$(PPC_ONLY)openpic
 	ide_adapter locked_pool scsi_periph
 	$(X86_ONLY)generic_x86
@@ -106,7 +106,7 @@ AddBootModuleSymlinksToFloppyBootArchive
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel session
-	$(BEOS_ADD_ONS_FILE_SYSTEMS)
+	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
 ;
 
@@ -161,7 +161,8 @@ Depends haiku-floppyboot-archive : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 HAIKU_BOOT_FLOPPY = haiku-boot-floppy.image ;
 MakeLocate $(HAIKU_BOOT_FLOPPY) : $(HAIKU_OUTPUT_DIR) ;
 
-BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : zbeos : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
+BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : haiku_loader
+	: $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 
 # remove the archive
 RmTemps $(HAIKU_BOOT_FLOPPY) : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
