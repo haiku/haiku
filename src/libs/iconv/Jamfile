@@ -10,7 +10,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags
-	-DLIBDIR="\\\"/boot/beos/system/lib\\\""
+	-DLIBDIR="\\\"/boot/system/lib\\\""
 	-DICONV_CONST=""
 	;
 
