@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -196,7 +196,7 @@ rtc_secs_to_tm(uint32 seconds, struct tm *t)
 
 	seconds = seconds % RTC_SECONDS_DAY;
 	t->tm_hour = seconds / 3600;
- 
+
 	seconds = seconds % 3600;
 	t->tm_min = seconds / 60;
 	t->tm_sec = seconds % 60;
@@ -268,7 +268,7 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 
 	TRACE(("new system_time_offset %Ld\n",
 		arch_rtc_get_system_time_offset(sRealTimeData)));
-	
+
 	return B_OK;
 }
 
@@ -305,10 +305,12 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 
 	sIsGMT = isGMT;
 
-	if (wasGMT != sIsGMT)
-                arch_rtc_set_system_time_offset(sRealTimeData,
-                        arch_rtc_get_system_time_offset(sRealTimeData) + (((sIsGMT) ? 1 : -1) * sTimezoneOffset));
- 
+	if (wasGMT != sIsGMT) {
+		arch_rtc_set_system_time_offset(sRealTimeData,
+			arch_rtc_get_system_time_offset(sRealTimeData) + (((sIsGMT) ? 1 : -1)
+				* sTimezoneOffset));
+	}
+
 	return B_OK;
 }
 
