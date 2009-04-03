@@ -1,9 +1,0 @@
-See libnetwork/dns/DEVNOTES for general notes. This file contains information about the legacy libbind.so.
-
-This folder and the headers folder contained within override the respective libnetwork/dns folder. Additionally, the legacy headers override the default posix headers.
-	
-The src folder is imported for sources. Currently, it is empty.
-
-You may import files from Haiku's libroot.so if funtionality is missing.
-
-libbind.so links against libnet.so because it needs gethostname() on non-Haiku targets.
