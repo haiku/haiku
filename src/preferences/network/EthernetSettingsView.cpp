@@ -340,7 +340,6 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "DHCP") == 0);
 
-
 	fCurrentSettings->fNameservers.MakeEmpty();
 	fCurrentSettings->fNameservers.AddItem(new BString(
 		fPrimaryDNSTextControl->Text()));
