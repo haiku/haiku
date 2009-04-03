@@ -10,15 +10,17 @@
 
 #include <string.h>
 
+#include <Alert.h>
+#include <FindDirectory.h>
 #include <Input.h>
-#include <Screen.h>
 #include <Menu.h>
 #include <MenuItem.h>
-#include <Alert.h>
 #include <Messenger.h>
+#include <Path.h>
+#include <Screen.h>
 
 #ifdef DEBUG
-#include <Debug.h>
+#	include <Debug.h>
 #endif
 
 #include "CannaCommon.h"
@@ -27,8 +29,9 @@
 #include "KouhoWindow.h"
 #include "PaletteWindow.h"
 
-CannaLooper::CannaLooper( CannaMethod *method )
-	:BLooper( "Canna Looper" )
+
+CannaLooper::CannaLooper(CannaMethod* method)
+	: BLooper("Canna Looper")
 {
 	owner = method;
 	canna = 0;
@@ -109,22 +112,30 @@ CannaLooper::Quit()
 	BLooper::Quit();
 }
 
+
 status_t
-CannaLooper::ReadSettings( char *basepath )
+CannaLooper::ReadSettings(char* basePath)
 {
-#ifndef __HAIKU__ 
-	strcpy( basepath, "/boot/home/config/KanBe/" );
-#else
-	strcpy( basepath, "/etc/KanBe/" );
-#endif
+	BPath path;
+	status_t status = find_directory(B_SYSTEM_DATA_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("KanBe");
+
+	strcpy(basePath, path.Path());
+
 	font_family family;
 	font_style style;
-	strcpy( family, "Haru" );
-	strcpy( style, "Regular" );
-	kouhoFont.SetFamilyAndStyle( family, style );
-	kouhoFont.SetSize( 12 );
-	return B_NO_ERROR;
+	strcpy(family, "Haru");
+	strcpy(style, "Regular");
+
+	kouhoFont.SetFamilyAndStyle(family, style);
+	kouhoFont.SetSize(12);
+
+	return B_OK;
 }
+
 
 void
 CannaLooper::EnqueueMessage( BMessage *msg )
