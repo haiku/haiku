@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -278,7 +278,7 @@ BackgroundsView::AllAttached()
 
 	BPath path;
 	entry_ref ref;
-	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) == B_OK) {
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &path) == B_OK) {
 		path.Append("artwork");
 		get_ref_for_path(path.Path(), &ref);
 	}
