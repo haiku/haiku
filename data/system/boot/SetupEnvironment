@@ -42,13 +42,13 @@ export BE_DEFAULT_CPLUS_FLAGS=""
 
 if [ "$SAFEMODE" != "yes" ]
 then
-	export PATH=.:$HOME/config/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
-	export LIBRARY_PATH="%A/lib:$HOME/config/lib:/boot/common/lib:/boot/beos/system/lib"
-	export ADDON_PATH="%A/add-ons:$HOME/config/add-ons:/boot/beos/system/add-ons"
+	export PATH=.:$HOME/config/bin:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export LIBRARY_PATH="%A/lib:$HOME/config/lib:/boot/common/lib:/boot/system/lib"
+	export ADDON_PATH="%A/add-ons:$HOME/config/add-ons:/boot/system/add-ons"
 else
-	export PATH=.:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
-	export LIBRARY_PATH="%A/lib:/boot/common/lib:/boot/beos/system/lib"
-	export ADDON_PATH="%A/add-ons:/boot/beos/system/add-ons"
+	export PATH=.:/boot/common/bin:/bin:/boot/apps:/boot/preferences:/boot/system/apps:/boot/system/preferences:$BETOOLS
+	export LIBRARY_PATH="%A/lib:/boot/common/lib:/boot/system/lib"
+	export ADDON_PATH="%A/add-ons:/boot/system/add-ons"
 fi
 
 # media kit

@@ -18,7 +18,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
-BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
+SYSTEM_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp comm compress copyattr $(X86_ONLY)CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
@@ -48,50 +48,51 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
-BEOS_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProbe
+SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProbe
 	DiskUsage DriveSetup CDPlayer Expander Icon-O-Matic Installer LaunchBox
 	Magnify Mail MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
 	PowerStatus ProcessController Screenshot ShowImage SoundRecorder StyledEdit
 	Terminal TextSearch TV Workspaces
 ;
-BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
+SYSTEM_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
 	ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
-BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
+SYSTEM_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs
 	Playground Pulse Sudoku Gradients
 ;
-BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
+SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
 	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
 	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
 	$(X86_ONLY)libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
 	libilmimf.so libiconv.so
 ;
-BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
+SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	net_server media_addon_server input_server app_server fake_app_server
 	midi_server print_server mail_daemon
 ;
 
-BEOS_NETWORK_DEVICES = ethernet loopback ;
-BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
+SYSTEM_NETWORK_DEVICES = ethernet loopback ;
+SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 	ipv4_datagram ;
-#BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
-BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
+#SYSTEM_NETWORK_PPP = ipcp modem pap pppoe ;
+SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
 
-BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nvidia.accelerant
-	$(X86_ONLY)matrox.accelerant $(X86_ONLY)neomagic.accelerant
-	$(X86_ONLY)intel_extreme.accelerant $(X86_ONLY)s3.accelerant $(X86_ONLY)vesa.accelerant
+SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
+	$(X86_ONLY)nvidia.accelerant $(X86_ONLY)matrox.accelerant
+	$(X86_ONLY)neomagic.accelerant $(X86_ONLY)intel_extreme.accelerant
+	$(X86_ONLY)s3.accelerant $(X86_ONLY)vesa.accelerant
 	#$(X86_ONLY)via.accelerant
 	#$(X86_ONLY)vmware.accelerant
 ;
-BEOS_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator JPEGTranslator
-	JPEG2000Translator PCXTranslator PNGTranslator PPMTranslator RAWTranslator
-	RTF-Translator SGITranslator STXTTranslator TGATranslator
+SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
+	JPEGTranslator JPEG2000Translator PCXTranslator PNGTranslator PPMTranslator
+	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WonderBrushTranslator
 ;
-BEOS_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
+SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
 	dvb.media_addon
 	hmulti_audio.media_addon
 	mixer.media_addon
@@ -103,7 +104,7 @@ BEOS_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
 	firewire_dv.media_addon
 	#legacy.media_addon
 ;
-BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
+SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	aiff_reader au_reader $(X86_ONLY)avcodec avi_reader
 	matroska mov_reader
 	mp3_decoder mp3_reader
@@ -112,21 +113,21 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	# theora
 	vorbis wav_reader
 ;
-BEOS_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
+SYSTEM_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
 	PCL5\ Compatible PCL6\ Compatible PDF\ Writer PS\ Compatible Preview
 ;
-BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
+SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-BEOS_ADD_ONS_SCREENSAVERS = DebugNow Flurry Haiku IFS Spider Message ;
-BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
-BEOS_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
-BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
+SYSTEM_ADD_ONS_SCREENSAVERS = DebugNow Flurry Haiku IFS Spider Message ;
+SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
+SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
+SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
 ;
-BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
-BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
+SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ;
+SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 	$(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
 	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
 	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
@@ -134,44 +135,44 @@ BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
 	$(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx usb_ecm
 ;
-#BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
-BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
+#SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
+SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
 	write_overlay $(GPL_ONLY)reiserfs ;
 #googlefs $(GPL_ONLY)ntfs ;
 
 
 # modules
-AddFilesToHaikuImage beos system add-ons kernel bus_managers
-	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToHaikuImage beos system add-ons kernel busses agp_gart
+AddFilesToHaikuImage system add-ons kernel bus_managers
+	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToHaikuImage system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
-AddFilesToHaikuImage beos system add-ons kernel busses ide
+AddFilesToHaikuImage system add-ons kernel busses ide
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa ;
-AddFilesToHaikuImage beos system add-ons kernel busses scsi
+AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
-AddFilesToHaikuImage beos system add-ons kernel busses usb
+AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
-AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
-AddFilesToHaikuImage beos system add-ons kernel debugger
+AddFilesToHaikuImage system add-ons kernel console : vga_text ;
+AddFilesToHaikuImage system add-ons kernel debugger
 	: $(X86_ONLY)<kdebug>disasm <kdebug>hangman <kdebug>invalidate_on_exit
 	<kdebug>usb_keyboard ;
-AddFilesToHaikuImage beos system add-ons kernel file_systems
-	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToHaikuImage beos system add-ons kernel generic
+AddFilesToHaikuImage system add-ons kernel file_systems
+	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToHaikuImage system add-ons kernel generic
 	: dpc ide_adapter locked_pool mpu401 scsi_periph ;
-AddFilesToHaikuImage beos system add-ons kernel partitioning_systems
+AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: intel session ;
-AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
+AddFilesToHaikuImage system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
 
 if $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
+	AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
 
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		AddFilesToHaikuImage beos system add-ons kernel debugger demangle :
+		AddFilesToHaikuImage system add-ons kernel debugger demangle :
 			<kdebug>gcc2 ;
 	}
 }
@@ -182,62 +183,62 @@ AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 									  random <driver>tty zero ;
-AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
-AddDriversToHaikuImage audio old	: $(BEOS_ADD_ONS_DRIVERS_AUDIO_OLD) ;
-AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
+AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
+AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw fw_raw ;
 AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
-AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
 AddDriversToHaikuImage misc			: <driver>poke <driver>test <driver>mem ;
-AddDriversToHaikuImage net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
-#AddDriversToHaikuImage power		: $(BEOS_ADD_ONS_DRIVERS_ACPI) ;
+AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+#AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
-AddFilesToHaikuImage beos system : <revisioned>kernel_$(TARGET_ARCH) ;
+AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
-AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIBS) ;
+AddFilesToHaikuImage system lib : $(SYSTEM_LIBS) ;
 
 # libnetwork.so replaces quite a few libraries
-BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES
+SYSTEM_LIBS_LIBNETWORK_ALIASES
 	= libsocket.so libbind.so libnet.so ;
 
 local lib ;
-for lib in $(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) {
-	AddSymlinkToHaikuImage beos system lib : libnetwork.so : $(lib) ;
+for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
+	AddSymlinkToHaikuImage system lib : libnetwork.so : $(lib) ;
 }
 
-AddSymlinkToHaikuImage beos system lib : libbnetapi.so : libnetapi.so ;
+AddSymlinkToHaikuImage system lib : libbnetapi.so : libnetapi.so ;
 
 # libGL.so has GLU (like BeOS) *and* GLUT API built-in
-BEOS_SYSTEM_LIBS_LIBGL_ALIASES
+SYSTEM_LIBS_LIBGL_ALIASES
 	= libGLU.so libglut.so ;
 
 if $(TARGET_ARCH) = x86 {
 local lib ;
-for lib in $(BEOS_SYSTEM_LIBS_LIBGL_ALIASES) {
-	AddSymlinkToHaikuImage beos system lib : libGL.so : $(lib) ;
+for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
+	AddSymlinkToHaikuImage system lib : libGL.so : $(lib) ;
 }
 }
 
 # servers
-AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
+AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToHaikuImage beos system		: runtime_loader Deskbar Tracker ;
-AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled ;
-AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
-AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
-AddFilesToHaikuImage beos demos			: $(BEOS_DEMOS) ;
+AddFilesToHaikuImage system				: runtime_loader Deskbar Tracker ;
+AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) consoled ;
+AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
+AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
+AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
 SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToHaikuImage beos bin			: which ;
+AddFilesToHaikuImage system bin			: which ;
 
-AddSymlinkToHaikuImage beos bin : sh : bash ;
+AddSymlinkToHaikuImage system bin : sh : bash ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
@@ -250,7 +251,7 @@ DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToHaikuImage home config be Applications
-		: /boot/beos/apps/$(linkTarget) : $(linkTarget) ;
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Desktop Applets links
@@ -260,12 +261,12 @@ DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 	AddSymlinkToHaikuImage home config be Desktop\ Applets
-		: /boot/beos/apps/$(linkTarget) : $(linkTarget) ;
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Preferences links
 AddDirectoryToHaikuImage home config be Preferences ;
-# TODO/NOTE: Cannot use $(BEOS_PREFERENCES) here since there is
+# TODO/NOTE: Cannot use $(SYSTEM_PREFERENCES) here since there is
 # "<preferences>Tracker"...
 DESKBAR_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
@@ -273,34 +274,34 @@ DESKBAR_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToHaikuImage home config be Preferences
-		: /boot/beos/preferences/$(linkTarget) : $(linkTarget) ;
+		: /boot/system/preferences/$(linkTarget) : $(linkTarget) ;
 }
 
 # Deskbar Demo links
 AddDirectoryToHaikuImage home config be Demos ;
-for linkTarget in $(BEOS_DEMOS) {
+for linkTarget in $(SYSTEM_DEMOS) {
 	AddSymlinkToHaikuImage home config be Demos
-		: /boot/beos/demos/$(linkTarget) : $(linkTarget) ;
+		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
-AddSymlinkToHaikuImage beos bin : bzip2 : bunzip2 ;
-AddSymlinkToHaikuImage beos bin : less : more ;
-AddSymlinkToHaikuImage beos bin : gzip : gunzip ;
-AddSymlinkToHaikuImage beos bin : gzip : zcat ;
-AddSymlinkToHaikuImage beos bin : zdiff : zcmp ;
-AddSymlinkToHaikuImage beos bin : unzip : zipinfo ;
-AddSymlinkToHaikuImage beos bin : gawk : awk ;
-AddSymlinkToHaikuImage beos bin : grep : egrep ;
-AddSymlinkToHaikuImage beos bin : grep : fgrep ;
-AddSymlinkToHaikuImage beos bin : vim : vi ;
-AddSymlinkToHaikuImage beos bin : vim : view ;
+AddSymlinkToHaikuImage system bin : bzip2 : bunzip2 ;
+AddSymlinkToHaikuImage system bin : less : more ;
+AddSymlinkToHaikuImage system bin : gzip : gunzip ;
+AddSymlinkToHaikuImage system bin : gzip : zcat ;
+AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
+AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
+AddSymlinkToHaikuImage system bin : gawk : awk ;
+AddSymlinkToHaikuImage system bin : grep : egrep ;
+AddSymlinkToHaikuImage system bin : grep : fgrep ;
+AddSymlinkToHaikuImage system bin : vim : vi ;
+AddSymlinkToHaikuImage system bin : vim : view ;
 
 
 # scripts and data files
 local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript InstallerInitScript
 	InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
-AddFilesToHaikuImage beos system boot : $(bootScripts) ;
+AddFilesToHaikuImage system boot : $(bootScripts) ;
 
 local userBootScripts = UserBootscript.sample UserSetupEnvironment.sample ;
 SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
@@ -309,25 +310,25 @@ AddFilesToHaikuImage home config boot : $(userBootScripts) ;
 local logoArtwork = "HAIKU logo - white on blue - big.png"
 	"HAIKU logo - white on blue - normal.png" ;
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
-AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
+AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 
-AddDirectoryToHaikuImage beos etc sounds ;
+AddDirectoryToHaikuImage system data sounds ;
 
 # Mail spell check dictionaries
 local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
-AddFilesToHaikuImage beos etc word_dictionary : $(spellFiles) ;
+AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
 
 local etcFiles = inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
-AddFilesToHaikuImage beos etc : $(etcFiles) ;
+AddFilesToHaikuImage system etc : $(etcFiles) ;
 
 SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
-AddFilesToHaikuImage beos etc vim : <etc>vimrc ;
+AddFilesToHaikuImage system etc vim : <etc>vimrc ;
 
 local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
 	Humorists Kids Law "Linux cookies" Love Magic Medicine Miscellaneous
@@ -335,37 +336,37 @@ local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
 	Sports "Tech Support Excuses" ;
 fortuneFiles = $(fortuneFiles:G=etc!fortunes) ;
 SEARCH on $(fortuneFiles) = [ FDirName $(HAIKU_TOP) data etc fortunes ] ;
-AddFilesToHaikuImage beos etc fortunes : $(fortuneFiles) ;
+AddFilesToHaikuImage system etc fortunes : $(fortuneFiles) ;
 
 local fontDir = [ FDirName $(HAIKU_TOP) data etc fonts ] ;
 local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
 local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
-AddFilesToHaikuImage beos etc fonts psfonts : $(psFonts) ;
-AddFilesToHaikuImage beos etc fonts ttfonts : $(ttFonts) ;
+AddFilesToHaikuImage system fonts psfonts : $(psFonts) ;
+AddFilesToHaikuImage system fonts ttfonts : $(ttFonts) ;
 
 local kanbeDir = [ FDirName $(HAIKU_TOP) data etc KanBe ] ;
 local kanbeDefault = [ Glob $(kanbeDir)/default : *.canna *.gz ] ;
 local kanbeDic = [ Glob $(kanbeDir)/dic : *.cbp ] ;
 local kanbeDicCanna = [ Glob $(kanbeDir)/dic/canna
 	: *.cld *.ctd *.cbd *.dir ] ;
-AddFilesToHaikuImage beos etc KanBe default : $(kanbeDefault) ;
-AddFilesToHaikuImage beos etc KanBe dic : $(kanbeDic) ;
-AddFilesToHaikuImage beos etc KanBe dic canna : $(kanbeDicCanna) ;
-AddDirectoryToHaikuImage beos etc KanBe dic group ;
-AddDirectoryToHaikuImage beos etc KanBe dic user ;
+AddFilesToHaikuImage system data KanBe default : $(kanbeDefault) ;
+AddFilesToHaikuImage system data KanBe dic : $(kanbeDic) ;
+AddFilesToHaikuImage system data KanBe dic canna : $(kanbeDicCanna) ;
+AddDirectoryToHaikuImage system data KanBe dic group ;
+AddDirectoryToHaikuImage system data KanBe dic user ;
 
 local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
-AddFilesToHaikuImage beos etc Keymap : $(keymapFiles) ;
-AddSymlinkToHaikuImage beos etc Keymap : Swedish : Finnish ;
-AddSymlinkToHaikuImage beos etc Keymap : Slovene : Croatian ;
-AddSymlinkToHaikuImage beos etc Keymap : US-International : Brazilian ;
+AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
+AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
+AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
+AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
 
 local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
 for timezone in $(timezones) {
 	local dir = [ on $(timezone) return $(RELATIVE_TIMEZONE_DIR) ] ;
-	AddFilesToHaikuImage beos etc timezones $(dir) : $(timezone) ;
+	AddFilesToHaikuImage system data timezones $(dir) : $(timezone) ;
 }
 
 local driverSettingsFiles = <driver-settings>kernel ;
@@ -390,7 +391,7 @@ AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
 AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
-AddFilesToHaikuImage beos system : zbeos ;
+AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
@@ -405,48 +406,48 @@ AddBootModuleSymlinksToHaikuImage
 ;
 
 # add-ons
-AddFilesToHaikuImage beos system add-ons accelerants
-	: $(BEOS_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuImage beos system add-ons opengl
+AddFilesToHaikuImage system add-ons accelerants
+	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+AddFilesToHaikuImage system add-ons opengl
 	: $(X86_ONLY)Mesa\ Software\ Renderer ;
-AddFilesToHaikuImage beos system add-ons Translators
-	: $(BEOS_ADD_ONS_TRANSLATORS) ;
-AddFilesToHaikuImage beos system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
-AddFilesToHaikuImage beos system add-ons mail_daemon outbound_protocols : SMTP ;
-AddFilesToHaikuImage beos system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
-AddFilesToHaikuImage beos system add-ons mail_daemon outbound_filters : Fortune ;
-AddFilesToHaikuImage beos system add-ons mail_daemon system_filters : Inbox New\ Mail\ Notification Outbox Message\ Parser ;
-AddFilesToHaikuImage beos system add-ons media : $(BEOS_ADD_ONS_MEDIA) ;
-AddFilesToHaikuImage beos system add-ons media plugins
-	: $(BEOS_ADD_ONS_MEDIA_PLUGINS) ;
-AddFilesToHaikuImage beos system add-ons Tracker
+AddFilesToHaikuImage system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
+AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
+AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
+AddFilesToHaikuImage system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
+AddFilesToHaikuImage system add-ons mail_daemon outbound_filters : Fortune ;
+AddFilesToHaikuImage system add-ons mail_daemon system_filters : Inbox New\ Mail\ Notification Outbox Message\ Parser ;
+AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
+AddFilesToHaikuImage system add-ons media plugins
+	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
+AddFilesToHaikuImage system add-ons Tracker
 	: FileType-F ZipOMatic-Z Open\ Target\ Folder-T ;
-AddSymlinkToHaikuImage beos system add-ons Tracker
-	: /boot/beos/preferences/Backgrounds : Background-B ;
-AddSymlinkToHaikuImage beos system add-ons Tracker
-	: /boot/beos/apps/TextSearch : TextSearch-G ;
-AddSymlinkToHaikuImage beos system add-ons Tracker
-	: /boot/beos/apps/DiskUsage : DiskUsage-I ;
-AddFilesToHaikuImage beos system add-ons input_server devices
+AddSymlinkToHaikuImage system add-ons Tracker
+	: /boot/system/preferences/Backgrounds : Background-B ;
+AddSymlinkToHaikuImage system add-ons Tracker
+	: /boot/system/apps/TextSearch : TextSearch-G ;
+AddSymlinkToHaikuImage system add-ons Tracker
+	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>wacom ;
-AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
-AddFilesToHaikuImage beos system add-ons kernel network
+AddFilesToHaikuImage system add-ons input_server filters : screen_saver ;
+AddFilesToHaikuImage system add-ons kernel network
 	: <net>notifications stack ;
-AddFilesToHaikuImage beos system add-ons kernel network devices
-	: $(BEOS_NETWORK_DEVICES) ;
-AddFilesToHaikuImage beos system add-ons kernel network datalink_protocols
-	: $(BEOS_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToHaikuImage beos system add-ons kernel network ppp
-	: $(BEOS_NETWORK_PPP) ;
-AddFilesToHaikuImage beos system add-ons kernel network protocols
-	: $(BEOS_NETWORK_PROTOCOLS) ;
-AddFilesToHaikuImage beos system add-ons Print : $(BEOS_ADD_ONS_PRINT) ;
-AddFilesToHaikuImage beos system add-ons Print transport
-	: $(BEOS_ADD_ONS_PRINT_TRANSPORT) ;
-AddFilesToHaikuImage beos system add-ons Screen\ Savers
-	: $(BEOS_ADD_ONS_SCREENSAVERS) ;
+AddFilesToHaikuImage system add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToHaikuImage system add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToHaikuImage system add-ons kernel network ppp
+	: $(SYSTEM_NETWORK_PPP) ;
+AddFilesToHaikuImage system add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+AddFilesToHaikuImage system add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
+AddFilesToHaikuImage system add-ons Print transport
+	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
+AddFilesToHaikuImage system add-ons Screen\ Savers
+	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
-AddFilesToHaikuImage beos system add-ons disk_systems
+AddFilesToHaikuImage system add-ons disk_systems
 	: <disk_system>intel <disk_system>bfs ;
 
 # create directories that will remain empty
@@ -469,11 +470,11 @@ AddDirectoryToHaikuImage home config add-ons input_server methods ;
 AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
-AddDirectoryToHaikuImage beos etc synth ;
-AddDirectoryToHaikuImage beos system add-ons input_server methods ;
+AddDirectoryToHaikuImage system data synth ;
+AddDirectoryToHaikuImage system add-ons input_server methods ;
 
 # optional
-AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
+AddFilesToHaikuImage optional system add-ons input_server methods : canna ;
 
 # printers
 AddDirectoryToHaikuImage home config settings printers Preview
@@ -482,7 +483,7 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
       : home-config-settings-printers-save-as-pdf.rdef ;
 
 # licenses
-CopyDirectoryToHaikuImage beos etc
+CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data etc licenses ]
 	: licenses : -x .svn ;
 
@@ -512,14 +513,14 @@ MakeLocate $(alternativeSystemLibsZip) : $(HAIKU_OUTPUT_DIR) ;
 
 # collect the targets we would install in the lib directory
 local alternativeSystemLibs ;
-local libTargets = [ FFilesInHaikuImageDirectory beos system lib ] ;
+local libTargets = [ FFilesInHaikuImageDirectory system lib ] ;
 local libTarget ;
 for libTarget in $(libTargets) {
 	alternativeSystemLibs += [ on $(libTarget) return $(TARGET) ] ;
 }
 
 # collect the symlinks we would install in the lib directory
-libTargets = [ FSymlinksInHaikuImageDirectory beos system lib ] ;
+libTargets = [ FSymlinksInHaikuImageDirectory system lib ] ;
 local tmpAlternativeLibDir
 	= [ FDirName $(HAIKU_OUTPUT_DIR) tmp alternativeLibs ] ;
 for libTarget in $(libTargets) {
@@ -567,7 +568,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 	}
 
 	# install the alternative libs in the right directory
-	UnzipArchiveToHaikuImage beos system lib $(libSubDir)
+	UnzipArchiveToHaikuImage system lib $(libSubDir)
 		: $(otherAlternativeSystemLibsZip) ;
 }
 

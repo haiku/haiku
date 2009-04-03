@@ -42,7 +42,7 @@ static const char *kSignature = "application/x-vnd.Haiku-debug_server";
 
 // paths to the apps used for debugging
 static const char *kConsoledPath	= "/bin/consoled";
-static const char *kTerminalPath	= "/boot/beos/apps/Terminal";
+static const char *kTerminalPath	= "/boot/system/apps/Terminal";
 static const char *kGDBPath			= "/bin/gdb";
 
 

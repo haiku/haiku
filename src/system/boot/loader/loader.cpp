@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,11 +24,11 @@
 #endif
 
 #define KERNEL_IMAGE	"kernel_" BOOT_ARCH
-#define KERNEL_PATH		"beos/system/" KERNEL_IMAGE
+#define KERNEL_PATH		"system/" KERNEL_IMAGE
 
 
 static const char *sPaths[] = {
-	"beos/system/add-ons/kernel",
+	"system/add-ons/kernel",
 	"home/config/add-ons/kernel",
 	NULL
 };

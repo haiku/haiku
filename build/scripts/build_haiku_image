@@ -207,7 +207,7 @@ if [ ! $updateOnly ]; then
 		$rmAttrs -f $copyrightAttrs
 		touch $copyrightAttrs
 		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
-		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}beos/apps/AboutSystem
+		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
 	fi
 fi
 

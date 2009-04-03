@@ -8,7 +8,7 @@
 #HAIKU_INSTALL_DIR = /Haiku ;
 
 # Install Haiku on device /dev/sda57. Be sure you know what you're doing!
-#HAIKU_IMAGE_DIR		= /dev ;
+#HAIKU_IMAGE_DIR	= /dev ;
 #HAIKU_IMAGE_NAME	= sda57 ;
 #HAIKU_DONT_CLEAR_IMAGE = 1 ;
 
@@ -19,7 +19,7 @@
 
 # Add symlink/file (timezone and keymap settings) to the image.
 #AddSymlinkToHaikuImage home config settings
-#	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+#	: /boot/system/data/timezones/Europe/Paris : timezone ;
 #AddFilesToHaikuImage home config settings : <keymap>US-International
 #	: Key_map ;
 

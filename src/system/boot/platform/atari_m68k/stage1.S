@@ -22,7 +22,7 @@
  * The offset of the partition in 512 byte blocks must be written at
  * position PARTITION_OFFSET_OFFSET (32 bit little endian; makebootable does
  * that) or otherwise the code can't find the partition.
- * The partition must be a BFS formatted. The file "beos/system/zbeos"
+ * The partition must be a BFS formatted. The file "system/haiku_loader"
  * (the stage 2 boot loader) loaded into memory at 0x1000:0x0000 (linear address
  * 0x10000) and entered at 0x:1000:0x0200 with parameters eax - partition offset
  * in 512 byte blocks and dl - BIOS ID of the boot drive.

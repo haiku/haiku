@@ -135,7 +135,7 @@ if [ -f $copyrightsFile ]; then
 	$rmAttrs -f $copyrightAttrs
 	touch $copyrightAttrs
 	$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
-	$copyAttrs $copyrightAttrs ${tPrefix}beos/apps/AboutSystem
+	$copyAttrs $copyrightAttrs ${tPrefix}system/apps/AboutSystem
 fi
 
 # generate the attribute stores

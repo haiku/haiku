@@ -2,21 +2,21 @@
 	PCWorld.cpp
 
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
 
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 
@@ -126,7 +126,7 @@ PCApplication::ReadyToRun()
 	be_roster->GetAppList(kSignature, &list);
 	long count = list.CountItems();
 	if (count > 1) {
-		for (long i = 0; i < count - 1; i++) {	
+		for (long i = 0; i < count - 1; i++) {
 			BMessenger* otherme = new BMessenger(NULL, (team_id)list.ItemAt(i));
 			BMessage* message = new BMessage(B_QUIT_REQUESTED);
 			otherme->SendMessage(message);
@@ -150,7 +150,7 @@ PCApplication::ArgvReceived(int32 argc, char **argv)
 			} while (be_roster->IsRunning(kTrackerSig) && k-- > 0);
 		}
 		remove("/boot/home/config/settings/Tracker/tracker_shelf");
-		launch(kTrackerSig, "/boot/beos/system/Tracker");
+		launch(kTrackerSig, "/boot/system/Tracker");
 	} else if (argc == 2 && strcmp(argv[1], "-deskbar") == 0) {
 		BDeskbar deskbar;
 		if (!gInDeskbar && !deskbar.HasItem(kDeskbarItemName))

@@ -102,10 +102,10 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	InstallOptionalHaikuImagePackage bebook_20081026
 		: http://haiku-files.org/files/optional-packages/bebook_20081026.zip
-		: beos documentation
+		: system documentation
 	;
 	AddSymlinkToHaikuImage home Desktop
-		: /boot/beos/documentation/bebook/index.html : BeBook ;
+		: /boot/system/documentation/bebook/index.html : BeBook ;
 }
 
 
@@ -147,14 +147,15 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	local bluetoothDrivers = h2generic ;
 	AddDriversToHaikuImage bluetooth : $(bluetoothDrivers) ;
-	AddFilesToHaikuImage beos system servers : bluetooth_server ;
-	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
-	AddFilesToHaikuImage beos system add-ons kernel network devices : bluetooth ;
-	AddFilesToHaikuImage beos system add-ons kernel network protocols : l2cap ;
-	AddFilesToHaikuImage beos system add-ons kernel bluetooth : btCoreData ;
-	AddFilesToHaikuImage beos preferences : Bluetooth ;
-	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
-	AddSymlinkToHaikuImage home config be Preferences : /boot/beos/preferences/Bluetooth ;
+	AddFilesToHaikuImage system servers : bluetooth_server ;
+	AddFilesToHaikuImage system lib : libbluetooth.so ;
+	AddFilesToHaikuImage system add-ons kernel network devices : bluetooth ;
+	AddFilesToHaikuImage system add-ons kernel network protocols : l2cap ;
+	AddFilesToHaikuImage system add-ons kernel bluetooth : btCoreData ;
+	AddFilesToHaikuImage system preferences : Bluetooth ;
+	AddFilesToHaikuImage system bin : bt_dev_info bt_discovery ;
+	AddSymlinkToHaikuImage home config be Preferences
+		: /boot/system/preferences/Bluetooth ;
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
 	}
@@ -198,12 +199,12 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage develop lib x86 : libposix_error_mapper.a ;
 
 	# cc and c++ wrapper scripts
-	AddFilesToHaikuImage beos bin : cc c++ ;
+	AddFilesToHaikuImage system bin : cc c++ ;
 
 	# mkdepend build tool, which is part of the Haiku source tree
 	# (same as make, but make is already included independent of the
 	# Development package)
-	AddFilesToHaikuImage beos bin : mkdepend ;
+	AddFilesToHaikuImage system bin : mkdepend ;
 
 	# skeleton makefile and makefile-engine
 	local makefileEngineFiles =
@@ -520,10 +521,10 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 # UserlandFS
 if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 	# kernel module
-	AddFilesToHaikuImage beos system add-ons kernel file_systems : userlandfs ;
+	AddFilesToHaikuImage system add-ons kernel file_systems : userlandfs ;
 
 	# server
-	AddFilesToHaikuImage beos system servers : userlandfs_server ;
+	AddFilesToHaikuImage system servers : userlandfs_server ;
 
 	# libs
 	local userlandfsLibs =
@@ -531,7 +532,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 		libuserlandfs_haiku_kernel.so
 		libuserlandfs_fuse.so
 	;
-	AddFilesToHaikuImage beos system lib : $(userlandfsLibs) ;
+	AddFilesToHaikuImage system lib : $(userlandfsLibs) ;
 
 	# development goodies
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
@@ -602,17 +603,17 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	CopyDirectoryToHaikuImage beos documentation
+	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs welcome ]
 		: welcome : -x .svn ;
-	CopyDirectoryToHaikuImage beos documentation
+	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs userguide ]
 		: userguide : -x .svn ;
-	AddFilesToHaikuImage beos documentation
+	AddFilesToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs Haiku-doc.css ]
 		: Haiku-doc.css ;
 	AddSymlinkToHaikuImage home Desktop
-		: /boot/beos/documentation/welcome/welcome.html : Welcome ;
+		: /boot/system/documentation/welcome/welcome.html : Welcome ;
 }
 
 

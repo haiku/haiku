@@ -38,16 +38,9 @@
 using std::nothrow;
 using namespace BPrivate;
 
-//------------------------------------------------------------------------------
-// Private local function declarations
-//------------------------------------------------------------------------------
 
 static bool larger_index(const recent_entry *entry1, const recent_entry *entry2);
 
-
-//------------------------------------------------------------------------------
-// TRoster 
-//------------------------------------------------------------------------------
 
 /*!
 	\class TRoster
@@ -79,10 +72,10 @@ const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
 
 //! Applications living in this tree are considered "vital system apps".
 static const char *const kVitalSystemAppPathPrefix
-	= "/boot/beos/system/servers";
+	= "/boot/system/servers";
 
 //! Applications living in this tree are considered "system apps".
-static const char *const kSystemAppPathPrefix = "/boot/beos/system";
+static const char *const kSystemAppPathPrefix = "/boot/system";
 
 // get_default_roster_settings_file
 /*!	\brief Returns the path to the default roster settings.
@@ -112,18 +105,19 @@ get_default_roster_settings_file(BPath &path)
 	The object is completely initialized and ready to handle requests.
 */
 TRoster::TRoster()
-	   : fLock("roster"),
-	     fRegisteredApps(),
-		 fEarlyPreRegisteredApps(),
-		 fIARRequestsByID(),
-		 fIARRequestsByToken(),
-		 fActiveApp(NULL),
-		 fWatchingService(),
-		 fRecentApps(),
-		 fRecentDocuments(),
-		 fRecentFolders(),
-		 fLastToken(0),
-		 fShuttingDown(false)
+	:
+	fLock("roster"),
+	fRegisteredApps(),
+	fEarlyPreRegisteredApps(),
+	fIARRequestsByID(),
+	fIARRequestsByToken(),
+	fActiveApp(NULL),
+	fWatchingService(),
+	fRecentApps(),
+	fRecentDocuments(),
+	fRecentFolders(),
+	fLastToken(0),
+	fShuttingDown(false)
 {
 	_LoadRosterSettings();
 }
@@ -178,7 +172,7 @@ PRINT(("full registration: %d\n", fullReg));
 	// check the parameters
 	team_id otherTeam = -1;
 	uint32 token = 0;
-	
+
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
 	BEntry entry(&ref);
 	if (!entry.Exists())
@@ -262,7 +256,7 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 		// add to recent apps if successful
 		if (signature && signature[0] != '\0')
 			fRecentApps.Add(signature, flags);
-		else			
+		else
 			fRecentApps.Add(&ref, flags);
 //		fRecentApps.Print();
 
@@ -972,7 +966,7 @@ TRoster::HandleGetRecentApps(BMessage *request)
 	if (!error)
 		error = fRecentApps.Get(maxCount, &reply);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1003,7 +997,7 @@ TRoster::HandleAddToRecentDocuments(BMessage *request)
 	if (!error)
 		error = fRecentDocuments.Add(&ref, appSig);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1034,7 +1028,7 @@ TRoster::HandleAddToRecentFolders(BMessage *request)
 	if (!error)
 		error = fRecentFolders.Add(&ref, appSig);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1062,7 +1056,7 @@ TRoster::HandleAddToRecentApps(BMessage *request)
 	if (!error)
 		error = fRecentApps.Add(appSig);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1086,7 +1080,7 @@ TRoster::HandleLoadRecentLists(BMessage *request)
 	if (!error)
 		error = _LoadRosterSettings(filename);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1110,7 +1104,7 @@ TRoster::HandleSaveRecentLists(BMessage *request)
 	if (!error)
 		error = _SaveRosterSettings(filename);
 	reply.AddInt32("result", error);
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
 }
@@ -1368,7 +1362,7 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	}
 
 	// debug server
-	RosterAppInfo *info = 
+	RosterAppInfo *info =
 		fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
 	if (info)
 		vitalSystemApps.insert(info->team);
@@ -1411,7 +1405,7 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	if (error != B_OK) {
 		userApps.MakeEmpty(true);
 		systemApps.MakeEmpty(true);
-	}		
+	}
 
 	return error;
 }
@@ -1691,7 +1685,7 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 	status_t error = request->FindInt32("max count", &maxCount);
 	// Look for optional file type(s)
 	if (!error) {
-		type_code typeFound;		
+		type_code typeFound;
 		status_t typeError = request->GetInfo("file type", &typeFound, &fileTypesCount);
 		if (!typeError)
 			typeError = typeFound == B_STRING_TYPE ? B_OK : B_BAD_TYPE;
@@ -1730,18 +1724,18 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 		   	                                 fileTypesCount, appSig, &reply);
 				D(fRecentDocuments.Print());
 		   	    break;
-		   	    
+
 			case B_REG_GET_RECENT_FOLDERS:
 				error = fRecentFolders.Get(maxCount, (const char**)fileTypes,
 			                               fileTypesCount, appSig, &reply);
 				D(fRecentFolders.Print());
 			    break;
-			
+
 			default:
 				D(PRINT(("WARNING: TRoster::_HandleGetRecentEntries(): unexpected "
 				         "request->what value of 0x%lx\n", request->what)));
-				error = B_BAD_VALUE;         
-				break; 
+				error = B_BAD_VALUE;
+				break;
 		}
 	}
 	reply.AddInt32("result", error);
@@ -1753,10 +1747,10 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 		delete fileTypes;
 		fileTypes = NULL;
 	}
-	request->SendReply(&reply);	
+	request->SendReply(&reply);
 
 	FUNCTION_END();
-} 
+}
 
 
 /*!
@@ -1803,7 +1797,7 @@ TRoster::_LoadRosterSettings(const char *path)
 	const char *settingsPath
 		= path ? path : get_default_roster_settings_file(_path);
 
-	RosterSettingsCharStream stream;	
+	RosterSettingsCharStream stream;
 	status_t error;
 	BFile file;
 
@@ -1822,24 +1816,24 @@ TRoster::_LoadRosterSettings(const char *path)
 		ssize_t bytes = file.Read(data, size);
 		error = bytes < 0 ? bytes : (bytes == size ? B_OK : B_FILE_ERROR);
 	}
-	if (!error) 
+	if (!error)
 		error = stream.SetTo(std::string(data));
 
 	delete[] data;
 
-	if (!error) {	
+	if (!error) {
 		// Clear the current lists as
 		// we'll be manually building them up
 		fRecentDocuments.Clear();
 		fRecentFolders.Clear();
 		fRecentApps.Clear();
-		
+
 		// Now we just walk through the file and read in the info
 		while (true) {
 			status_t streamError;
 			char str[B_PATH_NAME_LENGTH];
-			
-	
+
+
 			// (RecentDoc | RecentFolder | RecentApp)
 			streamError = stream.GetString(str);
 			if (!streamError) {
@@ -1849,17 +1843,17 @@ TRoster::_LoadRosterSettings(const char *path)
 					etApp,
 					etSomethingIsAmiss,
 				} type;
-			
+
 				if (strcmp(str, "RecentDoc") == 0) {
 					type = etDoc;
-				} else if (strcmp(str, "RecentFolder") == 0) {			
+				} else if (strcmp(str, "RecentFolder") == 0) {
 					type = etFolder;
 				} else if (strcmp(str, "RecentApp") == 0) {
 					type = etApp;
 				} else {
 					type = etSomethingIsAmiss;
 				}
-				
+
 				switch (type) {
 					case etDoc:
 					case etFolder:
@@ -1868,18 +1862,18 @@ TRoster::_LoadRosterSettings(const char *path)
 						std::list<recent_entry*> *list = (type == etDoc)
 						                                 ? &fRecentDocuments.fEntryList
 						                                 : &fRecentFolders.fEntryList;
-						
+
 						char path[B_PATH_NAME_LENGTH];
 						char app[B_PATH_NAME_LENGTH];
 						char rank[B_PATH_NAME_LENGTH];
 						entry_ref ref;
 						uint32 index = 0;
-		
+
 						// Convert the given path to an entry ref
 						streamError = stream.GetString(path);
-						if (!streamError) 
+						if (!streamError)
 							streamError = get_ref_for_path(path, &ref);
-							
+
 						// Add a new entry to the list for each application
 						// signature and rank we find
 						while (!streamError) {
@@ -1902,22 +1896,22 @@ TRoster::_LoadRosterSettings(const char *path)
 							if (!streamError) {
 								printf("pushing entry, leaf == '%s', app == '%s', index == %ld\n",
 								       entry->ref.name, entry->sig.c_str(), entry->index);
-								
+
 								list->push_back(entry);
 							}
 						}
-						
+
 						if (streamError) {
 							printf("entry error 0x%lx\n", streamError);
 							if (streamError != RosterSettingsCharStream::kEndOfLine
 							    && streamError != RosterSettingsCharStream::kEndOfStream)
 							stream.SkipLine();
 						}
-					
+
 						break;
 					}
-					
-				
+
+
 					case etApp:
 					{
 						char app[B_PATH_NAME_LENGTH];
@@ -1929,24 +1923,24 @@ TRoster::_LoadRosterSettings(const char *path)
 							stream.SkipLine();
 						break;
 					}
-					
+
 					default:
 						// Something was amiss; skip to the next line
 						stream.SkipLine();
 						break;
 				}
-			
+
 			}
-		
+
 			if (streamError == RosterSettingsCharStream::kEndOfStream)
 				break;
 		}
-	
+
 		// Now we must sort our lists of documents and folders by the
 		// indicies we read for each entry (largest index first)
 		fRecentDocuments.fEntryList.sort(larger_index);
 		fRecentFolders.fEntryList.sort(larger_index);
-	
+
 		printf("----------------------------------------------------------------------\n");
 		fRecentDocuments.Print();
 		printf("----------------------------------------------------------------------\n");
@@ -1957,7 +1951,7 @@ TRoster::_LoadRosterSettings(const char *path)
 	}
 	if (error)
 		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster settings "
-		         "from '%s', 0x%lx\n", settingsPath, error)));		         
+		         "from '%s', 0x%lx\n", settingsPath, error)));
 	return error;
 }
 
@@ -1970,7 +1964,7 @@ TRoster::_SaveRosterSettings(const char *path)
 
 	status_t error;
 	FILE* file;
-	
+
 	file = fopen(settingsPath, "w+");
 	error = file ? B_OK : errno;
 	if (!error) {
@@ -1989,19 +1983,18 @@ TRoster::_SaveRosterSettings(const char *path)
 			         "with error 0x%lx\n", saveError)));
 		fclose(file);
 	}
-	
+
 	return error;
 }
 
 
-//------------------------------------------------------------------------------
-// Private local functions
-//------------------------------------------------------------------------------
+//	#pragma mark - Private local functions
+
 
 /*! \brief Returns true if entry1's index is larger than entry2's index.
 
 	Also returns true if either entry is \c NULL.
-	
+
 	Used for sorting the recent entry lists loaded from disk into the
 	proper order.
 */

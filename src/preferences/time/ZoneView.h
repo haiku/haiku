@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@ class TimeZoneView : public BView {
 	public:
 						TimeZoneView(BRect frame);
 		virtual 		~TimeZoneView();
-		
+
 		virtual void 	AttachedToWindow();
 		virtual void 	MessageReceived(BMessage *message);
 		bool			CheckCanRevert();
@@ -45,13 +45,15 @@ class TimeZoneView : public BView {
 		// returns index of current zone
 		int32 			FillCityList(const char *area);
 
+		status_t		_GetTimezonesPath(BPath& path);
+
 	private:
 		BPopUpMenu 		*fRegionPopUp;
 		BListView 		*fCityList;
 		BButton 		*fSetZone;
 		TTZDisplay 		*fCurrent;
 		TTZDisplay		*fPreview;
-		
+
 		int32 			fHour;
 		int32 			fMinute;
 		BPath 			fCurrentZone;

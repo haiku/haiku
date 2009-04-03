@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2004-2008, François Revol.
+ * Copyright 2004, François Revol.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT license.
  */
 
@@ -30,28 +32,25 @@
 
 /* Haiku system directories */
 
-/* os root dir; just stick to 'beos' for now */
-#define SYSTEM "beos"
-//#define SYSTEM "haiku" // :)
-//#define SYSTEM "os"
+#define SYSTEM "system"
 
 static const char *kSystemDirectories[] = {
-	SYSTEM,										// B_BEOS_DIRECTORY
-	SYSTEM "/system",
-	SYSTEM "/system/add-ons",
-	SYSTEM "/system/boot",
-	SYSTEM "/etc/fonts",
-	SYSTEM "/system/lib",
-	SYSTEM "/system/servers",
+	SYSTEM,										// B_SYSTEM_DIRECTORY
+	SYSTEM,										// B_BEOS_SYSTEM_DIRECTORY
+	SYSTEM "/add-ons",
+	SYSTEM "/boot",
+	SYSTEM "/fonts",
+	SYSTEM "/lib",
+	SYSTEM "/servers",
 	SYSTEM "/apps",
 	SYSTEM "/bin",
 	SYSTEM "/etc",
 	SYSTEM "/documentation",
 	SYSTEM "/preferences",
-	SYSTEM "/system/add-ons/Translators",
-	SYSTEM "/system/add-ons/media",
-	SYSTEM "/etc/sounds",
-	SYSTEM "/etc",
+	SYSTEM "/add-ons/Translators",
+	SYSTEM "/add-ons/media",
+	SYSTEM "/data/sounds",
+	SYSTEM "/data",
 };
 
 /* Common directories, shared among users */
@@ -79,7 +78,7 @@ static const char *kCommonDirectories[] = {
 	"var",									// B_COMMON_VAR_DIRECTORY
 	COMMON "/add-ons/Translators",
 	COMMON "/add-ons/media",
-	COMMON "/sounds",
+	COMMON "/data/sounds",
 	COMMON "/data",
 };
 
@@ -99,7 +98,7 @@ static const char *kUserDirectories[] = {
 	HOME "/config/settings/printers",
 	HOME "/config/add-ons/Translators",
 	HOME "/config/add-ons/media",
-	HOME "/config/sounds",
+	HOME "/config/data/sounds",
 	HOME "/config/data",
 	HOME "/config/cache",
 };
@@ -208,23 +207,23 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			break;
 
 		/* Haiku system directories */
-		case B_BEOS_DIRECTORY:
+		case B_SYSTEM_DIRECTORY:
 		case B_BEOS_SYSTEM_DIRECTORY:
-		case B_BEOS_ADDONS_DIRECTORY:
-		case B_BEOS_BOOT_DIRECTORY:
-		case B_BEOS_FONTS_DIRECTORY:
-		case B_BEOS_LIB_DIRECTORY:
-		case B_BEOS_SERVERS_DIRECTORY:
-		case B_BEOS_APPS_DIRECTORY:
-		case B_BEOS_BIN_DIRECTORY:
-		case B_BEOS_ETC_DIRECTORY:
-		case B_BEOS_DOCUMENTATION_DIRECTORY:
-		case B_BEOS_PREFERENCES_DIRECTORY:
-		case B_BEOS_TRANSLATORS_DIRECTORY:
-		case B_BEOS_MEDIA_NODES_DIRECTORY:
-		case B_BEOS_SOUNDS_DIRECTORY:
-		case B_BEOS_DATA_DIRECTORY:
-			template = kSystemDirectories[which - B_BEOS_DIRECTORY];
+		case B_SYSTEM_ADDONS_DIRECTORY:
+		case B_SYSTEM_BOOT_DIRECTORY:
+		case B_SYSTEM_FONTS_DIRECTORY:
+		case B_SYSTEM_LIB_DIRECTORY:
+		case B_SYSTEM_SERVERS_DIRECTORY:
+		case B_SYSTEM_APPS_DIRECTORY:
+		case B_SYSTEM_BIN_DIRECTORY:
+		case B_SYSTEM_ETC_DIRECTORY:
+		case B_SYSTEM_DOCUMENTATION_DIRECTORY:
+		case B_SYSTEM_PREFERENCES_DIRECTORY:
+		case B_SYSTEM_TRANSLATORS_DIRECTORY:
+		case B_SYSTEM_MEDIA_NODES_DIRECTORY:
+		case B_SYSTEM_SOUNDS_DIRECTORY:
+		case B_SYSTEM_DATA_DIRECTORY:
+			template = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
 			break;
 
 		/* Common directories, shared among users */

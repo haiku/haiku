@@ -5,7 +5,7 @@
 ; partitions. The offset of the partition in 512 byte blocks must be written at
 ; position PARTITION_OFFSET_OFFSET (32 bit little endian; makebootable does
 ; that) or otherwise the code can't find the partition.
-; The partition must be a BFS formatted. The file "beos/system/zbeos"
+; The partition must be a BFS formatted. The file "system/haiku_loader"
 ; (the stage 2 boot loader) loaded into memory at 0x1000:0x0000 (linear address
 ; 0x10000) and entered at 0x:1000:0x0200 with parameters eax - partition offset
 ; in 512 byte blocks and dl - BIOS ID of the boot drive.
@@ -29,7 +29,7 @@
 
 ; BFS definitions
 
-%assign SUPER_BLOCK_MAGIC1			'1SFB'		; nasm reverses '...' consts
+%define SUPER_BLOCK_MAGIC1			'1SFB'		; nasm reverses '...' consts
 %assign SUPER_BLOCK_MAGIC2			0xdd121031
 %assign SUPER_BLOCK_MAGIC3			0x15b6830e
 
@@ -92,14 +92,14 @@
 
 
 ; 16 bit code
-SECTION
+SECTION .text
 BITS 16
 ORG BOOT_BLOCK_START_ADDRESS					; start code at 0x7c00
 
 ; nicer way to get the size of a structure
 %define	sizeof(s)	s %+ _size
 
-; using a structure in a another structure definition	
+; using a structure in a another structure definition
 %macro	nstruc	1-2		1
 					resb	sizeof(%1) * %2
 %endmacro
@@ -265,7 +265,7 @@ start:
 
 	; save the BIOS drive ID
 	mov			[bios_drive_id], dl
-	
+
 	; check for BIOS int 0x13 (disk services) extensions
 	mov			ah, CHECK_DISK_EXTENSIONS_PRESENT
 	mov			bx, 0x55aa
@@ -328,7 +328,7 @@ _writeString:
 	int			BIOS_VIDEO_SERVICES
 
 	jmp			.loop
-.loopend
+.loopend:
 
 	ret
 
@@ -437,8 +437,8 @@ readBlocks:
 	push		ax
 	pop			es
 	mov			bx, bp
-	
-	; block count to ax	
+
+	; block count to ax
 	mov			ax, di		; count
 
 	mov			dl, [bios_drive_id]
@@ -507,7 +507,7 @@ readBuffer:
 	pushad
 	xchg		eax, edi		; block index to eax
 	mov			ebp, esi		; buffer pointer to ebp
-	
+
 	call		readOneBlock
 
 	popad
@@ -525,7 +525,7 @@ readBuffer:
 
 	and			eax, eax
 	jz			.next_indirect_block
-	
+
 .more_blocks:
 	; compute blocks_left
 	xchg		eax, ecx							; save eax
@@ -549,7 +549,7 @@ readBuffer:
 
 	; adjust read_offset
 	add			eax, 2
-	
+
 	; success
 	mov			di, [sReadBufferStack]
 	mov	byte	[di + PushadStack.eax], 1
@@ -607,7 +607,7 @@ readBufferInit:
 
 	; position si at the 1st block run
 	lea			si, [inode + BFSInode.data + DataStream.direct]
-	
+
 	; buffer address
 	xor			ebp, ebp
 	mov			bp, buffer
@@ -631,7 +631,7 @@ kReadErrorString			db	"read error", 0
 kBadSuperBlockMagicString	db	"bad superblock magic", 0
 kNotADirectoryString		db	"not a directory", 0
 kBadInodeMagicString		db	"bad inode magic", 0
-kNoZbeosString				db	"zbeos not found", 0
+kNoZbeosString				db	"haiku_loader not found", 0
 %else
 kErrorString				db	"Failed to load OS. Press any key to reboot..."
 							db	0
@@ -639,9 +639,8 @@ kErrorString				db	"Failed to load OS. Press any key to reboot..."
 
 ; the path to the boot loader
 kPathComponents:
-pathComponent				"beos"
 pathComponent				"system"
-pathComponent				"zbeos"
+pathComponent				"haiku_loader"
 							db	0
 
 
@@ -716,7 +715,7 @@ readBootLoader:
 	xor			edx, edx
 	mov			dl, [bios_drive_id]
 
-	; ds, es	
+	; ds, es
 	push 		0x07c0
 	pop			ds
 	push 		0x1000
@@ -783,7 +782,7 @@ continueMain:
 
 .not_found:
 	error		kNoZbeosString
-	
+
 .read_loop:
 
 	; read the next B+ tree node
@@ -840,8 +839,8 @@ continueMain:
 	popa
 
 	jne			.skip_key
-	
-	; keys are equal	
+
+	; keys are equal
 
 	; get the current index
 	pop			dx			; pop previous key length
@@ -893,13 +892,13 @@ readInode:
 	; administrative part (not the small data section), which easily fits into
 	; one disk block.
 	call		readOneBlock
- 
+
 	cmp	dword	[inode + BFSInode.magic1], INODE_MAGIC1
 	je			.no_error
 
 	error		kBadInodeMagicString
 
-.no_error	
+.no_error:
 	popad
 
 	ret
@@ -913,7 +912,7 @@ readInode:
 ; eax:	disk block number, where the block run begins
 blockRunToDiskBlock:
 	push		ecx
-	
+
 	; run.allocation_group << superblock.ag_shift
 	mov			cl, [superblock + SuperBlock.ag_shift]
 	mov 		eax, [si + BlockRun.allocation_group]
@@ -922,7 +921,7 @@ blockRunToDiskBlock:
 	; add run.start
 	xor			ecx, ecx
 	mov			cx, [si + BlockRun.start]
-	
+
 	add			eax, ecx
 
 	pop			ecx
@@ -972,7 +971,7 @@ _writeInt32:
 	jl			.digit
 	add			dl, 'a' - '0' - 10
 
-.digit:	
+.digit:
 	add			dl, '0'
 
 	; prepend the digit to the string
@@ -990,7 +989,7 @@ _writeInt32:
 	popad
 	ret
 
-	
+
 ; check whether we are small enough
 end:
 				%if end - start > 1024

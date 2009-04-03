@@ -228,7 +228,7 @@ public:
 #ifdef USE_INLINE_IM
     void DrawIMString(void);
 #endif
-    
+
 private:
     void init(BRect);
 
@@ -265,7 +265,7 @@ public:
 private:
     scrollbar_T *gsb;
     float	ignoreValue;
-    
+
 };
 
 
@@ -718,7 +718,7 @@ VimWindow::QuitRequested()
 #ifdef FEAT_MBYTE
     km.csi_escape = false;
 #endif
-    
+
     write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
 
     return false;
@@ -1323,7 +1323,7 @@ VimTextAreaView::MessageReceived(BMessage *m)
 		    msg.AddFloat("be:height_reply", FILL_Y(1));
 		    IMData.messenger->SendMessage(&msg);
 		}
-		break;   
+		break;
 	    case B_INPUT_METHOD_STOPPED:
 		delete IMData.messenger;
 		delete IMData.message;
@@ -1392,7 +1392,7 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
 		FILL_X(col + cells) - PEN_WIDTH, FILL_Y(row + 1) - PEN_WIDTH);
 	FillRect(r, B_SOLID_LOW);
     }
-    
+
     BFont font;
     this->GetFont(&font);
     if(!font.IsFixed())
@@ -1527,7 +1527,7 @@ VimTextAreaView::mchInsertLines(int row, int num_lines)
     dest.top = FILL_Y(row + num_lines);
     dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
     dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
-    
+
     if (gui.vimWindow->Lock()) {
 	/* Clear one column more for when bold has spilled over */
 	CopyBits(source, dest);
@@ -1567,7 +1567,7 @@ void VimTextAreaView::DrawIMString(void)
                      IMData.row + IMData.count, W_WIDTH(curwin), GUI_MON_NOCLEAR);
     bool confirmed = false;
     msg->FindBool("be:confirmed", &confirmed);
-    if (confirmed) 
+    if (confirmed)
 	return;
     rgb_color hcolor = HighColor(), lcolor = LowColor();
     msg->FindString("be:string", &str);
@@ -1613,7 +1613,7 @@ void VimTextAreaView::DrawIMString(void)
 	pos.x += cn;
     }
     IMData.count = (int)pos.y;
-    
+
     SetHighColor(hcolor);
     SetLowColor(lcolor);
 }
@@ -2039,7 +2039,7 @@ gui_mch_init()
     if (gui.vdcmp < B_OK)
 	return FAIL;
     get_key_map(&keyMap, &keyMapChars);
-    
+
     gui.vimWindow = new VimWindow();	/* hidden and locked */
     if (!gui.vimWindow)
 	return FAIL;
@@ -2538,7 +2538,7 @@ gui_mch_get_font(
      */
     if(*name!='\0') {
 	end = (char_u *)strchr((char *)name, '/');
-	if (!end) 
+	if (!end)
 	    strncpy(family, (char *)name, len = strlen((char*)name));
 	else
 	    strncpy(family, (char *)name, len = end - name);
@@ -2549,7 +2549,7 @@ gui_mch_get_font(
 
     if(*name!='\0') {
 	end = (char_u *)strchr((char *)name, '/');
-	if (!end) 
+	if (!end)
 	    strncpy(style, (char *)name, len = strlen((char*)name));
 	else
 	    strncpy(style, (char *)name, len = end - name);
@@ -2562,7 +2562,7 @@ gui_mch_get_font(
 	size = atof((char *)name);
 	if (size > 0) font->SetSize(size);
     }
-	
+
     font->SetSpacing(B_FIXED_SPACING);
     font->SetEncoding(B_UNICODE_UTF8);
 
@@ -2730,7 +2730,7 @@ gui_mch_get_color(
 	char	line[LINE_LEN];
 	char_u	*fname;
 
-	fname = expand_env_save((char_u *)"/boot/beos/etc/rgb.txt");
+	fname = expand_env_save((char_u *)"/etc/rgb.txt");
 	if (fname == NULL)
 	    return INVALCOLOR;
 
@@ -2940,7 +2940,7 @@ gui_mch_settitle(
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     gui_mch_set_fg_color(color);
-    
+
     BRect r;
     r.left = FILL_X(gui.col);
     r.top = FILL_Y(gui.row);
@@ -3553,8 +3553,8 @@ im_set_position(int row, int col)
     }
     return;
 }
-    
-    int 
+
+    int
 im_get_status()
 {
     return(1);

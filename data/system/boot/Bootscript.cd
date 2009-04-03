@@ -72,15 +72,15 @@ fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
-	if [ -x /boot/beos/apps/Installer ]; then
-		/boot/beos/apps/Installer
-		#/boot/beos/apps/Terminal -x /boot/beos/apps/Installer
+	if [ -x /boot/system/apps/Installer ]; then
+		/boot/system/apps/Installer
+		#/boot/system/apps/Terminal -x /boot/system/apps/Installer
 	else
-		/boot/beos/apps/Terminal
+		/boot/system/apps/Terminal
 	fi
-	#launch beos/apps/Terminal
+	#launch system/apps/Terminal
 else
-	launch beos/bin/consoled
+	launch system/bin/consoled
 fi
 
 # sync disks

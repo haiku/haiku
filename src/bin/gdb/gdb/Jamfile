@@ -12,7 +12,7 @@ SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# all interested apps can link against.
 UsePrivateHeaders debug ;
 
-SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/boot/beos/etc/locale\\\"
+SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/etc/locale\\\"
 	-DMI_OUT=1 ;
 
 # filter warnings we don't want here

@@ -45,9 +45,9 @@ static struct {
 	const char *path;
 	const char *target;
 } sPredefinedLinks[] = {
-	{"/system", "/boot/beos/system"},
-	{"/bin", "/boot/beos/bin"},
-	{"/etc", "/boot/beos/etc"},
+	{"/system", "/boot/system"},
+	{"/bin", "/boot/system/bin"},
+	{"/etc", "/boot/system/etc"},
 	{"/var", "/boot/var"},
 	{"/tmp", "/boot/var/tmp"},
 	{NULL}

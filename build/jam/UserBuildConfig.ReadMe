@@ -83,17 +83,17 @@ SetUpdateHaikuImageOnly 1 ;
 # has been added, like for "kernel").
 HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
 
-# Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
+# Add "crashing_app" to the system/bin directory of the Haiku image/installation.
 # Note, that this also makes the image depend on the target, i.e. it is
 # automatically updated when the image is built.
-AddFilesToHaikuImage beos bin : crashing_app ;
+AddFilesToHaikuImage system bin : crashing_app ;
 
 # Make a symlink to home/config/bin/crash.
-AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
+AddSymlinkToHaikuImage home config bin : /bin/crashing_app : crash ;
 
 # Add timezone and keymap settings.
 AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+	: /boot/system/data/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 
 # Adds the source directories src/kits/storage and src/tests/servers/debug

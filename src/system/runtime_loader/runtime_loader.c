@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -65,22 +65,22 @@ search_path_for_type(image_type type)
 				":/bin"
 				":/boot/apps"
 				":/boot/preferences"
-				":/boot/beos/apps"
-				":/boot/beos/preferences"
+				":/boot/system/apps"
+				":/boot/system/preferences"
 				":/boot/develop/tools/gnupro/bin";
 
 		case B_LIBRARY_IMAGE:
 			return "%A/lib"
 				":/boot/home/config/lib"
 					// TODO: Remove!
-				":/boot/common/lib:/boot/beos/system/lib";
+				":/boot/common/lib:/boot/system/lib";
 
 		case B_ADD_ON_IMAGE:
 			return "%A/add-ons"
 				":/boot/home/config/add-ons"
 					// TODO: Remove!
 				":/boot/common/add-ons"
-				":/boot/beos/system/add-ons";
+				":/boot/system/add-ons";
 
 		default:
 			return NULL;
@@ -395,8 +395,7 @@ runtime_loader(void *_args)
 			gProgramArgs->env[i] += relocationOffset;
 	}
 
-	if (!strcmp(gProgramArgs->program_path,
-			"/boot/beos/system/runtime_loader")) {
+	if (!strcmp(gProgramArgs->program_path, "/boot/system/runtime_loader")) {
 		// TODO: this is a (temporary) work-around for bug #2273 which causes
 		// the cache's mutex to be locked twice when starting the runtime_loader
 		// itself.

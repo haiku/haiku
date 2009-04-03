@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2008, Haiku, Inc.
+ * Copyright (c) 2005-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -67,50 +67,54 @@ static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
 
 class AboutApp : public BApplication {
 	public:
-		AboutApp(void);
+								AboutApp();
 };
 
 class AboutWindow : public BWindow {
 	public:
-				AboutWindow(void);
-		bool	QuitRequested(void);
+								AboutWindow();
+
+		virtual	bool			QuitRequested();
 };
 
 class AboutView : public BView {
 	public:
-				AboutView(const BRect &r);
-				~AboutView(void);
+								AboutView(const BRect& frame);
+								~AboutView();
 
-		virtual void AttachedToWindow();
-		virtual void Pulse();
+		virtual void			AttachedToWindow();
+		virtual void			Pulse();
 
-		virtual void FrameResized(float width, float height);
-		virtual void Draw(BRect update);
-		virtual void MessageReceived(BMessage *msg);
-		virtual void MouseDown(BPoint pt);
+		virtual void			FrameResized(float width, float height);
+		virtual void			Draw(BRect updateRect);
+		virtual void			MessageReceived(BMessage* msg);
+		virtual void			MouseDown(BPoint point);
 
-		void	AddCopyrightEntry(const char *name, const char *text,
-					const Licenses& licenses, const char *url);
-		void	AddCopyrightEntry(const char *name, const char *text,
-					const char *url = NULL);
-		void	AddCopyrightEntry(const BMessage& packageDescription);
-		void	PickRandomHaiku();
+				void			AddCopyrightEntry(const char* name,
+									const char* text, const Licenses& licenses,
+									const char* url);
+				void			AddCopyrightEntry(const char* name,
+									const char* text, const char* url = NULL);
+				void			AddCopyrightEntry(
+									const BMessage& packageDescription);
+				void			PickRandomHaiku();
 
 	private:
-		void	_AddCopyrightsFromAttribute();
+				status_t		_GetLicensesPath(BPath& path);
+				void			_AddCopyrightsFromAttribute();
 
-		BStringView		*fMemView;
-		BTextView		*fUptimeView;
-		BView			*fInfoView;
-		HyperTextView	*fCreditsView;
+				BStringView*	fMemView;
+				BTextView*		fUptimeView;
+				BView*			fInfoView;
+				HyperTextView*	fCreditsView;
 
-		BBitmap			*fLogo;
+				BBitmap*		fLogo;
 
-		BPoint			fDrawPoint;
+				BPoint			fDrawPoint;
 
-		bigtime_t		fLastActionTime;
-		BMessageRunner	*fScrollRunner;
-		BQuery			fAppsQuery;
+				bigtime_t		fLastActionTime;
+				BMessageRunner*	fScrollRunner;
+				BQuery			fAppsQuery;
 };
 
 
@@ -548,7 +552,6 @@ AboutView::AboutView(const BRect &rect)
 		"(sorry!)"
 		"\n\n");
 
-
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Special Thanks To:\n");
 
@@ -557,6 +560,12 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
 	// copyrights for various projects we use
+
+	BPath licensesPath;
+	_GetLicensesPath(licensesPath);
+
+	BPath mitPath(licensesPath);
+	mitPath.Append("MIT license");
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -572,7 +581,7 @@ AboutView::AboutView(const BRect &rect)
 		"kernel and all code that applications may link against, is "
 		"distributed under the terms of the ");
 	fCreditsView->InsertHyperText("MIT license",
-		new OpenFileAction("/etc/licenses/MIT"));
+		new OpenFileAction(mitPath.Path()));
 	fCreditsView->Insert(". Some system libraries contain third party code "
 		"distributed under the LGPL license. You can find the copyrights "
 		"to third party code below.\n\n");
@@ -997,6 +1006,9 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 	fCreditsView->Insert(text);
 	fCreditsView->Insert("\n");
 
+	BPath licensesPath;
+	_GetLicensesPath(licensesPath);
+
 	if (licenses.CountLicenses() > 0) {
 		if (licenses.CountLicenses() > 1)
 			fCreditsView->Insert("Licenses: ");
@@ -1005,7 +1017,7 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 
 		for (int32 i = 0; i < licenses.CountLicenses(); i++) {
 			const char* license = licenses.LicenseAt(i);
-			BString licensePath("/etc/licenses/");
+			BString licensePath(licensesPath.Path());
 			licensePath += license;
 
 			if (i > 0)
@@ -1099,6 +1111,17 @@ AboutView::PickRandomHaiku()
 	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
 		delete s;
 	}
+}
+
+
+status_t
+AboutView::_GetLicensesPath(BPath& path)
+{
+	status_t status = find_directory(B_SYSTEM_DATA_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	return path.Append("licenses");
 }
 
 

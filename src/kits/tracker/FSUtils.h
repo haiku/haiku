@@ -68,7 +68,7 @@ class CopyLoopControl {
 			// inform that a file error occurred while copying <name>
 			// returns true if user decided to continue
 
-		virtual void UpdateStatus(const char *name, entry_ref ref, int32 count, 
+		virtual void UpdateStatus(const char *name, entry_ref ref, int32 count,
 			bool optional = false) = 0;
 
 		virtual bool CheckUserCanceled() = 0;
@@ -82,10 +82,10 @@ class CopyLoopControl {
 								// for files: save original attributes on file.
 		};
 
-		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry, 
-			const char *destName, const BDirectory *destDir, bool srcIsDir, 
+		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry,
+			const char *destName, const BDirectory *destDir, bool srcIsDir,
 			bool dstIsDir) = 0;
-			// override to always overwrite, never overwrite, let user decide, 
+			// override to always overwrite, never overwrite, let user decide,
 			// compare dates, etc.
 
 		virtual bool SkipEntry(const BEntry *, bool file) = 0;
@@ -123,8 +123,8 @@ class TrackerCopyLoopControl : public CopyLoopControl {
 		virtual bool CheckUserCanceled();
 			// returns true if canceled
 
-		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry, 
-			const char *destName, const BDirectory *destDir, bool srcIsDir, 
+		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry,
+			const char *destName, const BDirectory *destDir, bool srcIsDir,
 			bool dstIsDir);
 
 		virtual bool SkipEntry(const BEntry *, bool file);
@@ -137,7 +137,7 @@ class TrackerCopyLoopControl : public CopyLoopControl {
 };
 
 
-inline 
+inline
 TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
 	: fThread(thread)
 {
@@ -157,8 +157,6 @@ _IMPEXP_TRACKER void FSMakeOriginalName(char *name, BDirectory *destDir, const c
 _IMPEXP_TRACKER bool FSIsTrashDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsDeskDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsSystemDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsBeOSDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsHomeDir(const BEntry *);
 _IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref> *srcList, BList *pointList = NULL,
 	bool async = true);
@@ -174,7 +172,7 @@ _IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *application, const BMessa
 	// a document; to open documents with the preferred app, pase 0 in <application> and
 	// stuff all the document refs into <refsReceived>
 	// Consider having silent mode that does not show alerts, just returns error code
-	
+
 _IMPEXP_TRACKER status_t FSOpenWith(BMessage *listOfRefs);
 	// runs the Open With window; pas a list of refs
 
@@ -210,7 +208,7 @@ ReadAttrResult ReadAttr(const BNode *, const char *hostAttrName, const char *for
 	// native attribute name, then the foreign one; an endian swapping function can
 	// be passed, if null data won't be swapped; if <isForeign> set the foreign endianness
 	// will be read directly without first trying the native one
-	
+
 ReadAttrResult GetAttrInfo(const BNode *, const char *hostAttrName, const char *foreignAttrName,
 	type_code * = NULL, size_t * = NULL);
 

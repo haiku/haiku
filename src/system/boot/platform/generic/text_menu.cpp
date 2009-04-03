@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -100,7 +100,7 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 		printf(" ");
 
 	printf(item->Label());
-	
+
 	if (item->Submenu() && item->Submenu()->Type() == CHOICE_MENU) {
 		// show the current choice (if any)
 		const char *text = " (Current: ";
@@ -203,7 +203,7 @@ draw_menu(Menu *menu)
 	print_centered(2, "Haiku Boot Loader");
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004-2008 Haiku Inc.");
+	print_centered(4, "Copyright 2004-2009 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
@@ -459,7 +459,7 @@ run_menu(Menu *menu)
 //	#pragma mark -
 
 
-void 
+void
 platform_generic_update_text_menu_item(Menu *menu, MenuItem *item)
 {
 	if (menu->IsHidden())

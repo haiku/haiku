@@ -20,7 +20,7 @@ launch() {
 		echo There is no "$toLaunch"
 	fi
 	return 0
-}	
+}
 
 # launchscript <script path>
 
@@ -54,13 +54,13 @@ exec </dev/null
 exec >/dev/null 2>&1
 
 # Standard locations of boot files
-SCRIPTS=beos/system/boot
-SERVERS=beos/system/servers
+SCRIPTS=system/boot
+SERVERS=system/servers
 
 # clean the shared memory dir
 shmDir=/boot/var/shared_memory
 rm -rf $shmDir
-mkdir $shmDir
+mkdir -p $shmDir
 chmod 777 $shmDir
 
 # Set up the environment
@@ -77,7 +77,7 @@ if [ "$iw" = "yes" ]; then
 fi
 
 # Sets timezone etc.
-runprog beos/bin/clockconfig
+runprog system/bin/clockconfig
 
 # Launch servers
 
@@ -105,18 +105,18 @@ fi
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
 	if [ -e /etc/users ]; then
-		launch beos/system/Login
+		launch system/Login
 		# nothing more
 	else
-		launch beos/system/Tracker
-		launch beos/system/Deskbar
+		launch system/Tracker
+		launch system/Deskbar
 
 		# install ProcessController in the deskbar
-		(sleep 7; /boot/beos/apps/ProcessController -deskbar) &
+		(sleep 7; /boot/system/apps/ProcessController -deskbar) &
 	fi
-	launch beos/apps/Terminal
+	launch system/apps/Terminal
 else
-	launch beos/bin/consoled
+	launch system/bin/consoled
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
@@ -124,7 +124,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/midi_server
 fi
 
-# Launch Print Server 
+# Launch Print Server
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/print_server
 fi
@@ -135,7 +135,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for daily saving time
-launch beos/bin/dstcheck
+launch system/bin/dstcheck
 
 if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script

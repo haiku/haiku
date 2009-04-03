@@ -22,7 +22,7 @@
 /*
  * generate boot floppy:
  * cd src/system/boot/platform/atari_m68k/ ; make fixup_tos_floppy_chksum; cd -
- * dd if=generated/objects/haiku/m68k/release/system/boot/zbeos of=~/floppy.img bs=512 count=20 conv=notrunc
+ * dd if=generated/objects/haiku/m68k/release/system/boot/haiku_loader of=~/floppy.img bs=512 count=20 conv=notrunc
  * src/system/boot/platform/atari_m68k/fixup_tos_floppy_chksum ~/floppy.img
  * generate .prg:
  * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/ldscripts/m68k/boot_prg_atari_m68k.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
@@ -355,7 +355,7 @@ h5:
 unimpl:
 	.string "Unimplemented."
 msg_j1:
-	.string "jumping to zbeos."
+	.string "jumping to haiku_loader."
 
 
 shell_end:

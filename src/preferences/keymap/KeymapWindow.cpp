@@ -108,10 +108,10 @@ KeymapWindow::KeymapWindow()
 		create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
 	}
 
-	BMessenger messenger(this);	
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref, 
+	BMessenger messenger(this);
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
 		B_FILE_NODE, false, NULL);
-	fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, &ref, 
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, &ref,
 		B_FILE_NODE, false, NULL);
 
 	BScreen screen(this);
@@ -165,7 +165,7 @@ KeymapWindow::~KeymapWindow(void)
 }
 
 
-bool 
+bool
 KeymapWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -173,12 +173,12 @@ KeymapWindow::QuitRequested()
 }
 
 
-void 
+void
 KeymapWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SIMPLE_DATA:
-		case B_REFS_RECEIVED: 
+		case B_REFS_RECEIVED:
 		{
 			entry_ref ref;
 			int32 i = 0;
@@ -357,7 +357,7 @@ KeymapWindow::_CreateMenu()
 
 	for (int32 i = 0; i < numFamilies; i++) {
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			BMenuItem *item = 
+			BMenuItem *item =
 				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
 			fFontMenu->AddItem(item);
 
@@ -420,7 +420,7 @@ KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 
 		path.Append("KeyboardLayouts");
 
-		BDirectory directory;		
+		BDirectory directory;
 		if (directory.SetTo(path.Path()) == B_OK) {
 			entry_ref ref;
 			while (directory.GetNextRef(&ref) == B_OK) {
@@ -489,7 +489,7 @@ KeymapWindow::_SwitchShortcutKeys()
 
 
 //!	Saves previous map to the "Key_map" file.
-void 
+void
 KeymapWindow::_RevertKeymap()
 {
 	entry_ref ref;
@@ -512,7 +512,7 @@ KeymapWindow::_RevertKeymap()
 }
 
 
-void 
+void
 KeymapWindow::_UseKeymap()
 {
 	entry_ref ref;
@@ -538,15 +538,16 @@ KeymapWindow::_FillSystemMaps()
 	while ((item = fSystemListView->RemoveItem(static_cast<int32>(0))))
 		delete item;
 
+	// TODO: common keymaps!
 	BPath path;
-	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) != B_OK)
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &path) != B_OK)
 		return;
-	
-	path.Append("Keymap");
-	
+
+	path.Append("Keymaps");
+
 	BDirectory directory;
 	entry_ref ref;
-	
+
 	if (directory.SetTo(path.Path()) == B_OK) {
 		while (directory.GetNextRef(&ref) == B_OK) {
 			fSystemListView->AddItem(new KeymapListItem(ref));
@@ -555,7 +556,7 @@ KeymapWindow::_FillSystemMaps()
 }
 
 
-void 
+void
 KeymapWindow::_FillUserMaps()
 {
 	BListItem* item;
@@ -632,7 +633,7 @@ KeymapWindow::_GetActiveKeymapName()
 bool
 KeymapWindow::_SelectCurrentMap(BListView* view)
 {
-	if (fCurrentMapName.Length() <= 0) 
+	if (fCurrentMapName.Length() <= 0)
 		return false;
 
 	for (int32 i = 0; i < view->CountItems(); i++) {

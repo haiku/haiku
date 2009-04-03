@@ -3,19 +3,19 @@
 	Copyright (C) 2004 beunited.org
 	Copyright (c) 2006 Haiku, Inc. All Rights Reserved.
 
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 
@@ -311,21 +311,21 @@ ProcessController::MessageReceived(BMessage *message)
 			break;
 
 		case 'Trac':
-			launch(kTrackerSig, "/boot/beos/system/Tracker");
+			launch(kTrackerSig, "/boot/system/Tracker");
 			break;
 
 		case 'Dbar':
-			launch(kDeskbarSig, "/boot/beos/system/Deskbar");
+			launch(kDeskbarSig, "/boot/system/Deskbar");
 			break;
-		
+
 		case 'Term':
-			launch(kTerminalSig, "/boot/beos/apps/Terminal");
+			launch(kTerminalSig, "/boot/system/apps/Terminal");
 			break;
 
 		case 'AlDb':
 		{
 			if (!be_roster->IsRunning(kDeskbarSig))
-				launch(kDeskbarSig, "/boot/beos/system/Deskbar");
+				launch(kDeskbarSig, "/boot/system/Deskbar");
 			BDeskbar deskbar;
 			if (gInDeskbar || deskbar.HasItem (kDeskbarItemName))
 				deskbar.RemoveItem (kDeskbarItemName);
@@ -652,7 +652,7 @@ thread_popup(void *arg)
 
 	// CPU Load section
 	TeamBarMenu* CPUPopup = new TeamBarMenu("Threads and CPU Usage", infos, systemInfo.used_teams);
-	for (m = 0; m < systemInfo.used_teams; m++) {	
+	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
 			ThreadBarMenu* TeamPopup = new ThreadBarMenu(infos[m].team_name, infos[m].team_info.team, infos[m].team_info.thread_count);
 			BMessage* kill_team = new BMessage('KlTm');
