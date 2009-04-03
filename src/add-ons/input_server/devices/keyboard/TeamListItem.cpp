@@ -115,7 +115,9 @@ TeamListItem::GetInfo()
 bool
 TeamListItem::IsSystemServer()
 {
-	char* system = "/boot/beos/system/";
+    // TODO: use find_directory() in place of hardcoded paths
+
+	char* system = "/boot/system/";
 	if (strncmp(system, fInfo.args, strlen(system)) == 0)
 		return true;
 
