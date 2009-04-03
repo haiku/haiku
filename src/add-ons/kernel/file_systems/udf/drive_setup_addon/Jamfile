@@ -51,7 +51,7 @@ rule InstallUDFDS
 
 actions ignore InstallUDFDS
 {
-	cp $(>) /boot/beos/system/add-ons/drive_setup/fs/
+	cp $(>) /boot/system/add-ons/drive_setup/fs/
 }
 
 InstallUDFDS install : i-udf-ds ;
