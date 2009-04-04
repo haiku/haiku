@@ -1,15 +1,12 @@
-//
-//	CannaLooper.h
-//	CannaIM Looper object
+/*
+ * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 1999 M.Kawamura
+ */
+#ifndef CANNA_LOOPER_H
+#define CANNA_LOOPER_H
 
-//	This is a part of...
-//	CannaIM
-//	version 1.0
-//	(c) 1999 M.Kawamura
-//
-
-#ifndef _CANNA_LOOPER_H
-#define _CANNA_LOOPER_H
 
 #include <Messenger.h>
 #include <Font.h>
@@ -24,32 +21,33 @@ class BMessenger;
 
 extern Preferences gSettings;
 
-class CannaLooper : public BLooper
-{
+class CannaLooper : public BLooper {
 public:
-					CannaLooper( CannaMethod *method );
-	virtual void	Quit();
-	void			MessageReceived( BMessage *msg );
-	void			EnqueueMessage( BMessage *msg );
-	status_t		InitCheck();
-	status_t		ReadSettings( char *basepath );
-//	bool			QuitRequested();
-	void			SendInputStopped();
-	void			SendInputStarted();
-	
+							CannaLooper(CannaMethod* method);
+
+	virtual void			Quit();
+	virtual void			MessageReceived(BMessage* msg);
+
+			void			EnqueueMessage(BMessage* msg);
+			status_t		Init();
+			status_t		ReadSettings(char* basePath);
+
+			void			SendInputStopped();
+			void			SendInputStarted();
+
 private:
-	CannaMethod*	owner;
-	CannaInterface*	canna;
-	BFont			kouhoFont;
-	void			HandleKeyDown( BMessage *msg );
-	void			HandleLocationReply( BMessage *msg );
-	void			HandleMethodActivated( bool active );
-	void			ProcessResult( uint32 result );
-	void			ForceKakutei();
-	KouhoWindow*	theKouhoWindow;
-	PaletteWindow*	thePalette;
-	BMenu*			theMenu;
-	BMessenger		self;
+			void			_HandleKeyDown(BMessage* msg);
+			void			_HandleLocationReply(BMessage* msg);
+			void			_HandleMethodActivated(bool active);
+			void			_ProcessResult(uint32 result);
+			void			_ForceKakutei();
+
+			CannaMethod*	fOwner;
+			CannaInterface*	fCanna;
+			BFont			fKouhoFont;
+			KouhoWindow*	fKouhoWindow;
+			PaletteWindow*	fPaletteWindow;
+			BMenu*			fMenu;
 };
 
-#endif
+#endif	// CANNA_LOOPER_H

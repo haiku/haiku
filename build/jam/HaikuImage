@@ -344,16 +344,16 @@ local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToHaikuImage system fonts psfonts : $(psFonts) ;
 AddFilesToHaikuImage system fonts ttfonts : $(ttFonts) ;
 
-local kanbeDir = [ FDirName $(HAIKU_TOP) data etc KanBe ] ;
-local kanbeDefault = [ Glob $(kanbeDir)/default : *.canna *.gz ] ;
-local kanbeDic = [ Glob $(kanbeDir)/dic : *.cbp ] ;
-local kanbeDicCanna = [ Glob $(kanbeDir)/dic/canna
+local cannaDir = [ FDirName $(HAIKU_TOP) data etc KanBe ] ;
+local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
+local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
+local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
 	: *.cld *.ctd *.cbd *.dir ] ;
-AddFilesToHaikuImage system data KanBe default : $(kanbeDefault) ;
-AddFilesToHaikuImage system data KanBe dic : $(kanbeDic) ;
-AddFilesToHaikuImage system data KanBe dic canna : $(kanbeDicCanna) ;
-AddDirectoryToHaikuImage system data KanBe dic group ;
-AddDirectoryToHaikuImage system data KanBe dic user ;
+AddFilesToHaikuImage system data Canna default : $(cannaDefault) ;
+AddFilesToHaikuImage system data Canna dic : $(cannaDic) ;
+AddFilesToHaikuImage system data Canna dic canna : $(cannaDicCanna) ;
+AddDirectoryToHaikuImage system data Canna dic group ;
+AddDirectoryToHaikuImage system data Canna dic user ;
 
 local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ]
 	: *.keymap ] ;

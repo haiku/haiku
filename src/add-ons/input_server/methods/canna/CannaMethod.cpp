@@ -23,12 +23,15 @@ Preferences gSettings;
 BInputServerMethod*
 instantiate_input_method()
 {
-	return (new CannaMethod());
+	return new CannaMethod();
 }
 
 
+//	#pragma mark -
+
+
 CannaMethod::CannaMethod()
-	:BInputServerMethod( "Canna", (const uchar *)kCannaIcon )
+	: BInputServerMethod("Canna", (const uchar*)kCannaIcon)
 {
 #ifdef DEBUG
 	SERIAL_PRINT(( "CannaIM:Constructor called.\n" ));
@@ -87,7 +90,7 @@ CannaMethod::InitCheck()
 	status_t err;
 	looper = new CannaLooper( this );
 	looper->Lock();
-	err = looper->InitCheck();
+	err = looper->Init();
 	looper->Unlock();
 	cannaLooper = BMessenger( NULL, looper );
 #ifdef DEBUG
