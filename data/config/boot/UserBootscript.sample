@@ -12,4 +12,4 @@
 # This will allow the script to execute that command and process the next line.
 
 # Run LaunchBox
-# /boot/beos/apps/LaunchBox &
+# /boot/system/apps/LaunchBox &
