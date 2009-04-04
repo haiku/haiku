@@ -284,7 +284,7 @@ void
 CalcView::Draw(BRect updateRect)
 {
 	bool drawBackground = true;
-	if (Parent() && Window()->Bounds() != Frame()) {
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
 		// CalcView is embedded somewhere, most likely the Tracker Desktop
 		// shelf.
 		drawBackground = false;
@@ -758,8 +758,8 @@ CalcView::Paste(BMessage *message)
 		if (keypadRect.Contains(dropPoint) && dropColor) {
 			fBaseColor = *dropColor;
 			_Colorize();
-			// redraw keypad
-			Invalidate(keypadRect);
+			// redraw
+			Invalidate();
 		}
 
 	} else {
