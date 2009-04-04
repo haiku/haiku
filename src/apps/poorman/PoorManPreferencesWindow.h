@@ -72,7 +72,7 @@ public:
 
 virtual	void	MessageReceived(BMessage * message);
 
-		void	ShowWebDirFilePanel() { if (!webDirFilePanel->IsShowing()) webDirFilePanel->Show(); }
+		void	ShowWebDirFilePanel();
 		void	SelectWebDir(BMessage * message);
 		void	CreateLogFile(BMessage * message);
 };

@@ -32,12 +32,18 @@ const int32 MSG_FILE_PANEL_CREATE_LOG_FILE	= 'oCLF';
 			// Advanced Tab
 const int32 MSG_PREF_ADV_SLD_MAX_CONNECTION = 'PASM';
 
+// BMessage Preferences File
+const uint32 MSG_PREF_FILE = 'pref';
+
+//BMessage for Logger
+const int32 MSG_LOG = 'logg';
 // ------------------------------------------------------
 // PoorMan Window
 extern const char* STR_APP_SIG;
 extern       char* STR_APP_NAME;
 extern const char* STR_ERR_WEB_DIR; 	// Alert Box
 extern const char* STR_ERR_CANT_START;
+extern const char* STR_DIR_CREATED;
 
 extern const char* STR_MNU_FILE;
 extern const char* STR_MNU_FILE_SAVE_AS;
@@ -61,9 +67,9 @@ extern const char* STR_TXT_VIEW;
 // ------------------------------------------------------
 // Preferences Window
 extern		 char* STR_WIN_NAME_PREF;
-extern const char* STR_SETTINGS_FILE_PATH;
-extern const char* STR_SETTINGS_NEW_FILE_PATH;
-
+extern const char* STR_SETTINGS_FILE_NAME;
+extern const char* STR_SETTINGS_NEW_FILE_NAME;
+extern const char* STR_DEFAULT_WEB_DIRECTORY;
 
 extern const char* STR_TAB_SITE;
 extern const char* STR_BBX_LOCATION;
@@ -104,4 +110,6 @@ extern const rgb_color WHITE;
 extern const rgb_color GRAY;
 extern const rgb_color BACKGROUND_COLOR;
 extern const rgb_color BLACK;
+extern const rgb_color RED;
+extern const rgb_color GREEN;
 #endif

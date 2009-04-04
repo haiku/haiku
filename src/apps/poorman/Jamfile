@@ -1,19 +1,53 @@
 SubDir HAIKU_TOP src apps poorman ;
 
+SubDirCcFlags [ FDefines HAVE__PROGNAME=1 HAVE_FCNTL_H=1 HAVE_GRP_H=1 HAVE_MEMORY_H=1 HAVE_POLL_H=1 HAVE_SYS_POLL_H=1 TIME_WITH_SYS_TIME=1 HAVE_DIRENT_H=1 HAVE_STRERROR=1 HAVE_WAITPID=1 HAVE_VSNPRINTF=1 HAVE_SETSID=1 HAVE_SIGSET=1 HAVE_ATOLL=1 HAVE_UNISTD_H=1 HAVE_GETPAGESIZE=1 HAVE_MMAP=1 HAVE_SELECT=1 HAVE_POLL=1 HAVE_TM_GMTOFF=1 HAVE_SOCKLENT=1 HAVE_INT64T=1 ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps poorman libhttpd ] ;
+
+rule THTTPMakeHeader header : text
+{
+        header = [ FGristFiles $(header) ] ;
+        text = [ FGristFiles $(text) ] ;
+
+        SEARCH on $(text) = $(SEARCH_SOURCE) ;
+        MakeLocateArch $(header) ;
+
+        Depends $(header) : $(text) ;
+        LocalClean clean : $(header) ;
+
+        THTTPMakeHeader1 $(header) : $(text) ;
+}
+
+actions THTTPMakeHeader1
+{
+		rm -f $(1)
+		sed < $(2) > $(1) \
+			-e 's/#.*//' -e 's/[ 	]*$//' -e '/^$/d' \
+			-e 's/[ 	][ 	]*/", 0, "/' -e 's/^/{ "/' -e 's/$/", 0 },/'
+}
+
+THTTPMakeHeader mime_encodings.h : mime_encodings.txt ;
+THTTPMakeHeader mime_types.h : mime_types.txt ;
+
 AddResources PoorMan : PoorMan.rdef ;
 
 Application PoorMan : PoorMan.cpp
-	PoorManMainView.cpp
 	PoorManWindow.cpp
 	PoorManView.cpp
 	PoorManAdvancedView.cpp
 	StatusSlider.cpp
+	PoorManServer.cpp
 	PoorManSiteView.cpp
+	PoorManLogger.cpp
 	PoorManLoggingView.cpp
 	PoorManPreferencesWindow.cpp 
 	PoorManApplication.cpp
 	constants.cpp
-	: be tracker $(TARGET_LIBSTDC++)
+	
+	# libhttpd
+	libhttpd.c
+	match.c
+	tdate_parse.c
+	
+	: be network tracker $(TARGET_LIBSTDC++)
 	;
-
-

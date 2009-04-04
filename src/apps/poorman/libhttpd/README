@@ -1,0 +1,5 @@
+This is libhttpd from thttpd v2.25b, which is written by Jef Poskanzer.
+This version of libhttpd is modified to fit into the multithreaded PoorMan application.
+
+For more information about thttpd, please visit: 
+http://www.acme.com/software/thttpd/

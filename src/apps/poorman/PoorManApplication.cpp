@@ -5,30 +5,35 @@
  *	Version: 0.1
  */
 
+#include <Application.h>
 #include <Alert.h>
+#include <Directory.h>
 
 #include "constants.h"
-#include "PoorManView.h"
 #include "PoorManApplication.h"
-
+#include "PoorManWindow.h"
 
 PoorManApplication::PoorManApplication()
 	: BApplication(STR_APP_SIG),
-	  status(false), hits(0)
+	  mainWindow(NULL)
 {
-	// -------------------------------------------
-	// Main Window
-	//PoorManView		* mainView;
-	BRect			  mainRect;
-	
-	mainRect.Set(30.0f, 30.0f, 355.0f, 185.0f);
+	BRect mainRect(82.0f, 30.0f, 400.0f, 350.0f);
 	mainWindow = new PoorManWindow(mainRect);
+	mainWindow->Hide();
+	mainWindow->Show();
 	
-	//mainRect.OffsetTo(B_ORIGIN);
-	//mainView = new PoorManView(mainRect, STR_APP_NAME);
-	//mainView->SetViewColor(216,216,216,255);
+	BDirectory webDir;
+	if(mainWindow->ReadSettings() != B_OK){
+		if(webDir.SetTo(STR_DEFAULT_WEB_DIRECTORY) != B_OK)
+			mainWindow->DefaultSettings();
+	} else {
+		if(webDir.SetTo(mainWindow->WebDir()) != B_OK)
+			mainWindow->DefaultSettings();
+	}
 	
-	mainWindow->Show();	
+	mainWindow->StartServer();
+	mainWindow->SetDirLabel(mainWindow->WebDir());
+	mainWindow->Show();
 }
 
 void 

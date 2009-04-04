@@ -8,29 +8,36 @@
 #ifndef POOR_MAN_WINDOW_H
 #define POOR_MAN_WINDOW_H
 
-#include <Window.h>
-#include <Point.h>
-#include <FilePanel.h>
-#include <Path.h>
-#include <Message.h>
-#include <MenuBar.h>
-#include <Menu.h>
-#include <MenuItem.h>
-#include <TextView.h>
-#include <StringView.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <SupportDefs.h>
+#include <pthread.h>
 
-#include "PoorManView.h"
-#include "PoorManPreferencesWindow.h"
+#include <SupportDefs.h>
+#include <Window.h>
+#include <String.h>
+
+class BPoint;
+class BFilePanel;
+class BMessage;
+class BMenuBar;
+class BMenu;
+class BTextView;
+class BStringView;
+class BScrollView;
+class BRect;
+class BFile;
+class BFont;
+
+class PoorManView;
+class PoorManPreferencesWindow;
+class PoorManServer;
 
 class PoorManWindow: public BWindow
 {
 public:
 					PoorManWindow(BRect frame);
+virtual				~PoorManWindow();
 virtual	void		MessageReceived(BMessage * message);
 
+virtual void		FrameMoved(BPoint origin);
 virtual	void		FrameResized(float width, float height);
 virtual	bool		QuitRequested();
 virtual	void		Zoom(BPoint origin, float width, float height);
@@ -38,11 +45,18 @@ virtual	void		Zoom(BPoint origin, float width, float height);
 	// -------------------------------------------
 	// Public PoorMan Window Methods
 		void		SetDirLabel(const char * name);
-		void		SetHits(uint32 num) { hits = num;}
+		void		SetHits(uint32 num);
 		uint32		GetHits() { return hits; }
 		status_t	SaveConsole(BMessage * message, bool);
-		status_t	SaveSettings();
 		
+		status_t	SaveSettings();
+		status_t	ReadSettings();
+		void		DefaultSettings();
+		
+		status_t	StartServer();
+		status_t	StopServer();
+		
+		PoorManServer* GetServer()const{return fServer;}
 	// -------------------------------------------	
 	// Preferences and Settings
 		// Site Tab		
@@ -58,19 +72,16 @@ virtual	void		Zoom(BPoint origin, float width, float height);
 		bool		 LogFileFlag()				  { return log_file_flag; }
 		void		 SetLogFileFlag(bool flag) 	  { log_file_flag = flag; }
 		const char * LogPath()					  { return log_path.String(); }
-		void		 SetLogPath(const char * str) { log_path.SetTo(str); }
+		void		 SetLogPath(const char * str);
 		// Advanced Tab
-		int32		 MaxConnections()			  { return max_connections; }
-		void		 SetMaxConnections(int32 num) { max_connections = num;  }
+		int16		 MaxConnections()			  { return max_connections; }
+		void		 SetMaxConnections(int16 num) { max_connections = num;  }
 
 
 private:
 	// -------------------------------------------
 	// PoorMan Window Methods
-		status_t	ReadSettings();
-		void		DefaultSettings();
-		
-		void		UpdateStatusLabel(bool);
+		void		UpdateStatusLabelAndMenuItem();
 		void		UpdateHitsLabel();
 	
 private:
@@ -121,8 +132,9 @@ private:
 	bool			log_console_flag;
 	bool			log_file_flag;
 	BString			log_path;
+	
 	// advanced tab
-	int32			max_connections;
+	int16			max_connections;
 		
 	bool			is_zoomed;
 	float			last_width;
@@ -130,11 +142,16 @@ private:
 	BRect			frame;
 	BRect			setwindow_frame;
 	
-	
 	// File Panels
 	BFilePanel	*	saveConsoleFilePanel;
 	BFilePanel	*	saveConsoleSelectionFilePanel;
 
+	BFile* fLogFile;
+	BFont* fLogViewFont;
+	
+	PoorManServer* fServer;
+	
+	pthread_rwlock_t fLogFileLock;
 };
 
 #endif

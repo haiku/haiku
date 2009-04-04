@@ -16,6 +16,10 @@ extern const char* STR_ERR_WEB_DIR
 	  "Do you wish to select a folder to publish on the Web?";	
 extern const char* STR_ERR_CANT_START
 	= "Can't Start the Server";
+extern const char* STR_DIR_CREATED
+	= "A default Web directory has been created for you "
+	  "at \"/boot/home/public_html.\"\nMake sure an HTML " 
+	  "document named \"index.html\" is in that directory.";
 
 extern const char* STR_MNU_FILE
 	= "File";
@@ -58,11 +62,12 @@ extern const char* STR_TXT_VIEW
 			 char* STR_WIN_NAME_PREF
 	= "PoorMan Settings";
 
-extern const char* STR_SETTINGS_FILE_PATH
-	= "/boot/home/config/settings/PoorMan Settings";
-extern const char* STR_SETTINGS_NEW_FILE_PATH
-	= "/boot/home/config/settings/OBOS PoorMan Settings";
-	
+extern const char* STR_SETTINGS_FILE_NAME
+	= "PoorMan Settings";
+extern const char* STR_SETTINGS_NEW_FILE_NAME
+	= "OBOS PoorMan Settings";
+extern const char* STR_DEFAULT_WEB_DIRECTORY
+	= "/boot/home/public_html";	
 extern const char* STR_TAB_SITE
 	= "Site";
 extern const char* STR_BBX_LOCATION
@@ -123,12 +128,14 @@ extern const char* STR_ABOUT_BUTTON
 	= "OK";
 extern const char* STR_ABOUT_DESC
 	= "Poor Man's Web Server\n"
-	"Copyright © 2004 Haiku\n"
+	"Copyright " B_UTF8_COPYRIGHT " 2004-2009 Haiku\n"
 	"All rights reserved.\n\n"
-	"Written by: Philip Harrison";
+	"Written by: Philip Harrison, Ma Jie";
 	
 // --------------------------------	
 extern const rgb_color WHITE				= { 255, 255, 255, 255 };
 extern const rgb_color GRAY					= { 184, 184, 184, 255 };
 extern const rgb_color BACKGROUND_COLOR		= { 216, 216, 216, 255 };
 extern const rgb_color BLACK				= { 0, 0, 0, 255 };
+extern const rgb_color RED					= { 255, 0, 0, 255};
+extern const rgb_color GREEN				= { 0, 255, 0, 255};

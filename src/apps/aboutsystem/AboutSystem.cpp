@@ -565,7 +565,7 @@ AboutView::AboutView(const BRect &rect)
 	_GetLicensesPath(licensesPath);
 
 	BPath mitPath(licensesPath);
-	mitPath.Append("MIT license");
+	mitPath.Append("MIT");
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -808,6 +808,13 @@ AboutView::AboutView(const BRect &rect)
 //		"http://www.opensound.com");
 // BSD license
 
+	// libhttpd copyright (used as Poorman backend)
+	AddCopyrightEntry("libhttpd",
+		"Copyright " B_UTF8_COPYRIGHT "1995,1998,1999,2000,2001 by "
+		"Jef Poskanzer. All rights reserved.",
+		Licenses("LibHTTPd", NULL),
+		"http://www.acme.com/software/thttpd/");
+
 #ifdef __INTEL__
 	// Udis86 copyrights
 	AddCopyrightEntry("Udis86",
@@ -1018,7 +1025,7 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 		for (int32 i = 0; i < licenses.CountLicenses(); i++) {
 			const char* license = licenses.LicenseAt(i);
 			BString licensePath(licensesPath.Path());
-			licensePath += license;
+			licensePath << '/' << license;
 
 			if (i > 0)
 				fCreditsView->Insert(", ");

@@ -11,8 +11,8 @@
 
 #include <Application.h>
 
-#include "PoorManWindow.h"
-#include "PoorManPreferencesWindow.h"
+class PoorManWindow;
+//#include "PoorManPreferencesWindow.h"
 
 
 class PoorManApplication: public BApplication
@@ -23,13 +23,13 @@ public:
 PoorManWindow *	GetPoorManWindow() { return mainWindow; }
 private:
 			PoorManWindow				* mainWindow;
-			PoorManPreferencesWindow	* prefWindow;
+			//PoorManPreferencesWindow	* prefWindow;
 			
 			// --------------------------------------------
 			// settings variables
-			bool	status;
-			char	directory[512];
-			uint32	hits;	
+			//bool	status;
+			//char	directory[512];
+			//uint32	hits;	
 	
 };
 

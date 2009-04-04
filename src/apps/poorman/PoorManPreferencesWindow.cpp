@@ -8,13 +8,13 @@
 #include <Window.h>
 #include <Box.h>
 #include <Directory.h>
-#include <iostream>
+#include <Debug.h>
 
 #include "constants.h"
 #include "PoorManWindow.h"
 #include "PoorManApplication.h"
 #include "PoorManPreferencesWindow.h"
-
+#include "PoorManServer.h"
 
 PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
@@ -102,7 +102,7 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	BMessenger messenger(this);
 	BMessage message(MSG_FILE_PANEL_SELECT_WEB_DIR);
 	webDirFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
-		B_DIRECTORY_NODE, false, &message);
+		B_DIRECTORY_NODE, false, &message, NULL, true);
 
 	webDirFilePanel->SetPanelDirectory(new BDirectory("/boot/home/public_html"));
 	webDirFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
@@ -120,13 +120,11 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 
 }
 
-
 PoorManPreferencesWindow::~PoorManPreferencesWindow()
 {
 	delete logFilePanel;
 	delete webDirFilePanel;
 }
-
 
 void
 PoorManPreferencesWindow::MessageReceived(BMessage* message)
@@ -134,25 +132,32 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 	case MSG_PREF_BTN_DONE:
 			PoorManWindow		*	win;
+			PoorManServer* server;
 			win = ((PoorManApplication *)be_app)->GetPoorManWindow();
+			server = win->GetServer();
 
-			std::cout << "Pref Window: sendDir CheckBox: " << siteView->SendDirValue() << std::endl;
+			PRINT(("Pref Window: sendDir CheckBox: %d\n", siteView->SendDirValue()));
+			server->SetListDir(siteView->SendDirValue());
 			win->SetDirListFlag(siteView->SendDirValue());
-			std::cout << "Pref Window: indexFileName TextControl: " << siteView->IndexFileName() << std::endl;
-			win->SetIndexFileName(siteView->IndexFileName());
-			std::cout << "Pref Window: webDir: " << siteView->WebDir() << std::endl;
-			win->SetWebDir(siteView->WebDir());
-			win->SetDirLabel(siteView->WebDir());
+			PRINT(("Pref Window: indexFileName TextControl: %s\n", siteView->IndexFileName()));
+			if(server->SetIndexName(siteView->IndexFileName()) == B_OK)
+				win->SetIndexFileName(siteView->IndexFileName());
+			PRINT(("Pref Window: webDir: %s\n", siteView->WebDir()));
+			if(server->SetWebDir(siteView->WebDir()) == B_OK){
+				win->SetWebDir(siteView->WebDir());
+				win->SetDirLabel(siteView->WebDir());
+			}
 
-			std::cout << "Pref Window: logConsole CheckBox: " << loggingView->LogConsoleValue() << std::endl;
+			PRINT(("Pref Window: logConsole CheckBox: %d\n", loggingView->LogConsoleValue()));
 			win->SetLogConsoleFlag(loggingView->LogConsoleValue());
-			std::cout << "Pref Window: logFile CheckBox: " << loggingView->LogFileValue() << std::endl;
+			PRINT(("Pref Window: logFile CheckBox: %d\n", loggingView->LogFileValue()));
 			win->SetLogFileFlag(loggingView->LogFileValue());
-			std::cout << "Pref Window: logFileName: " << loggingView->LogFileName() << std::endl;
+			PRINT(("Pref Window: logFileName: %s\n", loggingView->LogFileName()));
 			win->SetLogPath(loggingView->LogFileName());
 
-			std::cout << "Pref Window: MaxConnections Slider: " << advancedView->MaxSimultaneousConnections() << std::endl;
-			win->SetMaxConnections(advancedView->MaxSimultaneousConnections());
+			PRINT(("Pref Window: MaxConnections Slider: %ld\n", advancedView->MaxSimultaneousConnections()));
+			server->SetMaxConns(advancedView->MaxSimultaneousConnections());
+			win->SetMaxConnections((int16)advancedView->MaxSimultaneousConnections());
 
 
 			if (Lock())
@@ -169,7 +174,7 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 		break;
 	case MSG_FILE_PANEL_SELECT_WEB_DIR:
 			// handle the open BMessage from the Select Web Directory File Panel
-			std::cout << "Select Web Directory:\n" << std::endl;
+			PRINT(("Select Web Directory:\n"));
 			SelectWebDir(message);
 		break;
 	case MSG_PREF_LOG_BTN_CREATE_FILE:
@@ -178,12 +183,12 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 		break;
 	case MSG_FILE_PANEL_CREATE_LOG_FILE:
 			// handle the save BMessage from the Create Log File Panel
-			std::cout << "Create Log File:\n" << std::endl;
+			PRINT(("Create Log File:\n"));
 			CreateLogFile(message);
 		break;
 	case MSG_PREF_ADV_SLD_MAX_CONNECTION:
 			max_connections = advancedView->MaxSimultaneousConnections();
-			std::cout << "Max Connections: " << max_connections << std::endl;
+			PRINT(("Max Connections: %ld\n", max_connections));
 		break;
 
 	default:
@@ -212,8 +217,20 @@ PoorManPreferencesWindow::SelectWebDir(BMessage * message)
 	//	;//return err;
 	entry.GetPath(&path);
 
-	std::cout << "DIR: " << path.Path() << std::endl;
+	PRINT(("DIR: %s\n", path.Path()));
 	siteView->SetWebDir(path.Path());
+	
+	bool temp;
+	if(message->FindBool("Default Dialog", &temp) == B_OK){
+		PoorManWindow* win = ((PoorManApplication *)be_app)->GetPoorManWindow();
+		if(win->GetServer()->SetWebDir(siteView->WebDir()) == B_OK){
+			win->SetWebDir(siteView->WebDir());
+			win->SetDirLabel(siteView->WebDir());
+		}
+		win->StartServer();
+		if(Lock())
+			Quit();
+	}
 }
 
 void
@@ -236,7 +253,7 @@ PoorManPreferencesWindow::CreateLogFile(BMessage * message)
 	//	;//return err;
 	entry.GetPath(&path);
 	path.Append(name);
-	std::cout << "Log File: " << path.Path() << std::endl;
+	PRINT(("Log File: %s\n", path.Path()));
 
 	if (err == B_OK)
 	{
@@ -245,4 +262,16 @@ PoorManPreferencesWindow::CreateLogFile(BMessage * message)
 	}
 
 	// mark the checkbox
+}
+
+/*A special version for "the default dialog", don't use it in MessageReceived()*/
+void
+PoorManPreferencesWindow::ShowWebDirFilePanel()
+{
+	BMessage message(MSG_FILE_PANEL_SELECT_WEB_DIR);
+	message.AddBool("Default Dialog", true);
+	
+	webDirFilePanel->SetMessage(&message);
+	if(!webDirFilePanel->IsShowing())
+		webDirFilePanel->Show();
 }

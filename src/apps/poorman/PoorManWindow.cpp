@@ -5,28 +5,54 @@
  *	Version: 0.1
  */
 
-#include "PoorManApplication.h"
-#include "PoorManPreferencesWindow.h"
 #include "PoorManWindow.h"
-#include "constants.h"
 
+#include <string.h>
+#include <time.h>
+#include <arpa/inet.h>
 
+#include <Alert.h>
 #include <Box.h>
 #include <Directory.h>
-#include <Alert.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <Path.h>
+#include <ScrollBar.h>
+#include <ScrollView.h>
+#include <StringView.h>
+#include <TypeConstants.h>
+#include <OS.h>
 
-#include <stdio.h>
-
-
-//#include <iostream>
+#include "PoorManApplication.h"
+#include "PoorManPreferencesWindow.h"
+#include "PoorManView.h"
+#include "PoorManServer.h"
+#include "PoorManLogger.h"
+#include "constants.h"
 
 PoorManWindow::PoorManWindow(BRect frame)
 	: BWindow(frame, STR_APP_NAME, B_TITLED_WINDOW, 0),
-	status(false), hits(0), last_width(325), last_height(155)
-{	
-	DefaultSettings();
+	status(false), hits(0), prefWindow(NULL), fLogFile(NULL), fServer(NULL)
+{
+	//preferences init
+	web_directory.SetTo(STR_DEFAULT_WEB_DIRECTORY);
+	index_file_name.SetTo("index.html");
+	dir_list_flag = false;
 	
+	log_console_flag = true;
+	log_file_flag = false;
+	log_path.SetTo("");
 	
+	max_connections = (int16)32;
+	
+	is_zoomed = true;
+	last_width = 318.0f;
+	last_height = 320.0f;
+	this->frame = frame;
+	setwindow_frame.Set(112.0f, 60.0f, 492.0f, 340.0f);
 	
 	// PoorMan Window
 	SetSizeLimits(318, 1600, 53, 1200); 
@@ -45,10 +71,10 @@ PoorManWindow::PoorManWindow(BRect frame)
 	mainView->SetFont(be_bold_font);
 	mainView->SetFontSize(12);
 	AddChild(mainView);
-		
+	
 	// BBox tests
 	BRect br;
-	br = frame;
+	br = mainView->Bounds();
 	br.top = 1.0;
 
 	BBox * bb = new BBox(br, "Background", B_FOLLOW_ALL_SIDES, 
@@ -67,7 +93,7 @@ PoorManWindow::PoorManWindow(BRect frame)
 	statusRect.left	+= 5;
 	statusRect.top 	+= 3;
 	statusRect.bottom = statusRect.top + 15;
-	statusRect.right = statusRect.left + 75;	// make the width wide enough for the string to display
+	statusRect.right = statusRect.left + 100;	// make the width wide enough for the string to display
 		
 	statusView = new BStringView(statusRect, "Status View", "Status: Stopped");
 	bb->AddChild(statusView);
@@ -80,13 +106,13 @@ PoorManWindow::PoorManWindow(BRect frame)
 	dirRect.left = statusRect.left;
 	dirRect.right -= 5;
 	
-	dirView = new BStringView(dirRect, "Dir View", "Directory: /boot/home/", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	dirView = new BStringView(dirRect, "Dir View", "Directory: (none)", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	bb->AddChild(dirView);
 	
 	// Hits String
 	BRect hitsRect;
 	hitsRect = bb->Bounds();
-	hitsRect.InsetBy(5, 5);
+	hitsRect.InsetBy(5.0f, 5.0f);
 	hitsRect.top = statusRect.top;
 	hitsRect.bottom = statusRect.bottom;
 	hitsRect.left = statusRect.right + 20;
@@ -99,34 +125,37 @@ PoorManWindow::PoorManWindow(BRect frame)
 	// Logging View
 	
 	// logRect
-	BRect logRect(5.0, 36.0, 306.0, 131.0);
+	BRect logRect = bb->Bounds();//(5.0, 36.0, 306.0, 131.0);
+	logRect.InsetBy(5, 5);
+	logRect.top = 36.0f;
+	logRect.right -= B_V_SCROLL_BAR_WIDTH;
 	
 	// textRect	
 	BRect textRect; //(1.0, 1.0, 175.0, 75.0);
 	textRect = logRect;
-	textRect.InsetBy(1.0, 1.0);
 	textRect.top = 0.0;
-	textRect.left = 0.0;
+	textRect.left = 2.0;
+	textRect.right = logRect.right - logRect.left - 2.0;
+	textRect.bottom = logRect.bottom - logRect.top;
+
+	fLogViewFont = new BFont(be_plain_font);
+	fLogViewFont->SetSize(11.0);
 
 	loggingView = new BTextView(logRect, STR_TXT_VIEW, textRect,
-		 B_FOLLOW_ALL_SIDES, B_WILL_DRAW );
+		 fLogViewFont, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW );
 
 	loggingView->MakeEditable(false);	// user cannot change the text
 	loggingView->MakeSelectable(true);
 	loggingView->SetViewColor(WHITE);
-
-	loggingView->Insert("This is PoorMan.\n"); // text_run_array
-	//loggingView->MakeFocus(true);
-	//AddChild(loggingView);
-	
-	
+	loggingView->SetStylable(true);
+		
 	// create the scroll view
 	scrollView = new BScrollView("Scroll View", loggingView, B_FOLLOW_ALL_SIDES, 
 					B_WILL_DRAW | B_FRAME_EVENTS, 
 					// Make sure articles on border do not occur when resizing
 					false, true);
 	bb->AddChild(scrollView);
-
+	loggingView->MakeFocus(true);
 
 
 	// -----------------------------------------------------------------
@@ -177,9 +206,19 @@ PoorManWindow::PoorManWindow(BRect frame)
 	
 	
 	AddChild(FileMenuBar);
+	
+	pthread_rwlock_init(&fLogFileLock, NULL);
 }
 
-void 
+PoorManWindow::~PoorManWindow()
+{
+	delete fServer;
+	delete fLogViewFont;
+	delete fLogFile;
+	pthread_rwlock_destroy(&fLogFileLock);
+}
+
+void
 PoorManWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -198,33 +237,20 @@ PoorManWindow::MessageReceived(BMessage* message)
 		SaveConsole(message, true);
 		break;
 	case MSG_MENU_EDIT_PREF:
-		prefWindow = new PoorManPreferencesWindow(BRect(30.0f, 30.0f, 410.0f, 310.0f), STR_WIN_NAME_PREF);
+		prefWindow = new PoorManPreferencesWindow(
+			setwindow_frame,
+			STR_WIN_NAME_PREF
+		);
 		break;
 	case MSG_MENU_CTRL_RUN:
-		BMenuItem * RunServer;
-		RunServer = ControlsMenu->FindItem(STR_MNU_CTRL_RUN_SERVER);
-		if (RunServer)
-		{
-			//status = httpd->Run();
-			/* For Testing 
-			if (status)
-				status = false;
-			else
-				status = true;
-			*/
-				
-			UpdateStatusLabel(status);
-			if (status)
-			{
-				RunServer->SetMarked(true);
-			} else {
-				RunServer->SetMarked(false);
-			}
-		}
+		if(status)
+			StopServer();
+		else
+			StartServer();
 		break;
 	case MSG_MENU_CTRL_CLEAR_HIT:
 		SetHits(0);
-		UpdateHitsLabel();
+		//UpdateHitsLabel();
 		break;
 	case MSG_MENU_CTRL_CLEAR_CONSOLE:
 		loggingView->SelectAll();
@@ -235,12 +261,95 @@ PoorManWindow::MessageReceived(BMessage* message)
 		f = fopen(log_path.String(), "w");
 		fclose(f);
 		break;
+	case MSG_LOG:
+	{
+		if(!log_console_flag && !log_file_flag)
+		break;
+	
+		time_t time;
+		in_addr_t address;
+		rgb_color color;
+		const void* pointer;
+		ssize_t size;
+		const char* msg;
+		BString line;
+		
+		if(message->FindString("cstring", &msg) != B_OK)
+			break;
+		if(message->FindData("time_t", B_TIME_TYPE, &pointer, &size) != B_OK)
+			time = -1;
+		else
+			time = *static_cast<time_t*>(pointer);
+		if(message->FindData("in_addr_t", B_ANY_TYPE, &pointer, &size) != B_OK)
+			address = INADDR_NONE;
+		else
+			address = *static_cast<in_addr_t*>(pointer);
+		if(message->FindData("rgb_color", B_RGB_COLOR_TYPE, &pointer, &size) != B_OK)
+			color = BLACK;
+		else
+			color = *static_cast<rgb_color*>(pointer);
+		
+		if(time != -1){
+			char timeString[26];
+			if(ctime_r(&time, timeString) != NULL){
+				timeString[24] = '\0';
+				line << '[' << timeString << "]: ";
+			}
+		}
+		
+		if(address != INADDR_NONE){
+			char addr[INET_ADDRSTRLEN];
+			struct in_addr sin_addr;
+			sin_addr.s_addr = address;
+			if(inet_ntop(AF_INET, &sin_addr, addr, sizeof(addr)) != NULL){
+				addr[strlen(addr)] = '\0';
+				line << '(' << addr << ") ";
+			}
+		}
+		
+		line << msg;
+		
+		text_run run;
+		text_run_array runs;
+		
+		run.offset = 0;
+		run.font = *fLogViewFont;
+		run.color = color;
+		
+		runs.count = 1;
+		runs.runs[0] = run;
+		
+		if(Lock()){
+			if(log_console_flag){
+				loggingView->Insert(loggingView->TextLength(),
+					line.String(), line.Length(), &runs);
+				loggingView->ScrollToOffset(loggingView->TextLength());
+			}
+		
+			if(log_file_flag){
+				if(pthread_rwlock_rdlock(&fLogFileLock) == 0){
+					fLogFile->Write(line.String(), line.Length());
+					pthread_rwlock_unlock(&fLogFileLock);
+				}
+			}
+			
+			Unlock();
+		}
+		
+		break;
+	}
 	default:
 		BWindow::MessageReceived(message);
 		break;
 	}
 }
 
+void
+PoorManWindow::FrameMoved(BPoint origin)
+{
+	frame.left = origin.x;
+	frame.top = origin.y;
+}
 
 void 
 PoorManWindow::FrameResized(float width, float height)
@@ -250,33 +359,62 @@ PoorManWindow::FrameResized(float width, float height)
 		last_width  = width;
 		last_height = height;
 	}
-	printf("(%f, %f)\n", width, height);
 }
 
-bool 
+bool
 PoorManWindow::QuitRequested()
 {
+	if(status){
+		time_t now = time(NULL);
+		char line[] = "[Thu Jan  1 00:00:00 1970]: Shutting down.\n";
+		
+		ctime_r(&now, line+1);
+		line[25] = ']';
+		line[26] = ' ';
+		
+		if(log_console_flag){
+				loggingView->Insert(loggingView->TextLength(),
+					line, strlen(line));
+				loggingView->ScrollToOffset(loggingView->TextLength());
+		}
+		
+		if(log_file_flag){
+			if(pthread_rwlock_rdlock(&fLogFileLock) == 0){
+					fLogFile->Write(line, strlen(line));
+					pthread_rwlock_unlock(&fLogFileLock);
+			}
+		}
+		
+		fServer->Stop();
+		status = false;
+		UpdateStatusLabelAndMenuItem();
+	}
+	
 	SaveSettings();
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return (true);
+	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+	return true;
 }
 
-void 
+void
 PoorManWindow::Zoom(BPoint origin, float width, float height)
 {
-	printf("Zoom: Is Zoomed before: %d (%f, %f)\n", is_zoomed, width, height); 
 	if (is_zoomed)
 	{	// Change to the Minimal size
 		is_zoomed = false;
 		ResizeTo(318, 53);
-		printf("ResizedTo(318, 53)\n");
 	}
 	else
 	{	// Change to the Zoomed size
 		is_zoomed = true;
 		ResizeTo(last_width, last_height);
-		printf("ResizedTo(%f, %f)\n", last_width, last_height);
 	}
+}
+
+void
+PoorManWindow::SetHits(uint32 num)
+{
+	hits = num;
+	UpdateHitsLabel();
 }
 
 // Private: Methods ------------------------------------------
@@ -368,11 +506,7 @@ void
 PoorManWindow::SetDirLabel(const char * name)
 {
 	BString dirPath("Directory: ");
-	int32 length = dirPath.Length() + 1;
-	dirPath.LockBuffer(length);
 	dirPath.Append(name);
-
-	dirPath.UnlockBuffer(length + strlen(name));
 	
 	if (Lock())
 	{
@@ -382,15 +516,15 @@ PoorManWindow::SetDirLabel(const char * name)
 }
 
 void 
-PoorManWindow::UpdateStatusLabel(bool set)
+PoorManWindow::UpdateStatusLabelAndMenuItem()
 {
 	if (Lock())
 	{
-		if (set)
+		if (status)
 			statusView->SetText("Status: Running");
 		else
 			statusView->SetText("Status: Stopped");
-		
+		ControlsMenu->FindItem(STR_MNU_CTRL_RUN_SERVER)->SetMarked(status);
 		Unlock();
 	}
 }
@@ -417,13 +551,13 @@ PoorManWindow::SaveConsole(BMessage * message, bool selection)
 	status_t	err = B_OK;
 	FILE		*f;
 	
-	if (err = message->FindRef("directory", &ref) != B_OK)
+	if ((err = message->FindRef("directory", &ref)) != B_OK)
 		return err;
 	
-	if (err = message->FindString("name", &name) != B_OK)
+	if ((err = message->FindString("name", &name)) != B_OK)
 		return err;
 	
-	if (err = entry.SetTo(&ref) != B_OK)
+	if ((err = entry.SetTo(&ref)) != B_OK)
 		return err;
 	
 	entry.GetPath(&path);
@@ -433,7 +567,7 @@ PoorManWindow::SaveConsole(BMessage * message, bool selection)
 		return B_ERROR;
 	
 	if (!selection)
-	{	
+	{
 		// write the data to the file
 		err = fwrite(loggingView->Text(), 1, loggingView->TextLength(), f);
 	} else {
@@ -455,88 +589,208 @@ PoorManWindow::SaveConsole(BMessage * message, bool selection)
 }
 
 
-void 
+void
 PoorManWindow::DefaultSettings()
 {
-	// Site Tab
-	SetIndexFileName("index.html");
-	SetDirListFlag(false);
-	// Logging Tab
-	SetLogConsoleFlag(true);
-	SetLogFileFlag(false);
-	// Advanced Tab
-	SetMaxConnections(32);
+	BAlert* serverAlert = new BAlert("Error Server", STR_ERR_CANT_START, "OK");
+	BAlert* dirAlert = new BAlert("Error Dir", STR_ERR_WEB_DIR, 
+		"Cancel", "Select", "Default", B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
+	dirAlert->SetShortcut(0, B_ESCAPE);
+	int32 buttonIndex = dirAlert->Go();
 
-	BDirectory webDir;
-	if (!webDir.Contains("/boot/home/public_html", B_DIRECTORY_NODE))
-	{
-		BAlert * serverAlert = new BAlert("Error Server", STR_ERR_CANT_START, "OK");
-
-		BAlert * dirAlert = new BAlert("Error Dir", STR_ERR_WEB_DIR, 
-			"Cancel", "Select", "Default", B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
-		dirAlert->SetShortcut(0, B_ESCAPE);
-		int32 buttonIndex = dirAlert->Go();
-
-
-		
-		// process dirAlert
-		switch (buttonIndex)
-		{
-			case 0:
-				serverAlert->Go();
-				QuitRequested();
-				break;
-			case 1:
-				serverAlert->Go();
-				prefWindow = new PoorManPreferencesWindow(BRect(30.0f, 30.0f, 410.0f, 310.0f), STR_WIN_NAME_PREF);
-				prefWindow->ShowWebDirFilePanel();
-				break;
-			case 2:
-
-				break;
+	switch (buttonIndex){
+	case 0:
+		serverAlert->Go();
+		SetWebDir("");
+		break;
+	case 1:
+		prefWindow = new PoorManPreferencesWindow(
+				setwindow_frame,
+				STR_WIN_NAME_PREF
+		);
+		serverAlert->Go();
+		prefWindow->ShowWebDirFilePanel();
+		break;
+	case 2:
+		if(create_directory(STR_DEFAULT_WEB_DIRECTORY, 0755) != B_OK){
+			serverAlert->Go();
+			SetWebDir("");
+			break;
 		}
-	} else {
-		printf("BDirectory contains: /boot/home/public_html\n");
-		SetWebDir("/boot/home/public_html");
+		BAlert* dirCreatedAlert =
+			new BAlert("Dir Created",STR_DIR_CREATED,"OK");
+		dirCreatedAlert->Go();
+		SetWebDir(STR_DEFAULT_WEB_DIRECTORY);
+		break;
 	}
-	
 }
 
-status_t 
+status_t
 PoorManWindow::ReadSettings()
 {
+	BPath p;
+	BFile f;
+	BMessage m;
+	
+	if(find_directory(B_USER_SETTINGS_DIRECTORY, &p) != B_OK)
+		return B_ERROR;
+	p.Append(STR_SETTINGS_FILE_NAME);
+	
+	f.SetTo(p.Path(), B_READ_ONLY);
+	if(f.InitCheck()!=B_OK)
+		return B_ERROR;
+	
+	if(m.Unflatten(&f)!=B_OK)
+		return B_ERROR;
+	
+	if(MSG_PREF_FILE != m.what)
+		return B_ERROR;
+	
+	//site tab
+	if(m.FindString("web_directory", &web_directory) != B_OK)
+		web_directory.SetTo(STR_DEFAULT_WEB_DIRECTORY);
+	if(m.FindString("index_file_name", &index_file_name) != B_OK)
+		index_file_name.SetTo("index.html");
+	if(m.FindBool("dir_list_flag", &dir_list_flag) != B_OK)
+		dir_list_flag = false;
+	
+	//logging tab
+	if(m.FindBool("log_console_flag", &log_console_flag) != B_OK)
+		log_console_flag = true;
+	if(m.FindBool("log_file_flag", &log_file_flag) != B_OK)
+		log_file_flag = false;
+	if(m.FindString("log_path", &log_path) != B_OK)
+		log_path.SetTo("");
+	
+	//advance tab
+	if(m.FindInt16("max_connections", &max_connections) != B_OK)
+		max_connections = (int16)32;
+	
+	//windows' position and size
+	if(m.FindRect("frame", &frame) != B_OK)
+		frame.Set(82.0f, 30.0f, 400.0f, 350.0f);
+	if(m.FindRect("setwindow_frame", &setwindow_frame) != B_OK)
+		setwindow_frame.Set(112.0f, 60.0f, 492.0f, 340.0f);
+	if(m.FindBool("is_zoomed", &is_zoomed) != B_OK)
+		is_zoomed = true;
+	if(m.FindFloat("last_width", &last_width) != B_OK)
+		last_width = 318.0f;
+	if(m.FindFloat("last_height", &last_height) != B_OK)
+		last_height = 320.0f;
+	
+	is_zoomed?ResizeTo(last_width, last_height):ResizeTo(318, 53);
+	MoveTo(frame.left, frame.top);
+	
+	fLogFile = new BFile(log_path.String(), B_CREATE_FILE|B_WRITE_ONLY|B_OPEN_AT_END);
+	if(fLogFile->InitCheck() != B_OK){
+		log_file_flag = false;
+		//log it to console, "log to file unavailable."
+		return B_OK;
+	}
+	
+	SetDirLabel(web_directory.String());
+	
+	return B_OK;
 }
 
-status_t 
+status_t
 PoorManWindow::SaveSettings()
 {
-	FILE * 	f;
-	size_t	s;
+	BPath p;
+	BFile f;
+	BMessage m(MSG_PREF_FILE);
+		
+	//site tab
+	m.AddString("web_directory", web_directory);
+	m.AddString("index_file_name", index_file_name);
+	m.AddBool("dir_list_flag", dir_list_flag);
 	
-	f = fopen(STR_SETTINGS_NEW_FILE_PATH, "wb");
-	if (f)
-	{
-		// Need to rewrite
-		/*
-		//fprintf(f, "%s",  web_directory.String());
-		s = fwrite(web_directory.String(), sizeof(char), web_directory.Length() + 1, f);
-
-		fprintf(f, "%s",  index_file_name.String());
-		fwrite(dir_list_flag, sizeof(bool), 1, f); 
-		//fprintf(f, "%uc", dir_list_flag);
-
-		// logging tab
-		fwrite(log_file_flag, sizeof(bool), 1, f);
-		//fprintf(f, "%uc", log_console_flag);
-		fprintf(f, "%uc", log_file_flag);
-		fprintf(f, "%s",  log_path.String());
-		// advanced tab
-		fprintf(f, "%ld", max_connections);
+	//logging tab
+	m.AddBool("log_console_flag", log_console_flag);
+	m.AddBool("log_file_flag", log_file_flag);
+	m.AddString("log_path", log_path);
 	
-		fprintf(f, "%uc", is_zoomed);
-		fprintf(f, "%f",  last_width);
-		fprintf(f, "%f",  last_height);
-		*/
+	//advance tab
+	m.AddInt16("max_connections", max_connections);
+	
+	//windows' position and size
+	m.AddRect("frame", frame);
+	m.AddRect("setwindow_frame", setwindow_frame);
+	m.AddBool("is_zoomed", is_zoomed);
+	m.AddFloat("last_width", last_width);
+	m.AddFloat("last_height", last_height);
+		
+	if(find_directory(B_USER_SETTINGS_DIRECTORY, &p) != B_OK)
+		return B_ERROR;
+	p.Append(STR_SETTINGS_FILE_NAME);
+	
+	f.SetTo(p.Path(), B_WRITE_ONLY| B_ERASE_FILE| B_CREATE_FILE);
+	if(f.InitCheck()!=B_OK)
+		return B_ERROR;
+	
+	if(m.Flatten(&f)!=B_OK)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+status_t
+PoorManWindow::StartServer()
+{
+	if(NULL == fServer)
+		fServer = new PoorManServer(
+			web_directory.String(),
+			max_connections,
+			dir_list_flag,
+			index_file_name.String()
+		);
+	
+	poorman_log("Starting up... ");
+	if(fServer->Run() != B_OK){
+		return B_ERROR;
 	}
-	fclose(f);
+	
+	status = true;
+	UpdateStatusLabelAndMenuItem();
+	poorman_log("done.\n", false, INADDR_NONE, GREEN);
+	
+	return B_OK;
+}
+
+status_t
+PoorManWindow::StopServer()
+{
+	if(NULL == fServer)
+		return B_ERROR;
+	
+	poorman_log("Shutting down.\n");
+	fServer->Stop();
+	status = false;
+	UpdateStatusLabelAndMenuItem();
+	return B_OK;
+}
+
+void
+PoorManWindow::SetLogPath(const char* str)
+{
+	if(log_path == str)
+		return;
+	
+	BFile* temp = new BFile(str, B_CREATE_FILE|B_WRITE_ONLY|B_OPEN_AT_END);
+	
+	if(temp->InitCheck() != B_OK){
+		delete temp;
+		return;
+	}
+	
+	if(pthread_rwlock_wrlock(&fLogFileLock) == 0){
+		delete fLogFile;
+		fLogFile = temp;
+		pthread_rwlock_unlock(&fLogFileLock);
+	} else {
+		delete temp;
+		return;
+	}
+	
+	log_path.SetTo(str);
 }
