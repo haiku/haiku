@@ -198,6 +198,7 @@ protected:
 };
 
 class Error : public AbstractTraceEntry {
+public:
 	Error(TCPEndpoint* endpoint, const char* error, int32 line)
 		:
 		fEndpoint(endpoint),
