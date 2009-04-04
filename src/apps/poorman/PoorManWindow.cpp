@@ -279,15 +279,15 @@ PoorManWindow::MessageReceived(BMessage* message)
 		if(message->FindData("time_t", B_TIME_TYPE, &pointer, &size) != B_OK)
 			time = -1;
 		else
-			time = *static_cast<time_t*>(pointer);
+			time = *static_cast<const time_t*>(pointer);
 		if(message->FindData("in_addr_t", B_ANY_TYPE, &pointer, &size) != B_OK)
 			address = INADDR_NONE;
 		else
-			address = *static_cast<in_addr_t*>(pointer);
+			address = *static_cast<const in_addr_t*>(pointer);
 		if(message->FindData("rgb_color", B_RGB_COLOR_TYPE, &pointer, &size) != B_OK)
 			color = BLACK;
 		else
-			color = *static_cast<rgb_color*>(pointer);
+			color = *static_cast<const rgb_color*>(pointer);
 		
 		if(time != -1){
 			char timeString[26];
