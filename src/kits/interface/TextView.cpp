@@ -1658,7 +1658,24 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 
 	_CancelInputMethod();
 
-	_SetRunArray(startOffset, endOffset, inRuns);
+	const text_run_array *runs = inRuns;
+
+	text_run_array oneRun;
+	
+	if (!fStylable) {
+		// When the text view is not stylable, we always set the whole text's
+		// style with the first run and ignore the offsets 
+		if (inRuns->count == 0)
+			return;
+		startOffset = 0;
+		endOffset = fText->Length();
+		oneRun.count = 1;
+		oneRun.runs[0] = inRuns->runs[0];
+		oneRun.runs[0].offset = 0;		
+		runs = &oneRun;
+	}
+	
+	_SetRunArray(startOffset, endOffset, runs);
 
 	_Refresh(startOffset, endOffset, true, false);
 }
@@ -2960,7 +2977,7 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	// update the style runs
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
 
-	if (inRuns != NULL) {
+	if (fStylable && (inRuns != NULL)) {
 		_SetRunArray(inOffset, inOffset + inLength, inRuns);
 	} else {
 		// apply nullStyle to inserted text
