@@ -214,7 +214,17 @@ CharacterView::MinSize()
 void
 CharacterView::FrameResized(float width, float height)
 {
-	_UpdateSize();
+	// Scroll to character
+
+	if (!fHasTopCharacter)
+		return;
+
+	BRect frame = _FrameFor(fTopCharacter);
+	if (!frame.IsValid())
+		return;
+
+	BView::ScrollTo(0, frame.top - fTopOffset);
+	fHasTopCharacter = false;
 }
 
 
@@ -396,6 +406,7 @@ CharacterView::Draw(BRect updateRect)
 void
 CharacterView::DoLayout()
 {
+	fHasTopCharacter = _GetTopmostCharacter(fTopCharacter, fTopOffset);
 	_UpdateSize();
 }
 
@@ -408,7 +419,7 @@ CharacterView::_BlockAt(BPoint point)
 		if (!IsShowingBlock(i))
 			continue;
 
-		if (fTitleTops[i] < point.y
+		if (fTitleTops[i] <= point.y
 			&& (i == kNumUnicodeBlocks - 1 || fTitleTops[i + 1] > point.y))
 			return i;
 	}
@@ -535,6 +546,57 @@ CharacterView::_UpdateSize()
 	}
 
 	Invalidate();
+}
+
+
+bool
+CharacterView::_GetTopmostCharacter(uint32& character, int32& offset)
+{
+	int32 top = (int32)Bounds().top;
+
+	int32 i = _BlockAt(BPoint(0, top));
+	if (i == -1)
+		return false;
+
+	int32 characterTop = fTitleTops[i] + fTitleHeight;
+	if (characterTop > top) {
+		character = kUnicodeBlocks[i].start;
+		offset = characterTop - top;
+		return true;
+	}
+
+	int32 lines = (top - characterTop + fCharacterHeight - 1)
+		/ fCharacterHeight;
+
+	character = kUnicodeBlocks[i].start + lines * fCharactersPerLine;
+	offset = top - characterTop - lines * fCharacterHeight;
+	return true;
+}
+
+
+BRect
+CharacterView::_FrameFor(uint32 character)
+{
+	// find block containing the character
+	
+	// TODO: could use binary search here
+
+	for (uint32 i = 0; i < kNumUnicodeBlocks; i++) {
+		if (kUnicodeBlocks[i].end < character)
+			continue;
+		if (kUnicodeBlocks[i].start > character) {
+			// Character is not mapped
+			return BRect();
+		}
+
+		int32 diff = character - kUnicodeBlocks[i].start;
+		int32 y = fTitleTops[i] + fTitleHeight + diff / fCharactersPerLine;
+		int32 x = fGap / 2 + diff % fCharactersPerLine;
+
+		return BRect(x, y, x + fCharacterWidth + fGap, y + fCharacterHeight);
+	}
+
+	return BRect();
 }
 
 

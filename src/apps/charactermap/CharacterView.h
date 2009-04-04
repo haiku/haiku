@@ -60,6 +60,9 @@ private:
 			bool 			_GetCharacterAt(BPoint point, uint32& character,
 								BRect* _frame = NULL);
 			void			_UpdateSize();
+			bool			_GetTopmostCharacter(uint32& character,
+								int32& offset);
+			BRect			_FrameFor(uint32 character);
 			void			_CopyToClipboard(const char* text);
 
 private:
@@ -69,6 +72,9 @@ private:
 			bool			fHasCharacter;
 			uint32			fCurrentCharacter;
 			BRect			fCurrentCharacterFrame;
+			bool			fHasTopCharacter;
+			uint32			fTopCharacter;
+			int32			fTopOffset;
 
 			bool			fShowPrivateBlocks;
 			bool			fShowContainedBlocksOnly;
