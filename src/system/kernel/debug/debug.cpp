@@ -743,7 +743,8 @@ enter_kernel_debugger(const char* message)
 	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
 	sPreviousDprintfState = set_dprintf_enabled(true);
 
-	if (sDebuggerOnCPU != smp_get_current_cpu() && smp_get_num_cpus() > 1) {
+	if (!gKernelStartup && sDebuggerOnCPU != smp_get_current_cpu()
+		&& smp_get_num_cpus() > 1) {
 		// First entry on a MP system, send a halt request to all of the other
 		// CPUs. Should they try to enter the debugger they will be cought in
 		// the loop above.
