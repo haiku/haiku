@@ -2,8 +2,10 @@
 
 # Make sure all apps have a MIME DB entry.
 
-mimeset -apps -f /boot/system/apps
-mimeset -f /boot/system/documentation
-mimeset -apps -f /boot/system/preferences
-mimeset -apps -f /boot/system/servers
-mimeset -apps -f /boot/apps
+SYSTEM=$(/bin/finddir B_SYSTEM_DIRECTORY 2>/dev/null || echo "/boot/beos")
+
+mimeset -apps -f "$SYSTEM/apps"
+mimeset       -f "$SYSTEM/documentation"
+mimeset -apps -f "$SYSTEM/preferences"
+mimeset -apps -f "$SYSTEM/servers"
+mimeset -apps -f "/boot/apps"
