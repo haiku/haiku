@@ -217,14 +217,14 @@ main(int argc, char *argv[])
 		} else {
 			/* else what? */
 			/* this can not happen! */
-			printf("Serious internal error; contact support\n");
+			fprintf(stderr, "Serious internal error; contact support\n");
 		}
 	}
 
 	/* Error messages and return code setting */
 
 	if (status == WRONG_DIR_TYPE) {
-		printf("%s: unrecognized directory_which constant \'%s\'\n", argv[0],
+		fprintf(stderr, "%s: unrecognized directory_which constant \'%s\'\n", argv[0],
 			argv[directoryArgNr]);
 		returnCode = 252;
 	}
