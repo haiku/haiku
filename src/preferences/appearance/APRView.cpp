@@ -197,12 +197,14 @@ APRView::MessageReceived(BMessage *msg)
 			UpdateControls();
 			UpdateAllColors();
 
-			BMenuItem *item = fDecorMenu->FindItem("Default");
-			if (item) {
-				item->SetMarked(true);
-				#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-				BPrivate::set_decorator(fDecorMenu->IndexOf(item));
-				#endif
+			if (fDecorMenu) {
+				BMenuItem *item = fDecorMenu->FindItem("Default");
+				if (item) {
+					item->SetMarked(true);
+					#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+					BPrivate::set_decorator(fDecorMenu->IndexOf(item));
+					#endif
+				}
 			}
 			Window()->PostMessage(kMsgUpdate);
 			break;
