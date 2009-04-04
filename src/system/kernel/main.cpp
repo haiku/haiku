@@ -189,6 +189,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		swap_init();
 #endif
 
+		// Start a thread to finish initializing the rest of the system. Note,
+		// it won't be scheduled before calling scheduler_start() (on any CPU).
+		TRACE("spawning main2 thread\n");
+		thread_id thread = spawn_kernel_thread(&main2, "main2",
+			B_NORMAL_PRIORITY, NULL);
+		send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
 		// bring up the AP cpus in a lock step fashion
 		TRACE("waking up AP cpus\n");
 		sCpuRendezvous = sCpuRendezvous2 = 0;
@@ -202,16 +209,9 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_cpu_rendezvous(&sCpuRendezvous2, 0);
 			// release the AP cpus to go enter the scheduler
 
-		TRACE("enabling interrupts and starting scheduler on cpu 0\n");
-		enable_interrupts();
+		TRACE("starting scheduler on cpu 0 and enabling interrupts\n");
 		scheduler_start();
-
-		// start a thread to finish initializing the rest of the system
-		TRACE("starting main2 thread\n");
-		thread_id thread = spawn_kernel_thread(&main2, "main2",
-			B_NORMAL_PRIORITY, NULL);
-		TRACE("resuming main2 thread...\n");
-		resume_thread(thread);
+		enable_interrupts();
 	} else {
 		// lets make sure we're in sync with the main cpu
 		// the boot processor has probably been sending us
@@ -228,8 +228,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
 
 		// welcome to the machine
-		enable_interrupts();
 		scheduler_start();
+		enable_interrupts();
 	}
 
 	TRACE("main: done... begin idle loop on cpu %d\n", currentCPU);

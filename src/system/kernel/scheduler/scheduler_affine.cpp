@@ -49,13 +49,13 @@ const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
 struct scheduler_thread_data {
-	scheduler_thread_data(void) 
+	scheduler_thread_data(void)
 	{
 		Init();
 	}
-	
-	
-	void Init() 
+
+
+	void Init()
 	{
 		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 		fLastQuantumSlot = 0;
@@ -69,7 +69,7 @@ struct scheduler_thread_data {
 			quantumAverage += fLastThreadQuantums[i];
 		return quantumAverage / kMaxTrackingQuantums;
 	}
-	
+
 	int32 fLastThreadQuantums[kMaxTrackingQuantums];
 	int16 fLastQuantumSlot;
 	int32 fLastQueue;
@@ -96,13 +96,13 @@ dump_run_queue(int argc, char **argv)
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		thread = sRunQueue[i];
-		kprintf("Run queue for cpu %ld (%ld threads)\n", i, 
+		kprintf("Run queue for cpu %ld (%ld threads)\n", i,
 			sRunQueueSize[i]);
 		if (sRunQueueSize[i] > 0) {
 			kprintf("thread      id      priority  avg. quantum  name\n");
 			while (thread) {
 				kprintf("%p  %-7ld %-8ld  %-12ld  %s\n", thread, thread->id,
-					thread->priority, 
+					thread->priority,
 					thread->scheduler_data->GetAverageQuantumUsage(),
 					thread->name);
 				thread = thread->queue_next;
@@ -126,7 +126,7 @@ affine_get_most_idle_cpu()
 		if (targetCPU < 0 || sRunQueueSize[i] < sRunQueueSize[targetCPU])
 			targetCPU = i;
 	}
-	
+
 	return targetCPU;
 }
 
@@ -151,7 +151,7 @@ static void
 affine_enqueue_in_run_queue(struct thread *thread)
 {
 	int32 targetCPU = -1;
-	if (thread->pinned_to_cpu > 0) 
+	if (thread->pinned_to_cpu > 0)
 		targetCPU = thread->previous_cpu->cpu_num;
 	else if (thread->previous_cpu == NULL || thread->previous_cpu->disabled)
 		targetCPU = affine_get_most_idle_cpu();
@@ -183,14 +183,14 @@ affine_enqueue_in_run_queue(struct thread *thread)
 			sRunQueue[targetCPU] = thread;
 		thread->scheduler_data->fLastQueue = targetCPU;
 	}
-	
+
 	thread->next_priority = thread->priority;
 
 	if (thread->priority != B_IDLE_PRIORITY && targetCPU != smp_get_current_cpu()) {
 		int32 idleCPU = targetCPU;
 		if ((sIdleCPUs & (1 << targetCPU)) == 0) {
 			idleCPU = affine_get_next_idle_cpu();
-			// no idle CPUs are available 
+			// no idle CPUs are available
 			// to try and grab this task
 			if (idleCPU < 0)
 				return;
@@ -214,7 +214,7 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 	}
 	sRunQueueSize[currentCPU]--;
 	resultThread->scheduler_data->fLastQueue = -1;
-	
+
 	return resultThread;
 }
 
@@ -256,17 +256,17 @@ static struct thread *steal_thread_from_other_cpus(int32 currentCPU)
 			if (nextThread->pinned_to_cpu > 0) {
 				prevThread = nextThread;
 				nextThread = prevThread->queue_next;
-			} else 
+			} else
 				break;
 		} while (nextThread->queue_next != NULL);
-		
+
 		// we reached the end of the queue without finding an
 		// eligible thread.
 		if (nextThread->pinned_to_cpu > 0)
 			nextThread = NULL;
-		
-		// dequeue the thread we're going to steal	
-		if (nextThread != NULL) 
+
+		// dequeue the thread we're going to steal
+		if (nextThread != NULL)
 			dequeue_from_run_queue(prevThread, targetCPU);
 	}
 
@@ -297,11 +297,11 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 
 	// search run queues for the thread
 	// TODO: keep track of the queue a thread is in (perhaps in a
-	// data pointer on the thread struct) so we only have to walk 
+	// data pointer on the thread struct) so we only have to walk
 	// that exact queue to find it.
 	struct thread *item = NULL, *prev = NULL;
 	targetCPU = thread->scheduler_data->fLastQueue;
-	
+
 	for (item = sRunQueue[targetCPU], prev = NULL; item && item != thread;
 			item = item->queue_next) {
 			if (prev)
@@ -404,7 +404,7 @@ affine_reschedule(void)
 			// skip normal threads sometimes (roughly 20%)
 			if (_rand() > 0x1a00)
 				break;
-			
+
 			// skip until next lower priority
 			int32 priority = nextThread->priority;
 			do {
@@ -412,7 +412,7 @@ affine_reschedule(void)
 				nextThread = nextThread->queue_next;
 			} while (nextThread->queue_next != NULL
 				&& priority == nextThread->queue_next->priority);
-		} 
+		}
 		// extract selected thread from the run queue
 		dequeue_from_run_queue(prevThread, currentCPU);
 	} else {
@@ -423,7 +423,7 @@ affine_reschedule(void)
 			nextThread = NULL;
 		if (nextThread == NULL) {
 			TRACE(("No threads to steal, grabbing from idle pool\n"));
-			// no other CPU had anything for us to take, 
+			// no other CPU had anything for us to take,
 			// grab one from the kernel's idle pool
 			nextThread = sIdleThreads;
 			if (nextThread)
@@ -447,7 +447,7 @@ affine_reschedule(void)
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		bigtime_t activeTime = 
+		bigtime_t activeTime =
 			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
 			+ (oldThread->user_time - oldThread->cpu->last_user_time);
 		oldThread->cpu->active_time += activeTime;
@@ -468,8 +468,8 @@ affine_reschedule(void)
 		bigtime_t quantum = kMinThreadQuantum;
 		// give CPU-bound background threads a larger quantum size
 		// to minimize unnecessary context switches if the system is idle
-		if (nextThread->scheduler_data->GetAverageQuantumUsage() 
-			> (kMinThreadQuantum >> 1) 
+		if (nextThread->scheduler_data->GetAverageQuantumUsage()
+			> (kMinThreadQuantum >> 1)
 			&& nextThread->priority < B_NORMAL_PRIORITY)
 			quantum = kMaxThreadQuantum;
 		timer *quantumTimer = &oldThread->cpu->quantum_timer;
@@ -516,19 +516,17 @@ affine_on_thread_destroy(struct thread* thread)
 }
 
 
-/*!	This starts the scheduler. Must be run under the context of
-	the initial idle thread.
+/*!	This starts the scheduler. Must be run in the context of the initial idle
+	thread. Interrupts must be disabled and will be disabled when returning.
 */
 static void
 affine_start(void)
 {
-	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
 	affine_reschedule();
 
 	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
 }
 
 

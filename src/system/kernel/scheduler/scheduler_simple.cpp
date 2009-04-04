@@ -261,7 +261,7 @@ simple_reschedule(void)
 		// CPU is disabled - service any threads we may have that are pinned,
 		// otherwise just select the idle thread
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
-			if (nextThread->pinned_to_cpu > 0 && 
+			if (nextThread->pinned_to_cpu > 0 &&
 				nextThread->previous_cpu == oldThread->cpu)
 					break;
 			prevThread = nextThread;
@@ -401,19 +401,17 @@ simple_on_thread_destroy(struct thread* thread)
 }
 
 
-/*!	This starts the scheduler. Must be run under the context of
-	the initial idle thread.
+/*!	This starts the scheduler. Must be run in the context of the initial idle
+	thread. Interrupts must be disabled and will be disabled when returning.
 */
 static void
 simple_start(void)
 {
-	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
 	simple_reschedule();
 
 	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
 }
 
 
