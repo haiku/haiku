@@ -216,7 +216,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	} else {
 		thread = inthread;
 	}
-	
+
 	if (!recycled)
 		scheduler_on_thread_create(thread);
 
@@ -259,7 +259,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->select_infos = NULL;
 	thread->post_interrupt_callback = NULL;
 	thread->post_interrupt_data = NULL;
-	
+
 	sprintf(temp, "thread_%ld_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);
 	if (thread->exit.sem < B_OK)
@@ -277,7 +277,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 
 	if (arch_thread_init_thread_struct(thread) < B_OK)
 		goto err4;
-	
+
 	return thread;
 
 err4:
@@ -2107,7 +2107,7 @@ thread_init(kernel_args *args)
 		B_DISPLAY_PRIORITY, NULL);
 	if (undertakerThread < 0)
 		panic("Failed to create undertaker thread!");
-	resume_thread(undertakerThread);
+	send_signal_etc(undertakerThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	// set up some debugger commands
 	add_debugger_command_etc("threads", &dump_thread_list, "List all threads",
