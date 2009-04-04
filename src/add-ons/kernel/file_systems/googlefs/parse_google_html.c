@@ -24,12 +24,17 @@
 
 #ifdef TESTME
 #define BUFSZ (128*1024)
+int dbgstep = 0;
+#define PRST printf(DBG "step %d\n", dbgstep++)
+#else
+#define PRST {}
 #endif
 
 //old
 //#define G_BEGIN_URL "<p class=g><a class=l href=\""
 //#define G_BEGIN_URL "<div class=g><a class=l href=\""
-#define G_BEGIN_URL "<div class=g><a href=\""
+//#define G_BEGIN_URL "<div class=g><a href=\""
+#define G_BEGIN_URL "<li class=g><h3 class=r><a href=\""
 //#define G_END_URL "\">"
 #define G_END_URL "\" class=l>"
 //#define G_BEGIN_NAME 
@@ -55,26 +60,41 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		return EINVAL;
 	/* sanity checks */
 	printf(DBG"sanity check...\n");
-	if (strstr(html, "<html><head>") != html)
-		return EINVAL;
+	PRST;
+	/* google now sends <!doctype html><head> sometimes... */
+	if (strstr(html, "<!doctype html><head>") != html) {
+		if (strstr(html, "<html><head>") != html)
+			return EINVAL;
+	}
+	PRST;
 //	p = strstr(html, "<title>Google Search:");
 	p = strstr(html, "Google");
 	if (!p) return EINVAL;
-	p = strstr(html, "</head><body");
+	PRST;
+	p = strstr(html, "<body");
 	if (!p) return EINVAL;
-	p = strstr(html, ">Results <b>");
+	PRST;
+	p = strstr(html, ">&nbsp;Results <b>");
 	if (!p) return EINVAL;
-	p+= strlen(">Results <b>");
+	PRST;
+	p+= strlen(">&nbsp;Results <b>");
 	startid = strtol(p, &p, 10);
 	if (!p) return EINVAL;
+	PRST;
 	p = strstr(html, "</b> - <b>");
 	p+= strlen("</b> - <b>");
 	if (!p) return EINVAL;
+	PRST;
 	lastid = strtol(p, &p, 10);
 	if (!p) return EINVAL;
+	PRST;
 	maxres = lastid - startid + 1;
 	printf(DBG"getting %ld results (%ld to %ld)\n", maxres, startid, lastid);
 	
+	p = strstr(html, "Search Results<");
+	if (!p) return EINVAL;
+	PRST;
+
 	
 	printf(DBG"parsing...\n");
 	do {
@@ -82,6 +102,9 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		long itemlen;
 		char *tmp;
 		int i;
+#ifdef TESTME
+		dbgstep = 0;
+#endif
 		nres = malloc(sizeof(struct google_result));
 		if (!nres) {
 			// XXX: cleanup!
@@ -90,6 +113,7 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		memset(nres, 0, sizeof(struct google_result));
 		nres->id = startid + numres; //- 1;
 
+		PRST;
 		/* find url */
 		// <p class=g><a href=URL>
 		if (!p) break;
@@ -98,12 +122,14 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		else
 			p = strstr(p, G_BEGIN_URL);
 		if (!p) break;
+		PRST;
 		p+= strlen(G_BEGIN_URL);
 		nextresult = strstr(p, G_BEGIN_URL);
 		//printf(DBG"[%ld] found token 1\n", numres);
 		item = p;
 		p = strstr(p, G_END_URL);
 		if (!p) break;
+		PRST;
 		p+= strlen(G_END_URL);
 		//printf(DBG"[%ld] found token 2\n", numres);
 		itemlen = p - item - strlen(G_END_URL);
@@ -116,6 +142,7 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		item = p;
 		p = strstr(p, G_END_NAME);
 		if (!p) break;
+		PRST;
 		p+= strlen(G_END_NAME);
 		//printf(DBG"[%ld] found token 3\n", numres);
 		itemlen = p - item - strlen(G_END_NAME);
@@ -127,10 +154,17 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		strncpy(q, item, itemlen);
 		q[itemlen] = '\0';
 		/* strip <*b> off */
+		PRST;
 		while ((tmp = strstr(q, "<b>")))
 			strcpy(tmp, tmp + 3);
 		while ((tmp = strstr(q, "</b>")))
 			strcpy(tmp, tmp + 4);
+		/* strip <*em> off */
+		PRST;
+		while ((tmp = strstr(q, "<em>")))
+			strcpy(tmp, tmp + 4);
+		while ((tmp = strstr(q, "</em>")))
+			strcpy(tmp, tmp + 5);
 		/* strip &foo; */
 		tmp = unentitify_string(q);
 		free(q);
@@ -139,6 +173,7 @@ int google_parse_results(const char *html, size_t htmlsize, struct google_result
 		strncpy(nres->name, tmp, GR_MAX_NAME-1);
 		nres->name[GR_MAX_NAME-1] = '\0';
 		free(tmp);
+		PRST;
 		
 #if 0
 		/* find snipset */

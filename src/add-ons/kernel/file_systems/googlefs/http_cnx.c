@@ -26,7 +26,14 @@
 
 #define HTTPVER "1.0"
 
-#define GOOGLEFS_UA "GoogleFS"
+//#define GOOGLEFS_UA "GoogleFS"
+//Mozilla/3.0 (compatible; NetPositive/2.2.2; BeOS)
+//Mozilla/5.0 (BeOS; U; BeOS BePC; en-US; rv:1.8.1.18) Gecko/20081114 BonEcho/2.0.0.18
+#ifdef __HAIKU__
+#define GOOGLEFS_UA "Mozilla/5.0 (compatible; GoogleFS/0.1; Haiku)"
+#else
+#define GOOGLEFS_UA "Mozilla/5.0 (compatible; GoogleFS/0.1; BeOS)"
+#endif
 
 #ifdef TESTME
 #define BUFSZ (128*1024)
@@ -125,7 +132,7 @@ status_t http_get(struct http_cnx *cnx, const char *url)
 	if (!req)
 		return B_NO_MEMORY;
 	/* no snprintf in kernel :( */
-	sprintf(req, "GET %s HTTP/"HTTPVER"\nUser-Agent: " GOOGLEFS_UA "/" "0.1" "\nAccept: */*\n\n", url);
+	sprintf(req, "GET %s HTTP/"HTTPVER"\r\nUser-Agent: " GOOGLEFS_UA "\r\nAccept: */*\r\n\r\n", url);
 	reqlen = strlen(req);
 	err = len = write(cnx->sock, req, reqlen);
 	if (len < 1)
