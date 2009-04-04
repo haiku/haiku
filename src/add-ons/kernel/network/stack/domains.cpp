@@ -220,11 +220,7 @@ domain_interface_control(net_domain_private* domain, int32 option,
 	if (device == NULL)
 		return ENODEV;
 
-	// The locking protocol dictates that if both the receive lock
-	// and domain locks are required, we MUST obtain the receive
-	// lock before the domain lock.
-	RecursiveLocker _1(device->receive_lock);
-	RecursiveLocker _2(domain->lock);
+	RecursiveLocker _(domain->lock);
 
 	net_interface* interface = find_interface(domain, name);
 	if (interface != NULL) {

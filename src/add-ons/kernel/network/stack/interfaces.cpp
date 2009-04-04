@@ -169,6 +169,8 @@ acquire_device_interface(net_device_interface* interface)
 static void
 notify_device_monitors(net_device_interface* interface, int32 event)
 {
+	RecursiveLocker _(interface->receive_lock);
+
 	DeviceMonitorList::Iterator iterator
 		= interface->monitor_funcs.GetIterator();
 	while (net_device_monitor* monitor = iterator.Next()) {
@@ -545,15 +547,9 @@ down_device_interface(net_device_interface* interface)
 	if (device->module->receive_data != NULL) {
 		thread_id readerThread = interface->reader_thread;
 
-		// one of the callers must hold a reference to the net_device_interface
-		// usually it is one of the net_interfaces.
-		recursive_lock_unlock(&interface->receive_lock);
-
 		// make sure the reader thread is gone before shutting down the interface
 		status_t status;
 		wait_for_thread(readerThread, &status);
-
-		recursive_lock_lock(&interface->receive_lock);
 	}
 }
 
@@ -768,12 +764,6 @@ device_removed(net_device* device)
 	// This is very complex, refer to delete_interface() for
 	// further details.
 
-	RecursiveLocker _(interface->receive_lock);
-
-	// this will possibly call:
-	//  remove_interface_from_domain() [domain gets locked]
-	//   delete_interface()
-	//    ... [see delete_interface()]
 	domain_removed_device_interface(interface);
 
 	notify_device_monitors(interface, B_DEVICE_BEING_REMOVED);
