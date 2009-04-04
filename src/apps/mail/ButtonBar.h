@@ -41,14 +41,13 @@ All rights reserved.
 
 struct BBDivider;
 
-class ButtonBar : public BBox {
+class ButtonBar : public BView {
 public:
 	ButtonBar(BRect frame, const char *name, uint8 enabledOffset,
 		uint8 disabledOffset, uint8 rollOffset, uint8 pressedOffset,
 		float Hmargin, float Vmargin, 
 		uint32 resizeMask = B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		int32 flags = B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_WILL_DRAW,
-		border_style border = B_FANCY_BORDER);
+		int32 flags = B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_WILL_DRAW);
 	virtual ~ButtonBar( void );
 		
 	// Hooks

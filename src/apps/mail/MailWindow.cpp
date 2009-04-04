@@ -493,11 +493,10 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (showButtonBar) {
 		BuildButtonBar();
 		fButtonBar->ShowLabels(showButtonBar);
-		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
-			MDR_DIALECT_CHOICE (true, true));
+		fButtonBar->Arrange(MDR_DIALECT_CHOICE(true, true));
 		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
-		fButtonBar->ResizeTo(Bounds().right+3, bbheight+1);
-		fButtonBar->MoveTo(-1, height-1);
+		fButtonBar->ResizeTo(Bounds().right, bbheight);
+		fButtonBar->MoveTo(0, height);
 		fButtonBar->Show();
 	} else
 		fButtonBar = NULL;
@@ -646,8 +645,8 @@ TMailWindow::UpdateViews()
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize( &bbwidth, &bbheight);
-		fButtonBar->ResizeTo(Bounds().right+3, bbheight+1);
-		fButtonBar->MoveTo(-1, nextY-1);
+		fButtonBar->ResizeTo(Bounds().right, bbheight);
+		fButtonBar->MoveTo(0, nextY);
 		nextY += bbheight + 1;
 		if (fButtonBar->IsHidden())
 			fButtonBar->Show();
