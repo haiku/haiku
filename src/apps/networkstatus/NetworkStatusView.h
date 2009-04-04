@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,12 +56,10 @@ class NetworkStatusView : public BView {
 		void			_Update(bool force = false);
 		void			_OpenNetworksPreferences();
 
-		BMessageRunner*	fMessageRunner;
 		BObjectList<BString> fInterfaces;
 		bool			fInDeskbar;
 		BBitmap*		fBitmaps[kStatusCount];
 		int32			fStatus;
-		int				fSocket;
 };
 
 #endif	// NETWORK_STATUS_VIEW_H

@@ -11,8 +11,14 @@
 
 #include "NetworkStatusView.h"
 
-#include "NetworkStatus.h"
-#include "NetworkStatusIcons.h"
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <unistd.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -29,22 +35,11 @@
 #include <String.h>
 #include <TextView.h>
 
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-#include <unistd.h>
+#include <net_notifications.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-// BONE compatibility
-#	define IF_NAMESIZE IFNAMSIZ
-#	define IFF_LINK 0
-#	define IFF_CONFIGURING 0
-#	define ifc_value ifc_val
-#endif
+#include "NetworkStatus.h"
+#include "NetworkStatusIcons.h"
+
 
 static const char *kStatusDescriptions[] = {
 	"Unknown",
@@ -57,15 +52,41 @@ static const char *kStatusDescriptions[] = {
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 
-const uint32 kMsgUpdate = 'updt';
 const uint32 kMsgShowConfiguration = 'shcf';
 const uint32 kMsgOpenNetworkPreferences = 'onwp';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
-const bigtime_t kUpdateInterval = 1000000;
-	// every second
+
+class SocketOpener {
+public:
+	SocketOpener()
+	{
+		fSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	}
+
+	~SocketOpener()
+	{
+		close(fSocket);
+	}
+
+	status_t InitCheck()
+	{
+		return fSocket >= 0 ? B_OK : B_ERROR;
+	}
+
+	operator int() const
+	{
+		return fSocket;
+	}
+
+private:
+	int	fSocket;
+};
+
+
+//	#pragma mark -
 
 
 NetworkStatusView::NetworkStatusView(BRect frame, int32 resizingMode,
@@ -111,8 +132,6 @@ NetworkStatusView::~NetworkStatusView()
 void
 NetworkStatusView::_Init()
 {
-	fMessageRunner = NULL;
-
 	for (int i = 0; i < kStatusCount; i++) {
 		fBitmaps[i] = NULL;
 	}
@@ -206,10 +225,9 @@ NetworkStatusView::AttachedToWindow()
 
 	SetLowColor(ViewColor());
 
-	BMessage update(kMsgUpdate);
-	fMessageRunner = new BMessageRunner(this, &update, kUpdateInterval);
+	start_watching_network(
+		B_WATCH_NETWORK_INTERFACE_CHANGES | B_WATCH_NETWORK_LINK_CHANGES, this);
 
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	_Update();
 }
 
@@ -217,8 +235,7 @@ NetworkStatusView::AttachedToWindow()
 void
 NetworkStatusView::DetachedFromWindow()
 {
-	delete fMessageRunner;
-	close(fSocket);
+	stop_watching_network(this);
 }
 
 
@@ -226,7 +243,7 @@ void
 NetworkStatusView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgUpdate:
+		case B_NETWORK_MONITOR:
 			_Update();
 			break;
 
@@ -276,8 +293,8 @@ void
 NetworkStatusView::_ShowConfiguration(BMessage* message)
 {
 	static const struct information_entry {
-		const char *label;
-		int32 control;
+		const char*	label;
+		int32		control;
 	} kInformationEntries[] = {
 		{ "Address", SIOCGIFADDR },
 		{ "Broadcast", SIOCGIFBRDADDR },
@@ -285,7 +302,11 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		{ NULL }
 	};
 
-	const char *name;
+	SocketOpener socket;
+	if (socket.InitCheck() != B_OK)
+		return;
+
+	const char* name;
 	if (message->FindString("interface", &name) != B_OK)
 		return;
 
@@ -298,7 +319,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	size_t boldLength = text.Length();
 
 	for (int i = 0; kInformationEntries[i].label; i++) {
-		if (ioctl(fSocket, kInformationEntries[i].control, &request,
+		if (ioctl(socket, kInformationEntries[i].control, &request,
 				sizeof(request)) < 0) {
 			continue;
 		}
@@ -341,7 +362,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 void
 NetworkStatusView::MouseDown(BPoint point)
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetAsyncAutoDestruct(true);
 	menu->SetFont(be_plain_font);
 
@@ -376,7 +397,7 @@ NetworkStatusView::MouseDown(BPoint point)
 void
 NetworkStatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "NetworkStatus\n"
+	BAlert* alert = new BAlert("about", "NetworkStatus\n"
 		"\twritten by Axel Dörfler and Hugo Santos\n"
 		"\tCopyright 2007, Haiku, Inc.\n", "Ok");
 	BTextView *view = alert->TextView();
@@ -407,12 +428,16 @@ NetworkStatusView::_PrepareRequest(struct ifreq& request, const char* name)
 int32
 NetworkStatusView::_DetermineInterfaceStatus(const char* name)
 {
+	SocketOpener socket;
+	if (socket.InitCheck() != B_OK)
+		return kStatusUnknown;
+
 	ifreq request;
 	if (!_PrepareRequest(request, name))
 		return kStatusUnknown;
 
 	uint32 flags = 0;
-	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
+	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
 		flags = request.ifr_flags;
 
 	int32 status = kStatusNoLink;
@@ -431,29 +456,33 @@ NetworkStatusView::_DetermineInterfaceStatus(const char* name)
 void
 NetworkStatusView::_Update(bool force)
 {
+	SocketOpener socket;
+	if (socket.InitCheck() != B_OK)
+		return;
+
 	// iterate over all interfaces and retrieve minimal status
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
 		return;
 
 	uint32 count = (uint32)config.ifc_value;
 	if (count == 0)
 		return;
 
-	void *buffer = malloc(count * sizeof(struct ifreq));
+	void* buffer = malloc(count * sizeof(struct ifreq));
 	if (buffer == NULL)
 		return;
 
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_buf = buffer;
-	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
 		free(buffer);
 		return;
 	}
 
-	ifreq *interface = (ifreq *)buffer;
+	ifreq* interface = (ifreq*)buffer;
 
 	int32 oldStatus = fStatus;
 	fStatus = kStatusUnknown;
@@ -481,15 +510,15 @@ NetworkStatusView::_Update(bool force)
 void
 NetworkStatusView::_OpenNetworksPreferences()
 {
-	status_t ret = be_roster->Launch("application/x-vnd.Haiku-Network");
-	if (ret < B_OK) {
+	status_t status = be_roster->Launch("application/x-vnd.Haiku-Network");
+	if (status < B_OK) {
 		BString errorMessage("Launching the Network preflet failed.\n\n"
 			"Error: ");
-		errorMessage << strerror(ret);
+		errorMessage << strerror(status);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
 			"Ok");
-		// asynchronous alert in order to not block replicant host
-		// application
+
+		// asynchronous alert in order to not block replicant host application
 		alert->Go(NULL);
 	}
 }
