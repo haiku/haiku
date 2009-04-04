@@ -1,14 +1,15 @@
 /*
- * finddir.c - 
- * (c) 2002, Sebastian Nozzi <sebnozzi@gmx.net>
- * 08/24/2004 - Francois Revol - added -l option.
+ * Copyright 2002, Sebastian Nozzi <sebnozzi@gmx.net>.
+ * Copyright 2004, Francois Revol.
+ *
+ * Distributed under the terms of the MIT License.
  */
-
-#include <FindDirectory.h>
-#include <fs_info.h>
 
 #include <stdio.h>
 #include <string.h>
+
+#include <FindDirectory.h>
+#include <fs_info.h>
 
 
 #define NO_ERRORS			0
@@ -20,25 +21,34 @@ typedef struct {
 	directory_which value;
 } directoryType;
 
-#define KEYVALUE_PAIR(key) {#key,key}
+#define KEYVALUE_PAIR(key) {#key, key}
 
 directoryType directoryTypes[] = {
+	// Generic directories
 	KEYVALUE_PAIR(B_DESKTOP_DIRECTORY),
 	KEYVALUE_PAIR(B_TRASH_DIRECTORY),
 	KEYVALUE_PAIR(B_APPS_DIRECTORY),
 	KEYVALUE_PAIR(B_PREFERENCES_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_SYSTEM_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_ADDONS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_BOOT_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_FONTS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_LIB_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_SERVERS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_APPS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_BIN_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_ETC_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_DOCUMENTATION_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_PREFERENCES_DIRECTORY),
+	KEYVALUE_PAIR(B_UTILITIES_DIRECTORY),
+
+	// System directories
+	KEYVALUE_PAIR(B_SYSTEM_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_ADDONS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_BOOT_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_FONTS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_LIB_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_SERVERS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_APPS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_BIN_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_ETC_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_DOCUMENTATION_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_PREFERENCES_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_SYSTEM_DATA_DIRECTORY),
+
+	// Common directories
 	KEYVALUE_PAIR(B_COMMON_DIRECTORY),
 	KEYVALUE_PAIR(B_COMMON_SYSTEM_DIRECTORY),
 	KEYVALUE_PAIR(B_COMMON_ADDONS_DIRECTORY),
@@ -55,6 +65,12 @@ directoryType directoryTypes[] = {
 	KEYVALUE_PAIR(B_COMMON_SPOOL_DIRECTORY),
 	KEYVALUE_PAIR(B_COMMON_TEMP_DIRECTORY),
 	KEYVALUE_PAIR(B_COMMON_VAR_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_DATA_DIRECTORY),
+
+	// User directories
 	KEYVALUE_PAIR(B_USER_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_CONFIG_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_ADDONS_DIRECTORY),
@@ -63,23 +79,32 @@ directoryType directoryTypes[] = {
 	KEYVALUE_PAIR(B_USER_LIB_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_SETTINGS_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_DESKBAR_DIRECTORY),
-	/* some more */
+	KEYVALUE_PAIR(B_USER_PRINTERS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_DATA_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_CACHE_DIRECTORY),
+
+	// Legacy system directories
+	KEYVALUE_PAIR(B_BEOS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_SYSTEM_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_ADDONS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_BOOT_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_FONTS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_LIB_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_SERVERS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_APPS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_BIN_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_ETC_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_DOCUMENTATION_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_PREFERENCES_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_TRANSLATORS_DIRECTORY),
 	KEYVALUE_PAIR(B_BEOS_MEDIA_NODES_DIRECTORY),
 	KEYVALUE_PAIR(B_BEOS_SOUNDS_DIRECTORY),
-	KEYVALUE_PAIR(B_BEOS_TRANSLATORS_DIRECTORY),
-	KEYVALUE_PAIR(B_COMMON_MEDIA_NODES_DIRECTORY),
-	KEYVALUE_PAIR(B_COMMON_SOUNDS_DIRECTORY),
-	KEYVALUE_PAIR(B_COMMON_TRANSLATORS_DIRECTORY),
-	KEYVALUE_PAIR(B_USER_MEDIA_NODES_DIRECTORY),
-	KEYVALUE_PAIR(B_USER_PRINTERS_DIRECTORY),
-	KEYVALUE_PAIR(B_USER_SOUNDS_DIRECTORY),
-	KEYVALUE_PAIR(B_USER_TRANSLATORS_DIRECTORY),
-	KEYVALUE_PAIR(B_UTILITIES_DIRECTORY),
-#ifdef B_BEOS_VERSION_DANO
-	/* Dano specific */
-	KEYVALUE_PAIR(B_ROOT_DIRECTORY),
-#endif /* B_BEOS_VERSION_DANO */
-	{NULL,B_USER_DESKBAR_DIRECTORY}
+	KEYVALUE_PAIR(B_BEOS_DATA_DIRECTORY),
+
+	{NULL, B_USER_DESKBAR_DIRECTORY}
 };
 
 
@@ -95,13 +120,14 @@ listDirectoryWhich(void)
 
 
 static bool
-retrieveDirValue(directoryType *list, const char *key, directory_which *value_out)
+retrieveDirValue(directoryType *list, const char *key,
+	directory_which *valueOut)
 {
 	unsigned i = 0;
 	
 	while (list[i].key != NULL) {
 		if (strcmp(list[i].key, key) == 0) {
-			*value_out = list[i].value;
+			*valueOut = list[i].value;
 			return true;
 		}
 
@@ -173,10 +199,8 @@ main(int argc, char *argv[])
 	if (status == NO_ERRORS && argc > directoryArgNr) {
 		/* get directory constant from next argument */
 
-		if (retrieveDirValue(directoryTypes, argv[directoryArgNr], &dirType) == false) {
+		if (!retrieveDirValue(directoryTypes, argv[directoryArgNr], &dirType))
 			status = WRONG_DIR_TYPE;
-		}
-		
 	} else {
 		status = ARGUMENT_MISSING;
 	}
@@ -186,10 +210,8 @@ main(int argc, char *argv[])
 	if (status == NO_ERRORS) {
 		/* Question: would B_PATH_NAME_LENGTH alone have been enough? */
 		char buffer[B_PATH_NAME_LENGTH+B_FILE_NAME_LENGTH];
-		status_t result;
-		
-		result = find_directory (dirType, volume, /*create it*/ false, buffer, sizeof(buffer));
-		
+		status_t result = find_directory (dirType, volume, false, buffer,
+			sizeof(buffer));
 		if (result == B_OK) {
 			printf("%s\n", buffer);
 		} else {
@@ -202,7 +224,8 @@ main(int argc, char *argv[])
 	/* Error messages and return code setting */
 
 	if (status == WRONG_DIR_TYPE) {
-		printf("%s: unrecognized directory_which constant \'%s\'\n", argv[0], argv[directoryArgNr]);
+		printf("%s: unrecognized directory_which constant \'%s\'\n", argv[0],
+			argv[directoryArgNr]);
 		returnCode = 252;
 	}
 
@@ -210,7 +233,7 @@ main(int argc, char *argv[])
 		usageMsg();
 		returnCode = 255;
 	}
-	
+
 	return returnCode;
 }
 
