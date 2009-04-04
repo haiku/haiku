@@ -177,6 +177,50 @@ protected:
 	tcp_state		fState;
 };
 
+class Spawn : public AbstractTraceEntry {
+public:
+	Spawn(TCPEndpoint* listeningEndpoint, TCPEndpoint* spawnedEndpoint)
+		:
+		fListeningEndpoint(listeningEndpoint),
+		fSpawnedEndpoint(spawnedEndpoint)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p spawns %p", fListeningEndpoint, fSpawnedEndpoint);
+	}
+
+protected:
+	TCPEndpoint*	fListeningEndpoint;
+	TCPEndpoint*	fSpawnedEndpoint;
+};
+
+class Error : public AbstractTraceEntry {
+	Error(TCPEndpoint* endpoint, const char* error, int32 line)
+		:
+		fEndpoint(endpoint),
+		fLine(line),
+		fError(error),
+		fState(endpoint->State())
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p (%12s) error at line %ld: %s", fEndpoint,
+			name_for_state(fState), fLine, fError);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	int32			fLine;
+	const char*		fError;
+	tcp_state		fState;
+};
+
 class Timer : public AbstractTraceEntry {
 public:
 	Timer(TCPEndpoint* endpoint, const char* which)
@@ -1309,7 +1353,8 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 	ProtocolSocket::Open();
 
 	fState = SYNCHRONIZE_RECEIVED;
-	T(State(this));
+	T(Spawn(parent, this));
+
 	fManager = parent->fManager;
 
 	LocalAddress().SetTo(buffer->destination);
@@ -1318,11 +1363,14 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 	TRACE("Spawn()");
 
 	// TODO: proper error handling!
-	if (fManager->BindChild(this) < B_OK)
+	if (fManager->BindChild(this) != B_OK) {
+		T(Error(this, "binding failed", __LINE__));
 		return DROP;
-
-	if (_PrepareSendPath(*PeerAddress()) < B_OK)
+	}
+	if (_PrepareSendPath(*PeerAddress()) != B_OK) {
+		T(Error(this, "prepare send faild", __LINE__));
 		return DROP;
+	}
 
 	fOptions = parent->fOptions;
 	fAcceptSemaphore = parent->fAcceptSemaphore;
@@ -1330,8 +1378,10 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 	_PrepareReceivePath(segment);
 
 	// send SYN+ACK
-	if (_SendQueued() < B_OK)
+	if (_SendQueued() != B_OK) {
+		T(Error(this, "sending failed", __LINE__));
 		return DROP;
+	}
 
 	segment.flags &= ~TCP_FLAG_SYNCHRONIZE;
 		// we handled this flag now, it must not be set for further processing
@@ -1358,8 +1408,10 @@ TCPEndpoint::_ListenReceive(tcp_segment_header& segment, net_buffer* buffer)
 
 	// spawn new endpoint for accept()
 	net_socket* newSocket;
-	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
+	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK) {
+		T(Error(this, "spawning failed", __LINE__));
 		return DROP;
+	}
 
 	return ((TCPEndpoint *)newSocket->first_protocol)->_Spawn(this,
 		segment, buffer);
