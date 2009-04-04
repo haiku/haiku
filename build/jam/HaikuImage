@@ -51,8 +51,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProbe
 	DiskUsage DriveSetup CDPlayer Expander Icon-O-Matic Installer LaunchBox
 	Magnify Mail MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
-	PowerStatus ProcessController Screenshot ShowImage SoundRecorder StyledEdit
-	Terminal TextSearch TV Workspaces
+	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
+	StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
@@ -246,7 +246,7 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 AddDirectoryToHaikuImage home config be Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Magnify Mail MediaPlayer
-	MidiPlayer People Screenshot SoundRecorder StyledEdit Terminal TV
+	MidiPlayer People PoorMan Screenshot SoundRecorder StyledEdit Terminal TV
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
