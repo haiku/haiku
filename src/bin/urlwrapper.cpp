@@ -15,14 +15,16 @@
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <Debug.h>
 #include <Mime.h>
 #include <Message.h>
 #include <TypeConstants.h>
 #include <Roster.h>
 #include <String.h>
+
+#include <ctype.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <Debug.h>
 
 /* compile-time configuration */
 #include "urlwrapper.h"
@@ -206,7 +208,19 @@ UrlWrapperApp::~UrlWrapperApp()
 
 status_t UrlWrapperApp::UnurlString(BString &s)
 {
-	// TODO:WRITEME
+	// TODO: check for %00 and bail out!
+	int32 length = s.Length();
+	int i;
+	for (i = 0; s[i] && i < length - 2; i++) {
+		if (s[i] == '%' && isxdigit(s[i+1]) && isxdigit(s[i+2])) {
+			int c;
+			sscanf(s.String() + i + 1, "%02x", &c);
+			s.Remove(i, 3);
+			s.Insert((char)c, 1, i);
+			length -= 2;
+		}
+	}
+	
 	return B_OK;
 }
 
@@ -423,7 +437,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	if (u.proto == "file") {
 		BMessage m(B_REFS_RECEIVED);
 		entry_ref ref;
-		// UnurlString(path);
+		UnurlString(u.path);
 		if (get_ref_for_path(u.path.String(), &ref) < B_OK)
 			return;
 		m.AddRef("refs", &ref);
@@ -433,7 +447,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_QUERY
-	// XXX:TODO: unencode the formula + split options
+	// XXX:TODO: split options
 	if (u.proto == "query") {
 		// mktemp ?
 		BString qname("/tmp/query-url-temp-");
@@ -444,8 +458,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		BString s;
 		int32 v;
 		
-		// TODO:
-		// UnurlString(full);
+		UnurlString(u.full);
 		// TODO: handle options (list of attrs in the column, ...)
 
 		v = 'qybF'; // QuerY By Formula XXX: any #define for that ?
@@ -453,6 +466,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		s = "TextControl";
 		query.WriteAttr("_trk/focusedView", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
 		s = u.full;
+		PRINT(("QUERY='%s'\n", s.String()));
 		query.WriteAttr("_trk/qryinitstr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
 		query.WriteAttr("_trk/qrystr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
 		s = "application/x-vnd.Be-query";
