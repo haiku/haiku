@@ -1916,29 +1916,29 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 40);
-	item = new BMenuItem("40 x 40", message);
+	item = new BMenuItem("40 x 40", message, '2');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 48);
-	item = new BMenuItem("48 x 48", message);
+	item = new BMenuItem("48 x 48", message, '3');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 64);
-	item = new BMenuItem("64 x 64", message);
+	item = new BMenuItem("64 x 64", message, '4');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	menu->AddItem(iconSizeMenu);
 
-	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '2');
+	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '5');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("List View", new BMessage(kListMode), '3');
+	item = new BMenuItem("List View", new BMessage(kListMode), '6');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
