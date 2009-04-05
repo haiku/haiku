@@ -96,7 +96,12 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 		BPose *pose;
 		for (int32 i = 0; (pose = view->PoseAtIndex(i)); i++) {
 			if (pose->IsSelected()) {
-				score++;
+				if (pose->TargetModel()->IsFile())
+					score++;
+				if (pose->TargetModel()->IsDirectory())
+					score+=2;
+				if (pose->TargetModel()->IsSymLink())
+					score-=10;
 				pose->Select(false);
 			}
 			BPoint location = pose->Location();
