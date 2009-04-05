@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2008-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
+#include <memory>
 #include <stdio.h>
 
 #include <Application.h>
@@ -17,15 +18,27 @@
 #include "StringTest.h"
 #include "VerticalLineTest.h"
 
+
+struct test_info {
+	const char*				name;
+	Test*					(*create)();
+};
+
+const test_info kTestInfos[] = {
+	{ "ClippedLines",		ClippedLineTest::CreateTest },
+	{ "HorizontalLines",	HorizontalLineTest::CreateTest },
+	{ "RandomLines",		RandomLineTest::CreateTest },
+	{ "Strings",			StringTest::CreateTest },
+	{ "VerticalLines",		VerticalLineTest::CreateTest },
+	{ NULL, NULL }
+};
+
+
 class Benchmark : public BApplication {
 public:
-	Benchmark()
+	Benchmark(Test* test)
 		: BApplication("application/x-vnd.haiku-benchmark"),
-		  fTest(new ClippedLineTest),
-//		  fTest(new HorizontalLineTest),
-//		  fTest(new RandomLineTest),
-//		  fTest(new StringTest),
-//		  fTest(new VerticalLineTest),
+		  fTest(test),
 		  fTestWindow(NULL)
 	{
 	}
@@ -79,11 +92,51 @@ private:
 };
 
 
-// main
+static void
+print_test_list(bool error)
+{
+	FILE* out = (error ? stderr : stdout);
+
+	fprintf(out, "available tests:\n");
+
+	for (int32 i = 0; kTestInfos[i].name; i++)
+		fprintf(out, "  %s\n", kTestInfos[i].name);
+}
+
+
 int
 main(int argc, char** argv)
 {
-	Benchmark app;
+	// get test name
+	const char* testName;
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <test name>\n", argv[0]);
+		print_test_list(true);
+		exit(1);
+	}
+	testName = argv[1];
+
+	// find and create the test
+	Test* test = NULL;
+	try {
+		for (int32 i = 0; kTestInfos[i].name; i++) {
+			if (strcmp(testName, kTestInfos[i].name) == 0) {
+				test = (kTestInfos[i].create)();
+				break;
+			}
+		}
+	} catch (std::bad_alloc) {
+		fprintf(stderr, "Insufficient memory to create the test. Sorry.\n");
+		exit(1);
+	}
+
+	if (test == NULL) {
+		fprintf(stderr, "Error: Invalid test name: \"%s\"\n", testName);
+		print_test_list(true);
+		exit(1);
+	}
+
+	Benchmark app(test);
 	app.Run();
 	return 0;
 }

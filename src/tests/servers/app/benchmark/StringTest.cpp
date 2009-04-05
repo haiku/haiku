@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2008-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -109,5 +109,12 @@ StringTest::PrintResults()
 		fGlyphsRendered * 1000000.0 / fTestDuration);
 	printf("Average time between iterations: %.4f seconds.\n",
 		(float)timeLeak / fIterations / 1000000);
+}
+
+
+Test*
+StringTest::CreateTest()
+{
+	return new StringTest();
 }
 

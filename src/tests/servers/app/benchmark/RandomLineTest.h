@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2008-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef VERTICAL_LINE_TEST_H
-#define VERTICAL_LINE_TEST_H
+#ifndef RANDOM_LINE_TEST_H
+#define RANDOM_LINE_TEST_H
 
 #include <Rect.h>
 
@@ -18,6 +18,8 @@ public:
 	virtual	bool				RunIteration(BView* view);
 	virtual	void				PrintResults();
 
+	static	Test*				CreateTest();
+
 private:
 	bigtime_t					fTestDuration;
 	bigtime_t					fTestStart;
@@ -30,4 +32,4 @@ private:
 	BRect						fViewBounds;
 };
 
-#endif // VERTICAL_LINE_TEST_H
+#endif // RANDOM_LINE_TEST_H
