@@ -170,6 +170,9 @@ CalcView::CalcView(BMessage* archive)
 	fOptions(new CalcOptions()),
 	fShowKeypad(true)
 {
+	// Do not restore the follow mode, in shelfs, we never follow.
+	SetResizingMode(B_FOLLOW_NONE);
+
 	// create expression text view
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
 	AddChild(fExpressionTextView);
