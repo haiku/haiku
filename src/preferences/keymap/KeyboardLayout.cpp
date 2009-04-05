@@ -199,30 +199,6 @@ KeyboardLayout::SetDefault()
 
 	// See for examples in the default layout below.
 #if 1
-	static const char* kDefaultLayout104 = "name = Generic 104-key\n"
-		// Size shortcuts
-		"default-size = 10,10\n"
-		"$b = 5,10\n"
-		"$c = 20,10\n"
-		"$d = 15,10\n"
-		"$enter = d20,10\n"
-		"$f = 10,20\n"
-		"$g = 13,10\n"
-		// Key rows
-		"[ 0,0; d:0x01; :-; :+4; $b:-; d:+4; $b:-; :+4; $b:-; d:+3; $b:-; "
-			"$g:led-num; $g:led-caps; $g:led-scroll ]\n"
-		"[ 0,20; :+13; d$c:+; $b:-; d:+3; $b:-; d:+4 ]\n"
-		"[ 0,30; d$d:0x26; :+12; $d:+1; $b:-; d:+3; $b:-; :+3; "
-			"d$f:+1 ]\n"
-		"[ 0,40; d$c:0x3b; :+11; $enter:+1; 40,10:-; :+3 ]\n"
-		"[ 0,50; d24,10:0x4b; :+10; d26,10:+1; 15,10:-; d:+1; "
-		"	15,10:-; :+3; d$f:+1 ]\n"
-		"[ 0,60; d$g:0x5c; d$g:0x66; d$g:0x5d; 59,10:+1; d$g:+1; d$g:0x67+1; "
-			"d$g:0x60; $b:-; d:+3; $b:-; $c:+1; :+1 ]\n";
-
-	_InitFrom(kDefaultLayout104);
-#endif
-#if 0
 	static const char* kDefaultLayout105 =
 		"name = Generic 105-key International\n"
 		// Size shortcuts
@@ -246,6 +222,30 @@ KeyboardLayout::SetDefault()
 			"d$g:0x60; $b:-; d:+3; $b:-; $c:+1; :+1 ]\n";
 
 	_InitFrom(kDefaultLayout105);
+#endif
+#if 0
+	static const char* kDefaultLayout104 = "name = Generic 104-key\n"
+		// Size shortcuts
+		"default-size = 10,10\n"
+		"$b = 5,10\n"
+		"$c = 20,10\n"
+		"$d = 15,10\n"
+		"$enter = d20,10\n"
+		"$f = 10,20\n"
+		"$g = 13,10\n"
+		// Key rows
+		"[ 0,0; d:0x01; :-; :+4; $b:-; d:+4; $b:-; :+4; $b:-; d:+3; $b:-; "
+			"$g:led-num; $g:led-caps; $g:led-scroll ]\n"
+		"[ 0,20; :+13; d$c:+; $b:-; d:+3; $b:-; d:+4 ]\n"
+		"[ 0,30; d$d:0x26; :+12; $d:+1; $b:-; d:+3; $b:-; :+3; "
+			"d$f:+1 ]\n"
+		"[ 0,40; d$c:0x3b; :+11; $enter:+1; 40,10:-; :+3 ]\n"
+		"[ 0,50; d24,10:0x4b; :+10; d26,10:+1; 15,10:-; d:+1; "
+		"	15,10:-; :+3; d$f:+1 ]\n"
+		"[ 0,60; d$g:0x5c; d$g:0x66; d$g:0x5d; 59,10:+1; d$g:+1; d$g:0x67+1; "
+			"d$g:0x60; $b:-; d:+3; $b:-; $c:+1; :+1 ]\n";
+
+	_InitFrom(kDefaultLayout104);
 #endif
 #if 0
 	static const char* kIBMLaptop = "name = IBM Laptop International\n"
