@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src add-ons tracker iconvader ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] : true ;
+	UsePrivateHeaders tracker ;
+} else {
+	# private, for testing...
+	SubDirC++Flags -I/work/zeta/src/cebit/os/zeta/system/lib/tracker ;
+	SubDirC++Flags -I/work/zeta/src/cebit/headers_p/tracker ;
+	SubDirC++Flags -I/work/zeta/src/cebit/headers_p ;
+}
+
+# TODO: does not seem to work:
+AddResources IconVader : IconVader.rdef ;
+
+Addon IconVader :
+	IconVader.cpp
+
+	: be tracker
+;
