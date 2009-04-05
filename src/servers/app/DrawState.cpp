@@ -12,6 +12,7 @@
 
 //!	Data classes for working with BView states and draw parameters
 
+#include "DrawState.h"
 
 #include <new>
 #include <stdio.h>
@@ -20,8 +21,8 @@
 
 #include "LinkReceiver.h"
 #include "LinkSender.h"
+#include "ServerProtocolStructs.h"
 
-#include "DrawState.h"
 
 using std::nothrow;
 
@@ -183,24 +184,24 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 void
 DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 {
-	rgb_color highColor;
-	rgb_color lowColor;
-	pattern patt;
+	ViewSetStateInfo info;
 
-	link.Read<BPoint>(&fPenLocation);
-	link.Read<float>(&fPenSize);
-	link.Read(&highColor, sizeof(rgb_color));
-	link.Read(&lowColor, sizeof(rgb_color));
-	link.Read(&patt, sizeof(pattern));
-	link.Read<int8>((int8*)&fDrawingMode);
-	link.Read<BPoint>(&fOrigin);
-	link.Read<int8>((int8*)&fLineJoinMode);
-	link.Read<int8>((int8*)&fLineCapMode);
-	link.Read<float>(&fMiterLimit);
-	link.Read<int8>((int8*)&fAlphaSrcMode);
-	link.Read<int8>((int8*)&fAlphaFncMode);
-	link.Read<float>(&fScale);
-	link.Read<bool>(&fFontAliasing);
+	link.Read<ViewSetStateInfo>(&info);
+	
+	fPenLocation = info.penLocation;
+	fPenSize = info.penSize;
+	fHighColor = info.highColor;
+	fLowColor = info.lowColor;
+	fPattern = info.pattern;
+	fDrawingMode = info.drawingMode;
+	fOrigin = info.origin;
+	fScale = info.scale;
+	fLineJoinMode = info.lineJoin;
+	fLineCapMode = info.lineCap;
+	fMiterLimit = info.miterLimit;
+	fAlphaSrcMode = info.alphaSourceMode;
+	fAlphaFncMode = info.alphaFunctionMode;
+	fFontAliasing = info.fontAntialiasing;
 
 	if (fPreviousState) {
 		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
@@ -210,11 +211,10 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 		fCombinedScale = fScale;
 	}
 
-	fHighColor = highColor;
-	fLowColor = lowColor;
-	fPattern = patt;
 
 	// read clipping
+	// TODO: This could be optimized, but the user clipping regions are rarely
+	// used, so it's low priority...
 	int32 clipRectCount;
 	link.Read<int32>(&clipRectCount);
 
@@ -237,33 +237,39 @@ void
 DrawState::WriteToLink(BPrivate::LinkSender& link) const
 {
 	// Attach font state
-	link.Attach<uint32>(fFont.GetFamilyAndStyle());
-	link.Attach<float>(fFont.Size());
-	link.Attach<float>(fFont.Shear());
-	link.Attach<float>(fFont.Rotation());
-	link.Attach<float>(fFont.FalseBoldWidth());
-	link.Attach<uint8>(fFont.Spacing());
-	link.Attach<uint8>(fFont.Encoding());
-	link.Attach<uint16>(fFont.Face());
-	link.Attach<uint32>(fFont.Flags());
+	ViewGetStateInfo info;
+	info.fontID = fFont.GetFamilyAndStyle();
+	info.fontSize = fFont.Size();
+	info.fontShear = fFont.Shear();
+	info.fontRotation = fFont.Rotation();
+	info.fontFalseBoldWidth = fFont.FalseBoldWidth();
+	info.fontSpacing = fFont.Spacing();
+	info.fontEncoding = fFont.Encoding();
+	info.fontFace = fFont.Face();
+	info.fontFlags = fFont.Flags();
 
 	// Attach view state
-	link.Attach<BPoint>(fPenLocation);
-	link.Attach<float>(fPenSize);
-	link.Attach<rgb_color>(fHighColor);
-	link.Attach<rgb_color>(fLowColor);
-	link.Attach<uint64>(fPattern.GetInt64());
-	link.Attach<BPoint>(fOrigin);
-	link.Attach<uint8>((uint8)fDrawingMode);
-	link.Attach<uint8>((uint8)fLineCapMode);
-	link.Attach<uint8>((uint8)fLineJoinMode);
-	link.Attach<float>(fMiterLimit);
-	link.Attach<uint8>((uint8)fAlphaSrcMode);
-	link.Attach<uint8>((uint8)fAlphaFncMode);
-	link.Attach<float>(fScale);
-	link.Attach<bool>(fFontAliasing);
+	info.viewStateInfo.penLocation = fPenLocation;
+	info.viewStateInfo.penSize = fPenSize;
+	info.viewStateInfo.highColor = fHighColor;
+	info.viewStateInfo.lowColor = fLowColor;
+	info.viewStateInfo.pattern = (::pattern)fPattern.GetPattern();
+	info.viewStateInfo.drawingMode = fDrawingMode;
+	info.viewStateInfo.origin = fOrigin;
+	info.viewStateInfo.scale = fScale;
+	info.viewStateInfo.lineJoin = fLineJoinMode;
+	info.viewStateInfo.lineCap = fLineCapMode;
+	info.viewStateInfo.miterLimit = fMiterLimit;
+	info.viewStateInfo.alphaSourceMode = fAlphaSrcMode;
+	info.viewStateInfo.alphaFunctionMode = fAlphaFncMode;
+	info.viewStateInfo.fontAntialiasing = fFontAliasing;
 
 
+	link.Attach<ViewGetStateInfo>(info);
+
+
+	// TODO: Could be optimized, but is low prio, since most views do not
+	// use a custom clipping region...
 	if (fClippingRegion) {
 		int32 clippingRectCount = fClippingRegion->CountRects();
 		link.Attach<int32>(clippingRectCount);

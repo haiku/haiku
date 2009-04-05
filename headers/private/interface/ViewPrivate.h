@@ -15,6 +15,7 @@
 #include <Point.h>
 #include <Rect.h>
 #include <Region.h>
+#include <ServerProtocolStructs.h>
 
 const static uint32 kDeleteReplicant = 'JAHA';
 
@@ -121,21 +122,13 @@ ViewState::IsAllValid() const
 
 }	// namespace BPrivate
 
-struct _array_hdr_{
-	float			startX;
-	float			startY;
-	float			endX;
-	float			endY;
-	rgb_color		color;
-};
-
 struct _array_data_{
 		// the max number of points in the array
-	uint32			maxCount;
+	uint32				maxCount;
 		// the current number of points in the array
-	uint32			count;
+	uint32				count;
 		// the array of points
-	_array_hdr_*	array;
+	ViewLineArrayInfo*	array;
 };
 
 #endif	/* VIEW_PRIVATE_H */

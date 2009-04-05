@@ -51,6 +51,7 @@
 #include <MessageUtils.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
+#include <ServerProtocolStructs.h>
 #include <ShapePrivate.h>
 #include <TokenSpace.h>
 #include <ViewPrivate.h>
@@ -216,22 +217,27 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	UpdateServerFontState(link);
 
 	link.StartMessage(AS_VIEW_SET_STATE);
-	link.Attach<BPoint>(pen_location);
-	link.Attach<float>(pen_size);
-	link.Attach<rgb_color>(high_color);
-	link.Attach<rgb_color>(low_color);
-	link.Attach< ::pattern>(pattern);
-	link.Attach<int8>((int8)drawing_mode);
-	link.Attach<BPoint>(origin);
-	link.Attach<int8>((int8)line_join);
-	link.Attach<int8>((int8)line_cap);
-	link.Attach<float>(miter_limit);
-	link.Attach<int8>((int8)alpha_source_mode);
-	link.Attach<int8>((int8)alpha_function_mode);
-	link.Attach<float>(scale);
-	link.Attach<bool>(font_aliasing);
+
+	ViewSetStateInfo info;
+	info.penLocation = pen_location;
+	info.penSize = pen_size;
+	info.highColor = high_color;
+	info.lowColor = low_color;
+	info.pattern = pattern;
+	info.drawingMode = drawing_mode;
+	info.origin = origin;
+	info.scale = scale;
+	info.lineJoin = line_join;
+	info.lineCap = line_cap;
+	info.miterLimit = miter_limit;
+	info.alphaSourceMode = alpha_source_mode;
+	info.alphaFunctionMode = alpha_function_mode;
+	info.fontAntialiasing = font_aliasing;
+	link.Attach<ViewSetStateInfo>(info);
 
 	// we send the 'local' clipping region... if we have one...
+	// TODO: Could be optimized, but is low prio, since most views won't
+	// have a custom clipping region.
 	if (clipping_region_used) {
 		int32 count = clipping_region.CountRects();
 		link.Attach<int32>(count);
@@ -260,57 +266,36 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 		|| code != B_OK)
 		return;
 
-	uint32 fontID;
-	float size;
-	float shear;
-	float rotation;
-	float falseBoldeWidth;
-	uint8 spacing;
-	uint8 encoding;
-	uint16 face;
-	uint32 flags;
+	ViewGetStateInfo info;
+	link.Read<ViewGetStateInfo>(&info);
 
-	// read and set the font state
-	link.Read<int32>((int32 *)&fontID);
-	link.Read<float>(&size);
-	link.Read<float>(&shear);
-	link.Read<float>(&rotation);
-	link.Read<float>(&falseBoldeWidth);
-	link.Read<int8>((int8 *)&spacing);
-	link.Read<int8>((int8 *)&encoding);
-	link.Read<int16>((int16 *)&face);
-	link.Read<int32>((int32 *)&flags);
-
+	// set view's font state
 	font_flags = B_FONT_ALL;
-	font.SetFamilyAndStyle(fontID);
-	font.SetSize(size);
-	font.SetShear(shear);
-	font.SetRotation(rotation);
-	font.SetFalseBoldWidth(falseBoldeWidth);
-	font.SetSpacing(spacing);
-	font.SetEncoding(encoding);
-	font.SetFace(face);
-	font.SetFlags(flags);
+	font.SetFamilyAndStyle(info.fontID);
+	font.SetSize(info.fontSize);
+	font.SetShear(info.fontShear);
+	font.SetRotation(info.fontRotation);
+	font.SetFalseBoldWidth(info.fontFalseBoldWidth);
+	font.SetSpacing(info.fontSpacing);
+	font.SetEncoding(info.fontEncoding);
+	font.SetFace(info.fontFace);
+	font.SetFlags(info.fontFlags);
 
-	// read and set view's state
-	link.Read<BPoint>(&pen_location);
-	link.Read<float>(&pen_size);
-	link.Read<rgb_color>(&high_color);
-	link.Read<rgb_color>(&low_color);
-	link.Read< ::pattern>(&pattern);
-	link.Read<BPoint>(&origin);
-
-	int8 drawingMode;
-	link.Read<int8>((int8 *)&drawingMode);
-	drawing_mode = (::drawing_mode)drawingMode;
-
-	link.Read<int8>((int8 *)&line_cap);
-	link.Read<int8>((int8 *)&line_join);
-	link.Read<float>(&miter_limit);
-	link.Read<int8>((int8 *)&alpha_source_mode);
-	link.Read<int8>((int8 *)&alpha_function_mode);
-	link.Read<float>(&scale);
-	link.Read<bool>(&font_aliasing);
+	// set view's state
+	pen_location = info.viewStateInfo.penLocation;
+	pen_size = info.viewStateInfo.penSize;
+	high_color = info.viewStateInfo.highColor;
+	low_color = info.viewStateInfo.lowColor;
+	pattern = info.viewStateInfo.pattern;
+	drawing_mode = info.viewStateInfo.drawingMode;
+	origin = info.viewStateInfo.origin;
+	scale = info.viewStateInfo.scale;
+	line_join = info.viewStateInfo.lineJoin;
+	line_cap = info.viewStateInfo.lineCap;
+	miter_limit = info.viewStateInfo.miterLimit;
+	alpha_source_mode = info.viewStateInfo.alphaSourceMode;
+	alpha_function_mode = info.viewStateInfo.alphaFunctionMode;
+	font_aliasing = info.viewStateInfo.fontAntialiasing;
 
 	// read the user clipping
 	// (that's NOT the current View visible clipping but the additional
@@ -796,6 +781,7 @@ BView::_ConvertFromScreen(BPoint *pt, bool checkLock) const
 	fParent->_ConvertFromScreen(pt, false);
 }
 
+
 void
 BView::ConvertFromScreen(BPoint *pt) const
 {
@@ -1017,8 +1003,10 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 	_CheckLockAndSwitchCurrent();
 
 	fOwner->fLink->StartMessage(AS_VIEW_SET_CURSOR);
-	fOwner->fLink->Attach<int32>(cursor->fServerToken);
-	fOwner->fLink->Attach<bool>(sync);
+	ViewSetViewCursorInfo info;
+	info.cursorToken = cursor->fServerToken;
+	info.sync = sync;
+	fOwner->fLink->Attach<ViewSetViewCursorInfo>(info);
 
 	if (!sync) {
 		cursor->fPendingViewCursor = true;
@@ -1781,10 +1769,13 @@ BView::SetLineMode(cap_mode lineCap, join_mode lineJoin, float miterLimit)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
+		ViewSetLineModeInfo info;
+		info.lineJoin = lineJoin;
+		info.lineCap = lineCap;
+		info.miterLimit = miterLimit;
+
 		fOwner->fLink->StartMessage(AS_VIEW_SET_LINE_MODE);
-		fOwner->fLink->Attach<int8>((int8)lineCap);
-		fOwner->fLink->Attach<int8>((int8)lineJoin);
-		fOwner->fLink->Attach<float>(miterLimit);
+		fOwner->fLink->Attach<ViewSetLineModeInfo>(info);
 
 		fState->valid_flags |= B_VIEW_LINE_MODES_BIT;
 	}
@@ -1830,13 +1821,13 @@ BView::LineMiterLimit() const
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
 			&& code == B_OK) {
-			int8 cap, join;
-			fOwner->fLink->Read<int8>((int8 *)&cap);
-			fOwner->fLink->Read<int8>((int8 *)&join);
-			fOwner->fLink->Read<float>(&fState->miter_limit);
 
-			fState->line_cap = (cap_mode)cap;
-			fState->line_join = (join_mode)join;
+			ViewSetLineModeInfo info;
+			fOwner->fLink->Read<ViewSetLineModeInfo>(&info);
+
+			fState->line_cap = info.lineCap;
+			fState->line_join = info.lineJoin;
+			fState->miter_limit = info.miterLimit;
 		}
 
 		fState->valid_flags |= B_VIEW_LINE_MODES_BIT;
@@ -1901,9 +1892,12 @@ BView::SetBlendingMode(source_alpha sourceAlpha, alpha_function alphaFunction)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
+		ViewBlendingModeInfo info;
+		info.sourceAlpha = sourceAlpha;
+		info.alphaFunction = alphaFunction;
+
 		fOwner->fLink->StartMessage(AS_VIEW_SET_BLENDING_MODE);
-		fOwner->fLink->Attach<int8>((int8)sourceAlpha);
-		fOwner->fLink->Attach<int8>((int8)alphaFunction);
+		fOwner->fLink->Attach<ViewBlendingModeInfo>(info);
 
 		fState->valid_flags |= B_VIEW_BLENDING_BIT;
 	}
@@ -1926,12 +1920,11 @@ BView::GetBlendingMode(source_alpha *_sourceAlpha,
 
 		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK) {
-			int8 alphaSourceMode, alphaFunctionMode;
-			fOwner->fLink->Read<int8>(&alphaSourceMode);
-			fOwner->fLink->Read<int8>(&alphaFunctionMode);
+ 			ViewBlendingModeInfo info;
+			fOwner->fLink->Read<ViewBlendingModeInfo>(&info);
 
-			fState->alpha_source_mode = (source_alpha)alphaSourceMode;
-			fState->alpha_function_mode = (alpha_function)alphaFunctionMode;
+			fState->alpha_source_mode = info.sourceAlpha;
+			fState->alpha_function_mode = info.alphaFunction;
 
 			fState->valid_flags |= B_VIEW_BLENDING_BIT;
 		}
@@ -1963,8 +1956,7 @@ BView::MovePenTo(float x, float y)
 		_CheckLockAndSwitchCurrent();
 
 		fOwner->fLink->StartMessage(AS_VIEW_SET_PEN_LOC);
-		fOwner->fLink->Attach<float>(x);
-		fOwner->fLink->Attach<float>(y);
+		fOwner->fLink->Attach<BPoint>(BPoint(x, y));
 
 		fState->valid_flags |= B_VIEW_PEN_LOCATION_BIT;
 	}
@@ -2387,11 +2379,14 @@ BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect, BRect viewRect,
 
 	_CheckLockAndSwitchCurrent();
 
+	ViewDrawBitmapInfo info;
+	info.bitmapToken = bitmap->_ServerToken();
+	info.options = options;
+	info.viewRect = viewRect;
+	info.bitmapRect = bitmapRect;
+
 	fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
-	fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
-	fOwner->fLink->Attach<uint32>(options);
-	fOwner->fLink->Attach<BRect>(viewRect);
-	fOwner->fLink->Attach<BRect>(bitmapRect);
+	fOwner->fLink->Attach<ViewDrawBitmapInfo>(info);
 
 	_FlushIfNotInTransaction();
 }
@@ -2422,15 +2417,14 @@ BView::DrawBitmapAsync(const BBitmap* bitmap, BPoint where)
 
 	_CheckLockAndSwitchCurrent();
 
-	BRect bitmapRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
-	BRect viewRect = bitmapRect.OffsetToCopy(where);
-	uint32 options = 0;
+	ViewDrawBitmapInfo info;
+	info.bitmapToken = bitmap->_ServerToken();
+	info.options = 0;
+	info.bitmapRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
+	info.viewRect = info.bitmapRect.OffsetToCopy(where);
 
 	fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
-	fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
-	fOwner->fLink->Attach<uint32>(options);
-	fOwner->fLink->Attach<BRect>(viewRect);
-	fOwner->fLink->Attach<BRect>(bitmapRect);
+	fOwner->fLink->Attach<ViewDrawBitmapInfo>(info);
 
 	_FlushIfNotInTransaction();
 }
@@ -2533,33 +2527,33 @@ BView::DrawString(const char *string, int32 length, escapement_delta *delta)
 
 
 void
-BView::DrawString(const char *string, int32 length, BPoint location,
-	escapement_delta *delta)
+BView::DrawString(const char* string, int32 length, BPoint location,
+	escapement_delta* delta)
 {
-	if (string == NULL || length < 1)
+	if (fOwner == NULL || string == NULL || length < 1)
 		return;
 
-	if (fOwner) {
-		_CheckLockAndSwitchCurrent();
+	_CheckLockAndSwitchCurrent();
 
-		// quite often delta will be NULL
-		if (delta)
-			fOwner->fLink->StartMessage(AS_DRAW_STRING_WITH_DELTA);
-		else
-			fOwner->fLink->StartMessage(AS_DRAW_STRING);
-		fOwner->fLink->Attach<int32>(length);
-		fOwner->fLink->Attach<BPoint>(location);
+	ViewDrawStringInfo info;
+	info.stringLength = length;
+	info.location = location;
+	if (delta != NULL)
+		info.delta = *delta;
 
-		if (delta)
-			fOwner->fLink->Attach<escapement_delta>(*delta);
+	// quite often delta will be NULL
+	if (delta)
+		fOwner->fLink->StartMessage(AS_DRAW_STRING_WITH_DELTA);
+	else
+		fOwner->fLink->StartMessage(AS_DRAW_STRING);
 
-		fOwner->fLink->AttachString(string, length);
+	fOwner->fLink->Attach<ViewDrawStringInfo>(info);
+	fOwner->fLink->Attach(string, length);
 
-		_FlushIfNotInTransaction();
+	_FlushIfNotInTransaction();
 
-		// this modifies our pen location, so we invalidate the flag.
-		fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
-	}
+	// this modifies our pen location, so we invalidate the flag.
+	fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
 }
 
 
@@ -3277,9 +3271,12 @@ BView::StrokeLine(BPoint pt0, BPoint pt1, ::pattern pattern)
 	_CheckLockAndSwitchCurrent();
 	_UpdatePattern(pattern);
 
+	ViewStrokeLineInfo info;
+	info.startPoint = pt0;
+	info.endPoint = pt1;
+
 	fOwner->fLink->StartMessage(AS_STROKE_LINE);
-	fOwner->fLink->Attach<BPoint>(pt0);
-	fOwner->fLink->Attach<BPoint>(pt1);
+	fOwner->fLink->Attach<ViewStrokeLineInfo>(info);
 
 	_FlushIfNotInTransaction();
 
@@ -3386,7 +3383,7 @@ BView::BeginLineArray(int32 count)
 	fCommArray = new _array_data_;
 	fCommArray->maxCount = count;
 	fCommArray->count = 0;
-	fCommArray->array = new _array_hdr_[count];
+	fCommArray->array = new ViewLineArrayInfo[count];
 }
 
 
@@ -3403,10 +3400,8 @@ BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
 
 	const uint32 &arrayCount = fCommArray->count;
 	if (arrayCount < fCommArray->maxCount) {
-		fCommArray->array[arrayCount].startX = pt0.x;
-		fCommArray->array[arrayCount].startY = pt0.y;
-		fCommArray->array[arrayCount].endX = pt1.x;
-		fCommArray->array[arrayCount].endY = pt1.y;
+		fCommArray->array[arrayCount].startPoint = pt0;
+		fCommArray->array[arrayCount].endPoint = pt1;
 		fCommArray->array[arrayCount].color = col;
 
 		fCommArray->count++;
@@ -3420,7 +3415,7 @@ BView::EndLineArray()
 	if (fOwner == NULL)
 		return;
 
-	if (!fCommArray)
+	if (fCommArray == NULL)
 		debugger("Can't call EndLineArray before BeginLineArray");
 
 	_CheckLockAndSwitchCurrent();
@@ -3428,7 +3423,7 @@ BView::EndLineArray()
 	fOwner->fLink->StartMessage(AS_STROKE_LINEARRAY);
 	fOwner->fLink->Attach<int32>(fCommArray->count);
 	fOwner->fLink->Attach(fCommArray->array,
-			fCommArray->count * sizeof(_array_hdr_));
+		fCommArray->count * sizeof(ViewLineArrayInfo));
 
 	_FlushIfNotInTransaction();
 

@@ -20,7 +20,7 @@ class BPoint;
 class Pattern {
  public:
 
-								Pattern(void) {} 
+								Pattern() {} 
 
 								Pattern(const uint64& p)
 									{ fPattern.type64 = p; }
@@ -34,11 +34,14 @@ class Pattern {
 								Pattern(const pattern& src)
 									{ fPattern.type64 = *(uint64*)src.data; }
 
-	inline	const int8*			GetInt8(void) const
+	inline	const int8*			GetInt8() const
 									{ return fPattern.type8; }
 
-	inline	uint64				GetInt64(void) const
+	inline	uint64				GetInt64() const
 									{ return fPattern.type64; }
+
+	inline	const ::pattern&	GetPattern() const
+									{ return *(const ::pattern*)&fPattern.type64; }
 
 	inline	void				Set(const int8* p)
 									{ fPattern.type64 = *((const uint64*)p); }

@@ -43,6 +43,7 @@
 #include <DirectWindowPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <ServerProtocolStructs.h>
 #include <ViewPrivate.h>
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
@@ -1545,17 +1546,15 @@ fDesktop->LockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_VIEW_CURSOR: View: %s\n",
 				Title(), fCurrentView->Name()));
 
-			int32 token;
-			bool sync;
-			link.Read<int32>(&token);
-			if (link.Read<bool>(&sync) != B_OK)
+			ViewSetViewCursorInfo info;
+			if (link.Read<ViewSetViewCursorInfo>(&info) != B_OK)
 				break;
 
 			if (!fDesktop->GetCursorManager().Lock())
 				break;
 
 			ServerCursor* cursor
-				= fDesktop->GetCursorManager().FindCursor(token);
+				= fDesktop->GetCursorManager().FindCursor(info.cursorToken);
 			fCurrentView->SetCursor(cursor);
 
 			fDesktop->GetCursorManager().Unlock();
@@ -1565,7 +1564,7 @@ fDesktop->LockSingleWindow();
 				if (fDesktop->ViewUnderMouse(fWindow) == fCurrentView->Token())
 					fServerApp->SetCurrentCursor(cursor);
 			}
-			if (sync) {
+			if (info.sync) {
 				// sync the client (it can now delete the cursor)
 				fLink.StartMessage(B_OK);
 				fLink.Flush();
@@ -1612,21 +1611,16 @@ fDesktop->LockSingleWindow();
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_LINE_MODE: "
 				"View: %s\n", Title(), fCurrentView->Name()));
-			int8 lineCap, lineJoin;
-			float miterLimit;
-
-			link.Read<int8>(&lineCap);
-			link.Read<int8>(&lineJoin);
-			if (link.Read<float>(&miterLimit) != B_OK)
+			ViewSetLineModeInfo info;
+			if (link.Read<ViewSetLineModeInfo>(&info) != B_OK)
 				break;
 
-			fCurrentView->CurrentState()->SetLineCapMode((cap_mode)lineCap);
-			fCurrentView->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
-			fCurrentView->CurrentState()->SetMiterLimit(miterLimit);
+			fCurrentView->CurrentState()->SetLineCapMode(info.lineCap);
+			fCurrentView->CurrentState()->SetLineJoinMode(info.lineJoin);
+			fCurrentView->CurrentState()->SetMiterLimit(info.miterLimit);
 
-			fWindow->GetDrawingEngine()->SetStrokeMode((cap_mode)lineCap,
-				(join_mode)lineJoin, miterLimit);
-//			_UpdateDrawState(fCurrentView);
+			fWindow->GetDrawingEngine()->SetStrokeMode(info.lineCap,
+				info.lineJoin, info.miterLimit);
 
 			break;
 		}
@@ -1634,10 +1628,13 @@ fDesktop->LockSingleWindow();
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LINE_MODE: "
 				"View: %s\n", Title(), fCurrentView->Name()));
+			ViewSetLineModeInfo info;
+			info.lineJoin = fCurrentView->CurrentState()->LineJoinMode();
+			info.lineCap = fCurrentView->CurrentState()->LineCapMode();
+			info.miterLimit = fCurrentView->CurrentState()->MiterLimit();
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->LineCapMode()));
-			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->LineJoinMode()));
-			fLink.Attach<float>(fCurrentView->CurrentState()->MiterLimit());
+			fLink.Attach<ViewSetLineModeInfo>(info);
 			fLink.Flush();
 
 			break;
@@ -1690,16 +1687,15 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_PEN_LOC:
 		{
-			float x, y;
-			link.Read<float>(&x);
-			if (link.Read<float>(&y) != B_OK)
+			BPoint location;
+			if (link.Read<BPoint>(&location) != B_OK)
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PEN_LOC: "
 				"View: %s -> BPoint(%.1f, %.1f)\n", Title(),
-				fCurrentView->Name(), x, y));
+				fCurrentView->Name(), location.x, location.y));
 
-			fCurrentView->CurrentState()->SetPenLocation(BPoint(x, y));
+			fCurrentView->CurrentState()->SetPenLocation(location);
 			break;
 		}
 		case AS_VIEW_GET_PEN_LOC:
@@ -1847,27 +1843,28 @@ fDesktop->LockSingleWindow();
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_BLEND_MODE: "
 				"View: %s\n", Title(), fCurrentView->Name()));
-			int8 srcAlpha, alphaFunc;
 
-			link.Read<int8>(&srcAlpha);
-			if (link.Read<int8>(&alphaFunc) != B_OK)
+			ViewBlendingModeInfo info;
+			if (link.Read<ViewBlendingModeInfo>(&info) != B_OK)
 				break;
 
 			fCurrentView->CurrentState()->SetBlendingMode(
-				(source_alpha)srcAlpha, (alpha_function)alphaFunc);
+				info.sourceAlpha, info.alphaFunction);
 			fWindow->GetDrawingEngine()->SetBlendingMode(
-				(source_alpha)srcAlpha, (alpha_function)alphaFunc);
+				info.sourceAlpha, info.alphaFunction);
 			break;
 		}
 		case AS_VIEW_GET_BLENDING_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_BLEND_MODE: "
 				"View: %s\n", Title(), fCurrentView->Name()));
+
+			ViewBlendingModeInfo info;
+			info.sourceAlpha = fCurrentView->CurrentState()->AlphaSrcMode();
+			info.alphaFunction = fCurrentView->CurrentState()->AlphaFncMode();
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(
-				fCurrentView->CurrentState()->AlphaSrcMode()));
-			fLink.Attach<int8>((int8)(
-				fCurrentView->CurrentState()->AlphaFncMode()));
+			fLink.Attach<ViewBlendingModeInfo>(info);
 			fLink.Flush();
 
 			break;
@@ -2286,27 +2283,23 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 	switch (code) {
 		case AS_STROKE_LINE:
 		{
-			float x1, y1, x2, y2;
-
-			link.Read<float>(&x1);
-			link.Read<float>(&y1);
-			link.Read<float>(&x2);
-			if (link.Read<float>(&y2) != B_OK)
+			ViewStrokeLineInfo info;
+			if (link.Read<ViewStrokeLineInfo>(&info) != B_OK)
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE: View: %s -> "
 				"BPoint(%.1f, %.1f) - BPoint(%.1f, %.1f)\n", Title(),
-					fCurrentView->Name(), x1, y1, x2, y2));
+					fCurrentView->Name(),
+					info.startPoint.x, info.startPoint.y,
+					info.endPoint.x, info.endPoint.y));
 
-			BPoint p1(x1, y1);
-			BPoint p2(x2, y2);
-			BPoint penPos = p2;
-			fCurrentView->ConvertToScreenForDrawing(&p1);
-			fCurrentView->ConvertToScreenForDrawing(&p2);
-			drawingEngine->StrokeLine(p1, p2);
+			BPoint penPos = info.endPoint;
+			fCurrentView->ConvertToScreenForDrawing(&info.startPoint);
+			fCurrentView->ConvertToScreenForDrawing(&info.endPoint);
+			drawingEngine->StrokeLine(info.startPoint, info.endPoint);
 
-			// We update the pen here because many DrawingEngine calls which do not update the
-			// pen position actually call StrokeLine
+			// We update the pen here because many DrawingEngine calls which
+			// do not update the pen position actually call StrokeLine
 
 			// TODO: Decide where to put this, for example, it cannot be done
 			// for DrawString(), also there needs to be a decision, if penlocation
@@ -2379,15 +2372,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 		}
 		case AS_VIEW_DRAW_BITMAP:
 		{
-			int32 bitmapToken;
-			uint32 options;
-			BRect bitmapRect;
-			BRect viewRect;
-
-			link.Read<int32>(&bitmapToken);
-			link.Read<uint32>(&options);
-			link.Read<BRect>(&viewRect);
-			if (link.Read<BRect>(&bitmapRect) != B_OK)
+			ViewDrawBitmapInfo info;
+			if (link.Read<ViewDrawBitmapInfo>(&info) != B_OK)
 				break;
 
 #if 0
@@ -2395,23 +2381,24 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				options |= B_FILTER_BITMAP_BILINEAR;
 #endif
 
-			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+			ServerBitmap* bitmap = fServerApp->FindBitmap(info.bitmapToken);
 			if (bitmap) {
 
 				DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: "
 					"View: %s, bitmap: %ld (size %ld x %ld), "
 					"BRect(%.1f, %.1f, %.1f, %.1f) -> "
 					"BRect(%.1f, %.1f, %.1f, %.1f)\n",
-					fTitle, fCurrentView->Name(), bitmapToken,
+					fTitle, fCurrentView->Name(), info.bitmapToken,
 					bitmap->Width(), bitmap->Height(),
-					bitmapRect.left, bitmapRect.top, bitmapRect.right,
-					bitmapRect.bottom, viewRect.left, viewRect.top,
-					viewRect.right, viewRect.bottom));
+					info.bitmapRect.left, info.bitmapRect.top,
+					info.bitmapRect.right, info.bitmapRect.bottom,
+					info.viewRect.left, info.viewRect.top,
+					info.viewRect.right, info.viewRect.bottom));
 
-				fCurrentView->ConvertToScreenForDrawing(&viewRect);
+				fCurrentView->ConvertToScreenForDrawing(&info.viewRect);
 
-				drawingEngine->DrawBitmap(bitmap, bitmapRect, viewRect,
-					options);
+				drawingEngine->DrawBitmap(bitmap, info.bitmapRect,
+					info.viewRect, info.options);
 			}
 
 			break;
@@ -2758,52 +2745,73 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			// 2) LineArrayData
 
 			int32 lineCount;
+			if (link.Read<int32>(&lineCount) != B_OK || lineCount <= 0)
+				break;
 
-			link.Read<int32>(&lineCount);
-			if (lineCount > 0) {
-				LineArrayData lineData[lineCount];
+			// To speed things up, try to use a stack allocation and only
+			// fall back to the heap if there are enough lines...
+			ViewLineArrayInfo* lineData;
+			static const int32 kStackBufferLineDataCount = 64;
+			ViewLineArrayInfo lineDataStackBuffer[kStackBufferLineDataCount];
+			if (lineCount > kStackBufferLineDataCount) {
+				lineData = new(std::nothrow) ViewLineArrayInfo[lineCount];
+				if (lineData == NULL)
+					break;
+			} else
+				lineData = lineDataStackBuffer;
 
-				for (int32 i = 0; i < lineCount; i++) {
-					LineArrayData* index = &lineData[i];
-
-					link.Read<float>(&(index->pt1.x));
-					link.Read<float>(&(index->pt1.y));
-					link.Read<float>(&(index->pt2.x));
-					link.Read<float>(&(index->pt2.y));
-					link.Read<rgb_color>(&(index->color));
-
-					fCurrentView->ConvertToScreenForDrawing(&index->pt1);
-					fCurrentView->ConvertToScreenForDrawing(&index->pt2);
-				}
-				drawingEngine->StrokeLineArray(lineCount, lineData);
+			// Read them all in one go
+			size_t dataSize = lineCount * sizeof(ViewLineArrayInfo);
+			if (link.Read(lineData, dataSize) != B_OK) {
+				if (lineData != lineDataStackBuffer)
+					delete[] lineData;
+				break;
 			}
+
+			// Convert to screen coords and draw
+			for (int32 i = 0; i < lineCount; i++) {
+				ViewLineArrayInfo* index = &lineData[i];
+
+				fCurrentView->ConvertToScreenForDrawing(&index->startPoint);
+				fCurrentView->ConvertToScreenForDrawing(&index->endPoint);
+			}
+			drawingEngine->StrokeLineArray(lineCount, lineData);
+
+			if (lineData != lineDataStackBuffer)
+				delete[] lineData;
 			break;
 		}
 		case AS_DRAW_STRING:
 		case AS_DRAW_STRING_WITH_DELTA:
 		{
-			char* string;
-			int32 length;
-			BPoint location;
-			escapement_delta _delta;
-			escapement_delta* delta = NULL;
-
-			link.Read<int32>(&length);
-			link.Read<BPoint>(&location);
-			if (code == AS_DRAW_STRING_WITH_DELTA) {
-				link.Read<escapement_delta>(&_delta);
-				if (_delta.nonspace != 0.0 || _delta.space != 0.0)
-					delta = &_delta;
-			}
-			if (link.ReadString(&string) != B_OK)
+			ViewDrawStringInfo info;
+			if (link.Read<ViewDrawStringInfo>(&info) != B_OK)
 				break;
+
+			char* string = (char*)malloc(info.stringLength + 1);
+			if (string == NULL)
+				break;
+
+			escapement_delta* delta = NULL;
+			if (code == AS_DRAW_STRING_WITH_DELTA) {
+				// In this case, info.delta will contain valid values.
+				delta = &info.delta;
+			}
+
+			if (link.Read(string, info.stringLength) != B_OK) {
+				free(string);
+				break;
+			}
+			// Terminate the string, if nothing else, it's important
+			// for the DTRACE call below...
+			string[info.stringLength] = '\0';
 
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING, View: %s "
 				"-> %s\n", Title(), fCurrentView->Name(), string));
 
-			fCurrentView->ConvertToScreenForDrawing(&location);
-			BPoint penLocation = drawingEngine->DrawString(string, length,
-				location, delta);
+			fCurrentView->ConvertToScreenForDrawing(&info.location);
+			BPoint penLocation = drawingEngine->DrawString(string,
+				info.stringLength, info.location, delta);
 
 			fCurrentView->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentView->CurrentState()->SetPenLocation(penLocation);
@@ -2903,12 +2911,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_SET_PEN_LOC:
 		{
-			float x, y;
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-			picture->WriteSetPenLocation(BPoint(x, y));
+			BPoint location;
+			link.Read<BPoint>(&location);
+			picture->WriteSetPenLocation(location);
 
-			fCurrentView->CurrentState()->SetPenLocation(BPoint(x, y));
+			fCurrentView->CurrentState()->SetPenLocation(location);
 			break;
 		}
 		case AS_VIEW_SET_PEN_SIZE:
@@ -2925,21 +2932,19 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_SET_LINE_MODE:
 		{
-			int8 lineCap, lineJoin;
-			float miterLimit;
 
-			link.Read<int8>(&lineCap);
-			link.Read<int8>(&lineJoin);
-			link.Read<float>(&miterLimit);
+			ViewSetLineModeInfo info;
+			link.Read<ViewSetLineModeInfo>(&info);
 
-			picture->WriteSetLineMode((cap_mode)lineCap, (join_mode)lineJoin, miterLimit);
+			picture->WriteSetLineMode(info.lineCap, info.lineJoin,
+				info.miterLimit);
 
-			fCurrentView->CurrentState()->SetLineCapMode((cap_mode)lineCap);
-			fCurrentView->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
-			fCurrentView->CurrentState()->SetMiterLimit(miterLimit);
+			fCurrentView->CurrentState()->SetLineCapMode(info.lineCap);
+			fCurrentView->CurrentState()->SetLineJoinMode(info.lineJoin);
+			fCurrentView->CurrentState()->SetMiterLimit(info.miterLimit);
 
-			fWindow->GetDrawingEngine()->SetStrokeMode((cap_mode)lineCap,
-				(join_mode)lineJoin, miterLimit);
+			fWindow->GetDrawingEngine()->SetStrokeMode(info.lineCap,
+				info.lineJoin, info.miterLimit);
 			break;
 		}
 		case AS_VIEW_SET_SCALE:
@@ -3081,14 +3086,10 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_STROKE_LINE:
 		{
-			float x1, y1, x2, y2;
+			ViewStrokeLineInfo info;
+			link.Read<ViewStrokeLineInfo>(&info);
 
-			link.Read<float>(&x1);
-			link.Read<float>(&y1);
-			link.Read<float>(&x2);
-			link.Read<float>(&y2);
-
-			picture->WriteStrokeLine(BPoint(x1, y1), BPoint(x2, y2));
+			picture->WriteStrokeLine(info.startPoint, info.endPoint);
 			break;
 		}
 
@@ -3102,17 +3103,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->WritePushState();
 
 			for (int32 i = 0; i < lineCount; i++) {
-				float x1, y1, x2, y2;
-				link.Read<float>(&x1);
-				link.Read<float>(&y1);
-				link.Read<float>(&x2);
-				link.Read<float>(&y2);
+				ViewLineArrayInfo lineData;
+				if (link.Read<ViewLineArrayInfo >(&lineData) != B_OK)
+					break;
 
-				rgb_color color;
-				link.Read<rgb_color>(&color);
-
-				picture->WriteSetHighColor(color);
-				picture->WriteStrokeLine(BPoint(x1, y1), BPoint(x2, y2));
+				picture->WriteSetHighColor(lineData.color);
+				picture->WriteStrokeLine(lineData.startPoint,
+					lineData.endPoint);
 			}
 
 			picture->WritePopState();
@@ -3139,18 +3136,29 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_DRAW_STRING:
 		case AS_DRAW_STRING_WITH_DELTA:
 		{
-			char* string = NULL;
-			int32 length;
-			BPoint location;
+			ViewDrawStringInfo info;
+			if (link.Read<ViewDrawStringInfo>(&info) != B_OK)
+				break;
 
-			link.Read<int32>(&length);
-			link.Read<BPoint>(&location);
-			escapement_delta delta = { 0, 0 };
-			if (code == AS_DRAW_STRING_WITH_DELTA)
-				link.Read<escapement_delta>(&delta);
-			link.ReadString(&string);
+			char* string = (char*)malloc(info.stringLength + 1);
+			if (string == NULL)
+				break;
 
-			picture->WriteDrawString(location, string, length, delta);
+			if (code != AS_DRAW_STRING_WITH_DELTA) {
+				// In this case, info.delta will NOT contain valid values.
+				info.delta = (escapement_delta){ 0, 0 };
+			}
+
+			if (link.Read(string, info.stringLength) != B_OK) {
+				free(string);
+				break;
+			}
+			// Terminate the string, if nothing else, it's important
+			// for the DTRACE call below...
+			string[info.stringLength] = '\0';
+
+			picture->WriteDrawString(info.location, string, info.stringLength,
+				info.delta);
 
 			free(string);
 			break;
@@ -3190,25 +3198,17 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_DRAW_BITMAP:
 		{
-			int32 token;
-			link.Read<int32>(&token);
+			ViewDrawBitmapInfo info;
+			link.Read<ViewDrawBitmapInfo>(&info);
 
-			uint32 options;
-			link.Read<uint32>(&options);
-
-			BRect viewRect;
-			link.Read<BRect>(&viewRect);
-
-			BRect bitmapRect;
-			link.Read<BRect>(&bitmapRect);
-
-			ServerBitmap *bitmap = App()->FindBitmap(token);
+			ServerBitmap *bitmap = App()->FindBitmap(info.bitmapToken);
 			if (bitmap == NULL)
 				break;
 
-			picture->WriteDrawBitmap(bitmapRect, viewRect, bitmap->Width(),
-				bitmap->Height(), bitmap->BytesPerRow(), bitmap->ColorSpace(),
-				options, bitmap->Bits(), bitmap->BitsLength());
+			picture->WriteDrawBitmap(info.bitmapRect, info.viewRect,
+				bitmap->Width(), bitmap->Height(), bitmap->BytesPerRow(),
+				bitmap->ColorSpace(), info.options, bitmap->Bits(),
+				bitmap->BitsLength());
 
 			break;
 		}
@@ -3293,20 +3293,18 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 /*
 		case AS_VIEW_SET_BLENDING_MODE:
 		{
-			int8 srcAlpha, alphaFunc;
-
-			link.Read<int8>(&srcAlpha);
-			link.Read<int8>(&alphaFunc);
+			ViewBlendingModeInfo info;
+			link.Read<ViewBlendingModeInfo>(&info);
 
 			picture->BeginOp(B_PIC_SET_BLENDING_MODE);
-			picture->AddInt16((int16)srcAlpha);
-			picture->AddInt16((int16)alphaFunc);
+			picture->AddInt16((int16)info.sourceAlpha);
+			picture->AddInt16((int16)info.alphaFunction);
 			picture->EndOp();
 
-			fCurrentView->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
-				(alpha_function)alphaFunc);
-			fWindow->GetDrawingEngine()->SetBlendingMode((source_alpha)srcAlpha,
-				(alpha_function)alphaFunc);
+			fCurrentView->CurrentState()->SetBlendingMode(info.sourceAlpha,
+				info.alphaFunction);
+			fWindow->GetDrawingEngine()->SetBlendingMode(info.sourceAlpha,
+				info.alphaFunction);
 			break;
 		}*/
 		default:

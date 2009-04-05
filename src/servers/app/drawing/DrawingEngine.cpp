@@ -1207,26 +1207,26 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
 // StrokeLineArray
 void
 DrawingEngine::StrokeLineArray(int32 numLines,
-	const LineArrayData *linedata)
+	const ViewLineArrayInfo *lineData)
 {
 	CRASH_IF_NOT_LOCKED
 
-	if (!linedata || numLines <= 0)
+	if (!lineData || numLines <= 0)
 		return;
 
 	// figure out bounding box for line array
-	const LineArrayData *data = (const LineArrayData *)&(linedata[0]);
-	BRect touched(min_c(data->pt1.x, data->pt2.x),
-				  min_c(data->pt1.y, data->pt2.y),
-				  max_c(data->pt1.x, data->pt2.x),
-				  max_c(data->pt1.y, data->pt2.y));
+	const ViewLineArrayInfo* data = (const ViewLineArrayInfo*)&(lineData[0]);
+	BRect touched(min_c(data->startPoint.x, data->endPoint.x),
+				  min_c(data->startPoint.y, data->endPoint.y),
+				  max_c(data->startPoint.x, data->endPoint.x),
+				  max_c(data->startPoint.y, data->endPoint.y));
 
 	for (int32 i = 1; i < numLines; i++) {
-		data = (const LineArrayData *)&(linedata[i]);
-		BRect box(min_c(data->pt1.x, data->pt2.x),
-				  min_c(data->pt1.y, data->pt2.y),
-				  max_c(data->pt1.x, data->pt2.x),
-				  max_c(data->pt1.y, data->pt2.y));
+		data = (const ViewLineArrayInfo*)&(lineData[i]);
+		BRect box(min_c(data->startPoint.x, data->endPoint.x),
+				  min_c(data->startPoint.y, data->endPoint.y),
+				  max_c(data->startPoint.x, data->endPoint.x),
+				  max_c(data->startPoint.y, data->endPoint.y));
 		touched = touched | box;
 	}
 	extend_by_stroke_width(touched, fPainter->PenSize());
@@ -1234,7 +1234,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	if (touched.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
-		data = (const LineArrayData *)&(linedata[0]);
+		data = (const ViewLineArrayInfo*)&(lineData[0]);
 
 		// store current graphics state, we mess with the
 		// high color and pattern...
@@ -1243,12 +1243,12 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 
 		fPainter->SetHighColor(data->color);
 		fPainter->SetPattern(B_SOLID_HIGH);
-		fPainter->StrokeLine(data->pt1, data->pt2);
+		fPainter->StrokeLine(data->startPoint, data->endPoint);
 
 		for (int32 i = 1; i < numLines; i++) {
-			data = (const LineArrayData *)&(linedata[i]);
+			data = (const ViewLineArrayInfo*)&(lineData[i]);
 			fPainter->SetHighColor(data->color);
-			fPainter->StrokeLine(data->pt1, data->pt2);
+			fPainter->StrokeLine(data->startPoint, data->endPoint);
 		}
 
 		// restore correct drawing state highcolor and pattern

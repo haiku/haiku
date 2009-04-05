@@ -16,6 +16,7 @@
 #include <Locker.h>
 #include <Point.h>
 #include <Gradient.h>
+#include <ServerProtocolStructs.h>
 
 #include "HWInterface.h"
 
@@ -29,11 +30,6 @@ class ServerBitmap;
 class ServerCursor;
 class ServerFont;
 
-typedef struct {
-	BPoint pt1;
-	BPoint pt2;
-	rgb_color color;
-} LineArrayData;
 
 class DrawingEngine : public HWInterfaceListener {
 public:
@@ -158,7 +154,7 @@ public:
 								const BPoint& end);
 
 			void			StrokeLineArray(int32 numlines,
-								const LineArrayData* data);
+								const ViewLineArrayInfo* data);
 
 			// -------- text related calls
 
