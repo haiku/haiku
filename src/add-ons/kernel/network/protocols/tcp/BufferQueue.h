@@ -76,8 +76,8 @@ BufferQueue::PushedData() const
 {
 	// we must check if fPushPointer is not 0 here due to
 	// tcp_sequence's special handling of >
-	return fPushPointer != 0
-		&& fPushPointer > fFirstSequence ? fPushPointer - fFirstSequence : 0;
+	return fPushPointer != 0 && fPushPointer > fFirstSequence
+		? (fPushPointer - fFirstSequence).Number() : 0;
 }
 
 #endif	// BUFFER_QUEUE_H

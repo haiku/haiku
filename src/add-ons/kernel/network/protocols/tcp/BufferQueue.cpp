@@ -91,14 +91,15 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	}
 	if (sequence < fFirstSequence) {
 		// this buffer contains data that is already long gone - trim it
-		gBufferModule->remove_header(buffer, fFirstSequence - sequence);
+		gBufferModule->remove_header(buffer,
+			(fFirstSequence - sequence).Number());
 		sequence = fFirstSequence;
 	}
 
 	if (fList.IsEmpty() || sequence >= fLastSequence) {
 		// we usually just add the buffer to the end of the queue
 		fList.Add(buffer);
-		buffer->sequence = sequence;
+		buffer->sequence = sequence.Number();
 
 		if (sequence == fLastSequence
 			&& fLastSequence - fFirstSequence == fNumBytes) {
@@ -157,7 +158,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 				> sequence) {
 			// We already have the first part of this buffer
 			gBufferModule->remove_header(buffer,
-				previous->sequence + previous->size - sequence);
+				(previous->sequence + previous->size - sequence).Number());
 			sequence = previous->sequence + previous->size;
 		}
 	}
@@ -179,7 +180,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		} else if (tcp_sequence(next->sequence) > sequence) {
 			// We have the end of this buffer already
 			gBufferModule->remove_trailer(buffer,
-				sequence + buffer->size - next->sequence);
+				(sequence + buffer->size - next->sequence).Number());
 		} else {
 			// We already have this data
 			gBufferModule->free(buffer);
@@ -196,7 +197,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	}
 
 	fList.Insert(next, buffer);
-	buffer->sequence = sequence;
+	buffer->sequence = sequence.Number();
 	fNumBytes += buffer->size;
 
 	// we might need to update the number of bytes available
@@ -253,7 +254,7 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 			gBufferModule->free(buffer);
 		} else {
 			// remove the header as far as needed
-			size_t size = sequence - buffer->sequence;
+			size_t size = (sequence - buffer->sequence).Number();
 			gBufferModule->remove_header(buffer, size);
 
 			buffer->sequence += size;
@@ -290,7 +291,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 		return B_BAD_VALUE;
 	}
 	if (tcp_sequence(sequence + bytes) > fLastSequence)
-		bytes = fLastSequence - sequence;
+		bytes = (fLastSequence - sequence).Number();
 
 	size_t bytesLeft = bytes;
 
@@ -305,14 +306,14 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 
 	if (source == NULL)
 		panic("we should have had that data...");
-	if (source->sequence > sequence) {
+	if (tcp_sequence(source->sequence) > sequence) {
 		panic("source %p, sequence = %lu (%lu)\n", source, source->sequence,
-			(uint32)sequence);
+			sequence.Number());
 	}
 
 	// clone the data
 
-	uint32 offset = sequence - source->sequence;
+	uint32 offset = (sequence - source->sequence).Number();
 
 	while (source != NULL && bytesLeft > 0) {
 		size_t size = min_c(source->size - offset, bytesLeft);
@@ -416,10 +417,10 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 size_t
 BufferQueue::Available(tcp_sequence sequence) const
 {
-	if (sequence > (uint32)fFirstSequence + fContiguousBytes)
+	if (sequence > (fFirstSequence + fContiguousBytes).Number())
 		return 0;
 
-	return fContiguousBytes + fFirstSequence - sequence;
+	return (fContiguousBytes + fFirstSequence - sequence).Number();
 }
 
 

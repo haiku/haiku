@@ -73,28 +73,105 @@ struct tcp_header {
 
 class tcp_sequence {
 public:
-					tcp_sequence() {}
-					tcp_sequence(uint32 sequence) : fNumber(sequence) {}
+	inline tcp_sequence() {}
+	inline tcp_sequence(uint32 sequence)
+		: fNumber(sequence)
+	{
+	}
 
-					operator uint32() const { return fNumber; }
+	inline uint32 Number() const
+	{
+		return fNumber;
+	}
 
-			void	operator=(uint32 sequence) { fNumber = sequence; }
-			bool	operator>(uint32 sequence) const
-						{ return (int32)(fNumber - sequence) > 0; }
-			bool	operator>=(uint32 sequence) const
-						{ return (int32)(fNumber - sequence) >= 0; }
-			bool	operator<(uint32 sequence) const
-						{ return (int32)(fNumber - sequence) < 0; }
-			bool	operator<=(uint32 sequence) const
-						{ return (int32)(fNumber - sequence) <= 0; }
+	inline tcp_sequence& operator=(tcp_sequence sequence)
+	{
+		fNumber = sequence.fNumber;
+		return *this;
+	}
 
-			uint32&	operator+=(uint32 sequence) { return fNumber += sequence; }
-			uint32&	operator++() { return ++fNumber; }
-			uint32	operator++(int _) { return fNumber++; }
+	inline tcp_sequence& operator+=(tcp_sequence sequence)
+	{
+		fNumber += sequence.fNumber;
+		return *this;
+	}
 
-private:
+	inline tcp_sequence& operator++()
+	{
+		fNumber++;
+		return *this;
+	}
+
+	inline tcp_sequence operator++(int _)
+	{
+		fNumber++;
+		return fNumber - 1;
+	}
+
+// Conceptually private, but used in global operators.
+//private:
 	uint32	fNumber;
 };
+
+
+// Global tcp_sequence Operators
+
+
+inline bool
+operator>(tcp_sequence a, tcp_sequence b)
+{
+	return (int32)(a.fNumber - b.fNumber) > 0;
+}
+
+
+inline bool
+operator>=(tcp_sequence a, tcp_sequence b)
+{
+	return (int32)(a.fNumber - b.fNumber) >= 0;
+}
+
+
+inline bool
+operator<(tcp_sequence a, tcp_sequence b)
+{
+	return (int32)(a.fNumber - b.fNumber) < 0;
+}
+
+
+inline bool
+operator<=(tcp_sequence a, tcp_sequence b)
+{
+	return (int32)(a.fNumber - b.fNumber) <= 0;
+}
+
+
+inline tcp_sequence
+operator+(tcp_sequence a, tcp_sequence b)
+{
+	return a.fNumber + b.fNumber;
+}
+
+
+inline tcp_sequence
+operator-(tcp_sequence a, tcp_sequence b)
+{
+	return a.fNumber - b.fNumber;
+}
+
+
+inline bool
+operator!=(tcp_sequence a, tcp_sequence b)
+{
+	return a.fNumber != b.fNumber;
+}
+
+
+inline bool
+operator==(tcp_sequence a, tcp_sequence b)
+{
+	return a.fNumber == b.fNumber;
+}
+
 
 // TCP flag constants
 #define TCP_FLAG_FINISH					0x01

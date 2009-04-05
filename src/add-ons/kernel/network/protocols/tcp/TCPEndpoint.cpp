@@ -1548,7 +1548,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		// the window must not shrink
 
 	// trim buffer to be within the receive window
-	int32 drop = fReceiveNext - segment.sequence;
+	int32 drop = (int32)(fReceiveNext - segment.sequence).Number();
 	if (drop > 0) {
 		if ((uint32)drop > buffer->size
 			|| ((uint32)drop == buffer->size
@@ -1566,7 +1566,8 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	int32 action = KEEP;
 
-	drop = segment.sequence + buffer->size - (fReceiveNext + fReceiveWindow);
+	drop = (int32)(segment.sequence + buffer->size
+		- (fReceiveNext + fReceiveWindow)).Number();
 	if (drop > 0) {
 		// remove data exceeding our window
 		if ((uint32)drop >= buffer->size) {
@@ -1844,7 +1845,7 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header& segment, uint32 length,
 	if (segment.advertised_window > 0) {
 		// correct the window to take into account what already has been advertised
 		uint32 window = (segment.advertised_window << fReceiveWindowShift)
-			- (fReceiveMaxAdvertised - fReceiveNext);
+			- (fReceiveMaxAdvertised - fReceiveNext).Number();
 
 		// if we can advertise a window larger than twice the maximum segment
 		// size, or half the maximum buffer size we send a window update
@@ -1912,14 +1913,14 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	else
 		segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
 
-	segment.acknowledge = fReceiveNext;
+	segment.acknowledge = fReceiveNext.Number();
 
 	// Process urgent data
 	if (fSendUrgentOffset > fSendNext) {
 		segment.flags |= TCP_FLAG_URGENT;
-		segment.urgent_offset = fSendUrgentOffset - fSendNext;
+		segment.urgent_offset = (fSendUrgentOffset - fSendNext).Number();
 	} else {
-		fSendUrgentOffset = fSendUnacknowledged;
+		fSendUrgentOffset = fSendUnacknowledged.Number();
 			// Keep urgent offset updated, so that it doesn't reach into our
 			// send window on overlap
 		segment.urgent_offset = 0;
@@ -1942,8 +1943,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	// reduced (by congestion for instance), so at some point in time flight
 	// size may be larger than the currently calculated window.
 
-	uint32 flightSize = fSendMax - fSendUnacknowledged;
-	uint32 consumedWindow = fSendNext - fSendUnacknowledged;
+	uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
+	uint32 consumedWindow = (fSendNext - fSendUnacknowledged).Number();
 
 	if (consumedWindow > sendWindow) {
 		sendWindow = 0;
@@ -1998,7 +1999,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		PeerAddress().CopyTo(buffer->destination);
 
 		uint32 size = buffer->size;
-		segment.sequence = fSendNext;
+		segment.sequence = fSendNext.Number();
 
 		TRACE("SendQueued(): buffer %p (%lu bytes) address %s to %s\n"
 			"\tflags 0x%x, seq %lu, ack %lu, rwnd %hu, cwnd %lu, ssthresh %lu\n"
@@ -2033,7 +2034,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		if (segment.flags & TCP_FLAG_FINISH)
 			size++;
 
-		uint32 sendMax = fSendMax;
+		uint32 sendMax = fSendMax.Number();
 		fSendNext += size;
 		if (fSendMax < fSendNext)
 			fSendMax = fSendNext;
@@ -2205,7 +2206,7 @@ TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime)
 void
 TCPEndpoint::_ResetSlowStart()
 {
-	fSlowStartThreshold = max_c((fSendMax - fSendUnacknowledged) / 2,
+	fSlowStartThreshold = max_c((fSendMax - fSendUnacknowledged).Number() / 2,
 		2 * fSendMaxSegmentSize);
 	fCongestionWindow = fSendMaxSegmentSize;
 }
@@ -2300,11 +2301,11 @@ TCPEndpoint::Dump() const
 	kprintf("  accept sem: %ld\n", fAcceptSemaphore);
 	kprintf("  options: 0x%lx\n", (uint32)fOptions);
 	kprintf("  send\n");
-	kprintf("    window shift: %lu\n", (uint32)fSendWindowShift);
-	kprintf("    unacknowledged: %lu\n", (uint32)fSendUnacknowledged);
-	kprintf("    next: %lu\n", (uint32)fSendNext);
-	kprintf("    max: %lu\n", (uint32)fSendMax);
-	kprintf("    urgent offset: %lu\n", (uint32)fSendUrgentOffset);
+	kprintf("    window shift: %u\n", fSendWindowShift);
+	kprintf("    unacknowledged: %lu\n", fSendUnacknowledged.Number());
+	kprintf("    next: %lu\n", fSendNext.Number());
+	kprintf("    max: %lu\n", fSendMax.Number());
+	kprintf("    urgent offset: %lu\n", fSendUrgentOffset.Number());
 	kprintf("    window: %lu\n", fSendWindow);
 	kprintf("    max window: %lu\n", fSendMaxWindow);
 	kprintf("    max segment size: %lu\n", fSendMaxSegmentSize);
@@ -2312,25 +2313,25 @@ TCPEndpoint::Dump() const
 #if DEBUG_BUFFER_QUEUE
 	fSendQueue.Dump();
 #endif
-	kprintf("    last acknowledge sent: %lu\n", (uint32)fLastAcknowledgeSent);
-	kprintf("    initial sequence: %lu\n", (uint32)fInitialSendSequence);
+	kprintf("    last acknowledge sent: %lu\n", fLastAcknowledgeSent.Number());
+	kprintf("    initial sequence: %lu\n", fInitialSendSequence.Number());
 	kprintf("  receive\n");
-	kprintf("    window shift: %lu\n", (uint32)fReceiveWindowShift);
-	kprintf("    next: %lu\n", (uint32)fReceiveNext);
-	kprintf("    max advertised: %lu\n", (uint32)fReceiveMaxAdvertised);
-	kprintf("    window: %lu\n", (uint32)fReceiveWindow);
-	kprintf("    max segment size: %lu\n", (uint32)fReceiveMaxSegmentSize);
+	kprintf("    window shift: %u\n", fReceiveWindowShift);
+	kprintf("    next: %lu\n", fReceiveNext.Number());
+	kprintf("    max advertised: %lu\n", fReceiveMaxAdvertised.Number());
+	kprintf("    window: %lu\n", fReceiveWindow);
+	kprintf("    max segment size: %lu\n", fReceiveMaxSegmentSize);
 	kprintf("    queue: %lu / %lu\n", fReceiveQueue.Available(),
 		fReceiveQueue.Size());
 #if DEBUG_BUFFER_QUEUE
 	fReceiveQueue.Dump();
 #endif
-	kprintf("    initial sequence: %lu\n", (uint32)fInitialReceiveSequence);
+	kprintf("    initial sequence: %lu\n", fInitialReceiveSequence.Number());
 	kprintf("    duplicate acknowledge count: %lu\n",
 		fDuplicateAcknowledgeCount);
 	kprintf("  round trip time: %ld (deviation %ld)\n", fRoundTripTime,
 		fRoundTripDeviation);
-	kprintf("  retransmit timeout: %llu\n", (uint64)fRetransmitTimeout);
+	kprintf("  retransmit timeout: %lld\n", fRetransmitTimeout);
 	kprintf("  congestion window: %lu\n", fCongestionWindow);
 	kprintf("  slow start threshold: %lu\n", fSlowStartThreshold);
 }
