@@ -39,7 +39,7 @@ protected:
 			BView*				_CreateMapLists();
 			void				_AddKeyboardLayouts(BMenu* menu);
 
-			void				_UpdateShortcutButton();
+			void				_UpdateSwitchShortcutButton();
 			void				_UpdateButtons();
 			void				_SwitchShortcutKeys();
 

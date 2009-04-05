@@ -152,7 +152,7 @@ KeymapWindow::KeymapWindow()
 	fAppliedMap = fCurrentMap;
 	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
 
-	_UpdateShortcutButton();
+	_UpdateSwitchShortcutButton();
 
 	Unlock();
 }
@@ -437,19 +437,18 @@ KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 }
 
 
+/*!	Sets the label of the "Switch Shorcuts" button to make it more
+	descriptive what will happen when you press that button.
+*/
 void
-KeymapWindow::_UpdateShortcutButton()
+KeymapWindow::_UpdateSwitchShortcutButton()
 {
 	const char* label = "Switch Shortcut Keys";
 	if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5d
-		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5c
-		&& fCurrentMap.KeyForModifier(B_RIGHT_OPTION_KEY) == 0x5f
-		&& fCurrentMap.KeyForModifier(B_RIGHT_CONTROL_KEY) == 0x60) {
+		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5c) {
 		label = "Switch Shortcut Keys To Windows/Linux Mode";
 	} else if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5c
-		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d
-		&& fCurrentMap.KeyForModifier(B_RIGHT_OPTION_KEY) == 0x60
-		&& fCurrentMap.KeyForModifier(B_RIGHT_CONTROL_KEY) == 0x5f) {
+		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d) {
 		label = "Switch Shortcut Keys To Haiku Mode";
 	}
 
@@ -463,7 +462,7 @@ KeymapWindow::_UpdateButtons()
 	fUseButton->SetEnabled(!fCurrentMap.Equals(fAppliedMap));
 	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
 
-	_UpdateShortcutButton();
+	_UpdateSwitchShortcutButton();
 }
 
 
@@ -472,7 +471,7 @@ KeymapWindow::_SwitchShortcutKeys()
 {
 	uint32 leftCommand = fCurrentMap.Map().left_command_key;
 	uint32 leftControl = fCurrentMap.Map().left_control_key;
-	uint32 rightOption = fCurrentMap.Map().right_option_key;
+	uint32 rightCommand = fCurrentMap.Map().right_command_key;
 	uint32 rightControl = fCurrentMap.Map().right_control_key;
 
 	// switch left side
@@ -480,8 +479,8 @@ KeymapWindow::_SwitchShortcutKeys()
 	fCurrentMap.Map().left_control_key = leftCommand;
 
 	// switch right side
-	fCurrentMap.Map().right_option_key = rightControl;
-	fCurrentMap.Map().right_control_key = rightOption;
+	fCurrentMap.Map().right_command_key = rightControl;
+	fCurrentMap.Map().right_control_key = rightCommand;
 
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 	_UpdateButtons();
