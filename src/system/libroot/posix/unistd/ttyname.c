@@ -29,15 +29,15 @@ ttyname_r(int fd, char *buffer, size_t bufferSize)
 
 	// first, some sanity checks:
 	if (fstat(fd, &fdStat) < 0)
-		return -1;
-
-	if (!S_ISCHR(fdStat.st_mode) || !isatty(fd)) {
-		errno = ENOTTY;
 		return ENOTTY;
-	}
+
+	if (!S_ISCHR(fdStat.st_mode) || !isatty(fd))
+		return ENOTTY;
 
 	// just ask devfs
-	return ioctl(fd, B_GET_PATH_FOR_DEVICE, buffer, bufferSize);
+	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, buffer, bufferSize) < 0)
+		return errno;
+	return 0;
 }
 
 
@@ -52,7 +52,9 @@ ttyname(int fd)
 	static char pathname[MAXPATHLEN];
 
 	int err = ttyname_r(fd, pathname, sizeof(pathname));
-	if (err < 0)
+	if (err != 0) {
+		errno = err;
 		return NULL;
+	}
 	return pathname;
 }
