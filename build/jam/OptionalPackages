@@ -17,6 +17,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Beam
 #	BeBook
 #	BeHappy
+#	BeOSCompatibility
 #	BePDF
 #	Bluetooth
 #	CVS
@@ -123,6 +124,18 @@ if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeHappy/BeHappy ;
 	}
+}
+
+
+# BeOSCompatibility
+if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
+	Echo "Warning: Adding BeOS compatibility symlinks. This will go away. Please fix your apps!" ;
+	AddSymlinkToHaikuImage beos : ../system/apps ;
+	AddSymlinkToHaikuImage beos : ../system/bin ;
+	AddSymlinkToHaikuImage beos : ../system/documentation ;
+	AddSymlinkToHaikuImage beos : ../system/etc ;
+	AddSymlinkToHaikuImage beos : ../system/preferences ;
+	AddSymlinkToHaikuImage beos : ../system ;
 }
 
 
