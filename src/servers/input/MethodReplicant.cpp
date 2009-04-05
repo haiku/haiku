@@ -40,7 +40,6 @@ MethodReplicant::MethodReplicant(const char* signature)
 	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1), kRemoteColorSpace);
 	fSegments->SetBits(kRemoteBits, kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
 	// Background Color
-	SetViewColor(184, 184, 184);
 
 	//add dragger
 	BRect rect(Bounds());
@@ -108,6 +107,9 @@ void
 MethodReplicant::AttachedToWindow()
 {
 	CALLED();
+
+	SetViewColor(Parent()->ViewColor());
+
 	BMessenger messenger(this);
 	BMessage msg(IS_METHOD_REGISTER);
 	msg.AddMessenger("address", messenger);
