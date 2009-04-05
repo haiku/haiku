@@ -6,6 +6,7 @@
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)
+ *		Clemens Zeidler (haiku@clemens-zeidler.de)
  */
 
 
@@ -102,7 +103,6 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 	// probe devices
 	// the probe function has to set the dev name and the dev packet size
 
-#if 0
 	status = probe_trackpoint(dev);
 	if (status == B_OK) {
 		*hooks = &gStandardMouseDeviceHooks;
@@ -114,7 +114,14 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 		*hooks = &gSynapticsDeviceHooks;
 		goto dev_found;
 	}
-#endif
+
+	// reset the mouse for the case that the previous probes leaf the mouse in
+	// a undefined state
+	status = ps2_reset_mouse(dev);
+	if (status != B_OK) {
+		INFO("ps2: reset after probe failed\n");
+		return B_ERROR;
+	}
 
 	status = probe_standard_mouse(dev);
 	if (status == B_OK) {
@@ -180,8 +187,6 @@ ps2_dev_publish(ps2_dev *dev)
 		if (status == B_OK) {
 			status = devfs_publish_device(dev->name, hooks);
 		}
-
-		//status = devfs_publish_device(dev->name, &gPointingDeviceHooks);
 	}
 
 	dev->active = true;
