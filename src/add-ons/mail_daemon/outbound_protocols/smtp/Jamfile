@@ -25,7 +25,7 @@ Addon SMTP :
 	smtp.cpp
 	md5c.c ;
 
-LinkAgainst SMTP : be libmail.so $(TARGET_NETWORK_LIBS) ;
+LinkAgainst SMTP : be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
 
 if $(USE_SSL) {
 	LinkAgainst SMTP : $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;

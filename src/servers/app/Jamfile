@@ -63,7 +63,7 @@ Server app_server :
 	:
 	libtranslation.so libbe.so
 	libasdrawing.a libpainter.a libagg.a libfreetype.so
-	libtextencoding.so libshared.a
+	libtextencoding.so libshared.a $(TARGET_LIBSTDC++)
 
 	: app_server.rdef
 ;

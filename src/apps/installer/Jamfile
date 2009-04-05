@@ -14,5 +14,5 @@ Application Installer :
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
-	: be tracker translation
+	: be tracker translation $(TARGET_LIBSTDC++)
 	: Installer.rdef ;

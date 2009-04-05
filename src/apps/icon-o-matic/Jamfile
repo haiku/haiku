@@ -297,7 +297,7 @@ Application Icon-O-Matic :
 	MainWindow.cpp
 	Util.cpp
 
-	: be tracker translation libshared.a libagg.a libexpat.a
+	: be tracker translation libshared.a libagg.a libexpat.a $(TARGET_LIBSTDC++)
 
 	: Icon-O-Matic.rdef
 ;

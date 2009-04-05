@@ -13,6 +13,6 @@ Preference Keymap :
 	KeymapMessageFilter.cpp
 	KeymapWindow.cpp
 
-	: be tracker
+	: be tracker $(TARGET_LIBSTDC++)
 	: Keymap.rdef
 ;

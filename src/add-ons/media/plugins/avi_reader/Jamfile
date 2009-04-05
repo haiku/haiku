@@ -10,7 +10,7 @@ Addon avi_reader :
 	avi_reader.cpp
 	:
 	libopendml.a
-	be libmedia.so
+	be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins avi_reader libOpenDML ;

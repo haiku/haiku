@@ -93,7 +93,7 @@ SharedLibrary libtracker.so :
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 
-	: be translation $(vector_icon_libs)
+	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++)
 
 	;
 

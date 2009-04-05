@@ -92,7 +92,7 @@ Translator JPEGTranslator :
 	exif_parser.cpp
 	JPEGTranslator.cpp
 
-	: be translation libjpeg.a
+	: be translation libjpeg.a $(TARGET_LIBSTDC++)
 	: true
 ;
 

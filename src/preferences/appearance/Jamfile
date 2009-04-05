@@ -22,7 +22,7 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 	
-	: be
+	: be $(TARGET_LIBSTDC++)
 	: Appearance.rdef
 	;
 
