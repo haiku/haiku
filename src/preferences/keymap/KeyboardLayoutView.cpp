@@ -133,16 +133,27 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	fDropPoint.x = -1;
 
 	Key* key = _KeyAt(point);
-	if (key != NULL) {
-		fKeyState[key->code / 8] |= (1 << (7 - (key->code & 7)));
-		
-		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+	if (key == NULL)
+		return;
+
+	if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+		if (_KeyState(key->code)) {
+			uint32 modifier = fKeymap->Modifier(key->code);
+			if ((modifier & modifiers()) == 0) {
+				_SetKeyState(key->code, false);
+				fModifiers &= ~modifier;
+				Invalidate();
+			}
+		} else {
+			_SetKeyState(key->code, true);
 			fModifiers |= fKeymap->Modifier(key->code);
 			Invalidate();
+		}
 
-			// TODO: if possible, we could handle the lock keys for real
-		} else
-			_InvalidateKey(key);
+		// TODO: if possible, we could handle the lock keys for real
+	} else {
+		_SetKeyState(key->code, true);
+		_InvalidateKey(key);
 	}
 }
 
@@ -152,19 +163,16 @@ KeyboardLayoutView::MouseUp(BPoint point)
 {
 	Key* key = _KeyAt(fClickPoint);
 	if (key != NULL) {
-		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
+		// modifier keys are sticky when used with the mouse
+		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code))
+			return;
+
+		_SetKeyState(key->code, false);
 
 		if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
 			return;
 
-		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
-			int32 newModifiers = modifiers();
-			if (fModifiers != newModifiers) {
-				fModifiers = modifiers();
-				Invalidate();
-			}
-		} else
-			_InvalidateKey(key);
+		_InvalidateKey(key);
 
 		if (fDragKey == NULL && fKeymap != NULL) {
 			// Send fake key down message to target
@@ -188,7 +196,17 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 
 			_EvaluateDropTarget(point);
 		}
-	} else if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
+
+		return;
+	}
+	
+	int32 buttons;
+	if (Window()->CurrentMessage() == NULL
+		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
+		|| buttons == 0)
+		return;
+
+	if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
 		|| fabs(point.y - fClickPoint.y) > 4)) {
 		// start dragging
 		Key* key = _KeyAt(fClickPoint);
@@ -767,26 +785,46 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 
 
 bool
-KeyboardLayoutView::_IsKeyPressed(int32 code)
+KeyboardLayoutView::_IsKeyPressed(uint32 code)
+{
+	if (fDropTarget != NULL && fDropTarget->code == (int32)code)
+		return true;
+
+	return _KeyState(code);
+}
+
+
+bool
+KeyboardLayoutView::_KeyState(uint32 code) const
 {
 	if (code >= 16 * 8)
 		return false;
-
-	if (fDropTarget != NULL && fDropTarget->code == code)
-		return true;
 
 	return (fKeyState[code / 8] & (1 << (7 - (code & 7)))) != 0;
 }
 
 
+void
+KeyboardLayoutView::_SetKeyState(uint32 code, bool pressed)
+{
+	if (code >= 16 * 8)
+		return;
+
+	if (pressed)
+		fKeyState[code / 8] |= (1 << (7 - (code & 7)));
+	else
+		fKeyState[code / 8] &= ~(1 << (7 - (code & 7)));
+}
+
+
 Key*
-KeyboardLayoutView::_KeyForCode(int32 code)
+KeyboardLayoutView::_KeyForCode(uint32 code)
 {
 	// TODO: have a lookup array
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
-		if (key->code == code)
+		if (key->code == (int32)code)
 			return key;
 	}
 
@@ -795,7 +833,7 @@ KeyboardLayoutView::_KeyForCode(int32 code)
 
 
 void
-KeyboardLayoutView::_InvalidateKey(int32 code)
+KeyboardLayoutView::_InvalidateKey(uint32 code)
 {
 	_InvalidateKey(_KeyForCode(code));
 }
@@ -814,7 +852,7 @@ KeyboardLayoutView::_InvalidateKey(const Key* key)
 	\return true if the view has been invalidated.
 */
 bool
-KeyboardLayoutView::_HandleDeadKey(int32 key, int32 modifiers)
+KeyboardLayoutView::_HandleDeadKey(uint32 key, int32 modifiers)
 {
 	if (fKeymap == NULL)
 		return false;

@@ -71,11 +71,13 @@ private:
 								size_t textSize);
 			void			_GetKeyLabel(const Key* key, char* text,
 								size_t textSize, key_kind& keyKind);
-			bool			_IsKeyPressed(int32 code);
-			Key*			_KeyForCode(int32 code);
-			void			_InvalidateKey(int32 code);
+			bool			_IsKeyPressed(uint32 code);
+			bool			_KeyState(uint32 code) const;
+			void			_SetKeyState(uint32 code, bool pressed);
+			Key*			_KeyForCode(uint32 code);
+			void			_InvalidateKey(uint32 code);
 			void			_InvalidateKey(const Key* key);
-			bool			_HandleDeadKey(int32 key, int32 modifiers);
+			bool			_HandleDeadKey(uint32 key, int32 modifiers);
 			void			_KeyChanged(const BMessage* message);
 			Key*			_KeyAt(BPoint point);
 			BRect			_FrameFor(BRect keyFrame);
