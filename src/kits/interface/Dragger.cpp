@@ -59,6 +59,7 @@ BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
 	fTransition(false),
 	fIsZombie(false),
 	fErrCount(0),
+	fPopUpIsCustom(false),
 	fPopUp(NULL)
 {
 	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
@@ -74,6 +75,7 @@ BDragger::BDragger(BMessage *data)
 	fTransition(false),
 	fIsZombie(false),
 	fErrCount(0),
+	fPopUpIsCustom(false),
 	fPopUp(NULL)
 {
 	data->FindInt32("_rel", (int32 *)&fRelation);
@@ -85,16 +87,17 @@ BDragger::BDragger(BMessage *data)
 	if (data->FindMessage("_popup", &popupMsg) == B_OK) {
 		BArchivable *archivable = instantiate_object(&popupMsg);
 
-		if (archivable)
+		if (archivable) {
 			fPopUp = dynamic_cast<BPopUpMenu *>(archivable);
+			fPopUpIsCustom = true;
+		}
 	}
 }
 
 
 BDragger::~BDragger()
 {
-	SetPopUp(NULL);
-	
+	delete fPopUp;
 	delete fBitmap;
 }
 
@@ -117,7 +120,7 @@ BDragger::Archive(BMessage *data, bool deep) const
 
 	BMessage popupMsg;
 	
-	if (fPopUp) {
+	if (fPopUp && fPopUpIsCustom) {
 		bool windowLocked = fPopUp->Window()->Lock();
 
 		ret = fPopUp->Archive(&popupMsg, deep);
@@ -510,11 +513,13 @@ BDragger::AllDetached()
 status_t
 BDragger::SetPopUp(BPopUpMenu *menu)
 {
-	if (fPopUp != menu)
+	if (menu != NULL && menu != fPopUp) {
 		delete fPopUp;
-
-	fPopUp = menu;
-	return B_OK;
+		fPopUp = menu;
+		fPopUpIsCustom = true;
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 

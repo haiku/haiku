@@ -114,6 +114,7 @@ class BDragger : public BView {
 				bool		fTransition;
 				bool		fIsZombie;
 				char		fErrCount;
+				bool		fPopUpIsCustom;
 				BBitmap	*	fBitmap;
 				BPopUpMenu*	fPopUp;
 				uint32		_reserved[3];
