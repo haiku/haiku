@@ -229,14 +229,16 @@ ViewHistory::Update(DataHistory* history, int32 width, int32 resolution,
 		|| fResolution != resolution
 		|| fRefresh != refresh) {
 		fValues.SetSize(width);
-		fLastTime = 0;
 		fResolution = resolution;
 		fRefresh = refresh;
+		fLastTime = 0;
 	}
 
 	// Compute how many new values we need to retrieve
 	if (fLastTime < history->Start())
 		fLastTime = history->Start();
+	if (fLastTime > history->End())
+		return;
 
 	int32 updateWidth = int32((toTime - fLastTime) / step);
 	if (updateWidth < 1)
@@ -827,7 +829,6 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 
 	while (true) {
 		DataSource* source = FindDataSource(remove);
-		//debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
 		if (source == NULL) {
 			if (removed)
 				break;
@@ -1116,7 +1117,7 @@ ActivityView::MessageReceived(BMessage* message)
 			if (source == NULL)
 				AddDataSource(baseSource);
 			else
-				RemoveDataSource(source);
+				RemoveDataSource(baseSource);
 
 			Invalidate();
 			break;
