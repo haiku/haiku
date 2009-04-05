@@ -7709,7 +7709,7 @@ BPoseView::OpenParent()
 void
 BPoseView::IdentifySelection()
 {
-	bool force = (modifiers() & B_OPTION_KEY) != 0;
+	bool force = (modifiers() & B_SHIFT_KEY) != 0;
 	int32 count = fSelectionList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BPose *pose = fSelectionList->ItemAt(index);
@@ -8890,21 +8890,21 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 	// note: fAlreadySelectedDropTarget is a trick to avoid to really search
 	// fSelectionList. Another solution would be to add Hilite/IsHilited just
 	// like Select/IsSelected in BPose and let it handle this case internally
-	
+
 	// can happen when starting a new drag
-	if (fAlreadySelectedDropTarget != fDropTarget)		
-		fAlreadySelectedDropTarget = NULL;	
-	
+	if (fAlreadySelectedDropTarget != fDropTarget)
+		fAlreadySelectedDropTarget = NULL;
+
 	// don't select, this droptarget was already part of a user selection
-	if (fDropTarget->IsSelected() && hiliteState) {		
-		fAlreadySelectedDropTarget = fDropTarget;		
-		return;	
- 	} 	
-	
+	if (fDropTarget->IsSelected() && hiliteState) {
+		fAlreadySelectedDropTarget = fDropTarget;
+		return;
+	}
+
 	// don't unselect the fAlreadySelectedDropTarget 
 	if ((fAlreadySelectedDropTarget == fDropTarget) && !hiliteState) {
 		fAlreadySelectedDropTarget = NULL;
-		return;	
+		return;
 	}
 
 	fDropTarget->Select(hiliteState);

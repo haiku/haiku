@@ -2357,12 +2357,12 @@ BContainerWindow::SetupMoveCopyMenus(const entry_ref *item_ref, BMenu *parent)
 		parent->AddItem(fCreateLinkItem, index);
 	}
 
-    // Set the "Create Link" item label here so it
-    // appears correctly when menus are disabled, too.
-    if (modifierKeys & B_SHIFT_KEY)
-    	fCreateLinkItem->SetLabel("Create Relative Link");
-    else
-    	fCreateLinkItem->SetLabel("Create Link");
+	// Set the "Create Link" item label here so it
+	// appears correctly when menus are disabled, too.
+	if (modifierKeys & B_SHIFT_KEY)
+		fCreateLinkItem->SetLabel("Create Relative Link");
+	else
+		fCreateLinkItem->SetLabel("Create Link");
 
 	// only enable once the menus are built
 	fMoveToItem->SetEnabled(false);
@@ -2405,6 +2405,15 @@ BContainerWindow::SetupMoveCopyMenus(const entry_ref *item_ref, BMenu *parent)
 	fMoveToItem->SetEnabled(true);
 	fCopyToItem->SetEnabled(true);
 	fCreateLinkItem->SetEnabled(true);
+
+	// Set the "Identify" item label
+	BMenuItem *identifyItem = parent->FindItem(kIdentifyEntry);
+	if (identifyItem != NULL) {
+		if (modifierKeys & B_SHIFT_KEY)
+			identifyItem->SetLabel("Force Identify");
+		else
+			identifyItem->SetLabel("Identify");
+	}
 }
 
 
