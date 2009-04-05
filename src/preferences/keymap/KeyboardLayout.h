@@ -28,6 +28,7 @@ struct Key {
 	key_shape	shape;
 	BRect		frame;
 	float		second_row;
+		// this is the width of the second row of a kEnterKeyShape key
 	bool		dark;
 };
 

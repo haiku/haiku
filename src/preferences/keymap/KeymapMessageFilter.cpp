@@ -3,6 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+/*!	This class implements a filter that applies a certain keymap to
+	the keyboard input.
+	It's used to be able to make keymap changes live within the
+	application.
+*/
 
 #include "KeymapMessageFilter.h"
 
@@ -64,6 +69,6 @@ KeymapMessageFilter::Filter(BMessage* message, BHandler** /*_target*/)
 			delete[] string;
 		}
 	}
-	
+
 	return B_DISPATCH_MESSAGE;
 }

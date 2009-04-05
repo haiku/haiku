@@ -538,14 +538,15 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		BRegion region(rect);
 		BRect originalRect = rect;
 		BRect missingRect = rect;
+
 		// TODO: for some reason, this does not always equal the bottom of
 		// the other keys...
-		missingRect.top = floorf(rect.bottom - fGap + 2
-			- fLayout->DefaultKeySize().height * fFactor);
+		missingRect.top = floorf(rect.top
+			+ fLayout->DefaultKeySize().height * fFactor - fGap - 1);
 		missingRect.right = floorf(missingRect.left
 			+ (key->frame.Width() - key->second_row) * fFactor - fGap - 2);
 		region.Exclude(missingRect);
-		ConstrainClippingRegion(&region);
+		view->ConstrainClippingRegion(&region);
 
 		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
@@ -556,7 +557,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		missingRect.right--;
 		missingRect.top -= 2;
 		region.Set(missingRect);
-		ConstrainClippingRegion(&region);
+		view->ConstrainClippingRegion(&region);
 
 		rect = originalRect;
 		rect.bottom = missingRect.top + 2;
@@ -566,14 +567,14 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		missingRect.right++;
 		missingRect.top += 2;
 		region.Set(missingRect);
-		ConstrainClippingRegion(&region);
+		view->ConstrainClippingRegion(&region);
 
 		rect = originalRect;
 		rect.left = missingRect.right - 2;
 		rect.top = missingRect.top - 2;
 		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
-		ConstrainClippingRegion(NULL);
+		view->ConstrainClippingRegion(NULL);
 	}
 }
 

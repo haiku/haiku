@@ -154,6 +154,50 @@ KeyboardLayout::Load(entry_ref& ref)
 void
 KeyboardLayout::SetDefault()
 {
+	// The keyboard layout description language defines the position,
+	// size, shape, and scancodes of the keys on the keyboard, row by
+	// row.
+	// You can define variables that are substituted in the row
+	// descriptions. Variables are always prefixed with a '$' symbol.
+
+	// On top level, only two different terms are accepted: value pairs,
+	// and row descriptions.
+	// Value pairs are in the form "<name> = <value>". There are only two
+	// predefined names at this moment "name" that specifies the name of
+	// a layout, and "default-size" that specifies the size of keys when
+	// no specific size is given. Also, variables can be specified this
+	// way.
+
+	// Row descriptions are embedded in the '[' and ']' brackets.
+	// The first term within a row is the position of the row, written as
+	// "<x>,<y>;" - the delimiter between terms/keys is usually the
+	// semi-colon. After the initial position, key descriptions are expected
+	// until the row is closed with a ']'.
+
+	// A key description is of the form "<shape>:<scancodes>", where <shape>
+	// is combined of the shape of the character, and its size, written as
+	// "<kind><width>,<height>[,<second-row-width>]".
+	// The kind can either be 'r' (the default, can also be omitted) for
+	// rectangular keys, or 'l' for the enter key. Additionally, you can use
+	// the 'd' character to mark dark keys. The size can be omitted completely,
+	// in which case the defined "default-size" is used. The default size is
+	// also used to determine the height of the first row of the enter key;
+	// the "<second-row-width>" specifier is only valid for enter keys, too.
+
+	// The scancodes can be written in different ways:
+	// 1) "+<count>": adds <count> keys, the scancodes will be used relative
+	//    to the previous keys.
+	// 2) "<first>-<last>": keys are added for scancode <first> to scancode
+	//    <last>.
+	// 3) "<first>+<count>": one key with the <first> scancode is added, plus
+	//    <count> ones with relative scancode from that one.
+
+	// Finally, you can also define LED indicator. Those can be made instead
+	// of a key, it accepts a size, but no shape modifiers. Also, instead of
+	// a scancode, the name of the modifer is given, currently only the
+	// following are allowed: "led-num", "led-caps", and "led-scroll".
+
+	// See for examples in the default layout below.
 #if 1
 	static const char* kDefaultLayout104 = "name = Generic 104-key\n"
 		// Size shortcuts
@@ -573,6 +617,7 @@ KeyboardLayout::_GetShape(const parse_state& state, const char* data, Key& key)
 }
 
 
+/*!	Returns the term delimiter expected in a certain parse mode. */
 const char*
 KeyboardLayout::_Delimiter(parse_mode mode)
 {
@@ -677,6 +722,10 @@ KeyboardLayout::_ParseTerm(const parse_state& state, const char*& data,
 }
 
 
+/*!	Initializes the keyboard layout from the data given.
+	The string has to be a valid keyboard layout description, otherwise
+	an error is returned.
+*/
 status_t
 KeyboardLayout::_InitFrom(const char* data)
 {
