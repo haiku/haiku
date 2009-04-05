@@ -2,7 +2,17 @@ SubDir HAIKU_TOP src bin bash ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DCONF_HOSTTYPE='\"i586\"' -DCONF_OSTYPE='\"beos\"' -DCONF_MACHTYPE='\"i586-pc-beos\"' -DCONF_VENDOR='\"pc\"' -DSHELL ;
+# split the canonical target string
+local cpuName = [ Match "([^-]*)-.*" : $(HAIKU_GCC_MACHINE) ] ;
+local vendorName = [ Match "[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
+local osName = [ Match "[^-]*-[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL ;
+SubDirCcFlags -DCONF_MACHTYPE='\"$(HAIKU_GCC_MACHINE)\"' ;
+SubDirCcFlags -DCONF_HOSTTYPE='\"$(cpuName)\"' ;
+SubDirCcFlags -DCONF_VENDOR='\"$(vendorName)\"' ;
+#SubDirCcFlags -DCONF_OSTYPE='\"$(osName)\"' ;
+SubDirCcFlags -DCONF_OSTYPE='\"beos\"' ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
