@@ -72,15 +72,19 @@ VerticalLineTest::RunIteration(BView* view)
 
 
 void
-VerticalLineTest::PrintResults()
+VerticalLineTest::PrintResults(BView* view)
 {
 	if (fTestDuration == 0) {
 		printf("Test was not run.\n");
 		return;
 	}
 	bigtime_t timeLeak = system_time() - fTestStart - fTestDuration;
+
+	Test::PrintResults(view);
+
 	printf("Line height: %ld\n", fViewBounds.IntegerHeight() + 1 - 2);
 	printf("Lines per iteration: %ld\n", fViewBounds.IntegerWidth() / 2);
+	printf("Total lines rendered: %llu\n", fLinesRendered);
 	printf("Lines per second: %.3f\n",
 		fLinesRendered * 1000000.0 / fTestDuration);
 	printf("Average time between iterations: %.4f seconds.\n",

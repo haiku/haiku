@@ -22,7 +22,7 @@ class Test;
 class TestView : public BView {
 public:
 								TestView(BRect frame, Test* test,
-									drawing_mode mode,
+									drawing_mode mode, bool useClipping,
 									const BMessenger& target);
 
 	virtual	void				AttachedToWindow();
@@ -31,21 +31,24 @@ public:
 private:
 			Test*				fTest;
 			BMessenger			fTarget;
+			bool				fUseClipping;
 };
 
 // TestWindow
 class TestWindow : public BWindow {
 public:
 								TestWindow(BRect fame, Test* test,
-									drawing_mode mode,
+									drawing_mode mode, bool useClipping,
 									const BMessenger& target);
 
 	virtual	bool				QuitRequested();
 
 			void				SetAllowedToQuit(bool allowed);
+			BView*				View() const { return fTestView; }
 private:
 			BMessenger			fTarget;
 			bool				fAllowedToQuit;
+			TestView*			fTestView;
 };
 
 #endif // TEST_WINDOW_H

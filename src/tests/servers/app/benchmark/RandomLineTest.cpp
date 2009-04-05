@@ -76,14 +76,18 @@ RandomLineTest::RunIteration(BView* view)
 
 
 void
-RandomLineTest::PrintResults()
+RandomLineTest::PrintResults(BView* view)
 {
 	if (fTestDuration == 0) {
 		printf("Test was not run.\n");
 		return;
 	}
 	bigtime_t timeLeak = system_time() - fTestStart - fTestDuration;
+
+	Test::PrintResults(view);
+
 	printf("Lines per iteration: %lu\n", fLinesPerIteration);
+	printf("Total lines rendered: %llu\n", fLinesRendered);
 	printf("Lines per second: %.3f\n",
 		fLinesRendered * 1000000.0 / fTestDuration);
 	printf("Average time between iterations: %.4f seconds.\n",

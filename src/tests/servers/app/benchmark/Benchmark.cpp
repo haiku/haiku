@@ -9,10 +9,10 @@
 #include <Application.h>
 #include <Screen.h>
 
+#include "DrawingModeToString.h"
 #include "TestWindow.h"
 
 // tests
-#include "ClippedLineTest.h"
 #include "HorizontalLineTest.h"
 #include "RandomLineTest.h"
 #include "StringTest.h"
@@ -25,7 +25,6 @@ struct test_info {
 };
 
 const test_info kTestInfos[] = {
-	{ "ClippedLines",		ClippedLineTest::CreateTest },
 	{ "HorizontalLines",	HorizontalLineTest::CreateTest },
 	{ "RandomLines",		RandomLineTest::CreateTest },
 	{ "Strings",			StringTest::CreateTest },
@@ -36,10 +35,12 @@ const test_info kTestInfos[] = {
 
 class Benchmark : public BApplication {
 public:
-	Benchmark(Test* test)
+	Benchmark(Test* test, drawing_mode mode, bool clipping)
 		: BApplication("application/x-vnd.haiku-benchmark"),
 		  fTest(test),
-		  fTestWindow(NULL)
+		  fTestWindow(NULL),
+		  fDrawingMode(mode),
+		  fUseClipping(clipping)
 	{
 	}
 
@@ -59,8 +60,8 @@ public:
 		frame.right = frame.left + width - 1;
 		frame.bottom = frame.top + height - 1;
 
-		fTestWindow = new TestWindow(frame, fTest, B_OP_COPY,
-			BMessenger(this));
+		fTestWindow = new TestWindow(frame, fTest, fDrawingMode,
+			fUseClipping, BMessenger(this));
 	}
 
 	virtual bool QuitRequested()
@@ -77,7 +78,9 @@ public:
 				printf("Test canceled early.\n");
 				// fall through
 			case MSG_TEST_FINISHED:
-				fTest->PrintResults();
+				fTestWindow->Lock();
+				fTest->PrintResults(fTestWindow->View());
+				fTestWindow->Unlock();
 				PostMessage(B_QUIT_REQUESTED);
 				break;
 			default:
@@ -89,6 +92,8 @@ public:
 private:
 	Test*			fTest;
 	TestWindow*		fTestWindow;
+	drawing_mode	fDrawingMode;
+	bool			fUseClipping;
 };
 
 
@@ -114,7 +119,25 @@ main(int argc, char** argv)
 		print_test_list(true);
 		exit(1);
 	}
-	testName = argv[1];
+	// skip program name
+	argc--;
+	argv++;
+
+	testName = argv[0];
+	bool clipping = false;
+	drawing_mode mode = B_OP_COPY;
+
+	while (argc > 0) {
+		drawing_mode possibleMode;
+		if (strcmp(argv[0], "--clipping") == 0 || strcmp(argv[0], "-c") == 0) {
+			clipping = true;
+		} else if (ToDrawingMode(argv[0], possibleMode)) {
+			mode = possibleMode;
+		}
+		argc--;
+		argv++;
+	}
+	
 
 	// find and create the test
 	Test* test = NULL;
@@ -136,7 +159,7 @@ main(int argc, char** argv)
 		exit(1);
 	}
 
-	Benchmark app(test);
+	Benchmark app(test, mode, clipping);
 	app.Run();
 	return 0;
 }

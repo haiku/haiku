@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application Benchmark :
 	Benchmark.cpp
-	ClippedLineTest.cpp
+	DrawingModeToString.cpp
 	HorizontalLineTest.cpp
 	RandomLineTest.cpp
 	StringTest.cpp

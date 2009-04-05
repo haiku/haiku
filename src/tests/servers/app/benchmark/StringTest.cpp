@@ -97,13 +97,16 @@ StringTest::RunIteration(BView* view)
 
 
 void
-StringTest::PrintResults()
+StringTest::PrintResults(BView* view)
 {
 	if (fTestDuration == 0) {
 		printf("Test was not run.\n");
 		return;
 	}
 	bigtime_t timeLeak = system_time() - fTestStart - fTestDuration;
+
+	Test::PrintResults(view);
+
 	printf("Glyphs per DrawString() call: %ld\n", fGlyphsPerLine);
 	printf("Glyphs per second: %.3f\n",
 		fGlyphsRendered * 1000000.0 / fTestDuration);

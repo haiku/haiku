@@ -5,7 +5,11 @@
 
 #include "Test.h"
 
+#include <stdio.h>
+
 #include <View.h>
+
+#include "DrawingModeToString.h"
 
 
 Test::Test()
@@ -35,3 +39,17 @@ Test::SetupClipping(BView* view)
 
 	view->ConstrainClippingRegion(&fClippingRegion);
 }
+
+
+void
+Test::PrintResults(BView* view)
+{
+	if (fClippingRegion.CountRects() > 0)
+		printf("Clipping rects: %ld\n", fClippingRegion.CountRects());
+
+	const char* string;
+	if (ToString(view->DrawingMode(), string))
+		printf("Drawing mode: %s\n", string);
+}
+
+

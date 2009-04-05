@@ -16,7 +16,7 @@ public:
 
 	virtual	void				Prepare(BView* view);
 	virtual	bool				RunIteration(BView* view);
-	virtual	void				PrintResults();
+	virtual	void				PrintResults(BView* view);
 
 	static	Test*				CreateTest();
 
