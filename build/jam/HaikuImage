@@ -18,7 +18,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
+SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp comm compress copyattr $(X86_ONLY)CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
@@ -38,7 +38,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	printf profile ps ptx pwd query quit rc readlink release renice rescan rlog
 	rm rmattr rmindex rmdir roster route
 	safemode screen_blanker screenmode sed setdecor settype setversion setvolume
-	seq sh sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
+	seq sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
 	stty su sum sync sysinfo
 	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
 	traceroute translate true tsort tty
@@ -238,7 +238,7 @@ AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: which ;
 
-AddSymlinkToHaikuImage system bin : sh : bash ;
+AddSymlinkToHaikuImage system bin : bash : sh ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
