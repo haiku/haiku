@@ -907,10 +907,10 @@ UserlandFS::KernelEmu::vpanic(const char *format, va_list args)
 	char buffer[1024];
 	strcpy(buffer, "PANIC: ");
 	int32 prefixLen = strlen(buffer);
-	int bufferSize = sizeof(buffer) - prefixLen;
 
 	// no vsnprintf() on PPC
 	#if defined(__INTEL__)
+		int bufferSize = sizeof(buffer) - prefixLen;
 		vsnprintf(buffer + prefixLen, bufferSize - 1, format, args);
 	#else
 		vsprintf(buffer + prefixLen, format, args);
