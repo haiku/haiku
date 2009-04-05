@@ -147,6 +147,11 @@ SimpleTest SetBorderScrollViewTest :
 	: be
 ;
 
+SimpleTest TextViewTest :
+	TextViewTest.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp Slider.cpp Control.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits interface ] ;
