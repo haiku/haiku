@@ -66,7 +66,7 @@ ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
 };
 
 
-static status_t
+status_t
 ps2_reset_mouse(ps2_dev *dev)
 {
 	uint8 data[2];

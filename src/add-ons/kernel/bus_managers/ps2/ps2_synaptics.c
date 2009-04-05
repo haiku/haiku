@@ -630,6 +630,7 @@ err1:
 status_t
 synaptics_close(void *_cookie)
 {
+	status_t status;
 	synaptics_cookie *cookie = _cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
@@ -641,6 +642,15 @@ synaptics_close(void *_cookie)
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_OPEN);
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_ENABLED);
 
+	// Reset the touchpad so it generate standard ps2 packets instead of
+	// extended ones. If not, BeOS is confused with such packets when rebooting
+	// without a complete shutdown.
+	status = ps2_reset_mouse(cookie->dev);
+	if (status != B_OK) {
+		INFO("ps2: reset failed\n");
+		return B_ERROR;
+	}
+		
 	if (gTouchpadInfo.capPassThrough)
 		ps2_service_notify_device_removed(gPassthroughDevice);
 
