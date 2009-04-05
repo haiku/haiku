@@ -16,10 +16,9 @@ class CircularBuffer {
 public:
 	CircularBuffer(size_t size)
 		:
-		fSize(size)
+		fSize(0)
 	{
-		fBuffer = (Type *)malloc(fSize * sizeof(Type));
-		MakeEmpty();
+		SetSize(size);
 	}
 
 	~CircularBuffer()
@@ -29,6 +28,18 @@ public:
 
 	status_t InitCheck() const
 	{
+		return fBuffer != NULL ? B_OK : B_NO_MEMORY;
+	}
+
+	status_t SetSize(size_t size)
+	{
+		MakeEmpty();
+
+		if (fSize == size)
+			return B_OK;
+
+		fSize = size;
+		fBuffer = (Type*)malloc(fSize * sizeof(Type));
 		return fBuffer != NULL ? B_OK : B_NO_MEMORY;
 	}
 
@@ -65,6 +76,11 @@ public:
 			index = fFirst++;
 
 		fBuffer[index % fSize] = item;
+	}
+
+	size_t Size() const
+	{
+		return fSize;
 	}
 
 private:

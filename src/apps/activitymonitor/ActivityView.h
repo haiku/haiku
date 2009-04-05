@@ -17,9 +17,9 @@
 
 class BBitmap;
 class BMessageRunner;
-class DataSource;
 class Scale;
 class SystemInfoHandler;
+class ViewHistory;
 struct data_item;
 
 
@@ -76,8 +76,6 @@ public:
 
 			bigtime_t	RefreshInterval() const
 							{ return atomic_get64((vint64*)&fRefreshInterval); }
-			bigtime_t	DrawInterval() const
-							{ return atomic_get64((vint64*)&fDrawInterval); }
 
 protected:
 	virtual	void		AttachedToWindow();
@@ -133,11 +131,11 @@ private:
 	mutable BLocker		fSourcesLock;
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;
+	BObjectList<ViewHistory> fViewValues;
 	thread_id			fRefreshThread;
 	sem_id				fRefreshSem;
 	bigtime_t			fRefreshInterval;
 	bigtime_t			fLastRefresh;
-	bigtime_t			fDrawInterval;
 	int32				fDrawResolution;
 	bool				fShowLegend;
 	bool				fZooming;

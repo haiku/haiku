@@ -17,7 +17,11 @@
 
 static const uint32 kMsgUpdateTimeInterval = 'upti';
 
-static const bigtime_t kUpdateIntervals[] = { 50, 100, 250, 500, 1000, 2000 };
+static const bigtime_t kUpdateIntervals[] = {
+	25, 50, 75, 100, 250, 500, 1000, 2000
+};
+static const size_t kNumUpdateIntervals
+	= sizeof(kUpdateIntervals) / sizeof(kUpdateIntervals[0]);
 
 
 class IntervalSlider : public BSlider {
@@ -42,9 +46,7 @@ public:
 		// Find closest index
 		int32 bestDiff = LONG_MAX;
 		uint32 bestIndex = 0;
-		for (uint32 i = 0;
-				i < sizeof(kUpdateIntervals) / sizeof(kUpdateIntervals[0]);
-				i++) {
+		for (uint32 i = 0; i < kNumUpdateIntervals; i++) {
 			int32 diff = abs(kUpdateIntervals[i] - interval);
 			if (diff < bestDiff) {
 				bestDiff = diff;
@@ -63,7 +65,7 @@ public:
 private:
 	const char* _TextFor(uint32 level) const
 	{
-		if (level >= sizeof(kUpdateIntervals) / sizeof(kUpdateIntervals[0]))
+		if (level >= kNumUpdateIntervals)
 			return NULL;
 
 		bigtime_t interval = kUpdateIntervals[level];
@@ -90,7 +92,7 @@ SettingsWindow::SettingsWindow(ActivityWindow* target)
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	fIntervalSlider = new IntervalSlider("Update time interval:",
-		new BMessage(kMsgUpdateTimeInterval), 6);
+		new BMessage(kMsgUpdateTimeInterval), kNumUpdateIntervals);
 	fIntervalSlider->SetInterval(target->RefreshInterval());
 
 	// controls pane

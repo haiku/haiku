@@ -9,6 +9,7 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector.h>
 
 #ifdef __HAIKU__
 #	include <AbstractLayoutItem.h>
@@ -20,6 +21,7 @@
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
+#include <Shape.h>
 #include <String.h>
 
 #include "ActivityMonitor.h"
@@ -29,20 +31,90 @@
 #include "SystemInfoHandler.h"
 
 
-class Scale {
+template<typename ObjectType>
+class ListAddDeleter {
 public:
-							Scale(scale_type type);
+	ListAddDeleter(BObjectList<ObjectType>& list, ObjectType* object,
+			int32 spot)
+		:
+		fList(list),
+		fObject(object)
+	{
+		if (fObject != NULL && !fList.AddItem(fObject, spot)) {
+			delete fObject;
+			fObject = NULL;
+		}
+	}
 
-			int64			MinimumValue() const { return fMinimumValue; }
-			int64			MaximumValue() const { return fMaximumValue; }
+	~ListAddDeleter()
+	{
+		if (fObject != NULL) {
+			fList.RemoveItem(fObject);
+			delete fObject;
+		}
+	}
 
-			void			Update(int64 value);
+	bool Failed() const
+	{
+		return fObject == NULL;
+	}
+
+	void Detach()
+	{
+		fObject = NULL;
+	}
 
 private:
-	scale_type				fType;
-	int64					fMinimumValue;
-	int64					fMaximumValue;
-	bool					fInitialized;
+	BObjectList<ObjectType>&	fList;
+	ObjectType*					fObject;
+};
+
+
+/*!	This class manages the scale of a history with a dynamic scale.
+	Every history value will be input via Update(), and the minimum/maximum
+	is computed from that.
+*/
+class Scale {
+public:
+								Scale(scale_type type);
+
+			int64				MinimumValue() const { return fMinimumValue; }
+			int64				MaximumValue() const { return fMaximumValue; }
+
+			void				Update(int64 value);
+
+private:
+			scale_type			fType;
+			int64				fMinimumValue;
+			int64				fMaximumValue;
+			bool				fInitialized;
+};
+
+/*!	Stores the interpolated on screen view values. This is done so that the
+	interpolation is fixed, and does not change when being scrolled.
+
+	We could also just do this by making sure we always ask for the same
+	interval only, but this way we also save the interpolation.
+*/
+class ViewHistory {
+public:
+								ViewHistory();
+
+			int64				ValueAt(int32 x);
+
+			int32				Start() const
+									{ return fValues.Size()
+										- fValues.CountItems(); }
+
+			void				Update(DataHistory* history, int32 width,
+									int32 resolution, bigtime_t toTime,
+									bigtime_t step, bigtime_t refresh);
+
+private:
+			CircularBuffer<int64> fValues;
+			int32				fResolution;
+			bigtime_t			fRefresh;
+			bigtime_t			fLastTime;
 };
 
 struct data_item {
@@ -127,6 +199,75 @@ Scale::Update(int64 value)
 //	#pragma mark -
 
 
+ViewHistory::ViewHistory()
+	:
+	fValues(1),
+	fResolution(-1),
+	fRefresh(-1),
+	fLastTime(0)
+{
+}
+
+
+int64
+ViewHistory::ValueAt(int32 x)
+{
+	int64* value = fValues.ItemAt(x - Start());
+	if (value != NULL)
+		return *value;
+
+	return 0;
+}
+
+
+void
+ViewHistory::Update(DataHistory* history, int32 width, int32 resolution,
+	bigtime_t toTime, bigtime_t step, bigtime_t refresh)
+{
+	// Check if we need to invalidate the existing values
+	if ((int32)fValues.Size() != width
+		|| fResolution != resolution
+		|| fRefresh != refresh) {
+		fValues.SetSize(width);
+		fLastTime = 0;
+		fResolution = resolution;
+		fRefresh = refresh;
+	}
+
+	// Compute how many new values we need to retrieve
+	if (fLastTime < history->Start())
+		fLastTime = history->Start();
+
+	int32 updateWidth = int32((toTime - fLastTime) / step);
+	if (updateWidth < 1)
+		return;
+
+	if (updateWidth > (int32)fValues.Size()) {
+		updateWidth = fValues.Size();
+		fLastTime = toTime - updateWidth * step;
+	}
+
+	for (int32 i = 0; i < updateWidth; i++) {
+		int64 value = history->ValueAt(fLastTime += step);
+
+		if (step > refresh) {
+			uint32 count = 1;
+			for (bigtime_t offset = refresh; offset < step; offset += refresh) {
+				// TODO: handle int64 overflow correctly!
+				value += history->ValueAt(fLastTime + offset);
+				count++;
+			}
+			value /= count;
+		}
+
+		fValues.AddItem(value);
+	}
+}
+
+
+//	#pragma mark -
+
+
 DataHistory::DataHistory(bigtime_t memorize, bigtime_t interval)
 	:
 	fBuffer(10000),
@@ -182,7 +323,7 @@ DataHistory::ValueAt(bigtime_t time)
 				int64 value = item->value;
 				value += int64(double(nextItem->value - value)
 					/ (nextItem->time - item->time) * (time - item->time));
-				return item->value;
+				return value;
 			}
 
 			// search in right part
@@ -458,7 +599,6 @@ ActivityView::_Init(const BMessage* settings)
 	SetViewColor(B_TRANSPARENT_COLOR);
 
 	fRefreshInterval = kInitialRefreshInterval;
-	fDrawInterval = kInitialRefreshInterval * 2;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
 	fZooming = false;
@@ -610,6 +750,7 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 
 	BAutolock _(fSourcesLock);
 
+	// Search for the correct insert spot to maintain the order of the sources
 	int32 insert = DataSource::IndexOf(source);
 	for (int32 i = 0; i < fSources.CountItems() && i < insert; i++) {
 		DataSource* before = fSources.ItemAt(i);
@@ -621,6 +762,9 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 	if (insert > fSources.CountItems())
 		insert = fSources.CountItems();
 
+	// Generate DataHistory and ViewHistory objects for the source
+	// (one might need one history per CPU)
+
 	uint32 count = 1;
 	if (source->PerCPU()) {
 		SystemInfo info;
@@ -630,13 +774,14 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 	for (uint32 i = 0; i < count; i++) {
 		DataHistory* values = new(std::nothrow) DataHistory(10 * 60000000LL,
 			RefreshInterval());
-		if (values == NULL)
-			return B_NO_MEMORY;
+		ListAddDeleter<DataHistory> valuesDeleter(fValues, values, insert);
 
-		if (!fValues.AddItem(values, insert + i)) {
-			delete values;
+		ViewHistory* viewValues = new(std::nothrow) ViewHistory;
+		ListAddDeleter<ViewHistory> viewValuesDeleter(fViewValues, viewValues,
+			insert);
+
+		if (valuesDeleter.Failed() || viewValuesDeleter.Failed())
 			return B_NO_MEMORY;
-		}
 
 		values->SetScale(_ScaleFor(source->ScaleType()));
 
@@ -645,6 +790,10 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 			copy = source->CopyForCPU(i);
 		else
 			copy = source->Copy();
+
+		ListAddDeleter<DataSource> sourceDeleter(fSources, copy, insert);
+		if (sourceDeleter.Failed())
+			return B_NO_MEMORY;
 
 		BString colorName = source->Name();
 		colorName << " color";
@@ -657,11 +806,9 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 				copy->SetColor(*color);
 		}
 
-		if (!fSources.AddItem(copy, insert + i)) {
-			fValues.RemoveItem(values);
-			delete values;
-			return B_NO_MEMORY;
-		}
+		valuesDeleter.Detach();
+		viewValuesDeleter.Detach();
+		sourceDeleter.Detach();
 	}
 
 #ifdef __HAIKU__
@@ -723,7 +870,7 @@ ActivityView::AttachedToWindow()
 
 	fRefreshSem = create_sem(0, "refresh sem");
 	fRefreshThread = spawn_thread(&_RefreshThread, "source refresh",
-		B_NORMAL_PRIORITY, this);
+		B_URGENT_DISPLAY_PRIORITY, this);
 	resume_thread(fRefreshThread);
 
 	FrameResized(Bounds().Width(), Bounds().Height());
@@ -808,6 +955,7 @@ ActivityView::MouseDown(BPoint where)
 		fZoomPoint = where;
 		fOriginalResolution = fDrawResolution;
 		fZooming = true;
+		SetMouseEventMask(B_POINTER_EVENTS);
 		return;
 	}
 
@@ -858,7 +1006,6 @@ ActivityView::MouseDown(BPoint where)
 
 	ConvertToScreen(&where);
 	menu->Go(where, true, false, true);
-
 }
 
 
@@ -953,11 +1100,6 @@ ActivityView::MessageReceived(BMessage* message)
 				interval = 10000;
 
 			atomic_set64(&fRefreshInterval, interval);
-			
-			if (interval > 250000)
-				atomic_set64(&fDrawInterval, interval);
-			else
-				atomic_set64(&fDrawInterval, interval * 2);
 			break;
 
 		case kMsgToggleDataSource:
@@ -1182,47 +1324,32 @@ ActivityView::_DrawHistory()
 	BAutolock _(fSourcesLock);
 
 	for (uint32 i = fSources.CountItems(); i-- > 0;) {
+		ViewHistory* viewValues = fViewValues.ItemAt(i);
 		DataSource* source = fSources.ItemAt(i);
 		DataHistory* values = fValues.ItemAt(i);
-		bigtime_t time = now - steps * timeStep;
-			// for now steps pixels per second
 
-		view->BeginLineArray(steps);
-		view->SetHighColor(source->Color());
+		viewValues->Update(values, steps, fDrawResolution, now, timeStep,
+			RefreshInterval());
 
-		float lastY = FLT_MIN;
-		uint32 lastX = 0;
+		uint32 x = viewValues->Start() * step;
+		BShape shape;
+		bool first = true;
 
-		for (uint32 x = 0; x < width; x += step, time += timeStep) {
-			// TODO: compute starting point instead!
-			if (values->Start() > time || values->End() < time)
-				continue;
+		for (uint32 i = viewValues->Start(); i < steps; x += step, i++) {
+			float y = _PositionForValue(source, values,
+				viewValues->ValueAt(i));
 
-			int64 value = values->ValueAt(time);
-			if (timeStep > RefreshInterval()) {
-				// TODO: always start with the same index, so that it always
-				// uses the same values for computation (currently it jumps)
-				uint32 count = 1;
-				for (bigtime_t offset = RefreshInterval(); offset < timeStep;
-						offset += RefreshInterval()) {
-					// TODO: handle int64 overflow correctly!
-					value += values->ValueAt(time + offset);
-					count++;
-				}
-				value /= count;
-			}
-
-			float y = _PositionForValue(source, values, value);
-			if (lastY != FLT_MIN) {
-				view->AddLine(BPoint(lastX, lastY), BPoint(x, y),
-					source->Color());
-			}
-
-			lastX = x;
-			lastY = y;
+			if (first) {
+				shape.MoveTo(BPoint(x, y));
+				first = false;
+			} else
+				shape.LineTo(BPoint(x, y));
 		}
 
-		view->EndLineArray();
+		view->SetHighColor(source->Color());
+		view->SetLineMode(B_BUTT_CAP, B_ROUND_JOIN);
+		view->MovePenTo(B_ORIGIN);
+		view->StrokeShape(&shape);
 	}
 
 	// TODO: add marks when an app started or quit
@@ -1336,11 +1463,7 @@ ActivityView::_Refresh()
 
 		fSourcesLock.Unlock();
 
-		bigtime_t now = info.Time();
-		if (fLastRefresh + DrawInterval() <= now) {
-			target.SendMessage(B_INVALIDATE);
-			fLastRefresh = now;
-		}
+		target.SendMessage(B_INVALIDATE);
 	}
 }
 
