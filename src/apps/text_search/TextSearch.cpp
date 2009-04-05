@@ -51,7 +51,7 @@ process_refs(entry_ref dirRef, BMessage *message, void* /*reserved*/)
 	// array contains the entry_refs of the selected files. The last
 	// argument, "reserved", is currently unused.
 	
-	// This version of TrackerGrep is a Tracker add-on, but primarily
+	// This version of TextSearch is a Tracker add-on, but primarily
 	// it is a stand-alone application. The add-on launches the app
 	// on the set of files you had selected in Tracker. That way you
 	// get the benefits of the Tracker add-on with the benefits of the

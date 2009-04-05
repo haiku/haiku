@@ -1438,7 +1438,7 @@ GrepWindow::_OnSelectInTracker()
 
 	if (!_AreAllFoldersOpenInTracker(&folderList)) {
 		BAlert* alert = new BAlert(NULL,
-			_T("Tracker Grep couldn't open one or more folders, and it's very "
+			_T(APP_NAME " couldn't open one or more folders, and it's very "
 				"sorry about it."),
 			_T("Forgive and forget!"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT);
@@ -1469,37 +1469,16 @@ GrepWindow::_OnQuitNow()
 void
 GrepWindow::_OnAboutRequested()
 {
-	app_info appInfo;
-	version_info vInfo;
-	BFile appFile;
-	BAppFileInfo appFileInfo;
-	BString fAppVersion;
-
-	if (be_app->Lock()) {
-		be_app->GetAppInfo(&appInfo);
-		appFile.SetTo(&appInfo.ref, B_READ_ONLY);
-		appFileInfo.SetTo(&appFile);
-		if (appFileInfo.GetVersionInfo(&vInfo, B_APP_VERSION_KIND) == B_OK)
-			fAppVersion = BString("") << vInfo.major << '.' << vInfo.middle;
-		be_app->Unlock();
-	}
-
 	BString text;
-	text << APP_NAME << " " << fAppVersion << "\n";
+	text << APP_NAME << " " << "\n\n";
 	int32 titleLength = text.Length();
-	text << _T("Get a grip on grep.") << "\n\n";
-	text << _T(APP_NAME " lets you search the contents of your files.") << " ";
-	text << _T("It is primarily intended for use with text files.") << "\n\n";
-	text << _T("Created by Matthijs Hollemans") << "\n";
-	text << "mahlzeit@users.sf.net" << "\n\n";
-	text << _T("Maintained by Jonas Sundström") << "\n";
-	text << "jonas@kirilla.com" << "\n\n";
-	text << _T("Contributed to by: ");
+	text << _T("Created by Matthijs Hollemans.") << "\n\n";
+	text << _T("Contributed to by ");
 	text << _T("Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, "
-		"Oliver Tappe, Luc Schrijvers and momoziro.");
+		"Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.");
 	text << "\n";
 
-	BAlert* alert = new BAlert("Tracker Grep", text.String(), _T("Ok"), NULL,
+	BAlert* alert = new BAlert("TextSearch", text.String(), _T("Ok"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
 
 	BTextView* view = alert->TextView();
