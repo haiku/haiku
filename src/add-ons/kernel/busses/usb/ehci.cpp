@@ -200,15 +200,17 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
 				TRACE_ERROR("bios won't give up control over the host controller (ignoring)\n");
-
-				// turn off the BIOS owned flag, clear all SMIs and continue
-				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-					fPCIInfo->function, extendedCapPointer + 2, 1, 0);
-				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-					fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
 				TRACE_ALWAYS("successfully took ownership of the host controller\n");
 			}
+
+			// Force off the BIOS owned flag, and clear all SMIs. Some BIOSes
+			// do indicate a successful handover but do not remove their SMIs
+			// and then freeze the system when interrupts are generated.
+			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, extendedCapPointer + 2, 1, 0);
+			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 		} else {
 			TRACE("extended capability is not a legacy support register\n");
 		}
