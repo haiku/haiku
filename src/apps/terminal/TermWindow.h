@@ -59,6 +59,7 @@ protected:
 	virtual void	MessageReceived(BMessage *message);
 	virtual void	WindowActivated(bool);
 	virtual void	MenusBeginning();
+	virtual	void	Zoom(BPoint leftTop, float width, float height);
 
 private:
 	struct Session;

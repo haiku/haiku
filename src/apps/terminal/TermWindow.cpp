@@ -482,6 +482,7 @@ TermWindow::MessageReceived(BMessage *message)
 		
 		case FULLSCREEN:
 			if (!fSavedFrame.IsValid()) { // go fullscreen
+				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
@@ -495,6 +496,7 @@ TermWindow::MessageReceived(BMessage *message)
 				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
 				MoveTo(screen.Frame().left, screen.Frame().top);
 			} else { // exit fullscreen
+				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fMenubar->Show();
 				_ActiveTermView()->ScrollBar()->Show();
@@ -843,6 +845,14 @@ TermWindow::_CheckChildren()
 		Session* session = (Session*)fSessions.ItemAt(i);
 		session->containerView->GetTermView()->CheckShellGone();
 	}
+}
+
+
+void
+TermWindow::Zoom(BPoint leftTop, float width, float height)
+{
+	_ActiveTermView()->DisableResizeView();
+	BWindow::Zoom(leftTop, width, height);
 }
 
 

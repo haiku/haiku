@@ -253,6 +253,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fFontHeight = 0;
 	fFontAscent = 0;
 	fFrameResized = false;
+	fResizeViewDisableCount = 0;
 	fLastActivityTime = 0;
 	fCursorState = 0;
 	fCursorHeight = 0;
@@ -1303,8 +1304,11 @@ TermView::FrameResized(float width, float height)
 	fResizeView->ResizeTo(width * 1.5, height * 1.5);
 	fResizeView->MoveTo((Bounds().Width() - fResizeView->Bounds().Width()) / 2,
 		(Bounds().Height()- fResizeView->Bounds().Height()) / 2);
-	if (!hasResizeView)
+	if (!hasResizeView && fResizeViewDisableCount < 1)
 		AddChild(fResizeView);
+
+	if (fResizeViewDisableCount > 0)
+		fResizeViewDisableCount--;
 
 	SetTermSize(rows, columns, false);
 
@@ -2557,3 +2561,10 @@ TermView::_ScrollToRange(TermPos start, TermPos end)
 		}
 	}
 }
+
+void
+TermView::DisableResizeView(int32 disableCount = 1)
+{
+	fResizeViewDisableCount += disableCount;
+}
+

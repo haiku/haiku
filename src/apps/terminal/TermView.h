@@ -83,6 +83,8 @@ public:
 
 			void			InitiateDrag();
 
+			void			DisableResizeView(int32 disableCount = 1);
+
 protected:
 	virtual void			AttachedToWindow();
 	virtual void			DetachedFromWindow();
@@ -196,6 +198,7 @@ private:
 
 			// frame resized flag.
 			bool			fFrameResized;
+			int32			fResizeViewDisableCount;
 
 			// Cursor Blinking, draw flag.
 			bigtime_t		fLastActivityTime;
