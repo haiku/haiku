@@ -118,13 +118,17 @@ BDragger::Archive(BMessage *data, bool deep) const
 	BMessage popupMsg;
 	
 	if (fPopUp) {
-		if (fPopUp->Window()->Lock()) {
-			ret = fPopUp->Archive(&popupMsg, deep);
-			if (ret == B_OK)
-				ret = data->AddMessage("_popup", &popupMsg);
+		bool windowLocked = fPopUp->Window()->Lock();
+
+		ret = fPopUp->Archive(&popupMsg, deep);
+
+		if (windowLocked)
 			fPopUp->Window()->Unlock();
-		} else
-			ret = B_ERROR;
+				// TODO: Investigate, in some (rare) occasions the menu window
+				//		 has already been unlocked
+
+		if (ret == B_OK)
+			ret = data->AddMessage("_popup", &popupMsg);
 	}
 
 	if (ret == B_OK)
