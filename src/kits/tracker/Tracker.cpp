@@ -680,9 +680,11 @@ TTracker::OpenRef(const entry_ref *ref, const node_ref *nodeToClose,
 
 		if (!brokenLinkWithSpecificHandler) {
 			delete model;
-			(new BAlert("", "There was an error resolving the link.",
-				"Cancel", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			BAlert *alert = new BAlert("",
+				"There was an error resolving the link.",
+				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
 			return result;
 		}
 	} else 

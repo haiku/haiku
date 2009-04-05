@@ -2392,9 +2392,14 @@ BPoseView::RemoveColumn(BColumn *columnToRemove, bool runAlert)
 {
 	// make sure last column is not removed
 	if (CountColumns() == 1) {
-		if (runAlert)
-			(new BAlert("", "You must have at least one Attribute showing.",
-				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		if (runAlert) {
+			BAlert *alert = new BAlert("",	
+				"You must have at least one Attribute showing.",
+				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
+		}
+
 		return false;
 	}
 
@@ -4491,22 +4496,28 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	bool okToMove = true;
 
 	if (destFolder->IsRoot()) {
-		(new BAlert("", kNoCopyToRootStr, "Cancel", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", kNoCopyToRootStr, "Cancel",
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		okToMove = false;
 	}
 
 	// can't copy items into the trash
 	if (forceCopy && destIsTrash) {
-		(new BAlert("", kNoCopyToTrashStr, "Cancel", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", kNoCopyToTrashStr, "Cancel",
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		okToMove = false;
 	}
 
 	// can't create symlinks into the trash
 	if (createLink && destIsTrash) {
-		(new BAlert("", kNoLinkToTrashStr, "Cancel", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", kNoLinkToTrashStr, "Cancel",
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		okToMove = false;
 	}
 
@@ -4514,8 +4525,10 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	if (srcWindow->TargetModel()->IsQuery()
 		&& !forceCopy && !destIsTrash && !createLink) {
 		srcWindow->UpdateIfNeeded();
-		okToMove = (new BAlert("", kOkToMoveStr, "Cancel", "Move", NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1;
+		BAlert *alert = new BAlert("", kOkToMoveStr, "Cancel",
+			"Move", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		okToMove = alert->Go() == 1;
 	}
 
 	if (okToMove) {
@@ -5377,9 +5390,10 @@ CheckVolumeReadOnly(const entry_ref *ref)
 {
 	BVolume volume (ref->device);
 	if (volume.IsReadOnly()) {
-		BAlert *alert (new BAlert ("", "Files cannot be moved or deleted "
-			"from a read-only volume.", "Cancel", NULL, NULL, 
-			B_WIDTH_AS_USUAL, B_STOP_ALERT));
+		BAlert *alert = new BAlert ("", "Files cannot be moved or "
+			"deleted from a read-only volume.", "Cancel", NULL,
+			NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return false;
 	}
@@ -5427,7 +5441,9 @@ BPoseView::MoveSelectionOrEntryToTrash(const entry_ref *ref, bool selectNext)
 				"be reverted.)";
 		}
 
-		if ((new BAlert("", alertText, "Cancel", "Delete"))->Go() == 0)
+		BAlert *alert = new BAlert("", alertText, "Cancel", "Delete");
+		alert->SetShortcut(0, B_ESCAPE);
+		if (alert->Go() == 0)
 			return;
 	}
 
@@ -7644,8 +7660,11 @@ BPoseView::OpenInfoWindows()
 {
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
-		(new BAlert("", "The Tracker must be running to see Info windows.",
-			"Cancel", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", "The Tracker must be running "
+			"to see Info windows.", "Cancel", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return;
  	}
 	SendSelectionAsRefs(kGetInfo);
@@ -7657,8 +7676,11 @@ BPoseView::SetDefaultPrinter()
 {
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
-		(new BAlert("", "The Tracker must be running to see set the default printer.",
-			"Cancel", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", "The Tracker must be running "
+			"to see set the default printer.", "Cancel", NULL, 
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return;
  	}
 	SendSelectionAsRefs(kMakeActivePrinter);

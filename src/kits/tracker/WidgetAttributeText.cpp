@@ -1602,8 +1602,10 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 		&& type != B_DOUBLE_TYPE
 		&& type != B_CHAR_TYPE
 		&& type != B_BOOL_TYPE) {
-		(new BAlert("", "Sorry, you cannot edit that attribute.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		BAlert *alert = new BAlert("", "Sorry, you cannot edit that attribute.",
+			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return false;
 	}
 
@@ -1634,8 +1636,11 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 				sscanf(textView->Text(), "%c", &ch);
 				//Check if we read the start of a multi-byte glyph:
 				if (!isprint(ch)) {
-					(new BAlert("", "Sorry, The 'Character' attribute cannot store a multi-byte glyph.",
-						"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+					BAlert *alert = new BAlert("", "Sorry, The 'Character' "
+						"attribute cannot store a multi-byte glyph.",
+						"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+					alert->Go();
 					return false;
 				}
 			
@@ -1732,8 +1737,11 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 	}
 
 	if (size < 0) {
-		(new BAlert("", "There was an error writing the attribute.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", 
+			"There was an error writing the attribute.", 
+			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_CANCEL);
+		alert->Go();
 
 		fValueIsDefined = false;
 		return false;

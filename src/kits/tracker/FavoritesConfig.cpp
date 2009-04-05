@@ -2236,8 +2236,12 @@ NameItemPanel::MessageReceived(BMessage *message)
 			{
 				const char *text = fNameFld->Text();
 				if (!text || text[0] == '\0'){
-					if ((new BAlert("", "The new name is empty, please enter a name", 
-						"Cancel", "OK", NULL, B_WIDTH_AS_USUAL))->Go() == 0)
+					BAlert *alert = new BAlert("",
+						"The new name is empty, please "
+						"enter a name", "Cancel", "OK", NULL, 
+						B_WIDTH_AS_USUAL);
+					alert->SetShortcut(0, B_ESCAPE);
+					if (alert->Go() == 0)
 						return;
 				}
 				BMessage nameChangeMessage(kNameChange);

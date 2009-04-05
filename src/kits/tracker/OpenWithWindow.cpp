@@ -678,8 +678,10 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 				"publisher of the application and ask them to update their application "
 				"to list the type of your document as supported.";
 
-			if ((new BAlert("", warning.String(), "Cancel", "Open", 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 0)
+			BAlert *alert = new BAlert("", warning.String(),
+				"Cancel", "Open", 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 0)
 				return;
 		}
 		// else - once we have an extensible sniffer, tell users to ask

@@ -180,12 +180,17 @@ TrackerCopyLoopControl::FileError(const char *message, const char *name,
 	char buffer[512];
 	sprintf(buffer, message, name, strerror(error));
 
-	if (allowContinue)
-		return (new BAlert("", buffer, "Cancel", "OK", 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
+	if (allowContinue) {
+		BAlert *alert = new BAlert("", buffer, "Cancel", "OK", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		return alert->Go() != 0;
+	}
 
-	(new BAlert("", buffer, "Cancel", 0, 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+	BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->Go();
 	return false;
 }
 
@@ -546,8 +551,11 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		if (gStatusWindow)
 			gStatusWindow->RemoveStatusItem(thread);
 
-		(new BAlert("", "You can't move or copy items to read-only volumes.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", 
+			"You can't move or copy items to read-only volumes.",
+			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return B_ERROR;
 	}
 
@@ -565,8 +573,10 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 			else
 				errorStr = "You cannot copy or move the root directory.";
 
-			(new BAlert("", errorStr, "Cancel", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			BAlert *alert = new BAlert("", errorStr, "Cancel", 0, 0,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}
 		if (moveMode == kMoveSelectionTo
@@ -604,8 +614,10 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 
 					// check for free space before starting copy
 					if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
-						(new BAlert("", kNoFreeSpace, "Cancel", 0, 0,
-							B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+						BAlert *alert = new BAlert("", kNoFreeSpace, "Cancel",
+							0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+						alert->SetShortcut(0, B_ESCAPE);
+						alert->Go();
 						return B_ERROR;
 					}
 				}
@@ -766,8 +778,10 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 			if (sourceEntry.InitCheck() != B_OK) {
 				BString error;
 				error << "Error moving \"" << srcRef->name << "\".";
-				(new BAlert("", error.String(), "Cancel", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				BAlert *alert = new BAlert("", error.String(), "Cancel", 0, 0,
+					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
+				alert->Go();
 				break;
 			}
 
@@ -781,8 +795,10 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 					BString error;
 					error << "Error moving \"" << srcRef->name << "\" to Trash. ("
 						<< strerror(result) << ")";
-					(new BAlert("", error.String(), "Cancel", 0, 0,
-						B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+					BAlert *alert = new BAlert("", error.String(), "Cancel",
+						0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+					alert->Go();
 					break;
 				}
 				continue;
@@ -1619,8 +1635,10 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 				volume.GetName(name);
 				char buffer[256];
 				sprintf(buffer, "Cannot unmount the boot volume \"%s\".", name);
-				(new BAlert("", buffer, "Cancel", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
+					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
+				alert->Go();
 			} else {
 				BMessage message(kUnmountVolume);
 				message.AddInt32("device_id", volume.Device());
@@ -1723,8 +1741,11 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 		const char *verb = (moveMode == kMoveSelectionTo) ? "moving" : "copying";
 		char replaceMsg[256];
 		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
-
-		switch ((new BAlert("", replaceMsg, "Cancel", "Prompt", "Replace All"))->Go()) {
+		
+		BAlert *alert = new BAlert("", replaceMsg,
+			"Cancel", "Prompt", "Replace All");
+		alert->SetShortcut(0, B_ESCAPE);
+		switch (alert->Go()) {
 			case 0:
 				return kCanceled;
 
@@ -1857,11 +1878,12 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 
 		// special case single collision (don't need Replace All shortcut)
 		BAlert *alert;
-		if (multipleCollisions || sourceIsDirectory)
+		if (multipleCollisions || sourceIsDirectory) {
 			alert = new BAlert("", replaceMsg, "Skip", "Replace All");
-		else
+		} else {
 			alert = new BAlert("", replaceMsg, "Cancel", "Replace");
-
+			alert->SetShortcut(0, B_ESCAPE);
+		}
 		switch (alert->Go()) {
 			case 0:		// user selected "Cancel" or "Skip"
 				replaceAll = kCanceled;
@@ -1887,8 +1909,10 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 		BString error;
 		error << "There was a problem trying to replace \""
 			<< name << "\". The item might be open or busy.";
-		(new BAlert("", error.String(), "Cancel", 0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert *alert = new BAlert("", error.String(), "Cancel", 0, 0,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 	}
 
 	return err;
@@ -2769,8 +2793,10 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 		}
 	}
 
-	(new BAlert("", "Sorry, could not create a new folder.", "Cancel", 0, 0,
-		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+	BAlert *alert = new BAlert("", "Sorry, could not create a new folder.",
+		"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->Go();
 	return result;
 }
 
@@ -2914,12 +2940,17 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 		alertString << "Could not open \"" << appRef->name << "\" (" << strerror(error) << "). ";
 		if (refs && openWithOK) {
 			alertString << kFindAlternativeStr;
-			if ((new BAlert("", alertString.String(), "Cancel", "Find", 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1)
+			BAlert *alert = new BAlert("", alertString.String(),
+				"Cancel", "Find", 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 1)
 				error = TrackerOpenWith(refs);
-		} else
-			(new BAlert("", alertString.String(), "Cancel", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		} else {
+			BAlert *alert = new BAlert("", alertString.String(),
+				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
+		}
 	}
 }
 
@@ -3131,8 +3162,11 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 				// offer the possibility to change the permissions
 
 				alertString << "\nShould this be fixed?";
-				if ((new BAlert("", alertString.String(), "Cancel", "Proceed", 0,
-						B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1) {
+				BAlert *alert = new BAlert("", alertString.String(),
+					"Cancel", "Proceed", 0,	B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
+				if (alert->Go() == 1) {
 					BEntry entry(&documentRef);
 					mode_t permissions;
 
@@ -3185,12 +3219,18 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 		if (openWithOK) {
 			ASSERT(alternative);
 			alertString << alternative;
-			if ((new BAlert("", alertString.String(), "Cancel", "Find", 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1)
+			BAlert *alert = new BAlert("", alertString.String(),
+				"Cancel", "Find", 0, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 1)
 				error = TrackerOpenWith(refs);
-		} else
-			(new BAlert("", alertString.String(), "Cancel", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		} else {
+			BAlert *alert = new BAlert("", alertString.String(),
+				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
+		}
 	}
 }
 

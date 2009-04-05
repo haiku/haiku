@@ -232,6 +232,7 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition,
 		BAlert* alert = new BAlert("Mount Warning", string.String(),
 			"Mount Read/Write", "Cancel", "Mount Read-only",
 			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		int32 choice = alert->Go();
 		switch (choice) {
 			case 0:
@@ -284,8 +285,10 @@ AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 		"Note: if an application is currently writing to the volume, unmounting"
 		" it now might result in loss of data.\n";
 
-	int32 choice = (new BAlert("", text.String(), "Cancel", "Force Unmount",
-		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+	BAlert* alert = new BAlert("", text.String(), "Cancel", "Force Unmount",
+		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	int32 choice = alert->Go();
 
 	return choice == 1;
 }
@@ -1018,8 +1021,10 @@ UnmountIfMatchingID(Partition *partition, void *castToParams)
 			text << "To unmount " << partition->VolumeName() << " some query "
 			"windows have to be closed. Would you like to close the query "
 			"windows?";
-			if ((new BAlert("", text.String(), "Cancel", "Close and unmount", NULL,
-				B_WIDTH_FROM_LABEL))->Go() == 0)
+			BAlert* alert = new BAlert("", text.String(), "Cancel", 
+				"Close and unmount", NULL, B_WIDTH_FROM_LABEL);
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 0)
 				return partition;
 			tracker->CloseActiveQueryWindows(params->device);
 		}

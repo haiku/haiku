@@ -2973,8 +2973,10 @@ BContainerWindow::LoadAddOn(BMessage *message)
 	if (result != B_OK) {
 		char buffer[1024];
 		sprintf(buffer, "Error %s loading Add-On %s.", strerror(result), addonRef.name);
-		(new BAlert("", buffer, "Cancel", 0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert("", buffer, "Cancel", 0, 0,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return;
 	}
 
