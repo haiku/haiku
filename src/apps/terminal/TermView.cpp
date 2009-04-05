@@ -2563,7 +2563,7 @@ TermView::_ScrollToRange(TermPos start, TermPos end)
 }
 
 void
-TermView::DisableResizeView(int32 disableCount = 1)
+TermView::DisableResizeView(int32 disableCount)
 {
 	fResizeViewDisableCount += disableCount;
 }
