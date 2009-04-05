@@ -80,8 +80,8 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 
 
 
-	//alert = new BAlert("Error", "Plop", "Ok");
-	//alert->Go();
+	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points. Avoid symlinks!", "Ok");
+	alert->Go();
 
 
 	int32 score = 0;
@@ -121,6 +121,11 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 		view->UnlockLooper();
 		snooze(100000);
 	}
+
+	BString scoreStr("You scored ");
+	scoreStr << score << " points!";
+	alert = new BAlert("Error", scoreStr.String(), "Cool!");
+	alert->Go();
 
 
 	status = B_ERROR;
