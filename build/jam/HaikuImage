@@ -344,7 +344,7 @@ local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToHaikuImage system fonts psfonts : $(psFonts) ;
 AddFilesToHaikuImage system fonts ttfonts : $(ttFonts) ;
 
-local cannaDir = [ FDirName $(HAIKU_TOP) data etc KanBe ] ;
+local cannaDir = [ FDirName $(HAIKU_TOP) data system data Canna ] ;
 local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
 local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
 local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
@@ -484,7 +484,7 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 
 # licenses
 CopyDirectoryToHaikuImage system data
-	: [ FDirName $(HAIKU_TOP) data etc licenses ]
+	: [ FDirName $(HAIKU_TOP) data system data licenses ]
 	: licenses : -x .svn ;
 
 
