@@ -267,11 +267,11 @@ KeyboardLayout::SetDefault()
 		"[ 0,10; $s:0x02+3; $gap:-; $s:+4; $gap:-; $s:+4; $sgap:-; "
 			"$s:0x34+2; ]\n"
 		"[ 0,20; :0x11+12; $backspace:+1 ]\n"
-		"[ 0,38; $tab:+1; :+12; $enter:0x47; ]\n"
+		"[ 0,38; $tab:0x26; :+12; $enter:0x47; ]\n"
 		"[ 0,56; $caps:0x3b; :+11; :0x33 ]\n"
 		"[ 0,74; $l-shift-ctrl:0x4b; :0x69; :0x4c+9; $r-shift:+1 ]\n"
 		"[ 0,92; :0x99; $l-shift-ctrl:0x5c; $option:0x66; :0x5d; $space:+1; "
-			":+1; :0x67; :0x60; $s:0x9a; $s:0x57; $s:0x9b ]\n"
+			":+1; :0x68; :0x60; $s:0x9a; $s:0x57; $s:0x9b ]\n"
 		"[ 221,102; $s:0x61+2; ]\n";
 
 	_InitFrom(kIBMLaptop);
@@ -287,6 +287,8 @@ KeyboardLayout::_FreeKeys()
 	fKeyCount = 0;
 	fKeyCapacity = 0;
 	fBounds = BRect();
+
+	fIndicators.MakeEmpty();
 }
 
 
