@@ -1,5 +1,5 @@
 /* renice.c - unixish renice command for BeOs
- * (c) 2001, 2002, François Revol (mmu_man) for OpenBeOS
+ * (c) 2001, 2002, FranÃ§ois Revol (mmu_man) for OpenBeOS
  * released under the MIT licence.
  *
  * How did I live without it before ??? ;)
@@ -8,7 +8,7 @@
  *  Cleanup for inclusion in OpenBeOS,
  *  Used the code to rewrite the 'prio' BeOS command for OpenBeOS.
  * 04-14-2002 v1.1
- *  Added -f upon suggestion from Idéfix on BeShare
+ *  Added -f upon suggestion from IdÃ©fix on BeShare
  * 2001 v1.0
  *  Initial.
  */
@@ -24,41 +24,43 @@ From man renice:
 /usr/sbin/renice [-n increment] [-p] [-g | -u] ID ... /usr/sbin/renice priority [-p] pid ... [-g pgrp ...] [-u user ...]
 
 
-#define B_LOW_PRIORITY                  5
-#define B_NORMAL_PRIORITY               10
-#define B_DISPLAY_PRIORITY              15
-#define B_URGENT_DISPLAY_PRIORITY       20
-#define B_REAL_TIME_DISPLAY_PRIORITY    100
-#define B_URGENT_PRIORITY               110
-#define B_REAL_TIME_PRIORITY            120
-
 BeOs priorities:
-High Prio (realtime)            Default                  Low Prio
-120                               10                        1 (0 only for idle_thread)
+(realtime)	High Prio			Default					Low Prio
+120			99					10						1 (0 only for idle_thread)
 
-UNIX Priorities:
--20                               0                         20
-
-Note that however this isn't perfect, since priorities 
-beyond 100 in BeOS move the thread into the real-time class.
-Linux for example, has a separate API for doing this, 
-and even a process set to -20 can be in the normal scheduling class.
+UNIX nice:
+			-20					0						19
+UNIX priorities:
+			0					20						39
 
 renice can be given more than one pid on the command line.
 prio is locked into one pid, then the priority.
 
 */
 
+#ifndef NZERO
+#define NZERO 20
+#endif
+
+#define BZERO B_NORMAL_PRIORITY
+#define BMIN (B_REAL_TIME_DISPLAY_PRIORITY-1)
+//#define BMAX B_NORMAL_PRIORITY
+#define BMAX 1
+
 // returns an equivalent UNIX priority for a given BeOS priority.
 static int32 prio_be_to_unix(int32 prio)
 {
-	return (prio > 10)?(- (20 * (prio - 10)) / 110):(2 * (10 - prio));
+	if (prio > BZERO)
+		return NZERO - ((prio - BZERO) * NZERO) / (BMIN - BZERO);
+	return NZERO + ((BZERO - prio) * (NZERO - 1)) / (BZERO - BMAX);
 }
 
 // returns an equivalent BeOS priority for a given UNIX priority.
 static int32 prio_unix_to_be(int32 prio)
 {
-	return (prio > 0)?(10 - (prio/2)):(10 + 110 * (-prio) / 20);
+	if (prio > NZERO)
+		return BZERO - ((prio - NZERO) * (BZERO - BMAX)) / (NZERO-1);
+	return BZERO + ((NZERO - prio) * (BMIN - BZERO)) / (NZERO);
 }
 
 static status_t renice_thread(int32 prio, int32 increment, bool use_be_prio, thread_id th)
@@ -94,7 +96,7 @@ int main(int argc, char **argv)
 	int err = 1;
 	char *thname;
 
-	prio = 9; // default UNIX priority for nice
+	prio = NZERO; // default UNIX priority for nice
 	// convert it to beos
 	if (!use_be_prio)
 	prio = prio_unix_to_be(prio);
@@ -130,6 +132,7 @@ int main(int argc, char **argv)
 						th = thinfo.thread;
 						renice_thread(prio, increment, use_be_prio, th);
 						err = 0;
+						/* find another one */
 					}
 				}
 			}
