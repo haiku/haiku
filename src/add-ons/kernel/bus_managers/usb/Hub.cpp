@@ -253,7 +253,7 @@ Hub::Explore(change_item **changeList)
 				int8 hubAddress = HubAddress();
 				uint8 hubPort = HubPort();
 				if (Speed() == USB_SPEED_HIGHSPEED) {
-					hubAddress = USBID();
+					hubAddress = DeviceAddress();
 					hubPort = i + 1;
 				}
 
