@@ -461,7 +461,7 @@ TTracker::InstallTemporaryBackgroundImages()
 	// make the large Haiku Logo the default background
 
 	BPath path;
-	status_t status = find_directory(B_BEOS_ETC_DIRECTORY, &path);
+	status_t status = find_directory(B_SYSTEM_DATA_DIRECTORY, &path);
 	if (status < B_OK) {
 		BString errorMessage;
 		errorMessage << "At " << __PRETTY_FUNCTION__ << "\n";
