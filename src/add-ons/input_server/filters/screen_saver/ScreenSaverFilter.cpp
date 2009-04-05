@@ -65,7 +65,7 @@ ScreenSaverController::MessageReceived(BMessage *message)
 		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
-			if (message->FindString("be:signature", &signature) == B_OK 
+			if (message->FindString("be:signature", &signature) == B_OK
 				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0) {
 				fFilter->SetEnabled(message->what == B_SOME_APP_LAUNCHED);
 			}
@@ -89,16 +89,16 @@ ScreenSaverController::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
-ScreenSaverFilter::ScreenSaverFilter() 
+ScreenSaverFilter::ScreenSaverFilter()
 	: BLocker("screen saver filter"),
-	fLastEventTime(0),
+	fLastEventTime(system_time()),
 	fBlankTime(0),
 	fSnoozeTime(0),
 	fCurrentCorner(NO_CORNER),
 	fFrameNum(0),
 	fRunner(NULL),
 	fCornerRunner(NULL),
-	fWatchingDirectory(false), 
+	fWatchingDirectory(false),
 	fWatchingFile(false),
 	fEnabled(false)
 {
@@ -237,7 +237,7 @@ ScreenSaverFilter::CheckTime()
 	BAutolock _(this);
 
 	bigtime_t now = system_time();
-	if (now >= fLastEventTime + fBlankTime)  
+	if (now >= fLastEventTime + fBlankTime)
 		_Invoke();
 
 	// TODO: this doesn't work correctly - since the BMessageRunner is not
