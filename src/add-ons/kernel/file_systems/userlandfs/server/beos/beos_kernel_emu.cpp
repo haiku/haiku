@@ -338,17 +338,12 @@ panic(const char *format, ...)
 	char buffer[1024];
 	strcpy(buffer, "PANIC: ");
 	int32 prefixLen = strlen(buffer);
+
 	va_list args;
 	va_start(args, format);
-	// no vsnprintf() on PPC
-	#if defined(__INTEL__)
-		int bufferSize = sizeof(buffer) - prefixLen;
-		vsnprintf(buffer + prefixLen, bufferSize - 1, format, args);
-	#else
-		vsprintf(buffer + prefixLen, format, args);
-	#endif
+	vsnprintf(buffer + prefixLen, sizeof(buffer) - prefixLen, format, args);
 	va_end(args);
-	buffer[sizeof(buffer) - 1] = '\0';
+
 	debugger(buffer);
 }
 
