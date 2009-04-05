@@ -355,13 +355,18 @@ AddFilesToHaikuImage system data Canna dic canna : $(cannaDicCanna) ;
 AddDirectoryToHaikuImage system data Canna dic group ;
 AddDirectoryToHaikuImage system data Canna dic user ;
 
-local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ]
+local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data etc keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
 AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
 AddSymlinkToHaikuImage system data Keymaps : Swedish : Finnish ;
 AddSymlinkToHaikuImage system data Keymaps : Slovene : Croatian ;
 AddSymlinkToHaikuImage system data Keymaps : US-International : Brazilian ;
+
+local keyboardLayoutsDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
+local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
+AddFilesToHaikuImage system data KeyboardLayouts : $(keyboardLayouts) ;
 
 local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
 for timezone in $(timezones) {
