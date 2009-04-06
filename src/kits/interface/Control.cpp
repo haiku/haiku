@@ -179,7 +179,7 @@ BControl::MessageReceived(BMessage *message)
 					reply.AddString("result", fLabel);
 					handled = true;
 				} else {
-					// B_GET_PROPERTY
+					// B_SET_PROPERTY
 					const char *label;
 					if (message->FindString("data", &label) == B_OK) {
 						SetLabel(label);
@@ -192,7 +192,7 @@ BControl::MessageReceived(BMessage *message)
 					reply.AddInt32("result", fValue);
 					handled = true;
 				} else {
-					// B_GET_PROPERTY
+					// B_SET_PROPERTY
 					int32 value;
 					if (message->FindInt32("data", &value) == B_OK) {
 						SetValue(value);
@@ -205,7 +205,7 @@ BControl::MessageReceived(BMessage *message)
 					reply.AddBool("result", fEnabled);
 					handled = true;
 				} else {
-					// B_GET_PROPERTY
+					// B_SET_PROPERTY
 					bool enabled;
 					if (message->FindBool("data", &enabled) == B_OK) {
 						SetEnabled(enabled);

@@ -16,6 +16,7 @@
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <Message.h>
+#include <PropertyInfo.h>
 #include <Region.h>
 #include <Window.h>
 
@@ -38,6 +39,18 @@
 #	define CALLED(x...)
 #	define TRACE(x...)
 #endif
+
+
+static property_info sPropertyList[] = {
+	{
+		"Value",
+		{ B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
+		{ B_STRING_TYPE }
+	},
+	{}
+};
 
 
 class BTextControl::LabelLayoutItem : public BAbstractLayoutItem {
@@ -542,40 +555,55 @@ BTextControl::SetFlags(uint32 flags)
 
 
 void
-BTextControl::MessageReceived(BMessage *msg)
+BTextControl::MessageReceived(BMessage *message)
 {
-	switch(msg->what) {
-		case B_SET_PROPERTY:
-		case B_GET_PROPERTY:
-			// TODO: implement these.
-			
-			// fall through and pass to BControl
-			// until implemented - note that we will still
-			// need to pass these up the chain for any scripting
-			// messages we don't handle ourselves regardless.
-		default:
-			BControl::MessageReceived(msg);
-			break;
+	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
+		BMessage reply(B_REPLY);
+		bool handled = false;
+
+		BMessage specifier;
+		int32 index;
+		int32 form;
+		const char *property;
+		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+			if (strcmp(property, "Value") == 0) {
+				if (message->what == B_GET_PROPERTY) {
+					reply.AddString("result", fText->Text());
+					handled = true;
+				} else {
+					const char *value = NULL;
+					// B_SET_PROPERTY
+					if (message->FindString("data", &value) == B_OK) {
+						fText->SetText(value);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
+				}
+			}
+		}
+		
+		if (handled) {
+			message->SendReply(&reply);
+			return;
+		}
 	}
+	
+	BControl::MessageReceived(message);
 }
 
 
 BHandler *
-BTextControl::ResolveSpecifier(BMessage *msg, int32 index,
-										 BMessage *specifier, int32 form,
+BTextControl::ResolveSpecifier(BMessage *message, int32 index,
+										 BMessage *specifier, int32 what,
 										 const char *property)
 {
-	/*
-	BPropertyInfo propInfo(prop_list);
-	BHandler *target = NULL;
+	BPropertyInfo propInfo(sPropertyList);
 
-	if (propInfo.FindMatch(message, 0, specifier, what, property) < B_OK)
-		return BControl::ResolveSpecifier(message, index, specifier, what,
-			property);
-	else
+	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
 		return this;
-	*/
-	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
+
+	return BControl::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 
