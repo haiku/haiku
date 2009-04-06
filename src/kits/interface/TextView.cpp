@@ -1628,7 +1628,8 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		_Refresh(startOffset, endOffset, startOffset != endOffset, false);
 	} else {
 		// the line breaks wont change, simply redraw
-		_DrawLines(LineAt(startOffset), LineAt(endOffset), startOffset, true);
+		_RequestDrawLines(LineAt(startOffset), LineAt(endOffset), startOffset,
+			true);
 	}
 }
 
@@ -3536,7 +3537,7 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 
 	_AutoResize(false);
 
-	_DrawLines(fromLine, toLine, drawOffset, erase);
+	_RequestDrawLines(fromLine, toLine, drawOffset, erase);
 
 	// erase the area below the text
 	BRect eraseRect = bounds;
@@ -4164,6 +4165,29 @@ BTextView::_DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 
 void
+BTextView::_RequestDrawLines(int32 startLine, int32 endLine, 
+	int32 startOffset, bool erase)
+{
+	if (!Window())
+		return;
+
+	long maxLine = fLines->NumLines() - 1;
+	if (startLine < 0)
+		startLine = 0;
+	if (endLine > maxLine)
+		endLine = maxLine;
+
+	STELine *from = (*fLines)[startLine];
+	STELine *to = endLine == maxLine ? NULL : (*fLines)[endLine + 1];
+	BRect invalidRect(fTextRect.left, from->origin + fTextRect.top,
+		fTextRect.right, 
+		to != NULL ? to->origin + fTextRect.top : fTextRect.bottom);
+	Invalidate(invalidRect);
+	Window()->UpdateIfNeeded();
+}
+
+
+void
 BTextView::_DrawCaret(int32 offset)
 {
 	float lineHeight;
@@ -4566,7 +4590,7 @@ BTextView::_AutoResize(bool redraw)
 	fTextRect.right = fTextRect.left + newWidth;
 
 	if (redraw)
-		_DrawLines(0, 0);
+		_RequestDrawLines(0, 0);
 
 	// erase any potential left over outside the text rect
 	// (can only be on right hand side)

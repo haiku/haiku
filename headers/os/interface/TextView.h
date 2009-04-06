@@ -324,6 +324,10 @@ private:
 
 			void				_DrawLines(int32 startLine, int32 endLine,
 									int32 startOffset = -1, bool erase = false);
+			void				_RequestDrawLines(int32 startLine, 
+									int32 endLine, int32 startOffset = -1, 
+									bool erase = false);
+			
 			void				_DrawCaret(int32 offset);
 			void				_ShowCaret();
 			void				_HideCaret();
