@@ -314,6 +314,9 @@ AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 
 AddDirectoryToHaikuImage system data sounds ;
 
+# Add mail provider infos.
+AddFilesToHaikuImage home config settings Mail ProviderInfo : $(HAIKU_PROVIDER_INFOS) ;
+
 # Mail spell check dictionaries
 local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;

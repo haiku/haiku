@@ -10,6 +10,7 @@
 #include "ConfigWindow.h"
 #include "CenterContainer.h"
 #include "Account.h"
+#include "AutoConfigWindow.h"
 
 #include <Application.h>
 #include <ListView.h>
@@ -610,6 +611,10 @@ ConfigWindow::QuitRequested()
 void
 ConfigWindow::MessageReceived(BMessage *msg)
 {
+	BRect autoConfigRect(0, 0, 400, 300);
+	BRect frame;
+
+	AutoConfigWindow *autoConfigWindow = NULL;
 	switch (msg->what) {
 		case kMsgAccountSelected:
 		{
@@ -627,7 +632,12 @@ ConfigWindow::MessageReceived(BMessage *msg)
 		}
 		case kMsgAddAccount:
 		{
-			Accounts::NewAccount();
+			frame = Frame();
+			autoConfigRect.OffsetTo(frame.left + (frame.Width() - autoConfigRect.Width()) / 2,
+										frame.top + (frame.Width() - autoConfigRect.Height()) / 2);
+			autoConfigWindow = new AutoConfigWindow(autoConfigRect,
+															this);
+			autoConfigWindow->Show();
 			break;
 		}
 		case kMsgRemoveAccount:

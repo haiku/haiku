@@ -6,9 +6,13 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }
 
+UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
+
+# for BObjectList.h
+UsePrivateHeaders shared ;
 
 # TODO(bga): E-mail preferences does not really need to link against the
 # OpenSSL libraries. Remove this after problems with the runtile loader are
@@ -31,11 +35,15 @@ if $(USE_SSL) {
 
 Preference E-mail :
 	Account.cpp
+	AutoConfig.cpp
+	AutoConfigWindow.cpp
+	AutoConfigView.cpp
 	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
-	main.cpp
-	: be libmail.so 
+	DNSQuery.cpp
+	main.cpp 
+	: be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB)
 	: e-mail.rdef
 	;
 
@@ -46,3 +54,6 @@ if $(USE_SSL) {
 Package haiku-maildaemon-cvs :
 	E-mail : 
 	boot beos preferences ;
+
+SubInclude HAIKU_TOP src preferences mail ProviderInfo ;
+

@@ -93,7 +93,7 @@ class Accounts
 {
 	public:
 		static void	Create(BListView *listView,BView *configView);
-		static void NewAccount();
+		static Account* NewAccount();
 		static void Save();
 		static void	Delete();
 

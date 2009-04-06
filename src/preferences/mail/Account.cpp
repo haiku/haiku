@@ -645,7 +645,7 @@ void Accounts::Create(BListView *listView, BView *configView)
 }
 
 
-void Accounts::NewAccount()
+Account* Accounts::NewAccount()
 {
 	Account *account = new Account();
 	gAccounts.AddItem(account);
@@ -653,6 +653,7 @@ void Accounts::NewAccount()
 	
 	if (gListView)
 		gListView->Select(gListView->IndexOf(account->fAccountItem));
+	return account;
 }
 
 
