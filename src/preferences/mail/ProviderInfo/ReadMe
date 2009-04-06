@@ -1,0 +1,28 @@
+The provider database is simply a collection of files with attributes. To add
+new provider to the image rdef files are used. In the jam file you have to add
+the new provider name. Here an example rdef file:
+ 
+resource(1, "Provider") "gmx.de";
+resource(2, "POP Server") "pop.gmx.net";
+resource(3, "IMAP Server") "imap.gmx.net";
+resource(4, "SMTP Server") "mail.gmx.de";
+resource(5, "POP Authentification") 0;
+resource(6, "SMTP Authentification") 0;
+resource(7, "Username Pattern") 0;
+ 
+ 
+you can pass the following options to the last three items:
+ 
+"POP Authentification":
+	0	plain text
+	1	APOP
+ 
+"SMTP Authentification":
+	0	none
+	1	ESMTP
+	2	POP3 before SMTP
+ 
+"Username Pattern":
+	0	username is the email address (default)
+	1	username is the local-part of the email address local-part@domain.net
+	2	no username is proposed 
