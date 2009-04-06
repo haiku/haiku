@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2006-2007 Troeglazov Gerasim (3dEyes**)
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
  * distribution in the file COPYING); if not, write to the Free Software
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #ifndef _NTFS_H
 #define _NTFS_H
 
@@ -77,12 +77,12 @@ if (vol == NULL) { \
 } \
 \
 LOCK((vol)->vlock); \
-} 
+}
 
 #define 	UNLOCK_VOL(vol) \
 { \
 UNLOCK((vol)->vlock); \
-} 
+}
 
 typedef enum {
 	NF_FreeClustersOutdate	= (1 << 0),  		// Information about amount of free clusters is outdated.
@@ -105,8 +105,8 @@ typedef struct filecookie
 
 #define ntfs_mark_free_space_outdated(ns) (ns->state |= (NF_FreeClustersOutdate | NF_FreeMFTOutdate));
 
- 
- 
+
+
 typedef struct nspace
 {
 	ntfs_volume	*ntvol;
@@ -118,7 +118,7 @@ typedef struct nspace
 #endif
 	int			free_cluster_count;
 	char		volumeLabel[MAX_PATH];
-	
+
 	ulong 		flags;
 
 	int 		state;
@@ -130,11 +130,11 @@ typedef struct nspace
 	BOOL 		force;
 	BOOL 		debug;
 	BOOL 		noatime;
-	BOOL 		no_detach;	
-	
-	
+	BOOL 		no_detach;
+
+
 	lock		vlock;
-		
+
 } nspace;
 
 

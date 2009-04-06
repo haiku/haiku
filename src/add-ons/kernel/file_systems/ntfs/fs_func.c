@@ -47,6 +47,55 @@ typedef struct identify_cookie {
 	char label[256];
 } identify_cookie;
 
+
+static status_t
+get_node_type(ntfs_inode* ni, int* _type)
+{
+	ntfs_attr* na;
+
+	// get the node type
+	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		*_type = S_IFDIR;
+		return B_OK;
+	}
+
+	// Regular or Interix (INTX) file.
+	*_type = S_IFREG;
+
+	na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
+	if (!na)
+		return ENOENT;
+
+	if (!ni->flags & FILE_ATTR_HIDDEN) {
+		if (na->data_size == 0)
+			*_type = S_IFIFO;
+	}
+
+	if (na->data_size <= sizeof(INTX_FILE_TYPES) + sizeof(ntfschar) * MAX_PATH
+			&& na->data_size > sizeof(INTX_FILE_TYPES)) {
+		INTX_FILE* intx_file;
+
+		intx_file = ntfs_malloc(na->data_size);
+		if (!intx_file)	{
+			ntfs_attr_close(na);
+			return EINVAL;
+		}
+		if (ntfs_attr_pread(na, 0, na->data_size, intx_file) != na->data_size) {
+			free(intx_file);
+			ntfs_attr_close(na);
+			return EINVAL;
+		}
+		if (intx_file->magic == INTX_SYMBOLIC_LINK)
+			*_type = S_IFLNK;
+		free(intx_file);
+	}
+
+	ntfs_attr_close(na);
+
+	return B_OK;
+}
+
+
 float
 fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
@@ -182,7 +231,8 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 			newNode->vnid = *_rootID;
 			newNode->parent_vnid = -1;
 
-			result = publish_vnode( _vol, *_rootID, (void*)newNode, &gNTFSVnodeOps, FS_DIR_MODE, 0);
+			result = publish_vnode( _vol, *_rootID, (void*)newNode,
+				&gNTFSVnodeOps, S_IFDIR, 0);
 			if ( result != B_NO_ERROR )	{
 				free( ns );
 				result = EINVAL;
@@ -395,7 +445,6 @@ exit:
 }
 
 
-
 status_t
 fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *_flags, bool reenter)
 {
@@ -418,10 +467,15 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *
 		char *name = NULL;
 
 		ni = ntfs_inode_open(ns->ntvol, vnid);
-		if(ni==NULL) {
+		if (ni == NULL) {
 			result = ENOENT;
 			goto exit;
-		 }
+		}
+
+		// get the node type
+		result = get_node_type(ni, _type);
+		if (result != B_OK)
+			goto exit;
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = ntfs_get_parent_ref(ni);
@@ -438,14 +492,16 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *
 		}
 
 		_node->private_node = newNode;
-		*_type = 0666;
 	}
 	else
 		result = ENOMEM;
 exit:
 
-	if(ni)
+	if (ni != NULL)
 		ntfs_inode_close(ni);
+
+	if (result != B_OK && newNode != NULL)
+		free(newNode);
 
 	ERRPRINT("fs_read_vnode - EXIT, result is %s\n", strerror(result));
 
@@ -869,7 +925,8 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 			set_mime(newNode, name);
 
 			result = B_NO_ERROR;
-			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps, FS_FILE_MODE, 0);
+			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps,
+				S_IFREG, 0);
 
 			ntfs_mark_free_space_outdated(ns);
 
@@ -1263,7 +1320,8 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char 
 			fmode = FS_FILE_MODE;
 	}
 
-	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,&gNTFSVnodeOps, FS_SLNK_MODE | fmode, 0)) != 0)
+	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,
+			&gNTFSVnodeOps, S_IFLNK | fmode, 0)) != 0)
 		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(result));
 
 	put_vnode(_vol, MREF(sym->mft_no) );
@@ -1344,7 +1402,8 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		newNode->parent_vnid = MREF(bi->mft_no);
 		set_mime(newNode, ".***");
 
-		result = publish_vnode(_vol, vnid, (void*)newNode,&gNTFSVnodeOps, FS_DIR_MODE, 0);
+		result = publish_vnode(_vol, vnid, (void*)newNode, &gNTFSVnodeOps,
+			S_IFDIR, 0);
 
 		put_vnode(_vol, MREF(ni->mft_no));
 
