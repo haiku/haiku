@@ -195,6 +195,8 @@ private:
 };
 
 
+int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
+
 #endif	// __cplusplus
 
 #ifdef __cplusplus
@@ -205,9 +207,8 @@ uint8* alloc_tracing_buffer(size_t size);
 uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
 char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
-tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
+struct tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
 			int32 skipFrames, bool userOnly);
-int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 void lock_tracing_buffer();
 void unlock_tracing_buffer();
 status_t tracing_init(void);
