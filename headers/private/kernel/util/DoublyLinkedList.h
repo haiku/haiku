@@ -28,8 +28,8 @@ public:
 	DoublyLinkedListLink() : next(NULL), previous(NULL) {}
 	~DoublyLinkedListLink() {}
 
-	Element	*next;
-	Element	*previous;
+	Element*	next;
+	Element*	previous;
 };
 
 // DoublyLinkedListLinkImpl
