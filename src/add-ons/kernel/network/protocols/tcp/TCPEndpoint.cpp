@@ -121,15 +121,15 @@ protected:
 class Send : public AbstractTraceEntry {
 public:
 	Send(TCPEndpoint* endpoint, tcp_segment_header& segment, net_buffer* buffer,
-			uint32 firstSequence, uint32 lastSequence)
+			tcp_sequence firstSequence, tcp_sequence lastSequence)
 		:
 		fEndpoint(endpoint),
 		fBuffer(buffer),
 		fBufferSize(buffer->size),
 		fSequence(segment.sequence),
 		fAcknowledge(segment.acknowledge),
-		fFirstSequence(firstSequence),
-		fLastSequence(lastSequence),
+		fFirstSequence(firstSequence.Number()),
+		fLastSequence(lastSequence.Number()),
 		fState(endpoint->State()),
 		fFlags(segment.flags)
 	{
