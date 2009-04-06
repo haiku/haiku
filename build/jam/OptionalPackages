@@ -23,6 +23,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	CVS
 #	Development
 #	Firefox
+#	KeymapSwitcher
 #	LibLayout
 #	Links
 #	NetSurf
@@ -332,6 +333,24 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+	}
+}
+
+
+# KeymapSwitcher
+if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package KeymapSwitcher available for gcc4" ;
+	} else {
+		local baseURL = http://downloads.sourceforge.net/dotmatrix4beos ;
+		InstallOptionalHaikuImagePackage KeymapSwitcher-gcc2-20090409
+			:  $(baseURL)/HaikuKeymapSwitcher-package-1.0.2.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Desktop\ Applets
+			: /boot/common/bin/KeymapSwitcher ;
 	}
 }
 
