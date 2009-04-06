@@ -555,7 +555,7 @@ ActivityView::ActivityView(const char* name, const BMessage* settings)
 #ifdef __HAIKU__
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 #else
-	: BView(BRect(0,0,300,200), name, B_FOLLOW_NONE,
+	: BView(BRect(0, 0, 300, 200), name, B_FOLLOW_NONE,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 #endif
 	fSourcesLock("data sources")
@@ -600,12 +600,15 @@ ActivityView::_Init(const BMessage* settings)
 #endif
 	SetViewColor(B_TRANSPARENT_COLOR);
 
-	fRefreshInterval = kInitialRefreshInterval;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
 	fZooming = false;
 
 	fSystemInfoHandler = new SystemInfoHandler;
+
+	if (settings == NULL
+		|| settings->FindInt64("refresh interval", &fRefreshInterval) != B_OK)
+		fRefreshInterval = kInitialRefreshInterval;
 
 	if (settings == NULL
 		|| settings->FindBool("show legend", &fShowLegend) != B_OK)
@@ -663,6 +666,10 @@ status_t
 ActivityView::SaveState(BMessage& state) const
 {
 	status_t status = state.AddBool("show legend", fShowLegend);
+	if (status != B_OK)
+		return status;
+
+	status = state.AddInt64("refresh interval", fRefreshInterval);
 	if (status != B_OK)
 		return status;
 
