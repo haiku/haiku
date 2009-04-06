@@ -3905,7 +3905,7 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 	const text_run_array *inRuns)
 {
 	_CancelInputMethod();
-	
+
 	if (TextLength() + inLength > MaxBytes())
 		return;
 	
@@ -3923,12 +3923,11 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 	InsertText(inText, inLength, inOffset, inRuns);
 
 	// offset the caret/selection 	 
-	//int32 saveStart = fSelStart; 	 
-	fSelStart += inLength; 	 
-	fSelEnd += inLength;
+	fSelStart += inLength;
+	fClickOffset = fSelEnd = fSelStart;
 	
 	// recalc line breaks and draw the text
-	_Refresh(inOffset, textLength, true, false);
+	_Refresh(inOffset, inOffset + inLength, true, true);
 }
 
 
@@ -3997,7 +3996,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 		view->SetFont(font);
 		view->SetHighColor(*color);
 
-		tabChars = numBytes;
+		tabChars = min_c(numBytes, length);
 		do {
 			foundTab = fText->FindChar(B_TAB, offset, &tabChars);
 			if (foundTab) {
@@ -4046,9 +4045,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 			}
 
 			int32 returnedBytes = tabChars;
-			const char *stringToDraw = fText->GetString(offset,
-				&returnedBytes);
-
+			const char *stringToDraw = fText->GetString(offset, &returnedBytes);
 			view->SetDrawingMode(textRenderingMode);
 			view->DrawString(stringToDraw, returnedBytes);
 			if (foundTab) {
@@ -4064,7 +4061,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 			offset += tabChars;
 			length -= tabChars;
 			numBytes -= tabChars;
-			tabChars = numBytes;
+			tabChars = min_c(numBytes, length);
 			numTabs = 0;
 		} while (foundTab && tabChars > 0);
 	}
