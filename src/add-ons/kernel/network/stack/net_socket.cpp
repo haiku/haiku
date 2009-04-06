@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,32 +35,35 @@
 #include "utility.h"
 
 
-struct net_socket_private : net_socket {
-	struct list_link		link;
-	team_id					owner;
-	uint32					max_backlog;
-	uint32					child_count;
-	struct list				pending_children;
-	struct list				connected_children;
+struct net_socket_private;
+typedef DoublyLinkedList<net_socket_private> SocketList;
 
-	struct select_sync_pool	*select_pool;
-	mutex					lock;
+struct net_socket_private
+		: net_socket, DoublyLinkedListLinkImpl<net_socket_private> {
+	team_id						owner;
+	uint32						max_backlog;
+	uint32						child_count;
+	SocketList					pending_children;
+	SocketList					connected_children;
+
+	struct select_sync_pool*	select_pool;
+	mutex						lock;
 };
 
 
-void socket_delete(net_socket *socket);
-int socket_bind(net_socket *socket, const struct sockaddr *address,
+void socket_delete(net_socket* socket);
+int socket_bind(net_socket* socket, const struct sockaddr* address,
 	socklen_t addressLength);
-int socket_setsockopt(net_socket *socket, int level, int option,
-	const void *value, int length);
+int socket_setsockopt(net_socket* socket, int level, int option,
+	const void* value, int length);
 
 
-struct list sSocketList;
-mutex sSocketLock;
+static SocketList sSocketList;
+static mutex sSocketLock;
 
 
 static size_t
-compute_user_iovec_length(iovec *userVec, uint32 count)
+compute_user_iovec_length(iovec* userVec, uint32 count)
 {
 	size_t length = 0;
 
@@ -77,14 +80,9 @@ compute_user_iovec_length(iovec *userVec, uint32 count)
 
 
 static void
-delete_children(struct list *list)
+delete_children(SocketList& list)
 {
-	while (true) {
-		net_socket_private *child
-			= (net_socket_private *)list_remove_head_item(list);
-		if (child == NULL)
-			break;
-
+	while (net_socket_private* child = list.RemoveHead()) {
 		child->parent = NULL;
 		socket_delete(child);
 	}
@@ -92,9 +90,9 @@ delete_children(struct list *list)
 
 
 static status_t
-create_socket(int family, int type, int protocol, net_socket_private **_socket)
+create_socket(int family, int type, int protocol, net_socket_private** _socket)
 {
-	struct net_socket_private *socket = new (std::nothrow) net_socket_private;
+	struct net_socket_private* socket = new(std::nothrow) net_socket_private;
 	if (socket == NULL)
 		return B_NO_MEMORY;
 
@@ -113,11 +111,6 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	list_init_etc(&socket->pending_children, offsetof(net_socket_private,
-		link));
-	list_init_etc(&socket->connected_children, offsetof(net_socket_private,
-		link));
-
 	status_t status = get_domain_protocols(socket);
 	if (status < B_OK) {
 		mutex_destroy(&socket->lock);
@@ -131,10 +124,10 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 
 
 static status_t
-add_ancillary_data(net_socket *socket, ancillary_data_container* container,
-	void *data, size_t dataLen)
+add_ancillary_data(net_socket* socket, ancillary_data_container* container,
+	void* data, size_t dataLen)
 {
-	cmsghdr *header = (cmsghdr*)data;
+	cmsghdr* header = (cmsghdr*)data;
 
 	while (dataLen > 0) {
 		if (header->cmsg_len < sizeof(cmsghdr) || header->cmsg_len > dataLen)
@@ -157,10 +150,10 @@ add_ancillary_data(net_socket *socket, ancillary_data_container* container,
 
 
 static status_t
-process_ancillary_data(net_socket *socket, ancillary_data_container* container,
-	msghdr *messageHeader)
+process_ancillary_data(net_socket* socket, ancillary_data_container* container,
+	msghdr* messageHeader)
 {
-	uint8 *dataBuffer = (uint8*)messageHeader->msg_control;
+	uint8* dataBuffer = (uint8*)messageHeader->msg_control;
 	int dataBufferLen = messageHeader->msg_controllen;
 
 	if (container == NULL || dataBuffer == NULL) {
@@ -169,7 +162,7 @@ process_ancillary_data(net_socket *socket, ancillary_data_container* container,
 	}
 
 	ancillary_data_header header;
-	void *data = NULL;
+	void* data = NULL;
 
 	while ((data = next_ancillary_data(container, data, &header)) != NULL) {
 		if (socket->first_info->process_ancillary_data == NULL)
@@ -191,7 +184,7 @@ process_ancillary_data(net_socket *socket, ancillary_data_container* container,
 
 
 static ssize_t
-socket_receive_no_buffer(net_socket *socket, msghdr *header, void *data,
+socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	size_t length, int flags)
 {
 	iovec stackVec = { data, length };
@@ -227,9 +220,9 @@ socket_receive_no_buffer(net_socket *socket, msghdr *header, void *data,
 
 
 status_t
-socket_open(int family, int type, int protocol, net_socket **_socket)
+socket_open(int family, int type, int protocol, net_socket** _socket)
 {
-	net_socket_private *socket;
+	net_socket_private* socket;
 	status_t status = create_socket(family, type, protocol, &socket);
 	if (status < B_OK)
 		return status;
@@ -243,7 +236,7 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 	socket->owner = team_get_current_team_id();
 
 	mutex_lock(&sSocketLock);
-	list_add_item(&sSocketList, socket);
+	sSocketList.Add(socket);
 	mutex_unlock(&sSocketLock);
 
 	*_socket = socket;
@@ -252,15 +245,15 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 
 
 status_t
-socket_close(net_socket *_socket)
+socket_close(net_socket* _socket)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 	return socket->first_info->close(socket->first_protocol);
 }
 
 
 status_t
-socket_free(net_socket *socket)
+socket_free(net_socket* socket)
 {
 	status_t status = socket->first_info->free(socket->first_protocol);
 	if (status == B_BUSY)
@@ -272,16 +265,16 @@ socket_free(net_socket *socket)
 
 
 status_t
-socket_readv(net_socket *socket, const iovec *vecs, size_t vecCount,
-	size_t *_length)
+socket_readv(net_socket* socket, const iovec* vecs, size_t vecCount,
+	size_t* _length)
 {
 	return -1;
 }
 
 
 status_t
-socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
-	size_t *_length)
+socket_writev(net_socket* socket, const iovec* vecs, size_t vecCount,
+	size_t* _length)
 {
 	if (socket->peer.ss_len == 0)
 		return ECONNRESET;
@@ -294,7 +287,7 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
 	}
 
 	// TODO: useful, maybe even computed header space!
-	net_buffer *buffer = gNetBufferModule.create(256);
+	net_buffer* buffer = gNetBufferModule.create(256);
 	if (buffer == NULL)
 		return ENOBUFS;
 
@@ -329,7 +322,7 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
 
 
 status_t
-socket_control(net_socket *socket, int32 op, void *data, size_t length)
+socket_control(net_socket* socket, int32 op, void* data, size_t length)
 {
 	switch (op) {
 		case FIONBIO:
@@ -365,21 +358,21 @@ socket_control(net_socket *socket, int32 op, void *data, size_t length)
 
 
 ssize_t
-socket_read_avail(net_socket *socket)
+socket_read_avail(net_socket* socket)
 {
 	return socket->first_info->read_avail(socket->first_protocol);
 }
 
 
 ssize_t
-socket_send_avail(net_socket *socket)
+socket_send_avail(net_socket* socket)
 {
 	return socket->first_info->send_avail(socket->first_protocol);
 }
 
 
 status_t
-socket_send_data(net_socket *socket, net_buffer *buffer)
+socket_send_data(net_socket* socket, net_buffer* buffer)
 {
 	return socket->first_info->send_data(socket->first_protocol,
 		buffer);
@@ -387,8 +380,8 @@ socket_send_data(net_socket *socket, net_buffer *buffer)
 
 
 status_t
-socket_receive_data(net_socket *socket, size_t length, uint32 flags,
-	net_buffer **_buffer)
+socket_receive_data(net_socket* socket, size_t length, uint32 flags,
+	net_buffer** _buffer)
 {
 	status_t status = socket->first_info->read_data(socket->first_protocol,
 		length, flags, _buffer);
@@ -406,15 +399,17 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 
 
 status_t
-socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
+socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 {
 	MutexLocker locker(sSocketLock);
 
-	net_socket_private *socket = NULL;
+	net_socket_private* socket = NULL;
+	SocketList::Iterator iterator = sSocketList.GetIterator();
 	uint32 cookie = *_cookie;
 	uint32 count = 0;
-	while ((socket = (net_socket_private *)list_get_next_item(&sSocketList,
-			socket)) != NULL) {
+	while (iterator.HasNext()) {
+		socket = iterator.Next();
+
 		// TODO: also traverse the pending connections
 		if (count == cookie)
 			break;
@@ -451,9 +446,9 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 
 
 status_t
-socket_spawn_pending(net_socket *_parent, net_socket **_socket)
+socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 {
-	net_socket_private *parent = (net_socket_private *)_parent;
+	net_socket_private* parent = (net_socket_private*)_parent;
 
 	MutexLocker locker(parent->lock);
 
@@ -463,7 +458,7 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 	if (parent->child_count > 3 * parent->max_backlog / 2)
 		return ENOBUFS;
 
-	net_socket_private *socket;
+	net_socket_private* socket;
 	status_t status = create_socket(parent->family, parent->type,
 		parent->protocol, &socket);
 	if (status < B_OK)
@@ -479,7 +474,7 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
 
 	// add to the parent's list of pending connections
-	list_add_item(&parent->pending_children, socket);
+	parent->pending_children.Add(socket);
 	socket->parent = parent;
 	parent->child_count++;
 
@@ -489,20 +484,20 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 
 
 void
-socket_delete(net_socket *_socket)
+socket_delete(net_socket* _socket)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 
 	if (socket->parent != NULL)
 		panic("socket still has a parent!");
 
 	mutex_lock(&sSocketLock);
-	list_remove_item(&sSocketList, socket);
+	sSocketList.Remove(socket);
 	mutex_unlock(&sSocketLock);
 
 	// also delete all children of this socket
-	delete_children(&socket->pending_children);
-	delete_children(&socket->connected_children);
+	delete_children(socket->pending_children);
+	delete_children(socket->connected_children);
 
 	put_domain_protocols(socket);
 	mutex_destroy(&socket->lock);
@@ -511,14 +506,13 @@ socket_delete(net_socket *_socket)
 
 
 status_t
-socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
+socket_dequeue_connected(net_socket* _parent, net_socket** _socket)
 {
-	net_socket_private *parent = (net_socket_private *)_parent;
+	net_socket_private* parent = (net_socket_private*)_parent;
 
 	mutex_lock(&parent->lock);
 
-	net_socket_private *socket = (net_socket_private *)list_remove_head_item(
-		&parent->connected_children);
+	net_socket_private* socket = parent->connected_children.RemoveHead();
 	if (socket != NULL) {
 		socket->parent = NULL;
 		parent->child_count--;
@@ -531,7 +525,7 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 		return B_ENTRY_NOT_FOUND;
 
 	mutex_lock(&sSocketLock);
-	list_add_item(&sSocketList, socket);
+	sSocketList.Add(socket);
 	mutex_unlock(&sSocketLock);
 
 	return B_OK;
@@ -539,78 +533,65 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 
 
 ssize_t
-socket_count_connected(net_socket *_parent)
+socket_count_connected(net_socket* _parent)
 {
-	net_socket_private *parent = (net_socket_private *)_parent;
+	net_socket_private* parent = (net_socket_private*)_parent;
 
 	MutexLocker _(parent->lock);
-
-	ssize_t count = 0;
-	void *item = NULL;
-	while ((item = list_get_next_item(&parent->connected_children,
-			item)) != NULL) {
-		count++;
-	}
-
-	return count;
+	return parent->connected_children.Count();
 }
 
 
 status_t
-socket_set_max_backlog(net_socket *_socket, uint32 backlog)
+socket_set_max_backlog(net_socket* _socket, uint32 backlog)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 
 	// we enforce an upper limit of connections waiting to be accepted
 	if (backlog > 256)
 		backlog = 256;
 
-	mutex_lock(&socket->lock);
+	MutexLocker _(socket->lock);
 
 	// first remove the pending connections, then the already connected
 	// ones as needed
-	net_socket_private *child;
+	net_socket_private* child;
 	while (socket->child_count > backlog
-		&& (child = (net_socket_private *)list_remove_tail_item(
-				&socket->pending_children)) != NULL) {
+		&& (child = socket->pending_children.RemoveTail()) != NULL) {
 		child->parent = NULL;
 		socket->child_count--;
 	}
 	while (socket->child_count > backlog
-		&& (child = (net_socket_private *)list_remove_tail_item(
-				&socket->connected_children)) != NULL) {
+		&& (child = socket->connected_children.RemoveTail()) != NULL) {
 		child->parent = NULL;
 		socket_delete(child);
 		socket->child_count--;
 	}
 
 	socket->max_backlog = backlog;
-	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 
 
-/*!
-	The socket has been connected. It will be moved to the connected queue
+/*!	The socket has been connected. It will be moved to the connected queue
 	of its parent socket.
 */
 status_t
-socket_connected(net_socket *socket)
+socket_connected(net_socket* socket)
 {
-	net_socket_private *parent = (net_socket_private *)socket->parent;
+	net_socket_private* parent = (net_socket_private*)socket->parent;
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
-	mutex_lock(&parent->lock);
+	MutexLocker _(&parent->lock);
 
-	list_remove_item(&parent->pending_children, socket);
-	list_add_item(&parent->connected_children, socket);
+	parent->pending_children.Remove((net_socket_private*)socket);
+	parent->connected_children.Add((net_socket_private*)socket);
 
 	// notify parent
 	if (parent->select_pool)
 		notify_select_event_pool(parent->select_pool, B_SELECT_READ);
 
-	mutex_unlock(&parent->lock);
 	return B_OK;
 }
 
@@ -619,9 +600,9 @@ socket_connected(net_socket *socket)
 
 
 status_t
-socket_request_notification(net_socket *_socket, uint8 event, selectsync *sync)
+socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 
 	mutex_lock(&socket->lock);
 
@@ -663,36 +644,29 @@ socket_request_notification(net_socket *_socket, uint8 event, selectsync *sync)
 
 
 status_t
-socket_cancel_notification(net_socket *_socket, uint8 event, selectsync *sync)
+socket_cancel_notification(net_socket* _socket, uint8 event, selectsync* sync)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 
-	mutex_lock(&socket->lock);
-
-	status_t status = remove_select_sync_pool_entry(&socket->select_pool,
-		sync, event);
-
-	mutex_unlock(&socket->lock);
-	return status;
+	MutexLocker _(socket->lock);
+	return remove_select_sync_pool_entry(&socket->select_pool, sync, event);
 }
 
 
 status_t
-socket_notify(net_socket *_socket, uint8 event, int32 value)
+socket_notify(net_socket* _socket, uint8 event, int32 value)
 {
-	net_socket_private *socket = (net_socket_private *)_socket;
+	net_socket_private* socket = (net_socket_private*)_socket;
 	bool notify = true;
 
 	switch (event) {
 		case B_SELECT_READ:
-			if ((ssize_t)socket->receive.low_water_mark > value
-				&& value >= B_OK)
+			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
 				notify = false;
 			break;
 
 		case B_SELECT_WRITE:
-			if ((ssize_t)socket->send.low_water_mark > value
-				&& value >= B_OK)
+			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
 				notify = false;
 			break;
 
@@ -701,12 +675,11 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 			break;
 	}
 
-	mutex_lock(&socket->lock);
+	MutexLocker _(socket->lock);
 
 	if (notify && socket->select_pool)
 		notify_select_event_pool(socket->select_pool, event);
 
-	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 
@@ -715,13 +688,13 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 
 
 int
-socket_accept(net_socket *socket, struct sockaddr *address,
-	socklen_t *_addressLength, net_socket **_acceptedSocket)
+socket_accept(net_socket* socket, struct sockaddr* address,
+	socklen_t* _addressLength, net_socket** _acceptedSocket)
 {
 	if ((socket->options & SO_ACCEPTCONN) == 0)
 		return B_BAD_VALUE;
 
-	net_socket *accepted;
+	net_socket* accepted;
 	status_t status = socket->first_info->accept(socket->first_protocol,
 		&accepted);
 	if (status < B_OK)
@@ -739,7 +712,7 @@ socket_accept(net_socket *socket, struct sockaddr *address,
 
 
 int
-socket_bind(net_socket *socket, const struct sockaddr *address,
+socket_bind(net_socket* socket, const struct sockaddr* address,
 	socklen_t addressLength)
 {
 	sockaddr empty;
@@ -755,7 +728,7 @@ socket_bind(net_socket *socket, const struct sockaddr *address,
 
 	if (socket->address.ss_len != 0) {
 		status_t status = socket->first_info->unbind(socket->first_protocol,
-			(sockaddr *)&socket->address);
+			(sockaddr*)&socket->address);
 		if (status < B_OK)
 			return status;
 	}
@@ -763,7 +736,7 @@ socket_bind(net_socket *socket, const struct sockaddr *address,
 	memcpy(&socket->address, address, sizeof(sockaddr));
 
 	status_t status = socket->first_info->bind(socket->first_protocol,
-		(sockaddr *)address);
+		(sockaddr*)address);
 	if (status < B_OK) {
 		// clear address again, as binding failed
 		socket->address.ss_len = 0;
@@ -774,7 +747,7 @@ socket_bind(net_socket *socket, const struct sockaddr *address,
 
 
 int
-socket_connect(net_socket *socket, const struct sockaddr *address,
+socket_connect(net_socket* socket, const struct sockaddr* address,
 	socklen_t addressLength)
 {
 	if (address == NULL || addressLength == 0)
@@ -792,8 +765,8 @@ socket_connect(net_socket *socket, const struct sockaddr *address,
 
 
 int
-socket_getpeername(net_socket *socket, struct sockaddr *address,
-	socklen_t *_addressLength)
+socket_getpeername(net_socket* socket, struct sockaddr* address,
+	socklen_t* _addressLength)
 {
 	if (socket->peer.ss_len == 0)
 		return ENOTCONN;
@@ -805,8 +778,8 @@ socket_getpeername(net_socket *socket, struct sockaddr *address,
 
 
 int
-socket_getsockname(net_socket *socket, struct sockaddr *address,
-	socklen_t *_addressLength)
+socket_getsockname(net_socket* socket, struct sockaddr* address,
+	socklen_t* _addressLength)
 {
 	if (socket->address.ss_len == 0)
 		return ENOTCONN;
@@ -819,8 +792,8 @@ socket_getsockname(net_socket *socket, struct sockaddr *address,
 
 
 status_t
-socket_get_option(net_socket *socket, int level, int option, void *value,
-	int *_length)
+socket_get_option(net_socket* socket, int level, int option, void* value,
+	int* _length)
 {
 	if (level != SOL_SOCKET)
 		return ENOPROTOOPT;
@@ -828,7 +801,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 	switch (option) {
 		case SO_SNDBUF:
 		{
-			uint32 *size = (uint32 *)value;
+			uint32* size = (uint32*)value;
 			*size = socket->send.buffer_size;
 			*_length = sizeof(uint32);
 			return B_OK;
@@ -836,7 +809,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 		case SO_RCVBUF:
 		{
-			uint32 *size = (uint32 *)value;
+			uint32* size = (uint32*)value;
 			*size = socket->receive.buffer_size;
 			*_length = sizeof(uint32);
 			return B_OK;
@@ -844,7 +817,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 		case SO_SNDLOWAT:
 		{
-			uint32 *size = (uint32 *)value;
+			uint32* size = (uint32*)value;
 			*size = socket->send.low_water_mark;
 			*_length = sizeof(uint32);
 			return B_OK;
@@ -852,7 +825,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 		case SO_RCVLOWAT:
 		{
-			uint32 *size = (uint32 *)value;
+			uint32* size = (uint32*)value;
 			*size = socket->receive.low_water_mark;
 			*_length = sizeof(uint32);
 			return B_OK;
@@ -872,7 +845,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 			if (timeout == B_INFINITE_TIMEOUT)
 				timeout = 0;
 
-			struct timeval *timeval = (struct timeval *)value;
+			struct timeval* timeval = (struct timeval*)value;
 			timeval->tv_sec = timeout / 1000000LL;
 			timeval->tv_usec = timeout % 1000000LL;
 
@@ -882,7 +855,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 		case SO_NONBLOCK:
 		{
-			int32 *_set = (int32 *)value;
+			int32* _set = (int32*)value;
 			*_set = socket->receive.timeout == 0 && socket->send.timeout == 0;
 			*_length = sizeof(int32);
 			return B_OK;
@@ -898,7 +871,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 		case SO_REUSEPORT:
 		case SO_USELOOPBACK:
 		{
-			int32 *_set = (int32 *)value;
+			int32* _set = (int32*)value;
 			*_set = (socket->options & option) != 0;
 			*_length = sizeof(int32);
 			return B_OK;
@@ -906,7 +879,7 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 		case SO_ERROR:
 		{
-			int32 *_set = (int32 *)value;
+			int32* _set = (int32*)value;
 			*_set = socket->error;
 			*_length = sizeof(int32);
 
@@ -925,8 +898,8 @@ socket_get_option(net_socket *socket, int level, int option, void *value,
 
 
 int
-socket_getsockopt(net_socket *socket, int level, int option, void *value,
-	int *_length)
+socket_getsockopt(net_socket* socket, int level, int option, void* value,
+	int* _length)
 {
 	return socket->first_protocol->module->getsockopt(socket->first_protocol,
 		level, option, value, _length);
@@ -934,7 +907,7 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 
 
 int
-socket_listen(net_socket *socket, int backlog)
+socket_listen(net_socket* socket, int backlog)
 {
 	status_t status = socket->first_info->listen(socket->first_protocol,
 		backlog);
@@ -946,7 +919,7 @@ socket_listen(net_socket *socket, int backlog)
 
 
 ssize_t
-socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
+socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	int flags)
 {
 	// If the protocol sports read_data_no_buffer() we use it.
@@ -954,7 +927,7 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 		return socket_receive_no_buffer(socket, header, data, length, flags);
 
 	size_t totalLength = length;
-	net_buffer *buffer;
+	net_buffer* buffer;
 	int i;
 
 	// the convention to this function is that have header been
@@ -1048,22 +1021,22 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 
 
 ssize_t
-socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
+socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	int flags)
 {
-	const sockaddr *address = NULL;
+	const sockaddr* address = NULL;
 	socklen_t addressLength = 0;
 	size_t bytesLeft = length;
 
 	if (length > SSIZE_MAX)
 		return B_BAD_VALUE;
 
-	ancillary_data_container *ancillaryData = NULL;
+	ancillary_data_container* ancillaryData = NULL;
 	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(NULL,
 		&delete_ancillary_data_container);
 
 	if (header != NULL) {
-		address = (const sockaddr *)header->msg_name;
+		address = (const sockaddr*)header->msg_name;
 		addressLength = header->msg_namelen;
 
 		// get the ancillary data
@@ -1074,7 +1047,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 			ancillaryDataDeleter.SetTo(ancillaryData);
 
 			status_t status = add_ancillary_data(socket, ancillaryData,
-				(cmsghdr *)header->msg_control, header->msg_controllen);
+				(cmsghdr*)header->msg_control, header->msg_controllen);
 			if (status != B_OK)
 				return status;
 		}
@@ -1090,7 +1063,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 			return EISCONN;
 
 		// socket is connected, we use that address
-		address = (struct sockaddr *)&socket->peer;
+		address = (struct sockaddr*)&socket->peer;
 		addressLength = socket->peer.ss_len;
 	}
 
@@ -1143,7 +1116,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 
 	while (bytesLeft > 0) {
 		// TODO: useful, maybe even computed header space!
-		net_buffer *buffer = gNetBufferModule.create(256);
+		net_buffer* buffer = gNetBufferModule.create(256);
 		if (buffer == NULL)
 			return ENOBUFS;
 
@@ -1175,7 +1148,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 				// partial send
 				vecOffset = bytes;
 				length -= vecOffset;
-				data = (uint8 *)data + vecOffset;
+				data = (uint8*)data + vecOffset;
 			} else if (header != NULL) {
 				// proceed with next buffer, if any
 				vecOffset = 0;
@@ -1224,7 +1197,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 
 
 status_t
-socket_set_option(net_socket *socket, int level, int option, const void *value,
+socket_set_option(net_socket* socket, int level, int option, const void* value,
 	int length)
 {
 	if (level != SOL_SOCKET)
@@ -1237,7 +1210,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length < (int)sizeof(struct linger))
 				return B_BAD_VALUE;
 
-			struct linger *linger = (struct linger *)value;
+			struct linger* linger = (struct linger*)value;
 			if (linger->l_onoff) {
 				socket->options |= SO_LINGER;
 				socket->linger = linger->l_linger;
@@ -1252,28 +1225,28 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
-			socket->send.buffer_size = *(const uint32 *)value;
+			socket->send.buffer_size = *(const uint32*)value;
 			return B_OK;
 
 		case SO_RCVBUF:
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
-			socket->receive.buffer_size = *(const uint32 *)value;
+			socket->receive.buffer_size = *(const uint32*)value;
 			return B_OK;
 
 		case SO_SNDLOWAT:
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
-			socket->send.low_water_mark = *(const uint32 *)value;
+			socket->send.low_water_mark = *(const uint32*)value;
 			return B_OK;
 
 		case SO_RCVLOWAT:
 			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
-			socket->receive.low_water_mark = *(const uint32 *)value;
+			socket->receive.low_water_mark = *(const uint32*)value;
 			return B_OK;
 
 		case SO_RCVTIMEO:
@@ -1282,7 +1255,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length != sizeof(struct timeval))
 				return B_BAD_VALUE;
 
-			const struct timeval *timeval = (const struct timeval *)value;
+			const struct timeval* timeval = (const struct timeval*)value;
 			bigtime_t timeout = timeval->tv_sec * 1000000LL + timeval->tv_usec;
 			if (timeout == 0)
 				timeout = B_INFINITE_TIMEOUT;
@@ -1298,7 +1271,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length != sizeof(int32))
 				return B_BAD_VALUE;
 
-			if (*(const int32 *)value) {
+			if (*(const int32*)value) {
 				socket->send.timeout = 0;
 				socket->receive.timeout = 0;
 			} else {
@@ -1318,7 +1291,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length != sizeof(int32))
 				return B_BAD_VALUE;
 
-			if (*(const int32 *)value)
+			if (*(const int32*)value)
 				socket->options |= option;
 			else
 				socket->options &= ~option;
@@ -1329,7 +1302,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 			if (length != sizeof(int32))
 				return B_BAD_VALUE;
 
-			int index = *(const int32 *)value;
+			int index = *(const int32*)value;
 			if (index < 0)
 				return B_BAD_VALUE;
 
@@ -1349,7 +1322,7 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 
 
 int
-socket_setsockopt(net_socket *socket, int level, int option, const void *value,
+socket_setsockopt(net_socket* socket, int level, int option, const void* value,
 	int length)
 {
 	return socket->first_protocol->module->setsockopt(socket->first_protocol,
@@ -1358,7 +1331,7 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 
 
 int
-socket_shutdown(net_socket *socket, int direction)
+socket_shutdown(net_socket* socket, int direction)
 {
 	return socket->first_info->shutdown(socket->first_protocol, direction);
 }
@@ -1426,16 +1399,11 @@ socket_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			// TODO: this is currently done in the net_stack driver
-			// initialize the main stack if not done so already
-			//module_info *module;
-			//return get_module(NET_STARTER_MODULE_NAME, &module);
-			list_init_etc(&sSocketList, offsetof(net_socket_private, link));
+			new (&sSocketList) SocketList;
 			mutex_init(&sSocketLock, "socket list");
 			return B_OK;
 		}
 		case B_MODULE_UNINIT:
-			//return put_module(NET_STARTER_MODULE_NAME);
 			mutex_destroy(&sSocketLock);
 			return B_OK;
 
