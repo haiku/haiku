@@ -1331,7 +1331,9 @@ void
 BTextView::GoToLine(int32 index)
 {
 	_CancelInputMethod();
+	_HideCaret();
 	fSelStart = fSelEnd = fClickOffset = OffsetAt(index);
+	_ShowCaret();
 }
 
 
@@ -1507,6 +1509,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 				Highlight(fSelStart, fSelEnd);
 		}
 		fSelStart = fSelEnd = fClickOffset = startOffset;
+		_ShowCaret();
 	} else {
 		if (fActive) {
 			// draw only those ranges that are different
