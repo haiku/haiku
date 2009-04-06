@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DRAGGER_H
@@ -115,7 +115,7 @@ class BDragger : public BView {
 				bool		fIsZombie;
 				char		fErrCount;
 				bool		fPopUpIsCustom;
-				BBitmap	*	fBitmap;
+				BBitmap*	fBitmap;
 				BPopUpMenu*	fPopUp;
 				uint32		_reserved[3];
 };

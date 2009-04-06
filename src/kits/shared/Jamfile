@@ -17,6 +17,7 @@ StaticLibrary libshared.a :
 	ColorQuantizer.cpp
 	CommandPipe.cpp
 	DateTime.cpp
+	DragTrackingFilter.cpp
 	HashString.cpp
 	RWLockManager.cpp
 ;

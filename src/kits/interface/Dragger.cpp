@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Rene Gollent (rene@gollent.com)
+ *		Alexandre Deckner (alex@zappotek.com)
  */
 
 //!	BDragger represents a replicant "handle".
@@ -25,6 +26,7 @@
 #include <Window.h>
 
 #include <AppServerLink.h>
+#include <DragTrackingFilter.h>
 #include <binary_compatibility/Interface.h>
 #include <ServerProtocol.h>
 #include <ViewPrivate.h>
@@ -37,6 +39,7 @@ bool BDragger::sVisibleInitialized;
 BLocker BDragger::sLock("BDragger static");
 BList BDragger::sList;
 
+const uint32 kMsgDragStarted = 'Drgs';
 
 const unsigned char
 kHandBitmap[] = {
@@ -153,6 +156,8 @@ BDragger::AttachedToWindow()
 
 	_DetermineRelationship();
 	_AddToList();
+
+	AddFilter(new DragTrackingFilter(this, kMsgDragStarted));
 }
 
 
@@ -211,73 +216,8 @@ BDragger::MouseDown(BPoint where)
 	uint32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
 
-	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-		if (!fShelf)
-			return;
-
+	if (fShelf != NULL && (buttons & B_SECONDARY_MOUSE_BUTTON))
 		_ShowPopUp(fTarget, where);
-	} else {
-		bigtime_t time = system_time();
-		bigtime_t clickSpeed = 0;
-
-		get_click_speed(&clickSpeed);
-
-		bool drag = false;
-
-		while (true) {
-			BPoint mousePoint;
-			GetMouse(&mousePoint, &buttons, false);
-
-			if (!buttons || system_time() > time + clickSpeed)
-				break;
-
-			float squaredDistance =
-				(mousePoint.x - where.x) * (mousePoint.x - where.x)
-				+ (mousePoint.y - where.y) * (mousePoint.y - where.y);
-  
-			if (squaredDistance >= 16) {
-				drag = true;
-				break;
-			}
-
-			snooze(40000);
-		}
-
-		if (drag) {
-			BMessage archive(B_ARCHIVED_OBJECT);
-
-			if (fRelation == TARGET_IS_PARENT)
-				fTarget->Archive(&archive);
-			else if (fRelation == TARGET_IS_CHILD)
-				Archive(&archive);
-			else {
-				if (fTarget->Archive(&archive)) {
-					BMessage archivedSelf(B_ARCHIVED_OBJECT);
-
-					if (Archive(&archivedSelf))
-						archive.AddMessage("__widget", &archivedSelf);
-				}
-			}
-
-			archive.AddInt32("be:actions", B_TRASH_TARGET);
-
-			BPoint offset;
-			drawing_mode mode;
-			BBitmap *bitmap = DragBitmap(&offset, &mode);
-			if (bitmap != NULL)
-				DragMessage(&archive, bitmap, mode, offset, this);
-			else {
-				DragMessage(&archive,
-					ConvertFromScreen(fTarget->ConvertToScreen(fTarget->Bounds())),
-					this);
-			}
-		} else {
-			if (!fShelf)
-				return;
-
-			_ShowPopUp(fTarget, where);
-		}
-	}
 }
 
 
@@ -325,6 +265,37 @@ BDragger::MessageReceived(BMessage *msg)
 					Show();
 				else
 					Hide();
+			}
+			break;
+
+		case kMsgDragStarted:
+			if (fTarget != NULL) {
+				BMessage archive(B_ARCHIVED_OBJECT);
+
+				if (fRelation == TARGET_IS_PARENT)
+					fTarget->Archive(&archive);
+				else if (fRelation == TARGET_IS_CHILD)
+					Archive(&archive);
+				else {
+					if (fTarget->Archive(&archive)) {
+						BMessage archivedSelf(B_ARCHIVED_OBJECT);
+
+						if (Archive(&archivedSelf))
+							archive.AddMessage("__widget", &archivedSelf);
+					}
+				}
+
+				archive.AddInt32("be:actions", B_TRASH_TARGET);
+				BPoint offset;
+				drawing_mode mode;
+				BBitmap *bitmap = DragBitmap(&offset, &mode);
+				if (bitmap != NULL)
+					DragMessage(&archive, bitmap, mode, offset, this);
+				else {
+					DragMessage(&archive,
+						ConvertFromScreen(fTarget->ConvertToScreen(fTarget->Bounds())),
+						this);
+				}
 			}
 			break;
 
