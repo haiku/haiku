@@ -120,7 +120,7 @@ void
 BasicThreadProfileResult::PrintResults()
 {
 	// get hit images
-	BasicThreadImage* images[fOldImages.Size() + fImages.Size()];
+	BasicThreadImage* images[fOldImages.Count() + fImages.Count()];
 	int32 imageCount = GetHitImages(images);
 
 	// count symbols

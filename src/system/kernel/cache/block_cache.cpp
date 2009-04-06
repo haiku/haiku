@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1523,7 +1523,7 @@ dump_cache(int argc, char** argv)
 
 	kprintf(" %ld blocks total, %ld dirty, %ld discarded, %ld referenced, %ld "
 		"in unused.\n", count, dirty, discarded, referenced,
-		cache->unused_blocks.Size());
+		cache->unused_blocks.Count());
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;

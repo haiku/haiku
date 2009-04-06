@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -723,7 +723,7 @@ dump_driver(int argc, char** argv)
 
 			kprintf("%p  %5ld %3ld %5ld %c %3ld %s\n", driver,
 				driver->image < 0 ? -1 : driver->image,
-				driver->devices_used, driver->devices.Size(),
+				driver->devices_used, driver->devices.Count(),
 				driver->binary_updated ? 'U' : ' ', driver->priority,
 				driver->name);
 		}
@@ -751,7 +751,7 @@ dump_driver(int argc, char** argv)
 	kprintf(" node:           %Ld\n", driver->node);
 	kprintf(" last modified:  %ld\n", driver->last_modified);
 	kprintf(" devs used:      %ld\n", driver->devices_used);
-	kprintf(" devs published: %ld\n", driver->devices.Size());
+	kprintf(" devs published: %ld\n", driver->devices.Count());
 	kprintf(" binary updated: %d\n", driver->binary_updated);
 	kprintf(" priority:       %ld\n", driver->priority);
 	kprintf(" api version:    %ld\n", driver->api_version);

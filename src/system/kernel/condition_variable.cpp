@@ -264,7 +264,7 @@ ConditionVariable::ListAll()
 	ConditionVariableHash::Iterator it(&sConditionVariableHash);
 	while (ConditionVariable* variable = it.Next()) {
 		// count waiting threads
-		int count = variable->fEntries.Size();
+		int count = variable->fEntries.Count();
 
 		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
 			variable->fObjectType, count);

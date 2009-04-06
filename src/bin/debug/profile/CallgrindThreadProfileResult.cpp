@@ -204,7 +204,7 @@ CallgrindThreadProfileResult::PrintResults()
 	fprintf(out, "summary: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
-	CallgrindThreadImage* images[fOldImages.Size() + fImages.Size()];
+	CallgrindThreadImage* images[fOldImages.Count() + fImages.Count()];
 	int32 imageCount = GetHitImages(images);
 
 	for (int32 i = 0; i < imageCount; i++) {
