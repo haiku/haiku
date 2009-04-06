@@ -1910,35 +1910,53 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 
 	BMessage* message = new BMessage(kIconMode);
 	message->AddInt32("size", 32);
-	item = new BMenuItem("32 x 32", message, '1');
+	item = new BMenuItem("32 x 32", message);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 40);
-	item = new BMenuItem("40 x 40", message, '2');
+	item = new BMenuItem("40 x 40", message);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 48);
-	item = new BMenuItem("48 x 48", message, '3');
+	item = new BMenuItem("48 x 48", message);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kScaleIconMode);
 	message->AddInt32("size", 64);
-	item = new BMenuItem("64 x 64", message, '4');
+	item = new BMenuItem("64 x 64", message);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	menu->AddItem(iconSizeMenu);
+	iconSizeMenu->AddSeparatorItem();
 
-	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '5');
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("scale", 0);
+	item = new BMenuItem("Decrease Size", message, '-');
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kScaleIconMode);
+	message->AddInt32("scale", 1);
+	item = new BMenuItem("Increase Size", message, '+');
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	// A sub menu where the super item can be invoked.
+	menu->AddItem(iconSizeMenu);
+	iconSizeMenu->Superitem()->SetShortcut('1', B_COMMAND_KEY);
+	iconSizeMenu->Superitem()->SetMessage(new BMessage(kIconMode));
+	iconSizeMenu->Superitem()->SetTarget(PoseView());
+
+	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '2');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("List View", new BMessage(kListMode), '6');
+	item = new BMenuItem("List View", new BMessage(kListMode), '3');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 

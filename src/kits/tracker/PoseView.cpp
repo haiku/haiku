@@ -2037,12 +2037,40 @@ BPoseView::MessageReceived(BMessage *message)
 
 		case kScaleIconMode: {
 			int32 size;
+			int32 scale;
 			if (message->FindInt32("size", &size) == B_OK) {
-				if (size != (int32)IconSizeInt()) {
+				if (size != (int32)IconSizeInt())
 					fViewState->SetIconSize(size);
-				} else
-					break;		// no change
-			}
+			} else if (message->FindInt32("scale", &scale) == B_OK
+						&& (fViewState->ViewMode() == kIconMode
+							|| fViewState->ViewMode() == kScaleIconMode)) {
+				if (scale == 0 && (int32)IconSizeInt() != 32) {
+					switch ((int32)IconSizeInt()) {
+						case 40:
+							fViewState->SetIconSize(32);
+							break;
+						case 48:
+							fViewState->SetIconSize(40);
+							break;
+						case 64:
+							fViewState->SetIconSize(48);
+							break;
+					}
+				} else if (scale == 1 && (int32)IconSizeInt() != 128) {
+					switch ((int32)IconSizeInt()) {
+						case 32:
+							fViewState->SetIconSize(40);
+							break;
+						case 40:
+							fViewState->SetIconSize(48);
+							break;
+						case 48:
+							fViewState->SetIconSize(64);
+							break;
+					}
+				}
+			} else
+				break;		// no change
 		} // fall thru
 		case kListMode:
 		case kIconMode:
