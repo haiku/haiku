@@ -9,7 +9,7 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector.h>
+#include <vector>
 
 #ifdef __HAIKU__
 #	include <AbstractLayoutItem.h>
