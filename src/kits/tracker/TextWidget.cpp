@@ -159,8 +159,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn *column,
 
 		result.bottom = poseLoc.y + (view->ListElemHeight() - 1);
 	} else {
-		if (view->ViewMode() == kIconMode
-			|| view->ViewMode() == kScaleIconMode) {
+		if (view->ViewMode() == kIconMode) {
 			// large/scaled icon mode
 			result.left = poseLoc.x + (view->IconSizeInt() - textWidth) / 2;
 		} else {
@@ -338,7 +337,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	rect.right = rect.left + textView->LineWidth() + 3;
 	// center new width, if necessary
 	if (view->ViewMode() == kIconMode
-		|| view->ViewMode() == kScaleIconMode
 		|| view->ViewMode() == kListMode && fAlignment == B_ALIGN_CENTER) {
 		rect.OffsetBy(bounds.Width() / 2 - rect.Width() / 2, 0);
 	}
@@ -366,7 +364,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	// configure text view
 	switch (view->ViewMode()) {
 		case kIconMode:
-		case kScaleIconMode:
 			textView->SetAlignment(B_ALIGN_CENTER);
 			break;
 

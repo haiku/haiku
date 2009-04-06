@@ -271,21 +271,21 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	message = new BMessage(kScaleIconMode);
+	message = new BMessage(kIconMode);
 	message->AddInt32("size", 40);
 	item = new BMenuItem("40 x 40", message);
 	item->SetMarked(PoseView()->IconSizeInt() == 40);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	message = new BMessage(kScaleIconMode);
+	message = new BMessage(kIconMode);
 	message->AddInt32("size", 48);
 	item = new BMenuItem("48 x 48", message);
 	item->SetMarked(PoseView()->IconSizeInt() == 48);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	message = new BMessage(kScaleIconMode);
+	message = new BMessage(kIconMode);
 	message->AddInt32("size", 64);
 	item = new BMenuItem("64 x 64", message);
 	item->SetMarked(PoseView()->IconSizeInt() == 64);

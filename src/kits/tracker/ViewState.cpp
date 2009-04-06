@@ -70,6 +70,7 @@ const char *kViewStateSecondarySortAttrName = "ViewState:fSecondarySortAttr";
 const char *kViewStateSecondarySortTypeName = "ViewState:fSecondarySortType";
 const char *kViewStateReverseSortName = "ViewState:fReverseSort";
 const char *kViewStateIconSizeName = "ViewState:fIconSize";
+const char *kViewStateLastIconSizeName = "ViewState:fLastIconSize";
 
 
 static const int32 kColumnStateMinArchiveVersion = 21;
@@ -280,6 +281,7 @@ BViewState::BViewState()
 	fViewMode = kListMode;
 	fLastIconMode = 0;
 	fIconSize = 32;
+	fLastIconSize = 32;
 	fListOrigin.Set(0, 0);
 	fIconOrigin.Set(0, 0);
 	fPrimarySortAttr = AttrHashString(kAttrStatName, B_STRING_TYPE);
@@ -304,12 +306,14 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 	stream->Read(&fSecondarySortType, sizeof(uint32));
 	stream->Read(&fReverseSort, sizeof(bool));
 	stream->Read(&fIconSize, sizeof(uint32));
+	stream->Read(&fLastIconSize, sizeof(uint32));
 
 	if (endianSwap) {
 		PRINT(("endian swapping view state\n"));
 		fViewMode = B_SWAP_INT32(fViewMode);
 		fLastIconMode = B_SWAP_INT32(fLastIconMode);
 		fIconSize = B_SWAP_INT32(fIconSize);
+		fLastIconSize = B_SWAP_INT32(fLastIconSize);
 		swap_data(B_POINT_TYPE, &fListOrigin,
 			sizeof(fListOrigin), B_SWAP_ALWAYS);
 		swap_data(B_POINT_TYPE, &fIconOrigin,
@@ -365,6 +369,7 @@ BViewState::ArchiveToStream(BMallocIO *stream) const
 	stream->Write(&fSecondarySortType, sizeof(uint32));
 	stream->Write(&fReverseSort, sizeof(bool));
 	stream->Write(&fIconSize, sizeof(uint32));
+	stream->Write(&fLastIconSize, sizeof(uint32));
 }
 
 
@@ -388,6 +393,8 @@ BViewState::ArchiveToMessage(BMessage &message) const
 		static_cast<int32>(fSecondarySortType));
 	message.AddBool(kViewStateReverseSortName, fReverseSort);
 	message.AddInt32(kViewStateIconSizeName, static_cast<int32>(fIconSize));
+	message.AddInt32(kViewStateLastIconSizeName,
+		static_cast<int32>(fLastIconSize));
 }
 
 
@@ -432,6 +439,7 @@ BViewState::_StorePreviousState()
 	fPreviousViewMode = fViewMode;
 	fPreviousLastIconMode = fLastIconMode;
 	fPreviousIconSize = fIconSize;
+	fPreviousLastIconSize = fLastIconSize;
 	fPreviousListOrigin = fListOrigin;
 	fPreviousIconOrigin = fIconOrigin;
 	fPreviousPrimarySortAttr = fPrimarySortAttr;
@@ -458,6 +466,10 @@ BViewState::_Sanitize(BViewState *state, bool fixOnly)
 		state->fIconSize = 16;
 	if (state->fIconSize > 64)
 		state->fIconSize = 64;
+	if (state->fLastIconSize < 16)
+		state->fLastIconSize = 16;
+	if (state->fLastIconSize > 64)
+		state->fLastIconSize = 64;
 
 	if (fixOnly)
 		return state;
@@ -466,12 +478,10 @@ BViewState::_Sanitize(BViewState *state, bool fixOnly)
 	if ((state->fViewMode != kListMode
 			&& state->fViewMode != kIconMode
 			&& state->fViewMode != kMiniIconMode
-			&& state->fViewMode != kScaleIconMode
 			&& state->fViewMode != 0)
 		|| (state->fLastIconMode != kListMode
 			&& state->fLastIconMode != kIconMode
 			&& state->fLastIconMode != kMiniIconMode
-			&& state->fLastIconMode != kScaleIconMode
 			&& state->fLastIconMode != 0)) {
 		PRINT(("Bad data instantiating ViewState, view mode %x, lastIconMode %x\n",
 			state->fViewMode, state->fLastIconMode));

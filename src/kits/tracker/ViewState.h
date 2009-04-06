@@ -96,7 +96,7 @@ class BColumn {
 };
 
 
-const int32 kViewStateArchiveVersion = 10;
+const int32 kViewStateArchiveVersion = 11;
 	// bump version when layout or size changes
 
 class BViewState {
@@ -113,6 +113,7 @@ class BViewState {
 		uint32 ViewMode() const;
 		uint32 LastIconMode() const;
 		uint32 IconSize() const;
+		uint32 LastIconSize() const;
 		BPoint ListOrigin() const;
 		BPoint IconOrigin() const;
 		uint32 PrimarySort() const;
@@ -124,6 +125,7 @@ class BViewState {
 		void SetViewMode(uint32);
 		void SetLastIconMode(uint32);
 		void SetIconSize(uint32);
+		void SetLastIconSize(uint32);
 		void SetListOrigin(BPoint);
 		void SetIconOrigin(BPoint);
 		void SetPrimarySort(uint32);
@@ -140,6 +142,7 @@ class BViewState {
 		uint32 fViewMode;
 		uint32 fLastIconMode;
 		uint32 fIconSize;
+		uint32 fLastIconSize;
 		BPoint fListOrigin;
 		BPoint fIconOrigin;
 		uint32 fPrimarySortAttr;
@@ -153,6 +156,7 @@ class BViewState {
 		uint32 	fPreviousViewMode;
 		uint32 	fPreviousLastIconMode;
 		uint32 	fPreviousIconSize;
+		uint32 	fPreviousLastIconSize;
 		BPoint 	fPreviousListOrigin;
 		BPoint 	fPreviousIconOrigin;
 		uint32 	fPreviousPrimarySortAttr;
@@ -268,6 +272,13 @@ BViewState::IconSize() const
 }
 
 
+inline uint32
+BViewState::LastIconSize() const
+{
+	return fLastIconSize;
+}
+
+
 inline BPoint
 BViewState::ListOrigin() const
 {
@@ -337,6 +348,13 @@ BViewState::SetIconSize(uint32 size)
 
 
 inline void
+BViewState::SetLastIconSize(uint32 size)
+{
+	fLastIconSize = size;
+}
+
+
+inline void
 BViewState::SetListOrigin(BPoint newOrigin)
 {
 	fListOrigin = newOrigin;
@@ -389,6 +407,7 @@ BViewState::StateNeedsSaving()
 	return (fPreviousViewMode != fViewMode)
 		|| (fPreviousLastIconMode != fLastIconMode)
 		|| (fPreviousIconSize != fIconSize)
+		|| (fPreviousLastIconSize != fLastIconSize)
 		|| (fPreviousListOrigin != fListOrigin)
 		|| (fPreviousIconOrigin != fIconOrigin)
 		|| (fPreviousPrimarySortAttr != fPrimarySortAttr)

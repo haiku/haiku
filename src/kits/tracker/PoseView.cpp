@@ -929,18 +929,13 @@ BPoseView::SetIconPoseHeight()
 {
 	switch (ViewMode()) {
 		case kIconMode:
-			fViewState->SetIconSize(B_LARGE_ICON);
+			// IconSize should allready be set in MessageReceived()
 			fIconPoseHeight = ceilf(IconSizeInt() + sFontHeight + 1);
 			break;
 
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
 			fIconPoseHeight = ceilf(sFontHeight < IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
-			break;
-
-		case kScaleIconMode:
-			// IconSize should allready be set in MessageReceived()
-			fIconPoseHeight = ceilf(IconSizeInt() + sFontHeight + 1);
 			break;
 
 		default:
@@ -961,11 +956,6 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint *grid, BPoint *offset) const
 			break;
 
 		case kIconMode:
-			grid->Set(60, 60);
-			offset->Set(20, 20);
-			break;
-
-		case kScaleIconMode:
 			grid->Set(IconSizeInt() + 28, IconSizeInt() + 28);
 			offset->Set(20, 20);
 			break;
@@ -1727,7 +1717,6 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 			case kIconMode:
 			case kMiniIconMode:
-			case kScaleIconMode:
 				if (poseInfo->fInitedDirectory == -1LL || fAlwaysAutoPlace) {
 					if (pose->HasLocation())
 						RemoveFromVSList(pose);
@@ -2035,15 +2024,14 @@ BPoseView::MessageReceived(BMessage *message)
 				pendingNodeMonitorCache.Add(message);
 			break;
 
-		case kScaleIconMode: {
+		case kIconMode: {
 			int32 size;
 			int32 scale;
 			if (message->FindInt32("size", &size) == B_OK) {
 				if (size != (int32)IconSizeInt())
 					fViewState->SetIconSize(size);
 			} else if (message->FindInt32("scale", &scale) == B_OK
-						&& (fViewState->ViewMode() == kIconMode
-							|| fViewState->ViewMode() == kScaleIconMode)) {
+						&& fViewState->ViewMode() == kIconMode) {
 				if (scale == 0 && (int32)IconSizeInt() != 32) {
 					switch ((int32)IconSizeInt()) {
 						case 40:
@@ -2069,11 +2057,16 @@ BPoseView::MessageReceived(BMessage *message)
 							break;
 					}
 				}
-			} else
-				break;		// no change
+			} else {
+				int32 iconSize = fViewState->LastIconSize();
+				if (iconSize < 32 || iconSize > 64) {
+					// uninitialized last icon size?
+					iconSize = 32;
+				}
+				fViewState->SetIconSize(iconSize);
+			}
 		} // fall thru
 		case kListMode:
-		case kIconMode:
 		case kMiniIconMode:
 			SetViewMode(message->what);
 			break;
@@ -2729,18 +2722,26 @@ BPoseView::ReadExtendedPoseInfo(Model *model)
 void
 BPoseView::SetViewMode(uint32 newMode)
 {
-	if (newMode == ViewMode() && newMode != kScaleIconMode)
-		return;
+	uint32 oldMode = ViewMode();
+	uint32 lastIconSize = fViewState->LastIconSize();
+
+	if (newMode == oldMode) {
+		if (newMode != kIconMode || lastIconSize == fViewState->IconSize())
+			return;
+	}
 
 	ASSERT(!IsFilePanel());
 
 	uint32 lastIconMode = fViewState->LastIconMode();
-	if (newMode != kListMode)
+	if (newMode != kListMode) {
 		fViewState->SetLastIconMode(newMode);
+		if (oldMode == kIconMode)
+			fViewState->SetLastIconSize(fViewState->IconSize());
+	}
 
-	uint32 oldMode = ViewMode();
 	fViewState->SetViewMode(newMode);
 
+	// toggle view layout between listmode and non-listmode, if necessary
 	BContainerWindow *window = ContainerWindow();
 	if (oldMode == kListMode) {
 		fTitleView->RemoveSelf();
@@ -2750,7 +2751,7 @@ BPoseView::SetViewMode(uint32 newMode)
 
 		MoveBy(0, -(kTitleViewHeight + 1));
 		ResizeBy(0, kTitleViewHeight + 1);
-	} else if (ViewMode() == kListMode) {
+	} else if (newMode == kListMode) {
 		MoveBy(0, kTitleViewHeight + 1);
 		ResizeBy(0, -(kTitleViewHeight + 1));
 
@@ -2767,14 +2768,14 @@ BPoseView::SetViewMode(uint32 newMode)
 
 	CommitActivePose();
 	SetIconPoseHeight();
-	GetLayoutInfo(ViewMode(), &fGrid, &fOffset);
+	GetLayoutInfo(newMode, &fGrid, &fOffset);
 
 	// see if we need to map icons into new mode
-	bool mapIcons;
-	if (fOkToMapIcons)
-		mapIcons = (ViewMode() != kListMode) && (ViewMode() != lastIconMode);
-	else
-		mapIcons = false;
+	bool mapIcons = false;
+	if (fOkToMapIcons) {
+		mapIcons = (newMode != kListMode) && (newMode != lastIconMode
+			|| fViewState->IconSize() != lastIconSize);
+	}
 
 	BPoint oldOffset;
 	BPoint oldGrid;
@@ -2784,7 +2785,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	BRect bounds(Bounds());
 	PoseList newPoseList(30);
 
-	if (ViewMode() != kListMode) {
+	if (newMode != kListMode) {
 		int32 count = fPoseList->CountItems();
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
@@ -2797,7 +2798,7 @@ BPoseView::SetViewMode(uint32 newMode)
 
 	// update origin in case of a list <-> icon mode transition
 	BPoint newOrigin;
-	if (ViewMode() == kListMode)
+	if (newMode == kListMode)
 		newOrigin = fViewState->ListOrigin();
 	else
 		newOrigin = fViewState->IconOrigin();

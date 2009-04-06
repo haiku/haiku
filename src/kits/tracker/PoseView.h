@@ -99,7 +99,6 @@ const int32 kListOffset = 20;
 const uint32 kMiniIconMode = 'Tmic';
 const uint32 kIconMode = 'Ticn';
 const uint32 kListMode = 'Tlst';
-const uint32 kScaleIconMode = 'Tsic'; // new mode for scaled icons
 
 const uint32 kCheckTypeahead = 'Tcty';
 

@@ -450,8 +450,7 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 
-	if (poseView->ViewMode() == kIconMode
-		|| poseView->ViewMode() == kScaleIconMode) {
+	if (poseView->ViewMode() == kIconMode) {
 		// check icon rect, then actual icon pixel
 		BRect rect(fLocation, fLocation);
 		rect.right += poseView->IconSizeInt() - 1;
@@ -880,8 +879,7 @@ BPose::CalcRect(const BPoseView *poseView)
 	ASSERT(poseView->ViewMode() != kListMode);
 
 	BRect rect;
-	if (poseView->ViewMode() == kIconMode
-		|| poseView->ViewMode() == kScaleIconMode) {
+	if (poseView->ViewMode() == kIconMode) {
 		rect.left = fLocation.x;
 		rect.right = rect.left + poseView->IconSizeInt();
 
