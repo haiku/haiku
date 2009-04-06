@@ -3046,6 +3046,79 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 }
 
 
+bool
+vm_unmap_page(vm_area* area, addr_t virtualAddress, bool preserveModified)
+{
+	vm_translation_map* map = &area->address_space->translation_map;
+
+	map->ops->lock(map);
+
+	addr_t physicalAddress;
+	uint32 flags;
+	status_t status = map->ops->query(map, virtualAddress, &physicalAddress, 
+		&flags);
+	if (status < B_OK || (flags & PAGE_PRESENT) == 0) {
+		map->ops->unlock(map);
+		return false;
+	}
+	vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+	if (page == NULL && area->cache_type != CACHE_TYPE_DEVICE) {
+		panic("area %p looking up page failed for pa 0x%lx\n", area,
+			physicalAddress);
+	}
+
+	if (area->wiring != B_NO_LOCK && area->cache_type != CACHE_TYPE_DEVICE)
+		decrement_page_wired_count(page);
+
+	map->ops->unmap(map, virtualAddress, virtualAddress + B_PAGE_SIZE - 1);
+
+	if (preserveModified) {
+		map->ops->flush(map);
+
+		status = map->ops->query(map, virtualAddress, &physicalAddress, &flags);
+		if ((flags & PAGE_MODIFIED) != 0 && page->state != PAGE_STATE_MODIFIED)
+			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+	}
+
+	map->ops->unlock(map);
+
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mapping* mapping;
+
+		mutex_lock(&sMappingLock);
+		map->ops->lock(map);
+
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while (iterator.HasNext()) {
+			mapping = iterator.Next();
+
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+
+				if (page->mappings.IsEmpty() && page->wired_count == 0)
+					atomic_add(&gMappedPagesCount, -1);
+
+				map->ops->unlock(map);
+				mutex_unlock(&sMappingLock);
+
+				free(mapping);
+
+				return true;
+			}
+		}
+
+		map->ops->unlock(map);
+		mutex_unlock(&sMappingLock);
+		
+		dprintf("vm_unmap_page: couldn't find mapping for area %p in page %p\n",
+			area, page);
+	}
+
+	return true;
+}
+
+
 status_t
 vm_unmap_pages(vm_area* area, addr_t base, size_t size, bool preserveModified)
 {
@@ -4559,11 +4632,11 @@ fault_remove_dummy_page(vm_dummy_page& dummyPage, bool isLocked)
 }
 
 
-/*!	Finds a page at the specified \a cacheOffset in either the \a topCacheRef
+/*!	Finds a page at the specified \a cacheOffset in either the \a topCache
 	or in its source chain. Will also page in a missing page in case there is
-	a cache that has the page.
+	a cache, whose backing store has the page.
 	If it couldn't find a page, it will return the vm_cache that should get it,
-	otherwise, it will return the vm_cache that contains the cache.
+	otherwise, it will return the vm_cache that contains the page.
 	It always grabs a reference to the vm_cache that it returns, and also locks
 	it.
 */
@@ -4968,7 +5041,7 @@ vm_soft_fault(vm_address_space* addressSpace, addr_t originalAddress,
 		// In case this is a copy-on-write page, we need to unmap it from the
 		// area now
 		if (isWrite && page->cache == topCache)
-			vm_unmap_pages(area, address, B_PAGE_SIZE, true);
+			vm_unmap_page(area, address, true);
 
 		// TODO: there is currently no mechanism to prevent a page being mapped
 		// more than once in case of a second page fault!
@@ -6384,7 +6457,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 			map->ops->unlock(map);
 
 			if (unmapPage)
-				vm_unmap_pages(area, pageAddress, B_PAGE_SIZE, true);
+				vm_unmap_page(area, pageAddress, true);
 		}
 	}
 
