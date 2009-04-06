@@ -35,6 +35,9 @@
 #include "utility.h"
 
 
+#define ADD_DEBUGGER_COMMANDS
+
+
 struct net_socket_private;
 typedef DoublyLinkedList<net_socket_private> SocketList;
 
@@ -214,6 +217,68 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 
 	return bytesRead;
 }
+
+
+#ifdef ADD_DEBUGGER_COMMANDS
+
+static int
+dump_socket(int argc, char** argv)
+{
+	if (argc < 2) {
+		kprintf("usage: %s [address]\n", argv[0]);
+		return 0;
+	}
+
+	net_socket_private* socket = (net_socket_private*)parse_expression(argv[1]);
+
+	kprintf("SOCKET %p\n", socket);
+	kprintf("  family.type.protocol: %d.%d.%d\n",
+		socket->family, socket->type, socket->protocol);
+	kprintf("  parent:               %p\n", socket->parent);
+	kprintf("  first protocol:       %p\n", socket->first_protocol);
+	kprintf("  first module_info:    %p\n", socket->first_info);
+	kprintf("  options:              %x\n", socket->options);
+	kprintf("  linger:               %d\n", socket->linger);
+	kprintf("  bound to device:      %d\n", socket->bound_to_device);
+	kprintf("  owner:                %ld\n", socket->owner);
+	kprintf("  max backlog:          %ld\n", socket->max_backlog);
+	kprintf("  child_count:          %lu\n", socket->child_count);
+	
+	if (socket->child_count == 0)
+		return 0;
+
+	kprintf("    pending children:\n");
+	SocketList::Iterator iterator = socket->pending_children.GetIterator();
+	while (net_socket_private* child = iterator.Next()) {
+		kprintf("      %p\n", child);
+	}
+
+	kprintf("    connected children:\n");
+	iterator = socket->connected_children.GetIterator();
+	while (net_socket_private* child = iterator.Next()) {
+		kprintf("      %p\n", child);
+	}
+
+	return 0;
+}
+
+
+static int
+dump_sockets(int argc, char** argv)
+{
+	kprintf("address        kind  owner protocol   module_info parent\n");
+
+	SocketList::Iterator iterator = sSocketList.GetIterator();
+	while (net_socket_private* socket = iterator.Next()) {
+		kprintf("%p %2d.%2d.%2d %6ld %p %p  %p\n", socket,
+			socket->family, socket->type, socket->protocol, socket->owner,
+			socket->first_protocol, socket->first_info, socket->parent);
+	}
+
+	return 0;
+}
+
+#endif	// ADD_DEBUGGER_COMMANDS
 
 
 //	#pragma mark -
@@ -1401,10 +1466,20 @@ socket_std_ops(int32 op, ...)
 		{
 			new (&sSocketList) SocketList;
 			mutex_init(&sSocketLock, "socket list");
+
+#ifdef ADD_DEBUGGER_COMMANDS
+			add_debugger_command("sockets", dump_sockets, "lists all sockets");
+			add_debugger_command("socket", dump_socket, "dumps a socket");
+#endif
 			return B_OK;
 		}
 		case B_MODULE_UNINIT:
 			mutex_destroy(&sSocketLock);
+
+#ifdef ADD_DEBUGGER_COMMANDS
+			remove_debugger_command("socket", dump_socket);
+			remove_debugger_command("sockets", dump_sockets);
+#endif
 			return B_OK;
 
 		default:
