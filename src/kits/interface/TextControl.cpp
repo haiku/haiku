@@ -10,6 +10,8 @@
 
 /*!	BTextControl displays text that can act like a control. */
 
+#include <string.h>
+
 #include <TextControl.h>
 
 #include <AbstractLayoutItem.h>
