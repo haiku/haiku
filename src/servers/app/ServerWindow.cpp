@@ -2788,9 +2788,15 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<ViewDrawStringInfo>(&info) != B_OK)
 				break;
 
-			char* string = (char*)malloc(info.stringLength + 1);
-			if (string == NULL)
-				break;
+			const ssize_t kMaxStackStringSize = 4096;
+			char stackString[kMaxStackStringSize];
+			char* string = stackString;
+			if (info.stringLength >= kMaxStackStringSize) {
+				// NOTE: Careful, the + 1 is for termination!
+				string = (char*)malloc((info.stringLength + 1 + 63) / 64 * 64);
+				if (string == NULL)
+					break;
+			}
 
 			escapement_delta* delta = NULL;
 			if (code == AS_DRAW_STRING_WITH_DELTA) {
@@ -2799,7 +2805,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			}
 
 			if (link.Read(string, info.stringLength) != B_OK) {
-				free(string);
+				if (string != stackString)
+					free(string);
 				break;
 			}
 			// Terminate the string, if nothing else, it's important
@@ -2816,7 +2823,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentView->CurrentState()->SetPenLocation(penLocation);
 
-			free(string);
+			if (string != stackString)
+				free(string);
 			break;
 		}
 
