@@ -714,7 +714,7 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 			else
 				poseInfo.fInitedDirectory = model->EntryRef()->directory;
 
-			poseInfo.fLocation = pose->Location();
+			poseInfo.fLocation = pose->Location(this);
 
 			ExtendedPoseInfo *extendedPoseInfo = NULL;
 			size_t extendedPoseInfoSize = 0;
@@ -740,7 +740,7 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 				}
 				ASSERT(extendedPoseInfo);
 
-				extendedPoseInfo->SetLocationForFrame(pose->Location(),
+				extendedPoseInfo->SetLocationForFrame(pose->Location(this),
 					*frameIfDesktop);
 				extendedPoseInfoSize = extendedPoseInfo->Size();
 			}
@@ -1016,7 +1016,7 @@ BPoseView::CommitActivePose(bool saveChanges)
 		int32 index = fPoseList->IndexOf(ActivePose());
 		BPoint loc(0, index * fListElemHeight);
 		if (ViewMode() != kListMode)
-			loc = ActivePose()->Location();
+			loc = ActivePose()->Location(this);
 
 		ActivePose()->Commit(saveChanges, loc, this, index);
 		fActivePose = NULL;
@@ -1652,7 +1652,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 		// set location from poseinfo if saved loc was for this dir
 		if (poseInfo->fInitedDirectory != -1LL) {
 			PinPointToValidRange(poseInfo->fLocation);
-			pose->SetLocation(poseInfo->fLocation);
+			pose->SetLocation(poseInfo->fLocation, this);
 			AddToVSList(pose);
 		}
 
@@ -1743,9 +1743,9 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 				if (fEnsurePosesVisible && !viewBounds.Intersects(poseBounds)) {
 					viewBounds.InsetBy(20, 20);
 					RemoveFromVSList(pose);
-					BPoint loc(pose->Location());
+					BPoint loc(pose->Location(this));
 					loc.ConstrainTo(viewBounds);
-					pose->SetLocation(loc);
+					pose->SetLocation(loc, this);
 					pose->SetSaveLocation();
 					AddToVSList(pose);
 					poseBounds = pose->CalcRect(this);
@@ -2741,6 +2741,24 @@ BPoseView::SetViewMode(uint32 newMode)
 
 	fViewState->SetViewMode(newMode);
 
+	// try to lock the center of the pose view when scaling icons
+	BPoint scaleOffset(0, 0);
+	if (newMode == kIconMode && oldMode == kIconMode) {
+		// definitely changing the icon size, so we will need to scroll
+		BRect bounds(Bounds());
+		BPoint center(bounds.LeftTop());
+		center.x += bounds.Width() / 2.0;
+		center.y += bounds.Height() / 2.0;
+		// convert the center into "unscaled icon placement" space
+		float oldScale = lastIconSize / 32.0;
+		BPoint unscaledCenter(center.x / oldScale, center.y / oldScale);
+		// get the new center in "scaled icon placement" place
+		float newScale = fViewState->IconSize() / 32.0;
+		BPoint newCenter(unscaledCenter.x * newScale,
+			unscaledCenter.y * newScale);
+		scaleOffset = newCenter - center;
+	}
+
 	// toggle view layout between listmode and non-listmode, if necessary
 	BContainerWindow *window = ContainerWindow();
 	if (oldMode == kListMode) {
@@ -2801,7 +2819,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	if (newMode == kListMode)
 		newOrigin = fViewState->ListOrigin();
 	else
-		newOrigin = fViewState->IconOrigin();
+		newOrigin = fViewState->IconOrigin() + scaleOffset;
 
 	PinPointToValidRange(newOrigin);
 
@@ -2837,8 +2855,8 @@ BPoseView::MapToNewIconMode(BPose *pose, BPoint oldGrid, BPoint oldOffset)
 	BPoint delta;
 	BPoint poseLoc;
 
-	poseLoc = PinToGrid(pose->Location(), oldGrid, oldOffset);
-	delta = pose->Location() - poseLoc;
+	poseLoc = PinToGrid(pose->Location(this), oldGrid, oldOffset);
+	delta = pose->Location(this) - poseLoc;
 	poseLoc -= oldOffset;
 
 	if (poseLoc.x >= 0)
@@ -2866,7 +2884,7 @@ BPoseView::MapToNewIconMode(BPose *pose, BPoint oldGrid, BPoint oldOffset)
 	}
 
 	poseLoc += fOffset;
-	pose->SetLocation(poseLoc);
+	pose->SetLocation(poseLoc, this);
 	pose->SetSaveLocation();
 }
 
@@ -3156,7 +3174,7 @@ BPoseView::Cleanup(bool doAll)
 		int32 count = fPoseList->CountItems();
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
-			BPoint location(pose->Location());
+			BPoint location(pose->Location(this));
 			BPoint newLocation(PinToGrid(location, fGrid, fOffset));
 
 			// do we need to move pose to a grid location?
@@ -3191,7 +3209,7 @@ void
 BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 {
 	// move pose to probable location
-	pose->SetLocation(fHintLocation);
+	pose->SetLocation(fHintLocation, this);
 	BRect rect(pose->CalcRect(this));
 	BPoint deltaFromBounds(fHintLocation - rect.LeftTop());
 
@@ -3214,9 +3232,9 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 
 	rect.InsetBy(3, 0);
 
-	fHintLocation = pose->Location() + BPoint(fGrid.x, 0);
+	fHintLocation = pose->Location(this) + BPoint(fGrid.x, 0);
 
-	pose->SetLocation(rect.LeftTop() + deltaFromBounds);
+	pose->SetLocation(rect.LeftTop() + deltaFromBounds, this);
 	pose->SetSaveLocation();
 }
 
@@ -3251,7 +3269,7 @@ BPoseView::CheckAutoPlacedPoses()
 		BPose *pose = fPoseList->ItemAt(index);
 		if (pose->WasAutoPlaced()) {
 			RemoveFromVSList(pose);
-			fHintLocation = pose->Location();
+			fHintLocation = pose->Location(this);
 			BRect oldBounds(pose->CalcRect(this));
 			PlacePose(pose, viewBounds);
 
@@ -3286,7 +3304,7 @@ BPoseView::CheckPoseVisibility(BRect *newFrame)
 	int32 count = fPoseList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BPose *pose = fPoseList->ItemAt(index);
-		BPoint newLocation(pose->Location());
+		BPoint newLocation(pose->Location(this));
 		bool locationNeedsUpdating = false;
 
 		if (desktop) {
@@ -3303,7 +3321,7 @@ BPoseView::CheckPoseVisibility(BRect *newFrame)
 					Invalidate(pose->CalcRect(this));
 						// make sure the old icon gets erased
 					RemoveFromVSList(pose);
-					pose->SetLocation(newLocation);
+					pose->SetLocation(newLocation, this);
 						// set the new location
 				}
 			}
@@ -3319,11 +3337,11 @@ BPoseView::CheckPoseVisibility(BRect *newFrame)
 				Invalidate(rect);
 				RemoveFromVSList(pose);
 			}
-			BPoint loc(pose->Location());
+			BPoint loc(pose->Location(this));
 			loc.ConstrainTo(bounds);
 				// place it onscreen
 
-			pose->SetLocation(loc);
+			pose->SetLocation(loc, this);
 				// set the new location
 			locationNeedsUpdating = true;
 		}
@@ -3359,7 +3377,7 @@ BPoseView::SlotOccupied(BRect poseRect, BRect viewBounds) const
 	int32 index = FirstIndexAtOrBelow((int32)(poseRect.top - IconPoseHeight()));
 	int32 numPoses = fVSPoseList->CountItems();
 
-	while (index < numPoses && fVSPoseList->ItemAt(index)->Location().y
+	while (index < numPoses && fVSPoseList->ItemAt(index)->Location(this).y
 		< poseRect.bottom) {
 
 		BRect rect(fVSPoseList->ItemAt(index)->CalcRect(this));
@@ -3384,7 +3402,7 @@ BPoseView::NextSlot(BPose *pose, BRect &poseRect, BRect viewBounds)
 		fHintLocation.y += fGrid.y;
 		fHintLocation.x = viewBounds.left + fOffset.x;
 		fHintLocation = PinToGrid(fHintLocation, fGrid, fOffset);
-		pose->SetLocation(fHintLocation);
+		pose->SetLocation(fHintLocation, this);
 		poseRect = pose->CalcRect(this);
 		poseRect.InsetBy(-3, 0);
 	}
@@ -3404,7 +3422,7 @@ BPoseView::FirstIndexAtOrBelow(int32 y, bool constrainIndex) const
 
 	while (l <= r) {
 		index = (l + r) >> 1;
-		int32 result = (int32)(y - fVSPoseList->ItemAt(index)->Location().y);
+		int32 result = (int32)(y - fVSPoseList->ItemAt(index)->Location(this).y);
 
 		if (result < 0)
 			r = index - 1;
@@ -3413,7 +3431,7 @@ BPoseView::FirstIndexAtOrBelow(int32 y, bool constrainIndex) const
 		else {
 			// compare turned out equal, find first pose
 			while (index > 0
-				&& y == fVSPoseList->ItemAt(index - 1)->Location().y)
+				&& y == fVSPoseList->ItemAt(index - 1)->Location(this).y)
 				index--;
 			return index;
 		}
@@ -3421,7 +3439,7 @@ BPoseView::FirstIndexAtOrBelow(int32 y, bool constrainIndex) const
 
 	// didn't find pose AT location y - bump index to proper insert point
 	while (index < fVSPoseList->CountItems()
-		&& fVSPoseList->ItemAt(index)->Location().y <= y)
+		&& fVSPoseList->ItemAt(index)->Location(this).y <= y)
 			index++;
 
 	// if flag is true then constrain index to legal value since this
@@ -3437,7 +3455,7 @@ BPoseView::FirstIndexAtOrBelow(int32 y, bool constrainIndex) const
 void
 BPoseView::AddToVSList(BPose *pose)
 {
-	int32 index = FirstIndexAtOrBelow((int32)pose->Location().y, false);
+	int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y, false);
 	fVSPoseList->AddItem(pose, index);
 }
 
@@ -3445,7 +3463,7 @@ BPoseView::AddToVSList(BPose *pose)
 int32
 BPoseView::RemoveFromVSList(const BPose *pose)
 {
-	int32 index = FirstIndexAtOrBelow((int32)pose->Location().y);
+	int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y);
 
 	int32 count = fVSPoseList->CountItems();
 	for (; index < count; index++) {
@@ -4498,7 +4516,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			// need to do this because bsearch uses top of pose
 			// to locate pose to remove
 			targetView->RemoveFromVSList(pose);
-			BPoint location (pose->Location() + delta);
+			BPoint location (pose->Location(targetView) + delta);
 			BRect oldBounds(pose->CalcRect(targetView));
 			if (dropOnGrid)
 				location = targetView->PinToGrid(location, targetView->fGrid, targetView->fOffset);
@@ -5270,7 +5288,7 @@ BPoseView::GetDropPointList(BPoint dropStart, BPoint dropEnd, const PoseList *po
 		if (sourceInListMode)
 			poseLoc = dropEnd + BPoint(0, index * (IconPoseHeight() + 3));
 		else
-			poseLoc = dropEnd + (pose->Location() - dropStart);
+			poseLoc = dropEnd + (pose->Location(this) - dropStart);
 
 		if (dropOnGrid)
 			poseLoc = PinToGrid(poseLoc, fGrid, fOffset);
@@ -6756,7 +6774,7 @@ BPoseView::GetDragRect(int32 clickedPoseIndex)
 				if (pose->IsSelected())
 					result = result | pose->CalcRect(this);
 
-				if (pose->Location().y > bounds.bottom)
+				if (pose->Location(this).y > bounds.bottom)
 					break;
 			}
 		}
@@ -7010,7 +7028,7 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 					fSelectionPivotPose = pose;
 			}
 
-			if (pose->Location().y > selectionRect.bottom)
+			if (pose->Location(this).y > selectionRect.bottom)
 				break;
 		}
 	}
@@ -7079,7 +7097,7 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose *po
 				AddRemovePoseFromSelection(fPoseList->ItemAt(i), i, select);
 
 		} else {
-			BRect selection(where, fSelectionPivotPose->Location());
+			BRect selection(where, fSelectionPivotPose->Location(this));
 
 			// Things will get odd if we don't 'fix' the selection rect.
 			if (selection.left > selection.right) {
@@ -7812,7 +7830,7 @@ BPoseView::ClearSelection()
 						Invalidate(pose->CalcRect(this));
 					}
 
-					if (pose->Location().y > bounds.bottom)
+					if (pose->Location(this).y > bounds.bottom)
 						break;
 				}
 			}
@@ -7872,7 +7890,7 @@ BPoseView::ShowSelection(bool show)
 							Invalidate(pose->CalcRect(this));
 						}
 
-					if (pose->Location().y > bounds.bottom)
+					if (pose->Location(this).y > bounds.bottom)
 						break;
 				}
 			}
@@ -8837,7 +8855,8 @@ BPoseView::FrameForPose(BPose *targetpose, bool convert, BRect *poseRect)
 				returnvalue = false;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top
+			- IconPoseHeight()), true);
 		int32 count = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < count; index++) {
@@ -8849,7 +8868,7 @@ BPoseView::FrameForPose(BPose *targetpose, bool convert, BRect *poseRect)
 					break;
 				}
 
-				if (pose->Location().y > bounds.bottom) {
+				if (pose->Location(this).y > bounds.bottom) {
 					returnvalue = false;
 					break;
 				}
@@ -8999,7 +9018,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 					break;
 				}
 
-				if (pose->Location().y > bounds.bottom)
+				if (pose->Location(this).y > bounds.bottom)
 					break;
 			}
 		}

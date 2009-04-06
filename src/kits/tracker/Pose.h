@@ -60,7 +60,7 @@ class BPose {
 		BTextWidget *AddWidget(BPoseView *, BColumn *);
 		BTextWidget *AddWidget(BPoseView *, BColumn *, ModelNodeLazyOpener &opener);
 		void RemoveWidget(BPoseView *, BColumn *);
-		void SetLocation(BPoint);
+		void SetLocation(BPoint, const BPoseView *);
 		void MoveTo(BPoint, BPoseView *, bool inval = true);
 
 		void Draw(BRect, BPoseView *, bool fullDraw = true,
@@ -108,7 +108,7 @@ class BPose {
 		void EditNextWidget(BPoseView *);
 		void EditPreviousWidget(BPoseView *);
 
-		BPoint Location() const;
+		BPoint Location(const BPoseView *poseView) const;
 		bool DelayedEdit() const;
 		void SetDelayedEdit(bool delay);
 		bool ListModeInited() const;
@@ -231,23 +231,6 @@ inline bool
 BPose::HasLocation() const
 {
 	return fHasLocation;
-}
-
-
-inline BPoint
-BPose::Location() const
-{
-	return fLocation;
-}
-
-
-inline void
-BPose::SetLocation(BPoint point)
-{
-	fLocation = BPoint(floorf(point.x), floorf(point.y));
-if (isinff(fLocation.x) || isinff(fLocation.y))
-debugger("BPose::SetLocation() - infinite location");
-	fHasLocation = true;
 }
 
 

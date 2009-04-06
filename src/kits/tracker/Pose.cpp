@@ -195,7 +195,7 @@ OneMouseUp(BTextWidget *widget, BPose *pose, BPoseView *poseView, BColumn *colum
 	if (poseView->ViewMode() == kListMode)
 		rect = widget->CalcClickRect(poseLoc, column, poseView);
 	else
-		rect = widget->CalcClickRect(pose->Location(), 0, poseView);
+		rect = widget->CalcClickRect(pose->Location(poseView), 0, poseView);
 
 	if (rect.Contains(where)) {
 		widget->MouseUp(rect, poseView, pose, where, pose->DelayedEdit());
@@ -224,7 +224,7 @@ void
 BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView *poseView)
 {
 	if (poseView->ViewMode() != kListMode)
-		poseLoc = fLocation;
+		poseLoc = Location(poseView);
 
 	ASSERT(fModel->IsNodeOpen());
 	EachTextWidget(this, poseView, OneCheckAndUpdate, poseLoc);
@@ -236,7 +236,7 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 	uint32 attrType, int32, BPoint poseLoc, BPoseView *poseView)
 {
 	if (poseView->ViewMode() != kListMode)
-		poseLoc = fLocation;
+		poseLoc = Location(poseView);
 
 	ASSERT(!resolvedModel || resolvedModel->IsNodeOpen());
 
@@ -330,18 +330,20 @@ BPose::UpdateIcon(BPoint poseLoc, BPoseView *poseView)
 {
 	IconCache::sIconCache->IconChanged(ResolvedModel());
 
+	int32 iconSize = poseView->IconSizeInt();
+
 	BRect rect;
 	if (poseView->ViewMode() == kListMode) {
 		rect = CalcRect(poseLoc, poseView);
 		rect.left += kListOffset;
-		// TODO: make this depend on IconSizeInt() as well?
-		rect.right = rect.left + B_MINI_ICON;
-		rect.top = rect.bottom - B_MINI_ICON;
+		rect.right = rect.left + iconSize;
+		rect.top = rect.bottom - iconSize;
 	} else {
-		rect.left = fLocation.x;
-		rect.top = fLocation.y;
-		rect.right = rect.left + poseView->IconSizeInt();
-		rect.bottom = rect.top + poseView->IconSizeInt();
+		BPoint location = Location(poseView);
+		rect.left = location.x;
+		rect.top = location.y;
+		rect.right = rect.left + iconSize;
+		rect.bottom = rect.top + iconSize;
 	}
 
 	poseView->Invalidate(rect);
@@ -390,7 +392,7 @@ BPose::EditFirstWidget(BPoint poseLoc, BPoseView *poseView)
 			if (poseView->ViewMode() == kListMode)
 				bounds = widget->CalcRect(poseLoc, column, poseView);
 			else
-				bounds = widget->CalcRect(fLocation, NULL, poseView);
+				bounds = widget->CalcRect(Location(poseView), NULL, poseView);
 			widget->StartEdit(bounds, poseView, this);
 			break;
 		}
@@ -422,7 +424,7 @@ BPose::EditPreviousNextWidgetCommon(BPoseView *poseView, bool next)
 				BPoint poseLoc(0, poseIndex * poseView->ListElemHeight());
 				bounds = widget->CalcRect(poseLoc, column, poseView);
 			} else
-				bounds = widget->CalcRect(fLocation, 0, poseView);
+				bounds = widget->CalcRect(Location(poseView), 0, poseView);
 
 			widget->StartEdit(bounds, poseView, this);
 			break;
@@ -450,14 +452,16 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 
+	BPoint location = Location(poseView);
+
 	if (poseView->ViewMode() == kIconMode) {
 		// check icon rect, then actual icon pixel
-		BRect rect(fLocation, fLocation);
+		BRect rect(location, location);
 		rect.right += poseView->IconSizeInt() - 1;
 		rect.bottom += poseView->IconSizeInt() - 1;
 
 		if (rect.Contains(where))
-			return IconCache::sIconCache->IconHitTest(where - fLocation,
+			return IconCache::sIconCache->IconHitTest(where - location,
 													  ResolvedModel(),
 													  kNormalIcon,
 													  poseView->IconSize());
@@ -469,14 +473,14 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 			rect.right = rect.left + textWidth; 
 		}
 
-		rect.top = fLocation.y + poseView->IconSizeInt();
+		rect.top = location.y + poseView->IconSizeInt();
 		rect.bottom = rect.top + poseView->FontHeight();
 
 		return rect.Contains(where);
 	}
 	
 	// MINI_ICON_MODE rect calc
-	BRect rect(fLocation, fLocation);
+	BRect rect(location, location);
 	rect.right += B_MINI_ICON + kMiniIconSeparator;
 	rect.bottom += poseView->IconPoseHeight();
 	BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
@@ -612,7 +616,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 		if (updateRgn && !updateRgn->Intersects(rect))
 			return;
 
-		BPoint iconOrigin(fLocation);
+		BPoint iconOrigin(Location(poseView));
 		iconOrigin += offset;
 
 		DrawIcon(iconOrigin, drawView, poseView->IconSize(), directDraw,
@@ -626,7 +630,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 		if (!widget || !widget->IsVisible())
 			return;
 
-		rect = widget->CalcRect(fLocation, 0, poseView);
+		rect = widget->CalcRect(Location(poseView), 0, poseView);
 
 		bool selectDuringDraw = directDraw && selected
 			&& (poseView->IsDesktopWindow() || windowActive);
@@ -664,11 +668,13 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 	ASSERT(poseView->ViewMode() != kListMode);
 	ASSERT(!IsSelected());
 
+	BPoint location(Location(poseView));
+
 	// draw icon directly
 	if (fPercent == -1)
-		DrawIcon(fLocation, poseView, poseView->IconSize(), true);
+		DrawIcon(location, poseView, poseView->IconSize(), true);
 	else
-		UpdateIcon(fLocation, poseView);
+		UpdateIcon(location, poseView);
 
 	BColumn *column = poseView->FirstColumn();
 	if (!column)
@@ -679,7 +685,7 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 		return;
 
 	// just invalidate the background, don't draw anything
-	poseView->Invalidate(widget->CalcRect(fLocation, 0, poseView));
+	poseView->Invalidate(widget->CalcRect(location, 0, poseView));
 }
 
 
@@ -691,8 +697,10 @@ BPose::MoveTo(BPoint point, BPoseView *poseView, bool inval)
 
 	BRect oldBounds;
 
+	BPoint oldLocation = Location(poseView);
+
 	ASSERT(poseView->ViewMode() != kListMode);
-	if (point == fLocation || poseView->ViewMode() == kListMode)
+	if (point == oldLocation || poseView->ViewMode() == kListMode)
 		return;
 
 	if (inval)
@@ -702,10 +710,16 @@ BPose::MoveTo(BPoint point, BPoseView *poseView, bool inval)
 	if (poseView->ActivePose() == this) {
 		BView *border_view = poseView->FindView("BorderView");
 		if (border_view)
-			border_view->MoveBy(point.x - fLocation.x, point.y - fLocation.y);
+			border_view->MoveBy(point.x - oldLocation.x, point.y - oldLocation.y);
 	}
 
-	fLocation = point;
+	float scale = 1.0;
+	if (poseView->ViewMode() == kIconMode) {
+		scale = poseView->IconSize() / 32.0;
+	}
+	fLocation.x = point.x / scale;
+	fLocation.y = point.y / scale;
+
 	fHasLocation = true;
 	fNeedsSaveLocation = true;
 
@@ -851,6 +865,31 @@ BPose::DrawToggleSwitch(BRect, BPoseView *)
 }
 
 
+BPoint
+BPose::Location(const BPoseView *poseView) const
+{
+	float scale = 1.0;
+	if (poseView->ViewMode() == kIconMode)
+		scale = poseView->IconSize() / 32.0;
+
+	return BPoint(fLocation.x * scale, fLocation.y * scale);
+}
+
+
+void
+BPose::SetLocation(BPoint point, const BPoseView *poseView)
+{
+	float scale = 1.0;
+	if (poseView->ViewMode() == kIconMode)
+		scale = poseView->IconSize() / 32.0;
+
+	fLocation = BPoint(floorf(point.x / scale), floorf(point.y / scale));
+if (isinff(fLocation.x) || isinff(fLocation.y))
+debugger("BPose::SetLocation() - infinite location");
+	fHasLocation = true;
+}
+
+
 BRect
 BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect)
 {
@@ -879,8 +918,9 @@ BPose::CalcRect(const BPoseView *poseView)
 	ASSERT(poseView->ViewMode() != kListMode);
 
 	BRect rect;
+	BPoint location = Location(poseView);
 	if (poseView->ViewMode() == kIconMode) {
-		rect.left = fLocation.x;
+		rect.left = location.x;
 		rect.right = rect.left + poseView->IconSizeInt();
 
 		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
@@ -892,12 +932,12 @@ BPose::CalcRect(const BPoseView *poseView)
 			}
 		}
 
-		rect.top = fLocation.y;
+		rect.top = location.y;
 		rect.bottom = rect.top + poseView->IconPoseHeight();
 	} else {
 		// MINI_ICON_MODE rect calc
-		rect.left = fLocation.x;
-		rect.top = fLocation.y;
+		rect.left = location.x;
+		rect.top = location.y;
 		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
 		rect.bottom = rect.top + poseView->IconPoseHeight();
 		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
@@ -927,8 +967,8 @@ BPose::PrintToStream()
 	}
 	PRINT(("%sselected\n", IsSelected() ? "" : "not "));
 	PRINT(("location %s x:%f y:%f\n", HasLocation() ? "" : "unknown ",
-		HasLocation() ? Location().x : 0,
-		HasLocation() ? Location().y : 0));
+		HasLocation() ? fLocation.x : 0,
+		HasLocation() ? fLocation.y : 0));
 	PRINT(("%s autoplaced \n", WasAutoPlaced() ? "was" : "not"));
 }
 
