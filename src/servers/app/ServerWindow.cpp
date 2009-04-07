@@ -3161,8 +3161,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				free(string);
 				break;
 			}
-			// Terminate the string, if nothing else, it's important
-			// for the DTRACE call below...
+			// Terminate the string
 			string[info.stringLength] = '\0';
 
 			picture->WriteDrawString(info.location, string, info.stringLength,
