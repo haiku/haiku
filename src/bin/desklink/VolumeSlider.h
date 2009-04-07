@@ -1,68 +1,35 @@
 /*
- * Copyright (c) 2003-2007, Haiku, Inc.
+ * Copyright 2003-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
  */
-#ifndef VOLUMESLIDER_H
-#define VOLUMESLIDER_H
+#ifndef VOLUME_SLIDER_H
+#define VOLUME_SLIDER_H
+
 
 #include <Window.h>
-#include <Control.h>
-#include <Bitmap.h>
-#include <ParameterWeb.h>
-
-#define VOLUME_USE_MIXER 0 /* default */
-#define VOLUME_USE_PHYS_OUTPUT 1
 
 
-class MixerControl {
-	public:
-		MixerControl(int32 volumeWhich, float *value = NULL, const char **error = NULL);
-		~MixerControl();
-		
-		void UpdateVolume(int32 value);
-		void ChangeVolumeBy(int32 incr);
-	private:
-		media_node *fAudioMixerNode;
-		BParameterWeb* fParamWeb;
-		BContinuousParameter* fMixerParam;
-		float fMin, fMax, fStep;
-};
-
-
-class SliderView : public BControl {
-	public:
-		SliderView(BRect rect, BMessage *msg, const char* title, uint32 resizeFlags,
-			int32 value);
-		~SliderView();
-
-		virtual void Draw(BRect);
-		virtual void MessageReceived(BMessage*);
-		virtual void MouseDown(BPoint point);
-		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-		virtual void MouseUp(BPoint point);
-
-	private:
-		BBitmap fLeftBitmap, fRightBitmap, fButtonBitmap;
-		const char* fTitle;
-};
+class BSlider;
+class MixerControl;
 
 class VolumeSlider : public BWindow {
-	public:
-		VolumeSlider(BRect frame, bool dontBeep=false, int32 volumeWhich=0);
-		~VolumeSlider();
+public:
+							VolumeSlider(BRect frame, bool dontBeep = false,
+								int32 volumeWhich = 0);
+							~VolumeSlider();
 
-		void MessageReceived(BMessage*);
-		void WindowActivated(bool active);
+protected:
+			void			MessageReceived(BMessage* message);
 
-	private:
-		MixerControl *fMixerControl;
-		bool fHasChanged;
-		bool fDontBeep;
-		SliderView *fSlider;
+private:
+			MixerControl*	fMixerControl;
+			bool			fHasChanged;
+			bool			fDontBeep;
+			BSlider*		fSlider;
 };
 
-#endif	// VOLUMESLIDER_H
+#endif	// VOLUME_SLIDER_H

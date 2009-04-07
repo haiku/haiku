@@ -11,9 +11,8 @@
 
 //! VolumeControl and link items in Deskbar
 
-#include "VolumeSlider.h"
-#include "DeskButton.h"
-#include "iconfile.h"
+#include <stdio.h>
+#include <strings.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -33,8 +32,11 @@
 #include <String.h>
 #include <View.h>
 
-#include <stdio.h>
-#include <strings.h>
+#include "DeskButton.h"
+#include "iconfile.h"
+#include "MixerControl.h"
+#include "VolumeSlider.h"
+
 
 #define MEDIA_SETTINGS 'mese'
 #define SOUND_SETTINGS 'sose'
@@ -161,7 +163,7 @@ MediaReplicant::MessageReceived(BMessage *message)
 	case B_ABOUT_REQUESTED:
 		(new BAlert("About Volume Control", "Volume Control (Replicant)\n"
 			    "  Brought to you by Jérôme DUVAL.\n\n"
-			    "Copyright " B_UTF8_COPYRIGHT "2003-2008, Haiku","OK"))->Go(NULL);
+			    "Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku","OK"))->Go(NULL);
 		break;
 
 	case OPEN_MEDIA_PLAYER:
@@ -424,6 +426,9 @@ MediaReplicant::_AlertFindDirectory(status_t status, const char *where)
 }
 
 
+//	#pragma mark -
+
+
 int
 main(int, char **argv)
 {	
@@ -454,6 +459,16 @@ main(int, char **argv)
 			}
 			return 0;
 		}
+
+#if 0
+		if (strcmp(argv[i], "--volume") == 0) {
+			entry_ref ref;
+			if (get_ref_for_path(argv[0], &ref) == B_OK) {
+				deskbar.AddItem(&ref);
+			}
+			return 0;
+		}
+#endif
 
 		if (strncmp(argv[i], "--remove", 8) == 0) {
 			BString replicant = "DeskButton";

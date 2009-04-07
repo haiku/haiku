@@ -110,7 +110,7 @@ DeskButton::MessageReceived(BMessage *message)
 		case B_ABOUT_REQUESTED:
 			(new BAlert("About Desklink", "Desklink (Replicant)\n"
 				"  Brought to you by Jérôme DUVAL.\n\n"
-				"Copyright " B_UTF8_COPYRIGHT "2003-2007, Haiku","OK"))->Go();
+				"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku","OK"))->Go();
 			break;
 		case OPEN_REF:
 			be_roster->Launch(&fRef);
