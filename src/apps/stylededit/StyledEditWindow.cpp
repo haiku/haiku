@@ -15,7 +15,6 @@
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
 
-
 #include <Alert.h>
 #include <Autolock.h>
 #include <CharacterSet.h>
@@ -31,14 +30,15 @@
 #include <Rect.h>
 #include <Roster.h>
 #include <ScrollView.h>
-#include <StringView.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
 
 using namespace BPrivate;
 
+
 const float kLineViewWidth = 30.0;
+
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
@@ -119,15 +119,6 @@ StyledEditWindow::InitWindow(uint32 encoding)
 		true, true, B_PLAIN_BORDER);
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);
-	
-	BScrollBar* HScrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
-	HScrollBar->MoveBy(kLineViewWidth + 1, 0);
-	HScrollBar->ResizeBy((-1 * kLineViewWidth) - 1, 0);
-	
-	fStringView = new BStringView(BRect(0,0,kLineViewWidth,B_H_SCROLL_BAR_HEIGHT), "stringview", "1", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fStringView->SetAlignment(B_ALIGN_CENTER);
-	fScrollView->AddChild(fStringView);
-	fStringView->MoveTo(0.0, HScrollBar->Frame().top);
 	
 	// Add "File"-menu:
 	BMenu* menu = new BMenu("File");
@@ -542,11 +533,6 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			fCopyItem->SetEnabled(false);
 			fClearItem->SetEnabled(false);
 			break;
-		case UPDATE_LINE:
-			char buf[20];
-			sprintf(buf, "%ld", fTextView->CurrentLine() + 1);
-			fStringView->SetText(buf);
-			break;	
 		case TEXT_CHANGED:
 			if (fUndoFlag) {
 				if (fUndoCleans) {
