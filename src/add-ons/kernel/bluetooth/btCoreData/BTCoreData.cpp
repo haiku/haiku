@@ -42,7 +42,7 @@ DumpHciConnections(int argc, char** argv)
 		conn = iterator.Next();
 		kprintf("\tLocalDevice=%lx Destination=%s handle=%#x type=%d outqueue=%ld expected=%ld\n",
 					conn->Hid, bdaddrUtils::ToString(conn->destination),
-			conn->handle, conn->type, conn->OutGoingFrames.Size() , conn->ExpectedResponses.Size());
+			conn->handle, conn->type, conn->OutGoingFrames.Count() , conn->ExpectedResponses.Count());
 
 			// each channel
 			DoublyLinkedList<L2capChannel>::Iterator channelIterator = conn->ChannelList.GetIterator();
