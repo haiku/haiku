@@ -16,13 +16,15 @@
 
 #include <new>
 
-#include <AutoDeleter.h>
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <Select.h>
+
+#include <AutoDeleter.h>
 #include <team.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
+#include <WeakReferenceable.h>
 
 #include <fs/select_sync_pool.h>
 #include <kernel.h>
@@ -41,8 +43,15 @@
 struct net_socket_private;
 typedef DoublyLinkedList<net_socket_private> SocketList;
 
-struct net_socket_private
-		: net_socket, DoublyLinkedListLinkImpl<net_socket_private> {
+struct net_socket_private : net_socket,
+		DoublyLinkedListLinkImpl<net_socket_private>,
+		WeakReferenceable<net_socket_private> {
+	net_socket_private();
+	~net_socket_private();
+
+	void RemoveFromParent();
+
+	WeakPointer<net_socket_private>* parent;
 	team_id						owner;
 	uint32						max_backlog;
 	uint32						child_count;
@@ -56,7 +65,6 @@ struct net_socket_private
 };
 
 
-void socket_delete(net_socket* socket);
 int socket_bind(net_socket* socket, const struct sockaddr* address,
 	socklen_t addressLength);
 int socket_setsockopt(net_socket* socket, int level, int option,
@@ -65,6 +73,80 @@ int socket_setsockopt(net_socket* socket, int level, int option,
 
 static SocketList sSocketList;
 static mutex sSocketLock;
+
+
+net_socket_private::net_socket_private()
+	: WeakReferenceable<net_socket_private>(this),
+	parent(NULL),
+	owner(-1),
+	max_backlog(0),
+	child_count(0),
+	select_pool(NULL),
+	is_connected(false)
+{
+	first_protocol = NULL;
+	first_info = NULL;
+	options = 0;
+	linger = 0;
+	bound_to_device = 0;
+	error = 0;
+
+	address.ss_len = 0;
+	peer.ss_len = 0;
+
+	mutex_init(&lock, "socket");
+
+	// set defaults (may be overridden by the protocols)
+	send.buffer_size = 65535;
+	send.low_water_mark = 1;
+	send.timeout = B_INFINITE_TIMEOUT;
+	receive.buffer_size = 65535;
+	receive.low_water_mark = 1;
+	receive.timeout = B_INFINITE_TIMEOUT;
+}
+
+
+net_socket_private::~net_socket_private()
+{
+	if (parent != NULL)
+		panic("socket still has a parent!");
+
+	mutex_lock(&sSocketLock);
+	sSocketList.Remove(this);
+	mutex_unlock(&sSocketLock);
+
+	mutex_lock(&lock);
+
+	// also delete all children of this socket
+	while (net_socket_private* child = pending_children.RemoveHead()) {
+		child->RemoveFromParent();
+	}
+	while (net_socket_private* child = connected_children.RemoveHead()) {
+		child->RemoveFromParent();
+	}
+
+	put_domain_protocols(this);
+
+	mutex_unlock(&lock);
+	mutex_destroy(&lock);
+}
+
+
+void
+net_socket_private::RemoveFromParent()
+{
+	parent->RemoveReference();
+	parent = NULL;
+
+	mutex_lock(&sSocketLock);
+	sSocketList.Add(this);
+	mutex_unlock(&sSocketLock);
+
+	RemoveReference();
+}
+
+
+//	#pragma mark -
 
 
 static size_t
@@ -84,16 +166,6 @@ compute_user_iovec_length(iovec* userVec, uint32 count)
 }
 
 
-static void
-delete_children(SocketList& list)
-{
-	while (net_socket_private* child = list.RemoveHead()) {
-		child->parent = NULL;
-		socket_delete(child);
-	}
-}
-
-
 static status_t
 create_socket(int family, int type, int protocol, net_socket_private** _socket)
 {
@@ -101,20 +173,9 @@ create_socket(int family, int type, int protocol, net_socket_private** _socket)
 	if (socket == NULL)
 		return B_NO_MEMORY;
 
-	memset(socket, 0, sizeof(net_socket_private));
 	socket->family = family;
 	socket->type = type;
 	socket->protocol = protocol;
-
-	mutex_init(&socket->lock, "socket");
-
-	// set defaults (may be overridden by the protocols)
-	socket->send.buffer_size = 65535;
-	socket->send.low_water_mark = 1;
-	socket->send.timeout = B_INFINITE_TIMEOUT;
-	socket->receive.buffer_size = 65535;
-	socket->receive.low_water_mark = 1;
-	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
 	status_t status = get_domain_protocols(socket);
 	if (status < B_OK) {
@@ -316,7 +377,7 @@ socket_open(int family, int type, int protocol, net_socket** _socket)
 
 	status = socket->first_info->open(socket->first_protocol);
 	if (status < B_OK) {
-		socket_delete(socket);
+		delete socket;
 		return status;
 	}
 
@@ -339,15 +400,12 @@ socket_close(net_socket* _socket)
 }
 
 
-status_t
-socket_free(net_socket* socket)
+void
+socket_free(net_socket* _socket)
 {
-	status_t status = socket->first_info->free(socket->first_protocol);
-	if (status == B_BUSY)
-		return B_OK;
-
-	socket_delete(socket);
-	return B_OK;
+	net_socket_private* socket = (net_socket_private*)_socket;
+	socket->first_info->free(socket->first_protocol);
+	socket->RemoveReference();
 }
 
 
@@ -532,6 +590,22 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 //	#pragma mark - connections
 
 
+void
+socket_acquire(net_socket* _socket)
+{
+	net_socket_private* socket = (net_socket_private*)_socket;
+	socket->AddReference();
+}
+
+
+bool
+socket_release(net_socket* _socket)
+{
+	net_socket_private* socket = (net_socket_private*)_socket;
+	return socket->RemoveReference();
+}
+
+
 status_t
 socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 {
@@ -562,7 +636,7 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 
 	// add to the parent's list of pending connections
 	parent->pending_children.Add(socket);
-	socket->parent = parent;
+	socket->parent = parent->GetWeakPointer();
 	parent->child_count++;
 
 	*_socket = socket;
@@ -570,42 +644,9 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 }
 
 
-void
-socket_delete(net_socket* _socket)
-{
-	net_socket_private* socket = (net_socket_private*)_socket;
-	net_socket_private* parent = (net_socket_private*)socket->parent;
-
-	if (parent != NULL) {
-		// The socket still has a parent
-		// TODO: we need to make sure our parent isn't deleted right now,
-		//   or in the process of deleting its children...
-		MutexLocker _(parent->lock);
-
-		if (socket->is_connected)
-			parent->connected_children.Remove(socket);
-		else
-			parent->pending_children.Remove(socket);
-
-		parent->child_count--;
-		socket->parent = NULL;
-	}
-
-	mutex_lock(&sSocketLock);
-	sSocketList.Remove(socket);
-	mutex_unlock(&sSocketLock);
-
-	// also delete all children of this socket
-	delete_children(socket->pending_children);
-	delete_children(socket->connected_children);
-
-	put_domain_protocols(socket);
-
-	mutex_destroy(&socket->lock);
-	delete socket;
-}
-
-
+/*!	Dequeues a connected child from a parent socket.
+	It also returns a reference with the child socket.
+*/
 status_t
 socket_dequeue_connected(net_socket* _parent, net_socket** _socket)
 {
@@ -615,7 +656,8 @@ socket_dequeue_connected(net_socket* _parent, net_socket** _socket)
 
 	net_socket_private* socket = parent->connected_children.RemoveHead();
 	if (socket != NULL) {
-		socket->parent = NULL;
+		socket->AddReference();
+		socket->RemoveFromParent();
 		parent->child_count--;
 		*_socket = socket;
 	}
@@ -624,10 +666,6 @@ socket_dequeue_connected(net_socket* _parent, net_socket** _socket)
 
 	if (socket == NULL)
 		return B_ENTRY_NOT_FOUND;
-
-	mutex_lock(&sSocketLock);
-	sSocketList.Add(socket);
-	mutex_unlock(&sSocketLock);
 
 	return B_OK;
 }
@@ -659,13 +697,12 @@ socket_set_max_backlog(net_socket* _socket, uint32 backlog)
 	net_socket_private* child;
 	while (socket->child_count > backlog
 		&& (child = socket->pending_children.RemoveTail()) != NULL) {
-		child->parent = NULL;
+		child->RemoveFromParent();
 		socket->child_count--;
 	}
 	while (socket->child_count > backlog
 		&& (child = socket->connected_children.RemoveTail()) != NULL) {
-		child->parent = NULL;
-		socket_delete(child);
+		child->RemoveFromParent();
 		socket->child_count--;
 	}
 
@@ -674,25 +711,64 @@ socket_set_max_backlog(net_socket* _socket, uint32 backlog)
 }
 
 
+/*!	Returns whether or not this socket has a parent. The parent might not be
+	valid anymore, though.
+*/
+bool
+socket_has_parent(net_socket* _socket)
+{
+	net_socket_private* socket = (net_socket_private*)_socket;
+	return socket->parent != NULL;
+}
+
+
 /*!	The socket has been connected. It will be moved to the connected queue
 	of its parent socket.
 */
 status_t
-socket_connected(net_socket* socket)
+socket_connected(net_socket* _socket)
 {
-	net_socket_private* parent = (net_socket_private*)socket->parent;
+	net_socket_private* socket = (net_socket_private*)_socket;
+
+	WeakReference<net_socket_private> parent = socket->parent;
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
-	MutexLocker _(&parent->lock);
+	MutexLocker _(parent->lock);
 
-	parent->pending_children.Remove((net_socket_private*)socket);
-	parent->connected_children.Add((net_socket_private*)socket);
-	((net_socket_private*)socket)->is_connected = true;
+	parent->pending_children.Remove(socket);
+	parent->connected_children.Add(socket);
+	socket->is_connected = true;
 
 	// notify parent
 	if (parent->select_pool)
 		notify_select_event_pool(parent->select_pool, B_SELECT_READ);
+
+	return B_OK;
+}
+
+
+/*!	The socket has been aborted. Steals the parent's reference, and releases
+	it.
+*/
+status_t
+socket_aborted(net_socket* _socket)
+{
+	net_socket_private* socket = (net_socket_private*)_socket;
+
+	WeakReference<net_socket_private> parent = socket->parent;
+	if (parent == NULL)
+		return B_BAD_VALUE;
+
+	MutexLocker _(parent->lock);
+
+	if (socket->is_connected)
+		parent->connected_children.Remove(socket);
+	else
+		parent->pending_children.Remove(socket);
+
+	parent->child_count--;
+	socket->RemoveFromParent();
 
 	return B_OK;
 }
@@ -1551,12 +1627,15 @@ net_socket_module_info gNetSocketModule = {
 	socket_get_next_stat,
 
 	// connections
+	socket_acquire,
+	socket_release,
 	socket_spawn_pending,
-	socket_delete,
 	socket_dequeue_connected,
 	socket_count_connected,
 	socket_set_max_backlog,
+	socket_has_parent,
 	socket_connected,
+	socket_aborted,
 
 	// notifications
 	socket_request_notification,

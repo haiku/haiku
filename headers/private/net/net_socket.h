@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_SOCKET_H
@@ -38,7 +38,6 @@ typedef struct net_socket {
 	}						send, receive;
 
 	status_t				error;
-	struct net_socket		*parent;
 } net_socket;
 
 struct net_socket_module_info {
@@ -47,7 +46,7 @@ struct net_socket_module_info {
 	status_t	(*open_socket)(int family, int type, int protocol,
 					net_socket **_socket);
 	status_t	(*close)(net_socket *socket);
-	status_t	(*free)(net_socket *socket);
+	void		(*free)(net_socket *socket);
 
 	status_t	(*readv)(net_socket *socket, const iovec *vecs,
 					size_t vecCount, size_t *_length);
@@ -72,13 +71,17 @@ struct net_socket_module_info {
 					struct net_stat *stat);
 
 	// connections
+	void		(*acquire_socket)(net_socket *socket);
+	bool		(*release_socket)(net_socket *socket);
+
 	status_t	(*spawn_pending_socket)(net_socket *parent,
 					net_socket **_socket);
-	void		(*delete_socket)(net_socket *socket);
 	status_t	(*dequeue_connected)(net_socket *parent, net_socket **_socket);
 	ssize_t		(*count_connected)(net_socket *parent);
 	status_t	(*set_max_backlog)(net_socket *socket, uint32 backlog);
+	bool		(*has_parent)(net_socket *socket);
 	status_t	(*set_connected)(net_socket *socket);
+	status_t	(*set_aborted)(net_socket *socket);
 
 	// notifications
 	status_t	(*request_notification)(net_socket *socket, uint8 event,

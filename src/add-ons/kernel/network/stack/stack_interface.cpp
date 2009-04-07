@@ -27,7 +27,8 @@ stack_interface_close(net_socket* socket)
 static status_t
 stack_interface_free(net_socket* socket)
 {
-	return gNetSocketModule.free(socket);
+	gNetSocketModule.free(socket);
+	return B_OK;
 }
 
 

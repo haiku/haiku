@@ -496,7 +496,8 @@ tcp_close(net_protocol* protocol)
 status_t
 tcp_free(net_protocol* protocol)
 {
-	return ((TCPEndpoint*)protocol)->Free();
+	((TCPEndpoint*)protocol)->Free();
+	return B_OK;
 }
 
 
@@ -708,9 +709,10 @@ tcp_receive_data(net_buffer* buffer)
 
 	TCPEndpoint* endpoint = endpointManager->FindConnection(
 		buffer->destination, buffer->source);
-	if (endpoint != NULL)
+	if (endpoint != NULL) {
 		segmentAction = endpoint->SegmentReceived(segment, buffer);
-	else if ((segment.flags & TCP_FLAG_RESET) == 0)
+		gSocketModule->release_socket(endpoint->socket);
+	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 
 	if ((segmentAction & RESET) != 0) {

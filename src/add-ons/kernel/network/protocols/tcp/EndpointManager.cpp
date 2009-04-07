@@ -318,7 +318,9 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 
 	TCPEndpoint *endpoint = _LookupConnection(local, peer);
 	if (endpoint != NULL) {
-		TRACE(("TCP: Received packet corresponds to explicit endpoint %p\n", endpoint));
+		TRACE(("TCP: Received packet corresponds to explicit endpoint %p\n",
+			endpoint));
+		gSocketModule->acquire_socket(endpoint->socket);
 		return endpoint;
 	}
 
@@ -329,7 +331,9 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 
 	endpoint = _LookupConnection(local, *wildcard);
 	if (endpoint != NULL) {
-		TRACE(("TCP: Received packet corresponds to wildcard endpoint %p\n", endpoint));
+		TRACE(("TCP: Received packet corresponds to wildcard endpoint %p\n",
+			endpoint));
+		gSocketModule->acquire_socket(endpoint->socket);
 		return endpoint;
 	}
 
@@ -339,7 +343,9 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 
 	endpoint = _LookupConnection(*localWildcard, *wildcard);
 	if (endpoint != NULL) {
-		TRACE(("TCP: Received packet corresponds to local wildcard endpoint %p\n", endpoint));
+		TRACE(("TCP: Received packet corresponds to local wildcard endpoint "
+			"%p\n", endpoint));
+		gSocketModule->acquire_socket(endpoint->socket);
 		return endpoint;
 	}
 
@@ -564,7 +570,7 @@ void
 EndpointManager::Dump() const
 {
 	kprintf("-------- TCP Domain %p ---------\n", this);
-	kprintf("%10s %20s %20s %8s %8s %12s\n", "address", "local", "peer",
+	kprintf("%10s %21s %21s %8s %8s %12s\n", "address", "local", "peer",
 		"recv-q", "send-q", "state");
 
 	ConnectionTable::Iterator iterator = fConnectionHash.GetIterator();
@@ -576,7 +582,7 @@ EndpointManager::Dump() const
 		endpoint->LocalAddress().AsString(localBuf, sizeof(localBuf), true);
 		endpoint->PeerAddress().AsString(peerBuf, sizeof(peerBuf), true);
 
-		kprintf("%p %20s %20s %8lu %8lu %12s\n", endpoint, localBuf, peerBuf,
+		kprintf("%p %21s %21s %8lu %8lu %12s\n", endpoint, localBuf, peerBuf,
 			endpoint->fReceiveQueue.Available(), endpoint->fSendQueue.Used(),
 			name_for_state(endpoint->State()));
 	}

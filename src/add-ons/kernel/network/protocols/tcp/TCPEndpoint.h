@@ -50,7 +50,7 @@ public:
 
 			status_t	Open();
 			status_t	Close();
-			status_t	Free();
+			void		Free();
 			status_t	Connect(const struct sockaddr* address);
 			status_t	Accept(struct net_socket** _acceptedSocket);
 			status_t	Bind(const sockaddr* address);

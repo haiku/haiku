@@ -554,7 +554,7 @@ TCPEndpoint::Close()
 }
 
 
-status_t
+void
 TCPEndpoint::Free()
 {
 	TRACE("Free()");
@@ -562,17 +562,16 @@ TCPEndpoint::Free()
 	MutexLocker _(fLock);
 
 	if (fState <= SYNCHRONIZE_SENT)
-		return B_OK;
+		return;
 
 	// we are only interested in the timer, not in changing state
 	_EnterTimeWait();
 
 	fFlags |= FLAG_CLOSED;
-	if ((fFlags & FLAG_DELETE_ON_CLOSE) != 0)
-		return B_OK;
-
-	return B_BUSY;
+	if ((fFlags & FLAG_DELETE_ON_CLOSE) == 0) {
 		// we'll be freed later when the 2MSL timer expires
+		gSocketModule->acquire_socket(socket);
+	}
 }
 
 
@@ -1169,7 +1168,7 @@ TCPEndpoint::_MarkEstablished()
 	fState = ESTABLISHED;
 	T(State(this));
 
-	if (socket->parent != NULL) {
+	if (gSocketModule->has_parent(socket)) {
 		gSocketModule->set_connected(socket);
 		release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
 	}
@@ -1211,13 +1210,11 @@ TCPEndpoint::_Close()
 	fSendList.Signal();
 	_NotifyReader();
 
-	if (socket->parent != NULL) {
+	if (gSocketModule->has_parent(socket)) {
 		// We still have a parent - obviously, we haven't been accepted yet,
 		// so no one could ever close us.
-		// Since we can't just delete ourself here, we trigger an immediate
-		// time-wait timer.
 		_CancelConnectionTimers();
-		gStackModule->set_timer(&fTimeWaitTimer, 0);
+		gSocketModule->set_aborted(socket);
 	}
 }
 
@@ -1792,8 +1789,7 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 	if ((fFlags & (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE))
 			== (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE)) {
 		locker.Unlock();
-		gSocketModule->delete_socket(socket);
-			// this will also delete us
+		gSocketModule->release_socket(socket);
 	}
 
 	return segmentAction;
@@ -2293,7 +2289,7 @@ TCPEndpoint::_TimeWaitTimer(net_timer* timer, void* _endpoint)
 
 	locker.Unlock();
 
-	gSocketModule->delete_socket(endpoint->socket);
+	gSocketModule->release_socket(endpoint->socket);
 }
 
 
