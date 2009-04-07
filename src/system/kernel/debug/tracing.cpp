@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1228,9 +1228,10 @@ tracing_init(void)
 
 	add_debugger_command_etc("traced", &dump_tracing_command,
 		"Dump recorded trace entries",
-		"[ \"--printteam\" ] [ \"--difftime\" ] (\"forward\" | \"backward\") "
+		"[ --printteam ] [ --difftime ] [ --stacktrace ] "
+			"(\"forward\" | \"backward\") "
 			"| ([ <start> [ <count> [ <range> ] ] ] "
-				"[ #<pattern> | (\"filter\" <filter>) ])\n"
+			"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
 		"specified, the command continues where the previous invocation left\n"
 		"off, i.e. printing the previous respectively next entries (as many\n"
@@ -1238,9 +1239,9 @@ tracing_init(void)
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
 		"If no arguments are given, the command continues in the direction\n"
 		"of the last invocation.\n"
-		"\"--printteam\"  enables printing the entries' team IDs.\n"
-		"\"--difftime\"   print difference times for all but the first entry.\n"
-		"\"--stacktrace\" print stack traces for entries that captured one.\n"
+		"--printteam  - enables printing the entries' team IDs.\n"
+		"--difftime   - print difference times for all but the first entry.\n"
+		"--stacktrace - print stack traces for entries that captured one.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
 		"               backward this will be the first or last entry printed\n"
