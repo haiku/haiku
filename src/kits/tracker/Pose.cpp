@@ -891,7 +891,7 @@ debugger("BPose::SetLocation() - infinite location");
 
 
 BRect
-BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect)
+BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect) const
 {
 	ASSERT(poseView->ViewMode() == kListMode);
 
@@ -913,7 +913,7 @@ BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect)
 
 
 BRect
-BPose::CalcRect(const BPoseView *poseView)
+BPose::CalcRect(const BPoseView *poseView) const
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 

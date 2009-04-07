@@ -2741,9 +2741,11 @@ BPoseView::SetViewMode(uint32 newMode)
 
 	fViewState->SetViewMode(newMode);
 
-	// try to lock the center of the pose view when scaling icons
+	// Try to lock the center of the pose view when scaling icons, but not
+	// if we are the desktop.
 	BPoint scaleOffset(0, 0);
-	if (newMode == kIconMode && oldMode == kIconMode) {
+	bool iconSizeChanged = newMode == kIconMode && oldMode == kIconMode;
+	if (!IsDesktopWindow() && iconSizeChanged) {
 		// definitely changing the icon size, so we will need to scroll
 		BRect bounds(Bounds());
 		BPoint center(bounds.LeftTop());
@@ -2795,6 +2797,9 @@ BPoseView::SetViewMode(uint32 newMode)
 			|| fViewState->IconSize() != lastIconSize);
 	}
 
+	// check if we need to re-place poses when they are out of view
+	bool checkLocations = IsDesktopWindow() && iconSizeChanged;
+
 	BPoint oldOffset;
 	BPoint oldGrid;
 	if (mapIcons)
@@ -2807,10 +2812,16 @@ BPoseView::SetViewMode(uint32 newMode)
 		int32 count = fPoseList->CountItems();
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
-			if (pose->HasLocation() == false)
+			if (pose->HasLocation() == false) {
 				newPoseList.AddItem(pose);
-			else if (mapIcons)
+			} else if (checkLocations && !IsValidLocation(pose)) {
+				// this icon has a location, but needs to be remapped, because
+				// it is going out of view for example
+				RemoveFromVSList(pose);
+				newPoseList.AddItem(pose);
+			} else if (mapIcons) {
 				MapToNewIconMode(pose, oldGrid, oldOffset);
+			}
 		}
 	}
 
@@ -3216,19 +3227,16 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 	// make pose rect a little bigger to ensure space between poses
 	rect.InsetBy(-3, 0);
 
-	BRect deskbarFrame;
-	bool checkDeskbarFrame = false;
-	if (IsDesktopWindow() && GetDeskbarFrame(&deskbarFrame) == B_OK) {
-		checkDeskbarFrame = true;
-		deskbarFrame.InsetBy(-10, -10);
-	}
+	bool checkValidLocation = IsDesktopWindow();
 
 	// find an empty slot to put pose into
-	if (fVSPoseList->CountItems() > 0)
+	if (fVSPoseList->CountItems() > 0) {
 		while (SlotOccupied(rect, viewBounds)
-			// avoid Deskbar
-			|| (checkDeskbarFrame && deskbarFrame.Intersects(rect)))
+			// check good location on the desktop
+			|| (checkValidLocation && !IsValidLocation(rect))) {
 			NextSlot(pose, rect, viewBounds);
+		}
+	}
 
 	rect.InsetBy(3, 0);
 
@@ -3236,6 +3244,49 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 
 	pose->SetLocation(rect.LeftTop() + deltaFromBounds, this);
 	pose->SetSaveLocation();
+}
+
+
+bool
+BPoseView::IsValidLocation(const BPose *pose)
+{
+	if (!IsDesktopWindow())
+		return true;
+
+	BRect rect(pose->CalcRect(this));
+	rect.InsetBy(-3, 0);
+	return IsValidLocation(rect);
+}
+
+
+bool
+BPoseView::IsValidLocation(const BRect& rect)
+{
+	if (!IsDesktopWindow())
+		return true;
+
+	// on the desktop, don't allow icons outside of the view bounds
+	if (!Bounds().Contains(rect))
+		return false;
+
+	// also check the deskbar frame
+	BRect deskbarFrame;
+	if (GetDeskbarFrame(&deskbarFrame) == B_OK) {
+		deskbarFrame.InsetBy(-10, -10);
+		if (deskbarFrame.Intersects(rect))
+			return false;
+	}
+
+	// check replicants
+	for (int32 i = 0; BView* child = ChildAt(i); i++) {
+		BRect childFrame = child->Frame();
+		childFrame.InsetBy(-5, -5);
+		if (childFrame.Intersects(rect))
+			return false;
+	}
+
+	// location is ok
+	return true;
 }
 
 

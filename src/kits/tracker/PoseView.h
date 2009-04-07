@@ -479,6 +479,8 @@ class BPoseView : public BView {
 			// find poses that need placing and place them in a new spot
 		void PlacePose(BPose *, BRect &);
 			// find a new place for a pose, starting at fHintLocation and place it
+		bool IsValidLocation(const BPose *pose);
+		bool IsValidLocation(const BRect& rect);
 		status_t GetDeskbarFrame(BRect* frame);
 		bool SlotOccupied(BRect poseRect, BRect viewBounds) const;
 		void NextSlot(BPose *, BRect &poseRect, BRect viewBounds);

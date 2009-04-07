@@ -91,8 +91,9 @@ class BPose {
 		bool PointInPose(BPoint poseLoc, const BPoseView *, BPoint where,
 				BTextWidget ** = NULL) const;
 		bool PointInPose(const BPoseView *, BPoint where) const ;
-		BRect CalcRect(BPoint loc, const BPoseView *, bool minimal_rect = false);
-		BRect CalcRect(const BPoseView *);
+		BRect CalcRect(BPoint loc, const BPoseView *,
+			bool minimal_rect = false) const;
+		BRect CalcRect(const BPoseView *) const;
 		void UpdateAllWidgets(int32 poseIndex, BPoint poseLoc, BPoseView *);
 		void UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 				uint32 attrType, int32 poseIndex, BPoint poseLoc, BPoseView *view);

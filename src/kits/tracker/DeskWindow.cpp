@@ -77,6 +77,21 @@ BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
 		fTrashContextMenu(0),
 		fShouldUpdateAddonShortcuts(true)
 {
+	// Add icon view switching shortcuts. These are displayed in the context
+	// menu, although they obviously don't work from those menu items.
+	BMessage* message = new BMessage(kIconMode);
+	AddShortcut('1', B_COMMAND_KEY, message, PoseView());
+
+	message = new BMessage(kMiniIconMode);
+	AddShortcut('2', B_COMMAND_KEY, message, PoseView());
+
+	message = new BMessage(kIconMode);
+	message->AddInt32("scale", 1);
+	AddShortcut('+', B_COMMAND_KEY, message, PoseView());
+
+	message = new BMessage(kIconMode);
+	message->AddInt32("scale", 0);
+	AddShortcut('-', B_COMMAND_KEY, message, PoseView());
 }
 
 
@@ -266,7 +281,7 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 
 	BMessage* message = new BMessage(kIconMode);
 	message->AddInt32("size", 32);
-	BMenuItem* item = new BMenuItem("32 x 32", message, '1');
+	BMenuItem* item = new BMenuItem("32 x 32", message);
 	item->SetMarked(PoseView()->IconSizeInt() == 32);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
@@ -292,9 +307,28 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
-	menu->AddItem(iconSizeMenu);
+	iconSizeMenu->AddSeparatorItem();
 
-	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode));
+	message = new BMessage(kIconMode);
+	message->AddInt32("scale", 0);
+	item = new BMenuItem("Decrease Size", message, '-');
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kIconMode);
+	message->AddInt32("scale", 1);
+	item = new BMenuItem("Increase Size", message, '+');
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	// A sub menu where the super item can be invoked.
+	menu->AddItem(iconSizeMenu);
+	iconSizeMenu->Superitem()->SetShortcut('1', B_COMMAND_KEY);
+	iconSizeMenu->Superitem()->SetMessage(new BMessage(kIconMode));
+	iconSizeMenu->Superitem()->SetTarget(PoseView());
+	iconSizeMenu->Superitem()->SetMarked(PoseView()->ViewMode() == kIconMode);
+
+	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '2');
 	item->SetMarked(PoseView()->ViewMode() == kMiniIconMode);
 	menu->AddItem(item);
 
