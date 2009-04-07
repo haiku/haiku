@@ -303,6 +303,9 @@ private:
 									float* outAscent, float* outDescent,
 									float* ioWidth);
 
+			int32				_FindLeftWordBoundary(int32 offset);
+			int32				_FindRightWordBoundary(int32 offset);
+
 			float				_StyledWidth(int32 fromOffset, int32 length,
 									float* outAscent = NULL,
 									float* outDescent = NULL) const;
