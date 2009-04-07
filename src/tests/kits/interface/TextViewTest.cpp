@@ -30,15 +30,15 @@ Window::Window()
 {
 	BRect rect = Bounds().InsetByCopy(20, 20);
 
-	BTextView* textView = new BTextView(rect, "text-o-mo", 
+	BTextView* textView = new BTextView(rect, "text-o-mo",
 		rect.OffsetToCopy(0, 0), B_FOLLOW_ALL);
 
-	BScrollView* scrollView = new BScrollView("scroll-o-mo", textView, 
+	BScrollView* scrollView = new BScrollView("scroll-o-mo", textView,
 		B_FOLLOW_ALL_SIDES, 0, true, true);
 	AddChild(scrollView);
-	
+
 	printf("starting to prepare content ... [%Ld]\n", system_time());
-	
+
 	// generate a million lines of content
 	const int32 kLineCount = 1000000;
 	const int32 kLineNoSize = 6;
@@ -51,7 +51,6 @@ Window::Window()
 	char* currLine = content.LockBuffer(contentLength);
 	if (currLine) {
 		int32 lineNo = 0;
-		char buf[10];
 		for ( ; lineNo < kLineCount; currLine += lineLength)
 			sprintf(currLine, format.String(), kLineNoSize, lineNo++);
 		content.UnlockBuffer(contentLength);
@@ -98,7 +97,7 @@ Application::ReadyToRun(void)
 //	#pragma mark -
 
 
-int 
+int
 main(int argc, char **argv)
 {
 	Application app;
