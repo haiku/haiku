@@ -280,7 +280,6 @@ IOOperation::Finish()
 
 				// The vector extends beyond the end offset -- cut it.
 				length = endOffset - offset;
-				length -= offset + length - endOffset;
 			}
 
 			if (base >= bounceBufferStart && base < bounceBufferEnd) {
