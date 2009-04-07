@@ -937,12 +937,16 @@ TermView::AttachedToWindow()
 		fTextBuffer->SetListener(thisMessenger);
 		_SynchronizeWithTextBuffer(0, -1);
 	}
+
+	be_clipboard->StartWatching(thisMessenger);
 }
 
 
 void
 TermView::DetachedFromWindow()
 {
+	be_clipboard->StopWatching(BMessenger(this));
+
 	delete fWinchRunner;
 	fWinchRunner = NULL;
 
@@ -1397,6 +1401,29 @@ TermView::MessageReceived(BMessage *msg)
 				Paste(be_clipboard);
 			break;
 		}
+
+		case B_CLIPBOARD_CHANGED:
+			// This message originates from the system clipboard. Overwrite
+			// the contents of the mouse clipboard with the ones from the
+			// system clipboard, in case it contains text data.
+			if (be_clipboard->Lock()) {
+				if (gMouseClipboard->Lock()) {
+					BMessage* clipMsgA = be_clipboard->Data();
+					const char* text;
+					ssize_t numBytes;
+					if (clipMsgA->FindData("text/plain", B_MIME_TYPE,
+							(const void**)&text, &numBytes) == B_OK ) {
+						gMouseClipboard->Clear();
+						BMessage* clipMsgB = gMouseClipboard->Data();
+						clipMsgB->AddData("text/plain", B_MIME_TYPE,
+							text, numBytes);
+						gMouseClipboard->Commit();
+					}
+					gMouseClipboard->Unlock();
+				}
+				be_clipboard->Unlock();
+			}
+			break;
 
 		case B_SELECT_ALL:
 			SelectAll();
