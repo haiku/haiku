@@ -303,9 +303,6 @@ private:
 									float* outAscent, float* outDescent,
 									float* ioWidth);
 
-			int32				_FindLeftWordBoundary(int32 offset);
-			int32				_FindRightWordBoundary(int32 offset);
-
 			float				_StyledWidth(int32 fromOffset, int32 length,
 									float* outAscent = NULL,
 									float* outDescent = NULL) const;
@@ -327,10 +324,10 @@ private:
 
 			void				_DrawLines(int32 startLine, int32 endLine,
 									int32 startOffset = -1, bool erase = false);
-			void				_RequestDrawLines(int32 startLine, 
-									int32 endLine, int32 startOffset = -1, 
+			void				_RequestDrawLines(int32 startLine,
+									int32 endLine, int32 startOffset = -1,
 									bool erase = false);
-			
+
 			void				_DrawCaret(int32 offset);
 			void				_ShowCaret();
 			void				_HideCaret();
@@ -368,6 +365,9 @@ private:
 			uint32				_CharClassification(int32 offset) const;
 			int32				_NextInitialByte(int32 offset) const;
 			int32				_PreviousInitialByte(int32 offset) const;
+
+			int32				_PreviousWordBoundary(int32 offset);
+			int32				_NextWordBoundary(int32 offset);
 
 			bool				_GetProperty(BMessage* specifier, int32 form,
 									const char* property, BMessage* reply);

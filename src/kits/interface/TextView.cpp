@@ -7,6 +7,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 
 /*!	BTextView displays and manages styled text. */
@@ -1923,10 +1924,10 @@ void
 BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 {
 	if (outFromOffset)
-		*outFromOffset = _FindLeftWordBoundary(inOffset);
+		*outFromOffset = _PreviousWordBoundary(inOffset);
 
 	if (outToOffset)
-		*outToOffset = _FindRightWordBoundary(inOffset);
+		*outToOffset = _NextWordBoundary(inOffset);
 }
 
 
@@ -3178,38 +3179,42 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 		message->FindInt32("modifiers", &modifiers);
 
 	bool shiftDown = modifiers & B_SHIFT_KEY;
+	bool ctrlDown = modifiers & B_CONTROL_KEY;
 
 	int32 currentOffset = fClickOffset;
 	switch (inArrowKey) {
 		case B_LEFT_ARROW:
-			if (shiftDown) {
-				fClickOffset = _PreviousInitialByte(fClickOffset);
-				if (fClickOffset != currentOffset) {
+			if (fSelStart != fSelEnd && !shiftDown)
+				fClickOffset = fSelStart;
+			else {
+				fClickOffset
+					= ctrlDown
+						? _PreviousWordBoundary(fClickOffset - 1)
+						: _PreviousInitialByte(fClickOffset);
+				if (shiftDown && fClickOffset != currentOffset) {
 					if (fClickOffset >= fSelStart)
 						selEnd = fClickOffset;
 					else
 						selStart = fClickOffset;
 				}
-			} else if (fSelStart != fSelEnd)
-				fClickOffset = fSelStart;
-			else
-				fClickOffset = _PreviousInitialByte(fSelStart);
-
+			}
 			break;
 
 		case B_RIGHT_ARROW:
-			if (shiftDown) {
-				fClickOffset = _NextInitialByte(fClickOffset);
-				if (fClickOffset != currentOffset) {
+			if (fSelStart != fSelEnd && !shiftDown)
+				fClickOffset = fSelEnd;
+			else {
+				fClickOffset
+					= ctrlDown
+						? _NextWordBoundary(fClickOffset)
+						: _NextInitialByte(fClickOffset);
+				if (shiftDown && fClickOffset != currentOffset) {
 					if (fClickOffset <= fSelEnd)
 						selStart = fClickOffset;
 					else
 						selEnd = fClickOffset;
 				}
-			} else if (fSelStart != fSelEnd)
-				fClickOffset = fSelEnd;
-			else
-				fClickOffset = _NextInitialByte(fSelEnd);
+			}
 			break;
 
 		case B_UP_ARROW:
@@ -3392,7 +3397,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 			BPoint currentPos = PointAt(fClickOffset);
 
 			currentPos.y += Bounds().Height();
-			fClickOffset = OffsetAt(LineAt(currentPos) + 1);
+			fClickOffset = OffsetAt(LineAt(currentPos));
 
 			if (shiftDown) {
 				if (fClickOffset >= fSelEnd) {
@@ -3803,7 +3808,7 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 
 
 int32
-BTextView::_FindLeftWordBoundary(int32 offset)
+BTextView::_PreviousWordBoundary(int32 offset)
 {
 	uint32 charType = _CharClassification(offset);
 	int32 previous;
@@ -3819,7 +3824,7 @@ BTextView::_FindLeftWordBoundary(int32 offset)
 
 
 int32
-BTextView::_FindRightWordBoundary(int32 offset)
+BTextView::_NextWordBoundary(int32 offset)
 {
 	uint32 charType = _CharClassification(offset);
 	int32 textLen = TextLength();
@@ -4338,17 +4343,17 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 		case 2:
 			// double click, extend selection wordwise
 			if (currentOffset <= fTrackingMouse->anchor) {
-				fTrackingMouse->selStart = _FindLeftWordBoundary(currentOffset);
+				fTrackingMouse->selStart = _PreviousWordBoundary(currentOffset);
 				fTrackingMouse->selEnd
 					= fTrackingMouse->shiftDown
 						? fSelEnd
-						: _FindRightWordBoundary(fTrackingMouse->anchor);
+						: _NextWordBoundary(fTrackingMouse->anchor);
 			} else {
 				fTrackingMouse->selStart
 					= fTrackingMouse->shiftDown
 						? fSelStart
-						: _FindLeftWordBoundary(fTrackingMouse->anchor);
-				fTrackingMouse->selEnd = _FindRightWordBoundary(currentOffset);
+						: _PreviousWordBoundary(fTrackingMouse->anchor);
+				fTrackingMouse->selEnd = _NextWordBoundary(currentOffset);
 			}
 			break;
 
