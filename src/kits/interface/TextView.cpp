@@ -3124,6 +3124,8 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 
 	fLayoutData = new LayoutData;
 	fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), fTextRect);
+
+	SetDoesUndo(true);
 }
 
 
@@ -3931,7 +3933,7 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 	InsertText(inText, inLength, inOffset, inRuns);
 
 	// offset the caret/selection, if the text was inserted before it
-	if (inOffset < fSelEnd) {
+	if (inOffset <= fSelEnd) {
 		fSelStart += inLength;
 		fClickOffset = fSelEnd = fSelStart;
 	}
