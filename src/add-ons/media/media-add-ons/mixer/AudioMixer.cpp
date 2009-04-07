@@ -1127,8 +1127,8 @@ AudioMixer::Gain_to_dB(float gain)
 
 
 status_t 
-AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
-							  void *value, size_t *ioSize)
+AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, void *value,
+	size_t *ioSize)
 {
 	TRACE("GetParameterValue: id 0x%08lx, ioSize %ld\n", id, *ioSize);
 	int param = PARAM(id);
@@ -1196,11 +1196,31 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 				static_cast<float *>(value)[0] = GAIN_TO_DB((output->GetOutputChannelGain(0) + output->GetOutputChannelGain(1)) / 2);
 			} else {
 				// multi channel control
-				if (*ioSize < output->GetOutputChannelCount() * sizeof(float))
-					goto err;
-				*ioSize = output->GetOutputChannelCount() * sizeof(float);
-				for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-					static_cast<float *>(value)[chan] = GAIN_TO_DB(output->GetOutputChannelGain(chan));
+				if (*ioSize == sizeof(float)) {
+					// get combined gain for all controls
+					float gain = 0;
+					for (int channel = 0;
+							channel < output->GetOutputChannelCount();
+							channel++) {
+						gain += GAIN_TO_DB(
+							output->GetOutputChannelGain(channel));
+					}
+					static_cast<float *>(value)[0] = gain
+						/ output->GetOutputChannelCount();
+				} else {
+					if (*ioSize < output->GetOutputChannelCount()
+							* sizeof(float))
+						goto err;
+
+					*ioSize = output->GetOutputChannelCount() * sizeof(float);
+
+					for (int channel = 0;
+							channel < output->GetOutputChannelCount();
+							channel++) {
+						static_cast<float *>(value)[channel]
+							= GAIN_TO_DB(output->GetOutputChannelGain(channel));
+					}
+				}
 			}
 		}
 		if (PARAM_IS_BALANCE(id)) {
@@ -1313,9 +1333,10 @@ err:
 	return B_ERROR;
 }
 
-void 
-AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
-							  const void *value, size_t size)
+
+void
+AudioMixer::SetParameterValue(int32 id, bigtime_t when, const void *value,
+	size_t size)
 {
 	TRACE("SetParameterValue: id 0x%08lx, size %ld\n", id, size);
 	bool update = false;
@@ -1394,7 +1415,8 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// output gain control
-			if (fCore->Settings()->UseBalanceControl() && output->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+			if (fCore->Settings()->UseBalanceControl()
+				&& output->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
 				// single channel control + balance
 				float l = output->GetOutputChannelGain(0);
 				float r = output->GetOutputChannelGain(1);
@@ -1406,10 +1428,26 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 				output->SetOutputChannelGain(1, output->GetOutputChannelGain(1) * f);
 			} else {
 				// multi channel control
-				if (size < output->GetOutputChannelCount() * sizeof(float))
-					goto err;
-				for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-					output->SetOutputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+				if (size == sizeof(float)) {
+					// set same volume for all channels
+					float gain = static_cast<const float *>(value)[0];
+					for (int channel = 0;
+							channel < output->GetOutputChannelCount();
+							channel++) {
+						output->SetOutputChannelGain(channel,
+							DB_TO_GAIN(gain));
+					}
+				} else {
+					if (size < output->GetOutputChannelCount() * sizeof(float))
+						goto err;
+					for (int channel = 0;
+							channel < output->GetOutputChannelCount();
+							channel++) {
+						output->SetOutputChannelGain(channel,
+							DB_TO_GAIN(static_cast<const float *>(
+								value)[channel]));
+					}
+				}
 			}
 		}
 		if (PARAM_IS_BALANCE(id)) {
