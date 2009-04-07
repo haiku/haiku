@@ -40,6 +40,7 @@ public:
 
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual const char*	Unit() const;
 	virtual rgb_color	Color() const;
 	virtual bool		AdaptiveScale() const;
@@ -81,6 +82,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
 };
 
@@ -94,6 +96,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
 };
 
@@ -107,6 +110,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
 };
 
@@ -120,6 +124,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
 };
 
@@ -172,6 +177,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
 };
 
@@ -190,6 +196,7 @@ public:
 
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 
 	virtual int32		CPU() const;
 	virtual bool		PerCPU() const;
@@ -202,6 +209,7 @@ private:
 	bigtime_t			fPreviousTime;
 	int32				fCPU;
 	BString				fLabel;
+	BString				fShortLabel;
 };
 
 
@@ -219,6 +227,7 @@ public:
 
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 
 	virtual bool		MultiCPUOnly() const;
 	virtual bool		Primary() const;
@@ -243,6 +252,7 @@ public:
 
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
 	virtual bool		Primary() const;
 
@@ -266,6 +276,7 @@ public:
 
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
 	virtual scale_type	ScaleType() const;
 	virtual bool		Primary() const;

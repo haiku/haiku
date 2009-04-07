@@ -13,6 +13,7 @@
 
 #ifdef __HAIKU__
 #	include <AbstractLayoutItem.h>
+#	include <ControlLook.h>
 #endif
 #include <Application.h>
 #include <Autolock.h>
@@ -920,6 +921,8 @@ void
 ActivityView::_UpdateOffscreenBitmap()
 {
 	BRect frame = _HistoryFrame();
+	frame.OffsetTo(B_ORIGIN);
+
 	if (fOffscreen != NULL && frame == fOffscreen->Bounds())
 		return;
 
@@ -1183,13 +1186,14 @@ ActivityView::_UpdateFrame()
 BRect
 ActivityView::_HistoryFrame() const
 {
-	if (!fShowLegend)
-		return Bounds();
-
 	BRect frame = Bounds();
-	BRect legendFrame = _LegendFrame();
 
-	frame.bottom = legendFrame.top - 1;
+	if (fShowLegend) {
+		BRect legendFrame = _LegendFrame();
+		frame.bottom = legendFrame.top - 1;
+	}
+
+	frame.InsetBy(2, 2);
 
 	return frame;
 }
@@ -1283,7 +1287,7 @@ ActivityView::_PositionForValue(DataSource* source, DataHistory* values,
 
 
 void
-ActivityView::_DrawHistory()
+ActivityView::_DrawHistory(bool drawBackground)
 {
 	_UpdateOffscreenBitmap();
 
@@ -1294,6 +1298,19 @@ ActivityView::_DrawHistory()
 	}
 
 	BRect frame = _HistoryFrame();
+	BRect outerFrame = frame.InsetByCopy(-2, -2);
+
+	// draw the outer frame
+	uint32 flags = 0;
+	if (!drawBackground)
+		flags |= BControlLook::B_BLEND_FRAME;
+	be_control_look->DrawTextControlBorder(this, outerFrame,
+		outerFrame, fLegendBackgroundColor, flags);
+
+	// convert to offscreen view if necessary
+	if (view != this)
+		frame.OffsetTo(B_ORIGIN);
+
 	view->SetLowColor(fHistoryBackgroundColor);
 	view->FillRect(frame, B_SOLID_LOW);
 
@@ -1322,7 +1339,6 @@ ActivityView::_DrawHistory()
 		scaleColor = tint_color(scaleColor, B_DARKEN_2_TINT);
 
 	view->SetHighColor(scaleColor);
-	view->StrokeRect(frame);
 	view->StrokeLine(BPoint(frame.left, frame.top + frame.Height() / 2),
 		BPoint(frame.right, frame.top + frame.Height() / 2));
 
@@ -1364,7 +1380,7 @@ ActivityView::_DrawHistory()
 	view->Sync();
 	if (fOffscreen != NULL) {
 		fOffscreen->Unlock();
-		DrawBitmap(fOffscreen, B_ORIGIN);
+		DrawBitmap(fOffscreen, outerFrame.LeftTop());
 	}
 }
 
@@ -1393,20 +1409,24 @@ ActivityView::_UpdateResolution(int32 resolution, bool broadcast)
 
 
 void
-ActivityView::Draw(BRect /*updateRect*/)
+ActivityView::Draw(BRect updateRect)
 {
-	_DrawHistory();
+	bool drawBackground = true;
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
+		drawBackground = false;
+
+	_DrawHistory(drawBackground);
 
 	if (!fShowLegend)
 		return;
 
 	// draw legend
+	BRect legendFrame = _LegendFrame();
+	SetLowColor(fLegendBackgroundColor);
+	if (drawBackground)
+		FillRect(legendFrame, B_SOLID_LOW);
 
 	BAutolock _(fSourcesLock);
-	BRect legendFrame = _LegendFrame();
-
-	SetLowColor(fLegendBackgroundColor);
-	FillRect(legendFrame, B_SOLID_LOW);
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -1418,11 +1438,12 @@ ActivityView::Draw(BRect /*updateRect*/)
 
 		// draw color box
 		BRect colorBox = _LegendColorFrameAt(legendFrame, i);
-		SetHighColor(tint_color(source->Color(), B_DARKEN_1_TINT));
-		StrokeRect(colorBox);
+		BRect rect = colorBox;
+		uint32 flags = BControlLook::B_BLEND_FRAME;
+		be_control_look->DrawTextControlBorder(this, rect,
+			rect, fLegendBackgroundColor, flags);
 		SetHighColor(source->Color());
-		colorBox.InsetBy(1, 1);
-		FillRect(colorBox);
+		FillRect(rect);
 
 		// show current value and label
 		float y = frame.top + ceilf(fontHeight.ascent);
@@ -1432,10 +1453,22 @@ ActivityView::Draw(BRect /*updateRect*/)
 		float width = StringWidth(text.String());
 
 		BString label = source->Label();
-		TruncateString(&label, B_TRUNCATE_MIDDLE,
-			frame.right - colorBox.right - 12 - width);
+		float possibleLabelWidth = frame.right - colorBox.right - 12 - width;
+		// TODO: TruncateString() is broken... remove + 5 when fixed!
+		if (ceilf(StringWidth(label.String()) + 5) > possibleLabelWidth)
+			label = source->ShortLabel();
+		TruncateString(&label, B_TRUNCATE_MIDDLE, possibleLabelWidth);
 
-		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		if (drawBackground)
+			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		else {
+			SetDrawingMode(B_OP_OVER);
+			rgb_color c = Parent()->LowColor();
+			if (c.red + c.green + c.blue > 128 * 3)
+				SetHighColor(0, 0, 0);
+			else
+				SetHighColor(255, 255, 255);
+		}
 		DrawString(label.String(), BPoint(6 + colorBox.right, y));
 		DrawString(text.String(), BPoint(frame.right - width, y));
 	}

@@ -151,6 +151,13 @@ DataSource::Name() const
 
 
 const char*
+DataSource::ShortLabel() const
+{
+	return Label();
+}
+
+
+const char*
 DataSource::Label() const
 {
 	return "";
@@ -325,6 +332,13 @@ UsedMemoryDataSource::Label() const
 }
 
 
+const char*
+UsedMemoryDataSource::ShortLabel() const
+{
+	return "Memory";
+}
+
+
 bool
 UsedMemoryDataSource::Primary() const
 {
@@ -364,6 +378,13 @@ const char*
 CachedMemoryDataSource::Label() const
 {
 	return "Cached Memory";
+}
+
+
+const char*
+CachedMemoryDataSource::ShortLabel() const
+{
+	return "Cache";
 }
 
 
@@ -412,6 +433,13 @@ SwapSpaceDataSource::Label() const
 }
 
 
+const char*
+SwapSpaceDataSource::ShortLabel() const
+{
+	return "Swap";
+}
+
+
 bool
 SwapSpaceDataSource::Primary() const
 {
@@ -456,6 +484,13 @@ const char*
 SemaphoresDataSource::Label() const
 {
 	return "Semaphores";
+}
+
+
+const char*
+SemaphoresDataSource::ShortLabel() const
+{
+	return "Sems";
 }
 
 
@@ -647,6 +682,13 @@ RunningAppsDataSource::Label() const
 }
 
 
+const char*
+RunningAppsDataSource::ShortLabel() const
+{
+	return "Apps";
+}
+
+
 bool
 RunningAppsDataSource::AdaptiveScale() const
 {
@@ -676,6 +718,7 @@ CPUUsageDataSource::CPUUsageDataSource(const CPUUsageDataSource& other)
 	fPreviousTime = other.fPreviousTime;
 	fCPU = other.fCPU;
 	fLabel = other.fLabel;
+	fShortLabel = other.fShortLabel;
 }
 
 
@@ -738,6 +781,13 @@ CPUUsageDataSource::Label() const
 
 
 const char*
+CPUUsageDataSource::ShortLabel() const
+{
+	return fShortLabel.String();
+}
+
+
+const char*
 CPUUsageDataSource::Name() const
 {
 	return "CPU Usage";
@@ -773,6 +823,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 	if (SystemInfo().CPUCount() > 1)
 		fLabel << " " << cpu;
 
+	fShortLabel = fLabel;
 	fLabel << " Usage";
 
 	const rgb_color kColors[] = {
@@ -868,6 +919,13 @@ CPUCombinedUsageDataSource::Label() const
 
 
 const char*
+CPUCombinedUsageDataSource::ShortLabel() const
+{
+	return "CPU";
+}
+
+
+const char*
 CPUCombinedUsageDataSource::Name() const
 {
 	return "CPU Usage (combined)";
@@ -955,6 +1013,13 @@ const char*
 PageFaultsDataSource::Label() const
 {
 	return "Page Faults";
+}
+
+
+const char*
+PageFaultsDataSource::ShortLabel() const
+{
+	return "P-Faults";
 }
 
 
@@ -1049,6 +1114,13 @@ const char*
 NetworkUsageDataSource::Label() const
 {
 	return fIn ? "Receiving" : "Sending";
+}
+
+
+const char*
+NetworkUsageDataSource::ShortLabel() const
+{
+	return fIn ? "RX" : "TX";
 }
 
 

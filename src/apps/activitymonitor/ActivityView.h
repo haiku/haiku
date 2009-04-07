@@ -110,7 +110,7 @@ private:
 			BRect		_LegendColorFrameAt(BRect frame, int32 index) const;
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
-			void		_DrawHistory();
+			void		_DrawHistory(bool drawBackground);
 			void		_UpdateResolution(int32 resolution,
 							bool broadcast = true);
 
