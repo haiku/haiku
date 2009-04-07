@@ -120,7 +120,6 @@ SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 KernelMergeObject kernel_misc.o :
 	Referenceable.cpp
-	WeakReferenceable.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

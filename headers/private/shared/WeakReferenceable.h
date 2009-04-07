@@ -11,19 +11,20 @@
 
 namespace BPrivate {
 
-class WeakReferenceable;
+template<typename Type> class WeakReferenceable;
 
+template<typename Type>
 class WeakPointer : public Referenceable {
 public:
-			WeakReferenceable*	Get();
+			Type*				Get();
 			bool				Put();
 
 			int32				UseCount() const;
 
 private:
-	friend class WeakReferenceable;
+	friend class WeakReferenceable<Type>;
 
-								WeakPointer(WeakReferenceable* object);
+								WeakPointer(Type* object);
 								~WeakPointer();
 
 private:
@@ -31,13 +32,14 @@ private:
 
 private:
 			vint32				fUseCount;
-			WeakReferenceable*	fObject;
+			Type*				fObject;
 };
 
+template<typename Type>
 class WeakReferenceable {
 public:
-								WeakReferenceable();
-	virtual						~WeakReferenceable();
+								WeakReferenceable(Type* object);
+								~WeakReferenceable();
 
 			void				AddReference()
 									{ fPointer->_GetUnchecked(); }
@@ -48,13 +50,13 @@ public:
 			int32				CountReferences() const
 									{ return fPointer->UseCount(); }
 
-			WeakPointer*		GetWeakPointer();
+			WeakPointer<Type>*	GetWeakPointer();
 
 protected:
-			WeakPointer*		fPointer;
+			WeakPointer<Type>*	fPointer;
 };
 
-template<typename Type = BPrivate::Referenceable>
+template<typename Type>
 class WeakReference {
 public:
 	WeakReference()
@@ -72,12 +74,20 @@ public:
 		SetTo(object);
 	}
 
-	WeakReference(const WeakPointer& other)
+	WeakReference(WeakPointer<Type>& other)
 		:
 		fPointer(NULL),
 		fObject(NULL)
 	{
 		SetTo(&other);
+	}
+
+	WeakReference(WeakPointer<Type>* other)
+		:
+		fPointer(NULL),
+		fObject(NULL)
+	{
+		SetTo(other);
 	}
 
 	WeakReference(const WeakReference<Type>& other)
@@ -103,12 +113,13 @@ public:
 		}
 	}
 
-	void SetTo(WeakPointer* pointer)
+	void SetTo(WeakPointer<Type>* pointer)
 	{
 		Unset();
 
 		if (pointer != NULL) {
-			fPointer = pointer->AddReference();
+			fPointer = pointer;
+			fPointer->AddReference();
 			fObject = pointer->Get();
 		}
 	}
@@ -142,6 +153,11 @@ public:
 		return *fObject;
 	}
 
+	operator Type*() const
+	{
+		return fObject;
+	}
+
 	Type* operator->() const
 	{
 		return fObject;
@@ -149,6 +165,9 @@ public:
 
 	WeakReference& operator=(const WeakReference<Type>& other)
 	{
+		if (this == &other)
+			return *this;
+
 		SetTo(other.fPointer);
 		return *this;
 	}
@@ -156,6 +175,18 @@ public:
 	WeakReference& operator=(const Type& other)
 	{
 		SetTo(&other);
+		return *this;
+	}
+
+	WeakReference& operator=(WeakPointer<Type>& other)
+	{
+		SetTo(&other);
+		return *this;
+	}
+
+	WeakReference& operator=(WeakPointer<Type>* other)
+	{
+		SetTo(other);
 		return *this;
 	}
 
@@ -170,7 +201,7 @@ public:
 	}
 
 private:
-	WeakPointer*	fPointer;
+	WeakPointer<Type>*	fPointer;
 	Type*			fObject;
 };
 
@@ -178,23 +209,25 @@ private:
 //	#pragma mark -
 
 
-inline WeakReferenceable*
-WeakPointer::Get()
+template<typename Type>
+inline Type*
+WeakPointer<Type>::Get()
 {
-	int32 count;
+	int32 count = -11;
 
 	do {
-		count = fUseCount;
+		count = atomic_get(&fUseCount);
 		if (count == 0)
 			return NULL;
-	} while (atomic_test_and_set(&fUseCount, count, count + 1) != count);
+	} while (atomic_test_and_set(&fUseCount, count + 1, count) != count);
 
 	return fObject;
 }
 
 
+template<typename Type>
 inline bool
-WeakPointer::Put()
+WeakPointer<Type>::Put()
 {
 	if (atomic_add(&fUseCount, -1) == 1) {
 		delete fObject;
@@ -205,15 +238,17 @@ WeakPointer::Put()
 }
 
 
+template<typename Type>
 inline int32
-WeakPointer::UseCount() const
+WeakPointer<Type>::UseCount() const
 {
 	return fUseCount;
 }
 
 
+template<typename Type>
 inline
-WeakPointer::WeakPointer(WeakReferenceable* object)
+WeakPointer<Type>::WeakPointer(Type* object)
 	:
 	fUseCount(1),
 	fObject(object)
@@ -221,14 +256,16 @@ WeakPointer::WeakPointer(WeakReferenceable* object)
 }
 
 
+template<typename Type>
 inline
-WeakPointer::~WeakPointer()
+WeakPointer<Type>::~WeakPointer()
 {
 }
 
 
+template<typename Type>
 inline bool
-WeakPointer::_GetUnchecked()
+WeakPointer<Type>::_GetUnchecked()
 {
 	return atomic_add(&fUseCount, 1) == 1;
 }
@@ -237,16 +274,26 @@ WeakPointer::_GetUnchecked()
 //	#pragma -
 
 
+template<typename Type>
 inline
-WeakReferenceable::WeakReferenceable()
+WeakReferenceable<Type>::WeakReferenceable(Type* object)
 	:
-	fPointer(new WeakPointer(this))
+	fPointer(new WeakPointer<Type>(object))
 {
 }
 
 
-inline WeakPointer*
-WeakReferenceable::GetWeakPointer()
+template<typename Type>
+inline
+WeakReferenceable<Type>::~WeakReferenceable()
+{
+	fPointer->RemoveReference();
+}
+
+
+template<typename Type>
+inline WeakPointer<Type>*
+WeakReferenceable<Type>::GetWeakPointer()
 {
 	fPointer->AddReference();
 	return fPointer;
