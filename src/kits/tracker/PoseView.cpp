@@ -2819,6 +2819,10 @@ BPoseView::SetViewMode(uint32 newMode)
 				// it is going out of view for example
 				RemoveFromVSList(pose);
 				newPoseList.AddItem(pose);
+			} else if (iconSizeChanged) {
+				// The pose location is still changed in view coordinates,
+				// so it needs to be changed anyways!
+				pose->SetSaveLocation();
 			} else if (mapIcons) {
 				MapToNewIconMode(pose, oldGrid, oldOffset);
 			}
