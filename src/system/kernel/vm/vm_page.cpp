@@ -1116,17 +1116,20 @@ PageWriterRun::Go()
 			move_page_to_active_or_inactive_queue(page, true);
 			page->busy_writing = false;
 		} else {
-			// We don't have to put the PAGE_MODIFIED bit back, as it's
-			// still in the modified pages list.
+			// Writing failed, so move the page back to the modified queue.
 			{
 				InterruptsSpinLocker locker(sPageLock);
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&sModifiedPageQueue, page);
 			}
+
 			if (!page->busy_writing) {
-				// someone has cleared the busy_writing flag which tells
-				// us our page has gone invalid
+				// Someone has cleared the busy_writing flag which tells
+				// us our page has gone invalid. We need to remove it from the
+				// cache and free it completely.
+				vm_remove_all_page_mappings(page, NULL);
 				cache->RemovePage(page);
+				vm_page_free(cache, page);
 			} else
 				page->busy_writing = false;
 		}
@@ -1519,6 +1522,7 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 			continue;
 		}
 
+		int oldPageState = page->state;
 		page->state = PAGE_STATE_BUSY;
 		page->busy_writing = true;
 
@@ -1542,6 +1546,14 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 		status_t status = write_page(page, 0, NULL);
 		cache->Lock();
 
+		// Before disabling interrupts handle part of the special case that
+		// writing the page failed due the cache having been shrunk. We need to
+		// remove the page from the cache and free it.
+		if (status != B_OK && !page->busy_writing) {
+			vm_remove_all_page_mappings(page, NULL);
+			cache->RemovePage(page);
+		}
+
 		InterruptsSpinLocker locker(&sPageLock);
 
 		if (status == B_OK) {
@@ -1549,23 +1561,31 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 			move_page_to_active_or_inactive_queue(page, dequeuedPage);
 			page->busy_writing = false;
 		} else {
-			// We don't have to put the PAGE_MODIFIED bit back, as it's still
-			// in the modified pages list.
+			// Writing the page failed -- move to the modified queue. If we
+			// dequeued it from there, just enqueue it again, otherwise set the
+			// page set explicitly, which will take care of moving between the
+			// queues.
 			if (dequeuedPage) {
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&sModifiedPageQueue, page);
+			} else {
+				page->state = oldPageState;
+				set_page_state_nolock(page, PAGE_STATE_MODIFIED);
 			}
 
 			if (!page->busy_writing) {
-				// someone has cleared the busy_writing flag which tells
-				// us our page has gone invalid
-				cache->RemovePage(page);
-			} else {
-				if (!dequeuedPage)
-					set_page_state_nolock(page, PAGE_STATE_MODIFIED);
+				// The busy_writing flag was cleared. That means the cache has
+				// been shrunk while we were trying to write the page and we
+				// have to free it now.
 
+				// Adjust temporary modified pages count, if necessary.
+				if (dequeuedPage && cache->temporary)
+					sModifiedTemporaryPages--;
+
+				// free the page
+				set_page_state_nolock(page, PAGE_STATE_FREE);
+			} else
 				page->busy_writing = false;
-			}
 		}
 
 		busyCondition.Unpublish();
