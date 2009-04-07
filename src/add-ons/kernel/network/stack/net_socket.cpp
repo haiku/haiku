@@ -307,7 +307,8 @@ dump_socket(int argc, char** argv)
 	kprintf("SOCKET %p\n", socket);
 	kprintf("  family.type.protocol: %d.%d.%d\n",
 		socket->family, socket->type, socket->protocol);
-	kprintf("  parent:               %p\n", socket->parent);
+	WeakReference<net_socket_private> parent = socket->parent;
+	kprintf("  parent:               %p (%p)\n", parent.Get(), socket->parent);
 	kprintf("  first protocol:       %p\n", socket->first_protocol);
 	kprintf("  first module_info:    %p\n", socket->first_info);
 	kprintf("  options:              %x\n", socket->options);
