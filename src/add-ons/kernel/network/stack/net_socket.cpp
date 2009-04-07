@@ -51,6 +51,8 @@ struct net_socket_private
 
 	struct select_sync_pool*	select_pool;
 	mutex						lock;
+
+	bool						is_connected;
 };
 
 
@@ -221,6 +223,16 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 
 #ifdef ADD_DEBUGGER_COMMANDS
 
+static void
+print_socket_line(net_socket_private* socket, const char* prefix)
+{
+	kprintf("%s%p %2d.%2d.%2d %6ld %p %p  %p%s\n", prefix, socket,
+		socket->family, socket->type, socket->protocol, socket->owner,
+		socket->first_protocol, socket->first_info, socket->parent,
+		socket->parent != NULL ? socket->is_connected ? " (c)" : " (p)" : "");
+}
+
+
 static int
 dump_socket(int argc, char** argv)
 {
@@ -242,6 +254,7 @@ dump_socket(int argc, char** argv)
 	kprintf("  bound to device:      %d\n", socket->bound_to_device);
 	kprintf("  owner:                %ld\n", socket->owner);
 	kprintf("  max backlog:          %ld\n", socket->max_backlog);
+	kprintf("  is connected:         %d\n", socket->is_connected);
 	kprintf("  child_count:          %lu\n", socket->child_count);
 	
 	if (socket->child_count == 0)
@@ -250,13 +263,13 @@ dump_socket(int argc, char** argv)
 	kprintf("    pending children:\n");
 	SocketList::Iterator iterator = socket->pending_children.GetIterator();
 	while (net_socket_private* child = iterator.Next()) {
-		kprintf("      %p\n", child);
+		print_socket_line(child, "      ");
 	}
 
 	kprintf("    connected children:\n");
 	iterator = socket->connected_children.GetIterator();
 	while (net_socket_private* child = iterator.Next()) {
-		kprintf("      %p\n", child);
+		print_socket_line(child, "      ");
 	}
 
 	return 0;
@@ -270,9 +283,18 @@ dump_sockets(int argc, char** argv)
 
 	SocketList::Iterator iterator = sSocketList.GetIterator();
 	while (net_socket_private* socket = iterator.Next()) {
-		kprintf("%p %2d.%2d.%2d %6ld %p %p  %p\n", socket,
-			socket->family, socket->type, socket->protocol, socket->owner,
-			socket->first_protocol, socket->first_info, socket->parent);
+		print_socket_line(socket, "");
+		
+		SocketList::Iterator childIterator
+			= socket->pending_children.GetIterator();
+		while (net_socket_private* child = childIterator.Next()) {
+			print_socket_line(child, " ");
+		}
+
+		childIterator = socket->connected_children.GetIterator();
+		while (net_socket_private* child = childIterator.Next()) {
+			print_socket_line(child, " ");
+		}
 	}
 
 	return 0;
@@ -552,9 +574,22 @@ void
 socket_delete(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
+	net_socket_private* parent = (net_socket_private*)socket->parent;
 
-	if (socket->parent != NULL)
-		panic("socket still has a parent!");
+	if (parent != NULL) {
+		// The socket still has a parent
+		// TODO: we need to make sure our parent isn't deleted right now,
+		//   or in the process of deleting its children...
+		MutexLocker _(parent->lock);
+
+		if (socket->is_connected)
+			parent->connected_children.Remove(socket);
+		else
+			parent->pending_children.Remove(socket);
+
+		parent->child_count--;
+		socket->parent = NULL;
+	}
 
 	mutex_lock(&sSocketLock);
 	sSocketList.Remove(socket);
@@ -565,6 +600,7 @@ socket_delete(net_socket* _socket)
 	delete_children(socket->connected_children);
 
 	put_domain_protocols(socket);
+
 	mutex_destroy(&socket->lock);
 	delete socket;
 }
@@ -652,6 +688,7 @@ socket_connected(net_socket* socket)
 
 	parent->pending_children.Remove((net_socket_private*)socket);
 	parent->connected_children.Add((net_socket_private*)socket);
+	((net_socket_private*)socket)->is_connected = true;
 
 	// notify parent
 	if (parent->select_pool)
