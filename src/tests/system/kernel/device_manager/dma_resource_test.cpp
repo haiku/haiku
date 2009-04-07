@@ -189,26 +189,11 @@ do_io(void* data, IOOperation* operation)
 		const iovec& vec = operation->Vecs()[i];
 		addr_t base = (addr_t)vec.iov_base;
 		size_t length = vec.iov_len;
-		size_t pageOffset = base % B_PAGE_SIZE;
 
-		while (length > 0) {
-			size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
-
-			uint8* virtualAddress;
-			vm_get_physical_page(base - pageOffset, (addr_t*)&virtualAddress,
-				PHYSICAL_PAGE_NO_WAIT);
-
-			if (operation->IsWrite())
-				memcpy(disk + offset, virtualAddress + pageOffset, toCopy);
-			else
-				memcpy(virtualAddress + pageOffset, disk + offset, toCopy);
-
-			vm_put_physical_page((addr_t)virtualAddress);
-
-			length -= toCopy;
-			offset += toCopy;
-			pageOffset = 0;
-		}
+		if (operation->IsWrite())
+			vm_memcpy_from_physical(disk + offset, base, length, false);
+		else
+			vm_memcpy_to_physical(base, disk + offset, length, false);
 	}
 
 	if (sIOScheduler != NULL)
