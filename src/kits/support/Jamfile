@@ -18,4 +18,5 @@ MergeObject <libbe>support_kit.o :
 	Referenceable.cpp
 	StopWatch.cpp
 	String.cpp
+	WeakReferenceable.cpp
 ;
