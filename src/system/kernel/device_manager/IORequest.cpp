@@ -246,9 +246,12 @@ IOOperation::Finish()
 
 		status_t error = B_OK;
 
+		// We iterate through the vecs we have read, moving offset (the device
+		// offset) as we go. If [offset, offset + vec.iov_len) intersects with
+		// [startOffset, endOffset) we copy to the final location.
 		off_t offset = fOffset;
-		off_t startOffset = fOriginalOffset;
-		off_t endOffset = fOriginalOffset + fOriginalLength;
+		const off_t startOffset = fOriginalOffset;
+		const off_t endOffset = fOriginalOffset + fOriginalLength;
 
 		for (uint32 i = 0; error == B_OK && i < vecCount; i++) {
 			const iovec& vec = vecs[i];
@@ -256,21 +259,28 @@ IOOperation::Finish()
 			size_t length = vec.iov_len;
 
 			if (offset < startOffset) {
+				// If the complete vector is before the start offset, skip it.
 				if (offset + length <= startOffset) {
 					offset += length;
 					continue;
 				}
 
+				// The vector starts before the start offset, but intersects
+				// with it. Skip the part we aren't interested in.
 				size_t diff = startOffset - offset;
+				offset += diff;
 				base += diff;
 				length -= diff;
 			}
 
 			if (offset + length > endOffset) {
+				// If we're already beyond the end offset, we're done.
 				if (offset >= endOffset)
 					break;
 
+				// The vector extends beyond the end offset -- cut it.
 				length = endOffset - offset;
+				length -= offset + length - endOffset;
 			}
 
 			if (base >= bounceBufferStart && base < bounceBufferEnd) {
