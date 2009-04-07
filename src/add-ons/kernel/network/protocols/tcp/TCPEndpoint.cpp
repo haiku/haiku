@@ -711,7 +711,7 @@ TCPEndpoint::Unbind(struct sockaddr *address)
 {
 	TRACE("Unbind()");
 
-	MutexLocker lock(fLock);
+	MutexLocker _(fLock);
 	return fManager->Unbind(this);
 }
 
@@ -721,7 +721,7 @@ TCPEndpoint::Listen(int count)
 {
 	TRACE("Listen()");
 
-	MutexLocker lock(fLock);
+	MutexLocker _(fLock);
 
 	if (fState != CLOSED)
 		return B_BAD_VALUE;
@@ -731,11 +731,13 @@ TCPEndpoint::Listen(int count)
 		return ENOBUFS;
 
 	status_t status = fManager->SetPassive(this);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		delete_sem(fAcceptSemaphore);
 		fAcceptSemaphore = -1;
 		return status;
 	}
+
+	gSocketModule->set_max_backlog(socket, count);
 
 	fState = LISTEN;
 	T(State(this));
@@ -1179,8 +1181,8 @@ TCPEndpoint::_MarkEstablished()
 status_t
 TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
-// TODO: Checking for CLOSED seems correct, but breaks several neon tests.
-// When investigating this, also have a look at _Close() and _HandleReset().
+	// TODO: Checking for CLOSED seems correct, but breaks several neon tests.
+	// When investigating this, also have a look at _Close() and _HandleReset().
 	while (fState < ESTABLISHED/* && fState != CLOSED*/) {
 		if (socket->error != B_OK)
 			return socket->error;
@@ -1208,6 +1210,15 @@ TCPEndpoint::_Close()
 
 	fSendList.Signal();
 	_NotifyReader();
+
+	if (socket->parent != NULL) {
+		// We still have a parent - obviously, we haven't been accepted yet,
+		// so no one could ever close us.
+		// Since we can't just delete ourself here, we trigger an immediate
+		// time-wait timer.
+		_CancelConnectionTimers();
+		gStackModule->set_timer(&fTimeWaitTimer, 0);
+	}
 }
 
 
