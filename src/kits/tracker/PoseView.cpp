@@ -4502,7 +4502,11 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	if (!createLink && !createRelativeLink && (*srcWindow->PoseView()->TargetModel()->NodeRef()
 		== *destFolder->NodeRef())) {
 		BPoseView *targetView = srcWindow->PoseView();
-
+		if (forceCopy) {
+			targetView->DuplicateSelection(&clickPt, &loc);
+			return;
+		}
+		
 		if (targetView->ViewMode() == kListMode)                    // can't move in list view
 			return;
 		
