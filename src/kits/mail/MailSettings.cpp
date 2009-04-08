@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -10,14 +10,15 @@
 
 #include <MailSettings.h>
 
-#include <Message.h>
-#include <FindDirectory.h>
 #include <Directory.h>
-#include <File.h>
 #include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Message.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <String.h>
-#include <Messenger.h>
+#include <Window.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -34,9 +35,8 @@ namespace MailInternal {
 
 //	#pragma mark - Chain methods
 
-//
-// To do
-//
+
+// TODO!
 BMailChain*
 NewMailChain()
 {
@@ -220,7 +220,7 @@ BMailSettings::Reload()
 			path.Path(), strerror(ret));
 		return ret;
 	}
-	
+
 	// clobber old settings
 	data = tmp;
 	return B_OK;
@@ -312,7 +312,11 @@ BMailSettings::SetStatusWindowFrame(BRect frame)
 int32
 BMailSettings::StatusWindowWorkspaces()
 {
-	return data.FindInt32("StatusWindowWorkSpace");
+	uint32 workspaces;
+	if (data.FindInt32("StatusWindowWorkSpace", (int32*)&workspaces) != B_OK)
+		return B_ALL_WORKSPACES;
+
+	return workspaces;
 }
 
 
