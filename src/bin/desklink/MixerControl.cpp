@@ -11,6 +11,8 @@
 
 #include "MixerControl.h"
 
+#include <string.h>
+
 #include <Debug.h>
 #include <ParameterWeb.h>
 
