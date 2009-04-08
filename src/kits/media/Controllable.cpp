@@ -116,13 +116,12 @@ BControllable::SetParameterWeb(BParameterWeb *web)
 	fWeb = web;
 
 	if (fWeb)
-		fWeb->mNode = Node(); // initialize BParameterWeb member variable
+		fWeb->fNode = Node(); // initialize BParameterWeb member variable
 		
 	UnlockParameterWeb();
 	if (old != web && web != 0)
 		BPrivate::media::notifications::WebChanged(Node());
-	if (old)
-		delete old;
+	delete old;
 	return B_OK;
 }
 
