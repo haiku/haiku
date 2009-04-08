@@ -15,25 +15,12 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 UsePrivateHeaders shared ;
 
 # TODO(bga): E-mail preferences does not really need to link against the
-# OpenSSL libraries. Remove this after problems with the runtile loader are
+# OpenSSL libraries. Remove this after problems with the runtime loader are
 # sorted up. Details here:
 #
 # http://www.freelists.org/post/haiku-development/Runtime-loader-problem
 
-local sslDir ;
-
-if $(USE_SSL) {
-	SubDirC++Flags -DUSE_SSL ;
-	if ! $(SSL_DIR) {
-		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
-	} else {
-		sslDir = $(SSL_DIR) ;
-	}
-	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
-}
-
-
-Preference E-mail :
+local sources =
 	Account.cpp
 	AutoConfig.cpp
 	AutoConfigWindow.cpp
@@ -42,18 +29,30 @@ Preference E-mail :
 	ConfigViews.cpp
 	ConfigWindow.cpp
 	DNSQuery.cpp
-	main.cpp 
-	: be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB)
-	: e-mail.rdef
-	;
+	main.cpp
+;
 
-if $(USE_SSL) {
-	LinkAgainst E-mail : $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DUSE_SSL ;
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
 }
 
+Preference E-mail
+	: $(sources)
+	: be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB)
+		$(HAIKU_OPENSSL_LIBS)
+	: e-mail.rdef
+;
+
 Package haiku-maildaemon-cvs :
-	E-mail : 
-	boot beos preferences ;
+	E-mail :
+	boot beos preferences
+;
 
 SubInclude HAIKU_TOP src preferences mail ProviderInfo ;
-

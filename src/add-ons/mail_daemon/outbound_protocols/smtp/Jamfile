@@ -11,26 +11,30 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-if $(USE_SSL) {
-	SubDirC++Flags -DUSE_SSL ;
-	if ! $(SSL_DIR) {
-		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
-	} else {
-		sslDir = $(SSL_DIR) ;
-	}
-	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
-}
-
-Addon SMTP :
+local sources =
 	smtp.cpp
-	md5c.c ;
+	md5c.c
+;
 
-LinkAgainst SMTP : be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) ;
-
-if $(USE_SSL) {
-	LinkAgainst SMTP : $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
+# use OpenSSL, if enabled
+if $(HAIKU_OPENSSL_ENABLED) {
+	SubDirC++Flags -DUSE_SSL ;
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
 }
+
+Addon SMTP
+	: $(sources)
+	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
+		$(HAIKU_OPENSSL_LIBS)
+;
 
 Package haiku-maildaemon-cvs :
 	SMTP :
-	boot home config add-ons mail_daemon outbound_protocols ;
+	boot home config add-ons mail_daemon outbound_protocols
+;

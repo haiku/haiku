@@ -1,0 +1,47 @@
+# This file contains setup for features that can optionally be used for the
+# build. For features that require downloading a zip file from somewhere it is
+# likely the same file use for an optional package.
+
+
+# SSL
+
+# Automatically enable the SSL feature, when the optional OpenSSL optional
+# package is enabled.
+if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
+	HAIKU_BUILD_FEATURE_SSL = 1 ;
+}
+
+local baseURL = http://haiku-files.org/files/optional-packages ;
+HAIKU_OPENSSL_PACKAGE = openssl-0.9.8j-gcc2-2009-01-28 ;
+HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE).zip ;
+
+if $(HAIKU_BUILD_FEATURE_SSL) {
+	if $(TARGET_ARCH) != x86 {
+		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
+	} else {
+		# Download the zip archive.
+		local zipFile = [ DownloadOptionalPackage $(HAIKU_OPENSSL_PACKAGE)
+			: $(HAIKU_OPENSSL_URL) ] ;
+
+		# zip file and output directory
+		HAIKU_OPENSSL_ZIP_FILE = $(zipFile) ;
+		HAIKU_OPENSSL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_OPENSSL_PACKAGE) ] ;
+
+		# unzip headers and libraries
+		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ UnzipArchive $(HAIKU_OPENSSL_DIR)
+			: common/include/ : $(zipFile)
+		] ;
+
+		HAIKU_OPENSSL_LIBS = [ UnzipArchive $(HAIKU_OPENSSL_DIR)
+			:
+			common/lib/libcrypto.so
+			common/lib/libssl.so
+			: $(zipFile)
+		] ;
+
+		HAIKU_OPENSSL_ENABLED = 1 ;
+		HAIKU_OPENSSL_HEADERS
+			= [ FDirName $(HAIKU_OPENSSL_DIR) common include ] ;
+	}
+}

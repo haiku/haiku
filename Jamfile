@@ -132,6 +132,11 @@ Depends ScreenSaverKit :
 	Haiku
 ;
 
+# Evaluate optional package dependencies and prepare the optional build
+# features before parsing the Jamfile tree.
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
+
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {
 	# Don't include "src", but at least include the stuff needed for the

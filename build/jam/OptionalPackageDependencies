@@ -1,0 +1,9 @@
+# package dependencies
+
+OptionalPackageDependencies APR-util : APR ;
+OptionalPackageDependencies BeHappy : BeBook NetSurf ;
+OptionalPackageDependencies Development : Perl ;
+OptionalPackageDependencies LibLayout : Development ;
+OptionalPackageDependencies NetSurf : OpenSSL ;
+OptionalPackageDependencies OpenSSH : OpenSSL ;
+OptionalPackageDependencies Subversion : OpenSSL ;

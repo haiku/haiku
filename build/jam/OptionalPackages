@@ -43,16 +43,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Yasm
 
 
-# package dependencies
-OptionalPackageDependencies APR-util : APR ;
-OptionalPackageDependencies BeHappy : BeBook NetSurf ;
-OptionalPackageDependencies Development : Perl ;
-OptionalPackageDependencies LibLayout : Development ;
-OptionalPackageDependencies NetSurf : OpenSSL ;
-OptionalPackageDependencies OpenSSH : OpenSSL ;
-OptionalPackageDependencies Subversion : OpenSSL ;
-
-
 # APR
 if [ IsOptionalHaikuImagePackageAdded APR ] {
 	if $(TARGET_ARCH) != x86 {
@@ -446,14 +436,12 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
 	} else {
-		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage openssl-0.9.8j-gcc2-2009-01-28
-			: $(baseURL)/openssl-0.9.8j-gcc2-2009-01-28.zip
+		InstallOptionalHaikuImagePackage $(HAIKU_OPENSSL_PACKAGE)
+			: $(HAIKU_OPENSSL_URL)
 			:
 		;
 	}
 }
-
 
 
 # P7zip
@@ -479,8 +467,6 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 		AddFilesToHaikuImage home config etc : expander.rules ;
 	}
 }
-
-
 
 
 # Pe text editor

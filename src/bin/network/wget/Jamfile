@@ -1,27 +1,33 @@
 SubDir HAIKU_TOP src bin network wget ;
 
 UseHeaders [ FDirName $(SUBDIR) src ] : true ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
 
 local defines = [ FDefines HAVE_CONFIG_H=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
-local SSL_FILES ;
-local SSL_LIBS ;
 
-if $(USE_SSL) {
+# use OpenSSL, if enabled
+local sslSources ;
+
+if $(HAIKU_OPENSSL_ENABLED) {
 	SubDirCcFlags -DHAVE_LIBSSL ;
-	if ! $(SSL_DIR) {
-		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl common ] ;
-	} else {
-		sslDir = $(SSL_DIR) ;
-	}
-	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
-	SSL_FILES = openssl.c ;
-	SSL_LIBS = $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
-} 
+	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	sslSources = openssl.c ;
+	Includes [ FGristFiles $(sslSources) ]
+		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+	SetupFeatureObjectsDir ssl ;
+} else {
+	SetupFeatureObjectsDir no-ssl ;
+}
+
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
+	# needs to be invoked after SetupFeatureObjectsDir
+
 
 BinCommand wget :
 	cmpt.c
@@ -55,6 +61,6 @@ BinCommand wget :
 	utils.c
 	version.c
 	xmalloc.c
-	$(SSL_FILES)
-	: $(TARGET_NETWORK_LIBS) $(SSL_LIBS)
+	$(sslSources)
+	: $(TARGET_NETWORK_LIBS) $(HAIKU_OPENSSL_LIBS)
 ;

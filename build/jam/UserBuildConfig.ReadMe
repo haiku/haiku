@@ -49,6 +49,11 @@ AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
 # has no effect on executables or other shared objects.
 DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
 
+# Enables the SSL build feature. Several targets will be compiled with SSL
+# support. Adding the OpenSSL optional package will automatically enable this
+# feature.
+HAIKU_BUILD_FEATURE_SSL = 1 ;
+
 
 # Haiku Image Related Modifications
 
