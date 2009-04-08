@@ -732,7 +732,7 @@ socket_connected(net_socket* _socket)
 	net_socket_private* socket = (net_socket_private*)_socket;
 
 	WeakReference<net_socket_private> parent = socket->parent;
-	if (socket->parent == NULL)
+	if (parent.Get() == NULL)
 		return B_BAD_VALUE;
 
 	MutexLocker _(parent->lock);
@@ -758,7 +758,7 @@ socket_aborted(net_socket* _socket)
 	net_socket_private* socket = (net_socket_private*)_socket;
 
 	WeakReference<net_socket_private> parent = socket->parent;
-	if (socket->parent == NULL)
+	if (parent.Get() == NULL)
 		return B_BAD_VALUE;
 
 	MutexLocker _(parent->lock);
