@@ -206,7 +206,6 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fViewState(new BViewState),
 	fStateNeedsSaving(false),
 	fCountView(NULL),
-	fUpdateRegion(new BRegion),				// does this need to be allocated ??
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
@@ -257,7 +256,6 @@ BPoseView::~BPoseView()
 	delete fSelectionList;
 	delete fMimeTypeList;
 	delete fZombieList;
-	delete fUpdateRegion;
 	delete fViewState;
 	delete fModel;
 	delete fKeyRunner;
@@ -1122,8 +1120,8 @@ BPoseView::AddPoses(Model *model)
 	if (model)
 		params->ref = *model->EntryRef();
 
-	thread_id addPosesThread = spawn_thread(&BPoseView::AddPosesTask, "add poses",
-			B_DISPLAY_PRIORITY, params);
+	thread_id addPosesThread = spawn_thread(&BPoseView::AddPosesTask,
+		"add poses", B_DISPLAY_PRIORITY, params);
 
 	if (addPosesThread >= B_OK) {
 		fAddPosesThreads.insert(addPosesThread);
@@ -1308,8 +1306,8 @@ BPoseView::AddPosesTask(void *castToParams)
 			}
 
 			if (!view->IsValidAddPosesThread(threadID)) {
-				// this handles the case of a file panel when the directory is switched
-				// and and old AddPosesTask needs to die.
+				// this handles the case of a file panel when the directory is
+				// switched and and old AddPosesTask needs to die.
 				// we might no longer be the current async thread
 				// for this view - if not then we're done
 				view->HideBarberPole();
@@ -1320,20 +1318,24 @@ BPoseView::AddPosesTask(void *castToParams)
 			}
 
 			if (count) {
-					// try to watch the model, no matter what
+				// try to watch the model, no matter what
 
 				if (result != B_OK) {
-					// failed to init pose, model is a zombie, add to zombie list
-					PRINT(("1 adding model %s to zombie list, error %s\n", model->Name(),
-						strerror(model->InitCheck())));
+					// failed to init pose, model is a zombie, add to zombie
+					// list
+					PRINT(("1 adding model %s to zombie list, error %s\n",
+						model->Name(), strerror(model->InitCheck())));
 					view->fZombieList->AddItem(model);
 					continue;
 				}
 
-				view->ReadPoseInfo(model, &(posesResult->fPoseInfos[modelChunkIndex]));
-				if (!view->ShouldShowPose(model, &(posesResult->fPoseInfos[modelChunkIndex]))
+				view->ReadPoseInfo(model,
+					&(posesResult->fPoseInfos[modelChunkIndex]));
+				if (!view->ShouldShowPose(model,
+						&(posesResult->fPoseInfos[modelChunkIndex]))
 					// filter out models we do not want to show
-					|| model->IsSymLink() && !view->CreateSymlinkPoseTarget(model)) {
+					|| model->IsSymLink()
+						&& !view->CreateSymlinkPoseTarget(model)) {
 					// filter out symlinks whose target models we do not
 					// want to show
 
@@ -1352,7 +1354,8 @@ BPoseView::AddPosesTask(void *castToParams)
 
 			bigtime_t now = system_time();
 
-			if (!count || modelChunkIndex >= kMaxAddPosesChunk || now > nextChunkTime) {
+			if (!count || modelChunkIndex >= kMaxAddPosesChunk
+				|| now > nextChunkTime) {
 				// keep getting models until we get <kMaxAddPosesChunk> of them
 				// or until 300000 runs out
 
@@ -1579,18 +1582,22 @@ BPoseView::CreatePose(Model *model, PoseInfo *poseInfo, bool insertionSort,
 
 
 void
-BPoseView::FinishPendingScroll(float &listViewScrollBy, BRect bounds)
+BPoseView::FinishPendingScroll(float &listViewScrollBy, BRect srcRect)
 {
-	if (!listViewScrollBy)
+	if (listViewScrollBy == 0.0)
 		return;
 
-	BRect srcRect(bounds);
-	BRect dstRect = srcRect;
-	srcRect.bottom -= listViewScrollBy;
-	dstRect.top += listViewScrollBy;
-	CopyBits(srcRect, dstRect);
-	listViewScrollBy = 0;
-	srcRect.bottom = dstRect.top;
+	// copy top contents to bottom and
+	// redraw from top to top of part that could be copied
+
+	if (srcRect.Width() > listViewScrollBy) {
+		BRect dstRect = srcRect;
+		srcRect.bottom -= listViewScrollBy;
+		dstRect.top += listViewScrollBy;
+		CopyBits(srcRect, dstRect);
+		listViewScrollBy = 0;
+		srcRect.bottom = dstRect.top;
+	}
 	SynchronousUpdate(srcRect);
 }
 
@@ -1636,7 +1643,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			fInsertedNodes.insert(*(model->NodeRef()));
 		}
 
-		if ((clipboardMode = FSClipboardFindNodeMode(model,false,true)) != 0
+		if ((clipboardMode = FSClipboardFindNodeMode(model, false, true)) != 0
 			&& !HasPosesInClipboard()) {
 			SetHasPosesInClipboard(true);
 		}
@@ -1672,22 +1679,40 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 					if (orientation == kInsertAfter)
 						poseIndex++;
 
-					poseBounds = CalcPoseRect(pose, poseIndex);
+					poseBounds = CalcPoseRectList(pose, poseIndex);
 					havePoseBounds = true;
 					BRect srcRect(Extent());
 					srcRect.top = poseBounds.top;
 					srcRect = srcRect & viewBounds;
 					BRect destRect(srcRect);
 					destRect.OffsetBy(0, fListElemHeight);
+					// special case the addition of a pose that scrolls
+					// the extent into the view for the first time:
+					if (destRect.bottom > viewBounds.top
+						&& destRect.top > destRect.bottom) {
+						// make destRect valid
+						destRect.top = viewBounds.top;
+					}
 
 					if (srcRect.Intersects(viewBounds)
 						|| destRect.Intersects(viewBounds)) {
+						// The visual area is affected by the insertion.
+						// If items have been added above the visual area,
+						// delay the scrolling. srcRect.bottom holds the
+						// current Extent(). So if the bottom is still above
+						// the viewBounds top, it means the view is scrolled
+						// to show the area below the items that have already
+						// been added.
 						if (srcRect.top == viewBounds.top
-							&& srcRect.bottom == viewBounds.bottom) {
+							&& srcRect.bottom >= viewBounds.top) {
 							// if new pose above current view bounds, cache up
 							// the draw and do it later
 							listViewScrollBy += fListElemHeight;
 							forceDraw = false;
+						} else if (!srcRect.IsValid()) {
+							// nothing to be scrolled, but extent became
+							// visible
+							SynchronousUpdate(destRect);
 						} else {
 							FinishPendingScroll(listViewScrollBy, viewBounds);
 							fPoseList->AddItem(pose, poseIndex);
@@ -1696,8 +1721,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 							CopyBits(srcRect, destRect);
 							srcRect.bottom = destRect.top;
 
-							//SynchronousUpdate(srcRect);
-							Invalidate(srcRect);
+							SynchronousUpdate(srcRect);
 						}
 					}
 				}
@@ -1708,7 +1732,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 				if (forceDraw) {
 					if (!havePoseBounds)
-						poseBounds = CalcPoseRect(pose, poseIndex);
+						poseBounds = CalcPoseRectList(pose, poseIndex);
 		 			if (viewBounds.Intersects(poseBounds))
 						Invalidate(poseBounds);
 				}
@@ -1862,7 +1886,7 @@ BPoseView::InsertPoseAfter(BPose *pose, int32 *index, int32 orientation,
 	BRect bounds(Bounds());
 	// copy the good bits in the list
 	BRect srcRect(Extent());
-	srcRect.top = CalcPoseRect(pose, *index).top;
+	srcRect.top = CalcPoseRectList(pose, *index).top;
 	srcRect = srcRect & bounds;
 	BRect destRect(srcRect);
 	destRect.OffsetBy(0, fListElemHeight);
@@ -1992,11 +2016,13 @@ BPoseView::MessageReceived(BMessage *message)
 		{
 			AddPosesResult *currentPoses;
 			entry_ref ref;
-			message->FindPointer("currentPoses", reinterpret_cast<void **>(&currentPoses));
+			message->FindPointer("currentPoses",
+				reinterpret_cast<void **>(&currentPoses));
 			message->FindRef("ref", &ref);
 
-			// check if CreatePoses should be called (abort if dir has been switched
-			// under normal circumstances, ignore in several special cases
+			// check if CreatePoses should be called (abort if dir has been
+			// switched under normal circumstances, ignore in several special
+			// cases
 			if (AddPosesThreadValid(&ref)) {
 				CreatePoses(currentPoses->fModels, currentPoses->fPoseInfos,
 					currentPoses->fCount, NULL, true, 0, 0, true);
@@ -2829,6 +2855,11 @@ BPoseView::SetViewMode(uint32 newMode)
 		}
 	}
 
+	// invalidate before anything else to avoid flickering, especially when
+	// scrolling is also performed (invalidating before scrolling will cause
+	// app_server to scroll silently, ie not visibly)
+	Invalidate();
+
 	// update origin in case of a list <-> icon mode transition
 	BPoint newOrigin;
 	if (newMode == kListMode)
@@ -2860,7 +2891,6 @@ BPoseView::SetViewMode(uint32 newMode)
 	SetScrollBarsTo(newOrigin);
 	EnableScrollBars();
 	ContainerWindow()->ViewModeChanged(oldMode, newMode);
-	Invalidate();
 }
 
 
@@ -3607,30 +3637,27 @@ BPoseView::SelectPoses(int32 start, int32 end)
 
 
 void
-BPoseView::ScrollIntoView(BPose *pose, int32 index, bool drawOnly)
+BPoseView::ScrollIntoView(BPose *pose, int32 index)
 {
-	BRect poseRect;
+	ScrollIntoView(CalcPoseRect(pose, index, true));
+}
 
-	if (ViewMode() == kListMode)
-		poseRect = CalcPoseRect(pose, index);
-	else
-		poseRect = pose->CalcRect(this);
 
-	if (!IsDesktopWindow() && !drawOnly) {
-		BRect testRect(poseRect);
+void
+BPoseView::ScrollIntoView(BRect poseRect)
+{
+	if (IsDesktopWindow())
+		return;
 
-		if (ViewMode() == kListMode) {
-			// if we're in list view then we only care that the entire
-			// pose is visible vertically, not horizontally
-			testRect.left = 0;
-			testRect.right = testRect.left + 1;
-		}
-		if (!Bounds().Contains(testRect))
-			SetScrollBarsTo(testRect.LeftTop());
+	if (ViewMode() == kListMode) {
+		// if we're in list view then we only care that the entire
+		// pose is visible vertically, not horizontally
+		poseRect.left = 0;
+		poseRect.right = poseRect.left + 1;
 	}
 
-	if (Bounds().Intersects(poseRect))
-		pose->Draw(poseRect, this, false);
+	if (!Bounds().Contains(poseRect))
+		SetScrollBarsTo(poseRect.LeftTop());
 }
 
 
@@ -3652,7 +3679,11 @@ BPoseView::AddPoseToSelection(BPose *pose, int32 index, bool scrollIntoView)
 		pose->Select(true);
 		fSelectionList->AddItem(pose);
 
-		ScrollIntoView(pose, index, !scrollIntoView);
+		BRect poseRect = CalcPoseRect(pose, index);
+		Invalidate(poseRect);
+
+		if (scrollIntoView)
+			ScrollIntoView(poseRect);
 
 		if (fSelectionChangedHook)
 			ContainerWindow()->SelectionChanged();
@@ -5738,7 +5769,7 @@ BPoseView::SelectAll()
 				poseRect = pose->CalcRect(loc, this);
 
 			if (bounds.Intersects(poseRect)) {
-				pose->Draw(poseRect, this, false);
+				pose->Draw(poseRect, bounds, this, false);
 				Flush();
 			}
 		}
@@ -5843,8 +5874,8 @@ BPoseView::SelectMatchingEntries(const BMessage *message)
 
 	// There is room for optimizations here: If regexp-type match, the Matches()
 	// function compiles the expression for every entry. One could use
-	// TrackerString::CompileRegExp and reuse the expression. However, then we have
-	// to take care of the case sensitivity ourselves.
+	// TrackerString::CompileRegExp and reuse the expression. However, then we
+	// have to take care of the case sensitivity ourselves.
 	for (int32 index = 0; index < count; index++) {
 		BPose *pose = fPoseList->ItemAt(index);
 		name = pose->TargetModel()->Name();
@@ -5890,7 +5921,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				if (pose->IsSelected()) {
 					RemovePoseFromSelection(fSelectionList->LastItem());
 					fSelectionPivotPose = pose;
-					ScrollIntoView(pose, index, false);
+					ScrollIntoView(pose, index);
 				} else
 					AddPoseToSelection(pose, index, true);
 			} else
@@ -6333,7 +6364,8 @@ BPoseView::ShowContextMenu(BPoint where)
 
 	window->Activate();
 	window->UpdateIfNeeded();
-	window->ShowContextMenu(where, pose ? pose->TargetModel()->EntryRef() : 0, this);
+	window->ShowContextMenu(where, pose ? pose->TargetModel()->EntryRef() : 0,
+		this);
 
 	if (fSelectionChangedHook)
 		window->SelectionChanged();
@@ -6745,7 +6777,8 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 				BRect poseRect(pose->CalcRect(loc, this, true));
 				if (poseRect.Intersects(inner)) {
 					BPoint offsetBy(-inner.LeftTop().x, -inner.LeftTop().y);
-					pose->Draw(poseRect, this, view, true, 0, offsetBy, false);
+					pose->Draw(poseRect, poseRect, this, view, true, offsetBy,
+						false);
 				}
 			}
 			loc.y += fListElemHeight;
@@ -6765,7 +6798,8 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 					continue;
 
 				BPoint offsetBy(-inner.LeftTop().x, -inner.LeftTop().y);
-				pose->Draw(poseRect, this, view, true, 0, offsetBy, false);
+				pose->Draw(poseRect, poseRect, this, view, true, offsetBy,
+					false);
 			}
 		}
 	}
@@ -6804,7 +6838,7 @@ BPoseView::GetDragRect(int32 clickedPoseIndex)
 	BPose *pose = fPoseList->ItemAt(clickedPoseIndex);
 	if (ViewMode() == kListMode) {
 		// get starting rect of clicked pose
-		result = CalcPoseRect(pose, clickedPoseIndex, true);
+		result = CalcPoseRectList(pose, clickedPoseIndex, true);
 
 		// add rects for visible poses only
 		int32 count = fPoseList->CountItems();
@@ -7309,7 +7343,7 @@ BPoseView::DeletePose(const node_ref *itemNode, BPose *pose, int32 index)
 
 		BRect invalidRect;
 		if (ViewMode() == kListMode)
-			invalidRect = CalcPoseRect(pose, index);
+			invalidRect = CalcPoseRectList(pose, index);
 		else
 			invalidRect = pose->CalcRect(this);
 
@@ -7479,7 +7513,7 @@ BPoseView::OpenSelectionCommon(BPose *clickedPose, int32 *poseIndex,
 	if (clickedPose) {
 		ASSERT(poseIndex);
 		if (ViewMode() == kListMode)
-			DrawOpenAnimation(CalcPoseRect(clickedPose, *poseIndex, true));
+			DrawOpenAnimation(CalcPoseRectList(clickedPose, *poseIndex, true));
 		else
 			DrawOpenAnimation(clickedPose->CalcRect(this));
 	}
@@ -7929,7 +7963,8 @@ BPoseView::ShowSelection(bool show)
 					if (pose->IsSelected() != show || fShowSelectionWhenInactive) {
 						if (!fShowSelectionWhenInactive)
 							pose->Select(show);
-						pose->Draw(BRect(pose->CalcRect(loc, this, false)), this, false);
+						pose->Draw(BRect(pose->CalcRect(loc, this, false)),
+							bounds, this, false);
 					}
 
 				loc.y += fListElemHeight;
@@ -7937,7 +7972,8 @@ BPoseView::ShowSelection(bool show)
 					break;
 			}
 		} else {
-			int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
+			int32 startIndex = FirstIndexAtOrBelow(
+				(int32)(bounds.top - IconPoseHeight()), true);
 			int32 count = fVSPoseList->CountItems();
 			for (int32 index = startIndex; index < count; index++) {
 				BPose *pose = fVSPoseList->ItemAt(index);
@@ -8157,16 +8193,13 @@ BPoseView::UpdateScrollRange()
 void
 BPoseView::DrawPose(BPose *pose, int32 index, bool fullDraw)
 {
-	BRect rect;
-	if (ViewMode() == kListMode)
-		rect = pose->CalcRect(BPoint(0, index * fListElemHeight), this, fullDraw);
-	else
-		rect = pose->CalcRect(this);
+	BRect rect = CalcPoseRect(pose, index, fullDraw);
 
-	if (TrackerSettings().ShowVolumeSpaceBar() && pose->TargetModel()->IsVolume())
+	if (TrackerSettings().ShowVolumeSpaceBar()
+		&& pose->TargetModel()->IsVolume()) {
 		Invalidate(rect);
-	else
-		pose->Draw(rect, this, fullDraw);
+	} else
+		pose->Draw(rect, rect, this, fullDraw);
 }
 
 
@@ -8265,19 +8298,17 @@ BPoseView::SynchronousUpdate(BRect updateRect, bool clip)
 		ConstrainClippingRegion(&updateRegion);
 	}
 
-	FillRect(updateRect, B_SOLID_LOW);
-	DrawViewCommon(updateRect);
+	Invalidate(updateRect);
+	Window()->UpdateIfNeeded();
 
 	if (clip)
-		ConstrainClippingRegion(0);
+		ConstrainClippingRegion(NULL);
 }
 
 
 void
 BPoseView::DrawViewCommon(const BRect &updateRect)
 {
-	GetClippingRegion(fUpdateRegion);
-
 	int32 count = fPoseList->CountItems();
 	if (ViewMode() == kListMode) {
 		int32 startIndex = (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
@@ -8289,7 +8320,7 @@ BPoseView::DrawViewCommon(const BRect &updateRect)
 		for (int32 index = startIndex; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
 			BRect poseRect(pose->CalcRect(loc, this, true));
-			pose->Draw(poseRect, this, true, fUpdateRegion);
+			pose->Draw(poseRect, updateRect, this, true);
 			loc.y += fListElemHeight;
 			if (loc.y >= updateRect.bottom)
 				break;
@@ -8298,8 +8329,8 @@ BPoseView::DrawViewCommon(const BRect &updateRect)
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
 			BRect poseRect(pose->CalcRect(this));
-			if (fUpdateRegion->Intersects(poseRect))
-				pose->Draw(poseRect, this, true, fUpdateRegion);
+			if (updateRect.Intersects(poseRect))
+				pose->Draw(poseRect, updateRect, this, true);
 		}
 	}
 }
@@ -8347,7 +8378,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 		dstRect.OffsetTo(loc);
 
 		BPoint offsetBy(0, -(index * ListElemHeight()));
-		pose->Draw(dstRect, this, offscreenView, true, &updateRegion,
+		pose->Draw(dstRect, updateRect, this, offscreenView, true,
 			offsetBy, pose->IsSelected());
 
 		offscreenView->Sync();
@@ -8409,7 +8440,7 @@ BPoseView::CheckPoseSortOrder(BPose *pose, int32 oldIndex)
 		return;
 	}
 
-	BRect invalidRect(CalcPoseRect(pose, oldIndex));
+	BRect invalidRect(CalcPoseRectList(pose, oldIndex));
 	CloseGapInList(&invalidRect);
 	Invalidate(invalidRect);
 		// need to invalidate for the last item in the list
@@ -9050,7 +9081,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 		for (int32 index = startIndex; index < count; index++) {
 			if (fDropTarget == fPoseList->ItemAt(index)) {
 				BRect poseRect = fDropTarget->CalcRect(loc, this, false);
-				fDropTarget->Draw(poseRect, this, false);
+				fDropTarget->Draw(poseRect, poseRect, this, false);
 				break;
 			}
 
@@ -9066,14 +9097,15 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 			BPose *pose = fVSPoseList->ItemAt(index);
 			if (pose) {
 				if (pose == fDropTarget) {
+					BRect poseRect = pose->CalcRect(this);
 					// TODO: maybe leave just the else part
 					if (!hiliteState)
 						// deselecting an icon with widget drawn over background
 						// have to be a little tricky here - draw just the icon,
 						// invalidate the widget
-						pose->DeselectWithoutErasingBackground(pose->CalcRect(this), this);
+						pose->DeselectWithoutErasingBackground(poseRect, this);
 					else
-						pose->Draw(pose->CalcRect(this), this, false);
+						pose->Draw(poseRect, poseRect, this, false);
 					break;
 				}
 
@@ -9254,9 +9286,29 @@ BPoseView::HandleAutoScroll()
 
 
 BRect
-BPoseView::CalcPoseRect(BPose *pose, int32 index, bool min) const
+BPoseView::CalcPoseRect(const BPose *pose, int32 index,
+	bool firstColumnOnly) const
 {
-	return pose->CalcRect(BPoint(0, index * fListElemHeight), this, min);
+	if (ViewMode() == kListMode)
+		return CalcPoseRectList(pose, index, firstColumnOnly);
+	else
+		return CalcPoseRectIcon(pose);
+}
+
+
+BRect
+BPoseView::CalcPoseRectIcon(const BPose *pose) const
+{
+	return pose->CalcRect(this);
+}
+
+
+BRect
+BPoseView::CalcPoseRectList(const BPose *pose, int32 index,
+	bool firstColumnOnly) const
+{
+	return pose->CalcRect(BPoint(0, index * fListElemHeight), this,
+		firstColumnOnly);
 }
 
 

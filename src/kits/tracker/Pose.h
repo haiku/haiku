@@ -63,10 +63,10 @@ class BPose {
 		void SetLocation(BPoint, const BPoseView *);
 		void MoveTo(BPoint, BPoseView *, bool inval = true);
 
-		void Draw(BRect, BPoseView *, bool fullDraw = true,
-			const BRegion * = 0);
-		void Draw(BRect, BPoseView *, BView *drawView, bool fullDraw,
-			const BRegion *, BPoint offset, bool selected);
+		void Draw(BRect poseRect, const BRect& updateRect, BPoseView *,
+			bool fullDraw = true);
+		void Draw(BRect poseRect, const BRect& updateRect, BPoseView *,
+			BView *drawView, bool fullDraw, BPoint offset, bool selected);
 		void DeselectWithoutErasingBackground(BRect rect, BPoseView *poseView);
 			// special purpose draw call for deselecting over a textured
 			// background
@@ -236,10 +236,10 @@ BPose::HasLocation() const
 
 
 inline void
-BPose::Draw(BRect rect, BPoseView *view, bool fullDraw,
-	const BRegion *updateRgn)
+BPose::Draw(BRect poseRect, const BRect& updateRect, BPoseView *view,
+	bool fullDraw)
 {
-	Draw(rect, view, (BView *)view, fullDraw, updateRgn, BPoint(0, 0),
+	Draw(poseRect, updateRect, view, (BView *)view, fullDraw, BPoint(0, 0),
 		IsSelected());
 }
 

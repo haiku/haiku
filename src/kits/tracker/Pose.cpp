@@ -524,8 +524,8 @@ BPose::PointInPose(BPoint loc, const BPoseView *poseView, BPoint where,
 
 
 void
-BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
-	const BRegion *updateRgn, BPoint offset, bool selected)
+BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *drawView,
+	bool fullDraw, BPoint offset, bool selected)
 {
 	// If the background wasn't cleared and Draw() is not called after
 	// having edited a name or similar (with fullDraw)
@@ -550,7 +550,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 		iconRect.left += kListOffset;
 		iconRect.right = iconRect.left + size;
 		iconRect.top = iconRect.bottom - size;
-		if (!updateRgn || updateRgn->Intersects(iconRect)) {
+		if (updateRect.Intersects(iconRect)) {
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(), directDraw,
 				!windowActive && !showSelectionWhenInactive);
 		}
@@ -572,7 +572,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 				BRect widgetRect(widget->ColumnRect(rect.LeftTop(), column,
 					poseView));
 				
-				if (!updateRgn || updateRgn->Intersects(widgetRect)) {
+				if (updateRect.Intersects(widgetRect)) {
 					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(), column,
 						poseView));
 					
@@ -613,10 +613,8 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 	} else {
 
 		// draw in icon mode
-		if (updateRgn && !updateRgn->Intersects(rect))
-			return;
-
-		BPoint iconOrigin(Location(poseView));
+		BPoint location(Location(poseView));
+		BPoint iconOrigin(location);
 		iconOrigin += offset;
 
 		DrawIcon(iconOrigin, drawView, poseView->IconSize(), directDraw,
@@ -630,7 +628,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 		if (!widget || !widget->IsVisible())
 			return;
 
-		rect = widget->CalcRect(Location(poseView), 0, poseView);
+		rect = widget->CalcRect(location, 0, poseView);
 
 		bool selectDuringDraw = directDraw && selected
 			&& (poseView->IsDesktopWindow() || windowActive);

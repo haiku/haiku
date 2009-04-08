@@ -131,7 +131,7 @@ class BPoseView : public BView {
 		virtual void RestoreColumnState(AttributeStreamNode *);
 		void AddColumnList(BObjectList<BColumn> *list);
 		virtual void SaveColumnState(AttributeStreamNode *);
-		virtual void SavePoseLocations(BRect *frameIfDesktop = 0);
+		virtual void SavePoseLocations(BRect *frameIfDesktop = NULL);
 		void DisableSaveLocation();
 
 		virtual	void SaveState(BMessage &) const;
@@ -146,7 +146,8 @@ class BPoseView : public BView {
 		uint32 ViewMode() const;
 
 		// re-use the pose view for a new directory
-	 	virtual void SwitchDir(const entry_ref *, AttributeStreamNode *node = 0);
+	 	virtual void SwitchDir(const entry_ref *,
+	 		AttributeStreamNode *node = NULL);
 
 		// in the rare cases where a pose view needs to be explicitly refreshed
 		// (for instance in a query window with a dynamic date query), this is
@@ -308,13 +309,15 @@ class BPoseView : public BView {
 
 		// pose selection
 		void SelectPose(BPose *, int32 index, bool scrollIntoView = true);
-		void AddPoseToSelection(BPose *, int32 index, bool scrollIntoView = true);
+		void AddPoseToSelection(BPose *, int32 index,
+			bool scrollIntoView = true);
 		void RemovePoseFromSelection(BPose *);
 		void SelectPoseAtLocation(BPoint);
 		void SelectPoses(int32 start, int32 end);
 
 		// pose handling
-		void ScrollIntoView(BPose *pose, int32 index, bool drawOnly = false);
+		void ScrollIntoView(BPose *pose, int32 index);
+		void ScrollIntoView(BRect poseRect);
 		void SetActivePose(BPose *);
 		BPose *ActivePose() const;
 		void CommitActivePose(bool saveChanges = true);
@@ -492,7 +495,11 @@ class BPoseView : public BView {
 		BPose *ConvertZombieToPose(Model *zombie, int32 index);
 
 		// pose handling
-		BRect CalcPoseRect(BPose *, int32 index, bool minimal = false) const;
+		BRect CalcPoseRect(const BPose *, int32 index,
+			bool firstColumnOnly = false) const;
+		BRect CalcPoseRectIcon(const BPose *) const;
+		BRect CalcPoseRectList(const BPose *, int32 index,
+			bool firstColumnOnly = false) const;
 		void DrawPose(BPose *, int32 index, bool fullDraw = true);
 		void DrawViewCommon(const BRect &updateRect);
 
@@ -637,7 +644,6 @@ class BPoseView : public BView {
 		BCountView *fCountView;
 		float fListElemHeight;
 		float fIconPoseHeight;
-		BRegion *fUpdateRegion;
 		BPose *fDropTarget;
 		BPose *fAlreadySelectedDropTarget;
 		BLooper *fSelectionHandler;
