@@ -1849,6 +1849,13 @@ unload_kernel_add_on(image_id id)
 }
 
 
+struct elf_image_info*
+elf_get_kernel_image()
+{
+	return sKernelImage;
+}
+
+
 status_t
 elf_get_image_info_for_address(addr_t address, image_info* info)
 {

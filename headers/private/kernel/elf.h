@@ -32,6 +32,7 @@ status_t elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 status_t elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 			addr_t *_baseAddress, const char **_symbolName,
 			const char **_imageName, bool *_exactMatch);
+struct elf_image_info* elf_get_kernel_image();
 status_t elf_get_image_info_for_address(addr_t address, image_info* info);
 image_id elf_create_memory_image(const char* imageName, addr_t text,
 			size_t textSize, addr_t data, size_t dataSize);
