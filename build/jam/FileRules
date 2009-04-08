@@ -224,8 +224,12 @@ rule UnzipArchive directory : entries : zipFile : grist
 
 	# one-time initialization for the main target (the directory)
 	if ! [ on $(directory) return $(INITIALIZED) ] {
+		# make sure the parent dir exists
+		local parentDir = $(directory:PG=dir) ;
+		Depends $(directory) : $(parentDir) ;
+		MkDir $(parentDir) ;
+
 		NoUpdate $(directory) ;
-		MakeLocate $(directory) : $(directory:P) ;
 		Depends $(directory) : $(zipFile) ;
 		UnzipArchive1 $(directory) : $(zipFile) ;
 		INITIALIZED on $(directory) = 1 ;
