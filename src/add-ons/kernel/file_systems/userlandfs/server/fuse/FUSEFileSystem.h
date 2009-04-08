@@ -47,6 +47,7 @@ public:
 			status_t			FinishInitClientFS(fuse_config* config,
 									const fuse_operations* ops, size_t opSize,
 									void* userData);
+			status_t			MainLoop(bool multithreaded);
 
 private:
 			class ArgumentVector;

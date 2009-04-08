@@ -41,7 +41,10 @@ struct fuse_config {
 extern "C" {
 #endif
 
-int fuse_parse_config_args(struct fuse_args* args, struct fuse_config* config);
+int fuse_parse_lib_config_args(struct fuse_args* args,
+	struct fuse_config* config);
+
+int fuse_parse_mount_config_args(struct fuse_args* args);
 
 #ifdef __cplusplus
 }

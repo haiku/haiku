@@ -272,11 +272,19 @@ PRINT(("FUSEFileSystem::FinishInitClientFS()\n"));
 	fFUSEConfig = *config;
 
 	// do the initialization
-	status_t error = _InitClientFS(ops, opSize, userData);
+	fInitStatus = _InitClientFS(ops, opSize, userData);
+	return fInitStatus;
+}
 
+
+status_t
+FUSEFileSystem::MainLoop(bool multithreaded)
+{
+	// TODO: Respect the multithreaded flag!
+
+PRINT(("FUSEFileSystem::FinishMounting()\n"));
 	// notify the mount thread
 PRINT(("  notifying mount thread\n"));
-	fInitStatus = error;
 	delete_sem(fInitSemaphore);
 
 	// loop until unmounting
@@ -287,10 +295,10 @@ PRINT(("  waiting for unmounting done\n"));
 
 	fExitSemaphore = -1;
 
-	if (error == B_OK)
+	if (fFS != NULL)
 		fuse_fs_destroy(fFS);
 
-	return error;
+	return fExitStatus;
 }
 
 
