@@ -184,12 +184,10 @@ gdb_parse_command(void)
 
 	switch (sCommand[0]) {
 		case 'H':
-			/*
-			 * Command H (actually Hct) is used to select
-			 * the current thread (-1 meaning all threads)
-			 * We just fake we recognize the the command
-			 * and send an 'OK' response.
-			 */
+			// Command H (actually Hct) is used to select
+			// the current thread (-1 meaning all threads)
+			// We just fake we recognize the the command
+			// and send an 'OK' response.
 			gdb_reply("OK");
 			break;
 
@@ -198,24 +196,22 @@ gdb_parse_command(void)
 				extern unsigned __data_start;
 				extern unsigned __bss_start;
 
-				/*
-				 * There are several q commands:
-				 *
-				 *     qXXXX        Request info about XXXX.
-				 *     QXXXX=yyyy   Set value of XXXX to yyyy.
-				 *     qOffsets     Get segment offsets
-				 *
-				 * Currently we only support the 'qOffsets'
-				 * form.
-				 *
-				 * *Note* that we actually have to lie,
-				 * At first thought looks like we should
-				 * return '_start', '__data_start' &
-				 * '__bss_start', however gdb gets
-				 * confused because the kernel link script
-				 * pre-links at 0x80000000. To keep gdb
-				 * gdb happy we just substract that amount.
-				 */
+				// There are several q commands:
+				//
+				//     qXXXX        Request info about XXXX.
+				//     QXXXX=yyyy   Set value of XXXX to yyyy.
+				//     qOffsets     Get segment offsets
+				//
+				// Currently we only support the 'qOffsets'
+				// form.
+				//
+				// *Note* that we actually have to lie,
+				// At first thought looks like we should
+				// return '_start', '__data_start' &
+				// '__bss_start', however gdb gets
+				// confused because the kernel link script
+				// pre-links at 0x80000000. To keep gdb
+				// gdb happy we just substract that amount.
 				if (strcmp(sCommand + 1, "Offsets") == 0) {
 					gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
 						((unsigned)(&__data_start)) - 0x80000000,
@@ -226,12 +222,10 @@ gdb_parse_command(void)
 			break;
 
 		case '?':
-			/*
-			 * command '?' is used for retrieving the signal
-			 * that stopped the program. Fully implemeting
-			 * this command requires help from the debugger,
-			 * by now we just fake a SIGKILL
-			 */
+			// command '?' is used for retrieving the signal
+			// that stopped the program. Fully implemeting
+			// this command requires help from the debugger,
+			// by now we just fake a SIGKILL
 			gdb_reply("S09");	/* SIGKILL = 9 */
 			break;
 
@@ -239,23 +233,21 @@ gdb_parse_command(void)
 			{
 				int cpu;
 
-				/*
-				 * command 'g' is used for reading the register
-				 * file. Faked by now.
-				 *
-				 * For x86 the register order is:
-				 *
-				 *    eax, ebx, ecx, edx,
-				 *    esp, ebp, esi, edi,
-				 *    eip, eflags,
-				 *    cs, ss, ds, es
-				 *
-				 * Note that even thought the segment descriptors
-				 * are actually 16 bits wide, gdb requires them
-				 * as 32 bit integers. Note also that for some
-				 * reason (unknown to me) gdb wants the register
-				 * dump in *big endian* format.
-				 */
+				// command 'g' is used for reading the register
+				// file. Faked by now.
+				//
+				// For x86 the register order is:
+				//
+				//    eax, ebx, ecx, edx,
+				//    esp, ebp, esi, edi,
+				//    eip, eflags,
+				//    cs, ss, ds, es
+				//
+				// Note that even thought the segment descriptors
+				// are actually 16 bits wide, gdb requires them
+				// as 32 bit integers. Note also that for some
+				// reason (unknown to me) gdb wants the register
+				// dump in *big endian* format.
 				cpu = smp_get_current_cpu();
 				gdb_regreply(dbg_register_file[cpu], 14);
 			}
@@ -267,11 +259,9 @@ gdb_parse_command(void)
 				unsigned address;
 				unsigned len;
 
-				/*
-				 * The 'm' command has the form mAAA,LLL
-				 * where AAA is the address and LLL is the
-				 * number of bytes.
-				 */
+				// The 'm' command has the form mAAA,LLL
+				// where AAA is the address and LLL is the
+				// number of bytes.
 				ptr = sCommand + 1;
 				address = 0;
 				len = 0;
@@ -292,12 +282,10 @@ gdb_parse_command(void)
 				if (len > 128)
 					len = 128;
 
-				/*
-				 * We cannot directly access the requested memory
-				 * for gdb may be trying to access an stray pointer
-				 * We copy the memory to a safe buffer using
-				 * the bulletproof user_memcpy().
-				 */
+				// We cannot directly access the requested memory
+				// for gdb may be trying to access an stray pointer
+				// We copy the memory to a safe buffer using
+				// the bulletproof user_memcpy().
 				if (user_memcpy(sSafeMemory, (char*)address, len) < 0)
 					gdb_reply("E02");
 				else
@@ -306,15 +294,13 @@ gdb_parse_command(void)
 			break;
 
 		case 'k':
-			/*
-			 * Command 'k' actual semantics is 'kill the damn thing'.
-			 * However gdb sends that command when you disconnect
-			 * from a debug session. I guess that 'kill' for the
-			 * kernel would map to reboot... however that's a
-			 * a very mean thing to do, instead we just quit
-			 * the gdb state machine and fallback to the regular
-			 * kernel debugger command prompt.
-			 */
+			// Command 'k' actual semantics is 'kill the damn thing'.
+			// However gdb sends that command when you disconnect
+			// from a debug session. I guess that 'kill' for the
+			// kernel would map to reboot... however that's a
+			// a very mean thing to do, instead we just quit
+			// the gdb state machine and fallback to the regular
+			// kernel debugger command prompt.
 			return QUIT;
 
 		default:
@@ -342,12 +328,10 @@ gdb_init_handler(int input)
 #if 0
 			gdb_nak();
 #else
-			/*
-			 * looks to me like we should send
-			 * a NAK here but it kinda works
-			 * better if we just gobble all
-			 * junk chars silently
-			 */
+			// looks to me like we should send
+			// a NAK here but it kinda works
+			// better if we just gobble all
+			// junk chars silently
 #endif
 			return INIT;
 	}
@@ -379,12 +363,10 @@ gdb_cksum1_handler(int input)
 		gdb_nak();
 		return INIT;
 #else
-		/*
-		 * looks to me like we should send
-		 * a NAK here but it kinda works
-		 * better if we just gobble all
-		 * junk chars silently
-		 */
+		// looks to me like we should send
+		// a NAK here but it kinda works
+		// better if we just gobble all
+		// junk chars silently
 #endif
 	}
 
@@ -404,12 +386,10 @@ gdb_cksum2_handler(int input)
 		gdb_nak();
 		return INIT;
 #else
-		/*
-		 * looks to me like we should send
-		 * a NAK here but it kinda works
-		 * better if we just gobble all
-		 * junk chars silently
-		 */
+		// looks to me like we should send
+		// a NAK here but it kinda works
+		// better if we just gobble all
+		// junk chars silently
 #endif
 	}
 
@@ -430,10 +410,8 @@ gdb_waitack_handler(int input)
 			return WAITACK;
 
 		default:
-			/*
-			 * looks like gdb and us are out of synch,
-			 * send a NAK and retry from INIT state.
-			 */
+			// looks like gdb and us are out of sync,
+			// send a NAK and retry from INIT state.
 			gdb_nak();
 			return INIT;
 	}
@@ -445,9 +423,7 @@ gdb_quit_handler(int input)
 {
 	(void)(input);
 
-	/*
-	 * actually we should never be here
-	 */
+	// actually we should never be here
 	return QUIT;
 }
 
