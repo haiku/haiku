@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel debugger run_on_exit ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon <kdebug>run_on_exit :
+	run_on_exit.cpp
+	;
