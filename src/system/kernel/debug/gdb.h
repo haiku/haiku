@@ -8,6 +8,7 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-int cmd_gdb(int, char **);
+
+int cmd_gdb(int argc, char** argv);
 
 #endif

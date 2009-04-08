@@ -25,13 +25,12 @@
 enum { INIT = 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };
 
 
-static char cmd[512];
-static int cmd_ptr;
-static int checksum;
+static char sCommand[512];
+static int sCommandIndex;
+static int sCheckSum;
 
-static char reply[512];
-
-static char safe_mem[512];
+static char sReply[512];
+static char sSafeMemory[512];
 
 
 // utility functions
@@ -75,81 +74,77 @@ gdb_nak(void)
 static void
 gdb_resend_reply(void)
 {
-	arch_debug_serial_puts(reply);
+	arch_debug_serial_puts(sReply);
 }
 
 
 static void
-gdb_reply(char const *fmt, ...)
+gdb_reply(char const* format, ...)
 {
 	int i;
 	int len;
 	int sum;
 	va_list args;
 
-	va_start(args, fmt);
-	reply[0] = '$';
-	vsprintf(reply + 1, fmt, args);
+	va_start(args, format);
+	sReply[0] = '$';
+	vsprintf(sReply + 1, format, args);
 	va_end(args);
 
-	len = strlen(reply);
+	len = strlen(sReply);
 	sum = 0;
 	for (i = 1; i < len; i++) {
-		sum += reply[i];
+		sum += sReply[i];
 	}
 	sum %= 256;
 
-	sprintf(reply + len, "#%02x", sum);
+	sprintf(sReply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
 
 
 static void
-gdb_regreply(int const *regs, int numregs)
+gdb_regreply(int const* regs, int numregs)
 {
 	int i;
 	int len;
 	int sum;
 
-	reply[0] = '$';
-	for (i = 0; i < numregs; i++) {
-		sprintf(reply+1+8*i, "%08lx", B_HOST_TO_BENDIAN_INT32(regs[i]));
-	}
+	sReply[0] = '$';
+	for (i = 0; i < numregs; i++)
+		sprintf(sReply + 1 + 8 * i, "%08lx", B_HOST_TO_BENDIAN_INT32(regs[i]));
 
-	len = strlen(reply);
+	len = strlen(sReply);
 	sum = 0;
-	for (i = 1; i < len; i++) {
-		sum += reply[i];
-	}
+	for (i = 1; i < len; i++)
+		sum += sReply[i];
 	sum %= 256;
 
-	sprintf(reply + len, "#%02x", sum);
+	sprintf(sReply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
 
 
 static void
-gdb_memreply(char const *bytes, int numbytes)
+gdb_memreply(char const* bytes, int numbytes)
 {
 	int i;
 	int len;
 	int sum;
 
-	reply[0] = '$';
-	for (i = 0; i < numbytes; i++) {
-		sprintf(reply+1+2*i, "%02x", (uint8)bytes[i]);
-	}
+	sReply[0] = '$';
+	for (i = 0; i < numbytes; i++)
+		sprintf(sReply + 1 + 2 * i, "%02x", (uint8)bytes[i]);
 
-	len = strlen(reply);
+	len = strlen(sReply);
 	sum = 0;
-	for (i = 1; i < len; i++) {
-		sum += reply[i];
-	}
+	for (i = 1; i < len; i++)
+		sum += sReply[i];
 	sum %= 256;
 
-	sprintf(reply + len, "#%02x", sum);
+	sprintf(sReply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
@@ -165,14 +160,13 @@ gdb_verify_checksum(void)
 	int len;
 	int sum;
 
-	len = strlen(cmd);
+	len = strlen(sCommand);
 	sum = 0;
-	for (i = 0; i < len; i++) {
-		sum += cmd[i];
-	}
+	for (i = 0; i < len; i++)
+		sum += sCommand[i];
 	sum %= 256;
 
-	return (sum == checksum) ? 1 : 0;
+	return (sum == sCheckSum) ? 1 : 0;
 }
 
 
@@ -188,7 +182,7 @@ gdb_parse_command(void)
 	} else
 		gdb_ack();
 
-	switch (cmd[0]) {
+	switch (sCommand[0]) {
 		case 'H':
 			/*
 			 * Command H (actually Hct) is used to select
@@ -222,10 +216,10 @@ gdb_parse_command(void)
 				 * pre-links at 0x80000000. To keep gdb
 				 * gdb happy we just substract that amount.
 				 */
-				if (strcmp(cmd+1, "Offsets") == 0) {
+				if (strcmp(sCommand + 1, "Offsets") == 0) {
 					gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
-						((unsigned)(&__data_start))-0x80000000,
-						((unsigned)(&__bss_start))-0x80000000);
+						((unsigned)(&__data_start)) - 0x80000000,
+						((unsigned)(&__bss_start)) - 0x80000000);
 				} else
 					gdb_reply("ENS");
 			}
@@ -269,7 +263,7 @@ gdb_parse_command(void)
 
 		case 'm':
 			{
-				char *ptr;
+				char* ptr;
 				unsigned address;
 				unsigned len;
 
@@ -278,7 +272,7 @@ gdb_parse_command(void)
 				 * where AAA is the address and LLL is the
 				 * number of bytes.
 				 */
-				ptr = cmd+1;
+				ptr = sCommand + 1;
 				address = 0;
 				len = 0;
 				while (ptr && *ptr && (*ptr != ',')) {
@@ -287,7 +281,7 @@ gdb_parse_command(void)
 					ptr += 1;
 				}
 				if (*ptr == ',')
-					ptr+= 1;
+					ptr += 1;
 
 				while (ptr && *ptr) {
 					len <<= 4;
@@ -295,7 +289,7 @@ gdb_parse_command(void)
 					ptr += 1;
 				}
 
-				if (len> 128)
+				if (len > 128)
 					len = 128;
 
 				/*
@@ -304,10 +298,10 @@ gdb_parse_command(void)
 				 * We copy the memory to a safe buffer using
 				 * the bulletproof user_memcpy().
 				 */
-				if (user_memcpy(safe_mem, (char *)address, len) < 0)
+				if (user_memcpy(sSafeMemory, (char*)address, len) < 0)
 					gdb_reply("E02");
 				else
-					gdb_memreply(safe_mem, len);
+					gdb_memreply(sSafeMemory, len);
 			}
 			break;
 
@@ -340,8 +334,8 @@ gdb_init_handler(int input)
 {
 	switch (input) {
 		case '$':
-			memset(cmd, 0, sizeof(cmd));
-			cmd_ptr = 0;
+			memset(sCommand, 0, sizeof(sCommand));
+			sCommandIndex = 0;
 			return CMDREAD;
 
 		default:
@@ -368,8 +362,8 @@ gdb_cmdread_handler(int input)
 			return CKSUM1;
 
 		default:
-			cmd[cmd_ptr] = input;
-			cmd_ptr += 1;
+			sCommand[sCommandIndex] = input;
+			sCommandIndex += 1;
 			return CMDREAD;
 	}
 }
@@ -394,7 +388,7 @@ gdb_cksum1_handler(int input)
 #endif
 	}
 
-	checksum = nibble << 4;
+	sCheckSum = nibble << 4;
 
 	return CKSUM2;
 }
@@ -419,7 +413,7 @@ gdb_cksum2_handler(int input)
 #endif
 	}
 
-	checksum += nibble;
+	sCheckSum += nibble;
 
 	return gdb_parse_command();
 }
@@ -497,7 +491,7 @@ gdb_state_machine(void)
 
 
 int
-cmd_gdb(int argc, char **argv)
+cmd_gdb(int argc, char** argv)
 {
 	(void)(argc);
 	(void)(argv);
