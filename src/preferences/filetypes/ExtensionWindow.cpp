@@ -38,8 +38,10 @@ compare_extensions(const void* _a, const void* _b)
 }
 
 
+//! newExtensionsList contains all the entries (char*) which are to be added.
 status_t
-add_extensions(BMimeType& type, BList& list, const char* removeExtension)
+merge_extensions(BMimeType& type, const BList& newExtensionsList,
+	const char* removeExtension)
 {
 	BMessage extensions;
 	status_t status = type.GetFileExtensions(&extensions);
@@ -47,32 +49,38 @@ add_extensions(BMimeType& type, BList& list, const char* removeExtension)
 		return status;
 
 	// replace the entry, and remove any equivalent entries
-	BList newList;
-	newList.AddList(&list);
+	BList mergedList;
+	mergedList.AddList(&newExtensionsList);
+	int32 originalCount = mergedList.CountItems();
 
 	const char* extension;
 	for (int32 i = 0; extensions.FindString("extensions", i,
 			&extension) == B_OK; i++) {
-		bool add = true;
-		for (int32 j = list.CountItems(); j-- > 0;) {
-			if ((removeExtension && !strcmp(removeExtension, extension))
-				|| !strcmp((const char*)list.ItemAt(j), extension)) {
-				// remove this item
-				continue;
+
+		for (int32 j = originalCount; j-- > 0;) {
+			if (!strcmp((const char*)mergedList.ItemAt(j), extension)) {
+				// Do not add this old item again, since it's already
+				// there.
+				mergedList.RemoveItem(j);
+				originalCount--;
 			}
 		}
 
-		if (add)
-			newList.AddItem((void *)extension);
+		// The item will be added behind "originalCount", so we cannot
+		// remove it accidentally in the next iterations, it's is added
+		// for good.
+		if (removeExtension == NULL || strcmp(removeExtension, extension))
+			mergedList.AddItem((void *)extension);
 	}
 
-	newList.SortItems(compare_extensions);
+	mergedList.SortItems(compare_extensions);
 
 	// Copy them to a new message (their memory is still part of the
 	// original BMessage)
 	BMessage newExtensions;
-	for (int32 i = 0; i < newList.CountItems(); i++) {
-		newExtensions.AddString("extensions", (const char*)newList.ItemAt(i));
+	for (int32 i = 0; i < mergedList.CountItems(); i++) {
+		newExtensions.AddString("extensions",
+			(const char*)mergedList.ItemAt(i));
 	}
 
 	return type.SetFileExtensions(&newExtensions);
@@ -80,12 +88,13 @@ add_extensions(BMimeType& type, BList& list, const char* removeExtension)
 
 
 status_t
-replace_extension(BMimeType& type, const char* newExtension, const char* oldExtension)
+replace_extension(BMimeType& type, const char* newExtension,
+	const char* oldExtension)
 {
 	BList list;
 	list.AddItem((void *)newExtension);
 
-	return add_extensions(type, list, oldExtension);
+	return merge_extensions(type, list, oldExtension);
 }
 
 

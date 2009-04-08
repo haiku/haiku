@@ -227,7 +227,7 @@ ExtensionListView::MessageReceived(BMessage* message)
 				list.AddItem(strdup(++point));
 		}
 
-		add_extensions(fType, list);
+		merge_extensions(fType, list);
 
 		// delete extension list
 		for (int32 index = list.CountItems(); index-- > 0;) {
