@@ -13,6 +13,7 @@ SharedLibrary libbsd.so :
 	progname.c
 	pty.cpp
 	signal.c
+	string.cpp
 	stringlist.c
 	unvis.c
 	usershell.c
