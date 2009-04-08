@@ -35,8 +35,6 @@
 /*
  * slicer.c++
  *
- * $Date: 2005/10/28 13:09:23 $ $Revision: 1.5 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/slicer.cc,v 1.5 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include <stdlib.h>

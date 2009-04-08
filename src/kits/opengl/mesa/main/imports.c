@@ -786,7 +786,24 @@ void *
 _mesa_bsearch( const void *key, const void *base, size_t nmemb, size_t size, 
                int (*compar)(const void *, const void *) )
 {
+#if defined(_WIN32_WCE)
+   void *mid;
+   int cmp;
+   while (nmemb) {
+      nmemb >>= 1;
+      mid = (char *)base + nmemb * size;
+      cmp = (*compar)(key, mid);
+      if (cmp == 0)
+	 return mid;
+      if (cmp > 0) {
+	 base = (char *)mid + size;
+	 --nmemb;
+      }
+   }
+   return NULL;
+#else
    return bsearch(key, base, nmemb, size, compar);
+#endif
 }
 
 /*@}*/
@@ -802,7 +819,7 @@ _mesa_bsearch( const void *key, const void *base, size_t nmemb, size_t size,
 char *
 _mesa_getenv( const char *var )
 {
-#if defined(_XBOX)
+#if defined(_XBOX) || defined(_WIN32_WCE)
    return NULL;
 #else
    return getenv(var);
@@ -917,6 +934,18 @@ _mesa_sprintf( char *str, const char *fmt, ... )
    return r;
 }
 
+/** Wrapper around vsnprintf() */
+int
+_mesa_snprintf( char *str, size_t size, const char *fmt, ... )
+{
+   int r;
+   va_list args;
+   va_start( args, fmt );  
+   r = vsnprintf( str, size, fmt, args );
+   va_end( args );
+   return r;
+}
+
 /** Wrapper around printf(), using vsprintf() for the formatting. */
 void
 _mesa_printf( const char *fmtString, ... )
@@ -926,8 +955,21 @@ _mesa_printf( const char *fmtString, ... )
    va_start( args, fmtString );  
    vsnprintf(s, MAXSTRING, fmtString, args);
    va_end( args );
-   fprintf(stderr,"%s", s);
+   fprintf(stderr, "%s", s);
 }
+
+/** Wrapper around fprintf(), using vsprintf() for the formatting. */
+void
+_mesa_fprintf( FILE *f, const char *fmtString, ... )
+{
+   char s[MAXSTRING];
+   va_list args;
+   va_start( args, fmtString );  
+   vsnprintf(s, MAXSTRING, fmtString, args);
+   va_end( args );
+   fprintf(f, "%s", s);
+}
+
 
 /** Wrapper around vsprintf() */
 int

@@ -23,7 +23,6 @@ int DisplayHeight() {
 /* the following function was stolen from the X sources as indicated. */
 
 /* Copyright 	Massachusetts Institute of Technology  1985, 1986, 1987 */
-/* $XConsortium: XParseGeom.c,v 11.18 91/02/21 17:23:05 rws Exp $ */
 
 /*
 Permission to use, copy, modify, distribute, and sell this software and its

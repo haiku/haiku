@@ -31,8 +31,6 @@
 /*
  * mystdio.h
  *
- * $Date: 2006/03/14 15:08:52 $ $Revision: 1.4 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/mystdio.h,v 1.4 2006/03/14 15:08:52 brianp Exp $
  */
 
 #ifndef __glumystdio_h_

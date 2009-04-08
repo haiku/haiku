@@ -35,8 +35,6 @@
 /*
  * mesher.c++
  *
- * $Date: 2001/11/29 16:16:55 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/mesher.cc,v 1.3 2001/11/29 16:16:55 kschultz Exp $
  */
 
 #include "glimports.h"

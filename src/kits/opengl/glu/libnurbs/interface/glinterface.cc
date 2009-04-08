@@ -31,10 +31,8 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/07/16 15:46:42 $ $Revision: 1.2 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/glinterface.cc,v 1.2 2001/07/16 15:46:42 brianp Exp $
 */
 
 #include "gluos.h"

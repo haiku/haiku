@@ -35,8 +35,6 @@
 /*
  * curvelist.c++
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/curvelist.cc,v 1.1 2001/03/17 00:25:40 brianp Exp $
  */
 
 #include "glimports.h"

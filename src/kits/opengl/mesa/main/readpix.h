@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  7.1
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,19 +23,20 @@
  */
 
 
-#ifndef API_EVAL_H
-#define API_EVAL_H
+#ifndef READPIXELS_H
+#define READPIXELS_H
 
-#include "mtypes.h"
 
-extern void _mesa_EvalPoint1( GLint i );
-extern void _mesa_EvalPoint2( GLint i, GLint j );
-extern void _mesa_EvalCoord1f( GLfloat u );
-extern void _mesa_EvalCoord2f( GLfloat u, GLfloat v );
-extern void _mesa_EvalCoord1fv( const GLfloat *u );
-extern void _mesa_EvalCoord2fv( const GLfloat *u );
+#include "main/mtypes.h"
+
+
+extern GLboolean
+_mesa_error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
+                              GLboolean drawing);
+
+extern void GLAPIENTRY
+_mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
+                  GLenum format, GLenum type, GLvoid *pixels );
+
 
 #endif
-
-
-

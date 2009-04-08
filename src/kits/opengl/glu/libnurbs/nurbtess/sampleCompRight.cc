@@ -31,10 +31,8 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2006/08/30 19:02:45 $ $Revision: 1.4 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/sampleCompRight.cc,v 1.4 2006/08/30 19:02:45 brianp Exp $
 */
 
 #include <stdlib.h>

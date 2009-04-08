@@ -30,8 +30,6 @@
 /*
 ** Author: Eric Veach, July 1994.
 **
-** $Date: 2003/07/24 22:41:17 $ $Revision: 1.4 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libtess/memalloc.h,v 1.4 2003/07/24 22:41:17 brianp Exp $
 */
 
 #ifndef __memalloc_simple_h_

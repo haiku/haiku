@@ -31,8 +31,6 @@
 /*
  * flist.h
  *
- * $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/flist.h,v 1.1 2001/03/17 00:25:40 brianp Exp $
  */
 
 #ifndef __gluflist_h_

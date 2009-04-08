@@ -28,7 +28,6 @@
  * Silicon Graphics, Inc.
  */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/gridWrap.h,v 1.1 2001/03/17 00:25:41 brianp Exp $
 */
 
 #ifndef _GRIDWRAP_H

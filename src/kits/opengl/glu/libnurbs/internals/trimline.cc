@@ -35,8 +35,6 @@
 /*
  * trimline.c++
  *
- * $Date: 2005/10/28 13:09:23 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/trimline.cc,v 1.2 2005/10/28 13:09:23 brianp Exp $
  */
 
 #include "glimports.h"

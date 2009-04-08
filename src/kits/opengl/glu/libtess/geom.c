@@ -30,8 +30,6 @@
 /*
 ** Author: Eric Veach, July 1994.
 **
-** $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libtess/geom.c,v 1.1 2001/03/17 00:25:41 brianp Exp $
 */
 
 #include "gluos.h"

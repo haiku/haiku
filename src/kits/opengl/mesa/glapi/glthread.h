@@ -225,8 +225,20 @@ typedef xmutex_rec _glthread_Mutex;
  */
 #ifdef BEOS_THREADS
 
+/* Problem with OS.h and this file on haiku */
+#ifndef __HAIKU__
 #include <kernel/OS.h>
+#endif
+
 #include <support/TLS.h>
+
+/* The only two typedefs required here
+ * this is cause of the OS.h problem
+ */
+#ifdef __HAIKU__
+typedef int32 thread_id;
+typedef int32 sem_id;
+#endif
 
 typedef struct {
    int32        key;
@@ -297,6 +309,10 @@ _glthread_GetTSD(_glthread_TSD *);
 
 extern void
 _glthread_SetTSD(_glthread_TSD *, void *);
+
+#if !defined __GNUC__ || __GNUC__ < 3
+#  define __builtin_expect(x, y) x
+#endif
 
 #if defined(GLX_USE_TLS)
 

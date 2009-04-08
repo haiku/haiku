@@ -134,6 +134,7 @@ StaticLibrary libmesa.a :
 
 	# main
 	api_arrayelt.c
+	api_exec.c
 	api_loopback.c
 	api_noop.c
 	api_validate.c
@@ -143,6 +144,7 @@ StaticLibrary libmesa.a :
 	blend.c
 	bufferobj.c
 	buffers.c
+	clear.c
 	clip.c
 	colortab.c
 	context.c
@@ -151,6 +153,7 @@ StaticLibrary libmesa.a :
 	depth.c
 	depthstencil.c
 	dlist.c
+	dlopen.c
 	drawpix.c
 	driverfuncs.c
 	enable.c
@@ -160,6 +163,7 @@ StaticLibrary libmesa.a :
 	extensions.c
 	fbobject.c
 	feedback.c
+	ffvertex_prog.c
 	fog.c
 	framebuffer.c
 	get.c
@@ -173,22 +177,29 @@ StaticLibrary libmesa.a :
 	lines.c
 	matrix.c
 	mipmap.c
+	multisample.c
 	pixel.c
+	pixelstore.c
 	points.c
 	polygon.c
 	queryobj.c
 	rastpos.c
+	readpix.c
 	renderbuffer.c
+	scissor.c
 	shaders.c
 	state.c
 	stencil.c
 	texcompress.c
 	texcompress_s3tc.c
 	texcompress_fxt1.c
+	texenv.c
 	texenvprogram.c
+	texgen.c
 	texformat.c
 	teximage.c
 	texobj.c
+	texparam.c
 	texrender.c
 	texstate.c
 	texstore.c
@@ -209,6 +220,7 @@ StaticLibrary libmesa.a :
 	t_context.c
 	t_draw.c
 	t_pipeline.c
+	t_rasterpos.c
 	t_vb_cull.c
 	t_vb_fog.c
 	t_vb_light.c
@@ -265,8 +277,10 @@ StaticLibrary libmesa.a :
 	nvfragparse.c
 	nvprogram.c
 	nvvertparse.c
+	prog_cache.c
 	prog_execute.c
 	prog_instruction.c
+	prog_noise.c
 	prog_parameter.c
 	prog_print.c
 	prog_statevars.c
@@ -289,7 +303,6 @@ StaticLibrary libmesa.a :
 	slang_emit.c
 	slang_ir.c
 	slang_label.c
-	slang_library_noise.c
 	slang_link.c
 	slang_log.c
 	slang_mem.c

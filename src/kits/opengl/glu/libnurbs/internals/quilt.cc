@@ -35,8 +35,6 @@
 /*
  * quilt.c++
  *
- * $Date: 2006/03/14 15:08:52 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/quilt.cc,v 1.3 2006/03/14 15:08:52 brianp Exp $
  */
 
 #include "glimports.h"

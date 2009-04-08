@@ -28,7 +28,6 @@
  * Silicon Graphics, Inc.
  */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/polyUtil.h,v 1.2 2001/11/29 16:16:55 kschultz Exp $
 */
 
 #ifndef _POLYUTIL_H

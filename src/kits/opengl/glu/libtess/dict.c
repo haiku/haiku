@@ -30,8 +30,6 @@
 /*
 ** Author: Eric Veach, July 1994.
 **
-** $Date: 2006/04/19 14:42:01 $ $Revision: 1.3 $
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libtess/dict.c,v 1.3 2006/04/19 14:42:01 brianp Exp $
 */
 
 #include <stddef.h>

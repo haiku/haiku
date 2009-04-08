@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  7.1
+ * Version:  7.3
  *
  * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
  *
@@ -165,7 +165,7 @@ static const struct {
    { OFF, "GL_SGIS_texture_border_clamp",      F(ARB_texture_border_clamp) },
    { ON,  "GL_SGIS_texture_edge_clamp",        F(SGIS_texture_edge_clamp) },
    { ON,  "GL_SGIS_texture_lod",               F(SGIS_texture_lod) },
-   { OFF, "GL_SGIX_depth_texture",             F(SGIX_depth_texture) },
+   { OFF, "GL_SGIX_depth_texture",             F(ARB_depth_texture) },
    { OFF, "GL_SGIX_shadow",                    F(SGIX_shadow) },
    { OFF, "GL_SGIX_shadow_ambient",            F(SGIX_shadow_ambient) },
    { OFF, "GL_SUN_multi_draw_arrays",          F(EXT_multi_draw_arrays) },
@@ -204,7 +204,7 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
    ctx->Extensions.ARB_shading_language_100 = GL_TRUE;
 #endif
 #if FEATURE_ARB_shading_language_120
-   ctx->Extensions.ARB_shading_language_120 = GL_FALSE; /* not quite done */
+   ctx->Extensions.ARB_shading_language_120 = GL_TRUE;
 #endif
    ctx->Extensions.ARB_shadow = GL_TRUE;
    ctx->Extensions.ARB_texture_border_clamp = GL_TRUE;
@@ -258,7 +258,7 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
    ctx->Extensions.EXT_secondary_color = GL_TRUE;
    ctx->Extensions.EXT_shared_texture_palette = GL_TRUE;
    ctx->Extensions.EXT_stencil_wrap = GL_TRUE;
-   ctx->Extensions.EXT_stencil_two_side = GL_FALSE; /* obsolete */
+   ctx->Extensions.EXT_stencil_two_side = GL_TRUE;
    ctx->Extensions.EXT_texture_env_add = GL_TRUE;
    ctx->Extensions.EXT_texture_env_combine = GL_TRUE;
    ctx->Extensions.EXT_texture_env_dot3 = GL_TRUE;
@@ -292,11 +292,19 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
    ctx->Extensions.SGI_texture_color_table = GL_TRUE;
    ctx->Extensions.SGIS_generate_mipmap = GL_TRUE;
    ctx->Extensions.SGIS_texture_edge_clamp = GL_TRUE;
-   ctx->Extensions.SGIX_depth_texture = GL_TRUE;
    ctx->Extensions.SGIX_shadow = GL_TRUE;
    ctx->Extensions.SGIX_shadow_ambient = GL_TRUE;
 #if FEATURE_ARB_vertex_program || FEATURE_ARB_fragment_program
    ctx->Extensions.EXT_gpu_program_parameters = GL_TRUE;
+#endif
+#if FEATURE_texture_fxt1
+   _mesa_enable_extension(ctx, "GL_3DFX_texture_compression_FXT1");
+#endif
+#if FEATURE_texture_s3tc
+   if (ctx->Mesa_DXTn) {
+      _mesa_enable_extension(ctx, "GL_EXT_texture_compression_s3tc");
+      _mesa_enable_extension(ctx, "GL_S3_s3tc");
+   }
 #endif
 }
 
@@ -398,7 +406,7 @@ _mesa_enable_2_0_extensions(GLcontext *ctx)
 #if FEATURE_ARB_shading_language_100
    ctx->Extensions.ARB_shading_language_100 = GL_TRUE;
 #endif
-   ctx->Extensions.EXT_stencil_two_side = GL_FALSE; /* obsolete */
+   ctx->Extensions.EXT_stencil_two_side = GL_TRUE;
 #if FEATURE_ARB_vertex_shader
    ctx->Extensions.ARB_vertex_shader = GL_TRUE;
 #endif
@@ -419,7 +427,7 @@ _mesa_enable_2_1_extensions(GLcontext *ctx)
    ctx->Extensions.EXT_texture_sRGB = GL_TRUE;
 #endif
 #ifdef FEATURE_ARB_shading_language_120
-   ctx->Extensions.ARB_shading_language_120 = GL_FALSE; /* not quite done */
+   ctx->Extensions.ARB_shading_language_120 = GL_TRUE;
 #endif
 }
 

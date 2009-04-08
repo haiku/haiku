@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.3
  *
  * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
@@ -29,12 +29,12 @@
  * functions to draw triangles.
  */
 
-#include "glheader.h"
-#include "context.h"
-#include "colormac.h"
-#include "imports.h"
-#include "macros.h"
-#include "texformat.h"
+#include "main/glheader.h"
+#include "main/context.h"
+#include "main/colormac.h"
+#include "main/imports.h"
+#include "main/macros.h"
+#include "main/texformat.h"
 
 #include "s_aatriangle.h"
 #include "s_context.h"
@@ -131,7 +131,8 @@ _swrast_culltriangle( GLcontext *ctx,
 
 #define SETUP_CODE							\
    struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0];	\
-   struct gl_texture_object *obj = ctx->Texture.Unit[0].Current2D;	\
+   struct gl_texture_object *obj = 					\
+      ctx->Texture.Unit[0].CurrentTex[TEXTURE_2D_INDEX];		\
    const GLint b = obj->BaseLevel;					\
    const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
    const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
@@ -182,7 +183,8 @@ _swrast_culltriangle( GLcontext *ctx,
 
 #define SETUP_CODE							\
    struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0];	\
-   struct gl_texture_object *obj = ctx->Texture.Unit[0].Current2D;	\
+   struct gl_texture_object *obj = 					\
+      ctx->Texture.Unit[0].CurrentTex[TEXTURE_2D_INDEX];		\
    const GLint b = obj->BaseLevel;					\
    const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
    const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
@@ -263,6 +265,7 @@ affine_span(GLcontext *ctx, SWspan *span,
             struct affine_info *info)
 {
    GLchan sample[4];  /* the filtered texture sample */
+   const GLuint texEnableSave = ctx->Texture._EnabledUnits;
 
    /* Instead of defining a function for each mode, a test is done
     * between the outer and inner loops. This is to reduce code size
@@ -392,6 +395,9 @@ affine_span(GLcontext *ctx, SWspan *span,
    GLuint i;
    GLchan *dest = span->array->rgba[0];
 
+   /* Disable tex units so they're not re-applied in swrast_write_rgba_span */
+   ctx->Texture._EnabledUnits = 0x0;
+
    span->intTex[0] -= FIXED_HALF;
    span->intTex[1] -= FIXED_HALF;
    switch (info->filter) {
@@ -493,7 +499,11 @@ affine_span(GLcontext *ctx, SWspan *span,
    }
    span->interpMask &= ~SPAN_RGBA;
    ASSERT(span->arrayMask & SPAN_RGBA);
+
    _swrast_write_rgba_span(ctx, span);
+
+   /* re-enable texture units */
+   ctx->Texture._EnabledUnits = texEnableSave;
 
 #undef SPAN_NEAREST
 #undef SPAN_LINEAR
@@ -515,7 +525,8 @@ affine_span(GLcontext *ctx, SWspan *span,
 #define SETUP_CODE							\
    struct affine_info info;						\
    struct gl_texture_unit *unit = ctx->Texture.Unit+0;			\
-   struct gl_texture_object *obj = unit->Current2D;			\
+   struct gl_texture_object *obj = 					\
+      ctx->Texture.Unit[0].CurrentTex[TEXTURE_2D_INDEX];		\
    const GLint b = obj->BaseLevel;					\
    const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
    const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
@@ -785,7 +796,8 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 #define SETUP_CODE							\
    struct persp_info info;						\
    const struct gl_texture_unit *unit = ctx->Texture.Unit+0;		\
-   const struct gl_texture_object *obj = unit->Current2D;		\
+   struct gl_texture_object *obj = 					\
+      ctx->Texture.Unit[0].CurrentTex[TEXTURE_2D_INDEX];		\
    const GLint b = obj->BaseLevel;					\
    info.texture = (const GLchan *) obj->Image[0][b]->Data;		\
    info.twidth_log2 = obj->Image[0][b]->WidthLog2;			\
@@ -1041,7 +1053,8 @@ _swrast_choose_triangle( GLcontext *ctx )
          const struct gl_texture_image *texImg;
          GLenum minFilter, magFilter, envMode;
          GLint format;
-         texObj2D = ctx->Texture.Unit[0].Current2D;
+         texObj2D = ctx->Texture.Unit[0].CurrentTex[TEXTURE_2D_INDEX];
+
          texImg = texObj2D ? texObj2D->Image[0][texObj2D->BaseLevel] : NULL;
          format = texImg ? texImg->TexFormat->MesaFormat : -1;
          minFilter = texObj2D ? texObj2D->MinFilter : (GLenum) 0;

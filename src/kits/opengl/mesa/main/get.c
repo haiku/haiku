@@ -19,10 +19,6 @@
 
 #define INT_TO_BOOLEAN(I)     ( (I) ? GL_TRUE : GL_FALSE )
 
-#define ENUM_TO_BOOLEAN(E)    ( (E) ? GL_TRUE : GL_FALSE )
-#define ENUM_TO_INT(E)        ( (GLint) (E) )
-#define ENUM_TO_FLOAT(E)      ( (GLfloat) (E) )
-
 #define BOOLEAN_TO_INT(B)     ( (GLint) (B) )
 #define BOOLEAN_TO_FLOAT(B)   ( (B) ? 1.0F : 0.0F )
 
@@ -293,7 +289,7 @@ _mesa_GetBooleanv( GLenum pname, GLboolean *params )
          params[0] = INT_TO_BOOLEAN(ctx->DrawBuffer->Visual.depthBits);
          break;
       case GL_DEPTH_CLEAR_VALUE:
-         params[0] = FLOAT_TO_BOOLEAN(ctx->Depth.Clear);
+         params[0] = FLOAT_TO_BOOLEAN(((GLfloat) ctx->Depth.Clear));
          break;
       case GL_DEPTH_FUNC:
          params[0] = ENUM_TO_BOOLEAN(ctx->Depth.Func);
@@ -888,21 +884,21 @@ _mesa_GetBooleanv( GLenum pname, GLboolean *params )
          params[0] = _mesa_IsEnabled(GL_TEXTURE_2D_ARRAY_EXT);
          break;
       case GL_TEXTURE_BINDING_1D:
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1D->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_2D:
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2D->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_3D:
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current3D->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_3D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_1D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetBooleanv");
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1DArray->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_ARRAY_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_2D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetBooleanv");
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2DArray->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_ARRAY_INDEX]->Name);
          break;
       case GL_TEXTURE_GEN_S:
          params[0] = ((ctx->Texture.Unit[ctx->Texture.CurrentUnit].TexGenEnabled & S_BIT) ? 1 : 0);
@@ -1075,7 +1071,7 @@ _mesa_GetBooleanv( GLenum pname, GLboolean *params )
          break;
       case GL_TEXTURE_BINDING_CUBE_MAP_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetBooleanv");
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentCubeMap->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_CUBE_INDEX]->Name);
          break;
       case GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetBooleanv");
@@ -1096,7 +1092,7 @@ _mesa_GetBooleanv( GLenum pname, GLboolean *params )
          GLuint i, n = _mesa_get_compressed_formats(ctx, formats, GL_FALSE);
          ASSERT(n <= 100);
          for (i = 0; i < n; i++)
-            params[i] = ENUM_TO_INT(formats[i]);
+            params[i] = ENUM_TO_BOOLEAN(formats[i]);
          }
          break;
       case GL_ARRAY_ELEMENT_LOCK_FIRST_EXT:
@@ -1573,7 +1569,7 @@ _mesa_GetBooleanv( GLenum pname, GLboolean *params )
          break;
       case GL_TEXTURE_BINDING_RECTANGLE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetBooleanv");
-         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentRect->Name);
+         params[0] = INT_TO_BOOLEAN(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_RECT_INDEX]->Name);
          break;
       case GL_MAX_RECTANGLE_TEXTURE_SIZE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetBooleanv");
@@ -2141,7 +2137,7 @@ _mesa_GetFloatv( GLenum pname, GLfloat *params )
          params[0] = (GLfloat)(ctx->DrawBuffer->Visual.depthBits);
          break;
       case GL_DEPTH_CLEAR_VALUE:
-         params[0] = ctx->Depth.Clear;
+         params[0] = ((GLfloat) ctx->Depth.Clear);
          break;
       case GL_DEPTH_FUNC:
          params[0] = ENUM_TO_FLOAT(ctx->Depth.Func);
@@ -2736,21 +2732,21 @@ _mesa_GetFloatv( GLenum pname, GLfloat *params )
          params[0] = BOOLEAN_TO_FLOAT(_mesa_IsEnabled(GL_TEXTURE_2D_ARRAY_EXT));
          break;
       case GL_TEXTURE_BINDING_1D:
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1D->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_2D:
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2D->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_3D:
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current3D->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_3D_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_1D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetFloatv");
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1DArray->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_ARRAY_INDEX]->Name);
          break;
       case GL_TEXTURE_BINDING_2D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetFloatv");
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2DArray->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_ARRAY_INDEX]->Name);
          break;
       case GL_TEXTURE_GEN_S:
          params[0] = BOOLEAN_TO_FLOAT(((ctx->Texture.Unit[ctx->Texture.CurrentUnit].TexGenEnabled & S_BIT) ? 1 : 0));
@@ -2923,7 +2919,7 @@ _mesa_GetFloatv( GLenum pname, GLfloat *params )
          break;
       case GL_TEXTURE_BINDING_CUBE_MAP_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetFloatv");
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentCubeMap->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_CUBE_INDEX]->Name);
          break;
       case GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetFloatv");
@@ -2944,7 +2940,7 @@ _mesa_GetFloatv( GLenum pname, GLfloat *params )
          GLuint i, n = _mesa_get_compressed_formats(ctx, formats, GL_FALSE);
          ASSERT(n <= 100);
          for (i = 0; i < n; i++)
-            params[i] = ENUM_TO_INT(formats[i]);
+            params[i] = ENUM_TO_FLOAT(formats[i]);
          }
          break;
       case GL_ARRAY_ELEMENT_LOCK_FIRST_EXT:
@@ -3421,7 +3417,7 @@ _mesa_GetFloatv( GLenum pname, GLfloat *params )
          break;
       case GL_TEXTURE_BINDING_RECTANGLE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetFloatv");
-         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentRect->Name);
+         params[0] = (GLfloat)(ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_RECT_INDEX]->Name);
          break;
       case GL_MAX_RECTANGLE_TEXTURE_SIZE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetFloatv");
@@ -3989,7 +3985,7 @@ _mesa_GetIntegerv( GLenum pname, GLint *params )
          params[0] = ctx->DrawBuffer->Visual.depthBits;
          break;
       case GL_DEPTH_CLEAR_VALUE:
-         params[0] = IROUND(ctx->Depth.Clear);
+         params[0] = FLOAT_TO_INT(((GLfloat) ctx->Depth.Clear));
          break;
       case GL_DEPTH_FUNC:
          params[0] = ENUM_TO_INT(ctx->Depth.Func);
@@ -4584,21 +4580,21 @@ _mesa_GetIntegerv( GLenum pname, GLint *params )
          params[0] = BOOLEAN_TO_INT(_mesa_IsEnabled(GL_TEXTURE_2D_ARRAY_EXT));
          break;
       case GL_TEXTURE_BINDING_1D:
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1D->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_INDEX]->Name;
          break;
       case GL_TEXTURE_BINDING_2D:
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2D->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_INDEX]->Name;
          break;
       case GL_TEXTURE_BINDING_3D:
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current3D->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_3D_INDEX]->Name;
          break;
       case GL_TEXTURE_BINDING_1D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetIntegerv");
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current1DArray->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_1D_ARRAY_INDEX]->Name;
          break;
       case GL_TEXTURE_BINDING_2D_ARRAY_EXT:
          CHECK_EXT1(MESA_texture_array, "GetIntegerv");
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].Current2DArray->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_2D_ARRAY_INDEX]->Name;
          break;
       case GL_TEXTURE_GEN_S:
          params[0] = BOOLEAN_TO_INT(((ctx->Texture.Unit[ctx->Texture.CurrentUnit].TexGenEnabled & S_BIT) ? 1 : 0));
@@ -4771,7 +4767,7 @@ _mesa_GetIntegerv( GLenum pname, GLint *params )
          break;
       case GL_TEXTURE_BINDING_CUBE_MAP_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetIntegerv");
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentCubeMap->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_CUBE_INDEX]->Name;
          break;
       case GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB:
          CHECK_EXT1(ARB_texture_cube_map, "GetIntegerv");
@@ -5269,7 +5265,7 @@ _mesa_GetIntegerv( GLenum pname, GLint *params )
          break;
       case GL_TEXTURE_BINDING_RECTANGLE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetIntegerv");
-         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentRect->Name;
+         params[0] = ctx->Texture.Unit[ctx->Texture.CurrentUnit].CurrentTex[TEXTURE_RECT_INDEX]->Name;
          break;
       case GL_MAX_RECTANGLE_TEXTURE_SIZE_NV:
          CHECK_EXT1(NV_texture_rectangle, "GetIntegerv");

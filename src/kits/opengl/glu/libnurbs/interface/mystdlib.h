@@ -31,8 +31,6 @@
 /*
  * mystdlib.h
  *
- * $Date: 2001/03/19 17:52:02 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/mystdlib.h,v 1.3 2001/03/19 17:52:02 pesco Exp $
  */
 
 #ifndef __glumystdlib_h_

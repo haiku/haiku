@@ -35,8 +35,6 @@
 /*
  * curve.c++
  *
- * $Date: 2004/05/12 15:29:36 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/curve.cc,v 1.3 2004/05/12 15:29:36 brianp Exp $
  */
 
 #include "glimports.h"

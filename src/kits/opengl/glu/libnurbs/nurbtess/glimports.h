@@ -31,8 +31,6 @@
 /*
  * glimports.h
  *
- * $Date: 2001/03/19 17:52:03 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/nurbtess/glimports.h,v 1.3 2001/03/19 17:52:03 pesco Exp $
  */
 
 #ifndef __gluimports_h_

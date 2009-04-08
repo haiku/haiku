@@ -31,10 +31,8 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
-** $Date: 2001/03/17 00:25:40 $ $Revision: 1.1 $
 */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/bezierPatchMesh.cc,v 1.1 2001/03/17 00:25:40 brianp Exp $
 */
 
 #include "gluos.h"
@@ -105,23 +103,22 @@ bezierPatchMesh *bezierPatchMeshMake(int maptype, float umin, float umax, int us
   int dimension;
   int the_ustride;
   int the_vstride;
-  
-  bezierPatchMesh *ret = (bezierPatchMesh*) malloc(sizeof(bezierPatchMesh));
-  assert(ret);
 
-  ret->bpatch = NULL;
-  ret->bpatch_normal = NULL;
-  ret->bpatch_color  = NULL;
-  ret->bpatch_texcoord = NULL;
- 
   if(maptype == GL_MAP2_VERTEX_3) dimension = 3;
   else if (maptype==GL_MAP2_VERTEX_4) dimension = 4;
   else {
     fprintf(stderr, "error in inMap2f, maptype=%i is wrong, maptype,map is invalid\n", maptype);
     return NULL;
   }
-  
+
+  bezierPatchMesh *ret = (bezierPatchMesh*) malloc(sizeof(bezierPatchMesh));
+  assert(ret);
+
+  ret->bpatch_normal = NULL;
+  ret->bpatch_color  = NULL;
+  ret->bpatch_texcoord = NULL;
   ret->bpatch = bezierPatchMake(umin, vmin, umax, vmax, uorder, vorder, dimension);
+
   /*copy the control points there*/
   the_ustride = vorder * dimension;
   the_vstride = dimension;

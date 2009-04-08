@@ -28,7 +28,6 @@
  * Silicon Graphics, Inc.
  */
 /*
-** $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/displaymode.h,v 1.1 2001/03/17 00:25:40 brianp Exp $
 */
 
 #ifndef __gludisplaymode_h_

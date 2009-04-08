@@ -31,8 +31,6 @@
 /*
  * glrenderer.h
  *
- * $Date: 2004/02/26 14:58:11 $ $Revision: 1.4 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/interface/glrenderer.h,v 1.4 2004/02/26 14:58:11 brianp Exp $
  */
 
 #ifndef __gluglrenderer_h_

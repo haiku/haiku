@@ -1,9 +1,8 @@
-
 /*
  * Mesa 3-D graphics library
- * Version:  3.5
+ * Version:  7.1
  *
- * Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,13 +23,40 @@
  */
 
 
-#ifndef S_DRAWPIXELS_H
-#define S_DRAWPIXELS_H
+#ifndef TEXGEN_H
+#define TEXGEN_H
 
 
-#include "mtypes.h"
-#include "swrast.h"
+#include "main/glheader.h"
 
-/* XXX kill this header? */
 
-#endif
+extern void GLAPIENTRY
+_mesa_GetTexGendv( GLenum coord, GLenum pname, GLdouble *params );
+
+extern void GLAPIENTRY
+_mesa_GetTexGenfv( GLenum coord, GLenum pname, GLfloat *params );
+
+extern void GLAPIENTRY
+_mesa_GetTexGeniv( GLenum coord, GLenum pname, GLint *params );
+
+extern void GLAPIENTRY
+_mesa_TexGend( GLenum coord, GLenum pname, GLdouble param );
+
+extern void GLAPIENTRY
+_mesa_TexGendv( GLenum coord, GLenum pname, const GLdouble *params );
+
+extern void GLAPIENTRY
+_mesa_TexGenf( GLenum coord, GLenum pname, GLfloat param );
+
+extern void GLAPIENTRY
+_mesa_TexGenfv( GLenum coord, GLenum pname, const GLfloat *params );
+
+extern void GLAPIENTRY
+_mesa_TexGeni( GLenum coord, GLenum pname, GLint param );
+
+extern void GLAPIENTRY
+_mesa_TexGeniv( GLenum coord, GLenum pname, const GLint *params );
+
+
+
+#endif /* TEXGEN_H */

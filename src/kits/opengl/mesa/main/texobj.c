@@ -29,7 +29,9 @@
 
 
 #include "glheader.h"
+#if FEATURE_colortable
 #include "colortab.h"
+#endif
 #include "context.h"
 #include "enums.h"
 #include "fbobject.h"
@@ -187,7 +189,9 @@ _mesa_delete_texture_object( GLcontext *ctx, struct gl_texture_object *texObj )
     */
    texObj->Target = 0x99;
 
+#if FEATURE_colortable
    _mesa_free_colortable_data(&texObj->Palette);
+#endif
 
    /* free the texture images */
    for (face = 0; face < 6; face++) {
@@ -378,6 +382,18 @@ _mesa_test_texobj_completeness( const GLcontext *ctx,
    GLint maxLog2 = 0, maxLevels = 0;
 
    t->_Complete = GL_TRUE;  /* be optimistic */
+
+   /* Detect cases where the application set the base level to an invalid
+    * value.
+    */
+   if ((baseLevel < 0) || (baseLevel > MAX_TEXTURE_LEVELS)) {
+      char s[100];
+      _mesa_sprintf(s, "obj %p (%d) base level = %d is invalid",
+              (void *) t, t->Name, baseLevel);
+      incomplete(t, s);
+      t->_Complete = GL_FALSE;
+      return;
+   }
 
    /* Always need the base level image */
    if (!t->Image[0][baseLevel]) {
@@ -740,30 +756,17 @@ unbind_texobj_from_fbo(GLcontext *ctx, struct gl_texture_object *texObj)
 static void
 unbind_texobj_from_texunits(GLcontext *ctx, struct gl_texture_object *texObj)
 {
-   GLuint u;
+   GLuint u, tex;
 
    for (u = 0; u < MAX_TEXTURE_IMAGE_UNITS; u++) {
       struct gl_texture_unit *unit = &ctx->Texture.Unit[u];
-      if (texObj == unit->Current1D) {
-         _mesa_reference_texobj(&unit->Current1D, ctx->Shared->Default1D);
-      }
-      else if (texObj == unit->Current2D) {
-         _mesa_reference_texobj(&unit->Current2D, ctx->Shared->Default2D);
-      }
-      else if (texObj == unit->Current3D) {
-         _mesa_reference_texobj(&unit->Current3D, ctx->Shared->Default3D);
-      }
-      else if (texObj == unit->CurrentCubeMap) {
-         _mesa_reference_texobj(&unit->CurrentCubeMap, ctx->Shared->DefaultCubeMap);
-      }
-      else if (texObj == unit->CurrentRect) {
-         _mesa_reference_texobj(&unit->CurrentRect, ctx->Shared->DefaultRect);
-      }
-      else if (texObj == unit->Current1DArray) {
-         _mesa_reference_texobj(&unit->Current1DArray, ctx->Shared->Default1DArray);
-      }
-      else if (texObj == unit->Current2DArray) {
-         _mesa_reference_texobj(&unit->Current2DArray, ctx->Shared->Default2DArray);
+      for (tex = 0; tex < NUM_TEXTURE_TARGETS; tex++) {
+         if (texObj == unit->CurrentTex[tex]) {
+            _mesa_reference_texobj(&unit->CurrentTex[tex],
+                                   ctx->Shared->DefaultTex[TEXTURE_1D_INDEX]);
+            ASSERT(unit->CurrentTex[tex]);
+            break;
+         }
       }
    }
 }
@@ -834,6 +837,35 @@ _mesa_DeleteTextures( GLsizei n, const GLuint *textures)
 
 
 /**
+ * Convert a GL texture target enum such as GL_TEXTURE_2D or GL_TEXTURE_3D
+ * into the corresponding Mesa texture target index.
+ * Return -1 if target is invalid.
+ */
+static GLint
+target_enum_to_index(GLenum target)
+{
+   switch (target) {
+   case GL_TEXTURE_1D:
+      return TEXTURE_1D_INDEX;
+   case GL_TEXTURE_2D:
+      return TEXTURE_2D_INDEX;
+   case GL_TEXTURE_3D:
+      return TEXTURE_3D_INDEX;
+   case GL_TEXTURE_CUBE_MAP_ARB:
+      return TEXTURE_CUBE_INDEX;
+   case GL_TEXTURE_RECTANGLE_NV:
+      return TEXTURE_RECT_INDEX;
+   case GL_TEXTURE_1D_ARRAY_EXT:
+      return TEXTURE_1D_ARRAY_INDEX;
+   case GL_TEXTURE_2D_ARRAY_EXT:
+      return TEXTURE_2D_ARRAY_INDEX;
+   default:
+      return -1;
+   }
+}
+
+
+/**
  * Bind a named texture to a texturing target.
  * 
  * \param target texture target.
@@ -855,38 +887,20 @@ _mesa_BindTexture( GLenum target, GLuint texName )
    const GLuint unit = ctx->Texture.CurrentUnit;
    struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
    struct gl_texture_object *newTexObj = NULL, *defaultTexObj = NULL;
+   GLint targetIndex;
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
    if (MESA_VERBOSE & (VERBOSE_API|VERBOSE_TEXTURE))
       _mesa_debug(ctx, "glBindTexture %s %d\n",
                   _mesa_lookup_enum_by_nr(target), (GLint) texName);
 
-   switch (target) {
-   case GL_TEXTURE_1D:
-      defaultTexObj = ctx->Shared->Default1D;
-      break;
-   case GL_TEXTURE_2D:
-      defaultTexObj = ctx->Shared->Default2D;
-      break;
-   case GL_TEXTURE_3D:
-      defaultTexObj = ctx->Shared->Default3D;
-      break;
-   case GL_TEXTURE_CUBE_MAP_ARB:
-      defaultTexObj = ctx->Shared->DefaultCubeMap;
-      break;
-   case GL_TEXTURE_RECTANGLE_NV:
-      defaultTexObj = ctx->Shared->DefaultRect;
-      break;
-   case GL_TEXTURE_1D_ARRAY_EXT:
-      defaultTexObj = ctx->Shared->Default1DArray;
-      break;
-   case GL_TEXTURE_2D_ARRAY_EXT:
-      defaultTexObj = ctx->Shared->Default2DArray;
-      break;
-   default:
+   targetIndex = target_enum_to_index(target);
+   if (targetIndex < 0) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glBindTexture(target)");
       return;
    }
+   assert(targetIndex < NUM_TEXTURE_TARGETS);
+   defaultTexObj = ctx->Shared->DefaultTex[targetIndex];
 
    /*
     * Get pointer to new texture object (newTexObj)
@@ -934,33 +948,8 @@ _mesa_BindTexture( GLenum target, GLuint texName )
     * texture object will be decremented.  It'll be deleted if the
     * count hits zero.
     */
-   switch (target) {
-      case GL_TEXTURE_1D:
-         _mesa_reference_texobj(&texUnit->Current1D, newTexObj);
-         break;
-      case GL_TEXTURE_2D:
-         _mesa_reference_texobj(&texUnit->Current2D, newTexObj);
-         break;
-      case GL_TEXTURE_3D:
-         _mesa_reference_texobj(&texUnit->Current3D, newTexObj);
-         break;
-      case GL_TEXTURE_CUBE_MAP_ARB:
-         _mesa_reference_texobj(&texUnit->CurrentCubeMap, newTexObj);
-         break;
-      case GL_TEXTURE_RECTANGLE_NV:
-         _mesa_reference_texobj(&texUnit->CurrentRect, newTexObj);
-         break;
-      case GL_TEXTURE_1D_ARRAY_EXT:
-         texUnit->Current1DArray = newTexObj;
-         break;
-      case GL_TEXTURE_2D_ARRAY_EXT:
-         texUnit->Current2DArray = newTexObj;
-         break;
-      default:
-         /* Bad target should be caught above */
-         _mesa_problem(ctx, "bad target in BindTexture");
-         return;
-   }
+   _mesa_reference_texobj(&texUnit->CurrentTex[targetIndex], newTexObj);
+   ASSERT(texUnit->CurrentTex[targetIndex]);
 
    /* Pass BindTexture call to device driver */
    if (ctx->Driver.BindTexture)

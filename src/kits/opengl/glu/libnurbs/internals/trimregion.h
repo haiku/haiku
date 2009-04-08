@@ -31,8 +31,6 @@
 /*
  * trimregion.h
  *
- * $Date: 2001/03/17 00:25:41 $ $Revision: 1.1 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/trimregion.h,v 1.1 2001/03/17 00:25:41 brianp Exp $
  */
 
 #ifndef __glutrimregion_h_

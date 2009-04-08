@@ -31,8 +31,6 @@
 /*
  * bufpool.h
  *
- * $Date: 2006/03/29 18:46:46 $ $Revision: 1.3 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/bufpool.h,v 1.3 2006/03/29 18:46:46 brianp Exp $
  */
 
 #ifndef __glubufpool_h_

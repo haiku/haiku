@@ -31,8 +31,6 @@
 /*
  * coveandtiler.h
  *
- * $Date: 2001/07/16 15:46:42 $ $Revision: 1.2 $
- * $Header: /cvs/mesa/Mesa/src/glu/sgi/libnurbs/internals/coveandtiler.h,v 1.2 2001/07/16 15:46:42 brianp Exp $
  */
 
 #ifndef __glucoveandtiler_h

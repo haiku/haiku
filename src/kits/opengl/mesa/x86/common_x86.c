@@ -48,8 +48,8 @@
 #include <machine/cpu.h>
 #endif
 
+#include "main/imports.h"
 #include "common_x86_asm.h"
-#include "imports.h"
 
 
 int _mesa_x86_cpu_features = 0;
