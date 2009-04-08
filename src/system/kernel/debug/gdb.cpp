@@ -18,6 +18,8 @@
 
 #include <arch/debug_console.h>
 #include <debug.h>
+#include <elf.h>
+#include <elf_priv.h>
 #include <smp.h>
 #include <vm.h>
 
@@ -183,6 +185,14 @@ gdb_parse_command(void)
 		gdb_ack();
 
 	switch (sCommand[0]) {
+		case '?':
+			// command '?' is used for retrieving the signal
+			// that stopped the program. Fully implemeting
+			// this command requires help from the debugger,
+			// by now we just fake a SIGKILL
+			gdb_reply("S09");	/* SIGKILL = 9 */
+			break;
+
 		case 'H':
 			// Command H (actually Hct) is used to select
 			// the current thread (-1 meaning all threads)
@@ -193,42 +203,28 @@ gdb_parse_command(void)
 
 		case 'q':
 		{
-			extern unsigned __data_start;
-			extern unsigned __bss_start;
+			// query commands
 
-			// There are several q commands:
-			//
-			//     qXXXX        Request info about XXXX.
-			//     QXXXX=yyyy   Set value of XXXX to yyyy.
-			//     qOffsets     Get segment offsets
-			//
-			// Currently we only support the 'qOffsets'
-			// form.
-			//
-			// *Note* that we actually have to lie,
-			// At first thought looks like we should
-			// return '_start', '__data_start' &
-			// '__bss_start', however gdb gets
-			// confused because the kernel link script
-			// pre-links at 0x80000000. To keep gdb
-			// gdb happy we just substract that amount.
-			if (strcmp(sCommand + 1, "Offsets") == 0) {
-				gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
-					((unsigned)(&__data_start)) - 0x80000000,
-					((unsigned)(&__bss_start)) - 0x80000000);
+			if (strcmp(sCommand + 1, "Supported") == 0) {
+				// get the supported features
+				gdb_reply("");
+			} else if (strcmp(sCommand + 1, "Offsets") == 0) {
+				// get the segment offsets
+				elf_image_info* kernelImage = elf_get_kernel_image();
+				gdb_reply("Text=%lx;Data=%lx;Bss=%lx",
+					kernelImage->text_region.delta,
+					kernelImage->data_region.delta,
+					kernelImage->data_region.delta);
 			} else
-				gdb_reply("ENS");
+				gdb_reply("");
 
 			break;
 		}
 
-		case '?':
-			// command '?' is used for retrieving the signal
-			// that stopped the program. Fully implemeting
-			// this command requires help from the debugger,
-			// by now we just fake a SIGKILL
-			gdb_reply("S09");	/* SIGKILL = 9 */
-			break;
+		case 'c':
+			// continue at address
+			// TODO: Parse the address and resume there!
+			return QUIT;
 
 		case 'g':
 		{
@@ -254,6 +250,13 @@ gdb_parse_command(void)
 
 			break;
 		}
+
+		case 'G':
+			// write registers
+			// TODO: Implement!
+			gdb_reply("E01");
+			break;
+
 
 		case 'm':
 		{
@@ -296,6 +299,10 @@ gdb_parse_command(void)
 			break;
 		}
 
+		case 'D':
+			// detach
+			return QUIT;
+
 		case 'k':
 			// Command 'k' actual semantics is 'kill the damn thing'.
 			// However gdb sends that command when you disconnect
@@ -306,8 +313,14 @@ gdb_parse_command(void)
 			// kernel debugger command prompt.
 			return QUIT;
 
-		default:
+		case 's':
+			// "step" -- resume (?) at address
+			// TODO: Implement!
 			gdb_reply("E01");
+			break;
+
+		default:
+			gdb_reply("");
 			break;
 	}
 
