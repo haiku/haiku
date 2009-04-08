@@ -124,6 +124,7 @@ private:
 	typedef BApplication inherited;
 };
 
+
 ServerApp::ServerApp()
  	: BApplication(B_MEDIA_SERVER_SIGNATURE),
 	fLocker(new BLocker("media server locker"))
@@ -142,7 +143,9 @@ ServerApp::ServerApp()
 	resume_thread(control_thread);
 }
 
-void ServerApp::ReadyToRun()
+
+void
+ServerApp::ReadyToRun()
 {
 	gNodeManager->LoadState();
 	gFormatManager->LoadState();
@@ -154,6 +157,7 @@ void ServerApp::ReadyToRun()
 
 	gAddOnManager->LoadState();
 }
+
 
 ServerApp::~ServerApp()
 {
@@ -185,7 +189,8 @@ ServerApp::QuitRequested()
 }
 
 
-void ServerApp::ArgvReceived(int32 argc, char **argv)
+void
+ServerApp::ArgvReceived(int32 argc, char **argv)
 {
 	for (int arg = 1; arg < argc; arg++) {
 		if (strstr(argv[arg], "dump")) {
@@ -208,7 +213,8 @@ void ServerApp::ArgvReceived(int32 argc, char **argv)
 }
 
 
-void ServerApp::StartAddonServer()
+void
+ServerApp::StartAddonServer()
 {
 	status_t err;
 
@@ -245,7 +251,8 @@ void ServerApp::StartAddonServer()
 }
 
 
-void ServerApp::TerminateAddonServer()
+void
+ServerApp::TerminateAddonServer()
 {
 	// nothing to do if it's already terminated
 	if (!be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
@@ -259,9 +266,9 @@ void ServerApp::TerminateAddonServer()
 		BMessage msg(B_QUIT_REQUESTED);
 		status_t err = msger.SendMessage(&msg, (BHandler *)NULL, 2000000);
 			// 2 sec timeout
-		if (err) {
-			ERROR("Trouble terminating media_addon_server (2). Error %d "
-				"(%s)\n", err, strerror(err));
+		if (err != B_OK) {
+			ERROR("Trouble terminating media_addon_server (2): %s\n",
+				strerror(err));
 		}
 	}
 
@@ -886,6 +893,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 	TRACE("ServerApp::HandleMessage %#lx leave\n", code);
 }
 
+
 int32
 ServerApp::controlthread(void *arg)
 {
@@ -902,6 +910,7 @@ ServerApp::controlthread(void *arg)
 
 	return 0;
 }
+
 
 void
 ServerApp::MessageReceived(BMessage *msg)
@@ -937,6 +946,10 @@ ServerApp::MessageReceived(BMessage *msg)
 	}
 	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
 }
+
+
+//	#pragma mark -
+
 
 int
 main()
