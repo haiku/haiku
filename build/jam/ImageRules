@@ -731,9 +731,7 @@ rule OptionalPackageDependencies package : dependencies
 rule InstallOptionalHaikuImagePackage package : url : dirTokens
 {
 	# download zip file
-	local zipFile = $(package:G=download).zip ;
-	MakeLocate $(zipFile) : $(HAIKU_DOWNLOAD_DIR) ;
-	DownloadFile $(zipFile) : $(url) ;
+	local zipFile = [ DownloadOptionalPackage $(package) : $(url) ] ;
 
 	# unzip onto image
 	UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;

@@ -189,6 +189,66 @@ actions UnarchiveObjects
 }
 
 
+rule UnzipArchive directory : entries : zipFile : grist
+{
+	# UnzipArchive <directory> : <entries> : <zipFile> [ : <grist> ]
+	#
+	# Unzips the zip file target <zipFile> to directory <directory>. The rule
+	# can be called multiple times for different <entries> for the same
+	# <directory> and <zipFile> combo.
+	#
+	# <directory> - The directory into which to unzip the zip file. The
+	#               directory is created is by this rule and it is the target
+	#               that the unzip action is associated with.
+	# <entries>   - The entries of the zip file one is interested in. The rule
+	#               always unzips the complete zip file, from the given entries
+	#               the rule creates targets (using <grist>) representing the
+	#               unzipped entries. Those targets are returned by the rule.
+	# <zipFile>   - The zip file target to unzip.
+	# <grist>     - The grist used to create targets from <entries>. Defaults to
+	#               "unzipped".
+
+	grist ?= unzipped ;
+
+	# Turn the entries into targets to build.
+	local targets ;
+	local entry ;
+	for entry in $(entries) {
+		local target = $(entry:G=$(grist)) ;
+		targets += $(target) ;
+	}
+
+	LOCATE on $(targets) = $(directory) ;
+	Depends $(targets) : $(directory) ;
+	NoUpdate $(targets) ;
+
+	# one-time initialization for the main target (the directory)
+	if ! [ on $(directory) return $(INITIALIZED) ] {
+		NoUpdate $(directory) ;
+		MakeLocate $(directory) : $(directory:P) ;
+		Depends $(directory) : $(zipFile) ;
+		UnzipArchive1 $(directory) : $(zipFile) ;
+		INITIALIZED on $(directory) = 1 ;
+	}
+
+	# Use a dummy rule so that it looks to jam like the targets are actually
+	# built from the directory target.
+	UnzipArchiveDummy $(targets) : $(directory) ;
+
+	return $(targets) ;
+}
+
+actions UnzipArchive1
+{
+	mkdir -p $(1[1])
+	unzip -q -u -o -d $(1[1]) $(2)
+}
+
+actions UnzipArchiveDummy
+{
+}
+
+
 rule ObjectReference
 {
 	# ObjectReference <reference object> : <source object>
@@ -298,4 +358,22 @@ rule DownloadFile target : url
 actions DownloadFile1
 {
 	wget -O $(1) $(URL)
+}
+
+rule DownloadOptionalPackage package : url
+{
+	# download zip file
+	local zipFile = $(package:G=download).zip ;
+
+	# Request the download only once.
+	if [ on $(zipFile) return $(HAIKU_OPTIONAL_PACKAGE_DOWNLOAD) ] {
+		return $(zipFile) ;
+	}
+
+	HAIKU_OPTIONAL_PACKAGE_DOWNLOAD on $(zipFile) = 1 ;
+
+	MakeLocate $(zipFile) : $(HAIKU_DOWNLOAD_DIR) ;
+	DownloadFile $(zipFile) : $(url) ;
+
+	return $(zipFile) ;
 }
