@@ -1,8 +1,9 @@
 /* 
  * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _DATA_EXCHANGE_H
 #define _DATA_EXCHANGE_H
 
@@ -14,6 +15,7 @@
 #include <Messenger.h>
 #include <Buffer.h>
 #include <Entry.h>
+
 
 namespace BPrivate {
 namespace media {
@@ -29,39 +31,50 @@ status_t QueryServer(BMessage &request, BMessage &reply);
 
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size);
-status_t QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t QueryServer(int32 msgcode, request_data *request, int requestsize,
+	reply_data *reply, int replysize);
 
 // Raw data based data exchange with the media_addon_server
 status_t SendToAddonServer(int32 msgcode, command_data *msg, int size);
-status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t QueryAddonServer(int32 msgcode, request_data *request, int requestSize,
+	reply_data *reply, int replysize);
 
 // Raw data based data exchange with any (media node control-) port
-status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size);
-status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg,
+	int size);
+status_t QueryPort(port_id requestport, int32 msgcode, request_data *request,
+	int requestsize, reply_data *reply, int replysize);
 
 // The base struct used for all raw requests
-struct request_data
-{
-	port_id reply_port;
+struct request_data {
+	port_id					reply_port;
 
 	status_t SendReply(status_t result, reply_data *reply, int replysize) const;
 };
 
 // The base struct used for all raw replys
-struct reply_data
-{
-	status_t result;
+struct reply_data {
+	status_t				result;
 };
 
 // The base struct used for all raw commands (asynchronous, no answer)
-struct command_data
-{
+struct command_data {
 	// yes, it's empty ;)
 };
 
-}; // dataexchange
-}; // media
-}; // BPrivate
+// The base struct used for all requests using an area
+struct area_request_data : request_data {
+	area_id					area;
+};
+
+// The base struct used for all replies using an area
+struct area_reply_data : reply_data {
+	area_id					area;
+};
+
+} // namespace dataexchange
+} // namespace media
+} // namespace BPrivate
 
 using namespace BPrivate::media::dataexchange;
 
@@ -81,7 +94,6 @@ enum {
 	// media addon server
 	MEDIA_ADDON_SERVER_PLAY_MEDIA = '_TRU'
 };
-
 
 // Raw port based communication
 enum {
@@ -196,40 +208,41 @@ enum {
  * but we can assign it to an xfer_entry_ref and send this one,
  * when we receive it we can assign it to a normal entry_ref
  */
-struct xfer_entry_ref
-{
+struct xfer_entry_ref {
 public:
 	xfer_entry_ref()
-		{
-			device = -1;
-			directory = -1;
-			name[0] = 0;
-		}
+	{
+		device = -1;
+		directory = -1;
+		name[0] = 0;
+	}
+
 	operator entry_ref() const
-		{
-			entry_ref ref(device, directory, name);
-			return ref;
-		}
-	void operator=(const entry_ref &ref)
-		{
-			device = ref.device;
-			directory = ref.directory;
-			if(ref.name)
-				strcpy(name, ref.name);
-			else
-				name[0] = 0;
-		}
+	{
+		entry_ref ref(device, directory, name);
+		return ref;
+	}
+
+	xfer_entry_ref& operator=(const entry_ref& ref)
+	{
+		device = ref.device;
+		directory = ref.directory;
+		if (ref.name)
+			strcpy(name, ref.name);
+		else
+			name[0] = 0;
+
+		return *this;
+	}
+
 private:
 	dev_t	device;
 	ino_t	directory;
-	char	name[B_FILE_NAME_LENGTH]; // == 256 bytes
+	char	name[B_FILE_NAME_LENGTH];
 };
 
-
-
 // used by SERVER_GET_NODE and SERVER_SET_NODE
-enum node_type 
-{ 
+enum node_type { 
 	VIDEO_INPUT, 
 	AUDIO_INPUT, 
 	VIDEO_OUTPUT, 
@@ -241,835 +254,695 @@ enum node_type
 };
 
 // used by SERVER_PUBLISH_INPUTS and SERVER_PUBLISH_OUTPUTS
-enum
-{
+enum {
 	MAX_OUTPUTS = 8,
 	MAX_INPUTS = 8,
 };
 
 // used by SERVER_GET_LIVE_NODES
-enum
-{
+enum {
 	MAX_LIVE_INFO = 16,
 };
 
 // used by SERVER_GET_INSTANCES_FOR
-enum
-{
+enum {
 	MAX_NODE_ID = 4000,
 };
 
 // used by SERVER_GET_READERS
-enum
-{
+enum {
 	MAX_READERS = 40,
 };
 
-struct addonserver_instantiate_dormant_node_request : public request_data
-{
-	media_addon_id addonid;
-	int32 flavorid;
-	team_id creator_team;
+struct addonserver_instantiate_dormant_node_request : request_data {
+	media_addon_id			addonid;
+	int32					flavorid;
+	team_id					creator_team;
 };
 
-struct addonserver_instantiate_dormant_node_reply : public reply_data
-{
-	media_node node;
+struct addonserver_instantiate_dormant_node_reply : reply_data {
+	media_node				node;
 };
 
-struct server_set_node_request : public request_data
-{
-	node_type type;
-	bool use_node;
-	media_node node;
-	bool use_dni;
-	dormant_node_info dni;
-	bool use_input;
-	media_input input;
+struct server_set_node_request : request_data {
+	node_type				type;
+	bool					use_node;
+	media_node				node;
+	bool					use_dni;
+	dormant_node_info		dni;
+	bool					use_input;
+	media_input				input;
 };
 
-struct server_set_node_reply : public reply_data
-{
+struct server_set_node_reply : reply_data {
 };
 
-struct server_get_node_request : public request_data
-{
-	node_type type;
-	team_id team;
+struct server_get_node_request : request_data {
+	node_type				type;
+	team_id					team;
 };
 
-struct server_get_node_reply : public reply_data
-{
-	media_node node;
+struct server_get_node_reply : public reply_data {
+	media_node				node;
 
 	// for AUDIO_OUTPUT_EX
-	char input_name[B_MEDIA_NAME_LENGTH];
-	int32 input_id;
+	char					input_name[B_MEDIA_NAME_LENGTH];
+	int32					input_id;
 };
 
-struct producer_format_proposal_request : public request_data
-{
-	media_source output;
-	media_format format;
+struct producer_format_proposal_request : public request_data {
+	media_source			output;
+	media_format			format;
 };
 
-struct producer_format_proposal_reply : public reply_data
-{
-	media_format format;
+struct producer_format_proposal_reply : reply_data {
+	media_format			format;
 };
 
-struct producer_prepare_to_connect_request : public request_data
-{
-	media_source source;
-	media_destination destination;
-	media_format format;
-	char name[B_MEDIA_NAME_LENGTH];
+struct producer_prepare_to_connect_request : request_data {
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	char					name[B_MEDIA_NAME_LENGTH];
 };
 
-struct producer_prepare_to_connect_reply : public reply_data
-{
-	media_format format;
-	media_source out_source;
-	char name[B_MEDIA_NAME_LENGTH];
+struct producer_prepare_to_connect_reply : reply_data {
+	media_format			format;
+	media_source			out_source;
+	char					name[B_MEDIA_NAME_LENGTH];
 };
 
-struct producer_connect_request : public request_data
-{
-	status_t error;
-	media_source source;
-	media_destination destination;
-	media_format format;
-	char name[B_MEDIA_NAME_LENGTH];
+struct producer_connect_request : request_data {
+	status_t				error;
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	char					name[B_MEDIA_NAME_LENGTH];
 };
 
-struct producer_connect_reply : public reply_data
-{
-	char name[B_MEDIA_NAME_LENGTH];
+struct producer_connect_reply : reply_data {
+	char					name[B_MEDIA_NAME_LENGTH];
 };
 
-struct producer_disconnect_request : public request_data
-{
-	media_source source;
-	media_destination destination;
+struct producer_disconnect_request : request_data {
+	media_source			source;
+	media_destination		destination;
 };
 
-struct producer_disconnect_reply : public reply_data
-{
+struct producer_disconnect_reply : reply_data {
 };
 
-struct producer_format_suggestion_requested_request : public request_data
-{
-	media_type type;
-	int32 quality;
+struct producer_format_suggestion_requested_request : request_data {
+	media_type				type;
+	int32					quality;
 };
 
-struct producer_format_suggestion_requested_reply : public reply_data
-{
-	media_format format;
+struct producer_format_suggestion_requested_reply : reply_data {
+	media_format			format;
 };
 
-struct producer_set_play_rate_request : public request_data
-{
-	int32 numer;
-	int32 denom;
+struct producer_set_play_rate_request : request_data {
+	int32					numer;
+	int32					denom;
 };
 
-struct producer_set_play_rate_reply : public reply_data
-{
+struct producer_set_play_rate_reply : reply_data {
 };
 
-struct producer_get_initial_latency_request : public request_data
-{
+struct producer_get_initial_latency_request : request_data {
 };
 
-struct producer_get_initial_latency_reply : public reply_data
-{
-	bigtime_t initial_latency;
-	uint32 flags;
+struct producer_get_initial_latency_reply : reply_data {
+	bigtime_t				initial_latency;
+	uint32					flags;
 };
 
-struct producer_get_latency_request : public request_data
-{
+struct producer_get_latency_request : request_data {
 };
 
-struct producer_get_latency_reply : public reply_data
-{
-	bigtime_t latency;
+struct producer_get_latency_reply : reply_data {
+	bigtime_t				latency;
 };
 
-struct producer_set_buffer_group_command : public command_data
-{
-	media_source source;
-	media_destination destination;
-	void *user_data;
-	int32 change_tag;
-	int32 buffer_count;
-	media_buffer_id buffers[1];
+struct producer_set_buffer_group_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	void*					user_data;
+	int32					change_tag;
+	int32					buffer_count;
+	media_buffer_id			buffers[1];
 };
 
-struct producer_format_change_requested_command : public command_data
-{
-	media_source source;
-	media_destination destination;
-	media_format format;
-	void *user_data;
-	int32 change_tag;
+struct producer_format_change_requested_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	void*					user_data;
+	int32					change_tag;
 };
 
-struct producer_video_clipping_changed_command : public command_data
-{
-	media_source source;
-	media_destination destination;
+struct producer_video_clipping_changed_command : command_data {
+	media_source			source;
+	media_destination		destination;
 	media_video_display_info display;
-	void *user_data;
-	int32 change_tag;
-	int32 short_count;
-	int16 shorts[1];
+	void*					user_data;
+	int32					change_tag;
+	int32					short_count;
+	int16					shorts[1];
 };
 
-struct producer_additional_buffer_requested_command : public command_data
-{
-	media_source source;
-	media_buffer_id prev_buffer;
-	bigtime_t prev_time;
-	bool has_seek_tag;
-	media_seek_tag prev_tag;
+struct producer_additional_buffer_requested_command : command_data {
+	media_source			source;
+	media_buffer_id			prev_buffer;
+	bigtime_t				prev_time;
+	bool					has_seek_tag;
+	media_seek_tag			prev_tag;
 };
 
-struct producer_latency_changed_command : public command_data
-{
-	media_source source;
-	media_destination destination;
-	bigtime_t latency;
-	uint32 flags;
+struct producer_latency_changed_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	bigtime_t				latency;
+	uint32					flags;
 };
 
-struct producer_enable_output_command : public command_data
-{
-	media_source source;
-	media_destination destination;
-	bool enabled;
-	void *user_data;
-	int32 change_tag;
+struct producer_enable_output_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	bool					enabled;
+	void*					user_data;
+	int32					change_tag;
 };
 
-struct producer_late_notice_received_command : public command_data
-{
-	media_source source;
-	bigtime_t how_much;
-	bigtime_t performance_time;
+struct producer_late_notice_received_command : command_data {
+	media_source			source;
+	bigtime_t				how_much;
+	bigtime_t				performance_time;
 };
 
-struct producer_set_run_mode_delay_command : public command_data
-{
-	BMediaNode::run_mode mode;
-	bigtime_t delay;
+struct producer_set_run_mode_delay_command : command_data {
+	BMediaNode::run_mode	mode;
+	bigtime_t				delay;
 };
 
-struct consumer_accept_format_request : public request_data
-{
-	media_destination dest;
-	media_format format;
+struct consumer_accept_format_request : request_data {
+	media_destination		dest;
+	media_format			format;
 };
 
-struct consumer_accept_format_reply : public reply_data
-{
-	media_format format;
+struct consumer_accept_format_reply : reply_data {
+	media_format			format;
 };
 
-struct consumer_connected_request : public request_data
-{
-	media_input input;
+struct consumer_connected_request : request_data {
+	media_input				input;
 };
 
-struct consumer_connected_reply : public reply_data
-{
-	media_input input;
+struct consumer_connected_reply : reply_data {
+	media_input				input;
 };
 
-struct server_publish_inputs_request : public request_data
-{
-	media_node node;
-	int32 count;
+struct server_publish_inputs_request : request_data {
+	media_node				node;
+	int32					count;
 	area_id area;	// if count > MAX_INPUTS, inputs are in the area
 					// area is created in the library, and also deleted
 					// in the library after the reply has been received
 	media_input inputs[MAX_INPUTS];
 };
 
-struct server_publish_inputs_reply : public reply_data
-{
+struct server_publish_inputs_reply : reply_data {
 };
 
-struct server_publish_outputs_request : public request_data
-{
-	media_node node;
-	int32 count;
-	area_id area; // if count > MAX_OUTPUTS, outputs are in the area
-					// area is created in the library, and also deleted
-					// in the library after the reply has been received
+struct server_publish_outputs_request : area_request_data {
+	media_node				node;
+	int32					count;
+		// if count > MAX_OUTPUTS, outputs are in the area
+		// area is created in the library, and also deleted
+		// in the library after the reply has been received
 	media_output outputs[MAX_OUTPUTS];
 };
 
-struct server_publish_outputs_reply : public reply_data
-{
+struct server_publish_outputs_reply : reply_data {
 };
 
-struct producer_get_next_output_request : public request_data
-{
-	int32 cookie;
+struct producer_get_next_output_request : request_data {
+	int32					cookie;
 };
 
-struct producer_get_next_output_reply : public reply_data
+struct producer_get_next_output_reply : reply_data
 {
-	int32 cookie;
-	media_output output;
+	int32					cookie;
+	media_output			output;
 };
 
-struct producer_dispose_output_cookie_request : public request_data
+struct producer_dispose_output_cookie_request : request_data
 {
-	int32 cookie;
+	int32					cookie;
 };
 
-struct producer_dispose_output_cookie_reply : public reply_data
-{
+struct producer_dispose_output_cookie_reply : reply_data {
 };
 
-struct consumer_get_next_input_request : public request_data
-{
-	int32 cookie;
+struct consumer_get_next_input_request : request_data {
+	int32					cookie;
 };
 
-struct consumer_get_next_input_reply : public reply_data
-{
-	int32 cookie;
-	media_input input;
+struct consumer_get_next_input_reply : reply_data {
+	int32					cookie;
+	media_input				input;
 };
 
-struct consumer_dispose_input_cookie_request : public request_data
-{
-	int32 cookie;
+struct consumer_dispose_input_cookie_request : request_data {
+	int32					cookie;
 };
 
-struct consumer_dispose_input_cookie_reply : public reply_data
-{
+struct consumer_dispose_input_cookie_reply : reply_data {
 };
 
-struct consumer_disconnected_request : public request_data
-{
-	media_source source;
-	media_destination destination;
+struct consumer_disconnected_request : request_data {
+	media_source			source;
+	media_destination		destination;
 };
 
-struct consumer_disconnected_reply : public reply_data
-{
+struct consumer_disconnected_reply : reply_data {
 };
 
-struct consumer_buffer_received_command : public command_data
-{
-	media_buffer_id buffer;
-	media_header header;
+struct consumer_buffer_received_command : command_data {
+	media_buffer_id			buffer;
+	media_header			header;
 };
 
-struct consumer_producer_data_status_command : public command_data
-{
-	media_destination for_whom;
-	int32 status;
-	bigtime_t at_performance_time;
+struct consumer_producer_data_status_command : command_data {
+	media_destination		for_whom;
+	int32					status;
+	bigtime_t				at_performance_time;
 };
 
-struct consumer_get_latency_for_request : public request_data
-{
-	media_destination for_whom;
+struct consumer_get_latency_for_request : request_data {
+	media_destination		for_whom;
 };
 
-struct consumer_get_latency_for_reply : public reply_data
-{
-	bigtime_t latency;
-	media_node_id timesource;
+struct consumer_get_latency_for_reply : reply_data {
+	bigtime_t				latency;
+	media_node_id			timesource;
 };
 
-struct consumer_format_changed_request : public request_data
-{
-	media_source producer;
-	media_destination consumer;
-	int32 change_tag;
-	media_format format;
+struct consumer_format_changed_request : request_data {
+	media_source			producer;
+	media_destination		consumer;
+	int32					change_tag;
+	media_format			format;
 };
 
-struct consumer_format_changed_reply : public reply_data
-{
+struct consumer_format_changed_reply : reply_data {
 };
 
-struct consumer_seek_tag_requested_request : public request_data
-{
-	media_destination destination;
-	bigtime_t target_time;
-	uint32 flags;
+struct consumer_seek_tag_requested_request : request_data {
+	media_destination		destination;
+	bigtime_t				target_time;
+	uint32					flags;
 };
 
-struct consumer_seek_tag_requested_reply : public reply_data
-{
-	media_seek_tag seek_tag;
-	bigtime_t tagged_time;
-	uint32 flags;
+struct consumer_seek_tag_requested_reply : reply_data {
+	media_seek_tag			seek_tag;
+	bigtime_t				tagged_time;
+	uint32					flags;
 };
 
-struct server_register_app_request : public request_data
-{
-	team_id team;
-	BMessenger messenger;
+struct server_register_app_request : request_data {
+	team_id					team;
+	BMessenger				messenger;
 };
 
-struct server_register_app_reply : public reply_data
-{
+struct server_register_app_reply : reply_data {
 };
 
-struct server_unregister_app_request : public request_data
-{
-	team_id team;
+struct server_unregister_app_request : request_data {
+	team_id					team;
 };
 
-struct server_unregister_app_reply : public reply_data
-{
+struct server_unregister_app_reply : reply_data {
 };
 
-struct server_set_node_creator_request : public request_data
-{
-	media_node_id node;
-	team_id creator;
+struct server_set_node_creator_request : request_data {
+	media_node_id			node;
+	team_id					creator;
 };
 
-struct server_set_node_creator_reply : public reply_data
-{
+struct server_set_node_creator_reply : reply_data {
 };
 
-struct server_change_addon_flavor_instances_count_request : public request_data
-{
-	media_addon_id addonid;
-	int32 flavorid;
-	int32 delta; // must be +1 or -1
-	team_id team;
+struct server_change_addon_flavor_instances_count_request : request_data {
+	media_addon_id			addonid;
+	int32					flavorid;
+	int32					delta; // must be +1 or -1
+	team_id					team;
 };
 
-struct server_change_addon_flavor_instances_count_reply : public reply_data
-{
+struct server_change_addon_flavor_instances_count_reply : reply_data {
 };
 
-struct server_register_node_request : public request_data
-{
-	media_addon_id addon_id;
-	int32 addon_flavor_id;
-	char name[B_MEDIA_NAME_LENGTH];
-	uint64 kinds;
-	port_id port;
-	team_id team;
-};
-
-struct server_register_node_reply : public reply_data
-{
-	media_node_id nodeid;
+struct server_register_node_request : request_data {
+	media_addon_id			addon_id;
+	int32					addon_flavor_id;
+	char					name[B_MEDIA_NAME_LENGTH];
+	uint64					kinds;
+	port_id					port;
+	team_id					team;
 };
 
-struct server_unregister_node_request : public request_data
-{
-	media_node_id nodeid;
-	team_id team;
+struct server_register_node_reply : reply_data {
+	media_node_id			nodeid;
 };
 
-struct server_unregister_node_reply : public reply_data
-{
-	media_addon_id addonid;
-	int32 flavorid;
+struct server_unregister_node_request : request_data {
+	media_node_id			nodeid;
+	team_id					team;
 };
 
-struct server_get_live_node_info_request : public request_data
-{
-	media_node node;
+struct server_unregister_node_reply : reply_data {
+	media_addon_id			addonid;
+	int32					flavorid;
 };
 
-struct server_get_live_node_info_reply : public reply_data
-{
-	live_node_info live_info;
+struct server_get_live_node_info_request : request_data {
+	media_node				node;
 };
 
-struct server_get_live_nodes_request : public request_data
-{
-	int32 maxcount;
-	bool has_input;
-	bool has_output;
-	bool has_name;
-	media_format inputformat;
-	media_format outputformat;
-	char name[B_MEDIA_NAME_LENGTH + 1]; // 1 for a trailing "*"
-	uint64 require_kinds;
-};
-
-struct server_get_live_nodes_reply : public reply_data
-{
-	int32 count;
-	area_id area; 	// if count > MAX_LIVE_INFO, live_node_infos are in the area
-					// area is created in the server, but deleted in the library
-	live_node_info live_info[MAX_LIVE_INFO]; 
+struct server_get_live_node_info_reply : reply_data {
+	live_node_info			live_info;
 };
 
-struct server_node_id_for_request : public request_data
-{
-	port_id port;
+struct server_get_live_nodes_request : request_data {
+	int32					maxcount;
+	bool					has_input;
+	bool					has_output;
+	bool					has_name;
+	media_format			inputformat;
+	media_format			outputformat;
+	char					name[B_MEDIA_NAME_LENGTH + 1];
+								// +1 for a trailing "*"
+	uint64					require_kinds;
 };
 
-struct server_node_id_for_reply : public reply_data
-{
-	media_node_id nodeid;
+struct server_get_live_nodes_reply : area_reply_data {
+	int32					count;
+		// if count > MAX_LIVE_INFO, live_node_infos are in the area
+		// area is created in the server, but deleted in the library
+	live_node_info			live_info[MAX_LIVE_INFO]; 
 };
 
-struct server_get_node_for_request : public request_data
-{
-	media_node_id nodeid;
-	team_id team;
+struct server_node_id_for_request : request_data {
+	port_id					port;
 };
 
-struct server_get_node_for_reply : public reply_data
-{
-	media_node clone;
+struct server_node_id_for_reply : reply_data {
+	media_node_id			nodeid;
 };
 
-struct server_release_node_request : public request_data
-{
-	media_node node;
-	team_id team;
+struct server_get_node_for_request : request_data {
+	media_node_id			nodeid;
+	team_id					team;
 };
 
-struct server_release_node_reply : public reply_data
-{
+struct server_get_node_for_reply : reply_data {
+	media_node				clone;
 };
 
-struct server_get_dormant_node_for_request : public request_data
-{
-	media_node node;
+struct server_release_node_request : request_data {
+	media_node				node;
+	team_id					team;
 };
 
-struct server_get_dormant_node_for_reply : public reply_data
-{
-	dormant_node_info node_info;
+struct server_release_node_reply : reply_data {
 };
 
-struct server_get_instances_for_request : public request_data
-{
-	int32 maxcount;
-	media_addon_id addon_id;
-	int32 addon_flavor_id;
+struct server_get_dormant_node_for_request : request_data {
+	media_node				node;
 };
 
-struct server_get_instances_for_reply : public reply_data
-{
-	int32 count;
-	media_node_id node_id[MAX_NODE_ID]; // no area here, MAX_NODE_ID is really large
+struct server_get_dormant_node_for_reply : reply_data {
+	dormant_node_info		node_info;
 };
 
-struct server_rescan_defaults_command : public command_data
-{
+struct server_get_instances_for_request : request_data {
+	int32					maxcount;
+	media_addon_id			addon_id;
+	int32					addon_flavor_id;
 };
 
-struct addonserver_rescan_mediaaddon_flavors_command : public command_data
-{
-	media_addon_id addonid;
+struct server_get_instances_for_reply : reply_data {
+	int32					count;
+	media_node_id			node_id[MAX_NODE_ID];
+		// no area here, MAX_NODE_ID is really large
 };
 
-struct server_register_mediaaddon_request : public request_data
-{
-	xfer_entry_ref	ref; // a ref to the file
+struct server_rescan_defaults_command : command_data {
 };
 
-struct server_register_mediaaddon_reply : public reply_data
-{
-	media_addon_id addonid;
+struct addonserver_rescan_mediaaddon_flavors_command : command_data {
+	media_addon_id			addonid;
 };
 
-struct server_unregister_mediaaddon_command : public command_data
-{
-	media_addon_id addonid;
+struct server_register_mediaaddon_request : request_data {
+	xfer_entry_ref			ref;
 };
 
-struct server_get_mediaaddon_ref_request : public request_data
-{
-	media_addon_id addonid;
+struct server_register_mediaaddon_reply : reply_data {
+	media_addon_id			addonid;
 };
 
-struct server_get_mediaaddon_ref_reply : public reply_data
-{
-	xfer_entry_ref	ref; // a ref to the file
+struct server_unregister_mediaaddon_command : command_data {
+	media_addon_id			addonid;
 };
 
-struct server_get_shared_buffer_area_request : public request_data
-{
+struct server_get_mediaaddon_ref_request : request_data {
+	media_addon_id			addonid;
 };
 
-struct server_get_shared_buffer_area_reply : public reply_data
-{
-	area_id area;
+struct server_get_mediaaddon_ref_reply : reply_data {
+	xfer_entry_ref			ref;
 };
 
-struct server_register_buffer_request : public request_data
-{
-	team_id team;
-	//either info.buffer is != 0, or the area, size, offset is used
-	buffer_clone_info info;
+struct server_get_shared_buffer_area_request : request_data {
 };
 
-struct server_register_buffer_reply : public reply_data
-{
-	buffer_clone_info info;
+struct server_get_shared_buffer_area_reply : area_reply_data {
 };
 
-struct server_unregister_buffer_command : public command_data
-{
-	team_id team;
-	media_buffer_id bufferid;
+struct server_register_buffer_request : request_data {
+	team_id					team;
+	buffer_clone_info		info;
+		// either info.buffer is != 0, or the area, size, offset is used
 };
 
-struct server_rewindtypes_request : public request_data
-{
+struct server_register_buffer_reply : reply_data {
+	buffer_clone_info		info;
 };
 
-struct server_rewindtypes_reply : public reply_data
-{
-	int32 count;
-	area_id area;
+struct server_unregister_buffer_command : command_data {
+	team_id					team;
+	media_buffer_id			bufferid;
 };
 
-struct server_rewindrefs_request : public request_data
-{
-	char type[B_MEDIA_NAME_LENGTH];
+struct server_rewindtypes_request : request_data {
 };
 
-struct server_rewindrefs_reply : public reply_data
-{
-	int32 count;
-	area_id area;
+struct server_rewindtypes_reply : area_reply_data {
+	int32					count;
 };
 
-struct server_getreffor_request : public request_data
-{
-	char type[B_MEDIA_NAME_LENGTH];
-	char item[B_MEDIA_NAME_LENGTH];
+struct server_rewindrefs_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_getreffor_reply : public reply_data
-{
-	xfer_entry_ref	ref; // a ref to the file
+struct server_rewindrefs_reply : area_reply_data {
+	int32					count;
 };
 
-struct server_setreffor_request : public request_data
-{
-	char type[B_MEDIA_NAME_LENGTH];
-	char item[B_MEDIA_NAME_LENGTH];
-	xfer_entry_ref	ref; // a ref to the file
+struct server_getreffor_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_setreffor_reply : public reply_data
-{
+struct server_getreffor_reply : reply_data {
+	xfer_entry_ref			ref;
 };
 
-struct server_removereffor_request : public request_data
-{
-	char type[B_MEDIA_NAME_LENGTH];
-	char item[B_MEDIA_NAME_LENGTH];
-	xfer_entry_ref	ref; // a ref to the file
+struct server_setreffor_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
+	xfer_entry_ref			ref;
 };
 
-struct server_removereffor_reply : public reply_data
-{
+struct server_setreffor_reply : reply_data {
 };
 
-struct server_removeitem_request : public request_data
-{
-	char type[B_MEDIA_NAME_LENGTH];
-	char item[B_MEDIA_NAME_LENGTH];
+struct server_removereffor_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
+	xfer_entry_ref			ref;
 };
 
-struct server_removeitem_reply : public reply_data
-{
+struct server_removereffor_reply : reply_data {
 };
 
-struct server_get_decoder_for_format_request : public request_data
-{
-	media_format format;
+struct server_removeitem_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_get_decoder_for_format_reply : public reply_data
-{
-	xfer_entry_ref	ref; // a ref to the decoder
+struct server_removeitem_reply : reply_data {
 };
 
-struct server_get_readers_request : public request_data
-{
+struct server_get_decoder_for_format_request : request_data {
+	media_format			format;
 };
 
-struct server_get_readers_reply : public reply_data
-{
-	xfer_entry_ref	ref[MAX_READERS]; // a list of refs to the reader
-	int32			count;
+struct server_get_decoder_for_format_reply : reply_data {
+	xfer_entry_ref			ref;
+		// a ref to the decoder
 };
 
-struct node_request_completed_command : public command_data
-{
-	media_request_info info;
+struct server_get_readers_request : request_data {
 };
 
-struct node_start_command : public command_data
-{
-	bigtime_t performance_time;	
+struct server_get_readers_reply : reply_data {
+	xfer_entry_ref			ref[MAX_READERS];
+		// a list of refs to the reader
+	int32					count;
 };
 
-struct node_stop_command : public command_data
-{
-	bigtime_t performance_time;	
-	bool immediate;
+struct node_request_completed_command : command_data {
+	media_request_info		info;
 };
 
-struct node_seek_command : public command_data
-{
-	bigtime_t media_time;
-	bigtime_t performance_time;
+struct node_start_command : command_data {
+	bigtime_t				performance_time;	
 };
 
-struct node_set_run_mode_command : public command_data
-{
-	BMediaNode::run_mode mode;
+struct node_stop_command : command_data {
+	bigtime_t				performance_time;	
+	bool					immediate;
 };
 
-struct node_time_warp_command : public command_data
-{
-	bigtime_t at_real_time;
-	bigtime_t to_performance_time;
+struct node_seek_command : command_data {
+	bigtime_t				media_time;
+	bigtime_t				performance_time;
 };
 
-struct node_set_timesource_command : public command_data
-{
-	media_node_id timesource_id;
+struct node_set_run_mode_command : command_data {
+	BMediaNode::run_mode	mode;
 };
 
-struct node_get_timesource_request : public request_data
-{
+struct node_time_warp_command : command_data {
+	bigtime_t				at_real_time;
+	bigtime_t				to_performance_time;
 };
 
-struct node_get_timesource_reply : public reply_data
-{
-	media_node_id timesource_id;
+struct node_set_timesource_command : command_data {
+	media_node_id			timesource_id;
 };
 
-struct node_final_release_command : public command_data
-{
+struct node_get_timesource_request : request_data {
 };
 
-struct timesource_add_slave_node_command : public command_data
-{
-	media_node node;
+struct node_get_timesource_reply : reply_data {
+	media_node_id			timesource_id;
 };
 
-struct timesource_remove_slave_node_command : public command_data
-{
-	media_node node;
+struct node_final_release_command : command_data {
 };
 
-struct timesource_get_start_latency_request : public request_data
-{
+struct timesource_add_slave_node_command : command_data {
+	media_node				node;
 };
 
-struct timesource_get_start_latency_reply : public reply_data
-{
-	bigtime_t start_latency;
+struct timesource_remove_slave_node_command : command_data {
+	media_node				node;
 };
 
-struct fileinterface_set_ref_request : public request_data
-{
-	dev_t device;
-	ino_t directory;
-	char name[B_FILE_NAME_LENGTH];
-	bigtime_t duration;
-	bool create;
+struct timesource_get_start_latency_request : request_data {
 };
 
-struct fileinterface_set_ref_reply : public reply_data
-{
-	bigtime_t duration;
+struct timesource_get_start_latency_reply : reply_data {
+	bigtime_t				start_latency;
 };
 
-struct fileinterface_get_ref_request : public request_data
-{
+struct fileinterface_set_ref_request : request_data {
+	dev_t					device;
+	ino_t					directory;
+	char					name[B_FILE_NAME_LENGTH];
+	bigtime_t				duration;
+	bool					create;
 };
 
-struct fileinterface_get_ref_reply : public reply_data
-{
-	dev_t device;
-	ino_t directory;
-	char name[B_FILE_NAME_LENGTH];
-	char mimetype[256];
+struct fileinterface_set_ref_reply : reply_data {
+	bigtime_t				duration;
 };
 
-struct fileinterface_sniff_ref_request : public request_data
-{
-	dev_t device;
-	ino_t directory;
-	char name[B_FILE_NAME_LENGTH];
+struct fileinterface_get_ref_request : request_data {
 };
 
-struct fileinterface_sniff_ref_reply : public reply_data
-{
-	char mimetype[256];
-	float capability;
+struct fileinterface_get_ref_reply : reply_data {
+	dev_t					device;
+	ino_t					directory;
+	char					name[B_FILE_NAME_LENGTH];
+	char					mimetype[B_MIME_TYPE_LENGTH];
 };
 
-struct controllable_get_parameter_web_request : public request_data
-{
-	area_id area;
-	int32 maxsize;
+struct fileinterface_sniff_ref_request : request_data {
+	dev_t					device;
+	ino_t					directory;
+	char					name[B_FILE_NAME_LENGTH];
 };
 
-struct controllable_get_parameter_web_reply : public reply_data
-{
-	type_code code;
-	int32 size; // = -1: parameter web data too large, = 0: no p.w., > 0: flattened p.w. data
+struct fileinterface_sniff_ref_reply : reply_data {
+	char					mimetype[B_MIME_TYPE_LENGTH];
+	float					capability;
+};
+
+struct controllable_get_parameter_web_request : area_request_data {
+	int32					max_size;
+};
+
+struct controllable_get_parameter_web_reply : reply_data {
+	type_code				code;
+	int32					size;
+		// = -1: parameter web data too large,
+		// = 0: no p.w., > 0: flattened p.w. data
 };
 
 #define MAX_PARAMETER_DATA (B_MEDIA_MESSAGE_SIZE - 100)
 
-struct controllable_get_parameter_data_request : public request_data
-{
-	int32 parameter_id;
-	size_t requestsize;
-	area_id area; //if area != -1, data is too large and must be passed in the area
+struct controllable_get_parameter_data_request : area_request_data {
+	int32					parameter_id;
+	size_t					request_size;
 };
 
-struct controllable_get_parameter_data_reply : public reply_data
-{
-	bigtime_t last_change;
-	char rawdata[MAX_PARAMETER_DATA];
-	size_t size;
+struct controllable_get_parameter_data_reply : reply_data {
+	bigtime_t				last_change;
+	char					raw_data[MAX_PARAMETER_DATA];
+	size_t					size;
 };
 
-struct controllable_set_parameter_data_request : public request_data
-{
-	int32 parameter_id;
-	bigtime_t when;
-	area_id area; //if area != -1, data is too large and is passed in the area
-	size_t size;
-	char rawdata[MAX_PARAMETER_DATA];
+struct controllable_set_parameter_data_request : area_request_data {
+	int32					parameter_id;
+	bigtime_t				when;
+	size_t					size;
+	char					raw_data[MAX_PARAMETER_DATA];
 };
 
-struct controllable_set_parameter_data_reply : public reply_data
-{
+struct controllable_set_parameter_data_reply : reply_data {
 };
 
-struct controllable_start_control_panel_request : public request_data
-{
-	media_node node;
+struct controllable_start_control_panel_request : request_data {
+	media_node				node;
 };
 
-struct controllable_start_control_panel_reply : public reply_data
-{
-	team_id team;
+struct controllable_start_control_panel_reply : reply_data {
+	team_id					team;
 };
 
 #endif // _DATA_EXCHANGE_H

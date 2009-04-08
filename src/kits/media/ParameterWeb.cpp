@@ -15,13 +15,14 @@
 #include <ParameterWeb.h>
 
 #include <new>
+#include <string.h>
 
 #include <MediaNode.h>
-#include <string.h>
-#include "DataExchange.h"
-#include "MediaMisc.h"
+#include <MediaRoster.h>
 
+#include "DataExchange.h"
 #include "debug.h"
+#include "MediaMisc.h"
 
 
 /*
@@ -422,14 +423,22 @@ BParameterWeb::ParameterAt(int32 index)
 status_t
 BParameterWeb::StartWatching(const BMessenger& target, int32 notificationType)
 {
-	return B_ERROR;
+	if (BMediaRoster::CurrentRoster() == NULL)
+		return B_ERROR;
+
+	return BMediaRoster::CurrentRoster()->StartWatching(target, fNode,
+		notificationType);
 }
 
 
 status_t
 BParameterWeb::StopWatching(const BMessenger& target, int32 notificationType)
 {
-	return B_ERROR;
+	if (BMediaRoster::CurrentRoster() == NULL)
+		return B_ERROR;
+
+	return BMediaRoster::CurrentRoster()->StopWatching(target, fNode,
+		notificationType);
 }
 
 
@@ -1285,11 +1294,11 @@ BParameter::GetValue(void* buffer, size_t* _size, bigtime_t* _when)
 		}
 	} else {
 		area = -1;
-		data = reply.rawdata;
+		data = reply.raw_data;
 	}
 
 	request.parameter_id = fID;
-	request.requestsize = size;
+	request.request_size = size;
 	request.area = area;
 
 	status_t status = QueryPort(node.port, CONTROLLABLE_GET_PARAMETER_DATA,
@@ -1356,7 +1365,7 @@ BParameter::SetValue(const void* buffer, size_t size, bigtime_t when)
 		}
 	} else {
 		area = -1;
-		data = request.rawdata;
+		data = request.raw_data;
 	}
 
 	memcpy(data, buffer, size);
