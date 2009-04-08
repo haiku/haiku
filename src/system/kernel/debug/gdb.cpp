@@ -192,34 +192,35 @@ gdb_parse_command(void)
 			break;
 
 		case 'q':
-			{
-				extern unsigned __data_start;
-				extern unsigned __bss_start;
+		{
+			extern unsigned __data_start;
+			extern unsigned __bss_start;
 
-				// There are several q commands:
-				//
-				//     qXXXX        Request info about XXXX.
-				//     QXXXX=yyyy   Set value of XXXX to yyyy.
-				//     qOffsets     Get segment offsets
-				//
-				// Currently we only support the 'qOffsets'
-				// form.
-				//
-				// *Note* that we actually have to lie,
-				// At first thought looks like we should
-				// return '_start', '__data_start' &
-				// '__bss_start', however gdb gets
-				// confused because the kernel link script
-				// pre-links at 0x80000000. To keep gdb
-				// gdb happy we just substract that amount.
-				if (strcmp(sCommand + 1, "Offsets") == 0) {
-					gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
-						((unsigned)(&__data_start)) - 0x80000000,
-						((unsigned)(&__bss_start)) - 0x80000000);
-				} else
-					gdb_reply("ENS");
-			}
+			// There are several q commands:
+			//
+			//     qXXXX        Request info about XXXX.
+			//     QXXXX=yyyy   Set value of XXXX to yyyy.
+			//     qOffsets     Get segment offsets
+			//
+			// Currently we only support the 'qOffsets'
+			// form.
+			//
+			// *Note* that we actually have to lie,
+			// At first thought looks like we should
+			// return '_start', '__data_start' &
+			// '__bss_start', however gdb gets
+			// confused because the kernel link script
+			// pre-links at 0x80000000. To keep gdb
+			// gdb happy we just substract that amount.
+			if (strcmp(sCommand + 1, "Offsets") == 0) {
+				gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
+					((unsigned)(&__data_start)) - 0x80000000,
+					((unsigned)(&__bss_start)) - 0x80000000);
+			} else
+				gdb_reply("ENS");
+
 			break;
+		}
 
 		case '?':
 			// command '?' is used for retrieving the signal
@@ -230,68 +231,70 @@ gdb_parse_command(void)
 			break;
 
 		case 'g':
-			{
-				int cpu;
+		{
+			int cpu;
 
-				// command 'g' is used for reading the register
-				// file. Faked by now.
-				//
-				// For x86 the register order is:
-				//
-				//    eax, ebx, ecx, edx,
-				//    esp, ebp, esi, edi,
-				//    eip, eflags,
-				//    cs, ss, ds, es
-				//
-				// Note that even thought the segment descriptors
-				// are actually 16 bits wide, gdb requires them
-				// as 32 bit integers. Note also that for some
-				// reason (unknown to me) gdb wants the register
-				// dump in *big endian* format.
-				cpu = smp_get_current_cpu();
-				gdb_regreply(dbg_register_file[cpu], 14);
-			}
+			// command 'g' is used for reading the register
+			// file. Faked by now.
+			//
+			// For x86 the register order is:
+			//
+			//    eax, ebx, ecx, edx,
+			//    esp, ebp, esi, edi,
+			//    eip, eflags,
+			//    cs, ss, ds, es
+			//
+			// Note that even thought the segment descriptors
+			// are actually 16 bits wide, gdb requires them
+			// as 32 bit integers. Note also that for some
+			// reason (unknown to me) gdb wants the register
+			// dump in *big endian* format.
+			cpu = smp_get_current_cpu();
+			gdb_regreply(dbg_register_file[cpu], 14);
+
 			break;
+		}
 
 		case 'm':
-			{
-				char* ptr;
-				unsigned address;
-				unsigned len;
+		{
+			char* ptr;
+			unsigned address;
+			unsigned len;
 
-				// The 'm' command has the form mAAA,LLL
-				// where AAA is the address and LLL is the
-				// number of bytes.
-				ptr = sCommand + 1;
-				address = 0;
-				len = 0;
-				while (ptr && *ptr && (*ptr != ',')) {
-					address <<= 4;
-					address += parse_nibble(*ptr);
-					ptr += 1;
-				}
-				if (*ptr == ',')
-					ptr += 1;
-
-				while (ptr && *ptr) {
-					len <<= 4;
-					len += parse_nibble(*ptr);
-					ptr += 1;
-				}
-
-				if (len > 128)
-					len = 128;
-
-				// We cannot directly access the requested memory
-				// for gdb may be trying to access an stray pointer
-				// We copy the memory to a safe buffer using
-				// the bulletproof user_memcpy().
-				if (user_memcpy(sSafeMemory, (char*)address, len) < 0)
-					gdb_reply("E02");
-				else
-					gdb_memreply(sSafeMemory, len);
+			// The 'm' command has the form mAAA,LLL
+			// where AAA is the address and LLL is the
+			// number of bytes.
+			ptr = sCommand + 1;
+			address = 0;
+			len = 0;
+			while (ptr && *ptr && (*ptr != ',')) {
+				address <<= 4;
+				address += parse_nibble(*ptr);
+				ptr += 1;
 			}
+			if (*ptr == ',')
+				ptr += 1;
+
+			while (ptr && *ptr) {
+				len <<= 4;
+				len += parse_nibble(*ptr);
+				ptr += 1;
+			}
+
+			if (len > 128)
+				len = 128;
+
+			// We cannot directly access the requested memory
+			// for gdb may be trying to access an stray pointer
+			// We copy the memory to a safe buffer using
+			// the bulletproof user_memcpy().
+			if (user_memcpy(sSafeMemory, (char*)address, len) < 0)
+				gdb_reply("E02");
+			else
+				gdb_memreply(sSafeMemory, len);
+
 			break;
+		}
 
 		case 'k':
 			// Command 'k' actual semantics is 'kill the damn thing'.
