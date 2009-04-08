@@ -91,6 +91,11 @@ public:
 			int32				CountParameters();
 			BParameter*			ParameterAt(int32 index);
 
+			status_t			StartWatching(const BMessenger& target,
+									int32 notificationType);
+			status_t			StopWatching(const BMessenger& target,
+									int32 notificationType);
+
 	// BFlattenable implementation
 	virtual	bool				IsFixedSize() const;
 	virtual type_code			TypeCode() const;

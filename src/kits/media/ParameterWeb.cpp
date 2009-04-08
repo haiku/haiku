@@ -419,6 +419,20 @@ BParameterWeb::ParameterAt(int32 index)
 }
 
 
+status_t
+BParameterWeb::StartWatching(const BMessenger& target, int32 notificationType)
+{
+	return B_ERROR;
+}
+
+
+status_t
+BParameterWeb::StopWatching(const BMessenger& target, int32 notificationType)
+{
+	return B_ERROR;
+}
+
+
 bool
 BParameterWeb::IsFixedSize() const
 {
