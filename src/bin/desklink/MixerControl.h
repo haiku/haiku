@@ -23,9 +23,13 @@ class BContinuousParameter;
 
 class MixerControl {
 public:
-							MixerControl(int32 volumeWhich, float *value = NULL,
-								const char **error = NULL);
+							MixerControl(int32 volumeWhich,
+								float* _value = NULL,
+								const char** _error = NULL);
 							~MixerControl();
+
+			int32			VolumeWhich() const;
+			float			Volume() const;
 
 			void			SetVolume(float volume);
 			void			ChangeVolumeBy(float value);
@@ -34,13 +38,13 @@ public:
 			float			Maximum() const { return fMax; }
 
 private:
-			float			_GetVolume();
-			void			_SetVolume(float volume);
-
+			int32			fVolumeWhich;
 			media_node*		fAudioMixerNode;
 			BParameterWeb*	fParameterWeb;
 			BContinuousParameter* fMixerParameter;
-			float			fMin, fMax, fStep;
+			float			fMin;
+			float			fMax;
+			float			fStep;
 };
 
 #endif	// MIXER_CONTROL_H

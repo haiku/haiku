@@ -2,11 +2,15 @@ SubDir HAIKU_TOP src bin desklink ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders app ;
+
 BinCommand desklink :
 	desklink.cpp
-	VolumeSlider.cpp
 	DeskButton.cpp
+	MediaReplicant.cpp
 	MixerControl.cpp
+	VolumeControl.cpp
+	VolumeWindow.cpp
 
 	: be libmedia.so
 	: desklink.rdef

@@ -5,6 +5,7 @@
  * Authors:
  *		Jérôme Duval
  *		François Revol
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 
 
@@ -17,6 +18,7 @@
 MixerControl::MixerControl(int32 volumeWhich, float* _value,
 		const char** _error)
 	:
+	fVolumeWhich(volumeWhich),
 	fAudioMixerNode(NULL),
 	fParameterWeb(NULL),
 	fMixerParameter(NULL),
@@ -170,35 +172,15 @@ MixerControl::~MixerControl()
 }
 
 
-void
-MixerControl::SetVolume(float volume)
+int32
+MixerControl::VolumeWhich() const
 {
-	if (fMixerParameter == NULL)
-		return;
-
-	if (volume < fMin)
-		volume = fMin;
-	else if (volume > fMax)
-		volume = fMax;
-
-	if (volume != _GetVolume())
-		fMixerParameter->SetValue(&volume, sizeof(float), system_time());
-}
-
-
-void
-MixerControl::ChangeVolumeBy(float value)
-{
-	if (fMixerParameter == NULL || value == 0.0f)
-		return;
-
-	float volume = _GetVolume();
-	SetVolume(volume + value);
+	return fVolumeWhich;
 }
 
 
 float
-MixerControl::_GetVolume()
+MixerControl::Volume() const
 {
 	if (fMixerParameter == NULL)
 		return 0.0f;
@@ -210,3 +192,31 @@ MixerControl::_GetVolume()
 
 	return volume;
 }
+
+
+void
+MixerControl::SetVolume(float volume)
+{
+	if (fMixerParameter == NULL)
+		return;
+
+	if (volume < fMin)
+		volume = fMin;
+	else if (volume > fMax)
+		volume = fMax;
+
+	if (volume != Volume())
+		fMixerParameter->SetValue(&volume, sizeof(float), system_time());
+}
+
+
+void
+MixerControl::ChangeVolumeBy(float value)
+{
+	if (fMixerParameter == NULL || value == 0.0f)
+		return;
+
+	float volume = Volume();
+	SetVolume(volume + value);
+}
+
