@@ -171,7 +171,7 @@ VolumeControl::MessageReceived(BMessage* msg)
 
 
 status_t
-VolumeControl::Invoke(BMessage* message = NULL)
+VolumeControl::Invoke(BMessage* message)
 {
 	if (fBeep && fOriginalValue != Value() && message == NULL) {
 		beep();
