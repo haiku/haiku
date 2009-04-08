@@ -483,6 +483,8 @@ BOutlineListView::Collapse(BListItem* item)
 	int32 startIndex = index;
 	int32 max = FullListCountItems() - fullIndex - 1;
 	int32 count = 0;
+	bool selectionChanged = false;
+	
 	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
 	while (max-- > 0) {
@@ -493,9 +495,10 @@ BOutlineListView::Collapse(BListItem* item)
 		if (item->IsItemVisible()) {
 			fList.RemoveItem(item);
 			item->SetItemVisible(false);
-			if (item->IsSelected())
+			if (item->IsSelected()) {
+				selectionChanged = true;
 				item->Deselect();
-
+			}
 			count++;
 		}
 
@@ -504,19 +507,21 @@ BOutlineListView::Collapse(BListItem* item)
 
 	_RecalcItemTops(startIndex);
 	// fix selection hints
-	// TODO: revise for multi selection lists
-	if (index < fFirstSelected) {
-		if (index + count < fFirstSelected) {
-			fFirstSelected -= count;
-			fLastSelected -= count;
-		} else {
-			// select top item
-			//fFirstSelected = fLastSelected = index;
-			//item->Select();
-			Select(index);
-		}
+	if (index < fFirstSelected && index + count < fFirstSelected) {
+		// all items removed were higher than the selection range,
+		// adjust the indexes to correspond to their new visible positions
+		fFirstSelected -= count;
+		fLastSelected -= count;
 	}
 
+	int32 maxIndex = fList.CountItems() - 1;
+	if (fFirstSelected > maxIndex) 
+		fFirstSelected = maxIndex;
+	if (fLastSelected > maxIndex)
+		fLastSelected = maxIndex;
+	if (selectionChanged)
+		SelectionChanged();
+	
 	_FixupScrollBar();
 	Invalidate();
 }
