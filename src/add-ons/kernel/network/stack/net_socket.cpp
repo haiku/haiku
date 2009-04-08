@@ -1056,6 +1056,14 @@ socket_get_option(net_socket* socket, int level, int option, void* value,
 			return B_OK;
 		}
 
+		case SO_TYPE:
+		{
+			int32* _set = (int32*)value;
+			*_set = socket->type;
+			*_length = sizeof(int32);
+			return B_OK;
+		}
+	
 		case SO_ERROR:
 		{
 			int32* _set = (int32*)value;
