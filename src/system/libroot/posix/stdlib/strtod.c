@@ -130,8 +130,13 @@ typedef	int32_t   Long;
 typedef	u_int32_t ULong;
 
 #ifdef DEBUG
-#	include <stdio.h>
-#	define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
+#	if	_KERNEL_MODE
+#		include <KernelExport.h>
+#		define Bug(x) {dprintf("%s\n", x);}
+#	else
+#		include <stdio.h>
+#		define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
+#	endif
 #endif
 
 #include <locale.h>
