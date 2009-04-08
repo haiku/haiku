@@ -215,7 +215,8 @@ userlandfs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 		fsNode->ops = ops;
 	}
 
-	PRINT(("userlandfs_get_vnode() done: (%lx, %p)\n", error, node));
+	PRINT(("userlandfs_get_vnode() done: (%lx, %p, %#x, %#lx)\n", error, node,
+		*_type, *_flags));
 	return error;
 }
 
