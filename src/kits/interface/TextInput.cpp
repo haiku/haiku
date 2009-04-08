@@ -153,7 +153,9 @@ BSize
 _BTextInput_::MinSize()
 {
 	BSize min;
-	min.height = ceilf(LineHeight(0) + 1.0);
+	min.height = ceilf(LineHeight(0) + 2.0);
+		// we always add at least one pixel vertical inset top/bottom for
+		// the text rect.
 	min.width = min.height * 3;
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), min);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All rights reserved.
+ * Copyright 2001-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1831,14 +1831,27 @@ BTextView::OffsetAt(BPoint point) const
 	const int32 textLength = fText->Length();
 
 	// should we even bother?
-	if (point.y >= fTextRect.bottom)
+	if (point.y >= fTextRect.bottom && point.x >= fTextRect.right)
 		return textLength;
-	else if (point.y < fTextRect.top)
+	else if (point.y < fTextRect.top && point.x <= fTextRect.left)
 		return 0;
+
+#define COMPILE_PROBABLY_BAD_CODE 1
+
+#if COMPILE_PROBABLY_BAD_CODE
+// NOTE: I have not been able to test what happens if all this is removed.
+// For one-line text views (BTextControl), it works just fine. But I would
+// need to check StyledEdit or something in various situations (new lines
+// at end and other stuff)...
+	// special case one line text views
+	if (CountLines() <= 1)
+		point.y = fTextRect.top;
+#endif
 
 	int32 lineNum = LineAt(point);
 	STELine* line = (*fLines)[lineNum];
 
+#if COMPILE_PROBABLY_BAD_CODE
 	// special case: if point is within the text rect and PixelToLine()
 	// tells us that it's on the last line, but if point is actually
 	// lower than the bottom of the last line, return the last offset
@@ -1847,6 +1860,7 @@ BTextView::OffsetAt(BPoint point) const
 		if (point.y >= ((line + 1)->origin + fTextRect.top))
 			return textLength;
 	}
+#endif
 
 	// convert to text rect coordinates
 	if (fAlignment != B_ALIGN_LEFT) {
@@ -2033,14 +2047,14 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 		selRect.left = max_c(startPt.x, fTextRect.left);
 		selRect.top = startPt.y;
 		selRect.right = endPt.x - 1.0;
-		selRect.bottom = endPt.y + endLineHeight - 1.0;
+		selRect.bottom = endPt.y + endLineHeight;
 		outRegion->Include(selRect);
 	} else {
 		// more than one line in the specified offset range
 		selRect.left = max_c(startPt.x, fTextRect.left);
 		selRect.top = startPt.y;
 		selRect.right = fTextRect.right;
-		selRect.bottom = startPt.y + startLineHeight - 1.0;
+		selRect.bottom = startPt.y + startLineHeight;
 		outRegion->Include(selRect);
 
 		if (startPt.y + startLineHeight < endPt.y) {
@@ -2048,14 +2062,14 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 			selRect.left = fTextRect.left;
 			selRect.top = startPt.y + startLineHeight;
 			selRect.right = fTextRect.right;
-			selRect.bottom = endPt.y - 1.0;
+			selRect.bottom = endPt.y;
 			outRegion->Include(selRect);
 		}
 
 		selRect.left = fTextRect.left;
 		selRect.top = endPt.y;
 		selRect.right = endPt.x - 1.0;
-		selRect.bottom = endPt.y + endLineHeight - 1.0;
+		selRect.bottom = endPt.y + endLineHeight;
 		outRegion->Include(selRect);
 	}
 }
@@ -2145,11 +2159,16 @@ BTextView::SetTextRect(BRect rect)
 	if (rect == fTextRect)
 		return;
 
+	// The text rect height is always calculated anyways to contain the
+	// whole text. But it is used here to remember the inset the user
+	// wanted.
 	bool needsRefresh = fTextRect.left != rect.left
 		 || fTextRect.right != rect.right || fTextRect.top != rect.top;
 
 	fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), rect);
 
+	// When we already know we don't want to recalculate anything, we
+	// can just ignore the bottom coordinate the user provided.
 	if (!needsRefresh)
 		rect.bottom = fTextRect.bottom;
 
@@ -4298,6 +4317,8 @@ BTextView::_PerformMouseUp(BPoint where)
 		Select(fTrackingMouse->clickOffset, fTrackingMouse->clickOffset);
 
 	_StopMouseTracking();
+	// adjust cursor if necessary
+	_TrackMouse(where, NULL, true);
 
 	return true;
 }
@@ -4394,9 +4415,10 @@ BTextView::_TrackMouse(BPoint where, const BMessage *message, bool force)
 
 	if (message && AcceptsDrop(message))
 		_TrackDrag(where);
-	else if ((fSelectable || fEditable) && !textRegion.Contains(where))
+	else if ((fSelectable || fEditable)
+		&& (fTrackingMouse != NULL || !textRegion.Contains(where))) {
 		SetViewCursor(B_CURSOR_I_BEAM, force);
-	else
+	} else
 		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, force);
 }
 
@@ -4518,7 +4540,7 @@ BTextView::_PerformAutoScrolling()
 {
 	// Scroll the view a bit if mouse is outside the view bounds
 	BRect bounds = Bounds();
-	BPoint scrollBy;
+	BPoint scrollBy(B_ORIGIN);
 
 	BPoint constraint = fWhere;
 	constraint.ConstrainTo(bounds);
@@ -4533,26 +4555,34 @@ BTextView::_PerformAutoScrolling()
 			scrollBy.x = -value;
 	}
 
-	float lineHeight = 0;
-	float vertDiff = 0;
-	if (fWhere.y > bounds.bottom) {
-		lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
-		vertDiff = fWhere.y - bounds.bottom;
-	} else if (fWhere.y < bounds.top) {
-		lineHeight = LineHeight(LineAt(bounds.LeftTop()));
-		vertDiff = fWhere.y - bounds.top; // negative value
+	if (CountLines() > 1) {
+		// scroll in Y only if multiple lines!
+
+		float lineHeight = 0;
+		float vertDiff = 0;
+		if (fWhere.y > bounds.bottom) {
+			lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
+			vertDiff = fWhere.y - bounds.bottom;
+		} else if (fWhere.y < bounds.top) {
+			lineHeight = LineHeight(LineAt(bounds.LeftTop()));
+			vertDiff = fWhere.y - bounds.top; // negative value
+		}
+		// Always scroll vertically line by line or by multiples of that
+		// based on the distance of the cursor from the border of the view
+		// TODO: Refine this, I can't even remember how beos works here
+		scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff)
+			/ lineHeight) : 0;
+	
+		// prevent from scrolling out of view
+		if (scrollBy.y != 0.0) {
+			float bottomMax = floorf(fTextRect.bottom
+				+ fLayoutData->bottomInset);
+			if (bounds.bottom + scrollBy.y > bottomMax)
+				scrollBy.y = bottomMax - bounds.bottom;
+			else if (bounds.top + scrollBy.y < 0)
+				scrollBy.y = -bounds.top;
+		}
 	}
-
-	// Always scroll vertically line by line or by multiples of that
-	// based on the distance of the cursor from the border of the view
-	// TODO: Refine this, I can't even remember how beos works here
-	scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff)
-		/ lineHeight) : 0;
-
-	if (bounds.bottom + scrollBy.y > fTextRect.Height())
-		scrollBy.y = fTextRect.Height() - bounds.bottom;
-	else if (bounds.top + scrollBy.y < 0)
-		scrollBy.y = -bounds.top;
 
 	if (scrollBy != B_ORIGIN)
 		ScrollBy(scrollBy.x, scrollBy.y);
