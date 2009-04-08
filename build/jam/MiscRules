@@ -1,6 +1,11 @@
 
 rule SetupObjectsDir
 {
+	# SetupObjectsDir
+	#
+	# Internal rule used to set up the *{LOCATE,SEARCH}*_{TARGET,SOURCE}
+	# variables for the current directory.
+
 	local relPath = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
 	if $(relPath) = . {
 		relPath = ;
@@ -17,6 +22,35 @@ rule SetupObjectsDir
 	}
 
 	LOCATE_TARGET = $(COMMON_PLATFORM_LOCATE_TARGET) ;
+	LOCATE_SOURCE = $(LOCATE_TARGET) ;
+	SEARCH_SOURCE = $(SUBDIR) $(LOCATE_SOURCE)
+		$(HOST_COMMON_DEBUG_LOCATE_TARGET)		# Also add the standard output
+		$(TARGET_COMMON_DEBUG_LOCATE_TARGET)	# dirs for generated sources.
+	;
+}
+
+rule SetupFeatureObjectsDir feature
+{
+	# SetupFeatureObjectsDir <feature>
+	#
+	# Updates the *{LOCATE,SEARCH}*_{TARGET,SOURCE} variables for the current
+	# directory appending a <feature> to each of them. Note that it resets
+	# the LOCATE_TARGET, LOCATE_SOURCE, SEARCH_SOURCE (!) variables. I.e. it
+	# should be invoked before customizing these variables further (e.g. like
+	# adding additional source directories to SEARCH_SOURCE).
+
+	COMMON_PLATFORM_LOCATE_TARGET
+		= [ FDirName $(COMMON_PLATFORM_LOCATE_TARGET) $(feature) ] ;
+
+	local var ;
+	for var in COMMON_ARCH COMMON_DEBUG DEBUG_$(HAIKU_DEBUG_LEVELS) {
+		HOST_$(var)_LOCATE_TARGET
+			= [ FDirName $(HOST_$(var)_LOCATE_TARGET) $(feature) ] ;
+		TARGET_$(var)_LOCATE_TARGET
+			= [ FDirName $(TARGET_$(var)_LOCATE_TARGET) $(feature) ] ;
+	}
+
+	LOCATE_TARGET = [ FDirName $(LOCATE_TARGET) $(feature) ] ;
 	LOCATE_SOURCE = $(LOCATE_TARGET) ;
 	SEARCH_SOURCE = $(SUBDIR) $(LOCATE_SOURCE)
 		$(HOST_COMMON_DEBUG_LOCATE_TARGET)		# Also add the standard output
