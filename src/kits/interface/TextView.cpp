@@ -2047,14 +2047,14 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 		selRect.left = max_c(startPt.x, fTextRect.left);
 		selRect.top = startPt.y;
 		selRect.right = endPt.x - 1.0;
-		selRect.bottom = endPt.y + endLineHeight;
+		selRect.bottom = endPt.y + endLineHeight - 1.0;
 		outRegion->Include(selRect);
 	} else {
 		// more than one line in the specified offset range
 		selRect.left = max_c(startPt.x, fTextRect.left);
 		selRect.top = startPt.y;
 		selRect.right = fTextRect.right;
-		selRect.bottom = startPt.y + startLineHeight;
+		selRect.bottom = startPt.y + startLineHeight - 1.0;
 		outRegion->Include(selRect);
 
 		if (startPt.y + startLineHeight < endPt.y) {
@@ -2062,14 +2062,14 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 			selRect.left = fTextRect.left;
 			selRect.top = startPt.y + startLineHeight;
 			selRect.right = fTextRect.right;
-			selRect.bottom = endPt.y;
+			selRect.bottom = endPt.y - 1.0;
 			outRegion->Include(selRect);
 		}
 
 		selRect.left = fTextRect.left;
 		selRect.top = endPt.y;
 		selRect.right = endPt.x - 1.0;
-		selRect.bottom = endPt.y + endLineHeight;
+		selRect.bottom = endPt.y + endLineHeight - 1.0;
 		outRegion->Include(selRect);
 	}
 }
