@@ -14,7 +14,7 @@ ATAChannel::ATAChannel(device_node *node)
 		fChannelID(0),
 		fController(NULL),
 		fCookie(NULL),
-		fExpectsDMATransfer(false),
+		fExpectsInterrupt(false),
 		fStatus(B_NO_INIT),
 		fSCSIBus(NULL),
 		fDeviceCount(0),
@@ -23,8 +23,8 @@ ATAChannel::ATAChannel(device_node *node)
 		fRequest(NULL)
 {
 	mutex_init(&fExecutionLock, "ata io execution");
-	B_INITIALIZE_SPINLOCK(&fDMATransferLock);
-	fDMATransferCondition.Init(this, "ata dma transfer");
+	B_INITIALIZE_SPINLOCK(&fInterruptLock);
+	fInterruptCondition.Init(this, "ata dma transfer");
 
 	gDeviceManager->get_attr_uint32(node, ATA_CHANNEL_ID_ITEM, &fChannelID,
 		true);
@@ -234,6 +234,9 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 		return B_OK;
 	}
 
+	// we aren't a check sense request, clear sense data for new request
+	fRequest->ClearSense();
+
 	if (ccb->target_id >= fDeviceCount) {
 		TRACE_ERROR("invalid target device\n");
 		fRequest->SetStatus(SCSI_SEL_TIMEOUT);
@@ -393,7 +396,7 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	_FlushAndWait(1);
 
 	while (true) {
-		uint8 status = _AltStatus();
+		uint8 status = AltStatus();
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
 			&& (status & ATA_STATUS_ERROR) != 0)
 			return B_ERROR;
@@ -443,7 +446,37 @@ ATAChannel::WaitDeviceReady()
 status_t
 ATAChannel::WaitForIdle()
 {
-	return Wait(0, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST, 0, 20 * 1000);
+	return Wait(0, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST, 0, 50 * 1000);
+}
+
+
+void
+ATAChannel::PrepareWaitingForInterrupt()
+{
+	TRACE_FUNCTION("\n");
+	InterruptsSpinLocker locker(fInterruptLock);
+	fExpectsInterrupt = true;
+	fInterruptCondition.Add(&fInterruptConditionEntry);
+}
+
+
+status_t
+ATAChannel::WaitForInterrupt(bigtime_t timeout)
+{
+	TRACE_FUNCTION("timeout: %lld\n", timeout);
+	status_t result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
+		timeout);
+
+	InterruptsSpinLocker locker(fInterruptLock);
+	fExpectsInterrupt = false;
+	locker.Unlock();
+
+	if (result != B_OK) {
+		TRACE_ERROR("timeout waiting for interrupt\n");
+		return B_TIMED_OUT;
+	}
+
+	return B_OK;
 }
 
 
@@ -464,7 +497,7 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 	}
 
 	if ((flags & ATA_DEVICE_READY_REQUIRED) != 0
-		&& (_AltStatus() & ATA_STATUS_DEVICE_READY) == 0) {
+		&& (AltStatus() & ATA_STATUS_DEVICE_READY) == 0) {
 		TRACE_ERROR("device ready not set\n");
 		request->SetStatus(SCSI_SEQUENCE_FAIL);
 		return B_ERROR;
@@ -583,35 +616,16 @@ ATAChannel::PrepareDMA(ATARequest *request)
 
 
 status_t
-ATAChannel::FinishDMA()
+ATAChannel::StartDMA()
 {
-	return fController->finish_dma(fCookie);
+	return fController->start_dma(fCookie);
 }
 
 
 status_t
-ATAChannel::ExecuteDMATransfer(ATARequest *request)
+ATAChannel::FinishDMA()
 {
-	InterruptsSpinLocker locker(fDMATransferLock);
-	fExpectsDMATransfer = true;
-	ConditionVariableEntry entry;
-	fDMATransferCondition.Add(&entry);
-	locker.Unlock();
-
-	fController->start_dma(fCookie);
-	bigtime_t timeout = system_time() + request->Timeout();
-	status_t waitResult = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
-
-	locker.Lock();
-	fExpectsDMATransfer = false;
-	locker.Unlock();
-
-	if (waitResult != B_OK) {
-		TRACE_ERROR("timeout waiting for DMA transfer\n");
-		return B_TIMED_OUT;
-	}
-
-	return B_OK;
+	return fController->finish_dma(fCookie);
 }
 
 
@@ -646,7 +660,7 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 
 		// wait 1 pio cycle
 		if (*blocksLeft > 0)
-			_AltStatus();
+			AltStatus();
 	}
 
 	if (result == B_OK && WaitDataRequest(false) != B_OK) {
@@ -659,6 +673,20 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 
 
 status_t
+ATAChannel::ReadRegs(ATADevice *device)
+{
+	return _ReadRegs(device->TaskFile(), device->RegisterMask());
+}
+
+
+uint8
+ATAChannel::AltStatus()
+{
+	return fController->get_altstatus(fCookie);
+}
+
+
+status_t
 ATAChannel::ReadPIO(uint8 *buffer, size_t length)
 {
 	return fController->read_pio(fCookie, (uint16 *)buffer,
@@ -666,11 +694,19 @@ ATAChannel::ReadPIO(uint8 *buffer, size_t length)
 }
 
 
+status_t
+ATAChannel::WritePIO(uint8 *buffer, size_t length)
+{
+	return fController->write_pio(fCookie, (uint16 *)buffer,
+		length / sizeof(uint16), true);
+}
+
+
 void
 ATAChannel::Interrupt(uint8 status)
 {
-	SpinLocker locker(fDMATransferLock);
-	if (!fExpectsDMATransfer) {
+	SpinLocker locker(fInterruptLock);
+	if (!fExpectsInterrupt) {
 		TRACE_ERROR("interrupt when not expecting transfer\n");
 		return;
 	}
@@ -680,7 +716,7 @@ ATAChannel::Interrupt(uint8 status)
 		return;
 	}
 
-	fDMATransferCondition.NotifyAll();
+	fInterruptCondition.NotifyAll();
 }
 
 
@@ -706,17 +742,10 @@ ATAChannel::_WriteControl(uint8 value)
 }
 
 
-uint8
-ATAChannel::_AltStatus()
-{
-	return fController->get_altstatus(fCookie);
-}
-
-
 void
 ATAChannel::_FlushAndWait(bigtime_t waitTime)
 {
-	_AltStatus();
+	AltStatus();
 	if (waitTime > 100)
 		snooze(waitTime);
 	else
@@ -749,7 +778,7 @@ ATAChannel::_ReadPIOBlock(ATARequest *request, size_t length)
 	if (transferred >= length)
 		return B_OK;
 
-	TRACE_ERROR("pio read: discarding after %lu bytes", transferred);
+	TRACE_ERROR("pio read: discarding after %lu bytes\n", transferred);
 
 	uint8 buffer[32];
 	length -= transferred;
@@ -799,7 +828,7 @@ ATAChannel::_WritePIOBlock(ATARequest *request, size_t length)
 	// only solution is to send zero bytes, though it's BAD
 	static const uint8 buffer[32] = {};
 
-	TRACE_ERROR("pio write: discarding after %lu bytes", transferred);
+	TRACE_ERROR("pio write: discarding after %lu bytes\n", transferred);
 
 	length -= transferred;
 	while (length > 0) {

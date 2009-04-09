@@ -12,14 +12,14 @@
 
 ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 	:	fChannel(channel),
-		fIndex(index),
-		fUseLBA(false),
-		fUse48Bits(false),
+		fRegisterMask(0),
 		fUseDMA(channel->UseDMA()),
 		fDMAMode(0),
 		fDMAFailures(0),
-		fTotalSectors(0),
-		fRegisterMask(0)
+		fIndex(index),
+		fUseLBA(false),
+		fUse48Bits(false),
+		fTotalSectors(0)
 {
 	memset(&fInfoBlock, 0, sizeof(fInfoBlock));
 	memset(&fTaskFile, 0, sizeof(fTaskFile));
@@ -202,7 +202,6 @@ ATADevice::ExecuteIO(ATARequest *request)
 
 	TRACE("request: 0x%02x\n", ccb->cdb[0]);
 
-	request->ClearSense();
 	switch (ccb->cdb[0]) {
 		case SCSI_OP_TEST_UNIT_READY:
 			return TestUnitReady(request);
@@ -541,7 +540,10 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	}
 
 	if (request->UseDMA()) {
-		result = fChannel->ExecuteDMATransfer(request);
+		fChannel->PrepareWaitingForInterrupt();
+		fChannel->StartDMA();
+
+		result = fChannel->WaitForInterrupt(request->Timeout());
 		status_t dmaResult = fChannel->FinishDMA();
 		if (result == B_OK && dmaResult == B_OK) {
 			fDMAFailures = 0;

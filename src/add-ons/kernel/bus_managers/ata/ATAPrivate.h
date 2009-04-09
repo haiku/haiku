@@ -85,6 +85,9 @@ public:
 		status_t					WaitDeviceReady();
 		status_t					WaitForIdle();
 
+		void						PrepareWaitingForInterrupt();
+		status_t					WaitForInterrupt(bigtime_t timeout);
+
 		// request handling
 		status_t					SendRequest(ATARequest *request,
 										uint32 flags);
@@ -93,12 +96,16 @@ public:
 
 		// data transfers
 		status_t					PrepareDMA(ATARequest *request);
+		status_t					StartDMA();
 		status_t					FinishDMA();
 
-		status_t					ExecuteDMATransfer(ATARequest *request);
 		status_t					ExecutePIOTransfer(ATARequest *request);
 
+		status_t					ReadRegs(ATADevice *device);
+		uint8						AltStatus();
+
 		status_t					ReadPIO(uint8 *buffer, size_t length);
+		status_t					WritePIO(uint8 *buffer, size_t length);
 
 		void						Interrupt(uint8 status);
 
@@ -109,7 +116,6 @@ private:
 										ata_reg_mask mask);
 		status_t					_WriteControl(uint8 value);
 
-		uint8						_AltStatus();
 		void						_FlushAndWait(bigtime_t waitTime);
 
 		status_t					_ReadPIOBlock(ATARequest *request,
@@ -133,9 +139,10 @@ private:
 		void *						fCookie;
 
 		mutex						fExecutionLock;
-		spinlock					fDMATransferLock;
-		ConditionVariable			fDMATransferCondition;
-		bool						fExpectsDMATransfer;
+		spinlock					fInterruptLock;
+		ConditionVariable			fInterruptCondition;
+		ConditionVariableEntry		fInterruptConditionEntry;
+		bool						fExpectsInterrupt;
 
 		status_t					fStatus;
 		scsi_bus					fSCSIBus;
@@ -179,29 +186,32 @@ virtual	bool						IsATAPI() { return false; };
 		status_t					DisableCommandQueueing();
 		status_t					ConfigureDMA();
 
-		status_t					Configure();
+virtual	status_t					Configure();
 		status_t					Identify();
 
 		status_t					ExecuteReadWrite(ATARequest *request,
 										uint64 address, uint32 sectorCount);
 
+protected:
+		const char *				_DebugContext() { return fDebugContext; };
+
+		ATAChannel *				fChannel;
+		ata_device_infoblock		fInfoBlock;
+		ata_task_file				fTaskFile;
+		ata_reg_mask				fRegisterMask;
+
+		bool						fUseDMA;
+		uint8						fDMAMode;
+		uint8						fDMAFailures;
+
 private:
 		status_t					_FillTaskFile(ATARequest *request,
 										uint64 address);
 
-		const char *				_DebugContext() { return fDebugContext; };
-
-		ATAChannel *				fChannel;
 		uint8						fIndex;
 		bool						fUseLBA;
 		bool						fUse48Bits;
-		bool						fUseDMA;
-		uint8						fDMAMode;
-		uint8						fDMAFailures;
 		uint64						fTotalSectors;
-		ata_device_infoblock		fInfoBlock;
-		ata_task_file				fTaskFile;
-		ata_reg_mask				fRegisterMask;
 
 		char						fDebugContext[16];
 };
@@ -213,12 +223,18 @@ public:
 										uint8 index);
 virtual								~ATAPIDevice();
 
+		status_t					SendPacket(ATARequest *request);
 virtual	status_t					ExecuteIO(ATARequest *request);
 
 virtual	bool						IsATAPI() { return true; };
 
+virtual	status_t					Configure();
+
 private:
-		uint8						fLastLun;
+		status_t					_FillTaskFilePacket(ATARequest *request);
+
+		bool						fInterruptsForPacket;
+		uint8						fPacket[12];
 };
 
 
