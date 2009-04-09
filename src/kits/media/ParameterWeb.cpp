@@ -420,28 +420,6 @@ BParameterWeb::ParameterAt(int32 index)
 }
 
 
-status_t
-BParameterWeb::StartWatching(const BMessenger& target, int32 notificationType)
-{
-	if (BMediaRoster::CurrentRoster() == NULL)
-		return B_ERROR;
-
-	return BMediaRoster::CurrentRoster()->StartWatching(target, fNode,
-		notificationType);
-}
-
-
-status_t
-BParameterWeb::StopWatching(const BMessenger& target, int32 notificationType)
-{
-	if (BMediaRoster::CurrentRoster() == NULL)
-		return B_ERROR;
-
-	return BMediaRoster::CurrentRoster()->StopWatching(target, fNode,
-		notificationType);
-}
-
-
 bool
 BParameterWeb::IsFixedSize() const
 {
@@ -685,12 +663,12 @@ BParameterGroup::~BParameterGroup()
 	CALLED();
 
 	for (int i = fControls->CountItems(); i-- > 0;) {
-		delete static_cast<BParameter*>(fControls->ItemAt(0));
+		delete static_cast<BParameter*>(fControls->ItemAt(i));
 	}
 	delete fControls;
 
 	for (int i = fGroups->CountItems(); i-- > 0;) {
-		delete static_cast<BParameterGroup*>(fGroups->ItemAt(0));
+		delete static_cast<BParameterGroup*>(fGroups->ItemAt(i));
 	}
 	delete fGroups;
 
