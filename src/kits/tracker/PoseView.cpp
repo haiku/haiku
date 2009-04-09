@@ -1708,11 +1708,11 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 							// if new pose above current view bounds, cache up
 							// the draw and do it later
 							listViewScrollBy += fListElemHeight;
-							forceDraw = false;
 						} else if (!srcRect.IsValid()) {
 							// nothing to be scrolled, but extent became
 							// visible
 							SynchronousUpdate(destRect);
+							forceDraw = false;
 						} else {
 							FinishPendingScroll(listViewScrollBy, viewBounds);
 							fPoseList->AddItem(pose, poseIndex);
@@ -1720,8 +1720,8 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 							addedItem = true;
 							CopyBits(srcRect, destRect);
 							srcRect.bottom = destRect.top;
-
 							SynchronousUpdate(srcRect);
+							forceDraw = false;
 						}
 					}
 				}
@@ -1734,7 +1734,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 					if (!havePoseBounds)
 						poseBounds = CalcPoseRectList(pose, poseIndex);
 		 			if (viewBounds.Intersects(poseBounds))
-						Invalidate(poseBounds);
+			 			SynchronousUpdate(poseBounds);
 				}
 				break;
 			}
@@ -8104,7 +8104,7 @@ BPoseView::SetScrollBarsTo(BPoint point)
 		// behaviour (BView<->BScrollBar feedback effects) when scrolling
 		// both directions at once versus separately.
 		BPoint origin = LeftTop();
-		ScrollTo(BPoint(point.x, point.y));
+		ScrollTo(BPoint(origin.x, point.y));
 		ScrollTo(point);
 	}
 }
