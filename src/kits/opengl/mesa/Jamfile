@@ -62,9 +62,11 @@ actions MkMaTypes1
 
 	if $(TARGET_ARCH) = x86 {
 		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
-	} else {
+	} else if $(TARGET_ARCH) = ppc {
 		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
 		# defines += USE_PPC_ASM ;
+	} else if $(TARGET_ARCH) = sparc {
+		defines += USE_SPARC_ASM ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
@@ -115,18 +117,21 @@ if $(TARGET_ARCH) = x86 {
 
 	arch_sources = 
 		common_ppc.c
-		t_vtx_generic.c
 		;
+
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) ppc ] ;
 
 } else if $(TARGET_ARCH) = sparc {
 
 	arch_sources = 
 		sparc.c 
-		t_vtx_generic.c 
+		clip.S
+		norm.S 
+		xform.S
 		;
 
-} else {
-	arch_sources = t_vtx_generic.c ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) sparc ] ;
+
 }
 
 
@@ -330,24 +335,27 @@ StaticLibrary libmesa.a :
 	vbo_split_copy.c
 	vbo_split_inplace.c
 
+	# arch specific assembly optimization
 	$(arch_sources)
-
-	# glapi
-	glapi.c
-	glthread.c
 ;
 
 
 local arch_sources ;
+# Use the faster GL API dispatching assembly code for the platform, if any!
 if $(TARGET_ARCH) = x86 {
-	# On x86 platform, use the faster GL API dispatching assembly code!
 	arch_sources = glapi_x86.S ;
+} else if $(TARGET_ARCH) = sparc {
+	arch_sources = glapi_sparc.S ;
 } else {
-	# For non-X86 platforms, no assembly code yet.
 	arch_sources = ;
 }
 
-MergeObject <opengl>mesa_arch_$(TARGET_ARCH).o :
+MergeObject <mesa>glapi-dispatching.o :
+
+	dispatch.c
+	glapi.c
+	glthread.c
+
 	$(arch_sources)
 ;
 

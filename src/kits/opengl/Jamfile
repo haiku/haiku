@@ -29,6 +29,8 @@ UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 	} else if $(TARGET_ARCH) = ppc {
 		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
 		# defines += USE_PPC_ASM ;
+	} else if $(TARGET_ARCH) = sparc {
+		defines += USE_SPARC_ASM ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
@@ -44,16 +46,14 @@ SharedLibrary libGL.so :
 
 	:
 
-	# Mesa optimized GL dispatching code (if any) for this target architecture 
-	<opengl>mesa_arch_$(TARGET_ARCH).o
+	# Mesa GL API dispatching code
+	<mesa>glapi-dispatching.o
 
 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
 	<opengl>sgi-glu.o
 
 	# GLUT API is included in libGL.so under Haiku, not a separate libglut.so library
 	<opengl>glut.o 
-
-	libmesa.a		# For GL API dispatching, mostly 
 
 	# External libs:
 	be 
