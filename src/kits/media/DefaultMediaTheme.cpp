@@ -1,27 +1,28 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "DefaultMediaTheme.h"
-#include "debug.h"
 
-#include <ParameterWeb.h>
-
-#include <Slider.h>
-#include <ScrollBar.h>
-#include <StringView.h>
-#include <Button.h>
-#include <TextControl.h>
-#include <OptionPopUp.h>
-#include <ChannelSlider.h>
 #include <Box.h>
+#include <Button.h>
+#include <ChannelSlider.h>
 #include <CheckBox.h>
-#include <TabView.h>
+#include <MediaRoster.h>
 #include <MenuField.h>
 #include <MessageFilter.h>
+#include <OptionPopUp.h>
+#include <ParameterWeb.h>
+#include <ScrollBar.h>
+#include <Slider.h>
+#include <StringView.h>
+#include <TabView.h>
+#include <TextControl.h>
 #include <Window.h>
+
+#include "debug.h"
 
 
 using namespace BPrivate;
@@ -121,7 +122,11 @@ class ContinuousMessageFilter : public MessageFilter {
 		virtual filter_result Filter(BMessage *message, BHandler **target);
 
 	private:
+		void _UpdateControl();
+
+		BControl				*fControl;
 		BContinuousParameter	&fParameter;
+		bool					fRegistered;
 };
 
 class DiscreteMessageFilter : public MessageFilter {
@@ -588,33 +593,22 @@ MessageFilter::FilterFor(BView *view, BParameter &parameter)
 ContinuousMessageFilter::ContinuousMessageFilter(BControl *control,
 		BContinuousParameter &parameter)
 	: MessageFilter(),
-	fParameter(parameter)
+	fControl(control),
+	fParameter(parameter),
+	fRegistered(false)
 {
 	// initialize view for us
 	control->SetMessage(new BMessage(kMsgParameterChanged));
 
-	// set initial value
-	// ToDo: response support!
-
-	float value[fParameter.CountChannels()];
-	size_t size = sizeof(value);
-	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
-		ERROR("ContinuousMessageFilter: Could not get value for continuous "
-			"parameter %p (name '%s', node %d)\n", &parameter,
-			parameter.Name(), (int)(parameter.Web()->Node().node));
-		return;
-	}
-
-	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
-		slider->SetValue((int32) (1000 * value[0]));
+	if (BSlider *slider = dynamic_cast<BSlider *>(fControl))
 		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
-	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
-		for (int32 i = 0; i < fParameter.CountChannels(); i++)
-			slider->SetValueFor(i, (int32) (1000 * value[i]));
-
+	else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(fControl))
 		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
-	} else
+	else
 		ERROR("ContinuousMessageFilter: unknown continuous parameter view\n");
+
+	// set initial value
+	_UpdateControl();
 }
 
 
@@ -626,32 +620,87 @@ ContinuousMessageFilter::~ContinuousMessageFilter()
 filter_result 
 ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 {
-	BControl *control;
-
-	if (message->what != kMsgParameterChanged
-		|| (control = dynamic_cast<BControl *>(*target)) == NULL)
+	if (*target != fControl)
 		return B_DISPATCH_MESSAGE;
 
-	// update view
-	// ToDo: support for response!
+	// TODO: remove this work-around! We can solve this by subclassing the
+	// slider classes, and start watching in their AttachedToWindow() method
+	if (!fRegistered) {
+		if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
+			roster->StartWatching(fControl, fParameter.Web()->Node(),
+				B_MEDIA_NEW_PARAMETER_VALUE);
+		}
+		fRegistered = true;
+	}
+		
+	if (message->what == kMsgParameterChanged) {
+		// update parameter from control
+		// TODO: support for response!
+
+		float value[fParameter.CountChannels()];
+
+		if (BSlider *slider = dynamic_cast<BSlider *>(fControl)) {
+			value[0] = (float)(slider->Value() / 1000.0);
+		} else if (BChannelSlider *slider
+				= dynamic_cast<BChannelSlider *>(fControl)) {
+			for (int32 i = 0; i < fParameter.CountChannels(); i++)
+				value[i] = (float)(slider->ValueFor(i) / 1000.0);
+		}
+
+		TRACE("ContinuousMessageFilter::Filter: update view %s, %ld "
+			"channels\n", control->Name(), fParameter.CountChannels());
+
+		if (fParameter.SetValue((void *)value, sizeof(value),
+				system_time()) < B_OK) {
+			ERROR("ContinuousMessageFilter::Filter: Could not set parameter "
+				"value for %p\n", &fParameter);
+			return B_DISPATCH_MESSAGE;
+		}
+		return B_SKIP_MESSAGE;
+	}
+	if (message->what == B_MEDIA_NEW_PARAMETER_VALUE) {
+		// update view from parameter -- if the message concerns us
+		const media_node* node;
+		int32 parameterID;
+		ssize_t size;
+		if (message->FindInt32("parameter", &parameterID) != B_OK
+			|| fParameter.ID() != parameterID
+			|| message->FindData("node", B_RAW_TYPE, (const void**)&node,
+					&size) != B_OK
+			|| fParameter.Web()->Node() != *node)
+			return B_DISPATCH_MESSAGE;
+
+		_UpdateControl();
+		return B_SKIP_MESSAGE;
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+void
+ContinuousMessageFilter::_UpdateControl()
+{
+	// TODO: response support!
 
 	float value[fParameter.CountChannels()];
-
-	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
-		value[0] = (float)(slider->Value() / 1000.0);
-	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
-		for (int32 i = 0; i < fParameter.CountChannels(); i++)
-			value[i] = (float)(slider->ValueFor(i) / 1000.0);
+	size_t size = sizeof(value);
+	if (fParameter.GetValue((void *)&value, &size, NULL) < B_OK) {
+		ERROR("ContinuousMessageFilter: Could not get value for continuous "
+			"parameter %p (name '%s', node %d)\n", &fParameter,
+			fParameter.Name(), (int)fParameter.Web()->Node().node);
+		return;
 	}
 
-	TRACE("ContinuousMessageFilter::Filter: update view %s, %ld channels\n", control->Name(), fParameter.CountChannels());
-
-	if (fParameter.SetValue((void *)value, sizeof(value), system_time()) < B_OK) {
-		ERROR("ContinuousMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);
-		return B_DISPATCH_MESSAGE;
+	if (BSlider *slider = dynamic_cast<BSlider *>(fControl)) {
+		slider->SetValue((int32) (1000 * value[0]));
+		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
+	} else if (BChannelSlider *slider
+			= dynamic_cast<BChannelSlider *>(fControl)) {
+		for (int32 i = 0; i < fParameter.CountChannels(); i++) {
+			slider->SetValueFor(i, (int32) (1000 * value[i]));
+		}
 	}
-
-	return B_SKIP_MESSAGE;
 }
 
 
