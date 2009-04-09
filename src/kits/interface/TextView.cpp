@@ -100,7 +100,9 @@ static const uint32 kFlattenedTextRunArrayVersion = 0;
 
 enum {
 	B_SEPARATOR_CHARACTER,
-	B_OTHER_CHARACTER
+	B_PUNCTUATION_CHARACTER,
+	B_OTHER_CHARACTER,
+	B_END_OF_TEXT
 };
 
 
@@ -1953,8 +1955,35 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 bool
 BTextView::CanEndLine(int32 offset)
 {
-	// TODO: Could be improved, the bebook says there are other checks to do
-	return (_CharClassification(offset) == B_SEPARATOR_CHARACTER);
+	// TODO: This has to be improved a lot, but also the wrapping code.
+	// It should use the forthcomming LocalKit.
+	uint32 classification = _CharClassification(offset);
+	if (classification == B_END_OF_TEXT
+		|| classification == B_SEPARATOR_CHARACTER) {
+		return true;
+	}
+
+	uint32 nextClassification = _CharClassification(offset + 1);
+	if (nextClassification == B_END_OF_TEXT)
+		return true;
+
+	if (classification == B_PUNCTUATION_CHARACTER
+		&& nextClassification == B_OTHER_CHARACTER) {
+		return true;
+	}
+
+// TODO: This cannot be enabled, since the wrapping code things the char
+// is a trailing space or something. Otherwise it would allow to treat
+// something like "..." as a word.
+//	uint32 nextNextClassification = _CharClassification(offset + 2);
+//
+//	if (classification == B_OTHER_CHARACTER
+//		&& nextClassification == B_PUNCTUATION_CHARACTER
+//		&& nextClassification == nextNextClassification) {
+//		return true;
+//	}
+
+	return false;
 }
 
 
@@ -3679,9 +3708,9 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 
 	int32 offset = fromOffset;
 
-	// Text wrapping is turned off.
-	// Just find the offset of the first \n character
 	if (!fWrap) {
+		// Text wrapping is turned off.
+		// Just find the offset of the first \n character
 		offset = limit - fromOffset;
 		fText->FindChar(B_ENTER, fromOffset, &offset);
 		offset += fromOffset;
@@ -4823,16 +4852,17 @@ BTextView::_SetRunArray(int32 startOffset, int32 endOffset,
 uint32
 BTextView::_CharClassification(int32 offset) const
 {
-	// TODO:Should check against a list of characters containing also
+	// TODO: Should check against a list of characters containing also
 	// japanese word breakers.
 	// And what about other languages ? Isn't there a better way to check
 	// for separator characters ?
 	// Andrew suggested to have a look at UnicodeBlockObject.h
 	switch (fText->RealCharAt(offset)) {
+		case '\0':
+			return B_END_OF_TEXT;
+
 		case B_SPACE:
 		case '_':
-		case '.':
-		case '\0':
 		case B_TAB:
 		case B_ENTER:
 		case '&':
@@ -4847,6 +4877,11 @@ BTextView::_CharClassification(int32 offset) const
 		case '^':
 		case '|':
 			return B_SEPARATOR_CHARACTER;
+
+		case '.':
+		case ',':
+			return B_PUNCTUATION_CHARACTER;
+
 		default:
 			return B_OTHER_CHARACTER;
 	}
