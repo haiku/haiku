@@ -17,7 +17,7 @@
 // maximum number of devices connected to controller (uint8, optional, default:2)
 #define ATA_CONTROLLER_MAX_DEVICES_ITEM "ide/max_devices"
 // set to not-0 if DMA is supported (uint8, optional, default:0)
-#define ATA_CONTROLLER_CAN_DMA_ITEM "ide/can_dma"
+#define ATA_CONTROLLER_CAN_DMA_ITEM "ide/can_DMA"
 // name of controller (string, required)
 #define ATA_CONTROLLER_CONTROLLER_NAME_ITEM "ide/controller_name"
 

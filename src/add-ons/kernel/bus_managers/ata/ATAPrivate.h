@@ -188,6 +188,7 @@ private:
 		bool						fUseLBA;
 		bool						fUse48Bits;
 		bool						fUseDMA;
+		uint8						fDMAMode;
 		uint64						fTotalSectors;
 		ata_device_infoblock		fInfoBlock;
 		ata_task_file				fTaskFile;

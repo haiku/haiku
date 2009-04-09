@@ -16,6 +16,7 @@ ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 		fUseLBA(false),
 		fUse48Bits(false),
 		fUseDMA(channel->UseDMA()),
+		fDMAMode(0),
 		fTotalSectors(0),
 		fRegisterMask(0)
 {
@@ -361,7 +362,43 @@ ATADevice::ConfigureDMA()
 	if (!fUseDMA)
 		return B_OK;
 
-	fUseDMA = false;
+	if (!fInfoBlock.DMA_supported) {
+		TRACE_ALWAYS("DMA not supported by device\n");
+		fUseDMA = false;
+		return B_OK;
+	}
+
+	#define CHECK_DMA_MODE(element, mode) \
+		if (fInfoBlock.element) { \
+			fDMAMode = mode; \
+			modeCount++; \
+		}
+
+	uint32 modeCount = 0;
+
+	CHECK_DMA_MODE(MDMA0_selected, 0x00);
+	CHECK_DMA_MODE(MDMA1_selected, 0x01);
+	CHECK_DMA_MODE(MDMA2_selected, 0x02);
+
+	if (fInfoBlock._88_valid) {
+		CHECK_DMA_MODE(UDMA0_selected, 0x10);
+		CHECK_DMA_MODE(UDMA1_selected, 0x11);
+		CHECK_DMA_MODE(UDMA2_selected, 0x12);
+		CHECK_DMA_MODE(UDMA3_selected, 0x13);
+		CHECK_DMA_MODE(UDMA4_selected, 0x14);
+		CHECK_DMA_MODE(UDMA5_selected, 0x15);
+		CHECK_DMA_MODE(UDMA6_selected, 0x16);
+	}
+
+	#undef CHECK_DMA_MODE
+
+	if (modeCount != 1) {
+		TRACE_ERROR("more than on DMA mode selected, not using DMA\n");
+		fUseDMA = false;
+		return B_OK;
+	}
+
+	TRACE_ALWAYS("using DMA mode 0x%02x\n", fDMAMode);
 	return B_OK;
 }
 

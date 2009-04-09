@@ -18,17 +18,21 @@ ATAChannel::ATAChannel(device_node *node)
 		fSCSIBus(NULL),
 		fDeviceCount(0),
 		fDevices(NULL),
-		fUseDMA(false),
+		fUseDMA(true),
 		fRequest(NULL)
 {
 	mutex_init(&fLock, "ata channel");
+
+	gDeviceManager->get_attr_uint32(node, ATA_CHANNEL_ID_ITEM, &fChannelID,
+		true);
+	snprintf(fDebugContext, sizeof(fDebugContext), " %lu", fChannelID);
 
 	if (fUseDMA) {
 		void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 		if (settings != NULL) {
 			if (get_driver_boolean_parameter(settings,
 				B_SAFEMODE_DISABLE_IDE_DMA, false, false)) {
-				TRACE("disabling dma because of safemode setting\n");
+				TRACE_ALWAYS("disabling DMA because of safemode setting\n");
 				fUseDMA = false;
 			}
 
@@ -39,7 +43,13 @@ ATAChannel::ATAChannel(device_node *node)
 	if (fUseDMA) {
 		uint8 canDMA;
 		if (gDeviceManager->get_attr_uint8(node, ATA_CONTROLLER_CAN_DMA_ITEM,
-			&canDMA, true) != B_OK || canDMA == 0) {
+			&canDMA, true) != B_OK) {
+			TRACE_ERROR("unknown if controller supports DMA, not using it\n");
+			fUseDMA = false;
+		}
+
+		if (canDMA == 0) {
+			TRACE_ALWAYS("controller doesn't support DMA, disabling\n");
 			fUseDMA = false;
 		}
 	}
@@ -65,11 +75,6 @@ ATAChannel::ATAChannel(device_node *node)
 
 	for (uint8 i = 0; i < fDeviceCount; i++)
 		fDevices[i] = NULL;
-
-
-	gDeviceManager->get_attr_uint32(node, ATA_CHANNEL_ID_ITEM, &fChannelID,
-		true);
-	snprintf(fDebugContext, sizeof(fDebugContext), " %lu", fChannelID);
 
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	fStatus = gDeviceManager->get_driver(parent,
@@ -149,14 +154,14 @@ ATAChannel::ScanBus()
 			continue;
 		}
 
-		TRACE_ALWAYS("identified ATA%s device %u\n", device->IsATAPI()
-			? "PI" : "", i);
-
 		if (device->Configure() != B_OK) {
 			TRACE_ERROR("failed to configure device\n");
 			delete device;
 			continue;
 		}
+
+		TRACE_ALWAYS("identified ATA%s device %u\n", device->IsATAPI()
+			? "PI" : "", i);
 
 		fDevices[i] = device;
 	}
