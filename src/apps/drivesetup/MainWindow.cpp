@@ -155,7 +155,8 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fFormatMI = new BMenuItem("Format (not implemented)", new BMessage(MSG_FORMAT));
+	fFormatMI = new BMenuItem("Format (not implemented)",
+		new BMessage(MSG_FORMAT));
 	fEjectMI = new BMenuItem("Eject", new BMessage(MSG_EJECT), 'E');
 	fSurfaceTestMI = new BMenuItem("Surface Test (not implemented)",
 		new BMessage(MSG_SURFACE_TEST));

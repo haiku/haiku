@@ -240,6 +240,9 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 }
 
 
+// #pragma mark - PartitionListView
+
+
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
 {
