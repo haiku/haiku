@@ -297,7 +297,12 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 
 	if (fClickPoint.x >= 0 && (fabs(where.x - fClickPoint.x) > 4
 			|| fabs(where.y - fClickPoint.y) > 4)) {
-		// start dragging
+		// Start dragging
+
+		// Update character - we want to drag the one we originally clicked
+		// on, not the one the mouse might be over now.
+		_GetCharacterAt(fClickPoint, character, &frame);
+
 		BPoint offset = fClickPoint - frame.LeftTop();
 		frame.OffsetTo(B_ORIGIN);
 
