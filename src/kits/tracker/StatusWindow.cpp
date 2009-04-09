@@ -249,12 +249,13 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 	{
 		AutoLock<BLooper> lock(be_app);
 		int32 count = be_app->CountWindows();
-		for (int32 index = 0; index < count; index++)
+		for (int32 index = 0; index < count; index++) {
 			if (dynamic_cast<BDeskWindow *>(be_app->WindowAt(index))
 				&& be_app->WindowAt(index)->IsActive()) {
 				desktopActive = true;
 				break;
 			}
+		}
 	}
 
 	if (IsHidden()) {
