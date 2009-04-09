@@ -37,9 +37,11 @@ public:
 			float			Minimum() const { return fMin; }
 			float			Maximum() const { return fMax; }
 
+			media_node		GainNode() { return fGainMediaNode; }
+
 private:
 			int32			fVolumeWhich;
-			media_node*		fAudioMixerNode;
+			media_node		fGainMediaNode;
 			BParameterWeb*	fParameterWeb;
 			BContinuousParameter* fMixerParameter;
 			float			fMin;

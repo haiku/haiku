@@ -21,7 +21,7 @@ MixerControl::MixerControl(int32 volumeWhich, float* _value,
 		const char** _error)
 	:
 	fVolumeWhich(volumeWhich),
-	fAudioMixerNode(NULL),
+	fGainMediaNode(media_node::null),
 	fParameterWeb(NULL),
 	fMixerParameter(NULL),
 	fMin(0.0f),
@@ -29,7 +29,6 @@ MixerControl::MixerControl(int32 volumeWhich, float* _value,
 	fStep(0.0f)
 {
 	bool retrying = false;
-	fAudioMixerNode = new media_node();
 
 	status_t err = B_OK;
 		/* BMediaRoster::Roster() doesn't set it if all is ok */
@@ -56,14 +55,14 @@ retry:
 	if (roster && err == B_OK) {
 		switch (volumeWhich) {
 			case VOLUME_USE_MIXER:
-				err = roster->GetAudioMixer(fAudioMixerNode);
+				err = roster->GetAudioMixer(&fGainMediaNode);
 				break;
 			case VOLUME_USE_PHYS_OUTPUT:
-				err = roster->GetAudioOutput(fAudioMixerNode);
+				err = roster->GetAudioOutput(&fGainMediaNode);
 				break;
 		}
 		if (err == B_OK) {
-			err = roster->GetParameterWebFor(*fAudioMixerNode, &fParameterWeb);
+			err = roster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
 			if (err == B_OK) {
 				// Finding the Mixer slider in the audio output ParameterWeb 
 				int32 numParams = fParameterWeb->CountParameters();
@@ -112,11 +111,11 @@ retry:
 					p = NULL;
 				}
 				if (p == NULL) {
-					errorString = volumeWhich
-						? "Could not find the soundcard":"Could not find the mixer";
+					errorString = volumeWhich ? "Could not find the soundcard"
+						: "Could not find the mixer";
 				} else if (p->Type() != BParameter::B_CONTINUOUS_PARAMETER) {
-					errorString = volumeWhich
-						? "Soundcard control unknown":"Mixer control unknown";
+					errorString = volumeWhich ? "Soundcard control unknown"
+						: "Mixer control unknown";
 				} else {
 					fMixerParameter = dynamic_cast<BContinuousParameter*>(p);
 					fMin = fMixerParameter->MinValue();
@@ -150,10 +149,9 @@ retry:
 		errorString = "No Media Roster";
 	}
 
-	if (err != B_OK) {
-		delete fAudioMixerNode;
-		fAudioMixerNode = NULL;
-	}
+	if (err != B_OK)
+		fGainMediaNode = media_node::null;
+
 	if (errorString) {
 		fprintf(stderr, "MixerControl: %s.\n", errorString);
 		if (_error)
@@ -169,8 +167,8 @@ MixerControl::~MixerControl()
 	delete fParameterWeb;
 
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL && fAudioMixerNode != NULL)
-		roster->ReleaseNode(*fAudioMixerNode);
+	if (roster != NULL && fGainMediaNode != media_node::null)
+		roster->ReleaseNode(fGainMediaNode);
 }
 
 
