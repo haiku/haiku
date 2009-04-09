@@ -8,6 +8,7 @@
 
 #include "fuse_config.h"
 
+#include <string.h>
 
 enum {
 	KEY_KERN_FLAG,
