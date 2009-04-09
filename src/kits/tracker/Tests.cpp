@@ -55,7 +55,11 @@ All rights reserved.
 
 const char *pathsToSearch[] = {
 //	"/boot/home/config/settings/NetPositive/Bookmarks/",
+#ifdef __HAIKU__
+	"/boot/system",
+#else
 	"/boot/beos",
+#endif
 	"/boot/apps",
 	"/boot/home",
 	0
