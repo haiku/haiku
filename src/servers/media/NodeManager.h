@@ -2,13 +2,14 @@
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #include "TList.h"
 #include "TMap.h"
 #include "TStack.h"
 #include "DataExchange.h"
 
-struct registered_node
-{
+
+struct registered_node {
 	media_node_id nodeid;
 	media_addon_id addon_id;
 	int32 addon_flavor_id;
@@ -23,8 +24,7 @@ struct registered_node
 	List<media_output> outputlist;
 };
 
-struct dormant_addon_flavor_info
-{
+struct dormant_addon_flavor_info {
 	media_addon_id AddonID;
 	int32 AddonFlavorID;	
 
@@ -40,8 +40,7 @@ struct dormant_addon_flavor_info
 class DefaultManager;
 class BufferManager;
 
-class NodeManager
-{
+class NodeManager {
 public:
 	NodeManager();
 	~NodeManager();

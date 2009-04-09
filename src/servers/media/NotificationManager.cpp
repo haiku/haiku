@@ -27,103 +27,108 @@
  *
  */
 
-#include <OS.h>
-#include <Locker.h>
-#include <Autolock.h>
-#include <Message.h>
-#include <Messenger.h>
-#include <MediaNode.h>
-#include "debug.h"
-#include "NodeManager.h"
-#include "DataExchange.h"
-#include "Notifications.h"
 #include "NotificationManager.h"
+
+#include <Autolock.h>
+#include <Locker.h>
+#include <Message.h>
+#include <OS.h>
+
+#include "DataExchange.h"
+#include "debug.h"
 #include "media_server.h"
-#include "Queue.h"
+#include "NodeManager.h"
+#include "Notifications.h"
 
 
 #define NOTIFICATION_THREAD_PRIORITY 19
 #define TIMEOUT 100000
 
+
 NotificationManager::NotificationManager()
- :	fNotificationQueue(new Queue),
+	:
 	fNotificationThreadId(-1),
-	fLocker(new BLocker("notification manager locker")),
-	fNotificationList(new List<Notification>)
+	fLocker("notification manager locker")
 {
-	fNotificationThreadId = spawn_thread(NotificationManager::worker_thread, "notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);
+	fNotificationThreadId = spawn_thread(NotificationManager::worker_thread,
+		"notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);
 	resume_thread(fNotificationThreadId);
 }
+
 
 NotificationManager::~NotificationManager()
 {
 	// properly terminate the queue and wait until the worker thread has finished
+	fNotificationQueue.Terminate();
+
 	status_t dummy;
-	fNotificationQueue->Terminate();
 	wait_for_thread(fNotificationThreadId, &dummy);
-	delete fNotificationQueue;
-	delete fLocker;
-	delete fNotificationList;
 }
+
 
 void
 NotificationManager::EnqueueMessage(BMessage *msg)
 {
 	// queue a copy of the message to be processed later
-	fNotificationQueue->AddItem(new BMessage(*msg));
+	fNotificationQueue.AddItem(new BMessage(*msg));
 }
+
 
 void
 NotificationManager::RequestNotifications(BMessage *msg)
 {
 	BMessenger messenger;
 	const media_node *node;
-	ssize_t nodesize;
+	ssize_t nodeSize;
 	team_id team;
 	int32 what;
 
 	msg->FindMessenger(NOTIFICATION_PARAM_MESSENGER, &messenger);
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
 	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
-	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
-	ASSERT(nodesize == sizeof(media_node));
+	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node),
+		&nodeSize);
+	ASSERT(nodeSize == sizeof(media_node));
 
 	Notification n;
 	n.messenger = messenger;
 	n.node = *node;
 	n.what = what;
 	n.team = team;
-	
-	TRACE("NotificationManager::RequestNotifications node %ld, team %ld, what %#lx\n",node->node, team, what);
 
-	fLocker->Lock();
-	fNotificationList->Insert(n);
-	fLocker->Unlock();
+	TRACE("NotificationManager::RequestNotifications node %ld, team %ld, "
+		"what %#lx\n",node->node, team, what);
+
+	fLocker.Lock();
+	fNotificationList.Insert(n);
+	fLocker.Unlock();
 
 	// send the initial B_MEDIA_NODE_CREATED containing all existing live nodes
 	BMessage initmsg(B_MEDIA_NODE_CREATED);
-	if (B_OK == gNodeManager->GetLiveNodes(&initmsg)) {
+	if (gNodeManager->GetLiveNodes(&initmsg) == B_OK)
 		messenger.SendMessage(&initmsg, static_cast<BHandler *>(NULL), TIMEOUT);
-	}
 }
+
 
 void
 NotificationManager::CancelNotifications(BMessage *msg)
 {
 	BMessenger messenger;
 	const media_node *node;
-	ssize_t nodesize;
+	ssize_t nodeSize;
 	team_id team;
 	int32 what;
 
 	msg->FindMessenger(NOTIFICATION_PARAM_MESSENGER, &messenger);
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
 	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
-	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
-	ASSERT(nodesize == sizeof(media_node));
+	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node),
+		&nodeSize);
+	ASSERT(nodeSize == sizeof(media_node));
 
-	TRACE("NotificationManager::CancelNotifications node %ld, team %ld, what %#lx\n",node->node, team, what);
-	
+	TRACE("NotificationManager::CancelNotifications node %ld, team %ld, what "
+		"%#lx\n", node->node, team, what);
+
 	/* if 		what == B_MEDIA_WILDCARD && node == media_node::null
 	 *		=> delete all notifications for the matching team & messenger 
 	 * else if 	what != B_MEDIA_WILDCARD && node == media_node::null
@@ -131,34 +136,39 @@ NotificationManager::CancelNotifications(BMessage *msg)
 	 * else if 	what == B_MEDIA_WILDCARD && node != media_node::null
 	 *		=> delete all notifications for the matching team & messenger & node
 	 * else if 	what != B_MEDIA_WILDCARD && node != media_node::null
-	 *		=> delete all notifications for the matching what & team & messenger & node
+	 *		=> delete all notifications for the matching what & team & messenger
+	 *				& node
 	 */
 	 
-	fLocker->Lock();
+	BAutolock _(fLocker);
 
 	Notification *n;
-	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
+	for (fNotificationList.Rewind(); fNotificationList.GetNext(&n); ) {
 		bool remove;
-		if (what == B_MEDIA_WILDCARD && *node == media_node::null && team == n->team && messenger == n->messenger)
+		if (what == B_MEDIA_WILDCARD && *node == media_node::null
+			&& team == n->team && messenger == n->messenger)
 			remove = true;
-		else if (what != B_MEDIA_WILDCARD && *node == media_node::null && what == n->what && team == n->team && messenger == n->messenger)
+		else if (what != B_MEDIA_WILDCARD && *node == media_node::null
+			&& what == n->what && team == n->team && messenger == n->messenger)
 			remove = true;
-		else if (what == B_MEDIA_WILDCARD && *node != media_node::null && team == n->team && messenger == n->messenger && n->node == *node)
+		else if (what == B_MEDIA_WILDCARD && *node != media_node::null
+			&& team == n->team && messenger == n->messenger && n->node == *node)
 			remove = true;
-		else if (what != B_MEDIA_WILDCARD && *node != media_node::null && what == n->what && team == n->team && messenger == n->messenger && n->node == *node)
+		else if (what != B_MEDIA_WILDCARD && *node != media_node::null
+			&& what == n->what && team == n->team && messenger == n->messenger
+			&& n->node == *node)
 			remove = true;
 		else
 			remove = false;
+
 		if (remove) {
-			if (fNotificationList->RemoveCurrent()) {
-			} else {
+			if (!fNotificationList.RemoveCurrent()) {
 				ASSERT(false);
 			}
 		}
 	}
-
-	fLocker->Unlock();
 }
+
 
 void
 NotificationManager::SendNotifications(BMessage *msg)
@@ -175,10 +185,10 @@ NotificationManager::SendNotifications(BMessage *msg)
 
 	TRACE("NotificationManager::SendNotifications what %#lx\n", what);
 
-	fLocker->Lock();
+	BAutolock _(fLocker);
 
 	Notification *n;
-	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
+	for (fNotificationList.Rewind(); fNotificationList.GetNext(&n); ) {
 		if (n->what != B_MEDIA_WILDCARD && n->what != what)
 			continue;
 		
@@ -200,18 +210,23 @@ NotificationManager::SendNotifications(BMessage *msg)
 			case B_MEDIA_PARAMETER_CHANGED:
 			case B_MEDIA_NODE_STOPPED:
 			case B_MEDIA_WEB_CHANGED:
-				msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &size);
+				msg->FindData("node", B_RAW_TYPE,
+					reinterpret_cast<const void **>(&node), &size);
 				ASSERT(size == sizeof(media_node));
 				if (n->node != *node)
 					continue;
 				break;
 
 			case B_MEDIA_FORMAT_CHANGED:
-				msg->FindData("source", B_RAW_TYPE, reinterpret_cast<const void **>(&source), &size);
+				msg->FindData("source", B_RAW_TYPE,
+					reinterpret_cast<const void **>(&source), &size);
 				ASSERT(size == sizeof(media_source));
-				msg->FindData("destination", B_RAW_TYPE, reinterpret_cast<const void **>(&destination), &size);
+				msg->FindData("destination", B_RAW_TYPE,
+					reinterpret_cast<const void **>(&destination), &size);
 				ASSERT(size == sizeof(media_destination));
-				if (n->node.port != source->port && n->node.port != destination->port)
+
+				if (n->node.port != source->port
+					&& n->node.port != destination->port)
 					continue;
 				break;
 		}
@@ -219,39 +234,39 @@ NotificationManager::SendNotifications(BMessage *msg)
 		TRACE("NotificationManager::SendNotifications sending\n");
 		n->messenger.SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
 	}
-
-	fLocker->Unlock();
 }
 	
+
 void
 NotificationManager::CleanupTeam(team_id team)
 {
 	TRACE("NotificationManager::CleanupTeam team %ld\n", team);
-	fLocker->Lock();
+	BAutolock _(fLocker);
 
-	int debugcount = 0;
+	int debugCount = 0;
 	Notification *n;
-	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
+	for (fNotificationList.Rewind(); fNotificationList.GetNext(&n); ) {
 		if (n->team == team) {
-			if (fNotificationList->RemoveCurrent()) {
-				debugcount++;
+			if (fNotificationList.RemoveCurrent()) {
+				debugCount++;
 			} else {
 				ASSERT(false);
 			}
 		}
 	}
-	
-	if (debugcount != 0)
-		ERROR("NotificationManager::CleanupTeam: removed  %d notifications for team %ld\n", debugcount, team);
 
-	fLocker->Unlock();
+	if (debugCount != 0) {
+		ERROR("NotificationManager::CleanupTeam: removed  %d notifications for "
+			"team %ld\n", debugCount, team);
+	}
 }
+
 
 void
 NotificationManager::WorkerThread()
 {
-	BMessage *msg;
-	while (NULL != (msg = static_cast<BMessage *>(fNotificationQueue->RemoveItem()))) {
+	while (BMessage *msg
+			= static_cast<BMessage *>(fNotificationQueue.RemoveItem())) {
 		switch (msg->what) {
 			case MEDIA_SERVER_REQUEST_NOTIFICATIONS:
 				RequestNotifications(msg);
@@ -269,6 +284,7 @@ NotificationManager::WorkerThread()
 	}
 }
 
+
 int32
 NotificationManager::worker_thread(void *arg)
 {
@@ -276,16 +292,19 @@ NotificationManager::worker_thread(void *arg)
 	return 0;
 }
 
+
 void
 NotificationManager::Dump()
 {
 	BAutolock lock(fLocker);
+
 	printf("\n");
 	printf("NotificationManager: list of subscribers follows:\n");
 	Notification *n;	
-	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
-		printf(" team %ld, what %#08lx, node-id %ld, node-port %ld, messenger %svalid\n",
-			n->team, n->what, n->node.node, n->node.port, n->messenger.IsValid() ? "" : "NOT ");
+	for (fNotificationList.Rewind(); fNotificationList.GetNext(&n); ) {
+		printf(" team %ld, what %#08lx, node-id %ld, node-port %ld, messenger "
+			"%svalid\n", n->team, n->what, n->node.node, n->node.port,
+			n->messenger.IsValid() ? "" : "NOT ");
 	}
 	printf("NotificationManager: list end\n");
 }
