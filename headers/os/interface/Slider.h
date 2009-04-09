@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,199 +28,205 @@ enum thumb_style {
 };
 
 
-#define USE_OFF_SCREEN_VIEW 1 
-
-
 class BSlider : public BControl {
-	public:
-		BSlider(BRect frame, const char *name, const char *label,
-			BMessage *message, int32 minValue, int32 maxValue,
-			thumb_style thumbType = B_BLOCK_THUMB,
-			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+public:
+								BSlider(BRect frame, const char* name,
+									const char* label, BMessage* message,
+									int32 minValue, int32 maxValue,
+									thumb_style thumbType = B_BLOCK_THUMB,
+									uint32 resizingMode
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
+										| B_FRAME_EVENTS);
 
-		BSlider(BRect frame, const char *name, const char *label,
-			BMessage *message, int32 minValue, int32 maxValue,
-			orientation posture, thumb_style thumbType = B_BLOCK_THUMB,
-			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+								BSlider(BRect frame, const char* name,
+									const char* label, BMessage* message,
+									int32 minValue, int32 maxValue,
+									orientation posture,
+									thumb_style thumbType = B_BLOCK_THUMB,
+									uint32 resizingMode
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
+										| B_FRAME_EVENTS);
 
-		BSlider(const char *name, const char *label,
-			BMessage *message, int32 minValue, int32 maxValue,
-			orientation posture, thumb_style thumbType = B_BLOCK_THUMB,
-			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+								BSlider(const char* name, const char* label,
+									BMessage* message, int32 minValue,
+									int32 maxValue, orientation posture,
+									thumb_style thumbType = B_BLOCK_THUMB,
+									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
+										| B_FRAME_EVENTS);
 
-		BSlider(BMessage *data);
-		virtual	~BSlider();
+								BSlider(BMessage* data);
+	virtual						~BSlider();
 
-		static 	BArchivable	*Instantiate(BMessage *data);
-		virtual	status_t 	Archive(BMessage *data, bool deep = true) const;
-		virtual status_t	Perform(perform_code code, void* data);
+	static 	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t 			Archive(BMessage* data, bool deep = true) const;
+	virtual status_t			Perform(perform_code code, void* data);
 
-		virtual void		WindowActivated(bool state);
-		virtual	void		AttachedToWindow();
-		virtual	void		AllAttached();
-		virtual	void		AllDetached();
-		virtual	void		DetachedFromWindow();
+	virtual void				WindowActivated(bool state);
+	virtual	void				AttachedToWindow();
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
+	virtual	void				DetachedFromWindow();
 
-		virtual	void		MessageReceived(BMessage *msg);
-		virtual void		FrameMoved(BPoint new_position);
-		virtual void		FrameResized(float w,float h);
-		virtual void		KeyDown(const char * bytes, int32 n);
-		virtual void		MouseDown(BPoint);
-		virtual void		MouseUp(BPoint pt);
-		virtual void		MouseMoved(BPoint pt, uint32 c, const BMessage *m);
-		virtual	void		Pulse();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual void				FrameMoved(BPoint newPosition);
+	virtual void				FrameResized(float width, float height);
+	virtual void				KeyDown(const char* bytes, int32 numBytes);
+	virtual void				MouseDown(BPoint point);
+	virtual void				MouseUp(BPoint point);
+	virtual void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* dragMessage);
+	virtual	void				Pulse();
 
-		virtual void		SetLabel(const char *label);
-		virtual	void		SetLimitLabels(const char *minLabel,
-								const char *maxLabel);
-		const char*			MinLimitLabel() const;
-		const char*			MaxLimitLabel() const;							
-		virtual	void		SetValue(int32);
-		virtual int32		ValueForPoint(BPoint) const;
-		virtual void		SetPosition(float);
-				float		Position() const;
-		virtual void		SetEnabled(bool on); 
-				void		GetLimits(int32 * minimum, int32 * maximum);	
+	virtual void				SetLabel(const char* label);
+	virtual	void				SetLimitLabels(const char* minLabel,
+									const char* maxLabel);
+			const char*			MinLimitLabel() const;
+			const char*			MaxLimitLabel() const;							
+	virtual	void				SetValue(int32);
+	virtual int32				ValueForPoint(BPoint) const;
+	virtual void				SetPosition(float);
+			float				Position() const;
+	virtual void				SetEnabled(bool on);
+			void				GetLimits(int32* minimum, int32* maximum) const;
 
-		virtual	void		Draw(BRect);
-		virtual void		DrawSlider();
-		virtual void		DrawBar();
-		virtual void		DrawHashMarks();
-		virtual void		DrawThumb();
-		virtual void		DrawFocusMark();
-		virtual	void		DrawText();
-		virtual const char*	UpdateText() const;
-				void		UpdateTextChanged();
+	virtual	void				Draw(BRect);
+	virtual void				DrawSlider();
+	virtual void				DrawBar();
+	virtual void				DrawHashMarks();
+	virtual void				DrawThumb();
+	virtual void				DrawFocusMark();
+	virtual	void				DrawText();
+	virtual const char*			UpdateText() const;
+			void				UpdateTextChanged();
 
-		virtual BRect		BarFrame() const;
-		virtual BRect		HashMarksFrame() const;
-		virtual BRect		ThumbFrame() const;
+	virtual BRect				BarFrame() const;
+	virtual BRect				HashMarksFrame() const;
+	virtual BRect				ThumbFrame() const;
 
-		virtual	void		SetFlags(uint32 flags);
-		virtual	void		SetResizingMode(uint32 mode);
+	virtual	void				SetFlags(uint32 flags);
+	virtual	void				SetResizingMode(uint32 mode);
 
-		virtual void		GetPreferredSize( float *width, float *height);
-		virtual void		ResizeToPreferred();
+	virtual void				GetPreferredSize(float* width, float* height);
+	virtual void				ResizeToPreferred();
 
-		virtual status_t	Invoke(BMessage *msg=NULL);
-		virtual BHandler*	ResolveSpecifier(BMessage *msg, int32 index,
-								BMessage *specifier, int32 form,
-								const char *property);
-		virtual	status_t	GetSupportedSuites(BMessage* data);
+	virtual status_t			Invoke(BMessage* message = NULL);
+	virtual BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 form,
+									const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
 
-		virtual	void		SetModificationMessage(BMessage *message);
-				BMessage*	ModificationMessage() const;
+	virtual	void				SetModificationMessage(BMessage* message);
+			BMessage*			ModificationMessage() const;
 
-		virtual void		SetSnoozeAmount(int32);
-				int32		SnoozeAmount() const;
+	virtual void				SetSnoozeAmount(int32);
+			int32				SnoozeAmount() const;
 
-		virtual	void		SetKeyIncrementValue(int32 value);
-				int32		KeyIncrementValue()	const;
+	virtual	void				SetKeyIncrementValue(int32 value);
+			int32				KeyIncrementValue()	const;
 
-		virtual	void		SetHashMarkCount(int32 count);
-				int32		HashMarkCount() const;
+	virtual	void				SetHashMarkCount(int32 count);
+			int32				HashMarkCount() const;
 
-		virtual	void		SetHashMarks(hash_mark_location where);
-		hash_mark_location	HashMarks() const;
+	virtual	void				SetHashMarks(hash_mark_location where);
+			hash_mark_location	HashMarks() const;
 
-		virtual	void		SetStyle(thumb_style s);
-				thumb_style	Style() const;
+	virtual	void				SetStyle(thumb_style style);
+			thumb_style			Style() const;
 
-		virtual	void		SetBarColor(rgb_color);
-				rgb_color	BarColor() const;
-		virtual	void		UseFillColor(bool, const rgb_color* c=NULL);
-				bool		FillColor(rgb_color*) const;
+	virtual	void				SetBarColor(rgb_color color);
+			rgb_color			BarColor() const;
+	virtual	void				UseFillColor(bool useFill,
+									const rgb_color* color = NULL);
+			bool				FillColor(rgb_color* color) const;
 
-				BView*		OffscreenView() const;
+			BView*				OffscreenView() const;
 
-				orientation	Orientation() const;
-		virtual void		SetOrientation(orientation);
+			orientation			Orientation() const;
+	virtual void				SetOrientation(orientation);
 
-				float		BarThickness() const;
-		virtual void		SetBarThickness(float thickness);
+			float				BarThickness() const;
+	virtual void				SetBarThickness(float thickness);
 
-		virtual void		SetFont(const BFont *font,
-								uint32 properties = B_FONT_ALL);
+	virtual void				SetFont(const BFont* font,
+									uint32 properties = B_FONT_ALL);
 
-		virtual void		SetLimits(int32 minimum, int32 maximum);
+	virtual void				SetLimits(int32 minimum, int32 maximum);
 
-		virtual	float		MaxUpdateTextWidth();
+	virtual	float				MaxUpdateTextWidth();
 
-		virtual	void		InvalidateLayout(bool descendants = false);
+	virtual	void				InvalidateLayout(bool descendants = false);
 
-		virtual	BSize		MinSize();
-		virtual	BSize		MaxSize();
-		virtual	BSize		PreferredSize();
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
 
-	private:
-				void		_DrawBlockThumb();
-				void		_DrawTriangleThumb();
+private:
+			// deprecated leftover of BeOS compatibility
+			void				GetLimits(int32* minimum, int32* maximum);	
 
-				BPoint		_Location() const;
-				void		_SetLocation(BPoint p);
+			void				_DrawBlockThumb();
+			void				_DrawTriangleThumb();
 
-				float		_MinPosition() const;
-				float		_MaxPosition() const;
-				bool		_ConstrainPoint(BPoint& point, BPoint compare) const;
+			BPoint				_Location() const;
+			void				_SetLocation(BPoint point);
 
-				BSize		_ValidateMinSize();
+			float				_MinPosition() const;
+			float				_MaxPosition() const;
+			bool				_ConstrainPoint(BPoint& point,
+									BPoint compare) const;
 
-		virtual	void		_ReservedSlider6();
-		virtual	void		_ReservedSlider7();
-		virtual	void		_ReservedSlider8();
-		virtual	void		_ReservedSlider9();
-		virtual	void		_ReservedSlider10();
-		virtual	void		_ReservedSlider11();
-		virtual	void		_ReservedSlider12();
+			BSize				_ValidateMinSize();
 
-				BSlider&	operator=(const BSlider &);
+	virtual	void				_ReservedSlider6();
+	virtual	void				_ReservedSlider7();
+	virtual	void				_ReservedSlider8();
+	virtual	void				_ReservedSlider9();
+	virtual	void				_ReservedSlider10();
+	virtual	void				_ReservedSlider11();
+	virtual	void				_ReservedSlider12();
 
-				void		_InitBarColor();
-				void		_InitObject();
+			BSlider&			operator=(const BSlider& other);
 
-	private:
-		BMessage*			fModificationMessage;
-		int32				fSnoozeAmount;
+			void				_InitBarColor();
+			void				_InitObject();
 
-		rgb_color 			fBarColor;
-		rgb_color 			fFillColor;
-		bool				fUseFillColor;
+private:
+			BMessage*			fModificationMessage;
+			int32				fSnoozeAmount;
 
-		char*				fMinLimitLabel;
-		char*				fMaxLimitLabel;
-		const char*			fUpdateText;
+			rgb_color 			fBarColor;
+			rgb_color 			fFillColor;
+			bool				fUseFillColor;
 
-		int32 				fMinValue;
-		int32 				fMaxValue;
-		int32 				fKeyIncrementValue;
+			char*				fMinLimitLabel;
+			char*				fMaxLimitLabel;
+			const char*			fUpdateText;
 
-		int32 				fHashMarkCount;
-		hash_mark_location 	fHashMarks;
+			int32 				fMinValue;
+			int32 				fMaxValue;
+			int32 				fKeyIncrementValue;
 
-#if USE_OFF_SCREEN_VIEW
-		BBitmap*			fOffScreenBits;
-		BView*				fOffScreenView;
-#endif
+			int32 				fHashMarkCount;
+			hash_mark_location 	fHashMarks;
 
-		thumb_style			fStyle;
+			BBitmap*			fOffScreenBits;
+			BView*				fOffScreenView;
 
-		BPoint 				fLocation;
-		BPoint				fInitialLocation;
+			thumb_style			fStyle;
 
-		orientation			fOrientation;
-		float				fBarThickness;
+			BPoint 				fLocation;
+			BPoint				fInitialLocation;
 
-		BSize				fMinSize;
+			orientation			fOrientation;
+			float				fBarThickness;
 
-		float				fMaxUpdateTextWidth;
+			BSize				fMinSize;
 
-#if USE_OFF_SCREEN_VIEW
-		uint32				_reserved[4];
-#else
-		uint32				_reserved[6];
-#endif
+			float				fMaxUpdateTextWidth;
+
+			uint32				_reserved[4];
 };
 
 #endif	// _SLIDER_H

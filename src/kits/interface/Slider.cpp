@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,6 +25,9 @@
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
+
+
+#define USE_OFF_SCREEN_VIEW 1 
 
 
 BSlider::BSlider(BRect frame, const char* name, const char* label,
@@ -778,10 +781,23 @@ BSlider::SetEnabled(bool on)
 
 
 void
+BSlider::GetLimits(int32 *minimum, int32 *maximum) const
+{
+	if (minimum != NULL)
+		*minimum = fMinValue;
+	if (maximum != NULL)
+		*maximum = fMaxValue;
+}
+
+
+//! This one is deprecated, and only left for binary compatiblity (it's private)
+void
 BSlider::GetLimits(int32 *minimum, int32 *maximum)
 {
-	*minimum = fMinValue;
-	*maximum = fMaxValue;
+	if (minimum != NULL)
+		*minimum = fMinValue;
+	if (maximum != NULL)
+		*maximum = fMaxValue;
 }
 
 
@@ -1594,6 +1610,9 @@ BSlider::SetBarThickness(float thickness)
 {
 	if (thickness < 1.0)
 		thickness = 1.0;
+	else
+		thickness = roundf(thickness);
+
 	if (thickness != fBarThickness) {
 		// calculate invalid barframe and extend by hashmark size
 		float hInset = 0.0;
