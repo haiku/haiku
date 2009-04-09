@@ -67,6 +67,10 @@ using std::nothrow;
 // the update session, which tells us the cause of the update
 
 
+//static rgb_color sPendingColor = (rgb_color){ 255, 255, 0, 255 };
+//static rgb_color sCurrentColor = (rgb_color){ 255, 0, 255, 255 };
+
+
 Window::Window(const BRect& frame, const char *name,
 		window_look look, window_feel feel, uint32 flags, uint32 workspaces,
 		::ServerWindow* window, DrawingEngine* drawingEngine)
@@ -411,8 +415,8 @@ Window::ScrollViewBy(View* view, int32 dx, int32 dy)
 
 	view->ScrollBy(dx, dy, dirty);
 
-//fDrawingEngine->FillRegion(dirty, rgb_color{ 255, 0, 255, 255 });
-//snooze(2000);
+//fDrawingEngine->FillRegion(*dirty, (rgb_color){ 255, 0, 255, 255 });
+//snooze(20000);
 
 	if (!IsOffscreenWindow() && IsVisible() && view->IsVisible()) {
 		dirty->IntersectWith(&VisibleContentRegion());
@@ -471,6 +475,18 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 					copyRegion->Exclude(allDirtyRegions);
 
 				fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
+
+				// The parts that could be copied are not dirty (at the
+				// target location!)
+				copyRegion->OffsetBy(xOffset, yOffset);
+				// Prevent those parts to being transfered to the dirty
+				// region...
+				if (allDirtyRegions != NULL)
+					allDirtyRegions->Exclude(copyRegion);
+				// ... and even exclude them from the pending dirty region!
+				if (fPendingUpdateSession->IsUsed())
+					fPendingUpdateSession->DirtyRegion().Exclude(copyRegion);
+
 				fRegionPool.Recycle(copyRegion);
 			} else {
 				// Fallback, should never be here.
@@ -1807,6 +1823,15 @@ Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 				fDrawingEngine->SetCopyToFrontEnabled(true);
 				fDrawingEngine->SuspendAutoSync();
 
+//sCurrentColor.red = rand() % 255;
+//sCurrentColor.green = rand() % 255;
+//sCurrentColor.blue = rand() % 255;
+//sPendingColor.red = rand() % 255;
+//sPendingColor.green = rand() % 255;
+//sPendingColor.blue = rand() % 255;
+//fDrawingEngine->FillRegion(*backgroundClearingRegion, sCurrentColor);
+//snooze(10000);
+
 				fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
 					&fContentRegion, true);
 
@@ -1863,9 +1888,6 @@ fWindow->ResyncDrawState();
 }
 
 
-//static rgb_color sPendingColor;
-//static rgb_color sCurrentColor;
-
 /*!
 	pre: the clipping is readlocked (this function is
 	only called from _TriggerContentRedraw()), which
@@ -1879,7 +1901,7 @@ Window::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 		return;
 
 //fDrawingEngine->FillRegion(*contentDirtyRegion, sPendingColor);
-//snooze(10000);
+//snooze(20000);
 
 	// add to pending
 	fPendingUpdateSession->SetUsed(true);
@@ -1964,14 +1986,16 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 
 	dirty->IntersectWith(&VisibleContentRegion());
 
-//sCurrentColor.red = rand() % 255;
-//sCurrentColor.green = rand() % 255;
-//sCurrentColor.blue = rand() % 255;
-//sPendingColor.red = rand() % 255;
-//sPendingColor.green = rand() % 255;
-//sPendingColor.blue = rand() % 255;
+//if (!fCurrentUpdateSession->IsExpose()) {
+////sCurrentColor.red = rand() % 255;
+////sCurrentColor.green = rand() % 255;
+////sCurrentColor.blue = rand() % 255;
+////sPendingColor.red = rand() % 255;
+////sPendingColor.green = rand() % 255;
+////sPendingColor.blue = rand() % 255;
 //fDrawingEngine->FillRegion(*dirty, sCurrentColor);
 //snooze(10000);
+//}
 
 	link.StartMessage(B_OK);
 	// append the current window geometry to the
@@ -1990,7 +2014,6 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	fDrawingEngine->SetCopyToFrontEnabled(false);
 
 	if (!fCurrentUpdateSession->IsExpose() && fDrawingEngine->LockParallelAccess()) {
-//fDrawingEngine->FillRegion(dirty, (rgb_color){ 255, 0, 0, 255 });
 		fDrawingEngine->SuspendAutoSync();
 
 		fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
