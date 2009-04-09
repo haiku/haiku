@@ -69,6 +69,7 @@ struct device_lun_s {
 	uint32		block_size;
 	uint8		device_type;
 	bool		removable;
+	bool		write_protected;
 };
 
 

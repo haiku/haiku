@@ -134,6 +134,7 @@ status_t	usb_disk_operation(device_lun *lun, uint8 operation,
 				bool directionIn);
 
 status_t	usb_disk_request_sense(device_lun *lun);
+status_t	usb_disk_mode_sense(device_lun *lun);
 status_t	usb_disk_test_unit_ready(device_lun *lun);
 status_t	usb_disk_inquiry(device_lun *lun);
 status_t	usb_disk_reset_capacity(device_lun *lun);
@@ -280,6 +281,10 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 			commandBlock->operation = operation;
 			commandBlock->lun = lun->logical_unit_number << 5;
 			commandBlock->allocation_length = (uint8)transferLength;
+			if (operation == SCSI_MODE_SENSE_6) {
+				// we hijack the lba argument to transport the desired page
+				commandBlock->reserved[1] = (uint8)logicalBlockAddress;
+			}
 			break;
 		}
 
@@ -461,6 +466,26 @@ usb_disk_request_sense(device_lun *lun)
 	}
 
 	return B_ERROR;
+}
+
+
+status_t
+usb_disk_mode_sense(device_lun *lun)
+{
+	uint32 dataLength = sizeof(scsi_mode_sense_6_parameter);
+	scsi_mode_sense_6_parameter parameter;
+	status_t result = usb_disk_operation(lun, SCSI_MODE_SENSE_6, 6,
+		SCSI_MODE_PAGE_DEVICE_CONFIGURATION, dataLength, &parameter,
+		&dataLength, true);
+	if (result != B_OK) {
+		TRACE_ALWAYS("getting mode sense data failed\n");
+		return result;
+	}
+
+	lun->write_protected
+		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT) != 0;
+	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");	
+	return B_OK;
 }
 
 
@@ -699,8 +724,16 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		result = usb_disk_inquiry(lun);
 		for (uint32 tries = 0; tries < 3; tries++) {
 			status_t ready = usb_disk_test_unit_ready(lun);
-			if (ready == B_OK || ready == B_DEV_NO_MEDIA)
+			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
+				if (ready == B_OK) {
+					// TODO: check for write protection
+					//if (usb_disk_mode_sense(lun) != B_OK)
+						lun->write_protected = false;
+				}
+
 				break;
+			}
+
 			snooze(10000);
 		}
 
@@ -956,7 +989,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			geometry->sectors_per_track = geometry->head_count = 1;
 			geometry->device_type = lun->device_type;
 			geometry->removable = lun->removable;
-			geometry->read_only = (lun->device_type == B_CD);
+			geometry->read_only = lun->write_protected;
 			geometry->write_once = (lun->device_type == B_WORM);
 			TRACE("B_GET_GEOMETRY: %ld sectors at %ld bytes per sector\n",
 				geometry->cylinder_count, geometry->bytes_per_sector);

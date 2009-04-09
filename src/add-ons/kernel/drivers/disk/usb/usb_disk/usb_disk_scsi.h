@@ -13,6 +13,7 @@ typedef enum {
 	SCSI_TEST_UNIT_READY_6 = 0x00,
 	SCSI_REQUEST_SENSE_6 = 0x03,
 	SCSI_INQUIRY_6 = 0x12,
+	SCSI_MODE_SENSE_6 = 0x1a,
 	SCSI_START_STOP_UNIT_6 = 0x1b,
 	SCSI_READ_CAPACITY_10 = 0x25,
 	SCSI_READ_10 = 0x28,
@@ -69,6 +70,17 @@ typedef struct scsi_inquiry_6_parameter_s {
 	char	product_revision_level[4];
 } _PACKED scsi_inquiry_6_parameter;
 
+typedef struct scsi_mode_sense_6_parameter_s {
+	uint8	data_length;
+	uint8	medium_type;
+	uint8	device_specific;
+	uint8	block_descriptor_length;
+	uint8	densitiy;
+	uint8	num_blocks[3];
+	uint8	reserved;
+	uint8	block_length[3];
+} _PACKED scsi_mode_sense_6_parameter;
+
 typedef struct scsi_read_capacity_10_parameter_s {
 	uint32	last_logical_block_address;
 	uint32	logical_block_length;
@@ -86,5 +98,9 @@ typedef enum {
 	SCSI_SENSE_KEY_DATA_PROTECT = 0x07,
 	SCSI_SENSE_KEY_ABORTED_COMMAND = 0x0b,
 } scsi_sense_key;
+
+// mode sense page code/parameter
+#define SCSI_MODE_PAGE_DEVICE_CONFIGURATION	0x10
+#define SCSI_DEVICE_SPECIFIC_WRITE_PROTECT	0x80
 
 #endif // _USB_DISK_SCSI_H_
