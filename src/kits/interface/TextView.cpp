@@ -3037,6 +3037,28 @@ BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 
 	// remove any style runs that have been obliterated
 	fStyles->RemoveStyleRange(fromOffset, toOffset);
+
+	// adjust the selection accordingly, assumes fSelEnd >= fSelStart!
+	int32 range = toOffset - fromOffset;
+	if (fSelStart >= toOffset) {
+		// selection is behind the range that was removed
+		fSelStart -= range;
+		fSelEnd -= range;
+	} else if (fSelStart >= fromOffset && fSelEnd <= toOffset) {
+		// the selection is within the range that was removed
+		fSelStart = fSelEnd = fromOffset;
+	} else if (fSelStart >= fromOffset && fSelEnd > toOffset) {
+		// the selection starts within and ends after the range
+		// the remaining part is the part that was after the range
+		fSelStart = fromOffset;
+		fSelEnd = fromOffset + fSelEnd - toOffset;
+	} else if (fSelStart < fromOffset && fSelEnd < toOffset) {
+		// the selection starts before, but ends within the range
+		fSelEnd = fromOffset;
+	} else if (fSelStart < fromOffset && fSelEnd >= toOffset) {
+		// the selection starts before and ends after the range
+		fSelEnd -= range;
+	}
 }
 
 
@@ -3341,7 +3363,6 @@ BTextView::_HandleDelete()
 		Highlight(fSelStart, fSelEnd);
 
 	DeleteText(fSelStart, fSelEnd);
-
 	fClickOffset = fSelEnd = fSelStart;
 
 	_Refresh(fSelStart, fSelEnd, true, true);
