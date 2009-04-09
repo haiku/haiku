@@ -103,6 +103,17 @@ VolumeControl::AttachedToWindow()
 	BSlider::AttachedToWindow();
 
 	SetEventMask(_IsReplicant() ? 0 : B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+
+	BMediaRoster::CurrentRoster()->StartWatching(this,
+		fMixerControl->GainNode(), B_MEDIA_NEW_PARAMETER_VALUE);
+}
+
+
+void
+VolumeControl::DetachedFromWindow()
+{
+	BMediaRoster::CurrentRoster()->StopWatching(this, fMixerControl->GainNode(),
+		B_MEDIA_NEW_PARAMETER_VALUE);
 }
 
 
@@ -163,6 +174,13 @@ VolumeControl::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
+
+		case B_MEDIA_NEW_PARAMETER_VALUE:
+			if (IsTracking())
+				break;
+
+			SetValue((int32)fMixerControl->Volume());
+			break;
 
 		default:
 			return BView::MessageReceived(msg);

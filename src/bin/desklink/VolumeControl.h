@@ -28,6 +28,7 @@ public:
 
 protected:
 	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 	virtual	void			MouseDown(BPoint where);
 	virtual	void			MessageReceived(BMessage* message);
 	virtual status_t		Invoke(BMessage* message = NULL);
