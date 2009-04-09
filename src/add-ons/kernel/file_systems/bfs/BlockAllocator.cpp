@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -103,9 +103,9 @@ public:
 		fBlock(blockNumber),
 		fData(data),
 		fStart(start),
-		fLength(length)
+		fLength(length),
+		fLabel(label)
 	{
-		strlcpy(fLabel, label, sizeof(fLabel));
 		fSum = checksum(data, size);
 		Initialized();
 	}
@@ -122,7 +122,33 @@ private:
 	uint32		fStart;
 	uint32		fLength;
 	uint32		fSum;
-	char		fLabel[12];
+	const char*	fLabel;
+};
+
+
+class BlockChange : public AbstractTraceEntry {
+public:
+	BlockChange(const char* label, int32 block, uint32 oldData, uint32 newData)
+		:
+		fBlock(block),
+		fOldData(oldData),
+		fNewData(newData),
+		fLabel(label)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:%s: block %ld, %08lx -> %08lx", fLabel,
+			fBlock, fOldData, fNewData);
+	}
+
+private:
+	int32		fBlock;
+	uint32		fOldData;
+	uint32		fNewData;
+	const char*	fLabel;
 };
 
 }	// namespace BFSBlockTracing
@@ -263,12 +289,6 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 	ASSERT(fWritable);
 #endif
 
-	if (uint32(start + numBlocks) > fNumBits) {
-		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u "
-			"(numBlocks = %u)!\n", numBlocks, (unsigned)fNumBits));
-		DIE(("Allocation::Allocate(): tried to allocate too many blocks"));
-	}
-
 	T(Block("b-alloc-in", fBlockNumber, fBlock, fVolume->BlockSize(),
 		start, numBlocks));
 
@@ -278,14 +298,19 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 		uint32 mask = 0;
 		for (int32 i = start % 32; i < 32 && numBlocks; i++, numBlocks--)
 			mask |= 1UL << i;
-#ifdef DEBUG
+
+		T(BlockChange("b-alloc", block, Block(block),
+			Block(block) | HOST_ENDIAN_TO_BFS_INT32(mask)));
+
+#if KDEBUG
 		// check for already set blocks
 		if (HOST_ENDIAN_TO_BFS_INT32(mask) & ((uint32*)fBlock)[block]) {
 			FATAL(("AllocationBlock::Allocate(): some blocks are already "
 				"allocated, start = %u, numBlocks = %u\n", start, numBlocks));
-			DEBUGGER(("blocks already set!"));
+			panic("blocks already set!");
 		}
 #endif
+
 		Block(block++) |= HOST_ENDIAN_TO_BFS_INT32(mask);
 		start = 0;
 	}
@@ -303,18 +328,15 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 	ASSERT(fWritable);
 #endif
 
-	if (uint32(start + numBlocks) > fNumBits) {
-		FATAL(("Allocation::Free(): tried to free too many blocks: %u "
-			"(numBlocks = %u)!\n", numBlocks, (unsigned)fNumBits));
-		DIE(("Allocation::Free(): tried to free too many blocks"));
-	}
-
 	int32 block = start >> 5;
 
 	while (numBlocks > 0) {
 		uint32 mask = 0;
 		for (int32 i = start % 32; i < 32 && numBlocks; i++, numBlocks--)
 			mask |= 1UL << (i % 32);
+
+		T(BlockChange("b-free", block, Block(block),
+			Block(block) & HOST_ENDIAN_TO_BFS_INT32(~mask)));
 
 		Block(block++) &= HOST_ENDIAN_TO_BFS_INT32(~mask);
 		start = 0;

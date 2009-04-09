@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * Some code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -329,15 +329,19 @@ dump_volume(int argc, char** argv)
 				run.start = HOST_ENDIAN_TO_BFS_INT16(strtoul(arg + 1, NULL, 0));
 				run.length = 0;
 
-				kprintf("%ld.%u -> block %Ld\n", run.AllocationGroup(),
-					run.Start(), volume->ToBlock(run));
+				kprintf("%ld.%u -> block %Ld, bitmap block %ld\n",
+					run.AllocationGroup(), run.Start(), volume->ToBlock(run),
+					volume->SuperBlock().BlocksPerAllocationGroup()
+						* run.AllocationGroup() + 1);
 			} else {
 				// offset to block_run
 				off_t offset = parse_expression(arg);
 				block_run run = volume->ToBlockRun(offset);
 
-				kprintf("block %Ld -> %ld.%u\n", offset, run.AllocationGroup(),
-					run.Start());
+				kprintf("block %Ld -> %ld.%u, bitmap block %ld\n", offset,
+					run.AllocationGroup(), run.Start(),
+					volume->SuperBlock().BlocksPerAllocationGroup()
+						* run.AllocationGroup() + 1);
 			}
 		}
 		return 0;
