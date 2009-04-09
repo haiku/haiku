@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
 #include <ControlLook.h>
@@ -29,7 +30,8 @@
 
 VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 	: BSlider("VolumeControl", "Volume", message, 0, 1, B_HORIZONTAL),
-	fBeep(beep)
+	fBeep(beep),
+	fSnapping(false)
 {
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -123,6 +125,13 @@ VolumeControl::DetachedFromWindow()
 }
 
 
+/*!	Since we have set a mouse event mask, we don't want to forward all
+	mouse downs to the slider - instead, we only invoke it, which causes a
+	message to our target. Within the VolumeWindow, this will actually
+	cause the window to close.
+	Also, we need to mask out the dragger in this case, or else dragging
+	us will also cause a volume update.
+*/
 void
 VolumeControl::MouseDown(BPoint where)
 {
@@ -149,6 +158,67 @@ VolumeControl::MouseDown(BPoint where)
 	}
 
 	BSlider::MouseDown(where);
+}
+
+
+void
+VolumeControl::MouseUp(BPoint where)
+{
+	fSnapping = false;
+	BSlider::MouseUp(where);
+}
+
+
+/*!	Override the BSlider functionality to be able to grab the knob when
+	it's over 0 dB for some pixels.
+*/
+void
+VolumeControl::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	if (!IsTracking()) {
+		BSlider::MouseMoved(where, transit, dragMessage);
+		return;
+	}
+
+	float cursorPosition = Orientation() == B_HORIZONTAL ? where.x : where.y;
+
+	if (fSnapping && cursorPosition >= fMinSnap && cursorPosition <= fMaxSnap) {
+		// Don't move the slider, keep the current value for a few
+		// more pixels
+		return;
+	}
+
+	fSnapping = false;
+
+	int32 oldValue = Value();
+	int32 newValue = ValueForPoint(where);
+	if (oldValue == newValue) {
+		BSlider::MouseMoved(where, transit, dragMessage);
+		return;
+	}
+
+	// Check if there is a 0 dB transition at all
+	if ((oldValue < 0 && newValue >= 0) || (oldValue > 0 && newValue <= 0)) {
+		SetValue(0);
+		if (ModificationMessage() != NULL)
+			Messenger().SendMessage(ModificationMessage());
+
+		if (oldValue > newValue) {
+			// movement from right to left
+			fMinSnap = _PointForValue(-4);
+			fMaxSnap = _PointForValue(1);
+		} else {
+			// movement from left to right
+			fMinSnap = _PointForValue(-1);
+			fMaxSnap = _PointForValue(4);
+		}
+
+		fSnapping = true;
+		return;
+	}
+
+	BSlider::MouseMoved(where, transit, dragMessage);
 }
 
 
@@ -186,6 +256,13 @@ VolumeControl::MessageReceived(BMessage* msg)
 				break;
 
 			SetValue((int32)fMixerControl->Volume());
+			break;
+
+		case B_ABOUT_REQUESTED:
+			(new BAlert("About Volume Control", "Volume Control\n"
+					"  Written by Jérôme DUVAL, and Axel Dörfler.\n\n"
+					"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku",
+				"OK"))->Go(NULL);
 			break;
 
 		default:
@@ -264,6 +341,22 @@ VolumeControl::_InitVolume(int32 volumeWhich)
 
 	fOriginalValue = (int32)volume;
 	SetValue((int32)volume);
+}
+
+
+float
+VolumeControl::_PointForValue(int32 value) const
+{
+	int32 min, max;
+	GetLimits(&min, &max);
+
+	if (Orientation() == B_HORIZONTAL) {
+		return ceilf(1.0f * (value - min) / (max - min)
+			* (BarFrame().Width() - 2) + BarFrame().left + 1);
+	} else {
+		return ceilf(BarFrame().top - 1.0f * (value - min) / (max - min)
+			* BarFrame().Height());
+	}
 }
 
 

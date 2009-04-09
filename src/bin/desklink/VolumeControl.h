@@ -29,7 +29,12 @@ public:
 protected:
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
+
 	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseUp(BPoint where);
+	virtual	void			MouseMoved(BPoint where, uint32 transit,
+								const BMessage* dragMessage);
+
 	virtual	void			MessageReceived(BMessage* message);
 	virtual status_t		Invoke(BMessage* message = NULL);
 
@@ -39,11 +44,16 @@ protected:
 private:
 			void			_InitVolume(int32 volumeWhich);
 			bool			_IsReplicant() const;
+			float			_PointForValue(int32 value) const;
 
 			mutable	char	fText[64];
 			MixerControl*	fMixerControl;
 			int32			fOriginalValue;
 			bool			fBeep;
+
+			bool			fSnapping;
+			float			fMinSnap;
+			float			fMaxSnap;
 };
 
 #endif	// VOLUME_SLIDER_H
