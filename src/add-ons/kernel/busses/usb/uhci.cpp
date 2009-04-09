@@ -22,6 +22,7 @@ pci_module_info *UHCI::sPCIModule = NULL;
 static int32 sDebuggerCommandAdded = 0;
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static int
 debug_process_transfer(int argc, char **argv)
 {
@@ -45,6 +46,7 @@ debug_process_transfer(int argc, char **argv)
 	transfer.SetData(data, length);
 	return ((UHCI *)pipe->GetBusManager())->ProcessDebugTransfer(&transfer);
 }
+#endif
 
 
 static int32
@@ -494,11 +496,13 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_IOC
 		| UHCI_USBINTR_SHORT);
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
 		add_debugger_command("uhci_process_transfer",
 			&debug_process_transfer,
 			"Processes a USB transfer with the given variables");
 	}
+#endif
 
 	TRACE("UHCI host controller driver constructed\n");
 	fInitOK = true;
@@ -507,10 +511,12 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 UHCI::~UHCI()
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
 		remove_debugger_command("uhci_process_transfer",
 			&debug_process_transfer);
 	}
+#endif
 
 	int32 result = 0;
 	fStopFinishThread = true;
@@ -1674,6 +1680,11 @@ UHCI::Interrupt()
 	// Check if we really had an interrupt
 	uint16 status = ReadReg16(UHCI_USBSTS);
 	if ((status & fEnabledInterrupts) == 0) {
+		if (status != 0) {
+			TRACE("discarding not enabled interrupts 0x%08lx\n", status);
+			WriteReg16(UHCI_USBSTS, status);
+		}
+
 		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
@@ -1737,7 +1748,7 @@ UHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
 	set_dprintf_enabled(true); 
-#ifndef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	load_driver_symbols("uhci");
 #endif
 #endif

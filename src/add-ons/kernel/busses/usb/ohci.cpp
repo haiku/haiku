@@ -511,7 +511,7 @@ OHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
 	set_dprintf_enabled(true);
-#ifndef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	load_driver_symbols("ohci");
 #endif
 #endif

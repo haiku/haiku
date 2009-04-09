@@ -16,6 +16,7 @@
 Stack *gUSBStack = NULL;
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static int
 debug_get_pipe_for_id(int argc, char **argv)
 {
@@ -33,6 +34,7 @@ debug_get_pipe_for_id(int argc, char **argv)
 	set_debug_variable("_usbPipe", (uint64)object);
 	return 0;
 }
+#endif
 
 
 static int32
@@ -44,7 +46,7 @@ bus_std_ops(int32 op, ...)
 			if (gUSBStack)
 				return B_OK;
 
-#ifndef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			// This code is to handle plain R5 (non-BONE) where the same module
 			// gets loaded multiple times (once for each exported module
 			// interface, the USB v2 and v3 API in our case). We don't want to
@@ -62,7 +64,7 @@ bus_std_ops(int32 op, ...)
 
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
-#ifndef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 			load_driver_symbols("usb");
 #endif
 #endif
@@ -77,10 +79,12 @@ bus_std_ops(int32 op, ...)
 			}
 
 			gUSBStack = stack;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			add_debugger_command("get_usb_pipe_for_id",
 				&debug_get_pipe_for_id,
 				"Gets the config for a USB pipe");
-#ifndef __HAIKU__
+#elif HAIKU_TARGET_PLATFORM_BEOS
 			// Plain R5 workaround, see comment above.
 			shared = create_area("shared usb stack", &address,
 				B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_NO_LOCK,
@@ -95,8 +99,11 @@ bus_std_ops(int32 op, ...)
 			TRACE_MODULE("uninit\n");
 			delete gUSBStack;
 			gUSBStack = NULL;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			remove_debugger_command("get_usb_pipe_for_id",
 				&debug_get_pipe_for_id);
+#endif
 			break;
 
 		default:

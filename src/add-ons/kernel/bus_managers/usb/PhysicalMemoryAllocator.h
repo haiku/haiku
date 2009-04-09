@@ -58,7 +58,7 @@ private:
 		size_t						*fArrayOffset;
 		uint8						**fArray;
 
-#if KDEBUG
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		uint32						fDebugBase;
 		uint32						fDebugChunkSize;
 		uint64						fDebugUseMap;

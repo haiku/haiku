@@ -66,7 +66,7 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	fManagedMemory = fBlockSize[0] * fArrayLength[0];
 
 	size_t roundedSize = biggestSize * minCountPerBlock;
-#if KDEBUG
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fDebugBase = roundedSize;
 	fDebugChunkSize = 64;
 	fDebugUseMap = 0;
@@ -128,7 +128,7 @@ status_t
 PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 	void **physicalAddress)
 {
-#if KDEBUG
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		for (int32 i = 0; i < 64; i++) {
 			uint64 mask = 1LL << i;
@@ -222,7 +222,7 @@ status_t
 PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 	void *physicalAddress)
 {
-#if KDEBUG
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		uint32 index = ((uint8 *)logicalAddress - (uint8 *)fLogicalBase
 			- fDebugBase) / fDebugChunkSize;
