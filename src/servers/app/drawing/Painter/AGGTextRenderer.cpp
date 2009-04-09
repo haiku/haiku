@@ -1,9 +1,8 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2005-2009, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 
 #include "AGGTextRenderer.h"
 
@@ -30,47 +29,47 @@
 #include "IntRect.h"
 
 
-// constructor
 AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 		renderer_type& solidRenderer, renderer_bin_type& binRenderer,
 		scanline_unpacked_type& scanline,
 		scanline_unpacked_subpix_type& subpixScanline,
 		rasterizer_subpix_type& subpixRasterizer)
-	: fPathAdaptor()
-	, fGray8Adaptor()
-	, fGray8Scanline()
-	, fMonoAdaptor()
-	, fMonoScanline()
-	, fSubpixAdaptor()
+	:
+	fPathAdaptor(),
+	fGray8Adaptor(),
+	fGray8Scanline(),
+	fMonoAdaptor(),
+	fMonoScanline(),
+	fSubpixAdaptor(),
 
-	, fCurves(fPathAdaptor)
-	, fContour(fCurves)
+	fCurves(fPathAdaptor),
+	fContour(fCurves),
 
-	, fSolidRenderer(solidRenderer)
-	, fBinRenderer(binRenderer)
-	, fSubpixRenderer(subpixRenderer)
-	, fScanline(scanline)
-	, fSubpixScanline(subpixScanline)
-	, fSubpixRasterizer(subpixRasterizer)
-	, fRasterizer()
+	fSolidRenderer(solidRenderer),
+	fBinRenderer(binRenderer),
+	fSubpixRenderer(subpixRenderer),
+	fScanline(scanline),
+	fSubpixScanline(subpixScanline),
+	fSubpixRasterizer(subpixRasterizer),
+	fRasterizer(),
 
-	, fHinted(true)
-	, fAntialias(true)
-	, fKerning(true)
-	, fEmbeddedTransformation()
+	fHinted(true),
+	fAntialias(true),
+	fKerning(true),
+	fEmbeddedTransformation()
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
 }
 
-// destructor
+
 AGGTextRenderer::~AGGTextRenderer()
 {
 }
 
-// SetFont
+
 void
-AGGTextRenderer::SetFont(const ServerFont &font)
+AGGTextRenderer::SetFont(const ServerFont& font)
 {
 	fFont = font;
 
@@ -84,7 +83,7 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 	fContour.width(font.FalseBoldWidth() * 2.0);
 }
 
-// SetHinting
+
 void
 AGGTextRenderer::SetHinting(bool hinting)
 {
@@ -92,7 +91,7 @@ AGGTextRenderer::SetHinting(bool hinting)
 //	fFontEngine.hinting(fEmbeddedTransformation.IsIdentity() && fHinted);
 }
 
-// SetAntialiasing
+
 void
 AGGTextRenderer::SetAntialiasing(bool antialiasing)
 {
@@ -115,7 +114,7 @@ typedef agg::conv_transform<FontCacheEntry::ContourConverter, Transformable>
 
 
 class AGGTextRenderer::StringRenderer {
- public:
+public:
 	StringRenderer(const IntRect& clippingFrame, bool dryRun,
 			FontCacheEntry::TransformedOutline& transformedGlyph,
 			FontCacheEntry::TransformedContourOutline& transformedContour,
@@ -123,19 +122,19 @@ class AGGTextRenderer::StringRenderer {
 			const BPoint& transformOffset,
 			BPoint* nextCharPos,
 			AGGTextRenderer& renderer)
+		:
+		fTransform(transform),
+		fTransformOffset(transformOffset),
+		fClippingFrame(clippingFrame),
+		fDryRun(dryRun),
+		fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+		fNextCharPos(nextCharPos),
+		fVector(false),
 
-		: fTransform(transform)
-		, fTransformOffset(transformOffset)
-		, fClippingFrame(clippingFrame)
-		, fDryRun(dryRun)
-		, fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN)
-		, fNextCharPos(nextCharPos)
-		, fVector(false)
+		fTransformedGlyph(transformedGlyph),
+		fTransformedContour(transformedContour),
 
-		, fTransformedGlyph(transformedGlyph)
-		, fTransformedContour(transformedContour)
-
-		, fRenderer(renderer)
+		fRenderer(renderer)
 	{
 	}
 
@@ -291,7 +290,7 @@ class AGGTextRenderer::StringRenderer {
 		return fBounds;
 	}
 
- private:
+private:
  	const Transformable& fTransform;
 	const BPoint&		fTransformOffset;
 	const IntRect&		fClippingFrame;
@@ -307,14 +306,10 @@ class AGGTextRenderer::StringRenderer {
 
 // RenderString
 BRect
-AGGTextRenderer::RenderString(const char* string,
-							  uint32 length,
-							  const BPoint& baseLine,
-							  const BRect& clippingFrame,
-							  bool dryRun,
-							  BPoint* nextCharPos,
-							  const escapement_delta* delta,
-							  FontCacheReference* cacheReference)
+AGGTextRenderer::RenderString(const char* string, uint32 length,
+	const BPoint& baseLine, const BRect& clippingFrame, bool dryRun,
+	BPoint* nextCharPos, const escapement_delta* delta,
+	FontCacheReference* cacheReference)
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2005-2009, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -21,8 +21,9 @@
 class FontCacheReference;
 
 class AGGTextRenderer {
- public:
-								AGGTextRenderer(renderer_subpix_type& subpixRenderer,
+public:
+								AGGTextRenderer(
+									renderer_subpix_type& subpixRenderer,
 									renderer_type& solidRenderer,
 									renderer_bin_type& binRenderer,
 									scanline_unpacked_type& scanline,
@@ -47,15 +48,13 @@ class AGGTextRenderer {
 									{ return fKerning; }
 
 			BRect				RenderString(const char* utf8String,
-											 uint32 length,
-											 const BPoint& baseLine,
-											 const BRect& clippingFrame,
-											 bool dryRun,
-											 BPoint* nextCharPos,
-											 const escapement_delta* delta,
-											 FontCacheReference* cacheReference);
+									uint32 length, const BPoint& baseLine,
+									const BRect& clippingFrame, bool dryRun,
+									BPoint* nextCharPos,
+									const escapement_delta* delta,
+									FontCacheReference* cacheReference);
 
- private:
+private:
 
 	class StringRenderer;
 	friend class StringRenderer;
@@ -83,10 +82,12 @@ class AGGTextRenderer {
 		// to support non-anti-aliased text rendering
 
 	ServerFont					fFont;
-	bool						fHinted;		// is glyph hinting active?
+	bool						fHinted;
+									// is glyph hinting active?
 	bool						fAntialias;
 	bool						fKerning;
-	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
+	Transformable				fEmbeddedTransformation;
+									// rotated or sheared font?
 };
 
 #endif // AGG_TEXT_RENDERER_H
