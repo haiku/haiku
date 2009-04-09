@@ -471,18 +471,12 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 	const char *warning = NULL;
 	bool requireOverride = true;
 
-	if (DirectoryMatches(entry, B_BEOS_DIRECTORY))
-		warning = "If you %s the system folder, you won't be able to "
-			"boot " OS_NAME "! Are you sure you want to do this? To %s the folder "
-			"anyway, hold down the Shift key and click \"Do it\".";
-#ifndef __HAIKU__
-	else if (DirectoryMatchesOrContains(entry, B_BEOS_SYSTEM_DIRECTORY))
+	if (DirectoryMatchesOrContains(entry, B_BEOS_DIRECTORY)) {
 		warning = "If you %s the system folder or its contents, you "
 			"won't be able to boot " OS_NAME "! Are you sure you want to do this? "
 			"To %s the system folder or its contents anyway, hold down "
 			"the Shift key and click \"Do it\".";
-#endif
-	else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
+	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning = "If you %s the home folder, " OS_NAME " may not "
 			"behave properly! Are you sure you want to do this? "
 			"To %s the home anyway, click \"Do it\".";
