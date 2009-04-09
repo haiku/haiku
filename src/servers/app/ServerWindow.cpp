@@ -2751,7 +2751,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			// To speed things up, try to use a stack allocation and only
 			// fall back to the heap if there are enough lines...
 			ViewLineArrayInfo* lineData;
-			static const int32 kStackBufferLineDataCount = 64;
+			const int32 kStackBufferLineDataCount = 64;
 			ViewLineArrayInfo lineDataStackBuffer[kStackBufferLineDataCount];
 			if (lineCount > kStackBufferLineDataCount) {
 				lineData = new(std::nothrow) ViewLineArrayInfo[lineCount];
@@ -2770,10 +2770,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			// Convert to screen coords and draw
 			for (int32 i = 0; i < lineCount; i++) {
-				ViewLineArrayInfo* index = &lineData[i];
-
-				fCurrentView->ConvertToScreenForDrawing(&index->startPoint);
-				fCurrentView->ConvertToScreenForDrawing(&index->endPoint);
+				fCurrentView->ConvertToScreenForDrawing(
+					&lineData[i].startPoint);
+				fCurrentView->ConvertToScreenForDrawing(
+					&lineData[i].endPoint);
 			}
 			drawingEngine->StrokeLineArray(lineCount, lineData);
 
@@ -3104,23 +3104,41 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_STROKE_LINEARRAY:
 		{
 			int32 lineCount;
-			link.Read<int32>(&lineCount);
-			if (lineCount <= 0)
+			if (link.Read<int32>(&lineCount) != B_OK || lineCount <= 0)
 				break;
+
+			// To speed things up, try to use a stack allocation and only
+			// fall back to the heap if there are enough lines...
+			ViewLineArrayInfo* lineData;
+			const int32 kStackBufferLineDataCount = 64;
+			ViewLineArrayInfo lineDataStackBuffer[kStackBufferLineDataCount];
+			if (lineCount > kStackBufferLineDataCount) {
+				lineData = new(std::nothrow) ViewLineArrayInfo[lineCount];
+				if (lineData == NULL)
+					break;
+			} else
+				lineData = lineDataStackBuffer;
+
+			// Read them all in one go
+			size_t dataSize = lineCount * sizeof(ViewLineArrayInfo);
+			if (link.Read(lineData, dataSize) != B_OK) {
+				if (lineData != lineDataStackBuffer)
+					delete[] lineData;
+				break;
+			}
 
 			picture->WritePushState();
 
 			for (int32 i = 0; i < lineCount; i++) {
-				ViewLineArrayInfo lineData;
-				if (link.Read<ViewLineArrayInfo >(&lineData) != B_OK)
-					break;
-
-				picture->WriteSetHighColor(lineData.color);
-				picture->WriteStrokeLine(lineData.startPoint,
-					lineData.endPoint);
+				picture->WriteSetHighColor(lineData[i].color);
+				picture->WriteStrokeLine(lineData[i].startPoint,
+					lineData[i].endPoint);
 			}
 
 			picture->WritePopState();
+
+			if (lineData != lineDataStackBuffer)
+				delete[] lineData;
 			break;
 		}
 
