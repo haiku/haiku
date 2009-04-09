@@ -104,16 +104,22 @@ VolumeControl::AttachedToWindow()
 
 	SetEventMask(_IsReplicant() ? 0 : B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
-	BMediaRoster::CurrentRoster()->StartWatching(this,
-		fMixerControl->GainNode(), B_MEDIA_NEW_PARAMETER_VALUE);
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
+		roster->StartWatching(this, fMixerControl->GainNode(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
 }
 
 
 void
 VolumeControl::DetachedFromWindow()
 {
-	BMediaRoster::CurrentRoster()->StopWatching(this, fMixerControl->GainNode(),
-		B_MEDIA_NEW_PARAMETER_VALUE);
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
+		roster->StopWatching(this, fMixerControl->GainNode(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
 }
 
 
