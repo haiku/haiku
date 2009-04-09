@@ -790,17 +790,6 @@ BSlider::GetLimits(int32 *minimum, int32 *maximum) const
 }
 
 
-//! This one is deprecated, and only left for binary compatiblity (it's private)
-void
-BSlider::GetLimits(int32 *minimum, int32 *maximum)
-{
-	if (minimum != NULL)
-		*minimum = fMinValue;
-	if (maximum != NULL)
-		*maximum = fMaxValue;
-}
-
-
 // #pragma mark - drawing
 
 
@@ -2125,39 +2114,41 @@ BSlider::operator=(const BSlider &)
 
 #if __GNUC__ < 3
 
-extern "C"
-void
+extern "C" void
+GetLimits__7BSliderPlT1(BSlider* slider, int32* minimum, int32* maximum)
+{
+	slider->GetLimits(minimum, maximum);
+}
+
+
+extern "C" void
 _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
 {
 	slider->BSlider::SetLimits(minimum, maximum);
 }
 
-extern "C"
-float
+extern "C" float
 _ReservedSlider5__7BSlider(BSlider *slider)
 {
 	return slider->BSlider::MaxUpdateTextWidth();
 }
 
 
-extern "C"
-void
+extern "C" void
 _ReservedSlider1__7BSlider(BSlider* slider, orientation _orientation)
 {
 	slider->BSlider::SetOrientation(_orientation);
 }
 
 
-extern "C"
-void
+extern "C" void
 _ReservedSlider2__7BSlider(BSlider* slider, float thickness)
 {
 	slider->BSlider::SetBarThickness(thickness);
 }
 
 
-extern "C"
-void
+extern "C" void
 _ReservedSlider3__7BSlider(BSlider* slider, const BFont* font,
 	uint32 properties)
 {

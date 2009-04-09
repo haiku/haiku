@@ -163,9 +163,6 @@ public:
 	virtual	BSize				PreferredSize();
 
 private:
-			// deprecated leftover of BeOS compatibility
-			void				GetLimits(int32* minimum, int32* maximum);	
-
 			void				_DrawBlockThumb();
 			void				_DrawTriangleThumb();
 
