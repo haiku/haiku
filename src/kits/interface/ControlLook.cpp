@@ -696,13 +696,6 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	BRect horizontalScrollBarFrame, const rgb_color& base,
 	border_style border, uint32 flags, uint32 _borders)
 {
-	if (border == B_NO_BORDER)
-		return;
-
-	bool excludeScrollCorner = border == B_FANCY_BORDER
-		&& horizontalScrollBarFrame.IsValid()
-		&& verticalScrollBarFrame.IsValid();
-
 	// calculate scroll corner rect before messing with the "rect"
 	BRect scrollCornerFillRect(rect.right, rect.bottom,
 		rect.right, rect.bottom);
@@ -710,6 +703,18 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		scrollCornerFillRect.left = horizontalScrollBarFrame.right + 1;
 	if (verticalScrollBarFrame.IsValid())
 		scrollCornerFillRect.top = verticalScrollBarFrame.bottom + 1;
+
+	if (border == B_NO_BORDER) {
+		if (scrollCornerFillRect.IsValid()) {
+			view->SetHighColor(base);
+			view->FillRect(scrollCornerFillRect);
+		}
+		return;
+	}
+
+	bool excludeScrollCorner = border == B_FANCY_BORDER
+		&& horizontalScrollBarFrame.IsValid()
+		&& verticalScrollBarFrame.IsValid();
 
 	uint32 borders = _borders;
 	if (excludeScrollCorner) {
