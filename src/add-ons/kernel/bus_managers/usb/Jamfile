@@ -4,10 +4,15 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirC++Flags -fno-rtti ;
 
+local compatSources ;
+
 SubDirSysHdrs $(SUBDIR) ;
 if $(TARGET_PLATFORM) != haiku {
 	UsePrivateHeaders kernel ;
 	UsePublicHeaders drivers ;
+	if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+		compatSources = kernel_cpp.cpp ;
+	}
 } else {
 	UsePrivateKernelHeaders ;
 }
@@ -22,6 +27,7 @@ KernelStaticLibrary libusb.a :
 	Interface.cpp
 	Object.cpp
 	PhysicalMemoryAllocator.cpp
+	$(compatSources)
 	: -fno-pic
 ;	
 
@@ -31,3 +37,5 @@ KernelAddon usb :
 	: usb.rdef
 	;
 
+SEARCH on [ FGristFiles $(compatSources) ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
