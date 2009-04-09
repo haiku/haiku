@@ -25,6 +25,7 @@
 #include "ATATracing.h"
 #include "ata_device_infoblock.h"
 
+#define ATA_MAX_DMA_FAILURES		3
 #define ATA_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define ATA_RELEASE_TIMEOUT			10 * 1000 * 1000
 #define ATA_SIGNATURE_ATAPI			0xeb140101
@@ -35,10 +36,10 @@
 enum {
 	ATA_DEVICE_READY_REQUIRED	= 0x01,
 	ATA_IS_WRITE				= 0x02,
-	ATA_DMA_TRANSFER			= 0x03,
-	ATA_CHECK_ERROR_BIT			= 0x04,
-	ATA_WAIT_FINISH				= 0x08,
-	ATA_WAIT_ANY_BIT			= 0x10
+	ATA_DMA_TRANSFER			= 0x04,
+	ATA_CHECK_ERROR_BIT			= 0x08,
+	ATA_WAIT_FINISH				= 0x10,
+	ATA_WAIT_ANY_BIT			= 0x20
 };
 
 
@@ -91,10 +92,15 @@ public:
 										uint32 flags, uint8 errorMask);
 
 		// data transfers
+		status_t					PrepareDMA(ATARequest *request);
+		status_t					FinishDMA();
+
 		status_t					ExecuteDMATransfer(ATARequest *request);
 		status_t					ExecutePIOTransfer(ATARequest *request);
 
 		status_t					ReadPIO(uint8 *buffer, size_t length);
+
+		void						Interrupt(uint8 status);
 
 private:
 		status_t					_ReadRegs(ata_task_file *taskFile,
@@ -125,7 +131,12 @@ private:
 		uint32						fChannelID;
 		ata_controller_interface *	fController;
 		void *						fCookie;
-		mutex						fLock;
+
+		mutex						fExecutionLock;
+		spinlock					fDMATransferLock;
+		ConditionVariable			fDMATransferCondition;
+		bool						fExpectsDMATransfer;
+
 		status_t					fStatus;
 		scsi_bus					fSCSIBus;
 		uint8						fDeviceCount;
@@ -178,9 +189,6 @@ private:
 		status_t					_FillTaskFile(ATARequest *request,
 										uint64 address);
 
-		status_t					_PrepareDMA(ATARequest *request);
-		status_t					_PreparePIO(ATARequest *request);
-
 		const char *				_DebugContext() { return fDebugContext; };
 
 		ATAChannel *				fChannel;
@@ -189,6 +197,7 @@ private:
 		bool						fUse48Bits;
 		bool						fUseDMA;
 		uint8						fDMAMode;
+		uint8						fDMAFailures;
 		uint64						fTotalSectors;
 		ata_device_infoblock		fInfoBlock;
 		ata_task_file				fTaskFile;

@@ -14,6 +14,7 @@ ATAChannel::ATAChannel(device_node *node)
 		fChannelID(0),
 		fController(NULL),
 		fCookie(NULL),
+		fExpectsDMATransfer(false),
 		fStatus(B_NO_INIT),
 		fSCSIBus(NULL),
 		fDeviceCount(0),
@@ -21,7 +22,9 @@ ATAChannel::ATAChannel(device_node *node)
 		fUseDMA(true),
 		fRequest(NULL)
 {
-	mutex_init(&fLock, "ata channel");
+	mutex_init(&fExecutionLock, "ata io execution");
+	B_INITIALIZE_SPINLOCK(&fDMATransferLock);
+	fDMATransferCondition.Init(this, "ata dma transfer");
 
 	gDeviceManager->get_attr_uint32(node, ATA_CHANNEL_ID_ITEM, &fChannelID,
 		true);
@@ -80,12 +83,14 @@ ATAChannel::ATAChannel(device_node *node)
 	fStatus = gDeviceManager->get_driver(parent,
 		(driver_module_info **)&fController, &fCookie);
 	gDeviceManager->put_node(parent);
+
+	fController->set_channel(fCookie, this);
 }
 
 
 ATAChannel::~ATAChannel()
 {
-	mutex_lock(&fLock);
+	mutex_lock(&fExecutionLock);
 
 	if (fDevices) {
 		for (uint8 i = 0; i < fDeviceCount; i++)
@@ -94,7 +99,7 @@ ATAChannel::~ATAChannel()
 	}
 
 	delete fRequest;
-	mutex_destroy(&fLock);
+	mutex_destroy(&fExecutionLock);
 }
 
 
@@ -217,10 +222,10 @@ status_t
 ATAChannel::ExecuteIO(scsi_ccb *ccb)
 {
 	TRACE_FUNCTION("%p\n", ccb);
-	if (mutex_trylock(&fLock) != B_OK)
+	if (mutex_trylock(&fExecutionLock) != B_OK)
 		return B_BUSY;
 
-	MutexLocker _(&fLock, true);
+	MutexLocker _(&fExecutionLock, true);
 
 	fRequest->SetCCB(ccb);
 	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
@@ -445,6 +450,10 @@ ATAChannel::WaitForIdle()
 status_t
 ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 {
+	// disable interrupts for PIO transfers, enable them for DMA
+	_WriteControl((flags & ATA_DMA_TRANSFER) != 0 ? 0
+		: ATA_DEVICE_CONTROL_DISABLE_INTS);
+
 	ATADevice *device = request->Device();
 	if (device->Select() != B_OK || WaitForIdle() != B_OK) {
 		// resetting the device here will discard current configuration,
@@ -479,7 +488,7 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 		// wait for the device to finish current command (device no longer busy)
 		status_t result = Wait(0, ATA_STATUS_BUSY, 0, request->Timeout());
 		if (result != B_OK) {
-			TRACE_ERROR("timeout\n");
+			TRACE_ERROR("timeout waiting for request finish\n");
 			request->SetStatus(SCSI_CMD_TIMEOUT);
 			return result;
 		}
@@ -565,11 +574,44 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 
 
 status_t
+ATAChannel::PrepareDMA(ATARequest *request)
+{
+	scsi_ccb *ccb = request->CCB();
+	return fController->prepare_dma(fCookie, ccb->sg_list, ccb->sg_count,
+		request->IsWrite());
+}
+
+
+status_t
+ATAChannel::FinishDMA()
+{
+	return fController->finish_dma(fCookie);
+}
+
+
+status_t
 ATAChannel::ExecuteDMATransfer(ATARequest *request)
 {
-	TRACE_ERROR("dma transfers unimplemented\n");
-	request->SetStatus(SCSI_SEQUENCE_FAIL);
-	return B_ERROR;
+	InterruptsSpinLocker locker(fDMATransferLock);
+	fExpectsDMATransfer = true;
+	ConditionVariableEntry entry;
+	fDMATransferCondition.Add(&entry);
+	locker.Unlock();
+
+	fController->start_dma(fCookie);
+	bigtime_t timeout = system_time() + request->Timeout();
+	status_t waitResult = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
+
+	locker.Lock();
+	fExpectsDMATransfer = false;
+	locker.Unlock();
+
+	if (waitResult != B_OK) {
+		TRACE_ERROR("timeout waiting for DMA transfer\n");
+		return B_TIMED_OUT;
+	}
+
+	return B_OK;
 }
 
 
@@ -612,14 +654,6 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 		result = B_ERROR;
 	}
 
-	if (result == B_OK) {
-		result = FinishRequest(request, ATA_WAIT_FINISH
-			| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ABORTED);
-	}
-
-	if (result != B_OK)
-		request->SetStatus(SCSI_SEQUENCE_FAIL);
-
 	return result;
 }
 
@@ -629,6 +663,24 @@ ATAChannel::ReadPIO(uint8 *buffer, size_t length)
 {
 	return fController->read_pio(fCookie, (uint16 *)buffer,
 		length / sizeof(uint16), false);
+}
+
+
+void
+ATAChannel::Interrupt(uint8 status)
+{
+	SpinLocker locker(fDMATransferLock);
+	if (!fExpectsDMATransfer) {
+		TRACE_ERROR("interrupt when not expecting transfer\n");
+		return;
+	}
+
+	if ((status & ATA_STATUS_BUSY) != 0) {
+		TRACE_ERROR(("interrupt while device is busy\n"));
+		return;
+	}
+
+	fDMATransferCondition.NotifyAll();
 }
 
 

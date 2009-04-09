@@ -205,7 +205,13 @@ ata_channel_added(device_node *parent)
 status_t
 ata_interrupt_handler(void *cookie, uint8 status)
 {
-	return B_UNHANDLED_INTERRUPT;
+	ATAChannel *channel = (ATAChannel *)cookie;
+	channel->Interrupt(status);
+
+	// the controller driver already checks if its interrupt status indicates
+	// that the interrupt was for this device, so we are only here if that's
+	// the case.
+	return B_HANDLED_INTERRUPT;
 }
 
 

@@ -17,6 +17,7 @@ ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 		fUse48Bits(false),
 		fUseDMA(channel->UseDMA()),
 		fDMAMode(0),
+		fDMAFailures(0),
 		fTotalSectors(0),
 		fRegisterMask(0)
 {
@@ -513,18 +514,15 @@ status_t
 ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	uint32 sectorCount)
 {
-	request->SetUseDMA(fUseDMA && _PrepareDMA(request) == B_OK);
-	if (!request->UseDMA()) {
-		status_t result = _PreparePIO(request);
-		if (result != B_OK) {
-			TRACE_ERROR("failed to prepare pio transfer\n");
-			return result;
-		}
-	}
+	request->SetUseDMA(fUseDMA && fChannel->PrepareDMA(request) == B_OK);
+	if (!request->UseDMA())
+		request->PrepareSGInfo();
 
 	request->SetBlocksLeft(sectorCount);
 	if (_FillTaskFile(request, address) != B_OK) {
 		TRACE_ERROR("failed to setup transfer request\n");
+		if (request->UseDMA())
+			fChannel->FinishDMA();
 		return B_ERROR;
 	}
 
@@ -537,13 +535,39 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	status_t result = fChannel->SendRequest(request, flags);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to send transfer request\n");
+		if (request->UseDMA())
+			fChannel->FinishDMA();
 		return result;
 	}
 
-	if (request->UseDMA())
-		return fChannel->ExecuteDMATransfer(request);
+	if (request->UseDMA()) {
+		result = fChannel->ExecuteDMATransfer(request);
+		status_t dmaResult = fChannel->FinishDMA();
+		if (result == B_OK && dmaResult == B_OK) {
+			fDMAFailures = 0;
+			request->CCB()->data_resid = 0;
+		} else {
+			if (dmaResult != B_OK) {
+				request->SetSense(SCSIS_KEY_HARDWARE_ERROR,
+					SCSIS_ASC_LUN_COM_FAILURE);
+				fDMAFailures++;
+				if (fDMAFailures >= ATA_MAX_DMA_FAILURES) {
+					TRACE_ALWAYS("disabling DMA after %u failures\n",
+						fDMAFailures);
+					fUseDMA = false;
+				}
+			} else {
+				// timeout
+				request->SetStatus(SCSI_CMD_TIMEOUT);
+			}
+		}
+	} else {
+		if (fChannel->ExecutePIOTransfer(request) != B_OK)
+			request->SetStatus(SCSI_SEQUENCE_FAIL);
+	}
 
-	return fChannel->ExecutePIOTransfer(request);
+	return fChannel->FinishRequest(request, ATA_WAIT_FINISH
+		| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ABORTED);
 }
 
 
@@ -619,20 +643,5 @@ ATADevice::_FillTaskFile(ATARequest *request, uint64 address)
 		return B_ERROR;
 	}
 
-	return B_OK;
-}
-
-
-status_t
-ATADevice::_PrepareDMA(ATARequest *request)
-{
-	return B_ERROR;
-}
-
-
-status_t
-ATADevice::_PreparePIO(ATARequest *request)
-{
-	request->PrepareSGInfo();
 	return B_OK;
 }
