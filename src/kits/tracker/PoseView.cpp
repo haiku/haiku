@@ -8093,15 +8093,19 @@ BPoseView::Extent() const
 void
 BPoseView::SetScrollBarsTo(BPoint point)
 {
-	BPoint origin;
-
 	if (fHScrollBar && fVScrollBar) {
 		fHScrollBar->SetValue(point.x);
 		fVScrollBar->SetValue(point.y);
 	} else {
-		origin = LeftTop();
-		ScrollTo(BPoint(point.x, origin.y));
-		ScrollTo(BPoint(origin.x, point.y));
+		// TODO: I don't know what this was supposed to work around
+		// (ie why it wasn't calling ScrollTo(point) simply). Although
+		// it cannot have been tested, since it was broken before, I am
+		// still leaving this, since I know there can be a subtle change in
+		// behaviour (BView<->BScrollBar feedback effects) when scrolling
+		// both directions at once versus separately.
+		BPoint origin = LeftTop();
+		ScrollTo(BPoint(point.x, point.y));
+		ScrollTo(point);
 	}
 }
 
