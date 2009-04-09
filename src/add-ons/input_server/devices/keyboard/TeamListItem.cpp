@@ -10,7 +10,9 @@
 
 #include <string.h>
 
+#include <FindDirectory.h>
 #include <NodeInfo.h>
+#include <Path.h>
 #include <View.h>
 
 
@@ -115,15 +117,31 @@ TeamListItem::GetInfo()
 bool
 TeamListItem::IsSystemServer()
 {
-    // TODO: use find_directory() in place of hardcoded paths
+	static bool firstCall = true;
+	static BPath systemServersPath;
+	static BPath trackerPath;
+	static BPath deskbarPath;
+	
+	if (firstCall) {
+		find_directory(B_SYSTEM_SERVERS_DIRECTORY, &systemServersPath);
 
-	char* system = "/boot/system/";
-	if (strncmp(system, fInfo.args, strlen(system)) == 0)
+		find_directory(B_SYSTEM_DIRECTORY, &trackerPath);
+		trackerPath.Append("Tracker");
+		
+		find_directory(B_SYSTEM_DIRECTORY, &deskbarPath);
+		deskbarPath.Append("Deskbar");
+		
+		firstCall = false;
+	}
+	
+	if (strncmp(systemServersPath.Path(), fInfo.args, strlen(systemServersPath.Path())) == 0)
 		return true;
 
-	system = "/system/servers/";
-	if (strncmp(system, fInfo.args, strlen(system)) == 0)
+	if (strncmp(trackerPath.Path(), fInfo.args, strlen(trackerPath.Path())) == 0)
 		return true;
 
-	return false;
+	if (strncmp(deskbarPath.Path(), fInfo.args, strlen(deskbarPath.Path())) == 0)
+		return true;
+	
+	return false;		
 }
