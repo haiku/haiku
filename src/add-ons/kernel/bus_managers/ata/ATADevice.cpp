@@ -432,6 +432,13 @@ ATADevice::Identify()
 		return B_ERROR;
 	}
 
+	if (fChannel->Wait(ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST, 0,
+		ATA_WAIT_ANY_BIT, 100 * 1000) != B_OK) {
+		TRACE_ALWAYS("no data request and not busy within 100ms, assuming "
+			"no device present\n");
+		return B_TIMED_OUT;
+	}
+
 	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, 0,
 			IsATAPI() ? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for identify request\n");

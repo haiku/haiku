@@ -379,8 +379,12 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 			&& (status & ATA_STATUS_ERROR) != 0)
 			return B_ERROR;
 
-		if ((status & setBits) == setBits && (status & clearedBits) == 0)
-			return B_OK;
+		if ((status & clearedBits) == 0) {
+			if ((flags & ATA_WAIT_ANY_BIT) != 0 && (status & setBits) != 0)
+				return B_OK;
+			if ((status & setBits) == setBits)
+				return B_OK;
+		}
 
 		bigtime_t elapsedTime = system_time() - startTime;
 		//TRACE("wait status after %lld: %u\n", elapsedTime, status);
