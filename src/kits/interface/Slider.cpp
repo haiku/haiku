@@ -679,7 +679,7 @@ BSlider::SetValue(int32 value)
 		range = 1;
 
 	float pos = (float)(value - fMinValue) / range *
-		_MaxPosition() - _MinPosition();
+		(_MaxPosition() - _MinPosition());
 
 	if (fOrientation == B_HORIZONTAL) {
 		loc.x = ceil(_MinPosition() + pos);
