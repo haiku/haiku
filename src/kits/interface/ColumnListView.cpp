@@ -1539,10 +1539,9 @@ BColumnListView::MakeFocus(bool isFocus)
 	if (fBorderStyle != B_NO_BORDER) {
 		// Redraw focus marks around view
 		Invalidate();
+		fHorizontalScrollBar->SetBorderHighlighted(isFocus);
+		fVerticalScrollBar->SetBorderHighlighted(isFocus);
 	}
-
-	fHorizontalScrollBar->SetBorderHighlighted(isFocus);
-	fVerticalScrollBar->SetBorderHighlighted(isFocus);
 
 	BView::MakeFocus(isFocus);
 }
@@ -1696,9 +1695,23 @@ BColumnListView::Draw(BRect updateRect)
 		if (!fHorizontalScrollBar->IsHidden())
 			horizontalScrollBarFrame = fHorizontalScrollBar->Frame();
 
+		if (fBorderStyle == B_NO_BORDER) {
+			// We still draw the left/top border, but not focused.
+			// The scrollbars cannot be displayed without frame and
+			// it looks bad to have no frame only along the left/top
+			// side.
+			rgb_color borderColor = tint_color(base, B_DARKEN_2_TINT);
+			SetHighColor(borderColor);
+			StrokeLine(BPoint(rect.left, rect.bottom),
+				BPoint(rect.left, rect.top));
+			StrokeLine(BPoint(rect.left + 1, rect.top),
+				BPoint(rect.right, rect.top));
+		}
+
 		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
 			verticalScrollBarFrame, horizontalScrollBarFrame,
 			base, fBorderStyle, flags);
+
 		return;
 	}
 
@@ -1960,7 +1973,7 @@ BColumnListView::_GetChildViewRects(const BRect& bounds,
 	hScrollBarRect.right -= B_V_SCROLL_BAR_WIDTH;
 
 	// Adjust stuff so the border will fit.
-	if (fBorderStyle == B_PLAIN_BORDER) {
+	if (fBorderStyle == B_PLAIN_BORDER || fBorderStyle == B_NO_BORDER) {
 		titleRect.InsetBy(1, 0);
 		titleRect.OffsetBy(0, 1);
 		outlineRect.InsetBy(1, 1);
