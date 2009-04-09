@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2004-2006, Rudolf Cornelissen. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -690,14 +690,16 @@ Aperture::_Free(aperture_memory *memory)
 		for (uint32 i = 0; i < count; i++, page++) {
 			vm_page_set_state(page, PAGE_STATE_FREE);
 		}
+
+		memory->page = NULL;
 	} else {
 		for (uint32 i = 0; i < count; i++) {
 			vm_page_set_state(memory->pages[i], PAGE_STATE_FREE);
 		}
-	}
 
-	free(memory->pages);
-	memory->pages = NULL;
+		free(memory->pages);
+		memory->pages = NULL;
+	}
 #else
 	delete_area(memory->area);
 	memory->area = -1;
