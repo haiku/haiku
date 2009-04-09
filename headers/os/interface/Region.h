@@ -25,7 +25,7 @@ typedef struct {
 
 
 class BRegion {
- public:
+public:
 								BRegion();
 								BRegion(const BRegion& region);
 								BRegion(const BRect rect);
@@ -73,7 +73,7 @@ class BRegion {
 
 			void				ExclusiveInclude(const BRegion* region);
 
- private:
+private:
 	friend class BDirectWindow;
 	friend class BPrivate::ServerLink;
 	friend class BPrivate::LinkReceiver;
@@ -81,7 +81,7 @@ class BRegion {
 	class Support;
 	friend class Support;
 
- private:
+private:
 								BRegion(const clipping_rect& rect);
 
 			void				_AdoptRegionData(BRegion& region);
@@ -92,7 +92,7 @@ class BRegion {
 			clipping_rect		_ConvertToInternal(
 									const clipping_rect& rect) const;
 
- private:
+private:
 			long				fCount;
 			long				fDataSize;
 			clipping_rect		fBounds;
