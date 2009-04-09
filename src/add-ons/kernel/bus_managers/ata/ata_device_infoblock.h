@@ -1,6 +1,6 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc.
+ * Copyright 2002/03, Thomas Kurschel.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -15,7 +15,6 @@
 	and its index in decimal as a remark. Without that, you
 	have a rough time when you messed up the offsets.
 */
-
 
 #include <lendian_bitfield.h>
 

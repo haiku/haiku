@@ -1,3 +1,9 @@
+/*
+ * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2002-2003, Thomas Kurschel.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef ATA_COMMANDS_H
 #define ATA_COMMANDS_H
 

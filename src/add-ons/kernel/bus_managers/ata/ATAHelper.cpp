@@ -1,5 +1,6 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.

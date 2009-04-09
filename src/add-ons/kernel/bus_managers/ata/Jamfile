@@ -20,3 +20,11 @@ KernelAddon ide :
 	virtual_memory.c
 	;
 
+KernelAddon ata :
+	ATAChannel.cpp
+	ATADevice.cpp
+	ATAHelper.cpp
+	ATAModule.cpp
+	ATAPIDevice.cpp
+	ATARequest.cpp
+	;

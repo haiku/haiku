@@ -1,3 +1,7 @@
+/*
+ * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef ATA_TRACING_H
 #define ATA_TRACING_H
 
