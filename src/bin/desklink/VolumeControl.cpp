@@ -245,8 +245,7 @@ VolumeControl::MessageReceived(BMessage* msg)
 
 			if (newValue != currentValue) {
 				SetValue(newValue);
-				if (ModificationMessage() != NULL)
-					Messenger().SendMessage(ModificationMessage());
+				InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
 			}
 			break;
 		}
