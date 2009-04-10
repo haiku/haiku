@@ -423,10 +423,12 @@ static void ff_ ## OPNAME ## cavs_qpel ## SIZE ## _mc03_ ## MMX(uint8_t *dst, ui
 "pavgb " #temp ", " #a "          \n\t"\
 "mov" #size " " #a ", " #b "      \n\t"
 
+#ifndef __HAIKU__
 QPEL_CAVS(put_,       PUT_OP, 3dnow)
 QPEL_CAVS(avg_, AVG_3DNOW_OP, 3dnow)
 QPEL_CAVS(put_,       PUT_OP, mmx2)
 QPEL_CAVS(avg_,  AVG_MMX2_OP, mmx2)
+#endif
 
 CAVS_MC(put_, 8, 3dnow)
 CAVS_MC(put_, 16,3dnow)
