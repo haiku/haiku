@@ -822,7 +822,6 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	static uint32 _previousOutputFlags = 0;
 	static TraceEntryIterator iterator;
 
-
 	// Note: start and index are Pascal-like indices (i.e. in [1, sEntries]).
 	int32 start = 0;	// special index: print the last count entries
 	int32 count = 0;
