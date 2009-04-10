@@ -179,6 +179,7 @@ AutoConfigWindow::GenerateBasicAccount()
 			inboundArchive.AddInt32("flavor", ssl);
 			inboundArchive.AddString("username", fAccountInfo.loginName);
 			inboundArchive.AddString("password", fAccountInfo.password);
+			inboundArchive.AddBool("leave_mail_on_server", bool(true));
 			inbound->SetFilter(0, inboundArchive, fAccountInfo.inboundProtocol);
 		}
 
