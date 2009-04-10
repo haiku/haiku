@@ -18,6 +18,37 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 }
 SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
+local libavcodecSourcesX86 = 
+	cpuid.c
+	cavsdsp_mmx.c
+	idct_mmx.c
+	idct_mmx_xvid.c
+	idct_sse2_xvid.c
+	dsputil_mmx.c
+	fft_sse.c
+	h264_idct_sse2.nasm
+	h264_deblock_sse2.nasm
+	fft_mmx.nasm
+	dsputil_yasm.nasm
+	simple_idct_mmx.c
+	motion_est_mmx.c
+	mpegvideo_mmx.c
+	rv40dsp_mmx.c
+	vc1dsp_mmx.c
+	vp3dsp_mmx.c
+	vp3dsp_sse2.c
+	vp6dsp_mmx.c
+	vp6dsp_sse2.c
+	fft_sse.c
+	fdct_mmx.c
+;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media plugins avcodec libavcodec x86 ] ;
+SEARCH on $(libavcodecSourcesX86) = $(SEARCH_SOURCE) ;
+StaticLibrary libavcodec_x86.a :
+	$(libavcodecSourcesX86)
+;
+
 StaticLibrary libavcodec.a :
 	4xm.c
 	8bps.c
@@ -282,26 +313,6 @@ StaticLibrary libavcodec.a :
 	xl.c
 	xsubdec.c
 	zmbv.c
-	x86/cpuid.c
-	x86/cavsdsp_mmx.c
-	x86/idct_mmx.c
-	x86/idct_mmx_xvid.c
-	x86/idct_sse2_xvid.c
-	x86/dsputil_mmx.c
-	x86/fft_sse.c
-	x86/h264_idct_sse2.nasm
-	x86/h264_deblock_sse2.nasm
-	x86/fft_mmx.nasm
-	x86/dsputil_yasm.nasm
-	x86/simple_idct_mmx.c
-	x86/motion_est_mmx.c
-	x86/mpegvideo_mmx.c
-	x86/rv40dsp_mmx.c
-	x86/vc1dsp_mmx.c
-	x86/vp3dsp_mmx.c
-	x86/vp3dsp_sse2.c
-	x86/vp6dsp_mmx.c
-	x86/vp6dsp_sse2.c
-	x86/fft_sse.c
-	x86/fdct_mmx.c
+	:
+	libavcodec_x86.a
 ;
