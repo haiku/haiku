@@ -299,7 +299,7 @@ ATADevice::SetFeature(int feature)
 {
 	TRACE("device_set_feature: feature %d\n", feature);
 
-	ATARequest request;
+	ATARequest request(false);
 	request.SetDevice(this);
 	request.SetTimeout(1 * 1000 * 1000);
 
@@ -464,7 +464,7 @@ ATADevice::Identify()
 	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
 		IsATAPI() ? "pi " : "", fChannel->ChannelID(), fIndex);
 
-	ATARequest request;
+	ATARequest request(false);
 	request.SetDevice(this);
 	request.SetTimeout(20 * 1000 * 1000);
 

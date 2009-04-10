@@ -138,7 +138,6 @@ private:
 		ata_controller_interface *	fController;
 		void *						fCookie;
 
-		mutex						fExecutionLock;
 		spinlock					fInterruptLock;
 		ConditionVariable			fInterruptCondition;
 		ConditionVariableEntry		fInterruptConditionEntry;
@@ -240,7 +239,8 @@ private:
 
 class ATARequest {
 public:
-									ATARequest();
+									ATARequest(bool hasLock);
+									~ATARequest();
 
 		void						SetStatus(uint8 status);
 		uint8						Status() { return fStatus; };
@@ -266,11 +266,10 @@ public:
 		void						SetBlocksLeft(uint32 blocksLeft);
 		uint32 *					BlocksLeft() { return &fBlocksLeft; };
 
-		status_t					Finish(bool resubmit,
-										mutex *mutexToUnlock);
+		status_t					Finish(bool resubmit);
 
 		// SCSI stuff
-		void						SetCCB(scsi_ccb *ccb);
+		status_t					Start(scsi_ccb *ccb);
 		scsi_ccb *					CCB() { return fCCB; };
 
 		void						PrepareSGInfo();
@@ -292,6 +291,9 @@ private:
 		void						_FillSense(scsi_sense *sense);
 
 		const char *				_DebugContext() { return " request"; };
+
+		mutex						fLock;
+		bool						fHasLock;
 
 		uint8						fStatus;
 		uint8						fSenseKey;

@@ -5,15 +5,26 @@
 
 #include "ATAPrivate.h"
 
-ATARequest::ATARequest()
-	:	fDevice(NULL),
+ATARequest::ATARequest(bool hasLock)
+	:	fHasLock(hasLock),
+		fDevice(NULL),
 		fTimeout(0),
 		fBlocksLeft(0),
 		fIsWrite(false),
 		fUseDMA(false),
 		fCCB(NULL)
 {
+	if (hasLock)
+		mutex_init(&fLock, "ata request");
+
 	ClearSense();
+}
+
+
+ATARequest::~ATARequest()
+{
+	if (fHasLock)
+		mutex_destroy(&fLock);
 }
 
 
@@ -76,7 +87,19 @@ ATARequest::SetBlocksLeft(uint32 blocksLeft)
 
 
 status_t
-ATARequest::Finish(bool resubmit, mutex *mutexToUnlock)
+ATARequest::Start(scsi_ccb *ccb)
+{
+	if (mutex_trylock(&fLock) != B_OK)
+		return B_BUSY;
+
+	fCCB = ccb;
+	fStatus = SCSI_REQ_CMP;
+	return B_OK;
+}
+
+
+status_t
+ATARequest::Finish(bool resubmit)
 {
 	// when the request completed and has set sense
     // data, report this to the scsi stack by setting
@@ -102,7 +125,7 @@ ATARequest::Finish(bool resubmit, mutex *mutexToUnlock)
 	} else
 		fCCB->subsys_status = fStatus;
 
-	mutex_unlock(mutexToUnlock);
+	mutex_unlock(&fLock);
 
 	if (resubmit)
 		gSCSIModule->resubmit(fCCB);
@@ -110,14 +133,6 @@ ATARequest::Finish(bool resubmit, mutex *mutexToUnlock)
 		gSCSIModule->finished(fCCB, 1);
 
 	return B_OK;
-}
-
-
-void
-ATARequest::SetCCB(scsi_ccb *ccb)
-{
-	fCCB = ccb;
-	fStatus = SCSI_REQ_CMP;
 }
 
 

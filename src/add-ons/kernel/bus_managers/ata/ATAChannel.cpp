@@ -22,7 +22,6 @@ ATAChannel::ATAChannel(device_node *node)
 		fUseDMA(true),
 		fRequest(NULL)
 {
-	mutex_init(&fExecutionLock, "ata io execution");
 	B_INITIALIZE_SPINLOCK(&fInterruptLock);
 	fInterruptCondition.Init(this, "ata dma transfer");
 
@@ -57,7 +56,7 @@ ATAChannel::ATAChannel(device_node *node)
 		}
 	}
 
-	fRequest = new(std::nothrow) ATARequest();
+	fRequest = new(std::nothrow) ATARequest(true);
 	if (fRequest == NULL) {
 		fStatus = B_NO_MEMORY;
 		return;
@@ -90,8 +89,6 @@ ATAChannel::ATAChannel(device_node *node)
 
 ATAChannel::~ATAChannel()
 {
-	mutex_lock(&fExecutionLock);
-
 	if (fDevices) {
 		for (uint8 i = 0; i < fDeviceCount; i++)
 			delete fDevices[i];
@@ -99,7 +96,6 @@ ATAChannel::~ATAChannel()
 	}
 
 	delete fRequest;
-	mutex_destroy(&fExecutionLock);
 }
 
 
@@ -222,16 +218,14 @@ status_t
 ATAChannel::ExecuteIO(scsi_ccb *ccb)
 {
 	TRACE_FUNCTION("%p\n", ccb);
-	if (mutex_trylock(&fExecutionLock) != B_OK) {
-		TRACE("channel is busy\n");
-		return B_BUSY;
-	}
+	status_t result = fRequest->Start(ccb);
+	if (result != B_OK)
+		return result;
 
-	fRequest->SetCCB(ccb);
 	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
 		TRACE("request sense\n");
 		fRequest->RequestSense();
-		fRequest->Finish(false, &fExecutionLock);
+		fRequest->Finish(false);
 		return B_OK;
 	}
 
@@ -241,7 +235,7 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 	if (ccb->target_id >= fDeviceCount) {
 		TRACE_ERROR("invalid target device\n");
 		fRequest->SetStatus(SCSI_SEL_TIMEOUT);
-		fRequest->Finish(false, &fExecutionLock);
+		fRequest->Finish(false);
 		return B_BAD_INDEX;
 	}
 
@@ -249,15 +243,15 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 	if (device == NULL) {
 		TRACE_ERROR("target device not present\n");
 		fRequest->SetStatus(SCSI_SEL_TIMEOUT);
-		fRequest->Finish(false, &fExecutionLock);
+		fRequest->Finish(false);
 		return B_BAD_INDEX;
 	}
 
 	fRequest->SetTimeout(ccb->timeout > 0 ? ccb->timeout * 1000 * 1000
 		: ATA_STANDARD_TIMEOUT);
 
-	status_t result = device->ExecuteIO(fRequest);
-	fRequest->Finish(false, &fExecutionLock);
+	result = device->ExecuteIO(fRequest);
+	fRequest->Finish(false);
 	return result;
 }
 
