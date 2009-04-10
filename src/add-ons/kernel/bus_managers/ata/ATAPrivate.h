@@ -107,7 +107,7 @@ public:
 		status_t					ReadPIO(uint8 *buffer, size_t length);
 		status_t					WritePIO(uint8 *buffer, size_t length);
 
-		void						Interrupt(uint8 status);
+		status_t					Interrupt(uint8 status);
 
 private:
 		status_t					_ReadRegs(ata_task_file *taskFile,
@@ -266,7 +266,8 @@ public:
 		void						SetBlocksLeft(uint32 blocksLeft);
 		uint32 *					BlocksLeft() { return &fBlocksLeft; };
 
-		status_t					Finish(bool resubmit);
+		status_t					Finish(bool resubmit,
+										mutex *mutexToUnlock);
 
 		// SCSI stuff
 		void						SetCCB(scsi_ccb *ccb);

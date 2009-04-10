@@ -206,12 +206,7 @@ status_t
 ata_interrupt_handler(void *cookie, uint8 status)
 {
 	ATAChannel *channel = (ATAChannel *)cookie;
-	channel->Interrupt(status);
-
-	// the controller driver already checks if its interrupt status indicates
-	// that the interrupt was for this device, so we are only here if that's
-	// the case.
-	return B_HANDLED_INTERRUPT;
+	return channel->Interrupt(status);
 }
 
 

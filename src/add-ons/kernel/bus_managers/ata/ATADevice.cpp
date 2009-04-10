@@ -23,9 +23,6 @@ ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 {
 	memset(&fInfoBlock, 0, sizeof(fInfoBlock));
 	memset(&fTaskFile, 0, sizeof(fTaskFile));
-
-	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
-		IsATAPI() ? "pi " : "", channel->ChannelID(), index);
 }
 
 
@@ -464,6 +461,9 @@ ATADevice::Configure()
 status_t
 ATADevice::Identify()
 {
+	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
+		IsATAPI() ? "pi " : "", fChannel->ChannelID(), fIndex);
+
 	ATARequest request;
 	request.SetDevice(this);
 	request.SetTimeout(20 * 1000 * 1000);
@@ -564,8 +564,10 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 			}
 		}
 	} else {
-		if (fChannel->ExecutePIOTransfer(request) != B_OK)
+		if (fChannel->ExecutePIOTransfer(request) != B_OK) {
+			TRACE_ERROR("executing pio transfer failed\n");
 			request->SetStatus(SCSI_SEQUENCE_FAIL);
+		}
 	}
 
 	return fChannel->FinishRequest(request, ATA_WAIT_FINISH

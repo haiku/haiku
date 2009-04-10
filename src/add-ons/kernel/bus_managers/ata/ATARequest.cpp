@@ -76,7 +76,7 @@ ATARequest::SetBlocksLeft(uint32 blocksLeft)
 
 
 status_t
-ATARequest::Finish(bool resubmit)
+ATARequest::Finish(bool resubmit, mutex *mutexToUnlock)
 {
 	// when the request completed and has set sense
     // data, report this to the scsi stack by setting
@@ -101,6 +101,8 @@ ATARequest::Finish(bool resubmit)
 		}
 	} else
 		fCCB->subsys_status = fStatus;
+
+	mutex_unlock(mutexToUnlock);
 
 	if (resubmit)
 		gSCSIModule->resubmit(fCCB);

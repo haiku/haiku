@@ -222,15 +222,16 @@ status_t
 ATAChannel::ExecuteIO(scsi_ccb *ccb)
 {
 	TRACE_FUNCTION("%p\n", ccb);
-	if (mutex_trylock(&fExecutionLock) != B_OK)
+	if (mutex_trylock(&fExecutionLock) != B_OK) {
+		TRACE("channel is busy\n");
 		return B_BUSY;
-
-	MutexLocker _(&fExecutionLock, true);
+	}
 
 	fRequest->SetCCB(ccb);
 	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
+		TRACE("request sense\n");
 		fRequest->RequestSense();
-		fRequest->Finish(false);
+		fRequest->Finish(false, &fExecutionLock);
 		return B_OK;
 	}
 
@@ -240,7 +241,7 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 	if (ccb->target_id >= fDeviceCount) {
 		TRACE_ERROR("invalid target device\n");
 		fRequest->SetStatus(SCSI_SEL_TIMEOUT);
-		fRequest->Finish(false);
+		fRequest->Finish(false, &fExecutionLock);
 		return B_BAD_INDEX;
 	}
 
@@ -248,7 +249,7 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 	if (device == NULL) {
 		TRACE_ERROR("target device not present\n");
 		fRequest->SetStatus(SCSI_SEL_TIMEOUT);
-		fRequest->Finish(false);
+		fRequest->Finish(false, &fExecutionLock);
 		return B_BAD_INDEX;
 	}
 
@@ -256,7 +257,7 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 		: ATA_STANDARD_TIMEOUT);
 
 	status_t result = device->ExecuteIO(fRequest);
-	fRequest->Finish(false);
+	fRequest->Finish(false, &fExecutionLock);
 	return result;
 }
 
@@ -554,7 +555,8 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 		return B_OK;
 
 	request->SetStatus(SCSI_SEQUENCE_FAIL);
-	TRACE_ERROR("command failed, error bit is set\n");
+	TRACE_ERROR("command failed, error bit is set: 0x%02x\n",
+		taskFile->read.error);
 	uint8 error = taskFile->read.error & errorMask;
 	if (error & ATA_ERROR_INTERFACE_CRC) {
 		TRACE_ERROR("interface crc error\n");
@@ -702,21 +704,22 @@ ATAChannel::WritePIO(uint8 *buffer, size_t length)
 }
 
 
-void
+status_t
 ATAChannel::Interrupt(uint8 status)
 {
 	SpinLocker locker(fInterruptLock);
 	if (!fExpectsInterrupt) {
-		TRACE_ERROR("interrupt when not expecting transfer\n");
-		return;
+		TRACE("interrupt when not expecting transfer\n");
+		return B_UNHANDLED_INTERRUPT;
 	}
 
 	if ((status & ATA_STATUS_BUSY) != 0) {
-		TRACE_ERROR(("interrupt while device is busy\n"));
-		return;
+		TRACE(("interrupt while device is busy\n"));
+		return B_UNHANDLED_INTERRUPT;
 	}
 
 	fInterruptCondition.NotifyAll();
+	return B_HANDLED_INTERRUPT;
 }
 
 
