@@ -6,6 +6,7 @@
  * Authors:
  *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
 #include "CalcView.h"
@@ -656,16 +657,16 @@ CalcView::FrameResized(float width, float height)
 	fExpressionTextView->MoveTo(frame.LeftTop());
 	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
 
-	frame.OffsetTo(B_ORIGIN);
-	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
-	frame.InsetBy(inset, inset);
-	fExpressionTextView->SetTextRect(frame);
-
 	// configure expression text view font size and color
 	float sizeDisp = fShowKeypad ? fHeight * kDisplayScaleY : fHeight;
 	BFont font(be_bold_font);
 	font.SetSize(sizeDisp * kExpressionFontScaleY);
 	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
+
+	frame.OffsetTo(B_ORIGIN);
+	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
+	frame.InsetBy(inset, inset);
+	fExpressionTextView->SetTextRect(frame);
 }
 
 
