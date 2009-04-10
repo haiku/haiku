@@ -49,10 +49,8 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
-	if (fInterruptsForPacket)
-		fChannel->PrepareWaitingForInterrupt();
-
-	status_t result = fChannel->SendRequest(request, ATA_DMA_TRANSFER);
+	status_t result = fChannel->SendRequest(request, request->UseDMA()
+		? ATA_DMA_TRANSFER : 0);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to send packet request\n");
 		if (request->UseDMA())
@@ -61,15 +59,8 @@ ATAPIDevice::SendPacket(ATARequest *request)
 	}
 
 	// wait for device to get ready for packet transmission
-	bool timedOut = false;
-	if (fInterruptsForPacket)
-		timedOut = fChannel->WaitForInterrupt(request->Timeout()) != B_OK;
-	else {
-		timedOut = fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, 0,
-			100 * 1000) != B_OK;
-	}
-
-	if (timedOut) {
+	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE, 100 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for data request\n");
 		if (request->UseDMA())
 			fChannel->FinishDMA();
@@ -95,8 +86,6 @@ ATAPIDevice::SendPacket(ATARequest *request)
 	// some old drives need a delay before submitting the packet
 	spin(10);
 
-	fChannel->PrepareWaitingForInterrupt();
-
 	// write packet
 	if (fChannel->WritePIO(fPacket, sizeof(fPacket)) != B_OK) {
 		TRACE_ERROR("failed to write packet\n");
@@ -108,65 +97,73 @@ ATAPIDevice::SendPacket(ATARequest *request)
 	}
 
 	if (request->UseDMA()) {
+		fChannel->PrepareWaitingForInterrupt();
 		fChannel->StartDMA();
+
 		result = fChannel->WaitForInterrupt(request->Timeout());
 		status_t dmaResult = fChannel->FinishDMA();
-		if (result == B_OK && dmaResult == B_OK) {
-			fDMAFailures = 0;
-			request->CCB()->data_resid = 0;
-		} else {
-			if (dmaResult != B_OK) {
-				request->SetSense(SCSIS_KEY_HARDWARE_ERROR,
-					SCSIS_ASC_LUN_COM_FAILURE);
-				fDMAFailures++;
-				if (fDMAFailures >= ATA_MAX_DMA_FAILURES) {
-					TRACE_ALWAYS("disabling DMA after %u failures\n",
-						fDMAFailures);
-					fUseDMA = false;
-				}
-			} else {
-				// timeout
-				request->SetStatus(SCSI_CMD_TIMEOUT);
-			}
-		}
-	} else {
-		result = fChannel->WaitForInterrupt(request->Timeout());
 		if (result != B_OK) {
-			TRACE_ERROR("timeout waiting for device to request data\n");
-			request->SetStatus(SCSI_SEQUENCE_FAIL);
+			request->SetStatus(SCSI_CMD_TIMEOUT);
 			return B_TIMED_OUT;
 		}
 
-		while (true) {
-			uint8 altStatus = fChannel->AltStatus();
-			if ((altStatus & ATA_STATUS_DATA_REQUEST) == 0)
-				break;
-
-			fRegisterMask = ATA_MASK_ERROR | ATA_MASK_IREASON;
-			fChannel->ReadRegs(this);
-
-			if (fTaskFile.packet_res.cmd_or_data) {
-				TRACE_ERROR("device expecting command instead of data\n");
-				request->SetStatus(SCSI_SEQUENCE_FAIL);
-				return B_ERROR;
-			}
-
-			fRegisterMask = ATA_MASK_BYTE_COUNT;
-			fChannel->ReadRegs(this);
-			size_t length = fTaskFile.packet_res.byte_count_0_7
-				| ((size_t)fTaskFile.packet_res.byte_count_8_15 << 8);
-			TRACE("about to transfer %lu bytes\n", length);
-
-			request->SetBlocksLeft((length + 511) / 512);
-			if (fChannel->ExecutePIOTransfer(request) != B_OK) {
-				TRACE_ERROR("failed to transfer data\n");
-				request->SetStatus(SCSI_SEQUENCE_FAIL);
-				return B_ERROR;
-			}
+		result = fChannel->FinishRequest(request, ATA_CHECK_DISK_FAILURE,
+			ATA_ERROR_ALL);
+		if (result != B_OK) {
+			TRACE_ERROR("device indicates transfer error after dma\n");
+			return result;
 		}
+
+		// for ATAPI it's ok for the device to send too much
+		if (dmaResult == B_OK || dmaResult == B_DEV_DATA_OVERRUN) {
+			fDMAFailures = 0;
+			request->CCB()->data_resid = 0;
+			return B_OK;
+		}
+
+		TRACE_ERROR("dma transfer failed\n");
+		request->SetSense(SCSIS_KEY_HARDWARE_ERROR,
+			SCSIS_ASC_LUN_COM_FAILURE);
+		fDMAFailures++;
+		if (fDMAFailures >= ATA_MAX_DMA_FAILURES) {
+			TRACE_ALWAYS("disabling DMA after %u failures\n", fDMAFailures);
+			fUseDMA = false;
+		}
+
+		return B_ERROR;
 	}
 
-	return fChannel->FinishRequest(request, ATA_WAIT_FINISH, ATA_ERROR_ABORTED);
+	// PIO data transfer
+	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE,
+		request->Timeout()) != B_OK) {
+		TRACE_ERROR("timeout waiting for device to request data\n");
+		request->SetStatus(SCSI_CMD_TIMEOUT);
+		return B_TIMED_OUT;
+	}
+
+	fRegisterMask = ATA_MASK_IREASON | ATA_MASK_BYTE_COUNT;
+	fChannel->ReadRegs(this);
+
+	if (fTaskFile.packet_res.cmd_or_data) {
+		TRACE_ERROR("device expecting command instead of data\n");
+		request->SetStatus(SCSI_SEQUENCE_FAIL);
+		return B_ERROR;
+	}
+
+	size_t length = fTaskFile.packet_res.byte_count_0_7
+		| ((size_t)fTaskFile.packet_res.byte_count_8_15 << 8);
+	TRACE("about to transfer %lu bytes\n", length);
+
+	request->SetBytesLeft(length);
+	fChannel->ExecutePIOTransfer(request);
+
+	result = fChannel->FinishRequest(request, ATA_WAIT_FINISH
+		| ATA_CHECK_DISK_FAILURE, ATA_ERROR_ALL);
+	if (result != B_OK)
+		TRACE_ERROR("device indicates transfer error after pio\n");
+
+	return result;
 }
 
 
@@ -199,7 +196,6 @@ ATAPIDevice::Configure()
 		return B_ERROR;
 
 	fTaskFile.packet.lun = 0;
-	fInterruptsForPacket = fInfoBlock._0.atapi.drq_speed == 1;
 
 	status_t result = ConfigureDMA();
 	if (result != B_OK)

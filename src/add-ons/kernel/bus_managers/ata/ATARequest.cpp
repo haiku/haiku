@@ -9,7 +9,7 @@ ATARequest::ATARequest(bool hasLock)
 	:	fHasLock(hasLock),
 		fDevice(NULL),
 		fTimeout(0),
-		fBlocksLeft(0),
+		fBytesLeft(0),
 		fIsWrite(false),
 		fUseDMA(false),
 		fCCB(NULL)
@@ -80,9 +80,9 @@ ATARequest::SetUseDMA(bool useDMA)
 
 
 void
-ATARequest::SetBlocksLeft(uint32 blocksLeft)
+ATARequest::SetBytesLeft(uint32 bytesLeft)
 {
-	fBlocksLeft = blocksLeft;
+	fBytesLeft = bytesLeft;
 }
 
 
@@ -94,6 +94,7 @@ ATARequest::Start(scsi_ccb *ccb)
 
 	fCCB = ccb;
 	fStatus = SCSI_REQ_CMP;
+	fIsWrite = false;
 	return B_OK;
 }
 

@@ -169,8 +169,7 @@ ATADevice::ReadCapacity(ATARequest *request)
 	}
 
 	scsi_res_read_capacity data;
-	data.block_size = B_HOST_TO_BENDIAN_INT32(512);
-		// TODO: 512 bytes fixed block size?
+	data.block_size = B_HOST_TO_BENDIAN_INT32(ATA_BLOCK_SIZE);
 
 	uint32 lastBlock = fTotalSectors - 1;
 	data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
@@ -462,7 +461,7 @@ status_t
 ATADevice::Identify()
 {
 	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
-		IsATAPI() ? "pi " : "", fChannel->ChannelID(), fIndex);
+		IsATAPI() ? "pi" : "", fChannel->ChannelID(), fIndex);
 
 	ATARequest request(false);
 	request.SetDevice(this);
@@ -485,8 +484,9 @@ ATADevice::Identify()
 		return B_TIMED_OUT;
 	}
 
-	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, 0,
-			IsATAPI() ? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
+	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE, IsATAPI()
+		? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for identify request\n");
 		return B_TIMED_OUT;
 	}
@@ -517,7 +517,7 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	if (!request->UseDMA())
 		request->PrepareSGInfo();
 
-	request->SetBlocksLeft(sectorCount);
+	request->SetBytesLeft(sectorCount * ATA_BLOCK_SIZE);
 	if (_FillTaskFile(request, address) != B_OK) {
 		TRACE_ERROR("failed to setup transfer request\n");
 		if (request->UseDMA())
@@ -571,7 +571,7 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	}
 
 	return fChannel->FinishRequest(request, ATA_WAIT_FINISH
-		| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ABORTED);
+		| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ALL);
 }
 
 
@@ -590,7 +590,7 @@ ATADevice::_FillTaskFile(ATARequest *request, uint64 address)
 		{ ATA_COMMAND_READ_DMA, ATA_COMMAND_WRITE_DMA }
 	};
 
-	uint32 sectorCount = *request->BlocksLeft();
+	uint32 sectorCount = *request->BytesLeft() / ATA_BLOCK_SIZE;
 	if (fUseLBA) {
 		if (fUse48Bits
 			&& (address + sectorCount > 0xfffffff || sectorCount > 0x100)) {

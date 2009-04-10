@@ -25,6 +25,7 @@
 #include "ATATracing.h"
 #include "ata_device_infoblock.h"
 
+#define ATA_BLOCK_SIZE				512 /* TODO: retrieve */
 #define ATA_MAX_DMA_FAILURES		3
 #define ATA_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define ATA_RELEASE_TIMEOUT			10 * 1000 * 1000
@@ -39,7 +40,8 @@ enum {
 	ATA_DMA_TRANSFER			= 0x04,
 	ATA_CHECK_ERROR_BIT			= 0x08,
 	ATA_WAIT_FINISH				= 0x10,
-	ATA_WAIT_ANY_BIT			= 0x20
+	ATA_WAIT_ANY_BIT			= 0x20,
+	ATA_CHECK_DISK_FAILURE		= 0x40
 };
 
 
@@ -103,6 +105,7 @@ public:
 
 		status_t					ReadRegs(ATADevice *device);
 		uint8						AltStatus();
+		bool						IsDMAInterruptSet();
 
 		status_t					ReadPIO(uint8 *buffer, size_t length);
 		status_t					WritePIO(uint8 *buffer, size_t length);
@@ -232,7 +235,6 @@ virtual	status_t					Configure();
 private:
 		status_t					_FillTaskFilePacket(ATARequest *request);
 
-		bool						fInterruptsForPacket;
 		uint8						fPacket[12];
 };
 
@@ -263,8 +265,8 @@ public:
 		void						SetUseDMA(bool useDMA);
 		bool						UseDMA() { return fUseDMA; };
 
-		void						SetBlocksLeft(uint32 blocksLeft);
-		uint32 *					BlocksLeft() { return &fBlocksLeft; };
+		void						SetBytesLeft(uint32 bytesLeft);
+		size_t *					BytesLeft() { return &fBytesLeft; };
 
 		status_t					Finish(bool resubmit);
 
@@ -302,7 +304,7 @@ private:
 
 		ATADevice *					fDevice;
 		bigtime_t					fTimeout;
-		uint32						fBlocksLeft;
+		size_t						fBytesLeft;
 		bool						fIsWrite;
 		bool						fUseDMA;
 		scsi_ccb *					fCCB;

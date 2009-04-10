@@ -393,8 +393,16 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	while (true) {
 		uint8 status = AltStatus();
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
-			&& (status & ATA_STATUS_ERROR) != 0)
+			&& (status & ATA_STATUS_ERROR) != 0) {
+			TRACE("error bit set while waiting\n");
 			return B_ERROR;
+		}
+
+		if ((flags & ATA_CHECK_DISK_FAILURE) != 0
+			&& (status & ATA_STATUS_DISK_FAILURE) != 0) {
+			TRACE("disk failure bit set while waiting\n");
+			return B_ERROR;
+		}
 
 		if ((status & clearedBits) == 0) {
 			if ((flags & ATA_WAIT_ANY_BIT) != 0 && (status & setBits) != 0)
@@ -426,8 +434,7 @@ status_t
 ATAChannel::WaitDataRequest(bool high)
 {
 	return Wait(high ? ATA_STATUS_DATA_REQUEST : 0,
-		high ? 0 : ATA_STATUS_DATA_REQUEST,
-		ATA_CHECK_ERROR_BIT, (high ? 10 : 1) * 1000 * 1000);
+		high ? 0 : ATA_STATUS_DATA_REQUEST, 0, (high ? 10 : 1) * 1000 * 1000);
 }
 
 
@@ -514,7 +521,7 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 {
 	if (flags & ATA_WAIT_FINISH) {
 		// wait for the device to finish current command (device no longer busy)
-		status_t result = Wait(0, ATA_STATUS_BUSY, 0, request->Timeout());
+		status_t result = Wait(0, ATA_STATUS_BUSY, flags, request->Timeout());
 		if (result != B_OK) {
 			TRACE_ERROR("timeout waiting for request finish\n");
 			request->SetStatus(SCSI_CMD_TIMEOUT);
@@ -545,12 +552,19 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 		return B_ERROR;
 	}
 
-	if ((taskFile->read.status & ATA_STATUS_ERROR) == 0)
+	uint8 checkFlags = ATA_STATUS_ERROR;
+	if (flags & ATA_CHECK_DISK_FAILURE)
+		checkFlags |= ATA_STATUS_DISK_FAILURE;
+
+	if ((taskFile->read.status & checkFlags) == 0)
 		return B_OK;
 
-	request->SetStatus(SCSI_SEQUENCE_FAIL);
-	TRACE_ERROR("command failed, error bit is set: 0x%02x\n",
-		taskFile->read.error);
+	if ((taskFile->read.error & ATA_ERROR_MEDIUM_CHANGED)
+		!= ATA_ERROR_MEDIUM_CHANGED) {
+		TRACE_ERROR("command failed, error bit is set: 0x%02x\n",
+			taskFile->read.error);
+	}
+
 	uint8 error = taskFile->read.error & errorMask;
 	if (error & ATA_ERROR_INTERFACE_CRC) {
 		TRACE_ERROR("interface crc error\n");
@@ -558,7 +572,7 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 		return B_ERROR;
 	}
 
-	if (flags & ATA_IS_WRITE) {
+	if (request->IsWrite()) {
 		if (error & ATA_ERROR_WRITE_PROTECTED) {
 			request->SetSense(SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
 			return B_ERROR;
@@ -630,32 +644,34 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 {
 	bigtime_t timeout = request->Timeout();
 	status_t result = B_OK;
-	uint32 *blocksLeft = request->BlocksLeft();
-	while (*blocksLeft > 0) {
-		if (Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, 0, timeout) != B_OK) {
+	size_t *bytesLeft = request->BytesLeft();
+	while (*bytesLeft > 0) {
+		if (Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, ATA_CHECK_ERROR_BIT
+			| ATA_CHECK_DISK_FAILURE, timeout) != B_OK) {
 			TRACE_ERROR("timeout waiting for device to request data\n");
 			result = B_TIMED_OUT;
 			break;
 		}
 
+		size_t currentLength = MIN(*bytesLeft, ATA_BLOCK_SIZE);
 		if (request->IsWrite()) {
-			result = _WritePIOBlock(request, 512);
+			result = _WritePIOBlock(request, currentLength);
 			if (result != B_OK) {
 				TRACE_ERROR("failed to write pio block\n");
 				break;
 			}
 		} else {
-			result = _ReadPIOBlock(request, 512);
+			result = _ReadPIOBlock(request, currentLength);
 			if (result != B_OK) {
 				TRACE_ERROR("failed to read pio block\n");
 				break;
 			}
 		}
 
-		(*blocksLeft)--;
+		*bytesLeft -= currentLength;
 
 		// wait 1 pio cycle
-		if (*blocksLeft > 0)
+		if (*bytesLeft > 0)
 			AltStatus();
 	}
 
