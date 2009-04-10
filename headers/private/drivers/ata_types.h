@@ -277,6 +277,8 @@ enum {
 	ATA_ERROR_INVALID_ADDRESS			= 0x10,		// invalid CHS address
 	ATA_ERROR_MEDIA_CHANGE_REQUESTED	= 0x08,		// media change requested
 	ATA_ERROR_NO_MEDIA					= 0x02,		// no media
+
+	ATA_ERROR_ALL						= 0xfe
 };
 
 typedef struct ata_channel_info *ata_channel_cookie;
