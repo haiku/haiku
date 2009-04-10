@@ -27,4 +27,5 @@ KernelAddon ata :
 	ATAModule.cpp
 	ATAPIDevice.cpp
 	ATARequest.cpp
+	ATATracing.cpp
 	;

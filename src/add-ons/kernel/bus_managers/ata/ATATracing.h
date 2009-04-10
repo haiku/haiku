@@ -5,16 +5,24 @@
 #ifndef ATA_TRACING_H
 #define ATA_TRACING_H
 
-//#define TRACE_ATA
-#ifdef TRACE_ATA
+#include <tracing.h>
+
+#define ATA_TRACE_START			0x00
+#define ATA_TRACE_FLUSH			0x01
+#define	ATA_TRACE_SYSLOG		0x02
+#define ATA_TRACE_FLUSH_SYSLOG	0x03
+
+#if ATA_TRACING
 #define TRACE(x...)				{ \
-									dprintf("ata%s: ", _DebugContext()); \
-									dprintf(x); \
+									ata_trace_printf(ATA_TRACE_START, \
+										"ata%s: ", _DebugContext()); \
+									ata_trace_printf(ATA_TRACE_FLUSH, x); \
 								}
 #define TRACE_FUNCTION(x...)	{ \
-									dprintf("ata%s: %s: ", _DebugContext(), \
+									ata_trace_printf(ATA_TRACE_START, \
+										"ata%s: %s: ", _DebugContext(), \
 										__FUNCTION__); \
-									dprintf(x); \
+									ata_trace_printf(ATA_TRACE_FLUSH, x); \
 								}
 #else
 #define TRACE(x...)				/* nothing */
@@ -22,13 +30,17 @@
 #endif
 
 #define TRACE_ALWAYS(x...)		{ \
-									dprintf("ata%s: ", _DebugContext()); \
-									dprintf(x); \
+									ata_trace_printf(ATA_TRACE_START, \
+										"ata%s: ", _DebugContext()); \
+									ata_trace_printf(ATA_TRACE_FLUSH_SYSLOG, x); \
 								}
 #define TRACE_ERROR(x...)		{ \
-									dprintf("ata%s error: ", _DebugContext()); \
-									dprintf(x); \
+									ata_trace_printf(ATA_TRACE_START, \
+										"ata%s error: ", _DebugContext()); \
+									ata_trace_printf(ATA_TRACE_FLUSH_SYSLOG, x); \
 								}
+
+void ata_trace_printf(uint32 flags, const char *format, ...);
 
 inline const char *
 _DebugContext()
