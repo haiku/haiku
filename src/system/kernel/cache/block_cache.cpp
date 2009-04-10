@@ -292,12 +292,128 @@ private:
 	status_t		fStatus;
 };
 
+#if BLOCK_CACHE_BLOCK_TRACING >= 2
+class BlockData : public AbstractTraceEntry {
+public:
+	enum {
+		kCurrent	= 0x01,
+		kParent		= 0x02,
+		kOriginal	= 0x04
+	};
+
+	BlockData(block_cache* cache, cached_block* block, const char* message)
+		:
+		fCache(cache),
+		fSize(cache->block_size),
+		fBlockNumber(block->block_number),
+		fMessage(message)
+	{
+		_Allocate(fCurrent, block->current_data);
+		_Allocate(fParent, block->parent_data);
+		_Allocate(fOriginal, block->original_data);
+
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, block %Ld, data %c%c%c: %s",
+			fCache, fBlockNumber, fCurrent != NULL ? 'c' : '-',
+			fParent != NULL ? 'p' : '-', fOriginal != NULL ? 'o' : '-',
+			fMessage);
+	}
+
+	void DumpBlocks(uint32 which, uint32 offset, uint32 size)
+	{
+		if ((which & kCurrent) != 0)
+			DumpBlock(kCurrent, offset, size);
+		if ((which & kParent) != 0)
+			DumpBlock(kParent, offset, size);
+		if ((which & kOriginal) != 0)
+			DumpBlock(kOriginal, offset, size);
+	}
+
+	void DumpBlock(uint32 which, uint32 offset, uint32 size)
+	{
+		if (offset > fSize) {
+			kprintf("invalid offset (block size %lu)\n", fSize);
+			return;
+		}
+		if (offset + size > fSize)
+			size = fSize - offset;
+
+		const char* label;
+		uint8* data;
+
+		if ((which & kCurrent) != 0) {
+			label = "current";
+			data = fCurrent;
+		} else if ((which & kParent) != 0) {
+			label = "parent";
+			data = fParent;
+		} else if ((which & kOriginal) != 0) {
+			label = "original";
+			data = fOriginal;
+		} else
+			return;
+
+		kprintf("%s: offset %lu, %lu bytes\n", label, offset, size);
+
+		static const uint32 kBlockSize = 16;
+		data += offset;
+
+		for (uint32 i = 0; i < size;) {
+			int start = i;
+
+			kprintf("  %04lx ", i);
+			for (; i < start + kBlockSize; i++) {
+				if (!(i % 4))
+					kprintf(" ");
+	
+				if (i >= size)
+					kprintf("  ");
+				else
+					kprintf("%02x", data[i]);
+			}
+
+			kprintf("\n");
+		}
+	}
+
+private:
+	void _Allocate(uint8*& target, void* source)
+	{
+		if (source == NULL) {
+			target = NULL;
+			return;
+		}
+
+		target = alloc_tracing_buffer_memcpy(source, fSize, false);
+	}
+
+	block_cache*	fCache;
+	uint32			fSize;
+	uint64			fBlockNumber;
+	const char*		fMessage;
+	uint8*			fCurrent;
+	uint8*			fParent;
+	uint8*			fOriginal;
+};
+#endif	// BLOCK_CACHE_BLOCK_TRACING >= 2
+
 }	// namespace BlockTracing
 
 #	define TB(x) new(std::nothrow) BlockTracing::x;
 #else
 #	define TB(x) ;
 #endif
+
+#if BLOCK_CACHE_BLOCK_TRACING >= 2
+#	define TB2(x) new(std::nothrow) BlockTracing::x;
+#else
+#	define TB2(x) ;
+#endif
+
 
 #if BLOCK_CACHE_TRANSACTION_TRACING
 namespace TransactionTracing {
@@ -1287,6 +1403,7 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 
 	block->is_dirty = true;
 	TB(Get(cache, block));
+	TB2(BlockData(cache, block, "get writable"));
 
 	return block->current_data;
 }
@@ -1311,6 +1428,7 @@ write_cached_block(block_cache* cache, cached_block* block,
 
 	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
 	TB(Write(cache, block));
+	TB2(BlockData(cache, block, "before write"));
 
 	ssize_t written = write_pos(cache->fd, block->block_number * blockSize,
 		data, blockSize);
@@ -1358,6 +1476,7 @@ write_cached_block(block_cache* cache, cached_block* block,
 		cache->unused_blocks.Add(block);
 	}
 
+	TB2(BlockData(cache, block, "after write"));
 	return B_OK;
 }
 
@@ -1621,6 +1740,96 @@ dump_caches(int argc, char** argv)
 	return 0;
 }
 
+
+#if BLOCK_CACHE_BLOCK_TRACING >= 2
+static int
+dump_block_data(int argc, char** argv)
+{
+	using namespace BlockTracing;
+
+	if (argc < 3) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	// Determine which blocks to show
+
+	uint32 which = 0;
+	int32 i = 1;
+	while (argv[i][0] == '-') {
+		char* arg = &argv[i][1];
+		while (arg[0]) {
+			switch (arg[0]) {
+				case 'c':
+					which |= BlockData::kCurrent;
+					break;
+				case 'p':
+					which |= BlockData::kParent;
+					break;
+				case 'o':
+					which |= BlockData::kOriginal;
+					break;
+
+				default:
+					kprintf("invalid block specifier (only o/c/p are "
+						"allowed).\n");
+					return 0;
+			}
+			arg++;
+		}
+	
+		i++;
+	}
+	if (which == 0)
+		which = BlockData::kCurrent | BlockData::kParent | BlockData::kOriginal;
+
+	// Get the range of blocks to print
+
+	int64 from = parse_expression(argv[i]);
+	int64 to = from;
+	if (argc > i + 1)
+		to = parse_expression(argv[i + 1]);
+	if (to < from)
+		to = from;
+
+	uint32 offset = 0;
+	uint32 size = LONG_MAX;
+	if (argc > i + 2)
+		offset = parse_expression(argv[i + 2]);
+	if (argc > i + 3)
+		size = parse_expression(argv[i + 3]);
+
+	TraceEntryIterator iterator;
+	iterator.MoveTo(from);
+
+	static char sBuffer[1024];
+	LazyTraceOutput out(sBuffer, sizeof(sBuffer), TRACE_OUTPUT_TEAM_ID);
+
+	while (TraceEntry* entry = iterator.Next()) {
+		if (iterator.Index() > to)
+			break;
+
+		Action* action = dynamic_cast<Action*>(entry);
+		if (action != NULL) {
+			out.Clear();
+			out.DumpEntry(action);
+			continue;
+		}
+
+		BlockData* blockData = dynamic_cast<BlockData*>(entry);
+		if (blockData == NULL)
+			continue;
+
+		out.Clear();
+		out.DumpEntry(blockData);
+
+		blockData->DumpBlocks(which, offset, size);
+	}
+
+	return 0;
+}
+#endif	// BLOCK_CACHE_BLOCK_TRACING >= 2
+
 #endif	// DEBUG_BLOCK_CACHE
 
 
@@ -1836,7 +2045,20 @@ block_cache_init(void)
 		"dumps a specific transaction", "[-b] ((<cache> <id>) | <transaction>)\n"
 		"Either use a block cache pointer and an ID or a pointer to the transaction.\n"
 		"  -b lists all blocks that are part of this transaction\n", 0);
-#endif
+#	if BLOCK_CACHE_BLOCK_TRACING >= 2
+	add_debugger_command_etc("block_cache_data", &dump_block_data,
+		"dumps the data blocks logged for the actions",
+		"[-cpo] <from> [<to> [<offset> [<size>]]]\n"
+		"If no data specifier is used, all blocks are shown by default.\n"
+		" -c       the current data is shown, if available.\n"
+		" -p       the parent data is shown, if available.\n"
+		" -o       the original data is shown, if available.\n"
+		" <from>   first index of tracing entries to show.\n"
+		" <to>     if given, the last entry. If not, only <from> is shown.\n"
+		" <offset> the offset of the block data.\n"
+		" <from>   the size of the block data that is dumped\n", 0);
+#	endif
+#endif	// DEBUG_BLOCK_CACHE
 
 	return B_OK;
 }
