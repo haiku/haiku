@@ -144,6 +144,7 @@ struct Elf32_Phdr {
 #define PT_NOTE		4
 #define PT_SHLIB	5
 #define PT_PHDR		6
+#define PT_STACK	0x6474e551
 
 #define PT_LOPROC	0x70000000
 #define PT_HIPROC	0x7fffffff
