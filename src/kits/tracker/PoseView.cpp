@@ -1672,6 +1672,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 				bool havePoseBounds = false;
 				bool addedItem = false;
+				bool needToDraw = true;
 
 				if (insertionSort && fPoseList->CountItems()) {
 					int32 orientation = BSearchList(pose, &poseIndex);
@@ -1708,20 +1709,20 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 							// if new pose above current view bounds, cache up
 							// the draw and do it later
 							listViewScrollBy += fListElemHeight;
-						} else if (!srcRect.IsValid()) {
-							// nothing to be scrolled, but extent became
-							// visible
-							SynchronousUpdate(destRect);
-							forceDraw = false;
+							needToDraw = false;
 						} else {
 							FinishPendingScroll(listViewScrollBy, viewBounds);
 							fPoseList->AddItem(pose, poseIndex);
 							fMimeTypeListIsDirty = true;
 							addedItem = true;
-							CopyBits(srcRect, destRect);
-							srcRect.bottom = destRect.top;
-							SynchronousUpdate(srcRect);
-							forceDraw = false;
+							if (srcRect.IsValid()) {
+								CopyBits(srcRect, destRect);
+								srcRect.bottom = destRect.top;
+								SynchronousUpdate(srcRect);
+							} else {
+								SynchronousUpdate(destRect);
+							}
+							needToDraw = false;
 						}
 					}
 				}
@@ -1730,7 +1731,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 					fMimeTypeListIsDirty = true;
 				}
 
-				if (forceDraw) {
+				if (needToDraw && forceDraw) {
 					if (!havePoseBounds)
 						poseBounds = CalcPoseRectList(pose, poseIndex);
 		 			if (viewBounds.Intersects(poseBounds))
