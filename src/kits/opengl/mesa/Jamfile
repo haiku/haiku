@@ -352,7 +352,6 @@ if $(TARGET_ARCH) = x86 {
 
 MergeObject <mesa>glapi-dispatching.o :
 
-	dispatch.c
 	glapi.c
 	glthread.c
 

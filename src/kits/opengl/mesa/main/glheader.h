@@ -142,17 +142,20 @@
  * For now, only used by some DRI hardware drivers for color/texel packing.
  */
 #if defined(BYTE_ORDER) && defined(BIG_ENDIAN) && BYTE_ORDER == BIG_ENDIAN
-#if defined(__linux__)
-#include <byteswap.h>
-#define CPU_TO_LE32( x )	bswap_32( x )
-#else /*__linux__*/
-#include <sys/endian.h>
-#define CPU_TO_LE32( x )	bswap32( x )
-#endif /*__linux__*/
-#define MESA_BIG_ENDIAN 1
+	#if defined(__linux__)
+		#include <byteswap.h>
+		#define CPU_TO_LE32( x )	bswap_32( x )
+	#elif defined(__BEOS__) || defined(__HAIKU__) 
+		#include <ByteOrder.h>
+		#define CPU_TO_LE32( x )	B_HOST_TO_LENDIAN_INT32( x )
+	#else
+		#include <sys/endian.h>
+		#define CPU_TO_LE32( x )	bswap32( x )
+	#endif
+	#define MESA_BIG_ENDIAN 1
 #else
-#define CPU_TO_LE32( x )	( x )
-#define MESA_LITTLE_ENDIAN 1
+	#define CPU_TO_LE32( x )	( x )
+	#define MESA_LITTLE_ENDIAN 1
 #endif
 #define LE32_TO_CPU( x )	CPU_TO_LE32( x )
 
