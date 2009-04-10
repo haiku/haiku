@@ -189,6 +189,11 @@ get_cpu_model_string(system_info *info)
 			if ((info->cpu_revision & 0xf) < 8)
 				return "C3 Nehemiah";
 			return "C3 Eden-N";
+		case B_CPU_VIA_C7_ESTHER:
+		case B_CPU_VIA_C7_ESTHER_2:
+			return "C7";
+		case B_CPU_VIA_NANO_ISAIAH:
+			return "Nano";
 
 		/* Cyrix/VIA */
 		case B_CPU_CYRIX_GXm:

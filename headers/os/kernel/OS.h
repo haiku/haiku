@@ -557,6 +557,9 @@ typedef enum cpu_types {
 	B_CPU_VIA_C3_SAMUEL_2				= 0x1367,
 	B_CPU_VIA_C3_EZRA_T					= 0x1368,
 	B_CPU_VIA_C3_NEHEMIAH				= 0x1369,
+	B_CPU_VIA_C7_ESTHER					= 0x136a,
+	B_CPU_VIA_C7_ESTHER_2				= 0x136d,
+	B_CPU_VIA_NANO_ISAIAH				= 0x136f,
 
 	/* Transmeta */
 	B_CPU_TRANSMETA_x86					= 0x1600,
