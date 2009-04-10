@@ -460,8 +460,11 @@ count_regions(char const *buff, int phnum, int phentsize)
 			case PT_PHDR:
 				/* we don't use it */
 				break;
+			case PT_STACK:
+				/* we don't use it */
+				break;
 			default:
-				FATAL("unhandled pheader type 0x%lx\n", pheaders[i].p_type);
+				FATAL("unhandled pheader type in count 0x%lx\n", pheaders->p_type);
 				return B_BAD_DATA;
 		}
 	}
@@ -678,8 +681,11 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 			case PT_PHDR:
 				/* we don't use it */
 				break;
+			case PT_STACK:
+				/* we don't use it */
+				break;
 			default:
-				FATAL("unhandled pheader type 0x%lx\n", pheader[i].p_type);
+				FATAL("unhandled pheader type in parse 0x%lx\n", pheader->p_type);
 				return B_BAD_DATA;
 		}
 	}
