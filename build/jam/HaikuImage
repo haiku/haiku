@@ -110,6 +110,7 @@ SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	mp3_decoder mp3_reader
 	mp4_reader musepack
 	ogg raw_decoder speex
+	$(X86_ONLY)APE_reader
 	# theora
 	vorbis wav_reader
 ;

@@ -174,7 +174,7 @@ rule AssembleNasm
 
 actions AssembleNasm
 {
-	nasm -d $(ASFLAGS) -f elf -o $(1) $(2)
+	yasm -d $(ASFLAGS) -f elf -o $(1) $(2)
 }
 
 rule Ld
