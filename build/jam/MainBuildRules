@@ -174,7 +174,11 @@ rule AssembleNasm
 
 actions AssembleNasm
 {
-	yasm -d $(ASFLAGS) -f elf -o $(1) $(2)
+	if test $(ASFLAGS) ; then
+		yasm -d $(ASFLAGS) -f elf32 -o $(1) $(2);
+	else
+		yasm -f elf32 -o $(1) $(2);
+	fi
 }
 
 rule Ld
