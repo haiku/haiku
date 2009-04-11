@@ -11,6 +11,9 @@
 #	include <IconUtils.h>
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <Alert.h>
 #include <Autolock.h>
 #include <Bitmap.h>
@@ -26,8 +29,6 @@
 #include <TextView.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
-
-#include <stdlib.h>
 
 
 static const uint32 kMsgValueChanged = 'vlch';
@@ -254,7 +255,7 @@ StringEditor::AttachedToWindow()
 }
 
 
-void 
+void
 StringEditor::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
@@ -305,7 +306,7 @@ MimeTypeEditor::_UpdateText()
 }
 
 
-void 
+void
 MimeTypeEditor::CommitChanges()
 {
 	if (fPreviousText != fTextControl->Text()) {
@@ -333,7 +334,7 @@ MimeTypeEditor::AttachedToWindow()
 }
 
 
-void 
+void
 MimeTypeEditor::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
@@ -379,7 +380,7 @@ NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
 }
 
 
-void 
+void
 NumberEditor::_UpdateText()
 {
 	if (fEditor.Lock()) {
@@ -625,7 +626,7 @@ NumberEditor::_TypeLabel()
 }
 
 
-size_t 
+size_t
 NumberEditor::_Size()
 {
 	switch (fEditor.Type()) {
@@ -711,7 +712,7 @@ NumberEditor::AttachedToWindow()
 }
 
 
-void 
+void
 NumberEditor::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
@@ -774,7 +775,7 @@ BooleanEditor::TypeMatches()
 }
 
 
-void 
+void
 BooleanEditor::_UpdateMenuField()
 {
 	if (fEditor.FileSize() != 1)
@@ -790,14 +791,14 @@ BooleanEditor::_UpdateMenuField()
 }
 
 
-void 
+void
 BooleanEditor::CommitChanges()
 {
 	// we're commiting the changes as they happen
 }
 
 
-void 
+void
 BooleanEditor::AttachedToWindow()
 {
 	fTrueMenuItem->SetTarget(this);
@@ -807,14 +808,14 @@ BooleanEditor::AttachedToWindow()
 }
 
 
-void 
+void
 BooleanEditor::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
 }
 
 
-void 
+void
 BooleanEditor::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -842,7 +843,7 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
-	if (editor.Type() == B_MINI_ICON_TYPE || editor.Type() == B_LARGE_ICON_TYPE 
+	if (editor.Type() == B_MINI_ICON_TYPE || editor.Type() == B_LARGE_ICON_TYPE
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		|| editor.Type() == B_VECTOR_ICON_TYPE
 #endif
@@ -876,7 +877,7 @@ ImageView::~ImageView()
 }
 
 
-void 
+void
 ImageView::AttachedToWindow()
 {
 	if (Parent() != NULL)
@@ -892,7 +893,7 @@ ImageView::AttachedToWindow()
 }
 
 
-void 
+void
 ImageView::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
@@ -1034,7 +1035,7 @@ ImageView::_UpdateImage()
 			case B_MESSAGE_TYPE:
 				type = "Flattened Bitmap";
 				break;
-			default:	
+			default:
 				break;
 		}
 		const char *colorSpace;
@@ -1283,7 +1284,7 @@ MessageView::AttachedToWindow()
 }
 
 
-void 
+void
 MessageView::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);

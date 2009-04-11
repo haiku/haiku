@@ -34,6 +34,7 @@
 #include "pr_server.h"
 #include "SpoolFolder.h"
 
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Bitmap.h>

@@ -34,6 +34,8 @@ All rights reserved.
 
 #include "AutoMounter.h"
 
+#include <Debug.h>
+
 #include "AutoLock.h"
 #include "AutoMounterSettings.h"
 #include "Commands.h"
@@ -1021,7 +1023,7 @@ UnmountIfMatchingID(Partition *partition, void *castToParams)
 			text << "To unmount " << partition->VolumeName() << " some query "
 			"windows have to be closed. Would you like to close the query "
 			"windows?";
-			BAlert* alert = new BAlert("", text.String(), "Cancel", 
+			BAlert* alert = new BAlert("", text.String(), "Cancel",
 				"Close and unmount", NULL, B_WIDTH_FROM_LABEL);
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)

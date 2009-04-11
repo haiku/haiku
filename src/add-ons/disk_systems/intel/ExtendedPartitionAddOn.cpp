@@ -5,6 +5,8 @@
 
 #include "ExtendedPartitionAddOn.h"
 
+#include <stdio.h>
+
 #include <new>
 
 #include <DiskDeviceTypes.h>
@@ -17,7 +19,7 @@
 using std::nothrow;
 
 
-static const uint32 kDiskSystemFlags = 
+static const uint32 kDiskSystemFlags =
 	0
 //	| B_DISK_SYSTEM_SUPPORTS_CHECKING
 //	| B_DISK_SYSTEM_SUPPORTS_REPAIRING

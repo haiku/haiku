@@ -7,6 +7,9 @@
 #include "DataView.h"
 #include "DataEditor.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <Window.h>
 #include <ScrollBar.h>
 #include <Autolock.h>

@@ -14,6 +14,9 @@
 #include "PartitionList.h"
 #include "Support.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #include <Alert.h>
 #include <Application.h>
 

@@ -48,6 +48,7 @@
 
 #include <AppDefs.h>
 #include <Autolock.h>
+#include <Debug.h>
 #include <List.h>
 #include <ScrollBar.h>
 #include <Shape.h>

@@ -5,6 +5,7 @@
 #include <NetEndpoint.h>
 
 #include <errno.h>
+#include <stdio.h>
 
 // #define DEBUG 1
 
@@ -64,7 +65,7 @@ BRawNetBuffer::AppendString(const char* string)
 status_t
 BRawNetBuffer::ReadUint16(uint16& value)
 {
-	uint16 netVal; 
+	uint16 netVal;
 	ssize_t sizeW = fBuffer.ReadAt(fReadPosition, &netVal, sizeof(uint16));
 	if (sizeW == 0)
 		return B_ERROR;
@@ -77,7 +78,7 @@ BRawNetBuffer::ReadUint16(uint16& value)
 status_t
 BRawNetBuffer::ReadUint32(uint32& value)
 {
-	uint32 netVal; 
+	uint32 netVal;
 	ssize_t sizeW = fBuffer.ReadAt(fReadPosition, &netVal, sizeof(uint32));
 	if (sizeW == 0)
 		return B_ERROR;
@@ -92,7 +93,7 @@ BRawNetBuffer::ReadString(BString& string)
 {
 	char* buffer = (char*)fBuffer.Buffer();
 	buffer = &buffer[fReadPosition];
-	
+
 	// if the string is compressed we have to follow the links to the
 	// sub strings
 	while (*buffer != 0) {
@@ -209,7 +210,7 @@ DNSTools::ConvertToDNSName(const BString& string)
 			dot = outString.FindFirst(".", lastDot + 1);
 			if (dot == B_ERROR)
 				break;
-	
+
 			// set a counts to the dot
 			diff =  dot - 1 - lastDot;
 			outString[lastDot] = (char)diff;
@@ -286,13 +287,13 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	in_addr dnsAddress;
 	if (ReadDNSServer(&dnsAddress) != B_OK)
 		return B_ERROR;
-	
+
 	// create dns query package
 	BRawNetBuffer buffer;
 	dns_header header;
 	_SetMXHeader(&header);
 	_AppendQueryHeader(buffer, &header);
-	
+
 	BString serverNameConv = DNSTools::ConvertToDNSName(serverName);
 	buffer.AppendString(serverNameConv.String());
 	buffer.AppendUint16(uint16(MX_RECORD));
@@ -308,7 +309,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	if (netEndpoint.Connect(netAddress) != B_OK)
 		return B_ERROR;
 	PRINT("Connected\n");
-	
+
 #ifdef DEBUG
 	int32 bytesSend =
 #endif
@@ -319,12 +320,12 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	BRawNetBuffer receiBuffer(512);
 	netEndpoint.SetTimeout(timeout);
 #ifdef DEBUG
-	int32 bytesRecei = 
+	int32 bytesRecei =
 #endif
 	netEndpoint.ReceiveFrom(receiBuffer.Data(), 512, netAddress);
 	PRINT("bytes received %i\n", int(bytesRecei));
 	dns_header receiHeader;
-	
+
 	_ReadQueryHeader(receiBuffer, &receiHeader);
 	PRINT("Package contains :");
 	PRINT("%d Questions, ", receiHeader.q_count);
@@ -338,7 +339,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	receiBuffer.ReadString(dummyS);
 	receiBuffer.ReadUint16(dummy);
 	receiBuffer.ReadUint16(dummy);
-	
+
 	bool mxRecordFound = false;
 	for (int i = 0; i < receiHeader.ans_count; i++) {
 		resource_record_head rrHead;
@@ -356,7 +357,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 			buffer.SkipReading(rrHead.dataLength);
 		}
 	}
-	
+
 	if (!mxRecordFound)
 		return B_ERROR;
 

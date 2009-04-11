@@ -36,6 +36,7 @@ All rights reserved.
 //
 
 #include <Bitmap.h>
+#include <Debug.h>
 #include <Node.h>
 #include <TranslationKit.h>
 #include <View.h>

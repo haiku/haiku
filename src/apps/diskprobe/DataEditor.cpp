@@ -8,11 +8,13 @@
 
 #include <Autolock.h>
 #include <NodeMonitor.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <Drivers.h>
 #include <fs_attr.h>
 #include <fs_info.h>
 
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -178,7 +180,7 @@ DataChange::~DataChange()
 }
 
 
-bool 
+bool
 DataChange::Merge(DataChange *change)
 {
 	return false;
@@ -196,7 +198,7 @@ ReplaceChange::ReplaceChange(off_t offset, const uint8 *data, size_t size)
 	fOldData = (uint8 *)malloc(size);
 	if (fNewData != NULL && fOldData != NULL) {
 		memcpy(fNewData, data, size);
-		fSize = size;		
+		fSize = size;
 	} else
 		fSize = 0;
 }
@@ -215,7 +217,7 @@ ReplaceChange::~ReplaceChange()
  *	method.
  */
 
-void 
+void
 ReplaceChange::Normalize(off_t bufferOffset, size_t bufferSize, off_t &offset,
 	size_t &dataOffset, size_t &size)
 {
@@ -230,7 +232,7 @@ ReplaceChange::Normalize(off_t bufferOffset, size_t bufferSize, off_t &offset,
 }
 
 
-void 
+void
 ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 {
 	// is it in our range?
@@ -257,7 +259,7 @@ ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 }
 
 
-void 
+void
 ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 {
 	// is it in our range?
@@ -283,7 +285,7 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 }
 
 
-bool 
+bool
 ReplaceChange::Merge(DataChange *_change)
 {
 	ReplaceChange *change = dynamic_cast<ReplaceChange *>(_change);
@@ -323,7 +325,7 @@ ReplaceChange::Merge(DataChange *_change)
 			// if this fails, we can't do anything about it
 		return false;
 	}
-	
+
 	if (fOffset < change->fOffset) {
 		memcpy(newData + fSize, change->fNewData, change->fSize);
 		memcpy(oldData + fSize, change->fOldData, change->fSize);
@@ -350,7 +352,7 @@ ReplaceChange::Merge(DataChange *_change)
 }
 
 
-void 
+void
 ReplaceChange::GetRange(off_t /*fileSize*/, off_t &_offset, off_t &_size)
 {
 	_offset = fOffset;
@@ -392,7 +394,7 @@ DataEditor::~DataEditor()
 }
 
 
-status_t 
+status_t
 DataEditor::SetTo(const char *path, const char *attribute)
 {
 	BEntry entry(path);
@@ -400,7 +402,7 @@ DataEditor::SetTo(const char *path, const char *attribute)
 }
 
 
-status_t 
+status_t
 DataEditor::SetTo(entry_ref &ref, const char *attribute)
 {
 	BEntry entry(&ref);
@@ -408,7 +410,7 @@ DataEditor::SetTo(entry_ref &ref, const char *attribute)
 }
 
 
-status_t 
+status_t
 DataEditor::SetTo(BEntry &entry, const char *attribute)
 {
 	fSize = 0;
@@ -516,7 +518,7 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 }
 
 
-status_t 
+status_t
 DataEditor::InitCheck()
 {
 	return fFile.InitCheck();
@@ -747,7 +749,7 @@ DataEditor::RemoveRedos()
 }
 
 
-status_t 
+status_t
 DataEditor::Undo()
 {
 	BAutolock locker(this);
@@ -776,7 +778,7 @@ DataEditor::Undo()
 }
 
 
-status_t 
+status_t
 DataEditor::Redo()
 {
 	BAutolock locker(this);
@@ -863,7 +865,7 @@ DataEditor::SetViewOffset(off_t offset)
 }
 
 
-status_t 
+status_t
 DataEditor::SetViewSize(size_t size, bool sendNotices)
 {
 	BAutolock locker(this);
@@ -979,7 +981,7 @@ DataEditor::UpdateIfNeeded(bool *_updated)
 }
 
 
-status_t 
+status_t
 DataEditor::ForceUpdate()
 {
 	BAutolock locker(this);
@@ -1045,7 +1047,7 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 }
 
 
-off_t 
+off_t
 DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 	bool caseInsensitive, bool cyclic, BMessenger progressMonitor,
 	volatile bool *stop)
@@ -1191,7 +1193,7 @@ DataEditor::SendNotices(DataChange *change)
 }
 
 
-void 
+void
 DataEditor::SendNotices(uint32 what, BMessage *message)
 {
 	if (fObservers.CountItems() == 0)
@@ -1213,7 +1215,7 @@ DataEditor::SendNotices(uint32 what, BMessage *message)
 }
 
 
-status_t 
+status_t
 DataEditor::StartWatching(BMessenger target)
 {
 	BAutolock locker(this);
@@ -1236,7 +1238,7 @@ DataEditor::StartWatching(BHandler *handler, BLooper *looper)
 }
 
 
-void 
+void
 DataEditor::StopWatching(BMessenger target)
 {
 	BAutolock locker(this);
@@ -1254,7 +1256,7 @@ DataEditor::StopWatching(BMessenger target)
 }
 
 
-void 
+void
 DataEditor::StopWatching(BHandler *handler, BLooper *looper)
 {
 	StopWatching(BMessenger(handler, looper));

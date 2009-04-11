@@ -21,6 +21,7 @@
 // BeOS
 #include <Application.h>
 #include <Autolock.h>
+#include <Debug.h>
 #include <Window.h>
 
 
@@ -55,7 +56,7 @@ static struct PageFormat
 	char  *label;
 	float width;
 	float height;
-} pageFormat[] = 
+} pageFormat[] =
 {
 	{"Letter", letter_width, letter_height },
 	{"Legal",  legal_width,  legal_height  },
@@ -81,7 +82,7 @@ static void GetPageFormat(float w, float h, BString& label)
 			label = pf.label; return;
 		}
 	}
-	
+
 	float unit = 72.0; // currently inc[h]es only
 	label << (w / unit) << "x" << (h / unit) << " in.";
 }
@@ -105,31 +106,31 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	if (kind == kJobSetup)
 		SetTitle("Print Setup");
 
-	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL, 
+	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL,
 					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 					B_PLAIN_BORDER);
 
 	AddChild(panel);
-	
+
 	float left = 10, top = 10;
 	BRect r(left, top, 160, 20);
 
 	// print selection popup menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
 	SetupPrintersMenu(menu);
-	
+
 	float width = be_plain_font->StringWidth("Printer:") + 10.0;
 	r.right = r.left + width + menu->MaxContentWidth() + 10;
 	fPrinters = new BMenuField(r, "Printer", "Printer:", menu);
 	fPrinters->SetDivider(width);
 	panel->AddChild(fPrinters);
 	top += fPrinters->Bounds().Height() + 10;
-	
+
 	// page format button
 	r.OffsetTo(left, top);
 	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON",
 		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
-	
+
 	// add description to button
 	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, fPageSetup->Frame().top);
 	BStringView *stringView = AddStringView(panel, r, "Paper Setup:");
@@ -139,7 +140,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fPageFormatText = AddStringView(panel, r, "");
 	fPageFormatText->ResizeToPreferred();
 	top = fPageSetup->Frame().bottom + 15;
-	
+
 	// page selection button
 	fJobSetup = NULL;
 	if (kind == kJobSetup) {
@@ -156,14 +157,14 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 		top = fJobSetup->Frame().bottom + 15;
 	}
 	top += 5;
-	
+
 	// separator line
 	BRect line(Bounds());
 	line.OffsetTo(0, top);
 	line.bottom = line.top+1;
 	AddChild(new BBox(line, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP));
 	top += 10;
-	
+
 	// Cancel button
 	r.OffsetTo(left, top);
 	BButton* cancel = new BButton(r, "Cancel", "Cancel",
@@ -171,7 +172,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	panel->AddChild(cancel);
 	cancel->ResizeToPreferred();
 	left = cancel->Frame().right + 10;
-	
+
 	// OK button
 	r.OffsetTo(left, top);
 	fOk = new BButton(r, "OK", "OK", new BMessage(MSG_OK));
@@ -179,15 +180,15 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fOk->ResizeToPreferred();
 	top += fOk->Bounds().Height() + 10;
 
-	// resize window	
+	// resize window
 	ResizeTo(fOk->Frame().right + 10, top);
-	
+
 	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
-	
+
 	SetDefaultButton(fOk);
-	
+
 	fPrinters->MakeFocus(true);
-	
+
 	UpdateSettings(true);
 }
 
@@ -244,7 +245,7 @@ void ConfigWindow::MessageReceived(BMessage* m)
 }
 
 
-static const char* 
+static const char*
 kAbout =
 "Printer Server\n"
 "© 2001-2008 Haiku\n"
@@ -293,32 +294,32 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 {
 	BBitmap* onBM = LoadBitmap(on);
 	BBitmap* offBM = LoadBitmap(off);
-	
+
 	BPicture* onPict = BitmapToPicture(panel, onBM);
 	BPicture* offPict = BitmapToPicture(panel, offBM);
 
 	BPictureButton* button = NULL;
-	
-	if (onPict != NULL && offPict != NULL) {	
+
+	if (onPict != NULL && offPict != NULL) {
 		button = new BPictureButton(frame, name, onPict, offPict, new BMessage(what));
 		button->SetViewColor(B_TRANSPARENT_COLOR);
 		panel->AddChild(button);
 		onBM->Lock();
 		button->ResizeTo(onBM->Bounds().Width(), onBM->Bounds().Height());
 		onBM->Unlock();
-		
+
 		BPicture* disabled = BitmapToGrayedPicture(panel, offBM);
 		button->SetDisabledOn(disabled);
 		delete disabled;
-		
+
 		disabled = BitmapToGrayedPicture(panel, onBM);
 		button->SetDisabledOff(disabled);
 		delete disabled;
-	}	
-	
-	delete onPict; delete offPict;	
+	}
+
+	delete onPict; delete offPict;
 	delete onBM; delete offBM;
-	
+
 	return button;
 }
 
@@ -430,21 +431,21 @@ void ConfigWindow::UpdateUI()
 		fOk->SetEnabled(false);
 		fPageFormatText->SetText("Undefined paper format");
 		fPageFormatText->ResizeToPreferred();
-	} else {	
+	} else {
 		fPageSetup->SetEnabled(true);
-	
+
 		if (fJobSetup)
 			fJobSetup->SetEnabled(fKind == kJobSetup && !fPageSettings.IsEmpty());
 
 		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
 			fKind == kPageSetup && !fPageSettings.IsEmpty());
-		
-		// display information about page format	
+
+		// display information about page format
 		BRect paperRect;
 		BString pageFormat;
 		if (fPageSettings.FindRect(PSRV_FIELD_PAPER_RECT, &paperRect) == B_OK) {
 			GetPageFormat(paperRect.Width(), paperRect.Height(), pageFormat);
-			
+
 			int32 orientation = 0;
 			fPageSettings.FindInt32(PSRV_FIELD_ORIENTATION, &orientation);
 			if (orientation == 0)
@@ -463,7 +464,7 @@ void ConfigWindow::UpdateUI()
 			int32 first, last;
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
-				if (first >= 1 && first <= last && last != INT_MAX) { 
+				if (first >= 1 && first <= last && last != INT_MAX) {
 					job << "From page " << first << " to " << last;
 				} else {
 					job << "All pages";
@@ -496,17 +497,17 @@ void ConfigWindow::Setup(config_setup_kind kind)
 	if (fCurrentPrinter) {
 		Hide();
 		if (kind == kPageSetup) {
-			BMessage settings = fPageSettings;			
+			BMessage settings = fPageSettings;
 			if (fCurrentPrinter->ConfigurePage(settings) == B_OK) {
 				fPageSettings = settings;
 				if (!fJobSettings.IsEmpty())
 					AddFields(&fJobSettings, &fPageSettings);
 			}
 		} else {
-			BMessage settings;			
+			BMessage settings;
 			if (fJobSettings.IsEmpty()) settings = fPageSettings;
 			else settings = fJobSettings;
-			
+
 			if (fCurrentPrinter->ConfigureJob(settings) == B_OK)
 				fJobSettings = settings;
 		}

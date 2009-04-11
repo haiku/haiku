@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Debug.h>
 #include <OS.h>
 #include <MenuField.h>
 #include <StorageKit.h>

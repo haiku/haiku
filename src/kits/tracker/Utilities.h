@@ -35,6 +35,9 @@ All rights reserved.
 #ifndef	_UTILITIES_H
 #define _UTILITIES_H
 
+#include <stdarg.h>
+#include <stdlib.h>
+
 #include <ByteOrder.h>
 #include <Bitmap.h>
 #include <DataIO.h>
@@ -52,7 +55,6 @@ All rights reserved.
 #include <String.h>
 #include <StringView.h>
 
-#include <stdarg.h>
 
 class BMessage;
 class BVolume;
@@ -133,7 +135,7 @@ class PoseInfo {
 			// them in the same location. This should probably be reworked -- Tracker
 			// could say strip the file location attributes when dropping files into
 			// a closed folder
-		BPoint fLocation;	
+		BPoint fLocation;
 };
 
 
@@ -165,7 +167,7 @@ class ExtendedPoseInfo {
 
 		int32 fNumFrames;
 		struct FrameLocation {
-			BPoint fLocation;	
+			BPoint fLocation;
 			BRect fFrame;
 			uint32 fWorkspaces;
 		};
@@ -178,19 +180,19 @@ void DisallowMetaKeys(BTextView *);
 void DisallowFilenameKeys(BTextView *);
 
 
-inline bool 
-IsDigit(const char c) 
+inline bool
+IsDigit(const char c)
 {
-	if ((c >= 48 && c <= 57) || c == 32) 
+	if ((c >= 48 && c <= 57) || c == 32)
 		return true;
-	else 
+	else
 		return false;
 }
 
 
 //! Compares two strings naturally, as opposed to lexicographically
-inline int 
-NaturalCompare(const char *s1, const char *s2) 
+inline int
+NaturalCompare(const char *s1, const char *s2)
 {
 	struct Chunk {
 		int32	type;
@@ -214,18 +216,18 @@ NaturalCompare(const char *s1, const char *s2)
 
 	while (true) {
 		// determine type of next chunks in each string based on first char
-		if (i == len1) 
+		if (i == len1)
 			a.type = -1;
 		else if (IsDigit(s1[i]))
 			a.type = 1;
-		else 
+		else
 			a.type = 0;
 
 		if (j == len2)
 			b.type = -1;
-		else if (IsDigit(s2[j])) 
+		else if (IsDigit(s2[j]))
 			b.type = 1;
-		else 
+		else
 			b.type = 0;
 
 		// check if we reached the end of either string
@@ -346,12 +348,12 @@ extern void FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 fr
 
 class FlickerFreeStringView : public BStringView {
 	// Adds support for offscreen bitmap drawing for string views that update often
-	// this would be better implemented as an option of BStringView	
+	// this would be better implemented as an option of BStringView
 	public:
-		FlickerFreeStringView(BRect bounds, const char *name, 
+		FlickerFreeStringView(BRect bounds, const char *name,
 			const char *text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
-		FlickerFreeStringView(BRect bounds, const char *name, 
+		FlickerFreeStringView(BRect bounds, const char *name,
 			const char *text, BBitmap *existingOffscreen,
 			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
@@ -407,7 +409,7 @@ class PositionPassingMenuItem : public BMenuItem {
 	protected:
 		virtual status_t Invoke(BMessage * = 0);
 			// appends the invoke location for NewFolder, etc. to use
-	
+
 	private:
 		typedef BMenuItem _inherited;
 };
@@ -707,14 +709,14 @@ inline void PrintDirToStream(const BDirectory *, const char * = 0) {}
 
 #ifdef xDEBUG
 
-	extern FILE *logFile;	
+	extern FILE *logFile;
 
 	inline void PrintToLogFile(const char *fmt, ...)
 	{
-    	va_list ap; 
-        va_start(ap, fmt); 
+    	va_list ap;
+        va_start(ap, fmt);
 		vfprintf(logFile, fmt, ap);
-		va_end(ap); 		
+		va_end(ap);
 	}
 
 	#define WRITELOG(_ARGS_)													\
@@ -729,7 +731,7 @@ inline void PrintDirToStream(const BDirectory *, const char * = 0) {}
 			PrintToLogFile("\n");												\
 			fflush(logFile);													\
 		}
-	
+
 #else
 
 	#define WRITELOG(_ARGS_)

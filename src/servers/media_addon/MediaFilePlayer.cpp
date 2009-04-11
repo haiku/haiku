@@ -9,6 +9,7 @@
 #include "ObjectList.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 BObjectList<MediaFilePlayer> list;
 
@@ -35,12 +36,12 @@ PlayMediaFile(const char *media_type, const char *media_name)
 			player->Restart();
 			return;
 		}
-	
+
 		list.RemoveItem(player);
 		delete player;
-		player = NULL;	
+		player = NULL;
 	}
-	
+
 	if (!player) {
 		player = new MediaFilePlayer(media_type, media_name, &ref);
 		if (player->InitCheck() == B_OK)
@@ -60,39 +61,39 @@ MediaFilePlayer::MediaFilePlayer(const char *media_type,
 	fPlayTrack(NULL)
 {
 	fName = strdup(media_name);
-	
+
 	fPlayFile = new BMediaFile(&fRef);
 	if ((fInitCheck = fPlayFile->InitCheck()) <B_OK) {
 		return;
 	}
-	
+
 	memset(&fPlayFormat, 0, sizeof(fPlayFormat));
-	
+
 	for (int i=0; i < fPlayFile->CountTracks(); i++) {
 		BMediaTrack *track = fPlayFile->TrackAt(i);
 		if (track == NULL)
 			continue;
 		fPlayFormat.type = B_MEDIA_RAW_AUDIO;
 		fPlayFormat.u.raw_audio.buffer_size = 256;
-		if ((track->DecodedFormat(&fPlayFormat) == B_OK) 
+		if ((track->DecodedFormat(&fPlayFormat) == B_OK)
 			&& (fPlayFormat.type == B_MEDIA_RAW_AUDIO)) {
 			fPlayTrack = track;
 			break;
 		}
 		fPlayFile->ReleaseTrack(track);
 	}
-	
+
 	if (fPlayTrack == NULL) {
 		fInitCheck = B_BAD_VALUE;
 		return;
 	}
-	
+
 	fSoundPlayer = new BSoundPlayer(&fPlayFormat.u.raw_audio, media_name, PlayFunction,
 		NULL, this);
 	if ((fInitCheck = fSoundPlayer->InitCheck()) != B_OK) {
 		return;
 	}
-	
+
 	fSoundPlayer->SetVolume(1.0f);
 	fSoundPlayer->SetHasData(true);
 	fSoundPlayer->Start();
@@ -134,7 +135,7 @@ MediaFilePlayer::Restart()
 void
 MediaFilePlayer::Stop()
 {
-	fSoundPlayer->Stop();	
+	fSoundPlayer->Stop();
 }
 
 
@@ -144,7 +145,7 @@ MediaFilePlayer::PlayFunction(void *cookie, void * buffer, size_t size, const me
 	MediaFilePlayer *player = (MediaFilePlayer *)cookie;
 	int64 frames = 0;
 	player->fPlayTrack->ReadFrames(buffer, &frames);
-	
+
 	if (frames <=0) {
 		player->fSoundPlayer->SetHasData(false);
 	}

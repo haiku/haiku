@@ -27,6 +27,7 @@
 #include <ShapePrivate.h>
 
 #include <Bitmap.h>
+#include <Debug.h>
 #include <List.h>
 #include <Shape.h>
 
@@ -91,7 +92,7 @@ ShapePainter::IterateLineTo(int32 lineCount, BPoint *linePts)
 	fOpStack.push(OP_LINETO | lineCount);
 	for (int32 i = 0; i < lineCount; i++)
 		fPtStack.push(linePts[i]);
-	
+
 	return B_OK;
 }
 
@@ -112,7 +113,7 @@ status_t
 ShapePainter::IterateClose(void)
 {
 	fOpStack.push(OP_CLOSE);
-	
+
 	return B_OK;
 }
 
@@ -128,8 +129,8 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 		int32 i;
 		uint32 *opList = new (std::nothrow) uint32[opCount];
 		if (opList == NULL)
-			return;	
-			
+			return;
+
 		BPoint *ptList = new (std::nothrow) BPoint[ptCount];
 		if (ptList == NULL) {
 			delete[] opList;
@@ -163,7 +164,7 @@ get_polygon_frame(const BPoint *points, int32 numPoints, BRect *_frame)
 	float l, t, r, b;
 
 	ASSERT(numPoints > 0);
-	
+
 	l = r = points->x;
 	t = b = points->y;
 
@@ -205,7 +206,7 @@ stroke_line(View *view, BPoint start, BPoint end)
 	BPoint penPos = end;
 
 	view->ConvertToScreenForDrawing(&start);
-	view->ConvertToScreenForDrawing(&end);	
+	view->ConvertToScreenForDrawing(&end);
 	view->Window()->GetDrawingEngine()->StrokeLine(start, end);
 
 	view->CurrentState()->SetPenLocation(penPos);
@@ -218,7 +219,7 @@ stroke_line(View *view, BPoint start, BPoint end)
 static void
 stroke_rect(View *view, BRect rect)
 {
-	view->ConvertToScreenForDrawing(&rect);	
+	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->StrokeRect(rect);
 }
 
@@ -226,7 +227,7 @@ stroke_rect(View *view, BRect rect)
 static void
 fill_rect(View *view, BRect rect)
 {
-	view->ConvertToScreenForDrawing(&rect);			
+	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->FillRect(rect);
 }
 
@@ -234,7 +235,7 @@ fill_rect(View *view, BRect rect)
 static void
 stroke_round_rect(View *view, BRect rect, BPoint radii)
 {
-	view->ConvertToScreenForDrawing(&rect);	
+	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
 		false);
 }
@@ -243,7 +244,7 @@ stroke_round_rect(View *view, BRect rect, BPoint radii)
 static void
 fill_round_rect(View *view, BRect rect, BPoint radii)
 {
-	view->ConvertToScreenForDrawing(&rect);	
+	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
 		true);
 }
@@ -341,7 +342,7 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
 			false, isClosed && numPoints > 2);
 		free(points);
 	}
@@ -364,11 +365,11 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
 			true, true);
 	} else {
 		 // avoid constructor/destructor calls by using malloc instead of new []
-		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint)); 
+		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
 		if (!points)
 			return;
 
@@ -377,7 +378,7 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
 			true, true);
 		free(points);
 	}
@@ -431,14 +432,14 @@ draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
 {
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
 		(color_space)pixelFormat, 0, bytesPerRow);
-	
+
 	if (!bitmap.IsValid())
 		return;
-	
+
 	memcpy(bitmap.Bits(), data, height * bytesPerRow);
 
 	view->ConvertToScreenForDrawing(&dest);
-	
+
 	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest,
 		options);
 }
@@ -447,10 +448,10 @@ draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
 static void
 draw_picture(View *view, BPoint where, int32 token)
 {
-	ServerPicture *picture = view->Window()->ServerWindow()->App()->FindPicture(token);	
+	ServerPicture *picture = view->Window()->ServerWindow()->App()->FindPicture(token);
 	if (picture != NULL) {
 		view->SetDrawingOrigin(where);
-		view->PushState();	
+		view->PushState();
 		picture->Play(view);
 		view->PopState();
 	}
@@ -465,7 +466,7 @@ set_clipping_rects(View *view, const BRect *rects, uint32 numRects)
 	BRegion region;
 	for (uint32 c = 0; c < numRects; c++)
 		region.Include(rects[c]);
-	view->SetUserClipping(&region);	
+	view->SetUserClipping(&region);
 }
 
 
@@ -512,7 +513,7 @@ exit_state_change(View *view)
 }
 
 
-static void 
+static void
 enter_font_state(View *view)
 {
 }
@@ -525,7 +526,7 @@ exit_font_state(View *view)
 }
 
 
-static void 
+static void
 set_origin(View *view, BPoint pt)
 {
 	view->CurrentState()->SetOrigin(pt);
@@ -600,7 +601,7 @@ set_scale(View *view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
 	view->Window()->ServerWindow()->ResyncDrawState();
-	
+
 	// Update the drawing engine draw state, since some stuff (for example
 	// the pen size) needs to be recalculated.
 }
@@ -746,7 +747,7 @@ const static void *kTableEntries[] = {
 	(const void *)set_font_shear,
 	(const void *)reserved,		// TODO: Marc Flerackers calls this "set_font_bpp". Investigate
 	(const void *)set_font_face,
-	(const void *)set_blending_mode 
+	(const void *)set_blending_mode
 };
 
 
@@ -761,7 +762,7 @@ ServerPicture::ServerPicture()
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 	fData = new (std::nothrow) BMallocIO();
-	
+
 	PictureDataWriter::SetTo(fData);
 }
 
@@ -781,13 +782,13 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 		return;
 
 	fData = mallocIO;
-	
+
 	const off_t size = picture.DataLength();
 	if (mallocIO->SetSize(size) < B_OK)
 		return;
-	
+
 	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()), size);
-		
+
 	PictureDataWriter::SetTo(fData);
 }
 
@@ -801,7 +802,7 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 	fUsurped(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
-	
+
 	fFile = new (std::nothrow) BFile(fileName, B_READ_WRITE);
 	if (fFile == NULL)
 		return;
@@ -824,7 +825,7 @@ ServerPicture::~ServerPicture()
 	delete fData;
 	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
-	
+
 	// We only delete the subpictures list, not the subpictures themselves,
 	// since the ServerApp keeps them in a list and will delete them on quit.
 	delete fPictures;
@@ -859,7 +860,7 @@ ServerPicture::SyncState(View *view)
 			view->CurrentState()->MiterLimit());
 	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
 	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
-	
+
 	WriteSetHighColor(view->CurrentState()->HighColor());
 	WriteSetLowColor(view->CurrentState()->LowColor());
 
@@ -888,10 +889,10 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 		link.Read<float>(&size);
 		WriteSetFontSize(size);
 	}
-	
+
 	if (mask & B_FONT_SHEAR) {
 		float shear;
-		link.Read<float>(&shear);	
+		link.Read<float>(&shear);
 		WriteSetFontShear(shear);
 	}
 
@@ -969,7 +970,7 @@ ServerPicture::NestPicture(ServerPicture *picture)
 {
 	if (fPictures == NULL)
 		fPictures = new (std::nothrow) BList;
-	
+
 	if (fPictures == NULL
 		|| !fPictures->AddItem(picture))
 		return false;
@@ -985,13 +986,13 @@ ServerPicture::DataLength() const
 		return 0;
 	off_t size;
 	fData->GetSize(&size);
-	return size;	
+	return size;
 }
 
 
 status_t
 ServerPicture::ImportData(BPrivate::LinkReceiver &link)
-{	
+{
 	int32 size = 0;
 	link.Read<int32>(&size);
 
@@ -1027,9 +1028,9 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	link.Attach<int32>(subPicturesCount);
 	if (subPicturesCount > 0) {
 		for (int32 i = 0; i < subPicturesCount; i++) {
-			ServerPicture *subPic = static_cast<ServerPicture *>(fPictures->ItemAtFast(i));	
-			link.Attach<int32>(subPic->Token());		
-		}	
+			ServerPicture *subPic = static_cast<ServerPicture *>(fPictures->ItemAtFast(i));
+			link.Attach<int32>(subPic->Token());
+		}
 	}
 
 	off_t size = 0;

@@ -32,9 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include "TrackerSettings.h"
+
+#include <Debug.h>
 
 #include "Tracker.h"
-#include "TrackerSettings.h"
 #include "WidgetAttributeText.h"
 
 
@@ -107,7 +109,7 @@ rgb_color ValueToColor(int32 value)
 	color.green = static_cast<uchar>((value >> 8L) & 0xff);
 	color.blue = static_cast<uchar>(value & 0xff);
 
-	return color;	
+	return color;
 }
 
 
@@ -146,7 +148,7 @@ TTrackerState::~TTrackerState()
 }
 
 
-void 
+void
 TTrackerState::SaveSettings(bool onlyIfNonDefault)
 {
 	if (fSettingsLoaded)
@@ -154,7 +156,7 @@ TTrackerState::SaveSettings(bool onlyIfNonDefault)
 }
 
 
-void 
+void
 TTrackerState::LoadSettingsIfNeeded()
 {
 	if (fSettingsLoaded)
@@ -215,7 +217,7 @@ TrackerSettings::TrackerSettings()
 }
 
 
-void 
+void
 TrackerSettings::SaveSettings(bool onlyIfNonDefault)
 {
 	gTrackerState.SaveSettings(onlyIfNonDefault);
@@ -243,7 +245,7 @@ TrackerSettings::DesktopFilePanelRoot()
 }
 
 
-void 
+void
 TrackerSettings::SetDesktopFilePanelRoot(bool enabled)
 {
 	gTrackerState.fDesktopFilePanelRoot->SetValue(enabled);
@@ -257,7 +259,7 @@ TrackerSettings::MountVolumesOntoDesktop()
 }
 
 
-void 
+void
 TrackerSettings::SetMountVolumesOntoDesktop(bool enabled)
 {
 	gTrackerState.fMountVolumesOntoDesktop->SetValue(enabled);
@@ -271,7 +273,7 @@ TrackerSettings::MountSharedVolumesOntoDesktop()
 }
 
 
-void 
+void
 TrackerSettings::SetMountSharedVolumesOntoDesktop(bool enabled)
 {
 	gTrackerState.fMountSharedVolumesOntoDesktop->SetValue(enabled);
@@ -285,7 +287,7 @@ TrackerSettings::IntegrateNonBootBeOSDesktops()
 }
 
 
-void 
+void
 TrackerSettings::SetIntegrateNonBootBeOSDesktops(bool enabled)
 {
 	gTrackerState.fIntegrateNonBootBeOSDesktops->SetValue(enabled);
@@ -305,7 +307,7 @@ TrackerSettings::EjectWhenUnmounting()
 }
 
 
-void 
+void
 TrackerSettings::SetEjectWhenUnmounting(bool enabled)
 {
 	gTrackerState.fEjectWhenUnmounting->SetValue(enabled);
@@ -397,14 +399,14 @@ TrackerSettings::SetSortFolderNamesFirst(bool enabled)
 }
 
 
-bool 
+bool
 TrackerSettings::HideDotFiles()
 {
 	return gTrackerState.fHideDotFiles->Value();
 }
 
 
-void 
+void
 TrackerSettings::SetHideDotFiles(bool hide)
 {
 	gTrackerState.fHideDotFiles->SetValue(hide);
@@ -479,21 +481,21 @@ TrackerSettings::RecentCounts(int32 *applications, int32 *documents, int32 *fold
 }
 
 
-void  
+void
 TrackerSettings::SetRecentApplicationsCount(int32 count)
 {
 	gTrackerState.fRecentApplicationsCount->ValueChanged(count);
 }
 
 
-void  
+void
 TrackerSettings::SetRecentDocumentsCount(int32 count)
 {
 	gTrackerState.fRecentDocumentsCount->ValueChanged(count);
 }
 
 
-void  
+void
 TrackerSettings::SetRecentFoldersCount(int32 count)
 {
 	gTrackerState.fRecentFoldersCount->ValueChanged(count);

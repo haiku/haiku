@@ -34,6 +34,7 @@
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
 
+#include <Debug.h>
 #include <DirectWindow.h>
 #include <Entry.h>
 #include <Message.h>

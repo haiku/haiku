@@ -10,6 +10,8 @@
 
 #include "Support.h"
 
+#include <stdio.h>
+
 #include <Partition.h>
 #include <String.h>
 

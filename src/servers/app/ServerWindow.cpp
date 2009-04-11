@@ -50,6 +50,7 @@
 
 #include <AppDefs.h>
 #include <Autolock.h>
+#include <Debug.h>
 #include <DirectWindow.h>
 #include <TokenSpace.h>
 #include <View.h>

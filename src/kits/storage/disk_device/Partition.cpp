@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <new>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/stat.h>
 
 #include <Directory.h>

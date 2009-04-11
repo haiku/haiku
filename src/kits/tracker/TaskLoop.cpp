@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Debug.h>
 #include <InterfaceDefs.h>
 
 #include "AutoLock.h"
@@ -60,7 +61,7 @@ OneShotDelayedTask::~OneShotDelayedTask()
 }
 
 
-bool 
+bool
 OneShotDelayedTask::RunIfNeeded(bigtime_t currentTime)
 {
 	if (currentTime < fRunAfter)
@@ -86,7 +87,7 @@ PeriodicDelayedTask::~PeriodicDelayedTask()
 }
 
 
-bool 
+bool
 PeriodicDelayedTask::RunIfNeeded(bigtime_t currentTime)
 {
 	if (!currentTime < fRunAfter)
@@ -107,7 +108,7 @@ PeriodicDelayedTaskWithTimeout::PeriodicDelayedTaskWithTimeout(
 }
 
 
-bool 
+bool
 PeriodicDelayedTaskWithTimeout::RunIfNeeded(bigtime_t currentTime)
 {
 	if (currentTime < fRunAfter)
@@ -137,7 +138,7 @@ RunWhenIdleTask::~RunWhenIdleTask()
 }
 
 
-bool 
+bool
 RunWhenIdleTask::RunIfNeeded(bigtime_t currentTime)
 {
 	if (currentTime < fRunAfter)
@@ -146,7 +147,7 @@ RunWhenIdleTask::RunIfNeeded(bigtime_t currentTime)
 	fRunAfter = currentTime + fPeriod;
 	// PRINT(("runWhenIdle: runAfter %Ld, current time %Ld, period %Ld\n",
 	//	fRunAfter, currentTime, fPeriod));
-	
+
 	if (fState == kInitialDelay) {
 //		PRINT(("run when idle task - past intial delay\n"));
 		ResetIdleTimer(currentTime);
@@ -175,7 +176,7 @@ ActivityLevel()
 }
 
 
-void 
+void
 RunWhenIdleTask::ResetIdleTimer(bigtime_t currentTime)
 {
 	fActivityLevel = ActivityLevel();
@@ -194,14 +195,14 @@ RunWhenIdleTask::IsIdle(bigtime_t currentTime, float taskOverhead)
 	bigtime_t currentActivityLevel = ActivityLevel();
 	float load = (float)(currentActivityLevel - fActivityLevel)
 		/ (float)(currentTime - fActivityLevelStart);
-	
+
 	fActivityLevel = currentActivityLevel;
 	fActivityLevelStart = currentTime;
 
 	load -= taskOverhead;
-	
+
 	bool idle = true;
-	
+
 	if (load > kIdleTreshold) {
 //		PRINT(("not idle enough %f\n", load));
 		idle = false;
@@ -230,7 +231,7 @@ RunWhenIdleTask::IdleTimerExpired(bigtime_t currentTime)
 }
 
 
-bool 
+bool
 RunWhenIdleTask::StillIdle(bigtime_t currentTime)
 {
 	return IsIdle(currentTime, kIdleTreshold);
@@ -245,11 +246,11 @@ TaskLoop::TaskLoop(bigtime_t heartBeat)
 
 
 TaskLoop::~TaskLoop()
-{	
+{
 }
 
 
-void 
+void
 TaskLoop::RunLater(DelayedTask *task)
 {
 	AddTask(task);
@@ -263,7 +264,7 @@ TaskLoop::RunLater(FunctionObject *functor, bigtime_t delay)
 }
 
 
-void 
+void
 TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor,
 	bigtime_t delay, bigtime_t period)
 {
@@ -271,7 +272,7 @@ TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor,
 }
 
 
-void 
+void
 TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor, bigtime_t delay,
 	bigtime_t period, bigtime_t timeout)
 {
@@ -279,7 +280,7 @@ TaskLoop::RunLater(FunctionObjectWithResult<bool> *functor, bigtime_t delay,
 }
 
 
-void 
+void
 TaskLoop::RunWhenIdle(FunctionObjectWithResult<bool> *functor, bigtime_t initialDelay,
 	bigtime_t idleTime, bigtime_t heartBeat)
 {
@@ -298,20 +299,20 @@ public:
 			maxAccumulatingTime(maxAccumulatingTime),
 			initialTime(system_time())
 		{}
-		
+
 	bool CanAccumulate(const AccumulatingFunctionObject *accumulateThis) const
 		{
 			if (maxAccumulateCount && accumulateCount > maxAccumulateCount)
 				// don't accumulate if too may accumulated already
 				return false;
-			
+
 			if (maxAccumulatingTime && system_time() > initialTime + maxAccumulatingTime)
 				// don't accumulate if too late past initial task
 				return false;
 
 			return static_cast<AccumulatingFunctionObject *>(fFunctor)->CanAccumulate(accumulateThis);
 		}
-		
+
 	virtual void Accumulate(AccumulatingFunctionObject *accumulateThis, bigtime_t delay)
 		{
 			fRunAfter = system_time() + delay;
@@ -341,7 +342,7 @@ TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t del
 			(fTaskList.ItemAt(index));
 		if (!task)
 			continue;
-		
+
 		if (task->CanAccumulate(functor)) {
 			task->Accumulate(functor, delay);
 			return;
@@ -352,7 +353,7 @@ TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject *functor, bigtime_t del
 }
 
 
-bool 
+bool
 TaskLoop::Pulse()
 {
 	ASSERT(fLock.IsLocked());
@@ -376,7 +377,7 @@ TaskLoop::Pulse()
 
 const bigtime_t kInfinity = B_INFINITE_TIMEOUT;
 
-bigtime_t 
+bigtime_t
 TaskLoop::LatestRunTime() const
 {
 	ASSERT(fLock.IsLocked());
@@ -409,7 +410,7 @@ TaskLoop::LatestRunTime() const
 }
 
 
-void 
+void
 TaskLoop::RemoveTask(DelayedTask *task)
 {
 	ASSERT(fLock.IsLocked());
@@ -441,35 +442,35 @@ StandAloneTaskLoop::StandAloneTaskLoop(bool keepThread, bigtime_t heartBeat)
 
 
 StandAloneTaskLoop::~StandAloneTaskLoop()
-{	
+{
 	fLock.Lock();
 	fNeedToQuit = true;
 	bool easyOut = (fScanThread == -1);
 	fLock.Unlock();
-	
+
 	if (!easyOut)
 		for (int32 timeout = 10000; ; timeout--) {
 			// use a 10 sec timeout value in case the spawned
 			// thread is stuck somewhere
-			
+
 			if (!timeout) {
 				PRINT(("StandAloneTaskLoop timed out, quitting abruptly"));
 				break;
 			}
-			
+
 			bool done;
-			
+
 			fLock.Lock();
 			done = (fScanThread == -1);
 			fLock.Unlock();
 			if (done)
 				break;
-			
+
 			snooze(1000);
 		}
 }
 
-void 
+void
 StandAloneTaskLoop::StartPulsingIfNeeded()
 {
 	ASSERT(fLock.IsLocked());
@@ -481,13 +482,13 @@ StandAloneTaskLoop::StartPulsingIfNeeded()
 	}
 }
 
-bool 
+bool
 StandAloneTaskLoop::KeepPulsingWhenEmpty() const
 {
 	return fKeepThread;
 }
 
-status_t 
+status_t
 StandAloneTaskLoop::RunBinder(void *castToThis)
 {
 	StandAloneTaskLoop *self = (StandAloneTaskLoop *)castToThis;
@@ -495,12 +496,12 @@ StandAloneTaskLoop::RunBinder(void *castToThis)
 	return B_OK;
 }
 
-void 
+void
 StandAloneTaskLoop::Run()
 {
 	for(;;) {
 		AutoLock<BLocker> autoLock(&fLock);
-		if (!autoLock) 
+		if (!autoLock)
 			return;
 
 		if (fNeedToQuit) {
@@ -523,17 +524,17 @@ StandAloneTaskLoop::Run()
 		bigtime_t afterHeartBeatTime = now + fHeartBeat;
 		bigtime_t snoozeTill = latestRunTime < afterHeartBeatTime ?
 			latestRunTime : afterHeartBeatTime;
-		
+
 		autoLock.Unlock();
 
-		if (snoozeTill > now) 
+		if (snoozeTill > now)
 			snooze_until(snoozeTill, B_SYSTEM_TIMEBASE);
 		else
 			snooze(1000);
 	}
 }
 
-void 
+void
 StandAloneTaskLoop::AddTask(DelayedTask *delayedTask)
 {
 	_inherited::AddTask(delayedTask);
@@ -544,9 +545,9 @@ StandAloneTaskLoop::AddTask(DelayedTask *delayedTask)
 	thread_info info;
 	get_thread_info(fScanThread, &info);
 	if (info.state == B_THREAD_ASLEEP) {
-		suspend_thread(fScanThread); 
+		suspend_thread(fScanThread);
 		snooze(1000);	// snooze because BeBook sez so
-		resume_thread(fScanThread); 
+		resume_thread(fScanThread);
 	}
 }
 
@@ -562,7 +563,7 @@ PiggybackTaskLoop::~PiggybackTaskLoop()
 {
 }
 
-void 
+void
 PiggybackTaskLoop::PulseMe()
 {
 	if (!fPulseMe)
@@ -577,13 +578,13 @@ PiggybackTaskLoop::PulseMe()
 	}
 }
 
-bool 
+bool
 PiggybackTaskLoop::KeepPulsingWhenEmpty() const
 {
 	return false;
 }
 
-void 
+void
 PiggybackTaskLoop::StartPulsingIfNeeded()
 {
 	fPulseMe = true;

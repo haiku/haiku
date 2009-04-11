@@ -32,11 +32,12 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <Beep.h>
-
 #include "FilePermissionsView.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+
+#include <Beep.h>
 
 
 const uint32 kPermissionsChanged = 'prch';
@@ -181,7 +182,7 @@ FilePermissionsView::ModelChanged(Model *model)
 				fExecuteUserCheckBox->Show();
 				fExecuteGroupCheckBox->Show();
 				fExecuteOtherCheckBox->Show();
-			}		
+			}
 
 			if (node.GetPermissions(&perms) == B_OK) {
 				fReadUserCheckBox->SetValue((int32)(perms & S_IRUSR));
@@ -205,9 +206,9 @@ FilePermissionsView::ModelChanged(Model *model)
 						user << "root";
 				else
 					user << nodeOwner;
-				fOwnerTextControl->SetText(user.String());	
+				fOwnerTextControl->SetText(user.String());
 			} else
-				fOwnerTextControl->SetText("Unknown");	
+				fOwnerTextControl->SetText("Unknown");
 
 			if (node.GetGroup(&nodeGroup) == B_OK) {
 				BString group;
@@ -218,9 +219,9 @@ FilePermissionsView::ModelChanged(Model *model)
 						group << "0";
 				else
 					group << nodeGroup;
-				fGroupTextControl->SetText(group.String());	
+				fGroupTextControl->SetText(group.String());
 			} else
-				fGroupTextControl->SetText("Unknown");	
+				fGroupTextControl->SetText("Unknown");
 
 			// Unless we're root, only allow the owner to transfer the ownership,
 			// i.e. disable text controls if uid:s doesn't match:
@@ -276,11 +277,11 @@ FilePermissionsView::MessageReceived(BMessage *message)
 
 				BNode node(fModel->EntryRef());
 
-				if (node.InitCheck() == B_OK) 
-					node.SetPermissions(newPermissions);	
+				if (node.InitCheck() == B_OK)
+					node.SetPermissions(newPermissions);
 				else {
 					ModelChanged(fModel);
-					beep();	
+					beep();
 				}
 			}
 			break;
@@ -294,11 +295,11 @@ FilePermissionsView::MessageReceived(BMessage *message)
 						node.SetOwner(owner);
 					else {
 						ModelChanged(fModel);
-						beep();	
+						beep();
 					}
 				} else {
 					ModelChanged(fModel);
-					beep();	
+					beep();
 				}
 			}
 			break;
@@ -312,11 +313,11 @@ FilePermissionsView::MessageReceived(BMessage *message)
 						node.SetGroup(group);
 					else {
 						ModelChanged(fModel);
-						beep();	
+						beep();
 					}
 				} else {
 					ModelChanged(fModel);
-					beep();	
+					beep();
 				}
 			}
 			break;

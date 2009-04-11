@@ -34,6 +34,7 @@ All rights reserved.
 
 // MountMenu implements a context menu used for mounting/unmounting volumes
 
+#include <Debug.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <InterfaceDefs.h>

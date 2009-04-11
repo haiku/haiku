@@ -60,7 +60,7 @@ BImageResources::BImageResources(void *memAddr)
 		name += ".rsrc";
 		BFile file(name.String(), B_READ_ONLY);
 #endif
-		if (file.InitCheck() == B_OK) 
+		if (file.InitCheck() == B_OK)
 			fResources.SetTo(&file);
 	}
 }
@@ -105,7 +105,7 @@ BImageResources::FinishResources(BResources *res) const
 
 const void *
 BImageResources::LoadResource(type_code type, int32 id, size_t *out_size) const
-{	
+{
 	// Serialize execution.
 	// Looks like BResources is not really thread safe. We should
 	// clean that up in the future and remove the locking from here.
@@ -196,14 +196,14 @@ BImageResources::GetIconResource(int32 id, const uint8** iconData,
 image_id
 BImageResources::find_image(void *memAddr) const
 {
-	image_info info; 
-	int32 cookie = 0; 
-	while (get_next_image_info(0, &cookie, &info) == B_OK) 
+	image_info info;
+	int32 cookie = 0;
+	while (get_next_image_info(0, &cookie, &info) == B_OK)
 		if ((info.text <= memAddr && (((uint8 *)info.text)+info.text_size) > memAddr)
-			||(info.data <= memAddr && (((uint8 *)info.data)+info.data_size) > memAddr)) 
+			||(info.data <= memAddr && (((uint8 *)info.data)+info.data_size) > memAddr))
 			// Found the image.
 			return info.id;
-	
+
 	return -1;
 }
 
@@ -242,7 +242,7 @@ BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) cons
 
 	return err;
 }
-	
+
 
 static BLocker resLock;
 static BImageResources *resources = NULL;

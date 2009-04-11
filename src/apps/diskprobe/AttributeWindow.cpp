@@ -8,6 +8,9 @@
 #include "ProbeView.h"
 #include "TypeEditors.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <TabView.h>
@@ -62,7 +65,7 @@ EditorTabView::EditorTabView(BRect frame, const char *name, button_width width,
 }
 
 
-void 
+void
 EditorTabView::FrameResized(float width, float height)
 {
 	BRect rect = Bounds();
@@ -84,7 +87,7 @@ EditorTabView::FrameResized(float width, float height)
 }
 
 
-void 
+void
 EditorTabView::Select(int32 tab)
 {
 	if (tab != fRawTab && fRawEditorView != NULL && !fRawEditorView->IsHidden(fRawEditorView))
@@ -131,7 +134,7 @@ EditorTabView::AddRawEditorTab(BView *view)
 }
 
 
-void 
+void
 EditorTabView::SetTypeEditorTab(BView *view)
 {
 	if (fTypeEditorView == view)
@@ -257,7 +260,7 @@ AttributeWindow::~AttributeWindow()
 }
 
 
-void 
+void
 AttributeWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -289,7 +292,7 @@ AttributeWindow::MessageReceived(BMessage *message)
 }
 
 
-bool 
+bool
 AttributeWindow::QuitRequested()
 {
 	if (fTypeEditorView != NULL)
