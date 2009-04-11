@@ -35,6 +35,7 @@
 #include <sem.h>
 #include <sys/resource.h>
 #include <syscalls.h>
+#include <system_profiler.h>
 #include <thread.h>
 #include <tracing.h>
 #include <user_atomic.h>

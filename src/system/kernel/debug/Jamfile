@@ -15,6 +15,7 @@ KernelMergeObject kernel_debug.o :
 	debug_variables.cpp
 	frame_buffer_console.cpp
 	gdb.cpp
+	system_profiler.cpp
 	tracing.cpp
 	user_debugger.cpp
 

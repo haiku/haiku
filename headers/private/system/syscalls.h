@@ -390,6 +390,11 @@ extern status_t		_kern_set_debugger_breakpoint(void *address, uint32 type,
 extern status_t		_kern_clear_debugger_breakpoint(void *address,
 						bool watchpoint);
 
+extern status_t		_kern_system_profiler_start(area_id bufferArea,
+						bigtime_t interval, int32 stackDepth);
+extern status_t		_kern_system_profiler_next_buffer(size_t bytesRead);
+extern status_t		_kern_system_profiler_stop();
+
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 extern int32		_kern_atomic_set(vint32 *value, int32 newValue);
