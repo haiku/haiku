@@ -314,5 +314,5 @@ StaticLibrary libavcodec.a :
 	xsubdec.c
 	zmbv.c
 	:
-	libavcodec_x86.a
+#	libavcodec_x86.a
 ;
