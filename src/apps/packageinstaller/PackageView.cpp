@@ -260,6 +260,7 @@ PackageView::Install()
 	InstalledPackageInfo packageInfo(fInfo.GetName(), fInfo.GetVersion());
 
 	status_t err = packageInfo.InitCheck();
+	err = B_ENTRY_NOT_FOUND;
 	if (err == B_OK) {
 		// The package is already installed, inform the user
 		BAlert *reinstall = new BAlert("reinstall",
@@ -303,7 +304,7 @@ PackageView::Install()
 	fStatusWindow->StageStep(1, "Installing files and directories");
 
 	// Install files and directories
-	PkgItem *iter;
+	PackageItem *iter;
 	BPath installedTo;
 	uint32 i;
 	BString label;
@@ -322,7 +323,7 @@ PackageView::Install()
 	packageInfo.SetSpaceNeeded(type->space_needed);
 
 	for (i = 0; i < n; i++) {
-		iter = static_cast<PkgItem *>(type->items.ItemAt(i));
+		iter = static_cast<PackageItem *>(type->items.ItemAt(i));
 		err = iter->WriteToPath(fCurrentPath.Path(), &installedTo);
 		if (err != B_OK) {
 			fprintf(stderr, "Error while writing path %s\n", fCurrentPath.Path());

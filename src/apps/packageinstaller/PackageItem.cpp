@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -36,13 +36,13 @@ enum {
 
 
 status_t
-inflate_data(uint8 *in, uint32 in_size, uint8 *out, uint32 out_size)
+inflate_data(uint8 *in, uint32 inSize, uint8 *out, uint32 outSize)
 {		
 	z_stream stream;
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
 	stream.opaque = Z_NULL;
-	stream.avail_in = in_size;
+	stream.avail_in = inSize;
 	stream.next_in = in;
 	status_t ret;
 
@@ -52,17 +52,17 @@ inflate_data(uint8 *in, uint32 in_size, uint8 *out, uint32 out_size)
 		return B_ERROR;
 	}
 
-	stream.avail_out = out_size;
+	stream.avail_out = outSize;
 	stream.next_out = out;
 
 	ret = inflate(&stream, Z_NO_FLUSH);
 	if (ret != Z_STREAM_END) {
+		// Uncompressed file size in package info corrupted
 		parser_debug("Left: %d\n", stream.avail_out);
-		return B_ERROR; // Uncompressed file size in package info corrupted
+		return B_ERROR;
 	}
 
-	(void)inflateEnd(&stream);
-
+	inflateEnd(&stream);
 	return B_OK;
 }
 
@@ -130,30 +130,28 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 }
 
 
-// #pragma mark -
+// #pragma mark - PackageItem
 
 
-PkgDirectory::PkgDirectory(BFile *parent, BString path, uint8 type, uint32 ctime, 
-			uint32 mtime, uint64 offset, uint64 size)
-	:	
-	fPath(path),
-	fOffset(offset),
-	fSize(size),
-	fPathType(type),
-	fCreationTime(ctime),
-	fModificationTime(mtime),
-	fPackage(parent)
+PackageItem::PackageItem(BFile *parent, const BString &path, uint8 type,
+	uint32 ctime, uint32 mtime, uint64 offset, uint64 size)
+{
+	SetTo(parent, path, type, ctime, mtime, offset, size);
+}
+
+
+PackageItem::~PackageItem()
 {
 }
 
 
 void
-PkgDirectory::SetTo(BFile *parent, BString path, uint8 type, uint32 ctime, 
-			uint32 mtime, uint64 offset, uint64 size)
+PackageItem::SetTo(BFile *parent, const BString &path, uint8 type, uint32 ctime, 
+	uint32 mtime, uint64 offset, uint64 size)
 {
 	fPackage = parent;
 	fPath = path;
-	
+
 	fOffset = offset;
 	fSize = size;
 	fPathType = type;
@@ -162,55 +160,15 @@ PkgDirectory::SetTo(BFile *parent, BString path, uint8 type, uint32 ctime,
 }
 
 
-PkgDirectory::~PkgDirectory()
-{
-}
-
-
-status_t
-PkgDirectory::WriteToPath(const char *path, BPath *final)
-{
-	BPath destination;
-	status_t ret;
-	parser_debug("Directory: %s WriteToPath() called!\n", fPath.String());
-
-	ret = _InitPath(path, &destination);
-	if (ret != B_OK)
-		return ret;
-
-	// Since Haiku is single-user right now, we give the newly
-	// created directory default permissions
-	ret = create_directory(destination.Path(), kDefaultMode);
-	if (ret != B_OK)
-		return ret;
-	BDirectory dir(destination.Path());
-	parser_debug("Directory created!\n");
-
-	if (fCreationTime)
-		dir.SetCreationTime(static_cast<time_t>(fCreationTime));
-	
-	if (fModificationTime)
-		dir.SetModificationTime(static_cast<time_t>(fModificationTime));
-
-	// Since directories can only have attributes in the offset section,
-	// we can check here whether it is necessary to continue
-	if (fOffset) {
-		ret = _HandleAttributes(&destination, &dir, "FoDa");
-	}
-	
-	if (final) {
-		*final = destination;
-	}
-
-	return ret;
-}
-
-
 int32
-PkgDirectory::_ItemExists(const char *name)
+PackageItem::ItemExists(const char *name)
 {
-	BString alertString = T("The file named");
-	alertString << " \'" << name << "\' ";
+	// TODO: this function doesn't really fit in, the GUI should be separated
+	// from the package engine completely
+
+	BString alertString = "The ";
+
+	alertString << ItemKind() << " named \'" << name << "\' ";
 	alertString << T("already exists in the given path. Should I replace "
 		"the existing file with the one from this package?");
 
@@ -222,13 +180,13 @@ PkgDirectory::_ItemExists(const char *name)
 
 
 status_t
-PkgDirectory::_InitPath(const char *path, BPath *destination)
+PackageItem::InitPath(const char *path, BPath *destination)
 {
 	status_t ret = B_OK;
 
 	if (fPathType == P_INSTALL_PATH) {
 		if (!path) {
-			parser_debug("_InitPath path is NULL\n");
+			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
 		}
 		ret = destination->SetTo(path, fPath.String());
@@ -237,7 +195,7 @@ PkgDirectory::_InitPath(const char *path, BPath *destination)
 		ret = destination->SetTo(fPath.String());
 	else {
 		if (!path) {
-			parser_debug("_InitPath path is NULL\n");
+			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
 		}
 
@@ -260,8 +218,8 @@ PkgDirectory::_InitPath(const char *path, BPath *destination)
 
 
 status_t
-PkgDirectory::_HandleAttributes(BPath *destination, BNode *node, 
-		const char *header)
+PackageItem::HandleAttributes(BPath *destination, BNode *node, 
+	const char *header)
 {
 	status_t ret = B_OK;
 
@@ -297,12 +255,14 @@ PkgDirectory::_HandleAttributes(BPath *destination, BNode *node,
 			if (!memcmp(buffer, "FBeA", 5))
 				continue;
 
-			ret = _ParseAttribute(buffer, node, &attrName, &nameSize, &attrType,
-					&attrData, &dataSize, &temp, &tempSize, &attrCSize, &attrOSize, 
-					&attrStarted, &done);
+			ret = ParseAttribute(buffer, node, &attrName, &nameSize, &attrType,
+				&attrData, &dataSize, &temp, &tempSize, &attrCSize, &attrOSize, 
+				&attrStarted, &done);
 			if (ret != B_OK || done) {
-				if (ret != B_OK)
-					parser_debug("_ParseAttribute failed for %s\n", destination->Path());
+				if (ret != B_OK) {
+					parser_debug("_ParseAttribute failed for %s\n",
+						destination->Path());
+				}
 				break;
 			}
 		}
@@ -315,11 +275,11 @@ PkgDirectory::_HandleAttributes(BPath *destination, BNode *node,
 }
 
 
-inline status_t
-PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName, 
-		uint32 *nameSize, uint32 *attrType, uint8 **attrData, uint64 *dataSize, 
-		uint8 **temp, uint64 *tempSize, uint64 *attrCSize, uint64 *attrOSize, 
-		bool *attrStarted, bool *done)
+status_t
+PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName, 
+	uint32 *nameSize, uint32 *attrType, uint8 **attrData, uint64 *dataSize, 
+	uint8 **temp, uint64 *tempSize, uint64 *attrCSize, uint64 *attrOSize, 
+	bool *attrStarted, bool *done)
 {
 	status_t ret = B_OK;
 	uint32 length;
@@ -332,8 +292,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		*attrOSize = 0;
 
 		*attrStarted = true;
-	}
-	else if (!memcmp(buffer, "BeAN", 5)) {
+	} else if (!memcmp(buffer, "BeAN", 5)) {
 		if (!*attrStarted) {
 			ret = B_ERROR;
 			return ret;
@@ -341,7 +300,8 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 
 		parser_debug(" BeAN.\n");
 		fPackage->Read(&length, 4);
-		swap_data(B_UINT32_TYPE, &length, sizeof(uint32), B_SWAP_BENDIAN_TO_HOST);
+		swap_data(B_UINT32_TYPE, &length, sizeof(uint32),
+			B_SWAP_BENDIAN_TO_HOST);
 
 		if (*nameSize < (length + 1)) {
 			delete *attrName;
@@ -352,8 +312,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		(*attrName)[length] = 0;
 
 		parser_debug(" (%ld) = %s\n", length, *attrName);
-	}
-	else if (!memcmp(buffer, "BeAT", 5)) {
+	} else if (!memcmp(buffer, "BeAT", 5)) {
 		if (!*attrStarted) {
 			ret = B_ERROR;
 			return ret;
@@ -363,8 +322,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		fPackage->Read(attrType, 4);
 		swap_data(B_UINT32_TYPE, attrType, sizeof(*attrType), 
 				B_SWAP_BENDIAN_TO_HOST);
-	}
-	else if (!memcmp(buffer, "BeAD", 5)) {
+	} else if (!memcmp(buffer, "BeAD", 5)) {
 		if (!*attrStarted) {
 			ret = B_ERROR;
 			return ret;
@@ -380,7 +338,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 				B_SWAP_BENDIAN_TO_HOST);
 
 		fPackage->Seek(4, SEEK_CUR); // TODO: Check what this means
-	
+
 		if (*tempSize < *attrCSize) {
 			delete *temp;
 			*tempSize = *attrCSize;
@@ -402,8 +360,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		ret = inflate_data(*temp, *tempSize, *attrData, *dataSize);
 		if (ret != B_OK)
 			return ret;
-	}
-	else if (!memcmp(buffer, padding, 7)) {
+	} else if (!memcmp(buffer, padding, 7)) {
 		if (!*attrStarted) {
 			*done = true;
 			return ret;
@@ -412,7 +369,7 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		parser_debug(" Padding.\n");
 		ssize_t wrote = node->WriteAttr(*attrName, *attrType, 0, *attrData, 
 			*attrOSize);
-		if(wrote != static_cast<ssize_t>(*attrOSize)) {
+		if (wrote != static_cast<ssize_t>(*attrOSize)) {
 			parser_debug("Failed to write attribute %s %s\n", *attrName, strerror(wrote));
 			return B_ERROR;
 		}
@@ -433,9 +390,9 @@ PkgDirectory::_ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 }
 
 
-inline status_t
-PkgDirectory::_ParseData(uint8 *buffer, BFile *file, uint64 originalSize, 
-		bool *done)
+status_t
+PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize, 
+	bool *done)
 {
 	status_t ret = B_OK;
 
@@ -484,11 +441,68 @@ PkgDirectory::_ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 }
 
 
+// #pragma mark - PackageDirectory
 
-PkgFile::PkgFile(BFile *parent, BString path, uint8 type, uint32 ctime, 
-			uint32 mtime, uint64 offset, uint64 size, uint64 originalSize, 
-			uint32 platform, BString mime, BString signature, uint32 mode)
-	:	PkgItem(parent, path, type, ctime, mtime, offset, size),
+
+PackageDirectory::PackageDirectory(BFile *parent, const BString &path,
+		uint8 type, uint32 ctime, uint32 mtime, uint64 offset, uint64 size)
+	: PackageItem(parent, path, type, ctime, mtime, offset, size)
+{
+}
+
+
+status_t
+PackageDirectory::WriteToPath(const char *path, BPath *final)
+{
+	BPath destination;
+	status_t ret;
+	parser_debug("Directory: %s WriteToPath() called!\n", fPath.String());
+
+	ret = InitPath(path, &destination);
+	if (ret != B_OK)
+		return ret;
+
+	// Since Haiku is single-user right now, we give the newly
+	// created directory default permissions
+	ret = create_directory(destination.Path(), kDefaultMode);
+	if (ret != B_OK)
+		return ret;
+	BDirectory dir(destination.Path());
+	parser_debug("Directory created!\n");
+
+	if (fCreationTime)
+		dir.SetCreationTime(static_cast<time_t>(fCreationTime));
+	
+	if (fModificationTime)
+		dir.SetModificationTime(static_cast<time_t>(fModificationTime));
+
+	// Since directories can only have attributes in the offset section,
+	// we can check here whether it is necessary to continue
+	if (fOffset)
+		ret = HandleAttributes(&destination, &dir, "FoDa");
+	
+	if (final)
+		*final = destination;
+
+	return ret;
+}
+
+
+const char*
+PackageDirectory::ItemKind()
+{
+	return "directory";
+}
+
+
+//	#pragma mark - PackageFile
+
+
+PackageFile::PackageFile(BFile *parent, const BString &path, uint8 type,
+		uint32 ctime, uint32 mtime, uint64 offset, uint64 size,
+		uint64 originalSize, uint32 platform, const BString &mime,
+		const BString &signature, uint32 mode)
+	: PackageItem(parent, path, type, ctime, mtime, offset, size),
 	fOriginalSize(originalSize),
 	fPlatform(platform),
 	fMode(mode),
@@ -498,29 +512,26 @@ PkgFile::PkgFile(BFile *parent, BString path, uint8 type, uint32 ctime,
 }
 
 
-PkgFile::~PkgFile()
-{
-}
-
-
 status_t
-PkgFile::WriteToPath(const char *path, BPath *final)
+PackageFile::WriteToPath(const char *path, BPath *final)
 {
 	BPath destination;
 	status_t ret;
 	parser_debug("File: %s WriteToPath() called!\n", fPath.String());
 
-	ret = _InitPath(path, &destination);
+	ret = InitPath(path, &destination);
 	if (ret != B_OK)
 		return ret;
 
-	BFile file(destination.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	BFile file(destination.Path(),
+		B_WRITE_ONLY | B_CREATE_FILE | B_FAIL_IF_EXISTS);
 	ret = file.InitCheck();
 	if (ret == B_FILE_EXISTS) {
-		int32 selection = _ItemExists(destination.Leaf());
+		int32 selection = ItemExists(destination.Leaf());
 		switch (selection) {
 			case 0:
-				ret = file.SetTo(destination.Path(), B_WRITE_ONLY | B_ERASE_FILE);
+				ret = file.SetTo(destination.Path(),
+					B_WRITE_ONLY | B_ERASE_FILE);
 				if (ret != B_OK)
 					return ret;
 				break;
@@ -529,8 +540,7 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 			default:
 				return B_FILE_EXISTS;
 		}
-	}
-	else if (ret == B_ENTRY_NOT_FOUND) {
+	} else if (ret == B_ENTRY_NOT_FOUND) {
 		BPath directory;
 		destination.GetParent(&directory);
 		if (create_directory(directory.Path(), kDefaultMode) != B_OK)
@@ -598,8 +608,7 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 				parser_debug("-> Attribute\n");
 				section = P_ATTRIBUTE;
 				continue;
-			}
-			else if (!memcmp(buffer, "FiDa", 5)) {
+			} else if (!memcmp(buffer, "FiDa", 5)) {
 				parser_debug("-> File data\n");
 				section = P_DATA;
 				continue;
@@ -607,17 +616,15 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 
 			switch (section) {
 				case P_ATTRIBUTE:
-				{
-					ret = _ParseAttribute(buffer, &file, &attrName, &nameSize, &attrType,
-						&attrData, &dataSize, &temp, &tempSize, &attrCSize, &attrOSize, 
-						&attrStarted, &done);
+					ret = ParseAttribute(buffer, &file, &attrName, &nameSize,
+						&attrType, &attrData, &dataSize, &temp, &tempSize,
+						&attrCSize, &attrOSize, &attrStarted, &done);
 					break;
-				}
+
 				case P_DATA:
-				{
-					ret = _ParseData(buffer, &file, fOriginalSize, &done);
+					ret = ParseData(buffer, &file, fOriginalSize, &done);
 					break;
-				}
+
 				default:
 					return B_ERROR;
 			}
@@ -630,41 +637,47 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 		delete[] temp;
 	}
 
-	if (final) {
+	if (final)
 		*final = destination;
-	}
 
 	return ret;
 }
 
 
-PkgLink::PkgLink(BFile *parent, BString path, BString link, uint8 type, 
-		uint32 ctime, uint32 mtime, uint32 mode, uint64 offset, uint64 size)
-	:	PkgItem(parent, path, type, ctime, mtime, offset, size),
+const char*
+PackageFile::ItemKind()
+{
+	return "file";
+}
+
+
+//	#pragma mark -
+
+
+PackageLink::PackageLink(BFile *parent, const BString &path,
+		const BString &link, uint8 type, uint32 ctime, uint32 mtime,
+		uint32 mode, uint64 offset, uint64 size)
+	: PackageItem(parent, path, type, ctime, mtime, offset, size),
 	fMode(mode),
 	fLink(link)
 {
 }
 
 
-PkgLink::~PkgLink()
-{
-}
-
-
 status_t
-PkgLink::WriteToPath(const char *path, BPath *final)
+PackageLink::WriteToPath(const char *path, BPath *final)
 {
-	BPath destination;
-	status_t ret;
 	parser_debug("Symlink: %s WriteToPath() called!\n", fPath.String());
 
-	ret = _InitPath(path, &destination);
+	BPath destination;
+	status_t ret = InitPath(path, &destination);
 	if (ret != B_OK)
 		return ret;
 
 	BString linkName(destination.Leaf());
-	parser_debug("%s:%s:%s\n", fPath.String(), destination.Path(), linkName.String());
+	parser_debug("%s:%s:%s\n", fPath.String(), destination.Path(),
+		linkName.String());
+
 	BPath dirPath;
 	ret = destination.GetParent(&dirPath);
 	BDirectory dir(dirPath.Path());
@@ -683,6 +696,42 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 
 	BSymLink symlink;
 	ret = dir.CreateSymLink(destination.Path(), fLink.String(), &symlink);
+	if (ret == B_FILE_EXISTS) {
+		// We need to check if the existing symlink is pointing at the same path
+		// as our new one - if not, let's prompt the user
+		symlink.SetTo(destination.Path());
+		BPath oldLink;
+
+		ret = symlink.MakeLinkedPath(&dir, &oldLink);
+		chdir(dirPath.Path());
+
+		if (ret == B_BAD_VALUE || oldLink != fLink.String()) {
+			// The old symlink is different (or not a symlink) - ask the user
+			int32 selection = ItemExists(destination.Leaf());
+			switch (selection) {
+				case 0:
+				{
+					symlink.Unset();
+					BEntry entry;
+					ret = entry.SetTo(destination.Path());
+					if (ret != B_OK)
+						return ret;
+
+					entry.Remove();
+					ret = dir.CreateSymLink(destination.Path(), fLink.String(),
+						&symlink);
+					break;
+				}
+				case 1:
+					parser_debug("Skipping already existent SymLink\n");
+					return B_OK;
+				default:
+					ret = B_FILE_EXISTS;
+			}
+		} else {
+			ret = B_OK;
+		}
+	}
 	if (ret != B_OK) {
 		parser_debug("CreateSymLink failed\n");
 		return ret;
@@ -695,8 +744,10 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 	if (fCreationTime && ret == B_OK)
 		ret = symlink.SetCreationTime(static_cast<time_t>(fCreationTime));
 	
-	if (fModificationTime && ret == B_OK)
-		ret = symlink.SetModificationTime(static_cast<time_t>(fModificationTime));
+	if (fModificationTime && ret == B_OK) {
+		ret = symlink.SetModificationTime(static_cast<time_t>(
+			fModificationTime));
+	}
 
 	if (ret != B_OK) {
 		parser_debug("Failed to set symlink attributes\n");
@@ -705,7 +756,7 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 
 	if (fOffset) {
 		// Symlinks also seem to have attributes - so parse them
-		ret = _HandleAttributes(&destination, &symlink, "LnDa");
+		ret = HandleAttributes(&destination, &symlink, "LnDa");
 	}
 
 	if (final) {
@@ -715,3 +766,9 @@ PkgLink::WriteToPath(const char *path, BPath *final)
 	return ret;
 }
 
+
+const char*
+PackageLink::ItemKind()
+{
+	return "symbolic link";
+}

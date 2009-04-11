@@ -5,30 +5,25 @@
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
-#ifndef PACKAGEITEM_H
-#define PACKAGEITEM_H
+#ifndef PACKAGE_ITEM_H
+#define PACKAGE_ITEM_H
 
-#include <String.h>
+
+#include <stdio.h>
+
 #include <Entry.h>
 #include <File.h>
 #include <Path.h>
-#include <stdio.h>
+#include <String.h>
 
-//#define DEBUG_PARSER
 
 // Local macro for the parser debug output
+//#define DEBUG_PARSER
 #ifdef DEBUG_PARSER
-	#define parser_debug(format, args...) fprintf(stderr, format, ##args)
+#	define parser_debug(format, args...) fprintf(stderr, format, ##args)
 #else
-	#define parser_debug(format, args...)
+#	define parser_debug(format, args...)
 #endif
-
-
-class PkgDirectory;
-
-// Since files are derive from directories, which is not too obvious,
-// we define a type PkgItem to use for base type iterations
-typedef PkgDirectory PkgItem;
 
 
 enum {
@@ -37,78 +32,105 @@ enum {
 	P_USER_PATH
 };
 
+extern status_t inflate_data(uint8* in, uint32 inSize, uint8* out,
+	uint32 outSize);
 
-status_t inflate_data(uint8 *in, uint32 in_size, uint8 *out, uint32 out_size);
 
+class PackageItem {
+public:
+							PackageItem(BFile* parent, const BString& path,
+								uint8 type, uint32 ctime, uint32 mtime,
+								uint64 offset = 0, uint64 size = 0);
+	virtual					~PackageItem();
 
-class PkgDirectory {
-	public:
-		PkgDirectory(BFile *parent, BString path, uint8 type, uint32 ctime, 
-				uint32 mtime, uint64 offset = 0, uint64 size = 0);
-		virtual ~PkgDirectory();
+	virtual	status_t		WriteToPath(const char* path = NULL,
+								BPath* final = NULL) = 0;
+	virtual	void			SetTo(BFile* parent, const BString& path,
+								uint8 type, uint32 ctime, uint32 mtime,
+								uint64 offset = 0, uint64 size = 0);
 
-		virtual status_t WriteToPath(const char *path = NULL, BPath *final = NULL);
-		virtual void SetTo(BFile *parent, BString path, uint8 type, 
-				uint32 ctime, uint32 mtime, uint64 offset = 0, uint64 size = 0);
+protected:
+	virtual	const char*		ItemKind() = 0;
+			int32			ItemExists(const char* name);
+			status_t		InitPath(const char* path, BPath* destination);
+			status_t		HandleAttributes(BPath* destination, BNode* node, 
+								const char* header);
 
-	protected:
-		int32 _ItemExists(const char *name);
-		status_t _InitPath(const char *path, BPath *destination);
-		status_t _HandleAttributes(BPath *destination, BNode *node, 
-				const char *header);
+			status_t		ParseAttribute(uint8* buffer, BNode* node,
+								char** attrName, uint32* nameSize,
+								uint32* attrType, uint8** attrData,
+								uint64* dataSize, uint8** temp,
+								uint64* tempSize, uint64* attrCSize,
+								uint64* attrOSize, bool* attrStarted,
+								bool* done);
+			status_t		ParseData(uint8* buffer, BFile* file,
+								uint64 originalSize, bool* done);
 
-		inline status_t _ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
-				uint32 *nameSize, uint32 *attrType, uint8 **attrData, uint64 *dataSize, 
-				uint8 **temp, uint64 *tempSize, uint64 *attrCSize, uint64 *attrOSize, 
-				bool *attrStarted, bool *done);
-		inline status_t _ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
-				bool *done);
+			BString			fPath;
+			uint64			fOffset;
+			uint64			fSize;
+			uint8			fPathType;
+			uint32			fCreationTime;
+			uint32			fModificationTime;
 
-		BString fPath;
-		uint64 fOffset;
-		uint64 fSize;
-		uint8	 fPathType;
-		uint32 fCreationTime;
-		uint32 fModificationTime;
-
-		BFile *fPackage;
+			BFile*			fPackage;
 };
 
 
-class PkgFile : public PkgItem {
-	public:
-		PkgFile(BFile *parent, BString path, uint8 type, uint32 ctime, 
-				uint32 mtime, uint64 offset, uint64 size, uint64 originalSize, 
-				uint32 platform, BString mime, BString signature, uint32 mode);
-		~PkgFile();
+class PackageDirectory : public PackageItem {
+public:
+							PackageDirectory(BFile* parent, const BString& path,
+								uint8 type, uint32 ctime, uint32 mtime,
+								uint64 offset = 0, uint64 size = 0);
 
-		status_t WriteToPath(const char *path = NULL, BPath *final = NULL);
+	virtual	status_t		WriteToPath(const char* path = NULL,
+								BPath* final = NULL);
 
-	private:
-		uint64 fOriginalSize;
-		uint32 fPlatform;
-		uint32 fMode;
+protected:
+	virtual	const char*		ItemKind();
+};
+
+
+class PackageFile : public PackageItem {
+public:
+							PackageFile(BFile* parent, const BString& path,
+								uint8 type, uint32 ctime, uint32 mtime,
+								uint64 offset, uint64 size, uint64 originalSize,
+								uint32 platform, const BString& mime,
+								const BString& signature, uint32 mode);
+
+	virtual	status_t		WriteToPath(const char* path = NULL,
+								BPath* final = NULL);
+
+protected:
+	virtual	const char*		ItemKind();
+
+private:
+			uint64			fOriginalSize;
+			uint32			fPlatform;
+			uint32			fMode;
 		
-		BString fMimeType;
-		BString fSignature;
+			BString			fMimeType;
+			BString			fSignature;
 };
 
 
-class PkgLink : public PkgItem {
-	public:
-		PkgLink(BFile *parent, BString path, BString link, uint8 type, 
-				uint32 ctime, uint32 mtime, uint32 mode, uint64 offset = 0, 
-				uint64 size = 0);
-		~PkgLink();
+class PackageLink : public PackageItem {
+public:
+							PackageLink(BFile* parent, const BString& path,
+								const BString& link, uint8 type,  uint32 ctime,
+								uint32 mtime, uint32 mode, uint64 offset = 0, 
+								uint64 size = 0);
 
-		status_t WriteToPath(const char *path = NULL, BPath *final = NULL);
+	virtual	status_t		WriteToPath(const char* path = NULL,
+								BPath* final = NULL);
 
-	private:
-		uint32 fMode;
+protected:
+	virtual	const char*		ItemKind();
 
-		BString fLink;
+private:
+			uint32			fMode;
+			BString			fLink;
 };
 
-
-#endif
-
+#endif	// PACKAGE_ITEM_H

@@ -38,8 +38,8 @@ class PackageInfo {
 		status_t InitCheck() { return fStatus; }
 
 	private:
-		void _AddItem(PkgItem *item, uint64 size, uint32 groups, uint32 path, 
-				uint32 cust);
+		void _AddItem(PackageItem *item, uint64 size, uint32 groups,
+			uint32 path, uint32 cust);
 
 		status_t fStatus;
 
