@@ -66,6 +66,7 @@ public:
 	inline status_t AddInt16(const char *name, int16 value);
 	inline status_t AddInt32(const char *name, int32 value);
 	inline status_t AddInt64(const char *name, int64 value);
+	inline status_t AddPointer(const char *name, const void* value);
 	inline status_t AddString(const char *name, const char *value);
 
 	status_t FindData(const char *name, type_code type,
@@ -82,6 +83,9 @@ public:
 	inline status_t FindInt32(const char *name, int32 index, int32 *value) const;
 	inline status_t FindInt64(const char *name, int64 *value) const;
 	inline status_t FindInt64(const char *name, int32 index, int64 *value) const;
+	inline status_t FindPointer(const char *name, void** value) const;
+	inline status_t FindPointer(const char *name, int32 index,
+		void** value) const;
 	inline status_t FindString(const char *name, const char **value) const;
 	inline status_t FindString(const char *name, int32 index,
 		const char **value) const;
@@ -99,6 +103,9 @@ public:
 	inline int64 GetInt64(const char* name, int64 defaultValue) const;
 	inline int64 GetInt64(const char* name, int32 index,
 		int64 defaultValue) const;
+	inline void* GetPointer(const char* name, const void* defaultValue) const;
+	inline void* GetPointer(const char* name, int32 index,
+		const void* defaultValue) const;
 	inline const char* GetString(const char* name,
 		const char* defaultValue) const;
 	inline const char* GetString(const char* name, int32 index,
@@ -112,6 +119,7 @@ public:
 	inline status_t SetInt16(const char* name, int16 value);
 	inline status_t SetInt32(const char* name, int32 value);
 	inline status_t SetInt64(const char* name, int64 value);
+	inline status_t SetPointer(const char* name, const void* value);
 
 	// message delivery
 	team_id Sender() const;
@@ -261,12 +269,20 @@ KMessage::AddInt32(const char *name, int32 value)
 }
 
 // AddInt64
-inline
-status_t
+inline status_t
 KMessage::AddInt64(const char *name, int64 value)
 {
 	return AddData(name, B_INT64_TYPE, &value, sizeof(int64), true);
 }
+
+
+// AddPointer
+inline status_t
+KMessage::AddPointer(const char *name, const void* value)
+{
+	return AddData(name, B_POINTER_TYPE, &value, sizeof(value), true);
+}
+
 
 // AddString
 inline
@@ -382,6 +398,23 @@ KMessage::FindInt64(const char *name, int32 index, int64 *value) const
 	return _FindType(name, B_INT64_TYPE, index, value);
 }
 
+
+// FindPointer
+inline status_t
+KMessage::FindPointer(const char *name, void** value) const
+{
+	return FindPointer(name, 0, value);
+}
+
+
+// FindPointer
+inline status_t
+KMessage::FindPointer(const char *name, int32 index, void** value) const
+{
+	return _FindType(name, B_POINTER_TYPE, index, value);
+}
+
+
 // FindString
 inline
 status_t
@@ -492,6 +525,24 @@ KMessage::GetInt64(const char* name, int32 index, int64 defaultValue) const
 }
 
 
+// GetPointer
+inline void*
+KMessage::GetPointer(const char* name, const void* defaultValue) const
+{
+	return const_cast<void*>(_GetType(name, B_POINTER_TYPE, 0, defaultValue));
+}
+
+
+// GetPointer
+inline void*
+KMessage::GetPointer(const char* name, int32 index,
+	const void* defaultValue) const
+{
+	return const_cast<void*>(_GetType(name, B_POINTER_TYPE, index,
+		defaultValue));
+}
+
+
 // GetString
 inline const char*
 KMessage::GetString(const char* name, int32 index,
@@ -553,6 +604,14 @@ inline status_t
 KMessage::SetInt64(const char* name, int64 value)
 {
 	return SetData(name, B_INT64_TYPE, &value, sizeof(int64));
+}
+
+
+// SetPointer
+inline status_t
+KMessage::SetPointer(const char* name, const void* value)
+{
+	return SetData(name, B_POINTER_TYPE, &value, sizeof(value));
 }
 
 
