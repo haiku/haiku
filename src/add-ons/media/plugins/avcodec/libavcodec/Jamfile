@@ -39,7 +39,6 @@ local libavcodecSourcesX86 =
 	vp3dsp_sse2.c
 	vp6dsp_mmx.c
 	vp6dsp_sse2.c
-	fft_sse.c
 	fdct_mmx.c
 ;
 
@@ -313,6 +312,4 @@ StaticLibrary libavcodec.a :
 	xl.c
 	xsubdec.c
 	zmbv.c
-	:
-#	libavcodec_x86.a
 ;
