@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef OPTIONS_H
@@ -17,6 +17,7 @@ struct Options {
 		stack_depth(5),
 		output(NULL),
 		callgrind_directory(NULL),
+		profile_all(false),
 		profile_kernel(true),
 		profile_loading(false),
 		profile_teams(true),
@@ -29,6 +30,7 @@ struct Options {
 	int32		stack_depth;
 	FILE*		output;
 	const char*	callgrind_directory;
+	bool		profile_all;
 	bool		profile_kernel;
 	bool		profile_loading;
 	bool		profile_teams;

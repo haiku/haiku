@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -96,13 +96,6 @@ Thread::SetInterval(bigtime_t interval)
 }
 
 
-status_t
-Thread::AddImage(Image* image)
-{
-	return fProfileResult->AddImage(image);
-}
-
-
 void
 Thread::AddSamples(int32 count, int32 dropped, int32 stackDepth,
 	bool variableStackDepth, int32 event)
@@ -143,6 +136,13 @@ Thread::AddSamples(int32 count, int32 dropped, int32 stackDepth,
 	}
 
 	fProfileResult->AddDroppedTicks(dropped);
+}
+
+
+void
+Thread::AddSamples(addr_t* samples, int32 sampleCount)
+{
+	fProfileResult->AddSamples(samples, sampleCount);
 }
 
 

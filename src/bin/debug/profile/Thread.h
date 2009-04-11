@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef THREAD_H
@@ -53,11 +53,13 @@ public:
 			void				SetSampleArea(area_id area, addr_t* samples);
 			void				SetInterval(bigtime_t interval);
 
-			status_t			AddImage(Image* image);
+	inline	status_t			AddImage(Image* image);
+	inline	void				RemoveImage(Image* image);
 
 			void				AddSamples(int32 count, int32 dropped,
 									int32 stackDepth, bool variableStackDepth,
 									int32 event);
+			void				AddSamples(addr_t* samples, int32 sampleCount);
 			void				PrintResults() const;
 
 private:
@@ -81,7 +83,10 @@ public:
 
 			void				SetInterval(bigtime_t interval);
 
+	virtual	void				SetLazyImages(bool lazy) = 0;
+
 	virtual	status_t			AddImage(Image* image) = 0;
+	virtual	void				RemoveImage(Image* image) = 0;
 	virtual	void				SynchronizeImages(int32 event) = 0;
 
 	virtual	void				AddSamples(addr_t* samples,
@@ -101,7 +106,10 @@ public:
 								AbstractThreadProfileResult();
 	virtual						~AbstractThreadProfileResult();
 
+	virtual	void				SetLazyImages(bool lazy);
+
 	virtual	status_t			AddImage(Image* image);
+	virtual	void				RemoveImage(Image* image);
 	virtual	void				SynchronizeImages(int32 event);
 
 			ThreadImageType*	FindImage(addr_t address) const;
@@ -120,6 +128,7 @@ protected:
 			ImageList			fImages;
 			ImageList			fNewImages;
 			ImageList			fOldImages;
+			bool				fLazyImages;
 };
 
 
@@ -192,6 +201,20 @@ Thread::ProfileResult() const
 }
 
 
+status_t
+Thread::AddImage(Image* image)
+{
+	return fProfileResult->AddImage(image);
+}
+
+
+void
+Thread::RemoveImage(Image* image)
+{
+	fProfileResult->RemoveImage(image);
+}
+
+
 // #pragma mark - AbstractThreadProfileResult
 
 
@@ -200,7 +223,8 @@ AbstractThreadProfileResult<ThreadImageType>::AbstractThreadProfileResult()
 	:
 	fImages(),
 	fNewImages(),
-	fOldImages()
+	fOldImages(),
+	fLazyImages(true)
 {
 }
 
@@ -212,6 +236,14 @@ AbstractThreadProfileResult<ThreadImageType>::~AbstractThreadProfileResult()
 		delete image;
 	while (ThreadImageType* image = fOldImages.RemoveHead())
 		delete image;
+}
+
+
+template<typename ThreadImageType>
+void
+AbstractThreadProfileResult<ThreadImageType>::SetLazyImages(bool lazy)
+{
+	fLazyImages = lazy;
 }
 
 
@@ -229,9 +261,30 @@ AbstractThreadProfileResult<ThreadImageType>::AddImage(Image* image)
 		return error;
 	}
 
-	fNewImages.Add(threadImage);
+	if (fLazyImages)
+		fNewImages.Add(threadImage);
+	else
+		fImages.Add(threadImage);
 
 	return B_OK;
+}
+
+
+template<typename ThreadImageType>
+void
+AbstractThreadProfileResult<ThreadImageType>::RemoveImage(Image* image)
+{
+	typename ImageList::Iterator it = fImages.GetIterator();
+	while (ThreadImageType* threadImage = it.Next()) {
+		if (threadImage->GetImage() == image) {
+			it.Remove();
+			if (threadImage->TotalHits() > 0)
+				fOldImages.Add(threadImage);
+			else
+				delete threadImage;
+			break;
+		}
+	}
 }
 
 

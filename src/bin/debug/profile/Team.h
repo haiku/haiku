@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_H
@@ -12,12 +12,16 @@
 #include "Thread.h"
 
 
+struct system_profiler_team_added;
+
+
 class Team {
 public:
 								Team();
 								~Team();
 
 			status_t			Init(team_id teamID, port_id debuggerPort);
+			status_t			Init(system_profiler_team_added* addedInfo);
 			status_t			InitThread(Thread* thread);
 
 			void				RemoveThread(Thread* thread);
@@ -25,9 +29,8 @@ public:
 			void				Exec(int32 event);
 
 			status_t			AddImage(const image_info& imageInfo,
-									int32 event);
-			status_t			RemoveImage(const image_info& imageInfo,
-									int32 event);
+									team_id owner, int32 event);
+			status_t			RemoveImage(image_id imageID, int32 event);
 
 	inline	const BObjectList<Image>&	Images() const;
 			Image*				FindImage(image_id id) const;
@@ -43,6 +46,9 @@ private:
 									const image_info& imageInfo, team_id owner,
 									int32 event, Image** _image = NULL);
 			void				_RemoveImage(int32 index, int32 event);
+
+			bool				_SynchronousProfiling() const
+									{ return fDebugContext.nub_port < 0; }
 
 private:
 	typedef DoublyLinkedList<Thread> ThreadList;

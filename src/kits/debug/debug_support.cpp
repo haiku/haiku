@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,8 +18,7 @@ using std::nothrow;
 
 
 struct debug_symbol_lookup_context {
-	debug_context	context;
-	SymbolLookup	*lookup;
+	SymbolLookup*	lookup;
 };
 
 struct debug_symbol_iterator : BPrivate::SymbolIterator {
@@ -266,20 +265,19 @@ debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 
 // debug_create_symbol_lookup_context
 status_t
-debug_create_symbol_lookup_context(debug_context *debugContext,
+debug_create_symbol_lookup_context(team_id team,
 	debug_symbol_lookup_context **_lookupContext)
 {
-	if (!debugContext || !_lookupContext)
+	if (team < 0 || !_lookupContext)
 		return B_BAD_VALUE;
 
 	// create the lookup context
 	debug_symbol_lookup_context *lookupContext
 		= new(nothrow) debug_symbol_lookup_context;
-	lookupContext->context = *debugContext;
 	ObjectDeleter<debug_symbol_lookup_context> contextDeleter(lookupContext);
 
 	// create and init symbol lookup
-	SymbolLookup *lookup = new(nothrow) SymbolLookup(debugContext->team);
+	SymbolLookup *lookup = new(nothrow) SymbolLookup(team);
 	if (!lookup)
 		return B_NO_MEMORY;
 

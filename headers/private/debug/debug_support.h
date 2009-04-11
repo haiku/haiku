@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DEBUG_SUPPORT_H
@@ -57,7 +57,7 @@ status_t debug_get_stack_frame(debug_context *context,
 typedef struct debug_symbol_lookup_context debug_symbol_lookup_context;
 typedef struct debug_symbol_iterator debug_symbol_iterator;
 
-status_t debug_create_symbol_lookup_context(debug_context *debugContext,
+status_t debug_create_symbol_lookup_context(team_id team,
 			debug_symbol_lookup_context **lookupContext);
 void debug_delete_symbol_lookup_context(
 			debug_symbol_lookup_context *lookupContext);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,10 +10,19 @@
 #include <image.h>
 
 #include <debug_support.h>
+#include <system_profiler_defs.h>
 
 #include "debug_utils.h"
 
 #include "Options.h"
+
+
+//#define TRACE_PROFILE_TEAM
+#ifdef TRACE_PROFILE_TEAM
+#	define TRACE(x...) printf(x)
+#else
+#	define TRACE(x...) do {} while(false)
+#endif
 
 
 enum {
@@ -71,8 +80,7 @@ Team::Init(team_id teamID, port_id debuggerPort)
 
 	// create symbol lookup context
 	debug_symbol_lookup_context* lookupContext;
-	error = debug_create_symbol_lookup_context(&fDebugContext,
-		&lookupContext);
+	error = debug_create_symbol_lookup_context(ID(), &lookupContext);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to create symbol lookup context for "
 			"team %ld: %s\n", kCommandName, teamID, strerror(error));
@@ -87,14 +95,8 @@ Team::Init(team_id teamID, port_id debuggerPort)
 
 	// also try to load the kernel images and symbols
 	if (gOptions.profile_kernel) {
-		// fake a debug context -- it's not really needed anyway
-		debug_context debugContext;
-		debugContext.team = B_SYSTEM_TEAM;
-		debugContext.nub_port = -1;
-		debugContext.reply_port = -1;
-
 		// create symbol lookup context
-		error = debug_create_symbol_lookup_context(&debugContext,
+		error = debug_create_symbol_lookup_context(B_SYSTEM_TEAM,
 			&lookupContext);
 		if (error != B_OK) {
 			fprintf(stderr, "%s: Failed to create symbol lookup context "
@@ -117,8 +119,19 @@ Team::Init(team_id teamID, port_id debuggerPort)
 
 
 status_t
+Team::Init(system_profiler_team_added* addedInfo)
+{
+	fInfo.team = addedInfo->team;
+	return B_OK;
+}
+
+
+status_t
 Team::InitThread(Thread* thread)
 {
+	// The thread
+	thread->ProfileResult()->SetLazyImages(!_SynchronousProfiling());
+
 	// create the sample area
 	char areaName[B_OS_NAME_LENGTH];
 	snprintf(areaName, sizeof(areaName), "profiling samples %ld",
@@ -142,40 +155,46 @@ Team::InitThread(Thread* thread)
 			return error;
 	}
 
-	// set thread debugging flags and start profiling
-	int32 threadDebugFlags = 0;
-//	if (!traceTeam) {
-//		threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
-//			| (traceChildThreads
-//				? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
-//	}
-	set_thread_debugging_flags(fNubPort, thread->ID(), threadDebugFlags);
+	if (!_SynchronousProfiling()) {
+		// set thread debugging flags and start profiling
+		int32 threadDebugFlags = 0;
+//		if (!traceTeam) {
+//			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
+//				| (traceChildThreads
+//					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
+//		}
+		set_thread_debugging_flags(fNubPort, thread->ID(), threadDebugFlags);
 
-	// start profiling
-	debug_nub_start_profiler message;
-	message.reply_port = fDebugContext.reply_port;
-	message.thread = thread->ID();
-	message.interval = gOptions.interval;
-	message.sample_area = sampleArea;
-	message.stack_depth = gOptions.stack_depth;
-	message.variable_stack_depth = gOptions.analyze_full_stack;
+		// start profiling
+		debug_nub_start_profiler message;
+		message.reply_port = fDebugContext.reply_port;
+		message.thread = thread->ID();
+		message.interval = gOptions.interval;
+		message.sample_area = sampleArea;
+		message.stack_depth = gOptions.stack_depth;
+		message.variable_stack_depth = gOptions.analyze_full_stack;
 
-	debug_nub_start_profiler_reply reply;
-	status_t error = send_debug_message(&fDebugContext,
-		B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
-		sizeof(reply));
-	if (error != B_OK || (error = reply.error) != B_OK) {
-		fprintf(stderr, "%s: Failed to start profiler for thread %ld: %s\n",
-			kCommandName, thread->ID(), strerror(error));
-		return error;
+		debug_nub_start_profiler_reply reply;
+		status_t error = send_debug_message(&fDebugContext,
+			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
+			sizeof(reply));
+		if (error != B_OK || (error = reply.error) != B_OK) {
+			fprintf(stderr, "%s: Failed to start profiler for thread %ld: %s\n",
+				kCommandName, thread->ID(), strerror(error));
+			return error;
+		}
+
+		thread->SetInterval(reply.interval);
+
+		fThreads.Add(thread);
+
+		// resume the target thread to be sure, it's running
+		resume_thread(thread->ID());
+	} else {
+		// debugger-less profiling
+		thread->SetInterval(gOptions.interval);
+		fThreads.Add(thread);
 	}
-
-	thread->SetInterval(reply.interval);
-
-	fThreads.Add(thread);
-
-	// resume the target thread to be sure, it's running
-	resume_thread(thread->ID());
 
 	return B_OK;
 }
@@ -211,20 +230,19 @@ Team::Exec(int32 event)
 
 
 status_t
-Team::AddImage(const image_info& imageInfo, int32 event)
+Team::AddImage(const image_info& imageInfo, team_id owner, int32 event)
 {
 	// create symbol lookup context
 	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(&fDebugContext,
-		&lookupContext);
+	status_t error = debug_create_symbol_lookup_context(owner, &lookupContext);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to create symbol lookup context for "
-			"team %ld: %s\n", kCommandName, ID(), strerror(error));
+			"team %ld: %s\n", kCommandName, owner, strerror(error));
 		return error;
 	}
 
 	Image* image;
-	error = _LoadImageSymbols(lookupContext, imageInfo, ID(), event,
+	error = _LoadImageSymbols(lookupContext, imageInfo, owner, event,
 		&image);
 	debug_delete_symbol_lookup_context(lookupContext);
 
@@ -242,10 +260,10 @@ Team::AddImage(const image_info& imageInfo, int32 event)
 
 
 status_t
-Team::RemoveImage(const image_info& imageInfo, int32 event)
+Team::RemoveImage(image_id imageID, int32 event)
 {
 	for (int32 i = 0; Image* image = fImages.ItemAt(i); i++) {
-		if (image->ID() == imageInfo.id) {
+		if (image->ID() == imageID) {
 			_RemoveImage(i, event);
 			return B_OK;
 		}
@@ -295,9 +313,13 @@ Team::_LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
 
 	status_t error = image->LoadSymbols(lookupContext);
 	if (error != B_OK) {
+		TRACE("Failed to load symbols of image %ld: %s\n", image->ID(),
+			strerror(error));
 		delete image;
 		return error;
 	}
+
+	TRACE("image %ld: loaded %ld symbols\n", image->ID(), image->SymbolCount());
 
 	if (!fImages.AddItem(image)) {
 		delete image;
@@ -318,10 +340,16 @@ Team::_RemoveImage(int32 index, int32 event)
 	if (image == NULL)
 		return;
 
-	// Note: We don't tell the threads that the image has been removed. They
-	// will be updated lazily when their next profiler update arrives. This
-	// is necessary, since the update might contain samples hitting that
-	// image.
+	if (_SynchronousProfiling()) {
+		ThreadList::Iterator it = fThreads.GetIterator();
+		while (Thread* thread = it.Next())
+			thread->ProfileResult()->RemoveImage(image);
+	} else {
+		// Note: We don't tell the threads that the image has been removed. They
+		// will be updated lazily when their next profiler update arrives. This
+		// is necessary, since the update might contain samples hitting that
+		// image.
+	}
 
 	image->SetDeletionEvent(event);
 	image->RemoveReference();
