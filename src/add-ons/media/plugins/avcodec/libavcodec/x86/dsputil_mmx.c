@@ -1639,6 +1639,7 @@ QPEL_2TAP(avg_,  8, 3dnow)
 static void just_return(void) { return; }
 #endif
 
+#ifndef __HAIKU__
 static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
                     int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height){
     const int w = 8;
@@ -1756,6 +1757,12 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int o
         src += 4-h*stride;
     }
 }
+
+#else
+static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
+                    int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height){
+}
+#endif
 
 #define PREFETCH(name, op) \
 static void name(void *mem, int stride, int h){\
@@ -2662,7 +2669,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         SET_HPEL_FUNCS(avg, 1, 8, mmx);
         SET_HPEL_FUNCS(avg_no_rnd, 1, 8, mmx);
 
-        c->gmc= gmc_mmx;
+        c->gmc= ff_gmc_c;
 
         c->add_bytes= add_bytes_mmx;
         c->add_bytes_l2= add_bytes_l2_mmx;
