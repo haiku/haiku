@@ -195,13 +195,6 @@ public:
 	virtual ~DiskNotifications()
 	{
 	}
-
-protected:
-	status_t _ToFlags(const KMessage& eventSpecifier, uint32& flags)
-	{
-		flags = eventSpecifier.GetInt32("flags", 0);
-		return B_OK;
-	}
 };
 
 

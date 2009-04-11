@@ -24,8 +24,8 @@ enum {
 
 // port notifications
 #define PORT_MONITOR	'_Pm_'
-#define PORT_ADDED		1
-#define PORT_REMOVED	2
+#define PORT_ADDED		0x01
+#define PORT_REMOVED	0x02
 
 #ifdef __cplusplus
 extern "C" {

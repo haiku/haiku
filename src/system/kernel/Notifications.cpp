@@ -13,6 +13,9 @@
 #include <team.h>
 
 
+static const char* kEventMaskString = "event mask";
+
+
 NotificationManager NotificationManager::sManager;
 
 
@@ -158,22 +161,28 @@ DefaultNotificationService::~DefaultNotificationService()
 
 /*!	\brief Notifies all registered listeners.
 	\param event The message defining the event
-	\param flags The flags that must be set in listeners to receive this event
+	\param eventMask Only listeners with an event mask sharing at least one
+		common bit with this mask will receive the event.
 */
 void
-DefaultNotificationService::Notify(const KMessage& event, uint32 flags)
+DefaultNotificationService::Notify(const KMessage& event, uint32 eventMask)
 {
 	RecursiveLocker _(fLock);
 
+	// Note: The following iterations support that the listener removes itself
+	// in the hook method. That's a property of the DoublyLinkedList iterator.
+
+	// notify all listeners about the event
 	DefaultListenerList::Iterator iterator = fListeners.GetIterator();
 	while (default_listener* listener = iterator.Next()) {
-		if ((flags & listener->flags) != 0)
+		if ((eventMask & listener->eventMask) != 0)
 			listener->listener->EventOccured(*this, &event);
 	}
 
+	// notify all listeners that all listeners have been notified
 	iterator = fListeners.GetIterator();
 	while (default_listener* listener = iterator.Next()) {
-		if ((flags & listener->flags) != 0)
+		if ((eventMask & listener->eventMask) != 0)
 			listener->listener->AllListenersNotified(*this);
 	}
 }
@@ -186,8 +195,8 @@ DefaultNotificationService::AddListener(const KMessage* eventSpecifier,
 	if (eventSpecifier == NULL)
 		return B_BAD_VALUE;
 
-	uint32 flags;
-	status_t status = _ToFlags(*eventSpecifier, flags);
+	uint32 eventMask;
+	status_t status = ToEventMask(*eventSpecifier, eventMask);
 	if (status != B_OK)
 		return status;
 
@@ -195,13 +204,13 @@ DefaultNotificationService::AddListener(const KMessage* eventSpecifier,
 	if (listener == NULL)
 		return B_NO_MEMORY;
 
-	listener->flags = flags;
+	listener->eventMask = eventMask;
 	listener->team = -1;
 	listener->listener = &notificationListener;
 
 	RecursiveLocker _(fLock);
 	if (fListeners.IsEmpty())
-		_FirstAdded();
+		FirstAdded();
 	fListeners.Add(listener);
 
 	return B_OK;
@@ -227,9 +236,9 @@ DefaultNotificationService::RemoveListener(const KMessage* eventSpecifier,
 		if (listener->listener == &notificationListener) {
 			iterator.Remove();
 			delete listener;
-			
+
 			if (fListeners.IsEmpty())
-				_LastRemoved();
+				LastRemoved();
 			return B_OK;
 		}
 	}
@@ -239,21 +248,21 @@ DefaultNotificationService::RemoveListener(const KMessage* eventSpecifier,
 
 
 status_t
-DefaultNotificationService::_ToFlags(const KMessage& eventSpecifier,
-	uint32& flags)
+DefaultNotificationService::ToEventMask(const KMessage& eventSpecifier,
+	uint32& eventMask)
 {
-	return eventSpecifier.FindInt32("flags", (int32*)&flags);
+	return eventSpecifier.FindInt32("event mask", (int32*)&eventMask);
 }
 
 
 void
-DefaultNotificationService::_FirstAdded()
+DefaultNotificationService::FirstAdded()
 {
 }
 
 
 void
-DefaultNotificationService::_LastRemoved()
+DefaultNotificationService::LastRemoved()
 {
 }
 
@@ -281,9 +290,9 @@ DefaultUserNotificationService::AddListener(const KMessage* eventSpecifier,
 	if (eventSpecifier == NULL)
 		return B_BAD_VALUE;
 
-	uint32 flags = eventSpecifier->GetInt32("flags", 0);
+	uint32 eventMask = eventSpecifier->GetInt32(kEventMaskString, 0);
 
-	return _AddListener(flags, listener);
+	return _AddListener(eventMask, listener);
 }
 
 
@@ -294,18 +303,18 @@ DefaultUserNotificationService::UpdateListener(const KMessage* eventSpecifier,
 	if (eventSpecifier == NULL)
 		return B_BAD_VALUE;
 
-	uint32 flags = eventSpecifier->GetInt32("flags", 0);
-	bool addFlags = eventSpecifier->GetBool("add flags", false);
+	uint32 eventMask = eventSpecifier->GetInt32(kEventMaskString, 0);
+	bool addEvents = eventSpecifier->GetBool("add events", false);
 
 	RecursiveLocker _(fLock);
 
 	DefaultListenerList::Iterator iterator = fListeners.GetIterator();
 	while (default_listener* listener = iterator.Next()) {
 		if (*listener->listener == notificationListener) {
-			if (addFlags)
-				listener->flags |= flags;
+			if (addEvents)
+				listener->eventMask |= eventMask;
 			else
-				listener->flags = flags;
+				listener->eventMask = eventMask;
 			return B_OK;
 		}
 	}
@@ -345,9 +354,9 @@ DefaultUserNotificationService::RemoveUserListeners(port_id port, uint32 token)
 		if (*listener->listener == userListener) {
 			iterator.Remove();
 			delete listener;
-			
+
 			if (fListeners.IsEmpty())
-				_LastRemoved();
+				LastRemoved();
 			return B_OK;
 		}
 	}
@@ -357,8 +366,8 @@ DefaultUserNotificationService::RemoveUserListeners(port_id port, uint32 token)
 
 
 status_t
-DefaultUserNotificationService::UpdateUserListener(uint32 flags, port_id port,
-	uint32 token)
+DefaultUserNotificationService::UpdateUserListener(uint32 eventMask,
+	port_id port, uint32 token)
 {
 	UserMessagingListener userListener(fSender, port, token);
 
@@ -367,7 +376,7 @@ DefaultUserNotificationService::UpdateUserListener(uint32 flags, port_id port,
 	DefaultListenerList::Iterator iterator = fListeners.GetIterator();
 	while (default_listener* listener = iterator.Next()) {
 		if (*listener->listener == userListener) {
-			listener->flags |= flags;
+			listener->eventMask |= eventMask;
 			return B_OK;
 		}
 	}
@@ -377,7 +386,7 @@ DefaultUserNotificationService::UpdateUserListener(uint32 flags, port_id port,
 	if (copiedListener == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = _AddListener(flags, *copiedListener);
+	status_t status = _AddListener(eventMask, *copiedListener);
 	if (status != B_OK)
 		delete copiedListener;
 
@@ -389,13 +398,13 @@ void
 DefaultUserNotificationService::EventOccured(NotificationService& service,
 	const KMessage* event)
 {
-	int32 opcode = event->GetInt32("opcode", -1);
+	int32 eventCode = event->GetInt32("event", -1);
 	team_id team = event->GetInt32("team", -1);
 
-	if (opcode == TEAM_REMOVED && team >= B_OK) {
+	if (eventCode == TEAM_REMOVED && team >= B_OK) {
 		// check if we have any listeners from that team, and remove them
 		RecursiveLocker _(fLock);
-	
+
 		DefaultListenerList::Iterator iterator = fListeners.GetIterator();
 		while (default_listener* listener = iterator.Next()) {
 			if (listener->team == team) {
@@ -415,20 +424,20 @@ DefaultUserNotificationService::AllListenersNotified(
 
 
 status_t
-DefaultUserNotificationService::_AddListener(uint32 flags,
+DefaultUserNotificationService::_AddListener(uint32 eventMask,
 	NotificationListener& notificationListener)
 {
 	default_listener* listener = new(std::nothrow) default_listener;
 	if (listener == NULL)
 		return B_NO_MEMORY;
 
-	listener->flags = flags;
+	listener->eventMask = eventMask;
 	listener->team = team_get_current_team_id();
 	listener->listener = &notificationListener;
 
 	RecursiveLocker _(fLock);
 	if (fListeners.IsEmpty())
-		_FirstAdded();
+		FirstAdded();
 	fListeners.Add(listener);
 
 	return B_OK;
@@ -511,7 +520,7 @@ NotificationManager::AddListener(const char* serviceName,
 	char buffer[96];
 	KMessage specifier;
 	specifier.SetTo(buffer, sizeof(buffer), 0);
-	specifier.AddInt32("event mask", eventMask);
+	specifier.AddInt32(kEventMaskString, eventMask);
 
 	return AddListener(serviceName, &specifier, listener);
 }
@@ -540,7 +549,7 @@ NotificationManager::UpdateListener(const char* serviceName,
 	char buffer[96];
 	KMessage specifier;
 	specifier.SetTo(buffer, sizeof(buffer), 0);
-	specifier.AddInt32("event mask", eventMask);
+	specifier.AddInt32(kEventMaskString, eventMask);
 
 	return UpdateListener(serviceName, &specifier, listener);
 }

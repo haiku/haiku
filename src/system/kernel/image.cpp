@@ -12,11 +12,12 @@
 #include <kimage.h>
 #include <kscheduler.h>
 #include <lock.h>
+#include <Notifications.h>
 #include <team.h>
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
-#include <util/OpenHashTable.h>
+#include <util/AutoLock.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -30,14 +31,6 @@
 #endif
 
 #define ADD_DEBUGGER_COMMANDS
-
-struct image {
-	struct image*			next;
-	struct image*			prev;
-	HashTableLink<image>	hash_link;
-	image_info				info;
-	team_id					team;
-};
 
 
 struct ImageTableDefinition {
@@ -55,9 +48,31 @@ struct ImageTableDefinition {
 typedef OpenHashTable<ImageTableDefinition> ImageTable;
 
 
+class ImageNotificationService : public DefaultNotificationService {
+public:
+	ImageNotificationService()
+		: DefaultNotificationService("images")
+	{
+	}
+
+	void Notify(uint32 eventCode, struct image* image)
+	{
+		char eventBuffer[128];
+		KMessage event;
+		event.SetTo(eventBuffer, sizeof(eventBuffer), IMAGE_MONITOR);
+		event.AddInt32("event", eventCode);
+		event.AddInt32("image", image->info.id);
+		event.AddPointer("imageStruct", image);
+
+		DefaultNotificationService::Notify(event, eventCode);
+	}
+};
+
+
 static image_id sNextImageID = 1;
 static mutex sImageMutex = MUTEX_INITIALIZER("image");
 static ImageTable* sImageTable;
+static ImageNotificationService sNotificationService;
 
 
 /*!	Registers an image with the specified team.
@@ -87,6 +102,9 @@ register_image(struct team *team, image_info *_info, size_t size)
 		list_add_item(&team->image_list, image);
 	sImageTable->Insert(image);
 
+	// notify listeners
+	sNotificationService.Notify(IMAGE_ADDED, image);
+
 	mutex_unlock(&sImageMutex);
 
 	TRACE(("register_image(team = %p, image id = %ld, image = %p\n", team, id, image));
@@ -115,6 +133,9 @@ unregister_image(struct team *team, image_id id)
 	if (status == B_OK) {
 		// notify the debugger
 		user_debug_image_deleted(&image->info);
+
+		// notify listeners
+		sNotificationService.Notify(IMAGE_REMOVED, image);
 
 		free(image);
 	}
@@ -263,6 +284,22 @@ dump_images_list(int argc, char **argv)
 #endif
 
 
+struct image*
+image_iterate_through_images(image_iterator_callback callback, void* cookie)
+{
+	MutexLocker locker(sImageMutex);
+
+	ImageTable::Iterator it = sImageTable->GetIterator();
+	struct image* image = NULL;
+	while ((image = it.Next()) != NULL) {
+		if (callback(image, cookie))
+			break;
+	}
+
+	return image;
+}
+
+
 status_t
 image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
@@ -309,6 +346,8 @@ image_init(void)
 		panic("image_init(): Failed to init image table: %s", strerror(error));
 		return error;
 	}
+
+	new(&sNotificationService) ImageNotificationService();
 
 #ifdef ADD_DEBUGGER_COMMANDS
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");

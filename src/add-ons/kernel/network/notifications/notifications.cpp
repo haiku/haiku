@@ -27,10 +27,8 @@ public:
 			void			Notify(const KMessage& event);
 
 protected:
-	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
-								uint32& flags);
-	virtual	void			_FirstAdded();
-	virtual	void			_LastRemoved();
+	virtual	void			FirstAdded();
+	virtual	void			LastRemoved();
 };
 
 static NetNotificationService sNotificationService;
@@ -63,16 +61,8 @@ NetNotificationService::Notify(const KMessage& event)
 }
 
 
-status_t
-NetNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
-{
-	flags = eventSpecifier.GetInt32("flags", 0);
-	return B_OK;
-}
-
-
 void
-NetNotificationService::_FirstAdded()
+NetNotificationService::FirstAdded()
 {
 	// The reference counting doesn't work for us, as we'll have to
 	// ensure our module stays loaded.
@@ -82,7 +72,7 @@ NetNotificationService::_FirstAdded()
 
 
 void
-NetNotificationService::_LastRemoved()
+NetNotificationService::LastRemoved()
 {
 	// Give up the reference _AddListener()
 	put_module(NET_NOTIFICATIONS_MODULE_NAME);

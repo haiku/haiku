@@ -23,6 +23,12 @@ struct select_info;
 struct thread_creation_attributes;
 
 
+// thread notifications
+#define THREAD_MONITOR	'_tm_'
+#define THREAD_ADDED	0x01
+#define THREAD_REMOVED	0x02
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -69,6 +75,10 @@ thread_is_idle_thread(struct thread *thread)
 {
 	return thread->entry == NULL;
 }
+
+typedef bool (*thread_iterator_callback)(struct thread* thread, void* cookie);
+struct thread* thread_iterate_through_threads(thread_iterator_callback callback,
+	void* cookie);
 
 thread_id allocate_thread_id(void);
 thread_id peek_next_thread_id(void);

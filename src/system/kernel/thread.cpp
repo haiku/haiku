@@ -30,6 +30,7 @@
 #include <kimage.h>
 #include <kscheduler.h>
 #include <ksignal.h>
+#include <Notifications.h>
 #include <real_time_clock.h>
 #include <smp.h>
 #include <syscalls.h>
@@ -86,8 +87,32 @@ struct UndertakerEntry : DoublyLinkedListLinkImpl<UndertakerEntry> {
 	}
 };
 
+
+class ThreadNotificationService : public DefaultNotificationService {
+public:
+	ThreadNotificationService()
+		: DefaultNotificationService("threads")
+	{
+	}
+
+	void Notify(uint32 eventCode, struct thread* thread)
+	{
+		char eventBuffer[128];
+		KMessage event;
+		event.SetTo(eventBuffer, sizeof(eventBuffer), THREAD_MONITOR);
+		event.AddInt32("event", eventCode);
+		event.AddInt32("thread", thread->id);
+		event.AddPointer("threadStruct", thread);
+
+		DefaultNotificationService::Notify(event, eventCode);
+	}
+};
+
+
 static DoublyLinkedList<UndertakerEntry> sUndertakerEntries;
 static ConditionVariable sUndertakerCondition;
+static ThreadNotificationService sNotificationService;
+
 
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
@@ -503,6 +528,9 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 	thread->args2 = attributes.args2;
 	thread->entry = attributes.entry;
 	status = thread->id;
+
+	// notify listeners
+	sNotificationService.Notify(THREAD_ADDED, thread);
 
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
@@ -1507,6 +1535,9 @@ thread_exit(void)
 		put_select_sync(sync);
 	}
 
+	// notify listeners
+	sNotificationService.Notify(THREAD_REMOVED, thread);
+
 	// shutdown the thread messaging
 
 	status = acquire_sem_etc(thread->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
@@ -1736,6 +1767,25 @@ thread_dequeue_id(struct thread_queue *q, thread_id id)
 		last = thread;
 		thread = thread->queue_next;
 	}
+	return thread;
+}
+
+
+struct thread*
+thread_iterate_through_threads(thread_iterator_callback callback, void* cookie)
+{
+	struct hash_iterator iterator;
+	hash_open(sThreadHash, &iterator);
+
+	struct thread* thread;
+	while ((thread = (struct thread*)hash_next(sThreadHash, &iterator))
+			!= NULL) {
+		if (callback(thread, cookie))
+			break;
+	}
+
+	hash_close(sThreadHash, &iterator, false);
+
 	return thread;
 }
 
@@ -2098,6 +2148,9 @@ thread_init(kernel_args *args)
 		insert_thread_into_team(thread->team, thread);
 	}
 	sUsedThreads = args->num_cpus;
+
+	// init the notification service
+	new(&sNotificationService) ThreadNotificationService();
 
 	// start the undertaker thread
 	new(&sUndertakerEntries) DoublyLinkedList<UndertakerEntry>();

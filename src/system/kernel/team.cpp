@@ -86,11 +86,7 @@ class TeamNotificationService : public DefaultNotificationService {
 public:
 							TeamNotificationService();
 
-			void			Notify(uint32 opcode, team_id team);
-
-protected:
-	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
-								uint32& flags);
+			void			Notify(uint32 eventCode, struct team* team);
 };
 
 
@@ -312,23 +308,16 @@ TeamNotificationService::TeamNotificationService()
 
 
 void
-TeamNotificationService::Notify(uint32 opcode, team_id team)
+TeamNotificationService::Notify(uint32 eventCode, struct team* team)
 {
-	char eventBuffer[64];
+	char eventBuffer[128];
 	KMessage event;
 	event.SetTo(eventBuffer, sizeof(eventBuffer), TEAM_MONITOR);
-	event.AddInt32("opcode", opcode);
-	event.AddInt32("team", team);
+	event.AddInt32("event", eventCode);
+	event.AddInt32("team", team->id);
+	event.AddPointer("teamStruct", team);
 
-	DefaultNotificationService::Notify(event, ~0U);
-}
-
-
-status_t
-TeamNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
-{
-	flags = ~0U;
-	return B_OK;
+	DefaultNotificationService::Notify(event, eventCode);
 }
 
 
@@ -1236,6 +1225,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	if (status != B_OK)
 		goto err4;
 
+	// notify team listeners
+	sNotificationService.Notify(TEAM_ADDED, team);
+
 	// Create a kernel thread, but under the context of the new team
 	// The new thread will take over ownership of teamArgs
 	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName,
@@ -1430,6 +1422,9 @@ exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 
 	user_debug_team_exec();
 
+	// notify team listeners
+	sNotificationService.Notify(TEAM_EXEC, team);
+
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
 
@@ -1602,6 +1597,9 @@ fork_team(void)
 		if (image < 0)
 			goto err5;
 	}
+
+	// notify team listeners
+	sNotificationService.Notify(TEAM_ADDED, team);
 
 	// create a kernel thread under the context of the new team
 	threadID = spawn_kernel_thread_etc(fork_team_thread_start,
@@ -2084,6 +2082,26 @@ team_used_teams(void)
 }
 
 
+/*!	Iterates through the list of teams. The team spinlock must be held.
+ */
+struct team*
+team_iterate_through_teams(team_iterator_callback callback, void* cookie)
+{
+	struct hash_iterator iterator;
+	hash_open(sTeamHash, &iterator);
+
+	struct team* team;
+	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
+		if (callback(team, cookie))
+			break;
+	}
+
+	hash_close(sTeamHash, &iterator, false);
+
+	return team;
+}
+
+
 /*! Fills the provided death entry if it's in the team.
 	You need to have the team lock held when calling this function.
 */
@@ -2420,7 +2438,7 @@ team_delete_team(struct team *team)
 		}
 	}
 
-	sNotificationService.Notify(TEAM_REMOVED, team->id);
+	sNotificationService.Notify(TEAM_REMOVED, team);
 
 	// free team resources
 

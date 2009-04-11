@@ -118,7 +118,7 @@ private:
 struct default_listener : public DoublyLinkedListLinkImpl<default_listener> {
 	~default_listener();
 
-	uint32	flags;
+	uint32	eventMask;
 	team_id	team;
 	NotificationListener* listener;
 };
@@ -131,7 +131,7 @@ public:
 								DefaultNotificationService(const char* name);
 	virtual						~DefaultNotificationService();
 
-			void				Notify(const KMessage& event, uint32 flags);
+			void				Notify(const KMessage& event, uint32 eventMask);
 
 	virtual status_t			AddListener(const KMessage* eventSpecifier,
 									NotificationListener& listener);
@@ -143,10 +143,10 @@ public:
 	virtual const char*			Name() { return fName; }
 
 protected:
-	virtual status_t			_ToFlags(const KMessage& eventSpecifier,
-									uint32& flags);
-	virtual	void				_FirstAdded();
-	virtual	void				_LastRemoved();
+	virtual status_t			ToEventMask(const KMessage& eventSpecifier,
+									uint32& eventMask);
+	virtual	void				FirstAdded();
+	virtual	void				LastRemoved();
 
 			recursive_lock		fLock;
 			DefaultListenerList	fListeners;
@@ -168,7 +168,7 @@ public:
 									NotificationListener& listener);
 
 			status_t			RemoveUserListeners(port_id port, uint32 token);
-			status_t			UpdateUserListener(uint32 flags,
+			status_t			UpdateUserListener(uint32 eventMask,
 									port_id port, uint32 token);
 
 private:
@@ -176,7 +176,7 @@ private:
 									const KMessage* event);
 	virtual void				AllListenersNotified(
 									NotificationService& service);
-			status_t			_AddListener(uint32 flags,
+			status_t			_AddListener(uint32 eventMask,
 									NotificationListener& listener);
 
 			UserMessagingMessageSender fSender;

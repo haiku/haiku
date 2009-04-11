@@ -65,10 +65,6 @@ public:
 							PortNotificationService();
 
 			void			Notify(uint32 opcode, port_id team);
-
-protected:
-	virtual	status_t		_ToFlags(const KMessage& eventSpecifier,
-								uint32& flags);
 };
 
 #define MAX_QUEUE_LENGTH 4096
@@ -109,18 +105,10 @@ PortNotificationService::Notify(uint32 opcode, port_id port)
 	char eventBuffer[64];
 	KMessage event;
 	event.SetTo(eventBuffer, sizeof(eventBuffer), PORT_MONITOR);
-	event.AddInt32("opcode", opcode);
+	event.AddInt32("event", opcode);
 	event.AddInt32("port", port);
 
-	DefaultNotificationService::Notify(event, ~0U);
-}
-
-
-status_t
-PortNotificationService::_ToFlags(const KMessage& eventSpecifier, uint32& flags)
-{
-	flags = ~0U;
-	return B_OK;
+	DefaultNotificationService::Notify(event, opcode);
 }
 
 

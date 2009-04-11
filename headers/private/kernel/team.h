@@ -9,10 +9,11 @@
 #include <thread_types.h>
 
 
-// Team notifications
+// team notifications
 #define TEAM_MONITOR	'_Tm_'
-#define TEAM_ADDED		1
-#define TEAM_REMOVED	2
+#define TEAM_ADDED		0x01
+#define TEAM_REMOVED	0x02
+#define TEAM_EXEC		0x04
 
 
 #ifdef __cplusplus
@@ -39,6 +40,10 @@ bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
+
+typedef bool (*team_iterator_callback)(struct team* team, void* cookie);
+struct team* team_iterate_through_teams(team_iterator_callback callback,
+	void* cookie);
 
 thread_id load_image_etc(int32 argCount, const char* const* args,
 	const char* const* env, int32 priority, team_id parentID, uint32 flags);
