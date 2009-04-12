@@ -46,7 +46,7 @@ bus_std_ops(int32 op, ...)
 			if (gUSBStack)
 				return B_OK;
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 			// This code is to handle plain R5 (non-BONE) where the same module
 			// gets loaded multiple times (once for each exported module
 			// interface, the USB v2 and v3 API in our case). We don't want to
