@@ -153,8 +153,15 @@ BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 			case B_LEFT_ARROW:
 			{
 				BListItem *item = ItemAt(CurrentSelection());
-				if (item && item->fHasSubitems)
-					Collapse(item);
+				if (item) {
+					if (item->fHasSubitems)
+						Collapse(item);
+					else {
+						item = Superitem(item);
+						if (item)
+							Select(IndexOf(item));
+					}
+				}
 				return;
 			}
 		}
