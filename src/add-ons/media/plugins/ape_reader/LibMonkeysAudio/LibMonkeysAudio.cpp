@@ -41,9 +41,9 @@ const char*	lib_monkeys_audio_components()
 //------------------------------------------------------------------------------
 const char*	lib_monkeys_audio_copyright()
 {
-	static string	saCright;
+	static std::string	saCright;
 
-	saCright = string(gCright)+"\n"+gOriginal;
+	saCright = std::string(gCright)+"\n"+gOriginal;
 	return saCright.c_str();
 }
 //------------------------------------------------------------------------------

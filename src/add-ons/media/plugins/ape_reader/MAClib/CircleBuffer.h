@@ -1,7 +1,7 @@
 #ifndef APE_CIRCLEBUFFER_H
 #define APE_CIRCLEBUFFER_H
 
-class CCircleBuffer  
+class CCircleBuffer
 {
 public:
 
@@ -17,14 +17,14 @@ public:
     int MaxGet();
 
     // direct writing
-    inline unsigned char * CCircleBuffer::GetDirectWritePointer()
+    inline unsigned char * GetDirectWritePointer()
     {
         // return a pointer to the tail -- note that it will always be safe to write
         // at least m_nMaxDirectWriteBytes since we use an end cap region
         return &m_pBuffer[m_nTail];
     }
 
-    inline void CCircleBuffer::UpdateAfterDirectWrite(int nBytes)
+    inline void UpdateAfterDirectWrite(int nBytes)
     {
         // update the tail
         m_nTail += nBytes;

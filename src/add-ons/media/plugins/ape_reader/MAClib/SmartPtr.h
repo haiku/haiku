@@ -86,6 +86,6 @@ public:
 
 #ifdef _MSC_VER
     #pragma warning(pop)
-#endif _MSC_VER
+#endif // _MSC_VER
 
 #endif // #ifndef APE_SMARTPTR_H

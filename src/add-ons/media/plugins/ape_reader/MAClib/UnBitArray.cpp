@@ -3,6 +3,9 @@
 #include "UnBitArray.h"
 #include "BitArray.h"
 
+#include <algorithm>
+
+
 const uint32 POWERS_OF_TWO_MINUS_ONE_REVERSED[33] = {4294967295,2147483647,1073741823,536870911,268435455,134217727,67108863,33554431,16777215,8388607,4194303,2097151,1048575,524287,262143,131071,65535,32767,16383,8191,4095,2047,1023,511,255,127,63,31,15,7,3,1,0};
 
 const uint32 K_SUM_MIN_BOUNDARY[32] = {0,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648,0,0,0,0};
@@ -27,7 +30,7 @@ const uint32 RANGE_WIDTH_2[64] = {19578,16582,12257,7906,4576,2366,1170,536,261,
 /***********************************************************************************
 Construction
 ***********************************************************************************/
-CUnBitArray::CUnBitArray(CIO * pIO, int nVersion) 
+CUnBitArray::CUnBitArray(CIO * pIO, int nVersion)
 {
     CreateHelper(pIO, 16384, nVersion);
     m_nFlushCounter = 0;
@@ -46,11 +49,11 @@ unsigned int CUnBitArray::DecodeValue(DECODE_VALUE_METHOD DecodeMethod, int nPar
     case DECODE_VALUE_METHOD_UNSIGNED_INT:
         return DecodeValueXBits(32);
     }
-    
+
     return 0;
 }
 
-void CUnBitArray::GenerateArray(int * pOutputArray, int nElements, int nBytesRequired) 
+void CUnBitArray::GenerateArray(int * pOutputArray, int nElements, int nBytesRequired)
 {
     GenerateArrayRange(pOutputArray, nElements);
 }
@@ -60,12 +63,12 @@ __inline unsigned char CUnBitArray::GetC()
     unsigned char nValue = (unsigned char) (m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31)));
     m_nCurrentBitIndex += 8;
     return nValue;
-}    
+}
 
 __inline int CUnBitArray::RangeDecodeFast(int nShift)
 {
     while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-    {   
+    {
         m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8) | ((m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
         m_nCurrentBitIndex += 8;
         m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8) | ((m_RangeCoderInfo.buffer >> 1) & 0xFF);
@@ -80,7 +83,7 @@ __inline int CUnBitArray::RangeDecodeFast(int nShift)
 __inline int CUnBitArray::RangeDecodeFastWithUpdate(int nShift)
 {
     while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-    {   
+    {
         m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8) | ((m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
         m_nCurrentBitIndex += 8;
         m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8) | ((m_RangeCoderInfo.buffer >> 1) & 0xFF);
@@ -108,21 +111,21 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
     if (m_nVersion >= 3990)
     {
         // figure the pivot value
-        int nPivotValue = max(BitArrayState.nKSum / 32, 1);
-        
+        int nPivotValue = std::max(BitArrayState.nKSum / 32, 1UL);
+
         // get the overflow
         int nOverflow = 0;
         {
             // decode
             int nRangeTotal = RangeDecodeFast(RANGE_OVERFLOW_SHIFT);
-            
+
             // lookup the symbol (must be a faster way than this)
             while (nRangeTotal >= RANGE_TOTAL_2[nOverflow + 1]) { nOverflow++; }
-            
+
             // update
             m_RangeCoderInfo.low -= m_RangeCoderInfo.range * RANGE_TOTAL_2[nOverflow];
             m_RangeCoderInfo.range = m_RangeCoderInfo.range * RANGE_WIDTH_2[nOverflow];
-            
+
             // get the working k
             if (nOverflow == (MODEL_ELEMENTS - 1))
             {
@@ -146,7 +149,7 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
                 int nPivotValueB = nSplitFactor;
 
                 while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-                {   
+                {
                     m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8) | ((m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
                     m_nCurrentBitIndex += 8;
                     m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8) | ((m_RangeCoderInfo.buffer >> 1) & 0xFF);
@@ -157,7 +160,7 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
                 m_RangeCoderInfo.low -= m_RangeCoderInfo.range * nBaseA;
 
                 while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-                {   
+                {
                     m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8) | ((m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
                     m_nCurrentBitIndex += 8;
                     m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8) | ((m_RangeCoderInfo.buffer >> 1) & 0xFF);
@@ -172,7 +175,7 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
             else
             {
                 while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-                {   
+                {
                     m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8) | ((m_pBitArray[m_nCurrentBitIndex >> 5] >> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
                     m_nCurrentBitIndex += 8;
                     m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8) | ((m_RangeCoderInfo.buffer >> 1) & 0xFF);
@@ -195,15 +198,15 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
     {
         // decode
         int nRangeTotal = RangeDecodeFast(RANGE_OVERFLOW_SHIFT);
-        
+
         // lookup the symbol (must be a faster way than this)
         int nOverflow = 0;
         while (nRangeTotal >= RANGE_TOTAL_1[nOverflow + 1]) { nOverflow++; }
-        
+
         // update
         m_RangeCoderInfo.low -= m_RangeCoderInfo.range * RANGE_TOTAL_1[nOverflow];
         m_RangeCoderInfo.range = m_RangeCoderInfo.range * RANGE_WIDTH_1[nOverflow];
-        
+
         // get the working k
         int nTempK;
         if (nOverflow == (MODEL_ELEMENTS - 1))
@@ -215,30 +218,30 @@ int CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
         {
             nTempK = (BitArrayState.k < 1) ? 0 : BitArrayState.k - 1;
         }
-        
+
         // figure the extra bits on the left and the left value
         if (nTempK <= 16 || m_nVersion < 3910)
         {
             nValue = RangeDecodeFastWithUpdate(nTempK);
-        }                    
+        }
         else
-        {    
+        {
             int nX1 = RangeDecodeFastWithUpdate(16);
             int nX2 = RangeDecodeFastWithUpdate(nTempK - 16);
             nValue = nX1 | (nX2 << 16);
         }
-            
+
         // build the value and output it
         nValue += (nOverflow << nTempK);
     }
 
     // update nKSum
     BitArrayState.nKSum += ((nValue + 1) / 2) - ((BitArrayState.nKSum + 16) >> 5);
-    
+
     // update k
-    if (BitArrayState.nKSum < K_SUM_MIN_BOUNDARY[BitArrayState.k]) 
+    if (BitArrayState.nKSum < K_SUM_MIN_BOUNDARY[BitArrayState.k])
         BitArrayState.k--;
-    else if (BitArrayState.nKSum >= K_SUM_MIN_BOUNDARY[BitArrayState.k + 1]) 
+    else if (BitArrayState.nKSum >= K_SUM_MIN_BOUNDARY[BitArrayState.k + 1])
         BitArrayState.k++;
 
     // output the value (converted to signed)
@@ -266,11 +269,11 @@ void CUnBitArray::Finalize()
 {
     // normalize
     while (m_RangeCoderInfo.range <= BOTTOM_VALUE)
-    {   
+    {
         m_nCurrentBitIndex += 8;
         m_RangeCoderInfo.range <<= 8;
     }
-    
+
     // used to back-pedal the last two bytes out
     // this should never have been a problem because we've outputted and normalized beforehand
     // but stopped doing it as of 3.96 in case it accounted for rare decompression failures
@@ -283,11 +286,11 @@ void CUnBitArray::GenerateArrayRange(int * pOutputArray, int nElements)
     UNBIT_ARRAY_STATE BitArrayState;
     FlushState(BitArrayState);
     FlushBitArray();
-    
+
     for (int z = 0; z < nElements; z++)
     {
         pOutputArray[z] = DecodeValueRange(BitArrayState);
     }
 
-    Finalize();    
+    Finalize();
 }
