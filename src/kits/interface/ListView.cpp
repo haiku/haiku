@@ -30,6 +30,7 @@ struct track_data {
 	int32		item_index;
 	bool		was_selected;
 	bool		try_drag;
+	bigtime_t	last_click_time;
 };
 
 static property_info sProperties[] = {
@@ -310,20 +311,28 @@ BListView::MouseDown(BPoint point)
 
 	// If the user double (or more) clicked within the current selection,
 	// we don't change the selection but invoke the selection.
-	int32 clicks;
-	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
-		&& index >= fFirstSelected && index <= fLastSelected) {
+	bigtime_t clickSpeed = 0;
+	get_click_speed(&clickSpeed);
+	bool multipleClick = system_time() - fTrack->last_click_time < clickSpeed
+		&& point == fTrack->drag_start;
+
+
+	if (multipleClick && index >= fFirstSelected && index <= fLastSelected) {
+		printf("Invoking item %ld\n", index);
 		Invoke();
 		return;
 	}
 
 	int32 modifiers;
 	message->FindInt32("modifiers", &modifiers);
-
-	fTrack->drag_start = point;
-	fTrack->item_index = index;
-	fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
-	fTrack->try_drag = true;
+	
+	if (!multipleClick) {
+		fTrack->drag_start = point;
+		fTrack->last_click_time = system_time();
+		fTrack->item_index = index;
+		fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
+		fTrack->try_drag = true;
+	}
 
 	if (index > -1) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
