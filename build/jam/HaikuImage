@@ -105,8 +105,7 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addo
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
-	aiff_reader au_reader avi_reader
-	# $(X86_ONLY)avcodec
+	aiff_reader au_reader $(X86_ONLY)avcodec avi_reader
 	matroska mov_reader
 	mp3_decoder mp3_reader
 	mp4_reader musepack
