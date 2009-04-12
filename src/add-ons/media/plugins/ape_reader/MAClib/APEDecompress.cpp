@@ -1,14 +1,18 @@
-#include "All.h"
-#include "APEDecompress.h"
-
 #include <algorithm>
 
+#include "All.h"
+#include "APEDecompress.h"
 #include "APEInfo.h"
 #include "Prepare.h"
 #include "UnBitArray.h"
 #include "NewPredictor.h"
 
 #define DECODE_BLOCK_SIZE        4096
+
+#if __GNUC__ != 2
+using std::min;
+using std::max;
+#endif
 
 CAPEDecompress::CAPEDecompress(int * pErrorCode, CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock)
 {
@@ -38,10 +42,10 @@ CAPEDecompress::CAPEDecompress(int * pErrorCode, CAPEInfo * pAPEInfo, int nStart
 
     // set the "real" start and finish blocks
     m_nStartBlock = (nStartBlock < 0)
-		? 0 : std::min(nStartBlock, GetInfo(APE_INFO_TOTAL_BLOCKS));
+		? 0 : min(nStartBlock, GetInfo(APE_INFO_TOTAL_BLOCKS));
     m_nFinishBlock = (nFinishBlock < 0)
 		? GetInfo(APE_INFO_TOTAL_BLOCKS)
-		: std::min(nFinishBlock, GetInfo(APE_INFO_TOTAL_BLOCKS));
+		: min(nFinishBlock, GetInfo(APE_INFO_TOTAL_BLOCKS));
     m_bIsRanged = (m_nStartBlock != 0) || (m_nFinishBlock != GetInfo(APE_INFO_TOTAL_BLOCKS));
 }
 
@@ -90,7 +94,7 @@ int CAPEDecompress::GetData(char * pBuffer, int nBlocks, int * pBlocksRetrieved)
 
     // cap
     int nBlocksUntilFinish = m_nFinishBlock - m_nCurrentBlock;
-    const int nBlocksToRetrieve = std::min(nBlocks, nBlocksUntilFinish);
+    const int nBlocksToRetrieve = min(nBlocks, nBlocksUntilFinish);
 
     // get the data
     unsigned char * pOutputBuffer = (unsigned char *) pBuffer;
@@ -104,7 +108,7 @@ int CAPEDecompress::GetData(char * pBuffer, int nBlocks, int * pBlocksRetrieved)
 
         // analyze how much to remove from the buffer
         const int nFrameBufferBlocks = m_nFrameBufferFinishedBlocks;
-        nBlocksThisPass = std::min(nBlocksLeft, nFrameBufferBlocks);
+        nBlocksThisPass = min(nBlocksLeft, nFrameBufferBlocks);
 
         // remove as much as possible
         if (nBlocksThisPass > 0)
@@ -187,7 +191,7 @@ int CAPEDecompress::FillFrameBuffer()
 
         int nFrameOffsetBlocks = m_nCurrentFrameBufferBlock % GetInfo(APE_INFO_BLOCKS_PER_FRAME);
         int nFrameBlocksLeft = nFrameBlocks - nFrameOffsetBlocks;
-        int nBlocksThisPass = std::min(nFrameBlocksLeft, nBlocksLeft);
+        int nBlocksThisPass = min(nFrameBlocksLeft, nBlocksLeft);
 
         // start the frame if we need to
         if (nFrameOffsetBlocks == 0)

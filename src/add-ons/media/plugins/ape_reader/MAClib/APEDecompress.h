@@ -1,8 +1,6 @@
 #ifndef APE_APEDECOMPRESS_H
 #define APE_APEDECOMPRESS_H
 
-#include "APEDecompress.h"
-
 class CUnBitArray;
 class CPrepare;
 class CAPEInfo;

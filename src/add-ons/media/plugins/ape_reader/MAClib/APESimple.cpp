@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "All.h"
 #include "APEInfo.h"
 #include "APECompress.h"
@@ -9,14 +11,16 @@
 #include "MD5.h"
 #include "CharacterHelper.h"
 
-#include <algorithm>
-
-
 #define UNMAC_DECODER_OUTPUT_NONE       0
 #define UNMAC_DECODER_OUTPUT_WAV        1
 #define UNMAC_DECODER_OUTPUT_APE        2
 
 #define BLOCKS_PER_DECODE               9216
+
+#if __GNUC__ != 2
+using std::min;
+using std::max;
+#endif
 
 int DecompressCore(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nOutputMode, int nCompressionLevel, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
 
@@ -207,7 +211,7 @@ int __stdcall VerifyFileW(const str_utf16 * pInputFilename, int * pPercentageDon
             nBytesRead = 1;
             while ((nBytesLeft > 0) && (nBytesRead > 0))
             {
-                int nBytesToRead = std::min(16384, nBytesLeft);
+                int nBytesToRead = min(16384, nBytesLeft);
                 if (pIO->Read(spBuffer, nBytesToRead, &nBytesRead) != ERROR_SUCCESS)
                     throw(ERROR_IO_READ);
 
