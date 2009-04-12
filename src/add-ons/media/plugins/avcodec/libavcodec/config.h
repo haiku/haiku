@@ -31,7 +31,7 @@
 #define HAVE_MMX2 1
 #define HAVE_NEON 0
 #define HAVE_PPC4XX 0
-#define HAVE_SSE 1
+#define HAVE_SSE 0
 #define HAVE_SSSE3 1
 #define HAVE_VIS 0
 #define HAVE_BEOSTHREADS 0
@@ -54,8 +54,8 @@
 #define HAVE_DLFCN_H 0
 #define HAVE_DLOPEN 0
 #define HAVE_DOS_PATHS 0
-#define HAVE_EBP_AVAILABLE 1
-#define HAVE_EBX_AVAILABLE 1
+#define HAVE_EBP_AVAILABLE 0
+#define HAVE_EBX_AVAILABLE 0
 #define HAVE_FAST_64BIT 0
 #define HAVE_FAST_CMOV 0
 #define HAVE_FAST_UNALIGNED 1

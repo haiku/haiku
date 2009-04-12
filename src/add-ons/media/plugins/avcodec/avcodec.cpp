@@ -123,7 +123,8 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 	TRACE("[%c]   input_format=%s\n", isAudio?('a'):('v'), buffer);
 	TRACE("[%c]   infoSize=%ld\n", isAudio?('a'):('v'), infoSize);
 	TRACE("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'),	ioEncodedFormat->user_data_type);
-//	TRACE("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), ioEncodedFormat->meta_data_size);
+	TRACE("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), ioEncodedFormat->MetaDataSize());
+	TRACE("[%c]   info_size=%ld\n", isAudio?('a'):('v'), infoSize);
 //#endif
 
 	media_format_description descr;
@@ -321,10 +322,13 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		
 		fOutputFrameRate = fOutputVideoFormat.field_rate;
 		
-		if (fInputFormat.MetaDataSize() > 0) {
-			ffc->extradata = (uint8_t *)fInputFormat.MetaData();
-			ffc->extradata_size = fInputFormat.MetaDataSize();
-		}
+		ffc->extradata = (uint8_t *)fExtraData;
+		ffc->extradata_size = fExtraDataSize;
+
+//		if (fInputFormat.MetaDataSize() > 0) {
+//			ffc->extradata = (uint8_t *)fInputFormat.MetaData();
+//			ffc->extradata_size = fInputFormat.MetaDataSize();
+//		}
 
 		TRACE("#### requested video format 0x%x\n",
 			inout_format->u.raw_video.display.format);
