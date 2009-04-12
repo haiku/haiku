@@ -528,8 +528,9 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 	}
 	
 	BString buffer;
-	buffer << "of " << totalItems;
-
+	if (totalItems > 0) 
+		buffer << "of " << totalItems;
+	
 	switch (fType) {
 		case kCopyState:
 			fStatusBar->Reset("Copying: ", buffer.String());
