@@ -8,6 +8,7 @@
 #include "PartitionMenuItem.h"
 #include "FSUndoRedo.h"
 #include "FSUtils.h"
+#include <stdio.h>
 #include <Alert.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>

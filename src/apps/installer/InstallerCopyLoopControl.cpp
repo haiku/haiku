@@ -5,6 +5,7 @@
  */
 #include "InstallerCopyLoopControl.h"
 #include "InstallerWindow.h"
+#include <stdio.h>
 #include <Alert.h>
 
 InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)

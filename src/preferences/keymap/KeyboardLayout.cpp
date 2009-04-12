@@ -8,6 +8,8 @@
 
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 
 #include <File.h>

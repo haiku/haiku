@@ -25,6 +25,7 @@
 #include "ClientMemoryAllocator.h"
 #include "ServerApp.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 

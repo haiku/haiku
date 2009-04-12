@@ -12,6 +12,7 @@
 #include "KeymapWindow.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Button.h>

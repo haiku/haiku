@@ -3,6 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "InstallerWindow.h"
+#include <stdio.h>
+#include <string.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
@@ -12,11 +15,9 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
-#include <string.h>
 #include <String.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
-#include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
