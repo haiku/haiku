@@ -116,17 +116,15 @@ if [ $isImage ]; then
 	if [ ! $updateOnly ]; then
 		echo "Creating image ..."
 
-		ddFlags=
+		imageFlags="-i${imageSize}M"
+		if [ ! "$dontClearImage" ]; then
+			imageFlags="$imageFlags -c"
+		fi
+
 		if [ $isVMwareImage ]; then
-			vmdkImageFlags=
-			if [ ! "$dontClearImage" ]; then
-				vmdkImageFlags="-c"
-			fi
-			$vmdkimage -h 64k -i${imageSize}M $vmdkImageFlags "$imagePath" \
-				|| exit 1
-		elif [ ! -e "$imagePath" -o ! "$dontClearImage" ]; then
-			dd if=/dev/zero of="$imagePath" bs=1048576 count=$imageSize \
-				|| exit 1
+			$vmdkimage -h 64k $imageFlags "$imagePath" || exit 1
+		else
+			$createImage $imageFlags "$imagePath" || exit 1
 		fi
 
 		$bfsShell --initialize $imageOffsetFlags "$imagePath" \

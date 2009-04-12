@@ -678,6 +678,7 @@ AddTargetVariableToScript $(script) : <build>addattr ;
 AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
 AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
+AddTargetVariableToScript $(script) : <build>create_image : createImage ;
 AddTargetVariableToScript $(script) : <build>makebootable ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
