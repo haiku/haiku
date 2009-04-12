@@ -301,6 +301,7 @@ while [ $# -gt 0 ] ; do
 				ppc)	haikuGCCMachine=powerpc-apple-haiku;;
 				m68k)	haikuGCCMachine=m68k-unknown-haiku;;
 				arm)	haikuGCCMachine=arm-unknown-haiku;;
+				mipsel)	haikuGCCMachine=mipsel-unknown-haiku;;
 				*)		echo "Unsupported target architecture: $2"
 						exit 1;;
 			esac
