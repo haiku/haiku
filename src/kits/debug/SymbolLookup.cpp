@@ -1,21 +1,20 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 #include "SymbolLookup.h"
 
-#include <errno.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
 #include <unistd.h>
 
 #include <new>
 
 #include <runtime_loader.h>
 #include <syscalls.h>
+
+#include "Image.h"
 
 
 #undef TRACE
@@ -27,8 +26,7 @@
 #endif
 
 
-using std::nothrow;
-using namespace BPrivate;
+using namespace BPrivate::Debug;
 
 
 // PrepareAddress
@@ -94,7 +92,7 @@ RemoteMemoryAccessor::Init()
 		TRACE(("area %ld: address: %p, size: %ld, name: %s\n", areaInfo.area,
 			areaInfo.address, areaInfo.size, areaInfo.name));
 
-		Area *area = new(nothrow) Area(areaInfo.area, areaInfo.address,
+		Area *area = new(std::nothrow) Area(areaInfo.area, areaInfo.address,
 			areaInfo.size);
 		if (!area)
 			return B_NO_MEMORY;
@@ -192,243 +190,34 @@ RemoteMemoryAccessor::_FindAreaNoThrow(const void *address, int32 size) const
 // #pragma mark -
 
 
-ImageFile::ImageFile(const image_info& info)
-	:
-	fInfo(info),
-	fFD(-1),
-	fFileSize(0),
-	fMappedFile((uint8*)MAP_FAILED),
-	fLoadDelta(0),
-	fSymbolTable(NULL),
-	fStringTable(NULL),
-	fSymbolCount(0),
-	fStringTableSize(0)
-{
-}
+class SymbolLookup::LoadedImage : public Image {
+public:
+								LoadedImage(SymbolLookup* symbolLookup,
+									const image_t* image, int32 symbolCount);
+	virtual						~LoadedImage();
 
+	virtual	image_id			ID() const;
+	virtual	const char*			Name() const;
+	virtual	addr_t				TextAddress() const;
+	virtual	size_t				TextSize() const;
 
-ImageFile::~ImageFile()
-{
-	if (fMappedFile != MAP_FAILED) {
-		munmap(fMappedFile, fFileSize);
-	} else {
-		delete[] fSymbolTable;
-		delete[] fStringTable;
-	}
+	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
+									addr_t* _baseAddress,
+									const char** _symbolName,
+									size_t *_symbolNameLen,
+									bool *_exactMatch) const;
+	virtual	status_t			NextSymbol(int32& iterator,
+									const char** _symbolName,
+									size_t* _symbolNameLen,
+									addr_t* _symbolAddress, size_t* _symbolSize,
+									int32* _symbolType) const;
 
-	if (fFD >= 0)
-		close(fFD);
-}
-
-
-status_t
-ImageFile::Load()
-{
-	// open and stat() the file
-	fFD = open(fInfo.name, O_RDONLY);
-	if (fFD < 0)
-		return errno;
-
-	struct stat st;
-	if (fstat(fFD, &st) < 0)
-		return errno;
-
-	fFileSize = st.st_size;
-	if (fFileSize < sizeof(Elf32_Ehdr))
-		return B_NOT_AN_EXECUTABLE;
-
-	// map it
-	fMappedFile = (uint8*)mmap(NULL, fFileSize, PROT_READ, MAP_PRIVATE, fFD, 0);
-	if (fMappedFile == MAP_FAILED)
-		return errno;
-
-	// examine the elf header
-	Elf32_Ehdr* elfHeader = (Elf32_Ehdr*)fMappedFile;
-	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
-		return B_NOT_AN_EXECUTABLE;
-
-	if (elfHeader->e_ident[4] != ELFCLASS32)
-		return B_NOT_AN_EXECUTABLE;
-
-	// verify the location of the program headers
-	int32 programHeaderCount = elfHeader->e_phnum;
-	if (elfHeader->e_phoff < sizeof(Elf32_Ehdr)
-		|| elfHeader->e_phentsize < sizeof(Elf32_Phdr)
-		|| elfHeader->e_phoff + programHeaderCount * elfHeader->e_phentsize
-			> fFileSize) {
-		return B_NOT_AN_EXECUTABLE;
-	}
-
-	Elf32_Phdr* programHeaders
-		= (Elf32_Phdr*)(fMappedFile + elfHeader->e_phoff);
-
-	// verify the location of the section headers
-	int32 sectionCount = elfHeader->e_shnum;
-	if (elfHeader->e_shoff < sizeof(Elf32_Ehdr)
-		|| elfHeader->e_shentsize < sizeof(Elf32_Shdr)
-		|| elfHeader->e_shoff + sectionCount * elfHeader->e_shentsize
-			> fFileSize) {
-		return B_NOT_AN_EXECUTABLE;
-	}
-
-	Elf32_Shdr* sectionHeaders
-		= (Elf32_Shdr*)(fMappedFile + elfHeader->e_shoff);
-
-	// find the first segment -- we need its relative offset
-	for (int32 i = 0; i < programHeaderCount; i++) {
-		Elf32_Phdr* header = (Elf32_Phdr*)
-			((uint8*)programHeaders + i * elfHeader->e_phentsize);
-		if (header->p_type == PT_LOAD) {
-			fLoadDelta = (addr_t)fInfo.text - header->p_vaddr;
-			break;
-		}
-	}
-
-	// find the symbol table
-	for (int32 i = 0; i < elfHeader->e_shnum; i++) {
-		Elf32_Shdr* sectionHeader = (Elf32_Shdr*)
-			((uint8*)sectionHeaders + i * elfHeader->e_shentsize);
-
-		if (sectionHeader->sh_type == SHT_SYMTAB) {
-			Elf32_Shdr& stringHeader = *(Elf32_Shdr*)
-				((uint8*)sectionHeaders
-					+ sectionHeader->sh_link * elfHeader->e_shentsize);
-
-			if (stringHeader.sh_type != SHT_STRTAB)
-				return B_BAD_DATA;
-
-			if (sectionHeader->sh_offset + sectionHeader->sh_size > fFileSize
-				|| stringHeader.sh_offset + stringHeader.sh_size > fFileSize) {
-				return B_BAD_DATA;
-			}
-
-			fSymbolTable = (Elf32_Sym*)(fMappedFile + sectionHeader->sh_offset);
-			fStringTable = (char*)(fMappedFile + stringHeader.sh_offset);
-			fSymbolCount = sectionHeader->sh_size / sizeof(Elf32_Sym);
-			fStringTableSize = stringHeader.sh_size;
-
-			return B_OK;
-		}
-	}
-
-	return B_BAD_DATA;
-}
-
-
-status_t
-ImageFile::LoadKernel()
-{
-	// get the table sizes
-	fSymbolCount = 0;
-	fStringTableSize = 0;
-	status_t error = _kern_read_kernel_image_symbols(fInfo.id,
-		NULL, &fSymbolCount, NULL, &fStringTableSize, NULL);
-	if (error != B_OK)
-		return error;
-
-	// allocate the tables
-	fSymbolTable = new(std::nothrow) Elf32_Sym[fSymbolCount];
-	fStringTable = new(std::nothrow) char[fStringTableSize];
-	if (fSymbolTable == NULL || fStringTable == NULL)
-		return B_NO_MEMORY;
-
-	// get the info
-	return _kern_read_kernel_image_symbols(fInfo.id,
-		fSymbolTable, &fSymbolCount, fStringTable, &fStringTableSize,
-		&fLoadDelta);
-}
-
-
-const Elf32_Sym*
-ImageFile::LookupSymbol(addr_t address, addr_t* _baseAddress,
-	const char** _symbolName, size_t *_symbolNameLen, bool *_exactMatch) const
-{
-	const Elf32_Sym* symbolFound = NULL;
-	const char* symbolName = NULL;
-	bool exactMatch = false;
-	addr_t deltaFound = ~(addr_t)0;
-
-	for (int32 i = 0; i < fSymbolCount; i++) {
-		const Elf32_Sym* symbol = &fSymbolTable[i];
-
-		if (symbol->st_value == 0
-			|| symbol->st_size >= (size_t)fInfo.text_size + fInfo.data_size) {
-			continue;
-		}
-
-		addr_t symbolAddress = symbol->st_value + fLoadDelta;
-		if (symbolAddress > address)
-			continue;
-
-		addr_t symbolDelta = address - symbolAddress;
-		if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
-			exactMatch = true;
-
-		if (exactMatch || symbolDelta < deltaFound) {
-			deltaFound = symbolDelta;
-			symbolFound = symbol;
-			symbolName = fStringTable + symbol->st_name;
-
-			if (exactMatch)
-				break;
-		}
-	}
-
-	if (symbolFound != NULL) {
-		if (_baseAddress != NULL)
-			*_baseAddress = symbolFound->st_value + fLoadDelta;
-		if (_symbolName != NULL)
-			*_symbolName = symbolName;
-		if (_exactMatch != NULL)
-			*_exactMatch = exactMatch;
-		if (_symbolNameLen != NULL)
-			*_symbolNameLen = _SymbolNameLen(symbolName);
-	}
-
-	return symbolFound;
-}
-
-
-status_t
-ImageFile::NextSymbol(int32& iterator, const char** _symbolName,
-	size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
-	int32* _symbolType) const
-{
-	while (true) {
-		if (++iterator >= fSymbolCount)
-			return B_ENTRY_NOT_FOUND;
-
-		const Elf32_Sym* symbol = &fSymbolTable[iterator];
-
-		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
-				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
-			|| symbol->st_value == 0) {
-			continue;
-		}
-
-		*_symbolName = fStringTable + symbol->st_name;
-		*_symbolNameLen = _SymbolNameLen(*_symbolName);
-		*_symbolAddress = symbol->st_value + fLoadDelta;
-		*_symbolSize = symbol->st_size;
-		*_symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
-			? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
-
-		return B_OK;
-	}
-}
-
-
-size_t
-ImageFile::_SymbolNameLen(const char* symbolName) const
-{
-	if (symbolName == NULL || (addr_t)symbolName < (addr_t)fStringTable
-		|| (addr_t)symbolName >= (addr_t)fStringTable + fStringTableSize) {
-		return 0;
-	}
-
-	return strnlen(symbolName,
-		(addr_t)fStringTable + fStringTableSize - (addr_t)symbolName);
-}
+private:
+			SymbolLookup*			fSymbolLookup;
+			const image_t*			fImage;
+			int32					fSymbolCount;
+			size_t					fTextDelta;
+};
 
 
 // #pragma mark -
@@ -439,7 +228,7 @@ SymbolLookup::SymbolLookup(team_id team)
 	:
 	RemoteMemoryAccessor(team),
 	fDebugArea(NULL),
-	fImageFiles()
+	fImages()
 {
 }
 
@@ -447,8 +236,8 @@ SymbolLookup::SymbolLookup(team_id team)
 // destructor
 SymbolLookup::~SymbolLookup()
 {
-	while (ImageFile* imageFile = fImageFiles.RemoveHead())
-		delete imageFile;
+	while (Image* image = fImages.RemoveHead())
+		delete image;
 }
 
 
@@ -500,18 +289,41 @@ SymbolLookup::Init()
 	image_info imageInfo;
 	int32 cookie = 0;
 	while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
-		ImageFile* imageFile = new(std::nothrow) ImageFile(imageInfo);
-		if (imageFile == NULL)
-			break;
+		Image* image;
 
-		error = fTeam == B_SYSTEM_TEAM
-			? imageFile->LoadKernel() : imageFile->Load();
-		if (error != B_OK) {
-			delete imageFile;
-			continue;
+		if (fTeam == B_SYSTEM_TEAM) {
+			// kernel image
+			KernelImage* kernelImage = new(std::nothrow) KernelImage;
+			if (kernelImage == NULL)
+				return B_NO_MEMORY;
+
+			error = kernelImage->Init(imageInfo);
+			image = kernelImage;
+		} else {
+			// userland image -- try to load an image file
+			ImageFile* imageFile = new(std::nothrow) ImageFile;
+			if (imageFile == NULL)
+				return B_NO_MEMORY;
+
+			error = imageFile->Init(imageInfo);
+			image = imageFile;
 		}
 
-		fImageFiles.Add(imageFile);
+		if (error != B_OK) {
+			// initialization error -- fall back to the loaded image
+			delete image;
+
+			const image_t* loadedImage = _FindLoadedImageByID(imageInfo.id);
+			if (loadedImage == NULL)
+				continue;
+
+			image = new(std::nothrow) LoadedImage(this, loadedImage,
+				Read(loadedImage->symhash[1]));
+			if (image == NULL)
+				return B_NO_MEMORY;
+		}
+
+		fImages.Add(image);
 	}
 
 	return B_OK;
@@ -526,25 +338,237 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 {
 	TRACE(("SymbolLookup::LookupSymbolAddress(%p)\n", (void*)address));
 
-	// Try the loaded image file first -- it also contains static symbols.
-	ImageFile* imageFile = _FindImageFileAtAddress(address);
-	if (imageFile != NULL) {
-		if (_imageName != NULL)
-			*_imageName = imageFile->Info().name;
-		const Elf32_Sym* symbol = imageFile->LookupSymbol(address, _baseAddress,
-			_symbolName, _symbolNameLen, _exactMatch);
-		if (symbol != NULL)
-			return B_OK;
-	}
-
-	// get the image for the address
-	const image_t *image = _FindImageAtAddress(address);
+	Image* image = _FindImageAtAddress(address);
 	if (!image)
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE(("SymbolLookup::LookupSymbolAddress(): found image: ID: %ld, text: "
-		"address: %p, size: %ld\n",
-		image->id, (void*)image->regions[0].vmstart, image->regions[0].size));
+	if (_imageName != NULL)
+		*_imageName = image->Name();
+
+	const Elf32_Sym* symbolFound = image->LookupSymbol(address, _baseAddress,
+		_symbolName, _symbolNameLen, _exactMatch);
+
+	TRACE(("SymbolLookup::LookupSymbolAddress(): done: symbol: %p, image name: "
+		"%s, exact match: %d\n", symbolFound, image->name, exactMatch));
+
+	if (symbolFound != NULL)
+		return B_OK;
+
+	// symbol not found -- return the image itself
+
+	if (_baseAddress)
+		*_baseAddress = image->TextAddress();
+
+	if (_imageName)
+		*_imageName = image->Name();
+
+	if (_symbolName)
+		*_symbolName = NULL;
+
+	if (_exactMatch)
+		*_exactMatch = false;
+
+	if (_symbolNameLen != NULL)
+		*_symbolNameLen = 0;
+
+	return B_OK;
+}
+
+
+// InitSymbolIterator
+status_t
+SymbolLookup::InitSymbolIterator(image_id imageID,
+	SymbolIterator& iterator) const
+{
+	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %ld\n", imageID));
+
+	// find the image
+	iterator.image = _FindImageByID(imageID);
+
+	// If that didn't work, find the loaded image.
+	if (iterator.image == NULL) {
+		TRACE(("SymbolLookup::InitSymbolIterator() done: image not "
+			"found\n"));
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	iterator.currentIndex = -1;
+
+	return B_OK;
+}
+
+
+// InitSymbolIterator
+status_t
+SymbolLookup::InitSymbolIteratorByAddress(addr_t address,
+	SymbolIterator& iterator) const
+{
+	TRACE(("SymbolLookup::InitSymbolIteratorByAddress(): base address: %#lx\n",
+		address));
+
+	// find the image
+	iterator.image = _FindImageAtAddress(address);
+	if (iterator.image == NULL) {
+		TRACE(("SymbolLookup::InitSymbolIteratorByAddress() done: image "
+			"not found\n"));
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	iterator.currentIndex = -1;
+
+	return B_OK;
+}
+
+
+// NextSymbol
+status_t
+SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
+	size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
+	int32* _symbolType) const
+{
+	return iterator.image->NextSymbol(iterator.currentIndex, _symbolName,
+		_symbolNameLen, _symbolAddress, _symbolSize, _symbolType);
+}
+
+
+// _FindLoadedImageAtAddress
+const image_t *
+SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const
+{
+	TRACE(("SymbolLookup::_FindLoadedImageAtAddress(%p)\n", (void*)address));
+
+	if (fDebugArea == NULL)
+		return NULL;
+
+	// iterate through the loaded images
+	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
+		 image;
+		 image = &Read(*image->next)) {
+		if (image->regions[0].vmstart <= address
+			&& address < image->regions[0].vmstart + image->regions[0].size) {
+			return image;
+		}
+	}
+
+	return NULL;
+}
+
+
+// _FindLoadedImageByID
+const image_t*
+SymbolLookup::_FindLoadedImageByID(image_id id) const
+{
+	if (fDebugArea == NULL)
+		return NULL;
+
+	// iterate through the images
+	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
+		 image;
+		 image = &Read(*image->next)) {
+		if (image->id == id)
+			return image;
+	}
+
+	return NULL;
+}
+
+
+// _FindImageAtAddress
+Image*
+SymbolLookup::_FindImageAtAddress(addr_t address) const
+{
+	DoublyLinkedList<Image>::ConstIterator it = fImages.GetIterator();
+	while (Image* image = it.Next()) {
+		addr_t textAddress = image->TextAddress();
+		if (address >= textAddress && address < textAddress + image->TextSize())
+			return image;
+	}
+
+	return NULL;
+}
+
+
+// _FindImageByID
+Image*
+SymbolLookup::_FindImageByID(image_id id) const
+{
+	DoublyLinkedList<Image>::ConstIterator it = fImages.GetIterator();
+	while (Image* image = it.Next()) {
+		if (image->ID() == id)
+			return image;
+	}
+
+	return NULL;
+}
+
+
+// _SymbolNameLen
+size_t
+SymbolLookup::_SymbolNameLen(const char* address) const
+{
+	Area* area = AreaForLocalAddress(address);
+	if (area == NULL)
+		return 0;
+
+	return strnlen(address, (addr_t)area->LocalAddress() + area->Size()
+		- (addr_t)address);
+}
+
+
+// #pragma mark - LoadedImage
+
+
+SymbolLookup::LoadedImage::LoadedImage(SymbolLookup* symbolLookup,
+	const image_t* image, int32 symbolCount)
+	:
+	fSymbolLookup(symbolLookup),
+	fImage(image),
+	fSymbolCount(symbolCount),
+	fTextDelta(image->regions[0].delta)
+{
+}
+
+
+SymbolLookup::LoadedImage::~LoadedImage()
+{
+}
+
+
+image_id
+SymbolLookup::LoadedImage::ID() const
+{
+	return fImage->id;
+}
+
+
+const char*
+SymbolLookup::LoadedImage::Name() const
+{
+	return fImage->path;
+}
+
+
+addr_t
+SymbolLookup::LoadedImage::TextAddress() const
+{
+	return fImage->regions[0].vmstart;
+}
+
+
+size_t
+SymbolLookup::LoadedImage::TextSize() const
+{
+	return fImage->regions[0].vmsize;
+}
+
+
+const Elf32_Sym*
+SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
+	const char** _symbolName, size_t *_symbolNameLen, bool *_exactMatch) const
+{
+	TRACE(("LoadedImage::LookupSymbol(): found image: ID: %ld, text: "
+		"address: %p, size: %ld\n", fImage->id,
+		(void*)fImage->regions[0].vmstart, fImage->regions[0].size));
 
 	// search the image for the symbol
 	const struct Elf32_Sym *symbolFound = NULL;
@@ -552,11 +576,11 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	bool exactMatch = false;
 	const char *symbolName = NULL;
 
-	int32 symbolCount = Read(image->symhash[1]);
-	const elf_region_t *textRegion = image->regions;				// local
+	int32 symbolCount = fSymbolLookup->Read(fImage->symhash[1]);
+	const elf_region_t *textRegion = fImage->regions;				// local
 
 	for (int32 i = 0; i < symbolCount; i++) {
-		const struct Elf32_Sym *symbol = &Read(image->syms[i]);
+		const struct Elf32_Sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
 
 		// The symbol table contains not only symbols referring to functions
 		// and data symbols within the shared object, but also referenced
@@ -581,8 +605,8 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 		addr_t symbolDelta = address - symbolAddress;
 
 		if (!symbolFound || symbolDelta < deltaFound) {
-			symbolName = (const char*)PrepareAddressNoThrow(SYMNAME(image,
-				symbol), 1);
+			symbolName = (const char*)fSymbolLookup->PrepareAddressNoThrow(
+				SYMNAME(fImage, symbol), 1);
 			if (symbolName == NULL)
 				continue;
 
@@ -597,215 +621,49 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 		}
 	}
 
-	TRACE(("SymbolLookup::LookupSymbolAddress(): done: symbol: %p, image name: "
-		"%s, exact match: %d\n", symbolFound, image->name, exactMatch));
+	TRACE(("LoadedImage::LookupSymbol(): done: symbol: %p, image name: "
+		"%s, exact match: %d\n", symbolFound, fImage->name, exactMatch));
 
-	if (_baseAddress) {
-		if (symbolFound)
+	if (symbolFound != NULL) {
+		if (_baseAddress)
 			*_baseAddress = symbolFound->st_value + textRegion->delta;
-		else
-			*_baseAddress = textRegion->vmstart;
+		if (_symbolName)
+			*_symbolName = symbolName;
+		if (_exactMatch)
+			*_exactMatch = exactMatch;
+		if (_symbolNameLen != NULL)
+			*_symbolNameLen = fSymbolLookup->_SymbolNameLen(symbolName);
 	}
 
-	if (_imageName)
-		*_imageName = image->name;
-
-	if (_symbolName)
-		*_symbolName = symbolName;	// remote address
-
-	if (_exactMatch)
-		*_exactMatch = exactMatch;
-
-	if (_symbolNameLen != NULL)
-		*_symbolNameLen = _SymbolNameLen(symbolName);
-
-	return B_OK;
+	return symbolFound;
 }
 
 
-// InitSymbolIterator
 status_t
-SymbolLookup::InitSymbolIterator(image_id imageID,
-	SymbolIterator& iterator) const
-{
-	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %ld\n", imageID));
-
-	// find the image file
-	iterator.imageFile = _FindImageFileByID(imageID);
-
-	// If that didn't work, find the image.
-	if (iterator.imageFile == NULL) {
-		const image_t* image = _FindImageByID(imageID);
-		if (image == NULL) {
-			TRACE(("SymbolLookup::InitSymbolIterator() done: image not "
-				"found\n"));
-			return B_ENTRY_NOT_FOUND;
-		}
-
-		iterator.image = image;
-		iterator.symbolCount = Read(image->symhash[1]);
-		iterator.textDelta = image->regions->delta;
-	}
-
-	iterator.currentIndex = -1;
-
-	return B_OK;
-}
-
-
-// InitSymbolIterator
-status_t
-SymbolLookup::InitSymbolIteratorByAddress(addr_t address,
-	SymbolIterator& iterator) const
-{
-	TRACE(("SymbolLookup::InitSymbolIteratorByAddress(): base address: %#lx\n",
-		address));
-
-	// find the image file
-	iterator.imageFile = _FindImageFileAtAddress(address);
-
-	// If that didn't work, find the image.
-	if (iterator.imageFile == NULL) {
-		const image_t *image = _FindImageAtAddress(address);
-		if (image == NULL) {
-			TRACE(("SymbolLookup::InitSymbolIteratorByAddress() done: image "
-				"not found\n"));
-			return B_ENTRY_NOT_FOUND;
-		}
-
-		iterator.image = image;
-		iterator.symbolCount = Read(image->symhash[1]);
-		iterator.textDelta = image->regions->delta;
-	}
-
-	iterator.currentIndex = -1;
-
-	return B_OK;
-}
-
-
-// NextSymbol
-status_t
-SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
+SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 	size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
 	int32* _symbolType) const
 {
-	// If we have an image file, get the next symbol from it.
-	const ImageFile* imageFile = iterator.imageFile;
-	if (imageFile != NULL) {
-		return imageFile->NextSymbol(iterator.currentIndex, _symbolName,
-			_symbolNameLen, _symbolAddress, _symbolSize, _symbolType);
-	}
-
-	// Otherwise we've to fall be to iterating through the image.
-	const image_t* image = iterator.image;
-
 	while (true) {
-		if (++iterator.currentIndex >= iterator.symbolCount)
+		if (++iterator >= fSymbolCount)
 			return B_ENTRY_NOT_FOUND;
 
-		const struct Elf32_Sym* symbol = &Read(image->syms[
-			iterator.currentIndex]);
+		const struct Elf32_Sym* symbol
+			= &fSymbolLookup->Read(fImage->syms[iterator]);
 		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
 				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
 			|| symbol->st_value == 0) {
 			continue;
 		}
 
-		*_symbolName = (const char*)PrepareAddressNoThrow(SYMNAME(image,
-			symbol), 1);
-		*_symbolNameLen = _SymbolNameLen(*_symbolName);
-		*_symbolAddress = symbol->st_value + iterator.textDelta;
+		*_symbolName = (const char*)fSymbolLookup->PrepareAddressNoThrow(
+			SYMNAME(fImage, symbol), 1);
+		*_symbolNameLen = fSymbolLookup->_SymbolNameLen(*_symbolName);
+		*_symbolAddress = symbol->st_value + fTextDelta;
 		*_symbolSize = symbol->st_size;
 		*_symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
 			? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
 
 		return B_OK;
 	}
-}
-
-
-// _FindImageAtAddress
-const image_t *
-SymbolLookup::_FindImageAtAddress(addr_t address) const
-{
-	TRACE(("SymbolLookup::_FindImageAtAddress(%p)\n", (void*)address));
-
-	if (fDebugArea == NULL)
-		return NULL;
-
-	// iterate through the images
-	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
-		 image;
-		 image = &Read(*image->next)) {
-		if (image->regions[0].vmstart <= address
-			&& address < image->regions[0].vmstart + image->regions[0].size) {
-			return image;
-		}
-	}
-
-	return NULL;
-}
-
-
-// _FindImageByID
-const image_t*
-SymbolLookup::_FindImageByID(image_id id) const
-{
-	if (fDebugArea == NULL)
-		return NULL;
-
-	// iterate through the images
-	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
-		 image;
-		 image = &Read(*image->next)) {
-		if (image->id == id)
-			return image;
-	}
-
-	return NULL;
-}
-
-
-// _FindImageFileAtAddress
-ImageFile*
-SymbolLookup::_FindImageFileAtAddress(addr_t address) const
-{
-	DoublyLinkedList<ImageFile>::ConstIterator it = fImageFiles.GetIterator();
-	while (ImageFile* imageFile = it.Next()) {
-		const image_info& info = imageFile->Info();
-		if (address >= (addr_t)info.text
-			&& address < (addr_t)info.text + info.text_size) {
-			return imageFile;
-		}
-	}
-
-	return NULL;
-}
-
-
-// _FindImageFileByID
-ImageFile*
-SymbolLookup::_FindImageFileByID(image_id id) const
-{
-	DoublyLinkedList<ImageFile>::ConstIterator it = fImageFiles.GetIterator();
-	while (ImageFile* imageFile = it.Next()) {
-		if (imageFile->Info().id == id)
-			return imageFile;
-	}
-
-	return NULL;
-}
-
-
-// _SymbolNameLen
-size_t
-SymbolLookup::_SymbolNameLen(const char* address) const
-{
-	Area* area = AreaForLocalAddress(address);
-	if (area == NULL)
-		return 0;
-
-	return strnlen(address, (addr_t)area->LocalAddress() + area->Size()
-		- (addr_t)address);
 }

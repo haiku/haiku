@@ -1,10 +1,10 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-#ifndef _SYMBOL_LOOKUP_H
-#define _SYMBOL_LOOKUP_H
+#ifndef SYMBOL_LOOKUP_H
+#define SYMBOL_LOOKUP_H
 
 #include <stdio.h>
 
@@ -20,6 +20,10 @@ struct Elf32_Sym;
 
 
 namespace BPrivate {
+namespace Debug {
+
+class Image;
+
 
 // Exception
 class Exception {
@@ -123,46 +127,9 @@ private:
 };
 
 
-// ImageFile
-class ImageFile : public DoublyLinkedListLinkImpl<ImageFile> {
-public:
-	ImageFile(const image_info& info);
-	~ImageFile();
-
-	const image_info& Info() const	{ return fInfo; }
-
-	status_t Load();
-	status_t LoadKernel();
-
-	const Elf32_Sym* LookupSymbol(addr_t address, addr_t* _baseAddress,
-		const char** _symbolName, size_t *_symbolNameLen,
-		bool *_exactMatch) const;
-	status_t NextSymbol(int32& iterator, const char** _symbolName,
-		size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
-		int32* _symbolType) const;
-
-private:
-	size_t _SymbolNameLen(const char* symbolName) const;
-
-private:
-	image_info			fInfo;
-	int					fFD;
-	off_t				fFileSize;
-	uint8*				fMappedFile;
-	addr_t				fLoadDelta;
-	Elf32_Sym*			fSymbolTable;
-	char*				fStringTable;
-	int32				fSymbolCount;
-	size_t				fStringTableSize;
-};
-
-
 // SymbolIterator
 struct SymbolIterator {
-	const image_t*		image;
-	const ImageFile*	imageFile;
-	int32				symbolCount;
-	size_t				textDelta;
+	const Image*		image;
 	int32				currentIndex;
 };
 
@@ -188,19 +155,24 @@ public:
 		int32* _symbolType) const;
 
 private:
-	const image_t *_FindImageAtAddress(addr_t address) const;
-	const image_t *_FindImageByID(image_id id) const;
-	ImageFile* _FindImageFileAtAddress(addr_t address) const;
-	ImageFile* _FindImageFileByID(image_id id) const;
+	class LoadedImage;
+	friend class LoadedImage;
+
+private:
+	const image_t* _FindLoadedImageAtAddress(addr_t address) const;
+	const image_t* _FindLoadedImageByID(image_id id) const;
+	Image* _FindImageAtAddress(addr_t address) const;
+	Image* _FindImageByID(image_id id) const;
 	size_t _SymbolNameLen(const char* address) const;
 
 private:
 	const runtime_loader_debug_area	*fDebugArea;
-	DoublyLinkedList<ImageFile>	fImageFiles;
+	DoublyLinkedList<Image>	fImages;
 };
 
+}	// namespace Debug
 }	// namespace BPrivate
 
-using BPrivate::SymbolLookup;
+using BPrivate::Debug::SymbolLookup;
 
-#endif	// _SYMBOL_LOOKUP_H
+#endif	// SYMBOL_LOOKUP_H

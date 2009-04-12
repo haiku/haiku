@@ -21,7 +21,7 @@ struct debug_symbol_lookup_context {
 	SymbolLookup*	lookup;
 };
 
-struct debug_symbol_iterator : BPrivate::SymbolIterator {
+struct debug_symbol_iterator : BPrivate::Debug::SymbolIterator {
 	debug_symbol_lookup_context*	lookup_context;
 };
 
@@ -327,7 +327,7 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 			exactMatch);
 		if (error != B_OK)
 			return error;
-	} catch (BPrivate::Exception exception) {
+	} catch (BPrivate::Debug::Exception exception) {
 		return exception.Error();
 	}
 
@@ -368,7 +368,7 @@ debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
 	status_t error;
 	try {
 		error = lookup->InitSymbolIterator(imageID, *iterator);
-	} catch (BPrivate::Exception exception) {
+	} catch (BPrivate::Debug::Exception exception) {
 		error = exception.Error();
 	}
 
@@ -386,7 +386,7 @@ debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
 			try {
 				error = lookup->InitSymbolIteratorByAddress(
 					(addr_t)imageInfo.text, *iterator);
-			} catch (BPrivate::Exception exception) {
+			} catch (BPrivate::Debug::Exception exception) {
 				error = exception.Error();
 			}
 		}
@@ -433,7 +433,7 @@ debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
 			_symbolType);
 		if (error != B_OK)
 			return error;
-	} catch (BPrivate::Exception exception) {
+	} catch (BPrivate::Debug::Exception exception) {
 		return exception.Error();
 	}
 
