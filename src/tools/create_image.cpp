@@ -131,11 +131,16 @@ main(int argc, char *argv[])
 			char buffer[1024 * 1024];
 			memset(buffer, 0, sizeof(buffer));
 
+			off_t totalWritten = 0;
 			ssize_t written;
-			while ((written = write(fd, buffer, sizeof(buffer))) > 0) {
-			}
+			while ((written = write(fd, buffer, sizeof(buffer))) > 0)
+				totalWritten += written;
 
-			if (written < 0) {
+			// Only fail, if an error occurs and we haven't written anything at
+			// all yet.
+			// TODO: We should probably first determine the size of the device
+			// and try to write only that much.
+			if (totalWritten == 0 && written < 0) {
 				fprintf(stderr, "Error: writing to device file %s failed "
 					"(%s)\n", file, strerror(errno));
 				exit(EXIT_FAILURE);
