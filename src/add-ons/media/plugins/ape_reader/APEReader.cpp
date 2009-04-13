@@ -2,8 +2,8 @@
 
 /*============================================================================*/
 const char*	gAppName = "APE (Monkey's Audio) reader";
-const char*	gAppVer = "Ver 1.12";
-const char*	gCright = "Copyright "B_UTF8_COPYRIGHT" 2005-2008 by SHINTA";
+const char*	gAppVer = "Ver 1.13";
+const char*	gCright = "Copyright "B_UTF8_COPYRIGHT" 2005-2009 by SHINTA";
 const char*	gAppSignature = "application/x-vnd.SHINTA-MediaKitAPEReader";
 /*============================================================================*/
 
@@ -137,27 +137,39 @@ status_t	TAPEReader::ReadBlocks()
 	return B_OK;
 }
 //------------------------------------------------------------------------------
-status_t	TAPEReader::Seek(void* oCookie, uint32 oFlags, int64* oFrame, bigtime_t* oTime)
+
+status_t		TAPEReader::FindKeyFrame(void* cookie, uint32 flags,
+								int64* frame, bigtime_t* time)
 {
-	return B_ERROR;
-#if 0	// not work in Haiku
+	printf("FindKeyFrame for time %Ld or frame %Ld\n",*time,*frame);
+	if ( flags & B_MEDIA_SEEK_TO_FRAME ) {
+		*time = *frame * 1000 /  mDecomp->GetInfo(APE_DECOMPRESS_TOTAL_BLOCKS) * mDecomp->GetInfo(APE_DECOMPRESS_LENGTH_MS);
+	} else if ( flags & B_MEDIA_SEEK_TO_TIME ) {
+		*frame = (*time)/1000*mDecomp->GetInfo(APE_DECOMPRESS_TOTAL_BLOCKS)/mDecomp->GetInfo(APE_DECOMPRESS_LENGTH_MS);
+	} else {
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+status_t		TAPEReader::Seek(void *cookie, uint32 flags,
+					 			int64 *frame, bigtime_t *time)
+{
 	int32		aNewBlock;
 
-	if ( oFlags&B_MEDIA_SEEK_TO_FRAME ) {
-		DBEXP("TAPEReader::Seek()", "Seek by frame not supported yet");
-		return B_ERROR;
-	} else if ( oFlags&B_MEDIA_SEEK_TO_TIME ) {
-		DBEXP("TAPEReader::Seek() - B_MEDIA_SEEK_TO_TIME", *oTime);
-		aNewBlock = (*oTime)/1000*mDecomp->GetInfo(APE_DECOMPRESS_TOTAL_BLOCKS)/mDecomp->GetInfo(APE_DECOMPRESS_LENGTH_MS);
-		DBEXP("TAPEReader::Seek() - aNewBlock", aNewBlock);
+	printf("Seek for time %Ld or frame %Ld\n",*time,*frame);
+	if ( flags & B_MEDIA_SEEK_TO_FRAME ) {
+                aNewBlock = *frame; 
+	} else if ( flags & B_MEDIA_SEEK_TO_TIME ) {
+		aNewBlock = (*time)/1000*mDecomp->GetInfo(APE_DECOMPRESS_TOTAL_BLOCKS)/mDecomp->GetInfo(APE_DECOMPRESS_LENGTH_MS);
 	} else {
 		return B_ERROR;
 	}
 	mReadPosTotal = aNewBlock*mDecomp->GetInfo(APE_INFO_BLOCK_ALIGN);
-	int a = mDecomp->Seek(aNewBlock);
+	mDecomp->Seek(aNewBlock);
 	ReadBlocks();
 	return B_OK;
-#endif
 }
 //------------------------------------------------------------------------------
 status_t	TAPEReader::Sniff(int32* oStreamCount)

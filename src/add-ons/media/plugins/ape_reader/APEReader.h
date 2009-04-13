@@ -31,7 +31,11 @@ public:
 	virtual	status_t	GetStreamInfo(void* oCookie, int64* oFrameCount, bigtime_t* oDuration, media_format* oFormat,
 								const void** oInfoBuffer, size_t* oInfoSize);
 
-	virtual	status_t	Seek(void* oCookie, uint32 oFlags, int64* oFrame, bigtime_t* oTime);
+	virtual	status_t		Seek(void *cookie, uint32 flags,
+					 			int64 *frame, bigtime_t *time);
+
+	virtual	status_t		FindKeyFrame(void* cookie, uint32 flags,
+								int64* frame, bigtime_t* time);
 
 	virtual	status_t	GetNextChunk(void* oCookie, const void** oChunkBuffer, size_t* oChunkSize, media_header* oMediaHeader);
 
