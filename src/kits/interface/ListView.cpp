@@ -33,6 +33,8 @@ struct track_data {
 	bigtime_t	last_click_time;
 };
 
+const float kDoubleClickTresh = 6;
+
 static property_info sProperties[] = {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
 		"Returns the number of BListItems currently in the list.", 0, { B_INT32_TYPE }
@@ -311,14 +313,24 @@ BListView::MouseDown(BPoint point)
 
 	// If the user double (or more) clicked within the current selection,
 	// we don't change the selection but invoke the selection.
-	bigtime_t clickSpeed = 0;
-	get_click_speed(&clickSpeed);
-	bool multipleClick = system_time() - fTrack->last_click_time < clickSpeed
-		&& point == fTrack->drag_start;
-
-
-	if (multipleClick && index >= fFirstSelected && index <= fLastSelected) {
-		printf("Invoking item %ld\n", index);
+	// TODO: move this code someplace where it can be shared everywhere
+	// instead of every class having to reimplement it, once some sane
+	// API for it is decided.
+	BPoint delta = point - fTrack->drag_start;
+	bigtime_t sysTime;
+	Window()->CurrentMessage()->FindInt64("when", &sysTime);
+	bigtime_t timeDelta = sysTime - fTrack->last_click_time;
+	bigtime_t doubleClickSpeed;
+	get_click_speed(&doubleClickSpeed);
+	bool doubleClick = false;
+	
+	if (timeDelta < doubleClickSpeed
+		&& fabs(delta.x) < kDoubleClickTresh
+		&& fabs(delta.y) < kDoubleClickTresh)
+		doubleClick = true;
+	
+	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
+		fTrack->drag_start.Set(LONG_MAX, LONG_MAX);
 		Invoke();
 		return;
 	}
@@ -326,7 +338,7 @@ BListView::MouseDown(BPoint point)
 	int32 modifiers;
 	message->FindInt32("modifiers", &modifiers);
 	
-	if (!multipleClick) {
+	if (!doubleClick) {
 		fTrack->drag_start = point;
 		fTrack->last_click_time = system_time();
 		fTrack->item_index = index;
