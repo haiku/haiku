@@ -117,11 +117,29 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 	}
 
 	if (IS_CODEC(codec, "A_MPEG/L3")) {
-		media_format_description description;
 		description.family = B_MPEG_FORMAT_FAMILY;
 		description.u.mpeg.id = B_MPEG_1_AUDIO_LAYER_3;
 		if (formats.GetFormatFor(description, format) != B_OK) 
 			format->type = B_MEDIA_ENCODED_AUDIO;
+
+		return B_OK;
+	}
+
+	if (IS_CODEC(codec, "A_AC3")) {
+		description.family =  B_WAV_FORMAT_FAMILY;
+		description.u.wav.codec = 0x2000;
+
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_AUDIO;
+
+		// Set the DecoderConfigSize (Not that haiku seems to use it)
+		if (private_size > 0) {
+			TRACE("AC3 private data found, size is %d\n", private_size);
+			if (format->SetMetaData(private_data, private_size) != B_OK) {
+				ERROR("Failed to set Decoder Config\n");
+				return B_ERROR;
+			}
+		}
 
 		return B_OK;
 	}
@@ -179,8 +197,26 @@ GetVideoFormat(media_format *format, const char *codec, void *private_data, int 
 		return B_OK;
 	}
 	if (IS_CODEC(codec, "V_MPEG4/ISO/AVC")) {
-		printf("TODO: MPEG4/AVC a.k.a h264\n");
-		return B_ERROR;
+		uint64 codecid = 'avc1';
+
+		description.family = B_QUICKTIME_FORMAT_FAMILY;
+		description.u.quicktime.codec = codecid;
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_VIDEO;
+
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		*(uint32 *)format->user_data = codecid; format->user_data[4] = 0;
+
+		// Set the DecoderConfigSize (Not that haiku seems to use it)
+		if (private_size > 0) {
+			TRACE("AVC private data found, size is %d\n", private_size);
+			if (format->SetMetaData(private_data, private_size) != B_OK) {
+				ERROR("Failed to set Decoder Config\n");
+				return B_ERROR;
+			}
+		}
+
+		return B_OK;
 	}
 	TRACE("not a codec!\n");
 
