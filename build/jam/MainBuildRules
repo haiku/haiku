@@ -175,9 +175,9 @@ rule AssembleNasm
 actions AssembleNasm
 {
 	if test $(ASFLAGS) ; then
-		yasm -d $(ASFLAGS) -f elf32 -o $(1) $(2);
+		$(HAIKU_YASM) -d $(ASFLAGS) -f elf32 -o $(1) $(2);
 	else
-		yasm -f elf32 -o $(1) $(2);
+		$(HAIKU_YASM) -f elf32 -o $(1) $(2);
 	fi
 }
 

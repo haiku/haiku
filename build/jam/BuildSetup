@@ -180,6 +180,11 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+
+		# yasm is required for target arch x86
+		if ! $(HAIKU_YASM) {
+			Exit "HAIKU_YASM not set. Please re-run configure." ;
+		}
 	}
 	case m68k :
 	{
