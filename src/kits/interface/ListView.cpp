@@ -326,7 +326,8 @@ BListView::MouseDown(BPoint point)
 	
 	if (timeDelta < doubleClickSpeed
 		&& fabs(delta.x) < kDoubleClickTresh
-		&& fabs(delta.y) < kDoubleClickTresh)
+		&& fabs(delta.y) < kDoubleClickTresh
+		&& fTrack->last_index == index)
 		doubleClick = true;
 	
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
