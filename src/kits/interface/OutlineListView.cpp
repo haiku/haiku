@@ -141,18 +141,23 @@ void
 BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (numBytes == 1) {
+		int32 currentSel = CurrentSelection();
 		switch (bytes[0]) {
 			case B_RIGHT_ARROW:
 			{
-				BListItem *item = ItemAt(CurrentSelection());
-				if (item && item->fHasSubitems)
-					Expand(item);
+				BListItem *item = ItemAt(currentSel);
+				if (item && item->fHasSubitems) {
+					if (!IsExpanded(currentSel)) 
+						Expand(item);
+					else
+						Select(currentSel + 1);
+				}
 				return;
 			}
 
 			case B_LEFT_ARROW:
 			{
-				BListItem *item = ItemAt(CurrentSelection());
+				BListItem *item = ItemAt(currentSel);
 				if (item) {
 					if (item->fHasSubitems)
 						Collapse(item);
