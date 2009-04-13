@@ -28,6 +28,7 @@ UnicodeBlockView::UnicodeBlockView(const char* name)
 	fShowPrivateBlocks(false),
 	fShowContainedBlocksOnly(false)
 {
+	_CreateBlocks();
 }
 
 
@@ -76,22 +77,6 @@ UnicodeBlockView::IsShowingBlock(int32 blockIndex) const
 		return false;
 
 	return true;
-}
-
-
-void
-UnicodeBlockView::AttachedToWindow()
-{
-	// TODO: if we're calling this in the constructor, strange things happen
-	_CreateBlocks();
-}
-
-
-void
-UnicodeBlockView::DetachedFromWindow()
-{
-	MakeEmpty();
-	fBlocks.MakeEmpty();
 }
 
 

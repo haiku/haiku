@@ -41,10 +41,6 @@ public:
 
 			bool			IsShowingBlock(int32 blockIndex) const;
 
-protected:
-	virtual	void			AttachedToWindow();
-	virtual	void			DetachedFromWindow();
-
 private:
 			void			_UpdateBlocks();
 			void			_CreateBlocks();
