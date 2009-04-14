@@ -2,8 +2,8 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-#ifndef _DOSFS_FILE_H_
-#define _DOSFS_FILE_H_
+#ifndef FAT_FILE_H
+#define FAT_FILE_H
 
 mode_t		make_mode(nspace *volume, vnode *node);
 status_t	write_vnode_entry(nspace *vol, vnode *node);
@@ -37,10 +37,8 @@ status_t	dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos,
 				size_t reqLen, struct file_io_vec *vecs, size_t *_count);
 bool		dosfs_can_page(fs_volume *_vol, fs_vnode *_node, void *_cookie);
 status_t	dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
-				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool reenter);
+				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 status_t	dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
-				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool reenter);
+				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 
-#endif
+#endif	/* FAT_FILE_H */

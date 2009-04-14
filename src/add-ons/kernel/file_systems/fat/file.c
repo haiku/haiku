@@ -1504,9 +1504,8 @@ dosfs_can_page(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 
 status_t
-dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-	bool reenter)
+dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -1522,9 +1521,7 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	if (node->cache == NULL)
 		return(B_BAD_VALUE);
 
-	if (!reenter) {
-		LOCK_VOL(vol);
-	}
+	LOCK_VOL(vol);
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
@@ -1548,18 +1545,15 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	if (!reenter) {
-		UNLOCK_VOL(vol);
-	}
+	UNLOCK_VOL(vol);
 
 	return status;
 }
 
 
 status_t
-dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-	bool reenter)
+dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -1575,9 +1569,7 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
 
-	if (!reenter) {
-		LOCK_VOL(vol);
-	}
+	LOCK_VOL(vol);
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
@@ -1601,9 +1593,7 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	if (!reenter) {
-		UNLOCK_VOL(vol);
-	}
+	UNLOCK_VOL(vol);
 
 	return status;
 }
