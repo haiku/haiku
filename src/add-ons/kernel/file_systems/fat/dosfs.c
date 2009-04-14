@@ -224,8 +224,10 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			goto error0;
 		}
 	}
-	if ((geo.bytes_per_sector != 0x200) && (geo.bytes_per_sector != 0x400) && (geo.bytes_per_sector != 0x800)) {
-		dprintf("dosfs: unsupported device block size (%lu)\n", geo.bytes_per_sector);
+	if (geo.bytes_per_sector != 0x200 && geo.bytes_per_sector != 0x400
+		&& geo.bytes_per_sector != 0x800 && geo.bytes_per_sector != 0x1000) {
+		dprintf("dosfs: unsupported device block size (%lu)\n",
+			geo.bytes_per_sector);
 		goto error0;
 	}
 	if (geo.removable) {
@@ -283,9 +285,9 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	// first fill in the universal fields from the bpb
 	vol->bytes_per_sector = read16(buf, 0xb);
 	if (vol->bytes_per_sector != 0x200 && vol->bytes_per_sector != 0x400
-		&& vol->bytes_per_sector != 0x800) {
+		&& vol->bytes_per_sector != 0x800 && vol->bytes_per_sector != 0x1000) {
 		dprintf("dosfs error: unsupported bytes per sector (%lu)\n",
-				vol->bytes_per_sector);
+			vol->bytes_per_sector);
 		goto error;
 	}
 
@@ -605,7 +607,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	int i;
 	uint32 bytes_per_sector;
 	uint32 sectors_per_cluster;
-	uint32 fat_count;
+	uint32 fatCount;
 	uint32 reserved_sectors;
 	uint32 total_sectors;
 	uint32 sectors_per_fat;
@@ -613,51 +615,49 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	identify_cookie *cookie;
 
 	// read in the boot sector
-	if (read_pos(fd, 0, (void*)buf, 512) != 512) {
+	if (read_pos(fd, 0, buf, 512) != 512)
 		return -1;
-	}
 
 	// only check boot signature on hard disks to account for broken mtools
 	// behavior
-	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+	if ((buf[0x1fe] != 0x55 || buf[0x1ff] != 0xaa) && buf[0x15] == 0xf8)
 		return -1;
-	if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8)) {
+	if (!memcmp(buf + 3, "NTFS    ", 8) || !memcmp(buf + 3, "HPFS    ", 8))
 		return -1;
-	}
 
 	// first fill in the universal fields from the bpb
-	bytes_per_sector = read16(buf,0xb);
-	if ((bytes_per_sector != 0x200) && (bytes_per_sector != 0x400) && (bytes_per_sector != 0x800)) {
+	bytes_per_sector = read16(buf, 0xb);
+	if (bytes_per_sector != 0x200 && bytes_per_sector != 0x400
+		&& bytes_per_sector != 0x800 && bytes_per_sector != 0x1000) {
 		return -1;
 	}
 
+	// must be a power of two
 	sectors_per_cluster = i = buf[0xd];
-	if ((i != 1) && (i != 2) && (i != 4) && (i != 8) &&
-		(i != 0x10) && (i != 0x20) && (i != 0x40) && (i != 0x80)) {
+	if (i != 1 && i != 2 && i != 4 && i != 8 && i != 0x10 && i != 0x20
+		&& i != 0x40 && i != 0x80)
 		return -1;
-	}
 
-	reserved_sectors = read16(buf,0xe);
+	reserved_sectors = read16(buf, 0xe);
 
-	fat_count = buf[0x10];
-	if ((fat_count == 0) || (fat_count > 8)) {
+	fatCount = buf[0x10];
+	if (fatCount == 0 || fatCount > 8)
 		return -1;
-	}
 
 	// check media descriptor versus known types
-	if ((buf[0x15] != 0xF0) && (buf[0x15] < 0xf8)) {
+	if (buf[0x15] != 0xf0 && buf[0x15] < 0xf8)
 		return -1;
-	}
 
 	strcpy(name, "no name");
-	sectors_per_fat = read16(buf,0x16);
+	sectors_per_fat = read16(buf, 0x16);
 	if (sectors_per_fat == 0) {
-		total_sectors = read32(buf,0x20);
+		total_sectors = read32(buf, 0x20);
 		dosfs_read_label(true, buf, name);
 	} else {
-		total_sectors = read16(buf,0x13); // partition size
+		total_sectors = read16(buf, 0x13);
+			// partition size
 		if (total_sectors == 0)
-			total_sectors = read32(buf,0x20);
+			total_sectors = read32(buf, 0x20);
 
 		dosfs_read_label(false, buf, name);
 	}
