@@ -1,3 +1,4 @@
+#include <string>
 #include <InterfaceDefs.h>
 
 /*============================================================================*/
@@ -16,7 +17,6 @@ const char*	gAppSignature = "application/x-vnd.SHINTA-LibMonkeysAudio";
 //------------------------------------------------------------------------------
 // BeOS
 // C++
-#include <string>
 // Add2
 //===========================================================================
 CAPETag*	create_capetag_1(CIO* oIO, BOOL oAnalyze)
