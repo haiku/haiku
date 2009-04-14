@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -242,6 +242,10 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 
 arp_entry::~arp_entry()
 {
+	// make sure there is no active timer left for us
+	sStackModule->cancel_timer(&timer);
+	sStackModule->wait_for_timer(&timer);
+
 	ClearQueue();
 }
 
@@ -562,6 +566,8 @@ arp_timer(struct net_timer *timer, void *data)
 			// the entry has aged so much that we're going to remove it
 			TRACE(("  remove ARP entry %p!\n", entry));
 
+			// TODO: we need to make sure we aren't deleting this entry from
+			// somewhere else right now!
 			mutex_lock(&sCacheLock);
 			hash_remove(sCache, entry);
 			mutex_unlock(&sCacheLock);
