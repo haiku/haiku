@@ -29,21 +29,21 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 		"Send Mail Only",
 		"Send and Receive Mail"};
 	BMenuItem *item;
-	for (int32 i = 0;i < 3;i++)
+	for (int32 i = 0; i < 3; i++)
 		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i], NULL));
 
-	fTypeField = new BMenuField(BRect(topLeft, rightDown),NULL,
-									"Account Type:",chainsPopUp);
+	fTypeField = new BMenuField(BRect(topLeft, rightDown), NULL,
+									"Account Type:", chainsPopUp);
 	fTypeField->SetDivider(divider);
 	fTypeField->Menu()->ItemAt(2)->SetMarked(true);
 	//fAccount->SetType(2);
 	AddChild(fTypeField);
 	
 	// protocol view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fInProtocolsField = SetupProtokolView(BRect(topLeft, rightDown));
-	if(fInProtocolsField){
+	if (fInProtocolsField) {
 		fTypeField->SetDivider(divider);
 		AddChild(fInProtocolsField);
 	}
@@ -52,8 +52,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	GetSMTPAddonRef(&fSMTPAddonRef);
 
 	// email view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fEmailView = new BTextControl(BRect(topLeft, rightDown),
 									"email", "E-mail Address", "",
 									new BMessage(kEMailChangedMsg));
@@ -61,8 +61,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	AddChild(fEmailView);
 
 	// login name view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fLoginNameView = new BTextControl(BRect(topLeft, rightDown),
 									"login", "Login Name", "",
 									NULL);
@@ -70,8 +70,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	AddChild(fLoginNameView);
 
 	// password view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fPasswordView = new BTextControl(BRect(topLeft, rightDown),
 									"password", "Password", "",
 									NULL);
@@ -80,8 +80,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	AddChild(fPasswordView);
 
 	// account view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fAccountNameView = new BTextControl(BRect(topLeft, rightDown),
 									"account", "Account Name", "",
 									NULL);
@@ -89,8 +89,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	AddChild(fAccountNameView);
 
 	// name view
-	topLeft.y+= stepSize;
-	rightDown.y+= stepSize;
+	topLeft.y += stepSize;
+	rightDown.y += stepSize;
 	fNameView = new BTextControl(BRect(topLeft, rightDown),
 									"name", "Real Name", "",
 									NULL);
@@ -313,8 +313,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	}
 	// inbound
 	BRect boxRect = Bounds();
-	boxRect.bottom/= 2;
-	boxRect.bottom-= 5;
+	boxRect.bottom /= 2;
+	boxRect.bottom -= 5;
 
 	BBox *box = new BBox(boxRect);
 	box->SetLabel("Inbound");
@@ -350,7 +350,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		if (info.inboundType == POP) {
 			item = fInboundEncryptionMenu->Menu()
 					->ItemAt(info.providerInfo.ssl_pop);
-			item->SetMarked(true);
+			if (item)
+				item->SetMarked(true);
 			fInboundEncryptionMenu->MoveTo(10, 80);
 		}
 		if (info.inboundType == IMAP) {
@@ -374,7 +375,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	// outbound
 	boxRect = Bounds();
 	boxRect.top = boxRect.bottom / 2;
-	boxRect.top+= 5;
+	boxRect.top += 5;
 
 	box = new BBox(boxRect);
 	box->SetLabel("Outbound");
@@ -394,7 +395,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	if (fOutboundAuthMenu) {
 		BMenuItem *item = fOutboundAuthMenu->Menu()
 							->ItemAt(info.providerInfo.authentification_smtp);
-		item->SetMarked(true);
+		if (item)
+			item->SetMarked(true);
 		fOutboundAuthItemStart = item;
 		box->AddChild(fOutboundAuthMenu);
 		fOutboundAuthMenu->SetDivider(divider);
