@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,7 +26,7 @@
 
 class PartitionMap;
 class LogicalPartition;
-struct partition_table_sector;
+struct partition_table;
 
 /*!
   \brief Writer for "Intel" style partitions.
@@ -41,21 +41,21 @@ public:
 
 			status_t			WriteMBR(const PartitionMap* map,
 									bool clearSectors);
-			status_t			WriteLogical(partition_table_sector* pts,
+			status_t			WriteLogical(partition_table* pts,
 									const LogicalPartition* partition);
-			status_t			WriteExtendedHead(partition_table_sector* pts,
+			status_t			WriteExtendedHead(partition_table* pts,
 									const LogicalPartition* firstPartition);
 
 private:
-			status_t			_WritePrimary(partition_table_sector* pts);
-			status_t			_WriteExtended(partition_table_sector* pts,
+			status_t			_WritePrimary(partition_table* pts);
+			status_t			_WriteExtended(partition_table* pts,
 									const LogicalPartition* partition,
 									const LogicalPartition* next);
 
 			status_t			_ReadSector(off_t offset,
-									partition_table_sector* pts);
+									partition_table* pts);
 			status_t			_WriteSector(off_t offset,
-									const partition_table_sector* pts);
+									const partition_table* pts);
 
 private:
 			int					fDeviceFD;

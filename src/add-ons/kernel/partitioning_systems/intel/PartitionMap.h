@@ -2,18 +2,16 @@
  * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
+#ifndef _INTEL_PARTITION_MAP_H
+#define _INTEL_PARTITION_MAP_H
 
-/*!
-	\file PartitionMap.h
+/*!	\file PartitionMap.h
 	\ingroup intel_module
 	\brief Definitions for "intel" style partitions and interface definitions
 		   for related classes.
 */
 
 // NOTE: <http://www.win.tue.nl/~aeb/partitions/partition_tables-2.html>
-
-#ifndef _INTEL_PARTITION_MAP_H
-#define _INTEL_PARTITION_MAP_H
 
 #include <SupportDefs.h>
 
@@ -32,19 +30,22 @@ enum {
 	SECTOR_SIZE = 512
 };
 
+
 // is_empty_type
 static inline bool
 is_empty_type(uint8 type)
 {
-	return (type == 0x00);
+	return type == 0x00;
 }
+
 
 // is_extended_type
 static inline bool
 is_extended_type(uint8 type)
 {
-	return (type == 0x05 || type == 0x0f || type == 0x85);
+	return type == 0x05 || type == 0x0f || type == 0x85;
 }
+
 
 // fill_buffer
 static inline void
@@ -78,8 +79,8 @@ struct partition_descriptor {
 	bool is_extended() const	{ return is_extended_type(type); }
 } _PACKED;
 
-// partition_table_sector
-struct partition_table_sector {
+// partition_table
+struct partition_table {
 	char					pad1[446];
 	partition_descriptor	table[4];
 	uint16					signature;
@@ -91,6 +92,7 @@ static const uint16 kPartitionTableSectorSignature = 0xaa55;
 class Partition;
 class PrimaryPartition;
 class LogicalPartition;
+
 
 // PartitionType
 /*!
@@ -122,6 +124,7 @@ private:
 	bool	fValid;
 };
 
+
 // Partition
 class Partition {
 public:
@@ -138,13 +141,13 @@ public:
 	bool IsEmpty() const	{ return is_empty_type(fType); }
 	bool IsExtended() const	{ return is_extended_type(fType); }
 
-	// NOTE: Both PTSOffset() and Offset() are absolute with regards to the
+	// NOTE: Both PartitionTableOffset() and Offset() are absolute with regards to the
 	// session (usually the disk). Ie, for all primary partitions, including
-	// the primary extended partition, the PTSOffset() points to the MBR (0).
-	// For logical partitions, the PTSOffset() is located within the primary
+	// the primary extended partition, the PartitionTableOffset() points to the MBR (0).
+	// For logical partitions, the PartitionTableOffset() is located within the primary
 	// extended partition, but again, the returned values are absolute with
 	// regards to the session. All values are expressed in bytes.
-	off_t PTSOffset() const	{ return fPTSOffset; }
+	off_t PartitionTableOffset() const	{ return fPartitionTableOffset; }
 		// offset of the sector containing the descriptor for this partition
 	off_t Offset() const	{ return fOffset; }
 		// start offset of the partition contents
@@ -156,7 +159,7 @@ public:
 	void GetPartitionDescriptor(partition_descriptor *descriptor,
 		off_t baseOffset) const;
 
-	void SetPTSOffset(off_t offset)	{ fPTSOffset = offset; }
+	void SetPartitionTableOffset(off_t offset)	{ fPartitionTableOffset = offset; }
 	void SetOffset(off_t offset)	{ fOffset = offset; }
 	void SetSize(off_t size)		{ fSize = size; }
 	void SetType(uint8 type)		{ fType = type; }
@@ -168,12 +171,13 @@ public:
 #endif
 
 private:
-	off_t	fPTSOffset;
+	off_t	fPartitionTableOffset;
 	off_t	fOffset;	// relative to the start of the session
 	off_t	fSize;
 	uint8	fType;
 	bool	fActive;
 };
+
 
 // PrimaryPartition
 class PrimaryPartition : public Partition {
@@ -203,6 +207,7 @@ private:
 	int32				fIndex;
 };
 
+
 // LogicalPartition
 class LogicalPartition : public Partition {
 public:
@@ -230,6 +235,7 @@ private:
 	LogicalPartition	*fNext;
 	LogicalPartition	*fPrevious;
 };
+
 
 // PartitionMap
 class PartitionMap {

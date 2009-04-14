@@ -1,13 +1,12 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
-/*!
-	\file PartitionMap.cpp
+/*!	\file PartitionMap.cpp
 	\brief Definitions for "intel" style partitions and implementation
 		   of related classes.
 */
@@ -292,7 +291,7 @@ PartitionType::FindNext()
 // constructor
 Partition::Partition()
 	:
-	fPTSOffset(0),
+	fPartitionTableOffset(0),
 	fOffset(0),
 	fSize(0),
 	fType(0),
@@ -301,21 +300,21 @@ Partition::Partition()
 }
 
 // constructor
-Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
+Partition::Partition(const partition_descriptor* descriptor, off_t tableOffset,
 		off_t baseOffset)
 	:
-	fPTSOffset(0),
+	fPartitionTableOffset(0),
 	fOffset(0),
 	fSize(0),
 	fType(0),
 	fActive(false)
 {
-	SetTo(descriptor, ptsOffset, baseOffset);
+	SetTo(descriptor, tableOffset, baseOffset);
 }
 
 // SetTo
 void
-Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+Partition::SetTo(const partition_descriptor *descriptor, off_t tableOffset,
 	off_t baseOffset)
 {
 	TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
@@ -323,16 +322,16 @@ Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
 		(off_t)descriptor->size * SECTOR_SIZE,
 		descriptor->type,
 		descriptor->active,
-		ptsOffset);
+		tableOffset);
 }
 
 
 // SetTo
 void
 Partition::SetTo(off_t offset, off_t size, uint8 type, bool active,
-	off_t ptsOffset)
+	off_t tableOffset)
 {
-	fPTSOffset = ptsOffset;
+	fPartitionTableOffset = tableOffset;
 	fOffset = offset;
 	fSize = size;
 	fType = type;
@@ -347,7 +346,7 @@ Partition::SetTo(off_t offset, off_t size, uint8 type, bool active,
 void
 Partition::Unset()
 {
-	fPTSOffset = 0;
+	fPartitionTableOffset = 0;
 	fOffset = 0;
 	fSize = 0;
 	fType = 0;
@@ -384,11 +383,11 @@ Partition::AdjustSize(off_t sessionSize)
 bool
 Partition::CheckLocation(off_t sessionSize) const
 {
-	// offsets and size must be block aligned, PTS and partition must lie
-	// within the session
-	if (fPTSOffset % SECTOR_SIZE != 0) {
-		TRACE(("Partition::CheckLocation() - bad pts offset: %lld "
-			"(session: %lld)\n", fPTSOffset, sessionSize));
+	// offsets and size must be block aligned, partition table and partition must
+	// lie within the session
+	if (fPartitionTableOffset % SECTOR_SIZE != 0) {
+		TRACE(("Partition::CheckLocation() - bad partition table offset: %lld "
+			"(session: %lld)\n", fPartitionTableOffset, sessionSize));
 		return false;
 	}
 	if (fOffset % SECTOR_SIZE != 0) {
@@ -401,9 +400,10 @@ Partition::CheckLocation(off_t sessionSize) const
 			"(session: %lld)\n", fSize, sessionSize));
 		return false;
 	}
-	if (fPTSOffset < 0 || fPTSOffset >= sessionSize) {
-		TRACE(("Partition::CheckLocation() - pts offset outside session: %lld "
-			"(session: %lld)\n", fPTSOffset, sessionSize));
+	if (fPartitionTableOffset < 0 || fPartitionTableOffset >= sessionSize) {
+		TRACE(("Partition::CheckLocation() - partition table offset outside "
+			"session: %lld (session size: %lld)\n", fPartitionTableOffset,
+			sessionSize));
 		return false;
 	}
 	if (fOffset < 0) {
@@ -434,10 +434,11 @@ PrimaryPartition::PrimaryPartition()
 
 // SetTo
 void
-PrimaryPartition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset)
+PrimaryPartition::SetTo(const partition_descriptor* descriptor,
+	off_t tableOffset)
 {
 	Unset();
-	Partition::SetTo(descriptor, ptsOffset, 0);
+	Partition::SetTo(descriptor, tableOffset, 0);
 }
 
 
@@ -475,11 +476,11 @@ PrimaryPartition::Assign(const PrimaryPartition& other)
 
 	const LogicalPartition* otherLogical = other.fHead;
 	while (otherLogical) {
-		off_t ptsOffset = otherLogical->PTSOffset();
-		otherLogical->GetPartitionDescriptor(&descriptor, ptsOffset);
+		off_t tableOffset = otherLogical->PartitionTableOffset();
+		otherLogical->GetPartitionDescriptor(&descriptor, tableOffset);
 
 		LogicalPartition* logical = new(nothrow) LogicalPartition(
-			&descriptor, ptsOffset, this);
+			&descriptor, tableOffset, this);
 		if (!logical)
 			return B_NO_MEMORY;
 
@@ -563,35 +564,36 @@ LogicalPartition::LogicalPartition()
 
 // constructor
 LogicalPartition::LogicalPartition(const partition_descriptor *descriptor,
-		off_t ptsOffset, PrimaryPartition *primary)
+		off_t tableOffset, PrimaryPartition *primary)
 	: Partition(),
 	  fPrimary(NULL),
 	  fNext(NULL),
 	  fPrevious(NULL)
 {
-	SetTo(descriptor, ptsOffset, primary);
+	SetTo(descriptor, tableOffset, primary);
 }
 
 // SetTo
 void
 LogicalPartition::SetTo(const partition_descriptor *descriptor,
-	off_t ptsOffset, PrimaryPartition *primary)
+	off_t tableOffset, PrimaryPartition *primary)
 {
 	Unset();
 	if (descriptor && primary) {
 		// There are two types of LogicalPartitions. There are so called
 		// "inner extended" partitions and the "real" logical partitions
 		// which contain data. The "inner extended" partitions don't contain
-		// data and are only used to point to the next PTS in the linked
-		// list of logical partitions. For "inner extended" partitions,
+		// data and are only used to point to the next partition table in the
+		// linked list of logical partitions. For "inner extended" partitions,
 		// the baseOffset is in relation to the (first sector of the)
 		// "primary extended" partition, in another words, all inner extended
 		// partitions use the same base offset for reference.
 		// The data containing, real logical partitions use the offset of the
-		// PTS that contains their partition descriptor as their baseOffset.
-		off_t baseOffset = (descriptor->is_extended() ? primary->Offset()
-			: ptsOffset);
-		Partition::SetTo(descriptor, ptsOffset, baseOffset);
+		// partition table that contains their partition descriptor as their
+		// baseOffset.
+		off_t baseOffset = descriptor->is_extended()
+			? primary->Offset() : tableOffset;
+		Partition::SetTo(descriptor, tableOffset, baseOffset);
 		fPrimary = primary;
 	}
 }
@@ -600,11 +602,11 @@ LogicalPartition::SetTo(const partition_descriptor *descriptor,
 // SetTo
 void
 LogicalPartition::SetTo(off_t offset, off_t size, uint8 type, bool active,
-	off_t ptsOffset, PrimaryPartition *primary)
+	off_t tableOffset, PrimaryPartition *primary)
 {
 	Unset();
 	if (primary) {
-		Partition::SetTo(offset, size, type, active, ptsOffset);
+		Partition::SetTo(offset, size, type, active, tableOffset);
 		fPrimary = primary;
 	}
 }
@@ -631,10 +633,12 @@ PartitionMap::PartitionMap()
 		fPrimaries[i].SetIndex(i);
 }
 
+
 // destructor
 PartitionMap::~PartitionMap()
 {
 }
+
 
 // Unset
 void
@@ -660,7 +664,7 @@ PartitionMap::Assign(const PartitionMap& other)
 
 
 // PrimaryPartitionAt
-PrimaryPartition *
+PrimaryPartition*
 PartitionMap::PrimaryPartitionAt(int32 index)
 {
 	PrimaryPartition *partition = NULL;
@@ -669,8 +673,9 @@ PartitionMap::PrimaryPartitionAt(int32 index)
 	return partition;
 }
 
+
 // PrimaryPartitionAt
-const PrimaryPartition *
+const PrimaryPartition*
 PartitionMap::PrimaryPartitionAt(int32 index) const
 {
 	const PrimaryPartition *partition = NULL;
@@ -717,8 +722,9 @@ PartitionMap::CountPartitions() const
 	return count;
 }
 
+
 // CountNonEmptyPartitions
-int32 
+int32
 PartitionMap::CountNonEmptyPartitions() const
 {
 	int32 count = 0;
@@ -730,8 +736,9 @@ PartitionMap::CountNonEmptyPartitions() const
 	return count;
 }
 
+
 // PartitionAt
-Partition *
+Partition*
 PartitionMap::PartitionAt(int32 index)
 {
 	Partition *partition = NULL;
@@ -752,69 +759,79 @@ PartitionMap::PartitionAt(int32 index)
 	return partition;
 }
 
+
 // PartitionAt
-const Partition *
+const Partition*
 PartitionMap::PartitionAt(int32 index) const
 {
 	return const_cast<PartitionMap*>(this)->PartitionAt(index);
 }
+
 
 // Check
 bool
 PartitionMap::Check(off_t sessionSize) const
 {
 	int32 partitionCount = CountPartitions();
+
 	// 1. check partition locations
 	for (int32 i = 0; i < partitionCount; i++) {
 		if (!PartitionAt(i)->CheckLocation(sessionSize))
 			return false;
 	}
-	// 2. check overlapping of partitions and location of PTSs
+
+	// 2. check overlapping of partitions and location of partition tables
 	bool result = true;
-	const Partition **byOffset = new(nothrow) const Partition*[partitionCount];
-	off_t *ptsOffsets = new(nothrow) off_t[partitionCount - 3];
-	if (byOffset && ptsOffsets) {
+	const Partition** byOffset = new(nothrow) const Partition*[partitionCount];
+	off_t* tableOffsets = new(nothrow) off_t[partitionCount - 3];
+	if (byOffset && tableOffsets) {
 		// fill the arrays
 		int32 byOffsetCount = 0;
-		int32 ptsOffsetCount = 1;	// primary PTS
-		ptsOffsets[0] = 0;			//
+		int32 tableOffsetCount = 1;	// primary partition table
+		tableOffsets[0] = 0;			//
 		for (int32 i = 0; i < partitionCount; i++) {
 			const Partition *partition = PartitionAt(i);
 			if (!partition->IsExtended())
 				byOffset[byOffsetCount++] = partition;
-			// add only logical partition PTS locations
-			if (i >= 4)
-				ptsOffsets[ptsOffsetCount++] = partition->PTSOffset();
+
+			// add only logical partition partition table locations
+			if (i >= 4) {
+				tableOffsets[tableOffsetCount++]
+					= partition->PartitionTableOffset();
+			}
 		}
+
 		// sort the arrays
 		qsort(byOffset, byOffsetCount, sizeof(const Partition*),
-			  cmp_partition_offset);
-		qsort(ptsOffsets, ptsOffsetCount, sizeof(off_t), cmp_offset);
+			cmp_partition_offset);
+		qsort(tableOffsets, tableOffsetCount, sizeof(off_t), cmp_offset);
+
 		// check for overlappings
 		off_t nextOffset = 0;
 		for (int32 i = 0; i < byOffsetCount; i++) {
 			const Partition *partition = byOffset[i];
 			if (partition->Offset() < nextOffset) {
 				TRACE(("intel: PartitionMap::Check(): overlapping partitions!"
-					   "\n"));
+					"\n"));
 				result = false;
 				break;
 			}
 			nextOffset = partition->Offset() + partition->Size();
 		}
-		// check uniqueness of PTS offsets and whether they lie outside of the
-		// non-extended partitions
+
+		// check uniqueness of partition table offsets and whether they lie
+		// outside of the non-extended partitions
 		if (result) {
-			for (int32 i = 0; i < ptsOffsetCount; i++) {
-				if (i > 0 && ptsOffsets[i] == ptsOffsets[i - 1]) {
-					TRACE(("intel: PartitionMap::Check(): same PTS for "
-						   "different extended partitions!\n"));
+			for (int32 i = 0; i < tableOffsetCount; i++) {
+				if (i > 0 && tableOffsets[i] == tableOffsets[i - 1]) {
+					TRACE(("intel: PartitionMap::Check(): same partition talbe "
+						"for different extended partitions!\n"));
 					result = false;
 					break;
-				} else if (is_inside_partitions(ptsOffsets[i], byOffset,
-												byOffsetCount)) {
-					TRACE(("intel: PartitionMap::Check(): a PTS lies "
-						   "inside a non-extended partition!\n"));
+				} else if (is_inside_partitions(tableOffsets[i], byOffset,
+								byOffsetCount)) {
+					TRACE(("intel: PartitionMap::Check(): a partition table "
+						"lies inside a non-extended partition!\n"));
 					result = false;
 					break;
 				}
@@ -822,11 +839,11 @@ PartitionMap::Check(off_t sessionSize) const
 		}
 	} else
 		result = false;		// no memory: assume failure
+
 	// cleanup
-	if (byOffset)
-		delete[] byOffset;
-	if (ptsOffsets)
-		delete[] ptsOffsets;
+	delete[] byOffset;
+	delete[] tableOffsets;
+
 	return result;
 }
 

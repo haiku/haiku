@@ -1,11 +1,13 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  *		Tomas Kucera, kucerat@centrum.cz
  */
+
+#include "write_support.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -29,7 +31,6 @@
 
 //#define TRACE(x) ;
 #define TRACE(x) dprintf x
-
 
 // Maximal size of move buffer (in sectors).
 static const int32 MAX_MOVE_BUFFER = 2 * 1024 * 4;
@@ -112,20 +113,20 @@ pm_is_sub_system_for(partition_data *partition)
 
 
 // sector_align (auxiliary function)
-static inline
-off_t
+static inline off_t
 sector_align(off_t offset)
 {
 	return offset / SECTOR_SIZE * SECTOR_SIZE;
 }
 
+
 // sector_align_up (auxiliary function)
-static inline
-off_t
+static inline off_t
 sector_align_up(off_t offset)
 {
 	return (offset + SECTOR_SIZE - 1) / SECTOR_SIZE * SECTOR_SIZE;
 }
+
 
 // validate_resize (auxiliary function)
 static bool
@@ -164,6 +165,7 @@ validate_resize(partition_data *partition, off_t *size)
 	return true;
 }
 
+
 // pm_validate_resize
 bool
 pm_validate_resize(partition_data *partition, off_t *size)
@@ -176,21 +178,23 @@ pm_validate_resize(partition_data *partition, off_t *size)
 	return validate_resize(partition, size);
 }
 
+
 // get_offset_ep (auxiliary function)
 static inline off_t
 get_offset_ep(const partition_data *partition)
 {
 	LogicalPartition *logical = (LogicalPartition *)partition->cookie;
-	off_t diff_offset = logical->Offset() - logical->PTSOffset();
+	off_t diff_offset = logical->Offset() - logical->PartitionTableOffset();
 	return partition->offset - diff_offset;
 }
+
 
 // get_size_ep (auxiliary function)
 static inline off_t
 get_size_ep(const partition_data *partition)
 {
 	LogicalPartition *logical = (LogicalPartition *)partition->cookie;
-	off_t diff_offset = logical->Offset() - logical->PTSOffset();
+	off_t diff_offset = logical->Offset() - logical->PartitionTableOffset();
 	return partition->size + diff_offset;
 }
 
@@ -234,6 +238,7 @@ get_sibling_partitions_pm(partition_data *partition,
 	}
 }
 
+
 // get_sibling_partitions_ep (auxiliary function)
 /*!
 	according to childOffset returns previous and next sibling or NULL
@@ -273,6 +278,7 @@ get_sibling_partitions_ep(partition_data *partition,
 	}
 }
 
+
 // validate_resize_child (auxiliary function)
 static bool
 validate_resize_child(partition_data *partition, partition_data *child,
@@ -310,6 +316,7 @@ validate_resize_child(partition_data *partition, partition_data *child,
 	return true;
 }
 
+
 // pm_validate_resize_child
 bool
 pm_validate_resize_child(partition_data *partition, partition_data *child,
@@ -324,6 +331,7 @@ pm_validate_resize_child(partition_data *partition, partition_data *child,
 		child->size, size, get_sibling_partitions_pm);
 }
 
+
 // pm_validate_move
 bool
 pm_validate_move(partition_data *partition, off_t *start)
@@ -335,6 +343,7 @@ pm_validate_move(partition_data *partition, off_t *start)
 	// nothing to do here
 	return true;
 }
+
 
 // validate_move_child (auxiliary function)
 static bool
@@ -424,6 +433,7 @@ is_type_valid_pm(const char *type, partition_data *partition,
 	return true;
 }
 
+
 // pm_validate_set_type
 bool
 pm_validate_set_type(partition_data *partition, const char *type)
@@ -464,6 +474,7 @@ pm_validate_initialize(partition_data *partition, char *name,
 
 	return true;
 }
+
 
 // validate_create_child_partition (auxiliary function)
 static bool
@@ -506,6 +517,7 @@ validate_create_child_partition(partition_data *partition, off_t *start,
 
 	return true;
 }
+
 
 // pm_validate_create_child
 /*!
@@ -555,17 +567,22 @@ pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 		get_sibling_partitions_pm);
 }
 
+
 // cmp_partition_position
 static int
-cmp_partition_position(const void *o1, const void *o2) {
+cmp_partition_position(const void *o1, const void *o2)
+{
 	off_t offset1 = ((PartitionPosition*)o1)->offset;
 	off_t offset2 = ((PartitionPosition*)o2)->offset;
+
 	if (offset1 < offset2)
 		return -1;
-	else if (offset1 > offset2)
+	if (offset1 > offset2)
 		return 1;
+
 	return 0;
 }
+
 
 // fill_partitionable_spaces_buffer_pm
 /*!
@@ -588,6 +605,7 @@ fill_partitionable_spaces_buffer_pm(partition_data *partition,
 	return partition_count;
 }
 
+
 // fill_partitionable_spaces_buffer_ep
 /*!
 	positions - output buffer with sufficient size
@@ -608,6 +626,7 @@ fill_partitionable_spaces_buffer_ep(partition_data *partition,
 	}
 	return partition_count;
 }
+
 
 // get_partitionable_spaces (auxiliary function)
 static status_t
@@ -672,6 +691,7 @@ get_partitionable_spaces(partition_data *partition,
 	return B_OK;
 }
 
+
 // pm_get_partitionable_spaces
 status_t
 pm_get_partitionable_spaces(partition_data *partition,
@@ -691,6 +711,7 @@ pm_get_partitionable_spaces(partition_data *partition,
 		fill_partitionable_spaces_buffer_pm, MBR_OFFSET * SECTOR_SIZE,
 		0, 0);
 }
+
 
 // pm_get_next_supported_type
 status_t
@@ -930,6 +951,7 @@ pm_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	return B_OK;
 }
 
+
 // pm_resize_child
 status_t
 pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
@@ -983,6 +1005,7 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	return B_OK;
 }
 
+
 // pm_move
 status_t
 pm_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
@@ -1011,6 +1034,7 @@ pm_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 	return B_OK;
 }
 
+
 // allocate_buffer (auxiliary function)
 /*!
 	tries to allocate buffer with the size: blockSize * tryAlloc
@@ -1032,6 +1056,7 @@ allocate_buffer(uint32 blockSize, int32 tryAlloc, int32 *allocated)
 	*allocated = 0;
 	return NULL;
 }
+
 
 // move_block (auxiliary function)
 static status_t
@@ -1058,13 +1083,14 @@ move_block(int fd, off_t fromOffset, off_t toOffset, uint8 *buffer, int32 size)
 	return error;
 }
 
+
 // move_partition (auxiliary function)
 static status_t
 move_partition(int fd, off_t fromOffset, off_t toOffset, off_t size,
 	uint8 *buffer, int32 buffer_size, disk_job_id job)
 {
-// TODO: This should be a service function of the DDM!
-// TODO: This seems to be broken if source and destination overlap.
+	// TODO: This should be a service function of the DDM!
+	// TODO: This seems to be broken if source and destination overlap.
 	status_t error = B_OK;
 	off_t cycleCount = size / buffer_size;
 	int32 remainingSize = size - cycleCount * buffer_size;
@@ -1082,6 +1108,7 @@ move_partition(int fd, off_t fromOffset, off_t toOffset, off_t size,
 	update_disk_device_job_progress(job, 1.0);
 	return error;
 }
+
 
 // pm_move_child
 status_t
@@ -1107,7 +1134,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID,
 	if (!map || !primary)
 		return B_BAD_VALUE;
 
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	if (!pm_validate_move_child(partition, child, &validatedOffset))
 		return B_BAD_VALUE;
@@ -1124,7 +1151,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID,
 		return B_NO_MEMORY;
 
 	// partition moving
-// TODO: The partition is not supposed to be locked at this point!
+	// TODO: The partition is not supposed to be locked at this point!
 	update_disk_device_job_progress(job, 0.0);
 	status_t error = B_OK;
 	error = move_partition(fd, child->offset, validatedOffset, child->size,
@@ -1151,6 +1178,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID,
 	partition_modified(childID);
 	return B_OK;
 }
+
 
 // pm_set_type
 status_t
@@ -1188,14 +1216,14 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	// this is impossible
 	if (!ptype.IsValid() || ptype.IsEmpty())
 		return false;
-// TODO: Incompatible return value!
+	// TODO: Incompatible return value!
 
 	// setting type to the partition
 	update_disk_device_job_progress(job, 0.0);
 	uint8 oldType = primary->Type();
 	primary->SetType(ptype.Type());
 
-// TODO: The partition is not supposed to be locked at this point!
+	// TODO: The partition is not supposed to be locked at this point!
 	PartitionMapWriter writer(fd, 0, partition->size);
 		// TODO: disk size?
 	status_t error = writer.WriteMBR(map, false);
@@ -1251,13 +1279,15 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 	return B_OK;
 }
 
+
 // pm_create_child
+/*!	childID is used for the return value, but is also an optional input
+	parameter -- -1 to be ignored
+*/
 status_t
 pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	const char *type, const char *parameters, disk_job_id job,
 	partition_id *childID)
-	// childID is used for the return value, but is also an optional input
-	// parameter -- -1 to be ignored
 {
 	TRACE(("intel: pm_create_child\n"));
 
@@ -1277,7 +1307,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// validate the offset, size and get index of the new partition
-// TODO: The parameters have already been checked and must not be altered!
+	// TODO: The parameters have already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
@@ -1303,7 +1333,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	PartitionType ptype;
 	ptype.SetType(type);
 
-	primary->SetPTSOffset(0);
+	primary->SetPartitionTableOffset(0);
 	primary->SetOffset(validatedOffset);
 	primary->SetSize(validatedSize);
 	primary->SetType(ptype.Type());
@@ -1313,7 +1343,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
 		// TODO: disk size or 2 * SECTOR_SIZE?
-// TODO: The partition is not supposed to be locked at this point!
+	// TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK) {
 		// putting into previous state
@@ -1341,6 +1371,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	partition_modified(partitionID);
 	return B_OK;
 }
+
 
 // pm_delete_child
 status_t
@@ -1375,7 +1406,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
 		// TODO: disk size or 2 * SECTOR_SIZE?
-// TODO: The partition is not supposed to be locked at this point!
+	// TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK)
 		return error;
@@ -1464,6 +1495,7 @@ ep_validate_resize(partition_data *partition, off_t *size)
 	return validate_resize(partition, size);
 }
 
+
 // ep_validate_resize_child
 bool
 ep_validate_resize_child(partition_data *partition, partition_data *child,
@@ -1484,6 +1516,7 @@ ep_validate_resize_child(partition_data *partition, partition_data *child,
 	return true;
 }
 
+
 // ep_validate_move
 bool
 ep_validate_move(partition_data *partition, off_t *start)
@@ -1496,10 +1529,11 @@ ep_validate_move(partition_data *partition, off_t *start)
 	return true;
 }
 
+
 // ep_validate_move_child
 bool
 ep_validate_move_child(partition_data *partition, partition_data *child,
-					   off_t *_start)
+	off_t *_start)
 {
 	TRACE(("intel: ep_validate_move_child\n"));
 
@@ -1518,6 +1552,7 @@ ep_validate_move_child(partition_data *partition, partition_data *child,
 	return true;
 }
 
+
 // is_type_valid_ep (auxiliary function)
 static inline bool
 is_type_valid_ep(const char *type)
@@ -1527,6 +1562,7 @@ is_type_valid_ep(const char *type)
 	ptype.SetType(type);
 	return (ptype.IsValid() && !ptype.IsEmpty() && !ptype.IsExtended());
 }
+
 
 // ep_validate_set_type
 bool
@@ -1540,6 +1576,7 @@ ep_validate_set_type(partition_data *partition, const char *type)
 	// validity check of the type
 	return is_type_valid_ep(type);
 }
+
 
 // ep_validate_initialize
 bool
@@ -1557,6 +1594,7 @@ ep_validate_initialize(partition_data *partition, char *name,
 	//		 to the Intel Extended Partition
 	return true;
 }
+
 
 // ep_validate_create_child
 bool
@@ -1599,6 +1637,7 @@ ep_validate_create_child(partition_data *partition, off_t *_start, off_t *_size,
 	return true;
 }
 
+
 // ep_get_partitionable_spaces
 status_t
 ep_get_partitionable_spaces(partition_data *partition,
@@ -1620,6 +1659,7 @@ ep_get_partitionable_spaces(partition_data *partition,
 		PTS_OFFSET * SECTOR_SIZE,
 		PTS_OFFSET * SECTOR_SIZE);
 }
+
 
 // ep_get_next_supported_type
 status_t
@@ -1661,6 +1701,7 @@ ep_get_next_supported_type(partition_data *partition, int32 *cookie,
 	return B_OK;
 }
 
+
 // ep_shadow_changed
 status_t
 ep_shadow_changed(partition_data *partition, partition_data *child,
@@ -1698,7 +1739,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!ep_validate_resize(partition, &validatedSize))
 		return B_BAD_VALUE;
@@ -1706,7 +1747,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	// update data stuctures
 	update_disk_device_job_progress(job, 0.0);
 
-// TODO: partition->size is not supposed to be touched.
+	// TODO: partition->size is not supposed to be touched.
 	partition->size = validatedSize;
 	partition->content_size = validatedSize;
 
@@ -1715,6 +1756,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	partition_modified(partitionID);
 	return B_OK;
 }
+
 
 // ep_resize_child
 status_t
@@ -1739,7 +1781,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!ep_validate_resize_child(partition, child, &validatedSize))
 		return B_BAD_VALUE;
@@ -1751,7 +1793,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	logical->SetSize(validatedSize);
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
-// TODO: The partition is not supposed to be locked here!
+	// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK) {
 		// putting into previous state
@@ -1773,6 +1815,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	return B_OK;
 }
 
+
 // ep_move
 status_t
 ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
@@ -1792,13 +1835,14 @@ ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new start
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	if (!ep_validate_move(partition, &offset))
 		return B_BAD_VALUE;
 
 	// nothing to do here
 	return B_OK;
 }
+
 
 // ep_move_child
 status_t
@@ -1823,7 +1867,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	if (!logical)
 		return B_BAD_VALUE;
 
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	if (!ep_validate_move_child(partition, child, &validatedOffset))
 		return B_BAD_VALUE;
@@ -1843,8 +1887,8 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	// partition moving
 	update_disk_device_job_progress(job, 0.0);
 	status_t error = B_OK;
-	// move partition with its header (PTS table)
-	off_t pts_offset = logical->Offset() - logical->PTSOffset();
+	// move partition with its header (partition table)
+	off_t pts_offset = logical->Offset() - logical->PartitionTableOffset();
 	error = move_partition(fd, child->offset - pts_offset,
 		validatedOffset - pts_offset, child->size + pts_offset, buffer,
 		allocated * SECTOR_SIZE, job);
@@ -1856,12 +1900,12 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	// updating data structure
 	child->offset = validatedOffset;
 	logical->SetOffset(logical->Offset() + diffOffset);
-	logical->SetPTSOffset(logical->PTSOffset() + diffOffset);
+	logical->SetPartitionTableOffset(logical->PartitionTableOffset() + diffOffset);
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
 		// TODO: If partition->offset is > prev->offset, then writing
 		// the previous logical partition table will fail!
-// TODO: The partition is not supposed to be locked here!
+	// TODO: The partition is not supposed to be locked here!
 	error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK)
 		// something went wrong - this is fatal (partition has been moved)
@@ -1879,6 +1923,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	partition_modified(childID);
 	return B_OK;
 }
+
 
 // ep_set_type
 status_t
@@ -1902,7 +1947,7 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	if (!logical)
 		return B_BAD_VALUE;
 
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	if (!ep_validate_set_type(child, type))
 		return B_BAD_VALUE;
 
@@ -1922,7 +1967,7 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	logical->SetType(ptype.Type());
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
-// TODO: The partition is not supposed to be locked here!
+	// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
@@ -1940,6 +1985,7 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	partition_modified(partitionID);
 	return B_OK;
 }
+
 
 // ep_initialize
 status_t
@@ -1977,12 +2023,12 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 	partition->content_cookie = primary;
 
 	// we delete code area in EBR - nothing should be there
-	partition_table_sector pts;
-	pts.clear_code_area();
+	partition_table table;
+	table.clear_code_area();
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
-// TODO: The partition is not supposed to be locked here!
-	status_t error = writer.WriteExtendedHead(&pts, NULL);
+	// TODO: The partition is not supposed to be locked here!
+	status_t error = writer.WriteExtendedHead(&table, NULL);
 	if (error != B_OK)
 		return error;
 
@@ -1991,6 +2037,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 	partition_modified(partitionID);
 	return B_OK;
 }
+
 
 // ep_create_child
 /*!
@@ -2021,7 +2068,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// validate the offset, size and get index of the new partition
-// TODO: The parameter has already been checked and must not be altered!
+	// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
@@ -2047,7 +2094,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	PartitionType ptype;
 	ptype.SetType(type);
 
-	logical->SetPTSOffset(validatedOffset - PTS_OFFSET * SECTOR_SIZE
+	logical->SetPartitionTableOffset(validatedOffset - PTS_OFFSET * SECTOR_SIZE
 		- partition->offset);
 	logical->SetOffset(validatedOffset - partition->offset);
 	logical->SetSize(validatedSize);
@@ -2056,14 +2103,15 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	logical->SetActive(false);
 
 	// we delete code area in EBR - nothing should be there
-	partition_table_sector pts;
-	pts.clear_code_area();
+	partition_table table;
+	table.clear_code_area();
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
 		// TODO: wrong offset range, writing prev will fail
-// TODO: The partition is not supposed to be locked here!
-	status_t error = writer.WriteLogical(&pts, logical);
+
+	// TODO: The partition is not supposed to be locked here!
+	status_t error = writer.WriteLogical(&table, logical);
 	if (error != B_OK) {
 		// putting into previous state
 		delete_partition(child->id);
@@ -2103,6 +2151,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	return B_OK;
 }
 
+
 // ep_delete_child
 status_t
 ep_delete_child(int fd, partition_id partitionID, partition_id childID,
@@ -2141,7 +2190,7 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
 		// TODO: Check offset range! Writing "prev/next_logical"?
 		// Should be parent->offset and parent->size?
-// TODO: The partition is not supposed to be locked here!
+	// TODO: The partition is not supposed to be locked here!
 	status_t error = prev_logical ? writer.WriteLogical(NULL, prev_logical)
 		: writer.WriteExtendedHead(NULL, next_logical);
 	if (error != B_OK)
