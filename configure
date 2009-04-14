@@ -386,7 +386,7 @@ esac
 # check yasm version
 if [ $targetArch = "x86" ]; then
 	$HAIKU_YASM --version > /dev/null || {
-		echo "The yasm assembler version 0.7.2 or later must be installed."
+		echo "The yasm assembler version 0.7.0 or later must be installed."
 		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
 		exit 1
 	}
@@ -394,13 +394,12 @@ if [ $targetArch = "x86" ]; then
 	set -- $($HAIKU_YASM --version | head -n 1)
 	versionOK=0
 	case $2 in
-		0.[0-6].*)		echo match1;;
-		0.7.[0-1].*)	echo match2;;
+		0.[0-6].*)		;;
 		*)				versionOK=1 ;;
 	esac
 
 	if [ $versionOK = 0 ]; then
-		echo "The yasm assembler version 0.7.2 or later must be installed."
+		echo "The yasm assembler version 0.7.0 or later must be installed."
 		echo "The installed version is $2."
 		echo "Download from: http://www.tortall.net/projects/yasm/wiki/Download"
 		exit 1
