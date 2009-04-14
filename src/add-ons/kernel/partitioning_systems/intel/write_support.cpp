@@ -70,7 +70,7 @@ status_t ep_get_partitionable_spaces(partition_data *partition,
 
 // pm_get_supported_operations
 uint32
-pm_get_supported_operations(partition_data* partition, uint32 mask = ~0)
+pm_get_supported_operations(partition_data* partition, uint32 mask)
 {
 	uint32 flags = B_DISK_SYSTEM_SUPPORTS_RESIZING
 		| B_DISK_SYSTEM_SUPPORTS_MOVING
@@ -94,7 +94,7 @@ pm_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 // pm_get_supported_child_operations
 uint32
 pm_get_supported_child_operations(partition_data* partition,
-	partition_data* child, uint32 mask = ~0)
+	partition_data* child, uint32 mask)
 {
 	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
@@ -1426,7 +1426,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 
 // ep_get_supported_operations
 uint32
-ep_get_supported_operations(partition_data* partition, uint32 mask = ~0)
+ep_get_supported_operations(partition_data* partition, uint32 mask)
 {
 	uint32 flags = B_DISK_SYSTEM_SUPPORTS_RESIZING
 		| B_DISK_SYSTEM_SUPPORTS_MOVING
@@ -1456,7 +1456,7 @@ ep_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 // ep_get_supported_child_operations
 uint32
 ep_get_supported_child_operations(partition_data* partition,
-	partition_data* child, uint32 mask = ~0)
+	partition_data* child, uint32 mask)
 {
 	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
