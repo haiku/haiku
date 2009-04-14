@@ -28,7 +28,8 @@ struct partition_table;
 class PartitionMapParser {
 public:
 								PartitionMapParser(int deviceFD,
-									off_t sessionOffset, off_t sessionSize);
+									off_t sessionOffset, off_t sessionSize,
+									uint32 blockSize);
 								~PartitionMapParser();
 
 			status_t			Parse(const uint8* block, PartitionMap* map);
@@ -45,6 +46,7 @@ private:
 
 private:
 			int					fDeviceFD;
+			uint32				fBlockSize;
 			off_t				fSessionOffset;
 			off_t				fSessionSize;
 			partition_table*	fPartitionTable;	// while parsing

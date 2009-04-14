@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -132,7 +132,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 		return -1;
 
 	// read the partition structure
-	PartitionMapParser parser(fd, 0, partition->size);
+	PartitionMapParser parser(fd, 0, partition->size, partition->block_size);
 	status_t error = parser.Parse(NULL, map);
 	if (error != B_OK) {
 		// cleanup, if not detected
@@ -173,6 +173,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	return -1;
 }
 
+
 // pm_scan_partition
 static status_t
 pm_scan_partition(int fd, partition_data *partition, void *cookie)
@@ -192,7 +193,6 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
-	partition->block_size = SECTOR_SIZE;
 
 	partition->content_cookie = map;
 	// children
@@ -202,7 +202,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 		PrimaryPartition *primary = map->PrimaryPartitionAt(i);
 		if (!primary->IsEmpty()) {
 			partition_data *child = create_child_partition(partition->id,
-														   index, -1);
+				index, -1);
 			index++;
 			if (!child) {
 				// something went wrong
@@ -212,7 +212,8 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 
 			child->offset = partition->offset + primary->Offset();
 			child->size = primary->Size();
-			child->block_size = SECTOR_SIZE;
+			child->block_size = partition->block_size;
+
 			// (no name)
 			char type[B_FILE_NAME_LENGTH];
 			primary->GetTypeString(type);
@@ -220,7 +221,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 			// parameters
 			char buffer[128];
 			sprintf(buffer, "type = %u ; active = %d", primary->Type(),
-					primary->Active());
+				primary->Active());
 			child->parameters = strdup(buffer);
 			child->cookie = primary;
 			// check for allocation problems
@@ -245,6 +246,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	return error;
 }
 
+
 // pm_free_identify_partition_cookie
 static void
 pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
@@ -256,6 +258,7 @@ pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 	}
 }
 
+
 // pm_free_partition_cookie
 static void
 pm_free_partition_cookie(partition_data *partition)
@@ -266,6 +269,7 @@ pm_free_partition_cookie(partition_data *partition)
 		partition->cookie = NULL;
 }
 
+
 // pm_free_partition_content_cookie
 static void
 pm_free_partition_content_cookie(partition_data *partition)
@@ -275,6 +279,7 @@ pm_free_partition_content_cookie(partition_data *partition)
 		partition->content_cookie = NULL;
 	}
 }
+
 
 // #pragma mark - Intel Extended Partition Module
 
@@ -291,6 +296,7 @@ ep_std_ops(int32 op, ...)
 	}
 	return B_ERROR;
 }
+
 
 // ep_identify_partition
 static float
@@ -319,6 +325,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 	return 0.95;
 }
 
+
 // ep_scan_partition
 static status_t
 ep_scan_partition(int fd, partition_data *partition, void *cookie)
@@ -340,7 +347,6 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
-	partition->block_size = SECTOR_SIZE;
 
 	partition->content_cookie = primary;
 	// children
@@ -348,8 +354,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	int32 index = 0;
 	for (int32 i = 0; i < primary->CountLogicalPartitions(); i++) {
 		LogicalPartition *logical = primary->LogicalPartitionAt(i);
-		partition_data *child = create_child_partition(partition->id,
-													   index, -1);
+		partition_data *child = create_child_partition(partition->id, index, -1);
 		index++;
 		if (!child) {
 			// something went wrong
@@ -360,7 +365,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		}
 		child->offset = parent->offset + logical->Offset();
 		child->size = logical->Size();
-		child->block_size = SECTOR_SIZE;
+		child->block_size = partition->block_size;
+
 		// (no name)
 		char type[B_FILE_NAME_LENGTH];
 		logical->GetTypeString(type);
@@ -380,6 +386,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 			break;
 		}
 	}
+
 	// cleanup on error
 	if (error != B_OK) {
 		partition->content_cookie = NULL;
@@ -391,12 +398,14 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	return error;
 }
 
+
 // ep_free_identify_partition_cookie
 static void
 ep_free_identify_partition_cookie(partition_data *partition, void *cookie)
 {
 	// nothing to do
 }
+
 
 // ep_free_partition_cookie
 static void
@@ -406,6 +415,7 @@ ep_free_partition_cookie(partition_data *partition)
 	if (partition)
 		partition->cookie = NULL;
 }
+
 
 // ep_free_partition_content_cookie
 static void

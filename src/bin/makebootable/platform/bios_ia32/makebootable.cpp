@@ -382,7 +382,8 @@ main(int argc, const char *const *argv)
 					}
 
 					// parse the partition map
-					PartitionMapParser parser(baseFD, 0, deviceSize);
+					// TODO: block size!
+					PartitionMapParser parser(baseFD, 0, deviceSize, 512);
 					PartitionMap map;
 					error = parser.Parse(NULL, &map);
 					if (error != B_OK) {
@@ -464,7 +465,8 @@ main(int argc, const char *const *argv)
 						* geometry.cylinders * 512;
 
 					// parse the partition map
-					PartitionMapParser parser(baseFD, 0, deviceSize);
+					// TODO: block size!
+					PartitionMapParser parser(baseFD, 0, deviceSize, 512);
 					PartitionMap map;
 					error = parser.Parse(NULL, &map);
 					if (error != B_OK) {
@@ -501,13 +503,13 @@ main(int argc, const char *const *argv)
 				// chop off the trailing number
 				int fileNameLen = strlen(fileName);
 				int baseNameLen = fileNameLen - 2;
-								
+
 				// get base device name and partition index
 				char baseDeviceName[B_PATH_NAME_LENGTH];
 				int partitionIndex = atoi(fileName + baseNameLen + 1);
 				memcpy(baseDeviceName, fileName, baseNameLen);
 				baseDeviceName[baseNameLen] = '\0';
-				
+
 				// open base device
 				int baseFD = open(baseDeviceName, O_RDONLY);
 				if (baseFD < 0) {
@@ -515,7 +517,7 @@ main(int argc, const char *const *argv)
 							baseDeviceName, strerror(errno));
 					exit(1);
 				}
-				
+
 				// get device size
 				int64 blockSize;
 				int64 blockCount;
@@ -534,9 +536,9 @@ main(int argc, const char *const *argv)
 				}
 
 				deviceSize = blockSize * blockCount;
-			
+
 				// parse the partition map
-				PartitionMapParser parser(baseFD, 0, deviceSize);
+				PartitionMapParser parser(baseFD, 0, deviceSize, blockSize);
 				PartitionMap map;
 				error = parser.Parse(NULL, &map);
 				if (error != B_OK) {
@@ -545,9 +547,9 @@ main(int argc, const char *const *argv)
 							strerror(error));
 					exit(1);
 				}
-				
+
 				close(baseFD);
-									
+
 				// check the partition we are supposed to write at
 				Partition *partition = map.PartitionAt(partitionIndex - 1);
 				if (!partition || partition->IsEmpty()) {
@@ -555,7 +557,7 @@ main(int argc, const char *const *argv)
 							partitionIndex);
 					exit(1);
 				}
-				
+
 				if (partition->IsExtended()) {
 					fprintf(stderr, "Error: Partition %d is an extended "
 							"partition.\n", partitionIndex);

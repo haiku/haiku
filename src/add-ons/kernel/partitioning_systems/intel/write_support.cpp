@@ -32,6 +32,9 @@
 //#define TRACE(x) ;
 #define TRACE(x) dprintf x
 
+// TODO: get rid of this - there is no such thing as a fixed sector size!
+static const uint32 SECTOR_SIZE = 512;
+
 // Maximal size of move buffer (in sectors).
 static const int32 MAX_MOVE_BUFFER = 2 * 1024 * 4;
 

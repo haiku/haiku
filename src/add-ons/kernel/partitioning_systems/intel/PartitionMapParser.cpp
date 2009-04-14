@@ -41,9 +41,10 @@ static const int32 kMaxLogicalPartitionCount = 128;
 
 // constructor
 PartitionMapParser::PartitionMapParser(int deviceFD, off_t sessionOffset,
-		off_t sessionSize)
+		off_t sessionSize, uint32 blockSize)
 	:
 	fDeviceFD(deviceFD),
+	fBlockSize(blockSize),
 	fSessionOffset(sessionOffset),
 	fSessionSize(sessionSize),
 	fPartitionTable(NULL),
@@ -105,9 +106,9 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 
 	// examine the table
 	for (int32 i = 0; i < 4; i++) {
-		const partition_descriptor *descriptor = &table->table[i];
-		PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
-		partition->SetTo(descriptor, 0);
+		const partition_descriptor* descriptor = &table->table[i];
+		PrimaryPartition* partition = fMap->PrimaryPartitionAt(i);
+		partition->SetTo(descriptor, 0, fBlockSize);
 
 #ifdef _BOOT_MODE
 		// work-around potential BIOS problems

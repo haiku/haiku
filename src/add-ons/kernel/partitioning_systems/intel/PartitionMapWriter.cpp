@@ -34,6 +34,10 @@ using std::nothrow;
 #endif
 
 
+// TODO: get rid of this - there is no such thing as a fixed sector size!
+static const uint32 SECTOR_SIZE = 512;
+
+
 // constructor
 /*!	\brief Creates the writer.
 

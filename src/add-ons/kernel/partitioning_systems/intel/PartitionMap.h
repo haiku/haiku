@@ -26,10 +26,6 @@
 #define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
 #define BFS_NAME "BFS Filesystem"
 
-enum {
-	SECTOR_SIZE = 512
-};
-
 
 // is_empty_type
 static inline bool
@@ -128,141 +124,172 @@ private:
 // Partition
 class Partition {
 public:
-	Partition();
-	Partition(const partition_descriptor *descriptor, off_t ptsOffset,
-		off_t baseOffset);
+								Partition();
+								Partition(const partition_descriptor* descriptor,
+									off_t tableOffset, off_t baseOffset,
+									uint32 blockSize);
 
-	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-		off_t baseOffset);
-	void SetTo(off_t offset, off_t size, uint8 type, bool active,
-		off_t ptsOffset);
-	void Unset();
+			void				SetTo(const partition_descriptor* descriptor,
+									off_t tableOffset, off_t baseOffset,
+									uint32 blockSize);
+			void				SetTo(off_t offset, off_t size, uint8 type,
+									bool active, off_t tableOffset,
+									uint32 blockSize);
+			void				Unset();
 
-	bool IsEmpty() const	{ return is_empty_type(fType); }
-	bool IsExtended() const	{ return is_extended_type(fType); }
+			bool				IsEmpty() const
+									{ return is_empty_type(fType); }
+			bool				IsExtended() const
+									{ return is_extended_type(fType); }
 
-	// NOTE: Both PartitionTableOffset() and Offset() are absolute with regards to the
-	// session (usually the disk). Ie, for all primary partitions, including
-	// the primary extended partition, the PartitionTableOffset() points to the MBR (0).
-	// For logical partitions, the PartitionTableOffset() is located within the primary
-	// extended partition, but again, the returned values are absolute with
-	// regards to the session. All values are expressed in bytes.
-	off_t PartitionTableOffset() const	{ return fPartitionTableOffset; }
-		// offset of the sector containing the descriptor for this partition
-	off_t Offset() const	{ return fOffset; }
-		// start offset of the partition contents
-	off_t Size() const		{ return fSize; }
-	uint8 Type() const		{ return fType; }
-	bool Active() const		{ return fActive; }
-	void GetTypeString(char *buffer) const
-		{ get_partition_type_string(fType, buffer); }
-	void GetPartitionDescriptor(partition_descriptor *descriptor,
-		off_t baseOffset) const;
+	// NOTE: Both PartitionTableOffset() and Offset() are absolute with regards
+	// to the session (usually the disk). Ie, for all primary partitions,
+	// including the primary extended partition, the PartitionTableOffset()
+	// points to the MBR (0).
+	// For logical partitions, the PartitionTableOffset() is located within the
+	// primary extended partition, but again, the returned values are absolute
+	// with regards to the session. All values are expressed in bytes.
+			off_t				PartitionTableOffset() const
+									{ return fPartitionTableOffset; }
+									// offset of the partition table
+			off_t				Offset() const		{ return fOffset; }
+									// start offset of the partition contents
+			off_t				Size() const		{ return fSize; }
+			uint8				Type() const		{ return fType; }
+			bool				Active() const		{ return fActive; }
+			uint32				BlockSize() const	{ return fBlockSize; }
+			void				GetTypeString(char *buffer) const
+									{ get_partition_type_string(fType, buffer); }
+			void				GetPartitionDescriptor(
+									partition_descriptor* descriptor,
+									off_t baseOffset) const;
 
-	void SetPartitionTableOffset(off_t offset)	{ fPartitionTableOffset = offset; }
-	void SetOffset(off_t offset)	{ fOffset = offset; }
-	void SetSize(off_t size)		{ fSize = size; }
-	void SetType(uint8 type)		{ fType = type; }
-	void SetActive(bool active)		{ fActive = active; }
+			void				SetPartitionTableOffset(off_t offset)
+									{ fPartitionTableOffset = offset; }
+			void				SetOffset(off_t offset)
+									{ fOffset = offset; }
+			void				SetSize(off_t size)
+									{ fSize = size; }
+			void				SetType(uint8 type)
+									{ fType = type; }
+			void				SetActive(bool active)
+									{ fActive = active; }
 
-	bool CheckLocation(off_t sessionSize) const;
+			bool				CheckLocation(off_t sessionSize) const;
 #ifdef _BOOT_MODE
-	void AdjustSize(off_t sessionSize);
+			void				AdjustSize(off_t sessionSize);
 #endif
 
 private:
-	off_t	fPartitionTableOffset;
-	off_t	fOffset;	// relative to the start of the session
-	off_t	fSize;
-	uint8	fType;
-	bool	fActive;
+			off_t				fPartitionTableOffset;
+			off_t				fOffset;
+				// relative to the start of the session
+			off_t				fSize;
+			uint32				fBlockSize;
+			uint8				fType;
+			bool				fActive;
 };
 
 
 // PrimaryPartition
 class PrimaryPartition : public Partition {
 public:
-	PrimaryPartition();
+								PrimaryPartition();
 
-	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset);
-	void SetTo(off_t offset, off_t size, uint8 type, bool active);
-	void Unset();
+			void				SetTo(const partition_descriptor* descriptor,
+									off_t tableOffset, uint32 blockSize);
+			void				SetTo(off_t offset, off_t size, uint8 type,
+									bool active, uint32 blockSize);
+			void				Unset();
 
-	status_t Assign(const PrimaryPartition& other);
+			status_t			Assign(const PrimaryPartition& other);
 
-	int32 Index() const			{ return fIndex; }
-	void SetIndex(int32 index)	{ fIndex = index; }
-		// private
+			int32				Index() const			{ return fIndex; }
+			void				SetIndex(int32 index)	{ fIndex = index; }
+				// private
 
-	// only if extended
-	int32 CountLogicalPartitions() const { return fLogicalPartitionCount; }
-	LogicalPartition *LogicalPartitionAt(int32 index) const;
-	void AddLogicalPartition(LogicalPartition *partition);
-	void RemoveLogicalPartition(LogicalPartition *partition);
+			// only if extended
+			int32				CountLogicalPartitions() const
+									{ return fLogicalPartitionCount; }
+			LogicalPartition*	LogicalPartitionAt(int32 index) const;
+			void				AddLogicalPartition(LogicalPartition* partition);
+			void				RemoveLogicalPartition(
+									LogicalPartition* partition);
 
 private:
-	LogicalPartition	*fHead;
-	LogicalPartition	*fTail;
-	int32				fLogicalPartitionCount;
-	int32				fIndex;
+			LogicalPartition*	fHead;
+			LogicalPartition*	fTail;
+			int32				fLogicalPartitionCount;
+			int32				fIndex;
 };
 
 
 // LogicalPartition
 class LogicalPartition : public Partition {
 public:
-	LogicalPartition();
-	LogicalPartition(const partition_descriptor *descriptor, off_t ptsOffset,
-		PrimaryPartition *primary);
+								LogicalPartition();
+								LogicalPartition(
+									const partition_descriptor* descriptor,
+									off_t tableOffset,
+									PrimaryPartition *primary);
 
-	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-		PrimaryPartition *primary);
-	void SetTo(off_t offset, off_t size, uint8 type, bool active,
-		off_t ptsOffset, PrimaryPartition *primary);
-	void Unset();
+			void				SetTo(const partition_descriptor* descriptor,
+									off_t tableOffset,
+									PrimaryPartition* primary);
+			void				SetTo(off_t offset, off_t size, uint8 type,
+									bool active, off_t tableOffset,
+									PrimaryPartition* primary);
+			void				Unset();
 
-	void SetPrimaryPartition(PrimaryPartition *primary) { fPrimary = primary; }
-	PrimaryPartition *GetPrimaryPartition() const { return fPrimary; }
+			void				SetPrimaryPartition(PrimaryPartition* primary)
+									{ fPrimary = primary; }
+			PrimaryPartition*	GetPrimaryPartition() const
+									{ return fPrimary; }
 
-	void SetNext(LogicalPartition *next) { fNext = next; }
-	LogicalPartition *Next() const { return fNext; }
+			void				SetNext(LogicalPartition* next)
+									{ fNext = next; }
+			LogicalPartition*	Next() const
+									{ return fNext; }
 
-	void SetPrevious(LogicalPartition *previous) { fPrevious = previous; }
-	LogicalPartition *Previous() const { return fPrevious; }
+			void				SetPrevious(LogicalPartition* previous)
+									{ fPrevious = previous; }
+			LogicalPartition*	Previous() const
+									{ return fPrevious; }
 
 private:
-	PrimaryPartition	*fPrimary;
-	LogicalPartition	*fNext;
-	LogicalPartition	*fPrevious;
+			PrimaryPartition*	fPrimary;
+			LogicalPartition*	fNext;
+			LogicalPartition*	fPrevious;
 };
 
 
 // PartitionMap
 class PartitionMap {
 public:
-	PartitionMap();
-	~PartitionMap();
+								PartitionMap();
+								~PartitionMap();
 
-	void Unset();
+			void				Unset();
 
-	status_t Assign(const PartitionMap& other);
+			status_t			Assign(const PartitionMap& other);
 
-	PrimaryPartition *PrimaryPartitionAt(int32 index);
-	const PrimaryPartition *PrimaryPartitionAt(int32 index) const;
-	int32 IndexOfPrimaryPartition(const PrimaryPartition* partition) const;
-	int32 CountNonEmptyPrimaryPartitions() const;
+			PrimaryPartition*	PrimaryPartitionAt(int32 index);
+			const PrimaryPartition* PrimaryPartitionAt(int32 index) const;
+			int32				IndexOfPrimaryPartition(
+									const PrimaryPartition* partition) const;
+			int32				CountNonEmptyPrimaryPartitions() const;
 
-	int32 ExtendedPartitionIndex() const;
+			int32				ExtendedPartitionIndex() const;
 
-	int32 CountPartitions() const;
-	int32 CountNonEmptyPartitions() const;
-	Partition *PartitionAt(int32 index);
-	const Partition *PartitionAt(int32 index) const;
+			int32				CountPartitions() const;
+			int32				CountNonEmptyPartitions() const;
+			Partition*			PartitionAt(int32 index);
+			const Partition*	PartitionAt(int32 index) const;
 
-	bool Check(off_t sessionSize) const;
+			bool				Check(off_t sessionSize) const;
 
 private:
-	PrimaryPartition		fPrimaries[4];
+			PrimaryPartition	fPrimaries[4];
 };
 
 #endif	// _INTEL_PARTITION_MAP_H
