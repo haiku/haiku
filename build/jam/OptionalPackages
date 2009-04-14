@@ -481,8 +481,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				: apps
 			;
 		} else {
-			InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc3-gcc2-2009-03-07
-				: $(baseURL)/pe-2.4.1-x86-rc3-gcc2-2009-03-07.zip
+			InstallOptionalHaikuImagePackage pe-2.4.2-x86-gcc2-2009-04-14
+				: $(baseURL)/pe-2.4.2-x86-gcc2-2009-04-14.zip
 				: apps
 			;
 		}
