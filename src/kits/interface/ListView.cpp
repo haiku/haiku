@@ -134,8 +134,8 @@ BListView::~BListView()
 }
 
 
-BArchivable *
-BListView::Instantiate(BMessage *archive)
+BArchivable*
+BListView::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BListView"))
 		return new BListView(archive);
@@ -145,7 +145,7 @@ BListView::Instantiate(BMessage *archive)
 
 
 status_t
-BListView::Archive(BMessage *archive, bool deep) const
+BListView::Archive(BMessage* archive, bool deep) const
 {
 	status_t status = BView::Archive(archive, deep);
 	if (status < B_OK)
@@ -491,7 +491,7 @@ BListView::MakeFocus(bool focused)
 		fScrollView->SetBorderHighlighted(focused);
 }
 
-// AttachedToWindow
+
 void
 BListView::AttachedToWindow()
 {
@@ -504,21 +504,21 @@ BListView::AttachedToWindow()
 	_FixupScrollBar();
 }
 
-// FrameResized
+
 void
 BListView::FrameResized(float width, float height)
 {
 	_FixupScrollBar();
 }
 
-// FrameMoved
+
 void
 BListView::FrameMoved(BPoint new_position)
 {
 	BView::FrameMoved(new_position);
 }
 
-// SetFont
+
 void
 BListView::SetFont(const BFont* font, uint32 mask)
 {
@@ -526,19 +526,20 @@ BListView::SetFont(const BFont* font, uint32 mask)
 	_FontChanged();
 }
 
-// TargetedByScrollView
+
 void
 BListView::TargetedByScrollView(BScrollView *view)
 {
 	fScrollView = view;
 }
 
-// ScrollTo
+
 void
 BListView::ScrollTo(BPoint point)
 {
 	BView::ScrollTo(point);
 }
+
 
 bool
 BListView::AddItem(BListItem *item, int32 index)
@@ -556,7 +557,7 @@ BListView::AddItem(BListItem *item, int32 index)
 		BFont font;
 		GetFont(&font);
 		item->SetTop((index > 0) ? ItemAt(index - 1)->Bottom() + 1.0 : 0.0);
-			
+
 		item->Update(this, &font);
 		_RecalcItemTops(index + 1);
 
@@ -573,6 +574,7 @@ BListView::AddItem(BListItem* item)
 {
 	if (!fList.AddItem(item))
 		return false;
+
 	// No need to adapt selection, as this item is the last in the list
 
 	if (Window()) {
@@ -580,9 +582,9 @@ BListView::AddItem(BListItem* item)
 		GetFont(&font);
 		int32 index = CountItems() - 1;
 		item->SetTop((index > 0) ? ItemAt(index - 1)->Bottom() + 1.0 : 0.0);
-		
+
 		item->Update(this, &font);
-		
+
 		_FixupScrollBar();
 		InvalidateItem(CountItems() - 1);
 	}
@@ -590,7 +592,7 @@ BListView::AddItem(BListItem* item)
 	return true;
 }
 
-// AddList
+
 bool
 BListView::AddList(BList* list, int32 index)
 {
@@ -623,14 +625,14 @@ BListView::AddList(BList* list, int32 index)
 	return true;
 }
 
-// AddList
+
 bool
 BListView::AddList(BList* list)
 {
 	return AddList(list, CountItems());
 }
 
-// RemoveItem
+
 BListItem*
 BListView::RemoveItem(int32 index)
 {
@@ -658,14 +660,14 @@ BListView::RemoveItem(int32 index)
 	return item;
 }
 
-// RemoveItem
+
 bool
 BListView::RemoveItem(BListItem *item)
 {
 	return BListView::RemoveItem(IndexOf(item)) != NULL;
 }
 
-// RemoveItems
+
 bool
 BListView::RemoveItems(int32 index, int32 count)
 {
@@ -682,7 +684,7 @@ BListView::RemoveItems(int32 index, int32 count)
 	return true;
 }
 
-// SetSelectionMessage
+
 void
 BListView::SetSelectionMessage(BMessage* message)
 {
@@ -690,45 +692,45 @@ BListView::SetSelectionMessage(BMessage* message)
 	fSelectMessage = message;
 }
 
-// SetInvocationMessage
+
 void
 BListView::SetInvocationMessage(BMessage* message)
 {
 	BInvoker::SetMessage(message);
 }
 
-// InvocationMessage
+
 BMessage*
 BListView::InvocationMessage() const
 {
 	return BInvoker::Message();
 }
 
-// InvocationCommand
+
 uint32
 BListView::InvocationCommand() const
 {
 	return BInvoker::Command();
 }
 
-// SelectionMessage
+
 BMessage*
 BListView::SelectionMessage() const
 {
 	return fSelectMessage;
 }
 
-// SelectionCommand
+
 uint32
 BListView::SelectionCommand() const
 {
 	if (fSelectMessage)
 		return fSelectMessage->what;
-	else
-		return 0;
+
+	return 0;
 }
 
-// SetListType
+
 void
 BListView::SetListType(list_view_type type)
 {
@@ -738,20 +740,22 @@ BListView::SetListType(list_view_type type)
 
 	fListType = type;
 }
-//------------------------------------------------------------------------------
-list_view_type BListView::ListType() const
+
+
+list_view_type
+BListView::ListType() const
 {
 	return fListType;
 }
 
-// ItemAt
+
 BListItem*
 BListView::ItemAt(int32 index) const
 {
 	return (BListItem*)fList.ItemAt(index);
 }
 
-// IndexOf
+
 int32
 BListView::IndexOf(BListItem *item) const
 {
@@ -766,7 +770,7 @@ BListView::IndexOf(BListItem *item) const
 	return fList.IndexOf(item);
 }
 
-// IndexOf
+
 int32
 BListView::IndexOf(BPoint point) const
 {
@@ -791,35 +795,35 @@ BListView::IndexOf(BPoint point) const
 	return -1;
 }
 
-// FirstItem
+
 BListItem*
 BListView::FirstItem() const
 {
 	return (BListItem*)fList.FirstItem();
 }
 
-// LastItem
+
 BListItem*
 BListView::LastItem() const
 {
 	return (BListItem*)fList.LastItem();
 }
 
-// HasItem
+
 bool
 BListView::HasItem(BListItem *item) const
 {
 	return IndexOf(item) != -1;
 }
 
-// CountItems
+
 int32
 BListView::CountItems() const
 {
 	return fList.CountItems();
 }
 
-// MakeEmpty
+
 void
 BListView::MakeEmpty()
 {
@@ -835,42 +839,42 @@ BListView::MakeEmpty()
 	}
 }
 
-// IsEmpty
+
 bool
 BListView::IsEmpty() const
 {
 	return fList.IsEmpty();
 }
 
-// DoForEach
+
 void
 BListView::DoForEach(bool (*func)(BListItem*))
 {
 	fList.DoForEach(reinterpret_cast<bool (*)(void*)>(func));
 }
 
-// DoForEach
+
 void
-BListView::DoForEach(bool (*func)(BListItem*, void*), void* arg )
+BListView::DoForEach(bool (*func)(BListItem*, void*), void* arg)
 {
 	fList.DoForEach(reinterpret_cast<bool (*)(void*, void*)>(func), arg);
 }
 
-// Items
+
 const BListItem**
 BListView::Items() const
 {
 	return (const BListItem**)fList.Items();
 }
 
-// InvalidateItem
+
 void
 BListView::InvalidateItem(int32 index)
 {
 	Invalidate(ItemFrame(index));
 }
 
-// ScrollToSelection
+
 void
 BListView::ScrollToSelection()
 {
@@ -916,7 +920,7 @@ BListView::IsItemSelected(int32 index) const
 	return false;
 }
 
-// CurrentSelection
+
 int32
 BListView::CurrentSelection(int32 index) const
 {
@@ -938,9 +942,9 @@ BListView::CurrentSelection(int32 index) const
 	return -1;
 }
 
-// Invoke
+
 status_t
-BListView::Invoke(BMessage *message)
+BListView::Invoke(BMessage* message)
 {
 	// Note, this is more or less a copy of BControl::Invoke() and should
 	// stay that way (ie. changes done there should be adopted here)
@@ -1037,7 +1041,7 @@ BListView::SortItems(int (*cmp)(const void *, const void *))
 	Invalidate();
 }
 
-// SwapItems
+
 bool
 BListView::SwapItems(int32 a, int32 b)
 {
@@ -1049,7 +1053,7 @@ BListView::SwapItems(int32 a, int32 b)
 	return DoMiscellaneous(B_SWAP_OP, &data);
 }
 
-// MoveItem
+
 bool
 BListView::MoveItem(int32 from, int32 to)
 {
@@ -1061,7 +1065,7 @@ BListView::MoveItem(int32 from, int32 to)
 	return DoMiscellaneous(B_MOVE_OP, &data);
 }
 
-// ReplaceItem
+
 bool
 BListView::ReplaceItem(int32 index, BListItem *item)
 {
@@ -1073,7 +1077,7 @@ BListView::ReplaceItem(int32 index, BListItem *item)
 	return DoMiscellaneous(B_REPLACE_OP, &data);
 }
 
-// ItemFrame
+
 BRect
 BListView::ItemFrame(int32 index)
 {
@@ -1096,8 +1100,10 @@ BListView::ResolveSpecifier(BMessage* message, int32 index,
 {
 	BPropertyInfo propInfo(sProperties);
 
-	if (propInfo.FindMatch(message, 0, specifier, form, property) < 0)
-		return BView::ResolveSpecifier(message, index, specifier, form, property);
+	if (propInfo.FindMatch(message, 0, specifier, form, property) < 0) {
+		return BView::ResolveSpecifier(message, index, specifier, form,
+			property);
+	}
 
 	// TODO: msg->AddInt32("_match_code_", );
 
@@ -1121,6 +1127,7 @@ BListView::GetSupportedSuites(BMessage* data)
 		return BView::GetSupportedSuites(data);
 	return err;
 }
+
 
 status_t
 BListView::Perform(perform_code code, void* _data)
@@ -1153,7 +1160,7 @@ BListView::Perform(perform_code code, void* _data)
 			BListView::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -1178,37 +1185,36 @@ BListView::Perform(perform_code code, void* _data)
 }
 
 
-// WindowActivated
 void
 BListView::WindowActivated(bool state)
 {
 	BView::WindowActivated(state);
 }
 
-// DetachedFromWindow
+
 void
 BListView::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
 }
 
-// InitiateDrag
+
 bool
 BListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 {
 	return false;
 }
 
-// ResizeToPreferred
+
 void
 BListView::ResizeToPreferred()
 {
 	BView::ResizeToPreferred();
 }
 
-// GetPreferredSize
+
 void
-BListView::GetPreferredSize(float *width, float *height)
+BListView::GetPreferredSize(float* _width, float* _height)
 {
 	int32 count = CountItems();
 
@@ -1220,26 +1226,29 @@ BListView::GetPreferredSize(float *width, float *height)
 				maxWidth = itemWidth;
 		}
 
-		*width = maxWidth;
-		*height = ItemAt(count - 1)->Bottom();
+		if (_width != NULL)
+			*_width = maxWidth;
+		if (_height != NULL)
+			*_height = ItemAt(count - 1)->Bottom();
 	} else {
-		BView::GetPreferredSize(width, height);
+		BView::GetPreferredSize(_width, _height);
 	}
 }
 
-// AllAttached
+
 void
 BListView::AllAttached()
 {
 	BView::AllAttached();
 }
 
-// AllDetached
+
 void
 BListView::AllDetached()
 {
 	BView::AllDetached();
 }
+
 
 BSize
 BListView::MinSize()
@@ -1266,9 +1275,8 @@ BListView::PreferredSize()
 }
 
 
-// DoMiscellaneous
 bool
-BListView::DoMiscellaneous(MiscCode code, MiscData *data)
+BListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
 	if (code > B_SWAP_OP)
 		return false;
@@ -1290,16 +1298,19 @@ BListView::DoMiscellaneous(MiscCode code, MiscData *data)
 	return false;
 }
 
+
 void BListView::_ReservedListView2() {}
 void BListView::_ReservedListView3() {}
 void BListView::_ReservedListView4() {}
 
-BListView &BListView::operator=(const BListView &)
+
+BListView&
+BListView::operator=(const BListView& /*other*/)
 {
 	return *this;
 }
 
-// _InitObject
+
 void
 BListView::_InitObject(list_view_type type)
 {
@@ -1314,12 +1325,11 @@ BListView::_InitObject(list_view_type type)
 	fTrack->item_index = -1;
 }
 
-// _FixupScrollBar
+
 void
 BListView::_FixupScrollBar()
 {
 	BScrollBar* vertScroller = ScrollBar(B_VERTICAL);
-
 	if (!vertScroller)
 		return;
 
@@ -1340,35 +1350,34 @@ BListView::_FixupScrollBar()
 		vertScroller->SetRange(0.0, itemHeight - bounds.Height() - 1.0);
 		vertScroller->SetProportion(bounds.Height () / itemHeight);
 		// scroll up if there is empty room on bottom
-		if (itemHeight < bounds.bottom) {
+		if (itemHeight < bounds.bottom)
 			ScrollBy(0.0, bounds.bottom - itemHeight);
-		}
 	}
 
 	if (count != 0)
 		vertScroller->SetSteps(ceilf(FirstItem()->Height()), bounds.Height());
 }
 
-// _InvalidateFrom
+
 void
 BListView::_InvalidateFrom(int32 index)
 {
 	// make sure index is behind last valid index
 	int32 count = CountItems();
-	if (index >= count) {
+	if (index >= count)
 		index = count;
-	}
+
 	// take the item before the wanted one,
 	// because that might already be removed
 	index--;
 	BRect dirty = Bounds();
-	if (index >= 0) {
+	if (index >= 0)
 		dirty.top = ItemFrame(index).bottom + 1;
-	}
+
 	Invalidate(dirty);
 }
 
-// _FontChanged
+
 void
 BListView::_FontChanged()
 {
@@ -1381,8 +1390,7 @@ BListView::_FontChanged()
 }
 
 
-/*!
-	Selects the item at the specified \a index, and returns \c true in
+/*!	Selects the item at the specified \a index, and returns \c true in
 	case the selection was changed because of this method.
 	If \a extend is \c false, all previously selected items are deselected.
 */
@@ -1394,7 +1402,7 @@ BListView::_Select(int32 index, bool extend)
 
 	// only lock the window when there is one
 	BAutolock locker(Window());
-	if (Window() && !locker.IsLocked())
+	if (Window() != NULL && !locker.IsLocked())
 		return false;
 
 	bool changed = false;
@@ -1428,8 +1436,7 @@ BListView::_Select(int32 index, bool extend)
 }
 
 
-/*!
-	Selects the items between \a from and \a to, and returns \c true in
+/*!	Selects the items between \a from and \a to, and returns \c true in
 	case the selection was changed because of this method.
 	If \a extend is \c false, all previously selected items are deselected.
 */
@@ -1545,7 +1552,7 @@ BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 	return true;
 }
 
-// _TryInitiateDrag
+
 bool
 BListView::_TryInitiateDrag(BPoint where)
 {
@@ -1562,7 +1569,7 @@ BListView::_TryInitiateDrag(BPoint where)
 	return false;
 }
 
-// _CalcFirstSelected
+
 int32
 BListView::_CalcFirstSelected(int32 after)
 {
@@ -1597,7 +1604,7 @@ BListView::_CalcLastSelected(int32 before)
 
 
 void
-BListView::DrawItem(BListItem *item, BRect itemRect, bool complete)
+BListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 {
 	item->DrawItem(this, itemRect, complete);
 }
@@ -1771,6 +1778,7 @@ BListView::_RescanSelection(int32 from, int32 to)
 			fLastSelected = i;
 	}
 }
+
 
 void
 BListView::_RecalcItemTops(int32 start, int32 end)
