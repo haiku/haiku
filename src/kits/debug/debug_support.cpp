@@ -11,6 +11,7 @@
 #include <debug_support.h>
 
 #include "arch_debug_support.h"
+#include "Image.h"
 #include "SymbolLookup.h"
 
 
@@ -22,7 +23,6 @@ struct debug_symbol_lookup_context {
 };
 
 struct debug_symbol_iterator : BPrivate::Debug::SymbolIterator {
-	debug_symbol_lookup_context*	lookup_context;
 };
 
 
@@ -397,8 +397,6 @@ debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
 		return error;
 	}
 
-	iterator->lookup_context = lookupContext;
-
 	*_iterator = iterator;
 	return B_OK;
 }
@@ -417,18 +415,15 @@ debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
 	size_t nameBufferLength, int32* _symbolType, void** _symbolLocation,
 	size_t* _symbolSize)
 {
-	if (iterator == NULL || iterator->lookup_context == NULL
-		|| iterator->lookup_context->lookup == NULL) {
+	if (iterator == NULL || iterator->image == NULL)
 		return B_BAD_VALUE;
-	}
-	debug_symbol_lookup_context* lookupContext = iterator->lookup_context;
 
 	const char* symbolName;
 	size_t symbolNameLen;
 	addr_t symbolLocation;
 
 	try {
-		status_t error = lookupContext->lookup->NextSymbol(*iterator,
+		status_t error = iterator->image->NextSymbol(iterator->currentIndex,
 			&symbolName, &symbolNameLen, &symbolLocation, _symbolSize,
 			_symbolType);
 		if (error != B_OK)
