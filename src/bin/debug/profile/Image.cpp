@@ -71,13 +71,13 @@ Image::LoadSymbols(debug_symbol_lookup_context* lookupContext)
 			if (symbol == NULL || !symbols.AddItem(symbol)) {
 				delete symbol;
 				fprintf(stderr, "%s: Out of memory\n", kCommandName);
-				debug_delete_image_symbol_iterator(iterator);
+				debug_delete_symbol_iterator(iterator);
 				return B_NO_MEMORY;
 			}
 		}
 	}
 
-	debug_delete_image_symbol_iterator(iterator);
+	debug_delete_symbol_iterator(iterator);
 
 	// sort the symbols
 	fSymbolCount = symbols.CountItems();

@@ -86,6 +86,11 @@ public:
 	virtual						~ImageFile();
 
 			status_t			Init(const image_info& info);
+			status_t			Init(const char* path);
+
+private:
+			status_t			_LoadFile(const char* path,
+									addr_t* _textAddress, size_t* _textSize);
 
 private:
 			int					fFD;

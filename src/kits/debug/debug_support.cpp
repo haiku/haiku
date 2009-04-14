@@ -23,6 +23,19 @@ struct debug_symbol_lookup_context {
 };
 
 struct debug_symbol_iterator : BPrivate::Debug::SymbolIterator {
+	bool	ownsImage;
+
+	debug_symbol_iterator()
+		:
+		ownsImage(false)
+	{
+	}
+
+	~debug_symbol_iterator()
+	{
+		if (ownsImage)
+			delete image;
+	}
 };
 
 
@@ -402,8 +415,43 @@ debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
 }
 
 
+status_t
+debug_create_file_symbol_iterator(const char* path,
+	debug_symbol_iterator** _iterator)
+{
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	// create the iterator
+	debug_symbol_iterator* iterator = new(std::nothrow) debug_symbol_iterator;
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<debug_symbol_iterator> iteratorDeleter(iterator);
+
+	// create the image file
+	ImageFile* imageFile = new(std::nothrow) ImageFile;
+	if (imageFile == NULL)
+		return B_NO_MEMORY;
+
+	// init the iterator
+	iterator->image = imageFile;
+	iterator->ownsImage = true;
+	iterator->currentIndex = -1;
+
+	// init the image file
+	status_t error = imageFile->Init(path);
+	if (error != B_OK)
+		return error;
+
+	iteratorDeleter.Detach();
+	*_iterator = iterator;
+
+	return B_OK;
+}
+
+
 void
-debug_delete_image_symbol_iterator(debug_symbol_iterator* iterator)
+debug_delete_symbol_iterator(debug_symbol_iterator* iterator)
 {
 	delete iterator;
 }

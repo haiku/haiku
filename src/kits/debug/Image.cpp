@@ -199,10 +199,51 @@ ImageFile::~ImageFile()
 status_t
 ImageFile::Init(const image_info& info)
 {
+	// just copy the image info
 	fInfo = info;
 
+	// load the file
+	addr_t textAddress;
+	size_t textSize;
+	status_t error = _LoadFile(info.name, &textAddress, &textSize);
+	if (error != B_OK)
+		return error;
+
+	// compute the load delta
+	fLoadDelta = (addr_t)fInfo.text - textAddress;
+
+	return B_OK;
+}
+
+
+status_t
+ImageFile::Init(const char* path)
+{
+	// load the file
+	addr_t textAddress;
+	size_t textSize;
+	status_t error = _LoadFile(path, &textAddress, &textSize);
+	if (error != B_OK)
+		return error;
+
+	// init the image info -- at least the part we use
+	fInfo.id = -1;
+	strlcpy(fInfo.name, path, sizeof(fInfo.name));
+    fInfo.text = (void*)textAddress;
+	fInfo.text_size = textSize;
+
+	// the image isn't loaded, so no delta
+	fLoadDelta = 0;
+
+	return B_OK;
+}
+
+
+status_t
+ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize)
+{
 	// open and stat() the file
-	fFD = open(fInfo.name, O_RDONLY);
+	fFD = open(path, O_RDONLY);
 	if (fFD < 0)
 		return errno;
 
@@ -251,12 +292,15 @@ ImageFile::Init(const image_info& info)
 	Elf32_Shdr* sectionHeaders
 		= (Elf32_Shdr*)(fMappedFile + elfHeader->e_shoff);
 
-	// find the first segment -- we need its relative offset
+	// find the first segment -- we need its load address
+	*_textAddress = 0;
+	*_textSize = 0;
 	for (int32 i = 0; i < programHeaderCount; i++) {
 		Elf32_Phdr* header = (Elf32_Phdr*)
 			((uint8*)programHeaders + i * elfHeader->e_phentsize);
 		if (header->p_type == PT_LOAD) {
-			fLoadDelta = (addr_t)fInfo.text - header->p_vaddr;
+			*_textAddress = header->p_vaddr;
+			*_textSize = header->p_memsz;
 			break;
 		}
 	}

@@ -70,7 +70,9 @@ status_t debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 status_t debug_create_image_symbol_iterator(
 			debug_symbol_lookup_context* lookupContext, image_id imageID,
 			debug_symbol_iterator** _iterator);
-void debug_delete_image_symbol_iterator(debug_symbol_iterator* iterator);
+status_t debug_create_file_symbol_iterator(const char* path,
+			debug_symbol_iterator** _iterator);
+void debug_delete_symbol_iterator(debug_symbol_iterator* iterator);
 
 status_t debug_next_image_symbol(debug_symbol_iterator* iterator,
 			char* nameBuffer, size_t nameBufferLength, int32* _symbolType,
