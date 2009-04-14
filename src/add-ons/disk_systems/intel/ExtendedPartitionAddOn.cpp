@@ -15,6 +15,8 @@
 
 #include <AutoDeleter.h>
 
+#include "IntelDiskSystem.h"
+
 
 using std::nothrow;
 
@@ -83,7 +85,7 @@ bool
 ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 {
 	// If it's big enough, we can initialize it.
-	return partition->Size() >= 2 * SECTOR_SIZE;
+	return partition->Size() >= 2 * partition->BlockSize();
 }
 
 
@@ -138,12 +140,12 @@ ExtendedPartitionAddOn::Initialize(BMutablePartition* partition,
 	status_t error = partition->SetContentType(Name());
 	if (error != B_OK)
 		return error;
-// TODO: The content type could as well be set by the caller.
+	// TODO: The content type could as well be set by the caller.
 
 	partition->SetContentName(NULL);
 	partition->SetContentParameters(NULL);
-	partition->SetBlockSize(SECTOR_SIZE);
-	partition->SetContentSize(partition->Size() / SECTOR_SIZE * SECTOR_SIZE);
+	partition->SetContentSize(
+		sector_align(partition->Size(), partition->BlockSize()));
 
 	*_handle = handleDeleter.Detach();
 

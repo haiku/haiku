@@ -9,9 +9,9 @@
 
 
 static inline off_t
-sector_align(off_t offset)
+sector_align(off_t offset, uint32 blockSize)
 {
-	return offset / SECTOR_SIZE * SECTOR_SIZE;
+	return offset / blockSize * blockSize;
 }
 
 
