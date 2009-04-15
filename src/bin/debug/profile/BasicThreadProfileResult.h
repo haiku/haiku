@@ -16,7 +16,8 @@ public:
 
 	virtual	status_t			Init();
 
-	inline	void				AddHit(addr_t address);
+	inline	bool				AddHit(addr_t address);
+	inline	void				AddUnknownHit();
 	inline	void				AddSymbolHit(int32 symbolIndex);
 	inline	void				AddImageHit();
 

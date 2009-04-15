@@ -56,15 +56,24 @@ BasicThreadImage::Init()
 }
 
 
-void
+bool
 BasicThreadImage::AddHit(addr_t address)
 {
 	int32 symbolIndex = fImage->FindSymbol(address);
-	if (symbolIndex >= 0)
-		fSymbolHits[symbolIndex]++;
-	else
-		fUnknownHits++;
+	if (symbolIndex < 0)
+		return false;
 
+	fSymbolHits[symbolIndex]++;
+	fTotalHits++;
+
+	return true;
+}
+
+
+void
+BasicThreadImage::AddUnknownHit()
+{
+	fUnknownHits++;
 	fTotalHits++;
 }
 
@@ -264,17 +273,27 @@ void
 ExclusiveThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 {
 	BasicThreadImage* image = NULL;
+		// the image in which we hit a symbol
+	BasicThreadImage* firstImage = NULL;
+		// the first image we hit, != image if no symbol was hit
+
 	for (int32 k = 0; k < sampleCount; k++) {
 		addr_t address = samples[k];
 		image = FindImage(address);
 		if (image != NULL) {
-			image->AddHit(address);
-			break;
+			if (image->AddHit(address))
+				break;
+			if (firstImage == NULL)
+				firstImage = image;
 		}
 	}
 
-	if (image == NULL)
-		fUnkownTicks++;
+	if (image == NULL) {
+		if (firstImage != NULL)
+			firstImage->AddUnknownHit();
+		else
+			fUnkownTicks++;
+	}
 
 	fTotalTicks++;
 	fTotalSampleCount += sampleCount;

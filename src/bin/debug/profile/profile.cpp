@@ -97,6 +97,7 @@ public:
 		:
 		fTeams(20, true),
 		fThreads(20, true),
+		fKernelTeam(NULL),
 		fDebuggerPort(debuggerPort)
 	{
 	}
@@ -154,8 +155,11 @@ public:
 
 	void RemoveTeam(team_id teamID)
 	{
-		if (Team* team = FindTeam(teamID))
+		if (Team* team = FindTeam(teamID)) {
+			if (team == fKernelTeam)
+				fKernelTeam = NULL;
 			fTeams.RemoveItem(team, true);
+		}
 	}
 
 	void RemoveThread(thread_id threadID)
@@ -244,7 +248,7 @@ private:
 			return B_NO_MEMORY;
 
 		status_t error = addedInfo != NULL
-			? team->Init(addedInfo)
+			? _InitUndebuggedTeam(team, addedInfo)
 			: _InitDebuggedTeam(team, teamID);
 		if (error != B_OK) {
 			delete team;
@@ -252,6 +256,9 @@ private:
 		}
 
 		fTeams.AddItem(team);
+
+		if (teamID == B_SYSTEM_TEAM)
+			fKernelTeam = team;
 
 		if (_team != NULL)
 			*_team = team;
@@ -273,6 +280,28 @@ private:
 
 		// add the kernel images
 		return _LoadTeamImages(team, B_SYSTEM_TEAM);
+	}
+
+	status_t _InitUndebuggedTeam(Team* team,
+		system_profiler_team_added* addedInfo)
+	{
+		// init the team
+		status_t error = team->Init(addedInfo);
+		if (error != B_OK)
+			return error;
+
+		// in case of a user team, add the kernel images
+		if (team->ID() == B_SYSTEM_TEAM || fKernelTeam == NULL)
+			return B_OK;
+
+		const BObjectList<Image>& kernelImages = fKernelTeam->Images();
+		int32 count = kernelImages.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			SharedImage* sharedImage = kernelImages.ItemAt(i)->GetSharedImage();
+			team->AddImage(sharedImage, sharedImage->Info(), B_SYSTEM_TEAM, 0);
+		}
+
+		return B_OK;
 	}
 
 	status_t _LoadTeamImages(Team* team, team_id teamID)
@@ -360,6 +389,7 @@ private:
 	BObjectList<Team>				fTeams;
 	BObjectList<Thread>				fThreads;
 	ImageMap						fImages;
+	Team*							fKernelTeam;
 	port_id							fDebuggerPort;
 };
 
@@ -409,8 +439,6 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 					= (system_profiler_team_added*)buffer;
 
 				threadManager.AddTeam(event);
-// TODO: ATM we're not adding kernel images to the team, if this is a team
-// created after we started profiling!
 				break;
 			}
 

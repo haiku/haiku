@@ -15,9 +15,12 @@ public:
 									int32 creationEvent);
 								~Image();
 
+	inline	SharedImage*		GetSharedImage() const	{ return fImage; }
+
 	inline	const image_id		ID() const;
 	inline	const char*			Name() const;
 	inline	team_id				Owner() const;
+	inline	addr_t				LoadDelta() const		{ return fLoadDelta; }
 
 	inline	int32				CreationEvent() const;
 	inline	int32				DeletionEvent() const;
