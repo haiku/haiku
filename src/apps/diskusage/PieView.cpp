@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright (c) 2009 Philippe Saint-Pierre, stpere@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
  * as long as it is accompanied by it's documentation and this copyright notice.
@@ -16,12 +17,17 @@
 #include <Entry.h>
 #include <File.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <String.h>
 #include <Volume.h>
+#include <Alert.h>
 
+#include <tracker_private.h>
+
+#include "Commands.h"
 #include "Common.h"
 #include "InfoWindow.h"
 #include "MainWindow.h"
@@ -433,13 +439,24 @@ void
 PieView::_DrawPieChart(BRect updateRect)
 {
 	BRect pieRect = Bounds();
-	pieRect.InsetBy(kPieOuterMargin, kPieOuterMargin);
 	if (!updateRect.Intersects(pieRect))
 		return;
+
+	pieRect.InsetBy(kPieOuterMargin, kPieOuterMargin);
 
 	SetHighColor(kPieBGColor);
 	FillRect(updateRect);
 
+	// constraint proportions
+	if (pieRect.Width() > pieRect.Height()) {
+		float moveBy = (pieRect.Width() - pieRect.Height()) / 2;
+		pieRect.left += moveBy;
+		pieRect.right -= moveBy;
+	} else {
+		float moveBy = (pieRect.Height() - pieRect.Width()) / 2;
+		pieRect.top -= moveBy;
+		pieRect.bottom += moveBy;
+	}
 	int colorIdx = 0;
 	FileInfo* currentDir = fScanners[fCurrentVolume]->CurrentDir();
 	FileInfo* parent = currentDir;
@@ -447,7 +464,8 @@ PieView::_DrawPieChart(BRect updateRect)
 		parent = parent->parent;
 		colorIdx++;
 	}
-	_DrawDirectory(currentDir, 0.0, 0.0, colorIdx % kBasePieColorCount, 0);
+	_DrawDirectory(pieRect, currentDir, 0.0, 0.0, colorIdx % kBasePieColorCount,
+		0);
 
 	// This is just for the case when the mouse hovers over the view
 	// while the scanning process is running and then does not move
@@ -462,10 +480,9 @@ PieView::_DrawPieChart(BRect updateRect)
 
 
 float
-PieView::_DrawDirectory(FileInfo* info, float parentSpan, float beginAngle,
-	int colorIdx, int level)
+PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
+	float beginAngle, int colorIdx, int level)
 {
-	BRect b = Bounds();
 	if (b.Width() < 2.0 * (kPieCenterSize + level * kPieRingSize
 		+ kPieOuterMargin + kPieInnerMargin)) {
 		return 0.0;
@@ -602,7 +619,7 @@ PieView::_DrawDirectory(FileInfo* info, float parentSpan, float beginAngle,
 	vector<FileInfo*>::iterator i = info->children.begin();
 	while (i != info->children.end()) {
 		float childSpan
-			= _DrawDirectory(*i, mySpan, beginAngle, colorIdx, level + 1);
+			= _DrawDirectory(b, *i, mySpan, beginAngle, colorIdx, level + 1);
 		if (childSpan >= kMinSegmentSpan) {
 			beginAngle += childSpan;
 			colorIdx = (colorIdx + 1) % kBasePieColorCount;
@@ -767,7 +784,7 @@ PieView::_ShowContextMenu(FileInfo* info, BPoint p)
 		if (item != NULL) {
 			switch (fMouseOverMenu->IndexOf(item)) {
 				case kIdxGetInfo:
-					new InfoWin(p, info, Window());
+					_OpenInfo(info, p);
 					break;
 				case kIdxOpen:
 					_Launch(info);
@@ -811,6 +828,19 @@ PieView::_Launch(FileInfo* info, const entry_ref* appRef)
 	} else {
 		// Launch a designated app to handle this file.
 		be_roster->Launch(appRef, &msg);
+	}
+}
+
+void
+PieView::_OpenInfo(FileInfo* info, BPoint p)
+{
+	BMessenger tracker(kTrackerSignature);
+	if (!tracker.IsValid()) {
+		new InfoWin(p, info, Window());
+ 	} else {
+		BMessage message(kGetInfo);
+		message.AddRef("refs", &info->ref);	
+		tracker.SendMessage(&message);
 	}
 }
 

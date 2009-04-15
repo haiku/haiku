@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src apps diskusage ;
 
+UsePrivateHeaders tracker ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
+
 Application DiskUsage :
 	App.cpp
 	Common.cpp

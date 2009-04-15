@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright (c) 2009 Philippe Saint-Pierre, stpere@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
  * as long as it is accompanied by it's documentation and this copyright notice.
@@ -24,8 +25,6 @@ public:
 	virtual						~MainWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				Zoom(BPoint origin, float width, float height);
-	virtual	void				FrameResized(float width, float height);
 	virtual	bool				QuitRequested();
 
 			void				ShowInfo(const FileInfo* info);
@@ -34,8 +33,6 @@ public:
 									bool invoke = false);
 
 private:
-			bool				_FixAspectRatio(float* width, float* height);
-
 			ControlsView*		fControlsView;
 			PieView*			fPieView;
 			StatusView*			fStatusView;

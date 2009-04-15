@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright (c) 2009 Philippe Saint-Pierre, stpere@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
  * as long as it is accompanied by it's documentation and this copyright notice.
@@ -92,26 +93,6 @@ MainWindow::MessageReceived(BMessage* message)
 }
 
 
-void
-MainWindow::Zoom(BPoint origin, float width, float height)
-{
-	width = Frame().Width();
-	height = Frame().Height();
-	if (_FixAspectRatio(&width, &height))
-		SetZoomLimits(width, height);
-
-	BWindow::Zoom(Frame().LeftTop(), width, height);
-}
-
-
-void
-MainWindow::FrameResized(float width, float height)
-{
-	if (_FixAspectRatio(&width, &height))
-		ResizeTo(width, height);
-}
-
-
 bool
 MainWindow::QuitRequested()
 {
@@ -142,30 +123,3 @@ MainWindow::FindDeviceFor(dev_t device, bool invoke)
 {
 	return fControlsView->FindDeviceFor(device, invoke);
 }
-
-
-// #pragma mark -
-
-
-bool
-MainWindow::_FixAspectRatio(float* width, float* height)
-{
-	float ctrlViewHeight = fControlsView->Bounds().Height();
-	float statusViewHeight = fStatusView->Bounds().Height();
-
-	float newPieSize = *height - ctrlViewHeight - statusViewHeight;
-	if (*width < newPieSize)
-		newPieSize = *width;
-
-	float newWidth = newPieSize;
-	float newHeight = newPieSize + ctrlViewHeight + statusViewHeight;
-	if (*width != newWidth || *height != newHeight) {
-		*width = newWidth;
-		*height = newHeight;
-		return true;
-	}
-
-	return false;
-}
-
-

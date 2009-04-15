@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright (c) 2009 Philippe Saint-Pierre, stpere@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
  * as long as it is accompanied by it's documentation and this copyright notice.
@@ -45,7 +46,7 @@ private:
 			void				_ShowVolume(BVolume* volume);
 			void				_DrawProgressBar(BRect updateRect);
 			void				_DrawPieChart(BRect updateRect);
-			float				_DrawDirectory(FileInfo* info,
+			float				_DrawDirectory(BRect b, FileInfo* info,
 									float parentSpan, float beginAngle,
 									int colorIdx, int level);
 			FileInfo*			_FileAt(const BPoint& where);
@@ -55,7 +56,7 @@ private:
 			void				_ShowContextMenu(FileInfo* info, BPoint where);
 			void				_Launch(FileInfo* info,
 									const entry_ref* ref = NULL);
-
+			void				_OpenInfo(FileInfo* info, BPoint p);
 private:
 		struct Segment {
 			Segment()
