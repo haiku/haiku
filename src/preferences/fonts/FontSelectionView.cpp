@@ -381,7 +381,14 @@ FontSelectionView::SetDefaults()
 	font_family family;
 	font_style style;
 	float size;
-	if (_get_system_default_font_(Name(), family, style, &size) != B_OK) {
+	const char* fontName;
+
+	if (!strcmp(Name(), "menu"))
+		fontName = "plain";
+	else
+		fontName = Name();
+
+	if (_get_system_default_font_(fontName, family, style, &size) != B_OK) {
 		Revert();
 		return;
 	}
@@ -425,8 +432,14 @@ FontSelectionView::IsDefaultable()
 	font_family defaultFamily;
 	font_style defaultStyle;
 	float defaultSize;
+	const char* fontName;
 
-	if (_get_system_default_font_(Name(), defaultFamily, defaultStyle, &defaultSize) != B_OK)
+	if (!strcmp(Name(), "menu"))
+		fontName = "plain";
+	else
+		fontName = Name();
+
+	if (_get_system_default_font_(fontName, defaultFamily, defaultStyle, &defaultSize) != B_OK)
 		return false;
 
 	font_family currentFamily;
