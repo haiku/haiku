@@ -90,9 +90,12 @@ struct arp_entry {
 	void ClearQueue();
 	void MarkFailed();
 	void MarkValid();
+	void ScheduleRemoval();
 };
 
-// see arp_control.h for flags
+// see arp_control.h for more flags
+#define ARP_FLAG_REMOVED			0x00010000
+#define ARP_PUBLIC_FLAG_MASK		0x0000ffff
 
 #define ARP_NO_STATE				0
 #define ARP_STATE_REQUEST			1
@@ -206,6 +209,8 @@ arp_entry::Lookup(in_addr_t address)
 arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	uint32 flags)
 {
+	ASSERT_LOCKED_MUTEX(&sCacheLock);
+
 	arp_entry *entry = new (std::nothrow) arp_entry;
 	if (entry == NULL)
 		return NULL;
@@ -232,6 +237,8 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	}
 
 	if (hash_insert(sCache, entry) != B_OK) {
+		// We can delete the entry here with the sCacheLock held, since it's
+		// guaranteed there are no timers pending.
 		delete entry;
 		return NULL;
 	}
@@ -294,6 +301,18 @@ arp_entry::MarkValid()
 }
 
 
+void
+arp_entry::ScheduleRemoval()
+{
+	// schedule a timer to remove this entry
+	timer_state = ARP_STATE_REMOVE_FAILED;
+	sStackModule->set_timer(&timer, 0);
+}
+
+
+//	#pragma mark -
+
+
 static void
 ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 {
@@ -324,8 +343,7 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 //	#pragma mark -
 
 
-/*!
-	Updates the entry determined by \a protocolAddress with the specified
+/*!	Updates the entry determined by \a protocolAddress with the specified
 	\a hardwareAddress.
 	If such an entry does not exist yet, a new entry is added. If you try
 	to update a local existing entry but didn't ask for it (by setting
@@ -338,6 +356,8 @@ status_t
 arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	uint32 flags, arp_entry **_entry = NULL)
 {
+	ASSERT_LOCKED_MUTEX(&sCacheLock);
+
 	arp_entry *entry = arp_entry::Lookup(protocolAddress);
 	if (entry != NULL) {
 		// We disallow updating of entries that had been resolved before,
@@ -385,9 +405,14 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 }
 
 
+/*!	Creates a permanent local entry for the interface belonging to this protocol.
+	You need to hold the cache lock when calling this function.
+*/
 static status_t
 arp_update_local(arp_protocol *protocol)
 {
+	ASSERT_LOCKED_MUTEX(&sCacheLock);
+
 	net_interface *interface = protocol->interface;
 	in_addr_t inetAddress;
 
@@ -566,9 +591,13 @@ arp_timer(struct net_timer *timer, void *data)
 			// the entry has aged so much that we're going to remove it
 			TRACE(("  remove ARP entry %p!\n", entry));
 
-			// TODO: we need to make sure we aren't deleting this entry from
-			// somewhere else right now!
 			mutex_lock(&sCacheLock);
+			if ((entry->flags & ARP_FLAG_REMOVED) != 0) {
+				// The entry has already been removed, and is about to be deleted
+				mutex_unlock(&sCacheLock);
+				break;
+			}
+
 			hash_remove(sCache, entry);
 			mutex_unlock(&sCacheLock);
 
@@ -616,13 +645,15 @@ arp_timer(struct net_timer *timer, void *data)
 
 /*!	Address resolver function: prepares and triggers the ARP request necessary
 	to retrieve the hardware address for \a address.
-	You need to have the sCacheLock held when calling this function - but
-	note that the lock will be interrupted here if everything goes well.
+
+	You need to have the sCacheLock held when calling this function.
 */
 static status_t
 arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 	arp_entry **_entry)
 {
+	ASSERT_LOCKED_MUTEX(&sCacheLock);
+
 	// create an unresolved ARP entry as a placeholder
 	arp_entry *entry = arp_entry::Add(address, NULL, 0);
 	if (entry == NULL)
@@ -632,14 +663,14 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 
 	entry->request_buffer = gBufferModule->create(256);
 	if (entry->request_buffer == NULL) {
-		// TODO: do something with the entry
+		entry->ScheduleRemoval();
 		return B_NO_MEMORY;
 	}
 
 	NetBufferPrepend<arp_header> bufferHeader(entry->request_buffer);
 	status_t status = bufferHeader.Status();
 	if (status < B_OK) {
-		// TODO: do something with the entry
+		entry->ScheduleRemoval();
 		return status;
 	}
 
@@ -658,9 +689,12 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 	if (protocol->interface->address != NULL) {
 		header.protocol_sender
 			= ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
-	} else
+	} else {
 		header.protocol_sender = 0;
-			// TODO: test if this actually works - maybe we should use INADDR_BROADCAST instead
+			// TODO: test if this actually works - maybe we should use
+			// INADDR_BROADCAST instead
+	}
+
 	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
 	header.protocol_target = address;
 
@@ -734,7 +768,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			} else
 				memset(control.ethernet_address, 0, ETHER_ADDRESS_LENGTH);
 
-			control.flags = entry->flags;
+			control.flags = entry->flags & ARP_PUBLIC_FLAG_MASK;
 			return user_memcpy(buffer, &control, sizeof(struct arp_control));
 		}
 
@@ -761,7 +795,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 					entry->hardware_address.sdl_data, ETHER_ADDRESS_LENGTH);
 			} else
 				memset(control.ethernet_address, 0, ETHER_ADDRESS_LENGTH);
-			control.flags = entry->flags;
+			control.flags = entry->flags & ARP_PUBLIC_FLAG_MASK;
 
 			return user_memcpy(buffer, &control, sizeof(struct arp_control));
 		}
@@ -774,9 +808,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			if ((entry->flags & ARP_FLAG_LOCAL) != 0)
 				return B_BAD_VALUE;
 
-			// schedule a timer to remove this entry
-			entry->timer_state = ARP_STATE_REMOVE_FAILED;
-			sStackModule->set_timer(&entry->timer, 0);
+			entry->ScheduleRemoval();
 			return B_OK;
 		}
 
@@ -791,9 +823,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 				if ((entry->flags & ARP_FLAG_LOCAL) != 0)
 					continue;
 
-				// schedule a timer to remove this entry
-				entry->timer_state = ARP_STATE_REMOVE_FAILED;
-				sStackModule->set_timer(&entry->timer, 0);
+				entry->ScheduleRemoval();
 			}
 			hash_close(sCache, &iterator, false);
 			return B_OK;
@@ -930,7 +960,10 @@ arp_up(net_datalink_protocol *_protocol)
 
 	// cache this device's address for later use
 
+	mutex_lock(&sCacheLock);
 	status = arp_update_local(protocol);
+	mutex_unlock(&sCacheLock);
+
 	if (status < B_OK) {
 		protocol->next->module->interface_down(protocol->next);
 		return status;
@@ -952,6 +985,9 @@ arp_down(net_datalink_protocol *protocol)
 			((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr);
 		if (entry != NULL) {
 			hash_remove(sCache, entry);
+			entry->flags |= ARP_FLAG_REMOVED;
+			locker.Unlock();
+
 			delete entry;
 		}
 	}
@@ -969,12 +1005,10 @@ arp_control(net_datalink_protocol *_protocol, int32 op, void *argument,
 	if (op == SIOCSIFADDR && (protocol->interface->flags & IFF_UP) != 0) {
 		// The interface may get a new address, so we need to update our
 		// local entries.
-		bool hasOldAddress = false;
 		in_addr_t oldAddress = 0;
 		if (protocol->interface->address != NULL) {
-			oldAddress = ((sockaddr_in *)
-				protocol->interface->address)->sin_addr.s_addr;
-			hasOldAddress = true;
+			oldAddress
+				= ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
 		}
 
 		status_t status = protocol->next->module->control(protocol->next,
@@ -982,21 +1016,22 @@ arp_control(net_datalink_protocol *_protocol, int32 op, void *argument,
 		if (status < B_OK)
 			return status;
 
+		MutexLocker locker(sCacheLock);
+
 		arp_update_local(protocol);
 
 		if (oldAddress == ((sockaddr_in *)
-				protocol->interface->address)->sin_addr.s_addr
-			|| !hasOldAddress)
+				protocol->interface->address)->sin_addr.s_addr)
 			return B_OK;
 
 		// remove previous address from cache
-		// TODO: we should be able to do this (add/remove) in one atomic operation!
-
-		MutexLocker locker(sCacheLock);
 
 		arp_entry *entry = arp_entry::Lookup(oldAddress);
 		if (entry != NULL) {
 			hash_remove(sCache, entry);
+			entry->flags |= ARP_FLAG_REMOVED;
+			locker.Unlock();
+
 			delete entry;
 		}
 
