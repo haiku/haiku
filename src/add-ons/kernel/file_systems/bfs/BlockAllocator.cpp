@@ -1120,7 +1120,7 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 
 // TODO: implement new FS checking API
 // Functions to check the validity of the bitmap - they are used from
-// the "chkbfs" command (since this does even a bit more, maybe we should
+// the "checkfs" command (since this does even a bit more, maybe we should
 // move this some place else?)
 
 
@@ -1184,6 +1184,17 @@ BlockAllocator::StartChecking(check_control* control)
 
 	fCheckCookie = cookie;
 		// to be able to restore nicely if "chkbfs" exited abnormally
+
+#if !BFS_SHELL
+	// Put removed vnodes to the stack -- they are not reachable by traversing
+	// the file system anymore.
+	void* inode = NULL;
+	ino_t nodeID;
+	while (get_next_removed_vnode(fVolume->FSVolume(), &nodeID,	 &inode)
+			== B_OK) {
+		cookie->stack.Push(fVolume->ToBlockRun(nodeID));
+	}
+#endif
 
 	// TODO: check reserved area in bitmap!
 
@@ -1299,8 +1310,6 @@ BlockAllocator::CheckNextNode(check_control* control)
 				return B_ENTRY_NOT_FOUND;
 			}
 
-			// get iterator for the next directory
-
 			Vnode vnode(fVolume, cookie->current);
 			Inode* inode;
 			if (vnode.Get(&inode) < B_OK) {
@@ -1309,11 +1318,21 @@ BlockAllocator::CheckNextNode(check_control* control)
 				continue;
 			}
 
+			control->inode = inode->ID();
+			control->mode = inode->Mode();
+
 			if (!inode->IsContainer()) {
-				FATAL(("check: inode at %Ld should have been a directory\n",
-					fVolume->ToBlock(cookie->current)));
-				continue;
+				// Check file
+				control->errors = 0;
+				control->status = CheckInode(inode, control);
+
+				if (inode->GetName(control->name) < B_OK)
+					strcpy(control->name, "(node has no name)");
+
+				return B_OK;
 			}
+
+			// get iterator for the next directory
 
 			BPlusTree* tree;
 			if (inode->GetTree(&tree) != B_OK) {
@@ -1337,10 +1356,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 			control->status = CheckInode(inode, control);
 
 			if (inode->GetName(control->name) < B_OK)
-				strcpy(control->name, "(node has no name)");
-
-			control->inode = inode->ID();
-			control->mode = inode->Mode();
+				strcpy(control->name, "(dir has no name)");
 
 			return B_OK;
 		}
