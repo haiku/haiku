@@ -16,6 +16,7 @@
 #include <File.h>
 #include <fs_interface.h>
 #include <NodeMonitor.h>
+#include "storage_support.h"
 
 #include <syscalls.h>
 
@@ -157,6 +158,10 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 
 	if (!ref)
 		return (fCStatus = B_BAD_VALUE);
+
+	// if ref->name is absolute, let the path-only SetTo() do the job
+	if (BPrivate::Storage::is_absolute_path(ref->name))
+		return SetTo(ref->name, openMode);
 
 	openMode |= O_CLOEXEC;
 
