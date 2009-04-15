@@ -154,6 +154,7 @@ unsigned int o_interval = 0;
 USHORT o_listen = 0;
 USHORT o_nflag = 0;
 USHORT o_wfile = 0;
+int o_quittimeout = 0;
 USHORT o_random = 0;
 USHORT o_udpmode = 0;
 USHORT o_verbose = 0;
@@ -222,6 +223,14 @@ void catch ()
   if (o_verbose > 1)		/* normally we don't care */
     bail (wrote_txt, wrote_net, wrote_out);
   bail (" punt!");
+}
+
+/* quitaftertimeout :
+   singal handler which quits after user given seconds after close of stdin */
+void quitaftertimeout ()
+{
+  close(netfd);
+  exit(0);
 }
 
 /* timeout and other signal handling cruft */
@@ -1172,16 +1181,21 @@ int readwrite (fd)
     } /* select fuckup */
 /* if we have a timeout AND stdin is closed AND we haven't heard anything
    from the net during that time, assume it's dead and close it too. */
-    if (rr == 0) {
-	if (! FD_ISSET (0, ding1))
-	  netretry--;			/* we actually try a coupla times. */
-	if (! netretry) {
-	  if (o_verbose > 1)		/* normally we don't care */
-	    holler ("net timeout");
-	  close (fd);
-	  return (0);			/* not an error! */
-	}
-    } /* select timeout */
+
+/* we need this section of if -q is not given, otherwise we dont quit if we
+   dont receive from net, we quit after timeout given with -q */
+    if (o_quittimeout == 0) {
+	if (rr == 0) {
+	  if (! FD_ISSET (0, ding1))
+	    netretry--;			/* we actually try a coupla times. */
+	  if (! netretry) {
+	    if (o_verbose > 1)		/* normally we don't care */
+	      holler ("net timeout");
+	    close (fd);
+	    return (0);			/* not an error! */
+	  }
+	} /* select timeout */
+    }
 /* xxx: should we check the exception fds too?  The read fds seem to give
    us the right info, and none of the examples I found bothered. */
 
@@ -1215,6 +1229,15 @@ Debug (("got %d from the net, errno %d", rr, errno))
 	if (rr <= 0) {			/* at end, or fukt, or ... */
 	  FD_CLR (0, ding1);		/* disable and close stdin */
 	  close (0);
+	  if (o_quittimeout > 0) {
+	    if (o_verbose > 1)
+	      fprintf (stderr, "STDIN closed, quit after %d seconds\n", o_quittimeout);
+	    signal (SIGALRM, quitaftertimeout);
+	    alarm (o_quittimeout);
+	    // if -q argument is < 0 we dont trigger any signal and we also don't
+	    // check for rr == 0 above, hence this is an infinite loop, essentially
+	    // waiting forever on fd of net.
+	  }
 	} else {
 	  rzleft = rr;
 	  zp = bigbuf_in;
@@ -1388,7 +1411,7 @@ main (argc, argv)
 
 /* If your shitbox doesn't have getopt, step into the nineties already. */
 /* optarg, optind = next-argv-component [i.e. flag arg]; optopt = last-char */
-  while ((x = getopt (argc, argv, "ae:g:G:hi:lno:p:rs:tuvw:z")) != EOF) {
+  while ((x = getopt (argc, argv, "ae:g:G:hi:lno:p:q:rs:tuvw:z")) != EOF) {
 /* Debug (("in go: x now %c, optarg %x optind %d", x, optarg, optind)) */
     switch (x) {
       case 'a':
@@ -1440,6 +1463,8 @@ main (argc, argv)
 	if (o_lport == 0)
 	  bail ("invalid local port %s", optarg);
 	break;
+	    case 'q':
+	o_quittimeout = atoi(optarg); break;
       case 'r':				/* randomize various things */
 	o_random++; break;
       case 's':				/* local source address */
@@ -1626,7 +1651,7 @@ Debug (("netfd %d from port %d to port %d", netfd, ourport, curport))
 #ifdef HAVE_HELP		/* unless we wanna be *really* cryptic */
 /* helpme :
    the obvious */
-helpme()
+void helpme()
 {
   o_verbose = 1;
   holler ("[v1.10]\n\
@@ -1649,6 +1674,9 @@ options:");
 	-n			numeric-only IP addresses, no DNS\n\
 	-o file			hex dump of traffic\n\
 	-p port			local port number\n\
+	-q secs			after  EOF on stdin, wait the specified number\n\
+         			of seconds and then quit. If seconds is\n\
+         			negative, wait forever.\n\
 	-r			randomize local and remote ports\n\
 	-s addr			local source address");
 #ifdef TELNET
