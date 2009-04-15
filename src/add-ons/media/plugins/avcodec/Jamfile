@@ -17,7 +17,7 @@ Addon avcodec :
  	gfx_util.cpp
 	:  
 	libavcodec.a
-	libavcodec_x86.a
+	libavcodec_$(TARGET_ARCH).a
 	libavutil.a
 	libswscale.a
 	be
