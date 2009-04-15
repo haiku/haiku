@@ -221,7 +221,7 @@ typedef xmutex_rec _glthread_Mutex;
 
 
 /*
- * BeOS threads. R5.x or sooner required.
+ * BeOS threads. R5.x or newer required.
  */
 #ifdef BEOS_THREADS
 
