@@ -383,7 +383,7 @@ private:
 	}
 
 private:
-	typedef std::map<string, SharedImage*> ImageMap;
+	typedef std::map<std::string, SharedImage*> ImageMap;
 
 private:
 	BObjectList<Team>				fTeams;
