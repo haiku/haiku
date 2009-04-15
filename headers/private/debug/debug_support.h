@@ -77,6 +77,8 @@ void debug_delete_symbol_iterator(debug_symbol_iterator* iterator);
 status_t debug_next_image_symbol(debug_symbol_iterator* iterator,
 			char* nameBuffer, size_t nameBufferLength, int32* _symbolType,
 			void** _symbolLocation, size_t* _symbolSize);
+status_t debug_get_symbol_iterator_image_info(debug_symbol_iterator* iterator,
+			image_info* info);
 
 #ifdef __cplusplus
 }	// extern "C"
