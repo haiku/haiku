@@ -490,3 +490,15 @@ debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
 
 	return B_OK;
 }
+
+
+status_t
+debug_get_symbol_iterator_image_info(debug_symbol_iterator* iterator,
+	image_info* info)
+{
+	if (iterator == NULL || iterator->image == NULL || info == NULL)
+		return B_BAD_VALUE;
+
+	*info = iterator->image->Info();
+	return B_OK;
+}

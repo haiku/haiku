@@ -196,11 +196,6 @@ public:
 									const image_t* image, int32 symbolCount);
 	virtual						~LoadedImage();
 
-	virtual	image_id			ID() const;
-	virtual	const char*			Name() const;
-	virtual	addr_t				TextAddress() const;
-	virtual	size_t				TextSize() const;
-
 	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
 									const char** _symbolName,
@@ -526,39 +521,25 @@ SymbolLookup::LoadedImage::LoadedImage(SymbolLookup* symbolLookup,
 	fSymbolCount(symbolCount),
 	fTextDelta(image->regions[0].delta)
 {
+	// init info
+	fInfo.id = fImage->id;
+	fInfo.type = fImage->type;
+	fInfo.sequence = 0;
+	fInfo.init_order = 0;
+	fInfo.init_routine = (void (*)())fImage->init_routine;
+	fInfo.term_routine = (void (*)())fImage->term_routine;
+	fInfo.device = -1;
+	fInfo.node = -1;
+	strlcpy(fInfo.name, fImage->path, sizeof(fInfo.name));
+	fInfo.text = (void*)fImage->regions[0].vmstart;
+	fInfo.data = (void*)fImage->regions[1].vmstart;
+	fInfo.text_size = fImage->regions[0].vmsize;
+	fInfo.data_size = fImage->regions[1].vmsize;
 }
 
 
 SymbolLookup::LoadedImage::~LoadedImage()
 {
-}
-
-
-image_id
-SymbolLookup::LoadedImage::ID() const
-{
-	return fImage->id;
-}
-
-
-const char*
-SymbolLookup::LoadedImage::Name() const
-{
-	return fImage->path;
-}
-
-
-addr_t
-SymbolLookup::LoadedImage::TextAddress() const
-{
-	return fImage->regions[0].vmstart;
-}
-
-
-size_t
-SymbolLookup::LoadedImage::TextSize() const
-{
-	return fImage->regions[0].vmsize;
 }
 
 

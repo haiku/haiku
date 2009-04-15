@@ -39,7 +39,6 @@ Image::~Image()
 
 SymbolTableBasedImage::SymbolTableBasedImage()
 	:
-	fInfo(),
 	fLoadDelta(0),
 	fSymbolTable(NULL),
 	fStringTable(NULL),
@@ -51,34 +50,6 @@ SymbolTableBasedImage::SymbolTableBasedImage()
 
 SymbolTableBasedImage::~SymbolTableBasedImage()
 {
-}
-
-
-image_id
-SymbolTableBasedImage::ID() const
-{
-	return fInfo.id;
-}
-
-
-const char*
-SymbolTableBasedImage::Name() const
-{
-	return fInfo.name;
-}
-
-
-addr_t
-SymbolTableBasedImage::TextAddress() const
-{
-	return (addr_t)fInfo.text;
-}
-
-
-size_t
-SymbolTableBasedImage::TextSize() const
-{
-	return fInfo.text_size;
 }
 
 
@@ -205,7 +176,10 @@ ImageFile::Init(const image_info& info)
 	// load the file
 	addr_t textAddress;
 	size_t textSize;
-	status_t error = _LoadFile(info.name, &textAddress, &textSize);
+	addr_t dataAddress;
+	size_t dataSize;
+	status_t error = _LoadFile(info.name, &textAddress, &textSize, &dataAddress,
+		&dataSize);
 	if (error != B_OK)
 		return error;
 
@@ -222,15 +196,27 @@ ImageFile::Init(const char* path)
 	// load the file
 	addr_t textAddress;
 	size_t textSize;
-	status_t error = _LoadFile(path, &textAddress, &textSize);
+	addr_t dataAddress;
+	size_t dataSize;
+	status_t error = _LoadFile(path, &textAddress, &textSize, &dataAddress,
+		&dataSize);
 	if (error != B_OK)
 		return error;
 
-	// init the image info -- at least the part we use
+	// init the image info
 	fInfo.id = -1;
+	fInfo.type = B_LIBRARY_IMAGE;
+	fInfo.sequence = 0;
+	fInfo.init_order = 0;
+	fInfo.init_routine = 0;
+	fInfo.term_routine = 0;
+	fInfo.device = -1;
+	fInfo.node = -1;
 	strlcpy(fInfo.name, path, sizeof(fInfo.name));
-    fInfo.text = (void*)textAddress;
+	fInfo.text = (void*)textAddress;
+	fInfo.data = (void*)dataAddress;
 	fInfo.text_size = textSize;
+	fInfo.data_size = dataSize;
 
 	// the image isn't loaded, so no delta
 	fLoadDelta = 0;
@@ -240,7 +226,8 @@ ImageFile::Init(const char* path)
 
 
 status_t
-ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize)
+ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
+	addr_t* _dataAddress, size_t* _dataSize)
 {
 	// open and stat() the file
 	fFD = open(path, O_RDONLY);
@@ -292,16 +279,23 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize)
 	Elf32_Shdr* sectionHeaders
 		= (Elf32_Shdr*)(fMappedFile + elfHeader->e_shoff);
 
-	// find the first segment -- we need its load address
+	// find the text and data segment -- we need load address and size
 	*_textAddress = 0;
 	*_textSize = 0;
+	*_dataAddress = 0;
+	*_dataSize = 0;
 	for (int32 i = 0; i < programHeaderCount; i++) {
 		Elf32_Phdr* header = (Elf32_Phdr*)
 			((uint8*)programHeaders + i * elfHeader->e_phentsize);
 		if (header->p_type == PT_LOAD) {
-			*_textAddress = header->p_vaddr;
-			*_textSize = header->p_memsz;
-			break;
+			if ((header->p_flags & PF_WRITE) == 0) {
+				*_textAddress = header->p_vaddr;
+				*_textSize = header->p_memsz;
+			} else {
+				*_dataAddress = header->p_vaddr;
+				*_dataSize = header->p_memsz;
+				break;
+			}
 		}
 	}
 

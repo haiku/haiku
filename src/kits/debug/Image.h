@@ -28,10 +28,12 @@ public:
 								Image();
 	virtual						~Image();
 
-	virtual	image_id			ID() const = 0;
-	virtual	const char*			Name() const = 0;
-	virtual	addr_t				TextAddress() const = 0;
-	virtual	size_t				TextSize() const = 0;
+			const image_info&	Info() const		{ return fInfo; }
+			image_id			ID() const			{ return fInfo.id; }
+			const char*			Name() const		{ return fInfo.name; }
+			addr_t				TextAddress() const
+				{ return (addr_t)fInfo.text; }
+			size_t				TextSize() const	{ return fInfo.text_size; }
 
 	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
@@ -43,6 +45,9 @@ public:
 									size_t* _symbolNameLen,
 									addr_t* _symbolAddress, size_t* _symbolSize,
 									int32* _symbolType) const = 0;
+
+protected:
+			image_info			fInfo;
 };
 
 
@@ -50,11 +55,6 @@ class SymbolTableBasedImage : public Image {
 public:
 								SymbolTableBasedImage();
 	virtual						~SymbolTableBasedImage();
-
-	virtual	image_id			ID() const ;
-	virtual	const char*			Name() const;
-	virtual	addr_t				TextAddress() const;
-	virtual	size_t				TextSize() const;
 
 	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
@@ -71,7 +71,6 @@ protected:
 			size_t				_SymbolNameLen(const char* symbolName) const;
 
 protected:
-			image_info			fInfo;
 			addr_t				fLoadDelta;
 			Elf32_Sym*			fSymbolTable;
 			char*				fStringTable;
@@ -90,7 +89,8 @@ public:
 
 private:
 			status_t			_LoadFile(const char* path,
-									addr_t* _textAddress, size_t* _textSize);
+									addr_t* _textAddress, size_t* _textSize,
+									addr_t* _dataAddress, size_t* _dataSize);
 
 private:
 			int					fFD;
