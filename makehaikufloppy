@@ -53,27 +53,27 @@ if [ $CD = 1 ] ; then
 
 	echo "Creating boot image..."
 
-	mkdir -p /tmp/beos/system
-	cp $BASE/beos/system/kernel_x86 /tmp/beos/system/
+	mkdir -p /tmp/system
+	cp $BASE/system/kernel_x86 /tmp/system/
 	oldCWD=$(pwd)
 
 	cd /tmp
-	tar chf /tmp/boot.tar beos/system/kernel_x86
-	rm -r /tmp/beos
+	tar chf /tmp/boot.tar system/kernel_x86
+	rm -r /tmp/system
 
 	cd $oldCWD
 	cd $BASE
 	pwd
 	tar rvhf /tmp/boot.tar \
-		beos/system/add-ons/kernel/busses/ide \
-		beos/system/add-ons/kernel/bus_managers \
-		beos/system/add-ons/kernel/file_systems/bfs \
-		beos/system/add-ons/kernel/generic \
-		beos/system/add-ons/kernel/partitioning_systems \
-		beos/system/add-ons/kernel/drivers/bin/scsi* \
-		beos/system/add-ons/kernel/file_systems/bfs \
+		system/add-ons/kernel/busses/ide \
+		system/add-ons/kernel/bus_managers \
+		system/add-ons/kernel/file_systems/bfs \
+		system/add-ons/kernel/generic \
+		system/add-ons/kernel/partitioning_systems \
+		system/add-ons/kernel/drivers/disk/scsi/scsi* \
+		system/add-ons/kernel/file_systems/bfs \
 		> /dev/null
-#		beos/system/add-ons/kernel/boot \
+#		system/add-ons/kernel/boot \
 	gzip -c /tmp/boot.tar > /tmp/boot.tgz
 	rm /tmp/boot.tar
 	cd $oldCWD
@@ -87,7 +87,7 @@ if [ $CD = 1 ] ; then
 		echo "Error creating temporary boot image"
 		exit 1
 	fi
-	dd if=$BASE/beos/system/zbeos of=/tmp/boot.img conv=notrunc
+	dd if=$BASE/system/haiku_loader of=/tmp/boot.img conv=notrunc
 	dd if=/tmp/boot.tgz of=/tmp/boot.img bs=192k seek=1 conv=notrunc
 
 	echo "Writing boot image to "$IMAGE
@@ -106,7 +106,7 @@ else
 	# non-CD mode (only writes the bare boot loader)
 
 	echo "Writing boot loader..."
-	dd if=$BASE/beos/system/zbeos of=$IMAGE bs=18k
+	dd if=$BASE/system/haiku_loader of=$IMAGE bs=18k
 	if [ $? != 0 ] ; then
 		echo "Error creating boot floppy"
 		exit 1
