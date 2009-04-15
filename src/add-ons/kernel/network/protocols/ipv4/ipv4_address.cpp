@@ -26,10 +26,12 @@
 	that is put into \a to.
 	If \a replaceWithZeros is set \a from will be replaced by an empty
 	address.
-	If a \a mask is given it is applied to \a from (such that \a to is the 
+	If a \a mask is given it is applied to \a from (such that \a to is the
 	result of \a from & \a mask).
 	\return B_OK if the address could be copied
 	\return B_NO_MEMORY if the new address could not be allocated
+	\return B_BAD_VALUE if any of \a from or \a mask refers to an uninitialized
+			address
 	\return B_MISMATCHED_VALUES if \a address does not match family AF_INET
 */
 static status_t
@@ -47,6 +49,8 @@ ipv4_copy_address(const sockaddr *from, sockaddr **to,
 	} else {
 		if (from == NULL)
 			return B_OK;
+		if (from->sa_len == 0 || (mask != NULL && mask->sa_len == 0))
+			return B_BAD_VALUE;
 		if (from->sa_family != AF_INET)
 			return B_MISMATCHED_VALUES;
 
@@ -69,17 +73,19 @@ ipv4_copy_address(const sockaddr *from, sockaddr **to,
 	Routing utility function: applies \a mask to given \a address and puts
 	the resulting address into \a result.
 	\return B_OK if the mask has been applied
-	\return B_BAD_VALUE if \a address or \a mask is NULL
+	\return B_BAD_VALUE if \a address is NULL or if any of \a address or \a mask
+			refers to an uninitialized address
 */
 static status_t
 ipv4_mask_address(const sockaddr *address, const sockaddr *mask, sockaddr *result)
 {
-	if (address == NULL || result == NULL)
+	if (address == NULL || address->sa_len == 0 || result == NULL
+			|| (mask != NULL && mask->sa_len == 0))
 		return B_BAD_VALUE;
 
 	memcpy(result, address, sizeof(sockaddr_in));
 	if (mask != NULL) {
-		((sockaddr_in *)result)->sin_addr.s_addr 
+		((sockaddr_in *)result)->sin_addr.s_addr
 			&= ((sockaddr_in *)mask)->sin_addr.s_addr;
 	}
 
@@ -90,7 +96,7 @@ ipv4_mask_address(const sockaddr *address, const sockaddr *mask, sockaddr *resul
 /*!
 	Checks if the given \a address is the empty address. By default, the port
 	is checked, too, but you can avoid that by passing \a checkPort = false.
-	\return true if \a address is NULL, uninitialized or the empty address, 
+	\return true if \a address is NULL, uninitialized or the empty address,
 		false if not
 */
 static bool
@@ -136,9 +142,10 @@ ipv4_equal_ports(const sockaddr *a, const sockaddr *b)
 
 
 /*!
-	Compares the IP-addresses and ports of the two given address structures 
+	Compares the IP-addresses and ports of the two given address structures
 	\a a and \a b.
-	\return true if IP-addresses and ports of \a a and \a b are equal, false if not
+	\return true if IP-addresses and ports of \a a and \a b are equal, false if
+			not
 */
 static bool
 ipv4_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
@@ -156,12 +163,12 @@ ipv4_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 
 
 /*!
-	Applies the given \a mask two \a a and \a b and then checks whether 
+	Applies the given \a mask two \a a and \a b and then checks whether
 	the masked addresses match.
 	\return true if \a a matches \a b after masking both, false if not
 */
 static bool
-ipv4_equal_masked_addresses(const sockaddr *a, const sockaddr *b, 
+ipv4_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 	const sockaddr *mask)
 {
 	if (a == NULL && b == NULL)
@@ -189,8 +196,8 @@ ipv4_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 
 /*!
 	Routing utility function: determines the least significant bit that is set
-	in the given \a mask. 
-	\return the number of the first bit that is set (0-32, where 32 means 
+	in the given \a mask.
+	\return the number of the first bit that is set (0-32, where 32 means
 		that there's no bit set in the mask).
 */
 static int32
@@ -226,7 +233,7 @@ ipv4_check_mask(const sockaddr *_mask)
 
 	uint32 mask = ntohl(((const sockaddr_in *)_mask)->sin_addr.s_addr);
 
-	// A mask (from LSB) starts with zeros, after the first one, only ones 
+	// A mask (from LSB) starts with zeros, after the first one, only ones
 	// are allowed:
 	bool zero = true;
 	int8 bit = 0;
@@ -243,7 +250,7 @@ ipv4_check_mask(const sockaddr *_mask)
 
 /*!
 	Creates a buffer for the given \a address and prints the address into
-	it (hexadecimal representation in host byte order or '<none>'). 
+	it (hexadecimal representation in host byte order or '<none>').
 	If \a printPort is set, the port is printed, too.
 	\return B_OK if the address could be printed, \a buffer will point to
 		the resulting string
@@ -295,13 +302,13 @@ ipv4_print_address(const sockaddr *_address, char **_buffer, bool printPort)
 
 
 /*!
-	Determines the port of the given \a address. 
+	Determines the port of the given \a address.
 	\return uint16 representing the port-nr
 */
 static uint16
 ipv4_get_port(const sockaddr *address)
 {
-	if (address == NULL)
+	if (address == NULL || address->sa_len == 0)
 		return 0;
 
 	return ((sockaddr_in *)address)->sin_port;
@@ -311,12 +318,12 @@ ipv4_get_port(const sockaddr *address)
 /*!
 	Sets the port of the given \a address to \a port.
 	\return B_OK if the port has been set
-	\return B_BAD_VALUE if \a address is NULL
+	\return B_BAD_VALUE if \a address is NULL or has not been initialized
 */
 static status_t
 ipv4_set_port(sockaddr *address, uint16 port)
 {
-	if (address == NULL)
+	if (address == NULL || address->sa_len == 0)
 		return B_BAD_VALUE;
 
 	((sockaddr_in *)address)->sin_port = port;
@@ -327,13 +334,14 @@ ipv4_set_port(sockaddr *address, uint16 port)
 /*!
 	Sets \a address to \a from.
 	\return B_OK if \a from has been copied into \a address
-	\return B_BAD_VALUE if either \a address or \a from is NULL
+	\return B_BAD_VALUE if either \a address or \a from is NULL or if the
+			address given in from has not been initialized
 	\return B_MISMATCHED_VALUES if from is not of family AF_INET
 */
 static status_t
 ipv4_set_to(sockaddr *address, const sockaddr *from)
 {
-	if (address == NULL || from == NULL)
+	if (address == NULL || from == NULL || from->sa_len == 0)
 		return B_BAD_VALUE;
 
 	if (from->sa_family != AF_INET)
@@ -345,13 +353,20 @@ ipv4_set_to(sockaddr *address, const sockaddr *from)
 }
 
 
+/*!
+	Updates missing parts in \a address with the values in \a from.
+	\return B_OK if \a address has been updated from \a from
+	\return B_BAD_VALUE if either \a address or \a from is NULL or if the
+			address given in from has not been initialized
+	\return B_MISMATCHED_VALUES if from is not of family AF_INET
+*/
 static status_t
 ipv4_update_to(sockaddr *_address, const sockaddr *_from)
 {
 	sockaddr_in *address = (sockaddr_in *)_address;
 	const sockaddr_in *from = (const sockaddr_in *)_from;
 
-	if (address == NULL || from == NULL)
+	if (address == NULL || from == NULL || from->sin_len == 0)
 		return B_BAD_VALUE;
 
 	if (from->sin_family != AF_INET)
@@ -438,7 +453,7 @@ ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 
 
 /*!
-	Computes a hash-value of the given addresses \a ourAddress 
+	Computes a hash-value of the given addresses \a ourAddress
 	and \a peerAddress.
 	\return uint32 representing the hash-value
 */
@@ -448,20 +463,27 @@ ipv4_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 	const sockaddr_in *our = (const sockaddr_in *)ourAddress;
 	const sockaddr_in *peer = (const sockaddr_in *)peerAddress;
 
-	return ((our ? our->sin_port : 0) | ((peer ? peer->sin_port : 0) << 16))
-		^ (our ? our->sin_addr.s_addr : 0) ^ (peer ? peer->sin_addr.s_addr : 0);
+	bool haveOur = our && our->sin_len != 0;
+	bool havePeer = peer && peer->sin_len != 0;
+
+	return
+		((haveOur ? our->sin_port : 0)
+			| ((havePeer ? peer->sin_port : 0) << 16))
+		^ (haveOur ? our->sin_addr.s_addr : 0)
+		^ (havePeer ? peer->sin_addr.s_addr : 0);
 }
 
 
 /*!
 	Adds the given \a address to the IP-checksum \a checksum.
 	\return B_OK if \a address has been added to the checksum
-	\return B_BAD_VALUE if either \a address or \a checksum is NULL
+	\return B_BAD_VALUE if either \a address or \a checksum is NULL or if
+	        the given address is not initialized
 */
 static status_t
 ipv4_checksum_address(struct Checksum *checksum, const sockaddr *address)
 {
-	if (checksum == NULL || address == NULL)
+	if (checksum == NULL || address == NULL || address->sa_len == 0)
 		return B_BAD_VALUE;
 
 	(*checksum) << (uint32)((sockaddr_in *)address)->sin_addr.s_addr;
