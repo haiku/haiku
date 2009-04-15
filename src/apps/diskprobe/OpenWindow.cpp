@@ -1,21 +1,24 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009 Ankur Sethi <get.me.ankur@gmail.com>
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-
 #include "OpenWindow.h"
-#include "DiskProbe.h"
 
 #include <Application.h>
-#include <Screen.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <MenuItem.h>
 #include <Button.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <GroupLayout.h>
+#include <GridLayoutBuilder.h>
+#include <MenuField.h>
+#include <MenuItem.h>
 #include <Path.h>
+#include <PopUpMenu.h>
+#include <Screen.h>
+
+#include "DiskProbe.h"
 
 
 static const uint32 kMsgProbeFile = 'prDv';
@@ -24,60 +27,39 @@ static const uint32 kMsgProbeDevice = 'prFl';
 
 OpenWindow::OpenWindow()
 	: BWindow(BRect(0, 0, 35, 10), "DiskProbe", B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+			 | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BView *view = new BView(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-
 	fDevicesMenu = new BPopUpMenu("devices");
 	CollectDevices(fDevicesMenu);
 	if (BMenuItem *item = fDevicesMenu->ItemAt(0))
 		item->SetMarked(true);
 
-	BRect rect = Bounds().InsetByCopy(8, 8);
-	BMenuField *field = new BMenuField(rect, "devices", "Examine Device:", fDevicesMenu);
-	field->ResizeToPreferred();
-	field->SetDivider(field->StringWidth(field->Label()) + 8);
-	view->AddChild(field);
+	BMenuField *field = new BMenuField("Examine Device:", fDevicesMenu, NULL);
 
-	BButton *probeDeviceButton = new BButton(BRect(10, 10, 20, 20), "file", "Probe Device",
-		new BMessage(kMsgProbeDevice), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	probeDeviceButton->ResizeToPreferred();
-	rect = probeDeviceButton->Bounds();
-	probeDeviceButton->MoveTo(Bounds().Width() - 8 - rect.Width(),
-		Bounds().Height() - 8 - rect.Height());
-	view->AddChild(probeDeviceButton);
-
-	// MakeDefault() may change the size and location of the button
-	rect = probeDeviceButton->Frame();
-	float width = rect.Width() + 58.0f;
+	BButton *probeDeviceButton = new BButton("device", "Probe Device",
+		new BMessage(kMsgProbeDevice));
 	probeDeviceButton->MakeDefault(true);
 
-	BButton *button = new BButton(rect, "file", "Probe File" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgProbeFile), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveBy(-button->Bounds().Width() - 8, 0);
-	view->AddChild(button);
-	width += button->Bounds().Width();
+	BButton *probeFileButton = new BButton("file", "Probe File" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgProbeFile));
 
-	button = new BButton(button->Frame(), "cancel", "Cancel",
-		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveBy(-button->Bounds().Width() - 8, 0);
-	view->AddChild(button);
-	width += button->Bounds().Width();
+	BButton *cancelButton = new BButton("cancel", "Cancel",
+		new BMessage(B_QUIT_REQUESTED));
 
-	// make sure the window is large enough
 
-	if (width < Bounds().Width())
-		width = Bounds().Width();
-	float height = button->Bounds().Height() + 24.0f + field->Frame().bottom;
-	if (height < Bounds().Height())
-		height = Bounds().Height();
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	
+	AddChild(BGridLayoutBuilder(8, 8)
+		.Add(field, 0, 0, 3)
+		.Add(cancelButton, 0, 1)
+		.Add(probeFileButton, 1, 1)
+		.Add(probeDeviceButton, 2, 1)
+		.SetInsets(8, 8, 8, 8)
+	);
 
-	ResizeTo(width, height);
-
+	// TODO: This does not center the window, since with layout management,
+	// the window will still have an invalid size at this point.
 	BScreen screen(this);
 	MoveTo(screen.Frame().left + (screen.Frame().Width() - Frame().Width()) / 2,
 		screen.Frame().top + (screen.Frame().Height() - Frame().Height()) / 2);

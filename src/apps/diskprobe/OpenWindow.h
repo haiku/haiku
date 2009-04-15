@@ -13,17 +13,18 @@ class BMenu;
 
 
 class OpenWindow : public BWindow {
-	public:
-		OpenWindow();
-		virtual ~OpenWindow();
+public:
+								OpenWindow();
+	virtual						~OpenWindow();
 
-		virtual void MessageReceived(BMessage *message);
-		virtual bool QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
-		static void CollectDevices(BMenu *menu, BEntry *startEntry = NULL);
+	static	void				CollectDevices(BMenu* menu,
+									BEntry* startEntry = NULL);
 
-	private:
-		BMenu	*fDevicesMenu;
+private:
+			BMenu*				fDevicesMenu;
 };
 
 #endif	/* OPEN_WINDOW_H */
