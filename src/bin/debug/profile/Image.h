@@ -5,73 +5,35 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <image.h>
-#include <OS.h>
-#include <String.h>
-
-#include "Referenceable.h"
-
-
-class debug_symbol_lookup_context;
-class Image;
-
-
-class Symbol {
-public:
-	Symbol(Image* image, addr_t base, size_t size, const char* name)
-		:
-		image(image),
-		base(base),
-		size(size),
-		name(name)
-	{
-	}
-
-	const char* Name() const	{ return name.String(); }
-
-	Image*	image;
-	addr_t	base;
-	size_t	size;
-	BString	name;
-};
-
-
-struct SymbolComparator {
-	inline bool operator()(const Symbol* a, const Symbol* b) const
-	{
-		return a->base < b->base;
-	}
-};
+#include "SharedImage.h"
 
 
 class Image : public Referenceable {
 public:
-								Image(const image_info& info, team_id owner,
+								Image(SharedImage* image,
+									const image_info& info, team_id owner,
 									int32 creationEvent);
 								~Image();
 
 	inline	const image_id		ID() const;
-	inline	const image_info&	Info() const;
+	inline	const char*			Name() const;
 	inline	team_id				Owner() const;
 
 	inline	int32				CreationEvent() const;
 	inline	int32				DeletionEvent() const;
 	inline	void				SetDeletionEvent(int32 event);
 
-			status_t			LoadSymbols(
-									debug_symbol_lookup_context* lookupContext);
-
 	inline	Symbol**			Symbols() const;
 	inline	int32				SymbolCount() const;
 
 	inline	bool				ContainsAddress(addr_t address) const;
-			int32				FindSymbol(addr_t address) const;
+	inline	int32				FindSymbol(addr_t address) const;
 
 private:
-			image_info			fInfo;
+			SharedImage*		fImage;
+			image_id			fID;
 			team_id				fOwner;
-			Symbol**			fSymbols;
-			int32				fSymbolCount;
+			addr_t				fLoadDelta;
 			int32				fCreationEvent;
 			int32				fDeletionEvent;
 };
@@ -83,14 +45,14 @@ private:
 const image_id
 Image::ID() const
 {
-	return fInfo.id;
+	return fID;
 }
 
 
-const image_info&
-Image::Info() const
+const char*
+Image::Name() const
 {
-	return fInfo;
+	return fImage->Name();
 }
 
 
@@ -125,22 +87,28 @@ Image::SetDeletionEvent(int32 event)
 Symbol**
 Image::Symbols() const
 {
-	return fSymbols;
+	return fImage->Symbols();
 }
 
 
 int32
 Image::SymbolCount() const
 {
-	return fSymbolCount;
+	return fImage->SymbolCount();
 }
 
 
 bool
 Image::ContainsAddress(addr_t address) const
 {
-	return address >= (addr_t)fInfo.text
-		&& address <= (addr_t)fInfo.data + fInfo.data_size - 1;
+	return fImage->ContainsAddress(address - fLoadDelta);
+}
+
+
+int32
+Image::FindSymbol(addr_t address) const
+{
+	return fImage->FindSymbol(address - fLoadDelta);
 }
 
 

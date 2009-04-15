@@ -78,37 +78,6 @@ Team::Init(team_id teamID, port_id debuggerPort)
 		return error;
 	}
 
-	// create symbol lookup context
-	debug_symbol_lookup_context* lookupContext;
-	error = debug_create_symbol_lookup_context(ID(), &lookupContext);
-	if (error != B_OK) {
-		fprintf(stderr, "%s: Failed to create symbol lookup context for "
-			"team %ld: %s\n", kCommandName, teamID, strerror(error));
-		return error;
-	}
-
-	// load the team's images and their symbols
-	error = _LoadSymbols(lookupContext, ID());
-	debug_delete_symbol_lookup_context(lookupContext);
-	if (error != B_OK)
-		return error;
-
-	// also try to load the kernel images and symbols
-	if (gOptions.profile_kernel) {
-		// create symbol lookup context
-		error = debug_create_symbol_lookup_context(B_SYSTEM_TEAM,
-			&lookupContext);
-		if (error != B_OK) {
-			fprintf(stderr, "%s: Failed to create symbol lookup context "
-				"for the kernel team: %s\n", kCommandName, strerror(error));
-			return error;
-		}
-
-		// load the kernel's images and their symbols
-		_LoadSymbols(lookupContext, B_SYSTEM_TEAM);
-		debug_delete_symbol_lookup_context(lookupContext);
-	}
-
 	// set team debugging flags
 	int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
 		| B_TEAM_DEBUG_TEAM_CREATION | B_TEAM_DEBUG_IMAGES;
@@ -230,32 +199,28 @@ Team::Exec(int32 event)
 
 
 status_t
-Team::AddImage(const image_info& imageInfo, team_id owner, int32 event)
+Team::AddImage(SharedImage* sharedImage, const image_info& imageInfo,
+	team_id owner, int32 event)
 {
-	// create symbol lookup context
-	debug_symbol_lookup_context* lookupContext;
-	status_t error = debug_create_symbol_lookup_context(owner, &lookupContext);
-	if (error != B_OK) {
-		fprintf(stderr, "%s: Failed to create symbol lookup context for "
-			"team %ld: %s\n", kCommandName, owner, strerror(error));
-		return error;
-	}
+	// create the image
+	Image* image = new(std::nothrow) Image(sharedImage, imageInfo, owner,
+		event);
+	if (image == NULL)
+		return B_NO_MEMORY;
 
-	Image* image;
-	error = _LoadImageSymbols(lookupContext, imageInfo, owner, event,
-		&image);
-	debug_delete_symbol_lookup_context(lookupContext);
+	if (!fImages.AddItem(image)) {
+		delete image;
+		return B_NO_MEMORY;
+	}
 
 	// Although we generally synchronize the threads' images lazily, we have
 	// to add new images at least, since otherwise images could be added
 	// and removed again, and the hits inbetween could never be matched.
-	if (error == B_OK) {
-		ThreadList::Iterator it = fThreads.GetIterator();
-		while (Thread* thread = it.Next())
-			thread->AddImage(image);
-	}
+	ThreadList::Iterator it = fThreads.GetIterator();
+	while (Thread* thread = it.Next())
+		thread->AddImage(image);
 
-	return error;
+	return B_OK;
 }
 
 
@@ -282,54 +247,6 @@ Team::FindImage(image_id id) const
 	}
 
 	return NULL;
-}
-
-
-status_t
-Team::_LoadSymbols(debug_symbol_lookup_context* lookupContext,
-	team_id owner)
-{
-	// iterate through the team's images and collect the symbols
-	image_info imageInfo;
-	int32 cookie = 0;
-	while (get_next_image_info(owner, &cookie, &imageInfo) == B_OK) {
-		status_t error = _LoadImageSymbols(lookupContext, imageInfo,
-			owner, 0);
-		if (error == B_NO_MEMORY)
-			return error;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-Team::_LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
-	const image_info& imageInfo, team_id owner, int32 event, Image** _image)
-{
-	Image* image = new(std::nothrow) Image(imageInfo, owner, event);
-	if (image == NULL)
-		return B_NO_MEMORY;
-
-	status_t error = image->LoadSymbols(lookupContext);
-	if (error != B_OK) {
-		TRACE("Failed to load symbols of image %ld: %s\n", image->ID(),
-			strerror(error));
-		delete image;
-		return error;
-	}
-
-	TRACE("image %ld: loaded %ld symbols\n", image->ID(), image->SymbolCount());
-
-	if (!fImages.AddItem(image)) {
-		delete image;
-		return B_NO_MEMORY;
-	}
-
-	if (_image != NULL)
-		*_image = image;
-
-	return B_OK;
 }
 
 

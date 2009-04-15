@@ -11,7 +11,9 @@
 #include <string.h>
 
 #include <algorithm>
+#include <map>
 #include <new>
+#include <string>
 
 #include <debugger.h>
 #include <OS.h>
@@ -20,6 +22,7 @@
 #include <syscalls.h>
 #include <system_profiler_defs.h>
 
+#include <AutoDeleter.h>
 #include <debug_support.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
@@ -96,6 +99,13 @@ public:
 		fThreads(20, true),
 		fDebuggerPort(debuggerPort)
 	{
+	}
+
+	~ThreadManager()
+	{
+		// release image references
+		for (ImageMap::iterator it = fImages.begin(); it != fImages.end(); ++it)
+			it->second->RemoveReference();
 	}
 
 	status_t AddTeam(team_id teamID, Team** _team = NULL)
@@ -186,16 +196,24 @@ public:
 
 	status_t AddImage(team_id teamID, const image_info& imageInfo, int32 event)
 	{
+		// get a shared image
+		SharedImage* sharedImage;
+		status_t error = _GetSharedImage(teamID, imageInfo, &sharedImage);
+		if (error != B_OK)
+			return error;
+
 		if (teamID == B_SYSTEM_TEAM) {
 			// a kernel image -- add it to all teams
 			int32 count = fTeams.CountItems();
-			for (int32 i = 0; i < count; i++)
-				fTeams.ItemAt(i)->AddImage(imageInfo, teamID, event);
+			for (int32 i = 0; i < count; i++) {
+				fTeams.ItemAt(i)->AddImage(sharedImage, imageInfo, teamID,
+					event);
+			}
 		}
 
 		// a userland team image -- add it to that image
 		if (Team* team = FindTeam(teamID))
-			return team->AddImage(imageInfo, teamID, event);
+			return team->AddImage(sharedImage, imageInfo, teamID, event);
 
 		return B_BAD_TEAM_ID;
 	}
@@ -227,7 +245,7 @@ private:
 
 		status_t error = addedInfo != NULL
 			? team->Init(addedInfo)
-			: team->Init(teamID, fDebuggerPort);
+			: _InitDebuggedTeam(team, teamID);
 		if (error != B_OK) {
 			delete team;
 			return error;
@@ -237,6 +255,43 @@ private:
 
 		if (_team != NULL)
 			*_team = team;
+
+		return B_OK;
+	}
+
+	status_t _InitDebuggedTeam(Team* team, team_id teamID)
+	{
+		// init the team
+		status_t error = team->Init(teamID, fDebuggerPort);
+		if (error != B_OK)
+			return error;
+
+		// add the team's images
+		error = _LoadTeamImages(team, teamID);
+		if (error != B_OK)
+			return error;
+
+		// add the kernel images
+		return _LoadTeamImages(team, B_SYSTEM_TEAM);
+	}
+
+	status_t _LoadTeamImages(Team* team, team_id teamID)
+	{
+		// iterate through the team's images and collect the symbols
+		image_info imageInfo;
+		int32 cookie = 0;
+		while (get_next_image_info(teamID, &cookie, &imageInfo) == B_OK) {
+			// get a shared image
+			SharedImage* sharedImage;
+			status_t error = _GetSharedImage(teamID, imageInfo, &sharedImage);
+			if (error != B_OK)
+				return error;
+
+			// add the image to the team
+			error = team->AddImage(sharedImage, imageInfo, teamID, 0);
+			if (error != B_OK)
+				return error;
+		}
 
 		return B_OK;
 	}
@@ -264,9 +319,47 @@ private:
 		return B_OK;
 	}
 
+	status_t _GetSharedImage(team_id teamID, const image_info& imageInfo,
+		SharedImage** _sharedImage)
+	{
+		// check whether the image has already been loaded
+		ImageMap::iterator it = fImages.find(imageInfo.name);
+		if (it != fImages.end()) {
+			*_sharedImage = it->second;
+			return B_OK;
+		}
+
+		// create the shared image
+		SharedImage* sharedImage = new(std::nothrow) SharedImage;
+		if (sharedImage == NULL)
+			return B_NO_MEMORY;
+		ObjectDeleter<SharedImage> imageDeleter(sharedImage);
+
+		// load the symbols
+		status_t error = teamID == B_SYSTEM_TEAM
+			? sharedImage->Init(teamID, imageInfo.id)
+			: sharedImage->Init(imageInfo.name);
+		if (error != B_OK)
+			return error;
+
+		try {
+			fImages[sharedImage->Name()] = sharedImage;
+		} catch (std::bad_alloc) {
+			return B_NO_MEMORY;
+		}
+
+		imageDeleter.Detach();
+		*_sharedImage = sharedImage;
+		return B_OK;
+	}
+
+private:
+	typedef std::map<string, SharedImage*> ImageMap;
+
 private:
 	BObjectList<Team>				fTeams;
 	BObjectList<Thread>				fThreads;
+	ImageMap						fImages;
 	port_id							fDebuggerPort;
 };
 
@@ -433,7 +526,8 @@ profile_all()
 	// create and area for the sample buffer
 	system_profiler_buffer_header* bufferHeader;
 	area_id area = create_area("profiling buffer", (void**)&bufferHeader,
-		B_ANY_ADDRESS, PROFILE_ALL_SAMPLE_AREA_SIZE, B_NO_LOCK, B_READ_AREA);
+		B_ANY_ADDRESS, PROFILE_ALL_SAMPLE_AREA_SIZE, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
 	if (area < 0) {
 		fprintf(stderr, "%s: Failed to create sample area: %s\n", kCommandName,
 			strerror(area));

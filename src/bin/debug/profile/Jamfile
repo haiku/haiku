@@ -13,6 +13,7 @@ BinCommand profile
 	BasicThreadProfileResult.cpp
 	CallgrindThreadProfileResult.cpp
 	Image.cpp
+	SharedImage.cpp
 	Team.cpp
 	Thread.cpp
 	profile.cpp

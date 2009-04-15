@@ -14,8 +14,9 @@
 
 
 struct HitSymbol {
-	int64	hits;
-	Symbol*	symbol;
+	int64		hits;
+	Symbol*		symbol;
+	image_id	imageID;
 
 	inline bool operator<(const HitSymbol& other) const
 	{
@@ -146,6 +147,7 @@ BasicThreadProfileResult::PrintResults()
 					HitSymbol& hitSymbol = hitSymbols[hitSymbolCount++];
 					hitSymbol.hits = symbolHits[i];
 					hitSymbol.symbol = symbols[i];
+					hitSymbol.imageID = image->ID();
 				}
 			}
 		}
@@ -180,10 +182,9 @@ BasicThreadProfileResult::PrintResults()
 			"---------------------------------------\n");
 		for (int32 k = 0; k < imageCount; k++) {
 			BasicThreadImage* image = images[k];
-			const image_info& imageInfo = image->GetImage()->Info();
 			fprintf(gOptions.output, "  %10lld  %10lld  %7ld %s\n",
-				image->TotalHits(), image->UnknownHits(), imageInfo.id,
-				imageInfo.name);
+				image->TotalHits(), image->UnknownHits(),
+				image->GetImage()->ID(), image->GetImage()->Name());
 		}
 	}
 
@@ -198,7 +199,7 @@ BasicThreadProfileResult::PrintResults()
 			const Symbol* symbol = hitSymbol.symbol;
 			fprintf(gOptions.output, "  %10lld  %10lld  %6.2f  %6ld  %s\n",
 				hitSymbol.hits, hitSymbol.hits * fInterval,
-				100.0 * hitSymbol.hits / totalTicks, symbol->image->ID(),
+				100.0 * hitSymbol.hits / totalTicks, hitSymbol.imageID,
 				symbol->Name());
 		}
 	} else

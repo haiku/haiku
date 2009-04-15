@@ -271,7 +271,7 @@ CallgrindThreadProfileResult::_PrintFunction(FILE* out,
 		int32 index = fNextImageOutputIndex++;
 		image->SetOutputIndex(index);
 		fprintf(out, "%sob=(%ld) %s:%ld\n", called ? "c" : "", index,
-			image->GetImage()->Info().name, image->ID());
+			image->GetImage()->Name(), image->ID());
 	} else {
 		// image is already known
 		// TODO: We may not need to print it at all!

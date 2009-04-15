@@ -28,8 +28,9 @@ public:
 
 			void				Exec(int32 event);
 
-			status_t			AddImage(const image_info& imageInfo,
-									team_id owner, int32 event);
+			status_t			AddImage(SharedImage* sharedImage,
+									const image_info& imageInfo, team_id owner,
+									int32 event);
 			status_t			RemoveImage(image_id imageID, int32 event);
 
 	inline	const BObjectList<Image>&	Images() const;
@@ -38,13 +39,6 @@ public:
 	inline	team_id				ID() const;
 
 private:
-			status_t			_LoadSymbols(
-									debug_symbol_lookup_context* lookupContext,
-									team_id owner);
-			status_t			_LoadImageSymbols(
-									debug_symbol_lookup_context* lookupContext,
-									const image_info& imageInfo, team_id owner,
-									int32 event, Image** _image = NULL);
 			void				_RemoveImage(int32 index, int32 event);
 
 			bool				_SynchronousProfiling() const
