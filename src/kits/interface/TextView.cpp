@@ -1537,7 +1537,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 				Highlight(start, end);
 			}
 		}
-		fSelStart = startOffset;
+		fSelStart = fClickOffset = startOffset;
 		fSelEnd = endOffset;
 	}
 }
@@ -4622,7 +4622,7 @@ BTextView::_PerformAutoScrolling()
 		// TODO: Refine this, I can't even remember how beos works here
 		scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff)
 			/ lineHeight) : 0;
-	
+
 		// prevent from scrolling out of view
 		if (scrollBy.y != 0.0) {
 			float bottomMax = floorf(fTextRect.bottom
