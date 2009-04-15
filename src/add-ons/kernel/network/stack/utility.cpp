@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,14 @@
 #include <util/AutoLock.h>
 
 #include "stack_private.h"
+
+
+//#define TRACE_UTILITY
+#ifdef TRACE_UTILITY
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 // internal Fifo class which doesn't maintain it's own lock
@@ -489,18 +497,20 @@ init_timer(net_timer* timer, net_timer_func hook, void* data)
 }
 
 
-/*!
-	Sets or cancels a timer. When the \a delay is below zero, an eventually running
-	timer is canceled, if not, it is scheduled to be executed after the specified
-	\a delay.
+/*!	Sets or cancels a timer. When the \a delay is below zero, an eventually
+	running timer is canceled, if not, it is scheduled to be executed after the
+	specified \a delay.
 	You need to have initialized the timer before calling this function.
-	In case you need to change a running timer, you have to cancel it first, before
-	making any changes.
+
+	In case you need to change a running timer, you have to cancel it first,
+	before making any changes.
 */
 void
 set_timer(net_timer* timer, bigtime_t delay)
 {
 	MutexLocker locker(sTimerLock);
+
+	TRACE("set_timer %p, hook %p, data %p\n", timer, timer->hook, timer->data);
 
 	if (timer->due > 0 && delay < 0) {
 		// this timer is scheduled, cancel it
@@ -526,6 +536,9 @@ bool
 cancel_timer(struct net_timer* timer)
 {
 	MutexLocker locker(sTimerLock);
+
+	TRACE("cancel_timer %p, hook %p, data %p\n", timer, timer->hook,
+		timer->data);
 
 	if (timer->due <= 0)
 		return false;
