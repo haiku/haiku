@@ -6,65 +6,103 @@
  *		Mark Hogben
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe St-Pierre, stpere@gmail.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 
 #include "FontView.h"
 
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
+#include <SpaceLayoutItem.h>
 
-FontView::FontView(BRect _rect)
-	: BView(_rect, "Fonts", B_FOLLOW_ALL, B_WILL_DRAW)
+
+static void
+add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
+	int32& row, bool withExtraSpace)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	BRect rect(Bounds());
+	layout->AddItem(view->CreateFontsLabelLayoutItem(), 0, row);
+	layout->AddItem(view->CreateFontsMenuBarLayoutItem(), 1, row);
 
-	float labelWidth = StringWidth("Fixed Font:") + 8;
+	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 2, row);
 
-	fPlainView = new FontSelectionView(rect, "plain", "Plain Font:");
-	fPlainView->SetDivider(labelWidth);
-	fPlainView->ResizeToPreferred();
-	AddChild(fPlainView);
+	layout->AddItem(view->CreateSizesLabelLayoutItem(), 3, row);
+	layout->AddItem(view->CreateSizesMenuBarLayoutItem(), 4, row);
 
-	rect.OffsetBy(0, fPlainView->Bounds().Height() + 10);
-	fBoldView = new FontSelectionView(rect, "bold", "Bold Font:");
-	fBoldView->SetDivider(labelWidth);
-	fBoldView->ResizeToPreferred();
-	AddChild(fBoldView);
+	row++;
 
-	rect.OffsetBy(0, fPlainView->Bounds().Height() + 10);
-	fFixedView = new FontSelectionView(rect, "fixed", "Fixed Font:");
-	fFixedView->SetDivider(labelWidth);
-	fFixedView->ResizeToPreferred();
-	AddChild(fFixedView);
+	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
+	layout->AddView(view->GetPreviewBox(), 1, row, 4);
 
-	rect.OffsetBy(0, fFixedView->Bounds().Height() + 10);
-	fMenuView = new FontSelectionView(rect, "menu", "Menu Font:");
-	fMenuView->SetDivider(labelWidth);
-	fMenuView->ResizeToPreferred();
-	AddChild(fMenuView);
+	row++;
+
+	if (withExtraSpace) {
+		layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5), 0, row, 5);
+		row++;
+	}
 }
 
 
-void
-FontView::GetPreferredSize(float *_width, float *_height)
+FontView::FontView()
+	: BView("Fonts", B_WILL_DRAW )
 {
-	if (_width)
-		*_width = fPlainView->Bounds().Width();
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+ 
+	fPlainView = new FontSelectionView("plain", "Plain Font:");
+	fBoldView = new FontSelectionView("bold", "Bold Font:");
+	fFixedView = new FontSelectionView("fixed", "Fixed Font:");
+	fMenuView = new FontSelectionView("menu", "Menu Font:");
 
-	if (_height)
-		*_height = fPlainView->Bounds().Height() * 4 + 40;
+	BGridLayout* layout = new BGridLayout(5, 5);
+	layout->SetInsets(10, 10, 10, 10);
+	SetLayout(layout);
+
+	int32 row = 0;
+	add_font_selection_view(layout, fPlainView, row, true);
+	add_font_selection_view(layout, fBoldView, row, true);
+	add_font_selection_view(layout, fFixedView, row, true);
+	add_font_selection_view(layout, fMenuView, row, false);
 }
 
 
 void
 FontView::SetDefaults()
 {
-	for (int32 i = 0; i < CountChildren(); i++) {
-		FontSelectionView* view = dynamic_cast<FontSelectionView *>(ChildAt(i));
-		if (view == NULL)
-			continue;
+	fPlainView->SetDefaults();
+	fBoldView->SetDefaults();
+	fFixedView->SetDefaults();
+	fMenuView->SetDefaults();
+}
 
-		view->SetDefaults();
+
+void
+FontView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgSetSize:
+		case kMsgSetFamily:
+		case kMsgSetStyle:
+		{
+			const char* name;
+			if (message->FindString("name", &name) != B_OK)
+				break;
+
+			if (!strcmp(name, "plain"))
+				fPlainView->MessageReceived(message);
+			else if (!strcmp(name, "bold"))
+				fBoldView->MessageReceived(message);
+			else if (!strcmp(name, "fixed"))
+				fFixedView->MessageReceived(message);			
+			else if (!strcmp(name, "menu"))
+				fMenuView->MessageReceived(message);
+			else
+				break;
+
+			Window()->PostMessage(kMsgUpdate);
+			break;
+		}	
+		default:
+			BView::MessageReceived(message);
 	}
 }
 
@@ -72,13 +110,10 @@ FontView::SetDefaults()
 void
 FontView::Revert()
 {
-	for (int32 i = 0; i < CountChildren(); i++) {
-		FontSelectionView* view = dynamic_cast<FontSelectionView *>(ChildAt(i));
-		if (view == NULL)
-			continue;
-
-		view->Revert();
-	}
+	fPlainView->Revert();
+	fBoldView->Revert();
+	fFixedView->Revert();
+	fMenuView->Revert();
 }
 
 
@@ -89,16 +124,6 @@ FontView::UpdateFonts()
 	fBoldView->UpdateFontsMenu();
 	fFixedView->UpdateFontsMenu();
 	fMenuView->UpdateFontsMenu();
-}
-
-
-void
-FontView::RelayoutIfNeeded()
-{
-	fPlainView->RelayoutIfNeeded();
-	fBoldView->RelayoutIfNeeded();
-	fFixedView->RelayoutIfNeeded();
-	fMenuView->RelayoutIfNeeded();
 }
 
 

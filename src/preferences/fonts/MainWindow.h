@@ -27,9 +27,13 @@ public:
 
 	virtual	bool			QuitRequested();
 	virtual	void			MessageReceived(BMessage *message);
+	virtual	void			Show();
+
 
 private:
-			void			_Center();
+		void				_Center();
+
+		bool				fCentered;
 
 		BMessageRunner*		fRunner;
 		FontView*			fFontsView;
@@ -41,4 +45,4 @@ private:
 
 static const int32 kMsgUpdate = 'updt';
 
-#endif	/* MAIN_WINDOW_H */
+#endif	// MAIN_WINDOW_H

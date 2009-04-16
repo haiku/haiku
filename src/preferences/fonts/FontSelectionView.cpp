@@ -1,13 +1,14 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mark Hogben
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe Saint-Pierre, stpere@gmail.com 
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 
 #include "FontSelectionView.h"
 #include "MainWindow.h"
@@ -18,6 +19,8 @@
 #include <PopUpMenu.h>
 #include <String.h>
 #include <StringView.h>
+#include <LayoutItem.h>
+#include <GroupLayoutBuilder.h>
 
 #include <stdio.h>
 
@@ -25,10 +28,6 @@
 #define INSTANT_UPDATE
 	// if defined, the system font will be updated immediately, and not
 	// only on exit
-
-static const int32 kMsgSetFamily = 'fmly';
-static const int32 kMsgSetStyle = 'styl';
-static const int32 kMsgSetSize = 'size';
 
 static const float kMinSize = 8.0;
 static const float kMaxSize = 18.0;
@@ -66,10 +65,9 @@ _get_system_default_font_(const char* which, font_family family,
 //	#pragma mark -
 
 
-FontSelectionView::FontSelectionView(BRect _rect, const char* name,
+FontSelectionView::FontSelectionView(const char* name,
 	const char* label, const BFont* currentFont)
-	: BView(_rect, name, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
-	fSavedFont(currentFont)
+	: BView(name, B_WILL_DRAW)
 {
 	if (currentFont == NULL) {
 		if (!strcmp(Name(), "plain"))
@@ -88,7 +86,7 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	} else
 		fCurrentFont = *currentFont;
 
-	fDivider = StringWidth(label) + 5;
+	fSavedFont = fCurrentFont;
 
 	fSizesMenu = new BPopUpMenu("size menu");
 	_BuildSizesMenu();
@@ -96,45 +94,26 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	fFontsMenu = new BPopUpMenu("font menu");
 
 	// font menu
-	BRect rect(Bounds());
-	fFontsMenuField = new BMenuField(rect, "fonts", label, fFontsMenu, false);
-	fFontsMenuField->SetDivider(fDivider);
+	fFontsMenuField = new BMenuField("fonts", label, fFontsMenu, NULL);
 	fFontsMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fFontsMenuField->ResizeToPreferred();
-	AddChild(fFontsMenuField);
 
 	// size menu
-	rect.right = rect.left + StringWidth("Size: 99") + 30.0f;
-	fSizesMenuField = new BMenuField(rect, "sizes", "Size:", fSizesMenu, true,
-		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	fSizesMenuField->SetDivider(StringWidth(fSizesMenuField->Label()) + 5.0f);
+	fSizesMenuField = new BMenuField("size", "Size:", fSizesMenu, NULL);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fSizesMenuField->ResizeToPreferred();
-	rect = Bounds();
-	fSizesMenuField->MoveBy(rect.right - fSizesMenuField->Bounds().Width(), 0);
-	AddChild(fSizesMenuField);
 
-	rect.top += fFontsMenuField->Bounds().Height() + 5;
-	rect.left = fDivider;
-	BFont font = be_plain_font;
-	font.SetSize(kMaxSize);
-	font_height height;
-	font.GetHeight(&height);
-	rect.bottom = rect.top + ceil(height.ascent + height.descent
-		+ height.leading) + 5;
+	// preview
+	fPreviewText = new BStringView("preview text",
+		"The quick brown fox jumps over the lazy dog."); 
 
-	fPreviewBox = new BBox(rect, "preview", B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW | B_FRAME_EVENTS);
-	AddChild(fPreviewBox);
-
-	// Place the text slightly inside the entire box area, so
-	// it doesn't overlap the box outline.
-	rect = fPreviewBox->Bounds().InsetByCopy(3, 3);
-	fPreviewText = new BStringView(rect, "preview text",
-		"The quick brown fox jumps over the lazy dog.",
-		B_FOLLOW_LEFT_RIGHT);
 	fPreviewText->SetFont(&fCurrentFont);
-	fPreviewBox->AddChild(fPreviewText);
+	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET)); 
+
+	// box around preview
+	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
+	fPreviewBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(fPreviewText)
+		.SetInsets(5, 5, 5, 5)
+	);
 }
 
 
@@ -146,66 +125,10 @@ FontSelectionView::~FontSelectionView()
 }
 
 
-void
-FontSelectionView::GetPreferredSize(float *_width, float *_height)
+BView*
+FontSelectionView::GetPreviewBox()
 {
-	// don't change the width if it is large enough
-	if (_width) {
-		*_width = fMaxFontNameWidth + 40 + fDivider
-			+ fSizesMenuField->Bounds().Width();
-
-		if (*_width < Bounds().Width())
-			*_width = Bounds().Width();
-	}
-
-	if (_height) {
-		BView* view = FindView("preview");
-		if (view != NULL)
-			*_height = view->Frame().bottom;
-	}
-}
-
-
-void
-FontSelectionView::SetDivider(float divider)
-{
-	fFontsMenuField->SetDivider(divider);
-
-	fPreviewBox->ResizeBy(fDivider - divider, 0);
-	fPreviewBox->MoveBy(divider - fDivider, 0);
-
-	// if the view is not yet attached to a window, the resizing mode is ignored
-	if (Window() == NULL)
-		fPreviewText->ResizeBy(fDivider - divider, 0);
-
-	fDivider = divider;
-}
-
-
-void
-FontSelectionView::RelayoutIfNeeded()
-{
-	float width, height;
-	GetPreferredSize(&width, &height);
-
-	if (width > Bounds().Width()) {
-		fSizesMenuField->MoveTo(fMaxFontNameWidth + fDivider + 40.0f,
-				fFontsMenuField->Bounds().top);
-		ResizeTo(width, height);
-	}
-}
-
-
-void
-FontSelectionView::AttachedToWindow()
-{
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	fSizesMenu->SetTargetForItems(this);
-	UpdateFontsMenu();
+	return fPreviewBox;
 }
 
 
@@ -222,8 +145,6 @@ FontSelectionView::MessageReceived(BMessage *msg)
 
 			fCurrentFont.SetSize(size);
 			_UpdateFontPreview();
-
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -250,8 +171,6 @@ FontSelectionView::MessageReceived(BMessage *msg)
 					_UpdateFontPreview();
 				}
 			}
-
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -272,8 +191,6 @@ FontSelectionView::MessageReceived(BMessage *msg)
 
 			fCurrentFont.SetFamilyAndStyle(family, style);
 			_UpdateFontPreview();
-
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -281,6 +198,34 @@ FontSelectionView::MessageReceived(BMessage *msg)
 			BView::MessageReceived(msg);
 	}
 }
+
+
+BLayoutItem* 
+FontSelectionView::CreateSizesLabelLayoutItem() 
+{ 
+	return fSizesMenuField->CreateLabelLayoutItem(); 
+} 
+
+
+BLayoutItem* 
+FontSelectionView::CreateSizesMenuBarLayoutItem() 
+{ 
+	return fSizesMenuField->CreateMenuBarLayoutItem(); 
+} 
+
+
+BLayoutItem* 
+FontSelectionView::CreateFontsLabelLayoutItem() 
+{ 
+	return fFontsMenuField->CreateLabelLayoutItem(); 
+} 
+
+
+BLayoutItem* 
+FontSelectionView::CreateFontsMenuBarLayoutItem() 
+{ 
+	return fFontsMenuField->CreateMenuBarLayoutItem(); 
+} 
 
 
 void
@@ -299,6 +244,7 @@ FontSelectionView::_BuildSizesMenu()
 
 		BMessage* message = new BMessage(kMsgSetSize);
 		message->AddInt32("size", size);
+		message->AddString("name", Name()); 
 
 		BMenuItem* item = new BMenuItem(label, message);
 		if (size == fCurrentFont.Size())
@@ -345,7 +291,6 @@ void
 FontSelectionView::_UpdateFontPreview()
 {
 	fPreviewText->SetFont(&fCurrentFont);
-	fPreviewText->Invalidate();
 
 #ifdef INSTANT_UPDATE
 	_UpdateSystemFont();
@@ -360,7 +305,7 @@ FontSelectionView::_UpdateSystemFont()
 	font_style style;
 	fCurrentFont.GetFamilyAndStyle(&family, &style);
 
-	if (!strcmp(Name(), "menu")) {
+	if (strcmp(Name(), "menu") == 0) {
 		// The menu font is not handled as a system font
 		menu_info info;
 		get_menu_info(&info);
@@ -383,7 +328,7 @@ FontSelectionView::SetDefaults()
 	float size;
 	const char* fontName;
 
-	if (!strcmp(Name(), "menu"))
+	if (strcmp(Name(), "menu") == 0)
 		fontName = "plain";
 	else
 		fontName = Name();
@@ -434,13 +379,15 @@ FontSelectionView::IsDefaultable()
 	float defaultSize;
 	const char* fontName;
 
-	if (!strcmp(Name(), "menu"))
+	if (strcmp(Name(), "menu") == 0)
 		fontName = "plain";
 	else
 		fontName = Name();
 
-	if (_get_system_default_font_(fontName, defaultFamily, defaultStyle, &defaultSize) != B_OK)
+	if (_get_system_default_font_(fontName, defaultFamily, defaultStyle,
+		&defaultSize) != B_OK) {
 		return false;
+	}
 
 	font_family currentFamily;
 	font_style currentStyle;
@@ -495,6 +442,8 @@ FontSelectionView::UpdateFontsMenu()
 
 		BMessage* message = new BMessage(kMsgSetFamily);
 		message->AddString("family", family);
+		message->AddString("name", Name());
+
 		BMenuItem* familyItem = new BMenuItem(stylesMenu, message);
 		fFontsMenu->AddItem(familyItem);
 
@@ -508,6 +457,7 @@ FontSelectionView::UpdateFontsMenu()
 			message = new BMessage(kMsgSetStyle);
 			message->AddString("family", (char*)family);
 			message->AddString("style", (char*)style);
+			message->AddString("name", Name());
 
 			BMenuItem *item = new BMenuItem(style, message);
 
@@ -518,9 +468,5 @@ FontSelectionView::UpdateFontsMenu()
 			}
 			stylesMenu->AddItem(item);
 		}
-
-		stylesMenu->SetTargetForItems(this);
 	}
-
-	fFontsMenu->SetTargetForItems(this);
 }

@@ -6,27 +6,29 @@
  *		Mark Hogben
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 #ifndef FONT_VIEW_H
 #define FONT_VIEW_H
 
-
 #include "FontSelectionView.h"
-
+#include "MainWindow.h"
+#include <Message.h>
 
 class FontView : public BView {
 public:
-								FontView(BRect frame);
+								FontView();
 
-	virtual void				GetPreferredSize(float *_width, float *_height);
+	virtual void				MessageReceived(BMessage* message);
 
 			void				SetDefaults();
 			void				Revert();
 			void				UpdateFonts();
-			void				RelayoutIfNeeded();
 
 			bool				IsDefaultable();
 			bool				IsRevertable();
+
+
 
 private:
 			FontSelectionView*	fPlainView;
@@ -34,5 +36,6 @@ private:
 			FontSelectionView*	fFixedView;
 			FontSelectionView*	fMenuView;
 };
+
 
 #endif	/* FONT_VIEW_H */
