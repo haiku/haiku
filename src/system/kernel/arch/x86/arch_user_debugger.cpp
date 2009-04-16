@@ -373,37 +373,23 @@ debugger_breakpoints(int argc, char** argv)
 
 
 static int
-debugger_breakpoint_usage(const char* command)
-{
-	if (command[0] == 'b') {
-		kprintf("Usage: breakpoint <address>\n");
-		kprintf("       breakpoint <address> clear\n");
-	} else {
-		kprintf("Usage: watchpoint <address> [ rw ] [ <size> ]\n");
-		kprintf("       watchpoint <address> clear\n");
-	}
-	return 0;
-}
-
-
-static int
 debugger_breakpoint(int argc, char** argv)
 {
 	// get arguments
 
 	if (argc < 2 || argc > 3)
-		return debugger_breakpoint_usage(argv[0]);
+		return print_debugger_command_usage(argv[0]);
 
 	addr_t address = strtoul(argv[1], NULL, 0);
 	if (address == 0)
-		return debugger_breakpoint_usage(argv[0]);
+		return print_debugger_command_usage(argv[0]);
 
 	bool clear = false;
 	if (argc == 3) {
 		if (strcmp(argv[2], "clear") == 0)
 			clear = true;
 		else
-			return debugger_breakpoint_usage(argv[0]);
+			return print_debugger_command_usage(argv[0]);
 	}
 
 	// set/clear breakpoint
@@ -434,11 +420,11 @@ debugger_watchpoint(int argc, char** argv)
 	// get arguments
 
 	if (argc < 2 || argc > 4)
-		return debugger_breakpoint_usage(argv[0]);
+		return print_debugger_command_usage(argv[0]);
 
 	addr_t address = strtoul(argv[1], NULL, 0);
 	if (address == 0)
-		return debugger_breakpoint_usage(argv[0]);
+		return print_debugger_command_usage(argv[0]);
 
 	bool clear = false;
 	bool readWrite = false;
@@ -457,7 +443,7 @@ debugger_watchpoint(int argc, char** argv)
 			length = strtoul(argv[argi++], NULL, 0);
 
 		if (length == 0 || argi < argc)
-			return debugger_breakpoint_usage(argv[0]);
+			return print_debugger_command_usage(argv[0]);
 	}
 
 	// set/clear breakpoint
@@ -489,6 +475,25 @@ debugger_watchpoint(int argc, char** argv)
 
 	return 0;
 }
+
+
+static int
+debugger_single_step(int argc, char** argv)
+{
+	// TODO: Since we need an iframe, this doesn't work when KDL wasn't entered
+	// via an exception.
+
+	struct iframe* frame = i386_get_current_iframe();
+	if (frame == NULL) {
+		kprintf("Failed to get the current iframe!\n");
+		return 0;
+	}
+
+	frame->flags |= (1 << X86_EFLAGS_TF);
+
+	return B_KDEBUG_QUIT;
+}
+
 
 #endif	// KERNEL_BREAKPOINTS
 
@@ -839,8 +844,13 @@ x86_handle_debug_exception(struct iframe *frame)
 			enable_interrupts();
 
 			user_debug_single_stepped();
-		} else
+		} else {
+			// Disable single-stepping -- the next "step" command will re-enable
+			// it, but we don't want it when continuing otherwise.
+			frame->flags &= ~(1 << X86_EFLAGS_TF);
+
 			panic("kernel single step");
+		}
 	} else if (dr6 & (1 << X86_DR6_BT)) {
 		// task switch
 		// Occurs only, if T in EFLAGS is set (which we don't do).
@@ -897,14 +907,25 @@ x86_init_user_debug()
 
 #if KERNEL_BREAKPOINTS
 	// install debugger commands
-	add_debugger_command("breakpoints", &debugger_breakpoints,
-		"lists current break-/watchpoints");
-	add_debugger_command("breakpoint", &debugger_breakpoint,
-		"set/clear a breakpoint");
-	add_debugger_command("watchpoints", &debugger_breakpoints,
-		"lists current break-/watchpoints");
-	add_debugger_command("watchpoint", &debugger_watchpoint,
-		"set/clear a watchpoint");
+	add_debugger_command_etc("breakpoints", &debugger_breakpoints,
+		"Lists current break-/watchpoints",
+		"\n"
+		"Lists the current kernel break-/watchpoints.\n", 0);
+	add_debugger_command_alias("watchpoints", "breakpoints", NULL);
+	add_debugger_command_etc("breakpoint", &debugger_breakpoint,
+		"Set/clears a breakpoint",
+		"<address> [ clear ]\n"
+		"Sets respectively clears the breakpoint at address <address>.\n", 0);
+	add_debugger_command_etc("watchpoint", &debugger_watchpoint,
+		"Set/clears a watchpoint",
+		"<address> <address> ( [ rw ] [ <size> ] | clear )\n"
+		"Sets respectively clears the watchpoint at address <address>.\n"
+		"If \"rw\" is given the new watchpoint is a read/write watchpoint\n"
+		"otherwise a write watchpoint only.\n", 0);
+	add_debugger_command_etc("step", &debugger_single_step,
+		"Single-steps to the next instruction",
+		"\n"
+		"Single-steps to the next instruction.\n", 0);
 #endif
 }
 
