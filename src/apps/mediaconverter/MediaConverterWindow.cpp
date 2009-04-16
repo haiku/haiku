@@ -345,7 +345,8 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 
 	BString string, string2;
 
-	BEntry entry("/boot/beos/apps/MediaPlayer", true);
+    // TODO: for preview, launch the default file app instead of hardcoded MediaPlayer
+	BEntry entry("/boot/system/apps/MediaPlayer", true);
 	char buffer[40];
 	char buffer2[B_PATH_NAME_LENGTH];
 	char *argv[3];
