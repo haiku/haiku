@@ -32,11 +32,11 @@ enum {
 
 Team::Team()
 	:
+	fID(-1),
 	fNubPort(-1),
 	fThreads(),
 	fImages(20, false)
 {
-	fInfo.team = -1;
 	fDebugContext.nub_port = -1;
 }
 
@@ -47,7 +47,7 @@ Team::~Team()
 		destroy_debug_context(&fDebugContext);
 
 	if (fNubPort >= 0)
-		remove_team_debugger(fInfo.team);
+		remove_team_debugger(fID);
 
 	for (int32 i = 0; Image* image = fImages.ItemAt(i); i++)
 		image->RemoveReference();
@@ -58,9 +58,13 @@ status_t
 Team::Init(team_id teamID, port_id debuggerPort)
 {
 	// get team info
-	status_t error = get_team_info(teamID, &fInfo);
+	team_info teamInfo;
+	status_t error = get_team_info(teamID, &teamInfo);
 	if (error != B_OK)
 		return error;
+
+	fID = teamID;
+	fArgs = teamInfo.args;
 
 	// install ourselves as the team debugger
 	fNubPort = install_team_debugger(teamID, debuggerPort);
@@ -90,7 +94,8 @@ Team::Init(team_id teamID, port_id debuggerPort)
 status_t
 Team::Init(system_profiler_team_added* addedInfo)
 {
-	fInfo.team = addedInfo->team;
+	fID = addedInfo->team;
+	fArgs = addedInfo->args;
 	return B_OK;
 }
 
@@ -177,7 +182,7 @@ Team::RemoveThread(Thread* thread)
 
 
 void
-Team::Exec(int32 event)
+Team::Exec(int32 event, const char* args, const char* threadName)
 {
 	// remove all non-kernel images
 	int32 imageCount = fImages.CountItems();
@@ -187,11 +192,13 @@ Team::Exec(int32 event)
 			_RemoveImage(i, event);
 	}
 
+	fArgs = args;
+
 	// update the main thread
 	ThreadList::Iterator it = fThreads.GetIterator();
 	while (Thread* thread = it.Next()) {
 		if (thread->ID() == ID()) {
-			thread->UpdateInfo();
+			thread->UpdateInfo(threadName);
 			break;
 		}
 	}

@@ -44,9 +44,10 @@ ThreadImage::Init()
 // #pragma mark - Thread
 
 
-Thread::Thread(const thread_info& info, Team* team)
+Thread::Thread(thread_id threadID, const char* name, Team* team)
 	:
-	fInfo(info),
+	fID(threadID),
+	fName(name),
 	fTeam(team),
 	fSampleArea(-1),
 	fSamples(NULL),
@@ -73,11 +74,9 @@ Thread::SetProfileResult(ThreadProfileResult* result)
 
 
 void
-Thread::UpdateInfo()
+Thread::UpdateInfo(const char* name)
 {
-	thread_info info;
-	if (get_thread_info(ID(), &info) == B_OK)
-		fInfo = info;
+	fName = name;
 }
 
 

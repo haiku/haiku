@@ -38,6 +38,7 @@ struct system_profiler_event_header {
 // B_SYSTEM_PROFILER_TEAM_ADDED
 struct system_profiler_team_added {
 	team_id		team;
+	char		args[1];
 };
 
 // B_SYSTEM_PROFILER_TEAM_REMOVED
@@ -48,12 +49,15 @@ struct system_profiler_team_removed {
 // B_SYSTEM_PROFILER_TEAM_EXEC
 struct system_profiler_team_exec {
 	team_id		team;
+	char		thread_name[B_OS_NAME_LENGTH];
+	char		args[1];
 };
 
 // B_SYSTEM_PROFILER_THREAD_ADDED
 struct system_profiler_thread_added {
 	team_id		team;
 	thread_id	thread;
+	char		name[B_OS_NAME_LENGTH];
 };
 
 // B_SYSTEM_PROFILER_THREAD_REMOVED

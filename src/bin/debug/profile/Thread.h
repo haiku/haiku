@@ -5,6 +5,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include <String.h>
+
 #include <util/DoublyLinkedList.h>
 
 #include "Image.h"
@@ -37,7 +39,8 @@ protected:
 
 class Thread : public DoublyLinkedListLinkImpl<Thread> {
 public:
-								Thread(const thread_info& info, Team* team);
+								Thread(thread_id threadID, const char* name,
+									Team* team);
 								~Thread();
 
 	inline	thread_id			ID() const;
@@ -48,7 +51,7 @@ public:
 	inline	ThreadProfileResult* ProfileResult() const;
 			void				SetProfileResult(ThreadProfileResult* result);
 
-			void				UpdateInfo();
+			void				UpdateInfo(const char* name);
 
 			void				SetSampleArea(area_id area, addr_t* samples);
 			void				SetInterval(bigtime_t interval);
@@ -66,7 +69,8 @@ private:
 	typedef DoublyLinkedList<ThreadImage>	ImageList;
 
 private:
-			thread_info			fInfo;
+			thread_id			fID;
+			BString				fName;
 			::Team*				fTeam;
 			area_id				fSampleArea;
 			addr_t*				fSamples;
@@ -169,14 +173,14 @@ ThreadImage::TotalHits() const
 thread_id
 Thread::ID() const
 {
-	return fInfo.thread;
+	return fID;
 }
 
 
 const char*
 Thread::Name() const
 {
-	return fInfo.name;
+	return fName.String();
 }
 
 

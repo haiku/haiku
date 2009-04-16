@@ -404,13 +404,16 @@ SystemProfiler::_TeamAdded(struct team* team)
 {
 	InterruptsSpinLocker locker(fLock);
 
+	size_t argsLen = strlen(team->args);
+
 	system_profiler_team_added* event = (system_profiler_team_added*)
-		_AllocateBuffer(sizeof(system_profiler_team_added),
+		_AllocateBuffer(sizeof(system_profiler_team_added) + argsLen,
 			B_SYSTEM_PROFILER_TEAM_ADDED, 0, 0);
 	if (event == NULL)
 		return false;
 
 	event->team = team->id;
+	strcpy(event->args, team->args);
 
 	fHeader->size = fBufferSize;
 
@@ -442,13 +445,18 @@ SystemProfiler::_TeamExec(struct team* team)
 {
 	InterruptsSpinLocker locker(fLock);
 
+	size_t argsLen = strlen(team->args);
+
 	system_profiler_team_exec* event = (system_profiler_team_exec*)
-		_AllocateBuffer(sizeof(system_profiler_team_exec),
+		_AllocateBuffer(sizeof(system_profiler_team_exec) + argsLen,
 			B_SYSTEM_PROFILER_TEAM_EXEC, 0, 0);
 	if (event == NULL)
 		return false;
 
 	event->team = team->id;
+	strlcpy(event->thread_name, team->main_thread->name,
+		sizeof(event->thread_name));
+	strcpy(event->args, team->args);
 
 	fHeader->size = fBufferSize;
 
@@ -469,6 +477,7 @@ SystemProfiler::_ThreadAdded(struct thread* thread)
 
 	event->team = thread->team->id;
 	event->thread = thread->id;
+	strlcpy(event->name, thread->name, sizeof(event->name));
 
 	fHeader->size = fBufferSize;
 

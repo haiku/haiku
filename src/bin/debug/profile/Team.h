@@ -5,6 +5,8 @@
 #ifndef TEAM_H
 #define TEAM_H
 
+#include <String.h>
+
 #include <debug_support.h>
 #include <ObjectList.h>
 #include <util/DoublyLinkedList.h>
@@ -26,7 +28,8 @@ public:
 
 			void				RemoveThread(Thread* thread);
 
-			void				Exec(int32 event);
+			void				Exec(int32 event, const char* args,
+									const char* threadName);
 
 			status_t			AddImage(SharedImage* sharedImage,
 									const image_info& imageInfo, team_id owner,
@@ -47,7 +50,8 @@ private:
 private:
 	typedef DoublyLinkedList<Thread> ThreadList;
 
-			team_info			fInfo;
+			team_id				fID;
+			BString				fArgs;
 			port_id				fNubPort;
 			debug_context		fDebugContext;
 			ThreadList			fThreads;
@@ -68,7 +72,7 @@ Team::Images() const
 team_id
 Team::ID() const
 {
-	return fInfo.team;
+	return fID;
 }
 
 

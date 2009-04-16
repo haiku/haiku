@@ -121,23 +121,28 @@ public:
 
 	status_t AddThread(thread_id threadID)
 	{
-		if (FindThread(threadID) != NULL)
-			return B_BAD_VALUE;
-
 		thread_info threadInfo;
 		status_t error = get_thread_info(threadID, &threadInfo);
 		if (error != B_OK)
 			return error;
 
-		Team* team = FindTeam(threadInfo.team);
+		return AddThread(threadInfo.team, threadID, threadInfo.name);
+	}
+
+	status_t AddThread(team_id teamID, thread_id threadID, const char* name)
+	{
+		if (FindThread(threadID) != NULL)
+			return B_BAD_VALUE;
+
+		Team* team = FindTeam(teamID);
 		if (team == NULL)
 			return B_BAD_TEAM_ID;
 
-		Thread* thread = new(std::nothrow) Thread(threadInfo, team);
+		Thread* thread = new(std::nothrow) Thread(threadID, name, team);
 		if (thread == NULL)
 			return B_NO_MEMORY;
 
-		error = _CreateThreadProfileResult(thread);
+		status_t error = _CreateThreadProfileResult(thread);
 		if (error != B_OK) {
 			delete thread;
 			return error;
@@ -455,10 +460,10 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 			case B_SYSTEM_PROFILER_TEAM_EXEC:
 			{
 				system_profiler_team_exec* event
-					= (system_profiler_team_exec*)event;
+					= (system_profiler_team_exec*)buffer;
 
 				if (Team* team = threadManager.FindTeam(event->team))
-					team->Exec(0);
+					team->Exec(0, event->args, event->thread_name);
 				break;
 			}
 
@@ -467,7 +472,8 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 				system_profiler_thread_added* event
 					= (system_profiler_thread_added*)buffer;
 
-				threadManager.AddThread(event->thread);
+				threadManager.AddThread(event->team, event->thread,
+					event->name);
 				break;
 			}
 
@@ -803,8 +809,16 @@ main(int argc, const char* const* argv)
 				quitLoop = message.origin.team == teamID;
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_EXEC:
-				if (Team* team = threadManager.FindTeam(message.origin.team))
-					team->Exec(message.team_exec.image_event);
+				if (Team* team = threadManager.FindTeam(message.origin.team)) {
+					team_info teamInfo;
+					thread_info threadInfo;
+					if (get_team_info(message.origin.team, &teamInfo) == B_OK
+						&& get_thread_info(message.origin.team, &threadInfo)
+							== B_OK) {
+						team->Exec(message.team_exec.image_event, teamInfo.args,
+							threadInfo.name);
+					}
+				}
 				break;
 
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
