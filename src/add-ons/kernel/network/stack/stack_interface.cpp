@@ -6,7 +6,7 @@
 #include "stack_private.h"
 
 
-/*	Interface module providing networking to the kernel.
+/*!	Interface module providing networking to the kernel.
 */
 
 
@@ -83,13 +83,13 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 	int flags, struct sockaddr* address, socklen_t* _addressLength)
 {
 	msghdr message;
-	iovec vecs[1] = { { data, length } };
+	iovec vec = { data, length };
 	message.msg_name = address;
 	if (_addressLength != NULL)
 		message.msg_namelen = *_addressLength;
 	else
 		message.msg_namelen = 0;
-	message.msg_iov = vecs;
+	message.msg_iov = &vec;
 	message.msg_iovlen = 1;
 	message.msg_control = NULL;
 	message.msg_controllen = 0;
@@ -109,13 +109,13 @@ static ssize_t
 stack_interface_recvmsg(net_socket* socket, struct msghdr* message, int flags)
 {
 	void* buffer = NULL;
-	size_t len = 0;
+	size_t length = 0;
 	if (message->msg_iovlen > 0) {
 		buffer = message->msg_iov[0].iov_base;
-		len = message->msg_iov[0].iov_len;
+		length = message->msg_iov[0].iov_len;
 	}
 
-	return gNetSocketModule.receive(socket, message, buffer, len, flags);
+	return gNetSocketModule.receive(socket, message, buffer, length, flags);
 }
 
 
@@ -132,10 +132,10 @@ stack_interface_sendto(net_socket* socket, const void* data, size_t length,
 	int flags, const struct sockaddr* address, socklen_t addressLength)
 {
 	msghdr message;
-	iovec vecs[1] = { { (void*)data, length } };
+	iovec vec = { (void*)data, length };
 	message.msg_name = (void*)address;
 	message.msg_namelen = addressLength;
-	message.msg_iov = vecs;
+	message.msg_iov = &vec;
 	message.msg_iovlen = 1;
 	message.msg_control = NULL;
 	message.msg_controllen = 0;
@@ -150,13 +150,14 @@ stack_interface_sendmsg(net_socket* socket, const struct msghdr* message,
 	int flags)
 {
 	void* buffer = NULL;
-	size_t len = 0;
+	size_t length = 0;
 	if (message->msg_iovlen > 0) {
 		buffer = message->msg_iov[0].iov_base;
-		len = message->msg_iov[0].iov_len;
+		length = message->msg_iov[0].iov_len;
 	}
 
-	return gNetSocketModule.send(socket, (msghdr*)message, buffer, len, flags);
+	return gNetSocketModule.send(socket, (msghdr*)message, buffer, length,
+		flags);
 }
 
 
@@ -199,7 +200,7 @@ stack_interface_getsockname(net_socket* socket, struct sockaddr* address,
 static int
 stack_interface_sockatmark(net_socket* socket)
 {
-// TODO:...
+	// TODO: sockatmark() missing
 	return B_UNSUPPORTED;
 }
 
@@ -213,7 +214,7 @@ stack_interface_socketpair(int family, int type, int protocol,
 
 
 static status_t
-stack_interface_ioctl(net_socket* socket, uint32 op, void *buffer,
+stack_interface_ioctl(net_socket* socket, uint32 op, void* buffer,
 	size_t length)
 {
 	return gNetSocketModule.control(socket, op, buffer, length);
@@ -221,7 +222,7 @@ stack_interface_ioctl(net_socket* socket, uint32 op, void *buffer,
 
 
 static status_t
-stack_interface_select(net_socket* socket, uint8 event, struct selectsync *sync)
+stack_interface_select(net_socket* socket, uint8 event, struct selectsync* sync)
 {
 	return gNetSocketModule.request_notification(socket, event, sync);
 }
@@ -229,15 +230,15 @@ stack_interface_select(net_socket* socket, uint8 event, struct selectsync *sync)
 
 static status_t
 stack_interface_deselect(net_socket* socket, uint8 event,
-	struct selectsync *sync)
+	struct selectsync* sync)
 {
 	return gNetSocketModule.cancel_notification(socket, event, sync);
 }
 
 
 status_t
-stack_interface_get_next_socket_stat(int family, uint32 *cookie,
-	struct net_stat *stat)
+stack_interface_get_next_socket_stat(int family, uint32* cookie,
+	struct net_stat* stat)
 {
 	return gNetSocketModule.get_next_stat(cookie, family, stat);
 }
