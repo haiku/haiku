@@ -1,5 +1,7 @@
 /*
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +18,9 @@
 
 #include <fd.h>
 #include <kernel.h>
+#include <lock.h>
 #include <syscall_restart.h>
+#include <util/AutoLock.h>
 #include <vfs.h>
 
 #include <net_stack_interface.h>
@@ -27,9 +31,17 @@
 #define MAX_SOCKET_OPTION_LEN	128
 #define MAX_ANCILLARY_DATA_LEN	1024
 
+#define GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor)	\
+	do {												\
+		status_t getError = get_socket_descriptor(fd, kernel, descriptor); \
+		if (getError != B_OK)							\
+			return getError;							\
+	} while (false)
+
 
 static net_stack_interface_module_info* sStackInterface = NULL;
 static vint32 sStackInterfaceInitialized = 0;
+static mutex sLock = MUTEX_INITIALIZER("stack interface");
 
 
 struct FDPutter {
@@ -44,40 +56,38 @@ struct FDPutter {
 			put_fd(descriptor);
 	}
 
-
 	file_descriptor*	descriptor;
 };
 
 
 static net_stack_interface_module_info*
-init_stack_interface_module()
+get_stack_interface_module()
 {
-	// TODO: Add driver settings option to load the userland net stack.
+	MutexLocker _(sLock);
 
-	// load module
-	net_stack_interface_module_info* module;
-	status_t error = get_module(NET_STACK_INTERFACE_MODULE_NAME,
-		(module_info**)&module);
-	if (error != B_OK)
-		return NULL;
+	if (sStackInterfaceInitialized++ == 0) {
+		// load module
+		net_stack_interface_module_info* module;
+		// TODO: Add driver settings option to load the userland net stack.
+		status_t error = get_module(NET_STACK_INTERFACE_MODULE_NAME,
+			(module_info**)&module);
+		if (error == B_OK)
+			sStackInterface = module;
+		else
+			sStackInterface = NULL;
+	}
 
-	sStackInterface = module;	// assumed to be atomic
-
-	// If someone else was faster getting the module, we put our reference.
-	if (atomic_test_and_set(&sStackInterfaceInitialized, 1, 0) != 0)
-		put_module(module->info.name);
-
-	return module;
+	return sStackInterface;
 }
 
 
-static inline net_stack_interface_module_info*
-get_stack_interface_module()
+static void
+put_stack_interface_module()
 {
-	if (sStackInterface)
-		return sStackInterface;
+	MutexLocker _(sLock);
 
-	return init_stack_interface_module();
+	if (sStackInterfaceInitialized-- == 1)
+		put_module(NET_STACK_INTERFACE_MODULE_NAME);
 }
 
 
@@ -206,14 +216,6 @@ get_socket_descriptor(int fd, bool kernel, file_descriptor*& descriptor)
 }
 
 
-#define GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor)	\
-	do {												\
-		status_t gsfdorError = get_socket_descriptor(fd, kernel, descriptor); \
-		if (gsfdorError != B_OK)						\
-			return gsfdorError;							\
-	} while (false)
-
-
 // #pragma mark - socket file descriptor
 
 
@@ -308,6 +310,7 @@ static void
 socket_free(struct file_descriptor *descriptor)
 {
 	sStackInterface->free(descriptor->u.socket);
+	put_stack_interface_module();
 }
 
 
@@ -372,14 +375,17 @@ common_socket(int family, int type, int protocol, bool kernel)
 	// create the socket
 	net_socket* socket;
 	status_t error = sStackInterface->open(family, type, protocol, &socket);
-	if (error != B_OK)
+	if (error != B_OK) {
+		put_stack_interface_module();
 		return error;
+	}
 
 	// allocate the FD
 	int fd = create_socket_fd(socket, kernel);
 	if (fd < 0) {
 		sStackInterface->close(socket);
 		sStackInterface->free(socket);
+		put_stack_interface_module();
 	}
 
 	return fd;
@@ -452,6 +458,9 @@ common_accept(int fd, struct sockaddr *address, socklen_t *_addressLength,
 	if (acceptedFD < 0) {
 		sStackInterface->close(acceptedSocket);
 		sStackInterface->free(acceptedSocket);
+	} else {
+		// we need a reference for the new FD
+		get_stack_interface_module();
 	}
 
 	return acceptedFD;
@@ -600,8 +609,10 @@ common_socketpair(int family, int type, int protocol, int fds[2], bool kernel)
 	net_socket* sockets[2];
 	status_t error = sStackInterface->socketpair(family, type, protocol,
 		sockets);
-	if (error != B_OK)
+	if (error != B_OK) {
+		put_stack_interface_module();
 		return error;
+	}
 
 	// allocate the FDs
 	for (int i = 0; i < 2; i++) {
@@ -609,10 +620,13 @@ common_socketpair(int family, int type, int protocol, int fds[2], bool kernel)
 		if (fds[i] < 0) {
 			sStackInterface->close(sockets[i]);
 			sStackInterface->free(sockets[i]);
+			put_stack_interface_module();
 			return fds[i];
 		}
 	}
 
+	// We need another reference for the second socket
+	get_stack_interface_module();
 	return B_OK;
 }
 
@@ -623,7 +637,11 @@ common_get_next_socket_stat(int family, uint32 *cookie, struct net_stat *stat)
 	if (!get_stack_interface_module())
 		return B_UNSUPPORTED;
 
-	return sStackInterface->get_next_socket_stat(family, cookie, stat);
+	status_t status = sStackInterface->get_next_socket_stat(family, cookie,
+		stat);
+
+	put_stack_interface_module();
+	return status;
 }
 
 
