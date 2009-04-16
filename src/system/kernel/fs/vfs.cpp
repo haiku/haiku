@@ -3774,63 +3774,6 @@ get_vnode_removed(fs_volume* volume, ino_t vnodeID, bool* _removed)
 }
 
 
-/*!	Iterates over all removed vnodes of the volume. You own a reference to the
-	vnode when this call returns; you must initialize *_parentNode with NULL when
-	calling this function the first time, subsequent calls will automatically
-	put the previous reference again.
-*/
-extern "C" status_t
-get_next_removed_vnode(fs_volume* volume, ino_t* _vnodeID, void** _privateNode)
-{
-	fs_mount* mount;
-	status_t status = get_mount(volume->id, &mount);
-	if (status != B_OK)
-		return status;
-
-	// Retrieve the previous vnode
-
-	struct vnode* vnode = NULL;
-
-	if (*_privateNode != NULL) {
-		MutexLocker _(sVnodeMutex);
-		vnode = lookup_vnode(volume->id, *_vnodeID);
-			// we already have a reference, so this vnode won't get away
-	}
-
-	// Determine the ID of the next one
-
-	RecursiveLocker locker(mount->rlock);
-
-	struct vnode* nextVnode;
-	if (vnode == NULL)
-		nextVnode = mount->vnodes.First();
-	else {
-		nextVnode = mount->vnodes.GetNext(vnode);
-		dec_vnode_ref_count(vnode, false, true);
-	}
-
-	while (nextVnode != NULL && !nextVnode->remove) {
-		nextVnode = mount->vnodes.GetNext(nextVnode);
-	}
-
-	if (nextVnode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	*_vnodeID = nextVnode->id;
-
-	locker.Unlock();
-
-	// Try to retrieve the vnode by ID, and return it's private node on success
-
-	status = get_vnode(volume->id, *_vnodeID, &vnode, true, true);
-	if (status != B_OK)
-		return status;
-
-	*_privateNode = vnode->private_node;
-	return B_OK;
-}
-
-
 extern "C" fs_volume*
 volume_for_vnode(fs_vnode* _vnode)
 {
