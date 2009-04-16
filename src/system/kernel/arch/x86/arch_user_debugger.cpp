@@ -212,6 +212,20 @@ clear_breakpoint(void *address, bool watchpoint)
 
 #if KERNEL_BREAKPOINTS
 
+
+static void
+install_breakpoints_per_cpu(void* /*cookie*/, int cpu)
+{
+	struct team* kernelTeam = team_get_kernel_team();
+
+	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
+	install_breakpoints(kernelTeam->debug_info.arch_info);
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+}
+
+
 static status_t
 set_kernel_breakpoint(void *address, uint32 type, uint32 length)
 {
@@ -226,9 +240,10 @@ set_kernel_breakpoint(void *address, uint32 type, uint32 length)
 	status_t error = set_breakpoint(kernelTeam->debug_info.arch_info, address,
 		type, length, true);
 
-	install_breakpoints(kernelTeam->debug_info.arch_info);
-
 	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
+	call_all_cpus(install_breakpoints_per_cpu, NULL);
+
 	restore_interrupts(state);
 
 	return error;
@@ -249,9 +264,10 @@ clear_kernel_breakpoint(void *address, bool watchpoint)
 	status_t error = clear_breakpoint(kernelTeam->debug_info.arch_info,
 		address, watchpoint);
 
-	install_breakpoints(kernelTeam->debug_info.arch_info);
-
 	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
+	call_all_cpus(install_breakpoints_per_cpu, NULL);
+
 	restore_interrupts(state);
 
 	return error;
@@ -404,7 +420,7 @@ debugger_breakpoint(int argc, char** argv)
 	}
 
 	if (error == B_OK)
-		install_breakpoints(info);
+		call_all_cpus_sync(install_breakpoints_per_cpu, NULL);
 	else
 		kprintf("Failed to install breakpoint: %s\n", strerror(error));
 
@@ -467,7 +483,7 @@ debugger_watchpoint(int argc, char** argv)
 	}
 
 	if (error == B_OK)
-		install_breakpoints(info);
+		call_all_cpus_sync(install_breakpoints_per_cpu, NULL);
 	else
 		kprintf("Failed to install breakpoint: %s\n", strerror(error));
 
