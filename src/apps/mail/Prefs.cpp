@@ -43,6 +43,11 @@ All rights reserved.
 #include <E-mail.h>
 #include <Application.h>
 
+#ifdef __HAIKU__
+# include <GridView.h>
+# include <GroupLayoutBuilder.h>
+#endif // __HAIKU__
+
 #include <MailSettings.h>
 #include <mail_encoding.h>
 #include <MDRLanguage.h>
@@ -109,13 +114,38 @@ extern BPoint	prefs_window;
 //#pragma mark -
 
 
+#ifdef __HAIKU__
+# define USE_LAYOUT_MANAGEMENT 1
+#else
+# define USE_LAYOUT_MANAGEMENT 0
+#endif
+
+
+#if USE_LAYOUT_MANAGEMENT
+static inline void
+add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
+{
+	menu->SetAlignment(B_ALIGN_RIGHT);
+	layout->AddItem(menu->CreateLabelLayoutItem(), 0, row);
+	layout->AddItem(menu->CreateMenuBarLayoutItem(), 1, row, 2);
+	row++;
+}
+#endif
+
+
 TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	bool* attachAttributes, bool* cquotes, uint32* account, int32* replyTo,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
 	bool* spellCheckStartOn, uint8* buttonBar)
 	:
+#if USE_LAYOUT_MANAGEMENT
+	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences", "Mailの設定"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS),
+#else
 	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences", "Mailの設定"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+#endif
 
 	fNewWrap(wrap),
 	fWrap(*fNewWrap),
@@ -156,6 +186,131 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	BMenuField* menu;
 
+#if USE_LAYOUT_MANAGEMENT
+	// group boxes
+
+	const float kSpacing = 8;
+
+	BGridView* interfaceView = new BGridView(kSpacing, kSpacing);
+	BGridLayout* interfaceLayout = interfaceView->GridLayout();
+	interfaceLayout->SetInsets(kSpacing, kSpacing, kSpacing, kSpacing);
+	BGridView* mailView = new BGridView(kSpacing, kSpacing);
+	BGridLayout* mailLayout = mailView->GridLayout();
+	mailLayout->SetInsets(kSpacing, kSpacing, kSpacing, kSpacing);
+
+	interfaceLayout->AlignLayoutWith(mailLayout, B_HORIZONTAL);
+
+	BBox* interfaceBox = new BBox(B_FANCY_BORDER, interfaceView);
+	interfaceBox->SetLabel(MDR_DIALECT_CHOICE ("User Interface",
+		"ユーザーインターフェース"));
+	BBox* mailBox = new BBox(B_FANCY_BORDER, mailView);
+	mailBox->SetLabel(MDR_DIALECT_CHOICE ("Mailing", "メール関係"));
+
+	// revert, ok & cancel
+
+	BButton* okButton = new BButton("ok", OK_BUTTON_TEXT, new BMessage(P_OK));
+	okButton->MakeDefault(true);
+
+	BButton* cancelButton = new BButton("cancel", CANCEL_BUTTON_TEXT,
+		new BMessage(P_CANCEL));
+
+	fRevert = new BButton("revert", REVERT_BUTTON_TEXT,
+		new BMessage(P_REVERT));
+	fRevert->SetEnabled(false);
+
+	// User Interface
+	int32 layoutRow = 0;
+
+	fButtonBarMenu = _BuildButtonBarMenu(*buttonBar);
+	menu = new BMenuField("bar", BUTTONBAR_TEXT, fButtonBarMenu, NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
+
+	fFontMenu = _BuildFontMenu(font);
+	menu = new BMenuField("font", FONT_TEXT, fFontMenu, NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
+
+	fSizeMenu = _BuildSizeMenu(font);
+	menu = new BMenuField("size", SIZE_TEXT, fSizeMenu, NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
+
+	fColoredQuotesMenu = _BuildColoredQuotesMenu(fColoredQuotes);
+	menu = new BMenuField("cquotes", QUOTES_TEXT, fColoredQuotesMenu, NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
+
+	fSpellCheckStartOnMenu = _BuildSpellCheckStartOnMenu(fSpellCheckStartOn);
+	menu = new BMenuField("spellCheckStartOn", SPELL_CHECK_START_ON_TEXT,
+		fSpellCheckStartOnMenu, NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
+
+
+	// Mail Accounts
+
+	layoutRow = 0;
+
+	fAccountMenu = _BuildAccountMenu(fAccount);
+	menu = new BMenuField("account", ACCOUNT_TEXT, fAccountMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	fReplyToMenu = _BuildReplyToMenu(fReplyTo);
+	menu = new BMenuField("replyTo", REPLYTO_TEXT, fReplyToMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	// Mail Contents
+
+	fReplyPreamble = new BTextControl("replytext", REPLY_PREAMBLE_TEXT,
+		*preamble, new BMessage(P_REPLY_PREAMBLE));
+	fReplyPreamble->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+
+	fReplyPreambleMenu = _BuildReplyPreambleMenu();
+	menu = new BMenuField("replyPreamble", NULL, fReplyPreambleMenu, NULL);
+	menu->SetExplicitMaxSize(BSize(27, B_SIZE_UNSET));
+
+	mailLayout->AddItem(fReplyPreamble->CreateLabelLayoutItem(), 0, layoutRow);
+	mailLayout->AddItem(fReplyPreamble->CreateTextViewLayoutItem(), 1,
+		layoutRow);
+	mailLayout->AddView(menu, 2, layoutRow);
+	layoutRow++;
+
+	fSignatureMenu = _BuildSignatureMenu(*sig);
+	menu = new BMenuField("sig", SIGNATURE_TEXT, fSignatureMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	fEncodingMenu = _BuildEncodingMenu(fEncoding);
+	menu = new BMenuField("enc", ENCODING_TEXT, fEncodingMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	fWarnUnencodableMenu = _BuildWarnUnencodableMenu(fWarnUnencodable);
+	menu = new BMenuField("warnUnencodable", WARN_UNENCODABLE_TEXT,
+		fWarnUnencodableMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	fWrapMenu = _BuildWrapMenu(*wrap);
+	menu = new BMenuField("wrap", WRAP_TEXT, fWrapMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+	
+	fAttachAttributesMenu = _BuildAttachAttributesMenu(*attachAttributes);
+	menu = new BMenuField("attachAttributes", ATTACH_ATTRIBUTES_TEXT,
+		fAttachAttributesMenu, NULL);
+	add_menu_to_layout(menu, mailLayout, layoutRow);
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, kSpacing)
+		.Add(interfaceBox)
+		.Add(mailBox)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kSpacing)
+			.Add(fRevert)
+			.AddGlue()
+			.Add(cancelButton)
+			.Add(okButton)
+		)
+		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
+	);
+
+	Show();
+
+#else // #if !USE_LAYOUT_MANAGEMENT
+
 	BRect r = Bounds();
 	BView *view = new BView(r, NULL, B_FOLLOW_ALL, B_FRAME_EVENTS);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -171,22 +326,25 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	// group boxes
 
-	r.Set(8,4,Bounds().right - 8,4 + 6 * (height + ITEM_SPACE));
-	BBox *interfaceBox = new BBox(r , NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	r.Set(8, 4, Bounds().right - 8, 4 + 6 * (height + ITEM_SPACE));
+	BBox* interfaceBox = new BBox(r , NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	interfaceBox->SetLabel(MDR_DIALECT_CHOICE ("User Interface",
 		"ユーザーインターフェース"));
 	view->AddChild(interfaceBox);
 
-	r.top = r.bottom + 8;  r.bottom = r.top + 9 * (height + ITEM_SPACE);
-	BBox *mailBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	r.top = r.bottom + 8;
+	r.bottom = r.top + 9 * (height + ITEM_SPACE);
+	BBox* mailBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	mailBox->SetLabel(MDR_DIALECT_CHOICE ("Mailing", "メール関係"));
 	view->AddChild(mailBox);
 
 	// revert, ok & cancel
 
-	r.top = r.bottom + 10;  r.bottom = r.top + height;
-	r.left = OK_BUTTON_X1;  r.right = OK_BUTTON_X2;
-	BButton *button = new BButton(r, "ok", OK_BUTTON_TEXT, new BMessage(P_OK));
+	r.top = r.bottom + 10;
+	r.bottom = r.top + height;
+	r.left = OK_BUTTON_X1;
+	r.right = OK_BUTTON_X2;
+	BButton* button = new BButton(r, "ok", OK_BUTTON_TEXT, new BMessage(P_OK));
 	button->MakeDefault(true);
 	view->AddChild(button);
 
@@ -334,9 +492,12 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	mailBox->AddChild(menu);
-	
+
 	ResizeTo(Frame().Width(), fRevert->Frame().bottom + 8);
+
 	Show();
+
+#endif // #if !USE_LAYOUT_MANAGEMENT
 }
 
 
