@@ -1784,9 +1784,9 @@ BContainerWindow::SetCloseItem(BMenu *menu)
 		&& (item = menu->FindItem(kCloseAllWindows)) == NULL)
 		return;
 
-	if (modifiers() & B_OPTION_KEY) {
+	if (modifiers() & B_SHIFT_KEY) {
 		item->SetLabel("Close All");
-		item->SetShortcut('W', B_COMMAND_KEY | B_OPTION_KEY);
+		item->SetShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY);
 		item->SetTarget(be_app);
 		item->SetMessage(new BMessage(kCloseAllWindows));
 	} else {
@@ -1970,8 +1970,8 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow),
-		'A', B_SHIFT_KEY);
+	item = new BMenuItem("Select"B_UTF8_ELLIPSIS,
+		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
@@ -1979,7 +1979,8 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Invert Selection", new BMessage(kInvertSelection), 'S');
+	item = new BMenuItem("Invert Selection", new BMessage(kInvertSelection),
+		'S');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
@@ -1994,9 +1995,15 @@ BContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(this);
 	menu->AddItem(item);
 
+	item = new BMenuItem("Close All in Workspace",
+		new BMessage(kCloseAllInWorkspace), 'Q');
+	item->SetTarget(be_app);
+	menu->AddItem(item);
+
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem("Preferences"B_UTF8_ELLIPSIS, new BMessage(kShowSettingsWindow));
+	item = new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
+		new BMessage(kShowSettingsWindow));
 	item->SetTarget(be_app);
 	menu->AddItem(item);
 }

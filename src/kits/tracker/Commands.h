@@ -50,6 +50,7 @@ const uint32 kOpenSelection = 'Tosl';
 const uint32 kOpenSelectionWith = 'Tosu';
 const uint32 kCloseAllWindows = 'Tall';
 const uint32 kCloseWindowAndChildren = 'Tcwc';
+const uint32 kCloseAllInWorkspace = 'Tciw';
 
 // end external app messages
 

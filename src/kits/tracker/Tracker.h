@@ -192,6 +192,7 @@ class TTracker : public BApplication {
 
 		void CloseAllWindows();
 		void CloseWindowAndChildren(const node_ref *);
+		void CloseAllInWorkspace();
 		void OpenInfoWindows(BMessage*);
 		void MoveRefsToTrash(const BMessage *);
 		void OpenContainerWindow(Model *, BMessage *refsList = NULL,

@@ -402,6 +402,10 @@ TTracker::MessageReceived(BMessage *message)
 			CloseAllWindows();
 			break;
 
+		case kCloseAllInWorkspace:
+			CloseAllInWorkspace();
+			break;
+
 		case kFindButton:
 			(new FindWindow())->Show();
 			break;
@@ -854,7 +858,6 @@ TTracker::ArgvReceived(int32 argc, char **argv)
 	}
 }
 
-
 void
 TTracker::OpenContainerWindow(Model *model, BMessage *originalRefsList,
 	OpenSelector openSelector, uint32 openFlags, bool checkAlreadyOpen,
@@ -1187,6 +1190,24 @@ TTracker::CloseWindowAndChildren(const node_ref *node)
 		window->PostMessage(B_QUIT_REQUESTED);
 	}
 }
+
+
+void
+TTracker::CloseAllInWorkspace()
+{
+	AutoLock<WindowList> lock(&fWindowList);
+
+	int32 currentWorkspace = 1 << current_workspace();
+	// count from end to beginning so we can remove items safely
+	for (int32 index = fWindowList.CountItems() - 1; index >= 0; index--) {
+		BWindow *window = fWindowList.ItemAt(index);
+		if (window->Workspaces() & currentWorkspace)
+			// avoid the desktop
+			if (!dynamic_cast<BDeskWindow *>(window) 
+				&& !dynamic_cast<BStatusWindow *>(window))
+				window->PostMessage(B_QUIT_REQUESTED);
+	}	
+}	
 
 
 void
