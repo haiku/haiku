@@ -657,6 +657,8 @@ uninit_timers(void)
 
 	status_t status;
 	wait_for_thread(sTimerThread, &status);
+
+	remove_debugger_command("net_timer", dump_timer);
 }
 
 
