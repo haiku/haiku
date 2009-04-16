@@ -41,6 +41,9 @@
 
 #define MAX_CHAIN_MODULES 5
 
+struct chain;
+typedef DoublyLinkedList<chain> ChainList;
+
 struct chain_key {
 	int		family;
 	int		type;
@@ -61,10 +64,10 @@ struct family {
 	struct family*	next;
 	int				type;
 	int32			ref_count;
-	struct list		chains;
+	ChainList		chains;
 };
 
-struct chain {
+struct chain : DoublyLinkedListLinkImpl<chain> {
 	chain(int family, int type, int protocol);
 	~chain();
 
@@ -83,7 +86,6 @@ struct chain {
 	static void DeleteChains(hash_table* chains);
 
 	chain*			next;
-	struct list_link family_link;
 	struct family*	parent;
 
 	int 			family;
@@ -113,7 +115,6 @@ family::family(int _type)
 	type(_type),
 	ref_count(0)
 {
-	list_init_etc(&chains, offsetof(struct chain, family_link));
 }
 
 
@@ -131,14 +132,10 @@ family::Release()
 		return;
 
 	TRACE(("family %d unused, uninit chains\n", type));
-	MutexLocker locker(&sChainLock);
+	MutexLocker _(sChainLock);
 
-	struct chain* chain = NULL;
-	while (true) {
-		chain = (struct chain*)list_get_next_item(&chains, chain);
-		if (chain == NULL)
-			break;
-
+	ChainList::Iterator iterator = chains.GetIterator();
+	while (struct chain* chain = iterator.Next()) {
 		chain->Uninitialize();
 	}
 }
@@ -208,6 +205,8 @@ chain::chain(int _family, int _type, int _protocol)
 	if (parent == NULL)
 		parent = ::family::Add(family);
 
+	//parent->chains.Add(this);
+
 	for (int32 i = 0; i < MAX_CHAIN_MODULES; i++) {
 		modules[i] = NULL;
 		infos[i] = NULL;
@@ -220,6 +219,8 @@ chain::~chain()
 	for (int32 i = 0; i < MAX_CHAIN_MODULES; i++) {
 		free((char*)modules[i]);
 	}
+
+	//parent->chains.Remove(this);
 }
 
 
@@ -227,7 +228,7 @@ status_t
 chain::Acquire()
 {
 	if (atomic_add(&ref_count, 1) > 0) {
-		if (flags & CHAIN_MISSING_MODULE) {
+		if ((flags & CHAIN_MISSING_MODULE) != 0) {
 			atomic_add(&ref_count, -1);
 			return EAFNOSUPPORT;
 		}
@@ -282,7 +283,7 @@ chain::Uninitialize()
 		return;
 
 	TRACE(("uninit chain %d.%d.%d\n", family, type, protocol));
-	MutexLocker locker(sInitializeChainLock);
+	MutexLocker _(sInitializeChainLock);
 
 	for (int32 i = 0; modules[i] != NULL; i++) {
 		put_module(modules[i]);
