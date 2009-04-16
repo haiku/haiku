@@ -26,6 +26,7 @@
 
 #include <arch/debug_console.h>
 #include <arch/debug.h>
+#include <util/AutoLock.h>
 #include <util/ring_buffer.h>
 
 #include <syslog_daemon.h>
@@ -102,6 +103,8 @@ static vint32 sInDebugger = 0;
 static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
 static vint32 sHandOverKDLToCPU = -1;
+static bool sCPUTrapped[B_MAX_CPU_COUNT];
+
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
@@ -1307,19 +1310,28 @@ debug_get_page_fault_info()
 void
 debug_trap_cpu_in_kdl(bool returnIfHandedOver)
 {
-	cpu_status state = disable_interrupts();
+	InterruptsLocker locker;
+
+	int cpu = smp_get_current_cpu();
+
+	// return, if we've been called recursively (we call
+	// smp_intercpu_int_handler() below)
+	if (sCPUTrapped[cpu])
+		return;
+
+	sCPUTrapped[cpu] = true;
 
 	while (sInDebugger != 0) {
-		if (sHandOverKDL && sHandOverKDLToCPU == smp_get_current_cpu()) {
+		if (sHandOverKDL && sHandOverKDLToCPU == cpu) {
 			if (returnIfHandedOver)
-				return;
+				break;
 
 			kernel_debugger(NULL);
 		} else
-			PAUSE();
+			smp_intercpu_int_handler();
 	}
 
-	restore_interrupts(state);
+	sCPUTrapped[cpu] = false;
 }
 
 
