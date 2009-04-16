@@ -298,6 +298,7 @@ BStringView::SetFont(const BFont* font, uint32 mask)
 {
 	BView::SetFont(font, mask);
 
+	Invalidate();
 	InvalidateLayout();
 }
 
