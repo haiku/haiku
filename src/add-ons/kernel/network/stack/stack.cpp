@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -53,15 +53,15 @@ struct family {
 	void Acquire();
 	void Release();
 
-	static int Compare(void *_family, const void *_key);
-	static uint32 Hash(void *_family, const void *_key, uint32 range);
-	static struct family *Lookup(int type);
-	static struct family *Add(int type);
+	static int Compare(void* _family, const void* _key);
+	static uint32 Hash(void* _family, const void* _key, uint32 range);
+	static struct family* Lookup(int type);
+	static struct family* Add(int type);
 
-	struct family *next;
-	int		type;
-	int32	ref_count;
-	struct list chains;
+	struct family*	next;
+	int				type;
+	int32			ref_count;
+	struct list		chains;
 };
 
 struct chain {
@@ -72,28 +72,28 @@ struct chain {
 	void Release();
 	void Uninitialize();
 
-	static int Compare(void *_chain, const void *_key);
-	static uint32 Hash(void *_chain, const void *_key, uint32 range);
-	static struct chain *Lookup(hash_table *chains, int family, int type,
+	static int Compare(void* _chain, const void* _key);
+	static uint32 Hash(void* _chain, const void* _key, uint32 range);
+	static struct chain* Lookup(hash_table* chains, int family, int type,
 		int protocol);
-	static struct chain *Add(hash_table *chains, int family, int type,
+	static struct chain* Add(hash_table* chains, int family, int type,
 		int protocol, va_list modules);
-	static struct chain *Add(hash_table *chains, int family, int type,
+	static struct chain* Add(hash_table* chains, int family, int type,
 		int protocol, ...);
-	static void DeleteChains(hash_table *chains);
+	static void DeleteChains(hash_table* chains);
 
-	chain	*next;
+	chain*			next;
 	struct list_link family_link;
-	struct family *parent;
+	struct family*	parent;
 
-	int 	family;
-	int		type;
-	int		protocol;
+	int 			family;
+	int				type;
+	int				protocol;
 
-	int32	ref_count;
-	uint32	flags;
-	const char *modules[MAX_CHAIN_MODULES + 1];
-	module_info *infos[MAX_CHAIN_MODULES + 1];
+	int32			ref_count;
+	uint32			flags;
+	const char*		modules[MAX_CHAIN_MODULES + 1];
+	module_info*	infos[MAX_CHAIN_MODULES + 1];
 };
 
 #define CHAIN_MISSING_MODULE	0x02
@@ -101,10 +101,10 @@ struct chain {
 
 static mutex sChainLock;
 static mutex sInitializeChainLock;
-static hash_table *sProtocolChains;
-static hash_table *sDatalinkProtocolChains;
-static hash_table *sReceivingProtocolChains;
-static hash_table *sFamilies;
+static hash_table* sProtocolChains;
+static hash_table* sDatalinkProtocolChains;
+static hash_table* sReceivingProtocolChains;
+static hash_table* sFamilies;
 static bool sInitialized;
 
 
@@ -133,9 +133,9 @@ family::Release()
 	TRACE(("family %d unused, uninit chains\n", type));
 	MutexLocker locker(&sChainLock);
 
-	struct chain *chain = NULL;
+	struct chain* chain = NULL;
 	while (true) {
-		chain = (struct chain *)list_get_next_item(&chains, chain);
+		chain = (struct chain*)list_get_next_item(&chains, chain);
 		if (chain == NULL)
 			break;
 
@@ -145,9 +145,9 @@ family::Release()
 
 
 /*static*/ int
-family::Compare(void *_family, const void *_key)
+family::Compare(void* _family, const void* _key)
 {
-	struct family *family = (struct family *)_family;
+	struct family* family = (struct family*)_family;
 	int key = (int)_key;
 
 	if (family->type == key)
@@ -158,9 +158,9 @@ family::Compare(void *_family, const void *_key)
 
 
 /*static*/ uint32
-family::Hash(void *_family, const void *_key, uint32 range)
+family::Hash(void* _family, const void* _key, uint32 range)
 {
-	struct family *family = (struct family *)_family;
+	struct family* family = (struct family*)_family;
 	int key = (int)_key;
 
 	if (family != NULL)
@@ -170,17 +170,17 @@ family::Hash(void *_family, const void *_key, uint32 range)
 }
 
 
-/*static*/ struct family *
+/*static*/ struct family*
 family::Lookup(int type)
 {
-	return (struct family *)hash_lookup(sFamilies, (void *)type);
+	return (struct family*)hash_lookup(sFamilies, (void*)type);
 }
 
 
-/*static*/ struct family *
+/*static*/ struct family*
 family::Add(int type)
 {
-	struct family *family = new (std::nothrow) ::family(type);
+	struct family* family = new (std::nothrow) ::family(type);
 	if (family == NULL)
 		return NULL;
 
@@ -218,7 +218,7 @@ chain::chain(int _family, int _type, int _protocol)
 chain::~chain()
 {
 	for (int32 i = 0; i < MAX_CHAIN_MODULES; i++) {
-		free((char *)modules[i]);
+		free((char*)modules[i]);
 	}
 }
 
@@ -293,10 +293,10 @@ chain::Uninitialize()
 
 
 /*static*/ int
-chain::Compare(void *_chain, const void *_key)
+chain::Compare(void* _chain, const void* _key)
 {
-	const chain_key *key = (const chain_key *)_key;
-	struct chain *chain = (struct chain *)_chain;
+	const chain_key* key = (const chain_key*)_key;
+	struct chain* chain = (struct chain*)_chain;
 
 	if (chain->family == key->family
 		&& chain->type == key->type
@@ -308,10 +308,10 @@ chain::Compare(void *_chain, const void *_key)
 
 
 /*static*/ uint32
-chain::Hash(void *_chain, const void *_key, uint32 range)
+chain::Hash(void* _chain, const void* _key, uint32 range)
 {
-	const chain_key *key = (const chain_key *)_key;
-	struct chain *chain = (struct chain *)_chain;
+	const chain_key* key = (const chain_key*)_key;
+	struct chain* chain = (struct chain*)_chain;
 
 // TODO: check if this makes a good hash...
 #define HASH(o) ((uint32)(((o)->family) ^ ((o)->type) ^ ((o)->protocol)) % range)
@@ -329,18 +329,19 @@ chain::Hash(void *_chain, const void *_key, uint32 range)
 }
 
 
-/*static */ struct chain *
-chain::Lookup(hash_table *chains, int family, int type, int protocol)
+/*static*/ struct chain*
+chain::Lookup(hash_table* chains, int family, int type, int protocol)
 {
 	struct chain_key key = { family, type, protocol };
-	return (struct chain *)hash_lookup(chains, &key);
+	return (struct chain*)hash_lookup(chains, &key);
 }
 
 
-/*static*/ struct chain *
-chain::Add(hash_table *chains, int family, int type, int protocol, va_list modules)
+/*static*/ struct chain*
+chain::Add(hash_table* chains, int family, int type, int protocol,
+	va_list modules)
 {
-	struct chain *chain = new (std::nothrow) ::chain(family, type, protocol);
+	struct chain* chain = new (std::nothrow) ::chain(family, type, protocol);
 	if (chain == NULL)
 		return NULL;
 
@@ -350,11 +351,11 @@ chain::Add(hash_table *chains, int family, int type, int protocol, va_list modul
 	}
 
 	TRACE(("Add chain %d.%d.%d:\n", family, type, protocol));
-	const char *module;
+	const char* module;
 	int32 count = 0;
 
 	while (true) {
-		module = va_arg(modules, const char *);
+		module = va_arg(modules, const char*);
 		if (module == NULL)
 			break;
 
@@ -378,13 +379,13 @@ chain::Add(hash_table *chains, int family, int type, int protocol, va_list modul
 }
 
 
-/*static*/ struct chain *
-chain::Add(hash_table *chains, int family, int type, int protocol, ...)
+/*static*/ struct chain*
+chain::Add(hash_table* chains, int family, int type, int protocol, ...)
 {
 	va_list modules;
 	va_start(modules, protocol);
 
-	struct chain *chain = Add(chains, family, type, 0, modules);
+	struct chain* chain = Add(chains, family, type, 0, modules);
 
 	va_end(modules);
 	return chain;
@@ -392,11 +393,11 @@ chain::Add(hash_table *chains, int family, int type, int protocol, ...)
 
 
 /*static*/ void
-chain::DeleteChains(hash_table *chains)
+chain::DeleteChains(hash_table* chains)
 {
 	uint32 cookie = 0;
 	while (true) {
-		struct chain *chain = (struct chain *)hash_remove_first(chains, &cookie);
+		struct chain* chain = (struct chain*)hash_remove_first(chains, &cookie);
 		if (chain == NULL)
 			break;
 
@@ -410,11 +411,11 @@ chain::DeleteChains(hash_table *chains)
 
 
 static void
-uninit_domain_protocols(net_socket *socket)
+uninit_domain_protocols(net_socket* socket)
 {
-	net_protocol *protocol = socket->first_protocol;
+	net_protocol* protocol = socket->first_protocol;
 	while (protocol != NULL) {
-		net_protocol *next = protocol->next;
+		net_protocol* next = protocol->next;
 		protocol->module->uninit_protocol(protocol);
 
 		protocol = next;
@@ -426,12 +427,12 @@ uninit_domain_protocols(net_socket *socket)
 
 
 status_t
-get_domain_protocols(net_socket *socket)
+get_domain_protocols(net_socket* socket)
 {
-	struct chain *chain;
+	struct chain* chain;
 
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
 			socket->type == SOCK_RAW ? 0 : socket->protocol);
@@ -446,14 +447,14 @@ get_domain_protocols(net_socket *socket)
 	// create net_protocol objects for the protocols in the chain
 
 	status_t status = chain->Acquire();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	net_protocol *last = NULL;
+	net_protocol* last = NULL;
 
 	for (int32 i = 0; chain->infos[i] != NULL; i++) {
-		net_protocol *protocol =
-			((net_protocol_module_info *)chain->infos[i])->init_protocol(socket);
+		net_protocol* protocol =
+			((net_protocol_module_info*)chain->infos[i])->init_protocol(socket);
 		if (protocol == NULL) {
 			// free protocols we already initialized
 			uninit_domain_protocols(socket);
@@ -461,7 +462,7 @@ get_domain_protocols(net_socket *socket)
 			return B_NO_MEMORY;
 		}
 
-		protocol->module = (net_protocol_module_info *)chain->infos[i];
+		protocol->module = (net_protocol_module_info*)chain->infos[i];
 		protocol->socket = socket;
 		protocol->next = NULL;
 
@@ -479,12 +480,12 @@ get_domain_protocols(net_socket *socket)
 
 
 status_t
-put_domain_protocols(net_socket *socket)
+put_domain_protocols(net_socket* socket)
 {
-	struct chain *chain;
+	struct chain* chain;
 
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
 			socket->protocol);
@@ -499,11 +500,11 @@ put_domain_protocols(net_socket *socket)
 
 
 static void
-uninit_domain_datalink_protocols(net_interface *interface)
+uninit_domain_datalink_protocols(net_interface* interface)
 {
-	net_datalink_protocol *protocol = interface->first_protocol;
+	net_datalink_protocol* protocol = interface->first_protocol;
 	while (protocol != NULL) {
-		net_datalink_protocol *next = protocol->next;
+		net_datalink_protocol* next = protocol->next;
 		protocol->module->uninit_protocol(protocol);
 
 		protocol = next;
@@ -515,13 +516,13 @@ uninit_domain_datalink_protocols(net_interface *interface)
 
 
 status_t
-get_domain_datalink_protocols(net_interface *_interface)
+get_domain_datalink_protocols(net_interface* _interface)
 {
-	struct net_interface_private *interface = (net_interface_private *)_interface;
-	struct chain *chain;
+	struct net_interface_private* interface = (net_interface_private*)_interface;
+	struct chain* chain;
 
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
 			interface->device_interface->device->type, 0);
@@ -535,12 +536,12 @@ get_domain_datalink_protocols(net_interface *_interface)
 	if (status < B_OK)
 		return status;
 
-	net_datalink_protocol *last = NULL;
+	net_datalink_protocol* last = NULL;
 
 	for (int32 i = 0; chain->infos[i] != NULL; i++) {
-		net_datalink_protocol *protocol;
-		status_t status = ((net_datalink_protocol_module_info *)chain->infos[i])->init_protocol(
-			interface, &protocol);
+		net_datalink_protocol* protocol;
+		status_t status = ((net_datalink_protocol_module_info*)
+			chain->infos[i])->init_protocol(interface, &protocol);
 		if (status < B_OK) {
 			// free protocols we already initialized
 			uninit_domain_datalink_protocols(interface);
@@ -548,7 +549,7 @@ get_domain_datalink_protocols(net_interface *_interface)
 			return status;
 		}
 
-		protocol->module = (net_datalink_protocol_module_info *)chain->infos[i];
+		protocol->module = (net_datalink_protocol_module_info*)chain->infos[i];
 		protocol->interface = interface;
 		protocol->next = NULL;
 
@@ -566,13 +567,13 @@ get_domain_datalink_protocols(net_interface *_interface)
 
 
 status_t
-put_domain_datalink_protocols(net_interface *_interface)
+put_domain_datalink_protocols(net_interface* _interface)
 {
-	struct net_interface_private *interface = (net_interface_private *)_interface;
-	struct chain *chain;
+	struct net_interface_private* interface = (net_interface_private*)_interface;
+	struct chain* chain;
 
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
 			interface->device_interface->device->type, 0);
@@ -587,15 +588,17 @@ put_domain_datalink_protocols(net_interface *_interface)
 
 
 status_t
-get_domain_receiving_protocol(net_domain *_domain, uint32 type,
-	net_protocol_module_info **_module)
+get_domain_receiving_protocol(net_domain* _domain, uint32 type,
+	net_protocol_module_info** _module)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
-	struct chain *chain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
+	struct chain* chain;
 
-	TRACE(("get_domain_receiving_protocol(family %d, type %lu)\n", domain->family, type));
+	TRACE(("get_domain_receiving_protocol(family %d, type %lu)\n",
+		domain->family, type));
+
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sReceivingProtocolChains, domain->family,
 			type, 0);
@@ -604,22 +607,22 @@ get_domain_receiving_protocol(net_domain *_domain, uint32 type,
 	}
 
 	status_t status = chain->Acquire();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	*_module = (net_protocol_module_info *)chain->infos[0];
+	*_module = (net_protocol_module_info*)chain->infos[0];
 	return B_OK;
 }
 
 
 status_t
-put_domain_receiving_protocol(net_domain *_domain, uint32 type)
+put_domain_receiving_protocol(net_domain* _domain, uint32 type)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
-	struct chain *chain;
+	struct net_domain_private* domain = (net_domain_private*)_domain;
+	struct chain* chain;
 
 	{
-		MutexLocker locker(&sChainLock);
+		MutexLocker _(sChainLock);
 
 		chain = chain::Lookup(sReceivingProtocolChains, domain->family,
 			type, 0);
@@ -642,7 +645,7 @@ register_domain_protocols(int family, int type, int protocol, ...)
 
 	MutexLocker locker(&sChainLock);
 
-	struct chain *chain = chain::Lookup(sProtocolChains, family, type, protocol);
+	struct chain* chain = chain::Lookup(sProtocolChains, family, type, protocol);
 	if (chain != NULL)
 		return B_OK;
 
@@ -666,7 +669,8 @@ register_domain_datalink_protocols(int family, int type, ...)
 	TRACE(("register_domain_datalink_protocol(%d.%d)\n", family, type));
 	MutexLocker locker(&sChainLock);
 
-	struct chain *chain = chain::Lookup(sDatalinkProtocolChains, family, type, 0);
+	struct chain* chain
+		= chain::Lookup(sDatalinkProtocolChains, family, type, 0);
 	if (chain != NULL)
 		return B_OK;
 
@@ -680,32 +684,34 @@ register_domain_datalink_protocols(int family, int type, ...)
 	if (chain == NULL)
 		return B_NO_MEMORY;
 
-	// Add datalink interface protocol as the last protocol in the chain; it's name
-	// stays unset, so that it won't be part of the release/acquire process.
+	// Add datalink interface protocol as the last protocol in the chain; it's
+	// name stays unset, so that it won't be part of the release/acquire process.
 
 	uint32 count = 0;
 	while (chain->modules[count] != NULL) {
 		count++;
 	}
 
-	chain->infos[count] = (module_info *)&gDatalinkInterfaceProtocolModule;
+	chain->infos[count] = (module_info*)&gDatalinkInterfaceProtocolModule;
 	return B_OK;
 }
 
 
 static status_t
-register_domain_receiving_protocol(int family, int type, const char *moduleName)
+register_domain_receiving_protocol(int family, int type, const char* moduleName)
 {
 	TRACE(("register_domain_receiving_protocol(%d.%d, %s)\n", family, type,
 		moduleName));
 
-	MutexLocker locker(&sChainLock);
+	MutexLocker _(sChainLock);
 
-	struct chain *chain = chain::Lookup(sReceivingProtocolChains, family, type, 0);
+	struct chain* chain
+		= chain::Lookup(sReceivingProtocolChains, family, type, 0);
 	if (chain != NULL)
 		return B_OK;
 
-	chain = chain::Add(sReceivingProtocolChains, family, type, 0, moduleName, NULL);
+	chain = chain::Add(sReceivingProtocolChains, family, type, 0, moduleName,
+		NULL);
 	if (chain == NULL)
 		return B_NO_MEMORY;
 
@@ -714,9 +720,9 @@ register_domain_receiving_protocol(int family, int type, const char *moduleName)
 
 
 static void
-scan_modules(const char *path)
+scan_modules(const char* path)
 {
-	void *cookie = open_module_list(path);
+	void* cookie = open_module_list(path);
 	if (cookie == NULL)
 		return;
 
@@ -728,7 +734,7 @@ scan_modules(const char *path)
 
 		TRACE(("scan %s\n", name));
 
-		module_info *module;
+		module_info* module;
 		if (get_module(name, &module) == B_OK) {
 			// we don't need the module right now, but we give it a chance
 			// to register itself
@@ -742,15 +748,15 @@ status_t
 init_stack()
 {
 	status_t status = init_domains();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	status = init_interfaces();
-	if (status < B_OK)
+	if (status != B_OK)
 		goto err1;
 
 	status = init_timers();
-	if (status < B_OK)
+	if (status != B_OK)
 		goto err2;
 
 	status = init_notifications();
@@ -760,6 +766,11 @@ init_stack()
 		dprintf("networking stack notifications could not be initialized: %s\n",
 			strerror(status));
 	}
+
+	module_info* dummy;
+	status = get_module(NET_SOCKET_MODULE_NAME, &dummy);
+	if (status != B_OK)
+		goto err3;
 
 	mutex_init(&sChainLock, "net chains");
 	mutex_init(&sInitializeChainLock, "net intialize chains");
@@ -818,6 +829,7 @@ err6:
 err5:
 	mutex_destroy(&sInitializeChainLock);
 	mutex_destroy(&sChainLock);
+err3:
 	uninit_timers();
 err2:
 	uninit_interfaces();
@@ -832,6 +844,7 @@ uninit_stack()
 {
 	TRACE(("Unloading network stack\n"));
 
+	put_module(NET_SOCKET_MODULE_NAME);
 	uninit_timers();
 	uninit_interfaces();
 	uninit_domains();
@@ -848,7 +861,8 @@ uninit_stack()
 
 	uint32 cookie = 0;
 	while (true) {
-		struct family *family = (struct family *)hash_remove_first(sFamilies, &cookie);
+		struct family* family = (struct family*)hash_remove_first(sFamilies,
+			&cookie);
 		if (family == NULL)
 			break;
 
@@ -939,12 +953,12 @@ net_stack_module_info gNetStackModule = {
 	next_ancillary_data
 };
 
-module_info *modules[] = {
-	(module_info *)&gNetStackModule,
-	(module_info *)&gNetBufferModule,
-	(module_info *)&gNetSocketModule,
-	(module_info *)&gNetDatalinkModule,
-	(module_info *)&gLinkModule,
-	(module_info *)&gNetStackInterfaceModule,
+module_info* modules[] = {
+	(module_info*)&gNetStackModule,
+	(module_info*)&gNetBufferModule,
+	(module_info*)&gNetSocketModule,
+	(module_info*)&gNetDatalinkModule,
+	(module_info*)&gLinkModule,
+	(module_info*)&gNetStackInterfaceModule,
 	NULL
 };

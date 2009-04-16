@@ -1604,6 +1604,7 @@ socket_std_ops(int32 op, ...)
 			return B_OK;
 		}
 		case B_MODULE_UNINIT:
+			ASSERT(sSocketList.IsEmpty());
 			mutex_destroy(&sSocketLock);
 
 #ifdef ADD_DEBUGGER_COMMANDS
