@@ -18,8 +18,8 @@
 // benaphore-style.
 #define KDEBUG							KDEBUG_LEVEL_2
 
-// Enable this to get support for kernel breakpoints.
-#define KERNEL_BREAKPOINTS				0
+// Set to 0 to disable support for kernel breakpoints.
+#define KERNEL_BREAKPOINTS				1
 
 
 // block/file cache

@@ -516,7 +516,7 @@ arch_update_thread_single_step()
 {
 	if (struct iframe* frame = i386_get_user_iframe()) {
 		struct thread* thread = thread_get_current_thread();
-	
+
 		// set/clear TF in EFLAGS depending on if single stepping is desired
 		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP)
 			frame->flags |= (1 << X86_EFLAGS_TF);
@@ -710,17 +710,18 @@ x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 {
 	struct thread *thread = thread_get_current_thread();
 
-#if !KERNEL_BREAKPOINTS
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED))
 		return;
-#endif
+
+	// disable kernel breakpoints
+	disable_breakpoints();
 
 	GRAB_THREAD_LOCK();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 
 	arch_team_debug_info &teamInfo = thread->team->debug_info.arch_info;
 
-	// install the breakpoints
+	// install the user breakpoints
 	install_breakpoints(teamInfo);
 
 	atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_INSTALLED);
@@ -738,22 +739,19 @@ x86_exit_user_debug_at_kernel_entry()
 {
 	struct thread *thread = thread_get_current_thread();
 
-#if !KERNEL_BREAKPOINTS
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
 		return;
-#endif
 
 	GRAB_THREAD_LOCK();
 
-	// disable breakpoints
+	// disable user breakpoints
 	disable_breakpoints();
 
-#if KERNEL_BREAKPOINTS
+	// install kernel breakpoints
 	struct team* kernelTeam = team_get_kernel_team();
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 	install_breakpoints(kernelTeam->debug_info.arch_info);
 	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
-#endif
 
 	atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_INSTALLED);
 
@@ -762,7 +760,7 @@ x86_exit_user_debug_at_kernel_entry()
 
 
 /**
- *	Interrupts are disabled and will be enabled by the function.
+ *	Interrupts are disabled and will possibly be enabled by the function.
  */
 void
 x86_handle_debug_exception(struct iframe *frame)
@@ -839,7 +837,7 @@ x86_handle_debug_exception(struct iframe *frame)
 
 
 /**
- *	Interrupts are disabled and will be enabled by the function.
+ *	Interrupts are disabled and will possibly be enabled by the function.
  */
 void
 x86_handle_breakpoint_exception(struct iframe *frame)
