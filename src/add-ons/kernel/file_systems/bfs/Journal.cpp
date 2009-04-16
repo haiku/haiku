@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1091,18 +1091,21 @@ Transaction::AddInode(Inode* inode)
 	if (fJournal == NULL)
 		panic("Transaction is not running!");
 
-	InodeList::Iterator iterator = fLockedInodes.GetIterator();
-	while (iterator.HasNext()) {
-		if (iterator.Next() == inode) {
-			//dprintf("  inode %Ld already in transaction\n", inode->ID());
-			return;
-		}
-	}
+	// These flags can only change while holding the transaction lock
+	if ((inode->Flags() & INODE_IN_TRANSACTION) != 0)
+		return;
+
+	// We share the same list link with the removed list, so we have to remove
+	// the inode from that list here (and add it back when we no longer need it)
+	if ((inode->Flags() & INODE_DELETED) != 0)
+		GetVolume()->RemovedInodes().Remove(inode);
 
 	if (!GetVolume()->IsInitializing())
 		acquire_vnode(GetVolume()->FSVolume(), inode->ID());
+
 	rw_lock_write_lock(&inode->fLock);
 	fLockedInodes.Add(inode);
+	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
 }
 
 
@@ -1112,8 +1115,14 @@ Transaction::RemoveInode(Inode* inode)
 	if (fJournal == NULL)
 		panic("Transaction is not running!");
 
+	inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
 	fLockedInodes.Remove(inode);
 	rw_lock_write_unlock(&inode->fLock);
+
+	// See AddInode() why we do this here
+	if ((inode->Flags() & INODE_DELETED) != 0)
+		GetVolume()->RemovedInodes().Add(inode);
+
 	if (!GetVolume()->IsInitializing())
 		put_vnode(GetVolume()->FSVolume(), inode->ID());
 }
@@ -1123,7 +1132,13 @@ void
 Transaction::_UnlockInodes()
 {
 	while (Inode* inode = fLockedInodes.RemoveHead()) {
+		inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
 		rw_lock_write_unlock(&inode->fLock);
+
+		// See AddInode() why we do this here
+		if ((inode->Flags() & INODE_DELETED) != 0)
+			GetVolume()->RemovedInodes().Add(inode);
+
 		if (!GetVolume()->IsInitializing())
 			put_vnode(GetVolume()->FSVolume(), inode->ID());
 	}

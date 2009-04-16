@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * Parts of this code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -165,7 +165,8 @@ struct small_data {
 
 class Volume;
 
-#define SHORT_SYMLINK_NAME_LENGTH	144 // length incl. terminating '\0'
+#define SHORT_SYMLINK_NAME_LENGTH	144
+	// length incl. terminating '\0'
 
 struct bfs_inode {
 	int32		magic1;
@@ -181,13 +182,14 @@ struct bfs_inode {
 	uint32		type;				// attribute type
 
 	int32		inode_size;
-	uint32		etc;				// a pointer to the Inode object during construction
+	uint32		etc;
 
 	union {
 		data_stream		data;
 		char 			short_symlink[SHORT_SYMLINK_NAME_LENGTH];
 	};
 	int32		pad[4];
+		// we use this member as a doubly linked list link
 
 	small_data	small_data_start[0];
 
@@ -222,6 +224,8 @@ enum inode_flags {
 	INODE_PERMANENT_FLAGS	= 0x0000ffff,
 
 	INODE_WAS_WRITTEN		= 0x00020000,
+	INODE_IN_TRANSACTION	= 0x00040000,
+
 	// The rest is only used by the file system check functionality
 	INODE_DONT_FREE_SPACE	= 0x00080000
 };

@@ -127,7 +127,6 @@ dump_inode(const bfs_inode* inode)
 	dump_block_run(	"  attributes         = ", inode->attributes);
 	Print("  type               = %u\n", (unsigned)inode->Type());
 	Print("  inode_size         = %u\n", (unsigned)inode->InodeSize());
-	Print("  etc                = %#08x\n", (int)inode->etc);
 	Print("  short_symlink      = %s\n",
 		S_ISLNK(inode->Mode()) && (inode->Flags() & INODE_LONG_SYMLINK) == 0
 			? inode->short_symlink : "-");

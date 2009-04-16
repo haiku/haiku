@@ -1147,7 +1147,7 @@ BlockAllocator::StartChecking(check_control* control)
 		// Lock the volume's journal
 
 	status_t status = mutex_lock(&fLock);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		fVolume->GetJournal(0)->Unlock(NULL, true);
 		return status;
 	}
@@ -1185,16 +1185,12 @@ BlockAllocator::StartChecking(check_control* control)
 	fCheckCookie = cookie;
 		// to be able to restore nicely if "chkbfs" exited abnormally
 
-#if !BFS_SHELL
 	// Put removed vnodes to the stack -- they are not reachable by traversing
 	// the file system anymore.
-	void* inode = NULL;
-	ino_t nodeID;
-	while (get_next_removed_vnode(fVolume->FSVolume(), &nodeID,	 &inode)
-			== B_OK) {
-		cookie->stack.Push(fVolume->ToBlockRun(nodeID));
+	InodeList::Iterator iterator = fVolume->RemovedInodes().GetIterator();
+	while (Inode* inode = iterator.Next()) {
+		cookie->stack.Push(inode->BlockRun());
 	}
-#endif
 
 	// TODO: check reserved area in bitmap!
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -24,7 +24,9 @@ class NodeGetter;
 class Transaction;
 
 
-class Inode : public SinglyLinkedListLinkImpl<Inode> {
+class Inode {
+	typedef DoublyLinkedListLink<Inode> Link;
+
 public:
 							Inode(Volume* volume, ino_t id);
 							Inode(Volume* volume, Transaction& transaction,
@@ -173,6 +175,11 @@ public:
 			void			AssertWriteLocked()
 								{ ASSERT_WRITE_LOCKED_RW_LOCK(&fLock); }
 #endif
+
+			Link*			GetDoublyLinkedListLink()
+								{ return (Link*)&fNode.pad[0]; }
+			const Link*		GetDoublyLinkedListLink() const
+								{ return (Link*)&fNode.pad[0]; }
 
 private:
 							Inode(const Inode& other);

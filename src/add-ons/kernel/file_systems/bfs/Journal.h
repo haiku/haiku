@@ -16,7 +16,6 @@ struct run_array;
 class Inode;
 class LogEntry;
 typedef DoublyLinkedList<LogEntry> LogEntryList;
-typedef SinglyLinkedList<Inode> InodeList;
 
 
 class Journal {

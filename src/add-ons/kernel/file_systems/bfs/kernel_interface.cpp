@@ -266,7 +266,7 @@ bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	}
 
 	status_t status = node->InitCheck(volume);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		if ((node->Flags() & INODE_DELETED) != 0) {
 			INFORM(("inode at %Ld is already deleted!\n", id));
 		} else {
@@ -281,7 +281,7 @@ bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		return B_NO_MEMORY;
 
 	status = inode->InitCheck(false);
-	if (status < B_OK)
+	if (status != B_OK)
 		delete inode;
 
 	if (status == B_OK) {
@@ -328,19 +328,19 @@ bfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	// The "chkbfs" functionality uses this flag to prevent the space used
-	// up by the inode from being freed - this flag is set only in situations
-	// where this is a good idea... (the block bitmap will get fixed anyway
-	// in this case).
-	if (inode->Flags() & INODE_DONT_FREE_SPACE) {
-		delete inode;
-		return B_OK;
-	}
-
 	// If the inode isn't in use anymore, we were called before
 	// bfs_unlink() returns - in this case, we can just use the
 	// transaction which has already deleted the inode.
 	Transaction transaction(volume, volume->ToBlock(inode->Parent()));
+
+	// The "chkbfs" functionality uses this flag to prevent the space used
+	// up by the inode from being freed - this flag is set only in situations
+	// where this is a good idea... (the block bitmap will get fixed anyway
+	// in this case).
+	if ((inode->Flags() & INODE_DONT_FREE_SPACE) != 0) {
+		delete inode;
+		return B_OK;
+	}
 
 	status_t status = inode->Free(transaction);
 	if (status == B_OK) {

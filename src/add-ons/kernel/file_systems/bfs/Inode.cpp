@@ -335,6 +335,7 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	NodeGetter node(volume, this);
 	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
+	fNode.flags &= HOST_ENDIAN_TO_BFS_INT32(INODE_PERMANENT_FLAGS);
 
 	char lockName[B_OS_NAME_LENGTH];
 	snprintf(lockName, sizeof(lockName), "bfs inode %d.%d",
@@ -411,6 +412,9 @@ Inode::~Inode()
 	file_map_delete(Map());
 	delete fTree;
 
+	if ((Flags() & INODE_DELETED) != 0)
+		fVolume->RemovedInodes().Remove(this);
+
 	rw_lock_destroy(&fLock);
 }
 
@@ -424,7 +428,7 @@ Inode::InitCheck(bool checkNode)
 		if (status == B_BUSY)
 			return B_BUSY;
 
-		if (status < B_OK) {
+		if (status != B_OK) {
 			FATAL(("inode at block %Ld corrupt!\n", BlockNumber()));
 			RETURN_ERROR(B_BAD_DATA);
 		}
@@ -436,7 +440,7 @@ Inode::InitCheck(bool checkNode)
 			RETURN_ERROR(B_NO_MEMORY);
 
 		status_t status = fTree->InitCheck();
-		if (status < B_OK) {
+		if (status != B_OK) {
 			FATAL(("inode tree at block %Ld corrupt!\n", BlockNumber()));
 			RETURN_ERROR(B_BAD_DATA);
 		}
@@ -551,7 +555,7 @@ Inode::_MakeSpaceForSmallData(Transaction& transaction, bfs_inode* node,
 		Inode* attribute;
 		status_t status = CreateAttribute(transaction, item->Name(),
 			item->Type(), &attribute);
-		if (status < B_OK)
+		if (status != B_OK)
 			RETURN_ERROR(status);
 
 		size_t length = item->DataSize();
@@ -559,7 +563,7 @@ Inode::_MakeSpaceForSmallData(Transaction& transaction, bfs_inode* node,
 
 		ReleaseAttribute(attribute);
 
-		if (status < B_OK) {
+		if (status != B_OK) {
 			Vnode vnode(fVolume, Attributes());
 			Inode* attributes;
 			if (vnode.Get(&attributes) < B_OK
@@ -947,6 +951,8 @@ Inode::_RemoveAttribute(Transaction& transaction, const char* name,
 		return status;
 
 	if (attributes->IsEmpty()) {
+		attributes->WriteLockInTransaction(transaction);
+
 		// remove attribute directory (don't fail if that can't be done)
 		if (remove_vnode(fVolume->FSVolume(), attributes->ID()) == B_OK) {
 			// update the inode, so that no one will ever doubt it's deleted :-)
@@ -954,8 +960,11 @@ Inode::_RemoveAttribute(Transaction& transaction, const char* name,
 			if (attributes->WriteBack(transaction) == B_OK) {
 				Attributes().SetTo(0, 0, 0);
 				WriteBack(transaction);
-			} else
+			} else {
 				unremove_vnode(fVolume->FSVolume(), attributes->ID());
+				attributes->Node().flags
+					&= ~HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -22,6 +22,8 @@ enum volume_flags {
 enum volume_initialize_flags {
 	VOLUME_NO_INDICES	= 0x0001,
 };
+
+typedef DoublyLinkedList<Inode> InodeList;
 
 class Volume {
 public:
@@ -86,6 +88,9 @@ public:
 
 			status_t		CreateIndicesRoot(Transaction& transaction);
 
+			InodeList&		RemovedInodes() { return fRemovedInodes; }
+				// This list is guarded by the transaction lock
+
 			// block bitmap
 			BlockAllocator&	Allocator();
 			status_t		AllocateForInode(Transaction& transaction,
@@ -127,7 +132,7 @@ public:
 								uint32* _offset = NULL);
 	static	status_t		Identify(int fd, disk_super_block* superBlock);
 
-	protected:
+protected:
 			fs_volume*		fVolume;
 			int				fDevice;
 			disk_super_block fSuperBlock;
@@ -155,6 +160,8 @@ public:
 
 			void*			fBlockCache;
 			thread_id		fCheckingThread;
+
+			InodeList		fRemovedInodes;
 };
 
 
