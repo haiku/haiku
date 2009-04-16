@@ -62,6 +62,7 @@ struct net_socket_private : net_socket,
 	mutex						lock;
 
 	bool						is_connected;
+	bool						is_in_socket_list;
 };
 
 
@@ -82,7 +83,8 @@ net_socket_private::net_socket_private()
 	max_backlog(0),
 	child_count(0),
 	select_pool(NULL),
-	is_connected(false)
+	is_connected(false),
+	is_in_socket_list(false)
 {
 	first_protocol = NULL;
 	first_info = NULL;
@@ -111,9 +113,10 @@ net_socket_private::~net_socket_private()
 	if (parent != NULL)
 		panic("socket still has a parent!");
 
-	mutex_lock(&sSocketLock);
-	sSocketList.Remove(this);
-	mutex_unlock(&sSocketLock);
+	if (is_in_socket_list) {
+		MutexLocker _(sSocketLock);
+		sSocketList.Remove(this);
+	}
 
 	mutex_lock(&lock);
 
@@ -135,12 +138,16 @@ net_socket_private::~net_socket_private()
 void
 net_socket_private::RemoveFromParent()
 {
+	ASSERT(!is_in_socket_list && parent != NULL);
+
 	parent->RemoveReference();
 	parent = NULL;
 
 	mutex_lock(&sSocketLock);
 	sSocketList.Add(this);
 	mutex_unlock(&sSocketLock);
+
+	is_in_socket_list = true;
 
 	RemoveReference();
 }
@@ -318,7 +325,7 @@ dump_socket(int argc, char** argv)
 	kprintf("  max backlog:          %ld\n", socket->max_backlog);
 	kprintf("  is connected:         %d\n", socket->is_connected);
 	kprintf("  child_count:          %lu\n", socket->child_count);
-	
+
 	if (socket->child_count == 0)
 		return 0;
 
@@ -346,7 +353,7 @@ dump_sockets(int argc, char** argv)
 	SocketList::Iterator iterator = sSocketList.GetIterator();
 	while (net_socket_private* socket = iterator.Next()) {
 		print_socket_line(socket, "");
-		
+
 		SocketList::Iterator childIterator
 			= socket->pending_children.GetIterator();
 		while (net_socket_private* child = childIterator.Next()) {
@@ -383,6 +390,7 @@ socket_open(int family, int type, int protocol, net_socket** _socket)
 	}
 
 	socket->owner = team_get_current_team_id();
+	socket->is_in_socket_list = true;
 
 	mutex_lock(&sSocketLock);
 	sSocketList.Add(socket);
@@ -1063,7 +1071,7 @@ socket_get_option(net_socket* socket, int level, int option, void* value,
 			*_length = sizeof(int32);
 			return B_OK;
 		}
-	
+
 		case SO_ERROR:
 		{
 			int32* _set = (int32*)value;
