@@ -802,7 +802,7 @@ BBox::_ValidateLayoutData()
 			fLayoutData->insets.Set(1, 1, 1, 1);
 			break;
 		case B_FANCY_BORDER:
-			fLayoutData->insets.Set(2, 2, 2, 2);
+			fLayoutData->insets.Set(3, 3, 3, 3);
 			break;
 		case B_NO_BORDER:
 		default:
