@@ -22,7 +22,6 @@ enum screen_corner {
 
 // time flags
 enum {
-	SAVER_DISABLED = 0x00,
 	ENABLE_SAVER = 0x01,
 	ENABLE_DPMS_STAND_BY = 0x02,
 	ENABLE_DPMS_SUSPEND = 0x04,

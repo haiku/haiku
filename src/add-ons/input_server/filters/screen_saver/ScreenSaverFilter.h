@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,7 +47,7 @@ public:
 			void				CheckCornerInvoke();
 
 			void				ReloadSettings();
-			void				SetEnabled(bool enabled);
+			void				SetIsRunning(bool isRunning);
 
 private:
 			uint32				_SnoozeTime() {return fSnoozeTime;}
@@ -76,7 +76,7 @@ private:
 			bool				fWatchingDirectory;
 			bool				fWatchingFile;
 
-			bool				fEnabled;
+			bool				fIsRunning;
 };
 
 #endif	/* SCREEN_SAVER_FILTER_H */

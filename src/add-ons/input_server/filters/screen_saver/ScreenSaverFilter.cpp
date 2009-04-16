@@ -67,7 +67,7 @@ ScreenSaverController::MessageReceived(BMessage *message)
 			const char *signature;
 			if (message->FindString("be:signature", &signature) == B_OK
 				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0) {
-				fFilter->SetEnabled(message->what == B_SOME_APP_LAUNCHED);
+				fFilter->SetIsRunning(message->what == B_SOME_APP_LAUNCHED);
 			}
 			break;
 		}
@@ -100,7 +100,7 @@ ScreenSaverFilter::ScreenSaverFilter()
 	fCornerRunner(NULL),
 	fWatchingDirectory(false),
 	fWatchingFile(false),
-	fEnabled(false)
+	fIsRunning(false)
 {
 	fController = new (std::nothrow) ScreenSaverController(this);
 	if (fController == NULL)
@@ -173,13 +173,16 @@ void
 ScreenSaverFilter::_Invoke()
 {
 	if (fCurrentCorner == fNeverBlankCorner && fNeverBlankCorner != NO_CORNER
-		|| fSettings.TimeFlags() == SAVER_DISABLED
-		|| fEnabled
+		|| (fSettings.TimeFlags() & ENABLE_SAVER) == 0
+		|| fIsRunning
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
 
-	if (be_roster->Launch(SCREEN_BLANKER_SIG) == B_OK)
-		fEnabled = true;
+	if (be_roster->Launch(SCREEN_BLANKER_SIG) == B_OK) {
+		// Already set the running state to avoid launching
+		// the blanker twice in any case.
+		fIsRunning = true;
+	}
 }
 
 
@@ -224,10 +227,11 @@ ScreenSaverFilter::ReloadSettings()
 
 
 void
-ScreenSaverFilter::SetEnabled(bool enabled)
+ScreenSaverFilter::SetIsRunning(bool isRunning)
 {
+	// called from the controller BLooper
 	BAutolock _(this);
-	fEnabled = enabled;
+	fIsRunning = isRunning;
 }
 
 
@@ -247,7 +251,7 @@ ScreenSaverFilter::CheckTime()
 	// snooze for blankTime.
 	// Otherwise, there was an event in the middle of the last snooze, so snooze
 	// for the remainder.
-	if (fEnabled || fLastEventTime + fBlankTime <= now)
+	if (fIsRunning || fLastEventTime + fBlankTime <= now)
 		fSnoozeTime = fBlankTime;
 	else
 		fSnoozeTime = fLastEventTime + fBlankTime - now;
