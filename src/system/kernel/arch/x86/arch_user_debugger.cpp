@@ -788,12 +788,6 @@ x86_handle_debug_exception(struct iframe *frame)
 
 	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
 
-	if (!IFRAME_IS_USER(frame)) {
-		panic("debug exception in kernel mode: dr6: 0x%lx, dr7: 0x%lx", dr6,
-			dr7);
-		return;
-	}
-
 	// check, which exception condition applies
 	if (dr6 & X86_DR6_BREAKPOINT_MASK) {
 		// breakpoint
@@ -814,40 +808,59 @@ x86_handle_debug_exception(struct iframe *frame)
 			}
 		}
 
-		// enable interrupts and notify the debugger
-		enable_interrupts();
+		if (IFRAME_IS_USER(frame)) {
+			// enable interrupts and notify the debugger
+			enable_interrupts();
 
-		if (watchpoint)
-			user_debug_watchpoint_hit();
-		else
-			user_debug_breakpoint_hit(false);
+			if (watchpoint)
+				user_debug_watchpoint_hit();
+			else
+				user_debug_breakpoint_hit(false);
+		} else {
+			panic("hit kernel %spoint: dr6: 0x%lx, dr7: 0x%lx",
+				watchpoint ? "watch" : "break", dr6, dr7);
+		}
 	} else if (dr6 & (1 << X86_DR6_BD)) {
 		// general detect exception
 		// Occurs only, if GD in DR7 is set (which we don't do) and someone
 		// tries to write to the debug registers.
-		dprintf("i386_handle_debug_exception(): ignoring spurious general "
-			"detect exception\n");
+		if (IFRAME_IS_USER(frame)) {
+			dprintf("i386_handle_debug_exception(): ignoring spurious general "
+				"detect exception\n");
 
-		enable_interrupts();
+			enable_interrupts();
+		} else
+			panic("spurious general detect exception in kernel mode");
 	} else if ((dr6 & (1 << X86_DR6_BS)) || sQEmuSingleStepHack) {
 		// single step
 
-		// enable interrupts and notify the debugger
-		enable_interrupts();
+		if (IFRAME_IS_USER(frame)) {
+			// enable interrupts and notify the debugger
+			enable_interrupts();
 
-		user_debug_single_stepped();
+			user_debug_single_stepped();
+		} else
+			panic("kernel single step");
 	} else if (dr6 & (1 << X86_DR6_BT)) {
 		// task switch
 		// Occurs only, if T in EFLAGS is set (which we don't do).
-		dprintf("i386_handle_debug_exception(): ignoring spurious task switch "
-			"exception\n");
+		if (IFRAME_IS_USER(frame)) {
+			dprintf("i386_handle_debug_exception(): ignoring spurious task switch "
+				"exception\n");
 
-		enable_interrupts();
+			enable_interrupts();
+		} else
+			panic("spurious task switch exception in kernel mode");
 	} else {
-		TRACE(("i386_handle_debug_exception(): ignoring spurious debug "
-			"exception (no condition recognized)\n"));
+		if (IFRAME_IS_USER(frame)) {
+			TRACE(("i386_handle_debug_exception(): ignoring spurious debug "
+				"exception (no condition recognized)\n"));
 
-		enable_interrupts();
+			enable_interrupts();
+		} else {
+			panic("spurious debug exception in kernel mode (no condition "
+				"recognized)");
+		}
 	}
 }
 
