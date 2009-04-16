@@ -27,7 +27,7 @@
 
 BStringView::BStringView(BRect frame, const char* name, const char* text,
 			uint32 resizeMask, uint32 flags)
-	:	BView(frame, name, resizeMask, flags),
+	:	BView(frame, name, resizeMask, flags | B_FULL_UPDATE_ON_RESIZE),
 		fText(text ? strdup(text) : NULL),
 		fAlign(B_ALIGN_LEFT),
 		fPreferredSize(-1, -1)
@@ -36,7 +36,7 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 
 
 BStringView::BStringView(const char* name, const char* text, uint32 flags)
-	:	BView(name, flags),
+	:	BView(name, flags | B_FULL_UPDATE_ON_RESIZE),
 		fText(text ? strdup(text) : NULL),
 		fAlign(B_ALIGN_LEFT),
 		fPreferredSize(-1, -1)
@@ -60,6 +60,7 @@ BStringView::BStringView(BMessage* data)
 		text = NULL;
 
 	SetText(text);
+	SetFlags(Flags() | B_FULL_UPDATE_ON_RESIZE);
 }
 
 
@@ -298,7 +299,6 @@ BStringView::SetFont(const BFont* font, uint32 mask)
 	BView::SetFont(font, mask);
 
 	InvalidateLayout();
-	Invalidate();
 }
 
 
@@ -367,7 +367,7 @@ BStringView::Perform(perform_code code, void* _data)
 			BStringView::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
