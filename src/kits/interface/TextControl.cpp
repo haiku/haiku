@@ -831,8 +831,8 @@ BTextControl::DoLayout()
 
 	// text view
 	BRect dirty(fText->Frame());
-	BRect textFrame(divider + 1, kFrameMargin, size.width - 2,
-		size.height - kFrameMargin);
+	BRect textFrame(divider + kFrameMargin, kFrameMargin,
+		size.width - kFrameMargin, size.height - kFrameMargin);
 
 	// place the text view and set the divider
 	BLayoutUtils::AlignInFrame(fText, textFrame);
@@ -1030,7 +1030,7 @@ BTextControl::_LayoutTextView()
 	frame.left = fDivider;
 	// we are stroking the frame around the text view, which
 	// is 2 pixels wide
-	frame.InsetBy(2.0, 2.0);
+	frame.InsetBy(kFrameMargin, kFrameMargin);
 	fText->MoveTo(frame.left, frame.top);
 	fText->ResizeTo(frame.Width(), frame.Height());
 	fText->AlignTextRect();

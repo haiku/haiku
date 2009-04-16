@@ -833,7 +833,7 @@ BMenuField::DoLayout()
 
 	// menu bar
 	BRect dirty(fMenuBar->Frame());
-	BRect menuBarFrame(divider + 1, kVMargin, size.width - 2,
+	BRect menuBarFrame(divider + kVMargin, kVMargin, size.width - kVMargin,
 		size.height - kVMargin);
 
 	// place the menu bar and set the divider
@@ -1104,14 +1104,8 @@ BMenuField::_ValidateLayoutData()
 	TRACE("menu bar min width: %.2f\n", fLayoutData->menu_bar_min.width);
 
 	// compute our minimal (== preferred) size
-	// TODO: The layout is a bit broken. A one pixel wide border is drawn
-	// around the menu bar to give it it's look. When the view has the focus,
-	// additionally a one pixel wide blue frame is drawn around it. In order
-	// to be able to easily visually align the menu bar with the text view of
-	// a text control, the divider must ignore the focus frame, though. Hence
-	// we add one less pixel to our width.
 	BSize min(fLayoutData->menu_bar_min);
-	min.width += 2 * kVMargin - 1;
+	min.width += 2 * kVMargin;
 	min.height += 2 * kVMargin;
 
 	if (divider > 0)
@@ -1131,7 +1125,7 @@ BMenuField::_ValidateLayoutData()
 float
 BMenuField::_MenuBarOffset() const
 {
-	return max_c(kVMargin, fDivider + 1);
+	return max_c(kVMargin, fDivider + kVMargin);
 }
 
 
@@ -1276,9 +1270,8 @@ BMenuField::MenuBarLayoutItem::BaseMinSize()
 {
 	fParent->_ValidateLayoutData();
 
-	// TODO: Cf. the TODO in _ValidateLayoutData().
 	BSize size = fParent->fLayoutData->menu_bar_min;
-	size.width += 2 * kVMargin - 1;
+	size.width += 2 * kVMargin;
 	size.height += 2 * kVMargin;
 
 	return size;
