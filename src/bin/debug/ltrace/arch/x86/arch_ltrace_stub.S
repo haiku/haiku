@@ -38,7 +38,9 @@ FUNCTION_END(arch_call_stub_size)
 
 
 
-// void arch_init_call_stub(void* stub, void* callback, void* function);
+// void arch_init_call_stub(void* stub,
+//		void* (*callback)(const void* stub, const void* args),
+//		void* function);
 FUNCTION(arch_init_call_stub):
 	push	%ebp
 	movl	%esp, %ebp
