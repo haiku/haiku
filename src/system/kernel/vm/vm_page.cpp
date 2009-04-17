@@ -32,6 +32,7 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 
+#include "VMAnonymousCache.h"
 #include "IORequest.h"
 #include "PageCacheLocker.h"
 
@@ -1120,7 +1121,9 @@ PageWriterRun::Go()
 			{
 				InterruptsSpinLocker locker(sPageLock);
 				page->state = PAGE_STATE_MODIFIED;
-				enqueue_page(&sModifiedPageQueue, page);
+				enqueue_page_to_head(&sModifiedPageQueue, page);
+					// Enqueue to the head, so we don't put it behind the
+					// page writer's marker again.
 			}
 
 			if (!page->busy_writing) {
@@ -1243,7 +1246,8 @@ page_writer(void* /*unused*/)
 			if (page->wired_count > 0
 				|| (cache->temporary
 #if ENABLE_SWAP_SUPPORT
-					&& (!lowOnPages /*|| page->usage_count > 0*/)
+					&& (!lowOnPages /*|| page->usage_count > 0*/
+						|| swap_available_pages() == 0)
 #endif
 				)) {
 				continue;
