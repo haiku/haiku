@@ -31,6 +31,31 @@ typedef struct {
 #define kNotSupported	"not supported"
 #define kSupported		"supported"
 
+char *dma_mode_strings[] = {
+	"Multiword DMA Mode 0 - 4.2 MB/s",
+	"Multiword DMA Mode 1 - 13.3 MB/s",
+	"Multiword DMA Mode 2 - 16.7 MB/s",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Invalid",
+	"Ultra DMA Mode 0 - 16.7 MB/s",
+	"Ultra DMA Mode 1 - 25 MB/s",
+	"Ultra DMA Mode 2 - 33.3 MB/s",
+	"Ultra DMA Mode 3 - 44.4 MB/s",
+	"Ultra DMA Mode 4 - 66.7 MB/s",
+	"Ultra DMA Mode 5 - 100 MB/s",
+	"Ultra DMA Mode 6 - 133 MB/s"
+};
 
 static void
 sizeAsString(off_t size, char *string)
@@ -117,7 +142,7 @@ main(int argc, char **argv)
 		if (st.dma_status > 6)
 			printf("Bad dma_status field\n");
 		else
-			printf("DMA mode: 0x%02x\n", st.dma_mode);
+			printf("DMA mode: %s\n", dma_mode_strings[st.dma_mode]);
 	}
 
 	printf("READ/WRITE DMA QUEUED: %s\n",
