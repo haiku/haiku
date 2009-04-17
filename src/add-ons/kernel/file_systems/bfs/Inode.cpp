@@ -1498,7 +1498,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	if (pos + length > Size()) {
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			*_length = 0;
 			WriteLockInTransaction(transaction);
 			RETURN_ERROR(status);
@@ -1511,7 +1511,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		// go into this transaction (we cannot wait until the file
 		// is closed)
 		status = WriteBack(transaction);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			WriteLockInTransaction(transaction);
 			return status;
 		}

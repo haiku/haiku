@@ -1103,7 +1103,7 @@ Transaction::AddInode(Inode* inode)
 	if (!GetVolume()->IsInitializing())
 		acquire_vnode(GetVolume()->FSVolume(), inode->ID());
 
-	rw_lock_write_lock(&inode->fLock);
+	rw_lock_write_lock(&inode->Lock());
 	fLockedInodes.Add(inode);
 	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
 }
@@ -1117,7 +1117,7 @@ Transaction::RemoveInode(Inode* inode)
 
 	inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
 	fLockedInodes.Remove(inode);
-	rw_lock_write_unlock(&inode->fLock);
+	rw_lock_write_unlock(&inode->Lock());
 
 	// See AddInode() why we do this here
 	if ((inode->Flags() & INODE_DELETED) != 0)
@@ -1133,7 +1133,7 @@ Transaction::_UnlockInodes()
 {
 	while (Inode* inode = fLockedInodes.RemoveHead()) {
 		inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
-		rw_lock_write_unlock(&inode->fLock);
+		rw_lock_write_unlock(&inode->Lock());
 
 		// See AddInode() why we do this here
 		if ((inode->Flags() & INODE_DELETED) != 0)

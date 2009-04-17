@@ -19,7 +19,6 @@ class TreeIterator;
 class AttributeIterator;
 class Index;
 class InodeAllocator;
-class InodeReadLocker;
 class NodeGetter;
 class Transaction;
 
@@ -188,8 +187,6 @@ private:
 
 	friend class AttributeIterator;
 	friend class InodeAllocator;
-	friend class InodeReadLocker;
-	friend class Transaction;
 
 			// small_data access methods
 			status_t		_MakeSpaceForSmallData(Transaction& transaction,
@@ -253,7 +250,7 @@ class InodeReadLocker {
 public:
 	InodeReadLocker(Inode* inode)
 		:
-		fLock(&inode->fLock)
+		fLock(&inode->Lock())
 	{
 		rw_lock_read_lock(fLock);
 	}

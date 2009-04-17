@@ -755,8 +755,13 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 				return status;
 
 			// fill the new blocks (if any) with zeros
-			if ((mask & B_STAT_SIZE_INSECURE) == 0)
+			if ((mask & B_STAT_SIZE_INSECURE) == 0) {
+				// We must not keep the inode locked during a write operation,
+				// or else we might deadlock.
+				rw_lock_write_unlock(&inode->Lock());
 				inode->FillGapWithZeros(oldSize, inode->Size());
+				rw_lock_write_lock(&inode->Lock());
+			}
 
 			if (!inode->IsDeleted()) {
 				Index index(volume);
