@@ -12,6 +12,7 @@ Addon mixer.media_addon :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
+	ResamplerSmooth.cpp
 	: be media
 ;
 

@@ -1,5 +1,3 @@
-#ifndef _RESAMPLER_H
-#define _RESAMPLER_H
 /* Copyright (C) 2003 Marcus Overhagen
  * Released under terms of the MIT license.
  *
@@ -10,6 +8,11 @@
  * both source and destination.
  *
  */
+#ifndef _RESAMPLER_H
+#define _RESAMPLER_H
+
+#include <SupportDefs.h>
+
 
 class Resampler
 {
@@ -53,4 +56,4 @@ Resampler::Resample(const void *src, int32 src_sample_offset, int32 src_sample_c
 	(this->*fFunc)(src, src_sample_offset, src_sample_count, dst, dst_sample_offset, dst_sample_count, gain);
 }
 
-#endif
+#endif // _RESAMPLER_H

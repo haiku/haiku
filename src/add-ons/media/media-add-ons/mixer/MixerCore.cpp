@@ -10,7 +10,8 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
-#include "Resampler.h"
+//#include "Resampler.h"
+#include "ResamplerSmooth.h"
 #include "RtList.h"
 
 #include <Buffer.h>
@@ -261,9 +262,15 @@ MixerCore::ApplyOutputFormat()
 	}
 
 	fResampler = new Resampler * [fMixBufferChannelCount];
+#if 0
 	for (int i = 0; i < fMixBufferChannelCount; i++)
 		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, 
-										format.format);
+			format.format);
+#else
+	for (int i = 0; i < fMixBufferChannelCount; i++)
+		fResampler[i] = new ResamplerSmooth(media_raw_audio_format::B_AUDIO_FLOAT, 
+			format.format);
+#endif
 	
 	TRACE("MixerCore::OutputFormatChanged:\n");
 	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
