@@ -379,15 +379,27 @@ print_features(uint32 features)
 #ifdef __INTEL__
 
 static void
-print_processor_signature(cpuid_info *info, const char *prefix)
+print_processor_signature(system_info *sys_info, cpuid_info *info, const char *prefix)
 {
-	printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
-		prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
-		info->eax_1.type,
-		info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
-		info->eax_1.model + (info->eax_1.model == 0xf ? info->eax_1.extended_model << 4 : 0),
-		info->eax_1.stepping,
-		info->eax_1.features);
+
+	if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
+		printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+			info->eax_1.type,
+			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
+			info->eax_1.model + (info->eax_1.model == 0xf ? info->eax_1.extended_model << 4 : 0),
+			info->eax_1.stepping,
+			info->eax_1.features);
+	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		// model calculation is different for INTEL
+		printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+			info->eax_1.type,
+			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
+			info->eax_1.model + ((info->eax_1.family == 0xf || info->eax_1.family == 0x6) ? info->eax_1.extended_model << 4 : 0),
+			info->eax_1.stepping,
+			info->eax_1.features);
+	}
 }
 
 #endif	// __INTEL__
@@ -475,7 +487,7 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	get_cpuid(&cpuInfo, 1, cpu);
-	print_processor_signature(&cpuInfo, NULL);
+	print_processor_signature(info, &cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
 
 	if (maxStandardFunction >= 1) {
@@ -487,7 +499,7 @@ dump_cpu(system_info *info, int32 cpu)
 	/* Extended CPUID */
 	if (maxExtendedFunction >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		print_processor_signature(&cpuInfo, "Extended AMD: ");
+		print_processor_signature(info, &cpuInfo, "Extended AMD: ");
 
 		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86
 			|| (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
