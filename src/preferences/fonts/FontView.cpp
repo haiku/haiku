@@ -12,6 +12,8 @@
 
 #include "FontView.h"
 
+#include <string.h>
+
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <SpaceLayoutItem.h>
