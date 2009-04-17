@@ -325,7 +325,7 @@ SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
 
-local etcFiles = inputrc profile teapot.data ;
+local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;

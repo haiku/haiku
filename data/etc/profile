@@ -92,3 +92,9 @@ alias which='whence'
 function dir {
 	ls -lF "$@";
 }
+
+# enable programmable completion
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
