@@ -398,7 +398,8 @@ change_to_directory (newdir, nolinks)
      resolved path doesn't exist), fail immediately. */
   if (posixly_correct && nolinks == 0 && canon_failed)
     {
-      errno = ENOENT;
+      if (errno != ENOENT)
+	errno = ENOTDIR;
       return (0);
     }
 
