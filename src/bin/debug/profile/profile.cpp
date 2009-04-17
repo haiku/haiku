@@ -206,7 +206,7 @@ public:
 	status_t AddImage(team_id teamID, const image_info& imageInfo, int32 event)
 	{
 		// get a shared image
-		SharedImage* sharedImage;
+		SharedImage* sharedImage = NULL;
 		status_t error = _GetSharedImage(teamID, imageInfo, &sharedImage);
 		if (error != B_OK)
 			return error;
@@ -424,9 +424,9 @@ get_id(const char *str, int32 &id)
 */
 
 
-static void
+static bool
 process_event_buffer(ThreadManager& threadManager, uint8* buffer,
-	size_t bufferSize)
+	size_t bufferSize, team_id mainTeam)
 {
 //printf("process_event_buffer(%p, %lu)\n", buffer, bufferSize);
 	const uint8* bufferEnd = buffer + bufferSize;
@@ -452,8 +452,12 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 				system_profiler_team_removed* event
 					= (system_profiler_team_removed*)buffer;
 
-				// TODO: Print results!
 				threadManager.RemoveTeam(event->team);
+
+				// quit, if the main team we're interested in is gone
+				if (mainTeam >= 0 && event->team == mainTeam)
+					return true;
+
 				break;
 			}
 
@@ -525,12 +529,14 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 			{
 				// Marks the end of the ring buffer -- we need to ignore the
 				// remaining bytes.
-				return;
+				return false;
 			}
 		}
 
 		buffer += header->size;
 	}
+
+	return false;
 }
 
 
@@ -542,8 +548,20 @@ signal_handler(int signal, void* data)
 
 
 static void
-profile_all()
+profile_all(const char* const* programArgs, int programArgCount)
 {
+	// Load the executable, if we have to.
+	thread_id threadID = -1;
+	if (programArgCount >= 1) {
+		threadID = load_program(programArgs, programArgCount,
+			gOptions.profile_loading);
+		if (threadID < 0) {
+			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
+				programArgs[0], strerror(threadID));
+			exit(1);
+		}
+	}
+
 	// install signal handlers so we can exit gracefully
     struct sigaction action;
     action.sa_handler = (sighandler_t)signal_handler;
@@ -584,6 +602,10 @@ profile_all()
 		exit(1);
 	}
 
+	// resume the loaded team, if we have one
+	if (threadID >= 0)
+		resume_thread(threadID);
+
 	// main event loop
 	while (true) {
 		// get the current buffer
@@ -592,14 +614,20 @@ profile_all()
 		uint8* buffer = bufferBase + bufferStart;
 //printf("processing buffer of size %lu bytes\n", bufferSize);
 
+		bool quit;
 		if (bufferStart + bufferSize <= totalBufferSize) {
-			process_event_buffer(threadManager, buffer, bufferSize);
+			quit = process_event_buffer(threadManager, buffer, bufferSize,
+				threadID);
 		} else {
 			size_t remainingSize = bufferStart + bufferSize - totalBufferSize;
-			process_event_buffer(threadManager, buffer,
-				bufferSize - remainingSize);
-			process_event_buffer(threadManager, bufferBase, remainingSize);
+			quit = process_event_buffer(threadManager, buffer,
+					bufferSize - remainingSize, threadID)
+				|| process_event_buffer(threadManager, bufferBase,
+					remainingSize, threadID);
 		}
+
+		if (quit)
+			break;
 
 		// get next buffer
 		error = _kern_system_profiler_next_buffer(bufferSize);
@@ -707,13 +735,13 @@ main(int argc, const char* const* argv)
 	} else
 		gOptions.output = stdout;
 
-	if (gOptions.profile_all) {
-		profile_all();
-		return 0;
-	}
-
 	const char* const* programArgs = argv + optind;
 	int programArgCount = argc - optind;
+
+	if (gOptions.profile_all) {
+		profile_all(programArgs, programArgCount);
+		return 0;
+	}
 
 	// get thread/team to be debugged
 	thread_id threadID = -1;
