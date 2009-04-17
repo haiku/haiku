@@ -10837,7 +10837,7 @@ att4424|tty4424|teletype 4424:\
 	:ac=``aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~:\
 	:ae=\E(B:al=\EL:as=\E(0:bl=^G:bt=\EO:cd=\EJ:ce=\Ez:\
 	:cl=\E[H\E[2J:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:ct=\EF:\
-	:dc=\EP:dl=\EM:do=\EB:ei=:ho=\E[H:ic=\E^:im=:\
+	:dc=\EP:dl=\EM:do=\EB:im=:ei=:ho=\E[H:ic=\E^:\
 	:is=\E[20l\E[?7h:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:kC=\EJ:\
 	:kb=^H:kd=\E[B:kh=\E[H:kl=\E[D:kr=\E[C:ku=\E[A:le=^H:mb=\E3:\
 	:md=\E3:me=\EX\E~\EZ\E4\E(B:mh=\EW:mr=\E}:nd=\EC:nw=\EE:\
@@ -10853,7 +10853,7 @@ att4424-1|tty4424-1|teletype 4424 in display function group I:\
 	:ac=``aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~:\
 	:ae=\E(B:al=\EL:as=\E(0:bl=^G:bt=\EO:cd=\EJ:ce=\Ez:\
 	:cl=\E[H\E[2J:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:ct=\EF:\
-	:dc=\EP:dl=\EM:do=\EB:ei=:ho=\E[H:ic=\E^:im=:\
+	:dc=\EP:dl=\EM:do=\EB:im=:ei=:ho=\E[H:ic=\E^:\
 	:is=\E[20l\E[?7h:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:kb=^H:\
 	:kd=\EB:kl=\ED:kr=\EC:ku=\EA:le=^H:mb=\E3:md=\E3:\
 	:me=\EX\E~\EZ\E4\E(B:mh=\EW:mr=\E}:nd=\EC:nw=\EE:\
@@ -10871,7 +10871,7 @@ att4424m|tty4424m|teletype 4424M:\
 	:am:da:db:mi:\
 	:co#80:it#8:li#23:\
 	:al=\EL:bl=^G:ce=\E[K:cl=\E[2;H\E[J:cm=\E[%i%2;%2H\E[B:\
-	:cr=^M:dc=\EP:dl=\EM:do=^J:ei=:ic=\E^:im=:ip=2:\
+	:cr=^M:dc=\EP:dl=\EM:do=^J:im=:ei=:ic=\E^:ip=2:\
 	:is=\E[m\E[2;24r:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:kb=^H:\
 	:kd=\E[B:kh=\E[H:kl=\E[D:kr=\E[C:ku=\E[A:le=^H:me=\E[m:\
 	:nd=\E[C:nw=^M^J:se=\E[m:sf=^J:so=\E[7m:sr=\ET:ta=^I:\
@@ -10981,8 +10981,8 @@ att4426|tty4426|teletype 4426S:\
 	:ac=``aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~:\
 	:ae=\E(B:al=\EL:as=\E(0:bl=^G:cd=\E[J:ce=\E[0K:ch=\E[%dG:\
 	:cl=\E[H\E[2J\E[1U\E[H\E[2J\E[1V:cm=\E[%i%d;%dH:cr=^M:\
-	:ct=\E[3g:cv=\E[%dd:dc=\EP:dl=\E[M:do=\E[B:ei=:ho=\E[H:\
-	:i1=\Ec\E[?7h:ic=\E^:im=:is=\E[m\E[1;24r:k1=\EOP:k2=\EOQ:\
+	:ct=\E[3g:cv=\E[%dd:dc=\EP:dl=\E[M:do=\E[B:im=:ei=:ho=\E[H:\
+	:i1=\Ec\E[?7h:ic=\E^:is=\E[m\E[1;24r:k1=\EOP:k2=\EOQ:\
 	:k3=\EOR:k4=\EOS:k5=\EOT:k6=\EOU:k7=\EOV:k8=\EOW:kB=\EO:\
 	:kC=\E[2J:kH=\E[24;1H:kb=^H:kd=\EB:kh=\E[H:kl=\ED:kr=\EC:\
 	:ku=\EA:le=\E[D:ll=\E[24H:md=\E[5m:me=\E[m\E(B:mr=\E[7m:\
@@ -14246,7 +14246,7 @@ c108|concept108|c108-8p|concept108-8p|concept 108 w/8 pages:\
 	:pf=\036o \E\EQ!\EYP\027:po=\EQ"\EY(\027\EYD\Eo \036:\
 	:rp=\Er%.%+ :se=\Ed:sf=^J:so=\ED:ta=\011:\
 	:te=\Ev  \001\177p\Ep\r\n:ti=\EU\Ev  8p\Ep\r\E\025:\
-	:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
+	:ts=:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
 	:vb=\Ek\EK:ve=\Ew:vs=\EW:
 c108-4p|concept108-4p|concept 108 w/4 pages:\
 	:am:bs:eo:es:hs:mi:ul:xn:xo:\
@@ -14267,7 +14267,7 @@ c108-4p|concept108-4p|concept 108 w/4 pages:\
 	:pf=\036o \E\EQ!\EYP\027:po=\EQ"\EY(\027\EYD\Eo \036:\
 	:rp=\Er%.%+ :se=\Ed:sf=^J:so=\ED:ta=\011:\
 	:te=\Ev  \001 p\Ep\r\n:ti=\EU\Ev  8p\Ep\r\E\025:\
-	:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
+	:ts=:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
 	:vb=\Ek\EK:ve=\Ew:vs=\EW:
 c108-rv|c108-rv-8p|concept 108 w/8 pages in reverse video:\
 	:am:bs:eo:es:hs:mi:ul:xn:xo:\
@@ -14288,7 +14288,7 @@ c108-rv|c108-rv-8p|concept 108 w/8 pages in reverse video:\
 	:pf=\036o \E\EQ!\EYP\027:po=\EQ"\EY(\027\EYD\Eo \036:\
 	:rp=\Er%.%+ :se=\Ee:sf=^J:so=\EE:ta=\011:\
 	:te=\Ev  \002 p\Ep\r\n:ti=\EU\Ev  8p\Ep\r:\
-	:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
+	:ts=:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
 	:vb=\EK\Ek:ve=\Ew:vs=\EW:
 c108-rv-4p|concept108rv4p|concept 108 w/4 pages in reverse video:\
 	:am:bs:eo:es:hs:mi:ul:xn:xo:\
@@ -14309,7 +14309,7 @@ c108-rv-4p|concept108rv4p|concept 108 w/4 pages in reverse video:\
 	:pf=\036o \E\EQ!\EYP\027:po=\EQ"\EY(\027\EYD\Eo \036:\
 	:rp=\Er%.%+ :se=\Ee:sf=^J:so=\EE:ta=\011:\
 	:te=\Ev  \001 p\Ep\r\n:ti=\EU\Ev  8p\Ep\r\E\025:\
-	:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
+	:ts=:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
 	:vb=\EK\Ek:ve=\Ew:vs=\EW:
 c108-w|c108-w-8p|concept108-w-8|concept108-w8p|concept 108 w/8 pages in wide mode:\
 	:am:bs:eo:es:hs:mi:ul:xn:xo:\
@@ -14330,7 +14330,7 @@ c108-w|c108-w-8p|concept108-w-8|concept108-w8p|concept 108 w/8 pages in wide mod
 	:pf=\036o \E\EQ!\EYP\027:po=\EQ"\EY(\027\EYD\Eo \036:\
 	:rp=\Er%.%+ :se=\Ed:sf=^J:so=\ED:ta=\011:\
 	:te=\Ev  ^A0\001D\Ep\r\n:ti=\EU\Ev  8\001D\Ep\r:\
-	:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
+	:ts=:..ts=\E z"\E?\E\005\EE\Ea %+\s:ue=\Eg:up=\E;:us=\EG:\
 	:vb=\Ek\EK:ve=\Ew:vs=\EW:
 
 # Concept 100:
@@ -15066,7 +15066,7 @@ dgunix+ccc|Configurable color info for DG D430C terminals in DG-UNIX mode:\
 dg+ccc|Configurable color info for DG D430C terminals in DG mode:\
 	:cc:ut:\
 	:Co#52:NC#53:pa#26:\
-	:..Ip=\036RG0%p1%{16}%/%{48}%+%c%p1%{16}%m%{48}%+%c%p2%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p3%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p4%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p5%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p6%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p7%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c:\
+	:Ip=:..Ip=\036RG0%p1%{16}%/%{48}%+%c%p1%{16}%m%{48}%+%c%p2%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p3%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p4%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p5%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p6%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p7%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c:\
 	:oc=\036RG01\:00??00000000\036RG01;00000000??00\036RG01<007?00000000\036RG01=000000007?00:\
 	:op=\036RF4831\:\036RF2>31;\036RF1=31<\036RF3?31=:\
 	:sp=\036RG2%+^P%+^P:
@@ -15967,7 +15967,7 @@ d412-unix-s|d462-unix-s|d412+s|d462+s|Data General DASHER D412+/D462+ in Unix mo
 	:rc=\036F}11:\
 	:..sa=\036%?%p1%p3%|%p6%|%tD%eE%;%?%p2%p6%|%t\024%e\025%;\036P%?%p4%tI%eJ%;%?%p1%p5%|%t\034%e\035%;\036FS%?%p9%t11%e00%;:\
 	:sc=\036F}10:se=^^E^]:sf=^J:so=^^D^\:sr=^^I:ta=^I:\
-	:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
+	:ts=:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
 	:us=^T:ve=\036FQ5:vi=\036FQ0:\
 	:..wi=\036FB%?%p1%t%p1%2.2X0%;%p2%p1%-%{1}%+%2.2X0%?%{23}%p2%>%t%{23}%p2%-%2.2X0%;000\036FX%p3%2.2X%p4%2.2X:
 
@@ -16110,7 +16110,7 @@ d413-unix-s|d463-unix-s|Data General DASHER D413/D463 in DG-UNIX mode with statu
 	:rc=\036F}11:\
 	:..sa=\036%?%p1%p3%|%p6%|%tD%eE%;%?%p2%p6%|%t\024%e\025%;\036P%?%p4%tI%eJ%;%?%p1%p5%|%t\034%e\035%;\036FS%?%p9%t11%e00%;:\
 	:sc=\036F}10:se=^^E^]:sf=^J:so=^^D^\:sr=^^I:ta=^I:\
-	:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
+	:ts=:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
 	:us=^T:ve=\036FQ5:vi=\036FQ0:\
 	:..wi=\036FB%?%p1%t%p1%2.2X0%;%p2%p1%-%{1}%+%2.2X0%?%{23}%p2%>%t%{23}%p2%-%2.2X0%;000\036FX%p3%2.2X%p4%2.2X:
 d413-unix-sr|d463-unix-sr|Data General DASHER D413/D463 in DG-UNIX mode with scrolling region:\
@@ -16249,7 +16249,7 @@ d414-unix-s|d464-unix-s|Data General D414/D464 in DG-UNIX mode with status line:
 	:rc=\036F}11:\
 	:..sa=\036%?%p1%p3%|%p6%|%tD%eE%;%?%p2%p6%|%t\024%e\025%;\036P%?%p4%tI%eJ%;%?%p1%p5%|%t\034%e\035%;\036FS%?%p9%t11%e00%;:\
 	:sc=\036F}10:se=^^E^]:sf=^J:so=^^D^\:sr=^^I:ta=^I:\
-	:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
+	:ts=:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
 	:us=^T:ve=\036FQ5:vi=\036FQ0:\
 	:..wi=\036FB%?%p1%t%p1%2.2X0%;%p2%p1%-%{1}%+%2.2X0%?%{23}%p2%>%t%{23}%p2%-%2.2X0%;000\036FX%p3%2.2X%p4%2.2X:
 d414-unix-sr|d464-unix-sr|Data General D414/D464 in DG-UNIX mode with scrolling region:\
@@ -16318,7 +16318,7 @@ d430c-dg-ccc|d430-dg-ccc|Data General D430C in DG mode with configurable colors:
 	:FU=^^\::FV=^^;:FW=^^<:FX=^^=:FY=^^>:FZ=^^0:Fa=^^!:Fb=^^":\
 	:Fc=^^#:Fd=^^$:Fe=^^%:Ff=^^&:Fg=^^':Fh=^^(:Fi=^^):Fj=^^*:\
 	:Fk=^^+:Fl=^^,:Fm=^^-:Fn=^^.:Fo=^^\s:\
-	:..Ip=\036RG0%p1%{16}%/%{48}%+%c%p1%{16}%m%{48}%+%c%p2%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p3%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p4%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p5%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p6%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p7%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c:\
+	:Ip=:..Ip=\036RG0%p1%{16}%/%{48}%+%c%p1%{16}%m%{48}%+%c%p2%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p3%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p4%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p5%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p6%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c%p7%{256}%*%{1001}%/%Pa%ga%{16}%/%{48}%+%c%ga%{16}%m%{48}%+%c:\
 	:K1=^^\\:K3=^^]:K4=^^^:K5=^^_:ac=j$k"l!m#n)q+t'u&v(w%x*:\
 	:ae=\036FS00:al=^^FH:as=\036FS11:bl=^G:cd=^^FF:ce=^K:\
 	:ch=\020%.\177:cl=^L:cm=\020%r%.%.:cr=^M:cv=\020\177%.:\
@@ -16455,7 +16455,7 @@ d430c-unix-s|d430-unix-s|Data General D430C in DG-UNIX mode with status line:\
 	:r1=\036FA\036FT0:r2=\036P@1:rc=\036F}11:\
 	:..sa=\036%?%p1%p3%|%p6%|%tD%eE%;%?%p2%p6%|%t\024%e\025%;\036P%?%p4%tI%eJ%;%?%p1%p5%|%t\034%e\035%;\036FS%?%p9%t11%e00%;:\
 	:sc=\036F}10:se=^^E^]:sf=^J:so=^^D^\:sr=^^I:ta=^I:\
-	:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
+	:ts=:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:up=^^PA:\
 	:us=^T:ve=\036FQ5:vi=\036FQ0:\
 	:..wi=\036FB%?%p1%t%p1%2.2X0%;%p2%p1%-%{1}%+%2.2X0%?%{23}%p2%>%t%{23}%p2%-%2.2X0%;000\036FX%p3%2.2X%p4%2.2X:
 d430c-unix-sr|d430-unix-sr|Data General D430C in DG-UNIX mode with scrolling region:\
@@ -16612,7 +16612,7 @@ d430c-unix-s-ccc|d430-unix-s-ccc|Data General D430C in DG-UNIX mode with status 
 	:rc=\036F}11:\
 	:..sa=\036%?%p1%p3%|%p6%|%tD%eE%;%?%p2%p6%|%t\024%e\025%;\036P%?%p4%tI%eJ%;%?%p1%p5%|%t\034%e\035%;\036FS%?%p9%t11%e00%;:\
 	:sc=\036F}10:se=^^E^]:sf=^J:so=^^D^\:..sp=\036RG2%p1%02X:\
-	:sr=^^I:ta=^I:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:\
+	:sr=^^I:ta=^I:ts=:..ts=\036F}00\036FP%p1%2.2X18\036PG:ue=^U:\
 	:up=^^PA:us=^T:ve=\036FQ5:vi=\036FQ0:\
 	:..wi=\036FB%?%p1%t%p1%2.2X0%;%p2%p1%-%{1}%+%2.2X0%?%{23}%p2%>%t%{23}%p2%-%2.2X0%;000\036FX%p3%2.2X%p4%2.2X:
 d430c-unix-sr-ccc|d430-unix-sr-ccc|Data General D430C in DG-UNIX mode with scrolling region and configurable colors:\
@@ -18870,7 +18870,7 @@ hp2624b-10p-p|hewlett packard 2624 B w/ extra memory & printer:\
 hp+color|hp with colors:\
 	:cc:\
 	:Co#16:NC#17:pa#7:\
-	:..Ip=\E&v%?%p2%{1000}%=%t1%e.%p2%d%;a%?%p3%{1000}%=%t1%e.%p3%d%;b%?%p4%{1000}%=%t1%e.%p4%d%;c%?%p5%{1000}%=%t1%e.%p5%d%;x%?%p6%{1000}%=%t1%e.%p6%d%;y%?%p7%{1000}%=%t1%e.%p7%d%;z%p1%dI:\
+	:Ip=:..Ip=\E&v%?%p2%{1000}%=%t1%e.%p2%d%;a%?%p3%{1000}%=%t1%e.%p3%d%;b%?%p4%{1000}%=%t1%e.%p4%d%;c%?%p5%{1000}%=%t1%e.%p5%d%;x%?%p6%{1000}%=%t1%e.%p6%d%;y%?%p7%{1000}%=%t1%e.%p7%d%;z%p1%dI:\
 	:oc=\E&v0m1a1b1c0I\E&v1a1I\E&v1b2I\E&v1a1b3I\E&v1c4I\E&v1a1c5I\E&v1b1c6I\E&v1x1y7I:\
 	:op=\E&v0S:sp=\E&v%dS:
 
@@ -18879,7 +18879,7 @@ hp2397a|hp2397|hewlett packard 2397A color terminal:\
 	:am:bw:cc:mi:xo:xs:\
 	:Co#16:NC#17:Nl#8:co#80:lh#2:li#24:lw#8:pa#7:pb#4800:vt#6:\
 	:CM=\E&a%dr%dC:DO=\E&a+%dR:\
-	:..Ip=\E&v%?%p2%{1000}%=%t1%e.%p2%d%;a%?%p3%{1000}%=%t1%e.%p3%d%;b%?%p4%{1000}%=%t1%e.%p4%d%;c%?%p5%{1000}%=%t1%e.%p5%d%;x%?%p6%{1000}%=%t1%e.%p6%d%;y%?%p7%{1000}%=%t1%e.%p7%d%;z%p1%dI:\
+	:Ip=:..Ip=\E&v%?%p2%{1000}%=%t1%e.%p2%d%;a%?%p3%{1000}%=%t1%e.%p3%d%;b%?%p4%{1000}%=%t1%e.%p4%d%;c%?%p5%{1000}%=%t1%e.%p5%d%;x%?%p6%{1000}%=%t1%e.%p6%d%;y%?%p7%{1000}%=%t1%e.%p7%d%;z%p1%dI:\
 	:LE=\E&a-%dC:LF=\E&j@:LO=\E&jB:RI=\E&a+%dC:UP=\E&a-%dR:\
 	:ac=T1R!U2S"W3O#V4P$t5u6w7v8\:'9(LQKWlRkT5I3@2[MAJSmFjGdHQ;Y+Z*X\:4>q,x.n/:\
 	:ae=^O:al=\EL:as=^N:bl=^G:bt=\Ei:cd=\EJ:ce=\EK:ch=\E&a%dC:\
@@ -19218,7 +19218,7 @@ ibm5081|ibmmpel|IBM 5081 1024x1024 256/4096 Megapel color display:\
 	:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:me=\E[0m\E(B:\
 	:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:s0=\E(B:s1=\E(0:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EYA%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EYA%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 ibm5081-c|ibmmpel-c|IBM 5081 1024x1024 256/4096 Megapel enhanced color display:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#33:\
@@ -19229,7 +19229,7 @@ ibm5081-c|ibmmpel-c|IBM 5081 1024x1024 256/4096 Megapel enhanced color display:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\EB:sf=^J:so=\EF\Ef3;:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EYA%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
+	:ts=:..ts=\Ej\EYA%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
 ibm5151|wy60-AT|wyse60-AT|IBM 5151 Monochrome display:\
 	:am:bw:ms:xo:\
 	:co#80:it#8:li#25:\
@@ -19435,7 +19435,7 @@ ibm8514|IBM 8514 color display:\
 	:kh=\EH:kl=^H:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EYI%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EYI%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 ibm8514-c|IBM 8514 color display with standout and underline:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#41:\
@@ -19446,7 +19446,7 @@ ibm8514-c|IBM 8514 color display with standout and underline:\
 	:kh=\EH:kl=^H:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\EB:sf=^J:so=\EF\Ef3;:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EYI%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
+	:ts=:..ts=\Ej\EYI%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
 
 ibmaed|IBM Experimental display:\
 	:am:bs:eo:ms:\
@@ -19472,7 +19472,7 @@ ibmmono|IBM workstation monochrome:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 ibmega|IBM Enhanced Color Display:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#24:\
@@ -19483,7 +19483,7 @@ ibmega|IBM Enhanced Color Display:\
 	:kh=\EH:kl=^H:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 ibmega-c|ibm5154-c|IBM Enhanced Color Display with standout and underline:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#24:\
@@ -19494,7 +19494,7 @@ ibmega-c|ibm5154-c|IBM Enhanced Color Display with standout and underline:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\EB:sf=^J:so=\EF\Ef3;:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY8%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
+	:ts=:..ts=\Ej\EY8%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
 ibmvga-c|IBM VGA display color termcap:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#24:\
@@ -19505,7 +19505,7 @@ ibmvga-c|IBM VGA display color termcap:\
 	:kh=\EH:kl=^H:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\EB:sf=^J:so=\EF\Ef3;:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY8%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
+	:ts=:..ts=\Ej\EY8%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
 ibmvga|IBM VGA display:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#24:\
@@ -19516,7 +19516,7 @@ ibmvga|IBM VGA display:\
 	:kh=\EH:kl=^H:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EY8%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 # ibmapa* and ibmmono entries come from ACIS 4.3 distribution
 rtpc|ibmapa16|IBM 6155 Extended Monochrome Graphics Display:\
 	:am:bs:es:hs:xo:\
@@ -19528,7 +19528,7 @@ rtpc|ibmapa16|IBM 6155 Extended Monochrome Graphics Display:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY@%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EY@%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 # Advanced Monochrome (6153) and Color (6154) Graphics Display:
 ibmapa8c|ibmapa8|IBM 6153/4 Advanced Graphics Display:\
 	:am:bs:es:hs:xo:\
@@ -19540,7 +19540,7 @@ ibmapa8c|ibmapa8|IBM 6153/4 Advanced Graphics Display:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mk=\EF\Ef0;\Eb0;:mr=\Ep:nd=\EC:nw=^M^J:\
 	:se=\Ez:sf=^J:so=\EZ:sr=\EA:st=\E0:ta=^I:\
-	:..ts=\Ej\EY?%+ \Eo:ue=\Ew:up=\EA:us=\EW:
+	:ts=:..ts=\Ej\EY?%+ \Eo:ue=\Ew:up=\EA:us=\EW:
 ibmapa8c-c|ibm6154-c|IBM 6154 Advanced Color Graphics Display:\
 	:am:bs:es:hs:xo:\
 	:co#80:li#31:\
@@ -19551,7 +19551,7 @@ ibmapa8c-c|ibm6154-c|IBM 6154 Advanced Color Graphics Display:\
 	:kd=\EB:kh=\EH:kl=\ED:kr=\EC:ku=\EA:l0=f10:le=^H:md=\EZ:\
 	:me=\Ew\Eq\Ez\EB:mh=\EF\Ef7;:mk=\EF\Ef0;\Eb0;:mr=\Ep:\
 	:nd=\EC:nw=^M^J:se=\EB:sf=^J:so=\EF\Ef3;:sr=\EA:st=\E0:\
-	:ta=^I:..ts=\Ej\EY?%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
+	:ta=^I:ts=:..ts=\Ej\EY?%+ \Eo:ue=\EB:up=\EA:us=\EF\Ef2;:
 hft-c-old|HFT with Color PC850:\
 	:am:bw:ms:xo:\
 	:Co#8:co#80:it#8:li#25:pa#64:\
@@ -20448,7 +20448,7 @@ prism9|p9|P9|MDC Prism-9 in ANSII mode:\
 	:rs=\E[&p\E[<12l\E F\E[3g\E[9;17;25;33;41;49;57;65;73 N:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p9-w: Prism-9 in 132 column mode
@@ -20475,7 +20475,7 @@ prism9-w|p9-w|P9-W|MDC Prism-9 in 132 column mode:\
 	:rs=\E[&p\E[<12l\E F\E[<14h:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p9-8: Prism-9 in P8 mode
@@ -20539,7 +20539,7 @@ prism12|p12|P12|MDC Prism-12 in ANSI mode:\
 	:rs=\E[&p\E[<12l\E F\E[3g\E[9;17;25;33;41;49;57;65;73 N:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p12-w: Prism-12 in 132 column mode
@@ -20566,7 +20566,7 @@ prism12-w|p12-w|P12-W|MDC Prism-12 in 132 column mode:\
 	:rs=\E[&p\E[<12l\E F\E[<14h:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p12-m: Prism-12 in MDC emulation mode
@@ -20630,7 +20630,7 @@ prism14|p14|P14|MDC Prism-14 in ANSII mode:\
 	:rs=\E[&p\E[<12l\E F\E[3g\E[9;17;25;33;41;49;57;65;73 N:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p14-w: Prism-14 in 132 column mode
@@ -20657,7 +20657,7 @@ prism14-w|p14-w|P14-W|MDC Prism-14 in 132 column mode:\
 	:rs=\E[&p\E[<12l\E F\E[<14h:\
 	:..sa=\E[%{0}%?%p1%p3%|%t%{4}%+%;%?%p2%t%{2}%+%;%?%p4%t%{1}%+%;%?%p6%t%{8}%+%;%?%p8%t%{32}%+%;%d%%{%?%p9%t\016%e\017%;:\
 	:sc=\E[%y:se=\E[27m:sf=^J:so=\E[7m:sr=\E[L:st=\EH:ta=^I:\
-	:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
+	:ts=:..ts=\E[%i%p1%d%%}:ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[<4h:\
 	:vi=\E[<4l:
 
 # p14-m: Prism-14 in MDC emulation mode
@@ -22985,7 +22985,7 @@ tty40|ds40|ds40-2|dataspeed40|teletype dataspeed 40/2:\
 	:bs:xo:\
 	:co#80:li#24:\
 	:al=\EL:cd=\EJ:cl=\EH\EJ:cr=\EG:ct=\EH\E2:dc=\EP:dl=\EM:\
-	:do=\EB:ei=:ho=\EH:ic=\E^:im=:kb=^]:kl=^H:le=^H:nd=\EC:pf=^T:\
+	:do=\EB:im=:ei=:ho=\EH:ic=\E^:kb=^]:kl=^H:le=^H:nd=\EC:pf=^T:\
 	:po=\022:rs=\023\ER:se=\E4:sf=\ES:so=\E3:sr=\ET:st=\E1:\
 	:ta=\E@:up=\E7:
 tty43|model 43 teletype:\
@@ -25349,7 +25349,7 @@ z29|zenith29|z29b|zenith z29b:\
 	:is=\E<\E[?2h\Ev:k0=\E~:k1=\ES:k2=\ET:k3=\EU:k4=\EV:k5=\EW:\
 	:k6=\EP:k7=\EQ:k8=\ER:k9=\E0I:kb=^H:kd=\EB:kh=\EH:kl=\ED:\
 	:kr=\EC:ku=\EA:l0=home:le=^H:nd=\EC:se=\Eq:sf=\n:so=\Ep:\
-	:sr=2\EI:ta=^I:..ts=\Ej\Ex5\Ex1\EY8%+ \Eo:ue=\Es0:up=\EA:\
+	:sr=2\EI:ta=^I:ts=:..ts=\Ej\Ex5\Ex1\EY8%+ \Eo:ue=\Es0:up=\EA:\
 	:us=\Es8:ve=\Ey4:vs=\Ex4:
 # z29 in ansi mode. Assumes that the cursor is in the correct state, and that
 # the world is stable. <rs1> causes the terminal to be reset to the state
@@ -25486,7 +25486,7 @@ ztx|ztx11|zt-1|htx11|ztx-1-a|ztx-10 or 11:\
 	:is=\Ej\EH\Eq\Ek\Ev\Ey1\Ey5\EG\Ey8\Ey9\Ey>:k0=\ES:\
 	:k1=\EB:k2=\EU:k3=\EV:k4=\EW:k5=\EP:k6=\EQ:k7=\ER:kb=^H:\
 	:kd=\EB:kl=\ED:kr=\EC:ku=\EA:le=^H:nd=\EC:se=\Eq:so=\Es5:\
-	:sr=\EI:ta=^I:..ts=\Ej\Ex5\Ex1\EY8%+ \Eo:ue=\Eq:up=\EA:\
+	:sr=\EI:ta=^I:ts=:..ts=\Ej\Ex5\Ex1\EY8%+ \Eo:ue=\Eq:up=\EA:\
 	:us=\Es2:
 
 #### IMS International (ims)
