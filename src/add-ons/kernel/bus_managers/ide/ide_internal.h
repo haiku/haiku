@@ -352,7 +352,7 @@ bool finish_dma(ide_device_info *device);
 void abort_dma(ide_device_info *device, ide_qrequest *qrequest);
 
 bool configure_dma(ide_device_info *device);
-
+int get_device_dma_mode(ide_device_info *device);
 
 // emulation.c
 

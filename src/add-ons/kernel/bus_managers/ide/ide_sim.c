@@ -743,7 +743,7 @@ ide_sim_ioctl(ide_bus_info *bus, uint8 targetID, uint32 op, void *buffer, size_t
 				status.dma_status = 2;
 
 			status.pio_mode = 0;
-			status.dma_mode = 0;
+			status.dma_mode = get_device_dma_mode(device);
 
 			memcpy(buffer, &status, min(sizeof(status), length));
 			return B_OK;

@@ -10,7 +10,6 @@
 
 #include "ide_internal.h"
 
-
 #define CHECK_DEV_DMA_MODE(infoblock, elem, mode, this_mode, num_modes ) \
 	if( infoblock->elem ) { \
 		mode = this_mode; \
@@ -18,7 +17,7 @@
 	}
 
 
-static int
+int
 get_device_dma_mode(ide_device_info *device)
 {
 	ide_device_infoblock *infoblock = &device->infoblock;
