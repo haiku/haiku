@@ -16,14 +16,14 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 }
 
 # Enable altivec support
-SubDirCcFlags -faltivec -maltivec -mabi=altivec ;
+SubDirCcFlags -maltivec -mabi=altivec ;
 
 local defines ;
 defines = HAVE_AV_CONFIG_H=1 ;
 defines += ARCH_X86=0 ARCH_X86_32=0 ARCH_PPC=1 ARCH_SPARC=0 ;
 defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
 defines += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSE3=0 ; 
-defines += HAVE_ALTIVEC=1 HAVE_ALTIVEC_H=0 ;
+defines += HAVE_ALTIVEC=1 HAVE_ALTIVEC_H=1 ;
 defines += HAVE_VIS=0 ;
 
 defines = [ FDefines $(defines) ] ;

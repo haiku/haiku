@@ -19,20 +19,21 @@ if $(TARGET_ARCH) = x86 {
     defines += ARCH_X86=1 ARCH_X86_32=1 ARCH_PPC=0 ARCH_SPARC=0 ;
     defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
     defines += HAVE_MMX=1 HAVE_MMX2=1 HAVE_SSE=0 HAVE_SSE3=1 ; 
-    defines += HAVE_ALTIVEC=0 ;
+    defines += HAVE_ALTIVEC=0 HAVE_ALTIVEC_H=0 ;
     defines += HAVE_VIS=0 ;
 } else if $(TARGET_ARCH) = ppc {
     defines += ARCH_X86=0 ARCH_X86_32=0 ARCH_PPC=1 ARCH_SPARC=0 ;
     defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
     defines += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSE3=0 ; 
-    defines += HAVE_ALTIVEC=1 ;
+    defines += HAVE_ALTIVEC=1 HAVE_ALTIVEC_H=1 ;
     defines += HAVE_VIS=0 ;
     arch_sources = yuv2rgb_altivec.c ;
+    SubDirCcFlags -maltivec -mabi=altivec ;
 } else if $(TARGET_ARCH) = sparc {
     defines += ARCH_X86=0 ARCH_X86_32=0 ARCH_PPC=0 ARCH_SPARC=1 ;
     defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
     defines += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSE3=0 ; 
-    defines += HAVE_ALTIVEC=0 ;
+    defines += HAVE_ALTIVEC=0 HAVE_ALTIVEC_H=0 ;
     defines += HAVE_VIS=1 ;
     arch_sources = yuv2rgb_vis.c ;
 }
