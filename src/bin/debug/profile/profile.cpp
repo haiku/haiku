@@ -806,6 +806,7 @@ main(int argc, const char* const* argv)
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 				// a debugged team is gone -- quit, if it is our team
+				threadManager.RemoveTeam(message.origin.team);
 				quitLoop = message.origin.team == teamID;
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_EXEC:
