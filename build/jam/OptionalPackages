@@ -386,7 +386,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		Echo "No optional package NetSurf available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage NetSurf
-			: http://revolf.free.fr/beos/netsurf-bone.zip
+			: http://haiku-files.org/files/optional-packages/NetSurf-r7117-x86-gcc2-2009-04-17.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
