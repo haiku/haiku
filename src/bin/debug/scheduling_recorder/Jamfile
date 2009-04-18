@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src bin debug scheduling_recorder ;
+
+UsePrivateHeaders debug kernel libroot shared ;
+UsePrivateSystemHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+BinCommand scheduling_recorder
+	:
+	scheduling_recorder.cpp
+	:
+	<bin>debug_utils.a
+	libdebug.so
+	be
+	$(TARGET_LIBSTDC++)
+;

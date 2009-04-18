@@ -9,5 +9,6 @@ StaticLibrary <bin>debug_utils.a : debug_utils.cpp ;
 
 HaikuSubInclude ltrace ;
 HaikuSubInclude profile ;
+HaikuSubInclude scheduling_recorder ;
 HaikuSubInclude strace ;
 HaikuSubInclude time_stats ;
