@@ -173,6 +173,9 @@ virtual								~ATADevice();
 		status_t					ReadCapacity(ATARequest *request);
 virtual	status_t					ExecuteIO(ATARequest *request);
 
+		void						GetRestrictions(bool *noAutoSense,
+										uint32 *maxBlocks);
+
 		// ATA stuff
 virtual	bool						IsATAPI() { return false; };
 

@@ -190,9 +190,9 @@ ata_channel_added(device_node *parent)
 		// maximum number of blocks per transmission:
 		// - ATAPI uses packets, i.e. normal SCSI limits apply
 		//   but I'm not sure about controller restrictions
-		// - ATA allows up to 256 blocks
+		// - ATA allows up to 256 blocks for LBA28 and 65535 for LBA48
 		// to fix specific drive bugs use ATAChannel::GetRestrictions()
-		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 } },
+		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 0xffff } },
 		{ ATA_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: channelID } },
 		{ NULL }
 	};

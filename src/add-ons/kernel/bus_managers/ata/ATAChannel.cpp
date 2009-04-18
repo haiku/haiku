@@ -197,13 +197,10 @@ ATAChannel::GetRestrictions(uint8 targetID, bool *isATAPI, bool *noAutoSense,
 	// we always indicate ATAPI so we have to emulate fewer commands
 	*isATAPI = true;
 	*noAutoSense = false;
+	*maxBlocks = 0x100;
 
-	if (targetID < fDeviceCount && fDevices[targetID] != NULL
-		&& fDevices[targetID]->IsATAPI()) {
-		*noAutoSense = true;
-	}
-
-	*maxBlocks = 255;
+	if (targetID < fDeviceCount && fDevices[targetID] != NULL)
+		fDevices[targetID]->GetRestrictions(noAutoSense, maxBlocks);
 }
 
 

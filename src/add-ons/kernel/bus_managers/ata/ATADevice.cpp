@@ -286,6 +286,20 @@ ATADevice::ExecuteIO(ATARequest *request)
 }
 
 
+void
+ATADevice::GetRestrictions(bool *noAutoSense, uint32 *maxBlocks)
+{
+	if (IsATAPI())
+		*noAutoSense = true;
+	else {
+		if (fUse48Bits)
+			*maxBlocks = 0xffff;
+		else
+			*maxBlocks = 0x100;
+	}
+}
+
+
 status_t
 ATADevice::Select()
 {
