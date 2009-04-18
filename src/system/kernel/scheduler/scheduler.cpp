@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +16,30 @@
 #define SCHEDULER_TYPE 1
 
 struct scheduler_ops* gScheduler;
+SchedulerListenerList gSchedulerListeners;
+
+
+SchedulerListener::~SchedulerListener()
+{
+}
+
+
+/*!	Add the given scheduler listener. Thread lock must be held.
+*/
+void
+scheduler_add_listener(struct SchedulerListener* listener)
+{
+	gSchedulerListeners.Add(listener);
+}
+
+
+/*!	Remove the given scheduler listener. Thread lock must be held.
+*/
+void
+scheduler_remove_listener(struct SchedulerListener* listener)
+{
+	gSchedulerListeners.Remove(listener);
+}
 
 
 void

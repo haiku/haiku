@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +12,28 @@
 
 struct scheduling_analysis;
 struct thread;
+struct SchedulerListener;
+
+
+#ifdef __cplusplus
+
+#include <util/DoublyLinkedList.h>
+
+struct SchedulerListener : DoublyLinkedListLinkImpl<SchedulerListener> {
+	virtual						~SchedulerListener();
+
+	virtual	void				ThreadEnqueuedInRunQueue(
+									struct thread* thread) = 0;
+	virtual	void				ThreadRemovedFromRunQueue(
+									struct thread* thread) = 0;
+	virtual	void				ThreadScheduled(struct thread* oldThread,
+									struct thread* newThread) = 0;
+};
+
+typedef DoublyLinkedList<SchedulerListener> SchedulerListenerList;
+extern SchedulerListenerList gSchedulerListeners;
+
+#endif	// __cplusplus
 
 
 struct scheduler_ops {
@@ -29,7 +51,7 @@ struct scheduler_ops {
 	// called when a thread structure is freed - freeing up any allocated
 	// mem on the scheduler's part should be done here
 	void (*on_thread_destroy)(struct thread* thread);
-	
+
 	void (*start)(void);
 };
 
@@ -51,6 +73,9 @@ extern struct scheduler_ops* gScheduler;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void scheduler_add_listener(struct SchedulerListener* listener);
+void scheduler_remove_listener(struct SchedulerListener* listener);
 
 void scheduler_init(void);
 

@@ -101,6 +101,12 @@ simple_enqueue_in_run_queue(struct thread *thread)
 
 	T(EnqueueThread(thread, prev, curr));
 
+	// notify listeners
+	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
+			SchedulerListener* listener = it.Next();) {
+		listener->ThreadEnqueuedInRunQueue(thread);
+	}
+
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
@@ -166,6 +172,12 @@ simple_set_thread_priority(struct thread *thread, int32 priority)
 	// a new position.
 
 	T(RemoveThread(thread));
+
+	// notify listeners
+	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
+			SchedulerListener* listener = it.Next();) {
+		listener->ThreadRemovedFromRunQueue(thread);
+	}
 
 	// find thread in run queue
 	struct thread *item, *prev;
@@ -334,6 +346,12 @@ simple_reschedule(void)
 		sRunQueue = nextThread->queue_next;
 
 	T(ScheduleThread(nextThread, oldThread));
+
+	// notify listeners
+	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
+			SchedulerListener* listener = it.Next();) {
+		listener->ThreadScheduled(oldThread, nextThread);
+	}
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
