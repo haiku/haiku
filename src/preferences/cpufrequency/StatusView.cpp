@@ -339,7 +339,7 @@ FrequencyMenu::UpdateMenu()
 
 
 StatusView::StatusView(BRect frame,	bool inDeskbar,
-						PreferencesStorage<freq_preferences>* storage = NULL)
+						PreferencesStorage<freq_preferences>* storage)
 	: BView(frame, kDeskbarItemName, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
@@ -600,7 +600,7 @@ StatusView::ResizeToPreferred(void)
 
 
 void
-StatusView::ShowPopUpMenu(bool show = true)
+StatusView::ShowPopUpMenu(bool show)
 {
 	fShowPopUpMenu = show;
 }

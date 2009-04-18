@@ -33,6 +33,7 @@
 #include <MessageFilter.h>
 
 // headers PreferencesWindow
+#include <Application.h>
 #include <GroupView.h>
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
@@ -375,14 +376,14 @@ PreferencesWindow<Preferences>::MessageReceived(BMessage *msg)
 			break;
 			
 		case kDefaultMsg:
-			Defaults();
+			PreferencesStorage<Preferences>::Defaults();
 			fRevertButton->SetEnabled(true);
 			if (fPreferencesView)
 				PostMessage(kDefaultMsg, fPreferencesView);
 			break;
 			
 		case kRevertMsg:
-			Revert();
+			PreferencesStorage<Preferences>::Revert();
 			fRevertButton->SetEnabled(false);
 			if (fPreferencesView)
 				PostMessage(kRevertMsg, fPreferencesView);
@@ -425,7 +426,7 @@ template<typename Preferences>
 void
 PreferencesWindow<Preferences>::_MoveToPosition()
 {
-	BPoint position = WindowPosition();
+	BPoint position = PreferencesStorage<Preferences>::WindowPosition();
 	// center window on screen if it had a bad position
 	if(position.x < 0 && position.y < 0){
 		BRect rect = BScreen().Frame();
