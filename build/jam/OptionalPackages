@@ -21,7 +21,9 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	BePDF
 #	Bluetooth
 #	CVS
-#	Development
+#	Development			- more complete dev environment (including autotools)
+#	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
+#	DevelopmentMin		- development headers, libs, tools, from sources only
 #	Firefox
 #	KeymapSwitcher
 #	LibLayout
@@ -160,7 +162,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddFilesToHaikuImage system bin : bt_dev_info bt_discovery ;
 	AddSymlinkToHaikuImage home config be Preferences
 		: /boot/system/preferences/Bluetooth ;
-	if [ IsOptionalHaikuImagePackageAdded Development ] {
+	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
 	}
 }
@@ -182,6 +184,52 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
+	# autotools
+	local baseURL = http://haiku-files.org/files/optional-packages ;
+	InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
+		: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip ;
+	InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-11-06
+		: $(baseURL)/automake-1.10.1-gcc2-2008-11-06.zip ;
+	InstallOptionalHaikuImagePackage libtool-2.2.6a-gcc2-2008-11-09
+		: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip ;
+	InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
+		: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip ;
+}
+
+
+# DevelopmentBase
+if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
+		&& $(TARGET_ARCH) = x86 {
+	# gcc and binutils
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024
+			: $(baseURL)/gcc-2.95.3-haiku-081024.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) = 4 {
+		local baseURL = http://haiku.mlotz.ch ;
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090313
+			: $(baseURL)/gcc-4.3.3-haiku-090313.zip ;
+
+		# symlink cpp to g++'s headers
+		AddSymlinkToHaikuImage develop headers
+			: /boot/develop/tools/gnupro/include/g++ : cpp ;
+	}
+
+	# other commonly used tools
+	local baseURL = http://haiku-files.org/files/optional-packages ;
+	InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
+		: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip ;
+	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
+		: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip ;
+	InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
+		: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip ;
+	InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
+		: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip ;
+}
+
+
+# DevelopmentMin
+if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	# glue code
 	AddFilesToHaikuImage develop lib x86
 		: <src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
@@ -205,10 +253,10 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# cc and c++ wrapper scripts
 	AddFilesToHaikuImage system bin : cc c++ ;
 
-	# mkdepend build tool, which is part of the Haiku source tree
-	# (same as make, but make is already included independent of the
-	# Development package)
-	AddFilesToHaikuImage system bin : mkdepend ;
+	# make and mkdepend build tool, which are part of the Haiku source tree
+	# TODO: Both should be removed from the tree, made download packages
+	# and moved to the DevelopmentBase package.
+	AddFilesToHaikuImage system bin : make mkdepend ;
 
 	# skeleton makefile and makefile-engine
 	local makefileEngineFiles =
@@ -243,63 +291,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		# gcc and binutils
-		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024
-			: $(baseURL)/gcc-2.95.3-haiku-081024.zip
-			:
-		;
-
 		AddHeaderDirectoryToHaikuImage cpp ;
 	}
-
-	if $(HAIKU_GCC_VERSION[1]) = 4 {
-		# gcc and binutils
-		local baseURL = http://haiku.mlotz.ch ;
-		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090313
-			: $(baseURL)/gcc-4.3.3-haiku-090313.zip
-			:
-		;
-
-		# symlink cpp to g++'s headers
-		AddSymlinkToHaikuImage develop headers
-			: /boot/develop/tools/gnupro/include/g++ : cpp ;
-	}
-
-	# other tools
-	local baseURL = http://haiku-files.org/files/optional-packages ;
-	InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
-		: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-11-06
-		: $(baseURL)/automake-1.10.1-gcc2-2008-11-06.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
-		: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
-		: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
-		: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage libtool-2.2.6a-gcc2-2008-11-09
-		: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
-		: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
-		:
-	;
-	InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
-		: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip
-		:
-	;
 }
 
 
@@ -553,7 +546,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 	AddFilesToHaikuImage system lib : $(userlandfsLibs) ;
 
 	# development goodies
-	if [ IsOptionalHaikuImagePackageAdded Development ] {
+	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
 		# library symlinks
 		local lib ;
 		for lib in $(userlandfsLibs) {

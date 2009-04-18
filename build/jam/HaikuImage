@@ -31,7 +31,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	join
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
-	make makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
+	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
 	modifiers mount mount_nfs mountvolume mv
 	nc netstat nl nohup od open passwd paste
 	patch pathchk pc ping play playfile playsound playwav pr prio printenv
