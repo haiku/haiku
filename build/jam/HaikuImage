@@ -54,7 +54,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
 	StyledEdit Terminal TextSearch TV Workspaces
 ;
-SYSTEM_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
+SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
 	ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
@@ -180,6 +180,7 @@ if $(TARGET_ARCH) = x86 {
 
 # drivers
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToHaikuImage power : enhanced_speedstep ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
@@ -269,9 +270,9 @@ for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 AddDirectoryToHaikuImage home config be Preferences ;
 # TODO/NOTE: Cannot use $(SYSTEM_PREFERENCES) here since there is
 # "<preferences>Tracker"...
-DESKBAR_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
-	ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
+DESKBAR_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
+	E-mail FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers
+	Screen ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
 ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToHaikuImage home config be Preferences

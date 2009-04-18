@@ -31,7 +31,7 @@
 #define EST_BASENAME "power/enhanced_speedstep/%d"
 
 // name of pnp generator of path ids
-#define EST_PATHID_GENERATOR "est/path_id"
+#define EST_PATHID_GENERATOR "enhanced_speedstep/path_id"
 
 static device_manager_info *sDeviceManager;
 static ConditionVariable sFrequencyCondition;
@@ -39,58 +39,8 @@ static vint32 sCurrentID;
 
 
 static status_t
-est_open(void *initCookie, const char *path, int flags, void** cookie)
-{
-	TRACE("est: open\n");
-	est_cookie *device = (est_cookie*)initCookie;
-	*cookie = device;
-	device->stop_watching = 0;
-
-	// enable enhanced speedstep
-	TRACE("est: check if enhanced speedstep is enabled\n");
-	uint64 msrMisc = x86_read_msr(MSR_MISC);
-	if ((msrMisc & MSR_EST_ENABLED) == 0) {
-		TRACE("est: enable enhanced speedstep\n");
-		x86_write_msr(MSR_MISC, msrMisc | MSR_EST_ENABLED);
-
-		uint64 msrMisc = x86_read_msr(MSR_MISC);
-		if ((msrMisc & MSR_EST_ENABLED) == 0) {
-			TRACE("est: enable enhanced speedstep failed\n");
-			return B_ERROR;
-		}
-	}
-
-	// get freq_info
-	if (est_get_info(&(device->available_states)) != B_OK)
-		return B_ERROR;
-	freq_info *freqsInfo = device->available_states;
-
-	// count number of states
-	TRACE("est: frequency info:\n");
-	freq_info *f;
-	device->number_states = 0;
-	for (f = freqsInfo; f->frequency != 0; f++) {
-		TRACE("est: Frequency %u, Volts %u, Power %i, Latency %u, id %u\n",
-			f->frequency, f->volts, f->power, f->id, EST_TRANS_LAT);
-		device->number_states++;
-	}
-
-	// print current frequency
-	freq_info *f2 = est_get_current(freqsInfo);
-	if (f2) {
-		TRACE("est: Current Frequency %u, Volts %u, Power %i, Latency %u\n",
-			f2->frequency, f2->volts, f2->power, EST_TRANS_LAT);
-	}
-
-	return B_OK;
-}
-
-
-static status_t
 est_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 {
-	TRACE("est: est_read\n");
-
 	if (*numBytes < 1)
 		return B_IO_ERROR;
 
@@ -140,7 +90,6 @@ est_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
 status_t
 est_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
-	TRACE("est: est_control op %u\n", int(op));
 	est_cookie* device = (est_cookie*)_cookie;
 	status_t err = B_ERROR;
 
@@ -211,8 +160,71 @@ est_control(void* _cookie, uint32 op, void* arg, size_t len)
 
 
 static status_t
+est_open(void *initCookie, const char *path, int flags, void** cookie)
+{
+	TRACE("est: open\n");
+	est_cookie *device;
+	device = (est_cookie *)calloc(1, sizeof(est_cookie));
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	*cookie = device;
+
+	device_node *node = (device_node *)initCookie;
+	device->node = node;
+
+	device_node *parent;
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
+		(void **)&device->acpi_cookie);
+	sDeviceManager->put_node(parent);
+
+	device->stop_watching = 0;
+
+	// enable enhanced speedstep
+	uint64 msrMisc = x86_read_msr(MSR_MISC);
+	if ((msrMisc & MSR_EST_ENABLED) == 0) {
+		TRACE("est: enable enhanced speedstep\n");
+		x86_write_msr(MSR_MISC, msrMisc | MSR_EST_ENABLED);
+
+		uint64 msrMisc = x86_read_msr(MSR_MISC);
+		if ((msrMisc & MSR_EST_ENABLED) == 0) {
+			TRACE("est: enable enhanced speedstep failed\n");
+			return B_ERROR;
+		}
+	}
+
+	// get freq_info
+	if (est_get_info(&(device->available_states)) != B_OK)
+		return B_ERROR;
+	freq_info *freqsInfo = device->available_states;
+
+	// count number of states
+	TRACE("est: frequency info:\n");
+	freq_info *f;
+	device->number_states = 0;
+	for (f = freqsInfo; f->frequency != 0; f++) {
+		TRACE("est: Frequency %u, Volts %u, Power %i, Latency %u, id %u\n",
+			f->frequency, f->volts, f->power, f->id, EST_TRANS_LAT);
+		device->number_states++;
+	}
+
+	// print current frequency
+	freq_info *f2 = est_get_current(freqsInfo);
+	if (f2) {
+		TRACE("est: Current Frequency %u, Volts %u, Power %i, Latency %u\n",
+			f2->frequency, f2->volts, f2->power, EST_TRANS_LAT);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 est_close(void* cookie)
 {
+	est_cookie *device = (est_cookie*)cookie;
+	free(device);
 	return B_OK;
 }
 
@@ -245,30 +257,28 @@ est_support(device_node *parent)
 		|| deviceType != ACPI_TYPE_PROCESSOR) {
 		return 0.0;
 	}
-	TRACE("est_support: supported\n");
 
 	// check if cpu support est
 	uint32 cpuNum = 0;
 	system_info sysInfo;
 	if (get_system_info(&sysInfo) != B_OK)
 		return 0.0;
-	TRACE("cpu_type: %u vendor %u model %u\n", sysInfo.cpu_type,
+	TRACE("est: cpu_type: %u vendor %u model %u\n", sysInfo.cpu_type,
 		sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK, sysInfo.cpu_type & 0x00FF);
 	if ((sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86)
 		return 0.0;
 
-	TRACE("ext\n");
 	cpuid_info info;
 	if (get_cpuid(&info, 1, cpuNum) != B_OK)
 		return 0.0;
 
-	TRACE("extended_features: %i\n", int(info.eax_1.extended_features));
+	TRACE("est: extended_features: %i\n", int(info.eax_1.extended_features));
 
 	// check for enhanced speedstep
 	if ((info.eax_1.extended_features & IA32_FEATURE_EXT_EST) == 0)
 		return 0.0;
 
-	TRACE("supports est\n");
+	TRACE("est: supported\n");
 	return 0.6;
 }
 
@@ -326,22 +336,8 @@ est_register_child_devices(void *_cookie)
 static status_t
 est_init_device(void *driverCookie, void **cookie)
 {
-	est_cookie *device;
-	device = (est_cookie *)calloc(1, sizeof(est_cookie));
-	if (device == NULL)
-		return B_NO_MEMORY;
-
-	*cookie = device;
-
-	device_node *node = (device_node *)driverCookie;
-	device->node = node;
-
-	device_node *parent;
-	parent = sDeviceManager->get_parent_node(node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
-		(void **)&device->acpi_cookie);
-	sDeviceManager->put_node(parent);
-
+	// driverCookie is the device node
+	*cookie = driverCookie;
 	return B_OK;
 }
 
@@ -349,9 +345,7 @@ est_init_device(void *driverCookie, void **cookie)
 static void
 est_uninit_device(void *_cookie)
 {
-	TRACE("est: est_uninit_device\n");
-	est_cookie *device = (est_cookie*)_cookie;
-	free(device);
+
 }
 
 

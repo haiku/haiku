@@ -8,6 +8,8 @@
  
 #include "DriverInterface.h"
 
+#include <stdio.h>
+
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -43,6 +45,7 @@ CPUFreqDriverInterface::CPUFreqDriverInterface()
 
 CPUFreqDriverInterface::~CPUFreqDriverInterface()
 {
+	StopWatching();
 	delete fFrequencyStates;
 	
 	if (InitCheck() == B_OK)
@@ -139,12 +142,13 @@ CPUFreqDriverInterface::StopWatching()
 	if (fIsWatching &&
 			ioctl(fDriverHandler, STOP_WATCHING_CPU_FREQ) == B_OK)
 	{
+		status_t status;
+		status = wait_for_thread(fThreadId, &status);
+		
 		delete fWatchingMessenger;
 		fWatchingMessenger = NULL;
+
 		fIsWatching = false;
-		
-		status_t status;
-		return wait_for_thread(fThreadId, &status);
 	}
 	
 	return B_ERROR;
@@ -200,7 +204,6 @@ CPUFreqDriverInterface::_FindSpeedStepDriver(const char* path)
 				return B_OK;
 		}
 		else {
-			printf("path %s\n", path.Path());
 			fDriverHandler = open(path.Path(), O_RDWR);
 			if (fDriverHandler >= 0) {
 				uint32 magicId = 0;

@@ -23,6 +23,8 @@
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
+#define MAX_FREQ_STRING "9999MHz"
+
 // messages FrequencySwitcher
 const uint32 kMsgDynamicPolicyPuls = '&dpp';
 
@@ -142,8 +144,7 @@ FrequencySwitcher::_CalculateDynamicState()
 		for (int i = 0; i < numberOfStates; i++) {
 			float usageOfStep = ColorStepView::UsageOfStep(i, numberOfStates,
 														fSteppingThreshold);
-			LOG("usage %f, step %f\n", usage, usageOfStep);
-			
+
 			if (usage < usageOfStep)
 			{
 				StateList* list = fDriverInterface->GetCpuFrequencyStates();
@@ -554,8 +555,6 @@ StatusView::FrameResized(float width, float height)
 void
 StatusView::Draw(BRect updateRect)
 {
-	
-	
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float height = fontHeight.ascent + fontHeight.descent;
@@ -586,8 +585,8 @@ StatusView::GetPreferredSize(float *width, float *height)
 	*height = fontHeight.ascent + fontHeight.descent;
 	if (!fInDeskbar)
 		*height += 7;
-		
-	*width = StringWidth(fFreqString.String());
+
+	*width = StringWidth(MAX_FREQ_STRING);
 }
 
 
@@ -629,15 +628,15 @@ StatusView::_SetupNewFreqString()
 {
 	if (fCurrentFrequency)
 		fFreqString = ColorStepView::CreateFrequencyString(
-											fCurrentFrequency->frequency);
+			fCurrentFrequency->frequency);
 	else 
 		fFreqString = "? MHz";
-	
+
 	ResizeToPreferred();
-	
+
 	if (fDragger) {
-		BRect frame = Frame();
-		fDragger->MoveTo(frame.right - 7, frame.bottom - 7);
+		BRect bounds = Bounds();
+		fDragger->MoveTo(bounds.right - 7, bounds.bottom - 7);
 	}
 }
 
@@ -645,6 +644,12 @@ void
 StatusView::_OpenPreferences()
 {
 	status_t ret = be_roster->Launch(kPrefSignature);
+	if (ret == B_ALREADY_RUNNING) {
+		app_info info;
+		ret = be_roster->GetAppInfo(kPrefSignature, &info);
+		if (ret == B_OK)
+			ret = be_roster->ActivateApp(info.team);
+	}
 	if (ret < B_OK) {
 		BString errorMessage("Launching the CPU Frequency preflet failed.\n\n"
 			"Error: ");
@@ -655,7 +660,6 @@ StatusView::_OpenPreferences()
 		// application
 		alert->Go(NULL);
 	}
-	
 }
 
 

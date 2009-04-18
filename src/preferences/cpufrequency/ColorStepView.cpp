@@ -8,6 +8,8 @@
 
 #include "ColorStepView.h"
 
+#include <stdio.h>
+
 #include <Window.h>
 
 
