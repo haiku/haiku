@@ -12,9 +12,12 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 SharedLibrary libdebug.so :
 	debug_support.cpp
+	DebugEventStream.cpp
 	Image.cpp
 	SymbolLookup.cpp
 
 	# architecture specific
 	arch_debug_support.cpp
+
+	: be
 ;
