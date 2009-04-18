@@ -83,7 +83,7 @@ This is also how you update the code in the future.</p></li>
 <li><p>Now the block that sets the defaults for timezone and keymap:</p>
 <pre># Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+	: /boot/system/etc/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : <keymap>German 
 	: Key_map ;</keymap></pre></li>
 <li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files with their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
@@ -128,7 +128,7 @@ HAIKU_IMAGE_HOST_NAME = "TEST" ;
 
 # Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+	: /boot/system/etc/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : <keymap>German 
 	: Key_map ;
 

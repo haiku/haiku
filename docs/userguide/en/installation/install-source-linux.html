@@ -40,7 +40,7 @@
 <h1>Downloading the tools and the Haiku source</h1>
 <ol>
 <li><p>Install all needed packages:</p>
-<pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential</pre></li>
+<pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm</pre></li>
 
 <li><p>Create the Haiku development directories and get the Haiku build tools source:</p>
 <pre class="terminal">mkdir develop
@@ -104,7 +104,7 @@ AddOptionalHaikuImagePackages WonderBrush ;</pre>
 <li><p>Now the block that sets the defaults for timezone and keymap:</p>
 <pre># Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+	: /boot/system/etc/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : German 
 	: Key_map ;</pre></li> 
 <li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files and their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
@@ -163,7 +163,7 @@ AddOptionalHaikuImagePackages WonderBrush ;
 
 # Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+	: /boot/system/etc/timezones/Europe/Paris : timezone ;
 AddFilesToHaikuImage home config settings : German 
 	: Key_map ;
 

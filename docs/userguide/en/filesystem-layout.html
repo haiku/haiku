@@ -42,18 +42,18 @@
 <p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Do it</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
 <p>Generally, there are three separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/beos/</span></td><td>&#160;</td><td>belongs to the system. Don't touch!</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td>&#160;</td><td>belongs to the system. Don't touch!</td></tr>
 <tr><td><span class="path">/boot/common/</span></td><td>&#160;</td><td>holds files that are shared between users.</td></tr>
 <tr><td><span class="path">/boot/home/</span></td><td>&#160;</td><td>is your personal folder where you keep your data and settings.</td></tr>
 </table>
 
-<h1><a id="system" name="system">The system folder - <span class="path">/boot/beos/</span></a></h1>
+<h1><a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h1>
 <p>The fact that it's called "<i>beos</i>" shows Haiku's BeOS heritage. It wasn't renamed yet to ensure backward compatibility with BeOS software.<br />
 Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 <p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
 Instead, you put it into the mirrored hierarchy under <span class="path">/boot/common/</span> or <span class="path">/boot/home/config/</span>.</p>
 <p>In our example the location for Translators in the system folder would be</p>
-<p><span class="path">/boot/beos/add-ons/Translators/</span></p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
 <p>So, the user "mirror" folder is either</p>
 <p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
 or<br />
@@ -86,7 +86,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Again from our BeOS legacy, the <span class="path">be</span> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items either with the Deskbar configuration panel or by putting files, folders or links into this folder directly.</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td>&#160;</td>
-<td>Complements the system's <span class="path">/boot/beos/bin/</span> folder and holds all your command line programs.</td></tr>
+<td>Complements the system's <span class="path">/boot/system/bin/</span> folder and holds all your command line programs.</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td>&#160;</td>
 <td>This folder is the place for <a href="scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>

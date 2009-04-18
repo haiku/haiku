@@ -47,24 +47,32 @@ The above settings will automatically mount any storage device you connect/inser
 <div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
 
 <h1><a id="navigating" name="navigating">Navigating</a></h1>
+<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
+You can prevent that by holding down the left <span class="key">WIN</span> key, which automatically closes the parent window.<br />
+This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts">Shortcuts and key combinations</a>.</p>
 <p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+
+<h2><a id="drill-down" name="drill-down">Drilling down the submenus</a></h2>
 <p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
 <img src="../images/tracker-images/drill-down.png" alt="drill-down.png" width="603" height="303" />
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/beos/system/</span>.<br /><br /></p>
+<!-- screenshot needs updating to show /boot/system/documentation -->
+<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/system/documentation/</span>.<br /><br /></p>
 <p>A similar method can be used from any Tracker window:</p>
 <img src="../images/tracker-images/window-drill-down.png" alt="window-drill-down.png" width="502" height="359" />
 <p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
 <p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p><br />
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the left <span class="key">WIN</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts">Shortcuts and key combinations</a>.</p>
+<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+
+<h2><a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h2>
+<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<img src="../images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" width="652" height="317" />
+<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
 
 <h1><a id="appearance" name="appearance">Appearance</a></h1>
 <img src="../images/tracker-images/window-menu.png" alt="window-menu.png" width="382" height="259" />
 <p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
 <ul>
-<li><p><b>Icon View</b> (<span class="key">ALT</span>&#160;<span class="key">1</span>) - Big icons, you can change the size from the submenu.</p></li>
+<li><p><b>Icon View</b> (<span class="key">ALT</span>&#160;<span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span>&#160;<span class="key">+</span>/<span class="key">ALT</span>&#160;<span class="key">-</span>.</p></li>
 <li><p><b>Mini Icon View</b> (<span class="key">ALT</span>&#160;<span class="key">2</span>) - Small icons.</p></li>
 <li><p><b>List View</b> (<span class="key">ALT</span>&#160;<span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
 </ul>
@@ -73,6 +81,8 @@ This is also true for keyboard navigation. For more on that, see topic <a href="
 <li><p><b>Resize Window</b> (<span class="key">ALT</span>&#160;<span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
 <li><p><b>Clean Up</b> (<span class="key">ALT</span>&#160;<span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean Up All</span> which additionally sorts all icons alphabetically.</p></li>
 <li><p><b>Select...</b> (<span class="key">SHIFT</span>&#160;<span class="key">ALT</span>&#160;<span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class='external free' title="http://en.wikipedia.org/wiki/Regular expression">regular expression</a>.</p></li>
+<li><p><b>Close</b> (<span class="key">ALT</span>&#160;<span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close All</span> which closes every Tracker window.</p></li>
+<li><p><b>Close All in Workspace</b> (<span class="key">ALT</span>&#160;<span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">WIN</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
 </ul>
 <p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean Up</span> (<span class="key">ALT</span>&#160;<span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
 <p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
@@ -118,7 +128,7 @@ This is also true for keyboard navigation. For more on that, see topic <a href="
 <li><p><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
 <li><p><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
 <li><p><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <b>Copy/Cut more</b> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><b>Identify</b> - will sniff out and set the type of a file if it didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to identify the filetype and correct it if it was false before.</p></li>
+<li><p><b>Identify</b> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <b>Force Identify</b> which identifies the filetype and corrects it if it was false before.</p></li>
 <li><p><b>Add-Ons</b> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
 </ul>
 
