@@ -140,12 +140,16 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
-	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
-		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT,
-		request->Timeout()) != B_OK) {
-		TRACE_ERROR("timeout waiting for device to request data\n");
-		request->SetStatus(SCSI_CMD_TIMEOUT);
-		return B_TIMED_OUT;
+	result = fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT, request->Timeout());
+	if (result != B_OK) {
+		if (result == B_TIMED_OUT) {
+			TRACE_ERROR("timeout waiting for device to request data\n");
+			request->SetStatus(SCSI_CMD_TIMEOUT);
+			return B_TIMED_OUT;
+		} else
+			return fChannel->FinishRequest(request, ATA_WAIT_FINISH
+				| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
 	}
 
 	// PIO data transfer
