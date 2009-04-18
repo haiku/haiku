@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -92,8 +92,8 @@ struct WaitObjectGroupingComparator {
 		const scheduling_analysis_thread_wait_object* b)
 	{
 		return a->wait_object->type < b->wait_object->type
-			|| a->wait_object->type == b->wait_object->type
-				&& strcmp(a->wait_object->name, b->wait_object->name) < 0;
+			|| (a->wait_object->type == b->wait_object->type
+				&& strcmp(a->wait_object->name, b->wait_object->name) < 0);
 	}
 };
 
@@ -407,8 +407,8 @@ do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
 	int32 finalI = 0;
 	while (initialI < initialUsageCount || finalI < finalUsageCount) {
 		if (initialI >= initialUsageCount
-			|| finalI < finalUsageCount
-				&& initialUsage[initialI].thread > finalUsage[finalI].thread) {
+			|| (finalI < finalUsageCount
+				&& initialUsage[initialI].thread > finalUsage[finalI].thread)) {
 			// new thread
 			memcpy(&sortedThreads[sortedThreadCount], &finalUsage[finalI],
 				sizeof(thread_info));
@@ -418,8 +418,8 @@ do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
 		}
 
 		if (finalI >= finalUsageCount
-			|| initialI < initialUsageCount
-				&& initialUsage[initialI].thread < finalUsage[finalI].thread) {
+			|| (initialI < initialUsageCount
+				&& initialUsage[initialI].thread < finalUsage[finalI].thread)) {
 			// gone thread
 			memcpy(&goneThreads[goneThreadCount], &initialUsage[initialI],
 				sizeof(thread_info));
@@ -452,7 +452,7 @@ do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
 	printf("\nTotal run time: %lld us\n", runTime);
 	printf("Thread time statistics in us:\n\n");
 	printf(" thread  name                                  kernel        user  "
-		"     total    in %\n");
+		"     total    in %%\n");
 	printf("-------------------------------------------------------------------"
 		"------------------\n");
 
