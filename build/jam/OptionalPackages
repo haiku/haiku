@@ -607,14 +607,15 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package VLC available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage VLC-0.8.6c
-			: http://www.yellowbites.com/downloads/vlc-0.8.6c.zip
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage VLC-0.8.6d
+			: $(baseURL)/vlc-0.8.6d-gcc2-2009-04-18.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: "/boot/apps/vlc-0.8.6c/VLC media player" ;
+			: "/boot/apps/vlc-0.8.6d/VLC media player" ;
 		AddSymlinkToHaikuImage common bin
-			: "/boot/apps/vlc-0.8.6c/VLC media player" : vlc ;
+			: "/boot/apps/vlc-0.8.6d/VLC media player" : vlc ;
 	}
 }
 
