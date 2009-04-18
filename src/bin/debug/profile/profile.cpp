@@ -525,7 +525,7 @@ process_event_buffer(ThreadManager& threadManager, uint8* buffer,
 				break;
 			}
 
-			case B_SYSTEM_PROFILER_SAMPLES_END:
+			case B_SYSTEM_PROFILER_BUFFER_END:
 			{
 				// Marks the end of the ring buffer -- we need to ignore the
 				// remaining bytes.
@@ -575,7 +575,7 @@ profile_all(const char* const* programArgs, int programArgCount)
 		exit(1);
     }
 
-	// create and area for the sample buffer
+	// create an area for the sample buffer
 	system_profiler_buffer_header* bufferHeader;
 	area_id area = create_area("profiling buffer", (void**)&bufferHeader,
 		B_ANY_ADDRESS, PROFILE_ALL_SAMPLE_AREA_SIZE, B_NO_LOCK,
@@ -594,8 +594,15 @@ profile_all(const char* const* programArgs, int programArgCount)
 	ThreadManager threadManager(-1);	// TODO: We don't need a debugger port!
 
 	// start profiling
-	status_t error = _kern_system_profiler_start(area, gOptions.interval,
-		gOptions.stack_depth);
+	system_profiler_parameters profilerParameters;
+	profilerParameters.buffer_area = area;
+	profilerParameters.flags = B_SYSTEM_PROFILER_TEAM_EVENTS
+		| B_SYSTEM_PROFILER_THREAD_EVENTS | B_SYSTEM_PROFILER_IMAGE_EVENTS
+		| B_SYSTEM_PROFILER_SAMPLING_EVENTS;
+	profilerParameters.interval = gOptions.interval;
+	profilerParameters.stack_depth = gOptions.stack_depth;
+
+	status_t error = _kern_system_profiler_start(&profilerParameters);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to start profiling: %s\n", kCommandName,
 			strerror(error));

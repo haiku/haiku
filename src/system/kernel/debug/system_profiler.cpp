@@ -14,6 +14,7 @@
 
 #include <cpu.h>
 #include <kimage.h>
+#include <kscheduler.h>
 #include <Notifications.h>
 #include <team.h>
 #include <thread.h>
@@ -35,11 +36,13 @@ static spinlock sProfilerLock = B_SPINLOCK_INITIALIZER;
 static SystemProfiler* sProfiler = NULL;
 
 
-class SystemProfiler : public Referenceable, private NotificationListener {
+class SystemProfiler : public Referenceable, private NotificationListener,
+	private SchedulerListener {
 public:
 								SystemProfiler(team_id team,
 									const area_info& userAreaInfo,
-									bigtime_t interval, int32 stackDepth);
+									const system_profiler_parameters&
+										parameters);
 								~SystemProfiler();
 
 			team_id				Team() const	{ return fTeam; }
@@ -50,6 +53,12 @@ public:
 private:
     virtual	void				EventOccured(NotificationService& service,
 									const KMessage* event);
+
+	virtual	void				ThreadEnqueuedInRunQueue(struct thread* thread);
+	virtual	void				ThreadRemovedFromRunQueue(
+									struct thread* thread);
+	virtual	void				ThreadScheduled(struct thread* oldThread,
+									struct thread* newThread);
 
 			bool				_TeamAdded(struct team* team);
 			bool				_TeamRemoved(struct team* team);
@@ -69,7 +78,7 @@ private:
 									void* cookie);
 
 			void*				_AllocateBuffer(size_t size, int event, int cpu,
-									int count);
+									int count, bool threadsLocked = false);
 
 	static	void				_InitTimers(void* cookie, int cpu);
 	static	void				_UninitTimers(void* cookie, int cpu);
@@ -93,7 +102,8 @@ private:
 			area_id				fUserArea;
 			area_id				fKernelArea;
 			size_t				fAreaSize;
-			int32				fStackDepth;
+			uint32				fFlags;
+			uint32				fStackDepth;
 			bigtime_t			fInterval;
 			system_profiler_buffer_header* fHeader;
 			uint8*				fBufferBase;
@@ -106,6 +116,7 @@ private:
 			bool				fThreadNotificationsEnabled;
 			bool				fImageNotificationsRequested;
 			bool				fImageNotificationsEnabled;
+			bool				fSchedulerNotificationsRequested;
 			ConditionVariable	fProfilerWaitCondition;
 			bool				fProfilerWaiting;
 			bool				fProfilingActive;
@@ -114,14 +125,20 @@ private:
 
 
 SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
-	bigtime_t interval, int32 stackDepth)
+	const system_profiler_parameters& parameters)
+#if 0
+	// scheduling
+	size_t		locking_lookup_size;	// size of the lookup table used for
+										// caching the locking primitive infos
+#endif
 	:
 	fTeam(team),
 	fUserArea(userAreaInfo.area),
 	fKernelArea(-1),
 	fAreaSize(userAreaInfo.size),
-	fStackDepth(stackDepth),
-	fInterval(interval),
+	fFlags(parameters.flags),
+	fStackDepth(parameters.stack_depth),
+	fInterval(parameters.interval),
 	fHeader(NULL),
 	fBufferBase(NULL),
 	fBufferCapacity(0),
@@ -133,6 +150,7 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fThreadNotificationsEnabled(false),
 	fImageNotificationsRequested(false),
 	fImageNotificationsEnabled(false),
+	fSchedulerNotificationsRequested(false),
 	fProfilerWaiting(false)
 {
 	B_INITIALIZE_SPINLOCK(&fLock);
@@ -152,8 +170,15 @@ SystemProfiler::~SystemProfiler()
 	fProfilingActive = false;
 	locker.Unlock();
 
+	// stop scheduler listening
+	if (fSchedulerNotificationsRequested) {
+		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+		scheduler_remove_listener(this);
+	}
+
 	// deactivate the profiling timers on all CPUs
-	call_all_cpus(_UninitTimers, this);
+	if ((fFlags & B_SYSTEM_PROFILER_SAMPLING_EVENTS) != 0)
+		call_all_cpus(_UninitTimers, this);
 
 	// cancel notifications
 	NotificationManager& notificationManager
@@ -217,53 +242,73 @@ SystemProfiler::Init()
 	// teams
 	NotificationManager& notificationManager
 		= NotificationManager::Manager();
-	error = notificationManager.AddListener("teams",
-		TEAM_ADDED | TEAM_REMOVED | TEAM_EXEC, *this);
-	if (error != B_OK)
-		return error;
-	fTeamNotificationsRequested = true;
+	if ((fFlags & B_SYSTEM_PROFILER_TEAM_EVENTS) != 0) {
+		error = notificationManager.AddListener("teams",
+			TEAM_ADDED | TEAM_REMOVED | TEAM_EXEC, *this);
+		if (error != B_OK)
+			return error;
+		fTeamNotificationsRequested = true;
+	}
 
 	// threads
-	error = notificationManager.AddListener("threads",
-		THREAD_ADDED | THREAD_REMOVED, *this);
-	if (error != B_OK)
-		return error;
-	fThreadNotificationsRequested = true;
+	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0) {
+		error = notificationManager.AddListener("threads",
+			THREAD_ADDED | THREAD_REMOVED, *this);
+		if (error != B_OK)
+			return error;
+		fThreadNotificationsRequested = true;
+	}
 
 	// images
-	error = notificationManager.AddListener("images",
-		IMAGE_ADDED | IMAGE_REMOVED, *this);
-	if (error != B_OK)
-		return error;
-	fImageNotificationsRequested = true;
+	if ((fFlags & B_SYSTEM_PROFILER_IMAGE_EVENTS) != 0) {
+		error = notificationManager.AddListener("images",
+			IMAGE_ADDED | IMAGE_REMOVED, *this);
+		if (error != B_OK)
+			return error;
+		fImageNotificationsRequested = true;
+	}
 
 	// We need to fill the buffer with the initial state of teams, threads,
 	// and images.
 
 	// teams
-	InterruptsSpinLocker teamsLocker(gTeamSpinlock);
-	if (team_iterate_through_teams(&_InitialTeamIterator, this) != NULL)
-		return B_BUFFER_OVERFLOW;
-	fTeamNotificationsEnabled = true;
-	teamsLocker.Unlock();
+	if ((fFlags & B_SYSTEM_PROFILER_TEAM_EVENTS) != 0) {
+		InterruptsSpinLocker teamsLocker(gTeamSpinlock);
+		if (team_iterate_through_teams(&_InitialTeamIterator, this) != NULL)
+			return B_BUFFER_OVERFLOW;
+		fTeamNotificationsEnabled = true;
+		teamsLocker.Unlock();
+	}
 
 	// threads
-	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
-	if (thread_iterate_through_threads(&_InitialThreadIterator, this)
-			!= NULL) {
-		return B_BUFFER_OVERFLOW;
+	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0) {
+		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+		if (thread_iterate_through_threads(&_InitialThreadIterator, this)
+				!= NULL) {
+			return B_BUFFER_OVERFLOW;
+		}
+		fThreadNotificationsEnabled = true;
+		threadsLocker.Unlock();
 	}
-	fThreadNotificationsEnabled = true;
-	threadsLocker.Unlock();
 
 	// images
-	if (image_iterate_through_images(&_InitialImageIterator, this) != NULL)
-		return B_BUFFER_OVERFLOW;
+	if ((fFlags & B_SYSTEM_PROFILER_IMAGE_EVENTS) != 0) {
+		if (image_iterate_through_images(&_InitialImageIterator, this) != NULL)
+			return B_BUFFER_OVERFLOW;
+	}
 
 	fProfilingActive = true;
 
+	// start scheduler listening
+	if ((fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
+		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+		scheduler_add_listener(this);
+		fSchedulerNotificationsRequested = true;
+	}
+
 	// activate the profiling timers on all CPUs
-	call_all_cpus(_InitTimers, this);
+	if ((fFlags & B_SYSTEM_PROFILER_SAMPLING_EVENTS) != 0)
+		call_all_cpus(_InitTimers, this);
 
 	return B_OK;
 }
@@ -396,6 +441,86 @@ SystemProfiler::EventOccured(NotificationService& service,
 				break;
 		}
 	}
+}
+
+
+#if 0
+// B_SYSTEM_PROFILER_WAIT_OBJECT_INFO
+struct system_profiler_wait_object_info {
+	uint32		type;
+	void*		object;
+	void*		referenced_object;
+	char		name[1];
+};
+#endif
+
+void
+SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_thread_enqueued_in_run_queue* event
+		= (system_profiler_thread_enqueued_in_run_queue*)
+			_AllocateBuffer(
+				sizeof(system_profiler_thread_enqueued_in_run_queue),
+				B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
+				smp_get_current_cpu(), 0, true);
+	if (event == NULL)
+		return;
+
+	event->time = system_time();
+	event->thread = thread->id;
+	event->priority = thread->priority;
+
+	fHeader->size = fBufferSize;
+}
+
+
+void
+SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_thread_removed_from_run_queue* event
+		= (system_profiler_thread_removed_from_run_queue*)
+			_AllocateBuffer(
+				sizeof(system_profiler_thread_removed_from_run_queue),
+				B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
+				smp_get_current_cpu(), 0, true);
+	if (event == NULL)
+		return;
+
+	event->time = system_time();
+	event->thread = thread->id;
+
+	fHeader->size = fBufferSize;
+}
+
+
+void
+SystemProfiler::ThreadScheduled(struct thread* oldThread,
+	struct thread* newThread)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	// TODO: Deal with the wait object!
+
+	system_profiler_thread_scheduled* event
+		= (system_profiler_thread_scheduled*)
+			_AllocateBuffer(sizeof(system_profiler_thread_scheduled),
+				B_SYSTEM_PROFILER_THREAD_SCHEDULED, smp_get_current_cpu(), 0,
+				true);
+	if (event == NULL)
+		return;
+
+	event->time = system_time();
+	event->thread = newThread->id;
+	event->previous_thread = oldThread->id;
+	event->previous_thread_state = oldThread->state;
+	event->previous_thread_wait_object_type = oldThread->wait.type;
+	event->previous_thread_wait_object = (addr_t)oldThread->wait.object;
+
+	fHeader->size = fBufferSize;
 }
 
 
@@ -573,7 +698,8 @@ SystemProfiler::_InitialImageIterator(struct image* image, void* cookie)
 
 
 void*
-SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
+SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
+	bool threadsLocked)
 {
 	size += sizeof(system_profiler_event_header);
 
@@ -584,7 +710,7 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
 			// not wrapped yet, but needed
 			system_profiler_event_header* header
 				= (system_profiler_event_header*)(fBufferBase + end);
-			header->event = B_SYSTEM_PROFILER_SAMPLES_END;
+			header->event = B_SYSTEM_PROFILER_BUFFER_END;
 			fBufferSize = fBufferCapacity - fBufferStart;
 			end = 0;
 		} else
@@ -605,7 +731,7 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
 	// If the buffer is full enough notify the profiler.
 	if (fProfilerWaiting && fBufferSize > fBufferCapacity / 2) {
 		fProfilerWaiting = false;
-		fProfilerWaitCondition.NotifyOne();
+		fProfilerWaitCondition.NotifyOne(threadsLocked);
 	}
 
 	return header + 1;
@@ -688,25 +814,32 @@ SystemProfiler::_ProfilingEvent(struct timer* timer)
 
 
 status_t
-_user_system_profiler_start(area_id bufferArea, bigtime_t interval,
-	int32 stackDepth)
+_user_system_profiler_start(struct system_profiler_parameters* userParameters)
 {
+	// copy params to the kernel
+	struct system_profiler_parameters parameters;
+	if (userParameters == NULL
+		|| user_memcpy(&parameters, userParameters, sizeof(parameters))
+			!= B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
 	// check the parameters
 	team_id team = thread_get_current_thread()->team->id;
 
 	area_info areaInfo;
-	status_t error = get_area_info(bufferArea, &areaInfo);
+	status_t error = get_area_info(parameters.buffer_area, &areaInfo);
 	if (error != B_OK)
 		return error;
 
-	if (areaInfo.team != team || stackDepth < 1)
+	if (areaInfo.team != team || parameters.stack_depth < 1)
 		return B_BAD_VALUE;
 
-	if (interval < B_DEBUG_MIN_PROFILE_INTERVAL)
-		interval = B_DEBUG_MIN_PROFILE_INTERVAL;
+	if (parameters.interval < B_DEBUG_MIN_PROFILE_INTERVAL)
+		parameters.interval = B_DEBUG_MIN_PROFILE_INTERVAL;
 
-	if (stackDepth > B_DEBUG_STACK_TRACE_DEPTH)
-		stackDepth = B_DEBUG_STACK_TRACE_DEPTH;
+	if (parameters.stack_depth > B_DEBUG_STACK_TRACE_DEPTH)
+		parameters.stack_depth = B_DEBUG_STACK_TRACE_DEPTH;
 
 	// quick check to see whether we do already have a profiler installed
 	InterruptsSpinLocker locker(sProfilerLock);
@@ -716,7 +849,7 @@ _user_system_profiler_start(area_id bufferArea, bigtime_t interval,
 
 	// initialize the profiler
 	SystemProfiler* profiler = new(std::nothrow) SystemProfiler(team, areaInfo,
-		interval, stackDepth);
+		parameters);
 	if (profiler == NULL)
 		return B_NO_MEMORY;
 	ObjectDeleter<SystemProfiler> profilerDeleter(profiler);

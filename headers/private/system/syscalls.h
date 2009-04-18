@@ -30,11 +30,12 @@ struct net_stat;
 struct pollfd;
 struct rlimit;
 struct scheduling_analysis;
-struct sigaction;
-struct stat;
 struct _sem_t;
 struct sembuf;
 union semun;
+struct sigaction;
+struct stat;
+struct system_profiler_parameters;
 
 struct disk_device_job_progress_info;
 struct partitionable_space_data;
@@ -390,8 +391,8 @@ extern status_t		_kern_set_debugger_breakpoint(void *address, uint32 type,
 extern status_t		_kern_clear_debugger_breakpoint(void *address,
 						bool watchpoint);
 
-extern status_t		_kern_system_profiler_start(area_id bufferArea,
-						bigtime_t interval, int32 stackDepth);
+extern status_t		_kern_system_profiler_start(
+						struct system_profiler_parameters* parameters);
 extern status_t		_kern_system_profiler_next_buffer(size_t bytesRead);
 extern status_t		_kern_system_profiler_stop();
 

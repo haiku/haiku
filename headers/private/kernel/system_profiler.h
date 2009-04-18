@@ -10,10 +10,13 @@
 #include <OS.h>
 
 
+struct system_profiler_parameters;
+
+
 __BEGIN_DECLS
 
-status_t _user_system_profiler_start(area_id bufferArea,
-	bigtime_t interval, int32 stackDepth);
+status_t _user_system_profiler_start(
+			struct system_profiler_parameters* parameters);
 status_t _user_system_profiler_next_buffer(size_t bytesRead);
 status_t _user_system_profiler_stop();
 

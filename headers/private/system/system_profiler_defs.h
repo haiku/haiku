@@ -8,17 +8,60 @@
 #include <image.h>
 
 
+struct system_profiler_parameters {
+	// general
+	area_id		buffer_area;			// area the events will be written to
+	uint32		flags;					// flags selecting the events to receive
+
+	// scheduling
+	size_t		locking_lookup_size;	// size of the lookup table used for
+										// caching the locking primitive infos
+
+	// sampling
+	bigtime_t	interval;				// interval at which to take samples
+	uint32		stack_depth;			// maximum stack depth to sample
+};
+
+
+// event flags
+enum {
+	B_SYSTEM_PROFILER_TEAM_EVENTS		= 0x01,
+	B_SYSTEM_PROFILER_THREAD_EVENTS		= 0x02,
+	B_SYSTEM_PROFILER_IMAGE_EVENTS		= 0x04,
+	B_SYSTEM_PROFILER_SAMPLING_EVENTS	= 0x08,
+	B_SYSTEM_PROFILER_SCHEDULING_EVENTS	= 0x10
+};
+
+
 // events
 enum {
-	B_SYSTEM_PROFILER_TEAM_ADDED = 0,
+	// reserved for the user application
+	B_SYSTEM_PROFILER_USER_EVENT = 0,
+
+	// ring buffer wrap-around marker
+	B_SYSTEM_PROFILER_BUFFER_END,
+
+	// team
+	B_SYSTEM_PROFILER_TEAM_ADDED,
 	B_SYSTEM_PROFILER_TEAM_REMOVED,
 	B_SYSTEM_PROFILER_TEAM_EXEC,
+
+	// thread
 	B_SYSTEM_PROFILER_THREAD_ADDED,
 	B_SYSTEM_PROFILER_THREAD_REMOVED,
+
+	// image
 	B_SYSTEM_PROFILER_IMAGE_ADDED,
 	B_SYSTEM_PROFILER_IMAGE_REMOVED,
+
+	// profiling samples
 	B_SYSTEM_PROFILER_SAMPLES,
-	B_SYSTEM_PROFILER_SAMPLES_END
+
+	// scheduling
+	B_SYSTEM_PROFILER_THREAD_SCHEDULED,
+	B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
+	B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
+	B_SYSTEM_PROFILER_WAIT_OBJECT_INFO
 };
 
 
@@ -82,6 +125,37 @@ struct system_profiler_image_removed {
 struct system_profiler_samples {
 	thread_id	thread;
 	addr_t		samples[0];
+};
+
+// B_SYSTEM_PROFILER_THREAD_SCHEDULED,
+struct system_profiler_thread_scheduled {
+	bigtime_t	time;
+	thread_id	thread;
+	thread_id	previous_thread;
+	uint16		previous_thread_state;
+	uint16		previous_thread_wait_object_type;
+	addr_t		previous_thread_wait_object;
+};
+
+// B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
+struct system_profiler_thread_enqueued_in_run_queue {
+	bigtime_t	time;
+	thread_id	thread;
+	uint8		priority;
+};
+
+// B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
+struct system_profiler_thread_removed_from_run_queue {
+	bigtime_t	time;
+	thread_id	thread;
+};
+
+// B_SYSTEM_PROFILER_WAIT_OBJECT_INFO
+struct system_profiler_wait_object_info {
+	uint32		type;
+	addr_t		object;
+	addr_t		referenced_object;
+	char		name[1];
 };
 
 
