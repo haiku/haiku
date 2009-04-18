@@ -215,7 +215,7 @@ enum {
 	
 	// packet and dma queued result
 	ATA_MASK_ERROR						= 0x01,
-	ATA_MASK_IREASON					= 0x02,
+	ATA_MASK_INTERRUPT_REASON			= 0x02,
 
 	ATA_MASK_DEVICE_HEAD				= 0x20,
 	ATA_MASK_COMMAND					= 0x40,
@@ -243,7 +243,7 @@ enum {
 	ATA_STATUS_DWF						= 0x20,		// reserved
 	ATA_STATUS_DMA						= 0x20,		// reserved
 	ATA_STATUS_DMA_READY				= 0x20,		// packet: DMA ready
-	ATA_STATUS_DISK_FAILURE				= 0x20,		// packet: disk failure
+	ATA_STATUS_DEVICE_FAULT				= 0x20,		// device fault
 	ATA_STATUS_DEVICE_READY				= 0x40,		// device ready
 	ATA_STATUS_BUSY						= 0x80		// busy
 };

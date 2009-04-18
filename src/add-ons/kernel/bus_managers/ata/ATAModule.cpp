@@ -136,7 +136,7 @@ ata_sim_reset_bus(scsi_sim_cookie cookie)
 	if (channel->Bus() == NULL)
 		return SCSI_NO_HBA;
 
-	channel->Reset(NULL, NULL);
+	channel->Reset(NULL);
 	return SCSI_REQ_CMP;
 }
 

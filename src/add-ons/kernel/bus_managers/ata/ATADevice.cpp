@@ -436,9 +436,11 @@ ATADevice::Configure()
 	if (fUseLBA) {
 		fTotalSectors = fInfoBlock.LBA_total_sectors;
 		fTaskFile.lba.mode = ATA_MODE_LBA;
+		fTaskFile.lba.device = fIndex;
 	} else {
 		fTotalSectors = chsCapacity;
 		fTaskFile.chs.mode = ATA_MODE_CHS;
+		fTaskFile.chs.device = fIndex;
 	}
 
 	fUse48Bits = fInfoBlock._48_bit_addresses_supported;
@@ -485,7 +487,7 @@ ATADevice::Identify()
 	}
 
 	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
-		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE, IsATAPI()
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT, IsATAPI()
 		? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for identify request\n");
 		return B_TIMED_OUT;
@@ -525,18 +527,20 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 		return B_ERROR;
 	}
 
-	uint32 flags = 0;
-	if (!IsATAPI())
-		flags |= ATA_DEVICE_READY_REQUIRED;
-	if (request->UseDMA())
-		flags |= ATA_DMA_TRANSFER;
-
-	status_t result = fChannel->SendRequest(request, flags);
+	status_t result = fChannel->SendRequest(request, IsATAPI()
+		? 0 : ATA_DEVICE_READY_REQUIRED);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to send transfer request\n");
 		if (request->UseDMA())
 			fChannel->FinishDMA();
 		return result;
+	}
+
+	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, 0, ATA_CHECK_ERROR_BIT
+		| ATA_CHECK_DEVICE_FAULT, request->Timeout()) != B_OK) {
+		TRACE_ERROR("timeout waiting for device to request data\n");
+		request->SetStatus(SCSI_CMD_TIMEOUT);
+		return B_TIMED_OUT;
 	}
 
 	if (request->UseDMA()) {
@@ -591,6 +595,8 @@ ATADevice::_FillTaskFile(ATARequest *request, uint64 address)
 	};
 
 	uint32 sectorCount = *request->BytesLeft() / ATA_BLOCK_SIZE;
+	TRACE("about to transfer %lu sectors\n", sectorCount);
+
 	if (fUseLBA) {
 		if (fUse48Bits
 			&& (address + sectorCount > 0xfffffff || sectorCount > 0x100)) {

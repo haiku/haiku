@@ -116,41 +116,34 @@ ATAChannel::SetBus(scsi_bus bus)
 status_t
 ATAChannel::ScanBus()
 {
-	bool devicePresent[fDeviceCount];
+	// check if there is anything at all
+	if (AltStatus() == 0xff) {
+		TRACE_ALWAYS("illegal status value, assuming no devices connected\n");
+		return B_OK;
+	}
+
 	uint32 deviceSignature[fDeviceCount];
-	status_t result = Reset(devicePresent, deviceSignature);
+	status_t result = Reset(deviceSignature);
 	if (result != B_OK) {
 		TRACE_ERROR("resetting the channel failed\n");
 		return result;
 	}
 
 	for (uint8 i = 0; i < fDeviceCount; i++) {
-		if (!devicePresent[i])
-			continue;
-
 		ATADevice *device = NULL;
 		if (deviceSignature[i] == ATA_SIGNATURE_ATAPI)
 			device = new(std::nothrow) ATAPIDevice(this, i);
 		else
 			device = new(std::nothrow) ATADevice(this, i);
 
-		if (device == NULL)
+		if (device == NULL) {
+			TRACE_ERROR("out of memory allocating device\n");
 			return B_NO_MEMORY;
+		}
 
 		TRACE("trying ATA%s device %u\n", device->IsATAPI() ? "PI" : "", i);
 
-		bool identified = device->Identify() == B_OK;
-		if (!identified && !device->IsATAPI()) {
-			// retry as atapi
-			delete device;
-			device = new(std::nothrow) ATAPIDevice(this, i);
-			if (device == NULL)
-				return B_NO_MEMORY;
-
-			identified = device->Identify() == B_OK;
-		}
-
-		if (!identified) {
+		if (device->Identify() != B_OK) {
 			delete device;
 			continue;
 		}
@@ -265,9 +258,8 @@ ATAChannel::SelectDevice(uint8 device)
 		return B_BAD_INDEX;
 
 	ata_task_file taskFile;
-	taskFile.chs.head = 0;
-	taskFile.chs.mode = ATA_MODE_LBA;
-	taskFile.chs.device = device;
+	taskFile.lba.mode = ATA_MODE_LBA;
+	taskFile.lba.device = device;
 
 	_WriteRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
 	_FlushAndWait(1);
@@ -286,38 +278,10 @@ ATAChannel::SelectDevice(uint8 device)
 }
 
 
-bool
-ATAChannel::IsDevicePresent(uint8 device)
-{
-	if (SelectDevice(device) != B_OK)
-		return false;
-
-	ata_task_file taskFile;
-	taskFile.chs.device = device;
-	taskFile.chs.mode = ATA_MODE_LBA;
-	taskFile.chs.command = ATA_COMMAND_NOP;
-	_WriteRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
-
-	_FlushAndWait(10);
-
-	_ReadRegs(&taskFile, ATA_MASK_STATUS | ATA_MASK_ERROR);
-	TRACE("status: 0x%02x; error: 0x%02x\n", taskFile.read.status,
-		taskFile.read.error);
-	return (taskFile.read.status & 0xf8) != 0xf8
-		&& taskFile.read.status != 0xa5;
-}
-
-
 status_t
-ATAChannel::Reset(bool *presence, uint32 *signatures)
+ATAChannel::Reset(uint32 *signatures)
 {
-	TRACE_FUNCTION("%p, %p\n", presence, signatures);
-
-	bool devicePresent[fDeviceCount];
-	for (uint8 i = 0; i < fDeviceCount; i++) {
-		devicePresent[i] = IsDevicePresent(i);
-		TRACE("device %d: %s present\n", i, devicePresent[i] ? "might be" : "is not");
-	}
+	TRACE_FUNCTION("\n");
 
 	SelectDevice(0);
 
@@ -339,13 +303,10 @@ ATAChannel::Reset(bool *presence, uint32 *signatures)
 	_FlushAndWait(150 * 1000);
 
 	for (uint8 i = 0; i < fDeviceCount; i++) {
-		if (presence != NULL)
-			presence[i] = devicePresent[i];
-
-		if (!devicePresent[i])
-			continue;
-
 		SelectDevice(i);
+
+		// ensure interrupts are disabled for this device
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 		// wait up to 31 seconds for busy to clear
 		if (Wait(0, ATA_STATUS_BUSY, 0, 31 * 1000 * 1000) != B_OK) {
@@ -390,6 +351,9 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	bigtime_t startTime = system_time();
 	_FlushAndWait(1);
 
+	TRACE("waiting for set bits 0x%02x and cleared bits 0x%02x\n",
+		setBits, clearedBits);
+
 	while (true) {
 		uint8 status = AltStatus();
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
@@ -398,9 +362,9 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 			return B_ERROR;
 		}
 
-		if ((flags & ATA_CHECK_DISK_FAILURE) != 0
-			&& (status & ATA_STATUS_DISK_FAILURE) != 0) {
-			TRACE("disk failure bit set while waiting\n");
+		if ((flags & ATA_CHECK_DEVICE_FAULT) != 0
+			&& (status & ATA_STATUS_DEVICE_FAULT) != 0) {
+			TRACE("device fault bit set while waiting\n");
 			return B_ERROR;
 		}
 
@@ -412,7 +376,7 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 		}
 
 		bigtime_t elapsedTime = system_time() - startTime;
-		//TRACE("wait status after %lld: %u\n", elapsedTime, status);
+		TRACE("wait status after %lld: 0x%02x\n", elapsedTime, status);
 		if (elapsedTime > timeout)
 			return B_TIMED_OUT;
 
@@ -459,6 +423,9 @@ ATAChannel::PrepareWaitingForInterrupt()
 	InterruptsSpinLocker locker(fInterruptLock);
 	fExpectsInterrupt = true;
 	fInterruptCondition.Add(&fInterruptConditionEntry);
+
+	// enable interrupts
+	_WriteControl(0);
 }
 
 
@@ -473,6 +440,9 @@ ATAChannel::WaitForInterrupt(bigtime_t timeout)
 	fExpectsInterrupt = false;
 	locker.Unlock();
 
+	// disable interrupts
+	_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
+
 	if (result != B_OK) {
 		TRACE_ERROR("timeout waiting for interrupt\n");
 		return B_TIMED_OUT;
@@ -485,10 +455,6 @@ ATAChannel::WaitForInterrupt(bigtime_t timeout)
 status_t
 ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 {
-	// disable interrupts for PIO transfers, enable them for DMA
-	_WriteControl((flags & ATA_DMA_TRANSFER) != 0 ? 0
-		: ATA_DEVICE_CONTROL_DISABLE_INTS);
-
 	ATADevice *device = request->Device();
 	if (device->Select() != B_OK || WaitForIdle() != B_OK) {
 		// resetting the device here will discard current configuration,
@@ -553,8 +519,8 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 	}
 
 	uint8 checkFlags = ATA_STATUS_ERROR;
-	if (flags & ATA_CHECK_DISK_FAILURE)
-		checkFlags |= ATA_STATUS_DISK_FAILURE;
+	if (flags & ATA_CHECK_DEVICE_FAULT)
+		checkFlags |= ATA_STATUS_DEVICE_FAULT;
 
 	if ((taskFile->read.status & checkFlags) == 0)
 		return B_OK;
@@ -646,13 +612,6 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 	status_t result = B_OK;
 	size_t *bytesLeft = request->BytesLeft();
 	while (*bytesLeft > 0) {
-		if (Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY, ATA_CHECK_ERROR_BIT
-			| ATA_CHECK_DISK_FAILURE, timeout) != B_OK) {
-			TRACE_ERROR("timeout waiting for device to request data\n");
-			result = B_TIMED_OUT;
-			break;
-		}
-
 		size_t currentLength = MIN(*bytesLeft, ATA_BLOCK_SIZE);
 		if (request->IsWrite()) {
 			result = _WritePIOBlock(request, currentLength);
@@ -670,9 +629,16 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 
 		*bytesLeft -= currentLength;
 
-		// wait 1 pio cycle
-		if (*bytesLeft > 0)
-			AltStatus();
+		if (*bytesLeft > 0) {
+			// wait for next block to be ready
+			if (Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
+				ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT,
+				timeout) != B_OK) {
+				TRACE_ERROR("timeout waiting for device to request data\n");
+				result = B_TIMED_OUT;
+				break;
+			}
+		}
 	}
 
 	if (result == B_OK && WaitDataRequest(false) != B_OK) {

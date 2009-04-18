@@ -49,8 +49,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
-	status_t result = fChannel->SendRequest(request, request->UseDMA()
-		? ATA_DMA_TRANSFER : 0);
+	status_t result = fChannel->SendRequest(request, 0);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to send packet request\n");
 		if (request->UseDMA())
@@ -60,7 +59,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 
 	// wait for device to get ready for packet transmission
 	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
-		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE, 100 * 1000) != B_OK) {
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT, 100 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for data request\n");
 		if (request->UseDMA())
 			fChannel->FinishDMA();
@@ -70,7 +69,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 	}
 
 	// make sure device really asks for command packet
-	fRegisterMask = ATA_MASK_IREASON;
+	fRegisterMask = ATA_MASK_INTERRUPT_REASON;
 	fChannel->ReadRegs(this);
 
 	if (!fTaskFile.packet_res.cmd_or_data
@@ -96,6 +95,14 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
+	if (!request->HasData()) {
+		result = fChannel->FinishRequest(request, ATA_WAIT_FINISH
+			| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
+		if (result != B_OK)
+			TRACE_ERROR("device indicates error after non-data command\n");
+		return result;
+	}
+
 	if (request->UseDMA()) {
 		fChannel->PrepareWaitingForInterrupt();
 		fChannel->StartDMA();
@@ -107,7 +114,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 			return B_TIMED_OUT;
 		}
 
-		result = fChannel->FinishRequest(request, ATA_CHECK_DISK_FAILURE,
+		result = fChannel->FinishRequest(request, ATA_CHECK_DEVICE_FAULT,
 			ATA_ERROR_ALL);
 		if (result != B_OK) {
 			TRACE_ERROR("device indicates transfer error after dma\n");
@@ -133,33 +140,47 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
-	// PIO data transfer
 	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
-		ATA_CHECK_ERROR_BIT | ATA_CHECK_DISK_FAILURE,
+		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT,
 		request->Timeout()) != B_OK) {
 		TRACE_ERROR("timeout waiting for device to request data\n");
 		request->SetStatus(SCSI_CMD_TIMEOUT);
 		return B_TIMED_OUT;
 	}
 
-	fRegisterMask = ATA_MASK_IREASON | ATA_MASK_BYTE_COUNT;
-	fChannel->ReadRegs(this);
+	// PIO data transfer
+	while (true) {
+		fRegisterMask = ATA_MASK_INTERRUPT_REASON | ATA_MASK_BYTE_COUNT;
+		fChannel->ReadRegs(this);
 
-	if (fTaskFile.packet_res.cmd_or_data) {
-		TRACE_ERROR("device expecting command instead of data\n");
-		request->SetStatus(SCSI_SEQUENCE_FAIL);
-		return B_ERROR;
+		if (fTaskFile.packet_res.cmd_or_data) {
+			TRACE_ERROR("device expecting command instead of data\n");
+			request->SetStatus(SCSI_SEQUENCE_FAIL);
+			return B_ERROR;
+		}
+
+		size_t length = fTaskFile.packet_res.byte_count_0_7
+			| ((size_t)fTaskFile.packet_res.byte_count_8_15 << 8);
+		TRACE("about to transfer %lu bytes\n", length);
+
+		request->SetBytesLeft(length);
+		fChannel->ExecutePIOTransfer(request);
+
+		if (fChannel->Wait(0, ATA_STATUS_BUSY, 0, request->Timeout()) != B_OK) {
+			TRACE_ERROR("timeout waiting for device to finish transfer\n");
+			request->SetStatus(SCSI_CMD_TIMEOUT);
+			return B_TIMED_OUT;
+		}
+
+		if ((fChannel->AltStatus() & ATA_STATUS_DATA_REQUEST) == 0) {
+			// transfer complete
+			TRACE("pio transfer complete\n");
+			break;
+		}
 	}
 
-	size_t length = fTaskFile.packet_res.byte_count_0_7
-		| ((size_t)fTaskFile.packet_res.byte_count_8_15 << 8);
-	TRACE("about to transfer %lu bytes\n", length);
-
-	request->SetBytesLeft(length);
-	fChannel->ExecutePIOTransfer(request);
-
 	result = fChannel->FinishRequest(request, ATA_WAIT_FINISH
-		| ATA_CHECK_DISK_FAILURE, ATA_ERROR_ALL);
+		| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
 	if (result != B_OK)
 		TRACE_ERROR("device indicates transfer error after pio\n");
 
@@ -210,7 +231,7 @@ ATAPIDevice::_FillTaskFilePacket(ATARequest *request)
 {
 	scsi_ccb *ccb = request->CCB();
 	fRegisterMask = ATA_MASK_FEATURES | ATA_MASK_BYTE_COUNT;
-	fTaskFile.packet.dma = request->UseDMA();
+	fTaskFile.packet.dma = request->UseDMA() ? 1 : 0;
 	fTaskFile.packet.ovl = 0;
 	fTaskFile.packet.byte_count_0_7 = ccb->data_length & 0xff;
 	fTaskFile.packet.byte_count_8_15 = ccb->data_length >> 8;

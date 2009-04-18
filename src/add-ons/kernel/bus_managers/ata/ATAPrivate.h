@@ -29,7 +29,9 @@
 #define ATA_MAX_DMA_FAILURES		3
 #define ATA_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define ATA_RELEASE_TIMEOUT			10 * 1000 * 1000
+#define ATA_SIGNATURE_ATA			0x00000101
 #define ATA_SIGNATURE_ATAPI			0xeb140101
+#define ATA_SIGNATURE_SATA			0xc33c0101
 #define ATA_SIM_MODULE_NAME			"bus_managers/ata/sim/driver_v1"
 #define ATA_CHANNEL_ID_GENERATOR	"ata/channel_id"
 #define ATA_CHANNEL_ID_ITEM			"ata/channel_id"
@@ -41,7 +43,7 @@ enum {
 	ATA_CHECK_ERROR_BIT			= 0x08,
 	ATA_WAIT_FINISH				= 0x10,
 	ATA_WAIT_ANY_BIT			= 0x20,
-	ATA_CHECK_DISK_FAILURE		= 0x40
+	ATA_CHECK_DEVICE_FAULT		= 0x40
 };
 
 
@@ -75,9 +77,8 @@ public:
 
 		// ATA stuff
 		status_t					SelectDevice(uint8 index);
-		bool						IsDevicePresent(uint8 index);
 
-		status_t					Reset(bool *presence, uint32 *signatures);
+		status_t					Reset(uint32 *signatures);
 
 		bool						UseDMA() { return fUseDMA; };
 
@@ -267,6 +268,8 @@ public:
 
 		void						SetBytesLeft(uint32 bytesLeft);
 		size_t *					BytesLeft() { return &fBytesLeft; };
+
+		bool						HasData() { return fCCB->data_length > 0; };
 
 		status_t					Finish(bool resubmit);
 
