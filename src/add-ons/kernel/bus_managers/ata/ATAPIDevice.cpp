@@ -95,13 +95,8 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		return B_ERROR;
 	}
 
-	if (!request->HasData()) {
-		result = fChannel->FinishRequest(request, ATA_WAIT_FINISH
-			| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
-		if (result != B_OK)
-			TRACE_ERROR("device indicates error after non-data command\n");
-		return result;
-	}
+	if (!request->HasData())
+		return _FinishRequest(request, ATA_WAIT_FINISH);
 
 	if (request->UseDMA()) {
 		fChannel->PrepareWaitingForInterrupt();
@@ -114,8 +109,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 			return B_TIMED_OUT;
 		}
 
-		result = fChannel->FinishRequest(request, ATA_CHECK_DEVICE_FAULT,
-			ATA_ERROR_ALL);
+		result = _FinishRequest(request, ATA_WAIT_FINISH);
 		if (result != B_OK) {
 			TRACE_ERROR("device indicates transfer error after dma\n");
 			return result;
@@ -148,8 +142,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 			request->SetStatus(SCSI_CMD_TIMEOUT);
 			return B_TIMED_OUT;
 		} else
-			return fChannel->FinishRequest(request, ATA_WAIT_FINISH
-				| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
+			return _FinishRequest(request, 0);
 	}
 
 	// PIO data transfer
@@ -170,10 +163,14 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		request->SetBytesLeft(length);
 		fChannel->ExecutePIOTransfer(request);
 
-		if (fChannel->Wait(0, ATA_STATUS_BUSY, 0, request->Timeout()) != B_OK) {
-			TRACE_ERROR("timeout waiting for device to finish transfer\n");
-			request->SetStatus(SCSI_CMD_TIMEOUT);
-			return B_TIMED_OUT;
+		result = fChannel->Wait(0, ATA_STATUS_BUSY, 0, request->Timeout());
+		if (result != B_OK) {
+			if (result == B_TIMED_OUT) {
+				TRACE_ERROR("timeout waiting for device to finish transfer\n");
+				request->SetStatus(SCSI_CMD_TIMEOUT);
+				return B_TIMED_OUT;
+			} else
+				return _FinishRequest(request, 0);
 		}
 
 		if ((fChannel->AltStatus() & ATA_STATUS_DATA_REQUEST) == 0) {
@@ -183,12 +180,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 		}
 	}
 
-	result = fChannel->FinishRequest(request, ATA_WAIT_FINISH
-		| ATA_CHECK_DEVICE_FAULT, ATA_ERROR_ALL);
-	if (result != B_OK)
-		TRACE_ERROR("device indicates transfer error after pio\n");
-
-	return result;
+	return _FinishRequest(request, ATA_WAIT_FINISH);
 }
 
 
@@ -240,5 +232,25 @@ ATAPIDevice::_FillTaskFilePacket(ATARequest *request)
 	fTaskFile.packet.byte_count_0_7 = ccb->data_length & 0xff;
 	fTaskFile.packet.byte_count_8_15 = ccb->data_length >> 8;
 	fTaskFile.packet.command = ATA_COMMAND_PACKET;
+	return B_OK;
+}
+
+
+status_t
+ATAPIDevice::_FinishRequest(ATARequest *request, uint32 flags)
+{
+	if (fChannel->FinishRequest(request, flags
+		| ATA_CHECK_DEVICE_FAULT, 0) != B_OK) {
+		// when we get an error from a packet device, we instruct the
+		// scsi layer to do a request sense. but since we don't want to
+		// return an emulated sense coming from ata, we clear our sense
+		// key first so that the next request sense will go to the packet
+		// device directly (as a packet command).
+		request->ClearSense();
+		request->SetStatus(SCSI_REQ_CMP_ERR);
+		request->CCB()->device_status = SCSI_STATUS_CHECK_CONDITION;
+		return B_ERROR;
+	}
+
 	return B_OK;
 }

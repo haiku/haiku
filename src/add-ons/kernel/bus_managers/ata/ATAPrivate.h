@@ -235,6 +235,8 @@ virtual	status_t					Configure();
 
 private:
 		status_t					_FillTaskFilePacket(ATARequest *request);
+		status_t					_FinishRequest(ATARequest *request,
+										uint32 flags);
 
 		uint8						fPacket[12];
 };
@@ -270,6 +272,7 @@ public:
 		size_t *					BytesLeft() { return &fBytesLeft; };
 
 		bool						HasData() { return fCCB->data_length > 0; };
+		bool						HasSense() { return fSenseKey != 0; };
 
 		status_t					Finish(bool resubmit);
 

@@ -215,7 +215,7 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 	if (result != B_OK)
 		return result;
 
-	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
+	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE && fRequest->HasSense()) {
 		TRACE("request sense\n");
 		fRequest->RequestSense();
 		fRequest->Finish(false);
