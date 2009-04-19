@@ -10,6 +10,8 @@
 
 #include <DataIO.h>
 
+#include <system_profiler_defs.h>
+
 
 #define INPUT_BUFFER_SIZE	(128 * 1024)
 
@@ -98,39 +100,58 @@ BDebugEventInputStream::Unset()
 }
 
 
+/*!	\brief Returns the next event in the stream.
+
+	At the end of the stream \c 0 is returned and \c *_buffer is set to \c NULL.
+	For events that don't have data associated with them, \c *_buffer will still
+	be non-NULL, even if dereferencing that address is not allowed.
+
+	\param _event Pointer to a pre-allocated location where the event ID shall
+		be stored.
+	\param _cpu Pointer to a pre-allocated location where the CPU index shall
+		be stored.
+	\param _buffer Pointer to a pre-allocated location where the pointer to the
+		event data shall be stored.
+	\return A negative error code in case an error occurred while trying to read
+		the info, the size of the data associated with the event otherwise.
+*/
 ssize_t
-BDebugEventInputStream::ReadNextEvent(
-	const system_profiler_event_header** _header)
+BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
+	const void** _buffer)
 {
 	// get the next header
 	status_t error = _GetData(sizeof(system_profiler_event_header));
 	if (error != B_OK) {
-		if (error == B_BAD_DATA && fBufferSize == 0)
-			return B_ENTRY_NOT_FOUND;
+		if (error == B_BAD_DATA && fBufferSize == 0) {
+			*_buffer = NULL;
+			return 0;
+		}
 		return error;
 	}
 
-	system_profiler_event_header* header
-		= (system_profiler_event_header*)(fBuffer + fBufferPosition);
+	system_profiler_event_header header
+		= *(system_profiler_event_header*)(fBuffer + fBufferPosition);
+
+	// skip the header in the buffer
+	fBufferSize -= sizeof(system_profiler_event_header);
+	fBufferPosition += sizeof(system_profiler_event_header);
 
 	// get the data
-	size_t size = header->size;
-	size_t totalSize = sizeof(system_profiler_event_header) + size;
-	if (header->size > 0) {
-		error = _GetData(totalSize);
+	if (header.size > 0) {
+		error = _GetData(header.size);
 		if (error != B_OK)
 			return error;
 	}
 
-	// header might have moved when getting the data
-	header = (system_profiler_event_header*)(fBuffer + fBufferPosition);
+	*_event = header.event;
+	*_cpu = header.cpu;
+	*_buffer = fBuffer + fBufferPosition;
 
 	// skip the event in the buffer
-	fBufferSize -= totalSize;
-	fBufferPosition += totalSize;
+	fBufferSize -= header.size;
+	fBufferPosition += header.size;
 
-	*_header = header;
-	return size;
+	return header.size;
 }
 
 

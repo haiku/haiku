@@ -7,8 +7,6 @@
 
 #include <SupportDefs.h>
 
-#include <system_profiler_defs.h>
-
 
 class BDataIO;
 
@@ -43,9 +41,8 @@ public:
 			status_t			SetTo(BDataIO* stream);
 			void				Unset();
 
-			ssize_t				ReadNextEvent(
-									const system_profiler_event_header**
-										_header);
+			ssize_t				ReadNextEvent(uint32* _event, uint32* _cpu,
+									const void** _buffer);
 
 private:
 			ssize_t				_Read(void* buffer, size_t size);

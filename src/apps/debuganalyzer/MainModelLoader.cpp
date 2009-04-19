@@ -134,15 +134,19 @@ MainModelLoader::_Loader()
 	try {
 		while (true) {
 			// get next event
-			const system_profiler_event_header* header;
-			ssize_t bufferSize = fInput->ReadNextEvent(&header);
-			if (bufferSize < 0) {
-				success = bufferSize == B_ENTRY_NOT_FOUND;
+			uint32 event;
+			uint32 cpu;
+			const void* buffer;
+			ssize_t bufferSize = fInput->ReadNextEvent(&event, &cpu, &buffer);
+			if (bufferSize < 0)
+				break;
+			if (buffer == NULL) {
+				success = true;
 				break;
 			}
 
 			// process the event
-			status_t error = _ProcessEvent(header, bufferSize);
+			status_t error = _ProcessEvent(event, cpu, buffer, bufferSize);
 			if (error != B_OK)
 				break;
 
@@ -178,7 +182,7 @@ MainModelLoader::_Loader()
 
 
 status_t
-MainModelLoader::_ProcessEvent(const system_profiler_event_header* header,
+MainModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 	size_t size)
 {
 	// TODO: Implement!

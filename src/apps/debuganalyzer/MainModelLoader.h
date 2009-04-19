@@ -29,9 +29,8 @@ public:
 private:
 	static	status_t			_LoaderEntry(void* data);
 			status_t			_Loader();
-			status_t			_ProcessEvent(
-									const system_profiler_event_header* header,
-									size_t size);
+			status_t			_ProcessEvent(uint32 event, uint32 cpu,
+									const void* buffer, size_t size);
 
 private:
 			BLocker				fLock;
