@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps debuganalyzer ;
+
+UsePrivateHeaders debug interface shared ;
+UsePrivateSystemHeaders ;
+
+Application DebugAnalyzer
+	:
+	DebugAnalyzer.cpp
+	MainModel.cpp
+	MainModelLoader.cpp
+	MainWindow.cpp
+	ThreadsPage.cpp
+
+	: libcolumnlistview.a libdebug.so be
+	: DebugAnalyzer.rdef
+;

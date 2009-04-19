@@ -1,0 +1,18 @@
+
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-DebugAnalyzer";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_BETA,
+	internal = 0,
+
+	short_info = "DebugAnalyzer",
+	long_info = "DebugAnalyzer ©2009 Haiku, Inc."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+// TODO: Please give me a nice icon!
