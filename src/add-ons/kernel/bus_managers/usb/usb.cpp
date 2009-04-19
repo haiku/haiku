@@ -31,6 +31,10 @@ debug_get_pipe_for_id(int argc, char **argv)
 	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
 		return 3;
 
+	// check if we support debug transfers for this pipe (only on UHCI for now)
+	if (object->GetBusManager()->TypeName()[0] != 'u')
+		return 4;
+
 	set_debug_variable("_usbPipe", (uint64)object);
 	return 0;
 }
