@@ -34,6 +34,8 @@ public:
 
 			void				UseAlternateScreenBuffer(bool clear);
 			void				UseNormalScreenBuffer();
+			
+			void				ReportAnyMouseEvent(bool reportAnyMouseEvent);
 
 protected:
 	virtual	void				NotifyListener();

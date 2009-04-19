@@ -75,6 +75,17 @@ TerminalBuffer::Encoding() const
 
 
 void
+TerminalBuffer::ReportAnyMouseEvent(bool reportAnyMouseEvent)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_REPORT_ANY_MOUSE_EVENT);
+		message.AddBool("reportAnyMouseEvent", reportAnyMouseEvent);
+		fListener.SendMessage(&message);
+	}	
+}
+
+
+void
 TerminalBuffer::SetEncoding(int encoding)
 {
 	fEncoding = encoding;

@@ -1,9 +1,12 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT license.
  */
+
+//! Escape sequence parse and character encoding.
+
 #include "TermParse.h"
 
 #include <ctype.h>
@@ -23,25 +26,19 @@
 #include "VTparse.h"
 
 
-//////////////////////////////////////////////////////////////////////////////
-// EscParse ... Escape sequence parse and character encoding.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-
 extern int gUTF8GroundTable[];		/* UTF8 Ground table */
 extern int gCS96GroundTable[];		/* CS96 Ground table */
 extern int gISO8859GroundTable[];	/* ISO8859 & EUC Ground table */
 extern int gSJISGroundTable[];		/* Shift-JIS Ground table */
 
-extern int gEscTable[];		/* ESC */
-extern int gCsiTable[];		/* ESC [ */
-extern int gDecTable[];		/* ESC [ ? */
-extern int gScrTable[];		/* ESC # */
-extern int gIgnoreTable[];		/* ignore table */
-extern int gIesTable[];		/* ignore ESC table */
+extern int gEscTable[];				/* ESC */
+extern int gCsiTable[];				/* ESC [ */
+extern int gDecTable[];				/* ESC [ ? */
+extern int gScrTable[];				/* ESC # */
+extern int gIgnoreTable[];			/* ignore table */
+extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
-extern int gMbcsTable[];		/* ESC $ */
+extern int gMbcsTable[];			/* ESC $ */
 
 
 
@@ -101,7 +98,7 @@ TermParse::StartThreads(TerminalBuffer *buffer)
 
 	status_t status = InitPtyReader();
 	if (status < B_OK) {
-		fBuffer = NULL;	
+		fBuffer = NULL;
 		return status;
 	}
 
@@ -109,9 +106,9 @@ TermParse::StartThreads(TerminalBuffer *buffer)
 	if (status < B_OK) {
 		StopPtyReader();
 		fBuffer = NULL;
-		return status;		
+		return status;
 	}
-	
+
 	return B_OK;
 }
 
@@ -126,9 +123,9 @@ TermParse::StopThreads()
 
 	StopPtyReader();
 	StopTermParse();
-	
+
 	fBuffer = NULL;
-	
+
 	return B_OK;
 }
 
@@ -144,7 +141,7 @@ TermParse::InitTermParse()
 		B_DISPLAY_PRIORITY, this);
 
 	resume_thread(fParseThread);
-	
+
 	return B_OK;
 }
 
@@ -164,7 +161,7 @@ TermParse::InitPtyReader()
 	if (fReaderLocker < 0) {
 		delete_sem(fReaderSem);
 		fReaderSem = -1;
-		return fReaderLocker;	
+		return fReaderLocker;
 	}
 
 	fReaderThread = spawn_thread(_ptyreader_thread, "PtyReader",
@@ -174,8 +171,8 @@ TermParse::InitPtyReader()
 		fReaderSem = -1;
 		delete_sem(fReaderLocker);
 		fReaderLocker = -1;
-		return fReaderThread;	
-	}	
+		return fReaderThread;
+	}
 
 	resume_thread(fReaderThread);
 
@@ -189,7 +186,7 @@ TermParse::StopTermParse()
 	if (fParseThread >= 0) {
 		status_t dummy;
 		wait_for_thread(fParseThread, &dummy);
-		fParseThread = -1;	
+		fParseThread = -1;
 	}
 }
 
@@ -201,7 +198,7 @@ TermParse::StopPtyReader()
 		delete_sem(fReaderSem);
 		fReaderSem = -1;
 	}
-	if (fReaderLocker >= 0) {	
+	if (fReaderLocker >= 0) {
 		delete_sem(fReaderLocker);
 		fReaderLocker = -1;
 	}
@@ -212,7 +209,7 @@ TermParse::StopPtyReader()
 		status_t status;
 		wait_for_thread(fReaderThread, &status);
 
-		fReaderThread = -1;	
+		fReaderThread = -1;
 	}
 }
 
@@ -227,11 +224,11 @@ TermParse::PtyReader()
 		// If Pty Buffer nearly full, snooze this thread, and continue.
 		while (READ_BUF_SIZE - bufferSize < MIN_PTY_BUFFER_SPACE) {
 			status_t status;
-			do {			
+			do {
 				status = acquire_sem(fReaderLocker);
 			} while (status == B_INTERRUPTED);
 			if (status < B_OK)
-				return status;		
+				return status;
 
 			bufferSize = fReadBufferSize;
 		}
@@ -309,7 +306,7 @@ TermParse::EscParse()
 	int top, bot;
 	int cs96 = 0;
 	uchar curess = 0;
-	
+
 	char cbuf[4], dstbuf[4];
 	char *ptr;
 
@@ -381,7 +378,7 @@ TermParse::EscParse()
 			case CASE_PRINT_GR:
 				/* case iso8859 gr character, or euc */
 				ptr = cbuf;
-				if (now_coding == B_EUC_CONVERSION 
+				if (now_coding == B_EUC_CONVERSION
 					|| now_coding == B_EUC_KR_CONVERSION
 					|| now_coding == B_JIS_CONVERSION
 					|| now_coding == B_GBK_CONVERSION
@@ -469,7 +466,7 @@ TermParse::EscParse()
 					break;
 				cbuf[1] = c;
 				cbuf[2] = '\0';
-				
+
 				fBuffer->InsertChar(cbuf, 2, attr);
 				break;
 
@@ -502,7 +499,7 @@ TermParse::EscParse()
 			case CASE_SCS_STATE:
 			{
 				cs96 = 0;
-				uchar dummy;				
+				uchar dummy;
 				_NextParseChar(dummy);
 				parsestate = groundtable;
 				break;
@@ -819,7 +816,7 @@ TermParse::EscParse()
 					//		  screen->max_col + 1, False);
 					parsestate = groundtable;
 					break;
-				
+
 			//	case CASE_GSETS:
 			//		screen->gsets[scstype] = GSET(c) | cs96;
 			//		parsestate = groundtable;
@@ -879,14 +876,14 @@ TermParse::EscParse()
 					uchar mode_char;
 					_NextParseChar(mode_char);
 					if (mode_char != '0'
-						&& mode_char != '1' 
+						&& mode_char != '1'
 						&& mode_char != '2') {
 						parsestate = groundtable;
 						break;
 					}
 					uchar current_char;
 					_NextParseChar(current_char);
-					while (_NextParseChar(current_char) == B_OK 
+					while (_NextParseChar(current_char) == B_OK
 						&& current_char != 0x7) {
 						if (!isprint(current_char & 0x7f)
 							|| len+2 >= sizeof(string))
@@ -987,7 +984,7 @@ TermParse::EscParse()
 					break;
 		}
 	}
-	
+
 	return B_OK;
 }
 
@@ -1109,8 +1106,23 @@ TermParse::_DecPrivateModeSet(int value)
 			// Use Alternate Screen Buffer.
 			fBuffer->UseAlternateScreenBuffer(false);
 			break;
+		case 1000:
+			// TODO: Send Mouse X & Y on button press and release.
+			break;
+		case 1003:
+			// Use All Motion Mouse Tracking
+			fBuffer->ReportAnyMouseEvent(true);
+			break;
 		case 1034:
-			// Interpret "meta" key, sets eighth bit.
+			// TODO: Interprete "meta" key, sets eighth bit.
+			// Not supported yet.
+			break;
+		case 1036:
+			// TODO: Send ESC when Meta modifies a key
+			// Not supported yet.
+			break;
+		case 1039:
+			// TODO: Send ESC when Alt modifies a key
 			// Not supported yet.
 			break;
 		case 1049:
@@ -1155,8 +1167,23 @@ TermParse::_DecPrivateModeReset(int value)
 			// Use Normal Screen Buffer.
 			fBuffer->UseNormalScreenBuffer();
 			break;
+		case 1000:
+			// TODO: Don't send Mouse X & Y on button press and release.
+			break;
+		case 1003:
+			// Disable All Motion Mouse Tracking.
+			fBuffer->ReportAnyMouseEvent(false);
+			break;
 		case 1034:
-			// Don’t interpret "meta" key.
+			// Don't interprete "meta" key.
+			// Not supported yet.
+			break;
+		case 1036:
+			// TODO: Don't send ESC when Meta modifies a key
+			// Not supported yet.
+			break;
+		case 1039:
+			// TODO: Don't send ESC when Alt modifies a key
 			// Not supported yet.
 			break;
 		case 1049:

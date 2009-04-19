@@ -170,7 +170,8 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fColumns(COLUMNS_DEFAULT),
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
-	fScrBufSize(historySize)
+	fScrBufSize(historySize),
+	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
 }
@@ -183,7 +184,8 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fColumns(columns),
 	fRows(rows),
 	fEncoding(M_UTF8),
-	fScrBufSize(historySize)
+	fScrBufSize(historySize),
+	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
 	SetTermSize(fRows, fColumns, true);
@@ -207,7 +209,8 @@ TermView::TermView(BMessage* archive)
 	fColumns(COLUMNS_DEFAULT),
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
-	fScrBufSize(1000)
+	fScrBufSize(1000),
+	fReportAnyMouseEvent(false)
 {
 	// We need this
 	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
@@ -277,6 +280,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fMouseTracking = false;
 	fIMflag = false;
 	fCheckMouseTracking = false;
+	fReportAnyMouseEvent = false;
 
 	fTextBuffer = new(std::nothrow) TerminalBuffer;
 	if (fTextBuffer == NULL)
@@ -1333,18 +1337,18 @@ TermView::MessageReceived(BMessage *msg)
 		//rgb_color *color;
 
 		int32 i = 0;
-				
+
 		if (msg->FindRef("refs", i++, &ref) == B_OK) {
 			// first check if secondary mouse button is pressed
 			int32 buttons = 0;
 			msg->FindInt32("buttons", &buttons);
-		
+
 			if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 				// start popup menu
 				_SecondaryMouseButtonDropped(msg);
 				return;
 			}
-			
+
 			_DoFileDrop(ref);
 
 			while (msg->FindRef("refs", i++, &ref) == B_OK) {
@@ -1517,7 +1521,13 @@ TermView::MessageReceived(BMessage *msg)
 				SetTitle(title);
 			break;
 		}
-
+		case MSG_REPORT_ANY_MOUSE_EVENT:
+		{
+			bool reportAnyMouseEvent;
+			if (msg->FindBool("reportAnyMouseEvent", &reportAnyMouseEvent) == B_OK)
+				fReportAnyMouseEvent = reportAnyMouseEvent;
+			break;
+		}
 		case MSG_REMOVE_RESIZE_VIEW_IF_NEEDED:
 		{
 			BPoint point;
@@ -1630,30 +1640,30 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	BMessage* insertMessage = new BMessage(*msg);
 	insertMessage->what = kSecondaryMouseDropAction;
 	insertMessage->AddInt8("action", kInsert);
-	
+
 	BMessage* cdMessage = new BMessage(*msg);
 	cdMessage->what = kSecondaryMouseDropAction;
 	cdMessage->AddInt8("action", kChangeDirectory);
-	
+
 	BMessage* lnMessage = new BMessage(*msg);
 	lnMessage->what = kSecondaryMouseDropAction;
 	lnMessage->AddInt8("action", kLinkFiles);
-	
+
 	BMessage* mvMessage = new BMessage(*msg);
 	mvMessage->what = kSecondaryMouseDropAction;
 	mvMessage->AddInt8("action", kMoveFiles);
-	
+
 	BMessage* cpMessage = new BMessage(*msg);
 	cpMessage->what = kSecondaryMouseDropAction;
 	cpMessage->AddInt8("action", kCopyFiles);
-		
+
 	BMenuItem* insertItem = new BMenuItem("Insert Path", insertMessage);
 	BMenuItem* cdItem = new BMenuItem("Change Directory", cdMessage);
 	BMenuItem* lnItem = new BMenuItem("Create Link Here", lnMessage);
 	BMenuItem* mvItem = new BMenuItem("Move Here", mvMessage);
 	BMenuItem* cpItem = new BMenuItem("Copy Here", cpMessage);
 	BMenuItem* chItem = new BMenuItem("Cancel", NULL);
-	
+
 	// if the refs point to different directorys disable the cd menu item
 	bool differentDirs = false;
 	BDirectory firstDir;
@@ -1667,14 +1677,14 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 			dir.SetTo(&ref);
 		else
 			entry.GetParent(&dir);
-				
+
 		if (i == 1) {
 			node_ref nodeRef;
 			dir.GetNodeRef(&nodeRef);
 			firstDir.SetTo(&nodeRef);
 		} else if (firstDir != dir) {
 			differentDirs = true;
-			break;	
+			break;
 		}
 	}
 	if (differentDirs)
@@ -1700,10 +1710,10 @@ TermView::_DoSecondaryMouseDropAction(BMessage* msg)
 {
 	int8 action = -1;
 	msg->FindInt8("action", &action);
-	
+
 	BString outString = "";
 	BString itemString = "";
-	
+
 	switch (action) {
 		case kInsert:
 			break;
@@ -1723,22 +1733,22 @@ TermView::_DoSecondaryMouseDropAction(BMessage* msg)
 		default:
 			return;
 	}
-	
+
 	bool listContainsDirectory = false;
 	entry_ref ref;
-	int32 i = 0;			
+	int32 i = 0;
 	while (msg->FindRef("refs", i++, &ref) == B_OK) {
 		BEntry ent(&ref);
 		BNode node(&ref);
 		BPath path(&ent);
 		BString string(path.Path());
-		
+
 		if (node.IsDirectory())
 			listContainsDirectory = true;
-		
+
 		if (i > 1)
 			itemString += " ";
-				
+
 		if (action == kChangeDirectory) {
 			if (!node.IsDirectory()) {
 				int32 slash = string.FindLast("/");
@@ -1751,18 +1761,18 @@ TermView::_DoSecondaryMouseDropAction(BMessage* msg)
 		string.CharacterEscape(kEscapeCharacters, '\\');
 		itemString += string;
 	}
-	
+
 	if (listContainsDirectory && action == kCopyFiles)
 		outString += " -R";
 
 	outString += itemString;
-	
+
 	if (action == kLinkFiles || action == kMoveFiles || action == kCopyFiles)
 		outString += " .";
-	
+
 	if (action != kInsert)
 		outString += "\n";
-		
+
 	_WritePTY(outString.String(), outString.Length());
 }
 
@@ -2024,15 +2034,55 @@ TermView::_MouseDistanceSinceLastClick(BPoint where)
 
 
 void
+TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
+	bool motion)
+{
+	char xtermButtons;
+	if (buttons == B_PRIMARY_MOUSE_BUTTON)
+		xtermButtons = 32 + 0;
+ 	else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+		xtermButtons = 32 + 1;
+	else if (buttons == B_TERTIARY_MOUSE_BUTTON)
+		xtermButtons = 32 + 2;
+	else
+		xtermButtons = 32 + 3;
+
+	if (motion)
+		xtermButtons += 32;
+
+	char xtermX = x + 1 + 32;
+	char xtermY = y + 1 + 32;
+
+	char destBuffer[6];
+	destBuffer[0] = '\033';
+	destBuffer[1] = '[';
+	destBuffer[2] = 'M';
+	destBuffer[3] = xtermButtons;
+	destBuffer[4] = xtermX;
+	destBuffer[5] = xtermY;
+	fShell->Write(destBuffer, 6);
+}
+
+
+void
 TermView::MouseDown(BPoint where)
 {
 	if (!IsFocus())
 		MakeFocus();
 
 	int32 buttons;
+	int32 modifier;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
+	Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
 
 	fMouseButtons = buttons;
+
+	if (fReportAnyMouseEvent) {
+
+  		TermPos clickPos = _ConvertToTerminal(where);
+  		_SendMouseEvent(buttons, modifier, clickPos.x, clickPos.y, false);
+		return;
+	}
 
 	// paste button
 	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
@@ -2043,14 +2093,13 @@ TermView::MouseDown(BPoint where)
 
 	// Select Region
 	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		int32 mod, clicks;
-		Window()->CurrentMessage()->FindInt32("modifiers", &mod);
+		int32 clicks;
 		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 
 		if (_HasSelection()) {
 			TermPos inPos = _ConvertToTerminal(where);
 			if (_CheckSelectedRegion(inPos)) {
-				if (mod & B_CONTROL_KEY) {
+				if (modifier & B_CONTROL_KEY) {
 					BPoint p;
 					uint32 bt;
 					do {
@@ -2081,7 +2130,7 @@ TermView::MouseDown(BPoint where)
 
 		TermPos clickPos = _ConvertToTerminal(where);
 
-		if (mod & B_SHIFT_KEY) {
+		if (modifier & B_SHIFT_KEY) {
 			fInitialSelectionStart = clickPos;
 			fInitialSelectionEnd = clickPos;
 			_ExtendSelection(fInitialSelectionStart, true, false);
@@ -2098,22 +2147,21 @@ TermView::MouseDown(BPoint where)
 			case 1:
 				fCheckMouseTracking = true;
 				fSelectGranularity = SELECT_CHARS;
-	      		break;
+				break;
 
 			case 2:
-				_SelectWord(where, (mod & B_SHIFT_KEY) != 0, false);
+				_SelectWord(where, (modifier & B_SHIFT_KEY) != 0, false);
 				fMouseTracking = true;
 				fSelectGranularity = SELECT_WORDS;
 				break;
 
 			case 3:
-	 			_SelectLine(where, (mod & B_SHIFT_KEY) != 0, false);
+				_SelectLine(where, (modifier & B_SHIFT_KEY) != 0, false);
 				fMouseTracking = true;
 				fSelectGranularity = SELECT_LINES;
 				break;
 		}
-  	}
-
+	}
 	fLastClickPoint = where;
 }
 
@@ -2121,6 +2169,15 @@ TermView::MouseDown(BPoint where)
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
+	if (fReportAnyMouseEvent) {
+		int32 modifier;
+		Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
+
+  		TermPos clickPos = _ConvertToTerminal(where);
+  		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y, true);
+		return;
+	}
+
 	if (fCheckMouseTracking) {
 		if (_MouseDistanceSinceLastClick(where) > 9)
 			fMouseTracking = true;
@@ -2169,15 +2226,15 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 			}
 
 			_ExtendSelection(_ConvertToTerminal(where), true, true);
-      		break;
+			break;
 		}
 		case SELECT_WORDS:
 			_SelectWord(where, true, true);
-      		break;
+			break;
 		case SELECT_LINES:
 			_SelectLine(where, true, true);
-      		break;
-	  }
+			break;
+	}
 }
 
 
@@ -2196,16 +2253,22 @@ TermView::MouseUp(BPoint where)
 	// clipboard.
 	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
-		&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
-		Copy(gMouseClipboard);
-	}
 
+	if (fReportAnyMouseEvent) {
+	  	TermPos clickPos = _ConvertToTerminal(where);
+	  	_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
+	} else {
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
+			&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+			Copy(gMouseClipboard);
+		}
+
+	}
 	fMouseButtons = buttons;
 }
 
 
-// Select a range of text
+//! Select a range of text.
 void
 TermView::_Select(TermPos start, TermPos end, bool inclusive,
 	bool setInitialSelection)
@@ -2267,7 +2330,7 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 }
 
 
-// extend selection (shift + mouse click)
+//! Extend selection (shift + mouse click).
 void
 TermView::_ExtendSelection(TermPos pos, bool inclusive,
 	bool useInitialSelection)

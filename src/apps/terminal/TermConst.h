@@ -91,6 +91,7 @@ const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 const uint32 MSG_TERMINAL_BUFFER_CHANGED		= 'bufc';
 const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
 const uint32 MSG_QUIT_TERMNAL					= 'qutt';
+const uint32 MSG_REPORT_ANY_MOUSE_EVENT			= 'mous';
 
 // Preference Read/Write Keys
 const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
