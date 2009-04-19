@@ -379,7 +379,7 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 
 		// The device may be ready almost immediatelly. If it isn't,
 		// poll often during the first 20ms, otherwise poll lazyly.
-		if (elapsedTime < 500)
+		if (elapsedTime < 1000)
 			spin(1);
 		else if (elapsedTime < 20000)
 			snooze(1000);
@@ -692,7 +692,7 @@ ATAChannel::Interrupt(uint8 status)
 	}
 
 	fInterruptCondition.NotifyAll();
-	return B_HANDLED_INTERRUPT;
+	return B_INVOKE_SCHEDULER;
 }
 
 
