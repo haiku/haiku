@@ -5,6 +5,7 @@ UsePrivateSystemHeaders ;
 
 Application DebugAnalyzer
 	:
+	DataSource.cpp
 	DebugAnalyzer.cpp
 	MainModel.cpp
 	MainModelLoader.cpp

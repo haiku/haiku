@@ -9,15 +9,29 @@
 
 
 class BTabView;
+class DataSource;
+class MainModel;
+class MainModelLoader;
 
 
 class MainWindow : public BWindow {
 public:
-								MainWindow();
+								MainWindow(DataSource* dataSource);
 	virtual						~MainWindow();
+
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				Quit();
+
+	virtual	void				Show();
+
+private:
+			void				_SetModel(MainModel* model);
 
 private:
 			BTabView*			fMainTabView;
+			MainModel*			fModel;
+			MainModelLoader*	fModelLoader;
 };
 
 

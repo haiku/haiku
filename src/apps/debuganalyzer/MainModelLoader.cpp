@@ -5,22 +5,30 @@
 
 #include "MainModelLoader.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #include <new>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <DebugEventStream.h>
 
+#include <system_profiler_defs.h>
+
+#include "DataSource.h"
 #include "MainModel.h"
 #include "MessageCodes.h"
 
 
-MainModelLoader::MainModelLoader()
+MainModelLoader::MainModelLoader(DataSource* dataSource,
+	const BMessenger& target, void* targetCookie)
 	:
 	fLock("main model loader"),
 	fModel(NULL),
-	fInput(NULL),
-	fTarget(),
+	fDataSource(dataSource),
+	fTarget(target),
+	fTargetCookie(targetCookie),
 	fLoaderThread(-1),
 	fLoading(false),
 	fAborted(false)
@@ -35,13 +43,13 @@ MainModelLoader::~MainModelLoader()
 		wait_for_thread(fLoaderThread, NULL);
 	}
 
-	delete fInput;
+	delete fDataSource;
 	delete fModel;
 }
 
 
 status_t
-MainModelLoader::StartLoading(BDataIO& input, const BMessenger& target)
+MainModelLoader::StartLoading()
 {
 	// check initialization
 	status_t error = fLock.InitCheck();
@@ -50,7 +58,7 @@ MainModelLoader::StartLoading(BDataIO& input, const BMessenger& target)
 
 	AutoLocker<BLocker> locker(fLock);
 
-	if (fModel != NULL)
+	if (fModel != NULL || fLoading || fDataSource == NULL)
 		return B_BAD_VALUE;
 
 	// create a model
@@ -59,17 +67,6 @@ MainModelLoader::StartLoading(BDataIO& input, const BMessenger& target)
 		return B_NO_MEMORY;
 	ObjectDeleter<MainModel> modelDeleter(model);
 
-	// create a debug input stream
-	BDebugEventInputStream* inputStream
-		= new(std::nothrow) BDebugEventInputStream;
-	if (inputStream == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<BDebugEventInputStream> inputDeleter(inputStream);
-
-	error = inputStream->SetTo(&input);
-	if (error != B_OK)
-		return error;
-
 	// spawn the loader thread
 	fLoaderThread = spawn_thread(&_LoaderEntry, "main model loader",
 		B_NORMAL_PRIORITY, this);
@@ -77,9 +74,7 @@ MainModelLoader::StartLoading(BDataIO& input, const BMessenger& target)
 		return fLoaderThread;
 
 	modelDeleter.Detach();
-	inputDeleter.Detach();
 	fModel = model;
-	fInput = inputStream;
 
 	fLoading = true;
 	fAborted = false;
@@ -127,53 +122,33 @@ MainModelLoader::_LoaderEntry(void* data)
 status_t
 MainModelLoader::_Loader()
 {
-	bool success = false;
-
-	uint32 count = 0;
-
+printf("MainModelLoader::_Loader()\n");
+	status_t error;
 	try {
-		while (true) {
-			// get next event
-			uint32 event;
-			uint32 cpu;
-			const void* buffer;
-			ssize_t bufferSize = fInput->ReadNextEvent(&event, &cpu, &buffer);
-			if (bufferSize < 0)
-				break;
-			if (buffer == NULL) {
-				success = true;
-				break;
-			}
-
-			// process the event
-			status_t error = _ProcessEvent(event, cpu, buffer, bufferSize);
-			if (error != B_OK)
-				break;
-
-			if (++count % 32 == 0) {
-				AutoLocker<BLocker> locker(fLock);
-				if (fAborted)
-					break;
-			}
-		}
-	} catch (...) {
+		error = _Load();
+	} catch(...) {
+printf("MainModelLoader::_Loader(): caught exception\n");
+		error = B_ERROR;
 	}
-
+printf("MainModelLoader::_Loader(): _Load() done: %s\n", strerror(error));
+	
 	// clean up and notify the target
 	AutoLocker<BLocker> locker(fLock);
 
-	delete fInput;
-	fInput = NULL;
-
-	if (success) {
-		fTarget.SendMessage(MSG_MODEL_LOADED_SUCCESSFULLY);
+	BMessage message;
+	if (error == B_OK) {
+		message.what = MSG_MODEL_LOADED_SUCCESSFULLY;
 	} else {
 		delete fModel;
 		fModel = NULL;
 
-		fTarget.SendMessage(
-			fAborted ? MSG_MODEL_LOADED_ABORTED : MSG_MODEL_LOADED_FAILED);
+		message.what = fAborted
+			? MSG_MODEL_LOADED_ABORTED : MSG_MODEL_LOADED_FAILED;
 	}
+
+	message.AddPointer("loader", this);
+	message.AddPointer("targetCookie", fTargetCookie);
+	fTarget.SendMessage(&message);
 
 	fLoading = false;
 
@@ -182,9 +157,99 @@ MainModelLoader::_Loader()
 
 
 status_t
+MainModelLoader::_Load()
+{
+	// get a BDataIO from the data source
+	BDataIO* io;
+	status_t error = fDataSource->CreateDataIO(&io);
+	if (error != B_OK)
+		return error;
+	ObjectDeleter<BDataIO> dataIOtDeleter(io);
+
+	// create a debug input stream
+	BDebugEventInputStream* input = new(std::nothrow) BDebugEventInputStream;
+	if (input == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<BDebugEventInputStream> inputDeleter(input);
+
+	error = input->SetTo(io);
+	if (error != B_OK)
+{
+printf("MainModelLoader::_Load(): initializing the debug input stream failed: %s\n", strerror(error));
+		return error;
+}
+
+	// process the events
+	uint32 count = 0;
+
+	while (true) {
+		// get next event
+		uint32 event;
+		uint32 cpu;
+		const void* buffer;
+		ssize_t bufferSize = input->ReadNextEvent(&event, &cpu, &buffer);
+		if (bufferSize < 0)
+{
+printf("MainModelLoader::_Load(): reading event failed: %s\n", strerror(bufferSize));
+			return bufferSize;
+}
+		if (buffer == NULL)
+			return B_OK;
+
+		// process the event
+		status_t error = _ProcessEvent(event, cpu, buffer, bufferSize);
+		if (error != B_OK)
+			return error;
+
+		// periodically check whether we're supposed to abort
+		if (++count % 32 == 0) {
+			AutoLocker<BLocker> locker(fLock);
+			if (fAborted)
+				return B_ERROR;
+		}
+	}
+}
+
+
+status_t
 MainModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 	size_t size)
 {
+	switch (event) {
+		case B_SYSTEM_PROFILER_TEAM_ADDED:
+printf("B_SYSTEM_PROFILER_TEAM_ADDED: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_TEAM_REMOVED:
+printf("B_SYSTEM_PROFILER_TEAM_REMOVED: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_TEAM_EXEC:
+printf("B_SYSTEM_PROFILER_TEAM_EXEC: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_THREAD_ADDED:
+printf("B_SYSTEM_PROFILER_THREAD_ADDED: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_THREAD_REMOVED:
+printf("B_SYSTEM_PROFILER_THREAD_REMOVED: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_THREAD_SCHEDULED:
+printf("B_SYSTEM_PROFILER_THREAD_SCHEDULED: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
+printf("B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
+printf("B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE: %lu\n", size);
+			break;
+		case B_SYSTEM_PROFILER_WAIT_OBJECT_INFO:
+printf("B_SYSTEM_PROFILER_WAIT_OBJECT_INFO: %lu\n", size);
+			break;
+		default:
+printf("unsupported event type %lu, size: %lu\n", event, size);
+return B_BAD_DATA;
+			break;
+	}
+
+
 	// TODO: Implement!
-	return B_ERROR;
+	return B_OK;
 }

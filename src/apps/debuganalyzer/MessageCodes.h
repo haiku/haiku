@@ -7,9 +7,11 @@
 
 
 enum {
-	MSG_MODEL_LOADED_SUCCESSFULLY	=	'mlsc',
-	MSG_MODEL_LOADED_FAILED			=	'mlfl',
-	MSG_MODEL_LOADED_ABORTED		=	'mlab'
+	MSG_MODEL_LOADED_SUCCESSFULLY	= 'mlsc',
+	MSG_MODEL_LOADED_FAILED			= 'mlfl',
+	MSG_MODEL_LOADED_ABORTED		= 'mlab',
+
+	MSG_WINDOW_QUIT					= 'wiqt'
 };
 
 
