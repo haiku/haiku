@@ -701,6 +701,7 @@ void*
 SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
 	bool threadsLocked)
 {
+	size = (size + 3) / 4 * 4;
 	size += sizeof(system_profiler_event_header);
 
 	size_t end = fBufferStart + fBufferSize;
