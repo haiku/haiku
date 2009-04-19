@@ -18,7 +18,7 @@
 	}
 
 
-static int
+int
 get_device_dma_mode(ide_device_info *device)
 {
 	ide_device_infoblock *infoblock = &device->infoblock;
