@@ -66,7 +66,7 @@ struct cache_description {
 	{0x4C, "L3 cache: 12288 KB, 12-way set associative, 64 bytes/line"},
 	{0x4D, "L3 cache: 16384 KB, 16-way set associative, 64 bytes/line"},
 	{0x4E, "L2 cache: 6144 KB, 24-way set associative, 64 bytes/line"},
-	{0x4F, "Inst TLB, 4K-bytes pages, ???, 32 entries"},
+	{0x4F, "Inst TLB, 4K-bytes pages, 32 entries"},
 	{0x50, "Inst TLB: 4K/4M/2M-bytes pages, fully associative, 64 entries"},
 	{0x51, "Inst TLB: 4K/4M/2M-bytes pages, fully associative, 128 entries"},
 	{0x52, "Inst TLB: 4K/4M/2M-bytes pages, fully associative, 256 entries"},
@@ -139,17 +139,58 @@ struct cache_description {
 static void
 print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 {
-	int i, j;
+	int i, j, max_desc;
+
+	uint8 cache_descriptors[15];	// Max 
+	
+	max_desc = 0;
+	i = 0;	
+	
+	// put valid values into array
+	if ((info->regs.eax & 0x80000000) == 0) {
+		// eax is valid, include values
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+	} else {
+		i+=3;
+	}
+	if ((info->regs.ebx & 0x80000000) == 0) {
+		// ebx is valid, include values
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+	} else {
+		i+=4;
+	}
+	if ((info->regs.edx & 0x80000000) == 0) {
+		// edx is valid, include values
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+	} else {
+		i+=4;
+	}
+	if ((info->regs.ecx & 0x80000000) == 0) {
+		// ecx is valid, include values
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+	}
 
 	putchar('\n');
 
-	for (i = 0; i < 15; i++) {
-		if (info->eax_2.cache_descriptors[i] == 0)
+	for (i = 0; i < max_desc; i++) {
+		// ignore NULL descriptors
+		if (cache_descriptors[i] == 0)
 			continue;
 
 		for (j = 0; sIntelCacheDescriptions[j].code; j++) {
-			if (info->eax_2.cache_descriptors[i] == sIntelCacheDescriptions[j].code) {
-				if (info->eax_2.cache_descriptors[i] == 0x40) {
+			if (cache_descriptors[i] == sIntelCacheDescriptions[j].code) {
+				if (cache_descriptors[i] == 0x40) {
 					printf("\tNo integrated L%u cache\n",
 						type >= B_CPU_INTEL_PENTIUM_IV
 						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
@@ -159,8 +200,10 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 				break;
 			}
 		}
+		
+		// Reached the end without finding a descriptor
 		if (sIntelCacheDescriptions[j].code == 0)
-			printf("\tUnknown cache descriptor 0x%02x\n", info->eax_2.cache_descriptors[i]);
+			printf("\tUnknown cache descriptor 0x%02x\n", cache_descriptors[i]);
 	}
 }
 
@@ -197,7 +240,7 @@ print_level2_cache(uint32 reg, const char *name)
 {
 	uint32 size = (reg >> 16) & 0xffff;
 	uint32 ways = (reg >> 12) & 0xf;
-	uint32 lines_per_tag = (reg >> 8) & 0xf;
+	uint32 lines_per_tag = (reg >> 8) & 0xf;		// intel does not define this
 	uint32 linesize = reg & 0xff;
 
 	printf("\t%s: %lu KB, ", name, size);
@@ -206,8 +249,7 @@ print_level2_cache(uint32 reg, const char *name)
 	else if (ways == 0x1)
 		printf("direct-mapped, ");
 	else
-		printf("%lu-way set associative, ", 1UL << (
-		ways / 2));
+		printf("%lu-way set associative, ", 1UL << (ways / 2));
 	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
 }
 
@@ -232,12 +274,13 @@ print_level1_cache(uint32 reg, const char *name)
 #ifdef __INTEL__
 
 static void
-print_cache_descriptors(int32 cpu)
+print_cache_desc(int32 cpu)
 {
 	cpuid_info info;
 	get_cpuid(&info, 0x80000005, cpu);
 
-	putchar('\n');
+	putchar('\n');	
+	
 	if (info.regs.eax)
 		print_TLB(info.regs.eax, info.regs.ebx ? "2M/4M-byte" : NULL);
 	if (info.regs.ebx)
@@ -246,6 +289,52 @@ print_cache_descriptors(int32 cpu)
 	print_level1_cache(info.regs.ecx, "L1 inst cache");
 	print_level1_cache(info.regs.edx, "L1 data cache");
 
+	get_cpuid(&info, 0x80000006, cpu);
+	print_level2_cache(info.regs.ecx, "L2 cache");
+}
+
+static void
+print_intel_cache_desc(int32 cpu)
+{
+	cpuid_info info;
+	uint32 type;
+	uint32 level;
+	bool is_fully_assoc;
+	uint32 linesize;
+	uint32 lines_per_tag;
+	uint32 ways;
+	uint32 sets;
+
+	// A second parameters needs to be passed to CPUID which determines the cache level to query
+	get_cpuid(&info, 0x00000004, cpu);
+
+	putchar('\n');
+	
+	type = info.regs.eax & 0xf;
+	level = (info.regs.eax & 0x70) >> 4;
+	is_fully_assoc = info.regs.eax & 0x100;
+	
+	linesize = (info.regs.ebx & 0xfff) + 1;
+	lines_per_tag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
+	ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
+	
+	sets = info.regs.ecx;
+
+	printf("\tL%ld ",level);
+	
+	switch (type) {
+		case 1: printf("Data cache "); break;	
+		case 2: printf("Inst cache "); break;	
+		case 3: printf("Unified cache "); break;
+		default: break;
+	}	
+	
+	if (is_fully_assoc)
+		printf("fully associative, ");
+	else
+		printf("%lu-way set associative, ", ways);
+	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
+	
 	get_cpuid(&info, 0x80000006, cpu);
 	print_level2_cache(info.regs.ecx, "L2 cache");
 }
@@ -515,10 +604,14 @@ dump_cpu(system_info *info, int32 cpu)
 	/* Cache/TLB descriptors */
 	if (maxExtendedFunction >= 5) {
 		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
-			get_cpuid(&cpuInfo, 0x80000005, cpu);
+			get_cpuid(&cpuInfo, 0x00000002, cpu);
 			print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
-		} else
-			print_cache_descriptors(cpu);
+		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+			// Intel does not support extended function 5 (but it does 6 hmm)
+			print_intel_cache_desc(cpu);
+		} else {
+			print_cache_desc(cpu);
+		}
 	}
 
 	if (maxStandardFunction >= 2) {
