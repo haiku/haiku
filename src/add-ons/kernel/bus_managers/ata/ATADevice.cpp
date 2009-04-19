@@ -550,13 +550,6 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 		return result;
 	}
 
-	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, 0, ATA_CHECK_ERROR_BIT
-		| ATA_CHECK_DEVICE_FAULT, request->Timeout()) != B_OK) {
-		TRACE_ERROR("timeout waiting for device to request data\n");
-		request->SetStatus(SCSI_CMD_TIMEOUT);
-		return B_TIMED_OUT;
-	}
-
 	if (request->UseDMA()) {
 		fChannel->PrepareWaitingForInterrupt();
 		fChannel->StartDMA();
@@ -582,6 +575,13 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 			}
 		}
 	} else {
+		if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, 0, ATA_CHECK_ERROR_BIT
+			| ATA_CHECK_DEVICE_FAULT, request->Timeout()) != B_OK) {
+			TRACE_ERROR("timeout waiting for device to request data\n");
+			request->SetStatus(SCSI_CMD_TIMEOUT);
+			return B_TIMED_OUT;
+		}
+
 		if (fChannel->ExecutePIOTransfer(request) != B_OK) {
 			TRACE_ERROR("executing pio transfer failed\n");
 			request->SetStatus(SCSI_SEQUENCE_FAIL);
