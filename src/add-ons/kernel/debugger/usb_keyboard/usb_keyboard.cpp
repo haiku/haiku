@@ -156,6 +156,9 @@ enter_debugger(void)
 			&& !has_debugger_command("ohci_process_transfer")))
 		return;
 
+	unset_debug_variable("_usbPipe");
+	unset_debug_variable("_usbReportSize");
+
 	evaluate_debug_command("get_usb_keyboard_config");
 	sUSBTransferLength = get_debug_variable("_usbReportSize", 0);
 	if (sUSBTransferLength == 0 || sUSBTransferLength > sizeof(sUSBTransferData))
