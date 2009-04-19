@@ -3,23 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers ata ;
 UsePrivateHeaders drivers ;
 UsePrivateKernelHeaders ;
 
-KernelAddon ide :
-	ata.c
-	ata_tracing.cpp
-	ata_request.c
-	atapi.c
-	channels.c
-	devices.c
-	dma.c
-	emulation.c
-	ide.c
-	ide_sim.c
-	pio.c
-	scsi2ata.c
-	sync.c
-	virtual_memory.c
-	;
-
 KernelAddon ata :
 	ATAChannel.cpp
 	ATADevice.cpp
