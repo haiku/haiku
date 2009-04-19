@@ -188,9 +188,8 @@ status_t
 ATAPIDevice::ExecuteIO(ATARequest *request)
 {
 	scsi_ccb *ccb = request->CCB();
-	if (ccb->target_lun > fInfoBlock.last_lun) {
-		TRACE_ERROR("invalid target lun %d, last lun is %d\n", ccb->target_lun,
-			fInfoBlock.last_lun);
+	if (ccb->target_lun != 0) {
+		TRACE_ERROR("invalid target lun %d\n", ccb->target_lun);
 		request->SetStatus(SCSI_SEL_TIMEOUT);
 		return B_BAD_INDEX;
 	}
@@ -209,12 +208,18 @@ ATAPIDevice::ExecuteIO(ATARequest *request)
 status_t
 ATAPIDevice::Configure()
 {
-	if (fInfoBlock._0.atapi.ATAPI != 2)
+	if (fInfoBlock.word_0.atapi.atapi_device != ATA_WORD_0_ATAPI_DEVICE) {
+		TRACE_ERROR("infoblock indicates non-atapi device\n");
 		return B_ERROR;
+	}
 
 	fTaskFile.packet.lun = 0;
 
 	status_t result = ConfigureDMA();
+	if (result != B_OK)
+		return result;
+
+	result = DisableCommandQueueing();
 	if (result != B_OK)
 		return result;
 

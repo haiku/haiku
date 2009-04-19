@@ -17,7 +17,6 @@ ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 		fDMAMode(0),
 		fDMAFailures(0),
 		fIndex(index),
-		fUseLBA(false),
 		fUse48Bits(false),
 		fTotalSectors(0)
 {
@@ -114,11 +113,12 @@ ATADevice::Inquiry(ATARequest *request)
 	scsi_res_inquiry data;
 	memset(&data, 0, sizeof(data));
 
-	data.device_type = scsi_dev_direct_access;
+	data.device_type = IsATAPI()
+		? fInfoBlock.word_0.atapi.command_packet_set : scsi_dev_direct_access;
 	data.device_qualifier = scsi_periph_qual_connected;
 
 	data.device_type_modifier = 0;
-	data.removable_medium = false;
+	data.removable_medium = fInfoBlock.word_0.ata.removable_media_device;
 
 	data.ansi_version = 2;
 	data.ecma_version = 0;
@@ -341,10 +341,10 @@ ATADevice::SetFeature(int feature)
 status_t
 ATADevice::DisableCommandQueueing()
 {
-	if (!fInfoBlock.DMA_QUEUED_supported)
+	if (!fInfoBlock.read_write_dma_queued_supported)
 		return B_OK;
 
-	if (fInfoBlock.RELEASE_irq_supported) {
+	if (fInfoBlock.release_interrupt_supported) {
 		status_t result = SetFeature(
 			ATA_COMMAND_SET_FEATURES_DISABLE_RELEASE_INT);
 		if (result != B_OK) {
@@ -353,7 +353,7 @@ ATADevice::DisableCommandQueueing()
 		}
 	}
 
-	if (fInfoBlock.SERVICE_irq_supported) {
+	if (fInfoBlock.service_interrupt_supported) {
 		status_t result = SetFeature(
 			ATA_COMMAND_SET_FEATURES_DISABLE_SERVICE_INT);
 		if (result != B_OK) {
@@ -372,7 +372,7 @@ ATADevice::ConfigureDMA()
 	if (!fUseDMA)
 		return B_OK;
 
-	if (!fInfoBlock.DMA_supported) {
+	if (!fInfoBlock.dma_supported) {
 		TRACE_ALWAYS("DMA not supported by device\n");
 		fUseDMA = false;
 		return B_OK;
@@ -386,18 +386,18 @@ ATADevice::ConfigureDMA()
 
 	uint32 modeCount = 0;
 
-	CHECK_DMA_MODE(MDMA0_selected, 0x00);
-	CHECK_DMA_MODE(MDMA1_selected, 0x01);
-	CHECK_DMA_MODE(MDMA2_selected, 0x02);
+	CHECK_DMA_MODE(multiword_dma_0_selected, 0x00);
+	CHECK_DMA_MODE(multiword_dma_1_selected, 0x01);
+	CHECK_DMA_MODE(multiword_dma_2_selected, 0x02);
 
-	if (fInfoBlock._88_valid) {
-		CHECK_DMA_MODE(UDMA0_selected, 0x10);
-		CHECK_DMA_MODE(UDMA1_selected, 0x11);
-		CHECK_DMA_MODE(UDMA2_selected, 0x12);
-		CHECK_DMA_MODE(UDMA3_selected, 0x13);
-		CHECK_DMA_MODE(UDMA4_selected, 0x14);
-		CHECK_DMA_MODE(UDMA5_selected, 0x15);
-		CHECK_DMA_MODE(UDMA6_selected, 0x16);
+	if (fInfoBlock.word_88_valid) {
+		CHECK_DMA_MODE(ultra_dma_0_selected, 0x10);
+		CHECK_DMA_MODE(ultra_dma_1_selected, 0x11);
+		CHECK_DMA_MODE(ultra_dma_2_selected, 0x12);
+		CHECK_DMA_MODE(ultra_dma_3_selected, 0x13);
+		CHECK_DMA_MODE(ultra_dma_4_selected, 0x14);
+		CHECK_DMA_MODE(ultra_dma_5_selected, 0x15);
+		CHECK_DMA_MODE(ultra_dma_6_selected, 0x16);
 	}
 
 	#undef CHECK_DMA_MODE
@@ -417,49 +417,31 @@ status_t
 ATADevice::Configure()
 {
 	// warning: ata == 0 means "this is ata"...
-	if (fInfoBlock._0.ata.ATA != 0) {
+	if (fInfoBlock.word_0.ata.ata_device != ATA_WORD_0_ATA_DEVICE) {
 		// CF has either magic header or CFA bit set
 		// we merge it to "CFA bit set" for easier (later) testing
-		if (*(uint16 *)&fInfoBlock == 0x848a)
-			fInfoBlock.CFA_supported = true;
-		else
+		if (fInfoBlock.word_0.raw == ATA_WORD_0_CFA_MAGIC)
+			fInfoBlock.compact_flash_assoc_supported = true;
+		else {
+			TRACE_ERROR("infoblock indicates non-ata device\n");
 			return B_ERROR;
+		}
 	}
 
-	if (!fInfoBlock._54_58_valid) {
-		// normally, current_xxx contains active CHS mapping,
-		// but if BIOS didn't call INITIALIZE DEVICE PARAMETERS
-		// the default mapping is used
-		fInfoBlock.current_sectors = fInfoBlock.sectors;
-		fInfoBlock.current_cylinders = fInfoBlock.cylinders;
-		fInfoBlock.current_heads = fInfoBlock.heads;
+	if (!fInfoBlock.lba_supported || fInfoBlock.lba_sector_count == 0) {
+		TRACE_ERROR("non-lba devices not supported\n");
+		return B_ERROR;
 	}
 
-	// just in case capacity_xxx isn't initialized - calculate it manually
-	// (seems that this information is really redundant; hopefully)
-	uint32 chsCapacity = fInfoBlock.current_sectors
-		* fInfoBlock.current_cylinders * fInfoBlock.current_heads;
+	fTotalSectors = fInfoBlock.lba_sector_count;
+	fTaskFile.lba.mode = ATA_MODE_LBA;
+	fTaskFile.lba.device = fIndex;
 
-	fInfoBlock.capacity_low = chsCapacity & 0xff;
-	fInfoBlock.capacity_high = chsCapacity >> 8;
-
-	// checking LBA_supported flag should be sufficient, but it seems
-	// that checking LBA_total_sectors is a good idea
-	fUseLBA = fInfoBlock.LBA_supported && fInfoBlock.LBA_total_sectors != 0;
-
-	if (fUseLBA) {
-		fTotalSectors = fInfoBlock.LBA_total_sectors;
-		fTaskFile.lba.mode = ATA_MODE_LBA;
-		fTaskFile.lba.device = fIndex;
-	} else {
-		fTotalSectors = chsCapacity;
-		fTaskFile.chs.mode = ATA_MODE_CHS;
-		fTaskFile.chs.device = fIndex;
+	if (fInfoBlock.lba48_supported
+		&& fInfoBlock.lba48_sector_count >= fInfoBlock.lba_sector_count) {
+		fUse48Bits = true;
+		fTotalSectors = fInfoBlock.lba48_sector_count;
 	}
-
-	fUse48Bits = fInfoBlock._48_bit_addresses_supported;
-	if (fUse48Bits)
-		fTotalSectors = fInfoBlock.LBA48_total_sectors;
 
 	status_t result = ConfigureDMA();
 	if (result != B_OK)
@@ -611,60 +593,53 @@ ATADevice::_FillTaskFile(ATARequest *request, uint64 address)
 	uint32 sectorCount = *request->BytesLeft() / ATA_BLOCK_SIZE;
 	TRACE("about to transfer %lu sectors\n", sectorCount);
 
-	if (fUseLBA) {
-		if (fUse48Bits
-			&& (address + sectorCount > 0xfffffff || sectorCount > 0x100)) {
-			// use LBA48 only if necessary
-			if (sectorCount > 0xffff) {
-				TRACE_ERROR("invalid sector count %lu\n", sectorCount);
-				request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST,
-					SCSIS_ASC_INV_CDB_FIELD);
-				return B_ERROR;
-			}
-
-			fRegisterMask = ATA_MASK_SECTOR_COUNT_48
-				| ATA_MASK_LBA_LOW_48
-				| ATA_MASK_LBA_MID_48
-				| ATA_MASK_LBA_HIGH_48;
-
-			fTaskFile.lba48.sector_count_0_7 = sectorCount & 0xff;
-			fTaskFile.lba48.sector_count_8_15 = (sectorCount >> 8) & 0xff;
-			fTaskFile.lba48.lba_0_7 = address & 0xff;
-			fTaskFile.lba48.lba_8_15 = (address >> 8) & 0xff;
-			fTaskFile.lba48.lba_16_23 = (address >> 16) & 0xff;
-			fTaskFile.lba48.lba_24_31 = (address >> 24) & 0xff;
-			fTaskFile.lba48.lba_32_39 = (address >> 32) & 0xff;
-			fTaskFile.lba48.lba_40_47 = (address >> 40) & 0xff;
-			fTaskFile.lba48.command = s48BitCommands[request->UseDMA()
-				? 1 : 0][request->IsWrite() ? 1 : 0];
-		} else {
-			// normal LBA
-			if (sectorCount > 0x100) {
-				TRACE_ERROR("invalid sector count %lu\n", sectorCount);
-				request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST,
-					SCSIS_ASC_INV_CDB_FIELD);
-				return B_ERROR;
-			}
-
-			fRegisterMask = ATA_MASK_SECTOR_COUNT
-				| ATA_MASK_LBA_LOW
-				| ATA_MASK_LBA_MID
-				| ATA_MASK_LBA_HIGH
-				| ATA_MASK_DEVICE_HEAD;
-
-			fTaskFile.lba.sector_count = sectorCount & 0xff;
-			fTaskFile.lba.lba_0_7 = address & 0xff;
-			fTaskFile.lba.lba_8_15 = (address >> 8) & 0xff;
-			fTaskFile.lba.lba_16_23 = (address >> 16) & 0xff;
-			fTaskFile.lba.lba_24_27 = (address >> 24) & 0xf;
-			fTaskFile.lba.command = s28BitCommands[request->UseDMA()
-				? 1 : 0][request->IsWrite() ? 1 : 0];
+	if (fUse48Bits
+		&& (address + sectorCount > 0xfffffff || sectorCount > 0x100)) {
+		// use LBA48 only if necessary
+		if (sectorCount > 0xffff) {
+			TRACE_ERROR("invalid sector count %lu\n", sectorCount);
+			request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST,
+				SCSIS_ASC_INV_CDB_FIELD);
+			return B_ERROR;
 		}
+
+		fRegisterMask = ATA_MASK_SECTOR_COUNT_48
+			| ATA_MASK_LBA_LOW_48
+			| ATA_MASK_LBA_MID_48
+			| ATA_MASK_LBA_HIGH_48;
+
+		fTaskFile.lba48.sector_count_0_7 = sectorCount & 0xff;
+		fTaskFile.lba48.sector_count_8_15 = (sectorCount >> 8) & 0xff;
+		fTaskFile.lba48.lba_0_7 = address & 0xff;
+		fTaskFile.lba48.lba_8_15 = (address >> 8) & 0xff;
+		fTaskFile.lba48.lba_16_23 = (address >> 16) & 0xff;
+		fTaskFile.lba48.lba_24_31 = (address >> 24) & 0xff;
+		fTaskFile.lba48.lba_32_39 = (address >> 32) & 0xff;
+		fTaskFile.lba48.lba_40_47 = (address >> 40) & 0xff;
+		fTaskFile.lba48.command = s48BitCommands[request->UseDMA()
+			? 1 : 0][request->IsWrite() ? 1 : 0];
 	} else {
-		// CHS mode - we do not support it anymore
-		TRACE_ERROR("chs mode not supported\n");
-		request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
-		return B_ERROR;
+		// normal LBA
+		if (sectorCount > 0x100) {
+			TRACE_ERROR("invalid sector count %lu\n", sectorCount);
+			request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST,
+				SCSIS_ASC_INV_CDB_FIELD);
+			return B_ERROR;
+		}
+
+		fRegisterMask = ATA_MASK_SECTOR_COUNT
+			| ATA_MASK_LBA_LOW
+			| ATA_MASK_LBA_MID
+			| ATA_MASK_LBA_HIGH
+			| ATA_MASK_DEVICE_HEAD;
+
+		fTaskFile.lba.sector_count = sectorCount & 0xff;
+		fTaskFile.lba.lba_0_7 = address & 0xff;
+		fTaskFile.lba.lba_8_15 = (address >> 8) & 0xff;
+		fTaskFile.lba.lba_16_23 = (address >> 16) & 0xff;
+		fTaskFile.lba.lba_24_27 = (address >> 24) & 0xf;
+		fTaskFile.lba.command = s28BitCommands[request->UseDMA()
+			? 1 : 0][request->IsWrite() ? 1 : 0];
 	}
 
 	return B_OK;

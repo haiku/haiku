@@ -22,8 +22,8 @@
 #include <util/AutoLock.h>
 
 #include "ATACommands.h"
+#include "ATAInfoblock.h"
 #include "ATATracing.h"
-#include "ata_device_infoblock.h"
 
 #define ATA_BLOCK_SIZE				512 /* TODO: retrieve */
 #define ATA_MAX_DMA_FAILURES		3
@@ -33,8 +33,8 @@
 #define ATA_SIGNATURE_ATAPI			0xeb140101
 #define ATA_SIGNATURE_SATA			0xc33c0101
 #define ATA_SIM_MODULE_NAME			"bus_managers/ata/sim/driver_v1"
-#define ATA_CHANNEL_ID_GENERATOR	"ata/channel_id"
-#define ATA_CHANNEL_ID_ITEM			"ata/channel_id"
+#define ATA_CHANNEL_ID_GENERATOR	"ide/channel_id"
+#define ATA_CHANNEL_ID_ITEM			"ide/channel_id"
 
 enum {
 	ATA_DEVICE_READY_REQUIRED	= 0x01,
@@ -180,7 +180,6 @@ virtual	status_t					ExecuteIO(ATARequest *request);
 virtual	bool						IsATAPI() { return false; };
 
 		bool						UseDMA() { return fUseDMA; };
-		bool						UseLBA() { return fUseLBA; };
 		bool						Use48Bits() { return fUse48Bits; };
 
 		status_t					Select();
@@ -215,7 +214,6 @@ private:
 										uint64 address);
 
 		uint8						fIndex;
-		bool						fUseLBA;
 		bool						fUse48Bits;
 		uint64						fTotalSectors;
 
