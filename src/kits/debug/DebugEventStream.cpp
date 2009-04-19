@@ -75,7 +75,7 @@ BDebugEventInputStream::SetTo(BDataIO* stream)
 	}
 
 	// check the header
-	if (strlcpy(header.signature, B_DEBUG_EVENT_STREAM_SIGNATURE,
+	if (strncmp(header.signature, B_DEBUG_EVENT_STREAM_SIGNATURE,
 			sizeof(header.signature)) != 0
 		|| header.version != B_DEBUG_EVENT_STREAM_VERSION
 		|| (header.flags & B_DEBUG_EVENT_STREAM_FLAG_HOST_ENDIAN) == 0) {
@@ -185,13 +185,12 @@ BDebugEventInputStream::_GetData(size_t size)
 		return B_BUFFER_OVERFLOW;
 
 	// move remaining data to the start of the buffer
-	if (fBufferSize > 0 && fBufferPosition > 0) {
+	if (fBufferSize > 0 && fBufferPosition > 0)
 		memmove(fBuffer, fBuffer + fBufferPosition, fBufferSize);
-		fBufferPosition = 0;
-	}
+	fBufferPosition = 0;
 
 	// read more data
-	ssize_t bytesRead = _Read(fBuffer + fBufferPosition,
+	ssize_t bytesRead = _Read(fBuffer + fBufferSize,
 		fBufferCapacity - fBufferSize);
 	if (bytesRead < 0)
 		return bytesRead;

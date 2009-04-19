@@ -16,6 +16,7 @@ struct debug_event_stream_header {
 	uint32	version;
 	uint32	flags;
 	uint32	event_mask;
+	uint32	reserved;
 };
 
 
