@@ -543,10 +543,10 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
 	// TODO: Check if this method can be removed completely
 	//int width = CodeConv::UTF8GetFontWidth(c.bytes);
-	if (width == FULL_WIDTH)
+	if ((int32)width == FULL_WIDTH)
 		attributes |= A_WIDTH;
 
-	if (fSoftWrappedCursor || fCursor.x + width > fWidth)
+	if (fSoftWrappedCursor || fCursor.x + (int32)width > fWidth)
 		_SoftBreakLine();
 	else
 		_PadLineToCursor();
@@ -903,7 +903,7 @@ BasicTerminalBuffer::_ResizeHistory(int32 width, int32 historyCapacity)
 			if (line->length > width)
 				_TruncateLine(line, width);
 			history->AddLine(line);
-		} 
+		}
 	}
 
 	delete fHistory;

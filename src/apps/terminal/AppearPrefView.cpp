@@ -1,25 +1,26 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
 #include "AppearPrefView.h"
-#include "MenuUtil.h"
-#include "PrefHandler.h"
-#include "TermConst.h"
-
-#include <View.h>
-#include <Button.h>
-#include <MenuField.h>
-#include <Menu.h>
-#include <MenuItem.h>
-#include <PopUpMenu.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <Button.h>
+#include <Menu.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <View.h>
+
+#include "MenuUtil.h"
+#include "PrefHandler.h"
+#include "TermConst.h"
 
 
 static bool
@@ -33,47 +34,49 @@ IsFontUsable(const BFont &font)
 		return true;
 
 	bool widthOk = true;
-	int lastWidth;
+	int lastWidth = 0;
+	char buffer[2] = {0, 0};
 	for (int c = 0x20 ; c <= 0x7e; c++){
-		char buf[4];
-		snprintf(buf, sizeof(buf), "%c", c);
-		int tmpWidth = (int)font.StringWidth(buf);
-		if (c > 0x20 &&(tmpWidth != lastWidth))
+		buffer[1] = c;
+
+		int width = (int)ceilf(font.StringWidth(buffer));
+		if (c > 0x20 && width != lastWidth)
 			widthOk = false;
-		lastWidth = tmpWidth;
+		lastWidth = width;
 	}
+
 	return widthOk;
 }
 
 
 AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
-	BMessenger messenger)
+		BMessenger messenger)
 	: PrefView(frame, name),
 	fAppearancePrefViewMessenger(messenger)
 {
   	const char *color_tbl[] = {
-	    	PREF_TEXT_FORE_COLOR,
-	    	PREF_TEXT_BACK_COLOR,
-	    	PREF_CURSOR_FORE_COLOR,
-	    	PREF_CURSOR_BACK_COLOR,
-	    	PREF_SELECT_FORE_COLOR,
-	    	PREF_SELECT_BACK_COLOR,
+		PREF_TEXT_FORE_COLOR,
+		PREF_TEXT_BACK_COLOR,
+		PREF_CURSOR_FORE_COLOR,
+		PREF_CURSOR_BACK_COLOR,
+		PREF_SELECT_FORE_COLOR,
+		PREF_SELECT_BACK_COLOR,
 #if 0
-	    	"",
-	    	PREF_IM_FORE_COLOR,
-	    	PREF_IM_BACK_COLOR,
-	    	PREF_IM_SELECT_COLOR,
-	    	"",
-	    	PREF_ANSI_BLACK_COLOR,
-	    	PREF_ANSI_RED_COLOR,
-	    	PREF_ANSI_GREEN_COLOR,
-	    	PREF_ANSI_YELLOW_COLOR,
-	    	PREF_ANSI_BLUE_COLOR,
-	    	PREF_ANSI_MAGENTA_COLOR,
-	    	PREF_ANSI_CYAN_COLOR,
-	    	PREF_ANSI_WHITE_COLOR,
+		"",
+		PREF_IM_FORE_COLOR,
+		PREF_IM_BACK_COLOR,
+		PREF_IM_SELECT_COLOR,
+		"",
+		PREF_ANSI_BLACK_COLOR,
+		PREF_ANSI_RED_COLOR,
+		PREF_ANSI_GREEN_COLOR,
+		PREF_ANSI_YELLOW_COLOR,
+		PREF_ANSI_BLUE_COLOR,
+		PREF_ANSI_MAGENTA_COLOR,
+		PREF_ANSI_CYAN_COLOR,
+		PREF_ANSI_WHITE_COLOR,
 #endif
-	    	NULL
+		NULL
   	};
 
 	float fontDividerSize = StringWidth("Font:") + 8.0;
@@ -122,7 +125,7 @@ AppearancePrefView::Revert()
 {
 	fColorField->Menu()->ItemAt(0)->SetMarked(true);
 	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
-	
+
 	fFont->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
 	fFontSize->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
 }
@@ -144,7 +147,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 {
 	bool modified = false;
 
-	switch (msg->what) { 
+	switch (msg->what) {
 		case MSG_HALF_FONT_CHANGED:
 			PrefHandler::Default()->setString(PREF_HALF_FONT_FAMILY,
 				fFont->Menu()->FindMarked()->Label());
@@ -159,7 +162,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 		case MSG_COLOR_CHANGED:
 			PrefHandler::Default()->setRGB(fColorField->Menu()->FindMarked()->Label(),
-				fColorControl->ValueAsColor());    
+				fColorControl->ValueAsColor());
 			modified = true;
 			break;
 
@@ -175,7 +178,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	if (modified) {
 		fAppearancePrefViewMessenger.SendMessage(msg);
-			
+
 		BMessenger messenger(this);
 		messenger.SendMessage(MSG_PREF_MODIFIED);
 	}
@@ -186,7 +189,7 @@ BMenu *
 AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
-	int32 numFamilies = count_font_families(); 
+	int32 numFamilies = count_font_families();
 
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family family;
@@ -213,7 +216,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 {
 	BPopUpMenu *menu = new BPopUpMenu("size");
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
-	
+
 	for (uint32 i = 0; sizes[i]; i++) {
 		BString string;
 		string << sizes[i];
