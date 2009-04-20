@@ -51,7 +51,22 @@ struct file_cache_ref {
 		//	write vs. read)
 	int32			last_access_index;
 	uint16			disabled_count;
-	bool			last_access_was_write;
+
+	inline void SetLastAccess(int32 index, off_t access, bool isWrite)
+	{
+		// we remember writes as negative offsets
+		last_access[index] = isWrite ? -access : access;
+	}
+
+	inline off_t LastAccess(int32 index, bool isWrite)
+	{
+		return isWrite ? -last_access[index] : last_access[index];
+	}
+
+	inline uint32 LastAccessPageOffset(int32 index, bool isWrite)
+	{
+		return LastAccess(index, isWrite) >> PAGE_SHIFT;
+	}
 };
 
 typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
@@ -104,14 +119,10 @@ push_access(file_cache_ref *ref, off_t offset, size_t bytes, bool isWrite)
 	if (previous < 0)
 		previous = LAST_ACCESSES - 1;
 
-	if (offset != ref->last_access[previous])
+	if (offset != ref->LastAccess(previous, isWrite))
 		ref->last_access[previous] = 0;
 
-	// we remember writes as negative offsets
-	if (isWrite)
-		ref->last_access[index] = -offset - bytes;
-	else
-		ref->last_access[index] = offset + bytes;
+	ref->SetLastAccess(index, offset + bytes, isWrite);
 
 	if (++index >= LAST_ACCESSES)
 		index = 0;
@@ -132,14 +143,14 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 
 			if (isWrite) {
 				// just schedule some pages to be written back
-				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
-						vm_page* page = it.Next();) {
-					if (page->state == PAGE_STATE_MODIFIED) {
-						// TODO: for now, we only schedule one
-						vm_page_schedule_write_page(page);
-						break;
-					}
-				}
+				int32 index = ref->last_access_index;
+				int32 previous = index - 1;
+				if (previous < 0)
+					previous = LAST_ACCESSES - 1;
+
+				vm_page_schedule_write_page_range(cache,
+					ref->LastAccessPageOffset(previous, true),
+					ref->LastAccessPageOffset(index, true));
 			} else {
 				// free some pages from our cache
 				// TODO: start with oldest
