@@ -77,8 +77,9 @@ public:
 
 		// ATA stuff
 		status_t					SelectDevice(uint8 index);
+		uint8						SelectedDevice();
 
-		status_t					Reset(uint32 *signatures);
+		status_t					Reset(bool *presence, uint32 *signatures);
 
 		bool						UseDMA() { return fUseDMA; };
 

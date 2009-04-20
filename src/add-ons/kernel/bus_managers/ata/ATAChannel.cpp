@@ -122,14 +122,18 @@ ATAChannel::ScanBus()
 		return B_OK;
 	}
 
+	bool devicePresent[fDeviceCount];
 	uint32 deviceSignature[fDeviceCount];
-	status_t result = Reset(deviceSignature);
+	status_t result = Reset(devicePresent, deviceSignature);
 	if (result != B_OK) {
 		TRACE_ERROR("resetting the channel failed\n");
 		return result;
 	}
 
 	for (uint8 i = 0; i < fDeviceCount; i++) {
+		if (!devicePresent[i])
+			continue;
+
 		ATADevice *device = NULL;
 		if (deviceSignature[i] == ATA_SIGNATURE_ATAPI)
 			device = new(std::nothrow) ATAPIDevice(this, i);
@@ -261,7 +265,7 @@ ATAChannel::SelectDevice(uint8 device)
 	_WriteRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
 	_FlushAndWait(1);
 
-#if KDEBUG > 0
+#if 0
 	// for debugging only
 	_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
 	if (taskFile.chs.device != device) {
@@ -275,8 +279,17 @@ ATAChannel::SelectDevice(uint8 device)
 }
 
 
+uint8
+ATAChannel::SelectedDevice()
+{
+	ata_task_file taskFile;
+	_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
+	return taskFile.lba.device;
+}
+
+
 status_t
-ATAChannel::Reset(uint32 *signatures)
+ATAChannel::Reset(bool *presence, uint32 *signatures)
 {
 	TRACE_FUNCTION("\n");
 
@@ -299,16 +312,26 @@ ATAChannel::Reset(uint32 *signatures)
 
 	_FlushAndWait(150 * 1000);
 
-	for (uint8 i = 0; i < fDeviceCount; i++) {
+	if (presence != NULL) {
+		for (uint8 i = 0; i < fDeviceCount; i++)
+			presence[i] = false;
+	}
+
+	uint8 deviceCount = fDeviceCount;
+	for (uint8 i = 0; i < deviceCount; i++) {
 		SelectDevice(i);
+		if (SelectedDevice() != i) {
+			TRACE_ALWAYS("cannot select device %d, assuming not present\n", i);
+			continue;
+		}
 
 		// ensure interrupts are disabled for this device
 		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 		// wait up to 31 seconds for busy to clear
 		if (Wait(0, ATA_STATUS_BUSY, 0, 31 * 1000 * 1000) != B_OK) {
-			TRACE_ERROR("reset timeout\n");
-			return B_TIMED_OUT;
+			TRACE_ERROR("device %d reset timeout\n", i);
+			continue;
 		}
 
 		ata_task_file taskFile;
@@ -322,12 +345,17 @@ ATAChannel::Reset(uint32 *signatures)
 			&& (i > 0 || taskFile.read.error != 0x81)) {
 			TRACE_ERROR("device %d failed, error code is 0x%02x\n", i,
 				taskFile.read.error);
+			continue;
 		}
 
 		if (i == 0 && taskFile.read.error >= 0x80) {
 			TRACE_ERROR("device %d indicates that other device failed"
 				" with code 0x%02x\n", i, taskFile.read.error);
+			deviceCount = 1;
 		}
+
+		if (presence != NULL)
+			presence[i] = true;
 
 		if (signatures != NULL) {
 			signatures[i] = taskFile.lba.sector_count
