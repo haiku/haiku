@@ -3,14 +3,14 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "MainModel.h"
+#include "Model.h"
 
 
-MainModel::MainModel()
+Model::Model()
 {
 }
 
 
-MainModel::~MainModel()
+Model::~Model()
 {
 }

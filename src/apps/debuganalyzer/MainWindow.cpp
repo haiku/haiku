@@ -14,9 +14,9 @@
 #include <AutoLocker.h>
 
 #include "DataSource.h"
-#include "MainModel.h"
-#include "MainModelLoader.h"
 #include "MessageCodes.h"
+#include "Model.h"
+#include "ModelLoader.h"
 #include "ThreadsPage.h"
 
 
@@ -41,7 +41,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 
 	// create a model loader, if we have a data source
 	if (dataSource != NULL)
-		fModelLoader = new MainModelLoader(dataSource, BMessenger(this), NULL);
+		fModelLoader = new ModelLoader(dataSource, BMessenger(this), NULL);
 }
 
 
@@ -59,7 +59,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_MODEL_LOADED_SUCCESSFULLY:
 		{
 printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
-			MainModel* model = fModelLoader->DetachModel();
+			Model* model = fModelLoader->DetachModel();
 			delete fModelLoader;
 			fModelLoader = NULL;
 
@@ -113,7 +113,7 @@ MainWindow::Show()
 
 
 void
-MainWindow::_SetModel(MainModel* model)
+MainWindow::_SetModel(Model* model)
 {
 	delete fModel;
 	fModel = model;

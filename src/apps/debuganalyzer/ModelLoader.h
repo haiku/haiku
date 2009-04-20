@@ -12,21 +12,21 @@
 class BDataIO;
 class BDebugEventInputStream;
 class DataSource;
-class MainModel;
+class Model;
 struct system_profiler_event_header;
 
 
-class MainModelLoader {
+class ModelLoader {
 public:
-								MainModelLoader(DataSource* dataSource,
+								ModelLoader(DataSource* dataSource,
 									const BMessenger& target,
 									void* targetCookie);
-								~MainModelLoader();
+								~ModelLoader();
 
 			status_t			StartLoading();
 			void				Abort();
 
-			MainModel*			DetachModel();
+			Model*				DetachModel();
 
 private:
 	static	status_t			_LoaderEntry(void* data);
@@ -37,7 +37,7 @@ private:
 
 private:
 			BLocker				fLock;
-			MainModel*			fModel;
+			Model*				fModel;
 			DataSource*			fDataSource;
 			BMessenger			fTarget;
 			void*				fTargetCookie;

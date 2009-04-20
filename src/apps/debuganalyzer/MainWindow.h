@@ -10,8 +10,8 @@
 
 class BTabView;
 class DataSource;
-class MainModel;
-class MainModelLoader;
+class ModelLoader;
+class Model;
 
 
 class MainWindow : public BWindow {
@@ -26,12 +26,12 @@ public:
 	virtual	void				Show();
 
 private:
-			void				_SetModel(MainModel* model);
+			void				_SetModel(Model* model);
 
 private:
 			BTabView*			fMainTabView;
-			MainModel*			fModel;
-			MainModelLoader*	fModelLoader;
+			Model*				fModel;
+			ModelLoader*		fModelLoader;
 };
 
 

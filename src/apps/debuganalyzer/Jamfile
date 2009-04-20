@@ -7,9 +7,9 @@ Application DebugAnalyzer
 	:
 	DataSource.cpp
 	DebugAnalyzer.cpp
-	MainModel.cpp
-	MainModelLoader.cpp
 	MainWindow.cpp
+	Model.cpp
+	ModelLoader.cpp
 	ThreadsPage.cpp
 
 	: libcolumnlistview.a libdebug.so be

@@ -2,18 +2,18 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef MAIN_MODEL_H
-#define MAIN_MODEL_H
+#ifndef MODEL_H
+#define MODEL_H
 
 
-class MainModel {
+class Model {
 public:
-								MainModel();
-								~MainModel();
+								Model();
+								~Model();
 
 private:
 };
 
 
 
-#endif	// MAIN_MODEL_H
+#endif	// MODEL_H

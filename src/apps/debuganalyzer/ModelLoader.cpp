@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "MainModelLoader.h"
+#include "ModelLoader.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -17,11 +17,11 @@
 #include <system_profiler_defs.h>
 
 #include "DataSource.h"
-#include "MainModel.h"
 #include "MessageCodes.h"
+#include "Model.h"
 
 
-MainModelLoader::MainModelLoader(DataSource* dataSource,
+ModelLoader::ModelLoader(DataSource* dataSource,
 	const BMessenger& target, void* targetCookie)
 	:
 	fLock("main model loader"),
@@ -36,7 +36,7 @@ MainModelLoader::MainModelLoader(DataSource* dataSource,
 }
 
 
-MainModelLoader::~MainModelLoader()
+ModelLoader::~ModelLoader()
 {
 	if (fLoaderThread >= 0) {
 		Abort();
@@ -49,7 +49,7 @@ MainModelLoader::~MainModelLoader()
 
 
 status_t
-MainModelLoader::StartLoading()
+ModelLoader::StartLoading()
 {
 	// check initialization
 	status_t error = fLock.InitCheck();
@@ -62,10 +62,10 @@ MainModelLoader::StartLoading()
 		return B_BAD_VALUE;
 
 	// create a model
-	MainModel* model = new(std::nothrow) MainModel;
+	Model* model = new(std::nothrow) Model;
 	if (model == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<MainModel> modelDeleter(model);
+	ObjectDeleter<Model> modelDeleter(model);
 
 	// spawn the loader thread
 	fLoaderThread = spawn_thread(&_LoaderEntry, "main model loader",
@@ -86,7 +86,7 @@ MainModelLoader::StartLoading()
 
 
 void
-MainModelLoader::Abort()
+ModelLoader::Abort()
 {
 	AutoLocker<BLocker> locker(fLock);
 
@@ -97,15 +97,15 @@ MainModelLoader::Abort()
 }
 
 
-MainModel*
-MainModelLoader::DetachModel()
+Model*
+ModelLoader::DetachModel()
 {
 	AutoLocker<BLocker> locker(fLock);
 
 	if (fModel == NULL || fLoading)
 		return NULL;
 
-	MainModel* model = fModel;
+	Model* model = fModel;
 	fModel = NULL;
 
 	return model;
@@ -113,24 +113,21 @@ MainModelLoader::DetachModel()
 
 
 /*static*/ status_t
-MainModelLoader::_LoaderEntry(void* data)
+ModelLoader::_LoaderEntry(void* data)
 {
-	return ((MainModelLoader*)data)->_Loader();
+	return ((ModelLoader*)data)->_Loader();
 }
 
 
 status_t
-MainModelLoader::_Loader()
+ModelLoader::_Loader()
 {
-printf("MainModelLoader::_Loader()\n");
 	status_t error;
 	try {
 		error = _Load();
 	} catch(...) {
-printf("MainModelLoader::_Loader(): caught exception\n");
 		error = B_ERROR;
 	}
-printf("MainModelLoader::_Loader(): _Load() done: %s\n", strerror(error));
 	
 	// clean up and notify the target
 	AutoLocker<BLocker> locker(fLock);
@@ -157,7 +154,7 @@ printf("MainModelLoader::_Loader(): _Load() done: %s\n", strerror(error));
 
 
 status_t
-MainModelLoader::_Load()
+ModelLoader::_Load()
 {
 	// get a BDataIO from the data source
 	BDataIO* io;
@@ -174,10 +171,7 @@ MainModelLoader::_Load()
 
 	error = input->SetTo(io);
 	if (error != B_OK)
-{
-printf("MainModelLoader::_Load(): initializing the debug input stream failed: %s\n", strerror(error));
 		return error;
-}
 
 	// process the events
 	uint32 count = 0;
@@ -189,10 +183,7 @@ printf("MainModelLoader::_Load(): initializing the debug input stream failed: %s
 		const void* buffer;
 		ssize_t bufferSize = input->ReadNextEvent(&event, &cpu, &buffer);
 		if (bufferSize < 0)
-{
-printf("MainModelLoader::_Load(): reading event failed: %s\n", strerror(bufferSize));
 			return bufferSize;
-}
 		if (buffer == NULL)
 			return B_OK;
 
@@ -212,7 +203,7 @@ printf("MainModelLoader::_Load(): reading event failed: %s\n", strerror(bufferSi
 
 
 status_t
-MainModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
+ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 	size_t size)
 {
 	switch (event) {
