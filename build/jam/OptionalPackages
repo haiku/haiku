@@ -122,13 +122,19 @@ if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 
 # BeOSCompatibility
 if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
-	Echo "Warning: Adding BeOS compatibility symlinks. This will go away. Please fix your apps!" ;
-	AddSymlinkToHaikuImage beos : ../system/apps ;
-	AddSymlinkToHaikuImage beos : ../system/bin ;
-	AddSymlinkToHaikuImage beos : ../system/documentation ;
-	AddSymlinkToHaikuImage beos : ../system/etc ;
-	AddSymlinkToHaikuImage beos : ../system/preferences ;
-	AddSymlinkToHaikuImage beos : ../system ;
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BeOSCompatibility available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package BeOSCompatibility available for gcc4" ;
+	} else {
+		Echo "Warning: Adding BeOS compatibility symlinks. This will go away. Please fix your apps!" ;
+		AddSymlinkToHaikuImage beos : ../system/apps ;
+		AddSymlinkToHaikuImage beos : ../system/bin ;
+		AddSymlinkToHaikuImage beos : ../system/documentation ;
+		AddSymlinkToHaikuImage beos : ../system/etc ;
+		AddSymlinkToHaikuImage beos : ../system/preferences ;
+		AddSymlinkToHaikuImage beos : ../system ;
+	}
 }
 
 
