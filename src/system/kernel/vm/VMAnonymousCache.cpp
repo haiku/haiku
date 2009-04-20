@@ -641,6 +641,16 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 }
 
 
+bool
+VMAnonymousCache::CanWritePage(off_t offset)
+{
+	// We can write the page, if we have not used all of our committed swap
+	// space or the page already has a swap slot assigned.
+	return fAllocatedSwapSize < fCommittedSwapSize
+		|| _SwapBlockGetAddress(offset >> PAGE_SHIFT) != SWAP_SLOT_NONE;
+}
+
+
 status_t
 VMAnonymousCache::Fault(struct vm_address_space *aspace, off_t offset)
 {

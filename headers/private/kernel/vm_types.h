@@ -219,6 +219,7 @@ public:
 	virtual	status_t	WriteAsync(off_t offset, const iovec* vecs,
 							size_t count, size_t numBytes, uint32 flags,
 							AsyncIOCallback* callback);
+	virtual	bool		CanWritePage(off_t offset);
 
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 

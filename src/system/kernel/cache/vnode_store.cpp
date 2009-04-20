@@ -101,6 +101,14 @@ VMVnodeCache::Fault(struct vm_address_space *aspace, off_t offset)
 }
 
 
+bool
+VMVnodeCache::CanWritePage(off_t offset)
+{
+	// all pages can be written
+	return true;
+}
+
+
 status_t
 VMVnodeCache::AcquireUnreferencedStoreRef()
 {

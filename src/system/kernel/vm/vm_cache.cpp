@@ -892,6 +892,20 @@ VMCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 }
 
 
+/*!	\brief Returns whether the cache can write the page at the given offset.
+
+	The cache must be locked when this function is invoked.
+
+	@param offset The page offset.
+	@return \c true, if the page can be written, \c false otherwise.
+*/
+bool
+VMCache::CanWritePage(off_t offset)
+{
+	return false;
+}
+
+
 status_t
 VMCache::Fault(struct vm_address_space *aspace, off_t offset)
 {

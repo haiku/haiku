@@ -1247,7 +1247,8 @@ page_writer(void* /*unused*/)
 				|| (cache->temporary
 #if ENABLE_SWAP_SUPPORT
 					&& (!lowOnPages /*|| page->usage_count > 0*/
-						|| swap_available_pages() == 0)
+						|| !cache->CanWritePage(
+								(off_t)page->cache_offset << PAGE_SHIFT))
 #endif
 				)) {
 				continue;
