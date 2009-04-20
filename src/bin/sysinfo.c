@@ -139,58 +139,58 @@ struct cache_description {
 static void
 print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 {
-	int i, j, max_desc;
+	int i, j, maxDesc;
 
-	uint8 cache_descriptors[15];	// Max 
+	uint8 cacheDescriptors[15];	// Max 
 	
-	max_desc = 0;
+	maxDesc = 0;
 	i = 0;	
 	
 	// put valid values into array
 	if ((info->regs.eax & 0x80000000) == 0) {
 		// eax is valid, include values
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
 	} else {
-		i+=3;
+		i += 3;
 	}
 	if ((info->regs.ebx & 0x80000000) == 0) {
 		// ebx is valid, include values
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
 	} else {
-		i+=4;
+		i += 4;
 	}
 	if ((info->regs.edx & 0x80000000) == 0) {
 		// edx is valid, include values
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
 	} else {
-		i+=4;
+		i += 4;
 	}
 	if ((info->regs.ecx & 0x80000000) == 0) {
 		// ecx is valid, include values
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
-		cache_descriptors[max_desc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
+		cacheDescriptors[maxDesc++] = info->eax_2.cache_descriptors[i++];
 	}
 
 	putchar('\n');
 
-	for (i = 0; i < max_desc; i++) {
+	for (i = 0; i < maxDesc; i++) {
 		// ignore NULL descriptors
-		if (cache_descriptors[i] == 0)
+		if (cacheDescriptors[i] == 0)
 			continue;
 
 		for (j = 0; sIntelCacheDescriptions[j].code; j++) {
-			if (cache_descriptors[i] == sIntelCacheDescriptions[j].code) {
-				if (cache_descriptors[i] == 0x40) {
+			if (cacheDescriptors[i] == sIntelCacheDescriptions[j].code) {
+				if (cacheDescriptors[i] == 0x40) {
 					printf("\tNo integrated L%u cache\n",
 						type >= B_CPU_INTEL_PENTIUM_IV
 						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
@@ -203,7 +203,7 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 		
 		// Reached the end without finding a descriptor
 		if (sIntelCacheDescriptions[j].code == 0)
-			printf("\tUnknown cache descriptor 0x%02x\n", cache_descriptors[i]);
+			printf("\tUnknown cache descriptor 0x%02x\n", cacheDescriptors[i]);
 	}
 }
 
@@ -240,8 +240,8 @@ print_level2_cache(uint32 reg, const char *name)
 {
 	uint32 size = (reg >> 16) & 0xffff;
 	uint32 ways = (reg >> 12) & 0xf;
-	uint32 lines_per_tag = (reg >> 8) & 0xf;		// intel does not define this
-	uint32 linesize = reg & 0xff;
+	uint32 linesPerTag = (reg >> 8) & 0xf;		// intel does not define this
+	uint32 lineSize = reg & 0xff;
 
 	printf("\t%s: %lu KB, ", name, size);
 	if (ways == 0xf)
@@ -250,7 +250,7 @@ print_level2_cache(uint32 reg, const char *name)
 		printf("direct-mapped, ");
 	else
 		printf("%lu-way set associative, ", 1UL << (ways / 2));
-	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
+	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
 }
 
 
@@ -259,15 +259,15 @@ print_level1_cache(uint32 reg, const char *name)
 {
 	uint32 size = (reg >> 24) & 0xff;
 	uint32 ways = (reg >> 16) & 0xff;
-	uint32 lines_per_tag = (reg >> 8) & 0xff;
-	uint32 linesize = reg & 0xff;
+	uint32 linesPerTag = (reg >> 8) & 0xff;
+	uint32 lineSize = reg & 0xff;
 
 	printf("\t%s: %lu KB, ", name, size);
 	if (ways == 0xff)
 		printf("fully associative, ");
 	else
 		printf("%lu-way set associative, ", ways);
-	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
+	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
 }
 
 
@@ -299,9 +299,9 @@ print_intel_cache_desc(int32 cpu)
 	cpuid_info info;
 	uint32 type;
 	uint32 level;
-	bool is_fully_assoc;
-	uint32 linesize;
-	uint32 lines_per_tag;
+	bool isFullyAssoc;
+	uint32 lineSize;
+	uint32 linesPerTag;
 	uint32 ways;
 	uint32 sets;
 
@@ -312,10 +312,10 @@ print_intel_cache_desc(int32 cpu)
 	
 	type = info.regs.eax & 0xf;
 	level = (info.regs.eax & 0x70) >> 4;
-	is_fully_assoc = info.regs.eax & 0x100;
+	isFullyAssoc = info.regs.eax & 0x100;
 	
-	linesize = (info.regs.ebx & 0xfff) + 1;
-	lines_per_tag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
+	lineSize = (info.regs.ebx & 0xfff) + 1;
+	linesPerTag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
 	ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
 	
 	sets = info.regs.ecx;
@@ -329,11 +329,11 @@ print_intel_cache_desc(int32 cpu)
 		default: break;
 	}	
 	
-	if (is_fully_assoc)
+	if (isFullyAssoc)
 		printf("fully associative, ");
 	else
 		printf("%lu-way set associative, ", ways);
-	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
+	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
 	
 	get_cpuid(&info, 0x80000006, cpu);
 	print_level2_cache(info.regs.ecx, "L2 cache");
