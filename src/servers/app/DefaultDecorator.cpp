@@ -1323,14 +1323,14 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 			zoomRect.left += inset;
 			zoomRect.top += inset;
 			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
-					down, focus);
+				down, focus);
 
 			inset = floorf(width / 2.1);
 			zoomRect = rect;
 			zoomRect.right -= inset;
 			zoomRect.bottom -= inset;
 			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
-					down, focus);
+				down, focus);
 			break;
 		}
 	}
