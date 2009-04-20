@@ -20,7 +20,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp comm compress copyattr $(X86_ONLY)CortexAddOnHost cp
+	clockconfig cmp comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	draggers driveinfo dstcheck du echo eject env error expand expr
 	factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd
@@ -58,7 +58,7 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
 	ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
-SYSTEM_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
+SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLDirectMode GLTeapot Mandelbrot Pairs
 	Playground Pulse Sudoku Gradients
 ;
