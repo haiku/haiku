@@ -10,6 +10,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval, jerome.duval@free.fr
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
 /*!
@@ -122,6 +123,14 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 
 	fInitialWorkspace = desktop->CurrentWorkspace();
 		// TODO: this should probably be retrieved when the app is loaded!
+
+	// record the current system wide fonts..
+	desktop->LockSingleWindow();
+	DesktopSettings settings(desktop);
+	settings.GetDefaultPlainFont(fPlainFont);
+	settings.GetDefaultBoldFont(fBoldFont);
+	settings.GetDefaultFixedFont(fFixedFont);
+	desktop->UnlockSingleWindow();
 
 	STRACE(("ServerApp %s:\n", Signature()));
 	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
@@ -1125,6 +1134,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_SET_SYSTEM_FONT:
 		{
+			FTRACE(("ServerApp %s: AS_SET_SYSTEM_FONT\n", Signature()));
 			// gets:
 			//	1) string - font type ("plain", ...)
 			//	2) string - family
@@ -1152,6 +1162,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 					LockedDesktopSettings settings(fDesktop);
 
+					// TODO: Should we also update our internal copies now?
 					if (!strcmp(type, "plain"))
 						settings.SetDefaultPlainFont(font);
 					else if (!strcmp(type, "bold"))
@@ -1215,31 +1226,41 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				break;
 			}
 
+			// The client is requesting the system fonts, this
+			// could happend either at application start up, or
+			// because the client is resyncing with the global
+			// fonts. So we record the current system wide fonts
+			// into our own copies at this point.
 			DesktopSettings settings(fDesktop);
+
+			settings.GetDefaultPlainFont(fPlainFont);
+			settings.GetDefaultBoldFont(fBoldFont);
+			settings.GetDefaultFixedFont(fFixedFont);
+
 			fLink.StartMessage(B_OK);
 
 			for (int32 i = 0; i < 3; i++) {
-				ServerFont font;
+				ServerFont* font;
 				switch (i) {
 					case 0:
-						settings.GetDefaultPlainFont(font);
+						font = &fPlainFont;
 						fLink.AttachString("plain");
 						break;
 					case 1:
-						settings.GetDefaultBoldFont(font);
+						font = &fBoldFont;
 						fLink.AttachString("bold");
 						break;
 					case 2:
-						settings.GetDefaultFixedFont(font);
+						font = &fFixedFont;
 						fLink.AttachString("fixed");
 						break;
 				}
 
-				fLink.Attach<uint16>(font.FamilyID());
-				fLink.Attach<uint16>(font.StyleID());
-				fLink.Attach<float>(font.Size());
-				fLink.Attach<uint16>(font.Face());
-				fLink.Attach<uint32>(font.Flags());
+				fLink.Attach<uint16>(font->FamilyID());
+				fLink.Attach<uint16>(font->StyleID());
+				fLink.Attach<float>(font->Size());
+				fLink.Attach<uint16>(font->Face());
+				fLink.Attach<uint32>(font->Flags());
 			}
 
 			fDesktop->UnlockSingleWindow();

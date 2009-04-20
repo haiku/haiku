@@ -9,6 +9,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Artur Wyszynski <harakash@gmail.com>
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
 /*!
@@ -618,11 +619,14 @@ fDesktop->LockAllWindows();
 //		fDesktop->LockSingleWindow();
 	}
 
-	// TODO: default fonts should be created and stored in the Application
-	DesktopSettings settings(fDesktop);
-	ServerFont font;
-	settings.GetDefaultPlainFont(font);
-	newView->CurrentState()->SetFont(font);
+	// Initialize the view with the current application plain font.
+	// NOTE: This might be out of sync with the global app_server plain
+	// font, but that is so on purpose! The client needs to resync itself
+	// with the app_server fonts upon notification, but if we just use
+	// the current font here, the be_plain_font on the client may still
+	// hold old values. So this needs to be an update initiated by the
+	// client application.
+	newView->CurrentState()->SetFont(App()->PlainFont());
 
 	if (_parent) {
 		View *parent;

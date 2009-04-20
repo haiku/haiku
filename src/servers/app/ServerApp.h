@@ -15,6 +15,7 @@
 
 #include "ClientMemoryAllocator.h"
 #include "MessageLooper.h"
+#include "ServerFont.h"
 
 #include <ObjectList.h>
 #include <TokenSpace.h>
@@ -84,6 +85,8 @@ class ServerApp : public MessageLooper {
 
 			Desktop*			GetDesktop() const { return fDesktop; }
 
+			const ServerFont&	PlainFont() const { return fPlainFont; }
+
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
  private:
@@ -110,6 +113,10 @@ class ServerApp : public MessageLooper {
 			Desktop*			fDesktop;
 			BString				fSignature;
 			team_id				fClientTeam;
+
+			ServerFont			fPlainFont;
+			ServerFont			fBoldFont;
+			ServerFont			fFixedFont;
 
 	mutable	BLocker				fWindowListLock;
 			BObjectList<ServerWindow> fWindowList;
