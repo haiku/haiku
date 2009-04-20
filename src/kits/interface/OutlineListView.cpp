@@ -6,6 +6,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Rene Gollent (rene@gollent.com)
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
 //! BOutlineListView represents a "nestable" list view.
@@ -20,6 +21,9 @@
 
 #include <binary_compatibility/Interface.h>
 
+
+const float kLatchHeight = 8.0f;
+const float kLatchWidth = 4.0f;
 
 struct ListItemComparator {
 	ListItemComparator(int (*compareFunc)(const BListItem *, const BListItem *))
@@ -1029,30 +1033,44 @@ BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 {
 	float left = level * 10.0f;
 
+	float halfHeight = itemRect.Height() / 2.0f;
+
 	if (collapsed) {
 		SetHighColor(192, 192, 192);
 
-		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 2.0f),
-			itemRect.LeftTop() + BPoint(left + 4.0f, 10.0f),
-			itemRect.LeftTop() + BPoint(left + 8.0f, 6.0f));
+		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 
+				halfHeight - kLatchHeight / 2.0f),
+			itemRect.LeftTop() + BPoint(left + 4.0f,
+				halfHeight + kLatchHeight / 2.0f),
+			itemRect.LeftTop() + BPoint(left + kLatchWidth + 4.0f,
+				halfHeight));
 
 		SetHighColor(0, 0, 0);
 
-		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 2.0f),
-			itemRect.LeftTop() + BPoint(left + 4.0f, 10.0f),
-			itemRect.LeftTop() + BPoint(left + 8.0f, 6.0f));
+		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 4.0f,
+				halfHeight - kLatchHeight / 2.0f),
+			itemRect.LeftTop() + BPoint(left + 4.0f,
+				halfHeight + kLatchHeight / 2.0f),
+			itemRect.LeftTop() + BPoint(left + kLatchWidth + 4.0f,
+				halfHeight));
 	} else {
 		SetHighColor(192, 192, 192);
 
-		FillTriangle(itemRect.LeftTop() + BPoint(left + 2.0f, 4.0f),
-			itemRect.LeftTop() + BPoint(left + 10.0f, 4.0f),
-			itemRect.LeftTop() + BPoint(left + 6.0f, 8.0f));
+		FillTriangle(itemRect.LeftTop() + BPoint(left + 2.0f,
+				halfHeight - kLatchWidth + 2.0f),
+			itemRect.LeftTop() + BPoint(left + kLatchHeight + 2.0f,
+				halfHeight - kLatchWidth + 2.0f),
+			itemRect.LeftTop() + BPoint(left + 2.0f + kLatchHeight / 2.0f,
+				halfHeight + 2.0f));
 
 		SetHighColor(0, 0, 0);
 
-		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 2.0f, 4.0f),
-			itemRect.LeftTop() + BPoint(left + 10.0f, 4.0f),
-			itemRect.LeftTop() + BPoint(left + 6.0f, 8.0f));
+		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 2.0f,
+				halfHeight - kLatchWidth + 2.0f),
+			itemRect.LeftTop() + BPoint(left + kLatchHeight + 2.0f,
+				halfHeight - kLatchWidth + 2.0f),
+			itemRect.LeftTop() + BPoint(left + 2.0f + kLatchHeight / 2.0f,
+				halfHeight + 2.0f));
 	}
 }
 
