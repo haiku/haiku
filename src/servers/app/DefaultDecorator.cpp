@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
 /*!	Default and fallback decorator for the app_server - the yellow tabs */
@@ -80,10 +81,10 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	fNonFocusFrameColors[1] = (rgb_color){ 216, 216, 216, 255 };
 	fNonFocusFrameColors[1] = fNonFocusFrameColors[0];
 
-	fFocusTabColor = UIColor(B_WINDOW_TAB_COLOR);
-	fFocusTextColor = UIColor(B_WINDOW_TEXT_COLOR);
-	fNonFocusTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
-	fNonFocusTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
+	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
+	fFocusTextColor = settings.UIColor(B_WINDOW_TEXT_COLOR);
+	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
 	fCloseBitmaps[0] = fCloseBitmaps[1] = fCloseBitmaps[2] = fCloseBitmaps[3]
 		= fZoomBitmaps[0] = fZoomBitmaps[1] = fZoomBitmaps[2] = fZoomBitmaps[3]
@@ -1269,6 +1270,8 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 		bool				focus;
 		int32				width;
 		int32				height;
+		rgb_color			focusColor;
+		rgb_color			nonFocusColor;
 		UtilityBitmap*		bitmap;
 		decorator_bitmap*	next;
 	};
@@ -1282,7 +1285,9 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	while (current) {
 		if (current->item == item && current->down == down
 			&& current->focus == focus && current->width == width
-			&& current->height == height) {
+			&& current->height == height
+			&& current->focusColor == object->fFocusTabColor
+			&& current->nonFocusColor == object->fNonFocusTabColor) {
 			return current->bitmap;
 		}
 
@@ -1317,15 +1322,15 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 			BRect zoomRect(rect);
 			zoomRect.left += inset;
 			zoomRect.top += inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down,
-				focus);
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
+					down, focus);
 
 			inset = floorf(width / 2.1);
 			zoomRect = rect;
 			zoomRect.right -= inset;
 			zoomRect.bottom -= inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down,
-				focus);
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
+					down, focus);
 			break;
 		}
 	}
@@ -1348,6 +1353,8 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	entry->width = width;
 	entry->height = height;
 	entry->bitmap = bitmap;
+	entry->focusColor = object->fFocusTabColor;
+	entry->nonFocusColor = object->fNonFocusTabColor;
 	entry->next = sBitmapList;
 	sBitmapList = entry;
 	return bitmap;
