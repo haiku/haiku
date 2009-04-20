@@ -508,7 +508,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	bool tryOffscreenBackBuffer = false;
 	fOffscreenBackBuffer = false;
-#if 1
+#if 0
 	if (fVGADevice < 0 && (color_space)newMode.space == B_RGB32) {
 		// we should have an accelerated graphics driver, try
 		// to allocate a frame buffer large enough to contain
@@ -594,12 +594,18 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 #endif
 
 	// update acceleration hooks
+#if 0
 	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE,
 		(void *)&fDisplayMode);
 	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
 		(void *)&fDisplayMode);
 	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(
 		B_SCREEN_TO_SCREEN_BLIT, (void *)&fDisplayMode);
+#else
+	fAccFillRect = NULL;
+	fAccInvertRect = NULL;
+	fAccScreenBlit = NULL;
+#endif
 
 	// in case there is no accelerated blit function, using
 	// an offscreen located backbuffer will not be beneficial!
@@ -627,6 +633,9 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 			&& fFrontBuffer->ColorSpace() != B_RGBA32)
 			|| fVGADevice >= 0 || fOffscreenBackBuffer)
 			doubleBuffered = true;
+#if 1
+		doubleBuffered = true;
+#endif
 
 		if (doubleBuffered) {
 			if (fOffscreenBackBuffer) {
