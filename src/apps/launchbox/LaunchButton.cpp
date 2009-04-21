@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2008, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "LaunchButton.h"
@@ -25,14 +22,16 @@
 //#include "BubbleHelper.h"
 #include "PadView.h"
 
+
 static const float kDragStartDist = 10.0;
 static const float kDragBitmapAlphaScale = 0.6;
 //static const char* kEmptyHelpString = "You can drag an icon here.";
 
+
 bigtime_t
 LaunchButton::fClickSpeed = 0;
 
-// constructor
+
 LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
 		BMessage* message, BHandler* target)
 	: IconButton(name, id, label, message, target),
@@ -43,18 +42,18 @@ LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
 	  fLastClickTime(0),
 	  fIconSize(DEFAULT_ICON_SIZE)
 {
-	if (fClickSpeed == 0 || get_click_speed(&fClickSpeed) < B_OK)
+	if (fClickSpeed == 0 || get_click_speed(&fClickSpeed) != B_OK)
 		fClickSpeed = 500000;
 }
 
-// destructor
+
 LaunchButton::~LaunchButton()
 {
 	delete fRef;
 	free(fAppSig);
 }
 
-// AttachedToWindow
+
 void
 LaunchButton::AttachedToWindow()
 {
@@ -62,14 +61,14 @@ LaunchButton::AttachedToWindow()
 	_UpdateToolTip();
 }
 
-// DetachedFromWindow
+
 void
 LaunchButton::DetachedFromWindow()
 {
 //	BubbleHelper::Default()->SetHelp(this, NULL);
 }
 
-// Draw
+
 void
 LaunchButton::Draw(BRect updateRect)
 {
@@ -88,7 +87,8 @@ LaunchButton::Draw(BRect updateRect)
 		IconButton::Draw(updateRect);
 	} else {
 		rgb_color background = LowColor();
-		rgb_color lightShadow = tint_color(background, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
+		rgb_color lightShadow = tint_color(background,
+			(B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
 		rgb_color shadow = tint_color(background, B_DARKEN_1_TINT);
 		rgb_color light = tint_color(background, B_LIGHTEN_1_TINT);
 		BRect r(Bounds());
@@ -99,7 +99,7 @@ LaunchButton::Draw(BRect updateRect)
 	}
 }
 
-// MessageReceived
+
 void
 LaunchButton::MessageReceived(BMessage* message)
 {
@@ -107,7 +107,7 @@ LaunchButton::MessageReceived(BMessage* message)
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED: {
 			entry_ref ref; 
-			if (message->FindRef("refs", &ref) >= B_OK) {
+			if (message->FindRef("refs", &ref) == B_OK) {
 				if (fRef) {
 					if (ref != *fRef) {
 						BEntry entry(fRef, true);
@@ -121,15 +121,18 @@ LaunchButton::MessageReceived(BMessage* message)
 								team = be_roster->TeamFor(fAppSig);
 							else
 								team = be_roster->TeamFor(fRef);
-							if (team < B_OK) {
+							if (team < 0) {
 								if (fAppSig)
 									be_roster->Launch(fAppSig, message, &team);
 								else
 									be_roster->Launch(fRef, message, &team);
 							} else {
 								app_info appInfo;
-								if (team >= B_OK && be_roster->GetRunningAppInfo(team, &appInfo) >= B_OK) {
-									BMessenger messenger(appInfo.signature, team);
+								if (team >= 0
+									&& be_roster->GetRunningAppInfo(team,
+										&appInfo) == B_OK) {
+									BMessenger messenger(appInfo.signature,
+										team);
 									if (messenger.IsValid())
 										messenger.SendMessage(message);
 								}
@@ -150,7 +153,7 @@ LaunchButton::MessageReceived(BMessage* message)
 	}
 }
 
-// MouseDown
+
 void
 LaunchButton::MouseDown(BPoint where)
 {
@@ -176,7 +179,7 @@ LaunchButton::MouseDown(BPoint where)
 		IconButton::MouseDown(where);
 }
 
-// MouseUp
+
 void
 LaunchButton::MouseUp(BPoint where)
 {
@@ -187,9 +190,10 @@ LaunchButton::MouseUp(BPoint where)
 	IconButton::MouseUp(where);
 }
 
-// MouseMoved
+
 void
-LaunchButton::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+LaunchButton::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
 {
 	if ((dragMessage && (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW))
 		&& ((dragMessage->what == B_SIMPLE_DATA
@@ -223,7 +227,8 @@ LaunchButton::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 					for (uint32 y = 0; y < height; y++) {
 						uint8* bitsHandle = bits;
 						for (uint32 x = 0; x < width; x++) {
-							bitsHandle[3] = uint8(bitsHandle[3] * kDragBitmapAlphaScale);
+							bitsHandle[3] = uint8(bitsHandle[3]
+								* kDragBitmapAlphaScale);
 							bitsHandle += 4;
 						}
 						bits += bpr;
@@ -277,7 +282,6 @@ LaunchButton::MaxSize()
 // #pragma mark -
 
 
-// SetTo
 void
 LaunchButton::SetTo(const entry_ref* ref)
 {
@@ -295,9 +299,9 @@ LaunchButton::SetTo(const entry_ref* ref)
 		// see if this is an application
 		BFile file(ref, B_READ_ONLY);
 		BAppFileInfo info;
-		if (info.SetTo(&file) >= B_OK) {
+		if (info.SetTo(&file) == B_OK) {
 			char mimeSig[B_MIME_TYPE_LENGTH];
-			if (info.GetSignature(mimeSig) >= B_OK) {
+			if (info.GetSignature(mimeSig) == B_OK) {
 				SetTo(mimeSig, false);
 			} else {
 				fprintf(stderr, "no MIME signature for '%s'\n", fRef->name);
@@ -312,14 +316,14 @@ LaunchButton::SetTo(const entry_ref* ref)
 	_UpdateToolTip();
 }
 
-// Ref
+
 entry_ref*
 LaunchButton::Ref() const
 {
 	return fRef;
 }
 
-// SetTo
+
 void
 LaunchButton::SetTo(const char* appSig, bool updateIcon)
 {
@@ -328,14 +332,14 @@ LaunchButton::SetTo(const char* appSig, bool updateIcon)
 		fAppSig = strdup(appSig);
 		if (updateIcon) {
 			entry_ref ref;
-			if (be_roster->FindApp(fAppSig, &ref) >= B_OK)
+			if (be_roster->FindApp(fAppSig, &ref) == B_OK)
 				SetTo(&ref);
 		}
 	}
 	_UpdateToolTip();
 }
 
-// SetDesciption
+
 void
 LaunchButton::SetDescription(const char* text)
 {
@@ -343,7 +347,7 @@ LaunchButton::SetDescription(const char* text)
 	_UpdateToolTip();
 }
 
-// SetIconSize
+
 void
 LaunchButton::SetIconSize(uint32 size)
 {
@@ -357,9 +361,10 @@ LaunchButton::SetIconSize(uint32 size)
 	Invalidate();
 }
 
+
 // #pragma mark -
 
-// _UpdateToolTip
+
 void
 LaunchButton::_UpdateToolTip()
 {
@@ -371,9 +376,9 @@ LaunchButton::_UpdateToolTip()
 			BFile file(fRef, B_READ_ONLY);
 			BAppFileInfo appFileInfo;
 			version_info info;
-			if (appFileInfo.SetTo(&file) >= B_OK
+			if (appFileInfo.SetTo(&file) == B_OK
 				&& appFileInfo.GetVersionInfo(&info,
-											  B_APP_VERSION_KIND) >= B_OK
+					B_APP_VERSION_KIND) == B_OK
 				&& strlen(info.short_info) > 0) {
 				helper << "\n\n" << info.short_info;
 			}
@@ -384,7 +389,7 @@ LaunchButton::_UpdateToolTip()
 	}
 }
 
-// _UpdateIcon
+
 void
 LaunchButton::_UpdateIcon(const entry_ref* ref)
 {
@@ -392,7 +397,7 @@ LaunchButton::_UpdateIcon(const entry_ref* ref)
 		fIconSize - 1), B_RGBA32);
 	// NOTE: passing an invalid/unknown icon_size argument will cause
 	// the BNodeInfo to ignore it and just use the bitmap bounds.
-	if (BNodeInfo::GetTrackerIcon(ref, icon, (icon_size)fIconSize) >= B_OK)
+	if (BNodeInfo::GetTrackerIcon(ref, icon, (icon_size)fIconSize) == B_OK)
 		SetIcon(icon);
 
 	delete icon;

@@ -1,11 +1,7 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef LAUNCH_BUTTON_H
 #define LAUNCH_BUTTON_H
 
@@ -22,12 +18,11 @@ enum {
 };
 
 class LaunchButton : public IconButton {
- public:
-								LaunchButton(const char* name,
-											 uint32 id,
-											 const char* label = NULL,
-											 BMessage* message = NULL,
-											 BHandler* target = NULL);
+public:
+								LaunchButton(const char* name, uint32 id,
+									const char* label = NULL,
+									BMessage* message = NULL,
+									BHandler* target = NULL);
 	virtual						~LaunchButton();
 
 	// IconButton interface
@@ -38,7 +33,7 @@ class LaunchButton : public IconButton {
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
+									const BMessage* dragMessage);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				PreferredSize();
@@ -64,17 +59,17 @@ class LaunchButton : public IconButton {
 			void				_UpdateToolTip();
 			void				_UpdateIcon(const entry_ref* ref);
 
-	entry_ref*					fRef;
-	char*						fAppSig;
-	BString						fDescription;	
+			entry_ref*			fRef;
+			char*				fAppSig;
+			BString				fDescription;	
+		
+			bool				fAnticipatingDrop;
+			bigtime_t			fLastClickTime;
+			BPoint				fDragStart;
+		
+			uint32				fIconSize;
 
-	bool						fAnticipatingDrop;
-	bigtime_t					fLastClickTime;
-	BPoint						fDragStart;
-
-	uint32						fIconSize;
-
-	static bigtime_t			fClickSpeed;
+	static	bigtime_t			fClickSpeed;
 };
 
 #endif // LAUNCH_BUTTON_H
