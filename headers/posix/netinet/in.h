@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETINET_IN_H_
@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 typedef uint16_t in_port_t;
 typedef uint32_t in_addr_t;
@@ -128,7 +128,7 @@ struct group_source_req {
 #define IP_ADD_MEMBERSHIP			12
 	/* ip_mreq; add an IP group membership */
 #define IP_DROP_MEMBERSHIP			13
-	/* ip_mreq; drop an IP group membership */ 
+	/* ip_mreq; drop an IP group membership */
 #define IP_BLOCK_SOURCE				14	/* ip_mreq_source */
 #define IP_UNBLOCK_SOURCE			15	/* ip_mreq_source */
 #define IP_ADD_SOURCE_MEMBERSHIP	16	/* ip_mreq_source */
@@ -144,63 +144,57 @@ struct group_source_req {
 #define IPV6_MULTICAST_HOPS			25	/* int */
 #define IPV6_MULTICAST_LOOP			26	/* int */
 
-#define __IPADDR(x)				((uint32_t)htonl((uint32_t)(x)))
+#define INADDR_ANY					((in_addr_t)0x00000000)
+#define INADDR_LOOPBACK				((in_addr_t)0x7f000001)
+#define INADDR_BROADCAST			((in_addr_t)0xffffffff)	/* must be masked */
 
-#define INADDR_ANY				0x00000000
-#define INADDR_LOOPBACK			__IPADDR(0x7f000001)
-#define INADDR_BROADCAST		0xffffffff				/* must be masked */
+#define INADDR_UNSPEC_GROUP			((in_addr_t)0xe0000000)	/* 224.0.0.0 */
+#define INADDR_ALLHOSTS_GROUP		((in_addr_t)0xe0000001)	/* 224.0.0.1 */
+#define INADDR_ALLROUTERS_GROUP		((in_addr_t)0xe0000002)	/* 224.0.0.2 */
+#define INADDR_MAX_LOCAL_GROUP		((in_addr_t)0xe00000ff)	/* 224.0.0.255 */
 
-#define INADDR_UNSPEC_GROUP		__IPADDR(0xe0000000)	/* 224.0.0.0 */
-#define INADDR_ALLHOSTS_GROUP	__IPADDR(0xe0000001)	/* 224.0.0.1 */
-#define INADDR_ALLROUTERS_GROUP	__IPADDR(0xe0000002)	/* 224.0.0.2 */
-#define INADDR_MAX_LOCAL_GROUP	__IPADDR(0xe00000ff)	/* 224.0.0.255 */
+#define IN_LOOPBACKNET				127
 
-#define IN_LOOPBACKNET			127						/* official! */
+#define INADDR_NONE					((in_addr_t)0xffffffff)
 
-#define INADDR_NONE				0xffffffff
+#define IN_CLASSA(i)				(((in_addr_t)(i) & 0x80000000) == 0)
+#define IN_CLASSA_NET				0xff000000
+#define IN_CLASSA_NSHIFT			24
+#define IN_CLASSA_HOST				0x00ffffff
+#define IN_CLASSA_MAX				128
 
-#define IN_CLASSA(i)			(((uint32_t)(i) & __IPADDR(0x80000000)) == \
-									__IPADDR(0x00000000))
-#define IN_CLASSA_NET			__IPADDR(0xff000000)
-#define IN_CLASSA_NSHIFT		24
-#define IN_CLASSA_HOST			__IPADDR(0x00ffffff)
-#define IN_CLASSA_MAX			128
+#define IN_CLASSB(i)				(((in_addr_t)(i) & 0xc0000000) == 0x80000000)
+#define IN_CLASSB_NET				0xffff0000
+#define IN_CLASSB_NSHIFT			16
+#define IN_CLASSB_HOST				0x0000ffff
+#define IN_CLASSB_MAX				65536
 
-#define IN_CLASSB(i)			(((uint32_t)(i) & __IPADDR(0xc0000000)) == \
-									__IPADDR(0x80000000))
-#define IN_CLASSB_NET			__IPADDR(0xffff0000)
-#define IN_CLASSB_NSHIFT		16
-#define IN_CLASSB_HOST			__IPADDR(0x0000ffff)
-#define IN_CLASSB_MAX			65536
+#define IN_CLASSC(i)				(((in_addr_t)(i) & 0xe0000000) == 0xc0000000)
+#define IN_CLASSC_NET				0xffffff00
+#define IN_CLASSC_NSHIFT			8
+#define IN_CLASSC_HOST				0x000000ff
 
-#define IN_CLASSC(i)			(((uint32_t)(i) & __IPADDR(0xe0000000)) == \
-									__IPADDR(0xc0000000))
-#define IN_CLASSC_NET			__IPADDR(0xffffff00)
-#define IN_CLASSC_NSHIFT		8
-#define IN_CLASSC_HOST			__IPADDR(0x000000ff)
-
-#define IN_CLASSD(i)			(((uint32_t)(i) & __IPADDR(0xf0000000)) == \
-									__IPADDR(0xe0000000))
+#define IN_CLASSD(i)				(((in_addr_t)(i) & 0xf0000000) == 0xe0000000)
 /* These ones aren't really net and host fields, but routing needn't know. */
-#define IN_CLASSD_NET			__IPADDR(0xf0000000)
-#define IN_CLASSD_NSHIFT		28
-#define IN_CLASSD_HOST			__IPADDR(0x0fffffff)
+#define IN_CLASSD_NET				0xf0000000
+#define IN_CLASSD_NSHIFT			28
+#define IN_CLASSD_HOST				0x0fffffff
 
-#define IN_MULTICAST(i)			IN_CLASSD(i)
+#define IN_MULTICAST(i)				IN_CLASSD(i)
 
-#define IN_EXPERIMENTAL(i)		(((uint32_t)(i) & 0xf0000000) == 0xf0000000)
-#define IN_BADCLASS(i)			(((uint32_t)(i) & 0xf0000000) == 0xf0000000)
+#define IN_EXPERIMENTAL(i)			(((in_addr_t)(i) & 0xf0000000) == 0xf0000000)
+#define IN_BADCLASS(i)				(((in_addr_t)(i) & 0xf0000000) == 0xf0000000)
 
-#define IP_MAX_MEMBERSHIPS		20
+#define IP_MAX_MEMBERSHIPS			20
 
 /* maximal length of the string representation of an IPv4 address */
-#define INET_ADDRSTRLEN			16
+#define INET_ADDRSTRLEN				16
 
 /* some helpful macro's :) */
-#define in_hosteq(s, t)			((s).s_addr == (t).s_addr)
-#define in_nullhost(x)			((x).s_addr == INADDR_ANY)
-#define satosin(sa)				((struct sockaddr_in *)(sa))
-#define sintosa(sin)			((struct sockaddr *)(sin))
+#define in_hosteq(s, t)				((s).s_addr == (t).s_addr)
+#define in_nullhost(x)				((x).s_addr == INADDR_ANY)
+#define satosin(sa)					((struct sockaddr_in *)(sa))
+#define sintosa(sin)				((struct sockaddr *)(sin))
 
 #ifdef __cplusplus
 }

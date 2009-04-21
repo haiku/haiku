@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,8 +21,7 @@
 #include <stdlib.h>
 
 
-/*!
-	Routing utility function: copies address \a from into a new address
+/*!	Routing utility function: copies address \a from into a new address
 	that is put into \a to.
 	If \a replaceWithZeros is set \a from will be replaced by an empty
 	address.
@@ -69,15 +68,15 @@ ipv4_copy_address(const sockaddr *from, sockaddr **to,
 }
 
 
-/*!
-	Routing utility function: applies \a mask to given \a address and puts
+/*!	Routing utility function: applies \a mask to given \a address and puts
 	the resulting address into \a result.
 	\return B_OK if the mask has been applied
 	\return B_BAD_VALUE if \a address is NULL or if any of \a address or \a mask
 			refers to an uninitialized address
 */
 static status_t
-ipv4_mask_address(const sockaddr *address, const sockaddr *mask, sockaddr *result)
+ipv4_mask_address(const sockaddr *address, const sockaddr *mask,
+	sockaddr *result)
 {
 	if (address == NULL || address->sa_len == 0 || result == NULL
 			|| (mask != NULL && mask->sa_len == 0))
@@ -93,8 +92,7 @@ ipv4_mask_address(const sockaddr *address, const sockaddr *mask, sockaddr *resul
 }
 
 
-/*!
-	Checks if the given \a address is the empty address. By default, the port
+/*!	Checks if the given \a address is the empty address. By default, the port
 	is checked, too, but you can avoid that by passing \a checkPort = false.
 	\return true if \a address is NULL, uninitialized or the empty address,
 		false if not
@@ -110,8 +108,7 @@ ipv4_is_empty_address(const sockaddr *address, bool checkPort)
 }
 
 
-/*!
-	Compares the IP-addresses of the two given address structures \a a and \a b.
+/*!	Compares the IP-addresses of the two given address structures \a a and \a b.
 	\return true if IP-addresses of \a a and \a b are equal, false if not
 */
 static bool
@@ -124,12 +121,12 @@ ipv4_equal_addresses(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return ipv4_is_empty_address(b, false);
 
-	return ((sockaddr_in *)a)->sin_addr.s_addr == ((sockaddr_in *)b)->sin_addr.s_addr;
+	return ((sockaddr_in *)a)->sin_addr.s_addr
+		== ((sockaddr_in *)b)->sin_addr.s_addr;
 }
 
 
-/*!
-	Compares the ports of the two given address structures \a a and \a b.
+/*!	Compares the ports of the two given address structures \a a and \a b.
 	\return true if ports of \a a and \a b are equal, false if not
 */
 static bool
@@ -141,8 +138,7 @@ ipv4_equal_ports(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!
-	Compares the IP-addresses and ports of the two given address structures
+/*!	Compares the IP-addresses and ports of the two given address structures
 	\a a and \a b.
 	\return true if IP-addresses and ports of \a a and \a b are equal, false if
 			not
@@ -157,13 +153,13 @@ ipv4_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return ipv4_is_empty_address(b, true);
 
-	return ((sockaddr_in *)a)->sin_addr.s_addr == ((sockaddr_in *)b)->sin_addr.s_addr
+	return ((sockaddr_in *)a)->sin_addr.s_addr
+			== ((sockaddr_in *)b)->sin_addr.s_addr
 		&& ((sockaddr_in *)a)->sin_port == ((sockaddr_in *)b)->sin_port;
 }
 
 
-/*!
-	Applies the given \a mask two \a a and \a b and then checks whether
+/*!	Applies the given \a mask two \a a and \a b and then checks whether
 	the masked addresses match.
 	\return true if \a a matches \a b after masking both, false if not
 */
@@ -194,8 +190,7 @@ ipv4_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 }
 
 
-/*!
-	Routing utility function: determines the least significant bit that is set
+/*!	Routing utility function: determines the least significant bit that is set
 	in the given \a mask.
 	\return the number of the first bit that is set (0-32, where 32 means
 		that there's no bit set in the mask).
@@ -208,7 +203,8 @@ ipv4_first_mask_bit(const sockaddr *_mask)
 
 	uint32 mask = ntohl(((const sockaddr_in *)_mask)->sin_addr.s_addr);
 
-	// TODO: this can be optimized, there are also some nice assembler mnemonics for this
+	// TODO: this can be optimized, there are also some nice assembler mnemonics
+	// for this
 	int8 bit = 0;
 	for (uint32 bitMask = 1; bit < 32; bitMask <<= 1, bit++) {
 		if (mask & bitMask)
@@ -219,8 +215,7 @@ ipv4_first_mask_bit(const sockaddr *_mask)
 }
 
 
-/*!
-	Routing utility function: checks the given \a mask for correctness (which
+/*!	Routing utility function: checks the given \a mask for correctness (which
 	means that (starting with LSB) consists zero or more unset bits, followed
 	by bits that are all set).
 	\return true if \a mask is ok, false if not
@@ -248,8 +243,7 @@ ipv4_check_mask(const sockaddr *_mask)
 }
 
 
-/*!
-	Creates a buffer for the given \a address and prints the address into
+/*!	Creates a buffer for the given \a address and prints the address into
 	it (hexadecimal representation in host byte order or '<none>').
 	If \a printPort is set, the port is printed, too.
 	\return B_OK if the address could be printed, \a buffer will point to
@@ -271,13 +265,14 @@ ipv4_print_address_buffer(const sockaddr *_address, char *buffer,
 	else {
 		unsigned int addr = ntohl(address->sin_addr.s_addr);
 
-		if (printPort)
+		if (printPort) {
 			snprintf(buffer, bufferSize, "%u.%u.%u.%u:%u",
 				(addr >> 24) & 0xff, (addr >> 16) & 0xff, (addr >> 8) & 0xff,
 				addr & 0xff, ntohs(address->sin_port));
-		else
+		} else {
 			snprintf(buffer, bufferSize, "%u.%u.%u.%u", (addr >> 24) & 0xff,
 				(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff);
+		}
 	}
 
 	return B_OK;
@@ -301,8 +296,7 @@ ipv4_print_address(const sockaddr *_address, char **_buffer, bool printPort)
 }
 
 
-/*!
-	Determines the port of the given \a address.
+/*!	Determines the port of the given \a address.
 	\return uint16 representing the port-nr
 */
 static uint16
@@ -315,8 +309,7 @@ ipv4_get_port(const sockaddr *address)
 }
 
 
-/*!
-	Sets the port of the given \a address to \a port.
+/*!	Sets the port of the given \a address to \a port.
 	\return B_OK if the port has been set
 	\return B_BAD_VALUE if \a address is NULL or has not been initialized
 */
@@ -331,8 +324,7 @@ ipv4_set_port(sockaddr *address, uint16 port)
 }
 
 
-/*!
-	Sets \a address to \a from.
+/*!	Sets \a address to \a from.
 	\return B_OK if \a from has been copied into \a address
 	\return B_BAD_VALUE if either \a address or \a from is NULL or if the
 			address given in from has not been initialized
@@ -353,8 +345,7 @@ ipv4_set_to(sockaddr *address, const sockaddr *from)
 }
 
 
-/*!
-	Updates missing parts in \a address with the values in \a from.
+/*!	Updates missing parts in \a address with the values in \a from.
 	\return B_OK if \a address has been updated from \a from
 	\return B_BAD_VALUE if either \a address or \a from is NULL or if the
 			address given in from has not been initialized
@@ -385,8 +376,7 @@ ipv4_update_to(sockaddr *_address, const sockaddr *_from)
 }
 
 
-/*!
-	Sets \a address to the empty address (0.0.0.0).
+/*!	Sets \a address to the empty address (0.0.0.0).
 	\return B_OK if \a address has been set
 	\return B_BAD_VALUE if \a address is NULL
 */
@@ -418,17 +408,16 @@ ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 	in_addr_t net;
 	if (mask == NULL) {
 		// choose default netmask depending on the class of the address
-		net = address->sin_addr.s_addr;
-		if (IN_CLASSA(net)
-			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
+		net = ntohl(address->sin_addr.s_addr);
+		if (IN_CLASSA(net) || (net >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
 			// class A, or loopback
-			net = IN_CLASSA_NET;
+			net = htonl(IN_CLASSA_NET);
 		} else if (IN_CLASSB(net)) {
 			// class B
-			net = IN_CLASSB_NET;
+			net = htonl(IN_CLASSB_NET);
 		} else {
 			// class C and rest
-			net = IN_CLASSC_NET;
+			net = htonl(IN_CLASSC_NET);
 		}
 	} else
 		net = mask->sin_addr.s_addr;
@@ -452,8 +441,7 @@ ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 }
 
 
-/*!
-	Computes a hash-value of the given addresses \a ourAddress
+/*!	Computes a hash-value of the given addresses \a ourAddress
 	and \a peerAddress.
 	\return uint32 representing the hash-value
 */
@@ -474,8 +462,7 @@ ipv4_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 }
 
 
-/*!
-	Adds the given \a address to the IP-checksum \a checksum.
+/*!	Adds the given \a address to the IP-checksum \a checksum.
 	\return B_OK if \a address has been added to the checksum
 	\return B_BAD_VALUE if either \a address or \a checksum is NULL or if
 	        the given address is not initialized
