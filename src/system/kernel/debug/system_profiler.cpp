@@ -833,14 +833,19 @@ _user_system_profiler_start(struct system_profiler_parameters* userParameters)
 	if (error != B_OK)
 		return error;
 
-	if (areaInfo.team != team || parameters.stack_depth < 1)
+	if (areaInfo.team != team)
 		return B_BAD_VALUE;
 
-	if (parameters.interval < B_DEBUG_MIN_PROFILE_INTERVAL)
-		parameters.interval = B_DEBUG_MIN_PROFILE_INTERVAL;
+	if ((parameters.flags & B_SYSTEM_PROFILER_SAMPLING_EVENTS) != 0) {
+		if (parameters.stack_depth < 1)
+			return B_BAD_VALUE;
 
-	if (parameters.stack_depth > B_DEBUG_STACK_TRACE_DEPTH)
-		parameters.stack_depth = B_DEBUG_STACK_TRACE_DEPTH;
+		if (parameters.interval < B_DEBUG_MIN_PROFILE_INTERVAL)
+			parameters.interval = B_DEBUG_MIN_PROFILE_INTERVAL;
+
+		if (parameters.stack_depth > B_DEBUG_STACK_TRACE_DEPTH)
+			parameters.stack_depth = B_DEBUG_STACK_TRACE_DEPTH;
+	}
 
 	// quick check to see whether we do already have a profiler installed
 	InterruptsSpinLocker locker(sProfilerLock);
