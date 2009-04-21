@@ -29,7 +29,7 @@ public:
 								BRegion();
 								BRegion(const BRegion& region);
 								BRegion(const BRect rect);
-	virtual						~BRegion();	
+	virtual						~BRegion();
 
 			BRegion&			operator=(const BRegion& from);
 			bool				operator==(const BRegion& other) const;
@@ -63,7 +63,7 @@ public:
 
 			void				Include(BRect rect);
 			void				Include(clipping_rect rect);
-			void				Include(const BRegion*);
+			void				Include(const BRegion* region);
 
 			void				Exclude(BRect r);
 			void				Exclude(clipping_rect r);
