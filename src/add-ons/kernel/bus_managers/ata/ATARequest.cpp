@@ -94,6 +94,7 @@ ATARequest::Start(scsi_ccb *ccb)
 
 	fCCB = ccb;
 	fStatus = SCSI_REQ_CMP;
+	fCCB->device_status = SCSI_STATUS_GOOD;
 	fIsWrite = false;
 	return B_OK;
 }
