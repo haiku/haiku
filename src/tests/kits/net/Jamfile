@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src tests kits net ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SimpleTest firefox_crash : firefox_crash.cpp : $(TARGET_NETWORK_LIBS) ;
+
 SimpleTest udp_client : udp_client.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest udp_echo : udp_echo.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
@@ -14,10 +16,10 @@ SimpleTest getpeername : getpeername.cpp : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_connection_test : tcp_connection_test.cpp
 	: $(TARGET_NETWORK_LIBS) ;
 
-SimpleTest NetAddressTest : NetAddressTest.cpp 
+SimpleTest NetAddressTest : NetAddressTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) ;
 
-SimpleTest NetEndpointTest : NetEndpointTest.cpp 
+SimpleTest NetEndpointTest : NetEndpointTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be ;
 
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
