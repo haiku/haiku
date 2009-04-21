@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons bluetooth ResetLocalDevice ;
 
 UsePrivateHeaders bluetooth ;
 
-Addon ClassicBe :
+Addon ResetLocalDevice :
 	ResetLocalDevice.cpp
 	: be
 ;

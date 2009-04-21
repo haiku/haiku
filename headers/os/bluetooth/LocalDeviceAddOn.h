@@ -8,7 +8,6 @@ class LocalDeviceAddOn {
 
 public:
 
-	LocalDeviceAddOn();
 	virtual const char* GetName()=0;
 
 	virtual status_t	InitCheck(LocalDevice* lDevice)=0;
