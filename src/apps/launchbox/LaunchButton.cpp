@@ -29,7 +29,10 @@ static const float kDragBitmapAlphaScale = 0.6;
 
 
 bigtime_t
-LaunchButton::fClickSpeed = 0;
+LaunchButton::sClickSpeed = 0;
+
+bool
+LaunchButton::sIgnoreDoubleClick = true;
 
 
 LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
@@ -42,8 +45,8 @@ LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
 	  fLastClickTime(0),
 	  fIconSize(DEFAULT_ICON_SIZE)
 {
-	if (fClickSpeed == 0 || get_click_speed(&fClickSpeed) != B_OK)
-		fClickSpeed = 500000;
+	if (sClickSpeed == 0 || get_click_speed(&sClickSpeed) != B_OK)
+		sClickSpeed = 500000;
 }
 
 
@@ -159,7 +162,7 @@ LaunchButton::MouseDown(BPoint where)
 {
 	bigtime_t now = system_time();
 	bool callInherited = true;
-	if (now - fLastClickTime < fClickSpeed)
+	if (sIgnoreDoubleClick && now - fLastClickTime < sClickSpeed)
 		callInherited = false;
 	fLastClickTime = now;
 	if (BMessage* message = Window()->CurrentMessage()) {
@@ -359,6 +362,13 @@ LaunchButton::SetIconSize(uint32 size)
 
 	InvalidateLayout();
 	Invalidate();
+}
+
+
+void
+LaunchButton::SetIgnoreDoubleClick(bool refuse)
+{
+	sIgnoreDoubleClick = refuse;
 }
 
 

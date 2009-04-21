@@ -55,6 +55,10 @@ public:
 			uint32				IconSize() const
 									{ return fIconSize; }
 
+	static	void				SetIgnoreDoubleClick(bool refuse);
+	static	bool				IgnoreDoubleClick()
+									{ return sIgnoreDoubleClick; }
+
  private:
 			void				_UpdateToolTip();
 			void				_UpdateIcon(const entry_ref* ref);
@@ -69,7 +73,8 @@ public:
 		
 			uint32				fIconSize;
 
-	static	bigtime_t			fClickSpeed;
+	static	bigtime_t			sClickSpeed;
+	static	bool				sIgnoreDoubleClick;
 };
 
 #endif // LAUNCH_BUTTON_H

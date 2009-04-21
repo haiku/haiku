@@ -22,15 +22,18 @@
 #include "LaunchButton.h"
 #include "MainWindow.h"
 
+
 static bigtime_t sActivationDelay = 40000;
 static const uint32 kIconSizes[] = { 16, 20, 24, 32, 40, 48, 64 };
 
+
 enum {
 	MSG_TOGGLE_LAYOUT			= 'tgll',
-	MSG_SET_ICON_SIZE			= 'stis'
+	MSG_SET_ICON_SIZE			= 'stis',
+	MSG_SET_IGNORE_DOUBLECLICK	= 'strd'
 };
 
-// constructor
+
 PadView::PadView(const char* name)
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, NULL),
 	  fDragging(false),
@@ -46,12 +49,12 @@ PadView::PadView(const char* name)
 	SetLayout(fButtonLayout);
 }
 
-// destructor
+
 PadView::~PadView()
 {
 }
 
-// Draw
+
 void
 PadView::Draw(BRect updateRect)
 {
@@ -127,7 +130,7 @@ PadView::Draw(BRect updateRect)
 	FillRect(r, B_SOLID_LOW);
 }
 
-// MessageReceived
+
 void
 PadView::MessageReceived(BMessage* message)
 {
@@ -141,18 +144,24 @@ PadView::MessageReceived(BMessage* message)
 				fButtonLayout->SetOrientation(B_HORIZONTAL);
 			}
 			break;
+
 		case MSG_SET_ICON_SIZE:
 			uint32 size;
 			if (message->FindInt32("size", (int32*)&size) == B_OK)
 				SetIconSize(size);
 			break;
+
+		case MSG_SET_IGNORE_DOUBLECLICK:
+			SetIgnoreDoubleClick(!IgnoreDoubleClick());
+			break;
+
 		default:
 			BView::MessageReceived(message);
 			break;
 	}
 }
 
-// MouseDown
+
 void
 PadView::MouseDown(BPoint where)
 {
@@ -205,7 +214,7 @@ PadView::MouseDown(BPoint where)
 	}
 }
 
-// MouseUp
+
 void
 PadView::MouseUp(BPoint where)
 {
@@ -220,7 +229,7 @@ PadView::MouseUp(BPoint where)
 	fDragging = false;
 }
 
-// MouseMoved
+
 void
 PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
@@ -241,7 +250,8 @@ PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 			bool raise = false;
 			if (fabs(0.5 - position.x) > fabs(0.5 - position.y)) {
 				// left or right border
-				if (where.y >= windowFrame.top && where.y <= windowFrame.bottom) {
+				if (where.y >= windowFrame.top
+					&& where.y <= windowFrame.bottom) {
 					if (position.x < 0.5 && where.x == frame.left)
 						raise = true;
 					else if (position.x > 0.5 && where.x == frame.right)
@@ -262,7 +272,7 @@ PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 	}
 }
 
-// AddButton
+
 void
 PadView::AddButton(LaunchButton* button, LaunchButton* beforeButton)
 {
@@ -274,21 +284,21 @@ PadView::AddButton(LaunchButton* button, LaunchButton* beforeButton)
 		fButtonLayout->AddView(button);
 }
 
-// RemoveButton
+
 bool
 PadView::RemoveButton(LaunchButton* button)
 {
 	return fButtonLayout->RemoveView(button);
 }
 
-// ButtonAt
+
 LaunchButton*
 PadView::ButtonAt(int32 index) const
 {
 	return dynamic_cast<LaunchButton*>(ChildAt(index));
 }
 
-// DisplayMenu
+
 void
 PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 {
@@ -362,6 +372,12 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	}
 	settingsM->AddItem(iconSizeM);
 
+	item = new BMenuItem("Ignore Double-click",
+		new BMessage(MSG_SET_IGNORE_DOUBLECLICK));
+	item->SetTarget(this);
+	item->SetMarked(IgnoreDoubleClick());
+	settingsM->AddItem(item);
+
 	uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
 	item = new BMenuItem("Show Window Border", new BMessage(what));
 	item->SetTarget(window);
@@ -420,7 +436,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	menu->Go(where, true, false, mouseRect, true);
 }
 
-// SetOrientation
+
 void
 PadView::SetOrientation(enum orientation orientation)
 {
@@ -433,14 +449,14 @@ PadView::SetOrientation(enum orientation orientation)
 	}
 }
 
-// Orientation
+
 enum orientation
 PadView::Orientation() const
 {
 	return fButtonLayout->Orientation();
 }
 
-// SetIconSize
+
 void
 PadView::SetIconSize(uint32 size)
 {
@@ -453,11 +469,25 @@ PadView::SetIconSize(uint32 size)
 		button->SetIconSize(fIconSize);
 }
 
-// IconSize
+
 uint32
 PadView::IconSize() const
 {
 	return fIconSize;
+}
+
+
+void
+PadView::SetIgnoreDoubleClick(bool refuse)
+{
+	LaunchButton::SetIgnoreDoubleClick(refuse);
+}
+
+
+bool
+PadView::IgnoreDoubleClick() const
+{
+	return LaunchButton::IgnoreDoubleClick();
 }
 
 

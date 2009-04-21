@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2008, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "MainWindow.h"
@@ -26,19 +23,20 @@
 #include "NamePanel.h"
 #include "PadView.h"
 
-// constructor
+
 MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
-	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-			| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
-			| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
-			B_ALL_WORKSPACES),
-	  fSettings(new BMessage('sett')),
-	  fPadView(new PadView("pad view")),
-	  fLastID(0),
-	  fNamePanelFrame(-1000.0, -1000.0, -800.0, -900.0),
-	  fAutoRaise(false),
-	  fShowOnAllWorkspaces(true)
+	:
+	BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
+		| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
+		B_ALL_WORKSPACES),
+	fSettings(new BMessage('sett')),
+	fPadView(new PadView("pad view")),
+	fLastID(0),
+	fNamePanelFrame(-1000.0, -1000.0, -800.0, -900.0),
+	fAutoRaise(false),
+	fShowOnAllWorkspaces(true)
 {
 	bool buttonsAdded = false;
 	if (load_settings(fSettings, "main_settings", "LaunchBox") >= B_OK)
@@ -54,20 +52,21 @@ MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 	AddChild(fPadView);
 }
 
-// constructor
+
 MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
-	: BWindow(frame, name,
-			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-			| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
-			| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
-			B_ALL_WORKSPACES),
-	  fSettings(settings),
-	  fPadView(new PadView("pad view")),
-	  fLastID(0),
-	  fNamePanelFrame(-1000.0, -1000.0, -900.0, -900.0),
-	  fAutoRaise(false),
-	  fShowOnAllWorkspaces(true)
+	:
+	BWindow(frame, name,
+		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
+		| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
+		B_ALL_WORKSPACES),
+	fSettings(settings),
+	fPadView(new PadView("pad view")),
+	fLastID(0),
+	fNamePanelFrame(-1000.0, -1000.0, -900.0, -900.0),
+	fAutoRaise(false),
+	fShowOnAllWorkspaces(true)
 {
 	if (!LoadSettings(settings))
 		_AddEmptyButtons();
@@ -77,13 +76,12 @@ MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
 }
 
 
-// destructor
 MainWindow::~MainWindow()
 {
 	delete fSettings;
 }
 
-// QuitRequested
+
 bool
 MainWindow::QuitRequested()
 {
@@ -105,7 +103,7 @@ MainWindow::QuitRequested()
 	return true;
 }
 
-// MessageReceived
+
 void
 MainWindow::MessageReceived(BMessage* message)
 {
@@ -257,7 +255,7 @@ MainWindow::MessageReceived(BMessage* message)
 	}
 }
 
-// Show
+
 void
 MainWindow::Show()
 {
@@ -265,14 +263,14 @@ MainWindow::Show()
 	_GetLocation();
 }
 
-// ScreenChanged
+
 void
 MainWindow::ScreenChanged(BRect frame, color_space format)
 {
 	_AdjustLocation(Frame());
 }
 
-// WorkspaceActivated
+
 void
 MainWindow::WorkspaceActivated(int32 workspace, bool active)
 {
@@ -284,7 +282,7 @@ MainWindow::WorkspaceActivated(int32 workspace, bool active)
 	}
 }
 
-// FrameMoved
+
 void
 MainWindow::FrameMoved(BPoint origin)
 {
@@ -292,7 +290,7 @@ MainWindow::FrameMoved(BPoint origin)
 		_GetLocation();
 }
 
-// FrameResized
+
 void
 MainWindow::FrameResized(float width, float height)
 {
@@ -301,7 +299,7 @@ MainWindow::FrameResized(float width, float height)
 	BWindow::FrameResized(width, height);
 }
 
-// ToggleAutoRaise
+
 void
 MainWindow::ToggleAutoRaise()
 {
@@ -312,7 +310,7 @@ MainWindow::ToggleAutoRaise()
 		fPadView->SetEventMask(0);
 }
 
-// LoadSettings
+
 bool
 MainWindow::LoadSettings(const BMessage* message)
 {
@@ -362,6 +360,11 @@ MainWindow::LoadSettings(const BMessage* message)
 	if (message->FindInt32("icon size", &iconSize) == B_OK)
 		fPadView->SetIconSize(iconSize);
 
+	// restore ignore double click
+	bool ignoreDoubleClick;
+	if (message->FindBool("ignore double click", &ignoreDoubleClick) == B_OK)
+		fPadView->SetIgnoreDoubleClick(ignoreDoubleClick);
+
 	// restore buttons
 	const char* path;
 	bool buttonAdded = false;
@@ -406,7 +409,7 @@ MainWindow::LoadSettings(const BMessage* message)
 	return buttonAdded;
 }
 
-// SaveSettings
+
 void
 MainWindow::SaveSettings(BMessage* message)
 {
@@ -439,6 +442,12 @@ MainWindow::SaveSettings(BMessage* message)
 	if (message->ReplaceInt32("icon size", fPadView->IconSize()) != B_OK)
 		message->AddInt32("icon size", fPadView->IconSize());
 
+	// store ignore double click
+	if (message->ReplaceBool("ignore double click",
+			fPadView->IgnoreDoubleClick()) != B_OK) {
+		message->AddBool("ignore double click", fPadView->IgnoreDoubleClick());
+	}
+
 	// store buttons
 	message->RemoveName("path");
 	message->RemoveName("description");
@@ -468,7 +477,7 @@ MainWindow::SaveSettings(BMessage* message)
 		message->AddInt32("workspaces", Workspaces());
 }
 
-// _GetLocation
+
 void
 MainWindow::_GetLocation()
 {
@@ -495,7 +504,7 @@ MainWindow::_GetLocation()
 	}
 }
 
-// _AdjustLocation
+
 void
 MainWindow::_AdjustLocation(BRect frame)
 {
@@ -532,7 +541,7 @@ MainWindow::_AdjustLocation(BRect frame)
 	ResizeTo(frame.Width(), frame.Height());
 }
 
-// _AddDefaultButtons
+
 void
 MainWindow::_AddDefaultButtons()
 {
@@ -573,7 +582,7 @@ MainWindow::_AddDefaultButtons()
 	button->SetTo("application/x-vnd.Haiku-Terminal", true);
 }
 
-// _AddEmptyButtons
+
 void
 MainWindow::_AddEmptyButtons()
 {

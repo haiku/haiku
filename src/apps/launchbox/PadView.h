@@ -40,6 +40,9 @@ public:
 			void				SetIconSize(uint32 size);
 			uint32				IconSize() const;
 
+			void				SetIgnoreDoubleClick(bool refuse);
+			bool				IgnoreDoubleClick() const;
+
 private:
 			BPoint				fDragOffset;
 			bool				fDragging;

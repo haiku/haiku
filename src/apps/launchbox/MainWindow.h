@@ -1,15 +1,12 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
 #include <Window.h>
+
 
 class PadView;
 
@@ -25,8 +22,9 @@ enum {
 	MSG_ADD_WINDOW				= 'addw',
 };
 
+
 class MainWindow : public BWindow {
- public:
+public:
 								MainWindow(const char* name, BRect frame,
 									bool addDefaultButtons = false); 
 								MainWindow(const char* name, BRect frame,
@@ -41,8 +39,7 @@ class MainWindow : public BWindow {
 	virtual	void				ScreenChanged(BRect frame, color_space format);
 	virtual void				WorkspaceActivated(int32 workspace, bool active);
 	virtual	void				FrameMoved(BPoint origin);
-	virtual	void				FrameResized(float width, 
-											 float height);
+	virtual	void				FrameResized(float width,  float height);
 
 	// MainWindow
 			void				ToggleAutoRaise();
@@ -59,23 +56,24 @@ class MainWindow : public BWindow {
 			BMessage*			Settings() const
 									{ return fSettings; }
 
- private:
+private:
  			void				_GetLocation();
 			void				_AdjustLocation(BRect frame);
 			void				_AddDefaultButtons();
 			void				_AddEmptyButtons();
 
-	BMessage*					fSettings;
-	PadView*					fPadView;
-	int32						fLastID;
+			BMessage*			fSettings;
+			PadView*			fPadView;
+			int32				fLastID;
 
-	float						fBorderDist;
-	BPoint						fScreenPosition;	// not really the position, 0...1 = left...right
+			float				fBorderDist;
+			BPoint				fScreenPosition;
+				// not really the position, 0...1 = left...right
 
-	BRect						fNamePanelFrame;
+			BRect				fNamePanelFrame;
 
-	bool						fAutoRaise;
-	bool						fShowOnAllWorkspaces;
+			bool				fAutoRaise;
+			bool				fShowOnAllWorkspaces;
 };
 
 #endif // MAIN_WINDOW_H
