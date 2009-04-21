@@ -1345,21 +1345,26 @@ BScrollBar::_UpdateThumbFrame()
 	// visual adjustments (room for darker line between thumb and buttons)
 	maxSize--;
 
-	float thumbSize = minSize;
-	float proportion = fProportion;
-	if (fMin >= fMax || proportion > 1.0 || proportion < 0.0)
-		proportion = 1.0;
-	if (proportion == 0.0) {
-		// Special case a proportion of 0.0, use the large step value
-		// in that case (NOTE: fMin == fMax already handled above)
-		// This calculation is based on the assumption that "large step"
-		// scrolls by one "page size".
-		proportion = fLargeStep / (2 * (fMax - fMin));
-		if (proportion > 1.0)
+	float thumbSize;
+	if (fPrivateData->fScrollBarInfo.proportional) {
+		float proportion = fProportion;
+		if (fMin >= fMax || proportion > 1.0 || proportion < 0.0)
 			proportion = 1.0;
-	}
-	if (fPrivateData->fScrollBarInfo.proportional)
-		thumbSize += (maxSize - minSize) * proportion;
+		if (proportion == 0.0) {
+			// Special case a proportion of 0.0, use the large step value
+			// in that case (NOTE: fMin == fMax already handled above)
+			// This calculation is based on the assumption that "large step"
+			// scrolls by one "page size".
+			proportion = fLargeStep / (2 * (fMax - fMin));
+			if (proportion > 1.0)
+				proportion = 1.0;
+		}
+		thumbSize = maxSize * proportion;
+		if (thumbSize < minSize)
+			thumbSize = minSize;
+	} else
+		thumbSize = minSize;
+
 	thumbSize = floorf(thumbSize + 0.5);
 	thumbSize--;
 
