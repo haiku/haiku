@@ -260,6 +260,66 @@ fssh_ioctl(int fd, unsigned long op, ...)
 				} else
 					error = errno;
 			}
+			#elif HAIKU_HOST_PLATFORM_DARWIN
+			{
+				// Darwin does not seems to provide a way to access disk
+				// geometry directly
+
+				struct stat status;
+
+				if (fstat(fd, &status) == 0) {
+					// Do nothing for a regular file
+					if (S_ISREG(status.st_mode))
+						break;
+
+					off_t mediaSize;
+
+					if (ioctl(fd, DKIOCGETBLOCKCOUNT, &mediaSize) != 0) {
+						error = errno;
+						break;
+					}
+
+					geometry->head_count = 4;
+					geometry->sectors_per_track = 63;
+					geometry->cylinder_count = mediaSize / geometry->head_count
+						/ geometry->sectors_per_track;
+
+					while (geometry->cylinder_count > 1024
+						&& geometry->head_count < 256) {
+						geometry->head_count *= 2;
+						geometry->cylinder_count /= 2;
+					}
+
+					if (geometry->head_count == 256) {
+						geometry->head_count = 255;
+						geometry->cylinder_count = mediaSize
+							/ geometry->head_count
+							/ geometry->sectors_per_track;
+					}
+
+					if (ioctl(fd, DKIOCGETBLOCKSIZE,
+							&geometry->bytes_per_sector) != 0) {
+						error = errno;
+						break;
+					}
+
+					uint32_t isWritable;
+					if (ioctl(fd, DKIOCISWRITABLE, &isWritable) != 0) {
+						error = errno;
+						break;
+					}
+
+					geometry->read_only = !isWritable;
+
+					// TODO: Get the real values...
+					geometry->device_type = FSSH_B_DISK;
+					geometry->removable = false;
+					geometry->write_once = false;
+
+					error = B_OK;
+				} else
+					error = errno;
+			}
 			#else
 				// Not implemented for this platform, i.e. we won't be able to
 				// deal with disk devices.
