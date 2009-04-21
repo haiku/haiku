@@ -512,7 +512,7 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int cpu)
 		// One CPU after the other will drop out of this loop and be caught by
 		// the loop below, until the last CPU (0) gets there. Save for +/- a few
 		// cycles the CPUs should pass the second loop at the same time.
-		while (sTSCSyncRendezvous > cpu) {
+		while (sTSCSyncRendezvous != cpu) {
 		}
 
 		sTSCSyncRendezvous = cpu - 1;
