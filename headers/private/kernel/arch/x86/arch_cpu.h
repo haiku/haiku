@@ -22,6 +22,7 @@
 
 
 // MSR registers (possibly Intel specific)
+#define IA32_MSR_TSC					0x10
 #define IA32_MSR_APIC_BASE				0x1b
 
 #define IA32_MSR_MTRR_CAPABILITIES		0xfe

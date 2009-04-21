@@ -78,6 +78,7 @@ bool gHasSSE = false;
 
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
+static vint32 sTSCSyncRendezvous;
 
 segment_descriptor *gGDT = NULL;
 
@@ -500,6 +501,28 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int cpu)
 {
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 	gX86SwapFPUFunc = i386_fnsave_swap;
+
+	// On SMP system we want to synchronize the CPUs' TSCs, so system_time()
+	// will return consistent values.
+	if (smp_get_num_cpus() > 1) {
+		// let the first CPU prepare the rendezvous point
+		if (cpu == 0)
+			sTSCSyncRendezvous = smp_get_num_cpus() - 1;
+
+		// One CPU after the other will drop out of this loop and be caught by
+		// the loop below, until the last CPU (0) gets there. Save for +/- a few
+		// cycles the CPUs should pass the second loop at the same time.
+		while (sTSCSyncRendezvous > cpu) {
+		}
+
+		sTSCSyncRendezvous = cpu - 1;
+
+		while (sTSCSyncRendezvous != -1) {
+		}
+
+		// reset TSC to 0
+		x86_write_msr(IA32_MSR_TSC, 0);
+	}
 
 	return B_OK;
 }
