@@ -24,7 +24,8 @@ BDebugEventInputStream::BDebugEventInputStream()
 	fBuffer(NULL),
 	fBufferCapacity(0),
 	fBufferSize(0),
-	fBufferPosition(0)
+	fBufferPosition(0),
+	fOwnsBuffer(false)
 {
 }
 
@@ -33,7 +34,8 @@ BDebugEventInputStream::~BDebugEventInputStream()
 {
 	Unset();
 
-	free(fBuffer);
+	if (fOwnsBuffer)
+		free(fBuffer);
 }
 
 
@@ -56,38 +58,37 @@ BDebugEventInputStream::SetTo(BDataIO* stream)
 			return B_NO_MEMORY;
 		}
 
+		fOwnsBuffer = true;
 		fBufferCapacity = INPUT_BUFFER_SIZE;
 		fBufferSize = 0;
 	}
 
-	fBufferPosition = 0;
+	return _Init();
+}
 
-	// read the header
-	debug_event_stream_header header;
-	ssize_t bytesRead = _Read(&header, sizeof(header));
-	if (bytesRead < 0) {
-		Unset();
-		return bytesRead;
-	}
-	if ((size_t)bytesRead != sizeof(header)) {
-		Unset();
-		return B_BAD_DATA;
-	}
 
-	// check the header
-	if (strncmp(header.signature, B_DEBUG_EVENT_STREAM_SIGNATURE,
-			sizeof(header.signature)) != 0
-		|| header.version != B_DEBUG_EVENT_STREAM_VERSION
-		|| (header.flags & B_DEBUG_EVENT_STREAM_FLAG_HOST_ENDIAN) == 0) {
-		// TODO: Support non-host endianess!
-		Unset();
-		return B_BAD_DATA;
+status_t
+BDebugEventInputStream::SetTo(const void* data, size_t size,
+	bool takeOverOwnership)
+{
+	Unset();
+
+	if (data == NULL || size == 0)
+		return B_BAD_VALUE;
+
+	if (fBuffer != NULL) {
+		if (fOwnsBuffer)
+			free(fBuffer);
+		fBuffer = NULL;
+		fBufferCapacity = 0;
+		fBufferSize = 0;
 	}
 
-	fFlags = header.flags;
-	fEventMask = header.event_mask;
+	fBuffer = (uint8*)data;
+	fBufferCapacity = fBufferSize = size;
+	fOwnsBuffer = takeOverOwnership;
 
-	return B_OK;
+	return _Init();
 }
 
 
@@ -97,6 +98,20 @@ BDebugEventInputStream::Unset()
 	fStream = NULL;
 	fFlags = 0;
 	fEventMask = 0;
+
+	// If we have a buffer that we own and has the right size, we keep it.
+	if (fOwnsBuffer) {
+		if (fBuffer != NULL && fBufferSize != INPUT_BUFFER_SIZE) {
+			free(fBuffer);
+			fBuffer = NULL;
+			fBufferCapacity = 0;
+			fBufferSize = 0;
+		}
+	} else {
+		fBuffer = NULL;
+		fBufferCapacity = 0;
+		fBufferSize = 0;
+	}
 }
 
 
@@ -155,6 +170,40 @@ BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
 }
 
 
+status_t
+BDebugEventInputStream::_Init()
+{
+	fBufferPosition = 0;
+
+	// get the header
+	status_t error = _GetData(sizeof(debug_event_stream_header));
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+	const debug_event_stream_header& header
+		= *(const debug_event_stream_header*)(fBuffer + fBufferPosition);
+
+	fBufferPosition += sizeof(debug_event_stream_header);
+	fBufferSize -= sizeof(debug_event_stream_header);
+
+	// check the header
+	if (strncmp(header.signature, B_DEBUG_EVENT_STREAM_SIGNATURE,
+			sizeof(header.signature)) != 0
+		|| header.version != B_DEBUG_EVENT_STREAM_VERSION
+		|| (header.flags & B_DEBUG_EVENT_STREAM_FLAG_HOST_ENDIAN) == 0) {
+		// TODO: Support non-host endianess!
+		Unset();
+		return B_BAD_DATA;
+	}
+
+	fFlags = header.flags;
+	fEventMask = header.event_mask;
+
+	return B_OK;
+}
+
+
 ssize_t
 BDebugEventInputStream::_Read(void* _buffer, size_t size)
 {
@@ -190,12 +239,14 @@ BDebugEventInputStream::_GetData(size_t size)
 	fBufferPosition = 0;
 
 	// read more data
-	ssize_t bytesRead = _Read(fBuffer + fBufferSize,
-		fBufferCapacity - fBufferSize);
-	if (bytesRead < 0)
-		return bytesRead;
-
-	fBufferSize += bytesRead;
+	if (fStream != NULL) {
+		ssize_t bytesRead = _Read(fBuffer + fBufferSize,
+			fBufferCapacity - fBufferSize);
+		if (bytesRead < 0)
+			return bytesRead;
+	
+		fBufferSize += bytesRead;
+	}
 
 	return fBufferSize >= size ? B_OK : B_BAD_DATA;
 }

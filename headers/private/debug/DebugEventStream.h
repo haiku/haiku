@@ -40,12 +40,15 @@ public:
 								~BDebugEventInputStream();
 
 			status_t			SetTo(BDataIO* stream);
+			status_t			SetTo(const void* data, size_t size,
+									bool takeOverOwnership);
 			void				Unset();
 
 			ssize_t				ReadNextEvent(uint32* _event, uint32* _cpu,
 									const void** _buffer);
 
 private:
+			status_t			_Init();
 			ssize_t				_Read(void* buffer, size_t size);
 			status_t			_GetData(size_t size);
 
@@ -57,6 +60,7 @@ private:
 			size_t				fBufferCapacity;
 			size_t				fBufferSize;
 			size_t				fBufferPosition;
+			bool				fOwnsBuffer;
 };
 
 
