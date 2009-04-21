@@ -23,12 +23,12 @@ static inline void bacpy(bdaddr_t* dst, bdaddr_t* src)
 
 static inline void baswap(bdaddr_t* dst, bdaddr_t* src)
 {
-  register uint8* d = (uint8*)dst;
-  register uint8* s = (uint8*)src;
-  register int i;
+	register uint8* d = (uint8*)dst;
+	register uint8* s = (uint8*)src;
+	register int i;
 
-  for(i=0; i<6; i++) d[i] = s[5-i];
-
+	for(i = 0; i < 6; i++)
+		d[i] = s[5 - i];
 }
 
 
