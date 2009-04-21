@@ -27,7 +27,7 @@ ConfigView::ConfigView()
 
 	BRect rect(5,4,250,25);
 	rect.bottom = rect.top - 2 + itemHeight;
-	BMailFileConfigView *fview = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Fortune File:","予言ファイル:"),"fortune_file",false,"/boot/system/etc/fortunes/default",B_FILE_NODE);
+	BMailFileConfigView *fview = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Fortune File:","予言ファイル:"),"fortune_file",false,"",B_FILE_NODE);
 	AddChild(fview);
 	
 	rect.top = rect.bottom + 8;
@@ -42,14 +42,10 @@ ConfigView::ConfigView()
 
 void ConfigView::SetTo(BMessage *archive)
 {
-	BString path = archive->FindString("fortune_file");
-	if (path == B_EMPTY_STRING)
-		path = "/boot/system/etc/fortunes/default";
-	
 	if (BMailFileConfigView *control = (BMailFileConfigView *)FindView("fortune_file"))
 		control->SetTo(archive,NULL);
 		
-	path = archive->FindString("tag_line");
+	BString path = archive->FindString("tag_line");
 	if (!archive->HasString("tag_line"))
 		path = "Fortune Cookie Says:\n\n";
 	
