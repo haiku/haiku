@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src tests system ;
 
+SubInclude HAIKU_TOP src tests system benchmarks ;
 SubInclude HAIKU_TOP src tests system boot ;
 SubInclude HAIKU_TOP src tests system consoled ;
 SubInclude HAIKU_TOP src tests system kernel ;
 SubInclude HAIKU_TOP src tests system libroot ;
-SubInclude HAIKU_TOP src tests system benchmarks ;
+SubInclude HAIKU_TOP src tests system random_file_actions ;
