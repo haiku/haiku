@@ -192,8 +192,16 @@ public:
 	T *FindIf(const UnaryPredicate<T> &);
 
 	// list must be sorted with CompareFunction for these to work
-	const T *BinarySearch(const T &, CompareFunction) const;
-	const T *BinarySearch(const T &, CompareFunctionWithState, void *state) const;
+	T *BinarySearch(const T &, CompareFunction) const;
+	T *BinarySearch(const T &, CompareFunctionWithState, void *state) const;
+
+	template<typename Key>
+	T *BinarySearchByKey(const Key &key, int (*compare)(const Key *, const T *))
+		const;
+
+	template<typename Key>
+	T *BinarySearchByKey(const Key &key,
+		int (*compare)(const Key *, const T *, void *), void *state) const;
 
 	// Binary insertion - list must be sorted with CompareFunction for
 	// these to work
@@ -624,20 +632,43 @@ BObjectList<T>::HSortItems(CompareFunctionWithState function, void *state)
 }
 
 template<class T>
-const T *
+T *
 BObjectList<T>::BinarySearch(const T &key, CompareFunction func) const
 {
-	return (const T *)_PointerList_::BinarySearch(&key,
+	return (T*)_PointerList_::BinarySearch(&key,
 		(GenericCompareFunction)func);
 }
 
 template<class T>
-const T *
+T *
 BObjectList<T>::BinarySearch(const T &key, CompareFunctionWithState func, void *state) const
 {
-	return (const T *)_PointerList_::BinarySearch(&key,
+	return (T*)_PointerList_::BinarySearch(&key,
 		(GenericCompareFunctionWithState)func, state);
 }
+
+
+template<class T>
+template<typename Key>
+T *
+BObjectList<T>::BinarySearchByKey(const Key &key,
+	int (*compare)(const Key *, const T *)) const
+{
+	return (T*)_PointerList_::BinarySearch(&key,
+		(GenericCompareFunction)compare);
+}
+
+
+template<class T>
+template<typename Key>
+T *
+BObjectList<T>::BinarySearchByKey(const Key &key,
+	int (*compare)(const Key *, const T *, void *), void *state) const
+{
+	return (T*)_PointerList_::BinarySearch(&key,
+		(GenericCompareFunctionWithState)compare, state);
+}
+
 
 template<class T>
 bool
