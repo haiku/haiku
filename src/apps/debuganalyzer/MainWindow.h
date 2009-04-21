@@ -12,6 +12,7 @@ class BTabView;
 class DataSource;
 class ModelLoader;
 class Model;
+class ThreadsPage;
 
 
 class MainWindow : public BWindow {
@@ -30,6 +31,7 @@ private:
 
 private:
 			BTabView*			fMainTabView;
+			ThreadsPage*		fThreadsPage;
 			Model*				fModel;
 			ModelLoader*		fModelLoader;
 };

@@ -36,3 +36,10 @@ ThreadsPage::ThreadsPage()
 ThreadsPage::~ThreadsPage()
 {
 }
+
+
+void
+ThreadsPage::SetModel(Model* model)
+{
+	fModel = model;
+}

@@ -32,6 +32,8 @@ private:
 	static	status_t			_LoaderEntry(void* data);
 			status_t			_Loader();
 			status_t			_Load();
+			status_t			_ReadDebugEvents(void** _eventData,
+									size_t* _size);
 			status_t			_ProcessEvent(uint32 event, uint32 cpu,
 									const void* buffer, size_t size);
 
@@ -44,6 +46,7 @@ private:
 			thread_id			fLoaderThread;
 			bool				fLoading;
 			bool				fAborted;
+			bigtime_t			fLastEventTime;
 };
 
 

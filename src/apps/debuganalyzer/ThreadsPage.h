@@ -9,6 +9,7 @@
 
 
 class BColumnListView;
+class Model;
 
 
 class ThreadsPage : public BGroupView {
@@ -16,8 +17,11 @@ public:
 								ThreadsPage();
 	virtual						~ThreadsPage();
 
+			void				SetModel(Model* model);
+
 private:
 			BColumnListView*	fThreadsListView;
+			Model*				fModel;
 };
 
 

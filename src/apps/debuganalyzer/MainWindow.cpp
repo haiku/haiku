@@ -25,6 +25,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 	BWindow(BRect(50, 50, 599, 499), "DebugAnalyzer", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fMainTabView(NULL),
+	fThreadsPage(new ThreadsPage),
 	fModel(NULL),
 	fModelLoader(NULL)
 {
@@ -117,4 +118,6 @@ MainWindow::_SetModel(Model* model)
 {
 	delete fModel;
 	fModel = model;
+
+	fThreadsPage->SetModel(fModel);
 }
