@@ -936,9 +936,9 @@ _init_interface_kit_()
 	// TODO: Could support different themes here in the future.
 	be_control_look = new BControlLook();
 
-	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
-
 	_init_global_fonts_();
+
+	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 
