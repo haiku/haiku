@@ -101,8 +101,7 @@ main(int argc, char** argv)
 		BDiskDeviceRoster roster;
 		BDiskDevice diskDevice;
 		BPartition* partition;
-		ret = roster.FindPartitionByVolume(volume, &diskDevice,
-			&partition);
+		ret = roster.FindPartitionByVolume(volume, &diskDevice, &partition);
 		if (ret != B_OK) {
 			fprintf(stderr, "%s: failed to get partition for device %ld: %s\n",
 				argv[0], volumeDevice, strerror(ret));
