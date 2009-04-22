@@ -61,6 +61,9 @@ public:
 
 	inline	team_id				ID() const;
 
+	inline	bigtime_t			CreationTime() const;
+	inline	bigtime_t			DeletionTime() const;
+
 			bool				AddThread(Thread* thread);
 
 	inline	void				SetDeletionTime(bigtime_t time);
@@ -90,6 +93,9 @@ public:
 	inline	thread_id			ID() const;
 	inline	const char*			Name() const;
 
+	inline	bigtime_t			CreationTime() const;
+	inline	bigtime_t			DeletionTime() const;
+
 	inline	void				SetDeletionTime(bigtime_t time);
 
 	static inline int			CompareByID(const Thread* a, const Thread* b);
@@ -114,6 +120,20 @@ team_id
 Model::Team::ID() const
 {
 	return fCreationEvent->team;
+}
+
+
+bigtime_t
+Model::Team::CreationTime() const
+{
+	return fCreationTime;
+}
+
+
+bigtime_t
+Model::Team::DeletionTime() const
+{
+	return fDeletionTime;
 }
 
 
@@ -149,6 +169,20 @@ const char*
 Model::Thread::Name() const
 {
 	return fCreationEvent->name;
+}
+
+
+bigtime_t
+Model::Thread::CreationTime() const
+{
+	return fCreationTime;
+}
+
+
+bigtime_t
+Model::Thread::DeletionTime() const
+{
+	return fDeletionTime;
 }
 
 
