@@ -26,7 +26,7 @@ define("VNCJAR", "VncViewer.jar");
 define("VNCCLASS", "VncViewer.class");
 
 // maximum count of qemu instances.
-define("MAX_QEMUS", 8);
+define("MAX_QEMUS", 2);
 
 // size of the java applet, must match the default resolution of the image.
 //define("APPLET_WIDTH", "800");
@@ -410,15 +410,10 @@ function output_options_form()
 	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\" ";
 	echo "value=\"1\" ";
 	if ($enable_sound) {
-		echo "checked=\"checked\" ";
-		echo "/><a onclick=\"o=window.document.getElementById('";
-		echo "sound_cb'); o.checked = !o.checked;\"";
+		echo "checked=\"checked\" /";
 	} else
 		echo "disabled=\"disabled\" /";
-	echo ">Sound";
-	if ($enable_sound)
-		echo "</a>";
-	//echo "</input>";
+	echo "><label for=\"sound_cb\">Sound</label>";
 	echo "</td>\n</tr>\n";
 
 	$enable_serial = 1;
@@ -433,14 +428,8 @@ function output_options_form()
 	echo "value=\"1\" "/*"disabled "*/;
 	if ($enable_serial) {
 		//echo "checked ";
-		echo "/><a onclick=\"o=window.document.getElementById('";
-		echo "serial_cb'); o.checked = !o.checked;\"";
-	} else
-		echo "/";
-	echo ">Serial";
-	if ($enable_serial)
-		echo "</a>";
-	//echo "</input>";
+	}
+	echo "/><label for=\"serial_cb\">Serial</label>";
 	echo "</td>\n</tr>\n";
 
 	if (defined("QEMU_USB_PASSTHROUGH")) {
@@ -457,14 +446,8 @@ function output_options_form()
 		echo "value=\"1\" "/*"disabled "*/;
 		if ($enable_webcam) {
 			//echo "checked ";
-			echo "/><a onclick=\"o=window.document.getElementById('";
-			echo "webcam_cb'); o.checked = !o.checked;\"";
-		} else
-			echo "/";
-		echo ">Webcam";
-		if ($enable_webcam)
-			echo "</a>";
-		//echo "</input>";
+		}
+		echo "/><label for=\"webcam_cb\">Webcam</label>";
 		echo "</td>\n</tr>\n";
 	}	
 	/*
