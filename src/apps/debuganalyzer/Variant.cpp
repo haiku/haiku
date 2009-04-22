@@ -270,6 +270,7 @@ void
 Variant::_SetTo(const char* value, uint32 flags)
 {
 	fType = B_STRING_TYPE;
+	fFlags = 0;
 
 	if (value != NULL) {
 		if ((flags & VARIANT_DONT_COPY_DATA) == 0) {
