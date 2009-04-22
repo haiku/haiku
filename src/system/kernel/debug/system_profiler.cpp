@@ -78,7 +78,8 @@ private:
 									void* cookie);
 
 			void*				_AllocateBuffer(size_t size, int event, int cpu,
-									int count, bool threadsLocked = false);
+									int count, bool threadsLocked = false,
+									bool* _unlockProfiler = NULL);
 
 	static	void				_InitTimers(void* cookie, int cpu);
 	static	void				_UninitTimers(void* cookie, int cpu);
@@ -120,6 +121,7 @@ private:
 			ConditionVariable	fProfilerWaitCondition;
 			bool				fProfilerWaiting;
 			bool				fProfilingActive;
+			bool				fReentered[B_MAX_CPU_COUNT];
 			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
 };
 
@@ -155,6 +157,8 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 {
 	B_INITIALIZE_SPINLOCK(&fLock);
 	fProfilerWaitCondition.Init(this, "system profiler");
+
+	memset(fReentered, 0, sizeof(fReentered));
 }
 
 
@@ -457,14 +461,19 @@ struct system_profiler_wait_object_info {
 void
 SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 {
-	InterruptsSpinLocker locker(fLock);
+	int cpu = smp_get_current_cpu();
+
+	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+		// When re-entering, we already hold the lock.
+
+	bool unlockProfiler = false;
 
 	system_profiler_thread_enqueued_in_run_queue* event
 		= (system_profiler_thread_enqueued_in_run_queue*)
 			_AllocateBuffer(
 				sizeof(system_profiler_thread_enqueued_in_run_queue),
 				B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
-				smp_get_current_cpu(), 0, true);
+				cpu, 0, true, &unlockProfiler);
 	if (event == NULL)
 		return;
 
@@ -473,20 +482,40 @@ SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 	event->priority = thread->priority;
 
 	fHeader->size = fBufferSize;
+
+	// Unblock the profiler thread, if necessary, but don't unblock the thread,
+	// if it had been waiting on a condition variable, since then we'd likely
+	// deadlock in ConditionVariable::NotifyOne(), as it acquires a static
+	// spinlock.
+	if (unlockProfiler
+		&& thread->wait.type != THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
+		// NotifyOne() will probably re-enqueue the profiler thread to the
+		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
+		// Hence we need the re-entering detection.
+		fProfilerWaiting = false;
+		fReentered[cpu] = true;
+		fProfilerWaitCondition.NotifyOne(true);
+		fReentered[cpu] = false;
+	}
 }
 
 
 void
 SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 {
-	InterruptsSpinLocker locker(fLock);
+	int cpu = smp_get_current_cpu();
+
+	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+		// When re-entering, we already hold the lock.
+
+	bool unlockProfiler = false;
 
 	system_profiler_thread_removed_from_run_queue* event
 		= (system_profiler_thread_removed_from_run_queue*)
 			_AllocateBuffer(
 				sizeof(system_profiler_thread_removed_from_run_queue),
 				B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
-				smp_get_current_cpu(), 0, true);
+				smp_get_current_cpu(), 0, true, &unlockProfiler);
 	if (event == NULL)
 		return;
 
@@ -494,6 +523,17 @@ SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 	event->thread = thread->id;
 
 	fHeader->size = fBufferSize;
+
+	// unblock the profiler thread, if necessary
+	if (unlockProfiler) {
+		// NotifyOne() will probably re-enqueue the profiler thread to the
+		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
+		// Hence we need the re-entering detection.
+		fProfilerWaiting = false;
+		fReentered[cpu] = true;
+		fProfilerWaitCondition.NotifyOne(true);
+		fReentered[cpu] = false;
+	}
 }
 
 
@@ -501,15 +541,20 @@ void
 SystemProfiler::ThreadScheduled(struct thread* oldThread,
 	struct thread* newThread)
 {
-	InterruptsSpinLocker locker(fLock);
+	int cpu = smp_get_current_cpu();
+
+	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+		// When re-entering, we already hold the lock.
 
 	// TODO: Deal with the wait object!
+
+	bool unlockProfiler = false;
 
 	system_profiler_thread_scheduled* event
 		= (system_profiler_thread_scheduled*)
 			_AllocateBuffer(sizeof(system_profiler_thread_scheduled),
 				B_SYSTEM_PROFILER_THREAD_SCHEDULED, smp_get_current_cpu(), 0,
-				true);
+				true, &unlockProfiler);
 	if (event == NULL)
 		return;
 
@@ -521,6 +566,17 @@ SystemProfiler::ThreadScheduled(struct thread* oldThread,
 	event->previous_thread_wait_object = (addr_t)oldThread->wait.object;
 
 	fHeader->size = fBufferSize;
+
+	// unblock the profiler thread, if necessary
+	if (unlockProfiler) {
+		// NotifyOne() will probably re-enqueue the profiler thread to the
+		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
+		// Hence we need the re-entering detection.
+		fProfilerWaiting = false;
+		fReentered[cpu] = true;
+		fProfilerWaitCondition.NotifyOne(true);
+		fReentered[cpu] = false;
+	}
 }
 
 
@@ -699,7 +755,7 @@ SystemProfiler::_InitialImageIterator(struct image* image, void* cookie)
 
 void*
 SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
-	bool threadsLocked)
+	bool threadsLocked, bool* _unlockProfiler)
 {
 	size = (size + 3) / 4 * 4;
 	size += sizeof(system_profiler_event_header);
@@ -731,8 +787,16 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
 
 	// If the buffer is full enough notify the profiler.
 	if (fProfilerWaiting && fBufferSize > fBufferCapacity / 2) {
-		fProfilerWaiting = false;
-		fProfilerWaitCondition.NotifyOne(threadsLocked);
+		if (threadsLocked) {
+			// We're obviously recording scheduler events. NotifyOne() will
+			// likely requeue the profiler thread in the run queue, thus causing
+			// recursion. We can't really handle the problem here, so just
+			// notify our caller.
+			*_unlockProfiler = true;
+		} else {
+			fProfilerWaiting = false;
+			fProfilerWaitCondition.NotifyOne();
+		}
 	}
 
 	return header + 1;
