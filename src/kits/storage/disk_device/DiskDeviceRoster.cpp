@@ -327,8 +327,8 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor* visitor,
 /*!	\brief Finds a BPartition by BVolume.
 */
 status_t
-BDiskDeviceRoster::FindPartitionByVolume(BVolume* volume, BDiskDevice* device,
-	BPartition** _partition)
+BDiskDeviceRoster::FindPartitionByVolume(const BVolume& volume,
+	BDiskDevice* device, BPartition** _partition)
 {
 	class FindPartitionVisitor : public BDiskDeviceVisitor {
 	public:
@@ -352,7 +352,7 @@ BDiskDeviceRoster::FindPartitionByVolume(BVolume* volume, BDiskDevice* device,
 
 	private:
 		dev_t	fVolume;
-	} visitor(volume->Device());
+	} visitor(volume.Device());
 
 	if (VisitEachMountedPartition(&visitor, device, _partition))
 		return B_OK;
@@ -369,7 +369,7 @@ BDiskDeviceRoster::FindPartitionByMountPoint(const char* mountPoint,
 {
 	BVolume volume(dev_for_path(mountPoint));
 	if (volume.InitCheck() == B_OK
-		&& FindPartitionByVolume(&volume, device, _partition))
+		&& FindPartitionByVolume(volume, device, _partition))
 		return B_OK;
 
 	return B_ENTRY_NOT_FOUND;

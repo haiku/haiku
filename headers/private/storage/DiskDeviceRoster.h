@@ -116,7 +116,7 @@ public:
 								BDiskDevice* device = NULL,
 								BPartition** _partition = NULL);
 
-			status_t		FindPartitionByVolume(BVolume* volume,
+			status_t		FindPartitionByVolume(const BVolume& volume,
 								BDiskDevice* device,
 								BPartition** _partition);
 			status_t		FindPartitionByMountPoint(const char* mountPoint,
