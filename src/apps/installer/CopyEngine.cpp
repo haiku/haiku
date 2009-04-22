@@ -332,45 +332,44 @@ SourceVisitor::SourceVisitor(BMenu *menu)
 bool
 SourceVisitor::Visit(BDiskDevice *device)
 {
-	if (!device->ContentType()
-		|| strcmp(device->ContentType(), kPartitionTypeBFS) != 0)
-		return false;
-	BPath path;
-	if (device->GetPath(&path) == B_OK)
-		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, "
-			"contentType:%s\n", path.Path(), device->Type(),
-			device->ContentType());
-	PartitionMenuItem *item = new PartitionMenuItem(NULL, device->ContentName(), NULL, new BMessage(SRC_PARTITION), device->ID());
-	if (device->IsMounted()) {
-		BPath mountPoint;
-		device->GetMountPoint(&mountPoint);
-		if (strcmp(BOOT_PATH, mountPoint.Path()) == 0)
-			item->SetMarked(true);
-	}
-	fMenu->AddItem(item);
-	return false;
+	return Visit(device, 0);
 }
 
 
 bool
 SourceVisitor::Visit(BPartition *partition, int32 level)
 {
-	if (!partition->ContentType()
-		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0)
-		return false;
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
-	PartitionMenuItem *item = new PartitionMenuItem(NULL,
-		partition->ContentName(), NULL, new BMessage(SRC_PARTITION),
-		partition->ID());
+	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
+
+	if (!partition->ContentType())
+		return false;
+
+	bool isBootPartition = false;
 	if (partition->IsMounted()) {
 		BPath mountPoint;
 		partition->GetMountPoint(&mountPoint);
-		if (strcmp(BOOT_PATH, mountPoint.Path()) == 0)
-			item->SetMarked(true);
+		isBootPartition = strcmp(BOOT_PATH, mountPoint.Path()) == 0;
 	}
+
+	if (!isBootPartition
+		&& strcmp(partition->ContentType(), kPartitionTypeBFS) != 0) {
+		// Except only BFS partitions, except this is the boot partition
+		// (ISO9660 with write overlay for example).
+		return false;
+	}
+
+	// TODO: We could probably check if this volume contains
+	// the Haiku kernel or something. Does it make sense to "install"
+	// from your BFS volume containing the music collection?
+	// TODO: Then the check for BFS could also be removed above.
+
+	PartitionMenuItem *item = new PartitionMenuItem(NULL,
+		partition->ContentName(), NULL, new BMessage(SRC_PARTITION),
+		partition->ID());
+	item->SetMarked(isBootPartition);
 	fMenu->AddItem(item);
 	return false;
 }
@@ -388,28 +387,41 @@ TargetVisitor::TargetVisitor(BMenu *menu)
 bool
 TargetVisitor::Visit(BDiskDevice *device)
 {
-	if (device->IsReadOnly() || device->IsReadOnlyMedia())
+	if (device->IsReadOnlyMedia())
 		return false;
-	BPath path;
-	if (device->GetPath(&path) == B_OK)
-		printf("TargetVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
-	char label[255], menuLabel[255];
-	_MakeLabel(device, label, menuLabel);
-	fMenu->AddItem(new PartitionMenuItem(device->ContentName(), label,
-		menuLabel, new BMessage(TARGET_PARTITION), device->ID()));
-	return false;
+	return Visit(device, 0);
 }
 
 
 bool
 TargetVisitor::Visit(BPartition *partition, int32 level)
 {
+	// TODO: This check does not work on non-mounted partitions!
 	if (partition->IsReadOnly())
 		return false;
+
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->Name());
+	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
+
+	if (partition->ContentSize() < 20 * 1024 * 1024) {
+		// reject partitions which are too small anyways
+		// TODO: Could depend on the source size
+		printf("  too small\n");
+		return false;
+	}
+
+	if (partition->CountChildren() > 0) {
+		// Looks like an extended partition, or the device itself.
+		// Do not accept this as target...
+		printf("  no leaf partition\n");
+		return false;
+	}
+
+	// TODO: After running DriveSetup and doing another scan, it would
+	// be great to pick the partition which just appeared!
+
 	char label[255], menuLabel[255];
 	_MakeLabel(partition, label, menuLabel);
 	fMenu->AddItem(new PartitionMenuItem(partition->ContentName(), label,
@@ -427,8 +439,8 @@ TargetVisitor::_MakeLabel(BPartition *partition, char *label, char *menuLabel)
 	if (partition->Parent())
 		partition->Parent()->GetPath(&path);
 
-	sprintf(label, "%s - %s [%s] [%s partition:%li]", partition->ContentName(),
-		size, partition->ContentType(), path.Path(), partition->ID());
+	sprintf(label, "%s - %s [%s] [%s]", partition->ContentName(),
+		size, partition->ContentType(), path.Path());
 	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size,
 		partition->ContentType());
 
