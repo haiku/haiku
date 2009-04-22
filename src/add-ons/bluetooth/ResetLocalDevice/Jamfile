@@ -4,5 +4,5 @@ UsePrivateHeaders bluetooth ;
 
 Addon ResetLocalDevice :
 	ResetLocalDevice.cpp
-	: be
+	: be libbluetooth.so
 ;

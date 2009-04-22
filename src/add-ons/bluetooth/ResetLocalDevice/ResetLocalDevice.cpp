@@ -10,7 +10,6 @@
 #include <CommandManager.h>
 
 
-
 ResetLocalDeviceAddOn::ResetLocalDeviceAddOn()
 {
 
@@ -43,27 +42,27 @@ ResetLocalDeviceAddOn::GetActionDescription()
 status_t
 ResetLocalDeviceAddOn::TakeAction(LocalDevice* lDevice)
 {
-	int8	 bt_status = BT_ERROR;
-	
+	int8	btStatus = BT_ERROR;
+
 	BMessenger* fMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
 
-    if (fMessenger == NULL || !fMessenger->IsValid())
-    	return B_ERROR;
+	if (fMessenger == NULL || !fMessenger->IsValid())
+		return B_ERROR;
 	
 	BluetoothCommand<> Reset(OGF_CONTROL_BASEBAND, OCF_RESET);
 	
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
-	request.AddInt32("hci_id", lDevice->GetID());
+	request.AddInt32("hci_id", lDevice->ID());
 	request.AddData("raw command", B_ANY_TYPE, Reset.Data(), Reset.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET));
-	
-	if (fMessenger->SendMessage(&request, &reply) == B_OK)
-		reply.FindInt8("status", &bt_status);
 
-	return bt_status;
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &btStatus);
+
+	return btStatus;
 }
 
 
