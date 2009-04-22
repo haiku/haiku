@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -48,6 +49,8 @@ struct entry {
 typedef std::vector<entry> EntryVector;
 
 
+const char* kDefaultBaseDir = "./random_file_temp";
+
 const uint32 kDefaultDirCount = 1;
 const uint32 kDefaultFileCount = 10;
 const uint32 kDefaultRunCount = 100;
@@ -71,6 +74,7 @@ static off_t sWriteTotal = 0;
 static off_t sReadTotal = 0;
 static bigtime_t sWriteTime = 0;
 static bigtime_t sReadTime = 0;
+static uint32 sRun = 0;
 
 
 static off_t
@@ -151,6 +155,9 @@ usage(int status)
 		"\t\t\t\tDefaults to %lu.\n"
 		"  -m, --max-file-size=<size>\tThe maximal file size of the files.\n"
 		"\t\t\t\tDefaults to %lld.\n"
+		"  -b, --base-dir=<path>\t\tThe base directory for the actions. "
+			"Defaults\n"
+		"\t\t\t\tto %s.\n"
 		"  -c, --check-interval=<count>\tCheck after every <count> runs. "
 			"Defaults to 0,\n"
 		"\t\t\t\tmeaning only check once at the end.\n"
@@ -159,7 +166,7 @@ usage(int status)
 		"  -k, --keep-dirty\t\tDo not remove the working files on quit.\n"
 		"  -v, --verbose\t\t\tShow the actions as being performed\n",
 		kProgramName, kDefaultRunCount, kDefaultFileCount, kDefaultDirCount,
-		kDefaultMaxFileSize);
+		kDefaultMaxFileSize, kDefaultBaseDir);
 
 	exit(status);
 }
@@ -206,6 +213,24 @@ verbose(const char* format, ...)
 	va_list args;
 	va_start(args, format);
 
+	vprintf(format, args);
+	putchar('\n');
+
+	va_end(args);
+	fflush(stdout);
+}
+
+
+static void
+action(const char* format, ...)
+{
+	if (!sVerbose)
+		return;
+
+	va_list args;
+	va_start(args, format);
+
+	printf("%7lu  ", sRun + 1);
 	vprintf(format, args);
 	putchar('\n');
 
@@ -288,7 +313,7 @@ write_blocks(int fd, struct entry& entry, bool append = false)
 		offset = stat.st_size;
 	}
 
-	verbose("  write %lu bytes", size);
+	verbose("\t\twrite %lu bytes", size);
 
 	entry.size += size;
 	uint32 blockOffset = offset % kBlockSize;
@@ -420,6 +445,29 @@ check_files(EntryVector& files)
 }
 
 
+static void
+remove_dirs(const std::string& path)
+{
+	DIR* dir = opendir(path.c_str());
+	if (dir == NULL) {
+		warning("Could not open directory \"%s\": %s", path.c_str(),
+			strerror(errno));
+		return;
+	}
+
+	while (struct dirent* entry = readdir(dir)) {
+		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+			continue;
+
+		std::string subPath = path + "/" + entry->d_name;
+		remove_dirs(subPath);
+	}
+
+	closedir(dir);
+	rmdir(path.c_str());
+}
+
+
 //	#pragma mark - Actions
 
 
@@ -429,7 +477,7 @@ create_dir(EntryVector& dirs)
 	std::string parent = choose_parent(dirs);
 	std::string name = create_name(parent, "dir");
 
-	verbose("create dir %s", name.c_str());
+	action("create dir %s", name.c_str());
 
 	if (mkdir(name.c_str(), 0777) != 0)
 		error("creating dir \"%s\" failed: %s", name.c_str(), strerror(errno));
@@ -450,6 +498,9 @@ remove_dir(EntryVector& dirs)
 		return;
 
 	int index = choose_index(dirs);
+	if (index == 0)
+		return;
+
 	const std::string& name = dirs[index].name;
 
 	if (rmdir(name.c_str()) != 0) {
@@ -461,7 +512,7 @@ remove_dir(EntryVector& dirs)
 		error("removing dir \"%s\" failed: %s", name.c_str(), strerror(errno));
 	}
 
-	verbose("removed dir %s", name.c_str());
+	action("removed dir %s", name.c_str());
 
 	EntryVector::iterator iterator = dirs.begin();
 	dirs.erase(iterator + index);
@@ -474,7 +525,7 @@ create_file(const EntryVector& dirs, EntryVector& files)
 	std::string parent = choose_parent(dirs);
 	std::string name = create_name(parent, "file");
 
-	verbose("create file %s", name.c_str());
+	action("create file %s", name.c_str());
 
 	int fd = open_file(name, O_RDWR | O_CREAT | O_TRUNC);
 	if (fd < 0)
@@ -504,7 +555,7 @@ remove_file(EntryVector& files)
 	if (remove(name.c_str()) != 0)
 		error("removing file \"%s\" failed: %s", name.c_str(), strerror(errno));
 
-	verbose("removed file %s", name.c_str());
+	action("removed file %s", name.c_str());
 
 	EntryVector::iterator iterator = files.begin();
 	files.erase(iterator + index);
@@ -523,7 +574,7 @@ rename_file(const EntryVector& dirs, EntryVector& files)
 	int index = choose_index(files);
 	const std::string& oldName = files[index].name;
 
-	verbose("rename file \"%s\" to \"%s\"", oldName.c_str(), newName.c_str());
+	action("rename file \"%s\" to \"%s\"", oldName.c_str(), newName.c_str());
 
 	if (rename(oldName.c_str(), newName.c_str()) != 0) {
 		error("renaming file \"%s\" to \"%s\" failed: %s", oldName.c_str(),
@@ -542,7 +593,7 @@ append_file(EntryVector& files)
 
 	struct entry& file = files[choose_index(files)];
 
-	verbose("append to \"%s\"", file.name.c_str());
+	action("append to \"%s\"", file.name.c_str());
 
 	int fd = open_file(file.name, O_WRONLY | O_APPEND);
 	if (fd < 0) {
@@ -563,7 +614,7 @@ replace_file(EntryVector& files)
 
 	struct entry& file = files[choose_index(files)];
 
-	verbose("replace \"%s\"", file.name.c_str());
+	action("replace \"%s\" contents", file.name.c_str());
 
 	int fd = open_file(file.name, O_CREAT | O_WRONLY | O_TRUNC);
 	if (fd < 0) {
@@ -586,7 +637,7 @@ truncate_file(EntryVector& files)
 
 	struct entry& file = files[choose_index(files)];
 
-	verbose("truncate \"%s\"", file.name.c_str());
+	action("truncate \"%s\"", file.name.c_str());
 
 	int fd = open_file(file.name, O_WRONLY | O_TRUNC);
 	if (fd < 0) {
@@ -615,6 +666,7 @@ main(int argc, char** argv)
 		{"dir-count", required_argument, 0, 'd'},
 		{"check-interval", required_argument, 0, 'c'},
 		{"max-file-size", required_argument, 0, 'm'},
+		{"base-dir", required_argument, 0, 'b'},
 		{"no-cache", no_argument, 0, 'n'},
 		{"keep-dirty", no_argument, 0, 'k'},
 		{"verbose", no_argument, 0, 'v'},
@@ -628,8 +680,13 @@ main(int argc, char** argv)
 	uint32 checkInterval = 0;
 	bool keepDirty = false;
 
+	struct entry base;
+	base.name = kDefaultBaseDir;
+	base.identifier = 0;
+	base.size = 0;
+
 	int c;
-	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:nkvh", kOptions,
+	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:b:nkvh", kOptions,
 			NULL)) != -1) {
 		switch (c) {
 			case 0:
@@ -666,11 +723,12 @@ main(int argc, char** argv)
 					checkInterval = 0;
 				break;
 			case 'm':
-			{
 				// max file size
 				sMaxFileSize = string_to_size(optarg);
 				break;
-			}
+			case 'b':
+				base.name = optarg;
+				break;
 			case 'n':
 				sDisableFileCache = true;
 				break;
@@ -692,10 +750,6 @@ main(int argc, char** argv)
 	EntryVector dirs;
 	EntryVector files;
 
-	struct entry base;
-	base.name = "./random_file_temp";
-	base.identifier = 0;
-
 	if (mkdir(base.name.c_str(), 0777) != 0 && errno != EEXIST) {
 		fprintf(stderr, "%s: cannot create base directory: %s\n",
 			kProgramName, strerror(errno));
@@ -704,11 +758,8 @@ main(int argc, char** argv)
 
 	dirs.push_back(base);
 
-	for (uint32 run = 0; run < runs; run++) {
+	for (sRun = 0; sRun < runs; sRun++) {
 		file_action action = choose_action();
-
-		if ((run % 100) == 0)
-			verbose("run %lu", run + 1);
 
 		switch (action) {
 			case kCreateFile:
@@ -760,8 +811,8 @@ main(int argc, char** argv)
 				break;
 		}
 
-		if (checkInterval != 0 && run > 0 && (run % checkInterval) == 0
-			&& run + 1 < runs)
+		if (checkInterval != 0 && sRun > 0 && (sRun % checkInterval) == 0
+			&& sRun + 1 < runs)
 			check_files(files);
 	}
 
@@ -771,9 +822,7 @@ main(int argc, char** argv)
 		for (int i = files.size(); i-- > 0;) {
 			remove_file(files);
 		}
-		for (int i = dirs.size(); i-- > 0;) {
-			remove_dir(dirs);
-		}
+		remove_dirs(base.name);
 	}
 
 	printf("%s written in %s, %s/s\n", size_to_string(sWriteTotal).c_str(),
