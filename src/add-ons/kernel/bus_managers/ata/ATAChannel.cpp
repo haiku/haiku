@@ -123,7 +123,7 @@ ATAChannel::ScanBus()
 	}
 
 	bool devicePresent[fDeviceCount];
-	uint32 deviceSignature[fDeviceCount];
+	uint16 deviceSignature[fDeviceCount];
 	status_t result = Reset(devicePresent, deviceSignature);
 	if (result != B_OK) {
 		TRACE_ERROR("resetting the channel failed\n");
@@ -289,7 +289,7 @@ ATAChannel::SelectedDevice()
 
 
 status_t
-ATAChannel::Reset(bool *presence, uint32 *signatures)
+ATAChannel::Reset(bool *presence, uint16 *signatures)
 {
 	TRACE_FUNCTION("\n");
 
@@ -335,8 +335,8 @@ ATAChannel::Reset(bool *presence, uint32 *signatures)
 		}
 
 		ata_task_file taskFile;
-		if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT | ATA_MASK_LBA_LOW
-			| ATA_MASK_LBA_MID | ATA_MASK_LBA_HIGH | ATA_MASK_ERROR) != B_OK) {
+		if (_ReadRegs(&taskFile, ATA_MASK_LBA_MID | ATA_MASK_LBA_HIGH
+			| ATA_MASK_ERROR) != B_OK) {
 			TRACE_ERROR("reading status failed\n");
 			return B_ERROR;
 		}
@@ -357,12 +357,12 @@ ATAChannel::Reset(bool *presence, uint32 *signatures)
 		if (presence != NULL)
 			presence[i] = true;
 
-		if (signatures != NULL) {
-			signatures[i] = taskFile.lba.sector_count
-				| (((uint32)taskFile.lba.lba_0_7) << 8)
-				| (((uint32)taskFile.lba.lba_8_15) << 16)
-				| (((uint32)taskFile.lba.lba_16_23) << 24);
-		}
+		uint16 signature = taskFile.lba.lba_8_15
+			| (((uint16)taskFile.lba.lba_16_23) << 8);
+		TRACE_ALWAYS("signature of device %d: 0x%04x\n", i, signature);
+
+		if (signatures != NULL)
+			signatures[i] = signature;
 	}
 
 	return B_OK;

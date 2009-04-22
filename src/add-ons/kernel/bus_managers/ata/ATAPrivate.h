@@ -29,9 +29,9 @@
 #define ATA_MAX_DMA_FAILURES		3
 #define ATA_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define ATA_RELEASE_TIMEOUT			10 * 1000 * 1000
-#define ATA_SIGNATURE_ATA			0x00000101
-#define ATA_SIGNATURE_ATAPI			0xeb140101
-#define ATA_SIGNATURE_SATA			0xc33c0101
+#define ATA_SIGNATURE_ATA			0x0000
+#define ATA_SIGNATURE_ATAPI			0xeb14
+#define ATA_SIGNATURE_SATA			0xc33c
 #define ATA_SIM_MODULE_NAME			"bus_managers/ata/sim/driver_v1"
 #define ATA_CHANNEL_ID_GENERATOR	"ide/channel_id"
 #define ATA_CHANNEL_ID_ITEM			"ide/channel_id"
@@ -79,7 +79,7 @@ public:
 		status_t					SelectDevice(uint8 index);
 		uint8						SelectedDevice();
 
-		status_t					Reset(bool *presence, uint32 *signatures);
+		status_t					Reset(bool *presence, uint16 *signatures);
 
 		bool						UseDMA() { return fUseDMA; };
 
