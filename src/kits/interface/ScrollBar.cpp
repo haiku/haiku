@@ -243,6 +243,8 @@ BScrollBar::BScrollBar(BMessage* data)
 	fTarget(NULL),
 	fTargetName(NULL)
 {
+	fPrivateData = new BScrollBar::Private(this);
+
 	// TODO: Does the BeOS implementation try to find the target
 	// by name again? Does it archive the name at all?
 	if (data->FindFloat("_range", 0, &fMin) < B_OK)
@@ -252,17 +254,26 @@ BScrollBar::BScrollBar(BMessage* data)
 	if (data->FindFloat("_steps", 0, &fSmallStep) < B_OK)
 		fSmallStep = 1.0;
 	if (data->FindFloat("_steps", 1, &fLargeStep) < B_OK)
-		fSmallStep = 10.0;
+		fLargeStep = 10.0;
 	if (data->FindFloat("_val", &fValue) < B_OK)
 		fValue = 0.0;
 	int32 orientation;
-	if (data->FindInt32("_orient", &orientation) < B_OK)
+	if (data->FindInt32("_orient", &orientation) < B_OK) {
 		fOrientation = B_VERTICAL;
-	else
+		if ((Flags() & B_SUPPORTS_LAYOUT) == 0) {
+			// just to make sure
+			SetResizingMode(fOrientation == B_VERTICAL
+				? B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT
+				: B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+		}
+	} else
 		fOrientation = (enum orientation)orientation;
 
 	if (data->FindFloat("_prop", &fProportion) < B_OK)
 		fProportion = 0.0;
+
+	_UpdateThumbFrame();
+	_UpdateArrowButtons();
 }
 
 
