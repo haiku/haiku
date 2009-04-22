@@ -11,7 +11,9 @@
 #include <stdio.h>
 
 #include <Autolock.h>
-#include <GradientLinear.h>
+#ifdef __HAIKU__
+#	include <GradientLinear.h>
+#endif
 #include <Message.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
