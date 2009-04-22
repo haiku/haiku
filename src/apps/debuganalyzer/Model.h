@@ -88,6 +88,7 @@ public:
 								~Thread();
 
 	inline	thread_id			ID() const;
+	inline	const char*			Name() const;
 
 	inline	void				SetDeletionTime(bigtime_t time);
 
@@ -141,6 +142,13 @@ thread_id
 Model::Thread::ID() const
 {
 	return fCreationEvent->thread;
+}
+
+
+const char*
+Model::Thread::Name() const
+{
+	return fCreationEvent->name;
 }
 
 
