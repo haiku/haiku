@@ -101,12 +101,6 @@ simple_enqueue_in_run_queue(struct thread *thread)
 
 	T(EnqueueThread(thread, prev, curr));
 
-	// notify listeners
-	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
-			SchedulerListener* listener = it.Next();) {
-		listener->ThreadEnqueuedInRunQueue(thread);
-	}
-
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
@@ -150,6 +144,12 @@ simple_enqueue_in_run_queue(struct thread *thread)
 				}
 			}
 		}
+	}
+
+	// notify listeners
+	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
+			SchedulerListener* listener = it.Next();) {
+		listener->ThreadEnqueuedInRunQueue(thread);
 	}
 }
 
