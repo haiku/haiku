@@ -77,20 +77,20 @@ TableColumn::GetColumnName(BString* into) const
 
 
 void
-TableColumn::DrawValue(void* value, BRect rect, BView* targetView)
+TableColumn::DrawValue(const Variant& value, BRect rect, BView* targetView)
 {
 }
 
 
 int
-TableColumn::CompareValues(void* a, void* b)
+TableColumn::CompareValues(const Variant& a, const Variant& b)
 {
 	return 0;
 }
 
 
 float
-TableColumn::GetPreferredValueWidth(void* value, BView* parent) const
+TableColumn::GetPreferredValueWidth(const Variant& value, BView* parent) const
 {
 	return Width();
 }
@@ -103,7 +103,9 @@ TableColumn::DrawField(BField* _field, BRect rect, BView* targetView)
 	if (field == NULL)
 		return;
 
-	void* value = fModel->ValueAt(field->RowIndex(), fModelIndex);
+	Variant value;
+	if (!fModel->GetValueAt(field->RowIndex(), fModelIndex, value))
+		return;
 	DrawValue(value, rect, targetView);
 }
 
@@ -122,8 +124,17 @@ TableColumn::CompareFields(BField* _field1, BField* _field2)
 	if (field2 == NULL)
 		return 1;
 
-	return CompareValues(fModel->ValueAt(field1->RowIndex(), fModelIndex),
-		fModel->ValueAt(field2->RowIndex(), fModelIndex));
+	Variant value1;
+	bool valid1 = fModel->GetValueAt(field1->RowIndex(), fModelIndex, value1);
+	Variant value2;
+	bool valid2 = fModel->GetValueAt(field2->RowIndex(), fModelIndex, value2);
+
+	if (!valid1)
+		return valid2 ? -1 : 0;
+	if (!valid2)
+		return 1;
+
+	return CompareValues(value1, value2);
 }
 
 
@@ -134,7 +145,9 @@ TableColumn::GetPreferredWidth(BField* _field, BView* parent) const
 	if (field == NULL)
 		return Width();
 
-	void* value = fModel->ValueAt(field->RowIndex(), fModelIndex);
+	Variant value;
+	if (!fModel->GetValueAt(field->RowIndex(), fModelIndex, value))
+		return Width();
 	return GetPreferredValueWidth(value, parent);
 }
 
@@ -159,25 +172,27 @@ StringTableColumn::~StringTableColumn()
 
 
 void
-StringTableColumn::DrawValue(void* value, BRect rect, BView* targetView)
+StringTableColumn::DrawValue(const Variant& value, BRect rect,
+	BView* targetView)
 {
-	fField.SetString((const char*)value);
+	fField.SetString(value.ToString());
 	fField.SetWidth(Width());
 	fColumn.DrawField(&fField, rect, targetView);
 }
 
 
 int
-StringTableColumn::CompareValues(void* a, void* b)
+StringTableColumn::CompareValues(const Variant& a, const Variant& b)
 {
-	return strcmp((const char*)a, (const char*)b);
+	return strcmp(a.ToString(), b.ToString());
 }
 
 
 float
-StringTableColumn::GetPreferredValueWidth(void* value, BView* parent) const
+StringTableColumn::GetPreferredValueWidth(const Variant& value,
+	BView* parent) const
 {
-	fField.SetString((const char*)value);
+	fField.SetString(value.ToString());
 	fField.SetWidth(Width());
 	return fColumn.GetPreferredWidth(&fField, parent);
 }

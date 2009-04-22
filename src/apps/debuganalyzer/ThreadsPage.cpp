@@ -61,17 +61,18 @@ public:
 		}
 	}
 
-	virtual void* ValueAt(int32 rowIndex, int32 columnIndex)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
 	{
 		Model::Thread* thread = fModel->ThreadAt(rowIndex);
 		if (thread == NULL)
-			return NULL;
+			return false;
 
 		switch (columnIndex) {
 			case 1:
-				return (void*)thread->Name();
+				value.SetTo(thread->Name(), VARIANT_DONT_COPY_DATA);
+				return true;
 			default:
-				return NULL;
+				return false;
 		}
 	}
 

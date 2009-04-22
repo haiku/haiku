@@ -9,6 +9,8 @@
 #include <ColumnTypes.h>
 #include <ObjectList.h>
 
+#include "Variant.h"
+
 
 class Table;
 
@@ -23,7 +25,8 @@ public:
 	virtual	void				GetColumnName(int columnIndex,
 									BString& name) const = 0;
 
-	virtual	void*				ValueAt(int32 rowIndex, int32 columnIndex) = 0;
+	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
+									Variant& value) = 0;
 };
 
 
@@ -43,10 +46,11 @@ protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
 	virtual	void				GetColumnName(BString* into) const;
 
-	virtual	void				DrawValue(void* value, BRect rect,
+	virtual	void				DrawValue(const Variant& value, BRect rect,
 									BView* targetView);
-	virtual	int					CompareValues(void* a, void* b);
-	virtual	float				GetPreferredValueWidth(void* value,
+	virtual	int					CompareValues(const Variant& a,
+									const Variant& b);
+	virtual	float				GetPreferredValueWidth(const Variant& value,
 									BView* parent) const;
 
 private:
@@ -80,10 +84,11 @@ public:
 	virtual						~StringTableColumn();
 
 protected:
-	virtual	void				DrawValue(void* value, BRect rect,
+	virtual	void				DrawValue(const Variant& value, BRect rect,
 									BView* targetView);
-	virtual	int					CompareValues(void* a, void* b);
-	virtual	float				GetPreferredValueWidth(void* value,
+	virtual	int					CompareValues(const Variant& a,
+									const Variant& b);
+	virtual	float				GetPreferredValueWidth(const Variant& value,
 									BView* parent) const;
 
 private:
