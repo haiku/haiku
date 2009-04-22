@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <SupportDefs.h>
+#include <OS.h>
 
 
 enum file_action {
@@ -33,7 +33,19 @@ enum file_action {
 	kNumActions
 };
 
-typedef std::vector<std::string> EntryVector;
+struct block_identifier {
+	off_t		offset;
+	uint32		identifier;
+	uint16		data[0];
+};
+
+struct entry {
+	std::string	name;
+	uint32		identifier;
+	off_t		size;
+};
+
+typedef std::vector<entry> EntryVector;
 
 
 const uint32 kDefaultDirCount = 1;
@@ -55,9 +67,14 @@ static bool sVerbose = false;
 static off_t sMaxFileSize = kDefaultMaxFileSize;
 static uint32 sCount = 0;
 
+static off_t sWriteTotal = 0;
+static off_t sReadTotal = 0;
+static bigtime_t sWriteTime = 0;
+static bigtime_t sReadTime = 0;
+
 
 static off_t
-to_size(const char* valueWithUnit)
+string_to_size(const char* valueWithUnit)
 {
 	char* unit;
 	off_t size = strtoull(valueWithUnit, &unit, 10);
@@ -73,23 +90,110 @@ to_size(const char* valueWithUnit)
 }
 
 
+static std::string
+size_to_string(off_t size)
+{
+	char buffer[256];
+
+	if (size > 10LL * 1024 * 1024 * 1024)
+		snprintf(buffer, sizeof(buffer), "%g GB", size / (1024.0 * 1024 * 1024));
+	else if (size > 10 * 1024 * 1024)
+		snprintf(buffer, sizeof(buffer), "%g MB", size / (1024.0 * 1024));
+	else if (size > 10 * 1024)
+		snprintf(buffer, sizeof(buffer), "%g KB", size / (1024.0));
+	else
+		snprintf(buffer, sizeof(buffer), "%lld B", size);
+
+	return buffer;
+}
+
+
+static std::string
+time_to_string(bigtime_t usecs)
+{
+	static const bigtime_t kSecond = 1000000ULL;
+	static const bigtime_t kHour = 3600 * kSecond;
+	static const bigtime_t kMinute = 60 * kSecond;
+
+	uint32 hours = usecs / kHour;
+	uint32 minutes = usecs / kMinute;
+	uint32 seconds = usecs / kSecond;
+
+	char buffer[256];
+	if (usecs >= kHour) {
+		minutes %= 60;
+		seconds %= 60;
+		snprintf(buffer, sizeof(buffer), "%luh %02lum %02lus", hours, minutes,
+			seconds);
+	} else if (usecs > 100 * kSecond) {
+		seconds %= 60;
+		snprintf(buffer, sizeof(buffer), "%lum %02lus", minutes, seconds);
+	} else
+		snprintf(buffer, sizeof(buffer), "%gs", 1.0 * usecs / kSecond);
+
+	return buffer;
+}
+
+
 static void
 usage(int status)
 {
 	fprintf(stderr,
 		"Usage: %s [options]\n"
-		"Performs some random file actions.\n"
+		"Performs some random file actions for file system testing.\n"
 		"\n"
-		"  -r, --runs=<count>\tThe number of actions to perform. Defaults to 100.\n"
-		"  -s, --seed=<seed>\tThe base seed to use for the random numbers.\n"
+		"  -r, --runs=<count>\t\tThe number of actions to perform.\n"
+		"\t\t\t\tDefaults to %lu.\n"
+		"  -s, --seed=<seed>\t\tThe base seed to use for the random numbers.\n"
 		"  -f, --file-count=<count>\tThe maximal number of files to create.\n"
+		"\t\t\t\tDefaults to %lu.\n"
 		"  -d, --dir-count=<count>\tThe maximal number of directories to create.\n"
+		"\t\t\t\tDefaults to %lu.\n"
 		"  -m, --max-file-size=<size>\tThe maximal file size of the files.\n"
-		"  -n, --no-cache\t\tDisables the file cache when doing I/O on a file.\n"
-		"  -v, --verbose\t\tShow the actions as being performed\n",
-		kProgramName);
+		"\t\t\t\tDefaults to %lld.\n"
+		"  -c, --check-interval=<count>\tCheck after every <count> runs. "
+			"Defaults to 0,\n"
+		"\t\t\t\tmeaning only check once at the end.\n"
+		"  -n, --no-cache\t\tDisables the file cache when doing I/O on\n"
+		"\t\t\t\ta file.\n"
+		"  -k, --keep-dirty\t\tDo not remove the working files on quit.\n"
+		"  -v, --verbose\t\t\tShow the actions as being performed\n",
+		kProgramName, kDefaultRunCount, kDefaultFileCount, kDefaultDirCount,
+		kDefaultMaxFileSize);
 
 	exit(status);
+}
+
+
+static void
+error(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	fprintf(stderr, "%s: ", kProgramName);
+	vfprintf(stderr, format, args);
+	fputc('\n', stderr);
+
+	va_end(args);
+	fflush(stderr);
+
+	exit(1);
+}
+
+
+static void
+warning(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	fprintf(stderr, "%s: ", kProgramName);
+	vfprintf(stderr, format, args);
+	fputc('\n', stderr);
+
+	va_end(args);
+	fflush(stderr);
 }
 
 
@@ -106,6 +210,7 @@ verbose(const char* format, ...)
 	putchar('\n');
 
 	va_end(args);
+	fflush(stdout);
 }
 
 
@@ -126,7 +231,7 @@ choose_index(const EntryVector& entries)
 static inline const std::string&
 choose_parent(const EntryVector& entries)
 {
-	return entries[choose_index(entries)];
+	return entries[choose_index(entries)].name;
 }
 
 
@@ -145,19 +250,28 @@ create_name(const std::string& parent, const char* prefix)
 static int
 open_file(const std::string& name, int mode)
 {
-	return open(name.c_str(), mode | (sDisableFileCache ? O_DIRECT : 0));
+	return open(name.c_str(), mode | (sDisableFileCache ? O_DIRECT : 0), 0666);
 }
 
 
 static void
-generate_block(char* block, const std::string& name, off_t offset)
+generate_block(char* buffer, const struct entry& entry, off_t offset)
 {
-	// TODO: generate unique and verifiable file contents.
+	block_identifier* block = (block_identifier*)buffer;
+	block->offset = offset;
+	block->identifier = entry.identifier;
+
+	uint32 count = (kBlockSize - offsetof(block_identifier, data))  / 2;
+	offset += offsetof(block_identifier, data);
+
+	for (uint32 i = 0; i < count; i++) {
+		block->data[i] = offset + i * 2;
+	}
 }
 
 
 static void
-write_blocks(int fd, const std::string& name, bool append = false)
+write_blocks(int fd, struct entry& entry, bool append = false)
 {
 	off_t size = min_c(rand() % sMaxFileSize, sMaxFileSize);
 	off_t offset = 0;
@@ -165,11 +279,8 @@ write_blocks(int fd, const std::string& name, bool append = false)
 	if (append) {
 		// in the append case, we need to check the file size
 		struct stat stat;
-		if (fstat(fd, &stat) != 0) {
-			fprintf(stderr, "%s: stat file failed: %s\n", kProgramName,
-				strerror(errno));
-			exit(1);
-		}
+		if (fstat(fd, &stat) != 0)
+			error("stat file failed: %s\n", strerror(errno));
 
 		if (size + stat.st_size > sMaxFileSize)
 			size = sMaxFileSize - stat.st_size;
@@ -179,20 +290,132 @@ write_blocks(int fd, const std::string& name, bool append = false)
 
 	verbose("  write %lu bytes", size);
 
+	entry.size += size;
+	uint32 blockOffset = offset % kBlockSize;
+	sWriteTotal += size;
+
+	bigtime_t start = system_time();
+
 	while (size > 0) {
 		char block[kBlockSize];
-		generate_block(block, name, offset);
+		generate_block(block, entry, offset - blockOffset);
 
-		ssize_t toWrite = min_c(size, kBlockSize);
-		ssize_t bytesWritten = write(fd, block, toWrite);
-		if (bytesWritten != toWrite) {
-			fprintf(stderr, "%s: writing failed: %s\n", kProgramName,
-				strerror(errno));
-			exit(1);
-		}
+		ssize_t toWrite = min_c(size, kBlockSize - blockOffset);
+		ssize_t bytesWritten = write(fd, block + blockOffset, toWrite);
+		if (bytesWritten != toWrite)
+			error("writing failed: %s", strerror(errno));
 
 		offset += toWrite;
 		size -= toWrite;
+		blockOffset = 0;
+	}
+
+	sWriteTime += system_time() - start;
+}
+
+
+static void
+dump_block(const char* buffer, int size, const char* prefix)
+{
+	const int DUMPED_BLOCK_SIZE = 16;
+	int i;
+
+	for (i = 0; i < size;) {
+		int start = i;
+
+		printf("%s%04x ", prefix, i);
+		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (!(i % 4))
+				printf(" ");
+
+			if (i >= size)
+				printf("  ");
+			else
+				printf("%02x", *(unsigned char*)(buffer + i));
+		}
+		printf("  ");
+
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (i < size) {
+				char c = buffer[i];
+
+				if (c < 30)
+					printf(".");
+				else
+					printf("%c", c);
+			} else
+				break;
+		}
+		printf("\n");
+	}
+}
+
+
+static void
+check_files(EntryVector& files)
+{
+	verbose("check all files...");
+
+	for (EntryVector::iterator i = files.begin(); i != files.end(); i++) {
+		const struct entry& file = *i;
+
+		int fd = open_file(file.name, O_RDONLY);
+		if (fd < 0) {
+			error("opening file \"%s\" failed: %s", file.name.c_str(),
+				strerror(errno));
+		}
+
+		// first check if size matches
+
+		struct stat stat;
+		if (fstat(fd, &stat) != 0) {
+			error("stat file \"%s\" failed: %s", file.name.c_str(),
+				strerror(errno));
+		}
+
+		if (file.size != stat.st_size) {
+			warning("size does not match for \"%s\"! Expected %lld "
+				"reported %lld", file.name.c_str(), file.size, stat.st_size);
+			close(fd);
+			continue;
+		}
+
+		// check contents
+
+		off_t size = file.size;
+		off_t offset = 0;
+		sReadTotal += size;
+
+		bigtime_t start = system_time();
+
+		while (size > 0) {
+			// read block
+			char block[kBlockSize];
+			ssize_t toRead = min_c(size, kBlockSize);
+			ssize_t bytesRead = read(fd, block, toRead);
+			if (bytesRead != toRead) {
+				error("reading \"%s\" failed: %s", file.name.c_str(),
+					strerror(errno));
+			}
+
+			// compare with generated block
+			char generatedBlock[kBlockSize];
+			generate_block(generatedBlock, file, offset);
+
+			if (memcmp(generatedBlock, block, bytesRead) != 0) {
+				dump_block(generatedBlock, bytesRead, "generated: ");
+				dump_block(block, bytesRead, "read:      ");
+				error("block at %lld differ in \"%s\"!", offset,
+					file.name.c_str());
+			}
+
+			offset += toRead;
+			size -= toRead;
+		}
+
+		sReadTime += system_time() - start;
+
+		close(fd);
 	}
 }
 
@@ -208,13 +431,15 @@ create_dir(EntryVector& dirs)
 
 	verbose("create dir %s", name.c_str());
 
-	if (mkdir(name.c_str(), 0777) != 0) {
-		fprintf(stderr, "%s: creating dir \"%s\" failed: %s\n", kProgramName,
-			name.c_str(), strerror(errno));
-		exit(1);
-	}
+	if (mkdir(name.c_str(), 0777) != 0)
+		error("creating dir \"%s\" failed: %s", name.c_str(), strerror(errno));
 
-	dirs.push_back(name);
+	struct entry dir;
+	dir.name = name;
+	dir.identifier = sCount;
+	dir.size = 0;
+
+	dirs.push_back(dir);
 }
 
 
@@ -225,19 +450,18 @@ remove_dir(EntryVector& dirs)
 		return;
 
 	int index = choose_index(dirs);
+	const std::string& name = dirs[index].name;
 
-	if (rmdir(dirs[index].c_str()) != 0) {
+	if (rmdir(name.c_str()) != 0) {
 		if (errno == ENOTEMPTY || errno == EEXIST) {
 			// TODO: in rare cases, we could remove all files
 			return;
 		}
 
-		fprintf(stderr, "%s: removing dir \"%s\" failed: %s\n", kProgramName,
-			dirs[index].c_str(), strerror(errno));
-		exit(1);
+		error("removing dir \"%s\" failed: %s", name.c_str(), strerror(errno));
 	}
 
-	verbose("removed dir %s", dirs[index].c_str());
+	verbose("removed dir %s", name.c_str());
 
 	EntryVector::iterator iterator = dirs.begin();
 	dirs.erase(iterator + index);
@@ -253,15 +477,18 @@ create_file(const EntryVector& dirs, EntryVector& files)
 	verbose("create file %s", name.c_str());
 
 	int fd = open_file(name, O_RDWR | O_CREAT | O_TRUNC);
-	if (fd < 0) {
-		fprintf(stderr, "%s: creating file \"%s\" failed: %s\n", kProgramName,
-			name.c_str(), strerror(errno));
-		exit(1);
-	}
+	if (fd < 0)
+		error("creating file \"%s\" failed: %s", name.c_str(), strerror(errno));
 
-	write_blocks(fd, name);
+	struct entry file;
+	file.name = name;
+	file.identifier = sCount;
+	file.size = 0;
+	write_blocks(fd, file);
+
+	files.push_back(file);
+
 	close(fd);
-	files.push_back(name);
 }
 
 
@@ -272,14 +499,12 @@ remove_file(EntryVector& files)
 		return;
 
 	int index = choose_index(files);
+	const std::string& name = files[index].name;
 
-	if (remove(files[index].c_str()) != 0) {
-		fprintf(stderr, "%s: removing file \"%s\" failed: %s\n", kProgramName,
-			files[index].c_str(), strerror(errno));
-		exit(1);
-	}
+	if (remove(name.c_str()) != 0)
+		error("removing file \"%s\" failed: %s", name.c_str(), strerror(errno));
 
-	verbose("removed file %s", files[index].c_str());
+	verbose("removed file %s", name.c_str());
 
 	EntryVector::iterator iterator = files.begin();
 	files.erase(iterator + index);
@@ -293,82 +518,83 @@ rename_file(const EntryVector& dirs, EntryVector& files)
 		return;
 
 	std::string parent = choose_parent(dirs);
-	std::string name = create_name(parent, "renamed-file");
+	std::string newName = create_name(parent, "renamed-file");
 
 	int index = choose_index(files);
+	const std::string& oldName = files[index].name;
 
-	verbose("rename file \"%s\" to \"%s\"", files[index].c_str(), name.c_str());
+	verbose("rename file \"%s\" to \"%s\"", oldName.c_str(), newName.c_str());
 
-	if (rename(files[index].c_str(), name.c_str()) != 0) {
-		fprintf(stderr, "%s: renaming file \"%s\" to \"%s\" failed: %s\n",
-			kProgramName, files[index].c_str(), name.c_str(), strerror(errno));
-		exit(1);
+	if (rename(oldName.c_str(), newName.c_str()) != 0) {
+		error("renaming file \"%s\" to \"%s\" failed: %s", oldName.c_str(),
+			newName.c_str(), strerror(errno));
 	}
 
-	files[index] = name;
+	files[index].name = newName;
 }
 
 
 static void
-append_file(const EntryVector& files)
+append_file(EntryVector& files)
 {
 	if (files.empty())
 		return;
 
-	const std::string& name = files[choose_index(files)];
+	struct entry& file = files[choose_index(files)];
 
-	verbose("append to \"%s\"", name.c_str());
+	verbose("append to \"%s\"", file.name.c_str());
 
-	int fd = open_file(name, O_WRONLY | O_APPEND);
+	int fd = open_file(file.name, O_WRONLY | O_APPEND);
 	if (fd < 0) {
-		fprintf(stderr, "%s: appending to file \"%s\" failed: %s\n",
-			kProgramName, name.c_str(), strerror(errno));
-		exit(1);
+		error("appending to file \"%s\" failed: %s", file.name.c_str(),
+			strerror(errno));
 	}
 
-	write_blocks(fd, name, true);
+	write_blocks(fd, file, true);
 	close(fd);
 }
 
 
 static void
-replace_file(const EntryVector& files)
+replace_file(EntryVector& files)
 {
 	if (files.empty())
 		return;
 
-	const std::string& name = files[choose_index(files)];
+	struct entry& file = files[choose_index(files)];
 
-	verbose("replace \"%s\"", name.c_str());
+	verbose("replace \"%s\"", file.name.c_str());
 
-	int fd = open_file(name, O_CREAT | O_WRONLY | O_TRUNC);
+	int fd = open_file(file.name, O_CREAT | O_WRONLY | O_TRUNC);
 	if (fd < 0) {
-		fprintf(stderr, "%s: replacing file \"%s\" failed: %s\n",
-			kProgramName, name.c_str(), strerror(errno));
-		exit(1);
+		error("replacing file \"%s\" failed: %s", file.name.c_str(),
+			strerror(errno));
 	}
 
-	write_blocks(fd, name);
+	file.size = 0;
+	write_blocks(fd, file);
+
 	close(fd);
 }
 
 
 static void
-truncate_file(const EntryVector& files)
+truncate_file(EntryVector& files)
 {
 	if (files.empty())
 		return;
 
-	const std::string& name = files[choose_index(files)];
+	struct entry& file = files[choose_index(files)];
 
-	verbose("truncate \"%s\"", name.c_str());
+	verbose("truncate \"%s\"", file.name.c_str());
 
-	int fd = open_file(name, O_WRONLY | O_TRUNC);
+	int fd = open_file(file.name, O_WRONLY | O_TRUNC);
 	if (fd < 0) {
-		fprintf(stderr, "%s: truncating file \"%s\" failed: %s\n",
-			kProgramName, name.c_str(), strerror(errno));
-		exit(1);
+		error("truncating file \"%s\" failed: %s", file.name.c_str(),
+			strerror(errno));
 	}
+
+	file.size = 0;
 
 	close(fd);
 }
@@ -387,8 +613,10 @@ main(int argc, char** argv)
 		{"seed", required_argument, 0, 's'},
 		{"file-count", required_argument, 0, 'f'},
 		{"dir-count", required_argument, 0, 'd'},
+		{"check-interval", required_argument, 0, 'c'},
 		{"max-file-size", required_argument, 0, 'm'},
 		{"no-cache", no_argument, 0, 'n'},
+		{"keep-dirty", no_argument, 0, 'k'},
 		{"verbose", no_argument, 0, 'v'},
 		{"help", no_argument, 0, 'h'},
 		{NULL}
@@ -397,9 +625,11 @@ main(int argc, char** argv)
 	uint32 maxFileCount = kDefaultFileCount;
 	uint32 maxDirCount = kDefaultDirCount;
 	uint32 runs = kDefaultRunCount;
+	uint32 checkInterval = 0;
+	bool keepDirty = false;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "r:s:f:d:m:nvh", kOptions,
+	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:nkvh", kOptions,
 			NULL)) != -1) {
 		switch (c) {
 			case 0:
@@ -429,14 +659,23 @@ main(int argc, char** argv)
 				else if (maxDirCount > kMaxDirCount)
 					maxDirCount = kMaxDirCount;
 				break;
+			case 'c':
+				// check interval
+				checkInterval = strtoul(optarg, NULL, 0);
+				if (checkInterval < 0)
+					checkInterval = 0;
+				break;
 			case 'm':
 			{
 				// max file size
-				sMaxFileSize = to_size(optarg);
+				sMaxFileSize = string_to_size(optarg);
 				break;
 			}
 			case 'n':
 				sDisableFileCache = true;
+				break;
+			case 'k':
+				keepDirty = true;
 				break;
 			case 'v':
 				sVerbose = true;
@@ -453,18 +692,24 @@ main(int argc, char** argv)
 	EntryVector dirs;
 	EntryVector files;
 
-	std::string baseName = "./random_file_temp";
-	if (mkdir(baseName.c_str(), 0777) != 0 && errno != EEXIST) {
+	struct entry base;
+	base.name = "./random_file_temp";
+	base.identifier = 0;
+
+	if (mkdir(base.name.c_str(), 0777) != 0 && errno != EEXIST) {
 		fprintf(stderr, "%s: cannot create base directory: %s\n",
 			kProgramName, strerror(errno));
 		return 1;
 	}
 
-	dirs.push_back(baseName);
-	
+	dirs.push_back(base);
+
 	for (uint32 run = 0; run < runs; run++) {
 		file_action action = choose_action();
-		
+
+		if ((run % 100) == 0)
+			verbose("run %lu", run + 1);
+
 		switch (action) {
 			case kCreateFile:
 				if (files.size() > maxFileCount / 2) {
@@ -514,14 +759,31 @@ main(int argc, char** argv)
 			default:
 				break;
 		}
+
+		if (checkInterval != 0 && run > 0 && (run % checkInterval) == 0
+			&& run + 1 < runs)
+			check_files(files);
 	}
 
-	for (int i = files.size(); i-- > 0;) {
-		remove_file(files);
+	check_files(files);
+
+	if (!keepDirty) {
+		for (int i = files.size(); i-- > 0;) {
+			remove_file(files);
+		}
+		for (int i = dirs.size(); i-- > 0;) {
+			remove_dir(dirs);
+		}
 	}
-	for (int i = dirs.size(); i-- > 0;) {
-		remove_dir(dirs);
-	}
+
+	printf("%s written in %s, %s/s\n", size_to_string(sWriteTotal).c_str(),
+		time_to_string(sWriteTime).c_str(),
+		size_to_string(int64(0.5 + sWriteTotal
+			/ (sWriteTime / 1000000.0))).c_str());
+	printf("%s read in %s, %s/s\n", size_to_string(sReadTotal).c_str(),
+		time_to_string(sReadTime).c_str(),
+		size_to_string(int64(0.5 + sReadTotal
+			/ (sReadTime / 1000000.0))).c_str());
 
 	return 0;
 }
