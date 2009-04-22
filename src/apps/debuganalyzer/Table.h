@@ -66,52 +66,6 @@ private:
 };
 
 
-class DelagateBasedTableColumn : public TableColumn {
-public:
-								DelagateBasedTableColumn(
-									BColumn* columnDelegate,
-									int32 modelIndex, float width,
-									float minWidth, float maxWidth,
-									alignment align);
-	virtual						~DelagateBasedTableColumn();
-
-protected:
-	virtual	void				DrawTitle(BRect rect, BView* targetView);
-	virtual	void				GetColumnName(BString* into) const;
-
-	virtual	void				DrawValue(const Variant& value, BRect rect,
-									BView* targetView);
-	virtual	float				GetPreferredValueWidth(const Variant& value,
-									BView* parent) const;
-
-	virtual	BField*				PrepareField(const Variant& value) const = 0;
-
-protected:
-			BColumn*			fColumnDelegate;
-};
-
-
-class StringTableColumn : public DelagateBasedTableColumn {
-public:
-								StringTableColumn(int32 modelIndex,
-									const char* title, float width,
-									float minWidth, float maxWidth,
-									uint32 truncate,
-									alignment align = B_ALIGN_LEFT);
-	virtual						~StringTableColumn();
-
-protected:
-	virtual	BField*				PrepareField(const Variant& value) const;
-
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
-
-private:
-			BStringColumn		fColumn;
-	mutable	BStringField		fField;
-};
-
-
 class Table : private BColumnListView {
 public:
 								Table(const char* name, uint32 flags,
@@ -137,7 +91,6 @@ private:
 			TableModel*			fModel;
 			ColumnList			fColumns;
 };
-
 
 
 #endif	// TABLE_H

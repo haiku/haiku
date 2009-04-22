@@ -11,6 +11,7 @@ Application DebugAnalyzer
 	Model.cpp
 	ModelLoader.cpp
 	Table.cpp
+	TableColumns.cpp
 	ThreadsPage.cpp
 	Variant.cpp
 

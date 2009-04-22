@@ -21,6 +21,16 @@
 #include "Model.h"
 
 
+inline void
+ModelLoader::_UpdateLastEventTime(bigtime_t time)
+{
+	if (fBaseTime < 0)
+		fBaseTime = time;
+
+	fLastEventTime = time - fBaseTime;
+}
+
+
 ModelLoader::ModelLoader(DataSource* dataSource,
 	const BMessenger& target, void* targetCookie)
 	:
@@ -172,6 +182,7 @@ ModelLoader::_Load()
 		return error;
 
 	// process the events
+	fBaseTime = -1;
 	fLastEventTime = -1;
 	uint32 count = 0;
 
@@ -284,7 +295,6 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 	switch (event) {
 		case B_SYSTEM_PROFILER_TEAM_ADDED:
 		{
-//printf("B_SYSTEM_PROFILER_TEAM_ADDED: %lu\n", size);
 			system_profiler_team_added* event
 				= (system_profiler_team_added*)buffer;
 
@@ -295,7 +305,6 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 
 		case B_SYSTEM_PROFILER_TEAM_REMOVED:
 		{
-//printf("B_SYSTEM_PROFILER_TEAM_REMOVED: %lu\n", size);
 			system_profiler_team_removed* event
 				= (system_profiler_team_removed*)buffer;
 
@@ -308,12 +317,10 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 		}
 
 		case B_SYSTEM_PROFILER_TEAM_EXEC:
-printf("B_SYSTEM_PROFILER_TEAM_EXEC: %lu\n", size);
 			break;
 
 		case B_SYSTEM_PROFILER_THREAD_ADDED:
 		{
-//printf("B_SYSTEM_PROFILER_THREAD_ADDED: %lu\n", size);
 			system_profiler_thread_added* event
 				= (system_profiler_thread_added*)buffer;
 
@@ -325,7 +332,6 @@ printf("B_SYSTEM_PROFILER_TEAM_EXEC: %lu\n", size);
 		}
 
 		case B_SYSTEM_PROFILER_THREAD_REMOVED:
-//printf("B_SYSTEM_PROFILER_THREAD_REMOVED: %lu\n", size);
 		{
 			system_profiler_thread_removed* event
 				= (system_profiler_thread_removed*)buffer;
@@ -339,16 +345,39 @@ printf("B_SYSTEM_PROFILER_TEAM_EXEC: %lu\n", size);
 		}
 
 		case B_SYSTEM_PROFILER_THREAD_SCHEDULED:
-printf("B_SYSTEM_PROFILER_THREAD_SCHEDULED: %lu\n", size);
+		{
+			system_profiler_thread_scheduled* event
+				= (system_profiler_thread_scheduled*)buffer;
+
+			_UpdateLastEventTime(event->time);
+
+			// TODO:...
 			break;
+		}
+
 		case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
-printf("B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE: %lu\n", size);
+		{
+			system_profiler_thread_enqueued_in_run_queue* event
+				= (system_profiler_thread_enqueued_in_run_queue*)buffer;
+
+			_UpdateLastEventTime(event->time);
+
+			// TODO:...
 			break;
+		}
+
 		case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
-printf("B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE: %lu\n", size);
+		{
+			system_profiler_thread_removed_from_run_queue* event
+				= (system_profiler_thread_removed_from_run_queue*)buffer;
+
+			_UpdateLastEventTime(event->time);
+
+			// TODO:...
 			break;
+		}
+
 		case B_SYSTEM_PROFILER_WAIT_OBJECT_INFO:
-printf("B_SYSTEM_PROFILER_WAIT_OBJECT_INFO: %lu\n", size);
 			break;
 		default:
 printf("unsupported event type %lu, size: %lu\n", event, size);

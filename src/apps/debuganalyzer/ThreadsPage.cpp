@@ -10,7 +10,7 @@
 #include <new>
 
 #include "Model.h"
-#include "Table.h"
+#include "TableColumns.h"
 
 
 // #pragma mark - ThreadsTableModel
@@ -41,8 +41,17 @@ public:
 			return false;
 
 		switch (columnIndex) {
+			case 0:
+				value.SetTo(thread->ID());
+				return true;
 			case 1:
 				value.SetTo(thread->Name(), VARIANT_DONT_COPY_DATA);
+				return true;
+			case 2:
+				value.SetTo(thread->CreationTime());
+				return true;
+			case 3:
+				value.SetTo(thread->DeletionTime());
 				return true;
 			default:
 				return false;
@@ -70,10 +79,14 @@ ThreadsPage::ThreadsPage()
 	fThreadsTable = new Table("threads list", 0);
 	AddChild(fThreadsTable->ToView());
 
-//	fThreadsTable->AddColumn(new StringTableColumn(0, "Thread", 40, 20, 1000,
-//		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new Int32TableColumn(0, "Thread", 40, 20, 1000,
+		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(2, "Creation", 80, 40, 1000,
+		true, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(3, "Deletion", 80, 40, 1000,
+		false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 //	fThreadsTable->AddColumn(new StringTableColumn(2, "Run Time", 80, 20, 1000,
 //		B_TRUNCATE_END, B_ALIGN_RIGHT));
 //	fThreadsTable->AddColumn(new StringTableColumn(3, "Wait Time", 80, 20, 1000,

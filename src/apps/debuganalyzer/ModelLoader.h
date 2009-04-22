@@ -37,6 +37,8 @@ private:
 			status_t			_ProcessEvent(uint32 event, uint32 cpu,
 									const void* buffer, size_t size);
 
+	inline	void				_UpdateLastEventTime(bigtime_t time);
+
 private:
 			BLocker				fLock;
 			Model*				fModel;
@@ -46,6 +48,7 @@ private:
 			thread_id			fLoaderThread;
 			bool				fLoading;
 			bool				fAborted;
+			bigtime_t			fBaseTime;
 			bigtime_t			fLastEventTime;
 };
 
