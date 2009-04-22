@@ -12,6 +12,7 @@ Application DebugAnalyzer
 	ModelLoader.cpp
 	Table.cpp
 	ThreadsPage.cpp
+	Variant.cpp
 
 	: libcolumnlistview.a libdebug.so be
 	: DebugAnalyzer.rdef
