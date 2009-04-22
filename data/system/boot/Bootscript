@@ -70,14 +70,16 @@ export SAFEMODE=`/bin/safemode`
 launchscript $SCRIPTS/SetupEnvironment
 
 # If the boot volume is a CD we use another script
-iw=`/bin/isvolume -readonly /boot`
+iw=`/bin/isvolume -readonly-partition /boot`
 if [ "$iw" = "yes" ]; then
-	launchscript $SCRIPTS/Bootscript.cd
-	exit 0 # and return
+	# block the CD tray (avoid accidental ejection)
+	# This option stays 'on' even if we continue booting to the desktop.
+	/bin/eject -b /boot
+else
+	# Sets timezone etc.
+	runprog system/bin/clockconfig
 fi
 
-# Sets timezone etc.
-runprog system/bin/clockconfig
 
 # Launch servers
 
@@ -101,6 +103,16 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
 	waitfor _input_server_event_loop_		# wait for input devices
 fi
+
+# Now ask the user if he wants to run the Installer or continue to the Desktop.
+if [ "$iw" = "yes" ]; then
+	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Installer" "Desktop"
+	if [ $? -eq 0 ]; then
+		launchscript $SCRIPTS/Bootscript.cd
+		exit 0 # and return
+	fi
+fi
+
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then

@@ -44,31 +44,6 @@ runprog() {
 ## Main script starts here
 ##
 
-# block the CD tray (avoid accidental ejection)
-/bin/eject -b /boot
-
-# Launch servers
-
-# We must wait for the app_server and registrar to be ready
-launch $SERVERS/registrar _roster_thread_	# launch registrar
-
-#launch $SERVERS/debug_server				# launch debug_server
-
-# Init Network
-if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/net_server				# launch net_server
-fi
-
-if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/app_server picasso		# launch app_server
-else
-	launch $SERVERS/fake_app_server picasso
-fi
-
-if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/syslog_daemon
-	waitfor _input_server_event_loop_		# wait for input devices
-fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
@@ -84,7 +59,7 @@ else
 fi
 
 # sync disks
-sync
+/bin/sync
 
 # prepare for reboot
 # (reboot quickly in 10 seconds)
