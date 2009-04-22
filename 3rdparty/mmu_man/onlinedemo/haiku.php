@@ -8,6 +8,9 @@
 // parts inspired by the Free Live OS Zoo
 // http://www.oszoo.org/wiki/index.php/Free_Live_OS_Zoo
 
+// name of the page
+define("PAGE_TITLE", "Haiku Online Demo");
+
 
 // relative path to the vnc java applet jar
 // you must *copy* (apache doesn't seem to like symlinks) it there.
@@ -55,7 +58,7 @@ define("QEMU_KEYMAPS", QEMU_BASE . "/share/qemu/keymaps");
 define("QEMU_ARGS", ""
 	."-daemonize " /* detach from stdin */
 	."-localtime " /* not UTC */
-	."-name 'Haiku Online Demo' "
+	."-name '" . PAGE_TITLE . "' "
 	."-monitor /dev/null "
 	."-serial none "
 	."-parallel none "
@@ -89,63 +92,11 @@ $vnckeymap = "en-us";
 $cpucount = 1;
 
 // statics
-$count = $_SESSION['compteur'];
+//$count = $_SESSION['compteur'];
 //$count = $GLOBALS['compteur'];
 $closing = 0;
 $do_kill = 0;
 $do_run = 0;
-
-// parse args
-if (isset($_GET['close']))
-	$closing = 1;
-
-if (isset($_GET['kill']))
-	$do_kill = 1;
-
-if (isset($_GET['run']))
-	$do_run = 1;
-
-if (isset($_GET['frame'])) {}
-
-session_start();
-
-//echo "do_run: " . $do_run . "<br>\n";
-//echo "do_kill: " . $do_kill . "<br>\n";
-
-?>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta name="robots" content="noindex, nofollow, noarchive" />
-<title>Haiku Online Demo</title>
-<link rel="shortcut icon" href="http://www.haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
-<style type="text/css">
-<!--
- /* basic style */
-body { background-color: <?php echo BGCOLOR; ?>; }
-a:link { color:orange; }
-a:visited { color:darkorange; }
-a:hover { color:pink; }
-.haiku_online_form { color: white; }
-.haiku_online_disabled { color: grey; }
-.haiku_online_out { color: white; }
-.haiku_online_debug { color: orange; }
-.haiku_online_error { color: red; font-weight: bold; }
-.haiku_online_applet { background-color: <?php echo BGCOLOR; ?>; }
--->
-</style>
-<script type="text/javascript">
-function onPageUnload() {
-	//window.open("<?php echo $_SERVER["SCRIPT_NAME"] . "?close"; ?>", "closing", "width=100,height=30,location=no,menubar=no,toolbar=no,scrollbars=no");
-}
-</script>
-</head>
-<?php
-
-
-if ($closing == 1)
-	echo "<body>";
-else
-	echo "<body onunload=\"onPageUnload();\">";
 
 function out($str)
 {
@@ -230,6 +181,11 @@ function vnc_display()
 	return qemu_slot();
 }
 
+function vnc_addr()
+{
+	return $_SERVER['HTTP_HOST'];
+}
+
 function vnc_port()
 {
 	return VNCPORTBASE + vnc_display();
@@ -237,7 +193,7 @@ function vnc_port()
 
 function vnc_addr_display()
 {
-	return $_SERVER['HTTP_HOST'] . ":" . vnc_display();
+	return vnc_addr() . ":" . vnc_display();
 }
 
 function vnc_url()
@@ -589,11 +545,30 @@ function output_vnc_info()
 	out("You can use an external VNC client at " .
 	    "<a href=\"vnc://" . vnc_addr_display() . "\">" .
 	    "vnc://" . vnc_addr_display() . "</a> " .
+	    "or open <a href=\"" . $_SERVER['PHP_SELF'] . "?getfile=vncinfo&slot=" . vnc_display() . "\">this file</a>, " .
 	    "or enter <tt>" . vnc_addr_display() . "</tt> in your " .
 	    "<a href=\"http://fr.wikipedia.org/wiki/Virtual_Network_" .
 	    "Computing\"" .
 	    ">VNC viewer</a>.");
 	//echo "<br />\n";
+}
+
+function output_vnc_info_file()
+{
+	if (!is_my_session_valid())
+		die("Bad request");
+
+	header("Content-type: application/x-vnc");
+	header('Content-Disposition: attachment; filename="onlinedemo.vnc"'); 
+
+	echo "[connection]\n";
+	echo "host=" . vnc_addr() . "\n";
+	echo "port=" . vnc_display() . "\n";
+	//echo "password=XXX\n";
+	//echo "[options]\n";
+	// cf. http://www.realvnc.com/pipermail/vnc-list/1999-December/011086.html
+	// cf. http://www.tek-tips.com/viewthread.cfm?qid=1173303&page=1
+	//echo "\n";
 }
 
 function output_audio_player_code($external_only=false)
@@ -610,7 +585,26 @@ function output_audio_player_code($external_only=false)
 		echo "controller=\"true\" align=\"right\">";
 	}
 	out("You can use an external audio play at " .
-	    "<a href=\"$url\">$url</a> or <a href=\"$icy\">$icy</a>.");
+	    "<a href=\"$url\">$url</a> or <a href=\"$icy\">$icy</a>, or use " .
+	    "<a href=\"" . $_SERVER['PHP_SELF'] . "?getfile=audiopls\">this playlist</a>.");
+}
+
+function output_audio_player_file()
+{
+	if (!is_my_session_valid())
+		die("Bad request");
+
+	header("Content-type: audio/x-mpegurl");
+	//header("Content-type: text/plain");
+	//header('Content-Disposition: attachment; filename="onlinedemo.m3u"'); 
+
+	$port = audio_port();
+	$url = "http://" . $_SERVER['HTTP_HOST'] . ":$port/";
+
+	//echo "#EXTM3U\n";
+	//echo "#EXTINF:0," . PAGE_TITLE . "\n";
+	echo "$url\n";
+	//echo "\n";
 }
 
 function output_applet_code($external_only=false)
@@ -674,6 +668,77 @@ function output_serial_output_code($external_only=false)
 	echo "</center>";
   
 }
+
+
+session_start();
+
+// parse args
+
+// output redirections...
+if (isset($_GET['getfile'])) {
+	switch ($_GET['getfile']) {
+	case "vncinfo":
+		output_vnc_info_file();
+		break;
+	case "audiopls":
+		output_audio_player_file();
+		break;
+	default:
+		die("Bad request");
+	}
+	die();
+}
+
+if (isset($_GET['close']))
+	$closing = 1;
+
+if (isset($_GET['kill']))
+	$do_kill = 1;
+
+if (isset($_GET['run']))
+	$do_run = 1;
+
+if (isset($_GET['frame'])) {}
+
+
+//echo "do_run: " . $do_run . "<br>\n";
+//echo "do_kill: " . $do_kill . "<br>\n";
+
+?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title><?php echo PAGE_TITLE; ?></title>
+<link rel="shortcut icon" href="http://www.haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
+<style type="text/css">
+<!--
+ /* basic style */
+body { background-color: <?php echo BGCOLOR; ?>; }
+a:link { color:orange; }
+a:visited { color:darkorange; }
+a:hover { color:pink; }
+.haiku_online_form { color: white; }
+.haiku_online_disabled { color: grey; }
+.haiku_online_out { color: white; }
+.haiku_online_debug { color: orange; }
+.haiku_online_error { color: red; font-weight: bold; }
+.haiku_online_applet { background-color: <?php echo BGCOLOR; ?>; }
+-->
+</style>
+<script type="text/javascript">
+function onPageUnload() {
+	//window.open("<?php echo $_SERVER["SCRIPT_NAME"] . "?close"; ?>", "closing", "width=100,height=30,location=no,menubar=no,toolbar=no,scrollbars=no");
+}
+</script>
+</head>
+<?php
+
+
+if ($closing == 1)
+	echo "<body>";
+else
+	echo "<body onunload=\"onPageUnload();\">";
+
 
 out("<div style=\"text-align:right;\">Available displays: " .
     available_qemu_slots() . "/" . total_qemu_slots() .
