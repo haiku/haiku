@@ -32,7 +32,6 @@ StdBinCommands
 	finddir.c
 	hd.c
 	idestatus.c
-	isvolume.cpp
 	listarea.c
 	listimage.c
 	listport.c
@@ -110,6 +109,7 @@ StdBinCommands
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
+	isvolume.cpp
 	shutdown.cpp
 	: be : $(haiku-utils_rsrc) ;
 }
