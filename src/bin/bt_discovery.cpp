@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <bluetooth/LocalDevice.h>
 #include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/LocalDevice.h>
 
 #include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
@@ -15,11 +15,12 @@
 
 thread_id mainThread;
 
-class simpleDiscoveryListener : public DiscoveryListener {
+class SimpleDiscoveryListener : public DiscoveryListener {
 
 public:
 
-simpleDiscoveryListener() : DiscoveryListener()
+SimpleDiscoveryListener()
+	: DiscoveryListener()
 {
 
 }
@@ -30,13 +31,15 @@ DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 {
 	BString classString;
 
-	printf("\t%s: Device %s discovered.\n",__FUNCTION__, bdaddrUtils::ToString(btDevice->GetBluetoothAddress()));
-	
+	printf("\t%s: Device %s discovered.\n",__FUNCTION__, 
+		bdaddrUtils::ToString(btDevice->GetBluetoothAddress()));
+
 	cod.GetServiceClass(classString);
 	classString << " |";
 	cod.GetMajorDeviceClass(classString);
 	classString << " |";
 	cod.GetMinorDeviceClass(classString);
+
 	printf("\t\t%s: \n", classString.String());
 }
 
@@ -44,10 +47,8 @@ DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 void
 InquiryCompleted(int discType)
 {
-
 	printf("\t%s: Inquiry process has finished ...\n",__FUNCTION__);
 	(void)send_data(mainThread, discType, NULL, 0);
-
 }
 
 
@@ -72,26 +73,28 @@ DumpInfo(LocalDevice* device)
 	}
 
 	printf("Discovering for  [LocalDevice] %s\t%s\n\n",
-         (device->GetFriendlyName()).String(),
-          bdaddrUtils::ToString(device->GetBluetoothAddress()));
+		(device->GetFriendlyName()).String(),
+		bdaddrUtils::ToString(device->GetBluetoothAddress()));
 
-	simpleDiscoveryListener* dListener = new simpleDiscoveryListener();
+	SimpleDiscoveryListener* dListener = new SimpleDiscoveryListener();
 
 	dAgent->StartInquiry(BT_GIAC, dListener);
-	
-	thread_id sender;		
-	(void)receive_data(&sender, NULL, 0);
-	
-    printf("Retrieving names ...\n");
-	
-    for (int32 index = 0 ; index < dAgent->RetrieveDevices(0).CountItems(); index++ ) {
 
-        RemoteDevice* rDevice = dAgent->RetrieveDevices(0).ItemAt(index);
-	    printf("\t%s \t@ %s ...\n", rDevice->GetFriendlyName(true).String(), bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
+	thread_id sender;
+	(void)receive_data(&sender, NULL, 0);
+
+	printf("Retrieving names ...\n");
+
+	for (int32 index = 0 ; index < dAgent->RetrieveDevices(0).CountItems(); index++ ) {
+
+		RemoteDevice* rDevice = dAgent->RetrieveDevices(0).ItemAt(index);
+		printf("\t%s \t@ %s ...\n", rDevice->GetFriendlyName(true).String(),
+			bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
 
     }
 
 }
+
 
 static status_t
 LocalDeviceError(status_t status)
@@ -105,38 +108,38 @@ LocalDeviceError(status_t status)
 int
 main(int argc, char *argv[])
 {
-
 	mainThread = find_thread(NULL);
 
-        if (argc == 2) {
-            // device specified
-            LocalDevice* device = LocalDevice::GetLocalDevice(atoi(argv[0]));
-            if (device == NULL)
-               return LocalDeviceError(ENODEV);
+	if (argc == 2) {
+		// device specified
+		LocalDevice* device = LocalDevice::GetLocalDevice(atoi(argv[0]));
+		if (device == NULL)
+			return LocalDeviceError(ENODEV);
 
-            DumpInfo(device);
+		DumpInfo(device);
 
-        } else if (argc == 1) {
-            // show all devices
-            LocalDevice* device = NULL;
+	} else if (argc == 1) {
+		// show all devices
+		LocalDevice* device = NULL;
 
-            printf("Performing discovery for %ld Bluetooth Local Devices ...\n", LocalDevice::GetLocalDeviceCount());
+		printf("Performing discovery for %ld Bluetooth Local Devices ...\n",
+			LocalDevice::GetLocalDeviceCount());
 
-            for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
+		for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
 
-               device = LocalDevice::GetLocalDevice();
-               if (device == NULL) {
-                    LocalDeviceError(ENODEV);
-                    continue;
-               }
-               DumpInfo(device);
+			device = LocalDevice::GetLocalDevice();
+			if (device == NULL) {
+				LocalDeviceError(ENODEV);
+				continue;
+			}
+			DumpInfo(device);
 
-            }
+		}
 
-            return B_OK;
+		return B_OK;
 
-        } else {
-                fprintf(stderr,"Usage: bt_dev_info [device]\n");
-                return B_ERROR;
-        }
+	} else {
+		fprintf(stderr,"Usage: bt_dev_info [device]\n");
+		return B_ERROR;
+	}
 }
