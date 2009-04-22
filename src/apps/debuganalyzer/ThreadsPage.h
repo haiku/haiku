@@ -8,8 +8,8 @@
 #include <GroupView.h>
 
 
-class BColumnListView;
 class Model;
+class Table;
 
 
 class ThreadsPage : public BGroupView {
@@ -20,7 +20,11 @@ public:
 			void				SetModel(Model* model);
 
 private:
-			BColumnListView*	fThreadsListView;
+			class ThreadsTableModel;
+
+private:
+			Table*				fThreadsTable;
+			ThreadsTableModel*	fThreadsTableModel;
 			Model*				fModel;
 };
 

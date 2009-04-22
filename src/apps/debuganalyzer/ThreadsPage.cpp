@@ -5,41 +5,136 @@
 
 #include "ThreadsPage.h"
 
-#include <ColumnTypes.h>
+#include <stdio.h>
+
+#include <new>
+
+#include "Model.h"
+#include "Table.h"
+
+
+// #pragma mark - ThreadsTableModel
+
+
+class ThreadsPage::ThreadsTableModel : public TableModel {
+public:
+	ThreadsTableModel(Model* model)
+		:
+		fModel(model)
+	{
+	}
+
+	virtual int32 CountColumns() const
+	{
+		return 6;
+	}
+
+	virtual int32 CountRows() const
+	{
+		return fModel->CountThreads();
+	}
+
+	virtual void GetColumnName(int columnIndex, BString& name) const
+	{
+		switch (columnIndex) {
+			case 0:
+				name = "Thread";
+				break;
+			case 1:
+				name = "Name";
+				break;
+			case 2:
+				name = "Run Time";
+				break;
+			case 3:
+				name = "Wait Time";
+				break;
+			case 4:
+				name = "Latencies";
+				break;
+			case 5:
+				name = "Preemptions";
+				break;
+			default:
+				name = "<invalid>";
+				break;
+		}
+	}
+
+	virtual void* ValueAt(int32 rowIndex, int32 columnIndex)
+	{
+		Model::Thread* thread = fModel->ThreadAt(rowIndex);
+		if (thread == NULL)
+			return NULL;
+
+		switch (columnIndex) {
+			case 1:
+				return (void*)thread->Name();
+			default:
+				return NULL;
+		}
+	}
+
+private:
+	Model*	fModel;
+};
+
+
+// #pragma mark - ThreadsPage
 
 
 ThreadsPage::ThreadsPage()
 	:
 	BGroupView(B_VERTICAL),
-	fThreadsListView(NULL)
+	fThreadsTable(NULL),
+	fThreadsTableModel(NULL),
+	fModel(NULL)
+
 {
 	SetName("Threads");
 
-	fThreadsListView = new BColumnListView("threads list", 0);
-	AddChild(fThreadsListView);
+	fThreadsTable = new Table("threads list", 0);
+	AddChild(fThreadsTable->ToView());
 
-	fThreadsListView->AddColumn(new BStringColumn("Thread", 40, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT), 0);
-	fThreadsListView->AddColumn(new BStringColumn("Name", 80, 40, 1000,
-		B_TRUNCATE_END, B_ALIGN_LEFT), 1);
-	fThreadsListView->AddColumn(new BStringColumn("Run Time", 80, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT), 2);
-	fThreadsListView->AddColumn(new BStringColumn("Wait Time", 80, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT), 3);
-	fThreadsListView->AddColumn(new BStringColumn("Latencies", 80, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT), 4);
-	fThreadsListView->AddColumn(new BStringColumn("Preemptions", 80, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT), 5);
+//	fThreadsTable->AddColumn(new StringTableColumn(0, "Thread", 40, 20, 1000,
+//		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
+		B_TRUNCATE_END, B_ALIGN_LEFT));
+//	fThreadsTable->AddColumn(new StringTableColumn(2, "Run Time", 80, 20, 1000,
+//		B_TRUNCATE_END, B_ALIGN_RIGHT));
+//	fThreadsTable->AddColumn(new StringTableColumn(3, "Wait Time", 80, 20, 1000,
+//		B_TRUNCATE_END, B_ALIGN_RIGHT));
+//	fThreadsTable->AddColumn(new StringTableColumn(4, "Latencies", 80, 20, 1000,
+//		B_TRUNCATE_END, B_ALIGN_RIGHT));
+//	fThreadsTable->AddColumn(new StringTableColumn(5, "Preemptions", 80, 20,
+//		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+
 }
 
 
 ThreadsPage::~ThreadsPage()
 {
+	fThreadsTable->SetTableModel(NULL);
+	delete fThreadsTableModel;
 }
 
 
 void
 ThreadsPage::SetModel(Model* model)
 {
+	if (model == fModel)
+		return;
+
+	if (fModel != NULL) {
+		fThreadsTable->SetTableModel(NULL);
+		delete fThreadsTableModel;
+		fThreadsTableModel = NULL;
+	}
+
 	fModel = model;
+
+	if (fModel != NULL) {
+		fThreadsTableModel = new(std::nothrow) ThreadsTableModel(fModel);
+		fThreadsTable->SetTableModel(fThreadsTableModel);
+	}
 }
