@@ -34,33 +34,6 @@ public:
 		return fModel->CountThreads();
 	}
 
-	virtual void GetColumnName(int columnIndex, BString& name) const
-	{
-		switch (columnIndex) {
-			case 0:
-				name = "Thread";
-				break;
-			case 1:
-				name = "Name";
-				break;
-			case 2:
-				name = "Run Time";
-				break;
-			case 3:
-				name = "Wait Time";
-				break;
-			case 4:
-				name = "Latencies";
-				break;
-			case 5:
-				name = "Preemptions";
-				break;
-			default:
-				name = "<invalid>";
-				break;
-		}
-	}
-
 	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
 	{
 		Model::Thread* thread = fModel->ThreadAt(rowIndex);

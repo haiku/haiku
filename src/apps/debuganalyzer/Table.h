@@ -22,9 +22,6 @@ public:
 	virtual	int32				CountColumns() const = 0;
 	virtual	int32				CountRows() const = 0;
 
-	virtual	void				GetColumnName(int columnIndex,
-									BString& name) const = 0;
-
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
 									Variant& value) = 0;
 };
