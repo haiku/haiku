@@ -331,8 +331,24 @@ InstallerWindow::ShowBottom()
 void
 InstallerWindow::LaunchDriveSetup()
 {
-	if (be_roster->Launch(DRIVESETUP_SIG) != B_OK)
-		fprintf(stderr, "There was an error while launching DriveSetup\n");
+	if (true || be_roster->Launch(DRIVESETUP_SIG) != B_OK) {
+		// Try really hard to launch it. It's very likely that this fails,
+		// when we run from the CD and there is only an incomplete mime
+		// database for example...
+		BPath path;
+		if (find_directory(B_SYSTEM_APPS_DIRECTORY, &path) != B_OK
+			|| path.Append("DriveSetup") != B_OK) {
+			path.SetTo("/boot/system/apps/DriveSetup");
+		}
+		BEntry entry(path.Path());
+		entry_ref ref;
+		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
+			BAlert* alert = new BAlert("error", "DriveSetup, the application "
+				"to configure disk partitions, could not be launched.",
+				"Ok");
+			alert->Go();
+		}
+	}
 }
 
 
