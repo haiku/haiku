@@ -38,7 +38,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 		.Add(fMainTabView);
 
 	fMainTabView->AddTab(new BView("Teams", 0));
-	fMainTabView->AddTab(new ThreadsPage);
+	fMainTabView->AddTab(fThreadsPage);
 
 	// create a model loader, if we have a data source
 	if (dataSource != NULL)
