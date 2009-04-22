@@ -11,9 +11,11 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <GradientLinear.h>
 #include <Message.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <Shape.h>
 #include <Window.h>
 
 #include "CommandStack.h"
@@ -126,18 +128,44 @@ PlaylistItem::Draw(BView* owner, BRect frame, const font_height& fh,
 
 		BRect r(0, 0, playbackMarkSize, playbackMarkSize);
 		r.OffsetTo(frame.left + 4,
-			ceilf((frame.top + frame.bottom) / 2) - 5);
+			ceilf((frame.top + frame.bottom - playbackMarkSize) / 2));
 
+#ifdef __HAIKU__
+		uint32 flags = owner->Flags();
+		owner->SetFlags(flags | B_SUBPIXEL_PRECISE);
+
+		BShape shape;
+		shape.MoveTo(r.LeftTop());
+		shape.LineTo(r.LeftBottom());
+		shape.LineTo(BPoint(r.right, (r.top + r.bottom) / 2));
+		shape.Close();
+
+		owner->MovePenTo(B_ORIGIN);
+		owner->FillShape(&shape);
+
+		shape.Clear();
+		r.InsetBy(1, 1);
+		shape.MoveTo(r.LeftTop());
+		shape.LineTo(r.LeftBottom());
+		shape.LineTo(BPoint(r.right, (r.top + r.bottom) / 2));
+		shape.Close();
+
+		BGradientLinear gradient;
+		gradient.SetStart(r.LeftTop());
+		gradient.SetEnd(r.LeftBottom());
+		gradient.AddColor(tint_color(green, B_LIGHTEN_1_TINT), 0);
+		gradient.AddColor(tint_color(green, B_DARKEN_1_TINT), 255.0);
+
+		owner->FillShape(&shape, gradient);
+
+		owner->SetFlags(flags);
+#else
 		BPoint arrow[3];
 		arrow[0] = r.LeftTop();
 		arrow[1] = r.LeftBottom();
 		arrow[2].x = r.right;
 		arrow[2].y = (r.top + r.bottom) / 2;
-#ifdef __HAIKU__
-		owner->SetPenSize(2);
-		owner->StrokePolygon(arrow, 3);
-		owner->SetPenSize(1);
-#else
+
 		rgb_color lightGreen = tint_color(green, B_LIGHTEN_2_TINT);
 		rgb_color darkGreen = tint_color(green, B_DARKEN_2_TINT);
  		owner->BeginLineArray(6);
@@ -163,10 +191,11 @@ PlaylistItem::Draw(BView* owner, BRect frame, const font_height& fh,
 		arrow[1].x += 1.0;
 		arrow[1].y -= 1.0;
 		arrow[2].x -= 2.0;
-#endif // __HAIKU__
+
 		owner->SetLowColor(owner->HighColor());
 		owner->SetHighColor(green);
 		owner->FillPolygon(arrow, 3);
+#endif // __HAIKU__
 	}
 }
 
