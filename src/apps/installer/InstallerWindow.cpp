@@ -331,7 +331,7 @@ InstallerWindow::ShowBottom()
 void
 InstallerWindow::LaunchDriveSetup()
 {
-	if (true || be_roster->Launch(DRIVESETUP_SIG) != B_OK) {
+	if (be_roster->Launch(DRIVESETUP_SIG) != B_OK) {
 		// Try really hard to launch it. It's very likely that this fails,
 		// when we run from the CD and there is only an incomplete mime
 		// database for example...
