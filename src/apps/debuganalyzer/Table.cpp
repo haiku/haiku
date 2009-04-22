@@ -39,12 +39,11 @@ TableModel::~TableModel()
 // #pragma mark - TableColumn
 
 
-TableColumn::TableColumn(BColumn* columnDelegate, int32 modelIndex, float width,
-	float minWidth, float maxWidth, alignment align)
+TableColumn::TableColumn(int32 modelIndex, float width, float minWidth,
+	float maxWidth, alignment align)
 	:
 	BColumn(width, minWidth, maxWidth, align),
 	fModel(NULL),
-	fColumnDelegate(columnDelegate),
 	fModelIndex(modelIndex)
 {
 }
@@ -59,20 +58,6 @@ void
 TableColumn::SetTableModel(TableModel* model)
 {
 	fModel = model;
-}
-
-
-void
-TableColumn::DrawTitle(BRect rect, BView* targetView)
-{
-	fColumnDelegate->DrawTitle(rect, targetView);
-}
-
-
-void
-TableColumn::GetColumnName(BString* into) const
-{
-	fColumnDelegate->GetColumnName(into);
 }
 
 
@@ -152,6 +137,54 @@ TableColumn::GetPreferredWidth(BField* _field, BView* parent) const
 }
 
 
+// #pragma mark - DelagateBasedTableColumn
+
+
+DelagateBasedTableColumn::DelagateBasedTableColumn(BColumn* columnDelegate,
+	int32 modelIndex, float width, float minWidth, float maxWidth,
+	alignment align)
+	:
+	TableColumn(modelIndex, width, minWidth, maxWidth, align),
+	fColumnDelegate(columnDelegate)
+{
+}
+
+
+DelagateBasedTableColumn::~DelagateBasedTableColumn()
+{
+}
+
+
+void
+DelagateBasedTableColumn::DrawTitle(BRect rect, BView* targetView)
+{
+	fColumnDelegate->DrawTitle(rect, targetView);
+}
+
+
+void
+DelagateBasedTableColumn::GetColumnName(BString* into) const
+{
+	fColumnDelegate->GetColumnName(into);
+}
+
+
+void
+DelagateBasedTableColumn::DrawValue(const Variant& value, BRect rect,
+	BView* targetView)
+{
+	fColumnDelegate->DrawField(PrepareField(value), rect, targetView);
+}
+
+
+float
+DelagateBasedTableColumn::GetPreferredValueWidth(const Variant& value,
+	BView* parent) const
+{
+	return fColumnDelegate->GetPreferredWidth(PrepareField(value), parent);
+}
+
+
 // #pragma mark - StringTableColumn
 
 
@@ -159,7 +192,8 @@ StringTableColumn::StringTableColumn(int32 modelIndex, const char* title,
 	float width, float minWidth, float maxWidth, uint32 truncate,
 	alignment align)
 	:
-	TableColumn(&fColumn, modelIndex, width, minWidth, maxWidth, align),
+	DelagateBasedTableColumn(&fColumn, modelIndex, width, minWidth, maxWidth,
+		align),
 	fColumn(title, width, minWidth, maxWidth, truncate, align),
 	fField("")
 {
@@ -171,13 +205,12 @@ StringTableColumn::~StringTableColumn()
 }
 
 
-void
-StringTableColumn::DrawValue(const Variant& value, BRect rect,
-	BView* targetView)
+BField*
+StringTableColumn::PrepareField(const Variant& value) const
 {
 	fField.SetString(value.ToString());
 	fField.SetWidth(Width());
-	fColumn.DrawField(&fField, rect, targetView);
+	return &fField;
 }
 
 
@@ -185,16 +218,6 @@ int
 StringTableColumn::CompareValues(const Variant& a, const Variant& b)
 {
 	return strcmp(a.ToString(), b.ToString());
-}
-
-
-float
-StringTableColumn::GetPreferredValueWidth(const Variant& value,
-	BView* parent) const
-{
-	fField.SetString(value.ToString());
-	fField.SetWidth(Width());
-	return fColumn.GetPreferredWidth(&fField, parent);
 }
 
 

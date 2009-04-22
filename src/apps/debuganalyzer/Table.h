@@ -30,10 +30,9 @@ public:
 };
 
 
-class TableColumn : private BColumn {
+class TableColumn : protected BColumn {
 public:
-								TableColumn(BColumn* columnDelegate,
-									int32 modelIndex, float width,
+								TableColumn(int32 modelIndex, float width,
 									float minWidth, float maxWidth,
 									alignment align);
 	virtual						~TableColumn();
@@ -43,9 +42,6 @@ public:
 			float				Width() const		{ return BColumn::Width(); }
 
 protected:
-	virtual	void				DrawTitle(BRect rect, BView* targetView);
-	virtual	void				GetColumnName(BString* into) const;
-
 	virtual	void				DrawValue(const Variant& value, BRect rect,
 									BView* targetView);
 	virtual	int					CompareValues(const Variant& a,
@@ -53,7 +49,7 @@ protected:
 	virtual	float				GetPreferredValueWidth(const Variant& value,
 									BView* parent) const;
 
-private:
+protected:
 	virtual	void				DrawField(BField* field, BRect rect,
 									BView* targetView);
 	virtual	int					CompareFields(BField* field1, BField* field2);
@@ -69,12 +65,36 @@ private:
 
 private:
 			TableModel*			fModel;
-			BColumn*			fColumnDelegate;
 			int32				fModelIndex;
 };
 
 
-class StringTableColumn : public TableColumn {
+class DelagateBasedTableColumn : public TableColumn {
+public:
+								DelagateBasedTableColumn(
+									BColumn* columnDelegate,
+									int32 modelIndex, float width,
+									float minWidth, float maxWidth,
+									alignment align);
+	virtual						~DelagateBasedTableColumn();
+
+protected:
+	virtual	void				DrawTitle(BRect rect, BView* targetView);
+	virtual	void				GetColumnName(BString* into) const;
+
+	virtual	void				DrawValue(const Variant& value, BRect rect,
+									BView* targetView);
+	virtual	float				GetPreferredValueWidth(const Variant& value,
+									BView* parent) const;
+
+	virtual	BField*				PrepareField(const Variant& value) const = 0;
+
+protected:
+			BColumn*			fColumnDelegate;
+};
+
+
+class StringTableColumn : public DelagateBasedTableColumn {
 public:
 								StringTableColumn(int32 modelIndex,
 									const char* title, float width,
@@ -84,12 +104,10 @@ public:
 	virtual						~StringTableColumn();
 
 protected:
-	virtual	void				DrawValue(const Variant& value, BRect rect,
-									BView* targetView);
+	virtual	BField*				PrepareField(const Variant& value) const;
+
 	virtual	int					CompareValues(const Variant& a,
 									const Variant& b);
-	virtual	float				GetPreferredValueWidth(const Variant& value,
-									BView* parent) const;
 
 private:
 			BStringColumn		fColumn;
