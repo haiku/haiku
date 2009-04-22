@@ -18,7 +18,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <fs_attr.h>
 #include <OS.h>
+#include <TypeConstants.h>
 
 
 enum file_action {
@@ -50,6 +52,7 @@ typedef std::vector<entry> EntryVector;
 
 
 const char* kDefaultBaseDir = "./random_file_temp";
+const char* kIdentifierAttribute = "rfa:identifier";
 
 const uint32 kDefaultDirCount = 1;
 const uint32 kDefaultFileCount = 10;
@@ -538,6 +541,9 @@ create_file(const EntryVector& dirs, EntryVector& files)
 	write_blocks(fd, file);
 
 	files.push_back(file);
+
+	fs_write_attr(fd, kIdentifierAttribute, B_UINT32_TYPE, 0, &file.identifier,
+		sizeof(uint32));
 
 	close(fd);
 }
