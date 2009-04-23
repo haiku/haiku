@@ -539,8 +539,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 
 #ifdef HANDLE_VLC
 	if (u.proto == "mms" || u.proto == "rtp" || u.proto == "rtsp") {
-		args[0] = "vlc";
-		args[1] = (char *)u.String();
+		args[0] = (char *)u.String();
+		args[1] = NULL;
 		be_roster->Launch(kVLCSig, 2, args);
 		return;
 	}
