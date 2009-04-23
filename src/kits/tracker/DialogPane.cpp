@@ -331,7 +331,8 @@ PaneSwitch::PaneSwitch(const char *name, bool leftAligned, uint32 flags)
 
 PaneSwitch::~PaneSwitch()
 {
-	SetLabels(NULL, NULL);
+	free(fLabelOn);
+	free(fLabelOff);
 }
 
 
