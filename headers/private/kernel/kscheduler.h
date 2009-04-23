@@ -15,27 +15,6 @@ struct thread;
 struct SchedulerListener;
 
 
-#ifdef __cplusplus
-
-#include <util/DoublyLinkedList.h>
-
-struct SchedulerListener : DoublyLinkedListLinkImpl<SchedulerListener> {
-	virtual						~SchedulerListener();
-
-	virtual	void				ThreadEnqueuedInRunQueue(
-									struct thread* thread) = 0;
-	virtual	void				ThreadRemovedFromRunQueue(
-									struct thread* thread) = 0;
-	virtual	void				ThreadScheduled(struct thread* oldThread,
-									struct thread* newThread) = 0;
-};
-
-typedef DoublyLinkedList<SchedulerListener> SchedulerListenerList;
-extern SchedulerListenerList gSchedulerListeners;
-
-#endif	// __cplusplus
-
-
 struct scheduler_ops {
 	void (*enqueue_in_run_queue)(struct thread* thread);
 	void (*reschedule)(void);

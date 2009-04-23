@@ -13,6 +13,7 @@
 #include <kscheduler.h>
 #include <ksignal.h>
 #include <int.h>
+#include <listeners.h>
 #include <scheduling_analysis.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -190,6 +191,8 @@ ConditionVariable::Init(const void* object, const char* objectType)
 	new(&fEntries) EntryList;
 
 	T_SCHEDULING_ANALYSIS(InitConditionVariable(this, object, objectType));
+	NotifyWaitObjectListeners(&WaitObjectListener::ConditionVariableInitialized,
+		this);
 }
 
 
@@ -203,6 +206,8 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 	new(&fEntries) EntryList;
 
 	T_SCHEDULING_ANALYSIS(InitConditionVariable(this, object, objectType));
+	NotifyWaitObjectListeners(&WaitObjectListener::ConditionVariableInitialized,
+		this);
 
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);

@@ -637,7 +637,8 @@ profile_all(const char* const* programArgs, int programArgCount)
 			break;
 
 		// get next buffer
-		error = _kern_system_profiler_next_buffer(bufferSize);
+		uint64 droppedEvents = 0;
+		error = _kern_system_profiler_next_buffer(bufferSize, &droppedEvents);
 
 		if (error != B_OK) {
 			if (error == B_INTERRUPTED) {

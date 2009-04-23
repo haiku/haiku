@@ -17,6 +17,7 @@
 #include <int.h>
 #include <kernel.h>
 #include <kscheduler.h>
+#include <listeners.h>
 #include <scheduler_defs.h>
 #include <smp.h>
 #include <thread.h>
@@ -147,10 +148,8 @@ simple_enqueue_in_run_queue(struct thread *thread)
 	}
 
 	// notify listeners
-	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
-			SchedulerListener* listener = it.Next();) {
-		listener->ThreadEnqueuedInRunQueue(thread);
-	}
+	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
+		thread);
 }
 
 
@@ -174,10 +173,8 @@ simple_set_thread_priority(struct thread *thread, int32 priority)
 	T(RemoveThread(thread));
 
 	// notify listeners
-	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
-			SchedulerListener* listener = it.Next();) {
-		listener->ThreadRemovedFromRunQueue(thread);
-	}
+	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
+		thread);
 
 	// find thread in run queue
 	struct thread *item, *prev;
@@ -348,10 +345,8 @@ simple_reschedule(void)
 	T(ScheduleThread(nextThread, oldThread));
 
 	// notify listeners
-	for (SchedulerListenerList::Iterator it = gSchedulerListeners.GetIterator();
-			SchedulerListener* listener = it.Next();) {
-		listener->ThreadScheduled(oldThread, nextThread);
-	}
+	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled,
+		oldThread, nextThread);
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;

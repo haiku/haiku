@@ -95,7 +95,7 @@ status_t
 Team::Init(system_profiler_team_added* addedInfo)
 {
 	fID = addedInfo->team;
-	fArgs = addedInfo->args;
+	fArgs = addedInfo->name + addedInfo->args_offset;
 	return B_OK;
 }
 

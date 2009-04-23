@@ -4,6 +4,7 @@
  */
 
 #include <kscheduler.h>
+#include <listeners.h>
 #include <smp.h>
 
 #include "scheduler_affine.h"

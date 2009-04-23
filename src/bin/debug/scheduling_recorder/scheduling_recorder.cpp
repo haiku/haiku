@@ -179,7 +179,9 @@ public:
 				break;
 
 			// get next buffer
-			error = _kern_system_profiler_next_buffer(bufferSize);
+			uint64 droppedEvents = 0;
+			error = _kern_system_profiler_next_buffer(bufferSize,
+				&droppedEvents);
 
 			if (error != B_OK) {
 				if (error == B_INTERRUPTED) {
@@ -192,6 +194,9 @@ public:
 					kCommandName, strerror(error));
 				break;
 			}
+
+			if (droppedEvents > 0)
+				fprintf(stderr, "%llu events dropped\n", droppedEvents);
 		}
 
 		// stop profiling

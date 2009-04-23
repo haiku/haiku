@@ -17,7 +17,8 @@ __BEGIN_DECLS
 
 status_t _user_system_profiler_start(
 			struct system_profiler_parameters* parameters);
-status_t _user_system_profiler_next_buffer(size_t bytesRead);
+status_t _user_system_profiler_next_buffer(size_t bytesRead,
+			uint64* _droppedEvents);
 status_t _user_system_profiler_stop();
 
 __END_DECLS

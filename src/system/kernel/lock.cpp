@@ -19,6 +19,7 @@
 #include <debug.h>
 #include <int.h>
 #include <kernel.h>
+#include <listeners.h>
 #include <scheduling_analysis.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -219,6 +220,7 @@ rw_lock_init(rw_lock* lock, const char* name)
 	lock->flags = 0;
 
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
+	NotifyWaitObjectListeners(&WaitObjectListener::RWLockInitialized, lock);
 }
 
 
@@ -234,6 +236,7 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
 
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
+	NotifyWaitObjectListeners(&WaitObjectListener::RWLockInitialized, lock);
 }
 
 
@@ -430,6 +433,7 @@ mutex_init(mutex* lock, const char *name)
 	lock->flags = 0;
 
 	T_SCHEDULING_ANALYSIS(InitMutex(lock, name));
+	NotifyWaitObjectListeners(&WaitObjectListener::MutexInitialized, lock);
 }
 
 
@@ -446,6 +450,7 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 	lock->flags = flags & MUTEX_FLAG_CLONE_NAME;
 
 	T_SCHEDULING_ANALYSIS(InitMutex(lock, name));
+	NotifyWaitObjectListeners(&WaitObjectListener::MutexInitialized, lock);
 }
 
 

@@ -81,7 +81,8 @@ struct system_profiler_event_header {
 // B_SYSTEM_PROFILER_TEAM_ADDED
 struct system_profiler_team_added {
 	team_id		team;
-	char		args[1];
+	uint16		args_offset;
+	char		name[1];
 };
 
 // B_SYSTEM_PROFILER_TEAM_REMOVED
@@ -127,7 +128,7 @@ struct system_profiler_samples {
 	addr_t		samples[0];
 };
 
-// B_SYSTEM_PROFILER_THREAD_SCHEDULED,
+// B_SYSTEM_PROFILER_THREAD_SCHEDULED
 struct system_profiler_thread_scheduled {
 	bigtime_t	time;
 	thread_id	thread;
@@ -137,14 +138,14 @@ struct system_profiler_thread_scheduled {
 	addr_t		previous_thread_wait_object;
 };
 
-// B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
+// B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE
 struct system_profiler_thread_enqueued_in_run_queue {
 	bigtime_t	time;
 	thread_id	thread;
 	uint8		priority;
 };
 
-// B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
+// B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE
 struct system_profiler_thread_removed_from_run_queue {
 	bigtime_t	time;
 	thread_id	thread;

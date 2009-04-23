@@ -20,6 +20,7 @@
 #include <int.h>
 #include <arch/int.h>
 #include <debug.h>
+#include <listeners.h>
 #include <scheduling_analysis.h>
 #include <thread.h>
 #include <team.h>
@@ -359,7 +360,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	return B_OK;
 }
 
- 
+
 //	#pragma mark - Private Kernel API
 
 
@@ -495,6 +496,8 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 			count, name, owner, id);
 
 		T_SCHEDULING_ANALYSIS(CreateSemaphore(id, name));
+		NotifyWaitObjectListeners(&WaitObjectListener::SemaphoreCreated, id,
+			name);
 	}
 
 	RELEASE_SEM_LIST_LOCK();
@@ -1151,6 +1154,21 @@ set_sem_owner(sem_id id, team_id team)
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
+}
+
+
+/*!	Returns the name of the semaphore. The name is not copied, so the caller
+	must make sure that the semaphore remains alive as long as the name is used.
+*/
+const char*
+sem_get_name_unsafe(sem_id id)
+{
+	int slot = id % sMaxSems;
+
+	if (sSemsActive == false || id < 0 || sSems[slot].id != id)
+		return NULL;
+
+	return sSems[slot].u.used.name;
 }
 
 

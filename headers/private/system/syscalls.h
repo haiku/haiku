@@ -393,7 +393,8 @@ extern status_t		_kern_clear_debugger_breakpoint(void *address,
 
 extern status_t		_kern_system_profiler_start(
 						struct system_profiler_parameters* parameters);
-extern status_t		_kern_system_profiler_next_buffer(size_t bytesRead);
+extern status_t		_kern_system_profiler_next_buffer(size_t bytesRead,
+						uint64* _droppedEvents);
 extern status_t		_kern_system_profiler_stop();
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */

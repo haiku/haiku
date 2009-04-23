@@ -31,6 +31,8 @@ extern status_t deselect_sem(int32 object, struct select_info *info,
 
 extern sem_id create_sem_etc(int32 count, const char *name, team_id owner);
 
+extern const char* sem_get_name_unsafe(sem_id id);
+
 /* user calls */
 sem_id _user_create_sem(int32 count, const char *name);
 status_t _user_delete_sem(sem_id id);

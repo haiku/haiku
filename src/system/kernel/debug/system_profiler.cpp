@@ -13,9 +13,12 @@
 #include <system_profiler_defs.h>
 
 #include <cpu.h>
+#include <kernel.h>
 #include <kimage.h>
 #include <kscheduler.h>
+#include <listeners.h>
 #include <Notifications.h>
+#include <sem.h>
 #include <team.h>
 #include <thread.h>
 #include <user_debugger.h>
@@ -32,12 +35,17 @@
 class SystemProfiler;
 
 
+// minimum/maximum size of the table used for wait object caching
+#define MIN_WAIT_OBJECT_COUNT	128
+#define MAX_WAIT_OBJECT_COUNT	1024
+
+
 static spinlock sProfilerLock = B_SPINLOCK_INITIALIZER;
 static SystemProfiler* sProfiler = NULL;
 
 
 class SystemProfiler : public Referenceable, private NotificationListener,
-	private SchedulerListener {
+	private SchedulerListener, private WaitObjectListener {
 public:
 								SystemProfiler(team_id team,
 									const area_info& userAreaInfo,
@@ -48,7 +56,8 @@ public:
 			team_id				Team() const	{ return fTeam; }
 
 			status_t			Init();
-			status_t			NextBuffer(size_t bytesRead);
+			status_t			NextBuffer(size_t bytesRead,
+									uint64* _droppedEvents);
 
 private:
     virtual	void				EventOccured(NotificationService& service,
@@ -60,6 +69,13 @@ private:
 	virtual	void				ThreadScheduled(struct thread* oldThread,
 									struct thread* newThread);
 
+	virtual	void				SemaphoreCreated(sem_id id,
+									const char* name);
+	virtual	void				ConditionVariableInitialized(
+									ConditionVariable* variable);
+	virtual	void				MutexInitialized(mutex* lock);
+	virtual	void				RWLockInitialized(rw_lock* lock);
+
 			bool				_TeamAdded(struct team* team);
 			bool				_TeamRemoved(struct team* team);
 			bool				_TeamExec(struct team* team);
@@ -70,6 +86,12 @@ private:
 			bool				_ImageAdded(struct image* image);
 			bool				_ImageRemoved(struct image* image);
 
+			void				_WaitObjectCreated(addr_t object, uint32 type);
+			void				_WaitObjectUsed(addr_t object, uint32 type);
+
+	inline	void				_MaybeNotifyProfilerThreadLocked();
+	inline	void				_MaybeNotifyProfilerThread();
+
 	static	bool				_InitialTeamIterator(struct team* team,
 									void* cookie);
 	static	bool				_InitialThreadIterator(struct thread* thread,
@@ -78,8 +100,7 @@ private:
 									void* cookie);
 
 			void*				_AllocateBuffer(size_t size, int event, int cpu,
-									int count, bool threadsLocked = false,
-									bool* _unlockProfiler = NULL);
+									int count);
 
 	static	void				_InitTimers(void* cookie, int cpu);
 	static	void				_UninitTimers(void* cookie, int cpu);
@@ -97,6 +118,45 @@ private:
 				addr_t			buffer[B_DEBUG_STACK_TRACE_DEPTH];
 			};
 
+			struct WaitObjectKey {
+				addr_t	object;
+				uint32	type;
+			};
+
+			struct WaitObject : DoublyLinkedListLinkImpl<WaitObject>,
+					HashTableLink<WaitObject>, WaitObjectKey {
+			};
+
+			struct WaitObjectTableDefinition {
+				typedef WaitObjectKey	KeyType;
+				typedef	WaitObject		ValueType;
+
+				size_t HashKey(const WaitObjectKey& key) const
+				{
+					return (size_t)key.object ^ (size_t)key.type;
+				}
+
+				size_t Hash(const WaitObject* value) const
+				{
+					return HashKey(*value);
+				}
+
+				bool Compare(const WaitObjectKey& key,
+					const WaitObject* value) const
+				{
+					return value->type == key.type
+						&& value->object == key.object;
+				}
+
+				HashTableLink<WaitObject>* GetLink(WaitObject* value) const
+				{
+					return value;
+				}
+			};
+
+			typedef DoublyLinkedList<WaitObject> WaitObjectList;
+			typedef OpenHashTable<WaitObjectTableDefinition> WaitObjectTable;
+
 private:
 			spinlock			fLock;
 			team_id				fTeam;
@@ -111,6 +171,7 @@ private:
 			size_t				fBufferCapacity;
 			size_t				fBufferStart;
 			size_t				fBufferSize;
+			uint64				fDroppedEvents;
 			bool				fTeamNotificationsRequested;
 			bool				fTeamNotificationsEnabled;
 			bool				fThreadNotificationsRequested;
@@ -118,21 +179,50 @@ private:
 			bool				fImageNotificationsRequested;
 			bool				fImageNotificationsEnabled;
 			bool				fSchedulerNotificationsRequested;
+			bool				fWaitObjectNotificationsRequested;
 			ConditionVariable	fProfilerWaitCondition;
 			bool				fProfilerWaiting;
 			bool				fProfilingActive;
 			bool				fReentered[B_MAX_CPU_COUNT];
 			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
+			struct thread**		fRunningThreads;
+			WaitObject*			fWaitObjectBuffer;
+			int32				fWaitObjectCount;
+			WaitObjectList		fUsedWaitObjects;
+			WaitObjectList		fFreeWaitObjects;
+			WaitObjectTable		fWaitObjectTable;
 };
+
+
+inline void
+SystemProfiler::_MaybeNotifyProfilerThreadLocked()
+{
+	// If the buffer is full enough, notify the profiler.
+	if (fProfilerWaiting && fBufferSize > fBufferCapacity / 2) {
+		fProfilerWaiting = false;
+		int cpu = smp_get_current_cpu();
+		fReentered[cpu] = true;
+		fProfilerWaitCondition.NotifyOne(true);
+		fReentered[cpu] = false;
+	}
+}
+
+
+inline void
+SystemProfiler::_MaybeNotifyProfilerThread()
+{
+	if (!fProfilerWaiting)
+		return;
+
+	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+	SpinLocker locker(fLock);
+
+	_MaybeNotifyProfilerThreadLocked();
+}
 
 
 SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	const system_profiler_parameters& parameters)
-#if 0
-	// scheduling
-	size_t		locking_lookup_size;	// size of the lookup table used for
-										// caching the locking primitive infos
-#endif
 	:
 	fTeam(team),
 	fUserArea(userAreaInfo.area),
@@ -146,6 +236,7 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fBufferCapacity(0),
 	fBufferStart(0),
 	fBufferSize(0),
+	fDroppedEvents(0),
 	fTeamNotificationsRequested(false),
 	fTeamNotificationsEnabled(false),
 	fThreadNotificationsRequested(false),
@@ -153,12 +244,28 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fImageNotificationsRequested(false),
 	fImageNotificationsEnabled(false),
 	fSchedulerNotificationsRequested(false),
-	fProfilerWaiting(false)
+	fWaitObjectNotificationsRequested(false),
+	fProfilerWaiting(false),
+	fWaitObjectBuffer(NULL),
+	fWaitObjectCount(0),
+	fUsedWaitObjects(),
+	fFreeWaitObjects(),
+	fWaitObjectTable()
 {
 	B_INITIALIZE_SPINLOCK(&fLock);
 	fProfilerWaitCondition.Init(this, "system profiler");
 
 	memset(fReentered, 0, sizeof(fReentered));
+
+	// compute the number wait objects we want to cache
+	if ((fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
+		fWaitObjectCount = parameters.locking_lookup_size
+			/ (sizeof(WaitObject) + sizeof(void*));
+		if (fWaitObjectCount < MIN_WAIT_OBJECT_COUNT)
+			fWaitObjectCount = MIN_WAIT_OBJECT_COUNT;
+		if (fWaitObjectCount > MAX_WAIT_OBJECT_COUNT)
+			fWaitObjectCount = MAX_WAIT_OBJECT_COUNT;
+	}
 }
 
 
@@ -178,6 +285,12 @@ SystemProfiler::~SystemProfiler()
 	if (fSchedulerNotificationsRequested) {
 		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
 		scheduler_remove_listener(this);
+	}
+
+	// stop wait object listening
+	if (fWaitObjectNotificationsRequested) {
+		InterruptsSpinLocker locker(gWaitObjectListenerLock);
+		remove_wait_object_listener(this);
 	}
 
 	// deactivate the profiling timers on all CPUs
@@ -205,6 +318,10 @@ SystemProfiler::~SystemProfiler()
 		fTeamNotificationsRequested = false;
 		notificationManager.RemoveListener("teams", NULL, *this);
 	}
+
+	// delete wait object related allocations
+	fWaitObjectTable.Clear();
+	delete[] fWaitObjectBuffer;
 
 	// unlock the memory and delete the area
 	if (fKernelArea >= 0) {
@@ -240,6 +357,20 @@ SystemProfiler::Init()
 	fBufferCapacity = fAreaSize - (fBufferBase - (uint8*)areaBase);
 	fHeader->start = 0;
 	fHeader->size = 0;
+
+	// allocate the wait object buffer and init the hash table
+	if (fWaitObjectCount > 0) {
+		fWaitObjectBuffer = new(std::nothrow) WaitObject[fWaitObjectCount];
+		if (fWaitObjectBuffer == NULL)
+			return B_NO_MEMORY;
+
+		for (int32 i = 0; i < fWaitObjectCount; i++)
+			fFreeWaitObjects.Add(fWaitObjectBuffer + i);
+
+		error = fWaitObjectTable.Init(fWaitObjectCount);
+		if (error != B_OK)
+			return error;
+	}
 
 	// start listening for notifications
 
@@ -284,31 +415,49 @@ SystemProfiler::Init()
 		teamsLocker.Unlock();
 	}
 
-	// threads
-	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0) {
-		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
-		if (thread_iterate_through_threads(&_InitialThreadIterator, this)
-				!= NULL) {
-			return B_BUFFER_OVERFLOW;
-		}
-		fThreadNotificationsEnabled = true;
-		threadsLocker.Unlock();
-	}
-
 	// images
 	if ((fFlags & B_SYSTEM_PROFILER_IMAGE_EVENTS) != 0) {
 		if (image_iterate_through_images(&_InitialImageIterator, this) != NULL)
 			return B_BUFFER_OVERFLOW;
 	}
 
+	// threads
+	struct thread* runningThreads[B_MAX_CPU_COUNT];
+	memset(runningThreads, 0, sizeof(runningThreads));
+	fRunningThreads = runningThreads;
+
+	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+	if ((fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0
+		|| (fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
+		if (thread_iterate_through_threads(&_InitialThreadIterator, this)
+				!= NULL) {
+			return B_BUFFER_OVERFLOW;
+		}
+		fThreadNotificationsEnabled
+			= (fFlags & B_SYSTEM_PROFILER_THREAD_EVENTS) != 0;
+	}
+
 	fProfilingActive = true;
 
-	// start scheduler listening
+	// start scheduler and wait object listening
 	if ((fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
-		InterruptsSpinLocker threadsLocker(gThreadSpinlock);
 		scheduler_add_listener(this);
 		fSchedulerNotificationsRequested = true;
+
+		SpinLocker waitObjectLocker(gWaitObjectListenerLock);
+		add_wait_object_listener(this);
+		fWaitObjectNotificationsRequested = true;
+		waitObjectLocker.Unlock();
+
+		// fake schedule events for the initially running threads
+		int32 cpuCount = smp_get_num_cpus();
+		for (int32 i = 0; i < cpuCount; i++) {
+			if (runningThreads[i] != NULL)
+				ThreadScheduled(runningThreads[i], runningThreads[i]);
+		}
 	}
+
+	threadsLocker.Unlock();
 
 	// activate the profiling timers on all CPUs
 	if ((fFlags & B_SYSTEM_PROFILER_SAMPLING_EVENTS) != 0)
@@ -319,7 +468,7 @@ SystemProfiler::Init()
 
 
 status_t
-SystemProfiler::NextBuffer(size_t bytesRead)
+SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 {
 	InterruptsSpinLocker locker(fLock);
 
@@ -348,12 +497,14 @@ SystemProfiler::NextBuffer(size_t bytesRead)
 
 		status_t error = waitEntry.Wait(
 			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 1000000);
-		if (error == B_OK) {
-			// the caller has unset fProfilerWaiting for us
-			return B_OK;
-		}
 
 		locker.Lock();
+
+		if (error == B_OK) {
+			// the caller has unset fProfilerWaiting for us
+			break;
+		}
+
 		fProfilerWaiting = false;
 
 		if (error != B_TIMED_OUT)
@@ -361,8 +512,15 @@ SystemProfiler::NextBuffer(size_t bytesRead)
 
 		// just the timeout -- return, if the buffer is not empty
 		if (fBufferSize > 0)
-			return B_OK;
+			break;
 	}
+
+	if (_droppedEvents != NULL) {
+		*_droppedEvents = fDroppedEvents;
+		fDroppedEvents = 0;
+	}
+
+	return B_OK;
 }
 
 
@@ -445,35 +603,24 @@ SystemProfiler::EventOccured(NotificationService& service,
 				break;
 		}
 	}
+
+	_MaybeNotifyProfilerThread();
 }
 
-
-#if 0
-// B_SYSTEM_PROFILER_WAIT_OBJECT_INFO
-struct system_profiler_wait_object_info {
-	uint32		type;
-	void*		object;
-	void*		referenced_object;
-	char		name[1];
-};
-#endif
 
 void
 SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 {
 	int cpu = smp_get_current_cpu();
 
-	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+	SpinLocker locker(fLock, false, !fReentered[cpu]);
 		// When re-entering, we already hold the lock.
-
-	bool unlockProfiler = false;
 
 	system_profiler_thread_enqueued_in_run_queue* event
 		= (system_profiler_thread_enqueued_in_run_queue*)
 			_AllocateBuffer(
 				sizeof(system_profiler_thread_enqueued_in_run_queue),
-				B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
-				cpu, 0, true, &unlockProfiler);
+				B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE, cpu, 0);
 	if (event == NULL)
 		return;
 
@@ -487,16 +634,8 @@ SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 	// if it had been waiting on a condition variable, since then we'd likely
 	// deadlock in ConditionVariable::NotifyOne(), as it acquires a static
 	// spinlock.
-	if (unlockProfiler
-		&& thread->wait.type != THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
-		// NotifyOne() will probably re-enqueue the profiler thread to the
-		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
-		// Hence we need the re-entering detection.
-		fProfilerWaiting = false;
-		fReentered[cpu] = true;
-		fProfilerWaitCondition.NotifyOne(true);
-		fReentered[cpu] = false;
-	}
+	if (thread->wait.type != THREAD_BLOCK_TYPE_CONDITION_VARIABLE)
+		_MaybeNotifyProfilerThreadLocked();
 }
 
 
@@ -505,17 +644,14 @@ SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 {
 	int cpu = smp_get_current_cpu();
 
-	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+	SpinLocker locker(fLock, false, !fReentered[cpu]);
 		// When re-entering, we already hold the lock.
-
-	bool unlockProfiler = false;
 
 	system_profiler_thread_removed_from_run_queue* event
 		= (system_profiler_thread_removed_from_run_queue*)
 			_AllocateBuffer(
 				sizeof(system_profiler_thread_removed_from_run_queue),
-				B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
-				smp_get_current_cpu(), 0, true, &unlockProfiler);
+				B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE, cpu, 0);
 	if (event == NULL)
 		return;
 
@@ -525,15 +661,7 @@ SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 	fHeader->size = fBufferSize;
 
 	// unblock the profiler thread, if necessary
-	if (unlockProfiler) {
-		// NotifyOne() will probably re-enqueue the profiler thread to the
-		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
-		// Hence we need the re-entering detection.
-		fProfilerWaiting = false;
-		fReentered[cpu] = true;
-		fProfilerWaitCondition.NotifyOne(true);
-		fReentered[cpu] = false;
-	}
+	_MaybeNotifyProfilerThreadLocked();
 }
 
 
@@ -543,18 +671,17 @@ SystemProfiler::ThreadScheduled(struct thread* oldThread,
 {
 	int cpu = smp_get_current_cpu();
 
-	InterruptsSpinLocker locker(fLock, false, !fReentered[cpu]);
+	SpinLocker locker(fLock, false, !fReentered[cpu]);
 		// When re-entering, we already hold the lock.
 
-	// TODO: Deal with the wait object!
-
-	bool unlockProfiler = false;
+	// If the old thread starts waiting, handle the wait object.
+	if (oldThread->state == B_THREAD_WAITING)
+		_WaitObjectUsed((addr_t)oldThread->wait.object, oldThread->wait.type);
 
 	system_profiler_thread_scheduled* event
 		= (system_profiler_thread_scheduled*)
 			_AllocateBuffer(sizeof(system_profiler_thread_scheduled),
-				B_SYSTEM_PROFILER_THREAD_SCHEDULED, smp_get_current_cpu(), 0,
-				true, &unlockProfiler);
+				B_SYSTEM_PROFILER_THREAD_SCHEDULED, cpu, 0);
 	if (event == NULL)
 		return;
 
@@ -568,15 +695,35 @@ SystemProfiler::ThreadScheduled(struct thread* oldThread,
 	fHeader->size = fBufferSize;
 
 	// unblock the profiler thread, if necessary
-	if (unlockProfiler) {
-		// NotifyOne() will probably re-enqueue the profiler thread to the
-		// run queue, thus causing our ThreadEnqueuedInRunQueue() to be invoked.
-		// Hence we need the re-entering detection.
-		fProfilerWaiting = false;
-		fReentered[cpu] = true;
-		fProfilerWaitCondition.NotifyOne(true);
-		fReentered[cpu] = false;
-	}
+	_MaybeNotifyProfilerThreadLocked();
+}
+
+
+void
+SystemProfiler::SemaphoreCreated(sem_id id, const char* name)
+{
+	_WaitObjectCreated((addr_t)id, THREAD_BLOCK_TYPE_SEMAPHORE);
+}
+
+
+void
+SystemProfiler::ConditionVariableInitialized(ConditionVariable* variable)
+{
+	_WaitObjectCreated((addr_t)variable, THREAD_BLOCK_TYPE_CONDITION_VARIABLE);
+}
+
+
+void
+SystemProfiler::MutexInitialized(mutex* lock)
+{
+	_WaitObjectCreated((addr_t)lock, THREAD_BLOCK_TYPE_MUTEX);
+}
+
+
+void
+SystemProfiler::RWLockInitialized(rw_lock* lock)
+{
+	_WaitObjectCreated((addr_t)lock, THREAD_BLOCK_TYPE_RW_LOCK);
 }
 
 
@@ -585,16 +732,20 @@ SystemProfiler::_TeamAdded(struct team* team)
 {
 	InterruptsSpinLocker locker(fLock);
 
+	size_t nameLen = strlen(team->name);
 	size_t argsLen = strlen(team->args);
 
 	system_profiler_team_added* event = (system_profiler_team_added*)
-		_AllocateBuffer(sizeof(system_profiler_team_added) + argsLen,
+		_AllocateBuffer(
+			sizeof(system_profiler_team_added) + nameLen + 1 + argsLen,
 			B_SYSTEM_PROFILER_TEAM_ADDED, 0, 0);
 	if (event == NULL)
 		return false;
 
 	event->team = team->id;
-	strcpy(event->args, team->args);
+	strcpy(event->name, team->name);
+	event->args_offset = nameLen + 1;
+	strcpy(event->name + nameLen + 1, team->args);
 
 	fHeader->size = fBufferSize;
 
@@ -727,6 +878,124 @@ SystemProfiler::_ImageRemoved(struct image* image)
 }
 
 
+void
+SystemProfiler::_WaitObjectCreated(addr_t object, uint32 type)
+{
+	SpinLocker locker(fLock);
+
+	// look up the object
+	WaitObjectKey key;
+	key.object = object;
+	key.type = type;
+	WaitObject* waitObject = fWaitObjectTable.Lookup(key);
+
+	// If found, remove it and add it to the free list. This might sound weird,
+	// but it makes sense, since we lazily track *used* wait objects only.
+	// I.e. the object in the table is now guaranteedly obsolete.
+	if (waitObject) {
+		fWaitObjectTable.Remove(waitObject);
+		fUsedWaitObjects.Remove(waitObject);
+		fFreeWaitObjects.Add(waitObject, false);
+	}
+}
+
+void
+SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
+{
+	// look up the object
+	WaitObjectKey key;
+	key.object = object;
+	key.type = type;
+	WaitObject* waitObject = fWaitObjectTable.Lookup(key);
+
+	// If already known, re-queue it as most recently used and be done.
+	if (waitObject != NULL) {
+		fUsedWaitObjects.Remove(waitObject);
+		fUsedWaitObjects.Add(waitObject);
+		return;
+	}
+
+	// not known yet -- get the info
+	const char* name = NULL;
+	const void* referencedObject = NULL;
+
+	switch (type) {
+		case THREAD_BLOCK_TYPE_SEMAPHORE:
+		{
+			name = sem_get_name_unsafe((sem_id)object);
+			break;
+		}
+
+		case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+		{
+			ConditionVariable* variable = (ConditionVariable*)object;
+			name = variable->ObjectType();
+			referencedObject = variable->Object();
+			break;
+		}
+
+		case THREAD_BLOCK_TYPE_MUTEX:
+		{
+			mutex* lock = (mutex*)object;
+			name = lock->name;
+			break;
+		}
+
+		case THREAD_BLOCK_TYPE_RW_LOCK:
+		{
+			rw_lock* lock = (rw_lock*)object;
+			name = lock->name;
+			break;
+		}
+
+		case THREAD_BLOCK_TYPE_OTHER:
+		{
+			name = (const char*)(void*)object;
+			break;
+		}
+
+		case THREAD_BLOCK_TYPE_SNOOZE:
+		case THREAD_BLOCK_TYPE_SIGNAL:
+		default:
+			return;
+	}
+
+	// add the event
+	size_t nameLen = name != NULL ? strlen(name) : 0;
+
+	system_profiler_wait_object_info* event
+		= (system_profiler_wait_object_info*)
+			_AllocateBuffer(sizeof(system_profiler_wait_object_info) + nameLen,
+				B_SYSTEM_PROFILER_WAIT_OBJECT_INFO, 0, 0);
+	if (event != NULL)
+		return;
+
+	event->type = type;
+	event->object = object;
+	event->referenced_object = (addr_t)referencedObject;
+	if (name != NULL)
+		strcpy(event->name, name);
+	else
+		event->name[0] = '\0';
+
+	fHeader->size = fBufferSize;
+
+	// add the wait object
+
+	// get a free one or steal the least recently used one
+	waitObject = fFreeWaitObjects.RemoveHead();
+	if (waitObject == NULL) {
+		waitObject = fUsedWaitObjects.RemoveHead();
+		fWaitObjectTable.Remove(waitObject);
+	}
+
+	waitObject->object = object;
+	waitObject->type = type;
+	fWaitObjectTable.Insert(waitObject);
+	fUsedWaitObjects.Add(waitObject);
+}
+
+
 /*static*/ bool
 SystemProfiler::_InitialTeamIterator(struct team* team, void* cookie)
 {
@@ -739,6 +1008,12 @@ SystemProfiler::_InitialTeamIterator(struct team* team, void* cookie)
 SystemProfiler::_InitialThreadIterator(struct thread* thread, void* cookie)
 {
 	SystemProfiler* self = (SystemProfiler*)cookie;
+
+	if ((self->fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0
+		&& thread->state == B_THREAD_RUNNING && thread->cpu != NULL) {
+		self->fRunningThreads[thread->cpu->cpu_num] = thread;
+	}
+
 	return !self->_ThreadAdded(thread);
 }
 
@@ -754,8 +1029,7 @@ SystemProfiler::_InitialImageIterator(struct image* image, void* cookie)
 
 
 void*
-SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
-	bool threadsLocked, bool* _unlockProfiler)
+SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
 {
 	size = (size + 3) / 4 * 4;
 	size += sizeof(system_profiler_event_header);
@@ -773,8 +1047,10 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
 		} else
 			end -= fBufferCapacity;
 
-		if (end + size > fBufferStart)
+		if (end + size > fBufferStart) {
+			fDroppedEvents++;
 			return NULL;
+		}
 	}
 
 	system_profiler_event_header* header
@@ -784,20 +1060,6 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count,
 	header->size = size - sizeof(system_profiler_event_header);
 
 	fBufferSize += size;
-
-	// If the buffer is full enough notify the profiler.
-	if (fProfilerWaiting && fBufferSize > fBufferCapacity / 2) {
-		if (threadsLocked) {
-			// We're obviously recording scheduler events. NotifyOne() will
-			// likely requeue the profiler thread in the run queue, thus causing
-			// recursion. We can't really handle the problem here, so just
-			// notify our caller.
-			*_unlockProfiler = true;
-		} else {
-			fProfilerWaiting = false;
-			fProfilerWaitCondition.NotifyOne();
-		}
-	}
 
 	return header + 1;
 }
@@ -851,10 +1113,8 @@ SystemProfiler::_DoSample()
 		_AllocateBuffer(sizeof(system_profiler_samples)
 				+ count * sizeof(addr_t),
 			B_SYSTEM_PROFILER_SAMPLES, cpu, count);
-	if (event == NULL) {
-		// TODO: Count drops!
+	if (event == NULL)
 		return;
-	}
 
 	event->thread = thread->id;
 	memcpy(event->samples, cpuData.buffer, count * sizeof(addr_t));
@@ -883,7 +1143,7 @@ _user_system_profiler_start(struct system_profiler_parameters* userParameters)
 {
 	// copy params to the kernel
 	struct system_profiler_parameters parameters;
-	if (userParameters == NULL
+	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters)
 		|| user_memcpy(&parameters, userParameters, sizeof(parameters))
 			!= B_OK) {
 		return B_BAD_ADDRESS;
@@ -942,8 +1202,11 @@ _user_system_profiler_start(struct system_profiler_parameters* userParameters)
 
 
 status_t
-_user_system_profiler_next_buffer(size_t bytesRead)
+_user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 {
+	if (_droppedEvents != NULL && !IS_USER_ADDRESS(_droppedEvents))
+		return B_BAD_ADDRESS;
+
 	team_id team = thread_get_current_thread()->team->id;
 
 	InterruptsSpinLocker locker(sProfilerLock);
@@ -955,7 +1218,13 @@ _user_system_profiler_next_buffer(size_t bytesRead)
 	Reference<SystemProfiler> reference(profiler);
 	locker.Unlock();
 
-	return profiler->NextBuffer(bytesRead);
+	uint64 droppedEvents;
+	status_t error = profiler->NextBuffer(bytesRead,
+		_droppedEvents != NULL ? &droppedEvents : NULL);
+	if (error == B_OK && _droppedEvents != NULL)
+		user_memcpy(_droppedEvents, &droppedEvents, sizeof(droppedEvents));
+
+	return error;
 }
 
 

@@ -30,6 +30,7 @@ KernelMergeObject kernel_core.o :
 	int.c
 	kernel_daemon.cpp
 	linkhack.c
+	listeners.cpp
 	lock.cpp
 	low_resource_manager.cpp
 	main.cpp
