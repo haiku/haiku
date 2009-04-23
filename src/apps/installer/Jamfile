@@ -7,7 +7,6 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 Application Installer : 
 	CopyEngine.cpp
-	DrawButton.cpp
 	FSUtils.cpp
 	InstallerApp.cpp
 	InstallerCopyLoopControl.cpp

@@ -104,29 +104,52 @@ DialogPane::Mode() const
 }
 
 class PaneSwitch : public BControl {
-
 public:
-	PaneSwitch(BRect frame, const char *name, bool leftAligned = true,
-		uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								PaneSwitch(BRect frame, const char* name,
+									bool leftAligned = true,
+									uint32 resizeMask
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 
-	virtual	void Draw(BRect );
-	virtual	void MouseDown(BPoint );
+								PaneSwitch(const char* name,
+									bool leftAligned = true,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+
+	virtual						~PaneSwitch();
+
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				MouseDown(BPoint where);
+
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
+
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+
+			void				SetLabels(const char* labelOn,
+									const char* labelOff);
+
 protected:
+			void				DoneTracking(BPoint where);
+			void				Track(BPoint where, uint32);
 
-	void DoneTracking(BPoint );
-	void Track(BPoint, uint32);
+			enum State {
+				kCollapsed,
+				kPressed,
+				kExpanded
+			};
 
-	enum State {
-		kCollapsed,
-		kPressed,
-		kExpanded
-	};
+	virtual	void				DrawInState(PaneSwitch::State state);
 
-	virtual void DrawInState(PaneSwitch::State state);
-	
-	bool fLeftAligned;
-	bool fPressing;
+private:
+			bool				fLeftAligned;
+			bool				fPressing;
+
+			char*				fLabelOn;
+			char*				fLabelOff;
+
+	static	const int32			sLatchSize = 11;
 };
 
 } // namespace BPrivate

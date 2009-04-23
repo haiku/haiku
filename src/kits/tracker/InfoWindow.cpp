@@ -946,22 +946,11 @@ AttributeView::AttributeView(BRect rect, Model *model)
 
 	fPermissionsSwitch = new PaneSwitch(BRect(), "Permissions");
 	fPermissionsSwitch->SetMessage(new BMessage(kPermissionsSelected));
+	fPermissionsSwitch->SetLabels(NULL, "Permissions");
 	AddChild(fPermissionsSwitch);
-
-	BStringView *stringView = new BStringView(BRect(), "Permissions", "Permissions");
-
-	AddChild(stringView);
-
-	stringView->ResizeToPreferred();
-
-	BRect bounds = Bounds(), stringViewBounds = stringView->Bounds();
-	fPermissionsSwitch->MoveTo(kBorderWidth + 3, bounds.bottom - stringViewBounds.bottom +
-		(stringViewBounds.bottom - 11) / 2);
-
-	stringView->MoveTo(kBorderWidth + 11 + 3, bounds.bottom -
-		stringViewBounds.bottom);
-
-	fPermissionsSwitch->ResizeTo(10, 11);
+	fPermissionsSwitch->ResizeToPreferred();
+	fPermissionsSwitch->MoveTo(kBorderWidth + 3,
+		Bounds().bottom - 3 - fPermissionsSwitch->Bounds().Height());
 
 	InitStrings(model);
 }

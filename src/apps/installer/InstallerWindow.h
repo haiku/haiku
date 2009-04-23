@@ -2,7 +2,6 @@
  * Copyright 2005, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _InstallerWindow_h
 #define _InstallerWindow_h
 
@@ -14,11 +13,15 @@
 #include <String.h>
 #include <TextView.h>
 #include <Window.h>
+
 #include "CopyEngine.h"
-#include "DrawButton.h"
 #include "PackageViews.h"
 
 #define INSTALLER_RIGHT 402
+
+namespace BPrivate {
+	class PaneSwitch;
+};
 
 enum InstallStatus {
 	kReadyForInstall,
@@ -53,7 +56,7 @@ class InstallerWindow : public BWindow {
 		static int ComparePackages(const void *firstArg, const void *secondArg);
 		BBox *fBackBox;
 		BButton *fBeginButton, *fSetupButton;
-		DrawButton *fDrawButton;
+		PaneSwitch *fDrawButton;
 		bool fDriveSetupLaunched;
 		InstallStatus fInstallStatus;
 		BTextView *fStatusView;

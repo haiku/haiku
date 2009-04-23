@@ -4,8 +4,10 @@
  */
 
 #include "InstallerWindow.h"
+
 #include <stdio.h>
 #include <string.h>
+
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
@@ -18,7 +20,10 @@
 #include <String.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
+
+#include "DialogPane.h"
 #include "PartitionMenuItem.h"
+
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
 
@@ -130,9 +135,12 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBackBox->AddChild(fPackagesScrollView);
 	fPackagesScrollView->Hide();
 
-	fDrawButton = new DrawButton(BRect(bounds.left + 12, bounds.bottom - 33,
-		bounds.left + 120, bounds.bottom - 20), "options_button",
-		"Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
+	fDrawButton = new PaneSwitch(BRect(bounds.left + 12, bounds.bottom - 33,
+		bounds.left + 120, bounds.bottom - 20), "options_button");
+
+	fDrawButton->SetLabels("Fewer options", "More options");
+	fDrawButton->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
+
 	fBackBox->AddChild(fDrawButton);
 
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);

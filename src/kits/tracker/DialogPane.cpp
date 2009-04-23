@@ -32,10 +32,13 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include "Window.h"
 #include "DialogPane.h"
+
+#include <LayoutUtils.h>
+
 #include "Thread.h"
 #include "Utilities.h"
+#include "Window.h"
 
 
 const uint32 kValueChanged = 'swch';
@@ -300,15 +303,162 @@ DialogPane::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - PaneSwitch
 
 
 PaneSwitch::PaneSwitch(BRect frame, const char *name, bool leftAligned,
-	uint32 resizeMask, uint32 flags)
-	:	BControl(frame, name, "", 0, resizeMask, flags),
-		fLeftAligned(leftAligned),
-		fPressing(false)
+		uint32 resizeMask, uint32 flags)
+	:
+	BControl(frame, name, "", 0, resizeMask, flags),
+	fLeftAligned(leftAligned),
+	fPressing(false),
+	fLabelOn(NULL),
+	fLabelOff(NULL)
 {
+}
+
+
+PaneSwitch::PaneSwitch(const char *name, bool leftAligned, uint32 flags)
+	:
+	BControl(name, "", 0, flags),
+	fLeftAligned(leftAligned),
+	fPressing(false),
+	fLabelOn(NULL),
+	fLabelOff(NULL)
+{
+}
+
+
+PaneSwitch::~PaneSwitch()
+{
+	SetLabels(NULL, NULL);
+}
+
+
+void
+PaneSwitch::Draw(BRect)
+{
+	BRect bounds(Bounds());
+
+	// Draw the label, if any
+	const char* label = fLabelOff;
+	if (fLabelOn != NULL && Value() == B_CONTROL_ON)
+		label = fLabelOn;
+
+	if (label != NULL) {
+		BPoint point;
+		float labelDist = sLatchSize + ceilf(sLatchSize / 2.0);
+		if (fLeftAligned)
+			point.x = labelDist;
+		else
+			point.x = bounds.right - labelDist - StringWidth(label);
+
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		point.y = (bounds.top + bounds.bottom
+			- ceilf(fontHeight.ascent) - ceilf(fontHeight.descent)) / 2
+			+ ceilf(fontHeight.ascent);
+
+		DrawString(label, point);
+	}
+
+	// draw the latch
+	if (fPressing)
+		DrawInState(kPressed);
+	else if (Value())
+		DrawInState(kExpanded);
+	else
+		DrawInState(kCollapsed);
+
+	// ...and the focus indication
+	if (!IsFocus() || !Window()->IsActive())
+		return;
+
+	rgb_color markColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+
+	BeginLineArray(2);
+	AddLine(BPoint(bounds.left + 2, bounds.bottom - 1),
+		BPoint(bounds.right - 2, bounds.bottom - 1), markColor);
+	AddLine(BPoint(bounds.left + 2, bounds.bottom),
+		BPoint(bounds.right - 2, bounds.bottom), kWhite);
+	EndLineArray();
+}
+
+
+void
+PaneSwitch::MouseDown(BPoint)
+{
+	if (!IsEnabled())
+		return;
+
+	fPressing = true;
+	MouseDownThread<PaneSwitch>::TrackMouse(this, &PaneSwitch::DoneTracking,
+		&PaneSwitch::Track);
+	Invalidate();
+}
+
+
+void
+PaneSwitch::GetPreferredSize(float* _width, float* _height)
+{
+	BSize size = MinSize();
+	if (_width)
+		*_width = size.width;
+	if (_height)
+		*_height = size.height;
+}
+
+
+BSize
+PaneSwitch::MinSize()
+{
+	BSize size;
+	float onLabelWidth = StringWidth(fLabelOn);
+	float offLabelWidth = StringWidth(fLabelOff);
+	float labelWidth = max_c(onLabelWidth, offLabelWidth);
+	size.width = sLatchSize;
+	if (labelWidth > 0.0)
+		size.width += ceilf(sLatchSize / 2.0) + labelWidth;
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	size.height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+	size.height = max_c(size.height, sLatchSize);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+PaneSwitch::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), MinSize());
+}
+
+
+BSize
+PaneSwitch::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), MinSize());
+}
+
+
+void
+PaneSwitch::SetLabels(const char* labelOn, const char* labelOff)
+{
+	free(fLabelOn);
+	free(fLabelOff);
+
+	if (labelOn != NULL)
+		fLabelOn = strdup(labelOn);
+	else
+		fLabelOn = NULL;
+
+	if (labelOff != NULL)
+		fLabelOff = strdup(labelOff);
+	else
+		fLabelOff = NULL;
+
+	Invalidate();
+	InvalidateLayout();
 }
 
 
@@ -338,42 +488,6 @@ PaneSwitch::Track(BPoint point, uint32)
 		fPressing = newPressing;
 		Invalidate();
 	}
-}
-
-
-void
-PaneSwitch::MouseDown(BPoint)
-{
-	if (!IsEnabled())
-		return;
-
-	fPressing = true;
-	MouseDownThread<PaneSwitch>::TrackMouse(this, &PaneSwitch::DoneTracking,
-		&PaneSwitch::Track);
-	Invalidate();
-}
-
-
-void
-PaneSwitch::Draw(BRect)
-{
-	if (fPressing)
-		DrawInState(kPressed);
-	else if (Value())
-		DrawInState(kExpanded);
-	else
-		DrawInState(kCollapsed);
-
-	rgb_color markColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-	
-	bool focused = IsFocus() && Window()->IsActive();
-	BRect bounds(Bounds());
-	BeginLineArray(2);
-	AddLine(BPoint(bounds.left + 2, bounds.bottom - 1),
-		BPoint(bounds.right - 2, bounds.bottom - 1), focused ? markColor : ViewColor());
-	AddLine(BPoint(bounds.left + 2, bounds.bottom),
-		BPoint(bounds.right - 2, bounds.bottom), focused ? kWhite : ViewColor());
-	EndLineArray();
 }
 
 
