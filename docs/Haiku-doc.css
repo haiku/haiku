@@ -250,3 +250,31 @@ pre.terminal {			/* Terminal output*/
   	font-size: 0.8em;
 }
 
+/* printer only pretty stuff */
+@media /*screen,*/print {
+	/* suggest page orientation */
+	@page { size: portrait; }
+	.noprint {
+		display: none;
+	}
+	/* some links we want to print the url along with (CSS2) */
+	a.printurl:after {
+		content: " <" attr(href) ">";
+		font-weight: normal;
+		font-size: small;
+	}
+	/* override for those we really don't want to print */
+	a.noprinturl:after {
+		content: "";
+	}
+	/* for acronyms we want their definitions inlined at print time */
+	acronym[title]:after {
+		font-size: small;
+		content: " (" attr(title) ")";
+		font-style: italic;
+	}
+	/* and not have mozilla dotted underline */
+	acronym {
+		border: none;
+	}
+}
