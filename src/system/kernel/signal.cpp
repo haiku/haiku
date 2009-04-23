@@ -622,8 +622,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		GRAB_THREAD_LOCK();
 	}
 
-	// ToDo: maybe the scheduler should only be invoked if there is reason to do it?
-	//	(ie. deliver_signal() moved some threads in the running queue?)
+	// TODO: The scheduler should only be invoked if there is reason to do it
+	// (ie. deliver_signal() moved some threads in the running queue)!
 	if ((flags & (B_DO_NOT_RESCHEDULE | SIGNAL_FLAG_TEAMS_LOCKED)) == 0)
 		scheduler_reschedule();
 
