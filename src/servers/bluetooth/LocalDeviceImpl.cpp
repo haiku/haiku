@@ -34,24 +34,34 @@
 LocalDeviceImpl*
 LocalDeviceImpl::CreateControllerAccessor(BPath* path)
 {
-	HCIDelegate* hd = new (std::nothrow)HCIControllerAccessor(path);
-
-	if (hd != NULL)
-		return new  (std::nothrow)LocalDeviceImpl(hd);
-	else
+	HCIDelegate* delegate = new(std::nothrow) HCIControllerAccessor(path);
+	if (delegate == NULL)
 		return NULL;
+
+	LocalDeviceImpl* device = new(std::nothrow) LocalDeviceImpl(delegate);
+	if (device == NULL) {
+		delete delegate;
+		return NULL;
+	}
+
+	return device;
 }
 
 
 LocalDeviceImpl*
 LocalDeviceImpl::CreateTransportAccessor(BPath* path)
 {
-	HCIDelegate* hd = new (std::nothrow)HCITransportAccessor(path);
-
-	if (hd != NULL)
-		return new (std::nothrow)LocalDeviceImpl(hd);
-	else
+	HCIDelegate* delegate = new(std::nothrow) HCITransportAccessor(path);
+	if (delegate == NULL)
 		return NULL;
+
+	LocalDeviceImpl* device = new(std::nothrow) LocalDeviceImpl(delegate);
+	if (device == NULL) {
+		delete delegate;
+		return NULL;
+	}
+
+	return device;
 }
 
 
