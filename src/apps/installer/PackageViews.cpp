@@ -194,8 +194,17 @@ GroupView::~GroupView()
 }
 
 
+// #pragma mark -
+
+
 PackagesView::PackagesView(BRect rect, const char* name)
 	: BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+{
+}
+
+
+PackagesView::PackagesView(const char* name)
+	: BView(name, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 }
 
@@ -296,5 +305,18 @@ PackagesView::GetPackagesToInstall(BList *list, int32 *size)
 			*size += cb->GetPackage()->Size();
 		}
 	}
+}
+
+
+void
+PackagesView::GetPreferredSize(float* _width, float* _height)
+{
+	// TODO: Something more nice as default? I need to see how this looks
+	// when there are actually any packages...
+	if (_width != NULL)
+		*_width = 200.0;
+
+	if (_height != NULL)
+		*_height = 150.0;
 }
 

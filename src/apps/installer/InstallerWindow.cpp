@@ -33,26 +33,36 @@ const uint32 SETUP_MESSAGE = 'iSEP';
 const uint32 START_SCAN = 'iSSC';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
-class LogoView : public BBox {
-	public:
-		LogoView(const BRect &r);
-		~LogoView(void);
-		virtual void Draw(BRect update);
-	private:
-		BBitmap			*fLogo;
-		BPoint			fDrawPoint;
+class LogoView : public BView {
+public:
+								LogoView(const BRect& frame);
+								LogoView();
+	virtual						~LogoView();
+
+	virtual	void				Draw(BRect update);
+
+	virtual	void				GetPreferredSize(float* _width, float* _height);
+
+private:
+			void				_Init();
+
+			BBitmap*			fLogo;
 };
 
 
-LogoView::LogoView(const BRect &r)
-	: BBox(r, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW,
-		B_NO_BORDER)
+LogoView::LogoView(const BRect& frame)
+	:
+	BView(frame, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
-	if (fLogo) {
-		fDrawPoint.x = (r.Width() - fLogo->Bounds().Width()) / 2;
-		fDrawPoint.y = 0;
-	}
+	_Init();
+}
+
+
+LogoView::LogoView()
+	:
+	BView("logoview", B_WILL_DRAW)
+{
+	_Init();
 }
 
 
@@ -65,8 +75,38 @@ LogoView::~LogoView(void)
 void
 LogoView::Draw(BRect update)
 {
-	if (fLogo)
-		DrawBitmap(fLogo, fDrawPoint);
+	if (fLogo == NULL)
+		return;
+
+	BRect bounds(Bounds());
+	BPoint placement;
+	placement.x = (bounds.left + bounds.right - fLogo->Bounds().Width()) / 2;
+	placement.y = (bounds.top + bounds.bottom - fLogo->Bounds().Height()) / 2;
+
+	DrawBitmap(fLogo, placement);
+}
+
+
+void
+LogoView::GetPreferredSize(float* _width, float* _height)
+{
+	float width = 0.0;
+	float height = 0.0;
+	if (fLogo) {
+		width = fLogo->Bounds().Width();
+		height = fLogo->Bounds().Height();
+	}
+	if (_width)
+		*_width = width;
+	if (_height)
+		*_height = height;
+}
+
+
+void
+LogoView::_Init()
+{
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
 }
 
 
@@ -84,22 +124,19 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fCopyEngine = new CopyEngine(this);
 
 	BRect bounds = Bounds();
-	bounds.bottom += 1;
-	bounds.right += 1;
 	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
 	AddChild(fBackBox);
 
 	BRect logoRect = fBackBox->Bounds();
-	logoRect.left += 1;
-	logoRect.top = 12;
-	logoRect.right -= 226;
-	logoRect.bottom = logoRect.top + 46 + B_H_SCROLL_BAR_HEIGHT;
+	logoRect.left += 12;
+	logoRect.top += 12;
 	LogoView *logoView = new LogoView(logoRect);
+	logoView->ResizeToPreferred();
 	fBackBox->AddChild(logoView);
 
-	BRect statusRect(bounds.right - 222, logoRect.top + 2, bounds.right - 14,
-		logoRect.bottom - B_H_SCROLL_BAR_HEIGHT + 4);
+	BRect statusRect(logoView->Frame().right + 14, logoRect.top + 2,
+		bounds.right - 14, logoView->Frame().bottom - 2);
 	BRect textRect(statusRect);
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(2, 2);

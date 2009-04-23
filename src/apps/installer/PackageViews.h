@@ -105,12 +105,15 @@ private:
 class PackagesView : public BView {
 public:
 								PackagesView(BRect rect, const char* name);
+								PackagesView(const char* name);
 	virtual						~PackagesView();
 
 			void				Clean();
 			void				AddPackages(BList& list, BMessage* message);
 			void				GetTotalSizeAsString(char* string);
 			void				GetPackagesToInstall(BList* list, int32* size);
+
+	virtual	void				GetPreferredSize(float* _width, float* _height);
 
 private:
 			BList				fViews;
