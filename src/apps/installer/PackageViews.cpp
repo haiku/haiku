@@ -74,18 +74,30 @@ Package::PackageFromEntry(BEntry &entry)
 	int32 size;
 	char group[64];
 	memset(group, 0, 64);
-	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0, package->fName, 64) < 0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0,
+		package->fName, 64) < 0) {
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0, group, 64) < 0)
+	}
+	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0,
+		group, 64) < 0) {
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0, package->fDescription, 64) < 0)
+	}
+	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0,
+		package->fDescription, 64) < 0) {
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0, &onByDefault, sizeof(onByDefault)) < 0)
+	}
+	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0,
+		&onByDefault, sizeof(onByDefault)) < 0) {
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0, &alwaysOn, sizeof(alwaysOn)) < 0)
+	}
+	if (directory.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0,
+		&alwaysOn, sizeof(alwaysOn)) < 0) {
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0, &size, sizeof(size)) < 0)
+	}
+	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0,
+		&size, sizeof(size)) < 0) {
 		goto err;
+	}
 	package->SetGroupName(group);
 	package->SetSize(size);
 	package->SetAlwaysOn(alwaysOn);
@@ -153,7 +165,8 @@ PackageCheckBox::Draw(BRect update)
 
 
 void
-PackageCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+PackageCheckBox::MouseMoved(BPoint point, uint32 transit,
+	const BMessage* dragMessage)
 {
 	printf("%s called\n", __PRETTY_FUNCTION__);
 	if (transit == B_ENTERED_VIEW) {
@@ -198,7 +211,8 @@ PackagesView::Clean()
 {
 	BView *view;
 	while ((view = ChildAt(0))) {
-		if (dynamic_cast<GroupView*>(view) || dynamic_cast<PackageCheckBox*>(view)) {
+		if (dynamic_cast<GroupView*>(view)
+			|| dynamic_cast<PackageCheckBox*>(view)) {
 			RemoveChild(view);
 			delete view;
 		}
@@ -230,7 +244,8 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 			rect.OffsetBy(0, 17);
 		}
 		PackageCheckBox *checkBox = new PackageCheckBox(rect, package);
-		checkBox->SetValue(package->OnByDefault() ? B_CONTROL_ON : B_CONTROL_OFF);
+		checkBox->SetValue(package->OnByDefault()
+			? B_CONTROL_ON : B_CONTROL_OFF);
 		checkBox->SetEnabled(!package->AlwaysOn());
 		checkBox->SetMessage(new BMessage(*msg));
 		AddChild(checkBox);
@@ -244,7 +259,8 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 		vertScroller->SetRange(0.0f, 0.0f);
 		vertScroller->SetValue(0.0f);
 	} else {
-		vertScroller->SetRange(0.0f, rect.top - vertScroller->Bounds().Height());
+		vertScroller->SetRange(0.0f, rect.top
+			- vertScroller->Bounds().Height());
 		vertScroller->SetProportion(vertScroller->Bounds().Height() / rect.top);
 	}
 
