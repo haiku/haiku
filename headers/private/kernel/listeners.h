@@ -68,6 +68,8 @@ NotifySchedulerListeners(
 
 
 struct WaitObjectListener : DoublyLinkedListLinkImpl<WaitObjectListener> {
+	virtual						~WaitObjectListener();
+
 	virtual	void				SemaphoreCreated(sem_id id,
 									const char* name) = 0;
 	virtual	void				ConditionVariableInitialized(

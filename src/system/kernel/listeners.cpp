@@ -10,6 +10,11 @@ WaitObjectListenerList gWaitObjectListeners;
 spinlock gWaitObjectListenerLock = B_SPINLOCK_INITIALIZER;
 
 
+WaitObjectListener::~WaitObjectListener()
+{
+}
+
+
 /*!	Add the given wait object listener. gWaitObjectListenerLock lock must be
 	held.
 */
