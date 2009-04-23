@@ -9,14 +9,16 @@
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
-#include <bluetooth/LocalDevice.h>
-#include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
+#include <bluetooth/LocalDevice.h>
+#include <bluetooth/RemoteDevice.h>
 
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetoothserver_p.h>
 #include <CommandManager.h>
+
+#include <new>
 
 #include "KitSupport.h"
 
@@ -40,7 +42,7 @@ LocalDevice::RequestLocalDeviceID(BMessage* request)
 		reply.FindInt32("hci_id", &hid) == B_OK ) {
 	
 	    if (hid >= 0)
-		    lDevice = new LocalDevice(hid);
+		    lDevice = new (std::nothrow)LocalDevice(hid);
     }
 	
 	delete messenger;
@@ -109,7 +111,7 @@ DiscoveryAgent*
 LocalDevice::GetDiscoveryAgent()
 {
 	/* TODO: Study a singleton here */
-	return new DiscoveryAgent(this);
+	return new (std::nothrow)DiscoveryAgent(this);
 }
 
 
@@ -131,7 +133,7 @@ LocalDevice::GetProperty(const char* property, uint32* value)
 	BMessage request(BT_MSG_GET_PROPERTY);
 	BMessage reply;
 	
-	request.AddInt32("hci_id", hid);	
+	request.AddInt32("hci_id", fHid);	
 	request.AddString("property", property);
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
@@ -166,7 +168,7 @@ LocalDevice::SetDiscoverable(int mode)
 	int8	 bt_status = BT_ERROR;
 	
 	
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	
 	
 	void* command = buildWriteScan(mode, &size);
@@ -177,7 +179,8 @@ LocalDevice::SetDiscoverable(int mode)
 	
 	request.AddData("raw command", B_ANY_TYPE, command, size);
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, 
+		OCF_WRITE_SCAN_ENABLE));
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
 		if (reply.FindInt8("status", &bt_status ) == B_OK ) {
@@ -209,10 +212,11 @@ LocalDevice::GetBluetoothAddress()
 	ssize_t	ssize;
 	
 	/* ADD ID */
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, command, size);
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR));
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, 
+		OCF_READ_BD_ADDR));
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
 		if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &ssize) == B_OK )
@@ -220,6 +224,13 @@ LocalDevice::GetBluetoothAddress()
 	}
 
 	return bdaddrUtils::LocalAddress();
+}
+
+
+hci_id
+LocalDevice::ID(void) const
+{
+	return fHid;	
 }
 
 
@@ -239,10 +250,11 @@ LocalDevice::GetFriendlyName()
 	BMessage reply;
 	
 
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, command, size);
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, 
+		OCF_READ_LOCAL_NAME));
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK &&
 		reply.FindString("friendlyname", &friendlyname) == B_OK){		
@@ -273,13 +285,15 @@ LocalDevice::GetDeviceClass()
 		const uint8*	record;
 		ssize_t	ssize;
 	
-		request.AddInt32("hci_id", hid);
+		request.AddInt32("hci_id", fHid);
 		request.AddData("raw command", B_ANY_TYPE, command, size);
 	    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV));
+	    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+	    	OCF_READ_CLASS_OF_DEV));
 	
-		if (fMessenger->SendMessage(&request, &reply) == B_OK &&
-			reply.FindData("devclass", B_ANY_TYPE, 0, (const void**)&record, &ssize) == B_OK) {
+		if (fMessenger->SendMessage(&request, &reply) == B_OK
+			&& reply.FindData("devclass", B_ANY_TYPE, 0, (const void**)&record,
+			&ssize) == B_OK) {
 
 			fDeviceClass.SetRecord(*record);
 		}
@@ -301,10 +315,11 @@ LocalDevice::ReadLocalVersion()
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, localVersion.Data(), localVersion.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION));
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM,
+		OCF_READ_LOCAL_VERSION));
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindInt8("status", &bt_status);
@@ -324,10 +339,11 @@ LocalDevice::ReadBufferSize()
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, BufferSize.Data(), BufferSize.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE));
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM,
+		OCF_READ_BUFFER_SIZE));
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindInt8("status", &bt_status);
@@ -347,16 +363,17 @@ LocalDevice::Reset()
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
-	request.AddInt32("hci_id", hid);
+	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, Reset.Data(), Reset.Size());
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET));
-	
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+		OCF_RESET));
+
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindInt8("status", &bt_status);
 
 	return bt_status;
-		
+
 }
 
 /*
@@ -372,7 +389,7 @@ LocalDevice::updateRecord(ServiceRecord srvRecord) {
 */
 
 
-LocalDevice::LocalDevice(hci_id hid) : hid(hid)
+LocalDevice::LocalDevice(hci_id hid) : fHid(hid)
 {
 	fMessenger = _RetrieveBluetoothMessenger();
 	ReadLocalVersion();
@@ -384,14 +401,15 @@ LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 
 		// Uncomment this out if your Broadcom dongle is not working properly
 		// Reset();	// Perform a reset to Broadcom buggyland
-		
+
 
 //#define BT_WRITE_BDADDR_FOR_BCM2035
 #ifdef BT_WRITE_BDADDR_FOR_BCM2035
-		// try the bcm stuff
+		// try write bdaddr to a bcm2035 -> will be moved to an addon
 		int8	 bt_status = BT_ERROR;
 		
-		BluetoothCommand<typed_command(hci_write_bcm2035_bdaddr)> writeAddress(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR);
+		BluetoothCommand<typed_command(hci_write_bcm2035_bdaddr)> 
+			writeAddress(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR);
 		
 		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 		BMessage reply;
@@ -402,10 +420,11 @@ LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 		writeAddress->bdaddr.b[4] = 0x03;
 		writeAddress->bdaddr.b[5] = 0x00;
 		
-		request.AddInt32("hci_id", hid);
+		request.AddInt32("hci_id", fHid);
 		request.AddData("raw command", B_ANY_TYPE, writeAddress.Data(), writeAddress.Size());
 		request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-		request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR));
+		request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_VENDOR_CMD,
+			OCF_WRITE_BCM2035_BDADDR));
 		
 		if (fMessenger->SendMessage(&request, &reply) == B_OK)
 			reply.FindInt8("status", &bt_status);
@@ -418,8 +437,7 @@ LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 
 LocalDevice::~LocalDevice()
 {
-	if (fMessenger)
-		delete fMessenger;
+	delete fMessenger;
 }
 
 

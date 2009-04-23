@@ -45,11 +45,12 @@ DiscoveryListener::InquiryCompleted(int discType)
 /* private */
 
 /* A LocalDevice is always referenced in any request to the
-   Bluetooth server therefore is going to be needed in any */
+ * Bluetooth server therefore is going to be needed in any 
+ */
 void
 DiscoveryListener::SetLocalDeviceOwner(LocalDevice* ld)
 {
-    fLocalDevice = ld;
+	fLocalDevice = ld;
 }
 
 
@@ -63,26 +64,24 @@ DiscoveryListener::GetRemoteDevicesList(void)
 void
 DiscoveryListener::MessageReceived(BMessage* message)
 {
-    int8 status;
+	int8 status;
 
-    switch (message->what)
-    {
-        case BT_MSG_INQUIRY_DEVICE:
-        {
+	switch (message->what) {
+		case BT_MSG_INQUIRY_DEVICE:
+		{
 			const struct inquiry_info* inquiryInfo;
-		 	ssize_t	size;
+			ssize_t	size;
 			RemoteDevice* rd = NULL;
 			bool duplicatedFound = false;
 				
 			//  TODO: Loop for all inquiryInfo!
-			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK )
-			{
-			    // Skip duplicated replies
-			    for (int32 index = 0 ; index < fRemoteDevicesList.CountItems(); index++) {
-			    
-			    	bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)->GetBluetoothAddress();
-			    				     	                          
-			        if (bdaddrUtils::Compare( (bdaddr_t*) &inquiryInfo->bdaddr, &b1 )) {
+			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK) {
+				// Skip duplicated replies
+				for (int32 index = 0 ; index < fRemoteDevicesList.CountItems(); index++) {
+					
+					bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)->GetBluetoothAddress();
+
+					if (bdaddrUtils::Compare((bdaddr_t*) &inquiryInfo->bdaddr, &b1)) {
 
 						// update these values
 						fRemoteDevicesList.ItemAt(index)->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
@@ -90,60 +89,50 @@ DiscoveryListener::MessageReceived(BMessage* message)
 						fRemoteDevicesList.ItemAt(index)->fScanMode = inquiryInfo->pscan_mode;
 						fRemoteDevicesList.ItemAt(index)->fClockOffset = inquiryInfo->clock_offset;
 
-						duplicatedFound = true;		
-			            break;			        
-			        }			        
-			    }
+						duplicatedFound = true;
+						break;
+					}
+				}
 
 				if (!duplicatedFound) {
-
-       	            rd = new RemoteDevice(inquiryInfo->bdaddr, (uint8*)inquiryInfo->dev_class);			        
+					rd = new RemoteDevice(inquiryInfo->bdaddr, (uint8*)inquiryInfo->dev_class);
 					fRemoteDevicesList.AddItem(rd);
 					// keep all inquiry reported data
-	    	        rd->SetLocalDeviceOwner(fLocalDevice);
+					rd->SetLocalDeviceOwner(fLocalDevice);
 					rd->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
 					rd->fScanPeriodMode = inquiryInfo->pscan_period_mode;
 					rd->fScanMode = inquiryInfo->pscan_mode;
 					rd->fClockOffset = inquiryInfo->clock_offset;
 
-	        	    DeviceDiscovered( rd, rd->GetDeviceClass());
-	            }    	                              
-  			}
-        }
-        break;
+					DeviceDiscovered( rd, rd->GetDeviceClass());
+				}
+			}
+			break;
+		}
 
-        case BT_MSG_INQUIRY_STARTED:
-            if (message->FindInt8("status", &status) == B_OK){
-                fRemoteDevicesList.MakeEmpty();
-	            InquiryStarted(status);
-            }
+		case BT_MSG_INQUIRY_STARTED:
+			if (message->FindInt8("status", &status) == B_OK) {
+				fRemoteDevicesList.MakeEmpty();
+				InquiryStarted(status);
+			}
+			break;
 
-        break;
+		case BT_MSG_INQUIRY_COMPLETED:
+			InquiryCompleted(BT_INQUIRY_COMPLETED);
+			break;
 
-        case BT_MSG_INQUIRY_COMPLETED:
+		case BT_MSG_INQUIRY_TERMINATED: /* inquiry was cancelled */
+			InquiryCompleted(BT_INQUIRY_TERMINATED);
+			break;
+		
+		case BT_MSG_INQUIRY_ERROR:
+			InquiryCompleted(BT_INQUIRY_ERROR);
+			break;
 
-            InquiryCompleted(BT_INQUIRY_COMPLETED);
-
-        break;
-        case BT_MSG_INQUIRY_TERMINATED: /* inquiry was cancelled */
-
-            InquiryCompleted(BT_INQUIRY_TERMINATED);
-
-        break;
-        case BT_MSG_INQUIRY_ERROR:
-
-            InquiryCompleted(BT_INQUIRY_ERROR);
-
-        break;
-
-        default:
-
-            BLooper::MessageReceived(message);
-
-        break;
-
-    }
-
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
 }
 
 

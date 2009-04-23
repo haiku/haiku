@@ -1,21 +1,19 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
+#include <bluetooth/bluetooth_error.h>
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
-#include <bluetooth/RemoteDevice.h>
 #include <bluetooth/LocalDevice.h>
-#include <bluetooth/bluetooth_error.h>
+#include <bluetooth/RemoteDevice.h>
+
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
 #include <bluetoothserver_p.h>
 #include <CommandManager.h>
-
 
 #include "KitSupport.h"
 
@@ -25,7 +23,7 @@ namespace Bluetooth {
 RemoteDevicesList
 DiscoveryAgent::RetrieveDevices(int option)
 {
-    /* No inquiry process initiated */
+    // No inquiry process initiated
     if (fLastUsedListener == NULL)
         return RemoteDevicesList();
 
@@ -64,7 +62,7 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
     BMessage reply;
 
-    request.AddInt32("hci_id", fLocalDevice->GetID());
+    request.AddInt32("hci_id", fLocalDevice->ID());
 
     startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES, &size);
 
@@ -105,7 +103,7 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
     BMessage reply;
 
-    request.AddInt32("hci_id", fLocalDevice->GetID());
+    request.AddInt32("hci_id", fLocalDevice->ID());
 
     cancelInquiryCommand = buildInquiryCancel(&size);
     request.AddData("raw command", B_ANY_TYPE, cancelInquiryCommand, size);
@@ -121,11 +119,13 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     return B_ERROR;
 }
 
+
 void
 DiscoveryAgent::SetLocalDeviceOwner(LocalDevice* ld)
 {
     fLocalDevice = ld;
 }
+
 
 DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 {
@@ -136,8 +136,7 @@ DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 
 DiscoveryAgent::~DiscoveryAgent()
 {
-	if (fMessenger)
-		delete fMessenger;
+	delete fMessenger;
 }
 
 

@@ -46,11 +46,11 @@ public:
 			ServiceRecord getRecord(Connection notifier);
 			void updateRecord(ServiceRecord srvRecord);
 	*/
-			hci_id			GetID(void) {return hid;}
+			hci_id	ID() const;
 private:
 			LocalDevice(hci_id hid);
 			virtual	~LocalDevice();
-			
+
 			status_t		ReadLocalVersion();
 			status_t		ReadBufferSize();
 			status_t		Reset();
@@ -58,8 +58,7 @@ private:
 	static	LocalDevice*	RequestLocalDeviceID(BMessage* request);
 
 			BMessenger*		fMessenger;
-
-			hci_id			hid;
+			hci_id			fHid;
 
 	friend class DiscoveryAgent;
 	friend class RemoteDevice;

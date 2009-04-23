@@ -13,9 +13,9 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 	static const char *services[] = { "Positioning", "Networking",
 				"Rendering", "Capturing", "Object Transfer",
 				"Audio", "Telephony", "Information" };
-	
+
 	if (GetServiceClass() != 0) {
-		
+
 		for (uint s = 0; s < (sizeof(services) / sizeof(*services)); s++) {
 			if (GetServiceClass() & (1 << s)) {
 				serviceClass << services[s];
@@ -23,7 +23,7 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 					serviceClass << ", ";
 			}
 		}
-		
+
 	} else
 		serviceClass <<  "Unspecified";
 
@@ -53,55 +53,55 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 	switch (major) {
 		case 0:	/* misc */
 			minorClass << " -";
-		break;
+			break;
 		case 1:	/* computer */
 			switch(minor) {
 				case 0:
 					minorClass << "Uncategorized";
-				break;	
+					break;	
 				case 1:
 					minorClass << "Desktop workstation";
-				break;	
+					break;	
 				case 2:
 					minorClass << "Server";
-				break;
+					break;
 				case 3:
 					minorClass << "Laptop";
-				break;
+					break;
 				case 4:
 					minorClass << "Handheld";
-				break;
+					break;
 				case 5:
 					minorClass << "Palm";
-				break;
+					break;
 				case 6:
 					minorClass << "Wearable";
-				break;
+					break;
 				}
-				break;
+			break;
 		case 2:	/* phone */
 			switch(minor) {
 				case 0:
 					minorClass << "Uncategorized";
-				break;
+					break;
 				case 1:
 					minorClass << "Cellular";
-				break;
+					break;
 				case 2:
 					minorClass << "Cordless";
-				break;
+					break;
 				case 3:
 					minorClass << "Smart phone";
-				break;
+					break;
 				case 4:
 					minorClass << "Wired modem or voice gateway";
-				break;
+					break;
 				case 5:
 					minorClass << "Common ISDN Access";
-				break;
+					break;
 				case 6:
 					minorClass << "Sim Card Reader";
-				break;
+					break;
 			}
 			break;
 		case 3:	/* lan access */
@@ -112,131 +112,133 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 			switch(minor / 8) {
 				case 0:
 					minorClass << "Fully available";
-				break;
+					break;
 				case 1:
 					minorClass << "1-17% utilized";
-				break;
+					break;
 				case 2:
 					minorClass << "17-33% utilized";
-				break;
+					break;
 				case 3:
 					minorClass << "33-50% utilized";
-				break;
+					break;
 				case 4:
 					minorClass << "50-67% utilized";
-				break;
+					break;
 				case 5:
 					minorClass << "67-83% utilized";
-				break;
+					break;
 				case 6:
 					minorClass << "83-99% utilized";
-				break;
+					break;
 				case 7:
 					minorClass << "No service available";
-				break;
+					break;
 			}
-		break;
+			break;
 		case 4:	/* audio/video */
 			switch(minor) {
 				case 0:
 					minorClass << "Uncategorized";
-				break;
+					break;
 				case 1:
 					minorClass << "Device conforms to the Headset profile";
-				break;
+					break;
 				case 2:
 					minorClass << "Hands-free";
-				break;
+					break;
 					/* 3 is reserved */
 				case 4:
 					minorClass << "Microphone";
-				break;
+					break;
 				case 5:
 					minorClass << "Loudspeaker";
-				break;
+					break;
 				case 6:
 					minorClass << "Headphones";
-				break;
+					break;
 				case 7:
 					minorClass << "Portable Audio";
-				break;
+					break;
 				case 8:
 					minorClass << "Car Audio";
-				break;
+					break;
 				case 9:
 					minorClass << "Set-top box";
-				break;
+					break;
 				case 10:
 					minorClass << "HiFi Audio Device";
-				break;
+					break;
 				case 11:
 					minorClass << "VCR";
-				break;
+					break;
 				case 12:
 					minorClass << "Video Camera";
-				break;
+					break;
 				case 13:
 					minorClass << "Camcorder";
-				break;
+					break;
 				case 14:
 					minorClass << "Video Monitor";
-				break;
+					break;
 				case 15:
 					minorClass << "Video Display and Loudspeaker";
-				break;
+					break;
 				case 16:
 					minorClass << "Video Conferencing";
-				break;
+					break;
 					/* 17 is reserved */
 				case 18:
 					minorClass << "Gaming/Toy";
-				break;
+					break;
 			}
-		break;
-		case 5:	/* peripheral */ {		
+			break;
+		case 5:	/* peripheral */
+		{		
 			switch(minor & 48) {
 				case 16:
 					minorClass << "Keyboard";
 					if (minor & 15)
 						minorClass << "/";
-				break;
+					break;
 				case 32:
 					minorClass << "Pointing device";
 					if (minor & 15)
 						minorClass << "/";
-				break;
+					break;
 				case 48:
 					minorClass << "Combo keyboard/pointing device";
 					if (minor & 15)
 						minorClass << "/";							
-				break;
+					break;
 			}
 			
 			switch(minor & 15) {
 				case 0:
-				break;
+					break;
 				case 1:
 					minorClass << "Joystick";
-				break;
+					break;
 				case 2:
 					minorClass << "Gamepad";
-				break;
+					break;
 				case 3:
 					minorClass << "Remote control";
-				break;
+					break;
 				case 4:
 					minorClass << "Sensing device";
-				break;
+					break;
 				case 5:
 					minorClass << "Digitizer tablet";
-				break;
+					break;
 				case 6:
 					minorClass << "Card reader";
-				break;
+					break;
 				default:
 					minorClass << "(reserved)";
-				break;
+					break;
 			}
+			break;
 		}
 		case 6:	/* imaging */
 			if (minor & 4)
@@ -247,51 +249,51 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 				minorClass << "Scanner";
 			if (minor & 32)
 				minorClass << "Printer";
-		break;
+			break;
 		case 7: /* wearable */
 			switch(minor) {
 				case 1:
 					minorClass << "Wrist Watch";
-				break;
+					break;
 				case 2:
 					minorClass << "Pager";
-				break;
+					break;
 				case 3:
 					minorClass << "Jacket";
-				break;
+					break;
 				case 4:
 					minorClass << "Helmet";
-				break;
+					break;
 				case 5:
 					minorClass << "Glasses";
-				break;
+					break;
 			}
-		break;
+			break;
 		case 8: /* toy */
 			switch(minor) {
 				case 1:
 					minorClass << "Robot";
-				break;	
+					break;	
 				case 2:
 					minorClass << "Vehicle";
-				break;
+					break;
 				case 3:
 					minorClass << "Doll / Action Figure";
-				break;
+					break;
 				case 4:
 					minorClass << "Controller";
-				break;
+					break;
 				case 5:
 					minorClass << "Game";
-				break;
+					break;
 			}
-		break;
+			break;
 		case 63:	/* uncategorised */
 			minorClass << "";
-		break;
+			break;
 		default:
 			minorClass << "Unknown (reserved) minor device class";
-		break;
+			break;
 	}
 }
 
@@ -307,7 +309,7 @@ DeviceClass::DumpDeviceClass(BString& string)
 	string << " | ";
 	string << "Minor Class: ";
 	GetMinorDeviceClass(string);
-	string << ".";	
+	string << ".";
 }
 
 }

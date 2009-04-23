@@ -22,6 +22,7 @@
 #include <PincodeWindow.h>
 
 #include <stdio.h>
+#include <new>
 
 
 #if 0
@@ -33,10 +34,10 @@
 LocalDeviceImpl*
 LocalDeviceImpl::CreateControllerAccessor(BPath* path)
 {
-	HCIDelegate* hd = new HCIControllerAccessor(path);
+	HCIDelegate* hd = new (std::nothrow)HCIControllerAccessor(path);
 
 	if (hd != NULL)
-		return new LocalDeviceImpl(hd);
+		return new  (std::nothrow)LocalDeviceImpl(hd);
 	else
 		return NULL;
 }
@@ -45,10 +46,10 @@ LocalDeviceImpl::CreateControllerAccessor(BPath* path)
 LocalDeviceImpl*
 LocalDeviceImpl::CreateTransportAccessor(BPath* path)
 {
-	HCIDelegate* hd = new HCITransportAccessor(path);
+	HCIDelegate* hd = new (std::nothrow)HCITransportAccessor(path);
 
 	if (hd != NULL)
-		return new LocalDeviceImpl(hd);
+		return new (std::nothrow)LocalDeviceImpl(hd);
 	else
 		return NULL;
 }
