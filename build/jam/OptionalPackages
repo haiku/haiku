@@ -659,8 +659,8 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage yasm-0.7.2-gcc2-2008-11-25
-			: $(baseURL)/yasm-0.7.2-gcc2-2008-11-25.zip
+		InstallOptionalHaikuImagePackage yasm-0.8.0-gcc2-2009-04-19
+			: $(baseURL)/yasm-0.8.0-gcc2-haiku-2009-04-19.zip
 			:
 		;
 	}
