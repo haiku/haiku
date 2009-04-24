@@ -48,14 +48,15 @@ public:
 			BMenu*				GetSourceMenu() { return fSrcMenu; };
 			BMenu*				GetTargetMenu() { return fDestMenu; };
 private:
-			void				DisableInterface(bool disable);
-			void				LaunchDriveSetup();
-			void				PublishPackages();
-			void				ShowBottom();
-			void				StartScan();
-			void				AdjustMenus();
-			void				SetStatusMessage(const char* text);
-	static	int					ComparePackages(const void* firstArg,
+			void				_ShowOptionalPackages();
+			void				_LaunchDriveSetup();
+			void				_DisableInterface(bool disable);
+			void				_ScanPartitions();
+			void				_UpdateMenus();
+			void				_PublishPackages();
+			void				_SetStatusMessage(const char* text);
+
+	static	int					_ComparePackages(const void* firstArg,
 									const void* secondArg);
 
 			BButton*			fBeginButton;

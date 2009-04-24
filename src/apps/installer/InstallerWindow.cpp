@@ -344,11 +344,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case RESET_INSTALL:
 			fInstallStatus = kReadyForInstall;
 			fBeginButton->SetEnabled(true);
-			DisableInterface(false);
+			_DisableInterface(false);
 			fBeginButton->SetLabel("Begin");
 			break;
 		case START_SCAN:
-			StartScan();
+			_ScanPartitions();
 			break;
 		case BEGIN_MESSAGE:
 			switch (fInstallStatus) {
@@ -362,13 +362,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					fInstallStatus = kInstalling;
 					BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 					fBeginButton->SetLabel("Stop");
-					DisableInterface(true);
+					_DisableInterface(true);
 					break;
 				}
 				case kInstalling:
 					if (fCopyEngine->Cancel()) {
 						fInstallStatus = kCancelled;
-						SetStatusMessage("Installation cancelled.");
+						_SetStatusMessage("Installation cancelled.");
 					}
 					break;
 				case kFinished:
@@ -379,23 +379,23 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		case SHOW_BOTTOM_MESSAGE:
-			ShowBottom();
+			_ShowOptionalPackages();
 			break;
 		case SRC_PARTITION:
 			if (fLastSrcItem == fSrcMenu->FindMarked())
 				break;
 			fLastSrcItem = fSrcMenu->FindMarked();
-			PublishPackages();
-			AdjustMenus();
+			_PublishPackages();
+			_UpdateMenus();
 			break;
 		case TARGET_PARTITION:
 			if (fLastTargetItem == fDestMenu->FindMarked())
 				break;
 			fLastTargetItem = fDestMenu->FindMarked();
-			AdjustMenus();
+			_UpdateMenus();
 			break;
 		case SETUP_MESSAGE:
-			LaunchDriveSetup();
+			_LaunchDriveSetup();
 			break;
 		case PACKAGE_CHECKBOX: {
 			char buffer[15];
@@ -411,16 +411,16 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			const char *status;
 			if (msg->FindString("status", &status) == B_OK) {
 				fLastStatus = fStatusView->Text();
-				SetStatusMessage(status);
+				_SetStatusMessage(status);
 			} else
-				SetStatusMessage(fLastStatus.String());
+				_SetStatusMessage(fLastStatus.String());
 			break;
 		}
 		case INSTALL_FINISHED:
 			fBeginButton->SetLabel("Quit");
-			SetStatusMessage("Installation completed.");
+			_SetStatusMessage("Installation completed.");
 			fInstallStatus = kFinished;
-			DisableInterface(false);
+			_DisableInterface(false);
 			break;
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
@@ -430,13 +430,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				&& strcasecmp(signature, DRIVESETUP_SIG) == 0) {
 				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
 				fBeginButton->SetEnabled(!fDriveSetupLaunched);
-				DisableInterface(fDriveSetupLaunched);
+				_DisableInterface(fDriveSetupLaunched);
 				if (fDriveSetupLaunched)
-					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS
+					_SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS
 						"\nClose DriveSetup to continue with the\n"
 						"installation.");
 				else
-					StartScan();
+					_ScanPartitions();
 			}
 			break;
 		}
@@ -462,8 +462,11 @@ InstallerWindow::QuitRequested()
 }
 
 
+// #pragma mark -
+
+
 void
-InstallerWindow::ShowBottom()
+InstallerWindow::_ShowOptionalPackages()
 {
 	if (fPackagesLayoutItem && fSizeViewLayoutItem) {
 		fPackagesLayoutItem->SetVisible(fDrawButton->Value());
@@ -473,7 +476,7 @@ InstallerWindow::ShowBottom()
 
 
 void
-InstallerWindow::LaunchDriveSetup()
+InstallerWindow::_LaunchDriveSetup()
 {
 	if (be_roster->Launch(DRIVESETUP_SIG) != B_OK) {
 		// Try really hard to launch it. It's very likely that this fails,
@@ -497,7 +500,7 @@ InstallerWindow::LaunchDriveSetup()
 
 
 void
-InstallerWindow::DisableInterface(bool disable)
+InstallerWindow::_DisableInterface(bool disable)
 {
 	fSetupButton->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
@@ -506,9 +509,9 @@ InstallerWindow::DisableInterface(bool disable)
 
 
 void
-InstallerWindow::StartScan()
+InstallerWindow::_ScanPartitions()
 {
-	SetStatusMessage("Scanning for disks" B_UTF8_ELLIPSIS);
+	_SetStatusMessage("Scanning for disks" B_UTF8_ELLIPSIS);
 
 	BMenuItem *item;
 	while ((item = fSrcMenu->RemoveItem((int32)0)))
@@ -519,16 +522,16 @@ InstallerWindow::StartScan()
 	fCopyEngine->ScanDisksPartitions(fSrcMenu, fDestMenu);
 
 	if (fSrcMenu->ItemAt(0)) {
-		PublishPackages();
+		_PublishPackages();
 	}
-	AdjustMenus();
-	SetStatusMessage("Choose the disk you want to install onto from the "
+	_UpdateMenus();
+	_SetStatusMessage("Choose the disk you want to install onto from the "
 		"pop-up menu. Then click \"Begin\".");
 }
 
 
 void
-InstallerWindow::AdjustMenus()
+InstallerWindow::_UpdateMenus()
 {
 	PartitionMenuItem *item1 = (PartitionMenuItem *)fSrcMenu->FindMarked();
 	BString label;
@@ -557,14 +560,14 @@ InstallerWindow::AdjustMenus()
 	char message[255];
 	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
 		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
-	SetStatusMessage(message);
+	_SetStatusMessage(message);
 	if (item1 && item2)
 		fBeginButton->SetEnabled(true);
 }
 
 
 void
-InstallerWindow::PublishPackages()
+InstallerWindow::_PublishPackages()
 {
 	fPackagesView->Clean();
 	PartitionMenuItem *item = (PartitionMenuItem *)fSrcMenu->FindMarked();
@@ -601,15 +604,25 @@ InstallerWindow::PublishPackages()
 			packages.AddItem(package);
 		}
 	}
-	packages.SortItems(ComparePackages);
+	packages.SortItems(_ComparePackages);
 
 	fPackagesView->AddPackages(packages, new BMessage(PACKAGE_CHECKBOX));
 	PostMessage(PACKAGE_CHECKBOX);
 }
 
 
+void
+InstallerWindow::_SetStatusMessage(const char *text)
+{
+	fStatusView->SetText(text);
+}
+
+
+// #pragma mark -
+
+
 int
-InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
+InstallerWindow::_ComparePackages(const void *firstArg, const void *secondArg)
 {
 	const Group *group1 = *static_cast<const Group * const *>(firstArg);
 	const Group *group2 = *static_cast<const Group * const *>(secondArg);
@@ -625,10 +638,4 @@ InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
 	return strcmp(package1->Name(), package2->Name());
 }
 
-
-void
-InstallerWindow::SetStatusMessage(const char *text)
-{
-	fStatusView->SetText(text);
-}
 
