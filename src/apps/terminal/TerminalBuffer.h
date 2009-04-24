@@ -34,8 +34,11 @@ public:
 
 			void				UseAlternateScreenBuffer(bool clear);
 			void				UseNormalScreenBuffer();
-			
-			void				ReportAnyMouseEvent(bool reportAnyMouseEvent);
+
+			void				ReportX10MouseEvent(bool report);
+			void				ReportNormalMouseEvent(bool report);
+			void				ReportButtonMouseEvent(bool report);
+			void				ReportAnyMouseEvent(bool report);
 
 protected:
 	virtual	void				NotifyListener();

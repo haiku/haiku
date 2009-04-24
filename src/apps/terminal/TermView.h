@@ -177,7 +177,7 @@ private:
 			void			_ScrollTo(float y, bool scrollGfx);
 			void			_ScrollToRange(TermPos start, TermPos end);
 
-			void			_SendMouseEvent(int32 button, int32 mode, int32 x, 
+			void			_SendMouseEvent(int32 button, int32 mode, int32 x,
 								int32 y, bool motion);
 private:
 	class CharClassifier;
@@ -253,7 +253,12 @@ private:
 			bool			fCheckMouseTracking;
 			int				fSelectGranularity;
 			BPoint			fLastClickPoint;
-			
+
+			// mouse
+			TermPos			fPrevPos;
+			bool			fReportX10MouseEvent;
+			bool			fReportNormalMouseEvent;
+			bool			fReportButtonMouseEvent;
 			bool			fReportAnyMouseEvent;
 
 			// Input Method parameter.
@@ -267,4 +272,4 @@ private:
 };
 
 
-#endif //TERMVIEW_H
+#endif // TERMVIEW_H

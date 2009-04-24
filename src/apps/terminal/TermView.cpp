@@ -171,6 +171,9 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fScrBufSize(historySize),
+	fReportX10MouseEvent(false),
+	fReportNormalMouseEvent(false),
+	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
@@ -185,6 +188,9 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fRows(rows),
 	fEncoding(M_UTF8),
 	fScrBufSize(historySize),
+	fReportX10MouseEvent(false),
+	fReportNormalMouseEvent(false),
+	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
@@ -210,6 +216,9 @@ TermView::TermView(BMessage* archive)
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fScrBufSize(1000),
+	fReportX10MouseEvent(false),
+	fReportNormalMouseEvent(false),
+	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
 	// We need this
@@ -280,6 +289,10 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fMouseTracking = false;
 	fIMflag = false;
 	fCheckMouseTracking = false;
+	fPrevPos = TermPos(-1, - 1);
+	fReportX10MouseEvent = false;
+	fReportNormalMouseEvent = false;
+	fReportButtonMouseEvent = false;
 	fReportAnyMouseEvent = false;
 
 	fTextBuffer = new(std::nothrow) TerminalBuffer;
@@ -1521,11 +1534,20 @@ TermView::MessageReceived(BMessage *msg)
 				SetTitle(title);
 			break;
 		}
-		case MSG_REPORT_ANY_MOUSE_EVENT:
+		case MSG_REPORT_MOUSE_EVENT:
 		{
-			bool reportAnyMouseEvent;
-			if (msg->FindBool("reportAnyMouseEvent", &reportAnyMouseEvent) == B_OK)
-				fReportAnyMouseEvent = reportAnyMouseEvent;
+			bool report;
+			if (msg->FindBool("reportX10MouseEvent", &report) == B_OK)
+				fReportX10MouseEvent = report;
+
+			if (msg->FindBool("reportNormalMouseEvent", &report) == B_OK)
+				fReportNormalMouseEvent = report;
+
+			if (msg->FindBool("reportButtonMouseEvent", &report) == B_OK)
+				fReportButtonMouseEvent = report;
+
+			if (msg->FindBool("reportAnyMouseEvent", &report) == B_OK)
+				fReportAnyMouseEvent = report;
 			break;
 		}
 		case MSG_REMOVE_RESIZE_VIEW_IF_NEEDED:
@@ -2077,8 +2099,8 @@ TermView::MouseDown(BPoint where)
 
 	fMouseButtons = buttons;
 
-	if (fReportAnyMouseEvent) {
-
+	if (fReportAnyMouseEvent || fReportButtonMouseEvent
+		|| fReportNormalMouseEvent || fReportX10MouseEvent) {
   		TermPos clickPos = _ConvertToTerminal(where);
   		_SendMouseEvent(buttons, modifier, clickPos.x, clickPos.y, false);
 		return;
@@ -2169,11 +2191,20 @@ TermView::MouseDown(BPoint where)
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
-	if (fReportAnyMouseEvent) {
+	if (fReportAnyMouseEvent || fReportButtonMouseEvent) {
 		int32 modifier;
 		Window()->CurrentMessage()->FindInt32("modifiers", &modifier);
 
   		TermPos clickPos = _ConvertToTerminal(where);
+
+  		if (fReportButtonMouseEvent) {
+  			if (fPrevPos.x != clickPos.x || fPrevPos.y != clickPos.y) {
+		  		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y,
+					true);
+  			}
+  			fPrevPos = clickPos;
+  			return;
+  		}
   		_SendMouseEvent(fMouseButtons, modifier, clickPos.x, clickPos.y, true);
 		return;
 	}
@@ -2254,7 +2285,8 @@ TermView::MouseUp(BPoint where)
 	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
 
-	if (fReportAnyMouseEvent) {
+	if (fReportAnyMouseEvent || fReportButtonMouseEvent
+		|| fReportNormalMouseEvent) {
 	  	TermPos clickPos = _ConvertToTerminal(where);
 	  	_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
 	} else {

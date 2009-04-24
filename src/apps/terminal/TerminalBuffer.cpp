@@ -75,13 +75,46 @@ TerminalBuffer::Encoding() const
 
 
 void
+TerminalBuffer::ReportX10MouseEvent(bool reportX10MouseEvent)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_REPORT_MOUSE_EVENT);
+		message.AddBool("reportX10MouseEvent", reportX10MouseEvent);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::ReportNormalMouseEvent(bool reportNormalMouseEvent)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_REPORT_MOUSE_EVENT);
+		message.AddBool("reportNormalMouseEvent", reportNormalMouseEvent);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::ReportButtonMouseEvent(bool report)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_REPORT_MOUSE_EVENT);
+		message.AddBool("reportButtonMouseEvent", report);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::ReportAnyMouseEvent(bool reportAnyMouseEvent)
 {
 	if (fListenerValid) {
-		BMessage message(MSG_REPORT_ANY_MOUSE_EVENT);
+		BMessage message(MSG_REPORT_MOUSE_EVENT);
 		message.AddBool("reportAnyMouseEvent", reportAnyMouseEvent);
 		fListener.SendMessage(&message);
-	}	
+	}
 }
 
 

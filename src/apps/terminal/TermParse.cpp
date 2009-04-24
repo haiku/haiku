@@ -1094,6 +1094,10 @@ TermParse::_DecPrivateModeSet(int value)
 			// screen).
 			// Not supported yet.
 			break;
+		case 9:
+			// Set Mouse X and Y on button press.
+			fBuffer->ReportX10MouseEvent(true);
+			break;
 		case 12:
 			// Start Blinking Cursor.
 			// Not supported yet.
@@ -1107,7 +1111,13 @@ TermParse::_DecPrivateModeSet(int value)
 			fBuffer->UseAlternateScreenBuffer(false);
 			break;
 		case 1000:
-			// TODO: Send Mouse X & Y on button press and release.
+			// Send Mouse X & Y on button press and release.
+			fBuffer->ReportNormalMouseEvent(true);
+			break;
+		case 1002:
+			// Send Mouse X and Y on button press and release, and on motion
+			// when the mouse enter a new cell
+			fBuffer->ReportButtonMouseEvent(true);
 			break;
 		case 1003:
 			// Use All Motion Mouse Tracking
@@ -1155,6 +1165,10 @@ TermParse::_DecPrivateModeReset(int value)
 			// Normal Video (Leaves Reverse Video, cf. there).
 			// Not supported yet.
 			break;
+		case 9:
+			// Disable Mouse X and Y on button press.
+			fBuffer->ReportX10MouseEvent(false);
+			break;
 		case 12:
 			// Stop Blinking Cursor.
 			// Not supported yet.
@@ -1168,7 +1182,13 @@ TermParse::_DecPrivateModeReset(int value)
 			fBuffer->UseNormalScreenBuffer();
 			break;
 		case 1000:
-			// TODO: Don't send Mouse X & Y on button press and release.
+			// Don't send Mouse X & Y on button press and release.
+			fBuffer->ReportNormalMouseEvent(false);
+			break;
+		case 1002:
+			// Don't send Mouse X and Y on button press and release, and on motion
+			// when the mouse enter a new cell
+			fBuffer->ReportButtonMouseEvent(false);
 			break;
 		case 1003:
 			// Disable All Motion Mouse Tracking.
