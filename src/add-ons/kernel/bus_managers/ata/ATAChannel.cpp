@@ -322,6 +322,13 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 	uint8 deviceCount = fDeviceCount;
 	for (uint8 i = 0; i < deviceCount; i++) {
 		SelectDevice(i);
+
+		if (AltStatus() == 0xff) {
+			TRACE_ALWAYS("illegal status value for device %d,"
+				" assuming not present\n", i);
+			continue;
+		}
+
 		if (SelectedDevice() != i) {
 			TRACE_ALWAYS("cannot select device %d, assuming not present\n", i);
 			continue;
