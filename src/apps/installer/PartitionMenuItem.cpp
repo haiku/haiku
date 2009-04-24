@@ -9,9 +9,10 @@
 
 #include "PartitionMenuItem.h"
 
-PartitionMenuItem::PartitionMenuItem(const char *name, const char *label, const char *menuLabel,
-	BMessage *msg, partition_id id)
-	: BMenuItem(label, msg)
+PartitionMenuItem::PartitionMenuItem(const char* name, const char* label,
+		const char* menuLabel, BMessage* message, partition_id id)
+	:
+	BMenuItem(label, message)
 {
 	fID = id;
 	fMenuLabel = strdup(menuLabel);
@@ -24,3 +25,25 @@ PartitionMenuItem::~PartitionMenuItem()
 	free(fMenuLabel);
 	free(fName);
 }
+
+
+partition_id
+PartitionMenuItem::ID() const
+{
+	return fID;
+}
+
+
+const char*
+PartitionMenuItem::MenuLabel() const
+{
+	return fMenuLabel ? fMenuLabel : Label();
+}
+
+
+const char*
+PartitionMenuItem::Name() const
+{
+	return fName ? fName : Label();
+}
+
