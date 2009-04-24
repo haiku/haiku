@@ -598,11 +598,20 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 //	#pragma mark - connections
 
 
-void
+bool
 socket_acquire(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
+
+	// During destruction, the socket might still be accessible over its endpoint
+	// protocol. We need to make sure the endpoint cannot acquire the socket
+	// anymore -- while not obvious, the endpoint protocol is responsible for the
+	// proper locking here.
+	if (socket->CountReferences() == 0)
+		return false;
+
 	socket->AddReference();
+	return true;
 }
 
 

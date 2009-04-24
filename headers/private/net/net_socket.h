@@ -71,7 +71,7 @@ struct net_socket_module_info {
 					struct net_stat *stat);
 
 	// connections
-	void		(*acquire_socket)(net_socket *socket);
+	bool		(*acquire_socket)(net_socket *socket);
 	bool		(*release_socket)(net_socket *socket);
 
 	status_t	(*spawn_pending_socket)(net_socket *parent,

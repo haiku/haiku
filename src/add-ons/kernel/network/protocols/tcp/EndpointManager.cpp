@@ -320,8 +320,8 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to explicit endpoint %p\n",
 			endpoint));
-		gSocketModule->acquire_socket(endpoint->socket);
-		return endpoint;
+		if (gSocketModule->acquire_socket(endpoint->socket))
+			return endpoint;
 	}
 
 	// no explicit endpoint exists, check for wildcard endpoints
@@ -333,8 +333,8 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to wildcard endpoint %p\n",
 			endpoint));
-		gSocketModule->acquire_socket(endpoint->socket);
-		return endpoint;
+		if (gSocketModule->acquire_socket(endpoint->socket))
+			return endpoint;
 	}
 
 	SocketAddressStorage localWildcard(AddressModule());
@@ -345,8 +345,8 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to local wildcard endpoint "
 			"%p\n", endpoint));
-		gSocketModule->acquire_socket(endpoint->socket);
-		return endpoint;
+		if (gSocketModule->acquire_socket(endpoint->socket))
+			return endpoint;
 	}
 
 	// no matching endpoint exists

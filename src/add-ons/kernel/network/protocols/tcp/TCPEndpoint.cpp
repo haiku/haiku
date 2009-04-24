@@ -673,7 +673,7 @@ TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 
 		status = acquire_sem_etc(fAcceptSemaphore, 1, B_ABSOLUTE_TIMEOUT
 			| B_CAN_INTERRUPT, timeout);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		locker.Lock();
@@ -682,7 +682,7 @@ TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 		if (status == B_OK)
 			TRACE("  Accept() returning %p", (*_acceptedSocket)->first_protocol);
 #endif
-	} while (status < B_OK);
+	} while (status != B_OK);
 
 	return status;
 }
