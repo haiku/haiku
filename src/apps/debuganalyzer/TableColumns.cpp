@@ -122,6 +122,39 @@ Int32TableColumn::CompareValues(const Variant& a, const Variant& b)
 }
 
 
+// #pragma mark - Int64TableColumn
+
+
+Int64TableColumn::Int64TableColumn(int32 modelIndex, const char* title,
+	float width, float minWidth, float maxWidth, uint32 truncate,
+	alignment align)
+	:
+	StringTableColumn(modelIndex, title, width, minWidth, maxWidth, truncate,
+		align)
+{
+}
+
+
+BField*
+Int64TableColumn::PrepareField(const Variant& value) const
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%lld", value.ToInt64());
+	return StringTableColumn::PrepareField(
+		Variant(buffer, VARIANT_DONT_COPY_DATA));
+}
+
+
+int
+Int64TableColumn::CompareValues(const Variant& a, const Variant& b)
+{
+	int64 diff = a.ToInt64() - b.ToInt64();
+	if (diff == 0)
+		return 0;
+	return diff < 0 ? -1 : 1;
+}
+
+
 // #pragma mark - BigtimeTableColumn
 
 

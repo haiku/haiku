@@ -72,6 +72,22 @@ protected:
 };
 
 
+class Int64TableColumn : public StringTableColumn {
+public:
+								Int64TableColumn(int32 modelIndex,
+									const char* title, float width,
+									float minWidth, float maxWidth,
+									uint32 truncate = B_TRUNCATE_MIDDLE,
+									alignment align = B_ALIGN_RIGHT);
+
+protected:
+	virtual	BField*				PrepareField(const Variant& value) const;
+
+	virtual	int					CompareValues(const Variant& a,
+									const Variant& b);
+};
+
+
 class BigtimeTableColumn : public StringTableColumn {
 public:
 								BigtimeTableColumn(int32 modelIndex,
