@@ -799,9 +799,10 @@ main(int argc, char** argv)
 					if (files.size() < maxFileCount)
 						create_file(dirs, files);
 				} else {
-					// create some more files to fill up the list
-					uint32 count = min_c(maxFileCount, files.size() + 10);
-					for (uint32 i = 0; i < count; i++) {
+					// create some more files to fill up the list (ie. 10%)
+					uint32 count
+						= min_c(maxFileCount, files.size() + maxFileCount / 10);
+					for (uint32 i = files.size(); i < count; i++) {
 						create_file(dirs, files);
 					}
 				}
@@ -812,9 +813,10 @@ main(int argc, char** argv)
 					if (dirs.size() < maxDirCount)
 						create_dir(dirs);
 				} else {
-					// create some more directories to fill up the list
-					uint32 count = min_c(maxDirCount, dirs.size() + 5);
-					for (uint32 i = 0; i < count; i++) {
+					// create some more directories to fill up the list (ie. 10%)
+					uint32 count
+						= min_c(maxDirCount, dirs.size() + maxDirCount / 10);
+					for (uint32 i = dirs.size(); i < count; i++) {
 						create_dir(dirs);
 					}
 				}
