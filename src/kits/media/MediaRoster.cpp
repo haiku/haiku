@@ -2371,7 +2371,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 		return B_ERROR;
 	}
 
-	ASSERT(node_info.internal_id == flavorID);
+	ASSERT(info.internal_id == flavorID);
 
 	// load the BMediaAddOn object
 	BMediaAddOn* addon;
