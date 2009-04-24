@@ -70,6 +70,7 @@ static const char *kProgramName = __progname;
 
 static bool sDisableFileCache = false;
 static bool sVerbose = false;
+static bool sCheckBeforeRemove = false;
 static off_t sMaxFileSize = kDefaultMaxFileSize;
 static uint32 sCount = 0;
 
@@ -166,6 +167,7 @@ usage(int status)
 		"\t\t\t\tmeaning only check once at the end.\n"
 		"  -n, --no-cache\t\tDisables the file cache when doing I/O on\n"
 		"\t\t\t\ta file.\n"
+		"  -a, --always-check\tAlways check contents before removing data.\n"
 		"  -k, --keep-dirty\t\tDo not remove the working files on quit.\n"
 		"  -v, --verbose\t\t\tShow the actions as being performed\n",
 		kProgramName, kDefaultRunCount, kDefaultFileCount, kDefaultDirCount,
@@ -380,6 +382,66 @@ dump_block(const char* buffer, int size, const char* prefix)
 
 
 static void
+check_file(const struct entry& file)
+{
+	int fd = open_file(file.name, O_RDONLY);
+	if (fd < 0) {
+		error("opening file \"%s\" failed: %s", file.name.c_str(),
+			strerror(errno));
+	}
+
+	// first check if size matches
+
+	struct stat stat;
+	if (fstat(fd, &stat) != 0)
+		error("stat file \"%s\" failed: %s", file.name.c_str(), strerror(errno));
+
+	if (file.size != stat.st_size) {
+		warning("size does not match for \"%s\"! Expected %lld reported %lld",
+			file.name.c_str(), file.size, stat.st_size);
+		close(fd);
+		return;
+	}
+
+	// check contents
+
+	off_t size = file.size;
+	off_t offset = 0;
+	sReadTotal += size;
+
+	bigtime_t start = system_time();
+
+	while (size > 0) {
+		// read block
+		char block[kBlockSize];
+		ssize_t toRead = min_c(size, kBlockSize);
+		ssize_t bytesRead = read(fd, block, toRead);
+		if (bytesRead != toRead) {
+			error("reading \"%s\" failed: %s", file.name.c_str(),
+				strerror(errno));
+		}
+
+		// compare with generated block
+		char generatedBlock[kBlockSize];
+		generate_block(generatedBlock, file, offset);
+
+		if (memcmp(generatedBlock, block, bytesRead) != 0) {
+			dump_block(generatedBlock, bytesRead, "generated: ");
+			dump_block(block, bytesRead, "read:      ");
+			error("block at %lld differ in \"%s\"!", offset, file.name.c_str());
+		}
+
+		offset += toRead;
+		size -= toRead;
+	}
+
+	sReadTime += system_time() - start;
+
+	close(fd);
+}
+
+
+static void
 check_files(EntryVector& files)
 {
 	verbose("check all files...");
@@ -387,63 +449,7 @@ check_files(EntryVector& files)
 	for (EntryVector::iterator i = files.begin(); i != files.end(); i++) {
 		const struct entry& file = *i;
 
-		int fd = open_file(file.name, O_RDONLY);
-		if (fd < 0) {
-			error("opening file \"%s\" failed: %s", file.name.c_str(),
-				strerror(errno));
-		}
-
-		// first check if size matches
-
-		struct stat stat;
-		if (fstat(fd, &stat) != 0) {
-			error("stat file \"%s\" failed: %s", file.name.c_str(),
-				strerror(errno));
-		}
-
-		if (file.size != stat.st_size) {
-			warning("size does not match for \"%s\"! Expected %lld "
-				"reported %lld", file.name.c_str(), file.size, stat.st_size);
-			close(fd);
-			continue;
-		}
-
-		// check contents
-
-		off_t size = file.size;
-		off_t offset = 0;
-		sReadTotal += size;
-
-		bigtime_t start = system_time();
-
-		while (size > 0) {
-			// read block
-			char block[kBlockSize];
-			ssize_t toRead = min_c(size, kBlockSize);
-			ssize_t bytesRead = read(fd, block, toRead);
-			if (bytesRead != toRead) {
-				error("reading \"%s\" failed: %s", file.name.c_str(),
-					strerror(errno));
-			}
-
-			// compare with generated block
-			char generatedBlock[kBlockSize];
-			generate_block(generatedBlock, file, offset);
-
-			if (memcmp(generatedBlock, block, bytesRead) != 0) {
-				dump_block(generatedBlock, bytesRead, "generated: ");
-				dump_block(block, bytesRead, "read:      ");
-				error("block at %lld differ in \"%s\"!", offset,
-					file.name.c_str());
-			}
-
-			offset += toRead;
-			size -= toRead;
-		}
-
-		sReadTime += system_time() - start;
-
-		close(fd);
+		check_file(file);
 	}
 }
 
@@ -558,6 +564,9 @@ remove_file(EntryVector& files)
 	int index = choose_index(files);
 	const std::string& name = files[index].name;
 
+	if (sCheckBeforeRemove)
+		check_file(files[index]);
+
 	if (remove(name.c_str()) != 0)
 		error("removing file \"%s\" failed: %s", name.c_str(), strerror(errno));
 
@@ -622,6 +631,9 @@ replace_file(EntryVector& files)
 
 	action("replace \"%s\" contents", file.name.c_str());
 
+	if (sCheckBeforeRemove)
+		check_file(file);
+
 	int fd = open_file(file.name, O_CREAT | O_WRONLY | O_TRUNC);
 	if (fd < 0) {
 		error("replacing file \"%s\" failed: %s", file.name.c_str(),
@@ -644,6 +656,9 @@ truncate_file(EntryVector& files)
 	struct entry& file = files[choose_index(files)];
 
 	action("truncate \"%s\"", file.name.c_str());
+
+	if (sCheckBeforeRemove)
+		check_file(file);
 
 	int fd = open_file(file.name, O_WRONLY | O_TRUNC);
 	if (fd < 0) {
@@ -674,6 +689,7 @@ main(int argc, char** argv)
 		{"max-file-size", required_argument, 0, 'm'},
 		{"base-dir", required_argument, 0, 'b'},
 		{"no-cache", no_argument, 0, 'n'},
+		{"always-check", no_argument, 0, 'a'},
 		{"keep-dirty", no_argument, 0, 'k'},
 		{"verbose", no_argument, 0, 'v'},
 		{"help", no_argument, 0, 'h'},
@@ -684,6 +700,7 @@ main(int argc, char** argv)
 	uint32 maxDirCount = kDefaultDirCount;
 	uint32 runs = kDefaultRunCount;
 	uint32 checkInterval = 0;
+	uint32 seed = 0;
 	bool keepDirty = false;
 
 	struct entry base;
@@ -692,7 +709,7 @@ main(int argc, char** argv)
 	base.size = 0;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:b:nkvh", kOptions,
+	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:b:nakvh", kOptions,
 			NULL)) != -1) {
 		switch (c) {
 			case 0:
@@ -704,7 +721,7 @@ main(int argc, char** argv)
 				break;
 			case 's':
 				// seed
-				srand(strtoul(optarg, NULL, 0));
+				seed = strtoul(optarg, NULL, 0);
 				break;
 			case 'f':
 				// file count
@@ -738,6 +755,9 @@ main(int argc, char** argv)
 			case 'n':
 				sDisableFileCache = true;
 				break;
+			case 'a':
+				sCheckBeforeRemove = true;
+				break;
 			case 'k':
 				keepDirty = true;
 				break;
@@ -763,6 +783,11 @@ main(int argc, char** argv)
 	}
 
 	dirs.push_back(base);
+
+	srand(seed);
+
+	verbose("%lu runs, %lu files (up to %s in size), %lu dirs, seed %lu\n", runs,
+		maxFileCount, size_to_string(sMaxFileSize).c_str(), maxDirCount, seed);
 
 	for (sRun = 0; sRun < runs; sRun++) {
 		file_action action = choose_action();
