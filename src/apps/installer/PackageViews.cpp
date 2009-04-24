@@ -1,22 +1,30 @@
 /*
- * Copyright 2005, Jérôme DUVAL. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2005, Jérôme DUVAL.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <fs_attr.h>
+#include "PackageViews.h"
+
+#include <stdio.h>
+
+#include <ControlLook.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <fs_attr.h>
+#include <LayoutUtils.h>
 #include <Messenger.h>
 #include <ScrollBar.h>
 #include <String.h>
-#include <stdio.h>
 #include <View.h>
-#include "PackageViews.h"
+
 #include "InstallerWindow.h"
+
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
 void SizeAsString(off_t size, char *string);
+
 
 void
 SizeAsString(off_t size, char *string)
@@ -261,20 +269,6 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 		rect.OffsetBy(0, 20);
 	}
 	ResizeTo(bounds.Width(), rect.top);
-
-	BScrollBar *vertScroller = ScrollBar(B_VERTICAL);
-
-	if (vertScroller->Bounds().Height() > rect.top) {
-		vertScroller->SetRange(0.0f, 0.0f);
-		vertScroller->SetValue(0.0f);
-	} else {
-		vertScroller->SetRange(0.0f, rect.top
-			- vertScroller->Bounds().Height());
-		vertScroller->SetProportion(vertScroller->Bounds().Height() / rect.top);
-	}
-
-	vertScroller->SetSteps(15, vertScroller->Bounds().Height());
-
 	Invalidate();
 }
 
@@ -309,14 +303,61 @@ PackagesView::GetPackagesToInstall(BList *list, int32 *size)
 
 
 void
+PackagesView::FrameResized(float width, float height)
+{
+	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
+	if (scrollBar == NULL)
+		return;
+
+	float virtualHeight = 0.0;
+
+	int32 count = CountChildren();
+	if (count > 0) {
+		BView* child = ChildAt(count - 1);
+		virtualHeight = child->Frame().bottom;
+	}
+
+	if (height > virtualHeight) {
+		scrollBar->SetRange(0.0f, 0.0f);
+		scrollBar->SetValue(0.0f);
+	} else {
+		scrollBar->SetRange(0.0f, virtualHeight - height);
+		scrollBar->SetProportion(height / virtualHeight);
+	}
+
+	scrollBar->SetSteps(15, height);
+}
+
+
+void
+PackagesView::Draw(BRect updateRect)
+{
+	if (CountChildren() > 0)
+		return;
+
+	be_control_look->DrawLabel(this, "No optional packages available.",
+		Bounds(), updateRect, ViewColor(), BControlLook::B_DISABLED,
+		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+}
+
+
+void
 PackagesView::GetPreferredSize(float* _width, float* _height)
 {
 	// TODO: Something more nice as default? I need to see how this looks
 	// when there are actually any packages...
 	if (_width != NULL)
-		*_width = 200.0;
+		*_width = 400.0;
 
 	if (_height != NULL)
-		*_height = 150.0;
+		*_height = 80.0;
+}
+
+
+BSize
+PackagesView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 }
 

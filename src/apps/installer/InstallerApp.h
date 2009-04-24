@@ -2,23 +2,23 @@
  * Copyright 2005, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
-#ifndef _InstallerApp_h
-#define _InstallerApp_h
+#ifndef INSTALLER_APP_H
+#define INSTALLER_APP_H
 
 #include <Application.h>
 #include "InstallerWindow.h"
 
+
 class InstallerApp : public BApplication {
-	public:
-		InstallerApp();
+public:
+								InstallerApp();
 
-	public:
-		virtual void AboutRequested();
-		virtual void ReadyToRun();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AboutRequested();
+	virtual	void				ReadyToRun();
 
-	private:
-		InstallerWindow *fWindow;
+private:
+			BWindow*			fEULAWindow;
 };
 
-#endif /* _InstallerApp_h */
+#endif // INSTALLER_APP_H

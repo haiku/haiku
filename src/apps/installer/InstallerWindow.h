@@ -2,8 +2,8 @@
  * Copyright 2005, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _InstallerWindow_h
-#define _InstallerWindow_h
+#ifndef INSTALLER_WINDOW_H
+#define INSTALLER_WINDOW_H
 
 #include <Box.h>
 #include <Button.h>
@@ -17,11 +17,11 @@
 #include "CopyEngine.h"
 #include "PackageViews.h"
 
-#define INSTALLER_RIGHT 402
-
 namespace BPrivate {
 	class PaneSwitch;
 };
+
+class BLayoutItem;
 
 enum InstallStatus {
 	kReadyForInstall,
@@ -37,40 +37,52 @@ const char PACKAGES_DIRECTORY[] = "_packages_";
 const char VAR_DIRECTORY[] = "var";
 
 class InstallerWindow : public BWindow {
-	public:
-		InstallerWindow(BRect frameRect);
-		virtual ~InstallerWindow();
+public:
+								InstallerWindow();
+	virtual						~InstallerWindow();
 
-		virtual void MessageReceived(BMessage *msg);
-		virtual bool QuitRequested();
-		BMenu *GetSourceMenu() { return fSrcMenu; };
-		BMenu *GetTargetMenu() { return fDestMenu; };
-	private:
-		void DisableInterface(bool disable);
-		void LaunchDriveSetup();
-		void PublishPackages();
-		void ShowBottom();
-		void StartScan();
-		void AdjustMenus();
-		void SetStatusMessage(const char *text);
-		static int ComparePackages(const void *firstArg, const void *secondArg);
-		BBox *fBackBox;
-		BButton *fBeginButton, *fSetupButton;
-		PaneSwitch *fDrawButton;
-		bool fDriveSetupLaunched;
-		InstallStatus fInstallStatus;
-		BTextView *fStatusView;
-		BMenu* fSrcMenu, *fDestMenu;
-		BMenuField* fSrcMenuField, *fDestMenuField;
-		PackagesView *fPackagesView;
-		BScrollView *fPackagesScrollView;
-		BStringView *fSizeView;
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
-		BBitmap *fLogo;
-		BPoint fDrawPoint;
-		CopyEngine *fCopyEngine;
-		BString fLastStatus;
-		BMenuItem *fLastSrcItem, *fLastTargetItem;
+			BMenu*				GetSourceMenu() { return fSrcMenu; };
+			BMenu*				GetTargetMenu() { return fDestMenu; };
+private:
+			void				DisableInterface(bool disable);
+			void				LaunchDriveSetup();
+			void				PublishPackages();
+			void				ShowBottom();
+			void				StartScan();
+			void				AdjustMenus();
+			void				SetStatusMessage(const char* text);
+	static	int					ComparePackages(const void* firstArg,
+									const void* secondArg);
+
+			BButton*			fBeginButton;
+			BButton*			fSetupButton;
+			PaneSwitch*			fDrawButton;
+
+			bool				fNeedsToCenterOnScreen;
+
+			bool				fDriveSetupLaunched;
+			InstallStatus		fInstallStatus;
+
+			BTextView*			fStatusView;
+			BMenu*				fSrcMenu;
+			BMenu*				fDestMenu;
+			BMenuField*			fSrcMenuField;
+			BMenuField*			fDestMenuField;
+			PackagesView*		fPackagesView;
+			BStringView*		fSizeView;
+
+			BLayoutItem*		fPackagesLayoutItem;
+			BLayoutItem*		fSizeViewLayoutItem;
+
+			CopyEngine*			fCopyEngine;
+			BString				fLastStatus;
+
+			BMenuItem*			fLastSrcItem;
+			BMenuItem*			fLastTargetItem;
 };
 
-#endif /* _InstallerWindow_h */
+#endif // INSTALLER_WINDOW_H

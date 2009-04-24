@@ -113,7 +113,10 @@ public:
 			void				GetTotalSizeAsString(char* string);
 			void				GetPackagesToInstall(BList* list, int32* size);
 
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				Draw(BRect updateRect);
 	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	BSize				MaxSize();
 
 private:
 			BList				fViews;

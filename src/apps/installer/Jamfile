@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src apps installer ;
 
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
-UsePrivateHeaders tracker ;
+UsePrivateHeaders shared storage tracker ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 Application Installer : 

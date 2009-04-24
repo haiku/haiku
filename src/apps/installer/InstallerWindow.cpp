@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2008, Jérôme DUVAL. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2005-2008, Jérôme DUVAL.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "InstallerWindow.h"
@@ -14,12 +15,20 @@
 #include <Box.h>
 #include <ClassInfo.h>
 #include <Directory.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
+#include <LayoutUtils.h>
+#include <MenuBar.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
+#include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
+
+#include "tracker_private.h"
 
 #include "DialogPane.h"
 #include "PartitionMenuItem.h"
@@ -52,7 +61,8 @@ private:
 
 LogoView::LogoView(const BRect& frame)
 	:
-	BView(frame, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
+	BView(frame, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
 	_Init();
 }
@@ -60,7 +70,7 @@ LogoView::LogoView(const BRect& frame)
 
 LogoView::LogoView()
 	:
-	BView("logoview", B_WILL_DRAW)
+	BView("logoview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
 	_Init();
 }
@@ -113,116 +123,217 @@ LogoView::_Init()
 // #pragma mark -
 
 
-InstallerWindow::InstallerWindow(BRect frame_rect)
-	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE),
+class SeparatorView : public BView {
+public:
+								SeparatorView(enum orientation orientation);
+	virtual						~SeparatorView();
+
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+	virtual	BSize				MaxSize();
+private:
+			enum orientation	fOrientation;
+};
+
+
+SeparatorView::SeparatorView(enum orientation orientation)
+	:
+	BView("separator", 0),
+	fOrientation(orientation)
+{
+	SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
+}
+
+
+SeparatorView::~SeparatorView()
+{
+}
+
+
+BSize
+SeparatorView::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(0, 0));
+}
+
+
+BSize
+SeparatorView::MaxSize()
+{
+	BSize size(0, 0);
+	if (fOrientation == B_VERTICAL)
+		size.height = B_SIZE_UNLIMITED;
+	else
+		size.width = B_SIZE_UNLIMITED;
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+SeparatorView::PreferredSize()
+{
+	BSize size(0, 0);
+	if (fOrientation == B_VERTICAL)
+		size.height = 10;
+	else
+		size.width = 10;
+
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+// #pragma mark -
+
+
+InstallerWindow::InstallerWindow()
+	: BWindow(BRect(-2000, -2000, -1800, -1800), "Installer", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fNeedsToCenterOnScreen(true),
+
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
+
+	fPackagesLayoutItem(NULL),
+	fSizeViewLayoutItem(NULL),
+
 	fLastSrcItem(NULL),
 	fLastTargetItem(NULL)
 {
 	fCopyEngine = new CopyEngine(this);
 
-	BRect bounds = Bounds();
-	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
-	AddChild(fBackBox);
+	LogoView* logoView = new LogoView();
 
-	BRect logoRect = fBackBox->Bounds();
-	logoRect.left += 12;
-	logoRect.top += 12;
-	LogoView *logoView = new LogoView(logoRect);
-	logoView->ResizeToPreferred();
-	fBackBox->AddChild(logoView);
-
-	BRect statusRect(logoView->Frame().right + 14, logoRect.top + 2,
-		bounds.right - 14, logoView->Frame().bottom - 2);
-	BRect textRect(statusRect);
-	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(2, 2);
-	fStatusView = new BTextView(statusRect, "statusView", textRect,
-		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fStatusView = new BTextView("statusView", be_plain_font, NULL, B_WILL_DRAW);
+	fStatusView->SetInsets(10, 10, 10, 10);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
-	BScrollView *scroll = new BScrollView("statusScroll", fStatusView,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
-	fBackBox->AddChild(scroll);
+	BSize logoSize = logoView->MinSize();
+	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66, B_SIZE_UNSET));
 
-	fBeginButton = new BButton(BRect(bounds.right - 90, bounds.bottom - 35,
-		bounds.right - 11, bounds.bottom - 11),
-		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fBeginButton = new BButton("begin_button", "Begin",
+		new BMessage(BEGIN_MESSAGE));
 	fBeginButton->MakeDefault(true);
 	fBeginButton->SetEnabled(false);
-	fBackBox->AddChild(fBeginButton);
 
-	fSetupButton = new BButton(BRect(bounds.left + 11, bounds.bottom - 35,
-		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36,
-		bounds.bottom - 22), "setup_button", "Setup partitions" B_UTF8_ELLIPSIS,
-		new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fBackBox->AddChild(fSetupButton);
-	fSetupButton->Hide();
+	fSetupButton = new BButton("setup_button",
+		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
-	fPackagesView = new PackagesView(BRect(bounds.left + 12, bounds.top + 4,
-		bounds.right - 15 - B_V_SCROLL_BAR_WIDTH, bounds.bottom - 61),
-		"packages_view");
-	fPackagesScrollView = new BScrollView("packagesScroll", fPackagesView,
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW, false, true);
-	fBackBox->AddChild(fPackagesScrollView);
-	fPackagesScrollView->Hide();
+	fPackagesView = new PackagesView("packages_view");
+	BScrollView* packagesScrollView = new BScrollView("packagesScroll",
+		fPackagesView, B_WILL_DRAW, false, true);
 
-	fDrawButton = new PaneSwitch(BRect(bounds.left + 12, bounds.bottom - 33,
-		bounds.left + 120, bounds.bottom - 20), "options_button");
-
-	fDrawButton->SetLabels("Fewer options", "More options");
+	fDrawButton = new PaneSwitch("options_button");
+	fDrawButton->SetLabels("Hide Optional Packages", "Show Optional Packages");
 	fDrawButton->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
-
-	fBackBox->AddChild(fDrawButton);
+	fDrawButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	fDrawButton->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
-	BRect fieldRect(bounds.left + 13, bounds.top + 70, bounds.right - 13,
-		bounds.top + 90);
-	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
-		"Install from: ", fSrcMenu);
-	fSrcMenuField->SetDivider(bounds.right - 300);
+	fSrcMenuField = new BMenuField("srcMenuField", "Install from: ", fSrcMenu,
+		NULL);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fBackBox->AddChild(fSrcMenuField);
 
-	fieldRect.OffsetBy(0, 23);
-	fDestMenuField = new BMenuField(fieldRect, "destMenuField",
-		"Onto: ", fDestMenu);
-	fDestMenuField->SetDivider(bounds.right - 300);
+	fDestMenuField = new BMenuField("destMenuField", "Onto: ", fDestMenu,
+		NULL);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fBackBox->AddChild(fDestMenuField);
 
-	BRect sizeRect = fBackBox->Bounds();
-	sizeRect.top = 105;
-	sizeRect.bottom = sizeRect.top + 15;
-	sizeRect.right -= 12;
-	const char* requiredDiskSpaceString = "Disk space required: 0.0 KB";
-	sizeRect.left = sizeRect.right - be_plain_font->StringWidth(
-		requiredDiskSpaceString) - 40;
-	fSizeView = new BStringView(sizeRect, "size_view",
-		requiredDiskSpaceString, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	const char* requiredDiskSpaceString
+		= "Additional disk space required: 0.0 KB";
+	fSizeView = new BStringView("size_view", requiredDiskSpaceString);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
-	fBackBox->AddChild(fSizeView);
-	fSizeView->Hide();
+	fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	fSizeView->SetExplicitAlignment(
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(logoView)
+			.Add(fStatusView)
+		)
+		.Add(new SeparatorView(B_HORIZONTAL))
+		.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+			.Add(BGridLayoutBuilder(0, 10)
+				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
+				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
+				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
+				.Add(fDestMenuField->CreateMenuBarLayoutItem(), 1, 1)
+
+				.Add(BSpaceLayoutItem::CreateVerticalStrut(5), 0, 2, 2)
+
+				.Add(fDrawButton, 0, 3, 2)
+				.Add(packagesScrollView, 0, 4, 2)
+				.Add(fSizeView, 0, 5, 2)
+			)
+
+			.AddStrut(5)
+
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+				.Add(fSetupButton)
+				.AddGlue()
+				.Add(fBeginButton)
+			)
+			.SetInsets(10, 10, 10, 10)
+		)
+	);
+
+	// Make the optional packages invisible on start
+	BLayout* layout = packagesScrollView->Parent()->GetLayout();
+	int32 index = layout->IndexOfView(packagesScrollView);
+	fPackagesLayoutItem = layout->ItemAt(index);
+
+	layout = fSizeView->Parent()->GetLayout();
+	index = layout->IndexOfView(fSizeView);
+	fSizeViewLayoutItem = layout->ItemAt(index);
+
+	fPackagesLayoutItem->SetVisible(false);
+	fSizeViewLayoutItem->SetVisible(false);
 
 	// finish creating window
+	if (!be_roster->IsRunning(kDeskbarSignature))
+		SetFlags(Flags() | B_NOT_MINIMIZABLE);
+
 	Show();
 
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
+ 
+	if (Lock()) {
+		fSetupButton->SetEnabled(!fDriveSetupLaunched);
+		Unlock();
+	}
+
 	be_roster->StartWatching(this);
 
 	PostMessage(START_SCAN);
 }
 
+
 InstallerWindow::~InstallerWindow()
 {
 	be_roster->StopWatching(this);
+}
+
+
+void
+InstallerWindow::FrameResized(float width, float height)
+{
+	BWindow::FrameResized(width, height);
+
+	if (fNeedsToCenterOnScreen) {
+		// We have created ourselves off-screen, since the size adoption
+		// because of the layout management may happen after Show(). We
+		// assume that the first frame event is because of this adoption and
+		// move ourselves to the screen center...
+		fNeedsToCenterOnScreen = false;
+		BRect frame = BScreen(this).Frame();
+		MoveTo(frame.left + (frame.Width() - Frame().Width()) / 2,
+			frame.top + (frame.Height() - Frame().Height()) / 2);
+	}
 }
 
 
@@ -290,7 +401,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			char buffer[15];
 			fPackagesView->GetTotalSizeAsString(buffer);
 			char string[255];
-			sprintf(string, "Disk space required: %s", buffer);
+			sprintf(string, "Additional disk space required: %s", buffer);
 			fSizeView->SetText(string);
 			break;
 		}
@@ -335,6 +446,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 	}
 }
 
+
 bool
 InstallerWindow::QuitRequested()
 {
@@ -353,22 +465,9 @@ InstallerWindow::QuitRequested()
 void
 InstallerWindow::ShowBottom()
 {
-	if (fDrawButton->Value()) {
-		ResizeTo(INSTALLER_RIGHT, 306);
-		if (fSetupButton->IsHidden())
-			fSetupButton->Show();
-		if (fPackagesScrollView->IsHidden())
-			fPackagesScrollView->Show();
-		if (fSizeView->IsHidden())
-			fSizeView->Show();
-	} else {
-		if (!fSetupButton->IsHidden())
-			fSetupButton->Hide();
-		if (!fPackagesScrollView->IsHidden())
-			fPackagesScrollView->Hide();
-		if (!fSizeView->IsHidden())
-			fSizeView->Hide();
-		ResizeTo(INSTALLER_RIGHT, 160);
+	if (fPackagesLayoutItem && fSizeViewLayoutItem) {
+		fPackagesLayoutItem->SetVisible(fDrawButton->Value());
+		fSizeViewLayoutItem->SetVisible(fDrawButton->Value());
 	}
 }
 
@@ -438,9 +537,8 @@ InstallerWindow::AdjustMenus()
 	} else {
 		if (fSrcMenu->CountItems() == 0)
 			label = "<none>";
-		else {
+		else
 			label = ((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel();
-		}
 	}
 	fSrcMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
 	fSrcMenuField->MenuItem()->SetLabel(label.String());
@@ -451,9 +549,8 @@ InstallerWindow::AdjustMenus()
 	} else {
 		if (fDestMenu->CountItems() == 0)
 			label = "<none>";
-		else {
-			label = ((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel();
-		}
+		else
+			label = "Please Choose Target";
 	}
 	fDestMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
 	fDestMenuField->MenuItem()->SetLabel(label.String());
