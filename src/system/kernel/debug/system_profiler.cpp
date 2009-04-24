@@ -260,7 +260,7 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	// compute the number wait objects we want to cache
 	if ((fFlags & B_SYSTEM_PROFILER_SCHEDULING_EVENTS) != 0) {
 		fWaitObjectCount = parameters.locking_lookup_size
-			/ (sizeof(WaitObject) + sizeof(void*));
+			/ (sizeof(WaitObject) + (sizeof(void*) * 3 / 2));
 		if (fWaitObjectCount < MIN_WAIT_OBJECT_COUNT)
 			fWaitObjectCount = MIN_WAIT_OBJECT_COUNT;
 		if (fWaitObjectCount > MAX_WAIT_OBJECT_COUNT)
@@ -367,7 +367,7 @@ SystemProfiler::Init()
 		for (int32 i = 0; i < fWaitObjectCount; i++)
 			fFreeWaitObjects.Add(fWaitObjectBuffer + i);
 
-		error = fWaitObjectTable.Init(fWaitObjectCount);
+		error = fWaitObjectTable.Init(fWaitObjectCount * 3 / 2);
 		if (error != B_OK)
 			return error;
 	}
@@ -893,7 +893,7 @@ SystemProfiler::_WaitObjectCreated(addr_t object, uint32 type)
 	// but it makes sense, since we lazily track *used* wait objects only.
 	// I.e. the object in the table is now guaranteedly obsolete.
 	if (waitObject) {
-		fWaitObjectTable.Remove(waitObject);
+		fWaitObjectTable.RemoveUnchecked(waitObject);
 		fUsedWaitObjects.Remove(waitObject);
 		fFreeWaitObjects.Add(waitObject, false);
 	}
@@ -967,7 +967,7 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 		= (system_profiler_wait_object_info*)
 			_AllocateBuffer(sizeof(system_profiler_wait_object_info) + nameLen,
 				B_SYSTEM_PROFILER_WAIT_OBJECT_INFO, 0, 0);
-	if (event != NULL)
+	if (event == NULL)
 		return;
 
 	event->type = type;
@@ -986,12 +986,12 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 	waitObject = fFreeWaitObjects.RemoveHead();
 	if (waitObject == NULL) {
 		waitObject = fUsedWaitObjects.RemoveHead();
-		fWaitObjectTable.Remove(waitObject);
+		fWaitObjectTable.RemoveUnchecked(waitObject);
 	}
 
 	waitObject->object = object;
 	waitObject->type = type;
-	fWaitObjectTable.Insert(waitObject);
+	fWaitObjectTable.InsertUnchecked(waitObject);
 	fUsedWaitObjects.Add(waitObject);
 }
 
