@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src apps debuganalyzer ;
 UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) main_window ] ;
+
 Application DebugAnalyzer
 	:
 	DataSource.cpp
