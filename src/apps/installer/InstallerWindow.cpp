@@ -543,7 +543,6 @@ InstallerWindow::_UpdateMenus()
 		else
 			label = ((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel();
 	}
-	fSrcMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
 	fSrcMenuField->MenuItem()->SetLabel(label.String());
 
 	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
@@ -555,7 +554,6 @@ InstallerWindow::_UpdateMenus()
 		else
 			label = "Please Choose Target";
 	}
-	fDestMenuField->TruncateString(&label, B_TRUNCATE_END, 260);
 	fDestMenuField->MenuItem()->SetLabel(label.String());
 	char message[255];
 	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
