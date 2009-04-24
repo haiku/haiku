@@ -42,7 +42,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	seq sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
 	stty su sum sync sysinfo
 	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
-	traceroute translate true tsort tty
+	traceroute translate trash true tsort tty
 	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
 	uptime urlwrapper useradd uudecode uuencode
 	vdir version vim vmstat waitfor wc wget whoami xargs xres yes
@@ -242,6 +242,7 @@ SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: which ;
 
 AddSymlinkToHaikuImage system bin : bash : sh ;
+AddSymlinkToHaikuImage system bin : trash : untrash ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
