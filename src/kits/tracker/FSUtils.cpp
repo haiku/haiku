@@ -2932,7 +2932,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 			dynamic_cast<TTracker *>(be_app)->CloseParent(*nodeToClose);
 	} else {
 		alertString << "Could not open \"" << appRef->name << "\" (" << strerror(error) << "). ";
-		if (refs && openWithOK) {
+		if (refs && openWithOK && error != B_SHUTTING_DOWN) {
 			alertString << kFindAlternativeStr;
 			BAlert *alert = new BAlert("", alertString.String(),
 				"Cancel", "Find", 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
