@@ -13,6 +13,7 @@
 #include "InitParamsPanel.h"
 #include "PartitionList.h"
 #include "Support.h"
+#include "tracker_private.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -233,6 +234,9 @@ MainWindow::MainWindow(BRect frame)
 
 	// visit all disks in the system and show their contents
 	_ScanDrives();
+
+	if (!be_roster->IsRunning(kDeskbarSignature))
+		SetFlags(Flags() | B_NOT_MINIMIZABLE)
 }
 
 
