@@ -196,10 +196,7 @@ InstallerWindow::InstallerWindow()
 	fInstallStatus(kReadyForInstall),
 
 	fPackagesLayoutItem(NULL),
-	fSizeViewLayoutItem(NULL),
-
-	fLastSrcItem(NULL),
-	fLastTargetItem(NULL)
+	fSizeViewLayoutItem(NULL)
 {
 	fCopyEngine = new CopyEngine(this);
 
@@ -382,16 +379,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			_ShowOptionalPackages();
 			break;
 		case SRC_PARTITION:
-			if (fLastSrcItem == fSrcMenu->FindMarked())
-				break;
-			fLastSrcItem = fSrcMenu->FindMarked();
 			_PublishPackages();
 			_UpdateMenus();
 			break;
 		case TARGET_PARTITION:
-			if (fLastTargetItem == fDestMenu->FindMarked())
-				break;
-			fLastTargetItem = fDestMenu->FindMarked();
 			_UpdateMenus();
 			break;
 		case SETUP_MESSAGE:
@@ -525,29 +516,41 @@ InstallerWindow::_ScanPartitions()
 		_PublishPackages();
 	}
 	_UpdateMenus();
-	_SetStatusMessage("Choose the disk you want to install onto from the "
-		"pop-up menu. Then click \"Begin\".");
 }
 
 
 void
 InstallerWindow::_UpdateMenus()
 {
-	PartitionMenuItem *item1 = (PartitionMenuItem *)fSrcMenu->FindMarked();
+	PartitionMenuItem* srcItem = (PartitionMenuItem*)fSrcMenu->FindMarked();
 	BString label;
-	if (item1) {
-		label = item1->MenuLabel();
+	if (srcItem) {
+		label = srcItem->MenuLabel();
 	} else {
 		if (fSrcMenu->CountItems() == 0)
 			label = "<none>";
 		else
-			label = ((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel();
+			label = ((PartitionMenuItem*)fSrcMenu->ItemAt(0))->MenuLabel();
 	}
 	fSrcMenuField->MenuItem()->SetLabel(label.String());
 
-	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
-	if (item2) {
-		label = item2->MenuLabel();
+	if (srcItem) {
+		// Prevent the user from having picked the same partition as source
+		// and destination.
+		for (int32 i = fDestMenu->CountItems() - 1; i >= 0; i--) {
+			PartitionMenuItem* dstItem
+				= (PartitionMenuItem*)fDestMenu->ItemAt(i);
+			if (dstItem->ID() == srcItem->ID()) {
+				dstItem->SetEnabled(false);
+				dstItem->SetMarked(false);
+			} else
+				dstItem->SetEnabled(true);
+		}
+	}
+
+	PartitionMenuItem* dstItem = (PartitionMenuItem*)fDestMenu->FindMarked();
+	if (dstItem) {
+		label = dstItem->MenuLabel();
 	} else {
 		if (fDestMenu->CountItems() == 0)
 			label = "<none>";
@@ -555,12 +558,23 @@ InstallerWindow::_UpdateMenus()
 			label = "Please Choose Target";
 	}
 	fDestMenuField->MenuItem()->SetLabel(label.String());
-	char message[255];
-	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
-		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
-	_SetStatusMessage(message);
-	if (item1 && item2)
-		fBeginButton->SetEnabled(true);
+	if (srcItem && dstItem) {
+		char message[255];
+		sprintf(message, "Press the Begin button to install from '%s' onto "
+			"'%s'.", srcItem->Name(), dstItem->Name());
+		_SetStatusMessage(message);
+	} else if (srcItem) {
+		_SetStatusMessage("Choose the disk you want to install onto from the "
+			"pop-up menu. Then click \"Begin\".");
+	} else if (dstItem) {
+		_SetStatusMessage("Choose the source disk from the "
+			"pop-up menu. Then click \"Begin\".");
+	} else {
+		_SetStatusMessage("Choose the source and destination disk from the "
+			"pop-up menus. Then click \"Begin\".");
+	}
+
+	fBeginButton->SetEnabled(srcItem && dstItem);
 }
 
 

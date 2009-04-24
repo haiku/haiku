@@ -81,9 +81,6 @@ private:
 
 			CopyEngine*			fCopyEngine;
 			BString				fLastStatus;
-
-			BMenuItem*			fLastSrcItem;
-			BMenuItem*			fLastTargetItem;
 };
 
 #endif // INSTALLER_WINDOW_H
