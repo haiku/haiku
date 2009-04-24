@@ -396,10 +396,6 @@ TargetVisitor::Visit(BDiskDevice *device)
 bool
 TargetVisitor::Visit(BPartition *partition, int32 level)
 {
-	// TODO: This check does not work on non-mounted partitions!
-	if (partition->IsReadOnly())
-		return false;
-
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
@@ -436,8 +432,7 @@ TargetVisitor::_MakeLabel(BPartition *partition, char *label, char *menuLabel)
 	char size[15];
 	SizeAsString(partition->ContentSize(), size);
 	BPath path;
-	if (partition->Parent())
-		partition->Parent()->GetPath(&path);
+	partition->GetPath(&path);
 
 	sprintf(label, "%s - %s [%s] [%s]", partition->ContentName(),
 		size, partition->ContentType(), path.Path());
