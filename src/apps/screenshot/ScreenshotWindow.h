@@ -53,7 +53,7 @@ private:
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
 
-			void			_SaveScreenshot();
+			status_t		_SaveScreenshot();
 			void			_SaveScreenshotSilent() const;
 
 private:

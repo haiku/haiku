@@ -8,6 +8,7 @@
 #include "PNGDump.h"
 
 
+#include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
@@ -192,7 +193,8 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 
 		case kFinishScreenshot:
 			_WriteSettings();
-			_SaveScreenshot();
+			if (_SaveScreenshot() != B_OK)
+				break;
 
 		// fall through
 		case B_QUIT_REQUESTED:
@@ -682,23 +684,41 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 }
 
 
-void
+status_t
 ScreenshotWindow::_SaveScreenshot()
 {
 	if (!fScreenshot || !fLastSelectedPath)
-		return;
+		return B_ERROR;
 
-	const char* path;
+	const char* _path;
 	BMessage* message = fLastSelectedPath->Message();
-	if (!message || message->FindString("path", &path) != B_OK)
-		return;
+	if (!message || message->FindString("path", &_path) != B_OK)
+		return B_ERROR;
 
-	BDirectory dir(path);
-	BFile file(&dir, fNameControl->Text(), B_CREATE_FILE |
-		B_ERASE_FILE | B_WRITE_ONLY);
-	if (file.InitCheck() != B_OK)
-		return;
+	BEntry entry;
+	BPath path;
 
+	path = _path;
+	path.Append(fNameControl->Text());
+	entry.SetTo(path.Path());
+
+	if (entry.Exists()) {
+		BAlert *myAlert = new BAlert("overwrite", "This file already exists.\n"
+			"Are you sure would you like to overwrite it?",
+    		"Cancel", "Overwrite", NULL,
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+
+			myAlert->SetShortcut(0, B_ESCAPE);
+			int32 button_index = myAlert->Go();
+			if (button_index == 0) {
+				return B_CANCELED;
+			}
+	}
+
+	BFile file(&entry, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() != B_OK) {
+		return B_ERROR;
+	}
 	BBitmapStream bitmapStream(fScreenshot);
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	roster->Translate(&bitmapStream, NULL, NULL, &file, fImageFileType,
@@ -707,12 +727,12 @@ ScreenshotWindow::_SaveScreenshot()
 
 	BNodeInfo nodeInfo(&file);
 	if (nodeInfo.InitCheck() != B_OK)
-		return;
+		return B_ERROR;
 
 	int32 numFormats;
 	const translation_format* formats = NULL;
 	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) != B_OK)
-		return;
+		return B_OK;
 
 	for (int32 i = 0; i < numFormats; ++i) {
 		if (formats[i].type == uint32(fImageFileType)) {
@@ -720,6 +740,7 @@ ScreenshotWindow::_SaveScreenshot()
 			break;
 		}
 	}
+	return B_OK;
 }
 
 
