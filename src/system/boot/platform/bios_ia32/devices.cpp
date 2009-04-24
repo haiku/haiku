@@ -528,7 +528,8 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 {
 	TRACE(("drive ID %u\n", driveID));
 
-	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
+	if (driveID < 0x80
+		|| get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// old style CHS support
 
 		if (get_drive_parameters(driveID, &fParameters) != B_OK) {
