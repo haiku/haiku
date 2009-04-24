@@ -351,7 +351,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			switch (fInstallStatus) {
 				case kReadyForInstall:
 				{
-					BList *list = new BList();
+					BList* list = new BList();
 					int32 size = 0;
 					fPackagesView->GetPackagesToInstall(list, &size);
 					fCopyEngine->SetPackagesList(list);
@@ -380,10 +380,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		case SRC_PARTITION:
 			_PublishPackages();
-			_UpdateMenus();
+			_UpdateControls();
 			break;
 		case TARGET_PARTITION:
-			_UpdateMenus();
+			_UpdateControls();
 			break;
 		case SETUP_MESSAGE:
 			_LaunchDriveSetup();
@@ -424,7 +424,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				_DisableInterface(fDriveSetupLaunched);
 				if (fDriveSetupLaunched)
 					_SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS
-						"\nClose DriveSetup to continue with the\n"
+						"\n\nClose DriveSetup to continue with the "
 						"installation.");
 				else
 					_ScanPartitions();
@@ -443,7 +443,7 @@ InstallerWindow::QuitRequested()
 {
 	if (fDriveSetupLaunched) {
 		(new BAlert("driveSetup",
-			"Please close the DriveSetup window before closing the\n"
+			"Please close the DriveSetup window before closing the "
 			"Installer window.", "OK"))->Go();
 		return false;
 	}
@@ -515,12 +515,12 @@ InstallerWindow::_ScanPartitions()
 	if (fSrcMenu->ItemAt(0)) {
 		_PublishPackages();
 	}
-	_UpdateMenus();
+	_UpdateControls();
 }
 
 
 void
-InstallerWindow::_UpdateMenus()
+InstallerWindow::_UpdateControls()
 {
 	PartitionMenuItem* srcItem = (PartitionMenuItem*)fSrcMenu->FindMarked();
 	BString label;
@@ -558,6 +558,7 @@ InstallerWindow::_UpdateMenus()
 			label = "Please Choose Target";
 	}
 	fDestMenuField->MenuItem()->SetLabel(label.String());
+
 	if (srcItem && dstItem) {
 		char message[255];
 		sprintf(message, "Press the Begin button to install from '%s' onto "

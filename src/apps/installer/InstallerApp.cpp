@@ -47,7 +47,7 @@ static const char* kInfoText =
 "This is alpha-quality software! It means there is a high risk of loosing "
 "important data. Make frequent backups! You have been warned.\n\n"
 
-"1)  If you are installing Haiku onto real hardware (not inside an emulation) "
+"1)  If you are installing Haiku onto real hardware (not inside an emulator) "
 "you need to have prepared a harddisk partition. The Installer and the "
 "DriveSetup tool will only offer to initialize existing partitions with the "
 "Haiku native filesystem. We recommend using the GParted Live-CD, it can also "

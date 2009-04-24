@@ -52,7 +52,7 @@ private:
 			void				_LaunchDriveSetup();
 			void				_DisableInterface(bool disable);
 			void				_ScanPartitions();
-			void				_UpdateMenus();
+			void				_UpdateControls();
 			void				_PublishPackages();
 			void				_SetStatusMessage(const char* text);
 
