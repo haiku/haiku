@@ -9,18 +9,20 @@
 
 #include "ATAPrivate.h"
 
+
 ATAChannel::ATAChannel(device_node *node)
-	:	fNode(node),
-		fChannelID(0),
-		fController(NULL),
-		fCookie(NULL),
-		fExpectsInterrupt(false),
-		fStatus(B_NO_INIT),
-		fSCSIBus(NULL),
-		fDeviceCount(0),
-		fDevices(NULL),
-		fUseDMA(true),
-		fRequest(NULL)
+	:
+	fNode(node),
+	fChannelID(0),
+	fController(NULL),
+	fCookie(NULL),
+	fExpectsInterrupt(false),
+	fStatus(B_NO_INIT),
+	fSCSIBus(NULL),
+	fDeviceCount(0),
+	fDevices(NULL),
+	fUseDMA(true),
+	fRequest(NULL)
 {
 	B_INITIALIZE_SPINLOCK(&fInterruptLock);
 	fInterruptCondition.Init(this, "ata dma transfer");
@@ -64,7 +66,7 @@ ATAChannel::ATAChannel(device_node *node)
 
 	uint8 maxDevices = 2;
 	if (gDeviceManager->get_attr_uint8(node, ATA_CONTROLLER_MAX_DEVICES_ITEM,
-		&maxDevices, true) != B_OK) {
+			&maxDevices, true) != B_OK) {
 		maxDevices = 2;
 	}
 
@@ -182,7 +184,7 @@ ATAChannel::PathInquiry(scsi_path_inquiry *info)
 
 	const char *controllerName = NULL;
 	if (gDeviceManager->get_attr_string(fNode,
-		SCSI_DESCRIPTION_CONTROLLER_NAME, &controllerName, true) == B_OK)
+			SCSI_DESCRIPTION_CONTROLLER_NAME, &controllerName, true) == B_OK)
 		strlcpy(info->hba_vid, controllerName, SCSI_HBA_ID);
 	else
 		strlcpy(info->hba_vid, "unknown", SCSI_HBA_ID);
@@ -336,7 +338,7 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 
 		ata_task_file taskFile;
 		if (_ReadRegs(&taskFile, ATA_MASK_LBA_MID | ATA_MASK_LBA_HIGH
-			| ATA_MASK_ERROR) != B_OK) {
+				| ATA_MASK_ERROR) != B_OK) {
 			TRACE_ERROR("reading status failed\n");
 			return B_ERROR;
 		}
@@ -497,7 +499,7 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 	}
 
 	if (_WriteRegs(device->TaskFile(), device->RegisterMask()
-		| ATA_MASK_COMMAND) != B_OK) {
+			| ATA_MASK_COMMAND) != B_OK) {
 		TRACE_ERROR("can't write command\n");
 		request->SetStatus(SCSI_HBA_ERR);
 		return B_ERROR;
@@ -551,7 +553,7 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 		return B_OK;
 
 	if ((taskFile->read.error & ATA_ERROR_MEDIUM_CHANGED)
-		!= ATA_ERROR_MEDIUM_CHANGED) {
+			!= ATA_ERROR_MEDIUM_CHANGED) {
 		TRACE_ERROR("command failed, error bit is set: 0x%02x\n",
 			taskFile->read.error);
 	}
@@ -897,7 +899,7 @@ ATAChannel::_TransferPIOPhysical(ATARequest *request, addr_t physicalAddress,
 		void *handle;
 		addr_t virtualAddress;
 		if (vm_get_physical_page_current_cpu(physicalAddress, &virtualAddress,
-			&handle) != B_OK) {
+				&handle) != B_OK) {
 			thread_unpin_from_current_cpu(thread);
 			// ouch: this should never ever happen
 			return B_ERROR;

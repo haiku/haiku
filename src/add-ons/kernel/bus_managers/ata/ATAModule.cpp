@@ -9,8 +9,10 @@
 
 #include "ATAPrivate.h"
 
+
 scsi_for_sim_interface *gSCSIModule = NULL;
 device_manager_info *gDeviceManager = NULL;
+
 
 static status_t
 ata_sim_init_bus(device_node *node, void **cookie)
@@ -175,8 +177,7 @@ ata_channel_added(device_node *parent)
 		return B_ERROR;
 	}
 
-	device_attr attributes[] =
-	{
+	device_attr attributes[] = {
 		{
 			B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
 				{ string: SCSI_FOR_SIM_MODULE_NAME }

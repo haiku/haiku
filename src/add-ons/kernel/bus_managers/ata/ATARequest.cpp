@@ -5,14 +5,16 @@
 
 #include "ATAPrivate.h"
 
+
 ATARequest::ATARequest(bool hasLock)
-	:	fHasLock(hasLock),
-		fDevice(NULL),
-		fTimeout(0),
-		fBytesLeft(0),
-		fIsWrite(false),
-		fUseDMA(false),
-		fCCB(NULL)
+	:
+	fHasLock(hasLock),
+	fDevice(NULL),
+	fTimeout(0),
+	fBytesLeft(0),
+	fIsWrite(false),
+	fUseDMA(false),
+	fCCB(NULL)
 {
 	if (hasLock)
 		mutex_init(&fLock, "ata request");

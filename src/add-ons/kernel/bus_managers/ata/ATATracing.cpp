@@ -7,8 +7,10 @@
 
 #include <stdarg.h>
 
+
 static char sTraceBuffer[256];
 static uint32 sTraceBufferOffset = 0;
+
 
 void
 ata_trace_printf(uint32 flags, const char *format, ...)

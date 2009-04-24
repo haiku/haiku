@@ -11,14 +11,15 @@
 
 
 ATADevice::ATADevice(ATAChannel *channel, uint8 index)
-	:	fChannel(channel),
-		fRegisterMask(0),
-		fUseDMA(channel->UseDMA()),
-		fDMAMode(0),
-		fDMAFailures(0),
-		fIndex(index),
-		fUse48Bits(false),
-		fTotalSectors(0)
+	:
+	fChannel(channel),
+	fRegisterMask(0),
+	fUseDMA(channel->UseDMA()),
+	fDMAMode(0),
+	fDMAFailures(0),
+	fIndex(index),
+	fUse48Bits(false),
+	fTotalSectors(0)
 {
 	memset(&fInfoBlock, 0, sizeof(fInfoBlock));
 	memset(&fTaskFile, 0, sizeof(fTaskFile));
@@ -45,7 +46,7 @@ ATADevice::TestUnitReady(ATARequest *request)
 		return result;
 	}
 
-	return fChannel->FinishRequest(request, ATA_WAIT_FINISH 
+	return fChannel->FinishRequest(request, ATA_WAIT_FINISH
 		| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_NO_MEDIA | ATA_ERROR_ABORTED
 		| ATA_ERROR_MEDIA_CHANGE_REQUESTED | ATA_ERROR_MEDIUM_CHANGED);
 }
@@ -63,8 +64,8 @@ ATADevice::SynchronizeCache(ATARequest *request)
 		return B_OK;
 
 	fRegisterMask = 0;
-	fTaskFile.lba.command = fUse48Bits ? ATA_COMMAND_FLUSH_CACHE_EXT
-		: ATA_COMMAND_FLUSH_CACHE;
+	fTaskFile.lba.command
+		= fUse48Bits ? ATA_COMMAND_FLUSH_CACHE_EXT : ATA_COMMAND_FLUSH_CACHE;
 
 	request->SetTimeout(60 * 1000 * 1000);
 	status_t result = fChannel->SendRequest(request, ATA_DEVICE_READY_REQUIRED);
@@ -254,7 +255,7 @@ ATADevice::ExecuteIO(ATARequest *request)
 		case SCSI_OP_WRITE_6:
 		{
 			scsi_cmd_rw_6 *command = (scsi_cmd_rw_6 *)ccb->cdb;
-			uint32 address = ((uint32)command->high_lba << 16) 
+			uint32 address = ((uint32)command->high_lba << 16)
 				| ((uint32)command->mid_lba << 8) | (uint32)command->low_lba;
 
 			request->SetIsWrite(command->opcode == SCSI_OP_WRITE_6);
@@ -320,15 +321,14 @@ ATADevice::SetFeature(int feature)
 	fTaskFile.write.command = ATA_COMMAND_SET_FEATURES;
 	fRegisterMask = ATA_MASK_FEATURES;
 
-	status_t result = fChannel->SendRequest(&request,
-		ATA_DEVICE_READY_REQUIRED);
+	status_t result = fChannel->SendRequest(&request, ATA_DEVICE_READY_REQUIRED);
 	if (result != B_OK) {
 		TRACE_ERROR("sending set feature request failed\n");
 		return result;
 	}
 
-	result = fChannel->FinishRequest(&request, ATA_WAIT_FINISH
-		| ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ABORTED);
+	result = fChannel->FinishRequest(&request,
+		ATA_WAIT_FINISH | ATA_DEVICE_READY_REQUIRED, ATA_ERROR_ABORTED);
 	if (result != B_OK) {
 		TRACE_ERROR("set feature request failed\n");
 		return result;
@@ -469,27 +469,27 @@ ATADevice::Identify()
 	fTaskFile.write.command = IsATAPI() ? ATA_COMMAND_IDENTIFY_PACKET_DEVICE
 		: ATA_COMMAND_IDENTIFY_DEVICE;
 
-	if (fChannel->SendRequest(&request, IsATAPI() ? 0
-		: ATA_DEVICE_READY_REQUIRED) != B_OK) {
+	if (fChannel->SendRequest(&request,
+			IsATAPI() ? 0 : ATA_DEVICE_READY_REQUIRED) != B_OK) {
 		TRACE_ERROR("sending identify request failed\n");
 		return B_ERROR;
 	}
 
 	if (fChannel->Wait(ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST, 0,
-		ATA_WAIT_ANY_BIT, 100 * 1000) != B_OK) {
+			ATA_WAIT_ANY_BIT, 100 * 1000) != B_OK) {
 		TRACE_ALWAYS("no data request and not busy within 100ms, assuming "
 			"no device present\n");
 		return B_TIMED_OUT;
 	}
 
 	if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, ATA_STATUS_BUSY,
-		ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT, IsATAPI()
-		? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
+			ATA_CHECK_ERROR_BIT | ATA_CHECK_DEVICE_FAULT,
+			IsATAPI() ? 20 * 1000 * 1000 : 500 * 1000) != B_OK) {
 		TRACE_ERROR("timeout waiting for identify request\n");
 		return B_TIMED_OUT;
 	}
 
-	// get the infoblock		
+	// get the infoblock
 	fChannel->ReadPIO((uint8 *)&fInfoBlock, sizeof(fInfoBlock));
 
 	if (fChannel->WaitDataRequest(false) != B_OK) {
@@ -497,8 +497,9 @@ ATADevice::Identify()
 		return B_ERROR;
 	}
 
-	if (fChannel->FinishRequest(&request, ATA_WAIT_FINISH | (IsATAPI() ? 0
-		: ATA_DEVICE_READY_REQUIRED), ATA_ERROR_ABORTED) != B_OK) {
+	if (fChannel->FinishRequest(&request,
+			ATA_WAIT_FINISH | (IsATAPI() ? 0 : ATA_DEVICE_READY_REQUIRED),
+			ATA_ERROR_ABORTED) != B_OK) {
 		TRACE_ERROR("failed to finish identify request\n");
 		return B_ERROR;
 	}
@@ -523,8 +524,8 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 		return B_ERROR;
 	}
 
-	status_t result = fChannel->SendRequest(request, IsATAPI()
-		? 0 : ATA_DEVICE_READY_REQUIRED);
+	status_t result = fChannel->SendRequest(request,
+		IsATAPI() ? 0 : ATA_DEVICE_READY_REQUIRED);
 	if (result != B_OK) {
 		TRACE_ERROR("failed to send transfer request\n");
 		if (request->UseDMA())
@@ -558,7 +559,7 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 		}
 	} else {
 		if (fChannel->Wait(ATA_STATUS_DATA_REQUEST, 0, ATA_CHECK_ERROR_BIT
-			| ATA_CHECK_DEVICE_FAULT, request->Timeout()) != B_OK) {
+				| ATA_CHECK_DEVICE_FAULT, request->Timeout()) != B_OK) {
 			TRACE_ERROR("timeout waiting for device to request data\n");
 			request->SetStatus(SCSI_CMD_TIMEOUT);
 			return B_TIMED_OUT;
