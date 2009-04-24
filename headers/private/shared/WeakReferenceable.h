@@ -28,7 +28,7 @@ private:
 								~WeakPointer();
 
 private:
-			bool				_GetUnchecked();
+			void				_GetUnchecked();
 
 private:
 			vint32				fUseCount;
@@ -264,10 +264,10 @@ WeakPointer<Type>::~WeakPointer()
 
 
 template<typename Type>
-inline bool
+inline void
 WeakPointer<Type>::_GetUnchecked()
 {
-	return atomic_add(&fUseCount, 1) == 1;
+	atomic_add(&fUseCount, 1);
 }
 
 
