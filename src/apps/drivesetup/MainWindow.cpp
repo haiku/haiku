@@ -20,19 +20,18 @@
 
 #include <Alert.h>
 #include <Application.h>
-
-#include <DiskDeviceVisitor.h>
-#include <DiskSystem.h>
-#include <DiskDevice.h>
-#include <Partition.h>
-#include <PartitioningInfo.h>
-#include <Path.h>
-
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
+#include <DiskDevice.h>
+#include <DiskDeviceVisitor.h>
+#include <DiskSystem.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
 #include <Menu.h>
+#include <Path.h>
+#include <Partition.h>
+#include <PartitioningInfo.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -236,7 +235,7 @@ MainWindow::MainWindow(BRect frame)
 	_ScanDrives();
 
 	if (!be_roster->IsRunning(kDeskbarSignature))
-		SetFlags(Flags() | B_NOT_MINIMIZABLE)
+		SetFlags(Flags() | B_NOT_MINIMIZABLE);
 }
 
 
