@@ -447,8 +447,8 @@ InstallerWindow::QuitRequested()
 			"Installer window.", "OK"))->Go();
 		return false;
 	}
-	be_app->PostMessage(B_QUIT_REQUESTED);
 	fCopyEngine->PostMessage(B_QUIT_REQUESTED);
+	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 

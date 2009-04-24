@@ -128,7 +128,9 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	BPartition *partition;
 	BVolume targetVolume;
 	status_t err = B_OK;
-	
+	int32 entries = 0;
+	entry_ref testRef;
+
 	fControl->Reset();
 
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
@@ -210,17 +212,69 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	// check not installing on boot volume
 	if ((strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0)
 		&& ((new BAlert("", "Are you sure you want to install onto the "
-			"current boot disk? The installer will have to reboot your "
+			"current boot disk? The Installer will have to reboot your "
 			"machine if you proceed.", "OK", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		SetStatusMessage("Installation stopped.");
 		goto error;
 	}
 
+	targetDir.SetTo(targetDirectory.Path());
+
+	// check target volume not empty
+	// NOTE: It's ok if exactly this path exists: home/Desktop/Trash
+	// and nothing else.
+	while (targetDir.GetNextRef(&testRef) == B_OK) {
+		if (strcmp(testRef.name, "home") == 0) {
+			BDirectory homeDir(&testRef);
+			while (homeDir.GetNextRef(&testRef) == B_OK) {
+				if (strcmp(testRef.name, "Desktop") == 0) {
+					BDirectory desktopDir(&testRef);
+					while (desktopDir.GetNextRef(&testRef) == B_OK) {
+						if (strcmp(testRef.name, "Trash") == 0) {
+							BDirectory trashDir(&testRef);
+							while (trashDir.GetNextRef(&testRef) == B_OK) {
+								// Something in the Trash
+								entries++;
+								break;
+							}
+						} else {
+							// Something besides Trash
+							entries++;
+						}
+		
+						if (entries > 0)
+							break;
+					}
+				} else {
+					// Something besides Desktop
+					entries++;
+				}
+
+				if (entries > 0)
+					break;
+			}
+		} else {
+			// Something besides home
+			entries++;
+		}
+
+		if (entries > 0)
+			break;
+	}
+	if (entries != 0
+		&& ((new BAlert("", "The target volume is not empty. Are you sure you "
+			"want to install anyways?", "Install Anyways", "Cancel", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+		err = B_CANCELED;
+		goto error;
+	}
+	
+
 	LaunchInitScript(targetDirectory);
 
 	// copy source volume
-	targetDir.SetTo(targetDirectory.Path());
+	targetDir.Rewind();
 	srcDir.SetTo(srcDirectory.Path());
 	err = CopyFolder(srcDir, targetDir);
 	
@@ -296,11 +350,11 @@ CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 	BDiskDevice device;
 	BPartition *partition = NULL;
 
-	printf("ScanDisksPartitions partitions begin\n");
+	printf("\nScanDisksPartitions source partitions begin\n");
 	SourceVisitor srcVisitor(srcMenu);
 	fDDRoster.VisitEachMountedPartition(&srcVisitor, &device, &partition);
 
-	printf("ScanDisksPartitions partitions begin\n");
+	printf("\nScanDisksPartitions target partitions begin\n");
 	TargetVisitor targetVisitor(targetMenu);
 	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
 }
@@ -344,7 +398,7 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
 
-	if (!partition->ContentType())
+	if (partition->ContentType() == NULL)
 		return false;
 
 	bool isBootPartition = false;
@@ -400,6 +454,13 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	if (partition->GetPath(&path) == B_OK)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
+
+	if (partition->ContentType() == NULL
+		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0) {
+		// Except only valid BFS partitions
+		printf("  not BFS\n");
+		return false;
+	}
 
 	if (partition->ContentSize() < 20 * 1024 * 1024) {
 		// reject partitions which are too small anyways
