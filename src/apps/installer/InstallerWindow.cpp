@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2005-2008, Jérôme DUVAL.
+ * Copyright 2005-2008, Jérôme DUVAL
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -13,24 +13,31 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Box.h>
+#include <Button.h>
 #include <ClassInfo.h>
 #include <Directory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
+#include <MenuField.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <ScrollView.h>
 #include <SpaceLayoutItem.h>
+#include <StatusBar.h>
 #include <String.h>
+#include <TextView.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 
 #include "tracker_private.h"
 
+#include "CopyEngine.h"
 #include "DialogPane.h"
+#include "PackageViews.h"
 #include "PartitionMenuItem.h"
 
 
@@ -187,19 +194,24 @@ SeparatorView::PreferredSize()
 // #pragma mark -
 
 
+static BLayoutItem*
+layout_item_for(BView* view)
+{
+	BLayout* layout = view->Parent()->GetLayout();
+	int32 index = layout->IndexOfView(view);
+	return layout->ItemAt(index);
+}
+
+
 InstallerWindow::InstallerWindow()
 	: BWindow(BRect(-2000, -2000, -1800, -1800), "Installer", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fNeedsToCenterOnScreen(true),
-
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
-
-	fPackagesLayoutItem(NULL),
-	fSizeViewLayoutItem(NULL)
+	fCopyEngine(new CopyEngine(this)),
+	fCopyEngineLock(NULL)
 {
-	fCopyEngine = new CopyEngine(this);
-
 	LogoView* logoView = new LogoView();
 
 	fStatusView = new BTextView("statusView", be_plain_font, NULL, B_WILL_DRAW);
@@ -210,24 +222,6 @@ InstallerWindow::InstallerWindow()
 	BSize logoSize = logoView->MinSize();
 	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66, B_SIZE_UNSET));
 
-	fBeginButton = new BButton("begin_button", "Begin",
-		new BMessage(BEGIN_MESSAGE));
-	fBeginButton->MakeDefault(true);
-	fBeginButton->SetEnabled(false);
-
-	fSetupButton = new BButton("setup_button",
-		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
-
-	fPackagesView = new PackagesView("packages_view");
-	BScrollView* packagesScrollView = new BScrollView("packagesScroll",
-		fPackagesView, B_WILL_DRAW, false, true);
-
-	fDrawButton = new PaneSwitch("options_button");
-	fDrawButton->SetLabels("Hide Optional Packages", "Show Optional Packages");
-	fDrawButton->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
-	fDrawButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-	fDrawButton->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
-
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
@@ -235,9 +229,21 @@ InstallerWindow::InstallerWindow()
 		NULL);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fDestMenuField = new BMenuField("destMenuField", "Onto: ", fDestMenu,
-		NULL);
+	fDestMenuField = new BMenuField("destMenuField", "Onto: ", fDestMenu, NULL);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
+
+	fPackagesSwitch = new PaneSwitch("options_button");
+	fPackagesSwitch->SetLabels("Hide Optional Packages",
+		"Show Optional Packages");
+	fPackagesSwitch->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
+	fPackagesSwitch->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNLIMITED));
+	fPackagesSwitch->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_TOP));
+
+	fPackagesView = new PackagesView("packages_view");
+	BScrollView* packagesScrollView = new BScrollView("packagesScroll",
+		fPackagesView, B_WILL_DRAW, false, true);
 
 	const char* requiredDiskSpaceString
 		= "Additional disk space required: 0.0 KB";
@@ -246,6 +252,17 @@ InstallerWindow::InstallerWindow()
 	fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 	fSizeView->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
+
+	fProgressBar = new BStatusBar("progress", "Install Progress:  ");
+	fProgressBar->SetMaxValue(100.0);
+
+	fBeginButton = new BButton("begin_button", "Begin",
+		new BMessage(BEGIN_MESSAGE));
+	fBeginButton->MakeDefault(true);
+	fBeginButton->SetEnabled(false);
+
+	fSetupButton = new BButton("setup_button",
+		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
@@ -263,12 +280,11 @@ InstallerWindow::InstallerWindow()
 
 				.Add(BSpaceLayoutItem::CreateVerticalStrut(5), 0, 2, 2)
 
-				.Add(fDrawButton, 0, 3, 2)
+				.Add(fPackagesSwitch, 0, 3, 2)
 				.Add(packagesScrollView, 0, 4, 2)
-				.Add(fSizeView, 0, 5, 2)
+				.Add(fProgressBar, 0, 5, 2)
+				.Add(fSizeView, 0, 6, 2)
 			)
-
-			.AddStrut(5)
 
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 				.Add(fSetupButton)
@@ -279,17 +295,15 @@ InstallerWindow::InstallerWindow()
 		)
 	);
 
-	// Make the optional packages invisible on start
-	BLayout* layout = packagesScrollView->Parent()->GetLayout();
-	int32 index = layout->IndexOfView(packagesScrollView);
-	fPackagesLayoutItem = layout->ItemAt(index);
-
-	layout = fSizeView->Parent()->GetLayout();
-	index = layout->IndexOfView(fSizeView);
-	fSizeViewLayoutItem = layout->ItemAt(index);
+	// Make the optional packages and progress bar invisible on start
+	fPackagesLayoutItem = layout_item_for(packagesScrollView);
+	fPkgSwitchLayoutItem = layout_item_for(fPackagesSwitch);
+	fSizeViewLayoutItem = layout_item_for(fSizeView);
+	fProgressLayoutItem = layout_item_for(fProgressBar);
 
 	fPackagesLayoutItem->SetVisible(false);
 	fSizeViewLayoutItem->SetVisible(false);
+	fProgressLayoutItem->SetVisible(false);
 
 	// finish creating window
 	if (!be_roster->IsRunning(kDeskbarSignature))
@@ -339,9 +353,17 @@ InstallerWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case RESET_INSTALL:
+			delete fCopyEngineLock;
+			fCopyEngineLock = NULL;
+
 			fInstallStatus = kReadyForInstall;
 			fBeginButton->SetEnabled(true);
 			_DisableInterface(false);
+
+			fProgressLayoutItem->SetVisible(false);
+			fPkgSwitchLayoutItem->SetVisible(true);
+			_ShowOptionalPackages();
+
 			fBeginButton->SetLabel("Begin");
 			break;
 		case START_SCAN:
@@ -351,23 +373,39 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			switch (fInstallStatus) {
 				case kReadyForInstall:
 				{
+					delete fCopyEngineLock;
+					fCopyEngineLock = new BLocker("copy engine lock");
 					BList* list = new BList();
 					int32 size = 0;
 					fPackagesView->GetPackagesToInstall(list, &size);
+					fCopyEngine->SetLock(fCopyEngineLock);
 					fCopyEngine->SetPackagesList(list);
 					fCopyEngine->SetSpaceRequired(size);
 					fInstallStatus = kInstalling;
 					BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 					fBeginButton->SetLabel("Stop");
 					_DisableInterface(true);
+
+					fProgressBar->SetTo(0.0, NULL, NULL);
+
+					fPkgSwitchLayoutItem->SetVisible(false);
+					fPackagesLayoutItem->SetVisible(false);
+					fSizeViewLayoutItem->SetVisible(false);
+					fProgressLayoutItem->SetVisible(true);
 					break;
 				}
 				case kInstalling:
-					if (fCopyEngine->Cancel()) {
-						fInstallStatus = kCancelled;
-						_SetStatusMessage("Installation cancelled.");
-					}
+				{
+					_QuitCopyEngine(true);
+//					if (fCopyEngine->Cancel()) {
+//						fInstallStatus = kCancelled;
+//						_SetStatusMessage("Installation cancelled.");
+//						fProgressLayoutItem->SetVisible(false);
+//						fPkgSwitchLayoutItem->SetVisible(true);
+//						_ShowOptionalPackages();
+//					}
 					break;
+				}
 				case kFinished:
 					PostMessage(B_QUIT_REQUESTED);
 					break;
@@ -388,7 +426,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case SETUP_MESSAGE:
 			_LaunchDriveSetup();
 			break;
-		case PACKAGE_CHECKBOX: {
+		case PACKAGE_CHECKBOX:
+		{
 			char buffer[15];
 			fPackagesView->GetTotalSizeAsString(buffer);
 			char string[255];
@@ -396,22 +435,47 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			fSizeView->SetText(string);
 			break;
 		}
-		case STATUS_MESSAGE: {
+		case STATUS_MESSAGE:
+		{
 			if (fInstallStatus != kInstalling)
 				break;
-			const char *status;
-			if (msg->FindString("status", &status) == B_OK) {
-				fLastStatus = fStatusView->Text();
-				_SetStatusMessage(status);
-			} else
-				_SetStatusMessage(fLastStatus.String());
+			float progress;
+			if (msg->FindFloat("progress", &progress) == B_OK) {
+				const char* currentItem;
+				if (msg->FindString("item", &currentItem) != B_OK)
+					currentItem = "???";
+				BString trailingLabel;
+				int32 currentCount;
+				int32 maximumCount;
+				if (msg->FindInt32("current", &currentCount) == B_OK
+					&& msg->FindInt32("maximum", &maximumCount) == B_OK) {
+					trailingLabel << currentCount << " of " << maximumCount;
+				} else {
+					trailingLabel << "?? of ??";
+				}
+				fProgressBar->SetTo(progress, currentItem,
+					trailingLabel.String());
+			} else {
+				const char *status;
+				if (msg->FindString("status", &status) == B_OK) {
+					fLastStatus = fStatusView->Text();
+					_SetStatusMessage(status);
+				} else
+					_SetStatusMessage(fLastStatus.String());
+			}
 			break;
 		}
 		case INSTALL_FINISHED:
+			delete fCopyEngineLock;
+			fCopyEngineLock = NULL;
+
 			fBeginButton->SetLabel("Quit");
 			_SetStatusMessage("Installation completed.");
 			fInstallStatus = kFinished;
 			_DisableInterface(false);
+			fProgressLayoutItem->SetVisible(false);
+			fPkgSwitchLayoutItem->SetVisible(true);
+			_ShowOptionalPackages();
 			break;
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
@@ -447,6 +511,7 @@ InstallerWindow::QuitRequested()
 			"Installer window.", "OK"))->Go();
 		return false;
 	}
+	_QuitCopyEngine(false);
 	fCopyEngine->PostMessage(B_QUIT_REQUESTED);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -460,8 +525,8 @@ void
 InstallerWindow::_ShowOptionalPackages()
 {
 	if (fPackagesLayoutItem && fSizeViewLayoutItem) {
-		fPackagesLayoutItem->SetVisible(fDrawButton->Value());
-		fSizeViewLayoutItem->SetVisible(fDrawButton->Value());
+		fPackagesLayoutItem->SetVisible(fPackagesSwitch->Value());
+		fSizeViewLayoutItem->SetVisible(fPackagesSwitch->Value());
 	}
 }
 
@@ -575,6 +640,8 @@ InstallerWindow::_UpdateControls()
 			"pop-up menus. Then click \"Begin\".");
 	}
 
+	fInstallStatus = kReadyForInstall;
+	fBeginButton->SetLabel("Begin");
 	fBeginButton->SetEnabled(srcItem && dstItem);
 }
 
@@ -628,6 +695,44 @@ void
 InstallerWindow::_SetStatusMessage(const char *text)
 {
 	fStatusView->SetText(text);
+}
+
+
+void
+InstallerWindow::_QuitCopyEngine(bool askUser)
+{
+	if (fCopyEngineLock == NULL)
+		return;
+
+	// first of all block the copy engine
+	fCopyEngineLock->Lock();
+	
+	bool quit = true;
+	if (askUser) {
+		quit = (new BAlert("cancel",
+			"Are you sure you want to to stop the installation?", 
+			"Continue", "Stop", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
+	}
+
+	if (quit) {
+		int32 tries = 0;
+		// wait until the engine blocks
+		while (fCopyEngineLock->CountLockRequests() < 2) {
+			// TODO: There is a race here, the copy engine
+			// may have finished before we locked the engine
+			// lock. That's why we limit the number of tries
+			// here.
+			tries++;
+			if (tries > 100)
+				break;
+			snooze(3000);
+		}
+		// make it quit by having it's lock fail
+		delete fCopyEngineLock;
+		fCopyEngineLock = NULL;
+	} else
+		fCopyEngineLock->Unlock();
 }
 
 

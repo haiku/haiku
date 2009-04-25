@@ -4,18 +4,26 @@
  */
 
 #include "CopyEngine.h"
-#include "InstallerWindow.h"
-#include "PartitionMenuItem.h"
-#include "FSUndoRedo.h"
-#include "FSUtils.h"
+
 #include <stdio.h>
+
 #include <Alert.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <FindDirectory.h>
+#include <Message.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <String.h>
 #include <VolumeRoster.h>
+
+#include "CopyEngine2.h"
+#include "InstallerWindow.h"
+#include "FSUndoRedo.h"
+#include "FSUtils.h"
+#include "PackageViews.h"
+#include "PartitionMenuItem.h"
+
 
 //#define COPY_TRACE
 #ifdef COPY_TRACE
@@ -130,6 +138,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	status_t err = B_OK;
 	int32 entries = 0;
 	entry_ref testRef;
+bigtime_t now;
 
 	fControl->Reset();
 
@@ -276,8 +285,21 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	// copy source volume
 	targetDir.Rewind();
 	srcDir.SetTo(srcDirectory.Path());
+now = system_time();
+#if 0
 	err = CopyFolder(srcDir, targetDir);
-	
+#else
+	{
+		BMessenger messenger(fWindow);
+		CopyEngine2 engine(messenger, new BMessage(STATUS_MESSAGE));
+		err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
+			fCancelLock);
+if (err != B_OK)
+printf("error: %s\n", strerror(err));
+	}
+#endif
+printf("copy time: %.3fs\n", (system_time() - now) / 1000000.0);
+
 	if (err != B_OK || fControl->CheckUserCanceled())
 		goto error;
 
@@ -347,6 +369,7 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 void
 CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 {
+	// NOTE: This is actually executed in the window thread.
 	BDiskDevice device;
 	BPartition *partition = NULL;
 

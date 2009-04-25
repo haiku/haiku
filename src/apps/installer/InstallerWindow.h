@@ -1,27 +1,29 @@
 /*
- * Copyright 2005, Jérôme DUVAL. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2005, Jérôme DUVAL
+ *  All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef INSTALLER_WINDOW_H
 #define INSTALLER_WINDOW_H
 
-#include <Box.h>
-#include <Button.h>
-#include <Menu.h>
-#include <MenuField.h>
-#include <ScrollView.h>
 #include <String.h>
-#include <TextView.h>
 #include <Window.h>
-
-#include "CopyEngine.h"
-#include "PackageViews.h"
 
 namespace BPrivate {
 	class PaneSwitch;
 };
+using namespace BPrivate;
 
+class BButton;
 class BLayoutItem;
+class BLocker;
+class BMenu;
+class BMenuField;
+class BStatusBar;
+class BStringView;
+class BTextView;
+class CopyEngine;
+class PackagesView;
 
 enum InstallStatus {
 	kReadyForInstall,
@@ -35,6 +37,7 @@ const uint32 INSTALL_FINISHED = 'iIFN';
 const uint32 RESET_INSTALL = 'iRSI';
 const char PACKAGES_DIRECTORY[] = "_packages_";
 const char VAR_DIRECTORY[] = "var";
+
 
 class InstallerWindow : public BWindow {
 public:
@@ -56,31 +59,39 @@ private:
 			void				_PublishPackages();
 			void				_SetStatusMessage(const char* text);
 
+			void				_QuitCopyEngine(bool askUser);
+
 	static	int					_ComparePackages(const void* firstArg,
 									const void* secondArg);
-
-			BButton*			fBeginButton;
-			BButton*			fSetupButton;
-			PaneSwitch*			fDrawButton;
-
-			bool				fNeedsToCenterOnScreen;
-
-			bool				fDriveSetupLaunched;
-			InstallStatus		fInstallStatus;
 
 			BTextView*			fStatusView;
 			BMenu*				fSrcMenu;
 			BMenu*				fDestMenu;
 			BMenuField*			fSrcMenuField;
 			BMenuField*			fDestMenuField;
+
+			PaneSwitch*			fPackagesSwitch;
 			PackagesView*		fPackagesView;
 			BStringView*		fSizeView;
 
+			BStatusBar*			fProgressBar;
+
+			BLayoutItem*		fPkgSwitchLayoutItem;
 			BLayoutItem*		fPackagesLayoutItem;
 			BLayoutItem*		fSizeViewLayoutItem;
+			BLayoutItem*		fProgressLayoutItem;
+
+			BButton*			fBeginButton;
+			BButton*			fSetupButton;
+
+			bool				fNeedsToCenterOnScreen;
+
+			bool				fDriveSetupLaunched;
+			InstallStatus		fInstallStatus;
 
 			CopyEngine*			fCopyEngine;
 			BString				fLastStatus;
+			BLocker*			fCopyEngineLock;
 };
 
 #endif // INSTALLER_WINDOW_H

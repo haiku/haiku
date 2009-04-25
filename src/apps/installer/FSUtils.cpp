@@ -360,7 +360,7 @@ SetUpPoseLocation(ino_t sourceParentIno, ino_t destParentIno,
 	if (loc && loc != (BPoint *)-1) {
 		// loc of -1 is used when copying/moving into a window in list mode
 		// where copying positions would not work
-		// ToSo:
+		// TODO:
 		// should push all this logic to upper levels
 		FSSetPoseLocation(destParentIno, destNode, *loc);
 	}

@@ -15,6 +15,7 @@
 #include <Partition.h>
 #include <Volume.h>
 
+class BLocker;
 class InstallerWindow;
 
 const uint32 ENGINE_START = 'eSRT';
@@ -27,6 +28,7 @@ class CopyEngine : public BLooper {
 		void SetPackagesList(BList *list);
 		void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
 		bool Cancel();
+		void SetLock(BLocker* lock) { fCancelLock = lock; }
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);
@@ -39,6 +41,7 @@ class CopyEngine : public BLooper {
 		InstallerCopyLoopControl *fControl;
 		BList *fPackages;
 		off_t fSpaceRequired;
+		BLocker* fCancelLock;
 };
 
 #endif /* _CopyEngine_h */
