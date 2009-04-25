@@ -10,12 +10,17 @@
 #include <Path.h>
 
 
+struct BString;
+
+
 class DataSource {
 public:
 								DataSource();
 	virtual						~DataSource();
 
 	virtual	status_t			CreateDataIO(BDataIO** _io) = 0;
+
+	virtual	status_t			GetName(BString& name);
 };
 
 
@@ -32,6 +37,8 @@ class PathDataSource : public FileDataSource {
 public:
 			status_t			Init(const char* path);
 
+	virtual	status_t			GetName(BString& name);
+
 protected:
 	virtual	status_t			OpenFile(BFile& file);
 
@@ -43,6 +50,8 @@ private:
 class EntryRefDataSource : public FileDataSource {
 public:
 			status_t			Init(const entry_ref* ref);
+
+	virtual	status_t			GetName(BString& name);
 
 protected:
 	virtual	status_t			OpenFile(BFile& file);
