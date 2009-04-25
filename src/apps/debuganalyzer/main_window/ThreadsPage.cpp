@@ -25,7 +25,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 11;
+		return 14;
 	}
 
 	virtual int32 CountRows() const
@@ -79,6 +79,15 @@ public:
 			case 10:
 				value.SetTo(thread->TotalRerunTime());
 				return true;
+			case 11:
+				value.SetTo(thread->Waits());
+				return true;
+			case 12:
+				value.SetTo(thread->TotalWaitTime());
+				return true;
+			case 13:
+				value.SetTo(thread->UnspecifiedWaitTime());
+				return true;
 			default:
 				return false;
 		}
@@ -127,6 +136,12 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 	fThreadsTable->AddColumn(new Int64TableColumn(9, "Preemptions", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new BigtimeTableColumn(10, "Preemption Time", 80,
+		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new Int64TableColumn(11, "Waits", 80, 20,
+		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(12, "Wait Time", 80,
+		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(13, "Unspecified Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fThreadsTable->AddTableListener(this);

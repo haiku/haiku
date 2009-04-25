@@ -129,6 +129,8 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	fTotalRerunTime(0),
 	fMinRerunTime(-1),
 	fMaxRerunTime(-1),
+	fWaits(0),
+	fTotalWaitTime(0),
 	fUnspecifiedWaitTime(0),
 	fPreemptions(0),
 	fWaitObjectGroups(20, true)
@@ -196,6 +198,14 @@ void
 Model::Thread::AddPreemption(bigtime_t runTime)
 {
 	fPreemptions++;
+}
+
+
+void
+Model::Thread::AddWait(bigtime_t waitTime)
+{
+	fWaits++;
+	fTotalWaitTime += waitTime;
 }
 
 

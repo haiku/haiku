@@ -29,6 +29,7 @@ private:
 			TextDataView*		fWaitTimeView;
 			TextDataView*		fLatencyView;
 			TextDataView*		fPreemptionView;
+			TextDataView*		fUnspecifiedTimeView;
 };
 
 

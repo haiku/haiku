@@ -19,7 +19,8 @@ ThreadWindow::GeneralPage::GeneralPage()
 	fRunTimeView(NULL),
 	fWaitTimeView(NULL),
 	fLatencyView(NULL),
-	fPreemptionView(NULL)
+	fPreemptionView(NULL),
+	fUnspecifiedTimeView(NULL)
 {
 	fThreadNameView = AddDataView("Name:");
 	fThreadIDView = AddDataView("ID:");
@@ -28,6 +29,7 @@ ThreadWindow::GeneralPage::GeneralPage()
 	fWaitTimeView = AddDataView("Wait Time:");
 	fLatencyView = AddDataView("Latencies:");
 	fPreemptionView = AddDataView("Preemptions:");
+	fUnspecifiedTimeView = AddDataView("Unspecified Time:");
 }
 
 
@@ -63,11 +65,9 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 		fRunTimeView->SetText(buffer);
 
 		// wait time
-		fWaitTimeView->SetText("");
-// TODO:...
-//		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
-//			fThread->TotalRunTime(), fThread->Runs());
-//		fWaitTimeView->SetText(buffer);
+		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
+			fThread->TotalWaitTime(), fThread->Waits());
+		fWaitTimeView->SetText(buffer);
 
 		// latencies
 		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
@@ -78,6 +78,11 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
 			fThread->TotalRerunTime(), fThread->Preemptions());
 		fPreemptionView->SetText(buffer);
+
+		// unspecified time
+		snprintf(buffer, sizeof(buffer), "%lld μs",
+			fThread->UnspecifiedWaitTime());
+		fUnspecifiedTimeView->SetText(buffer);
 	} else {
 		fThreadNameView->SetText("");
 		fThreadIDView->SetText("");
@@ -86,5 +91,6 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 		fWaitTimeView->SetText("");
 		fLatencyView->SetText("");
 		fPreemptionView->SetText("");
+		fUnspecifiedTimeView->SetText("");
 	}
 }

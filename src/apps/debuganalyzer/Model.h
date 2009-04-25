@@ -230,6 +230,9 @@ public:
 	inline	int64				Latencies() const;
 	inline	bigtime_t			TotalLatency() const;
 	inline	int64				Preemptions() const;
+	inline	int64				Waits() const;
+	inline	bigtime_t			TotalWaitTime() const;
+	inline	bigtime_t			UnspecifiedWaitTime() const;
 
 			ThreadWaitObjectGroup* ThreadWaitObjectGroupFor(uint32 type,
 									addr_t object) const;
@@ -240,6 +243,7 @@ public:
 			void				AddRerun(bigtime_t runTime);
 			void				AddLatency(bigtime_t latency);
 			void				AddPreemption(bigtime_t runTime);
+			void				AddWait(bigtime_t waitTime);
 			void				AddUnspecifiedWait(bigtime_t waitTime);
 
 			ThreadWaitObject*	AddThreadWaitObject(WaitObject* waitObject,
@@ -281,6 +285,8 @@ private:
 			bigtime_t			fMinRerunTime;
 			bigtime_t			fMaxRerunTime;
 
+			int64				fWaits;
+			bigtime_t			fTotalWaitTime;
 			bigtime_t			fUnspecifiedWaitTime;
 
 			int64				fPreemptions;
@@ -590,6 +596,27 @@ int64
 Model::Thread::Preemptions() const
 {
 	return fPreemptions;
+}
+
+
+int64
+Model::Thread::Waits() const
+{
+	return fWaits;
+}
+
+
+bigtime_t
+Model::Thread::TotalWaitTime() const
+{
+	return fTotalWaitTime;
+}
+
+
+bigtime_t
+Model::Thread::UnspecifiedWaitTime() const
+{
+	return fUnspecifiedWaitTime;
 }
 
 

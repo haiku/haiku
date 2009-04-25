@@ -552,6 +552,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		if (thread->waitObject != NULL) {
 			thread->waitObject->AddWait(diffTime);
 			thread->waitObject = NULL;
+			thread->thread->AddWait(diffTime);
 		} else if (thread->state != UNKNOWN)
 			thread->thread->AddUnspecifiedWait(diffTime);
 
