@@ -21,7 +21,8 @@ resource app_flags B_SINGLE_LAUNCH;
 resource file_types message {
 	"types" = "text",
 	"types" = "application/x-vnd.Be-directory",
-	"types" = "application/x-vnd.Be-symlink"
+	"types" = "application/x-vnd.Be-symlink",
+	"types" = "application/x-vnd.Be-volume"
 };
 
 resource vector_icon {
