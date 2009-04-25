@@ -25,8 +25,8 @@
 // dealings in this Software without prior written authorization of the
 // copyright holder.
 
-#ifndef _VECTOR_H
-#define _VECTOR_H
+#ifndef _INSTALLER_VECTOR_H
+#define _INSTALLER_VECTOR_H
 
 #include <new>
 #include <stdlib.h>
@@ -795,4 +795,4 @@ _VECTOR_CLASS_NAME::_IteratorIndex(const ConstIterator &iterator) const
 	return -1;
 }
 
-#endif	// _VECTOR_H
+#endif	// _INSTALLER_VECTOR_H
