@@ -19,20 +19,20 @@
 namespace Bluetooth {
 
 DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice)
-	: BListItem()
-	, fDevice(bDevice)	
+	: BListItem(),
+	fDevice(bDevice)
 {	
 	SetDevice(fDevice);
 }	
 
 
 DeviceListItem::DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi)
-	: BListItem()
-	, fDevice(NULL)
-	, fAddress(bdaddr)
-	, fClass(dClass)
-	, fName("unknown")
-	, fRSSI(rssi)
+	: BListItem(),
+	fDevice(NULL),
+	fAddress(bdaddr),
+	fClass(dClass),
+	fName("unknown"),
+	fRSSI(rssi)
 {
 
 }	
@@ -59,13 +59,13 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 {	
 	rgb_color	kBlack = { 0,0,0,0 };	
 	rgb_color	kHighlight = { 156,154,156,0 };	
-	
-	if (IsSelected() ||	complete)	{	
-		rgb_color	color; 
-		if (IsSelected())	
-			color	=	kHighlight;	
-		else 
-			color	=	owner->ViewColor();	
+
+	if (IsSelected() || complete) {
+		rgb_color	color;
+		if (IsSelected())
+			color = kHighlight;
+		else
+			color = owner->ViewColor();	
 
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
@@ -127,7 +127,7 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 #endif
 
 	owner->SetHighColor(kBlack);
-	
+
 } 
 
 
@@ -138,9 +138,8 @@ DeviceListItem::Update(BView *owner, const BFont *font)
 
    	font_height height;
 	font->GetHeight(&height);
-	SetHeight(MAX((height.ascent + height.descent + height.leading) * TEXT_ROWS + (TEXT_ROWS+1)*INSETS, 
-		DeviceClass::PixelsForIcon + 2 * INSETS));
-	
+	SetHeight(MAX((height.ascent + height.descent + height.leading) * TEXT_ROWS +
+		(TEXT_ROWS+1)*INSETS, DeviceClass::PixelsForIcon + 2 * INSETS));
 
 }
 	
