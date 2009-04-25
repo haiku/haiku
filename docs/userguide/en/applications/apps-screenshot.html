@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,7 +26,7 @@
 </div>
 <div class="topnav">
 	<p>
-		<a href="../applications.html">Applications</a>
+		<a href="../applications.html#list-of-apps">Applications</a>
 		&#160;&#160;&#160;
 		Previous: <a href="apps-poorman.html">PoorMan</a>
 		&#160;&#160;&#160;
@@ -43,19 +43,44 @@ width="64" height="64" />Screenshot</h1>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span></td></tr>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>Besides normal screenshots taken via <span class="key">PRINT</span>, which puts a PNG of the current screen into <span class="path">/boot/home/</span>, this application provides some useful options.</p>
+<p><img id="sreenshot" src="../../images/apps-images/screenshot.png" alt="screenshot.png" width="428" height="249" /></p>
+<p>Starting Screenshot will take a screenshot as usual, but offers from its main window controls to set filename, format and folder before saving the image.</p>
+<p>The <span class="button">Options</span> dialog has a few more settings:</p>
+<p><img id="sreenshot-options" src="../../images/apps-images/screenshot-options.png" alt="screenshot-options.png" width="429" height="249" /></p>
+<p>Besides the obvious, toggle between taking the whole screen or just the active window, including the window border and the mouse pointer, you can enter a delay before a screenshot is taken. Of course, this delay takes only effect if you take a new shot by pressing <span class="button">Take Screenshot</span>.</p>
+
+<h1>Taking a screenshot from Terminal</h1>
+<p>The Screenshot application is also usable from Terminal or a script.<br />
+<span class="cli">Screenshot --help</span> shows the familiar options as parameters:</p>
+
+<pre class="terminal">~> Screenshot --help
+
+Screenshot [OPTION]... Creates a bitmap of the current screen
+OPTION
+  -o, --options         Show options window first
+  -m, --mouse           Have the mouse pointer in the screenshot
+  -b, --border          Include the window border with the screenshot
+  -w, --window          Use active window instead of the entire screen
+  -d, --delay=seconds   Take screenshot after specified delay [in seconds]
+  -s, --silent          Saves the screenshot without the application window
+                        overwrites --options, saves to home directory as png
+
+Note: OPTION -b, --border takes only effect when used with -w, --window
+</pre>
+
 
 </div>
-<!--
+
 <div class="bottomnav">
 	<p>
-		<a href="../applications.html">Applications</a>
+		<a href="../applications.html#list-of-apps">Applications</a>
 		&#160;&#160;&#160;
 		Previous: <a href="apps-poorman.html">PoorMan</a>
 		&#160;&#160;&#160;
 		Next: <a href="apps-showimage.html">Showimage</a>
 	</p>
 </div>
--->
+
 </body>
 </html>
