@@ -47,31 +47,37 @@ public:
 				value.SetTo(thread->Name(), VARIANT_DONT_COPY_DATA);
 				return true;
 			case 2:
+			{
+				char buffer[128];
+				Model::Team* team = thread->GetTeam();
+				snprintf(buffer, sizeof(buffer), "%s (%ld)", team->Name(),
+					team->ID());
+				value.SetTo(buffer);
+				return true;
+			}
+			case 3:
 				value.SetTo(thread->CreationTime());
 				return true;
-			case 3:
+			case 4:
 				value.SetTo(thread->DeletionTime());
 				return true;
-			case 4:
+			case 5:
 				value.SetTo(thread->Runs());
 				return true;
-			case 5:
+			case 6:
 				value.SetTo(thread->TotalRunTime());
 				return true;
-			case 6:
-				value.SetTo(thread->Reruns());
-				return true;
 			case 7:
-				value.SetTo(thread->TotalRerunTime());
-				return true;
-			case 8:
 				value.SetTo(thread->Latencies());
 				return true;
-			case 9:
+			case 8:
 				value.SetTo(thread->TotalLatency());
 				return true;
-			case 10:
+			case 9:
 				value.SetTo(thread->Preemptions());
+				return true;
+			case 10:
+				value.SetTo(thread->TotalRerunTime());
 				return true;
 			default:
 				return false;
@@ -104,24 +110,24 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(2, "Creation", 80, 40, 1000,
+	fThreadsTable->AddColumn(new StringTableColumn(2, "Team", 80, 40, 1000,
+		B_TRUNCATE_END, B_ALIGN_LEFT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(3, "Creation", 80, 40, 1000,
 		true, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(3, "Deletion", 80, 40, 1000,
+	fThreadsTable->AddColumn(new BigtimeTableColumn(4, "Deletion", 80, 40, 1000,
 		false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new Int64TableColumn(4, "Runs", 80, 20, 1000,
+	fThreadsTable->AddColumn(new Int64TableColumn(5, "Runs", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(5, "Run Time", 80, 20, 1000,
+	fThreadsTable->AddColumn(new BigtimeTableColumn(6, "Run Time", 80, 20, 1000,
 		false, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new Int64TableColumn(6, "Reruns", 80, 20, 1000,
+	fThreadsTable->AddColumn(new Int64TableColumn(7, "Latencies", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(7, "Rerun Time", 80, 20,
-		1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new Int64TableColumn(8, "Latencies", 80, 20, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(9, "Latency Time", 80, 20,
+	fThreadsTable->AddColumn(new BigtimeTableColumn(8, "Latency Time", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new Int64TableColumn(10, "Preemptions", 80, 20,
+	fThreadsTable->AddColumn(new Int64TableColumn(9, "Preemptions", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new BigtimeTableColumn(10, "Preemption Time", 80,
+		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fThreadsTable->AddTableListener(this);
 }
