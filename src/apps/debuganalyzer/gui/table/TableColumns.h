@@ -7,7 +7,7 @@
 
 #include <ColumnTypes.h>
 
-#include "table/Table.h"
+#include "table/TableColumn.h"
 
 
 class DelagateBasedTableColumn : public TableColumn {
@@ -25,7 +25,7 @@ protected:
 
 	virtual	void				DrawValue(const Variant& value, BRect rect,
 									BView* targetView);
-	virtual	float				GetPreferredValueWidth(const Variant& value,
+	virtual	float				GetPreferredWidth(const Variant& value,
 									BView* parent) const;
 
 	virtual	BField*				PrepareField(const Variant& value) const = 0;

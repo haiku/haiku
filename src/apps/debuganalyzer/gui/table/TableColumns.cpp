@@ -49,7 +49,7 @@ DelagateBasedTableColumn::DrawValue(const Variant& value, BRect rect,
 
 
 float
-DelagateBasedTableColumn::GetPreferredValueWidth(const Variant& value,
+DelagateBasedTableColumn::GetPreferredWidth(const Variant& value,
 	BView* parent) const
 {
 	return fColumnDelegate->GetPreferredWidth(PrepareField(value), parent);

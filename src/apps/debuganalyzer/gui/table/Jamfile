@@ -9,5 +9,6 @@ UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 MergeObject DebugAnalyzer_gui_table.o
 	:
 	Table.cpp
+	TableColumn.cpp
 	TableColumns.cpp
 ;

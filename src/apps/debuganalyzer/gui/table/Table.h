@@ -9,6 +9,8 @@
 #include <ColumnTypes.h>
 #include <ObjectList.h>
 
+#include "table/TableColumn.h"
+
 #include "Variant.h"
 
 
@@ -24,45 +26,6 @@ public:
 
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
 									Variant& value) = 0;
-};
-
-
-class TableColumn : protected BColumn {
-public:
-								TableColumn(int32 modelIndex, float width,
-									float minWidth, float maxWidth,
-									alignment align);
-	virtual						~TableColumn();
-
-			int32				ModelIndex() const	{ return fModelIndex; }
-
-			float				Width() const		{ return BColumn::Width(); }
-
-protected:
-	virtual	void				DrawValue(const Variant& value, BRect rect,
-									BView* targetView);
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
-	virtual	float				GetPreferredValueWidth(const Variant& value,
-									BView* parent) const;
-
-protected:
-	virtual	void				DrawField(BField* field, BRect rect,
-									BView* targetView);
-	virtual	int					CompareFields(BField* field1, BField* field2);
-
-	virtual	float				GetPreferredWidth(BField* field,
-									BView* parent) const;
-
-			void				SetTableModel(TableModel* model);
-									// package private
-			
-private:
-			friend class Table;
-
-private:
-			TableModel*			fModel;
-			int32				fModelIndex;
 };
 
 
@@ -96,7 +59,9 @@ public:
 			void				RemoveTableListener(TableListener* listener);
 
 private:
-			typedef BObjectList<TableColumn>	ColumnList;
+			class Column;
+
+			typedef BObjectList<Column>			ColumnList;
 			typedef BObjectList<TableListener>	ListenerList;
 
 private:
