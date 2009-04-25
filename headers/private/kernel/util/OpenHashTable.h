@@ -8,6 +8,7 @@
 
 #include <OS.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef _KERNEL_MODE
 #	include <KernelExport.h>
