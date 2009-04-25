@@ -155,6 +155,23 @@ BGridLayout::~BGridLayout()
 	delete fColumnInfos;
 }
 
+
+// CountColumns
+int32
+BGridLayout::CountColumns() const
+{
+	return fColumnCount;
+}
+
+
+// CountRows
+int32
+BGridLayout::CountRows() const
+{
+	return fRowCount;
+}
+
+
 // HorizontalSpacing
 float
 BGridLayout::HorizontalSpacing() const

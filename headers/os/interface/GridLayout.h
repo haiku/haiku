@@ -15,6 +15,9 @@ public:
 									float vertical = 0.0f);
 	virtual						~BGridLayout();
 
+			int32				CountColumns() const;
+			int32				CountRows() const;
+
 			float				HorizontalSpacing() const;
 			float				VerticalSpacing() const;
 
