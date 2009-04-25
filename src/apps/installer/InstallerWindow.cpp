@@ -580,6 +580,7 @@ void
 InstallerWindow::_DisableInterface(bool disable)
 {
 	fSetupButton->SetEnabled(!disable);
+	fMakeBootableButton->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
 }
