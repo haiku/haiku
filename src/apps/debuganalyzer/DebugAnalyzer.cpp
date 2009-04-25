@@ -14,8 +14,9 @@
 #include <AutoDeleter.h>
 
 #include "DataSource.h"
-#include "MainWindow.h"
 #include "MessageCodes.h"
+
+#include "main_window/MainWindow.h"
 
 
 static const char* const kSignature = "application/x-vnd.Haiku-DebugAnalyzer";

@@ -7,17 +7,22 @@
 
 #include <stdio.h>
 
+#include <new>
+
 #include <Application.h>
 #include <GroupLayoutBuilder.h>
 #include <TabView.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "DataSource.h"
 #include "MessageCodes.h"
-#include "Model.h"
 #include "ModelLoader.h"
-#include "ThreadsPage.h"
+#include "SubWindowManager.h"
+
+#include "main_window/ThreadsPage.h"
+#include "thread_window/ThreadWindow.h"
 
 
 MainWindow::MainWindow(DataSource* dataSource)
@@ -25,10 +30,13 @@ MainWindow::MainWindow(DataSource* dataSource)
 	BWindow(BRect(50, 50, 599, 499), "DebugAnalyzer", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fMainTabView(NULL),
-	fThreadsPage(new ThreadsPage),
+	fThreadsPage(NULL),
 	fModel(NULL),
-	fModelLoader(NULL)
+	fModelLoader(NULL),
+	fSubWindowManager(NULL)
 {
+	fSubWindowManager = new SubWindowManager(this);
+
 	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
 	SetLayout(rootLayout);
 
@@ -38,7 +46,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 		.Add(fMainTabView);
 
 	fMainTabView->AddTab(new BView("Teams", 0));
-	fMainTabView->AddTab(fThreadsPage);
+	fMainTabView->AddTab(fThreadsPage = new ThreadsPage(this));
 
 	// create a model loader, if we have a data source
 	if (dataSource != NULL)
@@ -49,7 +57,11 @@ MainWindow::MainWindow(DataSource* dataSource)
 MainWindow::~MainWindow()
 {
 	delete fModelLoader;
-	delete fModel;
+
+	if (fModel != NULL)
+		fModel->RemoveReference();
+
+	fSubWindowManager->RemoveReference();
 }
 
 
@@ -63,8 +75,8 @@ printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
 			Model* model = fModelLoader->DetachModel();
 			delete fModelLoader;
 			fModelLoader = NULL;
-
 			_SetModel(model);
+			model->RemoveReference();
 			break;
 		}
 
@@ -88,6 +100,7 @@ printf("MSG_MODEL_LOADED_FAILED/MSG_MODEL_LOADED_ABORTED\n");
 void
 MainWindow::Quit()
 {
+	fSubWindowManager->Broadcast(B_QUIT_REQUESTED);
 	be_app->PostMessage(MSG_WINDOW_QUIT);
 
 	BWindow::Quit();
@@ -114,10 +127,57 @@ MainWindow::Show()
 
 
 void
+MainWindow::OpenThreadWindow(Model::Thread* thread)
+{
+	// create a sub window key
+	ObjectSubWindowKey* key = new(std::nothrow) ObjectSubWindowKey(thread);
+	if (key == NULL) {
+		// TODO: Report error!
+		return;
+	}
+	ObjectDeleter<ObjectSubWindowKey> keyDeleter(key);
+
+	AutoLocker<SubWindowManager> locker(fSubWindowManager);
+
+	// check whether the window already exists
+	ThreadWindow* window = dynamic_cast<ThreadWindow*>(
+		fSubWindowManager->LookupSubWindow(*key));
+	if (window != NULL) {
+		// window exists -- just bring it to front
+		locker.Unlock();
+		window->Lock();
+		window->Activate();
+		return;
+	}
+
+	// window doesn't exist yet -- create it
+	try {
+		window = new ThreadWindow(fSubWindowManager, fModel, thread);
+	} catch (std::bad_alloc) {
+		// TODO: Report error!
+	}
+
+	if (!window->AddToSubWindowManager(key)) {
+		// TODO: Report error!
+		delete window;
+	}
+
+	keyDeleter.Detach();
+
+	window->Show();
+}
+
+
+void
 MainWindow::_SetModel(Model* model)
 {
-	delete fModel;
+	if (fModel != NULL)
+		fModel->RemoveReference();
+
 	fModel = model;
+
+	if (fModel != NULL)
+		fModel->AddReference();
 
 	fThreadsPage->SetModel(fModel);
 }

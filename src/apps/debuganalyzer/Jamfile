@@ -7,16 +7,25 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) main_window ] ;
 
 Application DebugAnalyzer
 	:
+	AbstractGeneralPage.cpp
 	DataSource.cpp
 	DebugAnalyzer.cpp
-	MainWindow.cpp
 	Model.cpp
 	ModelLoader.cpp
+	SubWindow.cpp
+	SubWindowManager.cpp
 	Table.cpp
 	TableColumns.cpp
-	ThreadsPage.cpp
 	Variant.cpp
 
-	: libcolumnlistview.a libdebug.so be
-	: DebugAnalyzer.rdef
+	:
+	<nogrist>DebugAnalyzer_MainWindow.o
+	<nogrist>DebugAnalyzer_ThreadWindow.o
+
+	libcolumnlistview.a libdebug.so be
+	:
+	DebugAnalyzer.rdef
 ;
+
+HaikuSubInclude main_window ;
+HaikuSubInclude thread_window ;

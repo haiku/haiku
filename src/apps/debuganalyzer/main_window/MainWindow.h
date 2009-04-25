@@ -7,12 +7,13 @@
 
 #include <Window.h>
 
+#include "Model.h"
+
 
 class BTabView;
 class DataSource;
 class ModelLoader;
-class Model;
-class ThreadsPage;
+class SubWindowManager;
 
 
 class MainWindow : public BWindow {
@@ -26,6 +27,11 @@ public:
 
 	virtual	void				Show();
 
+			void				OpenThreadWindow(Model::Thread* thread);
+
+private:
+			class ThreadsPage;
+
 private:
 			void				_SetModel(Model* model);
 
@@ -34,8 +40,8 @@ private:
 			ThreadsPage*		fThreadsPage;
 			Model*				fModel;
 			ModelLoader*		fModelLoader;
+			SubWindowManager*	fSubWindowManager;
 };
-
 
 
 #endif	// MAIN_WINDOW_H

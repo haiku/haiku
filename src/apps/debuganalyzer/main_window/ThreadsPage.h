@@ -7,14 +7,14 @@
 
 #include <GroupView.h>
 
+#include "Table.h"
 
-class Model;
-class Table;
+#include "main_window/MainWindow.h"
 
 
-class ThreadsPage : public BGroupView {
+class MainWindow::ThreadsPage : public BGroupView, private TableListener {
 public:
-								ThreadsPage();
+								ThreadsPage(MainWindow* parent);
 	virtual						~ThreadsPage();
 
 			void				SetModel(Model* model);
@@ -23,6 +23,11 @@ private:
 			class ThreadsTableModel;
 
 private:
+	// TableListener
+	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
+
+private:
+			MainWindow*			fParent;
 			Table*				fThreadsTable;
 			ThreadsTableModel*	fThreadsTableModel;
 			Model*				fModel;

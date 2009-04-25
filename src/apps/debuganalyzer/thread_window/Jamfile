@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src apps debuganalyzer thread_window ;
+
+UsePrivateHeaders debug interface kernel shared ;
+UsePrivateSystemHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+MergeObject DebugAnalyzer_ThreadWindow.o
+	:
+	ThreadWindow.cpp
+	GeneralPage.cpp
+;

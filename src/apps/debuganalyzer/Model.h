@@ -8,11 +8,13 @@
 #include <ObjectList.h>
 #include <OS.h>
 
+#include <Referenceable.h>
+
 #include <system_profiler_defs.h>
 #include <util/SinglyLinkedList.h>
 
 
-class Model {
+class Model : public Referenceable {
 public:
 			struct creation_time_id;
 			struct type_and_object;
@@ -183,6 +185,7 @@ public:
 								~Team();
 
 	inline	team_id				ID() const;
+	inline	const char*			Name() const;
 
 	inline	bigtime_t			CreationTime() const;
 	inline	bigtime_t			DeletionTime() const;
@@ -215,6 +218,7 @@ public:
 
 	inline	thread_id			ID() const;
 	inline	const char*			Name() const;
+	inline	Team*				GetTeam() const;
 
 	inline	bigtime_t			CreationTime() const;
 	inline	bigtime_t			DeletionTime() const;
@@ -459,6 +463,14 @@ Model::Team::ID() const
 }
 
 
+const char*
+Model::Team::Name() const
+{
+	return fCreationEvent->name;
+		// TODO: We should probably return the last exec name!
+}
+
+
 bigtime_t
 Model::Team::CreationTime() const
 {
@@ -508,6 +520,13 @@ const char*
 Model::Thread::Name() const
 {
 	return fCreationEvent->name;
+}
+
+
+Model::Team*
+Model::Thread::GetTeam() const
+{
+	return fTeam;
 }
 
 

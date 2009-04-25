@@ -3,20 +3,19 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "ThreadsPage.h"
+#include "main_window/ThreadsPage.h"
 
 #include <stdio.h>
 
 #include <new>
 
-#include "Model.h"
 #include "TableColumns.h"
 
 
 // #pragma mark - ThreadsTableModel
 
 
-class ThreadsPage::ThreadsTableModel : public TableModel {
+class MainWindow::ThreadsPage::ThreadsTableModel : public TableModel {
 public:
 	ThreadsTableModel(Model* model)
 		:
@@ -87,9 +86,10 @@ private:
 // #pragma mark - ThreadsPage
 
 
-ThreadsPage::ThreadsPage()
+MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 	:
 	BGroupView(B_VERTICAL),
+	fParent(parent),
 	fThreadsTable(NULL),
 	fThreadsTableModel(NULL),
 	fModel(NULL)
@@ -100,7 +100,7 @@ ThreadsPage::ThreadsPage()
 	fThreadsTable = new Table("threads list", 0);
 	AddChild(fThreadsTable->ToView());
 
-	fThreadsTable->AddColumn(new Int32TableColumn(0, "Thread", 40, 20, 1000,
+	fThreadsTable->AddColumn(new Int32TableColumn(0, "ID", 40, 20, 1000,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
@@ -122,10 +122,12 @@ ThreadsPage::ThreadsPage()
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(10, "Preemptions", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+
+	fThreadsTable->AddTableListener(this);
 }
 
 
-ThreadsPage::~ThreadsPage()
+MainWindow::ThreadsPage::~ThreadsPage()
 {
 	fThreadsTable->SetTableModel(NULL);
 	delete fThreadsTableModel;
@@ -133,7 +135,7 @@ ThreadsPage::~ThreadsPage()
 
 
 void
-ThreadsPage::SetModel(Model* model)
+MainWindow::ThreadsPage::SetModel(Model* model)
 {
 	if (model == fModel)
 		return;
@@ -150,4 +152,13 @@ ThreadsPage::SetModel(Model* model)
 		fThreadsTableModel = new(std::nothrow) ThreadsTableModel(fModel);
 		fThreadsTable->SetTableModel(fThreadsTableModel);
 	}
+}
+
+
+void
+MainWindow::ThreadsPage::TableRowInvoked(Table* table, int32 rowIndex)
+{
+	Model::Thread* thread = fModel->ThreadAt(rowIndex);
+	if (thread != NULL)
+		fParent->OpenThreadWindow(thread);
 }
