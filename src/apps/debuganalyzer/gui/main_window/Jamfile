@@ -8,6 +8,8 @@ UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 
 MergeObject DebugAnalyzer_gui_main_window.o
 	:
+	GeneralPage.cpp
 	MainWindow.cpp
+	TeamsPage.cpp
 	ThreadsPage.cpp
 ;

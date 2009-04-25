@@ -27,9 +27,12 @@ public:
 
 	virtual	void				Show();
 
+			void				OpenTeamWindow(Model::Team* team);
 			void				OpenThreadWindow(Model::Thread* thread);
 
 private:
+			class GeneralPage;
+			class TeamsPage;
 			class ThreadsPage;
 
 private:
@@ -37,6 +40,8 @@ private:
 
 private:
 			BTabView*			fMainTabView;
+			GeneralPage*		fGeneralPage;
+			TeamsPage*			fTeamsPage;
 			ThreadsPage*		fThreadsPage;
 			Model*				fModel;
 			ModelLoader*		fModelLoader;

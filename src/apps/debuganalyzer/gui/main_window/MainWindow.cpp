@@ -21,7 +21,10 @@
 #include "ModelLoader.h"
 #include "SubWindowManager.h"
 
+#include "main_window/GeneralPage.h"
+#include "main_window/TeamsPage.h"
 #include "main_window/ThreadsPage.h"
+
 #include "thread_window/ThreadWindow.h"
 
 
@@ -30,6 +33,8 @@ MainWindow::MainWindow(DataSource* dataSource)
 	BWindow(BRect(50, 50, 599, 499), "DebugAnalyzer", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fMainTabView(NULL),
+	fGeneralPage(NULL),
+	fTeamsPage(NULL),
 	fThreadsPage(NULL),
 	fModel(NULL),
 	fModelLoader(NULL),
@@ -45,7 +50,8 @@ MainWindow::MainWindow(DataSource* dataSource)
 	BGroupLayoutBuilder(rootLayout)
 		.Add(fMainTabView);
 
-	fMainTabView->AddTab(new BView("Teams", 0));
+	fMainTabView->AddTab(fGeneralPage = new GeneralPage);
+	fMainTabView->AddTab(fTeamsPage = new TeamsPage(this));
 	fMainTabView->AddTab(fThreadsPage = new ThreadsPage(this));
 
 	// create a model loader, if we have a data source
@@ -127,6 +133,13 @@ MainWindow::Show()
 
 
 void
+MainWindow::OpenTeamWindow(Model::Team* team)
+{
+	// TODO:...
+}
+
+
+void
 MainWindow::OpenThreadWindow(Model::Thread* thread)
 {
 	// create a sub window key
@@ -179,5 +192,7 @@ MainWindow::_SetModel(Model* model)
 	if (fModel != NULL)
 		fModel->AddReference();
 
+	fGeneralPage->SetModel(fModel);
+	fTeamsPage->SetModel(fModel);
 	fThreadsPage->SetModel(fModel);
 }

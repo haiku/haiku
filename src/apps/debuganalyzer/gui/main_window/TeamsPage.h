@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef MAIN_THREADS_PAGE_H
-#define MAIN_THREADS_PAGE_H
+#ifndef MAIN_TEAMS_PAGE_H
+#define MAIN_TEAMS_PAGE_H
 
 #include <GroupView.h>
 
@@ -12,15 +12,15 @@
 #include "main_window/MainWindow.h"
 
 
-class MainWindow::ThreadsPage : public BGroupView, private TableListener {
+class MainWindow::TeamsPage : public BGroupView, private TableListener {
 public:
-								ThreadsPage(MainWindow* parent);
-	virtual						~ThreadsPage();
+								TeamsPage(MainWindow* parent);
+	virtual						~TeamsPage();
 
 			void				SetModel(Model* model);
 
 private:
-			class ThreadsTableModel;
+			class TeamsTableModel;
 
 private:
 	// TableListener
@@ -28,11 +28,11 @@ private:
 
 private:
 			MainWindow*			fParent;
-			Table*				fThreadsTable;
-			ThreadsTableModel*	fThreadsTableModel;
+			Table*				fTeamsTable;
+			TeamsTableModel*	fTeamsTableModel;
 			Model*				fModel;
 };
 
 
 
-#endif	// MAIN_THREADS_PAGE_H
+#endif	// MAIN_TEAMS_PAGE_H
