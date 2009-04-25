@@ -75,15 +75,61 @@ CopyEngine::CopyEngine(InstallerWindow *window)
 
 
 void
-CopyEngine::MessageReceived(BMessage*msg)
+CopyEngine::MessageReceived(BMessage* message)
 {
 	CALLED();
-	switch (msg->what) {
+
+	switch (message->what) {
 		case ENGINE_START:
-		{
 			Start(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
 			break;
+
+		case kWriteBootSector:
+		{
+			int32 id;
+			if (message->FindInt32("id", &id) != B_OK) {
+				SetStatusMessage("Boot sector not written because of an "
+					" internal error.");
+				break;
+			}
+
+			// TODO: Refactor with Start()
+			BPath targetDirectory;
+			BDiskDevice device;
+			BPartition* partition;
+
+			if (fDDRoster.GetPartitionWithID(id, &device, &partition) == B_OK) {
+				if (!partition->IsMounted()) {
+					if (partition->Mount() < B_OK) {
+						SetStatusMessage("The partition can't be mounted. "
+							"Please choose a different partition.");
+						break;
+					}
+				}
+				if (partition->GetMountPoint(&targetDirectory) != B_OK) {
+					SetStatusMessage("The mount point could not be retrieve.");
+					break;
+				}
+			} else if (fDDRoster.GetDeviceWithID(id, &device) == B_OK) {
+				if (!device.IsMounted()) {
+					if (device.Mount() < B_OK) {
+						SetStatusMessage("The disk can't be mounted. Please "
+							"choose a different disk.");
+						break;
+					}
+				}
+				if (device.GetMountPoint(&targetDirectory) != B_OK) {
+					SetStatusMessage("The mount point could not be retrieve.");
+					break;
+				}
+			}
+
+			LaunchFinishScript(targetDirectory);
+			// TODO: Get error from executing script!
+			SetStatusMessage("Boot sector successfully written.");
 		}
+		default:
+			BLooper::MessageReceived(message);
 	}
 }
 
@@ -395,6 +441,24 @@ bool
 CopyEngine::Cancel()
 {
 	return fControl->Cancel();
+}
+
+
+void
+CopyEngine::WriteBootSector(BMenu* targetMenu)
+{
+	// Executed in window thread.
+	CALLED();
+
+	PartitionMenuItem* item = (PartitionMenuItem*)targetMenu->FindMarked();
+	if (item == NULL) {
+		ERR("bad menu items\n");
+		return;
+	}
+
+	BMessage message(kWriteBootSector);
+	message.AddInt32("id", item->ID());
+	PostMessage(&message, this);
 }
 
 

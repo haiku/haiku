@@ -29,6 +29,8 @@ class CopyEngine : public BLooper {
 		void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
 		bool Cancel();
 		void SetLock(BLocker* lock) { fCancelLock = lock; }
+		void WriteBootSector(BMenu *targetMenu);
+
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);

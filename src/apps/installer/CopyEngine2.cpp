@@ -14,6 +14,8 @@
 #include <SymLink.h>
 
 #include "AutoLocker.h"
+#include "InstallerWindow.h"
+	// TODO: For PACKAGES_DIRECTORY and VAR_DIRECTORY, not so nice...
 
 using std::nothrow;
 
@@ -80,7 +82,8 @@ CopyEngine2::CopyFolder(const char* source, const char* destination,
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
 
-	status_t ret = _CollectCopyInfo(source);
+	int32 level = 0;
+	status_t ret = _CollectCopyInfo(source, level);
 	if (ret < B_OK)
 		return ret;
 
@@ -92,7 +95,8 @@ CopyEngine2::CopyFolder(const char* source, const char* destination,
 
 printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
 
-	return _CopyFolder(source, destination, locker);
+	level = 0;
+	return _CopyFolder(source, destination, level, locker);
 }
 
 
@@ -180,8 +184,10 @@ printf("CopyFile - cancled\n");
 
 
 status_t
-CopyEngine2::_CollectCopyInfo(const char* _source)
+CopyEngine2::_CollectCopyInfo(const char* _source, int32& level)
 {
+	level++;
+
 	BDirectory source(_source);
 	status_t ret = source.InitCheck();
 	if (ret < B_OK)
@@ -192,6 +198,14 @@ CopyEngine2::_CollectCopyInfo(const char* _source)
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
+		char name[B_FILE_NAME_LENGTH];
+		status_t ret = entry.GetName(name);
+		if (ret < B_OK)
+			return ret;
+
+		if (!_ShouldCopyEntry(name, statInfo, level))
+			continue;
+
 		if (S_ISDIR(statInfo.st_mode)) {
 			// handle recursive directory copy
 			BPath srcFolder;
@@ -199,31 +213,29 @@ CopyEngine2::_CollectCopyInfo(const char* _source)
 			if (ret < B_OK)
 				return ret;
 
-			ret = _CollectCopyInfo(srcFolder.Path());
+			ret = _CollectCopyInfo(srcFolder.Path(), level);
 			if (ret < B_OK)
 				return ret;
 		} else if (S_ISLNK(statInfo.st_mode)) {
+			// link, ignore size
 		} else {
 			// file data
-			off_t size;
-			ret = entry.GetSize(&size);
-			if (ret < B_OK)
-				return ret;
-
-			fBytesToCopy += size;
+			fBytesToCopy += statInfo.st_size;
 		}
 
 		fItemsToCopy++;
 	}
 
+	level--;
 	return B_OK;
 }
 
 
 status_t
 CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
-	BLocker* locker)
+	int32& level, BLocker* locker)
 {
+	level++;
 	fCurrentTargetFolder = _destination;
 
 	BDirectory source(_source);
@@ -253,18 +265,29 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 		if (ret < B_OK)
 			return ret;
 
-		fItemsCopied++;
-		fCurrentItem = name;
-
-		_UpdateProgress();
-
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
+		if (!_ShouldCopyEntry(name, statInfo, level))
+			continue;
+
+		fItemsCopied++;
+		fCurrentItem = name;
+		_UpdateProgress();
+
 		BEntry copy(&destination, name);
+		bool copyAttributes = true;
 
 		if (S_ISDIR(statInfo.st_mode)) {
 			// handle recursive directory copy
+
+			if (copy.Exists()) {
+				// Do not overwrite attributes on folders that exist.
+				// This should work better when the install target already
+				// contains a Haiku installation.
+				copyAttributes = false;
+			}
+
 			BPath srcFolder;
 			ret = entry.GetPath(&srcFolder);
 			if (ret < B_OK)
@@ -278,7 +301,8 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 			if (locker != NULL)
 				lock.Unlock();
 
-			ret = _CopyFolder(srcFolder.Path(), dstFolder.Path(), locker);
+			ret = _CopyFolder(srcFolder.Path(), dstFolder.Path(), level,
+				locker);
 			if (ret < B_OK)
 				return ret;
 
@@ -312,6 +336,9 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 				return ret;
 		}
 
+		if (!copyAttributes)
+			continue;
+
 		// copy attributes
 		BNode sourceNode(&entry);
 		BNode targetNode(&copy);
@@ -325,6 +352,8 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 			off_t offset = 0;
 			ssize_t read = sourceNode.ReadAttr(attrName, info.type,
 				offset, buffer, min_c(size, info.size));
+			// NOTE: It's important to still write the attribute even if
+			// we have read 0 bytes!
 			while (read >= 0) {
 				targetNode.WriteAttr(attrName, info.type, offset, buffer, read);
 				offset += read;
@@ -343,6 +372,7 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 		copy.SetCreationTime(statInfo.st_crtime);
 	}
 
+	level--;
 	return B_OK;
 }
 
@@ -360,6 +390,24 @@ CopyEngine2::_UpdateProgress()
 		message.AddString("folder", fCurrentTargetFolder);
 		fMessenger.SendMessage(&message);
 	}
+}
+
+
+bool
+CopyEngine2::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
+	int32 level) const
+{
+	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
+		if (strcmp(VAR_DIRECTORY, name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
+		if (strcmp(PACKAGES_DIRECTORY, name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
+	}
+	return true;
 }
 
 

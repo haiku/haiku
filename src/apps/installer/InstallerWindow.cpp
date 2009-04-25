@@ -264,6 +264,10 @@ InstallerWindow::InstallerWindow()
 	fSetupButton = new BButton("setup_button",
 		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
+	fMakeBootableButton = new BButton("makebootable_button",
+		"Write Boot Sector", new BMessage(kWriteBootSector));
+	fMakeBootableButton->SetEnabled(false);
+
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
@@ -286,8 +290,9 @@ InstallerWindow::InstallerWindow()
 				.Add(fSizeView, 0, 6, 2)
 			)
 
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 				.Add(fSetupButton)
+				.Add(fMakeBootableButton)
 				.AddGlue()
 				.Add(fBeginButton)
 			)
@@ -437,8 +442,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case STATUS_MESSAGE:
 		{
-			if (fInstallStatus != kInstalling)
-				break;
+// TODO: Was this supposed to prevent status messages still arriving
+// after the copy engine was shut down?
+//			if (fInstallStatus != kInstalling)
+//				break;
 			float progress;
 			if (msg->FindFloat("progress", &progress) == B_OK) {
 				const char* currentItem;
@@ -466,17 +473,27 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 		case INSTALL_FINISHED:
+		{
 			delete fCopyEngineLock;
 			fCopyEngineLock = NULL;
 
 			fBeginButton->SetLabel("Quit");
-			_SetStatusMessage("Installation completed.");
+
+			PartitionMenuItem* dstItem
+				= (PartitionMenuItem*)fDestMenu->FindMarked();
+			char status[1024];
+			snprintf(status, sizeof(status), "Installation completed. "
+				"Boot sector has been written to '%s'. Press Quit to reboot "
+				"or chose a new target volume to perform another "
+				"installation.", dstItem ? dstItem->Name() : "???");
+			_SetStatusMessage(status);
 			fInstallStatus = kFinished;
 			_DisableInterface(false);
 			fProgressLayoutItem->SetVisible(false);
 			fPkgSwitchLayoutItem->SetVisible(true);
 			_ShowOptionalPackages();
 			break;
+		}
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 		{
@@ -495,6 +512,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		case kWriteBootSector:
+			fCopyEngine->WriteBootSector(fDestMenu);
+			break;
+
 		default:
 			BWindow::MessageReceived(msg);
 			break;
@@ -643,6 +664,13 @@ InstallerWindow::_UpdateControls()
 	fInstallStatus = kReadyForInstall;
 	fBeginButton->SetLabel("Begin");
 	fBeginButton->SetEnabled(srcItem && dstItem);
+
+	// adjust "Write Boot Sector" button
+	label = "Write Boot Sector";
+	if (dstItem)
+		label << " to \'" <<dstItem->Name() << '\'';
+	fMakeBootableButton->SetEnabled(dstItem);
+	fMakeBootableButton->SetLabel(label.String());
 }
 
 

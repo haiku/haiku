@@ -28,10 +28,16 @@ public:
 									BLocker* locker = NULL);
 
 private:
-			status_t			_CollectCopyInfo(const char* source);
+			status_t			_CollectCopyInfo(const char* source,
+									int32& level);
 			status_t			_CopyFolder(const char* source,
 									const char* destination,
+									int32& level,
 									BLocker* locker = NULL);
+
+			bool				_ShouldCopyEntry(const char* name,
+									const struct stat& statInfo,
+									int32 level) const;
 
 			void				_UpdateProgress();
 
