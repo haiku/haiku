@@ -22,7 +22,6 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(0,0,0);
-	//BRect iDontCare(0,0,0,0);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -40,17 +39,17 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 	fManufacturerProperties = new BStringView("manufacturer", "");
 	fBuffersProperties = new BStringView("buffers", "");
 
-	fIcon = new BitmapView(new BBitmap(BRect(0, 0, 64 - 1, 64 - 1), B_RGBA32));
-	
-	fIcon->SetViewColor(0,0,0);
+	fIcon = new BView(BRect(0, 0, 32 - 1, 32 - 1),"Icon", B_FOLLOW_ALL, B_WILL_DRAW);
+	fIcon->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	SetBluetoothDevice(bDevice);
 
 	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 				.Add(fIcon)
+				.AddGlue()
 				.Add(BGroupLayoutBuilder(B_VERTICAL)
 						.Add(fName)
-						.AddGlue()			
+						.AddGlue()
 						.Add(fBdaddr)
 						.AddGlue()
 						.AddGlue()
@@ -100,6 +99,7 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		bDevice->GetDeviceClass().GetMinorDeviceClass(str);
 		fClass->SetText(str.String());
 		
+		bDevice->GetDeviceClass().Draw(fIcon, BPoint(Bounds().left, Bounds().top));
 		
 		uint32 value;
 		

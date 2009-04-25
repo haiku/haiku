@@ -8,34 +8,32 @@
 
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/BluetoothDevice.h>
-#include "../media/iconfile.h"
+/*#include "../media/iconfile.h"*/
 
 
 #include "DeviceListItem.h"
 
-
-#define PIXELS_FOR_ICON 32
 #define INSETS  5
 #define TEXT_ROWS  2
 
 namespace Bluetooth {
 
-DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice) 
-				:	BListItem(), 
-				fDevice(bDevice)	
+DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice)
+	: BListItem()
+	, fDevice(bDevice)	
 {	
-			SetDevice(fDevice);
+	SetDevice(fDevice);
 }	
 
 
 DeviceListItem::DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi)
-				:	BListItem(),				 
-				fDevice(NULL),
-				fAddress(bdaddr),
-				fClass(dClass),
-				fName("unknown"),
-				fRSSI(rssi)
-{	
+	: BListItem()
+	, fDevice(NULL)
+	, fAddress(bdaddr)
+	, fClass(dClass)
+	, fName("unknown")
+	, fRSSI(rssi)
+{
 
 }	
 
@@ -81,7 +79,7 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 	font_height	finfo;
 	be_plain_font->GetHeight(&finfo);
 
-	BPoint point = BPoint(itemRect.left	+ PIXELS_FOR_ICON + 2*INSETS, itemRect.bottom - finfo.descent + 1);
+	BPoint point = BPoint(itemRect.left	+ DeviceClass::PixelsForIcon + 2*INSETS, itemRect.bottom - finfo.descent + 1);
 	owner->SetFont(be_fixed_font);
 	owner->SetHighColor(kBlack);
 	owner->MovePenTo(point);
@@ -95,13 +93,15 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 	
 	owner->DrawString(secondLine.String());	 
 
-	point	-= BPoint(0, (finfo.ascent + finfo.descent + finfo.leading)); 
+	point -= BPoint(0, (finfo.ascent + finfo.descent + finfo.leading) + INSETS); 
 
-	owner->SetFont(be_plain_font); 
+	owner->SetFont(be_plain_font);
 	owner->MovePenTo(point); 
-	owner->DrawString(fName.String()); 
+	owner->DrawString(fName.String());
 	
-	// TODO: Generalize this		
+	fClass.Draw(owner, BPoint(itemRect.left, itemRect.top));
+
+#if 0	
 	switch (fClass.GetMajorDeviceClass()) {
 		case 1:
 		{
@@ -122,44 +122,11 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 				itemRect.left + INSETS + PIXELS_FOR_ICON, itemRect.top + INSETS + PIXELS_FOR_ICON));			
 		}
 		break;
-		case 2: // phone
-			owner->StrokeRoundRect(BRect(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4),
-				 itemRect.top + INSETS + 6,
-				 itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
-			 	 itemRect.top + INSETS + PIXELS_FOR_ICON - 2), 2, 2);
-			owner->StrokeRect(BRect(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
-			 	 itemRect.top + INSETS + 10,
-				 itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
-			 	 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
-				 itemRect.top + INSETS + PIXELS_FOR_ICON - 6), 
-				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
-				 itemRect.top + INSETS + PIXELS_FOR_ICON - 6));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
-				 itemRect.top + INSETS + PIXELS_FOR_ICON - 4), 
-				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4) - 4,
-				 itemRect.top + INSETS + PIXELS_FOR_ICON - 4));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
-				 itemRect.top + INSETS + 2), 
-				 BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4) + 4,
-				 itemRect.top + INSETS + 6));
-			break;
-		default: // Bluetooth Logo
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4),
-				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)),
-				BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
-				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON/4)));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/2),
-				 itemRect.top + INSETS +2));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/2),
-				 itemRect.top + INSETS + PIXELS_FOR_ICON - 2));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON*3/4),
-				 itemRect.top + INSETS + uint(PIXELS_FOR_ICON*3/4)));
-			owner->StrokeLine(BPoint(itemRect.left + INSETS + uint(PIXELS_FOR_ICON/4), 
-				itemRect.top + INSETS + uint(PIXELS_FOR_ICON/4)));
-	}
 
-	// TODO: Draw rssi
+	}
+#endif
+
+	owner->SetHighColor(kBlack);
 	
 } 
 
@@ -171,7 +138,8 @@ DeviceListItem::Update(BView *owner, const BFont *font)
 
    	font_height height;
 	font->GetHeight(&height);
-	SetHeight((height.ascent + height.descent + height.leading) * TEXT_ROWS + TEXT_ROWS*INSETS);
+	SetHeight(MAX((height.ascent + height.descent + height.leading) * TEXT_ROWS + (TEXT_ROWS+1)*INSETS, 
+		DeviceClass::PixelsForIcon + 2 * INSETS));
 	
 
 }

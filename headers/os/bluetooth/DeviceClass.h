@@ -6,6 +6,7 @@
 #define _DEVICE_CLASS_H
 
 #include <String.h>
+#include <View.h>
 
 namespace Bluetooth {
 
@@ -15,6 +16,10 @@ namespace Bluetooth {
 class DeviceClass {
 
 public:
+
+	static const uint8 PixelsForIcon = 32;
+	static const uint8 IconInsets = 5; 
+
 	DeviceClass(uint8 record[3])
 	{
 		SetRecord(record);
@@ -67,6 +72,8 @@ public:
 	void GetMinorDeviceClass(BString&);
 	
 	void DumpDeviceClass(BString&);
+	
+	void Draw(BView* view, const BPoint& point);
 
 private:
 	uint32 record;

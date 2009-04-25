@@ -312,4 +312,91 @@ DeviceClass::DumpDeviceClass(BString& string)
 	string << ".";
 }
 
+
+void
+DeviceClass::Draw(BView* view, const BPoint& point)
+{
+	rgb_color	kBlack = { 0,0,0,0 };
+	rgb_color	kBlue = { 28,110,157,0 };
+	rgb_color	kWhite = { 255,255,255,0 };
+
+
+	view->SetHighColor(kBlue);
+	view->FillRoundRect(BRect(point.x + IconInsets, point.y + IconInsets, 
+		point.x + IconInsets + PixelsForIcon, point.y + IconInsets + PixelsForIcon), 5, 5);
+
+	view->SetHighColor(kWhite);
+
+	switch (GetMajorDeviceClass()) {
+
+		case 2: // phone
+			view->StrokeRoundRect(BRect(point.x + IconInsets + uint(PixelsForIcon/4),
+				 point.y + IconInsets + 6,
+				 point.x + IconInsets + uint(PixelsForIcon*3/4),
+			 	 point.y + IconInsets + PixelsForIcon - 2), 2, 2);
+			view->StrokeRect(BRect(point.x + IconInsets + uint(PixelsForIcon/4) + 4,
+			 	 point.y + IconInsets + 10,
+				 point.x + IconInsets + uint(PixelsForIcon*3/4) - 4,
+			 	 point.y + IconInsets + uint(PixelsForIcon*3/4)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4) + 4,
+				 point.y + IconInsets + PixelsForIcon - 6), 
+				 BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4) - 4,
+				 point.y + IconInsets + PixelsForIcon - 6));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4) + 4,
+				 point.y + IconInsets + PixelsForIcon - 4), 
+				 BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4) - 4,
+				 point.y + IconInsets + PixelsForIcon - 4));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4) + 4,
+				 point.y + IconInsets + 2), 
+				 BPoint(point.x + IconInsets + uint(PixelsForIcon/4) + 4,
+				 point.y + IconInsets + 6));
+			break;
+		case 3: // LAN
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4),
+				 point.y + IconInsets + uint(PixelsForIcon*3/8)),
+				BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon*3/8)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*5/8),
+				 point.y + IconInsets + uint(PixelsForIcon/8)));			
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon*5/8)),
+				BPoint(point.x + IconInsets + uint(PixelsForIcon/4),
+				 point.y + IconInsets + uint(PixelsForIcon*5/8)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/8),
+				 point.y + IconInsets + uint(PixelsForIcon*7/8)));
+			break;
+		case 4: // audio/video
+			view->StrokeRect(BRect(point.x + IconInsets + uint(PixelsForIcon/4),
+				 point.y + IconInsets + uint(PixelsForIcon*3/8),
+				 point.x + IconInsets + uint(PixelsForIcon*3/8),
+			 	 point.y + IconInsets + uint(PixelsForIcon*5/8)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/8),
+				 point.y + IconInsets + uint(PixelsForIcon*3/8)),
+				BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon/8)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon*7/8)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/8),
+				 point.y + IconInsets + uint(PixelsForIcon*5/8)));
+			break;			
+		default: // Bluetooth Logo
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4),
+				 point.y + IconInsets + uint(PixelsForIcon*3/4)),
+				BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon/4)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/2),
+				 point.y + IconInsets +2));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/2),
+				 point.y + IconInsets + PixelsForIcon - 2));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon*3/4),
+				 point.y + IconInsets + uint(PixelsForIcon*3/4)));
+			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4), 
+				point.y + IconInsets + uint(PixelsForIcon/4)));
+			break;
+	}
+	
+	view->SetHighColor(kBlack);
+}
+
+
 }

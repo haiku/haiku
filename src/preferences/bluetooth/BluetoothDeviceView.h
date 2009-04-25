@@ -5,11 +5,11 @@
 #ifndef BLUETOOTHDEVICEVIEW_H_
 #define BLUETOOTHDEVICEVIEW_H_
 
-#include <View.h>
-#include <Message.h>
-#include <Invoker.h>
 #include <Box.h>
 #include <Bitmap.h>
+#include <Invoker.h>
+#include <Message.h>
+#include <View.h>
 
 #include <bluetooth/BluetoothDevice.h>
 
@@ -34,18 +34,18 @@ public:
 protected:
 	BluetoothDevice*	fDevice;
 	
-	BStringView*		fName;
-	BStringView*		fBdaddr;
-	BStringView*		fClassService;
-	BStringView*		fClass;
+	BStringView*	fName;
+	BStringView*	fBdaddr;
+	BStringView*	fClassService;
+	BStringView*	fClass;
 	
-	BStringView*		fHCIVersionProperties;
-	BStringView*		fLMPVersionProperties;
-	BStringView*		fManufacturerProperties;
+	BStringView*	fHCIVersionProperties;
+	BStringView*	fLMPVersionProperties;
+	BStringView*	fManufacturerProperties;
 	
-	BStringView*		fBuffersProperties;
+	BStringView*	fBuffersProperties;
 
-	BitmapView*			fIcon;
+	BView*			fIcon;
 
 };
 
@@ -82,8 +82,6 @@ class BitmapView : public BView
 	private:
 		BBitmap *fBitmap;
 };
-
-
 
 
 #endif
