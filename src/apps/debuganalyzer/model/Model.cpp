@@ -259,10 +259,13 @@ Model::Thread::AddThreadWaitObject(WaitObject* waitObject,
 // #pragma mark - Model
 
 
-Model::Model(void* eventData, size_t eventDataSize)
+Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize)
 	:
+	fDataSourceName(dataSourceName),
 	fEventData(eventData),
 	fEventDataSize(eventDataSize),
+	fBaseTime(0),
+	fLastEventTime(0),
 	fTeams(20, true),
 	fThreads(20, true),
 	fWaitObjectGroups(20, true)
@@ -273,6 +276,20 @@ Model::Model(void* eventData, size_t eventDataSize)
 Model::~Model()
 {
 	free(fEventData);
+}
+
+
+void
+Model::SetBaseTime(bigtime_t time)
+{
+	fBaseTime = time;
+}	
+
+
+void
+Model::SetLastEventTime(bigtime_t time)
+{
+	fLastEventTime = time;
 }
 
 

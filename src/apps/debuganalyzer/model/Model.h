@@ -5,9 +5,10 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <ObjectList.h>
 #include <OS.h>
+#include <String.h>
 
+#include <ObjectList.h>
 #include <Referenceable.h>
 
 #include <system_profiler_defs.h>
@@ -26,8 +27,17 @@ public:
 			class Thread;
 
 public:
-								Model(void* eventData, size_t eventDataSize);
+								Model(const char* dataSourceName,
+									void* eventData, size_t eventDataSize);
 								~Model();
+
+	inline	const char*			DataSourceName() const;
+
+	inline	bigtime_t			BaseTime() const;
+			void				SetBaseTime(bigtime_t time);
+
+	inline	bigtime_t			LastEventTime() const;
+			void				SetLastEventTime(bigtime_t time);
 
 			int32				CountTeams() const;
 			Team*				TeamAt(int32 index) const;
@@ -64,8 +74,11 @@ private:
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
 
 private:
+			BString				fDataSourceName;
 			void*				fEventData;
 			size_t				fEventDataSize;
+			bigtime_t			fBaseTime;
+			bigtime_t			fLastEventTime;
 			TeamList			fTeams;		// sorted by ID
 			ThreadList			fThreads;	// sorted by ID
 			WaitObjectGroupList	fWaitObjectGroups;
@@ -293,6 +306,30 @@ private:
 
 			ThreadWaitObjectGroupList fWaitObjectGroups;
 };
+
+
+// #pragma mark - Model
+
+
+const char*
+Model::DataSourceName() const
+{
+	return fDataSourceName.String();
+}
+
+
+bigtime_t
+Model::BaseTime() const
+{
+	return fBaseTime;
+}
+
+
+bigtime_t
+Model::LastEventTime() const
+{
+	return fLastEventTime;
+}
 
 
 // #pragma mark - WaitObject

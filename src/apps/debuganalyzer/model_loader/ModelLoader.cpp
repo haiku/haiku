@@ -58,8 +58,10 @@ ModelLoader::ThreadInfo::ThreadInfo(Model::Thread* thread)
 inline void
 ModelLoader::_UpdateLastEventTime(bigtime_t time)
 {
-	if (fBaseTime < 0)
+	if (fBaseTime < 0) {
 		fBaseTime = time;
+		fModel->SetBaseTime(time);
+	}
 
 	fLastEventTime = time - fBaseTime;
 }
@@ -168,7 +170,7 @@ ModelLoader::_Loader()
 	} catch(...) {
 		error = B_ERROR;
 	}
-	
+
 	// clean up and notify the target
 	AutoLocker<BLocker> locker(fLock);
 
@@ -210,8 +212,13 @@ ModelLoader::_Load()
 	if (error != B_OK)
 		return error;
 
+	// get the data source name
+	BString dataSourceName;
+	fDataSource->GetName(dataSourceName);
+
 	// create a model
-	fModel = new(std::nothrow) Model(eventData, eventDataSize);
+	fModel = new(std::nothrow) Model(dataSourceName.String(), eventData,
+		eventDataSize);
 	if (fModel == NULL) {
 		free(eventData);
 		return B_NO_MEMORY;
@@ -247,7 +254,7 @@ ModelLoader::_Load()
 		if (bufferSize < 0)
 			return bufferSize;
 		if (buffer == NULL)
-			return B_OK;
+			break;
 
 		// process the event
 		status_t error = _ProcessEvent(event, cpu, buffer, bufferSize);
@@ -261,6 +268,10 @@ ModelLoader::_Load()
 				return B_ERROR;
 		}
 	}
+
+	fModel->SetLastEventTime(fLastEventTime);
+
+	return B_OK;
 }
 
 
