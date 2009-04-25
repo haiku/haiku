@@ -66,6 +66,14 @@ private:
 };
 
 
+class TableListener {
+public:
+	virtual						~TableListener();
+
+	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
+};
+
+
 class Table : private BColumnListView {
 public:
 								Table(const char* name, uint32 flags,
@@ -84,12 +92,20 @@ public:
 
 			void				AddColumn(TableColumn* column);
 
+			bool				AddTableListener(TableListener* listener);
+			void				RemoveTableListener(TableListener* listener);
+
 private:
 			typedef BObjectList<TableColumn>	ColumnList;
+			typedef BObjectList<TableListener>	ListenerList;
+
+private:
+	virtual	void				ItemInvoked();
 
 private:
 			TableModel*			fModel;
 			ColumnList			fColumns;
+			ListenerList		fListeners;
 };
 
 

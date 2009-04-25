@@ -137,6 +137,20 @@ TableColumn::GetPreferredWidth(BField* _field, BView* parent) const
 }
 
 
+// #pragma mark - TableListener
+
+
+TableListener::~TableListener()
+{
+}
+
+
+void
+TableListener::TableRowInvoked(Table* table, int32 rowIndex)
+{
+}
+
+
 // #pragma mark - Table
 
 
@@ -232,4 +246,35 @@ Table::AddColumn(TableColumn* column)
 	column->SetTableModel(fModel);
 
 	BColumnListView::AddColumn(column, column->ModelIndex());
+}
+
+
+bool
+Table::AddTableListener(TableListener* listener)
+{
+	return fListeners.AddItem(listener);
+}
+
+
+void
+Table::RemoveTableListener(TableListener* listener)
+{
+	fListeners.RemoveItem(listener);
+}
+
+
+void
+Table::ItemInvoked()
+{
+	if (fListeners.IsEmpty())
+		return;
+
+	BRow* row = CurrentSelection();
+	if (row == NULL)
+		return;
+
+	int32 index = IndexOf(row);
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--)
+		fListeners.ItemAt(i)->TableRowInvoked(this, index);
 }
