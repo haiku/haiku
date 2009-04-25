@@ -9,7 +9,7 @@
 
 #include <new>
 
-#include "TableColumns.h"
+#include "table/TableColumns.h"
 
 
 // #pragma mark - ThreadsTableModel

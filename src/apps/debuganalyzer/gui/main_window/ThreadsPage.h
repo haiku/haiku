@@ -7,7 +7,7 @@
 
 #include <GroupView.h>
 
-#include "Table.h"
+#include "table/Table.h"
 
 #include "main_window/MainWindow.h"
 

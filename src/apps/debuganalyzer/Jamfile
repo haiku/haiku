@@ -3,29 +3,33 @@ SubDir HAIKU_TOP src apps debuganalyzer ;
 UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) main_window ] ;
+HAIKU_DEBUG_ANALYZER_HEADERS = 
+	$(SUBDIR)
+	[ FDirName $(SUBDIR) gui ]
+	[ FDirName $(SUBDIR) model ]
+	[ FDirName $(SUBDIR) model_loader ]
+	[ FDirName $(SUBDIR) util ]
+;
+
+UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
+
 
 Application DebugAnalyzer
 	:
-	AbstractGeneralPage.cpp
-	DataSource.cpp
 	DebugAnalyzer.cpp
-	Model.cpp
-	ModelLoader.cpp
-	SubWindow.cpp
-	SubWindowManager.cpp
-	Table.cpp
-	TableColumns.cpp
-	Variant.cpp
 
 	:
-	<nogrist>DebugAnalyzer_MainWindow.o
-	<nogrist>DebugAnalyzer_ThreadWindow.o
+	<nogrist>DebugAnalyzer_gui.o
+	<nogrist>DebugAnalyzer_model.o
+	<nogrist>DebugAnalyzer_model_loader.o
+	<nogrist>DebugAnalyzer_util.o
 
 	libcolumnlistview.a libdebug.so be
 	:
 	DebugAnalyzer.rdef
 ;
 
-HaikuSubInclude main_window ;
-HaikuSubInclude thread_window ;
+HaikuSubInclude gui ;
+HaikuSubInclude model ;
+HaikuSubInclude model_loader ;
+HaikuSubInclude util ;

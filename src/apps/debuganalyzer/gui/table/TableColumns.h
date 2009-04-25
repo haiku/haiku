@@ -7,7 +7,7 @@
 
 #include <ColumnTypes.h>
 
-#include "Table.h"
+#include "table/Table.h"
 
 
 class DelagateBasedTableColumn : public TableColumn {

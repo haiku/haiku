@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src apps debuganalyzer model_loader ;
+
+UsePrivateHeaders debug interface kernel shared ;
+UsePrivateSystemHeaders ;
+
+UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
+
+
+MergeObject DebugAnalyzer_model_loader.o
+	:
+	ModelLoader.cpp
+;

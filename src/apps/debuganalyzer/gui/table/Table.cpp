@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "Table.h"
+#include "table/Table.h"
 
 #include <new>
 
