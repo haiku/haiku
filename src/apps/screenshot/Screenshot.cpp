@@ -45,8 +45,8 @@ Screenshot::RefsReceived(BMessage* message)
 	bool includeBorder = false;
 	message->FindBool("border", &includeBorder);
 
-	bool includeCursor = false;
-	message->FindBool("border", &includeCursor);
+	bool includeMouse = false;
+	message->FindBool("border", &includeMouse);
 
 	bool grabActiveWindow = false;
 	message->FindBool("window", &grabActiveWindow);
@@ -57,7 +57,7 @@ Screenshot::RefsReceived(BMessage* message)
 	bool showConfigureWindow = false;
 	message->FindBool("configure", &showConfigureWindow);
 
-	new ScreenshotWindow(delay * 1000000, includeBorder, includeCursor,
+	new ScreenshotWindow(delay * 1000000, includeBorder, includeMouse,
 		grabActiveWindow, showConfigureWindow, saveScreenshotSilent);
 
 	fRefsReceived = true;
@@ -70,7 +70,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 	bigtime_t delay = 0;
 
 	bool includeBorder = false;
-	bool includeCursor = false;
+	bool includeMouse = false;
 	bool grabActiveWindow = false;
 	bool showConfigureWindow = false;
 	bool saveScreenshotSilent = false;
@@ -80,8 +80,8 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 			_ShowHelp();
 		else if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--border") == 0)
 			includeBorder = true;
-		else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--cursor") == 0)
-			includeCursor = true;
+		else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--mouse") == 0)
+			includeMouse = true;
 		else if (strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--window") == 0)
 			grabActiveWindow = true;
 		else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--silent") == 0)
@@ -99,7 +99,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 		}
 	}
 	fArgvReceived = true;
-	new ScreenshotWindow(delay, includeBorder, includeCursor, grabActiveWindow,
+	new ScreenshotWindow(delay, includeBorder, includeMouse, grabActiveWindow,
 		showConfigureWindow, saveScreenshotSilent);
 }
 
@@ -107,15 +107,15 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 void
 Screenshot::_ShowHelp() const
 {
-	printf("Screenshot [OPTION]... Creates a Bitmap of the current screen\n\n");
+	printf("Screenshot [OPTION]... Creates a bitmap of the current screen\n\n");
 	printf("OPTION\n");
 	printf("  -o, --options         Show options window first\n");
-	printf("  -c, --cursor          Have the cursor inside the screenshot\n");
+	printf("  -m, --mouse           Have the mouse pointer in the screenshot\n");
 	printf("  -b, --border          Include the window border with the screenshot\n");
 	printf("  -w, --window          Use active window instead of the entire screen\n");
 	printf("  -d, --delay=seconds   Take screenshot after specified delay [in seconds]\n");
-	printf("  -s, --silent          Saves the screenshot without the application window\n");
-	printf("                        overwrites --options, saves to home directory as png\n");
+	printf("  -s, --silent          Saves the screenshot without showing the app window\n");
+	printf("                        overrides --options, saves to home folder as png\n");
 	printf("\n");
 	printf("Note: OPTION -b, --border takes only effect when used with -w, --window\n");
 

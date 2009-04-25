@@ -22,7 +22,7 @@ class ScreenshotWindow : public BWindow {
 public:
 							ScreenshotWindow(bigtime_t delay = 0,
 								bool includeBorder = false,
-								bool includeCursor = false,
+								bool includeMouse = false,
 								bool grabActiveWindow = false,
 								bool showConfigWindow = false,
 								bool saveScreenshotSilent = false);
@@ -62,7 +62,7 @@ private:
 			BRadioButton*	fWholeDesktop;
 			BTextControl*	fDelayControl;
 			BCheckBox*		fWindowBorder;
-			BCheckBox*		fShowCursor;
+			BCheckBox*		fShowMouse;
 			BButton*		fBackToSave;
 			BButton*		fTakeScreenshot;
 			BTextControl*	fNameControl;
@@ -75,7 +75,7 @@ private:
 			bigtime_t		fDelay;
 
 			bool			fIncludeBorder;
-			bool			fIncludeCursor;
+			bool			fIncludeMouse;
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
 

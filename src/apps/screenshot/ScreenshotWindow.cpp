@@ -50,7 +50,7 @@
 enum {
 	kScreenshotType,
 	kIncludeBorder,
-	kShowCursor,
+	kShowMouse,
 	kBackToSave,
 	kTakeScreenshot,
 	kImageOutputFormat,
@@ -79,7 +79,7 @@ public:
 
 
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
-	bool includeCursor, bool grabActiveWindow, bool showConfigWindow,
+	bool includeMouse, bool grabActiveWindow, bool showConfigWindow,
 	bool saveScreenshotSilent)
 	: BWindow(BRect(0, 0, 200.0, 100.0), "Take Screenshot", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
@@ -90,7 +90,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fLastSelectedPath(NULL),
 	fDelay(delay),
 	fIncludeBorder(includeBorder),
-	fIncludeCursor(includeCursor),
+	fIncludeMouse(includeMouse),
 	fGrabActiveWindow(grabActiveWindow),
 	fShowConfigWindow(showConfigWindow)
 {
@@ -130,8 +130,8 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 				fIncludeBorder = (fWindowBorder->Value() == B_CONTROL_ON);
 		}	break;
 
-		case kShowCursor: {
-			fIncludeCursor = (fShowCursor->Value() == B_CONTROL_ON);
+		case kShowMouse: {
+			fIncludeMouse = (fShowMouse->Value() == B_CONTROL_ON);
 		}	break;
 
 		case kBackToSave: {
@@ -167,7 +167,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 				BMessenger target(this);
 				fOutputPathPanel = new BFilePanel(B_OPEN_PANEL, &target,
 					NULL, B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter());
-				fOutputPathPanel->Window()->SetTitle("Choose directory");
+				fOutputPathPanel->Window()->SetTitle("Choose folder");
 				fOutputPathPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 			}
 			fOutputPathPanel->Show();
@@ -245,7 +245,7 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 
 	fActiveWindow = new BRadioButton("Take active window",
 		 new BMessage(kScreenshotType));
-	fWholeDesktop = new BRadioButton("Take whole Desktop",
+	fWholeDesktop = new BRadioButton("Take whole screen",
 		 new BMessage(kScreenshotType));
 	fWholeDesktop->SetValue(B_CONTROL_ON);
 
@@ -263,9 +263,9 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		new BMessage(kIncludeBorder));
 	fWindowBorder->SetEnabled(false);
 
-	fShowCursor = new BCheckBox("Include cursor in screenshot",
-		new BMessage(kShowCursor));
-	fShowCursor->SetValue(fIncludeCursor);
+	fShowMouse = new BCheckBox("Include mouse pointer in screenshot",
+		new BMessage(kShowMouse));
+	fShowMouse->SetValue(fIncludeMouse);
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -291,7 +291,7 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		.AddStrut(10.0)
 		.AddGroup(B_HORIZONTAL)
 			.AddStrut(15.0)
-			.Add(fShowCursor)
+			.Add(fShowMouse)
 			.End()
 		.AddStrut(5.0)
 		.AddGroup(B_HORIZONTAL, 5.0)
@@ -430,7 +430,7 @@ ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
 	BPath path;
 	find_directory(B_USER_DIRECTORY, &path);
 
-	BString label("Home directory");
+	BString label("Home folder");
 	_AddItemToPathMenu(path.Path(), label, 0, (path.Path() == lastSelectedPath));
 
 	path.Append("Desktop");
@@ -440,7 +440,7 @@ ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
 	find_directory(B_BEOS_ETC_DIRECTORY, &path);
 	path.Append("artwork");
 
-	label.SetTo("Artwork directory");
+	label.SetTo("Artwork folder");
 	_AddItemToPathMenu(path.Path(), label, 2, (path.Path() == lastSelectedPath));
 
 	int32 i = 0;
@@ -461,7 +461,7 @@ ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
 	}
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
-	fOutputPathMenu->AddItem(new BMenuItem("Choose directory...",
+	fOutputPathMenu->AddItem(new BMenuItem("Choose folder...",
 		new BMessage(kChooseLocation)));
 }
 
@@ -628,9 +628,9 @@ ScreenshotWindow::_TakeScreenshot()
 	delete fScreenshot;
 	if (_GetActiveWindowFrame(&frame) == B_OK) {
 		fScreenshot = new BBitmap(frame.OffsetToCopy(B_ORIGIN), B_RGBA32);
-		BScreen(this).ReadBitmap(fScreenshot, fIncludeCursor, &frame);
+		BScreen(this).ReadBitmap(fScreenshot, fIncludeMouse, &frame);
 	} else {
-		BScreen(this).GetBitmap(&fScreenshot, fIncludeCursor);
+		BScreen(this).GetBitmap(&fScreenshot, fIncludeMouse);
 	}
 }
 
@@ -752,7 +752,7 @@ ScreenshotWindow::_SaveScreenshotSilent() const
 
 	BPath homePath;
 	if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK) {
-		fprintf(stderr, "failed to find user home directory\n");
+		fprintf(stderr, "failed to find user home folder\n");
 		return;
 	}
 
