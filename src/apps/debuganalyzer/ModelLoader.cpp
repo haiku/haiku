@@ -172,7 +172,7 @@ ModelLoader::_Loader()
 	// clean up and notify the target
 	AutoLocker<BLocker> locker(fLock);
 
-	ThreadInfo* threadInfo = fThreads.Clear();
+	ThreadInfo* threadInfo = fThreads.Clear(true);
 	while (threadInfo != NULL) {
 		ThreadInfo* nextInfo = threadInfo->fNext;
 		delete threadInfo;
