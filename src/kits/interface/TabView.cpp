@@ -1128,11 +1128,15 @@ BTabView::AddTab(BView *target, BTab *tab)
 		tab = new BTab(target);
 	else
 		tab->SetView(target);
-	
+
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->AddView(CountTabs(), target);
 
 	fTabList->AddItem(tab);
+
+	// When we don't have a any tabs yet, select this one.
+	if (CountTabs() == 1)
+		Select(0);
 }
 
 
