@@ -1,17 +1,17 @@
 // BlockingQueue.h
-// 
+//
 // Copyright (c) 2004, Ingo Weinhold (bonefish@cs.tu-berlin.de)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation 
+// to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // Except as contained in this notice, the name of a copyright holder shall
 // not be used in advertising or otherwise to promote the sale, use or other
 // dealings in this Software without prior written authorization of the
@@ -33,7 +33,9 @@
 #include <Locker.h>
 
 #include "AutoLocker.h"
-#include "Vector.h"
+#include <vector>
+
+using std::vector;
 
 typedef BLocker Locker;
 
@@ -46,7 +48,7 @@ public:
 			status_t			InitCheck() const;
 
 			status_t			Close(bool deleteElements,
-									const Vector<Element*>** elements = NULL);
+									const vector<Element*>** elements = NULL);
 
 			status_t			Push(Element* element);
 			status_t			Pop(Element** element,
@@ -54,10 +56,10 @@ public:
 			status_t			Peek(Element** element);
 			status_t			Remove(Element* element);
 
-			int32				Size(); 
+			int32				Size();
 
 private:
-			Vector<Element*>	fElements;
+			vector<Element*>	fElements;
 			sem_id				fElementSemaphore;
 };
 
@@ -90,7 +92,7 @@ BlockingQueue<Element>::InitCheck() const
 template<typename Element>
 status_t
 BlockingQueue<Element>::Close(bool deleteElements,
-	const Vector<Element*>** elements)
+	const vector<Element*>** elements)
 {
 	AutoLocker<Locker> _(this);
 	status_t error = delete_sem(fElementSemaphore);
@@ -100,9 +102,9 @@ BlockingQueue<Element>::Close(bool deleteElements,
 	if (elements)
 		*elements = &fElements;
 	if (deleteElements) {
-		int32 count = fElements.Count();
+		int32 count = fElements.size();
 		for (int32 i = 0; i < count; i++)
-			delete fElements.ElementAt(i);
+			delete fElements[i];
 	}
 	return error;
 }
@@ -115,12 +117,14 @@ BlockingQueue<Element>::Push(Element* element)
 	AutoLocker<Locker> _(this);
 	if (fElementSemaphore < 0)
 		return B_NO_INIT;
-	status_t error = fElements.PushBack(element);
+	try {
+		fElements.push_back(element);
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
+	status_t error = release_sem(fElementSemaphore);
 	if (error != B_OK)
-		return error;
-	error = release_sem(fElementSemaphore);
-	if (error != B_OK)
-		fElements.Erase(fElements.Count() - 1);
+		fElements.erase(fElements.begin() + fElements.size() - 1);
 	return error;
 }
 
@@ -136,11 +140,11 @@ BlockingQueue<Element>::Pop(Element** element, bigtime_t timeout)
 	AutoLocker<Locker> _(this);
 	if (fElementSemaphore < 0)
 		return B_NO_INIT;
-	int32 count = fElements.Count();
+	int32 count = fElements.size();
 	if (count == 0)
 		return B_ERROR;
-	*element = fElements.ElementAt(0);
-	fElements.Erase(0);
+	*element = fElements[0];
+	fElements.erase(fElements.begin());
 	return B_OK;
 }
 
@@ -152,10 +156,10 @@ BlockingQueue<Element>::Peek(Element** element)
 	AutoLocker<Locker> _(this);
 	if (fElementSemaphore < 0)
 		return B_NO_INIT;
-	int32 count = fElements.Count();
+	int32 count = fElements.size();
 	if (count == 0)
 		return B_ENTRY_NOT_FOUND;
-	*element = fElements.ElementAt(0);
+	*element = fElements[0];
 	return B_OK;
 }
 
@@ -171,15 +175,24 @@ BlockingQueue<Element>::Remove(Element* element)
 	AutoLocker<Locker> _(this);
 	if (fElementSemaphore < 0)
 		return B_NO_INIT;
-	int32 count = fElements.Remove(element);
+
+	int32 count = 0;
+	for (int32 i = fElements.size() - 1; i >= 0; i--) {
+		if (fElements[i] == element) {
+			fElements.erase(fElements.begin() + i);
+			count++;
+		}
+	}
 	if (count == 0) {
 		release_sem(fElementSemaphore);
 		return B_ENTRY_NOT_FOUND;
 	}
+#if 0
 	if (count > 1) {
 		ERROR(("ERROR: BlockingQueue::Remove(): Removed %ld elements!\n",
 			count));
 	}
+#endif
 	return error;
 }
 
@@ -189,7 +202,7 @@ int32
 BlockingQueue<Element>::Size()
 {
 	AutoLocker<Locker> _(this);
-	return (fElements.Count());
+	return (fElements.size());
 }
 
 #endif	// BLOCKING_QUEUE_H

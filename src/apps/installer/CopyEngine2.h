@@ -2,6 +2,8 @@
 #define COPY_ENGINE_2_H
 
 
+#include <stdlib.h>
+
 #include <Entry.h>
 #include <File.h>
 #include <Messenger.h>

@@ -34,7 +34,7 @@ class CopyEngine : public BLooper {
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);
-		void SetStatusMessage(char *status);
+		void SetStatusMessage(const char *status);
 		void Start(BMenu *srcMenu, BMenu *targetMenu);
 		status_t CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
 

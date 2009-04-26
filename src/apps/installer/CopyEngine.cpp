@@ -135,7 +135,7 @@ CopyEngine::MessageReceived(BMessage* message)
 
 
 void
-CopyEngine::SetStatusMessage(char *status)
+CopyEngine::SetStatusMessage(const char *status)
 {
 	BMessage msg(STATUS_MESSAGE);
 	msg.AddString("status", status);
@@ -297,7 +297,7 @@ bigtime_t now;
 							// Something besides Trash
 							entries++;
 						}
-		
+
 						if (entries > 0)
 							break;
 					}
@@ -324,7 +324,7 @@ bigtime_t now;
 		err = B_CANCELED;
 		goto error;
 	}
-	
+
 
 	LaunchInitScript(targetDirectory);
 
@@ -386,7 +386,7 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 		&& !fControl->CheckUserCanceled()) {
 		StatStruct statbuf;
 		entry.GetStat(&statbuf);
-		
+
 		Undo undo;
 		if (S_ISDIR(statbuf.st_mode)) {
 			char name[B_FILE_NAME_LENGTH];
