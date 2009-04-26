@@ -179,7 +179,8 @@ AutoConfigWindow::GenerateBasicAccount()
 			inboundArchive.AddInt32("flavor", ssl);
 			inboundArchive.AddString("username", fAccountInfo.loginName);
 			inboundArchive.AddString("password", fAccountInfo.password);
-			inboundArchive.AddBool("leave_mail_on_server", bool(true));
+			inboundArchive.AddBool("leave_mail_on_server", true);
+			inboundArchive.AddBool("delete_remote_when_local", true);
 			inbound->SetFilter(0, inboundArchive, fAccountInfo.inboundProtocol);
 		}
 
