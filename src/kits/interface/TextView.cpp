@@ -1537,7 +1537,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 				Highlight(start, end);
 			}
 		}
-		fSelStart = fClickOffset = startOffset;
+		fSelStart = startOffset;
 		fSelEnd = endOffset;
 	}
 }
@@ -3251,7 +3251,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 	bool shiftDown = modifiers & B_SHIFT_KEY;
 	bool ctrlDown = modifiers & B_CONTROL_KEY;
 
-	int32 currentOffset = fClickOffset;
+	int32 lastClickOffset = fClickOffset;
 	switch (inArrowKey) {
 		case B_LEFT_ARROW:
 			if (fSelStart != fSelEnd && !shiftDown)
@@ -3261,11 +3261,18 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 					= ctrlDown
 						? _PreviousWordBoundary(fClickOffset - 1)
 						: _PreviousInitialByte(fClickOffset);
-				if (shiftDown && fClickOffset != currentOffset) {
-					if (fClickOffset >= fSelStart)
-						selEnd = fClickOffset;
-					else
+				if (shiftDown && fClickOffset != lastClickOffset) {
+					if (fClickOffset < fSelStart) {
+						// extend selection to the left
 						selStart = fClickOffset;
+						if (lastClickOffset > fSelStart) {
+							// caret has jumped across "anchor"
+							selEnd = fSelStart;
+						}
+					} else {
+						// shrink selection from the right
+						selEnd = fClickOffset;
+					}
 				}
 			}
 			break;
@@ -3278,27 +3285,43 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 					= ctrlDown
 						? _NextWordBoundary(fClickOffset)
 						: _NextInitialByte(fClickOffset);
-				if (shiftDown && fClickOffset != currentOffset) {
-					if (fClickOffset <= fSelEnd)
-						selStart = fClickOffset;
-					else
+				if (shiftDown && fClickOffset != lastClickOffset) {
+					if (fClickOffset > fSelEnd) {
+						// extend selection to the right
 						selEnd = fClickOffset;
+						if (lastClickOffset < fSelEnd) {
+							// caret has jumped across "anchor"
+							selStart = fSelEnd;
+						}
+					} else {
+						// shrink selection from the left
+						selStart = fClickOffset;
+					}
 				}
 			}
 			break;
 
 		case B_UP_ARROW:
 		{
-			float height;
-			BPoint point = PointAt(fClickOffset, &height);
-			point.y -= height;
-			fClickOffset = OffsetAt(point);
-			if (shiftDown) {
-				if (fClickOffset != currentOffset) {
-					if (fClickOffset >= fSelStart)
-						selEnd = fClickOffset;
-					else
+			if (fSelStart != fSelEnd && !shiftDown)
+				fClickOffset = fSelStart;
+			else {
+				float height;
+				BPoint point = PointAt(fClickOffset, &height);
+				point.y -= height;
+				fClickOffset = OffsetAt(point);
+				if (shiftDown && fClickOffset != lastClickOffset) {
+					if (fClickOffset < fSelStart) {
+						// extend selection to the top
 						selStart = fClickOffset;
+						if (lastClickOffset > fSelStart) {
+							// caret has jumped across "anchor"
+							selEnd = fSelStart;
+						}
+					} else {
+						// shrink selection from the bottom
+						selEnd = fClickOffset;
+					}
 				}
 			}
 			break;
@@ -3306,16 +3329,25 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 
 		case B_DOWN_ARROW:
 		{
-			float height;
-			BPoint point = PointAt(fClickOffset, &height);
-			point.y += height;
-			fClickOffset = OffsetAt(point);
-			if (shiftDown) {
-				if (fClickOffset != currentOffset) {
-					if (fClickOffset <= fSelEnd)
-						selStart = fClickOffset;
-					else
+			if (fSelStart != fSelEnd && !shiftDown)
+				fClickOffset = fSelEnd;
+			else {
+				float height;
+				BPoint point = PointAt(fClickOffset, &height);
+				point.y += height;
+				fClickOffset = OffsetAt(point);
+				if (shiftDown && fClickOffset != lastClickOffset) {
+					if (fClickOffset > fSelEnd) {
+						// extend selection to the bottom
 						selEnd = fClickOffset;
+						if (lastClickOffset < fSelEnd) {
+							// caret has jumped across "anchor"
+							selStart = fSelEnd;
+						}
+					} else {
+						// shrink selection from the top
+						selStart = fClickOffset;
+					}
 				}
 			}
 			break;
@@ -3325,14 +3357,10 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 	// invalidate the null style
 	fStyles->InvalidateNullStyle();
 
-	currentOffset = fClickOffset;
 	if (shiftDown)
 		Select(selStart, selEnd);
 	else
 		Select(fClickOffset, fClickOffset);
-
-	fClickOffset = currentOffset;
-		// Select sets fClickOffset = fSelEnd
 
 	// scroll if needed
 	ScrollToOffset(fClickOffset);
@@ -3383,26 +3411,33 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 	bool shiftDown = mods & B_SHIFT_KEY;
 	bool ctrlDown = mods & B_CONTROL_KEY;
 	STELine* line = NULL;
-	int32 start = fSelStart, end = fSelEnd;
+	int32 selStart = fSelStart;
+	int32 selEnd = fSelEnd;
 
+	int32 lastClickOffset = fClickOffset;
 	switch (inPageKey) {
 		case B_HOME:
-			line = (*fLines)[CurrentLine()];
+			line = (*fLines)[LineAt(lastClickOffset)];
 			if (ctrlDown)
 				fClickOffset = 0;
 			else
 				fClickOffset = line->offset;
 
-			if (shiftDown) {
-				if (fClickOffset <= fSelStart) {
-					start = fClickOffset;
-					end = fSelEnd;
+			if (!shiftDown)
+				selStart = selEnd = fClickOffset;
+			else if (fClickOffset != lastClickOffset) {
+				if (fClickOffset < fSelStart) {
+					// extend selection to the left
+					selStart = fClickOffset;
+					if (lastClickOffset > fSelStart) {
+						// caret has jumped across "anchor"
+						selEnd = fSelStart;
+					}
 				} else {
-					start = fSelStart;
-					end = fClickOffset;
+					// shrink selection from the right
+					selEnd = fClickOffset;
 				}
-			} else
-				start = end = fClickOffset;
+			}
 
 			break;
 
@@ -3413,11 +3448,12 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 				// If we are on the last line, just go to the last
 				// character in the buffer, otherwise get the starting
 				// offset of the next line, and go to the previous character
-				if (CurrentLine() + 1 < fLines->NumLines()) {
-					line = (*fLines)[CurrentLine() + 1];
+				int32 currentLine = LineAt(lastClickOffset);
+				if (currentLine + 1 < fLines->NumLines()) {
+					line = (*fLines)[currentLine + 1];
 					fClickOffset = _PreviousInitialByte(line->offset);
 				} else {
-					// This check if needed to avoid moving the cursor
+					// This check is needed to avoid moving the cursor
 					// when the cursor is on the last line, and that line
 					// is empty
 					if (fClickOffset != fText->Length()) {
@@ -3428,16 +3464,21 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 				}
 			}
 
-			if (shiftDown) {
-				if (fClickOffset >= fSelEnd) {
-					start = fSelStart;
-					end = fClickOffset;
+			if (!shiftDown)
+				selStart = selEnd = fClickOffset;
+			else if (fClickOffset != lastClickOffset) {
+				if (fClickOffset > fSelEnd) {
+					// extend selection to the right
+					selEnd = fClickOffset;
+					if (lastClickOffset < fSelEnd) {
+						// caret has jumped across "anchor"
+						selStart = fSelEnd;
+					}
 				} else {
-					start = fClickOffset;
-					end = fSelEnd;
+					// shrink selection from the left
+					selStart = fClickOffset;
 				}
-			} else
-				start = end = fClickOffset;
+			}
 
 			break;
 
@@ -3448,16 +3489,21 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 			currentPos.y -= Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
 
-			if (shiftDown) {
-				if (fClickOffset <= fSelStart) {
-					start = fClickOffset;
-					end = fSelEnd;
+			if (!shiftDown)
+				selStart = selEnd = fClickOffset;
+			else if (fClickOffset != lastClickOffset) {
+				if (fClickOffset < fSelStart) {
+					// extend selection to the top
+					selStart = fClickOffset;
+					if (lastClickOffset > fSelStart) {
+						// caret has jumped across "anchor"
+						selEnd = fSelStart;
+					}
 				} else {
-					start = fSelStart;
-					end = fClickOffset;
+					// shrink selection from the bottom
+					selEnd = fClickOffset;
 				}
-			} else
-				start = end = fClickOffset;
+			}
 			break;
 		}
 
@@ -3468,23 +3514,32 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 			currentPos.y += Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
 
-			if (shiftDown) {
-				if (fClickOffset >= fSelEnd) {
-					start = fSelStart;
-					end = fClickOffset;
+			if (!shiftDown)
+				selStart = selEnd = fClickOffset;
+			else if (fClickOffset != lastClickOffset) {
+				if (fClickOffset > fSelEnd) {
+					// extend selection to the bottom
+					selEnd = fClickOffset;
+					if (lastClickOffset < fSelEnd) {
+						// caret has jumped across "anchor"
+						selStart = fSelEnd;
+					}
 				} else {
-					start = fClickOffset;
-					end = fSelEnd;
+					// shrink selection from the top
+					selStart = fClickOffset;
 				}
-			} else
-				start = end = fClickOffset;
+			}
 
 			break;
 		}
 	}
 
+	if (shiftDown)
+		Select(selStart, selEnd);
+	else
+		Select(fClickOffset, fClickOffset);
+
 	ScrollToOffset(fClickOffset);
-	Select(start, end);
 }
 
 
