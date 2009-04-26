@@ -176,6 +176,9 @@ public:
 	inline	void				AddWaitObject(
 									ThreadWaitObject* threadWaitObject);
 
+			bool				GetThreadWaitObjects(
+									BObjectList<ThreadWaitObject>& objects);
+
 	static inline int			CompareByTypeObject(
 									const ThreadWaitObjectGroup* a,
 									const ThreadWaitObjectGroup* b);
@@ -249,6 +252,8 @@ public:
 
 			ThreadWaitObjectGroup* ThreadWaitObjectGroupFor(uint32 type,
 									addr_t object) const;
+	inline	int32				CountThreadWaitObjectGroups() const;
+	inline	ThreadWaitObjectGroup* ThreadWaitObjectGroupAt(int32 index) const;
 
 	inline	void				SetDeletionTime(bigtime_t time);
 
@@ -654,6 +659,20 @@ bigtime_t
 Model::Thread::UnspecifiedWaitTime() const
 {
 	return fUnspecifiedWaitTime;
+}
+
+
+int32
+Model::Thread::CountThreadWaitObjectGroups() const
+{
+	return fWaitObjectGroups.CountItems();
+}
+
+
+Model::ThreadWaitObjectGroup*
+Model::Thread::ThreadWaitObjectGroupAt(int32 index) const
+{
+	return fWaitObjectGroups.ItemAt(index);
 }
 
 
