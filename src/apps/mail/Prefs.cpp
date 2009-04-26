@@ -82,6 +82,7 @@ using namespace BPrivate;
 #define ENCODING_TEXT		MDR_DIALECT_CHOICE ("Encoding:", "エンコード形式:")
 #define WARN_UNENCODABLE_TEXT	MDR_DIALECT_CHOICE ("Warn Unencodable:", "警告: エンコードできません")
 #define SPELL_CHECK_START_ON_TEXT	MDR_DIALECT_CHOICE ("Initial Spell Check Mode:", "編集時スペルチェック:")
+#define AUTO_MARK_READED_TEXT	MDR_DIALECT_CHOICE ("Automaticly mark mail as readed:", "Automaticly mark mail as readed:")
 
 #define BUTTONBAR_TEXT		MDR_DIALECT_CHOICE ("Button Bar:", "ボタンバー:")
 
@@ -99,7 +100,7 @@ enum	P_MESSAGES			{P_OK = 128, P_CANCEL, P_REVERT, P_FONT,
 							 P_SIG, P_ENC, P_WARN_UNENCODABLE,
 							 P_SPELL_CHECK_START_ON, P_BUTTON_BAR,
 							 P_ACCOUNT, P_REPLYTO, P_REPLY_PREAMBLE,
-							 P_COLORED_QUOTES};
+							 P_COLORED_QUOTES, P_MARK_READED};
 
 #define ICON_LABEL_TEXT MDR_DIALECT_CHOICE ("Show Icons & Labels", "アイコンとラベル")
 #define ICON_TEXT MDR_DIALECT_CHOICE ("Show Icons Only", "アイコンのみ")
@@ -136,7 +137,7 @@ add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	bool* attachAttributes, bool* cquotes, uint32* account, int32* replyTo,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
-	bool* spellCheckStartOn, uint8* buttonBar)
+	bool* spellCheckStartOn, bool* autoMarkReaded, uint8* buttonBar)
 	:
 #if USE_LAYOUT_MANAGEMENT
 	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences", "Mailの設定"),
@@ -180,7 +181,10 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	fWarnUnencodable(*fNewWarnUnencodable),
 
 	fNewSpellCheckStartOn(spellCheckStartOn),
-	fSpellCheckStartOn(*fNewSpellCheckStartOn)
+	fSpellCheckStartOn(*fNewSpellCheckStartOn),
+	
+	fNewAutoMarkReaded(autoMarkReaded),
+	fAutoMarkReaded(*fNewAutoMarkReaded)
 {
 	strcpy(fSignature, *fNewSignature);
 
@@ -242,7 +246,10 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 		fSpellCheckStartOnMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
-
+	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
+	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READED_TEXT,
+		fAutoMarkReadedMenu,	NULL);
+	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 	// Mail Accounts
 
 	layoutRow = 0;
@@ -406,6 +413,13 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
 
+	r.OffsetBy(0, height + ITEM_SPACE);
+	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
+	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READED_TEXT,
+		fAutoMarkReadedMenu,	NULL);
+	menu->SetDivider(labelWidth);
+	menu->SetAlignment(B_ALIGN_RIGHT);
+	interfaceBox->AddChild(menu);
 	
 	// Mail Accounts
 
@@ -579,6 +593,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 			*fNewEncoding = fEncoding;
 			*fNewWarnUnencodable = fWarnUnencodable;
 			*fNewSpellCheckStartOn = fSpellCheckStartOn;
+			*fNewAutoMarkReaded = fAutoMarkReaded;
 			*fNewButtonBar = fButtonBar;
 
 			be_app->PostMessage(PREFS_CHANGED);
@@ -719,11 +734,15 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 		case P_SPELL_CHECK_START_ON:
 			msg->FindBool("spellCheckStartOn", fNewSpellCheckStartOn);
 			break;
+		case P_MARK_READED:
+			msg->FindBool("autoMarkReaded", fNewAutoMarkReaded);
+			be_app->PostMessage(PREFS_CHANGED);
+			break;
 		case P_BUTTON_BAR:
 			msg->FindInt8("bar", (int8 *)fNewButtonBar);
 			be_app->PostMessage(PREFS_CHANGED);
 			break;
-
+			
 		default:
 			BWindow::MessageReceived(msg);
 	}
@@ -745,6 +764,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 		|| fEncoding != *fNewEncoding
 		|| fWarnUnencodable != *fNewWarnUnencodable
 		|| fSpellCheckStartOn != *fNewSpellCheckStartOn
+		|| fAutoMarkReaded != *fNewAutoMarkReaded
 		|| fButtonBar != *fNewButtonBar;
 	fRevert->SetEnabled(changed);
 }
@@ -1104,6 +1124,14 @@ TPrefsWindow::_BuildSpellCheckStartOnMenu(bool spellCheckStartOn)
 
 
 BPopUpMenu*
+TPrefsWindow::_BuildAutoMarkReadedMenu(bool autoMarkReaded)
+{
+	return _BuildBoolMenu(P_MARK_READED, "autoMarkReaded",
+		autoMarkReaded);
+}
+
+
+BPopUpMenu*
 TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 {
 	BMenuItem* item;
@@ -1130,3 +1158,4 @@ TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 
 	return menu;
 }
+					

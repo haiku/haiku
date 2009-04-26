@@ -69,7 +69,8 @@ public:
 									uint32* account, int32* replyTo,
 									char** preamble, char** sig,
 									uint32* encoding, bool* warnUnencodable,
-									bool* spellCheckStartOn, uint8* buttonBar);
+									bool* spellCheckStartOn,
+									bool* autoMarkReaded, uint8* buttonBar);
 	virtual						~TPrefsWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -90,8 +91,10 @@ private:
 									bool warnUnencodable);
 			BPopUpMenu*			_BuildSpellCheckStartOnMenu(
 									bool spellCheckStartOn);
+			BPopUpMenu*			_BuildAutoMarkReadedMenu(
+									bool autoMarkReaded);
 			BPopUpMenu*			_BuildButtonBarMenu(uint8 show);
-
+			
 			BPopUpMenu*			_BuildBoolMenu(uint32 msg,
 									const char* boolItem, bool isTrue);
 
@@ -120,6 +123,8 @@ private:
 			bool				fWarnUnencodable;
 			bool*				fNewSpellCheckStartOn;
 			bool				fSpellCheckStartOn;
+			bool*				fNewAutoMarkReaded;
+			bool				fAutoMarkReaded;
 
 			BButton*			fRevert;
 
@@ -137,6 +142,7 @@ private:
 			BPopUpMenu*			fWarnUnencodableMenu;
 			BPopUpMenu*			fSpellCheckStartOnMenu;
 			BPopUpMenu*			fButtonBarMenu;
+			BPopUpMenu*			fAutoMarkReadedMenu;
 };
 
 #endif	/* _PREFS_H */

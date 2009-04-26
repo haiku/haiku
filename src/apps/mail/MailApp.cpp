@@ -130,6 +130,7 @@ TMailApp::TMailApp()
 {
 	// set default values
 	fContentFont.SetSize(12.0);
+	fAutoMarkReaded = true;
 	fSignature = (char *)malloc(strlen(SIG_NONE) + 1);
 	strcpy(fSignature, SIG_NONE);
 	fReplyPreamble = (char *)malloc(1);
@@ -348,24 +349,23 @@ TMailApp::MessageReceived(BMessage *msg)
 						&fColoredQuotes, &fDefaultChain, &fUseAccountFrom,
 						&fReplyPreamble, &fSignature, &fMailCharacterSet,
 						&fWarnAboutUnencodableCharacters,
-						&fStartWithSpellCheckOn, &fShowButtonBar);
+						&fStartWithSpellCheckOn, &fAutoMarkReaded,
+						&fShowButtonBar);
 				fPrefsWindow->Show();
-				fPreviousShowButtonBar = fShowButtonBar;
 			}
 			break;
 
 		case PREFS_CHANGED:
 		{
-			// Do we need to update the state of the button bars?
-			if (fPreviousShowButtonBar != fShowButtonBar) {
-				// Notify all Mail windows
-				TMailWindow	*window;
-				for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i)) != NULL; i++) {
-					window->Lock();
-					window->UpdateViews();
-					window->Unlock();
-				}
-				fPreviousShowButtonBar = fShowButtonBar;
+			// Notify all Mail windows
+			TMailWindow	*window;
+			for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i))
+				!= NULL; i++)
+			{
+				window->Lock();
+				window->UpdatePreferences();
+				window->UpdateViews();
+				window->Unlock();
 			}
 			break;
 		}
@@ -912,6 +912,7 @@ TMailApp::SaveSettings()
 	settings.AddRect("SignatureWindowSize", fSignatureWindowFrame);
 	settings.AddBool("WordWrapMode", fWrapMode);
 	settings.AddPoint("PreferencesWindowLocation", fPrefsWindowPos);
+	settings.AddBool("AutoMarkReaded", fAutoMarkReaded);
 	settings.AddString("SignatureText", fSignature);
 	settings.AddInt32("CharacterSet", fMailCharacterSet);
 	settings.AddString("FindString", FindWindow::GetFindString());
@@ -999,6 +1000,9 @@ TMailApp::LoadSettings()
 	BPoint point;
 	if (settings.FindPoint("PreferencesWindowLocation", &point) == B_OK)
 		fPrefsWindowPos = point;
+
+	if (settings.FindBool("AutoMarkReaded", &boolValue) == B_OK)
+		fAutoMarkReaded = boolValue;
 
 	const char *string;
 	if (settings.FindString("SignatureText", &string) == B_OK) {
@@ -1135,6 +1139,14 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 
 
 // #pragma mark - settings
+
+
+bool
+TMailApp::AutoMarkReaded()
+{
+	BAutolock _(this);
+	return fAutoMarkReaded;	
+}
 
 
 BString

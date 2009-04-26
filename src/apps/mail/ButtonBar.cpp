@@ -76,16 +76,39 @@ ButtonBar::~ButtonBar()
 						
 
 BmapButton*
-ButtonBar::AddButton(const char *label, int32 baseID, BMessage *msg)
+ButtonBar::AddButton(const char *label, int32 baseID, BMessage *msg,
+	int32 position)
 {
 	BmapButton* button = new BmapButton(BRect(0, 0, 31, 31), label, label,
 		baseID + fEnabledOffset, baseID + fDisabledOffset, baseID + fRollOffset,
 		baseID + fPressedOffset, fShowLabels, msg,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP);
 
-	fButtonList.AddItem(button);
+	if (position > 0)
+		fButtonList.AddItem(button, position);
+	else
+		fButtonList.AddItem(button);
 	AddChild(button);
 	return button;
+}
+
+
+bool
+ButtonBar::RemoveButton(BmapButton *button)
+{
+	if (fButtonList.RemoveItem(button)) {
+		RemoveChild(button);
+		delete button;
+		return true;
+	}
+	return false;
+}
+
+
+int32
+ButtonBar::IndexOf(BmapButton *button)
+{
+	return fButtonList.IndexOf(button);
 }
 
 

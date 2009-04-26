@@ -107,10 +107,11 @@ class TMailWindow : public BWindow {
 				void			SaveTrackerPosition(entry_ref*);
 				void			SetOriginatingWindow(BWindow* window);
 
-				void			SetCurrentMessageRead();
+				void			SetCurrentMessageRead(bool readed = true);
 				void			SetTrackerSelectionToCurrent();
 				TMailWindow*	FrontmostWindow();
 				void			UpdateViews();
+				void			UpdatePreferences();
 
 	protected:
 				void			SetTitleForMessage();
@@ -125,6 +126,9 @@ class TMailWindow : public BWindow {
 				void			_RebuildQueryMenu(bool firstTime = false);
 				char*			_BuildQueryString(BEntry* entry) const;
  
+ 				void			_AddReadedButton();
+				void			_UpdateReadButton();
+				
 				TMailApp*		fApp;
 
 				BEmailMessage*	fMail;
@@ -193,6 +197,10 @@ class TMailWindow : public BWindow {
 				char*			fStartingText;	
 				entry_ref		fRepliedMail;
 				BMessenger*		fOriginatingWindow;
+				
+				bool			fAutoMarkReaded : 1;
+				BmapButton*		fReadedButton;
+				BmapButton*		fNextButton;
 };
 
 #endif // _MAIL_WINDOW_H

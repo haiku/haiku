@@ -57,7 +57,10 @@ public:
 		
 	void ShowLabels(bool show);
 	void Arrange(bool fixedWidth = true);
-	BmapButton *AddButton(const char *label, int32 baseID, BMessage *msg);
+	BmapButton *AddButton(const char *label, int32 baseID, BMessage *msg,
+							int32 position = -1);
+	bool RemoveButton(BmapButton *button);
+	int32 IndexOf(BmapButton *button);
 	void AddDivider(float vmargin);
 		
 protected:
