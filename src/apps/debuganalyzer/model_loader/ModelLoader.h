@@ -27,7 +27,7 @@ public:
 								~ModelLoader();
 
 			status_t			StartLoading();
-			void				Abort();
+			void				Abort(bool wait);
 
 			Model*				DetachModel();
 

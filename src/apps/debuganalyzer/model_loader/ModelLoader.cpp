@@ -84,10 +84,7 @@ ModelLoader::ModelLoader(DataSource* dataSource,
 
 ModelLoader::~ModelLoader()
 {
-	if (fLoaderThread >= 0) {
-		Abort();
-		wait_for_thread(fLoaderThread, NULL);
-	}
+	Abort(true);
 
 	delete fDataSource;
 	delete fModel;
@@ -128,14 +125,22 @@ ModelLoader::StartLoading()
 
 
 void
-ModelLoader::Abort()
+ModelLoader::Abort(bool wait)
 {
 	AutoLocker<BLocker> locker(fLock);
 
-	if (!fLoading || fAborted)
+	if (fLoaderThread < 0)
 		return;
 
-	fAborted = true;
+	thread_id thread = fLoaderThread;
+
+	if (fLoading)
+		fAborted = true;
+
+	locker.Unlock();
+
+	if (wait)
+		wait_for_thread(thread, NULL);
 }
 
 

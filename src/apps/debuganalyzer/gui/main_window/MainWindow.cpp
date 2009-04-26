@@ -106,6 +106,9 @@ printf("MSG_MODEL_LOADED_FAILED/MSG_MODEL_LOADED_ABORTED\n");
 void
 MainWindow::Quit()
 {
+	if (fModelLoader != NULL)
+		fModelLoader->Abort(true);
+
 	fSubWindowManager->Broadcast(B_QUIT_REQUESTED);
 	be_app->PostMessage(MSG_WINDOW_QUIT);
 
