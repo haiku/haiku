@@ -2123,8 +2123,6 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 			error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
 	}
 
-	printf("ref->name = %s\n", ref->name);
-
 	// init node
 	BNode node;
 	if (error == B_OK)
