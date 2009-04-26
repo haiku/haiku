@@ -42,12 +42,15 @@
 <li><p>Install all needed packages:</p>
 <pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm</pre></li>
 
-<li><p>Create the Haiku development directories and get the Haiku build tools source:</p>
+<li><p>Create the Haiku development directories and get the Haiku build tools source.:</p>
 <pre class="terminal">mkdir develop
 cd develop
 mkdir haiku
-cd haiku
-svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools</pre></li>
+cd haiku</pre>
+<p>Either as anonymous check-out:</p>
+<pre class="terminal">svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools</pre>
+<p>Or, if you have a valid Haiku developer account at Berlios:</p>
+<pre class="terminal">svn checkout https://developername@svn.berlios.de/svnroot/repos/haiku/buildtools/trunk buildtools</pre></li>
 
 <li><p>Build and install the Haiku Jam:</p>
 <pre class="terminal">cd  buildtools/jam
@@ -56,9 +59,9 @@ sudo ./jam0 install
 cd ../..</pre></li>
 
 <li><p>Get the Haiku source (this will take a while).<br />
-For anonymous check-out:</p>
+Either a anonymous check-out:</p>
 <pre class="terminal">svn checkout http://svn.berlios.de/svnroot/repos/haiku/haiku/trunk trunk</pre>
-<p>If you have a valid Haiku developer account at Berlios:</p>
+<p>Or, if you have a valid Haiku developer account at Berlios:</p>
 <pre class="terminal">svn checkout https://developername@svn.berlios.de/svnroot/repos/haiku/haiku/trunk trunk</pre>
 
 <p>If there are any errors while checking out the source, just cd into the trunk directory and type <span class="cli">svn update</span> to get any missed files.<br />
