@@ -1897,6 +1897,8 @@ Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 		window->ProcessDirtyRegion(dirty);
 	} else
 		MarkDirty(dirty);
+
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
@@ -1922,6 +1924,8 @@ Desktop::_HideWindow(Window* window)
 	_WindowChanged(window);
 
 	MarkDirty(dirty);
+
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
 }
 
 
