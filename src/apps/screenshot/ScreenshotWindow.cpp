@@ -243,9 +243,9 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fActiveWindow = new BRadioButton("Take active window",
+	fActiveWindow = new BRadioButton("Capture active window",
 		 new BMessage(kScreenshotType));
-	fWholeDesktop = new BRadioButton("Take whole screen",
+	fWholeDesktop = new BRadioButton("Capture entire screen",
 		 new BMessage(kScreenshotType));
 	fWholeDesktop->SetValue(B_CONTROL_ON);
 
@@ -263,7 +263,7 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		new BMessage(kIncludeBorder));
 	fWindowBorder->SetEnabled(false);
 
-	fShowMouse = new BCheckBox("Include mouse pointer in screenshot",
+	fShowMouse = new BCheckBox("Include mouse pointer",
 		new BMessage(kShowMouse));
 	fShowMouse->SetValue(fIncludeMouse);
 

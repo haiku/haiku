@@ -80,7 +80,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 			_ShowHelp();
 		else if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--border") == 0)
 			includeBorder = true;
-		else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--mouse") == 0)
+		else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--mouse-pointer") == 0)
 			includeMouse = true;
 		else if (strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--window") == 0)
 			grabActiveWindow = true;
@@ -110,9 +110,9 @@ Screenshot::_ShowHelp() const
 	printf("Screenshot [OPTION]... Creates a bitmap of the current screen\n\n");
 	printf("OPTION\n");
 	printf("  -o, --options         Show options window first\n");
-	printf("  -m, --mouse           Have the mouse pointer in the screenshot\n");
-	printf("  -b, --border          Include the window border with the screenshot\n");
-	printf("  -w, --window          Use active window instead of the entire screen\n");
+	printf("  -m, --mouse-pointer   Include the mouse pointer\n");
+	printf("  -b, --border          Include the window border\n");
+	printf("  -w, --window          Capture the active window instead of the entire screen\n");
 	printf("  -d, --delay=seconds   Take screenshot after specified delay [in seconds]\n");
 	printf("  -s, --silent          Saves the screenshot without showing the app window\n");
 	printf("                        overrides --options, saves to home folder as png\n");
