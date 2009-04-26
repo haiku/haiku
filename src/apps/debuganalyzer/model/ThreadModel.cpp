@@ -15,13 +15,20 @@ ThreadModel::WaitObjectGroup::WaitObjectGroup(
 	Model::ThreadWaitObject** waitObjects, int32 count)
 	:
 	fWaitObjects(waitObjects),
-	fCount(count)
+	fCount(count),
+	fWaits(0),
+	fTotalWaitTime(0)
 {
+	for (int32 i = 0; i < fCount; i++) {
+		fWaits += fWaitObjects[i]->Waits();
+		fTotalWaitTime += fWaitObjects[i]->TotalWaitTime();
+	}
 }
 
 
 ThreadModel::WaitObjectGroup::~WaitObjectGroup()
 {
+	delete[] fWaitObjects;
 }
 
 

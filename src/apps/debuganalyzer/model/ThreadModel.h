@@ -56,6 +56,9 @@ public:
 	inline	uint32				Type() const;
 	inline	const char*			Name() const;
 
+	inline	int64				Waits() const;
+	inline	bigtime_t			TotalWaitTime() const;
+
 	inline	int32				CountWaitObjects() const;
 	inline	Model::ThreadWaitObject* WaitObjectAt(int32 index) const;
 
@@ -68,6 +71,8 @@ public:
 private:
 			Model::ThreadWaitObject** fWaitObjects;
 			int32				fCount;
+			int64				fWaits;
+			bigtime_t			fTotalWaitTime;
 };
 
 
@@ -102,6 +107,20 @@ const char*
 ThreadModel::WaitObjectGroup::Name() const
 {
 	return fWaitObjects[0]->Name();
+}
+
+
+int64
+ThreadModel::WaitObjectGroup::Waits() const
+{
+	return fWaits;
+}
+
+
+bigtime_t
+ThreadModel::WaitObjectGroup::TotalWaitTime() const
+{
+	return fTotalWaitTime;
 }
 
 
