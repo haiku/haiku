@@ -323,12 +323,6 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 	for (uint8 i = 0; i < deviceCount; i++) {
 		SelectDevice(i);
 
-		if (AltStatus() == 0xff) {
-			TRACE_ALWAYS("illegal status value for device %d,"
-				" assuming not present\n", i);
-			continue;
-		}
-
 		if (SelectedDevice() != i) {
 			TRACE_ALWAYS("cannot select device %d, assuming not present\n", i);
 			continue;
@@ -336,6 +330,12 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 
 		// ensure interrupts are disabled for this device
 		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
+
+		if (AltStatus() == 0xff) {
+			TRACE_ALWAYS("illegal status value for device %d,"
+				" assuming not present\n", i);
+			continue;
+		}
 
 		// wait up to 31 seconds for busy to clear
 		if (Wait(0, ATA_STATUS_BUSY, 0, 31 * 1000 * 1000) != B_OK) {
@@ -388,6 +388,9 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	TRACE("waiting for set bits 0x%02x and cleared bits 0x%02x\n",
 		setBits, clearedBits);
 
+#if ATA_TRACING
+	unsigned lastStatus = 0x100;
+#endif
 	while (true) {
 		uint8 status = AltStatus();
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
@@ -410,9 +413,18 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 		}
 
 		bigtime_t elapsedTime = system_time() - startTime;
-		TRACE("wait status after %lld: 0x%02x\n", elapsedTime, status);
-		if (elapsedTime > timeout)
+#if ATA_TRACING
+		if (lastStatus != status) {
+			TRACE("wait status after %lld: 0x%02x\n", elapsedTime, status);
+			lastStatus = status;
+		}
+#endif
+
+		if (elapsedTime > timeout) {
+			TRACE("timeout, wait status after %lld: 0x%02x\n",
+				elapsedTime, status);
 			return B_TIMED_OUT;
+		}
 
 		// The device may be ready almost immediatelly. If it isn't,
 		// poll often during the first 20ms, otherwise poll lazyly.
