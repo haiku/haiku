@@ -94,6 +94,9 @@ private:
 		}
 	};
 
+	// For GCC 2
+	friend struct ObjectNode;
+
 	struct GroupNode : Node {
 		Model::ThreadWaitObjectGroup*	group;
 		BObjectList<ObjectNode>			objectNodes;
@@ -132,6 +135,9 @@ private:
 				columnIndex, value);
 		}
 	};
+
+	// For GCC 2
+	friend struct GroupNode;
 
 	struct RootNode : Node {
 		Model::Thread*			thread;
