@@ -2123,6 +2123,8 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 			error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
 	}
 
+	printf("ref->name = %s\n", ref->name);
+
 	// init node
 	BNode node;
 	if (error == B_OK)
@@ -2168,15 +2170,26 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 			if (error == B_OK) {
 				// if the file has a preferred app, let _TranslateType() find
 				// it for us
+				bool foundPreferredApp = false;
 				if (nodeInfo.GetPreferredApp(preferredApp) == B_OK) {
 					error = _TranslateType(preferredApp, appMeta, appRef,
 										   appFile);
-				} else {
-					// no preferred app -- we need to get the file's type
+					if (error == B_OK)
+						foundPreferredApp = true;
+				}
+				
+				if (!foundPreferredApp) {
+					// no preferred app or existing one was not found -- we
+					// need to get the file's type
+
+					error = B_OK; // reset error.
+
 					char fileType[B_MIME_TYPE_LENGTH];
+
 					// get the type from the file, or guess a type
 					if (nodeInfo.GetType(fileType) != B_OK)
 						error = _SniffFile(ref, &nodeInfo, fileType);
+
 					// now let _TranslateType() do the actual work
 					if (error == B_OK) {
 						error = _TranslateType(fileType, appMeta, appRef,
