@@ -17,9 +17,9 @@ extern const char* STR_ERR_WEB_DIR
 extern const char* STR_ERR_CANT_START
 	= "Can't Start the Server";
 extern const char* STR_DIR_CREATED
-	= "A default Web directory has been created for you "
+	= "A default Web folder has been created for you "
 	  "at \"/boot/home/public_html.\"\nMake sure an HTML " 
-	  "document named \"index.html\" is in that directory.";
+	  "document named \"index.html\" is in that folder.";
 
 extern const char* STR_MNU_FILE
 	= "File";
@@ -38,7 +38,7 @@ extern const char* STR_MNU_EDIT_COPY
 extern const char* STR_MNU_EDIT_SELECT_ALL
 	= "Select All";
 extern const char* STR_MNU_EDIT_PREF
-	= "Preferences" B_UTF8_ELLIPSIS;
+	= "Settings" B_UTF8_ELLIPSIS;
 extern const char* STR_MNU_CTRL
 	= "Controls";
 extern const char* STR_MNU_CTRL_RUN_SERVER
@@ -73,19 +73,19 @@ extern const char* STR_TAB_SITE
 extern const char* STR_BBX_LOCATION
 	= "Web Site Location";
 extern const char* STR_TXT_DIRECTORY
-	= "Web Directory:";
+	= "Web Folder:";
 extern const char* STR_BTN_DIRECTORY
-	= "Select Web Directory";
+	= "Select Web Folder";
 extern const char* STR_TXT_INDEX
-	= "Index File Name:";
+	= "Start Page:";
 extern const char* STR_BBX_OPTIONS
 	= "Web Site Options";
 extern const char* STR_CBX_DIR_LIST
-	= "Send Directory List if No Index";
+	= "Send file listing if there's no start page";
 extern const char* STR_CBX_DIR_LIST_LABEL
-	= "Send Directory List if No Index";
+	= "Send file listing if there's no start page";
 extern const char* STR_FILEPANEL_SELECT_WEB_DIR
-	= "Select Web Directory";
+	= "Select Web Folder";
 	
 extern const char* STR_TAB_LOGGING
 	= "Logging";
@@ -109,7 +109,7 @@ extern const char* STR_TAB_ADVANCED
 extern const char* STR_BBX_CONNECTION
 	= "Connections Options";
 extern const char* STR_SLD_LABEL
-	= "Maximum Simultaneous Connections:";
+	= "Max. Simultaneous Connections:";
 	 		 char* STR_SLD_STATUS_LABEL
 	= "connections";
 	
