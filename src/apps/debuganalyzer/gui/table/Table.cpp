@@ -10,6 +10,7 @@
 
 // #pragma mark - TableField
 
+
 class TableField : public BField {
 public:
 	TableField(int32 rowIndex)
@@ -59,7 +60,7 @@ public:
 									TableColumn* tableColumn);
 	virtual						~Column();
 
-			void				SetTableModel(TableModel* model);
+			void				SetModel(TableModel* model);
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -94,7 +95,7 @@ Table::Column::~Column()
 
 
 void
-Table::Column::SetTableModel(TableModel* model)
+Table::Column::SetModel(TableModel* model)
 {
 	fModel = model;
 }
@@ -213,7 +214,7 @@ Table::SetTableModel(TableModel* model)
 		Clear();
 
 		for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
-			column->SetTableModel(NULL);
+			column->SetModel(NULL);
 	}
 
 	fModel = model;
@@ -222,7 +223,7 @@ Table::SetTableModel(TableModel* model)
 		return;
 
 	for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
-		column->SetTableModel(fModel);
+		column->SetModel(fModel);
 
 	// create the rows
 	int32 rowCount = fModel->CountRows();
@@ -297,8 +298,11 @@ Table::ItemInvoked()
 	if (row == NULL)
 		return;
 
-	int32 index = IndexOf(row);
+	TableField* field = dynamic_cast<TableField*>(row->GetField(0));
+	if (field == NULL)
+		return;
+
 	int32 listenerCount = fListeners.CountItems();
 	for (int32 i = listenerCount - 1; i >= 0; i--)
-		fListeners.ItemAt(i)->TableRowInvoked(this, index);
+		fListeners.ItemAt(i)->TableRowInvoked(this, field->RowIndex());
 }
