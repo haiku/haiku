@@ -160,6 +160,9 @@ public:
 	inline	const char*			Name() const;
 	inline	addr_t				ReferencedObject();
 
+	inline	int64				Waits() const;
+	inline	bigtime_t			TotalWaitTime() const;
+
 			void				AddWait(bigtime_t waitTime);
 
 private:
@@ -489,6 +492,20 @@ addr_t
 Model::ThreadWaitObject::ReferencedObject()
 {
 	return fWaitObject->ReferencedObject();
+}
+
+
+int64
+Model::ThreadWaitObject::Waits() const
+{
+	return fWaits;
+}
+
+
+bigtime_t
+Model::ThreadWaitObject::TotalWaitTime() const
+{
+	return fTotalWaitTime;
 }
 
 
