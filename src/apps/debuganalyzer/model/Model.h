@@ -155,6 +155,11 @@ public:
 
 	inline	WaitObject*			GetWaitObject() const;
 
+	inline	uint32				Type() const;
+	inline	addr_t				Object() const;
+	inline	const char*			Name() const;
+	inline	addr_t				ReferencedObject();
+
 			void				AddWait(bigtime_t waitTime);
 
 private:
@@ -456,6 +461,34 @@ Model::WaitObject*
 Model::ThreadWaitObject::GetWaitObject() const
 {
 	return fWaitObject;
+}
+
+
+uint32
+Model::ThreadWaitObject::Type() const
+{
+	return fWaitObject->Type();
+}
+
+
+addr_t
+Model::ThreadWaitObject::Object() const
+{
+	return fWaitObject->Object();
+}
+
+
+const char*
+Model::ThreadWaitObject::Name() const
+{
+	return fWaitObject->Name();
+}
+
+
+addr_t
+Model::ThreadWaitObject::ReferencedObject()
+{
+	return fWaitObject->ReferencedObject();
 }
 
 
