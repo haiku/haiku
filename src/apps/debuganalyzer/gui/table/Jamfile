@@ -11,4 +11,5 @@ MergeObject DebugAnalyzer_gui_table.o
 	Table.cpp
 	TableColumn.cpp
 	TableColumns.cpp
+	TreeTable.cpp
 ;
