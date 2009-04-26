@@ -5,11 +5,9 @@
 #ifndef MAIN_MODEL_LOADER_H
 #define MAIN_MODEL_LOADER_H
 
-#include <Locker.h>
-#include <Messenger.h>
-
 #include <util/OpenHashTable.h>
 
+#include "AbstractModelLoader.h"
 #include "Model.h"
 
 
@@ -19,17 +17,22 @@ class DataSource;
 struct system_profiler_thread_added;
 
 
-class ModelLoader {
+class ModelLoader : public AbstractModelLoader {
 public:
 								ModelLoader(DataSource* dataSource,
 									const BMessenger& target,
 									void* targetCookie);
+
+protected:
 								~ModelLoader();
 
-			status_t			StartLoading();
-			void				Abort(bool wait);
-
+public:
 			Model*				DetachModel();
+
+protected:
+	virtual	status_t			PrepareForLoading();
+	virtual	status_t			Load();
+	virtual	void				FinishLoading(bool success);
 
 private:
 			enum ScheduleState {
@@ -78,8 +81,6 @@ private:
 				thread_removed_from_run_queue;
 
 private:
-	static	status_t			_LoaderEntry(void* data);
-			status_t			_Loader();
 			status_t			_Load();
 			status_t			_ReadDebugEvents(void** _eventData,
 									size_t* _size);
@@ -112,14 +113,8 @@ private:
 									uint32 type, addr_t object);
 
 private:
-			BLocker				fLock;
 			Model*				fModel;
 			DataSource*			fDataSource;
-			BMessenger			fTarget;
-			void*				fTargetCookie;
-			thread_id			fLoaderThread;
-			bool				fLoading;
-			bool				fAborted;
 			bigtime_t			fBaseTime;
 			bigtime_t			fLastEventTime;
 			ThreadTable			fThreads;

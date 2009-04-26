@@ -70,77 +70,17 @@ ModelLoader::_UpdateLastEventTime(bigtime_t time)
 ModelLoader::ModelLoader(DataSource* dataSource,
 	const BMessenger& target, void* targetCookie)
 	:
-	fLock("main model loader"),
+	AbstractModelLoader(target, targetCookie),
 	fModel(NULL),
-	fDataSource(dataSource),
-	fTarget(target),
-	fTargetCookie(targetCookie),
-	fLoaderThread(-1),
-	fLoading(false),
-	fAborted(false)
+	fDataSource(dataSource)
 {
 }
 
 
 ModelLoader::~ModelLoader()
 {
-	Abort(true);
-
 	delete fDataSource;
 	delete fModel;
-}
-
-
-status_t
-ModelLoader::StartLoading()
-{
-	// check initialization
-	status_t error = fLock.InitCheck();
-	if (error != B_OK)
-		return error;
-
-	AutoLocker<BLocker> locker(fLock);
-
-	if (fModel != NULL || fLoading || fDataSource == NULL)
-		return B_BAD_VALUE;
-
-	// init the hash tables
-	error = fThreads.Init();
-	if (error != B_OK)
-		return error;
-
-	// spawn the loader thread
-	fLoaderThread = spawn_thread(&_LoaderEntry, "main model loader",
-		B_NORMAL_PRIORITY, this);
-	if (fLoaderThread < 0)
-		return fLoaderThread;
-
-	fLoading = true;
-	fAborted = false;
-
-	resume_thread(fLoaderThread);
-
-	return B_OK;
-}
-
-
-void
-ModelLoader::Abort(bool wait)
-{
-	AutoLocker<BLocker> locker(fLock);
-
-	if (fLoaderThread < 0)
-		return;
-
-	thread_id thread = fLoaderThread;
-
-	if (fLoading)
-		fAborted = true;
-
-	locker.Unlock();
-
-	if (wait)
-		wait_for_thread(thread, NULL);
 }
 
 
@@ -159,26 +99,35 @@ ModelLoader::DetachModel()
 }
 
 
-/*static*/ status_t
-ModelLoader::_LoaderEntry(void* data)
+status_t
+ModelLoader::PrepareForLoading()
 {
-	return ((ModelLoader*)data)->_Loader();
+	if (fModel != NULL || fDataSource == NULL)
+		return B_BAD_VALUE;
+
+	// init the hash tables
+	status_t error = fThreads.Init();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 
 status_t
-ModelLoader::_Loader()
+ModelLoader::Load()
 {
-	status_t error;
 	try {
-		error = _Load();
+		return _Load();
 	} catch(...) {
-		error = B_ERROR;
+		return B_ERROR;
 	}
+}
 
-	// clean up and notify the target
-	AutoLocker<BLocker> locker(fLock);
 
+void
+ModelLoader::FinishLoading(bool success)
+{
 	ThreadInfo* threadInfo = fThreads.Clear(true);
 	while (threadInfo != NULL) {
 		ThreadInfo* nextInfo = threadInfo->fNext;
@@ -186,24 +135,10 @@ ModelLoader::_Loader()
 		threadInfo = nextInfo;
 	}
 
-	BMessage message;
-	if (error == B_OK) {
-		message.what = MSG_MODEL_LOADED_SUCCESSFULLY;
-	} else {
+	if (!success) {
 		delete fModel;
 		fModel = NULL;
-
-		message.what = fAborted
-			? MSG_MODEL_LOADED_ABORTED : MSG_MODEL_LOADED_FAILED;
 	}
-
-	message.AddPointer("loader", this);
-	message.AddPointer("targetCookie", fTargetCookie);
-	fTarget.SendMessage(&message);
-
-	fLoading = false;
-
-	return B_OK;
 }
 
 

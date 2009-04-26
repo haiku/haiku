@@ -62,7 +62,8 @@ MainWindow::MainWindow(DataSource* dataSource)
 
 MainWindow::~MainWindow()
 {
-	delete fModelLoader;
+	if (fModelLoader != NULL)
+		fModelLoader->Delete();
 
 	if (fModel != NULL)
 		fModel->RemoveReference();
@@ -79,7 +80,7 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
 			Model* model = fModelLoader->DetachModel();
-			delete fModelLoader;
+			fModelLoader->Delete();
 			fModelLoader = NULL;
 			_SetModel(model);
 			model->RemoveReference();
@@ -90,7 +91,7 @@ printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
 		case MSG_MODEL_LOADED_ABORTED:
 		{
 printf("MSG_MODEL_LOADED_FAILED/MSG_MODEL_LOADED_ABORTED\n");
-			delete fModelLoader;
+			fModelLoader->Delete();
 			fModelLoader = NULL;
 			// TODO: User feedback (in failed case)!
 			break;
@@ -128,7 +129,7 @@ MainWindow::Show()
 
 	status_t error = fModelLoader->StartLoading();
 	if (error != B_OK) {
-		delete fModelLoader;
+		fModelLoader->Delete();
 		fModelLoader = NULL;
 		// TODO: User feedback!
 	}
