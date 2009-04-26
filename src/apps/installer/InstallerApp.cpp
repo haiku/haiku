@@ -44,7 +44,7 @@ static const uint32 kMsgAgree = 'agre';
 static const char* kInfoText =
 "IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n"
 
-"This is alpha-quality software! It means there is a high risk of loosing "
+"This is alpha-quality software! It means there is a high risk of losing "
 "important data. Make frequent backups! You have been warned.\n\n"
 
 "1)  If you are installing Haiku onto real hardware (not inside an emulator) "
