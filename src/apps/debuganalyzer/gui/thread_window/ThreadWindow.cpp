@@ -14,7 +14,9 @@
 
 #include <AutoLocker.h>
 
-//#include "MessageCodes.h"
+#include "MessageCodes.h"
+#include "ThreadModel.h"
+#include "ThreadModelLoader.h"
 
 #include "thread_window/GeneralPage.h"
 #include "thread_window/WaitObjectsPage.h"
@@ -40,7 +42,9 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 	fGeneralPage(NULL),
 	fWaitObjectsPage(NULL),
 	fModel(model),
-	fThread(thread)
+	fThread(thread),
+	fThreadModel(NULL),
+	fThreadModelLoader(NULL)
 {
 	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
 	SetLayout(rootLayout);
@@ -54,13 +58,92 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 	fMainTabView->AddTab(fWaitObjectsPage = new WaitObjectsPage);
 
 	fGeneralPage->SetModel(fModel, fThread);
-	fWaitObjectsPage->SetModel(fModel, fThread);
 
 	fModel->AddReference();
+
+	// create a thread model loader
+	fThreadModelLoader = new ThreadModelLoader(fModel, fThread,
+		BMessenger(this), NULL);
 }
 
 
 ThreadWindow::~ThreadWindow()
 {
+	if (fThreadModelLoader != NULL)
+		fThreadModelLoader->Delete();
+
+	delete fThreadModel;
+
 	fModel->RemoveReference();
+}
+
+
+void
+ThreadWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_MODEL_LOADED_SUCCESSFULLY:
+		{
+printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
+			ThreadModel* model = fThreadModelLoader->DetachModel();
+			fThreadModelLoader->Delete();
+			fThreadModelLoader = NULL;
+			_SetModel(model);
+			break;
+		}
+
+		case MSG_MODEL_LOADED_FAILED:
+		case MSG_MODEL_LOADED_ABORTED:
+		{
+printf("MSG_MODEL_LOADED_FAILED/MSG_MODEL_LOADED_ABORTED\n");
+			fThreadModelLoader->Delete();
+			fThreadModelLoader = NULL;
+			// TODO: User feedback (in failed case)!
+			break;
+		}
+
+		default:
+			SubWindow::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+ThreadWindow::Quit()
+{
+	if (fThreadModelLoader != NULL)
+		fThreadModelLoader->Abort(true);
+
+	SubWindow::Quit();
+}
+
+
+void
+ThreadWindow::Show()
+{
+	SubWindow::Show();
+
+	AutoLocker<ThreadWindow> locker;
+
+	if (fThreadModelLoader == NULL)
+		return;
+
+	status_t error = fThreadModelLoader->StartLoading();
+	if (error != B_OK) {
+		fThreadModelLoader->Delete();
+		fThreadModelLoader = NULL;
+		// TODO: User feedback!
+	}
+}
+
+
+void
+ThreadWindow::_SetModel(ThreadModel* model)
+{
+	delete fThreadModel;
+
+	fThreadModel = model;
+
+	fWaitObjectsPage->SetModel(fThreadModel);
 }

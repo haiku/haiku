@@ -10,4 +10,5 @@ MergeObject DebugAnalyzer_model_loader.o
 	:
 	AbstractModelLoader.cpp
 	ModelLoader.cpp
+	ThreadModelLoader.cpp
 ;

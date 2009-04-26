@@ -11,6 +11,8 @@
 
 #include <thread_defs.h>
 
+#include "ThreadModel.h"
+
 #include "table/TableColumns.h"
 
 
@@ -20,13 +22,12 @@
 class ThreadWindow::WaitObjectsPage::WaitObjectsTreeModel
 	: public TreeTableModel {
 public:
-	WaitObjectsTreeModel(Model* model, Model::Thread* thread)
+	WaitObjectsTreeModel(ThreadModel* model)
 		:
-		fModel(model),
-		fThread(thread),
+		fThreadModel(model),
 		fRootNode(NULL)
 	{
-		fRootNode = new RootNode(thread);
+		fRootNode = new RootNode(fThreadModel);
 	}
 
 	~WaitObjectsTreeModel()
@@ -98,20 +99,17 @@ private:
 	friend struct ObjectNode;
 
 	struct GroupNode : Node {
-		Model::ThreadWaitObjectGroup*	group;
+		ThreadModel::WaitObjectGroup*	group;
 		BObjectList<ObjectNode>			objectNodes;
 
-		GroupNode(Model::ThreadWaitObjectGroup* group)
+		GroupNode(ThreadModel::WaitObjectGroup* group)
 			:
 			group(group)
 		{
-			BObjectList<Model::ThreadWaitObject> objects;
-			if (!group->GetThreadWaitObjects(objects))
-				throw std::bad_alloc();
-
-			int32 count = objects.CountItems();
+			int32 count = group->CountWaitObjects();
 			for (int32 i = 0; i < count; i++) {
-				if (!objectNodes.AddItem(new ObjectNode(objects.ItemAt(i))))
+				Model::ThreadWaitObject* waitObject = group->WaitObjectAt(i);
+				if (!objectNodes.AddItem(new ObjectNode(waitObject)))
 					throw std::bad_alloc();
 			}
 		}
@@ -131,7 +129,8 @@ private:
 			if (columnIndex >= 3)
 				return false;
 
-			return _GetWaitObjectValueAt(group->MostRecentWaitObject(),
+			return _GetWaitObjectValueAt(
+				group->WaitObjectAt(0)->GetWaitObject(),
 				columnIndex, value);
 		}
 	};
@@ -140,18 +139,18 @@ private:
 	friend struct GroupNode;
 
 	struct RootNode : Node {
-		Model::Thread*			thread;
+		ThreadModel*			threadModel;
 		BObjectList<GroupNode>	groupNodes;
 
-		RootNode(Model::Thread* thread)
+		RootNode(ThreadModel* model)
 			:
-			thread(thread),
+			threadModel(model),
 			groupNodes(20, true)
 		{
-			int32 count = thread->CountThreadWaitObjectGroups();
+			int32 count = threadModel->CountWaitObjectGroups();
 			for (int32 i = 0; i < count; i++) {
-				Model::ThreadWaitObjectGroup* group
-					= thread->ThreadWaitObjectGroupAt(i);
+				ThreadModel::WaitObjectGroup* group
+					= threadModel->WaitObjectGroupAt(i);
 				if (!groupNodes.AddItem(new GroupNode(group)))
 					throw std::bad_alloc();
 			}
@@ -235,8 +234,7 @@ private:
 	}
 
 private:
-	Model*			fModel;
-	Model::Thread*	fThread;
+	ThreadModel*	fThreadModel;
 	RootNode*		fRootNode;
 };
 
@@ -249,7 +247,7 @@ ThreadWindow::WaitObjectsPage::WaitObjectsPage()
 	BGroupView(B_VERTICAL),
 	fWaitObjectsTree(NULL),
 	fWaitObjectsTreeModel(NULL),
-	fModel(NULL)
+	fThreadModel(NULL)
 
 {
 	SetName("Wait Objects");
@@ -278,24 +276,22 @@ ThreadWindow::WaitObjectsPage::~WaitObjectsPage()
 
 
 void
-ThreadWindow::WaitObjectsPage::SetModel(Model* model, Model::Thread* thread)
+ThreadWindow::WaitObjectsPage::SetModel(ThreadModel* model)
 {
-	if (model == fModel)
+	if (model == fThreadModel)
 		return;
 
-	if (fModel != NULL) {
+	if (fThreadModel != NULL) {
 		fWaitObjectsTree->SetTreeTableModel(NULL);
 		delete fWaitObjectsTreeModel;
 		fWaitObjectsTreeModel = NULL;
 	}
 
-	fModel = model;
-	fThread = thread;
+	fThreadModel = model;
 
-	if (fModel != NULL) {
+	if (fThreadModel != NULL) {
 		try {
-			fWaitObjectsTreeModel
-				= new WaitObjectsTreeModel(fModel, fThread);
+			fWaitObjectsTreeModel = new WaitObjectsTreeModel(fThreadModel);
 		} catch (std::bad_alloc) {
 			// TODO: Report error!
 		}

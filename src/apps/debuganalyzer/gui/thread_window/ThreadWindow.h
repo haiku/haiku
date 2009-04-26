@@ -10,6 +10,8 @@
 
 
 class BTabView;
+class ThreadModel;
+class ThreadModelLoader;
 
 
 class ThreadWindow : public SubWindow {
@@ -18,18 +20,17 @@ public:
 									Model* model, Model::Thread* thread);
 	virtual						~ThreadWindow();
 
-//	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				MessageReceived(BMessage* message);
 
-//	virtual	void				Quit();
-
-//	virtual	void				Show();
+	virtual	void				Quit();
+	virtual	void				Show();
 
 private:
 			class GeneralPage;
 			class WaitObjectsPage;
 
 private:
-			void				_SetModel(Model* model);
+			void				_SetModel(ThreadModel* model);
 
 private:
 			BTabView*			fMainTabView;
@@ -37,6 +38,8 @@ private:
 			WaitObjectsPage*	fWaitObjectsPage;
 			Model*				fModel;
 			Model::Thread*		fThread;
+			ThreadModel*		fThreadModel;
+			ThreadModelLoader*	fThreadModelLoader;
 };
 
 

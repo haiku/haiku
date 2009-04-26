@@ -18,7 +18,7 @@ public:
 								WaitObjectsPage();
 	virtual						~WaitObjectsPage();
 
-			void				SetModel(Model* model, Model::Thread* thread);
+			void				SetModel(ThreadModel* model);
 
 private:
 			class WaitObjectsTreeModel;
@@ -31,8 +31,7 @@ private:
 private:
 			TreeTable*			fWaitObjectsTree;
 			WaitObjectsTreeModel* fWaitObjectsTreeModel;
-			Model*				fModel;
-			Model::Thread*		fThread;
+			ThreadModel*		fThreadModel;
 };
 
 

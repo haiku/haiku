@@ -1,0 +1,78 @@
+/*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include "ThreadModel.h"
+
+#include <new>
+
+
+// #pragma mark - WaitObjectGroup
+
+
+ThreadModel::WaitObjectGroup::WaitObjectGroup(
+	Model::ThreadWaitObject** waitObjects, int32 count)
+	:
+	fWaitObjects(waitObjects),
+	fCount(count)
+{
+}
+
+
+ThreadModel::WaitObjectGroup::~WaitObjectGroup()
+{
+}
+
+
+// #pragma mark - ThreadModel
+
+
+ThreadModel::ThreadModel(Model* model, Model::Thread* thread)
+	:
+	fModel(model),
+	fThread(thread),
+	fWaitObjectGroups(10, true)
+{
+}
+
+
+ThreadModel::~ThreadModel()
+{
+}
+
+
+ThreadModel::WaitObjectGroup*
+ThreadModel::AddWaitObjectGroup(
+	const BObjectList<Model::ThreadWaitObject>& waitObjects, int32 start,
+	int32 end)
+{
+	// check params
+	int32 count = end - start;
+	if (start < 0 || count <= 0 || waitObjects.CountItems() < end)
+		return NULL;
+
+	// create an array of the wait object
+	Model::ThreadWaitObject** objects
+		= new(std::nothrow) Model::ThreadWaitObject*[count];
+	if (objects == NULL)
+		return NULL;
+
+	for (int32 i = 0; i < count; i++)
+		objects[i] = waitObjects.ItemAt(start + i);
+
+	// create and add the group
+	WaitObjectGroup* group = new(std::nothrow) WaitObjectGroup(objects, count);
+	if (group == NULL) {
+		delete[] objects;
+		return NULL;
+	}
+
+	if (!fWaitObjectGroups.BinaryInsert(group,
+			&WaitObjectGroup::CompareByTypeName)) {
+		delete group;
+		return NULL;
+	}
+
+	return group;
+}
