@@ -111,7 +111,7 @@ floppy_start:
 	//bra floppy_start
 
 	// no interrupt
-	or.w		#0x0700,%sr
+	//or.w		#0x0700,%sr
 
 	//XXX: check for enough RAM
 
@@ -123,10 +123,7 @@ floppy_start:
 	//bsr putx
 	bsr			load_sectors
 	tst.w			%d0
-	beq			floppy_done
-	lea			failure_string,%a0
-	bsr			puts
-	bra			spin
+	bne			load_failed
 floppy_done:
 	lea		h4,%a0
 	bsr		puts
@@ -138,6 +135,11 @@ floppy_done:
 	//jmp			ATARI_ZBEOS_BASE+512
 	jmp		_start
 
+load_failed:	
+	lea			failure_string,%a0
+	bsr			puts
+spin:	
+	bra			spin
 	//rts
 
 /**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
@@ -191,80 +193,6 @@ failure_string:
 //	.org	DOT_STRING
 	.string	"."
 
-/*
- * \AUTO\HAIKU.PRG and ARAnyM BOOTSTRAP() support code
- */
-
-prg_start:
-	//lea		h4,%a0
-	//bsr		puts
-
-	// .prg:
-	// we need to switch to supervisor mode anyway
-	move.l		#SUP_SET,-(%sp)
-	move.w		#0x20,-(%sp)
-	trap		#1
-	addq.l		#6,%sp
-	move.l		%d0,saved_super_stack
-	
-#if 1
-			//_membot
-	move.l		#0x432,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-
-			//_memtop
-	move.l		#0x436,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-
-			//_v_bas_ad
-	move.l		#0x44e,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-#endif
-	// disable interrupts
-	//or.w		#0x0700,%sr
-	
-	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_END,%sp
-
-	lea		h5,%a0
-	bsr		puts
-	lea		_bs_entry,%a0
-	move.l		%a0,%d0
-	bsr		putx
-
-	// copy the rest of the prg
-
-	// load counter
-	clr.l		%d0
-	move.w		sNumSectors,%d0
-	sub.w		#1,%d0
-	// load addresses
-	lea		_bs_entry,%a0
-	move.l		#ATARI_ZBEOS_BASE,%a1
-
-
-nextsect:
-	move.l		#512/4-1,%d1
-copysect_loop:
-	move.l		(%a0)+,(%a1)+
-	dbf		%d1,copysect_loop
-	//bsr		putx
-	dbf		%d0,nextsect
-
-	lea		msg_j1,%a0
-	bsr		puts
-	// all done
-spin:
-	//bra			spin
-
-super_done:
-	// XXX: copy the rest !
-	move.l		#0,%d0
-	//jmp			ATARI_ZBEOS_BASE+512
-	jmp			_start
 
 saved_super_stack:
 	.long	0
@@ -368,3 +296,74 @@ shell_end:
 		// this block as valid boot block for the BIOS
 		// XXX: actually TOS wants a real checksum here so sum is 0x1234!
 
+/*
+ * \AUTO\HAIKU.PRG and ARAnyM BOOTSTRAP() support code
+ */
+
+prg_start:
+	//lea		h4,%a0
+	//bsr		puts
+
+	// .prg:
+	// we need to switch to supervisor mode anyway
+	move.l		#SUP_SET,-(%sp)
+	move.w		#0x20,-(%sp)
+	trap		#1
+	addq.l		#6,%sp
+	move.l		%d0,saved_super_stack
+	
+#if 1
+			//_membot
+	move.l		#0x432,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_memtop
+	move.l		#0x436,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_v_bas_ad
+	move.l		#0x44e,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+#endif
+	// disable interrupts
+	//or.w		#0x0700,%sr
+	
+	// setup stack
+	move.l		#ATARI_ZBEOS_STACK_END,%sp
+
+	lea		h5,%a0
+	bsr		puts
+	lea		_bs_entry,%a0
+	move.l		%a0,%d0
+	bsr		putx
+
+	// copy the rest of the prg
+
+	// load counter
+	clr.l		%d0
+	move.w		sNumSectors,%d0
+	sub.w		#1,%d0
+	// load addresses
+	lea		_bs_entry,%a0
+	move.l		#ATARI_ZBEOS_BASE,%a1
+
+
+nextsect:
+	move.l		#512/4-1,%d1
+copysect_loop:
+	move.l		(%a0)+,(%a1)+
+	dbf		%d1,copysect_loop
+	//bsr		putx
+	dbf		%d0,nextsect
+
+	lea		msg_j1,%a0
+	bsr		puts
+	// all done
+super_done:
+	// XXX: copy the rest !
+	move.l		#0,%d0
+	//jmp			ATARI_ZBEOS_BASE+512
+	jmp			_start
