@@ -1749,7 +1749,6 @@ BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
 {
 	// TODO: Cleanup.
-	const int32 textLength = fText->Length();
 	int32 lineNum = LineAt(inOffset);
 	STELine* line = (*fLines)[lineNum];
 	float height = 0;
@@ -1758,10 +1757,9 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	result.x = 0.0;
 	result.y = line->origin + fTextRect.top;
 
-	// Handle the case where there is only one line
-	// (no text inserted)
+	// Handle the case where we are on the last (always empty) line
 	// TODO: See if we can do this better
-	if (fStyles->NumRuns() == 0) {
+	if (fStyles->NumRuns() == 0 || lineNum == fLines->NumLines()) {
 		const rgb_color *color = NULL;
 		const BFont *font = NULL;
 		fStyles->GetNullStyle(&font, &color);
@@ -1773,32 +1771,24 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	} else {
 		height = (line + 1)->origin - line->origin;
 
-		// special case: go down one line if inOffset is a newline
-		if (inOffset == textLength && fText->RealCharAt(inOffset - 1)
-				== B_ENTER) {
-			result.y += height;
-			height = LineHeight(CountLines() - 1);
+		int32 offset = line->offset;
+		int32 length = inOffset - line->offset;
+		int32 numBytes = length;
+		bool foundTab = false;
+		do {
+			foundTab = fText->FindChar(B_TAB, offset, &numBytes);
+			float width = _StyledWidth(offset, numBytes);
+			result.x += width;
 
-		} else {
-			int32 offset = line->offset;
-			int32 length = inOffset - line->offset;
-			int32 numBytes = length;
-			bool foundTab = false;
-			do {
-				foundTab = fText->FindChar(B_TAB, offset, &numBytes);
-				float width = _StyledWidth(offset, numBytes);
-				result.x += width;
+			if (foundTab) {
+				result.x += _ActualTabWidth(result.x);
+				numBytes++;
+			}
 
-				if (foundTab) {
-					result.x += _ActualTabWidth(result.x);
-					numBytes++;
-				}
-
-				offset += numBytes;
-				length -= numBytes;
-				numBytes = length;
-			} while (foundTab && length > 0);
-		}
+			offset += numBytes;
+			length -= numBytes;
+			numBytes = length;
+		} while (foundTab && length > 0);
 	}
 
 	if (fAlignment != B_ALIGN_LEFT) {

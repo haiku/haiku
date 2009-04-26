@@ -8,7 +8,6 @@
 
 #include "LineBuffer.h"
 
-
 BTextView::LineBuffer::LineBuffer()
 	:	_BTextViewSupportBuffer_<STELine>(20, 2)
 {
@@ -54,7 +53,7 @@ BTextView::LineBuffer::OffsetToLine(int32 offset) const
 	int32 minIndex = 0;
 	int32 maxIndex = fItemCount - 1;
 	int32 index = 0;
-	
+
 	while (minIndex < maxIndex) {
 		index = (minIndex + maxIndex) >> 1;
 		if (offset >= fBuffer[index].offset) {
@@ -65,7 +64,11 @@ BTextView::LineBuffer::OffsetToLine(int32 offset) const
 		} else
 			maxIndex = index;
 	}
-	
+
+	// do check for last line
+	if (minIndex == maxIndex && offset >= fBuffer[maxIndex].offset)
+		index = maxIndex;
+
 	return index;
 }
 
@@ -76,7 +79,7 @@ BTextView::LineBuffer::PixelToLine(float pixel) const
 	int32 minIndex = 0;
 	int32 maxIndex = fItemCount - 1;
 	int32 index = 0;
-	
+
 	while (minIndex < maxIndex) {
 		index = (minIndex + maxIndex) >> 1;
 		if (pixel >= fBuffer[index].origin) {
@@ -87,14 +90,18 @@ BTextView::LineBuffer::PixelToLine(float pixel) const
 		} else
 			maxIndex = index;
 	}
-	
+
+	// do check for last line
+	if (minIndex == maxIndex && pixel >= fBuffer[maxIndex].origin)
+		index = maxIndex;
+
 	return index;
 }
 
 
 void
 BTextView::LineBuffer::BumpOrigin(float delta, long index)
-{	
+{
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].origin += delta;
 }
