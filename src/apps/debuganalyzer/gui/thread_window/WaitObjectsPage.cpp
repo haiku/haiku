@@ -52,7 +52,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 14;
+		return 6;
 	}
 
 	virtual bool GetValueAt(void* object, int32 columnIndex, Variant& value)
@@ -90,8 +90,7 @@ private:
 
 		virtual bool GetValueAt(int32 columnIndex, Variant& value)
 		{
-			return _GetWaitObjectValueAt(object->GetWaitObject(), columnIndex,
-				value);
+			return _GetWaitObjectValueAt(object, columnIndex, value);
 		}
 	};
 
@@ -126,12 +125,21 @@ private:
 
 		virtual bool GetValueAt(int32 columnIndex, Variant& value)
 		{
-			if (columnIndex >= 3)
-				return false;
+			if (columnIndex <= 2) {
+				return _GetWaitObjectValueAt(group->WaitObjectAt(0),
+					columnIndex, value);
+			}
 
-			return _GetWaitObjectValueAt(
-				group->WaitObjectAt(0)->GetWaitObject(),
-				columnIndex, value);
+			switch (columnIndex) {
+				case 4:
+					value.SetTo(group->Waits());
+					return true;
+				case 5:
+					value.SetTo(group->TotalWaitTime());
+					return true;
+				default:
+					return false;
+			}
 		}
 	};
 
@@ -195,7 +203,7 @@ private:
 		}
 	}
 
-	static bool _GetWaitObjectValueAt(Model::WaitObject* waitObject,
+	static bool _GetWaitObjectValueAt(Model::ThreadWaitObject* waitObject,
 		int32 columnIndex, Variant& value)
 	{
 		switch (columnIndex) {
@@ -228,6 +236,12 @@ private:
 				value.SetTo(buffer);
 				return true;
 			}
+			case 4:
+				value.SetTo(waitObject->Waits());
+				return true;
+			case 5:
+				value.SetTo(waitObject->TotalWaitTime());
+				return true;
 			default:
 				return false;
 		}
@@ -263,6 +277,10 @@ ThreadWindow::WaitObjectsPage::WaitObjectsPage()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fWaitObjectsTree->AddColumn(new StringTableColumn(3, "Referenced", 80, 40,
 		1000, B_TRUNCATE_END, B_ALIGN_LEFT));
+	fWaitObjectsTree->AddColumn(new Int64TableColumn(4, "Waits", 80, 20,
+		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fWaitObjectsTree->AddColumn(new BigtimeTableColumn(5, "Wait Time", 80,
+		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fWaitObjectsTree->AddTreeTableListener(this);
 }
