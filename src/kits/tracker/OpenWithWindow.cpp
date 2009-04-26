@@ -590,10 +590,9 @@ AddOneRefSignatures(const entry_ref *ref, void *castToIterator)
 
 	// add preferred app for file, if any
 	if (model.PreferredAppSignature()[0]) {
-		queryIterator->PushUniqueSignature(model.PreferredAppSignature());
-
 		// got one, mark it as preferred for this node
 		if (be_roster->FindApp(model.PreferredAppSignature(), &preferredRef) == B_OK) {
+			queryIterator->PushUniqueSignature(model.PreferredAppSignature());
 			preferredAppFromNode = true;
 			queryIterator->TrySettingPreferredAppForFile(&preferredRef);
 		}
