@@ -2,15 +2,15 @@ SubDir HAIKU_TOP src add-ons tracker mark_as ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-AddResources MarkAsNew-N : MarkAsNew.rdef ;
-AddResources MarkAsRead-R : MarkAsRead.rdef ;
+AddResources Mark\ as\ New-N : MarkAsNew.rdef ;
+AddResources Mark\ as\ Read-R : MarkAsRead.rdef ;
 
-Addon MarkAsNew-N :
+Addon Mark\ as\ New-N :
 	MarkAsNew.cpp
 	: be tracker
 ;
 
-Addon MarkAsRead-R :
+Addon Mark\ as\ Read-R :
 	MarkAsRead.cpp
 	: be tracker
 ;
