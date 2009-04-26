@@ -394,12 +394,14 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	while (true) {
 		uint8 status = AltStatus();
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
+			&& (status & ATA_STATUS_BUSY) == 0
 			&& (status & ATA_STATUS_ERROR) != 0) {
 			TRACE("error bit set while waiting\n");
 			return B_ERROR;
 		}
 
 		if ((flags & ATA_CHECK_DEVICE_FAULT) != 0
+			&& (status & ATA_STATUS_BUSY) == 0
 			&& (status & ATA_STATUS_DEVICE_FAULT) != 0) {
 			TRACE("device fault bit set while waiting\n");
 			return B_ERROR;
