@@ -10,4 +10,5 @@ MergeObject DebugAnalyzer_gui_thread_window.o
 	:
 	ThreadWindow.cpp
 	GeneralPage.cpp
+	WaitObjectsPage.cpp
 ;

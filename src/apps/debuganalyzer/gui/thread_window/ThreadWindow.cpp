@@ -17,6 +17,7 @@
 //#include "MessageCodes.h"
 
 #include "thread_window/GeneralPage.h"
+#include "thread_window/WaitObjectsPage.h"
 
 
 static BString
@@ -50,12 +51,10 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 		.Add(fMainTabView);
 
 	fMainTabView->AddTab(fGeneralPage = new GeneralPage);
-//	fMainTabView->AddTab(fWaitObjectsPage = new WaitObjectsPage);
-fMainTabView->AddTab(new BView("Dummy", 0));
-//fMainTabView->Select(0);
+	fMainTabView->AddTab(fWaitObjectsPage = new WaitObjectsPage);
 
 	fGeneralPage->SetModel(fModel, fThread);
-//	fWaitObjectsPage->SetModel(fModel, fThread);
+	fWaitObjectsPage->SetModel(fModel, fThread);
 
 	fModel->AddReference();
 }
