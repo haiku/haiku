@@ -147,8 +147,8 @@ private:
 	friend struct GroupNode;
 
 	struct RootNode : Node {
-		ThreadModel*			threadModel;
-		BObjectList<GroupNode>	groupNodes;
+		ThreadModel*		threadModel;
+		BObjectList<Node>	groupNodes;
 
 		RootNode(ThreadModel* model)
 			:
@@ -159,7 +159,7 @@ private:
 			for (int32 i = 0; i < count; i++) {
 				ThreadModel::WaitObjectGroup* group
 					= threadModel->WaitObjectGroupAt(i);
-				if (!groupNodes.AddItem(new GroupNode(group)))
+				if (!groupNodes.AddItem(_CreateGroupNode(group)))
 					throw std::bad_alloc();
 			}
 		}
@@ -178,6 +178,17 @@ private:
 		{
 			return false;
 		}
+
+	private:
+		static Node* _CreateGroupNode(ThreadModel::WaitObjectGroup* group)
+		{
+			// If the group has only one object, just create an object node. 
+			if (group->CountWaitObjects() == 1)
+				return new ObjectNode(group->WaitObjectAt(0));
+
+			return new GroupNode(group);
+		}
+
 	};
 
 private:
