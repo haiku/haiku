@@ -134,7 +134,7 @@ ThreadModel::WaitObjectGroup::CountWaitObjects() const
 Model::ThreadWaitObject*
 ThreadModel::WaitObjectGroup::WaitObjectAt(int32 index) const
 {
-	return index >= 0 && index < fCount ? fWaitObjects[0] : NULL;
+	return index >= 0 && index < fCount ? fWaitObjects[index] : NULL;
 }
 
 
