@@ -35,8 +35,9 @@ public:
 
 		virtual	void 			SwapBuffers(bool VSync = false);
 		virtual	void			Draw(BRect updateRect);
-		virtual	status_t	    CopyPixelsOut(BPoint source, BBitmap* dest);
+		virtual	status_t		CopyPixelsOut(BPoint source, BBitmap* dest);
 		virtual	status_t		CopyPixelsIn(BBitmap* source, BPoint dest);
+		virtual void			FrameResized(float width, float height);
 
 				GLvoid**		GetRows() { return fRowAddr; }
 
@@ -60,6 +61,8 @@ private:
 									GLuint width, GLuint height);
 		static void			Flush(GLcontext *ctx);
 
+		void				_AllocateBitmap();
+
 		BBitmap*				fBitmap;
 		bool					fDirectModeEnabled;
 		direct_buffer_info*			fInfo;
@@ -73,8 +76,8 @@ private:
 
 		GLchan 					fClearColor[4];	// buffer clear color
 		GLuint 					fClearIndex;	// buffer clear color index
-		GLuint 					fWidth;
-		GLuint					fHeight;
+		GLuint 					fWidth, fNewWidth;
+		GLuint					fHeight, fNewHeight;
 		color_space				fColorSpace;
 
 		GLvoid*					fRowAddr[MAX_HEIGHT];

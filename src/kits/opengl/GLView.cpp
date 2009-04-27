@@ -84,8 +84,6 @@ BGLView::LockGL()
 {
 	// TODO: acquire the OpenGL API lock it on this glview
 
-	if (!LockLooper())
-		return;
 	fDisplayLock.Lock();
 	if (fRenderer)
 		fRenderer->LockGL();
@@ -95,13 +93,10 @@ BGLView::LockGL()
 void
 BGLView::UnlockGL()
 {
-	if (!fDisplayLock.IsLocked())
-		return;
-	fDisplayLock.Unlock();
 	if (fRenderer)
 		fRenderer->UnlockGL();
-	UnlockLooper();
-
+	fDisplayLock.Unlock();
+	
 	// TODO: release the GL API lock to others glviews
 }
 
@@ -137,7 +132,7 @@ BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 	if (!fRenderer)
 		return B_ERROR;
 	
-	if (! dest || ! dest->Bounds().IsValid())
+	if (!dest || !dest->Bounds().IsValid())
 		return B_BAD_VALUE;
 
 	return fRenderer->CopyPixelsOut(source, dest);
@@ -150,7 +145,7 @@ BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 	if (!fRenderer)
 		return B_ERROR;
 	
-	if (! source || ! source->Bounds().IsValid())
+	if (!source || !source->Bounds().IsValid())
 		return B_BAD_VALUE;
 
 	return fRenderer->CopyPixelsIn(source, dest);
@@ -211,6 +206,7 @@ BGLView::AttachedToWindow()
 #endif
 		// Set default OpenGL viewport:
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
+		fRenderer->FrameResized(Bounds().IntegerWidth(), Bounds().IntegerHeight());
 
 		if (fClipInfo) {
 			fRenderer->DirectConnected(
@@ -263,8 +259,13 @@ BGLView::FrameResized(float width, float height)
 	for (BView *v = this; v; v = v->Parent())
 		v->ConvertToParent(&fBounds);
 
-	if (fRenderer)
+	if (fRenderer) {
+		LockGL();
+		_LockDraw();
 		fRenderer->FrameResized(width, height);
+		_UnlockDraw();
+		UnlockGL();
+	}
 
    	BView::FrameResized(width, height);
 }
@@ -344,6 +345,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			_UnlockDraw();
 		case B_DIRECT_MODIFY:
 		{
+			_LockDraw();
 			localInfo->buffer_state = info->buffer_state;
 			localInfo->driver_state = info->driver_state;
 			localInfo->bits = info->bits;
@@ -371,6 +373,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			for (uint32 c = 0; c < localInfo->clip_list_count; c++)
 				localInfo->clip_list[c] = region.RectAtInt(c);
 			
+			_UnlockDraw();
 			break; 
 		}		
 		case B_DIRECT_STOP: 

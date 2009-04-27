@@ -297,7 +297,13 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	_mesa_enable_1_3_extensions(fContext);
 	_mesa_enable_1_4_extensions(fContext);
 	_mesa_enable_1_5_extensions(fContext);
+	_mesa_enable_2_0_extensions(fContext);
+	_mesa_enable_2_1_extensions(fContext);
 
+	BRect bounds = view->Bounds();
+	fWidth = fNewWidth = (GLint)bounds.Width();
+	fHeight = fNewHeight = (GLint)bounds.Height();
+	
 	// some stupid applications (Quake2) don't even think about calling LockGL()
 	// before using glGetString and its glGet*() friends...
 	// so make sure there is at least a valid context.
@@ -326,93 +332,89 @@ MesaSoftwareRenderer::LockGL()
 
 	_mesa_make_current(fContext, fFrameBuffer, fFrameBuffer);
 
-	BRect b = GLView()->Bounds();
 	color_space cs = B_RGBA32;
 	
+	BAutolock lock(fInfoLocker);
 	if (fDirectModeEnabled && fInfo != NULL) {
 		cs = BScreen(GLView()->Window()).ColorSpace();
+		fNewWidth = fInfo->window_bounds.right 
+			- fInfo->window_bounds.left + 1;
+		fNewHeight = fInfo->window_bounds.bottom 
+			- fInfo->window_bounds.top + 1;
 	}
-	uint32 width = b.IntegerWidth() + 1;
-	uint32 height = b.IntegerHeight() + 1;
-	if (width != fWidth || height != fHeight || !fBitmap || cs != fColorSpace) {
-		if (cs != fColorSpace) {
-			switch (cs) {
-				case B_RGBA32:
-					fRenderBuffer->GetRow = get_row_RGBA32;
-					fRenderBuffer->GetValues = get_values_RGBA32;
-					fRenderBuffer->PutRow = put_row_RGBA32;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGBA32;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGBA32;
-					fRenderBuffer->PutValues = put_values_RGBA32;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGBA32;
-					break;
-				case B_RGB32:
-					fRenderBuffer->GetRow = get_row_RGB32;
-					fRenderBuffer->GetValues = get_values_RGB32;
-					fRenderBuffer->PutRow = put_row_RGB32;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGB32;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGB32;
-					fRenderBuffer->PutValues = put_values_RGB32;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGB32;
-					break;
-				case B_RGB24:
-					fRenderBuffer->GetRow = get_row_RGB24;
-					fRenderBuffer->GetValues = get_values_RGB24;
-					fRenderBuffer->PutRow = put_row_RGB24;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGB24;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGB24;
-					fRenderBuffer->PutValues = put_values_RGB24;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGB24;
-					break;
-				case B_RGB16:
-					fRenderBuffer->GetRow = get_row_RGB16;
-					fRenderBuffer->GetValues = get_values_RGB16;
-					fRenderBuffer->PutRow = put_row_RGB16;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGB16;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGB16;
-					fRenderBuffer->PutValues = put_values_RGB16;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
-					break;
-				case B_RGB15:
-					fRenderBuffer->GetRow = get_row_RGB15;
-					fRenderBuffer->GetValues = get_values_RGB15;
-					fRenderBuffer->PutRow = put_row_RGB15;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGB15;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGB15;
-					fRenderBuffer->PutValues = put_values_RGB15;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGB15;
-					break;
-				case B_CMAP8:
-					fRenderBuffer->GetRow = get_row_CMAP8;
-					fRenderBuffer->GetValues = get_values_CMAP8;
-					fRenderBuffer->PutRow = put_row_CMAP8;
-					fRenderBuffer->PutRowRGB = put_row_rgb_CMAP8;
-					fRenderBuffer->PutMonoRow = put_mono_row_CMAP8;
-					fRenderBuffer->PutValues = put_values_CMAP8;
-					fRenderBuffer->PutMonoValues = put_mono_values_CMAP8;
-					break;
-				default:
-					fprintf(stderr, "unsupported screen color space %d\n", cs);
-					debugger("unsupported OpenGL color space");
-					break;
-			}
-		}
 
-		// allocate new size of back buffer bitmap
-		delete fBitmap;
+	if (fBitmap && cs == fColorSpace && fNewWidth == fWidth 
+		&& fNewHeight == fHeight)
+		return;
+
+	if (cs != fColorSpace) {
 		fColorSpace = cs;
-		BRect rect(0.0, 0.0, width - 1, height - 1);
-		fBitmap = new BBitmap(rect, fColorSpace);
-		for (uint i = 0; i < height; i++) {
-			fRowAddr[height - i - 1] = (GLvoid *)((GLubyte *)fBitmap->Bits()
-				+ i * fBitmap->BytesPerRow());
+		switch (fColorSpace) {
+			case B_RGBA32:
+				fRenderBuffer->GetRow = get_row_RGBA32;
+				fRenderBuffer->GetValues = get_values_RGBA32;
+				fRenderBuffer->PutRow = put_row_RGBA32;
+				fRenderBuffer->PutRowRGB = put_row_rgb_RGBA32;
+				fRenderBuffer->PutMonoRow = put_mono_row_RGBA32;
+				fRenderBuffer->PutValues = put_values_RGBA32;
+				fRenderBuffer->PutMonoValues = put_mono_values_RGBA32;
+				break;
+			case B_RGB32:
+				fRenderBuffer->GetRow = get_row_RGB32;
+				fRenderBuffer->GetValues = get_values_RGB32;
+				fRenderBuffer->PutRow = put_row_RGB32;
+				fRenderBuffer->PutRowRGB = put_row_rgb_RGB32;
+				fRenderBuffer->PutMonoRow = put_mono_row_RGB32;
+				fRenderBuffer->PutValues = put_values_RGB32;
+				fRenderBuffer->PutMonoValues = put_mono_values_RGB32;
+				break;
+			case B_RGB24:
+				fRenderBuffer->GetRow = get_row_RGB24;
+				fRenderBuffer->GetValues = get_values_RGB24;
+				fRenderBuffer->PutRow = put_row_RGB24;
+				fRenderBuffer->PutRowRGB = put_row_rgb_RGB24;
+				fRenderBuffer->PutMonoRow = put_mono_row_RGB24;
+				fRenderBuffer->PutValues = put_values_RGB24;
+				fRenderBuffer->PutMonoValues = put_mono_values_RGB24;
+				break;
+			case B_RGB16:
+				fRenderBuffer->GetRow = get_row_RGB16;
+				fRenderBuffer->GetValues = get_values_RGB16;
+				fRenderBuffer->PutRow = put_row_RGB16;
+				fRenderBuffer->PutRowRGB = put_row_rgb_RGB16;
+				fRenderBuffer->PutMonoRow = put_mono_row_RGB16;
+				fRenderBuffer->PutValues = put_values_RGB16;
+				fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
+				break;
+			case B_RGB15:
+				fRenderBuffer->GetRow = get_row_RGB15;
+				fRenderBuffer->GetValues = get_values_RGB15;
+				fRenderBuffer->PutRow = put_row_RGB15;
+				fRenderBuffer->PutRowRGB = put_row_rgb_RGB15;
+				fRenderBuffer->PutMonoRow = put_mono_row_RGB15;
+				fRenderBuffer->PutValues = put_values_RGB15;
+				fRenderBuffer->PutMonoValues = put_mono_values_RGB15;
+				break;
+			case B_CMAP8:
+				fRenderBuffer->GetRow = get_row_CMAP8;
+				fRenderBuffer->GetValues = get_values_CMAP8;
+				fRenderBuffer->PutRow = put_row_CMAP8;
+				fRenderBuffer->PutRowRGB = put_row_rgb_CMAP8;
+				fRenderBuffer->PutMonoRow = put_mono_row_CMAP8;
+				fRenderBuffer->PutValues = put_values_CMAP8;
+				fRenderBuffer->PutMonoValues = put_mono_values_CMAP8;
+				break;
+			default:
+				fprintf(stderr, "unsupported screen color space %d\n", fColorSpace);
+				debugger("unsupported OpenGL color space");
+				break;
 		}
-
-		_mesa_resize_framebuffer(fContext, fFrameBuffer, width, height);
-		fWidth = width;
-		fHeight = height;
-		fRenderBuffer->Data = fBitmap->Bits();
 	}
+
+	fWidth = fNewWidth;
+	fHeight = fNewHeight;
+
+	_AllocateBitmap();
 }
 
 
@@ -435,35 +437,45 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 
 	// TODO: support VSync	
 
-	if (fBitmap) {
-		if (fVisual->doubleBufferMode)
-			_mesa_notifySwapBuffers(fContext);
+	if (!fBitmap)
+		return;
+	if (fVisual->doubleBufferMode)
+		_mesa_notifySwapBuffers(fContext);
 
-		if (!fDirectModeEnabled || fInfo == NULL) {
-			GLView()->LockLooper();
+	if (!fDirectModeEnabled || fInfo == NULL) {
+		if (GLView()->LockLooperWithTimeout(1000) == B_OK) {
 			GLView()->DrawBitmap(fBitmap);
 			GLView()->UnlockLooper();
-		} else {
-			BAutolock lock(fInfoLocker);
-			uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
-			uint32 bytesPerRow = fBitmap->BytesPerRow();
-			for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
-				clipping_rect *clip = &fInfo->clip_list[i];
-				int32 height = clip->bottom - clip->top + 1;
-				int32 bytesWidth
-					= (clip->right - clip->left + 1) * bytesPerPixel;
-				uint8 *p = (uint8 *)fInfo->bits + clip->top
-					* fInfo->bytes_per_row + clip->left * bytesPerPixel;
-				uint8 *b = (uint8 *)fBitmap->Bits()
-					+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
-					+ (clip->left - fInfo->window_bounds.left) * bytesPerPixel;
+		}
+		return;
+	}
 
-				for (int y = 0; y < height; y++) {
-					memcpy(p, b, bytesWidth);
-					p += fInfo->bytes_per_row;
-					b += bytesPerRow;
-				}
-			}
+	BAutolock lock(fInfoLocker);
+
+	// check the bitmap size still matches the size
+	if (fInfo->window_bounds.bottom - fInfo->window_bounds.top
+		!= fBitmap->Bounds().IntegerHeight()
+		|| fInfo->window_bounds.right - fInfo->window_bounds.left
+			!= fBitmap->Bounds().IntegerWidth())
+		return;
+	uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
+	uint32 bytesPerRow = fBitmap->BytesPerRow();
+	for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
+		clipping_rect *clip = &fInfo->clip_list[i];
+		int32 height = clip->bottom - clip->top + 1;
+		int32 bytesWidth
+			= (clip->right - clip->left + 1) * bytesPerPixel;
+		uint8 *p = (uint8 *)fInfo->bits + clip->top
+			* fInfo->bytes_per_row + clip->left * bytesPerPixel;
+		uint8 *b = (uint8 *)fBitmap->Bits()
+			+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
+			+ (clip->left - fInfo->window_bounds.left) 
+				* bytesPerPixel;
+
+		for (int y = 0; y < height; y++) {
+			memcpy(p, b, bytesWidth);
+			p += fInfo->bytes_per_row;
+			b += bytesPerRow;
 		}
 	}
 }
@@ -576,6 +588,32 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 		fInfo = NULL;
 	}
 		
+}
+
+
+void
+MesaSoftwareRenderer::FrameResized(float width, float height)
+{
+	BAutolock lock(fInfoLocker);
+	fNewWidth = (GLuint)width;
+	fNewHeight = (GLuint)height;
+}
+
+
+void
+MesaSoftwareRenderer::_AllocateBitmap()
+{
+	// allocate new size of back buffer bitmap
+	delete fBitmap;
+	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
+	fBitmap = new BBitmap(rect, fColorSpace);
+	for (uint i = 0; i < fHeight; i++) {
+		fRowAddr[fHeight - i - 1] = (GLvoid *)((GLubyte *)fBitmap->Bits()
+			+ i * fBitmap->BytesPerRow());
+	}
+
+	_mesa_resize_framebuffer(fContext, fFrameBuffer, fWidth, fHeight);
+	fRenderBuffer->Data = fBitmap->Bits();
 }
 
 
