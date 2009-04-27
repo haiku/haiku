@@ -49,13 +49,14 @@ class BGImageMenuItem : public BMenuItem {
 
 class PreviewBox : public BBox {
 	public:
-		PreviewBox(BRect frame, const char *name);
+		PreviewBox(BRect frame, const char *name, float _top);
 
 		void Draw(BRect rect);
 		void SetDesktop(bool isDesktop);
 
 	protected:
 		bool fIsDesktop;
+		float fDrawingTop;
 };
 
 

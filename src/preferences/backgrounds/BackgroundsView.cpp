@@ -125,8 +125,17 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 
+	float preview_width = 120.0f;
+
+	// get aspect ratio
+	float aspect_ratio = BScreen().Frame().Width() / 
+		BScreen().Frame().Height();
+	
+	float preview_height = ceil(preview_width / aspect_ratio);
+
 	fPreview = new PreviewBox(BRect(10, 8.0 + workspaceMenuField->Bounds().Height() / 2.0f
-		- ceilf(fontHeight.ascent + fontHeight.descent) / 2.0f, 160, 180), "preview");
+		- ceilf(fontHeight.ascent + fontHeight.descent) / 2.0f, 160, 180), "preview",
+		19 + 90 - preview_height);
 	fPreview->SetFont(&font);
 	fPreview->SetLabel("Preview");
 	AddChild(fPreview);
@@ -158,7 +167,9 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 		}
 	}
 
-	fPreView = new PreView(BRect(15, 25, 135, 115), "preView",
+	fPreView = new PreView(BRect((150 - preview_width) / 2, 25 + 90 - preview_height,
+			150 - (150 - preview_width) / 2, 25 + 90),
+		"preView",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_SUBPIXEL_PRECISE);
 	fPreview->AddChild(fPreView);
 
@@ -1250,8 +1261,10 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 //	#pragma mark -
 
 
-PreviewBox::PreviewBox(BRect frame, const char *name)
-	: BBox(frame, name)
+PreviewBox::PreviewBox(BRect frame, const char *name, float _top)
+	:
+	BBox(frame, name),
+	fDrawingTop(_top)
 {
 	fIsDesktop = true;
 }
@@ -1260,7 +1273,6 @@ PreviewBox::PreviewBox(BRect frame, const char *name)
 void
 PreviewBox::Draw(BRect rect)
 {
-	// TODO: make view size dependent!
 	rgb_color color = HighColor();
 
 	SetHighColor(LowColor());
@@ -1268,11 +1280,13 @@ PreviewBox::Draw(BRect rect)
 
 	if (fIsDesktop) {
 		BPoint points[] = {
-			BPoint(11, 19), BPoint(139, 19), BPoint(141, 21),
+			BPoint(11, fDrawingTop), BPoint(139, fDrawingTop), 
+			BPoint(141, fDrawingTop + 2),
 			BPoint(141, 119), BPoint(139, 121), BPoint(118, 121),
 			BPoint(118, 126), BPoint(117, 127), BPoint(33, 127),
 			BPoint(32, 126), BPoint(32, 121), BPoint(11, 121),
-			BPoint(9, 119), BPoint(9, 21), BPoint(11, 19)
+			BPoint(9, 119), BPoint(9, fDrawingTop + 2), 
+			BPoint(11, fDrawingTop)
 		};
 		SetHighColor(184, 184, 184);
 		FillPolygon(points, 15);
@@ -1280,7 +1294,7 @@ PreviewBox::Draw(BRect rect)
 		StrokePolygon(points, 15);
 		FillRect(BRect(107, 121, 111, 123));
 		SetHighColor(0, 0, 0);
-		StrokeRect(BRect(14, 24, 136, 116));
+		StrokeRect(BRect(14, fDrawingTop + 5, 136, 116));
 		SetHighColor(0, 255, 0);
 		FillRect(BRect(101, 122, 103, 123));
 	} else {
