@@ -16,6 +16,8 @@
 
 #include "avcodecplugin.h"
 
+#define DO_PROFILING 0
+
 #undef TRACE
 //#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
@@ -35,11 +37,14 @@ struct wave_format_ex {
 	// extra_data[extra_size]
 } _PACKED;
 
+static bigtime_t diff1 = 0, diff2 = 0;
+static long prof_cnt = 0;
+
 // uncommenting will make Decode() set the current thread priority to time
 // sharing, so it won't totally freeze if you busy-loop in there (to help debug
 // with CD Manager)
 //#define UNREAL
-
+ 
 avCodec::avCodec()
 	:	fHeader(),
 		fInfo(),
@@ -81,6 +86,14 @@ avCodec::avCodec()
 avCodec::~avCodec()
 {
 	TRACE("[%c] avCodec::~avCodec()\n", isAudio?('a'):('v'));
+
+#ifdef DO_PROFILING
+	if (prof_cnt > 0) {
+			printf("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
+				isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt,
+				fFrame);
+	}
+#endif
 
 	if(fCodecInitDone)
 		avcodec_close(ffc);
@@ -173,8 +186,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 				}
 				TRACE("avCodec: found decoder %s\n",fCodec->name);
 				
-				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY) {
-					TRACE("Additional MetaData required for WAV format. Should contain %ld has %ld\n",sizeof(wave_format_ex),infoSize);
+				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY && infoSize == sizeof(wave_format_ex)) {
 					const wave_format_ex *wfmt_data
 						= (const wave_format_ex *)infoBuffer;
 					size_t wfmt_size = infoSize;
@@ -187,6 +199,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 						}
 					}
 				} else {
+					fBlockAlign = ioEncodedFormat->u.encoded_audio.output.buffer_size;
 					TRACE("avCodec: extra data size %ld\n",infoSize);
 					fExtraDataSize = infoSize;
 					if (fExtraDataSize) {
@@ -403,20 +416,20 @@ status_t
 avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				media_header *mh, media_decode_info *info)
 {
+	const void *data;
+
 	if (!fCodecInitDone)
 		return B_BAD_VALUE;
 
 #ifdef DO_PROFILING
 	bigtime_t prof_t1, prof_t2, prof_t3;
-	static bigtime_t diff1 = 0, diff2 = 0;
-	static long prof_cnt = 0;
 #endif
 
 #ifdef UNREAL
 	set_thread_priority(find_thread(NULL), B_NORMAL_PRIORITY);
 #endif
 
-//	TRACE("[%c] avCodec::Decode()\n", isAudio?('a'):('v'));
+//	TRACE("[%c] avCodec::Decode() for time %Ld\n", isAudio?('a'):('v'), fStartTime);
 
 	mh->start_time = fStartTime;
 
@@ -490,11 +503,12 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 		}
 		fFrame += *out_frameCount;
 
+//		TRACE("Played %Ld frames at time %Ld\n",*out_frameCount, mh->start_time);
+
 	} else {	// Video
 
 		media_header chunk_mh;
 		status_t err;
-		const void *data;
 		size_t size;
 
 		err = GetNextChunk(&data, &size, &chunk_mh);
@@ -524,7 +538,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #ifdef DO_PROFILING
 		prof_t1 = system_time();
 #endif
-	
+
 		int got_picture = 0;
 		int len;
 		len = avcodec_decode_video(ffc, ffpicture, &got_picture,
@@ -548,8 +562,8 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #ifdef DO_PROFILING
 			prof_t2 = system_time();
 #endif
-			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
-				pixfmt_to_string(ffc->pix_fmt));
+//			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
+//				pixfmt_to_string(ffc->pix_fmt));
 
 			// Some decoders do not set pix_fmt until they have decoded 1 frame				
 			if (conv_func == 0) {
@@ -576,7 +590,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			diff2 += prof_t3 - prof_t2;
 			prof_cnt++;
 			if (!(fFrame % 10)) {
-				TRACE("[%c] profile: d1 = %lld, d2 = %lld (%ld)\n",
+				TRACE("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
 					isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt,
 					fFrame);
 			}
@@ -586,7 +600,6 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 	fStartTime = (bigtime_t) (1000000LL * fFrame / fOutputFrameRate);
 
-//	TRACE("END of avCodec::Decode()\n");
 	return B_OK;
 }
 
