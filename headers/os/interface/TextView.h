@@ -381,6 +381,10 @@ private:
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
 
+			int32				_LineAt(int32 offset) const;
+			int32				_LineAt(const BPoint& point) const;
+			bool				_IsOnEmptyLastLine(int32 offset) const;
+
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;
