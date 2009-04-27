@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tools fixup_tos_boot_checksum ;
+
+# avoid #includeing other stuff in the source
+#SubDirCcFlags -Dbfd_byte=char -DSYMNMLEN=8 ;
+
+BuildPlatformMain <build>fixup_tos_boot_checksum
+	: fixup_tos_boot_checksum.c
+	:
+;

@@ -108,6 +108,7 @@ SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
+SubInclude HAIKU_TOP src tools fixup_tos_boot_checksum ;
 SubInclude HAIKU_TOP src tools fs_shell ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
 SubInclude HAIKU_TOP src tools hack_coff ;
