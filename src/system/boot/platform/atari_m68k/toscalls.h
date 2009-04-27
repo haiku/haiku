@@ -134,11 +134,46 @@ extern "C" {
 	retvalue;					\
 })
 
+#define toscallLLWWWWW(trapnr, callnr, p1, p2, p3, p4, p5, p6, p7)	\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int32 _p1 = (int32)(p1);			\
+	int32 _p2 = (int32)(p2);			\
+	int16 _p3 = (int16)(p3);			\
+	int16 _p4 = (int16)(p4);			\
+	int16 _p5 = (int16)(p5);			\
+	int16 _p6 = (int16)(p6);			\
+	int16 _p7 = (int16)(p7);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.w	%7,-(%%sp) \n			\
+		move.w	%6,-(%%sp) \n			\
+		move.w	%5,-(%%sp) \n			\
+		move.w	%4,-(%%sp) \n			\
+		move.w	%3,-(%%sp) \n			\
+		move.l	%2,-(%%sp) \n			\
+		move.l	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#18,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),				\
+	  "r"(_p5), "r"(_p6),				\
+	  "r"(_p7),					/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
 /* pointer versions */
 #define toscallP(trapnr, callnr, a) toscallL(trapnr, callnr, (int32)a)
 #define toscallWPWWWL(trapnr, callnr, p1, p2, p3, p4, p5, p6) \
 	toscallWLWWWL(trapnr, callnr, p1, (int32)p2, p3, p4, p5, p6)
-
+#define toscallPLWWWWW(trapnr, callnr, p1, p2, p3, p4, p5, p6, p7)		\
+	toscallLLWWWWW(trapnr, callnr, (int32)p1, (int32)p2, p3, p4, p5, p6, p7)
 
 
 
@@ -323,6 +358,7 @@ static inline int Bconputs(int16 handle, const char *string)
 //#define Getrez() toscallV(XBIOS_TRAP, 4)
 #define Setscreen(log, phys, mode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
 #define VsetScreen(log, phys, mode, modecode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
+#define Floprd(buf, dummy, dev, sect, track, side, count) toscallPLWWWWW(XBIOS_TRAP, 8, (void *)buf, (int32)dummy, (int16)dev, (int16)sect, (int16)track, (int16)side, (int16)count)
 //#define Mfpint() toscallV(XBIOS_TRAP, 13, )
 #define Rsconf(speed, flow, ucr, rsr, tsr, scr) toscallWWWWWW(XBIOS_TRAP, 15, (int16)speed, (int16)flow, (int16)ucr, (int16)rsr, (int16)tsr, (int16)scr)
 //#define Keytbl(unshift, shift, caps) (KEYTAB *)toscallPPP(XBIOS_TRAP, 16, (char *)unshift, (char *)shift, (char *)caps)

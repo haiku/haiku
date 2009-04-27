@@ -15,7 +15,7 @@
 #include "Handle.h"
 #include "toscalls.h"
 
-//#define TRACE_DEVICES
+#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
@@ -144,6 +144,20 @@ class BlockHandle : public Handle {
 };
 
 
+class FloppyDrive : public BlockHandle {
+	public:
+		FloppyDrive(int handle);
+		virtual ~FloppyDrive();
+
+		status_t FillIdentifier();
+
+		virtual ssize_t ReadBlocks(void *buffer, off_t first, int32 count);
+
+	protected:
+		status_t	ReadBPB(struct tos_bpb *bpb);
+};
+
+
 class BIOSDrive : public BlockHandle {
 	public:
 		BIOSDrive(int handle);
@@ -193,7 +207,14 @@ get_drive_parameters(uint8 drive, drive_parameters *parameters)
 {
 	status_t err;
 	err = read_bpb(drive, &parameters->bpb);
-
+	TRACE(("get_drive_parameters: get_bpb: 0x%08lx\n", err));
+	TRACE(("get_drive_parameters: bpb: %04x %04x %04x %04x %04x %04x %04x %04x %04x \n",
+			parameters->bpb.recsiz, parameters->bpb.clsiz,
+			parameters->bpb.clsizb, parameters->bpb.rdlen,
+			parameters->bpb.fsiz, parameters->bpb.fatrec,
+			parameters->bpb.datrec, parameters->bpb.numcl,
+			parameters->bpb.bflags));
+	
 #if 0
 	// fill drive_parameters structure with useful values
 	parameters->parameters_size = kParametersSizeVersion1;
@@ -460,7 +481,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		for (major = 0; major < 256; major++) {
 			if (major == 64) // we don't want floppies
 				continue;
-			if (major > 23) // extensions and non-standard stuff... skip for speed.
+			if (major > 23 && major != 64) // extensions and non-standard stuff... skip for speed.
 				break;
 
 			for (minor = 0; minor < 255; minor++) {
@@ -563,6 +584,10 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 
 BlockHandle::BlockHandle(int handle)
 	: Handle(handle)
+	, fSize(0LL)
+	, fBlockSize(0)
+	, fHasParameters(false)
+	  
 {
 	TRACE(("BlockHandle::%s(): drive ID %u\n", __FUNCTION__, fHandle));
 }
@@ -647,6 +672,158 @@ BlockHandle::FillIdentifier()
 {
 	return B_NOT_ALLOWED;
 }
+
+//	#pragma mark -
+
+/*
+ * BIOS based disk access.
+ * Only for fallback from missing XHDI.
+ * XXX: This is broken!
+ * XXX: check for physical drives in PUN_INFO
+ * XXX: at least try to use MetaDOS calls instead.
+ */
+
+
+FloppyDrive::FloppyDrive(int handle)
+	: BlockHandle(handle)
+{
+	TRACE(("FloppyDrive::%s(%d)\n", __FUNCTION__, fHandle));
+
+	/* first check if the drive exists */
+	/* note floppy B can be reported present anyway... */
+	uint32 map = Drvmap();
+	if (!(map & (1 << fHandle))) {
+		fSize = 0LL;
+		return;
+	}
+	//XXX: check size
+
+	if (get_drive_parameters(fHandle, &fParameters) != B_OK) {
+		dprintf("getting drive parameters for: %u failed!\n", fHandle);
+		return;
+	}
+	fBlockSize = 512;
+	fParameters.sectors = 1440 * 1024 / 512;
+	fSize = fParameters.sectors * fBlockSize;
+	fHasParameters = false;
+/*
+	parameters->sectors_per_track = 9;
+	parameters->cylinders = (1440/2) / (9*2);
+	parameters->heads = 2;
+	parameters->sectors = parameters->cylinders * parameters->heads
+	* parameters->sectors_per_track;
+	*/
+#if 0
+	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
+		// old style CHS support
+
+		if (get_drive_parameters(driveID, &fParameters) != B_OK) {
+			dprintf("getting drive parameters for: %u failed!\n", fDriveID);
+			return;
+		}
+
+		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
+			fParameters.bytes_per_sector));
+		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+
+		fBlockSize = 512;
+		fSize = fParameters.sectors * fBlockSize;
+		fLBA = false;
+		fHasParameters = false;
+	} else {
+		TRACE(("size: %x\n", fParameters.parameters_size));
+		TRACE(("drive_path_signature: %x\n", fParameters.device_path_signature));
+		TRACE(("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus,
+			fParameters.interface_type));
+		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
+			fParameters.bytes_per_sector));
+		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+
+		fBlockSize = fParameters.bytes_per_sector;
+		fSize = fParameters.sectors * fBlockSize;
+		fLBA = true;
+		fHasParameters = true;
+	}
+#endif
+}
+
+
+FloppyDrive::~FloppyDrive()
+{
+}
+
+
+status_t
+FloppyDrive::FillIdentifier()
+{
+	TRACE(("FloppyDrive::%s: (%d)\n", __FUNCTION__, fHandle));
+#if 0
+	if (HasParameters()) {
+		// try all drive_parameters versions, beginning from the most informative
+
+#if 0
+		if (fill_disk_identifier_v3(fIdentifier, fParameters) == B_OK)
+			return B_OK;
+
+		if (fill_disk_identifier_v2(fIdentifier, fParameters) == B_OK)
+			return B_OK;
+#else
+		// TODO: the above version is the correct one - it's currently
+		//		disabled, as the kernel boot code only supports the
+		//		UNKNOWN_BUS/UNKNOWN_DEVICE way to find the correct boot
+		//		device.
+		if (fill_disk_identifier_v3(fIdentifier, fParameters) != B_OK)
+			fill_disk_identifier_v2(fIdentifier, fParameters);
+
+#endif
+
+		// no interesting information, we have to fall back to the default
+		// unknown interface/device type identifier
+	}
+
+	fIdentifier.bus_type = UNKNOWN_BUS;
+	fIdentifier.device_type = UNKNOWN_DEVICE;
+	fIdentifier.device.unknown.size = Size();
+
+	for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
+		fIdentifier.device.unknown.check_sums[i].offset = -1;
+		fIdentifier.device.unknown.check_sums[i].sum = 0;
+	}
+#endif
+
+	return B_ERROR;
+}
+
+
+ssize_t
+FloppyDrive::ReadBlocks(void *buffer, off_t first, int32 count)
+{
+	int sectorsPerBlocks = (fBlockSize / 512);
+	int32 ret;
+	TRACE(("FloppyDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
+	// force single sector reads to avoid crossing track boundaries
+	for (int i = 0; i < count; i++) {
+		uint8 *buf = (uint8 *)buffer;
+		buf += i * fBlockSize;
+		
+		int16 track, side, sect;
+		sect = (first + i) * sectorsPerBlocks;
+		track = sect / (9 * 2);
+		side = (sect / 9) % 2;
+		sect %= 9;
+		sect++; // 1-based
+	
+		
+		TRACE(("FloppyDrive::%s: THS: %d %d %d\n", __FUNCTION__, track, side, sect));
+		ret = Floprd(buf, 0L, fHandle, sect, track, side, 1);
+		if (ret < 0)
+			return toserror(ret);
+	}
+	return count;
+}
+
 
 //	#pragma mark -
 
@@ -928,7 +1105,16 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	init_xhdi();
 
 	//XXX: FIXME
-	BlockHandle *drive = new(nothrow) BlockHandle(gBootDriveID);
+	//BlockHandle *drive = new(nothrow) BlockHandle(gBootDriveID);
+	BlockHandle *drive;
+	switch (gBootDriveID) {
+		case 0:
+		case 1:
+			drive = new(nothrow) FloppyDrive(gBootDriveID);
+			break;
+		default:
+			drive = new(nothrow) BIOSDrive(gBootDriveID);
+	}
 	if (drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
 		return B_ERROR;
