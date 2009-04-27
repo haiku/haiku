@@ -510,8 +510,8 @@ void
 BTextView::Draw(BRect updateRect)
 {
 	// what lines need to be drawn?
-	int32 startLine = LineAt(BPoint(0.0, updateRect.top));
-	int32 endLine = LineAt(BPoint(0.0, updateRect.bottom));
+	int32 startLine = _LineAt(BPoint(0.0, updateRect.top));
+	int32 endLine = _LineAt(BPoint(0.0, updateRect.bottom));
 
 	_DrawLines(startLine, endLine);
 }
@@ -1157,7 +1157,7 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 	fText->InsertText(inFile, inOffset, inLength, 0);
 
 	// update the start offsets of each line below offset
-	fLines->BumpOffset(inLength, LineAt(inOffset) + 1);
+	fLines->BumpOffset(inLength, _LineAt(inOffset) + 1);
 
 	// update the style runs
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
@@ -1630,7 +1630,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		_Refresh(startOffset, endOffset, startOffset != endOffset, false);
 	} else {
 		// the line breaks wont change, simply redraw
-		_RequestDrawLines(LineAt(startOffset), LineAt(endOffset), startOffset,
+		_RequestDrawLines(_LineAt(startOffset), _LineAt(endOffset), startOffset,
 			false);
 	}
 }
@@ -1724,7 +1724,10 @@ BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 int32
 BTextView::LineAt(int32 offset) const
 {
-	return fLines->OffsetToLine(offset);
+	int32 lineNum = _LineAt(offset);
+	if (_IsOnEmptyLastLine(offset))
+		lineNum++;
+	return lineNum;
 }
 
 
@@ -1735,7 +1738,10 @@ BTextView::LineAt(int32 offset) const
 int32
 BTextView::LineAt(BPoint point) const
 {
-	return fLines->PixelToLine(point.y - fTextRect.top);
+	int32 lineNum = _LineAt(point);
+	if ((*fLines)[lineNum + 1]->origin <= point.y - fTextRect.top)
+		lineNum++;
+	return lineNum;
 }
 
 
@@ -1749,7 +1755,7 @@ BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
 {
 	// TODO: Cleanup.
-	int32 lineNum = LineAt(inOffset);
+	int32 lineNum = _LineAt(inOffset);
 	STELine* line = (*fLines)[lineNum];
 	float height = 0;
 
@@ -1757,9 +1763,9 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	result.x = 0.0;
 	result.y = line->origin + fTextRect.top;
 
-	// Handle the case where we are on the last (always empty) line
+	// Handle the case where there is only one line (no text inserted)
 	// TODO: See if we can do this better
-	if (fStyles->NumRuns() == 0 || lineNum == fLines->NumLines()) {
+	if (fStyles->NumRuns() == 0) {
 		const rgb_color *color = NULL;
 		const BFont *font = NULL;
 		fStyles->GetNullStyle(&font, &color);
@@ -1767,16 +1773,13 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		font_height fontHeight;
 		font->GetHeight(&fontHeight);
 		height = fontHeight.ascent + fontHeight.descent;
-
 	} else {
 		height = (line + 1)->origin - line->origin;
 
-		// special case: go down one line if inOffset is a newline
-		if (inOffset == TextLength() && inOffset > 0
-			&& fText->RealCharAt(inOffset - 1) == B_ENTER) {
+		if (_IsOnEmptyLastLine(inOffset)) {
+			// special case: go down one line if inOffset is the newline
+			// at the end of the buffer
 			result.y += height;
-			height = LineHeight(CountLines() - 1);
-
 		} else {
 			int32 offset = line->offset;
 			int32 length = inOffset - line->offset;
@@ -1831,25 +1834,15 @@ BTextView::OffsetAt(BPoint point) const
 	const int32 textLength = fText->Length();
 
 	// should we even bother?
-	if (point.y >= fTextRect.bottom && point.x >= fTextRect.right)
+	if (point.y >= fTextRect.bottom)
 		return textLength;
-	else if (point.y < fTextRect.top && point.x <= fTextRect.left)
+	else if (point.y < fTextRect.top)
 		return 0;
 
-#define COMPILE_PROBABLY_BAD_CODE 1
-
-#if COMPILE_PROBABLY_BAD_CODE
-// NOTE: I have not been able to test what happens if all this is removed.
-// For one-line text views (BTextControl), it works just fine. But I would
-// need to check StyledEdit or something in various situations (new lines
-// at end and other stuff)...
-	// special case one line text views
-	if (CountLines() <= 1)
-		point.y = fTextRect.top;
-#endif
-
-	int32 lineNum = LineAt(point);
+	int32 lineNum = _LineAt(point);
 	STELine* line = (*fLines)[lineNum];
+
+#define COMPILE_PROBABLY_BAD_CODE 1
 
 #if COMPILE_PROBABLY_BAD_CODE
 	// special case: if point is within the text rect and PixelToLine()
@@ -2999,7 +2992,7 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	fText->InsertText(inText, inLength, inOffset);
 
 	// update the start offsets of each line below offset
-	fLines->BumpOffset(inLength, LineAt(inOffset) + 1);
+	fLines->BumpOffset(inLength, _LineAt(inOffset) + 1);
 
 	// update the style runs
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
@@ -3415,11 +3408,13 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 	int32 lastClickOffset = fClickOffset;
 	switch (inPageKey) {
 		case B_HOME:
-			line = (*fLines)[LineAt(lastClickOffset)];
 			if (ctrlDown)
 				fClickOffset = 0;
-			else
+			else {
+				// get the start of the last line if caret is on it
+				line = (*fLines)[_LineAt(lastClickOffset)];
 				fClickOffset = line->offset;
+			}
 
 			if (!shiftDown)
 				selStart = selEnd = fClickOffset;
@@ -3446,7 +3441,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 				// If we are on the last line, just go to the last
 				// character in the buffer, otherwise get the starting
 				// offset of the next line, and go to the previous character
-				int32 currentLine = LineAt(lastClickOffset);
+				int32 currentLine = _LineAt(lastClickOffset);
 				if (currentLine + 1 < fLines->NumLines()) {
 					line = (*fLines)[currentLine + 1];
 					fClickOffset = _PreviousInitialByte(line->offset);
@@ -3486,6 +3481,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 
 			currentPos.y -= Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
+			ScrollBy(0, -1 * Bounds().Height());
 
 			if (!shiftDown)
 				selStart = selEnd = fClickOffset;
@@ -3502,6 +3498,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 					selEnd = fClickOffset;
 				}
 			}
+
 			break;
 		}
 
@@ -3511,6 +3508,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 
 			currentPos.y += Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
+			ScrollBy(0, Bounds().Height());
 
 			if (!shiftDown)
 				selStart = selEnd = fClickOffset;
@@ -3568,7 +3566,7 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 
 	if (fAutoindent && numBytes == 1 && *bytes == B_ENTER) {
 		int32 start, offset;
-		start = offset = OffsetAt(LineAt(fSelStart));
+		start = offset = OffsetAt(_LineAt(fSelStart));
 
 		while (ByteAt(offset) != '\0' &&
 				(ByteAt(offset) == B_TAB || ByteAt(offset) == B_SPACE))
@@ -3601,8 +3599,8 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 {
 	// TODO: Cleanup
 	float saveHeight = fTextRect.Height();
-	int32 fromLine = LineAt(fromOffset);
-	int32 toLine = LineAt(toOffset);
+	int32 fromLine = _LineAt(fromOffset);
+	int32 toLine = _LineAt(toOffset);
 	int32 saveFromLine = fromLine;
 	int32 saveToLine = toLine;
 	float saveLineHeight = LineHeight(fromLine);
@@ -3626,14 +3624,14 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 	if (newHeight != saveHeight) {
 		// the text area has changed
 		if (newHeight < saveHeight)
-			toLine = LineAt(BPoint(0.0f, saveHeight + fTextRect.top));
+			toLine = _LineAt(BPoint(0.0f, saveHeight + fTextRect.top));
 		else
-			toLine = LineAt(BPoint(0.0f, newHeight + fTextRect.top));
+			toLine = _LineAt(BPoint(0.0f, newHeight + fTextRect.top));
 	}
 
 	// draw only those lines that are visible
-	int32 fromVisible = LineAt(BPoint(0.0f, bounds.top));
-	int32 toVisible = LineAt(BPoint(0.0f, bounds.bottom));
+	int32 fromVisible = _LineAt(BPoint(0.0f, bounds.top));
+	int32 toVisible = _LineAt(BPoint(0.0f, bounds.bottom));
 	fromLine = max_c(fromVisible, fromLine);
 	toLine = min_c(toLine, toVisible);
 
@@ -3932,6 +3930,9 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 int32
 BTextView::_PreviousWordBoundary(int32 offset)
 {
+	if (offset <= 0)
+		return 0;
+
 	uint32 charType = _CharClassification(offset);
 	int32 previous;
 	while (offset > 0) {
@@ -3948,8 +3949,11 @@ BTextView::_PreviousWordBoundary(int32 offset)
 int32
 BTextView::_NextWordBoundary(int32 offset)
 {
-	uint32 charType = _CharClassification(offset);
 	int32 textLen = TextLength();
+	if (offset >= textLen)
+		return textLen;
+
+	uint32 charType = _CharClassification(offset);
 	while (offset < textLen) {
 		offset = _NextInitialByte(offset);
 		if (_CharClassification(offset) != charType)
@@ -4449,18 +4453,18 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 			// triple click, extend selection linewise
 			if (currentOffset <= fTrackingMouse->anchor) {
 				fTrackingMouse->selStart
-					= (*fLines)[LineAt(currentOffset)]->offset;
+					= (*fLines)[_LineAt(currentOffset)]->offset;
 				fTrackingMouse->selEnd
 					= fTrackingMouse->shiftDown
 						? fSelEnd
-						: (*fLines)[LineAt(fTrackingMouse->anchor) + 1]->offset;
+						: (*fLines)[_LineAt(fTrackingMouse->anchor) + 1]->offset;
 			} else {
 				fTrackingMouse->selStart
 					= fTrackingMouse->shiftDown
 						? fSelStart
-						: (*fLines)[LineAt(fTrackingMouse->anchor)]->offset;
+						: (*fLines)[_LineAt(fTrackingMouse->anchor)]->offset;
 				fTrackingMouse->selEnd
-					= (*fLines)[LineAt(currentOffset) + 1]->offset;
+					= (*fLines)[_LineAt(currentOffset) + 1]->offset;
 			}
 			break;
 
@@ -4664,10 +4668,10 @@ BTextView::_PerformAutoScrolling()
 		float lineHeight = 0;
 		float vertDiff = 0;
 		if (fWhere.y > bounds.bottom) {
-			lineHeight = LineHeight(LineAt(bounds.LeftBottom()));
+			lineHeight = LineHeight(_LineAt(bounds.LeftBottom()));
 			vertDiff = fWhere.y - bounds.bottom;
 		} else if (fWhere.y < bounds.top) {
-			lineHeight = LineHeight(LineAt(bounds.LeftTop()));
+			lineHeight = LineHeight(_LineAt(bounds.LeftTop()));
 			vertDiff = fWhere.y - bounds.top; // negative value
 		}
 		// Always scroll vertically line by line or by multiples of that
@@ -5227,6 +5231,44 @@ BTextView::_CancelInputMethod()
 	}
 
 	delete inlineInput;
+}
+
+
+/*! \brief Returns the line number for the character at the given offset.
+		N.B.: this will never return the last line (use LineAt() if you
+		need to be correct about that)
+	\param offset The offset of the wanted character.
+	\return A line number.
+*/
+int32
+BTextView::_LineAt(int32 offset) const
+{
+	return fLines->OffsetToLine(offset);
+}
+
+
+/*! \brief Returns the line number for the given point.
+		N.B.: this will never return the last line (use LineAt() if you
+		need to be correct about that)
+	\param point A point.
+	\return A line number.
+*/
+int32
+BTextView::_LineAt(const BPoint& point) const
+{
+	return fLines->PixelToLine(point.y - fTextRect.top);
+}
+
+
+/*! \brief Determines if the given offset is on the empty line at the end of
+		the buffer.
+	\param offset The offset that shall be checked.
+*/
+bool
+BTextView::_IsOnEmptyLastLine(int32 offset) const
+{
+	return (offset == TextLength() && offset > 0
+		&& fText->RealCharAt(offset - 1) == B_ENTER);
 }
 
 
