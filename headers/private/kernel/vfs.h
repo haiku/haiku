@@ -286,6 +286,10 @@ protected:
 };
 
 
+status_t vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie,
+			off_t pos, const iovec* vecs, size_t count, size_t numBytes,
+			uint32 flags, AsyncIOCallback* callback);
+
 status_t vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie,
 			off_t pos, const iovec* vecs, size_t count, size_t numBytes,
 			uint32 flags, AsyncIOCallback* callback);

@@ -427,6 +427,32 @@ vfs_synchronous_io(io_request* request,
 
 
 status_t
+vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t numBytes, uint32 flags,
+	AsyncIOCallback* callback)
+{
+	IORequest* request = IORequest::Create((flags & B_VIP_IO_REQUEST) != 0);
+	if (request == NULL) {
+		callback->IOFinished(B_NO_MEMORY, true, 0);
+		return B_NO_MEMORY;
+	}
+
+	status_t status = request->Init(pos, vecs, count, numBytes, false,
+		flags | B_DELETE_IO_REQUEST);
+	if (status != B_OK) {
+		delete request;
+		callback->IOFinished(status, true, 0);
+		return status;
+	}
+
+	request->SetFinishedCallback(&AsyncIOCallback::IORequestCallback,
+		callback);
+
+	return vfs_vnode_io(vnode, cookie, request);
+}
+
+
+status_t
 vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie, off_t pos,
 	const iovec* vecs, size_t count, size_t numBytes, uint32 flags,
 	AsyncIOCallback* callback)

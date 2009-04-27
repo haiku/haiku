@@ -69,9 +69,36 @@ struct file_cache_ref {
 	}
 };
 
+class PrecacheIO : public AsyncIOCallback {
+public:
+								PrecacheIO(file_cache_ref* ref, off_t offset,
+									size_t size);
+								~PrecacheIO();
+
+			status_t			Init();
+			status_t			Start();
+
+	virtual	void				IOFinished(status_t status,
+									bool partialTransfer,
+									size_t bytesTransferred);
+
+private:
+			file_cache_ref*		fRef;
+			VMCache*			fCache;
+			vm_page**			fPages;
+			size_t				fPageCount;
+			ConditionVariable*	fBusyConditions;
+			iovec*				fVecs;
+			off_t				fOffset;
+			size_t				fSize;
+};
+
 typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages);
+
+static void add_to_iovec(iovec *vecs, uint32 &index, uint32 max, addr_t address,
+	size_t size);
 
 
 static struct cache_module_info *sCacheModule;
@@ -81,8 +108,119 @@ static const uint8 kZeroBuffer[4096] = {};
 //	#pragma mark -
 
 
+PrecacheIO::PrecacheIO(file_cache_ref* ref, off_t offset, size_t size)
+	:
+	fRef(ref),
+	fCache(ref->cache),
+	fPages(NULL),
+	fBusyConditions(NULL),
+	fVecs(NULL),
+	fOffset(offset),
+	fSize(size)
+{
+	fPageCount = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+	fCache->AcquireRefLocked();
+}
+
+
+PrecacheIO::~PrecacheIO()
+{
+	delete[] fPages;
+	delete[] fBusyConditions;
+	delete[] fVecs;
+	fCache->ReleaseRefLocked();
+}
+
+
+status_t
+PrecacheIO::Init()
+{
+	if (fPageCount == 0)
+		return B_BAD_VALUE;
+
+	fPages = new(std::nothrow) vm_page*[fPageCount];
+	if (fPages == NULL)
+		return B_NO_MEMORY;
+
+	fBusyConditions = new(std::nothrow) ConditionVariable[fPageCount];
+	if (fBusyConditions == NULL)
+		return B_NO_MEMORY;
+
+	fVecs = new(std::nothrow) iovec[fPageCount];
+	if (fVecs == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+//!	Cache has to be locked when calling this method.
+status_t
+PrecacheIO::Start()
+{
+	// allocate pages for the cache and mark them busy
+	uint32 vecCount = 0;
+	uint32 i = 0;
+	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
+		vm_page* page = fPages[i++] = vm_page_allocate_page(
+			PAGE_STATE_FREE, true);
+		if (page == NULL)
+			break;
+
+		fBusyConditions[i - 1].Publish(page, "page");
+
+		fCache->InsertPage(page, fOffset + pos);
+
+		add_to_iovec(fVecs, vecCount, fPageCount,
+			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
+	}
+
+	if (i != fPageCount) {
+		// allocating pages failed
+		while (i-- > 0) {
+			fBusyConditions[i].Unpublish();
+			fCache->RemovePage(fPages[i]);
+			vm_page_set_state(fPages[i], PAGE_STATE_FREE);
+		}
+		return B_NO_MEMORY;
+	}
+
+	return vfs_asynchronous_read_pages(fRef->vnode, NULL, fOffset, fVecs,
+		vecCount, fSize, B_PHYSICAL_IO_REQUEST, this);
+}
+
+
+void
+PrecacheIO::IOFinished(status_t status, bool partialTransfer,
+	size_t bytesTransferred)
+{
+	AutoLocker<VMCache> locker(fCache);
+
+	// Make successfully loaded pages accessible again (partially
+	// transferred pages are considered failed)
+	size_t pagesTransferred = bytesTransferred >> PAGE_SHIFT;
+	for (uint32 i = 0; i < pagesTransferred; i++) {
+		fPages[i]->state = PAGE_STATE_ACTIVE;
+		fBusyConditions[i].Unpublish();
+	}
+
+	// Free pages after failed I/O
+	for (uint32 i = pagesTransferred; i < fPageCount; i++) {
+		fBusyConditions[i].Unpublish();
+		fCache->RemovePage(fPages[i]);
+		vm_page_set_state(fPages[i], PAGE_STATE_FREE);
+	}
+
+	delete this;
+}
+
+
+//	#pragma mark -
+
+
 static void
-add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
+add_to_iovec(iovec *vecs, uint32 &index, uint32 max, addr_t address,
+	size_t size)
 {
 	if (index > 0 && (addr_t)vecs[index - 1].iov_base
 			+ vecs[index - 1].iov_len == address) {
@@ -194,7 +332,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
 	iovec vecs[MAX_IO_VECS];
-	int32 vecCount = 0;
+	uint32 vecCount = 0;
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page *pages[MAX_IO_VECS];
@@ -314,7 +452,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
 	iovec vecs[MAX_IO_VECS];
-	int32 vecCount = 0;
+	uint32 vecCount = 0;
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
@@ -338,7 +476,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		ref->cache->InsertPage(page, offset + pos);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
-		page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
+			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
 	}
 
 	push_access(ref, offset, bufferSize, true);
@@ -391,7 +529,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		}
 	}
 
-	for (int32 i = 0; i < vecCount; i++) {
+	for (uint32 i = 0; i < vecCount; i++) {
 		addr_t base = (addr_t)vecs[i].iov_base;
 		size_t bytes = min_c(bufferSize,
 			size_t(vecs[i].iov_len - pageOffset));
@@ -757,6 +895,11 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 extern "C" void
 cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 {
+	if (low_resource_state(B_KERNEL_RESOURCE_PAGES) != B_NO_LOW_RESOURCE) {
+		// don't do anything if we don't have the resources left
+		return;
+	}
+
 	vm_cache *cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
@@ -764,16 +907,56 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	file_cache_ref *ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;
 
-	if (size > fileSize)
-		size = fileSize;
+	if (offset >= fileSize) {
+		cache->ReleaseRef();
+		return;
+	}
+	if (offset + size > fileSize)
+		size = offset - fileSize;
 
-	// we never fetch more than 4 MB at once
-	if (size > 4 * 1024 * 1024)
-		size = 4 * 1024 * 1024;
+	// "offset" and "size" are always aligned to B_PAGE_SIZE,
+	offset &= ~(B_PAGE_SIZE - 1);
+	size = ROUNDUP(size, B_PAGE_SIZE);
 
-	cache_io(ref, NULL, offset, 0, &size, false);
-	cache->Lock();
-	cache->ReleaseRefAndUnlock();
+	size_t bytesToRead = 0;
+	off_t lastOffset = offset;
+
+	AutoLocker<VMCache> locker(cache);
+
+	while (true) {
+		// check if this page is already in memory
+		if (size > 0) {
+			vm_page* page = cache->LookupPage(offset);
+
+			offset += B_PAGE_SIZE;
+			size -= B_PAGE_SIZE;
+
+			if (page == NULL) {
+				bytesToRead += B_PAGE_SIZE;
+				continue;
+			}
+		}
+		if (bytesToRead != 0) {
+			// read the part before the current page (or the end of the request)
+			PrecacheIO* io
+				= new(std::nothrow) PrecacheIO(ref, lastOffset, bytesToRead);
+			if (io == NULL || io->Init() != B_OK || io->Start() != B_OK) {
+				delete io;
+				return;
+			}
+
+			bytesToRead = 0;
+		}
+
+		if (size == 0) {
+			// we have reached the end of the request
+			break;
+		}
+
+		lastOffset = offset + B_PAGE_SIZE;
+	}
+
+	cache->ReleaseRefLocked();
 }
 
 

@@ -2256,9 +2256,9 @@ pre_map_area_pages(vm_area* area, VMCache* cache)
 	\a offset and \a size arguments have to be page aligned.
 */
 static area_id
-_vm_map_file(team_id team, const char* name, void** _address, uint32 addressSpec,
-	size_t size, uint32 protection, uint32 mapping, int fd, off_t offset,
-	bool kernel)
+_vm_map_file(team_id team, const char* name, void** _address,
+	uint32 addressSpec, size_t size, uint32 protection, uint32 mapping, int fd,
+	off_t offset, bool kernel)
 {
 	// TODO: for binary files, we want to make sure that they get the
 	//	copy of a file at a given time, ie. later changes should not
@@ -2352,7 +2352,7 @@ _vm_map_file(team_id team, const char* name, void** _address, uint32 addressSpec
 		offset, size, addressSpec, 0, protection, mapping, &area, name,
 		addressSpec == B_EXACT_ADDRESS, kernel);
 
-	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
+	if (status != B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
 		cache->ReleaseRefLocked();
 	}
@@ -2362,7 +2362,14 @@ _vm_map_file(team_id team, const char* name, void** _address, uint32 addressSpec
 
 	cache->Unlock();
 
-	if (status < B_OK)
+	if (status == B_OK) {
+		// TODO: this probably deserves a smarter solution, ie. don't always
+		// prefetch stuff
+		cache_prefetch_vnode(vnode, offset, min_c(size, 10LL * 1024 * 1024));
+			// prefetches at max 10 MB starting from "offset"
+	}
+
+	if (status != B_OK)
 		return status;
 
 	area->cache_type = CACHE_TYPE_VNODE;
@@ -3055,7 +3062,7 @@ vm_unmap_page(vm_area* area, addr_t virtualAddress, bool preserveModified)
 
 	addr_t physicalAddress;
 	uint32 flags;
-	status_t status = map->ops->query(map, virtualAddress, &physicalAddress, 
+	status_t status = map->ops->query(map, virtualAddress, &physicalAddress,
 		&flags);
 	if (status < B_OK || (flags & PAGE_PRESENT) == 0) {
 		map->ops->unlock(map);
@@ -3110,7 +3117,7 @@ vm_unmap_page(vm_area* area, addr_t virtualAddress, bool preserveModified)
 
 		map->ops->unlock(map);
 		mutex_unlock(&sMappingLock);
-		
+
 		dprintf("vm_unmap_page: couldn't find mapping for area %p in page %p\n",
 			area, page);
 	}
