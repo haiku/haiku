@@ -116,7 +116,6 @@ public:
   						return true;
 					}
 			}
-			printf("Searched %ld frames last Frame is %ld\n",index.size(),index.end()->frameNo);
 		}
 		
 		return false;

@@ -186,11 +186,7 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frame_size = 1;
 
 		cookie->duration = theFileReader->getVideoDuration(streamNumber);
-		if (videoFormat.FrameCount > 0) {
-			cookie->frame_count = videoFormat.FrameCount;
-		} else {
-			cookie->frame_count = theFileReader->getFrameCount(streamNumber);
-		}
+		cookie->frame_count = theFileReader->getFrameCount(streamNumber);
 				
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
@@ -294,17 +290,19 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("BlockAlign %d\n",audioFormat.BlockAlign);
 		TRACE("Bits %d\n",audioFormat.BitsPerSample);
 		
+		uint32 sampleSize = (audioFormat.NoChannels * audioFormat.BitsPerSample / 8);
+		
 		cookie->audio = true;
 		cookie->duration = theFileReader->getAudioDuration(streamNumber);
-		cookie->frame_count = theFileReader->getFrameCount(streamNumber);
+		cookie->frame_count = (cookie->duration * audioFormat.SamplesPerSec) / sampleSize / 1000000LL;
 		cookie->frame_pos = 0;
 		cookie->frames_per_sec_rate = audioFormat.SamplesPerSec;
 		cookie->frames_per_sec_scale = 1;
-
-		TRACE("audio frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6);
-
 		cookie->bytes_per_sec_rate = audioFormat.AvgBytesPerSec;
-//		cookie->sample_size = audioFormat.BlockAlign == 0 ? audioFormat.BitsPerSample / 8 * audioFormat.NoChannels : audioFormat.BlockAlign;
+		cookie->bytes_per_sec_scale = 1;
+
+		TRACE("Chunk Count %ld\n", theFileReader->getAudioChunkCount(streamNumber));
+		TRACE("audio frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6 );
 
 		if (audioFormat.Compression == 0x0001) {
 			// a raw PCM format
@@ -329,7 +327,9 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
 			format->u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
 			format->u.raw_audio.buffer_size = audioFormat.BlockAlign;
-//			cookie->frame_size = cookie->sample_size;
+		} else if (audioFormat.Compression == 0xa) {
+			// Windows Media Speech
+			return B_ERROR;
 		} else {
 			// some encoded format
 			description.family = B_WAV_FORMAT_FAMILY;
@@ -494,14 +494,12 @@ asfReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	uint32 size;
 	bool keyframe;
 
-	if (theFileReader->GetNextChunkInfo(cookie->stream, (cookie->frame_pos / cookie->frame_size), &(cookie->buffer), &size, &keyframe, &mediaHeader->start_time) == false) {
-		TRACE("LAST BUFFER : %d (%ld)\n",cookie->stream, cookie->frame_pos);
+	if (theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &(cookie->buffer), &size, &keyframe, &mediaHeader->start_time) == false) {
+		TRACE("LAST BUFFER : Stream %d (%ld)\n",cookie->stream, cookie->frame_pos);
 		*chunkSize = 0;
 		*chunkBuffer = NULL;
 		return B_LAST_BUFFER_ERROR;
 	}
-
-//	mediaHeader->start_time = bigtime_t(double(cookie->frame_pos) * 1000000.0 * double(cookie->frames_per_sec_scale)) / cookie->frames_per_sec_rate;
 
 	if (cookie->audio) {
 		TRACE("Audio");
@@ -516,9 +514,9 @@ asfReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 		mediaHeader->u.encoded_video.field_number = 0;
 		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
 	}
-	TRACE(" stream %d: frame %ld start time %.6f Size %ld key frame %s\n",cookie->stream, (cookie->frame_pos / cookie->frame_size), mediaHeader->start_time / 1000000.0, size, keyframe ? "true" : "false");
+	TRACE(" stream %d: frame %ld start time %.6f Size %ld key frame %s\n",cookie->stream, cookie->frame_pos, mediaHeader->start_time / 1000000.0, size, keyframe ? "true" : "false");
 
-	cookie->frame_pos += cookie->frame_size;
+	cookie->frame_pos ++;
 	
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;

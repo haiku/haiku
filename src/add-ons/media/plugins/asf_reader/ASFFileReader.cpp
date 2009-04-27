@@ -149,6 +149,10 @@ ASFFileReader::getAudioFormat(uint32 streamIndex, ASFAudioFormat *format)
 			format->extraDataSize = audioHeader->cbSize;
 			format->extraData = audioHeader->data;
 		
+			if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
+				printf("num payloads for audio %d\n",stream->extended->num_payload_ext);
+			}
+
 			return true;
 		}
 	}
@@ -178,7 +182,7 @@ ASFFileReader::getVideoFormat(uint32 streamIndex, ASFVideoFormat *format)
 			if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
 				format->FrameScale = stream->extended->avg_time_per_frame;
 				format->FrameRate = 10000000;
-				format->FrameCount = stream->extended->max_obj_size;
+				printf("num payloads for video %d\n",stream->extended->num_payload_ext);
 			}
 		
 			return true;
@@ -192,34 +196,61 @@ ASFFileReader::getVideoFormat(uint32 streamIndex, ASFVideoFormat *format)
 bigtime_t
 ASFFileReader::getVideoDuration(uint32 streamIndex)
 {
-	return asf_get_duration(asfFile);
+	asf_stream_t *stream;
+
+	stream = asf_get_stream(asfFile, streamIndex);
+	
+	if (stream) {
+		if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
+			printf("VIDEO end time %Ld, start time %Ld\n",stream->extended->end_time, stream->extended->start_time);
+			if (stream->extended->end_time - stream->extended->start_time > 0) {
+				return stream->extended->end_time - stream->extended->start_time;
+			}
+		}
+	}
+
+	return asf_get_duration(asfFile) / 10;
 }
 
 
 bigtime_t
 ASFFileReader::getAudioDuration(uint32 streamIndex)
 {
-	return asf_get_duration(asfFile);
+	asf_stream_t *stream;
+
+	stream = asf_get_stream(asfFile, streamIndex);
+	
+	if (stream) {
+		if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
+			printf("AUDIO end time %Ld, start time %Ld\n",stream->extended->end_time, stream->extended->start_time);
+			if (stream->extended->end_time - stream->extended->start_time > 0) {
+				return stream->extended->end_time - stream->extended->start_time;
+			}
+		}
+	}
+
+	return asf_get_duration(asfFile) / 10;  // convert from 100 nanosecond units to microseconds
 }
 
 
 bigtime_t
 ASFFileReader::getMaxDuration()
 {
-	return asf_get_duration(asfFile);
+	return asf_get_duration(asfFile) / 10;
 }
 
 
+// Not really frame count, really total data packets
 uint32
 ASFFileReader::getFrameCount(uint32 streamIndex)
-{
+{	
 	return asf_get_data_packets(asfFile);
 }
 
 uint32
 ASFFileReader::getAudioChunkCount(uint32 streamIndex)
 {
-	return 0;
+	return asf_get_data_packets(asfFile);
 }
 
 bool
@@ -277,14 +308,17 @@ bool
 ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	char **buffer, uint32 *size, bool *keyframe, bigtime_t *pts)
 {
+	// Ok, Need to join payloads together that have the same payload->pts
+	// packet->send_time seems to be a better presentation time stamp than pts though	
+	
 	asf_payload_t *payload;
 	
 	while (!HasIndex(streamIndex, pFrameNo+1) && asf_get_packet(asfFile, packet) > 0) {
 		for (int i=0;i<packet->payload_count;i++) {
-			payload = (asf_payload_t *)(packet->payloads);
+			payload = (asf_payload_t *)(&packet->payloads[i]);
 			printf("Payload %d ",i+1);
-			printf("Stream %d Keyframe %d pts %d frame %d, size %d\n",payload[i].stream_number,payload[i].key_frame, payload[i].pts, payload[i].media_object_number, payload[i].datalen);
-			AddIndex(payload[i].stream_number, payload[i].media_object_number, payload[i].key_frame, payload[i].pts, payload[i].data, payload[i].datalen);
+			printf("Stream %d Keyframe %d pts %d frame %d, size %d\n",payload->stream_number,payload->key_frame, payload->pts * 1000, payload->media_object_number, payload->datalen);
+			AddIndex(payload->stream_number, payload->media_object_number, payload->key_frame, packet->send_time * 1000, payload->data, payload->datalen);
 		}
 	}
 	
@@ -305,7 +339,22 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 bool
 ASFFileReader::IsSupported(BPositionIO *source)
 {
-	return true;
+	// Read first 4 bytes and if they match 30 26 b2 75 we have a asf file
+	uint8 header[4];
+	bool supported = false;
+	
+	off_t position = source->Position();
+	
+	if (source->Read(&header[0],4) == 4) {
+		supported = header[0] == 0x30 &&
+					header[1] == 0x26 &&
+					header[2] == 0xb2 &&
+					header[3] == 0x75;
+	}
+	
+	source->Seek(position,SEEK_SET);	
+	
+	return supported;
 }
 
 /* static */
