@@ -194,7 +194,7 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_PLATFORM = atari_m68k ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 130 ; # in kB
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 150 ; # in kB
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
