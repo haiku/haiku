@@ -65,10 +65,6 @@ BTextView::LineBuffer::OffsetToLine(int32 offset) const
 			maxIndex = index;
 	}
 
-	// do check for last line
-	if (minIndex == maxIndex && offset >= fBuffer[maxIndex].offset)
-		index = maxIndex;
-
 	return index;
 }
 
@@ -90,10 +86,6 @@ BTextView::LineBuffer::PixelToLine(float pixel) const
 		} else
 			maxIndex = index;
 	}
-
-	// do check for last line
-	if (minIndex == maxIndex && pixel >= fBuffer[maxIndex].origin)
-		index = maxIndex;
 
 	return index;
 }

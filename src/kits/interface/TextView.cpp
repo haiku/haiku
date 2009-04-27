@@ -1771,24 +1771,32 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	} else {
 		height = (line + 1)->origin - line->origin;
 
-		int32 offset = line->offset;
-		int32 length = inOffset - line->offset;
-		int32 numBytes = length;
-		bool foundTab = false;
-		do {
-			foundTab = fText->FindChar(B_TAB, offset, &numBytes);
-			float width = _StyledWidth(offset, numBytes);
-			result.x += width;
+		// special case: go down one line if inOffset is a newline
+		if (inOffset == TextLength() && inOffset > 0
+			&& fText->RealCharAt(inOffset - 1) == B_ENTER) {
+			result.y += height;
+			height = LineHeight(CountLines() - 1);
 
-			if (foundTab) {
-				result.x += _ActualTabWidth(result.x);
-				numBytes++;
-			}
+		} else {
+			int32 offset = line->offset;
+			int32 length = inOffset - line->offset;
+			int32 numBytes = length;
+			bool foundTab = false;
+			do {
+				foundTab = fText->FindChar(B_TAB, offset, &numBytes);
+				float width = _StyledWidth(offset, numBytes);
+				result.x += width;
 
-			offset += numBytes;
-			length -= numBytes;
-			numBytes = length;
-		} while (foundTab && length > 0);
+				if (foundTab) {
+					result.x += _ActualTabWidth(result.x);
+					numBytes++;
+				}
+
+				offset += numBytes;
+				length -= numBytes;
+				numBytes = length;
+			} while (foundTab && length > 0);
+		}
 	}
 
 	if (fAlignment != B_ALIGN_LEFT) {
