@@ -19,6 +19,7 @@
 #include <FindDirectory.h>
 #include <Font.h>
 #include <Clipboard.h>
+#include <TextView.h>
 
 #include "PeopleApp.h"
 #include "PeopleView.h"
@@ -52,7 +53,9 @@ TPeopleWindow::TPeopleWindow(BRect frame, char *title, entry_ref *ref)
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Edit");
-	menu->AddItem(fUndo = new BMenuItem("Undo", new BMessage(M_UNDO), 'Z'));
+	menu->AddItem(fUndo = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z'));
+	fUndo->SetTarget(NULL, this);
+	fUndo->SetEnabled(false);
 	menu->AddSeparatorItem();
 	menu->AddItem(fCut = new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
 	fCut->SetTarget(NULL, this);
@@ -91,12 +94,20 @@ void
 TPeopleWindow::MenusBeginning(void)
 {
 	bool enabled;
+	bool isRedo;
 
 	enabled = fView->CheckSave();
 	fSave->SetEnabled(enabled);
 	fRevert->SetEnabled(enabled);
 
-	fUndo->SetEnabled(false);
+	undo_state state = ((BTextView *)CurrentFocus())->UndoState(&isRedo);
+	fUndo->SetEnabled(state != B_UNDO_UNAVAILABLE);
+
+	if (isRedo)
+		fUndo->SetLabel("Redo");
+	else
+		fUndo->SetLabel("Undo");
+
 	enabled = fView->TextSelected();
 	fCut->SetEnabled(enabled);
 	fCopy->SetEnabled(enabled);
