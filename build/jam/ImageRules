@@ -1059,6 +1059,10 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	FLOPPY_IMAGE_SIZE on $(image) = $(HAIKU_BOOT_FLOPPY_IMAGE_SIZE) ;
 	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
+	if $(HAIKU_BOOT_PLATFORM) = atari_m68k {
+		Depends $(image) : <build>fixup_tos_boot_checksum ;
+		BuildFloppyBootImageAtariM68K $(image) : <build>fixup_tos_boot_checksum ;
+	}
 }
 
 actions BuildFloppyBootImage1
@@ -1072,6 +1076,11 @@ actions BuildFloppyBootImage1
 	dd if=$(>[2]) of=$(<) bs=$(ARCHIVE_IMAGE_OFFSET)k seek=1 conv=notrunc
 }
 
+actions BuildFloppyBootImageAtariM68K
+{
+	# fixup the boot sector checksum
+	$(>[1]) $(<)
+}
 
 #pragma mark - CD Boot Image rules
 
