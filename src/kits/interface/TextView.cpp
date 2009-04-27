@@ -1955,7 +1955,8 @@ BTextView::CanEndLine(int32 offset)
 	}
 
 	uint32 nextClassification = _CharClassification(offset + 1);
-	if (nextClassification == B_END_OF_TEXT)
+	if (nextClassification == B_END_OF_TEXT
+		|| nextClassification == B_SEPARATOR_CHARACTER)
 		return true;
 
 	if (classification == B_PUNCTUATION_CHARACTER
@@ -1963,16 +1964,12 @@ BTextView::CanEndLine(int32 offset)
 		return true;
 	}
 
-// TODO: This cannot be enabled, since the wrapping code things the char
-// is a trailing space or something. Otherwise it would allow to treat
-// something like "..." as a word.
-//	uint32 nextNextClassification = _CharClassification(offset + 2);
-//
-//	if (classification == B_OTHER_CHARACTER
-//		&& nextClassification == B_PUNCTUATION_CHARACTER
-//		&& nextClassification == nextNextClassification) {
-//		return true;
-//	}
+	uint32 nextNextClassification = _CharClassification(offset + 2);
+	if (classification == B_OTHER_CHARACTER
+		&& nextClassification == B_PUNCTUATION_CHARACTER
+		&& nextClassification == nextNextClassification) {
+		return true;
+	}
 
 	return false;
 }
@@ -3801,39 +3798,44 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 	float deltaWidth = 0.0;
 	float tabWidth = 0.0;
 	float strWidth = 0.0;
+	uchar theChar;
 
 	// wrap the text
 	do {
 		bool foundTab = false;
-
 		// find the next line break candidate
 		for ( ; (offset + delta) < limit ; delta++) {
-			if (CanEndLine(offset + delta))
+			if (CanEndLine(offset + delta)) {
+				theChar = fText->RealCharAt(offset + delta);
+				if (theChar != B_SPACE && theChar != B_TAB
+					&& theChar != B_ENTER) {
+					// we are scanning for trailing whitespace below, so we
+					// have to skip non-whitespace characters, that can end
+					// the line, here
+					delta++;
+				}
 				break;
+			}
 		}
+		// now skip over trailing whitespace, if any
 		for ( ; (offset + delta) < limit; delta++) {
-			uchar theChar = fText->RealCharAt(offset + delta);
 			if (!CanEndLine(offset + delta))
 				break;
 
+			theChar = fText->RealCharAt(offset + delta);
 			if (theChar == B_ENTER) {
 				// found a newline, we're done!
 				done = true;
 				delta++;
 				break;
+			} else if (theChar != B_SPACE && theChar != B_TAB) {
+				// stop at anything else than trailing whitespace
+				break;
 			} else {
 				// include all trailing spaces and tabs,
 				// but not spaces after tabs
-				if (theChar != B_SPACE && theChar != B_TAB)
-					break;
-				else {
-					if (theChar == B_SPACE && foundTab)
-						break;
-					else {
-						if (theChar == B_TAB)
-							foundTab = true;
-					}
-				}
+				if (theChar == B_TAB)
+					foundTab = true;
 			}
 		}
 		delta = max_c(delta, 1);
@@ -3860,23 +3862,39 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 			// we've found where the line will wrap
 			bool foundNewline = done;
 			done = true;
+
+			// we have included trailing whitespace in the width computation
+			// above, but that is not being shown anyway, so we try again
+			// without the trailing whitespace
 			int32 pos = delta - 1;
-			if (!CanEndLine(offset + pos))
+			theChar = fText->RealCharAt(offset + pos);
+			if (theChar != B_SPACE && theChar != B_TAB && theChar != B_ENTER) {
+				// there is no trailing whitespace, no point in trying
 				break;
-
-			strWidth -= (deltaWidth + tabWidth);
-
-			while (offset + pos > offset) {
-				if (!CanEndLine(offset + pos))
-					break;
-
-				pos--;
 			}
 
+			// reset string width to start of current run ...
+			strWidth -= (deltaWidth + tabWidth);
+			// ... skip back all trailing whitespace ...
+			while (offset + pos > offset) {
+				theChar = fText->RealCharAt(offset + pos);
+				if (theChar != B_SPACE && theChar != B_TAB
+					&& theChar != B_ENTER)
+					break;
+				pos--;
+			}
+			// ... and compute the resulting width (of visible characters)
 			strWidth += _StyledWidth(offset, pos + 1, &ascent, &descent);
-			if (strWidth >= *ioWidth)
+			if (strWidth >= *ioWidth) {
+				// width of visible characters exceeds line, we need to wrap
+				// before the current "word"
 				break;
+			}
 
+			// we can include the current "word" on this line, but we need
+			// to eat the trailing whitespace, such that we do not encounter
+			// it again during the next run
+			// TODO: can this ever be entered?
 			if (!foundNewline) {
 				while (offset + delta < limit) {
 					const char realChar = fText->RealCharAt(offset + delta);
@@ -3889,7 +3907,8 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 					&& fText->RealCharAt(offset + delta) == B_ENTER)
 					delta++;
 			}
-			// get the ascent and descent of the spaces/tabs
+			// get the ascent and descent of the current word, including all
+			// trailing whitespace
 			_StyledWidth(offset, delta, &ascent, &descent);
 		}
 
@@ -3909,8 +3928,8 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 		strWidth = 0.0;
 
 		int32 current = fromOffset;
-		for (offset = fromOffset; offset < limit; current = offset,
-				offset = _NextInitialByte(offset)) {
+		for (offset = _NextInitialByte(current); current < limit;
+				current = offset, offset = _NextInitialByte(offset)) {
 			strWidth += _StyledWidth(current, offset - current, &ascent,
 				&descent);
 			if (strWidth >= *ioWidth) {
