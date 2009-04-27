@@ -4665,20 +4665,13 @@ BTextView::_PerformAutoScrolling()
 	if (CountLines() > 1) {
 		// scroll in Y only if multiple lines!
 
-		float lineHeight = 0;
-		float vertDiff = 0;
+		// R5 does a pretty soft auto-scroll, we try to do the same by
+		// simply scrolling the distance between cursor and border
 		if (fWhere.y > bounds.bottom) {
-			lineHeight = LineHeight(_LineAt(bounds.LeftBottom()));
-			vertDiff = fWhere.y - bounds.bottom;
+			scrollBy.y = fWhere.y - bounds.bottom;
 		} else if (fWhere.y < bounds.top) {
-			lineHeight = LineHeight(_LineAt(bounds.LeftTop()));
-			vertDiff = fWhere.y - bounds.top; // negative value
+			scrollBy.y = fWhere.y - bounds.top; // negative value
 		}
-		// Always scroll vertically line by line or by multiples of that
-		// based on the distance of the cursor from the border of the view
-		// TODO: Refine this, I can't even remember how beos works here
-		scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff)
-			/ lineHeight) : 0;
 
 		// prevent from scrolling out of view
 		if (scrollBy.y != 0.0) {
@@ -4686,7 +4679,7 @@ BTextView::_PerformAutoScrolling()
 				+ fLayoutData->bottomInset);
 			if (bounds.bottom + scrollBy.y > bottomMax)
 				scrollBy.y = bottomMax - bounds.bottom;
-			else if (bounds.top + scrollBy.y < 0)
+			if (bounds.top + scrollBy.y < 0)
 				scrollBy.y = -bounds.top;
 		}
 	}
@@ -5285,7 +5278,8 @@ BTextView::TextTrackState::TextTrackState(BMessenger messenger)
 	fRunner(NULL)
 {
 	BMessage message(_PING_);
-	fRunner = new (nothrow) BMessageRunner(messenger, &message, 300000);
+	const bigtime_t scrollSpeed = 25 * 1000;	// 40 scroll steps per second
+	fRunner = new (nothrow) BMessageRunner(messenger, &message, scrollSpeed);
 }
 
 
