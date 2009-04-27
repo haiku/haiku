@@ -354,7 +354,12 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 			&& (i > 0 || taskFile.read.error != 0x81)) {
 			TRACE_ERROR("device %d failed, error code is 0x%02x\n", i,
 				taskFile.read.error);
-			continue;
+			// Workaround for Gigabyte i-RAM, which always reports 0x00 
+			// TODO: find something nicer
+			if (i == 1 && taskFile.read.error == 0x00) {
+				TRACE_ERROR("continuing anyway...\n");
+			} else
+				continue;
 		}
 
 		if (i == 0 && taskFile.read.error >= 0x80) {
