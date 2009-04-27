@@ -28,6 +28,11 @@
  * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/ldscripts/m68k/boot_prg_atari_m68k.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
  */
 
+/*
+ * references :
+ * http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-3-0/src/sys/arch/atari/stand/xxboot/fdboot/fdboot.S
+ */
+
 #include "atari_memory_map.h"
 #include "toscalls.h"
 
@@ -41,6 +46,9 @@
 	// when the drive reading fails for some reason, it will
 	// retry this many times until it will report a failure
 
+
+#define SECTSIZE 512
+
 //.text
 _bs_entry:
 /* main entry point, both from the floppy boot and .prg */
@@ -48,7 +56,7 @@ _bs_entry:
 
 //FAT lookalike to avoid nasty things from happening
 // http://alive.atari.org/alive10/btmania.php
-	.ascii	"Haiku0"
+	.ascii	"Haiku "
 	.byte	0xbe, 0x50, 0x38 // id
 	//LE
 	.byte	0x00, 0x02	//BPS
@@ -60,6 +68,7 @@ _bs_entry:
 	.byte	0xa0, 0x05		//NSECTS
 	.byte	0xf9			//MEDIA
 	.byte	0x05, 0x00		//SPF
+_fat_spt:	
 	.byte	0x09, 0x00		//SPT
 	.byte	0x02, 0x00		//NSIDES
 	.byte	0x00, 0x00		//NHID
@@ -74,39 +83,30 @@ sNumSectors:
 
 real_entry:
 
-#if 0
-	lea		h1,%a0
-	bsr		puts
-	move.l		#0x1234aa55,%d0
-	bsr		putx
-#endif
+// save the regs to return safely, like the NetBSD loader does:
+// http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-3-0/src/sys/arch/atari/stand/xxboot/fdboot/fdboot.S
+	movem.l		%d1-%d7/%a0-%a6,-(%sp)
 
+	lea		str,%a0
+	bsr		puts
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
 	move.l		#SUP_INQUIRE,-(%sp)
 	move.w		#0x20,-(%sp)
-	trap		#1
+	trap		#GEMDOS_TRAP
 	addq.l		#6,%sp
-
-	bsr		putx
 
 	cmp.l		#SUP_USER,%d0
 	bne			floppy_start
-	lea		h2,%a0
-	bsr		puts
-
 	bra			prg_start
-	//bra			bootsect_start
 
 /*
  * floppy boot support code
  */
 
 floppy_start:
-	lea		h3,%a0
-	bsr		puts
-	lea		str,%a0
+	lea		label_floppy,%a0
 	bsr		puts
 	//bra floppy_start
 
@@ -116,9 +116,9 @@ floppy_start:
 	//XXX: check for enough RAM
 
 	// load the rest
-	move.w		sNumSectors,%d2
+	//move.w		sNumSectors,%d2
 	// load at base + this code.
-	move.l		#(ATARI_ZBEOS_BASE+512),%a2
+	//move.l		#(ATARI_ZBEOS_BASE+512),%a2
 	//move.l		%a2,%d0
 	//bsr putx
 	bsr			load_sectors
@@ -133,13 +133,22 @@ floppy_done:
 	bsr		puts
 	move.l		#0,%d0
 	//jmp			ATARI_ZBEOS_BASE+512
+
+	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
 	jmp		_start
 
-load_failed:	
+load_failed:
+	//bra			_exit
+
+spin:	
+	//bra			spin
+_exit:	/*  */
 	lea			failure_string,%a0
 	bsr			puts
-spin:	
-	bra			spin
+	bsr			getc
+	
+	movem.l	(%sp)+,%d1-%d7/%a0-%a6
+	rts
 	//rts
 
 /**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
@@ -168,12 +177,12 @@ load_sectors:
 	// d2:	
 
 	//move.w		%d2,-(%sp)
-	move.w		#9,-(%sp)
-	move.w		#0,-(%sp)
-	move.w		#0,-(%sp)
-	move.w		#1,-(%sp)
-	move.w		#0,-(%sp)
-	move.l		#0,-(%sp)
+	move.w		#1,-(%sp) // count
+	move.w		#0,-(%sp) // sideno
+	move.w		#0,-(%sp) // trackno
+	move.w		#1,-(%sp) // sectno
+	move.w		TOSVAR_bootdev,-(%sp) // devno
+	clr.l		-(%sp) // filler
 	//move.w		#0,-(%sp)
 	//move.l		%a2,-(%sp)
 	move.l		#ATARI_ZBEOS_BASE,-(%sp)
@@ -182,16 +191,123 @@ load_sectors:
 	add.l		#20,%sp
 #endif
 
-	bsr	putx
+	//bsr	putx
+	//rts
+
+	/*
+	 * %d3:	remaining sects
+	 * %d4:	sectno
+	 * %d5:	trackno
+	 * %d6:	sideno
+	 * %d7:	sect / track
+	 * %a5:	buffer
+	 *
+	 */
+	// load the rest
+
+	// XXX:	 the NetBSD loader probes it, but trying to asserts ARAnyM
+	clr.l		%d7
+	move.b		_fat_spt,%d7	// sect/track
+	//move.w		#0,%d7	// sect/track
+	move.w		#0,%d6	// sideno
+	move.w		#0,%d5	// trackno
+	move.w		#1,%d4	// sectno
+	move.w		sNumSectors,%d3	// remainder
+	move.l		#ATARI_ZBEOS_BASE,%a5
+read_sectors_loop:	
+	bsr.s		read_sect
+	bne		read_sectors_fail
+	moveq		#'.',%d0
+	bsr		putc
+	subq.w		#1,%d3	// remainder--
+	bne.s		read_sectors_next
+	bsr	putcrlf
+	clr.l		%d0
+	rts
+
+	// compute next track/side/sector
+read_sectors_next:
+#if 0	//DEBUG
+	// [TRAK][SIDE]
+	move.w		%d5,%d0
+	swap		%d0
+	move.w		%d6,%d0
+	bsr		putx
+	// [SECT][S/TK]
+	move.w		%d4,%d0
+	swap		%d0
+	move.w		%d7,%d0
+	bsr		putx
+	//bsr		getc
+#endif	//!DEBUG
+	add.l		#SECTSIZE,%a5
+	addq.w		#1,%d4	// sectno++
+	cmp.w		%d7,%d4	// if (sectno == spt)
+	bne.s		.rs2	// {
+	addq.w		#1,%d6	//	sideno++ ;
+	cmp.w		#2,%d6	//	if (sideno == 2) {
+	bne		.rs1
+	clr.w		%d6	//		sideno = 0 ;
+	addq.w		#1,%d5	//		trackno++ ;
+	bsr	putcrlf
+
+.rs1:				//	}
+	clr.w		%d4	//	sectno = 0 ;
+.rs2:				// }
+	
+	bra.s		read_sectors_loop
+
+read_sectors_fail:
+	tst.w		%d7	// s/t
+	bne		read_sectors_fail2
+	move.w		%d4,%d0
+	bsr		putx
+	move.w		%d4,%d7
+	clr.w		%d4
+	//add.w		#1,
+	bra.s		read_sectors_next
+read_sectors_fail2:
+	moveq		#1,%d0
+	rts
+
+	
+read_sect:	/* read 1 sector */
+	/*
+	 * %d4:	sectno
+	 * %d5:	trackno
+	 * %d6:	sideno
+	 * %d7:	remaining count
+	 * %a5:	buffer
+	 *
+	 */
+#if 1
+	//move.w		%d2,-(%sp)
+	//move.w		#1,-(%sp) // count
+	//move.w		#0,-(%sp) // sideno
+	//move.w		#0,-(%sp) // trackno
+	//move.w		#2,-(%sp) // sectno
+	move.w		#1,-(%sp)
+	movem.w		%d4-%d6,-(%sp)
+	move.w		TOSVAR_bootdev,-(%sp) // devno
+	clr.l		-(%sp) // filler
+	move.l		%a5,-(%sp)
+	move.w		#8,-(%sp)	// floprd
+	trap		#XBIOS_TRAP
+	add.l		#20,%sp
+	tst.l		%d0
+	
+#endif
 	rts
 
 floppy_end:
 //	.org	FAILURE_STRING
 failure_string:
 //	.string " Loading failed! Press key to reboot.\r\n"
+	.string " Loading failed! Press key.\r\n"
+//	.string "FAIL"
 	
 //	.org	DOT_STRING
-	.string	"."
+//	.string	"."
 
 
 saved_super_stack:
@@ -229,14 +345,11 @@ putx0:
 putxdisp:
 	bsr	putc
 	dbf	%d2,putxloop
-	move.b	#'\r',%d0
-	bsr	putc
-	move.b	#'\n',%d0
-	bsr	putc
+	bsr	putcrlf
 	movem.l	(%sp)+,%d0-%d2/%a0-%a2
 	rts
 	
-	lea.l	str,%a0
+
 puts:
 .loopt:
 	move.b	(%a0)+,%d0
@@ -244,18 +357,13 @@ puts:
 	bsr	putc
 	bra	.loopt
 .strout:
+putcrlf:	
 	move.b	#'\r',%d0
 	bsr	putc
 	move.b	#'\n',%d0
 	bsr	putc
 	rts
 	
-.loop:
-	move	#'.',%d0
-	bsr		putc
-	bra		.loop
-	rts
-
 
 /* prints the char in d0.b to the console */
 putc:
@@ -263,28 +371,33 @@ putc:
 	move.w	%d0,-(%sp)
 	move.w	#DEV_CON,-(%sp)	// DEV_CON
 	move.w	#3,-(%sp)	// Bconout
-	trap	#13
+	trap	#BIOS_TRAP
 	add.l	#6,%sp
 	movem.l	(%sp)+,%d0-%d2/%a0-%a2
 	rts
 
+/* waits for a key */
+getc:
+	movem.l	%d1-%d2/%a0-%a2,-(%sp)
+	move.w	#DEV_CON,-(%sp)	// DEV_CON
+	move.w	#2,-(%sp)	// Bconin
+	trap	#BIOS_TRAP
+	add.l	#4,%sp
+	movem.l	(%sp)+,%d1-%d2/%a0-%a2
+	rts
+
 str:
 	.string "Haiku!"
-h1:
-	.string "H1"
-h2:
-	.string "H2"
-h3:
-	.string "H3"
+label_prg:
+	.string "P" //"RG boot"
+label_floppy:
+	.string "F" //"loppy boot"
 h4:
 	.string "H4"
 h5:
 	.string "H5"
-unimpl:
-	.string "Unimplemented."
 msg_j1:
-	.string "jumping to haiku_loader."
-
+	.string "Jumping to haiku_loader."
 
 shell_end:
 	//.fill	(0x01fe - shell_end), 1, 0x55
@@ -301,8 +414,8 @@ shell_end:
  */
 
 prg_start:
-	//lea		h4,%a0
-	//bsr		puts
+	lea		label_prg,%a0
+	bsr		puts
 
 	// .prg:
 	// we need to switch to supervisor mode anyway
@@ -312,7 +425,7 @@ prg_start:
 	addq.l		#6,%sp
 	move.l		%d0,saved_super_stack
 	
-#if 1
+#if 0
 			//_membot
 	move.l		#0x432,%a0
 	move.l		(%a0),%d0
