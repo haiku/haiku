@@ -48,7 +48,7 @@
 </table>
 
 <h1><a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h1>
-<p>The fact that it's called "<i>beos</i>" shows Haiku's BeOS heritage. It wasn't renamed yet to ensure backward compatibility with BeOS software.<br />
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
 Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 <p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
 Instead, you put it into the mirrored hierarchy under <span class="path">/boot/common/</span> or <span class="path">/boot/home/config/</span>.</p>
