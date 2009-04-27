@@ -206,6 +206,9 @@ ide_adapter_inthand(void *arg)
 			+ IDE_BM_STATUS_REG);
 		if ((status & IDE_BM_STATUS_INTERRUPT) == 0)
 			return B_UNHANDLED_INTERRUPT;
+		// clear pending PCI bus master DMA interrupt
+		pci->write_io_8(device, channel->bus_master_base + IDE_BM_STATUS_REG,
+			(status & 0xf8) | IDE_BM_STATUS_INTERRUPT);
 	}
 
 	// acknowledge IRQ
