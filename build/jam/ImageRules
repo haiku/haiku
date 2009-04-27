@@ -1056,6 +1056,7 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	Depends $(image) : $(haikuLoader) ;
 	Depends $(image) : $(archive) ;
 	#MakeLocateDebug $(image) ;
+	FLOPPY_IMAGE_SIZE on $(image) = $(HAIKU_BOOT_FLOPPY_IMAGE_SIZE) ;
 	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
 }
@@ -1064,7 +1065,7 @@ actions BuildFloppyBootImage1
 {
 	$(RM) $(<)
 	# make an empty image
-	dd if=/dev/zero of=$(<) bs=2k count=1440
+	dd if=/dev/zero of=$(<) bs=1k count=$(FLOPPY_IMAGE_SIZE)
 	# add haiku_loader
 	dd if=$(>[1]) of=$(<) conv=notrunc
 	# add the boot drivers tgz archive
