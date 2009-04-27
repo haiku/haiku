@@ -502,6 +502,21 @@ ScreenshotWindow::_CenterAndShow()
 void
 ScreenshotWindow::_UpdatePreviewPanel()
 {
+	float height = 150.0f;
+
+	float width = (fScreenshot->Bounds().Width() / 
+		fScreenshot->Bounds().Height()) * height;
+
+	// to prevent a preview way too wide
+	if (width > 400.0f) {
+		width = 400.0f;
+		height = (fScreenshot->Bounds().Height() /
+			fScreenshot->Bounds().Width()) * width;
+	}
+
+	fPreviewBox->SetExplicitMinSize(BSize(width, height));
+	fPreviewBox->SetExplicitMaxSize(BSize(width, height));
+
 	fPreviewBox->ClearViewBitmap();
 	fPreviewBox->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
 		fPreviewBox->Bounds(), B_FOLLOW_ALL, 0);
