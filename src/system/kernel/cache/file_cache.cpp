@@ -154,7 +154,9 @@ PrecacheIO::Init()
 }
 
 
-//!	Cache has to be locked when calling this method.
+/*!	Cache has to be locked when calling this method, but it will be temporarily
+    unlocked during execution.
+*/
 status_t
 PrecacheIO::Start()
 {
@@ -185,8 +187,14 @@ PrecacheIO::Start()
 		return B_NO_MEMORY;
 	}
 
-	return vfs_asynchronous_read_pages(fRef->vnode, NULL, fOffset, fVecs,
-		vecCount, fSize, B_PHYSICAL_IO_REQUEST, this);
+	fCache->Unlock();
+
+	status_t status = vfs_asynchronous_read_pages(fRef->vnode, NULL, fOffset,
+		fVecs, vecCount, fSize, B_PHYSICAL_IO_REQUEST, this);
+
+	fCache->Lock();
+
+	return status;
 }
 
 
