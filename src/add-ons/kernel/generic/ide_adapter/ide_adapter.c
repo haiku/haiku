@@ -32,7 +32,7 @@
 #define TRACE dprintf
 
 // set this to 1 for the ata stack, or 0 for the ide stack
-#define ATA_STACK 0
+// #define ATA_STACK 0
 
 static ide_for_controller_interface *ide;
 static device_manager_info *pnp;

@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src add-ons kernel generic ide_adapter ;
 
 UsePrivateHeaders drivers kernel ;
 
+local defines = [ FDefines ATA_STACK=$(HAIKU_ATA_STACK) ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
 KernelAddon ide_adapter :
 	ide_adapter.c
 	;
