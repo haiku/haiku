@@ -772,7 +772,7 @@ TarFS::Volume::_Inflate(boot::Partition *partition, void* cookie, off_t offset,
 		offset += bytesRead;
 
 		if (zStream.avail_in != 0 && status != Z_STREAM_END)
-			dprintf("tarfs: didn't read whole block!\n");
+			dprintf("tarfs: didn't read whole block: %s\n", zStream.msg);
 	} while (status == Z_OK);
 
 	inflateEnd(&zStream);
