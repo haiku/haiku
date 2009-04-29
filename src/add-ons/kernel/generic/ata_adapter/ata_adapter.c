@@ -31,9 +31,6 @@
 
 #define TRACE dprintf
 
-// set this to 1 for the ata stack, or 0 for the ide stack
-// #define ATA_STACK 0
-
 static ide_for_controller_interface *ide;
 static device_manager_info *pnp;
 
@@ -190,7 +187,6 @@ ide_adapter_read_pio(ide_adapter_channel_info *channel, uint16 *data,
 static int32
 ide_adapter_inthand(void *arg)
 {
-#if ATA_STACK
 	ide_adapter_channel_info *channel = (ide_adapter_channel_info *)arg;
 	pci_device_module_info *pci = channel->pci;
 	pci_device *device = channel->device;
@@ -217,36 +213,6 @@ ide_adapter_inthand(void *arg)
 	} else {
 		return B_UNHANDLED_INTERRUPT;
 	}
-
-#else
-	ide_adapter_channel_info *channel = (ide_adapter_channel_info *)arg;
-	pci_device_module_info *pci = channel->pci;
-	pci_device *device = channel->device;
-	uint8 status;
-
-	SHOW_FLOW0(3, "");
-
-	if (channel->lost)
-		return B_UNHANDLED_INTERRUPT;
-
-	// add test whether this is really our IRQ
-	if (channel->dmaing) {
-		// in DMA mode, there is a safe test
-		// in PIO mode, this don't work
-		status = pci->read_io_8(device, channel->bus_master_base
-			+ IDE_BM_STATUS_REG);
-		if ((status & IDE_BM_STATUS_INTERRUPT) == 0)
-			return B_UNHANDLED_INTERRUPT;
-		// clear pending PCI bus master DMA interrupt
-		pci->write_io_8(device, channel->bus_master_base + IDE_BM_STATUS_REG,
-			(status & 0xf8) | IDE_BM_STATUS_INTERRUPT);
-	}
-
-	// acknowledge IRQ
-	status = pci->read_io_8(device, channel->command_block_base + 7);
-
-	return ide->irq_handler(channel->ide_channel, status);
-#endif
 }
 
 
@@ -319,7 +285,6 @@ ide_adapter_start_dma(ide_adapter_channel_info *channel)
 static status_t
 ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 {
-#if ATA_STACK
 	pci_device_module_info *pci = channel->pci;
 	pci_device *device = channel->device;
 	uint8 command;
@@ -348,51 +313,6 @@ ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 		return B_ERROR;
 
 	return B_OK;
-#else
-	pci_device_module_info *pci = channel->pci;
-	pci_device *device = channel->device;
-	uint8 command;
-	uint8 status, newStatus;
-
-	command = pci->read_io_8(device, channel->bus_master_base
-		+ IDE_BM_COMMAND_REG);
-
-	command &= ~IDE_BM_COMMAND_START_STOP;
-	channel->dmaing = false;
-
-	pci->write_io_8(device, channel->bus_master_base + IDE_BM_COMMAND_REG,
-		command);
-
-	status = pci->read_io_8(device, channel->bus_master_base
-		+ IDE_BM_STATUS_REG);
-
-	// reset interrupt/error flags
-	newStatus = status | IDE_BM_STATUS_INTERRUPT | IDE_BM_STATUS_ERROR;
-	pci->write_io_8(device, channel->bus_master_base + IDE_BM_STATUS_REG,
-		newStatus);
-
-	if ((status & IDE_BM_STATUS_ERROR) != 0)
-		return B_ERROR;
-/*
-	// this doesn't work anymore, because the
-	// interrupt handler always clears this bit now
-	if ((status & IDE_BM_STATUS_INTERRUPT) == 0) {
-		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-			SHOW_ERROR0( 2, "DMA transfer aborted" );
-			return B_ERROR;
-		}
-
-		SHOW_ERROR0( 2, "DMA transfer: buffer underrun" );
-		return B_DEV_DATA_UNDERRUN;
-	}
-*/
-	if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-		SHOW_ERROR0( 2, "DMA transfer: buffer too large" );
-		return B_DEV_DATA_OVERRUN;
-	}
-
-	return B_OK;
-#endif
 }
 
 
@@ -484,14 +404,8 @@ ide_adapter_init_channel(device_node *node,
 
 	TRACE("PCI-IDE: init channel done\n");
 
-#if ATA_STACK
 	// disable interrupts
 	ide_adapter_write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien);
-#else
-	// enable interrupts so the channel is ready to run
-	ide_adapter_write_device_control(channel, ide_devctrl_bit3);
-#endif
-
 
 	*cookie = channel;
 
