@@ -56,22 +56,25 @@ _bs_entry:
 
 //FAT lookalike to avoid nasty things from happening
 // http://alive.atari.org/alive10/btmania.php
+// MS-DOS values :
+// http://support.microsoft.com/kb/75131/en
+// http://alumnus.caltech.edu/~pje/dosfiles.html
 	.ascii	"Haiku "
 	.byte	0xbe, 0x50, 0x38 // id
-	//LE
+	//LITTLE ENDIAN!
 	.byte	0x00, 0x02	//BPS
 	.byte	0x02		//SPC
 	//.byte	0x00		//???
 	.byte	0x00, 0x02	//RES - number of reserved sectors
-	.byte	0x00//0x02	//NFATS
-	.byte	0x00/*70*/, 0x00	//NDIRS
-	.byte	0xa0, 0x05		//NSECTS
-	.byte	0xf9			//MEDIA
-	.byte	0x05, 0x00		//SPF
+	.byte	0x00		//NFATS
+	.byte	0x00, 0x00	//NDIRS
+	.byte	0x40, 0x0b	//NSECTS
+	.byte	0xf0		//MEDIA
+	.byte	0x05, 0x00	//SPF
 _fat_spt:	
-	.byte	0x09, 0x00		//SPT
-	.byte	0x02, 0x00		//NSIDES
-	.byte	0x00, 0x00		//NHID
+	.byte	0x12, 0x00	//SPT
+	.byte	0x02, 0x00	//NSIDES
+	.byte	0x00, 0x00	//NHID
 	// we're done
 
 sNumSectors:
@@ -79,7 +82,8 @@ sNumSectors:
 	// written by the "makeflop" command in 512 byte blocks
 	// 0x180 is the allowed maximum, as the zipped TAR with the
 	// kernel and the boot module might start at offset 192 kB
-	.word	0x0300 //0x0180
+	//.word	0x0300 //0x0180
+	.word	BOOT_ARCHIVE_IMAGE_OFFSET*2
 
 real_entry:
 
@@ -125,16 +129,20 @@ floppy_start:
 	tst.w			%d0
 	bne			load_failed
 floppy_done:
-	lea		h4,%a0
-	bsr		puts
 	// setup stack
 	move.l		#ATARI_ZBEOS_STACK_END,%sp
-	lea		h5,%a0
-	bsr		puts
-	move.l		#0,%d0
 	//jmp			ATARI_ZBEOS_BASE+512
 
+	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
+	move.w		TOSVAR_bootdev,%d0
+	// XXX:	 use uint16 ??
+	move.b		%d0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
 	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
+
+	lea		msg_j1,%a0
+	bsr		puts
+	move.l		#0,%d0
+
 	jmp		_start
 
 load_failed:
@@ -310,18 +318,6 @@ failure_string:
 //	.string	"."
 
 
-saved_super_stack:
-	.long	0
-
-GLOBAL(gBootedFromImage):
-	.byte	0
-
-GLOBAL(gBootDriveID):
-	.byte	0
-
-GLOBAL(gBootPartitionOffset):
-	.long	0
-
 
 
 putx:
@@ -477,6 +473,27 @@ copysect_loop:
 	// all done
 super_done:
 	// XXX: copy the rest !
+	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
+	move.b		#0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
+	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
+
 	move.l		#0,%d0
+
 	//jmp			ATARI_ZBEOS_BASE+512
 	jmp			_start
+
+saved_super_stack:
+	.long	0
+
+GLOBAL(gBootedFromImage):
+	.byte	0
+
+GLOBAL(gBootDriveAPI):
+	.byte	ATARI_BOOT_DRVAPI_UNKNOWN
+
+GLOBAL(gBootDriveID):
+	.byte	0
+
+GLOBAL(gBootPartitionOffset):
+	.long	0
+

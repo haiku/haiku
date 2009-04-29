@@ -809,6 +809,18 @@ extern void nat_feat_debugprintf(const char *str);
 
 #endif /* __ASSEMBLER__ */
 
+/*
+ * Drive API used by the bootsector
+ * gBootDriveAPI is set to one of those
+ * not all are implemented
+ */
+#define ATARI_BOOT_DRVAPI_UNKNOWN 0
+#define ATARI_BOOT_DRVAPI_FLOPPY  1   // Floprd()
+#define ATARI_BOOT_DRVAPI_BIOS    2   // Rwabs()
+#define ATARI_BOOT_DRVAPI_XBIOS   3   // DMAread()
+#define ATARI_BOOT_DRVAPI_XHDI    4   // XHReadWrite()
+#define ATARI_BOOT_DRVAPI_METADOS 5   // Metaread()
+
 #ifdef __cplusplus
 }
 #endif

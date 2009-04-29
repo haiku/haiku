@@ -15,7 +15,7 @@
 #include "Handle.h"
 #include "toscalls.h"
 
-#define TRACE_DEVICES
+//#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
@@ -25,6 +25,7 @@
 
 // exported from shell.S
 extern uint8 gBootedFromImage;
+extern uint8 gBootDriveAPI; // ATARI_BOOT_DRIVE_API_*
 extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
@@ -702,8 +703,11 @@ FloppyDrive::FloppyDrive(int handle)
 		dprintf("getting drive parameters for: %u failed!\n", fHandle);
 		return;
 	}
+	// XXX: probe! this is a std 1.44kB floppy
 	fBlockSize = 512;
 	fParameters.sectors = 1440 * 1024 / 512;
+	fParameters.sectors_per_track = 18;
+	fParameters.heads = 2;
 	fSize = fParameters.sectors * fBlockSize;
 	fHasParameters = false;
 /*
@@ -797,12 +801,32 @@ FloppyDrive::FillIdentifier()
 }
 
 
+static void
+hexdump(uint8 *buf, uint32 offset)
+{
+// hexdump
+	
+	for (int i = 0; i < 512; i++) {
+		if ((i % 16) == 0)
+			TRACE(("%08lx ", offset+i));
+		if ((i % 16) == 8)
+		TRACE((" "));
+		TRACE((" %02x", buf[i]));
+
+		if ((i % 16) == 15)
+			TRACE(("\n"));
+	}
+}
+
+
 ssize_t
 FloppyDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 {
 	int sectorsPerBlocks = (fBlockSize / 512);
+	int sectorsPerTrack = fParameters.sectors_per_track;
+	int heads = fParameters.heads;
 	int32 ret;
-	TRACE(("FloppyDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
+	//TRACE(("FloppyDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
 	// force single sector reads to avoid crossing track boundaries
 	for (int i = 0; i < count; i++) {
 		uint8 *buf = (uint8 *)buffer;
@@ -810,17 +834,23 @@ FloppyDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 		
 		int16 track, side, sect;
 		sect = (first + i) * sectorsPerBlocks;
-		track = sect / (9 * 2);
-		side = (sect / 9) % 2;
-		sect %= 9;
+		track = sect / (sectorsPerTrack * heads);
+		side = (sect / sectorsPerTrack) % heads;
+		sect %= sectorsPerTrack;
 		sect++; // 1-based
 	
 		
-		TRACE(("FloppyDrive::%s: THS: %d %d %d\n", __FUNCTION__, track, side, sect));
+		/*
+		  TRACE(("FloppyDrive::%s: THS: %d %d %d\n",
+		  __FUNCTION__, track, side, sect));
+		*/
 		ret = Floprd(buf, 0L, fHandle, sect, track, side, 1);
 		if (ret < 0)
 			return toserror(ret);
+		//if (first >= 1440)
+		//hexdump(buf, (uint32)(first+i)*512);
 	}
+
 	return count;
 }
 
@@ -975,7 +1005,7 @@ XHDIDrive::XHDIDrive(int handle, uint16 major, uint16 minor)
 
 	fMajor = major;
 	fMinor = minor;
-	TRACE(("XHDIDrive::%s(%d, %d,%d)\n", __FUNCTION__, handle, fMajor, fMinor));
+	TRACE(("XHDIDrive::%s(%d, %d, %d)\n", __FUNCTION__, handle, fMajor, fMinor));
 
 	product[32] = '\0';
 	err = XHInqTarget(major, minor, &fBlockSize, &devflags, product);
@@ -1107,12 +1137,22 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	//XXX: FIXME
 	//BlockHandle *drive = new(nothrow) BlockHandle(gBootDriveID);
 	BlockHandle *drive;
-	switch (gBootDriveID) {
-		case 0:
-		case 1:
+	switch (gBootDriveAPI) {
+		case ATARI_BOOT_DRVAPI_FLOPPY:
 			drive = new(nothrow) FloppyDrive(gBootDriveID);
 			break;
+			/*
+		case ATARI_BOOT_DRVAPI_XBIOS:
+			drive = new(nothrow) DMADrive(gBootDriveID);
+			break;
+			*/
+		case ATARI_BOOT_DRVAPI_XHDI:
+			drive = new(nothrow) XHDIDrive(gBootDriveID, gBootDriveID, 0);
+			break;
+		case ATARI_BOOT_DRVAPI_UNKNOWN:
 		default:
+			dprintf("unknown boot drive API %d\n", gBootDriveAPI);
+			return B_ERROR;
 			drive = new(nothrow) BIOSDrive(gBootDriveID);
 	}
 	if (drive->InitCheck() != B_OK) {

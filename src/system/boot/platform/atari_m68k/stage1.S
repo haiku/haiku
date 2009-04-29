@@ -15,6 +15,8 @@
  * http://www.fortunecity.com/skyscraper/apple/308/html/chap3.htm
  * http://leonard.oxg.free.fr/articles/multi_atari/multi_atari.html
  * http://alive.atari.org/alive10/btmania.php
+ * AHDI boot args:
+ * http://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/atari/stand/xxboot/ahdi-xxboot/xxboot.ahdi.S
  * gas stuff:
  * http://www.gnu.org/software/binutils/manual/gas-2.9.1/html_chapter/as_18.html#SEC214
  * 
