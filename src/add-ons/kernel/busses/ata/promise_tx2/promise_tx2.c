@@ -91,20 +91,7 @@ inthand(void *arg)
 	if ((pci->read_io_8(device, channel->bus_master_base + 3) & 0x20) == 0)
 		return B_UNHANDLED_INTERRUPT;
 
-	if (channel->dmaing) {
-		// in DMA mode, there is a safe test
-		// in PIO mode, this doesn't work
-		*(uint8 *)&bm_status = pci->read_io_8( device,
-			channel->bus_master_base + ide_bm_status_reg );
-
-		if (!bm_status.interrupt)
-			return B_UNHANDLED_INTERRUPT;
-	}
-
-	// acknowledge IRQ
-	status = pci->read_io_8(device, channel->command_block_base + 7);
-
-	return ide->irq_handler(channel->ide_channel, status);
+	return ide_adapter->inthand(arg);
 }
 
 

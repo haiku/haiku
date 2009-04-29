@@ -761,40 +761,27 @@ dma_finish(void *channelCookie)
 
 	FLOW("dma_finish enter\n");
 
-	command = *channel->bm_command_reg & ~IDE_BM_COMMAND_START_STOP;
-	channel->dma_active = false;
-
-	*channel->bm_command_reg = command;
-
 	status = *channel->bm_status_reg;
 
-	*channel->bm_status_reg = status | IDE_BM_STATUS_INTERRUPT
-		| IDE_BM_STATUS_ERROR;
+	command = *channel->bm_command_reg;
+	*channel->bm_command_reg = command & ~IDE_BM_COMMAND_START_STOP;
+	
+	channel->dma_active = false;
 
+	*channel->bm_status_reg = status | IDE_BM_STATUS_ERROR;
 	*channel->dev_ctrl; // read altstatus to flush
 
+	if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
+		TRACE("dma_finish: buffer too large\n");
+		return B_DEV_DATA_OVERRUN;
+	} 
 	if ((status & IDE_BM_STATUS_ERROR) != 0) {
 		FLOW("dma_finish: failed\n");
 		return B_ERROR;
 	}
 
-	if ((status & IDE_BM_STATUS_INTERRUPT) == 0) {
-		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-			TRACE("dma_finish: transfer aborted\n");
-			return B_ERROR;
-		} else {
-			TRACE("dma_finish: buffer underrun\n");
-			return B_DEV_DATA_UNDERRUN;
-		}
-	} else {
-		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-			TRACE("dma_finish: buffer too large\n");
-			return B_DEV_DATA_OVERRUN;
-		} else {
-			FLOW("dma_finish leave\n");
-			return B_OK;
-		}
-	}
+	FLOW("dma_finish leave\n");
+	return B_OK;
 }
 
 
@@ -802,11 +789,12 @@ static int32
 handle_interrupt(void *arg)
 {
 	controller_data *controller = arg;
-	uint8 status;
-	int32 result, ret;
+	uint8 statusATA, statusBM;
+	int32 result;
 	int i;
 
 //	FLOW("handle_interrupt\n");
+
 
 	result = B_UNHANDLED_INTERRUPT;
 
@@ -815,21 +803,19 @@ handle_interrupt(void *arg)
 		if (!channel || channel->lost)
 			continue;
 
-		if (channel->dma_active) {
-			if ((*channel->bm_status_reg & IDE_BM_STATUS_INTERRUPT) == 0)
-				continue;
-		} else {
-			// for PIO, read the "Task File Configuration + Status" Interrupt
-			// status
-			if (!(*channel->stat & (1 << 11)))
-				continue;
-		}
+		// this could be a spurious interrupt, so always read status
+		// register unconditionally to acknowledge those
+		statusATA = *(channel->command_block + 7);
 
-		// acknowledge IRQ
-		status = *(channel->command_block + 7);
-		ret = ide->irq_handler(channel->ide_channel, status);
-		if (ret == B_INVOKE_SCHEDULER || result == B_UNHANDLED_INTERRUPT)
-			result = ret;
+		if (!channel->dma_active)
+			continue;
+
+		statusBM = *channel->bm_status_reg;
+		if (statusBM & IDE_BM_STATUS_INTERRUPT) {
+			*channel->bm_status_reg = (statusBM & 0xf8) | IDE_BM_STATUS_INTERRUPT;
+			ide->irq_handler(channel->ide_channel, statusATA);
+			result = B_INVOKE_SCHEDULER;
+		}
 	}
 
 	return result;
