@@ -255,6 +255,7 @@ PlaylistListView::AttachedToWindow()
 void
 PlaylistListView::MessageReceived(BMessage* message)
 {
+//	message->PrintToStream();
 	switch (message->what) {
 		// PlaylistObserver messages
 		case MSG_PLAYLIST_REF_ADDED: {
@@ -439,6 +440,16 @@ PlaylistListView::Randomize()
 
 	fCommandStack->Perform(new (nothrow) RandomizePLItemsCommand(fPlaylist,
 		(int32*)indices.Items(), indices.CountItems()));
+}
+
+
+void
+PlaylistListView::PermanentRemoveSelectedFile(bool permRemove)
+{
+	BAutolock _(fPlaylist);
+	int32 index = fPlaylist->CurrentRefIndex();
+	fPlaylist->SetCurrentRefIndex(index + 1);
+	fPlaylist->RemoveRefPermanent(index, permRemove);
 }
 
 

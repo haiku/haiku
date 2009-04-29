@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007-2008 Stephan Aßmus <superstippi@gmx.de> (GPL->MIT ok)
- * Copyright (C) 2007-2008 Fredrik Modéen <fredrik@modeen.se>
+ * Copyright (C) 2007-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -92,7 +92,9 @@ enum {
 	M_SELECT_VIDEO_TRACK		= 0x00010000,
 	M_SELECT_VIDEO_TRACK_END	= 0x000fffff,
 
-	M_SET_PLAYLIST_POSITION
+	M_SET_PLAYLIST_POSITION,
+	
+	M_FILE_DELETE
 };
 
 //#define printf(a...)
@@ -198,7 +200,7 @@ MainWin::MainWin()
 
 MainWin::~MainWin()
 {
-	printf("MainWin::~MainWin\n");
+//	printf("MainWin::~MainWin\n");
 
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 	fPlaylist->RemoveListener(fPlaylistObserver);
@@ -239,8 +241,8 @@ MainWin::FrameResized(float newWidth, float newHeight)
 	bool noMenu = fNoMenu || fIsFullscreen;
 	bool noControls = fNoControls || fIsFullscreen;
 
-	printf("FrameResized enter: newWidth %.0f, newHeight %.0f\n",
-		newWidth, newHeight);
+//	printf("FrameResized enter: newWidth %.0f, newHeight %.0f\n",
+//		newWidth, newHeight);
 
 	int maxVideoWidth  = int(newWidth) + 1;
 	int maxVideoHeight = int(newHeight) + 1
@@ -264,7 +266,7 @@ MainWin::FrameResized(float newWidth, float newHeight)
 
 	if (maxVideoHeight == 0) {
 		bool hidden = fVideoView->IsHidden();
-printf("  video view hidden: %d\n", hidden);
+//		printf("  video view hidden: %d\n", hidden);
 		if (!hidden)
 			fVideoView->Hide();
 	} else {
@@ -285,7 +287,7 @@ printf("  video view hidden: %d\n", hidden);
 //		y += fControlsHeight;
 	}
 
-	printf("FrameResized leave\n");
+//	printf("FrameResized leave\n");
 }
 
 
@@ -570,9 +572,7 @@ MainWin::MessageReceived(BMessage *msg)
 				_ToggleFullscreen();
 			_ResizeWindow(400);
 			break;
-
-/*
-		
+/*		
 		case B_ACQUIRE_OVERLAY_LOCK:
 			printf("B_ACQUIRE_OVERLAY_LOCK\n");
 			fVideoView->OverlayLockAcquire();
@@ -582,10 +582,9 @@ MainWin::MessageReceived(BMessage *msg)
 			printf("B_RELEASE_OVERLAY_LOCK\n");
 			fVideoView->OverlayLockRelease();
 			break;
-	
+*/	
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			printf("B_MOUSE_WHEEL_CHANGED\n");
 			float dx = msg->FindFloat("be:wheel_delta_x");
 			float dy = msg->FindFloat("be:wheel_delta_y");
 			bool inv = modifiers() & B_COMMAND_KEY;
@@ -595,7 +594,7 @@ MainWin::MessageReceived(BMessage *msg)
 			if (dy < -0.1)	PostMessage(inv ? M_SKIP_NEXT : M_VOLUME_UP);
 			break;
 		}
-*/
+
 		case M_SKIP_NEXT:
 			fControls->SkipForward();
 			break;
@@ -666,7 +665,9 @@ MainWin::MessageReceived(BMessage *msg)
 			// the global settings instance...
 			_AdoptGlobalSettings();
 			break;
-
+		case M_FILE_DELETE:
+			fControls->SkipForwardAndDelete();
+			break;
 		default:
 			// let BWindow handle the rest
 			BWindow::MessageReceived(msg);
@@ -837,7 +838,7 @@ MainWin::_RefsReceived(BMessage* msg)
 void
 MainWin::_SetupWindow()
 {
-	printf("MainWin::_SetupWindow\n");	
+//	printf("MainWin::_SetupWindow\n");	
 	// Populate the track menus
 	_SetupTrackMenus();
 	// Enable both if a file was loaded
@@ -1261,10 +1262,10 @@ MainWin::_KeyDown(BMessage *msg)
 	
 	uint32 key		 = msg->FindInt32("key");
 	uint32 raw_char  = msg->FindInt32("raw_char");
-	uint32 modifiers = msg->FindInt32("modifiers");
+	uint32 modifier = msg->FindInt32("modifiers");
 	
 	printf("key 0x%lx, raw_char 0x%lx, modifiers 0x%lx\n", key, raw_char,
-		modifiers);
+		modifier);
 	
 	switch (raw_char) {
 		case B_SPACE:
@@ -1279,14 +1280,14 @@ MainWin::_KeyDown(BMessage *msg)
 				break;
 
 		case B_ENTER:		// Enter / Return
-			if (modifiers & B_COMMAND_KEY) {
+			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
 				return B_OK;
 			} else
 				break;
 				
 		case B_TAB:
-			if ((modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
+			if ((modifier & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 					| B_MENU_KEY)) == 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
 				return B_OK;
@@ -1294,7 +1295,7 @@ MainWin::_KeyDown(BMessage *msg)
 				break;
 		
 		case B_UP_ARROW:
-			if (modifiers & B_COMMAND_KEY) {
+			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_SKIP_NEXT);
 			} else {
 				PostMessage(M_VOLUME_UP);
@@ -1302,7 +1303,7 @@ MainWin::_KeyDown(BMessage *msg)
 			return B_OK;
 
 		case B_DOWN_ARROW:
-			if (modifiers & B_COMMAND_KEY) {
+			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_SKIP_PREV);
 			} else {
 				PostMessage(M_VOLUME_DOWN);
@@ -1310,7 +1311,7 @@ MainWin::_KeyDown(BMessage *msg)
 			return B_OK;
 			
 		case B_RIGHT_ARROW:
-			if (modifiers & B_COMMAND_KEY) {
+			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_VOLUME_UP);
 			} else {
 				PostMessage(M_SKIP_NEXT);
@@ -1318,7 +1319,7 @@ MainWin::_KeyDown(BMessage *msg)
 			return B_OK;
 
 		case B_LEFT_ARROW:
-			if (modifiers & B_COMMAND_KEY) {
+			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_VOLUME_DOWN);
 			} else {
 				PostMessage(M_SKIP_PREV);
@@ -1336,17 +1337,15 @@ MainWin::_KeyDown(BMessage *msg)
 
 	switch (key) {
 		case 0x3a:  		// numeric keypad +
-			if ((modifiers & B_COMMAND_KEY) == 0) {
-				printf("if\n");
+			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_UP);
 				return B_OK;
 			} else {
-				printf("else\n");
 				break;
 			}
 
 		case 0x25:  		// numeric keypad -
-			if ((modifiers & B_COMMAND_KEY) == 0) {
+			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_DOWN);
 				return B_OK;
 			} else {
@@ -1370,6 +1369,14 @@ MainWin::_KeyDown(BMessage *msg)
 		case 0x48:			// numeric keypad left arrow
 			PostMessage(M_SKIP_PREV);
 			return B_OK;
+		case 0x34:			//delete button
+		case 0x3e: 			//d for delete
+		case 0x2b:			//t for Trash
+			if (modifiers() & B_COMMAND_KEY) {
+				PostMessage(M_FILE_DELETE);
+				return B_OK;
+			}
+			break;
 	}
 	
 	return B_ERROR;

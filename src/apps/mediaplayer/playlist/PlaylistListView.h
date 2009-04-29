@@ -45,6 +45,7 @@ class PlaylistListView : public SimpleListView {
 									int32 appendIndex);
 
 			void				Randomize();
+			void				PermanentRemoveSelectedFile(bool permRemove);
 
  private:
 			void				_FullSync();

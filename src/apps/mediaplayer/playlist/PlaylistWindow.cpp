@@ -53,7 +53,11 @@ enum {
 
 	// edit
 	M_PLAYLIST_EMPTY		= 'emty',
-	M_PLAYLIST_RANDOMIZE	= 'rand'
+	M_PLAYLIST_RANDOMIZE	= 'rand',
+	
+	// 
+	M_PLAYLIST_DELETE_FILE	= 'dlfi',
+	M_PLAYLIST_PER_DEL_FILE	= 'pdfi'
 };
 
 #define SPACE 5
@@ -191,11 +195,45 @@ PlaylistWindow::MessageReceived(BMessage* message)
 		case M_PLAYLIST_RANDOMIZE:
 			fListView->Randomize();
 			break;
-
+		case M_PLAYLIST_DELETE_FILE:
+			fListView->PermanentRemoveSelectedFile(false);
+			break;	
+		case M_PLAYLIST_PER_DEL_FILE:
+			fListView->PermanentRemoveSelectedFile(true);		
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+PlaylistWindow::DispatchMessage(BMessage *message, BHandler *handler)
+{
+	if (message->what == B_KEY_DOWN) {
+
+		uint32 key = message->FindInt32("key");
+	
+		switch (key) {
+			case 0x34:			//delete button
+			case 0x3e: 			//d for delete
+			case 0x2b:			//t for Trash
+				if (modifiers() & B_COMMAND_KEY) {
+					fListView->PermanentRemoveSelectedFile(true);
+					return;
+				}
+				break;
+			case 0x2a:			//r for Remove
+				if (modifiers() & B_COMMAND_KEY) {
+					fListView->PermanentRemoveSelectedFile(false);
+					return;
+				}
+				break;
+		}
+	}
+	
+	BWindow::DispatchMessage(message, handler);
 }
 
 
@@ -227,10 +265,16 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	fRedoMI = new BMenuItem("Redo", new BMessage(B_REDO), 'Z', B_SHIFT_KEY);
 	editMenu->AddItem(fRedoMI);
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem("Make Empty",
-		new BMessage(M_PLAYLIST_EMPTY), 'N'));
 	editMenu->AddItem(new BMenuItem("Randomize",
 		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
+	editMenu->AddSeparatorItem();
+	editMenu->AddItem(new BMenuItem("Remove",
+		new BMessage(M_PLAYLIST_DELETE_FILE), 'R'));	
+	editMenu->AddItem(new BMenuItem("Remove Permanent",
+		new BMessage(M_PLAYLIST_PER_DEL_FILE), 'T', B_COMMAND_KEY));	
+	editMenu->AddItem(new BMenuItem("Remove All",
+		new BMessage(M_PLAYLIST_EMPTY), 'N'));
+
 	menuBar->AddItem(editMenu);
 
 	AddChild(menuBar);

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen 	<marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus 	<superstippi@gmx.de>
- * Copyright (C) 2008 Fredrik Modéen 	<fredrik@modeen.se> (I have no problem changing my things to MIT)
+ * Copyright (C) 2008-2009 Fredrik Modéen 	<[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -68,6 +68,9 @@ public:
 			entry_ref			RemoveRef(int32 index,
 									bool careAboutCurrentIndex = true);
 
+			void				RemoveRefPermanent(int32 index, 
+									bool removeToTrash);
+
 			bool				AdoptPlaylist(Playlist& other);
 			bool				AdoptPlaylist(Playlist& other, int32 index);
 
@@ -101,6 +104,7 @@ private:
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
 	static	BString				_MIMEString(const entry_ref* entry);
+			void				_DeleteEntry(const entry_ref* file);
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;
 			void				_NotifyRefRemoved(int32 index) const;

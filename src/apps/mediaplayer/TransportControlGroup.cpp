@@ -301,7 +301,7 @@ TransportControlGroup::_ExponentialToLinear(float db_in)
 		db = db * (fabs(kVolumeDbMin) / pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative)));
 		db = -db;
 	}
-	printf("_ExponentialToLinear %.4f => %.4f\n", db_in, db);
+	//printf("_ExponentialToLinear %.4f => %.4f\n", db_in, db);
 	return db;
 }
 

@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2008-2009 Fredrik Modéen 	<[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,7 +29,6 @@
 #include "Controller.h"
 #include "Playlist.h"
 #include "PlaylistObserver.h"
-
 
 ControllerView::ControllerView(BRect frame, Controller* controller,
 		Playlist* playlist)
@@ -70,7 +70,7 @@ ControllerView::MessageReceived(BMessage *msg)
 		case MSG_PLAYLIST_REF_REMOVED:
 		case MSG_PLAYLIST_REFS_SORTED:
 		case MSG_PLAYLIST_CURRENT_REF_CHANGED:
-			CheckSkippable();
+			_CheckSkippable();
 			break;
 
 		default:
@@ -107,7 +107,7 @@ void
 ControllerView::Rewind()
 {
 	// TODO: make it so this function is called repeatedly
-	printf("ControllerView::Rewind()\n");
+	//printf("ControllerView::Rewind()\n");
 }
 
 
@@ -115,7 +115,7 @@ void
 ControllerView::Forward()
 {
 	// TODO: make it so this function is called repeatedly
-	printf("ControllerView::Forward()\n");
+	//printf("ControllerView::Forward()\n");
 }
 
 
@@ -132,6 +132,16 @@ ControllerView::SkipForward()
 {
 	BAutolock _(fPlaylist);
 	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+}
+
+
+void
+ControllerView::SkipForwardAndDelete()
+{
+	BAutolock _(fPlaylist);
+	int32 index = fPlaylist->CurrentRefIndex();
+	fPlaylist->SetCurrentRefIndex(index + 1);
+	fPlaylist->RemoveRefPermanent(index, true);
 }
 
 
@@ -161,7 +171,7 @@ ControllerView::PositionChanged(float value)
 
 
 void
-ControllerView::CheckSkippable()
+ControllerView::_CheckSkippable()
 {
 	BAutolock _(fPlaylist);
 
@@ -169,5 +179,3 @@ ControllerView::CheckSkippable()
 	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
 	SetSkippable(canSkipPrevious, canSkipNext);
 }
-
-

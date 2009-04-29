@@ -36,11 +36,11 @@ public:
 
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				DispatchMessage(BMessage *msg, BHandler *handler);
 
 private:
 			void				_CreateMenu(BRect& frame);
 			void				_ObjectChanged(const Notifier* object);
-
 			void				_SavePlaylist(const BMessage* filePanelMessage);
 			void				_SavePlaylist(const entry_ref& ref);
 			void				_SavePlaylist(BEntry& origEntry,

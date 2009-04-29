@@ -272,7 +272,7 @@ VideoNode::FormatChanged(const media_source &src,
 
 	fInput.format = format;
 
-	printf("VideoNode::FormatChanged leave\n");
+	//printf("VideoNode::FormatChanged leave\n");
 	return B_OK;	
 }
 

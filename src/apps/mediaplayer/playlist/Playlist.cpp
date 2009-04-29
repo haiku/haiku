@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
- * Copyright (C) 2008 Fredrik Modéen 	<fredrik@modeen.se> (I have no problem changing my things to MIT)
+ * Copyright (C) 2008-2009 Fredrik Modéen 	<[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,6 +39,11 @@
 using std::nothrow;
 
 // TODO: using BList for objects is bad, replace it with a template
+
+// TODO: Remove this and use Tracker's Command.h once it is moved into the private headers
+namespace BPrivate {
+	const uint32 kMoveToTrash = 'Ttrs';
+}
 
 Playlist::Listener::Listener() {}
 Playlist::Listener::~Listener() {}
@@ -280,6 +285,18 @@ Playlist::RemoveRef(int32 index, bool careAboutCurrentIndex)
 	}
 
 	return _ref;
+}
+
+
+void
+Playlist::RemoveRefPermanent(int32 index, bool removeToTrash)
+{
+	if (index != -1) {
+		entry_ref song = RemoveRef(index);
+
+		if(removeToTrash)
+			_DeleteEntry(&song);//Remove with tracker
+	}
 }
 
 
@@ -567,6 +584,17 @@ Playlist::_MIMEString(const entry_ref* ref)
 		nodeInfo.SetType(type.Type());
 	}
 	return BString(mimeString);	
+}
+
+
+void
+Playlist::_DeleteEntry(const entry_ref* file)
+{
+	// Move entry_ref to Trash
+	BMessage trash(BPrivate::kMoveToTrash);
+	trash.AddRef("refs", file);
+
+	BMessenger("application/x-vnd.Be-TRAK").SendMessage(&trash);		
 }
 
 

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007-2008 Stephan Aßmus <superstippi@gmx.de> (MIT Ok)
- * Copyright (C) 2007 Fredrik Modéen <fredrik@modeen.se>
+ * Copyright (C) 2007-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -231,14 +231,14 @@ Controller::SetTo(const entry_ref &ref)
 
 	err = mf->InitCheck();
 	if (err != B_OK) {
-		printf("Controller::SetTo: initcheck failed\n");
+		//printf("Controller::SetTo: initcheck failed\n");
 		_NotifyFileChanged();
 		return err;
 	}
 	
 	int trackcount = mf->CountTracks();
 	if (trackcount <= 0) {
-		printf("Controller::SetTo: trackcount %d\n", trackcount);
+		//printf("Controller::SetTo: trackcount %d\n", trackcount);
 		_NotifyFileChanged();
 		return B_MEDIA_NO_HANDLER;
 	}
@@ -248,15 +248,15 @@ Controller::SetTo(const entry_ref &ref)
 		media_format f;
 		err = t->EncodedFormat(&f);
 		if (err != B_OK) {
-			printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
-				i, err, strerror(err));
+			//printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
+			//	i, err, strerror(err));
 			mf->ReleaseTrack(t);
 			continue;
 		}
 		
 		if (t->Duration() <= 0) {
-			printf("Controller::SetTo: track index %d has no duration\n",i);
-			mf->ReleaseTrack(t);
+			//printf("Controller::SetTo: track index %d has no duration\n",i);
+			//mf->ReleaseTrack(t);
 			continue;
 		}
 		
@@ -272,8 +272,8 @@ Controller::SetTo(const entry_ref &ref)
 		}
 	}
 
-	printf("Controller::SetTo: %d audio track, %d video track\n",
-		AudioTrackCount(), VideoTrackCount());
+	//printf("Controller::SetTo: %d audio track, %d video track\n",
+	//	AudioTrackCount(), VideoTrackCount());
 
 	fMediaFile = mf;
 	mediaFileDeleter.Detach();
@@ -282,8 +282,8 @@ Controller::SetTo(const entry_ref &ref)
 	SelectVideoTrack(0);
 
 	if (fAudioTrackSupplier == NULL && fVideoTrackSupplier == NULL) {
-		printf("Controller::SetTo: no audio or video tracks found or "
-			"no decoders\n");
+		//printf("Controller::SetTo: no audio or video tracks found or "
+		//	"no decoders\n");
 		_NotifyFileChanged();
 		delete fMediaFile;
 		fMediaFile = NULL;
@@ -453,8 +453,8 @@ Controller::SelectVideoTrack(int n)
 	fDuration = max_c(a, v);
 	fVideoFrameRate = fVideoTrackSupplier->Format().u.raw_video.field_rate;
 	if (fVideoFrameRate <= 0.0) {
-		printf("Controller::SelectVideoTrack(%d) - invalid video frame rate: %.1f\n", n,
-			fVideoFrameRate);
+		//printf("Controller::SelectVideoTrack(%d) - invalid video frame rate: %.1f\n", n,
+		//	fVideoFrameRate);
 		fVideoFrameRate = 25.0;
 	}
 
@@ -486,7 +486,7 @@ Controller::CurrentVideoTrack()
 void
 Controller::Stop()
 {
-	printf("Controller::Stop\n");
+	//printf("Controller::Stop\n");
 
 	BAutolock _(this);
 
@@ -500,7 +500,7 @@ Controller::Stop()
 void
 Controller::Play()
 {
-	printf("Controller::Play\n");
+	//printf("Controller::Play\n");
 
 	BAutolock _(this);
 	
@@ -512,7 +512,7 @@ Controller::Play()
 void
 Controller::Pause()
 {
-	printf("Controller::Pause\n");
+//	printf("Controller::Pause\n");
 
 	BAutolock _(this);
 
@@ -525,7 +525,7 @@ Controller::Pause()
 void
 Controller::TogglePlaying()
 {
-	printf("Controller::TogglePlaying\n");
+//	printf("Controller::TogglePlaying\n");
 
 	BAutolock _(this);
 
@@ -567,7 +567,7 @@ Controller::TimePosition()
 void
 Controller::SetVolume(float value)
 {
-	printf("Controller::SetVolume %.4f\n", value);
+//	printf("Controller::SetVolume %.4f\n", value);
 	if (!Lock())
 		return;
 
