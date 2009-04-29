@@ -1,6 +1,7 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <fcntl.h>
+#include <unistd.h>
 
 uint8_t sector[512];
 
