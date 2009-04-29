@@ -73,9 +73,9 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 	status_t error = node->ReadAttr(kBackgroundImageInfo, info.type, 0, buffer, (size_t)info.size);
 	if (error == info.size)
 		error = container.Unflatten(buffer);
-		
+
 	delete [] buffer;
-	
+
 	if (error != B_OK)
 		return NULL;
 
@@ -86,26 +86,26 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 		Mode mode = kTiled;
 		bool textWidgetLabelOutline = false;
 		BPoint offset;
-		
-		if (container.FindString(kBackgroundImageInfoPath, index, &path) != B_OK)
+		BBitmap *bitmap = NULL;
+
+		if (container.FindString(kBackgroundImageInfoPath, index, &path) == B_OK) {	
+			bitmap = BTranslationUtils::GetBitmap(path);
+			if (!bitmap) {
+				PRINT(("failed to load background bitmap from path\n"));
+			}
+		} else
 			break;
-		
-		BBitmap *bitmap = BTranslationUtils::GetBitmap(path);
-		if (!bitmap) {
-//			PRINT(("failed to load background bitmap from path\n"));
-			continue;
-		}
-		
+
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index, (int32 *)&workspaces);
 		container.FindInt32(kBackgroundImageInfoMode, index, (int32 *)&mode);
 		container.FindBool(kBackgroundImageInfoTextOutline, index, &textWidgetLabelOutline);
 		container.FindPoint(kBackgroundImageInfoOffset, index, &offset);
-		
+
 		BackgroundImage::BackgroundImageInfo *imageInfo = new
 			BackgroundImage::BackgroundImageInfo(workspaces, bitmap, mode, offset,
 				textWidgetLabelOutline);
 
-		if (!result) 
+		if (!result)
 			result = new BackgroundImage(node, isDesktop);
 
 		result->Add(imageInfo);
@@ -137,8 +137,9 @@ BackgroundImage::BackgroundImage(const BNode *node, bool desktop)
 		fView(NULL),
 		fShowingBitmap(NULL),
 		fBitmapForWorkspaceList(1, true)
-{	
+{
 }
+
 
 BackgroundImage::~BackgroundImage()
 {
@@ -150,6 +151,7 @@ BackgroundImage::Add(BackgroundImageInfo *info)
 {
 	fBitmapForWorkspaceList.AddItem(info);
 }
+
 
 void 
 BackgroundImage::Show(BView *view, int32 workspace)
@@ -168,6 +170,16 @@ BackgroundImage::Show(BView *view, int32 workspace)
 void 
 BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 {
+	BPoseView *poseView = dynamic_cast<BPoseView *>(view);
+	if (poseView)
+		poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
+
+	if (info->fBitmap == NULL) {
+		view->ClearViewBitmap();
+		view->Invalidate();
+		fShowingBitmap = info;
+		return;
+	}
 	BRect viewBounds(view->Bounds());
 	BRect bitmapBounds(info->fBitmap->Bounds());
 	BRect destinationBitmapBounds(bitmapBounds);
@@ -205,15 +217,10 @@ BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 			break;
 	}
 	
-	BPoseView *poseView = dynamic_cast<BPoseView *>(view);
-	if (poseView)
-		poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
-	
 	// switch to the bitmap and force a redraw
 	view->SetViewBitmap(info->fBitmap, bitmapBounds, destinationBitmapBounds,
 		followFlags, tile);
 	view->Invalidate();
-
 	fShowingBitmap = info;
 }
 
@@ -250,7 +257,7 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 		if (info->fWorkspace == workspaceMask)
 			return info;
 		if (info->fWorkspace & workspaceMask)
-			result = info; 
+			result = info;
 	}
 	
 	return result;
@@ -268,6 +275,7 @@ BackgroundImage::WorkspaceActivated(BView *view, int32 workspace, bool state)
 		return;
 		
 	BackgroundImageInfo *info = ImageInfoForWorkspace(workspace);
+
 	if (info != fShowingBitmap) {
 		if (info)
 			Show(info, view);

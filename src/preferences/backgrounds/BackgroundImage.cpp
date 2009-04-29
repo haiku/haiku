@@ -116,13 +116,18 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 		BPoint offset;
 		uint32 imageSet = 0;
 		uint32 cacheMode = 0;
-		if (container.FindString(kBackgroundImageInfoPath, index, &path) != B_OK)
-			break;
+		int32 imageIndex = -1;
 
-		BPath bpath(path);
-		int32 imageIndex = view->AddImage(bpath);
-		if (imageIndex < 0)
-			imageIndex = -imageIndex - 1;
+		if (container.FindString(kBackgroundImageInfoPath, index, &path) == B_OK) {
+			if (strcmp(path, "")) {
+				BPath bpath(path);
+				imageIndex = view->AddImage(bpath);
+				if (imageIndex < 0) {
+					imageIndex = -imageIndex - 1;
+				}
+			}
+		} else 
+			break;
 
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index,
 			(int32 *)&workspaces);
@@ -359,12 +364,12 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 		if (fIsDesktop) {
 			if (info->fWorkspace == workspaceMask)
 				return info;
+
 			if (info->fWorkspace & workspaceMask)
 				result = info;
 		} else
 			return info;
 	}
-
 	return result;
 }
 
@@ -427,13 +432,15 @@ BackgroundImage::SetBackgroundImage(BNode *node)
 
 	for (int32 index = 0; index < count; index++) {
 		BackgroundImageInfo *info = fBitmapForWorkspaceList.ItemAt(index);
-		if (fBackgroundsView->GetImage(info->fImageIndex) == NULL)
-			continue;
 
 		container.AddBool(kBackgroundImageInfoTextOutline,
 			info->fTextWidgetLabelOutline);
-		container.AddString(kBackgroundImageInfoPath,
-			fBackgroundsView->GetImage(info->fImageIndex)->GetPath().Path());
+		if (fBackgroundsView->GetImage(info->fImageIndex) != NULL) {
+			container.AddString(kBackgroundImageInfoPath,
+				fBackgroundsView->GetImage(info->fImageIndex)->GetPath().Path());
+		} else 
+			container.AddString(kBackgroundImageInfoPath, "");
+
 		container.AddInt32(kBackgroundImageInfoWorkspaces, info->fWorkspace);
 		container.AddPoint(kBackgroundImageInfoOffset, info->fOffset);
 		container.AddInt32(kBackgroundImageInfoMode, info->fMode);
