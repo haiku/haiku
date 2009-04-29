@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide it8211 ;
+SubDir HAIKU_TOP src add-ons kernel busses ata it8211 ;
 
 UsePrivateHeaders kernel ;
 UsePrivateHeaders drivers ;

@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide promise_tx2 ;
+SubDir HAIKU_TOP src add-ons kernel busses ata promise_tx2 ;
 
 UsePrivateHeaders drivers kernel ;
 

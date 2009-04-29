@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide generic_ide_pci ;
+SubDir HAIKU_TOP src add-ons kernel busses ata generic_ide_pci ;
 
 UsePrivateHeaders drivers kernel ;
 

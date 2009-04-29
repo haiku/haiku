@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide silicon_image_3112 ;
+SubDir HAIKU_TOP src add-ons kernel busses ata silicon_image_3112 ;
 
 UsePrivateHeaders drivers kernel ;
 
