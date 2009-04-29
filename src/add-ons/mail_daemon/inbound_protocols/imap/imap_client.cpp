@@ -112,6 +112,8 @@ class IMAP4Client : public BRemoteMailStorageProtocol {
 		#endif
 
 		bool force_reselect;
+		
+		int32 fLastExists;
 };
 
 class NoopWorker : public BHandler {
@@ -283,7 +285,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 
 	noop = new NoopWorker(this);
 	runner->AddHandler(noop);
-	nooprunner = new BMessageRunner(BMessenger(noop,runner),new BMessage('impn'),10e6);
+	nooprunner = new BMessageRunner(BMessenger(noop,runner),new BMessage('impn'),10000000);
 
 	if (to_dl.CountItems() > 0)
 		runner->GetMessages(&to_dl,-1);
@@ -682,6 +684,7 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 			BString trash;
 			if (SendCommand("CLOSE") < B_OK)
 				return B_ERROR;
+
 			selected_mb = "";
 			WasCommandOkay(trash);
 		}
@@ -705,7 +708,7 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 			NestedString response;
 			if (GetResponse(tag,&response) < B_OK)
 				return B_ERROR;
-
+			
 			if (tag == expected)
 				break;
 
@@ -717,6 +720,22 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 
 			if ((response.CountItems() > 1) && (strcasecmp(response[1](),"RECENT") == 0))
 				recent = atoi(response[0]());
+		}
+		
+		// Whenever the mailbox is updated, only EXISTS is sent so we have no
+		// RECENT information. In this case we check if the mailbox increased
+		// its size and, if so, trick ourselves into downloading the new
+		// messages.
+		//
+		// TODO(bga): The IMAPClient code is in bad need of rewriting. The
+		// code below is just a patch to get things working until I find the
+		// time and motivation to rewrite it.
+		if (new_exists >= 0 && info->exists >= 0 && recent < 0) {
+			// We have EXISTS but no RECENT.
+			if (new_exists > info->exists) {
+				// The mailbox increased its size.
+				recent = new_exists - info->exists;
+			}
 		}
 
 		if ((queue_new_messages) && (recent > 0)) {
@@ -749,8 +768,10 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 			}
 		}
 
-		info->exists = new_exists;
-		info->next_uid = new_next_uid;
+		if (new_exists >= 0)
+			info->exists = new_exists;
+		if (new_next_uid >= 0)
+			info->next_uid = new_next_uid;
 
 		selected_mb = real_mb;
 	}
@@ -802,8 +823,6 @@ class IMAP4PartialReader : public BPositionIO {
 			NestedString response;
 			if (us->GetResponse(command,&response) != NOT_COMMAND_RESPONSE && command == cmd)
 				return;
-
-			//response.PrintToStream();
 
 			us->WasCommandOkay(command);
 			for (int32 i = 0; (i+1) < response[2].CountItems(); i++) {
@@ -1000,6 +1019,7 @@ IMAP4Client::ReceiveLine(BString &out)
 		runner->ShowError("IMAP Timeout.");
 		return B_TIMED_OUT;
 	}
+	
 	PRINT(("S:%s\n",out.String()));
 	return len;
 }
