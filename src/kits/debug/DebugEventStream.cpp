@@ -25,6 +25,7 @@ BDebugEventInputStream::BDebugEventInputStream()
 	fBufferCapacity(0),
 	fBufferSize(0),
 	fBufferPosition(0),
+	fStreamPosition(0),
 	fOwnsBuffer(false)
 {
 }
@@ -127,12 +128,15 @@ BDebugEventInputStream::Unset()
 		be stored.
 	\param _buffer Pointer to a pre-allocated location where the pointer to the
 		event data shall be stored.
+	\param _streamOffset Pointer to a pre-allocated location where the event
+		header's offset relative to the beginning of the stream shall be stored.
+		May be \c NULL.
 	\return A negative error code in case an error occurred while trying to read
 		the info, the size of the data associated with the event otherwise.
 */
 ssize_t
 BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
-	const void** _buffer)
+	const void** _buffer, off_t* _streamOffset)
 {
 	// get the next header
 	status_t error = _GetData(sizeof(system_profiler_event_header));
@@ -146,6 +150,8 @@ BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
 
 	system_profiler_event_header header
 		= *(system_profiler_event_header*)(fBuffer + fBufferPosition);
+
+	off_t streamOffset = fStreamPosition + fBufferPosition;
 
 	// skip the header in the buffer
 	fBufferSize -= sizeof(system_profiler_event_header);
@@ -161,6 +167,8 @@ BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
 	*_event = header.event;
 	*_cpu = header.cpu;
 	*_buffer = fBuffer + fBufferPosition;
+	if (_streamOffset)
+		*_streamOffset = streamOffset;
 
 	// skip the event in the buffer
 	fBufferSize -= header.size;
@@ -173,6 +181,7 @@ BDebugEventInputStream::ReadNextEvent(uint32* _event, uint32* _cpu,
 status_t
 BDebugEventInputStream::_Init()
 {
+	fStreamPosition = 0;
 	fBufferPosition = 0;
 
 	// get the header
@@ -236,6 +245,7 @@ BDebugEventInputStream::_GetData(size_t size)
 	// move remaining data to the start of the buffer
 	if (fBufferSize > 0 && fBufferPosition > 0)
 		memmove(fBuffer, fBuffer + fBufferPosition, fBufferSize);
+	fStreamPosition += fBufferPosition;
 	fBufferPosition = 0;
 
 	// read more data

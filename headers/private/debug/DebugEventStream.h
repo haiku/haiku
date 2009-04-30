@@ -45,7 +45,8 @@ public:
 			void				Unset();
 
 			ssize_t				ReadNextEvent(uint32* _event, uint32* _cpu,
-									const void** _buffer);
+									const void** _buffer,
+									off_t* _streamOffset = NULL);
 
 private:
 			status_t			_Init();
@@ -60,6 +61,7 @@ private:
 			size_t				fBufferCapacity;
 			size_t				fBufferSize;
 			size_t				fBufferPosition;
+			off_t				fStreamPosition;
 			bool				fOwnsBuffer;
 };
 
