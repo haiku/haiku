@@ -1619,6 +1619,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		endOffset = textLength;
 
 	// add the style to the style buffer
+	fStyles->SyncNullStyle(startOffset);
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
 		fontMode, &newFont, color);
 
