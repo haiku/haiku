@@ -128,6 +128,12 @@ struct system_profiler_samples {
 	addr_t		samples[0];
 };
 
+// base structure for the following three
+struct system_profiler_thread_scheduling_event {
+	bigtime_t	time;
+	thread_id	thread;
+};
+
 // B_SYSTEM_PROFILER_THREAD_SCHEDULED
 struct system_profiler_thread_scheduled {
 	bigtime_t	time;
