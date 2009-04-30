@@ -16,6 +16,7 @@
 #include "chart/BigtimeChartAxisLegendSource.h"
 #include "chart/Chart.h"
 #include "chart/ChartDataSource.h"
+#include "chart/DefaultChartAxisLegendSource.h"
 #include "chart/LegendChartAxis.h"
 #include "chart/LineChartRenderer.h"
 #include "chart/StringChartLegend.h"
@@ -324,6 +325,18 @@ ThreadWindow::ActivityPage::ActivityPage()
 	LegendChartAxis* axis = new LegendChartAxis(
 		new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_BOTTOM, axis);
+
+	axis = new LegendChartAxis(
+	new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
+	fActivityChart->SetAxis(CHART_AXIS_TOP, axis);
+
+	axis = new LegendChartAxis(
+	new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
+	fActivityChart->SetAxis(CHART_AXIS_LEFT, axis);
+
+	axis = new LegendChartAxis(
+	new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
+	fActivityChart->SetAxis(CHART_AXIS_RIGHT, axis);
 }
 
 
