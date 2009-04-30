@@ -32,6 +32,8 @@ public:
 								~Model();
 
 	inline	const char*			DataSourceName() const;
+	inline	void*				EventData() const;
+	inline	size_t				EventDataSize() const;
 
 	inline	bigtime_t			BaseTime() const;
 			void				SetBaseTime(bigtime_t time);
@@ -328,6 +330,20 @@ const char*
 Model::DataSourceName() const
 {
 	return fDataSourceName.String();
+}
+
+
+void*
+Model::EventData() const
+{
+	return fEventData;
+}
+
+
+size_t
+Model::EventDataSize() const
+{
+	return fEventDataSize;
 }
 
 
