@@ -4459,14 +4459,18 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 	if (fTrackingMouse == NULL)
 		return false;
 
+	int32 currentOffset = OffsetAt(where);
 	if (fTrackingMouse->selectionRect.IsValid()
 		&& fTrackingMouse->selectionRect.Contains(where)) {
-		_StopMouseTracking();
-		_InitiateDrag();
-		return true;
+		// we are tracking the mouse for drag action, if the mouse has moved
+		// from where it was clicked, we initiate a drag now:
+		if (currentOffset != fTrackingMouse->clickOffset) {
+			_StopMouseTracking();
+			_InitiateDrag();
+			return true;
+		}
+		return false;
 	}
-
-	int32 currentOffset = OffsetAt(where);
 
 	switch (fClickCount) {
 		case 3:
