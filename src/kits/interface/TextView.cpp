@@ -1342,6 +1342,8 @@ void
 BTextView::Cut(BClipboard *clipboard)
 {
 	_CancelInputMethod();
+	if (!fEditable)
+		return;
 	if (fUndo) {
 		delete fUndo;
 		fUndo = new CutUndoBuffer(this);
@@ -1391,7 +1393,7 @@ BTextView::Paste(BClipboard *clipboard)
 	CALLED();
 	_CancelInputMethod();
 
-	if (!clipboard->Lock())
+	if (!fEditable || !clipboard->Lock())
 		return;
 
 	BMessage *clip = clipboard->Data();
@@ -4439,8 +4441,7 @@ BTextView::_PerformMouseUp(BPoint where)
 	if (fTrackingMouse == NULL)
 		return false;
 
-	if (fTrackingMouse->selectionRect.IsValid()
-		&& fTrackingMouse->selectionRect.Contains(where))
+	if (fTrackingMouse->selectionRect.IsValid())
 		Select(fTrackingMouse->clickOffset, fTrackingMouse->clickOffset);
 
 	_StopMouseTracking();
@@ -4460,8 +4461,7 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 		return false;
 
 	int32 currentOffset = OffsetAt(where);
-	if (fTrackingMouse->selectionRect.IsValid()
-		&& fTrackingMouse->selectionRect.Contains(where)) {
+	if (fTrackingMouse->selectionRect.IsValid()) {
 		// we are tracking the mouse for drag action, if the mouse has moved
 		// from where it was clicked, we initiate a drag now:
 		if (currentOffset != fTrackingMouse->clickOffset) {
