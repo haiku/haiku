@@ -254,7 +254,7 @@ _xdebugPrintf(const char *fmt, ...)
 
 
 int
-_debuggerAssert(const char *file, int line, char *message)
+_debuggerAssert(const char *file, int line, const char *message)
 {
 	char buffer[1024];
 	snprintf(buffer, sizeof(buffer),

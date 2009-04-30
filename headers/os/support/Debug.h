@@ -31,7 +31,7 @@ extern "C" {
 	int _sPrintf(const char *, ...);
 #endif
 	int _xdebugPrintf(const char *, ...);
-	int _debuggerAssert(const char *, int, char *);
+	int _debuggerAssert(const char *, int, const char *);
 #ifdef __cplusplus
 }
 #endif
