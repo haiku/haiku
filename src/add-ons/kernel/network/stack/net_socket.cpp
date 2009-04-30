@@ -560,8 +560,11 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 	SocketList::Iterator iterator = sSocketList.GetIterator();
 	uint32 cookie = *_cookie;
 	uint32 count = 0;
-	while (iterator.HasNext()) {
+
+	while (true) {
 		socket = iterator.Next();
+		if (socket == NULL)
+			return B_ENTRY_NOT_FOUND;
 
 		// TODO: also traverse the pending connections
 		if (count == cookie)
@@ -570,9 +573,6 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 		if (family == -1 || family == socket->family)
 			count++;
 	}
-
-	if (socket == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	*_cookie = count + 1;
 

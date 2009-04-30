@@ -1248,7 +1248,7 @@ _user_get_next_socket_stat(int family, uint32 *_cookie, struct net_stat *_stat)
 
 	uint32 cookie;
 	if (!IS_USER_ADDRESS(_stat) || !IS_USER_ADDRESS(_cookie)
-			|| user_memcpy(&cookie, _cookie, sizeof(cookie)) != B_OK) {
+		|| user_memcpy(&cookie, _cookie, sizeof(cookie)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
 
