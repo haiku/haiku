@@ -1192,8 +1192,12 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 		return status;
 
 	msg = get_port_msg(msgCode, bufferSize);
-	if (msg == NULL)
+	if (msg == NULL) {
+		// Give up our slot in the queue again, and let someone else try and fail
+		// TODO: try to free some resources and try again?
+		release_sem(cachedSem);
 		return B_NO_MEMORY;
+	}
 
 	// sender credentials
 	msg->sender = geteuid();
