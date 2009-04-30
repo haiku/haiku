@@ -300,14 +300,14 @@ printf("Chart::DoLayout(%f, %f)\n", size.width, size.height);
 	fRenderer->SetFrame(fChartFrame.InsetByCopy(1, 1));
 printf("  fChartFrame: (%f, %f) - (%f, %f)\n", fChartFrame.left, fChartFrame.top, fChartFrame.right, fChartFrame.bottom);
 
-	fLeftAxis.SetFrame(0, fChartFrame.top, fChartFrame.left - 1,
-		fChartFrame.bottom);
-	fRightAxis.SetFrame(fChartFrame.right + 1, fChartFrame.top, width - 1,
-		fChartFrame.bottom);
-	fTopAxis.SetFrame(fChartFrame.left, 0, fChartFrame.right,
+	fLeftAxis.SetFrame(0, fChartFrame.top + 1, fChartFrame.left - 1,
+		fChartFrame.bottom - 1);
+	fRightAxis.SetFrame(fChartFrame.right + 1, fChartFrame.top + 1, width - 1,
+		fChartFrame.bottom - 1);
+	fTopAxis.SetFrame(fChartFrame.left + 1, 0, fChartFrame.right - 1,
 		fChartFrame.top - 1);
-	fBottomAxis.SetFrame(fChartFrame.left, fChartFrame.bottom + 1,
-		fChartFrame.right, height - 1);
+	fBottomAxis.SetFrame(fChartFrame.left + 1, fChartFrame.bottom + 1,
+		fChartFrame.right - 1, height - 1);
 }
 
 
