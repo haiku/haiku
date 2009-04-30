@@ -7,7 +7,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
 
-SubDirCcFlags -fomit-frame-pointer -DPIC -fno-common ;
+SubDirCcFlags -fomit-frame-pointer -DPIC ;
 #SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
 StaticLibrary libavutil.a :

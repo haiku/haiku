@@ -22,8 +22,6 @@ SubInclude HAIKU_TOP src add-ons media plugins speex ;
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader ;
 
-SubInclude HAIKU_TOP src add-ons media plugins asf_reader ;
-
 # The following add-ons are GPL licensed, and can only be used with
 # software whose license is GPL compatible. To include these GPL
 # licensed add-ons, you need to run configure with the --include-gpl-addons

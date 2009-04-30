@@ -2412,8 +2412,6 @@ b= t;
         }
     }
 }
-#include <stdio.h>
-#undef printf
 
 static av_always_inline void hl_decode_mb_internal(H264Context *h, int simple){
     MpegEncContext * const s = &h->s;
@@ -2422,8 +2420,6 @@ static av_always_inline void hl_decode_mb_internal(H264Context *h, int simple){
     const int mb_xy= h->mb_xy;
     const int mb_type= s->current_picture.mb_type[mb_xy];
     uint8_t  *dest_y, *dest_cb, *dest_cr;
-    uintptr_t v;
-    size_t align;
     int linesize, uvlinesize /*dct_offset*/;
     int i;
     int *block_offset = &h->block_offset[0];
@@ -2436,14 +2432,6 @@ static av_always_inline void hl_decode_mb_internal(H264Context *h, int simple){
     dest_y  = s->current_picture.data[0] + (mb_x + mb_y * s->linesize  ) * 16;
     dest_cb = s->current_picture.data[1] + (mb_x + mb_y * s->uvlinesize) * 8;
     dest_cr = s->current_picture.data[2] + (mb_x + mb_y * s->uvlinesize) * 8;
-
-  v = (uintptr_t)dest_y;
-
-  align = ffs((int)v);
-
-  printf("aligned(16): %s: address: %p alignment: %d (2^%u)\n",
-        align > 4 ? "PASS" : "FAIL", v, 1<<(align-1), align-1);
-
 
     s->dsp.prefetch(dest_y + (s->mb_x&3)*4*s->linesize + 64, s->linesize, 4);
     s->dsp.prefetch(dest_cb + (s->mb_x&7)*s->uvlinesize + 64, dest_cr - dest_cb, 2);

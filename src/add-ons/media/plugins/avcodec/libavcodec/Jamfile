@@ -14,7 +14,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
 } else {
-	SubDirCcFlags -fomit-frame-pointer -DPIC -fno-common ;
+	SubDirCcFlags -fomit-frame-pointer -DPIC ;
 }
 
 local defines ;

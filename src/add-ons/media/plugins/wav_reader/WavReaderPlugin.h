@@ -71,7 +71,6 @@ private:
 
 	int64			fFrameCount;
 	int32			fFrameRate;
-	uint16			fBufferSize;
 };
 
 

@@ -57,10 +57,6 @@ AtomBase *getAtom(BPositionIO *pStream)
 		// Handle extended size
 		pStream->Read(&aRealAtomSize,4);
 		aRealAtomSize = B_BENDIAN_TO_HOST_INT64(aRealAtomSize);
-	} else if (aAtomSize == 0) {
-		// aAtomSize extends to end of file.
-		// TODO this is broken
-		aRealAtomSize = 0;
 	} else {
 		aRealAtomSize = aAtomSize;
 	}
@@ -161,20 +157,8 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new STSSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
-	if (aAtomType == uint32('ctts')) {
-		return new CTTSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
-
 	if (aAtomType == uint32('stsz')) {
 		return new STSZAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
-
-	if (aAtomType == uint32('stz2')) {
-		return new STZ2Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
-
-	if (aAtomType == uint32('ftyp')) {
-		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
 	if (aAtomType == uint32('cmov')) {
@@ -191,6 +175,10 @@ AtomBase *getAtom(BPositionIO *pStream)
 
 	if (aAtomType == uint32('esds')) {
 		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
+	if (aAtomType == uint32('ftyp')) {
+		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
@@ -377,7 +365,7 @@ char *CMVDAtom::OnGetAtomName()
 	return "Compressed Movie Data";
 }
 
-MVHDAtom::MVHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+MVHDAtom::MVHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
 
@@ -387,7 +375,6 @@ MVHDAtom::~MVHDAtom()
 
 void MVHDAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
 	Read(&theHeader.CreationTime);
 	Read(&theHeader.ModificationTime);
 	Read(&theHeader.TimeScale);
@@ -400,7 +387,7 @@ void MVHDAtom::OnProcessMetaData()
 	Read(&theHeader.SelectionTime);
 	Read(&theHeader.SelectionDuration);
 	Read(&theHeader.CurrentTime);
-	Read(&theHeader.NextTrackID);
+	Read(&theHeader.NextTrackID);	
 }
 
 char *MVHDAtom::OnGetAtomName()
@@ -421,7 +408,7 @@ AtomBase *aAtomBase;
 	return theMVHDAtom;
 }
 
-STTSAtom::STTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STTSAtom::STTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
 	SUMDurations = 0;
@@ -440,11 +427,7 @@ void STTSAtom::OnProcessMetaData()
 {
 TimeToSample	*aTimeToSample;
 
-	FullAtom::OnProcessMetaData();
-
 	ReadArrayHeader(&theHeader);
-
-//	printf("STTS:: Entries %ld\n",theHeader.NoEntries);
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aTimeToSample = new TimeToSample;
@@ -455,11 +438,7 @@ TimeToSample	*aTimeToSample;
 		theTimeToSampleArray[i] = aTimeToSample;
 		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
 		SUMCounts += theTimeToSampleArray[i]->Count;
-
-//		printf("(%ld,%ld)",aTimeToSample->Count,aTimeToSample->Duration);
-
 	}
-//	printf("\n");
 }
 
 char *STTSAtom::OnGetAtomName()
@@ -467,55 +446,28 @@ char *STTSAtom::OnGetAtomName()
 	return "Time to Sample Atom";
 }
 
-uint32	STTSAtom::getSampleForTime(bigtime_t pTime)
+uint32	STTSAtom::getSampleForTime(uint32 pTime)
 {
-	// Sample for time is this calc, how does STTS help us?
-	return uint32((pTime * FrameRate + 50) / 1000000.0);
+// TODO this is too slow.  PreCalc when loading this?
+	uint64 Duration = 0;
+
+	for (uint32 i=0;i<theHeader.NoEntries;i++) {
+		Duration += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		if (Duration > pTime) {
+			return i;
+		}
+	}
+
+	return 0;
 }
 
 uint32	STTSAtom::getSampleForFrame(uint32 pFrame)
 {
-	// Convert frame to time and call getSampleForTime()
+// Hmm Sample is Frame really, this Atom is more usefull for time->sample calcs
 	return pFrame;
 }
 
-CTTSAtom::CTTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
-{
-	theHeader.NoEntries = 0;
-}
-
-CTTSAtom::~CTTSAtom()
-{
-	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		delete theCompTimeToSampleArray[i];
-		theCompTimeToSampleArray[i] = NULL;
-	}
-}
-
-void CTTSAtom::OnProcessMetaData()
-{
-CompTimeToSample	*aCompTimeToSample;
-
-	FullAtom::OnProcessMetaData();
-
-	ReadArrayHeader(&theHeader);
-
-	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		aCompTimeToSample = new CompTimeToSample;
-		
-		Read(&aCompTimeToSample->Count);
-		Read(&aCompTimeToSample->Offset);
-
-		theCompTimeToSampleArray[i] = aCompTimeToSample;
-	}
-}
-
-char *CTTSAtom::OnGetAtomName()
-{
-	return "Composition Time to Sample Atom";
-}
-
-STSCAtom::STSCAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STSCAtom::STSCAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
 }
@@ -532,13 +484,9 @@ void STSCAtom::OnProcessMetaData()
 {
 SampleToChunk	*aSampleToChunk;
 
-	FullAtom::OnProcessMetaData();
-
 	ReadArrayHeader(&theHeader);
 	
 	uint32	TotalPrevSamples = 0;
-	
-//	printf("STSC:: Entries %ld\n",theHeader.NoEntries);
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSampleToChunk = new SampleToChunk;
@@ -554,11 +502,8 @@ SampleToChunk	*aSampleToChunk;
 			aSampleToChunk->TotalPrevSamples = 0;
 		}
 
-//		printf("(%ld,%ld)",aSampleToChunk->SamplesPerChunk, aSampleToChunk->TotalPrevSamples);
-
 		theSampleToChunkArray[i] = aSampleToChunk;
 	}
-//	printf("\n");
 }
 
 char *STSCAtom::OnGetAtomName()
@@ -614,7 +559,7 @@ uint32	STSCAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 	return theSampleToChunkArray[theHeader.NoEntries-1]->FirstChunk;
 }
 
-STSSAtom::STSSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STSSAtom::STSSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
 }
@@ -631,15 +576,12 @@ void STSSAtom::OnProcessMetaData()
 {
 SyncSample	*aSyncSample;
 
-	FullAtom::OnProcessMetaData();
-
 	ReadArrayHeader(&theHeader);
-
+	
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSyncSample = new SyncSample;
 		
 		Read(&aSyncSample->SyncSampleNo);
-
 		theSyncSampleArray[i] = aSyncSample;
 	}
 }
@@ -657,7 +599,7 @@ bool	STSSAtom::IsSyncSample(uint32 pSampleNo)
 			return true;
 		}
 		
-		if (pSampleNo < theSyncSampleArray[i]->SyncSampleNo) {
+		if (pSampleNo > theSyncSampleArray[i]->SyncSampleNo) {
 			return false;
 		}
 	}
@@ -665,14 +607,14 @@ bool	STSSAtom::IsSyncSample(uint32 pSampleNo)
 	return false;
 }
 
-STSZAtom::STSZAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STSZAtom::STSZAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
-	SampleCount = 0;
+	theHeader.NoEntries = 0;
 }
 
 STSZAtom::~STSZAtom()
 {
-	for (uint32 i=0;i<SampleCount;i++) {
+	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		delete theSampleSizeArray[i];
 		theSampleSizeArray[i] = NULL;
 	}
@@ -680,36 +622,38 @@ STSZAtom::~STSZAtom()
 
 void STSZAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
+SampleSizeEntry	*aSampleSize;
 
-	Read(&SampleSize);
-	Read(&SampleCount);
-
+	// Just to make things difficult this is not quite a standard array header
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
+	Read(&theHeader.SampleSize);
+	Read(&theHeader.NoEntries);
+	
 	// If the sample size is constant there is no array and NoEntries seems to contain bad values
-	if (SampleSize == 0) {
-		SampleSizePtr	aSampleSizePtr;
-	
-		for (uint32 i=0;i<SampleCount;i++) {
-			aSampleSizePtr = new SampleSizeEntry;
+	if (theHeader.SampleSize == 0) {
+		for (uint32 i=0;i<theHeader.NoEntries;i++) {
+			aSampleSize = new SampleSizeEntry;
 		
-			Read(&aSampleSizePtr->EntrySize);
-	
-			theSampleSizeArray[i] = aSampleSizePtr;
+			Read(&aSampleSize->EntrySize);
+			theSampleSizeArray[i] = aSampleSize;
 		}
 	}
 }
 
 char *STSZAtom::OnGetAtomName()
 {
-	printf("SS=%ld Count=%ld ",SampleSize,SampleCount);
+	printf("%ld ",theHeader.SampleSize);
 	return "Sample Size Atom";
 }
 
 uint32	STSZAtom::getSizeForSample(uint32 pSampleNo)
 {
-	if (SampleSize > 0) {
+	if (theHeader.SampleSize > 0) {
 		// All samples are the same size
-		return SampleSize;
+		return theHeader.SampleSize;
 	}
 	
 	// Sample Array indexed by SampleNo
@@ -718,96 +662,10 @@ uint32	STSZAtom::getSizeForSample(uint32 pSampleNo)
 
 bool	STSZAtom::IsSingleSampleSize()
 {
-	return (SampleSize > 0);
+	return (theHeader.SampleSize > 0);
 }
 
-STZ2Atom::STZ2Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
-{
-	SampleCount = 0;
-}
-
-STZ2Atom::~STZ2Atom()
-{
-	for (uint32 i=0;i<SampleCount;i++) {
-		delete theSampleSizeArray[i];
-		theSampleSizeArray[i] = NULL;
-	}
-}
-
-void STZ2Atom::OnProcessMetaData()
-{
-	FullAtom::OnProcessMetaData();
-
-	uint8	reserved;
-	Read(&reserved);
-	Read(&reserved);
-	Read(&reserved);
-
-	Read(&FieldSize);
-	Read(&SampleCount);
-
-	SampleSizePtr	aSampleSizePtr;
-	uint8	EntrySize8;
-	uint16	EntrySize16;
-	
-	for (uint32 i=0;i<SampleCount;i++) {
-		aSampleSizePtr = new SampleSizeEntry;
-		
-		switch (FieldSize) {
-			case 4:
-				Read(&EntrySize8);
-				// 2 values per byte
-				aSampleSizePtr->EntrySize = (uint32)(EntrySize8);
-				break;
-			case 8:
-				Read(&EntrySize8);
-				// 1 value per byte
-				aSampleSizePtr->EntrySize = (uint32)(EntrySize8);
-				break;
-			case 16:
-				Read(&EntrySize16);
-				// 1 value per 2 bytes
-				aSampleSizePtr->EntrySize = (uint32)(EntrySize16);
-				break;
-		}
-		
-		theSampleSizeArray[i] = aSampleSizePtr;
-	}
-}
-
-char *STZ2Atom::OnGetAtomName()
-{
-	return "Compressed Sample Size Atom";
-}
-
-uint32	STZ2Atom::getSizeForSample(uint32 pSampleNo)
-{
-// THIS CODE NEEDS SOME TESTING, never seen a STZ2 atom
-
-uint32	index;
-
-	if (FieldSize == 4) {
-		// 2 entries per array entry so Divide by 2
-		index = pSampleNo / 2;
-		if (index * 2 == pSampleNo) {
-			// even so return low nibble
-			return theSampleSizeArray[index]->EntrySize && 0x0000000f;
-		} else {
-			// odd so return high nibble
-			return theSampleSizeArray[index]->EntrySize && 0x000000f0;
-		}
-	}
-
-	// Sample Array indexed by SampleNo
-	return theSampleSizeArray[pSampleNo]->EntrySize;
-}
-
-bool	STZ2Atom::IsSingleSampleSize()
-{
-	return false;
-}
-
-STCOAtom::STCOAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STCOAtom::STCOAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
 }
@@ -833,8 +691,6 @@ uint64 STCOAtom::OnGetChunkOffset()
 void STCOAtom::OnProcessMetaData()
 {
 ChunkToOffset	*aChunkToOffset;
-
-	FullAtom::OnProcessMetaData();
 
 	ReadArrayHeader(&theHeader);
 	
@@ -862,8 +718,8 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	}
 	
 	#if DEBUG
-		char msg[100]; sprintf(msg, "Bad Chunk ID %ld / %ld\n", pChunkID, theHeader.NoEntries);
-		DEBUGGER(msg);
+	  char msg[100]; sprintf(msg, "Bad Chunk ID %ld / %ld\n", pChunkID, theHeader.NoEntries);
+	  DEBUGGER(msg);
 	#endif
 
 	TRESPASS();
@@ -898,7 +754,7 @@ char *ESDSAtom::OnGetAtomName()
 	return "Extended Sample Description Atom";
 }
 
-STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
 }
@@ -930,7 +786,7 @@ STSDAtom::~STSDAtom()
 
 uint32	STSDAtom::getMediaComponentSubType()
 {
-	return dynamic_cast<STBLAtom *>(getParent())->getMediaHandlerType();
+	return dynamic_cast<STBLAtom *>(getParent())->getMediaComponentSubType();
 }
 
 void STSDAtom::ReadSoundDescription()
@@ -1089,9 +945,6 @@ void STSDAtom::ReadVideoDescription()
 
 void STSDAtom::OnProcessMetaData()
 {
-
-	FullAtom::OnProcessMetaData();
-
 	ReadArrayHeader(&theHeader);
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
@@ -1268,13 +1121,12 @@ void MDATAtom::OnProcessMetaData()
 
 char *MDATAtom::OnGetAtomName()
 {
-	printf("Offset %lld, Size %lld ",getAtomOffset(),getAtomSize() - 8);
 	return "Media Data Atom";
 }
 
 off_t	MDATAtom::getEOF()
 {
-	return getAtomOffset() + getAtomSize() - 8;
+	return getStreamOffset() + getAtomSize();
 }
 
 MINFAtom::MINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -1294,9 +1146,9 @@ char *MINFAtom::OnGetAtomName()
 	return "Quicktime Media Information Atom";
 }
 
-uint32 MINFAtom::getMediaHandlerType()
+uint32 MINFAtom::getMediaComponentSubType()
 {
-	return dynamic_cast<MDIAAtom *>(getParent())->getMediaHandlerType();
+	return dynamic_cast<MDIAAtom *>(getParent())->getMediaComponentSubType();
 }
 
 STBLAtom::STBLAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -1316,9 +1168,9 @@ char *STBLAtom::OnGetAtomName()
 	return "Quicktime Sample Table Atom";
 }
 
-uint32 STBLAtom::getMediaHandlerType()
+uint32 STBLAtom::getMediaComponentSubType()
 {
-	return dynamic_cast<MINFAtom *>(getParent())->getMediaHandlerType();
+	return dynamic_cast<MINFAtom *>(getParent())->getMediaComponentSubType();
 }
 
 DINFAtom::DINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -1338,7 +1190,7 @@ char *DINFAtom::OnGetAtomName()
 	return "Quicktime Data Information Atom";
 }
 
-TKHDAtom::TKHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+TKHDAtom::TKHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
 
@@ -1348,11 +1200,15 @@ TKHDAtom::~TKHDAtom()
 
 void TKHDAtom::OnProcessMetaData()
 {
-
-	FullAtom::OnProcessMetaData();
+	Read(&Version);
 	
-	if (getVersion() == 0) {
+	if (Version == 0) {
+		// Read into V0 header and convert to V1 Header
 		tkhdV0 aHeaderV0;
+		
+		Read(&aHeaderV0.Flags1);
+		Read(&aHeaderV0.Flags2);
+		Read(&aHeaderV0.Flags3);
 		Read(&aHeaderV0.CreationTime);
 		Read(&aHeaderV0.ModificationTime);
 		Read(&aHeaderV0.TrackID);
@@ -1363,23 +1219,26 @@ void TKHDAtom::OnProcessMetaData()
 		Read(&aHeaderV0.AlternateGroup);
 		Read(&aHeaderV0.Volume);
 		Read(&aHeaderV0.Reserved3);
-
-		for (uint32 i=0;i<9;i++) {
-			Read(&theHeader.MatrixStructure[i]);
-		}
-
+		Read(aHeaderV0.MatrixStructure,36);
 		Read(&aHeaderV0.TrackWidth);
 		Read(&aHeaderV0.TrackHeight);
 
+		theHeader.Flags1 = aHeaderV0.Flags1;
+		theHeader.Flags2 = aHeaderV0.Flags2;
+		theHeader.Flags3 = aHeaderV0.Flags3;
 		theHeader.Reserved1 = aHeaderV0.Reserved1;
 		theHeader.Reserved2 = aHeaderV0.Reserved2;
 		theHeader.Reserved3 = aHeaderV0.Reserved3;
+		
+		for (uint32 i=0;i<36;i++) {
+			theHeader.MatrixStructure[i] =  aHeaderV0.MatrixStructure[i];
+		}
 
 		// upconvert to V1 header
-		theHeader.CreationTime = (uint64)(aHeaderV0.CreationTime);
-		theHeader.ModificationTime = (uint64)(aHeaderV0.ModificationTime);
+		theHeader.CreationTime = uint64(aHeaderV0.CreationTime);
+		theHeader.ModificationTime = uint64(aHeaderV0.ModificationTime);
 		theHeader.TrackID = aHeaderV0.TrackID;
-		theHeader.Duration = (uint64)(aHeaderV0.Duration);
+		theHeader.Duration = aHeaderV0.Duration;
 		theHeader.Layer = aHeaderV0.Layer;
 		theHeader.AlternateGroup = aHeaderV0.AlternateGroup;
 		theHeader.Volume = aHeaderV0.Volume;
@@ -1387,6 +1246,10 @@ void TKHDAtom::OnProcessMetaData()
 		theHeader.TrackHeight = aHeaderV0.TrackHeight;
 
 	} else {
+		// Read direct into V1 Header
+		Read(&theHeader.Flags1);
+		Read(&theHeader.Flags2);
+		Read(&theHeader.Flags3);
 		Read(&theHeader.CreationTime);
 		Read(&theHeader.ModificationTime);
 		Read(&theHeader.TrackID);
@@ -1397,11 +1260,7 @@ void TKHDAtom::OnProcessMetaData()
 		Read(&theHeader.AlternateGroup);
 		Read(&theHeader.Volume);
 		Read(&theHeader.Reserved3);
-
-		for (uint32 i=0;i<9;i++) {
-			Read(&theHeader.MatrixStructure[i]);
-		}
-
+		Read(theHeader.MatrixStructure,36);
 		Read(&theHeader.TrackWidth);
 		Read(&theHeader.TrackHeight);
 	}
@@ -1430,20 +1289,20 @@ char *MDIAAtom::OnGetAtomName()
 	return "Quicktime Media Atom";
 }
 
-uint32 MDIAAtom::getMediaHandlerType()
+uint32 MDIAAtom::getMediaComponentSubType()
 {
 	// get child atom hdlr
 	HDLRAtom *aHDLRAtom;
 	aHDLRAtom = dynamic_cast<HDLRAtom *>(GetChildAtom(uint32('hdlr')));
 
 	if (aHDLRAtom) {
-		return aHDLRAtom->getMediaHandlerType();
+		return aHDLRAtom->getMediaComponentSubType();
 	}
 	
 	return 0;
 }
 
-MDHDAtom::MDHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+MDHDAtom::MDHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
 
@@ -1453,7 +1312,10 @@ MDHDAtom::~MDHDAtom()
 
 void MDHDAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
 	Read(&theHeader.CreationTime);
 	Read(&theHeader.ModificationTime);
 	Read(&theHeader.TimeScale);
@@ -1469,7 +1331,7 @@ char *MDHDAtom::OnGetAtomName()
 
 bigtime_t	MDHDAtom::getDuration() 
 {
-	return bigtime_t((theHeader.Duration * 1000000.0) / theHeader.TimeScale);
+	return bigtime_t((uint64(theHeader.Duration) * 1000000L) / theHeader.TimeScale);
 }
 
 uint32		MDHDAtom::getTimeScale()
@@ -1477,30 +1339,27 @@ uint32		MDHDAtom::getTimeScale()
 	return theHeader.TimeScale;
 }
 
-HDLRAtom::HDLRAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+HDLRAtom::HDLRAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
-	name = NULL;
 }
 
 HDLRAtom::~HDLRAtom()
 {
-	if (name) {
-		free(name);
-	}
 }
 
 void HDLRAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
 	Read(&theHeader.ComponentType);
 	Read(&theHeader.ComponentSubType);
 	Read(&theHeader.ComponentManufacturer);
 	Read(&theHeader.ComponentFlags);
 	Read(&theHeader.ComponentFlagsMask);
-
-	name = (char *)(malloc(getBytesRemaining()));
-
-	Read(name,getBytesRemaining());
+	
+	// Read Array of Strings?
 }
 
 char *HDLRAtom::OnGetAtomName()
@@ -1518,12 +1377,12 @@ bool HDLRAtom::IsAudioHandler()
 	return (theHeader.ComponentSubType == 'soun');
 }
 
-uint32 HDLRAtom::getMediaHandlerType()
+uint32 HDLRAtom::getMediaComponentSubType()
 {
 	return theHeader.ComponentSubType;
 }
 
-VMHDAtom::VMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+VMHDAtom::VMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
 
@@ -1533,11 +1392,15 @@ VMHDAtom::~VMHDAtom()
 
 void VMHDAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
-	Read(&theHeader.GraphicsMode);
-	Read(&theHeader.OpColourRed);
-	Read(&theHeader.OpColourGreen);
-	Read(&theHeader.OpColourBlue);
+	vmhd aHeader;
+	Read(&aHeader.Version);
+	Read(&aHeader.Flags1);
+	Read(&aHeader.Flags2);
+	Read(&aHeader.Flags3);
+	Read(&aHeader.GraphicsMode);
+	Read(&aHeader.OpColourRed);
+	Read(&aHeader.OpColourGreen);
+	Read(&aHeader.OpColourBlue);
 }
 
 char *VMHDAtom::OnGetAtomName()
@@ -1545,7 +1408,7 @@ char *VMHDAtom::OnGetAtomName()
 	return "Quicktime Video Media Header";
 }
 
-SMHDAtom::SMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+SMHDAtom::SMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
 
@@ -1555,9 +1418,13 @@ SMHDAtom::~SMHDAtom()
 
 void SMHDAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
-	Read(&theHeader.Balance);
-	Read(&theHeader.Reserved);
+	smhd aHeader;
+	Read(&aHeader.Version);
+	Read(&aHeader.Flags1);
+	Read(&aHeader.Flags2);
+	Read(&aHeader.Flags3);
+	Read(&aHeader.Balance);
+	Read(&aHeader.Reserved);
 }
 
 char *SMHDAtom::OnGetAtomName()
