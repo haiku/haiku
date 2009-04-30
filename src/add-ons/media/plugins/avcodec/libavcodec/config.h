@@ -54,7 +54,9 @@
 #define HAVE_DLFCN_H 0
 #define HAVE_DLOPEN 0
 #define HAVE_DOS_PATHS 0
-#define HAVE_EBP_AVAILABLE 0
+// Jamfile must have -fomit_frame_pointer
+#define HAVE_EBP_AVAILABLE 1
+// We use position independant code so no EBX
 #define HAVE_EBX_AVAILABLE 0
 #define HAVE_FAST_64BIT 0
 #define HAVE_FAST_CMOV 0
@@ -75,10 +77,10 @@
 #define HAVE_MACHINE_IOCTL_BT848_H 0
 #define HAVE_MACHINE_IOCTL_METEOR_H 0
 #define HAVE_MALLOC_H 1
-#define HAVE_MEMALIGN 1
+#define HAVE_MEMALIGN 0
 #define HAVE_MKSTEMP 1
 #define HAVE_PLD 0
-#define HAVE_POSIX_MEMALIGN 0
+#define HAVE_POSIX_MEMALIGN 1
 #define HAVE_PPC64 0
 #define HAVE_ROUND 1
 #define HAVE_ROUNDF 1
