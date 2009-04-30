@@ -215,52 +215,98 @@ printf("LegendChartAxis::Render()\n");
 	if (!_ValidateLayout(view))
 		return;
 
-	if (fLocation == CHART_AXIS_BOTTOM) {
+	float valueDirection;
+	float rulerDirection;
+	float BSize::* sizeField;
+	float BSize::* otherSizeField;
+	float BPoint::* pointField;
+	float BPoint::* otherPointField;
+
+	switch (fLocation) {
+		case CHART_AXIS_LEFT:
+		case CHART_AXIS_RIGHT:
+			valueDirection = -1;
+			rulerDirection = fLocation == CHART_AXIS_LEFT ? -1 : 1;
+			sizeField = &BSize::height;
+			otherSizeField = &BSize::width;
+			pointField = &BPoint::y;
+			otherPointField = &BPoint::x;
+			break;
+		case CHART_AXIS_TOP:
+		case CHART_AXIS_BOTTOM:
+			valueDirection = 1;
+			rulerDirection = fLocation == CHART_AXIS_TOP ? -1 : 1;
+			sizeField = &BSize::width;
+			otherSizeField = &BSize::height;
+			pointField = &BPoint::x;
+			otherPointField = &BPoint::y;
+			break;
+		default:
+			return;
+	}
+
 printf("  rendering...\n");
-		float totalSize = floorf(fFrame.Width()) + 1;
-		double rangeSize = fRange.max - fRange.min;
-		if (rangeSize == 0)
-			rangeSize = 1.0;
-		double scale = (double)totalSize / rangeSize;
-		float BSize::* sizeField = &BSize::width;
+	float totalSize = floorf(fFrame.Size().*sizeField) + 1;
+	double rangeSize = fRange.max - fRange.min;
+	if (rangeSize == 0)
+		rangeSize = 1.0;
+	double scale = (double)totalSize / rangeSize;
 
-		// draw the ruler
-		float rulerLeft = fFrame.left;
-		float rulerTop = fFrame.top + kChartRulerDistance;
-		float rulerRight = fFrame.right;
-		float rulerBottom = rulerTop + kRulerSize;
-printf("  ruler: (%f, %f) - (%f, %f)\n", rulerLeft, rulerTop, rulerRight, rulerBottom);
+	// draw the ruler
+	float rulerStart = fFrame.LeftBottom().*pointField;
+	float rulerChartClosest = rulerDirection == 1
+		? fFrame.LeftTop().*otherPointField + kChartRulerDistance
+		: fFrame.RightBottom().*otherPointField - kChartRulerDistance;
+	float rulerEnd = fFrame.RightTop().*pointField;
+	float rulerChartDistant = rulerChartClosest + rulerDirection * kRulerSize;
+printf("  ruler: (%f, %f) - (%f, %f)\n", rulerStart, rulerChartClosest, rulerEnd, rulerChartDistant);
 
-		rgb_color black = { 0, 0, 0, 255 };
-		view->BeginLineArray(3 + fLegends.CountItems());
-		view->AddLine(BPoint(rulerLeft, rulerTop),
-			BPoint(rulerLeft, rulerBottom), black);
-		view->AddLine(BPoint(rulerLeft, rulerBottom),
-			BPoint(rulerRight, rulerBottom), black);
-		view->AddLine(BPoint(rulerRight, rulerBottom),
-			BPoint(rulerRight, rulerTop), black);
+	rgb_color black = { 0, 0, 0, 255 };
+	view->BeginLineArray(3 + fLegends.CountItems());
+	BPoint first;
+	first.*pointField = rulerStart;
+	first.*otherPointField = rulerChartClosest;
+	BPoint second = first;
+	second.*otherPointField = rulerChartDistant;
+	BPoint third = second;
+	third.*pointField = rulerEnd;
+	BPoint fourth = third;
+	fourth.*otherPointField = rulerChartClosest;
+	view->AddLine(first, second, black);
+	view->AddLine(second, third, black);
+	view->AddLine(third, fourth, black);
 
-		// marks
-		for (int32 i = 0; LegendInfo* info = fLegends.ItemAt(i); i++) {
-			float position = (info->value - fRange.min) * scale;
-			position += rulerLeft;
-printf("  drawing mark at (%f, %f)\n", position, rulerBottom);
-			view->AddLine(BPoint(position, rulerBottom),
-				BPoint(position, rulerBottom + kRulerMarkSize), black);
-		}
-		view->EndLineArray();
+	// marks
+	for (int32 i = 0; LegendInfo* info = fLegends.ItemAt(i); i++) {
+		float position = (info->value - fRange.min) * scale;
+		position = rulerStart + valueDirection * position;
+		first.*pointField = position;
+		first.*otherPointField = rulerChartDistant;
+		second.*pointField = position;
+		second.*otherPointField = rulerChartDistant
+			+ rulerDirection * kRulerMarkSize;
+printf("  drawing mark at (%f, %f)\n", first.x, first.y);
+		view->AddLine(first, second, black);
+	}
+	view->EndLineArray();
 
-		// draw the legends
-		float legendTop = rulerBottom + kRulerMarkSize + kRulerLegendDistance;
+	// draw the legends
+	float legendRulerClosest = rulerChartDistant
+		+ rulerDirection * (kRulerMarkSize + kRulerLegendDistance);
 
-		for (int32 i = 0; LegendInfo* info = fLegends.ItemAt(i); i++) {
-			float position = _LegendPosition(info->value, info->size.*sizeField,
-				(float)totalSize, scale);;
-printf("  legend %ld: position: (%f, %f), size: (%f, %f)\n", i, position, legendTop, info->size.width, info->size.height);
+	for (int32 i = 0; LegendInfo* info = fLegends.ItemAt(i); i++) {
+		float position = _LegendPosition(info->value, info->size.*sizeField,
+			(float)totalSize, scale);;
 
-			fLegendRenderer->RenderLegend(info->legend, view,
-				BPoint(rulerLeft + position, legendTop));
-		}
+		first.*pointField = rulerStart
+			+ (valueDirection == 1
+				? position : -position - info->size.*sizeField);
+		first.*otherPointField = rulerDirection == 1
+			? legendRulerClosest
+			: legendRulerClosest - info->size.*otherSizeField;
+printf("  legend %ld: position: (%f, %f), size: (%f, %f)\n", i, first.x, first.y, info->size.width, info->size.height);
+
+		fLegendRenderer->RenderLegend(info->legend, view, first);
 	}
 }
 
