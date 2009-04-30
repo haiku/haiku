@@ -16,14 +16,14 @@
 #endif
 
 //#define INCLUDE_MMX 	defined(__INTEL__)
-#define INCLUDE_MMX 	0
+#define INCLUDE_MMX 	1
 
 // this function will try to find the best colorspaces for both the ff-codec and 
 // the Media Kit sides.
 gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat)
 {
 #if INCLUDE_MMX
-	bool mmx = IsMmxCpu();
+	bool mmx = true;
 #endif
 
 	switch (colorSpace)

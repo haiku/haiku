@@ -8,7 +8,7 @@ SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-SubDirCcFlags -fomit-frame-pointer -DPIC ;
+SubDirCcFlags -fomit-frame-pointer -DPIC -fno-common ;
 
 local arch_sources ;
 arch_sources = ;

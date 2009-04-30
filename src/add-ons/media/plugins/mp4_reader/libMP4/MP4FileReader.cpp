@@ -69,6 +69,7 @@ MP4FileReader::IsEndOfData(off_t pPosition)
 		if ((aAtomBase) && (aAtomBase->getAtomSize() > 8)) {
 			MDATAtom *aMDATAtom = dynamic_cast<MDATAtom *>(aAtomBase);
 			if (pPosition >= aMDATAtom->getAtomOffset() && pPosition <= aMDATAtom->getEOF()) {
+//				printf("IsEndOfData %Ld,%Ld,%Ld\n",pPosition,aMDATAtom->getAtomOffset(),aMDATAtom->getEOF());
 				return false;
 			}
 		}
@@ -634,7 +635,7 @@ MP4FileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 		*keyframe = IsKeyFrame(streamIndex, pFrameNo);
 	}
 
-//	printf("start %Ld, size %ld, eof %s, eod %s\n",*start,*size, IsEndOfFile(*start + *size) ? "true" : "false", IsEndOfData(*start + *size) ? "true" : "false");
+//	printf("frame %ld start %Ld, size %ld, eof %s, eod %s\n",pFrameNo,*start,*size, IsEndOfFile(*start + *size) ? "true" : "false", IsEndOfData(*start + *size) ? "true" : "false");
 
 	// TODO need a better method for detecting End of Data Note ChunkSize of 0 seems to be it.
 	if (IsEndOfFile(*start + *size) || IsEndOfData(*start + *size)) {

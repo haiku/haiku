@@ -2391,6 +2391,56 @@ void ff_x264_deblock_h_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int 
 #define ff_float_to_int16_interleave6_3dnow(a,b,c) float_to_int16_interleave_misc_3dnow(a,b,c,6)
 #define ff_float_to_int16_interleave6_3dn2(a,b,c)  float_to_int16_interleave_misc_3dnow(a,b,c,6)
 #endif
+
+#include <stdio.h>
+#undef printf
+
+void haiku_x264_deblock_v_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0) {
+
+  uintptr_t v = (uintptr_t)pix;
+  size_t align1;
+  size_t align2;
+
+  align1 = ffs((int)v);
+  printf("V pix aligned(16): %s: address: %p alignment: %d (2^%u)\n",
+        align1 > 4 ? "PASS" : "FAIL", v, 1<<(align1-1), align1-1);
+
+  v = (uintptr_t)tc0;
+
+  align2 = ffs((int)v);
+  printf("V tc0 aligned(16): %s: address: %p alignment: %d (2^%u)\n",
+        align2 > 4 ? "PASS" : "FAIL", v, 1<<(align2-1), align2-1);
+
+	if (align1 > 4 && align2 > 4) {
+		ff_x264_deblock_v_luma_sse2(pix, stride, alpha, beta, tc0);
+	} else {
+		h264_v_loop_filter_luma_mmx2(pix, stride, alpha, beta, tc0);
+	}
+}
+
+void haiku_x264_deblock_h_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0) {
+
+  uintptr_t v = (uintptr_t)pix;
+  size_t align1;
+  size_t align2;
+
+  align1 = ffs((int)v);
+  printf("H pix aligned(16): %s: address: %p alignment: %d (2^%u)\n",
+        align1 > 4 ? "PASS" : "FAIL", v, 1<<(align1-1), align1-1);
+
+  v = (uintptr_t)tc0;
+
+  align2 = ffs((int)v);
+  printf("H tc0 aligned(16): %s: address: %p alignment: %d (2^%u)\n",
+        align2 > 4 ? "PASS" : "FAIL", v, 1<<(align2-1), align2-1);
+
+	if (align1 > 4 && align2 > 4) {
+		ff_x264_deblock_h_luma_sse2(pix, stride, alpha, beta, tc0);
+	} else {
+		h264_h_loop_filter_luma_mmx2(pix, stride, alpha, beta, tc0);
+	}
+}
+
 #define ff_float_to_int16_interleave6_sse2 ff_float_to_int16_interleave6_sse
 
 #define FLOAT_TO_INT16_INTERLEAVE(cpu, body) \
@@ -2945,8 +2995,8 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 #endif
             if( mm_flags&FF_MM_SSE2 ){
 #if ARCH_X86_64 || !defined(__ICC) || __ICC > 1100
-                c->h264_v_loop_filter_luma = ff_x264_deblock_v_luma_sse2;
-                c->h264_h_loop_filter_luma = ff_x264_deblock_h_luma_sse2;
+                c->h264_v_loop_filter_luma = haiku_x264_deblock_v_luma_sse2;
+                c->h264_h_loop_filter_luma = haiku_x264_deblock_h_luma_sse2;
                 c->h264_v_loop_filter_luma_intra = ff_x264_deblock_v_luma_intra_sse2;
                 c->h264_h_loop_filter_luma_intra = ff_x264_deblock_h_luma_intra_sse2;
 #endif

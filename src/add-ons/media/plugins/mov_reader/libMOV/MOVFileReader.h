@@ -33,7 +33,7 @@
 #include "MOVParser.h"
 #include "ChunkSuperIndex.h"
 
-// QT MOV file reader (and maybe MP4 as well)
+// QT MOV file reader
 class MOVFileReader {
 private:
 	// Atom List
@@ -68,9 +68,9 @@ public:
 	// getter for MVHDAtom
 	MVHDAtom	*getMVHDAtom();
 
-	bool	IsEndOfFile(off_t pPosition);
+	bool	IsEndOfFile(off_t position);
 	bool	IsEndOfFile();
-	bool	IsEndOfData(off_t pPosition);
+	bool	IsEndOfData(off_t position);
 	
 	// Is this a quicktime file
 	static bool	IsSupported(BPositionIO *source);
@@ -81,45 +81,44 @@ public:
 	// Duration defined by the movie header
 	bigtime_t	getMovieDuration();
 	
-	// The first video track duration indexed by stream_index
-	bigtime_t	getVideoDuration(uint32 stream_index);
-	// the first audio track duration indexed by stream_index
-	bigtime_t	getAudioDuration(uint32 stream_index);
+	// The first video track duration indexed by streamIndex
+	bigtime_t	getVideoDuration(uint32 streamIndex);
+	// the first audio track duration indexed by streamIndex
+	bigtime_t	getAudioDuration(uint32 streamIndex);
 	// the max of all active audio or video durations
 	bigtime_t	getMaxDuration();
 
-	// The no of frames in the video track indexed by stream_index
-	uint32		getVideoFrameCount(uint32 stream_index);
-	// The no of frames in the audio track indexed by stream_index
-	uint32		getAudioFrameCount(uint32 stream_index);
-
+	// The no of frames in the track indexed by streamIndex
+	uint32		getFrameCount(uint32 streamIndex);
+	// The no of chunks in the audio track indexed by streamIndex
+	uint32		getAudioChunkCount(uint32 streamIndex);
 	// Is stream (track) a video track
-	bool		IsVideo(uint32 stream_index);
+	bool		IsVideo(uint32 streamIndex);
 	// Is stream (track) a audio track
-	bool		IsAudio(uint32 stream_index);
+	bool		IsAudio(uint32 streamIndex);
 
-	uint32	getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo);
-	uint32	getFirstFrameInChunk(uint32 stream_index, uint32 pChunkID);
+	uint32	getNoFramesInChunk(uint32 streamIndex, uint32 pFrameNo);
+	uint32	getFirstFrameInChunk(uint32 streamIndex, uint32 pChunkID);
 
-	uint64	getOffsetForFrame(uint32 stream_index, uint32 pFrameNo);
-	uint32	getChunkSize(uint32 stream_index, uint32 pFrameNo);
-	bool	IsKeyFrame(uint32 stream_index, uint32 pFrameNo);
+	uint64	getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo);
+	uint32	getChunkSize(uint32 streamIndex, uint32 pFrameNo);
+	bool	IsKeyFrame(uint32 streamIndex, uint32 pFrameNo);
 
 	status_t	ParseFile();
 	BPositionIO *Source() {return theStream;};
 
-	bool	IsActive(uint32 stream_index);
+	bool	IsActive(uint32 streamIndex);
 
-	bool	GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
+	bool	GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
 	
 	// Return all Audio Meta Data
-	const 	AudioMetaData 		*AudioFormat(uint32 stream_index);
+	const 	AudioMetaData 		*AudioFormat(uint32 streamIndex);
 	// Return all Video Meta Data
-	const 	VideoMetaData		*VideoFormat(uint32 stream_index);
+	const 	VideoMetaData		*VideoFormat(uint32 streamIndex);
 	
 	// XXX these need work
 	const 	mov_main_header		*MovMainHeader();
-	const 	mov_stream_header	*StreamFormat(uint32 stream_index);
+	const 	mov_stream_header	*StreamFormat(uint32 streamIndex);
 };
 
 #endif

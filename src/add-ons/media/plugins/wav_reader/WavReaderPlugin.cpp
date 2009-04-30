@@ -31,7 +31,7 @@
 #include "WavReaderPlugin.h"
 #include "RawFormats.h"
 
-//#define TRACE_WAVE_READER
+#define TRACE_WAVE_READER
 #ifdef TRACE_WAVE_READER
   #define TRACE printf
 #else
@@ -137,7 +137,11 @@ WavReader::Sniff(int32 *streamCount)
 	}
 	
 	format_struct format;
+	wave_format_ex wav_format;
 	format_struct_extensible format_ext;
+	mpeg1_wav_format mpeg1_format;
+	mpeg3_wav_format mpeg3_format;
+	
 	fact_struct fact;
 	
 	// read all chunks and search for "fact", "fmt" (normal or extensible) and "data"
@@ -146,6 +150,9 @@ WavReader::Sniff(int32 *streamCount)
 	bool foundFmt = false;
 	bool foundFmtExt = false;
 	bool foundData = false;
+	bool foundMPEG1 = false;
+	bool foundMPEG3 = false;
+	
 	while (pos + sizeof(chunk_struct) <= fFileSize) {
 		chunk_struct chunk;
 		if (sizeof(chunk) != Source()->ReadAt(pos, &chunk, sizeof(chunk))) {
@@ -159,12 +166,43 @@ WavReader::Sniff(int32 *streamCount)
 		}
 		switch (UINT32(chunk.fourcc)) {
 			case FOURCC('f','m','t',' '):
-				if (UINT32(chunk.len) >= sizeof(format)) {
+				// So what do we have a std format structure, a wav_format structure or a extended structure
+				if (UINT32(chunk.len) >= sizeof(wav_format)) {
+					// Read both format and wav format
+					if (sizeof(format) != Source()->ReadAt(pos, &format, sizeof(format))) {
+						ERROR("WavReader::Sniff: format chunk reading failed\n");
+						break;
+					}
+					if (sizeof(wav_format) != Source()->ReadAt(pos, &wav_format, sizeof(wav_format))) {
+						ERROR("WavReader::Sniff: format chunk reading failed\n");
+						break;
+					}
+					foundFmt = true;
+					
+					if (UINT16(wav_format.extra_size) == 12) {
+						// MPEG3 WAV FORMAT Structure
+						if (sizeof(mpeg3_format) != Source()->ReadAt(pos, &mpeg3_format, sizeof(mpeg3_format))) {
+							ERROR("WavReader::Sniff: format chunk reading failed\n");
+							break;
+						}
+						foundMPEG3 = true;
+					}
+					if (UINT16(wav_format.extra_size) == 22) {
+						// MPEG1 WAV FORMAT Structure
+						if (sizeof(mpeg1_format) != Source()->ReadAt(pos, &mpeg1_format, sizeof(mpeg1_format))) {
+							ERROR("WavReader::Sniff: format chunk reading failed\n");
+							break;
+						}
+						foundMPEG1 = true;
+					}
+					
+				} else if (UINT32(chunk.len) >= sizeof(format)) {
 					if (sizeof(format) != Source()->ReadAt(pos, &format, sizeof(format))) {
 						ERROR("WavReader::Sniff: format chunk reading failed\n");
 						break;
 					}
 					foundFmt = true;
+					
 					if (UINT32(chunk.len) >= sizeof(format_ext) && UINT16(format.format_tag) == 0xfffe) {
 						if (sizeof(format_ext) != Source()->ReadAt(pos, &format_ext, sizeof(format_ext))) {
 							ERROR("WavReader::Sniff: format extensible chunk reading failed\n");
@@ -230,6 +268,28 @@ WavReader::Sniff(int32 *streamCount)
 	}
 	if (foundFact) {
 		TRACE("  sample_length         %ld\n", UINT32(fact.sample_length));
+	}
+	
+	if (foundMPEG1) {
+		TRACE("  layer        %d\n", UINT16(mpeg1_format.head_layer));
+		TRACE("  bitrate      %ld\n", UINT32(mpeg1_format.head_bitrate));
+		TRACE("  mode         %d\n", UINT16(mpeg1_format.head_mode));
+		TRACE("  mode ext     %d\n", UINT16(mpeg1_format.head_mode_ext));
+		TRACE("  emphisis     %d\n", UINT16(mpeg1_format.head_emphasis));
+		TRACE("  flags        %d\n", UINT16(mpeg1_format.head_flags));
+		TRACE("  pts low      %ld\n", UINT32(mpeg1_format.pts_low));
+		TRACE("  pts high     %ld\n", UINT32(mpeg1_format.pts_high));
+	}
+
+	if (foundMPEG3) {
+		TRACE("  id               %d\n", UINT16(mpeg3_format.id));
+		TRACE("  flags           %ld\n", UINT32(mpeg3_format.flags));
+		TRACE("  block size       %d\n", UINT16(mpeg3_format.block_size));
+		TRACE("  frames per block %d\n", UINT16(mpeg3_format.frames_per_block));
+		TRACE("  codec delay      %d\n", UINT16(mpeg3_format.codec_delay));
+		fBufferSize = mpeg3_format.block_size;
+	} else {
+		fBufferSize = BUFFER_SIZE;
 	}
 
 	fMetaData.extra_size = 0;
@@ -298,7 +358,7 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->position = 0;
 	data->datasize = fDataSize;
 	data->fps = fMetaData.samples_per_sec;
-	data->buffersize = (BUFFER_SIZE / fMetaData.block_align) * fMetaData.block_align;
+	data->buffersize = (fBufferSize / fMetaData.block_align) * fMetaData.block_align;
 	data->buffer = malloc(data->buffersize);
 	data->framecount = fFrameCount ? fFrameCount : (8 * fDataSize) / (fMetaData.channels * fMetaData.bits_per_sample);
 	data->raw = fMetaData.format_tag == 0x0001;

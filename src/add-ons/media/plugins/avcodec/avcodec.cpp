@@ -466,12 +466,18 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			if (fChunkBufferSize == 0) {
 				media_header chunk_mh;
 				status_t err;
+				printf("Asking for more data after %Ld frames\n",fFrame);
 				err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
+				if (err == B_LAST_BUFFER_ERROR) {
+					printf("Last Chunk with chunk size %ld\n",fChunkBufferSize);
+					return err;
+				}
 				if (err != B_OK || fChunkBufferSize < 0) {
-					TRACE("GetNextChunk error %ld\n",fChunkBufferSize);
+					printf("GetNextChunk error %ld\n",fChunkBufferSize);
 					fChunkBufferSize = 0;
 					break;
 				}
+				printf("Got a Chunk with start time of %Ld\n",chunk_mh.start_time);
 				fChunkBufferOffset = 0;
 				fStartTime = chunk_mh.start_time;
 				if (*out_frameCount == 0)

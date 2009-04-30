@@ -140,6 +140,11 @@ struct TimeToSample {
 	uint32	Duration;
 };
 
+struct CompTimeToSample {
+	uint32	Count;
+	uint32	Offset;
+};
+
 struct SampleToChunk {
 	uint32	FirstChunk;
 	uint32	SamplesPerChunk;

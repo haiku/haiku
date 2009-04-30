@@ -56,7 +56,40 @@ struct wave_format_ex {
 	uint16 block_align;
 	uint16 bits_per_sample;
 	uint16 extra_size;
-} _PACKED;
+};
+
+struct mpeg3_wav_format {
+	uint16 format_tag;
+	uint16 channels;
+	uint32 samples_per_sec;
+	uint32 avg_bytes_per_sec;
+	uint16 block_align;
+	uint16 bits_per_sample;
+	uint16 extra_size;
+	uint16 id;
+	uint32 flags;
+	uint16 block_size;
+	uint16 frames_per_block;
+	uint16 codec_delay;
+};
+
+struct mpeg1_wav_format {
+	uint16 format_tag;
+	uint16 channels;
+	uint32 samples_per_sec;
+	uint32 avg_bytes_per_sec;
+	uint16 block_align;
+	uint16 bits_per_sample;
+	uint16 extra_size;
+	uint16 head_layer;
+	uint32 head_bitrate;
+	uint16 head_mode;
+	uint16 head_mode_ext;
+	uint16 head_emphasis;
+	uint16 head_flags;
+	uint32 pts_low;
+	uint32 pts_high;
+};
 
 struct format_struct_extensible
 { 
