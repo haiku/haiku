@@ -1893,6 +1893,8 @@ vm_page_try_reserve_pages(uint32 count)
 }
 
 
+// TODO: you must not have locked a cache when calling this function with
+// reserved == false. See vm_cache_acquire_locked_page_cache().
 vm_page *
 vm_page_allocate_page(int pageState, bool reserved)
 {
@@ -2167,10 +2169,17 @@ vm_page_num_free_pages(void)
 {
 	size_t reservedPages = sReservedPages;
 	size_t count = free_page_queue_count() + sInactivePageQueue.count;
-	if (reservedPages > count)
+	if (reservedPages >= count)
 		return 0;
 
 	return count - reservedPages;
+}
+
+
+size_t
+vm_page_num_unused_pages(void)
+{
+	return free_page_queue_count() - sReservedPages;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -35,6 +35,7 @@ void vm_page_requeue(struct vm_page *page, bool tail);
 size_t vm_page_num_pages(void);
 size_t vm_page_num_free_pages(void);
 size_t vm_page_num_available_pages(void);
+size_t vm_page_num_unused_pages(void);
 void vm_page_get_stats(system_info *info);
 
 status_t vm_page_write_modified_page_range(struct VMCache *cache,

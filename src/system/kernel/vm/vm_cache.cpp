@@ -345,6 +345,9 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 			return NULL;
 		}
 
+		// TODO: this is problematic, as it requires the caller not to have
+		// a lock on this cache (it might be called via
+		// vm_page_allocate_page(..., false)).
 		if (!cache->SwitchLock(&sCacheListLock)) {
 			// cache has been deleted
 			mutex_lock(&sCacheListLock);
