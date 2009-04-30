@@ -18,6 +18,7 @@
 #include "ThreadModel.h"
 #include "ThreadModelLoader.h"
 
+#include "thread_window/ActivityPage.h"
 #include "thread_window/GeneralPage.h"
 #include "thread_window/WaitObjectsPage.h"
 
@@ -41,6 +42,7 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 	fMainTabView(NULL),
 	fGeneralPage(NULL),
 	fWaitObjectsPage(NULL),
+	fActivityPage(NULL),
 	fModel(model),
 	fThread(thread),
 	fThreadModel(NULL),
@@ -56,6 +58,7 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 
 	fMainTabView->AddTab(fGeneralPage = new GeneralPage);
 	fMainTabView->AddTab(fWaitObjectsPage = new WaitObjectsPage);
+	fMainTabView->AddTab(fActivityPage = new ActivityPage);
 
 	fGeneralPage->SetModel(fModel, fThread);
 
@@ -146,4 +149,5 @@ ThreadWindow::_SetModel(ThreadModel* model)
 	fThreadModel = model;
 
 	fWaitObjectsPage->SetModel(fThreadModel);
+	fActivityPage->SetModel(fThreadModel);
 }

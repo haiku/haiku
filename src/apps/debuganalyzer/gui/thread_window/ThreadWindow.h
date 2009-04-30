@@ -26,6 +26,7 @@ public:
 	virtual	void				Show();
 
 private:
+			class ActivityPage;
 			class GeneralPage;
 			class WaitObjectsPage;
 
@@ -36,6 +37,7 @@ private:
 			BTabView*			fMainTabView;
 			GeneralPage*		fGeneralPage;
 			WaitObjectsPage*	fWaitObjectsPage;
+			ActivityPage*		fActivityPage;
 			Model*				fModel;
 			Model::Thread*		fThread;
 			ThreadModel*		fThreadModel;

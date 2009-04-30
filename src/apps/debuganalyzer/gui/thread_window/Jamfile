@@ -8,7 +8,8 @@ UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 
 MergeObject DebugAnalyzer_gui_thread_window.o
 	:
-	ThreadWindow.cpp
+	ActivityPage.cpp
 	GeneralPage.cpp
+	ThreadWindow.cpp
 	WaitObjectsPage.cpp
 ;
