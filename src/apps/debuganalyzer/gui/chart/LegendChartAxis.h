@@ -25,7 +25,7 @@ public:
 	virtual	void				SetLocation(ChartAxisLocation location);
 	virtual	void				SetRange(const ChartDataRange& range);
 	virtual	void				SetFrame(BRect frame);
-	virtual	BSize				PreferredSize(BView* view);
+	virtual	BSize				PreferredSize(BView* view, BSize maxSize);
 	virtual	void				Render(BView* view, BRect updateRect);
 
 private:
@@ -34,6 +34,8 @@ private:
 private:
 			void				_InvalidateLayout();
 			bool				_ValidateLayout(BView* view);
+			int32				_EstimateMaxLegendCount(BView* view, BSize size,
+									float* _hSpacing, float* _vSpacing);
 	inline	float				_LegendPosition(double value, float legendSize,
 									float totalSize, double scale);
 	inline	void				_FilterLegends(int32 totalSize, int32 spacing,

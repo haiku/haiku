@@ -288,13 +288,15 @@ printf("Chart::DoLayout(%f, %f)\n", size.width, size.height);
 	int32 bottom = 0;
 
 	if (fLeftAxis.axis != NULL)
-		left = fLeftAxis.axis->PreferredSize(this).IntegerWidth() + 1;
+		left = fLeftAxis.axis->PreferredSize(this, size).IntegerWidth() + 1;
 	if (fRightAxis.axis != NULL)
-		right = fRightAxis.axis->PreferredSize(this).IntegerWidth() + 1;
+		right = fRightAxis.axis->PreferredSize(this, size).IntegerWidth() + 1;
 	if (fTopAxis.axis != NULL)
-		top = fTopAxis.axis->PreferredSize(this).IntegerHeight() + 1;
-	if (fBottomAxis.axis != NULL)
-		bottom = fBottomAxis.axis->PreferredSize(this).IntegerHeight() + 1;
+		top = fTopAxis.axis->PreferredSize(this, size).IntegerHeight() + 1;
+	if (fBottomAxis.axis != NULL) {
+		bottom = fBottomAxis.axis->PreferredSize(this, size).IntegerHeight()
+			+ 1;
+	}
 
 	fChartFrame = BRect(left, top, width - right - 1, height - bottom - 1);
 	fRenderer->SetFrame(fChartFrame.InsetByCopy(1, 1));

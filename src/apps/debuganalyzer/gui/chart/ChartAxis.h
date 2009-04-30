@@ -21,7 +21,7 @@ public:
 	virtual	void				SetLocation(ChartAxisLocation location) = 0;
 	virtual	void				SetRange(const ChartDataRange& range) = 0;
 	virtual	void				SetFrame(BRect frame) = 0;
-	virtual	BSize				PreferredSize(BView* view) = 0;
+	virtual	BSize				PreferredSize(BView* view, BSize maxSize) = 0;
 	virtual	void				Render(BView* view, BRect updateRect) = 0;
 };
 

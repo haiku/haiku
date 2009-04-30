@@ -192,19 +192,53 @@ printf("LegendChartAxis::SetFrame((%f, %f) - (%f, %f))\n", frame.left, frame.top
 
 
 BSize
-LegendChartAxis::PreferredSize(BView* view)
+LegendChartAxis::PreferredSize(BView* view, BSize maxSize)
 {
-// TODO: Implement for real!
-	BSize size = fLegendRenderer->MaximumLegendSize(view);
+	// estimate the maximum legend count we might need
+	float hSpacing, vSpacing;
+	int32 maxLegends = _EstimateMaxLegendCount(view, maxSize, &hSpacing,
+		&vSpacing);
+	BSize spacing(hSpacing, vSpacing);
+	if (maxLegends < 4)
+		maxLegends = 4;
+
+	// get the legends
+	ChartLegend* legends[maxLegends];
+	double values[maxLegends];
+
+	int32 legendCount = fLegendSource->GetAxisLegends(fRange, legends, values,
+		maxLegends);
+
+	// get the sizes, delete the legends, and compute the preferred size
+	float BSize::* sizeField;
+	float BSize::* otherSizeField;
 	if (fLocation == CHART_AXIS_LEFT || fLocation == CHART_AXIS_RIGHT) {
-		size.width += kChartLegendDistance;
-		size.height = std::max(size.height * 4, 100.0f);
+		sizeField = &BSize::height;
+		otherSizeField = &BSize::width;
 	} else {
-		size.width = std::max(size.width * 4, 100.0f);
-		size.height += kChartLegendDistance;
+		sizeField = &BSize::width;
+		otherSizeField = &BSize::height;
 	}
 
-	return size;
+	BSize preferredSize;
+
+	for (int32 i = 0; i < legendCount; i++) {
+		ChartLegend* legend = legends[i];
+		BSize size = fLegendRenderer->LegendSize(legend, view);
+		delete legend;
+
+		if (size.*sizeField > preferredSize.*sizeField)
+			preferredSize.*sizeField = size.*sizeField;
+		if (size.*otherSizeField > preferredSize.*otherSizeField)
+			preferredSize.*otherSizeField = size.*otherSizeField;
+	}
+
+	// Suppose we want to have at least 2 legends.
+	preferredSize.*sizeField
+		= ceilf(preferredSize.*sizeField * 2 + spacing.*sizeField);
+	preferredSize.*otherSizeField += kChartLegendDistance;
+
+	return preferredSize;
 }
 
 
@@ -331,15 +365,9 @@ printf("LegendChartAxis::_ValidateLayout()\n");
 	int32 height = fFrame.IntegerHeight() + 1;
 printf("  width: %ld, height: %ld\n", width, height);
 
-	fLegendRenderer->GetMinimumLegendSpacing(view, &fHorizontalSpacing,
-		&fVerticalSpacing);
-
 	// estimate the maximum legend count we might need
-	int32 maxLegends;
-	if (fLocation == CHART_AXIS_LEFT || fLocation == CHART_AXIS_RIGHT)
-		maxLegends = height / (10 + fVerticalSpacing);
-	else
-		maxLegends = width / (20 + fHorizontalSpacing);
+	int32 maxLegends = _EstimateMaxLegendCount(view, fFrame.Size(),
+		&fHorizontalSpacing, &fVerticalSpacing);
 
 printf("  max %ld legends\n", maxLegends);
 	if (maxLegends == 0)
@@ -386,4 +414,18 @@ printf("  failed to create legend info!\n");
 
 	fLayoutValid = true;
 	return true;
+}
+
+
+int32
+LegendChartAxis::_EstimateMaxLegendCount(BView* view, BSize size,
+	float* _hSpacing, float* _vSpacing)
+{
+	// get the legend spacing
+	fLegendRenderer->GetMinimumLegendSpacing(view, _hSpacing, _vSpacing);
+
+	// estimate the maximum legend count we might need
+	if (fLocation == CHART_AXIS_LEFT || fLocation == CHART_AXIS_RIGHT)
+		return (size.IntegerHeight() + 1) / (10 + *_vSpacing);
+	return (size.IntegerWidth() + 1) / (20 + *_hSpacing);
 }
