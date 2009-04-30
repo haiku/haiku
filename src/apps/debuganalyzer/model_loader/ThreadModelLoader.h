@@ -31,6 +31,13 @@ protected:
 	virtual	void				FinishLoading(bool success);
 
 private:
+			// shorthands for the longish structure names
+			typedef system_profiler_thread_enqueued_in_run_queue
+				thread_enqueued_in_run_queue;
+			typedef system_profiler_thread_removed_from_run_queue
+				thread_removed_from_run_queue;
+
+private:
 			status_t			_Load();
 
 private:
