@@ -90,9 +90,9 @@ printf("BigtimeChartAxisLegendSource::GetAxisLegends(): range: %lld - %lld\n", s
 // TODO: Drop superfluous micro seconds digits, or even microseconds and seconds
 // completely.
 
-		StringChartLegend* legend = new(std::nothrow) StringChartLegend(buffer,
-			1);
-		if (legend == 0)
+		StringChartLegend* legend
+			= new(std::nothrow) StringChartLegend(buffer, 1);
+		if (legend == NULL)
 			return count;
 
 		legends[count] = legend;
