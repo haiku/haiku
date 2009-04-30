@@ -492,7 +492,7 @@ TBarApp::MessageReceived(BMessage *message)
 			bool reboot = (message->what == CMD_REBOOT_SYSTEM);
 			BRoster roster;
 			BRoster::Private rosterPrivate(roster);
-			status_t error = rosterPrivate.ShutDown(reboot, true, false);
+			status_t error = rosterPrivate.ShutDown(reboot, false, false);
 			if (error != B_OK)
 				fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 

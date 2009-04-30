@@ -366,31 +366,30 @@ TBeMenu::AddStandardBeMenuItems()
 
 	AddSeparatorItem();
 
-#ifdef __HAIKU__
-	item = new BMenuItem("Restart" B_UTF8_ELLIPSIS,
-		new BMessage(CMD_REBOOT_SYSTEM));
-#else
-	item = new BMenuItem("Restart", new BMessage(CMD_REBOOT_SYSTEM));
-#endif
+	BMenu *shutdownMenu = new BMenu("Shutdown");
+
+	item = new BMenuItem("Restart System", new BMessage(CMD_REBOOT_SYSTEM));
 	item->SetEnabled(!dragging);
-	AddItem(item);
+	shutdownMenu->AddItem(item);
 
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
 		item = new BMenuItem("Suspend", new BMessage(CMD_SUSPEND_SYSTEM));
 		item->SetEnabled(!dragging);
-		AddItem(item);
+		shutdownMenu->AddItem(item);
 	}
 #endif
 
-#ifdef __HAIKU__
-	item = new BMenuItem("Shut Down" B_UTF8_ELLIPSIS,
-		new BMessage(CMD_SHUTDOWN_SYSTEM));
-#else
-	item = new BMenuItem("Shut Down", new BMessage(CMD_SHUTDOWN_SYSTEM));
-#endif
+	item = new BMenuItem("Power Off", new BMessage(CMD_SHUTDOWN_SYSTEM));
 	item->SetEnabled(!dragging);
-	AddItem(item);
+	shutdownMenu->AddItem(item);
+
+#ifdef __HAIKU__
+	shutdownMenu->SetTargetForItems(be_app);
+#else
+	shutdownMenu->SetTargetForItems(BMessenger(ROSTER_SIG));
+#endif
+	AddItem(shutdownMenu);
 
 	fAddState = kAddingRecents;
 
