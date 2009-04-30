@@ -231,14 +231,14 @@ Controller::SetTo(const entry_ref &ref)
 
 	err = mf->InitCheck();
 	if (err != B_OK) {
-		//printf("Controller::SetTo: initcheck failed\n");
+		printf("Controller::SetTo: initcheck failed\n");
 		_NotifyFileChanged();
 		return err;
 	}
 	
 	int trackcount = mf->CountTracks();
 	if (trackcount <= 0) {
-		//printf("Controller::SetTo: trackcount %d\n", trackcount);
+		printf("Controller::SetTo: trackcount %d\n", trackcount);
 		_NotifyFileChanged();
 		return B_MEDIA_NO_HANDLER;
 	}
@@ -248,15 +248,15 @@ Controller::SetTo(const entry_ref &ref)
 		media_format f;
 		err = t->EncodedFormat(&f);
 		if (err != B_OK) {
-			//printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
-			//	i, err, strerror(err));
+			printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
+				i, err, strerror(err));
 			mf->ReleaseTrack(t);
 			continue;
 		}
 		
 		if (t->Duration() <= 0) {
-			//printf("Controller::SetTo: track index %d has no duration\n",i);
-			//mf->ReleaseTrack(t);
+			printf("Controller::SetTo: track index %d has no duration\n",i);
+			mf->ReleaseTrack(t);
 			continue;
 		}
 		
@@ -282,8 +282,8 @@ Controller::SetTo(const entry_ref &ref)
 	SelectVideoTrack(0);
 
 	if (fAudioTrackSupplier == NULL && fVideoTrackSupplier == NULL) {
-		//printf("Controller::SetTo: no audio or video tracks found or "
-		//	"no decoders\n");
+		printf("Controller::SetTo: no audio or video tracks found or "
+			"no decoders\n");
 		_NotifyFileChanged();
 		delete fMediaFile;
 		fMediaFile = NULL;
@@ -453,8 +453,8 @@ Controller::SelectVideoTrack(int n)
 	fDuration = max_c(a, v);
 	fVideoFrameRate = fVideoTrackSupplier->Format().u.raw_video.field_rate;
 	if (fVideoFrameRate <= 0.0) {
-		//printf("Controller::SelectVideoTrack(%d) - invalid video frame rate: %.1f\n", n,
-		//	fVideoFrameRate);
+		printf("Controller::SelectVideoTrack(%d) - invalid video frame rate: %.1f\n",
+			n, fVideoFrameRate);
 		fVideoFrameRate = 25.0;
 	}
 
