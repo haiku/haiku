@@ -43,10 +43,13 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
 	modifiers mount mount_nfs mountvolume mv
-	nc netstat nl nohup od open passwd paste
-	patch pathchk pc ping play playfile playsound playwav pr prio printenv
-	printf profile ps ptx pwd query quit rc readlink release renice rescan rlog
-	rm rmattr rmindex rmdir roster route
+	nc netstat nl nohup
+	od open
+	passwd paste patch pathchk pc ping play playfile playsound playwav pr prio
+	printenv printf profile ps ptx pwd
+	query quit
+	rc readlink reindex release renice rescan rlog rm rmattr rmindex rmdir roster
+	route
 	safemode screen_blanker screenmode sed setdecor settype setversion setvolume
 	seq sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
 	stty su sum sync sysinfo

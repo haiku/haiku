@@ -95,6 +95,7 @@ StdBinCommands
 	play.cpp
 	query.cpp
 	quit.cpp
+	reindex.cpp
 	roster.cpp
 	setdecor.cpp
 	settype.cpp
