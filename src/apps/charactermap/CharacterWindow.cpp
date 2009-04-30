@@ -126,6 +126,9 @@ CharacterWindow::CharacterWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
+	} else {
+		MoveTo(BPoint(100, 100));
+		ResizeTo(600, 450);
 	}
 
 	// create GUI
