@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src apps debuganalyzer gui chart ;
+
+UsePrivateHeaders shared ;
+
+UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
+
+
+MergeObject DebugAnalyzer_gui_chart.o
+	:
+	BigtimeChartAxisLegendSource.cpp
+	Chart.cpp
+	ChartAxis.cpp
+	ChartAxisLegendSource.cpp
+	ChartDataSource.cpp
+	ChartLegend.cpp
+	ChartRenderer.cpp
+	LegendChartAxis.cpp
+	LineChartRenderer.cpp
+	StringChartLegend.cpp
+;

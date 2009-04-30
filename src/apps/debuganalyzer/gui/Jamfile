@@ -12,12 +12,14 @@ MergeObject DebugAnalyzer_gui.o
 	SubWindow.cpp
 	SubWindowManager.cpp
 	:
+	DebugAnalyzer_gui_chart.o
 	DebugAnalyzer_gui_main_window.o
 	DebugAnalyzer_gui_table.o
 	DebugAnalyzer_gui_thread_window.o
 ;
 
 
+HaikuSubInclude chart ;
 HaikuSubInclude main_window ;
 HaikuSubInclude table ;
 HaikuSubInclude thread_window ;
