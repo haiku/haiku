@@ -164,17 +164,16 @@ PrecacheIO::Start()
 	uint32 vecCount = 0;
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
-		vm_page* page = fPages[i++] = vm_page_allocate_page(
-			PAGE_STATE_FREE, true);
+		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE, true);
 		if (page == NULL)
 			break;
 
-		fBusyConditions[i - 1].Publish(page, "page");
-
+		fBusyConditions[i].Publish(page, "page");
 		fCache->InsertPage(page, fOffset + pos);
 
 		add_to_iovec(fVecs, vecCount, fPageCount,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
+		fPages[i++] = page;
 	}
 
 	if (i != fPageCount) {
@@ -903,10 +902,8 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 extern "C" void
 cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 {
-	if (low_resource_state(B_KERNEL_RESOURCE_PAGES) != B_NO_LOW_RESOURCE) {
-		// don't do anything if we don't have the resources left
+	if (size == 0)
 		return;
-	}
 
 	vm_cache *cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
@@ -915,12 +912,17 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	file_cache_ref *ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;
 
-	if (offset >= fileSize) {
+	if (offset + size > fileSize)
+		size = fileSize - offset;
+	size_t reservePages = size / B_PAGE_SIZE;
+
+	// Don't do anything if we don't have the resources left, or the cache
+	// already contains more than 2/3 of its pages
+	if (offset >= fileSize || vm_page_num_unused_pages() < 2 * reservePages
+		|| 3 * cache->page_count > 2 * fileSize / B_PAGE_SIZE) {
 		cache->ReleaseRef();
 		return;
 	}
-	if (offset + size > fileSize)
-		size = offset - fileSize;
 
 	// "offset" and "size" are always aligned to B_PAGE_SIZE,
 	offset &= ~(B_PAGE_SIZE - 1);
@@ -929,7 +931,9 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	size_t bytesToRead = 0;
 	off_t lastOffset = offset;
 
-	AutoLocker<VMCache> locker(cache);
+	vm_page_reserve_pages(reservePages);
+
+	cache->Lock();
 
 	while (true) {
 		// check if this page is already in memory
@@ -950,7 +954,7 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 				= new(std::nothrow) PrecacheIO(ref, lastOffset, bytesToRead);
 			if (io == NULL || io->Init() != B_OK || io->Start() != B_OK) {
 				delete io;
-				return;
+				break;
 			}
 
 			bytesToRead = 0;
@@ -961,10 +965,11 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 			break;
 		}
 
-		lastOffset = offset + B_PAGE_SIZE;
+		lastOffset = offset;
 	}
 
-	cache->ReleaseRefLocked();
+	cache->ReleaseRefAndUnlock();
+	vm_page_unreserve_pages(reservePages);
 }
 
 

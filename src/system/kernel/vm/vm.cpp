@@ -2362,16 +2362,12 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 	cache->Unlock();
 
-#if 0
-// TODO: Fix ticket #3835 before enabling pre-fetching
-// http://dev.haiku-os.org/ticket/3835
 	if (status == B_OK) {
 		// TODO: this probably deserves a smarter solution, ie. don't always
-		// prefetch stuff
+		// prefetch stuff, and also, probably don't trigger it at this place.
 		cache_prefetch_vnode(vnode, offset, min_c(size, 10LL * 1024 * 1024));
 			// prefetches at max 10 MB starting from "offset"
 	}
-#endif
 
 	if (status != B_OK)
 		return status;
