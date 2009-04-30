@@ -185,22 +185,27 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->line_count = videoFormat.VideoHeight;
 		cookie->frame_size = 1;
 
-		cookie->duration = theFileReader->getVideoDuration(streamNumber);
+		cookie->duration = theFileReader->getStreamDuration(streamNumber);
 		cookie->frame_count = theFileReader->getFrameCount(streamNumber);
 				
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
 		
-		// asf does not have a frame rate!  The extended descriptor defines an average time per frame.
-		if (videoFormat.FrameScale && videoFormat.FrameRate) {
-			cookie->frames_per_sec_rate = videoFormat.FrameRate;
-			cookie->frames_per_sec_scale = videoFormat.FrameScale;
-			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
-		} else {
-			cookie->frames_per_sec_rate = 25;
-			cookie->frames_per_sec_scale = 1;
-			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using fallback)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
-		}
+		// asf does not have a frame rate!  The extended descriptor defines an average time per frame which is generally useless.
+		
+		cookie->frames_per_sec_rate = cookie->frame_count;
+		cookie->frames_per_sec_scale = cookie->duration / 1000000LL;
+		TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
+		
+//		if (videoFormat.FrameScale && videoFormat.FrameRate) {
+//			cookie->frames_per_sec_rate = videoFormat.FrameRate;
+//			cookie->frames_per_sec_scale = videoFormat.FrameScale;
+//			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
+//		} else {
+//			cookie->frames_per_sec_rate = 25;
+//			cookie->frames_per_sec_scale = 1;
+//			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using fallback)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
+//		}
 
 		description.family = B_AVI_FORMAT_FAMILY;
 		description.u.avi.codec = videoFormat.Compression;
@@ -277,6 +282,9 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			*(uint32 *)format->user_data = codecID; format->user_data[4] = 0;
 		}
 
+		cookie->buffer_size = ((videoFormat.VideoWidth * videoFormat.VideoHeight * 4) + 15) & ~15;		// WRONG Find max input buffer size needed
+		cookie->buffer = new char [cookie->buffer_size];
+
 		return B_OK;
 
 	}
@@ -293,15 +301,16 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		uint32 sampleSize = (audioFormat.NoChannels * audioFormat.BitsPerSample / 8);
 		
 		cookie->audio = true;
-		cookie->duration = theFileReader->getAudioDuration(streamNumber);
-		cookie->frame_count = (cookie->duration * audioFormat.SamplesPerSec) / sampleSize / 1000000LL;
+		cookie->duration = theFileReader->getStreamDuration(streamNumber);
+		// Calculate sample count using duration
+		cookie->frame_count = (cookie->duration * audioFormat.SamplesPerSec) / 1000000LL;
 		cookie->frame_pos = 0;
 		cookie->frames_per_sec_rate = audioFormat.SamplesPerSec;
 		cookie->frames_per_sec_scale = 1;
 		cookie->bytes_per_sec_rate = audioFormat.AvgBytesPerSec;
 		cookie->bytes_per_sec_scale = 1;
 
-		TRACE("Chunk Count %ld\n", theFileReader->getAudioChunkCount(streamNumber));
+		TRACE("Chunk Count %ld\n", theFileReader->getFrameCount(streamNumber));
 		TRACE("audio frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6 );
 
 		if (audioFormat.Compression == 0x0001) {
@@ -349,6 +358,9 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 				  cookie->frame_size);
 		}
 		
+		cookie->buffer_size = (audioFormat.BlockAlign + 15) & ~15;
+		cookie->buffer = new char [cookie->buffer_size];
+		
 		// TODO: this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audioFormat.Compression; format->user_data[4] = 0;
@@ -386,7 +398,6 @@ status_t
 asfReader::FreeCookie(void *_cookie)
 {
 	asf_cookie *cookie = (asf_cookie *)_cookie;
-	cookie->buffer = NULL;	// we don't own the buffer
 
 	delete [] cookie->buffer;
 
@@ -436,13 +447,13 @@ asfReader::Seek(void *cookie, uint32 flags, int64 *frame, bigtime_t *time)
 	if (flags & B_MEDIA_SEEK_TO_TIME) {
 		// frame = (time * rate) / fps / 1000000LL
 		*frame = ((*time * asfCookie->frames_per_sec_rate) / (int64)asfCookie->frames_per_sec_scale) / 1000000LL;
-		asfCookie->frame_pos = *frame;
+		asfCookie->frame_pos = theFileReader->GetFrameForTime(asfCookie->stream,*time);
 	}
 	
 	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		// time = frame * 1000000LL * fps / rate
 		*time = (*frame * 1000000LL * (int64)asfCookie->frames_per_sec_scale) / asfCookie->frames_per_sec_rate;
-		asfCookie->frame_pos = *frame;
+		asfCookie->frame_pos = theFileReader->GetFrameForTime(asfCookie->stream,*time);
 	}
 
 	TRACE("asfReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
@@ -514,9 +525,10 @@ asfReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 		mediaHeader->u.encoded_video.field_number = 0;
 		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
 	}
+	
 	TRACE(" stream %d: frame %ld start time %.6f Size %ld key frame %s\n",cookie->stream, cookie->frame_pos, mediaHeader->start_time / 1000000.0, size, keyframe ? "true" : "false");
 
-	cookie->frame_pos ++;
+	cookie->frame_pos++;
 	
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;

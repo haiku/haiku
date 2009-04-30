@@ -92,11 +92,19 @@ ASFFileReader::ParseFile()
 	}
 	
 	uint32 totalStreams = getStreamCount();
-	StreamHeader streamHeader;
+	StreamEntry streamEntry;
 
-	for (int i=0;i < totalStreams;i++) {
-		streamHeader.streamIndex = i;
-		streams.push_back(streamHeader);
+	for (uint32 i=0;i < totalStreams;i++) {
+		streamEntry.streamIndex = i;
+		streams.push_back(streamEntry);
+	}
+	
+	ParseIndex();
+	
+	// load the first packet
+	if (asf_get_packet(asfFile, packet) < 0) {
+		printf("Could not get first packet\n");
+		return B_ERROR;
 	}
 	
 	return B_OK;
@@ -194,15 +202,19 @@ ASFFileReader::getVideoFormat(uint32 streamIndex, ASFVideoFormat *format)
 
 
 bigtime_t
-ASFFileReader::getVideoDuration(uint32 streamIndex)
+ASFFileReader::getStreamDuration(uint32 streamIndex)
 {
+	if (streamIndex < streams.size()) {
+		return streams[streamIndex].getDuration();
+	}
+
 	asf_stream_t *stream;
 
 	stream = asf_get_stream(asfFile, streamIndex);
 	
 	if (stream) {
 		if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
-			printf("VIDEO end time %Ld, start time %Ld\n",stream->extended->end_time, stream->extended->start_time);
+			printf("STREAM %ld end time %Ld, start time %Ld\n",streamIndex, stream->extended->end_time, stream->extended->start_time);
 			if (stream->extended->end_time - stream->extended->start_time > 0) {
 				return stream->extended->end_time - stream->extended->start_time;
 			}
@@ -212,45 +224,14 @@ ASFFileReader::getVideoDuration(uint32 streamIndex)
 	return asf_get_duration(asfFile) / 10;
 }
 
-
-bigtime_t
-ASFFileReader::getAudioDuration(uint32 streamIndex)
-{
-	asf_stream_t *stream;
-
-	stream = asf_get_stream(asfFile, streamIndex);
-	
-	if (stream) {
-		if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
-			printf("AUDIO end time %Ld, start time %Ld\n",stream->extended->end_time, stream->extended->start_time);
-			if (stream->extended->end_time - stream->extended->start_time > 0) {
-				return stream->extended->end_time - stream->extended->start_time;
-			}
-		}
-	}
-
-	return asf_get_duration(asfFile) / 10;  // convert from 100 nanosecond units to microseconds
-}
-
-
-bigtime_t
-ASFFileReader::getMaxDuration()
-{
-	return asf_get_duration(asfFile) / 10;
-}
-
-
-// Not really frame count, really total data packets
 uint32
 ASFFileReader::getFrameCount(uint32 streamIndex)
 {	
-	return asf_get_data_packets(asfFile);
-}
-
-uint32
-ASFFileReader::getAudioChunkCount(uint32 streamIndex)
-{
-	return asf_get_data_packets(asfFile);
+	if (streamIndex < streams.size()) {
+		return streams[streamIndex].getFrameCount();
+	}
+	
+	return 0;
 }
 
 bool
@@ -282,12 +263,6 @@ ASFFileReader::IsAudio(uint32 streamIndex)
 	return false;
 }
 
-void
-ASFFileReader::AddIndex(uint32 streamIndex, uint32 frameNo, bool keyFrame, bigtime_t pts, uint8 *data, uint32 size)
-{
-	streams[streamIndex].AddIndex(frameNo, keyFrame, pts, data, size);
-}
-
 IndexEntry
 ASFFileReader::GetIndex(uint32 streamIndex, uint32 frameNo) 
 {
@@ -304,31 +279,115 @@ ASFFileReader::HasIndex(uint32 streamIndex, uint32 frameNo)
 	return false;
 }
 
+uint32
+ASFFileReader::GetFrameForTime(uint32 streamIndex, bigtime_t time)
+{
+	if (streamIndex < streams.size()) {
+		return streams[streamIndex].GetIndex(time).frameNo;
+	}
+	
+	return 0;
+}
+
+void
+ASFFileReader::ParseIndex() {
+	// Try to build some sort of useful index
+	// packet->send_time seems to be a better presentation time stamp than pts though	
+
+	if (asf_seek_to_msec(asfFile,0) < 0) {
+		printf("Seek to start of stream failed\n");
+	}
+
+	asf_payload_t *payload;
+	
+	while (asf_get_packet(asfFile, packet) > 0) {
+		for (int i=0;i<packet->payload_count;i++) {
+			payload = (asf_payload_t *)(&packet->payloads[i]);
+//			printf("Payload %d Stream %d Keyframe %d send time %ld pts %ld id %d size %d\n",i+1,payload->stream_number,payload->key_frame, packet->send_time * 1000L, payload->pts * 1000L, payload->media_object_number, payload->datalen);
+			if (payload->stream_number < streams.size()) {
+				streams[payload->stream_number].AddPayload(payload->media_object_number, payload->key_frame, packet->send_time * 1000, payload->datalen, false);
+			}
+		}
+	}
+	
+	for (uint32 i=0;i<streams.size();i++) {
+		streams[i].AddPayload(0, false, 0, 0, true);
+		streams[i].setDuration((packet->send_time + packet->duration) * 1000);
+	}
+	
+	if (asf_seek_to_msec(asfFile,0) < 0) {
+		printf("Seek to start of stream failed\n");
+	}
+}
+
 bool
 ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	char **buffer, uint32 *size, bool *keyframe, bigtime_t *pts)
 {
-	// Ok, Need to join payloads together that have the same payload->pts
-	// packet->send_time seems to be a better presentation time stamp than pts though	
-	
+	// Ok, Need to join payloads together that have the same payload->media_object_number
 	asf_payload_t *payload;
+
+	IndexEntry indexEntry = GetIndex(streamIndex, pFrameNo);
 	
-	while (!HasIndex(streamIndex, pFrameNo+1) && asf_get_packet(asfFile, packet) > 0) {
-		for (int i=0;i<packet->payload_count;i++) {
-			payload = (asf_payload_t *)(&packet->payloads[i]);
-			printf("Payload %d ",i+1);
-			printf("Stream %d Keyframe %d pts %d frame %d, size %d\n",payload->stream_number,payload->key_frame, payload->pts * 1000, payload->media_object_number, payload->datalen);
-			AddIndex(payload->stream_number, payload->media_object_number, payload->key_frame, packet->send_time * 1000, payload->data, payload->datalen);
+	if (indexEntry.noPayloads == 0) {
+		// No index entry
+		return false;
+	}
+	
+	while (packet->send_time * 1000 < indexEntry.pts) {
+		if (asf_get_packet(asfFile, packet) < 0) {
+			return false;
+		}
+	}
+
+	if (packet->send_time * 1000 > indexEntry.pts) {
+		// seek back to pts
+		printf("seeking back to %Ld status %Ld\n",indexEntry.pts, asf_seek_to_msec(asfFile, indexEntry.pts/1000));
+		if (asf_get_packet(asfFile, packet) < 0) {
+			return false;
 		}
 	}
 	
-	if (HasIndex(streamIndex, pFrameNo+1)) {
-		IndexEntry indexEntry = GetIndex(streamIndex, pFrameNo+1);
-		*buffer = (char *)indexEntry.data;
-		*size = indexEntry.size;
-		*keyframe = indexEntry.keyFrame;
-		*pts = indexEntry.pts;
-		return true;
+	// fillin some details
+	*size = indexEntry.dataSize;
+	*keyframe = indexEntry.keyFrame;
+	*pts = indexEntry.pts;
+	
+	uint32 expectedPayloads = indexEntry.noPayloads;
+	uint32 offset = 0;
+
+	for (int i=0;i<packet->payload_count;i++) {
+		payload = (asf_payload_t *)(&packet->payloads[i]);
+		// find the first payload matching the id we want and then
+		// combine the next x payloads where x is the noPayloads in indexEntry
+		if (payload->media_object_number == indexEntry.id && payload->stream_number == streamIndex) {
+			// copy data to buffer
+			memcpy(*buffer + offset, payload->data, payload->datalen);
+			offset += payload->datalen;
+			expectedPayloads--;
+			
+			if (expectedPayloads == 0) {
+				return true;
+			}
+		}
+	}
+	
+	// combine packets into a single buffer
+	while ((asf_get_packet(asfFile, packet) > 0) && (expectedPayloads > 0)) {
+		for (int i=0;i<packet->payload_count;i++) {
+			payload = (asf_payload_t *)(&packet->payloads[i]);
+			// find the first payload matching the id we want and then
+			// combine the next x payloads where x is the noPayloads in indexEntry
+			if (payload->media_object_number == indexEntry.id && payload->stream_number == streamIndex) {
+				// copy data to buffer
+				memcpy(*buffer + offset, payload->data, payload->datalen);
+				offset += payload->datalen;
+				expectedPayloads--;
+				if (expectedPayloads == 0) {
+					return true;
+				}
+			}
+		}
 	}
 	
 	return false;

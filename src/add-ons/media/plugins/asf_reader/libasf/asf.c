@@ -243,7 +243,8 @@ asf_seek_to_msec(asf_file_t *file, int64_t msec)
 	}
 
 	/* Index structure is missing, check if we can still seek */
-	if (file->index == NULL) {
+	// DLM we can always seek to 0
+	if (file->index == NULL && msec > 0) {
 		int i, audiocount;
 
 		audiocount = 0;

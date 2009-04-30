@@ -31,14 +31,14 @@
 INLINE void
 debug_printf(char *fmt, ...)
 {
-//#ifdef DEBUG
+#ifdef DEBUG
 	va_list argp;
 
 	va_start(argp, fmt);
 	vfprintf(stderr, fmt, argp);
 	va_end(argp);
 	fprintf(stderr, "\n");
-//#endif
+#endif
 }
 
 #endif
