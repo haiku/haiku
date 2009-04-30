@@ -83,3 +83,46 @@ ThreadModel::AddWaitObjectGroup(
 
 	return group;
 }
+
+
+bool
+ThreadModel::AddSchedulingEvent(const system_profiler_event_header* eventHeader)
+{
+	return fSchedulingEvents.AddItem(eventHeader);
+}
+
+
+int32
+ThreadModel::FindSchedulingEvent(bigtime_t time)
+{
+	if (time < 0)
+		return 0;
+
+	time += fModel->BaseTime();
+
+	int32 lower = 0;
+	int32 upper = CountSchedulingEvents();
+
+	while (lower < upper) {
+		int32 mid = (lower + upper) / 2;
+		const system_profiler_event_header* header = SchedulingEventAt(mid);
+		system_profiler_thread_scheduling_event* event
+			=  (system_profiler_thread_scheduling_event*)(header + 1);
+		if (event->time < time)
+			lower = mid + 1;
+		else
+			upper = mid;
+	}
+
+	// We've found the first event that has a time >= the given time. If its
+	// time is >, we rather return the previous event.
+	if (lower > 0) {
+		const system_profiler_event_header* header = SchedulingEventAt(lower);
+		system_profiler_thread_scheduling_event* event
+			=  (system_profiler_thread_scheduling_event*)(header + 1);
+		if (event->time > time)
+			lower--;
+	}
+
+	return lower;
+}

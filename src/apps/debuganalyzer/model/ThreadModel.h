@@ -30,13 +30,23 @@ public:
 	inline	int32				CountWaitObjectGroups() const;
 	inline	WaitObjectGroup*	WaitObjectGroupAt(int32 index) const;
 
+			bool				AddSchedulingEvent(
+									const system_profiler_event_header*
+										eventHeader);
+	inline	int32				CountSchedulingEvents() const;
+	inline	const system_profiler_event_header* SchedulingEventAt(
+									int32 index) const;
+			int32				FindSchedulingEvent(bigtime_t time);
+
 private:
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
+			typedef BObjectList<const system_profiler_event_header> EventList;
 
 private:
 			Model*				fModel;
 			Model::Thread*		fThread;
 			WaitObjectGroupList	fWaitObjectGroups;
+			EventList			fSchedulingEvents;
 };
 
 
@@ -90,6 +100,20 @@ ThreadModel::WaitObjectGroup*
 ThreadModel::WaitObjectGroupAt(int32 index) const
 {
 	return fWaitObjectGroups.ItemAt(index);
+}
+
+
+int32
+ThreadModel::CountSchedulingEvents() const
+{
+	return fSchedulingEvents.CountItems();
+}
+
+
+const system_profiler_event_header*
+ThreadModel::SchedulingEventAt(int32 index) const
+{
+	return fSchedulingEvents.ItemAt(index);
 }
 
 
