@@ -1,7 +1,12 @@
 SubDir HAIKU_TOP src add-ons kernel busses ; 
 
-#SubInclude HAIKU_TOP src add-ons kernel busses ata ;
-SubInclude HAIKU_TOP src add-ons kernel busses agp_gart ;
+# HACK: remove this when the old ide code is removed!
+if $(HAIKU_ATA_STACK) {
+SubInclude HAIKU_TOP src add-ons kernel busses ata ;
+} else {
 SubInclude HAIKU_TOP src add-ons kernel busses ide ;
+}
+
+SubInclude HAIKU_TOP src add-ons kernel busses agp_gart ;
 SubInclude HAIKU_TOP src add-ons kernel busses scsi ;
 SubInclude HAIKU_TOP src add-ons kernel busses usb ;
