@@ -150,8 +150,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 	$(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx usb_ecm
 ;
 #SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
-SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa $(IDE_ONLY)ide $(ATA_ONLY)ata scsi
-	config_manager agp_gart usb firewire $(X86_ONLY)acpi
+SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
+	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
 	write_overlay $(GPL_ONLY)ntfs $(GPL_ONLY)reiserfs ;
@@ -181,7 +181,8 @@ AddFilesToHaikuImage system add-ons kernel debugger
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: dpc $(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool mpu401 scsi_periph ;
+	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
+		scsi_periph ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
@@ -424,9 +425,10 @@ AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	$(X86_ONLY)acpi pci $(X86_ONLY)isa config_manager $(IDE_ONLY)ide $(ATA_ONLY)ata scsi usb
+	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager
+	$(IDE_ONLY)ide scsi usb
 	$(PPC_ONLY)openpic
-	$(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph
+	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
