@@ -34,14 +34,6 @@ StringChartLegendRenderer::GetMinimumLegendSpacing(BView* view,
 
 
 BSize
-StringChartLegendRenderer::MaximumLegendSize(BView* view)
-{
-// TODO: Implement for real!
-	return BSize(100, 20);
-}
-
-
-BSize
 StringChartLegendRenderer::LegendSize(ChartLegend* _legend, BView* view)
 {
 	StringChartLegend* legend = dynamic_cast<StringChartLegend*>(_legend);

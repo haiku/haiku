@@ -26,7 +26,6 @@ class StringChartLegendRenderer : public ChartLegendRenderer {
 public:
 	virtual	void				GetMinimumLegendSpacing(BView* view,
 									float* horizontal, float* vertical);
-	virtual	BSize				MaximumLegendSize(BView* view);
 
 	virtual	BSize				LegendSize(ChartLegend* legend,
 									BView* view);

@@ -33,7 +33,6 @@ public:
 
 	virtual	void				GetMinimumLegendSpacing(BView* view,
 									float* horizontal, float* vertical) = 0;
-	virtual	BSize				MaximumLegendSize(BView* view) = 0;
 
 	virtual	BSize				LegendSize(ChartLegend* legend,
 									BView* view) = 0;
