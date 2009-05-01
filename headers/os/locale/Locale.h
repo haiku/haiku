@@ -2,8 +2,6 @@
 #define _B_LOCALE_H_
 
 
-#include <LocaleBuild.h>
-
 #include <Collator.h>
 #include <Language.h>
 #include <Country.h>
@@ -13,7 +11,7 @@ class BCatalog;
 class BString;
 
 
-class _IMPEXP_LOCALE BLocale {
+class BLocale {
 	public:
 		BLocale();
 		~BLocale();
@@ -43,7 +41,7 @@ class _IMPEXP_LOCALE BLocale {
 		int StringCompare(const BString *, const BString *, int32 len = -1, int8 strength = B_COLLATE_DEFAULT) const;
 
 		void GetSortKey(const char *string, BString *key);
-		
+
 		status_t GetAppCatalog(BCatalog *);
 
 	protected:
@@ -53,34 +51,34 @@ class _IMPEXP_LOCALE BLocale {
 };
 
 // global objects
-extern _IMPEXP_LOCALE BLocale *be_locale;
-extern _IMPEXP_LOCALE BLocaleRoster *be_locale_roster;
+extern BLocale *be_locale;
+extern BLocaleRoster *be_locale_roster;
 
 //----------------------------------------------------------------------
 //--- country short-hands inlines ---
 
-inline void 
+inline void
 BLocale::FormatDate(char *target, size_t maxSize, time_t timer, bool longFormat)
 {
 	fCountry->FormatDate(target, maxSize, timer, longFormat);
 }
 
 
-inline void 
+inline void
 BLocale::FormatDate(BString *target, time_t timer, bool longFormat)
 {
 	fCountry->FormatDate(target, timer, longFormat);
 }
 
 
-inline void 
+inline void
 BLocale::FormatTime(char *target, size_t maxSize, time_t timer, bool longFormat)
 {
 	fCountry->FormatTime(target, maxSize, timer, longFormat);
 }
 
 
-inline void 
+inline void
 BLocale::FormatTime(BString *target, time_t timer, bool longFormat)
 {
 	fCountry->FormatTime(target, timer, longFormat);
@@ -90,14 +88,14 @@ BLocale::FormatTime(BString *target, time_t timer, bool longFormat)
 //--- locale short-hands inlines ---
 //	#pragma mark -
 
-inline int 
+inline int
 BLocale::StringCompare(const char *string1, const char *string2, int32 length, int8 strength) const
 {
 	return fCollator->Compare(string1, string2, length, strength);
 }
 
 
-inline int 
+inline int
 BLocale::StringCompare(const BString *string1, const BString *string2, int32 length, int8 strength) const
 {
 	return fCollator->Compare(string1->String(), string2->String(), length, strength);

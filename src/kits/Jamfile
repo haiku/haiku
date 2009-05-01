@@ -92,6 +92,7 @@ SubInclude HAIKU_TOP src kits debug ;
 SubInclude HAIKU_TOP src kits device ;
 SubInclude HAIKU_TOP src kits game ;
 SubInclude HAIKU_TOP src kits interface ;
+SubInclude HAIKU_TOP src kits locale ;
 SubInclude HAIKU_TOP src kits mail ;
 SubInclude HAIKU_TOP src kits media ;
 SubInclude HAIKU_TOP src kits midi ;

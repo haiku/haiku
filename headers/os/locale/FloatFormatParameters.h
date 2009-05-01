@@ -10,7 +10,7 @@ enum float_format_type {
 									// number to be formatted
 };
 
-class _IMPEXP_LOCALE BFloatFormatParameters : public BNumberFormatParameters {
+class BFloatFormatParameters : public BNumberFormatParameters {
 	public:
 		BFloatFormatParameters(const BFloatFormatParameters *parent = NULL);
 		BFloatFormatParameters(const BFloatFormatParameters &other);

@@ -1,12 +1,12 @@
 /*
- * This file contains library initialization code. 
+ * This file contains library initialization code.
  * The required mimetypes and attribute-indices are created here.
- */ 
+ */
 
 #include <syslog.h>
 
 #include <fs_attr.h>
-#include <fs_index.h> 
+#include <fs_index.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
@@ -14,7 +14,7 @@
 #include <DefaultCatalog.h>
 
 // helper function that makes sure an attribute-index exists:
-static void EnsureIndexExists(const char *attrName) 
+static void EnsureIndexExists(const char *attrName)
 {
 	BVolume bootVol;
 	BVolumeRoster volRoster;
@@ -22,14 +22,14 @@ static void EnsureIndexExists(const char *attrName)
 		return;
 	struct index_info idxInfo;
 	if (fs_stat_index(bootVol.Device(), attrName, &idxInfo) != 0) {
-		status_t res = fs_create_index(bootVol.Device(), attrName, 
+		status_t res = fs_create_index(bootVol.Device(), attrName,
 			B_STRING_TYPE, 0);
 		if (res == 0) {
-			log_team(LOG_INFO, 
+			log_team(LOG_INFO,
 				"successfully created the required index for attribute %s",
 				attrName);
 		} else {
-			log_team(LOG_ERR, 
+			log_team(LOG_ERR,
 				"failed to create the required index for attribute %s (%s)",
 				attrName, strerror(res));
 		}
@@ -47,7 +47,7 @@ SetupCatalogBasics()
 	// make sure the indices required for catalog-traversal are there:
 	EnsureIndexExists(BLocaleRoster::kCatLangAttr);
 	EnsureIndexExists(BLocaleRoster::kCatSigAttr);
-	
+
 	// install mimetype for default-catalog:
 	BMimeType mt;
 	status_t res = mt.SetTo(DefaultCatalog::kCatMimeType);
@@ -58,7 +58,7 @@ SetupCatalogBasics()
 		if (res == B_OK && !supertype.IsInstalled()) {
 			res = supertype.Install();
 		}
-		
+
 		if (res == B_OK) {
 			// info about the attributes of a catalog...
 			BMessage attrMsg;
@@ -109,7 +109,7 @@ SetupCatalogBasics()
 			// preferred app is catalog manager:
 			res = mt.SetPreferredApp(BLocaleRoster::kCatManagerMimeType, B_OPEN);
 		}
-		
+
 		if (res == B_OK)
 			res = mt.Install();
 	}
@@ -120,37 +120,9 @@ SetupCatalogBasics()
 }
 
 
-#if defined(__HAIKU__)
-
 extern "C"
-_IMPEXP_LOCALE 
 void
 initialize_after()
 {
 	SetupCatalogBasics();
 }
-
-#else
-
-// [zooey]:
-// 	hack suggested by Ingo Weinhold to make the be_roster work
-//    properly such that we can install mimetypes:
-class BRoster {
-public:
-	void InitMessengers();
-};
-
-extern const BRoster *be_roster;
-
-extern "C"
-_IMPEXP_LOCALE 
-void
-initialize_after()
-{
-	// now force be_roster to initialized state.
-	const_cast<BRoster*>(be_roster)->InitMessengers();
-
-	SetupCatalogBasics();
-}
-
-#endif

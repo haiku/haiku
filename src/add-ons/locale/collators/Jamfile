@@ -1,15 +1,22 @@
-SubDir LOCALE_TOP add-ons collators ;
+SubDir HAIKU_TOP src add-ons locale collators ;
 
-rule Collator
-{
-	# Collator <sources> ;
-	local sources = $(1) ;
-	local name = $(sources[1]:B) ;
-	local rsrc = $(name:S=.rsrc) ;
-	AddResources $(name) : $(rsrc) ;
-	AddOn $(name) : $(sources) : be liblocale.so ;
-}
+UsePublicHeaders locale ;
 
-Collator GermanDIN-2.cpp ;
-Collator French.cpp ;
+# Pseudo target to build all collator addons
+NotFile LocaleKitCollatorAddons ;
+Depends LocaleKitCollatorAddons
+	:
+	<collator-addon>GermanDIN-2
+	<collator-addon>French
+	;
+
+Addon <collator-addon>GermanDIN-2
+	: GermanDIN-2.cpp
+	: be liblocale.so 
+	;
+
+Addon <collator-addon>French
+	: French.cpp
+	: be liblocale.so 
+	;
 

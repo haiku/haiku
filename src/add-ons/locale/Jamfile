@@ -1,4 +1,4 @@
-SubDir LOCALE_TOP add-ons ;
+SubDir HAIKU_TOP src add-ons locale ;
 
-SubInclude LOCALE_TOP add-ons catalogs ;
-SubInclude LOCALE_TOP add-ons collators ;
+SubInclude HAIKU_TOP src add-ons locale catalogs ;
+SubInclude HAIKU_TOP src add-ons locale collators ;

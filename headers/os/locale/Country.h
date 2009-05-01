@@ -3,7 +3,6 @@
 
 
 #include <SupportDefs.h>
-#include <LocaleBuild.h>
 #include <LocaleStrings.h>
 #include <String.h>
 
@@ -13,11 +12,11 @@ enum {
 };
 
 
-class _IMPEXP_LOCALE BCountry {
+class BCountry {
 	public:
 		BCountry();
 		virtual ~BCountry();
-		
+
 		virtual const char *Name() const;
 
 		// see definitions below

@@ -1,8 +1,8 @@
-SubDir LOCALE_TOP preferences ;
+SubDir HAIKU_TOP src preferences locale ;
 
-AddResources Locale : Locale.rsrc ;
-
-Application Locale :
+Preference Locale :
 	Locale.cpp
 	LocaleWindow.cpp
-	: be liblocale.so ;
+	: be liblocale.so
+#	: Locale.rdef 
+	;

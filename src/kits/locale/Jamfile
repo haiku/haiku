@@ -1,6 +1,8 @@
-SubDir LOCALE_TOP lib ;
+SubDir HAIKU_TOP src kits locale ;
 
-DEFINES += _BUILDING_locale=1 ;
+UsePrivateHeaders locale ;
+
+UsePublicHeaders locale storage ;
 
 SharedLibrary liblocale.so
 	: adler32.c

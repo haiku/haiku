@@ -7,7 +7,7 @@
 class BString;
 struct format_field_position;
 
-class _IMPEXP_LOCALE BGenericNumberFormat {
+class BGenericNumberFormat {
 	public:
 		BGenericNumberFormat();
 		~BGenericNumberFormat();

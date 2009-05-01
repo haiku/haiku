@@ -3,8 +3,6 @@
 
 #include <SupportDefs.h>
 
-#include <LocaleBuild.h>
-
 enum unicode_char_category
 {
 	// Non-category for unassigned and non-character code points.
@@ -49,9 +47,9 @@ enum unicode_char_category
  * This specifies the language directional property of a character set.
  */
 
-enum unicode_char_direction { 
-	B_UNICODE_LEFT_TO_RIGHT               = 0, 
-	B_UNICODE_RIGHT_TO_LEFT               = 1, 
+enum unicode_char_direction {
+	B_UNICODE_LEFT_TO_RIGHT               = 0,
+	B_UNICODE_RIGHT_TO_LEFT               = 1,
 	B_UNICODE_EUROPEAN_NUMBER             = 2,
 	B_UNICODE_EUROPEAN_NUMBER_SEPARATOR   = 3,
 	B_UNICODE_EUROPEAN_NUMBER_TERMINATOR  = 4,
@@ -59,8 +57,8 @@ enum unicode_char_direction {
 	B_UNICODE_COMMON_NUMBER_SEPARATOR     = 6,
 	B_UNICODE_BLOCK_SEPARATOR             = 7,
 	B_UNICODE_SEGMENT_SEPARATOR           = 8,
-	B_UNICODE_WHITE_SPACE_NEUTRAL         = 9, 
-	B_UNICODE_OTHER_NEUTRAL               = 10, 
+	B_UNICODE_WHITE_SPACE_NEUTRAL         = 9,
+	B_UNICODE_OTHER_NEUTRAL               = 10,
 	B_UNICODE_LEFT_TO_RIGHT_EMBEDDING     = 11,
 	B_UNICODE_LEFT_TO_RIGHT_OVERRIDE      = 12,
 	B_UNICODE_RIGHT_TO_LEFT_ARABIC        = 13,
@@ -69,7 +67,7 @@ enum unicode_char_direction {
 	B_UNICODE_POP_DIRECTIONAL_FORMAT      = 16,
 	B_UNICODE_DIR_NON_SPACING_MARK        = 17,
 	B_UNICODE_BOUNDARY_NEUTRAL            = 18,
-	
+
 	B_UNICODE_DIRECTION_COUNT
 };
 
@@ -188,7 +186,7 @@ enum unicode_cell_width
 };
 
 
-class _IMPEXP_LOCALE BUnicodeChar {
+class BUnicodeChar {
 	public:
 		static bool IsAlpha(uint32 c);
 		static bool IsAlNum(uint32 c);
@@ -224,7 +222,7 @@ class _IMPEXP_LOCALE BUnicodeChar {
 };
 
 
-inline uint32 
+inline uint32
 BUnicodeChar::FromUTF8(const char *in)
 {
 	const char *string = in;

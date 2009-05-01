@@ -7,7 +7,7 @@ struct format_field_position;
 class BFloatFormatParameters;
 class BString;
 
-class _IMPEXP_LOCALE BFloatFormatImpl : public BNumberFormatImpl {
+class BFloatFormatImpl : public BNumberFormatImpl {
 	public:
 		BFloatFormatImpl();
 		virtual ~BFloatFormatImpl();

@@ -5,8 +5,6 @@
 #include <SupportDefs.h>
 #include <Archivable.h>
 
-#include <LocaleBuild.h>
-
 class BString;
 class BCollatorAddOn;
 
@@ -23,7 +21,7 @@ enum collator_strengths {
 };
 
 
-class _IMPEXP_LOCALE BCollator : public BArchivable {
+class BCollator : public BArchivable {
 	public:
 		BCollator();
 		BCollator(BCollatorAddOn *collator, int8 strength, bool ignorePunctuation);
@@ -55,21 +53,21 @@ class _IMPEXP_LOCALE BCollator : public BArchivable {
 };
 
 
-inline bool 
+inline bool
 BCollator::Equal(const char *s1, const char *s2, int32 len, int8 strength)
 {
 	return Compare(s1, s2, len, strength) == 0;
 }
 
 
-inline bool 
+inline bool
 BCollator::Greater(const char *s1, const char *s2, int32 len, int8 strength)
 {
 	return Compare(s1, s2, len, strength) > 0;
 }
 
 
-inline bool 
+inline bool
 BCollator::GreaterOrEqual(const char *s1, const char *s2, int32 len, int8 strength)
 {
 	return Compare(s1, s2, len, strength) >= 0;
@@ -80,7 +78,7 @@ BCollator::GreaterOrEqual(const char *s1, const char *s2, int32 len, int8 streng
 
 // For BCollator add-on implementations:
 
-class _IMPEXP_LOCALE BCollatorAddOn : public BArchivable {
+class BCollatorAddOn : public BArchivable {
 	public:
 		BCollatorAddOn();
 		BCollatorAddOn(BMessage *archive);
@@ -114,6 +112,6 @@ class _IMPEXP_LOCALE BCollatorAddOn : public BArchivable {
 // If your add-on should work with the standard tool to create a language, it
 // should export that function. However, once the language file has been written
 // only the archived collator is used, and that function won't be called anymore.
-extern "C" _IMPEXP_LOCALE BCollatorAddOn *instantiate_collator(void);
+extern "C" BCollatorAddOn *instantiate_collator(void);
 
 #endif	/* _COLLATOR_H_ */

@@ -1,3 +1,8 @@
-SubDir LOCALE_TOP add-ons catalogs zeta ;
+SubDir HAIKU_TOP src add-ons locale catalogs zeta ;
 
-AddOn zeta : Catalog.cpp : be liblocale.so ;
+UsePublicHeaders locale ;
+
+Addon <catalog-addon>zeta 
+	: Catalog.cpp 
+	: be liblocale.so 
+	;

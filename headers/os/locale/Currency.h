@@ -5,11 +5,9 @@
 #include <Message.h>
 #include <String.h>
 
-#include <LocaleBuild.h>
-
 class BLocale;
 
-class _IMPEXP_LOCALE BCurrency : public BArchivable {
+class BCurrency : public BArchivable {
 	public:
 		BCurrency(const BCurrency &other);
 		BCurrency(BMessage *archive);

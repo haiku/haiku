@@ -12,7 +12,7 @@ class BString;
 // and this class (and its base classes) should mirror the parameters
 // classes' accessor methods.
 //
-class _IMPEXP_LOCALE BIntegerFormat : public BNumberFormat, public BIntegerFormatParameters {
+class BIntegerFormat : public BNumberFormat, public BIntegerFormatParameters {
 	public:
 		BIntegerFormat(const BIntegerFormat &other);
 		~BIntegerFormat();

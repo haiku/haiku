@@ -24,7 +24,7 @@ enum {
 };
 
 // structure filled in while formatting
-struct _IMPEXP_LOCALE format_field_position {
+struct format_field_position {
 	uint32	field_type;
 	int32	start;
 	int32	length;
@@ -32,7 +32,7 @@ struct _IMPEXP_LOCALE format_field_position {
 
 class BFormatImpl;
 
-class _IMPEXP_LOCALE BFormat {
+class BFormat {
 	protected:
 		BFormat(const BFormat &other);
 		~BFormat();

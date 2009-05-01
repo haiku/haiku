@@ -3,14 +3,12 @@
 
 #include <SupportDefs.h>
 
-#include <LocaleBuild.h>
-
 enum format_alignment {
 	B_ALIGN_FORMAT_LEFT,		// reuse B_ALIGN_LEFT/B_ALIGN_RIGHT?
 	B_ALIGN_FORMAT_RIGHT,
 };
 
-class _IMPEXP_LOCALE BFormatParameters {
+class BFormatParameters {
 	public:
 		BFormatParameters(const BFormatParameters *parent = NULL);
 		BFormatParameters(const BFormatParameters &other);

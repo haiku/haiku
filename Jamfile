@@ -132,6 +132,25 @@ Depends ScreenSaverKit :
 	Haiku
 ;
 
+# Pseudo-target to build the locale kit only
+NotFile LocaleKit ;
+Depends LocaleKit :
+	liblocale.so
+	Locale
+	
+	# binaries for building localized software on haiku
+	collectcatkeys
+	dumpcatalog
+	linkcatkeys
+	
+	# addons
+	LocaleKitCollatorAddons
+	LocaleKitCatalogAddons
+	
+	# tests
+	LocaleKitTests
+;
+
 # Evaluate optional package dependencies and prepare the optional build
 # features before parsing the Jamfile tree.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;

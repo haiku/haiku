@@ -1,8 +1,6 @@
 #ifndef _CATALOG_H_
 #define _CATALOG_H_
 
-#include <LocaleBuild.h>
-
 #include <SupportDefs.h>
 #include <String.h>
 
@@ -12,7 +10,7 @@ class BMessage;
 struct entry_ref;
 
 
-class _IMPEXP_LOCALE BCatalog {
+class BCatalog {
 
 	public:
 		BCatalog();
@@ -51,8 +49,8 @@ class _IMPEXP_LOCALE BCatalog {
 };
 
 
-extern _IMPEXP_LOCALE BCatalog* be_catalog;
-extern _IMPEXP_LOCALE BCatalog* be_app_catalog;
+extern BCatalog* be_catalog;
+extern BCatalog* be_app_catalog;
 
 
 #ifndef B_AVOID_TRANSLATION_MACROS
@@ -60,22 +58,22 @@ extern _IMPEXP_LOCALE BCatalog* be_app_catalog;
 // you don't want these:
 
 #undef TR_CONTEXT
-	// In a single application, several strings (e.g. 'Ok') will be used 
-	// more than once, in different contexts. 
+	// In a single application, several strings (e.g. 'Ok') will be used
+	// more than once, in different contexts.
 	// As the application programmer can not know if all translations of
 	// this string will be the same for all languages, each occurrence of
 	// the string must be translated on its own.
 	// Specifying the context explicitly with each string allows the person
 	// translating a catalog to separate these different occurrences of the
-	// same string and tell which strings appears in what context of the 
+	// same string and tell which strings appears in what context of the
 	// application.
 	// In order to give the translator a useful hint, the application
-	// programmer needs to define TR_CONTEXT with the context he'd like 
+	// programmer needs to define TR_CONTEXT with the context he'd like
 	// to be associated with the strings used in this specifc source file.
 	// example:
 	//		#define TR_CONTEXT "Folder-Window"
-	// Tip: Use a descriptive name of the class implemented in that 
-	//		source-file. 
+	// Tip: Use a descriptive name of the class implemented in that
+	//		source-file.
 
 
 // Translation macros which may be used to shorten translation requests:
@@ -112,7 +110,7 @@ extern _IMPEXP_LOCALE BCatalog* be_app_catalog;
 			for (char **ch = choices; *ch; ch++) {
 				menu->AddItem(
 					new BMenuItem(
-						TR(*ch), 
+						TR(*ch),
 						new BMessage(...)
 					)
 				)
@@ -130,25 +128,25 @@ extern _IMPEXP_LOCALE BCatalog* be_app_catalog;
 #undef TR_MARK_ALL
 #define TR_MARK_ALL(str,ctx,cmt) \
 	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
-	
+
 #undef TR_MARK_ID
 #define TR_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
-	
+
 #endif	/* B_AVOID_TRANSLATION_MACROS */
 
 
 /************************************************************************/
 // For BCatalog add-on implementations:
 
-class _IMPEXP_LOCALE BCatalogAddOn {
+class BCatalogAddOn {
 		friend class BLocaleRoster;
 	public:
 		BCatalogAddOn(const char *signature, const char *language,
 					  int32 fingerprint);
 		virtual ~BCatalogAddOn();
 
-		virtual const char *GetString(const char *string, 
+		virtual const char *GetString(const char *string,
 								const char *context=NULL,
 								const char *comment=NULL) = 0;
 		virtual const char *GetString(uint32 id) = 0;
@@ -157,14 +155,14 @@ class _IMPEXP_LOCALE BCatalogAddOn {
 		BCatalogAddOn *Next();
 
 		// the following could be used to localize non-textual data (e.g. icons),
-		// but these will only be implemented if there's demand for such a 
+		// but these will only be implemented if there's demand for such a
 		// feature:
 		virtual bool CanHaveData() const;
 		virtual status_t GetData(const char *name, BMessage *msg);
 		virtual status_t GetData(uint32 id, BMessage *msg);
 
 		// interface for catalog-editor-app and testing apps:
-		virtual status_t SetString(const char *string, 
+		virtual status_t SetString(const char *string,
 							const char *translated,
 							const char *context=NULL,
 							const char *comment=NULL);
@@ -187,7 +185,7 @@ class _IMPEXP_LOCALE BCatalogAddOn {
 		// magic marker functions which are used to mark a string/id
 		// which will be translated elsewhere in the code (where it can
 		// not be found since it is references by a variable):
-		static const char *MarkForTranslation(const char *str, const char *ctx, 
+		static const char *MarkForTranslation(const char *str, const char *ctx,
 								const char *cmt);
 		static int32 MarkForTranslation(int32 id);
 
@@ -199,29 +197,29 @@ class _IMPEXP_LOCALE BCatalogAddOn {
 		BString 			fLanguageName;
 		int32				fFingerprint;
 		BCatalogAddOn 		*fNext;
-		
+
 		friend class BCatalog;
 		friend status_t get_add_on_catalog(BCatalog*, const char *);
 };
 
 // every catalog-add-on should export these symbols...
 // ...the function that instantiates a catalog for this add-on-type...
-extern "C" _IMPEXP_LOCALE 
+extern "C"
 BCatalogAddOn *instantiate_catalog(const char *signature,
 	const char *language, int32 fingerprint);
 // ...the function that creates an empty catalog for this add-on-type...
-extern "C" _IMPEXP_LOCALE 
+extern "C"
 BCatalogAddOn *create_catalog(const char *signature,
 	const char *language);
 // ...and the priority which will be used to order the catalog-add-ons:
-extern _IMPEXP_LOCALE uint8 gCatalogAddOnPriority;
+extern uint8 gCatalogAddOnPriority;
 
 
 /*
  * BCatalog - inlines for trivial accessors:
  */
 inline status_t
-BCatalog::GetSignature(BString *sig) 
+BCatalog::GetSignature(BString *sig)
 {
 	if (!sig)
 		return B_BAD_VALUE;
@@ -232,8 +230,8 @@ BCatalog::GetSignature(BString *sig)
 }
 
 
-inline status_t 
-BCatalog::GetLanguage(BString *lang) 
+inline status_t
+BCatalog::GetLanguage(BString *lang)
 {
 	if (!lang)
 		return B_BAD_VALUE;
@@ -241,11 +239,11 @@ BCatalog::GetLanguage(BString *lang)
 		return B_NO_INIT;
 	*lang = fCatalog->fLanguageName;
 	return B_OK;
-}	
+}
 
 
-inline status_t 
-BCatalog::GetFingerprint(int32 *fp) 
+inline status_t
+BCatalog::GetFingerprint(int32 *fp)
 {
 	if (!fp)
 		return B_BAD_VALUE;
@@ -259,13 +257,13 @@ BCatalog::GetFingerprint(int32 *fp)
 inline status_t
 BCatalog::InitCheck() const
 {
-	return fCatalog 
-				? fCatalog->InitCheck() 
+	return fCatalog
+				? fCatalog->InitCheck()
 				: B_NO_INIT;
 }
 
 
-inline int32 
+inline int32
 BCatalog::CountItems() const
 {
 	if (!fCatalog)
@@ -275,7 +273,7 @@ BCatalog::CountItems() const
 
 
 inline BCatalogAddOn *
-BCatalog::CatalogAddOn() 
+BCatalog::CatalogAddOn()
 {
 	return fCatalog;
 }
@@ -285,22 +283,22 @@ BCatalog::CatalogAddOn()
  * BCatalogAddOn - inlines for trivial accessors:
  */
 inline BCatalogAddOn *
-BCatalogAddOn::Next() 
+BCatalogAddOn::Next()
 {
 	return fNext;
 }
 
 
 inline const char *
-BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx, 
-	const char *cmt) 
+BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx,
+	const char *cmt)
 {
 	return str;
 }
 
 
 inline int32
-BCatalogAddOn::MarkForTranslation(int32 id) 
+BCatalogAddOn::MarkForTranslation(int32 id)
 {
 	return id;
 }
@@ -311,14 +309,14 @@ namespace BPrivate {
 /*
  * EditableCatalog
  */
-class _IMPEXP_LOCALE EditableCatalog : public BCatalog {
+class EditableCatalog : public BCatalog {
 
 	public:
-		EditableCatalog(const char *type, const char *signature, 
+		EditableCatalog(const char *type, const char *signature,
 			const char *language);
 		~EditableCatalog();
 
-		status_t SetString(const char *string, 
+		status_t SetString(const char *string,
 					const char *translated,
 					const char *context=NULL,
 					const char *comment=NULL);

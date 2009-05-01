@@ -7,7 +7,7 @@
 class BString;
 class BFloatFormatImpl;
 
-class _IMPEXP_LOCALE BFloatFormat : public BNumberFormat, public BFloatFormatParameters {
+class BFloatFormat : public BNumberFormat, public BFloatFormatParameters {
 	public:
 		BFloatFormat(const BFloatFormat &other);
 		~BFloatFormat();

@@ -7,8 +7,6 @@
 #	include <hash_map>
 #endif
 
-#include <LocaleBuild.h>
-
 #include <Catalog.h>
 #include <DataIO.h>
 #include <String.h>
@@ -45,9 +43,9 @@ namespace BPrivate {
  * but it should also support being created from up to three strings,
  * which as a whole specify the key to the translated string.
  */
-struct _IMPEXP_LOCALE CatKey {
+struct CatKey {
 	BString fKey;
-		// the key-string consists of three values separated by a special 
+		// the key-string consists of three values separated by a special
 		// token:
 		// - the native string
 		// - the context of the string's usage
@@ -73,7 +71,7 @@ struct _IMPEXP_LOCALE CatKey {
  * but the value-type might change to add support for shortcuts and/or
  * graphical data (button-images and the like).
  */
-class _IMPEXP_LOCALE DefaultCatalog : public BCatalogAddOn {
+class DefaultCatalog : public BCatalogAddOn {
 
 	public:
 		DefaultCatalog(const char *signature, const char *language,
@@ -81,10 +79,10 @@ class _IMPEXP_LOCALE DefaultCatalog : public BCatalogAddOn {
 				// constructor for normal use
 		DefaultCatalog(entry_ref *appOrAddOnRef);
 				// constructor for embedded catalog
-		DefaultCatalog(const char *path, const char *signature, 
+		DefaultCatalog(const char *path, const char *signature,
 			const char *language);
 				// constructor for editor-app
-					   
+
 		~DefaultCatalog();
 
 		// overrides of BCatalogAddOn:
@@ -93,7 +91,7 @@ class _IMPEXP_LOCALE DefaultCatalog : public BCatalogAddOn {
 		const char *GetString(uint32 id);
 		const char *GetString(const CatKey& key);
 		//
-		status_t SetString(const char *string, const char *translated, 
+		status_t SetString(const char *string, const char *translated,
 					const char *context = NULL, const char *comment = NULL);
 		status_t SetString(int32 id, const char *translated);
 		status_t SetString(const CatKey& key, const char *translated);
@@ -145,50 +143,50 @@ class _IMPEXP_LOCALE DefaultCatalog : public BCatalogAddOn {
 				CatMap::iterator fPos;
 				CatMap::iterator fEnd;
 		};
-		status_t GetWalker(CatWalker *walker);		
+		status_t GetWalker(CatWalker *walker);
 };
 
-inline 
+inline
 DefaultCatalog::CatWalker::CatWalker(CatMap &catMap)
 	: fPos(catMap.begin()),
 	  fEnd(catMap.end())
 {
 }
 
-inline bool 
+inline bool
 DefaultCatalog::CatWalker::AtEnd() const
 {
 	return fPos == fEnd;
 }
 
-inline const CatKey & 
+inline const CatKey &
 DefaultCatalog::CatWalker::GetKey() const
 {
 	assert(fPos != fEnd);
 	return fPos->first;
 }
 
-inline const char * 
+inline const char *
 DefaultCatalog::CatWalker::GetValue() const
 {
 	assert(fPos != fEnd);
 	return fPos->second.String();
 }
 
-inline void 
+inline void
 DefaultCatalog::CatWalker::Next()
 {
 	++fPos;
 }
 
-inline status_t 
+inline status_t
 DefaultCatalog::GetWalker(CatWalker *walker)
 {
 	if (!walker)
 		return B_BAD_VALUE;
 	*walker = CatWalker(fCatMap);
 	return B_OK;
-}		
+}
 
 }	// namespace BPrivate
 

@@ -1,8 +1,6 @@
 #ifndef _LOCALE_ROSTER_H_
 #define _LOCALE_ROSTER_H_
 
-#include <LocaleBuild.h>
-
 #include <String.h>
 
 class BLanguage;
@@ -20,7 +18,7 @@ enum {
 	B_LOCALE_CHANGED	= '_LCC',
 };
 
-class _IMPEXP_LOCALE BLocaleRoster {
+class BLocaleRoster {
 
 	public:
 		BLocaleRoster();
@@ -35,14 +33,14 @@ class _IMPEXP_LOCALE BLocaleRoster {
 		status_t GetDefaultCollator(BCollator **) const;
 		status_t GetDefaultLanguage(BLanguage **) const;
 		status_t GetDefaultCountry(BCountry **) const;
-		
+
 		status_t GetPreferredLanguages(BMessage *) const;
 		status_t SetPreferredLanguages(BMessage *);
-			// the message contains one or more 'language'-string-fields 
+			// the message contains one or more 'language'-string-fields
 			// which contain the language-name(s)
 
 		status_t GetInstalledLanguages(BMessage *) const;
-			// the message contains one or more 'language'-string-fields 
+			// the message contains one or more 'language'-string-fields
 			// which contain the language-name(s)
 
 		status_t GetInstalledCatalogs(BMessage *,
@@ -66,14 +64,14 @@ class _IMPEXP_LOCALE BLocaleRoster {
 
 	private:
 
-		BCatalogAddOn* LoadCatalog(const char *signature, 
+		BCatalogAddOn* LoadCatalog(const char *signature,
 							const char *language = NULL,
 							int32 fingerprint = 0);
 		BCatalogAddOn* LoadEmbeddedCatalog(entry_ref *appOrAddOnRef);
 		status_t UnloadCatalog(BCatalogAddOn *addOn);
 		//
 		BCatalogAddOn* CreateCatalog(const char *type,
-							const char *signature, 
+							const char *signature,
 							const char *language);
 
 		friend class BCatalog;

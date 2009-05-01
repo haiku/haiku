@@ -12,6 +12,7 @@ SubInclude HAIKU_TOP src preferences fonts ;
 SubInclude HAIKU_TOP src preferences joysticks ;
 SubInclude HAIKU_TOP src preferences keyboard ;
 SubInclude HAIKU_TOP src preferences keymap ;
+SubInclude HAIKU_TOP src preferences locale ;
 SubInclude HAIKU_TOP src preferences mail ;
 SubInclude HAIKU_TOP src preferences media ;
 SubInclude HAIKU_TOP src preferences menu ;

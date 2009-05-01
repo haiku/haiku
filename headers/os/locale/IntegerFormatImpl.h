@@ -7,7 +7,7 @@ struct format_field_position;
 class BIntegerFormatParameters;
 class BString;
 
-class _IMPEXP_LOCALE BIntegerFormatImpl : public BNumberFormatImpl {
+class BIntegerFormatImpl : public BNumberFormatImpl {
 	public:
 		BIntegerFormatImpl();
 		virtual ~BIntegerFormatImpl();

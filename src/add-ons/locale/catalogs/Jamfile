@@ -1,3 +1,10 @@
-SubDir LOCALE_TOP add-ons catalogs ;
+SubDir HAIKU_TOP src add-ons locale catalogs ;
 
-SubInclude LOCALE_TOP add-ons catalogs zeta ;
+# Pseudo target to build all collator addons
+NotFile LocaleKitCatalogAddons ;
+Depends LocaleKitCatalogAddons
+	:
+	<catalog-addon>zeta
+	;
+
+SubInclude HAIKU_TOP src add-ons locale catalogs zeta ;

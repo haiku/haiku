@@ -1,4 +1,6 @@
-SubDir LOCALE_TOP test number_format ;
+SubDir HAIKU_TOP src tests kits locale number_format ;
+
+UsePublicHeaders locale ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) generic_number_format ] ;
 
@@ -9,5 +11,5 @@ UnitTest NumberFormatTests
 	  GenericNumberFormatTests.cpp
 	  GenericNumberFormatConstructorTest.cpp
 
-	: be <unittests>liblocale.so
+	: be liblocale.so
 ;
