@@ -2031,7 +2031,8 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 
 
 void
-BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion) const
+BTextView::GetTextRegion(int32 startOffset, int32 endOffset,
+	BRegion *outRegion) const
 {
 	if (!outRegion)
 		return;
@@ -4472,10 +4473,9 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 			if (currentOffset <= fTrackingMouse->anchor) {
 				fTrackingMouse->selStart
 					= (*fLines)[_LineAt(currentOffset)]->offset;
-				fTrackingMouse->selEnd
-					= fTrackingMouse->shiftDown
-						? fSelEnd
-						: (*fLines)[_LineAt(fTrackingMouse->anchor) + 1]->offset;
+				fTrackingMouse->selEnd = fTrackingMouse->shiftDown
+					? fSelEnd
+					: (*fLines)[_LineAt(fTrackingMouse->anchor) + 1]->offset;
 			} else {
 				fTrackingMouse->selStart
 					= fTrackingMouse->shiftDown

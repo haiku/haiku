@@ -85,7 +85,8 @@ _BStyleRecordBuffer_::_BStyleRecordBuffer_()
 
 
 int32
-_BStyleRecordBuffer_::InsertRecord(const BFont *inFont, const rgb_color *inColor)
+_BStyleRecordBuffer_::InsertRecord(const BFont *inFont,
+	const rgb_color *inColor)
 {
 	int32 index = 0;
 
@@ -138,7 +139,8 @@ _BStyleRecordBuffer_::RemoveRecord(int32 index)
 
 
 bool
-_BStyleRecordBuffer_::MatchRecord(const BFont *inFont, const rgb_color *inColor, int32 *outIndex)
+_BStyleRecordBuffer_::MatchRecord(const BFont *inFont, const rgb_color *inColor,
+	int32 *outIndex)
 {
 	for (int32 i = 0; i < fItemCount; i++) {
 		if (*inFont == fBuffer[i].style.font
@@ -176,7 +178,8 @@ SetStyleFromMode(uint32 mode, const BFont *fromFont, BFont *toFont,
 }
 
 
-BTextView::StyleBuffer::StyleBuffer(const BFont *inFont, const rgb_color *inColor)
+BTextView::StyleBuffer::StyleBuffer(const BFont *inFont,
+	const rgb_color *inColor)
 	:
 	fValidNullStyle(true)
 {
@@ -216,12 +219,14 @@ void
 BTextView::StyleBuffer::SetNullStyle(uint32 inMode, const BFont *inFont,
 	const rgb_color *inColor, int32 offset)
 {
-	if (fValidNullStyle || fStyleRunDesc.ItemCount() < 1)
-		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);
-	else {
+	if (fValidNullStyle || fStyleRunDesc.ItemCount() < 1) {
+		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor,
+			&fNullStyle.color);
+	} else {
 		int32 index = OffsetToRun(offset - 1);
 		fNullStyle = fStyleRecord[fStyleRunDesc[index]->index]->style;
-		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor, &fNullStyle.color);
+		SetStyleFromMode(inMode, inFont, &fNullStyle.font, inColor,
+			&fNullStyle.color);
 	}
 
 	fValidNullStyle = true;
@@ -229,11 +234,12 @@ BTextView::StyleBuffer::SetNullStyle(uint32 inMode, const BFont *inFont,
 
 
 void
-BTextView::StyleBuffer::GetNullStyle(const BFont **font, const rgb_color **color) const
+BTextView::StyleBuffer::GetNullStyle(const BFont **font,
+	const rgb_color **color) const
 {
-	if (font)
+	if (font != NULL)
 		*font = &fNullStyle.font;
-	if (color)
+	if (color != NULL)
 		*color = &fNullStyle.color;
 }
 
@@ -241,8 +247,9 @@ BTextView::StyleBuffer::GetNullStyle(const BFont **font, const rgb_color **color
 STEStyleRange *
 BTextView::StyleBuffer::AllocateStyleRange(const int32 numStyles) const
 {
-	STEStyleRange* range = (STEStyleRange *)malloc(sizeof(int32) + sizeof(STEStyleRun) * numStyles);
-	if (range)
+	STEStyleRange* range = (STEStyleRange *)malloc(sizeof(int32)
+		+ sizeof(STEStyleRun) * numStyles);
+	if (range != NULL)
 		range->count = numStyles;
 	return range;
 }
@@ -326,7 +333,8 @@ BTextView::StyleBuffer::SetStyleRange(int32 fromOffset, int32 toOffset,
 
 
 void
-BTextView::StyleBuffer::GetStyle(int32 inOffset, BFont *outFont, rgb_color *outColor) const
+BTextView::StyleBuffer::GetStyle(int32 inOffset, BFont *outFont,
+	rgb_color *outColor) const
 {
 	if (fStyleRunDesc.ItemCount() < 1) {
 		if (outFont)
@@ -487,7 +495,8 @@ BTextView::StyleBuffer::operator[](int32 index) const
 // ? CompareStyles ?
 // ? FilterStyles ?
 static void
-FixupMode(const STEStyle &firstStyle, const STEStyle &otherStyle, uint32 &mode, bool &sameColor)
+FixupMode(const STEStyle &firstStyle, const STEStyle &otherStyle, uint32 &mode,
+	bool &sameColor)
 {
 	if (mode & B_FONT_FAMILY_AND_STYLE) {
 		if (firstStyle.font != otherStyle.font)
@@ -550,7 +559,8 @@ BTextView::StyleBuffer::ContinuousGetStyle(BFont *outFont, uint32 *ioMode,
 
 		for (int32 i = fromIndex; i < toIndex; i++) {
 			styleIndex = fStyleRunDesc[i]->index;
-			FixupMode(fStyleRecord[styleIndex]->style, theStyle, mode, oneColor);
+			FixupMode(fStyleRecord[styleIndex]->style, theStyle, mode,
+				oneColor);
 		}
 
 		if (ioMode)
