@@ -1,0 +1,3 @@
+SubDir LOCALE_TOP tools ;
+
+SubInclude LOCALE_TOP tools genprops ;

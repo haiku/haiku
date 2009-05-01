@@ -1,0 +1,5 @@
+SubDir LOCALE_TOP tools genprops ;
+
+SubDirSysHdrs [ FDirName $(LOCALE_TOP) lib ] ;
+
+Application genprops : genprops.cpp store.cpp utf8.cpp PropertyFile.cpp : be ;

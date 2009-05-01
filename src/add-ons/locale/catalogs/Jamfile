@@ -1,0 +1,3 @@
+SubDir LOCALE_TOP add-ons catalogs ;
+
+SubInclude LOCALE_TOP add-ons catalogs zeta ;

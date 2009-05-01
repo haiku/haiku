@@ -1,0 +1,13 @@
+SubDir LOCALE_TOP languages ;
+
+LANGUAGE_DIR = /etc/locale/languages ;
+
+{
+	local languages = [ Glob $(SUBDIR) : *.language ] ;
+	local language ;
+	for language in [ FGristFiles $(languages:D=) ] {
+		local installedLanguage = $(language:G=installed) ;
+		MakeLocate $(installedLanguage) : $(LANGUAGE_DIR) ;
+		File $(installedLanguage) : $(language) ;
+	}
+}

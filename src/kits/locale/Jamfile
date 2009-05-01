@@ -1,0 +1,35 @@
+SubDir LOCALE_TOP lib ;
+
+DEFINES += _BUILDING_locale=1 ;
+
+SharedLibrary liblocale.so
+	: adler32.c
+	  cat.cpp
+	  Catalog.cpp
+	  Collator.cpp
+	  Country.cpp
+	  Currency.cpp
+	  DefaultCatalog.cpp
+	  FloatFormat.cpp
+	  FloatFormatImpl.cpp
+	  FloatFormatParameters.cpp
+	  Format.cpp
+	  FormatImpl.cpp
+	  FormatParameters.cpp
+	  GenericNumberFormat.cpp
+	  IntegerFormat.cpp
+	  IntegerFormatImpl.cpp
+	  IntegerFormatParameters.cpp
+	  langinfo.cpp
+	  Language.cpp
+	  LibraryInit.cpp
+	  Locale.cpp
+	  LocaleRoster.cpp
+	  NumberFormat.cpp
+	  NumberFormatImpl.cpp
+	  NumberFormatParameters.cpp
+	  PropertyFile.cpp
+	  strfmon.cpp
+	  UnicodeChar.cpp
+	: be
+;

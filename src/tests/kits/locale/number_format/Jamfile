@@ -1,0 +1,13 @@
+SubDir LOCALE_TOP test number_format ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) generic_number_format ] ;
+
+UnitTest NumberFormatTests
+	: NumberFormatTestAddOn.cpp
+
+	  # BGenericNumberFormat
+	  GenericNumberFormatTests.cpp
+	  GenericNumberFormatConstructorTest.cpp
+
+	: be <unittests>liblocale.so
+;

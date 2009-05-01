@@ -1,0 +1,8 @@
+SubDir LOCALE_TOP preferences ;
+
+AddResources Locale : Locale.rsrc ;
+
+Application Locale :
+	Locale.cpp
+	LocaleWindow.cpp
+	: be liblocale.so ;

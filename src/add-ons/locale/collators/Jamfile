@@ -1,0 +1,15 @@
+SubDir LOCALE_TOP add-ons collators ;
+
+rule Collator
+{
+	# Collator <sources> ;
+	local sources = $(1) ;
+	local name = $(sources[1]:B) ;
+	local rsrc = $(name:S=.rsrc) ;
+	AddResources $(name) : $(rsrc) ;
+	AddOn $(name) : $(sources) : be liblocale.so ;
+}
+
+Collator GermanDIN-2.cpp ;
+Collator French.cpp ;
+

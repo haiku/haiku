@@ -1,0 +1,3 @@
+SubDir LOCALE_TOP add-ons catalogs zeta ;
+
+AddOn zeta : Catalog.cpp : be liblocale.so ;
