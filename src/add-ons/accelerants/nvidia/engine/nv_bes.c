@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-12/2005 */
+/* Written by Rudolf Cornelissen 05/2002-5/2009 */
 
 #define MODULE_BIT 0x00000200
 
@@ -225,8 +225,8 @@ static void nv_bes_calc_move_overlay(move_overlay_info *moi)
 	}
 	/* take zoom into account */
 	moi->hsrcstv += ((uint32)si->overlay.my_ov.h_start) << 16;
-	/* AND below required by hardware */
-	moi->hsrcstv &= 0x03fffffc;
+	/* AND below required by hardware (> 1024 support confirmed on all cards) */
+	moi->hsrcstv &= 0x07fffffc;
 	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", moi->hsrcstv / (float)65536));
 
 

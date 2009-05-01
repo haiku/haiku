@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-4/2006 */
+/* Written by Rudolf Cornelissen 05/2002-5/2009 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -133,25 +133,49 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					break;
 		}
 
-		/* check if the requested buffer width is supported */
-		if (si->overlay.myBuffer[offset].width > 1024)
-		{
-			LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+		/* checkout input picture size */
+		switch (si->ps.card_arch) {
+		case NV04A:
+			/* all DVD's are OK, but HDTV 1280x720p is not: it displays ghost images
+			 * (still find exact limit..) */
 
-			/* release the shared benaphore */
-			RELEASE_BEN(si->overlay.lock)
+			/* check if the requested buffer width is supported */
+			if (si->overlay.myBuffer[offset].width > 1024) {
+				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
 
-			return NULL;
-		}
-		/* check if the requested buffer height is supported */
-		if (height > 1024)
-		{
-			LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+				return NULL;
+			}
+			/* check if the requested buffer height is supported */
+			if (height > 1024) {
+				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
 
-			/* release the shared benaphore */
-			RELEASE_BEN(si->overlay.lock)
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+				return NULL;
+			}
+			break;
+		default:
+			/* HDTV 1920x1080p is confirmed OK on NV11 and higher cards */
 
-			return NULL;
+			/* check if the requested buffer width is supported */
+			if (si->overlay.myBuffer[offset].width > 1920) {
+				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+				return NULL;
+			}
+			/* check if the requested buffer height is supported */
+			if (height > 1080) {
+				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+				return NULL;
+			}
+			break;
 		}
 
 		/* store slopspace (in pixels) for each bitmap for use by 'overlay unit' (BES) */
