@@ -101,7 +101,7 @@ status_t MediaJack::getInput(
 		input->source = m_source;
 		input->destination = m_destination;
 		input->format = m_format;
-		m_label.CopyInto(input->name, 0, 64);
+		strlcpy(input->name, m_label.String(), B_MEDIA_NAME_LENGTH);
 		return B_OK;
 	}
 	return B_ERROR;
@@ -117,7 +117,7 @@ status_t MediaJack::getOutput(
 		output->source = m_source;
 		output->destination = m_destination;
 		output->format = m_format;
-		m_label.CopyInto(output->name, 0, 64);
+		strlcpy(output->name, m_label.String(), B_MEDIA_NAME_LENGTH);
 		return B_OK;
 	}
 	return B_ERROR;
