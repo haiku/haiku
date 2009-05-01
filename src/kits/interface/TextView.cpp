@@ -1162,13 +1162,11 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 	// update the style runs
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
 
-	if (inRuns != NULL)
+	if (fStylable && inRuns != NULL)
 		SetRunArray(inOffset, inOffset + inLength, inRuns);
 	else {
-		// apply nullStyle to inserted text
-		fStyles->SyncNullStyle(inOffset);
-		fStyles->SetStyleRange(inOffset, inOffset + inLength,
-			fText->Length(), B_FONT_ALL, NULL, NULL);
+		// apply null-style to inserted text
+		_ApplyStyleRange(inOffset, inOffset + inLength);
 	}
 
 	// recalc line breaks and draw the text
@@ -1591,14 +1589,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 {
 	CALLED();
 
-	if (startOffset > endOffset)
-		return;
-
-	BFont newFont;
-	if (font != NULL) {
-		newFont = font;
-		_NormalizeFont(&newFont);
-	}
+	_HideCaret();
 
 	const int32 textLength = fText->Length();
 
@@ -1607,23 +1598,22 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		// style and ignore the offsets
 		startOffset = 0;
 		endOffset = textLength;
+	} else {
+		// pin offsets at reasonable values
+		if (startOffset < 0)
+			startOffset = 0;
+		else if (startOffset > textLength)
+			startOffset = textLength;
+
+		if (endOffset < 0)
+			endOffset = 0;
+		else if (endOffset > textLength)
+			endOffset = textLength;
 	}
 
-	// pin offsets at reasonable values
-	if (startOffset < 0)
-		startOffset = 0;
-	else if (startOffset > textLength)
-		startOffset = textLength;
-
-	if (endOffset < 0)
-		endOffset = 0;
-	else if (endOffset > textLength)
-		endOffset = textLength;
-
-	// add the style to the style buffer
-	fStyles->SyncNullStyle(startOffset);
-	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
-		fontMode, &newFont, color);
+	// apply the style to the style buffer
+	fStyles->InvalidateNullStyle();
+	_ApplyStyleRange(startOffset, endOffset, fontMode, font, color);
 
 	if ((fontMode & (B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE)) != 0) {
 		// TODO: maybe only invalidate the layout (depending on
@@ -1636,6 +1626,8 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		_RequestDrawLines(_LineAt(startOffset), _LineAt(endOffset), startOffset,
 			false);
 	}
+
+	_ShowCaret();
 }
 
 
@@ -1769,20 +1761,18 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	// Handle the case where there is only one line (no text inserted)
 	// TODO: See if we can do this better
 	if (fStyles->NumRuns() == 0) {
-		const rgb_color *color = NULL;
-		const BFont *font = NULL;
-		fStyles->GetNullStyle(&font, &color);
-
-		font_height fontHeight;
-		font->GetHeight(&fontHeight);
-		height = fontHeight.ascent + fontHeight.descent;
+		fStyles->SyncNullStyle(0);
+		height = _NullStyleHeight();
 	} else {
 		height = (line + 1)->origin - line->origin;
 
 		if (_IsOnEmptyLastLine(inOffset)) {
-			// special case: go down one line if inOffset is the newline
-			// at the end of the buffer
+			// special case: go down one line if inOffset is at the newline
+			// at the end of the buffer ...
 			result.y += height;
+			// ... and return the height of that (empty) line
+			fStyles->SyncNullStyle(inOffset);
+			height = _NullStyleHeight();
 		} else {
 			int32 offset = line->offset;
 			int32 length = inOffset - line->offset;
@@ -2983,27 +2973,31 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	const text_run_array *inRuns)
 {
 	CALLED();
-	// why add nothing?
-	if (inLength < 1)
-		return;
 
-	// TODO: Pin offset/lenght
-	// add the text to the buffer
-	fText->InsertText(inText, inLength, inOffset);
+	if (inLength < 0)
+		inLength = 0;
 
-	// update the start offsets of each line below offset
-	fLines->BumpOffset(inLength, _LineAt(inOffset) + 1);
+	if (inOffset < 0)
+		inOffset = 0;
+	else if (inOffset > fText->Length())
+		inOffset = fText->Length();
 
-	// update the style runs
-	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
+	if (inLength > 0) {
+		// add the text to the buffer
+		fText->InsertText(inText, inLength, inOffset);
 
-	if (fStylable && (inRuns != NULL)) {
+		// update the start offsets of each line below offset
+		fLines->BumpOffset(inLength, _LineAt(inOffset) + 1);
+
+		// update the style runs
+		fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
+	}
+
+	if (fStylable && inRuns != NULL) {
 		_SetRunArray(inOffset, inOffset + inLength, inRuns);
 	} else {
-		// apply nullStyle to inserted text
-		fStyles->SyncNullStyle(inOffset);
-		fStyles->SetStyleRange(inOffset, inOffset + inLength,
-			fText->Length(), B_FONT_ALL, NULL, NULL);
+		// apply null-style to inserted text
+		_ApplyStyleRange(inOffset, inOffset + inLength);
 	}
 }
 
@@ -4927,10 +4921,8 @@ BTextView::_SetRunArray(int32 startOffset, int32 endOffset,
 				toOffset = (toOffset > endOffset) ? endOffset : toOffset;
 			}
 
-			BFont font = theRun->font;
-			_NormalizeFont(&font);
-			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
-				B_FONT_ALL, &theRun->font, &theRun->color);
+			_ApplyStyleRange(fromOffset, toOffset, B_FONT_ALL, &theRun->font,
+				&theRun->color, false);
 
 			theRun++;
 		}
@@ -5286,6 +5278,43 @@ BTextView::_IsOnEmptyLastLine(int32 offset) const
 {
 	return (offset == TextLength() && offset > 0
 		&& fText->RealCharAt(offset - 1) == B_ENTER);
+}
+
+
+void
+BTextView::_ApplyStyleRange(int32 fromOffset, int32 toOffset, uint32 inMode,
+	const BFont *inFont, const rgb_color *inColor, bool syncNullStyle)
+{
+	if (inFont != NULL) {
+		// if a font has been given, normalize it
+		BFont font = *inFont;
+		_NormalizeFont(&font);
+		inFont = &font;
+	}
+
+	if (!fStylable) {
+		// always apply font and color to full range for non-stylable textviews
+		fromOffset = 0;
+		toOffset = fText->Length();
+	}
+
+	if (syncNullStyle)
+		fStyles->SyncNullStyle(fromOffset);
+
+	fStyles->SetStyleRange(fromOffset, toOffset, fText->Length(), inMode,
+		inFont, inColor);
+}
+
+
+float
+BTextView::_NullStyleHeight() const
+{
+	const BFont *font = NULL;
+	fStyles->GetNullStyle(&font, NULL);
+
+	font_height fontHeight;
+	font->GetHeight(&fontHeight);
+	return fontHeight.ascent + fontHeight.descent;
 }
 
 

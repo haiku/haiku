@@ -362,6 +362,13 @@ private:
 			void				_SetRunArray(int32 startOffset, int32 endOffset,
 									const text_run_array* inRuns);
 
+			void				_ApplyStyleRange(int32 fromOffset,
+									int32 toOffset,
+									uint32 inMode = B_FONT_ALL,
+									const BFont *inFont = NULL,
+									const rgb_color *inColor = NULL,
+									bool syncNullStyle = true);
+
 			uint32				_CharClassification(int32 offset) const;
 			int32				_NextInitialByte(int32 offset) const;
 			int32				_PreviousInitialByte(int32 offset) const;
@@ -384,6 +391,8 @@ private:
 			int32				_LineAt(int32 offset) const;
 			int32				_LineAt(const BPoint& point) const;
 			bool				_IsOnEmptyLastLine(int32 offset) const;
+
+			float				_NullStyleHeight() const;
 
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
