@@ -223,11 +223,11 @@ printf("Chart::Draw((%f, %f) - (%f, %f))\n", updateRect.left, updateRect.top, up
 	// clear the axes background
 	if (fLeftAxis.axis != NULL || fTopAxis.axis != NULL
 		|| fRightAxis.axis != NULL || fBottomAxis.axis != NULL) {
-		SetHighColor(background);
+		SetLowColor(background);
 		BRegion clippingRegion(Bounds());
 		clippingRegion.Exclude(fChartFrame);
 		ConstrainClippingRegion(&clippingRegion);
-		FillRect(Bounds());
+		FillRect(Bounds(), B_SOLID_LOW);
 		ConstrainClippingRegion(NULL);
 	}
 
