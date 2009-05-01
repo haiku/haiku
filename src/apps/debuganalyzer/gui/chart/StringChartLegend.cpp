@@ -23,13 +23,28 @@ StringChartLegend::StringChartLegend(const char* string, int32 level)
 // #pragma mark - StringChartLegendRenderer
 
 
+StringChartLegendRenderer::StringChartLegendRenderer()
+	:
+	fFont(*be_plain_font)
+{
+	_Init();
+}
+
+
+StringChartLegendRenderer::StringChartLegendRenderer(const BFont& font)
+	:
+	fFont(font)
+{
+	_Init();
+}
+
+
 void
 StringChartLegendRenderer::GetMinimumLegendSpacing(BView* view,
 	float* horizontal, float* vertical)
 {
-// TODO: Implement for real!
-	*horizontal = 40;
-	*vertical = 20;
+	*horizontal = 2 * fEmWidth;
+	*vertical = fFontHeight / 2;
 }
 
 
@@ -40,16 +55,8 @@ StringChartLegendRenderer::LegendSize(ChartLegend* _legend, BView* view)
 	if (legend == NULL)
 		return BSize();
 
-// TODO: It's a bit expensive to do that for each legend!
-// TODO: Have a font per renderer?
-	BFont font;
-	view->GetFont(&font);
-	font_height fh;
-	font.GetHeight(&fh);
-	float fontHeight = ceilf(fh.ascent) + ceilf(fh.descent);
-	float width = ceilf(font.StringWidth(legend->String()));
-
-	return BSize(width, fontHeight);
+	float width = ceilf(fFont.StringWidth(legend->String()));
+	return BSize(width, fFontHeight);
 }
 
 
@@ -61,12 +68,20 @@ StringChartLegendRenderer::RenderLegend(ChartLegend* _legend, BView* view,
 	if (legend == NULL)
 		return;
 
-	BFont font;
-	view->GetFont(&font);
-	font_height fh;
-	font.GetHeight(&fh);
-	point.y += fh.ascent;
+	point.y += ceil(fFontAscent);
 
+	view->SetFont(&fFont);
 	view->SetHighColor(rgb_color().set_to(0, 0, 0, 255));
 	view->DrawString(legend->String(), point);
+}
+
+
+void
+StringChartLegendRenderer::_Init()
+{
+	font_height fh;
+	fFont.GetHeight(&fh);
+	fFontAscent = ceilf(fh.ascent);
+	fFontHeight = fFontAscent + ceilf(fh.descent);
+	fEmWidth = ceilf(fFont.StringWidth("m", 1));
 }

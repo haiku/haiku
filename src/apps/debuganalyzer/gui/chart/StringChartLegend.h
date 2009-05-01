@@ -5,6 +5,7 @@
 #ifndef STRING_CHART_LEGEND_H
 #define STRING_CHART_LEGEND_H
 
+#include <Font.h>
 #include <String.h>
 
 #include "chart/ChartLegend.h"
@@ -24,6 +25,9 @@ private:
 
 class StringChartLegendRenderer : public ChartLegendRenderer {
 public:
+								StringChartLegendRenderer();
+								StringChartLegendRenderer(const BFont& font);
+
 	virtual	void				GetMinimumLegendSpacing(BView* view,
 									float* horizontal, float* vertical);
 
@@ -31,6 +35,15 @@ public:
 									BView* view);
 	virtual	void				RenderLegend(ChartLegend* legend, BView* view,
 									BPoint point);
+
+private:
+			void				_Init();
+
+private:
+			BFont				fFont;
+			float				fFontAscent;
+			float				fFontHeight;
+			float				fEmWidth;
 };
 
 
