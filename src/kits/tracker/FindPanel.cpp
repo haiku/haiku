@@ -2564,8 +2564,7 @@ TAttrView::Draw(BRect)
 		// draws the is/contains, etc. string
 		bounds.left -= (width + 10);
 		bounds.bottom -= 6;
-		MovePenTo(bounds.LeftBottom());
-		DrawString(item->Submenu()->FindMarked()->Label());
+		DrawString(item->Submenu()->FindMarked()->Label(), bounds.LeftBottom());
 	}
 }
 
