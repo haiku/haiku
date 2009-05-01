@@ -649,12 +649,14 @@ KeyboardDevice::_ControlThread()
 
 			ctrlAltDelPressed = true;
 		}
+
 		if (ctrlAltDelPressed) {
 			if (fOwner->fTeamMonitorWindow != NULL) {
 				BMessage message(kMsgCtrlAltDelPressed);
 				message.AddBool("key down", isKeyDown);
 				fOwner->fTeamMonitorWindow->PostMessage(&message);
 			}
+
 			if (!isKeyDown)
 				ctrlAltDelPressed = false;
 		}
@@ -662,31 +664,45 @@ KeyboardDevice::_ControlThread()
 		BAutolock lock(fKeymapLock);
 
 		uint32 modifiers = fKeymap.Modifier(keycode);
-		if (modifiers
-			&& (!(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK))
-				|| isKeyDown)) {
-			BMessage* msg = new BMessage;
-			if (msg == NULL)
-				continue;
+		bool isLock
+			= (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) != 0;
+		if (modifiers != 0 && (!isLock || isKeyDown)) {
+			uint32 oldModifiers = fModifiers;
 
-			msg->AddInt64("when", timestamp);
-			msg->what = B_MODIFIERS_CHANGED;
-			msg->AddInt32("be:old_modifiers", fModifiers);
-
-			if ((isKeyDown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
+			if ((isKeyDown && !isLock)
 				|| (isKeyDown && !(fModifiers & modifiers)))
 				fModifiers |= modifiers;
-			else
+			else {
 				fModifiers &= ~modifiers;
 
-			msg->AddInt32("modifiers", fModifiers);
-			msg->AddData("states", B_UINT8_TYPE, states, 16);
+				// ensure that we don't clear a combined B_*_KEY when still
+				// one of the individual B_{LEFT|RIGHT}_*_KEY is pressed
+				if (fModifiers & (B_LEFT_SHIFT_KEY | B_RIGHT_SHIFT_KEY))
+					fModifiers |= B_SHIFT_KEY;
+				if (fModifiers & (B_LEFT_COMMAND_KEY | B_RIGHT_COMMAND_KEY))
+					fModifiers |= B_COMMAND_KEY;
+				if (fModifiers & (B_LEFT_CONTROL_KEY | B_RIGHT_CONTROL_KEY))
+					fModifiers |= B_CONTROL_KEY;
+				if (fModifiers & (B_LEFT_OPTION_KEY | B_RIGHT_OPTION_KEY))
+					fModifiers |= B_OPTION_KEY;
+			}
 
-			if (fOwner->EnqueueMessage(msg) != B_OK)
-				delete msg;
+			if (fModifiers != oldModifiers) {
+				BMessage* message = new BMessage(B_MODIFIERS_CHANGED);
+				if (message == NULL)
+					continue;
 
-			if (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK))
-				_UpdateLEDs();
+				message->AddInt64("when", timestamp);
+				message->AddInt32("be:old_modifiers", oldModifiers);
+				message->AddInt32("modifiers", fModifiers);
+				message->AddData("states", B_UINT8_TYPE, states, 16);
+
+				if (fOwner->EnqueueMessage(message) != B_OK)
+					delete message;
+
+				if (isLock)
+					_UpdateLEDs();
+			}
 		}
 
 		uint8 newDeadKey = 0;
