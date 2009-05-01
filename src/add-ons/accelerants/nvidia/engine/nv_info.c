@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-3/2006
+   Rudolf Cornelissen 7/2003-5/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2517,11 +2517,13 @@ static void detect_panels()
 
 	/* determine flatpanel type(s) */
 	/* note:
-	 * on NV11 accessing registerset(s) hangs card. */
-	//fixme: how about NV11's with panels?
-	//fixme?: linux checks on (only and) all dualhead cards, and only on DAC1...
-//fixme: testing...
-	if (/*si->ps.tmds1_active && */(si->ps.card_type != NV11))
+	 * - on NV11 accessing registerset(s) hangs card.
+	 * - the same applies for NV34.
+	 *   Confirmed for DAC2 access on ID 0x0322,
+	 *   but only after a failed VESA modeswitch by the HAIKU kernel
+	 *   at boot time caused by a BIOS fault inside the gfx card: it says
+	 *   it can do VESA 1280x1024x32 on CRTC1/DAC1 but it fails: no signal. */
+	if (si->ps.tmds1_active && (si->ps.card_type != NV11))
 	{
 		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
 		 * b0-7 = adress, b16 = 1 = write_enable */
@@ -2532,9 +2534,7 @@ static void detect_panels()
 		else
 			LOG(2,("INFO: Flatpanel on head 1 is TMDS type\n"));
 	}
-//fixme: testing...
-//	if (si->ps.tmds2_active && (si->ps.card_type != NV11))
-	if (si->ps.secondary_head && (si->ps.card_type != NV11))
+	if (si->ps.tmds2_active && (si->ps.card_type != NV11))
 	{
 		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
 		 * b0-7 = adress, b16 = 1 = write_enable */

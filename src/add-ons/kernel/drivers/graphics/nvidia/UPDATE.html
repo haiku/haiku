@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.85, Rudolf)</h1></p>
+<p><h1>head (SVN 0.87, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -14,6 +14,8 @@
 <li>'pgm_panel' is now preset to 'false' since this will probably increase chances of a good picture on panels outthere.
 <li>'force_ws' is now (re-enabled but) preset to 'true' since the number of widescreen monitors outthere is rapidly becoming mainstream.<br> <strong>Note please:</strong><br>
 'force_ws' was hardcoded to setting 'true' some time ago by the Haiku team because of these monitors.
+<li>Added 'block_acc' option in nvidia.settings to completely disable the acceleration engine. Use this as a work-around if the acceleration engine misbehaves.
+<li>Fixed card/system hanging after trying to log LVDS/TMDS distinction info. This (at least) fixes one NV34 trying to startup after a failed kernel VESA modeswitch without using the driver's coldstart option. Might very well help on other type cards too.
 </ul>
 </ul>
 </ul>
