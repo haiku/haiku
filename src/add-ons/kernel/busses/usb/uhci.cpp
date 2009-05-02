@@ -1713,12 +1713,12 @@ UHCI::Interrupt()
 	}
 
 	if (status & UHCI_USBSTS_HOSTERR) {
-		TRACE_MODULE("host system error\n");
+		TRACE_MODULE_ERROR("host system error\n");
 		acknowledge |= UHCI_USBSTS_HOSTERR;
 	}
 
 	if (status & UHCI_USBSTS_HCPRERR) {
-		TRACE_MODULE("process error\n");
+		TRACE_MODULE_ERROR("process error\n");
 		acknowledge |= UHCI_USBSTS_HCPRERR;
 	}
 
