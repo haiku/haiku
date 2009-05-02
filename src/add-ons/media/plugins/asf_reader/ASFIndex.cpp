@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 
+
 void
 IndexEntry::Clear() 
 {
