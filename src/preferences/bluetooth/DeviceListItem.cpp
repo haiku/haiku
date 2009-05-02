@@ -18,7 +18,7 @@
 
 namespace Bluetooth {
 
-DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice)
+DeviceListItem::DeviceListItem(BluetoothDevice* bDevice)
 	: BListItem(),
 	fDevice(bDevice)
 {	
@@ -26,7 +26,7 @@ DeviceListItem::DeviceListItem(BluetoothDevice*	bDevice)
 }	
 
 
-DeviceListItem::DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi)
+DeviceListItem::DeviceListItem(bdaddr_t bdaddr, DeviceClass dClass, int32 rssi)
 	: BListItem(),
 	fDevice(NULL),
 	fAddress(bdaddr),

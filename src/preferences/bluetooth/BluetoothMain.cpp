@@ -38,7 +38,7 @@ BluetoothApplication::AboutRequested()
                              "	- Luroh\n"
                              "	- Pieter Panman\n\n"
                              "Economically:\n"
-                             "	- Karl von Dorf, Andrea Bernardi (OSDrawer),\n"
+                             "	- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n"
                              "	- Matt M, Doug F, Hubert H,\n"
                              "	- Sebastian B, Andrew M, Jared E,\n"
                              "	- Frederik H, Tom S, Ferry B,\n"

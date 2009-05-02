@@ -233,7 +233,7 @@ DeviceManager::StartMonitoringDevice(const char	*device)
 	if (error != B_OK)
 		return error;
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,	"%s	path being monitorized\n", path.Path());
+	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,	"%s	path being monitored\n", path.Path());
 
 	// We are monitoring the root we may have already directories inside
 	// to be monitored
