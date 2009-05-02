@@ -445,6 +445,7 @@ FontManager::_GetDefaultStyle(const char *familyName, const char *styleName,
 status_t
 FontManager::_SetDefaultFonts()
 {
+	// plain font
 	FontStyle* style = _GetDefaultStyle(DEFAULT_PLAIN_FONT_FAMILY,
 		DEFAULT_PLAIN_FONT_STYLE, FALLBACK_PLAIN_FONT_FAMILY,
 		DEFAULT_PLAIN_FONT_STYLE,
@@ -457,6 +458,7 @@ FontManager::_SetDefaultFonts()
 	if (fDefaultPlainFont == NULL)
 		return B_NO_MEMORY;
 
+	// bold font
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
 		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
 
@@ -465,6 +467,7 @@ FontManager::_SetDefaultFonts()
 	if (fDefaultBoldFont == NULL)
 		return B_NO_MEMORY;
 
+	// fixed font
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
 		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
@@ -474,6 +477,7 @@ FontManager::_SetDefaultFonts()
 		return B_NO_MEMORY;
 
 	fDefaultFixedFont->SetSpacing(B_FIXED_SPACING);
+
 	return B_OK;
 }
 
@@ -917,11 +921,6 @@ FontManager::GetFamily(const char* name)
 
 	if (fScanned)
 		return NULL;
-
-	// try again
-	family = _FindFamily(name);
-	if (family != NULL)
-		return family;
 
 	// try font mappings before failing
 	if (_AddMappedFont(name) == B_OK)

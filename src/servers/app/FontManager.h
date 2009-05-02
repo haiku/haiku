@@ -112,6 +112,6 @@ class FontManager : public BLooper {
 };
 
 extern FT_Library gFreeTypeLibrary;
-extern FontManager *gFontManager;
+extern FontManager* gFontManager;
 
 #endif	/* FONT_MANAGER_H */
