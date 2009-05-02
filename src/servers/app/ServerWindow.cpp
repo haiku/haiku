@@ -385,9 +385,6 @@ ServerWindow::_Show()
 	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindow);
 	fDesktop->LockSingleWindow();
-
-	if (fDirectWindowData != NULL)
-		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
@@ -397,14 +394,10 @@ ServerWindow::_Show()
 void
 ServerWindow::_Hide()
 {
-	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: _Hide\n", Title()));
 
 	if (fWindow->IsHidden() || fWindow->IsOffscreenWindow())
 		return;
-
-	if (fDirectWindowData != NULL)
-		HandleDirectConnection(B_DIRECT_STOP);
 
 	fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindow);

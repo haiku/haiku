@@ -1898,7 +1898,8 @@ Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 	} else
 		MarkDirty(dirty);
 
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
+	window->ServerWindow()->HandleDirectConnection(
+		B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
