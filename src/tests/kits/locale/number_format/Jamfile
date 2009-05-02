@@ -4,12 +4,12 @@ UsePublicHeaders locale ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) generic_number_format ] ;
 
-UnitTest NumberFormatTests
+UnitTestLib libNumberFormatTests.so
 	: NumberFormatTestAddOn.cpp
 
 	  # BGenericNumberFormat
 	  GenericNumberFormatTests.cpp
 	  GenericNumberFormatConstructorTest.cpp
 
-	: be liblocale.so
+	: be $(TARGET_LIBSTDC++) liblocale.so
 ;

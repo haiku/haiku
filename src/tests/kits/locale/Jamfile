@@ -12,7 +12,7 @@ Depends LocaleKitTests
 	collatorSpeed
 	collatorTest
 	localeTest
-#	NumberFormatTests
+	libNumberFormatTests.so
 	;
 
 rule LocaleTest
@@ -35,14 +35,4 @@ Addon catalogTestAddOn
 	: be liblocale.so 
 	;
 
-# For the unit tests we need liblocale.so to live in the `lib' subdirectory
-# of the UnitTester application. We simply create a symlink that can be
-# referred to by `<unittests>liblocale.so'.
-#{
-#	local symlink = <unittests>liblocale.so ;
-#	MakeLocate $(symlink) : [ FDirName $(LOCALE_UNITTESTS_DIR) lib ] ;
-#	RelSymLink $(symlink) : liblocale.so ;
-#}
-
-# TODO: activate this again, once it's working!
-# SubInclude HAIKU_TOP src tests kits locale number_format ;
+SubInclude HAIKU_TOP src tests kits locale number_format ;
