@@ -569,15 +569,13 @@ i2c_ReadEDID(uint8 BusNR, edid1_info *edid)
 
 void i2c_TestEDID(void)
 {
-	uint8 bus, buses;
+	uint8 bus;
+	edid1_info edid;
+	bool *i2c_bus = &(si->ps.i2c_bus0);
 
-	/* set number of buses to test for */
-	buses = 2;
-	if (si->ps.secondary_head) buses = 4;
-
-	/* test bus */
-	for (bus = 0; bus < buses; bus++) {
-		edid1_info edid;
-		i2c_ReadEDID(bus, &edid);
+	/* test wired bus(es) */
+	for (bus = 0; bus < 4; bus++) {
+		if (i2c_bus[bus])
+			i2c_ReadEDID(bus, &edid);
 	}
 }
