@@ -5,6 +5,7 @@
 #include <String.h>
 #include <Window.h>
 
+#include "PreviewView.h"
 
 class BBitmap;
 class BBox;
@@ -57,7 +58,7 @@ private:
 			void			_SaveScreenshotSilent() const;
 
 private:
-			BBox*			fPreviewBox;
+			PreviewView*	fPreview;
 			BRadioButton*	fActiveWindow;
 			BRadioButton*	fWholeDesktop;
 			BTextControl*	fDelayControl;

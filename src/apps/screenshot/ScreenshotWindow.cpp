@@ -7,7 +7,6 @@
 
 #include "PNGDump.h"
 
-
 #include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -324,9 +323,7 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 void
 ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 {
-	fPreviewBox = new BBox(BRect(0.0, 0.0, 200.0, 150.0));
-	fPreviewBox->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
-	fPreviewBox->SetFlags(fPreviewBox->Flags() | B_FULL_UPDATE_ON_RESIZE);
+	fPreview = new PreviewView();
 
 	fNameControl = new BTextControl("", "Name:", "screenshot1", NULL);
 
@@ -354,7 +351,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 
 	layout->AddView(1, BGroupLayoutBuilder(B_VERTICAL)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
-			.Add(fPreviewBox)
+			.Add(fPreview)
 			.AddGroup(B_VERTICAL)
 				.Add(gridLayout->View())
 				.AddGlue()
@@ -514,13 +511,13 @@ ScreenshotWindow::_UpdatePreviewPanel()
 			fScreenshot->Bounds().Width()) * width;
 	}
 
-	fPreviewBox->SetExplicitMinSize(BSize(width, height));
-	fPreviewBox->SetExplicitMaxSize(BSize(width, height));
+	fPreview->SetExplicitMinSize(BSize(width, height));
+	fPreview->SetExplicitMaxSize(BSize(width, height));
 
-	fPreviewBox->ClearViewBitmap();
-	fPreviewBox->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
-		fPreviewBox->Bounds(), B_FOLLOW_ALL, 0);
-
+	fPreview->ClearViewBitmap();
+	fPreview->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
+		fPreview->Bounds(), B_FOLLOW_ALL, 0);
+	
 	BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
 	if (layout)
 		layout->SetVisibleItem(1L);

@@ -6,6 +6,7 @@ UsePrivateHeaders interface ;
 Application Screenshot :
 	main.cpp
 	PNGDump.cpp
+	PreviewView.cpp
 	Screenshot.cpp
 	ScreenshotWindow.cpp
 	: be tracker translation libpng.so libz.so
