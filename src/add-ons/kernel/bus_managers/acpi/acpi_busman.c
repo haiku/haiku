@@ -274,7 +274,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 
 
 status_t
-get_device_hid(const char *path, char *hid)
+get_device_hid(const char *path, char *hid, size_t bufferLength)
 {
 	ACPI_HANDLE handle;
 	ACPI_OBJECT info;
@@ -284,6 +284,9 @@ get_device_hid(const char *path, char *hid)
 	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
+	if (bufferLength < ACPI_DEVICE_ID_LENGTH)
+		return B_BUFFER_OVERFLOW;
+		
 	infoBuffer.Pointer = &info;
 	infoBuffer.Length = sizeof(ACPI_OBJECT);
 	info.String.Pointer = hid;

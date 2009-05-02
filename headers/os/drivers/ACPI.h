@@ -39,7 +39,7 @@ struct acpi_module_info {
 	status_t	(*get_device)(const char *hid, uint32 index, char *result,
 					size_t resultLength);
 
-	status_t	(*get_device_hid)(const char *path, char *hid);
+	status_t	(*get_device_hid)(const char *path, char *hid, size_t hidLength);
 	uint32		(*get_object_type)(const char *path);
 	status_t	(*get_object)(const char *path,
 					acpi_object_type **_returnValue);

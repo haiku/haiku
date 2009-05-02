@@ -109,7 +109,7 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 				{ NULL }
 			};
 
-			get_device_hid(result, hid);
+			get_device_hid(result, hid, sizeof(hid));
 
 			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
 					NULL, &deviceNode) == B_OK)

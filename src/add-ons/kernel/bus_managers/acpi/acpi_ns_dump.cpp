@@ -107,7 +107,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				break;
 			case ACPI_TYPE_DEVICE:
 				hid[0] = 0; /* zero-terminate string; get_device_hid can (and will) fail! */
-				device->acpi->get_device_hid(result, hid);
+				device->acpi->get_device_hid(result, hid, sizeof(hid));
 				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
 			case ACPI_TYPE_EVENT:
@@ -146,7 +146,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 			toWrite++;
 			if (ringBuffer.Lock()) {
 				if (ringBuffer.WritableAmount() < toWrite) {
-					//dprintf("not enough space\n");
 					if (!make_space(device, toWrite)) {
 						panic("couldn't make space");
 						exit_thread(0);
@@ -154,7 +153,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				}
 
 				written = ringBuffer.Write(output, toWrite);
-				//dprintf("written %ld bytes\n", written);
 				ringBuffer.Unlock();
 			}
 
@@ -225,38 +223,29 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
 	size_t bytesRead = 0; 
 	size_t readable = 0;
-        //dprintf("acpi_namespace_read(cookie: %p, position: %lld, buffer: %p, size: %ld)\n",
-        //                _cookie, position, buf, *num_bytes);
-
+       
 	RingBuffer &ringBuffer = *device->buffer;
 
 	if (ringBuffer.Lock()) {
 		readable = ringBuffer.ReadableAmount();
 
-		//dprintf("%ld bytes readable\n", readable);
 		if (readable <= 0) {
-			//dprintf("acquiring read sem...\n");
 			ringBuffer.Unlock();
 			status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
 			if (status == B_INTERRUPTED) {
-				//dprintf("read: acquire_sem returned %s\n", strerror(status));
 				*num_bytes = 0;
 				return status;
 			}
-			//dprintf("read sem acquired\n");
 			if (!ringBuffer.Lock()) {
-				dprintf("read: couldn't acquire lock. bailing\n");
 				*num_bytes = 0;
 				return B_ERROR;
 			}
 		}
 
-		//dprintf("readable %ld\n", ringBuffer.ReadableAmount());
 		bytesRead = ringBuffer.Read(buf, *num_bytes);
 		ringBuffer.Unlock();
 	}
 
-	//dprintf("read: read %ld bytes\n", bytesRead);
 	if (bytesRead < 0) {
 		*num_bytes = 0;
 		return bytesRead;
@@ -275,7 +264,6 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 static status_t
 acpi_namespace_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
-	dprintf("acpi_ns_dump: device_write\n");
 	*num_bytes = 0;				/* tell caller nothing was written */
 	return B_IO_ERROR;
 }
