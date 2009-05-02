@@ -8,6 +8,8 @@
 #include <String.h>
 #include <UnicodeChar.h>
 
+using namespace std;
+
 // constants (more below the helper classes)
 
 static const int kMaxIntDigitCount = 20;	// int64: 19 + sign, uint64: 20
@@ -98,7 +100,8 @@ class BGenericNumberFormat::GroupingInfo {
 			// unset old
 			Unset();
 			// set new
-			if (!separators && separatorCount <= 0 || !sizes && sizeCount <= 0)
+			if ((!separators && separatorCount <= 0)
+				|| (!sizes && sizeCount <= 0))
 				return B_OK;
 			// allocate arrays
 			fSeparators = new(nothrow) Symbol[separatorCount];
@@ -157,8 +160,8 @@ class BGenericNumberFormat::GroupingInfo {
 			for (int i = fSizeCount - 1; i >= 0; i--) {
 				if (fSumSizes[i] <= position) {
 					if (fSumSizes[i] == position
-						|| i == fSizeCount - 1
-						   && (position - fSumSizes[i]) % fSizes[i] == 0) {
+						|| (i == fSizeCount - 1
+							&& (position - fSumSizes[i]) % fSizes[i] == 0)) {
 						return fSumSeparators[i];
 					}
 					return NULL;
@@ -407,12 +410,14 @@ class BGenericNumberFormat::BufferWriter {
 // constants
 
 // digit symbols
-static const BGenericNumberFormat::Symbol kDefaultDigitSymbols[] = {
-	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-};
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultDigitSymbols[] = {
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+	};
 
 // decimal separator symbol
-static const BGenericNumberFormat::Symbol kDefaultFractionSeparator = ".";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultFractionSeparator = ".";
 
 // grouping separator symbols
 static const char *kDefaultGroupingSeparators[] = { "," };
@@ -429,53 +434,61 @@ static const size_t kNoGroupingSizes[] = { 0 };			// to please mwcc
 static const int32 kNoGroupingSizeCount = 0;
 
 // grouping info
-static const BGenericNumberFormat::GroupingInfo kDefaultGroupingInfo(
-	kDefaultGroupingSeparators, kDefaultGroupingSeparatorCount,
-	kDefaultGroupingSizes, kDefaultGroupingSizeCount
-);
-static const BGenericNumberFormat::GroupingInfo kNoGroupingInfo(
-	kNoGroupingSeparators, kNoGroupingSeparatorCount,
-	kNoGroupingSizes, kNoGroupingSizeCount
-);
+const BGenericNumberFormat::GroupingInfo
+	BGenericNumberFormat::kDefaultGroupingInfo(
+		kDefaultGroupingSeparators, kDefaultGroupingSeparatorCount,
+		kDefaultGroupingSizes, kDefaultGroupingSizeCount
+	);
+const BGenericNumberFormat::GroupingInfo
+	BGenericNumberFormat::kNoGroupingInfo(
+		kNoGroupingSeparators, kNoGroupingSeparatorCount,
+		kNoGroupingSizes, kNoGroupingSizeCount
+	);
 
 // exponent symbol
-static const BGenericNumberFormat::Symbol kDefaultExponentSymbol = "e";
-static const BGenericNumberFormat::Symbol kDefaultUpperCaseExponentSymbol
-	= "E";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultExponentSymbol = "e";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultUpperCaseExponentSymbol = "E";
 
 // NaN symbol
-static const BGenericNumberFormat::Symbol kDefaultNaNSymbol = "NaN";
-static const BGenericNumberFormat::Symbol kDefaultUpperCaseNaNSymbol = "NaN";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultNaNSymbol = "NaN";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultUpperCaseNaNSymbol = "NaN";
 
 // infinity symbol
-static const BGenericNumberFormat::Symbol kDefaultInfinitySymbol
-	= "infinity";
-static const BGenericNumberFormat::Symbol kDefaultUpperCaseInfinitySymbol
-	= "INFINITY";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultInfinitySymbol = "infinity";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultUpperCaseInfinitySymbol = "INFINITY";
 
 // negative infinity symbol
-static const BGenericNumberFormat::Symbol kDefaultNegativeInfinitySymbol
-	= "-infinity";
-static const BGenericNumberFormat::Symbol
-	kDefaultUpperCaseNegativeInfinitySymbol = "-INFINITY";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultNegativeInfinitySymbol = "-infinity";
+const BGenericNumberFormat::Symbol
+	BGenericNumberFormat::kDefaultUpperCaseNegativeInfinitySymbol = "-INFINITY";
 
 // sign symbols
-static const BGenericNumberFormat::SignSymbols kDefaultSignSymbols(
-	"+", "-", " ", "",	// prefixes
-	"", "", "", ""		// suffixes
-);
+const BGenericNumberFormat::SignSymbols
+	BGenericNumberFormat::kDefaultSignSymbols(
+		"+", "-", " ", "",	// prefixes
+		"", "", "", ""		// suffixes
+	);
 
 // mantissa sign symbols
-static const BGenericNumberFormat::SignSymbols kDefaultMantissaSignSymbols(
-	"", "", "", "",	// prefixes
-	"", "", "", ""		// suffixes
-);
+const BGenericNumberFormat::SignSymbols
+	BGenericNumberFormat::kDefaultMantissaSignSymbols(
+		"", "", "", "",	// prefixes
+		"", "", "", ""		// suffixes
+	);
 
 // exponent sign symbols
-static const BGenericNumberFormat::SignSymbols kDefaultExponentSignSymbols(
-	"+", "-", " ", "",	// prefixes
-	"", "", "", ""		// suffixes
-);
+const BGenericNumberFormat::SignSymbols
+	BGenericNumberFormat::kDefaultExponentSignSymbols(
+		"+", "-", " ", "",	// prefixes
+		"", "", "", ""		// suffixes
+	);
 
 
 // Integer
@@ -786,7 +799,7 @@ class BGenericNumberFormat::Float {
 			// integer part
 			int32 existingIntegerDigits = min(integerDigits, digitCount);
 			for (int i = 0; i < existingIntegerDigits; i++)
-				writer.Append(digitSymbols[digits[digitCount - i - 1]]);
+				writer.Append(digitSymbols[(int)digits[digitCount - i - 1]]);
 			// pad with zeros to get the desired number of integer digits
 			if (existingIntegerDigits < integerDigits) {
 				writer.Append(digitSymbols,
@@ -801,7 +814,7 @@ class BGenericNumberFormat::Float {
 			int32 existingFractionDigits
 				= min(digitCount - integerDigits, fractionDigits);
 			for (int i = existingFractionDigits - 1; i >= 0; i--)
-				writer.Append(digitSymbols[digits[i]]);
+				writer.Append(digitSymbols[(int)digits[i]]);
 			// pad with zeros to get the desired number of fraction digits
 			if (fractionDigits > existingFractionDigits) {
 				writer.Append(digitSymbols,
@@ -888,7 +901,7 @@ class BGenericNumberFormat::Float {
 				for (int i = existingIntegerDigits - 1; i >= 0; i--) {
 					if (i != integerDigits - 1)
 						writer.Append(groupingInfo->SeparatorForDigit(i));
-					writer.Append(digitSymbols[digits[
+					writer.Append(digitSymbols[(int)digits[
 						digitCount - existingIntegerDigits + i]]);
 				}
 			} else {
@@ -899,8 +912,10 @@ class BGenericNumberFormat::Float {
 								  integerDigits - existingIntegerDigits);
 				}
 				// write digits
-				for (int i = 0; i < existingIntegerDigits; i++)
-					writer.Append(digitSymbols[digits[digitCount - i - 1]]);
+				for (int i = 0; i < existingIntegerDigits; i++) {
+					writer.Append(
+						digitSymbols[(int)digits[digitCount - i - 1]]);
+				}
 			}
 			// fraction part
 			if (fractionDigits > 0 || forceFractionSeparator)
@@ -908,7 +923,7 @@ class BGenericNumberFormat::Float {
 			int32 existingFractionDigits
 				= min(digitCount - existingIntegerDigits, fractionDigits);
 			for (int i = existingFractionDigits - 1; i >= 0; i--)
-				writer.Append(digitSymbols[digits[i]]);
+				writer.Append(digitSymbols[(int)digits[i]]);
 			// pad with zeros to get the desired number of fraction digits
 			if (fractionDigits > existingFractionDigits) {
 				writer.Append(digitSymbols,

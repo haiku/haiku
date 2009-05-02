@@ -4,15 +4,20 @@
 #ifdef __MWERKS__
 #	include <hashmap.h>
 #else
+# if __GNUC__ > 2
+#	include <ext/hash_map>
+# else
 #	include <hash_map>
+# endif
 #endif
+
+#include <assert.h>
 
 #include <Catalog.h>
 #include <DataIO.h>
 #include <String.h>
 
 class BFile;
-
 
 namespace BPrivate {
 	struct CatKey;
@@ -29,10 +34,22 @@ template <class T> struct hash : public unary_function<T,size_t> {
 };
 #endif
 
+#if __GNUC__ > 2
+namespace __gnu_cxx {
+#endif	// __GNUC__ > 2
+
+template<>
 struct hash<BPrivate::CatKey> {
 	size_t operator() (const BPrivate::CatKey &key) const;
 };
 
+#if __GNUC__ > 2
+}	// namespace __gnu_cxx
+
+using namespace __gnu_cxx;
+#endif	// __GNUC__ > 2
+
+using namespace std;
 
 namespace BPrivate {
 

@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -27,8 +27,8 @@ class CatalogTest {
 #define catSig "x-vnd.Be.locale.catalogTest"
 #define catName catSig".catalog"
 
-void 
-CatalogTest::Run() 
+void
+CatalogTest::Run()
 {
 	printf("app...");
 	status_t res;
@@ -46,12 +46,12 @@ CatalogTest::Run()
 	res = cata.SetString("string", "Schnur", TR_CONTEXT);
 	assert(res == B_OK);
 	res = cata.SetString(hashVal, "Schnur_id");
-		// add a second entry for the same hash-value, but with different 
+		// add a second entry for the same hash-value, but with different
 		// translation
 	assert(res == B_OK);
 	res = cata.SetString("string", "String", "programming");
 	assert(res == B_OK);
-	res = cata.SetString("string", "Textpuffer", "programming", 
+	res = cata.SetString("string", "Textpuffer", "programming",
 		"Deutsches Fachbuch");
 	assert(res == B_OK);
 	res = cata.SetString("string", "Leine", TR_CONTEXT, "Deutsches Fachbuch");
@@ -80,7 +80,7 @@ CatalogTest::Run()
 	// the following id is unique to the embedded catalog:
 	res = catb.SetString(32, "hashed string");
 	assert(res == B_OK);
-	// the following string will be hidden by the definition inside the 
+	// the following string will be hidden by the definition inside the
 	// german catalog:
 	res = catb.SetString("string", "hidden", TR_CONTEXT);
 	assert(res == B_OK);
@@ -96,8 +96,8 @@ CatalogTest::Run()
 }
 
 
-void 
-CatalogTest::Check() 
+void
+CatalogTest::Check()
 {
 	status_t res;
 	printf("app-check...");
@@ -106,13 +106,13 @@ CatalogTest::Check()
 	size_t hashVal = CatKey::HashFun(s.String());
 	// ok, we now try to re-load the catalog that has just been written:
 	//
-	// actually, the following code can be seen as an example of what an 
+	// actually, the following code can be seen as an example of what an
 	// app needs in order to translate strings:
 	BCatalog cat;
 	res = be_locale->GetAppCatalog(&cat);
 	assert(res == B_OK);
 	// fetch basic data:
-	int32 fingerprint;
+	int32 fingerprint = 0;
 	res = cat.GetFingerprint(&fingerprint);
 	assert(res == B_OK);
 	BString lang;
@@ -140,7 +140,7 @@ CatalogTest::Check()
 	// the following id doesn't exist anywhere (hopefully):
 	s = TR_ID(-1);
 	assert(s == "");
-	// the following string exists twice, in the embedded as well as in the 
+	// the following string exists twice, in the embedded as well as in the
 	// external catalog. So we should get the external translation (as it should
 	// override the embedded one):
 	s = TR("string");
@@ -163,9 +163,9 @@ CatalogTest::Check()
 int
 main(int argc, char **argv)
 {
-	BApplication* testApp 
+	BApplication* testApp
 		= new BApplication("application/"catSig);
-	
+
 	// change to app-folder:
 	app_info appInfo;
 	be_app->GetAppInfo(&appInfo);

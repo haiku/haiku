@@ -31,7 +31,7 @@ main()
 			BUnicodeChar::IsUpper(i), BUnicodeChar::IsDefined(i), BUnicodeChar::Type(i));
 	}
 
-	uint32 chars[] = {(uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', 0};
+	uint32 chars[] = {(uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', (uint8)'�', 0};
 	for (int32 j = 0, i; (i = chars[j]) != 0; j++) {
 		unicode_char_to_string(i, text);
 		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, defined == %d, charType == %d\n",
@@ -45,7 +45,7 @@ main()
 		printf("toLower == %s\n", text);
 	}
 
-	char *utf8chars[] = {"à", "ß", "ñ", "é", "ç", "ä", NULL};
+	const char *utf8chars[] = {"à", "ß", "ñ", "é", "ç", "ä", NULL};
 	for (int32 j = 0, i; (i = BUnicodeChar::FromUTF8(utf8chars[j])) != 0; j++) {
 		unicode_char_to_string(i, text);
 		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, defined == %d, charType == %d\n",
@@ -63,9 +63,9 @@ main()
 	// Test BCollator class
 
 	BCollator *collator = be_locale->Collator();
-	char *strings[] = {"gehen", "géhen", "aus", "äUß", "auss", "äUß", "WO",
+	const char *strings[] = {"gehen", "géhen", "aus", "äUß", "auss", "äUß", "WO",
 		"wÖ", "SO", "so", "açñ", "acn", NULL};
-	char *strengths[] = {"primary:  ", "secondary:", "tertiary: "};
+	const char *strengths[] = {"primary:  ", "secondary:", "tertiary: "};
 	for (int32 i = 0; strings[i]; i += 2) {
 		for (int32 strength = B_COLLATE_PRIMARY; strength < 4; strength++) {
 			BString a, b;

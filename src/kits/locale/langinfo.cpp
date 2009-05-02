@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -14,7 +14,7 @@ nl_langinfo(nl_item id)
 	if (be_locale != NULL)
 		be_locale->GetString(id);
 
-	// ToDo: return default values!	
-	return "";
+	// ToDo: return default values!
+	return (char*)"";
 }
 

@@ -42,7 +42,7 @@ extern "C" uint32 adler32(uint32 adler, const uint8 *buf, uint32 len);
 /*
  * CatKey
  */
-size_t hash<CatKey>::operator()(const CatKey &key) const 
+size_t hash<CatKey>::operator()(const CatKey &key) const
 {
 	return key.fHashVal;
 }
@@ -98,10 +98,10 @@ CatKey::CatKey()
 }
 
 
-bool 
+bool
 CatKey::operator== (const CatKey& right) const
 {
-	// Two keys are equal if their hashval and key (string,context,comment) 
+	// Two keys are equal if their hashval and key (string,context,comment)
 	// are equal:
 	return fHashVal == right.fHashVal
 		&& fKey == right.fKey;
@@ -140,26 +140,26 @@ CatKey::GetStringParts(BString* str, BString* ctx, BString* cmt) const
 }
 
 
-size_t CatKey::HashFun(const char* s) { 
-	unsigned long h = 0; 
-	for ( ; *s; ++s) 
-		h = 5*h + *s; 
+size_t CatKey::HashFun(const char* s) {
+	unsigned long h = 0;
+	for ( ; *s; ++s)
+		h = 5*h + *s;
 
-	return size_t(h); 
+	return size_t(h);
 }
 
 
 static const char *kCatFolder = "catalogs";
 static const char *kCatExtension = ".catalog";
 
-const char *DefaultCatalog::kCatMimeType 
+const char *DefaultCatalog::kCatMimeType
 	= "locale/x-vnd.Be.locale-catalog.default";
 
 static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
 
-/* 
+/*
  * constructs a DefaultCatalog with given signature and language and reads
  * the catalog from disk.
  * InitCheck() will be B_OK if catalog could be loaded successfully, it will
@@ -178,9 +178,9 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	nref.node = appInfo.ref.directory;
 	BDirectory appDir(&nref);
 	BString catalogName("locale/");
-	catalogName << kCatFolder 
-		<< "/" << fSignature 
-		<< "/" << fLanguageName 
+	catalogName << kCatFolder
+		<< "/" << fSignature
+		<< "/" << fLanguageName
 		<< kCatExtension;
 	BPath catalogPath(&appDir, catalogName.String());
 	status_t status = ReadFromFile(catalogPath.Path());
@@ -190,10 +190,10 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 		BPath commonEtcPath;
 		find_directory(B_COMMON_ETC_DIRECTORY, &commonEtcPath);
 		if (commonEtcPath.InitCheck() == B_OK) {
-			catalogName = BString(commonEtcPath.Path()) 
-							<< "/locale/" << kCatFolder 
-							<< "/" << fSignature 
-							<< "/" << fLanguageName 
+			catalogName = BString(commonEtcPath.Path())
+							<< "/locale/" << kCatFolder
+							<< "/" << fSignature
+							<< "/" << fLanguageName
 							<< kCatExtension;
 			status = ReadFromFile(catalogName.String());
 		}
@@ -204,9 +204,9 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 		BPath systemEtcPath;
 		find_directory(B_BEOS_ETC_DIRECTORY, &systemEtcPath);
 		if (systemEtcPath.InitCheck() == B_OK) {
-			catalogName = BString(systemEtcPath.Path()) 
-							<< "/locale/" << kCatFolder 
-							<< "/" << fSignature 
+			catalogName = BString(systemEtcPath.Path())
+							<< "/locale/" << kCatFolder
+							<< "/" << fSignature
 							<< "/" << fLanguageName
 							<< kCatExtension;
 			status = ReadFromFile(catalogName.String());
@@ -214,7 +214,7 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	}
 
 	fInitCheck = status;
-	log_team(LOG_DEBUG, 
+	log_team(LOG_DEBUG,
 		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
 		signature, language, strerror(fInitCheck));
 }
@@ -231,7 +231,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	BCatalogAddOn("", "", 0)
 {
 	fInitCheck = ReadFromResource(appOrAddOnRef);
-	log_team(LOG_DEBUG, 
+	log_team(LOG_DEBUG,
 		"trying to load embedded catalog from resources results in %s",
 		strerror(fInitCheck));
 }
@@ -242,7 +242,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
  * This is used for editing/testing purposes.
  * InitCheck() will always be B_OK.
  */
-DefaultCatalog::DefaultCatalog(const char *path, const char *signature, 
+DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
 	BCatalogAddOn(signature, language, 0),
@@ -279,7 +279,7 @@ DefaultCatalog::ReadFromFile(const char *path)
 		log_team(LOG_ERR, "couldn't get size for catalog-file %s", path);
 		return res;
 	}
-	
+
 	auto_ptr<char> buf(new char [sz]);
 	res = catalogFile.Read(buf.get(), sz);
 	if (res < B_OK) {
@@ -287,7 +287,7 @@ DefaultCatalog::ReadFromFile(const char *path)
 		return res;
 	}
 	if (res < sz) {
-		log_team(LOG_ERR, "only got %lu instead of %Lu bytes from catalog-file %s", 
+		log_team(LOG_ERR, "only got %lu instead of %Lu bytes from catalog-file %s",
 			res, sz, path);
 		return res;
 	}
@@ -295,8 +295,8 @@ DefaultCatalog::ReadFromFile(const char *path)
 	res = Unflatten(&memIO);
 
 	if (res == B_OK) {
-		// some information living in member variables needs to be copied 
-		// to attributes. Although these attributes should have been written 
+		// some information living in member variables needs to be copied
+		// to attributes. Although these attributes should have been written
 		// when creating the catalog, we make sure that they exist there:
 		UpdateAttributes(catalogFile);
 	}
@@ -315,14 +315,14 @@ DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 	status_t res = node.SetTo(appOrAddOnRef);
 	if (res != B_OK) {
 		log_team(LOG_ERR, "couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef->device, appOrAddOnRef->directory, 
+			appOrAddOnRef->device, appOrAddOnRef->directory,
 			appOrAddOnRef->name);
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	log_team(LOG_DEBUG, 
+	log_team(LOG_DEBUG,
 		"looking for embedded catalog-attribute in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device, 
+		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device,
 		appOrAddOnRef->directory, appOrAddOnRef->name);
 
 	attr_info attrInfo;
@@ -360,14 +360,14 @@ DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 	status_t res = file.SetTo(appOrAddOnRef, B_READ_ONLY);
 	if (res != B_OK) {
 		log_team(LOG_ERR, "couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef->device, appOrAddOnRef->directory, 
+			appOrAddOnRef->device, appOrAddOnRef->directory,
 			appOrAddOnRef->name);
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	log_team(LOG_DEBUG, 
+	log_team(LOG_DEBUG,
 		"looking for embedded catalog-resource in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device, 
+		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef->device,
 		appOrAddOnRef->directory, appOrAddOnRef->name);
 
 	BResources rsrc;
@@ -378,7 +378,7 @@ DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 	}
 
 	size_t sz;
-	const void *buf = rsrc.LoadResource(B_MESSAGE_TYPE, 
+	const void *buf = rsrc.LoadResource(B_MESSAGE_TYPE,
 		BLocaleRoster::kEmbeddedCatResId, &sz);
 	if (!buf) {
 		log_team(LOG_DEBUG, "file has no catalog-resource");
@@ -416,11 +416,11 @@ DefaultCatalog::WriteToFile(const char *path)
 		// set mimetype-, language- and signature-attributes:
 		UpdateAttributes(catalogFile);
 		// finally write fingerprint:
-		catalogFile.WriteAttr(BLocaleRoster::kCatFingerprintAttr, B_INT32_TYPE, 
+		catalogFile.WriteAttr(BLocaleRoster::kCatFingerprintAttr, B_INT32_TYPE,
 			0, &fFingerprint, sizeof(int32));
 	}
 	if (res == B_OK)
-		UpdateAttributes(catalogFile);	
+		UpdateAttributes(catalogFile);
 	return res;
 }
 
@@ -435,7 +435,7 @@ DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 	status_t res = node.SetTo(appOrAddOnRef);
 	if (res != B_OK)
 		return res;
-		
+
 	BMallocIO mallocIO;
 	mallocIO.SetBlockSize(max(fCatMap.size()*20, 256UL));
 		// set a largish block-size in order to avoid reallocs
@@ -495,7 +495,7 @@ DefaultCatalog::CountItems() const
 
 
 const char *
-DefaultCatalog::GetString(const char *string, const char *context, 
+DefaultCatalog::GetString(const char *string, const char *context,
 	const char *comment)
 {
 	CatKey key(string, context, comment);
@@ -523,7 +523,7 @@ DefaultCatalog::GetString(const CatKey& key)
 
 
 status_t
-DefaultCatalog::SetString(const char *string, const char *translated, 
+DefaultCatalog::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
 	CatKey key(string, context, comment);
@@ -590,19 +590,19 @@ DefaultCatalog::UpdateAttributes(BFile& catalogFile)
 	char buf[bufSize];
 	if (catalogFile.ReadAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0, &buf, bufSize) <= 0
 		|| strcmp(kCatMimeType, buf) != 0) {
-		catalogFile.WriteAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0, 
+		catalogFile.WriteAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0,
 			kCatMimeType, strlen(kCatMimeType)+1);
 	}
-	if (catalogFile.ReadAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0, 
+	if (catalogFile.ReadAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
 		&buf, bufSize) <= 0
 		|| fLanguageName != buf) {
-		catalogFile.WriteAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0, 
+		catalogFile.WriteAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
 			fLanguageName.String(), fLanguageName.Length()+1);
 	}
-	if (catalogFile.ReadAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0, 
+	if (catalogFile.ReadAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
 		&buf, bufSize) <= 0
 		|| fSignature != buf) {
-		catalogFile.WriteAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0, 
+		catalogFile.WriteAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
 			fSignature.String(), fSignature.Length()+1);
 	}
 }
@@ -647,7 +647,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 	int16 version;
 	BMessage archiveMsg;
 	status_t res = archiveMsg.Unflatten(dataIO);
-	
+
 	if (res == B_OK) {
 		res = archiveMsg.FindInt16("c:ver", &version)
 			|| archiveMsg.FindInt32("c:sz", &count);
@@ -660,7 +660,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 		// if a specific fingerprint has been requested and the catalog does in fact
 		// have a fingerprint, both are compared. If they mismatch, we do not accept
 		// this catalog:
-		if (foundFingerprint != 0 && fFingerprint != 0 
+		if (foundFingerprint != 0 && fFingerprint != 0
 			&& foundFingerprint != fFingerprint) {
 			log_team(LOG_INFO, "default-catalog(sig=%s, lang=%s) "
 				"has mismatching fingerprint (%ld instead of the requested %ld), "
@@ -706,7 +706,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 
 
 BCatalogAddOn *
-DefaultCatalog::Instantiate(const char *signature, const char *language, 
+DefaultCatalog::Instantiate(const char *signature, const char *language,
 	int32 fingerprint)
 {
 	DefaultCatalog *catalog = new DefaultCatalog(signature, language, fingerprint);

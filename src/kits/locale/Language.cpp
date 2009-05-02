@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -15,12 +15,12 @@
 #include <ctype.h>
 
 
-static char *gBuiltInStrings[] = {
+static const char *gBuiltInStrings[] = {
 	"Yesterday",
 	"Today",
 	"Tomorrow",
 	"Future",
-	
+
 	"Sunday",
 	"Monday",
 	"Tuesday",
@@ -28,7 +28,7 @@ static char *gBuiltInStrings[] = {
 	"Thursday",
 	"Friday",
 	"Saturday",
-	
+
 	"Sun",
 	"Mon",
 	"Tue",
@@ -36,7 +36,7 @@ static char *gBuiltInStrings[] = {
 	"Thu",
 	"Fri",
 	"Sat",
-	
+
 	"January",
 	"February",
 	"March",
@@ -49,7 +49,7 @@ static char *gBuiltInStrings[] = {
 	"October",
 	"November",
 	"December",
-	
+
 	"Jan",
 	"Feb",
 	"Mar",
@@ -62,7 +62,7 @@ static char *gBuiltInStrings[] = {
 	"Oct",
 	"Nov",
 	"Dec",
-	
+
 	"^[yY]",
 	"^[nN]",
 	"yes",
@@ -130,7 +130,7 @@ BLanguage::BLanguage(const char *language)
 				break;
 			*family++ = '\0';
 
-			// set the direction of writing			
+			// set the direction of writing
 			char *direction = strchr(family, ',');
 			if (direction != NULL) {
 				*direction++ = '\0';
@@ -158,7 +158,7 @@ BLanguage::BLanguage(const char *language)
 			if (string == NULL)
 				continue;
 
-			fStrings[count++] = string; 
+			fStrings[count++] = string;
 		}
 	}
 
@@ -171,7 +171,7 @@ BLanguage::BLanguage(const char *language)
 
 BLanguage::~BLanguage()
 {
-	if (fName != NULL) 
+	if (fName != NULL)
 		free(fName);
 	if (fCode != NULL)
 		free(fCode);
@@ -198,7 +198,7 @@ BLanguage::Default()
 }
 
 
-uint8 
+uint8
 BLanguage::Direction() const
 {
 	return fDirection;

@@ -1,5 +1,5 @@
-#ifndef _B_GENERIC_NUMBER_FORMAT_H_ 
-#define _B_GENERIC_NUMBER_FORMAT_H_ 
+#ifndef _B_GENERIC_NUMBER_FORMAT_H_
+#define _B_GENERIC_NUMBER_FORMAT_H_
 
 #include <FloatFormatParameters.h>
 #include <IntegerFormatParameters.h>
@@ -116,6 +116,24 @@ class BGenericNumberFormat {
 			void Unset()	{ SetTo(NULL); }
 		};
 
+		static const Symbol kDefaultDigitSymbols[];
+		static const Symbol kDefaultFractionSeparator;
+		static const Symbol kDefaultExponentSymbol;
+		static const Symbol kDefaultUpperCaseExponentSymbol;
+		static const Symbol kDefaultNaNSymbol;
+		static const Symbol kDefaultUpperCaseNaNSymbol;
+		static const Symbol kDefaultInfinitySymbol;
+		static const Symbol kDefaultUpperCaseInfinitySymbol;
+		static const Symbol kDefaultNegativeInfinitySymbol;
+		static const Symbol	kDefaultUpperCaseNegativeInfinitySymbol;
+
+		static const GroupingInfo kDefaultGroupingInfo;
+		static const GroupingInfo kNoGroupingInfo;
+
+		static const SignSymbols kDefaultSignSymbols;
+		static const SignSymbols kDefaultMantissaSignSymbols;
+		static const SignSymbols kDefaultExponentSignSymbols;
+
 		status_t FormatInteger(const BIntegerFormatParameters *parameters,
 							   const Integer &integer, char *buffer,
 							   size_t bufferSize,
@@ -157,4 +175,4 @@ class BGenericNumberFormat {
 		SignSymbols					*fExponentSignSymbols;
 };
 
-#endif	// _B_GENERIC_NUMBER_FORMAT_H_ 
+#endif	// _B_GENERIC_NUMBER_FORMAT_H_

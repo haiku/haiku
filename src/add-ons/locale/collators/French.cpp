@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -12,24 +12,24 @@
 #include <ctype.h>
 
 
-struct compare_context {
-	compare_context(bool ignorePunctuation)
-		:
-		inputA(ignorePunctuation),
-		inputB(ignorePunctuation)
-	{
-	}
-
-	typedef BCollatorAddOn::input_context input_context;
-
-	const char		*a;
-	const char		*b;
-	input_context	inputA;
-	input_context	inputB;
-	size_t			length;
-};
-
 class FrenchCollator : public BCollatorAddOn {
+	struct compare_context {
+		compare_context(bool ignorePunctuation)
+			:
+			inputA(ignorePunctuation),
+			inputB(ignorePunctuation)
+		{
+		}
+
+		typedef BCollatorAddOn::input_context input_context;
+
+		const char		*a;
+		const char		*b;
+		input_context	inputA;
+		input_context	inputB;
+		size_t			length;
+	};
+
 	public:
 		FrenchCollator();
 		FrenchCollator(BMessage *archive);
@@ -105,7 +105,7 @@ FrenchCollator::CompareSecondary(compare_context &context)
 }
 
 
-status_t 
+status_t
 FrenchCollator::GetSortKey(const char *string, BString *key, int8 strength,
 	bool ignorePunctuation)
 {
@@ -187,7 +187,7 @@ FrenchCollator::GetSortKey(const char *string, BString *key, int8 strength,
 }
 
 
-int 
+int
 FrenchCollator::Compare(const char *a, const char *b, int32 length, int8 strength,
 	bool ignorePunctuation)
 {
@@ -238,7 +238,7 @@ FrenchCollator::Compare(const char *a, const char *b, int32 length, int8 strengt
 }
 
 
-status_t 
+status_t
 FrenchCollator::Archive(BMessage *archive, bool deep) const
 {
 	status_t status = BArchivable::Archive(archive, deep);
