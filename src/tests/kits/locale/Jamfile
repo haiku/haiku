@@ -8,6 +8,7 @@ Depends LocaleKitTests
 	:
 	catalogSpeed
 	catalogTest
+	catalogTestAddOn
 	collatorSpeed
 	collatorTest
 	localeTest
