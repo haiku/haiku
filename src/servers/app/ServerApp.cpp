@@ -1240,7 +1240,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.StartMessage(B_OK);
 
 			for (int32 i = 0; i < 3; i++) {
-				ServerFont* font;
+				ServerFont* font = NULL;
 				switch (i) {
 					case 0:
 						font = &fPlainFont;
