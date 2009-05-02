@@ -5,6 +5,7 @@
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Philippe Saint-Pierre
  */
 
 #include "Constants.h"
@@ -225,12 +226,10 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem("Yellow", YELLOW, new BMessage(FONT_COLOR)));
 	fFontMenu->AddSeparatorItem();
 
-	// Available fonts, mark "be_plain_font" item
+	// Available fonts
 
-	font_family plainFamily;
-	font_style plainStyle;
-	be_plain_font->GetFamilyAndStyle(&plainFamily, &plainStyle);
 	fCurrentFontItem = 0;
+	fCurrentStyleItem = 0;
 
 	BMenu* subMenu;
 	int32 numFamilies = count_font_families();
@@ -239,12 +238,8 @@ StyledEditWindow::InitWindow(uint32 encoding)
 		if (get_font_family(i, &family) == B_OK) {
 			subMenu = new BMenu(family);
 			subMenu->SetRadioMode(true);
-			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu, new BMessage(FONT_FAMILY)));
-
-			if (!strcmp(plainFamily, family)) {
-				menuItem->SetMarked(true);
-				fCurrentFontItem = menuItem;
-			}
+			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu, 
+				new BMessage(FONT_FAMILY)));
 
 			int32 numStyles = count_font_styles(family);
 			for (int32 j = 0; j < numStyles; j++) {
@@ -253,9 +248,6 @@ StyledEditWindow::InitWindow(uint32 encoding)
 				if (get_font_style(family, j, &style, &flags) == B_OK) {
 					subMenu->AddItem(menuItem = new BMenuItem(style,
 						new BMessage(FONT_STYLE)));
-
-					if (!strcmp(plainStyle, style))
-						menuItem->SetMarked(true);
 				}
 			}
 		}
@@ -270,7 +262,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	subMenu->SetRadioMode(true);
 
 	subMenu->AddItem(fAlignLeft = new BMenuItem("Left", new BMessage(ALIGN_LEFT)));
-	menuItem->SetMarked(true);
+	fAlignLeft->SetMarked(true);
 
 	subMenu->AddItem(fAlignCenter = new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
 	subMenu->AddItem(fAlignRight = new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
@@ -444,8 +436,8 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			const char* fontStyle = NULL;
 			void* ptr;
 			if (message->FindPointer("source", &ptr) == B_OK) {
-				fCurrentFontItem = static_cast<BMenuItem*>(ptr);
-				fontFamily = fCurrentFontItem->Label();
+				BMenuItem* item = static_cast<BMenuItem*>(ptr);
+				fontFamily = item->Label();
 			}
 			SetFontStyle(fontFamily, fontStyle);
 			break;
@@ -460,9 +452,9 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				fontStyle = item->Label();
 				BMenu* menu = item->Menu();
 				if (menu != NULL) {
-					fCurrentFontItem = menu->Superitem();
-					if (fCurrentFontItem != NULL)
-						fontFamily = fCurrentFontItem->Label();
+					BMenuItem* super_item = menu->Superitem();
+					if (super_item != NULL)
+						fontFamily = super_item->Label();
 				}
 			}
 			SetFontStyle(fontFamily, fontStyle);
@@ -629,8 +621,20 @@ StyledEditWindow::MenusBeginning()
 
 	// update the font menu
 	// unselect the old values
-	if (fCurrentFontItem != NULL)
+	if (fCurrentFontItem != NULL) {
 		fCurrentFontItem->SetMarked(false);
+		BMenu* menu = fCurrentFontItem->Submenu();
+		if (menu != NULL) {
+			BMenuItem* item = menu->FindMarked();
+			if (item != NULL) {
+				item->SetMarked(false);
+			}
+		}
+	}
+
+	if (fCurrentStyleItem != NULL) {
+		fCurrentStyleItem->SetMarked(false);
+	}
 
 	BMenuItem* oldColorItem = fFontColorMenu->FindMarked();
 	if (oldColorItem != NULL)
@@ -689,18 +693,20 @@ StyledEditWindow::MenusBeginning()
 		}
 	}
 
-	if (sameProperties & B_FONT_FAMILY_AND_STYLE) {
-		font_family family;
-		font_style style;
-		font.GetFamilyAndStyle(&family, &style);
-		fCurrentFontItem = fFontMenu->FindItem(family);
-		if (fCurrentFontItem != NULL) {
-			fCurrentFontItem->SetMarked(true);
-			BMenu* menu = fCurrentFontItem->Submenu();
-			if (menu != NULL) {
-				BMenuItem* item = menu->FindItem(style);
-				if (item != NULL)
-					item->SetMarked(true);
+	font_family family;
+	font_style style;
+	font.GetFamilyAndStyle(&family, &style);
+
+	fCurrentFontItem = fFontMenu->FindItem(family);
+
+	if (fCurrentFontItem != NULL) {
+		fCurrentFontItem->SetMarked(true);
+		BMenu* menu = fCurrentFontItem->Submenu();
+		if (menu != NULL) {
+			BMenuItem* item = menu->FindItem(style);
+			fCurrentStyleItem = item;
+			if (fCurrentStyleItem != NULL) {
+				item->SetMarked(true);
 			}
 		}
 	}
@@ -1278,8 +1284,15 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	// clear that family's bit on the menu, if necessary
 	if (strcmp(oldFamily, fontFamily)) {
 		BMenuItem* oldItem = fFontMenu->FindItem(oldFamily);
-		if (oldItem != NULL)
+		if (oldItem != NULL) {
 			oldItem->SetMarked(false);
+			BMenu* menu = oldItem->Submenu();
+			if (menu != NULL) {
+				oldItem = menu->FindItem(oldStyle);
+				if (oldItem != NULL)
+					oldItem->SetMarked(false);
+			}
+		}
 	}
 
 	font.SetFamilyAndStyle(fontFamily, fontStyle);
@@ -1287,8 +1300,10 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 
 	BMenuItem* superItem;
 	superItem = fFontMenu->FindItem(fontFamily);
-	if (superItem != NULL)
+	if (superItem != NULL) {
 		superItem->SetMarked(true);
+		fCurrentFontItem = superItem;
+	}
 
 	_UpdateCleanUndoRedoSaveRevert();
 }

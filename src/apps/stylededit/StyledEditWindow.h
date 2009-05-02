@@ -70,6 +70,7 @@ class StyledEditWindow : public BWindow {
 		BMenu			*fFontSizeMenu;
 		BMenu			*fFontColorMenu;
 		BMenuItem		*fCurrentFontItem;
+		BMenuItem		*fCurrentStyleItem;
 
 		BMenuItem		*fSaveItem;
 		BMenuItem		*fRevertItem;
