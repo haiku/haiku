@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Authors:	
+ * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Jérôme Duval (korli@users.berlios.de)
  *		Stephan Aßmus <superstippi@gmx.de>
@@ -163,7 +163,7 @@ BTab::Deselect()
 		if (removeView)
 			View()->RemoveSelf();
 	}
-	
+
 	fSelected = false;
 }
 
@@ -293,7 +293,7 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 			be_control_look->DrawInactiveTab(owner, frame, frame, no_tint, 0,
 				borders);
 		}
-		
+
 		DrawLabel(owner, frame);
 		return;
 	}
@@ -340,7 +340,7 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top + 1),
 		BPoint(frame.right, frame.top + 1), lightenmax);
 
-	if (full) { 
+	if (full) {
 		// full height right side
 		owner->AddLine(BPoint(frame.right, frame.top),
 			BPoint(frame.right + slopeWidth + 2, frame.bottom), darken2);
@@ -390,7 +390,7 @@ BTabView::BTabView(const char *name, button_width width, uint32 flags)
 }
 
 
-BTabView::BTabView(BRect frame, const char *name, button_width width, 
+BTabView::BTabView(BRect frame, const char *name, button_width width,
 	uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags)
 {
@@ -591,27 +591,27 @@ BTabView::MessageReceived(BMessage *message)
 					}
 				}
 			}
-			
+
 			if (handled)
 				message->SendReply(&reply);
 			else
 				BView::MessageReceived(message);
 			break;
 		}
-		
+
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			float deltaX = 0.0f;
 			float deltaY = 0.0f;
 			message->FindFloat("be:wheel_delta_x", &deltaX);
 			message->FindFloat("be:wheel_delta_y", &deltaY);
-			
+
 			if (deltaX == 0.0f && deltaY == 0.0f)
 				return;
-			
+
 			if (deltaY == 0.0f)
 				deltaY = deltaX;
-				
+
 			int32 selection = Selection();
 			int32 numTabs = CountTabs();
 			if (deltaY > 0  && selection < numTabs - 1) {
@@ -624,7 +624,7 @@ BTabView::MessageReceived(BMessage *message)
 		}
 		default:
 			BView::MessageReceived(message);
-			break;	
+			break;
 	}
 }
 
@@ -725,7 +725,7 @@ BTabView::Select(int32 index)
 		index = Selection();
 
 	BTab *tab = TabAt(Selection());
-	
+
 	if (tab)
 		tab->Deselect();
 
@@ -744,7 +744,7 @@ BTabView::Select(int32 index)
 	}
 
 	Invalidate();
-	
+
 	if (index != 0 && !Bounds().Contains(TabFrame(index))){
 		if (!Bounds().Contains(TabFrame(index).LeftTop()))
 			fTabOffset += TabFrame(index).left - Bounds().left - 20.0f;
@@ -960,12 +960,12 @@ BTabView::TabFrame(int32 tab_index) const
 				for (int32 i = 0; i < tab_index; i++){
 					x += StringWidth(TabAt(i)->Label()) + 20.0;
 				}
-	
+
 				return BRect(x, 0.0,
 					x + StringWidth(TabAt(tab_index)->Label()) + 20.0,
 					height);
 			}
-	
+
 			case B_WIDTH_FROM_WIDEST:
 				width = 0.0;
 				for (int32 i = 0; i < CountTabs(); i++) {
@@ -994,7 +994,7 @@ BTabView::TabFrame(int32 tab_index) const
 			return BRect(x - fTabOffset, 0.0f,
 				x - fTabOffset + StringWidth(TabAt(tab_index)->Label()) + 20.0f , fTabHeight);
 
-			
+
 			/*float x = X_OFFSET;
 			for (int32 i = 0; i < tab_index; i++)
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
@@ -1134,8 +1134,9 @@ BTabView::AddTab(BView *target, BTab *tab)
 
 	fTabList->AddItem(tab);
 
-	// When we don't have a any tabs yet, select this one.
-	if (CountTabs() == 1)
+	// When we haven't had a any tabs before, but are already attached to the
+	// window, select this one.
+	if (CountTabs() == 1 && Window() != NULL)
 		Select(0);
 }
 
@@ -1167,7 +1168,7 @@ BTabView::RemoveTab(int32 index)
 
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->RemoveItem(index);
-	
+
 	return tab;
 }
 
@@ -1275,14 +1276,14 @@ BTabView::_InitObject(bool layouted, button_width width)
 		fContainerView->SetLayout(new(std::nothrow) BCardLayout());
 	} else {
 		BRect bounds = Bounds();
-	
+
 		bounds.top += TabHeight();
 		bounds.InsetBy(3.0f, 3.0f);
 
 		fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
 			B_WILL_DRAW);
 	}
-	
+
 	fContainerView->SetViewColor(color);
 	fContainerView->SetLowColor(color);
 
