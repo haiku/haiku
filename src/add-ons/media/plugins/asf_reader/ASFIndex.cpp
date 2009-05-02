@@ -25,6 +25,8 @@
 
 #include "ASFIndex.h"
 
+#include <stdio.h>
+
 void
 IndexEntry::Clear() 
 {
