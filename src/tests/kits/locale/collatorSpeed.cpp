@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -119,7 +119,7 @@ main(int argc, char **argv)
 
 	if (collator == NULL) {
 		collator = be_locale->Collator();
-		addon = "default";
+		addon = (char*)"default";
 	}
 
 	// test key creation speed
