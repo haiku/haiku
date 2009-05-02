@@ -5,6 +5,8 @@
 
 #include <memory>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Screen.h>
@@ -137,7 +139,7 @@ main(int argc, char** argv)
 		argc--;
 		argv++;
 	}
-	
+
 
 	// find and create the test
 	Test* test = NULL;

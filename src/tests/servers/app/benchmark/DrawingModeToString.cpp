@@ -5,6 +5,9 @@
 
 #include "DrawingModeToString.h"
 
+#include <string.h>
+
+
 struct DrawingModeString {
 	const char*		string;
 	drawing_mode	mode;
