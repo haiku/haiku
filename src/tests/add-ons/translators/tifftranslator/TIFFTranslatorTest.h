@@ -9,15 +9,17 @@
 #define BBT_MIME_STRING  "image/x-be-bitmap"
 #define TIFF_MIME_STRING "image/tiff"
 
-class CppUnit::Test;
+namespace CppUnit {
+class Test;
+}
 
 class TIFFTranslatorTest : public BTestCase {
 public:
 	static CppUnit::Test* Suite();
-	
+
 	// This function called before *each* test added in Suite()
 	void setUp();
-	
+
 	// This function called after *each* test added in Suite()
 	void tearDown();
 

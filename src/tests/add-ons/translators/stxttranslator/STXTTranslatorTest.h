@@ -9,15 +9,17 @@
 #define TEXT_MIME_STRING "text/plain"
 #define STXT_MIME_STRING "text/x-vnd.Be-stxt"
 
-class CppUnit::Test;
+namespace CppUnit {
+class Test;
+}
 
 class STXTTranslatorTest : public BTestCase {
 public:
 	static CppUnit::Test* Suite();
-	
+
 	// This function called before *each* test added in Suite()
 	void setUp();
-	
+
 	// This function called after *each* test added in Suite()
 	void tearDown();
 
