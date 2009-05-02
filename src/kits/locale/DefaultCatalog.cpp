@@ -24,6 +24,7 @@
 
 #include <cstdio>
 
+using __gnu_cxx::hash;
 using std::auto_ptr;
 using std::min;
 using std::max;

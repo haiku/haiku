@@ -8,7 +8,11 @@
 #include <String.h>
 #include <UnicodeChar.h>
 
-using namespace std;
+#if __GNUC__ > 2
+using std::max;
+using std::min;
+using std::nothrow;
+#endif
 
 // constants (more below the helper classes)
 

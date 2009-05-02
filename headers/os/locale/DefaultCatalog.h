@@ -30,10 +30,6 @@ struct hash<BPrivate::CatKey> {
 
 #if __GNUC__ > 2
 }	// namespace __gnu_cxx
-
-using __gnu_cxx::hash;
-using __gnu_cxx::hash_map;
-using __gnu_cxx::equal_to;
 #endif	// __GNUC__ > 2
 
 namespace BPrivate {
@@ -125,7 +121,13 @@ class DefaultCatalog : public BCatalogAddOn {
 		int32 ComputeFingerprint() const;
 		void UpdateAttributes(BFile& catalogFile);
 
-		typedef hash_map<CatKey, BString, hash<CatKey>, equal_to<CatKey> > CatMap;
+#if __GNUC__ > 2
+		typedef __gnu_cxx::hash_map<CatKey, BString, 
+			__gnu_cxx::hash<CatKey>, std::equal_to<CatKey> > CatMap;
+#else
+		typedef hash_map<CatKey, BString, hash<CatKey>,
+			std::equal_to<CatKey> > CatMap;
+#endif
 		CatMap 				fCatMap;
 		mutable BString 	fPath;
 
