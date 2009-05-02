@@ -24,6 +24,12 @@
 
 #include <cstdio>
 
+using std::auto_ptr;
+using std::min;
+using std::max;
+using std::pair;
+
+
 /*
  *	This file implements the default catalog-type for the opentracker locale kit.
  *  Alternatively, this could be used as a full add-on, but currently this

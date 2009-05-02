@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -13,8 +13,10 @@
 #include <File.h>
 #include <String.h>
 
+using std::vector;
+
 void
-usage() 
+usage()
 {
 	fprintf(stderr,
 		"usage: linkcatkeys [-v] [-t(a|f|r)] [-o <outfile>] [-l <catalogLang>]\n"
@@ -80,17 +82,17 @@ main(int argc, char **argv)
 	}
 	if (inputFiles.empty() || !catalogSig || !outputFile.Length())
 		usage();
-	
+
 	EditableCatalog targetCatalog("Default", catalogSig, catalogLang);
 	if ((res = targetCatalog.InitCheck()) != B_OK) {
-		fprintf(stderr, "couldn't construct target-catalog %s - error: %s\n", 
+		fprintf(stderr, "couldn't construct target-catalog %s - error: %s\n",
 			outputFile.String(), strerror(res));
 		exit(-1);
 	}
 	DefaultCatalog* targetCatImpl
 		= dynamic_cast<DefaultCatalog*>(targetCatalog.CatalogAddOn());
 	if (!targetCatImpl) {
-		fprintf(stderr, "couldn't access impl of target-catalog %s\n", 
+		fprintf(stderr, "couldn't access impl of target-catalog %s\n",
 			outputFile.String());
 		exit(-1);
 	}
@@ -99,14 +101,14 @@ main(int argc, char **argv)
 	for( uint32 i=0; i<count; ++i) {
 		EditableCatalog inputCatalog("Default", catalogSig, "native");
 		if ((res = inputCatalog.ReadFromFile(inputFiles[i])) != B_OK) {
-			fprintf(stderr, "couldn't load target-catalog %s - error: %s\n", 
+			fprintf(stderr, "couldn't load target-catalog %s - error: %s\n",
 				inputFiles[i], strerror(res));
 			exit(-1);
 		}
 		DefaultCatalog* inputCatImpl
 			= dynamic_cast<DefaultCatalog*>(inputCatalog.CatalogAddOn());
 		if (!inputCatImpl) {
-			fprintf(stderr, "couldn't access impl of input-catalog %s\n", 
+			fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 				inputFiles[i]);
 			exit(-1);
 		}
@@ -116,7 +118,7 @@ main(int argc, char **argv)
 		// but this should be fast enough).
 		DefaultCatalog::CatWalker walker;
 		if ((res = inputCatImpl->GetWalker(&walker)) != B_OK) {
-			fprintf(stderr, "couldn't get walker for input-catalog %s - error: %s\n", 
+			fprintf(stderr, "couldn't get walker for input-catalog %s - error: %s\n",
 				inputFiles[i], strerror(res));
 			exit(-1);
 		}
@@ -135,7 +137,7 @@ main(int argc, char **argv)
 			entry.GetRef(&eref);
 			res = targetCatalog.WriteToAttribute(&eref);
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-attribute to %s - error: %s\n", 
+				fprintf(stderr, "couldn't write target-attribute to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
@@ -147,7 +149,7 @@ main(int argc, char **argv)
 			entry.GetRef(&eref);
 			res = targetCatalog.WriteToResource(&eref);
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-resource to %s - error: %s\n", 
+				fprintf(stderr, "couldn't write target-resource to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
@@ -155,7 +157,7 @@ main(int argc, char **argv)
 		default: {
 			res = targetCatalog.WriteToFile(outputFile.String());
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-catalog to %s - error: %s\n", 
+				fprintf(stderr, "couldn't write target-catalog to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}

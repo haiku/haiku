@@ -31,10 +31,10 @@ struct hash<BPrivate::CatKey> {
 #if __GNUC__ > 2
 }	// namespace __gnu_cxx
 
-using namespace __gnu_cxx;
+using __gnu_cxx::hash;
+using __gnu_cxx::hash_map;
+using __gnu_cxx::equal_to;
 #endif	// __GNUC__ > 2
-
-using namespace std;
 
 namespace BPrivate {
 
