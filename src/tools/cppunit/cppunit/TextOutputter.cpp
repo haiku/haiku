@@ -5,6 +5,9 @@
 #include <cppunit/TextOutputter.h>
 
 
+using std::endl;
+using std::ostream;
+
 namespace CppUnit
 {
 
@@ -22,8 +25,8 @@ TextOutputter::~TextOutputter()
 }
 
 
-void 
-TextOutputter::write() 
+void
+TextOutputter::write()
 {
   printHeader();
   m_stream << endl;
@@ -32,12 +35,12 @@ TextOutputter::write()
 }
 
 
-void 
+void
 TextOutputter::printFailures()
 {
   TestResultCollector::TestFailures::const_iterator itFailure = m_result->failures().begin();
   int failureNumber = 1;
-  while ( itFailure != m_result->failures().end() ) 
+  while ( itFailure != m_result->failures().end() )
   {
     m_stream  <<  endl;
     printFailure( *itFailure++, failureNumber++ );
@@ -45,7 +48,7 @@ TextOutputter::printFailures()
 }
 
 
-void 
+void
 TextOutputter::printFailure( TestFailure *failure,
                              int failureNumber )
 {
@@ -62,21 +65,21 @@ TextOutputter::printFailure( TestFailure *failure,
 }
 
 
-void 
+void
 TextOutputter::printFailureListMark( int failureNumber )
 {
   m_stream << failureNumber << ")";
 }
 
 
-void 
+void
 TextOutputter::printFailureTestName( TestFailure *failure )
 {
   m_stream << "test: " << failure->failedTestName();
 }
 
 
-void 
+void
 TextOutputter::printFailureType( TestFailure *failure )
 {
   m_stream << "("
@@ -85,7 +88,7 @@ TextOutputter::printFailureType( TestFailure *failure )
 }
 
 
-void 
+void
 TextOutputter::printFailureLocation( SourceLine sourceLine )
 {
   if ( !sourceLine.isValid() )
@@ -96,7 +99,7 @@ TextOutputter::printFailureLocation( SourceLine sourceLine )
 }
 
 
-void 
+void
 TextOutputter::printFailureDetail( Exception *thrownException )
 {
   if ( thrownException->isInstanceOf( NotEqualException::type() ) )
@@ -118,11 +121,11 @@ TextOutputter::printFailureDetail( Exception *thrownException )
 }
 
 
-void 
+void
 TextOutputter::printHeader()
 {
   if ( m_result->wasSuccessful() )
-    m_stream << endl << "OK (" << m_result->runTests () << " tests)" 
+    m_stream << endl << "OK (" << m_result->runTests () << " tests)"
              << endl;
   else
   {
@@ -133,14 +136,14 @@ TextOutputter::printHeader()
 }
 
 
-void 
+void
 TextOutputter::printFailureWarning()
 {
   m_stream  << "!!!FAILURES!!!" << endl;
 }
 
 
-void 
+void
 TextOutputter::printStatistics()
 {
   m_stream  << "Test Results:" << endl;

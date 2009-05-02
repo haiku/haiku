@@ -21,7 +21,7 @@ namespace CppUnit
  * \ingroup BrowsingCollectedTestResult
  *
  * Used to capture the failure location in assertion.
- * 
+ *
  * Use the CPPUNIT_SOURCELINE() macro to construct that object. Typically used when
  * writing an assertion macro in association with Asserter.
  *
@@ -32,7 +32,7 @@ class CPPUNIT_API SourceLine
 public:
   SourceLine();
 
-  SourceLine( const string &fileName,
+  SourceLine( const std::string &fileName,
               int lineNumber );
 
   /// Destructor.
@@ -42,13 +42,13 @@ public:
 
   int lineNumber() const;
 
-  string fileName() const;
+  std::string fileName() const;
 
   bool operator ==( const SourceLine &other ) const;
   bool operator !=( const SourceLine &other ) const;
 
 private:
-  string m_fileName;
+  std::string m_fileName;
   int m_lineNumber;
 };
 

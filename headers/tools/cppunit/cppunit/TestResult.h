@@ -35,9 +35,9 @@ class TestListener;
  * TestResult supplies a template method 'setSynchronizationObject()'
  * so that subclasses can provide mutual exclusion in the face of multiple
  * threads.  This can be useful when tests execute in one thread and
- * they fill a subclass of TestResult which effects change in another 
+ * they fill a subclass of TestResult which effects change in another
  * thread.  To have mutual exclusion, override setSynchronizationObject()
- * and make sure that you create an instance of ExclusiveZone at the 
+ * and make sure that you create an instance of ExclusiveZone at the
  * beginning of each method.
  *
  * \see Test, TestListener, TestResultCollector, Outputter.
@@ -63,13 +63,13 @@ public:
 
 protected:
   void addFailure( const TestFailure &failure );
-  
+
 protected:
-  typedef deque<TestListener *> TestListeners;
+  typedef std::deque<TestListener *> TestListeners;
   TestListeners m_listeners;
   bool m_stop;
 
-private: 
+private:
   TestResult( const TestResult &other );
   TestResult &operator =( const TestResult &other );
 };

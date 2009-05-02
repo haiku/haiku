@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+using std::string;
+
 _EXPORT
 BTestCase::BTestCase(string name)
 	: CppUnit::TestCase(name)
@@ -31,7 +33,7 @@ BTestCase::NextSubTest() {
 _EXPORT
 void
 BTestCase::NextSubTestBlock() {
-	if (BTestShell::GlobalBeVerbose()) 
+	if (BTestShell::GlobalBeVerbose())
 		printf("\n");
 }
 

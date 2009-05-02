@@ -6,6 +6,10 @@
 #include <cppunit/CompilerOutputter.h>
 
 
+using std::endl;
+using std::ostream;
+using std::string;
+
 namespace CppUnit
 {
 
@@ -32,7 +36,7 @@ CompilerOutputter::defaultOutputter( TestResultCollector *result,
 }
 
 
-void 
+void
 CompilerOutputter::write()
 {
   if ( m_result->wasSuccessful() )
@@ -42,15 +46,15 @@ CompilerOutputter::write()
 }
 
 
-void 
+void
 CompilerOutputter::printSucess()
 {
-  m_stream  << "OK (" << m_result->runTests()  << ")"  
+  m_stream  << "OK (" << m_result->runTests()  << ")"
             <<  endl;
 }
 
 
-void 
+void
 CompilerOutputter::printFailureReport()
 {
   printFailuresList();
@@ -58,7 +62,7 @@ CompilerOutputter::printFailureReport()
 }
 
 
-void 
+void
 CompilerOutputter::printFailuresList()
 {
   for ( int index =0; index < m_result->testFailuresTotal(); ++index)
@@ -68,7 +72,7 @@ CompilerOutputter::printFailuresList()
 }
 
 
-void 
+void
 CompilerOutputter::printFailureDetail( TestFailure *failure )
 {
   printFailureLocation( failure->sourceLine() );
@@ -77,26 +81,26 @@ CompilerOutputter::printFailureDetail( TestFailure *failure )
   printFailureMessage( failure );
 }
 
- 
-void 
+
+void
 CompilerOutputter::printFailureLocation( SourceLine sourceLine )
 {
   if ( sourceLine.isValid() )
-    m_stream  <<  sourceLine.fileName()  
+    m_stream  <<  sourceLine.fileName()
               <<  "("  << sourceLine.lineNumber()  << ") : ";
   else
     m_stream  <<  "##Failure Location unknown## : ";
 }
 
 
-void 
+void
 CompilerOutputter::printFailureType( TestFailure *failure )
 {
   m_stream  <<  (failure->isError() ? "Error" : "Assertion");
 }
 
 
-void 
+void
 CompilerOutputter::printFailedTestName( TestFailure *failure )
 {
   m_stream  <<  endl;
@@ -104,7 +108,7 @@ CompilerOutputter::printFailedTestName( TestFailure *failure )
 }
 
 
-void 
+void
 CompilerOutputter::printFailureMessage( TestFailure *failure )
 {
   m_stream  <<  endl;
@@ -117,7 +121,7 @@ CompilerOutputter::printFailureMessage( TestFailure *failure )
 }
 
 
-void 
+void
 CompilerOutputter::printNotEqualMessage( Exception *thrownException )
 {
   NotEqualException *e = (NotEqualException *)thrownException;
@@ -133,7 +137,7 @@ CompilerOutputter::printNotEqualMessage( Exception *thrownException )
 }
 
 
-void 
+void
 CompilerOutputter::printDefaultMessage( Exception *thrownException )
 {
   string wrappedMessage = wrap( thrownException->what() );
@@ -141,7 +145,7 @@ CompilerOutputter::printDefaultMessage( Exception *thrownException )
 }
 
 
-void 
+void
 CompilerOutputter::printStatistics()
 {
   m_stream  <<  "Failures !!!"  <<  endl;
@@ -177,7 +181,7 @@ CompilerOutputter::wrap( string message )
 }
 
 
-CompilerOutputter::Lines 
+CompilerOutputter::Lines
 CompilerOutputter::splitMessageIntoLines( string message )
 {
   Lines lines;
@@ -185,8 +189,8 @@ CompilerOutputter::splitMessageIntoLines( string message )
   string::iterator itStart = message.begin();
   while ( true )
   {
-    string::iterator itEol = find( itStart, 
-                                             message.end(), 
+    string::iterator itEol = find( itStart,
+                                             message.end(),
                                              '\n' );
     lines.push_back( message.substr( itStart - message.begin(),
                                      itEol - itStart ) );

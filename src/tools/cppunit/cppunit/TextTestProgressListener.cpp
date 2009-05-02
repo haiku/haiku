@@ -3,6 +3,9 @@
 #include <iostream>
 
 
+using std::cerr;
+using std::endl;
+
 namespace CppUnit
 {
 
@@ -17,7 +20,7 @@ TextTestProgressListener::~TextTestProgressListener()
 }
 
 
-void 
+void
 TextTestProgressListener::startTest( Test *test )
 {
   cerr << ".";
@@ -25,7 +28,7 @@ TextTestProgressListener::startTest( Test *test )
 }
 
 
-void 
+void
 TextTestProgressListener::addFailure( const TestFailure &failure )
 {
   cerr << ( failure.isError() ? "E" : "F" );
@@ -33,7 +36,7 @@ TextTestProgressListener::addFailure( const TestFailure &failure )
 }
 
 
-void 
+void
 TextTestProgressListener::done()
 {
   cerr  <<  endl;

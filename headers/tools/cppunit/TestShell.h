@@ -48,9 +48,9 @@ typedef CppUnit::SynchronizedObject::SynchronizationObject SyncObject;
 */
 class CPPUNIT_API BTestShell {
 public:
-	BTestShell(const string &description = "", SyncObject *syncObject = 0);	
+	BTestShell(const std::string &description = "", SyncObject *syncObject = 0);
 	virtual ~BTestShell();
-	
+
 	// This function is used to add the tests for a given kit (as contained
 	// in a BTestSuite object) to the list of available tests. The shell assumes
 	// ownership of the BTestSuite object. Each test in the kit is added to
@@ -64,7 +64,7 @@ public:
 	// when the program is run with "--list" as an argument. Usually the
 	// given suite would be a test suite for an entire class, but that's
 	// not a requirement.
-	void AddTest(const string &name, CppUnit::Test* test);
+	void AddTest(const std::string &name, CppUnit::Test* test);
 
 	// This function loads all the test addons it finds in the given
 	// directory, returning the number of tests actually loaded.
@@ -75,7 +75,7 @@ public:
 	// help, or lists installed tests, or whatever, depending on the
 	// command-line arguments passed in.
 	int Run(int argc, char *argv[]);
-	
+
 	// Verbosity Level enumeration and accessor function
 	enum VerbosityLevel { v0, v1, v2, v3, v4 };
 	VerbosityLevel Verbosity() const;
@@ -92,9 +92,9 @@ public:
 	// have to (and always make sure the pointer it returns isn't NULL
 	// before you try to use it :-).
 	static BTestShell* GlobalShell() { return fGlobalShell; };
-	
+
 	// Sets the global BTestShell pointer. The BTestShell class does
-	// not assume ownership of the object. 
+	// not assume ownership of the object.
 	static void SetGlobalShell(BTestShell *shell) { fGlobalShell = shell; };
 
 	const char* TestDir() const;
@@ -104,18 +104,18 @@ public:
 	bool WasDebuggerCalled();
 
 protected:
-	typedef map<string, CppUnit::Test*> TestMap;
-	typedef map<string, BTestSuite*> SuiteMap;
+	typedef std::map<std::string, CppUnit::Test*> TestMap;
+	typedef std::map<std::string, BTestSuite*> SuiteMap;
 
 	VerbosityLevel fVerbosityLevel;
-	set<string> fTestsToRun;
-	set<string> fSuitesToRun;
+	std::set<std::string> fTestsToRun;
+	std::set<std::string> fSuitesToRun;
 	TestMap fTests;
 	SuiteMap fSuites;
-	set<string> fLibDirs;
+	std::set<std::string> fLibDirs;
 	CppUnit::TestResult fTestResults;
 	CppUnit::TestResultCollector fResultsCollector;
-	string fDescription;
+	std::string fDescription;
 	static BTestShell* fGlobalShell;
 	static const char indent[];
 	bool fListTestsAndExit;
@@ -134,7 +134,7 @@ protected:
 
 	//! Prints out command line argument instructions
 	void PrintHelp();
-	
+
 	/*! \brief Prints out the list of valid command line arguments.
 		Called by PrintHelp().
 	*/
@@ -142,15 +142,15 @@ protected:
 
 	//! Prints out a list of all the currently available tests
 	void PrintInstalledTests();
-	
+
 	/*! \brief Handles command line arguments; returns true if everything goes
 		okay, false if not (or if the program just needs to terminate without
 		running any tests). Modifies settings in "settings" as necessary.
 	*/
 	bool ProcessArguments(int argc, char *argv[]);
-	
+
 	//! Processes a single argument, given by the \c arg parameter.
-	virtual bool ProcessArgument(string arg, int argc, char *argv[]);
+	virtual bool ProcessArgument(std::string arg, int argc, char *argv[]);
 
 	//! Makes any necessary pre-test preparations
 	void InitOutput();
@@ -159,12 +159,12 @@ protected:
 		the specified verbosity level.
 	*/
 	void PrintResults();
-	
+
 	/*! \brief Searches all the paths in \c fLibDirs, loading any dynamically
 		loadable suites it finds.
 	*/
 	virtual void LoadDynamicSuites();
-	
+
 	//! Sets the current test directory.
 	void UpdateTestDir(char *argv[]);
 
@@ -187,7 +187,7 @@ private:
 	static image_id _LoadAddOnHook(const char* path);
 	static status_t _UnloadAddOnHook(image_id image);
 #endif	// ! NO_ELF_SYMBOL_PATCHING
-	
+
 };	// class BTestShell
 
 #endif // _beos_test_shell_h_

@@ -28,34 +28,34 @@ class CPPUNIT_API TestCase : public Test,
 {
 public:
 
-    TestCase( string Name );
+    TestCase( std::string Name );
     //! \internal
     TestCase();
     ~TestCase();
-    
+
     virtual void run(TestResult *result);
     virtual int countTestCases() const;
-    string getName() const;
-    string toString() const;
+    std::string getName() const;
+    std::string toString() const;
 
     //! FIXME: what is this for?
     virtual TestResult *run();
-    
+
 protected:
     //! FIXME: this should probably be pure virtual.
     virtual void runTest();
 
     //! Create TestResult for the run(void) method.
     TestResult *defaultResult();
-    
+
 private:
-    TestCase( const TestCase &other ); 
-    TestCase &operator=( const TestCase &other ); 
-    
+    TestCase( const TestCase &other );
+    TestCase &operator=( const TestCase &other );
+
 private:
-    const string m_name;
+    const std::string m_name;
 };
 
 } // namespace CppUnit
 
-#endif // CPPUNIT_TESTCASE_H 
+#endif // CPPUNIT_TESTCASE_H

@@ -7,6 +7,12 @@
 #include <stdlib.h>
 
 
+using std::endl;
+using std::ostream;
+using std::pair;
+using std::string;
+
+
 namespace CppUnit
 {
 
@@ -21,7 +27,7 @@ XmlOutputter::Node::Node( string elementName,
 {
 }
 
-    
+
 XmlOutputter::Node::Node( string elementName,
                           int numericContent ) :
     m_name( elementName )
@@ -38,7 +44,7 @@ XmlOutputter::Node::~Node()
 }
 
 
-void 
+void
 XmlOutputter::Node::addAttribute( string attributeName,
                                   string value  )
 {
@@ -46,7 +52,7 @@ XmlOutputter::Node::addAttribute( string attributeName,
 }
 
 
-void 
+void
 XmlOutputter::Node::addAttribute( string attributeName,
                                   int numericValue )
 {
@@ -54,14 +60,14 @@ XmlOutputter::Node::addAttribute( string attributeName,
 }
 
 
-void 
+void
 XmlOutputter::Node::addNode( Node *node )
 {
   m_nodes.push_back( node );
 }
 
 
-string 
+string
 XmlOutputter::Node::toString() const
 {
   string element = "<";
@@ -87,7 +93,7 @@ XmlOutputter::Node::toString() const
 }
 
 
-string 
+string
 XmlOutputter::Node::attributesAsString() const
 {
   string attributes;
@@ -104,7 +110,7 @@ XmlOutputter::Node::attributesAsString() const
 }
 
 
-string 
+string
 XmlOutputter::Node::escape( string value ) const
 {
   string escaped;
@@ -113,31 +119,31 @@ XmlOutputter::Node::escape( string value ) const
     char c = value[index ];
     switch ( c )    // escape all predefined XML entity (safe?)
     {
-    case '<': 
+    case '<':
       escaped += "&lt;";
       break;
-    case '>': 
+    case '>':
       escaped += "&gt;";
       break;
-    case '&': 
+    case '&':
       escaped += "&amp;";
       break;
-    case '\'': 
+    case '\'':
       escaped += "&apos;";
       break;
-    case '"': 
+    case '"':
       escaped += "&quot;";
       break;
     default:
       escaped += c;
     }
   }
-  
+
   return escaped;
 }
 
-// should be somewhere else... Future CppUnit::String ?    
-string 
+// should be somewhere else... Future CppUnit::String ?
+string
 XmlOutputter::Node::asString( int value )
 {
   OStringStream stream;
@@ -166,7 +172,7 @@ XmlOutputter::~XmlOutputter()
 }
 
 
-void 
+void
 XmlOutputter::write()
 {
   writeProlog();
@@ -174,7 +180,7 @@ XmlOutputter::write()
 }
 
 
-void 
+void
 XmlOutputter::writeProlog()
 {
   m_stream  <<  "<?xml version=\"1.0\" "
@@ -183,7 +189,7 @@ XmlOutputter::writeProlog()
 }
 
 
-void 
+void
 XmlOutputter::writeTestsResult()
 {
   Node *rootNode = makeRootNode();
@@ -208,7 +214,7 @@ XmlOutputter::makeRootNode()
 }
 
 
-void 
+void
 XmlOutputter::fillFailedTestsMap( FailedTests &failedTests )
 {
   const TestResultCollector::TestFailures &failures = m_result->failures();
@@ -216,11 +222,11 @@ XmlOutputter::fillFailedTestsMap( FailedTests &failedTests )
   while ( itFailure != failures.end() )
   {
     TestFailure *failure = *itFailure++;
-    failedTests.insert( 
+    failedTests.insert(
     	pair< CppUnit::Test* const, CppUnit::TestFailure*
     	>(
-    		failure->failedTest(), failure 
-    	) 
+    		failure->failedTest(), failure
+    	)
     );
   }
 }
@@ -266,7 +272,7 @@ XmlOutputter::addStatistics( Node *rootNode )
   Node *statisticsNode = new Node( "Statistics" );
   rootNode->addNode( statisticsNode );
   statisticsNode->addNode( new Node( "Tests", m_result->runTests() ) );
-  statisticsNode->addNode( new Node( "FailuresTotal", 
+  statisticsNode->addNode( new Node( "FailuresTotal",
                                      m_result->testFailuresTotal() ) );
   statisticsNode->addNode( new Node( "Errors", m_result->testErrors() ) );
   statisticsNode->addNode( new Node( "Failures", m_result->testFailures() ) );
@@ -280,12 +286,12 @@ XmlOutputter::addFailedTest( Test *test,
                                        Node *testsNode )
 {
   Exception *thrownException = failure->thrownException();
-  
+
   Node *testNode = new Node( "FailedTest", thrownException->what() );
   testsNode->addNode( testNode );
   testNode->addAttribute( "id", testNumber );
   testNode->addNode( new Node( "Name", test->getName() ) );
-  testNode->addNode( new Node( "FailureType", 
+  testNode->addNode( new Node( "FailureType",
                                failure->isError() ? "Error" : "Assertion" ) );
 
   if ( failure->sourceLine().isValid() )
@@ -306,7 +312,7 @@ XmlOutputter::addFailureLocation( TestFailure *failure,
 
 
 void
-XmlOutputter::addSucessfulTest( Test *test, 
+XmlOutputter::addSucessfulTest( Test *test,
                                           int testNumber,
                                           Node *testsNode )
 {

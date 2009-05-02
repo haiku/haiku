@@ -6,31 +6,33 @@
 #include <map>
 #include <string>
 
-class CppUnit::TestResult;
+namespace CppUnit {
+class TestResult;
+}
 
 //! Groups together a set of tests for a given kit.
 class CPPUNIT_API BTestSuite : public CppUnit::Test {
 public:
-	BTestSuite( string name = "" );
+	BTestSuite(std::string name = "");
 	virtual ~BTestSuite();
 
-	virtual void run( CppUnit::TestResult *result );
+	virtual void run(CppUnit::TestResult *result);
 	virtual int countTestCases() const;
-	virtual string getName() const;
-	virtual string toString() const;
+	virtual std::string getName() const;
+	virtual std::string toString() const;
 
-	virtual void addTest(string name, CppUnit::Test *test);
+	virtual void addTest(std::string name, CppUnit::Test *test);
 	virtual void deleteContents();
 
-	const map<string, CppUnit::Test*> &getTests() const;
+	const std::map<std::string, CppUnit::Test*> &getTests() const;
 
 protected:
-	map<string, CppUnit::Test*> fTests;
-	const string fName;
+	std::map<std::string, CppUnit::Test*> fTests;
+	const std::string fName;
 
 private:
 	BTestSuite(const BTestSuite &other);
-	BTestSuite& operator=(const BTestSuite &other); 
+	BTestSuite& operator=(const BTestSuite &other);
 
 };
 

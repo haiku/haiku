@@ -25,8 +25,8 @@ namespace CppUnit
 /*! \brief Collects test result.
  * \ingroup WritingTestResult
  * \ingroup BrowsingCollectedTestResult
- * 
- * A TestResultCollector is a TestListener which collects the results of executing 
+ *
+ * A TestResultCollector is a TestListener which collects the results of executing
  * a test case. It is an instance of the Collecting Parameter pattern.
  *
  * The test framework distinguishes between failures and errors.
@@ -38,8 +38,8 @@ namespace CppUnit
 class CPPUNIT_API TestResultCollector : public TestSucessListener
 {
 public:
-  typedef deque<TestFailure *> TestFailures;
-  typedef deque<Test *> Tests;
+  typedef std::deque<TestFailure *> TestFailures;
+  typedef std::deque<Test *> Tests;
 
 
   /*! Constructs a TestResultCollector object.

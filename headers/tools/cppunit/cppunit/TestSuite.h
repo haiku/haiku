@@ -12,6 +12,9 @@
 #include <vector>
 #include <string>
 
+using std::string;
+using std::vector;
+
 namespace CppUnit {
 
 class TestResult;
@@ -36,7 +39,7 @@ class TestResult;
  * control for any tests added to them.
  *
  * TestSuites do not register themselves in the TestRegistry.
- * \see Test 
+ * \see Test
  * \see TestCaller
  */
 
@@ -59,7 +62,7 @@ public:
 
 private:
   TestSuite( const TestSuite &other );
-  TestSuite &operator =( const TestSuite &other ); 
+  TestSuite &operator =( const TestSuite &other );
 
 private:
   vector<Test *> m_tests;

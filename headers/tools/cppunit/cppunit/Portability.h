@@ -21,6 +21,10 @@
 #undef CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
 #endif
 
+#if __GNUC__ > 2
+#undef CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
+#endif
+
 /* Define to 1 if you wish to have the old-style macros
    assert(), assertEqual(), assertDoublesEqual(), and assertLongsEqual() */
 #ifndef CPPUNIT_ENABLE_NAKED_ASSERT
@@ -33,7 +37,7 @@
 #define CPPUNIT_ENABLE_CU_TEST_MACROS        0
 #endif
 
-/* Define to 1 if the preprocessor expands (#foo) to "foo" (quotes incl.) 
+/* Define to 1 if the preprocessor expands (#foo) to "foo" (quotes incl.)
    I don't think there is any C preprocess that does NOT support this! */
 #ifndef CPPUNIT_HAVE_CPP_SOURCE_ANNOTATION
 #define CPPUNIT_HAVE_CPP_SOURCE_ANNOTATION   1
@@ -60,11 +64,11 @@
 #if CPPUNIT_HAVE_SSTREAM
 #   include <sstream>
     namespace CppUnit {
-      class OStringStream : public ostringstream 
+      class OStringStream : public ostringstream
       {
       };
     }
-#else 
+#else
 #if CPPUNIT_HAVE_CLASS_STRSTREAM
 #   include <string>
 #   if CPPUNIT_HAVE_STRSTREAM
@@ -74,14 +78,14 @@
 #   endif
 
     namespace CppUnit {
-      class OStringStream : public ostrstream 
+      class OStringStream : public std::ostrstream
       {
       public:
-          string str()
+          std::string str()
           {
             (*this) << '\0';
-            string msg(ostrstream::str());
-            ostrstream::freeze(false);
+            std::string msg(std::ostrstream::str());
+            std::ostrstream::freeze(false);
             return msg;
           }
       };

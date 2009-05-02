@@ -28,7 +28,7 @@ Equals(const A &a, const B &b, const C &c)
 }
 
 // Returns a string version of the given integer
-extern CPPUNIT_API string IntToStr(int i);
+extern CPPUNIT_API std::string IntToStr(int i);
 
 // Calls system() with the concatenated string of command and parameter.
 extern CPPUNIT_API void ExecCommand(const char *command, const char *parameter);
@@ -40,5 +40,5 @@ extern CPPUNIT_API void ExecCommand(const char *command, const char *parameter1,
 
 // Calls system() with the given command (kind of silly, but it's consistent :-)
 extern CPPUNIT_API void ExecCommand(const char *command);
-	
+
 #endif	// __beos_test_utils_h__

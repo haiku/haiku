@@ -26,6 +26,10 @@
 #	include <ElfSymbolPatcher.h>
 #endif
 
+using std::cout;
+using std::endl;
+using std::set;
+
 _EXPORT BTestShell *BTestShell::fGlobalShell = NULL;
 const char BTestShell::indent[] = "  ";
 
@@ -62,20 +66,20 @@ BTestShell::AddSuite(BTestSuite *suite) {
 	if (suite) {
 		if (Verbosity() >= v3)
 			cout << "Adding suite '" << suite->getName() << "'" << endl;
-	
+
 		// Add the suite
 		fSuites[suite->getName()] = suite;
-		
+
 		// Add its tests
 		const TestMap &map = suite->getTests();
 		for (TestMap::const_iterator i = map.begin();
 			   i != map.end();
 			      i++) {
 			AddTest(i->first, i->second);
-			if (Verbosity() >= v4 && i->second) 
+			if (Verbosity() >= v4 && i->second)
 				cout << "  " << i->first << endl;
 		}
-			
+
 		return B_OK;
 	} else
 		return B_BAD_VALUE;
@@ -121,7 +125,7 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 		} else {
 //			cout << " !!! err == " << err << endl;
 		}
-		if (!err) 
+		if (!err)
 			err = AddSuite(func());
 		if (!err)
 			count++;
@@ -133,11 +137,11 @@ _EXPORT
 int
 BTestShell::Run(int argc, char *argv[]) {
 	// Make note of which directory we started in
-	UpdateTestDir(argv);	
+	UpdateTestDir(argv);
 
 	// Parse the command line args
 	if (!ProcessArguments(argc, argv))
-		return 0;		
+		return 0;
 
 	// Load any dynamically loadable tests we can find
 	LoadDynamicSuites();
@@ -147,24 +151,24 @@ BTestShell::Run(int argc, char *argv[]) {
 	if (fListTestsAndExit) {
 		PrintInstalledTests();
 		return 0;
-	}		
+	}
 
 	// Add the proper tests to our suite (or exit if there
 	// are no tests installed).
-	CppUnit::TestSuite suite;	
+	CppUnit::TestSuite suite;
 	if (fTests.empty()) {
-	
+
 		// No installed tests whatsoever, so bail
 		cout << "ERROR: No installed tests to run!" << endl;
 		return 0;
-		
+
 	} else if (fSuitesToRun.empty() && fTestsToRun.empty()) {
-	
+
 		// None specified, so run them all
 		TestMap::iterator i;
 		for (i = fTests.begin(); i != fTests.end(); ++i)
 			suite.addTest( i->second );
-			
+
 	} else {
 		set<string>::const_iterator i;
 		set<string> suitesToRemove;
@@ -187,14 +191,14 @@ BTestShell::Run(int argc, char *argv[]) {
 				}
 			}
 		}
-		
+
 		// Remove the names of all of the suites we discovered from the
 		// list of tests to run (unless there's also an installed individual
 		// test of the same name).
 		for (i = suitesToRemove.begin(); i != suitesToRemove.end(); i++) {
 			fTestsToRun.erase(*i);
 		}
-	
+
 		// Everything still in fTestsToRun must then be an explicit test
 		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) {
 			// Make sure it's a valid test
@@ -206,9 +210,9 @@ BTestShell::Run(int argc, char *argv[]) {
 				return 0;
 			}
 		}
-			
+
 	}
-	
+
 	// Run all the tests
 	InitOutput();
 	InstallPatches();
@@ -223,7 +227,7 @@ _EXPORT
 BTestShell::VerbosityLevel
 BTestShell::Verbosity() const {
 	return fVerbosityLevel;
-} 
+}
 
 _EXPORT
 const char*
@@ -276,7 +280,7 @@ BTestShell::PrintHelp() {
 	cout << "VALID ARGUMENTS:     " << endl;
 	PrintValidArguments();
 	cout << endl;
-	
+
 }
 
 _EXPORT
@@ -308,7 +312,7 @@ BTestShell::PrintInstalledTests() {
 	cout << "------------------------------------------------------------------------------" << endl;
 	cout << "Available Suites:" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
-	SuiteMap::const_iterator j;			
+	SuiteMap::const_iterator j;
 	for (j = fSuites.begin(); j != fSuites.end(); ++j)
 		cout << j->first << endl;
 	cout << endl;
@@ -317,7 +321,7 @@ BTestShell::PrintInstalledTests() {
 	cout << "------------------------------------------------------------------------------" << endl;
 	cout << "Available Tests:" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
-	TestMap::const_iterator i;			
+	TestMap::const_iterator i;
 	for (i = fTests.begin(); i != fTests.end(); ++i)
 		cout << i->first << endl;
 	cout << endl;
@@ -335,11 +339,11 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 	// which is just the app name)
 	for (int i = 1; i < argc; i++) {
 		string str(argv[i]);
-		
+
 		if (!ProcessArgument(str, argc, argv))
-			return false;		
+			return false;
 	}
-	
+
 	return true;
 }
 
@@ -363,12 +367,12 @@ BTestShell::ProcessArgument(string arg, int argc, char *argv[]) {
 	} else if (arg == "-v4") {
 		fVerbosityLevel = v4;
 	} else if (arg.length() >= 2 && arg[0] == '-' && arg[1] == 'l') {
-		fLibDirs.insert(arg.substr(2, arg.size()-2));		
+		fLibDirs.insert(arg.substr(2, arg.size()-2));
 	} else {
 		fTestsToRun.insert(arg);
 	}
 	return true;
-}			
+}
 
 _EXPORT
 void
@@ -404,7 +408,7 @@ BTestShell::PrintResults() {
 				     iFailure != fResultsCollector.failures().end();
 				     ++iFailure)
 				{
-					if (!(*iFailure)->isError()) 
+					if (!(*iFailure)->isError())
 						cout << "    " << (*iFailure)->toString() << endl;
 				}
 			}
@@ -414,17 +418,17 @@ BTestShell::PrintResults() {
 				     iFailure != fResultsCollector.failures().end();
 				     ++iFailure)
 				{
-					if ((*iFailure)->isError()) 
+					if ((*iFailure)->isError())
 						cout << "    " << (*iFailure)->toString() << endl;
 				}
 			}
-			
+
 		}
 		else
 			cout << "+ PASSED" << endl;
-			
+
 		cout << endl;
-			
+
 	}
 	else {
 		// Print out concise results for verbosity level == 0
@@ -433,7 +437,7 @@ BTestShell::PrintResults() {
 		else
 			cout << "+ PASSED" << endl;
 	}
-	
+
 }
 
 _EXPORT
@@ -448,15 +452,15 @@ BTestShell::LoadDynamicSuites() {
 	set<string>::iterator i;
 	for (i = fLibDirs.begin(); i != fLibDirs.end(); i++) {
 		BDirectory libDir((*i).c_str());
-		if (Verbosity() >= v3) 
+		if (Verbosity() >= v3)
 			cout << "Checking " << *i << endl;
 /*		int count =*/ LoadSuitesFrom(&libDir);
-		if (Verbosity() >= v3) {			
+		if (Verbosity() >= v3) {
 //			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
 //			cout << " from " << *i << endl;
 		}
 	}
-	
+
 	if (Verbosity() >= v3)
 		cout << endl;
 
@@ -466,11 +470,11 @@ BTestShell::LoadDynamicSuites() {
 		if (fTests.find(i->first) != fTests.end() && Verbosity() > v0) {
 			cout << "WARNING: '" << i->first << "' refers to both a test suite *and* an individual" <<
 			endl << "         test. Both will be executed, but it is reccommended you rename" <<
-			endl << "         one of them to resolve the conflict." <<  
+			endl << "         one of them to resolve the conflict." <<
 			endl << endl;
 		}
-	}		
-	
+	}
+
 }
 
 _EXPORT

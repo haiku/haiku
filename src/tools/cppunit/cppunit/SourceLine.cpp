@@ -1,6 +1,8 @@
 #include <cppunit/SourceLine.h>
 
 
+using std::string;
+
 namespace CppUnit
 {
 
@@ -23,28 +25,28 @@ SourceLine::~SourceLine()
 }
 
 
-bool 
+bool
 SourceLine::isValid() const
 {
   return !m_fileName.empty();
 }
 
 
-int 
+int
 SourceLine::lineNumber() const
 {
   return m_lineNumber;
 }
 
 
-string 
+string
 SourceLine::fileName() const
 {
   return m_fileName;
 }
 
 
-bool 
+bool
 SourceLine::operator ==( const SourceLine &other ) const
 {
   return m_fileName == other.m_fileName  &&
@@ -52,7 +54,7 @@ SourceLine::operator ==( const SourceLine &other ) const
 }
 
 
-bool 
+bool
 SourceLine::operator !=( const SourceLine &other ) const
 {
   return !( *this == other );

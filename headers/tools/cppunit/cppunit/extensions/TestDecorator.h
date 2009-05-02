@@ -16,8 +16,8 @@ class TestResult;
  * subclass the decorater and use it to wrap the test class.
  *
  * Does not assume ownership of the test it decorates
- */ 
-class CPPUNIT_API TestDecorator : public Test 
+ */
+class CPPUNIT_API TestDecorator : public Test
 {
 public:
     TestDecorator   (Test *test);
@@ -25,8 +25,8 @@ public:
 
     void        run             (TestResult *result);
     int         countTestCases  () const;
-    string getName         () const;
-    string toString        () const;
+    std::string getName         () const;
+    std::string toString        () const;
 
 protected:
     Test        *m_test;
@@ -53,11 +53,11 @@ inline void TestDecorator::run (TestResult *result)
 { m_test->run (result); }
 
 
-inline string TestDecorator::toString () const
+inline std::string TestDecorator::toString () const
 { return m_test->toString (); }
 
 
-inline string TestDecorator::getName () const
+inline std::string TestDecorator::getName () const
 { return m_test->getName(); }
 
 } // namespace CppUnit

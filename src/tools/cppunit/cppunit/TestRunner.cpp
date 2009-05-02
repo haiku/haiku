@@ -6,6 +6,9 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <iostream>
 
+using std::cin;
+using std::cout;
+using std::endl;
 
 namespace CppUnit {
 namespace TextUi {
@@ -13,7 +16,7 @@ namespace TextUi {
 /*! Constructs a new text runner.
  * \param outputter used to print text result. Owned by the runner.
  */
-TestRunner::TestRunner( Outputter *outputter ) 
+TestRunner::TestRunner( Outputter *outputter )
     : m_suite( new TestSuite( "All Tests" ) )
     , m_result( new TestResultCollector() )
     , m_eventManager( new TestResult() )
@@ -38,7 +41,7 @@ TestRunner::~TestRunner()
  *
  * \param test Test to add.
  */
-void 
+void
 TestRunner::addTest( Test *test )
 {
   if ( test != NULL )
@@ -51,7 +54,7 @@ TestRunner::addTest( Test *test )
  * \param testName Name of the test case to run. If an empty is given, then
  *                 all added test are run. The name must be the name of
  *                 of an added test.
- * \param doWait if \c true then the user must press the RETURN key 
+ * \param doWait if \c true then the user must press the RETURN key
  *               before the run() method exit.
  * \param doPrintResult if \c true (default) then the test result are printed
  *                      on the standard output.
@@ -89,10 +92,10 @@ TestRunner::runTestByName( string testName,
 }
 
 
-void 
+void
 TestRunner::wait( bool doWait )
 {
-  if ( doWait ) 
+  if ( doWait )
   {
     cout << "<RETURN> to continue" << endl;
     cin.get ();
@@ -100,7 +103,7 @@ TestRunner::wait( bool doWait )
 }
 
 
-void 
+void
 TestRunner::printResult( bool doPrintResult )
 {
   cout << endl;
@@ -109,11 +112,11 @@ TestRunner::printResult( bool doPrintResult )
 }
 
 
-Test * 
+Test *
 TestRunner::findTestByName( string name ) const
 {
-  for ( vector<Test *>::const_iterator it = m_suite->getTests().begin(); 
-        it != m_suite->getTests().end(); 
+  for ( vector<Test *>::const_iterator it = m_suite->getTests().begin();
+        it != m_suite->getTests().end();
         ++it )
   {
     Test *test = *it;
@@ -167,7 +170,7 @@ TestRunner::eventManager() const
  * \c true.
  * \see CompilerOutputter, XmlOutputter, TextOutputter.
  */
-void 
+void
 TestRunner::setOutputter( Outputter *outputter )
 {
   delete m_outputter;

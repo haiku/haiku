@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+using std::map;
+using std::string;
+using std::vector;
+
 _EXPORT
 BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 	: BTestCase(name)
@@ -24,7 +28,7 @@ BThreadedTestCase::~BThreadedTestCase() {
 		     i++)
 	{
 		delete i->second;
-	}		   
+	}
 }
 
 _EXPORT
@@ -47,9 +51,9 @@ BThreadedTestCase::NextSubTest() {
 			return;
 		}
 	}
-	
+
 	// Handle single-threaded case
-	BTestCase::NextSubTest();	
+	BTestCase::NextSubTest();
 }
 
 _EXPORT
@@ -62,7 +66,7 @@ BThreadedTestCase::Outputf(const char *str, ...) {
 		{
 			BAutolock lock(fUpdateLock);
 			isSingleThreaded = fNumberMap.find(id) == fNumberMap.end();
-		}			
+		}
 		if (isSingleThreaded) {
 			va_list args;
 			va_start(args, str);

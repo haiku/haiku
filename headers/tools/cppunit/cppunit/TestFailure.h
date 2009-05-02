@@ -20,7 +20,7 @@ class Test;
  * TestFailure assumes lifetime control for any exception
  * passed to it.
  */
-class CPPUNIT_API TestFailure 
+class CPPUNIT_API TestFailure
 {
 public:
   TestFailure( Test *failedTest,
@@ -37,9 +37,9 @@ public:
 
   virtual bool isError() const;
 
-  virtual string failedTestName() const;
-  
-  virtual string toString() const;
+  virtual std::string failedTestName() const;
+
+  virtual std::string toString() const;
 
   virtual TestFailure *clone() const;
 
@@ -48,9 +48,9 @@ protected:
   Exception *m_thrownException;
   bool m_isError;
 
-private: 
-  TestFailure( const TestFailure &other ); 
-  TestFailure &operator =( const TestFailure& other ); 
+private:
+  TestFailure( const TestFailure &other );
+  TestFailure &operator =( const TestFailure& other );
 };
 
 

@@ -20,7 +20,7 @@ namespace CppUnit {
    *   {
    *     return x == y;
    *   }
-   * 
+   *
    *   static string toString( const string& x )
    *   {
    *     string text = '"' + x + '"';    // adds quote around the string to see whitespace
@@ -32,14 +32,14 @@ namespace CppUnit {
    * \endcode
    */
   template <class T>
-  struct assertion_traits 
-  {  
+  struct assertion_traits
+  {
       static bool equal( const T& x, const T& y )
       {
           return x == y;
       }
 
-      static string toString( const T& x )
+      static std::string toString( const T& x )
       {
           OStringStream ost;
           ost << x;
@@ -51,37 +51,37 @@ namespace CppUnit {
   namespace TestAssert
   {
 #ifdef CPPUNIT_ENABLE_SOURCELINE_DEPRECATED
-    void CPPUNIT_API assertImplementation( bool         condition, 
-                                           string  conditionExpression = "",
+    void CPPUNIT_API assertImplementation( bool         condition,
+                                           std::string  conditionExpression = "",
                                            long lineNumber,
-                                           string  fileName );
+                                           std::string  fileName );
 
-    void CPPUNIT_API assertNotEqualImplementation( string expected,
-                                                   string actual,
+    void CPPUNIT_API assertNotEqualImplementation( std::string expected,
+                                                   std::string actual,
                                                    long lineNumber,
-                                                   string fileName );
-      
+                                                   std::string fileName );
+
 
     template <class T>
     void assertEquals( const T& expected,
                        const T& actual,
                        long lineNumber,
-                       string fileName )
+                       std::string fileName )
     {
       if ( !assertion_traits<T>::equal(expected,actual) ) // lazy toString conversion...
       {
         assertNotEqualImplementation( assertion_traits<T>::toString(expected),
                                       assertion_traits<T>::toString(actual),
-                                      lineNumber, 
+                                      lineNumber,
                                       fileName );
       }
     }
 
-    void CPPUNIT_API assertEquals( double expected, 
-                                   double actual, 
-                                   double delta, 
+    void CPPUNIT_API assertEquals( double expected,
+                                   double actual,
+                                   double delta,
                                    long lineNumber,
-                                   string fileName );
+                                   std::string fileName );
 
 #else   //                  using SourceLine
 
@@ -89,7 +89,7 @@ namespace CppUnit {
     void assertEquals( const T& expected,
                        const T& actual,
                        SourceLine sourceLine,
-                       const string &message ="" )
+                       const std::string &message ="" )
     {
       if ( !assertion_traits<T>::equal(expected,actual) ) // lazy toString conversion...
       {
@@ -167,7 +167,7 @@ namespace CppUnit {
  * Requirement for \a expected and \a actual parameters:
  * - They are exactly of the same type
  * - They are serializable into a strstream using operator <<.
- * - They can be compared using operator ==. 
+ * - They can be compared using operator ==.
  *
  * The last two requirements (serialization and comparison) can be
  * removed by specializing the CppUnit::assertion_traits.
@@ -190,7 +190,7 @@ namespace CppUnit {
  * Requirement for \a expected and \a actual parameters:
  * - They are exactly of the same type
  * - They are serializable into a strstream using operator <<.
- * - They can be compared using operator ==. 
+ * - They can be compared using operator ==.
  *
  * The last two requirements (serialization and comparison) can be
  * removed by specializing the CppUnit::assertion_traits.

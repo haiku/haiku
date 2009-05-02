@@ -4,15 +4,17 @@
 #include <cppunit/TestListener.h>
 #include <SupportDefs.h>
 
-class CppUnit::Test;
-class CppUnit::TestFailure;
-class CppUnit::Exception;
+namespace CppUnit {
+class Test;
+class TestFailure;
+class Exception;
+}
 
 //! Handles printing of test information
 /*! Receives notification of the beginning and end of each test,
 	and notification of all failures and errors. Prints out	said
 	information in a standard format to standard output.
-	
+
 	You should not need to explicitly use this class in any
 	of your tests.
 */

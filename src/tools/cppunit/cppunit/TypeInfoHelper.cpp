@@ -6,9 +6,12 @@
 #include <cppunit/extensions/TypeInfoHelper.h>
 
 
+using std::string;
+using std::type_info;
+
 namespace CppUnit {
 
-string 
+string
 TypeInfoHelper::getClassName( const type_info &info )
 {
     static const string classPrefix( "class " );
@@ -18,7 +21,7 @@ TypeInfoHelper::getClassName( const type_info &info )
 #if CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
 	name.compare( classPrefix, 0, classPrefix.length() );
 #else
-        name.compare( 0, classPrefix.length(), classPrefix );
+    name.compare( 0, classPrefix.length(), classPrefix );
 #endif
 
     return has_class_prefix ? name.substr( classPrefix.length() ) : name;
@@ -27,4 +30,4 @@ TypeInfoHelper::getClassName( const type_info &info )
 
 } //  namespace CppUnit
 
-#endif 
+#endif

@@ -66,7 +66,7 @@ class TestSuite;
  * CppUnit::TestSuite *suite = registry.makeTest();
  * \endcode
  *
- * Since a TestFactoryRegistry is a TestFactory, the named registries can be 
+ * Since a TestFactoryRegistry is a TestFactory, the named registries can be
  * registered in the unnamed registry, creating the hierarchy links.
  *
  * \see TestSuiteFactory, AutoRegisterSuite
@@ -79,19 +79,19 @@ public:
    * \param name Name of the registry. It is the name of TestSuite returned by
    *             makeTest().
    */
-  TestFactoryRegistry( string name = "All Tests" );
+  TestFactoryRegistry( std::string name = "All Tests" );
 
   /// Destructor.
   virtual ~TestFactoryRegistry();
 
   /** Returns a new TestSuite that contains the registered test.
-   * \return A new TestSuite which contains all the test added using 
+   * \return A new TestSuite which contains all the test added using
    * registerFactory(TestFactory *).
    */
   virtual Test *makeTest();
 
   /** Returns unnamed the registry.
-   * TestSuite registered using CPPUNIT_TEST_SUITE_REGISTRATION() are registered 
+   * TestSuite registered using CPPUNIT_TEST_SUITE_REGISTRATION() are registered
    * in this registry.
    * \return Registry which name is "All Tests".
    */
@@ -104,7 +104,7 @@ public:
    * \return Registry. If the registry does not exist, it is created with the
    *         specified name.
    */
-  static TestFactoryRegistry &getRegistry( const string &name );
+  static TestFactoryRegistry &getRegistry( const std::string &name );
 
   /** Adds the registered tests to the specified suite.
    * \param suite Suite the tests are added to.
@@ -113,15 +113,15 @@ public:
 
   /** Adds the specified TestFactory with a specific name (DEPRECATED).
    * \param name Name associated to the factory.
-   * \param factory Factory to register. 
+   * \param factory Factory to register.
    * \deprecated Use registerFactory( TestFactory *) instead.
    */
-  void registerFactory( const string &name,
+  void registerFactory( const std::string &name,
                         TestFactory *factory );
 
   /** Adds the specified TestFactory to the registry.
    *
-   * \param factory Factory to register. 
+   * \param factory Factory to register.
    */
   void registerFactory( TestFactory *factory );
 
@@ -130,10 +130,10 @@ private:
   void operator =( const TestFactoryRegistry &copy );
 
 private:
-  typedef map<string, TestFactory *> Factories;
+  typedef std::map<std::string, TestFactory *> Factories;
   Factories m_factories;
 
-  string m_name;
+  std::string m_name;
 };
 
 

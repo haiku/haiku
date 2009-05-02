@@ -2,13 +2,15 @@
 #include "cppunit/Test.h"
 #include "cppunit/TestFailure.h"
 
+using std::string;
+
 namespace CppUnit {
 
 /// Constructs a TestFailure with the given test and exception.
-TestFailure::TestFailure( Test *failedTest, 
+TestFailure::TestFailure( Test *failedTest,
                           Exception *thrownException,
                           bool isError ) :
-    m_failedTest( failedTest ), 
+    m_failedTest( failedTest ),
     m_thrownException( thrownException ),
     m_isError( isError )
 {
@@ -16,28 +18,28 @@ TestFailure::TestFailure( Test *failedTest,
 
 /// Deletes the owned exception.
 TestFailure::~TestFailure()
-{ 
-  delete m_thrownException; 
+{
+  delete m_thrownException;
 }
 
 /// Gets the failed test.
 Test *
 TestFailure::failedTest() const
-{ 
-  return m_failedTest; 
+{
+  return m_failedTest;
 }
 
 
 /// Gets the thrown exception. Never \c NULL.
 Exception *
 TestFailure::thrownException() const
-{ 
-  return m_thrownException; 
+{
+  return m_thrownException;
 }
 
 
 /// Gets the failure location.
-SourceLine 
+SourceLine
 TestFailure::sourceLine() const
 {
   return m_thrownException->sourceLine();
@@ -45,7 +47,7 @@ TestFailure::sourceLine() const
 
 
 /// Indicates if the failure is a failed assertion or an error.
-bool 
+bool
 TestFailure::isError() const
 {
   return m_isError;
@@ -53,7 +55,7 @@ TestFailure::isError() const
 
 
 /// Gets the name of the failed test.
-string 
+string
 TestFailure::failedTestName() const
 {
   return m_failedTest->getName();
@@ -61,9 +63,9 @@ TestFailure::failedTestName() const
 
 
 /// Returns a short description of the failure.
-string 
-TestFailure::toString() const 
-{ 
+string
+TestFailure::toString() const
+{
   return m_failedTest->toString() + ": " + m_thrownException->what();
 }
 

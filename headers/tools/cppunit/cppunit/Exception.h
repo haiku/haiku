@@ -14,31 +14,31 @@ namespace CppUnit {
  * Exception is an exception that serves
  * descriptive strings through its what() method
  */
-class CPPUNIT_API Exception : public exception
+class CPPUNIT_API Exception : public std::exception
 {
 public:
 
     class Type
     {
     public:
-        Type( string type ) : m_type ( type ) {}
+        Type( std::string type ) : m_type ( type ) {}
 
         bool operator ==( const Type &other ) const
         {
 	    return m_type == other.m_type;
         }
     private:
-        const string m_type;
+        const std::string m_type;
     };
 
 
-    Exception( string  message = "", 
+    Exception( std::string  message = "",
 	       SourceLine sourceLine = SourceLine() );
 
 #ifdef CPPUNIT_ENABLE_SOURCELINE_DEPRECATED
-    Exception( string  message, 
-	       long lineNumber, 
-	       string fileName );
+    Exception( std::string  message,
+	       long lineNumber,
+	       std::string fileName );
 #endif
 
     Exception (const Exception& other);
@@ -55,12 +55,12 @@ public:
     long lineNumber() const;
     string fileName() const;
 
-    static const string UNKNOWNFILENAME;
+    static const std::string UNKNOWNFILENAME;
     static const long UNKNOWNLINENUMBER;
 #endif
 
     virtual Exception *clone() const;
-    
+
     virtual bool isInstanceOf( const Type &type ) const;
 
     static Type type();
@@ -68,9 +68,9 @@ public:
 private:
     // VC++ does not recognize call to parent class when prefixed
     // with a namespace. This is a workaround.
-    typedef exception SuperClass;
+    typedef std::exception SuperClass;
 
-    string m_message;
+    std::string m_message;
     SourceLine m_sourceLine;
 };
 

@@ -21,7 +21,7 @@ class CPPUNIT_API TextOutputter : public Outputter
 {
 public:
   TextOutputter( TestResultCollector *result,
-                 ostream &stream );
+                 std::ostream &stream );
 
   /// Destructor.
   virtual ~TextOutputter();
@@ -42,7 +42,7 @@ public:
 
 protected:
   TestResultCollector *m_result;
-  ostream &m_stream;
+  std::ostream &m_stream;
 
 private:
   /// Prevents the use of the copy constructor.

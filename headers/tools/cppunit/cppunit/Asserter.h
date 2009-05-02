@@ -16,23 +16,23 @@ namespace CppUnit
  * \code
  * #include <cppunit/SourceLine.h>
  * #include <cppunit/TestAssert.h>
- * 
- * void 
+ *
+ * void
  * checkXmlEqual( string expectedXml,
  *                string actualXml,
  *                CppUnit::SourceLine sourceLine )
  * {
  *   string expected = XmlUniformiser( expectedXml ).stripped();
  *   string actual = XmlUniformiser( actualXml ).stripped();
- * 
+ *
  *   if ( expected == actual )
  *     return;
- * 
+ *
  *   ::CppUnit::Asserter::failNotEqual( expected,
  *                                      actual,
  *                                      sourceLine );
  * }
- * 
+ *
  * /// Asserts that two XML strings are equivalent.
  * #define CPPUNITTEST_ASSERT_XML_EQUAL( expected, actual ) \
  *     checkXmlEqual( expected, actual,                     \
@@ -44,7 +44,7 @@ namespace Asserter
 
   /*! Throws a Exception with the specified message and location.
    */
-  void CPPUNIT_API fail( string message, 
+  void CPPUNIT_API fail( std::string message,
                          SourceLine sourceLine = SourceLine() );
 
   /*! Throws a Exception with the specified message and location.
@@ -53,8 +53,8 @@ namespace Asserter
    * \param message Message explaining the assertion failiure.
    * \param sourceLine Location of the assertion.
    */
-  void CPPUNIT_API failIf( bool shouldFail, 
-                           string message, 
+  void CPPUNIT_API failIf( bool shouldFail,
+                           std::string message,
                            SourceLine sourceLine = SourceLine() );
 
   /*! Throws a NotEqualException with the specified message and location.
@@ -64,10 +64,10 @@ namespace Asserter
    *                          where the "difference" is located.
    * \param sourceLine Location of the assertion.
    */
-  void CPPUNIT_API failNotEqual( string expected, 
-                                 string actual, 
+  void CPPUNIT_API failNotEqual( std::string expected,
+                                 std::string actual,
                                  SourceLine sourceLine = SourceLine(),
-                                 string additionalMessage ="" );
+                                 std::string additionalMessage ="" );
 
   /*! Throws a NotEqualException with the specified message and location.
    * \param shouldFail if \c true then the exception is thrown. Otherwise
@@ -79,10 +79,10 @@ namespace Asserter
    * \param sourceLine Location of the assertion.
    */
   void CPPUNIT_API failNotEqualIf( bool shouldFail,
-                                   string expected, 
-                                   string actual, 
+                                   std::string expected,
+                                   std::string actual,
                                    SourceLine sourceLine = SourceLine(),
-                                   string additionalMessage ="" );
+                                   std::string additionalMessage ="" );
 
 } // namespace Asserter
 } // namespace CppUnit

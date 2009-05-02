@@ -18,20 +18,20 @@ const long Exception::UNKNOWNLINENUMBER = -1;
 
 
 /// Construct the exception
-Exception::Exception( const Exception &other ) : 
+Exception::Exception( const Exception &other ) :
     exception( other )
-{ 
-  m_message = other.m_message; 
+{
+  m_message = other.m_message;
   m_sourceLine = other.m_sourceLine;
-} 
+}
 
 
 /*!
  * \deprecated Use other constructor instead.
  */
-Exception::Exception( string message, 
-                      SourceLine sourceLine ) : 
-    m_message( message ), 
+Exception::Exception( std::string message,
+                      SourceLine sourceLine ) :
+    m_message( message ),
     m_sourceLine( sourceLine )
 {
 }
@@ -41,10 +41,10 @@ Exception::Exception( string message,
 /*!
  * \deprecated Use other constructor instead.
  */
-Exception::Exception( string message, 
-                      long lineNumber, 
-                      string fileName ) : 
-    m_message( message ), 
+Exception::Exception( std::string message,
+                      long lineNumber,
+                      std::string fileName ) :
+    m_message( message ),
     m_sourceLine( fileName, lineNumber )
 {
 }
@@ -58,33 +58,33 @@ Exception::~Exception () throw()
 
 
 /// Perform an assignment
-Exception& 
+Exception&
 Exception::operator =( const Exception& other )
-{ 
+{
 // Don't call superclass operator =(). VC++ STL implementation
-// has a bug. It calls the destructor and copy constructor of 
+// has a bug. It calls the destructor and copy constructor of
 // exception() which reset the virtual table to exception.
 //  SuperClass::operator =(other);
 
   if ( &other != this )
   {
-    m_message = other.m_message; 
+    m_message = other.m_message;
     m_sourceLine = other.m_sourceLine;
   }
 
-  return *this; 
+  return *this;
 }
 
 
 /// Return descriptive message
 const char*
 Exception::what() const throw()
-{ 
-  return m_message.c_str (); 
+{
+  return m_message.c_str ();
 }
 
 /// Location where the error occured
-SourceLine 
+SourceLine
 Exception::sourceLine() const
 {
   return m_sourceLine;
@@ -93,19 +93,19 @@ Exception::sourceLine() const
 
 #ifdef CPPUNIT_ENABLE_SOURCELINE_DEPRECATED
 /// The line on which the error occurred
-long 
+long
 Exception::lineNumber() const
-{ 
-  return m_sourceLine.isValid() ? m_sourceLine.lineNumber() : 
-                                  UNKNOWNLINENUMBER; 
+{
+  return m_sourceLine.isValid() ? m_sourceLine.lineNumber() :
+                                  UNKNOWNLINENUMBER;
 }
 
 
 /// The file in which the error occurred
-string 
+string
 Exception::fileName() const
-{ 
-  return m_sourceLine.isValid() ? m_sourceLine.fileName() : 
+{
+  return m_sourceLine.isValid() ? m_sourceLine.fileName() :
                                   UNKNOWNFILENAME;
 }
 #endif
@@ -118,7 +118,7 @@ Exception::clone() const
 }
 
 
-bool 
+bool
 Exception::isInstanceOf( const Type &exceptionType ) const
 {
   return exceptionType == type();

@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <OS.h>
 
+using std::cout;
+using std::endl;
+
 _EXPORT
 void
 BTestListener::startTest( CppUnit::Test *test ) {
@@ -25,7 +28,7 @@ BTestListener::addFailure( const CppUnit::TestFailure &failure ) {
    	cout << (failure.thrownException() != NULL
    	           ? failure.thrownException()->what()
    	             : "(unknown error)");
-   	cout << endl;	
+   	cout << endl;
 }
 
 _EXPORT
@@ -38,7 +41,7 @@ BTestListener::endTest( CppUnit::Test *test )  {
 //   		cout << "  - FAILED" << endl;
 	printTime(length);
    	cout << endl;
-}	 
+}
 
 _EXPORT
 void

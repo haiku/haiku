@@ -6,6 +6,10 @@
 #include <iostream>
 
 
+using std::cerr;
+using std::endl;
+using std::ostream;
+
 namespace CppUnit {
 
 
@@ -15,14 +19,14 @@ TextTestResult::TextTestResult()
 }
 
 
-void 
+void
 TextTestResult::addFailure( Test *test, Exception *e )
 {
 	TestResult::addFailure( test, e );
 }
 
 
-void 
+void
 TextTestResult::addFailure( const TestFailure &failure )
 {
   TestResultCollector::addFailure( failure );
@@ -30,7 +34,7 @@ TextTestResult::addFailure( const TestFailure &failure )
 }
 
 
-void 
+void
 TextTestResult::startTest( Test *test )
 {
   TestResultCollector::startTest (test);
@@ -38,12 +42,12 @@ TextTestResult::startTest( Test *test )
 }
 
 
-void 
+void
 TextTestResult::printFailures( ostream &stream )
 {
   TestFailures::const_iterator itFailure = failures().begin();
   int failureNumber = 1;
-  while ( itFailure != failures().end() ) 
+  while ( itFailure != failures().end() )
   {
     stream  <<  endl;
     printFailure( *itFailure++, failureNumber++, stream );
@@ -51,7 +55,7 @@ TextTestResult::printFailures( ostream &stream )
 }
 
 
-void 
+void
 TextTestResult::printFailure( TestFailure *failure,
                               int failureNumber,
                               ostream &stream )
@@ -69,7 +73,7 @@ TextTestResult::printFailure( TestFailure *failure,
 }
 
 
-void 
+void
 TextTestResult::printFailureListMark( int failureNumber,
                                       ostream &stream )
 {
@@ -77,7 +81,7 @@ TextTestResult::printFailureListMark( int failureNumber,
 }
 
 
-void 
+void
 TextTestResult::printFailureTestName( TestFailure *failure,
                                       ostream &stream )
 {
@@ -85,7 +89,7 @@ TextTestResult::printFailureTestName( TestFailure *failure,
 }
 
 
-void 
+void
 TextTestResult::printFailureType( TestFailure *failure,
                                   ostream &stream )
 {
@@ -95,7 +99,7 @@ TextTestResult::printFailureType( TestFailure *failure,
 }
 
 
-void 
+void
 TextTestResult::printFailureLocation( SourceLine sourceLine,
                                       ostream &stream )
 {
@@ -107,7 +111,7 @@ TextTestResult::printFailureLocation( SourceLine sourceLine,
 }
 
 
-void 
+void
 TextTestResult::printFailureDetail( Exception *thrownException,
                                     ostream &stream )
 {
@@ -130,8 +134,8 @@ TextTestResult::printFailureDetail( Exception *thrownException,
 }
 
 
-void 
-TextTestResult::print( ostream& stream ) 
+void
+TextTestResult::print( ostream& stream )
 {
   printHeader( stream );
   stream << endl;
@@ -139,11 +143,11 @@ TextTestResult::print( ostream& stream )
 }
 
 
-void 
+void
 TextTestResult::printHeader( ostream &stream )
 {
   if (wasSuccessful ())
-    stream << endl << "OK (" << runTests () << " tests)" 
+    stream << endl << "OK (" << runTests () << " tests)"
            << endl;
   else
   {
@@ -154,14 +158,14 @@ TextTestResult::printHeader( ostream &stream )
 }
 
 
-void 
+void
 TextTestResult::printFailureWarning( ostream &stream )
 {
   stream  << "!!!FAILURES!!!" << endl;
 }
 
 
-void 
+void
 TextTestResult::printStatistics( ostream &stream )
 {
   stream  << "Test Results:" << endl;
@@ -174,10 +178,10 @@ TextTestResult::printStatistics( ostream &stream )
 
 
 ostream &
-operator <<( ostream &stream, 
+operator <<( ostream &stream,
              TextTestResult &result )
-{ 
-  result.print (stream); return stream; 
+{
+  result.print (stream); return stream;
 }
 
 

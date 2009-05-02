@@ -14,17 +14,17 @@ class TestResult;
  *
  * Does not assume ownership of the test it decorates
  */
-class CPPUNIT_API RepeatedTest : public TestDecorator 
+class CPPUNIT_API RepeatedTest : public TestDecorator
 {
 public:
-    RepeatedTest( Test *test, 
-                  int timesRepeat ) : 
-        TestDecorator( test ), 
+    RepeatedTest( Test *test,
+                  int timesRepeat ) :
+        TestDecorator( test ),
         m_timesRepeat(timesRepeat) {}
 
     void run( TestResult *result );
     int countTestCases() const;
-    string toString() const;
+    std::string toString() const;
 
 private:
     RepeatedTest( const RepeatedTest & );

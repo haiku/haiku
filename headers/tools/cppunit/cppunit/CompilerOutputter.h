@@ -15,7 +15,7 @@ class Test;
 class TestFailure;
 class TestResultCollector;
 
-/*! 
+/*!
  * \brief Outputs a TestResultCollector in a compiler compatible format.
  * \ingroup WritingTestResult
  *
@@ -33,23 +33,23 @@ class TestResultCollector;
  * int main( int argc, char* argv[] ) {
  *   // if command line contains "-selftest" then this is the post build check
  *   // => the output must be in the compiler error format.
- *   bool selfTest = (argc > 1)  &&  
+ *   bool selfTest = (argc > 1)  &&
  *                   (string("-selftest") == argv[1]);
  *
  *   CppUnit::TextUi::TestRunner runner;
  *   runner.addTest( CppUnitTest::suite() );   // Add the top suite to the test runner
- * 
+ *
  *  if ( selfTest )
  *   { // Change the default outputter to a compiler error format outputter
  *     // The test runner owns the new outputter.
- *     runner.setOutputter( CppUnit::CompilerOutputter::defaultOutputter( 
+ *     runner.setOutputter( CppUnit::CompilerOutputter::defaultOutputter(
  *                                                        &runner.result(),
  *                                                         cerr ) );
  *   }
- * 
+ *
  *  // Run the test and don't wait a key if post build check.
  *   bool wasSucessful = runner.run( "", !selfTest );
- * 
+ *
  *   // Return error code 1 if the one of test failed.
  *   return wasSucessful ? 0 : 1;
  * }
@@ -61,7 +61,7 @@ public:
   /*! Constructs a CompilerOutputter object.
    */
   CompilerOutputter( TestResultCollector *result,
-                     ostream &stream );
+                     std::ostream &stream );
 
   /// Destructor.
   virtual ~CompilerOutputter();
@@ -69,7 +69,7 @@ public:
   /*! Creates an instance of an outputter that matches your current compiler.
    */
   static CompilerOutputter *defaultOutputter( TestResultCollector *result,
-                                              ostream &stream );
+                                              std::ostream &stream );
 
   void write();
 
@@ -84,7 +84,7 @@ public:
   virtual void printFailureMessage( TestFailure *failure );
   virtual void printNotEqualMessage( Exception *thrownException );
   virtual void printDefaultMessage( Exception *thrownException );
-  virtual string wrap( string message );
+  virtual std::string wrap( std::string message );
 
 private:
   /// Prevents the use of the copy constructor.
@@ -93,12 +93,12 @@ private:
   /// Prevents the use of the copy operator.
   void operator =( const CompilerOutputter &copy );
 
-  typedef vector<string> Lines;
-  static Lines splitMessageIntoLines( string message );
+  typedef std::vector<std::string> Lines;
+  static Lines splitMessageIntoLines( std::string message );
 
 private:
   TestResultCollector *m_result;
-  ostream &m_stream;
+  std::ostream &m_stream;
 };
 
 

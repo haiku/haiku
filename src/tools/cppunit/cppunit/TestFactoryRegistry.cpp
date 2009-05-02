@@ -9,12 +9,16 @@
 #endif
 
 
+using std::map;
+using std::set;
+using std::string;
+
 namespace CppUnit {
 
 /** (Implementation) This class manages all the TestFactoryRegistry.
  *
  * Responsible for the life-cycle of the TestFactoryRegistry.
- * 
+ *
  * TestFactory registry must call wasDestroyed() to indicate that
  * a given TestRegistry was destroyed, and needDestroy() to
  * know if a given TestFactory need to be destroyed (was not already
@@ -71,13 +75,13 @@ NamedRegistries::getRegistry( string name )
   {
     TestFactoryRegistry *factory = new TestFactoryRegistry( name );
 #if defined(__POWERPC__) && (defined(__BEOS__) || defined(__HAIKU__))
-    m_registries.insert( 
+    m_registries.insert(
     	pair<
-  			const basic_string< char, char_traits< char>, allocator<char> >, 
+  			const basic_string< char, char_traits< char>, allocator<char> >,
   			CppUnit::TestFactoryRegistry*
     	>(
-    		name, factory 
-    	) 
+    		name, factory
+    	)
     );
 #else
     m_registries.insert( std::make_pair( name, factory ) );
@@ -89,7 +93,7 @@ NamedRegistries::getRegistry( string name )
 }
 
 
-void 
+void
 NamedRegistries::wasDestroyed( TestFactory *factory )
 {
   m_factoriesToDestroy.erase( factory );
@@ -97,7 +101,7 @@ NamedRegistries::wasDestroyed( TestFactory *factory )
 }
 
 
-bool 
+bool
 NamedRegistries::needDestroy( TestFactory *factory )
 {
   return m_destroyedFactories.count( factory ) == 0;
@@ -143,7 +147,7 @@ TestFactoryRegistry::getRegistry( const string &name )
 }
 
 
-void 
+void
 TestFactoryRegistry::registerFactory( const string &name,
                                       TestFactory *factory )
 {
@@ -151,7 +155,7 @@ TestFactoryRegistry::registerFactory( const string &name,
 }
 
 
-void 
+void
 TestFactoryRegistry::registerFactory( TestFactory *factory )
 {
     static int serialNumber = 1;
@@ -172,11 +176,11 @@ TestFactoryRegistry::makeTest()
 }
 
 
-void 
+void
 TestFactoryRegistry::addTestToSuite( TestSuite *suite )
 {
-  for ( Factories::iterator it = m_factories.begin(); 
-        it != m_factories.end(); 
+  for ( Factories::iterator it = m_factories.begin();
+        it != m_factories.end();
         ++it )
   {
     TestFactory *factory = (*it).second;

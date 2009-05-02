@@ -2,6 +2,8 @@
 #include <cppunit/NotEqualException.h>
 
 
+using std::string;
+
 namespace CppUnit
 {
 
@@ -10,17 +12,17 @@ namespace Asserter
 {
 
 
-void 
-fail( string message, 
+void
+fail( string message,
       SourceLine sourceLine )
 {
   throw Exception( message, sourceLine );
 }
 
 
-void 
-failIf( bool shouldFail, 
-        string message, 
+void
+failIf( bool shouldFail,
+        string message,
         SourceLine location )
 {
   if ( shouldFail )
@@ -28,23 +30,23 @@ failIf( bool shouldFail,
 }
 
 
-void 
-failNotEqual( string expected, 
-              string actual, 
+void
+failNotEqual( string expected,
+              string actual,
               SourceLine sourceLine,
               string additionalMessage )
 {
-  throw NotEqualException( expected, 
-                           actual, 
-                           sourceLine, 
+  throw NotEqualException( expected,
+                           actual,
+                           sourceLine,
                            additionalMessage );
 }
 
 
-void 
+void
 failNotEqualIf( bool shouldFail,
-                string expected, 
-                string actual, 
+                string expected,
+                string actual,
                 SourceLine sourceLine,
                 string additionalMessage )
 {

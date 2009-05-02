@@ -13,7 +13,7 @@ class TestResult;
  *
  * All test objects should be a subclass of Test.  Some test objects,
  * TestCase for example, represent one individual test.  Other test
- * objects, such as TestSuite, are comprised of several tests.  
+ * objects, such as TestSuite, are comprised of several tests.
  *
  * When a Test is run, the result is collected by a TestResult object.
  *
@@ -38,20 +38,20 @@ public:
     virtual int                   countTestCases () const     = 0;
 
     /*! \brief Returns the test name.
-     * 
+     *
      * Each test has a name.  This name may be used to find the
      * test in a suite or registry of tests.
      */
-    virtual string           getName () const            = 0;
+    virtual std::string           getName () const            = 0;
 
     /*! \brief Description of the test, for diagnostic output.
      *
      * The test description will typically include the test name,
      * but may have additional description.  For example, a test
-     * suite named <tt>complex_add</tt> may be described as 
+     * suite named <tt>complex_add</tt> may be described as
      * <tt>suite complex_add</tt>.
      */
-    virtual string           toString () const           = 0;
+    virtual std::string           toString () const           = 0;
 
 
 };

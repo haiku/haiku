@@ -3,12 +3,14 @@
 namespace CppUnit {
 
 
+using std::string;
+
 NotEqualException::NotEqualException( string expected,
-                                      string actual, 
+                                      string actual,
                                       SourceLine sourceLine ,
                                       string additionalMessage ) :
-    Exception( "Expected: " + expected + 
-                   ", but was: " + actual + 
+    Exception( "Expected: " + expected +
+                   ", but was: " + actual +
                    "." + additionalMessage ,
                sourceLine),
     m_expected( expected ),
@@ -24,8 +26,8 @@ NotEqualException::NotEqualException( string expected,
  */
 NotEqualException::NotEqualException( string expected,
                                       string actual,
-                                      long lineNumber, 
-                                      string fileName ) : 
+                                      long lineNumber,
+                                      string fileName ) :
     Exception( "Expected: " + expected + ", but was: " + actual,
                lineNumber,
                fileName ),
@@ -36,7 +38,7 @@ NotEqualException::NotEqualException( string expected,
 #endif
 
 
-NotEqualException::NotEqualException( const NotEqualException &other ) : 
+NotEqualException::NotEqualException( const NotEqualException &other ) :
     Exception( other ),
     m_expected( other.m_expected ),
     m_actual( other.m_actual ),
@@ -72,7 +74,7 @@ NotEqualException::clone() const
 }
 
 
-bool 
+bool
 NotEqualException::isInstanceOf( const Type &exceptionType ) const
 {
   return exceptionType == type()  ||
@@ -87,21 +89,21 @@ NotEqualException::type()
 }
 
 
-string 
+string
 NotEqualException::expectedValue() const
 {
   return m_expected;
 }
 
 
-string 
+string
 NotEqualException::actualValue() const
 {
   return m_actual;
 }
 
 
-string 
+string
 NotEqualException::additionalMessage() const
 {
   return m_additionalMessage;
