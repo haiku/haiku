@@ -2439,6 +2439,7 @@ nfs_std_ops(int32 op, ...)
 	}
 }
 
+
 fs_volume_ops sNFSVolumeOps = {
 	&fs_unmount,
 	&fs_rfsstat,
@@ -2465,6 +2466,7 @@ fs_volume_ops sNFSVolumeOps = {
 	NULL,	// &fs_rewind_query,
 };
 
+
 fs_vnode_ops sNFSVnodeOps = {
 	/* vnode operations */
 	&fs_walk,
@@ -2476,6 +2478,9 @@ fs_vnode_ops sNFSVnodeOps = {
 	NULL, 	// &fs_can_page
 	NULL,	// &fs_read_pages
 	NULL, 	// &fs_write_pages
+
+	NULL,	// io()
+	NULL,	// cancel_io()
 
 	NULL,	// &fs_get_file_map,
 
@@ -2557,4 +2562,3 @@ module_info *modules[] = {
 	(module_info *)&sNFSFileSystem,
 	NULL,
 };
-
