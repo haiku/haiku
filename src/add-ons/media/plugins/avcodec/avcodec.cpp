@@ -467,8 +467,13 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				media_header chunk_mh;
 				status_t err;
 				err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
+				if (err == B_LAST_BUFFER_ERROR) {
+					TRACE("Last Chunk with chunk size %ld\n",fChunkBufferSize);
+					fChunkBufferSize = 0;
+					return err;
+				}
 				if (err != B_OK || fChunkBufferSize < 0) {
-					TRACE("GetNextChunk error %ld\n",fChunkBufferSize);
+					printf("GetNextChunk error %ld\n",fChunkBufferSize);
 					fChunkBufferSize = 0;
 					break;
 				}
