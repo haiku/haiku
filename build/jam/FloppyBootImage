@@ -16,6 +16,15 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
+#HACK: remove when old ide code is removed!
+local ATA_ONLY = ;
+local IDE_ONLY = ;
+if $(HAIKU_ATA_STACK) = 1 {
+	ATA_ONLY = "" ;
+} else {
+	IDE_ONLY = "" ;
+}
+
 local NET_BOOT = 0 ;
 
 local BOOT_ADD_ONS_NET ;
@@ -32,8 +41,8 @@ BOOT_ADD_ONS_NET =
 ;
 }
 
-SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
-	config_manager agp_gart usb
+SYSTEM_ADD_ONS_BUS_MANAGERS = agp_gart $(ATA_ONLY)ata config_manager pci
+	$(IDE_ONLY)ide $(X86_ONLY)isa scsi usb
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 #cdda fat googlefs nfs ;
@@ -52,7 +61,7 @@ AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive system add-ons kernel generic
-	: ide_adapter locked_pool scsi_periph ;
+	: $(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph ;
 AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
@@ -102,9 +111,10 @@ AddFilesToFloppyBootArchive system add-ons kernel network protocols
 AddBootModuleSymlinksToFloppyBootArchive
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	$(PPC_ONLY)openpic
-	ide_adapter locked_pool scsi_periph
+	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
 	$(X86_ONLY)generic_x86
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+	it8211
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel session
