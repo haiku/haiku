@@ -155,7 +155,7 @@ BTranslatorRoster::Private::Private()
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
-	
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
 #else
@@ -193,7 +193,7 @@ BTranslatorRoster::Private::~Private()
 
 	while (iterator != fTranslators.end()) {
 		BTranslator* translator = iterator->second.translator;
-		
+
 		translator->fOwningRoster = NULL;
 			// we don't want to be notified about this anymore
 
@@ -553,7 +553,7 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 	if (status == B_OK) {
 		// If the translator add-on supports the post R4.5
 		// translator creation mechanism, keep loading translators
-		// until MakeNthTranslator stops returning them.		
+		// until MakeNthTranslator stops returning them.
 		BTranslator* translator = NULL;
 		int32 created = 0;
 		for (int32 n = 0; (translator = makeNthTranslator(n, image, 0)) != NULL; n++) {
@@ -627,7 +627,7 @@ status_t
 BTranslatorRoster::Private::StopWatching(BMessenger target)
 {
 	MessengerList::iterator iterator = fMessengers.begin();
-	
+
 	while (iterator != fMessengers.end()) {
 		if (*iterator == target) {
 			fMessengers.erase(iterator);
@@ -783,7 +783,7 @@ BTranslatorRoster::Private::GetAllTranslators(translator_id** _ids, int32* _coun
 	while (iterator != fTranslators.end()) {
 		array[count++] = iterator->first;
 		iterator++;
-	} 
+	}
 
 	*_ids = array;
 	*_count = count;
@@ -882,8 +882,9 @@ BTranslatorRoster::Private::_CheckHints(const translation_format* formats,
 	// scan for suitable format
 	for (int32 i = 0; i < formatsCount && formats[i].type; i++) {
 		if (formats[i].type == hintType
-			|| hintMIME && ((super && !strncmp(formats[i].MIME, hintMIME, super))
-				|| !strcmp(formats[i].MIME, hintMIME)))
+			|| (hintMIME
+				&& ((super && !strncmp(formats[i].MIME, hintMIME, super))
+					|| !strcmp(formats[i].MIME, hintMIME))))
 			return &formats[i];
 	}
 
@@ -1138,7 +1139,7 @@ BTranslatorRoster::~BTranslatorRoster()
 {
 	// If the default BTranslatorRoster is being
 	// deleted, set the pointer to the default
-	// BTranslatorRoster to NULL 
+	// BTranslatorRoster to NULL
 	if (sDefaultRoster == this)
 		sDefaultRoster = NULL;
 
@@ -1159,7 +1160,7 @@ BTranslatorRoster::Archive(BMessage* into, bool deep) const
 	status_t status = BArchivable::Archive(into, deep);
 	if (status != B_OK)
 		return status;
-	
+
 	return fPrivate->StoreTranslators(*into);
 }
 
@@ -1240,7 +1241,7 @@ BTranslatorRoster::AddTranslators(const char* path)
 		BTranslatorRoster
 
 	\return B_BAD_VALUE, if translator is NULL,
-		B_OK if all went well 
+		B_OK if all went well
 */
 status_t
 BTranslatorRoster::AddTranslator(BTranslator* translator)
@@ -1281,7 +1282,7 @@ BTranslatorRoster::IsTranslator(entry_ref* ref)
 
 /*!
 	This function determines which translator is best suited
-	to convert the data from \a source. 
+	to convert the data from \a source.
 
 	\param source the data to be identified
 	\param ioExtension the configuration data for the translator
@@ -1348,7 +1349,7 @@ BTranslatorRoster::GetTranslators(BPositionIO* source, BMessage* ioExtension,
 	Returns an array in \a _ids of all of the translators stored by this
 	object.
 	You must free the array using delete[] when you are done with it.
-	
+
 	\param _ids the array is stored there (you own the array).
 	\param _count number of IDs in the array.
 */
@@ -1385,7 +1386,7 @@ BTranslatorRoster::GetTranslatorInfo(translator_id id, const char** _name,
 
 	BAutolock locker(fPrivate);
 
-	BTranslator* translator = fPrivate->FindTranslator(id);	
+	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
@@ -1422,7 +1423,7 @@ BTranslatorRoster::GetInputFormats(translator_id id,
 
 	BAutolock locker(fPrivate);
 
-	BTranslator* translator = fPrivate->FindTranslator(id);	
+	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
@@ -1453,7 +1454,7 @@ BTranslatorRoster::GetOutputFormats(translator_id id,
 
 	BAutolock locker(fPrivate);
 
-	BTranslator* translator = fPrivate->FindTranslator(id);	
+	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
@@ -1573,7 +1574,7 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 	off_t pos = source->Seek(0, SEEK_SET);
 	if (pos == 0) {
 		translator_info info;
-		status = translator->Identify(source, NULL, ioExtension, &info, wantOutType);	
+		status = translator->Identify(source, NULL, ioExtension, &info, wantOutType);
 		if (status >= B_OK) {
 			off_t pos = source->Seek(0, SEEK_SET);
 			if (pos != 0)
@@ -1613,7 +1614,7 @@ BTranslatorRoster::MakeConfigurationView(translator_id id, BMessage* ioExtension
 
 	BAutolock locker(fPrivate);
 
-	BTranslator* translator = fPrivate->FindTranslator(id);	
+	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
@@ -1640,7 +1641,7 @@ BTranslatorRoster::GetConfigurationMessage(translator_id id, BMessage* ioExtensi
 
 	BAutolock locker(fPrivate);
 
-	BTranslator* translator = fPrivate->FindTranslator(id);	
+	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
