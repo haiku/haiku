@@ -24,7 +24,7 @@
 
 #include <cstdio>
 
-#if __GCC__ > 2
+#if __GNUC__ > 2
 using __gnu_cxx::hash;
 #endif
 
