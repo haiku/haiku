@@ -29,10 +29,9 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
+	clockconfig cmp comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	draggers driveinfo dstcheck du dumpcatalog
-	echo eject env error expand expr
+	draggers driveinfo dstcheck du echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd
 	funzip fwcontrol
@@ -40,8 +39,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
 	join
-	keymap kill less lessecho lesskey link linkcatkeys listarea listattr 
-	listimage listdev
+	keymap kill less lessecho lesskey link listarea listattr listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
 	modifiers mount mount_nfs mountvolume mv
@@ -70,8 +68,8 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network Printers 
-	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
+	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
+	ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLDirectMode GLTeapot Mandelbrot Pairs
@@ -82,7 +80,7 @@ SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
 	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
 	libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
-	libilmimf.so libiconv.so liblocale.so
+	libilmimf.so libiconv.so
 ;
 SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	net_server media_addon_server input_server app_server fake_app_server
@@ -347,11 +345,6 @@ spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
-
-# Locale kit language files
-local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
-local languages = [ Glob $(languageDir) : *.language ] ;
-AddFilesToHaikuImage system etc locale languages : $(languages) ;
 
 local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
