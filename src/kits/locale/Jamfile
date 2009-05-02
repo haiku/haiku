@@ -33,5 +33,5 @@ SharedLibrary liblocale.so
 	  PropertyFile.cpp
 	  strfmon.cpp
 	  UnicodeChar.cpp
-	: be
-;
+	: be $(TARGET_LIBSTDC++)
+	;
