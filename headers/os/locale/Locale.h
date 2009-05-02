@@ -6,8 +6,8 @@
 #include <Language.h>
 #include <Country.h>
 
-
 class BCatalog;
+class BLocaleRoster;
 class BString;
 
 
