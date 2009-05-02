@@ -17,6 +17,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
+#include <Box.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <MessageRunner.h>
@@ -46,20 +47,24 @@ MainWindow::MainWindow()
 		new BMessage(kMsgRevert), B_WILL_DRAW);
 	fRevertButton->SetEnabled(false);	
 
-	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
+//	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
+
+	BBox* box = new BBox(B_FANCY_BORDER, NULL);
 
 	fFontsView = new FontView();
 
-	tabView->AddTab(fFontsView);
+//	tabView->AddTab(fFontsView);
+	box->AddChild(fFontsView);
 
 	fFontsView->UpdateFonts();
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	const float kInset = 8;
+	const float kInset = 10;
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(tabView)
+		.Add(box)
+//		.Add(tabView)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(kInset))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.Add(fDefaultsButton)
