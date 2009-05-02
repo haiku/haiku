@@ -190,22 +190,18 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 				
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
+		TRACE("calculated fps=%ld\n", cookie->frame_count * 1000000LL / cookie->duration);
 		
 		// asf does not have a frame rate!  The extended descriptor defines an average time per frame which is generally useless.
-		
-		cookie->frames_per_sec_rate = cookie->frame_count;
-		cookie->frames_per_sec_scale = cookie->duration / 1000000LL;
-		TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
-		
-//		if (videoFormat.FrameScale && videoFormat.FrameRate) {
-//			cookie->frames_per_sec_rate = videoFormat.FrameRate;
-//			cookie->frames_per_sec_scale = videoFormat.FrameScale;
-//			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
-//		} else {
-//			cookie->frames_per_sec_rate = 25;
-//			cookie->frames_per_sec_scale = 1;
-//			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using fallback)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
-//		}
+		if (videoFormat.FrameScale && videoFormat.FrameRate) {
+			cookie->frames_per_sec_rate = videoFormat.FrameRate;
+			cookie->frames_per_sec_scale = videoFormat.FrameScale;
+			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using average time per frame)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
+		} else {
+			cookie->frames_per_sec_rate = cookie->frame_count;
+			cookie->frames_per_sec_scale = cookie->duration / 1000000LL;
+			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (duration over frame count)\n", cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
+		}
 
 		description.family = B_AVI_FORMAT_FAMILY;
 		description.u.avi.codec = videoFormat.Compression;

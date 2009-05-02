@@ -156,10 +156,6 @@ ASFFileReader::getAudioFormat(uint32 streamIndex, ASFAudioFormat *format)
 			format->BitsPerSample = audioHeader->wBitsPerSample;
 			format->extraDataSize = audioHeader->cbSize;
 			format->extraData = audioHeader->data;
-		
-			if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
-				printf("num payloads for audio %d\n",stream->extended->num_payload_ext);
-			}
 
 			return true;
 		}
@@ -189,8 +185,8 @@ ASFFileReader::getVideoFormat(uint32 streamIndex, ASFVideoFormat *format)
 			
 			if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
 				format->FrameScale = stream->extended->avg_time_per_frame;
-				format->FrameRate = 10000000;
-				printf("num payloads for video %d\n",stream->extended->num_payload_ext);
+				format->FrameRate = 10000000L;
+				printf("num avg time per frame for video %Ld\n",stream->extended->avg_time_per_frame);
 			}
 		
 			return true;
@@ -221,7 +217,7 @@ ASFFileReader::getStreamDuration(uint32 streamIndex)
 		}
 	}
 
-	return asf_get_duration(asfFile) / 10;
+	return asf_get_duration(asfFile) / 10L;
 }
 
 uint32
@@ -303,16 +299,16 @@ ASFFileReader::ParseIndex() {
 	while (asf_get_packet(asfFile, packet) > 0) {
 		for (int i=0;i<packet->payload_count;i++) {
 			payload = (asf_payload_t *)(&packet->payloads[i]);
-//			printf("Payload %d Stream %d Keyframe %d send time %ld pts %ld id %d size %d\n",i+1,payload->stream_number,payload->key_frame, packet->send_time * 1000L, payload->pts * 1000L, payload->media_object_number, payload->datalen);
+	//		printf("Payload %d Stream %d Keyframe %d send time %Ld pts %Ld id %d size %d\n",i+1,payload->stream_number,payload->key_frame, 1000L * bigtime_t(packet->send_time), 1000L * bigtime_t(payload->pts), payload->media_object_number, payload->datalen);
 			if (payload->stream_number < streams.size()) {
-				streams[payload->stream_number].AddPayload(payload->media_object_number, payload->key_frame, packet->send_time * 1000, payload->datalen, false);
+				streams[payload->stream_number].AddPayload(payload->media_object_number, payload->key_frame, 1000L * payload->pts, payload->datalen, false);
 			}
 		}
 	}
 	
 	for (uint32 i=0;i<streams.size();i++) {
 		streams[i].AddPayload(0, false, 0, 0, true);
-		streams[i].setDuration((packet->send_time + packet->duration) * 1000);
+		streams[i].setDuration(1000L * (packet->send_time + packet->duration));
 	}
 	
 	if (asf_seek_to_msec(asfFile,0) < 0) {
@@ -326,7 +322,9 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 {
 	// Ok, Need to join payloads together that have the same payload->media_object_number
 	asf_payload_t *payload;
-
+	int64_t seekResult;
+	int packetSize;
+	
 	IndexEntry indexEntry = GetIndex(streamIndex, pFrameNo);
 	
 	if (indexEntry.noPayloads == 0) {
@@ -334,16 +332,42 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 		return false;
 	}
 	
-	while (packet->send_time * 1000 < indexEntry.pts) {
-		if (asf_get_packet(asfFile, packet) < 0) {
-			return false;
-		}
-	}
+//	printf("Stream %ld need pts %Ld, packet start %Ld packet end %Ld\n",streamIndex,indexEntry.pts,1000LL * packet->send_time,1000LL * (packet->send_time + packet->duration));
 
-	if (packet->send_time * 1000 > indexEntry.pts) {
-		// seek back to pts
-		printf("seeking back to %Ld status %Ld\n",indexEntry.pts, asf_seek_to_msec(asfFile, indexEntry.pts/1000));
-		if (asf_get_packet(asfFile, packet) < 0) {
+	if (1000LL * packet->send_time > indexEntry.pts || 1000LL * (packet->send_time + packet->duration) < indexEntry.pts) {
+		seekResult = asf_seek_to_msec(asfFile, indexEntry.pts/1000);
+		if (seekResult >= 0) {
+//			printf("Stream %ld seeked to %Ld got %Ld\n",streamIndex,indexEntry.pts, 1000L * seekResult);
+			packetSize = asf_get_packet(asfFile, packet);
+			if (packetSize <= 0) {
+				printf("Failed to Get Packet after seek result (%d)\n",packetSize);
+				return false;
+			}
+		} else if (seekResult == ASF_ERROR_SEEKABLE) {
+			// Stream not seekeable.  Is what we want forward in the stream, if so seek using Get Packet
+			if (1000LL * (packet->send_time + packet->duration) < indexEntry.pts) {
+				while (1000LL * (packet->send_time + packet->duration) < indexEntry.pts) {
+					packetSize = asf_get_packet(asfFile, packet);
+					if (packetSize <= 0) {
+						printf("Failed to Seek using Get Packet result (%d)\n",packetSize);
+						return false;
+					}
+//					printf("Stream %ld searching forward for pts %Ld, got packet start %Ld packet end %Ld\n",streamIndex,indexEntry.pts,1000LL * packet->send_time,1000LL * (packet->send_time + packet->duration));
+				}
+			} else {
+				// seek to 0 and read forward, going to be a killer on performance
+				seekResult = asf_seek_to_msec(asfFile, 0);
+				while (1000LL * (packet->send_time + packet->duration) < indexEntry.pts) {
+					packetSize = asf_get_packet(asfFile, packet);
+					if (packetSize <= 0) {
+						printf("Failed to Seek using Get Packet result (%d)\n",packetSize);
+						return false;
+					}
+//					printf("Stream %ld searching forward from 0 for pts %Ld, got packet start %Ld packet end %Ld\n",streamIndex,indexEntry.pts,1000LL * packet->send_time,1000LL * (packet->send_time + packet->duration));
+				}
+			}
+		} else {
+			printf("Seek failed\n");
 			return false;
 		}
 	}
@@ -373,7 +397,8 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	}
 	
 	// combine packets into a single buffer
-	while ((asf_get_packet(asfFile, packet) > 0) && (expectedPayloads > 0)) {
+	packetSize = asf_get_packet(asfFile, packet);
+	while ((packetSize > 0) && (expectedPayloads > 0)) {
 		for (int i=0;i<packet->payload_count;i++) {
 			payload = (asf_payload_t *)(&packet->payloads[i]);
 			// find the first payload matching the id we want and then
@@ -388,6 +413,13 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 				}
 			}
 		}
+		packetSize = asf_get_packet(asfFile, packet);
+	}
+	
+	if (packetSize == ASF_ERROR_EOF) {
+		printf("Unexpected EOF file truncated?\n");
+	} else {
+		printf("EOF? %ld,%d\n",expectedPayloads, packetSize);
 	}
 	
 	return false;

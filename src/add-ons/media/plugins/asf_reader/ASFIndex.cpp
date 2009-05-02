@@ -134,13 +134,17 @@ StreamEntry::AddPayload(uint32 id, bool keyFrame, bigtime_t pts, uint32 dataSize
 {
 	if (isLast) {
 		maxPTS = indexEntry.pts;
-		index.push_back(indexEntry);
-		printf("Stream Index Loaded for Stream %d Max Index %ld Max PTS %Ld\n",streamIndex, frameCount, maxPTS);
+		if (frameCount > 0) {
+			index.push_back(indexEntry);
+//			printf("Stream %d added Index %ld PTS %Ld payloads %d\n",streamIndex, indexEntry.frameNo, indexEntry.pts, indexEntry.noPayloads);
+			printf("Stream Index Loaded for Stream %d Max Frame %ld Max PTS %Ld size %ld\n",streamIndex, frameCount-1, maxPTS, index.size());
+		}
 	} else {
-		if (id > lastID) {
-			if (lastID != 0) {
+		if (id != lastID) {
+			if (frameCount != 0) {
 				// add indexEntry to Index
 				index.push_back(indexEntry);
+//				printf("Stream %d added Index %ld PTS %Ld payloads %d\n",streamIndex, indexEntry.frameNo, indexEntry.pts, indexEntry.noPayloads);
 			}
 			lastID = id;
 			indexEntry.Clear();
