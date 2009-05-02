@@ -1,14 +1,10 @@
 #ifndef _DEFAULT_CATALOG_H_
 #define _DEFAULT_CATALOG_H_
 
-#ifdef __MWERKS__
-#	include <hashmap.h>
-#else
-# if __GNUC__ > 2
+#if __GNUC__ > 2
 #	include <ext/hash_map>
-# else
+#else
 #	include <hash_map>
-# endif
 #endif
 
 #include <assert.h>
@@ -22,17 +18,6 @@ class BFile;
 namespace BPrivate {
 	struct CatKey;
 }
-
-/*
- * the hash-access functor which is being used to access the hash-value
- * stored inside of each key.
- */
-#ifdef __MWERKS__
-	// Codewarrior doesn't provide this declaration, so we do:
-template <class T> struct hash : public unary_function<T,size_t> {
-	size_t operator() (const T &key) const;
-};
-#endif
 
 #if __GNUC__ > 2
 namespace __gnu_cxx {
