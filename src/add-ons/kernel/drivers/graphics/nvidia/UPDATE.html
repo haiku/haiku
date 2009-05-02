@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.88, Rudolf)</h1></p>
+<p><h1>head (SVN 0.89, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -18,6 +18,7 @@
 <li>Added 'block_acc' option in nvidia.settings to completely disable the acceleration engine. Use this as a work-around if the acceleration engine misbehaves.
 <li>Fixed card/system hanging after trying to log LVDS/TMDS distinction info. This (at least) fixes one NV34 trying to startup after a failed kernel VESA modeswitch without using the driver's coldstart option. Might very well help on other type cards too.
 <li>HDTV video upto/including 1920x1080p can now be played back using overlay on Geforce cards where overlay is supported. On TNT1/TNT2/TNT2-M64 this can't be done and bitmap output is used.
+<li>Added partial DDC/EDID support: dumping monitor specs to logfile only for now.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>

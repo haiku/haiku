@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 
 StaticLibrary libnvidia_engine.a :
 	nv_acc.c
@@ -20,4 +21,5 @@ StaticLibrary libnvidia_engine.a :
 	nv_i2c.c
 	nv_info.c
 	nv_support.c
-	;
+	:
+;

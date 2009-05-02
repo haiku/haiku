@@ -34,6 +34,8 @@ bool i2c_writebyte (uint8 BusNR, uint8 byte);
 void i2c_readbuffer (uint8 BusNR, uint8* buf, uint8 size);
 void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size);
 status_t i2c_init(void);
+status_t i2c_ReadEDID(uint8 BusNR, edid1_info *edid);
+void i2c_TestEDID(void);
 
 /* card info functions */
 status_t parse_pins(void);

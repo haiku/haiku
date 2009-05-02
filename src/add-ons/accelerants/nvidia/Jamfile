@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
 Addon nvidia.accelerant :
@@ -18,7 +19,7 @@ Addon nvidia.accelerant :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: libnvidia_engine.a
+	: libnvidia_engine.a libaccelerantscommon.a
 ;
 
 Package haiku-nvidia-cvs :

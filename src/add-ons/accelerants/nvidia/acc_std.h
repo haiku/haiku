@@ -8,9 +8,15 @@
 
 #include <stdio.h>
 #include <sys/ioctl.h>
+
+/* DDC/EDID library */
+//#include <create_display_modes.h>
+#include <ddc.h>
+//#include <edid.h>
+
+/* Nvidia driver */
 #include "DriverInterface.h"
 #include "nv_globals.h"
-//apsed #include "nv_extern.h"
 #include "nv_proto.h"
 #include "be_driver_proto.h"
 
