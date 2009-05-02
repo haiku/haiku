@@ -486,6 +486,7 @@ AboutView::AboutView(const BRect &rect)
 		"David Dengg\n"
 		"John Drinkwater\n"
 		"Cian Duffy\n"
+		"Mark Erben\n"
 		"Christian Fasshauer\n"
 		"Andreas Färber\n"
 		"Marc Flerackers\n"
