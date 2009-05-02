@@ -24,7 +24,10 @@
 
 #include <cstdio>
 
+#if __GCC__ > 2
 using __gnu_cxx::hash;
+#endif
+
 using std::auto_ptr;
 using std::min;
 using std::max;
