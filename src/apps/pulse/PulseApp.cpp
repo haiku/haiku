@@ -125,7 +125,7 @@ PulseApp::BuildPulse()
 	if (prefs->window_mode == DESKBAR_MODE && LoadInDeskbar()) {
 		PostMessage(new BMessage(B_QUIT_REQUESTED));
 		return;
-	} else
+	} else if (prefs->window_mode == DESKBAR_MODE)
 		prefs->window_mode = NORMAL_WINDOW_MODE;
 
 	PulseWindow *pulseWindow = NULL;
