@@ -24,10 +24,14 @@ public:
 			const char*			MenuLabel() const;
 			const char*			Name() const;
 
+			void				SetIsValidTarget(bool isValidTarget);
+			bool				IsValidTarget() const;
+
 private:
 			partition_id		fID;
 			char*				fMenuLabel;
 			char*				fName;
+			bool				fIsValidTarget;
 };
 
 #endif // PARTITION_MENU_ITEM_H_

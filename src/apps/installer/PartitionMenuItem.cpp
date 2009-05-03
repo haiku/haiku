@@ -12,11 +12,12 @@
 PartitionMenuItem::PartitionMenuItem(const char* name, const char* label,
 		const char* menuLabel, BMessage* message, partition_id id)
 	:
-	BMenuItem(label, message)
+	BMenuItem(label, message),
+	fID(id),
+	fMenuLabel(strdup(menuLabel)),
+	fName(strdup(name)),
+	fIsValidTarget(true)
 {
-	fID = id;
-	fMenuLabel = strdup(menuLabel);
-	fName = strdup(name);
 }
 
 
@@ -37,13 +38,27 @@ PartitionMenuItem::ID() const
 const char*
 PartitionMenuItem::MenuLabel() const
 {
-	return fMenuLabel ? fMenuLabel : Label();
+	return fMenuLabel != NULL ? fMenuLabel : Label();
 }
 
 
 const char*
 PartitionMenuItem::Name() const
 {
-	return fName ? fName : Label();
+	return fName != NULL ? fName : Label();
+}
+
+
+void
+PartitionMenuItem::SetIsValidTarget(bool isValidTarget)
+{
+	fIsValidTarget = isValidTarget;
+}
+
+
+bool
+PartitionMenuItem::IsValidTarget() const
+{
+	return fIsValidTarget;
 }
 

@@ -633,18 +633,17 @@ InstallerWindow::_UpdateControls()
 	}
 	fSrcMenuField->MenuItem()->SetLabel(label.String());
 
-	if (srcItem) {
-		// Prevent the user from having picked the same partition as source
-		// and destination.
-		for (int32 i = fDestMenu->CountItems() - 1; i >= 0; i--) {
-			PartitionMenuItem* dstItem
-				= (PartitionMenuItem*)fDestMenu->ItemAt(i);
-			if (dstItem->ID() == srcItem->ID()) {
-				dstItem->SetEnabled(false);
-				dstItem->SetMarked(false);
-			} else
-				dstItem->SetEnabled(true);
-		}
+	// Disable any unsuitable target items
+	for (int32 i = fDestMenu->CountItems() - 1; i >= 0; i--) {
+		PartitionMenuItem* dstItem
+			= (PartitionMenuItem*)fDestMenu->ItemAt(i);
+		if (srcItem != NULL && dstItem->ID() == srcItem->ID()) {
+			// Prevent the user from having picked the same partition as source
+			// and destination.
+			dstItem->SetEnabled(false);
+			dstItem->SetMarked(false);
+		} else
+			dstItem->SetEnabled(dstItem->IsValidTarget());
 	}
 
 	PartitionMenuItem* dstItem = (PartitionMenuItem*)fDestMenu->FindMarked();

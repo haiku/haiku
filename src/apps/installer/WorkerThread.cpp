@@ -42,32 +42,34 @@
 
 const char BOOT_PATH[] = "/boot";
 
-extern void SizeAsString(off_t size, char *string);
+extern void SizeAsString(off_t size, char* string);
 
 
 const uint32 MSG_START_INSTALLING = 'eSRT';
 
 
-class SourceVisitor : public BDiskDeviceVisitor
-{
-	public:
-		SourceVisitor(BMenu *menu);
-		virtual bool Visit(BDiskDevice *device);
-		virtual bool Visit(BPartition *partition, int32 level);
-	private:
-		BMenu *fMenu;
+class SourceVisitor : public BDiskDeviceVisitor {
+public:
+	SourceVisitor(BMenu* menu);
+	virtual bool Visit(BDiskDevice* device);
+	virtual bool Visit(BPartition* partition, int32 level);
+
+private:
+	BMenu* fMenu;
 };
 
 
-class TargetVisitor : public BDiskDeviceVisitor
-{
-	public:
-		TargetVisitor(BMenu *menu);
-		virtual bool Visit(BDiskDevice *device);
-		virtual bool Visit(BPartition *partition, int32 level);
-	private:
-		void _MakeLabel(BPartition *partition, char *label, char *menuLabel);
-		BMenu *fMenu;
+class TargetVisitor : public BDiskDeviceVisitor {
+public:
+	TargetVisitor(BMenu* menu);
+	virtual bool Visit(BDiskDevice* device);
+	virtual bool Visit(BPartition* partition, int32 level);
+
+private:
+	void _MakeLabel(BPartition* partition, char* label, char* menuLabel,
+		bool showContentType);
+
+	BMenu* fMenu;
 };
 
 
@@ -532,13 +534,6 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
 
-	if (partition->ContentType() == NULL
-		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0) {
-		// Except only valid BFS partitions
-		printf("  not BFS\n");
-		return false;
-	}
-
 	if (partition->ContentSize() < 20 * 1024 * 1024) {
 		// reject partitions which are too small anyways
 		// TODO: Could depend on the source size
@@ -556,31 +551,46 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	// TODO: After running DriveSetup and doing another scan, it would
 	// be great to pick the partition which just appeared!
 
+	// Only BFS partitions are valid targets, but we want to display the
+	// other partitions as well, in order not to irritate the user.
+	bool isValidTarget = partition->ContentType() != NULL
+		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0;
+
 	char label[255], menuLabel[255];
-	_MakeLabel(partition, label, menuLabel);
-	fMenu->AddItem(new PartitionMenuItem(partition->ContentName(), label,
-		menuLabel, new BMessage(TARGET_PARTITION), partition->ID()));
+	_MakeLabel(partition, label, menuLabel, !isValidTarget);
+	PartitionMenuItem* item = new PartitionMenuItem(partition->ContentName(),
+		label, menuLabel, new BMessage(TARGET_PARTITION), partition->ID());
+
+	item->SetIsValidTarget(isValidTarget);
+
+
+	fMenu->AddItem(item);
 	return false;
 }
 
 
 void
-TargetVisitor::_MakeLabel(BPartition *partition, char *label, char *menuLabel)
+TargetVisitor::_MakeLabel(BPartition* partition, char* label, char* menuLabel,
+	bool showContentType)
 {
 	char size[15];
 	SizeAsString(partition->ContentSize(), size);
+
 	BPath path;
 	partition->GetPath(&path);
 
-	// TODO: Reenable the printing of the content type once Haiku supports
-	// installing to other file systems than BFS.
-//	sprintf(label, "%s - %s [%s] [%s]", partition->ContentName(),
-//		size, partition->ContentType(), path.Path());
-//	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size,
-//		partition->ContentType());
+	if (showContentType) {
+		const char* type = partition->ContentType();
+		if (type == NULL)
+			type = "Unknown Type";
+	
+		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
+			path.Path(), type);
+	} else {
+		sprintf(label, "%s - %s [%s]", partition->ContentName(), size,
+			path.Path());
+	}
 
-	sprintf(label, "%s - %s - %s", partition->ContentName(), size,
-		path.Path());
 	sprintf(menuLabel, "%s - %s", partition->ContentName(), size);
 }
 
