@@ -1504,7 +1504,7 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 					byte = 0;
 
 				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| byte == B_ZENKAKU_HANKAKU) {
+					|| byte == B_HANKAKU_ZENKAKU) {
 					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
 
 					// this event isn't sent to the user
