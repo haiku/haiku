@@ -410,6 +410,10 @@ TBeMenu::ClearMenuBuildingState()
 void
 TBeMenu::ResetTargets()
 {
+	// This method does not recurse into submenus
+ 	// and does not affect menu items in submenus.
+	// (e.g. "Restart System" and "Power Off")
+
 	BNavMenu::ResetTargets();
 
 	// if we are dragging, set the target to whatever was set
@@ -452,7 +456,8 @@ TBeMenu::ResetTargets()
 				case CMD_REBOOT_SYSTEM:
 				case CMD_SUSPEND_SYSTEM:
 				case CMD_SHUTDOWN_SYSTEM:
-					// restart/shutdown
+					// Unreachable cases.
+					// See comment at start of method.
 #ifdef __HAIKU__
 					item->SetTarget(be_app);
 #else
