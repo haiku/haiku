@@ -4,7 +4,7 @@ UsePrivateHeaders shared storage tracker ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 Application Installer : 
-	CopyEngine2.cpp
+	CopyEngine.cpp
 	InstallerApp.cpp
 	InstallerWindow.cpp
 	PackageViews.cpp

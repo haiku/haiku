@@ -1,4 +1,9 @@
-#include "CopyEngine2.h"
+/*
+ * Copyright 2008-2009, Stephan Aßmus <superstippi@gmx.de>
+ *  All rights reserved. Distributed under the terms of the MIT License.
+ */
+
+#include "CopyEngine.h"
 
 #include <new>
 
@@ -20,7 +25,7 @@
 using std::nothrow;
 
 
-CopyEngine2::CopyEngine2(const BMessenger& messenger, BMessage* message)
+CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
 	:
 	fBufferQueue(),
 	fWriterThread(-1),
@@ -50,7 +55,7 @@ CopyEngine2::CopyEngine2(const BMessenger& messenger, BMessage* message)
 }
 
 
-CopyEngine2::~CopyEngine2()
+CopyEngine::~CopyEngine()
 {
 	while (fBufferQueue.Size() > 0)
 		snooze(10000);
@@ -66,7 +71,7 @@ CopyEngine2::~CopyEngine2()
 
 
 status_t
-CopyEngine2::CopyFolder(const char* source, const char* destination,
+CopyEngine::CopyFolder(const char* source, const char* destination,
 	BLocker* locker)
 {
 	fBytesRead = 0;
@@ -101,7 +106,7 @@ printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
 
 
 status_t
-CopyEngine2::CopyFile(const BEntry& _source, const BEntry& _destination,
+CopyEngine::CopyFile(const BEntry& _source, const BEntry& _destination,
 	BLocker* locker)
 {
 	AutoLocker<BLocker> lock(locker);
@@ -184,7 +189,7 @@ printf("CopyFile - cancled\n");
 
 
 status_t
-CopyEngine2::_CollectCopyInfo(const char* _source, int32& level)
+CopyEngine::_CollectCopyInfo(const char* _source, int32& level)
 {
 	level++;
 
@@ -232,7 +237,7 @@ CopyEngine2::_CollectCopyInfo(const char* _source, int32& level)
 
 
 status_t
-CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
+CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 	int32& level, BLocker* locker)
 {
 	level++;
@@ -378,7 +383,7 @@ CopyEngine2::_CopyFolder(const char* _source, const char* _destination,
 
 
 void
-CopyEngine2::_UpdateProgress()
+CopyEngine::_UpdateProgress()
 {
 	if (fMessage != NULL) {
 		BMessage message(*fMessage);
@@ -394,7 +399,7 @@ CopyEngine2::_UpdateProgress()
 
 
 bool
-CopyEngine2::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
+CopyEngine::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
 	int32 level) const
 {
 	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
@@ -412,16 +417,16 @@ CopyEngine2::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
 
 
 int32
-CopyEngine2::_WriteThreadEntry(void* cookie)
+CopyEngine::_WriteThreadEntry(void* cookie)
 {
-	CopyEngine2* engine = (CopyEngine2*)cookie;
+	CopyEngine* engine = (CopyEngine*)cookie;
 	engine->_WriteThread();
 	return B_OK;
 }
 
 
 void
-CopyEngine2::_WriteThread()
+CopyEngine::_WriteThread()
 {
 	bigtime_t bufferWaitTimeout = 100000;
 

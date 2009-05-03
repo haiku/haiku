@@ -23,7 +23,7 @@
 #include <VolumeRoster.h>
 
 #include "AutoLocker.h"
-#include "CopyEngine2.h"
+#include "CopyEngine.h"
 #include "InstallerWindow.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
@@ -246,7 +246,7 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 	entry_ref testRef;
 
 	BMessenger messenger(fWindow);
-	CopyEngine2 engine(messenger, new BMessage(MSG_STATUS_MESSAGE));
+	CopyEngine engine(messenger, new BMessage(MSG_STATUS_MESSAGE));
 
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
 	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();

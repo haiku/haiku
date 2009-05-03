@@ -1,5 +1,9 @@
-#ifndef COPY_ENGINE_2_H
-#define COPY_ENGINE_2_H
+/*
+ * Copyright 2008-2009, Stephan Aßmus <superstippi@gmx.de>
+ *  All rights reserved. Distributed under the terms of the MIT License.
+ */
+#ifndef COPY_ENGINE_H
+#define COPY_ENGINE_H
 
 
 #include <stdlib.h>
@@ -15,11 +19,11 @@ class BLocker;
 class BMessage;
 class BMessenger;
 
-class CopyEngine2 {
+class CopyEngine {
 public:
-								CopyEngine2(const BMessenger& messenger,
+								CopyEngine(const BMessenger& messenger,
 									BMessage* message);
-	virtual						~CopyEngine2();
+	virtual						~CopyEngine();
 
 			status_t			CopyFolder(const char* source,
 									const char* destination,
