@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -899,7 +899,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 			bplustree_node* newDuplicate;
 			status = cachedDuplicate.Allocate(transaction, &newDuplicate,
 				&offset);
-			if (status < B_OK)
+			if (status != B_OK)
 				RETURN_ERROR(status);
 
 			// link the two nodes together
@@ -921,8 +921,8 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 	if (_FindFreeDuplicateFragment(transaction, node, cachedDuplicate,
 			&offset, &fragment, &fragmentIndex) != B_OK) {
 		// allocate a new duplicate fragment node
-		if ((status = cachedDuplicate.Allocate(transaction, &fragment,
-				&offset)) < B_OK)
+		status = cachedDuplicate.Allocate(transaction, &fragment, &offset);
+		if (status != B_OK)
 			RETURN_ERROR(status);
 
 		memset(fragment, 0, fNodeSize);
@@ -1692,19 +1692,10 @@ BPlusTree::Remove(Transaction& transaction, const uint8* key, uint16 keyLength,
 			// first round, check for duplicate entries
 			status_t status = _FindKey(node, key, keyLength,
 				&nodeAndKey.keyIndex);
-			if (status < B_OK)
+			if (status != B_OK)
 				RETURN_ERROR(status);
 
-			// If we will remove the last key, the iterator will be set
-			// to the next node after the current - if there aren't any
-			// more nodes, we need a way to prevent the TreeIterators to
-			// touch the old node again, we use BPLUSTREE_FREE for this
-			off_t next = node->RightLink() == BPLUSTREE_NULL
-				? BPLUSTREE_FREE : node->RightLink();
-			_UpdateIterators(nodeAndKey.nodeOffset, node->NumKeys() == 1
-				? next : BPLUSTREE_NULL, nodeAndKey.keyIndex, 0 , -1);
-
-			// is this a duplicate entry?
+			// Is this a duplicate entry?
 			if (bplustree_node::IsDuplicate(BFS_ENDIAN_TO_HOST_INT64(
 					node->Values()[nodeAndKey.keyIndex]))) {
 				if (fAllowDuplicates) {
@@ -1715,6 +1706,18 @@ BPlusTree::Remove(Transaction& transaction, const uint8* key, uint16 keyLength,
 				FATAL(("dupliate node found where no duplicates are "
 					"allowed!\n"));
 				RETURN_ERROR(B_ERROR);
+			} else {
+				if (node->Values()[nodeAndKey.keyIndex] != value)
+					return B_ENTRY_NOT_FOUND;
+
+				// If we will remove the last key, the iterator will be set
+				// to the next node after the current - if there aren't any
+				// more nodes, we need a way to prevent the TreeIterators to
+				// touch the old node again, we use BPLUSTREE_FREE for this
+				off_t next = node->RightLink() == BPLUSTREE_NULL
+					? BPLUSTREE_FREE : node->RightLink();
+				_UpdateIterators(nodeAndKey.nodeOffset, node->NumKeys() == 1
+					? next : BPLUSTREE_NULL, nodeAndKey.keyIndex, 0 , -1);
 			}
 		}
 
