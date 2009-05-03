@@ -1478,7 +1478,7 @@ BScrollBar::_ButtonFor(BPoint where) const
 	}
 
 	BRect rect(bounds.left, bounds.top,
-			   bounds.left + buttonSize - 1.0, bounds.top + buttonSize - 1.0);
+			   bounds.left + buttonSize, bounds.top + buttonSize);
 
 	if (fOrientation == B_VERTICAL) {
 		if (rect.Contains(where))
