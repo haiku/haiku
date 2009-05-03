@@ -7,7 +7,7 @@ resource(2, "META:S:DESC") #'MSDC' "Bookmark";
 
 resource(3, "META:L:DESC") #'MLDC' "Bookmark for a web page";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Be-NPOS";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
 
 resource(5, "META:ICON") #'VICN' array {
 	$"6E63696608010100006B02001602BA6666BB33323B3332BA6666480CCD4BD333"
