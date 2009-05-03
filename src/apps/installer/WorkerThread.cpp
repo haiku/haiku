@@ -388,6 +388,25 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 
 	_LaunchInitScript(targetDirectory);
 
+	// let the engine collect information for the progress bar later on
+	engine.ResetTargets();
+	err = engine.CollectTargets(srcDirectory.Path());
+	if (err != B_OK)
+		goto error;
+
+	// collect selected packages also
+	if (fPackages) {
+		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		int32 count = fPackages->CountItems();
+		for (int32 i = 0; i < count; i++) {
+			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
+			BPath packageDir(pkgRootDir.Path(), p->Folder());
+			err = engine.CollectTargets(packageDir.Path());
+			if (err != B_OK)
+				goto error;
+		}
+	}
+
 	// copy source volume
 	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
 		fCancelLock);
@@ -396,11 +415,11 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 
 	// copy selected packages
 	if (fPackages) {
-		srcDirectory.Append(PACKAGES_DIRECTORY);
+		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
-			BPath packageDir(srcDirectory.Path(), p->Folder());
+			BPath packageDir(pkgRootDir.Path(), p->Folder());
 			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
 				fCancelLock);
 			if (err != B_OK)

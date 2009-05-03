@@ -70,9 +70,8 @@ CopyEngine::~CopyEngine()
 }
 
 
-status_t
-CopyEngine::CopyFolder(const char* source, const char* destination,
-	BLocker* locker)
+void
+CopyEngine::ResetTargets()
 {
 	fBytesRead = 0;
 	fItemsCopied = 0;
@@ -87,10 +86,27 @@ CopyEngine::CopyFolder(const char* source, const char* destination,
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
 
+	if (fMessage) {
+		BMessage message(*fMessage);
+		message.AddString("status", "Collecting copy information.");
+		fMessenger.SendMessage(&message);
+	}
+}
+
+
+status_t
+CopyEngine::CollectTargets(const char* source)
+{
 	int32 level = 0;
-	status_t ret = _CollectCopyInfo(source, level);
-	if (ret < B_OK)
-		return ret;
+	return _CollectCopyInfo(source, level);
+}
+
+
+status_t
+CopyEngine::CopyFolder(const char* source, const char* destination,
+	BLocker* locker = NULL)
+{
+	printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
 
 	if (fMessage) {
 		BMessage message(*fMessage);
@@ -98,9 +114,7 @@ CopyEngine::CopyFolder(const char* source, const char* destination,
 		fMessenger.SendMessage(&message);
 	}
 
-printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
-
-	level = 0;
+	int32 level = 0;
 	return _CopyFolder(source, destination, level, locker);
 }
 

@@ -25,6 +25,9 @@ public:
 									BMessage* message);
 	virtual						~CopyEngine();
 
+			void				ResetTargets();
+			status_t			CollectTargets(const char* source);
+
 			status_t			CopyFolder(const char* source,
 									const char* destination,
 									BLocker* locker = NULL);

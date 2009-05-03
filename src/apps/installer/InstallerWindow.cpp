@@ -359,8 +359,18 @@ InstallerWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_RESET:
+		{
 			delete fCopyEngineLock;
 			fCopyEngineLock = NULL;
+
+			status_t error;
+			if (msg->FindInt32("error", &error) == B_OK) {
+				char errorMessage[2048];
+				snprintf(errorMessage, sizeof(errorMessage), "An error was "
+					"encountered and the installation was not completed:\n\n"
+					"Error:  %s", strerror(error));
+				(new BAlert("error", errorMessage, "Ok"))->Go();
+			}
 
 			fInstallStatus = kReadyForInstall;
 			fBeginButton->SetEnabled(true);
@@ -372,6 +382,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 
 			fBeginButton->SetLabel("Begin");
 			break;
+		}
 		case START_SCAN:
 			_ScanPartitions();
 			break;
@@ -530,7 +541,7 @@ InstallerWindow::QuitRequested()
 	if (fDriveSetupLaunched) {
 		(new BAlert("driveSetup",
 			"Please close the DriveSetup window before closing the "
-			"Installer window.", "OK"))->Go();
+			"Installer window.", "Ok"))->Go();
 		return false;
 	}
 	_QuitCopyEngine(false);
