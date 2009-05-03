@@ -770,8 +770,12 @@ set_page_state_nolock(vm_page *page, int pageState)
 		if (sPageDeficit > 0)
 			sFreePageCondition.NotifyOne();
 
-		if (pageState != PAGE_STATE_INACTIVE && page->cache != NULL)
-			panic("to be freed page %p has cache", page);
+		if (pageState != PAGE_STATE_INACTIVE) {
+			if (page->cache != NULL)
+				panic("to be freed page %p has cache", page);
+			if (!page->mappings.IsEmpty() || page->wired_count > 0)
+				panic("to be freed page %p has mappings", page);
+		}
 	}
 	if (page->cache != NULL && page->cache->temporary) {
 		if (pageState == PAGE_STATE_MODIFIED)
