@@ -17,6 +17,8 @@
 	#include <arch/ppc/arch_debugger.h>
 #elif __M68K__
 	#include <arch/m68k/arch_debugger.h>
+#elif __MIPSEL__
+	#include <arch/mipsel/arch_debugger.h>
 #else
 	#error you need to write a <arch/<cpu>/arch_debugger.h>
 #endif
