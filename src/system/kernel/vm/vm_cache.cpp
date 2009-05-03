@@ -789,6 +789,10 @@ VMCache::Resize(off_t newSize)
 			}
 
 			// remove the page and put it into the free queue
+			vm_remove_all_page_mappings(page, NULL);
+			ASSERT(page->wired_count == 0);
+				// TODO: Find a real solution! Unmapping is probably fine, but
+				// we have no way of unmapping wired pages here.
 			RemovePage(page);
 			vm_page_free(this, page);
 				// Note: When iterating through a IteratableSplayTree
