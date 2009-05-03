@@ -293,8 +293,8 @@ AddDirectoryToHaikuImage home config be Preferences ;
 # TODO/NOTE: Cannot use $(SYSTEM_PREFERENCES) here since there is
 # "<preferences>Tracker"...
 DESKBAR_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
-	E-mail FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers
-	Screen ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
+	E-mail FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network 
+	Printers Screen ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
 ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToHaikuImage home config be Preferences
