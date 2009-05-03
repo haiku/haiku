@@ -415,13 +415,6 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				case kInstalling:
 				{
 					_QuitCopyEngine(true);
-//					if (fWorkerThread->Cancel()) {
-//						fInstallStatus = kCancelled;
-//						_SetStatusMessage("Installation cancelled.");
-//						fProgressLayoutItem->SetVisible(false);
-//						fPkgSwitchLayoutItem->SetVisible(true);
-//						_ShowOptionalPackages();
-//					}
 					break;
 				}
 				case kFinished:
@@ -494,11 +487,18 @@ InstallerWindow::MessageReceived(BMessage *msg)
 
 			PartitionMenuItem* dstItem
 				= (PartitionMenuItem*)fDestMenu->FindMarked();
+
+			const char* quitString;
+			if (be_roster->IsRunning(kDeskbarSignature))
+				quitString = "leave the Installer";
+			else
+				quitString = "restart the computer";
+
 			char status[1024];
 			snprintf(status, sizeof(status), "Installation completed. "
-				"Boot sector has been written to '%s'. Press Quit to reboot "
+				"Boot sector has been written to '%s'. Press Quit to %s "
 				"or chose a new target volume to perform another "
-				"installation.", dstItem ? dstItem->Name() : "???");
+				"installation.", dstItem ? dstItem->Name() : "???", quitString);
 			_SetStatusMessage(status);
 			fInstallStatus = kFinished;
 			_DisableInterface(false);
