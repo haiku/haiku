@@ -104,7 +104,7 @@ CopyEngine::CollectTargets(const char* source)
 
 status_t
 CopyEngine::CopyFolder(const char* source, const char* destination,
-	BLocker* locker = NULL)
+	BLocker* locker)
 {
 	printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
 
