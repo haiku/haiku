@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <ClassInfo.h>
 #include <Directory.h>
+#include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutUtils.h>
@@ -35,10 +36,10 @@
 
 #include "tracker_private.h"
 
-#include "CopyEngine.h"
 #include "DialogPane.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
+#include "WorkerThread.h"
 
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
@@ -209,7 +210,7 @@ InstallerWindow::InstallerWindow()
 	fNeedsToCenterOnScreen(true),
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
-	fCopyEngine(new CopyEngine(this)),
+	fWorkerThread(new WorkerThread(this)),
 	fCopyEngineLock(NULL)
 {
 	LogoView* logoView = new LogoView();
@@ -265,7 +266,7 @@ InstallerWindow::InstallerWindow()
 		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
 	fMakeBootableButton = new BButton("makebootable_button",
-		"Write Boot Sector", new BMessage(kWriteBootSector));
+		"Write Boot Sector", new BMessage(MSG_WRITE_BOOT_SECTOR));
 	fMakeBootableButton->SetEnabled(false);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -357,7 +358,7 @@ void
 InstallerWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case RESET_INSTALL:
+		case MSG_RESET:
 			delete fCopyEngineLock;
 			fCopyEngineLock = NULL;
 
@@ -383,11 +384,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					BList* list = new BList();
 					int32 size = 0;
 					fPackagesView->GetPackagesToInstall(list, &size);
-					fCopyEngine->SetLock(fCopyEngineLock);
-					fCopyEngine->SetPackagesList(list);
-					fCopyEngine->SetSpaceRequired(size);
+					fWorkerThread->SetLock(fCopyEngineLock);
+					fWorkerThread->SetPackagesList(list);
+					fWorkerThread->SetSpaceRequired(size);
 					fInstallStatus = kInstalling;
-					BMessenger(fCopyEngine).SendMessage(ENGINE_START);
+					fWorkerThread->StartInstall();
 					fBeginButton->SetLabel("Stop");
 					_DisableInterface(true);
 
@@ -402,7 +403,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				case kInstalling:
 				{
 					_QuitCopyEngine(true);
-//					if (fCopyEngine->Cancel()) {
+//					if (fWorkerThread->Cancel()) {
 //						fInstallStatus = kCancelled;
 //						_SetStatusMessage("Installation cancelled.");
 //						fProgressLayoutItem->SetVisible(false);
@@ -440,7 +441,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			fSizeView->SetText(string);
 			break;
 		}
-		case STATUS_MESSAGE:
+		case MSG_STATUS_MESSAGE:
 		{
 // TODO: Was this supposed to prevent status messages still arriving
 // after the copy engine was shut down?
@@ -472,7 +473,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		case INSTALL_FINISHED:
+		case MSG_INSTALL_FINISHED:
 		{
 			delete fCopyEngineLock;
 			fCopyEngineLock = NULL;
@@ -512,8 +513,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		case kWriteBootSector:
-			fCopyEngine->WriteBootSector(fDestMenu);
+		case MSG_WRITE_BOOT_SECTOR:
+			fWorkerThread->WriteBootSector(fDestMenu);
 			break;
 
 		default:
@@ -533,7 +534,7 @@ InstallerWindow::QuitRequested()
 		return false;
 	}
 	_QuitCopyEngine(false);
-	fCopyEngine->PostMessage(B_QUIT_REQUESTED);
+	fWorkerThread->PostMessage(B_QUIT_REQUESTED);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -597,7 +598,7 @@ InstallerWindow::_ScanPartitions()
 	while ((item = fDestMenu->RemoveItem((int32)0)))
 		delete item;
 
-	fCopyEngine->ScanDisksPartitions(fSrcMenu, fDestMenu);
+	fWorkerThread->ScanDisksPartitions(fSrcMenu, fDestMenu);
 
 	if (fSrcMenu->ItemAt(0)) {
 		_PublishPackages();

@@ -22,8 +22,8 @@ class BMenuField;
 class BStatusBar;
 class BStringView;
 class BTextView;
-class CopyEngine;
 class PackagesView;
+class WorkerThread;
 
 enum InstallStatus {
 	kReadyForInstall,
@@ -32,10 +32,10 @@ enum InstallStatus {
 	kCancelled
 };
 
-const uint32 STATUS_MESSAGE = 'iSTM';
-const uint32 INSTALL_FINISHED = 'iIFN';
-const uint32 RESET_INSTALL = 'iRSI';
-const uint32 kWriteBootSector = 'iWBS';
+const uint32 MSG_STATUS_MESSAGE = 'iSTM';
+const uint32 MSG_INSTALL_FINISHED = 'iIFN';
+const uint32 MSG_RESET = 'iRSI';
+const uint32 MSG_WRITE_BOOT_SECTOR = 'iWBS';
 
 const char PACKAGES_DIRECTORY[] = "_packages_";
 const char VAR_DIRECTORY[] = "var";
@@ -92,7 +92,7 @@ private:
 			bool				fDriveSetupLaunched;
 			InstallStatus		fInstallStatus;
 
-			CopyEngine*			fCopyEngine;
+			WorkerThread*		fWorkerThread;
 			BString				fLastStatus;
 			BLocker*			fCopyEngineLock;
 };

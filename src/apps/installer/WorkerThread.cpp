@@ -1,26 +1,30 @@
 /*
- * Copyright 2005-2008, Jérôme DUVAL. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2005-2008, Jérôme DUVAL.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "CopyEngine.h"
+#include "WorkerThread.h"
 
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Autolock.h>
+#include <Directory.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <FindDirectory.h>
+#include <Menu.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <String.h>
 #include <VolumeRoster.h>
 
+#include "AutoLocker.h"
 #include "CopyEngine2.h"
 #include "InstallerWindow.h"
-#include "FSUndoRedo.h"
-#include "FSUtils.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
 
@@ -28,8 +32,8 @@
 //#define COPY_TRACE
 #ifdef COPY_TRACE
 #define CALLED() 		printf("CALLED %s\n",__PRETTY_FUNCTION__)
-#define ERR2(x, y...)	fprintf(stderr, "CopyEngine: "x" %s\n", y, strerror(err))
-#define ERR(x)			fprintf(stderr, "CopyEngine: "x" %s\n", strerror(err))
+#define ERR2(x, y...)	fprintf(stderr, "WorkerThread: "x" %s\n", y, strerror(err))
+#define ERR(x)			fprintf(stderr, "WorkerThread: "x" %s\n", strerror(err))
 #else
 #define CALLED()
 #define ERR(x)
@@ -39,6 +43,10 @@
 const char BOOT_PATH[] = "/boot";
 
 extern void SizeAsString(off_t size, char *string);
+
+
+const uint32 MSG_START_INSTALLING = 'eSRT';
+
 
 class SourceVisitor : public BDiskDeviceVisitor
 {
@@ -63,37 +71,39 @@ class TargetVisitor : public BDiskDeviceVisitor
 };
 
 
-CopyEngine::CopyEngine(InstallerWindow *window)
+// #pragma mark - WorkerThread
+
+
+WorkerThread::WorkerThread(InstallerWindow *window)
 	: BLooper("copy_engine"),
 	fWindow(window),
 	fPackages(NULL),
 	fSpaceRequired(0)
 {
-	fControl = new InstallerCopyLoopControl(window);
 	Run();
 }
 
 
 void
-CopyEngine::MessageReceived(BMessage* message)
+WorkerThread::MessageReceived(BMessage* message)
 {
 	CALLED();
 
 	switch (message->what) {
-		case ENGINE_START:
-			Start(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
+		case MSG_START_INSTALLING:
+			_PerformInstall(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
 			break;
 
-		case kWriteBootSector:
+		case MSG_WRITE_BOOT_SECTOR:
 		{
 			int32 id;
 			if (message->FindInt32("id", &id) != B_OK) {
-				SetStatusMessage("Boot sector not written because of an "
+				_SetStatusMessage("Boot sector not written because of an "
 					" internal error.");
 				break;
 			}
 
-			// TODO: Refactor with Start()
+			// TODO: Refactor with _PerformInstall()
 			BPath targetDirectory;
 			BDiskDevice device;
 			BPartition* partition;
@@ -101,32 +111,32 @@ CopyEngine::MessageReceived(BMessage* message)
 			if (fDDRoster.GetPartitionWithID(id, &device, &partition) == B_OK) {
 				if (!partition->IsMounted()) {
 					if (partition->Mount() < B_OK) {
-						SetStatusMessage("The partition can't be mounted. "
+						_SetStatusMessage("The partition can't be mounted. "
 							"Please choose a different partition.");
 						break;
 					}
 				}
 				if (partition->GetMountPoint(&targetDirectory) != B_OK) {
-					SetStatusMessage("The mount point could not be retrieve.");
+					_SetStatusMessage("The mount point could not be retrieve.");
 					break;
 				}
 			} else if (fDDRoster.GetDeviceWithID(id, &device) == B_OK) {
 				if (!device.IsMounted()) {
 					if (device.Mount() < B_OK) {
-						SetStatusMessage("The disk can't be mounted. Please "
+						_SetStatusMessage("The disk can't be mounted. Please "
 							"choose a different disk.");
 						break;
 					}
 				}
 				if (device.GetMountPoint(&targetDirectory) != B_OK) {
-					SetStatusMessage("The mount point could not be retrieve.");
+					_SetStatusMessage("The mount point could not be retrieve.");
 					break;
 				}
 			}
 
-			LaunchFinishScript(targetDirectory);
+			_LaunchFinishScript(targetDirectory);
 			// TODO: Get error from executing script!
-			SetStatusMessage("Boot sector successfully written.");
+			_SetStatusMessage("Boot sector successfully written.");
 		}
 		default:
 			BLooper::MessageReceived(message);
@@ -134,17 +144,67 @@ CopyEngine::MessageReceived(BMessage* message)
 }
 
 
+
+
 void
-CopyEngine::SetStatusMessage(const char *status)
+WorkerThread::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 {
-	BMessage msg(STATUS_MESSAGE);
-	msg.AddString("status", status);
-	BMessenger(fWindow).SendMessage(&msg);
+	// NOTE: This is actually executed in the window thread.
+	BDiskDevice device;
+	BPartition *partition = NULL;
+
+	printf("\nScanDisksPartitions source partitions begin\n");
+	SourceVisitor srcVisitor(srcMenu);
+	fDDRoster.VisitEachMountedPartition(&srcVisitor, &device, &partition);
+
+	printf("\nScanDisksPartitions target partitions begin\n");
+	TargetVisitor targetVisitor(targetMenu);
+	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
 }
 
 
 void
-CopyEngine::LaunchInitScript(BPath &path)
+WorkerThread::SetPackagesList(BList *list)
+{
+	// Executed in window thread.
+	BAutolock _(this);
+
+	delete fPackages;
+	fPackages = list;
+}
+
+
+void
+WorkerThread::StartInstall()
+{
+	// Executed in window thread.
+	PostMessage(MSG_START_INSTALLING, this);
+}
+
+
+void
+WorkerThread::WriteBootSector(BMenu* targetMenu)
+{
+	// Executed in window thread.
+	CALLED();
+
+	PartitionMenuItem* item = (PartitionMenuItem*)targetMenu->FindMarked();
+	if (item == NULL) {
+		ERR("bad menu items\n");
+		return;
+	}
+
+	BMessage message(MSG_WRITE_BOOT_SECTOR);
+	message.AddInt32("id", item->ID());
+	PostMessage(&message, this);
+}
+
+
+// #pragma mark -
+
+
+void
+WorkerThread::_LaunchInitScript(BPath &path)
 {
 	BPath bootPath;
 	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
@@ -152,13 +212,13 @@ CopyEngine::LaunchInitScript(BPath &path)
 	command += bootPath.Path();
 	command += "/InstallerInitScript ";
 	command += path.Path();
-	SetStatusMessage("Starting Installation.");
+	_SetStatusMessage("Starting Installation.");
 	system(command.String());
 }
 
 
 void
-CopyEngine::LaunchFinishScript(BPath &path)
+WorkerThread::_LaunchFinishScript(BPath &path)
 {
 	BPath bootPath;
 	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
@@ -166,27 +226,27 @@ CopyEngine::LaunchFinishScript(BPath &path)
 	command += bootPath.Path();
 	command += "/InstallerFinishScript ";
 	command += path.Path();
-	SetStatusMessage("Finishing Installation.");
+	_SetStatusMessage("Finishing Installation.");
 	system(command.String());
 }
 
 
 void
-CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
+WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 {
 	CALLED();
 
 	BPath targetDirectory, srcDirectory;
-	BDirectory targetDir, srcDir;
+	BDirectory targetDir;
 	BDiskDevice device;
 	BPartition *partition;
 	BVolume targetVolume;
 	status_t err = B_OK;
 	int32 entries = 0;
 	entry_ref testRef;
-bigtime_t now;
 
-	fControl->Reset();
+	BMessenger messenger(fWindow);
+	CopyEngine2 engine(messenger, new BMessage(MSG_STATUS_MESSAGE));
 
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
 	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
@@ -201,7 +261,7 @@ bigtime_t now;
 	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
 		if (!partition->IsMounted()) {
 			if ((err = partition->Mount()) < B_OK) {
-				SetStatusMessage("The disk can't be mounted. Please choose a "
+				_SetStatusMessage("The disk can't be mounted. Please choose a "
 					"different disk.");
 				ERR("BPartition::Mount");
 				goto error;
@@ -218,7 +278,7 @@ bigtime_t now;
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
-				SetStatusMessage("The disk can't be mounted. Please choose a "
+				_SetStatusMessage("The disk can't be mounted. Please choose a "
 					"different disk.");
 				ERR("BDiskDevice::Mount");
 				goto error;
@@ -259,7 +319,7 @@ bigtime_t now;
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
-		SetStatusMessage("You can't install the contents of a disk onto "
+		_SetStatusMessage("You can't install the contents of a disk onto "
 			"itself. Please choose a different disk.");
 		goto error;
 	}
@@ -270,7 +330,7 @@ bigtime_t now;
 			"current boot disk? The Installer will have to reboot your "
 			"machine if you proceed.", "OK", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
-		SetStatusMessage("Installation stopped.");
+		_SetStatusMessage("Installation stopped.");
 		goto error;
 	}
 
@@ -326,143 +386,54 @@ bigtime_t now;
 	}
 
 
-	LaunchInitScript(targetDirectory);
+	_LaunchInitScript(targetDirectory);
 
 	// copy source volume
-	targetDir.Rewind();
-	srcDir.SetTo(srcDirectory.Path());
-now = system_time();
-#if 0
-	err = CopyFolder(srcDir, targetDir);
-#else
-	{
-		BMessenger messenger(fWindow);
-		CopyEngine2 engine(messenger, new BMessage(STATUS_MESSAGE));
-		err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
-			fCancelLock);
-if (err != B_OK)
-printf("error: %s\n", strerror(err));
-	}
-#endif
-printf("copy time: %.3fs\n", (system_time() - now) / 1000000.0);
-
-	if (err != B_OK || fControl->CheckUserCanceled())
+	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
+		fCancelLock);
+	if (err != B_OK)
 		goto error;
 
 	// copy selected packages
 	if (fPackages) {
 		srcDirectory.Append(PACKAGES_DIRECTORY);
-		srcDir.SetTo(srcDirectory.Path());
-		BDirectory packageDir;
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
-			packageDir.SetTo(&srcDir, p->Folder());
-			err = CopyFolder(packageDir, targetDir);
-			if (err != B_OK || fControl->CheckUserCanceled())
+			BPath packageDir(srcDirectory.Path(), p->Folder());
+			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
+				fCancelLock);
+			if (err != B_OK)
 				goto error;
 		}
 	}
 
-	LaunchFinishScript(targetDirectory);
+	_LaunchFinishScript(targetDirectory);
 
-	BMessenger(fWindow).SendMessage(INSTALL_FINISHED);
+	BMessenger(fWindow).SendMessage(MSG_INSTALL_FINISHED);
 
 	return;
 error:
-	if (err == B_CANCELED || fControl->CheckUserCanceled())
-		SetStatusMessage("Installation canceled.");
-	ERR("Start failed");
-	BMessenger(fWindow).SendMessage(RESET_INSTALL);
-}
-
-
-status_t
-CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
-{
-	BEntry entry;
-	status_t err;
-	while (srcDir.GetNextEntry(&entry) == B_OK
-		&& !fControl->CheckUserCanceled()) {
-		StatStruct statbuf;
-		entry.GetStat(&statbuf);
-
-		Undo undo;
-		if (S_ISDIR(statbuf.st_mode)) {
-			char name[B_FILE_NAME_LENGTH];
-			if (entry.GetName(name) == B_OK
-				&& (strcmp(name, PACKAGES_DIRECTORY) == 0
-				|| strcmp(name, VAR_DIRECTORY) == 0)) {
-				continue;
-			}
-			err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
-		} else {
-			err = FSCopyFile(&entry, &statbuf, &targetDir, fControl, NULL,
-				false, undo);
-		}
-		if (err != B_OK) {
-			BPath path;
-			entry.GetPath(&path);
-			ERR2("error while copying %s", path.Path());
-			return err;
-		}
-	}
-
-	return B_OK;
+	BMessage statusMessage(MSG_RESET);
+	if (err == B_CANCELED)
+		_SetStatusMessage("Installation canceled.");
+	else
+		statusMessage.AddInt32("error", err);
+	ERR("_PerformInstall failed");
+	BMessenger(fWindow).SendMessage(&statusMessage);
 }
 
 
 void
-CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
+WorkerThread::_SetStatusMessage(const char *status)
 {
-	// NOTE: This is actually executed in the window thread.
-	BDiskDevice device;
-	BPartition *partition = NULL;
-
-	printf("\nScanDisksPartitions source partitions begin\n");
-	SourceVisitor srcVisitor(srcMenu);
-	fDDRoster.VisitEachMountedPartition(&srcVisitor, &device, &partition);
-
-	printf("\nScanDisksPartitions target partitions begin\n");
-	TargetVisitor targetVisitor(targetMenu);
-	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
+	BMessage msg(MSG_STATUS_MESSAGE);
+	msg.AddString("status", status);
+	BMessenger(fWindow).SendMessage(&msg);
 }
 
 
-void
-CopyEngine::SetPackagesList(BList *list)
-{
-	delete fPackages;
-	fPackages = list;
-}
-
-
-bool
-CopyEngine::Cancel()
-{
-	return fControl->Cancel();
-}
-
-
-void
-CopyEngine::WriteBootSector(BMenu* targetMenu)
-{
-	// Executed in window thread.
-	CALLED();
-
-	PartitionMenuItem* item = (PartitionMenuItem*)targetMenu->FindMarked();
-	if (item == NULL) {
-		ERR("bad menu items\n");
-		return;
-	}
-
-	BMessage message(kWriteBootSector);
-	message.AddInt32("id", item->ID());
-	PostMessage(&message, this);
-}
-
-
-// #pragma mark -
+// #pragma mark - SourceVisitor
 
 
 SourceVisitor::SourceVisitor(BMenu *menu)
@@ -516,7 +487,7 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 }
 
 
-// #pragma mark -
+// #pragma mark - TargetVisitor
 
 
 TargetVisitor::TargetVisitor(BMenu *menu)
@@ -582,10 +553,15 @@ TargetVisitor::_MakeLabel(BPartition *partition, char *label, char *menuLabel)
 	BPath path;
 	partition->GetPath(&path);
 
-	sprintf(label, "%s - %s [%s] [%s]", partition->ContentName(),
-		size, partition->ContentType(), path.Path());
-	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size,
-		partition->ContentType());
+	// TODO: Reenable the printing of the content type once Haiku supports
+	// installing to other file systems than BFS.
+//	sprintf(label, "%s - %s [%s] [%s]", partition->ContentName(),
+//		size, partition->ContentType(), path.Path());
+//	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size,
+//		partition->ContentType());
 
+	sprintf(label, "%s - %s - %s", partition->ContentName(), size,
+		path.Path());
+	sprintf(menuLabel, "%s - %s", partition->ContentName(), size);
 }
 

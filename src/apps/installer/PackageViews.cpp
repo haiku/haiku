@@ -178,11 +178,11 @@ PackageCheckBox::MouseMoved(BPoint point, uint32 transit,
 {
 	printf("%s called\n", __PRETTY_FUNCTION__);
 	if (transit == B_ENTERED_VIEW) {
-		BMessage msg(STATUS_MESSAGE);
+		BMessage msg(MSG_STATUS_MESSAGE);
 		msg.AddString("status", fPackage->Description());
 		BMessenger(NULL, Window()).SendMessage(&msg);
 	} else if (transit == B_EXITED_VIEW) {
-		BMessage msg(STATUS_MESSAGE);
+		BMessage msg(MSG_STATUS_MESSAGE);
 		BMessenger(NULL, Window()).SendMessage(&msg);
 	}
 }

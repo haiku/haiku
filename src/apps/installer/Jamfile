@@ -4,13 +4,11 @@ UsePrivateHeaders shared storage tracker ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 Application Installer : 
-	CopyEngine.cpp
 	CopyEngine2.cpp
-	FSUtils.cpp
 	InstallerApp.cpp
-	InstallerCopyLoopControl.cpp
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
+	WorkerThread.cpp
 	: be tracker translation $(TARGET_LIBSTDC++)
 	: Installer.rdef ;
