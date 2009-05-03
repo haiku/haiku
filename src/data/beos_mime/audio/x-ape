@@ -7,9 +7,7 @@ resource(2, "META:S:DESC") #'MSDC' "APE (Monkey's Audio) Sound File";
 
 resource(3, "META:L:DESC") #'MLDC' "Lossless Compressed APE (Monkey's Audio) Sound File";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
-
-resource(5, "META:EXTENS") message(234) {
+resource(4, "META:EXTENS") message(234) {
 	"extensions" = "ape",
 	"type" = "audio/x-ape"
 };

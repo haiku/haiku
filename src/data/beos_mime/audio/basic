@@ -5,12 +5,10 @@ resource(1, "META:TYPE") "audio/basic";
 
 resource(2, "META:S:DESC") #'MSDC' "Sun Sound File";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
-
-resource(4, "META:EXTENS") message(234) {
+resource(3, "META:EXTENS") message(234) {
 	"extensions" = "au",
 	"extensions" = "snd",
 	"type" = "audio/basic"
 };
 
-resource(5, "META:SNIFF_RULE") "0.50 (\".snd\")";
+resource(4, "META:SNIFF_RULE") "0.50 (\".snd\")";
