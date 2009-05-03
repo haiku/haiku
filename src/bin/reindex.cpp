@@ -175,7 +175,8 @@ handleFile(BEntry *entry, BNode *node)
 			BNode innerNode;
 			handleFile(&entryIterator, &innerNode);
 		}
-		return;
+
+		// also rewrite the attributes of the directory
 	}
 
 	char name[B_FILE_NAME_LENGTH];
@@ -347,7 +348,7 @@ main(int argc, char **argv)
 
 	while (*++argv) {
 		BEntry entry(*argv);
-		BNode  node;
+		BNode node;
 
 		if (entry.InitCheck() == B_OK) {
 			if (gFromVolume)
