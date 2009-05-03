@@ -705,9 +705,18 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G72");
 		status = nvxx_general_powerup();
 		break;
-	case 0x01d810de: /* Nvidia GeForce 7400 GO */
+	case 0x01d710de: /* Nvidia Quadro NVS 110M/GeForce 7300 Go */
 		si->ps.card_type = G72;
 		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia Quadro NVS M/GF 7300 Go");
+		sprintf(si->adi.chipset, "G72");
+		status = nvxx_general_powerup();
+		break;
+	case 0x01d810de: /* Nvidia GeForce 7400 Go */
+		si->ps.card_type = G72;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia GeForce 7400 Go");
 		sprintf(si->adi.chipset, "G72");
 		status = nvxx_general_powerup();
