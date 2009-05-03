@@ -208,6 +208,7 @@ InstallerWindow::InstallerWindow()
 	: BWindow(BRect(-2000, -2000, -1800, -1800), "Installer", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fNeedsToCenterOnScreen(true),
+	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
 	fWorkerThread(new WorkerThread(this)),
@@ -633,7 +634,9 @@ InstallerWindow::_UpdateControls()
 	}
 	fSrcMenuField->MenuItem()->SetLabel(label.String());
 
-	// Disable any unsuitable target items
+	// Disable any unsuitable target items, check if at least one partition
+	// is suitable.
+	bool foundOneSuitableTarget = false;
 	for (int32 i = fDestMenu->CountItems() - 1; i >= 0; i--) {
 		PartitionMenuItem* dstItem
 			= (PartitionMenuItem*)fDestMenu->ItemAt(i);
@@ -644,6 +647,9 @@ InstallerWindow::_UpdateControls()
 			dstItem->SetMarked(false);
 		} else
 			dstItem->SetEnabled(dstItem->IsValidTarget());
+
+		if (dstItem->IsEnabled())
+			foundOneSuitableTarget = true;
 	}
 
 	PartitionMenuItem* dstItem = (PartitionMenuItem*)fDestMenu->FindMarked();
@@ -683,6 +689,15 @@ InstallerWindow::_UpdateControls()
 		label << " to \'" <<dstItem->Name() << '\'';
 	fMakeBootableButton->SetEnabled(dstItem);
 	fMakeBootableButton->SetLabel(label.String());
+
+	if (!fEncouragedToSetupPartitions && !foundOneSuitableTarget) {
+		// Focus the users attention on the DriveSetup button
+		fEncouragedToSetupPartitions = true;
+		(new BAlert("use drive setup", "No partitions have been found that "
+			"are suitable for installation. Please setup partitions and "
+			"initialize at least one partition with the Be File System." ,
+			"Ok"))->Go();
+	}
 }
 
 

@@ -88,6 +88,7 @@ private:
 			BButton*			fMakeBootableButton;
 
 			bool				fNeedsToCenterOnScreen;
+			bool				fEncouragedToSetupPartitions;
 
 			bool				fDriveSetupLaunched;
 			InstallStatus		fInstallStatus;
