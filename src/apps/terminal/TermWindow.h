@@ -111,6 +111,8 @@ private:
 	bool			fForwardSearch;
 	bool			fMatchCase;
 	bool			fMatchWord;
+
+	bool			fFullScreen;
 };
 
 #endif // __TERMWINDOW_H

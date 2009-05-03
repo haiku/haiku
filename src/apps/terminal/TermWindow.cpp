@@ -152,7 +152,8 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 	fFindSelection(false),
 	fForwardSearch(false),
 	fMatchCase(false),
-	fMatchWord(false)
+	fMatchWord(false),
+	fFullScreen(false)
 {
 	_InitWindow();
 	_AddTab(args);
@@ -473,7 +474,7 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_FULL_SIZE_CHANGED:
 		{
 			BFont font;
-			_GetPreferredFont(font);			
+			_GetPreferredFont(font);
 			_ActiveTermView()->SetTermFont(&font);
 
 			_ResizeView(_ActiveTermView());
@@ -486,7 +487,9 @@ TermWindow::MessageReceived(BMessage *message)
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
-				_ActiveTermView()->ScrollBar()->Hide();
+				if (fTabView->CountTabs() == 1)
+					_ActiveTermView()->ScrollBar()->Hide();
+
 				fMenubar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
 				fTabView->MoveBy(0, -mbHeight);
@@ -495,6 +498,7 @@ TermWindow::MessageReceived(BMessage *message)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
 				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
 				MoveTo(screen.Frame().left, screen.Frame().top);
+				fFullScreen = true;
 			} else { // exit fullscreen
 				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenubar->Bounds().Height() + 1;
@@ -506,6 +510,7 @@ TermWindow::MessageReceived(BMessage *message)
 				fTabView->MoveBy(0, mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
+				fFullScreen = false;
 			}
 			break;	
 
@@ -565,8 +570,11 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 
 		case kNewTab:
-			if (fTabView->CountTabs() < kMaxTabs)
+			if (fTabView->CountTabs() < kMaxTabs) {
+				if (fFullScreen)
+					_ActiveTermView()->ScrollBar()->Show();
 				_AddTab(NULL);
+			}
 			break;
 
 		case kCloseView:
@@ -574,13 +582,14 @@ TermWindow::MessageReceived(BMessage *message)
 			TermView* termView;
 			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
 				int32 index = _IndexOfTermView(termView);
-				if (index >= 0)
+				if (index >= 0) {
 					_RemoveTab(index);
+				}
 			}
 			break;
 		}
 		
-		case kIncreaseFontSize:		
+		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
 			message->PrintToStream();
@@ -783,6 +792,8 @@ TermWindow::_RemoveTab(int32 index)
 		if (Session* session = (Session*)fSessions.RemoveItem(index)) {
 			delete session;
 			delete fTabView->RemoveTab(index);
+			if (fFullScreen)
+				_ActiveTermView()->ScrollBar()->Hide();
 		}
 	} else
 		PostMessage(B_QUIT_REQUESTED);
