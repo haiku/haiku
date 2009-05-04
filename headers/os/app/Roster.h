@@ -161,7 +161,7 @@ class BRoster {
 					bool *wasDocument) const;
 		status_t _TranslateType(const char *mimeType, BMimeType *appMeta,
 					entry_ref *appRef, BFile *appFile) const;
-		status_t _SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
+		status_t _GetFileType(const entry_ref *file, BNodeInfo *nodeInfo,
 					char *mimeType) const;
 		status_t _SendToRunning(team_id team, int argc, const char *const *args,
 					const BList *messageList, const entry_ref *ref,
