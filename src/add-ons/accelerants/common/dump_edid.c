@@ -50,41 +50,41 @@ edid_dump(edid1_info *edid)
 
 	dprintf("Supported VESA Video Modes:\n");
 	if (edid->established_timing.res_720x400x70)
-		dprintf("720x400@70\n");
+		dprintf("720x400@70Hz\n");
 	if (edid->established_timing.res_720x400x88)
-		dprintf("720x400@88\n");
+		dprintf("720x400@88Hz\n");
 	if (edid->established_timing.res_640x480x60)
-		dprintf("640x480@60\n");
+		dprintf("640x480@60Hz\n");
 	if (edid->established_timing.res_640x480x67)
-		dprintf("640x480x67\n");
+		dprintf("640x480x67Hz\n");
 	if (edid->established_timing.res_640x480x72)
-		dprintf("640x480x72\n");
+		dprintf("640x480x72Hz\n");
 	if (edid->established_timing.res_640x480x75)
-		dprintf("640x480x75\n");
+		dprintf("640x480x75Hz\n");
 	if (edid->established_timing.res_800x600x56)
-		dprintf("800x600@56\n");
+		dprintf("800x600@56Hz\n");
 	if (edid->established_timing.res_800x600x60)
-		dprintf("800x600@60\n");
+		dprintf("800x600@60Hz\n");
 
 	if (edid->established_timing.res_800x600x72)
-		dprintf("800x600@72\n");
+		dprintf("800x600@72Hz\n");
 	if (edid->established_timing.res_800x600x75)
-		dprintf("800x600@75\n");
+		dprintf("800x600@75Hz\n");
 	if (edid->established_timing.res_832x624x75)
-		dprintf("832x624@75\n");
+		dprintf("832x624@75Hz\n");
 	if (edid->established_timing.res_1024x768x87i)
-		dprintf("1024x768@87 interlaced\n");
+		dprintf("1024x768@87Hz interlaced\n");
 	if (edid->established_timing.res_1024x768x60)
-		dprintf("1024x768@60\n");
+		dprintf("1024x768@60Hz\n");
 	if (edid->established_timing.res_1024x768x70)
-		dprintf("1024x768@70\n");
+		dprintf("1024x768@70Hz\n");
 	if (edid->established_timing.res_1024x768x75)
-		dprintf("1024x768@75\n");
+		dprintf("1024x768@75Hz\n");
 	if (edid->established_timing.res_1280x1024x75)
-		dprintf("1280x1024@75\n");
+		dprintf("1280x1024@75Hz\n");
 
 	if (edid->established_timing.res_1152x870x75)
-		dprintf("1152x870@75\n");
+		dprintf("1152x870@75Hz\n");
 
 	for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
 		edid1_detailed_monitor *monitor = &edid->detailed_monitor[i];
@@ -149,8 +149,13 @@ edid_dump(edid1_info *edid)
 			case EDID1_IS_DETAILED_TIMING:
 			{
 				edid1_detailed_timing *timing = &monitor->data.detailed_timing;
+				dprintf("Additional Video Mode (%dx%d@%dHz):\n",
+					timing->h_active, timing->v_active, 
+					(timing->pixel_clock * 10000
+					/ (timing->h_active + timing->h_blank)
+					/ (timing->v_active + timing->v_blank)));
+					// Refresh rate = pixel clock in MHz / Htotal / Vtotal
 
-				dprintf("Additional Video Mode:\n");
 				dprintf("clock=%f MHz\n", timing->pixel_clock / 100.0);
 				dprintf("h: (%d, %d, %d, %d)\n", 
 					timing->h_active, timing->h_active + timing->h_sync_off,
