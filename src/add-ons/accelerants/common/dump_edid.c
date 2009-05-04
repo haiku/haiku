@@ -28,9 +28,11 @@ edid_dump(edid1_info *edid)
 	dprintf("Vendor: %s\n", edid->vendor.manufacturer);
 	dprintf("Product ID: %d\n", (int)edid->vendor.prod_id);
 	dprintf("Serial #: %d\n", (int)edid->vendor.serial);
-	dprintf("Produced in week/year: %d/%d\n", edid->vendor.week, edid->vendor.year);
+	dprintf("Produced in week/year: %d/%d\n", edid->vendor.week,
+		edid->vendor.year);
 
-	dprintf("EDID version: %d.%d\n", edid->version.version, edid->version.revision);
+	dprintf("EDID version: %d.%d\n", edid->version.version,
+		edid->version.revision);
 
 	dprintf("Type: %s\n", edid->display.input_type ? "Digital" : "Analog");
 	dprintf("Size: %d cm x %d cm\n", edid->display.h_size, edid->display.v_size);
@@ -43,7 +45,7 @@ edid_dump(edid1_info *edid)
 		if (edid->std_timing[i].h_size <= 256)
 			continue;
 
-		dprintf("%dx%d@%dHz (id=%d)\n", 
+		dprintf("%dx%d@%dHz (id=%d)\n",
 			edid->std_timing[i].h_size, edid->std_timing[i].v_size,
 			edid->std_timing[i].refresh, edid->std_timing[i].id);
 	}
@@ -56,11 +58,11 @@ edid_dump(edid1_info *edid)
 	if (edid->established_timing.res_640x480x60)
 		dprintf("640x480@60Hz\n");
 	if (edid->established_timing.res_640x480x67)
-		dprintf("640x480x67Hz\n");
+		dprintf("640x480@67Hz\n");
 	if (edid->established_timing.res_640x480x72)
-		dprintf("640x480x72Hz\n");
+		dprintf("640x480@72Hz\n");
 	if (edid->established_timing.res_640x480x75)
-		dprintf("640x480x75Hz\n");
+		dprintf("640x480@75Hz\n");
 	if (edid->established_timing.res_800x600x56)
 		dprintf("800x600@56Hz\n");
 	if (edid->established_timing.res_800x600x60)
@@ -106,7 +108,8 @@ edid_dump(edid1_info *edid)
 					monitor_range.min_h, monitor_range.max_h);
 				dprintf("Vertical frequency range = %d..%d Hz\n",
 					monitor_range.min_v, monitor_range.max_v);
-				dprintf("Maximum pixel clock = %d MHz\n", (uint16)monitor_range.max_clock * 10);
+				dprintf("Maximum pixel clock = %d MHz\n",
+					(uint16)monitor_range.max_clock * 10);
 				break;
 			}
 
@@ -122,24 +125,23 @@ edid_dump(edid1_info *edid)
 					if (whitepoint->index == 0)
 						continue;
 
-					dprintf("Additional whitepoint: (X,Y)=(%f,%f) gamma=%f index=%i\n",
-						whitepoint->white_x / 1024.0, 
-						whitepoint->white_y / 1024.0, 
-						(whitepoint->gamma + 100) / 100.0, 
-						whitepoint->index);
+					dprintf("Additional whitepoint: (X,Y)=(%f,%f) gamma=%f "
+						"index=%i\n", whitepoint->white_x / 1024.0,
+						whitepoint->white_y / 1024.0,
+						(whitepoint->gamma + 100) / 100.0, whitepoint->index);
 				}
 				break;
 			}
 
 			case EDID1_ADD_STD_TIMING:
-			{		
+			{
 				for (j = 0; j < EDID1_NUM_EXTRA_STD_TIMING; ++j) {
 					edid1_std_timing *timing = &monitor->data.std_timing[j];
 
 					if (timing->h_size <= 256)
 						continue;
 
-					dprintf("%dx%d@%dHz (id=%d)\n", 
+					dprintf("%dx%d@%dHz (id=%d)\n",
 						timing->h_size, timing->v_size,
 						timing->refresh, timing->id);
 				}
@@ -150,22 +152,22 @@ edid_dump(edid1_info *edid)
 			{
 				edid1_detailed_timing *timing = &monitor->data.detailed_timing;
 				dprintf("Additional Video Mode (%dx%d@%dHz):\n",
-					timing->h_active, timing->v_active, 
+					timing->h_active, timing->v_active,
 					(timing->pixel_clock * 10000
 					/ (timing->h_active + timing->h_blank)
 					/ (timing->v_active + timing->v_blank)));
 					// Refresh rate = pixel clock in MHz / Htotal / Vtotal
 
 				dprintf("clock=%f MHz\n", timing->pixel_clock / 100.0);
-				dprintf("h: (%d, %d, %d, %d)\n", 
+				dprintf("h: (%d, %d, %d, %d)\n",
 					timing->h_active, timing->h_active + timing->h_sync_off,
 					timing->h_active + timing->h_sync_off + timing->h_sync_width,
 					timing->h_active + timing->h_blank);
-				dprintf("v: (%d, %d, %d, %d)\n", 
+				dprintf("v: (%d, %d, %d, %d)\n",
 					timing->v_active, timing->v_active + timing->v_sync_off,
 					timing->v_active + timing->v_sync_off + timing->v_sync_width,
 					timing->v_active + timing->v_blank);
-				dprintf("size: %.1f cm x %.1f cm\n", 
+				dprintf("size: %.1f cm x %.1f cm\n",
 					timing->h_size / 10.0, timing->v_size / 10.0);
 				dprintf("border: %.1f cm x %.1f cm\n",
 					timing->h_border / 10.0, timing->v_border / 10.0);
