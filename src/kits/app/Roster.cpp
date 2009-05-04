@@ -8,7 +8,7 @@
  */
 
 /*!	BRoster class lets you launch apps and keeps track of apps
-	that are running. 
+	that are running.
 	Global be_roster represents the default BRoster.
 	app_info structure provides info for a running app.
 */
@@ -547,7 +547,7 @@ BRoster::GetActiveAppInfo(app_info *info) const
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -589,7 +589,7 @@ BRoster::FindApp(const char *mimeType, entry_ref *app) const
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -821,7 +821,7 @@ BRoster::ActivateApp(team_id team) const
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -868,7 +868,7 @@ BRoster::Launch(const char *mimeType, BMessage *initialMessage,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -908,7 +908,7 @@ BRoster::Launch(const char *mimeType, BList *messageList,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -953,7 +953,7 @@ BRoster::Launch(const char *mimeType, int argc, char **args,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a ref
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -1007,7 +1007,7 @@ BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a ref
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -1057,7 +1057,7 @@ BRoster::Launch(const entry_ref *ref, const BList *messageList,
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a ref
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -1119,13 +1119,13 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	// Clear the result if an error occured
 	if (err && refList)
 		refList->MakeEmpty();
 	// No return value, how sad :-(
-//	return err;	
+//	return err;
 }
 
 // GetRecentDocuments
@@ -1160,13 +1160,13 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	// Clear the result if an error occured
 	if (err && refList)
 		refList->MakeEmpty();
 	// No return value, how sad :-(
-//	return err;	
+//	return err;
 }
 
 // GetRecentFolders
@@ -1196,13 +1196,13 @@ BRoster::GetRecentFolders(BMessage *refList, int32 maxCount,
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	// Clear the result if an error occured
 	if (err && refList)
 		refList->MakeEmpty();
 	// No return value, how sad :-(
-//	return err;	
+//	return err;
 }
 
 // GetRecentApps
@@ -1229,13 +1229,13 @@ BRoster::GetRecentApps(BMessage *refList, int32 maxCount) const
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	// Clear the result if an error occured
 	if (err && refList)
 		refList->MakeEmpty();
 	// No return value, how sad :-(
-//	return err;	
+//	return err;
 }
 
 // AddToRecentDocuments
@@ -1249,18 +1249,18 @@ BRoster::AddToRecentDocuments(const entry_ref *doc, const char *appSig) const
 	BMessage reply;
 	status_t result;
 	char *callingAppSig = NULL;
-	
+
 	// If no signature is supplied, look up the signature of
 	// the calling app
 	if (!err && !appSig) {
 		app_info info;
 		err = GetRunningAppInfo(be_app->Team(), &info);
 		if (!err)
-			callingAppSig = info.signature;	
+			callingAppSig = info.signature;
 	}
 
 	// Build and send the message, read the reply
-	if (!err) 
+	if (!err)
 		err = msg.AddRef("ref", doc);
 	if (!err)
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
@@ -1269,7 +1269,7 @@ BRoster::AddToRecentDocuments(const entry_ref *doc, const char *appSig) const
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	if (err)
 		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
@@ -1286,18 +1286,18 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 	BMessage reply;
 	status_t result;
 	char *callingAppSig = NULL;
-	
+
 	// If no signature is supplied, look up the signature of
 	// the calling app
 	if (!err && !appSig) {
 		app_info info;
 		err = GetRunningAppInfo(be_app->Team(), &info);
 		if (!err)
-			callingAppSig = info.signature;	
+			callingAppSig = info.signature;
 	}
 
 	// Build and send the message, read the reply
-	if (!err) 
+	if (!err)
 		err = msg.AddRef("ref", folder);
 	if (!err)
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
@@ -1306,7 +1306,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
-	if (!err) 
+	if (!err)
 		err = result;
 	if (err)
 		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
@@ -1621,7 +1621,7 @@ BRoster::_IsAppRegistered(const entry_ref *ref, team_id team,
 		error = request.AddInt32("team", team);
 	if (error == B_OK && token > 0)
 		error = request.AddInt32("token", (int32)token);
-	
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
@@ -1645,7 +1645,7 @@ BRoster::_IsAppRegistered(const entry_ref *ref, team_id team,
 		} else if (reply.FindInt32("error", &error) != B_OK)
 			error = B_ERROR;
 	}
-	
+
 	return error;
 }
 
@@ -1801,7 +1801,7 @@ BRoster::_UpdateActiveApp(team_id team) const
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a mimeType and \a ref.
-	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
 	  preferred application is associated.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
@@ -2114,92 +2114,100 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 	// resolve ref, if necessary
 	BEntry entry;
 	status_t error = entry.SetTo(ref, false);
-	if (error == B_OK && entry.IsSymLink()) {
+	if (error != B_OK)
+		return error;
+
+	if (entry.IsSymLink()) {
 		// ref refers to a link
-		error = entry.SetTo(ref, true);
-		if (error == B_OK)
-			error = entry.GetRef(ref);
-		if (error != B_OK)
-			error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
+		if (entry.SetTo(ref, true) != B_OK || entry.GetRef(ref) != B_OK)
+			return B_LAUNCH_FAILED_NO_RESOLVE_LINK;
 	}
 
 	// init node
 	BNode node;
-	if (error == B_OK)
-		error = node.SetTo(ref);
+	error = node.SetTo(ref);
+	if (error != B_OK)
+		return error;
+
 	// get permissions
 	mode_t permissions;
-	if (error == B_OK)
-		error = node.GetPermissions(&permissions);
-	if (error == B_OK) {
-		if ((permissions & S_IXUSR) && node.IsFile()) {
-			// node is executable and a file -- we're done
-			*appRef = *ref;
-			error = appFile->SetTo(appRef, B_READ_ONLY);
+	error = node.GetPermissions(&permissions);
+	if (error != B_OK)
+		return error;
 
-			// get the app's signature via a BAppFileInfo
-			BAppFileInfo appFileInfo;
-			if (error == B_OK)
-				error = appFileInfo.SetTo(appFile);
+	if ((permissions & S_IXUSR) && node.IsFile()) {
+		// node is executable and a file -- we're done
+		*appRef = *ref;
+		error = appFile->SetTo(appRef, B_READ_ONLY);
+		if (error != B_OK)
+			return error;
 
-			char type[B_MIME_TYPE_LENGTH];
-			bool isDocument = true;
+		// get the app's signature via a BAppFileInfo
+		BAppFileInfo appFileInfo;
+		error = appFileInfo.SetTo(appFile);
+		if (error != B_OK)
+			return error;
 
-			if (error == B_OK) {
-				// don't worry, if the file doesn't have a signature, just
-				// unset the supplied object
-				if (appFileInfo.GetSignature(type) == B_OK)
-					error = appMeta->SetTo(type);
-				else
-					appMeta->Unset();
-				if (appFileInfo.GetType(type) == B_OK
-					&& !strcasecmp(type, B_APP_MIME_TYPE))
-					isDocument = false;
-			}
-			if (_wasDocument)
-				*_wasDocument = isDocument;
-		} else {
-			// the node is not exectuable or not a file
-			// init a node info
-			BNodeInfo nodeInfo;
-			if (error == B_OK)
-				error = nodeInfo.SetTo(&node);
-			char preferredApp[B_MIME_TYPE_LENGTH];
-			if (error == B_OK) {
-				// if the file has a preferred app, let _TranslateType() find
-				// it for us
-				bool foundPreferredApp = false;
-				if (nodeInfo.GetPreferredApp(preferredApp) == B_OK) {
-					error = _TranslateType(preferredApp, appMeta, appRef,
-										   appFile);
-					if (error == B_OK)
-						foundPreferredApp = true;
-				}
-				
-				if (!foundPreferredApp) {
-					// no preferred app or existing one was not found -- we
-					// need to get the file's type
+		char type[B_MIME_TYPE_LENGTH];
+		bool isDocument = true;
 
-					error = B_OK; // reset error.
+		// don't worry, if the file doesn't have a signature, just
+		// unset the supplied object
+		if (appFileInfo.GetSignature(type) == B_OK) {
+			error = appMeta->SetTo(type);
+			if (error != B_OK)
+				return error;
+		} else
+			appMeta->Unset();
 
-					char fileType[B_MIME_TYPE_LENGTH];
-
-					// get the type from the file, or guess a type
-					if (nodeInfo.GetType(fileType) != B_OK)
-						error = _SniffFile(ref, &nodeInfo, fileType);
-
-					// now let _TranslateType() do the actual work
-					if (error == B_OK) {
-						error = _TranslateType(fileType, appMeta, appRef,
-											   appFile);
-					}
-				}
-			}
-			if (_wasDocument)
-				*_wasDocument = true;
+		if (appFileInfo.GetType(type) == B_OK
+			&& !strcasecmp(type, B_APP_MIME_TYPE)) {
+			isDocument = false;
 		}
+
+		if (_wasDocument)
+			*_wasDocument = isDocument;
+
+		return B_OK;
 	}
-	return error;
+
+	// the node is not exectuable or not a file
+	// init a node info
+	BNodeInfo nodeInfo;
+	error = nodeInfo.SetTo(&node);
+	if (error != B_OK)
+		return error;
+
+	// if the file has a preferred app, let _TranslateType() find
+	// it for us
+	char preferredApp[B_MIME_TYPE_LENGTH];
+	if (nodeInfo.GetPreferredApp(preferredApp) == B_OK
+		&& _TranslateType(preferredApp, appMeta, appRef, appFile) == B_OK) {
+		if (_wasDocument)
+			*_wasDocument = true;
+		return B_OK;
+	}
+
+	// no preferred app or existing one was not found -- we
+	// need to get the file's type
+
+	// get the type from the file, or guess a type
+	char fileType[B_MIME_TYPE_LENGTH];
+	if (nodeInfo.GetType(fileType) != B_OK) {
+		error = _SniffFile(ref, &nodeInfo, fileType);
+		if (error != B_OK)
+			return error;
+	}
+
+	// now let _TranslateType() do the actual work
+	error = _TranslateType(fileType, appMeta, appRef, appFile);
+	if (error != B_OK)
+		return error;
+
+	if (_wasDocument)
+		*_wasDocument = true;
+
+	return B_OK;
 }
 
 // _TranslateType
@@ -2355,7 +2363,7 @@ BRoster::_SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
 	If \a messageList is not \c NULL or empty, those messages are sent first,
 	then follow \c B_ARGV_RECEIVED, \c B_REFS_RECEIVED and finally
 	\c B_READ_TO_RUN.
-	
+
 	\c B_ARGV_RECEIVED is sent only, if \a args is not \c NULL and contains
 	more than one element. \c B_REFS_RECEIVED is sent only, if \a ref is not
 	\c NULL.
@@ -2406,7 +2414,7 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 			for (int32 i = 0; i < argc; i++)
 				message.AddString("argv", args[i]);
 			messenger.SendMessage(&message);
-		} else if (ref) { 
+		} else if (ref) {
 			printf("_SendToRunning : B_REFS_RECEIVED\n");
 			BMessage message(B_REFS_RECEIVED);
 			message.AddRef("refs", ref);
@@ -2521,9 +2529,9 @@ BRoster::_ClearRecentApps() const
 // LoadRecentLists
 /*! \brief Loads the system's recently used document, folder, and
 	application lists from the specified file.
-	
+
 	\note The current lists are cleared before loading the new lists
-	
+
 	\param filename The name of the file to load from
 */
 void
@@ -2553,7 +2561,7 @@ BRoster::_LoadRecentLists(const char *filename) const
 // SaveRecentLists
 /*! \brief Saves the system's recently used document, folder, and
 	application lists to the specified file.
-	
+
 	\param filename The name of the file to save to
 */
 void
@@ -2843,6 +2851,6 @@ compare_app_versions(const entry_ref *app1, const entry_ref *app2)
 		else if (modificationTime1 > modificationTime2)
 			result = 1;
 	}
-	return result;	
+	return result;
 }
 
