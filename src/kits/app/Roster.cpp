@@ -2136,9 +2136,8 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 		return error;
 
 	if ((permissions & S_IXUSR) && node.IsFile()) {
-		// node is executable and a file -- we're done
-		*appRef = *ref;
-		error = appFile->SetTo(appRef, B_READ_ONLY);
+		// node is executable and a file
+		error = appFile->SetTo(ref, B_READ_ONLY);
 		if (error != B_OK)
 			return error;
 
@@ -2148,11 +2147,9 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 		if (error != B_OK)
 			return error;
 
-		char type[B_MIME_TYPE_LENGTH];
-		bool isDocument = true;
-
 		// don't worry, if the file doesn't have a signature, just
 		// unset the supplied object
+		char type[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.GetSignature(type) == B_OK) {
 			error = appMeta->SetTo(type);
 			if (error != B_OK)
@@ -2160,15 +2157,28 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 		} else
 			appMeta->Unset();
 
-		if (appFileInfo.GetType(type) == B_OK
-			&& !strcasecmp(type, B_APP_MIME_TYPE)) {
+		// If the file type indicates that the file is an application, we've
+		// definitely got what we're looking for.
+		bool isDocument = true;
+		if (_GetFileType(ref, &appFileInfo, type) == B_OK
+			&& strcasecmp(type, B_APP_MIME_TYPE) == 0) {
 			isDocument = false;
 		}
 
-		if (_wasDocument)
-			*_wasDocument = isDocument;
+		// If our file is not an application executable, we probably have a
+		// script. Check whether the file has a preferred application set. If
+		// so, we fall through and use the preferred app instead. Otherwise
+		// we're done.
+		char preferredApp[B_MIME_TYPE_LENGTH];
+		if (!isDocument || appFileInfo.GetPreferredApp(preferredApp) != B_OK) {
+			*appRef = *ref;
+			if (_wasDocument)
+				*_wasDocument = isDocument;
+			return B_OK;
+		}
 
-		return B_OK;
+		// Executable file, but not an application, and it has a preferred
+		// application set. Fall through...
 	}
 
 	// the node is not exectuable or not a file
@@ -2191,13 +2201,11 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 	// no preferred app or existing one was not found -- we
 	// need to get the file's type
 
-	// get the type from the file, or guess a type
+	// get the type from the file
 	char fileType[B_MIME_TYPE_LENGTH];
-	if (nodeInfo.GetType(fileType) != B_OK) {
-		error = _SniffFile(ref, &nodeInfo, fileType);
-		if (error != B_OK)
-			return error;
-	}
+	error = _GetFileType(ref, &nodeInfo, fileType);
+	if (error != B_OK)
+		return error;
 
 	// now let _TranslateType() do the actual work
 	error = _TranslateType(fileType, appMeta, appRef, appFile);
@@ -2318,10 +2326,11 @@ BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
 	return error;
 }
 
-// _SniffFile
-/*!	\brief Sniffs the MIME type for a file.
+// _GetFileType
+/*!	\brief Gets the type of a file either from the node info or by sniffing.
 
-	Also updates the file's MIME info, if possible.
+	The method first tries to get the file type from the supplied node info. If
+	that didn't work, the given entry ref is sniffed.
 
 	\param file An entry_ref referring to the file in question.
 	\param nodeInfo A BNodeInfo initialized to the file.
@@ -2334,24 +2343,31 @@ BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
 	- other errors
 */
 status_t
-BRoster::_SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
+BRoster::_GetFileType(const entry_ref *file, BNodeInfo *nodeInfo,
 	char *mimeType) const
 {
-	status_t error = (file && nodeInfo && mimeType ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		// Try to update the file's MIME info and just read the updated type.
-		// If that fails, sniff manually.
-		BPath path;
-		if (path.SetTo(file) != B_OK
-			|| update_mime_info(path.Path(), false, true, false) != B_OK
-			|| nodeInfo->GetType(mimeType) != B_OK) {
-			BMimeType type;
-			error = BMimeType::GuessMimeType(file, &type);
-			if (error == B_OK && type.IsValid())
-				strcpy(mimeType, type.Type());
-		}
+	// first try the node info
+	if (nodeInfo->GetType(mimeType) == B_OK)
+		return B_OK;
+
+	// Try to update the file's MIME info and just read the updated type.
+	// If that fails, sniff manually.
+	BPath path;
+	if (path.SetTo(file) != B_OK
+		|| update_mime_info(path.Path(), false, true, false) != B_OK
+		|| nodeInfo->GetType(mimeType) != B_OK) {
+		BMimeType type;
+		status_t error = BMimeType::GuessMimeType(file, &type);
+		if (error != B_OK)
+			return error;
+
+		if (!type.IsValid())
+			return B_BAD_VALUE;
+
+		strcpy(mimeType, type.Type());
 	}
-	return error;
+
+	return B_OK;
 }
 
 // _SendToRunning
