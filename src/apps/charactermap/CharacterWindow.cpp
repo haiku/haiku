@@ -52,7 +52,7 @@ public:
 	{
 		SetModificationMessage(message);
 	}
-	
+
 protected:
 	const char* UpdateText() const
 	{
@@ -126,9 +126,6 @@ CharacterWindow::CharacterWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
-	} else {
-		MoveTo(BPoint(100, 100));
-		ResizeTo(600, 450);
 	}
 
 	// create GUI
@@ -315,7 +312,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 				fSelectedFontItem = item;
 
 				_SetFont(item->Menu()->Name(), item->Label());
-			}	
+			}
 			break;
 		}
 
@@ -339,7 +336,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 			if (message->FindPointer("source", (void**)&item) != B_OK
 				|| item == NULL)
 				break;
-	
+
 			item->SetMarked(!item->IsMarked());
 
 			fCharacterView->ShowPrivateBlocks(item->IsMarked());
@@ -353,7 +350,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 			if (message->FindPointer("source", (void**)&item) != B_OK
 				|| item == NULL)
 				break;
-	
+
 			item->SetMarked(!item->IsMarked());
 
 			fCharacterView->ShowContainedBlocksOnly(item->IsMarked());
@@ -434,11 +431,11 @@ CharacterWindow::_SaveSettings()
 		status = settings.AddBool("show contained blocks only",
 			fCharacterView->IsShowingContainedBlocksOnly());
 	}
-	
+
 	if (status == B_OK) {
 		BFont font = fCharacterView->CharacterFont();
 		status = settings.AddInt32("font size", font.Size());
-		
+
 		font_family family;
 		font_style style;
 		if (status == B_OK)

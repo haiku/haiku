@@ -33,6 +33,8 @@ CharacterView::CharacterView(const char* name)
 {
 	fTitleTops = new int32[kNumUnicodeBlocks];
 	fCharacterFont.SetSize(fCharacterFont.Size() * 1.5f);
+
+	_UpdateFontSize();
 }
 
 
@@ -479,12 +481,8 @@ CharacterView::_GetCharacterAt(BPoint point, uint32& character, BRect* _frame)
 
 
 void
-CharacterView::_UpdateSize()
+CharacterView::_UpdateFontSize()
 {
-	// Compute data rect
-
-	BRect bounds = Bounds();
-
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	fTitleHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent
@@ -510,6 +508,17 @@ CharacterView::_UpdateSize()
 
 	fCharacterHeight += fGap;
 	fTitleGap = fGap * 3;
+}
+
+
+void
+CharacterView::_UpdateSize()
+{
+	// Compute data rect
+
+	BRect bounds = Bounds();
+
+	_UpdateFontSize();
 
 	fDataRect.right = bounds.Width();
 	fDataRect.bottom = 0;
@@ -583,7 +592,7 @@ BRect
 CharacterView::_FrameFor(uint32 character)
 {
 	// find block containing the character
-	
+
 	// TODO: could use binary search here
 
 	for (uint32 i = 0; i < kNumUnicodeBlocks; i++) {

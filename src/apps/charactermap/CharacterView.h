@@ -59,6 +59,7 @@ private:
 			int32			_BlockAt(BPoint point);
 			bool 			_GetCharacterAt(BPoint point, uint32& character,
 								BRect* _frame = NULL);
+			void			_UpdateFontSize();
 			void			_UpdateSize();
 			bool			_GetTopmostCharacter(uint32& character,
 								int32& offset);
