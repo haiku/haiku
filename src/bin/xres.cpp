@@ -354,7 +354,7 @@ struct ListState : State {
 			 resources.GetResourceInfo(i, &type, &id, &name, &size);
 			 i++) {
 
-			printf("'%s' %11ld %11lu  %s\n", resource_type(type), id, size,
+			printf("'%s' %11ld %11u  %s\n", resource_type(type), id, size,
 				(name && strlen(name) > 0 ? name : "(no name)"));
 		}
 	}
@@ -452,8 +452,8 @@ struct WriteFileState : State {
 		_PrepareOutput();
 
 		// filter resource
-		if (fInclusionPattern && !fInclusionPattern->Matches(id)
-			|| fExclusionPattern && fExclusionPattern->Matches(id)) {
+		if ((fInclusionPattern && !fInclusionPattern->Matches(id))
+			|| (fExclusionPattern && fExclusionPattern->Matches(id))) {
 			// not included or explicitly excluded
 			return;
 		}
@@ -862,7 +862,7 @@ main(int argc, const char *const *argv)
 
 	// don't allow "-l" together with other comands or without at least one
 	// input file
-	if (list && noList || list && !hasInputFiles)
+	if ((list && noList) || (list && !hasInputFiles))
 		print_usage_and_exit(true);
 
 	// create a state
