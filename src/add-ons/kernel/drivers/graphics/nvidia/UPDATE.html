@@ -19,6 +19,7 @@
 <li>Fixed card/system hanging after trying to log LVDS/TMDS distinction info. This (at least) fixes one NV34 trying to startup after a failed kernel VESA modeswitch without using the driver's coldstart option. Might very well help on other type cards too.
 <li>HDTV video upto/including 1920x1080p can now be played back using overlay on Geforce cards where overlay is supported. On TNT1/TNT2/TNT2-M64 this can't be done and bitmap output is used.
 <li>Added partial DDC/EDID support: dumping monitor specs to logfile only for now.
+<li>Added confirmed support for laptop card with ID 0x01d7: Quadro NVS 110M/GeForce 7300 Go. Also fixed support for laptop card with ID 0x01d8: GeForce 7400 Go: the 'laptop' definition was missing here.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
