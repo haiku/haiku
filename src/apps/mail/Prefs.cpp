@@ -82,7 +82,7 @@ using namespace BPrivate;
 #define ENCODING_TEXT		MDR_DIALECT_CHOICE ("Encoding:", "エンコード形式:")
 #define WARN_UNENCODABLE_TEXT	MDR_DIALECT_CHOICE ("Warn Unencodable:", "警告: エンコードできません")
 #define SPELL_CHECK_START_ON_TEXT	MDR_DIALECT_CHOICE ("Initial Spell Check Mode:", "編集時スペルチェック:")
-#define AUTO_MARK_READED_TEXT	MDR_DIALECT_CHOICE ("Automaticly mark mail as readed:", "Automaticly mark mail as readed:")
+#define AUTO_MARK_READED_TEXT	MDR_DIALECT_CHOICE ("Automatically mark mail as read:", "Automatically mark mail as read:")
 
 #define BUTTONBAR_TEXT		MDR_DIALECT_CHOICE ("Button Bar:", "ボタンバー:")
 
