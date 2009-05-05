@@ -8,15 +8,19 @@
 #define ISO_9660_H
 
 
-#include "lock.h"
+#if FS_SHELL
+#	include "fssh_api_wrapper.h"
+#else
+#	include <stdio.h>
+#	include <sys/types.h>
+#	include <time.h>
+#	include <endian.h>
 
-#include <fs_interface.h>
-#include <SupportDefs.h>
+#	include <fs_interface.h>
+#	include <SupportDefs.h>
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <time.h>
-#include <endian.h>
+#	include <lock.h>
+#endif
 
 
 // Size of primary volume descriptor for ISO9660

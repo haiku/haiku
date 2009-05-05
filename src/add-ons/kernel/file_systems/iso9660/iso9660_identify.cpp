@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Tyler Dauwalder.
  *
  * This file may be used under the terms of the MIT License.
@@ -33,27 +33,29 @@
 	- 0x003A == ':'
 	- 0x003B == ';'
 	- 0x003F == '?'
-	- 0x005C == '\'	
+	- 0x005C == '\'
 */
 
 #include "iso9660_identify.h"
 
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
+#ifndef FS_SHELL
+#	include <errno.h>
+#	include <stdlib.h>
+#	include <string.h>
+#	include <unistd.h>
+#	include <stdio.h>
 
-#include <ByteOrder.h>
-#include <fs_info.h>
-#include <KernelExport.h>
+#	include <ByteOrder.h>
+#	include <fs_info.h>
+#	include <KernelExport.h>
+#endif
 
 #include "iso9660.h"
 
 //#define TRACE(x) ;
 #define TRACE(x) dprintf x
 
-// misc constants
+
 static const char *kISO9660Signature = "CD001";
 static const uint32 kVolumeDescriptorLength = 2048;
 #define ISO9660_VOLUME_IDENTIFIER_LENGTH 32
@@ -72,18 +74,18 @@ typedef enum {
     descriptor types.
 */
 typedef struct iso9660_common_descriptor {
-	uchar	type;
+	uint8	type;
 	char	standard_identifier[5];	// should be 'CD001'
-	uchar	version;
+	uint8	version;
 	// Remaining bytes are unused
 } __attribute__((packed)) iso9660_common_volume_descriptor;
 
 typedef struct iso9660_volume_descriptor {
 	iso9660_common_descriptor common;
-	uchar	flags;
+	uint8	flags;
 	char	system_identifier[32];
 	char	identifier[ISO9660_VOLUME_IDENTIFIER_LENGTH];
-	uchar	_reserved0[8];
+	uint8	_reserved0[8];
 	uint32	size;
 	uint32	size_big_endian;
 	char	escape_sequences[ISO9660_ESCAPE_SEQUENCE_LENGTH];
@@ -97,7 +99,7 @@ typedef struct iso9660_volume_descriptor {
 	uint32	path_table_size;
 	uint32	path_table_size_big_endian;
 	uint32	_reserved1[4];
-	uchar	root_directory_record[34];
+	uint8	root_directory_record[34];
 	char	set_identifier[28];
 	// Remaining bytes are disinteresting to us
 } __attribute__((packed)) iso9660_volume_descriptor;
@@ -108,7 +110,7 @@ typedef struct iso9660_directory_record {
 	uint32	location;
 	uint32	location_big_endian;
 	uint32	data_length;
-	uchar	_reserved[14];
+	uint8	_reserved[14];
 	uint16	volume_space;
 } __attribute__((packed)) iso9660_directory_record;
 
@@ -199,10 +201,10 @@ iso9660_info::_SetString(char **string, const char *newString,
 	if (string == NULL)
 		return;
 
-	TRACE(("iso9660_info::set_string(%p ('%s'), '%s', %ld)\n", string,
-		*string, newString, newLength));
+	TRACE(("iso9660_info::set_string(%p ('%s'), '%s', %u)\n", string,
+		*string, newString, (unsigned)newLength));
 
-	char *&oldString = *string; 
+	char *&oldString = *string;
 	free(oldString);
 
 	if (newString) {
@@ -213,7 +215,7 @@ iso9660_info::_SetString(char **string, const char *newString,
 		}
 	} else
 		oldString = NULL;
-}			
+}
 
 
 //	#pragma mark - C functions
@@ -293,16 +295,16 @@ dump_primary_descriptor(iso9660_volume_descriptor *primary,
 	dump_common_descriptor(&primary->common, indent, false);
 	TRACE(("%s  identifier:             '%.32s'\n", indent,
 		primary->identifier));
-	TRACE(("%s  size:                   %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(primary->size)));
-	TRACE(("%s  set size:               %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(primary->set_size)));
-	TRACE(("%s  sequence number:        %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(primary->sequence_number)));
-	TRACE(("%s  logical block size:     %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(primary->logical_block_size)));
-	TRACE(("%s  path table size:        %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(primary->path_table_size)));
+	TRACE(("%s  size:                   %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(primary->size)));
+	TRACE(("%s  set size:               %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(primary->set_size)));
+	TRACE(("%s  sequence number:        %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(primary->sequence_number)));
+	TRACE(("%s  logical block size:     %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(primary->logical_block_size)));
+	TRACE(("%s  path table size:        %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(primary->path_table_size)));
 	TRACE(("%s  set identifier:         %.28s\n", indent,
 		primary->set_identifier));
 	dump_directory_record((iso9660_directory_record*)
@@ -333,10 +335,10 @@ dump_directory_record(iso9660_directory_record *record, const char *indent)
 {
 	TRACE(("%s  root directory record:\n", indent));
 	TRACE(("%s    length:               %d\n", indent, record->length));
-	TRACE(("%s    location:             %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(record->location)));
-	TRACE(("%s    data length:          %ld\n", indent,
-		B_LENDIAN_TO_HOST_INT32(record->data_length)));
+	TRACE(("%s    location:             %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(record->location)));
+	TRACE(("%s    data length:          %d\n", indent,
+		(int)B_LENDIAN_TO_HOST_INT32(record->data_length)));
 	TRACE(("%s    volume space:         %d\n", indent,
 		B_LENDIAN_TO_HOST_INT16(record->volume_space)));
 }
@@ -360,7 +362,7 @@ check_common_descriptor(iso9660_common_descriptor *common)
 /*! \brief Returns true if the given partition is a valid iso9660 partition.
 
 	See fs_identify_hook() for more information.
-	
+
 	\todo Fill in partitionInfo->mounted_at with something useful.
 */
 status_t
@@ -480,7 +482,7 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 							name, info->joliet_name));
 					}
 
-					info->SetJolietName(name, pos - name);							
+					info->SetJolietName(name, pos - name);
 				}
 				break;
 			}
@@ -495,7 +497,7 @@ iso9660_fs_identify(int deviceFD, iso9660_info *info)
 			default:
 				break;
 		}
-	} 
+	}
 
 	return found ? B_OK : error;
 }

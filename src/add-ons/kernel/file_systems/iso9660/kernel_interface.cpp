@@ -9,28 +9,31 @@
 
 
 #include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
 
-#include <KernelExport.h>
-#include <NodeMonitor.h>
-#include <fs_interface.h>
-#include <fs_cache.h>
+#ifndef FS_SHELL
+#	include <dirent.h>
+#	include <errno.h>
+#	include <fcntl.h>
+#	include <stdio.h>
+#	include <stdlib.h>
+#	include <string.h>
+#	include <sys/stat.h>
+#	include <time.h>
+#	include <unistd.h>
 
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <fs_index.h>
-#include <fs_query.h>
-#include <fs_volume.h>
+#	include <KernelExport.h>
+#	include <NodeMonitor.h>
+#	include <fs_interface.h>
+#	include <fs_cache.h>
 
-#include <util/kernel_cpp.h>
+#	include <fs_attr.h>
+#	include <fs_info.h>
+#	include <fs_index.h>
+#	include <fs_query.h>
+#	include <fs_volume.h>
+
+#	include <util/kernel_cpp.h>
+#endif
 
 #include "iso9660.h"
 #include "iso9660_identify.h"
@@ -285,7 +288,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 				} else {
 					result = initResult;
 					if (bytesRead == 0)
-						done = TRUE;
+						done = true;
 				}
 				blockData += bytesRead;
 				blockBytesRead += bytesRead;
@@ -302,7 +305,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			block_cache_put(ns->fBlockCache, cachedBlock);
 
 		} else
-			done = TRUE;
+			done = true;
 	}
 
 	TRACE(("fs_walk - EXIT, result is %s, vnid is %Lu\n",

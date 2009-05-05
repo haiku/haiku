@@ -9,18 +9,21 @@
 #include "iso9660.h"
 
 #include <ctype.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
 
-#include <ByteOrder.h>
-#include <Drivers.h>
-#include <KernelExport.h>
-#include <fs_cache.h>
+#ifndef FS_SHELL
+#	include <dirent.h>
+#	include <fcntl.h>
+#	include <stdlib.h>
+#	include <string.h>
+#	include <sys/stat.h>
+#	include <time.h>
+#	include <unistd.h>
+
+#	include <ByteOrder.h>
+#	include <Drivers.h>
+#	include <KernelExport.h>
+#	include <fs_cache.h>
+#endif
 
 #include "rock_ridge.h"
 
@@ -98,8 +101,8 @@ unicode_to_utf8(const char	*src, int32	*srcLen, char *dst, int32 *dstLen)
 
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
 		uint16 *UNICODE = (uint16 *)&src[srcCount];
-		uchar utf8[4];
-		uchar *UTF8 = utf8;
+		uint8 utf8[4];
+		uint8 *UTF8 = utf8;
 		int32 utf8Len;
 		int32 j;
 

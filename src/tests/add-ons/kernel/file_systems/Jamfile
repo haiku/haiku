@@ -1,12 +1,12 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems ;
 
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems cdda ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems consistency_check ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems fs_shell ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems fragmenter ;
-#SubInclude HAIKU_TOP src tests add-ons kernel file_systems iso9660 ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems random_file_actions ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems random_read ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ;
+HaikuSubInclude bfs ;
+HaikuSubInclude cdda ;
+HaikuSubInclude consistency_check ;
+HaikuSubInclude fs_shell ;
+HaikuSubInclude fragmenter ;
+HaikuSubInclude iso9660 ;
+HaikuSubInclude random_file_actions ;
+HaikuSubInclude random_read ;
+HaikuSubInclude udf ;
+HaikuSubInclude userlandfs ;

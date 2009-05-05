@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Tyler Dauwalder.
  *
@@ -8,7 +8,11 @@
 #define ISO9660_IDENTIFY_H
 
 
-#include <SupportDefs.h>
+#if FS_SHELL
+#	include "fssh_api_wrapper.h"
+#else
+#	include <SupportDefs.h>
+#endif
 
 
 /*! \brief Contains all the info of interest pertaining to an

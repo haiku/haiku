@@ -1,31 +1,34 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems iso9660 iso9660_shell ;
 
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems iso9660 ;
-SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ;
+UsePrivateHeaders fs_shell ;
 
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems iso9660 ] ;
+
+# set some additional defines
 {
-	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
-	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+	local defines = [ FDefines FS_SHELL USER DEBUG ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-exceptions ;
 }
 
-local fsShellSources = 
-	fsh.c rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
-	stub.c tracker.cpp sysdep.c hexdump.c argv.c
+local libHaikuCompat ;
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) && ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	libHaikuCompat = libhaikucompat_build.a ;
+}
+
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+BuildPlatformMain iso9660_shell
+	:
+	iso9660.cpp
+	iso9660_identify.cpp
+	kernel_interface.cpp
+
+	: <build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	  $(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
-
-SimpleTest iso9660_shell
-	:
-	$(fsShellSources)
-
-	iso.c kernel_interface.c
-	:
-	;
-
-# Tell Jam where to find these sources
-SEARCH on [ FGristFiles
-		iso.c kernel_interface.c
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems iso9660 ] ;
-
-SEARCH on [ FGristFiles
-		$(fsShellSources)
-	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
