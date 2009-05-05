@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -45,44 +45,44 @@
 
 
 struct rootfs_stream {
-	mode_t type;
+	mode_t						type;
 	struct stream_dir {
-		struct rootfs_vnode *dir_head;
-		struct list cookies;
+		struct rootfs_vnode*	dir_head;
+		struct list				cookies;
 	} dir;
 	struct stream_symlink {
-		char *path;
-		size_t length;
+		char*					path;
+		size_t					length;
 	} symlink;
 };
 
 struct rootfs_vnode {
-	struct rootfs_vnode *all_next;
-	ino_t		id;
-	char		*name;
-	time_t		modification_time;
-	time_t		creation_time;
-	uid_t		uid;
-	gid_t		gid;
-	struct rootfs_vnode *parent;
-	struct rootfs_vnode *dir_next;
-	struct rootfs_stream stream;
+	struct rootfs_vnode*		all_next;
+	ino_t						id;
+	char*						name;
+	time_t						modification_time;
+	time_t						creation_time;
+	uid_t						uid;
+	gid_t						gid;
+	struct rootfs_vnode*		parent;
+	struct rootfs_vnode*		dir_next;
+	struct rootfs_stream		stream;
 };
 
 struct rootfs {
-	fs_volume	*volume;
-	dev_t		id;
-	mutex		lock;
-	ino_t		next_vnode_id;
-	hash_table *vnode_list_hash;
-	struct rootfs_vnode *root_vnode;
+	fs_volume*					volume;
+	dev_t						id;
+	mutex						lock;
+	ino_t						next_vnode_id;
+	hash_table*					vnode_list_hash;
+	struct rootfs_vnode*		root_vnode;
 };
 
 // dircookie, dirs are only types of streams supported by rootfs
 struct rootfs_dir_cookie {
-	struct list_link link;
-	struct rootfs_vnode *current;
-	int32 state;	// iteration state
+	struct list_link			link;
+	struct rootfs_vnode*		current;
+	int32						iteration_state;
 };
 
 // directory iteration states
@@ -103,10 +103,10 @@ namespace {
 
 
 static uint32
-rootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
+rootfs_vnode_hash_func(void* _v, const void* _key, uint32 range)
 {
-	struct rootfs_vnode *vnode = (rootfs_vnode*)_v;
-	const ino_t *key = (const ino_t*)_key;
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_v;
+	const ino_t* key = (const ino_t*)_key;
 
 	if (vnode != NULL)
 		return vnode->id % range;
@@ -116,10 +116,10 @@ rootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 
 
 static int
-rootfs_vnode_compare_func(void *_v, const void *_key)
+rootfs_vnode_compare_func(void* _v, const void* _key)
 {
-	struct rootfs_vnode *v = (rootfs_vnode*)_v;
-	const ino_t *key = (const ino_t*)_key;
+	struct rootfs_vnode* v = (rootfs_vnode*)_v;
+	const ino_t* key = (const ino_t*)_key;
 
 	if (v->id == *key)
 		return 0;
@@ -128,11 +128,11 @@ rootfs_vnode_compare_func(void *_v, const void *_key)
 }
 
 
-static struct rootfs_vnode *
-rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent,
-	const char *name, int type)
+static struct rootfs_vnode*
+rootfs_create_vnode(struct rootfs* fs, struct rootfs_vnode* parent,
+	const char* name, int type)
 {
-	struct rootfs_vnode *vnode;
+	struct rootfs_vnode* vnode;
 
 	vnode = (rootfs_vnode*)malloc(sizeof(struct rootfs_vnode));
 	if (vnode == NULL)
@@ -163,7 +163,7 @@ rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent,
 
 
 static status_t
-rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete)
+rootfs_delete_vnode(struct rootfs* fs, struct rootfs_vnode* v, bool force_delete)
 {
 	// cant delete it if it's in a directory or is a directory
 	// and has children
@@ -180,12 +180,11 @@ rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete
 }
 
 
-/* makes sure none of the dircookies point to the vnode passed in */
-
+/*! Makes sure none of the dircookies point to the vnode passed in. */
 static void
-update_dir_cookies(struct rootfs_vnode *dir, struct rootfs_vnode *vnode)
+update_dir_cookies(struct rootfs_vnode* dir, struct rootfs_vnode* vnode)
 {
-	struct rootfs_dir_cookie *cookie = NULL;
+	struct rootfs_dir_cookie* cookie = NULL;
 
 	while ((cookie = (rootfs_dir_cookie*)list_get_next_item(
 			&dir->stream.dir.cookies, cookie)) != NULL) {
@@ -195,10 +194,10 @@ update_dir_cookies(struct rootfs_vnode *dir, struct rootfs_vnode *vnode)
 }
 
 
-static struct rootfs_vnode *
-rootfs_find_in_dir(struct rootfs_vnode *dir, const char *path)
+static struct rootfs_vnode*
+rootfs_find_in_dir(struct rootfs_vnode* dir, const char* path)
 {
-	struct rootfs_vnode *vnode;
+	struct rootfs_vnode* vnode;
 
 	if (!strcmp(path, "."))
 		return dir;
@@ -206,7 +205,7 @@ rootfs_find_in_dir(struct rootfs_vnode *dir, const char *path)
 		return dir->parent;
 
 	for (vnode = dir->stream.dir.dir_head; vnode; vnode = vnode->dir_next) {
-		if (strcmp(vnode->name, path) == 0)
+		if (!strcmp(vnode->name, path))
 			return vnode;
 	}
 	return NULL;
@@ -214,13 +213,14 @@ rootfs_find_in_dir(struct rootfs_vnode *dir, const char *path)
 
 
 static status_t
-rootfs_insert_in_dir(struct rootfs *fs, struct rootfs_vnode *dir,
-	struct rootfs_vnode *vnode)
+rootfs_insert_in_dir(struct rootfs* fs, struct rootfs_vnode* dir,
+	struct rootfs_vnode* vnode)
 {
 	// make sure the directory stays sorted alphabetically
 
-	struct rootfs_vnode *node = dir->stream.dir.dir_head, *last = NULL;
-	while (node && strcmp(node->name, vnode->name) < 0) {
+	struct rootfs_vnode* node = dir->stream.dir.dir_head;
+	struct rootfs_vnode* last = NULL;
+	while (node != NULL && strcmp(node->name, vnode->name) < 0) {
 		last = node;
 		node = node->dir_next;
 	}
@@ -243,22 +243,23 @@ rootfs_insert_in_dir(struct rootfs *fs, struct rootfs_vnode *dir,
 
 
 static status_t
-rootfs_remove_from_dir(struct rootfs *fs, struct rootfs_vnode *dir,
-	struct rootfs_vnode *findit)
+rootfs_remove_from_dir(struct rootfs* fs, struct rootfs_vnode* dir,
+	struct rootfs_vnode* removeVnode)
 {
-	struct rootfs_vnode *v;
-	struct rootfs_vnode *last_v;
+	struct rootfs_vnode* vnode;
+	struct rootfs_vnode* lastVnode;
 
-	for (v = dir->stream.dir.dir_head, last_v = NULL; v; last_v = v, v = v->dir_next) {
-		if (v == findit) {
-			/* make sure all dircookies dont point to this vnode */
-			update_dir_cookies(dir, v);
+	for (vnode = dir->stream.dir.dir_head, lastVnode = NULL; vnode != NULL;
+			lastVnode = vnode, vnode = vnode->dir_next) {
+		if (vnode == removeVnode) {
+			// make sure all dircookies dont point to this vnode
+			update_dir_cookies(dir, vnode);
 
-			if (last_v)
-				last_v->dir_next = v->dir_next;
+			if (lastVnode)
+				lastVnode->dir_next = vnode->dir_next;
 			else
-				dir->stream.dir.dir_head = v->dir_next;
-			v->dir_next = NULL;
+				dir->stream.dir.dir_head = vnode->dir_next;
+			vnode->dir_next = NULL;
 
 			dir->modification_time = time(NULL);
 			notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
@@ -270,17 +271,16 @@ rootfs_remove_from_dir(struct rootfs *fs, struct rootfs_vnode *dir,
 
 
 static bool
-rootfs_is_dir_empty(struct rootfs_vnode *dir)
+rootfs_is_dir_empty(struct rootfs_vnode* dir)
 {
 	return !dir->stream.dir.dir_head;
 }
 
 
-/** You must hold the FS lock when calling this function */
-
+/*! You must hold the FS lock when calling this function */
 static status_t
-remove_node(struct rootfs *fs, struct rootfs_vnode *directory,
-	struct rootfs_vnode *vnode)
+remove_node(struct rootfs* fs, struct rootfs_vnode* directory,
+	struct rootfs_vnode* vnode)
 {
 	// schedule this vnode to be removed when it's ref goes to zero
 
@@ -303,9 +303,10 @@ remove_node(struct rootfs *fs, struct rootfs_vnode *directory,
 
 
 static status_t
-rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, bool isDirectory)
+rootfs_remove(struct rootfs* fs, struct rootfs_vnode* dir, const char* name,
+	bool isDirectory)
 {
-	struct rootfs_vnode *vnode;
+	struct rootfs_vnode* vnode;
 	status_t status = B_OK;
 
 	mutex_lock(&fs->lock);
@@ -336,11 +337,11 @@ err:
 
 
 static status_t
-rootfs_mount(fs_volume *volume, const char *device, uint32 flags,
-	const char *args, ino_t *root_vnid)
+rootfs_mount(fs_volume* volume, const char* device, uint32 flags,
+	const char* args, ino_t* _rootID)
 {
-	struct rootfs *fs;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs;
+	struct rootfs_vnode* vnode;
 	status_t err;
 
 	TRACE(("rootfs_mount: entry\n"));
@@ -357,8 +358,9 @@ rootfs_mount(fs_volume *volume, const char *device, uint32 flags,
 
 	mutex_init(&fs->lock, "rootfs_mutex");
 
-	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr_t)&vnode->all_next - (addr_t)vnode,
-		&rootfs_vnode_compare_func, &rootfs_vnode_hash_func);
+	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE,
+		(addr_t)&vnode->all_next - (addr_t)vnode, &rootfs_vnode_compare_func,
+		&rootfs_vnode_hash_func);
 	if (fs->vnode_list_hash == NULL) {
 		err = B_NO_MEMORY;
 		goto err2;
@@ -376,7 +378,7 @@ rootfs_mount(fs_volume *volume, const char *device, uint32 flags,
 	hash_insert(fs->vnode_list_hash, vnode);
 	publish_vnode(volume, vnode->id, vnode, &sVnodeOps, vnode->stream.type, 0);
 
-	*root_vnid = vnode->id;
+	*_rootID = vnode->id;
 
 	return B_OK;
 
@@ -391,11 +393,9 @@ err2:
 
 
 static status_t
-rootfs_unmount(fs_volume *_volume)
+rootfs_unmount(fs_volume* _volume)
 {
-	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
-	struct rootfs_vnode *v;
-	struct hash_iterator i;
+	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
 
 	TRACE(("rootfs_unmount: entry fs = %p\n", fs));
 
@@ -403,10 +403,14 @@ rootfs_unmount(fs_volume *_volume)
 	put_vnode(fs->volume, fs->root_vnode->id);
 
 	// delete all of the vnodes
+	struct hash_iterator i;
 	hash_open(fs->vnode_list_hash, &i);
-	while ((v = (struct rootfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
-		rootfs_delete_vnode(fs, v, true);
+
+	while (struct rootfs_vnode* vnode = (struct rootfs_vnode*)
+			hash_next(fs->vnode_list_hash, &i)) {
+		rootfs_delete_vnode(fs, vnode, true);
 	}
+
 	hash_close(fs->vnode_list_hash, &i, false);
 
 	hash_uninit(fs->vnode_list_hash);
@@ -418,7 +422,7 @@ rootfs_unmount(fs_volume *_volume)
 
 
 static status_t
-rootfs_sync(fs_volume *_volume)
+rootfs_sync(fs_volume* _volume)
 {
 	TRACE(("rootfs_sync: entry\n"));
 
@@ -427,11 +431,11 @@ rootfs_sync(fs_volume *_volume)
 
 
 static status_t
-rootfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
+rootfs_lookup(fs_volume* _volume, fs_vnode* _dir, const char* name, ino_t* _id)
 {
-	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
-	struct rootfs_vnode *dir = (struct rootfs_vnode *)_dir->private_node;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (struct rootfs_vnode*)_dir->private_node;
+	struct rootfs_vnode* vnode;
 	status_t status;
 
 	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
@@ -461,12 +465,13 @@ err:
 
 
 static status_t
-rootfs_get_vnode_name(fs_volume *_volume, fs_vnode *_vnode, char *buffer,
+rootfs_get_vnode_name(fs_volume* _volume, fs_vnode* _vnode, char* buffer,
 	size_t bufferSize)
 {
-	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode->private_node;
+	struct rootfs_vnode* vnode = (struct rootfs_vnode*)_vnode->private_node;
 
-	TRACE(("rootfs_get_vnode_name: vnode = %p (name = %s)\n", vnode, vnode->name));
+	TRACE(("rootfs_get_vnode_name: vnode = %p (name = %s)\n", vnode,
+		vnode->name));
 
 	strlcpy(buffer, vnode->name, bufferSize);
 	return B_OK;
@@ -474,11 +479,11 @@ rootfs_get_vnode_name(fs_volume *_volume, fs_vnode *_vnode, char *buffer,
 
 
 static status_t
-rootfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_vnode, int *_type,
-	uint32 *_flags, bool reenter)
+rootfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _vnode, int* _type,
+	uint32* _flags, bool reenter)
 {
-	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode;
 
 	TRACE(("rootfs_getvnode: asking for vnode %Ld, r %d\n", id, reenter));
 
@@ -490,7 +495,7 @@ rootfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_vnode, int *_type,
 	if (!reenter)
 		mutex_unlock(&fs->lock);
 
-	TRACE(("rootfs_getnvnode: looked it up at %p\n", *_vnode));
+	TRACE(("rootfs_getnvnode: looked it up at %p\n", vnode));
 
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -505,10 +510,10 @@ rootfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_vnode, int *_type,
 
 
 static status_t
-rootfs_put_vnode(fs_volume *_volume, fs_vnode *_vnode, bool reenter)
+rootfs_put_vnode(fs_volume* _volume, fs_vnode* _vnode, bool reenter)
 {
 #ifdef TRACE_ROOTFS
-	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode->private_node;
+	struct rootfs_vnode* vnode = (struct rootfs_vnode*)_vnode->private_node;
 
 	TRACE(("rootfs_putvnode: entry on vnode 0x%Lx, r %d\n", vnode->id, reenter));
 #endif
@@ -517,19 +522,21 @@ rootfs_put_vnode(fs_volume *_volume, fs_vnode *_vnode, bool reenter)
 
 
 static status_t
-rootfs_remove_vnode(fs_volume *_volume, fs_vnode *_vnode, bool reenter)
+rootfs_remove_vnode(fs_volume* _volume, fs_vnode* _vnode, bool reenter)
 {
-	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
-	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode->private_node;
+	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode = (struct rootfs_vnode*)_vnode->private_node;
 
-	TRACE(("rootfs_remove_vnode: remove %p (0x%Lx), r %d\n", vnode, vnode->id, reenter));
+	TRACE(("rootfs_remove_vnode: remove %p (0x%Lx), r %d\n", vnode, vnode->id,
+		reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
 
 	if (vnode->dir_next) {
 		// can't remove node if it's linked to the dir
-		panic("rootfs_remove_vnode: vnode %p asked to be removed is present in dir\n", vnode);
+		panic("rootfs_remove_vnode: vnode %p asked to be removed is present in "
+			"dir\n", vnode);
 	}
 
 	rootfs_delete_vnode(fs, vnode, false);
@@ -542,15 +549,15 @@ rootfs_remove_vnode(fs_volume *_volume, fs_vnode *_vnode, bool reenter)
 
 
 static status_t
-rootfs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
-	int perms, void **_cookie, ino_t *_newID)
+rootfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int omode,
+	int perms, void** _cookie, ino_t* _newID)
 {
 	return B_BAD_VALUE;
 }
 
 
 static status_t
-rootfs_open(fs_volume *_volume, fs_vnode *_v, int oflags, void **_cookie)
+rootfs_open(fs_volume* _volume, fs_vnode* _v, int oflags, void** _cookie)
 {
 	// allow to open the file, but it can't be done anything with it
 
@@ -560,58 +567,54 @@ rootfs_open(fs_volume *_volume, fs_vnode *_v, int oflags, void **_cookie)
 
 
 static status_t
-rootfs_close(fs_volume *_volume, fs_vnode *_v, void *_cookie)
+rootfs_close(fs_volume* _volume, fs_vnode* _vnode, void* _cookie)
 {
-#ifdef TRACE_ROOTFS
-	struct rootfs_vnode *v = _v->private_node;
-	struct rootvoid **cookie = _cookie;
-
-	TRACE(("rootfs_close: entry vnode %p, cookie %p\n", v, cookie));
-#endif
+	TRACE(("rootfs_close: entry vnode %p, cookie %p\n", _vnode->private_node,
+		_cookie));
 	return B_OK;
 }
 
 
 static status_t
-rootfs_free_cookie(fs_volume *_volume, fs_vnode *_v, void *_cookie)
+rootfs_free_cookie(fs_volume* _volume, fs_vnode* _v, void* _cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-rootfs_fsync(fs_volume *_volume, fs_vnode *_v)
+rootfs_fsync(fs_volume* _volume, fs_vnode* _v)
 {
 	return B_OK;
 }
 
 
 static status_t
-rootfs_read(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
-	off_t pos, void *buffer, size_t *_length)
+rootfs_read(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
+	off_t pos, void* buffer, size_t* _length)
 {
 	return EINVAL;
 }
 
 
 static status_t
-rootfs_write(fs_volume *_volume, fs_vnode *vnode, void *cookie,
-	off_t pos, const void *buffer, size_t *_length)
+rootfs_write(fs_volume* _volume, fs_vnode* vnode, void* cookie,
+	off_t pos, const void* buffer, size_t* _length)
 {
-	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n",
-		vnode, cookie, pos, *_length));
+	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len %#x\n",
+		vnode, cookie, pos, (int)*_length));
 
 	return EPERM;
 }
 
 
 static status_t
-rootfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
+rootfs_create_dir(fs_volume* _volume, fs_vnode* _dir, const char* name,
 	int mode)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (rootfs_vnode*)_dir->private_node;
+	struct rootfs_vnode* vnode;
 	status_t status = 0;
 
 	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d\n", dir, name,
@@ -648,23 +651,24 @@ err:
 
 
 static status_t
-rootfs_remove_dir(fs_volume *_volume, fs_vnode *_dir, const char *name)
+rootfs_remove_dir(fs_volume* _volume, fs_vnode* _dir, const char* name)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (rootfs_vnode*)_dir->private_node;
 
-	TRACE(("rootfs_remove_dir: dir %p (0x%Lx), name '%s'\n", dir, dir->id, name));
+	TRACE(("rootfs_remove_dir: dir %p (0x%Lx), name '%s'\n", dir, dir->id,
+		name));
 
 	return rootfs_remove(fs, dir, name, true);
 }
 
 
 static status_t
-rootfs_open_dir(fs_volume *_volume, fs_vnode *_v, void **_cookie)
+rootfs_open_dir(fs_volume* _volume, fs_vnode* _v, void** _cookie)
 {
-	struct rootfs *fs = (struct rootfs *)_volume->private_volume;
-	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_v->private_node;
-	struct rootfs_dir_cookie *cookie;
+	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode = (struct rootfs_vnode*)_v->private_node;
+	struct rootfs_dir_cookie* cookie;
 
 	TRACE(("rootfs_open: vnode %p\n", vnode));
 
@@ -678,7 +682,7 @@ rootfs_open_dir(fs_volume *_volume, fs_vnode *_v, void **_cookie)
 	mutex_lock(&fs->lock);
 
 	cookie->current = vnode->stream.dir.dir_head;
-	cookie->state = ITERATION_STATE_BEGIN;
+	cookie->iteration_state = ITERATION_STATE_BEGIN;
 
 	list_add_item(&vnode->stream.dir.cookies, cookie);
 	*_cookie = cookie;
@@ -690,11 +694,11 @@ rootfs_open_dir(fs_volume *_volume, fs_vnode *_v, void **_cookie)
 
 
 static status_t
-rootfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
+rootfs_free_dir_cookie(fs_volume* _volume, fs_vnode* _vnode, void* _cookie)
 {
-	struct rootfs_dir_cookie *cookie = (rootfs_dir_cookie*)_cookie;
-	struct rootfs_vnode *vnode = (rootfs_vnode*)_vnode->private_node;
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
+	struct rootfs_dir_cookie* cookie = (rootfs_dir_cookie*)_cookie;
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_vnode->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
 
 	mutex_lock(&fs->lock);
 	list_remove_item(&vnode->stream.dir.cookies, cookie);
@@ -706,34 +710,35 @@ rootfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 
 
 static status_t
-rootfs_read_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+rootfs_read_dir(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
+	struct dirent* dirent, size_t bufferSize, uint32* _num)
 {
-	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode->private_node;
-	struct rootfs_dir_cookie *cookie = (rootfs_dir_cookie*)_cookie;
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode = (struct rootfs_vnode*)_vnode->private_node;
+	struct rootfs_dir_cookie* cookie = (rootfs_dir_cookie*)_cookie;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
 	status_t status = B_OK;
-	struct rootfs_vnode *childNode = NULL;
-	const char *name = NULL;
-	struct rootfs_vnode *nextChildNode = NULL;
-	int nextState = cookie->state;
+	struct rootfs_vnode* childNode = NULL;
+	const char* name = NULL;
+	struct rootfs_vnode* nextChildNode = NULL;
+	int nextState = cookie->iteration_state;
 
-	TRACE(("rootfs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _vnode, cookie, dirent, bufferSize,_num));
+	TRACE(("rootfs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %d, "
+		"num = %p\n", _vnode, cookie, dirent, (int)bufferSize, _num));
 
 	mutex_lock(&fs->lock);
 
-	switch (cookie->state) {
+	switch (cookie->iteration_state) {
 		case ITERATION_STATE_DOT:
 			childNode = vnode;
 			name = ".";
 			nextChildNode = vnode->stream.dir.dir_head;
-			nextState = cookie->state + 1;
+			nextState = cookie->iteration_state + 1;
 			break;
 		case ITERATION_STATE_DOT_DOT:
 			childNode = vnode->parent;
 			name = "..";
 			nextChildNode = vnode->stream.dir.dir_head;
-			nextState = cookie->state + 1;
+			nextState = cookie->iteration_state + 1;
 			break;
 		default:
 			childNode = cookie->current;
@@ -765,7 +770,7 @@ rootfs_read_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 		goto err;
 
 	cookie->current = nextChildNode;
-	cookie->state = nextState;
+	cookie->iteration_state = nextState;
 	*_num = 1;
 	status = B_OK;
 
@@ -777,16 +782,16 @@ err:
 
 
 static status_t
-rootfs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
+rootfs_rewind_dir(fs_volume* _volume, fs_vnode* _vnode, void* _cookie)
 {
-	struct rootfs_dir_cookie *cookie = (rootfs_dir_cookie*)_cookie;
-	struct rootfs_vnode *vnode = (rootfs_vnode*)_vnode->private_node;
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
+	struct rootfs_dir_cookie* cookie = (rootfs_dir_cookie*)_cookie;
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_vnode->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
 
 	mutex_lock(&fs->lock);
 
 	cookie->current = vnode->stream.dir.dir_head;
-	cookie->state = ITERATION_STATE_BEGIN;
+	cookie->iteration_state = ITERATION_STATE_BEGIN;
 
 	mutex_unlock(&fs->lock);
 	return B_OK;
@@ -794,43 +799,44 @@ rootfs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 
 
 static status_t
-rootfs_ioctl(fs_volume *_volume, fs_vnode *_v, void *_cookie, ulong op,
-	void *buf, size_t len)
+rootfs_ioctl(fs_volume* _volume, fs_vnode* _v, void* _cookie, ulong op,
+	void* buffer, size_t length)
 {
-	TRACE(("rootfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _v, _cookie, op, buf, len));
+	TRACE(("rootfs_ioctl: vnode %p, cookie %p, op %d, buf %p, length %d\n",
+		_volume, _cookie, (int)op, buffer, (int)length));
 
-	return EINVAL;
+	return B_BAD_VALUE;
 }
 
 
 static bool
-rootfs_can_page(fs_volume *_volume, fs_vnode *_v, void *cookie)
+rootfs_can_page(fs_volume* _volume, fs_vnode* _v, void* cookie)
 {
 	return false;
 }
 
 
 static status_t
-rootfs_read_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_read_pages(fs_volume* _volume, fs_vnode* _v, void* cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-rootfs_write_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_write_pages(fs_volume* _volume, fs_vnode* _v, void* cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-rootfs_read_link(fs_volume *_volume, fs_vnode *_link, char *buffer,
-	size_t *_bufferSize)
+rootfs_read_link(fs_volume* _volume, fs_vnode* _link, char* buffer,
+	size_t* _bufferSize)
 {
-	struct rootfs_vnode *link = (rootfs_vnode*)_link->private_node;
+	struct rootfs_vnode* link = (rootfs_vnode*)_link->private_node;
 
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
@@ -844,12 +850,12 @@ rootfs_read_link(fs_volume *_volume, fs_vnode *_link, char *buffer,
 
 
 static status_t
-rootfs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name,
-	const char *path, int mode)
+rootfs_symlink(fs_volume* _volume, fs_vnode* _dir, const char* name,
+	const char* path, int mode)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (rootfs_vnode*)_dir->private_node;
+	struct rootfs_vnode* vnode;
 	status_t status = B_OK;
 
 	TRACE(("rootfs_symlink: dir %p, name = '%s', path = %s\n", dir, name, path));
@@ -893,10 +899,10 @@ err:
 
 
 static status_t
-rootfs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
+rootfs_unlink(fs_volume* _volume, fs_vnode* _dir, const char* name)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (rootfs_vnode*)_dir->private_node;
 
 	TRACE(("rootfs_unlink: dir %p (0x%Lx), name '%s'\n", dir, dir->id, name));
 
@@ -905,66 +911,54 @@ rootfs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 
 
 static status_t
-rootfs_rename(fs_volume *_volume, fs_vnode *_fromDir, const char *fromName,
-	fs_vnode *_toDir, const char *toName)
+rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
+	fs_vnode* _toDir, const char* toName)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *fromDirectory = (rootfs_vnode*)_fromDir->private_node;
-	struct rootfs_vnode *toDirectory = (rootfs_vnode*)_toDir->private_node;
-	struct rootfs_vnode *vnode, *targetVnode, *parent;
-	status_t status;
-	char *nameBuffer = NULL;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* fromDirectory = (rootfs_vnode*)_fromDir->private_node;
+	struct rootfs_vnode* toDirectory = (rootfs_vnode*)_toDir->private_node;
 
-	TRACE(("rootfs_rename: from %p (0x%Lx), fromName '%s', to %p (0x%Lx), toName '%s'\n",
-		fromDirectory, fromDirectory->id, fromName, toDirectory, toDirectory->id, toName));
+	TRACE(("rootfs_rename: from %p (0x%Lx), fromName '%s', to %p (0x%Lx), "
+		"toName '%s'\n", fromDirectory, fromDirectory->id, fromName, toDirectory,
+		toDirectory->id, toName));
 
-	mutex_lock(&fs->lock);
+	MutexLocker _(&fs->lock);
 
-	vnode = rootfs_find_in_dir(fromDirectory, fromName);
-	if (vnode != NULL) {
-		status = B_ENTRY_NOT_FOUND;
-		goto err;
-	}
+	struct rootfs_vnode* vnode = rootfs_find_in_dir(fromDirectory, fromName);
+	if (vnode == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	// make sure the target not a subdirectory of us
-	parent = toDirectory->parent;
-	while (parent != NULL) {
-		if (parent == vnode) {
-			status = B_BAD_VALUE;
-			goto err;
-		}
+	// make sure the target is not a subdirectory of us
+	struct rootfs_vnode* parent = toDirectory->parent;
+	while (parent != NULL && parent != parent->parent) {
+		if (parent == vnode)
+			return B_BAD_VALUE;
 
 		parent = parent->parent;
 	}
 
-	// we'll reuse the name buffer if possible
-	if (strlen(fromName) >= strlen(toName)) {
-		nameBuffer = strdup(toName);
-		if (nameBuffer == NULL) {
-			status = B_NO_MEMORY;
-			goto err;
-		}
-	}
-
-	targetVnode = rootfs_find_in_dir(toDirectory, toName);
+	struct rootfs_vnode* targetVnode = rootfs_find_in_dir(toDirectory, toName);
 	if (targetVnode != NULL) {
 		// target node exists, let's see if it is an empty directory
-		if (S_ISDIR(targetVnode->stream.type) && !rootfs_is_dir_empty(targetVnode)) {
-			status = B_NAME_IN_USE;
-			goto err;
-		}
+		if (S_ISDIR(targetVnode->stream.type)
+			&& !rootfs_is_dir_empty(targetVnode))
+			return B_NAME_IN_USE;
 
 		// so we can cleanly remove it
 		remove_node(fs, toDirectory, targetVnode);
 	}
 
-	// change the name on this node
-	if (nameBuffer == NULL) {
-		// we can just copy it
-		strcpy(vnode->name, toName);
-	} else {
+	// we try to reuse the existing name buffer if possible
+	if (strlen(fromName) >= strlen(toName)) {
+		char* nameBuffer = strdup(toName);
+		if (nameBuffer == NULL)
+			return B_NO_MEMORY;
+
 		free(vnode->name);
 		vnode->name = nameBuffer;
+	} else {
+		// we can just copy it
+		strcpy(vnode->name, toName);
 	}
 
 	// remove it from the dir
@@ -975,28 +969,24 @@ rootfs_rename(fs_volume *_volume, fs_vnode *_fromDir, const char *fromName,
 	// so that it keeps sorted correctly.
 	rootfs_insert_in_dir(fs, toDirectory, vnode);
 
-	notify_entry_moved(fs->id, fromDirectory->id, fromName, toDirectory->id, toName, vnode->id);
-	status = B_OK;
+	notify_entry_moved(fs->id, fromDirectory->id, fromName, toDirectory->id,
+		toName, vnode->id);
 
-err:
-	if (status != B_OK)
-		free(nameBuffer);
-
-	mutex_unlock(&fs->lock);
-
-	return status;
+	return B_OK;
 }
 
 
 static status_t
-rootfs_read_stat(fs_volume *_volume, fs_vnode *_v, struct stat *stat)
+rootfs_read_stat(fs_volume* _volume, fs_vnode* _v, struct stat* stat)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *vnode = (rootfs_vnode*)_v->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_v->private_node;
 
-	TRACE(("rootfs_read_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
+	TRACE(("rootfs_read_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id,
+		stat));
 
-	// stream exists, but we know to return size 0, since we can only hold directories
+	// stream exists, but we know to return size 0, since we can only hold
+	// directories
 	stat->st_dev = fs->id;
 	stat->st_ino = vnode->id;
 	if (S_ISLNK(vnode->stream.type))
@@ -1021,13 +1011,14 @@ rootfs_read_stat(fs_volume *_volume, fs_vnode *_v, struct stat *stat)
 
 
 static status_t
-rootfs_write_stat(fs_volume *_volume, fs_vnode *_vnode, const struct stat *stat,
+rootfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 	uint32 statMask)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *vnode = (rootfs_vnode*)_vnode->private_node;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_vnode->private_node;
 
-	TRACE(("rootfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
+	TRACE(("rootfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id,
+		stat));
 
 	// we cannot change the size of anything
 	if (statMask & B_STAT_SIZE)
@@ -1035,17 +1026,19 @@ rootfs_write_stat(fs_volume *_volume, fs_vnode *_vnode, const struct stat *stat,
 
 	mutex_lock(&fs->lock);
 
-	if (statMask & B_STAT_MODE)
-		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
+	if ((statMask & B_STAT_MODE) != 0) {
+		vnode->stream.type = (vnode->stream.type & ~S_IUMSK)
+			| (stat->st_mode & S_IUMSK);
+	}
 
-	if (statMask & B_STAT_UID)
+	if ((statMask & B_STAT_UID) != 0)
 		vnode->uid = stat->st_uid;
-	if (statMask & B_STAT_GID)
+	if ((statMask & B_STAT_GID) != 0)
 		vnode->gid = stat->st_gid;
 
-	if (statMask & B_STAT_MODIFICATION_TIME)
+	if ((statMask & B_STAT_MODIFICATION_TIME) != 0)
 		vnode->modification_time = stat->st_mtime;
-	if (statMask & B_STAT_CREATION_TIME)
+	if ((statMask & B_STAT_CREATION_TIME) != 0)
 		vnode->creation_time = stat->st_crtime;
 
 	mutex_unlock(&fs->lock);
@@ -1056,13 +1049,13 @@ rootfs_write_stat(fs_volume *_volume, fs_vnode *_vnode, const struct stat *stat,
 
 
 static status_t
-rootfs_create_special_node(fs_volume *_volume, fs_vnode *_dir, const char *name,
-	fs_vnode *subVnode, mode_t mode, uint32 flags, fs_vnode *_superVnode,
-	ino_t *_nodeID)
+rootfs_create_special_node(fs_volume* _volume, fs_vnode* _dir, const char* name,
+	fs_vnode* subVnode, mode_t mode, uint32 flags, fs_vnode* _superVnode,
+	ino_t* _nodeID)
 {
-	struct rootfs *fs = (rootfs*)_volume->private_volume;
-	struct rootfs_vnode *dir = (rootfs_vnode*)_dir->private_node;
-	struct rootfs_vnode *vnode;
+	struct rootfs* fs = (rootfs*)_volume->private_volume;
+	struct rootfs_vnode* dir = (rootfs_vnode*)_dir->private_node;
+	struct rootfs_vnode* vnode;
 
 	MutexLocker _(fs->lock);
 
