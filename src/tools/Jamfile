@@ -104,7 +104,6 @@ SEARCH on [ FGristFiles
 
 SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
-SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
