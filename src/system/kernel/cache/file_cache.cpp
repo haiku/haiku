@@ -75,8 +75,8 @@ public:
 									size_t size);
 								~PrecacheIO();
 
-			status_t			Init();
-			status_t			Start();
+			status_t			Prepare();
+			void				ReadAsync();
 
 	virtual	void				IOFinished(status_t status,
 									bool partialTransfer,
@@ -90,6 +90,7 @@ private:
 			ConditionVariable*	fBusyConditions;
 			iovec*				fVecs;
 			off_t				fOffset;
+			uint32				fVecCount;
 			size_t				fSize;
 };
 
@@ -116,6 +117,7 @@ PrecacheIO::PrecacheIO(file_cache_ref* ref, off_t offset, size_t size)
 	fBusyConditions(NULL),
 	fVecs(NULL),
 	fOffset(offset),
+	fVecCount(0),
 	fSize(size)
 {
 	fPageCount = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
@@ -133,7 +135,7 @@ PrecacheIO::~PrecacheIO()
 
 
 status_t
-PrecacheIO::Init()
+PrecacheIO::Prepare()
 {
 	if (fPageCount == 0)
 		return B_BAD_VALUE;
@@ -150,18 +152,7 @@ PrecacheIO::Init()
 	if (fVecs == NULL)
 		return B_NO_MEMORY;
 
-	return B_OK;
-}
-
-
-/*!	Cache has to be locked when calling this method, but it will be temporarily
-    unlocked during execution.
-*/
-status_t
-PrecacheIO::Start()
-{
 	// allocate pages for the cache and mark them busy
-	uint32 vecCount = 0;
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
 		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE, true);
@@ -171,7 +162,7 @@ PrecacheIO::Start()
 		fBusyConditions[i].Publish(page, "page");
 		fCache->InsertPage(page, fOffset + pos);
 
-		add_to_iovec(fVecs, vecCount, fPageCount,
+		add_to_iovec(fVecs, fVecCount, fPageCount,
 			page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
 		fPages[i++] = page;
 	}
@@ -186,14 +177,17 @@ PrecacheIO::Start()
 		return B_NO_MEMORY;
 	}
 
-	fCache->Unlock();
+	return B_OK;
+}
 
-	status_t status = vfs_asynchronous_read_pages(fRef->vnode, NULL, fOffset,
-		fVecs, vecCount, fSize, B_PHYSICAL_IO_REQUEST, this);
 
-	fCache->Lock();
-
-	return status;
+void
+PrecacheIO::ReadAsync()
+{
+	// This object is going to be deleted after the I/O request has been
+	// fulfilled
+	vfs_asynchronous_read_pages(fRef->vnode, NULL, fOffset, fVecs, fVecCount,
+		fSize, B_PHYSICAL_IO_REQUEST, this);
 }
 
 
@@ -952,10 +946,15 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 			// read the part before the current page (or the end of the request)
 			PrecacheIO* io
 				= new(std::nothrow) PrecacheIO(ref, lastOffset, bytesToRead);
-			if (io == NULL || io->Init() != B_OK || io->Start() != B_OK) {
+			if (io == NULL || io->Prepare() != B_OK) {
 				delete io;
 				break;
 			}
+
+			// we must not have the cache locked during I/O
+			cache->Unlock();
+			io->ReadAsync();
+			cache->Lock();
 
 			bytesToRead = 0;
 		}
