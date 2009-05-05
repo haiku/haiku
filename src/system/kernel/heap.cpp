@@ -8,6 +8,7 @@
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 #include <arch/debug.h>
 #include <debug.h>
 #include <elf.h>
@@ -284,9 +285,9 @@ dump_page(heap_page *page)
 	for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp)
 		count++;
 
-	dprintf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; free_list %p (%lu entr%s)\n",
-		page, page->bin_index, page->free_count, page->empty_index,
-		page->free_list, count, count == 1 ? "y" : "ies");
+	dprintf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; "
+		"free_list %p (%lu entr%s)\n", page, page->bin_index, page->free_count,
+		page->empty_index, page->free_list, count, count == 1 ? "y" : "ies");
 }
 
 
@@ -315,10 +316,10 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: %lu; free_pages: %p (%lu entr%s)\n",
-			area, area->area, area->base, area->size, area->page_count,
-			area->free_pages, area->free_page_count,
-			area->free_page_count == 1 ? "y" : "ies");
+		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: "
+			"%lu; free_pages: %p (%lu entr%s)\n", area, area->area, area->base,
+			area->size, area->page_count, area->free_pages,
+			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
 		area = area->all_next;
 	}
 
@@ -329,8 +330,9 @@ dump_allocator_areas(heap_allocator *heap)
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	dprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: %lu; free_pages: %lu; empty_areas: %lu\n", heap,
-		heap->name, heap->page_size, heap->bin_count, heap->total_pages,
+	dprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: "
+		"%lu; free_pages: %lu; empty_areas: %lu\n", heap, heap->name,
+		heap->page_size, heap->bin_count, heap->total_pages,
 		heap->total_free_pages, heap->empty_areas);
 
 	if (areas)
@@ -410,11 +412,14 @@ dump_allocations(int argc, char **argv)
 				if (page->bin_index < heap->bin_count) {
 					// page is used by a small allocation bin
 					uint32 elementCount = page->empty_index;
-					size_t elementSize = heap->bins[page->bin_index].element_size;
-					for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+					size_t elementSize
+						= heap->bins[page->bin_index].element_size;
+					for (uint32 j = 0; j < elementCount;
+							j++, base += elementSize) {
 						// walk the free list to see if this element is in use
 						bool elementInUse = true;
-						for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp) {
+						for (addr_t *temp = page->free_list; temp != NULL;
+								temp = (addr_t *)*temp) {
 							if ((addr_t)temp == base) {
 								elementInUse = false;
 								break;
@@ -447,8 +452,10 @@ dump_allocations(int argc, char **argv)
 					uint32 pageCount = 1;
 					while (i + pageCount < area->page_count
 						&& area->page_table[i + pageCount].in_use
-						&& area->page_table[i + pageCount].bin_index == heap->bin_count
-						&& area->page_table[i + pageCount].allocation_id == page->allocation_id)
+						&& area->page_table[i + pageCount].bin_index
+							== heap->bin_count
+						&& area->page_table[i + pageCount].allocation_id
+							== page->allocation_id)
 						pageCount++;
 
 					info = (heap_leak_check_info *)(base + pageCount
@@ -786,16 +793,18 @@ heap_validate_heap(heap_allocator *heap)
 			if ((addr_t)&area->page_table[page->index] != (addr_t)page)
 				panic("used page index does not lead to target page\n");
 
-			if (page->prev != lastPage)
-				panic("used page entry has invalid prev link (%p vs %p bin %lu)\n",
-					page->prev, lastPage, i);
+			if (page->prev != lastPage) {
+				panic("used page entry has invalid prev link (%p vs %p bin "
+					"%lu)\n", page->prev, lastPage, i);
+			}
 
 			if (!page->in_use)
 				panic("used page marked as not in use\n");
 
-			if (page->bin_index != i)
+			if (page->bin_index != i) {
 				panic("used page with bin index %u in page list of bin %lu\n",
 					page->bin_index, i);
+			}
 
 			if (page->free_count < lastFreeCount)
 				panic("ordering of bin page list broken\n");
@@ -817,9 +826,10 @@ heap_validate_heap(heap_allocator *heap)
 			}
 
 			uint32 slotCount = bin->max_free_count;
-			if (page->empty_index > slotCount)
+			if (page->empty_index > slotCount) {
 				panic("empty index beyond slot count (%u with %lu slots)\n",
 					page->empty_index, slotCount);
+			}
 
 			freeSlotsCount += (slotCount - page->empty_index);
 			if (freeSlotsCount > slotCount)
@@ -919,8 +929,9 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 
 	mutex_unlock(&heap->lock);
 
-	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx - 0x%08lx\n",
-		area->area, heap->name, heap, area->base, area->base + area->size);
+	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx "
+		"- 0x%08lx\n", area->area, heap->name, heap, area->base,
+		area->base + area->size);
 }
 
 
@@ -970,8 +981,9 @@ heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
 	if (!locked)
 		mutex_unlock(&heap->lock);
 
-	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed from %s heap %p\n",
-		area->area, area->base, area->base + area->size, heap->name, heap);
+	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed "
+		"from %s heap %p\n", area->area, area->base, area->base + area->size,
+		heap->name, heap);
 	return B_OK;
 }
 
@@ -1311,7 +1323,8 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 
 	void *address = heap_raw_alloc(heap, size, binIndex);
 
-	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n", size, address));
+	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n",
+		size, address));
 
 #if KERNEL_HEAP_LEAK_CHECK
 	size -= sizeof(heap_leak_check_info);
@@ -1375,7 +1388,8 @@ heap_free(heap_allocator *heap, void *address)
 	heap_page *page = &area->page_table[((addr_t)address - area->base)
 		/ heap->page_size];
 
-	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
+	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page,
+		page->bin_index, page->free_count));
 
 	if (page->bin_index > heap->bin_count) {
 		panic("free(): page %p: invalid bin_index %d\n", page, page->bin_index);
@@ -1389,7 +1403,8 @@ heap_free(heap_allocator *heap, void *address)
 		heap_bin *bin = &heap->bins[page->bin_index];
 		if (((addr_t)address - area->base - page->index
 			* heap->page_size) % bin->element_size != 0) {
-			panic("free(): passed invalid pointer %p supposed to be in bin for element size %ld\n", address, bin->element_size);
+			panic("free(): passed invalid pointer %p supposed to be in bin for "
+				"element size %ld\n", address, bin->element_size);
 			mutex_unlock(&heap->lock);
 			return B_ERROR;
 		}
@@ -1398,9 +1413,11 @@ heap_free(heap_allocator *heap, void *address)
 		if (((uint32 *)address)[1] == 0xdeadbeef) {
 			// This block looks like it was freed already, walk the free list
 			// on this page to make sure this address doesn't exist.
-			for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp) {
+			for (addr_t *temp = page->free_list; temp != NULL;
+					temp = (addr_t *)*temp) {
 				if (temp == address) {
-					panic("free(): address %p already exists in page free list\n", address);
+					panic("free(): address %p already exists in page free "
+						"list\n", address);
 					mutex_unlock(&heap->lock);
 					return B_ERROR;
 				}
@@ -1409,12 +1426,14 @@ heap_free(heap_allocator *heap, void *address)
 
 		uint32 *dead = (uint32 *)address;
 		if (bin->element_size % 4 != 0) {
-			panic("free(): didn't expect a bin element size that is not a multiple of 4\n");
+			panic("free(): didn't expect a bin element size that is not a "
+				"multiple of 4\n");
 			mutex_unlock(&heap->lock);
 			return B_ERROR;
 		}
 
-		// the first 4 bytes are overwritten with the next free list pointer later
+		// the first 4 bytes are overwritten with the next free list pointer
+		// later
 		for (uint32 i = 1; i < bin->element_size / sizeof(uint32); i++)
 			dead[i] = 0xdeadbeef;
 #endif
@@ -1521,7 +1540,8 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	heap_page *page = &area->page_table[((addr_t)address - area->base)
 		/ heap->page_size];
 	if (page->bin_index > heap->bin_count) {
-		panic("realloc(): page %p: invalid bin_index %d\n", page, page->bin_index);
+		panic("realloc(): page %p: invalid bin_index %d\n", page,
+			page->bin_index);
 		mutex_unlock(&heap->lock);
 		return B_ERROR;
 	}
@@ -1671,7 +1691,7 @@ heap_grow_thread(void *)
 			// one to make some room.
 			TRACE(("heap_grower: grow heaps will run out of memory soon\n"));
 			if (heap_create_new_heap_area(sGrowHeap, "additional grow heap",
-				HEAP_DEDICATED_GROW_SIZE) != B_OK)
+					HEAP_DEDICATED_GROW_SIZE) != B_OK)
 				dprintf("heap_grower: failed to create new grow heap area\n");
 		}
 
@@ -1684,7 +1704,7 @@ heap_grow_thread(void *)
 				// allocation cannot be fulfilled due to lack of contiguous
 				// pages)
 				if (heap_create_new_heap_area(heap, "additional heap",
-					HEAP_GROW_SIZE) != B_OK)
+						HEAP_GROW_SIZE) != B_OK)
 					dprintf("heap_grower: failed to create new heap area\n");
 				sLastHandledGrowRequest[i] = sLastGrowRequest[i];
 			}
@@ -1768,7 +1788,8 @@ heap_init_post_thread()
 		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (growHeapArea < B_OK) {
-		panic("heap_init_post_thread(): couldn't allocate dedicate grow heap area");
+		panic("heap_init_post_thread(): couldn't allocate dedicate grow heap "
+			"area");
 		return growHeapArea;
 	}
 
@@ -1947,7 +1968,8 @@ free(void *address)
 			&& info->size == areaInfo.size && info->base == areaInfo.address
 			&& info->allocation_size < areaInfo.size) {
 			delete_area(area);
-			TRACE(("free(): freed huge allocation by deleting area %ld\n", area));
+			TRACE(("free(): freed huge allocation by deleting area %ld\n",
+				area));
 			return;
 		}
 	}
@@ -2002,8 +2024,8 @@ realloc(void *address, size_t newSize)
 
 			if (available >= newSize) {
 				// there is enough room available for the newSize
-				TRACE(("realloc(): new size %ld fits in old area %ld with %ld available\n",
-					newSize, area, available));
+				TRACE(("realloc(): new size %ld fits in old area %ld with %ld "
+					"available\n", newSize, area, available));
 				return address;
 			}
 
@@ -2017,13 +2039,14 @@ realloc(void *address, size_t newSize)
 
 			memcpy(newAddress, address, min_c(newSize, info->allocation_size));
 			delete_area(area);
-			TRACE(("realloc(): allocated new block %p for size %ld and deleted old area %ld\n",
-				newAddress, newSize, area));
+			TRACE(("realloc(): allocated new block %p for size %ld and deleted "
+				"old area %ld\n", newAddress, newSize, area));
 			return newAddress;
 		}
 	}
 
-	panic("realloc(): failed to realloc address %p to size %lu\n", address, newSize);
+	panic("realloc(): failed to realloc address %p to size %lu\n", address,
+		newSize);
 	return NULL;
 }
 
