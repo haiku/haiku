@@ -8,11 +8,13 @@
 #include "LocaleWindow.h"
 
 #include <Application.h>
-#include <Screen.h>
-#include <TabView.h>
-#include <ScrollView.h>
-#include <ListView.h>
 #include <Button.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <ListView.h>
+#include <Screen.h>
+#include <ScrollView.h>
+#include <TabView.h>
 
 
 const static uint32 kMsgSelectLanguage = 'slng';
@@ -24,58 +26,46 @@ LocaleWindow::LocaleWindow(BRect rect)
 	: BWindow(rect, "Locale", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	rect = Bounds();
-	BView *view = new BView(rect, "view", B_FOLLOW_ALL, 0);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
+	// Buttons at the bottom
 
-	BButton *button = new BButton(rect, "defaults", "Defaults",
-		new BMessage(kMsgDefaults), B_FOLLOW_NONE);
-	button->ResizeToPreferred();
-	button->MoveTo(10, rect.bottom - 10 - button->Bounds().Height());
-	view->AddChild(button);
+	BButton *button = new BButton("Defaults", new BMessage(kMsgDefaults));
 
-	fRevertButton = new BButton(rect, "revert", "Revert",
-		new BMessage(kMsgRevert), B_FOLLOW_NONE);
-	fRevertButton->ResizeToPreferred();
-	fRevertButton->MoveTo(20 + button->Bounds().Width(), button->Frame().top);
+	fRevertButton = new BButton("Revert", new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
-	view->AddChild(fRevertButton);
 
-	rect.InsetBy(10, 10);
-	rect.bottom -= 10 + button->Bounds().Height();
-	BTabView *tabView = new BTabView(rect, "tabview");
+	// Tabs
+	BTabView *tabView = new BTabView("tabview");
 
-	rect = tabView->ContainerView()->Bounds();
-	rect.InsetBy(2, 2);
-	BView *tab = new BView(rect, "Language", B_FOLLOW_NONE, B_WILL_DRAW);
+	// Language tab
+
+	BView *tab = new BView("Language", B_WILL_DRAW);
 	tab->SetViewColor(tabView->ViewColor());
+	tab->SetLayout(new BGroupLayout(B_VERTICAL,10));
 	tabView->AddTab(tab);
 
 	{
-		BRect frame = rect;
-		frame.InsetBy(12, 12);
-		frame.right = 100 + B_V_SCROLL_BAR_WIDTH;
-		frame.bottom = 150;
-
-		BListView *listView = new BListView(frame, "preferred", B_SINGLE_SELECTION_LIST, 
-			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+		BListView *listView = new BListView("preferred", B_SINGLE_SELECTION_LIST);
 		listView->SetSelectionMessage(new BMessage(kMsgSelectLanguage));
 
 		BScrollView *scrollView = new BScrollView("scroller", listView, 
-			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 0, false, true, B_FANCY_BORDER);
-		tab->AddChild(scrollView);
+			0, false, true, B_FANCY_BORDER);
+		tab->AddChild(BGroupLayoutBuilder(B_HORIZONTAL,10)
+			.Add(scrollView)
+			.AddGlue()
+		);
 	}
 
-	tab = new BView(rect, "Country", B_FOLLOW_NONE, B_WILL_DRAW);
+	// Country tab
+
+	tab = new BView("Country", B_WILL_DRAW);
 	tab->SetViewColor(tabView->ViewColor());
 	tabView->AddTab(tab);
 
-	tab = new BView(rect, "Keyboard", B_FOLLOW_NONE, B_WILL_DRAW);
+	// Keyboard tab
+
+	tab = new BView("Keyboard", B_WILL_DRAW);
 	tab->SetViewColor(tabView->ViewColor());
 	tabView->AddTab(tab);
-
-	view->AddChild(tabView);
 
 	// check if the window is on screen
 
@@ -90,6 +80,20 @@ LocaleWindow::LocaleWindow(BRect rect)
 		position.y = (rect.Height() - Bounds().Height()) / 2;
 	}
 	MoveTo(position);
+
+	// Layout management
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL,10)
+		.Add(tabView)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL,10)
+			.Add(button)
+			.Add(fRevertButton)
+			.AddGlue()
+		)
+		.SetInsets(5,5,5,5)
+	);
 }
 
 
