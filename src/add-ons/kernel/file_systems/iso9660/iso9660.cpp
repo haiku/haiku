@@ -738,6 +738,11 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 			}
 			cookie->pos += bytesRead;
 		}
+
+		if (cookie->pos == volume->logicalBlkSize[FS_DATA_FORMAT]) {
+			cookie->pos = 0;
+			cookie->block++;
+		}
 	} else {
 		if (totalRead >= cookie->totalSize)
 			result = B_ENTRY_NOT_FOUND;

@@ -246,66 +246,66 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 	while (totalRead < dataLength && !done) {
 		off_t cachedBlock = block;
 		char* blockData = (char*)block_cache_get(ns->fBlockCache, block);
-		if (blockData != NULL) {
-			size_t bytesRead = 0;
-			off_t blockBytesRead = 0;
-			iso9660_inode node;
-			int initResult;
+		if (blockData == NULL)
+			break;
 
-			TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer "
-				"%p.\n", block, blockData));
+		size_t bytesRead = 0;
+		off_t blockBytesRead = 0;
+		iso9660_inode node;
+		int initResult;
 
-			// Move to the next 2-block set if necessary
-			// Don't go over end of buffer, if dir record sits on boundary.
+		TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer "
+			"%p.\n", block, blockData));
 
-			while (blockBytesRead < 2 * ns->logicalBlkSize[FS_DATA_FORMAT]
-				&& totalRead + blockBytesRead < dataLength
-				&& blockData[0] != 0
-				&& !done) {
-				initResult = InitNode(&node, blockData, &bytesRead,
-					ns->joliet_level);
-				TRACE(("fs_walk - InitNode returned %s, filename %s, %lu bytes "
-					"read\n", strerror(initResult), node.name,
-					bytesRead));
+		// Move to the next block if necessary
+		// Don't go over end of buffer, if dir record sits on boundary.
 
-				if (initResult == B_OK) {
-					if (!strcmp(node.name, file)) {
-						TRACE(("fs_walk - success, found vnode at block %Ld, pos %Ld\n", block, blockBytesRead));
-						*_vnodeID = (block << 30)
-							+ (blockBytesRead & 0xffffffff);
-						TRACE(("fs_walk - New vnode id is %Ld\n", *_vnodeID));
+		while (blockBytesRead < ns->logicalBlkSize[FS_DATA_FORMAT]
+			&& totalRead + blockBytesRead < dataLength
+			&& blockData[0] != 0
+			&& !done) {
+			initResult = InitNode(&node, blockData, &bytesRead,
+				ns->joliet_level);
+			TRACE(("fs_walk - InitNode returned %s, filename %s, %lu bytes "
+				"read\n", strerror(initResult), node.name,
+				bytesRead));
 
-						result = get_vnode(_vol, *_vnodeID,
-							(void **)&newNode);
-						if (result == B_OK) {
-							newNode->parID = baseNode->id;
-							done = true;
-						}
-					} else {
-						free(node.name);
-						free(node.attr.slName);
+			if (initResult == B_OK) {
+				if (!strcmp(node.name, file)) {
+					TRACE(("fs_walk - success, found vnode at block %Ld, pos "
+						"%Ld\n", block, blockBytesRead));
+
+					*_vnodeID = (block << 30) + (blockBytesRead & 0xffffffff);
+					TRACE(("fs_walk - New vnode id is %Ld\n", *_vnodeID));
+
+					result = get_vnode(_vol, *_vnodeID,
+						(void **)&newNode);
+					if (result == B_OK) {
+						newNode->parID = baseNode->id;
+						done = true;
 					}
 				} else {
-					result = initResult;
-					if (bytesRead == 0)
-						done = true;
+					free(node.name);
+					free(node.attr.slName);
 				}
-				blockData += bytesRead;
-				blockBytesRead += bytesRead;
-
-				TRACE(("fs_walk - Adding %lu bytes to blockBytes read (total "
-					"%Ld/%lu).\n", bytesRead, blockBytesRead,
-					baseNode->dataLen[FS_DATA_FORMAT]));
+			} else {
+				result = initResult;
+				if (bytesRead == 0)
+					done = true;
 			}
-			totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
-			block++;
+			blockData += bytesRead;
+			blockBytesRead += bytesRead;
 
-			TRACE(("fs_walk - moving to next block %Ld, total read %lu\n",
-				block, totalRead));
-			block_cache_put(ns->fBlockCache, cachedBlock);
+			TRACE(("fs_walk - Adding %lu bytes to blockBytes read (total "
+				"%Ld/%lu).\n", bytesRead, blockBytesRead,
+				baseNode->dataLen[FS_DATA_FORMAT]));
+		}
+		totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
+		block++;
 
-		} else
-			done = true;
+		TRACE(("fs_walk - moving to next block %Ld, total read %lu\n",
+			block, totalRead));
+		block_cache_put(ns->fBlockCache, cachedBlock);
 	}
 
 	TRACE(("fs_walk - EXIT, result is %s, vnid is %Lu\n",
