@@ -40,7 +40,7 @@ LocaleWindow::LocaleWindow(BRect rect)
 
 	BView *tab = new BView("Language", B_WILL_DRAW);
 	tab->SetViewColor(tabView->ViewColor());
-	tab->SetLayout(new BGroupLayout(B_VERTICAL,10));
+	tab->SetLayout(new BGroupLayout(B_VERTICAL, 10));
 	tabView->AddTab(tab);
 
 	{
@@ -49,7 +49,7 @@ LocaleWindow::LocaleWindow(BRect rect)
 
 		BScrollView *scrollView = new BScrollView("scroller", listView, 
 			0, false, true, B_FANCY_BORDER);
-		tab->AddChild(BGroupLayoutBuilder(B_HORIZONTAL,10)
+		tab->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 			.Add(scrollView)
 			.AddGlue()
 		);
@@ -85,14 +85,14 @@ LocaleWindow::LocaleWindow(BRect rect)
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL,10)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(tabView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL,10)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 			.Add(button)
 			.Add(fRevertButton)
 			.AddGlue()
 		)
-		.SetInsets(5,5,5,5)
+		.SetInsets(5, 5, 5, 5)
 	);
 }
 
