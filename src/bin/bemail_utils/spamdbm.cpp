@@ -4904,7 +4904,6 @@ void ABSApp::ReadyToRun ()
     }
     else {
       DatabaseWindowPntr->Show (); /* Starts the window's message loop. */
-	  DatabaseWindowPntr->Minimize (g_ServerMode);
     }
   }
 
@@ -7057,6 +7056,12 @@ DatabaseWindow::DatabaseWindow ()
   if (m_WordsViewPntr == NULL)
     goto ErrorExit;
   AddChild (m_WordsViewPntr);
+ 
+ /* Minimize the window if we are starting up in server mode.  This is done 	 
+	before the window is open so it doesn't flash onto the screen, and possibly 	 
+	steal a keystroke or two.  The ControlsView will further update the minimize 	 
+	mode when it detects changes in the server mode. */ 
+  Minimize (g_ServerMode);
 
   return;
 
