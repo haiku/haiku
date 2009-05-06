@@ -293,7 +293,11 @@ ATAChannel::SelectedDevice()
 	ata_task_file taskFile;
 	if (_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD) != B_OK) {
 		TRACE_ERROR("reading register failed when detecting selected device\n");
-		return 2;
+		// Return an invalid device number so that the
+		// SelectedDevice() == "expected device" check fails.
+		// Due to the device number being a bit, we can't really get values
+		// other than 0 and 1, so anything >= 2 can be regarded as invalid.
+		return 234;
 	}
 
 	return taskFile.lba.device;
