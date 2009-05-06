@@ -34,10 +34,35 @@ public:
 	{
 	}
 
+	bool IsValid() const
+	{
+		
+		return min < max;
+	}
+
+	double Size() const
+	{
+		return max - min;
+	}
+
 	ChartDataRange& Extend(const ChartDataRange& other)
 	{
 		min = std::min(min, other.min);
 		max = std::max(max, other.max);
+		return *this;
+	}
+
+	ChartDataRange& OffsetBy(double offset)
+	{
+		min += offset;
+		max += offset;
+		return *this;
+	}
+
+	ChartDataRange& OffsetTo(double newMin)
+	{
+		max += newMin - min;
+		min = newMin;
 		return *this;
 	}
 
