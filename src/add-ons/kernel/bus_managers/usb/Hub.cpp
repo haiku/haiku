@@ -349,21 +349,29 @@ Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
 	usb_driver_cookie **cookies, bool added, bool recursive)
 {
-	TRACE("reporting hub\n");
+	status_t result = B_UNSUPPORTED;
 
-	// Report ourselfs first
-	status_t result = Device::ReportDevice(supportDescriptors,
-		supportDescriptorCount, hooks, cookies, added, recursive);
+	if (added) {
+		// Report hub before children when adding devices
+		TRACE("reporting hub before children\n");
+		result = Device::ReportDevice(supportDescriptors,
+			supportDescriptorCount, hooks, cookies, added, recursive);
+	}
 
-	if (!recursive)
-		return result;
-
-	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+	for (int32 i = 0; recursive && i < fHubDescriptor.num_ports; i++) {
 		if (!fChildren[i])
 			continue;
 
 		if (fChildren[i]->ReportDevice(supportDescriptors,
 				supportDescriptorCount, hooks, cookies, added, true) == B_OK)
+			result = B_OK;
+	}
+
+	if (!added) {
+		// Report hub after children when removing devices
+		TRACE("reporting hub after children\n");
+		if (Device::ReportDevice(supportDescriptors, supportDescriptorCount,
+				hooks, cookies, added, recursive) == B_OK)
 			result = B_OK;
 	}
 
