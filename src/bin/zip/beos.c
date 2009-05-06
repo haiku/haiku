@@ -746,6 +746,8 @@ local int add_Be_ef( struct zlist far *z )
         compbuff = attrbuff;
 
         flags = EB_BE_FL_NATURAL;
+    } else {
+        free( attrbuff );
     }
 
     /* Check to see if we really have enough room in the EF for the data. */
@@ -761,6 +763,7 @@ local int add_Be_ef( struct zlist far *z )
         z->ext = 0;
     }
     if( l_ef == NULL ) {
+        free( compbuff );
         return ZE_MEM;
     }
     z->extra = l_ef;
@@ -773,6 +776,7 @@ local int add_Be_ef( struct zlist far *z )
         z->cext = 0;
     }
     if( c_ef == NULL ) {
+        free( compbuff );
         return ZE_MEM;
     }
     z->cextra = c_ef;
@@ -804,6 +808,8 @@ local int add_Be_ef( struct zlist far *z )
     *c_ef++ = flags;
 
     z->cext += EB_C_BE_SIZE;
+
+    free( compbuff );
 
     return ZE_OK;
 }
