@@ -100,7 +100,7 @@ enum	P_MESSAGES			{P_OK = 128, P_CANCEL, P_REVERT, P_FONT,
 							 P_SIG, P_ENC, P_WARN_UNENCODABLE,
 							 P_SPELL_CHECK_START_ON, P_BUTTON_BAR,
 							 P_ACCOUNT, P_REPLYTO, P_REPLY_PREAMBLE,
-							 P_COLORED_QUOTES, P_MARK_READED};
+							 P_COLORED_QUOTES, P_MARK_READ};
 
 #define ICON_LABEL_TEXT MDR_DIALECT_CHOICE ("Show Icons & Labels", "アイコンとラベル")
 #define ICON_TEXT MDR_DIALECT_CHOICE ("Show Icons Only", "アイコンのみ")
@@ -137,7 +137,7 @@ add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	bool* attachAttributes, bool* cquotes, uint32* account, int32* replyTo,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
-	bool* spellCheckStartOn, bool* autoMarkReaded, uint8* buttonBar)
+	bool* spellCheckStartOn, bool* autoMarkRead, uint8* buttonBar)
 	:
 #if USE_LAYOUT_MANAGEMENT
 	BWindow(rect, MDR_DIALECT_CHOICE ("Mail Preferences", "Mailの設定"),
@@ -183,8 +183,8 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	fNewSpellCheckStartOn(spellCheckStartOn),
 	fSpellCheckStartOn(*fNewSpellCheckStartOn),
 	
-	fNewAutoMarkReaded(autoMarkReaded),
-	fAutoMarkReaded(*fNewAutoMarkReaded)
+	fNewAutoMarkRead(autoMarkRead),
+	fAutoMarkRead(*fNewAutoMarkRead)
 {
 	strcpy(fSignature, *fNewSignature);
 
@@ -246,9 +246,9 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 		fSpellCheckStartOnMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
-	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
-	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READ_TEXT,
-		fAutoMarkReadedMenu,	NULL);
+	fAutoMarkReadMenu = _BuildAutoMarkReadMenu(fAutoMarkRead);
+	menu = new BMenuField("autoMarkRead", AUTO_MARK_READ_TEXT,
+		fAutoMarkReadMenu,	NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 	// Mail Accounts
 
@@ -414,9 +414,9 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	interfaceBox->AddChild(menu);
 
 	r.OffsetBy(0, height + ITEM_SPACE);
-	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
-	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READ_TEXT,
-		fAutoMarkReadedMenu,	NULL);
+	fAutoMarkReadMenu = _BuildAutoMarkReadMenu(fAutoMarkRead);
+	menu = new BMenuField("autoMarkRead", AUTO_MARK_READ_TEXT,
+		fAutoMarkReadMenu,	NULL);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
 	interfaceBox->AddChild(menu);
@@ -593,7 +593,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 			*fNewEncoding = fEncoding;
 			*fNewWarnUnencodable = fWarnUnencodable;
 			*fNewSpellCheckStartOn = fSpellCheckStartOn;
-			*fNewAutoMarkReaded = fAutoMarkReaded;
+			*fNewAutoMarkRead = fAutoMarkRead;
 			*fNewButtonBar = fButtonBar;
 
 			be_app->PostMessage(PREFS_CHANGED);
@@ -734,8 +734,8 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 		case P_SPELL_CHECK_START_ON:
 			msg->FindBool("spellCheckStartOn", fNewSpellCheckStartOn);
 			break;
-		case P_MARK_READED:
-			msg->FindBool("autoMarkReaded", fNewAutoMarkReaded);
+		case P_MARK_READ:
+			msg->FindBool("autoMarkRead", fNewAutoMarkRead);
 			be_app->PostMessage(PREFS_CHANGED);
 			break;
 		case P_BUTTON_BAR:
@@ -764,7 +764,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 		|| fEncoding != *fNewEncoding
 		|| fWarnUnencodable != *fNewWarnUnencodable
 		|| fSpellCheckStartOn != *fNewSpellCheckStartOn
-		|| fAutoMarkReaded != *fNewAutoMarkReaded
+		|| fAutoMarkRead != *fNewAutoMarkRead
 		|| fButtonBar != *fNewButtonBar;
 	fRevert->SetEnabled(changed);
 }
@@ -1124,10 +1124,10 @@ TPrefsWindow::_BuildSpellCheckStartOnMenu(bool spellCheckStartOn)
 
 
 BPopUpMenu*
-TPrefsWindow::_BuildAutoMarkReadedMenu(bool autoMarkReaded)
+TPrefsWindow::_BuildAutoMarkReadMenu(bool autoMarkRead)
 {
-	return _BuildBoolMenu(P_MARK_READED, "autoMarkReaded",
-		autoMarkReaded);
+	return _BuildBoolMenu(P_MARK_READ, "autoMarkRead",
+		autoMarkRead);
 }
 
 

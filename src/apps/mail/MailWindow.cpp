@@ -167,7 +167,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fChanged(false),
 	fStartingText(NULL),
 	fOriginatingWindow(NULL),
-	fReadedButton(NULL),
+	fReadButton(NULL),
 	fNextButton(NULL)
 {
 	if (messenger != NULL)
@@ -194,7 +194,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		fIncoming = false;
 	}
 
-	fAutoMarkReaded = fApp->AutoMarkReaded();
+	fAutoMarkRead = fApp->AutoMarkRead();
 	BRect r(0, 0, RIGHT_BOUNDARY, 15);
 	fMenuBar = new BMenuBar(r, "");
 
@@ -634,8 +634,8 @@ TMailWindow::BuildButtonBar()
 			new BMessage(M_NEXTMSG));
 		bbar->AddButton(MDR_DIALECT_CHOICE ("Previous","前へ"), 20,
 			new BMessage(M_PREVMSG));
-		if (!fAutoMarkReaded) {
-			_AddReadedButton();
+		if (!fAutoMarkRead) {
+			_AddReadButton();
 		}
 	}
 	bbar->AddButton(MDR_DIALECT_CHOICE ("Inbox","受信箱"), 36,
@@ -696,7 +696,7 @@ TMailWindow::UpdateViews()
 void
 TMailWindow::UpdatePreferences()
 {
-	fAutoMarkReaded = fApp->AutoMarkReaded();
+	fAutoMarkRead = fApp->AutoMarkRead();
 	
 	_UpdateReadButton();
 }
@@ -817,17 +817,17 @@ TMailWindow::SetTrackerSelectionToCurrent()
 
 
 void
-TMailWindow::SetCurrentMessageRead(bool readed)
+TMailWindow::SetCurrentMessageRead(bool read)
 {
 	BNode node(fRef);
 	if (node.InitCheck() == B_NO_ERROR) {
 		BString status;
 		if (ReadAttrString(&node, B_MAIL_ATTR_STATUS, &status) == B_NO_ERROR) {
-			if (readed && !status.ICompare("New")) {
+			if (read && !status.ICompare("New")) {
 				node.RemoveAttr(B_MAIL_ATTR_STATUS);
 				WriteAttrString(&node, B_MAIL_ATTR_STATUS, "Read");
 			}
-			if (!readed && !status.ICompare("Read")) {
+			if (!read && !status.ICompare("Read")) {
 				node.RemoveAttr(B_MAIL_ATTR_STATUS);
 				WriteAttrString(&node, B_MAIL_ATTR_STATUS, "New");
 			}
@@ -1116,7 +1116,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				foundRef = GetTrackerWindowFile(&nextRef, msg->what ==
 				  M_DELETE_NEXT);
 			}
-			if (fIncoming && fAutoMarkReaded)
+			if (fIncoming && fAutoMarkRead)
 				SetCurrentMessageRead();
 
 			if (!fTrackerMessenger.IsValid() || !fIncoming) {
@@ -1441,7 +1441,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			SetCurrentMessageRead(false);
 			_UpdateReadButton();
 			break;
-		case M_READED:
+		case M_READ:
 			SetCurrentMessageRead();
 			msg->what = M_NEXTMSG;
 		case M_PREVMSG:
@@ -1452,7 +1452,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
 					TMailWindow *window = static_cast<TMailApp *>(be_app)->FindWindow(nextRef);
 					if (window == NULL) {
-						if (fAutoMarkReaded)
+						if (fAutoMarkRead)
 							SetCurrentMessageRead();
 						OpenMessage(&nextRef, fHeaderView->fCharacterSetUserSees);
 					} else {
@@ -1707,7 +1707,7 @@ TMailWindow::QuitRequested()
 		}
 	} else if (fRef && !sKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
-		if (fAutoMarkReaded)
+		if (fAutoMarkRead)
 			SetCurrentMessageRead();
 	}
 
@@ -3133,7 +3133,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 
 
 void
-TMailWindow::_AddReadedButton()
+TMailWindow::_AddReadButton()
 {
 	bool newMail = false;
 	BNode node(fRef);
@@ -3147,11 +3147,11 @@ TMailWindow::_AddReadedButton()
 	
 	int32 buttonIndex = fButtonBar->IndexOf(fNextButton);
 	if (newMail)
-		fReadedButton = fButtonBar->AddButton(
+		fReadButton = fButtonBar->AddButton(
 			MDR_DIALECT_CHOICE (" Read ", " Read "), 24,
-			new BMessage(M_READED), buttonIndex);
+			new BMessage(M_READ), buttonIndex);
 	else
-		fReadedButton = fButtonBar->AddButton(
+		fReadButton = fButtonBar->AddButton(
 			MDR_DIALECT_CHOICE ("Unread", "Unread"), 28,
 			new BMessage(M_UNREAD), buttonIndex);
 }
@@ -3161,10 +3161,10 @@ void
 TMailWindow::_UpdateReadButton()
 {
 	if (fApp->ShowButtonBar()) {
-		fButtonBar->RemoveButton(fReadedButton);
-		fReadedButton = NULL;
-		if (!fAutoMarkReaded && !fReadedButton) {
-			_AddReadedButton();
+		fButtonBar->RemoveButton(fReadButton);
+		fReadButton = NULL;
+		if (!fAutoMarkRead && !fReadButton) {
+			_AddReadButton();
 		}
 	}
 	UpdateViews();

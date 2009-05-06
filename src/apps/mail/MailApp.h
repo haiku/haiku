@@ -73,7 +73,7 @@ class TMailApp : public BApplication {
 				void			SetLastWindowFrame(BRect frame);
 
 				// TODO: move these into a MailSettings class
-				bool			AutoMarkReaded();
+				bool			AutoMarkRead();
 				BString			Signature();
 				BString			ReplyPreamble();
 				bool			WrapMode();
@@ -114,7 +114,7 @@ class TMailApp : public BApplication {
 				bool			fPrintHelpAndExit;
 
 				// TODO: these should go into a settings class
-				bool			fAutoMarkReaded;
+				bool			fAutoMarkRead;
 				char*			fSignature;
 				char*			fReplyPreamble;
 				bool			fWrapMode;

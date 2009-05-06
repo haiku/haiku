@@ -113,7 +113,7 @@ enum MENUS {
 	M_COPY,
 
 	// nav
-	M_READED,
+	M_READ,
 	M_UNREAD,
 	M_NEXTMSG,
 	M_PREVMSG,

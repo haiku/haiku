@@ -130,7 +130,7 @@ TMailApp::TMailApp()
 {
 	// set default values
 	fContentFont.SetSize(12.0);
-	fAutoMarkReaded = true;
+	fAutoMarkRead = true;
 	fSignature = (char *)malloc(strlen(SIG_NONE) + 1);
 	strcpy(fSignature, SIG_NONE);
 	fReplyPreamble = (char *)malloc(1);
@@ -349,7 +349,7 @@ TMailApp::MessageReceived(BMessage *msg)
 						&fColoredQuotes, &fDefaultChain, &fUseAccountFrom,
 						&fReplyPreamble, &fSignature, &fMailCharacterSet,
 						&fWarnAboutUnencodableCharacters,
-						&fStartWithSpellCheckOn, &fAutoMarkReaded,
+						&fStartWithSpellCheckOn, &fAutoMarkRead,
 						&fShowButtonBar);
 				fPrefsWindow->Show();
 			}
@@ -912,7 +912,7 @@ TMailApp::SaveSettings()
 	settings.AddRect("SignatureWindowSize", fSignatureWindowFrame);
 	settings.AddBool("WordWrapMode", fWrapMode);
 	settings.AddPoint("PreferencesWindowLocation", fPrefsWindowPos);
-	settings.AddBool("AutoMarkReaded", fAutoMarkReaded);
+	settings.AddBool("AutoMarkRead", fAutoMarkRead);
 	settings.AddString("SignatureText", fSignature);
 	settings.AddInt32("CharacterSet", fMailCharacterSet);
 	settings.AddString("FindString", FindWindow::GetFindString());
@@ -1001,8 +1001,8 @@ TMailApp::LoadSettings()
 	if (settings.FindPoint("PreferencesWindowLocation", &point) == B_OK)
 		fPrefsWindowPos = point;
 
-	if (settings.FindBool("AutoMarkReaded", &boolValue) == B_OK)
-		fAutoMarkReaded = boolValue;
+	if (settings.FindBool("AutoMarkRead", &boolValue) == B_OK)
+		fAutoMarkRead = boolValue;
 
 	const char *string;
 	if (settings.FindString("SignatureText", &string) == B_OK) {
@@ -1142,10 +1142,10 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 
 
 bool
-TMailApp::AutoMarkReaded()
+TMailApp::AutoMarkRead()
 {
 	BAutolock _(this);
-	return fAutoMarkReaded;	
+	return fAutoMarkRead;	
 }
 
 
