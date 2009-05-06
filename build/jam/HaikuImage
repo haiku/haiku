@@ -351,7 +351,7 @@ AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
 # Locale kit language files
 local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
 local languages = [ Glob $(languageDir) : *.language ] ;
-AddFilesToHaikuImage system etc locale languages : $(languages) ;
+AddFilesToHaikuImage system data locale languages : $(languages) ;
 
 local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;

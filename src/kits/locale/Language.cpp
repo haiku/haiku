@@ -109,7 +109,7 @@ BLanguage::BLanguage(const char *language)
 	sprintf(name, "locale/languages/%s.language", language);
 
 	BPath path;
-	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) < B_OK) {
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &path) < B_OK) {
 		Default();
 		return;
 	}
