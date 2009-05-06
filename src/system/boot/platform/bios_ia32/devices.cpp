@@ -198,6 +198,22 @@ check_cd_boot(BIOSDrive *drive)
 }
 
 
+static bool
+are_extensions_available(uint8 drive)
+{
+	struct bios_regs regs;
+	regs.eax = BIOS_IS_EXT_PRESENT;
+	regs.ebx = 0x55aa;
+	regs.edx = drive;
+	call_bios(0x13, &regs);
+
+	TRACE(("checking extensions: carry: %u; ebx: 0x%08lx; ecx: 0x%08lx\n",
+		regs.flags & CARRY_FLAG, regs.ebx, regs.ecx));
+	return (regs.flags & CARRY_FLAG) == 0 && regs.ebx == 0xaa55
+		&& (regs.ecx & 0x01 /* supports device access using packet */) != 0;
+}
+
+
 static status_t
 get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 {
@@ -528,7 +544,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 {
 	TRACE(("drive ID %u\n", driveID));
 
-	if (driveID < 0x80
+	if (driveID < 0x80 || !are_extensions_available(driveID)
 		|| get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// old style CHS support
 
@@ -627,12 +643,16 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			uint32 cylinder = head / fParameters.heads;
 			head %= fParameters.heads;
 
-			if (cylinder >= fParameters.cylinders)
+			if (cylinder >= fParameters.cylinders) {
+				TRACE(("cylinder value %lu bigger than available %lu\n",
+					cylinder, fParameters.cylinders));
 				return B_BAD_VALUE;
+			}
 
 			// try to read from the device more than once, just to make sure it'll work
 			struct bios_regs regs;
 			int32 tries = 3;
+			bool readWorked = false;
 
 			while (tries-- > 0) {
 				regs.eax = BIOS_READ | blocksRead;
@@ -642,21 +662,26 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 				regs.ebx = kExtraSegmentScratch;
 				call_bios(0x13, &regs);
 
-				if ((regs.flags & CARRY_FLAG) == 0)
+				if ((regs.flags & CARRY_FLAG) == 0) {
+					readWorked = true;
 					break;
+				}
+
+				TRACE(("read failed\n"));
 
 				if (tries < 2) {
 					// reset disk system
+					TRACE(("reset disk system\n"));
 					regs.eax = BIOS_RESET_DISK_SYSTEM;
 					regs.edx = fDriveID;
 					call_bios(0x13, &regs);
 				}
-	
+
 				// wait a bit between the retries (1/20 sec)
 				spin(50000);
 			}
 
-			if (regs.flags & CARRY_FLAG) {
+			if (!readWorked) {
 				dprintf("reading %ld bytes from drive %u failed at %Ld\n",
 					blocksRead, fDriveID, pos);
 				return B_ERROR;
