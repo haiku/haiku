@@ -1419,7 +1419,7 @@ BString::LockBuffer(int32 maxLength)
 {
 	int32 length = Length();
 	if (maxLength > length)
-		length += maxLength - length;
+		length = maxLength;
 
 	if (_DetachWith(fPrivateData, length) == B_OK) {
 		_ReferenceCount() = -1;
