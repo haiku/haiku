@@ -11,6 +11,7 @@
 
 #include <ControlLook.h>
 #include <Region.h>
+#include <ScrollBar.h>
 
 #include "chart/ChartAxis.h"
 #include "chart/ChartDataSource.h"
@@ -58,7 +59,11 @@ Chart::AxisInfo::Render(BView* view, const BRect& updateRect)
 Chart::Chart(ChartRenderer* renderer, const char* name)
 	:
 	BView(name, B_FRAME_EVENTS | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fRenderer(renderer)
+	fRenderer(renderer),
+	fHScrollSize(0),
+	fVScrollSize(0),
+	fHScrollValue(0),
+	fVScrollValue(0)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -129,7 +134,7 @@ printf("Chart::RemoveDataSource(%ld)\n", index);
 	fRenderer->RemoveDataSource(dataSource);
 
 	_UpdateDomainAndRange();
-	
+
 	return dataSource;
 }
 
@@ -178,29 +183,80 @@ Chart::SetAxis(ChartAxisLocation location, ChartAxis* axis)
 }
 
 
-#if 0
-ChartDataRange
-Chart::Domain() const
-{
-	return fDataSource != NULL ? fDataSource->Domain() : ChartDataRange();
-}
-
-
 void
-Chart::SetDisplayDomain(const ChartDataRange& domain)
+Chart::SetDisplayDomain(ChartDataRange domain)
 {
-	fRenderer->SetDomain(domain);
+	// sanitize the supplied range
+	if (domain.IsValid() && domain.Size() < fDomain.Size()) {
+		if (domain.min < fDomain.min)
+			domain.OffsetBy(fDomain.min - domain.min);
+		else if (domain.max > fDomain.max)
+			domain.OffsetBy(fDomain.max - domain.max);
+	} else
+		domain = fDomain;
+
+	if (domain == fDisplayDomain)
+		return;
+
+	fDisplayDomain = domain;
+
+	fRenderer->SetDomain(fDisplayDomain);
+	fTopAxis.SetRange(fDisplayDomain);
+	fBottomAxis.SetRange(fDisplayDomain);
+
+	_UpdateScrollBar(true);
+
+	InvalidateLayout();
 	Invalidate();
 }
 
 
 void
-Chart::SetDisplayDomain(const ChartDataRange& range)
+Chart::SetDisplayRange(ChartDataRange range)
 {
-	fRenderer->SetRange(range);
+	// sanitize the supplied range
+	if (range.IsValid() && range.Size() < fRange.Size()) {
+		if (range.min < fRange.min)
+			range.OffsetBy(fRange.min - range.min);
+		else if (range.max > fRange.max)
+			range.OffsetBy(fRange.max - range.max);
+	} else
+		range = fRange;
+
+	if (range == fDisplayRange)
+		return;
+
+	fDisplayRange = range;
+
+	fRenderer->SetRange(fDisplayRange);
+	fLeftAxis.SetRange(fDisplayRange);
+	fRightAxis.SetRange(fDisplayRange);
+
+	_UpdateScrollBar(false);
+
+	InvalidateLayout();
 	Invalidate();
 }
-#endif
+
+
+void
+Chart::DomainChanged()
+{
+	if (ScrollBar(B_HORIZONTAL) != NULL && fDisplayDomain.IsValid())
+		SetDisplayDomain(fDisplayDomain);
+	else
+		SetDisplayDomain(fDomain);
+}
+
+
+void
+Chart::RangeChanged()
+{
+	if (ScrollBar(B_VERTICAL) != NULL && fDisplayRange.IsValid())
+		SetDisplayRange(fDisplayRange);
+	else
+		SetDisplayRange(fRange);
+}
 
 
 void
@@ -208,6 +264,9 @@ Chart::FrameResized(float newWidth, float newHeight)
 {
 //printf("Chart::FrameResized(%f, %f)\n", newWidth, newHeight);
 //	fRenderer->SetFrame(Bounds());
+
+	_UpdateScrollBar(true);
+	_UpdateScrollBar(false);
 
 	Invalidate();
 }
@@ -252,24 +311,36 @@ printf("Chart::Draw((%f, %f) - (%f, %f))\n", updateRect.left, updateRect.top, up
 }
 
 
-#if 0
+void
+Chart::ScrollTo(BPoint where)
+{
+	_ScrollTo(where.x, true);
+	_ScrollTo(where.y, false);
+}
+
+
 BSize
 Chart::MinSize()
 {
+	// TODO: Implement for real!
+	return BSize(100, 100);
 }
 
 
 BSize
 Chart::MaxSize()
 {
+	// TODO: Implement for real!
+	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 }
 
 
 BSize
 Chart::PreferredSize()
 {
+	// TODO: Implement for real!
+	return MinSize();
 }
-#endif
 
 
 void
@@ -316,15 +387,17 @@ printf("  fChartFrame: (%f, %f) - (%f, %f)\n", fChartFrame.left, fChartFrame.top
 void
 Chart::_UpdateDomainAndRange()
 {
+	ChartDataRange oldDomain = fDomain;
+	ChartDataRange oldRange = fRange;
+
 	if (fDataSources.IsEmpty()) {
 		fDomain = ChartDataRange();
 		fRange = ChartDataRange();
-		return;
 	} else {
 		ChartDataSource* firstSource = fDataSources.ItemAt(0);
 		fDomain = firstSource->Domain();
 		fRange = firstSource->Range();
-	
+
 		for (int32 i = 1; ChartDataSource* source = fDataSources.ItemAt(i);
 				i++) {
 			fDomain.Extend(source->Domain());
@@ -332,11 +405,65 @@ Chart::_UpdateDomainAndRange()
 		}
 	}
 
-	fRenderer->SetDomain(fDomain);
-	fRenderer->SetRange(fRange);
+	if (fDomain != oldDomain)
+		DomainChanged();
+	if (fRange != oldRange)
+		RangeChanged();
+}
 
-	fLeftAxis.SetRange(fRange);
-	fTopAxis.SetRange(fDomain);
-	fRightAxis.SetRange(fRange);
-	fBottomAxis.SetRange(fDomain);
+
+void
+Chart::_UpdateScrollBar(bool horizontal)
+{
+	const ChartDataRange& range = horizontal ? fDomain : fRange;
+	const ChartDataRange& displayRange = horizontal
+		? fDisplayDomain : fDisplayRange;
+	float chartSize = horizontal ? fChartFrame.Width() : fChartFrame.Height();
+	chartSize += 3;	// +1 for pixel size, +2 for border
+	float& scrollSize = horizontal ? fHScrollSize : fVScrollSize;
+	float& scrollValue = horizontal ? fHScrollValue : fVScrollValue;
+	BScrollBar* scrollBar = ScrollBar(horizontal ? B_HORIZONTAL : B_VERTICAL);
+
+	float proportion;
+
+	if (range.IsValid() && displayRange.IsValid()) {
+		scrollSize = (range.Size() / displayRange.Size() - 1) * chartSize;
+		scrollValue = (displayRange.min - range.min) / displayRange.Size()
+			* chartSize;
+		proportion = displayRange.Size() / range.Size();
+	} else {
+		scrollSize = 0;
+		scrollValue = 0;
+		proportion = 1;
+	}
+
+	if (scrollBar != NULL) {
+		scrollBar->SetRange(0, scrollSize);
+// TODO: If the scroll range changes, we might need to reset the scroll value.
+		scrollBar->SetValue(scrollValue);
+		scrollBar->SetProportion(proportion);
+	}
+}
+
+
+void
+Chart::_ScrollTo(float value, bool horizontal)
+{
+	float& scrollValue = horizontal ? fHScrollValue : fVScrollValue;
+	if (value == scrollValue)
+		return;
+
+	const ChartDataRange& range = horizontal ? fDomain : fRange;
+	ChartDataRange displayRange = horizontal ? fDisplayDomain : fDisplayRange;
+	float chartSize = horizontal ? fChartFrame.Width() : fChartFrame.Height();
+	chartSize += 3;	// +1 for pixel size, +2 for border
+	const float& scrollSize = horizontal ? fHScrollSize : fVScrollSize;
+
+	scrollValue = value;
+	displayRange.OffsetTo(value / scrollSize
+		* (range.Size() - displayRange.Size()));
+	if (horizontal)
+		SetDisplayDomain(displayRange);
+	else
+		SetDisplayRange(displayRange);
 }

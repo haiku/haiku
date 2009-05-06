@@ -40,21 +40,25 @@ public:
 			void				SetAxis(ChartAxisLocation location,
 									ChartAxis* axis);
 
-#if 0
-			ChartDataRange		Domain() const;
+	inline	ChartDataRange		Domain() const;
+	inline	ChartDataRange		Range() const;
 
-			void				SetDisplayDomain(const ChartDataRange& domain);
-			void				SetDisplayRange(const ChartDataRange& range);
-#endif
+	inline	ChartDataRange		DisplayDomain() const;
+	inline	ChartDataRange		DisplayRange() const;
+
+			void				SetDisplayDomain(ChartDataRange domain);
+			void				SetDisplayRange(ChartDataRange range);
+
+	virtual	void				DomainChanged();
+	virtual	void				RangeChanged();
 
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				Draw(BRect updateRect);
+	virtual	void				ScrollTo(BPoint where);
 
-#if 0
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
-#endif
 
 	virtual	void				DoLayout();
 
@@ -74,6 +78,8 @@ private:
 
 private:
 			void				_UpdateDomainAndRange();
+			void				_UpdateScrollBar(bool horizontal);
+			void				_ScrollTo(float value, bool horizontal);
 
 private:
 			ChartRenderer*		fRenderer;
@@ -84,12 +90,42 @@ private:
 			AxisInfo			fBottomAxis;
 			ChartDataRange		fDomain;
 			ChartDataRange		fRange;
-#if 0
 			ChartDataRange		fDisplayDomain;
 			ChartDataRange		fDisplayRange;
-#endif
 			BRect				fChartFrame;
+			float				fHScrollSize;
+			float				fVScrollSize;
+			float				fHScrollValue;
+			float				fVScrollValue;
 };
+
+
+ChartDataRange
+Chart::Domain() const
+{
+	return fDomain;
+}
+
+
+ChartDataRange
+Chart::Range() const
+{
+	return fRange;
+}
+
+
+ChartDataRange
+Chart::DisplayDomain() const
+{
+	return fDisplayDomain;
+}
+
+
+ChartDataRange
+Chart::DisplayRange() const
+{
+	return fDisplayRange;
+}
 
 
 #endif	// CHART_H
