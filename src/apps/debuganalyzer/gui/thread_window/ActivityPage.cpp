@@ -8,6 +8,7 @@
 #include <new>
 
 #include <GroupLayoutBuilder.h>
+#include <ScrollView.h>
 
 #include <AutoDeleter.h>
 
@@ -96,7 +97,7 @@ public:
 				previousEventTime = event->time;
 				break;
 			}
-	
+
 			case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
 			{
 				system_profiler_thread_enqueued_in_run_queue* event
@@ -106,7 +107,7 @@ public:
 				previousEventTime = event->time;
 				break;
 			}
-	
+
 			case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
 			{
 				system_profiler_thread_removed_from_run_queue* event
@@ -134,7 +135,7 @@ public:
 						system_profiler_thread_scheduled* event
 							= (system_profiler_thread_scheduled*)(header + 1);
 						eventTime = double(event->time - baseTime);
-	
+
 						if (event->thread == threadID) {
 							// thread scheduled
 							if (state == READY) {
@@ -145,7 +146,7 @@ public:
 								// before
 								timeType = PREEMPTION_TIME;
 							}
-	
+
 							if (state == STILL_RUNNING) {
 								// Thread was running and continues to run.
 								state = RUNNING;
@@ -166,17 +167,17 @@ public:
 								timeType = RUN_TIME;
 							}
 						}
-	
+
 						break;
 					}
-			
+
 					case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
 					{
 						system_profiler_thread_enqueued_in_run_queue* event
 							= (system_profiler_thread_enqueued_in_run_queue*)
 								(header + 1);
 						eventTime = double(event->time - baseTime);
-	
+
 						if (state == RUNNING || state == STILL_RUNNING) {
 							// Thread was running and is reentered into the run
 							// queue. This is done by the scheduler, if the
@@ -193,20 +194,20 @@ public:
 							state = READY;
 							timeType = WAIT_TIME;
 						}
-	
+
 						break;
 					}
-			
+
 					case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
 					{
 						system_profiler_thread_removed_from_run_queue* event
 							= (system_profiler_thread_removed_from_run_queue*)
 								(header + 1);
 						eventTime = double(event->time - baseTime);
-	
+
 						// This really only happens when the thread priority is
 						// changed while the thread is ready.
-					
+
 						if (state == RUNNING) {
 							// This should never happen.
 							state = READY;
@@ -219,7 +220,7 @@ public:
 							timeType = PREEMPTION_TIME;
 						} else
 							state = READY;
-	
+
 						break;
 					}
 				}
@@ -315,7 +316,7 @@ ThreadWindow::ActivityPage::ActivityPage()
 	fActivityChart = new Chart(fActivityChartRenderer);
 
 	BGroupLayoutBuilder(this)
-		.Add(fActivityChart)
+		.Add(new BScrollView("activity scroll", fActivityChart, 0, true, false))
 		.AddStrut(20)
 	;
 
@@ -327,15 +328,15 @@ ThreadWindow::ActivityPage::ActivityPage()
 	fActivityChart->SetAxis(CHART_AXIS_BOTTOM, axis);
 
 	axis = new LegendChartAxis(
-	new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
+		new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_TOP, axis);
 
 	axis = new LegendChartAxis(
-	new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
+		new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_LEFT, axis);
 
 	axis = new LegendChartAxis(
-	new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
+		new DefaultChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_RIGHT, axis);
 }
 
@@ -402,5 +403,6 @@ ThreadWindow::ActivityPage::SetModel(ThreadModel* model)
 		fPreemptionTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
 			LATENCY_TIME);
 		fActivityChart->AddDataSource(fPreemptionTimeData, &latencyConfig);
+fActivityChart->SetDisplayDomain(ChartDataRange(0, 500000));
 	}
 }
