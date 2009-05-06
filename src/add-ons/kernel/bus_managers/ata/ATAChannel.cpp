@@ -264,7 +264,13 @@ ATAChannel::SelectDevice(uint8 device)
 	taskFile.lba.mode = ATA_MODE_LBA;
 	taskFile.lba.device = device;
 
-	_WriteRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
+	status_t result = _WriteRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
+	if (result != B_OK) {
+		TRACE_ERROR("writing register failed when trying to select device %d\n",
+			device);
+		return result;
+	}
+
 	_FlushAndWait(1);
 
 #if 0
@@ -285,7 +291,11 @@ uint8
 ATAChannel::SelectedDevice()
 {
 	ata_task_file taskFile;
-	_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
+	if (_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD) != B_OK) {
+		TRACE_ERROR("reading register failed when detecting selected device\n");
+		return 2;
+	}
+
 	return taskFile.lba.device;
 }
 
@@ -321,9 +331,7 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 
 	uint8 deviceCount = fDeviceCount;
 	for (uint8 i = 0; i < deviceCount; i++) {
-		SelectDevice(i);
-
-		if (SelectedDevice() != i) {
+		if (SelectDevice(i) != B_OK || SelectedDevice() != i) {
 			TRACE_ALWAYS("cannot select device %d, assuming not present\n", i);
 			continue;
 		}
