@@ -82,7 +82,7 @@ using namespace BPrivate;
 #define ENCODING_TEXT		MDR_DIALECT_CHOICE ("Encoding:", "エンコード形式:")
 #define WARN_UNENCODABLE_TEXT	MDR_DIALECT_CHOICE ("Warn Unencodable:", "警告: エンコードできません")
 #define SPELL_CHECK_START_ON_TEXT	MDR_DIALECT_CHOICE ("Initial Spell Check Mode:", "編集時スペルチェック:")
-#define AUTO_MARK_READED_TEXT	MDR_DIALECT_CHOICE ("Automatically mark mail as read:", "Automatically mark mail as read:")
+#define AUTO_MARK_READ_TEXT	MDR_DIALECT_CHOICE ("Automatically mark mail as read:", "Automatically mark mail as read:")
 
 #define BUTTONBAR_TEXT		MDR_DIALECT_CHOICE ("Button Bar:", "ボタンバー:")
 
@@ -247,7 +247,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
-	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READED_TEXT,
+	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READ_TEXT,
 		fAutoMarkReadedMenu,	NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 	// Mail Accounts
@@ -415,7 +415,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	r.OffsetBy(0, height + ITEM_SPACE);
 	fAutoMarkReadedMenu = _BuildAutoMarkReadedMenu(fAutoMarkReaded);
-	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READED_TEXT,
+	menu = new BMenuField("autoMarkReaded", AUTO_MARK_READ_TEXT,
 		fAutoMarkReadedMenu,	NULL);
 	menu->SetDivider(labelWidth);
 	menu->SetAlignment(B_ALIGN_RIGHT);
