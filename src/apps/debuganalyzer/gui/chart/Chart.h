@@ -57,6 +57,8 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* dragMessage);
 	virtual	void				FrameResized(float newWidth, float newHeight);
@@ -107,6 +109,8 @@ private:
 			float				fVScrollValue;
 			double				fDomainZoomLimit;
 			BPoint				fLastMousePos;
+			BPoint				fDraggingStartPos;
+			float				fDraggingStartScrollValue;
 };
 
 

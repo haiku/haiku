@@ -12,6 +12,7 @@
 #include <ControlLook.h>
 #include <Region.h>
 #include <ScrollBar.h>
+#include <Window.h>
 
 #include "chart/ChartAxis.h"
 #include "chart/ChartDataSource.h"
@@ -65,7 +66,8 @@ Chart::Chart(ChartRenderer* renderer, const char* name)
 	fHScrollValue(0),
 	fVScrollValue(0),
 	fDomainZoomLimit(0),
-	fLastMousePos(-1, -1)
+	fLastMousePos(-1, -1),
+	fDraggingStartPos(-1, -1)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -191,7 +193,7 @@ Chart::SetDisplayDomain(ChartDataRange domain)
 	// sanitize the supplied range
 	if (domain.IsValid() && domain.Size() < fDomain.Size()) {
 		if (domain.min < fDomain.min)
-			domain.OffsetBy(fDomain.min - domain.min);
+			domain.OffsetTo(fDomain.min);
 		else if (domain.max > fDomain.max)
 			domain.OffsetBy(fDomain.max - domain.max);
 	} else
@@ -219,7 +221,7 @@ Chart::SetDisplayRange(ChartDataRange range)
 	// sanitize the supplied range
 	if (range.IsValid() && range.Size() < fRange.Size()) {
 		if (range.min < fRange.min)
-			range.OffsetBy(fRange.min - range.min);
+			range.OffsetTo(fRange.min);
 		else if (range.max > fRange.max)
 			range.OffsetBy(fRange.max - range.max);
 	} else
@@ -314,9 +316,52 @@ Chart::FrameResized(float newWidth, float newHeight)
 
 
 void
+Chart::MouseDown(BPoint where)
+{
+	// ignore, if already dragging or if there's no scrollbar
+	if (fDraggingStartPos.x >= 0 || ScrollBar(B_HORIZONTAL) == NULL)
+		return;
+
+	// the first button must be pressed
+	int32 buttons;
+	if (Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
+		|| (buttons & B_PRIMARY_MOUSE_BUTTON) == 0) {
+		return;
+	}
+
+	fDraggingStartPos = where;
+	fDraggingStartScrollValue = fHScrollValue;
+
+	SetMouseEventMask(B_POINTER_EVENTS);
+}
+
+
+void
+Chart::MouseUp(BPoint where)
+{
+	// ignore if not dragging, or if the first mouse button is still pressed
+	int32 buttons;
+	if (fDraggingStartPos.x < 0
+		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
+		|| (buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		return;
+	}
+
+	// stop dragging
+	fDraggingStartPos.x = -1;
+}
+
+
+void
 Chart::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
 	fLastMousePos = where;
+
+	if (fDraggingStartPos.x < 0)
+		return;
+
+	ScrollBar(B_HORIZONTAL)->SetValue(fDraggingStartScrollValue
+		+ fDraggingStartPos.x - where.x);
 }
 
 
@@ -550,11 +595,6 @@ Chart::_Zoom(float x, float steps)
 		return;
 
 	domainPos -= displayDomainSize * x / chartSize;
-	ChartDataRange displayDomain(domainPos, domainPos + displayDomainSize);
-	if (displayDomain.min < fDomain.min)
-		displayDomain.OffsetTo(fDomain.min);
-	if (displayDomain.max > fDomain.max)
-		displayDomain.OffsetTo(fDomain.max - displayDomainSize);
-
-	SetDisplayDomain(displayDomain);
+	SetDisplayDomain(ChartDataRange(domainPos, domainPos + displayDomainSize));
+		// will adjust the supplied display domain to fit the domain
 }
