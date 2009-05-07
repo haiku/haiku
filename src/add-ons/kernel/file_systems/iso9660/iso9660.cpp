@@ -694,37 +694,40 @@ status_t
 ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 	size_t bufferSize)
 {
-	off_t totalRead = cookie->pos + (cookie->block - cookie->startBlock)
-		* volume->logicalBlkSize[FS_DATA_FORMAT];
-	off_t cacheBlock;
-	char *blockData;
 	int	result = B_NO_ERROR;
-	size_t bytesRead = 0;
+	bool done = false;
 
 	TRACE(("ISOReadDirEnt - ENTER\n"));
 
-	// If we're at the end of the data in a block, move to the next block.
-	while (true) {
-		blockData = (char*)block_cache_get(volume->fBlockCache, cookie->block);
-		if (blockData != NULL && *(blockData + cookie->pos) == 0) {
-			// NULL data, move to next block.
-			block_cache_put(volume->fBlockCache, cookie->block);
-			blockData = NULL;
-			totalRead += volume->logicalBlkSize[FS_DATA_FORMAT] - cookie->pos;
-			cookie->pos = 0;
-			cookie->block++;
-		} else
-			break;
+	while (!done) {
+		off_t totalRead = cookie->pos + (cookie->block - cookie->startBlock)
+			* volume->logicalBlkSize[FS_DATA_FORMAT];
 
-		if (totalRead >= cookie->totalSize)
-			break;
-	}
+		// If we're at the end of the data in a block, move to the next block.
+		char *blockData;
+		while (true) {
+			blockData
+				= (char*)block_cache_get(volume->fBlockCache, cookie->block);
+			if (blockData != NULL && *(blockData + cookie->pos) == 0) {
+				// NULL data, move to next block.
+				block_cache_put(volume->fBlockCache, cookie->block);
+				blockData = NULL;
+				totalRead
+					+= volume->logicalBlkSize[FS_DATA_FORMAT] - cookie->pos;
+				cookie->pos = 0;
+				cookie->block++;
+			} else
+				break;
 
-	cacheBlock = cookie->block;
-	if (blockData != NULL && totalRead < cookie->totalSize) {
-		bool done = false;
-		while (!done) {
+			if (totalRead >= cookie->totalSize)
+				break;
+		}
+
+		off_t cacheBlock = cookie->block;
+
+		if (blockData != NULL && totalRead < cookie->totalSize) {
 			iso9660_inode node;
+			size_t bytesRead = 0;
 			result = InitNode(&node, blockData + cookie->pos, &bytesRead,
 				volume->joliet_level);
 			if (result != B_OK)
@@ -741,14 +744,14 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 				if (node.name_length <= nameBufferSize) {
 					// need to do some size checking here.
 					strlcpy(dirent->d_name, node.name, node.name_length + 1);
-					TRACE(("ISOReadDirEnt  - success, name is %s, block %Ld, pos "
-						"%Ld, inode id %Ld\n", dirent->d_name, cookie->block,
+					TRACE(("ISOReadDirEnt  - success, name is %s, block %Ld, "
+						"pos %Ld, inode id %Ld\n", dirent->d_name, cookie->block,
 						cookie->pos, dirent->d_ino));
 				} else {
 					// TODO: this can be just normal if we support reading more
 					// than one entry.
-					TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in buffer "
-						"of size %lu\n", node.name, nameBufferSize));
+					TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in "
+						"buffer of size %d\n", node.name, (int)nameBufferSize));
 					result = B_BAD_VALUE;
 				}
 
@@ -761,19 +764,21 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 				cookie->pos = 0;
 				cookie->block++;
 			}
+		} else {
+			if (totalRead >= cookie->totalSize)
+				result = B_ENTRY_NOT_FOUND;
+			else
+				result = B_NO_MEMORY;
+			done = true;
 		}
-	} else {
-		if (totalRead >= cookie->totalSize)
-			result = B_ENTRY_NOT_FOUND;
-		else
-			result = B_NO_MEMORY;
-	}
 
-	if (blockData != NULL)
-		block_cache_put(volume->fBlockCache, cacheBlock);
+		if (blockData != NULL)
+			block_cache_put(volume->fBlockCache, cacheBlock);
+	}
 
 	TRACE(("ISOReadDirEnt - EXIT, result is %s, vnid is %Lu\n",
 		strerror(result), dirent->d_ino));
+
 	return result;
 }
 
@@ -801,19 +806,21 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 	memset(node->attr.stat, 0, sizeof(node->attr.stat));
 
 	node->extAttrRecLen = *(uint8*)buffer++;
-	TRACE(("InitNode - ext attr length is %ld\n", node->extAttrRecLen));
+	TRACE(("InitNode - ext attr length is %d\n", (int)node->extAttrRecLen));
 
 	node->startLBN[LSB_DATA] = *(uint32*)buffer;
 	buffer += 4;
 	node->startLBN[MSB_DATA] = *(uint32*)buffer;
 	buffer += 4;
-	TRACE(("InitNode - data start LBN is %ld\n", node->startLBN[FS_DATA_FORMAT]));
+	TRACE(("InitNode - data start LBN is %d\n",
+		(int)node->startLBN[FS_DATA_FORMAT]));
 
 	node->dataLen[LSB_DATA] = *(uint32*)buffer;
 	buffer += 4;
 	node->dataLen[MSB_DATA] = *(uint32*)buffer;
 	buffer += 4;
-	TRACE(("InitNode - data length is %ld\n", node->dataLen[FS_DATA_FORMAT]));
+	TRACE(("InitNode - data length is %d\n",
+		(int)node->dataLen[FS_DATA_FORMAT]));
 
 	init_node_date(&node->recordDate, buffer);
 	buffer += 7;
@@ -832,11 +839,11 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 
 	node->volSeqNum = *(uint32*)buffer;
 	buffer += 4;
-	TRACE(("InitNode - volume seq num is %ld\n", node->volSeqNum));
+	TRACE(("InitNode - volume seq num is %d\n", (int)node->volSeqNum));
 
 	node->name_length = *(uint8*)buffer;
 	buffer++;
-	TRACE(("InitNode - file id length is %lu\n", node->name_length));
+	TRACE(("InitNode - file id length is %u\n", node->name_length));
 
 	// Set defaults, in case there is no RockRidge stuff.
 	node->attr.stat[FS_DATA_FORMAT].st_mode |= (node->flags & ISO_IS_DIR) != 0

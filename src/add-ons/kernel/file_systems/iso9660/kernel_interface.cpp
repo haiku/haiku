@@ -221,8 +221,8 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 	iso9660_inode *baseNode = (iso9660_inode*)_base->private_node;
 	iso9660_inode *newNode = NULL;
 
-	TRACE(("fs_walk - looking for %s in dir file of length %ld\n", file,
-		baseNode->dataLen[FS_DATA_FORMAT]));
+	TRACE(("fs_walk - looking for %s in dir file of length %d\n", file,
+		(int)baseNode->dataLen[FS_DATA_FORMAT]));
 
 	if (strcmp(file, ".") == 0)  {
 		// base directory
@@ -266,12 +266,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			&& !done) {
 			initResult = InitNode(&node, blockData, &bytesRead,
 				ns->joliet_level);
-			TRACE(("fs_walk - InitNode returned %s, filename %s, %lu bytes "
-				"read\n", strerror(initResult), node.name,
-				bytesRead));
+			TRACE(("fs_walk - InitNode returned %s, filename %s, %u bytes "
+				"read\n", strerror(initResult), node.name, (unsigned)bytesRead));
 
 			if (initResult == B_OK) {
-				if (!strcmp(node.name, file)) {
+				if ((node.flags & ISO_IS_ASSOCIATED_FILE) == 0
+					&& !strcmp(node.name, file)) {
 					TRACE(("fs_walk - success, found vnode at block %Ld, pos "
 						"%Ld\n", block, blockBytesRead));
 
@@ -296,15 +296,15 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			blockData += bytesRead;
 			blockBytesRead += bytesRead;
 
-			TRACE(("fs_walk - Adding %lu bytes to blockBytes read (total "
-				"%Ld/%lu).\n", bytesRead, blockBytesRead,
-				baseNode->dataLen[FS_DATA_FORMAT]));
+			TRACE(("fs_walk - Adding %u bytes to blockBytes read (total "
+				"%Ld/%u).\n", (unsigned)bytesRead, blockBytesRead,
+				(unsigned)baseNode->dataLen[FS_DATA_FORMAT]));
 		}
 		totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
 		block++;
 
-		TRACE(("fs_walk - moving to next block %Ld, total read %lu\n",
-			block, totalRead));
+		TRACE(("fs_walk - moving to next block %Ld, total read %u\n",
+			block, (unsigned)totalRead));
 		block_cache_put(ns->fBlockCache, cachedBlock);
 	}
 
@@ -327,8 +327,8 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	uint32 pos = vnodeID & 0x3fffffff;
 	uint32 block = vnodeID >> 30;
 
-	TRACE(("fs_read_vnode - block = %ld, pos = %ld, raw = %Lu node %p\n",
-		block, pos, vnodeID, newNode));
+	TRACE(("fs_read_vnode - block = %u, pos = %u, raw = %Lu node %p\n",
+		(unsigned)block, (unsigned) pos, vnodeID, newNode));
 
 	if (pos > ns->logicalBlkSize[FS_DATA_FORMAT]) {
 		free(newNode);
@@ -352,7 +352,8 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	newNode->id = vnodeID;
 	_node->private_node = newNode;
 	_node->ops = &gISO9660VnodeOps;
-	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode & ~(S_IWUSR | S_IWGRP | S_IWOTH);
+	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode
+		& ~(S_IWUSR | S_IWGRP | S_IWOTH);
 	*_flags = 0;
 
 	if ((newNode->flags & ISO_IS_DIR) == 0) {
