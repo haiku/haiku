@@ -355,7 +355,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode & ~(S_IWUSR | S_IWGRP | S_IWOTH);
 	*_flags = 0;
 
-	if ((newNode->flags & ISO_ISDIR) == 0) {
+	if ((newNode->flags & ISO_IS_DIR) == 0) {
 		newNode->cache = file_cache_create(ns->id, vnodeID,
 			newNode->dataLen[FS_DATA_FORMAT]);
 	}
@@ -471,7 +471,7 @@ fs_read(fs_volume *_vol, fs_vnode *_node, void *cookie, off_t pos, void *buffer,
 {
 	iso9660_inode *node = (iso9660_inode *)_node->private_node;
 
-	if (node->flags & ISO_ISDIR)
+	if ((node->flags & ISO_IS_DIR) != 0)
 		return EISDIR;
 
 	uint32 fileSize = node->dataLen[FS_DATA_FORMAT];
@@ -548,7 +548,7 @@ fs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 
 	TRACE(("fs_open_dir - node is %p\n", node));
 
-	if (!(node->flags & ISO_ISDIR))
+	if ((node->flags & ISO_IS_DIR) == 0)
 		return B_NOT_A_DIRECTORY;
 
 	dircookie* dirCookie = (dircookie*)malloc(sizeof(dircookie));

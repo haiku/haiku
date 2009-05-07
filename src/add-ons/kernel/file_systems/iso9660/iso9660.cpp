@@ -303,6 +303,8 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 		length = *(uint8*)(buffer + 2);
 		if (buffer + length > end)
 			break;
+		if (length == 0)
+			break;
 
 		switch (((int)buffer[0] << 8) + buffer[1]) {
 			// Stat structure stuff
@@ -496,7 +498,7 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 			// Deep directory record masquerading as a file.
 			case 'CL':
 				TRACE(("RR: found CL, length %u\n", length));
-				node->flags |= ISO_ISDIR;
+				node->flags |= ISO_IS_DIR;
 				node->startLBN[LSB_DATA] = *(uint32*)(buffer+4);
 				node->startLBN[MSB_DATA] = *(uint32*)(buffer+8);
 				break;
@@ -508,7 +510,8 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 			case 'RE':
 				// Relocated directory, we should skip.
 				TRACE(("RR: found RE, length %u\n", length));
-				return B_BAD_VALUE;
+				// TODO: support relocated directories
+				return B_NOT_SUPPORTED;
 
 			case 'TF':
 				TRACE(("RR: found TF, length %u\n", length));
@@ -518,10 +521,17 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 				TRACE(("RR: found RR, length %u\n", length));
 				break;
 
+			case 'SF':
+				TRACE(("RR: found SF, sparse files not supported!\n"));
+				// TODO: support sparse files
+				return B_NOT_SUPPORTED;
+
 			default:
-				TRACE(("RR: %x, %x, end of extensions.\n",
-					buffer[0], buffer[1]));
-				done = true;
+				if (buffer[0] == '\0') {
+					TRACE(("RR: end of extensions\n"));
+					done = true;
+				} else
+					TRACE(("RR: Unknown tag %c%c\n", buffer[0], buffer[1]));
 				break;
 		}
 	}
@@ -712,36 +722,45 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 
 	cacheBlock = cookie->block;
 	if (blockData != NULL && totalRead < cookie->totalSize) {
-		iso9660_inode node;
-		result = InitNode(&node, blockData + cookie->pos, &bytesRead,
-			volume->joliet_level);
-		if (result == B_OK) {
-			size_t nameBufferSize = bufferSize - sizeof(struct dirent);
+		bool done = false;
+		while (!done) {
+			iso9660_inode node;
+			result = InitNode(&node, blockData + cookie->pos, &bytesRead,
+				volume->joliet_level);
+			if (result != B_OK)
+				break;
 
-			dirent->d_dev = volume->id;
-			dirent->d_ino = ((ino_t)cookie->block << 30)
-				+ (cookie->pos & 0x3fffffff);
-			dirent->d_reclen = sizeof(struct dirent) + node.name_length + 1;
+			if ((node.flags & ISO_IS_ASSOCIATED_FILE) == 0) {
+				size_t nameBufferSize = bufferSize - sizeof(struct dirent);
 
-			if (node.name_length <= nameBufferSize) {
-				// need to do some size checking here.
-				strlcpy(dirent->d_name, node.name, node.name_length + 1);
-				TRACE(("ISOReadDirEnt  - success, name is %s, block %Ld, pos "
-					"%Ld, inode id %Ld\n", dirent->d_name, cookie->block,
-					cookie->pos, dirent->d_ino));
-			} else {
-				// TODO: this can be just normal if we support reading more
-				// than one entry.
-				TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in buffer "
-					"of size %lu\n", node.name, nameBufferSize));
-				result = B_BAD_VALUE;
+				dirent->d_dev = volume->id;
+				dirent->d_ino = ((ino_t)cookie->block << 30)
+					+ (cookie->pos & 0x3fffffff);
+				dirent->d_reclen = sizeof(struct dirent) + node.name_length + 1;
+
+				if (node.name_length <= nameBufferSize) {
+					// need to do some size checking here.
+					strlcpy(dirent->d_name, node.name, node.name_length + 1);
+					TRACE(("ISOReadDirEnt  - success, name is %s, block %Ld, pos "
+						"%Ld, inode id %Ld\n", dirent->d_name, cookie->block,
+						cookie->pos, dirent->d_ino));
+				} else {
+					// TODO: this can be just normal if we support reading more
+					// than one entry.
+					TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in buffer "
+						"of size %lu\n", node.name, nameBufferSize));
+					result = B_BAD_VALUE;
+				}
+
+				done = true;
 			}
-			cookie->pos += bytesRead;
-		}
 
-		if (cookie->pos == volume->logicalBlkSize[FS_DATA_FORMAT]) {
-			cookie->pos = 0;
-			cookie->block++;
+			cookie->pos += bytesRead;
+
+			if (cookie->pos == volume->logicalBlkSize[FS_DATA_FORMAT]) {
+				cookie->pos = 0;
+				cookie->block++;
+			}
 		}
 	} else {
 		if (totalRead >= cookie->totalSize)
@@ -782,6 +801,7 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 	memset(node->attr.stat, 0, sizeof(node->attr.stat));
 
 	node->extAttrRecLen = *(uint8*)buffer++;
+	TRACE(("InitNode - ext attr length is %ld\n", node->extAttrRecLen));
 
 	node->startLBN[LSB_DATA] = *(uint32*)buffer;
 	buffer += 4;
@@ -819,7 +839,7 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 	TRACE(("InitNode - file id length is %lu\n", node->name_length));
 
 	// Set defaults, in case there is no RockRidge stuff.
-	node->attr.stat[FS_DATA_FORMAT].st_mode |= (node->flags & ISO_ISDIR) != 0
+	node->attr.stat[FS_DATA_FORMAT].st_mode |= (node->flags & ISO_IS_DIR) != 0
 		? S_IFDIR | S_IXUSR | S_IRUSR | S_IXGRP | S_IRGRP | S_IXOTH | S_IROTH
 		: S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
 

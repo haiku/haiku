@@ -116,12 +116,12 @@ struct iso9660_inode {
 
 // These go with the flags member of the iso9660_volume struct.
 enum {
-	ISO_ISHIDDEN	= 0,
-	ISO_ISDIR		= 2,
-	ISO_ISASSOCFILE	= 4,
-	ISO_EXTATTR		= 8,
-	ISO_EXTPERM		= 16,
-	ISO_MOREDIRS	= 128
+	ISO_IS_HIDDEN				= 0x01,
+	ISO_IS_DIR					= 0x02,
+	ISO_IS_ASSOCIATED_FILE		= 0x04,
+	ISO_EXTENDED_ATTRIBUTE		= 0x08,
+	ISO_EXTENDED_PERMISSIONS	= 0x10,
+	ISO_MORE_DIRS				= 0x80
 };
 
 
