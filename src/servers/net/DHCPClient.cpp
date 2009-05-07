@@ -397,6 +397,13 @@ DHCPClient::_Negotiate(dhcp_state state)
 	local.sin_port = htons(DHCP_CLIENT_PORT);
 	local.sin_addr.s_addr = INADDR_ANY;
 
+	// Enable reusing the port . This is needed in case there is more
+	// than 1 interface that needs to be configured. Note that the only reason
+	// this works is because there is code below to bind to a specific
+	// interface.
+	int option = 1;
+	setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option));
+
 	if (bind(socket, (struct sockaddr *)&local, sizeof(local)) < 0) {
 		close(socket);
 		return errno;
@@ -409,7 +416,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	broadcast.sin_port = htons(DHCP_SERVER_PORT);
 	broadcast.sin_addr.s_addr = INADDR_BROADCAST;
 
-	int option = 1;
+	option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
 	if (state == INIT) {
@@ -857,4 +864,3 @@ DHCPClient::MessageReceived(BMessage* message)
 			break;
 	}
 }
-
