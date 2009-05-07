@@ -123,7 +123,7 @@ public:
 	virtual ~FSDomain()	{}
 
 	virtual fssh_status_t Open(const char *path, int openMode, Node *&node) = 0;
-	
+
 	virtual fssh_status_t CreateFile(const char *path,
 		const struct fssh_stat &st, File *&file) = 0;
 	virtual fssh_status_t CreateDirectory(const char *path,
@@ -173,7 +173,7 @@ public:
 	{
 		if (!fAttrDir)
 			return 0;
-		
+
 		fssh_set_errno(FSSH_B_OK);
 		struct dirent *entry = fs_read_attr_dir(fAttrDir);
 		if (!entry)
@@ -394,7 +394,7 @@ public:
 		_node = node;
 		return FSSH_B_OK;
 	}
-	
+
 	virtual fssh_status_t CreateFile(const char *path,
 		const struct fssh_stat &st, File *&_file)
 	{
@@ -529,8 +529,9 @@ public:
 
 		// open the attribute directory
 		fAttrDir = _kern_open_attr_dir(fd, NULL);
-		if (fAttrDir < 0)
-			return fAttrDir;
+		if (fAttrDir < 0) {
+			// TODO: check if the file system supports attributes, and fail
+		}
 
 		return FSSH_B_OK;
 	}
@@ -539,7 +540,7 @@ public:
 	{
 		if (fAttrDir < 0)
 			return 0;
-		
+
 		char buffer[sizeof(fssh_dirent) + B_ATTR_NAME_LENGTH];
 		struct fssh_dirent *entry = (fssh_dirent *)buffer;
 		int numRead = _kern_read_dir(fAttrDir, entry, sizeof(buffer), 1);
@@ -758,7 +759,7 @@ public:
 		_node = node;
 		return FSSH_B_OK;
 	}
-	
+
 	virtual fssh_status_t CreateFile(const char *path,
 		const struct fssh_stat &st, File *&_file)
 	{
@@ -1183,7 +1184,7 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 				fssh_strerror(bytesRead));
 		}
 		linkTo[bytesRead] = '\0';	// always NULL-terminate
-		
+
 		// create the target link
 		SymLink *link;
 		error = targetDomain->CreateSymLink(target, linkTo,
