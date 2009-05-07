@@ -2025,7 +2025,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	bool command = false;
 	bool control = false;
 	bool shift = false;
-
+	bool option = false;
 	if (index > 0)
 		frame = ItemAt(index - 1)->Frame();
 	else
@@ -2045,6 +2045,8 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 				control = true;
 			if (item->fModifiers & B_SHIFT_KEY)
 				shift = true;
+			if (item->fModifiers & B_OPTION_KEY)
+				option = true;
 		}
 
 		item->fBounds.left = 0.0f;
@@ -2062,6 +2064,8 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	if (command)
 		frame.right += 17;
 	if (control)
+		frame.right += 17;
+	if (option)
 		frame.right += 17;
 	if (shift)
 		frame.right += 22;
