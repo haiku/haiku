@@ -2279,7 +2279,18 @@ BMenu::_InvokeItem(BMenuItem *item, bool now)
 		UnlockLooper();
 	}
 
-	item->Invoke();
+	// Lock the root menu window before calling BMenuItem::Invoke()
+	BMenu *parent = this;
+	BMenu *rootMenu = NULL;
+	do {
+		rootMenu = parent;
+		parent = rootMenu->Supermenu();
+	} while (parent != NULL);
+		
+	if (rootMenu->LockLooper()) {
+		item->Invoke();
+		rootMenu->UnlockLooper();
+	}
 }
 
 
