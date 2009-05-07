@@ -314,6 +314,8 @@ ThreadWindow::ActivityPage::ActivityPage()
 	ObjectDeleter<ChartRenderer> rendererDeleter(fActivityChartRenderer);
 
 	fActivityChart = new Chart(fActivityChartRenderer);
+	fActivityChart->SetDomainZoomLimit(1000);
+		// maximal zoom: 1 ms for the whole displayed domain
 
 	BGroupLayoutBuilder(this)
 		.Add(new BScrollView("activity scroll", fActivityChart, 0, true, false))
@@ -403,6 +405,5 @@ ThreadWindow::ActivityPage::SetModel(ThreadModel* model)
 		fPreemptionTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
 			LATENCY_TIME);
 		fActivityChart->AddDataSource(fPreemptionTimeData, &latencyConfig);
-fActivityChart->SetDisplayDomain(ChartDataRange(0, 500000));
 	}
 }
