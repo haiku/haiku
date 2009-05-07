@@ -101,7 +101,7 @@ ThreadModel::FindSchedulingEvent(bigtime_t time)
 	time += fModel->BaseTime();
 
 	int32 lower = 0;
-	int32 upper = CountSchedulingEvents();
+	int32 upper = CountSchedulingEvents() - 1;
 
 	while (lower < upper) {
 		int32 mid = (lower + upper) / 2;
