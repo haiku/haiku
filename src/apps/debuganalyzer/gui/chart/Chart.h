@@ -49,9 +49,16 @@ public:
 			void				SetDisplayDomain(ChartDataRange domain);
 			void				SetDisplayRange(ChartDataRange range);
 
+			double				DomainZoomLimit() const;
+			void				SetDomainZoomLimit(double limit);
+
 	virtual	void				DomainChanged();
 	virtual	void				RangeChanged();
 
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				ScrollTo(BPoint where);
@@ -80,6 +87,7 @@ private:
 			void				_UpdateDomainAndRange();
 			void				_UpdateScrollBar(bool horizontal);
 			void				_ScrollTo(float value, bool horizontal);
+			void				_Zoom(float x, float steps);
 
 private:
 			ChartRenderer*		fRenderer;
@@ -97,6 +105,8 @@ private:
 			float				fVScrollSize;
 			float				fHScrollValue;
 			float				fVScrollValue;
+			double				fDomainZoomLimit;
+			BPoint				fLastMousePos;
 };
 
 

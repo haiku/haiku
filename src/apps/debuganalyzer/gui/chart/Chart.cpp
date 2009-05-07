@@ -63,7 +63,9 @@ Chart::Chart(ChartRenderer* renderer, const char* name)
 	fHScrollSize(0),
 	fVScrollSize(0),
 	fHScrollValue(0),
-	fVScrollValue(0)
+	fVScrollValue(0),
+	fDomainZoomLimit(0),
+	fLastMousePos(-1, -1)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -239,6 +241,20 @@ Chart::SetDisplayRange(ChartDataRange range)
 }
 
 
+double
+Chart::DomainZoomLimit() const
+{
+	return fDomainZoomLimit;
+}
+
+
+void
+Chart::SetDomainZoomLimit(double limit)
+{
+	fDomainZoomLimit = limit;
+}
+
+
 void
 Chart::DomainChanged()
 {
@@ -260,6 +276,31 @@ Chart::RangeChanged()
 
 
 void
+Chart::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			// We're only interested in Shift + vertical wheel, if the mouse
+			// is in the chart frame.
+			float deltaY;
+			if ((modifiers() & B_SHIFT_KEY) == 0
+				|| message->FindFloat("be:wheel_delta_y", &deltaY) != B_OK
+				|| !fChartFrame.InsetByCopy(1, 1).Contains(fLastMousePos)) {
+				break;
+			}
+
+			_Zoom(fLastMousePos.x, deltaY);
+
+			return;
+		}
+	}
+
+	BView::MessageReceived(message);
+}
+
+
+void
 Chart::FrameResized(float newWidth, float newHeight)
 {
 //printf("Chart::FrameResized(%f, %f)\n", newWidth, newHeight);
@@ -269,6 +310,13 @@ Chart::FrameResized(float newWidth, float newHeight)
 	_UpdateScrollBar(false);
 
 	Invalidate();
+}
+
+
+void
+Chart::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
+{
+	fLastMousePos = where;
 }
 
 
@@ -419,7 +467,7 @@ Chart::_UpdateScrollBar(bool horizontal)
 	const ChartDataRange& displayRange = horizontal
 		? fDisplayDomain : fDisplayRange;
 	float chartSize = horizontal ? fChartFrame.Width() : fChartFrame.Height();
-	chartSize += 3;	// +1 for pixel size, +2 for border
+	chartSize--;	// +1 for pixel size, -2 for border
 	float& scrollSize = horizontal ? fHScrollSize : fVScrollSize;
 	float& scrollValue = horizontal ? fHScrollValue : fVScrollValue;
 	BScrollBar* scrollBar = ScrollBar(horizontal ? B_HORIZONTAL : B_VERTICAL);
@@ -456,7 +504,7 @@ Chart::_ScrollTo(float value, bool horizontal)
 	const ChartDataRange& range = horizontal ? fDomain : fRange;
 	ChartDataRange displayRange = horizontal ? fDisplayDomain : fDisplayRange;
 	float chartSize = horizontal ? fChartFrame.Width() : fChartFrame.Height();
-	chartSize += 3;	// +1 for pixel size, +2 for border
+	chartSize--;	// +1 for pixel size, -2 for border
 	const float& scrollSize = horizontal ? fHScrollSize : fVScrollSize;
 
 	scrollValue = value;
@@ -466,4 +514,47 @@ Chart::_ScrollTo(float value, bool horizontal)
 		SetDisplayDomain(displayRange);
 	else
 		SetDisplayRange(displayRange);
+}
+
+
+void
+Chart::_Zoom(float x, float steps)
+{
+	double displayDomainSize = fDisplayDomain.Size();
+	if (fDomainZoomLimit <= 0 || !fDomain.IsValid() || !fDisplayDomain.IsValid()
+		|| steps == 0) {
+		return;
+	}
+
+	// compute the domain point where to zoom in
+	float chartSize = fChartFrame.Width() - 1;
+	x -= fChartFrame.left + 1;
+	double domainPos = (fHScrollValue + x) / (fHScrollSize + chartSize)
+		* fDomain.Size();
+
+	double factor = 2;
+	if (steps < 0) {
+		steps = -steps;
+		factor = 1.0 / factor;
+	}
+
+	for (; steps > 0; steps--)
+		displayDomainSize *= factor;
+
+	if (displayDomainSize < fDomainZoomLimit)
+		displayDomainSize = fDomainZoomLimit;
+	if (displayDomainSize > fDomain.Size())
+		displayDomainSize = fDomain.Size();
+
+	if (displayDomainSize == fDisplayDomain.Size())
+		return;
+
+	domainPos -= displayDomainSize * x / chartSize;
+	ChartDataRange displayDomain(domainPos, domainPos + displayDomainSize);
+	if (displayDomain.min < fDomain.min)
+		displayDomain.OffsetTo(fDomain.min);
+	if (displayDomain.max > fDomain.max)
+		displayDomain.OffsetTo(fDomain.max - displayDomainSize);
+
+	SetDisplayDomain(displayDomain);
 }
