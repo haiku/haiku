@@ -1,3 +1,8 @@
+/*
+ * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "HIDReportItem.h"
 #include "HIDReport.h"
 

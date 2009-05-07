@@ -1,3 +1,7 @@
+/*
+ * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef HID_REPORT_ITEM_H
 #define HID_REPORT_ITEM_H
 
