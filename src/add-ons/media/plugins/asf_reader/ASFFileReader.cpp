@@ -299,7 +299,7 @@ ASFFileReader::ParseIndex() {
 	while (asf_get_packet(asfFile, packet) > 0) {
 		for (int i=0;i<packet->payload_count;i++) {
 			payload = (asf_payload_t *)(&packet->payloads[i]);
-	//		printf("Payload %d Stream %d Keyframe %d send time %Ld pts %Ld id %d size %d\n",i+1,payload->stream_number,payload->key_frame, 1000L * bigtime_t(packet->send_time), 1000L * bigtime_t(payload->pts), payload->media_object_number, payload->datalen);
+//			printf("Payload %d Stream %d Keyframe %d send time %Ld pts %Ld id %d size %d\n",i+1,payload->stream_number,payload->key_frame, 1000L * bigtime_t(packet->send_time), 1000L * bigtime_t(payload->pts), payload->media_object_number, payload->datalen);
 			if (payload->stream_number < streams.size()) {
 				streams[payload->stream_number].AddPayload(payload->media_object_number, payload->key_frame, 1000L * payload->pts, payload->datalen, false);
 			}
@@ -329,6 +329,7 @@ ASFFileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	
 	if (indexEntry.noPayloads == 0) {
 		// No index entry
+		printf("No Index entry for frame %ld\n",pFrameNo);
 		return false;
 	}
 	

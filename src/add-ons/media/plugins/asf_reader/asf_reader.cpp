@@ -190,7 +190,7 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 				
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
-		TRACE("calculated fps=%ld\n", cookie->frame_count * 1000000LL / cookie->duration);
+		TRACE("calculated fps=%Ld\n", cookie->frame_count * 1000000LL / cookie->duration);
 		
 		// asf does not have a frame rate!  The extended descriptor defines an average time per frame which is generally useless.
 		if (videoFormat.FrameScale && videoFormat.FrameRate) {
@@ -469,7 +469,7 @@ asfReader::FindKeyFrame(void* cookie, uint32 flags,
 	// Find the nearest keyframe to the given time or frame.
 
 	asf_cookie *asfCookie = (asf_cookie *)cookie;
-	bool keyframe = false;
+	IndexEntry indexEntry;
 
 	if (flags & B_MEDIA_SEEK_TO_TIME) {
 		// convert time to frame as we seek by frame
@@ -477,18 +477,34 @@ asfReader::FindKeyFrame(void* cookie, uint32 flags,
 		*frame = ((*time * asfCookie->frames_per_sec_rate) / (int64)asfCookie->frames_per_sec_scale) / 1000000LL;
 	}
 
-	if (flags & B_MEDIA_SEEK_TO_FRAME) {
-		// convert frame to time as we seek by frame
-		// frame = (time * rate) / fps / 1000000LL
-		*time = *frame * 1000000LL * (int64)asfCookie->frames_per_sec_scale / asfCookie->frames_per_sec_rate;
-	}
-	
 	TRACE("asfReader::FindKeyFrame: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
+
+	if (asfCookie->audio == false) {
+		// Only video has keyframes
+		if (flags & B_MEDIA_SEEK_CLOSEST_FORWARD || flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+			indexEntry = theFileReader->GetIndex(asfCookie->stream,*frame);
+
+			while (indexEntry.noPayloads > 0 && indexEntry.keyFrame == false && *frame > 0) {
+				if (flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+					(*frame)--;
+				} else {
+					(*frame)++;
+				}
+				indexEntry = theFileReader->GetIndex(asfCookie->stream,*frame);
+			}
+
+			if (indexEntry.noPayloads == 0) {
+				return B_ERROR;
+			}
+		}
+	}
+	
+	*time = *frame * 1000000LL * (int64)asfCookie->frames_per_sec_scale / asfCookie->frames_per_sec_rate;
 
 	return B_OK;
 }

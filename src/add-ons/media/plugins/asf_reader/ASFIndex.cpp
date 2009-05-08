@@ -73,7 +73,6 @@ StreamEntry::GetIndex(uint32 frameNo)
 	for (std::vector<IndexEntry>::iterator itr = index.begin(); itr != index.end(); ++itr) {
 		if (itr->frameNo == frameNo) {
 			indexEntry = *itr;
-			index.erase(itr);
 			break;
 		}
 	}
@@ -84,12 +83,10 @@ bool
 StreamEntry::HasIndex(uint32 frameNo)
 {
 	if (!index.empty()) {
-		for (std::vector<IndexEntry>::iterator itr = index.begin();
-    			itr != index.end();
-    			++itr) {
- 					if (itr->frameNo == frameNo) {
- 						return true;
-				}
+		for (std::vector<IndexEntry>::iterator itr = index.begin();	itr != index.end();	++itr) {
+ 			if (itr->frameNo == frameNo) {
+ 				return true;
+			}
 		}
 	}
 		
@@ -104,7 +101,6 @@ StreamEntry::GetIndex(bigtime_t pts)
 	for (std::vector<IndexEntry>::iterator itr = index.begin(); itr != index.end(); ++itr) {
 		if (pts <= itr->pts) {
 			indexEntry = *itr;
-			index.erase(itr);
 			break;
 		}
 	}
@@ -115,12 +111,10 @@ bool
 StreamEntry::HasIndex(bigtime_t pts)
 {
 	if (!index.empty()) {
-		for (std::vector<IndexEntry>::iterator itr = index.begin();
-    			itr != index.end();
-    			++itr) {
- 					if (pts <= itr->pts) {
- 						return true;
-				}
+		for (std::vector<IndexEntry>::iterator itr = index.begin();	itr != index.end();	++itr) {
+ 			if (pts <= itr->pts) {
+ 				return true;
+			}
 		}
 	}
 		
