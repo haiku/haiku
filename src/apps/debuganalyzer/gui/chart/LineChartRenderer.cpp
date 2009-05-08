@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <Shape.h>
 #include <View.h>
 
 #include "chart/ChartDataSource.h"
@@ -189,19 +190,23 @@ LineChartRenderer::Render(BView* view, BRect updateRect)
 	double scale = (double)fFrame.IntegerHeight() / sampleRange;
 
 	// draw
+	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 	for (int32 i = 0; DataSourceInfo* info = fDataSources.ItemAt(i); i++) {
 printf("LineChartRenderer::Render(): %p\n", info);
-		view->SetHighColor(info->config.Color());
 	
 		float bottom = fFrame.bottom;
-		view->MovePenTo(left + first,
-			bottom - ((info->samples[first] - minRange) * scale));
+		BShape shape;
+		shape.MoveTo(BPoint(left + first,
+			bottom - ((info->samples[first] - minRange) * scale)));
 	
 		for (int32 i = first; i <= last; i++) {
-			view->StrokeLine(BPoint(float(left + i),
+			shape.LineTo(BPoint(float(left + i),
 				float(bottom - ((info->samples[i] - minRange) * scale))));
 //printf("  %f: %f (%f)\n", info->samples[i] - minRange, float(bottom - ((info->samples[i] - minRange) * scale)), bottom);
 		}
+		view->SetHighColor(info->config.Color());
+		view->MovePenTo(B_ORIGIN);
+		view->StrokeShape(&shape);
 	}
 }
 
