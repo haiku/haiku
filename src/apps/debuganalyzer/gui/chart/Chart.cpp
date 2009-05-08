@@ -140,6 +140,8 @@ printf("Chart::RemoveDataSource(%ld)\n", index);
 
 	_UpdateDomainAndRange();
 
+	Invalidate();
+
 	return dataSource;
 }
 
