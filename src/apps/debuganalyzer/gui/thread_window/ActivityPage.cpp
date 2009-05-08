@@ -7,11 +7,15 @@
 
 #include <new>
 
+#include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Message.h>
 #include <ScrollView.h>
 
 #include <AutoDeleter.h>
 
+#include "ColorCheckBox.h"
+#include "MessageCodes.h"
 #include "ThreadModel.h"
 
 #include "chart/BigtimeChartAxisLegendSource.h"
@@ -31,6 +35,11 @@ enum {
 	UNSPECIFIED_TIME	= 4,
 	TIME_TYPE_COUNT		= 5
 };
+
+static const rgb_color kRunTimeColor		= {0, 0, 0, 255};
+static const rgb_color kWaitTimeColor		= {0, 255, 0, 255};
+static const rgb_color kPreemptionTimeColor	= {0, 0, 255, 255};
+static const rgb_color kLatencyTimeColor	= {255, 0, 0, 255};
 
 
 class ThreadWindow::ActivityPage::ThreadActivityData
@@ -303,8 +312,8 @@ ThreadWindow::ActivityPage::ActivityPage()
 	fActivityChartRenderer(NULL),
 	fRunTimeData(NULL),
 	fWaitTimeData(NULL),
-	fLatencyTimeData(NULL),
-	fPreemptionTimeData(NULL)
+	fPreemptionTimeData(NULL),
+	fLatencyTimeData(NULL)
 {
 	SetName("Activity");
 
@@ -320,9 +329,28 @@ ThreadWindow::ActivityPage::ActivityPage()
 	BGroupLayoutBuilder(this)
 		.Add(new BScrollView("activity scroll", fActivityChart, 0, true, false))
 		.AddStrut(20)
+		.Add(BGridLayoutBuilder()
+			.Add(fRunTimeCheckBox = new ColorCheckBox("Run Time", kRunTimeColor,
+					new BMessage(MSG_CHECK_BOX_RUN_TIME)),
+				0, 0)
+			.Add(fWaitTimeCheckBox = new ColorCheckBox("Wait Time",
+					kWaitTimeColor, new BMessage(MSG_CHECK_BOX_WAIT_TIME)),
+				1, 0)
+			.Add(fPreemptionTimeCheckBox = new ColorCheckBox("Latency Time",
+					kPreemptionTimeColor,
+					new BMessage(MSG_CHECK_BOX_PREEMPTION_TIME)),
+				0, 1)
+			.Add(fLatencyTimeCheckBox = new ColorCheckBox("Preemption Time",
+					kLatencyTimeColor,
+					new BMessage(MSG_CHECK_BOX_LATENCY_TIME)),
+				1, 1)
+		)
 	;
 
 	rendererDeleter.Detach();
+
+	// enable the run time chart data
+	fRunTimeCheckBox->CheckBox()->SetValue(B_CONTROL_ON);
 
 // TODO: Allocation management...
 	LegendChartAxis* axis = new LegendChartAxis(
@@ -374,36 +402,95 @@ ThreadWindow::ActivityPage::SetModel(ThreadModel* model)
 	fThreadModel = model;
 
 	if (fThreadModel != NULL) {
-		// run time
-		LineChartRendererDataSourceConfig runConfig(
-			rgb_color().set_to(0, 0, 0, 255));
+		_UpdateChartDataEnabled(RUN_TIME);
+		_UpdateChartDataEnabled(WAIT_TIME);
+		_UpdateChartDataEnabled(PREEMPTION_TIME);
+		_UpdateChartDataEnabled(LATENCY_TIME);
+	}
+}
 
-		fRunTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
-			RUN_TIME);
-		fActivityChart->AddDataSource(fRunTimeData, &runConfig);
 
-		// wait time
-		LineChartRendererDataSourceConfig waitConfig(
-			rgb_color().set_to(0, 255, 0, 255));
+void
+ThreadWindow::ActivityPage::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_CHECK_BOX_RUN_TIME:
+			_UpdateChartDataEnabled(RUN_TIME);
+			break;
+		case MSG_CHECK_BOX_WAIT_TIME:
+			_UpdateChartDataEnabled(WAIT_TIME);
+			break;
+		case MSG_CHECK_BOX_PREEMPTION_TIME:
+			_UpdateChartDataEnabled(PREEMPTION_TIME);
+			break;
+		case MSG_CHECK_BOX_LATENCY_TIME:
+			_UpdateChartDataEnabled(LATENCY_TIME);
+			break;
+		default:
+			BGroupView::MessageReceived(message);
+			break;
+	}
+}
 
-		fWaitTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
-			WAIT_TIME);
-		fActivityChart->AddDataSource(fWaitTimeData, &waitConfig);
 
-		// preemption time
-		LineChartRendererDataSourceConfig preemptionConfig(
-			rgb_color().set_to(0, 0, 255, 255));
+void
+ThreadWindow::ActivityPage::AttachedToWindow()
+{
+	fRunTimeCheckBox->SetTarget(this);
+	fWaitTimeCheckBox->SetTarget(this);
+	fPreemptionTimeCheckBox->SetTarget(this);
+	fLatencyTimeCheckBox->SetTarget(this);
+}
 
-		fLatencyTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
-			PREEMPTION_TIME);
-		fActivityChart->AddDataSource(fLatencyTimeData, &preemptionConfig);
 
-		// latency time
-		LineChartRendererDataSourceConfig latencyConfig(
-			rgb_color().set_to(255, 0, 0, 255));
+void
+ThreadWindow::ActivityPage::_UpdateChartDataEnabled(int timeType)
+{
+	ThreadActivityData** data;
+	ColorCheckBox* checkBox;
+	rgb_color color;
 
-		fPreemptionTimeData = new(std::nothrow) ThreadActivityData(fThreadModel,
-			LATENCY_TIME);
-		fActivityChart->AddDataSource(fPreemptionTimeData, &latencyConfig);
+	switch (timeType) {
+		case RUN_TIME:
+			data = &fRunTimeData;
+			checkBox = fRunTimeCheckBox;
+			color = kRunTimeColor;
+			break;
+		case WAIT_TIME:
+			data = &fWaitTimeData;
+			checkBox = fWaitTimeCheckBox;
+			color = kWaitTimeColor;
+			break;
+		case PREEMPTION_TIME:
+			data = &fPreemptionTimeData;
+			checkBox = fPreemptionTimeCheckBox;
+			color = kPreemptionTimeColor;
+			break;
+		case LATENCY_TIME:
+			data = &fLatencyTimeData;
+			checkBox = fLatencyTimeCheckBox;
+			color = kLatencyTimeColor;
+			break;
+		default:
+			return;
+	}
+
+	bool enabled = checkBox->CheckBox()->Value() == B_CONTROL_ON;
+
+	if ((*data != NULL) == enabled)
+		return;
+
+	if (enabled) {
+		LineChartRendererDataSourceConfig config(color);
+
+		*data = new(std::nothrow) ThreadActivityData(fThreadModel, timeType);
+		if (*data == NULL)
+			return;
+
+		fActivityChart->AddDataSource(*data, &config);
+	} else {
+		fActivityChart->RemoveDataSource(*data);
+		delete *data;
+		*data = NULL;
 	}
 }

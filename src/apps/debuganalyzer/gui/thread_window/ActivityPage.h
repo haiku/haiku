@@ -12,6 +12,7 @@
 
 class Chart;
 class ChartRenderer;
+class ColorCheckBox;
 
 
 class ThreadWindow::ActivityPage : public BGroupView {
@@ -21,8 +22,14 @@ public:
 
 			void				SetModel(ThreadModel* model);
 
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AttachedToWindow();
+
 private:
 			class ThreadActivityData;
+
+private:
+			void				_UpdateChartDataEnabled(int timeType);
 
 private:
 			ThreadModel*		fThreadModel;
@@ -30,10 +37,13 @@ private:
 			ChartRenderer*		fActivityChartRenderer;
 			ThreadActivityData*	fRunTimeData;
 			ThreadActivityData*	fWaitTimeData;
-			ThreadActivityData*	fLatencyTimeData;
 			ThreadActivityData*	fPreemptionTimeData;
+			ThreadActivityData*	fLatencyTimeData;
+			ColorCheckBox*		fRunTimeCheckBox;
+			ColorCheckBox*		fWaitTimeCheckBox;
+			ColorCheckBox*		fPreemptionTimeCheckBox;
+			ColorCheckBox*		fLatencyTimeCheckBox;
 };
-
 
 
 #endif	// THREAD_ACTIVITY_PAGE_H

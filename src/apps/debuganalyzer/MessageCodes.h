@@ -11,7 +11,12 @@ enum {
 	MSG_MODEL_LOADED_FAILED			= 'mlfl',
 	MSG_MODEL_LOADED_ABORTED		= 'mlab',
 
-	MSG_WINDOW_QUIT					= 'wiqt'
+	MSG_WINDOW_QUIT					= 'wiqt',
+
+	MSG_CHECK_BOX_RUN_TIME			= 'chkr',
+	MSG_CHECK_BOX_WAIT_TIME			= 'chkw',
+	MSG_CHECK_BOX_PREEMPTION_TIME	= 'chkp',
+	MSG_CHECK_BOX_LATENCY_TIME		= 'chkl'
 };
 
 
