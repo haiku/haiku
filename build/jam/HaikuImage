@@ -40,7 +40,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
 	join
-	keymap kill less lessecho lesskey link linkcatkeys listarea listattr 
+	keymap kill less lessecho lesskey link linkcatkeys listarea listattr
 	listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
@@ -70,7 +70,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network Printers 
+	FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
@@ -165,13 +165,8 @@ AddFilesToHaikuImage system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
-if $(HAIKU_ATA_STACK) = 1 {
 AddFilesToHaikuImage system add-ons kernel busses ide
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa ;
-} else {
-AddFilesToHaikuImage system add-ons kernel busses ata
-	: generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa ;
-}
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
@@ -293,7 +288,7 @@ AddDirectoryToHaikuImage home config be Preferences ;
 # TODO/NOTE: Cannot use $(SYSTEM_PREFERENCES) here since there is
 # "<preferences>Tracker"...
 DESKBAR_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
-	E-mail FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network 
+	E-mail FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network
 	Printers Screen ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
 ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
