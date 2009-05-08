@@ -1785,7 +1785,7 @@ TermView::_DoSecondaryMouseDropAction(BMessage* msg)
 	}
 
 	if (listContainsDirectory && action == kCopyFiles)
-		outString += " -R";
+		outString += "-R ";
 
 	outString += itemString;
 
