@@ -37,7 +37,7 @@ IsFontUsable(const BFont &font)
 	int lastWidth = 0;
 	char buffer[2] = {0, 0};
 	for (int c = 0x20 ; c <= 0x7e; c++){
-		buffer[1] = c;
+		buffer[0] = c;
 
 		int width = (int)ceilf(font.StringWidth(buffer));
 		if (c > 0x20 && width != lastWidth)
