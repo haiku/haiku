@@ -107,6 +107,7 @@ private:
 			float				fVScrollSize;
 			float				fHScrollValue;
 			float				fVScrollValue;
+			int32				fIgnoreScrollEvent;
 			double				fDomainZoomLimit;
 			BPoint				fLastMousePos;
 			BPoint				fDraggingStartPos;

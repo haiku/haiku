@@ -65,6 +65,7 @@ Chart::Chart(ChartRenderer* renderer, const char* name)
 	fVScrollSize(0),
 	fHScrollValue(0),
 	fVScrollValue(0),
+	fIgnoreScrollEvent(0),
 	fDomainZoomLimit(0),
 	fLastMousePos(-1, -1),
 	fDraggingStartPos(-1, -1)
@@ -407,6 +408,9 @@ printf("Chart::Draw((%f, %f) - (%f, %f))\n", updateRect.left, updateRect.top, up
 void
 Chart::ScrollTo(BPoint where)
 {
+	if (fIgnoreScrollEvent > 0)
+		return;
+
 	_ScrollTo(where.x, true);
 	_ScrollTo(where.y, false);
 }
@@ -531,8 +535,9 @@ Chart::_UpdateScrollBar(bool horizontal)
 	}
 
 	if (scrollBar != NULL) {
+		fIgnoreScrollEvent++;
 		scrollBar->SetRange(0, scrollSize);
-// TODO: If the scroll range changes, we might need to reset the scroll value.
+		fIgnoreScrollEvent--;
 		scrollBar->SetValue(scrollValue);
 		scrollBar->SetProportion(proportion);
 	}
