@@ -1168,18 +1168,14 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	// opening a directory read-only is allowed, although you can't read
+	// Opening a directory read-only is allowed, although you can't read
 	// any data from it.
-	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0) {
-		openMode = openMode & ~O_RWMASK;
-		// TODO: for compatibility reasons, we don't return an error here...
-		// e.g. "copyattr" tries to do that
-		//return B_IS_A_DIRECTORY;
-	}
+	if (inode->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
+		return B_IS_A_DIRECTORY;
 
 	status_t status = inode->CheckPermissions(open_mode_to_access(openMode)
 		| (openMode & O_TRUNC ? W_OK : 0));
-	if (status < B_OK)
+	if (status != B_OK)
 		RETURN_ERROR(status);
 
 	file_cookie* cookie = new(std::nothrow) file_cookie;
@@ -1205,10 +1201,6 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	if ((openMode & O_TRUNC) != 0) {
 		if ((openMode & O_RWMASK) == O_RDONLY)
 			return B_NOT_ALLOWED;
-		// TODO: this check is only necessary as long as we allow directories
-		// to be opened r/w, see above.
-		if (inode->IsDirectory())
-			return B_IS_A_DIRECTORY;
 
 		Transaction transaction(volume, inode->BlockNumber());
 		inode->WriteLockInTransaction(transaction);
