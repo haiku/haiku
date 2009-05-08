@@ -90,7 +90,7 @@ launch $SERVERS/debug_server				# launch debug_server
 
 # Init Network
 if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/net_server			# launch net_server
+	launch $SERVERS/net_server				# launch net_server
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
@@ -120,6 +120,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 		launch system/Login
 		# nothing more
 	else
+		cd /boot/home
 		launch system/Tracker
 		launch system/Deskbar
 

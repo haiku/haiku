@@ -47,6 +47,7 @@ runprog() {
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
+	cd /boot/home
 	if [ -x /boot/system/apps/Installer ]; then
 		/boot/system/apps/Installer
 		#/boot/system/apps/Terminal -x /boot/system/apps/Installer
