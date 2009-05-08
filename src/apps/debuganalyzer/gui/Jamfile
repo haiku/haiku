@@ -9,6 +9,7 @@ UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 MergeObject DebugAnalyzer_gui.o
 	:
 	AbstractGeneralPage.cpp
+	ColorCheckBox.cpp
 	SubWindow.cpp
 	SubWindowManager.cpp
 	:
