@@ -100,7 +100,8 @@ class AboutView : public BView {
 				void			PickRandomHaiku();
 
 	private:
-				status_t		_GetLicensesPath(BPath& path);
+				status_t		_GetLicensePath(const char* license,
+									BPath& path);
 				void			_AddCopyrightsFromAttribute();
 
 				BStringView*	fMemView;
@@ -562,11 +563,8 @@ AboutView::AboutView(const BRect &rect)
 
 	// copyrights for various projects we use
 
-	BPath licensesPath;
-	_GetLicensesPath(licensesPath);
-
-	BPath mitPath(licensesPath);
-	mitPath.Append("MIT");
+	BPath mitPath;
+	_GetLicensePath("MIT", mitPath);
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
@@ -1014,9 +1012,6 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 	fCreditsView->Insert(text);
 	fCreditsView->Insert("\n");
 
-	BPath licensesPath;
-	_GetLicensesPath(licensesPath);
-
 	if (licenses.CountLicenses() > 0) {
 		if (licenses.CountLicenses() > 1)
 			fCreditsView->Insert("Licenses: ");
@@ -1025,14 +1020,16 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 
 		for (int32 i = 0; i < licenses.CountLicenses(); i++) {
 			const char* license = licenses.LicenseAt(i);
-			BString licensePath(licensesPath.Path());
-			licensePath << '/' << license;
 
 			if (i > 0)
 				fCreditsView->Insert(", ");
 
-			fCreditsView->InsertHyperText(license,
-				new OpenFileAction(licensePath));
+			BPath licensePath;
+			if (_GetLicensePath(license, licensePath) == B_OK) {
+				fCreditsView->InsertHyperText(license,
+					new OpenFileAction(licensePath.Path()));
+			} else
+				fCreditsView->Insert(license);
 		}
 
 		fCreditsView->Insert("\n");
@@ -1123,13 +1120,27 @@ AboutView::PickRandomHaiku()
 
 
 status_t
-AboutView::_GetLicensesPath(BPath& path)
+AboutView::_GetLicensePath(const char* license, BPath& path)
 {
-	status_t status = find_directory(B_SYSTEM_DATA_DIRECTORY, &path);
-	if (status != B_OK)
-		return status;
+	static const directory_which directoryConstants[] = {
+		B_USER_DATA_DIRECTORY,
+		B_COMMON_DATA_DIRECTORY,
+		B_SYSTEM_DATA_DIRECTORY
+	};
+	static const int dirCount = 3;
 
-	return path.Append("licenses");
+	for (int i = 0; i < dirCount; i++) {
+		struct stat st;
+		status_t error = find_directory(directoryConstants[i], &path);
+		if (error == B_OK && path.Append("licenses") == B_OK
+			&& path.Append(license) == B_OK
+			&& lstat(path.Path(), &st) == 0) {
+			return B_OK;
+		}
+	}
+
+	path.Unset();
+	return B_ENTRY_NOT_FOUND;
 }
 
 
