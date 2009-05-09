@@ -99,10 +99,23 @@ public:
 			{
 				system_profiler_thread_scheduled* event
 					= (system_profiler_thread_scheduled*)(header + 1);
-				if (event->thread == threadID)
+				if (event->thread == threadID) {
+					// thread scheduled -- it must have been ready before
 					state = READY;
-				else
-					state = RUNNING;
+				} else {
+					// thread unscheduled -- it was running earlier, but should
+					// now be "still running" or "running", depending on whether
+					// it had been added to the run queue before
+					const system_profiler_event_header* previousHeader
+						= fModel->SchedulingEventAt(startIndex - 1);
+					if (previousHeader != NULL
+						&& previousHeader->event
+							== B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE) {
+						state = STILL_RUNNING;
+					} else
+						state = RUNNING;
+				}
+
 				previousEventTime = event->time;
 				break;
 			}
@@ -154,27 +167,33 @@ public:
 								// thread scheduled after having been preempted
 								// before
 								timeType = PREEMPTION_TIME;
+							} else if (state == STILL_RUNNING) {
+								// Thread was running and continues to run.
+								timeType = RUN_TIME;
+							} else {
+								// Can only happen, if we're missing context.
+								// Impossible to guess what the thread was doing
+								// before.
+								timeType = UNSPECIFIED_TIME;
 							}
 
-							if (state == STILL_RUNNING) {
-								// Thread was running and continues to run.
-								state = RUNNING;
-								timeType = RUN_TIME;
-							} else if (state != RUNNING) {
-								state = RUNNING;
-							}
+							state = RUNNING;
 						} else {
 							// thread unscheduled
 							if (state == STILL_RUNNING) {
 								// thread preempted
 								state = PREEMPTED;
-								timeType = RUN_TIME;
 							} else if (state == RUNNING) {
 								// thread starts waiting (it hadn't been added
 								// to the run queue before being unscheduled)
 								state = WAITING;
-								timeType = RUN_TIME;
+							} else {
+								// Can only happen, if we're missing context.
+								// Obviously the thread was running, but we
+								// can't guess the new thread state.
 							}
+
+							timeType = RUN_TIME;
 						}
 
 						break;
@@ -248,8 +267,10 @@ public:
 						timeType = LATENCY_TIME;
 						break;
 					case WAITING:
-					case UNKNOWN:
 						timeType = WAIT_TIME;
+						break;
+					case UNKNOWN:
+						timeType = UNSPECIFIED_TIME;
 						break;
 				}
 
@@ -336,11 +357,11 @@ ThreadWindow::ActivityPage::ActivityPage()
 			.Add(fWaitTimeCheckBox = new ColorCheckBox("Wait Time",
 					kWaitTimeColor, new BMessage(MSG_CHECK_BOX_WAIT_TIME)),
 				1, 0)
-			.Add(fPreemptionTimeCheckBox = new ColorCheckBox("Latency Time",
+			.Add(fPreemptionTimeCheckBox = new ColorCheckBox("Preemption Time",
 					kPreemptionTimeColor,
 					new BMessage(MSG_CHECK_BOX_PREEMPTION_TIME)),
 				0, 1)
-			.Add(fLatencyTimeCheckBox = new ColorCheckBox("Preemption Time",
+			.Add(fLatencyTimeCheckBox = new ColorCheckBox("Latency Time",
 					kLatencyTimeColor,
 					new BMessage(MSG_CHECK_BOX_LATENCY_TIME)),
 				1, 1)
