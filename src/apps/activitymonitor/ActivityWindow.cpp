@@ -332,7 +332,10 @@ ActivityWindow::_SaveSettings()
 void
 ActivityWindow::_AddDefaultView()
 {
-	ActivityView* view = new ActivityView("ActivityMonitor", NULL);
+	BMessage settings;
+	settings.AddInt64("refresh interval", RefreshInterval());
+
+	ActivityView* view = new ActivityView("ActivityMonitor", &settings);
 
 	switch (ActivityViewCount()) {
 		case 0:
