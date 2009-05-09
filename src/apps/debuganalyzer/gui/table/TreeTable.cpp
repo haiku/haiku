@@ -54,13 +54,13 @@ TreeTableListener::TreeTableNodeInvoked(TreeTable* table, void* node)
 // #pragma mark - Column
 
 
-class TreeTable::Column : public BColumn {
+class TreeTable::Column : public AbstractColumn {
 public:
 								Column(TreeTableModel* model,
 									TableColumn* tableColumn);
 	virtual						~Column();
 
-			void				SetModel(TreeTableModel* model);
+	virtual	void				SetModel(AbstractTableModel* model);
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -74,30 +74,26 @@ protected:
 
 private:
 			TreeTableModel*		fModel;
-			TableColumn*		fTableColumn;
 };
 
 
 TreeTable::Column::Column(TreeTableModel* model, TableColumn* tableColumn)
 	:
-	BColumn(tableColumn->Width(), tableColumn->MinWidth(),
-		tableColumn->MaxWidth(), tableColumn->Alignment()),
-	fModel(model),
-	fTableColumn(tableColumn)
+	AbstractColumn(tableColumn),
+	fModel(model)
 {
 }
 
 
 TreeTable::Column::~Column()
 {
-	delete fTableColumn;
 }
 
 
 void
-TreeTable::Column::SetModel(TreeTableModel* model)
+TreeTable::Column::SetModel(AbstractTableModel* model)
 {
-	fModel = model;
+	fModel = dynamic_cast<TreeTableModel*>(model);
 }
 
 
@@ -180,7 +176,7 @@ TreeTable::Column::GetPreferredWidth(BField* _field, BView* parent) const
 TreeTable::TreeTable(const char* name, uint32 flags, border_style borderStyle,
 	bool showHorizontalScrollbar)
 	:
-	BColumnListView(name, flags, borderStyle, showHorizontalScrollbar),
+	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL)
 {
 }
@@ -189,9 +185,8 @@ TreeTable::TreeTable(const char* name, uint32 flags, border_style borderStyle,
 TreeTable::TreeTable(TreeTableModel* model, const char* name, uint32 flags,
 	border_style borderStyle, bool showHorizontalScrollbar)
 	:
-	BColumnListView(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL),
-	fColumns(20, true)
+	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
+	fModel(NULL)
 {
 	SetTreeTableModel(model);
 }
@@ -213,7 +208,7 @@ TreeTable::SetTreeTableModel(TreeTableModel* model)
 	if (fModel != NULL) {
 		Clear();
 
-		for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
+		for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 			column->SetModel(NULL);
 	}
 
@@ -222,7 +217,7 @@ TreeTable::SetTreeTableModel(TreeTableModel* model)
 	if (fModel == NULL)
 		return;
 
-	for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
+	for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 		column->SetModel(fModel);
 
 	// recursively create the rows
@@ -267,23 +262,6 @@ TreeTable::_AddChildRows(void* parent, BRow* parentRow, int32 columnCount)
 }
 
 
-void
-TreeTable::AddColumn(TableColumn* column)
-{
-	if (column == NULL)
-		return;
-
-	Column* privateColumn = new Column(fModel, column);
-
-	if (!fColumns.AddItem(privateColumn)) {
-		delete privateColumn;
-		throw std::bad_alloc();
-	}
-
-	BColumnListView::AddColumn(privateColumn, column->ModelIndex());
-}
-
-
 bool
 TreeTable::AddTreeTableListener(TreeTableListener* listener)
 {
@@ -295,6 +273,13 @@ void
 TreeTable::RemoveTreeTableListener(TreeTableListener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+AbstractTable::AbstractColumn*
+TreeTable::CreateColumn(TableColumn* column)
+{
+	return new Column(fModel, column);
 }
 
 

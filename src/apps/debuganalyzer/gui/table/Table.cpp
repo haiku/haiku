@@ -54,13 +54,13 @@ TableListener::TableRowInvoked(Table* table, int32 rowIndex)
 // #pragma mark - Column
 
 
-class Table::Column : public BColumn {
+class Table::Column : public AbstractColumn {
 public:
 								Column(TableModel* model,
 									TableColumn* tableColumn);
 	virtual						~Column();
 
-			void				SetModel(TableModel* model);
+	virtual	void				SetModel(AbstractTableModel* model);
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -74,30 +74,26 @@ protected:
 
 private:
 			TableModel*			fModel;
-			TableColumn*		fTableColumn;
 };
 
 
 Table::Column::Column(TableModel* model, TableColumn* tableColumn)
 	:
-	BColumn(tableColumn->Width(), tableColumn->MinWidth(),
-		tableColumn->MaxWidth(), tableColumn->Alignment()),
-	fModel(model),
-	fTableColumn(tableColumn)
+	AbstractColumn(tableColumn),
+	fModel(model)
 {
 }
 
 
 Table::Column::~Column()
 {
-	delete fTableColumn;
 }
 
 
 void
-Table::Column::SetModel(TableModel* model)
+Table::Column::SetModel(AbstractTableModel* model)
 {
-	fModel = model;
+	fModel = dynamic_cast<TableModel*>(model);
 }
 
 
@@ -180,7 +176,7 @@ Table::Column::GetPreferredWidth(BField* _field, BView* parent) const
 Table::Table(const char* name, uint32 flags, border_style borderStyle,
 	bool showHorizontalScrollbar)
 	:
-	BColumnListView(name, flags, borderStyle, showHorizontalScrollbar),
+	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL)
 {
 }
@@ -189,9 +185,8 @@ Table::Table(const char* name, uint32 flags, border_style borderStyle,
 Table::Table(TableModel* model, const char* name, uint32 flags,
 	border_style borderStyle, bool showHorizontalScrollbar)
 	:
-	BColumnListView(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL),
-	fColumns(20, true)
+	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
+	fModel(NULL)
 {
 	SetTableModel(model);
 }
@@ -213,7 +208,7 @@ Table::SetTableModel(TableModel* model)
 	if (fModel != NULL) {
 		Clear();
 
-		for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
+		for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 			column->SetModel(NULL);
 	}
 
@@ -222,7 +217,7 @@ Table::SetTableModel(TableModel* model)
 	if (fModel == NULL)
 		return;
 
-	for (int32 i = 0; Column* column = fColumns.ItemAt(i); i++)
+	for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 		column->SetModel(fModel);
 
 	// create the rows
@@ -257,23 +252,6 @@ Table::SetTableModel(TableModel* model)
 }
 
 
-void
-Table::AddColumn(TableColumn* column)
-{
-	if (column == NULL)
-		return;
-
-	Column* privateColumn = new Column(fModel, column);
-
-	if (!fColumns.AddItem(privateColumn)) {
-		delete privateColumn;
-		throw std::bad_alloc();
-	}
-
-	BColumnListView::AddColumn(privateColumn, column->ModelIndex());
-}
-
-
 bool
 Table::AddTableListener(TableListener* listener)
 {
@@ -285,6 +263,13 @@ void
 Table::RemoveTableListener(TableListener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+AbstractTable::AbstractColumn*
+Table::CreateColumn(TableColumn* column)
+{
+	return new Column(fModel, column);
 }
 
 

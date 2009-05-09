@@ -5,10 +5,9 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#include <ColumnListView.h>
 #include <ColumnTypes.h>
-#include <ObjectList.h>
 
+#include "table/AbstractTable.h"
 #include "table/TableColumn.h"
 
 #include "Variant.h"
@@ -17,11 +16,10 @@
 class Table;
 
 
-class TableModel {
+class TableModel : public AbstractTableModel {
 public:
 	virtual						~TableModel();
 
-	virtual	int32				CountColumns() const = 0;
 	virtual	int32				CountRows() const = 0;
 
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
@@ -37,7 +35,7 @@ public:
 };
 
 
-class Table : private BColumnListView {
+class Table : public AbstractTable {
 public:
 								Table(const char* name, uint32 flags,
 									border_style borderStyle = B_NO_BORDER,
@@ -48,20 +46,18 @@ public:
 									bool showHorizontalScrollbar = true);
 	virtual						~Table();
 
-			BView*				ToView()				{ return this; }
-
 			void				SetTableModel(TableModel* model);
 			TableModel*			GetTableModel() const	{ return fModel; }
-
-			void				AddColumn(TableColumn* column);
 
 			bool				AddTableListener(TableListener* listener);
 			void				RemoveTableListener(TableListener* listener);
 
+protected:
+	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
+
 private:
 			class Column;
 
-			typedef BObjectList<Column>			ColumnList;
 			typedef BObjectList<TableListener>	ListenerList;
 
 private:
@@ -69,7 +65,6 @@ private:
 
 private:
 			TableModel*			fModel;
-			ColumnList			fColumns;
 			ListenerList		fListeners;
 };
 

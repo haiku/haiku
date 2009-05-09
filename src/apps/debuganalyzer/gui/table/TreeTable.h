@@ -5,10 +5,9 @@
 #ifndef TREE_TABLE_H
 #define TREE_TABLE_H
 
-#include <ColumnListView.h>
 #include <ColumnTypes.h>
-#include <ObjectList.h>
 
+#include "table/AbstractTable.h"
 #include "table/TableColumn.h"
 
 #include "Variant.h"
@@ -17,7 +16,7 @@
 class TreeTable;
 
 
-class TreeTableModel {
+class TreeTableModel : public AbstractTableModel {
 public:
 	virtual						~TreeTableModel();
 
@@ -26,8 +25,6 @@ public:
 
 	virtual	int32				CountChildren(void* parent) const = 0;
 	virtual	void*				ChildAt(void* parent, int32 index) const = 0;
-
-	virtual	int32				CountColumns() const = 0;
 
 	virtual	bool				GetValueAt(void* object, int32 columnIndex,
 									Variant& value) = 0;
@@ -43,7 +40,7 @@ public:
 };
 
 
-class TreeTable : private BColumnListView {
+class TreeTable : public AbstractTable {
 public:
 								TreeTable(const char* name, uint32 flags,
 									border_style borderStyle = B_NO_BORDER,
@@ -54,22 +51,20 @@ public:
 									bool showHorizontalScrollbar = true);
 	virtual						~TreeTable();
 
-			BView*				ToView()				{ return this; }
-
 			void				SetTreeTableModel(TreeTableModel* model);
 			TreeTableModel*		GetTreeTableModel() const	{ return fModel; }
-
-			void				AddColumn(TableColumn* column);
 
 			bool				AddTreeTableListener(
 									TreeTableListener* listener);
 			void				RemoveTreeTableListener(
 									TreeTableListener* listener);
 
+protected:
+	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
+
 private:
 			class Column;
 
-			typedef BObjectList<Column>				ColumnList;
 			typedef BObjectList<TreeTableListener>	ListenerList;
 
 private:
@@ -78,10 +73,8 @@ private:
 			void				_AddChildRows(void* parent, BRow* parentRow,
 									int32 columnCount);
 
-
 private:
 			TreeTableModel*		fModel;
-			ColumnList			fColumns;
 			ListenerList		fListeners;
 };
 
