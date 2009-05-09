@@ -1,0 +1,7 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/x-vnd.Be.URL.rsync";
+
+resource(2, "META:S:DESC") #'MSDC' "rsync URL";
+

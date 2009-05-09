@@ -1,0 +1,9 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/x-vnd.Be.URL.rtsp";
+
+resource(2, "META:S:DESC") #'MSDC' "RTSP URL";
+
+resource(3, "META:L:DESC") #'MLDC' "Real Time Streaming Protocol URL";
+
