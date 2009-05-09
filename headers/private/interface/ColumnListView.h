@@ -96,14 +96,14 @@ enum ColumnListViewColor {
 	B_COLOR_HEADER_TEXT			= 9,
 	B_COLOR_SEPARATOR_LINE		= 10,
 	B_COLOR_SEPARATOR_BORDER	= 11,
-	
+
 	B_COLOR_TOTAL				= 12
 };
 
 enum ColumnListViewFont {
 	B_FONT_ROW					= 0,
 	B_FONT_HEADER				= 1,
-	
+
 	B_FONT_TOTAL				= 2
 };
 
@@ -144,7 +144,7 @@ private:
 			BPrivate::
 			BRowContainer*		fChildList;
 			bool				fIsExpanded;
-			float				fHeight;	
+			float				fHeight;
 			BRow*				fNextSelected;
 			BRow*				fPrevSelected;
 			BRow*				fParent;
@@ -166,7 +166,7 @@ public:
 									float maxWidth,
 									alignment align = B_ALIGN_LEFT);
 	virtual 					~BColumn();
-	
+
 			float				Width() const;
 			void				SetWidth(float width);
 			float				MinWidth() const;
@@ -176,7 +176,7 @@ public:
 	virtual	void				DrawField(BField* field, BRect rect,
 									BView* targetView);
 	virtual	int					CompareFields(BField* field1, BField* field2);
-	
+
 	virtual void				MouseMoved(BColumnListView* parent, BRow* row,
 									BField* field, BRect fieldRect,
 									BPoint point, uint32 buttons, int32 code);
@@ -185,25 +185,25 @@ public:
 									BPoint point, uint32 buttons);
 	virtual	void				MouseUp(BColumnListView* parent, BRow* row,
 									BField* field);
-		
+
 	virtual	void				GetColumnName(BString* into) const;
 	virtual	float				GetPreferredWidth(BField* field,
 									BView* parent) const;
-	
+
 			bool				IsVisible() const;
 			void				SetVisible(bool);
-		
+
 			bool				WantsEvents() const;
 			void				SetWantsEvents(bool);
-			
+
 			bool				ShowHeading() const;
 			void				SetShowHeading(bool);
-		
+
 			alignment			Alignment() const;
 			void				SetAlignment(alignment);
 
 			int32				LogicalFieldNum() const;
-			
+
 	/*!
 		\param field The BField derivative to validate.
 
@@ -219,10 +219,10 @@ public:
 			logical field index where it occured.
 
 			\note Do not call the inherited version of this, it just returns
-			true; 
+			true;
 	  */
 	virtual	bool				AcceptsField(const BField* field) const;
-		
+
 private:
 			float				fWidth;
 			float 				fMinWidth;
@@ -234,7 +234,7 @@ private:
 			bool				fWantsEvents;
 			bool				fShowHeading;
 			alignment			fAlignment;
-		
+
 	friend class BPrivate::OutlineView;
 	friend class BColumnListView;
 	friend class BPrivate::TitleView;
@@ -265,8 +265,8 @@ public:
 			void 				SetFocusRow(int32 index, bool select = false);
 			void 				SetFocusRow(BRow* row, bool select = false);
 			void 				SetMouseTrackingEnabled(bool);
-	
-	// Selection 
+
+	// Selection
 			list_view_type		SelectionMode() const;
 			void 				Deselect(BRow* row);
 			void 				AddToSelection(BRow* row);
@@ -276,7 +276,7 @@ public:
 	virtual	void				SetSelectionMessage(BMessage* message);
 			BMessage*			SelectionMessage();
 			uint32				SelectionCommand() const;
-			void				SetSelectionMode(list_view_type type); 
+			void				SetSelectionMode(list_view_type type);
 				// list_view_type is defined in ListView.h.
 
 	// Sorting
@@ -290,7 +290,7 @@ public:
 			void				AddStatusView(BView* view);
 			BView*				RemoveStatusView();
 
-	// Column Manipulation	
+	// Column Manipulation
 			void				AddColumn(BColumn* column,
 									int32 logicalFieldIndex);
 			void				MoveColumn(BColumn* column, int32 index);
@@ -299,9 +299,11 @@ public:
 			BColumn*			ColumnAt(int32 index) const;
 			void				SetColumnVisible(BColumn* column,
 									bool isVisible);
-			void				SetColumnVisible(int32, bool);	
+			void				SetColumnVisible(int32, bool);
 			bool				IsColumnVisible(int32) const;
 			void				SetColumnFlags(column_flags flags);
+			void				ResizeColumnToPreferred(int32 index);
+			void				ResizeAllColumnsToPreferred();
 
 	// Row manipulation
 			const BRow*			RowAt(int32 index, BRow *parent = 0) const;
@@ -316,14 +318,14 @@ public:
 			void				AddRow(BRow* row, BRow* parent = NULL);
 			void				AddRow(BRow* row, int32 index,
 									BRow* parent = NULL);
-		
+
 			void				ScrollTo(const BRow* Row);
 			void				ScrollTo(BPoint point);
-			
+
 	// Does not delete row or children at this time.
 	// todo: Make delete row and children
 			void				RemoveRow(BRow* row);
-			
+
 			void				UpdateRow(BRow* row);
 			void				Clear();
 
@@ -334,12 +336,12 @@ public:
 									uint32 mask = B_FONT_ALL);
 	virtual	void				SetHighColor(rgb_color);
 			void				SetSelectionColor(rgb_color);
-			void				SetBackgroundColor(rgb_color); 
+			void				SetBackgroundColor(rgb_color);
 			void				SetEditColor(rgb_color);
 			const rgb_color		SelectionColor() const;
 			const rgb_color		BackgroundColor() const;
 			const rgb_color		EditColor() const;
-	
+
 	// Appearance (NEW STYLE)
 			void				SetColor(ColumnListViewColor colorIndex,
 									rgb_color color);
@@ -349,10 +351,10 @@ public:
 			rgb_color			Color(ColumnListViewColor colorIndex) const;
 			void				GetFont(ColumnListViewFont fontIndex,
 									BFont* font) const;
-			
+
 			BPoint				SuggestTextPosition(const BRow* row,
 									const BColumn* column = NULL) const;
-	
+
 			void				SetLatchWidth(float width);
 			float				LatchWidth() const;
 	virtual	void				DrawLatch(BView* view, BRect frame,
