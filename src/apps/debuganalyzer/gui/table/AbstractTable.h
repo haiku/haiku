@@ -30,6 +30,8 @@ public:
 			BView*				ToView()				{ return this; }
 
 	virtual	void				AddColumn(TableColumn* column);
+			void				ResizeColumnToPreferred(int32 index);
+			void				ResizeAllColumnsToPreferred();
 
 protected:
 			class AbstractColumn;

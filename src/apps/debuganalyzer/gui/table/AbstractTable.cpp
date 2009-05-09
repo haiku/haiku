@@ -68,3 +68,17 @@ AbstractTable::AddColumn(TableColumn* column)
 
 	BColumnListView::AddColumn(privateColumn, column->ModelIndex());
 }
+
+
+void
+AbstractTable::ResizeColumnToPreferred(int32 index)
+{
+	BColumnListView::ResizeColumnToPreferred(index);
+}
+
+
+void
+AbstractTable::ResizeAllColumnsToPreferred()
+{
+	BColumnListView::ResizeAllColumnsToPreferred();
+}
