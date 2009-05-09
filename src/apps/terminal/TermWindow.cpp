@@ -206,9 +206,6 @@ TermWindow::_InitWindow()
 	// make menu bar
 	_SetupMenu();
 
-	AddShortcut('+', B_COMMAND_KEY, new BMessage(kIncreaseFontSize));
-	AddShortcut('-', B_COMMAND_KEY, new BMessage(kDecreaseFontSize));
-
 	// shortcuts to switch tabs
 	for (int32 i = 0; i < 9; i++) {
 		BMessage* message = new BMessage(kSetActiveTab);
@@ -300,8 +297,16 @@ TermWindow::_SetupMenu()
 	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, false);
+
+	fSizeMenu = new BMenu("Text Size");
+	fSizeMenu->AddItem(new BMenuItem("Increase",
+		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY));
+	fSizeMenu->AddItem(new BMenuItem("Decrease",
+		new BMessage(kDecreaseFontSize), '-', B_COMMAND_KEY));
+
 	fHelpmenu->AddItem(fWindowSizeMenu);
 	fHelpmenu->AddItem(fEncodingmenu);
+	fHelpmenu->AddItem(fSizeMenu);
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_PREF_OPEN)));

@@ -96,6 +96,7 @@ private:
 	BMenu			*fEncodingmenu;
 	BMenu			*fHelpmenu;
 	BMenu			*fWindowSizeMenu;
+	BMenu			*fSizeMenu;
 
 	BMessage		*fPrintSettings;
 	PrefWindow		*fPrefWindow;
