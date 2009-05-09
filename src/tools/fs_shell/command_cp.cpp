@@ -1356,7 +1356,7 @@ command_cp(int argc, const char* const* argv)
 	// open the target node for attributes only mode
 	NodeDeleter targetDeleter;
 	if (options.attributesOnly) {
-		error = targetDomain->Open(target, FSSH_O_WRONLY, targetNode);
+		error = targetDomain->Open(target, FSSH_O_RDONLY, targetNode);
 		if (error != FSSH_B_OK) {
 			fprintf(stderr, "Error: Failed to open target `%s' for writing: "
 				"`%s'\n", target, fssh_strerror(error));
