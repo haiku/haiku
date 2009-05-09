@@ -182,7 +182,7 @@ private:
 	private:
 		static Node* _CreateGroupNode(ThreadModel::WaitObjectGroup* group)
 		{
-			// If the group has only one object, just create an object node. 
+			// If the group has only one object, just create an object node.
 			if (group->CountWaitObjects() == 1)
 				return new ObjectNode(group->WaitObjectAt(0));
 
@@ -325,6 +325,7 @@ ThreadWindow::WaitObjectsPage::SetModel(ThreadModel* model)
 			// TODO: Report error!
 		}
 		fWaitObjectsTree->SetTreeTableModel(fWaitObjectsTreeModel);
+		fWaitObjectsTree->ResizeAllColumnsToPreferred();
 	}
 }
 

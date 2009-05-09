@@ -116,6 +116,7 @@ MainWindow::TeamsPage::SetModel(Model* model)
 	if (fModel != NULL) {
 		fTeamsTableModel = new(std::nothrow) TeamsTableModel(fModel);
 		fTeamsTable->SetTableModel(fTeamsTableModel);
+		fTeamsTable->ResizeAllColumnsToPreferred();
 	}
 }
 

@@ -172,6 +172,7 @@ MainWindow::ThreadsPage::SetModel(Model* model)
 	if (fModel != NULL) {
 		fThreadsTableModel = new(std::nothrow) ThreadsTableModel(fModel);
 		fThreadsTable->SetTableModel(fThreadsTableModel);
+		fThreadsTable->ResizeAllColumnsToPreferred();
 	}
 }
 
