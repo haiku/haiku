@@ -43,7 +43,6 @@ BigtimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
 	// interpret range as time range
 	bigtime_t startTime = (bigtime_t)range.min;
 	bigtime_t endTime = (bigtime_t)range.max;
-printf("BigtimeChartAxisLegendSource::GetAxisLegends(): range: %lld - %lld\n", startTime, endTime);
 // TODO: Handle sub-microsecs ranges!
 	if (startTime >= endTime)
 		return 0;

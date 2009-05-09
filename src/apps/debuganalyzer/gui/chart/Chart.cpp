@@ -85,7 +85,6 @@ bool
 Chart::AddDataSource(ChartDataSource* dataSource, int32 index,
 	ChartRendererDataSourceConfig* config)
 {
-printf("Chart::AddDataSource(%p)\n", dataSource);
 	if (dataSource == NULL)
 		return false;
 
@@ -130,7 +129,6 @@ Chart::RemoveDataSource(ChartDataSource* dataSource)
 ChartDataSource*
 Chart::RemoveDataSource(int32 index)
 {
-printf("Chart::RemoveDataSource(%ld)\n", index);
 	if (index < 0 || index >= fDataSources.CountItems())
 		return NULL;
 
@@ -149,7 +147,6 @@ printf("Chart::RemoveDataSource(%ld)\n", index);
 void
 Chart::RemoveAllDataSources()
 {
-printf("Chart::RemoveAllDataSources()\n");
 	int32 count = fDataSources.CountItems();
 	for (int32 i = count - 1; i >= 0; i--)
 		fRenderer->RemoveDataSource(fDataSources.ItemAt(i));
@@ -371,7 +368,7 @@ Chart::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 void
 Chart::Draw(BRect updateRect)
 {
-printf("Chart::Draw((%f, %f) - (%f, %f))\n", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+//printf("Chart::Draw((%f, %f) - (%f, %f))\n", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color color;
 
@@ -447,7 +444,7 @@ Chart::DoLayout()
 {
 	// get size in pixels
 	BSize size = Bounds().Size();
-printf("Chart::DoLayout(%f, %f)\n", size.width, size.height);
+//printf("Chart::DoLayout(%f, %f)\n", size.width, size.height);
 	int32 width = size.IntegerWidth() + 1;
 	int32 height = size.IntegerHeight() + 1;
 
@@ -470,7 +467,7 @@ printf("Chart::DoLayout(%f, %f)\n", size.width, size.height);
 
 	fChartFrame = BRect(left, top, width - right - 1, height - bottom - 1);
 	fRenderer->SetFrame(fChartFrame.InsetByCopy(1, 1));
-printf("  fChartFrame: (%f, %f) - (%f, %f)\n", fChartFrame.left, fChartFrame.top, fChartFrame.right, fChartFrame.bottom);
+//printf("  fChartFrame: (%f, %f) - (%f, %f)\n", fChartFrame.left, fChartFrame.top, fChartFrame.right, fChartFrame.bottom);
 
 	fLeftAxis.SetFrame(0, fChartFrame.top + 1, fChartFrame.left - 1,
 		fChartFrame.bottom - 1);

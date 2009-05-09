@@ -64,7 +64,6 @@ void
 LegendChartAxis::_FilterLegends(int32 totalSize, int32 spacing,
 	float BSize::* sizeField)
 {
-printf("LegendChartAxis::_FilterLegends(%ld, %ld)\n", totalSize, spacing);
 	// compute the min/max legend levels
 	int32 legendCount = fLegends.CountItems();
 	int32 minLevel = INT_MAX;
@@ -91,7 +90,6 @@ printf("LegendChartAxis::_FilterLegends(%ld, %ld)\n", totalSize, spacing);
 	// preceeding same-level legends. We iterate backwards from the lower to
 	// the higher levels
 	for (int32 level = std::max(minLevel, 0L); level <= maxLevel;) {
-printf("  level: %ld\n", level);
 		legendCount = fLegends.CountItems();
 
 		// get the first legend position/end
@@ -101,12 +99,10 @@ printf("  level: %ld\n", level);
 
 		int32 previousEnd = (int32)ceilf(position + info->size.*sizeField);
 		int32 previousLevel = info->legend->Level();
-printf("     first legend: pos: %f, size: %f\n", position, info->size.*sizeField);
 
 		for (int32 i = 1; (info = fLegends.ItemAt(i)) != NULL; i++) {
 			float position = _LegendPosition(info->value, info->size.*sizeField,
 				(float)totalSize, scale);;
-printf("     legend %ld: pos: %f, size: %f\n", i, position, info->size.*sizeField);
 
 			if (position - spacing < previousEnd
 				&& (previousLevel <= level
@@ -183,7 +179,6 @@ LegendChartAxis::SetRange(const ChartDataRange& range)
 void
 LegendChartAxis::SetFrame(BRect frame)
 {
-printf("LegendChartAxis::SetFrame((%f, %f) - (%f, %f))\n", frame.left, frame.top, frame.right, frame.bottom);
 	if (frame != fFrame) {
 		fFrame = frame;
 		_InvalidateLayout();
@@ -245,7 +240,6 @@ LegendChartAxis::PreferredSize(BView* view, BSize maxSize)
 void
 LegendChartAxis::Render(BView* view, BRect updateRect)
 {
-printf("LegendChartAxis::Render()\n");
 	if (!_ValidateLayout(view))
 		return;
 
@@ -279,7 +273,6 @@ printf("LegendChartAxis::Render()\n");
 			return;
 	}
 
-printf("  rendering...\n");
 	float totalSize = floorf(fFrame.Size().*sizeField) + 1;
 	double rangeSize = fRange.max - fRange.min;
 	if (rangeSize == 0)
@@ -293,7 +286,6 @@ printf("  rendering...\n");
 		: fFrame.RightBottom().*otherPointField - kChartRulerDistance;
 	float rulerEnd = fFrame.RightTop().*pointField;
 	float rulerChartDistant = rulerChartClosest + rulerDirection * kRulerSize;
-printf("  ruler: (%f, %f) - (%f, %f)\n", rulerStart, rulerChartClosest, rulerEnd, rulerChartDistant);
 
 	rgb_color black = { 0, 0, 0, 255 };
 	view->BeginLineArray(3 + fLegends.CountItems());
@@ -319,7 +311,6 @@ printf("  ruler: (%f, %f) - (%f, %f)\n", rulerStart, rulerChartClosest, rulerEnd
 		second.*pointField = position;
 		second.*otherPointField = rulerChartDistant
 			+ rulerDirection * kRulerMarkSize;
-printf("  drawing mark at (%f, %f)\n", first.x, first.y);
 		view->AddLine(first, second, black);
 	}
 	view->EndLineArray();
@@ -338,7 +329,6 @@ printf("  drawing mark at (%f, %f)\n", first.x, first.y);
 		first.*otherPointField = rulerDirection == 1
 			? legendRulerClosest
 			: legendRulerClosest - info->size.*otherSizeField;
-printf("  legend %ld: position: (%f, %f), size: (%f, %f)\n", i, first.x, first.y, info->size.width, info->size.height);
 
 		fLegendRenderer->RenderLegend(info->legend, view, first);
 	}
@@ -357,24 +347,18 @@ LegendChartAxis::_ValidateLayout(BView* view)
 {
 	if (fLayoutValid)
 		return true;
-printf("LegendChartAxis::_ValidateLayout()\n");
 
 	fLegends.MakeEmpty();
 
 	int32 width = fFrame.IntegerWidth() + 1;
 	int32 height = fFrame.IntegerHeight() + 1;
-printf("  width: %ld, height: %ld\n", width, height);
 
 	// estimate the maximum legend count we might need
 	int32 maxLegends = _EstimateMaxLegendCount(view, fFrame.Size(),
 		&fHorizontalSpacing, &fVerticalSpacing);
 
-printf("  max %ld legends\n", maxLegends);
 	if (maxLegends == 0)
-{
-printf("  too small for any legends!\n");
 		return false;
-}
 
 	// get the legends
 	ChartLegend* legends[maxLegends];
@@ -382,27 +366,20 @@ printf("  too small for any legends!\n");
 
 	int32 legendCount = fLegendSource->GetAxisLegends(fRange, legends, values,
 		maxLegends);
-printf("  got %ld legends\n", legendCount);
 	if (legendCount == 0)
-{
-printf("  got no legends from source!\n");
 		return false;
-}
 
-printf("  range: %f - %f\n", fRange.min, fRange.max);
 	// create legend infos
 	for (int32 i = 0; i < legendCount; i++) {
 		ChartLegend* legend = legends[i];
 		BSize size = fLegendRenderer->LegendSize(legend, view);
 		LegendInfo* info = new(std::nothrow) LegendInfo(legend, values[i],
 			size);
-printf("    legend %ld: size: (%f, %f), value: %f\n", i, size.width, size.height, info->value);
 		if (info == NULL || !fLegends.AddItem(info)) {
 			// TODO: Report error!
 			delete info;
 			for (int32 k = i; k < legendCount; k++)
 				delete legends[k];
-printf("  failed to create legend info!\n");
 			return false;
 		}
 	}

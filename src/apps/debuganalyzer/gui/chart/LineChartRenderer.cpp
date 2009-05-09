@@ -192,17 +192,15 @@ LineChartRenderer::Render(BView* view, BRect updateRect)
 	// draw
 	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 	for (int32 i = 0; DataSourceInfo* info = fDataSources.ItemAt(i); i++) {
-printf("LineChartRenderer::Render(): %p\n", info);
-	
+
 		float bottom = fFrame.bottom;
 		BShape shape;
 		shape.MoveTo(BPoint(left + first,
 			bottom - ((info->samples[first] - minRange) * scale)));
-	
+
 		for (int32 i = first; i <= last; i++) {
 			shape.LineTo(BPoint(float(left + i),
 				float(bottom - ((info->samples[i] - minRange) * scale))));
-//printf("  %f: %f (%f)\n", info->samples[i] - minRange, float(bottom - ((info->samples[i] - minRange) * scale)), bottom);
 		}
 		view->SetHighColor(info->config.Color());
 		view->MovePenTo(B_ORIGIN);
