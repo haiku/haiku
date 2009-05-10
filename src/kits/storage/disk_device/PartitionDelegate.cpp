@@ -5,14 +5,20 @@
 
 #include "PartitionDelegate.h"
 
+#include <stdio.h>
+
 #include <DiskSystemAddOn.h>
 
 #include "DiskSystemAddOnManager.h"
 
 
+//#define TRACE_PARTITION_DELEGATE
 #undef TRACE
-#define TRACE(format...)
-//#define TRACE(format...)	printf(format)
+#ifdef TRACE_PARTITION_DELEGATE
+# define TRACE(x...) printf(x)
+#else
+# define TRACE(x...) do {} while (false)
+#endif
 
 
 // constructor
@@ -61,24 +67,28 @@ BPartition::Delegate::InitHierarchy(
 status_t
 BPartition::Delegate::InitAfterHierarchy()
 {
-	if (!fMutablePartition.ContentType())
+	TRACE("%p->BPartition::Delegate::InitAfterHierarchy()\n", this);
+
+	if (!fMutablePartition.ContentType()) {
+		TRACE("  no content type\n");
 		return B_OK;
+	}
 
 	// init disk system and handle
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
 	BDiskSystemAddOn* addOn = manager->GetAddOn(
 		fMutablePartition.ContentType());
 	if (!addOn) {
-		TRACE("BPartition::Delegate::InitAfterHierarchy(): add-on for disk "
-			"system \"%s\" not found\n", fMutablePartition.ContentType());
+		TRACE("  add-on for disk system \"%s\" not found\n",
+			fMutablePartition.ContentType());
 		return B_OK;
 	}
 
 	BPartitionHandle* handle;
 	status_t error = addOn->CreatePartitionHandle(&fMutablePartition, &handle);
 	if (error != B_OK) {
-		TRACE("BPartition::Delegate::InitAfterHierarchy(): Failed to create "
-			"partition handle for partition %ld, disk system: \"%s\": %s\n",
+		TRACE("  failed to create partition handle for partition %ld, disk "
+			"system: \"%s\": %s\n",
 			Partition()->ID(), addOn->Name(), strerror(error));
 		manager->PutAddOn(addOn);
 		return error;
@@ -379,8 +389,13 @@ status_t
 BPartition::Delegate::GetNextSupportedChildType(Delegate* child, int32 *cookie,
 	BString* type) const
 {
-	if (!fPartitionHandle)
+	TRACE("%p->BPartition::Delegate::GetNextSupportedChildType(child: %p, "
+		"cookie: %ld)\n", this, child, *cookie);
+
+	if (!fPartitionHandle) {
+		TRACE("  no partition handle!\n");
 		return B_NO_INIT;
+	}
 
 	return fPartitionHandle->GetNextSupportedType(
 		child ? &child->fMutablePartition : NULL, cookie, type);

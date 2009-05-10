@@ -30,6 +30,15 @@
 #include "PartitionDelegate.h"
 
 
+//#define TRACE_PARTITION
+#undef TRACE
+#ifdef TRACE_PARTITION
+# define TRACE(x...) printf(x)
+#else
+# define TRACE(x...) do {} while (false)
+#endif
+
+
 using std::nothrow;
 
 
@@ -1103,9 +1112,14 @@ BPartition::SetContentParameters(const char* parameters)
 status_t
 BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
 {
+	TRACE("%p->BPartition::GetNextSupportedType(%ld)\n", this, *cookie);
+
 	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (!parent || !fDelegate) {
+		TRACE("  not prepared (parent: %p, fDelegate: %p)!\n", parent,
+			fDelegate);
 		return B_NO_INIT;
+	}
 
 	return parent->fDelegate->GetNextSupportedChildType(fDelegate, cookie,
 		type);
@@ -1116,8 +1130,12 @@ BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
 status_t
 BPartition::GetNextSupportedChildType(int32 *cookie, BString* type) const
 {
-	if (!fDelegate)
+	TRACE("%p->BPartition::GetNextSupportedChildType(%ld)\n", this, *cookie);
+
+	if (!fDelegate) {
+		TRACE("  not prepared!\n");
 		return B_NO_INIT;
+	}
 
 	return fDelegate->GetNextSupportedChildType(NULL, cookie, type);
 }

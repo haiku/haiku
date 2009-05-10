@@ -29,6 +29,15 @@
 #include "DiskSystemAddOnManager.h"
 
 
+//#define TRACE_DISK_DEVICE
+#undef TRACE
+#ifdef TRACE_DISK_DEVICE
+# define TRACE(x...) printf(x)
+#else
+# define TRACE(x...) do {} while (false)
+#endif
+
+
 /*!	\class BDiskDevice
 	\brief A BDiskDevice object represents a storage device.
 */
@@ -241,17 +250,25 @@ BDiskDevice::IsModified() const
 status_t
 BDiskDevice::PrepareModifications()
 {
+	TRACE("%p->BDiskDevice::PrepareModifications()\n", this);
+
 	// check initialization
 	status_t error = InitCheck();
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE("  InitCheck() failed\n");
 		return error;
-	if (fDelegate)
+	}
+	if (fDelegate) {
+		TRACE("  already prepared!\n");
 		return B_BAD_VALUE;
+	}
 
 	// make sure the disk system add-ons are loaded
 	error = DiskSystemAddOnManager::Default()->LoadDiskSystems();
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE("  failed to load disk systems\n");
 		return error;
+	}
 
 	// recursively create the delegates
 	error = _CreateDelegates();
@@ -259,9 +276,12 @@ BDiskDevice::PrepareModifications()
 	// init them
 	if (error == B_OK)
 		error = _InitDelegates();
+	else
+		TRACE("  failed to create delegates\n");
 
 	// delete all of them, if something went wrong
 	if (error != B_OK) {
+		TRACE("  failed to init delegates\n");
 		_DeleteDelegates();
 		DiskSystemAddOnManager::Default()->UnloadDiskSystems();
 	}
