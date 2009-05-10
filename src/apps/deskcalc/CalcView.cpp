@@ -82,7 +82,7 @@ struct CalcView::CalcKey {
 CalcView *CalcView::Instantiate(BMessage *archive)
 {
 	if (!validate_instantiation(archive, "CalcView"))
-		return NULL; 
+		return NULL;
 
 	return new CalcView(archive);
 }
@@ -130,7 +130,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage *settings)
 
 	// parse calculator description
 	_ParseCalcDesc(fKeypadDescription);
-	
+
 	// colorize based on base color.
 	_Colorize();
 
@@ -182,7 +182,7 @@ CalcView::CalcView(BMessage* archive)
 	_LoadSettings(archive);
 	// replicant means size and window limit dont need changes
 	fShowKeypad = fOptions->show_keypad;
-	
+
 	// create pop-up menu system
 	_CreatePopUpMenu();
 
@@ -225,28 +225,28 @@ CalcView::MessageReceived(BMessage* message)
 
 		// act on posted message type
 		switch (message->what) {
-		
+
 			// handle "cut"
 			case B_CUT:
 				Cut();
 				break;
-			
+
 			// handle copy
 			case B_COPY:
 				Copy();
 				break;
-			
+
 			// handle paste
 			case B_PASTE:
 				// access system clipboard
-				if (be_clipboard->Lock()) { 
+				if (be_clipboard->Lock()) {
 					BMessage *clipper = be_clipboard->Data();
 					//clipper->PrintToStream();
 					Paste(clipper);
-					be_clipboard->Unlock(); 
+					be_clipboard->Unlock();
 				}
 				break;
-			
+
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
 				AboutRequested();
@@ -342,10 +342,10 @@ CalcView::Draw(BRect updateRect)
 				updateRect, fBaseColor, flags);
 		} else {
 			BeginLineArray(8);
-	
+
 			rgb_color lightShadow = tint_color(fBaseColor, B_DARKEN_1_TINT);
 			rgb_color darkShadow = tint_color(fBaseColor, B_DARKEN_3_TINT);
-	
+
 			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
 					BPoint(expressionRect.left, expressionRect.top),
 					lightShadow);
@@ -358,7 +358,7 @@ CalcView::Draw(BRect updateRect)
 			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
 					BPoint(expressionRect.right - 1, expressionRect.bottom),
 					fLightColor);
-	
+
 			expressionRect.InsetBy(1, 1);
 			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
 					BPoint(expressionRect.left, expressionRect.top),
@@ -372,7 +372,7 @@ CalcView::Draw(BRect updateRect)
 			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
 					BPoint(expressionRect.right - 1, expressionRect.bottom),
 					fBaseColor);
-	
+
 			EndLineArray();
 		}
 	}
@@ -441,10 +441,10 @@ CalcView::Draw(BRect updateRect)
 	// paint keypad b/g
 	SetHighColor(fBaseColor);
 	FillRect(updateRect & keypadRect);
-	
+
 	// render key main grid
 	BeginLineArray(((fColums + fRows) << 1) + 1);
-	
+
 	// render cols
 	AddLine(BPoint(0.0, sizeDisp),
 			BPoint(0.0, fHeight),
@@ -460,7 +460,7 @@ CalcView::Draw(BRect updateRect)
 	AddLine(BPoint(fColums * sizeCol, sizeDisp),
 			BPoint(fColums * sizeCol, fHeight),
 			fDarkColor);
-		
+
 	// render rows
 	for (int row = 0; row < fRows; row++) {
 		AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
@@ -473,10 +473,10 @@ CalcView::Draw(BRect updateRect)
 	AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
 			BPoint(fWidth, sizeDisp + fRows * sizeRow),
 			fDarkColor);
-		
+
 	// main grid complete
 	EndLineArray();
-	
+
 	// render key symbols
 	float halfSizeCol = sizeCol * 0.5f;
 	SetHighColor(fButtonTextColor);
@@ -502,8 +502,11 @@ void
 CalcView::MouseDown(BPoint point)
 {
 	// ensure this view is the current focus
-	if (!IsFocus())	
+	if (!fExpressionTextView->IsFocus()) {
+		// Call our version of MakeFocus(), since that will also apply the
+		// num_lock setting.
 		MakeFocus();
+	}
 
 	// read mouse buttons state
 	int32 buttons = 0;
@@ -513,8 +516,9 @@ CalcView::MouseDown(BPoint point)
 	if ((B_PRIMARY_MOUSE_BUTTON & buttons) == 0) {
 		BMenuItem* selected;
 		if ((selected = fPopUpMenu->Go(ConvertToScreen(point))) != NULL
-			&& selected->Message() != NULL)
-			MessageReceived(selected->Message());
+			&& selected->Message() != NULL) {
+			Window()->PostMessage(selected->Message(), this);
+		}
 		return;
 	}
 
@@ -524,7 +528,7 @@ CalcView::MouseDown(BPoint point)
 			bounds.left = bounds.right - fCalcIcon->Bounds().Width();
 			if (bounds.Contains(point)) {
 				// user clicked on calculator icon
-				fExpressionTextView->ApplyChanges();
+				fExpressionTextView->Clear();
 			}
 		}
 		return;
@@ -534,15 +538,15 @@ CalcView::MouseDown(BPoint point)
 	float sizeDisp = fHeight * kDisplayScaleY;
 	float sizeCol = fWidth / (float)fColums;
 	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
-	
+
 	// calculate location within grid
 	int gridCol = (int)floorf(point.x / sizeCol);
 	int gridRow = (int)floorf((point.y - sizeDisp) / sizeRow);
-	
+
 	// check limits
 	if ((gridCol >= 0) && (gridCol < fColums) &&
 		(gridRow >= 0) && (gridRow < fRows)) {
-	
+
 		// process key press
 		int key = gridRow * fColums + gridCol;
 		_FlashKey(key, FLAGS_MOUSE_DOWN);
@@ -557,6 +561,9 @@ CalcView::MouseDown(BPoint point)
 void
 CalcView::MouseUp(BPoint point)
 {
+	if (!fShowKeypad)
+		return;
+
 	int keys = fRows * fColums;
 	for (int i = 0; i < keys; i++) {
 		if (fKeypad[i].flags & FLAGS_MOUSE_DOWN) {
@@ -571,41 +578,41 @@ void
 CalcView::KeyDown(const char *bytes, int32 numBytes)
 {
  	// if single byte character...
-	if (numBytes == 1) { 
-		
+	if (numBytes == 1) {
+
 		//printf("Key pressed: %c\n", bytes[0]);
-		
+
 		switch (bytes[0]) {
-		
+
 			case B_ENTER:
 				// translate to evaluate key
 				_PressKey("=");
 				break;
-			
+
 			case B_LEFT_ARROW:
 			case B_BACKSPACE:
 				// translate to backspace key
 				_PressKey("BS");
 				break;
-			
+
 			case B_SPACE:
 			case B_ESCAPE:
 			case 'c':
 				// translate to clear key
 				_PressKey("C");
 				break;
-			
+
 			// bracket translation
 			case '[':
 			case '{':
 				_PressKey("(");
 				break;
-	
+
 			case ']':
 			case '}':
 				_PressKey(")");
 				break;
-			
+
 			default: {
 				// scan the keymap array for match
 				int keys = fRows * fColums;
@@ -628,8 +635,8 @@ CalcView::MakeFocus(bool focused)
 	if (focused) {
 		// set num lock
 		if (fOptions->auto_num_lock) {
-			set_keyboard_locks(B_NUM_LOCK |
-							   (modifiers() & (B_CAPS_LOCK | B_SCROLL_LOCK)));
+			set_keyboard_locks(B_NUM_LOCK
+				| (modifiers() & (B_CAPS_LOCK | B_SCROLL_LOCK)));
 		}
 	}
 
@@ -732,16 +739,16 @@ CalcView::Copy()
 						 expression.String(),
 						 expression.Length());
 		//clipper->PrintToStream();
-		be_clipboard->Commit(); 
-		be_clipboard->Unlock(); 
+		be_clipboard->Commit();
+		be_clipboard->Unlock();
 	}
 }
 
- 
+
 void
 CalcView::Paste(BMessage *message)
 {
-	// handle color drops first		
+	// handle color drops first
 	// read incoming color
 	const rgb_color* dropColor = NULL;
 	ssize_t dataSize;
@@ -750,14 +757,14 @@ CalcView::Paste(BMessage *message)
 						  (const void**)&dropColor,
 						  &dataSize) == B_OK
 		&& dataSize == sizeof(rgb_color)) {
-			
+
 		// calculate view relative drop point
 		BPoint dropPoint = ConvertFromScreen(message->DropPoint());
-		
+
 		// calculate current keypad area
 		float sizeDisp = fHeight * kDisplayScaleY;
 		BRect keypadRect(0.0, sizeDisp, fWidth, fHeight);
-		
+
 		// check location of color drop
 		if (keypadRect.Contains(dropPoint) && dropColor) {
 			fBaseColor = *dropColor;
@@ -802,7 +809,7 @@ CalcView::_LoadSettings(BMessage* archive)
 		fColums = 5;
 	if (archive->FindInt16("rows", &fRows) < B_OK)
 		fRows = 4;
-	
+
 	// read color scheme
 	const rgb_color* color;
 	ssize_t size;
@@ -814,7 +821,7 @@ CalcView::_LoadSettings(BMessage* archive)
 	} else {
 		fBaseColor = *color;
 	}
-		
+
 	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
 						  (const void**)&color, &size) < B_OK
 						  || size != sizeof(rgb_color)) {
@@ -823,7 +830,7 @@ CalcView::_LoadSettings(BMessage* archive)
 	} else {
 		fExpressionBGColor = *color;
 	}
-	
+
 	// load options
 	fOptions->LoadSettings(archive);
 
@@ -841,7 +848,7 @@ CalcView::_LoadSettings(BMessage* archive)
 
 	// parse calculator description
 	_ParseCalcDesc(fKeypadDescription);
-	
+
 	// colorize based on base color.
 	_Colorize();
 
@@ -859,7 +866,7 @@ CalcView::SaveSettings(BMessage* archive) const
 		ret = archive->AddInt16("cols", fColums);
 	if (ret == B_OK)
 		ret = archive->AddInt16("rows", fRows);
-	
+
 	// record color scheme
 	if (ret == B_OK)
 		ret = archive->AddData("rgbBaseColor", B_RGB_COLOR_TYPE,
@@ -967,7 +974,7 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 		// will forward the respective KeyDown event to us
 		fExpressionTextView->AddKeypadLabel(key->label);
 
-		// advance	
+		// advance
 		while (isspace(*p))
 			++p;
 		key++;
@@ -1026,6 +1033,9 @@ CalcView::_KeyForLabel(const char *label) const
 void
 CalcView::_FlashKey(int32 key, uint32 flashFlags)
 {
+	if (!fShowKeypad)
+		return;
+
 	if (flashFlags != 0)
 		fKeypad[key].flags |= flashFlags;
 	else
@@ -1065,7 +1075,7 @@ CalcView::_Colorize()
 	fLightColor.green	= (uint8)(fBaseColor.green * 1.25);
 	fLightColor.blue	= (uint8)(fBaseColor.blue * 1.25);
 	fLightColor.alpha	= 255;
-	
+
 	fDarkColor.red		= (uint8)(fBaseColor.red * 0.75);
 	fDarkColor.green	= (uint8)(fBaseColor.green * 0.75);
 	fDarkColor.blue		= (uint8)(fBaseColor.blue * 0.75);
@@ -1167,7 +1177,7 @@ CalcView::_ShowKeypad(bool show)
 	}
 }
 
- 
+
 void
 CalcView::_FetchAppIcon(BBitmap* into)
 {
