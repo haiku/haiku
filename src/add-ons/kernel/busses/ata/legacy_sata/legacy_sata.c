@@ -13,7 +13,7 @@
 
 #define DRIVER_PRETTY_NAME	"Legacy SATA"
 #define CONTROLLER_NAME		DRIVER_PRETTY_NAME
-#define CONTROLLER_MODULE_NAME	"busses/ide/legacy_sata/driver_v1"
+#define CONTROLLER_MODULE_NAME	"busses/ata/legacy_sata/driver_v1"
 #define CHANNEL_MODULE_NAME	"busses/ide/legacy_sata/channel/v1"
 
 #define TRACE(a...)		dprintf(DRIVER_PRETTY_NAME ": " a)

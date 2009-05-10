@@ -19,8 +19,8 @@
 
 #define DRIVER_PRETTY_NAME		"Silicon Image SATA"
 #define CONTROLLER_NAME			DRIVER_PRETTY_NAME
-#define CONTROLLER_MODULE_NAME	"busses/ide/silicon_image_3112/driver_v1"
-#define CHANNEL_MODULE_NAME		"busses/ide/silicon_image_3112/channel/v1"
+#define CONTROLLER_MODULE_NAME	"busses/ata/silicon_image_3112/driver_v1"
+#define CHANNEL_MODULE_NAME		"busses/ata/silicon_image_3112/channel/v1"
 
 enum asic_type {
 	ASIC_SI3112 = 0,
@@ -765,7 +765,7 @@ dma_finish(void *channelCookie)
 
 	command = *channel->bm_command_reg;
 	*channel->bm_command_reg = command & ~IDE_BM_COMMAND_START_STOP;
-	
+
 	channel->dma_active = false;
 
 	*channel->bm_status_reg = status | IDE_BM_STATUS_ERROR;
@@ -774,7 +774,7 @@ dma_finish(void *channelCookie)
 	if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
 		TRACE("dma_finish: buffer too large\n");
 		return B_DEV_DATA_OVERRUN;
-	} 
+	}
 	if ((status & IDE_BM_STATUS_ERROR) != 0) {
 		FLOW("dma_finish: failed\n");
 		return B_ERROR;

@@ -165,8 +165,17 @@ AddFilesToHaikuImage system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
-AddFilesToHaikuImage system add-ons kernel busses ide
-	: generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa ;
+
+if $(HAIKU_ATA_STACK) = 1 {
+	AddFilesToHaikuImage system add-ons kernel busses ata
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112
+			$(X86_ONLY)ide_isa ;
+} else {
+	AddFilesToHaikuImage system add-ons kernel busses ide
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112
+			$(X86_ONLY)ide_isa ;
+}
+
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb

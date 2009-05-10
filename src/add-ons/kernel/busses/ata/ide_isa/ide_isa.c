@@ -30,7 +30,7 @@
 #endif
 
 
-#define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/driver_v1"
+#define IDE_ISA_MODULE_NAME "busses/ata/ide_isa/driver_v1"
 
 // private node item:
 // io address of command block

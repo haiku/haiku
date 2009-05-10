@@ -21,8 +21,8 @@
 
 #include "wrapper.h"
 
-#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ide/promise_tx2/device_v1"
-#define PROMISE_TX2_CHANNEL_MODULE_NAME "busses/ide/promise_tx2/channel/v1"
+#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ata/promise_tx2/device_v1"
+#define PROMISE_TX2_CHANNEL_MODULE_NAME "busses/ata/promise_tx2/channel/v1"
 
 
 static ide_for_controller_interface *ide;

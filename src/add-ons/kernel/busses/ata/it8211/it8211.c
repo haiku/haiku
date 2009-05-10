@@ -8,8 +8,8 @@
 
 #include <ide_adapter.h>
 
-#define IT8211_CONTROLLER_MODULE_NAME "busses/ide/it8211/driver_v1"
-#define IT8211_CHANNEL_MODULE_NAME "busses/ide/it8211/channel/v1"
+#define IT8211_CONTROLLER_MODULE_NAME "busses/ata/it8211/driver_v1"
+#define IT8211_CHANNEL_MODULE_NAME "busses/ata/it8211/channel/v1"
 
 #define PCI_VENDOR_ITE			0x1283
 #define PCI_DEVICE_ITE_IT8211	0x8211

@@ -1521,11 +1521,13 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						_AddPath(*stack, "busses", "scsi");
 						break;
 					case PCI_ide:
+						_AddPath(*stack, "busses", "ata");
 						_AddPath(*stack, "busses", "ide");
 						break;
 					case PCI_sata:
 						// TODO: check for ahci interface
 						_AddPath(*stack, "busses", "scsi");
+						_AddPath(*stack, "busses", "ata");
 						_AddPath(*stack, "busses", "ide");
 						break;
 					default:

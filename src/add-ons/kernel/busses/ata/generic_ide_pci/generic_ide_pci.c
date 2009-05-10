@@ -11,8 +11,8 @@
 
 #include <ide_adapter.h>
 
-#define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ide/generic_ide_pci/driver_v1"
-#define GENERIC_IDE_PCI_CHANNEL_MODULE_NAME "busses/ide/generic_ide_pci/channel/v1"
+#define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ata/generic_ide_pci/driver_v1"
+#define GENERIC_IDE_PCI_CHANNEL_MODULE_NAME "busses/ata/generic_ide_pci/channel/v1"
 
 #define IDE_PCI_CONTROLLER_TYPE_NAME "ide pci controller"
 
