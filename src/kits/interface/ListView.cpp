@@ -880,7 +880,7 @@ BListView::ScrollToSelection()
 {
 	BRect itemFrame = ItemFrame(CurrentSelection(0));
 
-	if (Bounds().Intersects(itemFrame.InsetByCopy(0.0f, 2.0f)))
+	if (Bounds().Contains(itemFrame))
 		return;
 
 	if (itemFrame.top < Bounds().top)
