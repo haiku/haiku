@@ -14,7 +14,7 @@
 PartitionLocker::PartitionLocker(partition_id partitionID)
 	: fDevice(NULL),
 	  fPartitionID(partitionID)
-{	
+{
 }
 
 // destructor
