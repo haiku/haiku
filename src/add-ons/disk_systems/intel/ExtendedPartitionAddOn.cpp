@@ -5,9 +5,8 @@
 
 #include "ExtendedPartitionAddOn.h"
 
-#include <stdio.h>
-
 #include <new>
+#include <stdio.h>
 
 #include <DiskDeviceTypes.h>
 #include <MutablePartition.h>
@@ -16,6 +15,14 @@
 #include <AutoDeleter.h>
 
 #include "IntelDiskSystem.h"
+
+//#define TRACE_EXTENDED_PARTITION_ADD_ON
+#undef TRACE
+#ifdef TRACE_EXTENDED_PARTITION_ADD_ON
+# define TRACE(x...) printf(x)
+#else
+# define TRACE(x...) do {} while (false)
+#endif
 
 
 using std::nothrow;
@@ -244,6 +251,9 @@ status_t
 ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
 {
+	TRACE("%p->ExtendedPartitionHandle::GetNextSupportedType(child: %p, "
+		"cookie: %ld)\n", this, child, *cookie);
+
 	if (*cookie != 0)
 		return B_ENTRY_NOT_FOUND;
 	*cookie = *cookie + 1;

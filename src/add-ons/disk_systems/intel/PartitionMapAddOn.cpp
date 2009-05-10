@@ -6,6 +6,7 @@
 #include "PartitionMapAddOn.h"
 
 #include <new>
+#include <stdio.h>
 
 #include <DiskDeviceTypes.h>
 #include <MutablePartition.h>
@@ -14,6 +15,15 @@
 #include <AutoDeleter.h>
 
 #include "IntelDiskSystem.h"
+
+
+//#define TRACE_PARTITION_MAP_ADD_ON
+#undef TRACE
+#ifdef TRACE_PARTITION_MAP_ADD_ON
+# define TRACE(x...) printf(x)
+#else
+# define TRACE(x...) do {} while (false)
+#endif
 
 
 using std::nothrow;
@@ -251,6 +261,8 @@ status_t
 PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
 {
+	TRACE("%p->PartitionMapHandle::GetNextSupportedType(child: %p, "
+		"cookie: %ld)\n", this, child, *cookie);
 	// TODO: What are we supposed to do with the child?
 
 	// we support creating two types, primary and extended
