@@ -25,7 +25,7 @@ union ata_task_file;
 typedef unsigned int ata_reg_mask;
 
 // channel cookie, issued by ata bus manager
-typedef void *ata_channel;
+typedef void* ata_channel;
 
 // interface of controller driver
 typedef struct {

@@ -6,15 +6,13 @@
 #include <KernelExport.h>
 #include <stdlib.h>
 #include <string.h>
-#include <device_manager.h>
-#include <bus/IDE.h>
-#include <ide_adapter.h>
+#include <ata_adapter.h>
 
 
 #define DRIVER_PRETTY_NAME	"Legacy SATA"
 #define CONTROLLER_NAME		DRIVER_PRETTY_NAME
 #define CONTROLLER_MODULE_NAME	"busses/ata/legacy_sata/driver_v1"
-#define CHANNEL_MODULE_NAME	"busses/ide/legacy_sata/channel/v1"
+#define CHANNEL_MODULE_NAME	"busses/ata/legacy_sata/channel/v1"
 
 #define TRACE(a...)		dprintf(DRIVER_PRETTY_NAME ": " a)
 #define FLOW(a...)		dprintf(DRIVER_PRETTY_NAME ": " a)
@@ -55,9 +53,9 @@ static const char * const kChannelNames[] = {
 	"Tertiary Channel", "Quaternary Channel"
 };
 
-static ide_for_controller_interface* ide;
-static ide_adapter_interface* ide_adapter;
-static device_manager_info* dm;
+static ata_for_controller_interface* sATA;
+static ata_adapter_interface* sATAAdapter;
+static device_manager_info* sDeviceManager;
 
 
 static float
@@ -69,15 +67,15 @@ controller_supports(device_node *parent)
 	const char *bus = NULL;
 
 	// get the bus (should be PCI)
-	if (dm->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK)
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK)
 		return B_ERROR;
 	if (strcmp(bus, "pci") != 0) {
 		return B_ERROR;
 	}
 
 	// get vendor and device ID
-	if ((res=dm->get_attr_uint16(parent, B_DEVICE_VENDOR_ID, &vendor_id, false)) != B_OK
-		|| (res=dm->get_attr_uint16(parent, B_DEVICE_ID, &device_id, false)) != B_OK) {
+	if ((res = sDeviceManager->get_attr_uint16(parent, B_DEVICE_VENDOR_ID, &vendor_id, false)) != B_OK
+		|| (res = sDeviceManager->get_attr_uint16(parent, B_DEVICE_ID, &device_id, false)) != B_OK) {
 		return res;
 	}
 
@@ -140,7 +138,7 @@ controller_probe(device_node *parent)
 
 	TRACE("controller_probe\n");
 
-	dm->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
 
 	device_id = pci->read_pci_config(device, PCI_device_id, 2);
 	vendor_id = pci->read_pci_config(device, PCI_vendor_id, 2);
@@ -192,7 +190,7 @@ controller_probe(device_node *parent)
 		control_block_base[index] &= PCI_address_io_mask;
 	}
 
-	res = ide_adapter->detect_controller(pci, device, parent, bus_master_base,
+	res = sATAAdapter->detect_controller(pci, device, parent, bus_master_base,
 		CONTROLLER_MODULE_NAME, "" /* XXX: unused: controller_driver_type*/, CONTROLLER_NAME, true,
 		true, 1, 0xffff, 0x10000, &controller_node);
 	// don't register if controller is already registered!
@@ -207,7 +205,7 @@ controller_probe(device_node *parent)
 	// ignore errors during registration of channels - could be a simple rescan collision
 
 	for (index = 0; index < num_channels; index++) {
-		res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+		res = sATAAdapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
 			true, command_block_base[index], control_block_base[index], bus_master_base,
 			int_num, index, kChannelNames[index], &channels[index], false);
 
@@ -227,129 +225,129 @@ err:
 static status_t
 controller_init(device_node *node, void **controller_cookie)
 {
-	return ide_adapter->init_controller(
-		node, (ide_adapter_controller_info**)controller_cookie,
-		sizeof(ide_adapter_controller_info));
+	return sATAAdapter->init_controller(
+		node, (ata_adapter_controller_info**)controller_cookie,
+		sizeof(ata_adapter_controller_info));
 }
 
 
 static void
 controller_uninit(void *controller_cookie)
 {
-	ide_adapter->uninit_controller(controller_cookie);
+	sATAAdapter->uninit_controller(controller_cookie);
 }
 
 
 static void
 controller_removed(void *controller_cookie)
 {
-	ide_adapter->controller_removed(
-		(ide_adapter_controller_info*)controller_cookie);
+	sATAAdapter->controller_removed(
+		(ata_adapter_controller_info*)controller_cookie);
 }
 
 
 static status_t
 channel_init(device_node *node, void **channel_cookie)
 {
-	return ide_adapter->init_channel(node,
-		(ide_adapter_channel_info**)channel_cookie,
-		sizeof(ide_adapter_channel_info),
-		ide_adapter->inthand);
+	return sATAAdapter->init_channel(node,
+		(ata_adapter_channel_info**)channel_cookie,
+		sizeof(ata_adapter_channel_info),
+		sATAAdapter->inthand);
 }
 
 
 static void
 channel_uninit(void *channel_cookie)
 {
-	ide_adapter->uninit_channel(channel_cookie);
+	sATAAdapter->uninit_channel(channel_cookie);
 }
 
 
 static void
 channel_removed(void *channel_cookie)
 {
-	ide_adapter->channel_removed(channel_cookie);
+	sATAAdapter->channel_removed(channel_cookie);
 }
 
 
 static void
-channel_set(void *cookie, ide_channel channel)
+channel_set(void *cookie, ata_channel channel)
 {
-	ide_adapter->set_channel((ide_adapter_channel_info *)cookie, channel);
+	sATAAdapter->set_channel((ata_adapter_channel_info *)cookie, channel);
 }
 
 
 static status_t
-task_file_write(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_write(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return ide_adapter->write_command_block_regs(channel_cookie,tf,mask);
+	return sATAAdapter->write_command_block_regs(channel_cookie,tf,mask);
 }
 
 
 static status_t
-task_file_read(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_read(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return ide_adapter->read_command_block_regs(channel_cookie,tf,mask);
+	return sATAAdapter->read_command_block_regs(channel_cookie,tf,mask);
 }
 
 
 static uint8
 altstatus_read(void *channel_cookie)
 {
-	return ide_adapter->get_altstatus(channel_cookie);
+	return sATAAdapter->get_altstatus(channel_cookie);
 }
 
 
 static status_t
 device_control_write(void *channel_cookie, uint8 val)
 {
-	return ide_adapter->write_device_control(channel_cookie,val);
+	return sATAAdapter->write_device_control(channel_cookie,val);
 }
 
 
 static status_t
 pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ide_adapter->write_pio(channel_cookie,data,count,force_16bit);
+	return sATAAdapter->write_pio(channel_cookie,data,count,force_16bit);
 }
 
 
 static status_t
 pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return ide_adapter->read_pio(channel_cookie,data,count,force_16bit);
+	return sATAAdapter->read_pio(channel_cookie,data,count,force_16bit);
 }
 
 
 static status_t
 dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_count, bool write)
 {
-	return ide_adapter->prepare_dma(channel_cookie,sg_list,sg_list_count,write);
+	return sATAAdapter->prepare_dma(channel_cookie,sg_list,sg_list_count,write);
 }
 
 
 static status_t
 dma_start(void *channel_cookie)
 {
-	return ide_adapter->start_dma(channel_cookie);
+	return sATAAdapter->start_dma(channel_cookie);
 }
 
 
 static status_t
 dma_finish(void *channel_cookie)
 {
-	return ide_adapter->finish_dma(channel_cookie);
+	return sATAAdapter->finish_dma(channel_cookie);
 }
 
 
 module_dependency module_dependencies[] = {
-	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&dm },
-	{ IDE_ADAPTER_MODULE_NAME, (module_info **)&ide_adapter },
+	{ ATA_FOR_CONTROLLER_MODULE_NAME, (module_info **)&sATA },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
+	{ ATA_ADAPTER_MODULE_NAME, (module_info **)&sATAAdapter },
 	{}
 };
 
-static ide_controller_interface sChannelInterface = {
+static ata_controller_interface sChannelInterface = {
 	{
 		{
 			CHANNEL_MODULE_NAME,

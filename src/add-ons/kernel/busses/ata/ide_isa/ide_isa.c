@@ -16,10 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ata_adapter.h>
 #include <bus/ISA.h>
-#include <bus/IDE.h>
-#include <ide_types.h>
-#include <device_manager.h>
 
 
 //#define TRACE_IDE_ISA
@@ -30,19 +28,19 @@
 #endif
 
 
-#define IDE_ISA_MODULE_NAME "busses/ata/ide_isa/driver_v1"
+#define ATA_ISA_MODULE_NAME "busses/ata/ide_isa/driver_v1"
 
 // private node item:
 // io address of command block
-#define IDE_ISA_COMMAND_BLOCK_BASE "ide_isa/command_block_base"
+#define ATA_ISA_COMMAND_BLOCK_BASE "ide_isa/command_block_base"
 // io address of control block
-#define IDE_ISA_CONTROL_BLOCK_BASE "ide_isa/control_block_base"
+#define ATA_ISA_CONTROL_BLOCK_BASE "ide_isa/control_block_base"
 // interrupt number
-#define IDE_ISA_INTNUM "ide_isa/irq"
+#define ATA_ISA_INTNUM "ide_isa/irq"
 
 
-ide_for_controller_interface *ide;
-device_manager_info *pnp;
+ata_for_controller_interface *sATA;
+device_manager_info *sDeviceManager;
 
 
 // info about one channel
@@ -55,34 +53,33 @@ typedef struct channel_info {
 	uint32	lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
 
-	ide_channel ide_channel;
+	ata_channel ataChannel;
 	device_node *node;
 } channel_info;
 
 
-/*! publish node of an ide channel */
+/*! publish node of an ata channel */
 static status_t
 publish_channel(device_node *parent, uint16 command_block_base,
 	uint16 control_block_base, uint8 intnum, const char *name)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: ATA_FOR_CONTROLLER_MODULE_NAME }},
 
-		// properties of this controller for ide bus manager
-		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
-		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 0 }},
-		{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: 1 }},
-		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: name }},
+		// properties of this controller for ata bus manager
+		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 0 }},
+		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: name }},
 
 		// DMA properties; the 16 bit alignment is not necessary as
-		// the ide bus manager handles that very efficiently, but why
+		// the ata bus manager handles that very efficiently, but why
 		// not use the block device manager for doing that?
 		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
 
 		// private data to identify device
-		{ IDE_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
-		{ IDE_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
-		{ IDE_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
+		{ ATA_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
+		{ ATA_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
+		{ ATA_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
 		{ NULL }
 	};
 	io_resource resources[3] = {
@@ -94,7 +91,7 @@ publish_channel(device_node *parent, uint16 command_block_base,
 	TRACE("publishing %s, resources %#x %#x %d\n",
 		  name, command_block_base, control_block_base, intnum);
 
-	return pnp->register_node(parent, IDE_ISA_MODULE_NAME, attrs, resources,
+	return sDeviceManager->register_node(parent, ATA_ISA_MODULE_NAME, attrs, resources,
 		NULL);
 }
 
@@ -103,16 +100,16 @@ publish_channel(device_node *parent, uint16 command_block_base,
 
 
 static void
-set_channel(void *cookie, ide_channel ideChannel)
+set_channel(void *cookie, ata_channel ataChannel)
 {
 	channel_info *channel = cookie;
-	channel->ide_channel = ideChannel;
+	channel->ataChannel = ataChannel;
 }
 
 
 static status_t
-write_command_block_regs(void *channel_cookie, ide_task_file *tf,
-	ide_reg_mask mask)
+write_command_block_regs(void *channel_cookie, ata_task_file *tf,
+	ata_reg_mask mask)
 {
 	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
@@ -139,8 +136,8 @@ write_command_block_regs(void *channel_cookie, ide_task_file *tf,
 
 
 static status_t
-read_command_block_regs(void *channel_cookie, ide_task_file *tf,
-	ide_reg_mask mask)
+read_command_block_regs(void *channel_cookie, ata_task_file *tf,
+	ata_reg_mask mask)
 {
 	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
@@ -256,7 +253,7 @@ inthand(void *arg)
 	// acknowledge IRQ
 	status = channel->isa->read_io_8(channel->command_block_base + 7);
 
-	return ide->irq_handler(channel->ide_channel, status);
+	return sATA->interrupt_handler(channel->ataChannel, status);
 }
 
 
@@ -291,7 +288,7 @@ supports_device(device_node *parent)
 	const char *bus;
 
 	// make sure parent is really the ISA bus manager
-	if (pnp->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return B_ERROR;
 
 	if (strcmp(bus, "isa"))
@@ -318,14 +315,14 @@ init_channel(device_node *node, void **_cookie)
 	TRACE("ISA-IDE: channel init\n");
 
 	// get device data
-	if (pnp->get_attr_uint16(node, IDE_ISA_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
-		|| pnp->get_attr_uint16(node, IDE_ISA_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
-		|| pnp->get_attr_uint8(node, IDE_ISA_INTNUM, &irq, false) != B_OK)
+	if (sDeviceManager->get_attr_uint16(node, ATA_ISA_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
+		|| sDeviceManager->get_attr_uint16(node, ATA_ISA_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
+		|| sDeviceManager->get_attr_uint8(node, ATA_ISA_INTNUM, &irq, false) != B_OK)
 		return B_ERROR;
 
-	parent = pnp->get_parent_node(node);
-	pnp->get_driver(parent, (driver_module_info **)&isa, NULL);
-	pnp->put_node(parent);
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&isa, NULL);
+	sDeviceManager->put_node(parent);
 
 	channel = (channel_info *)malloc(sizeof(channel_info));
 	if (channel == NULL)
@@ -340,7 +337,7 @@ init_channel(device_node *node, void **_cookie)
 	channel->command_block_base = command_block_base;
 	channel->control_block_base = control_block_base;
 	channel->intnum = irq;
-	channel->ide_channel = NULL;
+	channel->ataChannel = NULL;
 
 	res = install_io_interrupt_handler(channel->intnum,
 		inthand, channel, 0);
@@ -351,7 +348,7 @@ init_channel(device_node *node, void **_cookie)
 	}
 
 	// enable interrupts so the channel is ready to run
-	write_device_control(channel, ide_devctrl_bit3);
+	write_device_control(channel, ATA_DEVICE_CONTROL_BIT3);
 
 	*_cookie = channel;
 	return B_OK;
@@ -370,7 +367,7 @@ uninit_channel(void *channel_cookie)
 	TRACE("ISA-IDE: channel uninit\n");
 
 	// disable IRQs
-	write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien);
+	write_device_control(channel, ATA_DEVICE_CONTROL_BIT3 | ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 	// catch spurious interrupt
 	// (some controllers generate an IRQ when you _disable_ interrupts,
@@ -416,16 +413,16 @@ channel_removed(void *cookie)
 
 
 module_dependency module_dependencies[] = {
-	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ ATA_FOR_CONTROLLER_MODULE_NAME, (module_info **)&sATA },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
 	{}
 };
 
 // exported interface
-static ide_controller_interface sISAControllerInterface = {
+static ata_controller_interface sISAControllerInterface = {
 	{
 		{
-			IDE_ISA_MODULE_NAME,
+			ATA_ISA_MODULE_NAME,
 			0,
 			NULL
 		},

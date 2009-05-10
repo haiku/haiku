@@ -3,14 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <KernelExport.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <KernelExport.h>
-#include <device_manager.h>
-#include <bus/IDE.h>
-
-#include <ide_adapter.h>
+#include <ata_adapter.h>
 
 #define TRACE(x...) dprintf("si-3112: " x)
 //#define FLOW(x...)	dprintf("si-3112: " x)
@@ -89,7 +86,7 @@ typedef struct channel_data {
 	pci_device_module_info *pci;
 	device_node *		node;
 	pci_device *		device;
-	ide_channel			ide_channel;
+	ata_channel			ataChannel;
 
 	volatile uint8 *	task_file;
 	volatile uint8 *	control_block;
@@ -109,9 +106,9 @@ typedef struct channel_data {
 } channel_data;
 
 
-static ide_for_controller_interface *	ide;
-static ide_adapter_interface *			ide_adapter;
-static device_manager_info *			dm;
+static ata_for_controller_interface* sATA;
+static ata_adapter_interface* sATAAdapter;
+static device_manager_info* sDeviceManager;
 
 static status_t device_control_write(void *channel_cookie, uint8 val);
 static int32 handle_interrupt(void *arg);
@@ -125,13 +122,13 @@ controller_supports(device_node *parent)
 	uint16 deviceID;
 
 	// get the bus (should be PCI)
-	if (dm->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK
 		|| strcmp(bus, "pci") != 0)
 		return B_ERROR;
 
 	// get vendor and device ID
-	if (dm->get_attr_uint16(parent, B_DEVICE_VENDOR_ID, &vendorID, false) != B_OK
-		|| dm->get_attr_uint16(parent, B_DEVICE_ID, &deviceID, false) != B_OK) {
+	if (sDeviceManager->get_attr_uint16(parent, B_DEVICE_VENDOR_ID, &vendorID, false) != B_OK
+		|| sDeviceManager->get_attr_uint16(parent, B_DEVICE_ID, &deviceID, false) != B_OK) {
 		return B_ERROR;
 	}
 
@@ -168,7 +165,7 @@ controller_probe(device_node *parent)
 
 	TRACE("controller_probe\n");
 
-	dm->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
 
 	deviceID = pci->read_pci_config(device, PCI_device_id, 2);
 	vendorID = pci->read_pci_config(device, PCI_vendor_id, 2);
@@ -209,17 +206,17 @@ controller_probe(device_node *parent)
 			{}
 		};
 		device_attr attrs[] = {
-			// properties of this controller for ide bus manager
+			// properties of this controller for ATA bus manager
 			// there are always max. 2 devices
-			// (unless this is a Compact Flash Card with a built-in IDE controller,
-			//  which has exactly 1 device)
-			{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: kASICData[asicIndex].channel_count }},
+			// (unless this is a Compact Flash Card with a built-in ATA
+			// controller, which has exactly 1 device)
+			{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE,
+				{ ui8: kASICData[asicIndex].channel_count }},
 			// of course we can DMA
-			{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
-			// command queuing always works
-			{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: true }},
+			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
 			// choose any name here
-			{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: CONTROLLER_NAME }},
+			{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE,
+				{ string: CONTROLLER_NAME }},
 
 			// DMA properties
 			// data must be word-aligned;
@@ -230,18 +227,21 @@ controller_probe(device_node *parent)
 			// max size of S/G block is 16 bits with zero being 64K
 			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
 			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-				{ ui32: IDE_ADAPTER_MAX_SG_COUNT }},
+				{ ui32: ATA_ADAPTER_MAX_SG_COUNT }},
 
 			// private data to find controller
-			{ "silicon_image_3112/asic_index", B_UINT32_TYPE, { ui32: asicIndex }},
-			{ "silicon_image_3112/mmio_base", B_UINT32_TYPE, { ui32: mmioBase }},
-			{ "silicon_image_3112/int_num", B_UINT32_TYPE, { ui32: interruptNumber }},
+			{ "silicon_image_3112/asic_index", B_UINT32_TYPE,
+				{ ui32: asicIndex }},
+			{ "silicon_image_3112/mmio_base", B_UINT32_TYPE,
+				{ ui32: mmioBase }},
+			{ "silicon_image_3112/int_num", B_UINT32_TYPE,
+				{ ui32: interruptNumber }},
 			{ NULL }
 		};
 
 		TRACE("publishing controller\n");
 
-		return dm->register_node(parent, CONTROLLER_MODULE_NAME, attrs,
+		return sDeviceManager->register_node(parent, CONTROLLER_MODULE_NAME, attrs,
 			resources, NULL);
 	}
 }
@@ -265,11 +265,11 @@ controller_init(device_node *node, void **_controllerCookie)
 
 	TRACE("controller_init\n");
 
-	if (dm->get_attr_uint32(node, "silicon_image_3112/asic_index", &asicIndex, false) != B_OK)
+	if (sDeviceManager->get_attr_uint32(node, "silicon_image_3112/asic_index", &asicIndex, false) != B_OK)
 		return B_ERROR;
-	if (dm->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmioBase, false) != B_OK)
+	if (sDeviceManager->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmioBase, false) != B_OK)
 		return B_ERROR;
-	if (dm->get_attr_uint32(node, "silicon_image_3112/int_num", &interruptNumber, false) != B_OK)
+	if (sDeviceManager->get_attr_uint32(node, "silicon_image_3112/int_num", &interruptNumber, false) != B_OK)
 		return B_ERROR;
 
 	controller = malloc(sizeof(controller_data));
@@ -287,9 +287,9 @@ controller_init(device_node *node, void **_controllerCookie)
 		return B_ERROR;
 	}
 
-	parent = dm->get_parent_node(node);
-	dm->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
-	dm->put_node(parent);
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
+	sDeviceManager->put_node(parent);
 
 	TRACE("asic %ld\n", asicIndex);
 	TRACE("int_num %ld\n", interruptNumber);
@@ -379,17 +379,17 @@ controller_register_channels(void *cookie)
 		device_attr attrs[] = {
 			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: DRIVER_PRETTY_NAME }},
 //			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: kControllerChannelData[channelIndex].name }},
-			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
+			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: ATA_FOR_CONTROLLER_MODULE_NAME }},
 
 			// private data to identify channel
-			{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
+			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
 			{ "silicon_image_3112/chan_index", B_UINT32_TYPE, { ui32: index }},
 			{ NULL }
 		};
 
 		TRACE("publishing %s\n", kControllerChannelData[index].name);
 
-		dm->register_node(controller->node, CHANNEL_MODULE_NAME, attrs,
+		sDeviceManager->register_node(controller->node, CHANNEL_MODULE_NAME, attrs,
 			NULL, NULL);
 	}
 
@@ -424,18 +424,18 @@ channel_init(device_node *node, void **_channelCookie)
 	if (!channel)
 		return B_NO_MEMORY;
 
-	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &channelIndex, false) != B_OK)
+	if (sDeviceManager->get_attr_uint32(node, "silicon_image_3112/chan_index", &channelIndex, false) != B_OK)
 		goto err;
 
 #if 0
 	if (1 /* debug */){
 		uint8 bus, device, function;
 		uint16 vendorID, deviceID;
-		dm->get_attr_uint8(node, PCI_DEVICE_BUS_ITEM, &bus, true);
-		dm->get_attr_uint8(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
-		dm->get_attr_uint8(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
-		dm->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
-		dm->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
+		sDeviceManager->get_attr_uint8(node, PCI_DEVICE_BUS_ITEM, &bus, true);
+		sDeviceManager->get_attr_uint8(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
+		sDeviceManager->get_attr_uint8(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
+		sDeviceManager->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
+		sDeviceManager->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
 		TRACE("bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
 			bus, device, function, vendorID, deviceID);
 	}
@@ -446,15 +446,15 @@ channel_init(device_node *node, void **_channelCookie)
 
 	TRACE("channel %p\n", channel);
 
-	parent = dm->get_parent_node(node);
-	dm->get_driver(parent, NULL, (void **)&controller);
-	dm->put_node(parent);
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, NULL, (void **)&controller);
+	sDeviceManager->put_node(parent);
 
 	TRACE("controller %p\n", controller);
 	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
 
 	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary
-	prdtSize = (IDE_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+	prdtSize = (ATA_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 	channel->prd_area = create_area("prd", (void **)&channel->prdt,
 		B_ANY_KERNEL_ADDRESS, prdtSize, B_CONTIGUOUS, 0);
 	if (channel->prd_area < B_OK) {
@@ -468,15 +468,15 @@ channel_init(device_node *node, void **_channelCookie)
 	channel->pci = controller->pci;
 	channel->device = controller->device;
 	channel->node = node;
-	channel->ide_channel = NULL;
+	channel->ataChannel = NULL;
 
 	channel->task_file = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].cmd + 1);
 	channel->control_block = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].ctl);
 	channel->command_block = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].cmd);
 	channel->dev_ctrl = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].ctl);
-	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_PRDT_ADDRESS);
-	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_STATUS_REG);
-	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_COMMAND_REG);
+	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + ATA_BM_PRDT_ADDRESS);
+	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + ATA_BM_STATUS_REG);
+	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + ATA_BM_COMMAND_REG);
 	channel->stat = (volatile uint32 *)(controller->mmio_addr + kControllerChannelData[channelIndex].stat);
 
 	channel->lost = 0;
@@ -485,7 +485,7 @@ channel_init(device_node *node, void **_channelCookie)
 	controller->channel[channelIndex] = channel;
 
 	// enable interrupts so the channel is ready to run
-	device_control_write(channel, ide_devctrl_bit3);
+	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3);
 
 	*_channelCookie = channel;
 
@@ -506,7 +506,7 @@ channel_uninit(void *channelCookie)
 	TRACE("channel_uninit enter\n");
 
 	// disable IRQs
-	device_control_write(channel, ide_devctrl_bit3 | ide_devctrl_nien);
+	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3 | ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 	// catch spurious interrupt
 	// (some controllers generate an IRQ when you _disable_ interrupts,
@@ -529,15 +529,15 @@ channel_removed(void *channelCookie)
 
 
 static void
-set_channel(void *channelCookie, ide_channel ideChannel)
+set_channel(void *channelCookie, ata_channel ataChannel)
 {
 	channel_data *channel = channelCookie;
-	channel->ide_channel = ideChannel;
+	channel->ataChannel = ataChannel;
 }
 
 
 static status_t
-task_file_write(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_write(void *channelCookie, ata_task_file *tf, ata_reg_mask mask)
 {
 	channel_data *channel = channelCookie;
 	int i;
@@ -565,7 +565,7 @@ task_file_write(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 
 
 static status_t
-task_file_read(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_read(void *channelCookie, ata_task_file *tf, ata_reg_mask mask)
 {
 	channel_data *channel = channelCookie;
 	int i;
@@ -709,8 +709,8 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 	*channel->dev_ctrl; // read altstatus to flush
 
 	// reset interrupt and error signal
-	status = *channel->bm_status_reg | IDE_BM_STATUS_INTERRUPT
-		| IDE_BM_STATUS_ERROR;
+	status = *channel->bm_status_reg | ATA_BM_STATUS_INTERRUPT
+		| ATA_BM_STATUS_ERROR;
 	*channel->bm_status_reg = status;
 
 	*channel->dev_ctrl; // read altstatus to flush
@@ -718,9 +718,9 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 	// set data direction
 	command = *channel->bm_command_reg;
 	if (write)
-		command &= ~IDE_BM_COMMAND_READ_FROM_DEVICE;
+		command &= ~ATA_BM_COMMAND_READ_FROM_DEVICE;
 	else
-		command |= IDE_BM_COMMAND_READ_FROM_DEVICE;
+		command |= ATA_BM_COMMAND_READ_FROM_DEVICE;
 
 	*channel->bm_command_reg = command;
 
@@ -740,7 +740,7 @@ dma_start(void *channelCookie)
 
 	FLOW("dma_start enter\n");
 
-	command = *channel->bm_command_reg | IDE_BM_COMMAND_START_STOP;
+	command = *channel->bm_command_reg | ATA_BM_COMMAND_START_STOP;
 	channel->dma_active = true;
 	*channel->bm_command_reg = command;
 
@@ -764,18 +764,18 @@ dma_finish(void *channelCookie)
 	status = *channel->bm_status_reg;
 
 	command = *channel->bm_command_reg;
-	*channel->bm_command_reg = command & ~IDE_BM_COMMAND_START_STOP;
+	*channel->bm_command_reg = command & ~ATA_BM_COMMAND_START_STOP;
 
 	channel->dma_active = false;
 
-	*channel->bm_status_reg = status | IDE_BM_STATUS_ERROR;
+	*channel->bm_status_reg = status | ATA_BM_STATUS_ERROR;
 	*channel->dev_ctrl; // read altstatus to flush
 
-	if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
+	if ((status & ATA_BM_STATUS_ACTIVE) != 0) {
 		TRACE("dma_finish: buffer too large\n");
 		return B_DEV_DATA_OVERRUN;
 	}
-	if ((status & IDE_BM_STATUS_ERROR) != 0) {
+	if ((status & ATA_BM_STATUS_ERROR) != 0) {
 		FLOW("dma_finish: failed\n");
 		return B_ERROR;
 	}
@@ -798,7 +798,7 @@ handle_interrupt(void *arg)
 
 	result = B_UNHANDLED_INTERRUPT;
 
-	for (i = 0; i <  controller->channel_count; i++) {
+	for (i = 0; i < controller->channel_count; i++) {
 		channel_data *channel = controller->channel[i];
 		if (!channel || channel->lost)
 			continue;
@@ -811,9 +811,10 @@ handle_interrupt(void *arg)
 			continue;
 
 		statusBM = *channel->bm_status_reg;
-		if (statusBM & IDE_BM_STATUS_INTERRUPT) {
-			*channel->bm_status_reg = (statusBM & 0xf8) | IDE_BM_STATUS_INTERRUPT;
-			ide->irq_handler(channel->ide_channel, statusATA);
+		if (statusBM & ATA_BM_STATUS_INTERRUPT) {
+			*channel->bm_status_reg
+				= (statusBM & 0xf8) | ATA_BM_STATUS_INTERRUPT;
+			sATA->interrupt_handler(channel->ataChannel, statusATA);
 			result = B_INVOKE_SCHEDULER;
 		}
 	}
@@ -823,14 +824,14 @@ handle_interrupt(void *arg)
 
 
 module_dependency module_dependencies[] = {
-	{ IDE_FOR_CONTROLLER_MODULE_NAME,	(module_info **)&ide },
-	{ B_DEVICE_MANAGER_MODULE_NAME,		(module_info **)&dm },
-	{ IDE_ADAPTER_MODULE_NAME,			(module_info **)&ide_adapter },
+	{ ATA_FOR_CONTROLLER_MODULE_NAME,	(module_info **)&sATA },
+	{ B_DEVICE_MANAGER_MODULE_NAME,		(module_info **)&sDeviceManager },
+	{ ATA_ADAPTER_MODULE_NAME,			(module_info **)&sATAAdapter },
 	{}
 };
 
 
-static ide_controller_interface sChannelInterface = {
+static ata_controller_interface sChannelInterface = {
 	{
 		{
 			CHANNEL_MODULE_NAME,
