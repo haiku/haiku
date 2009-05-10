@@ -33,9 +33,12 @@ public:
 			uint32			KeyForModifier(uint32 modifier);
 			status_t		SetModifier(uint32 keyCode, uint32 modifier);
 
-			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers);
+			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers,
+								bool* isEnabled = NULL);
 			bool			IsDeadSecondKey(uint32 keyCode, uint32 modifiers,
 								uint8 activeDeadKey);
+			void			SetDeadKeyEnabled(uint32 keyCode, uint32 modifiers,
+								bool enabled);
 			void			GetChars(uint32 keyCode, uint32 modifiers,
 								uint8 activeDeadKey, char** chars,
 								int32* numBytes);
@@ -54,6 +57,7 @@ public:
 private:
 			int32			_Offset(uint32 keyCode, uint32 modifiers,
 								uint32* _table = NULL);
+			uint8			_GetDeadKeyIndex(int32 offset);
 
 			char*			fChars;
 			key_map			fKeys;

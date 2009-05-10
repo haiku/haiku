@@ -33,6 +33,7 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	fEditable(true),
 	fModifiers(0),
 	fDeadKey(0),
+	fButtons(0),
 	fDragKey(NULL),
 	fDropTarget(NULL),
 	fOldSize(0, 0)
@@ -139,25 +140,45 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	if (key == NULL)
 		return;
 
-	if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
-		if (_KeyState(key->code)) {
-			uint32 modifier = fKeymap->Modifier(key->code);
-			if ((modifier & modifiers()) == 0) {
-				_SetKeyState(key->code, false);
-				fModifiers &= ~modifier;
+	int32 buttons = 0;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
+		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+
+	if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
+		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
+		// toggle the "deadness" of dead keys via middle mouse button
+		if (fKeymap != NULL) {
+			bool isEnabled = false;
+			uint8 deadKey
+				= fKeymap->IsDeadKey(key->code, fModifiers, &isEnabled);
+			if (deadKey > 0) {
+				fKeymap->SetDeadKeyEnabled(key->code, fModifiers, !isEnabled);
+				_InvalidateKey(key);
+			}
+		}
+	} else {
+		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code)) {
+			if (_KeyState(key->code)) {
+				uint32 modifier = fKeymap->Modifier(key->code);
+				if ((modifier & modifiers()) == 0) {
+					_SetKeyState(key->code, false);
+					fModifiers &= ~modifier;
+					Invalidate();
+				}
+			} else {
+				_SetKeyState(key->code, true);
+				fModifiers |= fKeymap->Modifier(key->code);
 				Invalidate();
 			}
+
+			// TODO: if possible, we could handle the lock keys for real
 		} else {
 			_SetKeyState(key->code, true);
-			fModifiers |= fKeymap->Modifier(key->code);
-			Invalidate();
+			_InvalidateKey(key);
 		}
-
-		// TODO: if possible, we could handle the lock keys for real
-	} else {
-		_SetKeyState(key->code, true);
-		_InvalidateKey(key);
 	}
+
+	fButtons = buttons;
 }
 
 
@@ -165,23 +186,38 @@ void
 KeyboardLayoutView::MouseUp(BPoint point)
 {
 	Key* key = _KeyAt(fClickPoint);
+
+	int32 buttons = 0;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
+		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+
 	if (key != NULL) {
-		// modifier keys are sticky when used with the mouse
-		if (fKeymap != NULL && fKeymap->IsModifierKey(key->code))
-			return;
+		if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0
+			&& (buttons & B_TERTIARY_MOUSE_BUTTON) == 0) {
+			_SetKeyState(key->code, false);
+			_InvalidateKey(key);
+			fButtons = buttons;
+		} else {
+			fButtons = buttons;
 
-		_SetKeyState(key->code, false);
+			// modifier keys are sticky when used with the mouse
+			if (fKeymap != NULL && fKeymap->IsModifierKey(key->code))
+				return;
 
-		if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
-			return;
+			_SetKeyState(key->code, false);
 
-		_InvalidateKey(key);
+			if (_HandleDeadKey(key->code, fModifiers) && fDeadKey != 0)
+				return;
 
-		if (fDragKey == NULL && fKeymap != NULL) {
-			// Send fake key down message to target
-			_SendFakeKeyDown(key);
+			_InvalidateKey(key);
+
+			if (fDragKey == NULL && fKeymap != NULL) {
+				// Send fake key down message to target
+				_SendFakeKeyDown(key);
+			}
 		}
 	}
+	fDragKey = NULL;
 }
 
 
@@ -190,6 +226,10 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* dragMessage)
 {
 	if (fKeymap == NULL)
+		return;
+
+	// rule out dragging for tertiary mouse button
+	if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0)
 		return;
 
 	if (dragMessage != NULL) {
@@ -202,7 +242,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 
 		return;
 	}
-	
+
 	int32 buttons;
 	if (Window()->CurrentMessage() == NULL
 		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
@@ -515,7 +555,7 @@ KeyboardLayoutView::_DrawKeyButton(BView* view, BRect& rect, BRect updateRect,
 {
 	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
 		background, pressed ? BControlLook::B_ACTIVATED : 0);
-	be_control_look->DrawButtonBackground(view, rect, updateRect, 
+	be_control_look->DrawButtonBackground(view, rect, updateRect,
 		base, pressed ? BControlLook::B_ACTIVATED : 0);
 }
 
@@ -529,11 +569,12 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	key_kind keyKind = kNormalKey;
 	int32 deadKey = 0;
 	bool secondDeadKey = false;
+	bool isDeadKeyEnabled = true;
 
 	char text[32];
 	if (fKeymap != NULL) {
 		_GetKeyLabel(key, text, sizeof(text), keyKind);
-		deadKey = fKeymap->IsDeadKey(key->code, fModifiers);
+		deadKey = fKeymap->IsDeadKey(key->code, fModifiers, &isDeadKeyEnabled);
 		secondDeadKey = fKeymap->IsDeadSecondKey(key->code, fModifiers,
 			fDeadKey);
 	} else {
@@ -545,7 +586,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 	if (secondDeadKey)
 		base = kSecondDeadKeyColor;
-	else if (deadKey > 0)
+	else if (deadKey > 0 && isDeadKeyEnabled)
 		base = kDeadKeyColor;
 
 	if (key->shape == kRectangleKeyShape) {
@@ -641,7 +682,7 @@ KeyboardLayoutView::_DrawIndicator(BView* view, BRect updateRect,
 
 	be_control_look->DrawButtonFrame(view, rect, updateRect, base,
 		background, BControlLook::B_DISABLED);
-	be_control_look->DrawButtonBackground(view, rect, updateRect, 
+	be_control_look->DrawButtonBackground(view, rect, updateRect,
 		base, BControlLook::B_DISABLED);
 }
 
@@ -857,14 +898,17 @@ KeyboardLayoutView::_InvalidateKey(const Key* key)
 bool
 KeyboardLayoutView::_HandleDeadKey(uint32 key, int32 modifiers)
 {
-	if (fKeymap == NULL)
+	if (fKeymap == NULL || fKeymap->IsModifierKey(key))
 		return false;
 
-	int32 deadKey = fKeymap->IsDeadKey(key, modifiers);
+	bool isEnabled = false;
+	int32 deadKey = fKeymap->IsDeadKey(key, modifiers, &isEnabled);
 	if (fDeadKey != deadKey) {
-		Invalidate();
-		fDeadKey = deadKey;
-		return true;
+		if (isEnabled) {
+			Invalidate();
+			fDeadKey = deadKey;
+			return true;
+		}
 	} else if (fDeadKey != 0) {
 		Invalidate();
 		fDeadKey = 0;

@@ -97,6 +97,7 @@ private:
 			uint8			fKeyState[16];
 			int32			fModifiers;
 			int32			fDeadKey;
+			int32			fButtons;
 
 			BPoint			fClickPoint;
 			Key*			fDragKey;

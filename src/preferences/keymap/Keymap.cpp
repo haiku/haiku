@@ -351,57 +351,28 @@ Keymap::SetModifier(uint32 keyCode, uint32 modifier)
 }
 
 
-//! Checks whether a key is a dead key.
+/*! Checks whether a key is a dead key.
+	If it is, the enabled/disabled state of that dead key will be passed
+	out via isEnabled (isEnabled is not touched for non-dead keys).
+*/
 uint8
-Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
+Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers, bool* isEnabled)
 {
-	if (fChars == NULL)
-		return 0;
-
 	uint32 tableMask = 0;
 	int32 offset = _Offset(keyCode, modifiers, &tableMask);
-	if (offset <= 0)
-		return 0;
-
-	uint32 numBytes = fChars[offset];
-	if (!numBytes)
-		return 0;
-
-	char chars[4];
-	strncpy(chars, &fChars[offset + 1], numBytes);
-	chars[numBytes] = 0;
-
-	int32 deadOffsets[] = {
-		fKeys.acute_dead_key[1],
-		fKeys.grave_dead_key[1],
-		fKeys.circumflex_dead_key[1],
-		fKeys.dieresis_dead_key[1],
-		fKeys.tilde_dead_key[1]
-	};
-
-	uint32 deadTables[] = {
-		fKeys.acute_tables,
-		fKeys.grave_tables,
-		fKeys.circumflex_tables,
-		fKeys.dieresis_tables,
-		fKeys.tilde_tables
-	};
-
-	for (int32 i = 0; i < 5; i++) {
-		if ((deadTables[i] & tableMask) == 0)
-			continue;
-
-		if (offset == deadOffsets[i])
-			return i + 1;
-
-		uint32 deadNumBytes = fChars[deadOffsets[i]];
-		if (!deadNumBytes)
-			continue;
-
-		if (strncmp(chars, &fChars[deadOffsets[i] + 1], deadNumBytes) == 0)
-			return i + 1;
+	uint8 deadKeyIndex = _GetDeadKeyIndex(offset);
+	if (deadKeyIndex > 0 && isEnabled != NULL) {
+		uint32 deadTables[] = {
+			fKeys.acute_tables,
+			fKeys.grave_tables,
+			fKeys.circumflex_tables,
+			fKeys.dieresis_tables,
+			fKeys.tilde_tables
+		};
+		*isEnabled = (deadTables[deadKeyIndex - 1] & tableMask) != 0;
 	}
-	return 0;
+
+	return deadKeyIndex;
 }
 
 
@@ -445,6 +416,33 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		i++;
 	}
 	return false;
+}
+
+
+//! Enables/disables the "deadness" of the given keycode/modifier combo.
+void
+Keymap::SetDeadKeyEnabled(uint32 keyCode, uint32 modifiers, bool enabled)
+{
+	uint32 tableMask = 0;
+	int32 offset = _Offset(keyCode, modifiers, &tableMask);
+	uint8 deadKeyIndex = _GetDeadKeyIndex(offset);
+	if (deadKeyIndex > 0) {
+		uint32* deadTables[] = {
+			&fKeys.acute_tables,
+			&fKeys.grave_tables,
+			&fKeys.circumflex_tables,
+			&fKeys.dieresis_tables,
+			&fKeys.tilde_tables
+		};
+
+		if (enabled)
+			(*deadTables[deadKeyIndex - 1]) |= tableMask;
+		else
+			(*deadTables[deadKeyIndex - 1]) &= ~tableMask;
+
+		if (fModificationMessage != NULL)
+			fTarget.SendMessage(fModificationMessage);
+	}
 }
 
 
@@ -692,4 +690,47 @@ Keymap::_Offset(uint32 keyCode, uint32 modifiers, uint32* _table)
 		return -1;
 
 	return offset;
+}
+
+
+uint8
+Keymap::_GetDeadKeyIndex(int32 offset)
+{
+	if (fChars == NULL || offset <= 0)
+		return 0;
+
+	uint32 numBytes = fChars[offset];
+	if (!numBytes)
+		return 0;
+
+	char chars[4];
+	strncpy(chars, &fChars[offset + 1], numBytes);
+	chars[numBytes] = 0;
+
+	int32 deadOffsets[] = {
+		fKeys.acute_dead_key[1],
+		fKeys.grave_dead_key[1],
+		fKeys.circumflex_dead_key[1],
+		fKeys.dieresis_dead_key[1],
+		fKeys.tilde_dead_key[1]
+	};
+
+	uint8 result = 0;
+	for (int32 i = 0; i < 5; i++) {
+		if (offset == deadOffsets[i]) {
+			result = i + 1;
+			break;
+		}
+
+		uint32 deadNumBytes = fChars[deadOffsets[i]];
+		if (!deadNumBytes)
+			continue;
+
+		if (strncmp(chars, &fChars[deadOffsets[i] + 1], deadNumBytes) == 0) {
+			result = i + 1;
+			break;
+		}
+	}
+
+	return result;
 }
