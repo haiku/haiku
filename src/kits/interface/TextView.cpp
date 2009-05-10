@@ -117,6 +117,7 @@ public:
 	int32				clickOffset;
 	bool				shiftDown;
 	BRect				selectionRect;
+	BPoint				where;
 
 	int32				anchor;
 	int32				selStart;
@@ -552,6 +553,7 @@ BTextView::MouseDown(BPoint where)
 
 	fTrackingMouse->clickOffset = OffsetAt(where);
 	fTrackingMouse->shiftDown = modifiers & B_SHIFT_KEY;
+	fTrackingMouse->where = where;
 
 	bigtime_t clickTime = system_time();
 	bigtime_t clickSpeed = 0;
@@ -738,7 +740,8 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 	}
 
 	// hide the cursor and caret
-	be_app->ObscureCursor();
+	if (IsFocus())
+		be_app->ObscureCursor();
 	_HideCaret();
 
 	switch (keyPressed) {
@@ -4458,8 +4461,11 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 	int32 currentOffset = OffsetAt(where);
 	if (fTrackingMouse->selectionRect.IsValid()) {
 		// we are tracking the mouse for drag action, if the mouse has moved
-		// from where it was clicked, we initiate a drag now:
-		if (currentOffset != fTrackingMouse->clickOffset) {
+		// to another index or more than three pixels from where it was clicked,
+		// we initiate a drag now:
+		if (currentOffset != fTrackingMouse->clickOffset
+			|| fabs(fTrackingMouse->where.x - where.x) > 3
+			|| fabs(fTrackingMouse->where.y - where.y) > 3) {
 			_StopMouseTracking();
 			_InitiateDrag();
 			return true;
@@ -5126,7 +5132,8 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 
 	_HideCaret();
 
-	be_app->ObscureCursor();
+	if (IsFocus())
+		be_app->ObscureCursor();
 
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current InlineInput object
