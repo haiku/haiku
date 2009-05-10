@@ -5,6 +5,7 @@
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Jonas Sundström
  */
 #ifndef STYLED_EDIT_APP
 #define STYLED_EDIT_APP
@@ -28,14 +29,13 @@ class StyledEditApp : public BApplication {
 		virtual			~StyledEditApp();
 
 		virtual void	MessageReceived(BMessage *message);
+		virtual void	ArgvReceived(int32 argc, char** argv);
 		virtual void	RefsReceived(BMessage *message);
 		virtual void	ReadyToRun();
 
-		virtual void	DispatchMessage(BMessage *an_event, BHandler *handler);
-
 		int32			NumberOfWindows();
 		void			OpenDocument();
-		void			OpenDocument(entry_ref *ref);
+		status_t		OpenDocument(entry_ref *ref);
 		void			CloseDocument();
 
 	private:
@@ -47,7 +47,7 @@ class StyledEditApp : public BApplication {
 		uint32			fOpenAsEncoding;
 		int32			fWindowCount;
 		int32			fNextUntitledWindow;
-		
+		bool			fBadArguments;
 };
 
 extern StyledEditApp* styled_edit_app;

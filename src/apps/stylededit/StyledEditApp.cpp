@@ -5,6 +5,7 @@
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Jonas Sundström
  */
 
 
@@ -115,6 +116,7 @@ StyledEditApp::StyledEditApp()
 
 	fWindowCount = 0;
 	fNextUntitledWindow = 1;
+	fBadArguments = false;
 
 	styled_edit_app = this;
 }
@@ -123,31 +125,6 @@ StyledEditApp::StyledEditApp()
 StyledEditApp::~StyledEditApp()
 {
 	delete fOpenPanel;
-}
-
-
-void
-StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
-{
-	if (msg->what == B_ARGV_RECEIVED) {
-		int32 argc;
-		if (msg->FindInt32("argc", &argc) != B_OK)
-			argc = 0;
-
-		const char** argv = new const char*[argc];
-		for (int arg = 0; arg < argc; arg++) {
-			if (msg->FindString("argv", arg, &argv[arg]) != B_OK) {
-				argv[arg] = "";
-			}
-		}
-		const char* cwd;
-		if (msg->FindString("cwd", &cwd) != B_OK)
-			cwd = "";
-
-		ArgvReceivedEx(argc, argv, cwd);
-		delete[] argv;
-	} else
-		BApplication::DispatchMessage(msg, handler);
 }
 
 
@@ -188,12 +165,56 @@ StyledEditApp::OpenDocument()
 }
 
 
-void
+status_t
 StyledEditApp::OpenDocument(entry_ref* ref)
 {
+	// traverse eventual symlink
+	BEntry entry(ref, true);
+	entry.GetRef(ref);
+
+	if (entry.IsDirectory()) {
+		BPath path(&entry);
+		fprintf(stderr, 
+			"Can't open directory \"%s\" for editing.\n",
+			path.Path());
+		return B_ERROR;
+	}
+
+	BEntry parent;
+	entry.GetParent(&parent);
+
+	if (!entry.Exists() && !parent.Exists()) {
+		fprintf(stderr, 
+			"Can't create file. Missing parent directory.\n");
+		return B_ERROR;
+	}
+
+	BWindow* window = NULL;
+	StyledEditWindow* document = NULL;
+
+	for (int32 index = 0; ; index++) {
+		window = WindowAt(index);
+		if (window == NULL)
+			break;
+
+		document = dynamic_cast<StyledEditWindow*>(window);
+		if (document == NULL)
+			continue;
+
+		if (document->IsDocumentEntryRef(ref)) {
+			if (document->Lock()) {
+				document->Activate();
+				document->Unlock();
+				return B_OK;
+			}
+		}
+	}
+
 	cascade();
 	new StyledEditWindow(gWindowRect, ref, fOpenAsEncoding);
 	fWindowCount++;
+
+	return B_OK;
 }
 
 
@@ -222,32 +243,18 @@ StyledEditApp::RefsReceived(BMessage *message)
 
 
 void
-StyledEditApp::ArgvReceivedEx(int32 argc, const char* argv[], const char* cwd)
+StyledEditApp::ArgvReceived(int32 argc, char* argv[])
 {
 	for (int i = 1 ; (i < argc) ; i++) {
-		BPath path;
-		if (argv[i][0] == '/')
-			path.SetTo(argv[i]);
-		else
-			path.SetTo(cwd, argv[i]);
+		BPath path(argv[i]);
+		entry_ref ref;	
+		get_ref_for_path(path.Path(), &ref);
+		
+		status_t status;
+		status = OpenDocument(&ref);
 
-		if (path.InitCheck() != B_OK) {
-			fprintf(stderr, "Setting path failed: \"");
-			if (argv[i][0] == '/')
-				fprintf(stderr, "%s\".\n", argv[i]);
-			else
-				fprintf(stderr, "%s/%s\".\n", cwd, argv[i]);
-			continue;
-		}
-
-		entry_ref ref;
-		status_t status = get_ref_for_path(path.Path(), &ref);
-		if (status != B_OK) {
-			fprintf(stderr, "Could not open \"%s\": %s.\n", path.Path(), strerror(status));
-			continue;
-		}
-
-		OpenDocument(&ref);
+		if (status != B_OK && IsLaunching())
+			fBadArguments = true;
 	}
 }
 
@@ -255,7 +262,12 @@ StyledEditApp::ArgvReceivedEx(int32 argc, const char* argv[], const char* cwd)
 void 
 StyledEditApp::ReadyToRun() 
 {
-	if (fWindowCount == 0)
+	if (fWindowCount > 0)
+		return;
+
+	if (fBadArguments)
+		Quit();
+	else
 		OpenDocument();
 }
 

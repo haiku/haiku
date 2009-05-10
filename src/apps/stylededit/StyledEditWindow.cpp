@@ -6,6 +6,7 @@
  *		Mattias Sundblad
  *		Andrew Bachmann
  *		Philippe Saint-Pierre
+ *		Jonas Sundström
  */
 
 #include "Constants.h"
@@ -27,6 +28,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Path.h>
 #include <PrintJob.h>
 #include <Rect.h>
 #include <Roster.h>
@@ -1345,3 +1347,31 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 
 	return alert->Go();
 }
+
+
+bool
+StyledEditWindow::IsDocumentEntryRef(const entry_ref* ref)
+{
+	if (ref == NULL)
+		return false;
+
+	if (fSaveMessage == NULL)
+		return false;
+
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return false;
+
+	entry_ref documentRef;
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+	get_ref_for_path(documentPath.Path(), &documentRef);
+
+	if (*ref == documentRef)
+		return true;
+
+	return false;
+}
+

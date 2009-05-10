@@ -5,6 +5,7 @@
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
+ *		Jonas Sundström
  */
 #ifndef STYLED_EDIT_WINDOW_H
 #define STYLED_EDIT_WINDOW_H
@@ -43,6 +44,7 @@ class StyledEditWindow : public BWindow {
 		status_t		PageSetup(const char *documentname);
 		void			Print(const char *documentname);
 		void			SearchAllWindows(BString find, BString replace, bool casesens);
+		bool			IsDocumentEntryRef(const entry_ref *ref);
 
 	private: 
 		void			InitWindow(uint32 encoding = 0);
