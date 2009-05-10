@@ -38,10 +38,10 @@ CalcWindow::CalcWindow(BRect frame, BMessage *settings)
 	fCalcView = new CalcView(frame, baseColor, settings);
 	
 	// create replicant dragger
-	BRect replicant_frame(frame);
-	replicant_frame.top = replicant_frame.bottom - 7.0f;
-	replicant_frame.left = replicant_frame.right - 7.0f;
-	BDragger* dragger = new BDragger(replicant_frame, fCalcView,
+	BRect replicantFrame(frame);
+	replicantFrame.top = replicantFrame.bottom - 7.0f;
+	replicantFrame.left = replicantFrame.right - 7.0f;
+	BDragger* dragger = new BDragger(replicantFrame, fCalcView,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	
 	// attach views
