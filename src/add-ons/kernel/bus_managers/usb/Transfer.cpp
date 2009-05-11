@@ -126,6 +126,10 @@ Transfer::AdvanceByFragment(size_t actualLength)
 status_t
 Transfer::InitKernelAccess()
 {
+	// nothing to do if we are already prepared
+	if (fClonedArea >= B_OK)
+		return B_OK;
+
 	// we might need to access a buffer in userspace. this will not
 	// be possible in the kernel space finisher thread unless we
 	// get the proper area id for the space we need and then clone it
