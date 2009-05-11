@@ -449,9 +449,9 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 		return stream;
 	}
 
-	dprintf("hda: hda_audio_group_get_widgets failed for %s stream\n", 
+	dprintf("hda: hda_audio_group_get_widgets failed for %s stream\n",
 		type == STREAM_PLAYBACK ? " playback" : "record");
-	
+
 	free(stream);
 	return NULL;
 }
@@ -512,7 +512,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	corb_t verb[2];
 	uint8* buffer;
 	status_t rc;
-	
+
 	/* Clear previously allocated memory */
 	if (stream->buffer_area >= B_OK) {
 		delete_area(stream->buffer_area);
@@ -546,10 +546,17 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			break;
 		}
 	}
-	
-	// Stream interrupts seem to arrive too early on most HDA
-	// so we adjust buffer descriptors to take this into account
-	uint32 offset = (stream->sample_size * stream->num_channels) * stream->rate / 48000;
+
+    // Stream interrupts seem to arrive too early on most HDA
+    // so we adjust buffer descriptors to take this into account
+    uint32 offset;
+    if (format & FORMAT_44_1_BASE_RATE) {
+        offset = (stream->sample_size * stream->num_channels) * stream->rate
+        	/ 44100;
+    } else {
+        offset = (stream->sample_size * stream->num_channels) * stream->rate
+        	/ 48000;
+    }
 	if (stream->controller->pci_info.vendor_id != INTEL_VENDORID)
 		offset *= 32;
 
@@ -732,7 +739,7 @@ hda_hw_init(hda_controller* controller)
 {
 	uint16 capabilities, stateStatus, cmd;
 	status_t status;
-	
+
 	/* Map MMIO registers */
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		(void*)controller->pci_info.u.h0.base_registers[0],
@@ -761,20 +768,20 @@ hda_hw_init(hda_controller* controller)
 
 	/* TCSEL is reset to TC0 (clear 0-2 bits) */
 	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0, 1);
-	
+
 	/* Enable snooping for ATI and Nvidia, right now for all their hda-devices,
 	   but only based on guessing. */
 	switch (controller->pci_info.vendor_id) {
 		case NVIDIA_VENDORID:
-			update_pci_register(controller, NVIDIA_HDA_TRANSREG, 
+			update_pci_register(controller, NVIDIA_HDA_TRANSREG,
 				NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS, 1);
-			update_pci_register(controller, NVIDIA_HDA_ISTRM_COH, 
+			update_pci_register(controller, NVIDIA_HDA_ISTRM_COH,
 				~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
-			update_pci_register(controller, NVIDIA_HDA_OSTRM_COH, 
+			update_pci_register(controller, NVIDIA_HDA_OSTRM_COH,
 				~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
 			break;
 		case ATI_VENDORID:
-			update_pci_register(controller, ATI_HDA_MISC_CNTR2, 
+			update_pci_register(controller, ATI_HDA_MISC_CNTR2,
 				ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP, 1);
 			break;
 		case INTEL_VENDORID:
