@@ -245,8 +245,48 @@ StyledEditApp::RefsReceived(BMessage *message)
 void
 StyledEditApp::ArgvReceived(int32 argc, char* argv[])
 {
+	// StyledEdit has the "single launch" flag set in its 
+	// resources. This means that while StyledEdit is running,
+	// additional StyledEdit invocations will not result in a
+	// new process but re-use the existing one, calling the
+	// hook methods of the BApplication subclass: ArgvReceived(),
+	// RefsReceived() or MessageReceived(B_SILENT_RELAUNCH),
+	// depending on the nature of the invocation.
+
+	// An implication of this relevant to ArgvReceived() is
+	// that the running application might have a current
+	// working directory different from the one of a later
+	// invocation. Arguments received from the later invocation,
+	// if having relative paths, will be incorrect when 
+	// interpreted as relative to the current working directory.
+
+	// BApplication's ArgvReceived() method does not supply
+	// the cwd of the invocation, but the BMessage by which
+	// the arguments get communicated to the BApplication
+	// supplies a cwd string. So we ask the BApplication, 
+	// to show the current message - the one that triggered
+	// the ArgvReceived() hook method - extract the cwd 
+	// string from it and patch any relative paths in argv.
+
+	// This does not take into account --option handling
+	// and how to avoid prepending a path to such arguments
+
+	const char* cwd = "";
+	BMessage* message = CurrentMessage();
+
+	if (message != NULL) {
+		if (message->FindString("cwd", &cwd) != B_OK)
+			cwd = "";
+	}
+
 	for (int i = 1 ; (i < argc) ; i++) {
-		BPath path(argv[i]);
+		BPath path;
+		if (argv[i][0] == '/')
+			path.SetTo(argv[i]);
+		else
+			path.SetTo(cwd, argv[i]);
+				// patch relative paths only
+
 		entry_ref ref;	
 		get_ref_for_path(path.Path(), &ref);
 		
