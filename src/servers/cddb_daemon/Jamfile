@@ -4,5 +4,6 @@ UsePrivateHeaders drivers ;
 
 Server cddb_daemon :
 	cddb_daemon.cpp
-	: be
+	cddb_server.cpp
+	: be bnetapi
 	;
