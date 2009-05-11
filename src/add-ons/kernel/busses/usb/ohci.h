@@ -7,7 +7,6 @@
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-
 #ifndef OHCI_H
 #define OHCI_H
 
@@ -19,15 +18,15 @@ struct pci_info;
 struct pci_module_info;
 class OHCIRootHub;
 
-typedef struct transfer_data_s {
-	Transfer					*transfer;
-	ohci_endpoint_descriptor	*endpoint;
-	ohci_general_td				*first_descriptor;
-	ohci_general_td				*data_descriptor;
-	ohci_general_td				*last_descriptor;
+typedef struct transfer_data {
+	Transfer *					transfer;
+	ohci_endpoint_descriptor *	endpoint;
+	ohci_general_td *			first_descriptor;
+	ohci_general_td *			data_descriptor;
+	ohci_general_td *			last_descriptor;
 	bool						incoming;
 	bool						canceled;
-	transfer_data_s				*link;
+	transfer_data *				link;
 } transfer_data;
 
 
@@ -89,15 +88,15 @@ static	int32						_FinishThread(void *data);
 										transfer_data *transfer);
 
 		// Endpoint related methods
-		ohci_endpoint_descriptor	*_AllocateEndpoint();
+		ohci_endpoint_descriptor *	_AllocateEndpoint();
 		void						_FreeEndpoint(
 										ohci_endpoint_descriptor *endpoint);
 		status_t					_InsertEndpointForPipe(Pipe *pipe);
 		status_t					_RemoveEndpointForPipe(Pipe *pipe);
-		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
+		ohci_endpoint_descriptor *	_FindInterruptEndpoint(uint8 interval);
 
 		// Transfer descriptor related methods
-		ohci_general_td				*_CreateGeneralDescriptor(
+		ohci_general_td *			_CreateGeneralDescriptor(
 										size_t bufferSize);
 		void						_FreeGeneralDescriptor(
 										ohci_general_td *descriptor);
@@ -122,7 +121,7 @@ static	int32						_FinishThread(void *data);
 		void						_LinkDescriptors(ohci_general_td *first,
 										ohci_general_td *second);
 
-		ohci_isochronous_td			*_CreateIsochronousDescriptor();
+		ohci_isochronous_td *		_CreateIsochronousDescriptor();
 		void						_FreeIsochronousDescriptor(
 										ohci_isochronous_td *descriptor);
 
@@ -140,33 +139,33 @@ inline	uint32						_ReadReg(uint32 reg);
 		void						_PrintDescriptorChain(
 										ohci_general_td *topDescriptor);
 
-static	pci_module_info				*sPCIModule;
-		pci_info					*fPCIInfo;
-		Stack						*fStack;
+static	pci_module_info *			sPCIModule;
+		pci_info *					fPCIInfo;
+		Stack *						fStack;
 
-		uint8						*fOperationalRegisters;
+		uint8 *						fOperationalRegisters;
 		area_id						fRegisterArea;
 
 		// Host Controller Communication Area related stuff
 		area_id						fHccaArea;
-		ohci_hcca					*fHcca;
-		ohci_endpoint_descriptor	**fInterruptEndpoints;
+		ohci_hcca *					fHcca;
+		ohci_endpoint_descriptor **	fInterruptEndpoints;
 
 		// Endpoint management
 		mutex						fEndpointLock;
-		ohci_endpoint_descriptor	*fDummyControl;
-		ohci_endpoint_descriptor	*fDummyBulk;
-		ohci_endpoint_descriptor	*fDummyIsochronous;
+		ohci_endpoint_descriptor *	fDummyControl;
+		ohci_endpoint_descriptor *	fDummyBulk;
+		ohci_endpoint_descriptor *	fDummyIsochronous;
 
 		// Maintain a linked list of transfer
-		transfer_data				*fFirstTransfer;
-		transfer_data				*fLastTransfer;
+		transfer_data *				fFirstTransfer;
+		transfer_data *				fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 
 		// Root Hub
-		OHCIRootHub					*fRootHub;
+		OHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
 
 		// Port management

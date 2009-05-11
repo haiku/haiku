@@ -5,7 +5,6 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-
 #ifndef EHCI_H
 #define EHCI_H
 
@@ -18,13 +17,13 @@ struct pci_module_info;
 class EHCIRootHub;
 
 
-typedef struct transfer_data_s {
-	Transfer		*transfer;
-	ehci_qh			*queue_head;
-	ehci_qtd		*data_descriptor;
+typedef struct transfer_data {
+	Transfer *		transfer;
+	ehci_qh *		queue_head;
+	ehci_qtd *		data_descriptor;
 	bool			incoming;
 	bool			canceled;
-	transfer_data_s	*link;
+	transfer_data *	link;
 } transfer_data;
 
 
@@ -75,7 +74,7 @@ static	int32						CleanupThread(void *data);
 		void						Cleanup();
 
 		// Queue Head functions
-		ehci_qh						*CreateQueueHead();
+		ehci_qh *					CreateQueueHead();
 		status_t					InitQueueHead(ehci_qh *queueHead,
 										Pipe *pipe);
 		void						FreeQueueHead(ehci_qh *queueHead);
@@ -97,7 +96,8 @@ static	int32						CleanupThread(void *data);
 										bool *directionIn);
 
 		// Descriptor functions
-		ehci_qtd					*CreateDescriptor(size_t bufferSizeToAllocate,
+		ehci_qtd *					CreateDescriptor(
+										size_t bufferSizeToAllocate,
 										uint8 pid);
 		status_t					CreateDescriptorChain(Pipe *pipe,
 										ehci_qtd **firstDescriptor,
@@ -112,7 +112,8 @@ static	int32						CleanupThread(void *data);
 		void						LinkDescriptors(ehci_qtd *first,
 										ehci_qtd *last, ehci_qtd *alt);
 
-		size_t						WriteDescriptorChain(ehci_qtd *topDescriptor,
+		size_t						WriteDescriptorChain(
+										ehci_qtd *topDescriptor,
 										iovec *vector, size_t vectorCount);
 		size_t						ReadDescriptorChain(ehci_qtd *topDescriptor,
 										iovec *vector, size_t vectorCount,
@@ -129,36 +130,36 @@ inline	uint8						ReadCapReg8(uint32 reg);
 inline	uint16						ReadCapReg16(uint32 reg);
 inline	uint32						ReadCapReg32(uint32 reg);
 
-static	pci_module_info				*sPCIModule;
+static	pci_module_info *			sPCIModule;
 
-		uint8						*fCapabilityRegisters;
-		uint8						*fOperationalRegisters;
+		uint8 *						fCapabilityRegisters;
+		uint8 *						fOperationalRegisters;
 		area_id						fRegisterArea;
-		pci_info					*fPCIInfo;
-		Stack						*fStack;
+		pci_info *					fPCIInfo;
+		Stack *						fStack;
 		uint32						fEnabledInterrupts;
 
 		// Periodic transfer framelist and interrupt entries
 		area_id						fPeriodicFrameListArea;
-		addr_t						*fPeriodicFrameList;
-		interrupt_entry				*fInterruptEntries;
+		addr_t *					fPeriodicFrameList;
+		interrupt_entry *			fInterruptEntries;
 
 		// Async transfer queue management
-		ehci_qh						*fAsyncQueueHead;
+		ehci_qh *					fAsyncQueueHead;
 		sem_id						fAsyncAdvanceSem;
 
 		// Maintain a linked list of transfers
-		transfer_data				*fFirstTransfer;
-		transfer_data				*fLastTransfer;
+		transfer_data *				fFirstTransfer;
+		transfer_data *				fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		sem_id						fCleanupSem;
 		thread_id					fCleanupThread;
 		bool						fStopThreads;
-		ehci_qh						*fFreeListHead;
+		ehci_qh *					fFreeListHead;
 
 		// Root Hub
-		EHCIRootHub					*fRootHub;
+		EHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
 
 		// Port management

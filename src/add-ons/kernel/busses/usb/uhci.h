@@ -7,7 +7,6 @@
  *		Niels S. Reedijk
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  */
-
 #ifndef UHCI_H
 #define UHCI_H
 
@@ -54,39 +53,39 @@ public:
 
 private:
 		status_t					fStatus;
-		Stack						*fStack;
-		uhci_qh						*fQueueHead;
-		uhci_td						*fStrayDescriptor;
-		uhci_qh						*fQueueTop;
+		Stack *						fStack;
+		uhci_qh *					fQueueHead;
+		uhci_td *					fStrayDescriptor;
+		uhci_qh *					fQueueTop;
 		mutex						fLock;
 };
 
 
-typedef struct transfer_data_s {
-	Transfer		*transfer;
-	Queue			*queue;
-	uhci_qh			*transfer_queue;
-	uhci_td			*first_descriptor;
-	uhci_td			*data_descriptor;
+typedef struct transfer_data {
+	Transfer *		transfer;
+	Queue *			queue;
+	uhci_qh *		transfer_queue;
+	uhci_td *		first_descriptor;
+	uhci_td *		data_descriptor;
 	bool			incoming;
 	bool			canceled;
-	transfer_data_s	*link;
+	transfer_data *	link;
 } transfer_data;
 
 
 // This structure is used to create a list of
 // descriptors per isochronous transfer
-typedef struct isochronous_transfer_data_s {
-	Transfer					*transfer;
+typedef struct isochronous_transfer_data {
+	Transfer *					transfer;
 	// The next field is used to keep track
 	// of every isochronous descriptor as they are NOT
 	// linked to each other in a queue like in every other
 	// transfer type
-	uhci_td						**descriptors;
+	uhci_td **					descriptors;
 	uint16						last_to_process;
 	bool						incoming;
 	bool						is_active;
-	isochronous_transfer_data_s	*link;
+	isochronous_transfer_data *	link;
 } isochronous_transfer_data;
 
 
@@ -145,22 +144,22 @@ static	int32						FinishThread(void *data);
 		// Isochronous transfer functions
 static int32						FinishIsochronousThread(void *data);
 		void						FinishIsochronousTransfers();
-		isochronous_transfer_data	*FindIsochronousTransfer(uhci_td *descriptor);
+		isochronous_transfer_data *	FindIsochronousTransfer(uhci_td *descriptor);
 
 		status_t					LinkIsochronousDescriptor(
 										uhci_td *descriptor,
 										uint16 frame);
-		uhci_td						*UnlinkIsochronousDescriptor(uint16 frame);
+		uhci_td *					UnlinkIsochronousDescriptor(uint16 frame);
 
 		// Transfer queue functions
-		uhci_qh						*CreateTransferQueue(uhci_td *descriptor);
+		uhci_qh *					CreateTransferQueue(uhci_td *descriptor);
 		void						FreeTransferQueue(uhci_qh *queueHead);
 
 		bool						LockIsochronous();
 		void						UnlockIsochronous();
 
 		// Descriptor functions
-		uhci_td						*CreateDescriptor(Pipe *pipe,
+		uhci_td *					CreateDescriptor(Pipe *pipe,
 										uint8 direction,
 										size_t bufferSizeToAllocate);
 		status_t					CreateDescriptorChain(Pipe *pipe,
@@ -198,51 +197,50 @@ inline	uint8						ReadReg8(uint32 reg);
 inline	uint16						ReadReg16(uint32 reg);
 inline	uint32						ReadReg32(uint32 reg);
 
-static	pci_module_info				*sPCIModule; 
+static	pci_module_info *			sPCIModule; 
 
 		uint32						fRegisterBase;
-		pci_info					*fPCIInfo;
-		Stack						*fStack;
+		pci_info *					fPCIInfo;
+		Stack *						fStack;
 		uint32						fEnabledInterrupts;
 
 		// Frame list memory
 		area_id						fFrameArea;
-		uint32						*fFrameList;
+		uint32 *					fFrameList;
 
 		// fFrameBandwidth[n] holds the available bandwidth
 		// of the nth frame in microseconds
-		uint16						*fFrameBandwidth;
+		uint16 *					fFrameBandwidth;
 
 		// fFirstIsochronousTransfer[n] and fLastIsochronousDescriptor[n]
 		// keeps track of the first and last isochronous transfer descriptor
 		// in the nth frame
-		uhci_td						**fFirstIsochronousDescriptor;
-		uhci_td						**fLastIsochronousDescriptor;
+		uhci_td **					fFirstIsochronousDescriptor;
+		uhci_td **					fLastIsochronousDescriptor;
 
 		// Queues
 		int32						fQueueCount;
-		Queue						**fQueues;
+		Queue **					fQueues;
 
 		// Maintain a linked list of transfers
-		transfer_data				*fFirstTransfer;
-		transfer_data				*fLastTransfer;
+		transfer_data *				fFirstTransfer;
+		transfer_data *				fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 
 		// Maintain a linked list of isochronous transfers
-		isochronous_transfer_data	*fFirstIsochronousTransfer;
-		isochronous_transfer_data	*fLastIsochronousTransfer;
+		isochronous_transfer_data *	fFirstIsochronousTransfer;
+		isochronous_transfer_data *	fLastIsochronousTransfer;
 		sem_id						fFinishIsochronousTransfersSem;
 		thread_id					fFinishIsochronousThread;
 		mutex						fIsochronousLock;
 		bool						fStopFinishIsochronousThread;
 
 		// Root hub
-		UHCIRootHub					*fRootHub;
+		UHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
 		uint8						fPortResetChange;
-
 };
 
 
