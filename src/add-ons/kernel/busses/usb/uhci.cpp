@@ -1361,31 +1361,20 @@ UHCI::FinishTransfers()
 							TRACE("still %ld bytes left on transfer\n",
 								transfer->transfer->VectorLength());
 
+							Transfer *resubmit = transfer->transfer;
+
 							// free the used descriptors
 							transfer->queue->RemoveTransfer(transfer->transfer_queue);
 							FreeDescriptorChain(transfer->first_descriptor);
 
 							// resubmit the advanced transfer so the rest
 							// of the buffers are transmitted over the bus
-							transfer->transfer->PrepareKernelAccess();
-							status_t result = CreateFilledTransfer(transfer->transfer,
-								&transfer->first_descriptor,
-								&transfer->transfer_queue);
-							transfer->data_descriptor = transfer->first_descriptor;
-							if (result == B_OK && Lock()) {
-								// reappend the transfer
-								if (fLastTransfer)
-									fLastTransfer->link = transfer;
-								if (!fFirstTransfer)
-									fFirstTransfer = transfer;
+							resubmit->PrepareKernelAccess();
+							if (SubmitTransfer(resubmit) != B_OK)
+								resubmit->Finished(B_ERROR, 0);
 
-								fLastTransfer = transfer;
-								Unlock();
-
-								transfer->queue->AppendTransfer(transfer->transfer_queue);
-								transfer = next;
-								continue;
-							}
+							transfer = next;
+							continue;
 						}
 
 						// the transfer is done, but we already set the
