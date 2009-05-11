@@ -43,10 +43,21 @@ width="64" height="64" />People</h1>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/People</span></td></tr>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/People_data</span></td></tr>
 </table>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+
+<p>People is a simple contact database using the <a href="../attributes.html">attributes</a> of Haiku's filesystem to store addresses and other contact information. Every contact is saved as one Person file with its data in separate attributes. All are indexed and therefore searchable with a <a href="../queries.html">query</a>.</p>
+
+<img src="../../images/apps-images/people.png" alt="people.png" width="332" height="404" />
+
+<p>The Group attribute at the bottom allows assigning a person to one or more groups. Useful for "mass mailing" a number of people who, for example, work on a specific project. The drop-down menu offers all currently existing groups. If a person belongs to more than one group, the group names are delimited with a "<tt>,</tt>".</p>
+
+<p>These Person files are usually all saved in <span class="path">/boot/home/people/</span>. To get a list of all your contacts, just open your people folder and display all attributes of interest. If you choose to organize your Person files in different folders, just use a query to display them all in one window. </p>
+
+<img src="../../images/apps-images/people-files.png" alt="people-files.png" width="735" height="233" />
+
+<p>You can treat these files like any other: You can sort according to attributes (even a second sorting order by holding <span class="key">SHIFT</span> while clicking) and of course delete, duplicate or rename Person files. Even the contact information can be edited directly: Clicking on an attribute (or <span class="key">ALT</span>&#160;<span class="key">E</span>) to edit works just like renaming a file. Once you're in edit mode, <span class="key">TAB</span> and <span class="key">SHIFT</span>&#160;<span class="key">TAB</span> will jump from column to column.</p>
 
 </div>
-<!--
+
 <div class="bottomnav">
 	<p>
 		<a href="../applications.html#list-of-apps">Applications</a>
@@ -56,6 +67,6 @@ width="64" height="64" />People</h1>
 		Next: <a href="apps-poorman.html">PoorMan</a>
 	</p>
 </div>
--->
+
 </body>
 </html>
