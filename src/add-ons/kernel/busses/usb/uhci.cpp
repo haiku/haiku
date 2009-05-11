@@ -684,8 +684,8 @@ UHCI::ProcessDebugTransfer(Transfer *transfer)
 			}
 
 			if ((descriptor->link_phy & TD_TERMINATE)
-				|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
-				< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
+				|| uhci_td_actual_length(descriptor)
+					< uhci_td_maximum_length(descriptor)) {
 				transferOK = true;
 				break;
 			}
@@ -1295,8 +1295,9 @@ UHCI::FinishTransfers()
 				}
 
 				if ((descriptor->link_phy & TD_TERMINATE)
-					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
-					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
+					|| ((descriptor->status & TD_CONTROL_SPD) != 0
+						&& uhci_td_actual_length(descriptor)
+							< uhci_td_maximum_length(descriptor))) {
 					// all descriptors are done, or we have a short packet
 					TRACE("td (0x%08lx) ok\n", descriptor->this_phy);
 					callbackStatus = B_OK;
@@ -1903,7 +1904,8 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 		result->status |= TD_CONTROL_ISOCHRONOUS;
 	else {
 		result->status |= TD_CONTROL_3_ERRORS;
-		if (direction == TD_TOKEN_IN)
+		if (direction == TD_TOKEN_IN
+			&& (pipe->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 			result->status |= TD_CONTROL_SPD;
 	}
 	if (pipe->Speed() == USB_SPEED_LOWSPEED)
@@ -2086,9 +2088,7 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 			break;
 
 		dataToggle = (current->token >> TD_TOKEN_DATA_TOGGLE_SHIFT) & 0x01;
-		size_t bufferSize = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
-		if (bufferSize == TD_STATUS_ACTLEN_NULL + 1)
-			bufferSize = 0;
+		size_t bufferSize = uhci_td_actual_length(current);
 
 		while (true) {
 			size_t length = min_c(bufferSize - bufferOffset,
@@ -2144,11 +2144,7 @@ UHCI::ReadActualLength(uhci_td *topDescriptor, uint8 *lastDataToggle)
 	uint8 dataToggle = 0;
 
 	while (current && (current->status & TD_STATUS_ACTIVE) == 0) {
-		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
-		if (length == TD_STATUS_ACTLEN_NULL + 1)
-			length = 0;
-
-		actualLength += length;
+		actualLength += uhci_td_actual_length(current);
 		dataToggle = (current->token >> TD_TOKEN_DATA_TOGGLE_SHIFT) & 0x01;
 
 		if (current->link_phy & TD_TERMINATE)
@@ -2191,10 +2187,7 @@ UHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer,
 		uhci_td *current = transfer->descriptors[i];
 
 		size_t bufferSize = current->buffer_size;
-		size_t actualLength = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
-
-		if (actualLength == TD_STATUS_ACTLEN_NULL + 1)
-			actualLength = 0;
+		size_t actualLength = uhci_td_actual_length(current);
 
 		isochronousData->packet_descriptors[i].actual_length = actualLength;
 

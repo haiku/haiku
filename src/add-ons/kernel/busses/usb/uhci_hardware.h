@@ -140,6 +140,26 @@ typedef struct
 #define TD_LINK_MASK				0xfffffff0
 
 
+static inline size_t
+uhci_td_maximum_length(uhci_td *descriptor)
+{
+	size_t length = (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT) + 1;
+	if (length == TD_STATUS_ACTLEN_NULL + 1)
+		return 0;
+	return length;
+}
+
+
+static inline size_t
+uhci_td_actual_length(uhci_td *descriptor)
+{
+	size_t length = (descriptor->status & TD_STATUS_ACTLEN_MASK) + 1;
+	if (length == TD_STATUS_ACTLEN_NULL + 1)
+		return 0;
+	return length;
+}
+
+
 // Represents a Queue Head (QH)
 typedef struct
 {
