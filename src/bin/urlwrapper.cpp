@@ -21,6 +21,7 @@
 #include <TypeConstants.h>
 #include <Roster.h>
 #include <String.h>
+#include <Url.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -50,36 +51,6 @@ const char *kIMSig = "application/x-vnd.m_eiman.sample_im_client";
 const char *kVLCSig = "application/x-vnd.videolan-vlc";
 #endif
 
-// TODO: make a public BUrl class for use by apps ?
-class Url : public BString {
-public:
-		Url(const char *url) : BString(url) { fStatus = ParseAndSplit(); };
-		~Url() {};
-status_t	InitCheck() const { return fStatus; };
-status_t	ParseAndSplit();
-
-bool		HasHost() const { return host.Length(); };
-bool		HasPort() const { return port.Length(); };
-bool		HasUser() const { return user.Length(); };
-bool		HasPass() const { return pass.Length(); };
-bool		HasPath() const { return path.Length(); };
-BString		Proto() const { return BString(proto); };
-BString		Full() const { return BString(full); }; // RFC1738's "sheme-part"
-BString		Host() const { return BString(host); };
-BString		Port() const { return BString(port); };
-BString		User() const { return BString(user); };
-BString		Pass() const { return BString(pass); };
-
-BString		proto;
-BString		full;
-BString		host;
-BString		port;
-BString		user;
-BString		pass;
-BString		path;
-private:
-status_t	fStatus;
-};
 
 class UrlWrapperApp : public BApplication
 {
@@ -96,79 +67,10 @@ private:
 
 };
 
-// proto:[//]user:pass@host:port/path
-status_t Url::ParseAndSplit()
-{
-	int32 v;
-	BString left;
-
-	v = FindFirst(":");
-	if (v < 0)
-		return B_BAD_VALUE;
-	
-	// TODO: proto and host should be lowercased.
-	// see http://en.wikipedia.org/wiki/URL_normalization
-	
-	CopyInto(proto, 0, v);
-	CopyInto(left, v + 1, Length() - v);
-	// TODO: RFC1738 says the // part should indicate the uri follows the u:p@h:p/path convention, so it should be used to check for special cases.
-	if (left.FindFirst("//") == 0)
-		left.RemoveFirst("//");
-	full = left;
-	
-	// path part
-	// actually some apps handle file://[host]/path
-	// but I have no idea what proto it implies...
-	// or maybe it's just to emphasize on "localhost".
-	v = left.FindFirst("/");
-	if (v == 0 || proto == "file") {
-		path = left;
-		return 0;
-	}
-	// some protos actually implies path if it's the only component
-	if ((v < 0) && (proto == "beshare" || proto == "irc")) { 
-		path = left;
-		return 0;
-	}
-	
-	if (v > -1) {
-		left.MoveInto(path, v+1, left.Length()-v);
-		left.Remove(v, 1);
-	}
-
-	// user:pass@host
-	v = left.FindFirst("@");
-	if (v > -1) {
-		left.MoveInto(user, 0, v);
-		left.Remove(0, 1);
-		v = user.FindFirst(":");
-		if (v > -1) {
-			user.MoveInto(pass, v, user.Length() - v);
-			pass.Remove(0, 1);
-		}
-	} else if (proto == "finger") {
-		// single component implies user
-		// see also: http://www.subir.com/lynx/lynx_help/lynx_url_support.html
-		user = left;
-		return 0;
-	}
-
-	// host:port
-	v = left.FindFirst(":");
-	if (v > -1) {
-		left.MoveInto(port, v + 1, left.Length() - v);
-		left.Remove(v, 1);
-	}
-
-	// not much left...
-	host = left;
-
-	return 0;
-}
 
 status_t UrlWrapperApp::SplitUrl(const char *url, BString &host, BString &port, BString &user, BString &pass, BString &path)
 {
-	Url u(url);
+	BPrivate::Support::BUrl u(url);
 	if (u.InitCheck() < 0)
 		return u.InitCheck();
 	host = u.host;
@@ -318,7 +220,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	const char *pausec = " ; read -p 'Press any key'";
 	char *args[] = { "/bin/sh", "-c", NULL, NULL};
 
-	Url u(argv[1]);
+	BPrivate::Support::BUrl u(argv[1]);
 	BString url = u.Full();
 	if (u.InitCheck() < 0) {
 		fprintf(stderr, "malformed url: '%s'\n", u.String());
@@ -578,3 +480,4 @@ int main(int argc, char **argv)
 		app.Run();
 	return 0;
 }
+

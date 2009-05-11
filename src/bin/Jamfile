@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src bin ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders app shared storage usb ;
+UsePrivateHeaders app shared storage support usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src kits support ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-UsePrivateHeaders shared app media ;
+UsePrivateHeaders shared app media support ;
 
 MergeObject <libbe>support_kit.o :
 	Archivable.cpp
@@ -18,4 +18,5 @@ MergeObject <libbe>support_kit.o :
 	Referenceable.cpp
 	StopWatch.cpp
 	String.cpp
+	Url.cpp
 ;
