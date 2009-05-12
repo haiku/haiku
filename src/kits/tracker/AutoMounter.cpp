@@ -165,7 +165,7 @@ suggest_mount_flags(const BPartition* partition, uint32* _flags)
 
 void
 AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
-	bool initialRescan)
+	bool initialRescan, partition_id deviceID)
 {
 	if (normal == kNoVolumes && removable == kNoVolumes)
 		return;
@@ -173,12 +173,14 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 	class InitialMountVisitor : public BDiskDeviceVisitor {
 		public:
 			InitialMountVisitor(mount_mode normalMode, mount_mode removableMode,
-					bool initialRescan, BMessage& previous)
+					bool initialRescan, BMessage& previous,
+					partition_id deviceID)
 				:
 				fNormalMode(normalMode),
 				fRemovableMode(removableMode),
 				fInitialRescan(initialRescan),
-				fPrevious(previous)
+				fPrevious(previous),
+				fOnlyOnDeviceID(deviceID)
 			{
 			}
 
@@ -196,7 +198,17 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 			virtual bool
 			Visit(BPartition* partition, int32 level)
 			{
-				mount_mode mode = partition->Device()->IsRemovableMedia()
+				if (fOnlyOnDeviceID >= 0) {
+					// only mount partitions on the given device id
+					BPartition* device = partition;
+					while (device->Parent() != NULL)
+						device = device->Parent();
+					if (device->ID() != fOnlyOnDeviceID)
+						return false;
+				}
+
+				mount_mode mode = !fInitialRescan
+					&& partition->Device()->IsRemovableMedia()
 					? fRemovableMode : fNormalMode;
 				if (mode == kNoVolumes
 					|| partition->IsMounted()
@@ -248,11 +260,12 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 			}
 
 		private:
-			mount_mode	fNormalMode;
-			mount_mode	fRemovableMode;
-			bool		fInitialRescan;
-			BMessage&	fPrevious;
-	} visitor(normal, removable, initialRescan, fSettings);
+			mount_mode		fNormalMode;
+			mount_mode		fRemovableMode;
+			bool			fInitialRescan;
+			BMessage&		fPrevious;
+			partition_id	fOnlyOnDeviceID;
+	} visitor(normal, removable, initialRescan, fSettings, deviceID);
 
 	BDiskDeviceList devices;
 	status_t status = devices.Fetch();
@@ -638,24 +651,26 @@ AutoMounter::MessageReceived(BMessage* message)
 			_WriteSettings();
 
 			if (rescanNow)
-				_MountVolumes(fNormalMode, fRemovableMode, false);
+				_MountVolumes(fNormalMode, fRemovableMode);
 			break;
 		}
 
 		case kMountAllNow:
-			_MountVolumes(kAllVolumes, kAllVolumes, false);
+			_MountVolumes(kAllVolumes, kAllVolumes);
 			break;
 
 		case B_DEVICE_UPDATE:
-printf("B_DEVICE_UPDATE\n");
-message->PrintToStream();
 			int32 event;
 			if (message->FindInt32("event", &event) != B_OK
 				|| (event != B_DEVICE_MEDIA_CHANGED
 					&& event != B_DEVICE_ADDED))
 				break;
 
-			_MountVolumes(kNoVolumes, fRemovableMode, false);
+			partition_id deviceID;
+			if (message->FindInt32("id", &deviceID) != B_OK)
+				break;
+
+			_MountVolumes(kNoVolumes, fRemovableMode, false, deviceID);
 			break;
 
 #if 0

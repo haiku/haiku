@@ -42,6 +42,7 @@ All rights reserved.
 #ifndef __HAIKU__
 #	include "DeviceMap.h"
 #else
+#	include <DiskDeviceDefs.h>
 class BPartition;
 class BPath;
 #endif
@@ -74,7 +75,9 @@ private:
 			};
 
 			void				_MountVolumes(mount_mode normal,
-									mount_mode removable, bool initialRescan);
+									mount_mode removable,
+									bool initialRescan = false,
+									partition_id deviceID = -1);
 			void				_MountVolume(const BMessage* message);
 			bool				_SuggestForceUnmount(const char* name,
 									status_t error);
