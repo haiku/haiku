@@ -200,9 +200,15 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 			{
 				if (fOnlyOnDeviceID >= 0) {
 					// only mount partitions on the given device id
+					// or if the partition ID is already matched
 					BPartition* device = partition;
-					while (device->Parent() != NULL)
+					while (device->Parent() != NULL) {
+						if (device->ID() == fOnlyOnDeviceID) {
+							// we are happy
+							break;
+						}
 						device = device->Parent();
+					}
 					if (device->ID() != fOnlyOnDeviceID)
 						return false;
 				}
