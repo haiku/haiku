@@ -69,6 +69,7 @@ typedef struct transfer_data {
 	uhci_td *		data_descriptor;
 	bool			incoming;
 	bool			canceled;
+	uint16			free_after_frame;
 	transfer_data *	link;
 } transfer_data;
 
@@ -136,6 +137,10 @@ static	int32						InterruptHandler(void *data);
 
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
+
+		void						AddToFreeList(transfer_data *transfer);
+static	int32						CleanupThread(void *data);
+		void						Cleanup();
 
 		status_t					CreateFilledTransfer(Transfer *transfer,
 										uhci_td **_firstDescriptor,
@@ -227,7 +232,12 @@ static	pci_module_info *			sPCIModule;
 		transfer_data *				fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
-		bool						fStopFinishThread;
+		bool						fStopThreads;
+
+		transfer_data *				fFreeList;
+		thread_id					fCleanupThread;
+		sem_id						fCleanupSem;
+		int32						fCleanupCount;
 
 		// Maintain a linked list of isochronous transfers
 		isochronous_transfer_data *	fFirstIsochronousTransfer;
@@ -235,7 +245,6 @@ static	pci_module_info *			sPCIModule;
 		sem_id						fFinishIsochronousTransfersSem;
 		thread_id					fFinishIsochronousThread;
 		mutex						fIsochronousLock;
-		bool						fStopFinishIsochronousThread;
 
 		// Root hub
 		UHCIRootHub *				fRootHub;

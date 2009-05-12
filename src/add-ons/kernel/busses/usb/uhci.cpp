@@ -334,12 +334,15 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fLastTransfer(NULL),
 		fFinishTransfersSem(-1),
 		fFinishThread(-1),
-		fStopFinishThread(false),
+		fStopThreads(false),
+		fFreeList(NULL),
+		fCleanupThread(-1),
+		fCleanupSem(-1),
+		fCleanupCount(0),
 		fFirstIsochronousTransfer(NULL),
 		fLastIsochronousTransfer(NULL),
 		fFinishIsochronousTransfersSem(-1),
 		fFinishIsochronousThread(-1),
-		fStopFinishIsochronousThread(false),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortResetChange(0)
@@ -456,17 +459,27 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fLastIsochronousDescriptor[i] = NULL;
 	}
 
-	// Create semaphore the finisher thread will wait for
+	// Create semaphore the finisher and cleanup threads will wait for
 	fFinishTransfersSem = create_sem(0, "UHCI Finish Transfers");
 	if (fFinishTransfersSem < B_OK) {
 		TRACE_ERROR("failed to create finisher semaphore\n");
 		return;
 	}
 
-	// Create the finisher service thread
+	fCleanupSem = create_sem(0, "UHCI Cleanup");
+	if (fCleanupSem < B_OK) {
+		TRACE_ERROR("failed to create cleanup semaphore\n");
+		return;
+	}
+
+	// Create the finisher service and cleanup threads
 	fFinishThread = spawn_kernel_thread(FinishThread,
 		"uhci finish thread", B_URGENT_DISPLAY_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
+
+	fCleanupThread = spawn_kernel_thread(CleanupThread,
+		"uhci cleanup thread", B_NORMAL_PRIORITY, (void *)this);
+	resume_thread(fCleanupThread);
 
 	// Create a lock for the isochronous transfer list
 	mutex_init(&fIsochronousLock, "UHCI isochronous lock");
@@ -519,11 +532,12 @@ UHCI::~UHCI()
 #endif
 
 	int32 result = 0;
-	fStopFinishThread = true;
-	fStopFinishIsochronousThread = true;
+	fStopThreads = true;
 	delete_sem(fFinishTransfersSem);
+	delete_sem(fCleanupSem);
 	delete_sem(fFinishIsochronousTransfersSem);
 	wait_for_thread(fFinishThread, &result);
+	wait_for_thread(fCleanupThread, &result);
 	wait_for_thread(fFinishIsochronousThread, &result);
 
 	LockIsochronous();
@@ -1217,7 +1231,7 @@ UHCI::FinishThread(void *data)
 void
 UHCI::FinishTransfers()
 {
-	while (!fStopFinishThread) {
+	while (!fStopThreads) {
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
 
@@ -1364,8 +1378,9 @@ UHCI::FinishTransfers()
 							Transfer *resubmit = transfer->transfer;
 
 							// free the used descriptors
-							transfer->queue->RemoveTransfer(transfer->transfer_queue);
-							FreeDescriptorChain(transfer->first_descriptor);
+							transfer->queue->RemoveTransfer(
+								transfer->transfer_queue);
+							AddToFreeList(transfer);
 
 							// resubmit the advanced transfer so the rest
 							// of the buffers are transmitted over the bus
@@ -1388,12 +1403,79 @@ UHCI::FinishTransfers()
 
 			// remove and free the hardware queue and its descriptors
 			transfer->queue->RemoveTransfer(transfer->transfer_queue);
-			FreeDescriptorChain(transfer->first_descriptor);
-			FreeTransferQueue(transfer->transfer_queue);
-
 			delete transfer->transfer;
-			delete transfer;
+			AddToFreeList(transfer);
 			transfer = next;
+		}
+	}
+}
+
+
+void
+UHCI::AddToFreeList(transfer_data *transfer)
+{
+	transfer->free_after_frame = ReadReg16(UHCI_FRNUM);
+	if (!Lock())
+		return;
+
+	transfer->link = fFreeList;
+	fFreeList = transfer;
+	Unlock();
+
+	if (atomic_add(&fCleanupCount, 1) == 0)
+		release_sem(fCleanupSem);
+}
+
+
+int32
+UHCI::CleanupThread(void *data)
+{
+	((UHCI *)data)->Cleanup();
+	return B_OK;
+}
+
+
+void
+UHCI::Cleanup()
+{
+	while (!fStopThreads) {
+		if (acquire_sem(fCleanupSem) != B_OK)
+			continue;
+
+		bigtime_t nextTime = system_time() + 1000;
+		while (atomic_get(&fCleanupCount) != 0) {
+			// wait for the frame to pass
+			snooze_until(nextTime, B_SYSTEM_TIMEBASE);
+			nextTime += 1000;
+
+			if (!Lock())
+				continue;
+
+			// find the first entry we may free
+			transfer_data **link = &fFreeList;
+			transfer_data *transfer = fFreeList;
+			uint16 frameNumber = ReadReg16(UHCI_FRNUM);
+			while (transfer) {
+				if (transfer->free_after_frame != frameNumber) {
+					*link = NULL;
+					break;
+				}
+
+				link = &transfer->link;
+				transfer = transfer->link;
+			}
+
+			Unlock();
+
+			// the transfers below this one are all freeable
+			while (transfer) {
+				transfer_data *next = transfer->link;
+				FreeDescriptorChain(transfer->first_descriptor);
+				FreeTransferQueue(transfer->transfer_queue);
+				delete transfer;
+				atomic_add(&fCleanupCount, -1);
+				transfer = next;
+			}
 		}
 	}
 }
@@ -1415,7 +1497,7 @@ UHCI::FinishIsochronousTransfers()
 	 * of a transfer, it processes the entire transfer.
 	 */
 
-	while (!fStopFinishIsochronousThread) {
+	while (!fStopThreads) {
 		// Go to sleep if there are not isochronous transfer to process
 		if (acquire_sem(fFinishIsochronousTransfersSem) < B_OK)
 			return;
