@@ -2847,7 +2847,55 @@ status_t
 BMediaRoster::SniffRef(const entry_ref& file, uint64 requireNodeKinds,
 	dormant_node_info* _node, BMimeType* mimeType)
 {
-	UNIMPLEMENTED();
+	CALLED();
+
+	TRACE("BMediaRoster::SniffRef looking for a node to handle %s : %Ld\n",file.name, requireNodeKinds);
+
+	if (_node == NULL)
+		return B_BAD_VALUE;
+
+	BMimeType aMimeType;
+	
+	dormant_node_info nodes[30];
+	int32 count = 30;
+	int32 highestCapability = -1;
+	float capability;
+	
+	media_node node;
+	
+	// Get all dormant nodes using GetDormantNodes
+	if (B_OK == GetDormantNodes(nodes, &count, NULL, NULL, NULL, requireNodeKinds | B_FILE_INTERFACE, 0)) {
+		// Call SniffRefFor on each node that matches requireNodeKinds
+		for (int32 i=0;i<count;i++) {
+			if (B_OK == InstantiateDormantNode(nodes[i],&node)) {
+				
+				if (B_OK == SniffRefFor(node,file,&aMimeType,&capability)) {
+					// find the first node that has 100% capability
+					TRACE("%s has a %f%% chance of playing file\n",nodes[i].name, capability * 100.0);
+					if (capability == 1.0) {
+						highestCapability = i;
+						break;
+					}
+				}
+				ReleaseNode(node);
+			}
+		}
+		
+		if (highestCapability != -1) {
+			*_node = nodes[highestCapability];
+	
+			TRACE("BMediaRoster::SniffRef: found a node %s addon-id %ld, flavor_id %ld\n",
+			nodes[highestCapability].name, nodes[highestCapability].addon, nodes[highestCapability].flavor_id);
+			
+			if (mimeType != NULL) {
+				//*mimeType = aMimeType; -- need a copy constructor
+			}
+			
+			return B_OK;
+		}
+
+	}
+	
 	return B_ERROR;
 }
 
