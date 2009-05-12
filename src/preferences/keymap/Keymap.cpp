@@ -168,43 +168,38 @@ Keymap::Save(entry_ref& ref)
 		return status;
 	}
 
-	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++)
 		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
-	}
 
 	ssize_t bytesWritten = file.Write(&fKeys, sizeof(fKeys));
-	if (bytesWritten < (ssize_t)sizeof(fKeys)) {
-		if (bytesWritten < 0)
-			return bytesWritten;
-		return B_IO_ERROR;
-	}
+	if (bytesWritten < (ssize_t)sizeof(fKeys))
+		status = bytesWritten < 0 ? bytesWritten : B_IO_ERROR;
 
-	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+
+	if (status == B_OK) {
+		fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+
+		bytesWritten = file.Write(&fCharsSize, sizeof(uint32));
+		if (bytesWritten < (ssize_t)sizeof(uint32))
+			status = bytesWritten < 0 ? bytesWritten : B_IO_ERROR;
+
+		fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
 	}
 
-	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
-
-	bytesWritten = file.Write(&fCharsSize, sizeof(uint32));
-	if (bytesWritten < (ssize_t)sizeof(uint32)) {
-		if (bytesWritten < 0)
-			return bytesWritten;
-		return B_IO_ERROR;
+	if (status == B_OK) {
+		bytesWritten = file.Write(fChars, fCharsSize);
+		if (bytesWritten < (ssize_t)fCharsSize)
+			status = bytesWritten < 0 ? bytesWritten : B_IO_ERROR;
 	}
 
-	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
-
-	bytesWritten = file.Write(fChars, fCharsSize);
-	if (bytesWritten < (ssize_t)fCharsSize) {
-		if (bytesWritten < 0)
-			return bytesWritten;
-		return B_IO_ERROR;
+	if (status == B_OK) {
+		file.WriteAttr("keymap:name", B_STRING_TYPE, 0, fName, strlen(fName));
+			// Failing would be non-fatal
 	}
 
-	file.WriteAttr("keymap:name", B_STRING_TYPE, 0, fName, strlen(fName));
-		// Failing would be non-fatal
-
-	return B_OK;
+	return status;
 }
 
 
