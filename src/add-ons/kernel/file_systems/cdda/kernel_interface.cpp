@@ -102,7 +102,8 @@ class Volume {
 		size_t		BufferSize() const { return 32 * kFrameSize; }
 			// TODO: for now
 
-		static void	DetermineName(cdtext& text, char* name, size_t length);
+		static void	DetermineName(uint32 cddbId, int DeviceFD, char* name,
+			size_t length);
 
 	private:
 		Inode*		_CreateNode(Inode* parent, const char* name,
@@ -437,6 +438,58 @@ read_attributes(int fd, Inode* inode)
 }
 
 
+static int
+open_attributes(uint32 cddbId, int deviceFD, int mode,
+	enum attr_mode attrMode)
+{
+	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return -1;
+
+	bool create = (mode & O_WRONLY) != 0;
+
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, create, path,
+			B_PATH_NAME_LENGTH) != B_OK) {
+		free(path);
+		return -1;
+	}
+
+	strlcat(path, "/cdda", B_PATH_NAME_LENGTH);
+	if (create)
+		mkdir(path, 0755);
+
+	if (attrMode == kDiscIDAttributes) {
+		char id[64];
+		snprintf(id, sizeof(id), "/%08lx", cddbId);
+		strlcat(path, id, B_PATH_NAME_LENGTH);
+	} else if (attrMode == kDeviceAttributes) {
+		uint32 length = strlen(path);
+		char* device = path + length;
+		if (ioctl(deviceFD, B_GET_PATH_FOR_DEVICE, device,
+				B_PATH_NAME_LENGTH - length) < B_OK) {
+			free(path);
+			return B_ERROR;
+		}
+
+		device++;
+
+		// replace slashes in the device path
+		while (device[0]) {
+			if (device[0] == '/')
+				device[0] = '_';
+
+			device++;
+		}
+	} else
+		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
+
+	int fd = open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
+
+	free(path);
+	return fd;
+}
+
+
 static void
 fill_stat_buffer(Volume* volume, Inode* inode, Attribute* attribute,
 	struct stat& stat)
@@ -545,15 +598,33 @@ Volume::InitCheck()
 
 
 /*static*/ void
-Volume::DetermineName(cdtext& text, char* name, size_t length)
+Volume::DetermineName(uint32 cddbId, int deviceFD, char* name, size_t length)
 {
-	if (text.artist != NULL && text.album != NULL)
-		snprintf(name, length, "%s - %s", text.artist, text.album);
-	else if (text.artist != NULL || text.album != NULL) {
-		snprintf(name, length, "%s", text.artist != NULL
-			? text.artist : text.album);
-	} else
-		strlcpy(name, "Audio CD", length);
+	int attrFD = open_attributes(cddbId, deviceFD, O_RDONLY,
+		kDiscIDAttributes);
+	if (attrFD < 0) {
+		// We do not have attributes set. Read CD text.
+		cdtext text;
+		read_cdtext(deviceFD, text);
+		if (text.artist != NULL && text.album != NULL)
+			snprintf(name, length, "%s - %s", text.artist, text.album);
+		else if (text.artist != NULL || text.album != NULL) {
+			snprintf(name, length, "%s", text.artist != NULL
+				? text.artist : text.album);
+		} else
+			strlcpy(name, "Audio CD", length);
+	} else {
+		// We have an attribute file. Read name from it.
+		char line[B_FILE_NAME_LENGTH];
+		if (!read_line(attrFD, line, B_FILE_NAME_LENGTH)) {
+			// Could not get name from attribute file. use default name.
+			strlcpy(name, "Audio CD", length);
+		} else {
+			// We got a name. Use it.
+			strlcpy(name, line, length);
+		}
+		close(attrFD);
+	}
 }
 
 
@@ -685,7 +756,7 @@ Volume::Mount(const char* device)
 	free(toc);
 
 	// determine volume title
-	DetermineName(text, title, sizeof(title));
+	DetermineName(fDiscID, fDevice, title, sizeof(title));
 
 	fName = strdup(title);
 	if (fName == NULL)
@@ -787,51 +858,7 @@ Volume::SetName(const char* name)
 int
 Volume::_OpenAttributes(int mode, enum attr_mode attrMode)
 {
-	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
-	if (path == NULL)
-		return -1;
-
-	bool create = (mode & O_WRONLY) != 0;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, create, path,
-			B_PATH_NAME_LENGTH) != B_OK) {
-		free(path);
-		return -1;
-	}
-
-	strlcat(path, "/cdda", B_PATH_NAME_LENGTH);
-	if (create)
-		mkdir(path, 0755);
-
-	if (attrMode == kDiscIDAttributes) {
-		char id[64];
-		snprintf(id, sizeof(id), "/%08lx", fDiscID);
-		strlcat(path, id, B_PATH_NAME_LENGTH);
-	} else if (attrMode == kDeviceAttributes) {
-		uint32 length = strlen(path);
-		char* device = path + length;
-		if (ioctl(fDevice, B_GET_PATH_FOR_DEVICE, device,
-				B_PATH_NAME_LENGTH - length) < B_OK) {
-			free(path);
-			return B_ERROR;
-		}
-
-		device++;
-
-		// replace slashes in the device path
-		while (device[0]) {
-			if (device[0] == '/')
-				device[0] = '_';
-
-			device++;
-		}
-	} else
-		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
-
-	int fd = open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
-
-	free(path);
-	return fd;
+	return open_attributes(fDiscID, fDevice, mode, attrMode);
 }
 
 
@@ -1357,11 +1384,9 @@ cdda_scan_partition(int fd, partition_data* partition, void* _cookie)
 
 	// determine volume title
 
-	cdtext text;
-	read_cdtext(fd, text);
-
+	uint32 cddbId = compute_cddb_disc_id(*toc);
 	char name[256];
-	Volume::DetermineName(text, name, sizeof(name));
+	Volume::DetermineName(cddbId, fd, name, sizeof(name));
 	partition->content_name = strdup(name);
 	if (partition->content_name == NULL)
 		return B_NO_MEMORY;
