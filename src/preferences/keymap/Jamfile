@@ -10,7 +10,6 @@ Preference Keymap :
 	Keymap.cpp
 	KeymapApplication.cpp
 	KeymapListItem.cpp
-	KeymapMessageFilter.cpp
 	KeymapWindow.cpp
 
 	: be tracker $(TARGET_LIBSTDC++)

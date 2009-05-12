@@ -21,6 +21,7 @@
 
 class BMenu;
 class BMenuBar;
+class BMenuField;
 class BTextControl;
 class KeyboardLayoutView;
 class KeymapListItem;
@@ -46,7 +47,7 @@ protected:
 			void				_UseKeymap();
 			void				_RevertKeymap();
 
-			BMenuBar*			_CreateDeadKeyMenu();
+			BMenuField*			_CreateDeadKeyMenuField();
 			void				_UpdateDeadKeyMenu();
 
 			void 				_FillSystemMaps();
@@ -66,7 +67,6 @@ protected:
 			KeyboardLayoutView*	fKeyboardLayoutView;
 			BTextControl*		fTextControl;
 			BButton*			fSwitchShortcutsButton;
-			BMenu*				fDeadKeyMenu;
 			BMenu*				fAcuteMenu;
 			BMenu*				fCircumflexMenu;
 			BMenu*				fDiaeresisMenu;
@@ -76,7 +76,6 @@ protected:
 			Keymap				fCurrentMap;
 			Keymap				fPreviousMap;
 			Keymap				fAppliedMap;
-			bool				fFirstTime;
 			BString				fCurrentMapName;
 
 			BFilePanel*			fOpenPanel;

@@ -64,6 +64,8 @@ public:
 								int8 deadKey, const char* bytes,
 								int32 numBytes = -1);
 
+			void			SetName(const char* name);
+
 			const key_map&	Map() const { return fKeys; }
 			key_map&		Map() { return fKeys; }
 

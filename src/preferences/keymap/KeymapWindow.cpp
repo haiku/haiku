@@ -21,8 +21,10 @@
 #include <GroupLayoutBuilder.h>
 #include <ListView.h>
 #include <MenuBar.h>
+#include <MenuField.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <StringView.h>
@@ -31,11 +33,9 @@
 #include "KeyboardLayoutView.h"
 #include "KeymapApplication.h"
 #include "KeymapListItem.h"
-#include "KeymapMessageFilter.h"
 
 
 static const uint32 kMsgMenuFileOpen = 'mMFO';
-static const uint32 kMsgMenuFileSave = 'mMFS';
 static const uint32 kMsgMenuFileSaveAs = 'mMFA';
 
 static const uint32 kChangeKeyboardLayout = 'cKyL';
@@ -47,7 +47,6 @@ static const uint32 kMsgMenuFontChanged = 'mMFC';
 static const uint32 kMsgSystemMapSelected = 'SmST';
 static const uint32 kMsgUserMapSelected = 'UmST';
 
-static const uint32 kMsgUseKeymap = 'UkyM';
 static const uint32 kMsgRevertKeymap = 'Rvrt';
 static const uint32 kMsgKeymapUpdated = 'upkM';
 
@@ -59,11 +58,12 @@ static const uint32 kMsgDeadKeyTildeChanged = 'dkTc';
 
 static const char* kDeadKeyTriggerNone = "<none>";
 
+static const char* kCurrentKeymapName = "(Current)";
+
 
 KeymapWindow::KeymapWindow()
 	: BWindow(BRect(80, 50, 880, 380), "Keymap", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fFirstTime(true)
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -87,7 +87,7 @@ KeymapWindow::KeymapWindow()
 				.Add(fKeyboardLayoutView)
 				//.Add(new BStringView("text label", "Sample and Clipboard:"))
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-					.Add(_CreateDeadKeyMenu(), 0.0)
+					.Add(_CreateDeadKeyMenuField(), 0.0)
 					.AddGlue()
 					.Add(fSwitchShortcutsButton))
 				.Add(fTextControl)
@@ -99,8 +99,6 @@ KeymapWindow::KeymapWindow()
 
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
 	fTextControl->MakeFocus();
-	fTextControl->TextView()->AddFilter(new KeymapMessageFilter(
-		B_PROGRAMMED_DELIVERY, B_ANY_SOURCE, &fCurrentMap));
 
 	_UpdateButtons();
 
@@ -194,6 +192,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 			int32 i = 0;
 			while (message->FindRef("refs", i++, &ref) == B_OK) {
 				fCurrentMap.Load(ref);
+				fAppliedMap = fCurrentMap;
 			}
 			fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 			fSystemListView->DeselectAll();
@@ -210,17 +209,18 @@ KeymapWindow::MessageReceived(BMessage* message)
 				BDirectory directory(&ref);
 				BEntry entry(&directory, name);
 				entry.GetRef(&ref);
+				fCurrentMap.SetName(name);
 				fCurrentMap.Save(ref);
-
+				fAppliedMap = fCurrentMap;
 				_FillUserMaps();
+				fCurrentMapName = name;
+				_SelectCurrentMap();
 			}
 			break;
 		}
 
 		case kMsgMenuFileOpen:
 			fOpenPanel->Show();
-			break;
-		case kMsgMenuFileSave:
 			break;
 		case kMsgMenuFileSaveAs:
 			fSavePanel->Show();
@@ -267,7 +267,6 @@ KeymapWindow::MessageReceived(BMessage* message)
 			BListView* otherListView;
 
 			if (message->what == kMsgSystemMapSelected) {
-				fUserListView->DeselectAll();
 				listView = fSystemListView;
 				otherListView = fUserListView;
 			} else {
@@ -290,21 +289,15 @@ KeymapWindow::MessageReceived(BMessage* message)
 			KeymapListItem* item
 				= static_cast<KeymapListItem*>(listView->ItemAt(index));
 			if (item != NULL) {
-				if (!fFirstTime)
-					fCurrentMap.Load(item->EntryRef());
-				else
-					fFirstTime = false;
-
+				fCurrentMap.Load(item->EntryRef());
+				fAppliedMap = fCurrentMap;
 				fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+				_UseKeymap();
 				_UpdateButtons();
 			}
 			break;
 		}
 
-		case kMsgUseKeymap:
-			_UseKeymap();
-			_UpdateButtons();
-			break;
 		case kMsgRevertKeymap:
 			_RevertKeymap();
 			_UpdateButtons();
@@ -399,9 +392,6 @@ KeymapWindow::_CreateMenu()
 	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgMenuFileOpen), 'O'));
 	menu->AddSeparatorItem();
-	item = new BMenuItem("Save", new BMessage(kMsgMenuFileSave), 'S');
-	item->SetEnabled(false);
-	menu->AddItem(item);
 	menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgMenuFileSaveAs)));
 	menu->AddSeparatorItem();
@@ -446,12 +436,10 @@ KeymapWindow::_CreateMenu()
 }
 
 
-BMenuBar*
-KeymapWindow::_CreateDeadKeyMenu()
+BMenuField*
+KeymapWindow::_CreateDeadKeyMenuField()
 {
-	BMenuBar* menuBar = new BMenuBar("deadkeymenubar");
-	fDeadKeyMenu = new BMenu("Select Dead Keys");
-	menuBar->AddItem(fDeadKeyMenu);
+	BPopUpMenu* deadKeyMenu = new BPopUpMenu("Select Dead Keys", false, false);
 
 	fAcuteMenu = new BMenu("Acute Trigger");
 	fAcuteMenu->SetRadioMode(true);
@@ -461,7 +449,7 @@ KeymapWindow::_CreateDeadKeyMenu()
 		new BMessage(kMsgDeadKeyAcuteChanged)));
 	fAcuteMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
 		new BMessage(kMsgDeadKeyAcuteChanged)));
-	fDeadKeyMenu->AddItem(fAcuteMenu);
+	deadKeyMenu->AddItem(fAcuteMenu);
 
 	fCircumflexMenu = new BMenu("Circumflex Trigger");
 	fCircumflexMenu->SetRadioMode(true);
@@ -469,7 +457,7 @@ KeymapWindow::_CreateDeadKeyMenu()
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
 	fCircumflexMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
-	fDeadKeyMenu->AddItem(fCircumflexMenu);
+	deadKeyMenu->AddItem(fCircumflexMenu);
 
 	fDiaeresisMenu = new BMenu("Diaeresis Trigger");
 	fDiaeresisMenu->SetRadioMode(true);
@@ -479,7 +467,7 @@ KeymapWindow::_CreateDeadKeyMenu()
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
 	fDiaeresisMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
-	fDeadKeyMenu->AddItem(fDiaeresisMenu);
+	deadKeyMenu->AddItem(fDiaeresisMenu);
 
 	fGraveMenu = new BMenu("Grave Trigger");
 	fGraveMenu->SetRadioMode(true);
@@ -487,7 +475,7 @@ KeymapWindow::_CreateDeadKeyMenu()
 		new BMessage(kMsgDeadKeyGraveChanged)));
 	fGraveMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
 		new BMessage(kMsgDeadKeyGraveChanged)));
-	fDeadKeyMenu->AddItem(fGraveMenu);
+	deadKeyMenu->AddItem(fGraveMenu);
 
 	fTildeMenu = new BMenu("Tilde Trigger");
 	fTildeMenu->SetRadioMode(true);
@@ -495,9 +483,9 @@ KeymapWindow::_CreateDeadKeyMenu()
 		new BMessage(kMsgDeadKeyTildeChanged)));
 	fTildeMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
 		new BMessage(kMsgDeadKeyTildeChanged)));
-	fDeadKeyMenu->AddItem(fTildeMenu);
+	deadKeyMenu->AddItem(fTildeMenu);
 
-	return menuBar;
+	return new BMenuField(NULL, deadKeyMenu);
 }
 
 
@@ -633,8 +621,10 @@ KeymapWindow::_UpdateDeadKeyMenu()
 void
 KeymapWindow::_UpdateButtons()
 {
-	if (!fCurrentMap.Equals(fAppliedMap))
+	if (!fCurrentMap.Equals(fAppliedMap)) {
+		fCurrentMap.SetName(kCurrentKeymapName);
 		_UseKeymap();
+	}
 
 	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
 
@@ -688,6 +678,7 @@ KeymapWindow::_RevertKeymap()
 }
 
 
+//!	Saves current map to the "Key_map" file.
 void
 KeymapWindow::_UseKeymap()
 {
@@ -704,6 +695,7 @@ KeymapWindow::_UseKeymap()
 	fAppliedMap.Load(ref);
 
 	fCurrentMapName = _GetActiveKeymapName();
+	_SelectCurrentMap();
 }
 
 
@@ -792,7 +784,7 @@ KeymapWindow::_GetCurrentKeymap(entry_ref& ref)
 BString
 KeymapWindow::_GetActiveKeymapName()
 {
-	BString mapName = "(Current)";	// safe default
+	BString mapName = kCurrentKeymapName;	// safe default
 
 	entry_ref ref;
 	_GetCurrentKeymap(ref);
@@ -832,6 +824,5 @@ KeymapWindow::_SelectCurrentMap()
 		&& !_SelectCurrentMap(fUserListView)) {
 		// Select the "(Current)" entry if no name matches
 		fUserListView->Select(0L);
-		fFirstTime = false;
 	}
 }

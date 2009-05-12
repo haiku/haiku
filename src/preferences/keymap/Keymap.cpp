@@ -85,6 +85,13 @@ Keymap::SetTarget(BMessenger target, BMessage* modificationMessage)
 
 
 void
+Keymap::SetName(const char* name)
+{
+	strlcpy(fName, name, sizeof(fName));
+}
+
+
+void
 Keymap::DumpKeymap()
 {
 	// Print a chart of the normal, shift, option, and option+shift
@@ -151,7 +158,14 @@ Keymap::Load(entry_ref &ref)
 	if (err < B_OK) {
 		fprintf(stderr, "error reading keymap chars: %s\n", strerror(err));
 	}
-	strlcpy(fName, ref.name, sizeof(fName));
+
+	// fetch name from attribute and fall back to filename
+	ssize_t bytesRead
+		= file.ReadAttr("keymap:name", B_STRING_TYPE, 0, fName, sizeof(fName));
+	if (bytesRead > 0)
+		fName[bytesRead] = '\0';
+	else
+		strlcpy(fName, ref.name, sizeof(fName));
 	return err;
 }
 
