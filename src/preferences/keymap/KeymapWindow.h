@@ -60,7 +60,6 @@ protected:
 
 			BListView*			fSystemListView;
 			BListView*			fUserListView;
-			BButton*			fUseButton;
 			BButton*			fRevertButton;
 			BMenu*				fLayoutMenu;
 			BMenu*				fFontMenu;
