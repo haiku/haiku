@@ -104,10 +104,10 @@ const supported_attribute_type kSupportedAttributeTypes[] = {
 
 // AttributeFilter
 struct AttributeFilter {
-
 	AttributeFilter()
-		: fName(NULL),
-		  fType(B_ANY_TYPE)
+		:
+		fName(NULL),
+		fType(B_ANY_TYPE)
 	{
 	}
 
@@ -133,10 +133,11 @@ private:
 // Parameters
 struct Parameters {
 	Parameters()
-		: copy_data(false),
-		  recursive(false),
-		  move_files(false),
-		  verbose(false)
+		:
+		copy_data(false),
+		recursive(false),
+		move_files(false),
+		verbose(false)
 	{
 	}
 
@@ -169,6 +170,7 @@ print_usage(bool error)
 	fprintf((error ? stderr : stdout), kUsage, commandName);
 }
 
+
 // print_usage_and_exit
 static void
 print_usage_and_exit(bool error)
@@ -176,6 +178,7 @@ print_usage_and_exit(bool error)
 	print_usage(error);
 	exit(error ? 1 : 0);
 }
+
 
 // next_arg
 static const char *
@@ -190,11 +193,11 @@ next_arg(int &argi, bool optional = false)
 	return kArgv[argi++];
 }
 
+
 // copy_attributes
 static void
-copy_attributes(const char *sourcePath, BNode &source,
-	const char *destPath, BNode &destination,
-	const Parameters &parameters)
+copy_attributes(const char *sourcePath, BNode &source, const char *destPath,
+	BNode &destination, const Parameters &parameters)
 {
 	char attrName[B_ATTR_NAME_LENGTH];
 	while (source.GetNextAttrName(attrName) == B_OK) {
@@ -249,10 +252,11 @@ copy_attributes(const char *sourcePath, BNode &source,
 	}
 }
 
+
 // copy_file_data
 static void
-copy_file_data(const char *sourcePath, BFile &source,
-	const char *destPath, BFile &destination, const Parameters &parameters)
+copy_file_data(const char *sourcePath, BFile &source, const char *destPath,
+	BFile &destination, const Parameters &parameters)
 {
 	char buffer[kCopyBufferSize];
 	off_t offset = 0;
@@ -280,6 +284,7 @@ copy_file_data(const char *sourcePath, BFile &source,
 	}
 }
 
+
 // copy_entry
 static void
 copy_entry(const char *sourcePath, const char *destPath,
@@ -299,7 +304,7 @@ copy_entry(const char *sourcePath, const char *destPath,
 
 	// stat destination
 	struct stat destStat;
-	bool destExists = (lstat(destPath, &destStat) == 0);
+	bool destExists = lstat(destPath, &destStat) == 0;
 
 	if (!destExists && !parameters.copy_data) {
 		fprintf(stderr, "Error: Destination file \"%s\" does not exist.\n",
@@ -610,6 +615,7 @@ copy_files(const char **sourcePaths, int sourceCount,
 		}
 	}
 }
+
 
 // main
 int
