@@ -75,7 +75,6 @@ KeymapWindow::KeymapWindow()
 	fSwitchShortcutsButton = new BButton("switch", "",
 		new BMessage(kMsgSwitchShortcuts));
 
-	fUseButton = new BButton("useButton", "Use", new BMessage(kMsgUseKeymap));
 	fRevertButton = new BButton("revertButton", "Revert",
 		new BMessage(kMsgRevertKeymap));
 
@@ -95,7 +94,6 @@ KeymapWindow::KeymapWindow()
 				.AddGlue(0.0)
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.AddGlue(0.0)
-					.Add(fUseButton)
 					.Add(fRevertButton)))
 			.SetInsets(10, 10, 10, 10)));
 
@@ -635,7 +633,9 @@ KeymapWindow::_UpdateDeadKeyMenu()
 void
 KeymapWindow::_UpdateButtons()
 {
-	fUseButton->SetEnabled(!fCurrentMap.Equals(fAppliedMap));
+	if (!fCurrentMap.Equals(fAppliedMap))
+		_UseKeymap();
+
 	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
 
 	_UpdateDeadKeyMenu();
