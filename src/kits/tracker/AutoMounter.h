@@ -73,8 +73,6 @@ private:
 				kRestorePreviousVolumes
 			};
 
-			bool				_SuggestMountFlags(const BPartition* partition,
-									uint32* _flags) const;
 			void				_MountVolumes(mount_mode normal,
 									mount_mode removable, bool initialRescan);
 			void				_MountVolume(const BMessage* message);

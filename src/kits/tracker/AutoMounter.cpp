@@ -99,6 +99,70 @@ AutoMounter::~AutoMounter()
 }
 
 
+static bool
+suggest_mount_flags(const BPartition* partition, uint32* _flags)
+{
+	uint32 mountFlags = 0;
+
+	bool askReadOnly = true;
+	bool isBFS = false;
+
+	if (partition->ContentType() != NULL
+		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
+#if 0
+		askReadOnly = false;
+#endif
+		isBFS = true;
+	}
+
+	BDiskSystem diskSystem;
+	status_t status = partition->GetDiskSystem(&diskSystem);
+	if (status == B_OK && !diskSystem.SupportsWriting())
+		askReadOnly = false;
+
+	if (partition->IsReadOnly())
+		askReadOnly = false;
+
+	if (askReadOnly) {
+		// Suggest to the user to mount read-only until Haiku is more mature.
+		BString string;
+		string << "Mounting volume ";
+		if (partition->ContentName() != NULL)
+			string << "'" << partition->ContentName() << "'\n\n";
+		else
+			string << "<unnamed volume>\n\n";
+		// TODO: Use distro name instead of "Haiku"...
+		if (!isBFS) {
+			string << "The file system on this volume is not the Haiku file "
+				"system. It is strongly suggested to mount it in read-only "
+				"mode. ";
+		} else {
+			string << "It is suggested to mount all additional Haiku volumes "
+				"in read-only mode. ";
+		}
+		string << "This will prevent unintentional data loss because of "
+			"errors in Haiku.";
+		BAlert* alert = new BAlert("Mount Warning", string.String(),
+			"Mount Read/Write", "Cancel", "Mount Read-only",
+			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		int32 choice = alert->Go();
+		switch (choice) {
+			case 0:
+				break;
+			case 1:
+				return false;
+			case 2:
+				mountFlags |= B_MOUNT_READ_ONLY;
+				break;
+		}
+	}
+
+	*_flags = mountFlags;
+	return true;
+}
+
+
 void
 AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 	bool initialRescan)
@@ -158,11 +222,18 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 				}
 
 				uint32 mountFlags;
-				BString mountFlagsKey(path.Path());
-				mountFlagsKey << kMountFlagsKeyExtension;
-				if (fPrevious.FindInt32(mountFlagsKey.String(),
-						(int32*)&mountFlags) < B_OK) {
-					mountFlags = 0;
+				if (!fInitialRescan) {
+					// Ask the user about mount flags if this is not the
+					// initial scan.
+					if (!suggest_mount_flags(partition, &mountFlags))
+						return false;
+				} else {
+					BString mountFlagsKey(path.Path());
+					mountFlagsKey << kMountFlagsKeyExtension;
+					if (fPrevious.FindInt32(mountFlagsKey.String(),
+							(int32*)&mountFlags) < B_OK) {
+						mountFlags = 0;
+					}
 				}
 
 				if (partition->Mount(NULL, mountFlags) == B_OK
@@ -190,68 +261,6 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 }
 
 
-bool
-AutoMounter::_SuggestMountFlags(const BPartition* partition,
-	uint32* _flags) const
-{
-	uint32 mountFlags = 0;
-
-	bool askReadOnly = true;
-	bool isBFS = false;
-
-	if (partition->ContentType() != NULL
-		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
-#if 0
-		askReadOnly = false;
-#endif
-		isBFS = true;
-	}
-
-	BDiskSystem diskSystem;
-	status_t status = partition->GetDiskSystem(&diskSystem);
-	if (status == B_OK && !diskSystem.SupportsWriting())
-		askReadOnly = false;
-
-	if (partition->IsReadOnly())
-		askReadOnly = false;
-
-	if (askReadOnly) {
-		// Suggest to the user to mount read-only until Haiku is more mature.
-		// TODO: would be nice to skip this for file systems which don't have
-		// support for writing anyways.
-		BString string;
-		// TODO: Use distro name instead of "Haiku"...
-		if (!isBFS) {
-			string << "The file system on this volume is not the Haiku file "
-				"system. It is strongly suggested to mount it in read-only "
-				"mode. ";
-		} else {
-			string << "It is suggested to mount all additional Haiku volumes "
-				"in read-only mode. ";
-		}
-		string << "This will prevent unintentional data loss because of "
-			"errors in Haiku.";
-		BAlert* alert = new BAlert("Mount Warning", string.String(),
-			"Mount Read/Write", "Cancel", "Mount Read-only",
-			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
-		alert->SetShortcut(1, B_ESCAPE);
-		int32 choice = alert->Go();
-		switch (choice) {
-			case 0:
-				break;
-			case 1:
-				return false;
-			case 2:
-				mountFlags |= B_MOUNT_READ_ONLY;
-				break;
-		}
-	}
-
-	*_flags = mountFlags;
-	return true;
-}
-
-
 void
 AutoMounter::_MountVolume(const BMessage* message)
 {
@@ -266,7 +275,7 @@ AutoMounter::_MountVolume(const BMessage* message)
 		return;
 
 	uint32 mountFlags;
-	if (!_SuggestMountFlags(partition, &mountFlags))
+	if (!suggest_mount_flags(partition, &mountFlags))
 		return;
 
 	status_t status = partition->Mount(NULL, mountFlags);
@@ -638,7 +647,8 @@ AutoMounter::MessageReceived(BMessage* message)
 			break;
 
 		case B_DEVICE_UPDATE:
-			message->PrintToStream();
+printf("B_DEVICE_UPDATE\n");
+message->PrintToStream();
 			int32 event;
 			if (message->FindInt32("event", &event) != B_OK
 				|| (event != B_DEVICE_MEDIA_CHANGED
