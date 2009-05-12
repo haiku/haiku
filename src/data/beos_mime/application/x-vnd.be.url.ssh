@@ -7,3 +7,5 @@ resource(2, "META:S:DESC") #'MSDC' "SSH URL";
 
 resource(3, "META:L:DESC") #'MLDC' "Secure Shell URL";
 
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
+

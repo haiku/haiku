@@ -5,3 +5,5 @@ resource(1, "META:TYPE") "application/x-vnd.Be.URL.beshare";
 
 resource(2, "META:S:DESC") #'MSDC' "BeShare URL";
 
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
+

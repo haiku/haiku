@@ -7,3 +7,5 @@ resource(2, "META:S:DESC") #'MSDC' "File URL";
 
 resource(3, "META:L:DESC") #'MLDC' "Local filesystem URL";
 
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
+
