@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BASE_DEVICE_H
@@ -21,6 +21,8 @@ public:
 
 	virtual	status_t		InitDevice();
 	virtual	void			UninitDevice();
+
+	virtual void			Removed();
 
 			device_module_info* Module() const { return fDeviceModule; }
 			void*			Data() const { return fDeviceData; }

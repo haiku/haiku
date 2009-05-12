@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -31,5 +31,11 @@ BaseDevice::InitDevice()
 
 void
 BaseDevice::UninitDevice()
+{
+}
+
+
+void
+BaseDevice::Removed()
 {
 }

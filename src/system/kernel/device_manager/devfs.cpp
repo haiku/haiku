@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -252,6 +252,9 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 	hash_remove(fs->vnode_hash, vnode);
 
 	if (S_ISCHR(vnode->stream.type)) {
+		// pass the call through to the underlying device
+		vnode->stream.u.dev.device->Removed();
+
 		// for partitions, we have to release the raw device but must
 		// not free the device info as it was inherited from the raw
 		// device and is still in use there

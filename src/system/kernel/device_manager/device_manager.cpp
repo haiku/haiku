@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -84,8 +84,14 @@ public:
 	virtual	status_t		InitDevice();
 	virtual	void			UninitDevice();
 
+	virtual void			Removed();
+
+			void			SetRemovedFromParent(bool removed)
+								{ fRemovedFromParent = removed; }
+
 private:
 	const char*				fModuleName;
+	bool					fRemovedFromParent;
 };
 
 typedef DoublyLinkedList<Device> DeviceList;
@@ -1057,6 +1063,8 @@ device_attr_private::Compare(const device_attr* attrA, const device_attr *attrB)
 
 
 Device::Device(device_node* node, const char* moduleName)
+	:
+	fRemovedFromParent(false)
 {
 	fNode = node;
 	fModuleName = strdup(moduleName);
@@ -1144,6 +1152,18 @@ Device::UninitDevice()
 }
 
 
+void
+Device::Removed()
+{
+	RecursiveLocker _(sLock);
+
+	if (!fRemovedFromParent)
+		fNode->RemoveDevice(this);
+
+	delete this;
+}
+
+
 //	#pragma mark - device_node
 
 
@@ -1201,8 +1221,8 @@ device_node::~device_node()
 
 	// Delete devices
 	while (Device* device = fDevices.RemoveHead()) {
+		device->SetRemovedFromParent(true);
 		devfs_unpublish_device(device, true);
-		delete device;
 	}
 
 	// Delete attributes

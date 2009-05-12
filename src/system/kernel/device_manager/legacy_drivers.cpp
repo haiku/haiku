@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -54,6 +54,8 @@ public:
 	virtual	status_t		InitDevice();
 	virtual	void			UninitDevice();
 
+	virtual	void			Removed();
+
 			void			SetHooks(device_hooks* hooks);
 
 			legacy_driver*	Driver() const { return fDriver; }
@@ -67,11 +69,16 @@ public:
 			bool			Republished() const { return fRepublished; }
 			void			SetRepublished(bool republished)
 								{ fRepublished = republished; }
+
+			void			SetRemovedFromParent(bool removed)
+								{ fRemovedFromParent = removed; }
+
 private:
 	legacy_driver*			fDriver;
 	const char*				fPath;
 	device_hooks*			fHooks;
 	bool					fRepublished;
+	bool					fRemovedFromParent;
 };
 
 typedef DoublyLinkedList<LegacyDevice> DeviceList;
@@ -284,9 +291,9 @@ republish_driver(legacy_driver* driver)
 
 		TRACE(("devfs: unpublishing no more present \"%s\"\n", device->Path()));
 		iterator.Remove();
+		device->SetRemovedFromParent(true);
 
 		devfs_unpublish_device(device, true);
-		delete device;
 	}
 
 	if (exported == 0) {
@@ -430,8 +437,8 @@ static void
 unpublish_driver(legacy_driver *driver)
 {
 	while (LegacyDevice* device = driver->devices.RemoveHead()) {
-		if (devfs_unpublish_device(device, true) == B_OK)
-			delete device;
+		device->SetRemovedFromParent(true);
+		devfs_unpublish_device(device, true);
 	}
 }
 
@@ -1109,7 +1116,8 @@ LegacyDevice::LegacyDevice(legacy_driver* driver, const char* path,
 		device_hooks* hooks)
 	:
 	fDriver(driver),
-	fRepublished(true)
+	fRepublished(true),
+	fRemovedFromParent(false)
 {
 	fDeviceModule = (device_module_info*)malloc(sizeof(device_module_info));
 	if (fDeviceModule != NULL)
@@ -1168,6 +1176,18 @@ LegacyDevice::UninitDevice()
 
 	if (fDriver != NULL)
 		fDriver->devices_used--;
+}
+
+
+void
+LegacyDevice::Removed()
+{
+	RecursiveLocker _(sLock);
+
+	if (!fRemovedFromParent)
+		fDriver->devices.Remove(this);
+
+	delete this;
 }
 
 
