@@ -85,6 +85,9 @@ typedef struct image_t {
 		bool			haiku;
 	} gcc_version;
 
+	uint32				api_version;
+	uint32				abi;
+
 	addr_t 				entry_point;
 	addr_t				init_routine;
 	addr_t				term_routine;

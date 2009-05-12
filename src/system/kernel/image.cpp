@@ -189,6 +189,9 @@ remove_images(struct team *team)
 status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
+	if (size > sizeof(image_info))
+		return B_BAD_VALUE;
+
 	status_t status = B_ENTRY_NOT_FOUND;
 
 	mutex_lock(&sImageMutex);
@@ -209,6 +212,9 @@ status_t
 _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 	size_t size)
 {
+	if (size > sizeof(image_info))
+		return B_BAD_VALUE;
+
 	status_t status = B_ENTRY_NOT_FOUND;
 	struct team *team;
 	cpu_status state;
@@ -468,13 +474,13 @@ _user_get_image_info(image_id id, image_info *userInfo, size_t size)
 	image_info info;
 	status_t status;
 
-	if (size != sizeof(image_info))
+	if (size > sizeof(image_info))
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
-	status = _get_image_info(id, &info, size);
+	status = _get_image_info(id, &info, sizeof(image_info));
 
 	if (user_memcpy(userInfo, &info, size) < B_OK)
 		return B_BAD_ADDRESS;
@@ -484,18 +490,19 @@ _user_get_image_info(image_id id, image_info *userInfo, size_t size)
 
 
 status_t
-_user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo, size_t size)
+_user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo,
+	size_t size)
 {
 	image_info info;
 	status_t status;
 
-	if (size != sizeof(image_info))
+	if (size > sizeof(image_info))
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userInfo) || !IS_USER_ADDRESS(_cookie))
 		return B_BAD_ADDRESS;
 
-	status = _get_next_image_info(team, _cookie, &info, size);
+	status = _get_next_image_info(team, _cookie, &info, sizeof(image_info));
 
 	if (user_memcpy(userInfo, &info, size) < B_OK)
 		return B_BAD_ADDRESS;

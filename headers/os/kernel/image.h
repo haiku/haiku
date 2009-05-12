@@ -33,6 +33,10 @@ typedef struct {
 	void		*data;
 	int32		text_size;
 	int32		data_size;
+
+	// Haiku R1 extensions
+	int32		api_version;	// the Haiku API version used by the image
+	int32		abi;			// the Haiku ABI used by the image
 } image_info;
 
 // flags for clear_caches()

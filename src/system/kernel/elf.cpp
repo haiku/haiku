@@ -20,6 +20,7 @@
 
 #include <AutoDeleter.h>
 #include <debug.h>
+#include <image_defs.h>
 #include <kernel.h>
 #include <kimage.h>
 #include <syscalls.h>
@@ -57,6 +58,10 @@ static mutex sImageLoadMutex = MUTEX_INITIALIZER("kimages_load_lock");
 	// serializes loading/unloading add-ons locking order
 	// sImageLoadMutex -> sImageMutex
 static bool sInitialized = false;
+
+
+static struct Elf32_Sym *elf_find_symbol(struct elf_image_info *image,
+	const char *name);
 
 
 /*! Calculates hash for an image using its ID */
@@ -106,6 +111,46 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.text_size = image->text_region.size;
 	imageInfo.data = (void *)image->data_region.start;
 	imageInfo.data_size = image->data_region.size;
+
+	if (image->text_region.id >= 0) {
+		// evaluate the API/ABI version symbols
+
+		// Haiku API version
+		imageInfo.api_version = 0;
+		struct Elf32_Sym* symbol = elf_find_symbol(image,
+			B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME);
+		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
+			&& symbol->st_value > 0
+			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+			&& symbol->st_size >= sizeof(uint32)) {
+			addr_t symbolAddress = symbol->st_value + image->text_region.delta;
+			if (symbolAddress >= image->text_region.start
+				&& symbolAddress - image->text_region.start + sizeof(uint32)
+					<= image->text_region.size) {
+				imageInfo.api_version = *(uint32*)symbolAddress;
+			}
+		}
+
+		// Haiku ABI
+		imageInfo.abi = 0;
+		symbol = elf_find_symbol(image,
+			B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME);
+		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
+			&& symbol->st_value > 0
+			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+			&& symbol->st_size >= sizeof(uint32)) {
+			addr_t symbolAddress = symbol->st_value + image->text_region.delta;
+			if (symbolAddress >= image->text_region.start
+				&& symbolAddress - image->text_region.start + sizeof(uint32)
+					<= image->text_region.size) {
+				imageInfo.api_version = *(uint32*)symbolAddress;
+			}
+		}
+	} else {
+		// in-memory image -- use the current values
+		imageInfo.api_version = B_HAIKU_VERSION;
+		imageInfo.abi = B_HAIKU_ABI;
+	}
 
 	image->id = register_image(team_get_kernel_team(), &imageInfo,
 		sizeof(image_info));
@@ -1528,6 +1573,12 @@ elf_load_user_image(const char *path, struct team *team, int flags,
     imageInfo.device = st.st_dev;
     imageInfo.node = st.st_ino;
 	strlcpy(imageInfo.name, path, sizeof(imageInfo.name));
+
+	imageInfo.api_version = B_HAIKU_VERSION;
+	imageInfo.abi = B_HAIKU_ABI;
+		// TODO: Get the actual values for the shared object. Currently only
+		// the runtime loader is loaded, so this is good enough for the time
+		// being.
 
 	imageInfo.id = register_image(team, &imageInfo, sizeof(image_info));
 	if (imageInfo.id >= 0 && team_get_current_team_id() == team->id)

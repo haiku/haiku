@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -19,6 +19,7 @@
 #include <OS.h>
 
 #include <elf32.h>
+#include <image_defs.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 #include <user_runtime.h>
@@ -142,6 +143,10 @@ static thread_id sSemOwner;
 static int32 sSemCount;
 
 extern runtime_loader_add_on_export gRuntimeLoaderAddOnExport;
+
+
+static struct Elf32_Sym* find_symbol(image_t* image, const char* name,
+	int32 type);
 
 
 void
@@ -694,6 +699,34 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 }
 
 
+static void
+analyze_image_haiku_version_and_abi(image_t* image)
+{
+	// Haiku API version
+	struct Elf32_Sym* symbol = find_symbol(image,
+		B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME, B_SYMBOL_TYPE_DATA);
+	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
+		&& symbol->st_value > 0
+		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+		&& symbol->st_size >= sizeof(uint32)) {
+		image->api_version
+			= *(uint32*)(symbol->st_value + image->regions[0].delta);
+	} else
+		image->api_version = 0;
+
+	// Haiku ABI
+	symbol = find_symbol(image, B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME,
+		B_SYMBOL_TYPE_DATA);
+	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
+		&& symbol->st_value > 0
+		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+		&& symbol->st_size >= sizeof(uint32)) {
+		image->abi = *(uint32*)(symbol->st_value + image->regions[0].delta);
+	} else
+		image->abi = 0;
+}
+
+
 static bool
 analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
@@ -831,9 +864,9 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 		// well as cases where e.g. in a gcc 2 program a single C file has
 		// been compiled with gcc 4.
 		if (gccMajor == 0 || gccMajor > version[0]
-		 	|| gccMajor == version[0]
+		 	|| (gccMajor == version[0]
 				&& (gccMiddle < version[1]
-					|| gccMiddle == version[1] && gccMinor < version[2])) {
+					|| (gccMiddle == version[1] && gccMinor < version[2])))) {
 			gccMajor = version[0];
 			gccMiddle = version[1];
 			gccMinor = version[2];
@@ -1311,9 +1344,9 @@ find_undefined_symbol_global(image_t* rootImage, image_t* image,
 	image_t* otherImage = sLoadedImages.head;
 	while (otherImage != NULL) {
 		if (otherImage == rootImage
-			|| otherImage->type != B_ADD_ON_IMAGE
+			|| (otherImage->type != B_ADD_ON_IMAGE
 				&& (otherImage->flags
-					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0) {
+					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
 			struct Elf32_Sym *symbol = find_symbol(otherImage, name,
 				B_SYMBOL_TYPE_ANY);
 			if (symbol) {
@@ -1542,6 +1575,8 @@ register_image(image_t *image, int fd, const char *path)
 	info.text_size = image->regions[0].vmsize;
 	info.data = (void *)image->regions[1].vmstart;
 	info.data_size = image->regions[1].vmsize;
+	info.api_version = image->api_version;
+	info.abi = image->abi;
 	image->id = _kern_register_image(&info, sizeof(image_info));
 }
 
@@ -1687,6 +1722,24 @@ load_container(char const *name, image_type type, const char *rpath,
 		goto err2;
 	}
 
+	status = map_image(fd, path, image, type == B_APP_IMAGE);
+	if (status < B_OK) {
+		FATAL("Could not map image: %s\n", strerror(status));
+		status = B_ERROR;
+		goto err2;
+	}
+
+	if (!parse_dynamic_segment(image)) {
+		FATAL("Troubles handling dynamic section\n");
+		status = B_BAD_DATA;
+		goto err3;
+	}
+
+	if (eheader.e_entry != 0)
+		image->entry_point = eheader.e_entry + image->regions[0].delta;
+
+	analyze_image_haiku_version_and_abi(image);
+
 	if (analyze_object_gcc_version(fd, image, eheader, sheaderSize, ph_buff,
 			sizeof(ph_buff))) {
 		// If this is the executable image, we init the search path
@@ -1709,25 +1762,9 @@ load_container(char const *name, image_type type, const char *rpath,
 	// symbol resolution strategy (fallback is R5-style, if version is
 	// unavailable)
 	if (image->gcc_version.major == 0
-		|| image->gcc_version.major == 2 && image->gcc_version.middle < 95) {
+		|| (image->gcc_version.major == 2 && image->gcc_version.middle < 95)) {
 		image->find_undefined_symbol = find_undefined_symbol_beos;
 	}
-
-	status = map_image(fd, path, image, type == B_APP_IMAGE);
-	if (status < B_OK) {
-		FATAL("Could not map image: %s\n", strerror(status));
-		status = B_ERROR;
-		goto err2;
-	}
-
-	if (!parse_dynamic_segment(image)) {
-		FATAL("Troubles handling dynamic section\n");
-		status = B_BAD_DATA;
-		goto err3;
-	}
-
-	if (eheader.e_entry != 0)
-		image->entry_point = eheader.e_entry + image->regions[0].delta;
 
 	image->type = type;
 	register_image(image, fd, path);
