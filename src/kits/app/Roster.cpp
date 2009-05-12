@@ -2423,12 +2423,19 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 			}
 		}
 
-		// send B_ARGV_RECEIVED or B_REFS_RECEIVED or B_SILENT_RELAUNCH (if already running)
+		// send B_ARGV_RECEIVED or B_REFS_RECEIVED or B_SILENT_RELAUNCH (if
+		// already running)
 		if (args && argc > 1) {
 			BMessage message(B_ARGV_RECEIVED);
 			message.AddInt32("argc", argc);
 			for (int32 i = 0; i < argc; i++)
 				message.AddString("argv", args[i]);
+
+			// also add current working directory
+			char cwd[B_PATH_NAME_LENGTH];
+			if (getcwd(cwd, B_PATH_NAME_LENGTH) != NULL)
+				message.AddString("cwd", cwd);
+
 			messenger.SendMessage(&message);
 		} else if (ref) {
 			printf("_SendToRunning : B_REFS_RECEIVED\n");
