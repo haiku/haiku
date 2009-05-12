@@ -2864,12 +2864,12 @@ BMediaRoster::SniffRef(const entry_ref& file, uint64 requireNodeKinds,
 	media_node node;
 	
 	// Get all dormant nodes using GetDormantNodes
-	if (B_OK == GetDormantNodes(nodes, &count, NULL, NULL, NULL, requireNodeKinds | B_FILE_INTERFACE, 0)) {
+	if (GetDormantNodes(nodes, &count, NULL, NULL, NULL, requireNodeKinds | B_FILE_INTERFACE, 0) == B_OK) {
 		// Call SniffRefFor on each node that matches requireNodeKinds
 		for (int32 i=0;i<count;i++) {
-			if (B_OK == InstantiateDormantNode(nodes[i],&node)) {
+			if (InstantiateDormantNode(nodes[i], &node) == B_OK) {
 				
-				if (B_OK == SniffRefFor(node,file,&aMimeType,&capability)) {
+				if (SniffRefFor(node, file, &aMimeType, &capability) == B_OK) {
 					// find the first node that has 100% capability
 					TRACE("%s has a %f%% chance of playing file\n",nodes[i].name, capability * 100.0);
 					if (capability == 1.0) {
