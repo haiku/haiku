@@ -13,6 +13,16 @@
 #include <InterfaceDefs.h>
 #include <Entry.h>
 #include <Messenger.h>
+#include <String.h>
+
+
+enum dead_key_index {
+	kDeadKeyAcute = 1,
+	kDeadKeyGrave,
+	kDeadKeyCircumflex,
+	kDeadKeyDiaeresis,
+	kDeadKeyTilde
+};
 
 
 class Keymap {
@@ -39,6 +49,11 @@ public:
 								uint8 activeDeadKey);
 			void			SetDeadKeyEnabled(uint32 keyCode, uint32 modifiers,
 								bool enabled);
+			void			GetDeadKeyTrigger(dead_key_index deadKeyIndex,
+								BString& outTrigger);
+			void			SetDeadKeyTrigger(dead_key_index deadKeyIndex,
+								const BString& trigger);
+
 			void			GetChars(uint32 keyCode, uint32 modifiers,
 								uint8 activeDeadKey, char** chars,
 								int32* numBytes);
@@ -57,6 +72,8 @@ public:
 private:
 			int32			_Offset(uint32 keyCode, uint32 modifiers,
 								uint32* _table = NULL);
+			bool			_SetChars(int32 offset, const char* bytes,
+								int32 numBytes);
 			uint8			_GetDeadKeyIndex(int32 offset);
 
 			char*			fChars;

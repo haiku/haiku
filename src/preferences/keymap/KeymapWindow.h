@@ -46,6 +46,9 @@ protected:
 			void				_UseKeymap();
 			void				_RevertKeymap();
 
+			BMenuBar*			_CreateDeadKeyMenu();
+			void				_UpdateDeadKeyMenu();
+
 			void 				_FillSystemMaps();
 			void				_FillUserMaps();
 			void				_SetListViewSize(BListView* listView);
@@ -64,6 +67,12 @@ protected:
 			KeyboardLayoutView*	fKeyboardLayoutView;
 			BTextControl*		fTextControl;
 			BButton*			fSwitchShortcutsButton;
+			BMenu*				fDeadKeyMenu;
+			BMenu*				fAcuteMenu;
+			BMenu*				fCircumflexMenu;
+			BMenu*				fDiaeresisMenu;
+			BMenu*				fGraveMenu;
+			BMenu*				fTildeMenu;
 
 			Keymap				fCurrentMap;
 			Keymap				fPreviousMap;

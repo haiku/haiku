@@ -446,6 +446,78 @@ Keymap::SetDeadKeyEnabled(uint32 keyCode, uint32 modifiers, bool enabled)
 }
 
 
+/*! Returns the trigger character string that is currently set for the dead
+	key with the given index (which is 1..5).
+*/
+void
+Keymap::GetDeadKeyTrigger(dead_key_index deadKeyIndex, BString& outTrigger)
+{
+	outTrigger = "";
+	if (deadKeyIndex < 1 || deadKeyIndex > 5)
+		return;
+
+	int32 deadOffsets[] = {
+		fKeys.acute_dead_key[1],
+		fKeys.grave_dead_key[1],
+		fKeys.circumflex_dead_key[1],
+		fKeys.dieresis_dead_key[1],
+		fKeys.tilde_dead_key[1]
+	};
+
+	int32 offset = deadOffsets[deadKeyIndex - 1];
+	if (offset < 0 || offset >= (int32)fCharsSize)
+		return;
+
+	uint32 deadNumBytes = fChars[offset];
+	if (!deadNumBytes)
+		return;
+
+	outTrigger.SetTo(&fChars[offset + 1], deadNumBytes);
+}
+
+
+/*! Sets the trigger character string that shall be used for the dead key
+	with the given index (which is 1..5).
+*/
+void
+Keymap::SetDeadKeyTrigger(dead_key_index deadKeyIndex, const BString& trigger)
+{
+	if (deadKeyIndex < 1 || deadKeyIndex > 5)
+		return;
+
+	int32 deadOffsets[] = {
+		fKeys.acute_dead_key[1],
+		fKeys.grave_dead_key[1],
+		fKeys.circumflex_dead_key[1],
+		fKeys.dieresis_dead_key[1],
+		fKeys.tilde_dead_key[1]
+	};
+
+	int32 offset = deadOffsets[deadKeyIndex - 1];
+	if (offset < 0 || offset >= (int32)fCharsSize)
+		return;
+
+	if (_SetChars(offset, trigger.String(), trigger.Length())) {
+		// reset modifier table such that new dead key is enabled wherever
+		// it is available
+		uint32* deadTables[] = {
+			&fKeys.acute_tables,
+			&fKeys.grave_tables,
+			&fKeys.circumflex_tables,
+			&fKeys.dieresis_tables,
+			&fKeys.tilde_tables
+		};
+		*deadTables[deadKeyIndex - 1]
+			= B_CONTROL_TABLE | B_OPTION_CAPS_SHIFT_TABLE | B_OPTION_CAPS_TABLE
+				| B_OPTION_SHIFT_TABLE | B_OPTION_TABLE | B_CAPS_SHIFT_TABLE
+				| B_CAPS_TABLE | B_SHIFT_TABLE | B_NORMAL_TABLE;
+
+		if (fModificationMessage != NULL)
+			fTarget.SendMessage(fModificationMessage);
+	}
+}
+
+
 //! Get the char for a key given modifiers and active dead key
 void
 Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
@@ -487,11 +559,21 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 	// here we take an potential active dead key
 	int32 *deadKey;
 	switch (activeDeadKey) {
-		case 1: deadKey = fKeys.acute_dead_key; break;
-		case 2: deadKey = fKeys.grave_dead_key; break;
-		case 3: deadKey = fKeys.circumflex_dead_key; break;
-		case 4: deadKey = fKeys.dieresis_dead_key; break;
-		case 5: deadKey = fKeys.tilde_dead_key; break;
+		case kDeadKeyAcute:
+			deadKey = fKeys.acute_dead_key;
+			break;
+		case kDeadKeyGrave:
+			deadKey = fKeys.grave_dead_key;
+			break;
+		case kDeadKeyCircumflex:
+			deadKey = fKeys.circumflex_dead_key;
+			break;
+		case kDeadKeyDiaeresis:
+			deadKey = fKeys.dieresis_dead_key;
+			break;
+		case kDeadKeyTilde:
+			deadKey = fKeys.tilde_dead_key;
+			break;
 		default:
 		{
 			// if not dead, we copy and return the char
@@ -556,54 +638,10 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 	if (numBytes > 6)
 		return;
 
-	int32 oldNumBytes = fChars[offset];
-
-	if (oldNumBytes == numBytes
-		&& !memcmp(&fChars[offset + 1], bytes, numBytes)) {
-		// nothing to do
-		return;
+	if (_SetChars(offset, bytes, numBytes)) {
+		if (fModificationMessage != NULL)
+			fTarget.SendMessage(fModificationMessage);
 	}
-
-	// TODO: handle dead keys!
-
-	int32 diff = numBytes - oldNumBytes;
-	if (diff != 0) {
-		fCharsSize += diff;
-
-		if (diff > 0) {
-			// make space for the new data
-			char* chars = new(std::nothrow) char[fCharsSize];
-			if (chars != NULL) {
-				memcpy(chars, fChars, offset + oldNumBytes + 1);
-				memcpy(&chars[offset + 1 + numBytes],
-					&fChars[offset + 1 + oldNumBytes],
-					fCharsSize - 2 - offset - diff);
-				delete[] fChars;
-				fChars = chars;
-			} else
-				return;
-		} else if (diff < 0) {
-			// shrink table
-			memmove(&fChars[offset + numBytes], &fChars[offset + oldNumBytes],
-				fCharsSize - offset - 2 - diff);
-		}
-
-		// update offsets
-
-		int32* data = fKeys.control_map;
-		int32 size = sizeof(fKeys.control_map) / 4 * 9
-			+ sizeof(fKeys.acute_dead_key) / 4 * 5;
-		for (int32 i = 0; i < size; i++) {
-			if (data[i] > offset)
-				data[i] += diff;
-		}
-	}
-
-	memcpy(&fChars[offset + 1], bytes, numBytes);
-	fChars[offset] = numBytes;
-
-	if (fModificationMessage != NULL)
-		fTarget.SendMessage(fModificationMessage);
 }
 
 
@@ -690,6 +728,56 @@ Keymap::_Offset(uint32 keyCode, uint32 modifiers, uint32* _table)
 		return -1;
 
 	return offset;
+}
+
+
+bool
+Keymap::_SetChars(int32 offset, const char* bytes, int32 numBytes)
+{
+	int32 oldNumBytes = fChars[offset];
+
+	if (oldNumBytes == numBytes
+		&& !memcmp(&fChars[offset + 1], bytes, numBytes)) {
+		// nothing to do
+		return false;
+	}
+
+	int32 diff = numBytes - oldNumBytes;
+	if (diff != 0) {
+		fCharsSize += diff;
+
+		if (diff > 0) {
+			// make space for the new data
+			char* chars = new(std::nothrow) char[fCharsSize];
+			if (chars != NULL) {
+				memcpy(chars, fChars, offset + oldNumBytes + 1);
+				memcpy(&chars[offset + 1 + numBytes],
+					&fChars[offset + 1 + oldNumBytes],
+					fCharsSize - 2 - offset - diff);
+				delete[] fChars;
+				fChars = chars;
+			} else
+				return false;
+		} else if (diff < 0) {
+			// shrink table
+			memmove(&fChars[offset + numBytes], &fChars[offset + oldNumBytes],
+				fCharsSize - offset - 2 - diff);
+		}
+
+		// update offsets
+		int32* data = fKeys.control_map;
+		int32 size = sizeof(fKeys.control_map) / 4 * 9
+			+ sizeof(fKeys.acute_dead_key) / 4 * 5;
+		for (int32 i = 0; i < size; i++) {
+			if (data[i] > offset)
+				data[i] += diff;
+		}
+	}
+
+	memcpy(&fChars[offset + 1], bytes, numBytes);
+	fChars[offset] = numBytes;
+
+	return true;
 }
 
 

@@ -51,6 +51,14 @@ static const uint32 kMsgUseKeymap = 'UkyM';
 static const uint32 kMsgRevertKeymap = 'Rvrt';
 static const uint32 kMsgKeymapUpdated = 'upkM';
 
+static const uint32 kMsgDeadKeyAcuteChanged = 'dkAc';
+static const uint32 kMsgDeadKeyCircumflexChanged = 'dkCc';
+static const uint32 kMsgDeadKeyDiaeresisChanged = 'dkDc';
+static const uint32 kMsgDeadKeyGraveChanged = 'dkGc';
+static const uint32 kMsgDeadKeyTildeChanged = 'dkTc';
+
+static const char* kDeadKeyTriggerNone = "<none>";
+
 
 KeymapWindow::KeymapWindow()
 	: BWindow(BRect(80, 50, 880, 380), "Keymap", B_TITLED_WINDOW,
@@ -80,8 +88,10 @@ KeymapWindow::KeymapWindow()
 				.Add(fKeyboardLayoutView)
 				//.Add(new BStringView("text label", "Sample and Clipboard:"))
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-					.Add(fTextControl)
+					.Add(_CreateDeadKeyMenu(), 0.0)
+					.AddGlue()
 					.Add(fSwitchShortcutsButton))
+				.Add(fTextControl)
 				.AddGlue(0.0)
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.AddGlue(0.0)
@@ -153,6 +163,7 @@ KeymapWindow::KeymapWindow()
 	fAppliedMap = fCurrentMap;
 	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
 
+	_UpdateDeadKeyMenu();
 	_UpdateSwitchShortcutButton();
 
 	Unlock();
@@ -307,6 +318,71 @@ KeymapWindow::MessageReceived(BMessage* message)
 			fUserListView->Select(0L);
 			break;
 
+		case kMsgDeadKeyAcuteChanged:
+		{
+			BMenuItem *item = fAcuteMenu->FindMarked();
+			if (item != NULL) {
+				const char* trigger = item->Label();
+				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
+					trigger = NULL;
+				fCurrentMap.SetDeadKeyTrigger(kDeadKeyAcute, trigger);
+				fKeyboardLayoutView->Invalidate();
+			}
+			break;
+		}
+
+		case kMsgDeadKeyCircumflexChanged:
+		{
+			BMenuItem *item = fCircumflexMenu->FindMarked();
+			if (item != NULL) {
+				const char* trigger = item->Label();
+				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
+					trigger = NULL;
+				fCurrentMap.SetDeadKeyTrigger(kDeadKeyCircumflex, trigger);
+				fKeyboardLayoutView->Invalidate();
+			}
+			break;
+		}
+
+		case kMsgDeadKeyDiaeresisChanged:
+		{
+			BMenuItem *item = fDiaeresisMenu->FindMarked();
+			if (item != NULL) {
+				const char* trigger = item->Label();
+				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
+					trigger = NULL;
+				fCurrentMap.SetDeadKeyTrigger(kDeadKeyDiaeresis, trigger);
+				fKeyboardLayoutView->Invalidate();
+			}
+			break;
+		}
+
+		case kMsgDeadKeyGraveChanged:
+		{
+			BMenuItem *item = fGraveMenu->FindMarked();
+			if (item != NULL) {
+				const char* trigger = item->Label();
+				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
+					trigger = NULL;
+				fCurrentMap.SetDeadKeyTrigger(kDeadKeyGrave, trigger);
+				fKeyboardLayoutView->Invalidate();
+			}
+			break;
+		}
+
+		case kMsgDeadKeyTildeChanged:
+		{
+			BMenuItem *item = fTildeMenu->FindMarked();
+			if (item != NULL) {
+				const char* trigger = item->Label();
+				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
+					trigger = NULL;
+				fCurrentMap.SetDeadKeyTrigger(kDeadKeyTilde, trigger);
+				fKeyboardLayoutView->Invalidate();
+			}
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -367,6 +443,61 @@ KeymapWindow::_CreateMenu()
 		}
 	}
 	menuBar->AddItem(fFontMenu);
+
+	return menuBar;
+}
+
+
+BMenuBar*
+KeymapWindow::_CreateDeadKeyMenu()
+{
+	BMenuBar* menuBar = new BMenuBar("deadkeymenubar");
+	fDeadKeyMenu = new BMenu("Select Dead Keys");
+	menuBar->AddItem(fDeadKeyMenu);
+
+	fAcuteMenu = new BMenu("Acute Trigger");
+	fAcuteMenu->SetRadioMode(true);
+	fAcuteMenu->AddItem(new BMenuItem("\xC2\xB4",
+		new BMessage(kMsgDeadKeyAcuteChanged)));
+	fAcuteMenu->AddItem(new BMenuItem("'",
+		new BMessage(kMsgDeadKeyAcuteChanged)));
+	fAcuteMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
+		new BMessage(kMsgDeadKeyAcuteChanged)));
+	fDeadKeyMenu->AddItem(fAcuteMenu);
+
+	fCircumflexMenu = new BMenu("Circumflex Trigger");
+	fCircumflexMenu->SetRadioMode(true);
+	fCircumflexMenu->AddItem(new BMenuItem("^",
+		new BMessage(kMsgDeadKeyCircumflexChanged)));
+	fCircumflexMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
+		new BMessage(kMsgDeadKeyCircumflexChanged)));
+	fDeadKeyMenu->AddItem(fCircumflexMenu);
+
+	fDiaeresisMenu = new BMenu("Diaeresis Trigger");
+	fDiaeresisMenu->SetRadioMode(true);
+	fDiaeresisMenu->AddItem(new BMenuItem("\xC2\xA8",
+		new BMessage(kMsgDeadKeyDiaeresisChanged)));
+	fDiaeresisMenu->AddItem(new BMenuItem("\"",
+		new BMessage(kMsgDeadKeyDiaeresisChanged)));
+	fDiaeresisMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
+		new BMessage(kMsgDeadKeyDiaeresisChanged)));
+	fDeadKeyMenu->AddItem(fDiaeresisMenu);
+
+	fGraveMenu = new BMenu("Grave Trigger");
+	fGraveMenu->SetRadioMode(true);
+	fGraveMenu->AddItem(new BMenuItem("`",
+		new BMessage(kMsgDeadKeyGraveChanged)));
+	fGraveMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
+		new BMessage(kMsgDeadKeyGraveChanged)));
+	fDeadKeyMenu->AddItem(fGraveMenu);
+
+	fTildeMenu = new BMenu("Tilde Trigger");
+	fTildeMenu->SetRadioMode(true);
+	fTildeMenu->AddItem(new BMenuItem("~",
+		new BMessage(kMsgDeadKeyTildeChanged)));
+	fTildeMenu->AddItem(new BMenuItem(kDeadKeyTriggerNone,
+		new BMessage(kMsgDeadKeyTildeChanged)));
+	fDeadKeyMenu->AddItem(fTildeMenu);
 
 	return menuBar;
 }
@@ -457,12 +588,57 @@ KeymapWindow::_UpdateSwitchShortcutButton()
 }
 
 
+/*!	Marks the menu items corresponding to the dead key state of the current
+	key map.
+*/
+void
+KeymapWindow::_UpdateDeadKeyMenu()
+{
+	BString trigger;
+	fCurrentMap.GetDeadKeyTrigger(kDeadKeyAcute, trigger);
+	if (!trigger.Length())
+		trigger = kDeadKeyTriggerNone;
+	BMenuItem* menuItem = fAcuteMenu->FindItem(trigger.String());
+	if (menuItem)
+		menuItem->SetMarked(true);
+
+	fCurrentMap.GetDeadKeyTrigger(kDeadKeyCircumflex, trigger);
+	if (!trigger.Length())
+		trigger = kDeadKeyTriggerNone;
+	menuItem = fCircumflexMenu->FindItem(trigger.String());
+	if (menuItem)
+		menuItem->SetMarked(true);
+
+	fCurrentMap.GetDeadKeyTrigger(kDeadKeyDiaeresis, trigger);
+	if (!trigger.Length())
+		trigger = kDeadKeyTriggerNone;
+	menuItem = fDiaeresisMenu->FindItem(trigger.String());
+	if (menuItem)
+		menuItem->SetMarked(true);
+
+	fCurrentMap.GetDeadKeyTrigger(kDeadKeyGrave, trigger);
+	if (!trigger.Length())
+		trigger = kDeadKeyTriggerNone;
+	menuItem = fGraveMenu->FindItem(trigger.String());
+	if (menuItem)
+		menuItem->SetMarked(true);
+
+	fCurrentMap.GetDeadKeyTrigger(kDeadKeyTilde, trigger);
+	if (!trigger.Length())
+		trigger = kDeadKeyTriggerNone;
+	menuItem = fTildeMenu->FindItem(trigger.String());
+	if (menuItem)
+		menuItem->SetMarked(true);
+}
+
+
 void
 KeymapWindow::_UpdateButtons()
 {
 	fUseButton->SetEnabled(!fCurrentMap.Equals(fAppliedMap));
 	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
 
+	_UpdateDeadKeyMenu();
 	_UpdateSwitchShortcutButton();
 }
 
