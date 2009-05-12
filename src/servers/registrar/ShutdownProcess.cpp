@@ -1255,19 +1255,23 @@ ShutdownProcess::_WorkerDoShutdown()
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
 	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
-		const char *title = (fReboot ? "Restart?" : "Shut Down?");
-		const char *text = (fReboot
+		const char* title = fReboot ? "Restart?" : "Shut Down?";
+		const char* text = fReboot
 			? "Do you really want to restart the system?"
-			: "Do you really want to shut down the system?");
-		const char *buttonText = (fReboot ? "Restart" : "Shut Down");
-		BAlert *alert = new BAlert(title, text, "Cancel", buttonText, NULL,
+			: "Do you really want to shut down the system?";
+		const char* defaultText = fReboot ? "Restart" : "Shut Down";
+		const char* otherText = fReboot ? "Shut Down" : "Restart";
+		BAlert* alert = new BAlert(title, text, "Cancel", otherText, defaultText,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 		alert->SetWorkspaces(B_ALL_WORKSPACES);
 		int32 result = alert->Go();
 
-		if (result != 1)
+		if (result == 1) {
+			// Toggle shutdown method
+			fReboot = !fReboot;
+		} else if (result < 1)
 			throw_error(B_SHUTDOWN_CANCELLED);
 	}
 
