@@ -164,11 +164,11 @@ TBarApp::~TBarApp()
 bool
 TBarApp::QuitRequested()
 {
-	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut")) 
+	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut"))
 		// don't allow user quitting
 		return false;
 
-	// system quitting, call inherited to notify all loopers 
+	// system quitting, call inherited to notify all loopers
 	fBarWindow->SaveSettings();
 	BApplication::QuitRequested();
 	return true;
@@ -268,7 +268,7 @@ TBarApp::InitSettings()
 				fSettingsFile->Read(&settings.recentDocsCount, sizeof(int32));
 			}
 			if (size >= kValidSettingsSize4) {
-				fSettingsFile->Read(&settings.timeShowSeconds, sizeof(bool));						
+				fSettingsFile->Read(&settings.timeShowSeconds, sizeof(bool));
 				fSettingsFile->Read(&settings.timeShowMil, sizeof(bool));
 			}
 			if (size >= kValidSettingsSize5)
@@ -344,13 +344,13 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 
 		case kConfigClose:
-			if (message->FindInt32("applications", &count) == B_OK)				
+			if (message->FindInt32("applications", &count) == B_OK)
 				fSettings.recentAppsCount = count;
-			if (message->FindInt32("folders", &count) == B_OK)				
+			if (message->FindInt32("folders", &count) == B_OK)
 				fSettings.recentFoldersCount = count;
-			if (message->FindInt32("documents", &count) == B_OK)				
+			if (message->FindInt32("documents", &count) == B_OK)
 				fSettings.recentDocsCount = count;
-				
+
 			fConfigWindow = NULL;
 			break;
 
@@ -364,7 +364,7 @@ TBarApp::MessageReceived(BMessage *message)
 
 			const char *sig = NULL;
 			message->FindString("be:signature", &sig);
-	
+
 			entry_ref ref;
 			message->FindRef("be:ref", &ref);
 
@@ -373,7 +373,7 @@ TBarApp::MessageReceived(BMessage *message)
 		}
 
 		case B_SOME_APP_QUIT:
-		{	
+		{
 			team_id team = -1;
 			message->FindInt32("be:team", &team);
 			RemoveTeam(team);
@@ -389,7 +389,7 @@ TBarApp::MessageReceived(BMessage *message)
 		case msg_Be:
 			__set_window_decor(0);
 			break;
-			
+
 		case msg_Win95:
 			__set_window_decor(2);
 			break;
@@ -408,11 +408,11 @@ TBarApp::MessageReceived(BMessage *message)
 			else
 				BDragger::ShowAllDraggers();
 			break;
-			
+
 		case msg_AlwaysTop:
  			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
 
- 			fBarWindow->SetFeel(fSettings.alwaysOnTop ? 
+ 			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
  				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
  			break;
 
@@ -456,7 +456,7 @@ TBarApp::MessageReceived(BMessage *message)
 				Unsubscribe(messenger);
 			break;
 		}
-		
+
 		case msg_superExpando:
 		{
 			fSettings.superExpando = !fSettings.superExpando;
@@ -467,7 +467,7 @@ TBarApp::MessageReceived(BMessage *message)
 			fBarWindow->Unlock();
 			break;
 		}
-		
+
 		case msg_expandNewTeams:
 		{
 			fSettings.expandNewTeams = !fSettings.expandNewTeams;
@@ -479,7 +479,7 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case 'TASK': 
+		case 'TASK':
 			fSwitcherMessenger.SendMessage(message);
 			break;
 
@@ -488,11 +488,15 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 
 		case CMD_REBOOT_SYSTEM:
-		case CMD_SHUTDOWN_SYSTEM: {
+		case CMD_SHUTDOWN_SYSTEM:
+		{
 			bool reboot = (message->what == CMD_REBOOT_SYSTEM);
+			bool confirm;
+			message->FindBool("confirm", &confirm);
+
 			BRoster roster;
 			BRoster::Private rosterPrivate(roster);
-			status_t error = rosterPrivate.ShutDown(reboot, false, false);
+			status_t error = rosterPrivate.ShutDown(reboot, confirm, false);
 			if (error != B_OK)
 				fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 
@@ -509,7 +513,7 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 
 		default:
-			BApplication::MessageReceived(message);		
+			BApplication::MessageReceived(message);
 			break;
 	}
 }
@@ -590,7 +594,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 	if (!autolock.IsLocked())
 		return;
 
-	// have we already seen this team, is this another instance of 
+	// have we already seen this team, is this another instance of
 	// a known app?
 	BarTeamInfo *multiLaunchTeam = NULL;
 	int32 teamCount = sBarTeamInfoList.CountItems();
@@ -612,7 +616,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 			message.AddString("sig", multiLaunchTeam->sig);
 
 			for (int32 i = 0; i < subsCount; i++)
-				((BMessenger *)sSubscribers.ItemAt(i))->SendMessage(&message);		
+				((BMessenger *)sSubscribers.ItemAt(i))->SendMessage(&message);
 		}
 		return;
 	}
@@ -620,7 +624,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 	BFile file(ref, B_READ_ONLY);
 	BAppFileInfo appMime(&file);
 
-	BarTeamInfo *barInfo = new BarTeamInfo(new BList(), flags, strdup(sig), 
+	BarTeamInfo *barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
 		new BBitmap(kIconSize, kIconFormat), strdup(ref->name));
 
 	barInfo->teams->AddItem((void *)team);
@@ -682,7 +686,7 @@ TBarApp::RemoveTeam(team_id team)
 				return;
 			}
 		}
-	} 
+	}
 }
 
 
@@ -697,8 +701,8 @@ TBarApp::ShowConfigWindow()
 		BPath path;
 		find_directory (B_USER_DESKBAR_DIRECTORY, &path);
 		entry_ref startref;
-		get_ref_for_path(path.Path(), &startref);	
-	
+		get_ref_for_path(path.Path(), &startref);
+
 		fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 240),
 #ifdef __HAIKU__
 			"Configure Leaf Menu", false, B_ANY_NODE,

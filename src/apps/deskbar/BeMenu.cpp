@@ -124,7 +124,7 @@ TBeMenu::DetachedFromWindow()
 }
 
 
-bool 
+bool
 TBeMenu::StartBuildingItemList()
 {
 	RemoveItems(0, CountItems(), true);
@@ -145,9 +145,9 @@ TBeMenu::DoneBuildingItemList()
 }
 
 
-bool 
+bool
 TBeMenu::AddNextItem()
-{	
+{
 	if (fAddState == kStart)
 		return AddStandardBeMenuItems();
 
@@ -167,7 +167,7 @@ TBeMenu::AddNextItem()
 		if (count > 0) {
 			AddSeparatorItem();
 
-			for (int i = 0;i < recentTypes;i++) {			
+			for (int i = 0;i < recentTypes;i++) {
 				if (!recentItem[i])
 					continue;
 
@@ -290,7 +290,7 @@ TBeMenu::AddStandardBeMenuItems()
 	subMenu->AddItem(item);
 
  	subMenu->AddSeparatorItem();
- 
+
  	TReplicantTray *replicantTray = ((TBarApp *)be_app)->BarView()->fReplicantTray;
 
 	item = new BMenuItem("24 Hour Clock", new BMessage(kMsgMilTime));
@@ -386,10 +386,13 @@ TBeMenu::AddStandardBeMenuItems()
 
 #ifdef __HAIKU__
 	shutdownMenu->SetTargetForItems(be_app);
+	BMessage* message = new BMessage(CMD_SHUTDOWN_SYSTEM);
+	message->AddBool("confirm", true);
+	AddItem(new BMenuItem(shutdownMenu, message));
 #else
 	shutdownMenu->SetTargetForItems(BMessenger(ROSTER_SIG));
-#endif
 	AddItem(shutdownMenu);
+#endif
 
 	fAddState = kAddingRecents;
 
@@ -397,7 +400,7 @@ TBeMenu::AddStandardBeMenuItems()
 }
 
 
-void 
+void
 TBeMenu::ClearMenuBuildingState()
 {
 	fAddState = kDone;
@@ -556,12 +559,12 @@ TRecentsMenu::DetachedFromWindow()
 {
 	//
 	//	BNavMenu::DetachedFromWindow sets the TypesList to NULL
-	//	
+	//
 	BMenu::DetachedFromWindow();
 }
 
 
-bool 
+bool
 TRecentsMenu::StartBuildingItemList()
 {
 	RemoveItems(0, CountItems(), true);
@@ -576,7 +579,7 @@ TRecentsMenu::StartBuildingItemList()
 }
 
 
-bool 
+bool
 TRecentsMenu::AddNextItem()
 {
 	if (fRecentsCount > 0 && AddRecents(fRecentsCount))
@@ -681,7 +684,7 @@ TRecentsMenu::AddRecents(int32 count)
 }
 
 
-void 
+void
 TRecentsMenu::DoneBuildingItemList()
 {
 	// !! note: don't call inherited here
@@ -694,7 +697,7 @@ TRecentsMenu::DoneBuildingItemList()
 }
 
 
-void 
+void
 TRecentsMenu::ClearMenuBuildingState()
 {
 	fMenuBuilt = false;
@@ -705,7 +708,7 @@ TRecentsMenu::ClearMenuBuildingState()
 void
 TRecentsMenu::ResetTargets()
 {
-	BNavMenu::ResetTargets();	
+	BNavMenu::ResetTargets();
 
 	// if we are dragging, set the target to whatever was set
 	// else set it to the default (Tracker)
