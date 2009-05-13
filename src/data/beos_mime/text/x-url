@@ -1,0 +1,18 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "text/x-url";
+
+resource(2, "META:SNIFF_RULE") "0.80 (\"[InternetShortcut]\")";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
+
+resource(4, "META:S:DESC") #'MSDC' "Internet Shortcut";
+
+resource(5, "META:L:DESC") #'MLDC' "Microsoft Internet Explorer Shortcut";
+
+resource(6, "META:EXTENS") message(234) {
+	"extensions" = "url",
+	"type" = "text/x-url"
+};
+
