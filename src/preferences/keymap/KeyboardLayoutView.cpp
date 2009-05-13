@@ -115,6 +115,7 @@ KeyboardLayoutView::WindowActivated(bool active)
 		Invalidate();
 }
 
+
 BSize
 KeyboardLayoutView::MinSize()
 {

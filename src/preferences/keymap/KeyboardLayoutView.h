@@ -30,20 +30,21 @@ public:
 			void			SetEditable(bool editable);
 
 protected:
-	virtual	void			AttachedToWindow();
+	virtual void			AttachedToWindow();
 	virtual void			FrameResized(float width, float height);
-	virtual	BSize			MinSize();
+	virtual BSize			MinSize();
 
-	virtual	void			KeyDown(const char* bytes, int32 numBytes);
-	virtual	void			KeyUp(const char* bytes, int32 numBytes);
-	virtual	void			MouseDown(BPoint point);
-	virtual	void			MouseUp(BPoint point);
-	virtual	void			MouseMoved(BPoint point, uint32 transit,
+	virtual void			KeyDown(const char* bytes, int32 numBytes);
+	virtual void			KeyUp(const char* bytes, int32 numBytes);
+	virtual void			MouseDown(BPoint point);
+	virtual void			MouseUp(BPoint point);
+	virtual void			MouseMoved(BPoint point, uint32 transit,
 								const BMessage* dragMessage);
 
-	virtual	void			Draw(BRect updateRect);
-	virtual	void			MessageReceived(BMessage* message);
+	virtual void			Draw(BRect updateRect);
+	virtual void			MessageReceived(BMessage* message);
 	virtual void			WindowActivated(bool active);
+
 private:
 	enum key_kind {
 		kNormalKey,
