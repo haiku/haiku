@@ -4,30 +4,23 @@
  *
  * Authors:
  *		François Revol, revol@free.fr
+ *		Jonas Sundström, jonas@kirilla.com
  */
 
 /*
  * urlwrapper: wraps URL mime types around command line apps
  * or other apps that don't handle them directly.
  */
-#define DEBUG 1
+#define DEBUG 0
 
 #include <Alert.h>
 #include <Application.h>
-#include <AppFileInfo.h>
 #include <Debug.h>
-#include <Mime.h>
-#include <Message.h>
-#include <TypeConstants.h>
+#include <NodeInfo.h>
 #include <Roster.h>
 #include <String.h>
 #include <Url.h>
 
-#include <ctype.h>
-#include <stdio.h>
-#include <unistd.h>
-
-/* compile-time configuration */
 #include "urlwrapper.h"
 
 const char *kAppSig = APP_SIGNATURE;
@@ -52,81 +45,32 @@ const char *kVLCSig = "application/x-vnd.videolan-vlc";
 #endif
 
 
-class UrlWrapperApp : public BApplication
+class UrlWrapper : public BApplication
 {
 public:
-	UrlWrapperApp();
-	~UrlWrapperApp();
-status_t	SplitUrl(const char *url, BString &host, BString &port, BString &user, BString &pass, BString &path);
-status_t	UnurlString(BString &s);
-status_t	Warn(const char *url);
-virtual void	RefsReceived(BMessage *msg);
-virtual void	ArgvReceived(int32 argc, char **argv);
-virtual void	ReadyToRun(void);
-private:
+								UrlWrapper();
+								~UrlWrapper();
 
+	virtual void				RefsReceived(BMessage *msg);
+	virtual void				ArgvReceived(int32 argc, char **argv);
+	virtual void				ReadyToRun(void);
+
+private:
+			status_t			_Warn(const char *url);
 };
 
 
-status_t UrlWrapperApp::SplitUrl(const char *url, BString &host, BString &port, BString &user, BString &pass, BString &path)
-{
-	BPrivate::Support::BUrl u(url);
-	if (u.InitCheck() < 0)
-		return u.InitCheck();
-	host = u.host;
-	port = u.port;
-	user = u.user;
-	pass = u.pass;
-	path = u.path;
-	return 0;
-}
-
-UrlWrapperApp::UrlWrapperApp() : BApplication(kAppSig)
-{
-#if 0
-	BMimeType mt(B_URL_TELNET);
-	if (mt.InitCheck())
-		return;
-	if (!mt.IsInstalled()) {
-		mt.Install();
-	}
-#endif
-#if 0
-	BAppFileInfo afi;
-	if (!afi.Supports(&mt)) {
-		//printf("adding support for telnet url\n");
-		BMessage typemsg;
-		typemsg.AddString("types", url_mime);
-		afi.SetSupportedTypes(&typemsg, true);
-	}
-#endif
-}
-
-UrlWrapperApp::~UrlWrapperApp()
+UrlWrapper::UrlWrapper() : BApplication(kAppSig)
 {
 }
 
 
-
-status_t UrlWrapperApp::UnurlString(BString &s)
+UrlWrapper::~UrlWrapper()
 {
-	// TODO: check for %00 and bail out!
-	int32 length = s.Length();
-	int i;
-	for (i = 0; s[i] && i < length - 2; i++) {
-		if (s[i] == '%' && isxdigit(s[i+1]) && isxdigit(s[i+2])) {
-			int c;
-			sscanf(s.String() + i + 1, "%02x", &c);
-			s.Remove(i, 3);
-			s.Insert((char)c, 1, i);
-			length -= 2;
-		}
-	}
-	
-	return B_OK;
 }
 
-status_t UrlWrapperApp::Warn(const char *url)
+
+status_t UrlWrapper::_Warn(const char *url)
 {
 	BString message("An application has requested the system to open the following url: \n");
 	message << "\n" << url << "\n\n";
@@ -140,7 +84,8 @@ status_t UrlWrapperApp::Warn(const char *url)
 	return B_ERROR;
 }
 
-void UrlWrapperApp::RefsReceived(BMessage *msg)
+
+void UrlWrapper::RefsReceived(BMessage *msg)
 {
 	char buff[B_PATH_NAME_LENGTH];
 	int32 index = 0;
@@ -206,13 +151,9 @@ void UrlWrapperApp::RefsReceived(BMessage *msg)
 	}
 }
 
-void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
+
+void UrlWrapper::ArgvReceived(int32 argc, char **argv)
 {
-#if 0
-	for (int i = 1; i < argc; i++) {
-		//printf("argv[%d]=%s\n", i, argv[i]);
-	}
-#endif
 	if (argc <= 1)
 		return;
 	
@@ -220,28 +161,36 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	const char *pausec = " ; read -p 'Press any key'";
 	char *args[] = { "/bin/sh", "-c", NULL, NULL};
 
-	BPrivate::Support::BUrl u(argv[1]);
-	BString url = u.Full();
-	if (u.InitCheck() < 0) {
-		fprintf(stderr, "malformed url: '%s'\n", u.String());
+	BPrivate::Support::BUrl url(argv[1]);
+
+	BString full = url.Full();
+	BString proto = url.Proto();
+	BString host = url.Host();
+	BString port = url.Port();
+	BString user = url.User();
+	BString pass = url.Pass();
+	BString path = url.Path();
+
+	if (url.InitCheck() < 0) {
+		fprintf(stderr, "malformed url: '%s'\n", url.String());
 		return;
 	}
 	
 	// XXX: debug
-	PRINT(("PROTO='%s'\n", u.proto.String()));
-	PRINT(("HOST='%s'\n", u.host.String()));
-	PRINT(("PORT='%s'\n", u.port.String()));
-	PRINT(("USER='%s'\n", u.user.String()));
-	PRINT(("PASS='%s'\n", u.pass.String()));
-	PRINT(("PATH='%s'\n", u.path.String()));
-	
-	if (u.proto == "telnet") {
+	PRINT(("PROTO='%s'\n", proto.String()));
+	PRINT(("HOST='%s'\n", host.String()));
+	PRINT(("PORT='%s'\n", port.String()));
+	PRINT(("USER='%s'\n", user.String()));
+	PRINT(("PASS='%s'\n", pass.String()));
+	PRINT(("PATH='%s'\n", path.String()));
+
+	if (proto == "telnet") {
 		BString cmd("telnet ");
-		if (u.HasUser())
-			cmd << "-l " << u.user << " ";
-		cmd << u.host;
-		if (u.HasPort())
-			cmd << " " << u.port;
+		if (url.HasUser())
+			cmd << "-l " << user << " ";
+		cmd << host;
+		if (url.HasPort())
+			cmd << " " << port;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
@@ -250,14 +199,14 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	}
 	
 	// see draft: http://tools.ietf.org/wg/secsh/draft-ietf-secsh-scp-sftp-ssh-uri/
-	if (u.proto == "ssh") {
+	if (proto == "ssh") {
 		BString cmd("ssh ");
 		
-		if (u.HasUser())
-			cmd << "-l " << u.user << " ";
-		if (u.HasPort())
-			cmd << "-oPort=" << u.port << " ";
-		cmd << u.host;
+		if (url.HasUser())
+			cmd << "-l " << user << " ";
+		if (url.HasPort())
+			cmd << "-oPort=" << port << " ";
+		cmd << host;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
@@ -266,7 +215,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (u.proto == "ftp") {
+	if (proto == "ftp") {
 		BString cmd("ftp ");
 		
 		/*
@@ -274,7 +223,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 			cmd << "-l " << user << " ";
 		cmd << host;
 		*/
-		cmd << u.full;
+		cmd << full;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
@@ -283,17 +232,17 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 	
-	if (u.proto == "sftp") {
+	if (proto == "sftp") {
 		BString cmd("sftp ");
 		
 		//cmd << url;
-		if (u.HasPort())
-			cmd << "-oPort=" << u.port << " ";
-		if (u.HasUser())
-			cmd << u.user << "@";
-		cmd << u.host;
-		if (u.HasPath())
-			cmd << ":" << u.path;
+		if (url.HasPort())
+			cmd << "-oPort=" << port << " ";
+		if (url.HasUser())
+			cmd << user << "@";
+		cmd << host;
+		if (url.HasPath())
+			cmd << ":" << path;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
 		args[2] = (char *)cmd.String();
@@ -302,14 +251,14 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (u.proto == "finger") {
+	if (proto == "finger") {
 		BString cmd("/bin/finger ");
 		
-		if (u.HasUser())
-			cmd << u.user;
-		if (u.HasHost() == 0)
-			u.host = "127.0.0.1";
-		cmd << "@" << u.host;
+		if (url.HasUser())
+			cmd << user;
+		if (url.HasHost() == 0)
+			host = "127.0.0.1";
+		cmd << "@" << host;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
 		args[2] = (char *)cmd.String();
@@ -319,13 +268,13 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	}
 
 #ifdef HANDLE_HTTP_WGET
-	if (u.proto == "http") {
+	if (proto == "http") {
 		BString cmd("/bin/wget ");
 		
 		//cmd << url;
-		if (u.HasUser())
-			cmd << u.user << "@";
-		cmd << u.full;
+		if (url.HasUser())
+			cmd << user << "@";
+		cmd << full;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
 		args[2] = (char *)cmd.String();
@@ -336,11 +285,11 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_FILE
-	if (u.proto == "file") {
+	if (proto == "file") {
 		BMessage m(B_REFS_RECEIVED);
 		entry_ref ref;
-		UnurlString(u.path);
-		if (get_ref_for_path(u.path.String(), &ref) < B_OK)
+		url.UnurlString(path);
+		if (get_ref_for_path(path.String(), &ref) < B_OK)
 			return;
 		m.AddRef("refs", &ref);
 		be_roster->Launch(kTrackerSig, &m);
@@ -350,7 +299,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 
 #ifdef HANDLE_QUERY
 	// XXX:TODO: split options
-	if (u.proto == "query") {
+	if (proto == "query") {
 		// mktemp ?
 		BString qname("/tmp/query-url-temp-");
 		qname << getpid() << "-" << system_time();
@@ -360,14 +309,14 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		BString s;
 		int32 v;
 		
-		UnurlString(u.full);
+		url.UnurlString(full);
 		// TODO: handle options (list of attrs in the column, ...)
 
 		v = 'qybF'; // QuerY By Formula XXX: any #define for that ?
 		query.WriteAttr("_trk/qryinitmode", B_INT32_TYPE, 0LL, &v, sizeof(v));
 		s = "TextControl";
 		query.WriteAttr("_trk/focusedView", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
-		s = u.full;
+		s = full;
 		PRINT(("QUERY='%s'\n", s.String()));
 		query.WriteAttr("_trk/qryinitstr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
 		query.WriteAttr("_trk/qrystr", B_STRING_TYPE, 0LL, s.String(), s.Length()+1);
@@ -384,9 +333,9 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_SH
-	if (u.proto == "sh") {
-		BString cmd(u.Full());
-		if (Warn(u.String()) != B_OK)
+	if (proto == "sh") {
+		BString cmd(full);
+		if (_Warn(url.String()) != B_OK)
 			return;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
@@ -398,23 +347,23 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_BESHARE
-	if (u.proto == "beshare") {
+	if (proto == "beshare") {
 		team_id team;
 		BMessenger msgr(kBeShareSig);
 		// if no instance is running, or we want a specific server, start it.
-		if (!msgr.IsValid() || u.HasHost()) {
+		if (!msgr.IsValid() || url.HasHost()) {
 			be_roster->Launch(kBeShareSig, (BMessage *)NULL, &team);
 			msgr = BMessenger(NULL, team);
 		}
-		if (u.HasHost()) {
+		if (url.HasHost()) {
 			BMessage mserver('serv');
-			mserver.AddString("server", u.host);
+			mserver.AddString("server", host);
 			msgr.SendMessage(&mserver);
 			
 		}
-		if (u.HasPath()) {
+		if (url.HasPath()) {
 			BMessage mquery('quer');
-			mquery.AddString("query", u.path);
+			mquery.AddString("query", path);
 			msgr.SendMessage(&mquery);
 		}
 		// TODO: handle errors
@@ -423,14 +372,14 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_IM
-	if (u.proto == "icq" || u.proto == "msn") {
+	if (proto == "icq" || proto == "msn") {
 		// TODO
 		team_id team;
 		be_roster->Launch(kIMSig, (BMessage *)NULL, &team);
 		BMessenger msgr(NULL, team);
-		if (u.HasHost()) {
+		if (url.HasHost()) {
 			BMessage mserver(B_REFS_RECEIVED);
-			mserver.AddString("server", u.host);
+			mserver.AddString("server", host);
 			msgr.SendMessage(&httpmserver);
 			
 		}
@@ -440,8 +389,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_VLC
-	if (u.proto == "mms" || u.proto == "rtp" || u.proto == "rtsp") {
-		args[0] = (char *)u.String();
+	if (proto == "mms" || proto == "rtp" || proto == "rtsp") {
+		args[0] = (char *)url.String();
 		be_roster->Launch(kVLCSig, 1, args);
 		return;
 	}
@@ -468,14 +417,16 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 
 }
 
-void UrlWrapperApp::ReadyToRun(void)
+
+void UrlWrapper::ReadyToRun(void)
 {
 	Quit();
 }
 
+
 int main(int argc, char **argv)
 {
-	UrlWrapperApp app;
+	UrlWrapper app;
 	if (be_app)
 		app.Run();
 	return 0;

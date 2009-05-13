@@ -9,8 +9,18 @@
 
 /*! Url class for parsing an URL and opening it with its preferred handler. */
 
+#define DEBUG 0
 
-#include "Url.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include <Debug.h>
+#include <MimeType.h>
+#include <Roster.h>
+#include <StorageDefs.h>
+
+#include <Url.h>
 
 namespace BPrivate {
 namespace Support {
@@ -18,7 +28,7 @@ namespace Support {
 BUrl::BUrl(const char *url)
 	: BString(url)
 {
-	fStatus = ParseAndSplit();
+	fStatus = _ParseAndSplit();
 }
 
 
@@ -34,8 +44,71 @@ BUrl::InitCheck() const
 }
 
 
+bool
+BUrl::HasPreferredApplication() const
+{
+	BString appSignature = PreferredApplication();
+	BMimeType mime(appSignature.String());
+
+	if (appSignature.IFindFirst("application/") == 0
+		&& mime.IsValid())
+		return true;
+
+	return false;
+}
+
+
+BString
+BUrl::PreferredApplication() const
+{
+	BString appSignature;
+	BMimeType mime(_UrlMimeType().String());
+	mime.GetPreferredApp(appSignature.LockBuffer(B_MIME_TYPE_LENGTH));
+	appSignature.UnlockBuffer();
+
+	return BString(appSignature);
+}
+
+
 status_t
-BUrl::ParseAndSplit()
+BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
+{
+	status_t status = InitCheck();
+	if (status != B_OK)
+		return status;
+
+	if (Length() > B_PATH_NAME_LENGTH) {
+		// TODO: BAlert
+		//	if (onProblemAskUser)
+		//		Balert ... Too long URL!
+		fprintf(stderr, "URL too long");
+		return B_NAME_TOO_LONG;
+	}
+	
+	char *argv[] = {
+		const_cast<char*>("BUrlInvokedApplication"),
+		const_cast<char*>(String()),
+		NULL
+	};
+
+#if DEBUG
+	if (HasPreferredApplication())
+		printf("HasPreferredApplication() == true\n");
+	else
+		printf("HasPreferredApplication() == false\n");
+#endif
+
+	status = be_roster->Launch(_UrlMimeType().String(), 1, argv+1);
+	if (status != B_OK) {
+		fprintf(stderr, "Opening URL failed: %s\n", strerror(status));
+	}
+
+	return status;
+}
+
+
+status_t
+BUrl::_ParseAndSplit()
 {
 	// proto:[//]user:pass@host:port/path
 
@@ -104,6 +177,16 @@ BUrl::ParseAndSplit()
 	host = left;
 
 	return 0;
+}
+
+
+BString
+BUrl::_UrlMimeType() const
+{
+	BString mime;
+	mime << "application/x-vnd.Be.URL." << proto;
+
+	return BString(mime);
 }
 
 
@@ -182,6 +265,33 @@ BString
 BUrl::Pass() const
 {
 	return BString(pass);
+}
+
+
+BString
+BUrl::Path() const
+{
+	return BString(path);
+}
+
+
+status_t
+BUrl::UnurlString(BString &string)
+{
+	// TODO: check for %00 and bail out!
+	int32 length = string.Length();
+	int i;
+	for (i = 0; string[i] && i < length - 2; i++) {
+		if (string[i] == '%' && isxdigit(string[i+1]) && isxdigit(string[i+2])) {
+			int c;
+			sscanf(string.String() + i + 1, "%02x", &c);
+			string.Remove(i, 3);
+			string.Insert((char)c, 1, i);
+			length -= 2;
+		}
+	}
+	
+	return B_OK;
 }
 
 }; // namespace Support

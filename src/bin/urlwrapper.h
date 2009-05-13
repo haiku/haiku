@@ -6,19 +6,11 @@
  *		François Revol, revol@free.fr
  */
 
-/*
- * urlwrapper: compile-time configuration of supported protocols.
- */
-
 #define APP_SIGNATURE "application/x-vnd.Haiku-urlwrapper"
-
-/* 
- * comment out to disable handling a specific protocol
- */
-
 
 /* NetPositive Bookmark file type */
 #define HANDLE_BOOKMARK_FILES
+
 /* M$IE .url files */
 #define HANDLE_URL_FILES
 
@@ -52,3 +44,4 @@
 /* audio: redirects SoundPlay-urls for shoutcast streams */
 /* UNIMPLEMENTED */
 //#define HANDLE_AUDIO
+
