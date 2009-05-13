@@ -42,6 +42,9 @@
 // TODO: implement better locking strategy
 // TODO: implement lazy binding
 
+// interim Haiku API versions
+#define HAIKU_VERSION_PRE_GLUE_CODE		0x00000010
+
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
 
 #define	PAGE_OFFSET(x) ((x) & (PAGE_MASK))
@@ -731,10 +734,6 @@ static bool
 analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
 {
-	image->gcc_version.major = 0;
-	image->gcc_version.middle = 0;
-	image->gcc_version.minor = 0;
-
 	if (sheaderSize > (int)bufferSize) {
 		FATAL("Cannot handle section headers bigger than %lu\n", bufferSize);
 		return false;
@@ -872,16 +871,26 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 			gccMinor = version[2];
 		}
 
-		if (gccMajor == 2 && gccPlatform != NULL && strcmp(gccPlatform, "haiku"))
+		if (gccMajor == 2 && gccPlatform != NULL
+			&& strcmp(gccPlatform, "haiku")) {
 			isHaiku = false;
+		}
 	}
 
-	image->gcc_version.major = gccMajor;
-	image->gcc_version.middle = gccMiddle;
-	image->gcc_version.minor = gccMinor;
-	image->gcc_version.haiku = isHaiku;
+	if (gccMajor == 0)
+		return false;
 
-	return gccMajor != 0;
+	if (gccMajor == 2) {
+		if (gccMiddle < 95)
+			image->abi = B_HAIKU_ABI_GCC_2_ANCIENT;
+		else if (isHaiku)
+			image->abi = B_HAIKU_ABI_GCC_2_HAIKU;
+		else
+			image->abi = B_HAIKU_ABI_GCC_2_BEOS;
+	} else
+		image->abi = gccMajor << 16;
+
+	return true;
 }
 
 
@@ -1421,7 +1430,7 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 
 			// patch the symbol name
 			symName = SYMNAME(image, sym);
-			if (!image->gcc_version.haiku) {
+			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
 				// The image has been compiled with a BeOS compiler. This means
 				// we'll have to redirect some functions for compatibility.
 				symName = beos_compatibility_map_symbol(symName);
@@ -1740,31 +1749,42 @@ load_container(char const *name, image_type type, const char *rpath,
 
 	analyze_image_haiku_version_and_abi(image);
 
-	if (analyze_object_gcc_version(fd, image, eheader, sheaderSize, ph_buff,
-			sizeof(ph_buff))) {
-		// If this is the executable image, we init the search path
-		// subdir, if the compiler version doesn't match ours.
-		if (type == B_APP_IMAGE) {
-			#if __GNUC__ == 2
-				if (image->gcc_version.major > 2)
-					sSearchPathSubDir = "gcc4";
-			#elif __GNUC__ == 4
-				if (image->gcc_version.major == 2)
-					sSearchPathSubDir = "gcc2";
-			#endif
+	if (image->abi == 0) {
+		// No ABI version in the shared object, i.e. it has been built before
+		// that was introduced in Haiku. We have to try and analyze the gcc
+		// version.
+		if (!analyze_object_gcc_version(fd, image, eheader, sheaderSize,
+				ph_buff, sizeof(ph_buff))) {
+			FATAL("Failed to get gcc version for %s\n", path);
+				// not really fatal, actually
+
+			// assume ancient BeOS
+			image->abi = B_HAIKU_ABI_GCC_2_ANCIENT;
 		}
-	} else {
-		FATAL("Failed to get gcc version for %s\n", path);
-		// not really fatal, actually
+	}
+
+	// guess the API version, if we couldn't figure it out yet
+	if (image->api_version == 0) {
+		image->api_version = image->abi > B_HAIKU_ABI_GCC_2_BEOS
+			? HAIKU_VERSION_PRE_GLUE_CODE : B_HAIKU_VERSION_BEOS;
+	}
+
+	// If this is the executable image, we init the search path
+	// subdir, if the compiler version doesn't match ours.
+	if (type == B_APP_IMAGE) {
+		#if __GNUC__ == 2
+			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
+				sSearchPathSubDir = "gcc4";
+		#elif __GNUC__ == 4
+			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
+				sSearchPathSubDir = "gcc2";
+		#endif
 	}
 
 	// init gcc version dependent image flags
-	// symbol resolution strategy (fallback is R5-style, if version is
-	// unavailable)
-	if (image->gcc_version.major == 0
-		|| (image->gcc_version.major == 2 && image->gcc_version.middle < 95)) {
+	// symbol resolution strategy
+	if (image->abi == B_HAIKU_ABI_GCC_2_ANCIENT)
 		image->find_undefined_symbol = find_undefined_symbol_beos;
-	}
 
 	image->type = type;
 	register_image(image, fd, path);
@@ -1777,9 +1797,8 @@ load_container(char const *name, image_type type, const char *rpath,
 
 	*_image = image;
 
-	KTRACE("rld: load_container(\"%s\"): done: id: %ld (gcc: %d.%d.%d)", name,
-		image->id, image->gcc_version.major, image->gcc_version.middle,
-		image->gcc_version.minor);
+	KTRACE("rld: load_container(\"%s\"): done: id: %ld (ABI: %#lx)", name,
+		image->id, image->abi);
 
 	return B_OK;
 

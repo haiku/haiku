@@ -78,13 +78,6 @@ typedef struct image_t {
 	int32				ref_count;
 	uint32				flags;
 
-	struct {
-		int				major;
-		int				middle;
-		int				minor;
-		bool			haiku;
-	} gcc_version;
-
 	uint32				api_version;
 	uint32				abi;
 
