@@ -86,7 +86,7 @@ SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 ;
 SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	net_server media_addon_server input_server app_server fake_app_server
-	midi_server print_server mail_daemon
+	midi_server print_server mail_daemon cddb_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;

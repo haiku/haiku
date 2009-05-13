@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <Directory.h>
+#include <Entry.h>
 #include <NodeMonitor.h>
 #include <Message.h>
 #include <Volume.h>
@@ -193,12 +194,54 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 	BVolume volume(device);
 	
 	status_t result;
-	if ((result = volume.SetName((diskData->title).String())) != B_OK) {
+	BString name = diskData->artist << " - " << diskData->title;
+	if ((result = volume.SetName(name.String())) != B_OK) {
 		printf("Can't set volume name.\n");
 		return result;
 	}
 	
-	return B_ERROR;
+	// Rename tracks and add relevant Audio attributes.	
+	BDirectory cddaRoot;
+	volume.GetRootDirectory(&cddaRoot);
+	
+	BEntry entry;
+	int cnt = 0;
+	while (cddaRoot.GetNextEntry(&entry) == B_OK) {
+		TrackData* data = (TrackData*)((readResponse->tracks).ItemAt(cnt));
+		
+		// Update name.
+		if ((result = entry.Rename((data->title).String())) != B_OK) {
+			// Failed renaming one entry. Abort processing.
+			printf("Failed renaming entry at index %d. Aborting.\n", cnt);
+			return result;
+		}
+		
+		// Add relevant attributes. We consider an error here as non-fatal.
+		BNode node(&entry);
+		node.WriteAttr("Audio:Title", B_STRING_TYPE, 0, (data->title).String(),
+			(data->title).Length());
+		node.WriteAttr("Audio:Album", B_STRING_TYPE, 0,
+			(readResponse->title).String(),
+			(readResponse->title).Length());
+		node.WriteAttr("Audio:Genre", B_STRING_TYPE, 0,
+			(readResponse->genre).String(),
+			(readResponse->genre).Length());
+		node.WriteAttr("Audio:Year", B_INT32_TYPE, 0, &(readResponse->year),
+			sizeof(int32));
+
+		if (data->artist == "") {
+			node.WriteAttr("Audio:Artist", B_STRING_TYPE, 0,
+				(readResponse->artist).String(),
+				(readResponse->artist).Length());
+		} else {
+			node.WriteAttr("Audio:Artist", B_STRING_TYPE, 0,
+				(data->artist).String(), (data->artist).Length());			
+		}
+			
+		cnt++;
+	}
+	
+	return B_OK;
 }	
 
 
