@@ -738,7 +738,7 @@ Volume::Mount(const char* device)
 		inode->AddAttribute("Audio:Title", B_STRING_TYPE, text.titles[i]);
 		inode->AddAttribute("Audio:Genre", B_STRING_TYPE, text.genre);
 		inode->AddAttribute("Audio:Track", B_INT32_TYPE, track);
-		inode->AddAttribute("Audio:Bitrate", B_STRING_TYPE, "128 kbps");
+		inode->AddAttribute("Audio:Bitrate", B_STRING_TYPE, "1378 kbps");
 
 		snprintf(title, sizeof(title), "%02lu:%02lu",
 			uint32(inode->FrameCount() / kFramesPerMinute),
