@@ -157,9 +157,12 @@ struct BTextView::LayoutData {
 };
 
 
-const static rgb_color kBlackColor = { 0, 0, 0, 255 };
-const static rgb_color kBlueInputColor = { 152, 203, 255, 255 };
-const static rgb_color kRedInputColor = { 255, 152, 152, 255 };
+static const rgb_color kBlackColor = { 0, 0, 0, 255 };
+static const rgb_color kBlueInputColor = { 152, 203, 255, 255 };
+static const rgb_color kRedInputColor = { 255, 152, 152, 255 };
+
+static const float kHorizontalScrollBarStep = 10.0;
+static const float kVerticalScrollBarStep = 12.0;
 
 
 static property_info sPropertyList[] = {
@@ -3243,7 +3246,9 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 	int32 lastClickOffset = fClickOffset;
 	switch (inArrowKey) {
 		case B_LEFT_ARROW:
-			if (fSelStart != fSelEnd && !shiftDown)
+			if (!fEditable)
+				_ScrollBy(-1 * kHorizontalScrollBarStep, 0);
+			else if (fSelStart != fSelEnd && !shiftDown)
 				fClickOffset = fSelStart;
 			else {
 				fClickOffset
@@ -3267,7 +3272,9 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 			break;
 
 		case B_RIGHT_ARROW:
-			if (fSelStart != fSelEnd && !shiftDown)
+			if (!fEditable)
+				_ScrollBy(kHorizontalScrollBarStep, 0);
+			else if (fSelStart != fSelEnd && !shiftDown)
 				fClickOffset = fSelEnd;
 			else {
 				fClickOffset
@@ -3292,7 +3299,9 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 
 		case B_UP_ARROW:
 		{
-			if (fSelStart != fSelEnd && !shiftDown)
+			if (!fEditable)
+				_ScrollBy(0, -1 * kVerticalScrollBarStep);
+			else if (fSelStart != fSelEnd && !shiftDown)
 				fClickOffset = fSelStart;
 			else {
 				float height;
@@ -3318,7 +3327,9 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 
 		case B_DOWN_ARROW:
 		{
-			if (fSelStart != fSelEnd && !shiftDown)
+			if (!fEditable)
+				_ScrollBy(0, kVerticalScrollBarStep);
+			else if (fSelStart != fSelEnd && !shiftDown)
 				fClickOffset = fSelEnd;
 			else {
 				float height;
@@ -3346,13 +3357,15 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 	// invalidate the null style
 	fStyles->InvalidateNullStyle();
 
-	if (shiftDown)
-		Select(selStart, selEnd);
-	else
-		Select(fClickOffset, fClickOffset);
+	if (fEditable) {
+		if (shiftDown)
+			Select(selStart, selEnd);
+		else
+			Select(fClickOffset, fClickOffset);
 
-	// scroll if needed
-	ScrollToOffset(fClickOffset);
+		// scroll if needed
+		ScrollToOffset(fClickOffset);
+	}
 }
 
 
@@ -3406,9 +3419,15 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 	int32 lastClickOffset = fClickOffset;
 	switch (inPageKey) {
 		case B_HOME:
-			if (ctrlDown)
+			if (!fEditable) {
+				_ScrollTo(0, 0);
+				break;
+			}
+
+			if (ctrlDown) {
+				_ScrollTo(0, 0);
 				fClickOffset = 0;
-			else {
+			} else {
 				// get the start of the last line if caret is on it
 				line = (*fLines)[_LineAt(lastClickOffset)];
 				fClickOffset = line->offset;
@@ -3433,7 +3452,13 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 			break;
 
 		case B_END:
+			if (!fEditable) {
+				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
+				break;
+			}
+
 			if (ctrlDown) {
+				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				fClickOffset = fText->Length();
 			} else {
 				// If we are on the last line, just go to the last
@@ -3479,7 +3504,10 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 
 			currentPos.y -= Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
-			ScrollBy(0, -1 * Bounds().Height());
+			_ScrollBy(0, -1 * Bounds().Height());
+
+			if (!fEditable)
+				break;
 
 			if (!shiftDown)
 				selStart = selEnd = fClickOffset;
@@ -3506,7 +3534,10 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 
 			currentPos.y += Bounds().Height();
 			fClickOffset = OffsetAt(LineAt(currentPos));
-			ScrollBy(0, Bounds().Height());
+			_ScrollBy(0, Bounds().Height());
+
+			if (!fEditable)
+				break;
 
 			if (!shiftDown)
 				selStart = selEnd = fClickOffset;
@@ -3528,12 +3559,14 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 		}
 	}
 
-	if (shiftDown)
-		Select(selStart, selEnd);
-	else
-		Select(fClickOffset, fClickOffset);
+	if (fEditable) {
+		if (shiftDown)
+			Select(selStart, selEnd);
+		else
+			Select(fClickOffset, fClickOffset);
 
-	ScrollToOffset(fClickOffset);
+		ScrollToOffset(fClickOffset);
+	}
 }
 
 
@@ -3580,7 +3613,8 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 
 	fClickOffset = fSelEnd;
 
-	ScrollToOffset(fClickOffset);
+	if (fEditable)
+		ScrollToOffset(fClickOffset);
 }
 
 
@@ -4368,7 +4402,7 @@ BTextView::_DrawCaret(int32 offset)
 inline void
 BTextView::_ShowCaret()
 {
-	if (!fCaretVisible)
+	if (!fCaretVisible && fEditable)
 		_InvertCaret();
 }
 
@@ -4719,8 +4753,8 @@ void
 BTextView::_UpdateScrollbars()
 {
 	BRect bounds(Bounds());
-	BScrollBar *horizontalScrollBar = ScrollBar(B_HORIZONTAL);
- 	BScrollBar *verticalScrollBar = ScrollBar(B_VERTICAL);
+	BScrollBar* horizontalScrollBar = ScrollBar(B_HORIZONTAL);
+ 	BScrollBar* verticalScrollBar = ScrollBar(B_VERTICAL);
 
 	// do we have a horizontal scroll bar?
 	if (horizontalScrollBar != NULL) {
@@ -4733,7 +4767,7 @@ BTextView::_UpdateScrollbars()
 
 		horizontalScrollBar->SetRange(0, (float)maxRange);
 		horizontalScrollBar->SetProportion((float)viewWidth / (float)dataWidth);
-		horizontalScrollBar->SetSteps(10, dataWidth / 10);
+		horizontalScrollBar->SetSteps(kHorizontalScrollBarStep, dataWidth / 10);
 	}
 
 	// how about a vertical scroll bar?
@@ -4747,8 +4781,42 @@ BTextView::_UpdateScrollbars()
 
 		verticalScrollBar->SetRange(0, maxRange);
 		verticalScrollBar->SetProportion((float)viewHeight / (float)dataHeight);
-		verticalScrollBar->SetSteps(12, viewHeight);
+		verticalScrollBar->SetSteps(kVerticalScrollBarStep, viewHeight);
 	}
+}
+
+
+/*! \brief Scrolls by the given offsets
+*/
+void
+BTextView::_ScrollBy(float horizontal, float vertical)
+{
+	BRect bounds = Bounds();
+	_ScrollTo(bounds.left + horizontal, bounds.top + vertical);
+}
+
+
+/*! \brief Scrolls to the given position, making sure not to scroll out of
+	bounds
+*/
+void
+BTextView::_ScrollTo(float x, float y)
+{
+	BRect bounds = Bounds();
+	long viewWidth = bounds.IntegerWidth();
+	long viewHeight = bounds.IntegerHeight();
+
+	if (x > fTextRect.right - viewWidth)
+		x = fTextRect.right - viewWidth;
+	if (x < 0.0)
+		x = 0.0;
+
+	if (y > fTextRect.bottom + fLayoutData->bottomInset - viewHeight)
+		y = fTextRect.bottom + fLayoutData->bottomInset - viewHeight;
+	if (y < 0.0)
+		y = 0.0;
+
+	ScrollTo(x, y);
 }
 
 
@@ -5185,6 +5253,7 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
 
+printf("string=%s\n", string);
 	const int32 inlineOffset = fInline->Offset();
 	InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;

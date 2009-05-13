@@ -394,6 +394,10 @@ private:
 
 			float				_NullStyleHeight() const;
 
+			void				_ScrollBy(float horizontalStep,
+									float verticalStep);
+			void				_ScrollTo(float x, float y);
+
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;
