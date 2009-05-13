@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -509,7 +509,7 @@ read_cdtext(int fd, struct cdtext &cdtext)
 	read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer,
 		kBufferSize);
 	if (read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer,
-			kBufferSize) < B_OK) {
+			kBufferSize) != B_OK) {
 		free(buffer);
 		return B_ERROR;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -102,8 +102,8 @@ class Volume {
 		size_t		BufferSize() const { return 32 * kFrameSize; }
 			// TODO: for now
 
-		static void	DetermineName(uint32 cddbId, int DeviceFD, char* name,
-			size_t length);
+		static void	DetermineName(uint32 cddbId, int device, char* name,
+						size_t length);
 
 	private:
 		Inode*		_CreateNode(Inode* parent, const char* name,
@@ -439,7 +439,7 @@ read_attributes(int fd, Inode* inode)
 
 
 static int
-open_attributes(uint32 cddbId, int deviceFD, int mode,
+open_attributes(uint32 cddbID, int deviceFD, int mode,
 	enum attr_mode attrMode)
 {
 	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
@@ -460,25 +460,25 @@ open_attributes(uint32 cddbId, int deviceFD, int mode,
 
 	if (attrMode == kDiscIDAttributes) {
 		char id[64];
-		snprintf(id, sizeof(id), "/%08lx", cddbId);
+		snprintf(id, sizeof(id), "/%08lx", cddbID);
 		strlcat(path, id, B_PATH_NAME_LENGTH);
 	} else if (attrMode == kDeviceAttributes) {
 		uint32 length = strlen(path);
-		char* device = path + length;
-		if (ioctl(deviceFD, B_GET_PATH_FOR_DEVICE, device,
+		char* deviceName = path + length;
+		if (ioctl(deviceFD, B_GET_PATH_FOR_DEVICE, deviceName,
 				B_PATH_NAME_LENGTH - length) < B_OK) {
 			free(path);
 			return B_ERROR;
 		}
 
-		device++;
+		deviceName++;
 
 		// replace slashes in the device path
-		while (device[0]) {
-			if (device[0] == '/')
-				device[0] = '_';
+		while (deviceName[0]) {
+			if (deviceName[0] == '/')
+				deviceName[0] = '_';
 
-			device++;
+			deviceName++;
 		}
 	} else
 		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
@@ -598,33 +598,33 @@ Volume::InitCheck()
 
 
 /*static*/ void
-Volume::DetermineName(uint32 cddbId, int deviceFD, char* name, size_t length)
+Volume::DetermineName(uint32 cddbID, int device, char* name, size_t length)
 {
-	int attrFD = open_attributes(cddbId, deviceFD, O_RDONLY,
+	name[0] = '\0';
+
+	int attrFD = open_attributes(cddbID, device, O_RDONLY,
 		kDiscIDAttributes);
 	if (attrFD < 0) {
 		// We do not have attributes set. Read CD text.
 		cdtext text;
-		read_cdtext(deviceFD, text);
-		if (text.artist != NULL && text.album != NULL)
-			snprintf(name, length, "%s - %s", text.artist, text.album);
-		else if (text.artist != NULL || text.album != NULL) {
-			snprintf(name, length, "%s", text.artist != NULL
-				? text.artist : text.album);
-		} else
-			strlcpy(name, "Audio CD", length);
+		if (read_cdtext(device, text) == B_OK) {
+			if (text.artist != NULL && text.album != NULL)
+				snprintf(name, length, "%s - %s", text.artist, text.album);
+			else if (text.artist != NULL || text.album != NULL) {
+				snprintf(name, length, "%s", text.artist != NULL
+					? text.artist : text.album);
+			}
+		}
 	} else {
 		// We have an attribute file. Read name from it.
-		char line[B_FILE_NAME_LENGTH];
-		if (!read_line(attrFD, line, B_FILE_NAME_LENGTH)) {
-			// Could not get name from attribute file. use default name.
-			strlcpy(name, "Audio CD", length);
-		} else {
-			// We got a name. Use it.
-			strlcpy(name, line, length);
-		}
+		if (!read_line(attrFD, name, length))
+			name[0] = '\0';
+
 		close(attrFD);
 	}
+
+	if (!name[0])
+		strlcpy(name, "Audio CD", length);
 }
 
 
@@ -644,7 +644,7 @@ Volume::Mount(const char* device)
 	if (status == B_OK && count_audio_tracks(toc) == 0)
 		status = B_BAD_TYPE;
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		free(toc);
 		return status;
 	}
@@ -655,11 +655,11 @@ Volume::Mount(const char* device)
 	fRootNode = _CreateNode(NULL, "", 0, 0, S_IFDIR | 0777);
 	if (fRootNode == NULL)
 		status = B_NO_MEMORY;
-	if (status >= B_OK) {
+	if (status == B_OK) {
 		status = publish_vnode(FSVolume(), fRootNode->ID(), fRootNode,
 			&gCDDAVnodeOps, fRootNode->Type(), 0);
 	}
-	if (status < B_OK) {
+	if (status != B_OK) {
 		free(toc);
 		return status;
 	}
@@ -671,7 +671,7 @@ Volume::Mount(const char* device)
 		// We do not seem to have an attribute file so this is probably the
 		// first time this CD is inserted. In this case, try to read CD-Text
 		// data.
-		if (read_cdtext(fDevice, text) < B_OK)
+		if (read_cdtext(fDevice, text) != B_OK)
 			dprintf("CDDA: no CD-Text found.\n");
 		else
 			doLookup = false;	 
@@ -1385,9 +1385,9 @@ cdda_scan_partition(int fd, partition_data* partition, void* _cookie)
 
 	// determine volume title
 
-	uint32 cddbId = compute_cddb_disc_id(*toc);
 	char name[256];
-	Volume::DetermineName(cddbId, fd, name, sizeof(name));
+	Volume::DetermineName(compute_cddb_disc_id(*toc), fd, name, sizeof(name));
+
 	partition->content_name = strdup(name);
 	if (partition->content_name == NULL)
 		return B_NO_MEMORY;
