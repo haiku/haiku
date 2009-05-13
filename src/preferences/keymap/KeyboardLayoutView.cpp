@@ -108,6 +108,13 @@ KeyboardLayoutView::FrameResized(float width, float height)
 }
 
 
+void
+KeyboardLayoutView::WindowActivated(bool active)
+{
+	if (active)
+		Invalidate();
+}
+
 BSize
 KeyboardLayoutView::MinSize()
 {
@@ -482,7 +489,8 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				&& fModifiers != newModifiers) {
 				fModifiers = newModifiers;
 				_EvaluateDropTarget(fDropPoint);
-				Invalidate();
+				if (Window()->IsActive())
+					Invalidate();
 			}
 			break;
 		}
@@ -947,7 +955,7 @@ KeyboardLayoutView::_KeyChanged(const BMessage* message)
 			uint8 diff = fKeyState[i] ^ state[i];
 			fKeyState[i] = state[i];
 
-			if (!checkSingle)
+			if (!checkSingle || !Window()->IsActive())
 				continue;
 
 			for (int32 j = 7; diff != 0; j--, diff >>= 1) {

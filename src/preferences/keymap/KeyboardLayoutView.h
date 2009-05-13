@@ -43,7 +43,7 @@ protected:
 
 	virtual	void			Draw(BRect updateRect);
 	virtual	void			MessageReceived(BMessage* message);
-
+	virtual void			WindowActivated(bool active);
 private:
 	enum key_kind {
 		kNormalKey,
