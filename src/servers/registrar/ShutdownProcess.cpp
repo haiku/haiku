@@ -1,7 +1,13 @@
 /*
  * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2006-2008, Stephan Aßmus.
+ * Copyright 2006, Ryan Leavengood.
+ *
  * Distributed under the terms of the MIT License.
  */
+
+#include "ShutdownProcess.h"
 
 #include <new>
 #include <string.h>
@@ -28,9 +34,7 @@
 #include <TokenSpace.h>
 #include <util/DoublyLinkedList.h>
 
-#ifdef __HAIKU__
 #include <syscalls.h>
-#endif
 
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"
@@ -39,7 +43,6 @@
 #include "MessageEvent.h"
 #include "Registrar.h"
 #include "RosterAppInfo.h"
-#include "ShutdownProcess.h"
 #include "TRoster.h"
 
 using std::nothrow;
@@ -98,16 +101,14 @@ enum {
 };
 
 
-// inverse_compare_by_registration_time
-static
-bool
-inverse_compare_by_registration_time(const RosterAppInfo *info1,
-	const RosterAppInfo *info2)
+static bool
+inverse_compare_by_registration_time(const RosterAppInfo* info1,
+	const RosterAppInfo* info2)
 {
 	return (info2->registration_time < info1->registration_time);
 }
 
-// throw_error
+
 /*!	\brief Used to avoid type matching problems when throwing a constant.
 */
 static inline
@@ -117,10 +118,10 @@ throw_error(status_t error)
 	throw error;
 }
 
-// TimeoutEvent
+
 class ShutdownProcess::TimeoutEvent : public MessageEvent {
 public:
-	TimeoutEvent(BHandler *target)
+	TimeoutEvent(BHandler* target)
 		: MessageEvent(0, target, MSG_PHASE_TIMED_OUT)
 	{
 		SetAutoDelete(false);
@@ -139,7 +140,7 @@ public:
 		fMessage.ReplaceInt32("team", team);
 	}
 
-	static int32 GetMessagePhase(BMessage *message)
+	static int32 GetMessagePhase(BMessage* message)
 	{
 		int32 phase;
 		if (message->FindInt32("phase", &phase) != B_OK)
@@ -148,7 +149,7 @@ public:
 		return phase;
 	}
 
-	static int32 GetMessageTeam(BMessage *message)
+	static int32 GetMessageTeam(BMessage* message)
 	{
 		team_id team;
 		if (message->FindInt32("team", &team) != B_OK)
@@ -159,14 +160,14 @@ public:
 };
 
 
-// InternalEvent
 class ShutdownProcess::InternalEvent
 	: public DoublyLinkedListLinkImpl<InternalEvent> {
 public:
 	InternalEvent(uint32 type, team_id team, int32 phase)
-		: fType(type),
-		  fTeam(team),
-		  fPhase(phase)
+		:
+		fType(type),
+		fTeam(team),
+		fPhase(phase)
 	{
 	}
 
@@ -181,21 +182,19 @@ private:
 };
 
 
-// InternalEventList
 struct ShutdownProcess::InternalEventList : DoublyLinkedList<InternalEvent> {
 };
 
 
-// QuitRequestReplyHandler
 class ShutdownProcess::QuitRequestReplyHandler : public BHandler {
 public:
-	QuitRequestReplyHandler(ShutdownProcess *shutdownProcess)
+	QuitRequestReplyHandler(ShutdownProcess* shutdownProcess)
 		: BHandler("shutdown quit reply handler"),
-		  fShutdownProcess(shutdownProcess)
+		fShutdownProcess(shutdownProcess)
 	{
 	}
 
-	virtual void MessageReceived(BMessage *message)
+	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
 			case B_REPLY:
@@ -222,7 +221,6 @@ private:
 };
 
 
-// ShutdownWindow
 class ShutdownProcess::ShutdownWindow : public BWindow {
 public:
 	ShutdownWindow()
@@ -230,14 +228,14 @@ public:
 			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_MINIMIZABLE
 				| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
-		  fKillAppMessage(NULL),
-		  fCurrentApp(-1)
+		fKillAppMessage(NULL),
+		fCurrentApp(-1)
 	{
 	}
 
 	~ShutdownWindow()
 	{
-		for (int32 i = 0; AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
+		for (int32 i = 0; AppInfo* info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
 			delete info;
 		}
 	}
@@ -279,7 +277,7 @@ public:
 			return B_NO_MEMORY;
 		fRootView->AddChild(fKillAppButton);
 
-		BMessage *message = new BMessage(MSG_KILL_APPLICATION);
+		BMessage* message = new BMessage(MSG_KILL_APPLICATION);
 		if (!message)
 			return B_NO_MEMORY;
 		message->AddInt32("team", -1);
@@ -406,9 +404,9 @@ public:
 		return B_OK;
 	}
 
-	status_t AddApp(team_id team, BBitmap *miniIcon, BBitmap *largeIcon)
+	status_t AddApp(team_id team, BBitmap* miniIcon, BBitmap* largeIcon)
 	{
-		AppInfo *info = new(nothrow) AppInfo;
+		AppInfo* info = new(nothrow) AppInfo;
 		if (!info) {
 			delete miniIcon;
 			delete largeIcon;
@@ -436,13 +434,13 @@ public:
 		if (team == fCurrentApp)
 			SetCurrentApp(-1);
 
-		AppInfo *info = (AppInfo*)fAppInfos.RemoveItem(index);
+		AppInfo* info = (AppInfo*)fAppInfos.RemoveItem(index);
 		delete info;
 	}
 
 	void SetCurrentApp(team_id team)
 	{
-		AppInfo *info = (team >= 0 ? _AppInfoFor(team) : NULL);
+		AppInfo* info = (team >= 0 ? _AppInfoFor(team) : NULL);
 
 		fCurrentApp = team;
 		fRootView->SetAppInfo(info);
@@ -450,7 +448,7 @@ public:
 		fKillAppMessage->ReplaceInt32("team", team);
 	}
 
-	void SetText(const char *text)
+	void SetText(const char* text)
 	{
 		fTextView->SetText(text);
 	}
@@ -513,7 +511,7 @@ private:
 		if (team < 0)
 			return -1;
 
-		for (int32 i = 0; AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
+		for (int32 i = 0; AppInfo* info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
 			if (info->team == team)
 				return i;
 		}
@@ -521,7 +519,7 @@ private:
 		return -1;
 	}
 
-	AppInfo *_AppInfoFor(team_id team)
+	AppInfo* _AppInfoFor(team_id team)
 	{
 		int32 index = _AppInfoIndexOf(team);
 		return (index >= 0 ? (AppInfo*)fAppInfos.ItemAt(index) : NULL);
@@ -529,9 +527,10 @@ private:
 
 	class TAlertView : public BView {
 	  public:
-		TAlertView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+		TAlertView(BRect frame, const char* name, uint32 resizeMask,
+				uint32 flags)
 			: BView(frame, name, resizeMask, flags | B_WILL_DRAW),
-			  fAppInfo(NULL)
+			fAppInfo(NULL)
 		{
 		}
 
@@ -554,7 +553,7 @@ private:
 			}
 		}
 
-		void SetAppInfo(AppInfo *info)
+		void SetAppInfo(AppInfo* info)
 		{
 			fAppInfo = info;
 			Invalidate();
@@ -566,42 +565,43 @@ private:
 
 private:
 	BList				fAppInfos;
-	TAlertView			*fRootView;
-	BTextView			*fTextView;
-	BButton				*fKillAppButton;
-	BButton				*fCancelShutdownButton;
-	BButton				*fRebootSystemButton;
-	BButton				*fAbortedOKButton;
-	BMessage			*fKillAppMessage;
+	TAlertView*			fRootView;
+	BTextView*			fTextView;
+	BButton*			fKillAppButton;
+	BButton*			fCancelShutdownButton;
+	BButton*			fRebootSystemButton;
+	BButton*			fAbortedOKButton;
+	BMessage*			fKillAppMessage;
 	team_id				fCurrentApp;
 };
 
 
 // #pragma mark -
 
-// constructor
-ShutdownProcess::ShutdownProcess(TRoster *roster, EventQueue *eventQueue)
-	: BLooper("shutdown process"),
-	  EventMaskWatcher(BMessenger(this), B_REQUEST_QUIT),
-	  fWorkerLock("worker lock"),
-	  fRequest(NULL),
-	  fRoster(roster),
-	  fEventQueue(eventQueue),
-	  fTimeoutEvent(NULL),
-	  fInternalEvents(NULL),
-	  fInternalEventSemaphore(-1),
-	  fQuitRequestReplyHandler(NULL),
-	  fWorker(-1),
-	  fCurrentPhase(INVALID_PHASE),
-	  fShutdownError(B_ERROR),
-	  fHasGUI(false),
-	  fReboot(false),
-	  fRequestReplySent(false),
-	  fWindow(NULL)
+
+ShutdownProcess::ShutdownProcess(TRoster* roster, EventQueue* eventQueue)
+	:
+	BLooper("shutdown process"),
+	EventMaskWatcher(BMessenger(this), B_REQUEST_QUIT),
+	fWorkerLock("worker lock"),
+	fRequest(NULL),
+	fRoster(roster),
+	fEventQueue(eventQueue),
+	fTimeoutEvent(NULL),
+	fInternalEvents(NULL),
+	fInternalEventSemaphore(-1),
+	fQuitRequestReplyHandler(NULL),
+	fWorker(-1),
+	fCurrentPhase(INVALID_PHASE),
+	fShutdownError(B_ERROR),
+	fHasGUI(false),
+	fReboot(false),
+	fRequestReplySent(false),
+	fWindow(NULL)
 {
 }
 
-// destructor
+
 ShutdownProcess::~ShutdownProcess()
 {
 	// terminate the GUI
@@ -642,7 +642,7 @@ ShutdownProcess::~ShutdownProcess()
 
 	// delete all internal events and the queue
 	if (fInternalEvents) {
-		while (InternalEvent *event = fInternalEvents->First()) {
+		while (InternalEvent* event = fInternalEvents->First()) {
 			fInternalEvents->Remove(event);
 			delete event;
 		}
@@ -655,9 +655,9 @@ ShutdownProcess::~ShutdownProcess()
 	delete fRequest;
 }
 
-// Init
+
 status_t
-ShutdownProcess::Init(BMessage *request)
+ShutdownProcess::Init(BMessage* request)
 {
 	PRINT(("ShutdownProcess::Init()\n"));
 
@@ -729,9 +729,9 @@ ShutdownProcess::Init(BMessage *request)
 	return B_OK;
 }
 
-// MessageReceived
+
 void
-ShutdownProcess::MessageReceived(BMessage *message)
+ShutdownProcess::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SOME_APP_QUIT:
@@ -748,7 +748,7 @@ ShutdownProcess::MessageReceived(BMessage *message)
 
 			// remove the app info from the respective list
 			int32 phase;
-			RosterAppInfo *info;
+			RosterAppInfo* info;
 			{
 				BAutolock _(fWorkerLock);
 
@@ -778,7 +778,7 @@ ShutdownProcess::MessageReceived(BMessage *message)
 			// get the phase the event is intended for
 			int32 phase = TimeoutEvent::GetMessagePhase(message);
 			team_id team = TimeoutEvent::GetMessageTeam(message);;
-PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
+			PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 
 			BAutolock _(fWorkerLock);
 
@@ -857,9 +857,9 @@ PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 	}
 }
 
-// SendReply
+
 void
-ShutdownProcess::SendReply(BMessage *request, status_t error)
+ShutdownProcess::SendReply(BMessage* request, status_t error)
 {
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
@@ -871,7 +871,7 @@ ShutdownProcess::SendReply(BMessage *request, status_t error)
 	}
 }
 
-// _SendReply
+
 void
 ShutdownProcess::_SendReply(status_t error)
 {
@@ -881,7 +881,7 @@ ShutdownProcess::_SendReply(status_t error)
 	}
 }
 
-// _SetPhase
+
 void
 ShutdownProcess::_SetPhase(int32 phase)
 {
@@ -896,7 +896,7 @@ ShutdownProcess::_SetPhase(int32 phase)
 	fEventQueue->RemoveEvent(fTimeoutEvent);
 }
 
-// _ScheduleTimeoutEvent
+
 void
 ShutdownProcess::_ScheduleTimeoutEvent(bigtime_t timeout, team_id team)
 {
@@ -914,7 +914,7 @@ ShutdownProcess::_ScheduleTimeoutEvent(bigtime_t timeout, team_id team)
 	fEventQueue->AddEvent(fTimeoutEvent);
 }
 
-// _SetShowShutdownWindow
+
 void
 ShutdownProcess::_SetShowShutdownWindow(bool show)
 {
@@ -930,7 +930,7 @@ ShutdownProcess::_SetShowShutdownWindow(bool show)
 	}
 }
 
-// _InitShutdownWindow
+
 void
 ShutdownProcess::_InitShutdownWindow()
 {
@@ -959,15 +959,15 @@ ShutdownProcess::_InitShutdownWindow()
 	}
 }
 
-// _AddShutdownWindowApps
+
 void
-ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
+ShutdownProcess::_AddShutdownWindowApps(AppInfoList& infos)
 {
 	if (!fHasGUI)
 		return;
 
 	for (AppInfoList::Iterator it = infos.It(); it.IsValid(); ++it) {
-		RosterAppInfo *info = *it;
+		RosterAppInfo* info = *it;
 
 		// init an app file info
 		BFile file;
@@ -995,7 +995,7 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
 #endif
 
 		// mini icon
-		BBitmap *miniIcon = new(nothrow) BBitmap(BRect(0, 0, 15, 15), format);
+		BBitmap* miniIcon = new(nothrow) BBitmap(BRect(0, 0, 15, 15), format);
 		if (miniIcon != NULL) {
 			error = miniIcon->InitCheck();
 			if (error == B_OK)
@@ -1007,7 +1007,7 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
 		}
 
 		// mini icon
-		BBitmap *largeIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31), format);
+		BBitmap* largeIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31), format);
 		if (largeIcon != NULL) {
 			error = largeIcon->InitCheck();
 			if (error == B_OK)
@@ -1027,7 +1027,7 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList &infos)
 	}
 }
 
-// _RemoveShutdownWindowApp
+
 void
 ShutdownProcess::_RemoveShutdownWindowApp(team_id team)
 {
@@ -1038,7 +1038,7 @@ ShutdownProcess::_RemoveShutdownWindowApp(team_id team)
 	}
 }
 
-// _SetShutdownWindowCurrentApp
+
 void
 ShutdownProcess::_SetShutdownWindowCurrentApp(team_id team)
 {
@@ -1049,9 +1049,9 @@ ShutdownProcess::_SetShutdownWindowCurrentApp(team_id team)
 	}
 }
 
-// _SetShutdownWindowText
+
 void
-ShutdownProcess::_SetShutdownWindowText(const char *text)
+ShutdownProcess::_SetShutdownWindowText(const char* text)
 {
 	if (fHasGUI) {
 		BAutolock _(fWindow);
@@ -1060,7 +1060,7 @@ ShutdownProcess::_SetShutdownWindowText(const char *text)
 	}
 }
 
-// _SetShutdownWindowCancelButtonEnabled
+
 void
 ShutdownProcess::_SetShutdownWindowCancelButtonEnabled(bool enabled)
 {
@@ -1071,7 +1071,7 @@ ShutdownProcess::_SetShutdownWindowCancelButtonEnabled(bool enabled)
 	}
 }
 
-// _SetShutdownWindowKillButtonEnabled
+
 void
 ShutdownProcess::_SetShutdownWindowKillButtonEnabled(bool enabled)
 {
@@ -1082,7 +1082,7 @@ ShutdownProcess::_SetShutdownWindowKillButtonEnabled(bool enabled)
 	}
 }
 
-// _SetShutdownWindowWaitForShutdown
+
 void
 ShutdownProcess::_SetShutdownWindowWaitForShutdown()
 {
@@ -1093,7 +1093,7 @@ ShutdownProcess::_SetShutdownWindowWaitForShutdown()
 	}
 }
 
-// _SetShutdownWindowWaitForAbortedOK
+
 void
 ShutdownProcess::_SetShutdownWindowWaitForAbortedOK()
 {
@@ -1104,7 +1104,7 @@ ShutdownProcess::_SetShutdownWindowWaitForAbortedOK()
 	}
 }
 
-// _NegativeQuitRequestReply
+
 void
 ShutdownProcess::_NegativeQuitRequestReply(thread_id thread)
 {
@@ -1116,9 +1116,9 @@ ShutdownProcess::_NegativeQuitRequestReply(thread_id thread)
 	_PushEvent(ABORT_EVENT, thread, fCurrentPhase);
 }
 
-// _PrepareShutdownMessage
+
 void
-ShutdownProcess::_PrepareShutdownMessage(BMessage &message) const
+ShutdownProcess::_PrepareShutdownMessage(BMessage& message) const
 {
 	message.what = B_QUIT_REQUESTED;
 	message.AddBool("_shutdown_", true);
@@ -1126,26 +1126,19 @@ ShutdownProcess::_PrepareShutdownMessage(BMessage &message) const
 	BMessage::Private(message).SetReply(BMessenger(fQuitRequestReplyHandler));
 }
 
-// _ShutDown
+
 status_t
 ShutdownProcess::_ShutDown()
 {
 	PRINT(("Invoking _kern_shutdown(%d)\n", fReboot));
-
-	#ifdef __HAIKU__
-		RETURN_ERROR(_kern_shutdown(fReboot));
-	#else
-		// we can't do anything on R5
-		return B_ERROR;
-	#endif
+	RETURN_ERROR(_kern_shutdown(fReboot));
 }
 
 
-// _PushEvent
 status_t
 ShutdownProcess::_PushEvent(uint32 eventType, team_id team, int32 phase)
 {
-	InternalEvent *event = new(nothrow) InternalEvent(eventType, team, phase);
+	InternalEvent* event = new(nothrow) InternalEvent(eventType, team, phase);
 	if (!event) {
 		ERROR(("ShutdownProcess::_PushEvent(): Failed to create event!\n"));
 
@@ -1160,9 +1153,9 @@ ShutdownProcess::_PushEvent(uint32 eventType, team_id team, int32 phase)
 	return B_OK;
 }
 
-// _GetNextEvent
+
 status_t
-ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
+ShutdownProcess::_GetNextEvent(uint32& eventType, thread_id& team, int32& phase,
 	bool block)
 {
 	while (true) {
@@ -1187,7 +1180,7 @@ ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
 		// get the event
 		BAutolock _(fWorkerLock);
 
-		InternalEvent *event = fInternalEvents->Head();
+		InternalEvent* event = fInternalEvents->Head();
 		fInternalEvents->Remove(event);
 
 		eventType = event->Type();
@@ -1210,14 +1203,14 @@ ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
 	return B_OK;
 }
 
-// _WorkerEntry
+
 status_t
-ShutdownProcess::_WorkerEntry(void *data)
+ShutdownProcess::_WorkerEntry(void* data)
 {
 	return ((ShutdownProcess*)data)->_Worker();
 }
 
-// _Worker
+
 status_t
 ShutdownProcess::_Worker()
 {
@@ -1239,7 +1232,7 @@ ShutdownProcess::_Worker()
 	return B_OK;
 }
 
-// _WorkerDoShutdown
+
 void
 ShutdownProcess::_WorkerDoShutdown()
 {
@@ -1333,25 +1326,23 @@ ShutdownProcess::_WorkerDoShutdown()
 				break;
 		} while (event != REBOOT_SYSTEM_EVENT);
 
-		#ifdef __HAIKU__
 		_kern_shutdown(true);
-		#endif
 	}
 
 	// either there's no GUI or reboot failed: we enter the kernel debugger
 	// instead
-	#ifdef __HAIKU__
+#ifdef __HAIKU__
 // TODO: Introduce the syscall.
 //	while (true) {
 //		_kern_kernel_debugger("The system is shut down. It's now safe to turn "
 //			"off the computer.");
 //	}
-	#endif
+#endif
 }
 
 
 bool
-ShutdownProcess::_WaitForApp(team_id team, AppInfoList *list, bool systemApps)
+ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 {
 	uint32 event;
 	do {
@@ -1393,7 +1384,7 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList *list, bool systemApps)
 
 
 void
-ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
+ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 {
 	PRINT(("ShutdownProcess::_QuitApps(%s)\n",
 		(systemApps ? "system" : "user")));
@@ -1453,7 +1444,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 		{
 			BAutolock _(fWorkerLock);
 			if (!list.IsEmpty()) {
-				RosterAppInfo *info = *list.It();
+				RosterAppInfo* info = *list.It();
 				team = info->team;
 				port = info->port;
 				strcpy(appName, info->ref.name);
@@ -1493,7 +1484,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 				// This is a system app: remove it from the list
 				BAutolock _(fWorkerLock);
 
-				if (RosterAppInfo *info = list.InfoFor(team)) {
+				if (RosterAppInfo* info = list.InfoFor(team)) {
 					list.RemoveInfo(info);
 					delete info;
 				}
@@ -1502,7 +1493,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 	}
 }
 
-// _QuitBackgroundApps
+
 void
 ShutdownProcess::_QuitBackgroundApps()
 {
@@ -1535,7 +1526,7 @@ ShutdownProcess::_QuitBackgroundApps()
 	PRINT(("ShutdownProcess::_QuitBackgroundApps() done\n"));
 }
 
-// _WaitForBackgroundApps
+
 void
 ShutdownProcess::_WaitForBackgroundApps()
 {
@@ -1569,7 +1560,7 @@ ShutdownProcess::_WaitForBackgroundApps()
 	PRINT(("ShutdownProcess::_WaitForBackgroundApps() done\n"));
 }
 
-// _KillBackgroundApps
+
 void
 ShutdownProcess::_KillBackgroundApps()
 {
@@ -1590,12 +1581,12 @@ ShutdownProcess::_KillBackgroundApps()
 		// get the first team to kill
 		team_id team = -1;
 		char appName[B_FILE_NAME_LENGTH];
-		AppInfoList &list = fBackgroundApps;
+		AppInfoList& list = fBackgroundApps;
 		{
 			BAutolock _(fWorkerLock);
 
 			if (!list.IsEmpty()) {
-				RosterAppInfo *info = *list.It();
+				RosterAppInfo* info = *list.It();
 				team = info->team;
 				strcpy(appName, info->ref.name);
 			}
@@ -1613,7 +1604,7 @@ ShutdownProcess::_KillBackgroundApps()
 	}
 }
 
-// _QuitNonApps
+
 void
 ShutdownProcess::_QuitNonApps()
 {
@@ -1661,10 +1652,10 @@ ShutdownProcess::_QuitNonApps()
 	PRINT(("ShutdownProcess::_QuitNonApps() done\n"));
 }
 
-// _QuitBlockingApp
+
 void
-ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
-	const char *appName, bool cancelAllowed)
+ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
+	const char* appName, bool cancelAllowed)
 {
 	bool debugged = false;
 	bool modal = false;
@@ -1737,14 +1728,14 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 	{
 		BAutolock _(fWorkerLock);
 
-		if (RosterAppInfo *info = list.InfoFor(team)) {
+		if (RosterAppInfo* info = list.InfoFor(team)) {
 			list.RemoveInfo(info);
 			delete info;
 		}
 	}
 }
 
-// _DisplayAbortingApp
+
 void
 ShutdownProcess::_DisplayAbortingApp(team_id team)
 {
@@ -1754,7 +1745,7 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 	{
 		BAutolock _(fWorkerLock);
 
-		RosterAppInfo *info = fUserApps.InfoFor(team);
+		RosterAppInfo* info = fUserApps.InfoFor(team);
 		if (!info)
 			info = fSystemApps.InfoFor(team);
 		if (!info)
@@ -1774,8 +1765,8 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 
 	// compose the text to be displayed
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "Application \"%s\" has aborted the shutdown "
-		"process.", appName);
+	snprintf(buffer, sizeof(buffer), "Application \"%s\" has aborted the "
+		"shutdown process.", appName);
 
 	// set up the window
 	_SetShutdownWindowCurrentApp(team);
@@ -1802,14 +1793,6 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 		// stop waiting when the user hit the cancel button
 		if (event == ABORT_EVENT && phase == ABORTED_PHASE && eventTeam < 0)
 			break;
-
-// This doesn't give us anything; it will just prevent us to see which
-// app was responsible after all...
-#if 0
-		// also stop when the responsible app quit
-		if ((event == APP_QUIT_EVENT) && eventTeam == team)
-			break;
-#endif
 	}
 }
 
