@@ -64,6 +64,6 @@ extern
 "C"
 #endif
 status_t elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
-			struct elf_image_info *shared_image, const char *sym_prepend, addr_t *sym_addr);
+			struct elf_image_info *shared_image, addr_t *sym_addr);
 
 #endif	/* _KERNEL_ELF_PRIV_H */

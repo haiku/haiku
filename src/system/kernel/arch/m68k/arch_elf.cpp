@@ -56,8 +56,8 @@ static const char *kRelocations[] = {
 	"R_68K_JMP_SLOT",	/* Create PLT entry */
 	"R_68K_RELATIVE",	/* Adjust by program base */
 	/* These are GNU extensions to enable C++ vtable garbage collection.  */
-	"R_68K_GNU_VTINHERIT",	
-	"R_68K_GNU_VTENTRY",	
+	"R_68K_GNU_VTINHERIT",
+	"R_68K_GNU_VTENTRY",
 #if 0
 	"R_386_NONE",
 	"R_386_32",			/* add symbol value */
@@ -79,8 +79,8 @@ status_t
 boot_arch_elf_relocate_rel(struct preloaded_image *image,
 	struct Elf32_Rel *rel, int rel_len)
 #else
-int 
-arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
+int
+arch_elf_relocate_rel(struct elf_image_info *image,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
 #endif
 {
@@ -140,8 +140,8 @@ status_t
 boot_arch_elf_relocate_rela(struct preloaded_image *image,
 	struct Elf32_Rela *rel, int rel_len)
 #else
-int 
-arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
+int
+arch_elf_relocate_rela(struct elf_image_info *image,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
 #endif
 {
@@ -191,8 +191,7 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 #ifdef _BOOT_MODE
 				vlErr = boot_elf_resolve_symbol(image, sym, &S);
 #else
-				vlErr = elf_resolve_symbol(image, sym, resolve_image,
-					sym_prepend, &S);
+				vlErr = elf_resolve_symbol(image, sym, resolve_image, &S);
 #endif
 				if (vlErr < 0) {
 					dprintf("%s(): Failed to relocate "

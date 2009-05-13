@@ -660,33 +660,22 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 
 /*!	Resolves the \a symbol by linking against \a sharedImage if necessary.
 	Returns the resolved symbol's address in \a _symbolAddress.
-	TODO: eventually get rid of "symbolPrepend"
 */
 status_t
 elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
-	struct elf_image_info *sharedImage, const char *symbolPrepend,
-	addr_t *_symbolAddress)
+	struct elf_image_info *sharedImage, addr_t *_symbolAddress)
 {
 	switch (symbol->st_shndx) {
 		case SHN_UNDEF:
 		{
 			struct Elf32_Sym *newSymbol;
-			char newNameBuffer[368];
-			char *newName;
-
-			// patch the symbol name
-			if (symbolPrepend) {
-				newName = newNameBuffer;
-				strlcpy(newName, symbolPrepend, sizeof(newName));
-				strlcat(newName, SYMNAME(image, symbol), sizeof(newName));
-			} else
-				newName = SYMNAME(image, symbol);
+			const char *symbolName = SYMNAME(image, symbol);
 
 			// it's undefined, must be outside this image, try the other image
-			newSymbol = elf_find_symbol(sharedImage, newName);
+			newSymbol = elf_find_symbol(sharedImage, symbolName);
 			if (newSymbol == NULL) {
 				dprintf("\"%s\": could not resolve symbol '%s'\n",
-					image->name, newName);
+					image->name, symbolName);
 				return B_MISSING_SYMBOL;
 			}
 
@@ -694,14 +683,14 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 			if (ELF32_ST_TYPE(symbol->st_info)
 					!= ELF32_ST_TYPE(newSymbol->st_info)) {
 				dprintf("elf_resolve_symbol: found symbol '%s' in shared image "
-					"but wrong type\n", newName);
+					"but wrong type\n", symbolName);
 				return B_MISSING_SYMBOL;
 			}
 
 			if (ELF32_ST_BIND(newSymbol->st_info) != STB_GLOBAL
 				&& ELF32_ST_BIND(newSymbol->st_info) != STB_WEAK) {
 				TRACE(("elf_resolve_symbol: found symbol '%s' but not "
-					"exported\n", newName));
+					"exported\n", symbolName));
 				return B_MISSING_SYMBOL;
 			}
 
@@ -727,7 +716,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 
 /*! Until we have shared library support, just this links against the kernel */
 static int
-elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
+elf_relocate(struct elf_image_info *image)
 {
 	int status = B_NO_ERROR;
 
@@ -738,8 +727,8 @@ elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
 		TRACE(("total %i relocs\n",
 			image->rel_len / (int)sizeof(struct Elf32_Rel)));
 
-		status = arch_elf_relocate_rel(image, symbolPrepend, sKernelImage,
-			image->rel, image->rel_len);
+		status = arch_elf_relocate_rel(image, sKernelImage, image->rel,
+			image->rel_len);
 		if (status < B_OK)
 			return status;
 	}
@@ -749,10 +738,10 @@ elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
 			image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
 
 		if (image->pltrel_type == DT_REL) {
-			status = arch_elf_relocate_rel(image, symbolPrepend, sKernelImage,
-				image->pltrel, image->pltrel_len);
+			status = arch_elf_relocate_rel(image, sKernelImage, image->pltrel,
+				image->pltrel_len);
 		} else {
-			status = arch_elf_relocate_rela(image, symbolPrepend, sKernelImage,
+			status = arch_elf_relocate_rela(image, sKernelImage,
 				(struct Elf32_Rela *)image->pltrel, image->pltrel_len);
 		}
 		if (status < B_OK)
@@ -760,8 +749,8 @@ elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
 	}
 
 	if (image->rela) {
-		status = arch_elf_relocate_rela(image, symbolPrepend, sKernelImage,
-			image->rela, image->rela_len);
+		status = arch_elf_relocate_rela(image, sKernelImage, image->rela,
+			image->rela_len);
 		if (status < B_OK)
 			return status;
 	}
@@ -943,7 +932,7 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 		goto error1;
 
 	if (!kernel) {
-		status = elf_relocate(image, NULL);
+		status = elf_relocate(image);
 		if (status < B_OK)
 			goto error1;
 	} else
@@ -1823,7 +1812,7 @@ load_kernel_add_on(const char *path)
 	if (status < B_OK)
 		goto error5;
 
-	status = elf_relocate(image, NULL);
+	status = elf_relocate(image);
 	if (status < B_OK)
 		goto error5;
 

@@ -60,7 +60,7 @@ boot_arch_elf_relocate_rel(struct preloaded_image *image,
 	struct Elf32_Rel *rel, int relLength)
 #else
 int
-arch_elf_relocate_rel(struct elf_image_info *image, const char *prepend,
+arch_elf_relocate_rel(struct elf_image_info *image,
 	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
 #endif
 {
@@ -93,8 +93,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *prepend,
 #ifdef _BOOT_MODE
 				status = boot_elf_resolve_symbol(image, symbol, &S);
 #else
-				status = elf_resolve_symbol(image, symbol, resolveImage,
-					prepend, &S);
+				status = elf_resolve_symbol(image, symbol, resolveImage, &S);
 #endif
 				if (status < B_OK)
 					return status;
@@ -172,7 +171,7 @@ boot_arch_elf_relocate_rela(struct preloaded_image *image,
 	struct Elf32_Rela *rel, int relLength)
 #else
 int
-arch_elf_relocate_rela(struct elf_image_info *image, const char *prepend,
+arch_elf_relocate_rela(struct elf_image_info *image,
 	struct elf_image_info *resolveImage, struct Elf32_Rela *rel, int relLength)
 #endif
 {
