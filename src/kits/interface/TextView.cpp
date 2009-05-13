@@ -5253,7 +5253,6 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
 
-printf("string=%s\n", string);
 	const int32 inlineOffset = fInline->Offset();
 	InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;
