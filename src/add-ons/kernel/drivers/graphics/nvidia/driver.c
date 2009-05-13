@@ -155,11 +155,7 @@ static uint16 nvidia_device_list[] = {
 	0x0112, /* Nvidia GeForce2 Go */
 	0x0113, /* Nvidia Quadro2 MXR/EX/Go */
 	0x0140, /* Nvidia GeForce FX 6600 GT */
-#if 0
-	// TODO: investigate! Other cards might be affected, see tickets #1530
-	//	and #1712.
 	0x0141, /* Nvidia GeForce FX 6600 */
-#endif
 	0x0142, /* Nvidia GeForce FX 6600LE */
 	0x0143, /* Nvidia GeForce 6600 VE */
 	0x0144, /* Nvidia GeForce FX 6600 Go */
