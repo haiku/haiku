@@ -683,10 +683,7 @@ ShutdownProcess::Init(BMessage* request)
 		RETURN_ERROR(fInternalEventSemaphore);
 
 	// init the app server connection
-	fHasGUI = (Registrar::App()->InitGUIContext() == B_OK);
-
-	// tell TRoster not to accept new applications anymore
-	fRoster->SetShuttingDown(true);
+	fHasGUI = Registrar::App()->InitGUIContext() == B_OK;
 
 	// start watching application quits
 	status_t error = fRoster->AddWatcher(this);
@@ -694,18 +691,6 @@ ShutdownProcess::Init(BMessage* request)
 		fRoster->SetShuttingDown(false);
 		RETURN_ERROR(error);
 	}
-
-	// get a list of all applications to shut down and sort them
-	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fBackgroundApps,
-		fVitalSystemApps);
-	if (error != B_OK) {
-		fRoster->RemoveWatcher(this);
-		fRoster->SetShuttingDown(false);
-		RETURN_ERROR(error);
-	}
-
-	fUserApps.Sort(&inverse_compare_by_registration_time);
-	fSystemApps.Sort(&inverse_compare_by_registration_time);
 
 	// start the worker thread
 	fWorker = spawn_thread(_WorkerEntry, "shutdown worker", B_NORMAL_PRIORITY,
@@ -1268,6 +1253,26 @@ ShutdownProcess::_WorkerDoShutdown()
 			throw_error(B_SHUTDOWN_CANCELLED);
 	}
 
+	// tell TRoster not to accept new applications anymore
+	fRoster->SetShuttingDown(true);
+
+	fWorkerLock.Lock();
+
+	// get a list of all applications to shut down and sort them
+	status_t status = fRoster->GetShutdownApps(fUserApps, fSystemApps,
+		fBackgroundApps, fVitalSystemApps);
+	if (status  != B_OK) {
+		fWorkerLock.Unlock();
+		fRoster->RemoveWatcher(this);
+		fRoster->SetShuttingDown(false);
+		return;
+	}
+
+	fUserApps.Sort(&inverse_compare_by_registration_time);
+	fSystemApps.Sort(&inverse_compare_by_registration_time);
+
+	fWorkerLock.Unlock();
+
 	// make the shutdown window ready and show it
 	_InitShutdownWindow();
 	_SetShutdownWindowCurrentApp(-1);
@@ -1321,8 +1326,8 @@ ShutdownProcess::_WorkerDoShutdown()
 		do {
 			team_id team;
 			int32 phase;
-			status_t error = _GetNextEvent(event, team, phase, true);
-			if (error != B_OK)
+			status = _GetNextEvent(event, team, phase, true);
+			if (status != B_OK)
 				break;
 		} while (event != REBOOT_SYSTEM_EVENT);
 
