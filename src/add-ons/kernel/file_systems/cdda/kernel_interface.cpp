@@ -43,14 +43,14 @@ typedef DoublyLinkedList<Attribute> AttributeList;
 typedef DoublyLinkedList<attr_cookie> AttrCookieList;
 
 struct riff_header {
-	uint32	magic;
-	uint32	length;
-	uint32	id;
+	uint32		magic;
+	uint32		length;
+	uint32		id;
 } _PACKED;
 
 struct riff_chunk {
-	uint32	fourcc;
-	uint32	length;
+	uint32		fourcc;
+	uint32		length;
 } _PACEKD;
 
 struct wav_format_chunk : riff_chunk {
@@ -75,160 +75,168 @@ enum attr_mode {
 };
 
 class Volume {
-	public:
-		Volume(fs_volume* fsVolume);
-		~Volume();
+public:
+							Volume(fs_volume* fsVolume);
+							~Volume();
 
-		status_t	InitCheck();
-		fs_volume*	FSVolume() const { return fFSVolume; }
-		uint32		DiscID() const { return fDiscID; }
-		Inode&		RootNode() const { return *fRootNode; }
+			status_t		InitCheck();
+			fs_volume*		FSVolume() const { return fFSVolume; }
+			uint32			DiscID() const { return fDiscID; }
+			Inode&			RootNode() const { return *fRootNode; }
 
-		status_t	Mount(const char* device);
-		int			Device() const { return fDevice; }
-		ino_t		GetNextNodeID() { return fNextID++; }
+			status_t		Mount(const char* device);
+			int				Device() const { return fDevice; }
+			ino_t			GetNextNodeID() { return fNextID++; }
 
-		const char*	Name() const { return fName; }
-		status_t	SetName(const char* name);
+			const char*		Name() const { return fName; }
+			status_t		SetName(const char* name);
 
-		Semaphore&	Lock();
+			Semaphore&		Lock();
 
-		Inode*		Find(ino_t id);
-		Inode*		Find(const char* name);
+			Inode*			Find(ino_t id);
+			Inode*			Find(const char* name);
 
-		Inode*		FirstEntry() const { return fFirstEntry; }
+			Inode*			FirstEntry() const { return fFirstEntry; }
 
-		off_t		NumBlocks() const { return fNumBlocks; }
-		size_t		BufferSize() const { return 32 * kFrameSize; }
-			// TODO: for now
+			off_t			NumBlocks() const { return fNumBlocks; }
+			size_t			BufferSize() const { return 32 * kFrameSize; }
+								// TODO: for now
 
-		static void	DetermineName(uint32 cddbId, int device, char* name,
-						size_t length);
+	static	void			DetermineName(uint32 cddbId, int device, char* name,
+								size_t length);
 
-	private:
-		Inode*		_CreateNode(Inode* parent, const char* name,
-						off_t start, off_t frames, int32 type);
-		int			_OpenAttributes(int mode,
-						enum attr_mode attrMode = kDiscIDAttributes);
-		void		_RestoreAttributes();
-		void		_RestoreAttributes(int fd);
-		void		_StoreAttributes();
-		void		_RestoreSharedAttributes();
-		void		_StoreSharedAttributes();
+private:
+			Inode*			_CreateNode(Inode* parent, const char* name,
+								off_t start, off_t frames, int32 type);
+			int				_OpenAttributes(int mode,
+								enum attr_mode attrMode = kDiscIDAttributes);
+			void			_RestoreAttributes();
+			void			_RestoreAttributes(int fd);
+			void			_StoreAttributes();
+			void			_RestoreSharedAttributes();
+			void			_StoreSharedAttributes();
 
-		Semaphore	fLock;
-		fs_volume*	fFSVolume;
-		int			fDevice;
-		dev_t		fID;
-		uint32		fDiscID;
-		Inode*		fRootNode;
-		ino_t		fNextID;
-		char*		fName;
-		off_t		fNumBlocks;
+			Semaphore		fLock;
+			fs_volume*		fFSVolume;
+			int				fDevice;
+			dev_t			fID;
+			uint32			fDiscID;
+			Inode*			fRootNode;
+			ino_t			fNextID;
+			char*			fName;
+			off_t			fNumBlocks;
 
-		// root directory contents - we don't support other directories
-		Inode*		fFirstEntry;
+			// root directory contents - we don't support other directories
+			Inode*			fFirstEntry;
 };
 
 class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
-	public:
-		Attribute(const char* name, type_code type);
-		~Attribute();
+public:
+							Attribute(const char* name, type_code type);
+							~Attribute();
 
-		status_t InitCheck() const { return fName != NULL ? B_OK : B_NO_MEMORY; }
-		status_t SetTo(const char* name, type_code type);
-		void SetType(type_code type) { fType = type; }
+			status_t		InitCheck() const
+								{ return fName != NULL ? B_OK : B_NO_MEMORY; }
+			status_t		SetTo(const char* name, type_code type);
+			void			SetType(type_code type)
+								{ fType = type; }
 
-		status_t ReadAt(off_t offset, uint8* buffer, size_t* _length);
-		status_t WriteAt(off_t offset, const uint8* buffer, size_t* _length);
-		void Truncate();
-		status_t SetSize(off_t size);
+			status_t		ReadAt(off_t offset, uint8* buffer,
+								size_t* _length);
+			status_t		WriteAt(off_t offset, const uint8* buffer,
+								size_t* _length);
+			void			Truncate();
+			status_t		SetSize(off_t size);
 
-		const char* Name() const { return fName; }
-		size_t Size() const { return fSize; }
-		type_code Type() const { return fType; }
-		uint8* Data() const { return fData; }
+			const char*		Name() const { return fName; }
+			size_t			Size() const { return fSize; }
+			type_code		Type() const { return fType; }
+			uint8*			Data() const { return fData; }
 		
-		bool IsProtectedNamespace();
-		static bool IsProtectedNamespace(const char* name);
+			bool			IsProtectedNamespace();
+	static	bool			IsProtectedNamespace(const char* name);
 
-	private:
-		char*		fName;
-		type_code	fType;
-		uint8*		fData;
-		size_t		fSize;
+private:
+			char*			fName;
+			type_code		fType;
+			uint8*			fData;
+			size_t			fSize;
 };
 
 class Inode {
-	public:
-		Inode(Volume* volume, Inode* parent, const char* name, off_t start,
-			off_t frames, int32 type);
-		~Inode();
+public:
+							Inode(Volume* volume, Inode* parent,
+								const char* name, off_t start, off_t frames,
+								int32 type);
+							~Inode();
 
-		status_t	InitCheck();
-		ino_t		ID() const { return fID; }
+			status_t		InitCheck();
+			ino_t			ID() const { return fID; }
 
-		const char*	Name() const { return fName; }
-		status_t	SetName(const char* name);
+			const char*		Name() const { return fName; }
+			status_t		SetName(const char* name);
 
-		int32		Type() const
-						{ return fType; }
-		gid_t		GroupID() const
-						{ return fGroupID; }
-		uid_t		UserID() const
-						{ return fUserID; }
-		time_t		CreationTime() const
-						{ return fCreationTime; }
-		time_t		ModificationTime() const
-						{ return fModificationTime; }
-		off_t		StartFrame() const
-						{ return fStartFrame; }
-		off_t		FrameCount() const
-						{ return fFrameCount; }
-		off_t		Size() const
-						{ return fFrameCount * kFrameSize /* + WAV header */; }
+			int32			Type() const
+								{ return fType; }
+			gid_t			GroupID() const
+								{ return fGroupID; }
+			uid_t			UserID() const
+								{ return fUserID; }
+			time_t			CreationTime() const
+								{ return fCreationTime; }
+			time_t			ModificationTime() const
+								{ return fModificationTime; }
+			off_t			StartFrame() const
+								{ return fStartFrame; }
+			off_t			FrameCount() const
+								{ return fFrameCount; }
+			off_t			Size() const
+								{ return fFrameCount * kFrameSize; }
+									// does not include the WAV header
 
-		Attribute*	FindAttribute(const char* name) const;
-		status_t	AddAttribute(Attribute* attribute, bool overwrite);
-		status_t	AddAttribute(const char* name, type_code type,
-						bool overwrite, const uint8* data, size_t length);
-		status_t	AddAttribute(const char* name, type_code type,
-						const char* string);
-		status_t	AddAttribute(const char* name, type_code type,
-						uint32 value);
-		status_t	RemoveAttribute(const char* name,
-						bool checkNamespace = false);
+			Attribute*		FindAttribute(const char* name) const;
+			status_t		AddAttribute(Attribute* attribute, bool overwrite);
+			status_t		AddAttribute(const char* name, type_code type,
+								bool overwrite, const uint8* data,
+								size_t length);
+			status_t		AddAttribute(const char* name, type_code type,
+								const char* string);
+			status_t		AddAttribute(const char* name, type_code type,
+								uint32 value);
+			status_t		RemoveAttribute(const char* name,
+								bool checkNamespace = false);
 
-		void		AddAttrCookie(attr_cookie* cookie);
-		void		RemoveAttrCookie(attr_cookie* cookie);
-		void		RewindAttrCookie(attr_cookie* cookie);
+			void			AddAttrCookie(attr_cookie* cookie);
+			void			RemoveAttrCookie(attr_cookie* cookie);
+			void			RewindAttrCookie(attr_cookie* cookie);
 
-		AttributeList::ConstIterator Attributes() const
-						{ return fAttributes.GetIterator(); }
+			AttributeList::ConstIterator Attributes() const
+								{ return fAttributes.GetIterator(); }
 
-		const wav_header* WAVHeader() const { return &fWAVHeader; }
+			const wav_header* WAVHeader() const
+								{ return &fWAVHeader; }
 
-		Inode*		Next() const { return fNext; }
-		void		SetNext(Inode *inode) { fNext = inode; }
+			Inode*			Next() const { return fNext; }
+			void			SetNext(Inode *inode) { fNext = inode; }
 
-	private:
-		Inode*		fNext;
-		ino_t		fID;
-		int32		fType;
-		char		*fName;
-		gid_t		fGroupID;
-		uid_t		fUserID;
-		time_t		fCreationTime;
-		time_t		fModificationTime;
-		off_t		fStartFrame;
-		off_t		fFrameCount;
-		AttributeList fAttributes;
-		AttrCookieList fAttrCookies;
-		wav_header	fWAVHeader;
+private:
+			Inode*			fNext;
+			ino_t			fID;
+			int32			fType;
+			char*			fName;
+			gid_t			fGroupID;
+			uid_t			fUserID;
+			time_t			fCreationTime;
+			time_t			fModificationTime;
+			off_t			fStartFrame;
+			off_t			fFrameCount;
+			AttributeList	fAttributes;
+			AttrCookieList	fAttrCookies;
+			wav_header		fWAVHeader;
 };
 
 struct dir_cookie {
-	Inode		*current;
+	Inode*		current;
 	int			state;	// iteration state
 };
 
@@ -241,13 +249,13 @@ enum {
 };
 
 struct attr_cookie : DoublyLinkedListLinkImpl<attr_cookie> {
-	Attribute	*current;
+	Attribute*	current;
 };
 
 struct file_cookie {
 	int			open_mode;
 	off_t		buffer_offset;
-	void		*buffer;
+	void*		buffer;
 };
 
 static const uint32 kMaxAttributeSize = 65536;
