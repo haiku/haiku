@@ -1,11 +1,17 @@
 /*
  * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, François Revol, revol@free.fr.
+ * Copyright 2009, Jonas Sundström, jonas@kirilla.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 /*! Launches an application/document from the shell */
 
+
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Entry.h>
 #include <List.h>
@@ -13,10 +19,7 @@
 #include <Roster.h>
 #include <String.h>
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <Url.h>
 
 
 const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
@@ -86,25 +89,15 @@ main(int argc, char **argv)
 				status = B_OK;
 		} else if (strchr(*argv, ':')) {
 			// try to open it as an URI
-			BString mimeType = "application/x-vnd.Be.URL.";
-			BString arg(*argv);
-			mimeType.Append(arg, arg.FindFirst(":"));
-
-			// the protocol should be alphanum
-			// we just check if it's registered
-			// if not there is likely no supporting app anyway
-			if (BMimeType::IsValid(mimeType.String())) {
-				char *args[2] = { *argv, NULL };
-				status = be_roster->Launch(openWith ? openWith
-					: mimeType.String(), 1, args);
-				if (status == B_OK)
-					continue;
-			}
+			BPrivate::Support::BUrl url(*argv);
+			if (url.OpenWithPreferredApplication() == B_OK)
+				continue;
 
 			// maybe it's "file:line" or "file:line:col"
 			int line = 0, col = 0, i;
 			status = B_ENTRY_NOT_FOUND;
 			// remove gcc error's last :
+			BString arg(*argv);
 			if (arg[arg.Length() - 1] == ':')
 				arg.Truncate(arg.Length() - 1);
 
