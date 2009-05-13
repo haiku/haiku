@@ -158,14 +158,6 @@ public:
 		return *this;
 	}
 
-	inline ThisClass& operator=(ThisClass& otherLocker)
-	{
-		fLockable = otherLocker.fLockable;
-		fLocked = otherLocker.fLocked;
-		otherLocker.Detach();
-		return &this;
-	}
-
 	inline bool IsLocked() const	{ return fLocked; }
 
 	inline operator bool() const	{ return fLocked; }
