@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,10 +11,6 @@
 
 #define DEBUG 0
 
-#include <ctype.h>
-#include <stdio.h>
-#include <unistd.h>
-
 #include <Debug.h>
 #include <MimeType.h>
 #include <Roster.h>
@@ -25,7 +21,7 @@
 namespace BPrivate {
 namespace Support {
 
-BUrl::BUrl(const char *url)
+BUrl::BUrl(const char* url)
 	: BString(url)
 {
 	fStatus = _ParseAndSplit();
@@ -80,12 +76,12 @@ BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
 	if (Length() > B_PATH_NAME_LENGTH) {
 		// TODO: BAlert
 		//	if (onProblemAskUser)
-		//		Balert ... Too long URL!
+		//		BAlert ... Too long URL!
 		fprintf(stderr, "URL too long");
 		return B_NAME_TOO_LONG;
 	}
 	
-	char *argv[] = {
+	char* argv[] = {
 		const_cast<char*>("BUrlInvokedApplication"),
 		const_cast<char*>(String()),
 		NULL
@@ -122,61 +118,62 @@ BUrl::_ParseAndSplit()
 	// TODO: proto and host should be lowercased.
 	// see http://en.wikipedia.org/wiki/URL_normalization
 	
-	CopyInto(proto, 0, v);
+	CopyInto(fProto, 0, v);
 	CopyInto(left, v + 1, Length() - v);
-	// TODO: RFC1738 says the // part should indicate the uri follows the u:p@h:p/path convention, so it should be used to check for special cases.
+	// TODO: RFC1738 says the // part should indicate the uri follows the
+	// u:p@h:p/path convention, so it should be used to check for special cases.
 	if (left.FindFirst("//") == 0)
 		left.RemoveFirst("//");
-	full = left;
+	fFull = left;
 	
 	// path part
 	// actually some apps handle file://[host]/path
 	// but I have no idea what proto it implies...
 	// or maybe it's just to emphasize on "localhost".
 	v = left.FindFirst("/");
-	if (v == 0 || proto == "file") {
-		path = left;
-		return 0;
+	if (v == 0 || fProto == "file") {
+		fPath = left;
+		return B_OK;
 	}
 	// some protos actually implies path if it's the only component
-	if ((v < 0) && (proto == "beshare" || proto == "irc")) { 
-		path = left;
-		return 0;
+	if ((v < 0) && (fProto == "beshare" || fProto == "irc")) { 
+		fPath = left;
+		return B_OK;
 	}
 	
 	if (v > -1) {
-		left.MoveInto(path, v+1, left.Length()-v);
+		left.MoveInto(fPath, v+1, left.Length()-v);
 		left.Remove(v, 1);
 	}
 
 	// user:pass@host
 	v = left.FindFirst("@");
 	if (v > -1) {
-		left.MoveInto(user, 0, v);
+		left.MoveInto(fUser, 0, v);
 		left.Remove(0, 1);
-		v = user.FindFirst(":");
+		v = fUser.FindFirst(":");
 		if (v > -1) {
-			user.MoveInto(pass, v, user.Length() - v);
-			pass.Remove(0, 1);
+			fUser.MoveInto(fPass, v, fUser.Length() - v);
+			fPass.Remove(0, 1);
 		}
-	} else if (proto == "finger") {
+	} else if (fProto == "finger") {
 		// single component implies user
 		// see also: http://www.subir.com/lynx/lynx_help/lynx_url_support.html
-		user = left;
-		return 0;
+		fUser = left;
+		return B_OK;
 	}
 
 	// host:port
 	v = left.FindFirst(":");
 	if (v > -1) {
-		left.MoveInto(port, v + 1, left.Length() - v);
+		left.MoveInto(fPort, v + 1, left.Length() - v);
 		left.Remove(v, 1);
 	}
 
 	// not much left...
-	host = left;
+	fHost = left;
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -184,7 +181,7 @@ BString
 BUrl::_UrlMimeType() const
 {
 	BString mime;
-	mime << "application/x-vnd.Be.URL." << proto;
+	mime << "application/x-vnd.Be.URL." << fProto;
 
 	return BString(mime);
 }
@@ -193,107 +190,88 @@ BUrl::_UrlMimeType() const
 bool
 BUrl::HasHost() const
 {
-	return host.Length();
+	return fHost.Length();
 }
 
 
 bool
 BUrl::HasPort() const
 {
-	return port.Length();
+	return fPort.Length();
 }
 
 
 bool
 BUrl::HasUser() const
 {
-	return user.Length();
+	return fUser.Length();
 }
 
 
 bool
 BUrl::HasPass() const
 {
-	return pass.Length();
+	return fPass.Length();
 }
 
 
 bool
 BUrl::HasPath() const
 {
-	return path.Length();
+	return fPath.Length();
 }
 
 
-BString
+const BString&
 BUrl::Proto() const
 {
-	return BString(proto);
+	return fProto;
 }
 
 
-BString
+const BString&
 BUrl::Full() const
 {
 	// RFC1738's "sheme-part"
-	return BString(full);
+	return fFull;
 }
 
 
-BString
+const BString&
 BUrl::Host() const
 {
-	return BString(host);
+	return fHost;
 }
 
 
-BString
+const BString&
 BUrl::Port() const
 {
-	return BString(port);
+	return fPort;
 }
 
 
-BString
+const BString&
 BUrl::User() const
 {
-	return BString(user);
+	return fUser;
 }
 
 
-BString
+const BString&
 BUrl::Pass() const
 {
-	return BString(pass);
+	return fPass;
 }
 
 
-BString
+const BString&
 BUrl::Path() const
 {
-	return BString(path);
+	return fPath;
 }
 
 
-status_t
-BUrl::UnurlString(BString &string)
-{
-	// TODO: check for %00 and bail out!
-	int32 length = string.Length();
-	int i;
-	for (i = 0; string[i] && i < length - 2; i++) {
-		if (string[i] == '%' && isxdigit(string[i+1]) && isxdigit(string[i+2])) {
-			int c;
-			sscanf(string.String() + i + 1, "%02x", &c);
-			string.Remove(i, 3);
-			string.Insert((char)c, 1, i);
-			length -= 2;
-		}
-	}
-	
-	return B_OK;
-}
-
-}; // namespace Support
-}; // namespace BPrivate
+} // namespace Support
+} // namespace BPrivate
 

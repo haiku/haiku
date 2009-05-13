@@ -1,47 +1,28 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		François Revol, revol@free.fr
  */
+#ifndef _URL_WRAPPER_H
+#define _URL_WRAPPER_H
+ 
+#include <Application.h>
+#include <String.h>
 
-#define APP_SIGNATURE "application/x-vnd.Haiku-urlwrapper"
 
-/* NetPositive Bookmark file type */
-#define HANDLE_BOOKMARK_FILES
+class UrlWrapper : public BApplication
+{
+public:
+								UrlWrapper();
+								~UrlWrapper();
 
-/* M$IE .url files */
-#define HANDLE_URL_FILES
+	virtual void				RefsReceived(BMessage* msg);
+	virtual void				ArgvReceived(int32 argc, char** argv);
+	virtual void				ReadyToRun(void);
 
-/* file: redirects to Tracker */
-#define HANDLE_FILE
+private:
+			status_t			_Warn(const char* url);
+			status_t			_DecodeUrlString(BString& string);
+};
 
-/* http: downloads with wget in a Terminal */
-#define HANDLE_HTTP_WGET
-
-/* query: BeOS/Haiku-specific: this should allow putting queries in web pages :) */
-#define HANDLE_QUERY
-
-/* mid: cid: as per RFC 2392 */
-/* http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid */
-/* UNIMPLEMENTED */
-//#define HANDLE_MID_CID
-
-/* sh: executes a shell command (before warning user of danger) */
-#define HANDLE_SH
-
-/* beshare: optionaly connect to a server and start a query */
-#define HANDLE_BESHARE
-
-/* icq: msn: ... should open im_client to this user */
-/* UNIMPLEMENTED */
-//#define HANDLE_IM
-
-/* mms: rtp: rtsp: opens the stream with VLC */
-#define HANDLE_VLC
-
-/* audio: redirects SoundPlay-urls for shoutcast streams */
-/* UNIMPLEMENTED */
-//#define HANDLE_AUDIO
+#endif // _URL_WRAPPER_H
 
