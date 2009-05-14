@@ -122,13 +122,13 @@ The second line is the location of the zip file. <tt>$(HAIKU_TOP)</tt> is the lo
 <p>In the same way, you use <tt>CopyDirectoryToHaikuImage</tt> and <tt>AddFilesToHaikuImage</tt> to copy whole directories or single files into the image.</p></li>
 
 <li><p>The above commands are executed when building any kind of image. "Build Profiles" provide the means to set commands specifically for different configurations.<br />
-These are two profiles, one for building and installing an image directly onto a partition and the other to generate a VMWare image:</p>
+These are two profiles, one for building and installing an image directly onto a partition (and in that case add the optional development package) and the other to generate a 900mb VMWare image:</p>
 <pre>DefineBuildProfile disk : disk : "/dev/sda7" ;
 DefineBuildProfile vmware : vmware-image ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
-
+		AddOptionalHaikuImagePackages Development ;	
 	}
 
 
@@ -175,7 +175,7 @@ DefineBuildProfile vmware : vmware-image ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
-
+		AddOptionalHaikuImagePackages Development ;
 	}
 
 
