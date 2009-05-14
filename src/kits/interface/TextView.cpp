@@ -1764,15 +1764,16 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	result.x = 0.0;
 	result.y = line->origin + fTextRect.top;
 
-	// Handle the case where there is only one line (no text inserted)
-	// TODO: See if we can do this better
+	bool onEmptyLastLine = _IsOnEmptyLastLine(inOffset);
+
 	if (fStyles->NumRuns() == 0) {
+		// Handle the case where there is only one line (no text inserted)
 		fStyles->SyncNullStyle(0);
 		height = _NullStyleHeight();
 	} else {
 		height = (line + 1)->origin - line->origin;
 
-		if (_IsOnEmptyLastLine(inOffset)) {
+		if (onEmptyLastLine) {
 			// special case: go down one line if inOffset is at the newline
 			// at the end of the buffer ...
 			result.y += height;
@@ -1802,16 +1803,15 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	}
 
 	if (fAlignment != B_ALIGN_LEFT) {
-		float modifier = fTextRect.right - LineWidth(lineNum);
+		float lineWidth = onEmptyLastLine ? 0.0 : LineWidth(lineNum);
+		float alignmentOffset = fTextRect.Width() - lineWidth;
 		if (fAlignment == B_ALIGN_CENTER)
-			modifier /= 2;
-		result.x += modifier;
+			alignmentOffset /= 2;
+		result.x += alignmentOffset;
 	}
+
 	// convert from text rect coordinates
-	// NOTE: I didn't understand why "- 1.0"
-	// and it works only correct without it on Haiku app_server.
-	// Feel free to enlighten me though!
-	result.x += fTextRect.left;// - 1.0;
+	result.x += fTextRect.left;
 
 	// round up
 	result.x = ceilf(result.x);
@@ -1856,10 +1856,10 @@ BTextView::OffsetAt(BPoint point) const
 
 	// convert to text rect coordinates
 	if (fAlignment != B_ALIGN_LEFT) {
-		float lineWidth = fTextRect.right - LineWidth(lineNum);
+		float alignmentOffset = fTextRect.Width() - LineWidth(lineNum);
 		if (fAlignment == B_ALIGN_CENTER)
-			lineWidth /= 2;
-		point.x -= lineWidth;
+			alignmentOffset /= 2;
+		point.x -= alignmentOffset;
 	}
 
 	point.x -= fTextRect.left;
@@ -1984,7 +1984,14 @@ BTextView::LineWidth(int32 lineNum) const
 		return 0;
 
 	STELine* line = (*fLines)[lineNum];
-	return _StyledWidth(line->offset, (line + 1)->offset - line->offset);
+	int32 length = (line + 1)->offset - line->offset;
+
+	// skip newline at the end of the line, if any, as it does no contribute
+	// to the width
+	if (ByteAt((line + 1)->offset - 1) == B_ENTER)
+		length--;
+
+	return _StyledWidth(line->offset, length);
 }
 
 
@@ -4149,6 +4156,12 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 		} else
 			startLeft = PointAt(startOffset).x;
 	}
+	else if (fAlignment != B_ALIGN_LEFT) {
+		float alignmentOffset = fTextRect.Width() - LineWidth(lineNum);
+		if (fAlignment == B_ALIGN_CENTER)
+			alignmentOffset /= 2;
+		startLeft = fTextRect.left + alignmentOffset;
+	}
 
 	int32 length = (line + 1)->offset;
 	if (startOffset != -1)
@@ -4159,20 +4172,12 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 	// DrawString() chokes if you draw a newline
 	if (ByteAt((line + 1)->offset - 1) == B_ENTER)
 		length--;
-	if (fAlignment != B_ALIGN_LEFT) {
-		// B_ALIGN_RIGHT
-		startLeft = (fTextRect.right - LineWidth(lineNum));
-		if (fAlignment == B_ALIGN_CENTER)
-			startLeft /= 2;
-		startLeft += fTextRect.left;
-	}
 
 	view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
 
 	if (erase) {
 		eraseRect.top = line->origin + fTextRect.top;
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
-
 		view->FillRect(eraseRect, B_SOLID_LOW);
 	}
 
