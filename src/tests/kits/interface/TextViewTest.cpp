@@ -5,12 +5,21 @@
 
 
 #include <Application.h>
-#include <Window.h>
+#include <Button.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <TextControl.h>
 #include <TextView.h>
+#include <Window.h>
 
 #include <stdio.h>
+
+
+const static uint32 kMsgAlignLeft = 'alle';
+const static uint32 kMsgAlignCenter = 'alce';
+const static uint32 kMsgAlignRight = 'alri';
 
 
 class Window : public BWindow {
@@ -18,6 +27,11 @@ class Window : public BWindow {
 		Window();
 
 		virtual bool QuitRequested();
+		virtual void MessageReceived(BMessage *message);
+
+	private:
+		BTextControl* fTextControl;
+		BTextView* fTextView;
 };
 
 
@@ -28,22 +42,30 @@ Window::Window()
 	: BWindow(BRect(100, 100, 800, 500), "TextView-Test",
 			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	BRect rect = Bounds().InsetByCopy(20, 20);
+	fTextControl = new BTextControl("text-contr-O",
+		"a single line of text - (c) Conglom-O", NULL);
+	fTextView = new BTextView("text-O");
+	BScrollView* scrollView = new BScrollView("scroll-O", fTextView, 0, true,
+		true, B_FANCY_BORDER);
 
-	BTextView* textView = new BTextView(rect, "text-o-mo",
-		rect.OffsetToCopy(0, 0), B_FOLLOW_ALL);
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(fTextControl)
+		.Add(scrollView)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+			.Add(new BButton("Align Left", new BMessage(kMsgAlignLeft)))
+			.AddGlue()
+			.Add(new BButton("Align Center", new BMessage(kMsgAlignCenter)))
+			.AddGlue()
+			.Add(new BButton("Align Right", new BMessage(kMsgAlignRight)))
+		)
+		.SetInsets(5, 5, 5, 5)
+	);
 
-	BScrollView* scrollView = new BScrollView("scroll-o-mo", textView,
-		B_FOLLOW_ALL_SIDES, 0, true, true);
-	AddChild(scrollView);
-
-	printf("starting to prepare content ... [%Ld]\n", system_time());
-
-	// generate a million lines of content
-	const int32 kLineCount = 1000000;
+	// generate some lines of content
+	const int32 kLineCount = 10;
 	const int32 kLineNoSize = 6;
-	BString line
-		= ":	you should see a pretty large text in this textview	...\n";
+	BString line = ": just some text here - nothing special to see\n";
 	BString format = BString("%*d") << line;
 	BString content;
 	int32 lineLength = line.Length() + kLineNoSize;
@@ -55,9 +77,8 @@ Window::Window()
 			sprintf(currLine, format.String(), kLineNoSize, lineNo++);
 		content.UnlockBuffer(contentLength);
 	}
-	printf("setting content ... [%Ld]\n", system_time());
-	textView->SetText(content.String());
-	printf("done. [%Ld]\n", system_time());
+	fTextView->SetInsets(2,2,2,2);
+	fTextView->SetText(content.String());
 }
 
 
@@ -66,6 +87,32 @@ Window::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
+}
+
+
+void
+Window::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgAlignLeft:
+			fTextControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
+			fTextView->SetAlignment(B_ALIGN_LEFT);
+			break;
+
+		case kMsgAlignCenter:
+			fTextControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
+			fTextView->SetAlignment(B_ALIGN_CENTER);
+			break;
+
+		case kMsgAlignRight:
+			fTextControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+			fTextView->SetAlignment(B_ALIGN_RIGHT);
+			break;
+
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
 }
 
 
