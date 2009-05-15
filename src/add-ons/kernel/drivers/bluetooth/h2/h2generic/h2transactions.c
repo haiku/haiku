@@ -1,8 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 #include "h2generic.h"
@@ -38,13 +37,13 @@ void event_complete(void* cookie, status_t status, void* data, size_t actual_len
 
 
 static status_t
-assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
+assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 {
-	net_buffer*		nbuf = NULL;
-	snet_buffer*	snbuf = NULL;
+	net_buffer* nbuf = NULL;
+	snet_buffer* snbuf = NULL;
 
-	size_t      currentPacketLen = 0;
-	size_t      expectedPacketLen = 0;
+	size_t currentPacketLen = 0;
+	size_t expectedPacketLen = 0;
 
 	bdev->stat.bytesRX += count;
 
@@ -55,43 +54,41 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 	while (count) {
 
-		//debugf("count %d nb=%p sb=%p type=%d\n",count, nbuf, snbuf, type);
+		//debugf("count %d nb=%p sb=%p type=%d\n", count, nbuf, snbuf, type);
 
-		if ( (type != BT_EVENT && nbuf == NULL) ||
-			(type == BT_EVENT && (snbuf == NULL || snb_completed(snbuf))) ) {
+		if ((type != BT_EVENT && nbuf == NULL) 
+			|| (type == BT_EVENT && (snbuf == NULL || snb_completed(snbuf)))) {
 
 			/* new buffer incoming */
 			switch (type) {
 				case BT_EVENT:
 					if (count >= HCI_EVENT_HDR_SIZE) {
-
 						struct hci_event_header* headerPkt = data;
 						expectedPacketLen = HCI_EVENT_HDR_SIZE + headerPkt->elen;
-						snbuf = bdev->eventRx = snb_fetch(&bdev->snetBufferRecycleTrash, expectedPacketLen);
-
+						snbuf = bdev->eventRx = snb_fetch(&bdev->snetBufferRecycleTrash, 
+							expectedPacketLen);
 					} else {
 						flowf("EVENT frame corrupted\n");
 						return EILSEQ;
 					}
-				break;
+					break;
 
 				case BT_ACL:
 					if (count >= HCI_ACL_HDR_SIZE) {
 						int16 index;
 						struct hci_acl_header* headerPkt = data;
 
-						expectedPacketLen = HCI_ACL_HDR_SIZE + B_LENDIAN_TO_HOST_INT16(headerPkt->alen);
+						expectedPacketLen = HCI_ACL_HDR_SIZE
+							+ B_LENDIAN_TO_HOST_INT16(headerPkt->alen);
 
-						/* Create the buffer */
+						// Create the buffer -> TODO: this allocation can fail
 						bdev->nbufferRx[type] = nbuf = nb->create(expectedPacketLen);
-						// TODO: this allocation can fail!!
 						nbuf->protocol = type;
-						debugf("new ACL frame %p\n", nbuf);
-						debugf("### Incoming ACL: len = %d\n", count);
-						for (index = 0 ; index < count; index++ ) {
+
+						debugf("## Incoming ACL frame %p len = %d ", nbuf, count);
+						for (index = 0 ; index < count; index++)
 							dprintf("%x:",((uint8*)data)[index]);
-						}
-						flowf("### \n");
+						dprintf(" ## \n");
 
 					} else {
 						flowf("ACL frame corrupted\n");
@@ -104,14 +101,14 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 				break;
 
 				default:
-					panic("unkown packet type in assembly");
+					panic("unknown packet type in assembly");
 				break;
 			}
 
 			currentPacketLen = expectedPacketLen;
 
 		} else {
-			/* Continuation */
+			// Continuation of a packet
 			if (type != BT_EVENT)
 				currentPacketLen = get_expected_size(nbuf) - nbuf->size;
 			else
@@ -125,20 +122,22 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 		else
 			nb->append(nbuf, data, currentPacketLen);
 
-		/* Complete frame? */
+		// Complete frame?
 		if (type == BT_EVENT && snb_completed(snbuf)) {
 			post_packet_up(bdev, type, snbuf);
 			snbuf = bdev->eventRx = NULL;
 		}
 
 		if (type != BT_EVENT && (get_expected_size(nbuf) - nbuf->size) == 0 ) {
-
 			post_packet_up(bdev, type, nbuf);
 			bdev->nbufferRx[type] = nbuf = NULL;
-		} /*else {
+		} else {
+#if DEBUG_ACL
 			if (type == BT_ACL)
-				debugf("ACL Packet not filled size=%ld expected=%ld\n", nbuf->size, get_expected_size(nbuf));
-		}*/
+				debugf("ACL Packet not filled size=%ld expected=%ld\n",
+					nbuf->size, get_expected_size(nbuf));
+#endif					
+		}
 
 		/* in case in the pipe there is info about the next buffer ... */
 		count -= currentPacketLen;
@@ -162,16 +161,19 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 #endif
 {
 	bt_usb_dev* bdev = cookie;
-	status_t    err;
+	//bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer/slower option
+	status_t    error;
 
-	/* TODO: or not running anymore */
-	if (status == B_CANCELED)
+	if (bdev == NULL)
+		return;
+
+	if (status == B_CANCELED) // or not running anymore...
 		return;
 
 	if (status != B_OK || actual_len == 0)
 		goto resubmit;
 
-	if ( assembly_rx(cookie, BT_EVENT, data, actual_len) == B_OK ) {
+	if (assembly_rx(cookie, BT_EVENT, data, actual_len) == B_OK) {
 		bdev->stat.successfulTX++;
 	} else {
 		bdev->stat.errorRX++;
@@ -179,18 +181,16 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 
 resubmit:
 
-	err = usb->queue_interrupt(bdev->intr_in_ep->handle,
-							data, bdev->max_packet_size_intr_in ,
-							event_complete, bdev);
+	error = usb->queue_interrupt(bdev->intr_in_ep->handle, data, 
+		bdev->max_packet_size_intr_in, event_complete, bdev);
 
-	if (err != B_OK)   {
+	if (error != B_OK) {
 		reuse_room(&bdev->eventRoom, data);
 		bdev->stat.rejectedRX++;
-		debugf("RX event resubmittion failed %s\n",strerror(err));
+		debugf("RX event resubmittion failed %s\n", strerror(error));
 	} else {
 		bdev->stat.acceptedRX++;
 	}
-
 }
 
 
@@ -202,10 +202,13 @@ acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 #endif
 {
 	bt_usb_dev* bdev = cookie;
-	status_t    err;
+	//bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer/slower option
+	status_t error;
 
-	/* TODO: or not running anymore? */
-	if (status == B_CANCELED)
+	if (bdev == NULL)
+		return;
+
+	if (status == B_CANCELED) // or not running anymore...
 		return;
 
 	if (status != B_OK || actual_len == 0)
@@ -219,14 +222,14 @@ acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 
 resubmit:
 
-	err = usb->queue_bulk(bdev->bulk_in_ep->handle, data,
-						max(HCI_MAX_FRAME_SIZE,bdev->max_packet_size_bulk_in),
-						acl_rx_complete, (void*) bdev);
+	error = usb->queue_bulk(bdev->bulk_in_ep->handle, data,
+		max(HCI_MAX_FRAME_SIZE, bdev->max_packet_size_bulk_in),	
+		acl_rx_complete, (void*) bdev);
 
-	if (err != B_OK)   {
+	if (error != B_OK)   {
 		reuse_room(&bdev->aclRoom, data);
 		bdev->stat.rejectedRX++;
-		debugf("RX acl resubmittion failed %s\n", strerror(err));
+		debugf("RX acl resubmittion failed %s\n", strerror(error));
 	} else {
 		bdev->stat.acceptedRX++;
 	}
@@ -239,16 +242,15 @@ resubmit:
 status_t
 submit_rx_event(bt_usb_dev* bdev)
 {
-	status_t    status;
-	size_t      size = bdev->max_packet_size_intr_in;
-	void*       buf = alloc_room(&bdev->eventRoom, size);
+	size_t size = bdev->max_packet_size_intr_in;
+	void* buf = alloc_room(&bdev->eventRoom, size);
+	status_t status;
 
 	if (buf == NULL)
 		return ENOMEM;
 
-	status = usb->queue_interrupt(bdev->intr_in_ep->handle,
-								buf, size ,
-								event_complete, (void*) bdev);
+	status = usb->queue_interrupt(bdev->intr_in_ep->handle,	buf, size,
+		event_complete, (void*)bdev);
 
 	if (status != B_OK) {
 		reuse_room(&bdev->eventRoom, buf); // reuse allocated one
@@ -264,19 +266,18 @@ submit_rx_event(bt_usb_dev* bdev)
 
 status_t
 submit_rx_acl(bt_usb_dev* bdev)
-{
-
-	status_t    status;
-	size_t      size = max(HCI_MAX_FRAME_SIZE,bdev->max_packet_size_bulk_in);
-	void*       buf = alloc_room(&bdev->aclRoom, size);
+{	
+	size_t size = max(HCI_MAX_FRAME_SIZE, bdev->max_packet_size_bulk_in);
+	void* buf = alloc_room(&bdev->aclRoom, size);
+	status_t status;
 
 	if (buf == NULL)
 		return ENOMEM;
 
-	status = usb->queue_bulk(bdev->bulk_in_ep->handle, buf, size ,
-								acl_rx_complete, bdev);
+	status = usb->queue_bulk(bdev->bulk_in_ep->handle, buf, size,
+		acl_rx_complete, bdev);
 
-	if (status != B_OK)   {
+	if (status != B_OK) {
 		reuse_room(&bdev->aclRoom, buf); // reuse allocated
 		bdev->stat.rejectedRX++;
 	} else {
@@ -290,11 +291,10 @@ submit_rx_acl(bt_usb_dev* bdev)
 status_t
 submit_rx_sco(bt_usb_dev* bdev)
 {
+
 	/* not yet implemented */
 	return B_ERROR;
 }
-
-
 
 #if 0
 #pragma mark --- TX Complete ---
@@ -307,18 +307,17 @@ command_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
 command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 #endif
 {
-	snet_buffer* snbuf = (snet_buffer*) cookie;
+	snet_buffer* snbuf = (snet_buffer*)cookie;
 	bt_usb_dev* bdev = snb_cookie(snbuf);
 
-	debugf("%ld @ %p\n", actual_len, data);
+	debugf("len = %ld @%p\n", actual_len, data);
 
-	if (status != B_OK) {
+	if (status == B_OK) {
 		bdev->stat.successfulTX++;
 		bdev->stat.bytesTX += actual_len;
 	} else {
 		bdev->stat.errorTX++;
-		/* the packet has been lost */
-		/* too late to requeue it? */
+		// the packet has been lost,too late to requeue it? 
 	}
 
 	snb_park(&bdev->snetBufferRecycleTrash, snbuf);
@@ -337,19 +336,17 @@ acl_tx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
 acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 #endif
 {
-	net_buffer* nbuf = (net_buffer*) cookie;
+	net_buffer* nbuf = (net_buffer*)cookie;
 	bt_usb_dev* bdev = GET_DEVICE(nbuf);
 
 	debugf("fetched=%p status=%ld nbuftype %lx B%p\n",bdev, status, nbuf->type, data);
 
-	if (status != B_OK) {
-
+	if (status == B_OK) {
 		bdev->stat.successfulTX++;
 		bdev->stat.bytesTX += actual_len;
 	} else {
 		bdev->stat.errorTX++;
-		/* the packet has been lost */
-		/* too late to requeue it? */
+		// the packet has been lost,too late to requeue it?
 	}
 
 	nb_destroy(nbuf);
@@ -365,13 +362,12 @@ acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 status_t
 submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 {
-	status_t err;
-
-	uint8   bRequestType = bdev->ctrl_req;
-	uint8   bRequest = 0;
-	uint16  wIndex = 0;
-	uint16  value = 0;
-	uint16  wLength = B_HOST_TO_LENDIAN_INT16(snb_size(snbuf));
+	uint8 bRequestType = bdev->ctrl_req;
+	uint8 bRequest = 0;
+	uint16 wIndex = 0;
+	uint16 value = 0;
+	uint16 wLength = B_HOST_TO_LENDIAN_INT16(snb_size(snbuf));
+	status_t error;	
 
 	if (!GET_BIT(bdev->state, RUNNING)) {
 		return B_DEV_NOT_READY;
@@ -382,30 +378,33 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 
 	debugf("@%p\n", snb_get(snbuf));
 
-	err = usb->queue_request(bdev->dev, bRequestType, bRequest,
-								value, wIndex, wLength,
-								snb_get(snbuf), wLength //???
-								,command_complete, (void*) snbuf);
+	error = usb->queue_request(bdev->dev, bRequestType, bRequest,
+								value, wIndex, wLength,	snb_get(snbuf),
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU								
+								wLength, //???
+#endif								
+								command_complete, (void*) snbuf);
 
-	if (err != B_OK )   {
+	if (error != B_OK) {
 		bdev->stat.rejectedTX++;
 	} else {
 		bdev->stat.acceptedTX++;
 	}
 
-	return err;
+	return error;
 }
+
 
 status_t
 submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 {
-	status_t err;
 	int32 index;
+	status_t error;
 
 	/* set cookie */
 	SET_DEVICE(nbuf, bdev->hdev);
 
-	if (!GET_BIT(bdev->state, RUNNING) ) {
+	if (!GET_BIT(bdev->state, RUNNING)) {
 		return B_DEV_NOT_READY;
 	}
 
@@ -415,17 +414,16 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 	}
 	flowf("### \n");
 
-	err = usb->queue_bulk(bdev->bulk_out_ep->handle,
-						nb_get_whole_buffer(nbuf), nbuf->size,
-						acl_tx_complete, (void*) nbuf);
+	error = usb->queue_bulk(bdev->bulk_out_ep->handle, nb_get_whole_buffer(nbuf),
+						nbuf->size,	acl_tx_complete, (void*)nbuf);
 
-	if (err != B_OK )   {
+	if (error != B_OK) {
 		bdev->stat.rejectedTX++;
 	} else {
 		bdev->stat.acceptedTX++;
 	}
 
-	return err;
+	return error;
 }
 
 

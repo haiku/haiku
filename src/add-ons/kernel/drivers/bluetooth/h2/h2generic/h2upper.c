@@ -1,10 +1,8 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 
 #include <string.h>
 
@@ -20,59 +18,61 @@
 #include <btDebug.h>
 
 
-/* TODO: split for commands and comunication(ACL&SCO) */
+/* TODO: split for commands and comunication (ACL&SCO) */
 void 
 sched_tx_processing(bt_usb_dev* bdev)
-{
+{    
+	net_buffer* nbuf;
+	snet_buffer* snbuf;
+	status_t err;
+	
+	debugf("(%p)\n", bdev)
     
-    net_buffer* nbuf;
-    snet_buffer* snbuf;
-	status_t 	err;
-	flowf("sched\n")    
     if (!TEST_AND_SET(&bdev->state, PROCESSING)) {
-        /* We are not processing in another thread so... START!! */
+        // We are not processing in another thread so... START!!
                 
         do {
-            /* Do while this bit is on... so someone should set it before we stop the iterations*/
+            /* Do while this bit is on... so someone should set it before we
+             * stop the iterations
+             */
             CLEAR_BIT(bdev->state, SENDING);
-            /* check Commands*/
+            // check Commands
     #ifdef EMPTY_COMMAND_QUEUE        
-            while (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND]) ) {            
+            while (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND])) {
     #else
-            if (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND]) ) {
+            if (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND])) {
     #endif            
                 snbuf = list_remove_head_item(&bdev->nbuffersTx[BT_COMMAND]);       
                 err = submit_tx_command(bdev, snbuf);
                 if (err != B_OK) {
-                    /* re-head it*/
+                    // re-head it
                     list_insert_item_before(&bdev->nbuffersTx[BT_COMMAND], 
-                                            list_get_first_item(&bdev->nbuffersTx[BT_COMMAND]), snbuf);
-                }                                                
+							list_get_first_item(&bdev->nbuffersTx[BT_COMMAND]), snbuf);
+                }
             }
             
-            /* check Acl */
+            // check ACl
     #define EMPTY_ACL_QUEUE
     #ifdef EMPTY_ACL_QUEUE
-            while (!list_is_empty(&bdev->nbuffersTx[BT_ACL]) ) {
+            while (!list_is_empty(&bdev->nbuffersTx[BT_ACL])) {
     #else            
-            if (!list_is_empty(&bdev->nbuffersTx[BT_ACL]) ) {
+            if (!list_is_empty(&bdev->nbuffersTx[BT_ACL])) {
     #endif             
                 nbuf = list_remove_head_item(&bdev->nbuffersTx[BT_ACL]);                
                 err = submit_tx_acl(bdev, nbuf);
                 if (err != B_OK) {
                     /* re-head it*/
                     list_insert_item_before(&bdev->nbuffersTx[BT_ACL], 
-                                            list_get_first_item(&bdev->nbuffersTx[BT_ACL]), nbuf);
-                }                                                                
-                
+							list_get_first_item(&bdev->nbuffersTx[BT_ACL]), nbuf);
+                }
+
             }
-    
-            if (!list_is_empty(&bdev->nbuffersTx[BT_SCO]) ) {
+
+            if (!list_is_empty(&bdev->nbuffersTx[BT_SCO])) {
                 /* TODO to be implemented */    
-                
+
             }
-        
-        
+
         } while (GET_BIT(bdev->state, SENDING));
         
         CLEAR_BIT(bdev->state, PROCESSING);
@@ -81,28 +81,26 @@ sched_tx_processing(bt_usb_dev* bdev)
         /* We are processing so MARK that we need to still go on with that ... */    
         SET_BIT(bdev->state, SENDING);
     }
-
 }
+
 
 status_t 
 post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 {
-    
-    status_t err = B_OK;
+    status_t err = B_ERROR;
 
 	debugf("Frame up type=%d\n", type);
-            
-	err = B_ERROR;
 
     if (type == BT_EVENT) {
-		snet_buffer* snbuf = (snet_buffer*) buf;
-		btCoreData->PostEvent(bdev->ndev, snb_get(snbuf), (size_t) snb_size(snbuf));
+		snet_buffer* snbuf = (snet_buffer*)buf;
+		flowf("to btDataCore\n");
+		btCoreData->PostEvent(bdev->ndev, snb_get(snbuf), (size_t)snb_size(snbuf));
 		snb_park(&bdev->snetBufferRecycleTrash, snbuf);
 	} else {
 		net_buffer* nbuf = (net_buffer*) buf;
   		/* No need to free the buffer at allocation is gonna be reused */
-  		flowf("HCI not present for acl posting to net_device\n");
-		btDevices->receive_data(bdev->ndev, &nbuf);	
+  		flowf("to net_device\n");
+		btDevices->receive_data(bdev->ndev, &nbuf);
     }
 
     return err;
@@ -133,7 +131,7 @@ send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
                     bdev->nbuffersPendingTx[type]++;
             break;
             default:
-                debugf("Unkown packet type for sending %d\n",type);
+                debugf("Unknown packet type for sending %d\n",type);
                 // TODO: free the net_buffer -> no, allow upper layer 
                 // handle it with the given error
                 err = B_BAD_VALUE;
@@ -144,9 +142,11 @@ send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
     }
 
     // TODO: check if device is actually ready for this
-    // TODO: unLock device
+    // TODO: unlock device
         
-    /* sched in All cases even if nbuf is null (hidden way to provoke re-scheduling)*/
+    /* sched in All cases even if nbuf is null (hidden way to provoke
+     * re-scheduling)
+     */
     sched_tx_processing(bdev);
     
     return err;
@@ -178,7 +178,9 @@ send_command(hci_id hid, snet_buffer* snbuf)
     // TODO: check if device is actually ready for this
     // TODO: mutex?
         
-    /* sched in All cases even if nbuf is null (hidden way to provoke re-scheduling)*/
+    /* sched in All cases even if nbuf is null (hidden way to provoke
+     * re-scheduling)
+     */
     sched_tx_processing(bdev);
     
     return err;

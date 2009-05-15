@@ -1,6 +1,6 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  */
@@ -12,8 +12,7 @@
 #include <KernelExport.h>
 #include <ByteOrder.h>
 #include <Drivers.h>
-#include <USB_spec.h>
-#include <USB.h>
+
 
 #include "snet_buffer.h"
 
@@ -47,41 +46,46 @@ struct net_device_module_info* btDevices = NULL;
 struct net_buffer_module_info* nb = NULL;
 struct bluetooth_core_data_module_info* btCoreData = NULL;
 
-/* Driver Global data */
+// Driver Global data
 static char	 *publish_names[MAX_BT_GENERIC_USB_DEVICES];
 
-int32 		dev_count = 0;	/* number of connected devices */
-static bt_usb_dev*	bt_usb_devices[MAX_BT_GENERIC_USB_DEVICES];
-sem_id 		dev_table_sem = -1; /* sem to synchronize access to device table */
+int32 dev_count = 0; // number of connected devices
+static bt_usb_dev* bt_usb_devices[MAX_BT_GENERIC_USB_DEVICES];
+sem_id dev_table_sem = -1; // sem to synchronize access to device table
 
 status_t submit_nbuffer(hci_id hid, net_buffer* nbuf);
 
 usb_support_descriptor supported_devices[] =
 {
-    /* Generic Bluetooth USB device */
-    /* Class, SubClass, and Protocol codes that describe a Bluetooth device */
+    // Generic Bluetooth USB device
+    // Class, SubClass, and Protocol codes that describe a Bluetooth device
 	{ UDCLASS_WIRELESS, UDSUBCLASS_RF, UDPROTO_BLUETOOTH , 0 , 0 },
 
-    /* Generic devices	*/
-	/* Broadcom BCM2035 */
+	// Broadcom BCM2035
 	{ 0, 0, 0, 0x0a5c, 0x200a },
 	{ 0, 0, 0, 0x0a5c, 0x2009 },
 
-	/* Devices taken from the linux Driver */
-	/* AVM BlueFRITZ! USB v2.0 */
+	// Devices taken from the linux Driver
+	// AVM BlueFRITZ! USB v2.0
 	{ 0, 0, 0, 0x057c   , 0x3800 },
-	/* Bluetooth Ultraport Module from IBM */
+	// Bluetooth Ultraport Module from IBM
 	{ 0, 0, 0, 0x04bf   , 0x030a },
-	/* ALPS Modules with non-standard id */
+	// ALPS Modules with non-standard id
 	{ 0, 0, 0, 0x044e   , 0x3001 },
 	{ 0, 0, 0, 0x044e   , 0x3002 },
-	/* Ericsson with non-standard id */
+	// Ericsson with non-standard id
 	{ 0, 0, 0, 0x0bdb   , 0x1002 }
 };
 
 /* add a device to the list of connected devices */
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static bt_usb_dev*
-spawn_device(const usb_device* usb_dev)
+spawn_device(usb_device usb_dev)
+#else
+static bt_usb_dev*
+spawn_device(usb_device* usb_dev)
+#endif
+
 {
 	int32 i;
 	status_t err = B_OK;
@@ -89,7 +93,7 @@ spawn_device(const usb_device* usb_dev)
 
 	flowf("add_device()\n");
 
-	/* 16 usb dongles... u are unsane */
+	// 16 usb dongles... 
 	if (dev_count >= MAX_BT_GENERIC_USB_DEVICES) {
 		flowf("device table full\n");
 		goto exit;
@@ -97,11 +101,11 @@ spawn_device(const usb_device* usb_dev)
 
 	/* try the allocation */
 	new_bt_dev = (bt_usb_dev*)malloc(sizeof(bt_usb_dev));
-	if ( new_bt_dev == NULL ) {
-		flowf("no memory allocating\n");
+	if (new_bt_dev == NULL) {
+		flowf("no memory\n");
 		goto exit;
 	}
-	memset(new_bt_dev, 0, sizeof(bt_usb_dev) );
+	memset(new_bt_dev, 0, sizeof(bt_usb_dev));
 
 	/* We will need this sem for some flow control */
 	new_bt_dev->cmd_complete = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "cmd_complete");
@@ -210,8 +214,12 @@ fetch_device(bt_usb_dev* dev, hci_id hid)
 
 
 /* called by USB Manager when device is added to the USB */
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static status_t
-device_added(const usb_device* dev, void** cookie)
+device_added(usb_device dev, void** cookie)
+#else
+device_added(usb_device* dev, void** cookie)
+#endif
 {
 	const usb_interface_info* 		interface;
 	const usb_device_descriptor* 	desc;
@@ -223,7 +231,7 @@ device_added(const usb_device* dev, void** cookie)
 	bt_usb_dev* new_bt_dev = spawn_device(dev);
     int e;
 
-	debugf("device_added(%p, %p)\n", dev, new_bt_dev);
+	debugf("device_added(%ld, %p)\n", dev, new_bt_dev);
 
 	if (new_bt_dev == NULL) {
 		flowf("Couldn't allocate device record.\n");
@@ -358,13 +366,13 @@ device_removed(void* cookie)
         return B_ERROR;
     }
 
-	if (!TEST_AND_CLEAR(&bdev->state, RUNNING) ) {
+	if (!TEST_AND_CLEAR(&bdev->state, RUNNING)) {
 		flowf(" wasnt running¿?\n");
 	}
 
 
 	flowf("Cancelling queues...\n");
-	if ( bdev->intr_in_ep != NULL ) {
+	if (bdev->intr_in_ep != NULL) {
 		usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
 		flowf("Cancelling impossible EVENTS\n");
 	}
@@ -455,7 +463,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 	}
 
 	// Set RUNNING
-	if ( TEST_AND_SET(&bdev->state, ANCILLYANT) ) {
+	if (TEST_AND_SET(&bdev->state, RUNNING)) {
 	    flowf("dev already running! - reOpened device!\n");
 	    return B_ERROR;
 	}
@@ -486,7 +494,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 		//	TODO: Fill the transport descriptor
 	    err = btDevices->init_device(bdev->name, &ndev);
 		
-    	if ( err == B_OK ) {
+    	if (err == B_OK) {
     		bdev->hdev = hdev = ndev->index; // get the index
     		bdev->ndev = ndev;  // get the net_device
 
@@ -645,7 +653,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			#if BT_DRIVER_SUPPORTS_ACL // ACL
 			for (i = 0; i < MAX_ACL_IN_WINDOW; i++) {
 				err = submit_rx_acl(bdev);
-				if (err != B_OK && i == 0 ) {
+				if (err != B_OK && i == 0) {
 	  			    CLEAR_BIT(bdev->state, ANCILLYANT);	// Set the flaq in the HCI world
 					flowf("Queuing failed device stops running\n");
 					break;
