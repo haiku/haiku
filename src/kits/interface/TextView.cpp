@@ -5250,22 +5250,52 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 		clauseCount++;
 	}
 
-	int32 selectionStart = 0;
-	int32 selectionEnd = 0;
-	message->FindInt32("be:selection", 0, &selectionStart);
-	message->FindInt32("be:selection", 1, &selectionEnd);
+	if (confirmed) {
+		_Refresh(fSelStart, fSelEnd, true, true);
+		_ShowCaret();
 
-	fInline->SetSelectionOffset(selectionStart);
-	fInline->SetSelectionLength(selectionEnd - selectionStart);
+		// now we need to feed ourselves the individual characters as if the
+		// user would have pressed them now - this lets KeyDown() pick out all
+		// the special characters like B_BACKSPACE, cursor keys and the like:
+		const char* currPos = string;
+		const char* prevPos = currPos;
+		while (*currPos != '\0') {
+			if ((*currPos & 0xC0) == 0xC0) {
+				// found the start of an UTF-8 char, we collect while it lasts
+				++currPos;
+				while ((*currPos & 0xC0) == 0x80)
+					++currPos;
+			} else if ((*currPos & 0xC0) == 0x80) {
+				// illegal: character starts with utf-8 intermediate byte, skip it
+				prevPos = ++currPos;
+			} else {
+				// single byte character/code, just feed that
+				++currPos;
+			}
+			KeyDown(prevPos, currPos - prevPos);
+			prevPos = currPos;
+		}
 
-	const int32 inlineOffset = fInline->Offset();
-	InsertText(string, stringLen, fSelStart, NULL);
-	fSelStart += stringLen;
-	fClickOffset = fSelEnd = fSelStart;
+		_Refresh(fSelStart, fSelEnd, true, true);
+	} else {
+		// temporarily show transient state of inline input
+		int32 selectionStart = 0;
+		int32 selectionEnd = 0;
+		message->FindInt32("be:selection", 0, &selectionStart);
+		message->FindInt32("be:selection", 1, &selectionEnd);
 
-	_Refresh(inlineOffset, fSelEnd, true, true);
+		fInline->SetSelectionOffset(selectionStart);
+		fInline->SetSelectionLength(selectionEnd - selectionStart);
 
-	_ShowCaret();
+		const int32 inlineOffset = fInline->Offset();
+		InsertText(string, stringLen, fSelStart, NULL);
+		fSelStart += stringLen;
+		fClickOffset = fSelEnd = fSelStart;
+
+		_Refresh(inlineOffset, fSelEnd, true, true);
+		_ShowCaret();
+	}
+
 }
 
 
