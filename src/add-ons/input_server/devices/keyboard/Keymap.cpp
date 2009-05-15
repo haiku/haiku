@@ -21,7 +21,7 @@
 #include <string.h>
 
 
-static void 
+static void
 print_key(char *chars, int32 offset)
 {
 	int size = chars[offset++];
@@ -62,9 +62,9 @@ print_key(char *chars, int32 offset)
 void
 Keymap::DumpKeymap()
 {
-	// Print a chart of the normal, shift, option, and option+shift 
-	// keys. 
-	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n"); 
+	// Print a chart of the normal, shift, option, and option+shift
+	// keys.
+	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n");
 
 	for (int i = 0; i < 128; i++) {
 		printf(" 0x%x\t", i);
@@ -102,10 +102,10 @@ Keymap::~Keymap()
 }
 
 
-/* we need to know if a key is a modifier key to choose 
+/* we need to know if a key is a modifier key to choose
 	a valid key when several are pressed together
 */
-bool 
+bool
 Keymap::IsModifierKey(uint32 keyCode)
 {
 	return keyCode == fKeys.caps_key
@@ -124,7 +124,7 @@ Keymap::IsModifierKey(uint32 keyCode)
 
 
 //! We need to know a modifier for a key
-uint32 
+uint32
 Keymap::Modifier(uint32 keyCode)
 {
 	if (keyCode == fKeys.caps_key)
@@ -197,7 +197,7 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 
 	int32 offset;
 	uint32 tableMask = 0;
-	
+
 	switch (modifiers & 0xcf) {
 		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; tableMask = B_SHIFT_TABLE; break;
 		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; tableMask = B_CAPS_TABLE; break;
@@ -217,9 +217,9 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 	if (!numBytes)
 		return 0;
 
-	char chars[4];	
+	char chars[4];
 	strncpy(chars, &(fChars[offset+1]), numBytes );
-	chars[numBytes] = 0; 
+	chars[numBytes] = 0;
 
 	int32 deadOffsets[] = {
 		fKeys.acute_dead_key[1],
@@ -227,7 +227,7 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 		fKeys.circumflex_dead_key[1],
 		fKeys.dieresis_dead_key[1],
 		fKeys.tilde_dead_key[1]
-	}; 
+	};
 
 	uint32 deadTables[] = {
 		fKeys.acute_tables,
@@ -277,7 +277,7 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 	}
 
 	if (offset <= 0 || offset > fCharsSize)
-		return false;	
+		return false;
 
 	uint32 numBytes = fChars[offset];
 	if (!numBytes)
@@ -291,7 +291,7 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		fKeys.tilde_dead_key
 	};
 
-	int32 *deadOffset = deadOffsets[activeDeadKey-1]; 
+	int32 *deadOffset = deadOffsets[activeDeadKey-1];
 
 	for (int32 i=0; i<32; i++) {
 		if (offset == deadOffset[i])
@@ -414,19 +414,23 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 				}
 			}
 			return;
-		}		
+		}
 		i++;
 	}
 
-	// if not found we return the current char mapped	
-	*chars = new (std::nothrow) char[*numBytes + 1];
+	// if not found we return the whole sequence (the dead key itself plus
+	// the following char)
+	int32 deadKeyNumBytes = fChars[deadKey[1]];
+	int32 fullNumBytes = deadKeyNumBytes + *numBytes;
+	*chars = new (std::nothrow) char[fullNumBytes + 1];
 	if (*chars == NULL) {
 		*numBytes = 0;
 		return;
 	}
-
-	strncpy(*chars, &(fChars[offset + 1]), *numBytes );
-	(*chars)[*numBytes] = 0; 	
+	strncpy(*chars, &fChars[deadKey[1] + 1], deadKeyNumBytes);
+	strncpy(*chars + deadKeyNumBytes, &fChars[offset + 1], *numBytes);
+	*numBytes = fullNumBytes;
+	(*chars)[fullNumBytes] = 0;
 }
 
 
