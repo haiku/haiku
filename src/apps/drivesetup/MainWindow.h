@@ -44,13 +44,12 @@ public:
 
 private:
 			void				_ScanDrives();
-			void				_ScanFileSystems();
 
 			void				_AdaptToSelectedPartition();
 			void				_SetToDiskAndPartition(partition_id diskID,
 									partition_id partitionID,
 									partition_id parentID);
-			void				_EnabledDisableMenuItems(BDiskDevice* disk,
+			void				_UpdateMenus(BDiskDevice* disk,
 									partition_id selectedPartition,
 									partition_id parentID);
 
@@ -67,6 +66,9 @@ private:
 			void				_Initialize(BDiskDevice* disk,
 									partition_id selectedPartition,
 									const BString& diskSystemName);
+			void				_Create(BDiskDevice* disk,
+									partition_id selectedPartition,
+									const BString& partitionType);
 
 
 			BDiskDeviceRoster	fDDRoster;
