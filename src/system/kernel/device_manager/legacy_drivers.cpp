@@ -1184,7 +1184,7 @@ LegacyDevice::Removed()
 {
 	RecursiveLocker _(sLock);
 
-	if (!fRemovedFromParent)
+	if (!fRemovedFromParent && fDriver != NULL)
 		fDriver->devices.Remove(this);
 
 	delete this;
