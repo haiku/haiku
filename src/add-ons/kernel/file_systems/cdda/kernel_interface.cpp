@@ -683,6 +683,8 @@ Volume::Mount(const char* device)
 			dprintf("CDDA: no CD-Text found.\n");
 		else
 			doLookup = false;	 
+	} else {
+		doLookup = false;
 	}
 		
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
