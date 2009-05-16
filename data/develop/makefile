@@ -32,8 +32,13 @@ TYPE=
 #	in folder names do not work well with this makefile.
 SRCS= 
 
-#	specify the resource files to use
+#	specify the resource definition files to use
 #	full path or a relative path to the resource file can be used.
+RDEFS= 
+	
+#	specify the resource files to use. 
+#	full path or a relative path to the resource file can be used.
+#	both RDEFS and RSRCS can be defined in the same makefile.
 RSRCS= 
 
 # @<-src@ 
