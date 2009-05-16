@@ -7025,37 +7025,31 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		status = mount->volume->file_system->mount(mount->volume, device, flags,
 			args, &rootID);
-		if (status < 0) {
-			// ToDo: why should we hide the error code from the file system here?
-			//status = ERR_VFS_GENERAL;
+		if (status != 0)
 			goto err2;
-		}
 	} else {
-		struct vnode* coveredVnode;
-		status = path_to_vnode(path, true, &coveredVnode, NULL, kernel);
-		if (status < B_OK)
+		status = path_to_vnode(path, true, &mount->covers_vnode, NULL, kernel);
+		if (status != B_OK)
 			goto err2;
 
 		// make sure covered_vnode is a directory
-		if (!S_ISDIR(coveredVnode->type)) {
+		if (!S_ISDIR(mount->covers_vnode->type)) {
 			status = B_NOT_A_DIRECTORY;
-			goto err2;
+			goto err3;
 		}
 
-		if (coveredVnode->mount->root_vnode == coveredVnode) {
+		if (mount->covers_vnode->mount->root_vnode == mount->covers_vnode) {
 			// this is already a mount point
 			status = B_BUSY;
-			goto err2;
+			goto err3;
 		}
-
-		mount->covers_vnode = coveredVnode;
 
 		// mount it/them
 		fs_volume* volume = mount->volume;
 		while (volume) {
 			status = volume->file_system->mount(volume, device, flags, args,
 				&rootID);
-			if (status < B_OK) {
+			if (status != B_OK) {
 				if (volume->sub_volume)
 					goto err4;
 				goto err3;
@@ -7116,7 +7110,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 err4:
 	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 err3:
-	if (mount->covers_vnode)
+	if (mount->covers_vnode != NULL)
 		put_vnode(mount->covers_vnode);
 err2:
 	mutex_lock(&sMountMutex);
