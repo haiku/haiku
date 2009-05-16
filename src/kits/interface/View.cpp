@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1587,7 +1587,9 @@ BView::SetEventMask(uint32 mask, uint32 options)
 	if (fEventMask == mask && fEventOptions == options)
 		return B_OK;
 
-	fEventMask = mask | (fEventMask & 0xffff0000);
+	// don't change the mask if it's zero and we've got options
+	if (mask != 0 || options == 0)
+		fEventMask = mask | (fEventMask & 0xffff0000);
 	fEventOptions = options;
 
 	fState->archiving_flags |= B_VIEW_EVENT_MASK_BIT;

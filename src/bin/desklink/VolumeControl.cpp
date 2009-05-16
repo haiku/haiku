@@ -104,7 +104,10 @@ VolumeControl::AttachedToWindow()
 {
 	BSlider::AttachedToWindow();
 
-	SetEventMask(_IsReplicant() ? 0 : B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	if (_IsReplicant())
+		SetEventMask(0, 0);
+	else
+		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
 	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
