@@ -1469,12 +1469,10 @@ KDiskDeviceManager::_CheckMediaStatus()
 			bool changedMedia = device->MediaChanged();
 			device->UpdateMediaStatusIfNeeded();
 
-			// Detect it there was any status change since last check.
-			bool updated = (hadMedia != device->HasMedia()) ||
-				(changedMedia != device->MediaChanged());		
-
-			if ((!device->MediaChanged() &&
-				(device->HasMedia() || !hadMedia)) || !updated)
+			// Detect if there was any status change since last check.
+			if ((!device->MediaChanged() && (device->HasMedia() || !hadMedia))
+				|| !(hadMedia != device->HasMedia()
+					|| changedMedia != device->MediaChanged()))
 				continue;
 
 			device->MarkBusy(true);
