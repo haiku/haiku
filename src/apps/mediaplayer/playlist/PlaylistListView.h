@@ -33,9 +33,9 @@ class PlaylistListView : public SimpleListView {
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 
 	// SimpleListView interface
-	virtual	void				MoveItems(BList& indices, int32 toIndex);
-	virtual	void				CopyItems(BList& indices, int32 toIndex);
-	virtual	void				RemoveItemList(BList& indices);
+	virtual	void				MoveItems(const BList& indices, int32 toIndex);
+	virtual	void				CopyItems(const BList& indices, int32 toIndex);
+	virtual	void				RemoveItemList(const BList& indices);
 
 	virtual	void				DrawListItem(BView* owner, int32 index,
 									BRect frame) const;
@@ -45,7 +45,7 @@ class PlaylistListView : public SimpleListView {
 									int32 appendIndex);
 
 			void				Randomize();
-			void				PermanentRemoveSelectedFile(bool permRemove);
+			void				RemoveSelectionToTrash();
 
  private:
 			void				_FullSync();

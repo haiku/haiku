@@ -288,18 +288,6 @@ Playlist::RemoveRef(int32 index, bool careAboutCurrentIndex)
 }
 
 
-void
-Playlist::RemoveRefPermanent(int32 index, bool removeToTrash)
-{
-	if (index != -1) {
-		entry_ref song = RemoveRef(index);
-
-		if(removeToTrash)
-			_DeleteEntry(&song);//Remove with tracker
-	}
-}
-
-
 int32
 Playlist::IndexOf(const entry_ref& _ref) const
 {
@@ -455,7 +443,7 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 	BEntry entry(&ref, true);
 	if (entry.InitCheck() < B_OK || !entry.Exists())
 		return;
-	
+
 	if (entry.IsDirectory()) {
 		BDirectory dir(&entry);
 		if (dir.InitCheck() < B_OK)
@@ -490,8 +478,8 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 		FileReadWrite lineReader(&file);
 
 		BString str;
-		entry_ref refPath; 
-		status_t err; 
+		entry_ref refPath;
+		status_t err;
 		BPath path;
 		while (lineReader.Next(str)) {
 			str = str.RemoveFirst("file://");
@@ -501,7 +489,7 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 			if (path.Path() != NULL) {
 				if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
 					playlist->AddRef(refPath);
-				} else			
+				} else
 					printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
 			} else
 				printf("Error - No File Found in playlist\n");
@@ -536,7 +524,7 @@ Playlist::playlist_cmp(const void *p1, const void *p2)
 Playlist::_IsMediaFile(const BString& mimeString)
 {
 	BMimeType superType;
-	BMimeType fileType(mimeString.String()); 
+	BMimeType fileType(mimeString.String());
 
 	if (fileType.GetSupertype(&superType) != B_OK)
 		return false;
@@ -550,21 +538,21 @@ Playlist::_IsMediaFile(const BString& mimeString)
 
 /*static*/ bool
 Playlist::_IsTextPlaylist(const BString& mimeString)
-{    	
+{
 	return mimeString.Compare(kTextPlaylistMimeString) == 0;
 }
 
 
 /*static*/ bool
 Playlist::_IsBinaryPlaylist(const BString& mimeString)
-{    	
+{
 	return mimeString.Compare(kBinaryPlaylistMimeString) == 0;
 }
 
 
 /*static*/ bool
 Playlist::_IsPlaylist(const BString& mimeString)
-{    	
+{
 	return _IsTextPlaylist(mimeString) || _IsBinaryPlaylist(mimeString);
 }
 
@@ -583,18 +571,7 @@ Playlist::_MIMEString(const entry_ref* ref)
 		strlcpy(mimeString, type.Type(), B_MIME_TYPE_LENGTH);
 		nodeInfo.SetType(type.Type());
 	}
-	return BString(mimeString);	
-}
-
-
-void
-Playlist::_DeleteEntry(const entry_ref* file)
-{
-	// Move entry_ref to Trash
-	BMessage trash(BPrivate::kMoveToTrash);
-	trash.AddRef("refs", file);
-
-	BMessenger("application/x-vnd.Be-TRAK").SendMessage(&trash);		
+	return BString(mimeString);
 }
 
 

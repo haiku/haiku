@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,18 +46,17 @@
 
 enum {
 	// file
-	M_PLAYLIST_OPEN			= 'open',
-	M_PLAYLIST_SAVE			= 'save',
-	M_PLAYLIST_SAVE_AS		= 'svas',
-	M_PLAYLIST_SAVE_RESULT	= 'psrs',
+	M_PLAYLIST_OPEN							= 'open',
+	M_PLAYLIST_SAVE							= 'save',
+	M_PLAYLIST_SAVE_AS						= 'svas',
+	M_PLAYLIST_SAVE_RESULT					= 'psrs',
 
 	// edit
-	M_PLAYLIST_EMPTY		= 'emty',
-	M_PLAYLIST_RANDOMIZE	= 'rand',
-	
-	// 
-	M_PLAYLIST_DELETE_FILE	= 'dlfi',
-	M_PLAYLIST_PER_DEL_FILE	= 'pdfi'
+	M_PLAYLIST_EMPTY						= 'emty',
+	M_PLAYLIST_RANDOMIZE					= 'rand',
+
+	M_PLAYLIST_REMOVE						= 'rmov',
+	M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH	= 'rmtr'
 };
 
 #define SPACE 5
@@ -195,45 +194,16 @@ PlaylistWindow::MessageReceived(BMessage* message)
 		case M_PLAYLIST_RANDOMIZE:
 			fListView->Randomize();
 			break;
-		case M_PLAYLIST_DELETE_FILE:
-			fListView->PermanentRemoveSelectedFile(false);
-			break;	
-		case M_PLAYLIST_PER_DEL_FILE:
-			fListView->PermanentRemoveSelectedFile(true);		
+		case M_PLAYLIST_REMOVE:
+			fListView->RemoveSelected();
+			break;
+		case M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH:
+			fListView->RemoveSelectionToTrash();
 			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-PlaylistWindow::DispatchMessage(BMessage *message, BHandler *handler)
-{
-	if (message->what == B_KEY_DOWN) {
-
-		uint32 key = message->FindInt32("key");
-	
-		switch (key) {
-			case 0x34:			//delete button
-			case 0x3e: 			//d for delete
-			case 0x2b:			//t for Trash
-				if (modifiers() & B_COMMAND_KEY) {
-					fListView->PermanentRemoveSelectedFile(true);
-					return;
-				}
-				break;
-			case 0x2a:			//r for Remove
-				if (modifiers() & B_COMMAND_KEY) {
-					fListView->PermanentRemoveSelectedFile(false);
-					return;
-				}
-				break;
-		}
-	}
-	
-	BWindow::DispatchMessage(message, handler);
 }
 
 
@@ -268,10 +238,10 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	editMenu->AddItem(new BMenuItem("Randomize",
 		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem("Remove",
-		new BMessage(M_PLAYLIST_DELETE_FILE), 'R'));	
-	editMenu->AddItem(new BMenuItem("Remove Permanent",
-		new BMessage(M_PLAYLIST_PER_DEL_FILE), 'T', B_COMMAND_KEY));	
+	editMenu->AddItem(new BMenuItem("Remove (Del)",
+		new BMessage(M_PLAYLIST_REMOVE)/*, B_DELETE, 0*/));
+	editMenu->AddItem(new BMenuItem("Remove and Put into Trash",
+		new BMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH), 'T'));
 	editMenu->AddItem(new BMenuItem("Remove All",
 		new BMessage(M_PLAYLIST_EMPTY), 'N'));
 

@@ -68,9 +68,6 @@ public:
 			entry_ref			RemoveRef(int32 index,
 									bool careAboutCurrentIndex = true);
 
-			void				RemoveRefPermanent(int32 index, 
-									bool removeToTrash);
-
 			bool				AdoptPlaylist(Playlist& other);
 			bool				AdoptPlaylist(Playlist& other, int32 index);
 
@@ -81,7 +78,7 @@ public:
 			// navigating current ref
 			bool				SetCurrentRefIndex(int32 index);
 			int32				CurrentRefIndex() const;
-		
+
 			void				GetSkipInfo(bool* canSkipPrevious,
 									bool* canSkipNext) const;
 
@@ -89,7 +86,7 @@ public:
 			bool				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
 
-			// support functions			
+			// support functions
 			void				AppendRefs(const BMessage* refsReceivedMessage,
 									int32 appendIndex = -1);
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
@@ -103,8 +100,7 @@ private:
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
-	static	BString				_MIMEString(const entry_ref* entry);
-			void				_DeleteEntry(const entry_ref* file);
+	static	BString				_MIMEString(const entry_ref* ref);
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;
 			void				_NotifyRefRemoved(int32 index) const;

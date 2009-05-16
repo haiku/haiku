@@ -6,7 +6,7 @@
  *		Stephan Aßmus 	<superstippi@gmx.de>
  *		Fredrik Modéen 	<fredrik@modeen.se>
  */
- 
+
 #ifndef PLAYLIST_WINDOW_H
 #define PLAYLIST_WINDOW_H
 
@@ -36,7 +36,6 @@ public:
 
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				DispatchMessage(BMessage *msg, BHandler *handler);
 
 private:
 			void				_CreateMenu(BRect& frame);

@@ -136,16 +136,6 @@ ControllerView::SkipForward()
 
 
 void
-ControllerView::SkipForwardAndDelete()
-{
-	BAutolock _(fPlaylist);
-	int32 index = fPlaylist->CurrentRefIndex();
-	fPlaylist->SetCurrentRefIndex(index + 1);
-	fPlaylist->RemoveRefPermanent(index, true);
-}
-
-
-void
 ControllerView::VolumeChanged(float value)
 {
 	fController->SetVolume(value);

@@ -264,12 +264,12 @@ DragSortableListView::InitiateDrag( BPoint point, int32 index, bool )
 				v->SetHighColor( 0, 0, 0, 255 );
 				v->StrokeRect( v->Bounds() );
 				v->Sync();
-	
+
 				uint8 *bits = (uint8 *)dragBitmap->Bits();
 				int32 height = (int32)dragBitmap->Bounds().Height() + 1;
 				int32 width = (int32)dragBitmap->Bounds().Width() + 1;
 				int32 bpr = dragBitmap->BytesPerRow();
-	
+
 				if (fade) {
 					for ( int32 y = 0; y < height - ALPHA / 2; y++, bits += bpr ) {
 						uint8 *line = bits + 3;
@@ -395,7 +395,7 @@ DragSortableListView::KeyDown( const char* bytes, int32 numBytes )
 {
 	if ( numBytes < 1 )
 		return;
-		
+
 	if ( ( bytes[0] == B_BACKSPACE ) || ( bytes[0] == B_DELETE ) )
 		RemoveSelected();
 
@@ -569,7 +569,7 @@ DragSortableListView::SetDropTargetRect(const BMessage* message, BPoint where)
 			// offset where by half of item height
 			r = ItemFrame(0);
 			where.y += r.Height() / 2.0;
-	
+
 			int32 index = IndexOf(where);
 			if (index < 0)
 				index = CountItems();
@@ -627,7 +627,7 @@ DragSortableListView::ScrollTo(int32 index)
 
 // MoveItems
 void
-DragSortableListView::MoveItems(BList& indices, int32 index)
+DragSortableListView::MoveItems(const BList& indices, int32 index)
 {
 	DeselectAll();
 	// we remove the items while we look at them, the insertion index is decreased
@@ -659,7 +659,7 @@ DragSortableListView::MoveItems(BList& indices, int32 index)
 
 // CopyItems
 void
-DragSortableListView::CopyItems(BList& indices, int32 toIndex)
+DragSortableListView::CopyItems(const BList& indices, int32 toIndex)
 {
 	DeselectAll();
 	// by inserting the items after we copied all items first, we avoid
@@ -689,7 +689,7 @@ DragSortableListView::CopyItems(BList& indices, int32 toIndex)
 
 // RemoveItemList
 void
-DragSortableListView::RemoveItemList(BList& indices)
+DragSortableListView::RemoveItemList(const BList& indices)
 {
 	int32 count = indices.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -698,11 +698,10 @@ DragSortableListView::RemoveItemList(BList& indices)
 	}
 }
 
-// RemoveSelected
+// GetSelectedItems
 void
-DragSortableListView::RemoveSelected()
+DragSortableListView::GetSelectedItems(BList& indices)
 {
-	BList indices;
 	for (int32 i = 0; true; i++) {
 		int32 index = CurrentSelection(i);
 		if (index < 0)
@@ -710,6 +709,14 @@ DragSortableListView::RemoveSelected()
 		if (!indices.AddItem((void*)index))
 			break;
 	}
+}
+
+// RemoveSelected
+void
+DragSortableListView::RemoveSelected()
+{
+	BList indices;
+	GetSelectedItems(indices);
 
 	DeselectAll();
 

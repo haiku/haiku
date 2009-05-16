@@ -89,9 +89,11 @@ class DragSortableListView : public BListView {
 
 			bool			MouseWheelChanged(float x, float y);
 
-	virtual	void			MoveItems(BList& indices, int32 toIndex);
-	virtual	void			CopyItems(BList& indices, int32 toIndex);
-	virtual	void			RemoveItemList(BList& indices);
+	virtual	void			MoveItems(const BList& indices, int32 toIndex);
+	virtual	void			CopyItems(const BList& indices, int32 toIndex);
+	virtual	void			RemoveItemList(const BList& indices);
+
+			void			GetSelectedItems(BList& indices);
 			void			RemoveSelected(); // uses RemoveItemList()
 			void			RemoveAll(); // uses RemoveItemList()
 			int32			CountSelectedItems() const;

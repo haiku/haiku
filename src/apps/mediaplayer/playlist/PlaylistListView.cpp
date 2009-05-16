@@ -358,7 +358,7 @@ PlaylistListView::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (numBytes < 1)
 		return;
-		
+
 	if ((bytes[0] == B_BACKSPACE) || (bytes[0] == B_DELETE))
 		RemoveSelected();
 
@@ -367,7 +367,7 @@ PlaylistListView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-PlaylistListView::MoveItems(BList& indices, int32 toIndex)
+PlaylistListView::MoveItems(const BList& indices, int32 toIndex)
 {
 	fCommandStack->Perform(new (nothrow) MovePLItemsCommand(fPlaylist,
 		(int32*)indices.Items(), indices.CountItems(), toIndex));
@@ -375,7 +375,7 @@ PlaylistListView::MoveItems(BList& indices, int32 toIndex)
 
 
 void
-PlaylistListView::CopyItems(BList& indices, int32 toIndex)
+PlaylistListView::CopyItems(const BList& indices, int32 toIndex)
 {
 	fCommandStack->Perform(new (nothrow) CopyPLItemsCommand(fPlaylist,
 		(int32*)indices.Items(), indices.CountItems(), toIndex));
@@ -383,7 +383,7 @@ PlaylistListView::CopyItems(BList& indices, int32 toIndex)
 
 
 void
-PlaylistListView::RemoveItemList(BList& indices)
+PlaylistListView::RemoveItemList(const BList& indices)
 {
 	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
 		(int32*)indices.Items(), indices.CountItems()));
@@ -444,12 +444,12 @@ PlaylistListView::Randomize()
 
 
 void
-PlaylistListView::PermanentRemoveSelectedFile(bool permRemove)
+PlaylistListView::RemoveSelectionToTrash()
 {
-	BAutolock _(fPlaylist);
-	int32 index = fPlaylist->CurrentRefIndex();
-	fPlaylist->SetCurrentRefIndex(index + 1);
-	fPlaylist->RemoveRefPermanent(index, permRemove);
+	BList indices;
+	GetSelectedItems(indices);
+	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
+		(int32*)indices.Items(), indices.CountItems(), true));
 }
 
 

@@ -36,7 +36,7 @@ public:
 						ControllerView(BRect frame, Controller* controller,
 							Playlist* playlist);
 						~ControllerView();
-					
+
 	// TransportControlGroup interface
 	virtual	uint32		EnabledButtons();
 	virtual	void		TogglePlaying();
@@ -45,7 +45,6 @@ public:
 	virtual	void		Forward();
 	virtual	void		SkipBackward();
 	virtual	void		SkipForward();
-	virtual	void		SkipForwardAndDelete();
 	virtual	void		VolumeChanged(float value);
 	virtual	void		ToggleMute();
 	virtual	void		PositionChanged(float value);
