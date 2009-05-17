@@ -349,13 +349,6 @@ while [ $# -gt 0 ] ; do
 	esac
 done
 
-# check for a 64bit platform
-case "${platformMachine}" in
-	x86_64)	use32bit=1 ;;
-	*)	echo Assuming 32-bit machine: "$platformMachine"
-		use32bit=0 ;;
-esac
-
 # detect the build platform
 case "${platform}" in
 	BeOS)	revision=`uname -r`
