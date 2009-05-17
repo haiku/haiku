@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -323,13 +323,13 @@ BListView::MouseDown(BPoint point)
 	bigtime_t doubleClickSpeed;
 	get_click_speed(&doubleClickSpeed);
 	bool doubleClick = false;
-	
+
 	if (timeDelta < doubleClickSpeed
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
 		&& fTrack->item_index == index)
 		doubleClick = true;
-	
+
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
 		fTrack->drag_start.Set(LONG_MAX, LONG_MAX);
 		Invoke();
@@ -338,7 +338,7 @@ BListView::MouseDown(BPoint point)
 
 	int32 modifiers;
 	message->FindInt32("modifiers", &modifiers);
-	
+
 	if (!doubleClick) {
 		fTrack->drag_start = point;
 		fTrack->last_click_time = system_time();
@@ -382,22 +382,27 @@ BListView::MouseDown(BPoint point)
 void
 BListView::MouseUp(BPoint pt)
 {
-	fTrack->item_index = -1;
 	fTrack->try_drag = false;
 }
 
-// MouseMoved
+
 void
-BListView::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
+BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	if (fTrack->item_index == -1) {
+	if (fTrack->item_index == -1 || !fTrack->try_drag) {
 		// mouse was not clicked above any item
 		// or no mouse button pressed
 		return;
 	}
 
-	if (_TryInitiateDrag(pt))
-		return;
+	// Initiate a drag if the mouse was moved far enough
+	BPoint offset = where - fTrack->drag_start;
+	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
+	if (dragDistance >= 5.0f) {
+		fTrack->try_drag = false;
+		InitiateDrag(fTrack->drag_start, fTrack->item_index,
+			fTrack->was_selected);
+	}
 }
 
 
@@ -615,7 +620,7 @@ BListView::AddList(BList* list, int32 index)
 			ItemAt(i)->SetTop((i > 0) ? ItemAt(i - 1)->Bottom() + 1.0 : 0.0);
 			ItemAt(i)->Update(this, &font);
 		}
-		
+
 		_RecalcItemTops(index + list->CountItems() - 1);
 
 		_FixupScrollBar();
@@ -1550,23 +1555,6 @@ BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 		fFirstSelected = fLastSelected = -1;
 
 	return true;
-}
-
-
-bool
-BListView::_TryInitiateDrag(BPoint where)
-{
-	if (!fTrack->try_drag || fTrack->item_index < 0)
-		return false;
-
-	BPoint offset = where - fTrack->drag_start;
-	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
-
-	if (dragDistance > 5.0) {
-		fTrack->try_drag = false;
-		return InitiateDrag(fTrack->drag_start, fTrack->item_index, fTrack->was_selected);
-	}
-	return false;
 }
 
 
