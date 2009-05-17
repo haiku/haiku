@@ -147,6 +147,11 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/mail_daemon "" -E
 fi
 
+# Launch CDDB Daemon
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/cddb_daemon ""
+fi
+
 # Check for daily saving time
 launch system/bin/dstcheck
 

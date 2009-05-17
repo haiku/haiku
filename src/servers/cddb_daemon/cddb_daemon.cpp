@@ -35,11 +35,13 @@ CDDBDaemon::CDDBDaemon()
 	fVolumeRoster->StartWatching();
 	
 	BVolume volume;
+	printf("Checking currently mounted volumes ...\n");
 	while (fVolumeRoster->GetNextVolume(&volume) == B_OK) {
 		if (_Lookup(volume.Device()) != B_OK) {
 			continue;
 		}
 	}
+	printf("Checking complete. Listening for device mounts.\n");
 }
 
 
@@ -82,10 +84,11 @@ CDDBDaemon::_Lookup(const dev_t device)
 	uint32 cddbId;
 	if (!_CanLookup(device, &cddbId, toc)) {
 		free(toc);
+		printf("Skipping device with id %d.\n", device);
 		return B_BAD_TYPE;
 	}
 		
-	printf("CD can be looked up. CDDB id = %08lx.\n", cddbId);
+	printf("Looking up CD with CDDB Id %08lx.\n", cddbId);
 
 	CDDBServer cddb_server("freedb.freedb.org:80");
 
@@ -93,6 +96,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 
 	BList queryResponse;
 	if ((result = cddb_server.Query(cddbId, toc, &queryResponse)) != B_OK) {
+		printf("Error when querying CD.\n");
 		free(toc);
 		return result;
 	}
@@ -101,6 +105,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 
 	QueryResponseData* diskData = _SelectResult(&queryResponse);
 	if (diskData == NULL) {
+		printf("Could not find any CD entries in query response.\n");
 		return B_BAD_INDEX;
 	}
 
@@ -112,7 +117,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	if (_WriteCDData(device, diskData, &readResponse) == B_OK) {
 		printf("CD data saved.\n");
 	} else {
-		printf("CD data not saved.\n" );
+		printf("Error writting CD data.\n" );
 	}
 
 	// Delete itens in the query response BList;
@@ -179,9 +184,24 @@ CDDBDaemon::_SelectResult(BList* response) const
 	//
 	// TODO(bga):Right now it just picks the first entry on the list but
 	// someday we may want to let the user choose one.
-	if (response->CountItems() != 0)
+	int32 numItems = response->CountItems();
+	if (numItems > 0) {
+		if (numItems > 1) {
+			printf("Multiple matches found :\n");
+		};
+		for (int32 i = 0; i < numItems; i++) {
+			QueryResponseData* data = (QueryResponseData*)response->ItemAt(i);
+			printf("* %s : %s - %s (%s)\n", (data->cddbId).String(),
+				(data->artist).String(), (data->title).String(),
+				(data->category).String());
+		}
+		if (numItems > 1) {
+			printf("Returning first entry.\n");
+		}
+		
 		return (QueryResponseData*)response->ItemAt(0L);
-	
+	}
+
 	return NULL;
 }
 
@@ -246,6 +266,7 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 
 
 int main(void) {
+	printf("CDDB Daemon for Haiku v1.0.0 started.\n");
 	CDDBDaemon* cddbDaemon = new CDDBDaemon();
 	cddbDaemon->Run();
 	delete cddbDaemon; 

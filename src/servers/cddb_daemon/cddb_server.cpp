@@ -252,8 +252,6 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 				trackData->title = line;
 					
 				(readResponse->tracks).AddItem(trackData);
-			} else {
-				printf("Unhandled or unknown prefix: %s\n", prefix.String());
 			}
 			
 			if (output == "" || output == ".\r\n") {
