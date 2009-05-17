@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-9/2007.
+   Rudolf Cornelissen 8/2003-5/2009.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -80,9 +80,9 @@ status_t nv_acc_init_dma()
 	err = 0;
 
 	/* a hanging engine only recovers from a complete power-down/power-up cycle */
-	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	NV_REG32(NV32_PWRUPCTRL) = 0xffff00ff;
 	snooze(1000);
-	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+	NV_REG32(NV32_PWRUPCTRL) = 0xffffffff;
 
 	/* don't try this on NV20 and later.. */
 	/* note:

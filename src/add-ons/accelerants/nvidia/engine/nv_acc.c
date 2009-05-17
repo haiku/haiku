@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-5/2005.
+   Rudolf Cornelissen 8/2003-5/2009.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -85,9 +85,9 @@ status_t nv_acc_init()
 	uint16 cnt;
 
 	/* a hanging engine only recovers from a complete power-down/power-up cycle */
-	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	NV_REG32(NV32_PWRUPCTRL) = 0xffff00ff;
 	snooze(1000);
-	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+	NV_REG32(NV32_PWRUPCTRL) = 0xffffffff;
 
 	/* setup PTIMER: */
 	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
