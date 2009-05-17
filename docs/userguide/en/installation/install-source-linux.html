@@ -40,9 +40,13 @@
 <h1>Downloading the tools and the Haiku source</h1>
 <ol>
 <li><p>Install all needed packages:</p>
+<p>On Ubuntu you can do so by clicking <a href="apt:subversion,autoconf,automake,texinfo,flex,bison,gawk,build-essential,yasm">here</a>, or use the command line:</p>
 <pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm</pre></li>
 
-<li><p>Create the Haiku development directories and get the Haiku build tools source.:</p>
+<p>On 64-bit systems, you will also need the <a href="apt:libc6-dev-i386">libc6-dev-i386</a> package:</p>
+<pre class="terminal">sudo apt-get install libc6-dev-i386</pre></li>
+
+<li><p>Create the Haiku development directories and get the Haiku build tools source:</p>
 <pre class="terminal">mkdir develop
 cd develop
 mkdir haiku
