@@ -55,8 +55,7 @@ enum {
 	M_PLAYLIST_EMPTY						= 'emty',
 	M_PLAYLIST_RANDOMIZE					= 'rand',
 
-	M_PLAYLIST_REMOVE						= 'rmov',
-	M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH	= 'rmtr'
+	M_PLAYLIST_REMOVE						= 'rmov'
 };
 
 #define SPACE 5
@@ -198,8 +197,16 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			fListView->RemoveSelected();
 			break;
 		case M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH:
-			fListView->RemoveSelectionToTrash();
+		{
+printf("M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH\n");
+message->PrintToStream();
+			int32 index;
+			if (message->FindInt32("playlist index", &index) == B_OK)
+				fListView->RemoveToTrash(index);
+			else
+				fListView->RemoveSelectionToTrash();
 			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;

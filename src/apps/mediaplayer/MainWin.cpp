@@ -194,6 +194,11 @@ MainWin::MainWin()
 	Settings::Default()->AddListener(&fGlobalSettingsListener);
 	_AdoptGlobalSettings();
 
+	AddShortcut('z', B_COMMAND_KEY, new BMessage(B_UNDO));
+	AddShortcut('y', B_COMMAND_KEY, new BMessage(B_UNDO));
+	AddShortcut('z', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
+	AddShortcut('y', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
+
 	Show();
 }
 
@@ -358,6 +363,11 @@ MainWin::MessageReceived(BMessage *msg)
 			}
 			break;
 
+		case B_UNDO:
+		case B_REDO:
+			fPlaylistWindow->PostMessage(msg);
+			break;
+
 		case M_MEDIA_SERVER_STARTED:
 			printf("TODO: implement M_MEDIA_SERVER_STARTED\n");
 			// fController->...
@@ -404,6 +414,8 @@ MainWin::MessageReceived(BMessage *msg)
 		// ControllerObserver messages
 		case MSG_CONTROLLER_FILE_FINISHED:
 		{
+			BAutolock _(fPlaylist);
+
 			bool hadNext = fPlaylist->SetCurrentRefIndex(
 				fPlaylist->CurrentRefIndex() + 1);
 			if (!hadNext) {
@@ -653,6 +665,8 @@ MainWin::MessageReceived(BMessage *msg)
 			}
 */
 		case M_SET_PLAYLIST_POSITION: {
+			BAutolock _(fPlaylist);
+
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK)
 				fPlaylist->SetCurrentRefIndex(index);
@@ -723,6 +737,7 @@ MainWin::OpenFile(const entry_ref &ref)
 
 	status_t err = fController->SetTo(ref);
 	if (err != B_OK) {
+		BAutolock _(fPlaylist);
 		if (fPlaylist->CountItems() == 1) {
 			// display error if this is the only file we're supposed to play
 			BString message;
@@ -778,10 +793,17 @@ void
 MainWin::ShowPlaylistWindow()
 {
 	if (fPlaylistWindow->Lock()) {
+		// make sure the window shows on the same workspace as ourself
+		uint32 workspaces = Workspaces();
+		if (fPlaylistWindow->Workspaces() != workspaces)
+			fPlaylistWindow->SetWorkspaces(workspaces);
+
+		// show or activate
 		if (fPlaylistWindow->IsHidden())
 			fPlaylistWindow->Show();
 		else
 			fPlaylistWindow->Activate();
+
 		fPlaylistWindow->Unlock();
 	}
 }
@@ -823,6 +845,7 @@ MainWin::_RefsReceived(BMessage* msg)
 	// the playlist ist replaced by dropped files
 	// or the dropped files are appended to the end
 	// of the existing playlist if <shift> is pressed
+	BAutolock _(fPlaylist);
 	int32 appendIndex = modifiers() & B_SHIFT_KEY ?
 		fPlaylist->CountItems() : -1;
 	msg->AddInt32("append_index", appendIndex);
@@ -1367,15 +1390,19 @@ MainWin::_KeyDown(BMessage *msg)
 		case 0x48:			// numeric keypad left arrow
 			PostMessage(M_SKIP_PREV);
 			return B_OK;
-// TODO: Reenable this and use Undo/Redo stack...
-//		case 0x34:			//delete button
-//		case 0x3e: 			//d for delete
-//		case 0x2b:			//t for Trash
-//			if (modifiers() & B_COMMAND_KEY) {
-//				PostMessage(M_FILE_DELETE);
-//				return B_OK;
-//			}
-//			break;
+
+		case 0x34:			//delete button
+		case 0x3e: 			//d for delete
+		case 0x2b:			//t for Trash
+			if (modifiers() & B_COMMAND_KEY) {
+				BAutolock _(fPlaylist);
+				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
+				removeMessage.AddInt32("playlist index",
+					fPlaylist->CurrentRefIndex());
+				fPlaylistWindow->PostMessage(&removeMessage);
+				return B_OK;
+			}
+			break;
 	}
 
 	return B_ERROR;
@@ -1541,6 +1568,7 @@ MainWin::_UpdateControlsEnabledStatus()
 	if (fHasAudio)
 		enabledButtons |= VOLUME_ENABLED;
 
+	BAutolock _(fPlaylist);
 	bool canSkipPrevious, canSkipNext;
 	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
 	if (canSkipPrevious)

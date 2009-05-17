@@ -55,10 +55,12 @@ Application MediaPlayer :
 
 	# playlist
 	CopyPLItemsCommand.cpp
+	EntryRefPlaylistItem.cpp
 	ImportPLItemsCommand.cpp
 	ListViews.cpp
 	MovePLItemsCommand.cpp
 	Playlist.cpp
+	PlaylistItem.cpp
 	PlaylistListView.cpp
 	PlaylistObserver.cpp
 	PlaylistWindow.cpp

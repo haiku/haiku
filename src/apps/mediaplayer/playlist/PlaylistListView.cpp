@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,10 +56,10 @@ text_offset(const font_height& fh)
 }
 
 
-class PlaylistItem : public SimpleItem {
+class PlaylistListView::Item : public SimpleItem {
  public:
-								PlaylistItem(const entry_ref& ref);
-		virtual					~PlaylistItem();
+								Item(const entry_ref& ref);
+		virtual					~Item();
 
 				void			Draw(BView* owner, BRect frame,
 									const font_height& fh,
@@ -73,20 +73,20 @@ class PlaylistItem : public SimpleItem {
 };
 
 
-PlaylistItem::PlaylistItem(const entry_ref& ref)
+PlaylistListView::Item::Item(const entry_ref& ref)
 	: SimpleItem(ref.name),
 	  fRef(ref)
 {
 }
 
 
-PlaylistItem::~PlaylistItem()
+PlaylistListView::Item::~Item()
 {
 }
 
 
 void
-PlaylistItem::Draw(BView* owner, BRect frame, const font_height& fh,
+PlaylistListView::Item::Draw(BView* owner, BRect frame, const font_height& fh,
 	bool tintedLine, uint32 mode, bool active, uint32 playbackState)
 {
 	rgb_color color = (rgb_color){ 255, 255, 255, 255 };
@@ -323,7 +323,7 @@ PlaylistListView::MouseDown(BPoint where)
 	float textOffset = text_offset(fFontHeight);
 
 	for (int32 i = 0;
-		PlaylistItem* item = dynamic_cast<PlaylistItem*>(ItemAt(i)); i++) {
+		Item* item = dynamic_cast<Item*>(ItemAt(i)); i++) {
 		BRect r = ItemFrame(i);
 		if (r.Contains(where)) {
 			if (clicks == 2) {
@@ -385,15 +385,14 @@ PlaylistListView::CopyItems(const BList& indices, int32 toIndex)
 void
 PlaylistListView::RemoveItemList(const BList& indices)
 {
-	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems()));
+	RemoveItemList(indices, false);
 }
 
 
 void
 PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 {
-	if (PlaylistItem* item = dynamic_cast<PlaylistItem*>(ItemAt(index))) {
+	if (Item* item = dynamic_cast<Item*>(ItemAt(index))) {
 		item->Draw(owner, frame, fFontHeight, index % 2,
 			DISPLAY_NAME, index == fCurrentPlaylistIndex, fPlaybackState);
 	}
@@ -448,8 +447,24 @@ PlaylistListView::RemoveSelectionToTrash()
 {
 	BList indices;
 	GetSelectedItems(indices);
+	RemoveItemList(indices, true);
+}
+
+
+void
+PlaylistListView::RemoveToTrash(int32 index)
+{
+	BList indices;
+	indices.AddItem((void*)index);
+	RemoveItemList(indices, true);
+}
+
+
+void
+PlaylistListView::RemoveItemList(const BList& indices, bool intoTrash)
+{
 	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems(), true));
+		(int32*)indices.Items(), indices.CountItems(), intoTrash));
 }
 
 
@@ -496,7 +511,7 @@ PlaylistListView::_FullSync()
 void
 PlaylistListView::_AddItem(const entry_ref& ref, int32 index)
 {
-	PlaylistItem* item = new (nothrow) PlaylistItem(ref);
+	Item* item = new (nothrow) Item(ref);
 	if (item)
 		AddItem(item, index);
 }

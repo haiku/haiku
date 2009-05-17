@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,11 +14,10 @@ class CommandStack;
 class Controller;
 class ControllerObserver;
 class Playlist;
-class PlaylistItem;
 class PlaylistObserver;
 
 class PlaylistListView : public SimpleListView {
- public:
+public:
 								PlaylistListView(BRect frame,
 									Playlist* playlist,
 									Controller* controller,
@@ -46,8 +45,13 @@ class PlaylistListView : public SimpleListView {
 
 			void				Randomize();
 			void				RemoveSelectionToTrash();
+			void				RemoveToTrash(int32 index);
+			void				RemoveItemList(const BList& indices,
+									bool intoTrash);
 
- private:
+private:
+	class Item;
+
 			void				_FullSync();
 			void				_AddItem(const entry_ref& ref, int32 index);
 			void				_RemoveItem(int32 index);
@@ -67,7 +71,7 @@ class PlaylistListView : public SimpleListView {
 			uint32				fPlaybackState;
 
 			font_height			fFontHeight;
-			PlaylistItem*		fLastClickedItem;
+			Item*				fLastClickedItem;
 };
 
 #endif // PLAYLIST_LIST_VIEW_H

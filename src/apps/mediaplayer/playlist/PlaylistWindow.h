@@ -27,6 +27,10 @@ class RWLocker;
 class BButton;
 class BFilePanel;
 
+enum {
+	M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH	= 'rmtr'
+};
+
 class PlaylistWindow : public BWindow {
 public:
 								PlaylistWindow(BRect frame,

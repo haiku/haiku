@@ -40,11 +40,6 @@ using std::nothrow;
 
 // TODO: using BList for objects is bad, replace it with a template
 
-// TODO: Remove this and use Tracker's Command.h once it is moved into the private headers
-namespace BPrivate {
-	const uint32 kMoveToTrash = 'Ttrs';
-}
-
 Playlist::Listener::Listener() {}
 Playlist::Listener::~Listener() {}
 void Playlist::Listener::RefAdded(const entry_ref& ref, int32 index) {}
