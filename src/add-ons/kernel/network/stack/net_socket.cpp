@@ -70,7 +70,7 @@ int socket_bind(net_socket* socket, const struct sockaddr* address,
 	socklen_t addressLength);
 int socket_setsockopt(net_socket* socket, int level, int option,
 	const void* value, int length);
-
+ssize_t socket_read_avail(net_socket* socket);
 
 static SocketList sSocketList;
 static mutex sSocketLock;
@@ -494,6 +494,23 @@ socket_control(net_socket* socket, int32 op, void* data, size_t length)
 
 			return socket_setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &value,
 				sizeof(int));
+		}
+
+		case FIONREAD:
+		{
+			if (data == NULL)
+				return B_BAD_VALUE;
+
+			ssize_t available = socket_read_avail(socket);
+			if (is_syscall()) {
+				if (!IS_USER_ADDRESS(data)
+					|| user_memcpy(data, &available, sizeof(ssize_t)) != B_OK) {
+					return B_BAD_ADDRESS;
+				}
+			} else
+				*(ssize_t *)data = available;
+
+			return B_OK;
 		}
 
 		case B_SET_BLOCKING_IO:
