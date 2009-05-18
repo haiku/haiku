@@ -1466,6 +1466,8 @@ MainWin::_ToggleFullscreen()
 		Show();
 	}
 
+	fVideoView->SetFullscreen(fIsFullscreen);
+
 	_MarkSettingsItem(M_TOGGLE_FULLSCREEN, fIsFullscreen);
 
 	printf("_ToggleFullscreen leave\n");

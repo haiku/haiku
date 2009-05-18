@@ -1,5 +1,5 @@
 /*
- * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "VideoView.h"
@@ -18,13 +18,19 @@
 #undef private
 #endif
 
+#include <Application.h>
+#include <WindowScreen.h>
+
 #include "Settings.h"
 
 
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
-	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+		| B_PULSE_NEEDED),
 	  fOverlayMode(false),
 	  fIsPlaying(false),
+	  fIsFullscreen(false),
+	  fLastMouseMove(system_time()),
 	  fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -82,6 +88,37 @@ VideoView::MessageReceived(BMessage* message)
 			BView::MessageReceived(message);
 	}
 }
+
+
+void
+VideoView::Pulse()
+{
+	if (!fIsFullscreen || !fIsPlaying)
+		return;
+
+	bigtime_t now = system_time();
+	if (now - fLastMouseMove > 5LL * 1000000) {
+		fLastMouseMove = now;
+		// take care of disabling the screen saver
+		BPoint where;
+		uint32 buttons;
+		GetMouse(&where, &buttons, false);
+		set_mouse_position((int32)where.x, (int32)where.y);
+		// hide the mouse cursor until the user moves it
+		be_app->ObscureCursor();
+	}
+}
+
+
+void
+VideoView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	fLastMouseMove = system_time();
+}
+
+
+// #pragma mark -
 
 
 void
@@ -214,8 +251,14 @@ VideoView::DisableOverlay()
 void
 VideoView::SetPlaying(bool playing)
 {
-	printf("VideoView::SetPlaying(%d)\n", playing);
 	fIsPlaying = playing;
+}
+
+
+void
+VideoView::SetFullscreen(bool fullScreen)
+{
+	fIsFullscreen = fullScreen;
 }
 
 

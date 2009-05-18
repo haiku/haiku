@@ -46,7 +46,7 @@ Application MediaPlayer :
 	AudioResampler.cpp
 	AudioSupplier.cpp
 	AudioVolumeConverter.cpp
-	
+
 	# media_node_framework/video
 	VideoConsumer.cpp
 	VideoProducer.cpp
@@ -104,7 +104,7 @@ Application MediaPlayer :
 	TransportControlGroup.cpp
 	VideoView.cpp
 
-	: be media tracker translation textencoding $(TARGET_LIBSTDC++)
+	: be game media tracker translation textencoding $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 
