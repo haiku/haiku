@@ -365,7 +365,6 @@ BColorControl::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgColorEntered:
 		{
-printf("kMsgColorEntered\n");
 			rgb_color color;
 			color.red = min_c(strtol(fRedText->Text(), NULL, 10), 255);
 			color.green = min_c(strtol(fGreenText->Text(), NULL, 10), 255);
