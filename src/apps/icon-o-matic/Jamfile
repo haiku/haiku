@@ -13,6 +13,7 @@ SubDirC++Flags $(defines) ;
 local iconSourceDirs =
 	icon
 	icon/flat_icon
+	icon/message
 	icon/shape
 	icon/style
 	icon/transformable
@@ -78,6 +79,10 @@ Application Icon-O-Matic :
 	LittleEndianBuffer.cpp
 	PathCommandQueue.cpp
 
+	# icon/message
+	Defines.cpp
+	MessageImporter.cpp
+
 	# icon/shape
 	PathContainer.cpp
 	Shape.cpp
@@ -108,7 +113,6 @@ Application Icon-O-Matic :
 	########  Icon-O-Matic  ########
 
 	# document
-	Defines.cpp
 	Document.cpp
 	IconObject.cpp
 	SetPropertiesCommand.cpp
@@ -228,7 +232,6 @@ Application Icon-O-Matic :
 
 	# import_export/message
 	MessageExporter.cpp
-	MessageImporter.cpp
 
 	# import_export/styled_text
 	StyledTextImporter.cpp
