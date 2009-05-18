@@ -230,42 +230,49 @@ TranslatorSettings::LoadSettings()
 status_t
 TranslatorSettings::LoadSettings(BMessage *pmsg)
 {
-	status_t result = B_OK;
-	
-	if (pmsg) {
-		
-		fLock.Lock();
-		
-		const TranSetting *defs = fDefaults;
-		for (int32 i = 0; i < fDefCount; i++) {
-			bool tempBool;
-			int32 tempInt32;
-			status_t ret;
-			switch (defs[i].dataType) {
-				case TRAN_SETTING_BOOL:
-					ret = pmsg->FindBool(defs[i].name, &tempBool);
-					if (ret < B_OK)
-						tempBool = static_cast<bool>(defs[i].defaultVal);
-					fSettingsMsg.ReplaceBool(defs[i].name, tempBool);
-					break;
-					
-				case TRAN_SETTING_INT32:
-					ret = pmsg->FindInt32(defs[i].name, &tempInt32);
-					if (ret < B_OK)
-						tempInt32 = defs[i].defaultVal;
-					fSettingsMsg.ReplaceInt32(defs[i].name, tempInt32);
-					break;
-					
-				default:
-					// ASSERT here? Erase the bogus setting entry instead?
-					break;
-			}	
-		}		
+	if (pmsg == NULL)
+		return B_BAD_VALUE;
 
-		fLock.Unlock();
+	fLock.Lock();
+	const TranSetting *defaults = fDefaults;
+	for (int32 i = 0; i < fDefCount; i++) {
+		switch (defaults[i].dataType) {
+			case TRAN_SETTING_BOOL:
+			{
+				bool value;
+				if (pmsg->FindBool(defaults[i].name, &value) != B_OK) {
+					if (fSettingsMsg.HasBool(defaults[i].name))
+						break;
+					else
+						value = static_cast<bool>(defaults[i].defaultVal);
+				}
+
+				fSettingsMsg.ReplaceBool(defaults[i].name, value);
+				break;
+			}
+
+			case TRAN_SETTING_INT32:
+			{
+				int32 value;
+				if (pmsg->FindInt32(defaults[i].name, &value) != B_OK) {
+					if (fSettingsMsg.HasInt32(defaults[i].name))
+						break;
+					else
+						value = defaults[i].defaultVal;
+				}
+
+				fSettingsMsg.ReplaceInt32(defaults[i].name, value);
+				break;
+			}
+
+			default:
+				// TODO: ASSERT here? Erase the bogus setting entry instead?
+				break;
+		}
 	}
-	
-	return result;
+
+	fLock.Unlock();
+	return B_OK;
 }
 
 // ---------------------------------------------------------------
