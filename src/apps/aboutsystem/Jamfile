@@ -19,7 +19,7 @@ Application AboutSystem :
 	HyperTextActions.cpp
 	HyperTextView.cpp
 	Utilities.cpp
-	: be translation
+	: $(TARGET_LIBSTDC++) be translation
 	: AboutSystem.rdef
 ;
 

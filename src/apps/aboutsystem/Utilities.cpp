@@ -6,7 +6,7 @@
 #include "Utilities.h"
 
 #include <ctype.h>
-#include <stdarg.h>
+#include <stdlib.h>
 
 #include <Message.h>
 
@@ -41,67 +41,346 @@ trim_string(const char* string, size_t len)
 }
 
 
-// #pragma mark - Licenses
+// #pragma mark - StringVector
 
 
-Licenses::Licenses(const char* license,...)
+StringVector::StringVector()
 	:
-	fLicenses(NULL),
+	fStrings(NULL),
 	fCount(0)
 {
-	if (license == NULL)
+}
+
+
+StringVector::StringVector(const char* string,...)
+	:
+	fStrings(NULL),
+	fCount(0)
+{
+	if (string == NULL)
 		return;
 
 	va_list list;
+	va_start(list, string);
+	SetTo(string, list);
+	va_end(list);
+}
 
-	// count licenses
-	va_start(list, license);
+
+StringVector::StringVector(const BMessage& strings, const char* fieldName)
+	:
+	fStrings(NULL),
+	fCount(0)
+{
+	SetTo(strings, fieldName);
+}
+
+
+StringVector::StringVector(const StringVector& other)
+	:
+	fStrings(NULL),
+	fCount(0)
+{
+	if (other.fCount == 0)
+		return;
+
+	fStrings = new BString[other.fCount];
+	fCount = other.fCount;
+
+	for (int32 i = 0; i < fCount; i++)
+		fStrings[i] = other.fStrings[i];
+}
+
+
+StringVector::~StringVector()
+{
+	Unset();
+}
+
+
+void
+StringVector::SetTo(const char* string,...)
+{
+	va_list list;
+	va_start(list, string);
+	SetTo(string, list);
+	va_end(list);
+}
+
+
+void
+StringVector::SetTo(const char* string, va_list _list)
+{
+	// free old strings
+	Unset();
+
+	if (string == NULL)
+		return;
+
+	// count strings
+	va_list list;
+	va_copy(list, _list);
 	fCount = 1;
 	while (va_arg(list, const char*) != NULL)
 		fCount++;
 	va_end(list);
 
 	// create array and copy them
-	fLicenses = new BString[fCount];
-	fLicenses[0] = license;
+	fStrings = new BString[fCount];
+	fStrings[0] = string;
 
-	va_start(list, license);
+	va_copy(list, _list);
 	for (int32 i = 1; i < fCount; i++)
-		fLicenses[i] = va_arg(list, const char*);
+		fStrings[i] = va_arg(list, const char*);
 	va_end(list);
+
 }
 
 
-Licenses::Licenses(const BMessage& licenses)
-	:
-	fLicenses(NULL),
-	fCount(0)
+void
+StringVector::SetTo(const BMessage& strings, const char* fieldName,
+	const char* prefix)
 {
+	Unset();
+
 	type_code type;
 	int32 count;
-	if (licenses.GetInfo("License", &type, &count) != B_OK
+	if (strings.GetInfo(fieldName, &type, &count) != B_OK
 		|| type != B_STRING_TYPE) {
 		return;
 	}
 
-	fLicenses = new BString[count];
+	fStrings = new BString[count];
 
 	for (int32 i = 0; i < count; i++) {
-		if (licenses.FindString("License", i, &fLicenses[i]) != B_OK)
+		if (strings.FindString(fieldName, i, &fStrings[i]) != B_OK)
 			return;
+
+		if (prefix != NULL)
+			fStrings[i].Prepend(prefix);
+
 		fCount++;
 	}
 }
 
 
-Licenses::~Licenses()
+void
+StringVector::Unset()
 {
-	delete[] fLicenses;
+	delete[] fStrings;
+	fStrings = NULL;
+	fCount = 0;
 }
 
 
 const char*
-Licenses::LicenseAt(int32 index) const
+StringVector::StringAt(int32 index) const
 {
-	return (index >= 0 && index < fCount ? fLicenses[index].String() : NULL);
+	return (index >= 0 && index < fCount ? fStrings[index].String() : NULL);
+}
+
+
+// #pragma mark - PackageCredit
+
+
+PackageCredit::PackageCredit(const char* packageName)
+	:
+	fPackageName(packageName)
+{
+}
+
+
+PackageCredit::PackageCredit(const BMessage& packageDescription)
+{
+	const char* package;
+	const char* copyright;
+	const char* url;
+
+	// package and copyright are mandatory
+	if (packageDescription.FindString("Package", &package) != B_OK
+		|| packageDescription.FindString("Copyright", &copyright) != B_OK) {
+		return;
+	}
+
+	// URL is optional
+	if (packageDescription.FindString("URL", &url) != B_OK)
+		url = NULL;
+
+	fPackageName = package;
+	fCopyrights.SetTo(packageDescription, "Copyright", COPYRIGHT_STRING);
+	fLicenses.SetTo(packageDescription, "License");
+	fURL = url;
+}
+
+
+PackageCredit::PackageCredit(const PackageCredit& other)
+	:
+	fPackageName(other.fPackageName),
+	fCopyrights(other.fCopyrights),
+	fLicenses(other.fLicenses),
+	fURL(other.fURL)
+{
+}
+
+
+PackageCredit::~PackageCredit()
+{
+}
+
+
+bool
+PackageCredit::IsValid() const
+{
+	// should have at least a package name and a copyright
+	return fPackageName.Length() > 0 && !fCopyrights.IsEmpty();
+}
+
+
+bool
+PackageCredit::IsBetterThan(const PackageCredit& other) const
+{
+	// We prefer credits with licenses.
+	if (CountLicenses() > 0 && other.CountLicenses() == 0)
+		return true;
+
+	// Scan the copyrights for year numbers and let the greater one win.
+	return _MaxCopyrightYear() > other._MaxCopyrightYear();
+}
+
+
+PackageCredit&
+PackageCredit::SetCopyrights(const char* copyright,...)
+{
+	va_list list;
+	va_start(list, copyright);
+	fCopyrights.SetTo(copyright, list);
+	va_end(list);
+
+	return *this;
+}
+
+
+PackageCredit&
+PackageCredit::SetCopyright(const char* copyright)
+{
+	return SetCopyrights(copyright, NULL);
+}
+
+
+PackageCredit&
+PackageCredit::SetLicenses(const char* license,...)
+{
+	va_list list;
+	va_start(list, license);
+	fLicenses.SetTo(license, list);
+	va_end(list);
+
+	return *this;
+}
+
+
+PackageCredit&
+PackageCredit::SetLicense(const char* license)
+{
+	return SetLicenses(license, NULL);
+}
+
+
+PackageCredit&
+PackageCredit::SetURL(const char* url)
+{
+	fURL = url;
+
+	return *this;
+}
+
+
+const char*
+PackageCredit::PackageName() const
+{
+	return fPackageName.String();
+}
+
+
+const StringVector&
+PackageCredit::Copyrights() const
+{
+	return fCopyrights;
+}
+
+
+int32
+PackageCredit::CountCopyrights() const
+{
+	return fCopyrights.CountStrings();
+}
+
+
+const char*
+PackageCredit::CopyrightAt(int32 index) const
+{
+	return fCopyrights.StringAt(index);
+}
+
+
+const StringVector&
+PackageCredit::Licenses() const
+{
+	return fLicenses;
+}
+
+
+int32
+PackageCredit::CountLicenses() const
+{
+	return fLicenses.CountStrings();
+}
+
+
+const char*
+PackageCredit::LicenseAt(int32 index) const
+{
+	return fLicenses.StringAt(index);
+}
+
+
+const char*
+PackageCredit::URL() const
+{
+	return fURL.Length() > 0 ? fURL.String() : NULL;
+}
+
+
+int
+PackageCredit::_MaxCopyrightYear() const
+{
+	int maxYear = 0;
+
+	for (int32 i = 0; const char* string = CopyrightAt(i); i++) {
+		// iterate through the numbers
+		int32 start = 0;
+		while (true) {
+			// find the next number start
+			while (string[start] != '\0' && !isdigit(string[start]))
+				start++;
+
+			if (string[start] == '\0')
+				break;
+
+			// find the end
+			int32 end = start + 1;
+			while (string[end] != '\0' && isdigit(string[end]))
+				end++;
+
+			if (end - start == 4) {
+				int year = atoi(string + start);
+				if (year > 1900 && year < 2200 && year > maxYear)
+					maxYear = year;
+			}
+
+			start = end;
+		}
+	}
+
+	return maxYear;
 }

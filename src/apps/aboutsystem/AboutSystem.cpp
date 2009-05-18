@@ -13,6 +13,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <map>
+#include <string>
+
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -24,7 +27,6 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Path.h>
-#include <Query.h>
 #include <Resources.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -51,7 +53,6 @@
 #endif
 
 #define SCROLL_CREDITS_VIEW 'mviv'
-#define READ_APP_QUERY_ENT 'raqe'
 
 
 static const char *UptimeToString(char string[], size_t size);
@@ -78,7 +79,7 @@ class AboutWindow : public BWindow {
 };
 
 class AboutView : public BView {
-	public:
+public:
 								AboutView(const BRect& frame);
 								~AboutView();
 
@@ -91,18 +92,23 @@ class AboutView : public BView {
 		virtual void			MouseDown(BPoint point);
 
 				void			AddCopyrightEntry(const char* name,
-									const char* text, const Licenses& licenses,
+									const char* text,
+									const StringVector& licenses,
 									const char* url);
 				void			AddCopyrightEntry(const char* name,
 									const char* text, const char* url = NULL);
-				void			AddCopyrightEntry(
-									const BMessage& packageDescription);
 				void			PickRandomHaiku();
 
-	private:
+
+private:
+				typedef std::map<std::string, PackageCredit*> PackageCreditMap;
+
+private:
 				status_t		_GetLicensePath(const char* license,
 									BPath& path);
 				void			_AddCopyrightsFromAttribute();
+				void			_AddPackageCredit(const PackageCredit& package);
+				void			_AddPackageCreditEntries();
 
 				BStringView*	fMemView;
 				BTextView*		fUptimeView;
@@ -115,7 +121,7 @@ class AboutView : public BView {
 
 				bigtime_t		fLastActionTime;
 				BMessageRunner*	fScrollRunner;
-				BQuery			fAppsQuery;
+				PackageCreditMap fPackageCredits;
 };
 
 
@@ -139,11 +145,6 @@ AboutWindow::AboutWindow()
 {
 	AboutView *view = new AboutView(Bounds());
 	AddChild(view);
-
-	// start reading from the app query
-	BMessage msg(READ_APP_QUERY_ENT);
-	BMessenger msgr(view);
-	msgr.SendMessage(&msg);
 
 	MoveTo((BScreen().Frame().Width() - Bounds().Width()) / 2,
 		(BScreen().Frame().Height() - Bounds().Height()) / 2 );
@@ -381,7 +382,7 @@ AboutView::AboutView(const BRect &rect)
 	if (year < 2008)
 		year = 2008;
 	snprintf(string, sizeof(string),
-		"Copyright " B_UTF8_COPYRIGHT " 2001-%ld The Haiku project. ", year);
+		COPYRIGHT_STRING "2001-%ld The Haiku project. ", year);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
@@ -391,7 +392,6 @@ AboutView::AboutView(const BRect &rect)
 		"Haiku, Inc. or of the respective authors where expressly noted "
 		"in the source."
 		"\n\n");
-
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
 	fCreditsView->InsertHyperText("http://www.haiku-os.org",
@@ -585,7 +585,6 @@ AboutView::AboutView(const BRect &rect)
 		"distributed under the LGPL license. You can find the copyrights "
 		"to third party code below.\n\n");
 
-
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
 		"Contains software from the GNU Project, "
@@ -595,8 +594,8 @@ AboutView::AboutView(const BRect &rect)
 		"sharutils, gawk, bison, m4, make, "
 		"gdb, wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
-		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.",
-		Licenses("GNU LGPL v2.1", "GNU GPL v2", "GNU GPL v3", NULL),
+		COPYRIGHT_STRING "The Free Software Foundation.",
+		StringVector("GNU LGPL v2.1", "GNU GPL v2", "GNU GPL v3", NULL),
 		"http://www.gnu.org");
 
 	// FreeBSD copyrights
@@ -605,242 +604,260 @@ AboutView::AboutView(const BRect &rect)
 		"released under the BSD licence:\n"
 		"cal, ftpd, ping, telnet, "
 		"telnetd, traceroute\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 The FreeBSD Project.  "
+		COPYRIGHT_STRING "1994-2008 The FreeBSD Project.  "
 		"All rights reserved.",
 		"http://www.freebsd.org");
+			// TODO: License!
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
 		"Contains software developed by the NetBSD, "
 		"Foundation, Inc. and its contributors:\n"
 		"ftp, tput\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 The NetBSD Foundation, Inc.  "
+		COPYRIGHT_STRING "1996-2008 The NetBSD Foundation, Inc.  "
 		"All rights reserved.",
 		"http://www.netbsd.org");
+			// TODO: License!
 
 	// FFMpeg copyrights
-	AddCopyrightEntry("FFMpeg libavcodec",
-		"Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.",
-		"http://www.ffmpeg.org");
+	_AddPackageCredit(PackageCredit("FFMpeg libavcodec")
+		.SetCopyright(COPYRIGHT_STRING "2000-2007 Fabrice Bellard, et al.")
+		.SetURL("http://www.ffmpeg.org"));
+			// TODO: License!
 
 	// AGG copyrights
-	AddCopyrightEntry("AntiGrain Geometry",
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).",
-		"http://www.antigrain.com");
+	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
+		.SetCopyright(COPYRIGHT_STRING "2002-2006 Maxim Shemanarev (McSeem).")
+		.SetURL("http://www.antigrain.com"));
+			// TODO: License!
 
 	// PDFLib copyrights
-	AddCopyrightEntry("PDFLib",
-		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
-		"All rights reserved.\n"
-		"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.",
-		"http://www.pdflib.com");
+	_AddPackageCredit(PackageCredit("PDFLib")
+		.SetCopyright(COPYRIGHT_STRING "1997-2006 PDFlib GmbH and Thomas Merz. "
+			"All rights reserved.\n"
+			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.")
+		.SetURL("http://www.pdflib.com"));
+			// TODO: License!
 
 	// FreeType copyrights
-	AddCopyrightEntry("FreeType2",
-		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 "
-		"The FreeType Project.  All rights reserved.",
-		"http://www.freetype.org");
+	_AddPackageCredit(PackageCredit("FreeType2")
+		.SetCopyright("Portions of this software are copyright "
+			B_UTF8_COPYRIGHT " 1996-2006 "
+			"The FreeType Project.  All rights reserved.")
+		.SetURL("http://www.freetype.org"));
+			// TODO: License!
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
-	AddCopyrightEntry("Mesa",
-		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
-		"Mesa3D project.  All rights reserved.",
-		"http://www.mesa3d.org");
+	_AddPackageCredit(PackageCredit("Mesa")
+		.SetCopyright(COPYRIGHT_STRING "1999-2006 Brian Paul. "
+			"Mesa3D project.  All rights reserved.")
+		.SetURL("http://www.mesa3d.org"));
+			// TODO: License!
 
 	// SGI's GLU implementation copyrights
-	AddCopyrightEntry("GLU",
-		"Copyright " B_UTF8_COPYRIGHT " 1991-2000 Silicon Graphics, Inc. "
-		"SGI's Software FreeB license.  All rights reserved.");
+	_AddPackageCredit(PackageCredit("GLU")
+		.SetCopyright(COPYRIGHT_STRING
+			"1991-2000 Silicon Graphics, Inc. "
+			"SGI's Software FreeB license.  All rights reserved."));
+			// TODO: License!
 
 	// GLUT implementation copyrights
-	AddCopyrightEntry("GLUT",
-		"Copyright " B_UTF8_COPYRIGHT " 1994-1997 Mark Kilgard. "
-		"All rights reserved.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1997 Be Inc.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby.");
+	_AddPackageCredit(PackageCredit("GLUT")
+		.SetCopyrights(COPYRIGHT_STRING "1994-1997 Mark Kilgard. "
+				"All rights reserved.",
+			COPYRIGHT_STRING "1997 Be Inc.",
+			COPYRIGHT_STRING "1999 Jake Hamby.",
+			NULL));
+			// TODO: License!
 
 	// OpenGroup & DEC (BRegion backend) copyright
-	AddCopyrightEntry("BRegion backend (XFree86)",
-		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988, 1998  The Open Group.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment "
-		"Corporation, Maynard, Massachusetts.\n"
-		"All rights reserved.");
+	_AddPackageCredit(PackageCredit("BRegion backend (XFree86)")
+		.SetCopyrights(COPYRIGHT_STRING "1987, 1988, 1998 The Open Group.",
+			COPYRIGHT_STRING "1987, 1988 Digital Equipment "
+				"Corporation, Maynard, Massachusetts.\n"
+				"All rights reserved.",
+			NULL));
+			// TODO: License!
 
 	// Konatu font
-	AddCopyrightEntry("Konatu font",
-		"Copyright " B_UTF8_COPYRIGHT " 2002- MASUDA mitiya.\n"
-		"MIT license. All rights reserved.");
+	_AddPackageCredit(PackageCredit("Konatu font")
+		.SetCopyright(COPYRIGHT_STRING "2002- MASUDA mitiya.\n"
+			"MIT license. All rights reserved."));
+			// TODO: License!
 
 	// expat copyrights
-	AddCopyrightEntry("expat",
-		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source "
-		"Software Center Ltd and Clark Cooper.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.");
+	_AddPackageCredit(PackageCredit("expat")
+		.SetCopyrights(COPYRIGHT_STRING
+				"1998, 1999, 2000 Thai Open Source "
+				"Software Center Ltd and Clark Cooper.",
+			COPYRIGHT_STRING "2001, 2002, 2003 Expat maintainers.",
+			NULL));
+			// TODO: License!
 
 	// zlib copyrights
-	AddCopyrightEntry("zlib",
-		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark "
-		"Adler.");
+	_AddPackageCredit(PackageCredit("zlib")
+		.SetCopyright(COPYRIGHT_STRING
+			"1995-2004 Jean-loup Gailly and Mark Adler."));
+			// TODO: License!
 
 	// zip copyrights
-	AddCopyrightEntry("Info-ZIP",
-		"Copyright " B_UTF8_COPYRIGHT " 1990-2002 Info-ZIP. All rights reserved.");
+	_AddPackageCredit(PackageCredit("Info-ZIP")
+		.SetCopyright(COPYRIGHT_STRING
+			"1990-2002 Info-ZIP. All rights reserved."));
+			// TODO: License!
 
 	// bzip2 copyrights
-	AddCopyrightEntry("bzip2",
-		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights "
-		"reserved.");
+	_AddPackageCredit(PackageCredit("bzip2")
+		.SetCopyright(COPYRIGHT_STRING
+			"1996-2005 Julian R Seward. All rights reserved."));
+			// TODO: License!
 
 	// VIM copyrights
-	AddCopyrightEntry("Vi IMproved",
-		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
+	_AddPackageCredit(PackageCredit("Vi IMproved")
+		.SetCopyright(COPYRIGHT_STRING "Bram Moolenaar et al."));
+			// TODO: License!
 
 	// lp_solve copyrights
-	AddCopyrightEntry("lp_solve",
-		"Copyright " B_UTF8_COPYRIGHT
-			" Michel Berkelaar, Kjell Eikland, Peter Notebaert",
-		"http://lpsolve.sourceforge.net/");
-			// license: LGPL
+	_AddPackageCredit(PackageCredit("lp_solve")
+		.SetCopyright(COPYRIGHT_STRING
+			"Michel Berkelaar, Kjell Eikland, Peter Notebaert")
+		.SetLicense("GNU LGPL v2.1")
+		.SetURL("http://lpsolve.sourceforge.net/"));
 
 	// OpenEXR copyrights
-	AddCopyrightEntry("OpenEXR",
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2005 Industrial Light & Magic, "
-		"a division of Lucas Digital Ltd. LLC.");
+	_AddPackageCredit(PackageCredit("OpenEXR")
+		.SetCopyright(COPYRIGHT_STRING "2002-2005 Industrial Light & Magic, "
+			"a division of Lucas Digital Ltd. LLC."));
+			// TODO: License!
 
 	// Bullet copyrights
-	AddCopyrightEntry("Bullet",
-		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans",
-		"http://www.bulletphysics.com");
+	_AddPackageCredit(PackageCredit("Bullet")
+		.SetCopyright(COPYRIGHT_STRING "2003-2008 Erwin Coumans")
+		.SetURL("http://www.bulletphysics.com"));
+			// TODO: License!
 
 	// atftp copyrights
-	AddCopyrightEntry("atftp",
-		"Copyright " B_UTF8_COPYRIGHT " 2000 Jean-Pierre Lefebvre and Remi "
-		"Lefebvre");
+	_AddPackageCredit(PackageCredit("atftp")
+		.SetCopyright(COPYRIGHT_STRING
+			"2000 Jean-Pierre Lefebvre and Remi Lefebvre"));
+			// TODO: License!
 
 	// Netcat copyrights
-	AddCopyrightEntry("Netcat",
-		"Copyright " B_UTF8_COPYRIGHT " 1996 Hobbit");
+	_AddPackageCredit(PackageCredit("Netcat")
+		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit"));
+			// TODO: License!
 
 	// acpica copyrights
-	AddCopyrightEntry("acpica",
-		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Intel Corp.");
+	_AddPackageCredit(PackageCredit("acpica")
+		.SetCopyright(COPYRIGHT_STRING "1999-2006 Intel Corp."));
+			// TODO: License!
 
 	// unrar copyrights
-	AddCopyrightEntry("unrar",
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2008 Alexander L. Roshal. "
-		"All rights reserved.",
-		"http://www.rarlab.com");
-
-// p7zip copyrights
-//	AddCopyrightEntry("p7zip",
-//		"Copyright " B_UTF8_COPYRIGHT " 2008 Igor Pavlov. "
-//		"All rights reserved.");
+	_AddPackageCredit(PackageCredit("unrar")
+		.SetCopyright(COPYRIGHT_STRING "2002-2008 Alexander L. Roshal. "
+			"All rights reserved.")
+		.SetURL("http://www.rarlab.com"));
+			// TODO: License!
 
 	// libpng copyrights
-	AddCopyrightEntry("libpng",
-		"Copyright " B_UTF8_COPYRIGHT " 2004, 2006-2008 Glenn "
-		"Randers-Pehrson.");
+	_AddPackageCredit(PackageCredit("libpng")
+		.SetCopyright(COPYRIGHT_STRING "2004, 2006-2008 Glenn "
+			"Randers-Pehrson."));
+			// TODO: License!
 
 	// libprint copyrights
-	AddCopyrightEntry("libprint",
-		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Y.Takagi. All rights "
-		"reserved.");
+	_AddPackageCredit(PackageCredit("libprint")
+		.SetCopyright(COPYRIGHT_STRING
+			"1999-2000 Y.Takagi. All rights reserved."));
+			// TODO: License!
 
 	// cortex copyrights
-	AddCopyrightEntry("Cortex",
-		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Eric Moon.");
+	_AddPackageCredit(PackageCredit("Cortex")
+		.SetCopyright(COPYRIGHT_STRING "1999-2000 Eric Moon."));
+			// TODO: License!
 
 	// FluidSynth copyrights
-	AddCopyrightEntry("FluidSynth",
-		"Copyright " B_UTF8_COPYRIGHT " 2003 Peter Hanappe and others.");
+	_AddPackageCredit(PackageCredit("FluidSynth")
+		.SetCopyright(COPYRIGHT_STRING "2003 Peter Hanappe and others."));
+			// TODO: License!
 
 	// CannaIM copyrights
-	AddCopyrightEntry("CannaIM",
-		"Copyright " B_UTF8_COPYRIGHT " 1999 Masao Kawamura.");
+	_AddPackageCredit(PackageCredit("CannaIM")
+		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura."));
+			// TODO: License!
 
 	// libxml2, libxslt, libexslt copyrights
-	AddCopyrightEntry("libxml2, libxslt",
-		"Copyright " B_UTF8_COPYRIGHT " 1998-2003 Daniel Veillard. "
-		"All rights reserved.");
+	_AddPackageCredit(PackageCredit("libxml2, libxslt")
+		.SetCopyright(COPYRIGHT_STRING
+			"1998-2003 Daniel Veillard. All rights reserved."));
+			// TODO: License!
 
-	AddCopyrightEntry("libexslt",
-		"Copyright " B_UTF8_COPYRIGHT " 2001-2002 Thomas Broyer, Charlie "
-		"Bozeman and Daniel Veillard.  All rights reserved.");
+	_AddPackageCredit(PackageCredit("libexslt")
+		.SetCopyright(COPYRIGHT_STRING
+			"2001-2002 Thomas Broyer, Charlie "
+			"Bozeman and Daniel Veillard.  All rights reserved."));
+			// TODO: License!
 
 	// Xiph.org Foundation copyrights
-	AddCopyrightEntry("Xiph.org Foundation",
-		"libvorbis, libogg, libtheora, libspeex"
-		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 Xiph.Org. "
-		"All rights reserved.",
-		"http://www.xiph.org");
+	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
+		.SetCopyrights("libvorbis, libogg, libtheora, libspeex",
+			COPYRIGHT_STRING "1994-2008 Xiph.Org. "
+				"All rights reserved.",
+			NULL)
+		.SetURL("http://www.xiph.org"));
+			// TODO: License!
 
 	// The Tcpdump Group
-	AddCopyrightEntry("The Tcpdump Group",
-		"tcpdump, libpcap",
-		"http://www.tcpdump.org");
+	_AddPackageCredit(PackageCredit("The Tcpdump Group")
+		.SetCopyright("tcpdump, libpcap")
+		.SetURL("http://www.tcpdump.org"));
+			// TODO: License!
 
 	// Matroska
-	AddCopyrightEntry("libmatroska",
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2003 Steve Lhomme. "
-		"All rights reserved.",
-		"http://www.matroska.org");
+	_AddPackageCredit(PackageCredit("libmatroska")
+		.SetCopyright(COPYRIGHT_STRING "2002-2003 Steve Lhomme. "
+			"All rights reserved.")
+		.SetURL("http://www.matroska.org"));
+			// TODO: License!
 
 	// BColorQuantizer (originally CQuantizer code)
-	AddCopyrightEntry("CQuantizer",
-		"Copyright " B_UTF8_COPYRIGHT " 1996-1997 Jeff Prosise. "
-		"All rights reserved.");
+	_AddPackageCredit(PackageCredit("CQuantizer")
+		.SetCopyright(COPYRIGHT_STRING "1996-1997 Jeff Prosise. "
+			"All rights reserved."));
+			// TODO: License!
 
 	// MAPM (Mike's Arbitrary Precision Math Library) used by DeskCalc
-	AddCopyrightEntry("MAPM",
-		"Copyright " B_UTF8_COPYRIGHT "1999-2007 Michael C. Ring. "
-		"All rights reserved.",
-		"http://tc.umn.edu/~ringx004");
+	_AddPackageCredit(PackageCredit("MAPM")
+		.SetCopyright(COPYRIGHT_STRING
+			"1999-2007 Michael C. Ring. All rights reserved.")
+		.SetURL("http://tc.umn.edu/~ringx004"));
+			// TODO: License!
 
 	// MkDepend 1.7 copyright (Makefile dependency generator)
-	AddCopyrightEntry("MkDepend",
-		"Copyright " B_UTF8_COPYRIGHT "1995-2001 Lars Düning. "
-		"All rights reserved.");
-
-// OpenSound
-//	AddCopyrightEntry("OpenSound",
-//		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 4Front Technologies ",
-//		"http://www.opensound.com");
-// BSD license
+	_AddPackageCredit(PackageCredit("MkDepend")
+		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
+			"All rights reserved."));
+			// TODO: License!
 
 	// libhttpd copyright (used as Poorman backend)
-	AddCopyrightEntry("libhttpd",
-		"Copyright " B_UTF8_COPYRIGHT "1995,1998,1999,2000,2001 by "
-		"Jef Poskanzer. All rights reserved.",
-		Licenses("LibHTTPd", NULL),
-		"http://www.acme.com/software/thttpd/");
+	_AddPackageCredit(PackageCredit("libhttpd")
+		.SetCopyright(COPYRIGHT_STRING
+			"1995,1998,1999,2000,2001 by "
+			"Jef Poskanzer. All rights reserved.")
+		.SetLicense("LibHTTPd")
+		.SetURL("http://www.acme.com/software/thttpd/"));
 
 #ifdef __INTEL__
 	// Udis86 copyrights
-	AddCopyrightEntry("Udis86",
-		"Copyright " B_UTF8_COPYRIGHT " 2002, 2003, 2004 Vivek Mohan. "
-		"All rights reserved.",
-		"http://udis86.sourceforge.net");
+	_AddPackageCredit(PackageCredit("Udis86")
+		.SetCopyright(COPYRIGHT_STRING "2002, 2003, 2004 Vivek Mohan. "
+			"All rights reserved.")
+		.SetURL("http://udis86.sourceforge.net"));
+			// TODO: License!
 #endif
 
 	_AddCopyrightsFromAttribute();
-
-	// Build a list of installed applications and show their
-	// long version info. Well-behaved apps usually give
-	// copyright info there.
-
-	font.SetSize(be_bold_font->Size() + 4);
-	font.SetFace(B_BOLD_FACE);
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nInstalled applications\n\n");
-
-	BVolume bootVolume;
-	BVolumeRoster().GetBootVolume(&bootVolume);
-	fAppsQuery.SetVolume(&bootVolume);
-	if (fAppsQuery.SetPredicate(
-			"((BEOS:APP_SIG==\"**\")&&(name!=\"*.so\")&&(name!=\"*.rsrc\")&&"
-			"(BEOS:TYPE==\"application/x-vnd.Be-elfexecutable\"))") >= B_OK) {
-		fAppsQuery.Fetch();
-	}
+	_AddPackageCreditEntries();
 }
 
 
@@ -927,61 +944,6 @@ AboutView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case READ_APP_QUERY_ENT:
-		{
-			BEntry ent;
-			if (fAppsQuery.GetNextEntry(&ent) < B_OK) {
-				fAppsQuery.Clear();
-				fCreditsView->MakeSelectable(true);
-				break;
-			}
-			BFile file;
-			BPath path;
-			if (ent.Exists() &&
-				ent.GetPath(&path) >= B_OK &&
-				file.SetTo(&ent, B_READ_ONLY) >= B_OK) {
-				/* filter only apps */
-				if (strncmp(path.Path(), "/boot/apps", 10) == 0) {
-					BAppFileInfo appFileInfo(&file);
-					uint32 flags;
-					version_info version;
-					if (appFileInfo.InitCheck() >= B_OK &&
-						appFileInfo.GetAppFlags(&flags) >= B_OK &&
-						appFileInfo.GetVersionInfo(&version,
-							B_APP_VERSION_KIND) >= B_OK) {
-						//printf("AppFileInfo for %s :\n", path.Path());
-						//printf("flags: %08x\n", flags);
-						BString name;
-						BString info;
-						name << path.Leaf();
-						if (strlen(version.short_info) &&
-							strcmp(version.short_info, path.Leaf()))
-							name << " (" << version.short_info << ")";
-						/*
-						info << "\tVersion: ";
-						info << version.major << ".";
-						info << version.middle << ".";
-						info << version.minor;
-						char varieties[] = "dabgmf";
-						if (version.variety > B_FINAL_VERSION)
-							info << "?";
-						else
-							info << varieties[version.variety];
-						info << version.internal;
-						info << "\n";
-						*/
-						info << version.long_info;
-						AddCopyrightEntry(name.String(), info.String());
-
-					}
-				}
-			}
-			// note for self: read next entry :)
-			BMessage m(READ_APP_QUERY_ENT);
-			BMessenger(this).SendMessage(&m);
-			break;
-		}
-
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -993,13 +955,13 @@ void
 AboutView::AddCopyrightEntry(const char *name, const char *text,
 	const char *url)
 {
-	AddCopyrightEntry(name, text, NULL, url);
+	AddCopyrightEntry(name, text, StringVector(), url);
 }
 
 
 void
 AboutView::AddCopyrightEntry(const char *name, const char *text,
-	const Licenses& licenses, const char *url)
+	const StringVector& licenses, const char *url)
 {
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
@@ -1012,14 +974,14 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 	fCreditsView->Insert(text);
 	fCreditsView->Insert("\n");
 
-	if (licenses.CountLicenses() > 0) {
-		if (licenses.CountLicenses() > 1)
+	if (licenses.CountStrings() > 0) {
+		if (licenses.CountStrings() > 1)
 			fCreditsView->Insert("Licenses: ");
 		else
 			fCreditsView->Insert("License: ");
 
-		for (int32 i = 0; i < licenses.CountLicenses(); i++) {
-			const char* license = licenses.LicenseAt(i);
+		for (int32 i = 0; i < licenses.CountStrings(); i++) {
+			const char* license = licenses.StringAt(i);
 
 			if (i > 0)
 				fCreditsView->Insert(", ");
@@ -1041,30 +1003,6 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 		fCreditsView->Insert("\n");
 	}
 	fCreditsView->Insert("\n");
-}
-
-
-void
-AboutView::AddCopyrightEntry(const BMessage& packageDescription)
-{
-	const char* package;
-	const char* copyright;
-	const char* url;
-
-	// package and copyright are mandatory
-	if (packageDescription.FindString("Package", &package) != B_OK
-		|| packageDescription.FindString("Copyright", &copyright) != B_OK) {
-		return;
-	}
-
-	// URL is optional
-	if (packageDescription.FindString("URL", &url) != B_OK)
-		url = NULL;
-
-	BString copyrightLine("Copyright " B_UTF8_COPYRIGHT " ");
-	copyrightLine += copyright;
-
-	AddCopyrightEntry(package, copyrightLine.String(), packageDescription, url);
 }
 
 
@@ -1220,14 +1158,54 @@ AboutView::_AddCopyrightsFromAttribute()
 
 		if (fieldName == "Package") {
 			// flush the current package
-			AddCopyrightEntry(package);
+			_AddPackageCredit(PackageCredit(package));
 			package.MakeEmpty();
 		}
 	}
 
 	// flush current package
-	AddCopyrightEntry(package);
+	_AddPackageCredit(PackageCredit(package));
 #endif
+}
+
+
+void
+AboutView::_AddPackageCreditEntries()
+{
+	for (PackageCreditMap::iterator it = fPackageCredits.begin();
+		it != fPackageCredits.end(); ++it) {
+		PackageCredit* package = it->second;
+
+		BString text(package->CopyrightAt(0));
+		int32 count = package->CountCopyrights();
+		for (int32 i = 1; i < count; i++)
+			text << "\n" << package->CopyrightAt(i);
+
+		AddCopyrightEntry(package->PackageName(), text.String(),
+			package->Licenses(), package->URL());
+	}
+}
+
+
+void
+AboutView::_AddPackageCredit(const PackageCredit& package)
+{
+	if (!package.IsValid())
+		return;
+
+	PackageCreditMap::iterator it = fPackageCredits.find(package.PackageName());
+	if (it != fPackageCredits.end()) {
+		// If the new package credit isn't "better" than the old one, ignore it.
+		PackageCredit* oldPackage = it->second;
+		if (!package.IsBetterThan(*oldPackage))
+			return;
+
+		// replace the old credit
+		fPackageCredits.erase(it);
+		delete oldPackage;
+	}
+
+	fPackageCredits[package.PackageName()] = new PackageCredit(package);
 }
 
 
