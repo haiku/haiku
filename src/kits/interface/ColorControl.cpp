@@ -246,7 +246,6 @@ BColorControl::SetValue(int32 value)
 	c2.green = (value & 0x00FF0000) >> 16;
 	c2.blue = (value & 0x0000FF00) >> 8;
 	c2.alpha = 255;
-	char string[4];
 
 	if (fPaletteMode) {
 		//workaround when two indexes have the same color
@@ -264,7 +263,7 @@ BColorControl::SetValue(int32 value)
 		
 		fPreviousSelectedPaletteColorIndex = fSelectedPaletteColorIndex;	
 	} else {	
-		float invalidateRadius = kSelectorSize/2 + kSelectorPenSize;
+		float invalidateRadius = kSelectorSize / 2 + kSelectorPenSize;
 		BPoint p;
 		
 		if (c1.red != c2.red) {
@@ -295,26 +294,23 @@ BColorControl::SetValue(int32 value)
 				 p.x + invalidateRadius, p.y + invalidateRadius));
 		}
 	}
-	
+
+	// Set the value here, since BTextControl will trigger
+	// Window()->UpdateIfNeeded() which will cause us to draw the indicators
+	// at the old offset.
+	if (Value() != value)
+		BControl::SetValueNoUpdate(value);
+
 	// the textcontrols have to be updated even when the color
 	// hasn't changed since the value is clamped upstream
 	// and the textcontrols would still show the unclamped value
+	char string[4];
 	sprintf(string, "%d", c2.red);
 	fRedText->SetText(string);
 	sprintf(string, "%d", c2.green);
 	fGreenText->SetText(string);
 	sprintf(string, "%d", c2.blue);
 	fBlueText->SetText(string);
-
-	if (Value() == value)
-		return;
-
-	BControl::SetValueNoUpdate(value);
-
-	if (LockLooper()) {
-		Window()->UpdateIfNeeded();
-		UnlockLooper();
-	}
 }
 
 
@@ -369,6 +365,7 @@ BColorControl::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgColorEntered:
 		{
+printf("kMsgColorEntered\n");
 			rgb_color color;
 			color.red = min_c(strtol(fRedText->Text(), NULL, 10), 255);
 			color.green = min_c(strtol(fGreenText->Text(), NULL, 10), 255);
@@ -388,29 +385,17 @@ BColorControl::MessageReceived(BMessage *message)
 void
 BColorControl::Draw(BRect updateRect)
 {
-	if (fBitmap) {
-		if (!fBitmap->Lock())
-			return;
-
-		if (fOffscreenView->Bounds().Intersects(updateRect))
-			DrawBitmap(fBitmap, B_ORIGIN);
-
-		fBitmap->Unlock();
-		_DrawSelectors(this);
-
-	} else {
+	if (fBitmap)
+		DrawBitmap(fBitmap, B_ORIGIN);
+	else
 		_DrawColorArea(this, updateRect);
-		_DrawSelectors(this);
-	}
+	_DrawSelectors(this);
 }
 
 
 void
 BColorControl::_DrawColorArea(BView* target, BRect update)
 {
-	BRegion region(update);
-	target->ConstrainClippingRegion(&region);
-
 	BRect bevelRect = fPaletteFrame.InsetByCopy(-2.0,-2.0);	//bevel
 	bool enabled = IsEnabled();
 
@@ -509,8 +494,6 @@ BColorControl::_DrawColorArea(BView* target, BRect update)
 		_ColorRamp(_RampFrame(2), target, green, compColor, 0, false, update);
 		_ColorRamp(_RampFrame(3), target, blue, compColor, 0, false, update);	
 	}
-	
-	target->ConstrainClippingRegion(NULL);
 }
 
 
@@ -710,6 +693,8 @@ BColorControl::MouseDown(BPoint point)
 		return;
 	if (!fPaletteFrame.Contains(point))
 		return;
+
+	MakeFocus();
 	
 	if (fPaletteMode) {
 		int column = (int) ( (point.x - fPaletteFrame.left) / fCellSize );
@@ -723,7 +708,8 @@ BColorControl::MouseDown(BPoint point)
 		rgb_color color = ValueAsColor();
 	
 		uint8 shade = (unsigned char)max_c(0,
-			min_c((point.x - _RampFrame(0).left) * 255 / _RampFrame(0).Width(), 255));
+			min_c((point.x - _RampFrame(0).left) * 255 / _RampFrame(0).Width(),
+				255));
 		
 		if (_RampFrame(0).Contains(point)) {
 			color.red = color.green = color.blue = shade;
@@ -746,7 +732,6 @@ BColorControl::MouseDown(BPoint point)
 	Invoke();
 
 	SetTracking(true);
-	MakeFocus();
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY|B_LOCK_WINDOW_FOCUS);
 }
 
