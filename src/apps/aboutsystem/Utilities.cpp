@@ -8,6 +8,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#if __GNUC__ < 4
+#include <stdarg.h>
+#define va_copy		__va_copy
+#endif
+
 #include <Message.h>
 
 
