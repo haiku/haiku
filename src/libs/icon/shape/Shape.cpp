@@ -157,16 +157,18 @@ Shape::~Shape()
 
 // #pragma mark -
 
-#ifdef ICON_O_MATIC
-
 // Unarchive
 status_t
 Shape::Unarchive(const BMessage* archive)
 {
+#ifdef ICON_O_MATIC
 	// IconObject properties
 	status_t ret = IconObject::Unarchive(archive);
 	if (ret < B_OK)
 		return ret;
+#else
+	status_t ret;
+#endif
 
 	// recreate transformers
 	BMessage transformerArchive;
@@ -216,6 +218,8 @@ Shape::Unarchive(const BMessage* archive)
 
 	return B_OK;
 }
+
+#ifdef ICON_O_MATIC
 
 // Archive
 status_t
@@ -407,10 +411,10 @@ Shape::InitCheck() const
 void
 Shape::SetStyle(::Style* style)
 {
-#ifdef ICON_O_MATIC
 	if (fStyle == style)
 		return;
 
+#ifdef ICON_O_MATIC
 	if (fStyle) {
 		fStyle->RemoveObserver(this);
 		fStyle->Release();

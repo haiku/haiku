@@ -50,9 +50,7 @@ class Gradient : public Transformable {
 
  public:
 								Gradient(bool empty = false);
-#ifdef ICON_O_MATIC
 								Gradient(BMessage* archive);
-#endif
 								Gradient(const Gradient& other);
 	virtual						~Gradient();
 

@@ -26,10 +26,10 @@ class TransformerFactory {
 	static	Transformer*		TransformerFor(uint32 type,
 											   VertexSource& source);
 
-#ifdef ICON_O_MATIC
 	static	Transformer*		TransformerFor(BMessage* archive,
 											   VertexSource& source);
 
+#ifdef ICON_O_MATIC
 	static	bool				NextType(int32* cookie,
 										 uint32* type,
 										 BString* name);

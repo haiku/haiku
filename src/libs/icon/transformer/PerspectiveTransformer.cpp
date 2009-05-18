@@ -26,7 +26,6 @@ PerspectiveTransformer::PerspectiveTransformer(VertexSource& source)
 {
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 PerspectiveTransformer::PerspectiveTransformer(VertexSource& source,
 											   BMessage* archive)
@@ -35,7 +34,6 @@ PerspectiveTransformer::PerspectiveTransformer(VertexSource& source,
 {
 	// TODO: upgrade AGG to be able to use load_from() etc
 }
-#endif
 
 // destructor
 PerspectiveTransformer::~PerspectiveTransformer()

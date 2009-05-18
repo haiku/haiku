@@ -31,11 +31,10 @@ class AffineTransformer : public Transformer,
 
 								AffineTransformer(
 									VertexSource& source);
-#ifdef ICON_O_MATIC
 								AffineTransformer(
 									VertexSource& source,
 									BMessage* archive);
-#endif
+
 	virtual						~AffineTransformer();
 
 	virtual	Transformer*		Clone(VertexSource& source) const;

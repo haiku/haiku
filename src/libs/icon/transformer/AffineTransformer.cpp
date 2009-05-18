@@ -31,7 +31,6 @@ AffineTransformer::AffineTransformer(VertexSource& source)
 {
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source,
 									 BMessage* archive)
@@ -50,7 +49,6 @@ AffineTransformer::AffineTransformer(VertexSource& source,
 			load_from((const double*)matrix);
 	}
 }
-#endif // ICON_O_MATIC
 
 // destructor
 AffineTransformer::~AffineTransformer()

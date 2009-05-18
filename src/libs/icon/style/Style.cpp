@@ -10,9 +10,9 @@
 
 #include <new>
 
-#ifdef ICON_O_MATIC
 # include <Message.h>
 
+#ifdef ICON_O_MATIC
 # include "ui_defines.h"
 #else
 # define kWhite (rgb_color){ 255, 255, 255, 255 }
@@ -77,11 +77,14 @@ Style::Style(const Style& other)
 	SetGradient(other.fGradient);
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 Style::Style(BMessage* archive)
+#ifdef ICON_O_MATIC
 	: IconObject(archive),
 	  Observer(),
+#else
+	:
+#endif
 
 	  fColor(kWhite),
 	  fGradient(NULL),
@@ -102,7 +105,6 @@ Style::Style(BMessage* archive)
 		SetGradient(&gradient);
 	}
 }
-#endif // ICON_O_MATIC
 
 // destructor
 Style::~Style()

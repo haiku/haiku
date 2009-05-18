@@ -38,12 +38,15 @@ Gradient::Gradient(bool empty)
 	}
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 Gradient::Gradient(BMessage* archive)
+#ifdef ICON_O_MATIC
 	: BArchivable(archive),
 	  Observable(),
 	  Transformable(),
+#else
+	: Transformable(),
+#endif
 
 	  fColors(4),
 	  fType(GRADIENT_LINEAR),
@@ -80,7 +83,6 @@ Gradient::Gradient(BMessage* archive)
 						  &fInheritTransformation) < B_OK)
 		fInheritTransformation = true;
 }
-#endif // ICON_O_MATIC
 
 // constructor
 Gradient::Gradient(const Gradient& other)

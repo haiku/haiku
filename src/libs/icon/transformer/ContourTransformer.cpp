@@ -33,7 +33,6 @@ ContourTransformer::ContourTransformer(VertexSource& source)
 	auto_detect_orientation(true);
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source,
 									   BMessage* archive)
@@ -62,7 +61,6 @@ ContourTransformer::ContourTransformer(VertexSource& source,
 	if (archive->FindDouble("inner miter limit", &value) == B_OK)
 		inner_miter_limit(value);
 }
-#endif // ICON_O_MATIC
 
 // destructor
 ContourTransformer::~ContourTransformer()

@@ -28,11 +28,10 @@ class StrokeTransformer : public Transformer,
 
 								StrokeTransformer(
 									VertexSource& source);
-#ifdef ICON_O_MATIC
 								StrokeTransformer(
 									VertexSource& source,
 									BMessage* archive);
-#endif
+
 	virtual						~StrokeTransformer();
 
 	// Transformer interface

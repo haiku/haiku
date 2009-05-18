@@ -31,11 +31,10 @@ class PerspectiveTransformer : public Transformer,
 
 								PerspectiveTransformer(
 									VertexSource& source);
-#ifdef ICON_O_MATIC
 								PerspectiveTransformer(
 									VertexSource& source,
 									BMessage* archive);
-#endif
+
 	virtual						~PerspectiveTransformer();
 
 	// Transformer interface

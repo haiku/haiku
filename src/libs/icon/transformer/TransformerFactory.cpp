@@ -38,7 +38,6 @@ TransformerFactory::TransformerFor(uint32 type, VertexSource& source)
 	return NULL;
 }
 
-#ifdef ICON_O_MATIC
 // TransformerFor
 Transformer*
 TransformerFactory::TransformerFor(BMessage* message,
@@ -57,6 +56,8 @@ TransformerFactory::TransformerFor(BMessage* message,
 
 	return NULL;
 }
+
+#ifdef ICON_O_MATIC
 
 // NextType
 bool

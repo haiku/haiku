@@ -70,9 +70,8 @@ class VectorPath {
 
 								VectorPath();
 								VectorPath(const VectorPath& from);
-#ifdef ICON_O_MATIC
 								VectorPath(BMessage* archive);
-#endif
+
 	virtual						~VectorPath();
 
 #ifdef ICON_O_MATIC

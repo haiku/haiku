@@ -22,6 +22,8 @@
 #include <agg_color_rgba.h>
 
 
+class BMessage;
+
 namespace BPrivate {
 namespace Icon {
 
@@ -37,9 +39,8 @@ class Style {
 								Style();
 								Style(const Style& other);
 								Style(const rgb_color& color);
-#ifdef ICON_O_MATIC
 								Style(BMessage* archive);
-#endif
+
 	virtual						~Style();
 
 #ifdef ICON_O_MATIC

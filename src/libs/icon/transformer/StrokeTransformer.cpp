@@ -31,7 +31,6 @@ StrokeTransformer::StrokeTransformer(VertexSource& source)
 {
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 StrokeTransformer::StrokeTransformer(VertexSource& source,
 									 BMessage* archive)
@@ -64,7 +63,6 @@ StrokeTransformer::StrokeTransformer(VertexSource& source,
 	if (archive->FindDouble("shorten", &value) == B_OK)
 		shorten(value);
 }
-#endif // ICON_O_MATIC
 
 // destructor
 StrokeTransformer::~StrokeTransformer()

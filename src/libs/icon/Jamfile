@@ -6,6 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 # source directories
 local sourceDirs =
 	flat_icon
+	message
 	shape
 	style
 	transformable
@@ -28,6 +29,10 @@ StaticLibrary libicon.a :
 	FlatIconImporter.cpp
 	LittleEndianBuffer.cpp
 	PathCommandQueue.cpp
+
+	# message
+	Defines.cpp
+	MessageImporter.cpp
 
 	# shape
 	PathContainer.cpp

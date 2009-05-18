@@ -36,15 +36,17 @@ Transformer::Transformer(VertexSource& source, const char* name)
 {
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 Transformer::Transformer(VertexSource& source,
 						 BMessage* archive)
+#ifdef ICON_O_MATIC
 	: IconObject(archive),
+#else
+	:
+#endif
 	  fSource(source)
 {
 }
-#endif // ICON_O_MATIC
 
 // destructor
 Transformer::~Transformer()

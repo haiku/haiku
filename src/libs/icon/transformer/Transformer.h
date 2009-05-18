@@ -12,6 +12,7 @@
 #ifdef ICON_O_MATIC
 #	include "IconObject.h"
 #else
+#	include <Message.h>
 #	include <SupportDefs.h>
 #endif
 
@@ -41,10 +42,9 @@ class Transformer : public VertexSource {
  public:
 								Transformer(VertexSource& source,
 											const char* name);
-#ifdef ICON_O_MATIC
 								Transformer(VertexSource& source,
 											BMessage* archive);
-#endif
+
 	virtual						~Transformer();
 
 	// Transformer

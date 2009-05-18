@@ -59,9 +59,9 @@ class Shape : public BPrivate::Icon::Transformable {
 								Shape(const Shape& other);
 	virtual						~Shape();
 
-#ifdef ICON_O_MATIC
 	// IconObject interface
 	virtual	status_t			Unarchive(const BMessage* archive);
+#ifdef ICON_O_MATIC
 	virtual	status_t			Archive(BMessage* into,
 										bool deep = true) const;
 

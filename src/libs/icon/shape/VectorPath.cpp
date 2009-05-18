@@ -21,10 +21,12 @@
 #ifdef ICON_O_MATIC
 #include <debugger.h>
 #include <typeinfo>
+#endif // ICON_O_MATIC
 
 #include <Message.h>
 #include <TypeConstants.h>
 
+#ifdef ICON_O_MATIC
 # include "support.h"
 
 # include "CommonPropertyIDs.h"
@@ -119,12 +121,15 @@ VectorPath::VectorPath(const VectorPath& from)
 	*this = from;
 }
 
-#ifdef ICON_O_MATIC
 // constructor
 VectorPath::VectorPath(BMessage* archive)
+#ifdef ICON_O_MATIC
 	: BArchivable(),
 	  IconObject(archive),
 	  fListeners(20),
+#else
+	:
+#endif
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
@@ -161,7 +166,6 @@ VectorPath::VectorPath(BMessage* archive)
 		fClosed = false;
 
 }
-#endif // ICON_O_MATIC
 
 // destructor
 VectorPath::~VectorPath()

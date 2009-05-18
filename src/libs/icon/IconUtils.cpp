@@ -23,6 +23,7 @@
 #include "Icon.h"
 #include "IconRenderer.h"
 #include "FlatIconImporter.h"
+#include "MessageImporter.h"
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 #	define B_MINI_ICON_TYPE		'MICN'
@@ -244,8 +245,14 @@ BIconUtils::GetVectorIcon(const uint8* buffer, size_t size, BBitmap* result)
 
 	FlatIconImporter importer;
 	ret = importer.Import(&icon, const_cast<uint8*>(buffer), size);
-	if (ret < B_OK)
-		return ret;
+	if (ret < B_OK) {
+		// try the message based format used by Icon-O-Matic
+		MessageImporter messageImporter;
+		BMemoryIO memoryIO(const_cast<uint8*>(buffer), size);
+		ret = messageImporter.Import(&icon, &memoryIO);
+		if (ret < B_OK)
+			return ret;
+	}
 
 	IconRenderer renderer(temp);
 	renderer.SetIcon(&icon);

@@ -28,11 +28,10 @@ class ContourTransformer : public Transformer,
 
 								ContourTransformer(
 									VertexSource& source);
-#ifdef ICON_O_MATIC
 								ContourTransformer(
 									VertexSource& source,
 									BMessage* archive);
-#endif
+
 	virtual						~ContourTransformer();
 
 	virtual	Transformer*		Clone(VertexSource& source) const;
