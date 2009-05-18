@@ -7,7 +7,13 @@
 	applications.
 */
 
+#include "TRoster.h"
+
 #include <new>
+
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <Application.h>
 #include <AppMisc.h>
@@ -18,13 +24,8 @@
 #include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <Path.h>
-#include <Roster.h>	// for B_BACKGROUND_APP
 #include <ServerProtocol.h>
 #include <storage_support.h>
-
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"
@@ -33,17 +34,12 @@
 #include "RegistrarDefs.h"
 #include "RosterAppInfo.h"
 #include "RosterSettingsCharStream.h"
-#include "TRoster.h"
 
 using std::nothrow;
 using namespace BPrivate;
 
 
-static bool larger_index(const recent_entry *entry1, const recent_entry *entry2);
-
-
-/*!
-	\class TRoster
+/*!	\class TRoster
 	\brief Implements the application roster.
 
 	This class handles the BRoster requests. For each kind a hook method is
@@ -70,21 +66,21 @@ static bool larger_index(const recent_entry *entry1, const recent_entry *entry2)
 //! The maximal period of time an app may be early pre-registered (60 s).
 const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
 
-//! Applications living in this tree are considered "vital system apps".
-static const char *const kVitalSystemAppPathPrefix
-	= "/boot/system/servers";
+//! Applications living in these directory are considered "system apps".
+// TODO: move those into a common shared system header
+static const char* const kSystemAppPath = "/boot/system";
+static const char* const kSystemServerPath = "/boot/system/servers";
 
-//! Applications living in this tree are considered "system apps".
-static const char *const kSystemAppPathPrefix = "/boot/system";
 
-// get_default_roster_settings_file
+//	#pragma mark - Private local functions
+
+
 /*!	\brief Returns the path to the default roster settings.
 	\param path BPath to be set to the roster settings path.
 	\return the settings path as C string (\code path.Path() \endcode).
 */
-static
-const char *
-get_default_roster_settings_file(BPath &path)
+static const char*
+get_default_roster_settings_file(BPath& path)
 {
 	// get the path of the settings dir and append the subpath of our file
 	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -99,7 +95,27 @@ get_default_roster_settings_file(BPath &path)
 	return path.Path();
 }
 
-// constructor
+
+/*! \brief Returns true if entry1's index is larger than entry2's index.
+
+	Also returns true if either entry is \c NULL.
+
+	Used for sorting the recent entry lists loaded from disk into the
+	proper order.
+*/
+bool
+larger_index(const recent_entry* entry1, const recent_entry* entry2)
+{
+	if (entry1 && entry2)
+		return entry1->index > entry2->index;
+
+	return true;
+}
+
+
+//	#pragma mark -
+
+
 /*!	\brief Creates a new roster.
 
 	The object is completely initialized and ready to handle requests.
@@ -122,19 +138,19 @@ TRoster::TRoster()
 	_LoadRosterSettings();
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with this object.
 */
 TRoster::~TRoster()
 {
 }
 
-// HandleAddApplication
+
 /*!	\brief Handles an AddApplication() request.
 	\param request The request message
 */
 void
-TRoster::HandleAddApplication(BMessage *request)
+TRoster::HandleAddApplication(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -142,7 +158,7 @@ TRoster::HandleAddApplication(BMessage *request)
 
 	status_t error = B_OK;
 	// get the parameters
-	const char *signature;
+	const char* signature;
 	entry_ref ref;
 	uint32 flags;
 	team_id team;
@@ -163,8 +179,9 @@ TRoster::HandleAddApplication(BMessage *request)
 		port = -1;
 	if (request->FindBool("full_registration", &fullReg) != B_OK)
 		fullReg = false;
-PRINT(("team: %ld, signature: %s\n", team, signature));
-PRINT(("full registration: %d\n", fullReg));
+
+	PRINT(("team: %ld, signature: %s\n", team, signature));
+	PRINT(("full registration: %d\n", fullReg));
 
 	if (fShuttingDown)
 		error = B_SHUTTING_DOWN;
@@ -183,10 +200,10 @@ PRINT(("full registration: %d\n", fullReg));
 
 	// entry_ref
 	if (error == B_OK) {
-PRINT(("flags: %lx\n", flags));
-PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+		PRINT(("flags: %lx\n", flags));
+		PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 		// check single/exclusive launchers
-		RosterAppInfo *info = NULL;
+		RosterAppInfo* info = NULL;
 		if ((launchFlags == B_SINGLE_LAUNCH
 			 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
 			&& ((info = info = fRegisteredApps.InfoFor(&ref)) != NULL
@@ -200,7 +217,7 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	// signature
 	if (error == B_OK && signature) {
 		// check exclusive launchers
-		RosterAppInfo *info = NULL;
+		RosterAppInfo* info = NULL;
 		if (launchFlags == B_EXCLUSIVE_LAUNCH
 			&& (((info = fRegisteredApps.InfoFor(signature)))
 				|| ((info = fEarlyPreRegisteredApps.InfoFor(signature))))) {
@@ -222,7 +239,7 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	// Add the application info.
 	if (error == B_OK) {
 		// alloc and init the info
-		RosterAppInfo *info = new(nothrow) RosterAppInfo;
+		RosterAppInfo* info = new(nothrow) RosterAppInfo;
 		if (info) {
 			info->Init(thread, team, port, flags, &ref, signature);
 			if (fullReg)
@@ -233,14 +250,15 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 			// add it to the right list
 			bool addingSuccess = false;
 			if (team >= 0) {
-PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info->ref.name));
+				PRINT(("added ref: %ld, %lld, %s\n", info->ref.device,
+					info->ref.directory, info->ref.name));
 				addingSuccess = (AddApp(info) == B_OK);
 				if (addingSuccess && fullReg)
 					_AppAdded(info);
 			} else {
 				token = info->token = _NextToken();
 				addingSuccess = fEarlyPreRegisteredApps.AddInfo(info);
-PRINT(("added to early pre-regs, token: %lu\n", token));
+				PRINT(("added to early pre-regs, token: %lu\n", token));
 			}
 			if (!addingSuccess)
 				SET_ERROR(error, B_NO_MEMORY);
@@ -258,7 +276,6 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 			fRecentApps.Add(signature, flags);
 		else
 			fRecentApps.Add(&ref, flags);
-//		fRecentApps.Print();
 
 		BMessage reply(B_REG_SUCCESS);
 		// The token is valid only when no team ID has been supplied.
@@ -278,12 +295,12 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 	FUNCTION_END();
 }
 
-// HandleCompleteRegistration
+
 /*!	\brief Handles a CompleteRegistration() request.
 	\param request The request message
 */
 void
-TRoster::HandleCompleteRegistration(BMessage *request)
+TRoster::HandleCompleteRegistration(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -317,7 +334,7 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 	if (error == B_OK) {
 		if (team >= 0) {
 			// everything is fine -- set the values
-			RosterAppInfo *info = fRegisteredApps.InfoFor(team);
+			RosterAppInfo* info = fRegisteredApps.InfoFor(team);
 			if (info && info->state == APP_STATE_PRE_REGISTERED) {
 				info->thread = thread;
 				info->port = port;
@@ -342,12 +359,12 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleIsAppRegistered
+
 /*!	\brief Handles an IsAppRegistered() request.
 	\param request The request message
 */
 void
-TRoster::HandleIsAppRegistered(BMessage *request)
+TRoster::HandleIsAppRegistered(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -377,7 +394,7 @@ TRoster::HandleIsAppRegistered(BMessage *request)
 		SET_ERROR(error, B_BAD_VALUE);
 
 	// look up the information
-	RosterAppInfo *info = NULL;
+	RosterAppInfo* info = NULL;
 	if (error == B_OK) {
 		if ((info = fRegisteredApps.InfoFor(team)) != NULL) {
 			PRINT(("found team in fRegisteredApps\n"));
@@ -411,12 +428,12 @@ TRoster::HandleIsAppRegistered(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleRemovePreRegApp
+
 /*!	\brief Handles a RemovePreRegApp() request.
 	\param request The request message
 */
 void
-TRoster::HandleRemovePreRegApp(BMessage *request)
+TRoster::HandleRemovePreRegApp(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -429,7 +446,7 @@ TRoster::HandleRemovePreRegApp(BMessage *request)
 		SET_ERROR(error, B_BAD_VALUE);
 	// remove the app
 	if (error == B_OK) {
-		RosterAppInfo *info = fEarlyPreRegisteredApps.InfoForToken(token);
+		RosterAppInfo* info = fEarlyPreRegisteredApps.InfoForToken(token);
 		if (info) {
 			fEarlyPreRegisteredApps.RemoveInfo(info);
 			delete info;
@@ -449,12 +466,12 @@ TRoster::HandleRemovePreRegApp(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleRemoveApp
+
 /*!	\brief Handles a RemoveApp() request.
 	\param request The request message
 */
 void
-TRoster::HandleRemoveApp(BMessage *request)
+TRoster::HandleRemoveApp(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -465,10 +482,12 @@ TRoster::HandleRemoveApp(BMessage *request)
 	team_id team;
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
-PRINT(("team: %ld\n", team));
+
+	PRINT(("team: %ld\n", team));
+
 	// remove the app
 	if (error == B_OK) {
-		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team)) {
+		if (RosterAppInfo* info = fRegisteredApps.InfoFor(team)) {
 			RemoveApp(info);
 			delete info;
 		} else
@@ -487,18 +506,19 @@ PRINT(("team: %ld\n", team));
 	FUNCTION_END();
 }
 
-// HandleSetThreadAndTeam
+
 /*!	\brief Handles a SetThreadAndTeam() request.
 	\param request The request message
 */
 void
-TRoster::HandleSetThreadAndTeam(BMessage *request)
+TRoster::HandleSetThreadAndTeam(BMessage* request)
 {
 	FUNCTION_START();
 
 	BAutolock _(fLock);
 
 	status_t error = B_OK;
+
 	// get the parameters
 	team_id team;
 	thread_id thread;
@@ -509,14 +529,17 @@ TRoster::HandleSetThreadAndTeam(BMessage *request)
 		thread = -1;
 	if (request->FindInt32("token", (int32*)&token) != B_OK)
 		SET_ERROR(error, B_BAD_VALUE);
+
 	// check the parameters
 	// team
 	if (error == B_OK && team < 0)
 		SET_ERROR(error, B_BAD_VALUE);
-PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
+
+	PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
+
 	// update the app_info
 	if (error == B_OK) {
-		RosterAppInfo *info = fEarlyPreRegisteredApps.InfoForToken(token);
+		RosterAppInfo* info = fEarlyPreRegisteredApps.InfoForToken(token);
 		if (info) {
 			// Set thread and team, create a port for the application and
 			// move the app_info from the list of the early pre-registered
@@ -544,7 +567,7 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 			// handle pending IsAppRegistered() requests
 			IARRequestMap::iterator it = fIARRequestsByID.find(team);
 			if (it != fIARRequestsByID.end()) {
-				BMessageQueue *requests = it->second;
+				BMessageQueue* requests = it->second;
 				if (error == B_OK)
 					_ReplyToIARRequests(requests, info);
 				delete requests;
@@ -553,7 +576,7 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 
 			it = fIARRequestsByToken.find((int32)token);
 			if (it != fIARRequestsByToken.end()) {
-				BMessageQueue *requests = it->second;
+				BMessageQueue* requests = it->second;
 				if (error == B_OK)
 					_ReplyToIARRequests(requests, info);
 				delete requests;
@@ -575,12 +598,12 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 	FUNCTION_END();
 }
 
-// HandleSetSignature
+
 /*!	\brief Handles a SetSignature() request.
 	\param request The request message
 */
 void
-TRoster::HandleSetSignature(BMessage *request)
+TRoster::HandleSetSignature(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -589,14 +612,14 @@ TRoster::HandleSetSignature(BMessage *request)
 	status_t error = B_OK;
 	// get the parameters
 	team_id team;
-	const char *signature;
+	const char* signature;
 	if (request->FindInt32("team", &team) != B_OK)
 		error = B_BAD_VALUE;
 	if (request->FindString("signature", &signature) != B_OK)
 		error = B_BAD_VALUE;
 	// find the app and set the signature
 	if (error == B_OK) {
-		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
+		if (RosterAppInfo* info = fRegisteredApps.InfoFor(team))
 			strcpy(info->signature, signature);
 		else
 			SET_ERROR(error, B_REG_APP_NOT_REGISTERED);
@@ -614,12 +637,12 @@ TRoster::HandleSetSignature(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleGetAppInfo
+
 /*!	\brief Handles a Get{Running,Active,}AppInfo() request.
 	\param request The request message
 */
 void
-TRoster::HandleGetAppInfo(BMessage *request)
+TRoster::HandleGetAppInfo(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -629,7 +652,7 @@ TRoster::HandleGetAppInfo(BMessage *request)
 	// get the parameters
 	team_id team;
 	entry_ref ref;
-	const char *signature;
+	const char* signature;
 	bool hasTeam = true;
 	bool hasRef = true;
 	bool hasSignature = true;
@@ -639,14 +662,16 @@ TRoster::HandleGetAppInfo(BMessage *request)
 		hasRef = false;
 	if (request->FindString("signature", &signature) != B_OK)
 		hasSignature = false;
+
 if (hasTeam)
 PRINT(("team: %ld\n", team));
 if (hasRef)
 PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 if (hasSignature)
 PRINT(("signature: %s\n", signature));
+
 	// get the info
-	RosterAppInfo *info = NULL;
+	RosterAppInfo* info = NULL;
 	if (error == B_OK) {
 		if (hasTeam) {
 			info = fRegisteredApps.InfoFor(team);
@@ -683,12 +708,12 @@ PRINT(("signature: %s\n", signature));
 	FUNCTION_END();
 }
 
-// HandleGetAppList
+
 /*!	\brief Handles a GetAppList() request.
 	\param request The request message
 */
 void
-TRoster::HandleGetAppList(BMessage *request)
+TRoster::HandleGetAppList(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -696,7 +721,7 @@ TRoster::HandleGetAppList(BMessage *request)
 
 	status_t error = B_OK;
 	// get the parameters
-	const char *signature;
+	const char* signature;
 	if (request->FindString("signature", &signature) != B_OK)
 		signature = NULL;
 	// reply to the request
@@ -704,7 +729,7 @@ TRoster::HandleGetAppList(BMessage *request)
 		BMessage reply(B_REG_SUCCESS);
 		// get the list
 		for (AppInfoList::Iterator it(fRegisteredApps.It());
-			 RosterAppInfo *info = *it;
+			 RosterAppInfo* info = *it;
 			 ++it) {
 			if (info->state != APP_STATE_REGISTERED)
 				continue;
@@ -730,7 +755,7 @@ TRoster::HandleGetAppList(BMessage *request)
 	\param request The request message
 */
 void
-TRoster::HandleUpdateActiveApp(BMessage *request)
+TRoster::HandleUpdateActiveApp(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -744,7 +769,7 @@ TRoster::HandleUpdateActiveApp(BMessage *request)
 
 	// activate the app
 	if (error == B_OK) {
-		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
+		if (RosterAppInfo* info = fRegisteredApps.InfoFor(team))
 			UpdateActiveApp(info);
 		else
 			error = B_BAD_TEAM_ID;
@@ -765,12 +790,12 @@ TRoster::HandleUpdateActiveApp(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleBroadcast
+
 /*!	\brief Handles a Broadcast() request.
 	\param request The request message
 */
 void
-TRoster::HandleBroadcast(BMessage *request)
+TRoster::HandleBroadcast(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -806,13 +831,13 @@ TRoster::HandleBroadcast(BMessage *request)
 		class BroadcastMessagingTargetSet
 			: public AppInfoListMessagingTargetSet {
 			public:
-				BroadcastMessagingTargetSet(AppInfoList &list, team_id team)
+				BroadcastMessagingTargetSet(AppInfoList& list, team_id team)
 					: AppInfoListMessagingTargetSet(list, true),
 					  fTeam(team)
 				{
 				}
 
-				virtual bool Filter(const RosterAppInfo *info)
+				virtual bool Filter(const RosterAppInfo* info)
 				{
 					return AppInfoListMessagingTargetSet::Filter(info)
 						&& (info->team != fTeam);
@@ -834,12 +859,12 @@ TRoster::HandleBroadcast(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleStartWatching
+
 /*!	\brief Handles a StartWatching() request.
 	\param request The request message
 */
 void
-TRoster::HandleStartWatching(BMessage *request)
+TRoster::HandleStartWatching(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -855,7 +880,7 @@ TRoster::HandleStartWatching(BMessage *request)
 		error = B_BAD_VALUE;
 	// add the new watcher
 	if (error == B_OK) {
-		Watcher *watcher = new(nothrow) EventMaskWatcher(target, events);
+		Watcher* watcher = new(nothrow) EventMaskWatcher(target, events);
 		if (watcher) {
 			if (!fWatchingService.AddWatcher(watcher)) {
 				error = B_NO_MEMORY;
@@ -877,12 +902,12 @@ TRoster::HandleStartWatching(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleStopWatching
+
 /*!	\brief Handles a StopWatching() request.
 	\param request The request message
 */
 void
-TRoster::HandleStopWatching(BMessage *request)
+TRoster::HandleStopWatching(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -911,12 +936,12 @@ TRoster::HandleStopWatching(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleGetRecentDocuments
+
 /*!	\brief Handles a GetRecentDocuments() request.
 	\param request The request message
 */
 void
-TRoster::HandleGetRecentDocuments(BMessage *request)
+TRoster::HandleGetRecentDocuments(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -927,12 +952,12 @@ TRoster::HandleGetRecentDocuments(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleGetRecentFolders
+
 /*!	\brief Handles a GetRecentFolders() request.
 	\param request The request message
 */
 void
-TRoster::HandleGetRecentFolders(BMessage *request)
+TRoster::HandleGetRecentFolders(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -943,12 +968,12 @@ TRoster::HandleGetRecentFolders(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleGetRecentApps
+
 /*!	\brief Handles a GetRecentApps() request.
 	\param request The request message
 */
 void
-TRoster::HandleGetRecentApps(BMessage *request)
+TRoster::HandleGetRecentApps(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -971,12 +996,12 @@ TRoster::HandleGetRecentApps(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleAddToRecentDocuments
+
 /*!	\brief Handles an AddToRecentDocuments() request.
 	\param request The request message
 */
 void
-TRoster::HandleAddToRecentDocuments(BMessage *request)
+TRoster::HandleAddToRecentDocuments(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -988,7 +1013,7 @@ TRoster::HandleAddToRecentDocuments(BMessage *request)
 	}
 
 	entry_ref ref;
-	const char *appSig;
+	const char* appSig;
 	BMessage reply(B_REG_RESULT);
 
 	status_t error = request->FindRef("ref", &ref);
@@ -1002,12 +1027,12 @@ TRoster::HandleAddToRecentDocuments(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleAddToRecentFolders
+
 /*!	\brief Handles an AddToRecentFolders() request.
 	\param request The request message
 */
 void
-TRoster::HandleAddToRecentFolders(BMessage *request)
+TRoster::HandleAddToRecentFolders(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -1019,7 +1044,7 @@ TRoster::HandleAddToRecentFolders(BMessage *request)
 	}
 
 	entry_ref ref;
-	const char *appSig;
+	const char* appSig;
 	BMessage reply(B_REG_RESULT);
 
 	status_t error = request->FindRef("ref", &ref);
@@ -1033,12 +1058,12 @@ TRoster::HandleAddToRecentFolders(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleAddToRecentApps
+
 /*!	\brief Handles an AddToRecentApps() request.
 	\param request The request message
 */
 void
-TRoster::HandleAddToRecentApps(BMessage *request)
+TRoster::HandleAddToRecentApps(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -1049,7 +1074,7 @@ TRoster::HandleAddToRecentApps(BMessage *request)
 		return;
 	}
 
-	const char *appSig;
+	const char* appSig;
 	BMessage reply(B_REG_RESULT);
 
 	status_t error = request->FindString("app sig", &appSig);
@@ -1061,8 +1086,9 @@ TRoster::HandleAddToRecentApps(BMessage *request)
 	FUNCTION_END();
 }
 
+
 void
-TRoster::HandleLoadRecentLists(BMessage *request)
+TRoster::HandleLoadRecentLists(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -1073,7 +1099,7 @@ TRoster::HandleLoadRecentLists(BMessage *request)
 		return;
 	}
 
-	const char *filename;
+	const char* filename;
 	BMessage reply(B_REG_RESULT);
 
 	status_t error = request->FindString("filename", &filename);
@@ -1085,8 +1111,9 @@ TRoster::HandleLoadRecentLists(BMessage *request)
 	FUNCTION_END();
 }
 
+
 void
-TRoster::HandleSaveRecentLists(BMessage *request)
+TRoster::HandleSaveRecentLists(BMessage* request)
 {
 	FUNCTION_START();
 
@@ -1097,7 +1124,7 @@ TRoster::HandleSaveRecentLists(BMessage *request)
 		return;
 	}
 
-	const char *filename;
+	const char* filename;
 	BMessage reply(B_REG_RESULT);
 
 	status_t error = request->FindString("filename", &filename);
@@ -1109,7 +1136,7 @@ TRoster::HandleSaveRecentLists(BMessage *request)
 	FUNCTION_END();
 }
 
-// ClearRecentDocuments
+
 /*!	\brief Clears the current list of recent documents
 */
 void
@@ -1120,7 +1147,7 @@ TRoster::ClearRecentDocuments()
 	fRecentDocuments.Clear();
 }
 
-// ClearRecentFolders
+
 /*!	\brief Clears the current list of recent folders
 */
 void
@@ -1131,7 +1158,7 @@ TRoster::ClearRecentFolders()
 	fRecentFolders.Clear();
 }
 
-// ClearRecentApps
+
 /*!	\brief Clears the current list of recent apps
 */
 void
@@ -1142,7 +1169,7 @@ TRoster::ClearRecentApps()
 	fRecentApps.Clear();
 }
 
-// Init
+
 /*!	\brief Initializes the roster.
 
 	Currently only adds the registrar to the roster.
@@ -1163,7 +1190,7 @@ TRoster::Init()
 		return fLock.Sem();
 
 	// create the info
-	RosterAppInfo *info = new(nothrow) RosterAppInfo;
+	RosterAppInfo* info = new(nothrow) RosterAppInfo;
 	if (!info)
 		error = B_NO_MEMORY;
 
@@ -1175,9 +1202,8 @@ TRoster::Init()
 	// init and add the info
 	if (error == B_OK) {
 		info->Init(be_app->Thread(), be_app->Team(),
-				   BMessenger::Private(be_app_messenger).Port(),
-				   B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP, &ref,
-				   kRegistrarSignature);
+			BMessenger::Private(be_app_messenger).Port(),
+			B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP, &ref, kRegistrarSignature);
 		info->state = APP_STATE_REGISTERED;
 		info->registration_time = system_time();
 		error = AddApp(info);
@@ -1190,13 +1216,13 @@ TRoster::Init()
 	return error;
 }
 
-// AddApp
+
 /*!	\brief Add the supplied app info to the list of (pre-)registered apps.
 
 	\param info The app info to be added
 */
 status_t
-TRoster::AddApp(RosterAppInfo *info)
+TRoster::AddApp(RosterAppInfo* info)
 {
 	BAutolock _(fLock);
 
@@ -1208,14 +1234,14 @@ TRoster::AddApp(RosterAppInfo *info)
 	return error;
 }
 
-// RemoveApp
+
 /*!	\brief Removes the supplied app info from the list of (pre-)registered
 	apps.
 
 	\param info The app info to be removed
 */
 void
-TRoster::RemoveApp(RosterAppInfo *info)
+TRoster::RemoveApp(RosterAppInfo* info)
 {
 	BAutolock _(fLock);
 
@@ -1239,13 +1265,13 @@ TRoster::RemoveApp(RosterAppInfo *info)
 	\param info The info of the app to be activated
 */
 void
-TRoster::UpdateActiveApp(RosterAppInfo *info)
+TRoster::UpdateActiveApp(RosterAppInfo* info)
 {
 	BAutolock _(fLock);
 
 	if (info != fActiveApp) {
 		// deactivate the currently active app
-		RosterAppInfo *oldActiveApp = fActiveApp;
+		RosterAppInfo* oldActiveApp = fActiveApp;
 		fActiveApp = NULL;
 		if (oldActiveApp)
 			_AppDeactivated(oldActiveApp);
@@ -1258,7 +1284,7 @@ TRoster::UpdateActiveApp(RosterAppInfo *info)
 	}
 }
 
-// CheckSanity
+
 /*!	\brief Checks whether the (pre-)registered applications are still running.
 
 	This is necessary, since killed applications don't unregister properly.
@@ -1301,7 +1327,7 @@ TRoster::CheckSanity()
 		// don't delete infos a second time
 }
 
-// SetShuttingDown
+
 /*!	\brief Tells the roster whether a shutdown process is in progess at the
 		   moment.
 
@@ -1319,7 +1345,7 @@ TRoster::SetShuttingDown(bool shuttingDown)
 	fShuttingDown = shuttingDown;
 }
 
-// GetShutdownApps
+
 /*!	\brief Returns lists of applications to be asked to quit on shutdown.
 
 	\param userApps List of RosterAppInfos identifying the user applications.
@@ -1332,8 +1358,8 @@ TRoster::SetShuttingDown(bool shuttingDown)
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
-	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps)
+TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
+	AppInfoList& backgroundApps, hash_set<team_id>& vitalSystemApps)
 {
 	BAutolock _(fLock);
 
@@ -1362,17 +1388,17 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	}
 
 	// debug server
-	RosterAppInfo *info =
+	RosterAppInfo* info =
 		fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
 	if (info)
 		vitalSystemApps.insert(info->team);
 
 	// populate the other groups
 	for (AppInfoList::Iterator it(fRegisteredApps.It());
-		 RosterAppInfo *info = *it;
+		 RosterAppInfo* info = *it;
 		 ++it) {
 		if (vitalSystemApps.find(info->team) == vitalSystemApps.end()) {
-			RosterAppInfo *clonedInfo = info->Clone();
+			RosterAppInfo* clonedInfo = info->Clone();
 			if (clonedInfo) {
 				if (_IsSystemApp(info)) {
 					if (!systemApps.AddInfo(clonedInfo))
@@ -1410,9 +1436,9 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 	return error;
 }
 
-// AddWatcher
+
 status_t
-TRoster::AddWatcher(Watcher *watcher)
+TRoster::AddWatcher(Watcher* watcher)
 {
 	BAutolock _(fLock);
 
@@ -1426,9 +1452,8 @@ TRoster::AddWatcher(Watcher *watcher)
 }
 
 
-// RemoveWatcher
 void
-TRoster::RemoveWatcher(Watcher *watcher)
+TRoster::RemoveWatcher(Watcher* watcher)
 {
 	BAutolock _(fLock);
 
@@ -1437,12 +1462,11 @@ TRoster::RemoveWatcher(Watcher *watcher)
 }
 
 
-// _AppAdded
 /*!	\brief Hook method invoked, when an application has been fully registered.
 	\param info The RosterAppInfo of the added application.
 */
 void
-TRoster::_AppAdded(RosterAppInfo *info)
+TRoster::_AppAdded(RosterAppInfo* info)
 {
 	// notify the watchers
 	BMessage message(B_SOME_APP_LAUNCHED);
@@ -1451,12 +1475,13 @@ TRoster::_AppAdded(RosterAppInfo *info)
 	fWatchingService.NotifyWatchers(&message, &filter);
 }
 
-// _AppRemoved
-/*!	\brief Hook method invoked, when a fully registered application has been removed.
+
+/*!	\brief Hook method invoked, when a fully registered application has been
+		removed.
 	\param info The RosterAppInfo of the removed application.
 */
 void
-TRoster::_AppRemoved(RosterAppInfo *info)
+TRoster::_AppRemoved(RosterAppInfo* info)
 {
 	if (info) {
 		// deactivate the app, if it was the active one
@@ -1471,55 +1496,51 @@ TRoster::_AppRemoved(RosterAppInfo *info)
 	}
 }
 
-// _AppActivated
+
 /*!	\brief Hook method invoked, when an application has been activated.
 	\param info The RosterAppInfo of the activated application.
 */
 void
-TRoster::_AppActivated(RosterAppInfo *info)
+TRoster::_AppActivated(RosterAppInfo* info)
 {
-	if (info) {
-		if (info->state == APP_STATE_REGISTERED) {
-			// send B_APP_ACTIVATED to the app
-			BMessenger messenger;
-			BMessenger::Private messengerPrivate(messenger);
-			messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
-			BMessage message(B_APP_ACTIVATED);
-			message.AddBool("active", true);
-			// not sure, if it makes sense to use the MessageDeliverer here
-			MessageDeliverer::Default()->DeliverMessage(&message, messenger);
+	if (info != NULL && info->state == APP_STATE_REGISTERED) {
+		// send B_APP_ACTIVATED to the app
+		BMessenger messenger;
+		BMessenger::Private messengerPrivate(messenger);
+		messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
+		BMessage message(B_APP_ACTIVATED);
+		message.AddBool("active", true);
+		// not sure, if it makes sense to use the MessageDeliverer here
+		MessageDeliverer::Default()->DeliverMessage(&message, messenger);
 
-			// notify the watchers
-			BMessage watcherMessage(B_SOME_APP_ACTIVATED);
-			_AddMessageWatchingInfo(&watcherMessage, info);
-			EventMaskWatcherFilter filter(B_REQUEST_ACTIVATED);
-			fWatchingService.NotifyWatchers(&watcherMessage, &filter);
-		}
+		// notify the watchers
+		BMessage watcherMessage(B_SOME_APP_ACTIVATED);
+		_AddMessageWatchingInfo(&watcherMessage, info);
+		EventMaskWatcherFilter filter(B_REQUEST_ACTIVATED);
+		fWatchingService.NotifyWatchers(&watcherMessage, &filter);
 	}
 }
 
-// _AppDeactivated
+
 /*!	\brief Hook method invoked, when an application has been deactivated.
 	\param info The RosterAppInfo of the deactivated application.
 */
 void
-TRoster::_AppDeactivated(RosterAppInfo *info)
+TRoster::_AppDeactivated(RosterAppInfo* info)
 {
-	if (info) {
-		if (info->state == APP_STATE_REGISTERED) {
-			// send B_APP_ACTIVATED to the app
-			BMessenger messenger;
-			BMessenger::Private messengerPrivate(messenger);
-			messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
-			BMessage message(B_APP_ACTIVATED);
-			message.AddBool("active", false);
-			// not sure, if it makes sense to use the MessageDeliverer here
-			MessageDeliverer::Default()->DeliverMessage(&message, messenger);
-		}
+	if (info != NULL && info->state == APP_STATE_REGISTERED) {
+		// send B_APP_ACTIVATED to the app
+		BMessenger messenger;
+		BMessenger::Private messengerPrivate(messenger);
+		messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
+		BMessage message(B_APP_ACTIVATED);
+		message.AddBool("active", false);
+		// not sure, if it makes sense to use the MessageDeliverer here
+		MessageDeliverer::Default()->DeliverMessage(&message, messenger);
 	}
 }
 
-// _AddMessageAppInfo
+
 /*!	\brief Adds an app_info to a message.
 
 	The info is added as a flat_app_info to a field "app_info" with the type
@@ -1530,30 +1551,32 @@ TRoster::_AppDeactivated(RosterAppInfo *info)
 	\return \c B_OK if everything went fine, an error code otherwise.
 */
 status_t
-TRoster::_AddMessageAppInfo(BMessage *message, const app_info *info)
+TRoster::_AddMessageAppInfo(BMessage* message, const app_info* info)
 {
 	// An app_info is not completely flat. The entry_ref contains a string
 	// pointer. Therefore we flatten the info.
 	flat_app_info flatInfo;
 	flatInfo.info = *info;
+
 	// set the ref name to NULL and copy it into the flat structure
 	flatInfo.info.ref.name = NULL;
 	flatInfo.ref_name[0] = '\0';
 	if (info->ref.name)
 		strcpy(flatInfo.ref_name, info->ref.name);
+
 	// add the flat info
 	return message->AddData("app_info", B_REG_APP_INFO_TYPE, &flatInfo,
-							sizeof(flat_app_info));
+		sizeof(flat_app_info));
 }
 
-// _AddMessageWatchingInfo
+
 /*!	\brief Adds application monitoring related fields to a message.
 	\param message The message.
 	\param info The app_info of the concerned application.
 	\return \c B_OK if everything went fine, an error code otherwise.
 */
 status_t
-TRoster::_AddMessageWatchingInfo(BMessage *message, const app_info *info)
+TRoster::_AddMessageWatchingInfo(BMessage* message, const app_info* info)
 {
 	status_t error = B_OK;
 	if (error == B_OK)
@@ -1569,7 +1592,7 @@ TRoster::_AddMessageWatchingInfo(BMessage *message, const app_info *info)
 	return error;
 }
 
-// _NextToken
+
 /*!	\brief Returns the next available token.
 	\return The token.
 */
@@ -1579,7 +1602,7 @@ TRoster::_NextToken()
 	return ++fLastToken;
 }
 
-// _AddIARRequest
+
 /*!	\brief Adds an IsAppRegistered() request to the given map.
 
 	If something goes wrong, the method deletes the request.
@@ -1607,7 +1630,7 @@ TRoster::_AddIARRequest(IARRequestMap& map, int32 key, BMessage* request)
 	requests->AddMessage(request);
 }
 
-// _ReplyToIARRequests
+
 /*!	\brief Invokes _ReplyToIARRequest() for all messages in the given
 		   message queue.
 
@@ -1616,8 +1639,7 @@ TRoster::_AddIARRequest(IARRequestMap& map, int32 key, BMessage* request)
 		   (may be \c NULL)
 */
 void
-TRoster::_ReplyToIARRequests(BMessageQueue *requests,
-	const RosterAppInfo *info)
+TRoster::_ReplyToIARRequests(BMessageQueue* requests, const RosterAppInfo* info)
 {
 	while (BMessage* request = requests->NextMessage()) {
 		_ReplyToIARRequest(request, info);
@@ -1625,7 +1647,7 @@ TRoster::_ReplyToIARRequests(BMessageQueue *requests,
 	}
 }
 
-// _ReplyToIARRequest
+
 /*!	\brief Sends a reply message to an IsAppRegistered() request.
 
 	The message to be sent is a simple \c B_REG_SUCCESS message containing
@@ -1638,7 +1660,7 @@ TRoster::_ReplyToIARRequests(BMessageQueue *requests,
 		   (may be \c NULL)
 */
 void
-TRoster::_ReplyToIARRequest(BMessage *request, const RosterAppInfo *info)
+TRoster::_ReplyToIARRequest(BMessage* request, const RosterAppInfo* info)
 {
 	// pre-registered or registered?
 	bool preRegistered = false;
@@ -1657,18 +1679,18 @@ TRoster::_ReplyToIARRequest(BMessage *request, const RosterAppInfo *info)
 	BMessage reply(B_REG_SUCCESS);
 	reply.AddBool("registered", (bool)info);
 	reply.AddBool("pre-registered", preRegistered);
-PRINT(("_ReplyToIARRequest(): pre-registered: %d\n", preRegistered));
+	PRINT(("_ReplyToIARRequest(): pre-registered: %d\n", preRegistered));
 	if (info)
 		_AddMessageAppInfo(&reply, info);
 	request->SendReply(&reply);
 }
 
-// _HandleGetRecentEntries
+
 /*! \brief Handles requests for both GetRecentDocuments() and
 	GetRecentFolders().
 */
 void
-TRoster::_HandleGetRecentEntries(BMessage *request)
+TRoster::_HandleGetRecentEntries(BMessage* request)
 {
 	FUNCTION_START();
 	if (!request) {
@@ -1678,15 +1700,16 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 
 	int32 maxCount;
 	BMessage reply(B_REG_RESULT);
-	char **fileTypes = NULL;
+	char** fileTypes = NULL;
 	int32 fileTypesCount = 0;
-	char *appSig = NULL;
+	char* appSig = NULL;
 
 	status_t error = request->FindInt32("max count", &maxCount);
 	// Look for optional file type(s)
 	if (!error) {
 		type_code typeFound;
-		status_t typeError = request->GetInfo("file type", &typeFound, &fileTypesCount);
+		status_t typeError = request->GetInfo("file type", &typeFound,
+			&fileTypesCount);
 		if (!typeError)
 			typeError = typeFound == B_STRING_TYPE ? B_OK : B_BAD_TYPE;
 		if (!typeError) {
@@ -1695,7 +1718,7 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 		}
 		if (!typeError) {
 			for (int i = 0; !error && i < fileTypesCount; i++) {
-				const char *type;
+				const char* type;
 				if (request->FindString("file type", i, &type) == B_OK) {
 					fileTypes[i] = new(nothrow) char[B_MIME_TYPE_LENGTH];
 					error = fileTypes[i] ? B_OK : B_NO_MEMORY;
@@ -1708,7 +1731,7 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 	}
 	// Look for optional app sig
 	if (!error) {
-		const char *sig;
+		const char* sig;
 		error = request->FindString("app sig", &sig);
 		if (!error) {
 			appSig = new(nothrow) char[B_MIME_TYPE_LENGTH];
@@ -1777,24 +1800,22 @@ TRoster::_ValidateRunning(const entry_ref& ref, const char* signature)
 
 
 bool
-TRoster::_IsSystemApp(RosterAppInfo *info) const
+TRoster::_IsSystemApp(RosterAppInfo* info) const
 {
 	BPath path;
-	status_t error = path.SetTo(&info->ref);
-	if (error != B_OK)
+	if (path.SetTo(&info->ref) != B_OK || path.GetParent(&path) != B_OK)
 		return false;
 
-	int len = strlen(path.Path());
-	int prefixLen = strlen(kSystemAppPathPrefix);
-	return (len > prefixLen
-		&& strncmp(path.Path(), kSystemAppPathPrefix, prefixLen) == 0);
+	return !strcmp(path.Path(), kSystemAppPath)
+		|| !strcmp(path.Path(), kSystemServerPath);
 }
 
+
 status_t
-TRoster::_LoadRosterSettings(const char *path)
+TRoster::_LoadRosterSettings(const char* path)
 {
 	BPath _path;
-	const char *settingsPath
+	const char* settingsPath
 		= path ? path : get_default_roster_settings_file(_path);
 
 	RosterSettingsCharStream stream;
@@ -1806,7 +1827,7 @@ TRoster::_LoadRosterSettings(const char *path)
 	if (!error)
 		error = file.GetSize(&size);
 
-	char *data = NULL;
+	char* data = NULL;
 
 	if (!error) {
 		data = new(nothrow) char[size];
@@ -1859,9 +1880,9 @@ TRoster::_LoadRosterSettings(const char *path)
 					case etFolder:
 					{
 						// For curing laziness
-						std::list<recent_entry*> *list = (type == etDoc)
-						                                 ? &fRecentDocuments.fEntryList
-						                                 : &fRecentFolders.fEntryList;
+						std::list<recent_entry*>* list = type == etDoc
+							? &fRecentDocuments.fEntryList
+							: &fRecentFolders.fEntryList;
 
 						char path[B_PATH_NAME_LENGTH];
 						char app[B_PATH_NAME_LENGTH];
@@ -1888,9 +1909,10 @@ TRoster::_LoadRosterSettings(const char *path)
 								if (index == ULONG_MAX)
 									streamError = errno;
 							}
-							recent_entry *entry = NULL;
+							recent_entry* entry = NULL;
 							if (!streamError) {
-								entry = new(nothrow) recent_entry(&ref, app, index);
+								entry = new(nothrow) recent_entry(&ref, app,
+									index);
 								streamError = entry ? B_OK : B_NO_MEMORY;
 							}
 							if (!streamError) {
@@ -1949,18 +1971,20 @@ TRoster::_LoadRosterSettings(const char *path)
 		fRecentApps.Print();
 		printf("----------------------------------------------------------------------\n");
 	}
-	if (error)
-		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster settings "
-		         "from '%s', 0x%lx\n", settingsPath, error)));
+	if (error) {
+		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster "
+			"settings from '%s', 0x%lx\n", settingsPath, error)));
+	}
 	return error;
 }
 
+
 status_t
-TRoster::_SaveRosterSettings(const char *path)
+TRoster::_SaveRosterSettings(const char* path)
 {
 	BPath _path;
-	const char *settingsPath
-		= path ? path : get_default_roster_settings_file(_path);
+	const char* settingsPath
+		= path != NULL ? path : get_default_roster_settings_file(_path);
 
 	status_t error;
 	FILE* file;
@@ -1970,40 +1994,22 @@ TRoster::_SaveRosterSettings(const char *path)
 	if (!error) {
 		status_t saveError;
 		saveError = fRecentDocuments.Save(file, "Recent documents", "RecentDoc");
-		if (saveError)
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent documents save failed "
-			         "with error 0x%lx\n", saveError)));
+		if (saveError) {
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent documents save "
+				"failed with error 0x%lx\n", saveError)));
+		}
 		saveError = fRecentFolders.Save(file, "Recent folders", "RecentFolder");
-		if (saveError)
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save failed "
-			         "with error 0x%lx\n", saveError)));
+		if (saveError) {
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save "
+				"failed with error 0x%lx\n", saveError)));
+		}
 		saveError = fRecentApps.Save(file);
-		if (saveError)
-			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save failed "
-			         "with error 0x%lx\n", saveError)));
+		if (saveError) {
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save "
+				"failed with error 0x%lx\n", saveError)));
+		}
 		fclose(file);
 	}
 
 	return error;
 }
-
-
-//	#pragma mark - Private local functions
-
-
-/*! \brief Returns true if entry1's index is larger than entry2's index.
-
-	Also returns true if either entry is \c NULL.
-
-	Used for sorting the recent entry lists loaded from disk into the
-	proper order.
-*/
-bool
-larger_index(const recent_entry *entry1, const recent_entry *entry2)
-{
-	if (entry1 && entry2)
-		return entry1->index > entry2->index;
-	else
-		return true;
-}
-
