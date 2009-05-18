@@ -44,6 +44,11 @@ static translation_format sOutputFormats[] = {
 };
 
 
+static TranSetting sDefaultSettings[] = {
+	{ HVIF_SETTING_RENDER_SIZE, TRAN_SETTING_INT32, 64 }
+};
+
+
 BTranslator *
 make_nth_translator(int32 n, image_id image, uint32 flags, ...)
 {
@@ -58,8 +63,9 @@ HVIFTranslator::HVIFTranslator()
 			HVIF_TRANSLATOR_VERSION, sInputFormats,
 			sizeof(sInputFormats) / sizeof(sInputFormats[0]), sOutputFormats,
 			sizeof(sOutputFormats) / sizeof(sOutputFormats[0]),
-			"HVIFTranslator_Settings", NULL, 0, B_TRANSLATOR_BITMAP,
-			HVIF_FORMAT_CODE)
+			"HVIFTranslator_Settings", sDefaultSettings,
+			sizeof(sDefaultSettings) / sizeof(sDefaultSettings[0]),
+			B_TRANSLATOR_BITMAP, HVIF_FORMAT_CODE)
 {
 }
 
@@ -134,7 +140,12 @@ HVIFTranslator::DerivedTranslate(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 	}
 
-	BBitmap rendered(BRect(0, 0, 63, 63), B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+	int32 renderSize = fSettings->SetGetInt32(HVIF_SETTING_RENDER_SIZE);
+	if (renderSize <= 0 || renderSize > 1024)
+		renderSize = 64;
+
+	BBitmap rendered(BRect(0, 0, renderSize - 1, renderSize - 1),
+		B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 	if (BIconUtils::GetVectorIcon(buffer, size, &rendered) != B_OK) {
 		free(buffer);
 		return B_NO_TRANSLATOR;
@@ -158,5 +169,5 @@ BView *
 HVIFTranslator::NewConfigView(TranslatorSettings *settings)
 {
 	return new HVIFView(BRect(0, 0, 250, 150), "HVIFTranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW);
+		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }

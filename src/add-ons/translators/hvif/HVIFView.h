@@ -8,12 +8,23 @@
 #ifndef HVIF_VIEW_H
 #define HVIF_VIEW_H
 
+#include "TranslatorSettings.h"
+
+#include <Slider.h>
 #include <View.h>
 
 class HVIFView : public BView {
 public:
 							HVIFView(const BRect &frame, const char *name,
-								uint32 resizeMode, uint32 flags);
+								uint32 resizeMode, uint32 flags,
+								TranslatorSettings *settings);
+
+virtual	void				AttachedToWindow();
+virtual	void				MessageReceived(BMessage *message);
+
+private:
+		BSlider *			fRenderSize;
+		TranslatorSettings *fSettings;
 };
 
 #endif	// HVIF_VIEW_H

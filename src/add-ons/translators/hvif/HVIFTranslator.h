@@ -11,6 +11,7 @@
 #include "BaseTranslator.h"
 
 #define HVIF_TRANSLATOR_VERSION		B_TRANSLATION_MAKE_VERSION(1, 0, 0)
+#define HVIF_SETTING_RENDER_SIZE	"hvif /renderSize"
 
 class HVIFTranslator : public BaseTranslator {
 public:
