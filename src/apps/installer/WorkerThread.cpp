@@ -381,7 +381,7 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 	}
 	if (entries != 0
 		&& ((new BAlert("", "The target volume is not empty. Are you sure you "
-			"want to install anyways?", "Install Anyways", "Cancel", 0,
+			"want to install anyway?", "Install Anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		err = B_CANCELED;
 		goto error;
@@ -535,7 +535,7 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
 
 	if (partition->ContentSize() < 20 * 1024 * 1024) {
-		// reject partitions which are too small anyways
+		// reject partitions which are too small anyway
 		// TODO: Could depend on the source size
 		printf("  too small\n");
 		return false;
@@ -583,7 +583,7 @@ TargetVisitor::_MakeLabel(BPartition* partition, char* label, char* menuLabel,
 		const char* type = partition->ContentType();
 		if (type == NULL)
 			type = "Unknown Type";
-	
+
 		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
 			path.Path(), type);
 	} else {
