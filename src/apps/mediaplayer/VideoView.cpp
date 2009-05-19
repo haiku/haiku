@@ -97,7 +97,7 @@ VideoView::Pulse()
 		return;
 
 	bigtime_t now = system_time();
-	if (now - fLastMouseMove > 5LL * 1000000) {
+	if (now - fLastMouseMove > 2LL * 1000000) {
 		fLastMouseMove = now;
 		// take care of disabling the screen saver
 		BPoint where;
