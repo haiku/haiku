@@ -12,13 +12,17 @@ resource(3, "META:S:DESC") #'MSDC' "Source Code";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "asm",
+	"extensions" = "bas",
 	"extensions" = "c",
 	"extensions" = "cc",
 	"extensions" = "cpp",
 	"extensions" = "h",
 	"extensions" = "h++",
+	"extensions" = "inc",
 	"extensions" = "java",
+	"extensions" = "pas",
 	"extensions" = "pl",
+	"extensions" = "pp",
 	"extensions" = "py",
 	"extensions" = "S",
 	"type" = "text/x-source-code"
