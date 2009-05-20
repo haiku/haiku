@@ -72,11 +72,16 @@ struct team_arg {
 };
 
 struct fork_arg {
-	area_id		user_stack_area;
-	addr_t		user_stack_base;
-	size_t		user_stack_size;
-	addr_t		user_local_storage;
-	sigset_t	sig_block_mask;
+	area_id				user_stack_area;
+	addr_t				user_stack_base;
+	size_t				user_stack_size;
+	addr_t				user_local_storage;
+	sigset_t			sig_block_mask;
+	struct sigaction	sig_action[32];
+	addr_t				signal_stack_base;
+	size_t				signal_stack_size;
+	bool				signal_stack_enabled;
+
 	struct user_thread* user_thread;
 
 	struct arch_fork_arg arch_info;
@@ -1458,6 +1463,11 @@ fork_team_thread_start(void *_args)
 	thread->user_local_storage = forkArgs->user_local_storage;
 	thread->sig_block_mask = forkArgs->sig_block_mask;
 	thread->user_thread = forkArgs->user_thread;
+	memcpy(thread->sig_action, forkArgs->sig_action,
+		sizeof(forkArgs->sig_action));
+	thread->signal_stack_base = forkArgs->signal_stack_base;
+	thread->signal_stack_size = forkArgs->signal_stack_size;
+	thread->signal_stack_enabled = forkArgs->signal_stack_enabled;
 
 	arch_thread_init_tls(thread);
 
@@ -1587,6 +1597,12 @@ fork_team(void)
 	forkArgs->user_stack_size = parentThread->user_stack_size;
 	forkArgs->user_local_storage = parentThread->user_local_storage;
 	forkArgs->sig_block_mask = parentThread->sig_block_mask;
+	memcpy(forkArgs->sig_action, parentThread->sig_action,
+		sizeof(forkArgs->sig_action));
+	forkArgs->signal_stack_base = parentThread->signal_stack_base;
+	forkArgs->signal_stack_size = parentThread->signal_stack_size;
+	forkArgs->signal_stack_enabled = parentThread->signal_stack_enabled;
+
 	arch_store_fork_frame(&forkArgs->arch_info);
 
 	// copy image list
