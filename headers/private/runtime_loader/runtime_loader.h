@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -20,6 +21,7 @@
 
 
 struct user_space_program_args;
+struct SymbolLookupInfo;
 
 struct rld_export {
 	// runtime loader API export
@@ -66,6 +68,13 @@ typedef struct elf_region_t {
 	uint32		flags;
 } elf_region_t;
 
+typedef struct elf_version_info {
+	uint32		hash;			// version name hash
+	const char	*name;			// version name
+	const char	*file_name;		// dependency file name (needed versions only)
+	bool		hidden;			// version hidden (needed versions only)
+} elf_version_info;
+
 typedef struct image_t {
 	// image identification
 	char				path[B_PATH_NAME_LENGTH];
@@ -100,9 +109,26 @@ typedef struct image_t {
 	uint32				num_needed;
 	struct image_t		**needed;
 
+	// versioning related structures
+	uint32				num_version_definitions;
+	struct Elf32_Verdef	*version_definitions;
+	uint32				num_needed_versions;
+	struct Elf32_Verneed *needed_versions;
+	Elf32_Versym		*symbol_versions;
+	elf_version_info	*versions;
+	uint32				num_versions;
+
+#ifdef __cplusplus
 	struct Elf32_Sym*	(*find_undefined_symbol)(struct image_t* rootImage,
-							struct image_t* image, const char* name,
+							struct image_t* image,
+							const SymbolLookupInfo& lookupInfo,
 							struct image_t** foundInImage);
+#else
+	struct Elf32_Sym*	(*find_undefined_symbol)(struct image_t* rootImage,
+							struct image_t* image,
+							const struct SymbolLookupInfo* lookupInfo,
+							struct image_t** foundInImage);
+#endif
 
 	// Singly-linked list of symbol patchers for symbols defined respectively
 	// referenced by this image.

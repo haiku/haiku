@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <algorithm>
+
 
 //#define TRACE_RLD
 #ifdef TRACE_RLD
@@ -114,7 +116,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			// copy what's left (when the application name is removed)
 			if (lastSlash != NULL) {
 				strlcpy(buffer, programPath,
-					min((int)pathLength, lastSlash + 1 - programPath));
+					std::min((long)pathLength, lastSlash + 1 - programPath));
 			} else
 				strlcpy(buffer, ".", pathLength);
 

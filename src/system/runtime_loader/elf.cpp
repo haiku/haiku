@@ -87,6 +87,10 @@ enum {
 
 typedef void (*init_term_function)(image_id);
 
+static Elf32_Sym* find_symbol(image_t* image,
+	const SymbolLookupInfo& lookupInfo);
+static uint32 elf_hash(const uint8 *name);
+
 
 // image events
 enum {
@@ -128,6 +132,41 @@ struct RuntimeLoaderSymbolPatcher {
 };
 
 
+struct SymbolLookupInfo {
+	const char*				name;
+	int32					type;
+	uint32					hash;
+	uint32					flags;
+	const elf_version_info*	version;
+
+	SymbolLookupInfo(const char* name, int32 type, uint32 hash,
+		const elf_version_info* version = NULL, uint32 flags = 0)
+		:
+		name(name),
+		type(type),
+		hash(hash),
+		flags(flags),
+		version(version)
+	{
+	}
+
+	SymbolLookupInfo(const char* name, int32 type,
+		const elf_version_info* version = NULL, uint32 flags = 0)
+		:
+		name(name),
+		type(type),
+		hash(elf_hash((const uint8*)name)),
+		flags(flags),
+		version(version)
+	{
+	}
+};
+
+
+// values for SymbolLookupInfo::flags
+#define LOOKUP_FLAG_DEFAULT_VERSION	0x01
+
+
 static image_queue_t sLoadedImages = {0, 0};
 static image_queue_t sDisposableImages = {0, 0};
 static uint32 sLoadedImageCount = 0;
@@ -146,10 +185,6 @@ static thread_id sSemOwner;
 static int32 sSemCount;
 
 extern runtime_loader_add_on_export gRuntimeLoaderAddOnExport;
-
-
-static struct Elf32_Sym* find_symbol(image_t* image, const char* name,
-	int32 type);
 
 
 void
@@ -519,6 +554,7 @@ delete_image_struct(image_t *image)
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
 #endif
 	free(image->needed);
+	free(image->versions);
 
 	while (RuntimeLoaderSymbolPatcher* patcher
 			= image->defined_symbol_patchers) {
@@ -707,7 +743,8 @@ analyze_image_haiku_version_and_abi(image_t* image)
 {
 	// Haiku API version
 	struct Elf32_Sym* symbol = find_symbol(image,
-		B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME, B_SYMBOL_TYPE_DATA);
+		SymbolLookupInfo(B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME,
+			B_SYMBOL_TYPE_DATA));
 	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 		&& symbol->st_value > 0
 		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
@@ -718,8 +755,9 @@ analyze_image_haiku_version_and_abi(image_t* image)
 		image->api_version = 0;
 
 	// Haiku ABI
-	symbol = find_symbol(image, B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME,
-		B_SYMBOL_TYPE_DATA);
+	symbol = find_symbol(image,
+		SymbolLookupInfo(B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME,
+			B_SYMBOL_TYPE_DATA));
 	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 		&& symbol->st_value > 0
 		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
@@ -1111,6 +1149,24 @@ parse_dynamic_segment(image_t *image)
 			case DT_SONAME:
 				sonameOffset = d[i].d_un.d_val;
 				break;
+			case DT_VERSYM:
+				image->symbol_versions = (Elf32_Versym*)
+					(d[i].d_un.d_ptr + image->regions[0].delta);
+				break;
+			case DT_VERDEF:
+				image->version_definitions = (Elf32_Verdef*)
+					(d[i].d_un.d_ptr + image->regions[0].delta);
+				break;
+			case DT_VERDEFNUM:
+				image->num_version_definitions = d[i].d_un.d_val;
+				break;
+			case DT_VERNEED:
+				image->needed_versions = (Elf32_Verneed*)
+					(d[i].d_un.d_ptr + image->regions[0].delta);
+				break;
+			case DT_VERNEEDNUM:
+				image->num_needed_versions = d[i].d_un.d_val;
+				break;
 			default:
 				continue;
 		}
@@ -1231,50 +1287,147 @@ runtime_loader_add_on_export gRuntimeLoaderAddOnExport = {
 };
 
 
-static struct Elf32_Sym *
-find_symbol(image_t *image, const char *name, int32 type)
+static bool
+equals_image_name(image_t* image, const char* name)
 {
-	uint32 hash, i;
+	const char* lastSlash = strrchr(name, '/');
+	return strcmp(image->name, lastSlash != NULL ? lastSlash + 1 : name) == 0;
+}
 
-	// ToDo: "type" is currently ignored!
-	(void)type;
 
+static Elf32_Sym*
+find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
+{
 	if (image->dynamic_ptr == 0)
 		return NULL;
 
-	hash = elf_hash((uint8 *)name) % HASHTABSIZE(image);
+	Elf32_Sym* versionedSymbol = NULL;
+	uint32 versionedSymbolCount = 0;
 
-	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF; i = HASHCHAINS(image)[i]) {
-		struct Elf32_Sym *symbol = &image->syms[i];
+	uint32 bucket = lookupInfo.hash % HASHTABSIZE(image);
+
+	for (uint32 i = HASHBUCKETS(image)[bucket]; i != STN_UNDEF;
+			i = HASHCHAINS(image)[i]) {
+		struct Elf32_Sym* symbol = &image->syms[i];
 
 		if (symbol->st_shndx != SHN_UNDEF
 			&& ((ELF32_ST_BIND(symbol->st_info)== STB_GLOBAL)
 				|| (ELF32_ST_BIND(symbol->st_info) == STB_WEAK))
-			&& !strcmp(SYMNAME(image, symbol), name)) {
+			&& !strcmp(SYMNAME(image, symbol), lookupInfo.name)) {
+
 			// check if the type matches
-			if ((type == B_SYMBOL_TYPE_TEXT && ELF32_ST_TYPE(symbol->st_info) != STT_FUNC)
-				|| (type == B_SYMBOL_TYPE_DATA && ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT))
+			uint32 type = ELF32_ST_TYPE(symbol->st_info);
+			if ((lookupInfo.type == B_SYMBOL_TYPE_TEXT && type != STT_FUNC)
+				|| (lookupInfo.type == B_SYMBOL_TYPE_DATA
+					&& type != STT_OBJECT)) {
+				continue;
+			}
+
+			// check the version
+
+			// Handle the simple cases -- the image doesn't have version
+			// information -- first.
+			if (image->symbol_versions == NULL) {
+				if (lookupInfo.version == NULL) {
+					// No specific symbol version was requested either, so the
+					// symbol is just fine.
+					return symbol;
+				}
+
+				// A specific version is requested. If it's the dependency
+				// referred to by the requested version, it's apparently an
+				// older version of the dependency and we're not happy.
+				if (equals_image_name(image, lookupInfo.version->file_name)) {
+					// TODO: That should actually be kind of fatal!
+					return NULL;
+				}
+
+				// This is some other image. We accept the symbol.
+				return symbol;
+			}
+
+			// The image has version information. Let's see what we've got.
+			uint32 versionID = image->symbol_versions[i];
+			uint32 versionIndex = VER_NDX(versionID);
+			elf_version_info& version = image->versions[versionIndex];
+
+			// skip local versions
+			if (versionIndex == VER_NDX_LOCAL)
 				continue;
 
-			return symbol;
+			if (lookupInfo.version != NULL) {
+				// a specific version is requested
+
+				// compare the versions
+				if (version.hash == lookupInfo.version->hash
+					&& strcmp(version.name, lookupInfo.version->name) == 0) {
+					// versions match
+					return symbol;
+				}
+
+				// The versions don't match. We're still fine with the
+				// base version, if it is public and we're not looking for
+				// the default version.
+				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0
+					&& versionIndex == VER_NDX_GLOBAL
+					&& (lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION)
+						== 0) {
+					// TODO: Revise the default version case! That's how
+					// FreeBSD implements it, but glibc doesn't handle it
+					// specially.
+					return symbol;
+				}
+			} else {
+				// No specific version requested, but the image has version
+				// information. This can happen in either of these cases:
+				//
+				// * The dependent object was linked against an older version
+				//   of the now versioned dependency.
+				// * The symbol is looked up via find_image_symbol() or dlsym().
+				//
+				// In the first case we return the base version of the symbol
+				// (VER_NDX_GLOBAL or VER_NDX_INITIAL), or, if that doesn't
+				// exist, the unique, non-hidden versioned symbol.
+				//
+				// In the second case we want to return the public default
+				// version of the symbol. The handling is pretty similar to the
+				// first case, with the exception that we treat VER_NDX_INITIAL
+				// as regular version.
+
+				// VER_NDX_GLOBAL is always good, VER_NDX_INITIAL is fine, if
+				// we don't look for the default version.
+				if (versionIndex == VER_NDX_GLOBAL
+					|| ((lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION) == 0
+						&& versionIndex == VER_NDX_INITIAL)) {
+					return symbol;
+				}
+
+				// If not hidden, remember the version -- we'll return it, if
+				// it is the only one.
+				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0) {
+					versionedSymbolCount++;
+					versionedSymbol = symbol;
+				}
+			}
 		}
 	}
 
-	return NULL;
+	return versionedSymbolCount == 1 ? versionedSymbol : NULL;
 }
 
 
 static status_t
-find_symbol(image_t* image, char const* symbolName, int32 symbolType,
+find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo,
 	void **_location)
 {
 	// get the symbol in the image
-	struct Elf32_Sym* symbol = find_symbol(image, symbolName, symbolType);
+	struct Elf32_Sym* symbol = find_symbol(image, lookupInfo);
 	if (symbol == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	void* location = (void*)(symbol->st_value + image->regions[0].delta);
-	patch_defined_symbol(image, symbolName, &location, &symbolType);
+	int32 symbolType = lookupInfo.type;
+	patch_defined_symbol(image, lookupInfo.name, &location, &symbolType);
 
 	if (_location != NULL)
 		*_location = location;
@@ -1284,7 +1437,7 @@ find_symbol(image_t* image, char const* symbolName, int32 symbolType,
 
 
 static status_t
-find_symbol_breadth_first(image_t* image, const char* name, int32 type,
+find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
 	image_t** _foundInImage, void** _location)
 {
 	image_t* queue[sLoadedImageCount];
@@ -1298,7 +1451,7 @@ find_symbol_breadth_first(image_t* image, const char* name, int32 type,
 		// pop next image
 		image = queue[index++];
 
-		if (find_symbol(image, name, type, _location) == B_OK) {
+		if (find_symbol(image, lookupInfo, _location) == B_OK) {
 			found = true;
 			break;
 		}
@@ -1322,16 +1475,16 @@ find_symbol_breadth_first(image_t* image, const char* name, int32 type,
 
 
 static struct Elf32_Sym*
-find_undefined_symbol_beos(image_t* rootImage, image_t* image, const char* name,
-	image_t** foundInImage)
+find_undefined_symbol_beos(image_t* rootImage, image_t* image,
+	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
 	// BeOS style symbol resolution: It is sufficient to check the direct
 	// dependencies. The linker would have complained, if the symbol wasn't
 	// there.
 	for (uint32 i = 0; i < image->num_needed; i++) {
 		if (image->needed[i]->dynamic_ptr) {
-			struct Elf32_Sym *symbol = find_symbol(image->needed[i], name,
-				B_SYMBOL_TYPE_ANY);
+			struct Elf32_Sym *symbol = find_symbol(image->needed[i],
+				lookupInfo);
 			if (symbol) {
 				*foundInImage = image->needed[i];
 				return symbol;
@@ -1345,7 +1498,7 @@ find_undefined_symbol_beos(image_t* rootImage, image_t* image, const char* name,
 
 static struct Elf32_Sym*
 find_undefined_symbol_global(image_t* rootImage, image_t* image,
-	const char* name, image_t** foundInImage)
+	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
 	// Global load order symbol resolution: All loaded images are searched for
 	// the symbol in the order they have been loaded. We skip add-on images and
@@ -1356,8 +1509,7 @@ find_undefined_symbol_global(image_t* rootImage, image_t* image,
 			|| (otherImage->type != B_ADD_ON_IMAGE
 				&& (otherImage->flags
 					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
-			struct Elf32_Sym *symbol = find_symbol(otherImage, name,
-				B_SYMBOL_TYPE_ANY);
+			struct Elf32_Sym *symbol = find_symbol(otherImage, lookupInfo);
 			if (symbol) {
 				*foundInImage = otherImage;
 				return symbol;
@@ -1372,7 +1524,7 @@ find_undefined_symbol_global(image_t* rootImage, image_t* image,
 
 static struct Elf32_Sym*
 find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
-	const char* name, image_t** foundInImage)
+	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
 // TODO: How do we want to implement this one? Using global scope resolution
 // might be undesired as it is now, since libraries could refer to symbols in
@@ -1381,7 +1533,8 @@ find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
 // skip the add-on, or to do breadth-first resolution in the add-on dependency
 // scope, also skipping the add-on itself. BeOS style resolution is safe, too,
 // but we miss out features like undefined symbols and preloading.
-	return find_undefined_symbol_beos(rootImage, image, name, foundInImage);
+	return find_undefined_symbol_beos(rootImage, image, lookupInfo,
+		foundInImage);
 }
 
 
@@ -1426,14 +1579,22 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 		{
 			struct Elf32_Sym *sharedSym;
 			image_t *sharedImage;
-			const char *symName;
+			const char *symName = SYMNAME(image, sym);
 
 			// patch the symbol name
-			symName = SYMNAME(image, sym);
 			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
 				// The image has been compiled with a BeOS compiler. This means
 				// we'll have to redirect some functions for compatibility.
 				symName = beos_compatibility_map_symbol(symName);
+			}
+
+			// get the version info
+			const elf_version_info* versionInfo = NULL;
+			if (image->symbol_versions != NULL) {
+				uint32 index = sym - image->syms;
+				uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
+				if (versionIndex >= VER_NDX_INITIAL)
+					versionInfo = image->versions + versionIndex;
 			}
 
 			int32 type = B_SYMBOL_TYPE_ANY;
@@ -1444,7 +1605,7 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 
 			// it's undefined, must be outside this image, try the other images
 			sharedSym = rootImage->find_undefined_symbol(rootImage, image,
-				symName, &sharedImage);
+				SymbolLookupInfo(symName, type, versionInfo), &sharedImage);
 			void* location = NULL;
 
 			enum {
@@ -1554,6 +1715,193 @@ image_event(image_t* image, uint32 event)
 		if (function != NULL)
 			function(image);
 	}
+}
+
+
+static status_t
+init_image_version_infos(image_t* image)
+{
+	// First find out how many version infos we need -- i.e. get the greatest
+	// version index from the defined and needed versions (they use the same
+	// index namespace).
+	uint32 maxIndex = 0;
+
+	if (image->version_definitions != NULL) {
+		Elf32_Verdef* definition = image->version_definitions;
+		for (uint32 i = 0; i < image->num_version_definitions; i++) {
+			if (definition->vd_version != 1) {
+				FATAL("Unsupported version definition revision: %u\n",
+					definition->vd_version);
+				return B_BAD_VALUE;
+			}
+
+			uint32 versionIndex = VER_NDX(definition->vd_ndx);
+			if (versionIndex > maxIndex)
+				maxIndex = versionIndex;
+
+			definition = (Elf32_Verdef*)
+				((uint8*)definition	+ definition->vd_next);
+		}
+	}
+
+	if (image->needed_versions != NULL) {
+		Elf32_Verneed* needed = image->needed_versions;
+		for (uint32 i = 0; i < image->num_needed_versions; i++) {
+			if (needed->vn_version != 1) {
+				FATAL("Unsupported version needed revision: %u\n",
+					needed->vn_version);
+				return B_BAD_VALUE;
+			}
+
+			Elf32_Vernaux* vernaux
+				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			for (uint32 k = 0; k < needed->vn_cnt; k++) {
+				uint32 versionIndex = VER_NDX(vernaux->vna_other);
+				if (versionIndex > maxIndex)
+					maxIndex = versionIndex;
+
+				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			}
+
+			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		}
+	}
+
+	if (maxIndex == 0)
+		return B_OK;
+
+	// allocate the version infos
+	image->versions
+		= (elf_version_info*)malloc(sizeof(elf_version_info) * (maxIndex + 1));
+	if (image->versions == NULL) {
+		FATAL("Memory shortage in init_image_version_infos()");
+		return B_NO_MEMORY;
+	}
+	image->num_versions = maxIndex + 1;
+
+	// init the version infos
+
+	// version definitions
+	if (image->version_definitions != NULL) {
+		Elf32_Verdef* definition = image->version_definitions;
+		for (uint32 i = 0; i < image->num_version_definitions; i++) {
+			if (definition->vd_cnt > 0
+				&& (definition->vd_flags & VER_FLG_BASE) == 0) {
+				Elf32_Verdaux* verdaux
+					= (Elf32_Verdaux*)((uint8*)definition + definition->vd_aux);
+
+				uint32 versionIndex = VER_NDX(definition->vd_ndx);
+				elf_version_info& info = image->versions[versionIndex];
+				info.hash = definition->vd_hash;
+				info.name = STRING(image, verdaux->vda_name);
+			}
+
+			definition = (Elf32_Verdef*)
+				((uint8*)definition + definition->vd_next);
+		}
+	}
+
+	// needed versions
+	if (image->needed_versions != NULL) {
+		Elf32_Verneed* needed = image->needed_versions;
+		for (uint32 i = 0; i < image->num_needed_versions; i++) {
+			const char* fileName = STRING(image, needed->vn_file);
+
+			Elf32_Vernaux* vernaux
+				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			for (uint32 k = 0; k < needed->vn_cnt; k++) {
+				uint32 versionIndex = VER_NDX(vernaux->vna_other);
+				elf_version_info& info = image->versions[versionIndex];
+				info.hash = vernaux->vna_hash;
+				info.name = STRING(image, vernaux->vna_name);
+				info.file_name = fileName;
+				info.hidden = (vernaux->vna_other & VER_NDX_FLAG_HIDDEN) != 0;
+
+				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			}
+
+			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+assert_defined_image_version(image_t* dependentImage, image_t* image,
+	const elf_version_info& neededVersion, bool weak)
+{
+	// If the image doesn't have version definitions, we print a warning and
+	// succeed. Weird, but that's how glibc does it. Not unlikely we'll fail
+	// later when resolving versioned symbols.
+	if (image->version_definitions == NULL) {
+		FATAL("%s: No version information available (required by %s)\n",
+			image->name, dependentImage->name);
+		return B_OK;
+	}
+
+	// iterate through the defined versions to find the given one
+	Elf32_Verdef* definition = image->version_definitions;
+	for (uint32 i = 0; i < image->num_version_definitions; i++) {
+		uint32 versionIndex = VER_NDX(definition->vd_ndx);
+		elf_version_info& info = image->versions[versionIndex];
+
+		if (neededVersion.hash == info.hash
+			&& strcmp(neededVersion.name, info.name) == 0) {
+			return B_OK;
+		}
+
+		definition = (Elf32_Verdef*)
+			((uint8*)definition + definition->vd_next);
+	}
+
+	// version not found -- fail, if not weak
+	if (!weak) {
+		FATAL("%s: version \"%s\" not found (required by %s)\n", image->name,
+			neededVersion.name, dependentImage->name);
+		return B_MISSING_SYMBOL;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+check_needed_image_versions(image_t* image)
+{
+	if (image->needed_versions == NULL)
+		return B_OK;
+
+	Elf32_Verneed* needed = image->needed_versions;
+	for (uint32 i = 0; i < image->num_needed_versions; i++) {
+		const char* fileName = STRING(image, needed->vn_file);
+		image_t* dependency = find_image(fileName, ALL_IMAGE_TYPES);
+		if (dependency == NULL) {
+			// This can't really happen, unless the object file is broken, since
+			// the file should also appear in DT_NEEDED.
+			FATAL("Version dependency \"%s\" not found", fileName);
+			return B_FILE_NOT_FOUND;
+		}
+
+		Elf32_Vernaux* vernaux
+			= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+		for (uint32 k = 0; k < needed->vn_cnt; k++) {
+			uint32 versionIndex = VER_NDX(vernaux->vna_other);
+			elf_version_info& info = image->versions[versionIndex];
+
+			status_t error = assert_defined_image_version(image, dependency,
+				info, (vernaux->vna_flags & VER_FLG_WEAK) != 0);
+			if (error != B_OK)
+				return error;
+
+			vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+		}
+
+		needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+	}
+
+	return B_OK;
 }
 
 
@@ -1786,6 +2134,9 @@ load_container(char const *name, image_type type, const char *rpath,
 	if (image->abi == B_HAIKU_ABI_GCC_2_ANCIENT)
 		image->find_undefined_symbol = find_undefined_symbol_beos;
 
+	// init version infos
+	status = init_image_version_infos(image);
+
 	image->type = type;
 	register_image(image, fd, path);
 	image_event(image, IMAGE_EVENT_LOADED);
@@ -1924,9 +2275,19 @@ load_immediate_dependencies(image_t *image)
 static status_t
 load_dependencies(image_t* image)
 {
+	// load dependencies (breadth-first)
 	for (image_t* otherImage = image; otherImage != NULL;
 			otherImage = otherImage->next) {
 		status_t status = load_immediate_dependencies(otherImage);
+		if (status != B_OK)
+			return status;
+	}
+
+	// Check the needed versions for the given image and all newly loaded
+	// dependencies.
+	for (image_t* otherImage = image; otherImage != NULL;
+			otherImage = otherImage->next) {
+		status_t status = check_needed_image_versions(otherImage);
 		if (status != B_OK)
 			return status;
 	}
@@ -2055,8 +2416,9 @@ inject_runtime_loader_api(image_t* rootImage)
 	// API.
 	image_t* image;
 	void* _export;
-	if (find_symbol_breadth_first(rootImage, "__gRuntimeLoader",
-			B_SYMBOL_TYPE_DATA, &image, &_export) == B_OK) {
+	if (find_symbol_breadth_first(rootImage,
+			SymbolLookupInfo("__gRuntimeLoader", B_SYMBOL_TYPE_DATA), &image,
+			&_export) == B_OK) {
 		*(void**)_export = &gRuntimeLoader;
 	}
 }
@@ -2120,7 +2482,8 @@ preload_image(char const* path)
 
 	// if the image contains an add-on, register it
 	runtime_loader_add_on* addOnStruct;
-	if (find_symbol(image, "__gRuntimeLoaderAddOn", B_SYMBOL_TYPE_DATA,
+	if (find_symbol(image,
+			SymbolLookupInfo("__gRuntimeLoaderAddOn", B_SYMBOL_TYPE_DATA),
 			(void**)&addOnStruct) == B_OK) {
 		RuntimeLoaderAddOn* addOn = new(mynothrow) RuntimeLoaderAddOn(image,
 			addOnStruct);
@@ -2222,8 +2585,9 @@ load_program(char const *path, void **_entry)
 
 	// Since the images are initialized now, we no longer should use our
 	// getenv(), but use the one from libroot.so
-	find_symbol_breadth_first(sProgramImage, "getenv", B_SYMBOL_TYPE_TEXT,
-		&image, (void**)&gGetEnv);
+	find_symbol_breadth_first(sProgramImage,
+		SymbolLookupInfo("getenv", B_SYMBOL_TYPE_TEXT), &image,
+		(void**)&gGetEnv);
 
 	if (sProgramImage->entry_point == 0) {
 		status = B_NOT_AN_EXECUTABLE;
@@ -2505,10 +2869,16 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 	if (image != NULL) {
 		if (recursive) {
 			// breadth-first search in the given image and its dependencies
-			status = find_symbol_breadth_first(image, symbolName, symbolType,
+			status = find_symbol_breadth_first(image,
+				SymbolLookupInfo(symbolName, symbolType, NULL,
+					LOOKUP_FLAG_DEFAULT_VERSION),
 				&image, _location);
-		} else
-			status = find_symbol(image, symbolName, symbolType, _location);
+		} else {
+			status = find_symbol(image,
+				SymbolLookupInfo(symbolName, symbolType, NULL,
+					LOOKUP_FLAG_DEFAULT_VERSION),
+				_location);
+		}
 
 		if (status == B_OK && _inImage != NULL)
 			*_inImage = image->id;
@@ -2536,7 +2906,10 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 		// look in the default scope
 		image_t* image;
 		Elf32_Sym* symbol = find_undefined_symbol_global(sProgramImage,
-			sProgramImage, symbolName, &image);
+			sProgramImage,
+			SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_ANY, NULL,
+				LOOKUP_FLAG_DEFAULT_VERSION),
+			&image);
 		if (symbol != NULL) {
 			*_location = (void*)(symbol->st_value + image->regions[0].delta);
 			int32 symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
@@ -2581,8 +2954,9 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 					continue;
 				}
 
-				struct Elf32_Sym *symbol = find_symbol(image, symbolName,
-					B_SYMBOL_TYPE_TEXT);
+				struct Elf32_Sym *symbol = find_symbol(image,
+					SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_TEXT, NULL,
+						LOOKUP_FLAG_DEFAULT_VERSION));
 				if (symbol == NULL)
 					continue;
 
@@ -2601,8 +2975,10 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 	} else {
 		// breadth-first search in the given image and its dependencies
 		image_t* inImage;
-		status = find_symbol_breadth_first((image_t*)handle, symbolName,
-			B_SYMBOL_TYPE_ANY, &inImage, _location);
+		status = find_symbol_breadth_first((image_t*)handle,
+			SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_ANY, NULL,
+				LOOKUP_FLAG_DEFAULT_VERSION),
+			&inImage, _location);
 	}
 
 	rld_unlock();

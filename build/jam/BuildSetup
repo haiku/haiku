@@ -795,6 +795,7 @@ local buildVars =
 	PRIVATE_SYSTEM_HEADERS
 
 	LIBSTDC++ LIBSUPC++
+	STATIC_LIBSTDC++ STATIC_LIBSUPC++
 
 	NETWORK_LIBS NETAPI_LIB SELECT_UNAME_ETC_LIB
 
@@ -1035,5 +1036,6 @@ EnableWerror src kits interface ;
 EnableWerror src kits storage ;
 EnableWerror src kits support ;
 EnableWerror src system kernel ;
+EnableWerror src system runtime_loader ;
 EnableWerror src add-ons kernel file_systems bfs ;
 EnableWerror src add-ons kernel file_systems userlandfs ;

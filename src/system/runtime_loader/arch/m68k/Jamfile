@@ -6,7 +6,7 @@ UsePrivateSystemHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
 StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
-	arch_relocate.c
+	arch_relocate.cpp
 	:
 	<src!system!libroot!os!arch!$(TARGET_ARCH)>atomic.o
 	<src!system!libroot!os!arch!$(TARGET_ARCH)>thread.o

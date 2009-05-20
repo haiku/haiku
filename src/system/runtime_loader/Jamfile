@@ -13,6 +13,7 @@ SubDirC++Flags -fno-builtin -fno-exceptions ;
 DEFINES +=
 	KMESSAGE_CONTAINER_ONLY
 	_LOADER_MODE
+	USING_LIBGCC=1
 ;
 
 AddResources runtime_loader : runtime_loader.rdef ;
@@ -65,9 +66,9 @@ SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 Objects
-	runtime_loader.c
+	runtime_loader.cpp
 	elf.cpp
-	export.c
+	export.cpp
 	heap.cpp
 	utility.cpp
 ;
@@ -76,6 +77,7 @@ Ld runtime_loader :
 	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o ]
 	libruntime_loader.a
 	libruntime_loader_$(TARGET_ARCH).a
+	$(TARGET_STATIC_LIBSUPC++)
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
 ;

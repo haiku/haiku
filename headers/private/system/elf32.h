@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -21,6 +21,7 @@ typedef uint32 Elf32_Off;
 typedef int32 Elf32_Sword;
 typedef uint32 Elf32_Word;
 
+typedef Elf32_Half Elf32_Versym;
 
 /*** ELF header ***/
 
@@ -63,8 +64,8 @@ struct Elf32_Ehdr {
 #define ELFCLASS32	1
 #define ELFCLASS64	2
 // endian (EI_DATA)
-#define ELFDATA2LSB	1	// little endian
-#define ELFDATA2MSB	2	// big endian
+#define ELFDATA2LSB	1	/* little endian */
+#define ELFDATA2MSB	2	/* big endian */
 
 
 /*** section header ***/
@@ -104,6 +105,10 @@ struct Elf32_Shdr {
 #define SHT_REL			9
 #define SHT_SHLIB		10
 #define SHT_DYNSYM		11
+
+#define SHT_GNU_verdef	0x6ffffffd    /* version definition section */
+#define SHT_GNU_verneed	0x6ffffffe    /* version needs section */
+#define SHT_GNU_versym	0x6fffffff    /* version symbol table */
 
 #define SHT_LOPROC		0x70000000
 #define SHT_HIPROC		0x7fffffff
@@ -248,15 +253,100 @@ struct Elf32_Dyn {
 #define DT_TEXTREL	22
 #define DT_JMPREL	23
 
-#define DT_LOPROC	0x70000000
-#define DT_HIPROC	0x7fffffff
+#define DT_VERSYM       0x6ffffff0	/* symbol version table */
+#define DT_VERDEF		0x6ffffffc	/* version definition table */
+#define DT_VERDEFNUM	0x6ffffffd	/* number of version definitions */
+#define DT_VERNEED		0x6ffffffe 	/* table with needed versions */
+#define DT_VERNEEDNUM	0x6fffffff	/* number of needed versions */
+
+#define DT_LOPROC		0x70000000
+#define DT_HIPROC		0x7fffffff
+
+
+/* version definition section */
+
+struct Elf32_Verdef {
+	Elf32_Half	vd_version;		/* version revision */
+	Elf32_Half	vd_flags;		/* version information flags */
+	Elf32_Half	vd_ndx;			/* version index as specified in the
+								   symbol version table */
+	Elf32_Half	vd_cnt;			/* number of associated verdaux entries */
+	Elf32_Word	vd_hash;		/* version name hash value */
+	Elf32_Word	vd_aux;			/* byte offset to verdaux array */
+	Elf32_Word	vd_next;		/* byte offset to next verdef entry */
+};
+
+/* values for vd_version (version revision) */
+#define VER_DEF_NONE		0		/* no version */
+#define VER_DEF_CURRENT		1		/* current version */
+#define VER_DEF_NUM			2		/* given version number */
+
+/* values for vd_flags (version information flags) */
+#define VER_FLG_BASE		0x1		/* version definition of file itself */
+#define VER_FLG_WEAK		0x2 	/* weak version identifier */
+
+/* values for versym symbol index */
+#define VER_NDX_LOCAL		0		/* symbol is local */
+#define VER_NDX_GLOBAL		1		/* symbol is global/unversioned */
+#define VER_NDX_INITIAL		2		/* initial version -- that's the one given
+									   to symbols when a library becomes
+									   versioned; handled by the linker (and
+									   runtime loader) similar to
+									   VER_NDX_GLOBAL */
+#define VER_NDX_LORESERVE	0xff00	/* beginning of reserved entries */
+#define VER_NDX_ELIMINATE	0xff01	/* symbol is to be eliminated */
+
+#define VER_NDX_FLAG_HIDDEN	0x8000	/* flag: version is hidden */
+#define VER_NDX_MASK		0x7fff	/* mask to get the actual version index */
+#define VER_NDX(x)			((x) & VER_NDX_MASK)
+
+
+/* auxiliary version information */
+
+struct Elf32_Verdaux {
+	Elf32_Word	vda_name;		/* string table offset to version or dependency
+								   name */
+	Elf32_Word	vda_next;		/* byte offset to next verdaux entry */
+};
+
+
+/* version dependency section */
+
+struct Elf32_Verneed {
+	Elf32_Half	vn_version;		/* version of structure */
+	Elf32_Half	vn_cnt;			/* number of associated vernaux entries */
+	Elf32_Word	vn_file;		/* byte offset to file name for this
+								   dependency */
+	Elf32_Word	vn_aux;			/* byte offset to vernaux array */
+	Elf32_Word	vn_next;		/* byte offset to next verneed entry */
+};
+
+/* values for vn_version (version revision) */
+#define VER_NEED_NONE		0	/* no version */
+#define VER_NEED_CURRENT	1	/* current version */
+#define VER_NEED_NUM		2	/* given version number */
+
+
+/* auxiliary needed version information */
+
+struct Elf32_Vernaux {
+	Elf32_Word	vna_hash;		/* dependency name hash value */
+	Elf32_Half	vna_flags;		/* dependency specific information flags */
+	Elf32_Half	vna_other;		/* version index as specified in the symbol
+								   version table */
+	Elf32_Word	vna_name;		/* string table offset to dependency name */
+	Elf32_Word	vna_next;		/* byte offset to next vernaux entry */
+};
+
+/* values for vna_flags */
+#define VER_FLG_WEAK	0x2		/* weak version identifier */
 
 
 /*** inline functions ***/
 
 #ifdef __cplusplus
 
-inline bool 
+inline bool
 Elf32_Ehdr::IsHostEndian() const
 {
 #if B_HOST_IS_LENDIAN
@@ -267,7 +357,7 @@ Elf32_Ehdr::IsHostEndian() const
 }
 
 
-inline bool 
+inline bool
 Elf32_Phdr::IsReadWrite() const
 {
 	return !(~p_flags & (PF_READ | PF_WRITE));
@@ -281,28 +371,28 @@ Elf32_Phdr::IsExecutable() const
 }
 
 
-inline uint8 
+inline uint8
 Elf32_Sym::Bind() const
 {
 	return ELF32_ST_BIND(st_info);
 }
 
 
-inline uint8 
+inline uint8
 Elf32_Sym::Type() const
 {
 	return ELF32_ST_TYPE(st_info);
 }
 
 
-inline uint8 
+inline uint8
 Elf32_Rel::SymbolIndex() const
 {
 	return ELF32_R_SYM(r_info);
 }
 
 
-inline uint8 
+inline uint8
 Elf32_Rel::Type() const
 {
 	return ELF32_R_TYPE(r_info);
