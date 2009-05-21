@@ -13,6 +13,9 @@
 #include <image.h>
 
 
+struct elf_version_info;
+
+
 typedef struct elf_region {
 	area_id		id;
 	addr_t		start;
@@ -49,6 +52,15 @@ struct elf_image_info {
 	struct Elf32_Sym *debug_symbols;
 	uint32		num_debug_symbols;
 	const char	*debug_string_table;
+
+	// versioning related structures
+	uint32				num_version_definitions;
+	struct Elf32_Verdef	*version_definitions;
+	uint32				num_needed_versions;
+	struct Elf32_Verneed *needed_versions;
+	Elf32_Versym		*symbol_versions;
+	struct elf_version_info	*versions;
+	uint32				num_versions;
 };
 
 

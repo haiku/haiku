@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -61,7 +62,7 @@ static bool sInitialized = false;
 
 
 static struct Elf32_Sym *elf_find_symbol(struct elf_image_info *image,
-	const char *name);
+	const char *name, const elf_version_info *version, bool lookupDefault);
 
 
 /*! Calculates hash for an image using its ID */
@@ -118,7 +119,7 @@ register_elf_image(struct elf_image_info *image)
 		// Haiku API version
 		imageInfo.api_version = 0;
 		struct Elf32_Sym* symbol = elf_find_symbol(image,
-			B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME);
+			B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 			&& symbol->st_value > 0
 			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
@@ -134,7 +135,7 @@ register_elf_image(struct elf_image_info *image)
 		// Haiku ABI
 		imageInfo.abi = 0;
 		symbol = elf_find_symbol(image,
-			B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME);
+			B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 			&& symbol->st_value > 0
 			&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
@@ -268,6 +269,27 @@ create_image_struct()
 	image->ref_count = 1;
 
 	return image;
+}
+
+
+static void
+delete_elf_image(struct elf_image_info *image)
+{
+	if (image->text_region.id >= 0)
+		delete_area(image->text_region.id);
+
+	if (image->data_region.id >= 0)
+		delete_area(image->data_region.id);
+
+	if (image->vnode)
+		vfs_put_vnode(image->vnode);
+
+	free(image->versions);
+	free(image->debug_symbols);
+	free((void*)image->debug_string_table);
+	free(image->elf_header);
+	free(image->name);
+	free(image);
 }
 
 
@@ -566,19 +588,105 @@ void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 
 
 static struct Elf32_Sym *
-elf_find_symbol(struct elf_image_info *image, const char *name)
+elf_find_symbol(struct elf_image_info *image, const char *name,
+	const elf_version_info *lookupVersion, bool lookupDefault)
 {
 	if (image->dynamic_section == 0 || HASHTABSIZE(image) == 0)
 		return NULL;
 
+	Elf32_Sym* versionedSymbol = NULL;
+	uint32 versionedSymbolCount = 0;
+
 	uint32 hash = elf_hash(name) % HASHTABSIZE(image);
 	for (uint32 i = HASHBUCKETS(image)[hash]; i != STN_UNDEF;
 			i = HASHCHAINS(image)[i]) {
-		if (!strcmp(SYMNAME(image, &image->syms[i]), name))
-			return &image->syms[i];
+		Elf32_Sym* symbol = &image->syms[i];
+		if (strcmp(SYMNAME(image, symbol), name) != 0)
+			continue;
+
+		// check the version
+
+		// Handle the simple cases -- the image doesn't have version
+		// information -- first.
+		if (image->symbol_versions == NULL) {
+			if (lookupVersion == NULL) {
+				// No specific symbol version was requested either, so the
+				// symbol is just fine.
+				return symbol;
+			}
+
+			// A specific version is requested. Since the only possible
+			// dependency is the kernel itself, the add-on was obviously linked
+			// against a newer kernel.
+			dprintf("Kernel add-on requires version support, but the kernel "
+				"is too old.\n");
+			return NULL;
+		}
+
+		// The image has version information. Let's see what we've got.
+		uint32 versionID = image->symbol_versions[i];
+		uint32 versionIndex = VER_NDX(versionID);
+		elf_version_info& version = image->versions[versionIndex];
+
+		// skip local versions
+		if (versionIndex == VER_NDX_LOCAL)
+			continue;
+
+		if (lookupVersion != NULL) {
+			// a specific version is requested
+
+			// compare the versions
+			if (version.hash == lookupVersion->hash
+				&& strcmp(version.name, lookupVersion->name) == 0) {
+				// versions match
+				return symbol;
+			}
+
+			// The versions don't match. We're still fine with the
+			// base version, if it is public and we're not looking for
+			// the default version.
+			if ((versionID & VER_NDX_FLAG_HIDDEN) == 0
+				&& versionIndex == VER_NDX_GLOBAL
+				&& !lookupDefault) {
+				// TODO: Revise the default version case! That's how
+				// FreeBSD implements it, but glibc doesn't handle it
+				// specially.
+				return symbol;
+			}
+		} else {
+			// No specific version requested, but the image has version
+			// information. This can happen in either of these cases:
+			//
+			// * The dependent object was linked against an older version
+			//   of the now versioned dependency.
+			// * The symbol is looked up via find_image_symbol() or dlsym().
+			//
+			// In the first case we return the base version of the symbol
+			// (VER_NDX_GLOBAL or VER_NDX_INITIAL), or, if that doesn't
+			// exist, the unique, non-hidden versioned symbol.
+			//
+			// In the second case we want to return the public default
+			// version of the symbol. The handling is pretty similar to the
+			// first case, with the exception that we treat VER_NDX_INITIAL
+			// as regular version.
+
+			// VER_NDX_GLOBAL is always good, VER_NDX_INITIAL is fine, if
+			// we don't look for the default version.
+			if (versionIndex == VER_NDX_GLOBAL
+				|| (!lookupDefault && versionIndex == VER_NDX_INITIAL)) {
+				return symbol;
+			}
+
+			// If not hidden, remember the version -- we'll return it, if
+			// it is the only one.
+			if ((versionID & VER_NDX_FLAG_HIDDEN) == 0) {
+				versionedSymbolCount++;
+				versionedSymbol = symbol;
+			}
+		}
 	}
 
-	return NULL;
+	return versionedSymbolCount == 1 ? versionedSymbol : NULL;
 }
 
 
@@ -639,6 +747,24 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 			case DT_PLTREL:
 				image->pltrel_type = d[i].d_un.d_val;
 				break;
+			case DT_VERSYM:
+				image->symbol_versions = (Elf32_Versym*)
+					(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_VERDEF:
+				image->version_definitions = (Elf32_Verdef*)
+					(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_VERDEFNUM:
+				image->num_version_definitions = d[i].d_un.d_val;
+				break;
+			case DT_VERNEED:
+				image->needed_versions = (Elf32_Verneed*)
+					(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_VERNEEDNUM:
+				image->num_needed_versions = d[i].d_un.d_val;
+				break;
 
 			default:
 				continue;
@@ -658,6 +784,185 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 }
 
 
+static status_t
+assert_defined_image_version(elf_image_info* dependentImage,
+	elf_image_info* image, const elf_version_info& neededVersion, bool weak)
+{
+	// If the image doesn't have version definitions, we print a warning and
+	// succeed. Weird, but that's how glibc does it. Not unlikely we'll fail
+	// later when resolving versioned symbols.
+	if (image->version_definitions == NULL) {
+		dprintf("%s: No version information available (required by %s)\n",
+			image->name, dependentImage->name);
+		return B_OK;
+	}
+
+	// iterate through the defined versions to find the given one
+	Elf32_Verdef* definition = image->version_definitions;
+	for (uint32 i = 0; i < image->num_version_definitions; i++) {
+		uint32 versionIndex = VER_NDX(definition->vd_ndx);
+		elf_version_info& info = image->versions[versionIndex];
+
+		if (neededVersion.hash == info.hash
+			&& strcmp(neededVersion.name, info.name) == 0) {
+			return B_OK;
+		}
+
+		definition = (Elf32_Verdef*)
+			((uint8*)definition + definition->vd_next);
+	}
+
+	// version not found -- fail, if not weak
+	if (!weak) {
+		dprintf("%s: version \"%s\" not found (required by %s)\n", image->name,
+			neededVersion.name, dependentImage->name);
+		return B_MISSING_SYMBOL;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+init_image_version_infos(elf_image_info* image)
+{
+	// First find out how many version infos we need -- i.e. get the greatest
+	// version index from the defined and needed versions (they use the same
+	// index namespace).
+	uint32 maxIndex = 0;
+
+	if (image->version_definitions != NULL) {
+		Elf32_Verdef* definition = image->version_definitions;
+		for (uint32 i = 0; i < image->num_version_definitions; i++) {
+			if (definition->vd_version != 1) {
+				dprintf("Unsupported version definition revision: %u\n",
+					definition->vd_version);
+				return B_BAD_VALUE;
+			}
+
+			uint32 versionIndex = VER_NDX(definition->vd_ndx);
+			if (versionIndex > maxIndex)
+				maxIndex = versionIndex;
+
+			definition = (Elf32_Verdef*)
+				((uint8*)definition	+ definition->vd_next);
+		}
+	}
+
+	if (image->needed_versions != NULL) {
+		Elf32_Verneed* needed = image->needed_versions;
+		for (uint32 i = 0; i < image->num_needed_versions; i++) {
+			if (needed->vn_version != 1) {
+				dprintf("Unsupported version needed revision: %u\n",
+					needed->vn_version);
+				return B_BAD_VALUE;
+			}
+
+			Elf32_Vernaux* vernaux
+				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			for (uint32 k = 0; k < needed->vn_cnt; k++) {
+				uint32 versionIndex = VER_NDX(vernaux->vna_other);
+				if (versionIndex > maxIndex)
+					maxIndex = versionIndex;
+
+				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			}
+
+			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		}
+	}
+
+	if (maxIndex == 0)
+		return B_OK;
+
+	// allocate the version infos
+	image->versions
+		= (elf_version_info*)malloc(sizeof(elf_version_info) * (maxIndex + 1));
+	if (image->versions == NULL) {
+		dprintf("Memory shortage in init_image_version_infos()\n");
+		return B_NO_MEMORY;
+	}
+	image->num_versions = maxIndex + 1;
+
+	// init the version infos
+
+	// version definitions
+	if (image->version_definitions != NULL) {
+		Elf32_Verdef* definition = image->version_definitions;
+		for (uint32 i = 0; i < image->num_version_definitions; i++) {
+			if (definition->vd_cnt > 0
+				&& (definition->vd_flags & VER_FLG_BASE) == 0) {
+				Elf32_Verdaux* verdaux
+					= (Elf32_Verdaux*)((uint8*)definition + definition->vd_aux);
+
+				uint32 versionIndex = VER_NDX(definition->vd_ndx);
+				elf_version_info& info = image->versions[versionIndex];
+				info.hash = definition->vd_hash;
+				info.name = STRING(image, verdaux->vda_name);
+			}
+
+			definition = (Elf32_Verdef*)
+				((uint8*)definition + definition->vd_next);
+		}
+	}
+
+	// needed versions
+	if (image->needed_versions != NULL) {
+		Elf32_Verneed* needed = image->needed_versions;
+		for (uint32 i = 0; i < image->num_needed_versions; i++) {
+			const char* fileName = STRING(image, needed->vn_file);
+
+			Elf32_Vernaux* vernaux
+				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			for (uint32 k = 0; k < needed->vn_cnt; k++) {
+				uint32 versionIndex = VER_NDX(vernaux->vna_other);
+				elf_version_info& info = image->versions[versionIndex];
+				info.hash = vernaux->vna_hash;
+				info.name = STRING(image, vernaux->vna_name);
+				info.file_name = fileName;
+
+				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			}
+
+			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+check_needed_image_versions(elf_image_info* image)
+{
+	if (image->needed_versions == NULL)
+		return B_OK;
+
+	Elf32_Verneed* needed = image->needed_versions;
+	for (uint32 i = 0; i < image->num_needed_versions; i++) {
+		elf_image_info* dependency = sKernelImage;
+
+		Elf32_Vernaux* vernaux
+			= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+		for (uint32 k = 0; k < needed->vn_cnt; k++) {
+			uint32 versionIndex = VER_NDX(vernaux->vna_other);
+			elf_version_info& info = image->versions[versionIndex];
+
+			status_t error = assert_defined_image_version(image, dependency,
+				info, (vernaux->vna_flags & VER_FLG_WEAK) != 0);
+			if (error != B_OK)
+				return error;
+
+			vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+		}
+
+		needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+	}
+
+	return B_OK;
+}
+
+
 /*!	Resolves the \a symbol by linking against \a sharedImage if necessary.
 	Returns the resolved symbol's address in \a _symbolAddress.
 */
@@ -671,8 +976,18 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 			struct Elf32_Sym *newSymbol;
 			const char *symbolName = SYMNAME(image, symbol);
 
+			// get the version info
+			const elf_version_info* versionInfo = NULL;
+			if (image->symbol_versions != NULL) {
+				uint32 index = symbol - image->syms;
+				uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
+				if (versionIndex >= VER_NDX_INITIAL)
+					versionInfo = image->versions + versionIndex;
+			}
+
 			// it's undefined, must be outside this image, try the other image
-			newSymbol = elf_find_symbol(sharedImage, symbolName);
+			newSymbol = elf_find_symbol(sharedImage, symbolName, versionInfo,
+				false);
 			if (newSymbol == NULL) {
 				dprintf("\"%s\": could not resolve symbol '%s'\n",
 					image->name, symbolName);
@@ -778,29 +1093,16 @@ verify_eheader(struct Elf32_Ehdr *elfHeader)
 }
 
 
-static status_t
+static void
 unload_elf_image(struct elf_image_info *image)
 {
 	if (atomic_add(&image->ref_count, -1) > 1)
-		return B_OK;
+		return;
 
 	TRACE(("unload image %ld, %s\n", image->id, image->name));
 
-	delete_area(image->text_region.id);
-	delete_area(image->data_region.id);
-
-	if (image->vnode)
-		vfs_put_vnode(image->vnode);
-
 	unregister_elf_image(image);
-
-	free(image->debug_symbols);
-	free((void*)image->debug_string_table);
-	free(image->elf_header);
-	free(image->name);
-	free(image);
-
-	return B_NO_ERROR;
+	delete_elf_image(image);
 }
 
 
@@ -910,14 +1212,13 @@ error1:
 static status_t
 insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 {
-	struct elf_image_info *image;
 	status_t status;
 
 	status = verify_eheader(&preloadedImage->elf_header);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	image = create_image_struct();
+	elf_image_info *image = create_image_struct();
 	if (image == NULL)
 		return B_NO_MEMORY;
 
@@ -928,12 +1229,20 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	image->data_region = preloadedImage->data_region;
 
 	status = elf_parse_dynamic_section(image);
-	if (status < B_OK)
+	if (status != B_OK)
+		goto error1;
+
+	status = init_image_version_infos(image);
+	if (status != B_OK)
 		goto error1;
 
 	if (!kernel) {
+		status = check_needed_image_versions(image);
+		if (status != B_OK)
+			goto error1;
+
 		status = elf_relocate(image);
-		if (status < B_OK)
+		if (status != B_OK)
 			goto error1;
 	} else
 		sKernelImage = image;
@@ -972,11 +1281,8 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	return B_OK;
 
 error1:
-	free(image);
+	delete_elf_image(image);
 
-	// clean up preloaded image resources (this image won't be used anymore)
-	delete_area(preloadedImage->text_region.id);
-	delete_area(preloadedImage->data_region.id);
 	preloadedImage->id = -1;
 
 	return status;
@@ -1209,7 +1515,7 @@ get_image_symbol(image_id id, const char *name, int32 symbolClass,
 		goto done;
 	}
 
-	symbol = elf_find_symbol(image, name);
+	symbol = elf_find_symbol(image, name, NULL, true);
 	if (symbol == NULL || symbol->st_shndx == SHN_UNDEF) {
 		status = B_ENTRY_NOT_FOUND;
 		goto done;
@@ -1657,6 +1963,7 @@ load_kernel_add_on(const char *path)
 	image->vnode = vnode;
 	image->elf_header = elfHeader;
 	image->name = strdup(path);
+	vnode = NULL;
 
 	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader->e_phnum
 		* elfHeader->e_phentsize);
@@ -1812,6 +2119,14 @@ load_kernel_add_on(const char *path)
 	if (status < B_OK)
 		goto error5;
 
+	status = init_image_version_infos(image);
+	if (status != B_OK)
+		goto error5;
+
+	status = check_needed_image_versions(image);
+	if (status != B_OK)
+		goto error5;
+
 	status = elf_relocate(image);
 	if (status < B_OK)
 		goto error5;
@@ -1842,15 +2157,13 @@ done:
 	return image->id;
 
 error5:
-	delete_area(image->data_region.id);
-	delete_area(image->text_region.id);
 error4:
 	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress,
 		reservedSize);
 error3:
 	free(programHeaders);
 error2:
-	free(image);
+	delete_elf_image(image);
 error1:
 	free(elfHeader);
 error:
@@ -1870,22 +2183,15 @@ error0:
 status_t
 unload_kernel_add_on(image_id id)
 {
-	struct elf_image_info *image;
-	status_t status;
+	MutexLocker _(sImageLoadMutex);
+	MutexLocker _2(sImageMutex);
 
-	mutex_lock(&sImageLoadMutex);
-	mutex_lock(&sImageMutex);
+	elf_image_info *image = find_image(id);
+	if (image == NULL)
+		return B_BAD_IMAGE_ID;
 
-	image = find_image(id);
-	if (image != NULL)
-		status = unload_elf_image(image);
-	else
-		status = B_BAD_IMAGE_ID;
-
-	mutex_unlock(&sImageMutex);
-	mutex_unlock(&sImageLoadMutex);
-
-	return status;
+	unload_elf_image(image);
+	return B_OK;
 }
 
 
@@ -2059,9 +2365,8 @@ elf_init(kernel_args *args)
 		panic("could not create kernel image.\n");
 
 	// Build image structures for all preloaded images.
-	for (image = args->preloaded_images; image != NULL; image = image->next) {
+	for (image = args->preloaded_images; image != NULL; image = image->next)
 		insert_preloaded_image(image, false);
-	}
 
 	add_debugger_command("ls", &dump_address_info,
 		"lookup symbol for a particular address");
