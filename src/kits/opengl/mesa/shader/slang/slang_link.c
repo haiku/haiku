@@ -249,6 +249,11 @@ link_uniform_vars(GLcontext *ctx,
             _mesa_append_uniform(shProg->Uniforms, p->Name, prog->Target, i);
          if (uniform)
             uniform->Initialized = p->Initialized;
+
+	 /* Add the flag indicating that the program is dependent on constant
+	  * state.
+	  */
+	 prog->Parameters->StateFlags |= _NEW_PROGRAM;
       }
 
       /* The samplerMap[] table we build here is used to remap/re-index

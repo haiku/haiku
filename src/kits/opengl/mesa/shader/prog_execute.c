@@ -873,7 +873,7 @@ _mesa_execute_program(GLcontext * ctx,
                 * result.z = result.x * APPX(result.y)
                 * We do what the ARB extension says.
                 */
-               q[2] = (GLfloat) pow(2.0, t[0]);
+               q[2] = (GLfloat) _mesa_pow(2.0, t[0]);
             }
             q[1] = t[0] - floor_t0;
             q[3] = 1.0F;
@@ -986,7 +986,7 @@ _mesa_execute_program(GLcontext * ctx,
                if (a[1] == 0.0 && a[3] == 0.0)
                   result[2] = 1.0;
                else
-                  result[2] = EXPF(a[3] * LOGF(a[1]));
+                  result[2] = (GLfloat) _mesa_pow(a[1], a[3]);
             }
             else {
                result[2] = 0.0;
@@ -1577,8 +1577,8 @@ _mesa_execute_program(GLcontext * ctx,
       case OPCODE_TXB:         /* GL_ARB_fragment_program only */
          /* Texel lookup with LOD bias */
          {
-            const struct gl_texture_unit *texUnit
-               = &ctx->Texture.Unit[inst->TexSrcUnit];
+            const GLuint unit = machine->Samplers[inst->TexSrcUnit];
+            const struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
             GLfloat texcoord[4], color[4], lodBias;
 
             fetch_vector4(&inst->SrcReg[0], machine, texcoord);

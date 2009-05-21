@@ -1496,10 +1496,16 @@ generic_attrib_check(struct var_cache *vc_head)
    curr = vc_head;
    while (curr) {
       if (curr->type == vt_attrib) {
-         if (curr->attrib_is_generic)
-            genericAttrib[ curr->attrib_binding ] = GL_TRUE;
-         else
+         if (curr->attrib_is_generic) {
+            GLuint attr = (curr->attrib_binding == 0)
+               ? 0 : (curr->attrib_binding - VERT_ATTRIB_GENERIC0);
+            assert(attr < MAX_VERTEX_PROGRAM_ATTRIBS);
+            genericAttrib[attr] = GL_TRUE;
+         }
+         else {
+            assert(curr->attrib_binding < MAX_VERTEX_PROGRAM_ATTRIBS);
             explicitAttrib[ curr->attrib_binding ] = GL_TRUE;
+         }
       }
 
       curr = curr->next;
@@ -1823,7 +1829,6 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
                if (param_var->param_binding_begin == ~0U)
                   param_var->param_binding_begin = idx;
                param_var->param_binding_length++;
-               Program->Base.NumParameters++;
             }
          }
          else {
@@ -1832,7 +1837,6 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
             if (param_var->param_binding_begin == ~0U)
                param_var->param_binding_begin = idx;
             param_var->param_binding_length++;
-            Program->Base.NumParameters++;
          }
          break;
 
@@ -1843,7 +1847,6 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
          if (param_var->param_binding_begin == ~0U)
             param_var->param_binding_begin = idx;
          param_var->param_binding_length++;
-         Program->Base.NumParameters++;
 
          /* Check if there is more: 0 -> we're done, else its an integer */
          if (**inst) {
@@ -1879,7 +1882,6 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
                idx = _mesa_add_state_reference(Program->Base.Parameters,
                                                state_tokens);
                param_var->param_binding_length++;
-               Program->Base.NumParameters++;
             }
          }
          else {
@@ -1897,7 +1899,6 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
             param_var->param_binding_begin = idx;
          param_var->param_binding_type = PROGRAM_CONSTANT;
          param_var->param_binding_length++;
-         Program->Base.NumParameters++;
          break;
 
       default:
@@ -1906,12 +1907,14 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
          return 1;
    }
 
+   Program->Base.NumParameters = Program->Base.Parameters->NumParameters;
+
    /* Make sure we haven't blown past our parameter limits */
    if (((Program->Base.Target == GL_VERTEX_PROGRAM_ARB) &&
-        (Program->Base.NumParameters >=
+        (Program->Base.NumParameters >
          ctx->Const.VertexProgram.MaxLocalParams))
        || ((Program->Base.Target == GL_FRAGMENT_PROGRAM_ARB)
-           && (Program->Base.NumParameters >=
+           && (Program->Base.NumParameters >
                ctx->Const.FragmentProgram.MaxLocalParams))) {
       program_error(ctx, Program->Position, "Too many parameter variables");
       return 1;

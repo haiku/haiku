@@ -63,6 +63,7 @@ struct _mesa_HashTable {
    struct HashEntry *Table[TABLE_SIZE];  /**< the lookup table */
    GLuint MaxKey;                        /**< highest key inserted so far */
    _glthread_Mutex Mutex;                /**< mutual exclusion lock */
+   _glthread_Mutex WalkMutex;            /**< for _mesa_HashWalk() */
    GLboolean InDeleteAll;                /**< Debug check */
 };
 
@@ -79,6 +80,7 @@ _mesa_NewHashTable(void)
    struct _mesa_HashTable *table = CALLOC_STRUCT(_mesa_HashTable);
    if (table) {
       _glthread_INIT_MUTEX(table->Mutex);
+      _glthread_INIT_MUTEX(table->WalkMutex);
    }
    return table;
 }
@@ -111,6 +113,7 @@ _mesa_DeleteHashTable(struct _mesa_HashTable *table)
       }
    }
    _glthread_DESTROY_MUTEX(table->Mutex);
+   _glthread_DESTROY_MUTEX(table->WalkMutex);
    _mesa_free(table);
 }
 
@@ -285,6 +288,11 @@ _mesa_HashDeleteAll(struct _mesa_HashTable *table,
 
 /**
  * Walk over all entries in a hash table, calling callback function for each.
+ * Note: we use a separate mutex in this function to avoid a recursive
+ * locking deadlock (in case the callback calls _mesa_HashRemove()) and to
+ * prevent multiple threads/contexts from getting tangled up.
+ * A lock-less version of this function could be used when the table will
+ * not be modified.
  * \param table  the hash table to walk
  * \param callback  the callback function
  * \param userData  arbitrary pointer to pass along to the callback
@@ -300,14 +308,16 @@ _mesa_HashWalk(const struct _mesa_HashTable *table,
    GLuint pos;
    ASSERT(table);
    ASSERT(callback);
-   _glthread_LOCK_MUTEX(table2->Mutex);
+   _glthread_LOCK_MUTEX(table2->WalkMutex);
    for (pos = 0; pos < TABLE_SIZE; pos++) {
-      struct HashEntry *entry;
-      for (entry = table->Table[pos]; entry; entry = entry->Next) {
+      struct HashEntry *entry, *next;
+      for (entry = table->Table[pos]; entry; entry = next) {
+         /* save 'next' pointer now in case the callback deletes the entry */
+         next = entry->Next;
          callback(entry->Key, entry->Data, userData);
       }
    }
-   _glthread_UNLOCK_MUTEX(table2->Mutex);
+   _glthread_UNLOCK_MUTEX(table2->WalkMutex);
 }
 
 

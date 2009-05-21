@@ -1379,11 +1379,10 @@ _math_matrix_analyse( GLmatrix *mat )
 
    if (mat->inv && (mat->flags & MAT_DIRTY_INVERSE)) {
       matrix_invert( mat );
+      mat->flags &= ~MAT_DIRTY_INVERSE;
    }
 
-   mat->flags &= ~(MAT_DIRTY_FLAGS|
-		   MAT_DIRTY_TYPE|
-		   MAT_DIRTY_INVERSE);
+   mat->flags &= ~(MAT_DIRTY_FLAGS | MAT_DIRTY_TYPE);
 }
 
 /*@}*/

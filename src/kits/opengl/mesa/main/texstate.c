@@ -802,6 +802,9 @@ _mesa_free_texture_data(GLcontext *ctx)
    /* unreference current textures */
    for (u = 0; u < MAX_TEXTURE_IMAGE_UNITS; u++) {
       struct gl_texture_unit *unit = ctx->Texture.Unit + u;
+      /* The _Current texture could account for another reference */
+      _mesa_reference_texobj(&ctx->Texture.Unit[u]._Current, NULL);
+
       for (tgt = 0; tgt < NUM_TEXTURE_TARGETS; tgt++) {
          _mesa_reference_texobj(&unit->CurrentTex[tgt], NULL);
       }

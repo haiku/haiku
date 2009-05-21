@@ -1104,6 +1104,9 @@ static void build_lighting( struct tnl_program *p )
 
    if (twoside) {
       if (!p->state->material_shininess_is_zero) {
+         /* Note that we negate the back-face specular exponent here.
+          * The negation will be un-done later in the back-face code below.
+          */
          struct ureg shininess = get_material(p, 1, STATE_SHININESS);
          emit_op1(p, OPCODE_MOV, dots, WRITEMASK_Z, 
                   negate(swizzle1(shininess,X)));
@@ -1309,6 +1312,11 @@ static void build_lighting( struct tnl_program *p )
 	       mask1 = 0;
 	    }
 
+            /* For the back face we need to negate the X and Y component
+             * dot products.  dots.Z has the negated back-face specular
+             * exponent.  We swizzle that into the W position.  This
+             * negation makes the back-face specular term positive again.
+             */
             dots = negate(swizzle(dots,X,Y,W,Z));
 
 	    if (!is_undef(att)) {
@@ -1327,8 +1335,10 @@ static void build_lighting( struct tnl_program *p )
 
 	    emit_op3(p, OPCODE_MAD, res0, mask0, swizzle1(lit,Y), diffuse, _bfc0);
 	    emit_op3(p, OPCODE_MAD, res1, mask1, swizzle1(lit,Z), specular, _bfc1);
-            /* restore negate flag for next lighting */
-            dots = negate(dots);
+            /* restore dots to its original state for subsequent lights
+             * by negating and swizzling again.
+             */
+            dots = negate(swizzle(dots,X,Y,W,Z));
 
 	    release_temp(p, ambient);
 	    release_temp(p, diffuse);

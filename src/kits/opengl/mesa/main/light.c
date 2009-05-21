@@ -209,7 +209,6 @@ _mesa_Lightfv( GLenum light, GLenum pname, const GLfloat *params )
 	 _math_matrix_analyse(ctx->ModelviewMatrixStack.Top);
       }
       TRANSFORM_DIRECTION(temp, params, ctx->ModelviewMatrixStack.Top->m);
-      NORMALIZE_3FV(temp);
       params = temp;
       break;
    case GL_SPOT_EXPONENT:
@@ -1137,12 +1136,18 @@ compute_light_positions( GLcontext *ctx )
       }
 
       if (light->_Flags & LIGHT_SPOT) {
+         /* Note: we normalize the spot direction now */
+
 	 if (ctx->_NeedEyeCoords) {
 	    COPY_3V( light->_NormDirection, light->EyeDirection );
+            NORMALIZE_3FV( light->_NormDirection );
 	 }
          else {
+            GLfloat spotDir[3];
+            COPY_3V(spotDir, light->EyeDirection);
+            NORMALIZE_3FV(spotDir);
 	    TRANSFORM_NORMAL( light->_NormDirection,
-			      light->EyeDirection,
+			      spotDir,
 			      ctx->ModelviewMatrixStack.Top->m);
 	 }
 

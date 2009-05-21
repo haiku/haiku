@@ -178,15 +178,20 @@ _mesa_add_named_constant(struct gl_program_parameter_list *paramList,
                          const char *name, const GLfloat values[4],
                          GLuint size)
 {
-#if 0 /* disable this for now -- we need to save the name! */
+   /* first check if this is a duplicate constant */
    GLint pos;
-   GLuint swizzle;
-   ASSERT(size == 4); /* XXX future feature */
-   /* check if we already have this constant */
-   if (_mesa_lookup_parameter_constant(paramList, values, 4, &pos, &swizzle)) {
-      return pos;
+   for (pos = 0; pos < paramList->NumParameters; pos++) {
+      const GLfloat *pvals = paramList->ParameterValues[pos];
+      if (pvals[0] == values[0] &&
+          pvals[1] == values[1] &&
+          pvals[2] == values[2] &&
+          pvals[3] == values[3] &&
+          _mesa_strcmp(paramList->Parameters[pos].Name, name) == 0) {
+         /* Same name and value is already in the param list - reuse it */
+         return pos;
+      }
    }
-#endif
+   /* not found, add new parameter */
    return _mesa_add_parameter(paramList, PROGRAM_CONSTANT, name,
                               size, GL_NONE, values, NULL, 0x0);
 }

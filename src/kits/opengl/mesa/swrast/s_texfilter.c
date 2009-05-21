@@ -2061,6 +2061,7 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
       fcol -= 0.5F;
       i0 = IFLOOR(fcol);
       i1 = i0 + 1;
+      break;
    default:
       _mesa_problem(NULL, "bad wrapMode in clamp_rect_coord_linear");
       i0 = i1 = 0;

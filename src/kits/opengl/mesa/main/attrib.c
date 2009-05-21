@@ -1176,7 +1176,7 @@ _mesa_PopAttrib(void)
 
                /* restore clip planes */
                for (i = 0; i < MAX_CLIP_PLANES; i++) {
-                  const GLuint mask = 1 << 1;
+                  const GLuint mask = 1 << i;
                   const GLfloat *eyePlane = xform->EyeUserPlane[i];
                   COPY_4V(ctx->Transform.EyeUserPlane[i], eyePlane);
                   if (xform->ClipPlanesEnabled & mask) {

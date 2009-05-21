@@ -457,28 +457,36 @@ emit_statevars(const char *name, int array_len,
          tokens[0] = STATE_TEXENV_COLOR;
       }
       else if (strcmp(name, "gl_EyePlaneS") == 0) {
-         tokens[0] = STATE_TEXGEN_EYE_S;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_EYE_S;
       }
       else if (strcmp(name, "gl_EyePlaneT") == 0) {
-         tokens[0] = STATE_TEXGEN_EYE_T;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_EYE_T;
       }
       else if (strcmp(name, "gl_EyePlaneR") == 0) {
-         tokens[0] = STATE_TEXGEN_EYE_R;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_EYE_R;
       }
       else if (strcmp(name, "gl_EyePlaneQ") == 0) {
-         tokens[0] = STATE_TEXGEN_EYE_Q;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_EYE_Q;
       }
       else if (strcmp(name, "gl_ObjectPlaneS") == 0) {
-         tokens[0] = STATE_TEXGEN_OBJECT_S;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_OBJECT_S;
       }
       else if (strcmp(name, "gl_ObjectPlaneT") == 0) {
-         tokens[0] = STATE_TEXGEN_OBJECT_T;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_OBJECT_T;
       }
       else if (strcmp(name, "gl_ObjectPlaneR") == 0) {
-         tokens[0] = STATE_TEXGEN_OBJECT_R;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_OBJECT_R;
       }
       else if (strcmp(name, "gl_ObjectPlaneQ") == 0) {
-         tokens[0] = STATE_TEXGEN_OBJECT_Q;
+         tokens[0] = STATE_TEXGEN;
+         tokens[2] = STATE_TEXGEN_OBJECT_Q;
       }
       else {
          return -1; /* invalid array name */

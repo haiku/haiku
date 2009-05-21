@@ -170,6 +170,9 @@ _mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
       return;
    }
 
+   if (width == 0 || height == 0)
+      return; /* nothing to do */
+
    if (ctx->Pack.BufferObj->Name) {
       if (!_mesa_validate_pbo_access(2, &ctx->Pack, width, height, 1,
                                      format, type, pixels)) {

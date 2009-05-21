@@ -570,6 +570,9 @@ void
 _swrast_choose_point(GLcontext *ctx)
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+   const GLfloat size = CLAMP(ctx->Point.Size,
+                              ctx->Point.MinSize,
+                              ctx->Point.MaxSize);
 
    if (ctx->RenderMode == GL_RENDER) {
       if (ctx->Point.PointSprite) {
@@ -578,7 +581,7 @@ _swrast_choose_point(GLcontext *ctx)
       else if (ctx->Point.SmoothFlag) {
          swrast->Point = smooth_point;
       }
-      else if (ctx->Point.Size > 1.0 ||
+      else if (size > 1.0 ||
                ctx->Point._Attenuated ||
                ctx->VertexProgram.PointSizeEnabled) {
          swrast->Point = large_point;

@@ -77,28 +77,30 @@ _mesa_DrawPixels( GLsizei width, GLsizei height,
    }
 
    if (ctx->RenderMode == GL_RENDER) {
-      /* Round, to satisfy conformance tests (matches SGI's OpenGL) */
-      GLint x = IROUND(ctx->Current.RasterPos[0]);
-      GLint y = IROUND(ctx->Current.RasterPos[1]);
+      if (width > 0 && height > 0) {
+         /* Round, to satisfy conformance tests (matches SGI's OpenGL) */
+         GLint x = IROUND(ctx->Current.RasterPos[0]);
+         GLint y = IROUND(ctx->Current.RasterPos[1]);
 
-      if (ctx->Unpack.BufferObj->Name) {
-         /* unpack from PBO */
-         if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height, 1,
-                                        format, type, pixels)) {
-            _mesa_error(ctx, GL_INVALID_OPERATION,
-                        "glDrawPixels(invalid PBO access)");
-            return;
+         if (ctx->Unpack.BufferObj->Name) {
+            /* unpack from PBO */
+            if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height, 1,
+                                           format, type, pixels)) {
+               _mesa_error(ctx, GL_INVALID_OPERATION,
+                           "glDrawPixels(invalid PBO access)");
+               return;
+            }
+            if (ctx->Unpack.BufferObj->Pointer) {
+               /* buffer is mapped - that's an error */
+               _mesa_error(ctx, GL_INVALID_OPERATION,
+                           "glDrawPixels(PBO is mapped)");
+               return;
+            }
          }
-         if (ctx->Unpack.BufferObj->Pointer) {
-            /* buffer is mapped - that's an error */
-            _mesa_error(ctx, GL_INVALID_OPERATION,
-                        "glDrawPixels(PBO is mapped)");
-            return;
-         }
+
+         ctx->Driver.DrawPixels(ctx, x, y, width, height, format, type,
+                                &ctx->Unpack, pixels);
       }
-
-      ctx->Driver.DrawPixels(ctx, x, y, width, height, format, type,
-			     &ctx->Unpack, pixels);
    }
    else if (ctx->RenderMode == GL_FEEDBACK) {
       /* Feedback the current raster pos info */
@@ -159,10 +161,12 @@ _mesa_CopyPixels( GLint srcx, GLint srcy, GLsizei width, GLsizei height,
 
    if (ctx->RenderMode == GL_RENDER) {
       /* Round to satisfy conformance tests (matches SGI's OpenGL) */
-      GLint destx = IROUND(ctx->Current.RasterPos[0]);
-      GLint desty = IROUND(ctx->Current.RasterPos[1]);
-      ctx->Driver.CopyPixels( ctx, srcx, srcy, width, height, destx, desty,
-			      type );
+      if (width > 0 && height > 0) {
+         GLint destx = IROUND(ctx->Current.RasterPos[0]);
+         GLint desty = IROUND(ctx->Current.RasterPos[1]);
+         ctx->Driver.CopyPixels( ctx, srcx, srcy, width, height, destx, desty,
+                                 type );
+      }
    }
    else if (ctx->RenderMode == GL_FEEDBACK) {
       FLUSH_CURRENT( ctx, 0 );

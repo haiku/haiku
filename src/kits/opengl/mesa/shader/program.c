@@ -296,6 +296,7 @@ _mesa_new_program(GLcontext *ctx, GLenum target, GLuint id)
    struct gl_program *prog;
    switch (target) {
    case GL_VERTEX_PROGRAM_ARB: /* == GL_VERTEX_PROGRAM_NV */
+   case GL_VERTEX_STATE_PROGRAM_NV:
       prog = _mesa_init_vertex_program(ctx, CALLOC_STRUCT(gl_vertex_program),
                                        target, id );
       break;

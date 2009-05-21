@@ -1399,11 +1399,17 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
    }
 
    /*
-    * Write to renderbuffers
+    * Write to renderbuffers.
+    * Depending on glDrawBuffer() state and the which color outputs are
+    * written by the fragment shader, we may either replicate one color to
+    * all renderbuffers or write a different color to each renderbuffer.
+    * multiFragOutputs=TRUE for the later case.
     */
    {
       const GLuint numBuffers = fb->_NumColorDrawBuffers;
-      const GLboolean multiFragOutputs = numBuffers > 1;
+      const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
+      const GLboolean multiFragOutputs = 
+         (fp && fp->Base.OutputsWritten >= (1 << FRAG_RESULT_DATA0));
       GLuint buf;
 
       for (buf = 0; buf < numBuffers; buf++) {
