@@ -151,7 +151,6 @@ init_image_version_infos(image_t* image)
 				info.hash = vernaux->vna_hash;
 				info.name = STRING(image, vernaux->vna_name);
 				info.file_name = fileName;
-				info.hidden = (vernaux->vna_other & VER_NDX_FLAG_HIDDEN) != 0;
 
 				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
 			}

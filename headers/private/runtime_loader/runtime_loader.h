@@ -72,7 +72,6 @@ typedef struct elf_version_info {
 	uint32		hash;			// version name hash
 	const char	*name;			// version name
 	const char	*file_name;		// dependency file name (needed versions only)
-	bool		hidden;			// version hidden (needed versions only)
 } elf_version_info;
 
 typedef struct image_t {
