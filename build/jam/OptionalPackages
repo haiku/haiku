@@ -450,8 +450,8 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package P7zip available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage p7zip-4.61-gcc2-2008-12-03
-			: http://haiku-files.org/files/optional-packages/p7zip-4.61-gcc2-2008-12-03.zip
+		InstallOptionalHaikuImagePackage p7zip-4.65-gcc2-haiku-2009-05-20
+			: http://haiku-files.org/files/optional-packages/p7zip-4.65-gcc2-haiku-2009-05-20.zip
 			:
 		;
 
