@@ -5,6 +5,7 @@ UsePrivateSystemHeaders ;
 KernelObjects
 	init_term_dyn.c
 	start_dyn.c
+	haiku_version_glue.c
 ;
 
 SubInclude HAIKU_TOP src system glue arch ;

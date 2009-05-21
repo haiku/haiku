@@ -5,17 +5,12 @@
 
 #include <user_runtime.h>
 #include <image.h>
-#include <image_defs.h>
 
 #include "init_term_dyn.h"
 
 
-// Haiku API and ABI versions -- we compile those into shared objects so that
-// the runtime loader can discriminate the versions and enable compatibility
-// work-arounds, if necessary.
-
-uint32 B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE = B_HAIKU_VERSION;
-uint32 B_SHARED_OBJECT_HAIKU_ABI_VARIABLE = B_HAIKU_ABI;
+// include the version glue -- it's separate for the kernel add-ons only
+#include "haiku_version_glue.c"
 
 
 /**	These functions are called from _init()/_fini() (in crti.S, crtn.S)

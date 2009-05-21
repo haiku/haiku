@@ -19,7 +19,7 @@ endif
 ifeq ($(NAME), )
 	NAME = NameThisApp
 endif
-	
+
 ifeq ($(TYPE), )
 	TYPE = APP
 endif
@@ -30,7 +30,7 @@ endif
 
 # 	specify that the binary should be created in the object directory
 # NOTE: make doesn't find the target if its name is enclosed in
-#       quotation marks 
+#       quotation marks
 #	TARGET		:= "$(OBJ_DIR)/$(NAME)"
 	TARGET		:= $(OBJ_DIR)/$(NAME)
 
@@ -50,7 +50,7 @@ ifeq ($(CPU), x86)
 #	set the compiler and compiler flags
 	CC		=	gcc
 
-#	SETTING: set the CFLAGS for each binary type	
+#	SETTING: set the CFLAGS for each binary type
 	ifeq ($(TYPE), DRIVER)
 		CFLAGS	+= -D_KERNEL_MODE=1 -no-fpic
 	else
@@ -72,15 +72,15 @@ ifeq ($(CPU), x86)
 	endif
 	endif
 	endif
-		
 
-	
+
+
 #	SETTING: set proper debugger flags
 	ifeq ($(DEBUGGER), TRUE)
 		DEBUG += -g
 		OPTIMIZER = -O0
-	endif	
-	
+	endif
+
 	CFLAGS += $(OPTIMIZER) $(DEBUG)
 
 #	SETTING: set warning level
@@ -104,19 +104,20 @@ ifeq ($(CPU), x86)
 		LDFLAGS += -nostart -Xlinker -soname=$(NAME)
 	else
 	ifeq ($(TYPE), DRIVER)
-		LDFLAGS += -nostdlib /boot/develop/lib/x86/_KERNEL_
-	endif 
-	endif 
-	endif 
+		LDFLAGS += -nostdlib /boot/develop/lib/x86/_KERNEL_ \
+					/boot/develop/lib/x86/haiku_version_glue.o
+	endif
+	endif
+	endif
 
-	
+
 else
 
 #	ppc Settings
 ifeq ($(CPU), ppc)
 #	set the compiler and compiler flags
 	CC		=	mwcc
-	CFLAGS	+=	
+	CFLAGS	+=
 
 #	SETTING: set the proper optimization level
 	ifeq ($(OPTIMIZE), FULL)
@@ -137,7 +138,7 @@ ifeq ($(CPU), ppc)
 	#set the proper debugger settings
 	ifeq ($(DEBUGGER), TRUE)
 		DEBUG += -g
-	endif	
+	endif
 
 	CFLAGS += $(OPTIMIZER) $(DEBUG)
 
@@ -159,10 +160,10 @@ ifeq ($(CPU), ppc)
 
 #	SETTING: set linker flags for each binary type
 	ifeq ($(TYPE), APP)
-		LDFLAGS += 
+		LDFLAGS +=
 	else
 	ifeq ($(TYPE), SHARED)
-		LDFLAGS += 	-xms 
+		LDFLAGS += 	-xms
 	endif
 	endif
 
@@ -179,10 +180,10 @@ ifeq ($(CPU), ppc)
 					-lroot \
 					/boot/develop/lib/ppc/glue-noinit.a \
 					/boot/develop/lib/ppc/init_term_dyn.o \
-					/boot/develop/lib/ppc/start_dyn.o 
-	endif			
-	
-	
+					/boot/develop/lib/ppc/start_dyn.o
+	endif
+
+
 #	SETTING: output symbols in an xMAP file
 	ifeq ($(SYMBOLS), TRUE)
 		LDFLAGS += -map $(TARGET).xMAP
@@ -249,7 +250,7 @@ LINK_LIBS += $(filter %.so %.a _APP_ _KERNEL_, $(LIBS))
 #	prepend -l to each name: be becomes -lbe
 LINK_LIBS += $(foreach lib, $(filter-out %.so %.a _APP_ _KERNEL_, $(LIBS)), $(addprefix -l, $(lib)))
 
-# add to the linker flags 
+# add to the linker flags
 LDFLAGS += $(LINK_PATHS)  $(LINK_LIBS)
 
 #	SETTING: add the defines to the compiler flags
@@ -269,9 +270,9 @@ else
 	BUILD_LINE = $(LD) -o $@ $(OBJS) $(LDFLAGS)
 endif
 
-# pseudo-function for converting a list of resource definition files in RDEFS 
+# pseudo-function for converting a list of resource definition files in RDEFS
 # variable to a corresponding list of object files in $(OBJ_DIR)/xxx.rsrc
-# The "function" strips off the rdef file suffix (.rdef) and then strips 
+# The "function" strips off the rdef file suffix (.rdef) and then strips
 # of the directory name, leaving just the root file name.
 # It then appends the .rsrc suffix and prepends the $(OBJ_DIR)/ path
 define RDEFS_LIST_TO_RSRCS
@@ -294,7 +295,7 @@ endef
 	endif
 
 
-#	define the actual work to be done	
+#	define the actual work to be done
 default: $(TARGET)
 
 $(TARGET):	$(OBJ_DIR) $(OBJS) $(RSRCS)

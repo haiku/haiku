@@ -237,9 +237,11 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 # DevelopmentMin
 if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	# glue code
-	AddFilesToHaikuImage develop lib x86
-		: <src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
-		  <src!system!glue>init_term_dyn.o <src!system!glue>start_dyn.o ;
+	AddFilesToHaikuImage develop lib x86 :
+		<src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
+		<src!system!glue>init_term_dyn.o <src!system!glue>start_dyn.o
+		<src!system!glue>haiku_version_glue.o
+	;
 
 	# kernel
 	AddFilesToHaikuImage develop lib x86 : kernel.so : _KERNEL_ ;
