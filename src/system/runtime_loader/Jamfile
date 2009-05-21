@@ -85,9 +85,9 @@ Objects $(sources) ;
 
 Ld runtime_loader :
 	[ FGristFiles $(sources:S=$(SUFOBJ)) ]
+	libruntime_loader.a
 	libruntime_loader_$(TARGET_ARCH).a
 	$(TARGET_STATIC_LIBSUPC++)
-	libruntime_loader.a
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
 ;
