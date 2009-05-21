@@ -1,11 +1,11 @@
 /* Shuffle lines of text.
 
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    Written by Paul Eggert.  */
 
@@ -35,10 +34,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "shuf"
 
-#define AUTHORS "Paul Eggert"
-
-/* The name this program was run with. */
-char *program_name;
+#define AUTHORS proper_name ("Paul Eggert")
 
 void
 usage (int status)
@@ -64,9 +60,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
   -e, --echo                treat each ARG as an input line\n\
   -i, --input-range=LO-HI   treat each number LO through HI as an input line\n\
-  -n, --head-lines=LINES    output at most LINES lines\n\
+  -n, --head-count=COUNT    output at most COUNT lines\n\
   -o, --output=FILE         write result to FILE instead of standard output\n\
-      --random-source=FILE  get random bytes from FILE (default /dev/urandom)\n\
+      --random-source=FILE  get random bytes from FILE\n\
   -z, --zero-terminated     end lines with 0 byte, not newline\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -75,7 +71,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
 
   exit (status);
@@ -218,7 +214,7 @@ read_input (FILE *in, char eolbyte, char ***pline)
 
 static int
 write_permuted_output (size_t n_lines, char * const *line, size_t lo_input,
-		       size_t const *permutation)
+		       size_t const *permutation, char eolbyte)
 {
   size_t i;
 
@@ -234,7 +230,7 @@ write_permuted_output (size_t n_lines, char * const *line, size_t lo_input,
     for (i = 0; i < n_lines; i++)
       {
 	unsigned long int n = lo_input + permutation[i];
-	if (printf ("%lu\n", n) < 0)
+	if (printf ("%lu%c", n, eolbyte) < 0)
 	  return -1;
       }
 
@@ -262,7 +258,7 @@ main (int argc, char **argv)
   size_t *permutation;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -404,7 +400,8 @@ main (int argc, char **argv)
 
   if (outfile && ! freopen (outfile, "w", stdout))
     error (EXIT_FAILURE, errno, "%s", quotearg_colon (outfile));
-  if (write_permuted_output (head_lines, line, lo_input, permutation) != 0)
+  if (write_permuted_output (head_lines, line, lo_input, permutation, eolbyte)
+      != 0)
     error (EXIT_FAILURE, errno, _("write error"));
 
 #ifdef lint

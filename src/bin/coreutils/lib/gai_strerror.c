@@ -1,10 +1,13 @@
-/* Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
+/* Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006, 2008, 2009 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Philip Blundell <pjb27@cam.ac.uk>, 1997.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -18,13 +21,10 @@
 
 #ifndef _LIBC
 # include <config.h>
-# include "getaddrinfo.h"
 #endif
 
 #include <stdio.h>
-#ifdef HAVE_NETDB_H
-# include <netdb.h>
-#endif
+#include <netdb.h>
 
 #ifdef _LIBC
 # include <libintl.h>
@@ -53,7 +53,7 @@ values[] =
     { EAI_SOCKTYPE, N_("ai_socktype not supported") },
     { EAI_SYSTEM, N_("System error") },
     { EAI_OVERFLOW, N_("Argument buffer too small") },
-#ifdef __USE_GNU
+#ifdef EAI_INPROGRESS
     { EAI_INPROGRESS, N_("Processing request in progress") },
     { EAI_CANCELED, N_("Request canceled") },
     { EAI_NOTCANCELED, N_("Request not canceled") },

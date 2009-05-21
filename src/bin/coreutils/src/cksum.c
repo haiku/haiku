@@ -1,10 +1,10 @@
 /* cksum -- calculate and print POSIX checksums and sizes of files
-   Copyright (C) 92, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 92, 1995-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Q. Frank Xia, qx@math.columbia.edu.
    Cosmetic changes and reorganization by David MacKenzie, djm@gnu.ai.mit.edu.
@@ -38,12 +37,13 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "cksum"
 
-#define AUTHORS "Q. Frank Xia"
+#define AUTHORS proper_name ("Q. Frank Xia")
 
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdint.h>
 #include "system.h"
+#include "xfreopen.h"
 
 #ifdef CRCTAB
 
@@ -109,13 +109,9 @@ main (void)
 # include <getopt.h>
 # include "long-options.h"
 # include "error.h"
-# include "inttostr.h"
 
 /* Number of bytes to read at once.  */
 # define BUFLEN (1 << 16)
-
-/* The name this program was run with.  */
-char *program_name;
 
 static uint_fast32_t const crctab[256] =
 {
@@ -197,7 +193,7 @@ cksum (const char *file, bool print_name)
       fp = stdin;
       have_read_stdin = true;
       if (O_BINARY && ! isatty (STDIN_FILENO))
-	freopen (NULL, "rb", stdin);
+	xfreopen (NULL, "rb", stdin);
     }
   else
     {
@@ -273,7 +269,7 @@ Print CRC checksum and byte counts of each FILE.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -285,14 +281,14 @@ main (int argc, char **argv)
   bool ok;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, Version,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "", NULL, NULL) != -1)
     usage (EXIT_FAILURE);

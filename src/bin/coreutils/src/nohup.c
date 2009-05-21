@@ -1,10 +1,10 @@
 /* nohup -- run a command immune to hangups, with output to a non-tty
-   Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering  */
 
@@ -35,7 +34,7 @@
 
 #define PROGRAM_NAME "nohup"
 
-#define AUTHORS "Jim Meyering"
+#define AUTHORS proper_name ("Jim Meyering")
 
 /* Exit statuses.  */
 enum
@@ -43,8 +42,6 @@ enum
     /* `nohup' itself failed.  */
     NOHUP_FAILURE = 127
   };
-
-char *program_name;
 
 void
 usage (int status)
@@ -66,8 +63,15 @@ Run COMMAND, ignoring hangup signals.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      printf (_("\n\
+If standard input is a terminal, redirect it from /dev/null.\n\
+If standard output is a terminal, append output to `nohup.out' if possible,\n\
+`$HOME/nohup.out' otherwise.\n\
+If standard error is a terminal, redirect it to standard output.\n\
+To save output to FILE, use `%s COMMAND > FILE'.\n"),
+	      program_name);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -83,7 +87,7 @@ main (int argc, char **argv)
   bool redirecting_stderr;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -91,7 +95,7 @@ main (int argc, char **argv)
   initialize_exit_failure (NOHUP_FAILURE);
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, Version,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "+", NULL, NULL) != -1)
     usage (NOHUP_FAILURE);
@@ -158,8 +162,8 @@ main (int argc, char **argv)
       umask (umask_value);
       error (0, 0,
 	     _(ignoring_input
-	       ? "ignoring input and appending output to %s"
-	       : "appending output to %s"),
+	       ? N_("ignoring input and appending output to %s")
+	       : N_("appending output to %s")),
 	     quote (file));
       free (in_home);
     }
@@ -181,8 +185,8 @@ main (int argc, char **argv)
       if (!redirecting_stdout)
 	error (0, 0,
 	       _(ignoring_input
-		 ? "ignoring input and redirecting stderr to stdout"
-		 : "redirecting stderr to stdout"));
+		 ? N_("ignoring input and redirecting stderr to stdout")
+		 : N_("redirecting stderr to stdout")));
 
       if (dup2 (out_fd, STDERR_FILENO) < 0)
 	error (NOHUP_FAILURE, errno, _("failed to redirect standard error"));

@@ -1,11 +1,11 @@
 /* paste - merge lines of files
-   Copyright (C) 1997-2005 Free Software Foundation, Inc.
+   Copyright (C) 1997-2005, 2008 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David Ihnat.  */
 
@@ -43,17 +42,17 @@
 #include <sys/types.h>
 #include "system.h"
 #include "error.h"
+#include "quotearg.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "paste"
 
-#define AUTHORS "David M. Ihnat", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("David M. Ihnat"), \
+  proper_name ("David MacKenzie")
 
 /* Indicates that no delimiter should be added in the current position. */
 #define EMPTY_DELIM '\0'
-
-/* Name this program was run with. */
-char *program_name;
 
 /* If nonzero, we have read standard input at some point. */
 static bool have_read_stdin;
@@ -80,12 +79,17 @@ static struct option const longopts[] =
 /* Set globals delims and delim_end.  Copy STRPTR to DELIMS, converting
    backslash representations of special characters in STRPTR to their actual
    values. The set of possible backslash characters has been expanded beyond
-   that recognized by the Unix version.  */
+   that recognized by the Unix version.
+   Return 0 upon success.
+   If the string ends in an odd number of backslashes, ignore the
+   final backslash and return nonzero.  */
 
-static void
+static int
 collapse_escapes (char const *strptr)
 {
   char *strout = xstrdup (strptr);
+  bool backslash_at_end = false;
+
   delims = strout;
 
   while (*strptr)
@@ -124,6 +128,14 @@ collapse_escapes (char const *strptr)
 	      *strout++ = '\v';
 	      break;
 
+	    case '\\':
+	      *strout++ = '\\';
+	      break;
+
+	    case '\0':
+	      backslash_at_end = true;
+	      goto done;
+
 	    default:
 	      *strout++ = *strptr;
 	      break;
@@ -131,7 +143,11 @@ collapse_escapes (char const *strptr)
 	  strptr++;
 	}
     }
+
+ done:;
+
   delim_end = strout;
+  return backslash_at_end ? 1 : 0;
 }
 
 /* Report a write error and exit.  */
@@ -434,7 +450,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       /* FIXME: add a couple of examples.  */
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -447,7 +463,7 @@ main (int argc, char **argv)
   char const *delim_arg = "\t";
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -480,9 +496,17 @@ main (int argc, char **argv)
     }
 
   if (optind == argc)
-    argv[argc++] = "-";
+    argv[argc++] = bad_cast ("-");
 
-  collapse_escapes (delim_arg);
+  if (collapse_escapes (delim_arg))
+    {
+      /* Don't use the default quoting style, because that would double the
+	 number of displayed backslashes, making the diagnostic look bogus.  */
+      set_quoting_style (NULL, escape_quoting_style);
+      error (EXIT_FAILURE, 0,
+	     _("delimiter list ends with an unescaped backslash: %s"),
+	     quotearg_colon (delim_arg));
+    }
 
   if (!serial_merge)
     ok = paste_parallel (argc - optind, &argv[optind]);

@@ -1,11 +1,11 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2004-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /*-
  * Copyright (c) 1990, 1993, 1994
@@ -63,7 +62,6 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #endif
 #include <fcntl.h>
 #include <errno.h>
-#include "dirfd.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +69,6 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 
 #if ! _LIBC
 # include "fcntl--.h"
-# include "lstat.h"
 # include "openat.h"
 # include "unistd--.h"
 # include "same-inode.h"
@@ -87,10 +84,62 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 # define DT_IS_KNOWN(d) ((d)->d_type != DT_UNKNOWN)
 /* True if the type of the directory entry D must be T.  */
 # define DT_MUST_BE(d, t) ((d)->d_type == (t))
+# define D_TYPE(d) ((d)->d_type)
 #else
 # define DT_IS_KNOWN(d) false
 # define DT_MUST_BE(d, t) false
+# define D_TYPE(d) DT_UNKNOWN
+
+# undef DT_UNKNOWN
+# define DT_UNKNOWN 0
+
+/* Any nonzero values will do here, so long as they're distinct.
+   Undef any existing macros out of the way.  */
+# undef DT_BLK
+# undef DT_CHR
+# undef DT_DIR
+# undef DT_FIFO
+# undef DT_LNK
+# undef DT_REG
+# undef DT_SOCK
+# define DT_BLK 1
+# define DT_CHR 2
+# define DT_DIR 3
+# define DT_FIFO 4
+# define DT_LNK 5
+# define DT_REG 6
+# define DT_SOCK 7
 #endif
+
+#ifndef S_IFLNK
+# define S_IFLNK 0
+#endif
+#ifndef S_IFSOCK
+# define S_IFSOCK 0
+#endif
+
+enum
+{
+  NOT_AN_INODE_NUMBER = 0
+};
+
+#ifdef D_INO_IN_DIRENT
+# define D_INO(dp) (dp)->d_ino
+#else
+/* Some systems don't have inodes, so fake them to avoid lots of ifdefs.  */
+# define D_INO(dp) NOT_AN_INODE_NUMBER
+#endif
+
+/* If there are more than this many entries in a directory,
+   and the conditions mentioned below are satisfied, then sort
+   the entries on inode number before any further processing.  */
+#ifndef FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD
+# define FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD 10000
+#endif
+enum
+{
+  _FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD = FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD
+};
 
 enum Fts_stat
 {
@@ -121,7 +170,7 @@ enum Fts_stat
 #endif
 
 #ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
 #  define __attribute__(x) /* empty */
 # endif
 #endif
@@ -568,6 +617,12 @@ fts_close (FTS *sp)
 	  }
 
 	fd_ring_clear (&sp->fts_fd_ring);
+
+#if GNULIB_FTS
+	if (sp->fts_leaf_optimization_works_ht)
+	  hash_free (sp->fts_leaf_optimization_works_ht);
+#endif
+
 	free_dir (sp);
 
 	/* Free up the stream pointer. */
@@ -581,6 +636,172 @@ fts_close (FTS *sp)
 
 	return (0);
 }
+
+#if defined __linux__ \
+  && HAVE_SYS_VFS_H && HAVE_FSTATFS && HAVE_STRUCT_STATFS_F_TYPE
+
+#include <sys/vfs.h>
+
+/* Linux-specific constants from coreutils' src/fs.h */
+# define S_MAGIC_TMPFS 0x1021994
+# define S_MAGIC_NFS 0x6969
+# define S_MAGIC_REISERFS 0x52654973
+# define S_MAGIC_PROC 0x9FA0
+
+/* Return false if it is easy to determine the file system type of
+   the directory on which DIR_FD is open, and sorting dirents on
+   inode numbers is known not to improve traversal performance with
+   that type of file system.  Otherwise, return true.  */
+static bool
+dirent_inode_sort_may_be_useful (int dir_fd)
+{
+  /* Skip the sort only if we can determine efficiently
+     that skipping it is the right thing to do.
+     The cost of performing an unnecessary sort is negligible,
+     while the cost of *not* performing it can be O(N^2) with
+     a very large constant.  */
+  struct statfs fs_buf;
+
+  /* If fstatfs fails, assume sorting would be useful.  */
+  if (fstatfs (dir_fd, &fs_buf) != 0)
+    return true;
+
+  /* FIXME: what about when f_type is not an integral type?
+     deal with that if/when it's encountered.  */
+  switch (fs_buf.f_type)
+    {
+    case S_MAGIC_TMPFS:
+    case S_MAGIC_NFS:
+      /* On a file system of any of these types, sorting
+	 is unnecessary, and hence wasteful.  */
+      return false;
+
+    default:
+      return true;
+    }
+}
+
+/* Given a file descriptor DIR_FD open on a directory D,
+   return true if it is valid to apply the leaf-optimization
+   technique of counting directories in D via stat.st_nlink.  */
+static bool
+leaf_optimization_applies (int dir_fd)
+{
+  struct statfs fs_buf;
+
+  /* If fstatfs fails, assume we can't use the optimization.  */
+  if (fstatfs (dir_fd, &fs_buf) != 0)
+    return false;
+
+  /* FIXME: do we need to detect AFS mount points?  I doubt it,
+     unless fstatfs can report S_MAGIC_REISERFS for such a directory.  */
+
+  switch (fs_buf.f_type)
+    {
+      /* List here the file system types that lack useable dirent.d_type
+	 info, yet for which the optimization does apply.  */
+    case S_MAGIC_REISERFS:
+      return true;
+
+    case S_MAGIC_PROC:
+      /* Explicitly listing this or any other file system type for which
+	 the optimization is not applicable is not necessary, but we leave
+	 it here to document the risk.  Per http://bugs.debian.org/143111,
+	 /proc may have bogus stat.st_nlink values.  */
+      /* fall through */
+    default:
+      return false;
+    }
+}
+
+#else
+static bool dirent_inode_sort_may_be_useful (int dir_fd) { return true; }
+static bool leaf_optimization_applies (int dir_fd) { return false; }
+#endif
+
+#if GNULIB_FTS
+/* link-count-optimization entry:
+   map an stat.st_dev number to a boolean: leaf_optimization_works */
+struct LCO_ent
+{
+  dev_t st_dev;
+  bool opt_ok;
+};
+
+/* Use a tiny initial size.  If a traversal encounters more than
+   a few devices, the cost of growing/rehashing this table will be
+   rendered negligible by the number of inodes processed.  */
+enum { LCO_HT_INITIAL_SIZE = 13 };
+
+static size_t
+LCO_hash (void const *x, size_t table_size)
+{
+  struct LCO_ent const *ax = x;
+  return (uintmax_t) ax->st_dev % table_size;
+}
+
+static bool
+LCO_compare (void const *x, void const *y)
+{
+  struct LCO_ent const *ax = x;
+  struct LCO_ent const *ay = y;
+  return ax->st_dev == ay->st_dev;
+}
+
+/* Ask the same question as leaf_optimization_applies, but query
+   the cache first (FTS.fts_leaf_optimization_works_ht), and if necessary,
+   update that cache.  */
+static bool
+link_count_optimize_ok (FTSENT const *p)
+{
+  FTS *sp = p->fts_fts;
+  Hash_table *h = sp->fts_leaf_optimization_works_ht;
+  struct LCO_ent tmp;
+  struct LCO_ent *ent;
+  bool opt_ok;
+  struct LCO_ent *t2;
+
+  /* If we're not in CWDFD mode, don't bother with this optimization,
+     since the caller is not serious about performance. */
+  if (!ISSET(FTS_CWDFD))
+    return false;
+
+  /* map st_dev to the boolean, leaf_optimization_works */
+  if (h == NULL)
+    {
+      h = sp->fts_leaf_optimization_works_ht
+	= hash_initialize (LCO_HT_INITIAL_SIZE, NULL, LCO_hash,
+			   LCO_compare, free);
+      if (h == NULL)
+	return false;
+    }
+  tmp.st_dev = p->fts_statp->st_dev;
+  ent = hash_lookup (h, &tmp);
+  if (ent)
+    return ent->opt_ok;
+
+  /* Look-up failed.  Query directly and cache the result.  */
+  t2 = malloc (sizeof *t2);
+  if (t2 == NULL)
+    return false;
+
+  /* Is it ok to perform the optimization in the dir, FTS_CWD_FD?  */
+  opt_ok = leaf_optimization_applies (sp->fts_cwd_fd);
+  t2->opt_ok = opt_ok;
+  t2->st_dev = p->fts_statp->st_dev;
+
+  ent = hash_insert (h, t2);
+  if (ent == NULL)
+    {
+      /* insertion failed */
+      free (t2);
+      return false;
+    }
+  fts_assert (ent == t2);
+
+  return opt_ok;
+}
+#endif
 
 /*
  * Special case of "/" at the end of the file name so that slashes aren't
@@ -685,7 +906,7 @@ fts_read (register FTS *sp)
 			/* If fts_build's call to fts_safe_changedir failed
 			   because it was not able to fchdir into a
 			   subdirectory, tell the caller.  */
-			if (p->fts_errno)
+			if (p->fts_errno && p->fts_info != FTS_DNR)
 				p->fts_info = FTS_ERR;
 			LEAVE_DIR (sp, p, "2");
 			return (p);
@@ -742,7 +963,27 @@ check_for_dir:
 		if (p->fts_info == FTS_NSOK)
 		  {
 		    if (p->fts_statp->st_size == FTS_STAT_REQUIRED)
-		      p->fts_info = fts_stat(sp, p, false);
+		      {
+			FTSENT *parent = p->fts_parent;
+			if (FTS_ROOTLEVEL < p->fts_level
+			    /* ->fts_n_dirs_remaining is not valid
+			       for command-line-specified names.  */
+			    && parent->fts_n_dirs_remaining == 0
+			    && ISSET(FTS_NOSTAT)
+			    && ISSET(FTS_PHYSICAL)
+			    && link_count_optimize_ok (parent))
+			  {
+			    /* nothing more needed */
+			  }
+			else
+			  {
+			    p->fts_info = fts_stat(sp, p, false);
+			    if (S_ISDIR(p->fts_statp->st_mode)
+				&& p->fts_level != FTS_ROOTLEVEL
+				&& parent->fts_n_dirs_remaining)
+				  parent->fts_n_dirs_remaining--;
+			  }
+		      }
 		    else
 		      fts_assert (p->fts_statp->st_size == FTS_NO_STAT_REQUIRED);
 		  }
@@ -910,6 +1151,53 @@ fts_children (register FTS *sp, int instr)
 	    close (fd);
 	  }
 	return (sp->fts_child);
+}
+
+/* A comparison function to sort on increasing inode number.
+   For some file system types, sorting either way makes a huge
+   performance difference for a directory with very many entries,
+   but sorting on increasing values is slightly better than sorting
+   on decreasing values.  The difference is in the 5% range.  */
+static int
+fts_compare_ino (struct _ftsent const **a, struct _ftsent const **b)
+{
+  return (a[0]->fts_statp->st_ino < b[0]->fts_statp->st_ino ? -1
+	  : b[0]->fts_statp->st_ino < a[0]->fts_statp->st_ino ? 1 : 0);
+}
+
+/* Map the dirent.d_type value, DTYPE, to the corresponding stat.st_mode
+   S_IF* bit and set ST.st_mode, thus clearing all other bits in that field.  */
+static void
+set_stat_type (struct stat *st, unsigned int dtype)
+{
+  mode_t type;
+  switch (dtype)
+    {
+    case DT_BLK:
+      type = S_IFBLK;
+      break;
+    case DT_CHR:
+      type = S_IFCHR;
+      break;
+    case DT_DIR:
+      type = S_IFDIR;
+      break;
+    case DT_FIFO:
+      type = S_IFIFO;
+      break;
+    case DT_LNK:
+      type = S_IFLNK;
+      break;
+    case DT_REG:
+      type = S_IFREG;
+      break;
+    case DT_SOCK:
+      type = S_IFSOCK;
+      break;
+    default:
+      type = 0;
+    }
+  st->st_mode = type;
 }
 
 /*
@@ -1091,7 +1379,7 @@ mem1:				saved_errno = errno;
 		new_len = len + _D_EXACT_NAMLEN (dp);
 		if (new_len < len) {
 			/*
-			 * In the unlikely even that we would end up
+			 * In the unlikely event that we would end up
 			 * with a file name longer than SIZE_MAX, free up
 			 * the current structure and the structures already
 			 * allocated, then error out with ENAMETOOLONG.
@@ -1112,6 +1400,9 @@ mem1:				saved_errno = errno;
 		if (dp->d_type == DT_WHT)
 			p->fts_flags |= FTS_ISW;
 #endif
+		/* Store dirent.d_ino, in case we need to sort
+		   entries before processing them.  */
+		p->fts_statp->st_ino = D_INO (dp);
 
 		/* Build a file name for fts_stat to stat. */
 		if (ISSET(FTS_NOCHDIR)) {
@@ -1138,8 +1429,11 @@ mem1:				saved_errno = errno;
 					  && DT_IS_KNOWN(dp)
 					  && ! DT_MUST_BE(dp, DT_DIR));
 			p->fts_info = FTS_NSOK;
+			/* Propagate dirent.d_type information back
+			   to caller, when possible.  */
+			set_stat_type (p->fts_statp, D_TYPE (dp));
 			fts_set_stat_required(p, !skip_stat);
-			is_dir = (ISSET(FTS_PHYSICAL) && ISSET(FTS_NOSTAT)
+			is_dir = (ISSET(FTS_PHYSICAL)
 				  && DT_MUST_BE(dp, DT_DIR));
 		} else {
 			p->fts_info = fts_stat(sp, p, false);
@@ -1205,6 +1499,19 @@ mem1:				saved_errno = errno;
 			cur->fts_info = FTS_DP;
 		fts_lfree(head);
 		return (NULL);
+	}
+
+	/* If there are many entries, no sorting function has been specified,
+	   and this file system is of a type that may be slow with a large
+	   number of entries, then sort the directory entries on increasing
+	   inode numbers.  */
+	if (nitems > _FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD
+	    && !sp->fts_compar
+	    && ISSET (FTS_CWDFD)
+	    && dirent_inode_sort_may_be_useful (sp->fts_cwd_fd)) {
+		sp->fts_compar = fts_compare_ino;
+		head = fts_sort (sp, head, nitems);
+		sp->fts_compar = NULL;
 	}
 
 	/* Sort the entries. */
@@ -1400,6 +1707,8 @@ err:		memset(sbp, 0, sizeof(struct stat));
 	}
 
 	if (S_ISDIR(sbp->st_mode)) {
+		p->fts_n_dirs_remaining = (sbp->st_nlink
+					   - (ISSET(FTS_SEEDOT) ? 0 : 2));
 		if (ISDOT(p->fts_name)) {
 			/* Command-line "." and ".." are real directories. */
 			return (p->fts_level == FTS_ROOTLEVEL ? FTS_D : FTS_DOT);
@@ -1476,7 +1785,7 @@ fts_sort (FTS *sp, FTSENT *head, register size_t nitems)
 	 * 40 so don't realloc one entry at a time.
 	 */
 	if (nitems > sp->fts_nitems) {
-		struct _ftsent **a;
+		FTSENT **a;
 
 		sp->fts_nitems = nitems + 40;
 		if (SIZE_MAX / sizeof *a < sp->fts_nitems

@@ -1,10 +1,10 @@
 /* df - summarize free disk space
-   Copyright (C) 91, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>.
    --human-readable and --megabyte options added by lm@sgi.com.
@@ -29,7 +28,6 @@
 #include "error.h"
 #include "fsusage.h"
 #include "human.h"
-#include "inttostr.h"
 #include "mountlist.h"
 #include "quote.h"
 #include "save-cwd.h"
@@ -39,10 +37,9 @@
 #define PROGRAM_NAME "df"
 
 #define AUTHORS \
-  "Torbjorn Granlund", "David MacKenzie", "Paul Eggert"
-
-/* Name this program was run with. */
-char *program_name;
+  proper_name_utf8 ("Torbjorn Granlund", "Torbj\303\266rn Granlund"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Paul Eggert")
 
 /* If true, show inode information. */
 static bool inode_format;
@@ -73,7 +70,7 @@ static bool file_systems_processed;
 /* If true, invoke the `sync' system call before getting any usage data.
    Using this option can make df very slow, especially with many or very
    busy disks.  Note that this may make a difference on some systems --
-   SunOS 4.1.3, for one.  It is *not* necessary on Linux.  */
+   SunOS 4.1.3, for one.  It is *not* necessary on GNU/Linux.  */
 static bool require_sync;
 
 /* Desired exit status.  */
@@ -111,13 +108,17 @@ static struct mount_entry *mount_list;
 /* If true, print file system type as well.  */
 static bool print_type;
 
+/* If true, print a grand total at the end.  */
+static bool print_grand_total;
+
+/* Grand total data. */
+static struct fs_usage grand_fsu;
+
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
   NO_SYNC_OPTION = CHAR_MAX + 1,
-  /* FIXME: --kilobytes is deprecated (but not -k); remove in late 2006 */
-  KILOBYTES_LONG_OPTION,
   SYNC_OPTION
 };
 
@@ -128,13 +129,13 @@ static struct option const long_options[] =
   {"inodes", no_argument, NULL, 'i'},
   {"human-readable", no_argument, NULL, 'h'},
   {"si", no_argument, NULL, 'H'},
-  {"kilobytes", no_argument, NULL, KILOBYTES_LONG_OPTION},
   {"local", no_argument, NULL, 'l'},
   {"megabytes", no_argument, NULL, 'm'}, /* obsolescent */
   {"portability", no_argument, NULL, 'P'},
   {"print-type", no_argument, NULL, 'T'},
   {"sync", no_argument, NULL, SYNC_OPTION},
   {"no-sync", no_argument, NULL, NO_SYNC_OPTION},
+  {"total", no_argument, NULL, 'c'},
   {"type", required_argument, NULL, 't'},
   {"exclude-type", required_argument, NULL, 'x'},
   {GETOPT_HELP_OPTION_DECL},
@@ -230,18 +231,28 @@ excluded_fstype (const char *fstype)
   return false;
 }
 
+/* Return true if N is a known integer value.  On many file systems,
+   UINTMAX_MAX represents an unknown value; on AIX, UINTMAX_MAX - 1
+   represents unknown.  Use a rule that works on AIX file systems, and
+   that almost-always works on other types.  */
+static bool
+known_value (uintmax_t n)
+{
+  return n < UINTMAX_MAX - 1;
+}
+
 /* Like human_readable (N, BUF, human_output_opts, INPUT_UNITS, OUTPUT_UNITS),
    except:
 
     - If NEGATIVE, then N represents a negative number,
       expressed in two's complement.
-    - Otherwise, return "-" if N is UINTMAX_MAX.  */
+    - Otherwise, return "-" if N is unknown.  */
 
 static char const *
 df_readable (bool negative, uintmax_t n, char *buf,
 	     uintmax_t input_units, uintmax_t output_units)
 {
-  if (n == UINTMAX_MAX && !negative)
+  if (! known_value (n) && !negative)
     return "-";
   else
     {
@@ -251,6 +262,41 @@ df_readable (bool negative, uintmax_t n, char *buf,
 	*--p = '-';
       return p;
     }
+}
+
+/* Logical equivalence */
+#define LOG_EQ(a, b) (!(a) == !(b))
+
+/* Add integral value while using uintmax_t for value part and separate
+   negation flag. It adds value of SRC and SRC_NEG to DEST and DEST_NEG.
+   The result will be in DEST and DEST_NEG.  See df_readable to understand
+   how the negation flag is used.  */
+static void
+add_uint_with_neg_flag (uintmax_t *dest, bool *dest_neg,
+			uintmax_t src, bool src_neg)
+{
+  if (LOG_EQ (*dest_neg, src_neg))
+    {
+      *dest += src;
+      return;
+    }
+
+  if (*dest_neg)
+    *dest = -*dest;
+
+  if (src_neg)
+    src = -src;
+
+  if (src < *dest)
+    *dest -= src;
+  else
+    {
+      *dest = src - *dest;
+      *dest_neg = src_neg;
+    }
+
+  if (*dest_neg)
+    *dest = -*dest;
 }
 
 /* Display a space listing for the disk device with absolute file name DISK.
@@ -269,7 +315,8 @@ df_readable (bool negative, uintmax_t n, char *buf,
 static void
 show_dev (char const *disk, char const *mount_point,
 	  char const *stat_file, char const *fstype,
-	  bool me_dummy, bool me_remote)
+	  bool me_dummy, bool me_remote,
+	  const struct fs_usage *force_fsu)
 {
   struct fs_usage fsu;
   char buf[3][LONGEST_HUMAN_READABLE + 2];
@@ -302,7 +349,9 @@ show_dev (char const *disk, char const *mount_point,
   if (!stat_file)
     stat_file = mount_point ? mount_point : disk;
 
-  if (get_fs_usage (stat_file, disk, &fsu))
+  if (force_fsu)
+    fsu = *force_fsu;
+  else if (get_fs_usage (stat_file, disk, &fsu))
     {
       error (0, errno, "%s", quote (stat_file));
       exit_status = EXIT_FAILURE;
@@ -353,6 +402,11 @@ show_dev (char const *disk, char const *mount_point,
       available = fsu.fsu_ffree;
       negate_available = false;
       available_to_root = available;
+
+      if (known_value (total))
+	grand_fsu.fsu_files += total;
+      if (known_value (available))
+	grand_fsu.fsu_ffree += available;
     }
   else
     {
@@ -377,13 +431,22 @@ show_dev (char const *disk, char const *mount_point,
       total = fsu.fsu_blocks;
       available = fsu.fsu_bavail;
       negate_available = (fsu.fsu_bavail_top_bit_set
-			  & (available != UINTMAX_MAX));
+			  & known_value (available));
       available_to_root = fsu.fsu_bfree;
+
+      if (known_value (total))
+	grand_fsu.fsu_blocks += input_units * total;
+      if (known_value (available_to_root))
+	grand_fsu.fsu_bfree  += input_units * available_to_root;
+      if (known_value (available))
+	add_uint_with_neg_flag (&grand_fsu.fsu_bavail,
+				&grand_fsu.fsu_bavail_top_bit_set,
+				input_units * available, negate_available);
     }
 
   used = UINTMAX_MAX;
   negate_used = false;
-  if (total != UINTMAX_MAX && available_to_root != UINTMAX_MAX)
+  if (known_value (total) && known_value (available_to_root))
     {
       used = total - available_to_root;
       negate_used = (total < available_to_root);
@@ -398,7 +461,7 @@ show_dev (char const *disk, char const *mount_point,
 	  width, df_readable (negate_available, available,
 			      buf[2], input_units, output_units));
 
-  if (used == UINTMAX_MAX || available == UINTMAX_MAX)
+  if (! known_value (used) || ! known_value (available))
     ;
   else if (!negate_used
 	   && used <= TYPE_MAXIMUM (uintmax_t) / 100
@@ -556,7 +619,7 @@ show_disk (char const *disk)
     {
       show_dev (best_match->me_devname, best_match->me_mountdir, NULL,
 		best_match->me_type, best_match->me_dummy,
-		best_match->me_remote);
+		best_match->me_remote, NULL);
       return true;
     }
 
@@ -660,7 +723,8 @@ show_point (const char *point, const struct stat *statp)
 
   if (best_match)
     show_dev (best_match->me_devname, best_match->me_mountdir, point,
-	      best_match->me_type, best_match->me_dummy, best_match->me_remote);
+	      best_match->me_type, best_match->me_dummy, best_match->me_remote,
+	      NULL);
   else
     {
       /* We couldn't find the mount entry corresponding to POINT.  Go ahead and
@@ -671,7 +735,7 @@ show_point (const char *point, const struct stat *statp)
       char *mp = find_mount_point (point, statp);
       if (mp)
 	{
-	  show_dev (NULL, mp, NULL, NULL, false, false);
+	  show_dev (NULL, mp, NULL, NULL, false, false, NULL);
 	  free (mp);
 	}
     }
@@ -700,7 +764,7 @@ show_all_entries (void)
 
   for (me = mount_list; me; me = me->me_next)
     show_dev (me->me_devname, me->me_mountdir, NULL, me->me_type,
-	      me->me_dummy, me->me_remote);
+	      me->me_dummy, me->me_remote, NULL);
 }
 
 /* Add FSTYPE to the list of file system types to display. */
@@ -749,6 +813,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
   -a, --all             include dummy file systems\n\
   -B, --block-size=SIZE  use SIZE-byte blocks\n\
+      --total           produce a grand total\n\
   -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n\
   -H, --si              likewise, but use powers of 1000 not 1024\n\
 "), stdout);
@@ -772,7 +837,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 SIZE may be (or may be an integer optionally followed by) one of following:\n\
 kB 1000, K 1024, MB 1000*1000, M 1024*1024, and so on for G, T, P, E, Z, Y.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -780,11 +845,10 @@ kB 1000, K 1024, MB 1000*1000, M 1024*1024, and so on for G, T, P, E, Z, Y.\n\
 int
 main (int argc, char **argv)
 {
-  int c;
   struct stat *stats IF_LINT (= 0);
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -801,17 +865,29 @@ main (int argc, char **argv)
   file_systems_processed = false;
   posix_format = false;
   exit_status = EXIT_SUCCESS;
+  print_grand_total = false;
+  grand_fsu.fsu_blocksize = 1;
 
-  while ((c = getopt_long (argc, argv, "aB:iF:hHklmPTt:vx:", long_options, NULL))
-	 != -1)
+  for (;;)
     {
+      int oi = -1;
+      int c = getopt_long (argc, argv, "aB:iF:hHklmPTt:vx:", long_options,
+			   &oi);
+      if (c == -1)
+	break;
+
       switch (c)
 	{
 	case 'a':
 	  show_all_fs = true;
 	  break;
 	case 'B':
-	  human_output_opts = human_options (optarg, true, &output_block_size);
+	  {
+	    enum strtol_error e = human_options (optarg, &human_output_opts,
+						 &output_block_size);
+	    if (e != LONGINT_OK)
+	      xstrtol_fatal (e, oi, c, long_options, optarg);
+	  }
 	  break;
 	case 'i':
 	  inode_format = true;
@@ -824,10 +900,6 @@ main (int argc, char **argv)
 	  human_output_opts = human_autoscale | human_SI;
 	  output_block_size = 1;
 	  break;
-	case KILOBYTES_LONG_OPTION:
-	  error (0, 0,
-		 _("the --kilobytes option is deprecated; use -k instead"));
-	  /* fall through */
 	case 'k':
 	  human_output_opts = 0;
 	  output_block_size = 1024;
@@ -865,6 +937,10 @@ main (int argc, char **argv)
 	  add_excluded_fs_type (optarg);
 	  break;
 
+	case 'c':
+	  print_grand_total = true;
+	  break;
+
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
@@ -881,8 +957,8 @@ main (int argc, char **argv)
 	  output_block_size = (getenv ("POSIXLY_CORRECT") ? 512 : 1024);
 	}
       else
-	human_output_opts = human_options (getenv ("DF_BLOCK_SIZE"), false,
-					   &output_block_size);
+	human_options (getenv ("DF_BLOCK_SIZE"),
+		       &human_output_opts, &output_block_size);
     }
 
   /* Fail if the same file system type was both selected and excluded.  */
@@ -912,17 +988,21 @@ main (int argc, char **argv)
     {
       int i;
 
-      /* stat all the given entries to make sure they get automounted,
-	 if necessary, before reading the file system table.  */
+      /* Open each of the given entries to make sure any corresponding
+	 partition is automounted.  This must be done before reading the
+	 file system table.  */
       stats = xnmalloc (argc - optind, sizeof *stats);
       for (i = optind; i < argc; ++i)
 	{
-	  if (stat (argv[i], &stats[i - optind]))
+	  int fd = open (argv[i], O_RDONLY | O_NOCTTY);
+	  if (fd < 0 || fstat (fd, &stats[i - optind]))
 	    {
 	      error (0, errno, "%s", quote (argv[i]));
 	      exit_status = EXIT_FAILURE;
 	      argv[i] = NULL;
 	    }
+	  if (0 <= fd)
+	    close (fd);
 	}
     }
 
@@ -937,10 +1017,10 @@ main (int argc, char **argv)
       /* Couldn't read the table of mounted file systems.
 	 Fail if df was invoked with no file name arguments;
 	 Otherwise, merely give a warning and proceed.  */
+      int status =          (optind < argc ? 0 : EXIT_FAILURE);
       const char *warning = (optind < argc ? _("Warning: ") : "");
-      int status = (optind < argc ? 0 : EXIT_FAILURE);
-      error (status, errno,
-	     _("%scannot read table of mounted file systems"), warning);
+      error (status, errno, "%s%s", warning,
+	     _("cannot read table of mounted file systems"));
     }
 
   if (require_sync)
@@ -959,6 +1039,13 @@ main (int argc, char **argv)
     }
   else
     show_all_entries ();
+
+  if (print_grand_total)
+    {
+      if (inode_format)
+	grand_fsu.fsu_blocks = 1;
+      show_dev ("total", NULL, NULL, NULL, false, false, &grand_fsu);
+    }
 
   if (! file_systems_processed)
     error (EXIT_FAILURE, 0, _("no file systems processed"));

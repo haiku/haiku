@@ -1,12 +1,12 @@
 /* On some systems, mkdir ("foo/", 0700) fails because of the trailing
    slash.  On those systems, this wrapper removes the trailing slash.
 
-   Copyright (C) 2001, 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,20 +14,16 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* written by Jim Meyering */
 
 #include <config.h>
 
-/* Disable the definition of mkdir to rpl_mkdir (from config.h) in this
-   file.  Otherwise, we'd get conflicting prototypes for rpl_mkdir on
-   most systems.  */
-#undef mkdir
-
+/* Specification.  */
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,10 +31,24 @@
 #include "dirname.h"
 #include "xalloc.h"
 
+/* Disable the definition of mkdir to rpl_mkdir (from the <sys/stat.h>
+   substitute) in this file.  Otherwise, we'd get an endless recursion.  */
+#undef mkdir
+
+/* mingw's _mkdir() function has 1 argument, but we pass 2 arguments.
+   Additionally, it declares _mkdir (and depending on compile flags, an
+   alias mkdir), only in the nonstandard io.h.  */
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# define mkdir(name,mode) _mkdir (name)
+# define maybe_unused _UNUSED_PARAMETER_
+#else
+# define maybe_unused /* empty */
+#endif
+
 /* This function is required at least for NetBSD 1.5.2.  */
 
 int
-rpl_mkdir (char const *dir, mode_t mode)
+rpl_mkdir (char const *dir, mode_t mode maybe_unused)
 {
   int ret_val;
   char *tmp_dir;

@@ -1,10 +1,10 @@
 /* su for GNU.  Run a shell with substitute user and group IDs.
-   Copyright (C) 1992-2006 Free Software Foundation, Inc.
+   Copyright (C) 1992-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Run a shell with the real and effective UID and GID and groups
    of USER, default `root'.
@@ -93,7 +92,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "su"
 
-#define AUTHORS "David MacKenzie"
+#define AUTHORS proper_name ("David MacKenzie")
 
 #if HAVE_PATHS_H
 # include <paths.h>
@@ -119,18 +118,15 @@
 /* The user to become if none is specified.  */
 #define DEFAULT_USER "root"
 
-char *crypt ();
-char *getusershell ();
-void endusershell ();
-void setusershell ();
+char *crypt (char const *key, char const *salt);
+char *getusershell (void);
+void endusershell (void);
+void setusershell (void);
 
 extern char **environ;
 
 static void run_shell (char const *, char const *, char **, size_t)
      ATTRIBUTE_NORETURN;
-
-/* The name this program was run with.  */
-char *program_name;
 
 /* If true, pass the `-f' option to the subshell.  */
 static bool fast_startup;
@@ -300,13 +296,13 @@ change_identity (const struct passwd *pw)
 #ifdef HAVE_INITGROUPS
   errno = 0;
   if (initgroups (pw->pw_name, pw->pw_gid) == -1)
-    error (EXIT_FAIL, errno, _("cannot set groups"));
+    error (EXIT_FAILURE, errno, _("cannot set groups"));
   endgrent ();
 #endif
   if (setgid (pw->pw_gid))
-    error (EXIT_FAIL, errno, _("cannot set group id"));
+    error (EXIT_FAILURE, errno, _("cannot set group id"));
   if (setuid (pw->pw_uid))
-    error (EXIT_FAIL, errno, _("cannot set user id"));
+    error (EXIT_FAILURE, errno, _("cannot set user id"));
 }
 
 /* Run SHELL, or DEFAULT_SHELL if SHELL is empty.
@@ -399,7 +395,7 @@ Change the effective user id and group id to that of USER.\n\
 \n\
 A mere - implies -l.   If USER not given, assume root.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -415,12 +411,12 @@ main (int argc, char **argv)
   struct passwd pw_copy;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  initialize_exit_failure (EXIT_FAIL);
+  initialize_exit_failure (EXIT_FAILURE);
   atexit (close_stdout);
 
   fast_startup = false;
@@ -457,7 +453,7 @@ main (int argc, char **argv)
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
 	default:
-	  usage (EXIT_FAIL);
+	  usage (EXIT_FAILURE);
 	}
     }
 
@@ -472,10 +468,10 @@ main (int argc, char **argv)
   pw = getpwnam (new_user);
   if (! (pw && pw->pw_name && pw->pw_name[0] && pw->pw_dir && pw->pw_dir[0]
 	 && pw->pw_passwd))
-    error (EXIT_FAIL, 0, _("user %s does not exist"), new_user);
+    error (EXIT_FAILURE, 0, _("user %s does not exist"), new_user);
 
   /* Make a copy of the password information and point pw at the local
-     copy instead.  Otherwise, some systems (e.g. Linux) would clobber
+     copy instead.  Otherwise, some systems (e.g. GNU/Linux) would clobber
      the static data through the getlogin call from log_su.
      Also, make sure pw->pw_shell is a nonempty string.
      It may be NULL when NEW_USER is a username that is retrieved via NIS (YP),
@@ -495,7 +491,7 @@ main (int argc, char **argv)
 #ifdef SYSLOG_FAILURE
       log_su (pw, false);
 #endif
-      error (EXIT_FAIL, 0, _("incorrect password"));
+      error (EXIT_FAILURE, 0, _("incorrect password"));
     }
 #ifdef SYSLOG_SUCCESS
   else

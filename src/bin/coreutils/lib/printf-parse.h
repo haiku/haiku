@@ -1,9 +1,12 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Parse printf format string.
-   Copyright (C) 1999, 2002-2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2003, 2005, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -17,6 +20,10 @@
 
 #ifndef _PRINTF_PARSE_H
 #define _PRINTF_PARSE_H
+
+/* This file can be parametrized with the following macros:
+     ENABLE_UNISTDIO    Set to 1 to enable the unistdio extensions.
+     STATIC             Set to 'static' to declare the function static.  */
 
 #include "printf-args.h"
 
@@ -32,6 +39,9 @@
 /* arg_index value indicating that no argument is consumed.  */
 #define ARG_NONE	(~(size_t)0)
 
+/* xxx_directive: A parsed directive.
+   xxx_directives: A parsed format string.  */
+
 /* A parsed directive.  */
 typedef struct
 {
@@ -44,7 +54,7 @@ typedef struct
   const char* precision_start;
   const char* precision_end;
   size_t precision_arg_index;
-  char conversion; /* d i o u x X f e E g G c s p n U % but not C S */
+  char conversion; /* d i o u x X f F e E g G a A c s p n U % but not C S */
   size_t arg_index;
 }
 char_directive;
@@ -59,16 +69,114 @@ typedef struct
 }
 char_directives;
 
+#if ENABLE_UNISTDIO
+
+/* A parsed directive.  */
+typedef struct
+{
+  const uint8_t* dir_start;
+  const uint8_t* dir_end;
+  int flags;
+  const uint8_t* width_start;
+  const uint8_t* width_end;
+  size_t width_arg_index;
+  const uint8_t* precision_start;
+  const uint8_t* precision_end;
+  size_t precision_arg_index;
+  uint8_t conversion; /* d i o u x X f F e E g G a A c s p n U % but not C S */
+  size_t arg_index;
+}
+u8_directive;
+
+/* A parsed format string.  */
+typedef struct
+{
+  size_t count;
+  u8_directive *dir;
+  size_t max_width_length;
+  size_t max_precision_length;
+}
+u8_directives;
+
+/* A parsed directive.  */
+typedef struct
+{
+  const uint16_t* dir_start;
+  const uint16_t* dir_end;
+  int flags;
+  const uint16_t* width_start;
+  const uint16_t* width_end;
+  size_t width_arg_index;
+  const uint16_t* precision_start;
+  const uint16_t* precision_end;
+  size_t precision_arg_index;
+  uint16_t conversion; /* d i o u x X f F e E g G a A c s p n U % but not C S */
+  size_t arg_index;
+}
+u16_directive;
+
+/* A parsed format string.  */
+typedef struct
+{
+  size_t count;
+  u16_directive *dir;
+  size_t max_width_length;
+  size_t max_precision_length;
+}
+u16_directives;
+
+/* A parsed directive.  */
+typedef struct
+{
+  const uint32_t* dir_start;
+  const uint32_t* dir_end;
+  int flags;
+  const uint32_t* width_start;
+  const uint32_t* width_end;
+  size_t width_arg_index;
+  const uint32_t* precision_start;
+  const uint32_t* precision_end;
+  size_t precision_arg_index;
+  uint32_t conversion; /* d i o u x X f F e E g G a A c s p n U % but not C S */
+  size_t arg_index;
+}
+u32_directive;
+
+/* A parsed format string.  */
+typedef struct
+{
+  size_t count;
+  u32_directive *dir;
+  size_t max_width_length;
+  size_t max_precision_length;
+}
+u32_directives;
+
+#endif
+
 
 /* Parses the format string.  Fills in the number N of directives, and fills
    in directives[0], ..., directives[N-1], and sets directives[N].dir_start
    to the end of the format string.  Also fills in the arg_type fields of the
    arguments and the needed count of arguments.  */
-#ifdef STATIC
-STATIC
+#if ENABLE_UNISTDIO
+extern int
+       ulc_printf_parse (const char *format, char_directives *d, arguments *a);
+extern int
+       u8_printf_parse (const uint8_t *format, u8_directives *d, arguments *a);
+extern int
+       u16_printf_parse (const uint16_t *format, u16_directives *d,
+			 arguments *a);
+extern int
+       u32_printf_parse (const uint32_t *format, u32_directives *d,
+			 arguments *a);
 #else
+# ifdef STATIC
+STATIC
+# else
 extern
-#endif
+# endif
 int printf_parse (const char *format, char_directives *d, arguments *a);
+#endif
 
 #endif /* _PRINTF_PARSE_H */

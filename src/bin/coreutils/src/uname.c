@@ -1,12 +1,12 @@
 /* uname -- print system information
 
-   Copyright (C) 1989, 1992, 1993, 1996, 1997, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1989, 1992, 1993, 1996, 1997, 1999-2005, 2007-2008
+   Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu> */
 
@@ -54,11 +53,13 @@
 #include "system.h"
 #include "error.h"
 #include "quote.h"
+#include "uname.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
-#define PROGRAM_NAME "uname"
+#define PROGRAM_NAME (uname_mode == UNAME_UNAME ? "uname" : "arch")
 
-#define AUTHORS "David MacKenzie"
+#define AUTHORS proper_name ("David MacKenzie")
+#define ARCH_AUTHORS "David MacKenzie", "Karel Zak"
 
 /* Values that are bitwise or'd into `toprint'. */
 /* Kernel name. */
@@ -85,10 +86,7 @@
 /* Operating system.  */
 #define PRINT_OPERATING_SYSTEM 128
 
-/* The name this program was run with, for error messages. */
-char *program_name;
-
-static struct option const long_options[] =
+static struct option const uname_long_options[] =
 {
   {"all", no_argument, NULL, 'a'},
   {"kernel-name", no_argument, NULL, 's'},
@@ -106,6 +104,13 @@ static struct option const long_options[] =
   {NULL, 0, NULL, 0}
 };
 
+static struct option const arch_long_options[] =
+{
+  {GETOPT_HELP_OPTION_DECL},
+  {GETOPT_VERSION_OPTION_DECL},
+  {NULL, 0, NULL, 0}
+};
+
 void
 usage (int status)
 {
@@ -115,7 +120,10 @@ usage (int status)
   else
     {
       printf (_("Usage: %s [OPTION]...\n"), program_name);
-      fputs (_("\
+
+      if (uname_mode == UNAME_UNAME)
+        {
+          fputs (_("\
 Print certain system information.  With no OPTION, same as -s.\n\
 \n\
   -a, --all                print all information, in the following order,\n\
@@ -124,16 +132,25 @@ Print certain system information.  With no OPTION, same as -s.\n\
   -n, --nodename           print the network node hostname\n\
   -r, --kernel-release     print the kernel release\n\
 "), stdout);
-      fputs (_("\
+          fputs (_("\
   -v, --kernel-version     print the kernel version\n\
   -m, --machine            print the machine hardware name\n\
   -p, --processor          print the processor type or \"unknown\"\n\
   -i, --hardware-platform  print the hardware platform or \"unknown\"\n\
   -o, --operating-system   print the operating system\n\
 "), stdout);
+	}
+      else
+        {
+	  fputs (_("\
+Print machine architecture.\n\
+\n\
+"), stdout);
+	}
+
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -151,69 +168,83 @@ print_element (char const *element)
   fputs (element, stdout);
 }
 
-int
-main (int argc, char **argv)
+
+/* Set all the option flags according to the switches specified.
+   Return the mask indicating which elements to print.  */
+
+static int
+decode_switches (int argc, char **argv)
 {
   int c;
-  static char const unknown[] = "unknown";
-
-  /* Mask indicating which elements to print. */
   unsigned int toprint = 0;
 
-  initialize_main (&argc, &argv);
-  program_name = argv[0];
-  setlocale (LC_ALL, "");
-  bindtextdomain (PACKAGE, LOCALEDIR);
-  textdomain (PACKAGE);
-
-  atexit (close_stdout);
-
-  while ((c = getopt_long (argc, argv, "asnrvmpio", long_options, NULL)) != -1)
+  if (uname_mode == UNAME_ARCH)
     {
-      switch (c)
+      while ((c = getopt_long (argc, argv, "",
+			       arch_long_options, NULL)) != -1)
 	{
-	case 'a':
-	  toprint = UINT_MAX;
-	  break;
+	  switch (c)
+	    {
+	    case_GETOPT_HELP_CHAR;
 
-	case 's':
-	  toprint |= PRINT_KERNEL_NAME;
-	  break;
+	    case_GETOPT_VERSION_CHAR (PROGRAM_NAME, ARCH_AUTHORS);
 
-	case 'n':
-	  toprint |= PRINT_NODENAME;
-	  break;
+	    default:
+	      usage (EXIT_FAILURE);
+	    }
+        }
+      toprint = PRINT_MACHINE;
+    }
+  else
+    {
+      while ((c = getopt_long (argc, argv, "asnrvmpio",
+			       uname_long_options, NULL)) != -1)
+        {
+	  switch (c)
+	    {
+	    case 'a':
+	      toprint = UINT_MAX;
+	      break;
 
-	case 'r':
-	  toprint |= PRINT_KERNEL_RELEASE;
-	  break;
+	    case 's':
+	      toprint |= PRINT_KERNEL_NAME;
+	      break;
 
-	case 'v':
-	  toprint |= PRINT_KERNEL_VERSION;
-	  break;
+	    case 'n':
+	      toprint |= PRINT_NODENAME;
+	      break;
 
-	case 'm':
-	  toprint |= PRINT_MACHINE;
-	  break;
+	    case 'r':
+	      toprint |= PRINT_KERNEL_RELEASE;
+	      break;
 
-	case 'p':
-	  toprint |= PRINT_PROCESSOR;
-	  break;
+	    case 'v':
+	      toprint |= PRINT_KERNEL_VERSION;
+	      break;
 
-	case 'i':
-	  toprint |= PRINT_HARDWARE_PLATFORM;
-	  break;
+	    case 'm':
+	      toprint |= PRINT_MACHINE;
+	      break;
 
-	case 'o':
-	  toprint |= PRINT_OPERATING_SYSTEM;
-	  break;
+	    case 'p':
+	      toprint |= PRINT_PROCESSOR;
+	      break;
 
-	case_GETOPT_HELP_CHAR;
+	    case 'i':
+	      toprint |= PRINT_HARDWARE_PLATFORM;
+	      break;
 
-	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+	    case 'o':
+	      toprint |= PRINT_OPERATING_SYSTEM;
+	      break;
 
-	default:
-	  usage (EXIT_FAILURE);
+	    case_GETOPT_HELP_CHAR;
+
+	    case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+
+	    default:
+	      usage (EXIT_FAILURE);
+	    }
 	}
     }
 
@@ -222,6 +253,27 @@ main (int argc, char **argv)
       error (0, 0, _("extra operand %s"), quote (argv[optind]));
       usage (EXIT_FAILURE);
     }
+
+  return toprint;
+}
+
+int
+main (int argc, char **argv)
+{
+  static char const unknown[] = "unknown";
+
+  /* Mask indicating which elements to print. */
+  unsigned int toprint = 0;
+
+  initialize_main (&argc, &argv);
+  set_program_name (argv[0]);
+  setlocale (LC_ALL, "");
+  bindtextdomain (PACKAGE, LOCALEDIR);
+  textdomain (PACKAGE);
+
+  atexit (close_stdout);
+
+  toprint = decode_switches (argc, argv);
 
   if (toprint == 0)
     toprint = PRINT_KERNEL_NAME;

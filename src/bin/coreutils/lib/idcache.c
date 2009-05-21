@@ -1,12 +1,12 @@
 /* idcache.c -- map user and group IDs, cached for speed
 
-   Copyright (C) 1985, 1988, 1989, 1990, 1997, 1998, 2003, 2005, 2006
+   Copyright (C) 1985, 1988, 1989, 1990, 1997, 1998, 2003, 2005-2007
    Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,15 +14,14 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
+#include "idcache.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
 
@@ -45,10 +44,23 @@ struct userid
   char name[FLEXIBLE_ARRAY_MEMBER];
 };
 
+/* FIXME: provide a function to free any malloc'd storage and reset lists,
+   so that an application can use code like this just before exiting:
+   #ifdef lint
+     idcache_clear ();
+   #endif
+*/
+
 static struct userid *user_alist;
 
 /* Each entry on list is a user name for which the first lookup failed.  */
 static struct userid *nouser_alist;
+
+/* Use the same struct as for userids.  */
+static struct userid *group_alist;
+
+/* Each entry on list is a group name for which the first lookup failed.  */
+static struct userid *nogroup_alist;
 
 /* Translate UID to a login name, with cache, or NULL if unresolved.  */
 
@@ -131,12 +143,6 @@ getuidbyname (const char *user)
   nouser_alist = tail;
   return NULL;
 }
-
-/* Use the same struct as for userids.  */
-static struct userid *group_alist;
-
-/* Each entry on list is a group name for which the first lookup failed.  */
-static struct userid *nogroup_alist;
 
 /* Translate GID to a group name, with cache, or NULL if unresolved.  */
 

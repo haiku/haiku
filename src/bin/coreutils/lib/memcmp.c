@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1993, 1995, 1997, 1998, 2003, 2006 Free Software
+/* Copyright (C) 1991, 1993, 1995, 1997, 1998, 2003, 2006, 2009 Free Software
    Foundation, Inc.
 
    Contributed by Torbjorn Granlund (tege@sics.se).
@@ -6,9 +6,9 @@
    NOTE: The canonical source of this file is maintained with the GNU C Library.
    Bugs can be reported to bug-glibc@prep.ai.mit.edu.
 
-   This program is free software; you can redistribute it and/or modify it
+   This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   Free Software Foundation; either version 3 of the License, or any
    later version.
 
    This program is distributed in the hope that it will be useful,
@@ -17,15 +17,15 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBC
 # include <config.h>
 #endif
 
 #include <string.h>
+
+#include <stdint.h>
 
 #undef memcmp
 
@@ -90,16 +90,16 @@ typedef unsigned char byte;
 __inline
 # endif
 static int
-memcmp_bytes (long unsigned int a, long unsigned int b)
+memcmp_bytes (op_t a, op_t b)
 {
-  long int srcp1 = (long int) &a;
-  long int srcp2 = (long int) &b;
+  const byte *srcp1 = (const byte *) &a;
+  const byte *srcp2 = (const byte *) &b;
   op_t a0, b0;
 
   do
     {
-      a0 = ((byte *) srcp1)[0];
-      b0 = ((byte *) srcp2)[0];
+      a0 = srcp1[0];
+      b0 = srcp2[0];
       srcp1 += 1;
       srcp2 += 1;
     }
@@ -115,7 +115,7 @@ memcmp_bytes (long unsigned int a, long unsigned int b)
 __inline
 #endif
 static int
-memcmp_common_alignment (long int srcp1, long int srcp2, size_t len)
+memcmp_common_alignment (uintptr_t srcp1, uintptr_t srcp2, size_t len)
 {
   op_t a0, a1;
   op_t b0, b1;
@@ -200,7 +200,7 @@ memcmp_common_alignment (long int srcp1, long int srcp2, size_t len)
 __inline
 #endif
 static int
-memcmp_not_common_alignment (long int srcp1, long int srcp2, size_t len)
+memcmp_not_common_alignment (uintptr_t srcp1, uintptr_t srcp2, size_t len)
 {
   op_t a0, a1, a2, a3;
   op_t b0, b1, b2, b3;
@@ -304,8 +304,8 @@ rpl_memcmp (const void *s1, const void *s2, size_t len)
 {
   op_t a0;
   op_t b0;
-  long int srcp1 = (long int) s1;
-  long int srcp2 = (long int) s2;
+  uintptr_t srcp1 = (uintptr_t) s1;
+  uintptr_t srcp2 = (uintptr_t) s2;
   op_t res;
 
   if (len >= OP_T_THRES)

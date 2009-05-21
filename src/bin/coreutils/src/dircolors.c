@@ -1,11 +1,11 @@
 /* dircolors - output commands to set the LS_COLOR environment variable
-   Copyright (C) 1996-2007 Free Software Foundation, Inc.
+   Copyright (C) 1996-2008 Free Software Foundation, Inc.
    Copyright (C) 1994, 1995, 1997, 1998, 1999, 2000 H. Peter Anvin
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -26,7 +25,6 @@
 #include "dircolors.h"
 #include "c-strcase.h"
 #include "error.h"
-#include "getline.h"
 #include "obstack.h"
 #include "quote.h"
 #include "xstrndup.h"
@@ -34,7 +32,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "dircolors"
 
-#define AUTHORS "H. Peter Anvin"
+#define AUTHORS proper_name ("H. Peter Anvin")
 
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
@@ -61,18 +59,19 @@ static struct obstack lsc_obstack;
 
 static const char *const slack_codes[] =
 {
-  "NORMAL", "NORM", "FILE", "DIR", "LNK", "LINK",
+  "NORMAL", "NORM", "FILE", "RESET", "DIR", "LNK", "LINK",
   "SYMLINK", "ORPHAN", "MISSING", "FIFO", "PIPE", "SOCK", "BLK", "BLOCK",
   "CHR", "CHAR", "DOOR", "EXEC", "LEFT", "LEFTCODE", "RIGHT", "RIGHTCODE",
   "END", "ENDCODE", "SUID", "SETUID", "SGID", "SETGID", "STICKY",
-  "OTHER_WRITABLE", "OWR", "STICKY_OTHER_WRITABLE", "OWT", NULL
+  "OTHER_WRITABLE", "OWR", "STICKY_OTHER_WRITABLE", "OWT", "CAPABILITY",
+  "HARDLINK", "CLRTOEOL", NULL
 };
 
 static const char *const ls_codes[] =
 {
-  "no", "no", "fi", "di", "ln", "ln", "ln", "or", "mi", "pi", "pi",
+  "no", "no", "fi", "rs", "di", "ln", "ln", "ln", "or", "mi", "pi", "pi",
   "so", "bd", "bd", "cd", "cd", "do", "ex", "lc", "lc", "rc", "rc", "ec", "ec",
-  "su", "su", "sg", "sg", "st", "ow", "ow", "tw", "tw", NULL
+  "su", "su", "sg", "sg", "st", "ow", "ow", "tw", "tw", "ca", "hl", "cl", NULL
 };
 #define array_len(Array) (sizeof (Array) / sizeof *(Array))
 verify (array_len (slack_codes) == array_len (ls_codes));
@@ -88,8 +87,6 @@ static struct option const long_options[] =
     {GETOPT_VERSION_OPTION_DECL},
     {NULL, 0, NULL, 0}
   };
-
-char *program_name;
 
 void
 usage (int status)
@@ -116,7 +113,7 @@ If FILE is specified, read it to determine which colors to use for which\n\
 file types and extensions.  Otherwise, a precompiled database is used.\n\
 For details on the format of these files, run `dircolors --print-database'.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
 
   exit (status);
@@ -404,7 +401,7 @@ main (int argc, char **argv)
   bool print_database = false;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -452,8 +449,8 @@ to select a shell syntax are mutually exclusive"));
       error (0, 0, _("extra operand %s"), quote (argv[!print_database]));
       if (print_database)
 	fprintf (stderr, "%s\n",
-		 _("File operands cannot be combined with "
-		   "--print-database (-p)."));
+		 _("file operands cannot be combined with "
+		   "--print-database (-p)"));
       usage (EXIT_FAILURE);
     }
 

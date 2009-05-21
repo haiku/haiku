@@ -1,10 +1,10 @@
 /* comm -- compare two sorted files line by line.
-   Copyright (C) 86, 90, 91, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 86, 90, 91, 1995-2005, 2008-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Richard Stallman and David MacKenzie. */
 
@@ -24,22 +23,21 @@
 #include "system.h"
 #include "linebuffer.h"
 #include "error.h"
-#include "hard-locale.h"
 #include "quote.h"
 #include "stdio--.h"
+#include "memcmp2.h"
 #include "xmemcoll.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "comm"
 
-#define AUTHORS "Richard Stallman", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("Richard M. Stallman"), \
+  proper_name ("David MacKenzie")
 
 /* Undefine, to avoid warning about redefinition on some systems.  */
 #undef min
 #define min(x, y) ((x) < (y) ? (x) : (y))
-
-/* The name this program was run with. */
-char *program_name;
 
 /* True if the LC_COLLATE locale is hard.  */
 static bool hard_LC_COLLATE;
@@ -53,8 +51,39 @@ static bool only_file_2;
 /* If true, print lines that are found in both files. */
 static bool both;
 
+/* If nonzero, we have seen at least one unpairable line. */
+static bool seen_unpairable;
+
+/* If nonzero, we have warned about disorder in that file. */
+static bool issued_disorder_warning[2];
+
+/* If nonzero, check that the input is correctly ordered. */
+static enum
+  {
+    CHECK_ORDER_DEFAULT,
+    CHECK_ORDER_ENABLED,
+    CHECK_ORDER_DISABLED
+  } check_input_order;
+
+/* Output columns will be delimited with this string, which may be set
+   on the command-line with --output-delimiter=STR.  The default is a
+   single TAB character. */
+static char const *delimiter;
+
+/* For long options that have no equivalent short option, use a
+   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+enum
+{
+  CHECK_ORDER_OPTION = CHAR_MAX + 1,
+  NOCHECK_ORDER_OPTION,
+  OUTPUT_DELIMITER_OPTION
+};
+
 static struct option const long_options[] =
 {
+  {"check-order", no_argument, NULL, CHECK_ORDER_OPTION},
+  {"nocheck-order", no_argument, NULL, NOCHECK_ORDER_OPTION},
+  {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -89,9 +118,22 @@ and column three contains lines common to both files.\n\
   -2              suppress lines unique to FILE2\n\
   -3              suppress lines that appear in both files\n\
 "), stdout);
+      fputs (_("\
+\n\
+  --check-order     check that the input is correctly sorted, even\n\
+                      if all input lines are pairable\n\
+  --nocheck-order   do not check that the input is correctly sorted\n\
+"), stdout);
+      fputs (_("\
+  --output-delimiter=STR  separate columns with STR\n\
+"), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      fputs (_("\
+\n\
+Note, comparisons honor the rules specified by `LC_COLLATE'.\n\
+"), stdout);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -102,7 +144,7 @@ and column three contains lines common to both files.\n\
    2 for a line only in file 2, 3 for a line in both. */
 
 static void
-writeline (const struct linebuffer *line, FILE *stream, int class)
+writeline (struct linebuffer const *line, FILE *stream, int class)
 {
   switch (class)
     {
@@ -114,24 +156,69 @@ writeline (const struct linebuffer *line, FILE *stream, int class)
     case 2:
       if (!only_file_2)
 	return;
-      /* Print a TAB if we are printing lines from file 1.  */
+      /* Print a delimiter if we are printing lines from file 1.  */
       if (only_file_1)
-	putc ('\t', stream);
+	fputs (delimiter, stream);
       break;
 
     case 3:
       if (!both)
 	return;
-      /* Print a TAB if we are printing lines from file 1.  */
+      /* Print a delimiter if we are printing lines from file 1.  */
       if (only_file_1)
-	putc ('\t', stream);
-      /* Print a TAB if we are printing lines from file 2.  */
+	fputs (delimiter, stream);
+      /* Print a delimiter if we are printing lines from file 2.  */
       if (only_file_2)
-	putc ('\t', stream);
+	fputs (delimiter, stream);
       break;
     }
 
   fwrite (line->buffer, sizeof (char), line->length, stream);
+}
+
+/* Check that successive input lines PREV and CURRENT from input file
+   WHATFILE are presented in order.
+
+   If the user specified --nocheck-order, the check is not made.
+   If the user specified --check-order, the problem is fatal.
+   Otherwise (the default), the message is simply a warning.
+
+   A message is printed at most once per input file.
+
+   This funtion was copied (nearly) verbatim from `src/join.c'. */
+
+static void
+check_order (struct linebuffer const *prev,
+	     struct linebuffer const *current,
+	     int whatfile)
+{
+
+  if (check_input_order != CHECK_ORDER_DISABLED
+      && ((check_input_order == CHECK_ORDER_ENABLED) || seen_unpairable))
+    {
+      if (!issued_disorder_warning[whatfile - 1])
+	{
+	  int order;
+
+	  if (hard_LC_COLLATE)
+	    order = xmemcoll (prev->buffer, prev->length - 1,
+			      current->buffer, current->length - 1);
+	  else
+	    order = memcmp2 (prev->buffer, prev->length - 1,
+			     current->buffer, current->length - 1);
+
+	  if (0 < order)
+	    {
+	      error ((check_input_order == CHECK_ORDER_ENABLED
+		      ? EXIT_FAILURE : 0),
+		     0, _("file %d is not in sorted order"), whatfile);
+
+	      /* If we get to here, the message was just a warning, but we
+		 want only to issue it once. */
+	      issued_disorder_warning[whatfile - 1] = true;
+	    }
+	}
+    }
 }
 
 /* Compare INFILES[0] and INFILES[1].
@@ -142,28 +229,42 @@ writeline (const struct linebuffer *line, FILE *stream, int class)
 static void
 compare_files (char **infiles)
 {
-  /* For each file, we have one linebuffer in lb1.  */
-  struct linebuffer lb1[2];
+  /* For each file, we have four linebuffers in lba. */
+  struct linebuffer lba[2][4];
 
   /* thisline[i] points to the linebuffer holding the next available line
      in file i, or is NULL if there are no lines left in that file.  */
   struct linebuffer *thisline[2];
 
+  /* all_line[i][alt[i][0]] also points to the linebuffer holding the
+     current line in file i. We keep two buffers of history around so we
+     can look two lines back when we get to the end of a file. */
+  struct linebuffer *all_line[2][4];
+
+  /* This is used to rotate through the buffers for each input file. */
+  int alt[2][3];
+
   /* streams[i] holds the input stream for file i.  */
   FILE *streams[2];
 
-  int i;
+  int i, j;
 
   /* Initialize the storage. */
   for (i = 0; i < 2; i++)
     {
-      initbuffer (&lb1[i]);
-      thisline[i] = &lb1[i];
+      for (j = 0; j < 4; j++)
+	{
+	  initbuffer (&lba[i][j]);
+	  all_line[i][j] = &lba[i][j];
+	}
+      alt[i][0] = 0;
+      alt[i][1] = 0;
+      alt[i][2] = 0;
       streams[i] = (STREQ (infiles[i], "-") ? stdin : fopen (infiles[i], "r"));
       if (!streams[i])
 	error (EXIT_FAILURE, errno, "%s", infiles[i]);
 
-      thisline[i] = readlinebuffer (thisline[i], streams[i]);
+      thisline[i] = readlinebuffer (all_line[i][alt[i][0]], streams[i]);
       if (ferror (streams[i]))
 	error (EXIT_FAILURE, errno, "%s", infiles[i]);
     }
@@ -171,6 +272,7 @@ compare_files (char **infiles)
   while (thisline[0] || thisline[1])
     {
       int order;
+      bool fill_up[2] = { false, false };
 
       /* Compare the next available lines of the two files.  */
 
@@ -197,25 +299,47 @@ compare_files (char **infiles)
       /* Output the line that is lesser. */
       if (order == 0)
 	writeline (thisline[1], stdout, 3);
-      else if (order > 0)
-	writeline (thisline[1], stdout, 2);
       else
-	writeline (thisline[0], stdout, 1);
+	{
+	  seen_unpairable = true;
+	  if (order <= 0)
+	    writeline (thisline[0], stdout, 1);
+	  else
+	    writeline (thisline[1], stdout, 2);
+	}
 
       /* Step the file the line came from.
 	 If the files match, step both files.  */
-      if (order >= 0)
-	{
-	  thisline[1] = readlinebuffer (thisline[1], streams[1]);
-	  if (ferror (streams[1]))
-	    error (EXIT_FAILURE, errno, "%s", infiles[1]);
-	}
+      if (0 <= order)
+	fill_up[1] = true;
       if (order <= 0)
-	{
-	  thisline[0] = readlinebuffer (thisline[0], streams[0]);
-	  if (ferror (streams[0]))
-	    error (EXIT_FAILURE, errno, "%s", infiles[0]);
-	}
+	fill_up[0] = true;
+
+      for (i = 0; i < 2; i++)
+	if (fill_up[i])
+	  {
+	    /* Rotate the buffers for this file. */
+	    alt[i][2] = alt[i][1];
+	    alt[i][1] = alt[i][0];
+	    alt[i][0] = (alt[i][0] + 1) & 0x03;
+
+	    thisline[i] = readlinebuffer (all_line[i][alt[i][0]], streams[i]);
+
+	    if (thisline[i])
+	      check_order (all_line[i][alt[i][1]], thisline[i], i + 1);
+
+	    /* If this is the end of the file we may need to re-check
+	       the order of the previous two lines, since we might have
+	       discovered an unpairable match since we checked before. */
+	    else if (all_line[i][alt[i][2]]->buffer)
+	      check_order (all_line[i][alt[i][2]],
+			   all_line[i][alt[i][1]], i + 1);
+
+	    if (ferror (streams[i]))
+	      error (EXIT_FAILURE, errno, "%s", infiles[i]);
+
+	    fill_up[i] = false;
+	  }
     }
 
   for (i = 0; i < 2; i++)
@@ -229,7 +353,7 @@ main (int argc, char **argv)
   int c;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -240,6 +364,10 @@ main (int argc, char **argv)
   only_file_1 = true;
   only_file_2 = true;
   both = true;
+
+  seen_unpairable = false;
+  issued_disorder_warning[0] = issued_disorder_warning[1] = false;
+  check_input_order = CHECK_ORDER_DEFAULT;
 
   while ((c = getopt_long (argc, argv, "123", long_options, NULL)) != -1)
     switch (c)
@@ -254,6 +382,25 @@ main (int argc, char **argv)
 
       case '3':
 	both = false;
+	break;
+
+      case NOCHECK_ORDER_OPTION:
+	check_input_order = CHECK_ORDER_DISABLED;
+	break;
+
+      case CHECK_ORDER_OPTION:
+	check_input_order = CHECK_ORDER_ENABLED;
+	break;
+
+      case OUTPUT_DELIMITER_OPTION:
+	if (delimiter && !STREQ (delimiter, optarg))
+	  error (EXIT_FAILURE, 0, _("multiple delimiters specified"));
+	delimiter = optarg;
+	if (!*delimiter)
+	  {
+	    error (EXIT_FAILURE, 0, _("empty %s not allowed"),
+		   quote ("--output-delimiter"));
+	  }
 	break;
 
       case_GETOPT_HELP_CHAR;
@@ -279,7 +426,14 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
+  /* The default delimiter is a TAB. */
+  if (!delimiter)
+    delimiter = "\t";
+
   compare_files (argv + optind);
 
-  exit (EXIT_SUCCESS);
+  if (issued_disorder_warning[0] || issued_disorder_warning[1])
+    exit (EXIT_FAILURE);
+  else
+    exit (EXIT_SUCCESS);
 }

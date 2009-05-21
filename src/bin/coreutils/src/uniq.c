@@ -1,10 +1,10 @@
 /* uniq -- remove duplicate lines from a sorted file
-   Copyright (C) 86, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 86, 91, 1995-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,10 +12,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Richard Stallman and David MacKenzie. */
+/* Written by Richard M. Stallman and David MacKenzie. */
 
 #include <config.h>
 
@@ -27,7 +26,6 @@
 #include "argmatch.h"
 #include "linebuffer.h"
 #include "error.h"
-#include "hard-locale.h"
 #include "posixver.h"
 #include "quote.h"
 #include "xmemcoll.h"
@@ -37,7 +35,9 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "uniq"
 
-#define AUTHORS "Richard Stallman", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("Richard M. Stallman"), \
+  proper_name ("David MacKenzie")
 
 #define SWAP_LINES(A, B)			\
   do						\
@@ -48,9 +48,6 @@
       (B) = _tmp;				\
     }						\
   while (0)
-
-/* The name this program was run with. */
-char *program_name;
 
 /* True if the LC_COLLATE locale is hard.  */
 static bool hard_LC_COLLATE;
@@ -119,6 +116,7 @@ static struct option const longopts[] =
   {"skip-fields", required_argument, NULL, 'f'},
   {"skip-chars", required_argument, NULL, 's'},
   {"check-chars", required_argument, NULL, 'w'},
+  {"zero-terminated", no_argument, NULL, 'z'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -137,8 +135,10 @@ Usage: %s [OPTION]... [INPUT [OUTPUT]]\n\
 "),
 	      program_name);
       fputs (_("\
-Discard all but one of successive identical lines from INPUT (or\n\
-standard input), writing to OUTPUT (or standard output).\n\
+Filter adjacent matching lines from INPUT (or standard input),\n\
+writing to OUTPUT (or standard output).\n\
+\n\
+With no options, matching lines are merged to the first occurrence.\n\
 \n\
 "), stdout);
      fputs (_("\
@@ -156,6 +156,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -i, --ignore-case     ignore differences in case when comparing\n\
   -s, --skip-chars=N    avoid comparing the first N characters\n\
   -u, --unique          only print unique lines\n\
+  -z, --zero-terminated  end lines with 0 byte, not newline\n\
 "), stdout);
      fputs (_("\
   -w, --check-chars=N   compare no more than N characters in lines\n\
@@ -164,10 +165,16 @@ Mandatory arguments to long options are mandatory for short options too.\n\
      fputs (VERSION_OPTION_DESCRIPTION, stdout);
      fputs (_("\
 \n\
-A field is a run of whitespace, then non-whitespace characters.\n\
-Fields are skipped before chars.\n\
+A field is a run of blanks (usually spaces and/or TABs), then non-blank\n\
+characters.  Fields are skipped before chars.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+     fputs (_("\
+\n\
+Note: 'uniq' does not detect repeated lines unless they are adjacent.\n\
+You may want to sort the input first, or use `sort -u' without `uniq'.\n\
+Also, comparisons honor the rules specified by `LC_COLLATE'.\n\
+"), stdout);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -198,25 +205,25 @@ size_opt (char const *opt, char const *msgid)
    return a pointer to the beginning of the line's field to be compared. */
 
 static char *
-find_field (const struct linebuffer *line)
+find_field (struct linebuffer const *line)
 {
   size_t count;
-  char *lp = line->buffer;
+  char const *lp = line->buffer;
   size_t size = line->length - 1;
   size_t i = 0;
 
-  for (count = 0; count < skip_fields && i < size; count++)
+  for (count = 0; count < skip_fields; count++)
     {
-      while (i < size && isblank (lp[i]))
+      while (i < size && isblank (to_uchar (lp[i])))
 	i++;
-      while (i < size && !isblank (lp[i]))
+      while (i < size && !isblank (to_uchar (lp[i])))
 	i++;
     }
 
   for (count = 0; count < skip_chars && i < size; count++)
     i++;
 
-  return lp + i;
+  return line->buffer + i;
 }
 
 /* Return false if two strings OLD and NEW match, true if not.
@@ -268,7 +275,7 @@ writeline (struct linebuffer const *line,
    If either is "-", use the standard I/O stream for it instead. */
 
 static void
-check_file (const char *infile, const char *outfile)
+check_file (const char *infile, const char *outfile, char delimiter)
 {
   struct linebuffer lb1, lb2;
   struct linebuffer *thisline, *prevline;
@@ -300,7 +307,7 @@ check_file (const char *infile, const char *outfile)
 	{
 	  char *thisfield;
 	  size_t thislen;
-	  if (readlinebuffer (thisline, stdin) == 0)
+	  if (readlinebuffer_delim (thisline, stdin, delimiter) == 0)
 	    break;
 	  thisfield = find_field (thisline);
 	  thislen = thisline->length - 1 - (thisfield - thisline->buffer);
@@ -323,7 +330,7 @@ check_file (const char *infile, const char *outfile)
       uintmax_t match_count = 0;
       bool first_delimiter = true;
 
-      if (readlinebuffer (prevline, stdin) == 0)
+      if (readlinebuffer_delim (prevline, stdin, delimiter) == 0)
 	goto closefiles;
       prevfield = find_field (prevline);
       prevlen = prevline->length - 1 - (prevfield - prevline->buffer);
@@ -333,7 +340,7 @@ check_file (const char *infile, const char *outfile)
 	  bool match;
 	  char *thisfield;
 	  size_t thislen;
-	  if (readlinebuffer (thisline, stdin) == 0)
+	  if (readlinebuffer_delim (thisline, stdin, delimiter) == 0)
 	    {
 	      if (ferror (stdin))
 		goto closefiles;
@@ -363,7 +370,7 @@ check_file (const char *infile, const char *outfile)
 		  if ((delimit_groups == DM_PREPEND)
 		      || (delimit_groups == DM_SEPARATE
 			  && !first_delimiter))
-		    putchar ('\n');
+		    putchar (delimiter);
 		}
 	    }
 
@@ -406,10 +413,11 @@ main (int argc, char **argv)
   enum Skip_field_option_type skip_field_option_type = SFO_NONE;
   int nfiles = 0;
   char const *file[2];
+  char delimiter = '\n';	/* change with --zero-terminated, -z */
 
   file[0] = file[1] = "-";
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -434,7 +442,7 @@ main (int argc, char **argv)
       if (optc == -1
 	  || (posixly_correct && nfiles != 0)
 	  || ((optc = getopt_long (argc, argv,
-				   "-0123456789Dcdf:is:uw:", longopts, NULL))
+				   "-0123456789Dcdf:is:uw:z", longopts, NULL))
 	      == -1))
 	{
 	  if (argc <= optind)
@@ -530,6 +538,10 @@ main (int argc, char **argv)
 				  N_("invalid number of bytes to compare"));
 	  break;
 
+	case 'z':
+	  delimiter = '\0';
+	  break;
+
 	case_GETOPT_HELP_CHAR;
 
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -546,7 +558,7 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
-  check_file (file[0], file[1]);
+  check_file (file[0], file[1], delimiter);
 
   exit (EXIT_SUCCESS);
 }

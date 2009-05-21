@@ -1,10 +1,10 @@
 /* mv -- move or rename files
-   Copyright (C) 86, 89, 90, 91, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Mike Parker, David MacKenzie, and Jim Meyering */
 
@@ -22,9 +21,9 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <assert.h>
+#include <selinux/selinux.h>
 
 #include "system.h"
-#include "argmatch.h"
 #include "backupfile.h"
 #include "copy.h"
 #include "cp-hash.h"
@@ -32,52 +31,34 @@
 #include "filenamecat.h"
 #include "quote.h"
 #include "remove.h"
+#include "root-dev-ino.h"
+#include "priv-set.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "mv"
 
-#define AUTHORS "Mike Parker", "David MacKenzie", "Jim Meyering"
-
-/* Initial number of entries in each hash table entry's table of inodes.  */
-#define INITIAL_HASH_MODULE 100
-
-/* Initial number of entries in the inode hash table.  */
-#define INITIAL_ENTRY_TAB_SIZE 70
+#define AUTHORS \
+  proper_name ("Mike Parker"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Jim Meyering")
 
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
-  REPLY_OPTION = CHAR_MAX + 1,
-  STRIP_TRAILING_SLASHES_OPTION
+  STRIP_TRAILING_SLASHES_OPTION = CHAR_MAX + 1
 };
-
-/* The name this program was run with. */
-char *program_name;
 
 /* Remove any trailing slashes from each SOURCE argument.  */
 static bool remove_trailing_slashes;
-
-/* Valid arguments to the `--reply' option. */
-static char const* const reply_args[] =
-{
-  "yes", "no", "query", NULL
-};
-
-/* The values that correspond to the above strings. */
-static int const reply_vals[] =
-{
-  I_ALWAYS_YES, I_ALWAYS_NO, I_ASK_USER
-};
 
 static struct option const long_options[] =
 {
   {"backup", optional_argument, NULL, 'b'},
   {"force", no_argument, NULL, 'f'},
   {"interactive", no_argument, NULL, 'i'},
+  {"no-clobber", no_argument, NULL, 'n'},
   {"no-target-directory", no_argument, NULL, 'T'},
-  {"reply", required_argument, NULL, REPLY_OPTION}, /* Deprecated 2005-07-03,
-						       remove in 2008. */
   {"strip-trailing-slashes", no_argument, NULL, STRIP_TRAILING_SLASHES_OPTION},
   {"suffix", required_argument, NULL, 'S'},
   {"target-directory", required_argument, NULL, 't'},
@@ -92,7 +73,6 @@ static void
 rm_option_init (struct rm_options *x)
 {
   x->ignore_missing_files = false;
-  x->root_dev_ino = NULL;
   x->recursive = true;
   x->one_file_system = false;
 
@@ -108,11 +88,22 @@ rm_option_init (struct rm_options *x)
      the initial working directory, in case one of those is a
      `.'-relative name.  */
   x->require_restore_cwd = true;
+
+  {
+    static struct dev_ino dev_ino_buf;
+    x->root_dev_ino = get_root_dev_ino (&dev_ino_buf);
+    if (x->root_dev_ino == NULL)
+      error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
+	     quote ("/"));
+  }
 }
 
 static void
 cp_option_init (struct cp_options *x)
 {
+  bool selinux_enabled = (0 < is_selinux_enabled ());
+
+  cp_options_default (x);
   x->copy_as_regular = false;  /* FIXME: maybe make this an option */
   x->dereference = DEREF_NEVER;
   x->unlink_dest_before_opening = false;
@@ -120,14 +111,18 @@ cp_option_init (struct cp_options *x)
   x->hard_link = false;
   x->interactive = I_UNSPECIFIED;
   x->move_mode = true;
-  x->chown_privileges = chown_privileges ();
   x->one_file_system = false;
   x->preserve_ownership = true;
   x->preserve_links = true;
   x->preserve_mode = true;
   x->preserve_timestamps = true;
+  x->preserve_security_context = selinux_enabled;
+  x->reduce_diagnostics = false;
   x->require_preserve = false;  /* FIXME: maybe make this an option */
   x->ignore_attributes = false;
+  x->require_preserve_context = false;
+  x->preserve_xattr = true;
+  x->require_preserve_xattr = false;
   x->recursive = true;
   x->sparse_mode = SPARSE_AUTO;  /* FIXME: maybe make this an option */
   x->symbolic_link = false;
@@ -135,6 +130,7 @@ cp_option_init (struct cp_options *x)
   x->mode = 0;
   x->stdin_tty = isatty (STDIN_FILENO);
 
+  x->open_dangling_dest_symlink = false;
   x->update = false;
   x->verbose = false;
   x->dest_info = NULL;
@@ -249,9 +245,9 @@ movefile (char *source, char *dest, bool dest_is_dir,
 
   /* This code was introduced to handle the ambiguity in the semantics
      of mv that is induced by the varying semantics of the rename function.
-     Some systems (e.g., Linux) have a rename function that honors a
+     Some systems (e.g., GNU/Linux) have a rename function that honors a
      trailing slash, while others (like Solaris 5,6,7) have a rename
-     function that ignores a trailing slash.  I believe the Linux
+     function that ignores a trailing slash.  I believe the GNU/Linux
      rename semantics are POSIX and susv2 compliant.  */
 
   if (remove_trailing_slashes)
@@ -300,6 +296,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -b                           like --backup but does not accept an argument\n\
   -f, --force                  do not prompt before overwriting\n\
   -i, --interactive            prompt before overwrite\n\
+  -n, --no-clobber             do not overwrite an existing file\n\
+If you specify more than one of -i, -f, -n, only the final one takes effect.\n\
 "), stdout);
       fputs (_("\
       --strip-trailing-slashes  remove any trailing slashes from each SOURCE\n\
@@ -329,7 +327,7 @@ the VERSION_CONTROL environment variable.  Here are the values:\n\
   existing, nil   numbered if numbered backups exist, simple otherwise\n\
   simple, never   always make simple backups\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -349,20 +347,23 @@ main (int argc, char **argv)
   char **file;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  atexit (close_stdout);
+  atexit (close_stdin);
 
   cp_option_init (&x);
+
+  /* Try to disable the ability to unlink a directory.  */
+  priv_set_remove_linkdir ();
 
   /* FIXME: consider not calling getenv for SIMPLE_BACKUP_SUFFIX unless
      we'll actually use backup_suffix_string.  */
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
-  while ((c = getopt_long (argc, argv, "bfit:uvS:T", long_options, NULL))
+  while ((c = getopt_long (argc, argv, "bfint:uvS:T", long_options, NULL))
 	 != -1)
     {
       switch (c)
@@ -378,11 +379,8 @@ main (int argc, char **argv)
 	case 'i':
 	  x.interactive = I_ASK_USER;
 	  break;
-	case REPLY_OPTION: /* Deprecated */
-	  x.interactive = XARGMATCH ("--reply", optarg,
-				     reply_args, reply_vals);
-	  error (0, 0,
-		 _("the --reply option is deprecated; use -i or -f instead"));
+	case 'n':
+	  x.interactive = I_ALWAYS_NO;
 	  break;
 	case STRIP_TRAILING_SLASHES_OPTION:
 	  remove_trailing_slashes = true;
@@ -438,7 +436,7 @@ main (int argc, char **argv)
     {
       if (target_directory)
 	error (EXIT_FAILURE, 0,
-	       _("Cannot combine --target-directory (-t) "
+	       _("cannot combine --target-directory (-t) "
 		 "and --no-target-directory (-T)"));
       if (2 < n_files)
 	{
@@ -454,6 +452,13 @@ main (int argc, char **argv)
       else if (2 < n_files)
 	error (EXIT_FAILURE, 0, _("target %s is not a directory"),
 	       quote (file[n_files - 1]));
+    }
+
+  if (make_backups && x.interactive == I_ALWAYS_NO)
+    {
+      error (0, 0,
+	     _("options --backup and --no-clobber are mutually exclusive"));
+      usage (EXIT_FAILURE);
     }
 
   if (backup_suffix_string)

@@ -1,10 +1,10 @@
 /* core functions for copying files and directories
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation.
+   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Extracted from cp.c and librarified by Jim Meyering.  */
 
@@ -22,7 +21,6 @@
 
 # include <stdbool.h>
 # include "hash.h"
-# include "lstat.h"
 
 /* Control creation of sparse files (files with holes).  */
 enum Sparse_type
@@ -83,12 +81,24 @@ struct cp_options
 {
   enum backup_type backup_type;
 
+  /* How to handle symlinks in the source.  */
+  enum Dereference_symlink dereference;
+
+  /* This value is used to determine whether to prompt before removing
+     each existing destination file.  It works differently depending on
+     whether move_mode is set.  See code/comments in copy.c.  */
+  enum Interactive interactive;
+
+  /* Control creation of sparse files.  */
+  enum Sparse_type sparse_mode;
+
+  /* Set the mode of the destination file to exactly this value
+     if SET_MODE is nonzero.  */
+  mode_t mode;
+
   /* If true, copy all files except (directories and, if not dereferencing
      them, symbolic links,) as if they were regular files.  */
   bool copy_as_regular;
-
-  /* How to handle symlinks.  */
-  enum Dereference_symlink dereference;
 
   /* If true, remove each existing destination nondirectory before
      trying to open it.  */
@@ -105,11 +115,6 @@ struct cp_options
      Create destination directories as usual. */
   bool hard_link;
 
-  /* This value is used to determine whether to prompt before removing
-     each existing destination file.  It works differently depending on
-     whether move_mode is set.  See code/comments in copy.c.  */
-  enum Interactive interactive;
-
   /* If true, rather than copying, first attempt to use rename.
      If that fails, then resort to copying.  */
   bool move_mode;
@@ -117,6 +122,13 @@ struct cp_options
   /* Whether this process has appropriate privileges to chown a file
      whose owner is not the effective user ID.  */
   bool chown_privileges;
+
+  /* Whether this process has appropriate privileges to do the
+     following operations on a file even when it is owned by some
+     other user: set the file's atime, mtime, mode, or ACL; remove or
+     rename an entry in the file even though it is a sticky directory,
+     or to mount on the file.  */
+  bool owner_privileges;
 
   /* If true, when copying recursively, skip any subdirectories that are
      on different file systems from the one we started on.  */
@@ -142,12 +154,46 @@ struct cp_options
 
   /* If true and any of the above (for preserve) file attributes cannot
      be applied to a destination file, treat it as a failure and return
-     nonzero immediately.  E.g. cp -p requires this be nonzero, mv requires
-     it be zero.  */
+     nonzero immediately.  E.g. for cp -p this must be true, for mv it
+     must be false.  */
   bool require_preserve;
 
   /* If nonzero, attributes will be ignored when copying.  */
   int ignore_attributes;
+
+  /* If true, attempt to preserve the SELinux security context, too.
+     Set this only if the kernel is SELinux enabled.  */
+  bool preserve_security_context;
+
+  /* Useful only when preserve_security_context is true.
+     If true, a failed attempt to preserve a file's security context
+     propagates failure "out" to the caller.  If false, a failure to
+     preserve a file's security context does not change the invoking
+     application's exit status.  Give diagnostics for failed syscalls
+     regardless of this setting.  For example, with "cp --preserve=context"
+     this flag is "true", while with "cp -a", it is false.  That means
+     "cp -a" attempts to preserve any security context, but does not
+     fail if it is unable to do so.  */
+  bool require_preserve_context;
+
+  /* If true, attempt to preserve extended attributes using libattr.
+     Ignored if coreutils are compiled without xattr support. */
+  bool preserve_xattr;
+
+  /* Useful only when preserve_xattr is true.
+     If true, a failed attempt to preserve file's extended attributes
+     propagates failure "out" to the caller.  If false, a failure to
+     preserve file's extended attributes does not change the invoking
+     application's exit status.  Give diagnostics for failed syscalls
+     regardless of this setting.  For example, with "cp --preserve=xattr"
+     this flag is "true", while with "cp --preserve=all", it is false. */
+  bool require_preserve_xattr;
+
+  /* Used as difference boolean between cp -a and cp -dR --preserve=all.
+     If true, non-mandatory failure diagnostics are not displayed. This
+     should prevent poluting cp -a output.
+   */
+  bool reduce_diagnostics;
 
   /* If true, copy directories recursively and copy special files
      as themselves rather than copying their contents. */
@@ -156,13 +202,6 @@ struct cp_options
   /* If true, set file mode to value of MODE.  Otherwise,
      set it based on current umask modified by UMASK_KILL.  */
   bool set_mode;
-
-  /* Set the mode of the destination file to exactly this value
-     if SET_MODE is nonzero.  */
-  mode_t mode;
-
-  /* Control creation of sparse files.  */
-  enum Sparse_type sparse_mode;
 
   /* If true, create symbolic links instead of copying files.
      Create destination directories as usual. */
@@ -177,6 +216,11 @@ struct cp_options
 
   /* If true, stdin is a tty.  */
   bool stdin_tty;
+
+  /* If true, open a dangling destination symlink when not in move_mode.
+     Otherwise, copy_reg gives a diagnostic (it refuses to write through
+     such a symlink) and returns false.  */
+  bool open_dangling_dest_symlink;
 
   /* This is a set of destination name/inode/dev triples.  Each such triple
      represents a file we have created corresponding to a source file name
@@ -214,7 +258,7 @@ bool copy (char const *src_name, char const *dst_name,
 void dest_info_init (struct cp_options *);
 void src_info_init (struct cp_options *);
 
-bool chown_privileges (void);
+void cp_options_default (struct cp_options *);
 bool chown_failure_ok (struct cp_options const *);
 mode_t cached_umask (void);
 

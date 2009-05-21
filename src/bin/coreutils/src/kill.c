@@ -1,10 +1,10 @@
 /* kill -- send a signal to a process
-   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
@@ -36,11 +35,12 @@
 #include "system.h"
 #include "error.h"
 #include "sig2str.h"
+#include "operand2sig.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "kill"
 
-#define AUTHORS "Paul Eggert"
+#define AUTHORS proper_name ("Paul Eggert")
 
 #if ! (HAVE_DECL_STRSIGNAL || defined strsignal)
 # if ! (HAVE_DECL_SYS_SIGLIST || defined sys_siglist)
@@ -60,9 +60,6 @@
 # endif
 #endif
 
-/* The name this program was run with, for error messages.  */
-char *program_name;
-
 static char const short_options[] =
   "0::1::2::3::4::5::6::7::8::9::"
   "A::B::C::D::E::F::G::H::I::J::K::L::M::"
@@ -110,59 +107,13 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\n\
 SIGNAL may be a signal name like `HUP', or a signal number like `1',\n\
-or an exit status of a process terminated by a signal.\n\
+or the exit status of a process terminated by a signal.\n\
 PID is an integer; if negative it identifies a process group.\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
-}
-
-/* Convert OPERAND to a signal number with printable representation SIGNAME.
-   Return the signal number, or -1 if unsuccessful.  */
-
-static int
-operand2sig (char const *operand, char *signame)
-{
-  int signum;
-
-  if (ISDIGIT (*operand))
-    {
-      char *endp;
-      long int l = (errno = 0, strtol (operand, &endp, 10));
-      int i = l;
-      signum = (operand == endp || *endp || errno || i != l ? -1
-		: WIFSIGNALED (i) ? WTERMSIG (i)
-		: i);
-    }
-  else
-    {
-      /* Convert signal to upper case in the C locale, not in the
-	 current locale.  Don't assume ASCII; it might be EBCDIC.  */
-      char *upcased = xstrdup (operand);
-      char *p;
-      for (p = upcased; *p; p++)
-	if (strchr ("abcdefghijklmnopqrstuvwxyz", *p))
-	  *p += 'A' - 'a';
-
-      /* Look for the signal name, possibly prefixed by "SIG",
-	 and possibly lowercased.  */
-      if (! (str2sig (upcased, &signum) == 0
-	     || (upcased[0] == 'S' && upcased[1] == 'I' && upcased[2] == 'G'
-		 && str2sig (upcased + 3, &signum) == 0)))
-	signum = -1;
-
-      free (upcased);
-    }
-
-  if (signum < 0 || sig2str (signum, signame) != 0)
-    {
-      error (0, 0, _("%s: invalid signal"), operand);
-      return -1;
-    }
-
-  return signum;
 }
 
 /* Print a row of `kill -t' output.  NUM_WIDTH is the maximum signal
@@ -287,7 +238,7 @@ main (int argc, char **argv)
   char signame[SIG2STR_MAX];
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

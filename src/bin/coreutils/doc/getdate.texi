@@ -4,7 +4,7 @@
 @c 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 @c Permission is granted to copy, distribute and/or modify this document
-@c under the terms of the GNU Free Documentation License, Version 1.2 or
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
 @c any later version published by the Free Software Foundation; with no
 @c Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
 @c Texts.  A copy of the license is included in the ``GNU Free
@@ -265,16 +265,19 @@ which uses @samp{12m} for noon and @samp{12pm} for midnight.)
 The time may alternatively be followed by a time zone correction,
 expressed as @samp{@var{s}@var{hh}@var{mm}}, where @var{s} is @samp{+}
 or @samp{-}, @var{hh} is a number of zone hours and @var{mm} is a number
-of zone minutes.  You can also separate @var{hh} from @var{mm} with a colon.
+of zone minutes.
+The zone minutes term, @var{mm}, may be omitted, in which case
+the one- or two-digit correction is interpreted as a number of hours.
+You can also separate @var{hh} from @var{mm} with a colon.
 When a time zone correction is given this way, it
 forces interpretation of the time relative to
 Coordinated Universal Time (@sc{utc}), overriding any previous
 specification for the time zone or the local time zone.  For example,
 @samp{+0530} and @samp{+05:30} both stand for the time zone 5.5 hours
-ahead of @sc{utc} (e.g., India).  The @var{minute}
-part of the time of day may not be elided when a time zone correction
-is used.  This is the best way to specify a time zone correction by
-fractional parts of an hour.
+ahead of @sc{utc} (e.g., India).
+This is the best way to
+specify a time zone correction by fractional parts of an hour.
+The maximum zone correction is 24 hours.
 
 Either @samp{am}/@samp{pm} or a time zone correction may be specified,
 but not both.

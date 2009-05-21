@@ -1,11 +1,14 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006, 2007 Free Software
+   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006, 2007, 2008 Free Software
    Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -19,11 +22,14 @@
 
 #include <config.h>
 
-#include "getaddrinfo.h"
+#include <netdb.h>
 
 #if HAVE_NETINET_IN_H
 # include <netinet/in.h>
 #endif
+
+/* Get inet_ntop.  */
+#include <arpa/inet.h>
 
 /* Get calloc. */
 #include <stdlib.h>
@@ -39,8 +45,6 @@
 #include "gettext.h"
 #define _(String) gettext (String)
 #define N_(String) String
-
-#include "inet_ntop.h"
 
 /* BeOS has AF_INET, but not PF_INET.  */
 #ifndef PF_INET
@@ -179,7 +183,7 @@ getaddrinfo (const char *restrict nodename,
       const char *proto =
 	(hints && hints->ai_socktype == SOCK_DGRAM) ? "udp" : "tcp";
 
-      if (!(hints->ai_flags & AI_NUMERICSERV))
+      if (hints == NULL || !(hints->ai_flags & AI_NUMERICSERV))
 	/* FIXME: Use getservbyname_r if available. */
 	se = getservbyname (servname, proto);
 
@@ -300,6 +304,22 @@ getaddrinfo (const char *restrict nodename,
   tmp->ai_addr->sa_family = he->h_addrtype;
   tmp->ai_family = he->h_addrtype;
 
+#ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
+  switch (he->h_addrtype)
+    {
+#if HAVE_IPV4
+    case AF_INET:
+      tmp->ai_addr->sa_len = sizeof (struct sockaddr_in);
+      break;
+#endif
+#if HAVE_IPV6
+    case AF_INET6:
+      tmp->ai_addr->sa_len = sizeof (struct sockaddr_in6);
+      break;
+#endif
+    }
+#endif
+
   /* FIXME: If more than one address, create linked list of addrinfo's. */
 
   *res = tmp;
@@ -326,7 +346,7 @@ freeaddrinfo (struct addrinfo *ai)
       cur = ai;
       ai = ai->ai_next;
 
-      if (cur->ai_canonname) free (cur->ai_canonname);
+      free (cur->ai_canonname);
       free (cur);
     }
 }

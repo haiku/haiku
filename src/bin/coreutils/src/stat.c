@@ -1,10 +1,10 @@
 /* stat.c -- display file or file system status
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation.
+   Copyright (C) 2001-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    Written by Michael Meskes.  */
 
@@ -54,6 +53,7 @@
 #elif HAVE_OS_H /* BeOS */
 # include <fs_info.h>
 #endif
+#include <selinux/selinux.h>
 
 #include "system.h"
 
@@ -62,12 +62,11 @@
 #include "file-type.h"
 #include "fs.h"
 #include "getopt.h"
-#include "inttostr.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "stat-time.h"
 #include "strftime.h"
-#include "xreadlink.h"
+#include "areadlink.h"
 
 #define alignof(type) offsetof (struct { char c; type x; }, x)
 
@@ -150,17 +149,18 @@ statfs (char const *filename, struct fs_info *buf)
 
 #define PROGRAM_NAME "stat"
 
-#define AUTHORS "Michael Meskes"
+#define AUTHORS proper_name ("Michael Meskes")
 
 enum
 {
   PRINTF_OPTION = CHAR_MAX + 1
 };
 
-static struct option const long_options[] = {
+static struct option const long_options[] =
+{
+  {"context", no_argument, 0, 'Z'},
   {"dereference", no_argument, NULL, 'L'},
   {"file-system", no_argument, NULL, 'f'},
-  {"filesystem", no_argument, NULL, 'f'}, /* obsolete and undocumented alias */
   {"format", required_argument, NULL, 'c'},
   {"printf", required_argument, NULL, PRINTF_OPTION},
   {"terse", no_argument, NULL, 't'},
@@ -169,7 +169,8 @@ static struct option const long_options[] = {
   {NULL, 0, NULL, 0}
 };
 
-char *program_name;
+/* Whether to follow symbolic links;  True for --dereference (-L).  */
+static bool follow_links;
 
 /* Whether to interpret backslash-escape sequences.
    True for --printf=FMT, not for --format=FMT (-c).  */
@@ -183,7 +184,7 @@ static char const *trailing_delim = "";
    Some systems have statfvs.f_basetype[FSTYPSZ] (AIX, HP-UX, and Solaris).
    Others have statvfs.f_fstypename[_VFS_NAMELEN] (NetBSD 3.0).
    Others have statfs.f_fstypename[MFSNAMELEN] (NetBSD 1.5.2).
-   Still others have neither and have to get by with f_type (Linux).
+   Still others have neither and have to get by with f_type (GNU/Linux).
    But f_type may only exist in statfs (Cygwin).  */
 static char const *
 human_fstype (STRUCT_STATVFS const *statfsbuf)
@@ -195,33 +196,77 @@ human_fstype (STRUCT_STATVFS const *statfsbuf)
     {
 # if defined __linux__
 
+      /* Compare with what's in libc:
+	 f=/a/libc/sysdeps/unix/sysv/linux/linux_fsinfo.h
+	 sed -n '/ADFS_SUPER_MAGIC/,/SYSFS_MAGIC/p' $f \
+	   | perl -n -e '/#define (.*?)_(?:SUPER_)MAGIC\s+0x(\S+)/' \
+	     -e 'and print "case S_MAGIC_$1: /\* 0x" . uc($2) . " *\/\n"' \
+	   | sort > sym_libc
+	 perl -ne '/^\s+(case S_MAGIC_.*?): \/\* 0x(\S+) \*\//' \
+	     -e 'and do { $v=uc$2; print "$1: /\* 0x$v *\/\n"}' stat.c \
+	   | sort > sym_stat
+	 diff -u sym_stat sym_libc
+      */
+
+      /* Also sync from the list in "man 2 statfs".  */
+
       /* IMPORTANT NOTE: Each of the following `case S_MAGIC_...:'
 	 statements must be followed by a hexadecimal constant in
 	 a comment.  The S_MAGIC_... name and constant are automatically
 	 combined to produce the #define directives in fs.h.  */
 
+    case S_MAGIC_ADFS: /* 0xADF5 */
+      return "adfs";
     case S_MAGIC_AFFS: /* 0xADFF */
       return "affs";
+    case S_MAGIC_AUTOFS: /* 0x187 */
+      return "autofs";
+    case S_MAGIC_BEFS: /* 0x42465331 */
+      return "befs";
+    case S_MAGIC_BFS: /* 0x1BADFACE */
+      return "bfs";
+    case S_MAGIC_BINFMT_MISC: /* 0x42494e4d */
+      return "binfmt_misc";
+    case S_MAGIC_CODA: /* 0x73757245 */
+      return "coda";
+    case S_MAGIC_COH: /* 0x012FF7B7 */
+      return "coh";
+    case S_MAGIC_CRAMFS: /* 0x28CD3D45 */
+      return "cramfs";
+    case S_MAGIC_DEVFS: /* 0x1373 */
+      return "devfs";
     case S_MAGIC_DEVPTS: /* 0x1CD1 */
       return "devpts";
+    case S_MAGIC_EFS: /* 0x414A53 */
+      return "efs";
     case S_MAGIC_EXT: /* 0x137D */
       return "ext";
-    case S_MAGIC_EXT2_OLD: /* 0xEF51 */
-      return "ext2";
     case S_MAGIC_EXT2: /* 0xEF53 */
       return "ext2/ext3";
-    case S_MAGIC_JFS: /* 0x3153464a */
-      return "jfs";
-    case S_MAGIC_XFS: /* 0x58465342 */
-      return "xfs";
+    case S_MAGIC_EXT2_OLD: /* 0xEF51 */
+      return "ext2";
+    case S_MAGIC_FAT: /* 0x4006 */
+      return "fat";
+    case S_MAGIC_FUSECTL: /* 0x65735543 */
+      return "fusectl";
     case S_MAGIC_HPFS: /* 0xF995E849 */
       return "hpfs";
+    case S_MAGIC_HUGETLBFS: /* 0x958458f6 */
+      return "hugetlbfs";
     case S_MAGIC_ISOFS: /* 0x9660 */
-      return "isofs";
-    case S_MAGIC_ISOFS_WIN: /* 0x4000 */
       return "isofs";
     case S_MAGIC_ISOFS_R_WIN: /* 0x4004 */
       return "isofs";
+    case S_MAGIC_ISOFS_WIN: /* 0x4000 */
+      return "isofs";
+    case S_MAGIC_JFFS2: /* 0x72B6 */
+      return "jffs2";
+    case S_MAGIC_JFFS: /* 0x07C0 */
+      return "jffs";
+    case S_MAGIC_JFS: /* 0x3153464A */
+      return "jfs";
+    case S_MAGIC_LUSTRE: /* 0x0BD00BD0 */
+      return "lustre";
     case S_MAGIC_MINIX: /* 0x137F */
       return "minix";
     case S_MAGIC_MINIX_30: /* 0x138F */
@@ -230,46 +275,57 @@ human_fstype (STRUCT_STATVFS const *statfsbuf)
       return "minix v2";
     case S_MAGIC_MINIX_V2_30: /* 0x2478 */
       return "minix v2 (30 char.)";
-    case S_MAGIC_MSDOS: /* 0x4d44 */
+    case S_MAGIC_MSDOS: /* 0x4D44 */
       return "msdos";
-    case S_MAGIC_FAT: /* 0x4006 */
-      return "fat";
-    case S_MAGIC_NCP: /* 0x564c */
+    case S_MAGIC_NCP: /* 0x564C */
       return "novell";
     case S_MAGIC_NFS: /* 0x6969 */
       return "nfs";
-    case S_MAGIC_PROC: /* 0x9fa0 */
-      return "proc";
-    case S_MAGIC_SMB: /* 0x517B */
-      return "smb";
-    case S_MAGIC_XENIX: /* 0x012FF7B4 */
-      return "xenix";
-    case S_MAGIC_SYSV4: /* 0x012FF7B5 */
-      return "sysv4";
-    case S_MAGIC_SYSV2: /* 0x012FF7B6 */
-      return "sysv2";
-    case S_MAGIC_COH: /* 0x012FF7B7 */
-      return "coh";
-    case S_MAGIC_UFS: /* 0x00011954 */
-      return "ufs";
-    case S_MAGIC_XIAFS: /* 0x012FD16D */
-      return "xia";
-    case S_MAGIC_NTFS: /* 0x5346544e */
+    case S_MAGIC_NFSD: /* 0x6E667364 */
+      return "nfsd";
+    case S_MAGIC_NTFS: /* 0x5346544E */
       return "ntfs";
-    case S_MAGIC_TMPFS: /* 0x1021994 */
-      return "tmpfs";
+    case S_MAGIC_OPENPROM: /* 0x9fa1 */
+      return "openprom";
+    case S_MAGIC_PROC: /* 0x9FA0 */
+      return "proc";
+    case S_MAGIC_QNX4: /* 0x002F */
+      return "qnx4";
+    case S_MAGIC_RAMFS: /* 0x858458F6 */
+      return "ramfs";
     case S_MAGIC_REISERFS: /* 0x52654973 */
       return "reiserfs";
-    case S_MAGIC_CRAMFS: /* 0x28cd3d45 */
-      return "cramfs";
     case S_MAGIC_ROMFS: /* 0x7275 */
       return "romfs";
-    case S_MAGIC_RAMFS: /* 0x858458f6 */
-      return "ramfs";
+    case S_MAGIC_SMB: /* 0x517B */
+      return "smb";
     case S_MAGIC_SQUASHFS: /* 0x73717368 */
       return "squashfs";
     case S_MAGIC_SYSFS: /* 0x62656572 */
       return "sysfs";
+    case S_MAGIC_SYSV2: /* 0x012FF7B6 */
+      return "sysv2";
+    case S_MAGIC_SYSV4: /* 0x012FF7B5 */
+      return "sysv4";
+    case S_MAGIC_TMPFS: /* 0x1021994 */
+      return "tmpfs";
+    case S_MAGIC_UDF: /* 0x15013346 */
+      return "udf";
+    case S_MAGIC_UFS: /* 0x00011954 */
+      return "ufs";
+    case S_MAGIC_UFS_BYTESWAPPED: /* 0x54190100 */
+      return "ufs";
+    case S_MAGIC_USBDEVFS: /* 0x9FA2 */
+      return "usbdevfs";
+    case S_MAGIC_VXFS: /* 0xA501FCF5 */
+      return "vxfs";
+    case S_MAGIC_XENIX: /* 0x012FF7B4 */
+      return "xenix";
+    case S_MAGIC_XFS: /* 0x58465342 */
+      return "xfs";
+    case S_MAGIC_XIAFS: /* 0x012FD16D */
+      return "xia";
+
 # elif __GNU__
     case FSTYPE_UFS:
       return "ufs";
@@ -356,9 +412,7 @@ human_time (struct timespec t)
 			+ sizeof "-MM-DD HH:MM:SS.NNNNNNNNN +ZZZZ"))];
   struct tm const *tm = localtime (&t.tv_sec);
   if (tm == NULL)
-    return (TYPE_SIGNED (time_t)
-	    ? imaxtostr (t.tv_sec, str)
-	    : umaxtostr (t.tv_sec, str));
+    return timetostr (t.tv_sec, str);
   nstrftime (str, sizeof str, "%Y-%m-%d %H:%M:%S.%N %z", tm, 0, t.tv_nsec);
   return str;
 }
@@ -392,6 +446,26 @@ out_uint_x (char *pformat, size_t prefix_len, uintmax_t arg)
 {
   strcpy (pformat + prefix_len, PRIxMAX);
   printf (pformat, arg);
+}
+
+/* Very specialized function (modifies FORMAT), just so as to avoid
+   duplicating this code between both print_statfs and print_stat.  */
+static void
+out_file_context (char const *filename, char *pformat, size_t prefix_len)
+{
+  char *scontext;
+  if ((follow_links
+       ? getfilecon (filename, &scontext)
+       : lgetfilecon (filename, &scontext)) < 0)
+    {
+      error (0, errno, _("failed to get security context of %s"),
+	     quote (filename));
+      scontext = NULL;
+    }
+  strcpy (pformat + prefix_len, "s");
+  printf (pformat, (scontext ? scontext : "?"));
+  if (scontext)
+    freecon (scontext);
 }
 
 /* print statfs info */
@@ -467,12 +541,14 @@ print_statfs (char *pformat, size_t prefix_len, char m, char const *filename,
       }
       break;
     case 'c':
-      out_int (pformat, prefix_len, statfsbuf->f_files);
+      out_uint (pformat, prefix_len, statfsbuf->f_files);
       break;
     case 'd':
       out_int (pformat, prefix_len, statfsbuf->f_ffree);
       break;
-
+    case 'C':
+      out_file_context (filename, pformat, prefix_len);
+      break;
     default:
       fputc ('?', stdout);
       break;
@@ -497,7 +573,7 @@ print_stat (char *pformat, size_t prefix_len, char m,
       out_string (pformat, prefix_len, quote (filename));
       if (S_ISLNK (statbuf->st_mode))
 	{
-	  char *linkname = xreadlink_with_size (filename, statbuf->st_size);
+	  char *linkname = areadlink_with_size (filename, statbuf->st_size);
 	  if (linkname == NULL)
 	    {
 	      error (0, errno, _("cannot read symbolic link %s"),
@@ -594,6 +670,9 @@ print_stat (char *pformat, size_t prefix_len, char m,
 	out_int (pformat, prefix_len, statbuf->st_ctime);
       else
 	out_uint (pformat, prefix_len, statbuf->st_ctime);
+      break;
+    case 'C':
+      out_file_context (filename, pformat, prefix_len);
       break;
     default:
       fputc ('?', stdout);
@@ -774,8 +853,7 @@ do_statfs (char const *filename, bool terse, char const *format)
 
 /* stat the file and print what we find */
 static bool
-do_stat (char const *filename, bool follow_links, bool terse,
-	 char const *format)
+do_stat (char const *filename, bool terse, char const *format)
 {
   struct stat statbuf;
 
@@ -828,7 +906,7 @@ usage (int status)
 	     program_name);
   else
     {
-      printf (_("Usage: %s [OPTION] FILE...\n"), program_name);
+      printf (_("Usage: %s [OPTION]... FILE...\n"), program_name);
       fputs (_("\
 Display file or file system status.\n\
 \n\
@@ -853,6 +931,7 @@ The valid format sequences for files (without --file-system):\n\
   %A   Access rights in human readable form\n\
   %b   Number of blocks allocated (see %B)\n\
   %B   The size in bytes of each block reported by %b\n\
+  %C   SELinux security context string\n\
 "), stdout);
       fputs (_("\
   %d   Device number in decimal\n\
@@ -892,6 +971,7 @@ Valid format sequences for file systems:\n\
   %c   Total file nodes in file system\n\
   %d   Free file nodes in file system\n\
   %f   Free blocks in file system\n\
+  %C   SELinux security context string\n\
 "), stdout);
       fputs (_("\
   %i   File System ID in hex\n\
@@ -903,7 +983,7 @@ Valid format sequences for file systems:\n\
   %T   Type in human readable form\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -913,21 +993,20 @@ main (int argc, char *argv[])
 {
   int c;
   int i;
-  bool follow_links = false;
   bool fs = false;
   bool terse = false;
   char *format = NULL;
   bool ok = true;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  while ((c = getopt_long (argc, argv, "c:fLt", long_options, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "c:fLtZ", long_options, NULL)) != -1)
     {
       switch (c)
 	{
@@ -955,6 +1034,15 @@ main (int argc, char *argv[])
 	  terse = true;
 	  break;
 
+	case 'Z':  /* FIXME: remove in 2010 */
+	  /* Ignore, for compatibility with distributions
+	     that implemented this before upstream.
+	     But warn of impending removal.  */
+	  error (0, 0,
+		 _("the --context (-Z) option is obsolete and will be removed\n"
+		   "in a future release"));
+	  break;
+
 	case_GETOPT_HELP_CHAR;
 
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -973,7 +1061,7 @@ main (int argc, char *argv[])
   for (i = optind; i < argc; i++)
     ok &= (fs
 	   ? do_statfs (argv[i], terse, format)
-	   : do_stat (argv[i], follow_links, terse, format));
+	   : do_stat (argv[i], terse, format));
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

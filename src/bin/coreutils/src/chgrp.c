@@ -1,10 +1,10 @@
 /* chgrp -- change group ownership of files
-   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>. */
 
@@ -35,14 +34,13 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "chgrp"
 
-#define AUTHORS "David MacKenzie", "Jim Meyering"
+#define AUTHORS \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Jim Meyering")
 
 #if ! HAVE_ENDGRENT
 # define endgrent() ((void) 0)
 #endif
-
-/* The name the program was run with. */
-char *program_name;
 
 /* The argument to the --reference option.  Use the group ID of this file.
    This file must exist.  */
@@ -92,7 +90,7 @@ parse_group (const char *name)
 	  unsigned long int tmp;
 	  if (! (xstrtoul (name, NULL, 10, &tmp, "") == LONGINT_OK
 		 && tmp <= GID_T_MAX))
-	    error (EXIT_FAILURE, 0, _("invalid group %s"), quote (name));
+	    error (EXIT_FAILURE, 0, _("invalid group: %s"), quote (name));
 	  gid = tmp;
 	}
       endgrent ();		/* Save a file descriptor. */
@@ -160,7 +158,7 @@ Examples:\n\
   %s -hR staff /u  Change the group of /u and subfiles to \"staff\".\n\
 "),
 	      program_name, program_name);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -183,7 +181,7 @@ main (int argc, char **argv)
   int optc;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -304,6 +302,7 @@ main (int argc, char **argv)
 	       quote ("/"));
     }
 
+  bit_flags |= FTS_DEFER_STAT;
   ok = chown_files (argv + optind, bit_flags,
 		    (uid_t) -1, gid,
 		    (uid_t) -1, (gid_t) -1, &chopt);

@@ -1,11 +1,11 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2004-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /*
  * Copyright (c) 1989, 1993
@@ -130,9 +129,12 @@ typedef struct {
      file systems like FAT, CIFS, FUSE-based ones, etc., when entries from
      their name/inode cache are flushed too early.
      Use this flag to make fts_open and fts_read defer the stat/lstat/fststat
-     of each entry until it actually processed.  However, note that if you use
-     this option and also specify a comparison function, that function may not
-     examine any data via fts_statp.  */
+     of each entry until it is actually processed.  However, note that if you
+     use this option and also specify a comparison function, that function may
+     not examine any data via fts_statp.  However, when fts_statp->st_mode is
+     nonzero, the S_IFMT type bits are valid, with mapped dirent.d_type data.
+     Of course, that happens only on file systems that provide useful
+     dirent.d_type data.  */
 # define FTS_DEFER_STAT		0x0400
 
 # define FTS_OPTIONMASK	0x07ff		/* valid user option mask */
@@ -142,6 +144,15 @@ typedef struct {
 	int fts_options;		/* fts_open options, global flags */
 
 # if GNULIB_FTS
+	/* Map a directory's device number to a boolean.  The boolean is
+	   true if for that file system (type determined by a single fstatfs
+	   call per FS) st_nlink can be used to calculate the number of
+	   sub-directory entries in a directory.
+	   Using this table is an optimization that permits us to look up
+	   file system type on a per-inode basis at the minimal cost of
+	   calling fstatfs only once per traversed device.  */
+	struct hash_table *fts_leaf_optimization_works_ht;
+
 	union {
 		/* This data structure is used if FTS_TIGHT_CYCLE_CHECK is
 		   specified.  It records the directories between a starting
@@ -190,6 +201,7 @@ typedef struct _ftsent {
 	ptrdiff_t fts_level;		/* depth (-1 to N) */
 
 	size_t fts_namelen;		/* strlen(fts_name) */
+	nlink_t fts_n_dirs_remaining;	/* count down from st_nlink */
 
 # define FTS_D		 1		/* preorder directory */
 # define FTS_DC		 2		/* directory that causes cycles */

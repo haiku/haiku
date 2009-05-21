@@ -1,25 +1,22 @@
-/* Copyright (C) 1991,92,93,94,95,96,97,98,99,2004,2005,2006,2007 Free Software
-   Foundation, Inc.
+/* Copyright (C) 1991-1999, 2004-2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #if !_LIBC
 # include <config.h>
 # include <unistd.h>
-# include "dirfd.h"
 #endif
 
 #include <errno.h>
@@ -29,6 +26,14 @@
 #include <stddef.h>
 
 #include <fcntl.h> /* For AT_FDCWD on Solaris 9.  */
+
+/* If this host provides the openat function, then enable
+   code below to make getcwd more efficient and robust.  */
+#ifdef HAVE_OPENAT
+# define HAVE_OPENAT_SUPPORT 1
+#else
+# define HAVE_OPENAT_SUPPORT 0
+#endif
 
 #ifndef __set_errno
 # define __set_errno(val) (errno = (val))
@@ -90,7 +95,7 @@
 #endif
 
 #if !_LIBC
-# define __getcwd getcwd
+# define __getcwd rpl_getcwd
 # define __lstat lstat
 # define __closedir closedir
 # define __opendir opendir
@@ -123,7 +128,7 @@ __getcwd (char *buf, size_t size)
       DEEP_NESTING = 100
     };
 
-#ifdef AT_FDCWD
+#if HAVE_OPENAT_SUPPORT
   int fd = AT_FDCWD;
   bool fd_needs_closing = false;
 #else
@@ -204,7 +209,7 @@ __getcwd (char *buf, size_t size)
       bool use_d_ino = true;
 
       /* Look at the parent directory.  */
-#ifdef AT_FDCWD
+#if HAVE_OPENAT_SUPPORT
       fd = openat (fd, "..", O_RDONLY);
       if (fd < 0)
 	goto lose;
@@ -231,7 +236,7 @@ __getcwd (char *buf, size_t size)
       mount_point = dotdev != thisdev;
 
       /* Search for the last directory.  */
-#ifdef AT_FDCWD
+#if HAVE_OPENAT_SUPPORT
       dirstream = fdopendir (fd);
       if (dirstream == NULL)
 	goto lose;
@@ -287,7 +292,7 @@ __getcwd (char *buf, size_t size)
 
 	  {
 	    int entry_status;
-#ifdef AT_FDCWD
+#if HAVE_OPENAT_SUPPORT
 	    entry_status = fstatat (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
 #else
 	    /* Compute size needed for this file name, or for the file
@@ -383,7 +388,7 @@ __getcwd (char *buf, size_t size)
   if (dirp == &dir[allocated - 1])
     *--dirp = '/';
 
-#ifndef AT_FDCWD
+#if ! HAVE_OPENAT_SUPPORT
   if (dotlist != dots)
     free (dotlist);
 #endif
@@ -409,7 +414,7 @@ __getcwd (char *buf, size_t size)
     int save = errno;
     if (dirstream)
       __closedir (dirstream);
-#ifdef AT_FDCWD
+#if HAVE_OPENAT_SUPPORT
     if (fd_needs_closing)
       close (fd);
 #else

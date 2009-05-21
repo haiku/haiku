@@ -1,10 +1,10 @@
 /* nl -- number lines of files
-   Copyright (C) 89, 92, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 89, 92, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Scott Bartram (nancy!scott@uunet.uu.net)
    Revised by David MacKenzie (djm@gnu.ai.mit.edu) */
@@ -36,7 +35,9 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "nl"
 
-#define AUTHORS "Scott Bartram", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("Scott Bartram"), \
+  proper_name ("David MacKenzie")
 
 /* Line-number formats.  They are given an int width, an intmax_t
    value, and a string separator.  */
@@ -59,9 +60,6 @@ enum section
 {
   Header, Body, Footer, Text
 };
-
-/* The name this program was run with. */
-char *program_name;
 
 /* Format of body lines (-b).  */
 static char const *body_type = "t";
@@ -200,7 +198,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -s, --number-separator=STRING   add STRING after (possible) line number\n\
 "), stdout);
       fputs (_("\
-  -v, --first-page=NUMBER         first line number on each logical page\n\
+  -v, --starting-line-number=NUMBER  first line number on each logical page\n\
   -w, --number-width=NUMBER       use NUMBER columns for line numbers\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -226,7 +224,7 @@ FORMAT is one of:\n\
   rz   right justified, leading zeros\n\
 \n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -459,7 +457,7 @@ main (int argc, char **argv)
   bool ok = true;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

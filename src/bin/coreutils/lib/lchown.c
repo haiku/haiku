@@ -1,12 +1,12 @@
 /* Provide a stub lchown function for systems that lack it.
 
-   Copyright (C) 1998, 1999, 2002, 2004, 2006 Free Software
+   Copyright (C) 1998, 1999, 2002, 2004, 2006, 2007 Free Software
    Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,16 +14,31 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* written by Jim Meyering */
 
 #include <config.h>
 
-#include "lchown.h"
+/* If the system chown does not follow symlinks, we don't want it
+   replaced by gnulib's chown, which does follow symlinks.  */
+#if CHOWN_MODIFIES_SYMLINK
+# define REPLACE_CHOWN 0
+#endif
+#include <unistd.h>
 
+#include <errno.h>
 #include <sys/stat.h>
+
+/* Some systems don't have EOPNOTSUPP.  */
+#ifndef EOPNOTSUPP
+# ifdef ENOTSUP
+#  define EOPNOTSUPP ENOTSUP
+# else
+/* Some systems don't have ENOTSUP either.  */
+#  define EOPNOTSUPP EINVAL
+# endif
+#endif
 
 /* Work just like chown, except when FILE is a symbolic link.
    In that case, set errno to EOPNOTSUPP and return -1.

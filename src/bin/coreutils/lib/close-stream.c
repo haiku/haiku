@@ -1,12 +1,12 @@
 /* Close a stream, with nicer error checking than fclose's.
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006 Free
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006, 2007, 2008 Free
    Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -24,7 +23,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "__fpending.h"
+#include "fpending.h"
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
@@ -33,6 +32,10 @@
 /* Close STREAM.  Return 0 if successful, EOF (setting errno)
    otherwise.  A failure might set errno to 0 if the error number
    cannot be determined.
+
+   A failure with errno set to EPIPE may or may not indicate an error
+   situation worth signaling to the user.  See the documentation of the
+   close_stdout_set_ignore_EPIPE function for details.
 
    If a program writes *anything* to STREAM, that program should close
    STREAM and make sure that it succeeds before exiting.  Otherwise,

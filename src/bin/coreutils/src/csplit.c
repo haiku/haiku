@@ -1,10 +1,10 @@
 /* csplit - split a file into sections determined by context lines
-   Copyright (C) 91, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Stuart Kemp, cpsrk@groper.jcu.edu.au.
    Modified by David MacKenzie, djm@gnu.ai.mit.edu. */
@@ -30,30 +29,17 @@
 
 #include "error.h"
 #include "fd-reopen.h"
-#include "inttostr.h"
 #include "quote.h"
 #include "safe-read.h"
 #include "stdio--.h"
 #include "xstrtol.h"
 
-/* Use SA_NOCLDSTOP as a proxy for whether the sigaction machinery is
-   present.  */
-#ifndef SA_NOCLDSTOP
-# define SA_NOCLDSTOP 0
-# define sigprocmask(How, Set, Oset) /* empty */
-# define sigset_t int
-# if ! HAVE_SIGINTERRUPT
-#  define siginterrupt(sig, flag) /* empty */
-# endif
-#endif
-
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "csplit"
 
-#define AUTHORS "Stuart Kemp", "David MacKenzie"
-
-/* Increment size of area for control records. */
-#define ALLOC_SIZE 20
+#define AUTHORS \
+  proper_name ("Stuart Kemp"), \
+  proper_name ("David MacKenzie")
 
 /* The default prefix for output file names. */
 #define DEFAULT_PREFIX	"xx"
@@ -126,9 +112,6 @@ static void create_output_file (void);
 static void delete_all_files (bool);
 static void save_line_to_file (const struct cstring *line);
 void usage (int status);
-
-/* The name this program was run with. */
-char *program_name;
 
 /* Start of buffer list. */
 static struct buffer_record *head = NULL;
@@ -241,12 +224,10 @@ xalloc_die (void)
 static void
 interrupt_handler (int sig)
 {
-  if (! SA_NOCLDSTOP)
-    signal (sig, SIG_IGN);
-
   delete_all_files (true);
-
-  signal (sig, SIG_DFL);
+  /* The signal has been reset to SIG_DFL, but blocked during this
+     handler.  Force the default action of this signal once the
+     handler returns and the block is removed.  */
   raise (sig);
 }
 
@@ -1329,7 +1310,7 @@ main (int argc, char **argv)
   unsigned long int val;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -1424,7 +1405,6 @@ main (int argc, char **argv)
       };
     enum { nsigs = sizeof sig / sizeof sig[0] };
 
-#if SA_NOCLDSTOP
     struct sigaction act;
 
     sigemptyset (&caught_signals);
@@ -1437,19 +1417,11 @@ main (int argc, char **argv)
 
     act.sa_handler = interrupt_handler;
     act.sa_mask = caught_signals;
-    act.sa_flags = 0;
+    act.sa_flags = SA_NODEFER | SA_RESETHAND;
 
     for (i = 0; i < nsigs; i++)
       if (sigismember (&caught_signals, sig[i]))
 	sigaction (sig[i], &act, NULL);
-#else
-    for (i = 0; i < nsigs; i++)
-      if (signal (sig[i], SIG_IGN) != SIG_IGN)
-	{
-	  signal (sig[i], interrupt_handler);
-	  siginterrupt (sig[i], 1);
-	}
-#endif
   }
 
   split_file ();
@@ -1509,7 +1481,7 @@ Read standard input if FILE is -.  Each PATTERN may be:\n\
 \n\
 A line OFFSET is a required `+' or `-' followed by a positive integer.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }

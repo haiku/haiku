@@ -1,10 +1,10 @@
 /* unexpand - convert blanks to tabs
-   Copyright (C) 89, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 89, 91, 1995-2006, 2008-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* By default, convert only maximal strings of initial blanks and tabs
    into tabs.
@@ -47,14 +46,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "unexpand"
 
-#define AUTHORS "David MacKenzie"
-
-/* The number of bytes added at a time to the amount of memory
-   allocated for the output line.  */
-#define OUTPUT_BLOCK 256
-
-/* The name this program was run with.  */
-char *program_name;
+#define AUTHORS proper_name ("David MacKenzie")
 
 /* If true, convert blanks even after nonblank characters have been
    read on the line.  */
@@ -84,7 +76,7 @@ static char **file_list;
 /* Default for `file_list' if no files are given on the command line.  */
 static char *stdin_argv[] =
 {
-  "-", NULL
+  (char *) "-", NULL
 };
 
 /* True if we have ever read standard input.  */
@@ -138,7 +130,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -465,7 +457,7 @@ main (int argc, char **argv)
   bool convert_first_only = false;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

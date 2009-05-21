@@ -1,10 +1,10 @@
 /* cp-hash.c  -- file copying (hash search routines)
-   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation.
+   Copyright (C) 89, 90, 91, 1995-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,22 +12,18 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    Written by Torbjorn Granlund, Sweden (tege@sics.se).
    Rewritten to use lib/hash.c by Jim Meyering.  */
 
 #include <config.h>
 
-#include <stdio.h>
 #include <sys/types.h>
 #include "system.h"
 
 #include "same.h"
-#include "quote.h"
 #include "hash.h"
-#include "error.h"
 #include "cp-hash.h"
 
 /* Use ST_DEV and ST_INO as the key, FILENAME as the value.
@@ -96,24 +92,6 @@ forget_created (ino_t ino, dev_t dev)
   ent = hash_delete (src_to_dest, &probe);
   if (ent)
     src_to_dest_free (ent);
-}
-
-/* Add FILE to the list of files that we have created.
-   Return true if successful.  */
-
-extern bool
-remember_created (char const *file)
-{
-  struct stat sb;
-
-  if (stat (file, &sb) < 0)
-    {
-      error (0, errno, "%s", quote (file));
-      return false;
-    }
-
-  remember_copied (file, sb.st_ino, sb.st_dev);
-  return true;
 }
 
 /* If INO/DEV correspond to an already-copied source file, return the

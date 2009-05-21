@@ -1,12 +1,15 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* sha1.c - Functions to compute SHA1 message digest of files or
    memory blocks according to the NIST specification FIPS-180-1.
 
-   Copyright (C) 2000, 2001, 2003, 2004, 2005, 2006 Free Software
+   Copyright (C) 2000, 2001, 2003, 2004, 2005, 2006, 2008 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   Free Software Foundation; either version 3, or (at your option) any
    later version.
 
    This program is distributed in the hope that it will be useful,
@@ -67,28 +70,32 @@ sha1_init_ctx (struct sha1_ctx *ctx)
   ctx->buflen = 0;
 }
 
-/* Put result from CTX in first 20 bytes following RESBUF.  The result
-   must be in little endian byte order.
+/* Copy the 4 byte value from v into the memory location pointed to by *cp,
+   If your architecture allows unaligned access this is equivalent to
+   * (uint32_t *) cp = v  */
+static inline void
+set_uint32 (char *cp, uint32_t v)
+{
+  memcpy (cp, &v, sizeof v);
+}
 
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32-bit value.  */
+/* Put result from CTX in first 20 bytes following RESBUF.  The result
+   must be in little endian byte order.  */
 void *
 sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf)
 {
-  ((uint32_t *) resbuf)[0] = SWAP (ctx->A);
-  ((uint32_t *) resbuf)[1] = SWAP (ctx->B);
-  ((uint32_t *) resbuf)[2] = SWAP (ctx->C);
-  ((uint32_t *) resbuf)[3] = SWAP (ctx->D);
-  ((uint32_t *) resbuf)[4] = SWAP (ctx->E);
+  char *r = resbuf;
+  set_uint32 (r + 0 * sizeof ctx->A, SWAP (ctx->A));
+  set_uint32 (r + 1 * sizeof ctx->B, SWAP (ctx->B));
+  set_uint32 (r + 2 * sizeof ctx->C, SWAP (ctx->C));
+  set_uint32 (r + 3 * sizeof ctx->D, SWAP (ctx->D));
+  set_uint32 (r + 4 * sizeof ctx->E, SWAP (ctx->E));
 
   return resbuf;
 }
 
 /* Process the remaining bytes in the internal buffer and the usual
-   prolog according to the standard and write the result to RESBUF.
-
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32-bit value.  */
+   prolog according to the standard and write the result to RESBUF.  */
 void *
 sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf)
 {

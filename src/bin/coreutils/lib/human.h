@@ -1,12 +1,12 @@
 /* human.h -- print human readable file size
 
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Free Software Foundation, Inc.
+   2005, 2006, 2007 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert and Larry McVoy.  */
 
@@ -26,6 +25,8 @@
 # include <stdbool.h>
 # include <stdint.h>
 # include <unistd.h>
+
+# include <xstrtol.h>
 
 /* A conservative bound on the maximum length of a human-readable string.
    The output can be the square of the largest uintmax_t, so double
@@ -78,6 +79,6 @@ enum
 
 char *human_readable (uintmax_t, char *, int, uintmax_t, uintmax_t);
 
-int human_options (char const *, bool, uintmax_t *);
+enum strtol_error human_options (char const *, int *, uintmax_t *);
 
 #endif /* HUMAN_H_ */

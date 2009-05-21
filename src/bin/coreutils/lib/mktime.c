@@ -1,3 +1,6 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Convert a `struct tm' to a time_t value.
    Copyright (C) 1993-1999, 2002-2005, 2006, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -5,7 +8,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -290,7 +293,9 @@ __mktime_internal (struct tm *tp,
   int mday = tp->tm_mday;
   int mon = tp->tm_mon;
   int year_requested = tp->tm_year;
-  int isdst = tp->tm_isdst;
+  /* Normalize the value.  */
+  int isdst = ((tp->tm_isdst >> (8 * sizeof (tp->tm_isdst) - 1))
+	       | (tp->tm_isdst != 0));
 
   /* 1 if the previous probe was DST.  */
   int dst2;

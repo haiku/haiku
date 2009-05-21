@@ -1,11 +1,14 @@
-/* Copyright (C) 1992-2001, 2003, 2004, 2005, 2006 Free Software
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
+/* Copyright (C) 1992-2001, 2003, 2004, 2005, 2006, 2007 Free Software
    Foundation, Inc.
 
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -40,8 +43,6 @@
 #if HAVE_TERMIOS_H
 # include <termios.h>
 #endif
-
-#include "getline.h"
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
@@ -142,7 +143,7 @@ getpass (const char *prompt)
      == fileno (out).  The POSIX restrictions are tricky and change
      from POSIX version to POSIX version, so play it safe and invoke
      fseek even if in != out.  */
-  fseek (out, 0, SEEK_CUR);
+  fseeko (out, 0, SEEK_CUR);
 
   if (buf != NULL)
     {

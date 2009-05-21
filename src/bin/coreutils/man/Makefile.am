@@ -1,10 +1,10 @@
 # Make coreutils man pages.				-*-Makefile-*-
 
-# Copyright (C) 2002-2007 Free Software Foundation, Inc.
+# Copyright (C) 2002-2009 Free Software Foundation, Inc.
 
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
 # This program is distributed in the hope that it will be useful,
@@ -13,38 +13,25 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-dist_man_MANS = \
-  base64.1 basename.1 cat.1 chgrp.1 chmod.1 chown.1 cksum.1 comm.1 \
-  cp.1 csplit.1 cut.1 date.1 dd.1 df.1 dir.1 dircolors.1 dirname.1 du.1 \
-  echo.1 env.1 expand.1 expr.1 factor.1 false.1 fmt.1 fold.1 groups.1 \
-  head.1 hostname.1 id.1 install.1 join.1 kill.1 \
-  link.1 ln.1 logname.1 \
-  ls.1 md5sum.1 mkdir.1 mkfifo.1 mknod.1 mv.1 nl.1 nohup.1 od.1 \
-  paste.1 pathchk.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 \
-  rm.1 rmdir.1 seq.1 sha1sum.1 sha224sum.1 sha256sum.1 sha384sum.1 sha512sum.1 \
-  shred.1 shuf.1 sleep.1 sort.1 split.1 stat.1 \
-  su.1 sum.1 sync.1 tac.1 tail.1 tee.1 test.1 touch.1 tr.1 true.1 tsort.1 \
-  tty.1 unexpand.1 uniq.1 unlink.1 vdir.1 wc.1 \
-  whoami.1 yes.1 $(MAN)
-optional_mans = \
-  chroot.1 hostid.1 nice.1 pinky.1 stty.1 uname.1 uptime.1 users.1 who.1
+dist_man1_MANS = $(MAN)
 
+man_aux = $(dist_man1_MANS:.1=.x)
 
-man_aux = $(dist_man_MANS:.1=.x) $(optional_mans:.1=.x)
+EXTRA_DIST = $(man_aux) $(NO_INSTALL_PROGS_DEFAULT:%=%.x) help2man
+MAINTAINERCLEANFILES = $(dist_man1_MANS)
 
-EXTRA_DIST = $(man_aux) help2man $(optional_mans)
-MAINTAINERCLEANFILES = $(dist_man_MANS)
+# Depend on ../.version to get version number changes.
+common_dep = ../.version
 
-# Depend on configure.ac to get version number changes.
-common_dep = $(top_srcdir)/configure.ac
+# Note that arch depends on uname.c
+arch.1:		$(common_dep)	$(srcdir)/arch.x	../src/uname.c
 
 base64.1:	$(common_dep)	$(srcdir)/base64.x	../src/base64.c
 basename.1:	$(common_dep)	$(srcdir)/basename.x	../src/basename.c
 cat.1:		$(common_dep)	$(srcdir)/cat.x		../src/cat.c
+chcon.1:	$(common_dep)	$(srcdir)/chcon.x	../src/chcon.c
 chgrp.1:	$(common_dep)	$(srcdir)/chgrp.x	../src/chgrp.c
 chmod.1:	$(common_dep)	$(srcdir)/chmod.x	../src/chmod.c
 chown.1:	$(common_dep)	$(srcdir)/chown.x	../src/chown.c
@@ -72,7 +59,7 @@ factor.1:	$(common_dep)	$(srcdir)/factor.x	../src/factor.c
 false.1:	$(common_dep)	$(srcdir)/false.x	../src/false.c
 fmt.1:		$(common_dep)	$(srcdir)/fmt.x		../src/fmt.c
 fold.1:		$(common_dep)	$(srcdir)/fold.x	../src/fold.c
-groups.1:	$(common_dep)	$(srcdir)/groups.x	../src/groups.sh
+groups.1:	$(common_dep)	$(srcdir)/groups.x	../src/groups.c
 head.1:		$(common_dep)	$(srcdir)/head.x	../src/head.c
 hostid.1:	$(common_dep)	$(srcdir)/hostid.x	../src/hostid.c
 hostname.1:	$(common_dep)	$(srcdir)/hostname.x	../src/hostname.c
@@ -88,6 +75,7 @@ md5sum.1:	$(common_dep)	$(srcdir)/md5sum.x	../src/md5sum.c
 mkdir.1:	$(common_dep)	$(srcdir)/mkdir.x	../src/mkdir.c
 mkfifo.1:	$(common_dep)	$(srcdir)/mkfifo.x	../src/mkfifo.c
 mknod.1:	$(common_dep)	$(srcdir)/mknod.x	../src/mknod.c
+mktemp.1:	$(common_dep)	$(srcdir)/mktemp.x	../src/mktemp.c
 mv.1:		$(common_dep)	$(srcdir)/mv.x		../src/mv.c
 nice.1:		$(common_dep)	$(srcdir)/nice.x	../src/nice.c
 nl.1:		$(common_dep)	$(srcdir)/nl.x		../src/nl.c
@@ -104,6 +92,7 @@ pwd.1:		$(common_dep)	$(srcdir)/pwd.x		../src/pwd.c
 readlink.1:	$(common_dep)	$(srcdir)/readlink.x	../src/readlink.c
 rm.1:		$(common_dep)	$(srcdir)/rm.x		../src/rm.c
 rmdir.1:	$(common_dep)	$(srcdir)/rmdir.x	../src/rmdir.c
+runcon.1:	$(common_dep)	$(srcdir)/runcon.x	../src/runcon.c
 seq.1:		$(common_dep)	$(srcdir)/seq.x		../src/seq.c
 sha1sum.1:	$(common_dep)	$(srcdir)/sha1sum.x	../src/md5sum.c
 sha224sum.1:	$(common_dep)	$(srcdir)/sha224sum.x	../src/md5sum.c
@@ -124,9 +113,11 @@ tac.1:		$(common_dep)	$(srcdir)/tac.x		../src/tac.c
 tail.1:		$(common_dep)	$(srcdir)/tail.x	../src/tail.c
 tee.1:		$(common_dep)	$(srcdir)/tee.x		../src/tee.c
 test.1:		$(common_dep)	$(srcdir)/test.x	../src/test.c
+timeout.1:	$(common_dep)	$(srcdir)/timeout.x	../src/timeout.c
 touch.1:	$(common_dep)	$(srcdir)/touch.x	../src/touch.c
 tr.1:		$(common_dep)	$(srcdir)/tr.x		../src/tr.c
 true.1:		$(common_dep)	$(srcdir)/true.x	../src/true.c
+truncate.1:	$(common_dep)	$(srcdir)/truncate.x	../src/truncate.c
 tsort.1:	$(common_dep)	$(srcdir)/tsort.x	../src/tsort.c
 tty.1:		$(common_dep)	$(srcdir)/tty.x		../src/tty.c
 uname.1:	$(common_dep)	$(srcdir)/uname.x	../src/uname.c
@@ -141,13 +132,17 @@ who.1:		$(common_dep)	$(srcdir)/who.x		../src/who.c
 whoami.1:	$(common_dep)	$(srcdir)/whoami.x	../src/whoami.c
 yes.1:		$(common_dep)	$(srcdir)/yes.x		../src/yes.c
 
+# This is required so that changes to e.g., emit_bug_reporting_address
+# provoke regeneration of all $(MAN) files.
+$(MAN): $(top_srcdir)/src/system.h
+
 SUFFIXES = .x .1
 
 # Ensure that help2man runs the ../src/ginstall binary as
 # `install' when creating install.1.
 # Similarly, ensure that it uses the ../src/[ binary to create test.1.
 t = $*.td
-mapped_name = `echo $*|sed 's/install/ginstall/; s/test/[/'`
+mapped_name = `echo $*|sed 's/^install$$/ginstall/; s/^test$$/[/'`
 
 # Note the use of $t/$*, rather than just `$*' as in other packages.
 # That is necessary to avoid failures for programs that are also shell built-in
@@ -161,20 +156,19 @@ mapped_name = `echo $*|sed 's/install/ginstall/; s/test/[/'`
 	  *)							\
 	    rm -f $@						\
 	    && { echo "Updating man page $@";			\
-	         rm -rf $t;					\
-	         mkdir $t;					\
-	         (cd $t && $(LN_S) ../../src/$(mapped_name) $*); \
-	            $(PERL) -- $(srcdir)/help2man		\
-	             --source='$(PACKAGE_STRING)'		\
-	             --include=$(srcdir)/$*.x			\
-	             --output=$t/$@ $t/$*;			\
+		 rm -rf $t;					\
+		 mkdir $t;					\
+		 (cd $t && $(LN_S) ../../src/$(mapped_name) $*); \
+		    $(PERL) -- $(srcdir)/help2man		\
+		     --source='$(PACKAGE_STRING)'		\
+		     --include=$(srcdir)/$*.x			\
+		     --output=$t/$@ $t/$*;			\
 	       }						\
 	    && sed 's|$*\.td/||g' $t/$@ > $@			\
-	    && chmod a-w $@					\
 	    && rm -rf $t ;;					\
 	esac
 
-check-local: check-x-vs-1 check-programs-vs-x
+distcheck-hook: check-x-vs-1 check-programs-vs-x
 
 # Sort in traditional ASCII order, regardless of the current locale;
 # otherwise we may get into trouble with distinct strings that the
@@ -182,14 +176,17 @@ check-local: check-x-vs-1 check-programs-vs-x
 ASSORT = LC_ALL=C sort
 
 # Ensure that for each .x file in this directory, there is a
-# corresponding .1 file in the definition of $(dist_man_MANS) above.
+# corresponding .1 file in the definition of $(dist_man1_MANS) above.
+# But since that expansion usually lacks programs like su and arch,
+# add them here manually.
 .PHONY: check-x-vs-1
 check-x-vs-1:
 	PATH=../src$(PATH_SEPARATOR)$$PATH; export PATH;		\
 	t=ls-files.$$$$;						\
 	(cd $(srcdir) && ls -1 *.x) | sed 's/\.x$$//' | $(ASSORT) > $$t;\
-	echo $(dist_man_MANS) | tr -s ' ' '\n' | sed 's/\.1$$//'	\
-	  | $(ASSORT) | diff - $$t || { rm $$t; exit 1; };		\
+	(echo $(dist_man1_MANS) $(NO_INSTALL_PROGS_DEFAULT)		\
+	  | tr -s ' ' '\n' | sed 's/\.1$$//')				\
+	  | $(ASSORT) -u | diff - $$t || { rm $$t; exit 1; };		\
 	rm $$t
 
 all_programs =								\

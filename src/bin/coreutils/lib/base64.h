@@ -1,12 +1,13 @@
 /* -*- buffer-read-only: t -*- vi: set ro: */
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* base64.h -- Encode binary data using printable characters.
    Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -45,12 +46,19 @@ extern void base64_encode (const char *restrict in, size_t inlen,
 extern size_t base64_encode_alloc (const char *in, size_t inlen, char **out);
 
 extern void base64_decode_ctx_init (struct base64_decode_context *ctx);
-extern bool base64_decode (struct base64_decode_context *ctx,
-			   const char *restrict in, size_t inlen,
-			   char *restrict out, size_t *outlen);
 
-extern bool base64_decode_alloc (struct base64_decode_context *ctx,
-				 const char *in, size_t inlen,
-				 char **out, size_t *outlen);
+extern bool base64_decode_ctx (struct base64_decode_context *ctx,
+			       const char *restrict in, size_t inlen,
+			       char *restrict out, size_t *outlen);
+
+extern bool base64_decode_alloc_ctx (struct base64_decode_context *ctx,
+				     const char *in, size_t inlen,
+				     char **out, size_t *outlen);
+
+#define base64_decode(in, inlen, out, outlen) \
+	base64_decode_ctx (NULL, in, inlen, out, outlen)
+
+#define base64_decode_alloc(in, inlen, out, outlen) \
+	base64_decode_alloc_ctx (NULL, in, inlen, out, outlen)
 
 #endif /* BASE64_H */

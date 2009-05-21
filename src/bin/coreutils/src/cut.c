@@ -1,11 +1,11 @@
 /* cut - remove parts of lines of files
-   Copyright (C) 1997-2006 Free Software Foundation, Inc.
+   Copyright (C) 1997-2008 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David Ihnat.  */
 
@@ -40,7 +39,10 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "cut"
 
-#define AUTHORS "David Ihnat", "David MacKenzie", "Jim Meyering"
+#define AUTHORS \
+  proper_name ("David M. Ihnat"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Jim Meyering")
 
 #define FATAL_ERROR(Message)						\
   do									\
@@ -57,6 +59,8 @@
 #define ADD_RANGE_PAIR(rp, low, high)			\
   do							\
     {							\
+      if (low == 0 || high == 0)			\
+	FATAL_ERROR (_("fields and positions are numbered from 1")); \
       if (n_rp >= n_rp_allocated)			\
 	{						\
 	  (rp) = X2NREALLOC (rp, &n_rp_allocated);	\
@@ -115,9 +119,6 @@ enum operating_mode
     /* Output the given delimeter-separated fields. */
     field_mode
   };
-
-/* The name this program was run with. */
-char *program_name;
 
 static enum operating_mode operating_mode;
 
@@ -186,7 +187,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION]... [FILE]...\n\
+Usage: %s OPTION... [FILE]...\n\
 "),
 	      program_name);
       fputs (_("\
@@ -209,7 +210,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
       --complement        complement the set of selected bytes, characters\n\
-                            or fields.\n\
+                            or fields\n\
 "), stdout);
       fputs (_("\
   -s, --only-delimited    do not print lines not containing delimiters\n\
@@ -234,7 +235,7 @@ Each range is one of:\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -342,6 +343,8 @@ set_fields (const char *fieldstr)
 {
   size_t initial = 1;		/* Value of first number in a range.  */
   size_t value = 0;		/* If nonzero, a number being accumulated.  */
+  bool lhs_specified = false;
+  bool rhs_specified = false;
   bool dash_found = false;	/* True if a '-' is found in this field.  */
   bool field_found = false;	/* True if at least one field spec
 				   has been processed.  */
@@ -366,15 +369,11 @@ set_fields (const char *fieldstr)
 	  dash_found = true;
 	  fieldstr++;
 
-	  if (value)
-	    {
-	      initial = value;
-	      value = 0;
-	    }
-	  else
-	    initial = 1;
+	  initial = (lhs_specified ? value : 1);
+	  value = 0;
 	}
-      else if (*fieldstr == ',' || isblank (*fieldstr) || *fieldstr == '\0')
+      else if (*fieldstr == ',' ||
+	       isblank (to_uchar (*fieldstr)) || *fieldstr == '\0')
 	{
 	  in_digits = false;
 	  /* Ending the string, or this field/byte sublist. */
@@ -382,9 +381,12 @@ set_fields (const char *fieldstr)
 	    {
 	      dash_found = false;
 
-	      /* A range.  Possibilites: -n, m-n, n-.
+	      if (!lhs_specified && !rhs_specified)
+		FATAL_ERROR (_("invalid range with no endpoint: -"));
+
+	      /* A range.  Possibilities: -n, m-n, n-.
 		 In any case, `initial' contains the start of the range. */
-	      if (value == 0)
+	      if (!rhs_specified)
 		{
 		  /* `n-'.  From `initial' to end of line. */
 		  eol_range_start = initial;
@@ -394,7 +396,7 @@ set_fields (const char *fieldstr)
 		{
 		  /* `m-n' or `-n' (1-n). */
 		  if (value < initial)
-		    FATAL_ERROR (_("invalid byte or field list"));
+		    FATAL_ERROR (_("invalid decreasing range"));
 
 		  /* Is there already a range going to end of line? */
 		  if (eol_range_start != 0)
@@ -432,7 +434,7 @@ set_fields (const char *fieldstr)
 		  value = 0;
 		}
 	    }
-	  else if (value != 0)
+	  else
 	    {
 	      /* A simple field number, not a range. */
 	      ADD_RANGE_PAIR (rp, value, value);
@@ -446,6 +448,8 @@ set_fields (const char *fieldstr)
 	    }
 
 	  fieldstr++;
+	  lhs_specified = false;
+	  rhs_specified = false;
 	}
       else if (ISDIGIT (*fieldstr))
 	{
@@ -456,10 +460,15 @@ set_fields (const char *fieldstr)
 	    num_start = fieldstr;
 	  in_digits = true;
 
+	  if (dash_found)
+	    rhs_specified = 1;
+	  else
+	    lhs_specified = 1;
+
 	  /* Detect overflow.  */
 	  if (!DECIMAL_DIGIT_ACCUMULATE (value, *fieldstr - '0', size_t))
 	    {
-	      /* In case the user specified -c4294967296,22,
+	      /* In case the user specified -c$(echo 2^64|bc),22,
 		 complain only about the first number.  */
 	      /* Determine the length of the offending number.  */
 	      size_t len = strspn (num_start, "0123456789");
@@ -750,7 +759,7 @@ main (int argc, char **argv)
   char *spec_list_string IF_LINT(= NULL);
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

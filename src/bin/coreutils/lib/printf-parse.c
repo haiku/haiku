@@ -1,12 +1,12 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Formatted output to strings.
-   This file is intended to provide exactly the same functionality
-   as the version in gnulib, but without the need for the xsize module.
-
-   Copyright (C) 1999-2000, 2002-2003, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 1999-2000, 2002-2003, 2006-2008 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -18,34 +18,63 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include <config.h>
+/* This file can be parametrized with the following macros:
+     CHAR_T             The element type of the format string.
+     CHAR_T_ONLY_ASCII  Set to 1 to enable verification that all characters
+                        in the format string are ASCII.
+     DIRECTIVE          Structure denoting a format directive.
+                        Depends on CHAR_T.
+     DIRECTIVES         Structure denoting the set of format directives of a
+                        format string.  Depends on CHAR_T.
+     PRINTF_PARSE       Function that parses a format string.
+                        Depends on CHAR_T.
+     STATIC             Set to 'static' to declare the function static.
+     ENABLE_UNISTDIO    Set to 1 to enable the unistdio extensions.  */
+
+#ifndef PRINTF_PARSE
+# include <config.h>
+#endif
 
 /* Specification.  */
-#if WIDE_CHAR_VERSION
-# include "wprintf-parse.h"
-#else
+#ifndef PRINTF_PARSE
 # include "printf-parse.h"
+#endif
+
+/* Default parameters.  */
+#ifndef PRINTF_PARSE
+# define PRINTF_PARSE printf_parse
+# define CHAR_T char
+# define DIRECTIVE char_directive
+# define DIRECTIVES char_directives
 #endif
 
 /* Get size_t, NULL.  */
 #include <stddef.h>
 
-/* Get intmax_t, SIZE_MAX.  */
-#include <stdint.h>
+/* Get intmax_t.  */
+#if defined IN_LIBINTL || defined IN_LIBASPRINTF
+# if HAVE_STDINT_H_WITH_UINTMAX
+#  include <stdint.h>
+# endif
+# if HAVE_INTTYPES_H_WITH_UINTMAX
+#  include <inttypes.h>
+# endif
+#else
+# include <stdint.h>
+#endif
 
 /* malloc(), realloc(), free().  */
 #include <stdlib.h>
 
-#if WIDE_CHAR_VERSION
-# define PRINTF_PARSE wprintf_parse
-# define CHAR_T wchar_t
-# define DIRECTIVE wchar_t_directive
-# define DIRECTIVES wchar_t_directives
-#else
-# define PRINTF_PARSE printf_parse
-# define CHAR_T char
-# define DIRECTIVE char_directive
-# define DIRECTIVES char_directives
+/* errno.  */
+#include <errno.h>
+
+/* Checked size_t computations.  */
+#include "xsize.h"
+
+#if CHAR_T_ONLY_ASCII
+/* c_isascii().  */
+# include "c-ctype.h"
 #endif
 
 #ifdef STATIC
@@ -63,10 +92,10 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 
   d->count = 0;
   d_allocated = 1;
-  d->dir = malloc (d_allocated * sizeof (DIRECTIVE));
+  d->dir = (DIRECTIVE *) malloc (d_allocated * sizeof (DIRECTIVE));
   if (d->dir == NULL)
     /* Out of memory.  */
-    return -1;
+    goto out_of_memory_1;
 
   a->count = 0;
   a_allocated = 0;
@@ -80,19 +109,19 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 	size_t memory_size;						\
 	argument *memory;						\
 									\
-	a_allocated *= 2;						\
+	a_allocated = xtimes (a_allocated, 2);				\
 	if (a_allocated <= n)						\
-	  a_allocated = n + 1;						\
-	if (SIZE_MAX / sizeof (argument) < a_allocated)			\
+	  a_allocated = xsum (n, 1);					\
+	memory_size = xtimes (a_allocated, sizeof (argument));		\
+	if (size_overflow_p (memory_size))				\
 	  /* Overflow, would lead to out of memory.  */			\
-	  goto error;							\
-	memory_size = a_allocated * sizeof (argument);			\
-	memory = (a->arg						\
-		  ? realloc (a->arg, memory_size)			\
-		  : malloc (memory_size));				\
+	  goto out_of_memory;						\
+	memory = (argument *) (a->arg					\
+			       ? realloc (a->arg, memory_size)		\
+			       : malloc (memory_size));			\
 	if (memory == NULL)						\
 	  /* Out of memory.  */						\
-	  goto error;							\
+	  goto out_of_memory;						\
 	a->arg = memory;						\
       }									\
     while (a->count <= n)						\
@@ -110,7 +139,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
       if (c == '%')
 	{
 	  size_t arg_index = ARG_NONE;
-	  DIRECTIVE *dp = &d->dir[d->count];/* pointer to next directive */
+	  DIRECTIVE *dp = &d->dir[d->count]; /* pointer to next directive */
 
 	  /* Initialize the next directive.  */
 	  dp->dir_start = cp - 1;
@@ -135,13 +164,12 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 		  size_t n = 0;
 
 		  for (np = cp; *np >= '0' && *np <= '9'; np++)
-		    if (n < SIZE_MAX / 10)
-		      n = 10 * n + (*np - '0');
-		    else
-		      /* n too large for memory.  */
-		      goto error;
+		    n = xsum (xtimes (n, 10), *np - '0');
 		  if (n == 0)
 		    /* Positional argument 0.  */
+		    goto error;
+		  if (size_overflow_p (n))
+		    /* n too large, would lead to out of memory later.  */
 		    goto error;
 		  arg_index = n - 1;
 		  cp = np + 1;
@@ -206,13 +234,12 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 		      size_t n = 0;
 
 		      for (np = cp; *np >= '0' && *np <= '9'; np++)
-			if (n < SIZE_MAX / 10)
-			  n = 10 * n + (*np - '0');
-			else
-			  /* n too large for memory.  */
-			  goto error;
+			n = xsum (xtimes (n, 10), *np - '0');
 		      if (n == 0)
 			/* Positional argument 0.  */
+			goto error;
+		      if (size_overflow_p (n))
+			/* n too large, would lead to out of memory later.  */
 			goto error;
 		      dp->width_arg_index = n - 1;
 		      cp = np + 1;
@@ -264,13 +291,13 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 			  size_t n = 0;
 
 			  for (np = cp; *np >= '0' && *np <= '9'; np++)
-			    if (n < SIZE_MAX / 10)
-			      n = 10 * n + (*np - '0');
-			    else
-			      /* n too large for memory.  */
-			      goto error;
+			    n = xsum (xtimes (n, 10), *np - '0');
 			  if (n == 0)
 			    /* Positional argument 0.  */
+			    goto error;
+			  if (size_overflow_p (n))
+			    /* n too large, would lead to out of memory
+			       later.  */
 			    goto error;
 			  dp->precision_arg_index = n - 1;
 			  cp = np + 1;
@@ -323,7 +350,6 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 		      flags += 8;
 		      cp++;
 		    }
-#if HAVE_INTMAX_T
 		  else if (*cp == 'j')
 		    {
 		      if (sizeof (intmax_t) > sizeof (long))
@@ -338,7 +364,6 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 			}
 		      cp++;
 		    }
-#endif
 		  else if (*cp == 'z' || *cp == 'Z')
 		    {
 		      /* 'z' is standardized in ISO C 99, but glibc uses 'Z'
@@ -370,6 +395,44 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 			}
 		      cp++;
 		    }
+#if defined __APPLE__ && defined __MACH__
+		  /* On MacOS X 10.3, PRIdMAX is defined as "qd".
+		     We cannot change it to "lld" because PRIdMAX must also
+		     be understood by the system's printf routines.  */
+		  else if (*cp == 'q')
+		    {
+		      if (64 / 8 > sizeof (long))
+			{
+			  /* int64_t = long long */
+			  flags += 16;
+			}
+		      else
+			{
+			  /* int64_t = long */
+			  flags += 8;
+			}
+		      cp++;
+		    }
+#endif
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+		  /* On native Win32, PRIdMAX is defined as "I64d".
+		     We cannot change it to "lld" because PRIdMAX must also
+		     be understood by the system's printf routines.  */
+		  else if (*cp == 'I' && cp[1] == '6' && cp[2] == '4')
+		    {
+		      if (64 / 8 > sizeof (long))
+			{
+			  /* __int64 = long long */
+			  flags += 16;
+			}
+		      else
+			{
+			  /* __int64 = long */
+			  flags += 8;
+			}
+		      cp += 3;
+		    }
+#endif
 		  else
 		    break;
 		}
@@ -416,12 +479,10 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 		  break;
 		case 'f': case 'F': case 'e': case 'E': case 'g': case 'G':
 		case 'a': case 'A':
-#if HAVE_LONG_DOUBLE
 		  if (flags >= 16 || (flags & 4))
 		    type = TYPE_LONGDOUBLE;
 		  else
-#endif
-		  type = TYPE_DOUBLE;
+		    type = TYPE_DOUBLE;
 		  break;
 		case 'c':
 		  if (flags >= 8)
@@ -476,6 +537,17 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 		  else
 		    type = TYPE_COUNT_INT_POINTER;
 		  break;
+#if ENABLE_UNISTDIO
+		/* The unistdio extensions.  */
+		case 'U':
+		  if (flags >= 16)
+		    type = TYPE_U32_STRING;
+		  else if (flags >= 8)
+		    type = TYPE_U16_STRING;
+		  else
+		    type = TYPE_U8_STRING;
+		  break;
+#endif
 		case '%':
 		  type = TYPE_NONE;
 		  break;
@@ -504,19 +576,28 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 	  d->count++;
 	  if (d->count >= d_allocated)
 	    {
+	      size_t memory_size;
 	      DIRECTIVE *memory;
 
-	      if (SIZE_MAX / (2 * sizeof (DIRECTIVE)) < d_allocated)
+	      d_allocated = xtimes (d_allocated, 2);
+	      memory_size = xtimes (d_allocated, sizeof (DIRECTIVE));
+	      if (size_overflow_p (memory_size))
 		/* Overflow, would lead to out of memory.  */
-		goto error;
-	      d_allocated *= 2;
-	      memory = realloc (d->dir, d_allocated * sizeof (DIRECTIVE));
+		goto out_of_memory;
+	      memory = (DIRECTIVE *) realloc (d->dir, memory_size);
 	      if (memory == NULL)
 		/* Out of memory.  */
-		goto error;
+		goto out_of_memory;
 	      d->dir = memory;
 	    }
 	}
+#if CHAR_T_ONLY_ASCII
+      else if (!c_isascii (c))
+	{
+	  /* Non-ASCII character.  Not supported.  */
+	  goto error;
+	}
+#endif
     }
   d->dir[d->count].dir_start = cp;
 
@@ -529,10 +610,21 @@ error:
     free (a->arg);
   if (d->dir)
     free (d->dir);
+  errno = EINVAL;
+  return -1;
+
+out_of_memory:
+  if (a->arg)
+    free (a->arg);
+  if (d->dir)
+    free (d->dir);
+out_of_memory_1:
+  errno = ENOMEM;
   return -1;
 }
 
+#undef PRINTF_PARSE
 #undef DIRECTIVES
 #undef DIRECTIVE
+#undef CHAR_T_ONLY_ASCII
 #undef CHAR_T
-#undef PRINTF_PARSE

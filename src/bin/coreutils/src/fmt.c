@@ -1,10 +1,10 @@
 /* GNU fmt -- simple text formatter.
-   Copyright (C) 1994-2006 Free Software Foundation, Inc.
+   Copyright (C) 1994-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Ross Paterson <rap@doc.ic.ac.uk>.  */
 
@@ -34,7 +33,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "fmt"
 
-#define AUTHORS "Ross Paterson"
+#define AUTHORS proper_name ("Ross Paterson")
 
 /* The following parameters represent the program's idea of what is
    "best".  Adjust to taste, subject to the caveats given.  */
@@ -168,9 +167,6 @@ static void put_line (WORD *w, int indent);
 static void put_word (WORD *w);
 static void put_space (int space);
 
-/* The name this program was run with.  */
-const char *program_name;
-
 /* Option values.  */
 
 /* If true, first 2 lines may have different indent (default false).  */
@@ -270,10 +266,10 @@ usage (int status)
 	     program_name);
   else
     {
-      printf (_("Usage: %s [-DIGITS] [OPTION]... [FILE]...\n"), program_name);
+      printf (_("Usage: %s [-WIDTH] [OPTION]... [FILE]...\n"), program_name);
       fputs (_("\
 Reformat each paragraph in the FILE(s), writing to standard output.\n\
-If no FILE or if FILE is `-', read standard input.\n\
+The option -WIDTH is an abbreviated form of --width=DIGITS.\n\
 \n\
 "), stdout);
       fputs (_("\
@@ -297,14 +293,14 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n"),
 	     stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
 
 /* Decode options and launch execution.  */
 
-static const struct option long_options[] =
+static struct option const long_options[] =
 {
   {"crown-margin", no_argument, NULL, 'c'},
   {"prefix", required_argument, NULL, 'p'},
@@ -325,7 +321,7 @@ main (int argc, char **argv)
   char const *max_width_option = NULL;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

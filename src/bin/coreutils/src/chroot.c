@@ -1,10 +1,11 @@
 /* chroot -- run command or shell with special root directory
-   Copyright (C) 95, 96, 1997, 1999-2004 Free Software Foundation, Inc.
+   Copyright (C) 95, 96, 1997, 1999-2004, 2007-2009
+   Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Roland McGrath.  */
 
@@ -30,10 +30,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "chroot"
 
-#define AUTHORS "Roland McGrath"
-
-/* The name this program was run with, for error messages. */
-char *program_name;
+#define AUTHORS proper_name ("Roland McGrath")
 
 void
 usage (int status)
@@ -44,7 +41,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s NEWROOT [COMMAND...]\n\
+Usage: %s NEWROOT [COMMAND [ARG]...]\n\
   or:  %s OPTION\n\
 "), program_name, program_name);
       fputs (_("\
@@ -57,7 +54,7 @@ Run COMMAND with root directory set to NEWROOT.\n\
 \n\
 If no command is given, run ``${SHELL} -i'' (default: /bin/sh).\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -66,39 +63,40 @@ int
 main (int argc, char **argv)
 {
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  initialize_exit_failure (EXIT_FAIL);
+  initialize_exit_failure (EXIT_FAILURE);
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, Version,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "+", NULL, NULL) != -1)
-    usage (EXIT_FAIL);
+    usage (EXIT_FAILURE);
 
   if (argc <= optind)
     {
       error (0, 0, _("missing operand"));
-      usage (EXIT_FAIL);
+      usage (EXIT_FAILURE);
     }
 
   if (chroot (argv[optind]) != 0)
-    error (EXIT_FAIL, errno, _("cannot change root directory to %s"), argv[1]);
+    error (EXIT_FAILURE, errno, _("cannot change root directory to %s"),
+	   argv[optind]);
 
   if (chdir ("/"))
-    error (EXIT_FAIL, errno, _("cannot chdir to root directory"));
+    error (EXIT_FAILURE, errno, _("cannot chdir to root directory"));
 
   if (argc == optind + 1)
     {
       /* No command.  Run an interactive shell.  */
       char *shell = getenv ("SHELL");
       if (shell == NULL)
-	shell = "/bin/sh";
+	shell = bad_cast ("/bin/sh");
       argv[0] = shell;
-      argv[1] = "-i";
+      argv[1] = bad_cast ("-i");
       argv[2] = NULL;
     }
   else

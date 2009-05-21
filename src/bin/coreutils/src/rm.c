@@ -1,10 +1,10 @@
 /* `rm' file deletion utility for GNU.
-   Copyright (C) 88, 90, 91, 1994-2007 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Rubin, David MacKenzie, and Richard Stallman.
    Reworked to use chdir and avoid recursion by Jim Meyering.  */
@@ -51,21 +50,21 @@
 #include "system.h"
 #include "argmatch.h"
 #include "error.h"
-#include "lstat.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "remove.h"
 #include "root-dev-ino.h"
 #include "yesno.h"
+#include "priv-set.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "rm"
 
 #define AUTHORS \
-  "Paul Rubin", "David MacKenzie, Richard Stallman", "Jim Meyering"
-
-/* Name this program was run with.  */
-char *program_name;
+  proper_name ("Paul Rubin"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Richard M. Stallman"), \
+  proper_name ("Jim Meyering")
 
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
@@ -204,7 +203,7 @@ Note that if you use rm to remove a file, it is usually possible to recover\n\
 the contents of that file.  If you want more assurance that the contents are\n\
 truly unrecoverable, consider using shred.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -234,14 +233,17 @@ main (int argc, char **argv)
   int c;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  atexit (close_stdout);
+  atexit (close_stdin);
 
   rm_option_init (&x);
+
+  /* Try to disable the ability to unlink a directory.  */
+  priv_set_remove_linkdir ();
 
   while ((c = getopt_long (argc, argv, "dfirvIR", long_opts, NULL)) != -1)
     {

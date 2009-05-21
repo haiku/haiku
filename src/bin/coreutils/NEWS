@@ -1,5 +1,642 @@
 GNU coreutils NEWS                                    -*- outline -*-
 
+* Noteworthy changes in release 7.4 (2009-05-07) [stable]
+
+** Bug fixes
+
+  date -d 'next mon', when run on a Monday, now prints the date
+  7 days in the future rather than the current day.  Same for any other
+  day-of-the-week name, when run on that same day of the week.
+  [This bug appears to have been present in "the beginning". ]
+
+  date -d tuesday, when run on a Tuesday -- using date built from the 7.3
+  release tarball, not from git -- would print the date 7 days in the future.
+  Now, it works properly and prints the current date.  That was due to
+  human error (including not-committed changes in a release tarball)
+  and the fact that there is no check to detect when the gnulib/ git
+  submodule is dirty.
+
+** Build-related
+
+  make check: two tests have been corrected
+
+** Portability
+
+  There have been some ACL-related portability fixes for *BSD,
+  inherited from gnulib.
+
+
+* Noteworthy changes in release 7.3 (2009-05-01) [stable]
+
+** Bug fixes
+
+  cp now diagnoses failure to preserve selinux/xattr attributes when
+  --preserve=context,xattr is specified in combination with -a.
+  Also, cp no longer suppresses attribute-preservation diagnostics
+  when preserving SELinux context was explicitly requested.
+
+  ls now aligns output correctly in the presence of abbreviated month
+  names from the locale database that have differing widths.
+
+  ls -v and sort -V now order names like "#.b#" properly
+
+  mv: do not print diagnostics when failing to preserve xattr's on file
+  systems without xattr support.
+
+  sort -m no longer segfaults when its output file is also an input file.
+  E.g., with this, touch 1; sort -m -o 1 1, sort would segfault.
+  [introduced in coreutils-7.2]
+
+** Changes in behavior
+
+  shred, sort, shuf: now use an internal pseudorandom generator by default.
+  This is mainly noticable in shred where the 3 random passes it does by
+  default should proceed at the speed of the disk.  Previously /dev/urandom
+  was used if available, which is relatively slow on GNU/Linux systems.
+
+** Improved robustness
+
+  cp would exit successfully after copying less than the full contents
+  of a file larger than ~4000 bytes from a linux-/proc file system to a
+  destination file system with a fundamental block size of 4KiB or greater.
+  Reading into a 4KiB-or-larger buffer, cp's "read" syscall would return
+  a value smaller than 4096, and cp would interpret that as EOF (POSIX
+  allows this).  This optimization, now removed, saved 50% of cp's read
+  syscalls when copying small files.  Affected linux kernels: at least
+  2.6.9 through 2.6.29.
+  [the optimization was introduced in coreutils-6.0]
+
+** Portability
+
+  df now pre-mounts automountable directories even with automounters for
+  which stat-like syscalls no longer provoke mounting.  Now, df uses open.
+
+  `id -G $USER` now works correctly even on Darwin and NetBSD. Previously it
+  would either truncate the group list to 10, or go into an infinite loop,
+  due to their non-standard getgrouplist implementations.
+  [truncation introduced in coreutils-6.11]
+  [infinite loop introduced in coreutils-7.1]
+
+
+* Noteworthy changes in release 7.2 (2009-03-31) [stable]
+
+** New features
+
+  pwd now accepts the options --logical (-L) and --physical (-P).  For
+  compatibility with existing scripts, -P is the default behavior
+  unless POSIXLY_CORRECT is requested.
+
+** Bug fixes
+
+  cat once again immediately outputs data it has processed.
+  Previously it would have been buffered and only output if enough
+  data was read, or on process exit.
+  [bug introduced in coreutils-6.0]
+
+  comm's new --check-order option would fail to detect disorder on any pair
+  of lines where one was a prefix of the other.  For example, this would
+  fail to report the disorder: printf 'Xb\nX\n'>k; comm --check-order k k
+  [bug introduced in coreutils-7.0]
+
+  cp once again diagnoses the invalid "cp -rl dir dir" right away,
+  rather than after creating a very deep dir/dir/dir/... hierarchy.
+  The bug strikes only with both --recursive (-r, -R) and --link (-l).
+  [bug introduced in coreutils-7.1]
+
+  ls --sort=version (-v) sorted names beginning with "." inconsistently.
+  Now, names that start with "." are always listed before those that don't.
+
+  pr: fix the bug whereby --indent=N (-o) did not indent header lines
+  [bug introduced in coreutils-6.9.90]
+
+  sort now handles specified key ends correctly.
+  Previously -k1,1b would have caused leading space from field 2 to be
+  included in the sort while -k2,3.0 would have not included field 3.
+
+** Changes in behavior
+
+  cat,cp,install,mv,split: these programs now read and write a minimum
+  of 32KiB at a time.  This was seen to double throughput when reading
+  cached files on GNU/Linux-based systems.
+
+  cp -a now tries to preserve extended attributes (xattr), but does not
+  diagnose xattr-preservation failure.  However, cp --preserve=all still does.
+
+  ls --color: hard link highlighting can be now disabled by changing the
+  LS_COLORS environment variable. To disable it you can add something like
+  this to your profile: eval `dircolors | sed s/hl=[^:]*:/hl=:/`
+
+
+* Noteworthy changes in release 7.1 (2009-02-21) [stable]
+
+** New features
+
+  Add extended attribute support available on certain filesystems like ext2
+  and XFS.
+    cp: Tries to copy xattrs when --preserve=xattr or --preserve=all specified
+    mv: Always tries to copy xattrs
+    install: Never copies xattrs
+
+  cp and mv accept a new option, --no-clobber (-n): silently refrain
+  from overwriting any existing destination file
+
+  dd accepts iflag=cio and oflag=cio to open the file in CIO (concurrent I/O)
+  mode where this feature is available.
+
+  install accepts a new option, --compare (-C): compare each pair of source
+  and destination files, and if the destination has identical content and
+  any specified owner, group, permissions, and possibly SELinux context, then
+  do not modify the destination at all.
+
+  ls --color now highlights hard linked files, too
+
+  stat -f recognizes the Lustre file system type
+
+** Bug fixes
+
+  chgrp, chmod, chown --silent (--quiet, -f) no longer print some diagnostics
+  [bug introduced in coreutils-5.1]
+
+  cp uses much less memory in some situations
+
+  cp -a now correctly tries to preserve SELinux context (announced in 6.9.90),
+  doesn't inform about failure, unlike with --preserve=all
+
+  du --files0-from=FILE no longer reads all of FILE into RAM before
+  processing the first file name
+
+  seq 9223372036854775807 9223372036854775808 now prints only two numbers
+  on systems with extended long double support and good library support.
+  Even with this patch, on some systems, it still produces invalid output,
+  from 3 to at least 1026 lines long. [bug introduced in coreutils-6.11]
+
+  seq -w now accounts for a decimal point added to the last number
+  to correctly print all numbers to the same width.
+
+  wc --files0-from=FILE no longer reads all of FILE into RAM, before
+  processing the first file name, unless the list of names is known
+  to be small enough.
+
+** Changes in behavior
+
+  cp and mv: the --reply={yes,no,query} option has been removed.
+  Using it has elicited a warning for the last three years.
+
+  dd: user specified offsets that are too big are handled better.
+  Previously, erroneous parameters to skip and seek could result
+  in redundant reading of the file with no warnings or errors.
+
+  du: -H (initially equivalent to --si) is now equivalent to
+  --dereference-args, and thus works as POSIX requires
+
+  shred: now does 3 overwrite passes by default rather than 25.
+
+  ls -l now marks SELinux-only files with the less obtrusive '.',
+  rather than '+'.  A file with any other combination of MAC and ACL
+  is still marked with a '+'.
+
+
+* Noteworthy changes in release 7.0 (2008-10-05) [beta]
+
+** New programs
+
+  timeout: Run a command with bounded time.
+  truncate: Set the size of a file to a specified size.
+
+** New features
+
+  chgrp, chmod, chown, chcon, du, rm: now all display linear performance,
+  even when operating on million-entry directories on ext3 and ext4 file
+  systems.  Before, they would exhibit O(N^2) performance, due to linear
+  per-entry seek time cost when operating on entries in readdir order.
+  Rm was improved directly, while the others inherit the improvement
+  from the newer version of fts in gnulib.
+
+  comm now verifies that the inputs are in sorted order.  This check can
+  be turned off with the --nocheck-order option.
+
+  comm accepts new option, --output-delimiter=STR, that allows specification
+  of an output delimiter other than the default single TAB.
+
+  cp and mv: the deprecated --reply=X option is now also undocumented.
+
+  dd accepts iflag=fullblock to make it accumulate full input blocks.
+  With this new option, after a short read, dd repeatedly calls read,
+  until it fills the incomplete block, reaches EOF, or encounters an error.
+
+  df accepts a new option --total, which produces a grand total of all
+  arguments after all arguments have been processed.
+
+  If the GNU MP library is available at configure time, factor and
+  expr support arbitrarily large numbers.  Pollard's rho algorithm is
+  used to factor large numbers.
+
+  install accepts a new option --strip-program to specify the program used to
+  strip binaries.
+
+  ls now colorizes files with capabilities if libcap is available
+
+  ls -v now uses filevercmp function as sort predicate (instead of strverscmp)
+
+  md5sum now accepts the new option, --quiet, to suppress the printing of
+  'OK' messages.  sha1sum, sha224sum, sha384sum, and sha512sum accept it, too.
+
+  sort accepts a new option, --files0-from=F, that specifies a file
+  containing a null-separated list of files to sort.  This list is used
+  instead of filenames passed on the command-line to avoid problems with
+  maximum command-line (argv) length.
+
+  sort accepts a new option --batch-size=NMERGE, where NMERGE
+  represents the maximum number of inputs that will be merged at once.
+  When processing more than NMERGE inputs, sort uses temporary files.
+
+  sort accepts a new option --version-sort (-V, --sort=version),
+  specifying that ordering is to be based on filevercmp.
+
+** Bug fixes
+
+  chcon --verbose now prints a newline after each message
+
+  od no longer suffers from platform bugs in printf(3).  This is
+  probably most noticeable when using 'od -tfL' to print long doubles.
+
+  seq -0.1 0.1 2 now prints 2,0 when locale's decimal point is ",".
+  Before, it would mistakenly omit the final number in that example.
+
+  shuf honors the --zero-terminated (-z) option, even with --input-range=LO-HI
+
+  shuf --head-count is now correctly documented.  The documentation
+  previously claimed it was called --head-lines.
+
+** Improvements
+
+  Improved support for access control lists (ACLs): On MacOS X, Solaris 7..10,
+  HP-UX 11, Tru64, AIX, IRIX 6.5, and Cygwin, "ls -l" now displays the presence
+  of an ACL on a file via a '+' sign after the mode, and "cp -p" copies ACLs.
+
+  join has significantly better performance due to better memory management
+
+  ls now uses constant memory when not sorting and using one_per_line format,
+  no matter how many files are in a given directory
+
+  od now aligns fields across lines when printing multiple -t
+  specifiers, and no longer prints fields that resulted entirely from
+  padding the input out to the least common multiple width.
+
+** Changes in behavior
+
+  stat's --context (-Z) option has always been a no-op.
+  Now it evokes a warning that it is obsolete and will be removed.
+
+
+* Noteworthy changes in release 6.12 (2008-05-31) [stable]
+
+** Bug fixes
+
+  chcon, runcon: --help output now includes the bug-reporting address
+
+  cp -p copies permissions more portably.  For example, on MacOS X 10.5,
+  "cp -p some-fifo some-file" no longer fails while trying to copy the
+  permissions from the some-fifo argument.
+
+  id with no options now prints the SELinux context only when invoked
+  with no USERNAME argument.
+
+  id and groups once again print the AFS-specific nameless group-ID (PAG).
+  Printing of such large-numbered, kernel-only (not in /etc/group) group-IDs
+  was suppressed in 6.11 due to ignorance that they are useful.
+
+  uniq: avoid subtle field-skipping malfunction due to isblank misuse.
+  In some locales on some systems, isblank(240) (aka &nbsp) is nonzero.
+  On such systems, uniq --skip-fields=N would fail to skip the proper
+  number of fields for some inputs.
+
+  tac: avoid segfault with --regex (-r) and multiple files, e.g.,
+  "echo > x; tac -r x x".  [bug present at least in textutils-1.8b, from 1992]
+
+** Changes in behavior
+
+  install once again sets SELinux context, when possible
+  [it was deliberately disabled in 6.9.90]
+
+
+* Noteworthy changes in release 6.11 (2008-04-19) [stable]
+
+** Bug fixes
+
+  configure --enable-no-install-program=groups now works.
+
+  "cp -fR fifo E" now succeeds with an existing E.  Before this fix, using
+  -fR to copy a fifo or "special" file onto an existing file would fail
+  with EEXIST.  Now, it once again unlinks the destination before trying
+  to create the destination file.  [bug introduced in coreutils-5.90]
+
+  dd once again works with unnecessary options like if=/dev/stdin and
+  of=/dev/stdout.  [bug introduced in fileutils-4.0h]
+
+  id now uses getgrouplist, when possible.  This results in
+  much better performance when there are many users and/or groups.
+
+  ls no longer segfaults on files in /proc when linked with an older version
+  of libselinux.  E.g., ls -l /proc/sys would dereference a NULL pointer.
+
+  md5sum would segfault for invalid BSD-style input, e.g.,
+  echo 'MD5 (' | md5sum -c -  Now, md5sum ignores that line.
+  sha1sum, sha224sum, sha384sum, and sha512sum are affected, too.
+  [bug introduced in coreutils-5.1.0]
+
+  md5sum -c would accept a NUL-containing checksum string like "abcd\0..."
+  and would unnecessarily read and compute the checksum of the named file,
+  and then compare that checksum to the invalid one: guaranteed to fail.
+  Now, it recognizes that the line is not valid and skips it.
+  sha1sum, sha224sum, sha384sum, and sha512sum are affected, too.
+  [bug present in the original version, in coreutils-4.5.1, 1995]
+
+  "mkdir -Z x dir" no longer segfaults when diagnosing invalid context "x"
+  mkfifo and mknod would fail similarly.  Now they're fixed.
+
+  mv would mistakenly unlink a destination file before calling rename,
+  when the destination had two or more hard links.  It no longer does that.
+  [bug introduced in coreutils-5.3.0]
+
+  "paste -d'\' file" no longer overruns memory (heap since coreutils-5.1.2,
+  stack before then) [bug present in the original version, in 1992]
+
+  "pr -e" with a mix of backspaces and TABs no longer corrupts the heap
+  [bug present in the original version, in 1992]
+
+  "ptx -F'\' long-file-name" would overrun a malloc'd buffer and corrupt
+  the heap.  That was triggered by a lone backslash (or odd number of them)
+  at the end of the option argument to --flag-truncation=STRING (-F),
+  --word-regexp=REGEXP (-W), or --sentence-regexp=REGEXP (-S).
+
+  "rm -r DIR" would mistakenly declare to be "write protected" -- and
+  prompt about -- full DIR-relative names longer than MIN (PATH_MAX, 8192).
+
+  "rmdir --ignore-fail-on-non-empty" detects and ignores the failure
+  in more cases when a directory is empty.
+
+  "seq -f % 1" would issue the erroneous diagnostic "seq: memory exhausted"
+  rather than reporting the invalid string format.
+  [bug introduced in coreutils-6.0]
+
+** New features
+
+  join now verifies that the inputs are in sorted order.  This check can
+  be turned off with the --nocheck-order option.
+
+  sort accepts the new option --sort=WORD, where WORD can be one of
+  general-numeric, month, numeric or random.  These are equivalent to the
+  options --general-numeric-sort/-g, --month-sort/-M, --numeric-sort/-n
+  and --random-sort/-R, resp.
+
+** Improvements
+
+  id and groups work around an AFS-related bug whereby those programs
+  would print an invalid group number, when given no user-name argument.
+
+  ls --color no longer outputs unnecessary escape sequences
+
+  seq gives better diagnostics for invalid formats.
+
+** Portability
+
+  rm now works properly even on systems like BeOS and Haiku,
+  which have negative errno values.
+
+** Consistency
+
+  install, mkdir, rmdir and split now write --verbose output to stdout,
+  not to stderr.
+
+
+* Noteworthy changes in release 6.10 (2008-01-22) [stable]
+
+** Bug fixes
+
+  Fix a non-portable use of sed in configure.ac.
+  [bug introduced in coreutils-6.9.92]
+
+
+* Noteworthy changes in release 6.9.92 (2008-01-12) [beta]
+
+** Bug fixes
+
+  cp --parents no longer uses uninitialized memory when restoring the
+  permissions of a just-created destination directory.
+  [bug introduced in coreutils-6.9.90]
+
+  tr's case conversion would fail in a locale with differing numbers
+  of lower case and upper case characters.  E.g., this would fail:
+  env LC_CTYPE=en_US.ISO-8859-1 tr '[:upper:]' '[:lower:]'
+  [bug introduced in coreutils-6.9.90]
+
+** Improvements
+
+  "touch -d now writable-but-owned-by-someone-else" now succeeds
+  whenever that same command would succeed without "-d now".
+  Before, it would work fine with no -d option, yet it would
+  fail with the ostensibly-equivalent "-d now".
+
+
+* Noteworthy changes in release 6.9.91 (2007-12-15) [beta]
+
+** Bug fixes
+
+  "ls -l" would not output "+" on SELinux hosts unless -Z was also given.
+
+  "rm" would fail to unlink a non-directory when run in an environment
+  in which the user running rm is capable of unlinking a directory.
+  [bug introduced in coreutils-6.9]
+
+
+* Noteworthy changes in release 6.9.90 (2007-12-01) [beta]
+
+** New programs
+
+  arch: equivalent to uname -m, not installed by default
+  But don't install this program on Solaris systems.
+
+  chcon: change the SELinux security context of a file
+
+  mktemp: create a temporary file or directory (or names)
+
+  runcon: run a program in a different SELinux security context
+
+** Programs no longer installed by default
+
+  hostname, su
+
+** Changes in behavior
+
+  cp, by default, refuses to copy through a dangling destination symlink
+  Set POSIXLY_CORRECT if you require the old, risk-prone behavior.
+
+  pr -F no longer suppresses the footer or the first two blank lines in
+  the header.  This is for compatibility with BSD and POSIX.
+
+  tr now warns about an unescaped backslash at end of string.
+  The tr from coreutils-5.2.1 and earlier would fail for such usage,
+  and Solaris' tr ignores that final byte.
+
+** New features
+
+  Add SELinux support, based on the patch from Fedora:
+  * cp accepts new --preserve=context option.
+  * "cp -a" works with SELinux:
+  Now, cp -a attempts to preserve context, but failure to do so does
+  not change cp's exit status.  However "cp --preserve=context" is
+  similar, but failure *does* cause cp to exit with nonzero status.
+  * install accepts new "-Z, --context=C" option.
+  * id accepts new "-Z" option.
+  * stat honors the new %C format directive: SELinux security context string
+  * ls accepts a slightly modified -Z option.
+  * ls: contrary to Fedora version, does not accept --lcontext and --scontext
+
+  The following commands and options now support the standard size
+  suffixes kB, M, MB, G, GB, and so on for T, P, Y, Z, and Y:
+  head -c, head -n, od -j, od -N, od -S, split -b, split -C,
+  tail -c, tail -n.
+
+  cp -p tries to preserve the GID of a file even if preserving the UID
+  is not possible.
+
+  uniq accepts a new option: --zero-terminated (-z).  As with the sort
+  option of the same name, this makes uniq consume and produce
+  NUL-terminated lines rather than newline-terminated lines.
+
+  wc no longer warns about character decoding errors in multibyte locales.
+  This means for example that "wc /bin/sh" now produces normal output
+  (though the word count will have no real meaning) rather than many
+  error messages.
+
+** New build options
+
+  By default, "make install" no longer attempts to install (or even build) su.
+  To change that, use ./configure --enable-install-program=su.
+  If you also want to install the new "arch" program, do this:
+  ./configure --enable-install-program=arch,su.
+
+  You can inhibit the compilation and installation of selected programs
+  at configure time.  For example, to avoid installing "hostname" and
+  "uptime", use ./configure --enable-no-install-program=hostname,uptime
+  Note: currently, "make check" passes, even when arch and su are not
+  built (that's the new default).  However, if you inhibit the building
+  and installation of other programs, don't be surprised if some parts
+  of "make check" fail.
+
+** Remove deprecated options
+
+  df no longer accepts the --kilobytes option.
+  du no longer accepts the --kilobytes or --megabytes options.
+  ls no longer accepts the --kilobytes option.
+  ptx longer accepts the --copyright option.
+  who no longer accepts -i or --idle.
+
+** Improved robustness
+
+  ln -f can no longer silently clobber a just-created hard link.
+  In some cases, ln could be seen as being responsible for data loss.
+  For example, given directories a, b, c, and files a/f and b/f, we
+  should be able to do this safely: ln -f a/f b/f c && rm -f a/f b/f
+  However, before this change, ln would succeed, and thus cause the
+  loss of the contents of a/f.
+
+  stty no longer silently accepts certain invalid hex values
+  in its 35-colon command-line argument
+
+** Bug fixes
+
+  chmod no longer ignores a dangling symlink.  Now, chmod fails
+  with a diagnostic saying that it cannot operate on such a file.
+  [bug introduced in coreutils-5.1.0]
+
+  cp attempts to read a regular file, even if stat says it is empty.
+  Before, "cp /proc/cpuinfo c" would create an empty file when the kernel
+  reports stat.st_size == 0, while "cat /proc/cpuinfo > c" would "work",
+  and create a nonempty one. [bug introduced in coreutils-6.0]
+
+  cp --parents no longer mishandles symlinks to directories in file
+  name components in the source, e.g., "cp --parents symlink/a/b d"
+  no longer fails.  Also, 'cp' no longer considers a destination
+  symlink to be the same as the referenced file when copying links
+  or making backups.  For example, if SYM is a symlink to FILE,
+  "cp -l FILE SYM" now reports an error instead of silently doing
+  nothing.  The behavior of 'cp' is now better documented when the
+  destination is a symlink.
+
+  "cp -i --update older newer" no longer prompts; same for mv
+
+  "cp -i" now detects read errors on standard input, and no longer consumes
+  too much seekable input; same for ln, install, mv, and rm.
+
+  cut now diagnoses a range starting with zero (e.g., -f 0-2) as invalid;
+  before, it would treat it as if it started with 1 (-f 1-2).
+
+  "cut -f 2-0" now fails; before, it was equivalent to "cut -f 2-"
+
+  cut now diagnoses the '-' in "cut -f -" as an invalid range, rather
+  than interpreting it as the unlimited range, "1-".
+
+  date -d now accepts strings of the form e.g., 'YYYYMMDD +N days',
+  in addition to the usual 'YYYYMMDD N days'.
+
+  du -s now includes the size of any stat'able-but-inaccessible directory
+  in the total size.
+
+  du (without -s) prints whatever it knows of the size of an inaccessible
+  directory.  Before, du would print nothing for such a directory.
+
+  ls -x DIR would sometimes output the wrong string in place of the
+  first entry.  [introduced in coreutils-6.8]
+
+  ls --color would mistakenly color a dangling symlink as if it were
+  a regular symlink.  This would happen only when the dangling symlink
+  was not a command-line argument and in a directory with d_type support.
+  [introduced in coreutils-6.0]
+
+  ls --color, (with a custom LS_COLORS envvar value including the
+  ln=target attribute) would mistakenly output the string "target"
+  before the name of each symlink.  [introduced in coreutils-6.0]
+
+  od's --skip (-j) option now works even when the kernel says that a
+  nonempty regular file has stat.st_size = 0.  This happens at least
+  with files in /proc and linux-2.6.22.
+
+  "od -j L FILE" had a bug: when the number of bytes to skip, L, is exactly
+  the same as the length of FILE, od would skip *no* bytes.  When the number
+  of bytes to skip is exactly the sum of the lengths of the first N files,
+  od would skip only the first N-1 files. [introduced in textutils-2.0.9]
+
+  ./printf %.10000000f 1 could get an internal ENOMEM error and generate
+  no output, yet erroneously exit with status 0.  Now it diagnoses the error
+  and exits with nonzero status.  [present in initial implementation]
+
+  seq no longer mishandles obvious cases like "seq 0 0.000001 0.000003",
+  so workarounds like "seq 0 0.000001 0.0000031" are no longer needed.
+
+  seq would mistakenly reject some valid format strings containing %%,
+  and would mistakenly accept some invalid ones. e.g., %g%% and %%g, resp.
+
+  "seq .1 .1" would mistakenly generate no output on some systems
+
+  Obsolete sort usage with an invalid ordering-option character, e.g.,
+  "env _POSIX2_VERSION=199209 sort +1x" no longer makes sort free an
+  invalid pointer [introduced in coreutils-6.5]
+
+  sorting very long lines (relative to the amount of available memory)
+  no longer provokes unaligned memory access
+
+  split --line-bytes=N (-C N) no longer creates an empty file
+  [this bug is present at least as far back as textutils-1.22 (Jan, 1997)]
+
+  tr -c no longer aborts when translating with Set2 larger than the
+  complement of Set1.  [present in the original version, in 1992]
+
+  tr no longer rejects an unmatched [:lower:] or [:upper:] in SET1.
+  [present in the original version]
+
+
 * Noteworthy changes in release 6.9 (2007-03-22) [stable]
 
 ** Bug fixes
@@ -12,7 +649,6 @@ GNU coreutils NEWS                                    -*- outline -*-
 
   Using pr -m -s (i.e. merging files, with TAB as the output separator)
   no longer inserts extraneous spaces between output columns.
-
 
 * Noteworthy changes in release 6.8 (2007-02-24) [not-unstable]
 
@@ -51,10 +687,32 @@ GNU coreutils NEWS                                    -*- outline -*-
   pwd and "readlink -e ." no longer fail unnecessarily when a parent
   directory is unreadable.
 
+  rm (without -f) could prompt when it shouldn't, or fail to prompt
+  when it should, when operating on a full name longer than 511 bytes
+  and getting an ENOMEM error while trying to form the long name.
+
+  rm could mistakenly traverse into the wrong directory under unusual
+  conditions: when a full name longer than 511 bytes specifies a search-only
+  directory, and when forming that name fails with ENOMEM, rm would attempt
+  to open a truncated-to-511-byte name with the first five bytes replaced
+  with "[...]".  If such a directory were to actually exist, rm would attempt
+  to remove it.
+
   "rm -rf /etc/passwd" (run by non-root) now prints a diagnostic.
   Before it would print nothing.
 
   "rm --interactive=never F" no longer prompts for an unwritable F
+
+  "rm -rf D" would emit an misleading diagnostic when failing to
+  remove a symbolic link within the unwritable directory, D.
+  Introduced in coreutils-6.0.  Similarly, when a cross-partition
+  "mv" fails because the source directory is unwritable, it now gives
+  a reasonable diagnostic.  Before, this would print
+    $ mkdir /tmp/x; touch /tmp/x/y; chmod -w /tmp/x;
+    $ test $(stat -c %d /tmp/x) -ne $(stat -c %d .) && mv /tmp/x/y .
+    mv: cannot remove `/tmp/x/y': Not a directory
+  Now it prints this:
+    mv: cannot remove `/tmp/x/y': Permission denied.
 
 ** New features
 
@@ -87,7 +745,7 @@ GNU coreutils NEWS                                    -*- outline -*-
   Fix similar problems with cp options like -p that imply
   --preserve=ownership, with install -d when combined with either -o
   or -g, and with mv when copying across file system boundaries.
-  This bug affects coreutils 6.0 through 6.6.
+  This bug affects all versions of coreutils through 6.6.
 
   du --one-file-system (-x) would skip subdirectories of any directory
   listed as second or subsequent command line argument.  This bug affects
@@ -1842,8 +2500,7 @@ packages, see ./old/*/NEWS.
 
 ========================================================================
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software
-Foundation, Inc.
+Copyright (C) 2001-2009 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2 or

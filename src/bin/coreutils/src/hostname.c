@@ -1,10 +1,10 @@
 /* hostname - set or print the name of current host system
-   Copyright (C) 1994-1997, 1999-2005 Free Software Foundation, Inc.
+   Copyright (C) 1994-1997, 1999-2005, 2007-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering.  */
 
@@ -31,17 +30,13 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "hostname"
 
-#define AUTHORS "Jim Meyering"
-
-#if HAVE_SETHOSTNAME && !defined sethostname
-int sethostname ();
-#endif
+#define AUTHORS proper_name ("Jim Meyering")
 
 #if !defined HAVE_SETHOSTNAME && defined HAVE_SYSINFO && \
      defined HAVE_SYS_SYSTEMINFO_H
 # include <sys/systeminfo.h>
 
-int
+static int
 sethostname (char *name, size_t namelen)
 {
   /* Using sysinfo() is the SVR4 mechanism to set a hostname. */
@@ -50,9 +45,6 @@ sethostname (char *name, size_t namelen)
 
 # define HAVE_SETHOSTNAME 1  /* Now we have it... */
 #endif
-
-/* The name this program was run with. */
-char *program_name;
 
 void
 usage (int status)
@@ -71,7 +63,7 @@ Print or set the hostname of the current system.\n\
              program_name, program_name);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -82,14 +74,14 @@ main (int argc, char **argv)
   char *hostname;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, Version,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "", NULL, NULL) != -1)
     usage (EXIT_FAILURE);

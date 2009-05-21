@@ -1,22 +1,20 @@
 /* Base64 encode/decode strings or files.
-   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2004-2008 Free Software Foundation, Inc.
 
    This file is part of Base64.
 
-   Base64 is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Base64 is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Base64; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-   MA 02110-1301, USA. */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* Written by Simon Josefsson <simon@josefsson.org>.  */
 
@@ -37,24 +35,20 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "base64"
 
-#define AUTHOR "Simon Josefsson"
+#define AUTHORS proper_name ("Simon Josefsson")
 
-/* The invocation name of this program.  */
-char *program_name;
-
-static const struct option long_options[] = {
+static struct option const long_options[] =
+{
   {"decode", no_argument, 0, 'd'},
   {"wrap", required_argument, 0, 'w'},
   {"ignore-garbage", no_argument, 0, 'i'},
-  {"help", no_argument, 0, GETOPT_HELP_CHAR},
-  {"version", no_argument, 0, GETOPT_VERSION_CHAR},
 
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
 };
 
-static void
+void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
@@ -63,7 +57,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] [FILE]\n\
+Usage: %s [OPTION]... [FILE]\n\
 Base64 encode or decode FILE, or standard input, to standard output.\n\
 \n"), program_name);
       fputs (_("\
@@ -87,7 +81,7 @@ When decoding, the input may contain newlines in addition to the bytes of\n\
 the formal base64 alphabet.  Use --ignore-garbage to attempt to recover\n\
 from any other non-alphabet bytes in the encoded stream.\n"),
 	     stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
 
   exit (status);
@@ -220,12 +214,12 @@ do_decode (FILE *in, FILE *out, bool ignore_garbage)
 	 However, when it processes the final input buffer, we want
 	 to iterate it one additional time, but with an indicator
 	 telling it to flush what is in CTX.  */
-      for (k = 0; k < 1 + feof (in); k++)
+      for (k = 0; k < 1 + !!feof (in); k++)
 	{
 	  if (k == 1 && ctx.i == 0)
 	    break;
 	  n = BLOCKSIZE;
-	  ok = base64_decode (&ctx, inbuf, (k == 0 ? sum : 0), outbuf, &n);
+	  ok = base64_decode_ctx (&ctx, inbuf, (k == 0 ? sum : 0), outbuf, &n);
 
 	  if (fwrite (outbuf, 1, n, out) < n)
 	    error (EXIT_FAILURE, errno, _("write error"));
@@ -244,22 +238,22 @@ main (int argc, char **argv)
   FILE *input_fh;
   const char *infile;
 
-  /* True if --decode has bene given and we should decode data. */
+  /* True if --decode has been given and we should decode data. */
   bool decode = false;
-  /* True if we should ignore non-alphabetic characters. */
+  /* True if we should ignore non-base64-alphabetic characters. */
   bool ignore_garbage = false;
   /* Wrap encoded base64 data around the 76:th column, by default. */
   uintmax_t wrap_column = 76;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  while ((opt = getopt_long (argc, argv, "dqiw:", long_options, NULL)) != -1)
+  while ((opt = getopt_long (argc, argv, "diw:", long_options, NULL)) != -1)
     switch (opt)
       {
       case 'd':
@@ -278,7 +272,7 @@ main (int argc, char **argv)
 
 	case_GETOPT_HELP_CHAR;
 
-	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHOR);
+	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
       default:
 	usage (EXIT_FAILURE);
@@ -296,7 +290,7 @@ main (int argc, char **argv)
   else
     infile = "-";
 
-  if (strcmp (infile, "-") == 0)
+  if (STREQ (infile, "-"))
     input_fh = stdin;
   else
     {
@@ -312,7 +306,7 @@ main (int argc, char **argv)
 
   if (fclose (input_fh) == EOF)
     {
-      if (strcmp (infile, "-") == 0)
+      if (STREQ (infile, "-"))
 	error (EXIT_FAILURE, errno, _("closing standard input"));
       else
 	error (EXIT_FAILURE, errno, "%s", infile);

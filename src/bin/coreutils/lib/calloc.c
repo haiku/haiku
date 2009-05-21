@@ -1,11 +1,11 @@
 /* calloc() function that is glibc compatible.
-   This wrapper function is required at least on Tru64 UNIX 5.1.
-   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+   This wrapper function is required at least on Tru64 UNIX 5.1 and mingw.
+   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,15 +13,24 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* written by Jim Meyering */
+/* written by Jim Meyering and Bruno Haible */
 
 #include <config.h>
-#undef calloc
+/* Only the AC_FUNC_CALLOC macro defines 'calloc' already in config.h.  */
+#ifdef calloc
+# define NEED_CALLOC_GNU
+# undef calloc
+#endif
 
+/* Specification.  */
 #include <stdlib.h>
+
+#include <errno.h>
+
+/* Call the system's calloc below.  */
+#undef calloc
 
 /* Allocate and zero-fill an NxS-byte block of memory from the heap.
    If N or S is zero, allocate and zero-fill a 1-byte block.  */
@@ -29,16 +38,33 @@
 void *
 rpl_calloc (size_t n, size_t s)
 {
-  size_t bytes;
+  void *result;
 
+#ifdef NEED_CALLOC_GNU
   if (n == 0 || s == 0)
-    return calloc (1, 1);
+    {
+      n = 1;
+      s = 1;
+    }
+  else
+    {
+      /* Defend against buggy calloc implementations that mishandle
+	 size_t overflow.  */
+      size_t bytes = n * s;
+      if (bytes / s != n)
+	{
+	  errno = ENOMEM;
+	  return NULL;
+	}
+    }
+#endif
 
-  /* Defend against buggy calloc implementations that mishandle
-     size_t overflow.  */
-  bytes = n * s;
-  if (bytes / s != n)
-    return NULL;
+  result = calloc (n, s);
 
-  return calloc (n, s);
+#if !HAVE_CALLOC_POSIX
+  if (result == NULL)
+    errno = ENOMEM;
+#endif
+
+  return result;
 }

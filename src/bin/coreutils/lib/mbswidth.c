@@ -1,10 +1,10 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2007 Free Software Foundation, Inc.
+   Copyright (C) 2000-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <haible@clisp.cons.org>.  */
 
@@ -30,20 +29,11 @@
 /* Get isprint().  */
 #include <ctype.h>
 
-/* Get mbstate_t, mbrtowc(), mbsinit().  */
+/* Get mbstate_t, mbrtowc(), mbsinit(), wcwidth().  */
 #include <wchar.h>
-
-/* Get wcwidth().  */
-#include "wcwidth.h"
 
 /* Get iswcntrl().  */
 #include <wctype.h>
-
-#ifndef mbsinit
-# if !HAVE_MBSINIT
-#  define mbsinit(ps) 1
-# endif
-#endif
 
 /* Returns the number of columns needed to represent the multibyte
    character string pointed to by STRING.  If a non-printable character
@@ -70,7 +60,6 @@ mbsnwidth (const char *string, size_t nbytes, int flags)
   int width;
 
   width = 0;
-#if HAVE_MBRTOWC
   if (MB_CUR_MAX > 1)
     {
       while (p < plimit)
@@ -162,7 +151,6 @@ mbsnwidth (const char *string, size_t nbytes, int flags)
 	  }
       return width;
     }
-#endif
 
   while (p < plimit)
     {

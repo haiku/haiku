@@ -1,10 +1,10 @@
 /* fchdir replacement.
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,14 +12,14 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include <unistd.h>
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
@@ -27,10 +27,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 #include "canonicalize.h"
-#include "dirfd.h"
 
 /* This replacement assumes that a directory is not renamed while opened
    through a file descriptor.  */
@@ -76,84 +74,53 @@ ensure_dirs_slot (size_t fd)
     }
 }
 
-/* Override open() and close(), to keep track of the open file descriptors.  */
+/* Hook into the gnulib replacements for open() and close() to keep track
+   of the open file descriptors.  */
 
-int
-close (int fd)
-#undef close
+void
+_gl_unregister_fd (int fd)
 {
-  int retval = close (fd);
-
-  if (retval >= 0 && fd >= 0 && fd < dirs_allocated)
+  if (fd >= 0 && fd < dirs_allocated)
     {
       if (dirs[fd].name != NULL)
 	free (dirs[fd].name);
       dirs[fd].name = NULL;
       dirs[fd].saved_errno = ENOTDIR;
     }
-  return retval;
 }
 
-int
-open (const char *filename, int flags, ...)
-#undef open
+void
+_gl_register_fd (int fd, const char *filename)
 {
-  mode_t mode;
-  int fd;
   struct stat statbuf;
 
-  mode = 0;
-  if (flags & O_CREAT)
+  ensure_dirs_slot (fd);
+  if (fd < dirs_allocated
+      && fstat (fd, &statbuf) >= 0 && S_ISDIR (statbuf.st_mode))
     {
-      va_list arg;
-      va_start (arg, flags);
-
-      /* If mode_t is narrower than int, use the promoted type (int),
-	 not mode_t.  Use sizeof to guess whether mode_t is narrower;
-	 we don't know of any practical counterexamples.  */
-      mode = (sizeof (mode_t) < sizeof (int)
-	      ? va_arg (arg, int)
-	      : va_arg (arg, mode_t));
-
-      va_end (arg);
+      dirs[fd].name = canonicalize_file_name (filename);
+      if (dirs[fd].name == NULL)
+	dirs[fd].saved_errno = errno;
     }
-  fd = open (filename, flags, mode);
-  if (fd >= 0)
-    {
-      ensure_dirs_slot (fd);
-      if (fd < dirs_allocated
-	  && fstat (fd, &statbuf) >= 0 && S_ISDIR (statbuf.st_mode))
-	{
-	  dirs[fd].name = canonicalize_file_name (filename);
-	  if (dirs[fd].name == NULL)
-	    dirs[fd].saved_errno = errno;
-	}
-    }
-  return fd;
 }
 
 /* Override opendir() and closedir(), to keep track of the open file
    descriptors.  Needed because there is a function dirfd().  */
 
 int
-closedir (DIR *dp)
+rpl_closedir (DIR *dp)
 #undef closedir
 {
   int fd = dirfd (dp);
   int retval = closedir (dp);
 
-  if (retval >= 0 && fd >= 0 && fd < dirs_allocated)
-    {
-      if (dirs[fd].name != NULL)
-	free (dirs[fd].name);
-      dirs[fd].name = NULL;
-      dirs[fd].saved_errno = ENOTDIR;
-    }
+  if (retval >= 0)
+    _gl_unregister_fd (fd);
   return retval;
 }
 
 DIR *
-opendir (const char *filename)
+rpl_opendir (const char *filename)
 #undef opendir
 {
   DIR *dp;
@@ -163,15 +130,7 @@ opendir (const char *filename)
     {
       int fd = dirfd (dp);
       if (fd >= 0)
-	{
-	  ensure_dirs_slot (fd);
-	  if (fd < dirs_allocated)
-	    {
-	      dirs[fd].name = canonicalize_file_name (filename);
-	      if (dirs[fd].name == NULL)
-	        dirs[fd].saved_errno = errno;
-	    }
-	}
+	_gl_register_fd (fd, filename);
     }
   return dp;
 }
@@ -179,7 +138,7 @@ opendir (const char *filename)
 /* Override dup() and dup2(), to keep track of open file descriptors.  */
 
 int
-dup (int oldfd)
+rpl_dup (int oldfd)
 #undef dup
 {
   int newfd = dup (oldfd);
@@ -214,7 +173,7 @@ dup (int oldfd)
 }
 
 int
-dup2 (int oldfd, int newfd)
+rpl_dup2 (int oldfd, int newfd)
 #undef dup2
 {
   int retval = dup2 (oldfd, newfd);

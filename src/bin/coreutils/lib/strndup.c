@@ -1,3 +1,6 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* A replacement function, for systems that lack strndup.
 
    Copyright (C) 1996, 1997, 1998, 2001, 2002, 2003, 2005, 2006, 2007
@@ -5,7 +8,7 @@
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   Free Software Foundation; either version 3, or (at your option) any
    later version.
 
    This program is distributed in the hope that it will be useful,

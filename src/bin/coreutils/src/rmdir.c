@@ -1,12 +1,12 @@
 /* rmdir -- remove directories
 
-   Copyright (C) 90, 91, 1995-2002, 2004, 2005, 2006 Free Software
+   Copyright (C) 90, 91, 1995-2002, 2004-2008 Free Software
    Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Options:
    -p, --parent		Remove any parent dirs that are explicitly mentioned
@@ -31,15 +30,13 @@
 
 #include "system.h"
 #include "error.h"
-#include "quotearg.h"
+#include "prog-fprintf.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "rmdir"
 
-#define AUTHORS "David MacKenzie"
-
-/* The name this program was run with. */
-char *program_name;
+#define AUTHORS proper_name ("David MacKenzie")
 
 /* If true, remove empty parent directories.  */
 static bool remove_empty_parents;
@@ -75,11 +72,39 @@ static struct option const longopts[] =
 
 /* Return true if ERROR_NUMBER is one of the values associated
    with a failed rmdir due to non-empty target directory.  */
-
 static bool
 errno_rmdir_non_empty (int error_number)
 {
   return (error_number == RMDIR_ERRNO_NOT_EMPTY);
+}
+
+/* Return true if when rmdir fails with errno == ERROR_NUMBER
+   the directory may be empty.  */
+static bool
+errno_may_be_empty (int error_number)
+{
+  switch (error_number)
+    {
+    case EACCES:
+    case EPERM:
+    case EROFS:
+    case EEXIST:
+    case EBUSY:
+      return true;
+    default:
+      return false;
+    }
+}
+
+/* Return true if an rmdir failure with errno == error_number
+   for DIR is ignorable.  */
+static bool
+ignorable_failure (int error_number, char const *dir)
+{
+  return (ignore_fail_on_non_empty
+	  && (errno_rmdir_non_empty (error_number)
+	      || (errno_may_be_empty (error_number)
+		  && is_empty_dir (AT_FDCWD, dir))));
 }
 
 /* Remove any empty parent directories of DIR.
@@ -107,21 +132,22 @@ remove_parents (char *dir)
 
       /* Give a diagnostic for each attempted removal if --verbose.  */
       if (verbose)
-	error (0, 0, _("removing directory, %s"), dir);
+	prog_fprintf (stdout, _("removing directory, %s"), quote (dir));
 
       ok = (rmdir (dir) == 0);
 
       if (!ok)
 	{
 	  /* Stop quietly if --ignore-fail-on-non-empty. */
-	  if (ignore_fail_on_non_empty
-	      && errno_rmdir_non_empty (errno))
+	  if (ignorable_failure (errno, dir))
 	    {
 	      ok = true;
 	    }
 	  else
 	    {
-	      error (0, errno, "%s", quotearg_colon (dir));
+	      /* Barring race conditions, DIR is expected to be a directory.  */
+	      error (0, errno, _("failed to remove directory %s"),
+		     quote (dir));
 	    }
 	  break;
 	}
@@ -143,16 +169,16 @@ Remove the DIRECTORY(ies), if they are empty.\n\
 \n\
       --ignore-fail-on-non-empty\n\
                   ignore each failure that is solely because a directory\n\
-                  is non-empty\n\
+                    is non-empty\n\
 "), stdout);
       fputs (_("\
-  -p, --parents   Remove DIRECTORY and its ancestors.  E.g., `rmdir -p a/b/c' is\n\
-                  similar to `rmdir a/b/c a/b a'.\n\
+  -p, --parents   remove DIRECTORY and its ancestors; e.g., `rmdir -p a/b/c' is\n\
+                    similar to `rmdir a/b/c a/b a'\n\
   -v, --verbose   output a diagnostic for every directory processed\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -164,7 +190,7 @@ main (int argc, char **argv)
   int optc;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -205,15 +231,16 @@ main (int argc, char **argv)
 
       /* Give a diagnostic for each attempted removal if --verbose.  */
       if (verbose)
-	error (0, 0, _("removing directory, %s"), dir);
+	prog_fprintf (stdout, _("removing directory, %s"), quote (dir));
 
       if (rmdir (dir) != 0)
 	{
-	  if (ignore_fail_on_non_empty
-	      && errno_rmdir_non_empty (errno))
+	  if (ignorable_failure (errno, dir))
 	    continue;
 
-	  error (0, errno, "%s", quotearg_colon (dir));
+	  /* Here, the diagnostic is less precise, since we have no idea
+	     whether DIR is a directory.  */
+	  error (0, errno, _("failed to remove %s"), quote (dir));
 	  ok = false;
 	}
       else if (remove_empty_parents)

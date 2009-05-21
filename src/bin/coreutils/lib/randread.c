@@ -1,11 +1,11 @@
 /* Generate buffers of random data.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
@@ -40,18 +39,18 @@
 #include "unlocked-io.h"
 #include "xalloc.h"
 
-#ifndef MIN
-# define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
 #ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
-#  define __attribute__(x)
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
+#  define __attribute__(x) /* empty */
 # endif
 #endif
 
-#ifndef ATTRIBUTE_UNUSED
-# define ATTRIBUTE_UNUSED __attribute__ ((__unused__))
+#ifndef ATTRIBUTE_NORETURN
+# define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+#endif
+
+#ifndef MIN
+# define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 #if _STRING_ARCH_unaligned
@@ -59,10 +58,6 @@
 #else
 # define alignof(type) offsetof (struct { char c; type x; }, x)
 # define ALIGNED_POINTER(ptr, type) ((size_t) (ptr) % alignof (type) == 0)
-#endif
-
-#ifndef DEFAULT_RANDOM_FILE
-# define DEFAULT_RANDOM_FILE "/dev/urandom"
 #endif
 
 /* The maximum buffer size used for reads of random data.  Using the
@@ -73,10 +68,8 @@
 /* A source of random data for generating random buffers.  */
 struct randread_source
 {
-  /* Stream to read random bytes from.  If null, the behavior is
-     undefined; the current implementation uses ISAAC in this case,
-     but this is for old-fashioned implementations that lack
-     /dev/urandom and callers should not rely on this.  */
+  /* Stream to read random bytes from.  If null, the current
+     implementation uses an internal PRNG (ISAAC).  */
   FILE *source;
 
   /* Function to call, and its argument, if there is an input error or
@@ -117,7 +110,7 @@ struct randread_source
 
 /* The default error handler.  */
 
-static void
+static void ATTRIBUTE_NORETURN
 randread_error (void const *file_name)
 {
   if (file_name)
@@ -158,18 +151,14 @@ randread_new (char const *name, size_t bytes_bound)
     return simple_new (NULL, NULL);
   else
     {
-      char const *file_name = (name ? name : DEFAULT_RANDOM_FILE);
-      FILE *source = fopen_safer (file_name, "rb");
+      FILE *source = NULL;
       struct randread_source *s;
 
-      if (! source)
-	{
-	  if (name)
-	    return NULL;
-	  file_name = NULL;
-	}
+      if (name)
+	if (! (source = fopen_safer (name, "rb")))
+	  return NULL;
 
-      s = simple_new (source, file_name);
+      s = simple_new (source, name);
 
       if (source)
 	setvbuf (source, s->buf.c, _IOFBF, MIN (sizeof s->buf.c, bytes_bound));

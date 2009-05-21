@@ -1,14 +1,14 @@
 /* hash - hashing table processing.
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006 Free
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007 Free
    Software Foundation, Inc.
 
    Written by Jim Meyering, 1992.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,8 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* A generic hash table package.  */
 
@@ -576,6 +575,8 @@ hash_initialize (size_t candidate, const Hash_tuning *tuning,
     goto fail;
 
   table->bucket = calloc (table->n_buckets, sizeof *table->bucket);
+  if (table->bucket == NULL)
+    goto fail;
   table->bucket_limit = table->bucket + table->n_buckets;
   table->n_buckets_used = 0;
   table->n_entries = 0;

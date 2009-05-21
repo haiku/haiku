@@ -1,10 +1,10 @@
 /* pathchk -- check whether file names are valid or portable
-   Copyright (C) 1991-2006 Free Software Foundation, Inc.
+   Copyright (C) 1991-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 #include <stdio.h>
@@ -25,7 +24,6 @@
 
 #include "system.h"
 #include "error.h"
-#include "euidaccess.h"
 #include "quote.h"
 #include "quotearg.h"
 
@@ -37,7 +35,10 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "pathchk"
 
-#define AUTHORS "Paul Eggert", "David MacKenzie", "Jim Meyering"
+#define AUTHORS \
+  proper_name ("Paul Eggert"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Jim Meyering")
 
 #ifndef _POSIX_PATH_MAX
 # define _POSIX_PATH_MAX 256
@@ -70,9 +71,6 @@
 
 static bool validate_file_name (char *, bool, bool);
 
-/* The name this program was run with. */
-char *program_name;
-
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
@@ -98,7 +96,7 @@ usage (int status)
     {
       printf (_("Usage: %s [OPTION]... NAME...\n"), program_name);
       fputs (_("\
-Diagnose unportable constructs in NAME.\n\
+Diagnose invalid or unportable file names.\n\
 \n\
   -p                  check for most POSIX systems\n\
   -P                  check for empty names and leading \"-\"\n\
@@ -106,7 +104,7 @@ Diagnose unportable constructs in NAME.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -120,7 +118,7 @@ main (int argc, char **argv)
   int optc;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -200,7 +198,7 @@ portable_chars_only (char const *file, size_t filelen)
 
   if (*invalid)
     {
-      mbstate_t mbstate = { 0, };
+      DECLARE_ZEROED_AGGREGATE (mbstate_t, mbstate);
       size_t charlen = mbrlen (invalid, filelen - validlen, &mbstate);
       error (0, 0,
 	     _("nonportable character %s in file name %s"),
@@ -325,7 +323,7 @@ validate_file_name (char *file, bool check_basic_portability,
 		     dir);
 	      return false;
 	    }
-	  maxsize = MIN (size, SIZE_MAX);
+	  maxsize = MIN (size, SSIZE_MAX);
 	}
 
       if (maxsize <= filelen)
@@ -387,7 +385,7 @@ validate_file_name (char *file, bool check_basic_portability,
 	      len = pathconf (dir, _PC_NAME_MAX);
 	      *start = c;
 	      if (0 <= len)
-		name_max = MIN (len, SIZE_MAX);
+		name_max = MIN (len, SSIZE_MAX);
 	      else
 		switch (errno)
 		  {

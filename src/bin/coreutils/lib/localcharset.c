@@ -1,10 +1,13 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Determine a canonical name for the current locale's character encoding.
 
-   Copyright (C) 2000-2006 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006, 2008-2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -28,13 +31,19 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined __APPLE__ && defined __MACH__ && HAVE_LANGINFO_CODESET
+# define DARWIN7 /* Darwin 7 or newer, i.e. MacOS X 10.3 or newer */
+#endif
+
 #if defined _WIN32 || defined __WIN32__
 # define WIN32_NATIVE
 #endif
 
 #if defined __EMX__
 /* Assume EMX program runs on OS/2, even if compiled under DOS.  */
-# define OS2
+# ifndef OS2
+#  define OS2
+# endif
 #endif
 
 #if !defined WIN32_NATIVE
@@ -110,7 +119,7 @@ get_charset_aliases (void)
   cp = charset_aliases;
   if (cp == NULL)
     {
-#if !(defined VMS || defined WIN32_NATIVE || defined __CYGWIN__ || (defined(__BEOS__) || defined(__HAIKU__)))
+#if !(defined DARWIN7 || defined VMS || defined WIN32_NATIVE || defined __CYGWIN__ || defined __BEOS__ || defined __HAIKU__)
       FILE *fp;
       const char *dir;
       const char *base = "charset.alias";
@@ -211,6 +220,39 @@ get_charset_aliases (void)
 
 #else
 
+# if defined DARWIN7
+      /* To avoid the trouble of installing a file that is shared by many
+	 GNU packages -- many packaging systems have problems with this --,
+	 simply inline the aliases here.  */
+      cp = "ISO8859-1" "\0" "ISO-8859-1" "\0"
+	   "ISO8859-2" "\0" "ISO-8859-2" "\0"
+	   "ISO8859-4" "\0" "ISO-8859-4" "\0"
+	   "ISO8859-5" "\0" "ISO-8859-5" "\0"
+	   "ISO8859-7" "\0" "ISO-8859-7" "\0"
+	   "ISO8859-9" "\0" "ISO-8859-9" "\0"
+	   "ISO8859-13" "\0" "ISO-8859-13" "\0"
+	   "ISO8859-15" "\0" "ISO-8859-15" "\0"
+	   "KOI8-R" "\0" "KOI8-R" "\0"
+	   "KOI8-U" "\0" "KOI8-U" "\0"
+	   "CP866" "\0" "CP866" "\0"
+	   "CP949" "\0" "CP949" "\0"
+	   "CP1131" "\0" "CP1131" "\0"
+	   "CP1251" "\0" "CP1251" "\0"
+	   "eucCN" "\0" "GB2312" "\0"
+	   "GB2312" "\0" "GB2312" "\0"
+	   "eucJP" "\0" "EUC-JP" "\0"
+	   "eucKR" "\0" "EUC-KR" "\0"
+	   "Big5" "\0" "BIG5" "\0"
+	   "Big5HKSCS" "\0" "BIG5-HKSCS" "\0"
+	   "GBK" "\0" "GBK" "\0"
+	   "GB18030" "\0" "GB18030" "\0"
+	   "SJIS" "\0" "SHIFT_JIS" "\0"
+	   "ARMSCII-8" "\0" "ARMSCII-8" "\0"
+	   "PT154" "\0" "PT154" "\0"
+	 /*"ISCII-DEV" "\0" "?" "\0"*/
+	   "*" "\0" "UTF-8" "\0";
+# endif
+
 # if defined VMS
       /* To avoid the troubles of an extra file charset.alias_vms in the
 	 sources of many GNU packages, simply inline the aliases here.  */
@@ -265,6 +307,14 @@ get_charset_aliases (void)
 	   "CP54936" "\0" "GB18030" "\0"
 	   "CP65001" "\0" "UTF-8" "\0";
 # endif
+
+# if defined __BEOS__ || defined __HAIKU__
+	/* To avoid the troubles of installing a separate file in the same
+	  directory as the DLL and of retrieving the DLL's directory at
+	  runtime, simply inline the aliases here.  */
+	cp = "UTF-8" "\0";
+# endif
+
 #endif
 
       charset_aliases = cp;

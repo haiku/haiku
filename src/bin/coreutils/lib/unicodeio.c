@@ -1,25 +1,21 @@
 /* Unicode character output to streams with locale dependent encoding.
 
-   Copyright (C) 2000-2003, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <haible@clisp.cons.org>.  */
-
-/* Note: This file requires the locale_charset() function.  See in
-   libiconv-1.8/libcharset/INTEGRATE for how to obtain it.  */
 
 #include <config.h>
 
@@ -40,17 +36,8 @@
 #define _(msgid) gettext (msgid)
 #define N_(msgid) msgid
 
-#ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
-#  define __attribute__(x) /* empty */
-# endif
-#endif
-
-#ifndef ATTRIBUTE_UNUSED
-# define ATTRIBUTE_UNUSED __attribute__ ((__unused__))
-#endif
-
 #include "localcharset.h"
+#include "unistr.h"
 
 /* When we pass a Unicode character to iconv(), we must pass it in a
    suitable encoding. The standardized Unicode encodings are
@@ -63,42 +50,6 @@
    mark, but this is not backed by an RFC.
    So we use UTF-8. It supports characters up to \U7FFFFFFF and is
    unambiguously defined.  */
-
-/* Stores the UTF-8 representation of the Unicode character wc in r[0..5].
-   Returns the number of bytes stored, or -1 if wc is out of range.  */
-static int
-utf8_wctomb (unsigned char *r, unsigned int wc)
-{
-  int count;
-
-  if (wc < 0x80)
-    count = 1;
-  else if (wc < 0x800)
-    count = 2;
-  else if (wc < 0x10000)
-    count = 3;
-  else if (wc < 0x200000)
-    count = 4;
-  else if (wc < 0x4000000)
-    count = 5;
-  else if (wc <= 0x7fffffff)
-    count = 6;
-  else
-    return -1;
-
-  switch (count)
-    {
-      /* Note: code falls through cases! */
-      case 6: r[5] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x4000000;
-      case 5: r[4] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x200000;
-      case 4: r[3] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x10000;
-      case 3: r[2] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x800;
-      case 2: r[1] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0xc0;
-      case 1: r[0] = wc;
-    }
-
-  return count;
-}
 
 /* Luckily, the encoding's name is platform independent.  */
 #define UTF8_NAME "UTF-8"
@@ -155,7 +106,7 @@ unicode_to_mb (unsigned int code,
     }
 
   /* Convert the character to UTF-8.  */
-  count = utf8_wctomb ((unsigned char *) inbuf, code);
+  count = u8_uctomb ((unsigned char *) inbuf, code, sizeof (inbuf));
   if (count < 0)
     return failure (code, N_("character out of range"), callback_arg);
 
@@ -218,7 +169,7 @@ fwrite_success_callback (const char *buf, size_t buflen, void *callback_arg)
 /* Simple failure callback that displays an error and exits.  */
 static long
 exit_failure_callback (unsigned int code, const char *msg,
-		       void *callback_arg ATTRIBUTE_UNUSED)
+		       void *callback_arg _UNUSED_PARAMETER_)
 {
   if (msg == NULL)
     error (1, 0, _("cannot convert U+%04X to local character set"), code);
@@ -231,8 +182,9 @@ exit_failure_callback (unsigned int code, const char *msg,
 /* Simple failure callback that displays a fallback representation in plain
    ASCII, using the same notation as ISO C99 strings.  */
 static long
-fallback_failure_callback (unsigned int code, const char *msg ATTRIBUTE_UNUSED
-			   , void *callback_arg)
+fallback_failure_callback (unsigned int code,
+			   const char *msg _UNUSED_PARAMETER_,
+			   void *callback_arg)
 {
   FILE *stream = (FILE *) callback_arg;
 

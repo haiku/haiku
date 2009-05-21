@@ -1,10 +1,11 @@
 /* echo.c, derived from code echo.c in Bash.
-   Copyright (C) 87,89, 1991-1997, 1999-2005 Free Software Foundation, Inc.
+   Copyright (C) 87,89, 1991-1997, 1999-2005, 2007-2009 Free Software
+   Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,46 +13,24 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include "system.h"
-#include "long-options.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "echo"
 
-#define AUTHORS "FIXME unknown"
-
-/* echo [-neE] [arg ...]
-Output the ARGs.  If -n is specified, the trailing newline is
-suppressed.  If the -e option is given, interpretation of the
-following backslash-escaped characters is turned on:
-	\a	alert (bell)
-	\b	backspace
-	\c	suppress trailing newline
-	\f	form feed
-	\n	new line
-	\r	carriage return
-	\t	horizontal tab
-	\v	vertical tab
-	\\	backslash
-	\0NNN	the character whose ASCII code is NNN (octal).
-
-You can explicitly turn off the interpretation of the above characters
-on System V systems with the -E option.
-*/
+#define AUTHORS \
+  proper_name ("Brian Fox"), \
+  proper_name ("Chet Ramey")
 
 /* If true, interpret backslash escapes by default.  */
 #ifndef DEFAULT_ECHO_TO_XPG
 enum { DEFAULT_ECHO_TO_XPG = false };
 #endif
-
-/* The name this program was run with. */
-char *program_name;
 
 void
 usage (int status)
@@ -61,19 +40,22 @@ usage (int status)
 	     program_name);
   else
     {
-      printf (_("Usage: %s [OPTION]... [STRING]...\n"), program_name);
+      printf (_("\
+Usage: %s [SHORT-OPTION]... [STRING]...\n\
+  or:  %s LONG-OPTION\n\
+"), program_name, program_name);
       fputs (_("\
 Echo the STRING(s) to standard output.\n\
 \n\
   -n             do not output the trailing newline\n\
 "), stdout);
       fputs (_(DEFAULT_ECHO_TO_XPG
-	       ? "\
+	       ? N_("\
   -e             enable interpretation of backslash escapes (default)\n\
-  -E             disable interpretation of backslash escapes\n"
-	       : "\
+  -E             disable interpretation of backslash escapes\n")
+	       : N_("\
   -e             enable interpretation of backslash escapes\n\
-  -E             disable interpretation of backslash escapes (default)\n"),
+  -E             disable interpretation of backslash escapes (default)\n")),
 	     stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -87,7 +69,7 @@ If -e is in effect, the following sequences are recognized:\n\
   \\b     backspace\n\
 "), stdout);
       fputs (_("\
-  \\c     suppress trailing newline\n\
+  \\c     produce no further output\n\
   \\f     form feed\n\
   \\n     new line\n\
   \\r     carriage return\n\
@@ -95,7 +77,7 @@ If -e is in effect, the following sequences are recognized:\n\
   \\v     vertical tab\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -134,16 +116,27 @@ main (int argc, char **argv)
   bool do_v9 = DEFAULT_ECHO_TO_XPG;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  if (allow_options)
-    parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-			usage, AUTHORS, (char const *) NULL);
+  /* We directly parse options, rather than use parse_long_options, in
+     order to avoid accepting abbreviations.  */
+  if (allow_options && argc == 2)
+    {
+      if (STREQ (argv[1], "--help"))
+	usage (EXIT_SUCCESS);
+
+      if (STREQ (argv[1], "--version"))
+	{
+	  version_etc (stdout, PROGRAM_NAME, PACKAGE_NAME, Version, AUTHORS,
+		       (char *) NULL);
+	  exit (EXIT_SUCCESS);
+	}
+    }
 
   --argc;
   ++argv;

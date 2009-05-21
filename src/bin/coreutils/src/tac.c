@@ -1,10 +1,10 @@
 /* tac - concatenate and print files in reverse
-   Copyright (C) 1988-1991, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Jay Lepreau (lepreau@cs.utah.edu).
    GNU enhancements by David MacKenzie (djm@gnu.ai.mit.edu). */
@@ -49,11 +48,14 @@ tac -r -s '.\|
 #include "quotearg.h"
 #include "safe-read.h"
 #include "stdlib--.h"
+#include "xfreopen.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tac"
 
-#define AUTHORS "Jay Lepreau", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("Jay Lepreau"), \
+  proper_name ("David MacKenzie")
 
 #if defined __MSDOS__ || defined _WIN32
 /* Define this to non-zero on systems for which the regular mechanism
@@ -73,9 +75,6 @@ tac -r -s '.\|
 
 /* The number of bytes per atomic write. */
 #define WRITESIZE 8192
-
-/* The name this program was run with. */
-char *program_name;
 
 /* The string that separates the records of the file. */
 static char const *separator;
@@ -111,6 +110,7 @@ static size_t G_buffer_size;
 /* The compiled regular expression representing `separator'. */
 static struct re_pattern_buffer compiled_separator;
 static char compiled_separator_fastmap[UCHAR_MAX + 1];
+static struct re_registers regs;
 
 static struct option const longopts[] =
 {
@@ -149,7 +149,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -213,7 +213,6 @@ tac_seekable (int input_fd, const char *file)
   char first_char = *separator;	/* Speed optimization, non-regexp. */
   char const *separator1 = separator + 1; /* Speed optimization, non-regexp. */
   size_t match_length1 = match_length - 1; /* Speed optimization, non-regexp. */
-  struct re_registers regs;
 
   /* Find the size of the input file. */
   file_pos = lseek (input_fd, (off_t) 0, SEEK_END);
@@ -456,7 +455,8 @@ copy_to_temp (FILE **g_tmp, char **g_tempfile, int input_fd, char const *file)
   fd = mkstemp (template);
   if (fd < 0)
     {
-      error (0, errno, _("cannot create temporary file %s"), quote (tempfile));
+      error (0, errno, _("cannot create temporary file in %s"),
+	     quote (tempdir));
       return false;
     }
 
@@ -534,7 +534,7 @@ tac_file (const char *filename)
       fd = STDIN_FILENO;
       filename = _("standard input");
       if (O_BINARY && ! isatty (STDIN_FILENO))
-	freopen (NULL, "rb", stdin);
+	xfreopen (NULL, "rb", stdin);
     }
   else
     {
@@ -574,7 +574,7 @@ main (int argc, char **argv)
   char const *const *file;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -648,7 +648,7 @@ main (int argc, char **argv)
 	  : default_file_list);
 
   if (O_BINARY && ! isatty (STDOUT_FILENO))
-    freopen (NULL, "wb", stdout);
+    xfreopen (NULL, "wb", stdout);
 
   {
     size_t i;

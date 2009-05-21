@@ -3,10 +3,10 @@
    Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
    2005, 2006, 2007 Free Software Foundation Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Yacc-based version written by Jim Kingdon and David MacKenzie.
    Rewritten by Jim Meyering.  */
@@ -41,8 +40,6 @@
    isdigit unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
-
-time_t mktime ();
 
 /*
   POSIX requires:
@@ -187,15 +184,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
 bool
 posixtime (time_t *p, const char *s, unsigned int syntax_bits)
 {
-  struct tm tm0
-#ifdef lint
-  /* Placate gcc-4's -Wuninitialized.
-     posix_time_parse fails to set all of tm0 only when it returns
-     nonzero (due to year() returning nonzero), and in that case,
-     this code doesn't use the tm0 at all.  */
-    = { 0, }
-#endif
-    ;
+  struct tm tm0;
   struct tm tm1;
   struct tm const *tm;
   time_t t;

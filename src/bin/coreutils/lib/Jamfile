@@ -10,11 +10,13 @@ SubDirSysHdrs $(SUBDIR) ;
 #SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
 
 StaticLibrary libfetish.a : 
-	__fpending.c
-	acl.c
+#	__fpending.c
+#	acl.c
 #	alloca.c
-	allocsa.c
+#	allocsa.c
+	areadlink-with-size.c
 	argmatch.c
+	argv-iter.c
 	asnprintf.c
 #	atexit.c
 	backupfile.c
@@ -31,11 +33,12 @@ StaticLibrary libfetish.a :
 	chown.c
 	cloexec.c
 	close-stream.c
+	closein.c
 	closeout.c
+	copy-acl.c
 	cycle-check.c
 	diacrit.c
 	dirchownmod.c
-#	dirfd.c
 	dirname.c
 	dup-safer.c
 #	dup2.c
@@ -50,13 +53,20 @@ StaticLibrary libfetish.a :
 #	fchown-stub.c
 	fd-reopen.c
 	fd-safer.c
+	file-has-acl.c
+	file-set.c
 	file-type.c
 #	fileblocks.c
 	filemode.c
 	filenamecat.c
+	filevercmp.c
 	fnmatch.c
 	fopen-safer.c
+	fpending.c
 	fprintftime.c
+	freadahead.c
+	freadptr.c
+	freadseek.c
 #	fsusage.c
 #	ftruncate.c
 	fts.c
@@ -67,7 +77,6 @@ StaticLibrary libfetish.a :
 #	getgroups.c
 #	gethostname.c
 	gethrxtime.c
-#	getline.c
 	getloadavg.c
 	getndelim2.c
 #	getopt.c
@@ -81,32 +90,39 @@ StaticLibrary libfetish.a :
 	hard-locale.c
 	hash-pjw.c
 	hash.c
+	hash-triple.c
 	human.c
 	i-ring.c
 	idcache.c
 	imaxtostr.c
 	inet_ntop.c
 	isapipe.c
-#	lchown.c
 	linebuffer.c
 	localcharset.c
 	long-options.c
 #	lstat-stub.c
 #	lstat.c
 #	malloc.c
+	malloca.c
+	mbchar.c
 	mbscasecmp.c
+	mbslen.c
+	mbsstr.c
 	mbswidth.c
 	md5.c
 	memcasecmp.c
 #	memchr.c
+	memchr2.c
 #	memcmp.c
 	memcoll.c
+	memcmp2.c
 #	memcpy.c
 #	memmove.c
 	mempcpy.c
 	memrchr.c
 #	memset.c
 	memxfrm.c
+	mgetgroups.c
 	mkancesdirs.c
 	mkdir.c
 	mkdir-p.c
@@ -126,7 +142,9 @@ StaticLibrary libfetish.a :
 	physmem.c
 	posixtm.c
 	posixver.c
-	putenv.c
+	progname.c
+	propername.c
+#	putenv.c
 	quote.c
 	quotearg.c
 #	raise.c
@@ -151,6 +169,7 @@ StaticLibrary libfetish.a :
 	savedir.c
 	savewd.c
 #	setenv.c
+	set-mode-acl.c
 	settime.c
 	sha1.c
 	sha256.c
@@ -162,6 +181,7 @@ StaticLibrary libfetish.a :
 	strftime.c
 	strintcmp.c
 	stripslash.c
+	strnlen1.c
 #	strncasecmp.c
 	strndup.c
 	strnlen.c
@@ -178,6 +198,10 @@ StaticLibrary libfetish.a :
 	strverscmp.c
 #	tempname.c
 	time_r.c
+	trim.c
+	u8-uctomb.c
+	u8-uctomb-aux.c
+	uinttostr.c
 	umaxtostr.c
 	unicodeio.c
 	unlinkdir.c
@@ -186,8 +210,10 @@ StaticLibrary libfetish.a :
 #	utime.c
 	utimecmp.c
 	utimens.c
+	version.c
 	version-etc.c
 	version-etc-fsf.c
+	write-any-file.c
 	xalloc-die.c
 	xfts.c
 	xgetcwd.c
@@ -196,15 +222,16 @@ StaticLibrary libfetish.a :
 	xmemcoll.c
 	xmemxfrm.c
 	xnanosleep.c
-	xreadlink.c
-	xreadlink-with-size.c
+	xprintf.c
 	xstrndup.c
 	xstrtod.c
 	xstrtoimax.c
 	xstrtol.c
+	xstrtol-error.c
 	xstrtold.c
 	xstrtoul.c
 	xstrtoumax.c
 	yesno.c
 ;
 
+SEARCH on [ FGristFiles u8-uctomb.c u8-uctomb-aux.c ] = [ FDirName $(SUBDIR) unistr ] ;

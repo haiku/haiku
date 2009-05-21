@@ -10,8 +10,10 @@ the bug-report mailing list (as seen on last line of e.g., cp --help).
 A Costa                             agcosta@gis.net
 Aaron Hawley                        ashawley@uvm.edu
 Achim Blumensath                    blume@corona.oche.de
+Adam Jimerson                       vendion@charter.net
 Adam Klein                          aklein@debian.org
 Adrian Bunk                         bunk@stusta.de
+AIDA Shinra                         shinra@j10n.org
 Akim Demaille                       demaille@inf.enst.fr
 Alain Magloire                      alain@qnx.com
 Alan Iwi                            iwi@atm.ox.ac.uk
@@ -20,20 +22,26 @@ Albert Hopkins                      ahopkins@dynacare.com
 Alberto Accomazzi                   alberto@cfa0.harvard.edu
 aldomel                             aldomel@ix.netcom.com
 Alen Muzinic                        zveki@fly.cc.fer.hr
+Alexander Nguyen                    vinh@seas.ucla.edu
+Alexander V. Lukyanov               lav@netis.ru
+Allen Hewes                         allen@decisiv.net
+Axel Dörfler                        axeld@pinc-software.de
 Alexandre Duret-Lutz                duret_g@epita.fr
 Alexey Solovyov                     alekso@math.uu.se
 Alexey Vyskubov                     alexey@pippuri.mawhrin.net
 Alfred M. Szmidt                    ams@kemisten.nu
 Andi Kleen                          freitag@alancoxonachip.com
 Andre Novaes Cunha                  Andre.Cunha@br.global-one.net
+Andreas Frische                     andreasfrische@gmail.com
 Andreas Gruenbacher                 ag@bestbits.at
 Andreas Jaeger                      jaeger@gnu.org
 Andreas Luik                        luik@isa.de
-Andreas Schwab                      schwab@suse.de
+Andreas Schwab                      schwab@linux-m68k.org
 Andreas Stolcke                     stolcke@ICSI.Berkeley.EDU
 Andrei Gaponenko                    andr@triumf.ca
 Andres Soolo                        andres@soolo.matti.ee
 Andrew Burgess                      aab@cichlid.com
+Andrew Church                       achurch@achurch.org
 Andrew Dalke                        dalke@bioreason.com
 Andrew Fabbro                       andrew@fabbro.org
 Andrew Pham                         andpha@us.ibm.com
@@ -54,6 +62,7 @@ Augey Mikus                         mikus@dqc.org
 Aurelien Jarno                      aurel32@debian.org
 Austin Donnelly                     Austin.Donnelly@cl.cam.ac.uk
 Axel Kittenberger                   Anshil@gmx.net
+Barry Kelly                         http://barrkel.blogspot.com/
 Bauke Jan Douma                     bjdouma@xs4all.nl
 Ben Elliston                        bje@air.net.au
 Ben Harris                          bjh21@netbsd.org
@@ -67,6 +76,7 @@ Bernhard Baehr                      bernhard.baehr@gmx.de
 Bernhard Gabler                     bernhard@uni-koblenz.de
 Bernhard Rosenkraenzer              bero@redhat.de
 Bert Deknuydt                       Bert.Deknuydt@esat.kuleuven.ac.be
+Bert Wesarg                         bert.wesarg@googlemail.com
 Bill Peters                         peters@gaffel.as.arizona.edu
 Bjorn Helgaas                       helgaas@rsn.hp.com
 Bob McCracken                       kerouac@ravenet.com
@@ -74,12 +84,16 @@ Bob Proulx                          rwp@fc.hp.com
 Branden Robinson                    branden@necrotic.deadbeast.net
 Brendan O'Dea                       bod@compusol.com.au
 Brian Kimball                       bfk@footbag.org
+Brian M. Carlson                    sandals@crustytoothpaste.ath.cx
+Brian Silverman                     bsilverman@conceptxdesign.com
 Brian Youmans                       3diff@gnu.org
 Bruce Korb                          bkorb@veritas.com
 Bruce Robertson                     brucer@theodolite.dyndns.org
 Bruno Haible                        haible@clisp.cons.org
+C de-Avillez                        hggdh2@gmail.com
 Carl Johnson                        carlj@cjlinux.home.org
 Carl Lowenstein                     cdl@mpl.UCSD.EDU
+Carl Roth                           roth@urs.us
 Carlos Canau                        Carlos.Canau@relay.puug.pt
 Charles Karney                      karney@pppl.gov
 Charles Randall                     crandall@matchlogic.com
@@ -102,17 +116,23 @@ Colin Plumb                         colin@nyx.net
 Colin Watson                        cjw44@riva.ucam.org
 Collin Rogowski                     collin@rogowski.de
 Cray-Cyber Project                  http://www.cray-cyber.org
+Cristian Cadar                      cristic@stanford.edu
 Cyril Bouthors                      cyril@bouthors.org
 Dale Scheetz                        dwarf@polaris.net
+Dameon G. Rogers                    dgr03@uark.edu
 Dan Hagerty                         hag@gnu.ai.it.edu
-Dan Jacobson                        http://www.geocities.com/jidani
+Dan Jacobson                        jidanni@jidanni.org
 Dan Pascu                           dan@services.iiruc.ro
 Daniel Bergstrom                    noa@melody.se
+Daniel Dunbar                       ddunbar@stanford.edu
+Daniel P. Berrangé                  berrange@redhat.com
 Dániel Varga                        danielv@axelero.hu
 Danny Levinson                      danny.levinson@overture.com
+Darrel Francis                      d.francis@cheerful.com
 Darren Salt                         ds@youmustbejoking.demon.co.uk
 Dave Beckett                        dajobe@dajobe.org
 David Alan Gilbert                  gilbertd@treblig.org
+David Bartley                       dtbartle@csclub.uwaterloo.ca
 David Dyck                          dcd@tc.fluke.COM
 David Eisner                        cradle@umd.edu
 David Flynn                         dav@chess.plus.com
@@ -120,8 +140,11 @@ David Godfrey                       dave@delta.demon.co.uk
 David Luyer                         david_luyer@pacific.net.au
 David Madore                        david.madore@ens.fr
 David Malone                        dwmalone@cnri.dit.ie
+Davide Canova                       kc.canova@gmail.com
+Dawson Engler                       engler@stanford.edu
 Dean Gaudet                         dean-savannah@arctic.org
 Deepak Goel                         deego@gnufans.org
+Denis Excoffier                     denis.excoffier@airbus.com
 Dennis Henriksen                    opus@flamingo.osrl.dk
 Dennis Smit                         ds@nerds-incorporated.org
 Derek Clegg                         dclegg@next.com
@@ -139,10 +162,14 @@ Duncan Roe                          duncanr@optimation.com.au
 Ed Avis                             ed@membled.com
 Edward Welbourne                    eddy@opera.com
 Edzer Pebesma                       Edzer.Pebesma@rivm.nl
+Egmont Koblinger                    egmont@uhulinux.hu
 Eirik Fuller                        eirik@hackrat.com
 Eivind                              eivindt@multinet.no
+Elbert Pol                          elbert.pol@gmail.com
 Eli Zaretskii                       eliz@is.elta.co.il
+Elias Pipping                       pipping@gentoo.org
 Emile LeBlanc                       leblanc@math.toronto.edu
+Erik Auerswald                      auerswal@unix-ag.uni-kl.de
 Eric Backus                         ericb@lsid.hp.com
 Eric Blake                          ebb9@byu.net
 Eric G. Miller                      egm2@jps.net
@@ -168,24 +195,29 @@ Gabor Z. Papp                       gzp@gzp.org.hu
 Gaël Quéri                          gqueri@mail.dotcom.fr
 Galen Hazelwood                     galenh@micron.net
 Gary Anderson                       ganderson@clark.net
+Gary Johnson                        garyjohn@spk.agilent.com
 Gary V. Vaughan                     gary@gnu.org
 Gaute Hvoslef Kvalnes               gaute@verdsveven.com
 Geoff Collyer                       geoff at collyer.net
 Geoff Kuenning                      geoff@cs.hmc.edu
 Geoff Odhner                        geoff@franklin.com
 Geoff Whale                         geoffw@cse.unsw.EDU.AU
+Gerald Pfeifer                      gerald@pfeifer.com
 Gerhard Poul                        gpoul@gnu.org
 Germano Leichsenring                germano@jedi.cs.kobe-u.ac.jp
-Göran Uddeborg                      goeran@uddeborg.pp.se
+Glen Lenker                         glen.lenker@gmail.com
+Göran Uddeborg                      goeran@uddeborg.se
 Guochun Shi                         gshi@ncsa.uiuc.edu
 GOTO Masanori                       gotom@debian.or.jp
 Greg Louis                          glouis@dynamicro.on.ca
 Greg McGary                         gkm@gnu.org
+Greg Metcalfe                       metcalfegreg@qwest.net
 Greg Schafer                        gschafer@zip.com.au
 Greg Troxel                         gdt@bbn.com
 Greg Wooledge                       gawooledge@sherwin.com
 Gregory Leblanc                     gleblanc@cu-portland.edu
 Guido Leenders                      guido.leenders@invantive.com
+Guntram Blohm                       Extern.Guntram.Blohm@AUDI.DE
 H. J. Lu                            hjl@valinux.com
 Hans Ginzel                         hans@matfyz.cz
 Hans Lermen                         lermen@fgan.de
@@ -194,6 +226,7 @@ Harald Dunkel                       harald.dunkel@t-online.de
 Harry Liu                           rliu@lek.ugcs.caltech.edu
 Harti Brandt                        brandt@fokus.fraunhofer.de
 Harvey Eneman                       Harvey.Eneman@oracle.com
+Heiko Marr                          h.marr@webmasters.de
 Helen Faulkner                      helen_ml_faulkner@yahoo.co.uk
 Herbert Xu                          herbert@gondor.apana.org.au
 Holger Berger                       hberger@ess.nec.de
@@ -202,29 +235,37 @@ Hugh Daniel                         hugh@xanadu.com
 Ian Bruce                           ian.bruce@myrealbox.com
 Iain Calder                         ic56@rogers.com
 Ian Jackson                         ijackson@chiark.greenend.org.uk
+Ian Kent                            ikent@redhat.com
 Ian Lance Taylor                    ian@cygnus.com
 Ian Turner                          vectro@pipeline.com
 Iida Yosiaki                        iida@gnu.org
+Ilya N. Golubev                     gin@mo.msk.ru
 Ingo Saitz                          ingo@debian.org
 Ivo Timmermans                      ivo@debian.org
 James                               james@albion.glarp.com
 James Antill                        jmanti%essex.ac.uk@seralph21.essex.ac.uk
 James Lemley                        James.Lemley@acxiom.com
 James Hunt                          jamesodhunt@hotmail.com
+James Ralston                       ralston@pobox.com
 James Sneeringer                    jvs@ocslink.com
 James Tanis                         jtt@soscorp.com
-James Youngman                      james+usenet@free-lunch.demon.co.uk
+James Youngman                      jay@gnu.org
 Jamie Lokier                        jamie@imbolc.ucc.ie
 Jamie McClelland                    jm@mayfirst.org
+Jan Engelhardt                      jengelh@medozas.de
 Jan Fedak                           J.Fedak@sh.cvut.cz
+Jan Moringen                        jan.moringen@uni-bielefeld.de
 Jan Nieuwenhuizen                   janneke@gnu.org
 Janos Farkas                        chexum@shadow.banki.hu
 Jarkko Hietaniemi                   jhi@epsilon.hut.fi
+Jarod Wilson                        jwilson@redhat.com
 Jean Charles Delepine               delepine@u-picardie.fr
 Jeff Moore                          jbm@mordor.com
 Jeff Sheinberg                      jeff@bsrd.net
 Jens Elkner                         elkner@imsgroup.de
 Jens Schmidt                        jms@jsds.hamburg.com
+Jeph Cowan                          jeph@ucar.edu
+Jeremy Maitin-Shepard               jbms@cmu.edu
 Jerome Abela                        abela@hsc.fr
 Jérôme Zago                         bug-coreutils-ml@agt-the-walker.net
 Jesse Kornblum                      kornblum@usna.edu
@@ -236,6 +277,7 @@ Joakim Rosqvist                     dvljrt@cs.umu.se
 Jochen Hein                         jochen@jochen.org
 Joe Orton                           joe@manyfish.co.uk
 Joerg Sonnenberger                  joerg@britannica.bec.de
+Joey Hess                           joeyh@debian.org
 Johan Boule                         bohan@bohan.dyndns.org
 Johan Danielsson                    joda@pdc.kth.se
 John Bley                           jbb6@acpub.duke.edu
@@ -252,7 +294,9 @@ Jon Peatfield                       J.S.Peatfield@damtp.cam.ac.uk
 Joost van Baal                      joostvb@xs4all.nl
 Jorge Stolfi                        stolfi@ic.unicamp.br
 Joseph S. Myers                     jsm28@cam.ac.uk
+Josh Triplett                       josh@freedesktop.org
 Joshua Hudson                       joshudson@gmail.com
+Josselin Mouette                    joss@debian.org
 Juan F. Codagnone                   juam@arnet.com.ar
 Juan M. Guerrero                    st001906@hrz1.hrz.tu-darmstadt.de
 Jungshik Shin                       jshin@pantheon.yale.edu
@@ -274,6 +318,7 @@ Keith Owens                         kaos@audio.apana.org.au
 Keith Thompson                      kst@cts.com
 Ken Pizzini                         kenp@halcyon.com
 Kevin Mudrick                       kmudrick@healthmarketscience.com
+Kirk Kelsey                         kirk.kelsey@0x4b.net
 Kristin E Thomas                    kristint@us.ibm.com
 Kjetil Torgrim Homme                kjetilho@ifi.uio.no
 Kristoffer Rose                     kris@diku.dk
@@ -323,6 +368,7 @@ Mate Wierdl                         mw@moni.msci.memphis.edu
 Matej Vela                          mvela@public.srce.hr
 Matt Kraai                          kraai@ftbfs.org
 Matt Perry                          matt@primefactor.com
+Matt Pham                           mattvpham@gmail.com
 Matt Schalit                        mschalit@pacbell.net
 Matt Swift                          swift@alum.mit.edu
 Matthew Arnison                     maffew@cat.org.au
@@ -336,6 +382,7 @@ Matthew Woehlke                     mw_triad@users.sourceforge.net
 Matthias Urlichs                    smurf@noris.de
 Matti Aarnio                        matti.aarnio@zmailer.org
 Mattias Wadenstein                  maswan@acc.umu.se
+Max Chang                           maxchang@ucla.edu
 Meelis Roos                         mroos@tartu.cyber.ee
 Michael                             michael@aplatform.com
 Michael ???                         michael@roka.net
@@ -347,6 +394,7 @@ Michael Hasselberg                  mikelh@zonta.ping.de
 Michael Hohn                        hohn@math.utah.edu
 Michael J. Croghan                  mcroghan@usatoday.com
 Michael McFarland                   sidlon@yahoo.com
+Michael McLagan                     mmclagan@invlogic.com
 Michael Piefel                      piefel@informatik.hu-berlin.de
 Michael Steffens                    michael.steffens@s.netic.de
 Michael Stone                       mstone@debian.org
@@ -358,6 +406,7 @@ Michal Politowski                   mpol@charybda.icm.edu.pl
 Michal Svec                         msvec@suse.cz
 Michel Robitaille                   robitail@IRO.UMontreal.CA
 Michiel Bacchiani                   bacchian@raven.bu.edu
+Mikael Magnusson                    mikachu@gmail.com
 Mike Castle                         dalgoda@ix.netcom.com
 Mike Coleman                        mkc@mathdogs.com
 Mike Jetzer                         mjetzer@mke.catalystwms.com
@@ -371,11 +420,13 @@ Neal H Walfield                     neal@cs.uml.edu
 Neil Brown                          neilb@cse.unsw.edu.au
 Nelson H. F. Beebe                  beebe@math.utah.edu
 Nick Estes                          debian@nickstoys.com
+Nick Graham                         nick.d.graham@gmail.com
 Nick Lawes                          nlawes@silverplatter.com
 Nickolai Zeldovich                  nickolai@cs.stanford.edu
 Nicolas François                    nicolas.francois@centraliens.net
 Niklas Edmundsson                   nikke@acc.umu.se
 Nikola Milutinovic                  Nikola.Milutinovic@ev.co.yu
+Nima Nikzad                         nnikzad@ucla.edu
 Noah Friedman                       friedman@splode.com
 Noel Cragg                          noel@red-bean.com
 Norbert Kiesel                      nkiesel@tbdnetworks.com
@@ -385,8 +436,12 @@ Ole Laursen                         olau@hardworking.dk
 Oliver Kiddle                       okiddle@yahoo.co.uk
 Ørn E. Hansen                       oehansen@daimi.aau.dk
 Oskar Liljeblad                     osk@hem.passagen.se
+Otavio Salvador                     otavio@ossystems.com.br
+Pádraig Brady                       P@draigBrady.com
 Patrick Mauritz                     oxygene@studentenbude.ath.cx
+Paul D. Smith                       psmith@gnu.org
 Paul Eggert                         eggert@twinsun.com
+Paul Ghaleb                         paul.ghaleb@st.com
 Paul Jarc                           prj@po.cwru.edu
 Paul Nevai                          nevai@ops.mps.ohio-state.edu
 Paul Sauer                          paul@alexa.com
@@ -396,7 +451,9 @@ Paul Worrall                        paul@basilisk.uklinux.net
 Pawel Prokop                        pablo@wizard.ae.krakow.pl
 Per Cederqvist                      ceder@lysator.liu.se
 Per Kristian Hove                   perhov@math.ntnu.no
+Per Starbäck                        starback@stp.lingfil.uu.se
 Peter Breitenlohner                 peb@mppmu.mpg.de
+Peter Dyballa                       peter_dyballa@web.de
 Peter Eriksson                      peter@ifm.liu.se
 Peter Fales                         psfales@lucent.com
 Peter Horst                         peter@ointment.org
@@ -404,15 +461,19 @@ Peter Moulder                       reiter@netspace.net.au
 Peter O'Gorman                      bug-coreutils@mlists.thewrittenword.com
 Peter Samuelson                     psamuels@sampo.creighton.edu
 Peter Seebach                       seebs@taniemarie.solon.com
+Petr Uzel                           petr.uzel@suse.cz
 Petter Reinholdtsen                 pere@hungry.com
 Phelippe Neveu                      pneveu@pcigeomatics.com
 Phil Richards                       phil.richards@vf.vodafone.co.uk
+Philip Rowlands                     phr@doc.ic.ac.uk
 Philippe De Muyter                  phdm@macqel.be
 Philippe Schnoebelen                Philippe.Schnoebelen@imag.fr
 Phillip Jones                       mouse@datastacks.com
 Piergiorgio Sartor                  sartor@sony.de
+Pieter Bowman                       bowman@math.utah.edu
 Piotr Kwapulinski                   kwap@univ.gda.pl
 Prashant TR                         tr@eth.net
+Priit Jõerüüt                       jemm4jemm@yahoo.com
 Rainer Orth                         ro@TechFak.Uni-Bielefeld.DE
 Ralf W. Stephan                     stephan@tmt.de
 Ralf Wildenhues                     Ralf.Wildenhues@gmx.de
@@ -439,6 +500,8 @@ Ronald F. Guilmette                 rfg@netcom.com
 Ross Alexander                      r.alexander@auckland.ac.nz
 Ross Paterson                       rap@doc.ic.ac.uk
 Ross Ridge                          rridge@calum.csclub.uwaterloo.ca
+Rudolf Kastl                        rkastl@redhat.com
+Sahil Amoli                         sahilamoli@gmail.com
 Sami Farin                          sfarin@ratol.fi
 Samuel Tardieu                      sam@rfc1149.net
 Samuel Thibault                     samuel.thibault@ens-lyon.org
@@ -447,7 +510,8 @@ Sander van Malssen                  svm@kozmix.ow.nl
 Santiago Vila Doncel                sanvila@unex.es
 Savochkin Andrey Vladimirovich      saw@msu.ru
 Scott Lurndal                       slurn@griffin.engr.sgi.com
-S�bastien Maret                     smaret@umich.edu
+Sébastien Maret                     smaret@umich.edu
+Sergei Steshenko                    sergstesh@yahoo.com
 Shing-Shong Shei                    shei@cs.indiana.edu
 Soeren Sonnenburg                   sonnenburg@informatik.hu-berlin.de
 Solar Designer                      solar@owl.openwall.com
@@ -460,16 +524,21 @@ Stephen Gildea                      gildea@stop.mail-abuse.org
 Stephen Smoogen                     smooge@mindspring.com
 Steve McConnel                      steve@acadcomp.sil.org
 Steve McIntyre                      steve@einval.com
+Steve Ward                          planet36@gmail.com
 Steven G. Johnson                   stevenj@alum.mit.edu
 Steven Mocking                      ufo@quicknet.nl
+Steven Parkes                       smparkes@smparkes.net
+Steven Schveighoffer                schveiguy@yahoo.com
 Steven P Watson                     steven@magelico.net
 Stuart Kemp                         skemp@peter.bmc.com
-Sven Joachim                        sven_joachim@web.de
+Stuart Shelton                      stuart@shelton.me
+Sven Joachim                        svenjoac@gmx.de
 Szakacsits Szabolcs                 szaka@sienet.hu
 Tadayoshi Funaba                    tadf@kt.rim.or.jp
 TAKAI Kousuke                       takai@vlsi.kuee.kyoto-u.ac.jp
 Theodore Ts'o                       tytso@rsts-11.mit.edu
 The Wanderer                        inverseparadox@comcast.net
+Theodoros V. Kalamatianos           nyb@users.sourceforge.net
 Thomas Bushnell                     thomas@gnu.ai.mit.edu
 Thomas Goerlich                     thomas@schnappmatik.de
 Thomas Hood                         jdthood@yahoo.co.uk
@@ -480,8 +549,10 @@ Thomas Schwinge                     tschwinge@gnu.org
 Thomas Wolff                        mined@towo.net
 Tim J. Robbins                      tjr@FreeBSD.org
 Tim Mooney                          mooney@dogbert.cc.ndsu.NoDak.edu
+Tim Ryan                            Tim_Ryan@bnz.co.nz
 Tim Smithers                        mouse@dmouse.com.au
 Tim Waugh                           twaugh@redhat
+Tobias Stoeckmann                   tobias@bugol.de
 Toby Peterson                       toby@opendarwin.org
 Todd A. Jacobs                      tjacobs@codegnome.org
 Tom Haynes                          thomas@netapp.com
@@ -498,6 +569,7 @@ Torbjorn Granlund                   tege@nada.kth.se
 Torbjorn Lindgren                   tl@funcom.no
 Torsten Landschoff                  torsten@pclab.ifg.uni-kiel.de
 Tristan Miller                      psychonaut@nothingisreal.com
+Tzvi Rotshtein                      tzvi.ro@gmail.com
 Ulrich Drepper                      drepper@gnu.org
 Ulrich Hermisson                    ulrich_hermisson@hotmail.com
 Urs Thuermann                       urs@isnogud.escape.de
@@ -505,7 +577,9 @@ Uwe H. Steinfeld                    usteinfeld@gmx.net
 Vesselin Atanasov                   vesselin@bgnet.bg
 Vin Shelton                         acs@alumni.princeton.edu
 Vineet Chadha                       chadha@acis.ufl.edu
+Vitali Lovich                       vlovich@gmail.com
 Vitaly A. Ostanin                   vyt@altlinux.org
+Vito Caputo                         vcaputo@pengaru.com
 Vlada Macek                         tuttle@bbs.fsik.cvut.cz
 Volker Borchert                     bt@teknon.de
 Volker Paul                         vpaul@dohle.com

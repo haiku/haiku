@@ -132,6 +132,12 @@
 /* Define to 1 when using the gnulib fopen-safer module. */
 #define GNULIB_FOPEN_SAFER 1
 
+/* Define to 1 when using the gnulib module fts. */
+#define GNULIB_FTS 1
+
+/* Define to 1 when using the gnulib module unistr/u8-uctomb. */
+#define GNULIB_UNISTR_U8_UCTOMB 1
+
 /* The concatenation of the strings `GNU ', and PACKAGE. */
 #define GNU_PACKAGE "GNU coreutils"
 
@@ -1823,9 +1829,6 @@
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef pid_t */
 
-/* Define to rpl_putenv if the replacement function should be used. */
-#define putenv rpl_putenv
-
 /* Define to rpl_re_comp if the replacement should be used. */
 /* #undef re_comp rpl_re_comp */
 
@@ -1905,6 +1908,15 @@
 
 /* Define to rpl_utime if the replacement function should be used. */
 /* #undef utime */
+
+/* Define as a marker that can be attached to function parameter declarations
+   for parameters that are not used.  This helps to reduce warnings, such as
+   from GCC -Wunused-parameter.  */
+#if __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 7)
+# define _UNUSED_PARAMETER_ __attribute__ ((__unused__))
+#else
+# define _UNUSED_PARAMETER_
+#endif
 
 /* Define as a macro for copying va_list variables. */
 #if __GNUC__ < 3

@@ -1,10 +1,10 @@
 /* du -- summarize disk usage
-   Copyright (C) 1988-1991, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Differences from the Unix du:
    * Doesn't simply ignore the names of regular files given as arguments
@@ -31,15 +30,14 @@
 #include <assert.h>
 #include "system.h"
 #include "argmatch.h"
+#include "argv-iter.h"
 #include "error.h"
 #include "exclude.h"
 #include "fprintftime.h"
 #include "hash.h"
 #include "human.h"
-#include "inttostr.h"
 #include "quote.h"
 #include "quotearg.h"
-#include "readtokens0.h"
 #include "same.h"
 #include "stat-time.h"
 #include "xfts.h"
@@ -51,7 +49,10 @@ extern bool fts_debug;
 #define PROGRAM_NAME "du"
 
 #define AUTHORS \
-  "Torbjorn Granlund", "David MacKenzie, Paul Eggert", "Jim Meyering"
+  proper_name_utf8 ("Torbjorn Granlund", "Torbj\303\266rn Granlund"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Paul Eggert"), \
+  proper_name ("Jim Meyering")
 
 #if DU_DEBUG
 # define FTS_CROSS_CHECK(Fts) fts_cross_check (Fts)
@@ -124,9 +125,6 @@ struct dulevel
   struct duinfo subdir;
 };
 
-/* Name under which this program was invoked.  */
-char *program_name;
-
 /* If true, display counts for all files, not just directories.  */
 static bool opt_all = false;
 
@@ -195,15 +193,8 @@ enum
   EXCLUDE_OPTION,
   FILES0_FROM_OPTION,
   HUMAN_SI_OPTION,
-
-  /* FIXME: --kilobytes is deprecated (but not -k); remove in late 2006 */
-  KILOBYTES_LONG_OPTION,
-
   MAX_DEPTH_OPTION,
-
-  /* FIXME: --megabytes is deprecated (but not -m); remove in late 2006 */
   MEGABYTES_LONG_OPTION,
-
   TIME_OPTION,
   TIME_STYLE_OPTION
 };
@@ -222,10 +213,8 @@ static struct option const long_options[] =
   {"files0-from", required_argument, NULL, FILES0_FROM_OPTION},
   {"human-readable", no_argument, NULL, 'h'},
   {"si", no_argument, NULL, HUMAN_SI_OPTION},
-  {"kilobytes", no_argument, NULL, KILOBYTES_LONG_OPTION},
   {"max-depth", required_argument, NULL, MAX_DEPTH_OPTION},
   {"null", no_argument, NULL, '0'},
-  {"megabytes", no_argument, NULL, MEGABYTES_LONG_OPTION},
   {"no-dereference", no_argument, NULL, 'P'},
   {"one-file-system", no_argument, NULL, 'x'},
   {"separate-dirs", no_argument, NULL, 'S'},
@@ -298,13 +287,14 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -B, --block-size=SIZE  use SIZE-byte blocks\n\
   -b, --bytes           equivalent to `--apparent-size --block-size=1'\n\
   -c, --total           produce a grand total\n\
-  -D, --dereference-args  dereference FILEs that are symbolic links\n\
+  -D, --dereference-args  dereference only symlinks that are listed on the\n\
+                          command line\n\
 "), stdout);
       fputs (_("\
       --files0-from=F   summarize disk usage of the NUL-terminated file\n\
-                          names specified in file F\n\
-  -H                    like --si, but also evokes a warning; will soon\n\
-                          change to be equivalent to --dereference-args (-D)\n\
+                          names specified in file F;\n\
+                          If F is - then read names from standard input\n\
+  -H                    equivalent to --dereference-args (-D)\n\
   -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n\
       --si              like -h, but use powers of 1000 not 1024\n\
 "), stdout);
@@ -321,9 +311,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -s, --summarize       display only a total for each argument\n\
 "), stdout);
       fputs (_("\
-  -x, --one-file-system  skip directories on different file systems\n\
-  -X FILE, --exclude-from=FILE  Exclude files that match any pattern in FILE.\n\
-      --exclude=PATTERN  Exclude files that match PATTERN.\n\
+  -x, --one-file-system    skip directories on different file systems\n\
+  -X, --exclude-from=FILE  exclude files that match any pattern in FILE\n\
+      --exclude=PATTERN    exclude files that match PATTERN\n\
       --max-depth=N     print the total for a directory (or file, with --all)\n\
                           only if it is N or fewer levels below the command\n\
                           line argument;  --max-depth=0 is the same as\n\
@@ -344,7 +334,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 SIZE may be (or may be an integer optionally followed by) one of following:\n\
 kB 1000, K 1024, MB 1000*1000, M 1024*1024, and so on for G, T, P, E, Z, Y.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -422,10 +412,7 @@ show_date (const char *format, struct timespec when)
   if (! tm)
     {
       char buf[INT_BUFSIZE_BOUND (intmax_t)];
-      error (0, 0, _("time %s is out of range"),
-	     (TYPE_SIGNED (time_t)
-	      ? imaxtostr (when.tv_sec, buf)
-	      : umaxtostr (when.tv_sec, buf)));
+      error (0, 0, _("time %s is out of range"), timetostr (when.tv_sec, buf));
       fputs (buf, stdout);
       return;
     }
@@ -488,7 +475,7 @@ process_file (FTS *fts, FTSENT *ent)
   bool skip;
 
   /* If necessary, set FTS_SKIP before returning.  */
-  skip = excluded_file_name (exclude, ent->fts_path);
+  skip = excluded_file_name (exclude, file);
   if (skip)
     fts_set (fts, ent, FTS_SKIP);
 
@@ -605,13 +592,8 @@ process_file (FTS *fts, FTSENT *ent)
     duinfo_add (&dulvl[level].ent, &dui);
 
   /* Even if this directory is unreadable or we can't chdir into it,
-     do let its size contribute to the total, ... */
+     do let its size contribute to the total. */
   duinfo_add (&tot_dui, &dui);
-
-  /* ... but don't print out a total for it, since without the size(s)
-     of any potential entries, it could be very misleading.  */
-  if (ent->fts_info == FTS_DNR)
-    return ok;
 
   /* If we're not counting an entry, e.g., because it's a hard link
      to a file we've already counted (and --count-links), then don't
@@ -666,25 +648,19 @@ du_files (char **files, int bit_flags)
       fts_close (fts);
     }
 
-  if (print_grand_total)
-    print_size (&tot_dui, _("total"));
-
   return ok;
 }
 
 int
 main (int argc, char **argv)
 {
-  int c;
   char *cwd_only[2];
   bool max_depth_specified = false;
-  char **files;
   bool ok = true;
   char *files_from = NULL;
-  struct Tokens tok;
 
   /* Bit flags that control how fts works.  */
-  int bit_flags = FTS_TIGHT_CYCLE_CHECK;
+  int bit_flags = FTS_TIGHT_CYCLE_CHECK | FTS_DEFER_STAT;
 
   /* Select one of the three FTS_ options that control if/when
      to follow a symlink.  */
@@ -693,11 +669,13 @@ main (int argc, char **argv)
   /* If true, display only a total for each argument. */
   bool opt_summarize_only = false;
 
-  cwd_only[0] = ".";
+  struct argv_iterator *ai;
+
+  cwd_only[0] = bad_cast (".");
   cwd_only[1] = NULL;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -706,12 +684,17 @@ main (int argc, char **argv)
 
   exclude = new_exclude ();
 
-  human_output_opts = human_options (getenv ("DU_BLOCK_SIZE"), false,
-				     &output_block_size);
+  human_options (getenv ("DU_BLOCK_SIZE"),
+		 &human_output_opts, &output_block_size);
 
-  while ((c = getopt_long (argc, argv, DEBUG_OPT "0abchHklmsxB:DLPSX:",
-			   long_options, NULL)) != -1)
+  for (;;)
     {
+      int oi = -1;
+      int c = getopt_long (argc, argv, DEBUG_OPT "0abchHklmsxB:DLPSX:",
+			   long_options, &oi);
+      if (c == -1)
+	break;
+
       switch (c)
 	{
 #if DU_DEBUG
@@ -747,20 +730,11 @@ main (int argc, char **argv)
 	  output_block_size = 1;
 	  break;
 
-	case 'H':  /* FIXME: remove warning and move this "case 'H'" to
-		      precede --dereference-args in late 2006.  */
-	  error (0, 0, _("WARNING: use --si, not -H; the meaning of the -H\
- option will soon\nchange to be the same as that of --dereference-args (-D)"));
-	  /* fall through */
 	case HUMAN_SI_OPTION:
 	  human_output_opts = human_autoscale | human_SI;
 	  output_block_size = 1;
 	  break;
 
-	case KILOBYTES_LONG_OPTION:
-	  error (0, 0,
-		 _("the --kilobytes option is deprecated; use -k instead"));
-	  /* fall through */
 	case 'k':
 	  human_output_opts = 0;
 	  output_block_size = 1024;
@@ -784,7 +758,7 @@ main (int argc, char **argv)
 	  }
 	  break;
 
-	case MEGABYTES_LONG_OPTION:
+	case MEGABYTES_LONG_OPTION: /* FIXME: remove in 2009 */
 	  error (0, 0,
 		 _("the --megabytes option is deprecated; use -m instead"));
 	  /* fall through */
@@ -806,10 +780,16 @@ main (int argc, char **argv)
 	  break;
 
 	case 'B':
-	  human_output_opts = human_options (optarg, true, &output_block_size);
+	  {
+	    enum strtol_error e = human_options (optarg, &human_output_opts,
+						 &output_block_size);
+	    if (e != LONGINT_OK)
+	      xstrtol_fatal (e, oi, c, long_options, optarg);
+	  }
 	  break;
 
-	case 'D': /* This will eventually be 'H' (-H), too.  */
+	case 'H':  /* NOTE: before 2008-12, -H was equivalent to --si.  */
+	case 'D':
 	  symlink_deref_bits = FTS_COMFOLLOW | FTS_PHYSICAL;
 	  break;
 
@@ -946,7 +926,7 @@ main (int argc, char **argv)
 	{
 	  error (0, 0, _("extra operand %s"), quote (argv[optind]));
 	  fprintf (stderr, "%s\n",
-		   _("File operands cannot be combined with --files0-from."));
+		   _("file operands cannot be combined with --files0-from"));
 	  usage (EXIT_FAILURE);
 	}
 
@@ -954,66 +934,96 @@ main (int argc, char **argv)
 	error (EXIT_FAILURE, errno, _("cannot open %s for reading"),
 	       quote (files_from));
 
-      readtokens0_init (&tok);
-
-      if (! readtokens0 (stdin, &tok) || fclose (stdin) != 0)
-	error (EXIT_FAILURE, 0, _("cannot read file names from %s"),
-	       quote (files_from));
-
-      files = tok.tok;
+      ai = argv_iter_init_stream (stdin);
     }
   else
     {
-      files = (optind < argc ? argv + optind : cwd_only);
+      char **files = (optind < argc ? argv + optind : cwd_only);
+      ai = argv_iter_init_argv (files);
     }
+
+  if (!ai)
+    xalloc_die ();
 
   /* Initialize the hash structure for inode numbers.  */
   hash_init ();
 
-  /* Report and filter out any empty file names before invoking fts.
-     This works around a glitch in fts, which fails immediately
-     (without looking at the other file names) when given an empty
-     file name.  */
-  {
-    size_t i = 0;
-    size_t j;
-
-    for (j = 0; ; j++)
-      {
-	if (i != j)
-	  files[i] = files[j];
-
-	if ( ! files[i])
-	  break;
-
-	if (files[i][0])
-	  i++;
-	else
-	  {
-	    if (files_from)
-	      {
-		/* Using the standard `filename:line-number:' prefix here is
-		   not totally appropriate, since NUL is the separator, not NL,
-		   but it might be better than nothing.  */
-		unsigned long int file_number = j + 1;
-		error (0, 0, "%s:%lu: %s", quotearg_colon (files_from),
-		       file_number, _("invalid zero-length file name"));
-	      }
-	    else
-	      error (0, 0, "%s", _("invalid zero-length file name"));
-	  }
-      }
-
-    ok = (i == j);
-  }
-
   bit_flags |= symlink_deref_bits;
-  ok &= du_files (files, bit_flags);
 
-  /* This isn't really necessary, but it does ensure we
-     exercise this function.  */
-  if (files_from)
-    readtokens0_free (&tok);
+  while (true)
+    {
+      static char *temp_argv[] = { NULL, NULL };
+      bool skip_file = false;
+      enum argv_iter_err ai_err;
+      char *file_name = argv_iter (ai, &ai_err);
+      if (ai_err == AI_ERR_EOF)
+	break;
+      if (!file_name)
+	{
+	  switch (ai_err)
+	    {
+	    case AI_ERR_READ:
+	      error (0, errno, _("%s: read error"), quote (files_from));
+	      skip_file = true;
+	      continue;
+
+	    case AI_ERR_MEM:
+	      xalloc_die ();
+
+	    default:
+	      assert (!"unexpected error code from argv_iter");
+	    }
+	}
+      if (files_from && STREQ (files_from, "-") && STREQ (file_name, "-"))
+	{
+	  /* Give a better diagnostic in an unusual case:
+	     printf - | du --files0-from=- */
+	  error (0, 0, _("when reading file names from stdin, "
+			 "no file name of %s allowed"),
+		 quote (file_name));
+	  skip_file = true;
+	}
+
+      /* Report and skip any empty file names before invoking fts.
+	 This works around a glitch in fts, which fails immediately
+	 (without looking at the other file names) when given an empty
+	 file name.  */
+      if (!file_name[0])
+	{
+	  /* Diagnose a zero-length file name.  When it's one
+	     among many, knowing the record number may help.
+	     FIXME: currently print the record number only with
+	     --files0-from=FILE.  Maybe do it for argv, too?  */
+	  if (files_from == NULL)
+	    error (0, 0, "%s", _("invalid zero-length file name"));
+	  else
+	    {
+	      /* Using the standard `filename:line-number:' prefix here is
+		 not totally appropriate, since NUL is the separator, not NL,
+		 but it might be better than nothing.  */
+	      unsigned long int file_number = argv_iter_n_args (ai);
+	      error (0, 0, "%s:%lu: %s", quotearg_colon (files_from),
+		     file_number, _("invalid zero-length file name"));
+	    }
+	  skip_file = true;
+	}
+
+      if (skip_file)
+	ok = false;
+      else
+	{
+	  temp_argv[0] = file_name;
+	  ok &= du_files (temp_argv, bit_flags);
+	}
+    }
+
+  argv_iter_free (ai);
+
+  if (files_from && (ferror (stdin) || fclose (stdin) != 0))
+    error (EXIT_FAILURE, 0, _("error reading %s"), quote (files_from));
+
+  if (print_grand_total)
+    print_size (&tot_dui, _("total"));
 
   hash_free (htab);
 

@@ -1,10 +1,10 @@
 /* tee - read from standard input and write to standard output and files.
-   Copyright (C) 85,1990-2006 Free Software Foundation, Inc.
+   Copyright (C) 85,1990-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Mike Parker, Richard M. Stallman, and David MacKenzie */
 
@@ -25,11 +24,15 @@
 #include "system.h"
 #include "error.h"
 #include "stdio--.h"
+#include "xfreopen.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tee"
 
-#define AUTHORS "Mike Parker", "Richard M. Stallman", "David MacKenzie"
+#define AUTHORS \
+  proper_name ("Mike Parker"), \
+  proper_name ("Richard M. Stallman"), \
+  proper_name ("David MacKenzie")
 
 static bool tee_files (int nfiles, const char **files);
 
@@ -38,9 +41,6 @@ static bool append;
 
 /* If true, ignore interrupts. */
 static bool ignore_interrupts;
-
-/* The name that this program was run with. */
-char *program_name;
 
 static struct option const long_options[] =
 {
@@ -72,7 +72,7 @@ Copy standard input to each FILE, and also to standard output.\n\
 \n\
 If a FILE is -, copy again to standard output.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -84,7 +84,7 @@ main (int argc, char **argv)
   int optc;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -153,9 +153,9 @@ tee_files (int nfiles, const char **files)
     files[i] = files[i - 1];
 
   if (O_BINARY && ! isatty (STDIN_FILENO))
-    freopen (NULL, "rb", stdin);
+    xfreopen (NULL, "rb", stdin);
   if (O_BINARY && ! isatty (STDOUT_FILENO))
-    freopen (NULL, "wb", stdout);
+    xfreopen (NULL, "wb", stdout);
 
   /* In the array of NFILES + 1 descriptors, make
      the first one correspond to standard output.   */
@@ -191,7 +191,7 @@ tee_files (int nfiles, const char **files)
 	 Standard output is the first one.  */
       for (i = 0; i <= nfiles; i++)
 	if (descriptors[i]
-	    && fwrite (buffer, 1, bytes_read, descriptors[i]) != bytes_read)
+	    && fwrite (buffer, bytes_read, 1, descriptors[i]) != 1)
 	  {
 	    error (0, errno, "%s", files[i]);
 	    descriptors[i] = NULL;

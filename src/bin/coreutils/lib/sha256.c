@@ -1,12 +1,12 @@
 /* sha256.c - Functions to compute SHA256 and SHA224 message digest of files or
    memory blocks according to the NIST specification FIPS-180-2.
 
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David Madore, considerably copypasting from
    Scott G. Miller's sha1.c
@@ -86,18 +85,25 @@ sha224_init_ctx (struct sha256_ctx *ctx)
   ctx->buflen = 0;
 }
 
-/* Put result from CTX in first 32 bytes following RESBUF.  The result
-   must be in little endian byte order.
+/* Copy the value from v into the memory location pointed to by *cp,
+   If your architecture allows unaligned access this is equivalent to
+   * (uint32_t *) cp = v  */
+static inline void
+set_uint32 (char *cp, uint32_t v)
+{
+  memcpy (cp, &v, sizeof v);
+}
 
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32-bit value.  */
+/* Put result from CTX in first 32 bytes following RESBUF.  The result
+   must be in little endian byte order.  */
 void *
 sha256_read_ctx (const struct sha256_ctx *ctx, void *resbuf)
 {
   int i;
+  char *r = resbuf;
 
   for (i = 0; i < 8; i++)
-    ((uint32_t *) resbuf)[i] = SWAP (ctx->state[i]);
+    set_uint32 (r + i * sizeof ctx->state[0], SWAP (ctx->state[i]));
 
   return resbuf;
 }
@@ -106,23 +112,21 @@ void *
 sha224_read_ctx (const struct sha256_ctx *ctx, void *resbuf)
 {
   int i;
+  char *r = resbuf;
 
   for (i = 0; i < 7; i++)
-    ((uint32_t *) resbuf)[i] = SWAP (ctx->state[i]);
+    set_uint32 (r + i * sizeof ctx->state[0], SWAP (ctx->state[i]));
 
   return resbuf;
 }
 
 /* Process the remaining bytes in the internal buffer and the usual
-   prolog according to the standard and write the result to RESBUF.
-
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32-bit value.  */
+   prolog according to the standard and write the result to RESBUF.  */
 static void
 sha256_conclude_ctx (struct sha256_ctx *ctx)
 {
   /* Take yet unprocessed bytes into account.  */
-  uint32_t bytes = ctx->buflen;
+  size_t bytes = ctx->buflen;
   size_t size = (bytes < 56) ? 64 / 4 : 64 * 2 / 4;
 
   /* Now count remaining bytes.  */
@@ -130,9 +134,13 @@ sha256_conclude_ctx (struct sha256_ctx *ctx)
   if (ctx->total[0] < bytes)
     ++ctx->total[1];
 
-  /* Put the 64-bit file length in *bits* at the end of the buffer.  */
-  ctx->buffer[size - 2] = SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29));
-  ctx->buffer[size - 1] = SWAP (ctx->total[0] << 3);
+  /* Put the 64-bit file length in *bits* at the end of the buffer.
+     Use set_uint32 rather than a simple assignment, to avoid risk of
+     unaligned access.  */
+  set_uint32 ((char *) &ctx->buffer[size - 2],
+	      SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29)));
+  set_uint32 ((char *) &ctx->buffer[size - 1],
+	      SWAP (ctx->total[0] << 3));
 
   memcpy (&((char *) ctx->buffer)[bytes], fillbuf, (size - 2) * 4 - bytes);
 

@@ -1,10 +1,13 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* getdelim.c --- Implementation of replacement getdelim function.
-   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006 Free
+   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006, 2007, 2008 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2, or (at
+   published by the Free Software Foundation; either version 3, or (at
    your option) any later version.
 
    This program is distributed in the hope that it will be useful, but
@@ -21,7 +24,7 @@
 
 #include <config.h>
 
-#include "getdelim.h"
+#include <stdio.h>
 
 #include <limits.h>
 #include <stdlib.h>
@@ -33,13 +36,18 @@
 #ifndef SSIZE_MAX
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif
-#if !HAVE_FLOCKFILE
+
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+# define getc_maybe_unlocked(fp)	getc(fp)
+#elif !HAVE_FLOCKFILE || !HAVE_FUNLOCKFILE || !HAVE_DECL_GETC_UNLOCKED
 # undef flockfile
-# define flockfile(x) ((void) 0)
-#endif
-#if !HAVE_FUNLOCKFILE
 # undef funlockfile
+# define flockfile(x) ((void) 0)
 # define funlockfile(x) ((void) 0)
+# define getc_maybe_unlocked(fp)	getc(fp)
+#else
+# define getc_maybe_unlocked(fp)	getc_unlocked(fp)
 #endif
 
 /* Read up to (and including) a DELIMITER from FP into *LINEPTR (and
@@ -64,20 +72,22 @@ getdelim (char **lineptr, size_t *n, int delimiter, FILE *fp)
 
   if (*lineptr == NULL || *n == 0)
     {
+      char *new_lineptr;
       *n = 120;
-      *lineptr = (char *) malloc (*n);
-      if (*lineptr == NULL)
+      new_lineptr = (char *) realloc (*lineptr, *n);
+      if (new_lineptr == NULL)
 	{
 	  result = -1;
 	  goto unlock_return;
 	}
+      *lineptr = new_lineptr;
     }
 
   for (;;)
     {
       int i;
 
-      i = getc (fp);
+      i = getc_maybe_unlocked (fp);
       if (i == EOF)
 	{
 	  result = -1;
@@ -97,6 +107,7 @@ getdelim (char **lineptr, size_t *n, int delimiter, FILE *fp)
 	  if (cur_len + 1 >= needed)
 	    {
 	      result = -1;
+	      errno = EOVERFLOW;
 	      goto unlock_return;
 	    }
 
@@ -121,6 +132,7 @@ getdelim (char **lineptr, size_t *n, int delimiter, FILE *fp)
   result = cur_len ? cur_len : result;
 
  unlock_return:
-  funlockfile (fp);
+  funlockfile (fp); /* doesn't set errno */
+
   return result;
 }

@@ -1,12 +1,12 @@
 /* xalloc.h -- malloc with out-of-memory checking
 
    Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2003, 2004, 2006, 2007 Free Software Foundation, Inc.
+   1999, 2000, 2003, 2004, 2006, 2007, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef XALLOC_H_
 # define XALLOC_H_
@@ -29,13 +28,21 @@ extern "C" {
 
 
 # ifndef __attribute__
-#  if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
+#  if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
 #   define __attribute__(x)
 #  endif
 # endif
 
 # ifndef ATTRIBUTE_NORETURN
 #  define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+# endif
+
+# ifndef ATTRIBUTE_MALLOC
+#  if __GNUC__ >= 3
+#   define ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
+#  else
+#   define ATTRIBUTE_MALLOC
+#  endif
 # endif
 
 /* This function is always triggered when memory is exhausted.
@@ -45,13 +52,13 @@ extern "C" {
    memory allocation failure.  */
 extern void xalloc_die (void) ATTRIBUTE_NORETURN;
 
-void *xmalloc (size_t s);
-void *xzalloc (size_t s);
-void *xcalloc (size_t n, size_t s);
+void *xmalloc (size_t s) ATTRIBUTE_MALLOC;
+void *xzalloc (size_t s) ATTRIBUTE_MALLOC;
+void *xcalloc (size_t n, size_t s) ATTRIBUTE_MALLOC;
 void *xrealloc (void *p, size_t s);
 void *x2realloc (void *p, size_t *pn);
-void *xmemdup (void const *p, size_t s);
-char *xstrdup (char const *str);
+void *xmemdup (void const *p, size_t s) ATTRIBUTE_MALLOC;
+char *xstrdup (char const *str) ATTRIBUTE_MALLOC;
 
 /* Return 1 if an array of N objects, each of size S, cannot exist due
    to size arithmetic overflow.  S must be positive and N must be
@@ -98,10 +105,10 @@ char *xstrdup (char const *str);
 # if HAVE_INLINE
 #  define static_inline static inline
 # else
-   void *xnmalloc (size_t n, size_t s);
+   void *xnmalloc (size_t n, size_t s) ATTRIBUTE_MALLOC;
    void *xnrealloc (void *p, size_t n, size_t s);
    void *x2nrealloc (void *p, size_t *pn, size_t s);
-   char *xcharalloc (size_t n);
+   char *xcharalloc (size_t n) ATTRIBUTE_MALLOC;
 # endif
 
 # ifdef static_inline
@@ -109,6 +116,7 @@ char *xstrdup (char const *str);
 /* Allocate an array of N objects, each with S bytes of memory,
    dynamically, with error checking.  S must be nonzero.  */
 
+static_inline void *xnmalloc (size_t n, size_t s) ATTRIBUTE_MALLOC;
 static_inline void *
 xnmalloc (size_t n, size_t s)
 {
@@ -220,6 +228,7 @@ x2nrealloc (void *p, size_t *pn, size_t s)
 /* Return a pointer to a new buffer of N bytes.  This is like xmalloc,
    except it returns char *.  */
 
+static_inline char *xcharalloc (size_t n) ATTRIBUTE_MALLOC;
 static_inline char *
 xcharalloc (size_t n)
 {

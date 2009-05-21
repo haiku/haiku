@@ -36,7 +36,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd
 	funzip fwcontrol
-	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname
+	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe 
+	hd head hey hostname
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
 	join
@@ -55,10 +56,10 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	safemode screen_blanker screenmode sed setdecor settype setversion setvolume
 	seq sha1sum shar shred shuf shutdown sleep sort spamdbm split stat strace
 	stty su sum sync sysinfo
-	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
-	traceroute translate trash true tsort tty
-	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
-	uptime urlwrapper useradd uudecode uuencode
+	tac tail tar tcpdump tcptester tee telnet telnetd test timeout top touch tput
+	tr traceroute translate trash true truncate tsort tty
+	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
+	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vim vmstat waitfor wc wget whoami xargs xres yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;

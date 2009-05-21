@@ -1,10 +1,10 @@
 /* tail -- output the last part of file(s)
-   Copyright (C) 1989, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 1989, 90, 91, 1995-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Can display any amount of data, unlike the Unix version, which uses
    a fixed size buffer and therefore can only deliver a limited number
@@ -36,12 +35,12 @@
 #include "c-strtod.h"
 #include "error.h"
 #include "fcntl--.h"
-#include "inttostr.h"
 #include "isapipe.h"
 #include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
 #include "stat-time.h"
+#include "xfreopen.h"
 #include "xnanosleep.h"
 #include "xstrtol.h"
 #include "xstrtod.h"
@@ -50,7 +49,10 @@
 #define PROGRAM_NAME "tail"
 
 #define AUTHORS \
-  "Paul Rubin", "David MacKenzie, Ian Lance Taylor", "Jim Meyering"
+  proper_name ("Paul Rubin"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Ian Lance Taylor"), \
+  proper_name ("Jim Meyering")
 
 /* Number of items to tail.  */
 #define DEFAULT_N_LINES 10
@@ -160,9 +162,6 @@ enum header_mode
 static uintmax_t max_n_unchanged_stats_between_opens =
   DEFAULT_MAX_N_UNCHANGED_STATS_BETWEEN_OPENS;
 
-/* The name this program was run with.  */
-char *program_name;
-
 /* The process ID of the process (presumably on the current host)
    that is writing to all followed files.  */
 static pid_t pid;
@@ -227,10 +226,6 @@ With no FILE, or when FILE is -, read standard input.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
      fputs (_("\
-      --retry              keep trying to open a file even if it is\n\
-                           inaccessible when tail starts or if it becomes\n\
-                           inaccessible later; useful when following by name,\n\
-                           i.e., with --follow=name\n\
   -c, --bytes=N            output the last N bytes; alternatively, use +N to\n\
                            output bytes starting with the Nth of each file\n\
 "), stdout);
@@ -256,8 +251,13 @@ Mandatory arguments to long options are mandatory for short options too.\n\
      fputs (_("\
       --pid=PID            with -f, terminate after process ID, PID dies\n\
   -q, --quiet, --silent    never output headers giving file names\n\
+      --retry              keep trying to open a file even when it is or\n\
+                             becomes inaccessible; useful when following by\n\
+                             name, i.e., with --follow=name\n\
+"), stdout);
+     fputs (_("\
   -s, --sleep-interval=S   with -f, sleep for approximately S seconds\n\
-                           (default 1.0) between iterations.\n\
+                             (default 1.0) between iterations\n\
   -v, --verbose            always output headers giving file names\n\
 "), stdout);
      fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -267,7 +267,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 If the first character of N (the number of bytes or lines) is a `+',\n\
 print beginning with the Nth item from the start of each file, otherwise,\n\
 print the last N items in the file.  N may have a multiplier suffix:\n\
-b 512, k 1024, m 1024*1024.\n\
+b 512, kB 1000, K 1024, MB 1000*1000, M 1024*1024,\n\
+GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.\n\
 \n\
 "), stdout);
      fputs (_("\
@@ -282,7 +283,7 @@ rotation).  Use --follow=name in that case.  That causes tail to track the\n\
 named file by reopening it periodically to see if it has been removed and\n\
 recreated by some other program.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -297,7 +298,7 @@ valid_file_spec (struct File_spec const *f)
 static char const *
 pretty_name (struct File_spec const *f)
 {
-  return (STREQ (f->name, "-") ? "standard input" : f->name);
+  return (STREQ (f->name, "-") ? _("standard input") : f->name);
 }
 
 static void
@@ -1273,7 +1274,7 @@ tail_file (struct File_spec *f, uintmax_t n_units)
       have_read_stdin = true;
       fd = STDIN_FILENO;
       if (O_BINARY && ! isatty (STDIN_FILENO))
-	freopen (NULL, "rb", stdin);
+	xfreopen (NULL, "rb", stdin);
     }
   else
     fd = open (f->name, O_RDONLY | O_BINARY);
@@ -1475,7 +1476,7 @@ parse_options (int argc, char **argv,
 
 	  {
 	    strtol_error s_err;
-	    s_err = xstrtoumax (optarg, NULL, 10, n_units, "bkm");
+	    s_err = xstrtoumax (optarg, NULL, 10, n_units, "bkKmMGTPEZY0");
 	    if (s_err != LONGINT_OK)
 	      {
 		error (EXIT_FAILURE, 0, "%s: %s", optarg,
@@ -1596,7 +1597,7 @@ main (int argc, char **argv)
   double sleep_interval = 1.0;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -1628,7 +1629,7 @@ main (int argc, char **argv)
     }
   else
     {
-      static char *dummy_stdin = "-";
+      static char *dummy_stdin = (char *) "-";
       n_files = 1;
       file = &dummy_stdin;
 
@@ -1683,7 +1684,7 @@ main (int argc, char **argv)
     print_headers = true;
 
   if (O_BINARY && ! isatty (STDOUT_FILENO))
-    freopen (NULL, "wb", stdout);
+    xfreopen (NULL, "wb", stdout);
 
   for (i = 0; i < n_files; i++)
     ok &= tail_file (&F[i], n_units);

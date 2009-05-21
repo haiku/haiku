@@ -1,12 +1,12 @@
 /* Close standard output and standard error, exiting with a diagnostic on error.
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006 Free
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006, 2008 Free
    Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,14 +14,14 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 #include "closeout.h"
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -41,6 +41,43 @@ void
 close_stdout_set_file_name (const char *file)
 {
   file_name = file;
+}
+
+static bool ignore_EPIPE /* = false */;
+
+/* Specify the reaction to an EPIPE error during the closing of stdout:
+     - If ignore = true, it shall be ignored.
+     - If ignore = false, it shall evoke a diagnostic, along with a nonzero
+       exit status.
+   The default is ignore = false.
+
+   This setting matters only if the SIGPIPE signal is ignored (i.e. its
+   handler set to SIG_IGN) or blocked.  Only particular programs need to
+   temporarily ignore SIGPIPE.  If SIGPIPE is ignored or blocked because
+   it was ignored or blocked in the parent process when it created the
+   child process, it usually is a bug in the parent process: It is bad
+   practice to have SIGPIPE ignored or blocked while creating a child
+   process.
+
+   EPIPE occurs when writing to a pipe or socket that has no readers now,
+   when SIGPIPE is ignored or blocked.
+
+   The ignore = false setting is suitable for a scenario where it is normally
+   guaranteed that the pipe writer terminates before the pipe reader.  In
+   this case, an EPIPE is an indication of a premature termination of the
+   pipe reader and should lead to a diagnostic and a nonzero exit status.
+
+   The ignore = true setting is suitable for a scenario where you don't know
+   ahead of time whether the pipe writer or the pipe reader will terminate
+   first.  In this case, an EPIPE is an indication that the pipe writer can
+   stop doing useless write() calls; this is what close_stdout does anyway.
+   EPIPE is part of the normal pipe/socket shutdown protocol in this case,
+   and should not lead to a diagnostic message.  */
+
+void
+close_stdout_set_ignore_EPIPE (bool ignore)
+{
+  ignore_EPIPE = ignore;
 }
 
 /* Close standard output.  On error, issue a diagnostic and _exit
@@ -69,7 +106,8 @@ close_stdout_set_file_name (const char *file)
 void
 close_stdout (void)
 {
-  if (close_stream (stdout) != 0)
+  if (close_stream (stdout) != 0
+      && !(ignore_EPIPE && errno == EPIPE))
     {
       char const *write_error = _("write error");
       if (file_name)

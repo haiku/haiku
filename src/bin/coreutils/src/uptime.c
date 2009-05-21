@@ -1,10 +1,10 @@
 /* GNU's uptime.
-   Copyright (C) 1992-2002, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1992-2002, 2004-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Created by hacking who.c by Kaveh Ghazi ghazi@caip.rutgers.edu.  */
 
@@ -37,16 +36,15 @@
 #include "long-options.h"
 #include "quote.h"
 #include "readutmp.h"
+#include "fprintftime.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "uptime"
 
-#define AUTHORS "Joseph Arceneaux", "David MacKenzie", "Kaveh Ghazi"
-
-int getloadavg ();
-
-/* The name this program was run with. */
-char *program_name;
+#define AUTHORS \
+  proper_name ("Joseph Arceneaux"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Kaveh Ghazi")
 
 static void
 print_uptime (size_t n, const STRUCT_UTMP *this)
@@ -127,22 +125,24 @@ print_uptime (size_t n, const STRUCT_UTMP *this)
   uphours = (uptime - (updays * 86400)) / 3600;
   upmins = (uptime - (updays * 86400) - (uphours * 3600)) / 60;
   tmn = localtime (&time_now);
+  /* procps' version of uptime also prints the seconds field, but
+     previous versions of coreutils don't. */
   if (tmn)
-    printf (_(" %2d:%02d%s  up "),
-	    ((tmn->tm_hour % 12) == 0 ? 12 : tmn->tm_hour % 12),
-	    /* FIXME: use strftime, not am, pm.  Uli reports that
-	       the german translation is meaningless.  */
-	    tmn->tm_min, (tmn->tm_hour < 12 ? _("am") : _("pm")));
+    /* TRANSLATORS: This prints the current clock time. */
+    fprintftime (stdout, _(" %H:%M%P  "), tmn, 0, 0);
   else
-    printf (_(" ??:????  up "));
+    printf (_(" ??:????  "));
   if (uptime == (time_t) -1)
-    printf (_("???? days ??:??,  "));
+    printf (_("up ???? days ??:??,  "));
   else
     {
       if (0 < updays)
-	printf (ngettext ("%ld day", "%ld days", select_plural (updays)),
-		updays);
-      printf (" %2d:%02d,  ", uphours, upmins);
+	printf (ngettext ("up %ld day %2d:%02d,  ",
+			  "up %ld days %2d:%02d,  ",
+			  select_plural (updays)),
+		updays, uphours, upmins);
+      else
+	printf ("up  %2d:%02d,  ", uphours, upmins);
     }
   printf (ngettext ("%lu user", "%lu users", entries),
 	  (unsigned long int) entries);
@@ -194,18 +194,29 @@ usage (int status)
 	     program_name);
   else
     {
-      printf (_("Usage: %s [OPTION]... [ FILE ]\n"), program_name);
+      printf (_("Usage: %s [OPTION]... [FILE]\n"), program_name);
       printf (_("\
 Print the current time, the length of time the system has been up,\n\
 the number of users on the system, and the average number of jobs\n\
-in the run queue over the last 1, 5 and 15 minutes.\n\
+in the run queue over the last 1, 5 and 15 minutes."));
+#ifdef __linux__
+      /* It would be better to introduce a configure test for this,
+	 but such a test is hard to write.  For the moment then, we
+	 have a hack which depends on the preprocessor used at compile
+	 time to tell us what the running kernel is.  Ugh.  */
+      printf(_("  \
+Processes in\n\
+an uninterruptible sleep state also contribute to the load average.\n"));
+#else
+      printf(_("\n"));
+#endif
+      printf (_("\
 If FILE is not specified, use %s.  %s as FILE is common.\n\
-\n\
-"),
+\n"),
 	      UTMP_FILE, WTMP_FILE);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -214,14 +225,14 @@ int
 main (int argc, char **argv)
 {
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, Version,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "", NULL, NULL) != -1)
     usage (EXIT_FAILURE);

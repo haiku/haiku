@@ -1,10 +1,10 @@
 /* factor -- print prime factors of n.
-   Copyright (C) 86, 1995-2005 Free Software Foundation, Inc.
+   Copyright (C) 86, 1995-2005, 2007-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,24 +12,27 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Rubin <phr@ocf.berkeley.edu>.
-   Adapted for GNU, fixed to factor UINT_MAX by Jim Meyering.  */
+   Adapted for GNU, fixed to factor UINT_MAX by Jim Meyering.
+   Arbitrary-precision code adapted by James Youngman from Torbjörn
+   Granlund's factorize.c, from GNU MP version 4.2.2.
+*/
 
 #include <config.h>
 #include <getopt.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <sys/types.h>
+#if HAVE_GMP
+#include <gmp.h>
+#endif
 
 #include <assert.h>
-#define NDEBUG 1
 
 #include "system.h"
 #include "error.h"
-#include "inttostr.h"
-#include "long-options.h"
 #include "quote.h"
 #include "readtokens.h"
 #include "xstrtol.h"
@@ -37,10 +40,231 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "factor"
 
-#define AUTHORS "Paul Rubin"
+#define AUTHORS proper_name ("Paul Rubin")
 
 /* Token delimiters when reading from a file.  */
 #define DELIM "\n\t "
+
+static bool verbose = false;
+
+#if HAVE_GMP
+static mpz_t *factor = NULL;
+static size_t nfactors_found = 0;
+static size_t nfactors_allocated = 0;
+
+static void
+debug (char const *fmt, ...)
+{
+  if (verbose)
+    {
+      va_list ap;
+      va_start (ap, fmt);
+      vfprintf (stderr, fmt, ap);
+    }
+}
+
+static void
+emit_factor (mpz_t n)
+{
+  if (nfactors_found == nfactors_allocated)
+    factor = x2nrealloc (factor, &nfactors_allocated, sizeof *factor);
+  mpz_init (factor[nfactors_found]);
+  mpz_set (factor[nfactors_found], n);
+  ++nfactors_found;
+}
+
+static void
+emit_ul_factor (unsigned long int i)
+{
+  mpz_t t;
+  mpz_init (t);
+  mpz_set_ui (t, i);
+  emit_factor (t);
+  mpz_clear (t);
+}
+
+static void
+factor_using_division (mpz_t t, unsigned int limit)
+{
+  mpz_t q, r;
+  unsigned long int f;
+  int ai;
+  static unsigned int const add[] = {4, 2, 4, 2, 4, 6, 2, 6};
+  unsigned int const *addv = add;
+  unsigned int failures;
+
+  debug ("[trial division (%u)] ", limit);
+
+  mpz_init (q);
+  mpz_init (r);
+
+  f = mpz_scan1 (t, 0);
+  mpz_div_2exp (t, t, f);
+  while (f)
+    {
+      emit_ul_factor (2);
+      --f;
+    }
+
+  for (;;)
+    {
+      mpz_tdiv_qr_ui (q, r, t, 3);
+      if (mpz_cmp_ui (r, 0) != 0)
+	break;
+      mpz_set (t, q);
+      emit_ul_factor (3);
+    }
+
+  for (;;)
+    {
+      mpz_tdiv_qr_ui (q, r, t, 5);
+      if (mpz_cmp_ui (r, 0) != 0)
+	break;
+      mpz_set (t, q);
+      emit_ul_factor (5);
+    }
+
+  failures = 0;
+  f = 7;
+  ai = 0;
+  while (mpz_cmp_ui (t, 1) != 0)
+    {
+      mpz_tdiv_qr_ui (q, r, t, f);
+      if (mpz_cmp_ui (r, 0) != 0)
+	{
+	  f += addv[ai];
+	  if (mpz_cmp_ui (q, f) < 0)
+	    break;
+	  ai = (ai + 1) & 7;
+	  failures++;
+	  if (failures > limit)
+	    break;
+	}
+      else
+	{
+	  mpz_swap (t, q);
+	  emit_ul_factor (f);
+	  failures = 0;
+	}
+    }
+
+  mpz_clear (q);
+  mpz_clear (r);
+}
+
+static void
+factor_using_pollard_rho (mpz_t n, int a_int)
+{
+  mpz_t x, x1, y, P;
+  mpz_t a;
+  mpz_t g;
+  mpz_t t1, t2;
+  int k, l, c, i;
+
+  debug ("[pollard-rho (%d)] ", a_int);
+
+  mpz_init (g);
+  mpz_init (t1);
+  mpz_init (t2);
+
+  mpz_init_set_si (a, a_int);
+  mpz_init_set_si (y, 2);
+  mpz_init_set_si (x, 2);
+  mpz_init_set_si (x1, 2);
+  k = 1;
+  l = 1;
+  mpz_init_set_ui (P, 1);
+  c = 0;
+
+  while (mpz_cmp_ui (n, 1) != 0)
+    {
+S2:
+      mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
+
+      mpz_sub (t1, x1, x); mpz_mul (t2, P, t1); mpz_mod (P, t2, n);
+      c++;
+      if (c == 20)
+	{
+	  c = 0;
+	  mpz_gcd (g, P, n);
+	  if (mpz_cmp_ui (g, 1) != 0)
+	    goto S4;
+	  mpz_set (y, x);
+	}
+
+      k--;
+      if (k > 0)
+	goto S2;
+
+      mpz_gcd (g, P, n);
+      if (mpz_cmp_ui (g, 1) != 0)
+	goto S4;
+
+      mpz_set (x1, x);
+      k = l;
+      l = 2 * l;
+      for (i = 0; i < k; i++)
+	{
+	  mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
+	}
+      mpz_set (y, x);
+      c = 0;
+      goto S2;
+S4:
+      do
+	{
+	  mpz_mul (y, y, y); mpz_add (y, y, a); mpz_mod (y, y, n);
+	  mpz_sub (t1, x1, y); mpz_gcd (g, t1, n);
+	}
+      while (mpz_cmp_ui (g, 1) == 0);
+
+      mpz_div (n, n, g);	/* divide by g, before g is overwritten */
+
+      if (!mpz_probab_prime_p (g, 3))
+	{
+	  do
+	    {
+	      mp_limb_t a_limb;
+	      mpn_random (&a_limb, (mp_size_t) 1);
+	      a_int = (int) a_limb;
+	    }
+	  while (a_int == -2 || a_int == 0);
+
+	  debug ("[composite factor--restarting pollard-rho] ");
+	  factor_using_pollard_rho (g, a_int);
+	}
+      else
+	{
+	  emit_factor (g);
+	}
+      mpz_mod (x, x, n);
+      mpz_mod (x1, x1, n);
+      mpz_mod (y, y, n);
+      if (mpz_probab_prime_p (n, 3))
+	{
+	  emit_factor (n);
+	  break;
+	}
+    }
+
+  mpz_clear (g);
+  mpz_clear (P);
+  mpz_clear (t2);
+  mpz_clear (t1);
+  mpz_clear (a);
+  mpz_clear (x1);
+  mpz_clear (x);
+  mpz_clear (y);
+}
+
+#else
+
+static void
+debug (char const *fmt ATTRIBUTE_UNUSED, ...)
+{
+}
+
+#endif
 
 /* The maximum number of factors, including -1, for negative numbers.  */
 #define MAX_N_FACTORS (sizeof (uintmax_t) * CHAR_BIT)
@@ -60,42 +284,10 @@ static const unsigned char wheel_tab[] =
 #define WHEEL_START (wheel_tab + WHEEL_SIZE)
 #define WHEEL_END (wheel_tab + (sizeof wheel_tab / sizeof wheel_tab[0]))
 
-/* The name this program was run with. */
-char *program_name;
-
-void
-usage (int status)
-{
-  if (status != EXIT_SUCCESS)
-    fprintf (stderr, _("Try `%s --help' for more information.\n"),
-	     program_name);
-  else
-    {
-      printf (_("\
-Usage: %s [NUMBER]...\n\
-  or:  %s OPTION\n\
-"),
-	      program_name, program_name);
-      fputs (_("\
-Print the prime factors of each NUMBER.\n\
-\n\
-"), stdout);
-      fputs (HELP_OPTION_DESCRIPTION, stdout);
-      fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      fputs (_("\
-\n\
-Print the prime factors of all specified integer NUMBERs.  If no arguments\n\
-are specified on the command line, they are read from standard input.\n\
-"), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
-    }
-  exit (status);
-}
-
 /* FIXME: comment */
 
 static size_t
-factor (uintmax_t n0, size_t max_n_factors, uintmax_t *factors)
+factor_wheel (uintmax_t n0, size_t max_n_factors, uintmax_t *factors)
 {
   uintmax_t n = n0, d, q;
   size_t n_factors = 0;
@@ -138,32 +330,181 @@ factor (uintmax_t n0, size_t max_n_factors, uintmax_t *factors)
   return n_factors;
 }
 
-/* FIXME: comment */
-
-static bool
-print_factors (const char *s)
+/* Single-precision factoring */
+static void
+print_factors_single (uintmax_t n)
 {
   uintmax_t factors[MAX_N_FACTORS];
-  uintmax_t n;
-  size_t n_factors;
+  size_t n_factors = factor_wheel (n, MAX_N_FACTORS, factors);
   size_t i;
   char buf[INT_BUFSIZE_BOUND (uintmax_t)];
-  strtol_error err;
 
-  if ((err = xstrtoumax (s, NULL, 10, &n, "")) != LONGINT_OK)
-    {
-      if (err == LONGINT_OVERFLOW)
-	error (0, 0, _("%s is too large"), quote (s));
-      else
-	error (0, 0, _("%s is not a valid positive integer"), quote (s));
-      return false;
-    }
-  n_factors = factor (n, MAX_N_FACTORS, factors);
   printf ("%s:", umaxtostr (n, buf));
   for (i = 0; i < n_factors; i++)
     printf (" %s", umaxtostr (factors[i], buf));
   putchar ('\n');
-  return true;
+}
+
+#if HAVE_GMP
+static int
+mpcompare (const void *av, const void *bv)
+{
+  mpz_t *const *a = av;
+  mpz_t *const *b = bv;
+  return mpz_cmp (**a, **b);
+}
+
+static void
+sort_and_print_factors (void)
+{
+  mpz_t **faclist;
+  size_t i;
+
+  faclist = xcalloc (nfactors_found, sizeof *faclist);
+  for (i = 0; i < nfactors_found; ++i)
+    {
+      faclist[i] = &factor[i];
+    }
+  qsort (faclist, nfactors_found, sizeof *faclist, mpcompare);
+
+  for (i = 0; i < nfactors_found; ++i)
+    {
+      fputc (' ', stdout);
+      mpz_out_str (stdout, 10, *faclist[i]);
+    }
+  putchar ('\n');
+  free (faclist);
+}
+
+static void
+free_factors (void)
+{
+  size_t i;
+
+  for (i = 0; i < nfactors_found; ++i)
+    {
+      mpz_clear (factor[i]);
+    }
+  /* Don't actually free factor[] because in the case where we are
+     reading numbers from stdin, we may be about to use it again.  */
+  nfactors_found = 0;
+}
+
+/* Arbitrary-precision factoring */
+static void
+print_factors_multi (mpz_t t)
+{
+  mpz_out_str (stdout, 10, t);
+  putchar (':');
+
+  if (mpz_sgn (t) != 0)
+    {
+      /* Set the trial division limit according to the size of t.  */
+      size_t n_bits = mpz_sizeinbase (t, 2);
+      unsigned int division_limit = MIN (n_bits, 1000);
+      division_limit *= division_limit;
+
+      factor_using_division (t, division_limit);
+
+      if (mpz_cmp_ui (t, 1) != 0)
+	{
+	  debug ("[is number prime?] ");
+	  if (mpz_probab_prime_p (t, 3))
+	    emit_factor (t);
+	  else
+	    factor_using_pollard_rho (t, 1);
+	}
+    }
+
+  mpz_clear (t);
+  sort_and_print_factors ();
+  free_factors ();
+}
+#endif
+
+
+/* Emit the factors of the indicated number.  If we have the option of using
+   either algorithm, we select on the basis of the length of the number.
+   For longer numbers, we prefer the MP algorithm even if the native algorithm
+   has enough digits, because the algorithm is better.  The turnover point
+   depends on the value.  */
+static bool
+print_factors (char const *s)
+{
+  uintmax_t n;
+  strtol_error err = xstrtoumax (s, NULL, 10, &n, "");
+
+#if HAVE_GMP
+  enum { GMP_TURNOVER_POINT = 100000 };
+
+  if (err == LONGINT_OVERFLOW
+      || (err == LONGINT_OK && GMP_TURNOVER_POINT <= n))
+    {
+      mpz_t t;
+      mpz_init (t);
+      if (gmp_sscanf (s, "%Zd", t) == 1)
+	{
+	  debug ("[%s]", _("using arbitrary-precision arithmetic"));
+	  print_factors_multi (t);
+	  return true;
+	}
+      err = LONGINT_INVALID;
+    }
+#endif
+
+  switch (err)
+    {
+    case LONGINT_OK:
+      debug ("[%s]", _("using single-precision arithmetic"));
+      print_factors_single (n);
+      return true;
+
+    case LONGINT_OVERFLOW:
+      error (0, 0, _("%s is too large"), quote (s));
+      return false;
+
+    default:
+      error (0, 0, _("%s is not a valid positive integer"), quote (s));
+      return false;
+    }
+}
+
+enum
+{
+  VERBOSE_OPTION = CHAR_MAX + 1
+};
+
+static struct option const long_options[] =
+{
+  {"verbose", no_argument, NULL, VERBOSE_OPTION},
+  {GETOPT_HELP_OPTION_DECL},
+  {GETOPT_VERSION_OPTION_DECL},
+  {NULL, 0, NULL, 0}
+};
+
+void
+usage (int status)
+{
+  if (status != EXIT_SUCCESS)
+    fprintf (stderr, _("Try `%s --help' for more information.\n"),
+	     program_name);
+  else
+    {
+      printf (_("\
+Usage: %s [NUMBER]...\n\
+  or:  %s OPTION\n\
+"),
+	      program_name, program_name);
+      fputs (_("\
+Print the prime factors of each specified integer NUMBER.  If none\n\
+are specified on the command line, read them from standard input.\n\
+\n\
+"), stdout);
+      fputs (HELP_OPTION_DESCRIPTION, stdout);
+      fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      emit_bug_reporting_address ();
+    }
+  exit (status);
 }
 
 static bool
@@ -191,19 +532,32 @@ int
 main (int argc, char **argv)
 {
   bool ok;
+  int c;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      usage, AUTHORS, (char const *) NULL);
-  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
-    usage (EXIT_FAILURE);
+  while ((c = getopt_long (argc, argv, "", long_options, NULL)) != -1)
+    {
+      switch (c)
+	{
+	case VERBOSE_OPTION:
+	  verbose = true;
+	  break;
+
+	case_GETOPT_HELP_CHAR;
+
+	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+
+	default:
+	  usage (EXIT_FAILURE);
+	}
+    }
 
   if (argc <= optind)
     ok = do_stdin ();
@@ -215,6 +569,8 @@ main (int argc, char **argv)
 	if (! print_factors (argv[i]))
 	  ok = false;
     }
-
+#if HAVE_GMP
+  free (factor);
+#endif
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

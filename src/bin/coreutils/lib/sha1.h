@@ -1,10 +1,14 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Declarations of functions and data types used for SHA1 sum
    library functions.
-   Copyright (C) 2000, 2001, 2003, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2003, 2005, 2006, 2008
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
+   Free Software Foundation; either version 3, or (at your option) any
    later version.
 
    This program is distributed in the hope that it will be useful,
@@ -21,6 +25,8 @@
 
 # include <stdio.h>
 # include <stdint.h>
+
+#define SHA1_DIGEST_SIZE 20
 
 /* Structure to save state of computation between the single steps.  */
 struct sha1_ctx
@@ -57,19 +63,13 @@ extern void sha1_process_bytes (const void *buffer, size_t len,
 /* Process the remaining bytes in the buffer and put result from CTX
    in first 20 bytes following RESBUF.  The result is always in little
    endian byte order, so that a byte-wise output yields to the wanted
-   ASCII representation of the message digest.
-
-   IMPORTANT: On some systems it is required that RESBUF be correctly
-   aligned for a 32 bits value.  */
+   ASCII representation of the message digest.  */
 extern void *sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf);
 
 
 /* Put result from CTX in first 20 bytes following RESBUF.  The result is
    always in little endian byte order, so that a byte-wise output yields
-   to the wanted ASCII representation of the message digest.
-
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32 bits value.  */
+   to the wanted ASCII representation of the message digest.  */
 extern void *sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf);
 
 

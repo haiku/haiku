@@ -1,10 +1,10 @@
 /* env - run a program in a modified environment
-   Copyright (C) 1986, 1991-2005, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1986, 1991-2005, 2007-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Richard Mlynarik and David MacKenzie */
 
@@ -79,7 +78,6 @@
 
 #include <config.h>
 #include <stdio.h>
-#include <getopt.h>
 #include <sys/types.h>
 #include <getopt.h>
 
@@ -89,14 +87,11 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "env"
 
-#define AUTHORS "Richard Mlynarik", "David MacKenzie"
-
-int putenv ();
+#define AUTHORS \
+  proper_name ("Richard Mlynarik"), \
+  proper_name ("David MacKenzie")
 
 extern char **environ;
-
-/* The name by which this program was run. */
-char *program_name;
 
 static struct option const longopts[] =
 {
@@ -130,7 +125,7 @@ Set each NAME to VALUE in the environment and run COMMAND.\n\
 \n\
 A mere - implies -i.  If no COMMAND, print the resulting environment.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -142,12 +137,12 @@ main (int argc, char **argv)
   bool ignore_environment = false;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  initialize_exit_failure (EXIT_FAIL);
+  initialize_exit_failure (EXIT_FAILURE);
   atexit (close_stdout);
 
   while ((optc = getopt_long (argc, argv, "+iu:", longopts, NULL)) != -1)
@@ -162,7 +157,7 @@ main (int argc, char **argv)
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	default:
-	  usage (EXIT_FAIL);
+	  usage (EXIT_FAILURE);
 	}
     }
 

@@ -1,10 +1,10 @@
 /* sort - sort lines of text (with all kinds of options).
-   Copyright (C) 1988, 1991-2007 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    Written December 1988 by Mike Haertel.
    The author may be reached (Email) at the address mike@gnu.ai.mit.edu,
@@ -30,14 +29,15 @@
 #include "system.h"
 #include "argmatch.h"
 #include "error.h"
-#include "hard-locale.h"
+#include "filevercmp.h"
 #include "hash.h"
-#include "inttostr.h"
 #include "md5.h"
 #include "physmem.h"
 #include "posixver.h"
 #include "quote.h"
+#include "quotearg.h"
 #include "randread.h"
+#include "readtokens0.h"
 #include "stdio--.h"
 #include "stdlib--.h"
 #include "strnumcmp.h"
@@ -56,7 +56,9 @@ struct rlimit { size_t rlim_cur; };
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "sort"
 
-#define AUTHORS "Mike Haertel", "Paul Eggert"
+#define AUTHORS \
+  proper_name ("Mike Haertel"), \
+  proper_name ("Paul Eggert")
 
 #if HAVE_LANGINFO_CODESET
 # include <langinfo.h>
@@ -74,8 +76,11 @@ struct rlimit { size_t rlim_cur; };
 # endif
 #endif
 
-#ifndef STDC_HEADERS
-double strtod ();
+#if !defined OPEN_MAX && defined NR_OPEN
+# define OPEN_MAX NR_OPEN
+#endif
+#if !defined OPEN_MAX
+# define OPEN_MAX 20
 #endif
 
 #define UCHAR_LIM (UCHAR_MAX + 1)
@@ -173,6 +178,7 @@ struct keyfield
 				   Handle numbers in exponential notation. */
   bool month;			/* Flag for comparison by month name. */
   bool reverse;			/* Reverse the sense of comparison. */
+  bool version;			/* sort by version number */
   struct keyfield *next;	/* Next keyfield to try. */
 };
 
@@ -181,9 +187,6 @@ struct month
   char const *name;
   int val;
 };
-
-/* The name this program was run with. */
-char *program_name;
 
 /* FIXME: None of these tables work with multibyte character sets.
    Also, there are many other bugs when handling multibyte characters.
@@ -224,13 +227,13 @@ static struct month monthtab[] =
 };
 
 /* During the merge phase, the number of files to merge at once. */
-#define NMERGE 16
+#define NMERGE_DEFAULT 16
 
 /* Minimum size for a merge or check buffer.  */
 #define MIN_MERGE_BUFFER_SIZE (2 + sizeof (struct line))
 
 /* Minimum sort size; the code might not work with smaller sizes.  */
-#define MIN_SORT_SIZE (NMERGE * MIN_MERGE_BUFFER_SIZE)
+#define MIN_SORT_SIZE (nmerge * MIN_MERGE_BUFFER_SIZE)
 
 /* The number of bytes needed for a merge or check buffer, which can
    function relatively efficiently even if it holds only one line.  If
@@ -282,6 +285,10 @@ static struct keyfield *keylist;
 /* Program used to (de)compress temp files.  Must accept -d.  */
 static char const *compress_program;
 
+/* Maximum number of files to merge in one go.  If more than this
+   number are present, temp files will be used. */
+static unsigned int nmerge = NMERGE_DEFAULT;
+
 static void sortlines_temp (struct line *, size_t, struct line *);
 
 /* Report MESSAGE for FILE, then clean up and exit.
@@ -305,8 +312,9 @@ usage (int status)
     {
       printf (_("\
 Usage: %s [OPTION]... [FILE]...\n\
+  or:  %s [OPTION]... --files0-from=F\n\
 "),
-	      program_name);
+	      program_name, program_name);
       fputs (_("\
 Write sorted concatenation of all FILE(s) to standard output.\n\
 \n\
@@ -327,20 +335,40 @@ Ordering options:\n\
   -g, --general-numeric-sort  compare according to general numerical value\n\
   -i, --ignore-nonprinting    consider only printable characters\n\
   -M, --month-sort            compare (unknown) < `JAN' < ... < `DEC'\n\
+"), stdout);
+      fputs (_("\
   -n, --numeric-sort          compare according to string numerical value\n\
   -R, --random-sort           sort by random hash of keys\n\
-      --random-source=FILE    get random bytes from FILE (default /dev/urandom)\n\
+      --random-source=FILE    get random bytes from FILE\n\
   -r, --reverse               reverse the result of comparisons\n\
+"), stdout);
+      fputs (_("\
+      --sort=WORD             sort according to WORD:\n\
+                                general-numeric -g, month -M, numeric -n,\n\
+                                random -R, version -V\n\
+  -V, --version-sort          natural sort of (version) numbers within text\n\
 \n\
 "), stdout);
       fputs (_("\
 Other options:\n\
 \n\
+"), stdout);
+      fputs (_("\
+      --batch-size=NMERGE   merge at most NMERGE inputs at once;\n\
+                            for more use temp files\n\
+"), stdout);
+      fputs (_("\
   -c, --check, --check=diagnose-first  check for sorted input; do not sort\n\
   -C, --check=quiet, --check=silent  like -c, but do not report first bad line\n\
       --compress-program=PROG  compress temporaries with PROG;\n\
                               decompress them with PROG -d\n\
-  -k, --key=POS1[,POS2]     start a key at POS1, end it at POS2 (origin 1)\n\
+      --files0-from=F       read input from the files specified by\n\
+                            NUL-terminated names in file F;\n\
+                            If F is - then read names from standard input\n\
+"), stdout);
+      fputs (_("\
+  -k, --key=POS1[,POS2]     start a key at POS1 (origin 1), end it at POS2\n\
+                            (default end of line)\n\
   -m, --merge               merge already sorted files; do not sort\n\
 "), stdout);
       fputs (_("\
@@ -380,7 +408,7 @@ The locale specified by the environment affects sort order.\n\
 Set LC_ALL=C to get the traditional sort order that uses\n\
 native byte values.\n\
 "), stdout );
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
 
   exit (status);
@@ -392,10 +420,13 @@ enum
 {
   CHECK_OPTION = CHAR_MAX + 1,
   COMPRESS_PROGRAM_OPTION,
-  RANDOM_SOURCE_OPTION
+  FILES0_FROM_OPTION,
+  NMERGE_OPTION,
+  RANDOM_SOURCE_OPTION,
+  SORT_OPTION
 };
 
-static char const short_options[] = "-bcCdfgik:mMno:rRsS:t:T:uy:z";
+static char const short_options[] = "-bcCdfgik:mMno:rRsS:t:T:uVy:z";
 
 static struct option const long_options[] =
 {
@@ -404,17 +435,21 @@ static struct option const long_options[] =
   {"compress-program", required_argument, NULL, COMPRESS_PROGRAM_OPTION},
   {"dictionary-order", no_argument, NULL, 'd'},
   {"ignore-case", no_argument, NULL, 'f'},
+  {"files0-from", required_argument, NULL, FILES0_FROM_OPTION},
   {"general-numeric-sort", no_argument, NULL, 'g'},
   {"ignore-nonprinting", no_argument, NULL, 'i'},
   {"key", required_argument, NULL, 'k'},
   {"merge", no_argument, NULL, 'm'},
   {"month-sort", no_argument, NULL, 'M'},
   {"numeric-sort", no_argument, NULL, 'n'},
+  {"version-sort", no_argument, NULL, 'V'},
   {"random-sort", no_argument, NULL, 'R'},
   {"random-source", required_argument, NULL, RANDOM_SOURCE_OPTION},
+  {"sort", required_argument, NULL, SORT_OPTION},
   {"output", required_argument, NULL, 'o'},
   {"reverse", no_argument, NULL, 'r'},
   {"stable", no_argument, NULL, 's'},
+  {"batch-size", required_argument, NULL, NMERGE_OPTION},
   {"buffer-size", required_argument, NULL, 'S'},
   {"field-separator", required_argument, NULL, 't'},
   {"temporary-directory", required_argument, NULL, 'T'},
@@ -425,15 +460,43 @@ static struct option const long_options[] =
   {NULL, 0, NULL, 0},
 };
 
+#define CHECK_TABLE \
+  _ct_("quiet",          'C') \
+  _ct_("silent",         'C') \
+  _ct_("diagnose-first", 'c')
+
 static char const *const check_args[] =
 {
-  "quiet", "silent", "diagnose-first", NULL
+#define _ct_(_s, _c) _s,
+  CHECK_TABLE NULL
+#undef  _ct_
 };
 static char const check_types[] =
 {
-  'C', 'C', 'c'
+#define _ct_(_s, _c) _c,
+  CHECK_TABLE
+#undef  _ct_
 };
-ARGMATCH_VERIFY (check_args, check_types);
+
+#define SORT_TABLE \
+  _st_("general-numeric", 'g') \
+  _st_("month",           'M') \
+  _st_("numeric",         'n') \
+  _st_("random",          'R') \
+  _st_("version",         'V')
+
+static char const *const sort_args[] =
+{
+#define _st_(_s, _c) _s,
+  SORT_TABLE NULL
+#undef  _st_
+};
+static char const sort_types[] =
+{
+#define _st_(_s, _c) _c,
+  SORT_TABLE
+#undef  _st_
+};
 
 /* The set of signals that are caught.  */
 static sigset_t caught_signals;
@@ -669,10 +732,13 @@ exit_cleanup (void)
 }
 
 /* Create a new temporary file, returning its newly allocated tempnode.
-   Store into *PFD the file descriptor open for writing.  */
+   Store into *PFD the file descriptor open for writing.
+   If the creation fails, return NULL and store -1 into *PFD if the
+   failure is due to file descriptor exhaustion and
+   SURVIVE_FD_EXHAUSTION; otherwise, die.  */
 
 static struct tempnode *
-create_temp_file (int *pfd)
+create_temp_file (int *pfd, bool survive_fd_exhaustion)
 {
   static char const slashbase[] = "/sortXXXXXX";
   static size_t temp_dir_index;
@@ -705,7 +771,13 @@ create_temp_file (int *pfd)
   errno = saved_errno;
 
   if (fd < 0)
-    die (_("cannot create temporary file"), file);
+    {
+      if (! (survive_fd_exhaustion && errno == EMFILE))
+	error (SORT_FAILURE, errno, _("cannot create temporary file in %s"),
+	       quote (temp_dir));
+      free (node);
+      node = NULL;
+    }
 
   *pfd = fd;
   return node;
@@ -715,27 +787,30 @@ create_temp_file (int *pfd)
    standard output; HOW should be "w".  When opening for input, "-"
    means standard input.  To avoid confusion, do not return file
    descriptors STDIN_FILENO, STDOUT_FILENO, or STDERR_FILENO when
-   opening an ordinary FILE.  */
+   opening an ordinary FILE.  Return NULL if unsuccessful.  */
+
+static FILE *
+stream_open (const char *file, const char *how)
+{
+  if (!file)
+    return stdout;
+  if (STREQ (file, "-") && *how == 'r')
+    {
+      have_read_stdin = true;
+      return stdin;
+    }
+  return fopen (file, how);
+}
+
+/* Same as stream_open, except always return a non-null value; die on
+   failure.  */
 
 static FILE *
 xfopen (const char *file, const char *how)
-{
-  FILE *fp;
-
-  if (!file)
-    fp = stdout;
-  else if (STREQ (file, "-") && *how == 'r')
-    {
-      have_read_stdin = true;
-      fp = stdin;
-    }
-  else
-    {
-      fp = fopen (file, how);
-      if (! fp)
-	die (_("open failed"), file);
-    }
-
+ {
+  FILE *fp = stream_open (file, how);
+  if (!fp)
+    die (_("open failed"), file);
   return fp;
 }
 
@@ -774,7 +849,8 @@ dup2_or_die (int oldfd, int newfd)
 
 /* Fork a child process for piping to and do common cleanup.  The
    TRIES parameter tells us how many times to try to fork before
-   giving up.  Return the PID of the child or -1 if fork failed.  */
+   giving up.  Return the PID of the child, or -1 (setting errno)
+   on failure. */
 
 static pid_t
 pipe_fork (int pipefds[2], size_t tries)
@@ -817,8 +893,10 @@ pipe_fork (int pipefds[2], size_t tries)
 
   if (pid < 0)
     {
+      saved_errno = errno;
       close (pipefds[0]);
       close (pipefds[1]);
+      errno = saved_errno;
     }
   else if (pid == 0)
     {
@@ -836,15 +914,22 @@ pipe_fork (int pipefds[2], size_t tries)
 }
 
 /* Create a temporary file and start a compression program to filter output
-   to that file.  Set *PFP to the file handle and if *PPID is non-NULL,
-   set it to the PID of the newly-created process.  */
+   to that file.  Set *PFP to the file handle and if PPID is non-NULL,
+   set *PPID to the PID of the newly-created process.  If the creation
+   fails, return NULL if the failure is due to file descriptor
+   exhaustion and SURVIVE_FD_EXHAUSTION; otherwise, die.  */
 
 static char *
-create_temp (FILE **pfp, pid_t *ppid)
+maybe_create_temp (FILE **pfp, pid_t *ppid, bool survive_fd_exhaustion)
 {
   int tempfd;
-  struct tempnode *node = create_temp_file (&tempfd);
-  char *name = node->name;
+  struct tempnode *node = create_temp_file (&tempfd, survive_fd_exhaustion);
+  char *name;
+
+  if (! node)
+    return NULL;
+
+  name = node->name;
 
   if (compress_program)
     {
@@ -885,48 +970,68 @@ create_temp (FILE **pfp, pid_t *ppid)
   return name;
 }
 
+/* Create a temporary file and start a compression program to filter output
+   to that file.  Set *PFP to the file handle and if *PPID is non-NULL,
+   set it to the PID of the newly-created process.  Die on failure.  */
+
+static char *
+create_temp (FILE **pfp, pid_t *ppid)
+{
+  return maybe_create_temp (pfp, ppid, false);
+}
+
 /* Open a compressed temp file and start a decompression process through
    which to filter the input.  PID must be the valid processes ID of the
-   process used to compress the file.  */
+   process used to compress the file.  Return NULL (setting errno to
+   EMFILE) if we ran out of file descriptors, and die on any other
+   kind of failure.  */
 
 static FILE *
 open_temp (const char *name, pid_t pid)
 {
   int tempfd, pipefds[2];
-  pid_t child_pid;
-  FILE *fp;
+  FILE *fp = NULL;
 
   wait_proc (pid);
 
   tempfd = open (name, O_RDONLY);
   if (tempfd < 0)
-    die (_("couldn't open temporary file"), name);
+    return NULL;
 
-  child_pid = pipe_fork (pipefds, MAX_FORK_TRIES_DECOMPRESS);
-  if (0 < child_pid)
+  switch (pipe_fork (pipefds, MAX_FORK_TRIES_DECOMPRESS))
     {
+    case -1:
+      if (errno != EMFILE)
+	error (SORT_FAILURE, errno, _("couldn't create process for %s -d"),
+	       compress_program);
       close (tempfd);
-      close (pipefds[1]);
-    }
-  else if (child_pid == 0)
-    {
+      errno = EMFILE;
+      break;
+
+    case 0:
       close (pipefds[0]);
       dup2_or_die (tempfd, STDIN_FILENO);
       close (tempfd);
       dup2_or_die (pipefds[1], STDOUT_FILENO);
       close (pipefds[1]);
 
-      if (execlp (compress_program, compress_program, "-d", (char *) NULL) < 0)
-	error (SORT_FAILURE, errno, _("couldn't execute %s -d"),
-	       compress_program);
-    }
-  else
-    error (SORT_FAILURE, errno, _("couldn't create process for %s -d"),
-	   compress_program);
+      execlp (compress_program, compress_program, "-d", (char *) NULL);
+      error (SORT_FAILURE, errno, _("couldn't execute %s -d"),
+	     compress_program);
 
-  fp = fdopen (pipefds[0], "r");
-  if (! fp)
-    die (_("couldn't create temporary file"), name);
+    default:
+      close (tempfd);
+      close (pipefds[1]);
+
+      fp = fdopen (pipefds[0], "r");
+      if (! fp)
+	{
+	  int saved_errno = errno;
+	  close (pipefds[0]);
+	  errno = saved_errno;
+	}
+      break;
+    }
 
   return fp;
 }
@@ -1031,9 +1136,65 @@ inittables (void)
 #endif
 }
 
+/* Specify how many inputs may be merged at once.
+   This may be set on the command-line with the
+   --batch-size option. */
+static void
+specify_nmerge (int oi, char c, char const *s)
+{
+  uintmax_t n;
+  struct rlimit rlimit;
+  enum strtol_error e = xstrtoumax (s, NULL, 10, &n, NULL);
+
+  /* Try to find out how many file descriptors we'll be able
+     to open.  We need at least nmerge + 3 (STDIN_FILENO,
+     STDOUT_FILENO and STDERR_FILENO). */
+  unsigned int max_nmerge = ((getrlimit (RLIMIT_NOFILE, &rlimit) == 0
+			      ? rlimit.rlim_cur
+			      : OPEN_MAX)
+			     - 3);
+
+  if (e == LONGINT_OK)
+    {
+      nmerge = n;
+      if (nmerge != n)
+	e = LONGINT_OVERFLOW;
+      else
+	{
+	  if (nmerge < 2)
+	    {
+	      error (0, 0, _("invalid --%s argument %s"),
+		     long_options[oi].name, quote(s));
+	      error (SORT_FAILURE, 0,
+		     _("minimum --%s argument is %s"),
+		     long_options[oi].name, quote("2"));
+	    }
+	  else if (max_nmerge < nmerge)
+	    {
+	      e = LONGINT_OVERFLOW;
+	    }
+	  else
+	    return;
+	}
+    }
+
+  if (e == LONGINT_OVERFLOW)
+    {
+      char max_nmerge_buf[INT_BUFSIZE_BOUND (unsigned int)];
+      error (0, 0, _("--%s argument %s too large"),
+	     long_options[oi].name, quote(s));
+      error (SORT_FAILURE, 0,
+	     _("maximum --%s argument with current rlimit is %s"),
+	     long_options[oi].name,
+	     uinttostr (max_nmerge, max_nmerge_buf));
+    }
+  else
+    xstrtol_fatal (e, oi, c, long_options, s);
+}
+
 /* Specify the amount of main memory to use when sorting.  */
 static void
-specify_sort_size (char const *s)
+specify_sort_size (int oi, char c, char const *s)
 {
   uintmax_t n;
   char *suffix;
@@ -1089,7 +1250,7 @@ specify_sort_size (char const *s)
       e = LONGINT_OVERFLOW;
     }
 
-  STRTOL_FATAL_ERROR (s, _("sort size"), e);
+  xstrtol_fatal (e, oi, c, long_options, s);
 }
 
 /* Return the default sort size.  */
@@ -1246,7 +1407,6 @@ begfield (const struct line *line, const struct keyfield *key)
   char *ptr = line->text, *lim = ptr + line->length - 1;
   size_t sword = key->sword;
   size_t schar = key->schar;
-  size_t remaining_bytes;
 
   /* The leading field separator itself is included in a field when -t
      is absent.  */
@@ -1268,16 +1428,14 @@ begfield (const struct line *line, const struct keyfield *key)
 	  ++ptr;
       }
 
+  /* If we're ignoring leading blanks when computing the Start
+     of the field, skip past them here.  */
   if (key->skipsblanks)
     while (ptr < lim && blanks[to_uchar (*ptr)])
       ++ptr;
 
   /* Advance PTR by SCHAR (if possible), but no further than LIM.  */
-  remaining_bytes = lim - ptr;
-  if (schar < remaining_bytes)
-    ptr += schar;
-  else
-    ptr = lim;
+  ptr = MIN (lim, ptr + schar);
 
   return ptr;
 }
@@ -1290,7 +1448,9 @@ limfield (const struct line *line, const struct keyfield *key)
 {
   char *ptr = line->text, *lim = ptr + line->length - 1;
   size_t eword = key->eword, echar = key->echar;
-  size_t remaining_bytes;
+
+  if (echar == 0)
+    eword++; /* Skip all of end field.  */
 
   /* Move PTR past EWORD fields or to one past the last byte on LINE,
      whichever comes first.  If there are more than EWORD fields, leave
@@ -1367,19 +1527,17 @@ limfield (const struct line *line, const struct keyfield *key)
     }
 #endif
 
-  /* If we're ignoring leading blanks when computing the End
-     of the field, don't start counting bytes until after skipping
-     past any leading blanks. */
-  if (key->skipeblanks)
-    while (ptr < lim && blanks[to_uchar (*ptr)])
-      ++ptr;
+  if (echar != 0) /* We need to skip over a portion of the end field.  */
+    {
+      /* If we're ignoring leading blanks when computing the End
+	 of the field, skip past them here.  */
+      if (key->skipeblanks)
+	while (ptr < lim && blanks[to_uchar (*ptr)])
+	  ++ptr;
 
-  /* Advance PTR by ECHAR (if possible), but no further than LIM.  */
-  remaining_bytes = lim - ptr;
-  if (echar < remaining_bytes)
-    ptr += echar;
-  else
-    ptr = lim;
+      /* Advance PTR by ECHAR (if possible), but no further than LIM.  */
+      ptr = MIN (lim, ptr + echar);
+    }
 
   return ptr;
 }
@@ -1489,9 +1647,14 @@ fillbuf (struct buffer *buf, FILE *fp, char const *file)
 	  return true;
 	}
 
-      /* The current input line is too long to fit in the buffer.
-	 Double the buffer size and try again.  */
-      buf->buf = X2REALLOC (buf->buf, &buf->alloc);
+      {
+	/* The current input line is too long to fit in the buffer.
+	   Double the buffer size and try again, keeping it properly
+	   aligned.  */
+	size_t line_alloc = buf->alloc / sizeof (struct line);
+	buf->buf = x2nrealloc (buf->buf, &line_alloc, sizeof (struct line));
+	buf->alloc = line_alloc * sizeof (struct line);
+      }
     }
 }
 
@@ -1698,6 +1861,32 @@ compare_random (char *restrict texta, size_t lena,
   return diff;
 }
 
+/* Compare the keys TEXTA (of length LENA) and TEXTB (of length LENB)
+   using filevercmp. See lib/filevercmp.h for function description. */
+
+static int
+compare_version (char *restrict texta, size_t lena,
+		 char *restrict textb, size_t lenb)
+{
+  int diff;
+
+  /* It is necessary to save the character after the end of the field.
+     "filevercmp" works with NUL terminated strings.  Our blocks of
+     text are not necessarily terminated with a NUL byte. */
+  char sv_a = texta[lena];
+  char sv_b = textb[lenb];
+
+  texta[lena] = '\0';
+  textb[lenb] = '\0';
+
+  diff = filevercmp (texta, textb);
+
+  texta[lena] = sv_a;
+  textb[lenb] = sv_b;
+
+  return diff;
+}
+
 /* Compare two lines A and B trying every key in sequence until there
    are no more keys or a difference is found. */
 
@@ -1737,6 +1926,8 @@ keycompare (const struct line *a, const struct line *b)
 		  (texta, textb));
 	  *lima = savea, *limb = saveb;
 	}
+      else if (key->version)
+	diff = compare_version (texta, lena, textb, lenb);
       else if (key->month)
 	diff = getmonth (texta, lena) - getmonth (textb, lenb);
       /* Sorting like this may become slow, so in a simple locale the user
@@ -1998,27 +2189,54 @@ check (char const *file_name, char checkonly)
   return ordered;
 }
 
+/* Open FILES (there are NFILES of them) and store the resulting array
+   of stream pointers into (*PFPS).  Allocate the array.  Return the
+   number of successfully opened files, setting errno if this value is
+   less than NFILES.  */
+
+static size_t
+open_input_files (struct sortfile *files, size_t nfiles, FILE ***pfps)
+{
+  FILE **fps = *pfps = xnmalloc (nfiles, sizeof *fps);
+  int i;
+
+  /* Open as many input files as we can.  */
+  for (i = 0; i < nfiles; i++)
+    {
+      fps[i] = (files[i].pid
+		? open_temp (files[i].name, files[i].pid)
+		: stream_open (files[i].name, "r"));
+      if (!fps[i])
+	break;
+    }
+
+  return i;
+}
+
 /* Merge lines from FILES onto OFP.  NTEMPS is the number of temporary
    files (all of which are at the start of the FILES array), and
    NFILES is the number of files; 0 <= NTEMPS <= NFILES <= NMERGE.
-   Close input and output files before returning.
+   FPS is the vector of open stream corresponding to the files.
+   Close input and output streams before returning.
    OUTPUT_FILE gives the name of the output file.  If it is NULL,
-   the output file is standard output.  If OFP is NULL, the output
-   file has not been opened yet (or written to, if standard output).  */
+   the output file is standard output.  */
 
 static void
 mergefps (struct sortfile *files, size_t ntemps, size_t nfiles,
-	  FILE *ofp, char const *output_file)
+	  FILE *ofp, char const *output_file, FILE **fps)
 {
-  FILE *fps[NMERGE];		/* Input streams for each file.  */
-  struct buffer buffer[NMERGE];	/* Input buffers for each file. */
+  struct buffer *buffer = xnmalloc (nfiles, sizeof *buffer);
+				/* Input buffers for each file. */
   struct line saved;		/* Saved line storage for unique check. */
   struct line const *savedline = NULL;
 				/* &saved if there is a saved line. */
   size_t savealloc = 0;		/* Size allocated for the saved line. */
-  struct line const *cur[NMERGE]; /* Current line in each line table. */
-  struct line const *base[NMERGE]; /* Base of each line table.  */
-  size_t ord[NMERGE];		/* Table representing a permutation of fps,
+  struct line const **cur = xnmalloc (nfiles, sizeof *cur);
+				/* Current line in each line table. */
+  struct line const **base = xnmalloc (nfiles, sizeof *base);
+				/* Base of each line table.  */
+  size_t *ord = xnmalloc (nfiles, sizeof *ord);
+				/* Table representing a permutation of fps,
 				   such that cur[ord[0]] is the smallest line
 				   and will be next output. */
   size_t i;
@@ -2030,9 +2248,6 @@ mergefps (struct sortfile *files, size_t ntemps, size_t nfiles,
   /* Read initial lines from each input file. */
   for (i = 0; i < nfiles; )
     {
-      fps[i] = (files[i].pid
-		? open_temp (files[i].name, files[i].pid)
-		: xfopen (files[i].name, "r"));
       initbuf (&buffer[i], sizeof (struct line),
 	       MAX (merge_buffer_size, sort_size / nfiles));
       if (fillbuf (&buffer[i], fps[i], files[i].name))
@@ -2054,12 +2269,12 @@ mergefps (struct sortfile *files, size_t ntemps, size_t nfiles,
 	  free (buffer[i].buf);
 	  --nfiles;
 	  for (j = i; j < nfiles; ++j)
-	    files[j] = files[j + 1];
+	    {
+	      files[j] = files[j + 1];
+	      fps[j] = fps[j + 1];
+	    }
 	}
     }
-
-  if (! ofp)
-    ofp = xfopen (output_file, "w");
 
   /* Set up the ord table according to comparisons among input lines.
      Since this only reorders two items if one is strictly greater than
@@ -2191,6 +2406,33 @@ mergefps (struct sortfile *files, size_t ntemps, size_t nfiles,
     }
 
   xfclose (ofp, output_file);
+  free(fps);
+  free(buffer);
+  free(ord);
+  free(base);
+  free(cur);
+}
+
+/* Merge lines from FILES onto OFP.  NTEMPS is the number of temporary
+   files (all of which are at the start of the FILES array), and
+   NFILES is the number of files; 0 <= NTEMPS <= NFILES <= NMERGE.
+   Close input and output files before returning.
+   OUTPUT_FILE gives the name of the output file.
+
+   Return the number of files successfully merged.  This number can be
+   less than NFILES if we ran low on file descriptors, but in this
+   case it is never less than 2.  */
+
+static size_t
+mergefiles (struct sortfile *files, size_t ntemps, size_t nfiles,
+	    FILE *ofp, char const *output_file)
+{
+  FILE **fps;
+  size_t nopened = open_input_files (files, nfiles, &fps);
+  if (nopened < nfiles && nopened < 2)
+    die (_("open failed"), files[nopened].name);
+  mergefps (files, ntemps, nopened, ofp, output_file, fps);
+  return nopened;
 }
 
 /* Merge into T the two sorted arrays of lines LO (with NLO members)
@@ -2359,10 +2601,21 @@ avoid_trashing_input (struct sortfile *files, size_t ntemps,
 	  FILE *tftp;
 	  pid_t pid;
 	  char *temp = create_temp (&tftp, &pid);
-	  mergefps (&files[i],0, nfiles - i, tftp, temp);
-	  files[i].name = temp;
-	  files[i].pid = pid;
-	  return i + 1;
+	  size_t num_merged = 0;
+	  do
+	    {
+	      num_merged += mergefiles (&files[i], 0, nfiles - i, tftp, temp);
+	      files[i].name = temp;
+	      files[i].pid = pid;
+
+	      if (i + num_merged < nfiles)
+		memmove(&files[i + 1], &files[i + num_merged],
+			num_merged * sizeof *files);
+	      ntemps += 1;
+	      nfiles -= num_merged - 1;;
+	      i += num_merged;
+	    }
+	  while (i < nfiles);
 	}
     }
 
@@ -2378,7 +2631,7 @@ static void
 merge (struct sortfile *files, size_t ntemps, size_t nfiles,
        char const *output_file)
 {
-  while (NMERGE < nfiles)
+  while (nmerge < nfiles)
     {
       /* Number of input files processed so far.  */
       size_t in;
@@ -2393,21 +2646,24 @@ merge (struct sortfile *files, size_t ntemps, size_t nfiles,
       /* Number of easily-available slots at the next loop iteration.  */
       size_t cheap_slots;
 
-      /* Do as many NMERGE-size merges as possible.  */
-      for (out = in = 0; out < nfiles / NMERGE; out++, in += NMERGE)
+      /* Do as many NMERGE-size merges as possible. In the case that
+         nmerge is bogus, increment by the maximum number of file
+         descriptors allowed.  */
+      for (out = in = 0; nmerge <= nfiles - in; out++)
 	{
 	  FILE *tfp;
 	  pid_t pid;
 	  char *temp = create_temp (&tfp, &pid);
-	  size_t nt = MIN (ntemps, NMERGE);
-	  ntemps -= nt;
-	  mergefps (&files[in], nt, NMERGE, tfp, temp);
+	  size_t num_merged = mergefiles (&files[in], MIN (ntemps, nmerge),
+					  nmerge, tfp, temp);
+	  ntemps -= MIN (ntemps, num_merged);
 	  files[out].name = temp;
 	  files[out].pid = pid;
+	  in += num_merged;
 	}
 
       remainder = nfiles - in;
-      cheap_slots = NMERGE - out % NMERGE;
+      cheap_slots = nmerge - out % nmerge;
 
       if (cheap_slots < remainder)
 	{
@@ -2418,12 +2674,12 @@ merge (struct sortfile *files, size_t ntemps, size_t nfiles,
 	  FILE *tfp;
 	  pid_t pid;
 	  char *temp = create_temp (&tfp, &pid);
-	  size_t nt = MIN (ntemps, nshortmerge);
-	  ntemps -= nt;
-	  mergefps (&files[in], nt, nshortmerge, tfp, temp);
+	  size_t num_merged = mergefiles (&files[in], MIN (ntemps, nshortmerge),
+					  nshortmerge, tfp, temp);
+	  ntemps -= MIN (ntemps, num_merged);
 	  files[out].name = temp;
 	  files[out++].pid = pid;
-	  in += nshortmerge;
+	  in += num_merged;
 	}
 
       /* Put the remaining input files into the last NMERGE-sized output
@@ -2434,7 +2690,59 @@ merge (struct sortfile *files, size_t ntemps, size_t nfiles,
     }
 
   nfiles = avoid_trashing_input (files, ntemps, nfiles, output_file);
-  mergefps (files, ntemps, nfiles, NULL, output_file);
+
+  /* We aren't guaranteed that this final mergefiles will work, therefore we
+     try to merge into the output, and then merge as much as we can into a
+     temp file if we can't. Repeat.  */
+
+  for (;;)
+    {
+      /* Merge directly into the output file if possible.  */
+      FILE **fps;
+      size_t nopened = open_input_files (files, nfiles, &fps);
+
+      if (nopened == nfiles)
+	{
+	  FILE *ofp = stream_open (output_file, "w");
+	  if (ofp)
+	    {
+	      mergefps (files, ntemps, nfiles, ofp, output_file, fps);
+	      break;
+	    }
+	  if (errno != EMFILE || nopened <= 2)
+	    die (_("open failed"), output_file);
+	}
+      else if (nopened <= 2)
+	die (_("open failed"), files[nopened].name);
+
+      /* We ran out of file descriptors.  Close one of the input
+	 files, to gain a file descriptor.  Then create a temporary
+	 file with our spare file descriptor.  Retry if that failed
+	 (e.g., some other process could open a file between the time
+	 we closed and tried to create).  */
+      {
+      FILE *tfp;
+      pid_t pid;
+      char *temp;
+      do
+	{
+	  nopened--;
+	  xfclose (fps[nopened], files[nopened].name);
+	  temp = maybe_create_temp (&tfp, &pid, ! (nopened <= 2));
+	}
+      while (!temp);
+
+      /* Merge into the newly allocated temporary.  */
+      mergefps (&files[0], MIN (ntemps, nopened), nopened, tfp, temp, fps);
+      ntemps -= MIN (ntemps, nopened);
+      files[0].name = temp;
+      files[0].pid = pid;
+
+      memmove (&files[1], &files[nopened], (nfiles - nopened) * sizeof *files);
+      ntemps++;
+      nfiles -= nopened - 1;
+      }
+    }
 }
 
 /* Sort NFILES FILES onto OUTPUT_FILE. */
@@ -2583,10 +2891,11 @@ check_ordering_compatibility (void)
 
   for (key = keylist; key; key = key->next)
     if ((1 < (key->random + key->numeric + key->general_numeric + key->month
-	      + !!key->ignore))
+	      + key->version + !!key->ignore))
 	|| (key->random && key->translate))
       {
-	char opts[7];
+	/* The following is too big, but guaranteed to be "big enough". */
+	char opts[sizeof short_options];
 	char *p = opts;
 	if (key->ignore == nondictionary)
 	  *p++ = 'd';
@@ -2600,6 +2909,8 @@ check_ordering_compatibility (void)
 	  *p++ = 'M';
 	if (key->numeric)
 	  *p++ = 'n';
+	if (key->version)
+	  *p++ = 'V';
 	if (key->random)
 	  *p++ = 'R';
 	*p = '\0';
@@ -2701,6 +3012,9 @@ set_ordering (const char *s, struct keyfield *key, enum blanktype blanktype)
 	case 'r':
 	  key->reverse = true;
 	  break;
+	case 'V':
+	  key->version = true;
+	  break;
 	default:
 	  return (char *) s;
 	}
@@ -2733,10 +3047,12 @@ main (int argc, char **argv)
   bool posixly_correct = (getenv ("POSIXLY_CORRECT") != NULL);
   bool obsolete_usage = (posix2_version () < 200112);
   char **files;
+  char *files_from = NULL;
+  struct Tokens tok;
   char const *outfile = NULL;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -2826,7 +3142,7 @@ main (int argc, char **argv)
   gkey.sword = gkey.eword = SIZE_MAX;
   gkey.ignore = NULL;
   gkey.translate = NULL;
-  gkey.numeric = gkey.general_numeric = gkey.random = false;
+  gkey.numeric = gkey.general_numeric = gkey.random = gkey.version = false;
   gkey.month = gkey.reverse = false;
   gkey.skipsblanks = gkey.skipeblanks = false;
 
@@ -2838,6 +3154,7 @@ main (int argc, char **argv)
 	 pedantic and a file was seen, unless the POSIX version
 	 predates 1003.1-2001 and -c was not seen and the operand is
 	 "-o FILE" or "-oFILE".  */
+      int oi = -1;
 
       if (c == -1
 	  || (posixly_correct && nfiles != 0
@@ -2847,7 +3164,7 @@ main (int argc, char **argv)
 		    && argv[optind][0] == '-' && argv[optind][1] == 'o'
 		    && (argv[optind][2] || optind + 1 != argc)))
 	  || ((c = getopt_long (argc, argv, short_options,
-				long_options, NULL))
+				long_options, &oi))
 	      == -1))
 	{
 	  if (argc <= optind)
@@ -2874,10 +3191,7 @@ main (int argc, char **argv)
 		  if (! (key->sword | key->schar))
 		    key->sword = SIZE_MAX;
 		  if (! s || *set_ordering (s, key, bl_start))
-		    {
-		      free (key);
-		      key = NULL;
-		    }
+		    key = NULL;
 		  else
 		    {
 		      if (minus_pos_usage)
@@ -2900,6 +3214,9 @@ main (int argc, char **argv)
 	    files[nfiles++] = optarg;
 	  break;
 
+	case SORT_OPTION:
+	  c = XARGMATCH ("--sort", optarg, sort_args, sort_types);
+	  /* Fall through. */
 	case 'b':
 	case 'd':
 	case 'f':
@@ -2909,6 +3226,7 @@ main (int argc, char **argv)
 	case 'n':
 	case 'r':
 	case 'R':
+	case 'V':
 	  {
 	    char str[2];
 	    str[0] = c;
@@ -2930,9 +3248,13 @@ main (int argc, char **argv)
 	  break;
 
 	case COMPRESS_PROGRAM_OPTION:
-	  if (compress_program && strcmp (compress_program, optarg) != 0)
+	  if (compress_program && !STREQ (compress_program, optarg))
 	    error (SORT_FAILURE, 0, _("multiple compress programs specified"));
 	  compress_program = optarg;
+	  break;
+
+	case FILES0_FROM_OPTION:
+	  files_from = optarg;
 	  break;
 
 	case 'k':
@@ -2975,12 +3297,9 @@ main (int argc, char **argv)
 		  badfieldspec (optarg, N_("field number is zero"));
 		}
 	      if (*s == '.')
-		s = parse_field_count (s + 1, &key->echar,
-				       N_("invalid number after `.'"));
-	      else
 		{
-		  /* `-k 2,3' is equivalent to `+1 -3'.  */
-		  key->eword++;
+		  s = parse_field_count (s + 1, &key->echar,
+				         N_("invalid number after `.'"));
 		}
 	      s = set_ordering (s, key, bl_end);
 	    }
@@ -2991,6 +3310,10 @@ main (int argc, char **argv)
 
 	case 'm':
 	  mergeonly = true;
+	  break;
+
+	case NMERGE_OPTION:
+	  specify_nmerge (oi, c, optarg);
 	  break;
 
 	case 'o':
@@ -3010,7 +3333,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 'S':
-	  specify_sort_size (optarg);
+	  specify_sort_size (oi, c, optarg);
 	  break;
 
 	case 't':
@@ -3079,14 +3402,78 @@ main (int argc, char **argv)
 	}
     }
 
+  if (files_from)
+    {
+      FILE *stream;
+
+      /* When using --files0-from=F, you may not specify any files
+	 on the command-line.  */
+      if (nfiles)
+	{
+	  error (0, 0, _("extra operand %s"), quote (files[0]));
+	  fprintf (stderr, "%s\n",
+		   _("file operands cannot be combined with --files0-from"));
+	  usage (SORT_FAILURE);
+	}
+
+      if (STREQ (files_from, "-"))
+	stream = stdin;
+      else
+	{
+	  stream = fopen (files_from, "r");
+	  if (stream == NULL)
+	    error (SORT_FAILURE, errno, _("cannot open %s for reading"),
+		   quote (files_from));
+	}
+
+      readtokens0_init (&tok);
+
+      if (! readtokens0 (stream, &tok) || fclose (stream) != 0)
+	error (SORT_FAILURE, 0, _("cannot read file names from %s"),
+	       quote (files_from));
+
+      if (tok.n_tok)
+	{
+	  size_t i;
+	  free (files);
+	  files = tok.tok;
+	  nfiles = tok.n_tok;
+	  for (i = 0; i < nfiles; i++)
+	  {
+	      if (STREQ (files[i], "-"))
+		error (SORT_FAILURE, 0, _("when reading file names from stdin, "
+					  "no file name of %s allowed"),
+		       quote (files[i]));
+	      else if (files[i][0] == '\0')
+		{
+		  /* Using the standard `filename:line-number:' prefix here is
+		     not totally appropriate, since NUL is the separator, not NL,
+		     but it might be better than nothing.  */
+		  unsigned long int file_number = i + 1;
+		  error (SORT_FAILURE, 0,
+			 _("%s:%lu: invalid zero-length file name"),
+			 quotearg_colon (files_from), file_number);
+		}
+	  }
+	}
+      else
+	error (SORT_FAILURE, 0, _("no input from %s"),
+	       quote (files_from));
+    }
+
   /* Inheritance of global options to individual keys. */
   for (key = keylist; key; key = key->next)
     {
-      if (! (key->ignore || key->translate
-             || (key->skipsblanks | key->reverse
-                 | key->skipeblanks | key->month | key->numeric
-                 | key->general_numeric
-                 | key->random)))
+      if (! (key->ignore
+	     || key->translate
+	     || (key->skipsblanks
+		 | key->reverse
+		 | key->skipeblanks
+		 | key->month
+		 | key->numeric
+		 | key->version
+		 | key->general_numeric
+		 | key->random)))
         {
           key->ignore = gkey.ignore;
           key->translate = gkey.translate;
@@ -3097,15 +3484,21 @@ main (int argc, char **argv)
           key->general_numeric = gkey.general_numeric;
           key->random = gkey.random;
           key->reverse = gkey.reverse;
+          key->version = gkey.version;
         }
 
       need_random |= key->random;
     }
 
-  if (!keylist && (gkey.ignore || gkey.translate
-		   || (gkey.skipsblanks | gkey.skipeblanks | gkey.month
-		       | gkey.numeric | gkey.general_numeric
-                       | gkey.random)))
+  if (!keylist && (gkey.ignore
+		   || gkey.translate
+		   || (gkey.skipsblanks
+		       | gkey.skipeblanks
+		       | gkey.month
+		       | gkey.numeric
+		       | gkey.general_numeric
+		       | gkey.random
+		       | gkey.version)))
     {
       insertkey (&gkey);
       need_random |= gkey.random;
@@ -3130,11 +3523,16 @@ main (int argc, char **argv)
 
   if (nfiles == 0)
     {
-      static char *minus = "-";
+      static char *minus = (char *) "-";
       nfiles = 1;
       free (files);
       files = &minus;
     }
+
+  /* Need to re-check that we meet the minimum requirement for memory
+     usage with the final value for NMERGE. */
+  if (0 < sort_size)
+    sort_size = MAX (sort_size, MIN_SORT_SIZE);
 
   if (checkonly)
     {
@@ -3163,6 +3561,7 @@ main (int argc, char **argv)
 	sortfiles[i].name = files[i];
 
       merge (sortfiles, 0, nfiles, outfile);
+      IF_LINT (free (sortfiles));
     }
   else
     sort (files, nfiles, outfile);

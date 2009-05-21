@@ -31,10 +31,9 @@ StdBinCommands
 	false.c
 	fmt.c
 	fold.c
+	getlimits.c
 	head.c
-	id.c
 	join.c
-	kill.c
 	link.c
 	ln.c
 	logname.c
@@ -50,7 +49,6 @@ StdBinCommands
 	printf.c
 	ptx.c
 	readlink.c
-	rmdir.c
 	seq.c
 	shred.c
 	shuf.c
@@ -66,6 +64,7 @@ StdBinCommands
 	touch.c
 	tr.c
 	true.c
+	truncate.c
 	tsort.c
 	tty.c
 	unexpand.c
@@ -86,7 +85,6 @@ MODE on su = 04755 ;
 StdBinCommands
 	hostname.c
 	tail.c
-	uname.c
 	: libfetish.a $(TARGET_SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
 
 #commands requiring something in libroot.so (getrlimit, fchdir...)
@@ -95,7 +93,6 @@ StdBinCommands
 	chmod.c
 	chroot.c
 	du.c
-	mkdir.c
 	pwd.c
 	sleep.c
 	sort.c
@@ -108,6 +105,12 @@ StdBinCommands
 # who.c
 
 BinCommand "[" : lbracket.c : libfetish.a : $(coreutils_rsrc) ;
+
+BinCommand kill : kill.c operand2sig.c : libfetish.a : $(coreutils_rsrc) ;
+
+BinCommand id : id.c group-list.c : libfetish.a : $(coreutils_rsrc) ;
+
+BinCommand groups : groups.c [ FGristFiles group-list.o ] : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand ls : 
 	ls.c ls-ls.c : libfetish.a : $(coreutils_rsrc) ;
@@ -142,8 +145,13 @@ BinCommand vdir :
 BinCommand dir :
 	[ FGristFiles ls.o ] ls-dir.c : libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand <bin>install : install.c [ FGristFiles copy.o cp-hash.o ]
+BinCommand <bin>install : install.c prog-fprintf.c [ FGristFiles copy.o cp-hash.o ]
 	: libfetish.a : $(coreutils_rsrc) ;
 
-MakeLocatePlatform groups ;
-Shell groups : groups.sh ;
+BinCommand mkdir : mkdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a libroot.so : $(coreutils_rsrc) ;
+
+BinCommand rmdir : rmdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a libroot.so : $(coreutils_rsrc) ;
+
+BinCommand uname : uname.c uname-uname.c : libfetish.a $(TARGET_SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
+
+BinCommand timeout : timeout.c [ FGristFiles operand2sig.o ] : libfetish.a : $(coreutils_rsrc) ;

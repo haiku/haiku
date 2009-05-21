@@ -1,10 +1,10 @@
-/* Utility to help print --version output in a consistent format.
-   Copyright (C) 1999-2007 Free Software Foundation, Inc.
+/* Print --version and bug-reporting information in a consistent format.
+   Copyright (C) 1999-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering. */
 
@@ -33,7 +32,7 @@
 #include "gettext.h"
 #define _(msgid) gettext (msgid)
 
-enum { COPYRIGHT_YEAR = 2007 };
+enum { COPYRIGHT_YEAR = 2009 };
 
 /* Like version_etc, below, but with the NULL-terminated author list
    provided via a variable of type va_list.  */
@@ -67,8 +66,8 @@ version_etc_va (FILE *stream,
 
   fputs (_("\
 \n\
-This is free software.  You may redistribute copies of it under the terms of\n\
-the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n\
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
+This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 \n\
 "),
@@ -170,4 +169,18 @@ version_etc (FILE *stream,
 
   va_start (authors, version);
   version_etc_va (stream, command_name, package, version, authors);
+}
+
+void
+emit_bug_reporting_address (void)
+{
+  /* TRANSLATORS: The placeholder indicates the bug-reporting address
+     for this package.  Please add _another line_ saying
+     "Report translation bugs to <...>\n" with the address for translation
+     bugs (typically your translation team's web or email address).  */
+  printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+  printf (_("%s home page: <http://www.gnu.org/software/%s/>.\n"),
+	  PACKAGE_NAME, PACKAGE);
+  fputs (_("General help using GNU software: <http://www.gnu.org/gethelp/>.\n"),
+         stdout);
 }

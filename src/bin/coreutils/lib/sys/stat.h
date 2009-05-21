@@ -273,4 +273,35 @@ rpl_mkdir (char const *name, mode_t mode)
 # define mkdir rpl_mkdir
 #endif
 
+/* Declare BSD extensions.  */
+
+#if 1
+/* Change the mode of FILENAME to MODE, without dereferencing it if FILENAME
+   denotes a symbolic link.  */
+# if !0
+/* The lchmod replacement follows symbolic links.  Callers should take
+   this into account; lchmod should be applied only to arguments that
+   are known to not be symbolic links.  On hosts that lack lchmod,
+   this can lead to race conditions between the check and the
+   invocation of lchmod, but we know of no workarounds that are
+   reliable in general.  You might try requesting support for lchmod
+   from your operating system supplier.  */
+#  define lchmod chmod
+# endif
+# if 0 /* assume already declared */
+extern int lchmod (const char *filename, mode_t mode);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef lchmod
+# define lchmod(f,m) \
+    (GL_LINK_WARNING ("lchmod is unportable - " \
+                      "use gnulib module lchmod for portability"), \
+     lchmod (f, m))
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* _gl_SYS_STAT_H */

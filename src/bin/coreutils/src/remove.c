@@ -1,10 +1,10 @@
 /* remove.c -- core functions for removing files and directories
-   Copyright (C) 88, 90, 91, 1994-2007 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Extracted from rm.c and librarified, then rewritten by Jim Meyering.  */
 
@@ -25,29 +24,23 @@
 
 #include "system.h"
 #include "cycle-check.h"
-#include "dirfd.h"
 #include "error.h"
-#include "euidaccess.h"
 #include "euidaccess-stat.h"
 #include "file-type.h"
 #include "hash.h"
 #include "hash-pjw.h"
-#include "lstat.h"
 #include "obstack.h"
-#include "openat.h"
 #include "quote.h"
 #include "remove.h"
 #include "root-dev-ino.h"
 #include "unlinkdir.h"
+#include "write-any-file.h"
 #include "yesno.h"
 
 /* Avoid shadowing warnings because these are functions declared
    in dirname.h as well as locals used below.  */
 #define dir_name rm_dir_name
 #define dir_len rm_dir_len
-
-#define obstack_chunk_alloc malloc
-#define obstack_chunk_free free
 
 /* This is the maximum number of consecutive readdir/unlink calls that
    can be made (with no intervening rewinddir or closedir/opendir) before
@@ -63,6 +56,14 @@ enum
   {
     CONSECUTIVE_READDIR_UNLINK_THRESHOLD = 10
   };
+
+/* If the heuristics in preprocess_dir suggest that there
+   are fewer than this many entries in a directory, then it
+   skips the preprocessing altogether.  */
+enum
+{
+  INODE_SORT_DIR_ENTRIES_THRESHOLD = 10000
+};
 
 /* FIXME: in 2009, or whenever Darwin 7.9.0 (aka MacOS X 10.3.9) is no
    longer relevant, remove this work-around code.  Then, there will be
@@ -112,7 +113,22 @@ struct AD_ent
   struct dev_ino dev_ino;
 };
 
-extern char *program_name;
+/* D_TYPE(D) is the type of directory entry D if known, DT_UNKNOWN
+   otherwise.  */
+#if HAVE_STRUCT_DIRENT_D_TYPE
+# define D_TYPE(d) ((d)->d_type)
+#else
+# define D_TYPE(d) DT_UNKNOWN
+
+/* Any int values will do here, so long as they're distinct.
+   Undef any existing macros out of the way.  */
+# undef DT_UNKNOWN
+# undef DT_DIR
+# undef DT_LNK
+# define DT_UNKNOWN 0
+# define DT_DIR 1
+# define DT_LNK 2
+#endif
 
 struct dirstack_state
 {
@@ -148,6 +164,11 @@ struct dirstack_state
 };
 typedef struct dirstack_state Dirstack_state;
 
+/* A static buffer and its allocated size, these variables are used by
+   xfull_filename and full_filename to form full, relative file names.  */
+static char *g_buf;
+static size_t g_n_allocated;
+
 /* Like fstatat, but cache the result.  If ST->st_size is -1, the
    status has not been gotten yet.  If less than -1, fstatat failed
    with errno == ST->st_ino.  Otherwise, the status has already
@@ -159,7 +180,7 @@ cache_fstatat (int fd, char const *file, struct stat *st, int flag)
     {
       st->st_size = -2;
       st->st_ino = errno;
-	}
+    }
   if (0 <= st->st_size)
     return 0;
   errno = (int) st->st_ino;
@@ -201,10 +222,32 @@ hash_compare_strings (void const *x, void const *y)
   return STREQ (x, y) ? true : false;
 }
 
+/* Obstack allocator: longjump on failure.  */
+static void *
+rm_malloc (void *v_jumpbuf, long size)
+{
+  jmp_buf *jumpbuf = v_jumpbuf;
+  void *p = malloc (size);
+  if (p)
+    return p;
+  longjmp (*jumpbuf, 1);
+}
+
+/* With the 2-arg allocator, we must also provide a two-argument freer.  */
+static void
+rm_free (void *v_jumpbuf ATTRIBUTE_UNUSED, void *ptr)
+{
+  free (ptr);
+}
+
 static inline void
 push_dir (Dirstack_state *ds, const char *dir_name)
 {
   size_t len = strlen (dir_name);
+
+  /* Don't copy trailing slashes.  */
+  while (1 < len && dir_name[len - 1] == '/')
+    --len;
 
   /* Append the string onto the stack.  */
   obstack_grow (&ds->dir_stack, dir_name, len);
@@ -222,13 +265,15 @@ push_dir (Dirstack_state *ds, const char *dir_name)
 /* Return the entry name of the directory on the top of the stack
    in malloc'd storage.  */
 static inline char *
-top_dir (Dirstack_state const *ds)
+top_dir (Dirstack_state *ds)
 {
   size_t n_lengths = obstack_object_size (&ds->len_stack) / sizeof (size_t);
   size_t *length = obstack_base (&ds->len_stack);
   size_t top_len = length[n_lengths - 1];
   char const *p = obstack_next_free (&ds->dir_stack) - top_len;
-  char *q = xmalloc (top_len);
+  char *q = malloc (top_len);
+  if (q == NULL)
+    longjmp (ds->current_arg_jumpbuf, 1);
   memcpy (q, p, top_len - 1);
   q[top_len - 1] = 0;
   return q;
@@ -285,77 +330,103 @@ right_justify (char *dst, size_t dst_len, const char *src, size_t src_len,
   return dst_len - src_len;
 }
 
-/* Using the global directory name obstack, create the full name FILENAME.
+/* Using the global directory name obstack, create the full name of FILENAME.
    Return it in sometimes-realloc'd space that should not be freed by the
-   caller.  Realloc as necessary.  If realloc fails, use a static buffer
-   and put as long a suffix in that buffer as possible.  */
+   caller.  Realloc as necessary.  If realloc fails, return NULL.  */
 
-#define full_filename(Filename) full_filename_ (ds, Filename)
 static char *
-full_filename_ (Dirstack_state const *ds, const char *filename)
+full_filename0 (Dirstack_state const *ds, const char *filename)
 {
-  static char *buf = NULL;
-  static size_t n_allocated = 0;
-
   size_t dir_len = obstack_object_size (&ds->dir_stack);
   char *dir_name = obstack_base (&ds->dir_stack);
-  size_t n_bytes_needed;
-  size_t filename_len;
+  size_t filename_len = strlen (filename);
+  size_t n_bytes_needed = dir_len + filename_len + 1;
 
-  filename_len = strlen (filename);
-  n_bytes_needed = dir_len + filename_len + 1;
-
-  if (n_allocated < n_bytes_needed)
+  if (g_n_allocated < n_bytes_needed)
     {
-      /* This code requires that realloc accept NULL as the first arg.
-         This function must not use xrealloc.  Otherwise, an out-of-memory
-	 error involving a file name to be expanded here wouldn't ever
-	 be issued.  Use realloc and fall back on using a static buffer
-	 if memory allocation fails.  */
-      char *new_buf = realloc (buf, n_bytes_needed);
-      n_allocated = n_bytes_needed;
-
+      char *new_buf = realloc (g_buf, n_bytes_needed);
       if (new_buf == NULL)
-	{
-#define SBUF_SIZE 512
-#define ELLIPSES_PREFIX "[...]"
-	  static char static_buf[SBUF_SIZE];
-	  bool truncated;
-	  size_t len;
-	  char *p;
+	return NULL;
 
-	  free (buf);
-	  len = right_justify (static_buf, SBUF_SIZE, filename,
-			       filename_len + 1, &p, &truncated);
-	  right_justify (static_buf, len, dir_name, dir_len, &p, &truncated);
-	  if (truncated)
-	    {
-	      memcpy (static_buf, ELLIPSES_PREFIX,
-		      sizeof (ELLIPSES_PREFIX) - 1);
-	    }
-	  return p;
-	}
-
-      buf = new_buf;
+      g_buf = new_buf;
+      g_n_allocated = n_bytes_needed;
     }
 
-  if (filename_len == 1 && *filename == '.' && dir_len)
+  if (STREQ (filename, ".") && dir_len)
     {
       /* FILENAME is just `.' and dir_len is nonzero.
 	 Copy the directory part, omitting the trailing slash,
 	 and append a trailing zero byte.  */
-      char *p = mempcpy (buf, dir_name, dir_len - 1);
+      char *p = mempcpy (g_buf, dir_name, dir_len - 1);
       *p = 0;
     }
   else
     {
       /* Copy the directory part, including trailing slash, and then
 	 append the filename part, including a trailing zero byte.  */
-      memcpy (mempcpy (buf, dir_name, dir_len), filename, filename_len + 1);
-      assert (strlen (buf) + 1 == n_bytes_needed);
+      memcpy (mempcpy (g_buf, dir_name, dir_len), filename, filename_len + 1);
+      assert (strlen (g_buf) + 1 == n_bytes_needed);
     }
 
+  return g_buf;
+}
+
+/* Using the global directory name obstack, create the full name of FILENAME.
+   Return it in sometimes-realloc'd space that should not be freed by the
+   caller.  Realloc as necessary.  If realloc fails, die.  */
+
+static char *
+xfull_filename (Dirstack_state const *ds, const char *filename)
+{
+  char *buf = full_filename0 (ds, filename);
+  if (buf == NULL)
+    xalloc_die ();
   return buf;
+}
+
+/* Using the global directory name obstack, create the full name FILENAME.
+   Return it in sometimes-realloc'd space that should not be freed by the
+   caller.  Realloc as necessary.  If realloc fails, use a static buffer
+   and put as long a suffix in that buffer as possible.  Be careful not
+   to change errno.  */
+
+#define full_filename(Filename) full_filename_ (ds, Filename)
+static char *
+full_filename_ (Dirstack_state const *ds, const char *filename)
+{
+  int saved_errno = errno;
+  char *full_name = full_filename0 (ds, filename);
+  if (full_name)
+    {
+      errno = saved_errno;
+      return full_name;
+    }
+
+  {
+#define SBUF_SIZE 512
+#define ELLIPSES_PREFIX "[...]"
+    static char static_buf[SBUF_SIZE];
+    bool file_truncated;
+    bool dir_truncated;
+    size_t n_bytes_remaining;
+    char *p;
+    char *dir_name = obstack_base (&ds->dir_stack);
+    size_t dir_len = obstack_object_size (&ds->dir_stack);
+
+    free (g_buf);
+    n_bytes_remaining = right_justify (static_buf, SBUF_SIZE, filename,
+				       strlen (filename) + 1, &p,
+				       &file_truncated);
+    right_justify (static_buf, n_bytes_remaining, dir_name, dir_len,
+		   &p, &dir_truncated);
+    if (file_truncated || dir_truncated)
+      {
+	memcpy (static_buf, ELLIPSES_PREFIX,
+		sizeof (ELLIPSES_PREFIX) - 1);
+      }
+    errno = saved_errno;
+    return p;
+  }
 }
 
 static inline size_t
@@ -393,14 +464,32 @@ AD_stack_clear (Dirstack_state *ds)
     }
 }
 
-static Dirstack_state *
-ds_init (void)
+/* Initialize obstack O just enough so that it may be freed
+   with obstack_free.  */
+static void
+obstack_init_minimal (struct obstack *o)
 {
-  Dirstack_state *ds = xmalloc (sizeof *ds);
-  obstack_init (&ds->dir_stack);
-  obstack_init (&ds->len_stack);
-  obstack_init (&ds->Active_dir);
-  return ds;
+  o->chunk = NULL;
+}
+
+static void
+ds_init (Dirstack_state *ds)
+{
+  unsigned int i;
+  struct obstack *o[3];
+  o[0] = &ds->dir_stack;
+  o[1] = &ds->len_stack;
+  o[2] = &ds->Active_dir;
+
+  /* Ensure each of these is NULL, in case init/allocation
+     fails and we end up calling ds_free on all three while only
+     one or two has been initialized.  */
+  for (i = 0; i < 3; i++)
+    obstack_init_minimal (o[i]);
+
+  for (i = 0; i < 3; i++)
+    obstack_specify_allocation_with_arg
+      (o[i], 0, 0, rm_malloc, rm_free, &ds->current_arg_jumpbuf);
 }
 
 static void
@@ -419,7 +508,6 @@ ds_free (Dirstack_state *ds)
   obstack_free (&ds->dir_stack, NULL);
   obstack_free (&ds->len_stack, NULL);
   obstack_free (&ds->Active_dir, NULL);
-  free (ds);
 }
 
 /* Pop the active directory (AD) stack and prepare to move `up' one level,
@@ -492,7 +580,7 @@ AD_pop_and_chdir (DIR *dirp, int *fdp, Dirstack_state *ds)
 	 searchable, when using Solaris' openat.  Without this openat
 	 call, tests/rm2 would fail to remove directories a/2 and a/3.  */
       if (fd < 0)
-	fd = openat (AT_FDCWD, full_filename ("."), O_RDONLY);
+	fd = openat (AT_FDCWD, xfull_filename (ds, "."), O_RDONLY);
 
       if (fd < 0)
 	{
@@ -679,39 +767,9 @@ AD_is_removable (Dirstack_state const *ds, char const *file)
   return ! (top->unremovable && hash_lookup (top->unremovable, file));
 }
 
-/* Return true if DIR is determined to be an empty directory.  */
-static bool
-is_empty_dir (int fd_cwd, char const *dir)
-{
-  DIR *dirp;
-  struct dirent const *dp;
-  int saved_errno;
-  int fd = openat (fd_cwd, dir,
-		   (O_RDONLY | O_DIRECTORY
-		    | O_NOCTTY | O_NOFOLLOW | O_NONBLOCK));
-
-  if (fd < 0)
-    return false;
-
-  dirp = fdopendir (fd);
-  if (dirp == NULL)
-    {
-      close (fd);
-      return false;
-    }
-
-  errno = 0;
-  dp = readdir_ignoring_dot_and_dotdot (dirp);
-  saved_errno = errno;
-  closedir (dirp);
-  if (dp != NULL)
-    return false;
-  return saved_errno == 0 ? true : false;
-}
-
-/* Return 1 if FILE is an unwritable non-symlink, 0 if it is writable or some
-   other type of file.
-   Returns -1 and sets errno if there is some problem in determining the answer.
+/* Return 1 if FILE is an unwritable non-symlink,
+   0 if it is writable or some other type of file,
+   -1 and set errno if there is some problem in determining the answer.
    Set *BUF to the file status.
    This is to avoid calling euidaccess when FILE is a symlink.  */
 static int
@@ -720,6 +778,8 @@ write_protected_non_symlink (int fd_cwd,
 			     Dirstack_state const *ds,
 			     struct stat *buf)
 {
+  if (can_write_any_file ())
+    return 0;
   if (cache_fstatat (fd_cwd, file, buf, AT_SYMLINK_NOFOLLOW) != 0)
     return -1;
   if (S_ISLNK (buf->st_mode))
@@ -743,13 +803,13 @@ write_protected_non_symlink (int fd_cwd,
 	Disadvantage: changes working directory (not reentrant) and can't
 	work if save_cwd fails.
 
-     3) if (euidaccess (full_filename (file), W_OK) == 0)
-	Disadvantage: doesn't work if full_filename is too long.
+     3) if (euidaccess (xfull_filename (file), W_OK) == 0)
+	Disadvantage: doesn't work if xfull_filename is too long.
 	Inefficient for very deep trees (O(Depth^2)).
 
      4) If the full pathname is sufficiently short (say, less than
 	PATH_MAX or 8192 bytes, whichever is shorter):
-	use method (3) (i.e., euidaccess (full_filename (file), W_OK));
+	use method (3) (i.e., euidaccess (xfull_filename (file), W_OK));
 	Otherwise: vfork, fchdir in the child, run euidaccess in the
 	child, then the child exits with a status that tells the parent
 	whether euidaccess succeeded.
@@ -763,7 +823,7 @@ write_protected_non_symlink (int fd_cwd,
 
      5) If the full file name is sufficiently short (say, less than
 	PATH_MAX or 8192 bytes, whichever is shorter):
-	use method (3) (i.e., euidaccess (full_filename (file), W_OK));
+	use method (3) (i.e., euidaccess (xfull_filename (file), W_OK));
 	Otherwise: look just at the file bits.  Perhaps issue a warning
 	the first time this occurs.
 
@@ -778,13 +838,13 @@ write_protected_non_symlink (int fd_cwd,
       = obstack_object_size (&ds->dir_stack) + strlen (file);
 
     if (MIN (PATH_MAX, 8192) <= file_name_len)
-      return !euidaccess_stat (buf, W_OK);
-    if (euidaccess (full_filename (file), W_OK) == 0)
+      return ! euidaccess_stat (buf, W_OK);
+    if (euidaccess (xfull_filename (ds, file), W_OK) == 0)
       return 0;
     if (errno == EACCES)
       {
-        errno = 0;
-        return 1;
+	errno = 0;
+	return 1;
       }
 
     /* Perhaps some other process has removed the file, or perhaps this
@@ -799,6 +859,9 @@ write_protected_non_symlink (int fd_cwd,
    return RM_USER_DECLINED.  If not ignoring missing files and we
    cannot lstat FILENAME, then return RM_ERROR.
 
+   *PDIRENT_TYPE is the type of the directory entry; update it to DT_DIR
+   or DT_LNK as needed.  *SBUF is the file's status.
+
    Depending on MODE, ask whether to `descend into' or to `remove' the
    directory FILENAME.  MODE is ignored when FILENAME is not a directory.
    Set *IS_EMPTY to T_YES if FILENAME is an empty directory, and it is
@@ -806,11 +869,13 @@ write_protected_non_symlink (int fd_cwd,
    Don't even try to set *IS_EMPTY when MODE == PA_REMOVE_DIR.  */
 static enum RM_status
 prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
-	struct stat *sbuf,
+	int *pdirent_type, struct stat *sbuf,
 	struct rm_options const *x, enum Prompt_action mode,
 	Ternary *is_empty)
 {
   int write_protected = 0;
+  int dirent_type = *pdirent_type;
+  int wp_errno = 0;
 
   *is_empty = T_UNKNOWN;
 
@@ -820,31 +885,58 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
   errno = 0;
 
   if (!x->ignore_missing_files
-      & ((x->interactive == RMI_ALWAYS) | x->stdin_tty))
-    write_protected = write_protected_non_symlink (fd_cwd, filename, ds, sbuf);
+      && ((x->interactive == RMI_ALWAYS) || x->stdin_tty)
+      && dirent_type != DT_LNK)
+    {
+      write_protected = write_protected_non_symlink (fd_cwd, filename, ds, sbuf);
+      wp_errno = errno;
+    }
 
   if (write_protected || errno || x->interactive == RMI_ALWAYS)
     {
+      if (0 <= write_protected && dirent_type == DT_UNKNOWN)
+	{
+	  if (cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW) == 0)
+	    {
+	      if (S_ISLNK (sbuf->st_mode))
+		dirent_type = DT_LNK;
+	      else if (S_ISDIR (sbuf->st_mode))
+		dirent_type = DT_DIR;
+	      /* Otherwise it doesn't matter, so leave it DT_UNKNOWN.  */
+	      *pdirent_type = dirent_type;
+	    }
+	  else
+	    {
+	      /* This happens, e.g., with `rm '''.  */
+	      write_protected = -1;
+	      wp_errno = errno;
+	    }
+	}
+
+      if (0 <= write_protected)
+	switch (dirent_type)
+	  {
+	  case DT_LNK:
+	    /* Using permissions doesn't make sense for symlinks.  */
+	    if (x->interactive != RMI_ALWAYS)
+	      return RM_OK;
+	    break;
+
+	  case DT_DIR:
+	    if (!x->recursive)
+	      {
+		write_protected = -1;
+		wp_errno = EISDIR;
+	      }
+	    break;
+	  }
+
+      {
       char const *quoted_name = quote (full_filename (filename));
-      if (errno == 0)
-	{
-	  /* May fail for, e.g., with `rm '''.  */
-	  cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW);
-	}
 
-      if (errno == 0)
+      if (write_protected < 0)
 	{
-	  /* Using permissions doesn't make sense for symlinks.  */
-	  if (S_ISLNK (sbuf->st_mode) && x->interactive != RMI_ALWAYS)
-	    return RM_OK;
-
-	  if (S_ISDIR (sbuf->st_mode) && !x->recursive)
-	    errno = EISDIR;
-	}
-
-      if (errno != 0)
-	{
-	  error (0, errno, _("cannot remove %s"), quoted_name);
+	  error (0, wp_errno, _("cannot remove %s"), quoted_name);
 	  return RM_ERROR;
 	}
 
@@ -852,8 +944,7 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
       /* FIXME: use a variant of error (instead of fprintf) that doesn't
 	 append a newline.  Then we won't have to declare program_name in
 	 this file.  */
-      if (S_ISDIR (sbuf->st_mode)
-	  && x->recursive
+      if (dirent_type == DT_DIR
 	  && mode == PA_DESCEND_INTO_DIR
 	  && ((*is_empty = (is_empty_dir (fd_cwd, filename) ? T_YES : T_NO))
 	      == T_NO))
@@ -864,16 +955,23 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
 		 program_name, quoted_name);
       else
 	{
-	  /* TRANSLATORS: You may find it more convenient to translate
-	     the equivalent of _("%s: remove %s (write-protected) %s? ").
-	     It should avoid grammatical problems with the output
-	     of file_type.  */
+	  if (cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW) != 0)
+	    {
+	      error (0, errno, _("cannot remove %s"), quoted_name);
+	      return RM_ERROR;
+	    }
+
 	  fprintf (stderr,
 		   (write_protected
+		    /* TRANSLATORS: You may find it more convenient to
+		       translate "%s: remove %s (write-protected) %s? "
+		       instead.  It should avoid grammatical problems
+		       with the output of file_type.  */
 		    ? _("%s: remove write-protected %s %s? ")
 		    : _("%s: remove %s %s? ")),
 		   program_name, file_type (sbuf), quoted_name);
 	}
+      }
 
       if (!yesno ())
 	return RM_USER_DECLINED;
@@ -886,28 +984,30 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
    *ST is FILENAME's tstatus.
    Do not modify errno.  */
 static inline bool
-is_dir_lstat (char const *filename, struct stat *st)
+is_dir_lstat (int fd_cwd, char const *filename, struct stat *st)
 {
   int saved_errno = errno;
   bool is_dir =
-    (cache_fstatat (AT_FDCWD, filename, st, AT_SYMLINK_NOFOLLOW) == 0
+    (cache_fstatat (fd_cwd, filename, st, AT_SYMLINK_NOFOLLOW) == 0
      && S_ISDIR (st->st_mode));
   errno = saved_errno;
   return is_dir;
 }
 
-#if HAVE_STRUCT_DIRENT_D_TYPE
-
-/* True if the type of the directory entry D is known.  */
-# define DT_IS_KNOWN(d) ((d)->d_type != DT_UNKNOWN)
-
-/* True if the type of the directory entry D must be T.  */
-# define DT_MUST_BE(d, t) ((d)->d_type == (t))
-
-#else
-# define DT_IS_KNOWN(d) false
-# define DT_MUST_BE(d, t) false
-#endif
+/* Return true if FILENAME is a non-directory.
+   Otherwise, including the case in which lstat fails, return false.
+   *ST is FILENAME's tstatus.
+   Do not modify errno.  */
+static inline bool
+is_nondir_lstat (int fd_cwd, char const *filename, struct stat *st)
+{
+  int saved_errno = errno;
+  bool is_non_dir =
+    (cache_fstatat (fd_cwd, filename, st, AT_SYMLINK_NOFOLLOW) == 0
+     && !S_ISDIR (st->st_mode));
+  errno = saved_errno;
+  return is_non_dir;
+}
 
 #define DO_UNLINK(Fd_cwd, Filename, X)					\
   do									\
@@ -978,14 +1078,14 @@ ignorable_missing (struct rm_options const *x, int errnum)
 
 static enum RM_status
 remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
-	      struct stat *st,
-	      struct rm_options const *x, struct dirent const *dp)
+	      int dirent_type_arg, struct stat *st,
+	      struct rm_options const *x)
 {
   Ternary is_empty_directory;
-  enum RM_status s = prompt (fd_cwd, ds, filename, st, x, PA_DESCEND_INTO_DIR,
+  enum RM_status s = prompt (fd_cwd, ds, filename, &dirent_type_arg, st, x,
+			     PA_DESCEND_INTO_DIR,
 			     &is_empty_directory);
-  bool known_to_be_dir = (cache_stat_ok (st) && S_ISDIR (st->st_mode));
-
+  int dirent_type = dirent_type_arg;
   if (s != RM_OK)
     return s;
 
@@ -1005,7 +1105,7 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
 
   if (cannot_unlink_dir ())
     {
-      if (known_to_be_dir && ! x->recursive)
+      if (dirent_type == DT_DIR && ! x->recursive)
 	{
 	  error (0, EISDIR, _("cannot remove %s"),
 		 quote (full_filename (filename)));
@@ -1021,22 +1121,27 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
 
       /* If we happen to know that FILENAME is a directory, return now
 	 and let the caller remove it -- this saves the overhead of a failed
-	 unlink call.  If FILENAME is a command-line argument, then dp is NULL,
-	 so we'll first try to unlink it.  Using unlink here is ok, because it
-	 cannot remove a directory.  */
-      if ((dp && DT_MUST_BE (dp, DT_DIR)) || known_to_be_dir)
+	 unlink call.  If FILENAME is a command-line argument, then
+	 DIRENT_TYPE is DT_UNKNOWN so we'll first try to unlink it.
+	 Using unlink here is ok, because it cannot remove a
+	 directory.  */
+      if (dirent_type == DT_DIR)
 	return RM_NONEMPTY_DIR;
 
       DO_UNLINK (fd_cwd, filename, x);
 
-      /* Upon a failed attempt to unlink a directory, most non-Linux systems
-	 set errno to the POSIX-required value EPERM.  In that case, change
-	 errno to EISDIR so that we emit a better diagnostic.  */
-      if (! x->recursive && errno == EPERM && is_dir_lstat (filename, st))
+      /* Upon a failed attempt to unlink a directory, most non GNU/Linux
+	 systems set errno to the POSIX-required value EPERM.  In that case,
+	 change errno to EISDIR so that we emit a better diagnostic.  */
+      if (! x->recursive && errno == EPERM && is_dir_lstat (fd_cwd,
+							    filename, st))
 	errno = EISDIR;
 
       if (! x->recursive
-	  || (cache_stat_ok (st) && !S_ISDIR (st->st_mode)))
+	  || (cache_stat_ok (st) && !S_ISDIR (st->st_mode))
+	  || ((errno == EACCES || errno == EPERM)
+	      && is_nondir_lstat (fd_cwd, filename, st))
+	  )
 	{
 	  if (ignorable_missing (x, errno))
 	    return RM_OK;
@@ -1054,31 +1159,24 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
       /* If we don't already know whether FILENAME is a directory,
 	 find out now.  Then, if it's a non-directory, we can use
 	 unlink on it.  */
-      bool is_dir;
 
-      if (cache_statted (st))
-	is_dir = known_to_be_dir;
-      else
+      if (dirent_type == DT_UNKNOWN)
 	{
-	  if (dp && DT_IS_KNOWN (dp))
-	    is_dir = DT_MUST_BE (dp, DT_DIR);
-	  else
+	  if (fstatat (fd_cwd, filename, st, AT_SYMLINK_NOFOLLOW))
 	    {
-	      if (fstatat (fd_cwd, filename, st, AT_SYMLINK_NOFOLLOW))
-		{
-		  if (ignorable_missing (x, errno))
-		    return RM_OK;
+	      if (ignorable_missing (x, errno))
+		return RM_OK;
 
-		  error (0, errno, _("cannot remove %s"),
-			 quote (full_filename (filename)));
-		  return RM_ERROR;
-		}
-
-	      is_dir = !! S_ISDIR (st->st_mode);
+	      error (0, errno, _("cannot remove %s"),
+		     quote (full_filename (filename)));
+	      return RM_ERROR;
 	    }
+
+	  if (S_ISDIR (st->st_mode))
+	    dirent_type = DT_DIR;
 	}
 
-      if (! is_dir)
+      if (dirent_type != DT_DIR)
 	{
 	  /* At this point, barring race conditions, FILENAME is known
 	     to be a non-directory, so it's ok to try to unlink it.  */
@@ -1125,7 +1223,7 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
    isn't restored.  */
 static DIR *
 fd_to_subdirp (int fd_cwd, char const *f,
-	       struct rm_options const *x, int prev_errno,
+	       int prev_errno,
 	       struct stat *subdir_sb,
 	       int *cwd_errno ATTRIBUTE_UNUSED)
 {
@@ -1155,6 +1253,188 @@ fd_to_subdirp (int fd_cwd, char const *f,
   return NULL;
 }
 
+struct readdir_data
+{
+  ino_t ino;
+  char name[FLEXIBLE_ARRAY_MEMBER];
+};
+
+#if HAVE_STRUCT_DIRENT_D_TYPE
+/* A comparison function to sort on increasing inode number.  */
+static int
+compare_ino (void const *av, void const *bv)
+{
+  struct readdir_data const *const *a = av;
+  struct readdir_data const *const *b = bv;
+  return (a[0]->ino < b[0]->ino ? -1
+	  : b[0]->ino < a[0]->ino ? 1 : 0);
+}
+
+/* Return an approximation of the maximum number of dirent entries
+   in a directory with stat data *ST.  */
+static size_t
+dirent_count (struct stat const *st)
+{
+  return st->st_size / 16;
+}
+
+#if defined __linux__ \
+  && HAVE_SYS_VFS_H && HAVE_FSTATFS && HAVE_STRUCT_STATFS_F_TYPE
+#  include <sys/vfs.h>
+#  include "fs.h"
+
+/* Return false if it is easy to determine the file system type of
+   the directory on which DIR_FD is open, and sorting dirents on
+   inode numbers is known not to improve traversal performance with
+   that type of file system.  Otherwise, return true.  */
+static bool
+dirent_inode_sort_may_be_useful (int dir_fd)
+{
+  /* Skip the sort only if we can determine efficiently
+     that skipping it is the right thing to do.
+     The cost of performing an unnecessary sort is negligible,
+     while the cost of *not* performing it can be O(N^2) with
+     a very large constant.  */
+  struct statfs fs_buf;
+
+  /* If fstatfs fails, assume sorting would be useful.  */
+  if (fstatfs (dir_fd, &fs_buf) != 0)
+    return true;
+
+  /* FIXME: what about when f_type is not an integral type?
+     deal with that if/when it's encountered.  */
+  switch (fs_buf.f_type)
+    {
+    case S_MAGIC_TMPFS:
+    case S_MAGIC_NFS:
+      /* On a file system of any of these types, sorting
+	 is unnecessary, and hence wasteful.  */
+      return false;
+
+    default:
+      return true;
+    }
+}
+# else /* !HAVE_STRUCT_STATFS_F_TYPE */
+static bool dirent_inode_sort_may_be_useful (int dir_fd) { return true; }
+# endif /* !HAVE_STRUCT_STATFS_F_TYPE */
+#endif /* HAVE_STRUCT_DIRENT_D_TYPE */
+
+/* When a directory contains very many entries, operating on N entries in
+   readdir order can be very seek-intensive (be it to unlink or even to
+   merely stat each entry), to the point that it results in O(N^2) work.
+   This is file-system-specific: ext3 and ext4 (as of 2008) are susceptible,
+   but tmpfs is not.  The general solution is to process entries in inode
+   order.  That means reading all entries, and sorting them before operating
+   on any.  As such, it is useful only on systems with useful dirent.d_ino.
+   Since 'rm -r's removal process must traverse into directories and since
+   this preprocessing phase can allocate O(N) storage, here we store and
+   sort only non-directory entries, and then remove all of those, so that we
+   can free all allocated storage before traversing into any subdirectory.
+   Perform this optimization only when not interactive and not in verbose
+   mode, to keep the implementation simple and to minimize duplication.
+   Upon failure, simply free any resources and return.  */
+static void
+preprocess_dir (DIR **dirp, struct rm_options const *x)
+{
+#if HAVE_STRUCT_DIRENT_D_TYPE
+
+  struct stat st;
+  /* There are many reasons to return right away, skipping this
+     optimization.  The penalty for being wrong is that we will
+     perform a small amount of extra work.
+
+     Skip this optimization if... */
+
+  int dir_fd = dirfd (*dirp);
+  if (/* - there is a chance of interactivity */
+      x->interactive != RMI_NEVER
+
+      /* - we're in verbose mode */
+      || x->verbose
+
+      /* - privileged users can unlink nonempty directories.
+	 Otherwise, there'd be a race condition between the readdir
+	 call (in which we learn dirent.d_type) and the unlink, by
+	 which time the non-directory may be replaced with a directory. */
+      || ! cannot_unlink_dir ()
+
+      /* - we can't fstat the file descriptor */
+      || fstat (dir_fd, &st) != 0
+
+      /* - the directory is smaller than some threshold.
+	 Estimate the number of inodes with a heuristic.
+         There's no significant benefit to sorting if there are
+	 too few inodes.  */
+      || dirent_count (&st) < INODE_SORT_DIR_ENTRIES_THRESHOLD
+
+      /* Sort only if it might help.  */
+      || ! dirent_inode_sort_may_be_useful (dir_fd))
+    return;
+
+  /* FIXME: maybe test file system type, too; skip if it's tmpfs: see fts.c */
+
+  struct obstack o_readdir_data;  /* readdir data: inode,name pairs  */
+  struct obstack o_p;  /* an array of pointers to each inode,name pair */
+
+  /* Arrange to longjmp upon obstack allocation failure.  */
+  jmp_buf readdir_jumpbuf;
+  if (setjmp (readdir_jumpbuf))
+    goto cleanup;
+
+  obstack_init_minimal (&o_readdir_data);
+  obstack_init_minimal (&o_p);
+
+  obstack_specify_allocation_with_arg (&o_readdir_data, 0, 0,
+				       rm_malloc, rm_free, &readdir_jumpbuf);
+  obstack_specify_allocation_with_arg (&o_p, 0, 0,
+				       rm_malloc, rm_free, &readdir_jumpbuf);
+
+  /* Read all entries, storing <d_ino, d_name> for each non-dir one.
+     Maintain a parallel list of pointers into the primary buffer.  */
+  while (1)
+    {
+      struct dirent const *dp;
+      dp = readdir_ignoring_dot_and_dotdot (*dirp);
+      /* no need to distinguish EOF from failure */
+      if (dp == NULL)
+	break;
+
+      /* Skip known-directory and type-unknown entries.  */
+      if (D_TYPE (dp) == DT_UNKNOWN || D_TYPE (dp) == DT_DIR)
+	break;
+
+      size_t name_len = strlen (dp->d_name);
+      size_t ent_len = offsetof (struct readdir_data, name) + name_len + 1;
+      struct readdir_data *v = obstack_alloc (&o_readdir_data, ent_len);
+      v->ino = D_INO (dp);
+      memcpy (v->name, dp->d_name, name_len + 1);
+
+      /* Append V to the list of pointers.  */
+      obstack_ptr_grow (&o_p, v);
+    }
+
+  /* Compute size and finalize VV.  */
+  size_t n = obstack_object_size (&o_p) / sizeof (void *);
+  struct readdir_data **vv = obstack_finish (&o_p);
+
+  /* Sort on inode number.  */
+  qsort(vv, n, sizeof *vv, compare_ino);
+
+  /* Iterate through those pointers, unlinking each name.  */
+  for (size_t i = 0; i < n; i++)
+    {
+      /* ignore failure */
+      unlinkat (dir_fd, vv[i]->name, 0);
+    }
+
+ cleanup:
+  obstack_free (&o_readdir_data, NULL);
+  obstack_free (&o_p, NULL);
+  rewinddir (*dirp);
+#endif
+}
+
 /* Remove entries in the directory open on DIRP
    Upon finding a directory that is both non-empty and that can be chdir'd
    into, return RM_OK and set *SUBDIR and fill in SUBDIR_SB, where
@@ -1176,6 +1456,10 @@ remove_cwd_entries (DIR **dirp,
 
   assert (VALID_STATUS (status));
   *subdir = NULL;
+
+  /* This is just an optimization.
+     It's not a fatal problem if it fails.  */
+  preprocess_dir (dirp, x);
 
   while (1)
     {
@@ -1216,7 +1500,8 @@ remove_cwd_entries (DIR **dirp,
 	 Systems without the d_type member will have to endure
 	 the performance hit of first calling lstat F. */
       cache_stat_init (subdir_sb);
-      tmp_status = remove_entry (dirfd (*dirp), ds, f, subdir_sb, x, dp);
+      tmp_status = remove_entry (dirfd (*dirp), ds, f,
+				 D_TYPE (dp), subdir_sb, x);
       switch (tmp_status)
 	{
 	case RM_OK:
@@ -1236,7 +1521,7 @@ remove_cwd_entries (DIR **dirp,
 	case RM_NONEMPTY_DIR:
 	  {
 	    DIR *subdir_dirp = fd_to_subdirp (dirfd (*dirp), f,
-					      x, errno, subdir_sb, NULL);
+					      errno, subdir_sb, NULL);
 	    if (subdir_dirp == NULL)
 	      {
 		status = RM_ERROR;
@@ -1324,7 +1609,7 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
      fd_to_subdirp's fstat, along with the `fstat' and the dev/ino
      comparison in AD_push ensure that we detect it and fail.  */
 
-  DIR *dirp = fd_to_subdirp (fd_cwd, dir, x, 0, dir_st, cwd_errno);
+  DIR *dirp = fd_to_subdirp (fd_cwd, dir, 0, dir_st, cwd_errno);
 
   if (dirp == NULL)
     {
@@ -1412,13 +1697,10 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
 	/* Try to remove EMPTY_DIR only if remove_cwd_entries succeeded.  */
 	if (tmp_status == RM_OK)
 	  {
-	    /* This does a little more work than necessary when it actually
-	       prompts the user.  E.g., we already know that D is a directory
-	       and that it's almost certainly empty, yet we lstat it.
-	       But that's no big deal since we're interactive.  */
 	    struct stat empty_st;
 	    Ternary is_empty;
-	    enum RM_status s = prompt (fd, ds, empty_dir,
+	    int dirent_type = DT_DIR;
+	    enum RM_status s = prompt (fd, ds, empty_dir, &dirent_type,
 				       cache_stat_init (&empty_st), x,
 				       PA_REMOVE_DIR, &is_empty);
 
@@ -1489,8 +1771,8 @@ rm_1 (Dirstack_state *ds, char const *filename,
   if (dot_or_dotdot (base))
     {
       error (0, 0, _(base == filename
-		     ? "cannot remove directory %s"
-		     : "cannot remove %s directory %s"),
+		     ? N_("cannot remove directory %s")
+		     : N_("cannot remove %s directory %s")),
 	     quote_n (0, base), quote_n (1, filename));
       return RM_ERROR;
     }
@@ -1519,7 +1801,8 @@ rm_1 (Dirstack_state *ds, char const *filename,
   AD_INIT_OTHER_MEMBERS ();
 
   {
-  enum RM_status status = remove_entry (AT_FDCWD, ds, filename, &st, x, NULL);
+  enum RM_status status = remove_entry (AT_FDCWD, ds, filename,
+					DT_UNKNOWN, &st, x);
   if (status == RM_NONEMPTY_DIR)
     {
       /* In the event that remove_dir->remove_cwd_entries detects
@@ -1535,7 +1818,7 @@ rm_1 (Dirstack_state *ds, char const *filename,
 
   ds_clear (ds);
   return status;
-  }
+}
   }
 }
 
@@ -1545,9 +1828,18 @@ extern enum RM_status
 rm (size_t n_files, char const *const *file, struct rm_options const *x)
 {
   enum RM_status status = RM_OK;
-  Dirstack_state *ds = ds_init ();
+  Dirstack_state ds;
   int cwd_errno = 0;
   size_t i;
+
+  /* Arrange for obstack allocation failure to longjmp.  */
+  if (setjmp (ds.current_arg_jumpbuf))
+    {
+      status = RM_ERROR;
+      goto cleanup;
+    }
+
+  ds_init (&ds);
 
   for (i = 0; i < n_files; i++)
     {
@@ -1558,7 +1850,7 @@ rm (size_t n_files, char const *const *file, struct rm_options const *x)
 	}
       else
 	{
-	  enum RM_status s = rm_1 (ds, file[i], x, &cwd_errno);
+	  enum RM_status s = rm_1 (&ds, file[i], x, &cwd_errno);
 	  assert (VALID_STATUS (s));
 	  UPDATE_STATUS (status, s);
 	}
@@ -1571,7 +1863,8 @@ rm (size_t n_files, char const *const *file, struct rm_options const *x)
       status = RM_ERROR;
     }
 
-  ds_free (ds);
+ cleanup:;
+  ds_free (&ds);
 
   return status;
 }

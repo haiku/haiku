@@ -1,10 +1,10 @@
 /* system-dependent definitions for coreutils
-   Copyright (C) 1989, 1991-2007 Free Software Foundation, Inc.
+   Copyright (C) 1989, 1991-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <alloca.h>
 
@@ -36,19 +35,6 @@ you must include <sys/types.h> before including this file
 #endif
 
 #include <unistd.h>
-
-#ifndef STDIN_FILENO
-# define STDIN_FILENO 0
-#endif
-
-#ifndef STDOUT_FILENO
-# define STDOUT_FILENO 1
-#endif
-
-#ifndef STDERR_FILENO
-# define STDERR_FILENO 2
-#endif
-
 
 /* limits.h must come before pathmax.h because limits.h on some systems
    undefs PATH_MAX, whereas pathmax.h sets PATH_MAX.  */
@@ -110,15 +96,17 @@ you must include <sys/types.h> before including this file
 #ifndef ENOSYS
 # define ENOSYS (-1)
 #endif
+#ifndef ENODATA
+# define ENODATA (-1)
+#endif
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include "version.h"
 
-/* Exit statuses for programs like 'env' that exec other programs.
-   EXIT_FAILURE might not be 1, so use EXIT_FAIL in such programs.  */
+/* Exit statuses for programs like 'env' that exec other programs.  */
 enum
 {
-  EXIT_FAIL = 1,
   EXIT_CANNOT_INVOKE = 126,
   EXIT_ENOENT = 127
 };
@@ -158,6 +146,9 @@ enum
 /* Some systems don't have inodes, so fake them to avoid lots of ifdefs.  */
 # define D_INO(dp) NOT_AN_INODE_NUMBER
 #endif
+
+/* include here for SIZE_MAX.  */
+#include <inttypes.h>
 
 /* Get or fake the disk device blocksize.
    Usually defined by sys/param.h (if at all).  */
@@ -239,8 +230,6 @@ enum
 #include "stat-macros.h"
 
 #include "timespec.h"
-
-#include <inttypes.h>
 
 #include <ctype.h>
 
@@ -359,6 +348,7 @@ uid_t getuid ();
 #include "same-inode.h"
 
 #include "dirname.h"
+#include "openat.h"
 
 static inline bool
 dot_or_dotdot (char const *file_name)
@@ -384,6 +374,36 @@ readdir_ignoring_dot_and_dotdot (DIR *dirp)
     }
 }
 
+/* Return true if DIR is determined to be an empty directory.  */
+static inline bool
+is_empty_dir (int fd_cwd, char const *dir)
+{
+  DIR *dirp;
+  struct dirent const *dp;
+  int saved_errno;
+  int fd = openat (fd_cwd, dir,
+		   (O_RDONLY | O_DIRECTORY
+		    | O_NOCTTY | O_NOFOLLOW | O_NONBLOCK));
+
+  if (fd < 0)
+    return false;
+
+  dirp = fdopendir (fd);
+  if (dirp == NULL)
+    {
+      close (fd);
+      return false;
+    }
+
+  errno = 0;
+  dp = readdir_ignoring_dot_and_dotdot (dirp);
+  saved_errno = errno;
+  closedir (dirp);
+  if (dp != NULL)
+    return false;
+  return saved_errno == 0 ? true : false;
+}
+
 /* Factor out some of the common --help and --version processing code.  */
 
 /* These enum values cannot possibly conflict with the option values
@@ -399,6 +419,8 @@ enum
   "help", no_argument, NULL, GETOPT_HELP_CHAR
 #define GETOPT_VERSION_OPTION_DECL \
   "version", no_argument, NULL, GETOPT_VERSION_CHAR
+#define GETOPT_SELINUX_CONTEXT_OPTION_DECL \
+  "context", required_argument, NULL, 'Z'
 
 #define case_GETOPT_HELP_CHAR			\
   case GETOPT_HELP_CHAR:			\
@@ -418,12 +440,26 @@ enum
 #define VERSION_OPTION_DESCRIPTION \
   _("      --version  output version information and exit\n")
 
+#include "closein.h"
 #include "closeout.h"
+
+#define emit_bug_reporting_address unused__emit_bug_reporting_address
 #include "version-etc.h"
+#undef emit_bug_reporting_address
+
+#include "propername.h"
+/* Define away proper_name (leaving proper_name_utf8, which affects far
+   fewer programs), since it's not worth the cost of adding ~17KB to
+   the x86_64 text size of every single program.  This avoids a 40%
+   (almost ~2MB) increase in the on-disk space utilization for the set
+   of the 100 binaries. */
+#define proper_name(x) (x)
+
+#include "progname.h"
 
 #define case_GETOPT_VERSION_CHAR(Program_name, Authors)			\
   case GETOPT_VERSION_CHAR:						\
-    version_etc (stdout, Program_name, GNU_PACKAGE, VERSION, Authors,	\
+    version_etc (stdout, Program_name, PACKAGE_NAME, Version, Authors,	\
                  (char *) NULL);					\
     exit (EXIT_SUCCESS);						\
     break;
@@ -469,8 +505,21 @@ enum
 # define IF_LINT(Code) /* empty */
 #endif
 
+/* With -Dlint, avoid warnings from gcc about code like mbstate_t m = {0,};
+   by wasting space on a static variable of the same type, that is thus
+   guaranteed to be initialized to 0, and use that on the RHS.  */
+#define DZA_CONCAT0(x,y) x ## y
+#define DZA_CONCAT(x,y) DZA_CONCAT0 (x, y)
+#ifdef lint
+# define DECLARE_ZEROED_AGGREGATE(Type, Var) \
+   static Type DZA_CONCAT (s0_, __LINE__); Type Var = DZA_CONCAT (s0_, __LINE__)
+#else
+# define DECLARE_ZEROED_AGGREGATE(Type, Var) \
+  Type Var = { 0, }
+#endif
+
 #ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
 #  define __attribute__(x) /* empty */
 # endif
 #endif
@@ -500,21 +549,6 @@ enum
 
 #ifndef EOVERFLOW
 # define EOVERFLOW EINVAL
-#endif
-
-#if ! HAVE_FSEEKO
-# if ! defined fseeko
-#  define fseeko(s, o, w) ((o) == (long int) (o)	\
-			   ? fseek (s, o, w)		\
-			   : (errno = EOVERFLOW, -1))
-# endif
-# if ! defined ftello
-static inline off_t ftello (FILE *stream)
-{
-  verify (sizeof (long int) <= sizeof (off_t));
-  return ftell (stream);
-}
-# endif
 #endif
 
 #if ! HAVE_SYNC
@@ -581,3 +615,90 @@ ptr_align (void const *ptr, size_t alignment)
      || (Type) ((Accum) * 10 + (Digit_val)) < (Accum))			\
     ? false : (((Accum) = (Accum) * 10 + (Digit_val)), true))		\
   )
+
+#include "hard-locale.h"
+static inline void
+emit_bug_reporting_address (void)
+{
+  printf (_("\nReport %s bugs to %s\n"), last_component (program_name),
+	  PACKAGE_BUGREPORT);
+  /* FIXME 2010: use AC_PACKAGE_URL once we require autoconf-2.64 */
+  printf (_("%s home page: <http://www.gnu.org/software/%s/>\n"),
+	  PACKAGE_NAME, PACKAGE);
+  fputs (_("General help using GNU software: <http://www.gnu.org/gethelp/>\n"),
+	 stdout);
+
+  if (hard_locale (LC_MESSAGES))
+    {
+      /* TRANSLATORS: Replace LANG_CODE in this URL with your language code
+	 <http://translationproject.org/team/LANG_CODE.html> to form one of
+	 the URLs at http://translationproject.org/team/.  Otherwise, replace
+	 the entire URL with your translation team's email address.  */
+      printf (_("Report %s translation bugs to "
+		"<http://translationproject.org/team/>\n"),
+		last_component (program_name));
+    }
+}
+
+#include "inttostr.h"
+
+static inline char *
+timetostr (time_t t, char *buf)
+{
+  return (TYPE_SIGNED (time_t)
+	  ? imaxtostr (t, buf)
+	  : umaxtostr (t, buf));
+}
+
+static inline char *
+bad_cast (char const *s)
+{
+  return (char *) s;
+}
+
+/* As of Mar 2009, 32KiB is determined to be the minimium
+   blksize to best minimize system call overhead.
+   This can be tested with this script with the results
+   shown for a 1.7GHz pentium-m with 2GB of 400MHz DDR2 RAM:
+
+   for i in $(seq 0 10); do
+     size=$((8*1024**3)) #ensure this is big enough
+     bs=$((1024*2**$i))
+     printf "%7s=" $bs
+     dd bs=$bs if=/dev/zero of=/dev/null count=$(($size/$bs)) 2>&1 |
+     sed -n 's/.* \([0-9.]* [GM]B\/s\)/\1/p'
+   done
+
+      1024=734 MB/s
+      2048=1.3 GB/s
+      4096=2.4 GB/s
+      8192=3.5 GB/s
+     16384=3.9 GB/s
+     32768=5.2 GB/s
+     65536=5.3 GB/s
+    131072=5.5 GB/s
+    262144=5.7 GB/s
+    524288=5.7 GB/s
+   1048576=5.8 GB/s
+
+   Note that this is to minimize system call overhead.
+   Other values may be appropriate to minimize file system
+   or disk overhead.  For example on my current GNU/Linux system
+   the readahead setting is 128KiB which was read using:
+
+   file="."
+   device=$(df -P --local "$file" | tail -n1 | cut -d' ' -f1)
+   echo $(( $(blockdev --getra $device) * 512 ))
+
+   However there isn't a portable way to get the above.
+   In the future we could use the above method if available
+   and default to io_blksize() if not.
+ */
+enum { IO_BUFSIZE = 32*1024 };
+static inline size_t
+io_blksize (struct stat sb)
+{
+  return MAX (IO_BUFSIZE, ST_BLKSIZE (sb));
+}
+
+void usage (int status) ATTRIBUTE_NORETURN;

@@ -1,10 +1,10 @@
 /* GNU's pinky.
-   Copyright (C) 1992-1997, 1999-2006 Free Software Foundation, Inc.
+   Copyright (C) 1992-1997, 1999-2006, 2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Created by hacking who.c by Kaveh Ghazi ghazi@caip.rutgers.edu */
 
@@ -27,23 +26,21 @@
 
 #include "canon-host.h"
 #include "error.h"
-#include "hard-locale.h"
-#include "inttostr.h"
 #include "readutmp.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "pinky"
 
-#define AUTHORS "Joseph Arceneaux", "David MacKenzie", "Kaveh Ghazi"
+#define AUTHORS \
+  proper_name ("Joseph Arceneaux"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Kaveh Ghazi")
 
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN 64
 #endif
 
-char *ttyname ();
-
-/* The name this program was run with. */
-const char *program_name;
+char *ttyname (int);
 
 /* If true, display the hours:minutes since each user has touched
    the keyboard, or blank if within the last minute, or days followed
@@ -198,7 +195,7 @@ time_string (const STRUCT_UTMP *utmp_ent)
       return buf;
     }
   else
-    return TYPE_SIGNED (time_t) ? imaxtostr (t, buf) : umaxtostr (t, buf);
+    return timetostr (t, buf);
 }
 
 /* Display a line of information about UTMP_ENT. */
@@ -252,7 +249,8 @@ print_entry (const STRUCT_UTMP *utmp_ent)
       name[UT_USER_SIZE] = '\0';
       pw = getpwnam (name);
       if (pw == NULL)
-	printf (" %19s", "        ???");
+	/* TRANSLATORS: Real name is unknown; at most 19 characters. */
+	printf (" %19s", _("        ???"));
       else
 	{
 	  char *const comma = strchr (pw->pw_gecos, ',');
@@ -275,7 +273,8 @@ print_entry (const STRUCT_UTMP *utmp_ent)
       if (last_change)
 	printf (" %-6s", idle_string (last_change));
       else
-	printf (" %-6s", "???");
+	/* TRANSLATORS: Idle time is unknown; at most 5 characters. */
+	printf (" %-6s", _("?????"));
     }
 
   printf (" %s", time_string (utmp_ent));
@@ -330,6 +329,7 @@ print_long_entry (const char name[])
   printf (_("In real life: "));
   if (pw == NULL)
     {
+      /* TRANSLATORS: Real name is unknown; no hard limit. */
       printf (" %s", _("???\n"));
       return;
     }
@@ -530,7 +530,7 @@ usage (int status)
 A lightweight `finger' program;  print user information.\n\
 The utmp file will be %s.\n\
 "), UTMP_FILE);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -542,7 +542,7 @@ main (int argc, char **argv)
   int n_users;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);

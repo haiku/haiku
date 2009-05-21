@@ -1,20 +1,19 @@
 /* Permuted index for GNU, with keywords in their context.
-   Copyright (C) 1990, 1991, 1993, 1998-2006 Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1993, 1998-2009 Free Software Foundation, Inc.
    François Pinard <pinard@iro.umontreal.ca>, 1988.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    François Pinard <pinard@iro.umontreal.ca> */
 
@@ -35,10 +34,10 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "ptx"
 
-/* Note to translator: Please translate "F. Pinard" to "François
-   Pinard" if "ç" (c-with-cedilla) is available in the
-   translation's character set and encoding.  */
-#define AUTHORS _("F. Pinard")
+/* TRANSLATORS: Please translate "F. Pinard" to "François Pinard"
+   if "ç" (c-with-cedilla) is available in the translation's character
+   set and encoding.  */
+#define AUTHORS proper_name_utf8 ("F. Pinard", "Fran\xc3\xa7ois Pinard")
 
 /* Number of possible characters in a byte.  */
 #define CHAR_SET_SIZE 256
@@ -65,12 +64,6 @@
 /* Reallocation step when swallowing non regular files.  The value is not
    the actual reallocation step, but its base two logarithm.  */
 #define SWALLOW_REALLOC_LOG 12
-
-/* Imported from "regex.c".  */
-#define Sword 1
-
-/* The name this program was run with. */
-char *program_name;
 
 /* Program options.  */
 
@@ -311,91 +304,97 @@ copy_unescaped_string (const char *string)
   cursor = result;
 
   while (*string)
-    if (*string == '\\')
-      {
-	string++;
-	switch (*string)
-	  {
-	  case 'x':		/* \xhhh escape, 3 chars maximum */
-	    value = 0;
-	    for (length = 0, string++;
-		 length < 3 && isxdigit (to_uchar (*string));
-		 length++, string++)
-	      value = value * 16 + HEXTOBIN (*string);
-	    if (length == 0)
-	      {
-		*cursor++ = '\\';
-		*cursor++ = 'x';
-	      }
-	    else
+    {
+      if (*string == '\\')
+	{
+	  string++;
+	  switch (*string)
+	    {
+	    case 'x':		/* \xhhh escape, 3 chars maximum */
+	      value = 0;
+	      for (length = 0, string++;
+		   length < 3 && isxdigit (to_uchar (*string));
+		   length++, string++)
+		value = value * 16 + HEXTOBIN (*string);
+	      if (length == 0)
+		{
+		  *cursor++ = '\\';
+		  *cursor++ = 'x';
+		}
+	      else
+		*cursor++ = value;
+	      break;
+
+	    case '0':		/* \0ooo escape, 3 chars maximum */
+	      value = 0;
+	      for (length = 0, string++;
+		   length < 3 && ISODIGIT (*string);
+		   length++, string++)
+		value = value * 8 + OCTTOBIN (*string);
 	      *cursor++ = value;
-	    break;
+	      break;
 
-	  case '0':		/* \0ooo escape, 3 chars maximum */
-	    value = 0;
-	    for (length = 0, string++;
-		 length < 3 && ISODIGIT (*string);
-		 length++, string++)
-	      value = value * 8 + OCTTOBIN (*string);
-	    *cursor++ = value;
-	    break;
-
-	  case 'a':		/* alert */
+	    case 'a':		/* alert */
 #if __STDC__
-	    *cursor++ = '\a';
+	      *cursor++ = '\a';
 #else
-	    *cursor++ = 7;
+	      *cursor++ = 7;
 #endif
-	    string++;
-	    break;
-
-	  case 'b':		/* backspace */
-	    *cursor++ = '\b';
-	    string++;
-	    break;
-
-	  case 'c':		/* cancel the rest of the output */
-	    while (*string)
 	      string++;
-	    break;
+	      break;
 
-	  case 'f':		/* form feed */
-	    *cursor++ = '\f';
-	    string++;
-	    break;
+	    case 'b':		/* backspace */
+	      *cursor++ = '\b';
+	      string++;
+	      break;
 
-	  case 'n':		/* new line */
-	    *cursor++ = '\n';
-	    string++;
-	    break;
+	    case 'c':		/* cancel the rest of the output */
+	      while (*string)
+		string++;
+	      break;
 
-	  case 'r':		/* carriage return */
-	    *cursor++ = '\r';
-	    string++;
-	    break;
+	    case 'f':		/* form feed */
+	      *cursor++ = '\f';
+	      string++;
+	      break;
 
-	  case 't':		/* horizontal tab */
-	    *cursor++ = '\t';
-	    string++;
-	    break;
+	    case 'n':		/* new line */
+	      *cursor++ = '\n';
+	      string++;
+	      break;
 
-	  case 'v':		/* vertical tab */
+	    case 'r':		/* carriage return */
+	      *cursor++ = '\r';
+	      string++;
+	      break;
+
+	    case 't':		/* horizontal tab */
+	      *cursor++ = '\t';
+	      string++;
+	      break;
+
+	    case 'v':		/* vertical tab */
 #if __STDC__
-	    *cursor++ = '\v';
+	      *cursor++ = '\v';
 #else
-	    *cursor++ = 11;
+	      *cursor++ = 11;
 #endif
-	    string++;
-	    break;
+	      string++;
+	      break;
 
-	  default:
-	    *cursor++ = '\\';
-	    *cursor++ = *string++;
-	    break;
-	  }
-      }
-    else
-      *cursor++ = *string++;
+	    case '\0':		/* lone backslash at end of string */
+	      /* ignore it */
+	      break;
+
+	    default:
+	      *cursor++ = '\\';
+	      *cursor++ = *string++;
+	      break;
+	    }
+	}
+      else
+	*cursor++ = *string++;
+    }
 
   *cursor = '\0';
   return result;
@@ -1351,6 +1350,8 @@ fix_output_parameters (void)
 	 right side, or one on either side.  */
 
       before_max_width -= 2 * truncation_string_length;
+      if (before_max_width < 0)
+	before_max_width = 0;
       keyafter_max_width -= 2 * truncation_string_length;
     }
   else
@@ -1922,7 +1923,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE or if FILE is -, read Standard Input.  `-F /' by default.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -1933,11 +1934,10 @@ With no FILE or if FILE is -, read Standard Input.  `-F /' by default.\n\
 `----------------------------------------------------------------------*/
 
 /* Long options equivalences.  */
-static const struct option long_options[] =
+static struct option const long_options[] =
 {
   {"auto-reference", no_argument, NULL, 'A'},
   {"break-file", required_argument, NULL, 'b'},
-  {"copyright", no_argument, NULL, 'C'}, /* Deprecated, remove in 2007.  */
   {"flag-truncation", required_argument, NULL, 'F'},
   {"ignore-case", no_argument, NULL, 'f'},
   {"gap-size", required_argument, NULL, 'g'},
@@ -1976,7 +1976,7 @@ main (int argc, char **argv)
   /* Decode program options.  */
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -1987,7 +1987,7 @@ main (int argc, char **argv)
   setchrclass (NULL);
 #endif
 
-  while (optchar = getopt_long (argc, argv, "ACF:GM:ORS:TW:b:i:fg:o:trw:",
+  while (optchar = getopt_long (argc, argv, "AF:GM:ORS:TW:b:i:fg:o:trw:",
 				long_options, NULL),
 	 optchar != EOF)
     {
@@ -2085,11 +2085,6 @@ main (int argc, char **argv)
 				     format_args, format_vals);
 	case_GETOPT_HELP_CHAR;
 
-	case 'C':
-	  error (0, 0, _("\
-the --copyright option is deprecated; use --version instead"));
-          /* fallthrough */
-
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	}
     }
@@ -2116,11 +2111,10 @@ the --copyright option is deprecated; use --version instead"));
 
       for (file_index = 0; file_index < number_input_files; file_index++)
 	{
-	  input_file_name[file_index] = argv[optind];
 	  if (!*argv[optind] || STREQ (argv[optind], "-"))
-	    input_file_name[0] = NULL;
+	    input_file_name[file_index] = NULL;
 	  else
-	    input_file_name[0] = argv[optind];
+	    input_file_name[file_index] = argv[optind];
 	  optind++;
 	}
     }

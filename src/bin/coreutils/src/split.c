@@ -1,10 +1,10 @@
 /* split.c -- split a file into pieces.
-   Copyright (C) 1988, 1991, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991, 1995-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* By tege@sics.se, with rms.
 
@@ -31,23 +30,21 @@
 #include "error.h"
 #include "fd-reopen.h"
 #include "fcntl--.h"
-#include "getpagesize.h"
 #include "full-read.h"
 #include "full-write.h"
-#include "inttostr.h"
 #include "quote.h"
 #include "safe-read.h"
+#include "xfreopen.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "split"
 
-#define AUTHORS "Torbjorn Granlund", "Richard M. Stallman"
+#define AUTHORS \
+  proper_name_utf8 ("Torbjorn Granlund", "Torbj\303\266rn Granlund"), \
+  proper_name ("Richard M. Stallman")
 
 #define DEFAULT_SUFFIX_LENGTH 2
-
-/* The name this program was run with. */
-char *program_name;
 
 /* Base name of output files.  */
 static char const *outbase;
@@ -104,7 +101,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] [INPUT [PREFIX]]\n\
+Usage: %s [OPTION]... [INPUT [PREFIX]]\n\
 "),
 	      program_name);
     fputs (_("\
@@ -124,16 +121,18 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -l, --lines=NUMBER      put NUMBER lines per output file\n\
 "), DEFAULT_SUFFIX_LENGTH);
       fputs (_("\
-      --verbose           print a diagnostic to standard error just\n\
-                            before each output file is opened\n\
+      --verbose           print a diagnostic just before each\n\
+                            output file is opened\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
-SIZE may have a multiplier suffix: b for 512, k for 1K, m for 1 Meg.\n\
+SIZE may have a multiplier suffix:\n\
+b 512, kB 1000, K 1024, MB 1000*1000, M 1024*1024,\n\
+GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -190,7 +189,7 @@ next_file_name (void)
 	  sufindex[i] = 0;
 	  outfile_mid[i] = suffix_alphabet[sufindex[i]];
 	}
-      error (EXIT_FAILURE, 0, _("Output file suffixes exhausted"));
+      error (EXIT_FAILURE, 0, _("output file suffixes exhausted"));
     }
 }
 
@@ -208,7 +207,7 @@ cwrite (bool new_file_flag, const char *bp, size_t bytes)
 
       next_file_name ();
       if (verbose)
-	fprintf (stderr, _("creating file %s\n"), quote (outfile));
+	fprintf (stdout, _("creating file %s\n"), quote (outfile));
       output_desc = open (outfile,
 			  O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
 			  (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
@@ -336,7 +335,11 @@ line_bytes_split (size_t n_bytes)
 
       n_buffered += n_read;
       if (n_buffered != n_bytes)
-	eof = true;
+	{
+	  if (n_buffered == 0)
+	    break;
+	  eof = true;
+	}
 
       /* Find where to end this chunk.  */
       bp = buf + n_buffered;
@@ -384,11 +387,12 @@ main (int argc, char **argv)
   char *buf;			/* file i/o buffer */
   size_t page_size = getpagesize ();
   uintmax_t n_units;
+  static char const multipliers[] = "bEGKkMmPTYZ0";
   int c;
   int digits_optind = 0;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -397,8 +401,8 @@ main (int argc, char **argv)
 
   /* Parse command line options.  */
 
-  infile = "-";
-  outbase = "x";
+  infile = bad_cast ( "-");
+  outbase = bad_cast ("x");
 
   while (1)
     {
@@ -428,7 +432,7 @@ main (int argc, char **argv)
 	  if (split_type != type_undef)
 	    FAIL_ONLY_ONE_WAY ();
 	  split_type = type_bytes;
-	  if (xstrtoumax (optarg, NULL, 10, &n_units, "bkm") != LONGINT_OK
+	  if (xstrtoumax (optarg, NULL, 10, &n_units, multipliers) != LONGINT_OK
 	      || n_units == 0)
 	    {
 	      error (0, 0, _("%s: invalid number of bytes"), optarg);
@@ -452,7 +456,7 @@ main (int argc, char **argv)
 	  if (split_type != type_undef)
 	    FAIL_ONLY_ONE_WAY ();
 	  split_type = type_byteslines;
-	  if (xstrtoumax (optarg, NULL, 10, &n_units, "bkm") != LONGINT_OK
+	  if (xstrtoumax (optarg, NULL, 10, &n_units, multipliers) != LONGINT_OK
 	      || n_units == 0 || SIZE_MAX < n_units)
 	    {
 	      error (0, 0, _("%s: invalid number of bytes"), optarg);
@@ -541,7 +545,7 @@ main (int argc, char **argv)
 
   /* Binary I/O is safer when bytecounts are used.  */
   if (O_BINARY && ! isatty (STDIN_FILENO))
-    freopen (NULL, "rb", stdin);
+    xfreopen (NULL, "rb", stdin);
 
   /* No output file is open now.  */
   output_desc = -1;
@@ -550,7 +554,7 @@ main (int argc, char **argv)
 
   if (fstat (STDIN_FILENO, &stat_buf) != 0)
     error (EXIT_FAILURE, errno, "%s", infile);
-  in_blk_size = ST_BLKSIZE (stat_buf);
+  in_blk_size = io_blksize (stat_buf);
 
   buf = ptr_align (xmalloc (in_blk_size + 1 + page_size - 1), page_size);
 

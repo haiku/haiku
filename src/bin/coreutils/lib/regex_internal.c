@@ -1,12 +1,15 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software
-   Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+   Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -236,7 +239,7 @@ build_wcs_buffer (re_string_t *pstr)
 	}
       else
 	p = (const char *) pstr->raw_mbs + pstr->raw_mbs_idx + byte_idx;
-      mbclen = mbrtowc (&wc, p, remain_len, &pstr->cur_state);
+      mbclen = __mbrtowc (&wc, p, remain_len, &pstr->cur_state);
       if (BE (mbclen == (size_t) -2, 0))
 	{
 	  /* The buffer doesn't have enough space, finish to build.  */
@@ -306,9 +309,9 @@ build_wcs_upper_buffer (re_string_t *pstr)
 
 	  remain_len = end_idx - byte_idx;
 	  prev_st = pstr->cur_state;
-	  mbclen = mbrtowc (&wc,
-			    ((const char *) pstr->raw_mbs + pstr->raw_mbs_idx
-			     + byte_idx), remain_len, &pstr->cur_state);
+	  mbclen = __mbrtowc (&wc,
+			      ((const char *) pstr->raw_mbs + pstr->raw_mbs_idx
+			       + byte_idx), remain_len, &pstr->cur_state);
 	  if (BE (mbclen < (size_t) -2, 1))
 	    {
 	      wchar_t wcu = wc;
@@ -376,7 +379,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	  }
 	else
 	  p = (const char *) pstr->raw_mbs + pstr->raw_mbs_idx + src_idx;
-	mbclen = mbrtowc (&wc, p, remain_len, &pstr->cur_state);
+	mbclen = __mbrtowc (&wc, p, remain_len, &pstr->cur_state);
 	if (BE (mbclen < (size_t) -2, 1))
 	  {
 	    wchar_t wcu = wc;
@@ -499,8 +502,8 @@ re_string_skip_chars (re_string_t *pstr, Idx new_raw_idx, wint_t *last_wc)
       Idx remain_len;
       remain_len = pstr->len - rawbuf_idx;
       prev_st = pstr->cur_state;
-      mbclen = mbrtowc (&wc2, (const char *) pstr->raw_mbs + rawbuf_idx,
-			remain_len, &pstr->cur_state);
+      mbclen = __mbrtowc (&wc2, (const char *) pstr->raw_mbs + rawbuf_idx,
+			  remain_len, &pstr->cur_state);
       if (BE (mbclen == (size_t) -2 || mbclen == (size_t) -1 || mbclen == 0, 0))
 	{
 	  /* We treat these cases as a single byte character.  */
@@ -687,10 +690,10 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 	}
       else
 	{
+#ifdef RE_ENABLE_I18N
 	  /* No, skip all characters until IDX.  */
 	  Idx prev_valid_len = pstr->valid_len;
 
-#ifdef RE_ENABLE_I18N
 	  if (BE (pstr->offsets_needed, 0))
 	    {
 	      pstr->len = pstr->raw_len - idx + offset;
@@ -745,8 +748,8 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 			  /* XXX Don't use mbrtowc, we know which conversion
 			     to use (UTF-8 -> UCS4).  */
 			  memset (&cur_state, 0, sizeof (cur_state));
-			  mbclen = mbrtowc (&wc2, (const char *) p, mlen,
-					    &cur_state);
+			  mbclen = __mbrtowc (&wc2, (const char *) p, mlen,
+					      &cur_state);
 			  if (raw + offset - p <= mbclen
 			      && mbclen < (size_t) -2)
 			    {
@@ -1689,11 +1692,9 @@ create_cd_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
 
   for (i = 0 ; i < nodes->nelem ; i++)
     {
-      unsigned int constraint = 0;
       re_token_t *node = dfa->nodes + nodes->elems[i];
       re_token_type_t type = node->type;
-      if (node->constraint)
-	constraint = node->constraint;
+      unsigned int constraint = node->constraint;
 
       if (type == CHARACTER && !constraint)
 	continue;
@@ -1706,8 +1707,6 @@ create_cd_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
 	newstate->halt = 1;
       else if (type == OP_BACK_REF)
 	newstate->has_backref = 1;
-      else if (type == ANCHOR)
-	constraint = node->opr.ctx_type;
 
       if (constraint)
 	{

@@ -2,23 +2,20 @@
 
 /* Modified to run with the GNU shell by bfox. */
 
-/* Copyright (C) 1987-2005 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2005, 2007-2009 Free Software Foundation, Inc.
 
-   This file is part of GNU Bash, the Bourne Again SHell.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
-
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Define TEST_STANDALONE to get the /bin/test version.  Otherwise, you get
    the shell builtin version. */
@@ -41,9 +38,6 @@
 #endif
 
 #include "system.h"
-#include "error.h"
-#include "euidaccess.h"
-#include "inttostr.h"
 #include "quote.h"
 #include "stat-time.h"
 #include "strnumcmp.h"
@@ -51,8 +45,6 @@
 #if HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
-
-char *program_name;
 
 /* Exit status for syntax errors, etc.  */
 enum { TEST_TRUE, TEST_FALSE, TEST_FAILURE };
@@ -99,7 +91,7 @@ test_syntax_error (char const *format, char const *arg)
    past the end of the argument list.  This check is supressed if the
    argument is false.  */
 
-static inline void
+static void
 advance (bool f)
 {
   ++pos;
@@ -108,7 +100,7 @@ advance (bool f)
     beyond ();
 }
 
-static inline void
+static void
 unary_advance (void)
 {
   advance (true);
@@ -575,9 +567,9 @@ test_unop (char const *op)
     case 'u': case 'w': case 'x': case 'z':
     case 'G': case 'L': case 'O': case 'S': case 'N':
       return true;
+    default:
+      return false;
     }
-
-  return false;
 }
 
 static bool
@@ -681,7 +673,6 @@ posixtest (int nargs)
 }
 
 #if defined TEST_STANDALONE
-# include "long-options.h"
 
 void
 usage (int status)
@@ -773,8 +764,13 @@ Except for -h and -L, all FILE-related tests dereference symbolic links.\n\
 Beware that parentheses need to be escaped (e.g., by backslashes) for shells.\n\
 INTEGER may also be -l STRING, which evaluates to the length of STRING.\n\
 "), stdout);
+      fputs (_("\
+\n\
+NOTE: [ honors the --help and --version options, but test does not.\n\
+test treats each of those as it treats any other nonempty STRING.\n\
+"), stdout);
       printf (USAGE_BUILTIN_WARNING, _("test and/or ["));
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -784,7 +780,9 @@ INTEGER may also be -l STRING, which evaluates to the length of STRING.\n\
 # define main test_command
 #endif
 
-#define AUTHORS "Kevin Braunsdorf", "Matthew Bradburn"
+#define AUTHORS \
+  proper_name ("Kevin Braunsdorf"), \
+  proper_name ("Matthew Bradburn")
 
 /*
  * [:
@@ -806,7 +804,7 @@ main (int margc, char **margv)
     return (test_error_return);
 #else /* TEST_STANDALONE */
   initialize_main (&margc, &margv);
-  program_name = margv[0];
+  set_program_name (margv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -820,16 +818,25 @@ main (int margc, char **margv)
   if (LBRACKET)
     {
       /* Recognize --help or --version, but only when invoked in the
-	 "[" form, and when the last argument is not "]".  POSIX
-	 allows "[ --help" and "[ --version" to have the usual GNU
-	 behavior, but it requires "test --help" and "test --version"
-	 to exit silently with status 0.  */
-      if (margc < 2 || !STREQ (margv[margc - 1], "]"))
+	 "[" form, when the last argument is not "]".  Use direct
+	 parsing, rather than parse_long_options, to avoid accepting
+	 abbreviations.  POSIX allows "[ --help" and "[ --version" to
+	 have the usual GNU behavior, but it requires "test --help"
+	 and "test --version" to exit silently with status 0.  */
+      if (margc == 2)
 	{
-	  parse_long_options (margc, margv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-			      usage, AUTHORS, (char const *) NULL);
-	  test_syntax_error (_("missing `]'"), NULL);
+	  if (STREQ (margv[1], "--help"))
+	    usage (EXIT_SUCCESS);
+
+	  if (STREQ (margv[1], "--version"))
+	    {
+	      version_etc (stdout, PROGRAM_NAME, PACKAGE_NAME, Version, AUTHORS,
+			   (char *) NULL);
+	      test_exit (EXIT_SUCCESS);
+	    }
 	}
+      if (margc < 2 || !STREQ (margv[margc - 1], "]"))
+	test_syntax_error (_("missing `]'"), NULL);
 
       --margc;
     }

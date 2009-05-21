@@ -1,12 +1,11 @@
 /* Concatenate two arbitrary file names.
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering.  */
 
@@ -24,6 +22,7 @@
 /* Specification.  */
 #include "filenamecat.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "dirname.h"
@@ -57,10 +56,10 @@ longest_relative_suffix (char const *f)
    set *BASE_IN_RESULT to point to the sole corresponding slash that
    is copied into the result buffer.
 
-   Report an error if memory is exhausted.  */
+   Return NULL if malloc fails.  */
 
 char *
-file_name_concat (char const *dir, char const *abase, char **base_in_result)
+mfile_name_concat (char const *dir, char const *abase, char **base_in_result)
 {
   char const *dirbase = last_component (dir);
   size_t dirbaselen = base_len (dirbase);
@@ -70,8 +69,11 @@ file_name_concat (char const *dir, char const *abase, char **base_in_result)
   char const *base = longest_relative_suffix (abase);
   size_t baselen = strlen (base);
 
-  char *p_concat = xmalloc (dirlen + needs_separator + baselen + 1);
+  char *p_concat = malloc (dirlen + needs_separator + baselen + 1);
   char *p;
+
+  if (p_concat == NULL)
+    return NULL;
 
   p = mempcpy (p_concat, dir, dirlen);
   *p = DIRECTORY_SEPARATOR;
@@ -86,39 +88,15 @@ file_name_concat (char const *dir, char const *abase, char **base_in_result)
   return p_concat;
 }
 
-#ifdef TEST_FILE_NAME_CONCAT
-# include <stdlib.h>
-# include <stdio.h>
-int
-main ()
-{
-  static char const *const tests[][3] =
-    {
-      {"a", "b",   "a/b"},
-      {"a/", "b",  "a/b"},
-      {"a/", "/b", "a/b"},
-      {"a", "/b",  "a/b"},
+/* Just like mfile_name_concat, above, except, rather than
+   returning NULL upon malloc failure, here, we report the
+   "memory exhausted" condition and exit.  */
 
-      {"/", "b",  "/b"},
-      {"/", "/b", "/b"},
-      {"/", "/",  "/"},
-      {"a", "/",  "a/"},   /* this might deserve a diagnostic */
-      {"/a", "/", "/a/"},  /* this might deserve a diagnostic */
-      {"a", "//b",  "a/b"},
-    };
-  size_t i;
-  bool fail = false;
-  for (i = 0; i < sizeof tests / sizeof tests[0]; i++)
-    {
-      char *base_in_result;
-      char const *const *t = tests[i];
-      char *res = file_name_concat (t[0], t[1], &base_in_result);
-      if (strcmp (res, t[2]) != 0)
-	{
-	  printf ("got %s, expected %s\n", res, t[2]);
-	  fail = true;
-	}
-    }
-  exit (fail ? EXIT_FAILURE : EXIT_SUCCESS);
+char *
+file_name_concat (char const *dir, char const *abase, char **base_in_result)
+{
+  char *p = mfile_name_concat (dir, abase, base_in_result);
+  if (p == NULL)
+    xalloc_die ();
+  return p;
 }
-#endif

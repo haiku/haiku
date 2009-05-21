@@ -1,10 +1,10 @@
 /* Compute MD5, SHA1, SHA224, SHA256, SHA384 or SHA512 checksum of files or strings
-   Copyright (C) 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>.  */
 
@@ -36,10 +35,9 @@
 #if HASH_ALGO_SHA512 || HASH_ALGO_SHA384
 # include "sha512.h"
 #endif
-#include "getline.h"
 #include "error.h"
-#include "quote.h"
 #include "stdio--.h"
+#include "xfreopen.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #if HASH_ALGO_MD5
@@ -91,7 +89,10 @@
 #define DIGEST_HEX_BYTES (DIGEST_BITS / 4)
 #define DIGEST_BIN_BYTES (DIGEST_BITS / 8)
 
-#define AUTHORS "Ulrich Drepper", "Scott Miller", "David Madore"
+#define AUTHORS \
+  proper_name ("Ulrich Drepper"), \
+  proper_name ("Scott Miller"), \
+  proper_name ("David Madore")
 
 /* The minimum length of a valid digest line.  This length does
    not include any newline character at the end of a line.  */
@@ -117,20 +118,22 @@ static bool status_only = false;
    improperly formatted checksum line.  */
 static bool warn = false;
 
-/* The name this program was run with.  */
-char *program_name;
+/* With --check, suppress the "OK" printed for each verified file.  */
+static bool quiet = false;
 
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
-  STATUS_OPTION = CHAR_MAX + 1
+  STATUS_OPTION = CHAR_MAX + 1,
+  QUIET_OPTION
 };
 
-static const struct option long_options[] =
+static struct option const long_options[] =
 {
   { "binary", no_argument, NULL, 'b' },
   { "check", no_argument, NULL, 'c' },
+  { "quiet", no_argument, NULL, QUIET_OPTION },
   { "status", no_argument, NULL, STATUS_OPTION },
   { "text", no_argument, NULL, 't' },
   { "warn", no_argument, NULL, 'w' },
@@ -148,7 +151,7 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] [FILE]...\n\
+Usage: %s [OPTION]... [FILE]...\n\
 Print or check %s (%d-bit) checksums.\n\
 With no FILE, or when FILE is -, read standard input.\n\
 \n\
@@ -177,7 +180,8 @@ With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
       fputs (_("\
 \n\
-The following two options are useful only when verifying checksums:\n\
+The following three options are useful only when verifying checksums:\n\
+      --quiet             don't print OK for each successfully verified file\n\
       --status            don't output anything, status code shows success\n\
   -w, --warn              warn about improperly formatted checksum lines\n\
 \n\
@@ -191,7 +195,7 @@ should be a former output of this program.  The default mode is to print\n\
 a line with checksum, a character indicating type (`*' for binary, ` ' for\n\
 text), and name for each FILE.\n"),
 	      DIGEST_REFERENCE);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
 
   exit (status);
@@ -207,6 +211,9 @@ static bool
 bsd_split_3 (char *s, size_t s_len, unsigned char **hex_digest, char **file_name)
 {
   size_t i;
+
+  if (s_len == 0)
+    return false;
 
   *file_name = s;
 
@@ -343,16 +350,19 @@ split_3 (char *s, size_t s_len,
   return true;
 }
 
+/* Return true if S is a NUL-terminated string of DIGEST_HEX_BYTES hex digits.
+   Otherwise, return false.  */
 static bool
 hex_digits (unsigned char const *s)
 {
-  while (*s)
+  unsigned int i;
+  for (i = 0; i < digest_hex_bytes; i++)
     {
       if (!isxdigit (*s))
         return false;
       ++s;
     }
-  return true;
+  return *s == '\0';
 }
 
 /* An interface to the function, DIGEST_STREAM.
@@ -382,7 +392,7 @@ digest_file (const char *filename, int *binary, unsigned char *bin_result)
 	  if (*binary < 0)
 	    *binary = ! isatty (STDIN_FILENO);
 	  if (*binary)
-	    freopen (NULL, "rb", stdin);
+	    xfreopen (NULL, "rb", stdin);
 	}
     }
   else
@@ -449,7 +459,7 @@ digest_check (const char *checkfile_name)
   line_chars_allocated = 0;
   do
     {
-      char *filename;
+      char *filename IF_LINT (= NULL);
       int binary;
       unsigned char *hex_digest IF_LINT (= NULL);
       ssize_t line_length;
@@ -524,8 +534,10 @@ digest_check (const char *checkfile_name)
 
 	      if (!status_only)
 		{
-		  printf ("%s: %s\n", filename,
-			  (cnt != digest_bin_bytes ? _("FAILED") : _("OK")));
+		  if (cnt != digest_bin_bytes)
+		    printf ("%s: %s\n", filename, _("FAILED"));
+		  else if (!quiet)
+		    printf ("%s: %s\n", filename, _("OK"));
 		  fflush (stdout);
 		}
 	    }
@@ -599,7 +611,7 @@ main (int argc, char **argv)
 
   /* Setting values of global variables.  */
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -618,6 +630,7 @@ main (int argc, char **argv)
       case STATUS_OPTION:
 	status_only = true;
 	warn = false;
+	quiet = false;
 	break;
       case 't':
 	binary = 0;
@@ -625,6 +638,12 @@ main (int argc, char **argv)
       case 'w':
 	status_only = false;
 	warn = true;
+	quiet = false;
+	break;
+      case QUIET_OPTION:
+	status_only = false;
+	warn = false;
+	quiet = true;
 	break;
       case_GETOPT_HELP_CHAR;
       case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -656,11 +675,18 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
+  if (quiet & !do_check)
+    {
+      error (0, 0,
+       _("the --quiet option is meaningful only when verifying checksums"));
+      usage (EXIT_FAILURE);
+    }
+
   if (!O_BINARY && binary < 0)
     binary = 0;
 
   if (optind == argc)
-    argv[argc++] = "-";
+    argv[argc++] = bad_cast ("-");
 
   for (; optind < argc; ++optind)
     {

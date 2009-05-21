@@ -1,9 +1,12 @@
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Decomposed printf argument list.
    Copyright (C) 1999, 2002-2003, 2006-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -17,6 +20,16 @@
 
 #ifndef _PRINTF_ARGS_H
 #define _PRINTF_ARGS_H
+
+/* This file can be parametrized with the following macros:
+     ENABLE_UNISTDIO    Set to 1 to enable the unistdio extensions.
+     PRINTF_FETCHARGS   Name of the function to be declared.
+     STATIC             Set to 'static' to declare the function static.  */
+
+/* Default parameters.  */
+#ifndef PRINTF_FETCHARGS
+# define PRINTF_FETCHARGS printf_fetchargs
+#endif
 
 /* Get size_t.  */
 #include <stddef.h>
@@ -52,9 +65,7 @@ typedef enum
   TYPE_ULONGLONGINT,
 #endif
   TYPE_DOUBLE,
-#if HAVE_LONG_DOUBLE
   TYPE_LONGDOUBLE,
-#endif
   TYPE_CHAR,
 #if HAVE_WINT_T
   TYPE_WIDE_CHAR,
@@ -70,6 +81,12 @@ typedef enum
   TYPE_COUNT_LONGINT_POINTER
 #if HAVE_LONG_LONG_INT
 , TYPE_COUNT_LONGLONGINT_POINTER
+#endif
+#if ENABLE_UNISTDIO
+  /* The unistdio extensions.  */
+, TYPE_U8_STRING
+, TYPE_U16_STRING
+, TYPE_U32_STRING
 #endif
 } arg_type;
 
@@ -93,9 +110,7 @@ typedef struct
 #endif
     float			a_float;
     double			a_double;
-#if HAVE_LONG_DOUBLE
     long double			a_longdouble;
-#endif
     int				a_char;
 #if HAVE_WINT_T
     wint_t			a_wide_char;
@@ -111,6 +126,12 @@ typedef struct
     long int *			a_count_longint_pointer;
 #if HAVE_LONG_LONG_INT
     long long int *		a_count_longlongint_pointer;
+#endif
+#if ENABLE_UNISTDIO
+    /* The unistdio extensions.  */
+    const uint8_t *		a_u8_string;
+    const uint16_t *		a_u16_string;
+    const uint32_t *		a_u32_string;
 #endif
   }
   a;
@@ -131,6 +152,6 @@ STATIC
 #else
 extern
 #endif
-int printf_fetchargs (va_list args, arguments *a);
+int PRINTF_FETCHARGS (va_list args, arguments *a);
 
 #endif /* _PRINTF_ARGS_H */

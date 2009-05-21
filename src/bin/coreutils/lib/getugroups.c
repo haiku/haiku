@@ -1,12 +1,11 @@
 /* getugroups.c -- return a list of the groups a user is in
 
-   Copyright (C) 1990, 1991, 1998, 1999, 2000, 2003, 2004, 2005, 2006
-   Free Software Foundation.
+   Copyright (C) 1990, 1991, 1998-2000, 2003-2008 Free Software Foundation.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,28 +13,26 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by David MacKenzie. */
 
 #include <config.h>
 
-#include <sys/types.h>
+#include "getugroups.h"
+
+#include <limits.h>
 #include <stdio.h> /* grp.h on alpha OSF1 V2.0 uses "FILE *". */
 #include <grp.h>
 
 #include <unistd.h>
 
 #include <errno.h>
-#ifndef EOVERFLOW
-# define EOVERFLOW EINVAL
-#endif
 
 /* Some old header files might not declare setgrent, getgrent, and endgrent.
    If you don't have them at all, we can't implement this function.
    You lose!  */
-struct group *getgrent ();
+struct group *getgrent (void);
 
 #include <string.h>
 
@@ -45,15 +42,14 @@ struct group *getgrent ();
    process.  Store at most MAXCOUNT group IDs in the GROUPLIST array.
    If GID is not -1, store it first (if possible).  GID should be the
    group ID (pw_gid) obtained from getpwuid, in case USERNAME is not
-   listed in /etc/groups.
-   Always return the number of groups of which USERNAME is a member.  */
+   listed in /etc/groups.  Upon failure, set errno and return -1.
+   Otherwise, return the number of IDs we've written into GROUPLIST.  */
 
 int
-getugroups (int maxcount, GETGROUPS_T *grouplist, char *username, gid_t gid)
+getugroups (int maxcount, GETGROUPS_T *grouplist, char const *username,
+	    gid_t gid)
 {
-  struct group *grp;
-  register char **cp;
-  register int count = 0;
+  int count = 0;
 
   if (gid != (gid_t) -1)
     {
@@ -63,8 +59,16 @@ getugroups (int maxcount, GETGROUPS_T *grouplist, char *username, gid_t gid)
     }
 
   setgrent ();
-  while ((grp = getgrent ()) != 0)
+  while (1)
     {
+      char **cp;
+      struct group *grp;
+
+      errno = 0;
+      grp = getgrent ();
+      if (grp == NULL)
+	break;
+
       for (cp = grp->gr_mem; *cp; ++cp)
 	{
 	  int n;
@@ -83,22 +87,28 @@ getugroups (int maxcount, GETGROUPS_T *grouplist, char *username, gid_t gid)
 	      if (maxcount != 0)
 		{
 		  if (count >= maxcount)
-		    {
-		      endgrent ();
-		      return count;
-		    }
+		    goto done;
 		  grouplist[count] = grp->gr_gid;
 		}
-	      count++;
-	      if (count < 0)
+	      if (count == INT_MAX)
 		{
 		  errno = EOVERFLOW;
-		  return -1;
+		  goto done;
 		}
+	      count++;
 	    }
 	}
     }
-  endgrent ();
+
+  if (errno != 0)
+    count = -1;
+
+ done:
+  {
+    int saved_errno = errno;
+    endgrent ();
+    errno = saved_errno;
+  }
 
   return count;
 }

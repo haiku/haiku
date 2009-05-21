@@ -1,12 +1,12 @@
 /* Provide a replacement for the POSIX nanosleep function.
 
-   Copyright (C) 1999, 2000, 2002, 2004, 2005, 2006, 2007 Free
+   Copyright (C) 1999, 2000, 2002, 2004, 2005, 2006, 2007, 2008 Free
    Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* written by Jim Meyering */
 
@@ -23,14 +22,13 @@
 
 #include <time.h>
 
+#include "sig-handler.h"
 #include "timespec.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
-#if HAVE_SYS_SELECT_H
-# include <sys/select.h>
-#endif
+#include <sys/select.h>
 #include <signal.h>
 
 #include <sys/time.h>
@@ -44,7 +42,7 @@ enum { BILLION = 1000 * 1000 * 1000 };
 
 #if HAVE_BUG_BIG_NANOSLEEP
 
-void
+static void
 getnow (struct timespec *t)
 {
 # if defined CLOCK_MONOTONIC && HAVE_CLOCK_GETTIME
@@ -105,10 +103,6 @@ rpl_nanosleep (const struct timespec *requested_delay,
 #  define SIGCONT SIGTERM
 # endif
 
-# if ! HAVE_SIGINTERRUPT
-#  define siginterrupt(sig, flag) /* empty */
-# endif
-
 static sig_atomic_t volatile suspended;
 
 /* Handle SIGCONT. */
@@ -153,22 +147,18 @@ rpl_nanosleep (const struct timespec *requested_delay,
   /* set up sig handler */
   if (! initialized)
     {
-# ifdef SA_NOCLDSTOP
-      struct sigaction oldact, newact;
-      newact.sa_handler = sighandler;
-      sigemptyset (&newact.sa_mask);
-      newact.sa_flags = 0;
+      struct sigaction oldact;
 
       sigaction (SIGCONT, NULL, &oldact);
-      if (oldact.sa_handler != SIG_IGN)
-	sigaction (SIGCONT, &newact, NULL);
-# else
-      if (signal (SIGCONT, SIG_IGN) != SIG_IGN)
+      if (get_handler (&oldact) != SIG_IGN)
 	{
-	  signal (SIGCONT, sighandler);
-	  siginterrupt (SIGCONT, 1);
+	  struct sigaction newact;
+
+	  newact.sa_handler = sighandler;
+	  sigemptyset (&newact.sa_mask);
+	  newact.sa_flags = 0;
+	  sigaction (SIGCONT, &newact, NULL);
 	}
-# endif
       initialized = true;
     }
 

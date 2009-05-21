@@ -1,10 +1,10 @@
 /* dd -- convert a file while copying it.
-   Copyright (C) 85, 90, 91, 1995-2007 Free Software Foundation, Inc.
+   Copyright (C) 85, 90, 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Rubin, David MacKenzie, and Stuart Kemp. */
 
@@ -29,10 +28,10 @@
 #include "error.h"
 #include "fd-reopen.h"
 #include "gethrxtime.h"
-#include "getpagesize.h"
 #include "human.h"
 #include "long-options.h"
 #include "quote.h"
+#include "quotearg.h"
 #include "xstrtol.h"
 #include "xtime.h"
 
@@ -41,7 +40,10 @@ static void process_signals (void);
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "dd"
 
-#define AUTHORS "Paul Rubin", "David MacKenzie", "Stuart Kemp"
+#define AUTHORS \
+  proper_name ("Paul Rubin"), \
+  proper_name ("David MacKenzie"), \
+  proper_name ("Stuart Kemp")
 
 /* Use SA_NOCLDSTOP as a proxy for whether the sigaction machinery is
    present.  SA_NODEFER and SA_RESETHAND are XSI extensions.  */
@@ -64,11 +66,16 @@ static void process_signals (void);
 # define SIGINFO SIGUSR1
 #endif
 
+/* This may belong in GNULIB's fcntl module instead.
+   Define O_CIO to 0 if it is not supported by this OS. */
+#ifndef O_CIO
+# define O_CIO 0
+#endif
+
 #if ! HAVE_FDATASYNC
 # define fdatasync(fd) (errno = ENOSYS, -1)
 #endif
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
 #define output_char(c)				\
   do						\
     {						\
@@ -125,9 +132,6 @@ enum
   {
     STATUS_NOXFER = 01
   };
-
-/* The name this program was run with. */
-char *program_name;
 
 /* The name of the input file, or NULL for the standard input. */
 static char const *input_file = NULL;
@@ -195,8 +199,7 @@ static bool input_seekable;
 static int input_seek_errno;
 
 /* File offset of the input, in bytes, along with a flag recording
-   whether it overflowed.  The offset is valid only if the input is
-   seekable and if the offset has not overflowed.  */
+   whether it overflowed.  */
 static uintmax_t input_offset;
 static bool input_offset_overflow;
 
@@ -225,6 +228,9 @@ static sig_atomic_t volatile interrupt_signal;
 
 /* A count of the number of pending info signals that have been received.  */
 static sig_atomic_t volatile info_signal_count;
+
+/* Function used for read (to handle iflag=fullblock parameter).  */
+static ssize_t (*iread_fnc) (int fd, char *buf, size_t size);
 
 /* A longest symbol in the struct symbol_values tables below.  */
 #define LONGEST_SYMBOL "fdatasync"
@@ -257,11 +263,43 @@ static struct symbol_value const conversions[] =
   {"", 0}
 };
 
+enum
+  {
+    /* Compute a value that's bitwise disjoint from the union
+       of all O_ values.  */
+    v = ~(0
+          | O_APPEND
+          | O_BINARY
+          | O_CIO
+          | O_DIRECT
+          | O_DIRECTORY
+          | O_DSYNC
+          | O_NOATIME
+          | O_NOCTTY
+          | O_NOFOLLOW
+          | O_NOLINKS
+          | O_NONBLOCK
+          | O_SYNC
+          | O_TEXT
+          ),
+    /* Use its lowest bit.  */
+    O_FULLBLOCK = v ^ (v & (v - 1))
+  };
+
+/* Ensure that we got something.  */
+verify (O_FULLBLOCK != 0);
+
+#define MULTIPLE_BITS_SET(i) (((i) & ((i) - 1)) != 0)
+
+/* Ensure that this is a single-bit value.  */
+verify ( ! MULTIPLE_BITS_SET (O_FULLBLOCK));
+
 /* Flags, for iflag="..." and oflag="...".  */
 static struct symbol_value const flags[] =
 {
   {"append",	O_APPEND},
   {"binary",	O_BINARY},
+  {"cio",	O_CIO},
   {"direct",	O_DIRECT},
   {"directory",	O_DIRECTORY},
   {"dsync",	O_DSYNC},
@@ -272,6 +310,7 @@ static struct symbol_value const flags[] =
   {"nonblock",	O_NONBLOCK},
   {"sync",	O_SYNC},
   {"text",	O_TEXT},
+  {"fullblock", O_FULLBLOCK}, /* Accumulate full blocks from input.  */
   {"",		0}
 };
 
@@ -393,6 +432,25 @@ static char const ebcdic_to_ascii[] =
   '\070', '\071', '\372', '\373', '\374', '\375', '\376', '\377'
 };
 
+/* True if we need to close the standard output *stream*.  */
+static bool close_stdout_required = true;
+
+/* The only reason to close the standard output *stream* is if
+   parse_long_options fails (as it does for --help or --version).
+   In any other case, dd uses only the STDOUT_FILENO file descriptor,
+   and the "cleanup" function calls "close (STDOUT_FILENO)".
+   Closing the file descriptor and then letting the usual atexit-run
+   close_stdout function call "fclose (stdout)" would result in a
+   harmless failure of the close syscall (with errno EBADF).
+   This function serves solely to avoid the unnecessary close_stdout
+   call, once parse_long_options has succeeded.  */
+static void
+maybe_close_stdout (void)
+{
+  if (close_stdout_required)
+    close_stdout ();
+}
+
 void
 usage (int status)
 {
@@ -409,16 +467,16 @@ Usage: %s [OPERAND]...\n\
       fputs (_("\
 Copy a file, converting and formatting according to the operands.\n\
 \n\
-  bs=BYTES        force ibs=BYTES and obs=BYTES\n\
+  bs=BYTES        read and write BYTES bytes at a time (also see ibs=,obs=)\n\
   cbs=BYTES       convert BYTES bytes at a time\n\
   conv=CONVS      convert the file as per the comma separated symbol list\n\
   count=BLOCKS    copy only BLOCKS input blocks\n\
-  ibs=BYTES       read BYTES bytes at a time\n\
+  ibs=BYTES       read BYTES bytes at a time (default: 512)\n\
 "), stdout);
       fputs (_("\
   if=FILE         read from FILE instead of stdin\n\
   iflag=FLAGS     read as per the comma separated symbol list\n\
-  obs=BYTES       write BYTES bytes at a time\n\
+  obs=BYTES       write BYTES bytes at a time (default: 512)\n\
   of=FILE         write to FILE instead of stdout\n\
   oflag=FLAGS     write as per the comma separated symbol list\n\
   seek=BLOCKS     skip BLOCKS obs-sized blocks at start of output\n\
@@ -428,8 +486,8 @@ Copy a file, converting and formatting according to the operands.\n\
       fputs (_("\
 \n\
 BLOCKS and BYTES may be followed by the following multiplicative suffixes:\n\
-xM M, c 1, w 2, b 512, kB 1000, K 1024, MB 1000*1000, M 1024*1024,\n\
-GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.\n\
+c =1, w =2, b =512, kB =1000, K =1024, MB =1000*1000, M =1024*1024, xM =M\n\
+GB =1000*1000*1000, G =1024*1024*1024, and so on for T, P, E, Z, Y.\n\
 \n\
 Each CONV symbol may be:\n\
 \n\
@@ -462,14 +520,18 @@ Each FLAG symbol may be:\n\
 \n\
   append    append mode (makes sense only for output; conv=notrunc suggested)\n\
 "), stdout);
+      if (O_CIO)
+	fputs (_("  cio       use concurrent I/O for data\n"), stdout);
       if (O_DIRECT)
 	fputs (_("  direct    use direct I/O for data\n"), stdout);
       if (O_DIRECTORY)
-	fputs (_("  directory fail unless a directory\n"), stdout);
+	fputs (_("  directory  fail unless a directory\n"), stdout);
       if (O_DSYNC)
 	fputs (_("  dsync     use synchronized I/O for data\n"), stdout);
       if (O_SYNC)
 	fputs (_("  sync      likewise, but also for metadata\n"), stdout);
+      fputs (_("  fullblock  accumulate full blocks of input (iflag only)\n"),
+	     stdout);
       if (O_NONBLOCK)
 	fputs (_("  nonblock  use non-blocking I/O\n"), stdout);
       if (O_NOATIME)
@@ -507,7 +569,7 @@ Options are:\n\
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -527,7 +589,7 @@ translate_charset (char const *new_trans)
 static inline bool
 multiple_bits_set (int i)
 {
-  return (i & (i - 1)) != 0;
+  return MULTIPLE_BITS_SET (i);
 }
 
 /* Print transfer statistics.  */
@@ -611,7 +673,7 @@ cleanup (void)
 	   _("closing output file %s"), quote (output_file));
 }
 
-static inline void ATTRIBUTE_NORETURN
+static void ATTRIBUTE_NORETURN
 quit (int code)
 {
   cleanup ();
@@ -744,6 +806,27 @@ iread (int fd, char *buf, size_t size)
     }
 }
 
+/* Wrapper around iread function to accumulate full blocks.  */
+static ssize_t
+iread_fullblock (int fd, char *buf, size_t size)
+{
+  ssize_t nread = 0;
+
+  while (0 < size)
+    {
+      ssize_t ncurr = iread (fd, buf, size);
+      if (ncurr < 0)
+	return ncurr;
+      if (ncurr == 0)
+	break;
+      nread += ncurr;
+      buf   += ncurr;
+      size  -= ncurr;
+    }
+
+  return nread;
+}
+
 /* Write to FD the buffer BUF of size SIZE, processing any signals
    that arrive.  Return the number of bytes written, setting errno if
    this is less than SIZE.  Keep trying if there are partial
@@ -767,7 +850,7 @@ iwrite (int fd, char const *buf, size_t size)
       else if (nwritten == 0)
 	{
 	  /* Some buggy drivers return 0 when one tries to write beyond
-	     a device's end.  (Example: Linux 1.2.13 on /dev/fd0.)
+	     a device's end.  (Example: Linux kernel 1.2.13 on /dev/fd0.)
 	     Set errno to ENOSPC so they get a sensible diagnostic.  */
 	  errno = ENOSPC;
 	  break;
@@ -798,41 +881,50 @@ write_output (void)
   oc = 0;
 }
 
+/* Return true if STR is of the form "PATTERN" or "PATTERNDELIM...".  */
+
+static bool
+operand_matches (char const *str, char const *pattern, char delim)
+{
+  while (*pattern)
+    if (*str++ != *pattern++)
+      return false;
+  return !*str || *str == delim;
+}
+
 /* Interpret one "conv=..." or similar operand STR according to the
    symbols in TABLE, returning the flags specified.  If the operand
-   cannot be parsed, use ERROR_MSGID to generate a diagnostic.
-   As a by product, this function replaces each `,' in STR with a NUL byte.  */
+   cannot be parsed, use ERROR_MSGID to generate a diagnostic.  */
 
 static int
-parse_symbols (char *str, struct symbol_value const *table,
+parse_symbols (char const *str, struct symbol_value const *table,
 	       char const *error_msgid)
 {
   int value = 0;
 
-  do
+  for (;;)
     {
+      char const *strcomma = strchr (str, ',');
       struct symbol_value const *entry;
-      char *new = strchr (str, ',');
-      if (new != NULL)
-	*new++ = '\0';
-      for (entry = table; ; entry++)
+
+      for (entry = table;
+	   ! (operand_matches (str, entry->symbol, ',') && entry->value);
+	   entry++)
 	{
 	  if (! entry->symbol[0])
 	    {
-	      error (0, 0, _(error_msgid), quote (str));
+	      size_t slen = strcomma ? strcomma - str : strlen (str);
+	      error (0, 0, "%s: %s", _(error_msgid),
+		     quotearg_n_style_mem (0, locale_quoting_style, str, slen));
 	      usage (EXIT_FAILURE);
 	    }
-	  if (STREQ (entry->symbol, str))
-	    {
-	      if (! entry->value)
-		error (EXIT_FAILURE, 0, _(error_msgid), quote (str));
-	      value |= entry->value;
-	      break;
-	    }
 	}
-      str = new;
+
+      value |= entry->value;
+      if (!strcomma)
+	break;
+      str = strcomma + 1;
     }
-  while (str);
 
   return value;
 }
@@ -869,78 +961,82 @@ parse_integer (const char *str, bool *invalid)
   return n;
 }
 
+/* OPERAND is of the form "X=...".  Return true if X is NAME.  */
+
+static bool
+operand_is (char const *operand, char const *name)
+{
+  return operand_matches (operand, name, '=');
+}
+
 static void
-scanargs (int argc, char **argv)
+scanargs (int argc, char *const *argv)
 {
   int i;
   size_t blocksize = 0;
 
   for (i = optind; i < argc; i++)
     {
-      char *name, *val;
+      char const *name = argv[i];
+      char const *val = strchr (name, '=');
 
-      name = argv[i];
-      val = strchr (name, '=');
       if (val == NULL)
 	{
 	  error (0, 0, _("unrecognized operand %s"), quote (name));
 	  usage (EXIT_FAILURE);
 	}
-      *val++ = '\0';
+      val++;
 
-      if (STREQ (name, "if"))
+      if (operand_is (name, "if"))
 	input_file = val;
-      else if (STREQ (name, "of"))
+      else if (operand_is (name, "of"))
 	output_file = val;
-      else if (STREQ (name, "conv"))
+      else if (operand_is (name, "conv"))
 	conversions_mask |= parse_symbols (val, conversions,
-					   N_("invalid conversion: %s"));
-      else if (STREQ (name, "iflag"))
+					   N_("invalid conversion"));
+      else if (operand_is (name, "iflag"))
 	input_flags |= parse_symbols (val, flags,
-				      N_("invalid input flag: %s"));
-      else if (STREQ (name, "oflag"))
+				      N_("invalid input flag"));
+      else if (operand_is (name, "oflag"))
 	output_flags |= parse_symbols (val, flags,
-				       N_("invalid output flag: %s"));
-      else if (STREQ (name, "status"))
+				       N_("invalid output flag"));
+      else if (operand_is (name, "status"))
 	status_flags |= parse_symbols (val, statuses,
-				       N_("invalid status flag: %s"));
+				       N_("invalid status flag"));
       else
 	{
 	  bool invalid = false;
 	  uintmax_t n = parse_integer (val, &invalid);
 
-	  if (STREQ (name, "ibs"))
+	  if (operand_is (name, "ibs"))
 	    {
 	      invalid |= ! (0 < n && n <= MAX_BLOCKSIZE (INPUT_BLOCK_SLOP));
 	      input_blocksize = n;
-	      conversions_mask |= C_TWOBUFS;
 	    }
-	  else if (STREQ (name, "obs"))
+	  else if (operand_is (name, "obs"))
 	    {
 	      invalid |= ! (0 < n && n <= MAX_BLOCKSIZE (OUTPUT_BLOCK_SLOP));
 	      output_blocksize = n;
-	      conversions_mask |= C_TWOBUFS;
 	    }
-	  else if (STREQ (name, "bs"))
+	  else if (operand_is (name, "bs"))
 	    {
 	      invalid |= ! (0 < n && n <= MAX_BLOCKSIZE (INPUT_BLOCK_SLOP));
 	      blocksize = n;
 	    }
-	  else if (STREQ (name, "cbs"))
+	  else if (operand_is (name, "cbs"))
 	    {
 	      invalid |= ! (0 < n && n <= SIZE_MAX);
 	      conversion_blocksize = n;
 	    }
-	  else if (STREQ (name, "skip"))
+	  else if (operand_is (name, "skip"))
 	    skip_records = n;
-	  else if (STREQ (name, "seek"))
+	  else if (operand_is (name, "seek"))
 	    seek_records = n;
-	  else if (STREQ (name, "count"))
+	  else if (operand_is (name, "count"))
 	    max_records = n;
 	  else
 	    {
-	      error (0, 0, _("unrecognized operand %s=%s"),
-		     quote_n (0, name), quote_n (1, val));
+	      error (0, 0, _("unrecognized operand %s"), quote (name));
 	      usage (EXIT_FAILURE);
 	    }
 
@@ -951,12 +1047,13 @@ scanargs (int argc, char **argv)
 
   if (blocksize)
     input_blocksize = output_blocksize = blocksize;
+  else
+    {
+      /* POSIX says dd aggregates short reads into
+	 output_blocksize if bs= is not specified.  */
+      conversions_mask |= C_TWOBUFS;
+    }
 
-  /* If bs= was given, both `input_blocksize' and `output_blocksize' will
-     have been set to positive values.  If either has not been set,
-     bs= was not given, so make sure two buffers are used. */
-  if (input_blocksize == 0 || output_blocksize == 0)
-    conversions_mask |= C_TWOBUFS;
   if (input_blocksize == 0)
     input_blocksize = DEFAULT_BLOCKSIZE;
   if (output_blocksize == 0)
@@ -966,6 +1063,16 @@ scanargs (int argc, char **argv)
 
   if (input_flags & (O_DSYNC | O_SYNC))
     input_flags |= O_RSYNC;
+
+  if (output_flags & O_FULLBLOCK)
+    {
+      error (0, 0, "%s: %s", _("invalid output flag"), "'fullblock'");
+      usage (EXIT_FAILURE);
+    }
+  iread_fnc = ((input_flags & O_FULLBLOCK)
+	       ? iread_fullblock
+	       : iread);
+  input_flags &= ~O_FULLBLOCK;
 
   if (multiple_bits_set (conversions_mask & (C_ASCII | C_EBCDIC | C_IBM)))
     error (EXIT_FAILURE, 0, _("cannot combine any two of {ascii,ebcdic,ibm}"));
@@ -1094,7 +1201,7 @@ advance_input_offset (uintmax_t offset)
    to indicate that lseek failed.
 
    The offending behavior has been confirmed with an Exabyte SCSI tape
-   drive accessed via /dev/nst0 on both Linux-2.2.17 and Linux-2.4.16.  */
+   drive accessed via /dev/nst0 on both Linux 2.2.17 and 2.4.16 kernels.  */
 
 #ifdef __linux__
 
@@ -1155,16 +1262,66 @@ skip (int fdesc, char const *file, uintmax_t records, size_t blocksize,
       && 0 <= skip_via_lseek (file, fdesc, offset, SEEK_CUR))
     {
       if (fdesc == STDIN_FILENO)
-	advance_input_offset (offset);
-      return 0;
+        {
+	   struct stat st;
+	   if (fstat (STDIN_FILENO, &st) != 0)
+	     error (EXIT_FAILURE, errno, _("cannot fstat %s"), quote (file));
+	   if (S_ISREG (st.st_mode) && st.st_size < (input_offset + offset))
+	     {
+	       /* When skipping past EOF, return the number of _full_ blocks
+		* that are not skipped, and set offset to EOF, so the caller
+		* can determine the requested skip was not satisfied.  */
+	       records = ( offset - st.st_size ) / blocksize;
+	       offset = st.st_size - input_offset;
+	     }
+	   else
+	     records = 0;
+	   advance_input_offset (offset);
+        }
+      else
+        records = 0;
+      return records;
     }
   else
     {
       int lseek_errno = errno;
+      off_t soffset;
+
+      /* The seek request may have failed above if it was too big
+         (> device size, > max file size, etc.)
+         Or it may not have been done at all (> OFF_T_MAX).
+         Therefore try to seek to the end of the file,
+         to avoid redundant reading.  */
+      if ((soffset = skip_via_lseek (file, fdesc, 0, SEEK_END)) >= 0)
+	{
+	  /* File is seekable, and we're at the end of it, and
+	     size <= OFF_T_MAX. So there's no point using read to advance.  */
+
+	  if (!lseek_errno)
+	    {
+	      /* The original seek was not attempted as offset > OFF_T_MAX.
+		 We should error for write as can't get to the desired
+		 location, even if OFF_T_MAX < max file size.
+		 For read we're not going to read any data anyway,
+		 so we should error for consistency.
+		 It would be nice to not error for /dev/{zero,null}
+		 for any offset, but that's not a significant issue.  */
+	      lseek_errno = EOVERFLOW;
+	    }
+
+	  if (fdesc == STDIN_FILENO)
+	    error (0, lseek_errno, _("%s: cannot skip"), quote (file));
+	  else
+	    error (0, lseek_errno, _("%s: cannot seek"), quote (file));
+	  /* If the file has a specific size and we've asked
+	     to skip/seek beyond the max allowable, then quit.  */
+	  quit (EXIT_FAILURE);
+	}
+      /* else file_size && offset > OFF_T_MAX or file ! seekable */
 
       do
 	{
-	  ssize_t nread = iread (fdesc, buf, blocksize);
+	  ssize_t nread = iread_fnc (fdesc, buf, blocksize);
 	  if (nread < 0)
 	    {
 	      if (fdesc == STDIN_FILENO)
@@ -1408,7 +1565,7 @@ dd_copy (void)
      the input buffer;  thus we allocate 2 pages of slop in the
      real buffer.  8k above the blocksize shouldn't bother anyone.
 
-     The page alignment is necessary on any linux system that supports
+     The page alignment is necessary on any Linux kernel that supports
      either the SGI raw I/O patch or Steven Tweedies raw I/O patch.
      It is necessary when accessing raw (i.e. character special) disk
      devices on Unixware or other SVR4-derived system.  */
@@ -1433,10 +1590,22 @@ dd_copy (void)
 
   if (skip_records != 0)
     {
-      skip (STDIN_FILENO, input_file, skip_records, input_blocksize, ibuf);
+      uintmax_t us_bytes = input_offset + (skip_records * input_blocksize);
+      uintmax_t us_blocks = skip (STDIN_FILENO, input_file,
+				  skip_records, input_blocksize, ibuf);
+      us_bytes -= input_offset;
+
       /* POSIX doesn't say what to do when dd detects it has been
-	 asked to skip past EOF, so I assume it's non-fatal if the
-	 call to 'skip' returns nonzero.  FIXME: maybe give a warning.  */
+	 asked to skip past EOF, so I assume it's non-fatal.
+	 There are 3 reasons why there might be unskipped blocks/bytes:
+	     1. file is too small
+	     2. pipe has not enough data
+	     3. short reads  */
+      if (us_blocks || (!input_offset_overflow && us_bytes))
+	{
+	  error (0, 0,
+		 _("%s: cannot skip to specified offset"), quote (input_file));
+	}
     }
 
   if (seek_records != 0)
@@ -1475,7 +1644,7 @@ dd_copy (void)
 		(conversions_mask & (C_BLOCK | C_UNBLOCK)) ? ' ' : '\0',
 		input_blocksize);
 
-      nread = iread (STDIN_FILENO, ibuf, input_blocksize);
+      nread = iread_fnc (STDIN_FILENO, ibuf, input_blocksize);
 
       if (nread == 0)
 	break;			/* EOF.  */
@@ -1635,18 +1804,20 @@ main (int argc, char **argv)
   off_t offset;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   /* Arrange to close stdout if parse_long_options exits.  */
-  atexit (close_stdout);
+  atexit (maybe_close_stdout);
 
   page_size = getpagesize ();
 
-  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, Version,
 		      usage, AUTHORS, (char const *) NULL);
+  close_stdout_required = false;
+
   if (getopt_long (argc, argv, "", NULL, NULL) != -1)
     usage (EXIT_FAILURE);
 
@@ -1672,7 +1843,7 @@ main (int argc, char **argv)
 
   offset = lseek (STDIN_FILENO, 0, SEEK_CUR);
   input_seekable = (0 <= offset);
-  input_offset = offset;
+  input_offset = MAX(0, offset);
   input_seek_errno = errno;
 
   if (output_file == NULL)
@@ -1716,7 +1887,7 @@ main (int argc, char **argv)
 	      /* Complain only when ftruncate fails on a regular file, a
 		 directory, or a shared memory object, as POSIX 1003.1-2004
 		 specifies ftruncate's behavior only for these file types.
-		 For example, do not complain when Linux 2.4 ftruncate
+		 For example, do not complain when Linux kernel 2.4 ftruncate
 		 fails on /dev/fd0.  */
 	      int ftruncate_errno = errno;
 	      struct stat stdout_stat;

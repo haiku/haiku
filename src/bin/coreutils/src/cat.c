@@ -1,10 +1,10 @@
 /* cat -- concatenate files and print on the standard output.
-   Copyright (C) 88, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1995-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Differences from the Unix cat:
    * Always unbuffered, -u is ignored.
@@ -38,21 +37,16 @@
 #include "system.h"
 #include "error.h"
 #include "full-write.h"
-#include "getpagesize.h"
 #include "quote.h"
 #include "safe-read.h"
+#include "xfreopen.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "cat"
 
-#define AUTHORS "Torbjorn Granlund", "Richard M. Stallman"
-
-/* Undefine, to avoid warning about redefinition on some systems.  */
-#undef max
-#define max(h,i) ((h) > (i) ? (h) : (i))
-
-/* Name under which this program was invoked.  */
-char *program_name;
+#define AUTHORS \
+  proper_name_utf8 ("Torbjorn Granlund", "Torbj\303\266rn Granlund"), \
+  proper_name ("Richard M. Stallman")
 
 /* Name of input file.  May be "-".  */
 static char const *infile;
@@ -93,18 +87,18 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [OPTION] [FILE]...\n\
+Usage: %s [OPTION]... [FILE]...\n\
 "),
 	      program_name);
       fputs (_("\
 Concatenate FILE(s), or standard input, to standard output.\n\
 \n\
   -A, --show-all           equivalent to -vET\n\
-  -b, --number-nonblank    number nonblank output lines\n\
+  -b, --number-nonblank    number nonempty output lines\n\
   -e                       equivalent to -vE\n\
   -E, --show-ends          display $ at end of each line\n\
   -n, --number             number all output lines\n\
-  -s, --squeeze-blank      never more than one single blank line\n\
+  -s, --squeeze-blank      suppress repeated empty output lines\n\
 "), stdout);
       fputs (_("\
   -t                       equivalent to -vT\n\
@@ -125,7 +119,7 @@ Examples:\n\
   %s        Copy standard input to standard output.\n\
 "),
 	      program_name, program_name);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -339,7 +333,7 @@ cat (
 		input_pending = true;
 #endif
 
-	      if (input_pending)
+	      if (!input_pending)
 		write_pending (outbuf, &bpout);
 
 	      /* Read more input into INBUF.  */
@@ -565,7 +559,7 @@ main (int argc, char **argv)
   };
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -642,7 +636,7 @@ main (int argc, char **argv)
   if (fstat (STDOUT_FILENO, &stat_buf) < 0)
     error (EXIT_FAILURE, errno, _("standard output"));
 
-  outsize = ST_BLKSIZE (stat_buf);
+  outsize = io_blksize (stat_buf);
   /* Input file can be output file for non-regular files.
      fstat on pipes returns S_IFSOCK on some systems, S_IFIFO
      on others, so the checking should not be done for those types,
@@ -667,7 +661,7 @@ main (int argc, char **argv)
     {
       file_open_mode |= O_BINARY;
       if (O_BINARY && ! isatty (STDOUT_FILENO))
-	freopen (NULL, "wb", stdout);
+	xfreopen (NULL, "wb", stdout);
     }
 
   /* Check if any of the input files are the same as the output file.  */
@@ -687,7 +681,7 @@ main (int argc, char **argv)
 	  have_read_stdin = true;
 	  input_desc = STDIN_FILENO;
 	  if ((file_open_mode & O_BINARY) && ! isatty (STDIN_FILENO))
-	    freopen (NULL, "rb", stdin);
+	    xfreopen (NULL, "rb", stdin);
 	}
       else
 	{
@@ -706,7 +700,7 @@ main (int argc, char **argv)
 	  ok = false;
 	  goto contin;
 	}
-      insize = ST_BLKSIZE (stat_buf);
+      insize = io_blksize (stat_buf);
 
       /* Compare the device and i-node numbers of this input file with
 	 the corresponding values of the (output file associated with)
@@ -728,7 +722,7 @@ main (int argc, char **argv)
       if (! (number | show_ends | show_nonprinting
 	     | show_tabs | squeeze_blank))
 	{
-	  insize = max (insize, outsize);
+	  insize = MAX (insize, outsize);
 	  inbuf = xmalloc (insize + page_size - 1);
 
 	  ok &= simple_cat (ptr_align (inbuf, page_size), insize);

@@ -1,10 +1,10 @@
 /* chown-core.c -- core functions for changing ownership.
-   Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation.
+   Copyright (C) 2000, 2002-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Extracted from chown.c/chgrp.c and librarified by Jim Meyering.  */
 
@@ -26,8 +25,6 @@
 #include "system.h"
 #include "chown-core.h"
 #include "error.h"
-#include "inttostr.h"
-#include "openat.h"
 #include "quote.h"
 #include "root-dev-ino.h"
 #include "xfts.h"
@@ -299,18 +296,22 @@ change_file_owner (FTS *fts, FTSENT *ent,
 	  fts_set (fts, ent, FTS_AGAIN);
 	  return true;
 	}
-      error (0, ent->fts_errno, _("cannot access %s"), quote (file_full_name));
+      if (! chopt->force_silent)
+        error (0, ent->fts_errno, _("cannot access %s"),
+	       quote (file_full_name));
       ok = false;
       break;
 
     case FTS_ERR:
-      error (0, ent->fts_errno, _("%s"), quote (file_full_name));
+      if (! chopt->force_silent)
+        error (0, ent->fts_errno, _("%s"), quote (file_full_name));
       ok = false;
       break;
 
     case FTS_DNR:
-      error (0, ent->fts_errno, _("cannot read directory %s"),
-	     quote (file_full_name));
+      if (! chopt->force_silent)
+        error (0, ent->fts_errno, _("cannot read directory %s"),
+	       quote (file_full_name));
       ok = false;
       break;
 
@@ -341,8 +342,9 @@ change_file_owner (FTS *fts, FTSENT *ent,
 	{
 	  if (fstatat (fts->fts_cwd_fd, file, &stat_buf, 0) != 0)
 	    {
-	      error (0, errno, _("cannot dereference %s"),
-		     quote (file_full_name));
+	      if (! chopt->force_silent)
+	        error (0, errno, _("cannot dereference %s"),
+		       quote (file_full_name));
 	      ok = false;
 	    }
 
@@ -420,7 +422,7 @@ change_file_owner (FTS *fts, FTSENT *ent,
 	    }
 	}
 
-      /* On some systems (e.g., Linux-2.4.x),
+      /* On some systems (e.g., GNU/Linux 2.4.x),
 	 the chown function resets the `special' permission bits.
 	 Do *not* restore those bits;  doing so would open a window in
 	 which a malicious user, M, could subvert a chown command run
@@ -495,7 +497,8 @@ chown_files (char **files, int bit_flags,
 	  if (errno != 0)
 	    {
 	      /* FIXME: try to give a better message  */
-	      error (0, errno, _("fts_read failed"));
+	      if (! chopt->force_silent)
+	        error (0, errno, _("fts_read failed"));
 	      ok = false;
 	    }
 	  break;

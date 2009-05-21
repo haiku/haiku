@@ -1,7 +1,7 @@
 # Configuration file for dircolors, a utility to help you set the
 # LS_COLORS environment variable used by GNU ls with the --color option.
 
-# Copyright (C) 1996, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+# Copyright (C) 1996, 1999-2008
 # Free Software Foundation, Inc.
 # Copying and distribution of this file, with or without modification,
 # are permitted provided the copyright notice and this notice are preserved.
@@ -27,7 +27,10 @@ TERM cons25
 TERM console
 TERM cygwin
 TERM dtterm
+TERM eterm-color
 TERM gnome
+TERM gnome-256color
+TERM jfbterm
 TERM konsole
 TERM kterm
 TERM linux
@@ -40,12 +43,15 @@ TERM rxvt-cygwin
 TERM rxvt-cygwin-native
 TERM rxvt-unicode
 TERM screen
+TERM screen-256color
 TERM screen-bce
 TERM screen-w
 TERM screen.linux
 TERM vt100
 TERM xterm
+TERM xterm-16color
 TERM xterm-256color
+TERM xterm-88color
 TERM xterm-color
 TERM xterm-debian
 
@@ -57,11 +63,13 @@ TERM xterm-debian
 # 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
 # Background color codes:
 # 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
-NORMAL 00	# global default, although everything should be something.
-FILE 00		# normal file
+#NORMAL 00	# no color code at all
+#FILE 00	# regular file: use no color at all
+RESET 0		# reset to "normal" color
 DIR 01;34	# directory
 LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
 		# numerical value, the color is as for the file pointed to.)
+HARDLINK 44;37	# regular file with more than one link
 FIFO 40;33	# pipe
 SOCK 01;35	# socket
 DOOR 01;35	# door
@@ -70,6 +78,7 @@ CHR 40;33;01	# character device driver
 ORPHAN 40;31;01 # symlink to nonexistent file, or non-stat'able file
 SETUID 37;41	# file that is setuid (u+s)
 SETGID 30;43	# file that is setgid (g+s)
+CAPABILITY 30;41	# file with capability
 STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
 STICKY 37;44	# dir with the sticky bit set (+t) and not other-writable
@@ -98,9 +107,11 @@ EXEC 01;32
 .arj 01;31
 .taz 01;31
 .lzh 01;31
+.lzma 01;31
 .zip 01;31
 .z   01;31
 .Z   01;31
+.dz  01;31
 .gz  01;31
 .bz2 01;31
 .bz  01;31
@@ -130,6 +141,8 @@ EXEC 01;32
 .tif 01;35
 .tiff 01;35
 .png 01;35
+.svg 01;35
+.svgz 01;35
 .mng 01;35
 .pcx 01;35
 .mov 01;35
@@ -151,11 +164,18 @@ EXEC 01;32
 .flc 01;35
 .avi 01;35
 .fli 01;35
+.flv 01;35
 .gl 01;35
 .dl 01;35
 .xcf 01;35
 .xwd 01;35
 .yuv 01;35
+
+# http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+.axv 01;35
+.anx 01;35
+.ogv 01;35
+.ogx 01;35
 
 # audio formats
 .aac 00;36
@@ -169,3 +189,9 @@ EXEC 01;32
 .ogg 00;36
 .ra 00;36
 .wav 00;36
+
+# http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+.axa 00;36
+.oga 00;36
+.spx 00;36
+.xspf 00;36

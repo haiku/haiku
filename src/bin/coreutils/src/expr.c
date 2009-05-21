@@ -1,10 +1,10 @@
 /* expr -- evaluate expressions.
-   Copyright (C) 86, 1991-1997, 1999-2006 Free Software Foundation, Inc.
+   Copyright (C) 86, 1991-1997, 1999-2008 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,10 +12,10 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Author: Mike Parker.
+   Modified for arbitrary-precision calculation by James Youngman.
 
    This program evaluates expressions.  Each token (operator, operand,
    parenthesis) of the expression must be a seperate argument.  The
@@ -34,18 +34,121 @@
 #include "system.h"
 
 #include <regex.h>
-#include "long-options.h"
 #include "error.h"
-#include "inttostr.h"
-#include "quote.h"
+#include "long-options.h"
 #include "quotearg.h"
 #include "strnumcmp.h"
 #include "xstrtol.h"
 
+/* Various parts of this code assume size_t fits into unsigned long
+   int, the widest unsigned type that GMP supports.  */
+verify (SIZE_MAX <= ULONG_MAX);
+
+static void integer_overflow (char) ATTRIBUTE_NORETURN;
+
+#ifndef HAVE_GMP
+# define HAVE_GMP 0
+#endif
+
+#if HAVE_GMP
+# include <gmp.h>
+#else
+/* Approximate gmp.h well enough for expr.c's purposes.  */
+typedef intmax_t mpz_t[1];
+static void mpz_clear (mpz_t z) {}
+static void mpz_init_set_ui (mpz_t z, unsigned long int i) { z[0] = i; }
+static int
+mpz_init_set_str (mpz_t z, char *s, int base)
+{
+  return xstrtoimax (s, NULL, base, z, NULL) == LONGINT_OK ? 0 : -1;
+}
+static void
+mpz_add (mpz_t r, mpz_t a0, mpz_t b0)
+{
+  intmax_t a = a0[0];
+  intmax_t b = b0[0];
+  intmax_t val = a + b;
+  if ((val < a) != (b < 0))
+    integer_overflow ('+');
+  r[0] = val;
+}
+static void
+mpz_sub (mpz_t r, mpz_t a0, mpz_t b0)
+{
+  intmax_t a = a0[0];
+  intmax_t b = b0[0];
+  intmax_t val = a - b;
+  if ((a < val) != (b < 0))
+    integer_overflow ('-');
+  r[0] = val;
+}
+static void
+mpz_mul (mpz_t r, mpz_t a0, mpz_t b0)
+{
+  intmax_t a = a0[0];
+  intmax_t b = b0[0];
+  intmax_t val = a * b;
+  if (! (a == 0 || b == 0
+	 || ((val < 0) == ((a < 0) ^ (b < 0)) && val / a == b)))
+    integer_overflow ('*');
+  r[0] = val;
+}
+static void
+mpz_tdiv_q (mpz_t r, mpz_t a0, mpz_t b0)
+{
+  intmax_t a = a0[0];
+  intmax_t b = b0[0];
+
+  /* Some x86-style hosts raise an exception for INT_MIN / -1.  */
+  if (a < - INTMAX_MAX && b == -1)
+    integer_overflow ('/');
+  r[0] = a / b;
+}
+static void
+mpz_tdiv_r (mpz_t r, mpz_t a0, mpz_t b0)
+{
+  intmax_t a = a0[0];
+  intmax_t b = b0[0];
+
+  /* Some x86-style hosts raise an exception for INT_MIN % -1.  */
+  r[0] = a < - INTMAX_MAX && b == -1 ? 0 : a % b;
+}
+static char *
+mpz_get_str (char const *str, int base, mpz_t z)
+{
+  char buf[INT_BUFSIZE_BOUND (intmax_t)];
+  return xstrdup (imaxtostr (z[0], buf));
+}
+static int
+mpz_sgn (mpz_t z)
+{
+  return z[0] < 0 ? -1 : 0 < z[0];
+}
+static int
+mpz_fits_ulong_p (mpz_t z)
+{
+  return 0 <= z[0] && z[0] <= ULONG_MAX;
+}
+static unsigned long int
+mpz_get_ui (mpz_t z)
+{
+  return z[0];
+}
+static int
+mpz_out_str (FILE *stream, int base, mpz_t z)
+{
+  char buf[INT_BUFSIZE_BOUND (intmax_t)];
+  return fputs (imaxtostr (z[0], buf), stream) != EOF;
+}
+#endif
+
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "expr"
 
-#define AUTHORS "Mike Parker"
+#define AUTHORS \
+  proper_name ("Mike Parker"), \
+  proper_name ("James Youngman"), \
+  proper_name ("Paul Eggert")
 
 /* Exit statuses.  */
 enum
@@ -74,7 +177,7 @@ struct valinfo
   TYPE type;			/* Which kind. */
   union
   {				/* The value itself. */
-    intmax_t i;
+    mpz_t i;
     char *s;
   } u;
 };
@@ -82,9 +185,6 @@ typedef struct valinfo VALUE;
 
 /* The arguments given to the program, minus the program name.  */
 static char **args;
-
-/* The name this program was run with. */
-char *program_name;
 
 static VALUE *eval (bool);
 static bool nomoreargs (void);
@@ -130,6 +230,8 @@ separates increasing precedence groups.  EXPRESSION may be:\n\
   ARG1 + ARG2       arithmetic sum of ARG1 and ARG2\n\
   ARG1 - ARG2       arithmetic difference of ARG1 and ARG2\n\
 "), stdout);
+      /* Tell xgettext that the "% A" below is not a printf-style
+	 format string:  xgettext:no-c-format */
       fputs (_("\
 \n\
   ARG1 * ARG2       arithmetic product of ARG1 and ARG2\n\
@@ -163,7 +265,7 @@ Pattern matches return the string matched between \\( and \\) or null; if\n\
 Exit status is 0 if EXPRESSION is neither null nor 0, 1 if EXPRESSION is null\n\
 or 0, 2 if EXPRESSION is syntactically invalid, and 3 if an error occurred.\n\
 "), stdout);
-      printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
+      emit_bug_reporting_address ();
     }
   exit (status);
 }
@@ -180,6 +282,16 @@ static void
 integer_overflow (char op)
 {
   error (EXPR_FAILURE, ERANGE, "%c", op);
+  abort (); /* notreached */
+}
+
+static void die (int errno_val, char const *msg)
+  ATTRIBUTE_NORETURN;
+static void
+die (int errno_val, char const *msg)
+{
+  error (EXPR_FAILURE, errno_val, "%s", msg);
+  abort (); /* notreached */
 }
 
 int
@@ -188,7 +300,7 @@ main (int argc, char **argv)
   VALUE *v;
 
   initialize_main (&argc, &argv);
-  program_name = argv[0];
+  set_program_name (argv[0]);
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
@@ -196,7 +308,7 @@ main (int argc, char **argv)
   initialize_exit_failure (EXPR_FAILURE);
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
+  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, VERSION,
 		      usage, AUTHORS, (char const *) NULL);
   /* The above handles --help and --version.
      Since there is no other invocation of getopt, handle `--' here.  */
@@ -225,11 +337,11 @@ main (int argc, char **argv)
 /* Return a VALUE for I.  */
 
 static VALUE *
-int_value (intmax_t i)
+int_value (unsigned long int i)
 {
   VALUE *v = xmalloc (sizeof *v);
   v->type = integer;
-  v->u.i = i;
+  mpz_init_set_ui (v->u.i, i);
   return v;
 }
 
@@ -251,6 +363,8 @@ freev (VALUE *v)
 {
   if (v->type == string)
     free (v->u.s);
+  else
+    mpz_clear (v->u.i);
   free (v);
 }
 
@@ -259,22 +373,18 @@ freev (VALUE *v)
 static void
 printv (VALUE *v)
 {
-  char *p;
-  char buf[INT_BUFSIZE_BOUND (intmax_t)];
-
   switch (v->type)
     {
     case integer:
-      p = imaxtostr (v->u.i, buf);
+      mpz_out_str (stdout, 10, v->u.i);
+      putchar ('\n');
       break;
     case string:
-      p = v->u.s;
+      puts (v->u.s);
       break;
     default:
       abort ();
     }
-
-  puts (p);
 }
 
 /* Return true if V is a null-string or zero-number.  */
@@ -285,7 +395,7 @@ null (VALUE *v)
   switch (v->type)
     {
     case integer:
-      return v->u.i == 0;
+      return mpz_sgn (v->u.i) == 0;
     case string:
       {
 	char const *cp = v->u.s;
@@ -328,13 +438,15 @@ looks_like_integer (char const *cp)
 static void
 tostring (VALUE *v)
 {
-  char buf[INT_BUFSIZE_BOUND (intmax_t)];
-
   switch (v->type)
     {
     case integer:
-      v->u.s = xstrdup (imaxtostr (v->u.i, buf));
-      v->type = string;
+      {
+	char *s = mpz_get_str (NULL, 10, v->u.i);
+	mpz_clear (v->u.i);
+	v->u.s = s;
+	v->type = string;
+      }
       break;
     case string:
       break;
@@ -354,20 +466,36 @@ toarith (VALUE *v)
       return true;
     case string:
       {
-	intmax_t value;
+	char *s = v->u.s;
 
-	if (! looks_like_integer (v->u.s))
+	if (! looks_like_integer (s))
 	  return false;
-	if (xstrtoimax (v->u.s, NULL, 10, &value, NULL) != LONGINT_OK)
-	  error (EXPR_FAILURE, ERANGE, "%s", v->u.s);
-	free (v->u.s);
-	v->u.i = value;
+	if (mpz_init_set_str (v->u.i, s, 10) != 0 && !HAVE_GMP)
+	  error (EXPR_FAILURE, ERANGE, "%s", s);
+	free (s);
 	v->type = integer;
 	return true;
       }
     default:
       abort ();
     }
+}
+
+/* Extract a size_t value from a integer value I.
+   If the value is negative, return SIZE_MAX.
+   If the value is too large, return SIZE_MAX - 1.  */
+static size_t
+getsize (mpz_t i)
+{
+  if (mpz_sgn (i) < 0)
+    return SIZE_MAX;
+  if (mpz_fits_ulong_p (i))
+    {
+      unsigned long int ul = mpz_get_ui (i);
+      if (ul < SIZE_MAX)
+	return ul;
+    }
+  return SIZE_MAX - 1;
 }
 
 /* Return true and advance if the next token matches STR exactly.
@@ -548,13 +676,14 @@ eval6 (bool evaluate)
     }
   else if (nextarg ("index"))
     {
+      size_t pos;
+
       l = eval6 (evaluate);
       r = eval6 (evaluate);
       tostring (l);
       tostring (r);
-      v = int_value (strcspn (l->u.s, r->u.s) + 1);
-      if (v->u.i == strlen (l->u.s) + 1)
-	v->u.i = 0;
+      pos = strcspn (l->u.s, r->u.s);
+      v = int_value (l->u.s[pos] ? pos + 1 : 0);
       freev (l);
       freev (r);
       return v;
@@ -567,19 +696,26 @@ eval6 (bool evaluate)
       i2 = eval6 (evaluate);
       tostring (l);
       llen = strlen (l->u.s);
-      if (!toarith (i1) || !toarith (i2)
-	  || llen < i1->u.i
-	  || i1->u.i <= 0 || i2->u.i <= 0)
+
+      if (!toarith (i1) || !toarith (i2))
 	v = str_value ("");
       else
 	{
-	  size_t vlen = MIN (i2->u.i, llen - i1->u.i + 1);
-	  char *vlim;
-	  v = xmalloc (sizeof *v);
-	  v->type = string;
-	  v->u.s = xmalloc (vlen + 1);
-	  vlim = mempcpy (v->u.s, l->u.s + i1->u.i - 1, vlen);
-	  *vlim = '\0';
+	  size_t pos = getsize (i1->u.i);
+	  size_t len = getsize (i2->u.i);
+
+	  if (llen < pos || pos == 0 || len == 0 || len == SIZE_MAX)
+	    v = str_value ("");
+	  else
+	    {
+	      size_t vlen = MIN (len, llen - pos + 1);
+	      char *vlim;
+	      v = xmalloc (sizeof *v);
+	      v->type = string;
+	      v->u.s = xmalloc (vlen + 1);
+	      vlim = mempcpy (v->u.s, l->u.s + pos - 1, vlen);
+	      *vlim = '\0';
+	    }
 	}
       freev (l);
       freev (i1);
@@ -630,7 +766,6 @@ eval4 (bool evaluate)
   VALUE *l;
   VALUE *r;
   enum { multiply, divide, mod } fxn;
-  intmax_t val = 0;
 
 #ifdef EVAL_TRACE
   trace ("eval4");
@@ -651,34 +786,14 @@ eval4 (bool evaluate)
 	{
 	  if (!toarith (l) || !toarith (r))
 	    error (EXPR_INVALID, 0, _("non-numeric argument"));
-	  if (fxn == multiply)
-	    {
-	      val = l->u.i * r->u.i;
-	      if (! (l->u.i == 0 || r->u.i == 0
-		     || ((val < 0) == ((l->u.i < 0) ^ (r->u.i < 0))
-			 && val / l->u.i == r->u.i)))
-		integer_overflow ('*');
-	    }
-	  else
-	    {
-	      if (r->u.i == 0)
-		error (EXPR_INVALID, 0, _("division by zero"));
-	      if (l->u.i < - INTMAX_MAX && r->u.i == -1)
-		{
-		  /* Some x86-style hosts raise an exception for
-		     INT_MIN / -1 and INT_MIN % -1, so handle these
-		     problematic cases specially.  */
-		  if (fxn == divide)
-		    integer_overflow ('/');
-		  val = 0;
-		}
-	      else
-		val = fxn == divide ? l->u.i / r->u.i : l->u.i % r->u.i;
-	    }
+	  if (fxn != multiply && mpz_sgn (r->u.i) == 0)
+	    error (EXPR_INVALID, 0, _("division by zero"));
+	  ((fxn == multiply ? mpz_mul
+	    : fxn == divide ? mpz_tdiv_q
+	    : mpz_tdiv_r)
+	   (l->u.i, l->u.i, r->u.i));
 	}
-      freev (l);
       freev (r);
-      l = int_value (val);
     }
 }
 
@@ -690,7 +805,6 @@ eval3 (bool evaluate)
   VALUE *l;
   VALUE *r;
   enum { plus, minus } fxn;
-  intmax_t val = 0;
 
 #ifdef EVAL_TRACE
   trace ("eval3");
@@ -709,22 +823,9 @@ eval3 (bool evaluate)
 	{
 	  if (!toarith (l) || !toarith (r))
 	    error (EXPR_INVALID, 0, _("non-numeric argument"));
-	  if (fxn == plus)
-	    {
-	      val = l->u.i + r->u.i;
-	      if ((val < l->u.i) != (r->u.i < 0))
-		integer_overflow ('+');
-	    }
-	  else
-	    {
-	      val = l->u.i - r->u.i;
-	      if ((l->u.i < val) != (r->u.i < 0))
-		integer_overflow ('-');
-	    }
+	  (fxn == plus ? mpz_add : mpz_sub) (l->u.i, l->u.i, r->u.i);
 	}
-      freev (l);
       freev (r);
-      l = int_value (val);
     }
 }
 
@@ -780,9 +881,9 @@ eval2 (bool evaluate)
 	      if (errno)
 		{
 		  error (0, errno, _("string comparison failed"));
-		  error (0, 0, _("Set LC_ALL='C' to work around the problem."));
+		  error (0, 0, _("set LC_ALL='C' to work around the problem"));
 		  error (EXPR_INVALID, 0,
-			 _("The strings compared were %s and %s."),
+			 _("the strings compared were %s and %s"),
 			 quotearg_n_style (0, locale_quoting_style, l->u.s),
 			 quotearg_n_style (1, locale_quoting_style, r->u.s));
 		}
