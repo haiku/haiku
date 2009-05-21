@@ -20,14 +20,6 @@
 #include <algorithm>
 
 
-//#define TRACE_RLD
-#ifdef TRACE_RLD
-#	define TRACE(x) printf x
-#else
-#	define TRACE(x) ;
-#endif
-
-
 struct user_space_program_args *gProgramArgs;
 
 

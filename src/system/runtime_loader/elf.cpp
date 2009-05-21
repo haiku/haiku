@@ -19,231 +19,36 @@
 #include <OS.h>
 
 #include <elf32.h>
-#include <image_defs.h>
-#include <runtime_loader.h>
 #include <syscalls.h>
-#include <user_runtime.h>
-#include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
-#include <util/KMessage.h>
-#include <vm_defs.h>
 
-#include "tracing_config.h"
-
-
-//#define TRACE_RLD
-#ifdef TRACE_RLD
-#	define TRACE(x) dprintf x
-#else
-#	define TRACE(x) ;
-#endif
+#include "add_ons.h"
+#include "elf_load_image.h"
+#include "elf_symbol_lookup.h"
+#include "elf_versioning.h"
+#include "errors.h"
+#include "images.h"
 
 
 // TODO: implement better locking strategy
 // TODO: implement lazy binding
 
-// interim Haiku API versions
-#define HAIKU_VERSION_PRE_GLUE_CODE		0x00000010
-
-#define	PAGE_MASK (B_PAGE_SIZE - 1)
-
-#define	PAGE_OFFSET(x) ((x) & (PAGE_MASK))
-#define	PAGE_BASE(x) ((x) & ~(PAGE_MASK))
-#define TO_PAGE_SIZE(x) ((x + (PAGE_MASK)) & ~(PAGE_MASK))
-
-#define RLD_PROGRAM_BASE 0x00200000
-	/* keep in sync with app ldscript */
-
 // a handle returned by load_library() (dlopen())
 #define RLD_GLOBAL_SCOPE	((void*)-2l)
 
-enum {
-	// the lower two bits are reserved for RTLD_NOW and RTLD_GLOBAL
-
-	RFLAG_RW					= 0x0010,
-	RFLAG_ANON					= 0x0020,
-
-	RFLAG_TERMINATED			= 0x0200,
-	RFLAG_INITIALIZED			= 0x0400,
-	RFLAG_SYMBOLIC				= 0x0800,
-	RFLAG_RELOCATED				= 0x1000,
-	RFLAG_PROTECTED				= 0x2000,
-	RFLAG_DEPENDENCIES_LOADED	= 0x4000,
-	RFLAG_REMAPPED				= 0x8000,
-
-	RFLAG_VISITED				= 0x10000,
-	RFLAG_USE_FOR_RESOLVING		= 0x20000
-		// temporarily set in the symbol resolution code
-};
-
-
-#define IMAGE_TYPE_TO_MASK(type)	(1 << ((type) - 1))
-#define ALL_IMAGE_TYPES				(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
-									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE) \
-									| IMAGE_TYPE_TO_MASK(B_ADD_ON_IMAGE) \
-									| IMAGE_TYPE_TO_MASK(B_SYSTEM_IMAGE))
-#define APP_OR_LIBRARY_TYPE			(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
-									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
 typedef void (*init_term_function)(image_id);
 
-static Elf32_Sym* find_symbol(image_t* image,
-	const SymbolLookupInfo& lookupInfo);
-static uint32 elf_hash(const uint8 *name);
+bool gProgramLoaded = false;
+image_t* gProgramImage;
 
-
-// image events
-enum {
-	IMAGE_EVENT_LOADED,
-	IMAGE_EVENT_RELOCATED,
-	IMAGE_EVENT_INITIALIZED,
-	IMAGE_EVENT_UNINITIALIZING,
-	IMAGE_EVENT_UNLOADING
-};
-
-
-struct RuntimeLoaderAddOn
-		: public DoublyLinkedListLinkImpl<RuntimeLoaderAddOn> {
-	image_t*				image;
-	runtime_loader_add_on*	addOn;
-
-	RuntimeLoaderAddOn(image_t* image, runtime_loader_add_on* addOn)
-		:
-		image(image),
-		addOn(addOn)
-	{
-	}
-};
-
-typedef DoublyLinkedList<RuntimeLoaderAddOn> AddOnList;
-
-struct RuntimeLoaderSymbolPatcher {
-	RuntimeLoaderSymbolPatcher*		next;
-	runtime_loader_symbol_patcher*	patcher;
-	void*							cookie;
-
-	RuntimeLoaderSymbolPatcher(runtime_loader_symbol_patcher* patcher,
-			void* cookie)
-		:
-		patcher(patcher),
-		cookie(cookie)
-	{
-	}
-};
-
-
-struct SymbolLookupInfo {
-	const char*				name;
-	int32					type;
-	uint32					hash;
-	uint32					flags;
-	const elf_version_info*	version;
-
-	SymbolLookupInfo(const char* name, int32 type, uint32 hash,
-		const elf_version_info* version = NULL, uint32 flags = 0)
-		:
-		name(name),
-		type(type),
-		hash(hash),
-		flags(flags),
-		version(version)
-	{
-	}
-
-	SymbolLookupInfo(const char* name, int32 type,
-		const elf_version_info* version = NULL, uint32 flags = 0)
-		:
-		name(name),
-		type(type),
-		hash(elf_hash((const uint8*)name)),
-		flags(flags),
-		version(version)
-	{
-	}
-};
-
-
-// values for SymbolLookupInfo::flags
-#define LOOKUP_FLAG_DEFAULT_VERSION	0x01
-
-
-static image_queue_t sLoadedImages = {0, 0};
-static image_queue_t sDisposableImages = {0, 0};
-static uint32 sLoadedImageCount = 0;
-static image_t *sProgramImage;
-static KMessage sErrorMessage;
-static bool sProgramLoaded = false;
-static const char *sSearchPathSubDir = NULL;
-static bool sInvalidImageIDs;
-static image_t **sPreloadedImages = NULL;
+static image_t** sPreloadedImages = NULL;
 static uint32 sPreloadedImageCount = 0;
-static AddOnList sAddOns;
 
 // a recursive lock
 static sem_id sSem;
 static thread_id sSemOwner;
 static int32 sSemCount;
-
-extern runtime_loader_add_on_export gRuntimeLoaderAddOnExport;
-
-
-void
-dprintf(const char *format, ...)
-{
-	char buffer[1024];
-
-	va_list list;
-	va_start(list, format);
-
-	vsnprintf(buffer, sizeof(buffer), format, list);
-	_kern_debug_output(buffer);
-
-	va_end(list);
-}
-
-#define FATAL(x...)							\
-	do {									\
-		dprintf("runtime_loader: " x);		\
-		if (!sProgramLoaded)				\
-			printf("runtime_loader: " x);	\
-	} while (false)
-
-
-/*!	Mini atoi(), so we don't have to include the libroot dependencies.
- */
-int
-atoi(const char* num)
-{
-	int result = 0;
-	while (*num >= '0' && *num <= '9') {
-		result = (result * 10) + (*num - '0');
-		num++;
-	}
-
-	return result;
-}
-
-
-#if RUNTIME_LOADER_TRACING
-
-void
-ktrace_printf(const char *format, ...)
-{
-	va_list list;
-	va_start(list, format);
-
-	char buffer[1024];
-	vsnprintf(buffer, sizeof(buffer), format, list);
-	_kern_ktrace_output(buffer);
-
-	va_end(list);
-}
-
-#define KTRACE(x...)	ktrace_printf(x)
-
-#else
-#	define KTRACE(x...)
-#endif	// RUNTIME_LOADER_TRACING
 
 
 static void
@@ -265,1905 +70,6 @@ rld_lock()
 		sSemOwner = self;
 	}
 	sSemCount++;
-}
-
-
-static void
-enqueue_image(image_queue_t *queue, image_t *image)
-{
-	image->next = 0;
-
-	image->prev = queue->tail;
-	if (queue->tail)
-		queue->tail->next = image;
-
-	queue->tail = image;
-	if (!queue->head)
-		queue->head = image;
-}
-
-
-static void
-dequeue_image(image_queue_t *queue, image_t *image)
-{
-	if (image->next)
-		image->next->prev = image->prev;
-	else
-		queue->tail = image->prev;
-
-	if (image->prev)
-		image->prev->next = image->next;
-	else
-		queue->head = image->next;
-
-	image->prev = 0;
-	image->next = 0;
-}
-
-
-static uint32
-elf_hash(const uint8 *name)
-{
-	uint32 hash = 0;
-	uint32 temp;
-
-	while (*name) {
-		hash = (hash << 4) + *name++;
-		if ((temp = hash & 0xf0000000)) {
-			hash ^= temp >> 24;
-		}
-		hash &= ~temp;
-	}
-	return hash;
-}
-
-
-static inline bool
-report_errors()
-{
-	return gProgramArgs->error_port >= 0;
-}
-
-
-//! Remaps the image ID of \a image after fork.
-static status_t
-update_image_id(image_t *image)
-{
-	int32 cookie = 0;
-	image_info info;
-	while (_kern_get_next_image_info(B_CURRENT_TEAM, &cookie, &info,
-			sizeof(image_info)) == B_OK) {
-		for (uint32 i = 0; i < image->num_regions; i++) {
-			if (image->regions[i].vmstart == (addr_t)info.text) {
-				image->id = info.id;
-				return B_OK;
-			}
-		}
-	}
-
-	FATAL("Could not update image ID %ld after fork()!\n", image->id);
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-//! After fork, we lazily rebuild the image IDs of all loaded images.
-static status_t
-update_image_ids(void)
-{
-	for (image_t *image = sLoadedImages.head; image; image = image->next) {
-		status_t status = update_image_id(image);
-		if (status != B_OK)
-			return status;
-	}
-	for (image_t *image = sDisposableImages.head; image; image = image->next) {
-		status_t status = update_image_id(image);
-		if (status != B_OK)
-			return status;
-	}
-
-	sInvalidImageIDs = false;
-	return B_OK;
-}
-
-
-static image_t *
-find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
-	uint32 typeMask)
-{
-	for (image_t *image = queue->head; image; image = image->next) {
-		const char *imageName = isPath ? image->path : image->name;
-		int length = isPath ? sizeof(image->path) : sizeof(image->name);
-
-		if (!strncmp(imageName, name, length)
-			&& (typeMask & IMAGE_TYPE_TO_MASK(image->type)) != 0) {
-			return image;
-		}
-	}
-
-	return NULL;
-}
-
-
-static image_t *
-find_image(char const *name, uint32 typeMask)
-{
-	bool isPath = strchr(name, '/') != NULL;
-	return find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
-}
-
-
-static image_t *
-find_loaded_image_by_id(image_id id)
-{
-	if (sInvalidImageIDs) {
-		// After fork, we lazily rebuild the image IDs of all loaded images
-		update_image_ids();
-	}
-
-	for (image_t *image = sLoadedImages.head; image; image = image->next) {
-		if (image->id == id)
-			return image;
-	}
-
-	// For the termination routine, we need to look into the list of
-	// disposable images as well
-	for (image_t *image = sDisposableImages.head; image; image = image->next) {
-		if (image->id == id)
-			return image;
-	}
-
-	return NULL;
-}
-
-
-static image_t*
-get_program_image()
-{
-	for (image_t *image = sLoadedImages.head; image; image = image->next) {
-		if (image->type == B_APP_IMAGE)
-			return image;
-	}
-
-	return NULL;
-}
-
-
-static const char *
-get_program_path()
-{
-	if (image_t* image = get_program_image())
-		return image->path;
-
-	return NULL;
-}
-
-
-static status_t
-parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize,
-	int32 *_sheaderSize)
-{
-	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
-		return B_NOT_AN_EXECUTABLE;
-
-	if (eheader->e_ident[4] != ELFCLASS32)
-		return B_NOT_AN_EXECUTABLE;
-
-	if (eheader->e_phoff == 0)
-		return B_NOT_AN_EXECUTABLE;
-
-	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
-		return B_NOT_AN_EXECUTABLE;
-
-	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
-	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
-
-	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
-		return B_NOT_AN_EXECUTABLE;
-
-	return B_OK;
-}
-
-
-static int32
-count_regions(char const *buff, int phnum, int phentsize)
-{
-	struct Elf32_Phdr *pheaders;
-	int32 count = 0;
-	int i;
-
-	for (i = 0; i < phnum; i++) {
-		pheaders = (struct Elf32_Phdr *)(buff + i * phentsize);
-
-		switch (pheaders->p_type) {
-			case PT_NULL:
-				/* NOP header */
-				break;
-			case PT_LOAD:
-				count += 1;
-				if (pheaders->p_memsz != pheaders->p_filesz) {
-					addr_t A = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_memsz);
-					addr_t B = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_filesz);
-
-					if (A != B)
-						count += 1;
-				}
-				break;
-			case PT_DYNAMIC:
-				/* will be handled at some other place */
-				break;
-			case PT_INTERP:
-				/* should check here for appropiate interpreter */
-				break;
-			case PT_NOTE:
-				/* unsupported */
-				break;
-			case PT_SHLIB:
-				/* undefined semantics */
-				break;
-			case PT_PHDR:
-				/* we don't use it */
-				break;
-			case PT_STACK:
-				/* we don't use it */
-				break;
-			default:
-				FATAL("unhandled pheader type in count 0x%lx\n", pheaders->p_type);
-				return B_BAD_DATA;
-		}
-	}
-
-	return count;
-}
-
-
-static image_t *
-create_image(const char *name, const char *path, int num_regions)
-{
-	size_t allocSize = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
-	const char *lastSlash;
-
-	image_t *image = (image_t*)malloc(allocSize);
-	if (image == NULL) {
-		FATAL("no memory for image %s\n", path);
-		return NULL;
-	}
-
-	memset(image, 0, allocSize);
-
-	strlcpy(image->path, path, sizeof(image->path));
-
-	// Make the last component of the supplied name the image name.
-	// If present, DT_SONAME will replace this name.
-	if ((lastSlash = strrchr(name, '/')))
-		strlcpy(image->name, lastSlash + 1, sizeof(image->name));
-	else
-		strlcpy(image->name, name, sizeof(image->name));
-
-	image->ref_count = 1;
-	image->num_regions = num_regions;
-
-	return image;
-}
-
-
-static void
-delete_image_struct(image_t *image)
-{
-#ifdef DEBUG
-	size_t size = sizeof(image_t) + (image->num_regions - 1) * sizeof(elf_region_t);
-	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
-#endif
-	free(image->needed);
-	free(image->versions);
-
-	while (RuntimeLoaderSymbolPatcher* patcher
-			= image->defined_symbol_patchers) {
-		image->defined_symbol_patchers = patcher->next;
-		delete patcher;
-	}
-	while (RuntimeLoaderSymbolPatcher* patcher
-			= image->undefined_symbol_patchers) {
-		image->undefined_symbol_patchers = patcher->next;
-		delete patcher;
-	}
-
-#ifdef DEBUG
-	// overwrite images to make sure they aren't accidently reused anywhere
-	memset(image, 0xa5, size);
-#endif
-	free(image);
-}
-
-
-static void
-delete_image(image_t *image)
-{
-	if (image == NULL)
-		return;
-
-	_kern_unregister_image(image->id);
-		// registered in load_container()
-
-	delete_image_struct(image);
-}
-
-
-static void
-update_image_flags_recursively(image_t* image, uint32 flagsToSet,
-	uint32 flagsToClear)
-{
-	image_t* queue[sLoadedImageCount];
-	uint32 count = 0;
-	uint32 index = 0;
-	queue[count++] = image;
-	image->flags |= RFLAG_VISITED;
-
-	while (index < count) {
-		// pop next image
-		image = queue[index++];
-
-		// push dependencies
-		for (uint32 i = 0; i < image->num_needed; i++) {
-			image_t* needed = image->needed[i];
-			if ((needed->flags & RFLAG_VISITED) == 0) {
-				queue[count++] = needed;
-				needed->flags |= RFLAG_VISITED;
-			}
-		}
-	}
-
-	// update flags
-	for (uint32 i = 0; i < count; i++) {
-		queue[i]->flags = (queue[i]->flags | flagsToSet)
-			& ~(flagsToClear | RFLAG_VISITED);
-	}
-}
-
-
-static void
-set_image_flags_recursively(image_t* image, uint32 flags)
-{
-	update_image_flags_recursively(image, flags, 0);
-}
-
-
-static void
-clear_image_flags_recursively(image_t* image, uint32 flags)
-{
-	update_image_flags_recursively(image, 0, flags);
-}
-
-
-static status_t
-parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
-{
-	struct Elf32_Phdr *pheader;
-	int regcount;
-	int i;
-
-	regcount = 0;
-	for (i = 0; i < phnum; i++) {
-		pheader = (struct Elf32_Phdr *)(buff + i * phentsize);
-
-		switch (pheader->p_type) {
-			case PT_NULL:
-				/* NOP header */
-				break;
-			case PT_LOAD:
-				if (pheader->p_memsz == pheader->p_filesz) {
-					/*
-					 * everything in one area
-					 */
-					image->regions[regcount].start = pheader->p_vaddr;
-					image->regions[regcount].size = pheader->p_memsz;
-					image->regions[regcount].vmstart = PAGE_BASE(pheader->p_vaddr);
-					image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_memsz
-						+ PAGE_OFFSET(pheader->p_vaddr));
-					image->regions[regcount].fdstart = pheader->p_offset;
-					image->regions[regcount].fdsize = pheader->p_filesz;
-					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_WRITE) {
-						// this is a writable segment
-						image->regions[regcount].flags |= RFLAG_RW;
-					}
-				} else {
-					/*
-					 * may require splitting
-					 */
-					addr_t A = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_memsz);
-					addr_t B = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_filesz);
-
-					image->regions[regcount].start = pheader->p_vaddr;
-					image->regions[regcount].size = pheader->p_filesz;
-					image->regions[regcount].vmstart = PAGE_BASE(pheader->p_vaddr);
-					image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_filesz
-						+ PAGE_OFFSET(pheader->p_vaddr));
-					image->regions[regcount].fdstart = pheader->p_offset;
-					image->regions[regcount].fdsize = pheader->p_filesz;
-					image->regions[regcount].delta = 0;
-					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_WRITE) {
-						// this is a writable segment
-						image->regions[regcount].flags |= RFLAG_RW;
-					}
-
-					if (A != B) {
-						/*
-						 * yeah, it requires splitting
-						 */
-						regcount += 1;
-						image->regions[regcount].start = pheader->p_vaddr;
-						image->regions[regcount].size = pheader->p_memsz - pheader->p_filesz;
-						image->regions[regcount].vmstart = image->regions[regcount-1].vmstart + image->regions[regcount-1].vmsize;
-						image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_memsz + PAGE_OFFSET(pheader->p_vaddr))
-							- image->regions[regcount-1].vmsize;
-						image->regions[regcount].fdstart = 0;
-						image->regions[regcount].fdsize = 0;
-						image->regions[regcount].delta = 0;
-						image->regions[regcount].flags = RFLAG_ANON;
-						if (pheader->p_flags & PF_WRITE) {
-							// this is a writable segment
-							image->regions[regcount].flags |= RFLAG_RW;
-						}
-					}
-				}
-				regcount += 1;
-				break;
-			case PT_DYNAMIC:
-				image->dynamic_ptr = pheader->p_vaddr;
-				break;
-			case PT_INTERP:
-				/* should check here for appropiate interpreter */
-				break;
-			case PT_NOTE:
-				/* unsupported */
-				break;
-			case PT_SHLIB:
-				/* undefined semantics */
-				break;
-			case PT_PHDR:
-				/* we don't use it */
-				break;
-			case PT_STACK:
-				/* we don't use it */
-				break;
-			default:
-				FATAL("unhandled pheader type in parse 0x%lx\n", pheader->p_type);
-				return B_BAD_DATA;
-		}
-	}
-
-	return B_OK;
-}
-
-
-static void
-analyze_image_haiku_version_and_abi(image_t* image)
-{
-	// Haiku API version
-	struct Elf32_Sym* symbol = find_symbol(image,
-		SymbolLookupInfo(B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME,
-			B_SYMBOL_TYPE_DATA));
-	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
-		&& symbol->st_value > 0
-		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
-		&& symbol->st_size >= sizeof(uint32)) {
-		image->api_version
-			= *(uint32*)(symbol->st_value + image->regions[0].delta);
-	} else
-		image->api_version = 0;
-
-	// Haiku ABI
-	symbol = find_symbol(image,
-		SymbolLookupInfo(B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME,
-			B_SYMBOL_TYPE_DATA));
-	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
-		&& symbol->st_value > 0
-		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
-		&& symbol->st_size >= sizeof(uint32)) {
-		image->abi = *(uint32*)(symbol->st_value + image->regions[0].delta);
-	} else
-		image->abi = 0;
-}
-
-
-static bool
-analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
-	int32 sheaderSize, char* buffer, size_t bufferSize)
-{
-	if (sheaderSize > (int)bufferSize) {
-		FATAL("Cannot handle section headers bigger than %lu\n", bufferSize);
-		return false;
-	}
-
-	// read section headers
-	ssize_t length = _kern_read(fd, eheader.e_shoff, buffer, sheaderSize);
-	if (length != sheaderSize) {
-		FATAL("Could not read section headers: %s\n", strerror(length));
-		return false;
-	}
-
-	// load the string section
-	Elf32_Shdr* sectionHeader
-		= (Elf32_Shdr*)(buffer + eheader.e_shstrndx * eheader.e_shentsize);
-
-	if (sheaderSize + sectionHeader->sh_size > bufferSize) {
-		FATAL("Buffer not big enough for section string section\n");
-		return false;
-	}
-
-	char* sectionStrings = buffer + bufferSize - sectionHeader->sh_size;
-	length = _kern_read(fd, sectionHeader->sh_offset, sectionStrings,
-		sectionHeader->sh_size);
-	if (length != (int)sectionHeader->sh_size) {
-		FATAL("Could not read section string section: %s\n", strerror(length));
-		return false;
-	}
-
-	// find the .comment section
-	off_t commentOffset = 0;
-	size_t commentSize = 0;
-	for (uint32 i = 0; i < eheader.e_shnum; i++) {
-		sectionHeader = (Elf32_Shdr*)(buffer + i * eheader.e_shentsize);
-		const char* sectionName = sectionStrings + sectionHeader->sh_name;
-		if (sectionHeader->sh_name != 0
-			&& strcmp(sectionName, ".comment") == 0) {
-			commentOffset = sectionHeader->sh_offset;
-			commentSize = sectionHeader->sh_size;
-			break;
-		}
-	}
-
-	if (commentSize == 0) {
-		FATAL("Could not find .comment section\n");
-		return false;
-	}
-
-	// read a part of the comment section
-	if (commentSize > 512)
-		commentSize = 512;
-
-	length = _kern_read(fd, commentOffset, buffer, commentSize);
-	if (length != (int)commentSize) {
-		FATAL("Could not read .comment section: %s\n", strerror(length));
-		return false;
-	}
-
-	// the common prefix of the strings in the .comment section
-	static const char* kGCCVersionPrefix = "GCC: (GNU) ";
-	size_t gccVersionPrefixLen = strlen(kGCCVersionPrefix);
-
-	size_t index = 0;
-	int gccMajor = 0;
-	int gccMiddle = 0;
-	int gccMinor = 0;
-	bool isHaiku = true;
-
-	// Read up to 10 comments. The first three or four are usually from the
-	// glue code.
-	for (int i = 0; i < 10; i++) {
-		// skip '\0'
-		while (index < commentSize && buffer[index] == '\0')
-			index++;
-		char* stringStart = buffer + index;
-
-		// find string end
-		while (index < commentSize && buffer[index] != '\0')
-			index++;
-
-		// ignore the entry at the end of the buffer
-		if (index == commentSize)
-			break;
-
-		// We have to analyze string like these:
-		// GCC: (GNU) 2.9-beos-991026
-		// GCC: (GNU) 2.95.3-haiku-080322
-		// GCC: (GNU) 4.1.2
-
-		// skip the common prefix
-		if (strncmp(stringStart, kGCCVersionPrefix, gccVersionPrefixLen) != 0)
-			continue;
-
-		// the rest is the GCC version
-		char* gccVersion = stringStart + gccVersionPrefixLen;
-		char* gccPlatform = strchr(gccVersion, '-');
-		char* patchLevel = NULL;
-		if (gccPlatform != NULL) {
-			*gccPlatform = '\0';
-			gccPlatform++;
-			patchLevel = strchr(gccPlatform, '-');
-			if (patchLevel != NULL) {
-				*patchLevel = '\0';
-				patchLevel++;
-			}
-		}
-
-		// split the gcc version into major, middle, and minor
-		int version[3] = { 0, 0, 0 };
-
-		for (int k = 0; gccVersion != NULL && k < 3; k++) {
-			char* dot = strchr(gccVersion, '.');
-			if (dot) {
-				*dot = '\0';
-				dot++;
-			}
-			version[k] = atoi(gccVersion);
-			gccVersion = dot;
-		}
-
-		// got any version?
-		if (version[0] == 0)
-			continue;
-
-		// Select the gcc version with the smallest major, but the greatest
-		// middle/minor. This should usually ignore the glue code version as
-		// well as cases where e.g. in a gcc 2 program a single C file has
-		// been compiled with gcc 4.
-		if (gccMajor == 0 || gccMajor > version[0]
-		 	|| (gccMajor == version[0]
-				&& (gccMiddle < version[1]
-					|| (gccMiddle == version[1] && gccMinor < version[2])))) {
-			gccMajor = version[0];
-			gccMiddle = version[1];
-			gccMinor = version[2];
-		}
-
-		if (gccMajor == 2 && gccPlatform != NULL
-			&& strcmp(gccPlatform, "haiku")) {
-			isHaiku = false;
-		}
-	}
-
-	if (gccMajor == 0)
-		return false;
-
-	if (gccMajor == 2) {
-		if (gccMiddle < 95)
-			image->abi = B_HAIKU_ABI_GCC_2_ANCIENT;
-		else if (isHaiku)
-			image->abi = B_HAIKU_ABI_GCC_2_HAIKU;
-		else
-			image->abi = B_HAIKU_ABI_GCC_2_BEOS;
-	} else
-		image->abi = gccMajor << 16;
-
-	return true;
-}
-
-
-static bool
-assert_dynamic_loadable(image_t *image)
-{
-	uint32 i;
-
-	if (!image->dynamic_ptr)
-		return true;
-
-	for (i = 0; i < image->num_regions; i++) {
-		if (image->dynamic_ptr >= image->regions[i].start
-			&& image->dynamic_ptr < image->regions[i].start + image->regions[i].size)
-			return true;
-	}
-
-	return false;
-}
-
-
-/**	This function will change the protection of all read-only segments
- *	to really be read-only.
- *	The areas have to be read/write first, so that they can be relocated.
- */
-
-static void
-remap_images(void)
-{
-	image_t *image;
-	uint32 i;
-
-	for (image = sLoadedImages.head; image != NULL; image = image->next) {
-		for (i = 0; i < image->num_regions; i++) {
-			if ((image->regions[i].flags & RFLAG_RW) == 0
-				&& (image->regions[i].flags & RFLAG_REMAPPED) == 0) {
-				// we only need to do this once, so we remember those we've already mapped
-				if (_kern_set_area_protection(image->regions[i].id,
-						B_READ_AREA | B_EXECUTE_AREA) == B_OK)
-					image->regions[i].flags |= RFLAG_REMAPPED;
-			}
-		}
-	}
-}
-
-
-static status_t
-map_image(int fd, char const *path, image_t *image, bool fixed)
-{
-	status_t status = B_OK;
-	const char *baseName;
-	uint32 i;
-
-	(void)(fd);
-
-	// cut the file name from the path as base name for the created areas
-	baseName = strrchr(path, '/');
-	if (baseName != NULL)
-		baseName++;
-	else
-		baseName = path;
-
-	for (i = 0; i < image->num_regions; i++) {
-		char regionName[B_OS_NAME_LENGTH];
-		addr_t loadAddress;
-		uint32 addressSpecifier;
-
-		// for BeOS compatibility: if we load an old BeOS executable, we
-		// have to relocate it, if possible - we recognize it because the
-		// vmstart is set to 0 (hopefully always)
-		if (fixed && image->regions[i].vmstart == 0)
-			fixed = false;
-
-		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
-			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
-
-		if (image->dynamic_ptr && !fixed) {
-			// relocatable image... we can afford to place wherever
-			if (i == 0) {
-				// but only the first segment gets a free ride
-				loadAddress = RLD_PROGRAM_BASE;
-				addressSpecifier = B_BASE_ADDRESS;
-			} else {
-				loadAddress = image->regions[i].vmstart + image->regions[i-1].delta;
-				addressSpecifier = B_EXACT_ADDRESS;
-			}
-		} else {
-			// not relocatable, put it where it asks or die trying
-			loadAddress = image->regions[i].vmstart;
-			addressSpecifier = B_EXACT_ADDRESS;
-		}
-
-		if (image->regions[i].flags & RFLAG_ANON) {
-			image->regions[i].id = _kern_create_area(regionName, (void **)&loadAddress,
-				addressSpecifier, image->regions[i].vmsize, B_NO_LOCK,
-				B_READ_AREA | B_WRITE_AREA);
-
-			if (image->regions[i].id < 0) {
-				status = image->regions[i].id;
-				goto error;
-			}
-
-			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
-			image->regions[i].vmstart = loadAddress;
-		} else {
-			image->regions[i].id = _kern_map_file(regionName,
-				(void **)&loadAddress, addressSpecifier,
-				image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP, fd, PAGE_BASE(image->regions[i].fdstart));
-
-			if (image->regions[i].id < 0) {
-				status = image->regions[i].id;
-				goto error;
-			}
-
-			TRACE(("\"%s\" at %p, 0x%lx bytes (%s)\n", path,
-				(void *)loadAddress, image->regions[i].vmsize,
-				image->regions[i].flags & RFLAG_RW ? "rw" : "read-only"));
-
-			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
-			image->regions[i].vmstart = loadAddress;
-
-			// handle trailer bits in data segment
-			if (image->regions[i].flags & RFLAG_RW) {
-				addr_t startClearing;
-				addr_t toClear;
-
-				startClearing = image->regions[i].vmstart
-					+ PAGE_OFFSET(image->regions[i].start)
-					+ image->regions[i].size;
-				toClear = image->regions[i].vmsize
-					- PAGE_OFFSET(image->regions[i].start)
-					- image->regions[i].size;
-
-				TRACE(("cleared 0x%lx and the following 0x%lx bytes\n", startClearing, toClear));
-				memset((void *)startClearing, 0, toClear);
-			}
-		}
-	}
-
-	if (image->dynamic_ptr)
-		image->dynamic_ptr += image->regions[0].delta;
-
-	return B_OK;
-
-error:
-	return status;
-}
-
-
-static void
-unmap_image(image_t *image)
-{
-	uint32 i;
-
-	for (i = 0; i < image->num_regions; i++) {
-		_kern_delete_area(image->regions[i].id);
-
-		image->regions[i].id = -1;
-	}
-}
-
-
-static bool
-parse_dynamic_segment(image_t *image)
-{
-	struct Elf32_Dyn *d;
-	int i;
-	int sonameOffset = -1;
-
-	image->symhash = 0;
-	image->syms = 0;
-	image->strtab = 0;
-
-	d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	if (!d)
-		return true;
-
-	for (i = 0; d[i].d_tag != DT_NULL; i++) {
-		switch (d[i].d_tag) {
-			case DT_NEEDED:
-				image->num_needed += 1;
-				break;
-			case DT_HASH:
-				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_STRTAB:
-				image->strtab = (char *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_REL:
-				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_RELSZ:
-				image->rel_len = d[i].d_un.d_val;
-				break;
-			case DT_RELA:
-				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_RELASZ:
-				image->rela_len = d[i].d_un.d_val;
-				break;
-			// TK: procedure linkage table
-			case DT_JMPREL:
-				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_PLTRELSZ:
-				image->pltrel_len = d[i].d_un.d_val;
-				break;
-			case DT_INIT:
-				image->init_routine = (d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_FINI:
-				image->term_routine = (d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_SONAME:
-				sonameOffset = d[i].d_un.d_val;
-				break;
-			case DT_VERSYM:
-				image->symbol_versions = (Elf32_Versym*)
-					(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_VERDEF:
-				image->version_definitions = (Elf32_Verdef*)
-					(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_VERDEFNUM:
-				image->num_version_definitions = d[i].d_un.d_val;
-				break;
-			case DT_VERNEED:
-				image->needed_versions = (Elf32_Verneed*)
-					(d[i].d_un.d_ptr + image->regions[0].delta);
-				break;
-			case DT_VERNEEDNUM:
-				image->num_needed_versions = d[i].d_un.d_val;
-				break;
-			default:
-				continue;
-		}
-	}
-
-	// lets make sure we found all the required sections
-	if (!image->symhash || !image->syms || !image->strtab)
-		return false;
-
-	if (sonameOffset >= 0)
-		strlcpy(image->name, STRING(image, sonameOffset), sizeof(image->name));
-
-	return true;
-}
-
-
-static void
-patch_defined_symbol(image_t* image, const char* name, void** symbol,
-	int32* type)
-{
-	RuntimeLoaderSymbolPatcher* patcher = image->defined_symbol_patchers;
-	while (patcher != NULL && *symbol != 0) {
-		image_t* inImage = image;
-		patcher->patcher(patcher->cookie, NULL, image, name, &inImage,
-			symbol, type);
-		patcher = patcher->next;
-	}
-}
-
-
-static void
-patch_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
-	image_t** foundInImage, void** symbol, int32* type)
-{
-	if (*foundInImage != NULL)
-		patch_defined_symbol(*foundInImage, name, symbol, type);
-
-	RuntimeLoaderSymbolPatcher* patcher = image->undefined_symbol_patchers;
-	while (patcher != NULL) {
-		patcher->patcher(patcher->cookie, rootImage, image, name, foundInImage,
-			symbol, type);
-		patcher = patcher->next;
-	}
-}
-
-
-status_t
-register_defined_symbol_patcher(struct image_t* image,
-	runtime_loader_symbol_patcher* _patcher, void* cookie)
-{
-	RuntimeLoaderSymbolPatcher* patcher
-		= new(mynothrow) RuntimeLoaderSymbolPatcher(_patcher, cookie);
-	if (patcher == NULL)
-		return B_NO_MEMORY;
-
-	patcher->next = image->defined_symbol_patchers;
-	image->defined_symbol_patchers = patcher;
-
-	return B_OK;
-}
-
-
-void
-unregister_defined_symbol_patcher(struct image_t* image,
-	runtime_loader_symbol_patcher* _patcher, void* cookie)
-{
-	RuntimeLoaderSymbolPatcher** patcher = &image->defined_symbol_patchers;
-	while (*patcher != NULL) {
-		if ((*patcher)->patcher == _patcher && (*patcher)->cookie == cookie) {
-			RuntimeLoaderSymbolPatcher* toDelete = *patcher;
-			*patcher = (*patcher)->next;
-			delete toDelete;
-			return;
-		}
-		patcher = &(*patcher)->next;
-	}
-}
-
-
-status_t
-register_undefined_symbol_patcher(struct image_t* image,
-	runtime_loader_symbol_patcher* _patcher, void* cookie)
-{
-	RuntimeLoaderSymbolPatcher* patcher
-		= new(mynothrow) RuntimeLoaderSymbolPatcher(_patcher, cookie);
-	if (patcher == NULL)
-		return B_NO_MEMORY;
-
-	patcher->next = image->undefined_symbol_patchers;
-	image->undefined_symbol_patchers = patcher;
-
-	return B_OK;
-}
-
-
-void
-unregister_undefined_symbol_patcher(struct image_t* image,
-	runtime_loader_symbol_patcher* _patcher, void* cookie)
-{
-	RuntimeLoaderSymbolPatcher** patcher = &image->undefined_symbol_patchers;
-	while (*patcher != NULL) {
-		if ((*patcher)->patcher == _patcher && (*patcher)->cookie == cookie) {
-			RuntimeLoaderSymbolPatcher* toDelete = *patcher;
-			*patcher = (*patcher)->next;
-			delete toDelete;
-			return;
-		}
-		patcher = &(*patcher)->next;
-	}
-}
-
-
-runtime_loader_add_on_export gRuntimeLoaderAddOnExport = {
-	register_defined_symbol_patcher,
-	unregister_defined_symbol_patcher,
-	register_undefined_symbol_patcher,
-	unregister_undefined_symbol_patcher
-};
-
-
-static bool
-equals_image_name(image_t* image, const char* name)
-{
-	const char* lastSlash = strrchr(name, '/');
-	return strcmp(image->name, lastSlash != NULL ? lastSlash + 1 : name) == 0;
-}
-
-
-static Elf32_Sym*
-find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
-{
-	if (image->dynamic_ptr == 0)
-		return NULL;
-
-	Elf32_Sym* versionedSymbol = NULL;
-	uint32 versionedSymbolCount = 0;
-
-	uint32 bucket = lookupInfo.hash % HASHTABSIZE(image);
-
-	for (uint32 i = HASHBUCKETS(image)[bucket]; i != STN_UNDEF;
-			i = HASHCHAINS(image)[i]) {
-		struct Elf32_Sym* symbol = &image->syms[i];
-
-		if (symbol->st_shndx != SHN_UNDEF
-			&& ((ELF32_ST_BIND(symbol->st_info)== STB_GLOBAL)
-				|| (ELF32_ST_BIND(symbol->st_info) == STB_WEAK))
-			&& !strcmp(SYMNAME(image, symbol), lookupInfo.name)) {
-
-			// check if the type matches
-			uint32 type = ELF32_ST_TYPE(symbol->st_info);
-			if ((lookupInfo.type == B_SYMBOL_TYPE_TEXT && type != STT_FUNC)
-				|| (lookupInfo.type == B_SYMBOL_TYPE_DATA
-					&& type != STT_OBJECT)) {
-				continue;
-			}
-
-			// check the version
-
-			// Handle the simple cases -- the image doesn't have version
-			// information -- first.
-			if (image->symbol_versions == NULL) {
-				if (lookupInfo.version == NULL) {
-					// No specific symbol version was requested either, so the
-					// symbol is just fine.
-					return symbol;
-				}
-
-				// A specific version is requested. If it's the dependency
-				// referred to by the requested version, it's apparently an
-				// older version of the dependency and we're not happy.
-				if (equals_image_name(image, lookupInfo.version->file_name)) {
-					// TODO: That should actually be kind of fatal!
-					return NULL;
-				}
-
-				// This is some other image. We accept the symbol.
-				return symbol;
-			}
-
-			// The image has version information. Let's see what we've got.
-			uint32 versionID = image->symbol_versions[i];
-			uint32 versionIndex = VER_NDX(versionID);
-			elf_version_info& version = image->versions[versionIndex];
-
-			// skip local versions
-			if (versionIndex == VER_NDX_LOCAL)
-				continue;
-
-			if (lookupInfo.version != NULL) {
-				// a specific version is requested
-
-				// compare the versions
-				if (version.hash == lookupInfo.version->hash
-					&& strcmp(version.name, lookupInfo.version->name) == 0) {
-					// versions match
-					return symbol;
-				}
-
-				// The versions don't match. We're still fine with the
-				// base version, if it is public and we're not looking for
-				// the default version.
-				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0
-					&& versionIndex == VER_NDX_GLOBAL
-					&& (lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION)
-						== 0) {
-					// TODO: Revise the default version case! That's how
-					// FreeBSD implements it, but glibc doesn't handle it
-					// specially.
-					return symbol;
-				}
-			} else {
-				// No specific version requested, but the image has version
-				// information. This can happen in either of these cases:
-				//
-				// * The dependent object was linked against an older version
-				//   of the now versioned dependency.
-				// * The symbol is looked up via find_image_symbol() or dlsym().
-				//
-				// In the first case we return the base version of the symbol
-				// (VER_NDX_GLOBAL or VER_NDX_INITIAL), or, if that doesn't
-				// exist, the unique, non-hidden versioned symbol.
-				//
-				// In the second case we want to return the public default
-				// version of the symbol. The handling is pretty similar to the
-				// first case, with the exception that we treat VER_NDX_INITIAL
-				// as regular version.
-
-				// VER_NDX_GLOBAL is always good, VER_NDX_INITIAL is fine, if
-				// we don't look for the default version.
-				if (versionIndex == VER_NDX_GLOBAL
-					|| ((lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION) == 0
-						&& versionIndex == VER_NDX_INITIAL)) {
-					return symbol;
-				}
-
-				// If not hidden, remember the version -- we'll return it, if
-				// it is the only one.
-				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0) {
-					versionedSymbolCount++;
-					versionedSymbol = symbol;
-				}
-			}
-		}
-	}
-
-	return versionedSymbolCount == 1 ? versionedSymbol : NULL;
-}
-
-
-static status_t
-find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo,
-	void **_location)
-{
-	// get the symbol in the image
-	struct Elf32_Sym* symbol = find_symbol(image, lookupInfo);
-	if (symbol == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	void* location = (void*)(symbol->st_value + image->regions[0].delta);
-	int32 symbolType = lookupInfo.type;
-	patch_defined_symbol(image, lookupInfo.name, &location, &symbolType);
-
-	if (_location != NULL)
-		*_location = location;
-
-	return B_OK;
-}
-
-
-static status_t
-find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
-	image_t** _foundInImage, void** _location)
-{
-	image_t* queue[sLoadedImageCount];
-	uint32 count = 0;
-	uint32 index = 0;
-	queue[count++] = image;
-	image->flags |= RFLAG_VISITED;
-
-	bool found = false;
-	while (index < count) {
-		// pop next image
-		image = queue[index++];
-
-		if (find_symbol(image, lookupInfo, _location) == B_OK) {
-			found = true;
-			break;
-		}
-
-		// push needed images
-		for (uint32 i = 0; i < image->num_needed; i++) {
-			image_t* needed = image->needed[i];
-			if ((needed->flags & RFLAG_VISITED) == 0) {
-				queue[count++] = needed;
-				needed->flags |= RFLAG_VISITED;
-			}
-		}
-	}
-
-	// clear visited flags
-	for (uint32 i = 0; i < count; i++)
-		queue[i]->flags &= ~RFLAG_VISITED;
-
-	return found ? B_OK : B_ENTRY_NOT_FOUND;
-}
-
-
-static struct Elf32_Sym*
-find_undefined_symbol_beos(image_t* rootImage, image_t* image,
-	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
-{
-	// BeOS style symbol resolution: It is sufficient to check the direct
-	// dependencies. The linker would have complained, if the symbol wasn't
-	// there.
-	for (uint32 i = 0; i < image->num_needed; i++) {
-		if (image->needed[i]->dynamic_ptr) {
-			struct Elf32_Sym *symbol = find_symbol(image->needed[i],
-				lookupInfo);
-			if (symbol) {
-				*foundInImage = image->needed[i];
-				return symbol;
-			}
-		}
-	}
-
-	return NULL;
-}
-
-
-static struct Elf32_Sym*
-find_undefined_symbol_global(image_t* rootImage, image_t* image,
-	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
-{
-	// Global load order symbol resolution: All loaded images are searched for
-	// the symbol in the order they have been loaded. We skip add-on images and
-	// RTLD_LOCAL images though.
-	image_t* otherImage = sLoadedImages.head;
-	while (otherImage != NULL) {
-		if (otherImage == rootImage
-			|| (otherImage->type != B_ADD_ON_IMAGE
-				&& (otherImage->flags
-					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
-			struct Elf32_Sym *symbol = find_symbol(otherImage, lookupInfo);
-			if (symbol) {
-				*foundInImage = otherImage;
-				return symbol;
-			}
-		}
-		otherImage = otherImage->next;
-	}
-
-	return NULL;
-}
-
-
-static struct Elf32_Sym*
-find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
-	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
-{
-// TODO: How do we want to implement this one? Using global scope resolution
-// might be undesired as it is now, since libraries could refer to symbols in
-// the add-on, which would result in add-on symbols implicitely becoming used
-// outside of the add-on. So the options would be to use the global scope but
-// skip the add-on, or to do breadth-first resolution in the add-on dependency
-// scope, also skipping the add-on itself. BeOS style resolution is safe, too,
-// but we miss out features like undefined symbols and preloading.
-	return find_undefined_symbol_beos(rootImage, image, lookupInfo,
-		foundInImage);
-}
-
-
-/*!	This function is called when we run BeOS images on Haiku.
-	It allows us to redirect functions to ensure compatibility.
-*/
-static const char*
-beos_compatibility_map_symbol(const char* symbolName)
-{
-	struct symbol_mapping {
-		const char* from;
-		const char* to;
-	};
-	static const struct symbol_mapping kMappings[] = {
-		// TODO: Improve this, and also use it for libnet.so compatibility!
-		// Allow an image to provide a function that will be invoked for every
-		// (transitively) depending image. The function can return a table to
-		// remap symbols (probably better address to address). All the tables
-		// for a single image would be combined into a hash table and an
-		// undefined symbol patcher using this hash table would be added.
-		{"fstat", "__be_fstat"},
-		{"lstat", "__be_lstat"},
-		{"stat", "__be_stat"},
-	};
-	const uint32 kMappingCount = sizeof(kMappings) / sizeof(kMappings[0]);
-
-	for (uint32 i = 0; i < kMappingCount; i++) {
-		if (!strcmp(symbolName, kMappings[i].from))
-			return kMappings[i].to;
-	}
-
-	return symbolName;
-}
-
-
-int
-resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
-	addr_t *symAddress)
-{
-	switch (sym->st_shndx) {
-		case SHN_UNDEF:
-		{
-			struct Elf32_Sym *sharedSym;
-			image_t *sharedImage;
-			const char *symName = SYMNAME(image, sym);
-
-			// patch the symbol name
-			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
-				// The image has been compiled with a BeOS compiler. This means
-				// we'll have to redirect some functions for compatibility.
-				symName = beos_compatibility_map_symbol(symName);
-			}
-
-			// get the version info
-			const elf_version_info* versionInfo = NULL;
-			if (image->symbol_versions != NULL) {
-				uint32 index = sym - image->syms;
-				uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
-				if (versionIndex >= VER_NDX_INITIAL)
-					versionInfo = image->versions + versionIndex;
-			}
-
-			int32 type = B_SYMBOL_TYPE_ANY;
-			if (ELF32_ST_TYPE(sym->st_info) == STT_FUNC)
-				type = B_SYMBOL_TYPE_TEXT;
-			else if (ELF32_ST_TYPE(sym->st_info) == STT_OBJECT)
-				type = B_SYMBOL_TYPE_DATA;
-
-			// it's undefined, must be outside this image, try the other images
-			sharedSym = rootImage->find_undefined_symbol(rootImage, image,
-				SymbolLookupInfo(symName, type, versionInfo), &sharedImage);
-			void* location = NULL;
-
-			enum {
-				ERROR_NO_SYMBOL,
-				ERROR_WRONG_TYPE,
-				ERROR_NOT_EXPORTED,
-				ERROR_UNPATCHED
-			};
-			uint32 lookupError = ERROR_UNPATCHED;
-
-			if (sharedSym == NULL) {
-				// symbol not found at all
-				lookupError = ERROR_NO_SYMBOL;
-				sharedImage = NULL;
-			} else if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
-				&& ELF32_ST_TYPE(sym->st_info)
-					!= ELF32_ST_TYPE(sharedSym->st_info)) {
-				// symbol not of the requested type
-				lookupError = ERROR_WRONG_TYPE;
-				sharedImage = NULL;
-			} else if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
-				&& ELF32_ST_BIND(sharedSym->st_info) != STB_WEAK) {
-				// symbol not exported
-				lookupError = ERROR_NOT_EXPORTED;
-				sharedImage = NULL;
-			} else {
-				// symbol is fine, get its location
-				location = (void*)(sharedSym->st_value
-					+ sharedImage->regions[0].delta);
-			}
-
-			patch_undefined_symbol(rootImage, image, symName, &sharedImage,
-				&location, &type);
-
-			if (location == NULL) {
-				switch (lookupError) {
-					case ERROR_NO_SYMBOL:
-						FATAL("elf_resolve_symbol: could not resolve symbol "
-							"'%s'\n", symName);
-						break;
-					case ERROR_WRONG_TYPE:
-						FATAL("elf_resolve_symbol: found symbol '%s' in shared "
-							"image but wrong type\n", symName);
-						break;
-					case ERROR_NOT_EXPORTED:
-						FATAL("elf_resolve_symbol: found symbol '%s', but not "
-							"exported\n", symName);
-						break;
-					case ERROR_UNPATCHED:
-						FATAL("elf_resolve_symbol: found symbol '%s', but was "
-							"hidden by symbol patchers\n", symName);
-						break;
-				}
-
-				if (report_errors())
-					sErrorMessage.AddString("missing symbol", symName);
-
-				return B_MISSING_SYMBOL;
-			}
-
-			*symAddress = (addr_t)location;
-			return B_OK;
-		}
-
-		case SHN_ABS:
-			*symAddress = sym->st_value + image->regions[0].delta;
-			return B_NO_ERROR;
-
-		case SHN_COMMON:
-			// ToDo: finish this
-			FATAL("elf_resolve_symbol: COMMON symbol, finish me!\n");
-			return B_ERROR; //ERR_NOT_IMPLEMENTED_YET;
-
-		default:
-			// standard symbol
-			*symAddress = sym->st_value + image->regions[0].delta;
-			return B_NO_ERROR;
-	}
-}
-
-
-static void
-image_event(image_t* image, uint32 event)
-{
-	AddOnList::Iterator it = sAddOns.GetIterator();
-	while (RuntimeLoaderAddOn* addOn = it.Next()) {
-		void (*function)(image_t* image) = NULL;
-
-		switch (event) {
-			case IMAGE_EVENT_LOADED:
-				function = addOn->addOn->image_loaded;
-				break;
-			case IMAGE_EVENT_RELOCATED:
-				function = addOn->addOn->image_relocated;
-				break;
-			case IMAGE_EVENT_INITIALIZED:
-				function = addOn->addOn->image_initialized;
-				break;
-			case IMAGE_EVENT_UNINITIALIZING:
-				function = addOn->addOn->image_uninitializing;
-				break;
-			case IMAGE_EVENT_UNLOADING:
-				function = addOn->addOn->image_unloading;
-				break;
-		}
-
-		if (function != NULL)
-			function(image);
-	}
-}
-
-
-static status_t
-init_image_version_infos(image_t* image)
-{
-	// First find out how many version infos we need -- i.e. get the greatest
-	// version index from the defined and needed versions (they use the same
-	// index namespace).
-	uint32 maxIndex = 0;
-
-	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
-		for (uint32 i = 0; i < image->num_version_definitions; i++) {
-			if (definition->vd_version != 1) {
-				FATAL("Unsupported version definition revision: %u\n",
-					definition->vd_version);
-				return B_BAD_VALUE;
-			}
-
-			uint32 versionIndex = VER_NDX(definition->vd_ndx);
-			if (versionIndex > maxIndex)
-				maxIndex = versionIndex;
-
-			definition = (Elf32_Verdef*)
-				((uint8*)definition	+ definition->vd_next);
-		}
-	}
-
-	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
-		for (uint32 i = 0; i < image->num_needed_versions; i++) {
-			if (needed->vn_version != 1) {
-				FATAL("Unsupported version needed revision: %u\n",
-					needed->vn_version);
-				return B_BAD_VALUE;
-			}
-
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
-			for (uint32 k = 0; k < needed->vn_cnt; k++) {
-				uint32 versionIndex = VER_NDX(vernaux->vna_other);
-				if (versionIndex > maxIndex)
-					maxIndex = versionIndex;
-
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
-			}
-
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
-		}
-	}
-
-	if (maxIndex == 0)
-		return B_OK;
-
-	// allocate the version infos
-	image->versions
-		= (elf_version_info*)malloc(sizeof(elf_version_info) * (maxIndex + 1));
-	if (image->versions == NULL) {
-		FATAL("Memory shortage in init_image_version_infos()");
-		return B_NO_MEMORY;
-	}
-	image->num_versions = maxIndex + 1;
-
-	// init the version infos
-
-	// version definitions
-	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
-		for (uint32 i = 0; i < image->num_version_definitions; i++) {
-			if (definition->vd_cnt > 0
-				&& (definition->vd_flags & VER_FLG_BASE) == 0) {
-				Elf32_Verdaux* verdaux
-					= (Elf32_Verdaux*)((uint8*)definition + definition->vd_aux);
-
-				uint32 versionIndex = VER_NDX(definition->vd_ndx);
-				elf_version_info& info = image->versions[versionIndex];
-				info.hash = definition->vd_hash;
-				info.name = STRING(image, verdaux->vda_name);
-			}
-
-			definition = (Elf32_Verdef*)
-				((uint8*)definition + definition->vd_next);
-		}
-	}
-
-	// needed versions
-	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
-		for (uint32 i = 0; i < image->num_needed_versions; i++) {
-			const char* fileName = STRING(image, needed->vn_file);
-
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
-			for (uint32 k = 0; k < needed->vn_cnt; k++) {
-				uint32 versionIndex = VER_NDX(vernaux->vna_other);
-				elf_version_info& info = image->versions[versionIndex];
-				info.hash = vernaux->vna_hash;
-				info.name = STRING(image, vernaux->vna_name);
-				info.file_name = fileName;
-				info.hidden = (vernaux->vna_other & VER_NDX_FLAG_HIDDEN) != 0;
-
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
-			}
-
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
-		}
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-assert_defined_image_version(image_t* dependentImage, image_t* image,
-	const elf_version_info& neededVersion, bool weak)
-{
-	// If the image doesn't have version definitions, we print a warning and
-	// succeed. Weird, but that's how glibc does it. Not unlikely we'll fail
-	// later when resolving versioned symbols.
-	if (image->version_definitions == NULL) {
-		FATAL("%s: No version information available (required by %s)\n",
-			image->name, dependentImage->name);
-		return B_OK;
-	}
-
-	// iterate through the defined versions to find the given one
-	Elf32_Verdef* definition = image->version_definitions;
-	for (uint32 i = 0; i < image->num_version_definitions; i++) {
-		uint32 versionIndex = VER_NDX(definition->vd_ndx);
-		elf_version_info& info = image->versions[versionIndex];
-
-		if (neededVersion.hash == info.hash
-			&& strcmp(neededVersion.name, info.name) == 0) {
-			return B_OK;
-		}
-
-		definition = (Elf32_Verdef*)
-			((uint8*)definition + definition->vd_next);
-	}
-
-	// version not found -- fail, if not weak
-	if (!weak) {
-		FATAL("%s: version \"%s\" not found (required by %s)\n", image->name,
-			neededVersion.name, dependentImage->name);
-		return B_MISSING_SYMBOL;
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-check_needed_image_versions(image_t* image)
-{
-	if (image->needed_versions == NULL)
-		return B_OK;
-
-	Elf32_Verneed* needed = image->needed_versions;
-	for (uint32 i = 0; i < image->num_needed_versions; i++) {
-		const char* fileName = STRING(image, needed->vn_file);
-		image_t* dependency = find_image(fileName, ALL_IMAGE_TYPES);
-		if (dependency == NULL) {
-			// This can't really happen, unless the object file is broken, since
-			// the file should also appear in DT_NEEDED.
-			FATAL("Version dependency \"%s\" not found", fileName);
-			return B_FILE_NOT_FOUND;
-		}
-
-		Elf32_Vernaux* vernaux
-			= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
-		for (uint32 k = 0; k < needed->vn_cnt; k++) {
-			uint32 versionIndex = VER_NDX(vernaux->vna_other);
-			elf_version_info& info = image->versions[versionIndex];
-
-			status_t error = assert_defined_image_version(image, dependency,
-				info, (vernaux->vna_flags & VER_FLG_WEAK) != 0);
-			if (error != B_OK)
-				return error;
-
-			vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
-		}
-
-		needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
-	}
-
-	return B_OK;
-}
-
-
-static void
-register_image(image_t *image, int fd, const char *path)
-{
-	struct stat stat;
-	image_info info;
-
-	// ToDo: set these correctly
-	info.id = 0;
-	info.type = image->type;
-	info.sequence = 0;
-	info.init_order = 0;
-	info.init_routine = (void (*)())image->init_routine;
-	info.term_routine = (void (*)())image->term_routine;
-
-	if (_kern_read_stat(fd, NULL, false, &stat, sizeof(struct stat)) == B_OK) {
-		info.device = stat.st_dev;
-		info.node = stat.st_ino;
-	} else {
-		info.device = -1;
-		info.node = -1;
-	}
-
-	strlcpy(info.name, path, sizeof(info.name));
-	info.text = (void *)image->regions[0].vmstart;
-	info.text_size = image->regions[0].vmsize;
-	info.data = (void *)image->regions[1].vmstart;
-	info.data_size = image->regions[1].vmsize;
-	info.api_version = image->api_version;
-	info.abi = image->abi;
-	image->id = _kern_register_image(&info, sizeof(image_info));
-}
-
-
-static status_t
-relocate_image(image_t *rootImage, image_t *image)
-{
-	status_t status = arch_relocate_image(rootImage, image);
-	if (status < B_OK) {
-		FATAL("troubles relocating: 0x%lx (image: %s, %s)\n", status,
-			image->path, image->name);
-		return status;
-	}
-
-	_kern_image_relocated(image->id);
-	image_event(image, IMAGE_EVENT_RELOCATED);
-	return B_OK;
-}
-
-
-static status_t
-load_container(char const *name, image_type type, const char *rpath,
-	image_t **_image)
-{
-	int32 pheaderSize, sheaderSize;
-	char path[PATH_MAX];
-	ssize_t length;
-	char ph_buff[4096];
-	int32 numRegions;
-	image_t *found;
-	image_t *image;
-	status_t status;
-	int fd;
-
-	struct Elf32_Ehdr eheader;
-
-	// Have we already loaded that image? Don't check for add-ons -- we always
-	// reload them.
-	if (type != B_ADD_ON_IMAGE) {
-		found = find_image(name, APP_OR_LIBRARY_TYPE);
-
-		if (found == NULL && type != B_APP_IMAGE) {
-			// Special case for add-ons that link against the application
-			// executable, with the executable not having a soname set.
-			if (const char* lastSlash = strrchr(name, '/')) {
-				image_t* programImage = get_program_image();
-				if (strcmp(programImage->name, lastSlash + 1) == 0)
-					found = programImage;
-			}
-		}
-
-		if (found) {
-			atomic_add(&found->ref_count, 1);
-			*_image = found;
-			KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\") "
-				"already loaded", name, type, rpath);
-			return B_OK;
-		}
-	}
-
-	KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\")", name, type,
-		rpath);
-
-	strlcpy(path, name, sizeof(path));
-
-	// find and open the file
-	fd = open_executable(path, type, rpath, get_program_path(),
-		sSearchPathSubDir);
-	if (fd < 0) {
-		FATAL("cannot open file %s\n", name);
-		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
-		return fd;
-	}
-
-	// normalize the image path
-	status = _kern_normalize_path(path, true, path);
-	if (status != B_OK)
-		goto err1;
-
-	// Test again if this image has been registered already - this time,
-	// we can check the full path, not just its name as noted.
-	// You could end up loading an image twice with symbolic links, else.
-	if (type != B_ADD_ON_IMAGE) {
-		found = find_image(path, APP_OR_LIBRARY_TYPE);
-		if (found) {
-			atomic_add(&found->ref_count, 1);
-			*_image = found;
-			_kern_close(fd);
-			KTRACE("rld: load_container(\"%s\"): already loaded after all",
-				name);
-			return B_OK;
-		}
-	}
-
-	length = _kern_read(fd, 0, &eheader, sizeof(eheader));
-	if (length != sizeof(eheader)) {
-		status = B_NOT_AN_EXECUTABLE;
-		FATAL("troubles reading ELF header\n");
-		goto err1;
-	}
-
-	status = parse_elf_header(&eheader, &pheaderSize, &sheaderSize);
-	if (status < B_OK) {
-		FATAL("incorrect ELF header\n");
-		goto err1;
-	}
-
-	// ToDo: what to do about this restriction??
-	if (pheaderSize > (int)sizeof(ph_buff)) {
-		FATAL("Cannot handle program headers bigger than %lu\n", sizeof(ph_buff));
-		status = B_UNSUPPORTED;
-		goto err1;
-	}
-
-	length = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
-	if (length != pheaderSize) {
-		FATAL("Could not read program headers: %s\n", strerror(length));
-		status = B_BAD_DATA;
-		goto err1;
-	}
-
-	numRegions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	if (numRegions <= 0) {
-		FATAL("Troubles parsing Program headers, numRegions = %ld\n", numRegions);
-		status = B_BAD_DATA;
-		goto err1;
-	}
-
-	image = create_image(name, path, numRegions);
-	if (image == NULL) {
-		FATAL("Failed to allocate image_t object\n");
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-
-	status = parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	if (status < B_OK)
-		goto err2;
-
-	if (!assert_dynamic_loadable(image)) {
-		FATAL("Dynamic segment must be loadable (implementation restriction)\n");
-		status = B_UNSUPPORTED;
-		goto err2;
-	}
-
-	status = map_image(fd, path, image, type == B_APP_IMAGE);
-	if (status < B_OK) {
-		FATAL("Could not map image: %s\n", strerror(status));
-		status = B_ERROR;
-		goto err2;
-	}
-
-	if (!parse_dynamic_segment(image)) {
-		FATAL("Troubles handling dynamic section\n");
-		status = B_BAD_DATA;
-		goto err3;
-	}
-
-	if (eheader.e_entry != 0)
-		image->entry_point = eheader.e_entry + image->regions[0].delta;
-
-	analyze_image_haiku_version_and_abi(image);
-
-	if (image->abi == 0) {
-		// No ABI version in the shared object, i.e. it has been built before
-		// that was introduced in Haiku. We have to try and analyze the gcc
-		// version.
-		if (!analyze_object_gcc_version(fd, image, eheader, sheaderSize,
-				ph_buff, sizeof(ph_buff))) {
-			FATAL("Failed to get gcc version for %s\n", path);
-				// not really fatal, actually
-
-			// assume ancient BeOS
-			image->abi = B_HAIKU_ABI_GCC_2_ANCIENT;
-		}
-	}
-
-	// guess the API version, if we couldn't figure it out yet
-	if (image->api_version == 0) {
-		image->api_version = image->abi > B_HAIKU_ABI_GCC_2_BEOS
-			? HAIKU_VERSION_PRE_GLUE_CODE : B_HAIKU_VERSION_BEOS;
-	}
-
-	// If this is the executable image, we init the search path
-	// subdir, if the compiler version doesn't match ours.
-	if (type == B_APP_IMAGE) {
-		#if __GNUC__ == 2
-			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
-				sSearchPathSubDir = "gcc4";
-		#elif __GNUC__ == 4
-			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
-				sSearchPathSubDir = "gcc2";
-		#endif
-	}
-
-	// init gcc version dependent image flags
-	// symbol resolution strategy
-	if (image->abi == B_HAIKU_ABI_GCC_2_ANCIENT)
-		image->find_undefined_symbol = find_undefined_symbol_beos;
-
-	// init version infos
-	status = init_image_version_infos(image);
-
-	image->type = type;
-	register_image(image, fd, path);
-	image_event(image, IMAGE_EVENT_LOADED);
-
-	_kern_close(fd);
-
-	enqueue_image(&sLoadedImages, image);
-	sLoadedImageCount++;
-
-	*_image = image;
-
-	KTRACE("rld: load_container(\"%s\"): done: id: %ld (ABI: %#lx)", name,
-		image->id, image->abi);
-
-	return B_OK;
-
-err3:
-	unmap_image(image);
-err2:
-	delete_image_struct(image);
-err1:
-	_kern_close(fd);
-
-	KTRACE("rld: load_container(\"%s\"): failed: %s", name,
-		strerror(status));
-
-	return status;
 }
 
 
@@ -2220,7 +126,7 @@ load_immediate_dependencies(image_t *image)
 				int32 neededOffset = d[i].d_un.d_val;
 				const char *name = STRING(image, neededOffset);
 
-				status_t loadStatus = load_container(name, B_LIBRARY_IMAGE,
+				status_t loadStatus = load_image(name, B_LIBRARY_IMAGE,
 					rpath, &image->needed[j]);
 				if (loadStatus < B_OK) {
 					status = loadStatus;
@@ -2229,7 +135,7 @@ load_immediate_dependencies(image_t *image)
 						status = B_MISSING_LIBRARY;
 
 						if (reportErrors)
-							sErrorMessage.AddString("missing library", name);
+							gErrorMessage.AddString("missing library", name);
 					}
 
 					// Collect all missing libraries in case we report back
@@ -2296,40 +202,19 @@ load_dependencies(image_t* image)
 }
 
 
-static uint32
-topological_sort(image_t *image, uint32 slot, image_t **initList,
-	uint32 sortFlag)
+static status_t
+relocate_image(image_t *rootImage, image_t *image)
 {
-	uint32 i;
-
-	if (image->flags & sortFlag)
-		return slot;
-
-	image->flags |= sortFlag; /* make sure we don't visit this one */
-	for (i = 0; i < image->num_needed; i++)
-		slot = topological_sort(image->needed[i], slot, initList, sortFlag);
-
-	initList[slot] = image;
-	return slot + 1;
-}
-
-
-static ssize_t
-get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
-{
-	image_t **list;
-
-	list = (image_t**)malloc(sLoadedImageCount * sizeof(image_t *));
-	if (list == NULL) {
-		FATAL("memory shortage in get_sorted_image_list()");
-		*_list = NULL;
-		return B_NO_MEMORY;
+	status_t status = arch_relocate_image(rootImage, image);
+	if (status < B_OK) {
+		FATAL("troubles relocating: 0x%lx (image: %s, %s)\n", status,
+			image->path, image->name);
+		return status;
 	}
 
-	memset(list, 0, sLoadedImageCount * sizeof(image_t *));
-
-	*_list = list;
-	return topological_sort(image, 0, list, sortFlag);
+	_kern_image_relocated(image->id);
+	image_event(image, IMAGE_EVENT_RELOCATED);
+	return B_OK;
 }
 
 
@@ -2390,26 +275,6 @@ init_dependencies(image_t *image, bool initHead)
 
 
 static void
-put_image(image_t *image)
-{
-	// If all references to the image are gone, add it to the disposable list
-	// and remove all dependencies
-
-	if (atomic_add(&image->ref_count, -1) == 1) {
-		size_t i;
-
-		dequeue_image(&sLoadedImages, image);
-		enqueue_image(&sDisposableImages, image);
-		sLoadedImageCount--;
-
-		for (i = 0; i < image->num_needed; i++) {
-			put_image(image->needed[i]);
-		}
-	}
-}
-
-
-void
 inject_runtime_loader_api(image_t* rootImage)
 {
 	// We patch any exported __gRuntimeLoader symbols to point to our private
@@ -2450,7 +315,7 @@ preload_image(char const* path)
 	KTRACE("rld: preload_image(\"%s\")", path);
 
 	image_t *image = NULL;
-	status_t status = load_container(path, B_ADD_ON_IMAGE, NULL, &image);
+	status_t status = load_image(path, B_ADD_ON_IMAGE, NULL, &image);
 	if (status < B_OK) {
 		rld_unlock();
 		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
@@ -2485,12 +350,7 @@ preload_image(char const* path)
 	if (find_symbol(image,
 			SymbolLookupInfo("__gRuntimeLoaderAddOn", B_SYMBOL_TYPE_DATA),
 			(void**)&addOnStruct) == B_OK) {
-		RuntimeLoaderAddOn* addOn = new(mynothrow) RuntimeLoaderAddOn(image,
-			addOnStruct);
-		if (addOn != NULL) {
-			sAddOns.Add(addOn);
-			addOnStruct->init(&gRuntimeLoader, &gRuntimeLoaderAddOnExport);
-		}
+		add_add_on(image, addOnStruct);
 	}
 
 	KTRACE("rld: preload_image(\"%s\") done: id: %ld", path, image->id);
@@ -2500,8 +360,7 @@ preload_image(char const* path)
 err:
 	KTRACE("rld: preload_image(\"%s\") failed: %s", path, strerror(status));
 
-	dequeue_image(&sLoadedImages, image);
-	sLoadedImageCount--;
+	dequeue_loaded_image(image);
 	delete_image(image);
 	return status;
 }
@@ -2559,65 +418,65 @@ load_program(char const *path, void **_entry)
 
 	TRACE(("rld: load %s\n", path));
 
-	status = load_container(path, B_APP_IMAGE, NULL, &sProgramImage);
+	status = load_image(path, B_APP_IMAGE, NULL, &gProgramImage);
 	if (status < B_OK)
 		goto err;
 
-	if (sProgramImage->find_undefined_symbol == NULL)
-		sProgramImage->find_undefined_symbol = find_undefined_symbol_global;
+	if (gProgramImage->find_undefined_symbol == NULL)
+		gProgramImage->find_undefined_symbol = find_undefined_symbol_global;
 
-	status = load_dependencies(sProgramImage);
+	status = load_dependencies(gProgramImage);
 	if (status < B_OK)
 		goto err;
 
 	// Set RTLD_GLOBAL on all libraries including the program.
 	// This results in the desired symbol resolution for dlopen()ed libraries.
-	set_image_flags_recursively(sProgramImage, RTLD_GLOBAL);
+	set_image_flags_recursively(gProgramImage, RTLD_GLOBAL);
 
-	status = relocate_dependencies(sProgramImage);
+	status = relocate_dependencies(gProgramImage);
 	if (status < B_OK)
 		goto err;
 
-	inject_runtime_loader_api(sProgramImage);
+	inject_runtime_loader_api(gProgramImage);
 
 	remap_images();
-	init_dependencies(sProgramImage, true);
+	init_dependencies(gProgramImage, true);
 
 	// Since the images are initialized now, we no longer should use our
 	// getenv(), but use the one from libroot.so
-	find_symbol_breadth_first(sProgramImage,
+	find_symbol_breadth_first(gProgramImage,
 		SymbolLookupInfo("getenv", B_SYMBOL_TYPE_TEXT), &image,
 		(void**)&gGetEnv);
 
-	if (sProgramImage->entry_point == 0) {
+	if (gProgramImage->entry_point == 0) {
 		status = B_NOT_AN_EXECUTABLE;
 		goto err;
 	}
 
-	*_entry = (void *)(sProgramImage->entry_point);
+	*_entry = (void *)(gProgramImage->entry_point);
 
 	rld_unlock();
 
-	sProgramLoaded = true;
+	gProgramLoaded = true;
 
 	KTRACE("rld: load_program(\"%s\") done: entry: %p, id: %ld", path,
-		*_entry, sProgramImage->id);
+		*_entry, gProgramImage->id);
 
-	return sProgramImage->id;
+	return gProgramImage->id;
 
 err:
 	KTRACE("rld: load_program(\"%s\") failed: %s", path, strerror(status));
 
-	delete_image(sProgramImage);
+	delete_image(gProgramImage);
 
 	if (report_errors()) {
 		// send error message
-		sErrorMessage.AddInt32("error", status);
-		sErrorMessage.SetDeliveryInfo(gProgramArgs->error_token,
+		gErrorMessage.AddInt32("error", status);
+		gErrorMessage.SetDeliveryInfo(gProgramArgs->error_token,
 			-1, 0, find_thread(NULL));
 
 		_kern_write_port_etc(gProgramArgs->error_port, 'KMSG',
-			sErrorMessage.Buffer(), sErrorMessage.ContentSize(), 0, 0);
+			gErrorMessage.Buffer(), gErrorMessage.ContentSize(), 0, 0);
 	}
 	_kern_loading_app_failed(status);
 	rld_unlock();
@@ -2651,7 +510,7 @@ load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 			return 0;
 		}
 
-		image = find_image(path, APP_OR_LIBRARY_TYPE);
+		image = find_loaded_image_by_name(path, APP_OR_LIBRARY_TYPE);
 		if (image != NULL && (flags & RTLD_GLOBAL) != 0)
 			set_image_flags_recursively(image, RTLD_GLOBAL);
 
@@ -2665,7 +524,7 @@ load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 		}
 	}
 
-	status = load_container(path, type, NULL, &image);
+	status = load_image(path, type, NULL, &image);
 	if (status < B_OK) {
 		rld_unlock();
 		KTRACE("rld: load_library(\"%s\") failed to load container: %s", path,
@@ -2713,8 +572,7 @@ load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 err:
 	KTRACE("rld: load_library(\"%s\") failed: %s", path, strerror(status));
 
-	dequeue_image(&sLoadedImages, image);
-	sLoadedImageCount--;
+	dequeue_loaded_image(image);
 	delete_image(image);
 	rld_unlock();
 	return status;
@@ -2736,7 +594,7 @@ unload_library(void* handle, image_id imageID, bool addOn)
 	rld_lock();
 		// for now, just do stupid simple global locking
 
-	if (sInvalidImageIDs) {
+	if (gInvalidImageIDs) {
 		// After fork, we lazily rebuild the image IDs of all loaded images
 		update_image_ids();
 	}
@@ -2750,21 +608,19 @@ unload_library(void* handle, image_id imageID, bool addOn)
 		put_image(image);
 		status = B_OK;
 	} else {
-		for (image = sLoadedImages.head; image; image = image->next) {
-			if (image->id == imageID) {
-				// unload image
-				if (type == image->type) {
-					put_image(image);
-					status = B_OK;
-				} else
-					status = B_BAD_VALUE;
-				break;
-			}
+		image = find_loaded_image_by_id(imageID, true);
+		if (image != NULL) {
+			// unload image
+			if (type == image->type) {
+				put_image(image);
+				status = B_OK;
+			} else
+				status = B_BAD_VALUE;
 		}
 	}
 
 	if (status == B_OK) {
-		while ((image = sDisposableImages.head) != NULL) {
+		while ((image = get_disposable_images().head) != NULL) {
 			// call image fini here...
 			if (gRuntimeLoader.call_atexit_hooks_for_range) {
 				gRuntimeLoader.call_atexit_hooks_for_range(
@@ -2776,7 +632,7 @@ unload_library(void* handle, image_id imageID, bool addOn)
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
 
-			dequeue_image(&sDisposableImages, image);
+			dequeue_disposable_image(image);
 			unmap_image(image);
 
 			image_event(image, IMAGE_EVENT_UNLOADING);
@@ -2801,7 +657,7 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 	rld_lock();
 
 	// get the image from those who have been already initialized
-	image = find_loaded_image_by_id(imageID);
+	image = find_loaded_image_by_id(imageID, false);
 	if (image == NULL) {
 		rld_unlock();
 		return B_BAD_IMAGE_ID;
@@ -2865,7 +721,7 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 		// for now, just do stupid simple global locking
 
 	// get the image from those who have been already initialized
-	image = find_loaded_image_by_id(imageID);
+	image = find_loaded_image_by_id(imageID, false);
 	if (image != NULL) {
 		if (recursive) {
 			// breadth-first search in the given image and its dependencies
@@ -2905,8 +761,8 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 	if (handle == RTLD_DEFAULT || handle == RLD_GLOBAL_SCOPE) {
 		// look in the default scope
 		image_t* image;
-		Elf32_Sym* symbol = find_undefined_symbol_global(sProgramImage,
-			sProgramImage,
+		Elf32_Sym* symbol = find_undefined_symbol_global(gProgramImage,
+			gProgramImage,
 			SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_ANY, NULL,
 				LOOKUP_FLAG_DEFAULT_VERSION),
 			&image);
@@ -2922,7 +778,7 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 		// calling image. Return the next after the caller symbol.
 
 		// First of all, find the caller image.
-		image_t* callerImage = sLoadedImages.head;
+		image_t* callerImage = get_loaded_images().head;
 		for (; callerImage != NULL; callerImage = callerImage->next) {
 			elf_region_t& text = callerImage->regions[0];
 			if ((addr_t)caller >= text.vmstart
@@ -2938,7 +794,7 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 			bool hitCallerImage = false;
 			set_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
 
-			image_t* image = sLoadedImages.head;
+			image_t* image = get_loaded_images().head;
 			for (; image != NULL; image = image->next) {
 				// skip the caller image
 				if (image == callerImage) {
@@ -2998,7 +854,7 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 
 	rld_lock();
 
-	image = find_loaded_image_by_id(id);
+	image = find_loaded_image_by_id(id, false);
 	if (image == NULL) {
 		rld_unlock();
 		return B_BAD_IMAGE_ID;
@@ -3052,11 +908,11 @@ terminate_program(void)
 	image_t **termList;
 	ssize_t count, i;
 
-	count = get_sorted_image_list(sProgramImage, &termList, RFLAG_TERMINATED);
+	count = get_sorted_image_list(gProgramImage, &termList, RFLAG_TERMINATED);
 	if (count < B_OK)
 		return;
 
-	if (sInvalidImageIDs) {
+	if (gInvalidImageIDs) {
 		// After fork, we lazily rebuild the image IDs of all loaded images
 		update_image_ids();
 	}
@@ -3083,12 +939,11 @@ terminate_program(void)
 void
 rldelf_init(void)
 {
-	// invoke static constructors
-	new(&sAddOns) AddOnList;
-
 	sSem = create_sem(1, "runtime loader");
 	sSemOwner = -1;
 	sSemCount = 0;
+
+	init_add_ons();
 
 	// create the debug area
 	{
@@ -3103,7 +958,7 @@ rldelf_init(void)
 			_kern_loading_app_failed(areaID);
 		}
 
-		area->loaded_images = &sLoadedImages;
+		area->loaded_images = &get_loaded_images();
 	}
 
 	// initialize error message if needed
@@ -3112,7 +967,7 @@ rldelf_init(void)
 		if (buffer == NULL)
 			return;
 
-		sErrorMessage.SetTo(buffer, 1024, 'Rler');
+		gErrorMessage.SetTo(buffer, 1024, 'Rler');
 	}
 }
 
@@ -3128,7 +983,7 @@ elf_reinit_after_fork(void)
 	// and have cloned images with different IDs. Since in most cases (fork()
 	// + exec*()) this would just increase the fork() overhead with no one
 	// caring, we do that lazily, when first doing something different.
-	sInvalidImageIDs = true;
+	gInvalidImageIDs = true;
 
 	return B_OK;
 }

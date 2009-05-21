@@ -58,6 +58,21 @@ printf(const char *format, ...)
 }
 
 
+extern "C" void
+dprintf(const char *format, ...)
+{
+	char buffer[1024];
+
+	va_list list;
+	va_start(list, format);
+
+	vsnprintf(buffer, sizeof(buffer), format, list);
+	_kern_debug_output(buffer);
+
+	va_end(list);
+}
+
+
 extern "C" uint32
 __swap_int32(uint32 value)
 {
@@ -79,8 +94,41 @@ _get_thread_info(thread_id thread, thread_info *info, size_t size)
 }
 
 
-status_t
+extern "C" status_t
 snooze(bigtime_t timeout)
 {
 	return B_ERROR;
 }
+
+
+/*!	Mini atoi(), so we don't have to include the libroot dependencies.
+ */
+extern "C" int
+atoi(const char* num)
+{
+	int result = 0;
+	while (*num >= '0' && *num <= '9') {
+		result = (result * 10) + (*num - '0');
+		num++;
+	}
+
+	return result;
+}
+
+
+#if RUNTIME_LOADER_TRACING
+
+extern "C" void
+ktrace_printf(const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), format, list);
+	_kern_ktrace_output(buffer);
+
+	va_end(list);
+}
+
+#endif // RUNTIME_LOADER_TRACING

@@ -65,16 +65,26 @@ SEARCH on [ FGristFiles kernel_vsprintf.c ]
 SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
-Objects
-	runtime_loader.cpp
+
+local sources =
+	add_ons.cpp
 	elf.cpp
+	elf_haiku_version.cpp
+	elf_load_image.cpp
+	elf_symbol_lookup.cpp
+	elf_versioning.cpp
+	errors.cpp
 	export.cpp
 	heap.cpp
+	images.cpp
+	runtime_loader.cpp
 	utility.cpp
 ;
 
+Objects $(sources) ;
+
 Ld runtime_loader :
-	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o ]
+	[ FGristFiles $(sources:S=$(SUFOBJ)) ]
 	libruntime_loader.a
 	libruntime_loader_$(TARGET_ARCH).a
 	$(TARGET_STATIC_LIBSUPC++)
