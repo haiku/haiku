@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src bin chkbfs ;
-
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
-UsePrivateHeaders kernel ;
-
-StdBinCommands
-	chkbfs.cpp
-	;
