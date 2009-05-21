@@ -20,8 +20,9 @@ static int8 sUnitExponent[16] = {
 };
 
 
-HIDParser::HIDParser()
-	:	fReportCount(0),
+HIDParser::HIDParser(HIDDevice *device)
+	:	fDevice(device),
+		fReportCount(0),
 		fReports(NULL),
 		fRootCollection(NULL)
 {
@@ -35,7 +36,7 @@ HIDParser::~HIDParser()
 
 
 status_t
-HIDParser::ParseReportDescriptor(uint8 *reportDescriptor,
+HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 	size_t descriptorLength)
 {
 	_Reset();
@@ -56,11 +57,11 @@ HIDParser::ParseReportDescriptor(uint8 *reportDescriptor,
 	}
 
 	HIDCollection *collection = NULL;
-	uint8 *pointer = reportDescriptor;
-	uint8 *end = pointer + descriptorLength;
+	const uint8 *pointer = reportDescriptor;
+	const uint8 *end = pointer + descriptorLength;
 
 	while (pointer < end) {
-		item_prefix *item = (item_prefix *)pointer;
+		const item_prefix *item = (item_prefix *)pointer;
 		size_t itemSize = sItemSize[item->size];
 		uint32 data = 0;
 
@@ -179,12 +180,8 @@ HIDParser::ParseReportDescriptor(uint8 *reportDescriptor,
 					if (!localState.string_index_set)
 						localState.string_index = localState.string_minimum;
 
-					target->AddMainItem(globalState, localState, *mainData);
-					if (collection != NULL) {
-						collection->AddMainItem(globalState, localState, 
-							*mainData);
-					} else
-						TRACE_ALWAYS("main item not part of a collection\n");
+					target->AddMainItem(globalState, localState, *mainData,
+						collection);
 				}
 
 				// reset the local item state
@@ -428,9 +425,40 @@ HIDParser::ReportAt(uint8 type, uint8 index)
 }
 
 
-status_t
-HIDParser::SetReport(uint8 *report, size_t length)
+size_t
+HIDParser::MaxReportSize()
 {
+	size_t maxSize = 0;
+	for (uint32 i = 0; i < fReportCount; i++) {
+		HIDReport *report = fReports[i];
+		if (report == NULL)
+			continue;
+
+		if (report->ReportSize() > maxSize)
+			maxSize = report->ReportSize();
+	}
+
+	return maxSize;
+}
+
+
+void
+HIDParser::SetReport(status_t status, uint8 *report, size_t length)
+{
+	if (status != B_OK) {
+		// in case of error we need to notify all input reports, as we don't
+		// know who has waiting listeners.
+		for (uint32 i = 0; i < fReportCount; i++) {
+			if (fReports[i] == NULL
+				|| fReports[i]->Type() != HID_REPORT_TYPE_INPUT)
+				continue;
+
+			fReports[i]->SetReport(status, NULL, 0);
+		}
+
+		return;
+	}
+
 	HIDReport *target = fReports[0];
 	if (fUsesReportIDs) {
 		target = FindReport(HID_REPORT_TYPE_INPUT, report[0]);
@@ -440,10 +468,10 @@ HIDParser::SetReport(uint8 *report, size_t length)
 
 	if (target == NULL) {
 		TRACE_ALWAYS("got report buffer but found no report to handle it\n");
-		return B_ENTRY_NOT_FOUND;
+		return;
 	}
 
-	return target->SetReport(report, length);
+	target->SetReport(status, report, length);
 }
 
 

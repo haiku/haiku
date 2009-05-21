@@ -7,6 +7,8 @@
 
 #include "HIDParser.h"
 
+class HIDReportItem;
+
 class HIDCollection {
 public:
 								HIDCollection(HIDCollection *parent,
@@ -20,9 +22,11 @@ public:
 		uint32					CountChildren() { return fChildCount; };
 		HIDCollection *			ChildAt(uint32 index);
 
-		void					AddMainItem(global_item_state &globalState,
-									local_item_state &localState,
-									main_item_data &mainData);
+		void					AddItem(HIDReportItem *item);
+		uint32					CountItems() { return fItemCount; };
+		HIDReportItem *			ItemAt(uint32 index);
+
+		void					PrintToStream(uint32 indentLevel = 0);
 
 private:
 		HIDCollection *			fParent;
@@ -34,6 +38,10 @@ private:
 
 		uint32					fChildCount;
 		HIDCollection **		fChildren;
+
+		uint32					fItemCount;
+		uint32					fItemsAllocated;
+		HIDReportItem **		fItems;
 };
 
 #endif // HID_COLLECTION_H

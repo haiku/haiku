@@ -4,6 +4,8 @@
  */
 
 #include "Driver.h"
+#include "HIDCollection.h"
+#include "HIDDevice.h"
 #include "HIDReport.h"
 #include "HIDReportItem.h"
 
@@ -19,6 +21,7 @@ HIDReport::HIDReport(HIDParser *parser, uint8 type, uint8 id)
 		fItemsUsed(0),
 		fItemsAllocated(0),
 		fItems(NULL),
+		fReportStatus(B_NO_INIT),
 		fCurrentReport(NULL),
 		fBusyCount(0)
 {
@@ -34,7 +37,8 @@ HIDReport::~HIDReport()
 
 void
 HIDReport::AddMainItem(global_item_state &globalState,
-	local_item_state &localState, main_item_data &mainData)
+	local_item_state &localState, main_item_data &mainData,
+	HIDCollection *collection)
 {
 	TRACE("adding main item to report of type 0x%02x with id 0x%02x\n",
 		fType, fReportID);
@@ -121,31 +125,36 @@ HIDReport::AddMainItem(global_item_state &globalState,
 			usageMinimum = usageMaximum = usage.u.extended;
 		}
 
-		fItems[fItemsUsed++] = new(std::nothrow) HIDReportItem(this,
+		fItems[fItemsUsed] = new(std::nothrow) HIDReportItem(this,
 			fReportSize, globalState.report_size, mainData.data_constant == 0,
 			mainData.array_variable == 0, mainData.relative != 0,
 			logicalMinimum, logicalMaximum, usageMinimum, usageMaximum);
+		if (fItems[fItemsUsed] == NULL)
+			TRACE_ALWAYS("no memory when creating report item\n");
+
+		if (collection != NULL)
+			collection->AddItem(fItems[fItemsUsed]);
+		else
+			TRACE_ALWAYS("main item not part of a collection\n");
+
+		fReportSize += globalState.report_size;
+		fItemsUsed++;
 	}
 }
 
 
-status_t
-HIDReport::SetReport(uint8 *report, size_t length)
+void
+HIDReport::SetReport(status_t status, uint8 *report, size_t length)
 {
-	if (report == NULL) {
-		fCurrentReport = NULL;
-		return B_OK;
-	}
-
-	if (length * 8 < fReportSize) {
+	fReportStatus = status;
+	fCurrentReport = report;
+	if (status == B_OK && length * 8 < fReportSize) {
 		TRACE_ALWAYS("report of %lu bits too small, expected %lu bits\n",
 			length * 8, fReportSize);
-		return B_ERROR;
+		fReportStatus = B_ERROR;
 	}
 
 	fConditionVariable.NotifyAll();
-	fCurrentReport = report;
-	return B_OK;
 }
 
 
@@ -164,17 +173,23 @@ HIDReport::WaitForReport(bigtime_t timeout)
 	while (atomic_or(&fBusyCount, 0) != 0)
 		snooze(1000);
 
+#ifndef TEST_MODE
 	ConditionVariableEntry conditionVariableEntry;
 	fConditionVariable.Add(&conditionVariableEntry);
-	//status_t result = fParser->Device()->MaybeScheduleTransfer();
+	status_t result = fParser->Device()->MaybeScheduleTransfer();
 	if (result != B_OK) {
 		conditionVariableEntry.Wait(B_RELATIVE_TIMEOUT, 0);
 		return result;
 	}
 
-	result = conditionVariableEntry.Wait(B_RELATIVE_TIMEOUT, timeout);
+	result = conditionVariableEntry.Wait(B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		timeout);
 	if (result != B_OK)
 		return result;
+
+	if (fReportStatus != B_OK)
+		return fReportStatus;
+#endif
 
 	atomic_add(&fBusyCount, 1);
 	return B_OK;
@@ -185,6 +200,38 @@ void
 HIDReport::DoneProcessing()
 {
 	atomic_add(&fBusyCount, -1);
+}
+
+
+void
+HIDReport::PrintToStream()
+{
+	TRACE_ALWAYS("HIDReport %p\n", this);
+
+	const char *typeName = "unknown";
+	switch (fType) {
+		case HID_REPORT_TYPE_INPUT:
+			typeName = "input";
+			break;
+		case HID_REPORT_TYPE_OUTPUT:
+			typeName = "output";
+			break;
+		case HID_REPORT_TYPE_FEATURE:
+			typeName = "feature";
+			break;
+	}
+
+	TRACE_ALWAYS("\ttype: %u %s\n", fType, typeName);
+	TRACE_ALWAYS("\treport id: %u\n", fReportID);
+	TRACE_ALWAYS("\treport size: %lu bits = %lu bytes\n", fReportSize,
+		(fReportSize + 7) / 8);
+
+	TRACE_ALWAYS("\titem count: %lu\n", fItemsUsed);
+	for (uint32 i = 0; i < fItemsUsed; i++) {
+		HIDReportItem *item = fItems[i];
+		if (item != NULL)
+			item->PrintToStream(1);
+	}
 }
 
 

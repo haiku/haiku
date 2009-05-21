@@ -124,6 +124,12 @@ typedef struct usage_value {
 	} u;
 
 	bool			is_extended;
+
+					usage_value()
+					{
+						u.extended = 0;
+						is_extended = false;
+					}
 } usage_value;
 
 

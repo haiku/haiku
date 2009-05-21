@@ -22,6 +22,7 @@ public:
 		bool					Array() { return fArray; };
 		bool					Signed() { return fMinimum > fMaximum; };
 
+		uint16					UsagePage();
 		uint32					UsageMinimum() { return fUsageMinimum; };
 		uint32					UsageMaximum() { return fUsageMaximum; };
 
@@ -29,6 +30,7 @@ public:
 		bool					Valid() { return fValid; };
 		uint32					Data() { return fData; };
 
+		void					PrintToStream(uint32 indentLevel = 0);
 private:
 		HIDReport *				fReport;
 		uint32					fByteOffset;

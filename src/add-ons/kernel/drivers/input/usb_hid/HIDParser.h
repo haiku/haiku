@@ -7,15 +7,19 @@
 
 #include "HIDDataTypes.h"
 
-class HIDReport;
 class HIDCollection;
+class HIDDevice;
+class HIDReport;
 
 class HIDParser {
 public:
-								HIDParser();
+								HIDParser(HIDDevice *device);
 								~HIDParser();
 
-		status_t				ParseReportDescriptor(uint8 *reportDescriptor,
+		HIDDevice *				Device() { return fDevice; };
+
+		status_t				ParseReportDescriptor(
+									const uint8 *reportDescriptor,
 									size_t descriptorLength);
 
 		bool					UsesReportIDs() { return fUsesReportIDs; };
@@ -23,16 +27,19 @@ public:
 		HIDReport *				FindReport(uint8 type, uint8 id);
 		uint8					CountReports(uint8 type);
 		HIDReport *				ReportAt(uint8 type, uint8 index);
+		size_t					MaxReportSize();
 
 		HIDCollection *			RootCollection() { return fRootCollection; };
 
-		status_t				SetReport(uint8 *report, size_t length);
+		void					SetReport(status_t status, uint8 *report,
+									size_t length);
 
 private:
 		HIDReport *				_FindOrCreateReport(uint8 type, uint8 id);
 		float					_CalculateResolution(global_item_state *state);
 		void					_Reset();
 
+		HIDDevice *				fDevice;
 		bool					fUsesReportIDs;
 		uint8					fReportCount;
 		HIDReport **			fReports;

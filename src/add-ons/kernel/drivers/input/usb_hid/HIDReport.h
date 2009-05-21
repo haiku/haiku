@@ -14,6 +14,7 @@
 #define HID_REPORT_TYPE_FEATURE		0x04
 #define HID_REPORT_TYPE_ANY			0x07
 
+class HIDCollection;
 class HIDReportItem;
 
 class HIDReport {
@@ -24,12 +25,18 @@ public:
 
 		uint8					Type() { return fType; };
 		uint8					ID() { return fReportID; };
+		size_t					ReportSize() { return (fReportSize + 7) / 8; };
+
+		HIDParser *				Parser() { return fParser; };
+		HIDDevice *				Device() { return fParser->Device(); };
 
 		void					AddMainItem(global_item_state &globalState,
 									local_item_state &localState,
-									main_item_data &mainData);
+									main_item_data &mainData,
+									HIDCollection *collection);
 
-		status_t				SetReport(uint8 *report, size_t length);
+		void					SetReport(status_t status, uint8 *report,
+									size_t length);
 		uint8 *					CurrentReport() { return fCurrentReport; };
 
 		uint32					CountItems() { return fItemsUsed; };
@@ -37,6 +44,8 @@ public:
 
 		status_t				WaitForReport(bigtime_t timeout);
 		void					DoneProcessing();
+
+		void					PrintToStream();
 
 private:
 		void					_SignExtend(uint32 &minimum, uint32 &maximum);
@@ -51,6 +60,7 @@ private:
 		uint32					fItemsAllocated;
 		HIDReportItem **		fItems;
 
+		status_t				fReportStatus;
 		uint8 *					fCurrentReport;
 		int32					fBusyCount;
 		ConditionVariable		fConditionVariable;
