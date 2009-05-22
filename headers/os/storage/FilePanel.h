@@ -14,6 +14,7 @@ class BMessage;
 class BMessenger;
 class BWindow;
 struct stat;
+struct stat_beos;
 
 
 class BRefFilter {
@@ -22,7 +23,7 @@ class BRefFilter {
 		virtual		 ~BRefFilter() {};
 #endif
 		virtual	bool Filter(const entry_ref* ref, BNode* node,
-						struct stat* stat, const char* mimeType) = 0;
+						struct stat_beos* stat, const char* mimeType) = 0;
 };
 
 

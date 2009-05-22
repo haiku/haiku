@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <compat/sys/stat.h>
+
 
 DirectoryRefFilter::DirectoryRefFilter()
 {
@@ -21,8 +23,8 @@ DirectoryRefFilter::DirectoryRefFilter()
 
 
 bool
-DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
-	const char *filetype)
+DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node,
+	struct stat_beos *st, const char *filetype)
 {
 	if (S_ISDIR(st->st_mode))
 		return true;

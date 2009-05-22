@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system kernel lib ;
 
+UsePrivateHeaders shared ;
+
 # kernel libroot os files
 
 KernelMergeObject kernel_os_main.o :
@@ -113,8 +115,6 @@ KernelMergeObject kernel_lib_posix.o :
 ;
 
 # misc
-
-UsePrivateHeaders shared ;
 
 SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src kits support ] ;
 

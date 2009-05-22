@@ -11,9 +11,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+
 struct node_ref;
+struct stat_beos;
 class BVolume;
-  
+
 
 class BStatable {
 	public:
@@ -21,6 +23,11 @@ class BStatable {
 		virtual ~BStatable();
 #endif
 
+private:
+		virtual status_t _GetStat(struct stat_beos *st) const;
+			// provided for BeOS compatibility
+
+public:
 		virtual status_t GetStat(struct stat *st) const = 0;
 
 		bool IsFile() const;
@@ -38,7 +45,7 @@ class BStatable {
 		status_t GetPermissions(mode_t *perms) const;
 		status_t SetPermissions(mode_t perms);
 
-		status_t GetSize(off_t *size) const; 
+		status_t GetSize(off_t *size) const;
 
 		status_t GetModificationTime(time_t *mtime) const;
 		status_t SetModificationTime(time_t mtime);
@@ -55,7 +62,6 @@ class BStatable {
 		friend class BEntry;
 		friend class BNode;
 
-		virtual	void _OhSoStatable1();
 		virtual	void _OhSoStatable2();
 		virtual	void _OhSoStatable3();
 		uint32 _reserved[4];

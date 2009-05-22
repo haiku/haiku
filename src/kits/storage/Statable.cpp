@@ -13,14 +13,17 @@
 */
 
 #include <Statable.h>
+
+#include <sys/stat.h>
+
+#include <compat/sys/stat.h>
+
 #include <Node.h>
 #include <NodeMonitor.h>
 #include <Volume.h>
 
-#include <sys/stat.h>
 
-
-#if __GNUC__ > 3
+#if __GNUC__ > 2
 BStatable::~BStatable()
 {
 }
@@ -37,6 +40,22 @@ BStatable::~BStatable()
 	- \c B_NOT_ALLOWED: Read only node or volume.
 */
 
+
+/*!	\brief GetStat() compatibility version.
+*/
+status_t
+BStatable::_GetStat(struct stat_beos *st) const
+{
+	struct stat newStat;
+	status_t error = GetStat(&newStat);
+	if (error != B_OK)
+		return error;
+
+	convert_to_stat_beos(&newStat, st);
+	return B_OK;
+}
+
+
 /*!	\brief Returns if the current node is a file.
 	\return \c true, if the BNode is properly initialized and is a file,
 			\c false otherwise.
@@ -47,7 +66,7 @@ BStatable::IsFile() const
 	struct stat statData;
 	if (GetStat(&statData) == B_OK)
 		return S_ISREG(statData.st_mode);
-	else 
+	else
 		return false;
 }
 
@@ -61,7 +80,7 @@ BStatable::IsDirectory() const
 	struct stat statData;
 	if (GetStat(&statData) == B_OK)
 		return S_ISDIR(statData.st_mode);
-	else 
+	else
 		return false;
 }
 
@@ -75,15 +94,15 @@ BStatable::IsSymLink() const
 	struct stat statData;
 	if (GetStat(&statData) == B_OK)
 		return S_ISLNK(statData.st_mode);
-	else 
+	else
 		return false;
 }
-	
+
 /*!	\brief Returns a node_ref for the current node.
 	\param ref the node_ref structure to be filled in
 	\see GetStat() for return codes
 */
-status_t 
+status_t
 BStatable::GetNodeRef(node_ref *ref) const
 {
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
@@ -96,12 +115,12 @@ BStatable::GetNodeRef(node_ref *ref) const
 	}
 	return error;
 }
-	
+
 /*!	\brief Returns the owner of the node.
 	\param owner a pointer to a uid_t variable to be set to the result
 	\see GetStat() for return codes
 */
-status_t 
+status_t
 BStatable::GetOwner(uid_t *owner) const
 {
 	status_t error = (owner ? B_OK : B_BAD_VALUE);
@@ -117,14 +136,14 @@ BStatable::GetOwner(uid_t *owner) const
 	\param owner the new owner
 	\see GetStat() for return codes
 */
-status_t 
+status_t
 BStatable::SetOwner(uid_t owner)
 {
 	struct stat statData;
 	statData.st_uid = owner;
 	return set_stat(statData, B_STAT_UID);
 }
-	
+
 /*!	\brief Returns the group owner of the node.
 	\param group a pointer to a gid_t variable to be set to the result
 	\see GetStat() for return codes
@@ -152,7 +171,7 @@ BStatable::SetGroup(gid_t group)
 	statData.st_gid = group;
 	return set_stat(statData, B_STAT_GID);
 }
-	
+
 /*!	\brief Returns the permissions of the node.
 	\param perms a pointer to a mode_t variable to be set to the result
 	\see GetStat() for return codes
@@ -302,7 +321,18 @@ BStatable::GetVolume(BVolume *vol) const
 	return error;
 }
 
-void BStatable::_OhSoStatable1() {}
+
+// _OhSoStatable1() -> GetStat()
+extern "C" status_t
+#if __GNUC__ == 2
+_OhSoStatable1__9BStatable(const BStatable *self, struct stat *st)
+#else
+_ZN9BStatable14_OhSoStatable1Ev(const BStatable *self, struct stat *st)
+#endif
+{
+	return self->GetStat(st);
+}
+
+
 void BStatable::_OhSoStatable2() {}
 void BStatable::_OhSoStatable3() {}
-

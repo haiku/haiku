@@ -19,7 +19,7 @@ const uint32 MSG_DIRECTORY = 'mDIR';
 class DirectoryRefFilter : public BRefFilter {
 	public:
 		DirectoryRefFilter();
-		bool Filter(const entry_ref *ref, BNode* node, struct stat *st,
+		bool Filter(const entry_ref *ref, BNode* node, struct stat_beos *st,
 			const char *filetype);
 };
 

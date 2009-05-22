@@ -46,7 +46,7 @@ class ExpanderRules {
 class RuleRefFilter : public BRefFilter {
 	public:
 		RuleRefFilter(ExpanderRules &rules);
-		bool Filter(const entry_ref *ref, BNode* node, struct stat *st,
+		bool Filter(const entry_ref *ref, BNode* node, struct stat_beos *st,
 			const char *filetype);
 	protected:
 		ExpanderRules &fRules;

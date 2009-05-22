@@ -10,8 +10,10 @@
 #include <EntryList.h>
 #include <StorageDefs.h>
 
+
 class BFile;
 class BSymLink;
+struct stat_beos;
 
 
 class BDirectory : public BNode, public BEntryList {
@@ -63,6 +65,9 @@ class BDirectory : public BNode, public BEntryList {
 		friend class BNode;
 		friend class BEntry;
 		friend class BFile;
+
+		status_t _GetStatFor(const char *path, struct stat *st) const;
+		status_t _GetStatFor(const char *path, struct stat_beos *st) const;
 
 		virtual void _ErectorDirectory1();
 		virtual void _ErectorDirectory2();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,7 +11,10 @@
 
 #include "storage_support.h"
 
-#include <syscalls.h>
+#include <fcntl.h>
+#include <string.h>
+
+#include <compat/sys/stat.h>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -20,8 +23,7 @@
 #include <Path.h>
 #include <SymLink.h>
 
-#include <fcntl.h>
-#include <string.h>
+#include <syscalls.h>
 
 
 extern mode_t __gUmask;
@@ -509,7 +511,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 		return false;
 
 	uint32 dirLen = strlen(dirPath.Path());
-	
+
 	if (!strncmp(dirPath.Path(), entryPath.Path(), dirLen)) {
 		// if the paths are identical, return a match to stay consistent with
 		// BeOS behavior.
@@ -520,7 +522,8 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 }
 
 
-/*!	\brief Returns the stat structure of the entry referred to by the supplied
+/*!	\fn status_t BDirectory::GetStatFor(const char *path, struct stat *st) const
+	\brief Returns the stat structure of the entry referred to by the supplied
 	path name.
 	\param path the entry's path name. May be relative to this directory or
 		   absolute, or \c NULL to get the directories stat info.
@@ -538,21 +541,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 	- \c B_NOT_A_DIRECTORY: \a path includes a non-directory.
 */
-status_t
-BDirectory::GetStatFor(const char *path, struct stat *st) const
-{
-	if (!st)
-		return B_BAD_VALUE;
-	if (InitCheck() != B_OK)
-		return B_NO_INIT;
-
-	if (path != NULL) {
-		if (path[0] == '\0')
-			return B_ENTRY_NOT_FOUND;
-		return _kern_read_stat(fDirFd, path, false, st, sizeof(struct stat));
-	}
-	return GetStat(st);
-}
+// Implemented as BDirectory::_GetStatFor().
 
 
 /*!	\brief Returns the BDirectory's next entry as a BEntry.
@@ -866,6 +855,36 @@ BDirectory::operator=(const BDirectory &dir)
 }
 
 
+status_t
+BDirectory::_GetStatFor(const char *path, struct stat *st) const
+{
+	if (!st)
+		return B_BAD_VALUE;
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (path != NULL) {
+		if (path[0] == '\0')
+			return B_ENTRY_NOT_FOUND;
+		return _kern_read_stat(fDirFd, path, false, st, sizeof(struct stat));
+	}
+	return GetStat(st);
+}
+
+
+status_t
+BDirectory::_GetStatFor(const char *path, struct stat_beos *st) const
+{
+	struct stat newStat;
+	status_t error = _GetStatFor(path, &newStat);
+	if (error != B_OK)
+		return error;
+
+	convert_to_stat_beos(&newStat, st);
+	return B_OK;
+}
+
+
 // FBC
 void BDirectory::_ErectorDirectory1() {}
 void BDirectory::_ErectorDirectory2() {}
@@ -969,3 +988,28 @@ create_directory(const char *path, mode_t mode)
 	return B_OK;
 }
 
+
+// #pragma mark - symbol versions
+
+
+#if __GNUC__ == 2	// gcc 2
+
+// BeOS compatible GetStatFor()
+B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP9stat_beos",
+	"GetStatFor__C10BDirectoryPCcP4stat@LIBBE_BASE");
+
+// Haiku GetStatFor()
+B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
+	"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_1_ALPHA1");
+
+#else	// gcc 4
+
+// BeOS compatible GetStatFor()
+B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP9stat_beos",
+	"_ZNK10BDirectory10GetStatForEPKcP4stat@LIBBE_BASE");
+
+// Haiku GetStatFor()
+B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP4stat",
+	"_ZNK10BDirectory10GetStatForEPKcP4stat@@LIBBE_1_ALPHA1");
+
+#endif	// gcc 4

@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <compat/sys/stat.h>
+
 
 ExpanderRule::ExpanderRule(BString mimetype, BString filenameExtension,
 	BString listingCmd, BString expandCmd)
@@ -127,7 +129,7 @@ ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
 		if (rule->MimeType().IsValid() && rule->MimeType() == filetype)
 			return rule;
 		int32 extPosition = fileName.FindLast(rule->FilenameExtension());
-		if (extPosition != -1 
+		if (extPosition != -1
 			&& extPosition == (length - rule->FilenameExtension().Length()))
 			return rule;
 	}
@@ -156,7 +158,7 @@ RuleRefFilter::RuleRefFilter(ExpanderRules &rules)
 
 
 bool
-RuleRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
+RuleRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat_beos *st,
 	const char *filetype)
 {
 	if (node->IsDirectory() || node->IsSymLink())

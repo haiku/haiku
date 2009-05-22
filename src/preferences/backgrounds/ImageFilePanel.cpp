@@ -162,7 +162,7 @@ CustomRefFilter::CustomRefFilter(bool imageFiltering)
 
 bool
 CustomRefFilter::Filter(const entry_ref *ref, BNode* node,
-	struct stat *stat, const char *filetype)
+	struct stat_beos *stat, const char *filetype)
 {
 	if (!fImageFiltering)
 		return node->IsDirectory();

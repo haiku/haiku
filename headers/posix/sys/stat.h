@@ -7,6 +7,7 @@
 
 
 #include <sys/types.h>
+#include <time.h>
 
 
 struct stat {
@@ -19,13 +20,20 @@ struct stat {
 	off_t			st_size;		/* size in bytes of this file */
 	dev_t			st_rdev;		/* device type (not used) */
 	blksize_t		st_blksize;		/* preferred block size for I/O */
-	time_t			st_atime;		/* last access time */
-	time_t			st_mtime;		/* last modification time */
-	time_t			st_ctime;		/* last change time, not creation time */
-	time_t			st_crtime;		/* creation time */
+	struct timespec	st_atim;		/* last access time */
+	struct timespec	st_mtim;		/* last modification time */
+	struct timespec	st_ctim;		/* last change time, not creation time */
+	struct timespec	st_crtim;		/* creation time */
 	unsigned int	st_type;		/* attribute/index type */
 	blkcnt_t		st_blocks;		/* number of blocks allocated for object */
 };
+
+/* source compatibility with old stat structure */
+#define st_atime	st_atim.tv_sec
+#define st_mtime	st_mtim.tv_sec
+#define st_ctime	st_ctim.tv_sec
+#define st_crtime	st_crtim.tv_sec
+
 
 /* extended file types */
 #define S_ATTR_DIR			01000000000	/* attribute directory */

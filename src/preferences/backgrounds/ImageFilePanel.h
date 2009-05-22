@@ -21,7 +21,7 @@ class CustomRefFilter : public BRefFilter {
 		CustomRefFilter(bool imageFiltering);
 		virtual ~CustomRefFilter() {};
 
-		bool Filter(const entry_ref *ref, BNode* node, struct stat *st,
+		bool Filter(const entry_ref *ref, BNode* node, struct stat_beos *st,
 			const char *filetype);
 
 	protected:

@@ -32,20 +32,22 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <ctype.h>
 #include <errno.h>
 #include <float.h>
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <ctype.h>
-#include <stdlib.h>
 #include <map>
+#include <stdlib.h>
 #include <string.h>
+
+#include <compat/sys/stat.h>
 
 #include <Alert.h>
 #include <Application.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Dragger.h>
+#include <fs_attr.h>
+#include <fs_info.h>
 #include <Screen.h>
 #include <Query.h>
 #include <List.h>
@@ -140,7 +142,7 @@ const unsigned char kCopyCursor[] = { 16, 1, 1, 1,
 	0x00, 0x00, 0x70, 0x00, 0x78, 0x00, 0x78, 0x00,
 	0x3f, 0xc0, 0x3f, 0xf8, 0x1f, 0xfc, 0x1f, 0xfe,
 	0x7f, 0xfe, 0xff, 0xfe, 0xff, 0xfe, 0x7f, 0xfe,
-	0x1f, 0xfe, 0x07, 0xfe, 0x03, 0xf8, 0x00, 0x00 
+	0x1f, 0xfe, 0x07, 0xfe, 0x03, 0xf8, 0x00, 0x00
 };
 
 const char *kNoCopyToTrashStr = "Sorry, you can't copy items to the Trash.";
@@ -177,7 +179,7 @@ AddPosesResult::ReleaseModels(void)
 
 static BPose *
 BSearch(PoseList *table, const BPose* key, BPoseView *view,
-	int (*cmp)(const BPose *, const BPose *, BPoseView *), 
+	int (*cmp)(const BPose *, const BPose *, BPoseView *),
 	bool returnClosest = true);
 
 static int
@@ -647,7 +649,7 @@ BPoseView::SaveState(AttributeStreamNode *node)
 	node->Write(viewStateAttr, viewStateAttrForeign, B_RAW_TYPE,
 		stream.Position(), stream.Buffer());
 
-	fStateNeedsSaving = false;	
+	fStateNeedsSaving = false;
 }
 
 
@@ -874,7 +876,7 @@ void
 BPoseView::ScrollTo(BPoint point)
 {
 	_inherited::ScrollTo(point);
-		
+
 	//keep the view state in sync.
 	if (ViewMode() == kListMode)
 		fViewState->SetListOrigin(LeftTop());
@@ -1385,7 +1387,7 @@ BPoseView::AddPosesTask(void *castToParams)
 
 		BMessage finishedSending(kAddPosesCompleted);
 		lock.Target().SendMessage(&finishedSending);
-				
+
 	} catch (failToLock) {
 		// we are here because the window got closed or otherwise failed to
 		// lock
@@ -1632,7 +1634,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 		// pose adopts model and deletes it when done
 
-		if (fInsertedNodes.find(*(model->NodeRef())) != fInsertedNodes.end() 
+		if (fInsertedNodes.find(*(model->NodeRef())) != fInsertedNodes.end()
 			|| FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
 			delete model;
@@ -1793,7 +1795,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 		model->CloseNode();
 	}
-	
+
 	be_clipboard->Unlock();
 
 	FinishPendingScroll(listViewScrollBy, viewBounds);
@@ -1820,8 +1822,14 @@ BPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 		return false;
 
 	// check filter before adding item
-	return !fRefFilter || fRefFilter->Filter(model->EntryRef(), model->Node(),
-		const_cast<StatStruct *>(model->StatBuf()), model->MimeType());
+	if (!fRefFilter)
+		return true;
+
+	struct stat_beos statBeOS;
+	convert_to_stat_beos(model->StatBuf(), &statBeOS);
+
+	return fRefFilter->Filter(model->EntryRef(), model->Node(), &statBeOS,
+		model->MimeType());
 }
 
 
@@ -2441,7 +2449,7 @@ BPoseView::RemoveColumn(BColumn *columnToRemove, bool runAlert)
 	// make sure last column is not removed
 	if (CountColumns() == 1) {
 		if (runAlert) {
-			BAlert *alert = new BAlert("",	
+			BAlert *alert = new BAlert("",
 				"You must have at least one Attribute showing.",
 				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
@@ -4028,7 +4036,7 @@ bool
 BPoseView::HandleMessageDropped(BMessage *message)
 {
 	ASSERT(message->WasDropped());
-	
+
 	// reset system cursor in case it was altered by drag and drop
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	fCursorCheck = false;
@@ -4550,7 +4558,7 @@ void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	BContainerWindow *destWindow, uint32 buttons, BPoint loc, bool forceCopy,
 	bool forceMove, bool createLink, bool relativeLink, BPoint clickPt, bool dropOnGrid)
-{	
+{
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
 		return;
@@ -4593,11 +4601,11 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			targetView->DuplicateSelection(&clickPt, &loc);
 			return;
 		}
-		
+
 		if (targetView->ViewMode() == kListMode)                    // can't move in list view
 			return;
-		
-		BPoint delta = loc - clickPt;			
+
+		BPoint delta = loc - clickPt;
 		int32 count = targetView->fSelectionList->CountItems();
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = targetView->fSelectionList->ItemAt(index);
@@ -4691,7 +4699,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			if (!CheckDevicesEqual(srcList->ItemAt(0), destFolder))
 				moveMode = kCopySelectionTo;
 		}
-		
+
 		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		return;
 	}
@@ -4719,7 +4727,7 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	bool pinToGrid = (modifiers() & B_COMMAND_KEY) != 0;
-	MoveSelectionInto(TargetModel(), srcWindow, window, buttons, dropPt, 
+	MoveSelectionInto(TargetModel(), srcWindow, window, buttons, dropPt,
 		false, false, false, false, clickPt, pinToGrid);
 }
 
@@ -5535,7 +5543,7 @@ CheckVolumeReadOnly(const entry_ref *ref)
 		alert->Go();
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -6602,7 +6610,7 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 			if (strcasecmp(type, kPlainTextMimeType) == 0) {
 				// got a text file
 
-				
+
 				file.Seek(0, SEEK_SET);
 				off_t size = 0;
 				file.GetSize(&size);
@@ -7303,7 +7311,7 @@ bool
 BPoseView::DeletePose(const node_ref *itemNode, BPose *pose, int32 index)
 {
 	watch_node(itemNode, B_STOP_WATCHING, this);
-	
+
 	if (!pose)
 		pose = fPoseList->FindPose(itemNode, &index);
 
@@ -7640,13 +7648,13 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 
 	// Restore state, might fail if the state has never been saved for this node
 	uint32 oldMode = ViewMode();
-	bool viewStateRestored = false;		
-	if (node) {		
+	bool viewStateRestored = false;
+	if (node) {
 		BViewState *previousState = fViewState;
-		RestoreState(node);		
+		RestoreState(node);
 		viewStateRestored = (fViewState != previousState);
 	}
-	
+
 	if (viewStateRestored) {
 		// Make sure the title view reset its items
 		fTitleView->Reset();
@@ -7708,7 +7716,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 	else AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	Invalidate();	
+	Invalidate();
 
 	fLastKeyTime = 0;
 }
@@ -7818,7 +7826,7 @@ BPoseView::SetDefaultPrinter()
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
 		BAlert *alert = new BAlert("", "The Tracker must be running "
-			"to see set the default printer.", "Cancel", NULL, 
+			"to see set the default printer.", "Cancel", NULL,
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
@@ -8180,7 +8188,7 @@ BPoseView::UpdateScrollRange()
 
 	// set proportions for bars
 	BRect totalExtent(extent | bounds);
-		
+
 	if (fHScrollBar && totalExtent.Width() != 0.0) {
 		float proportion = bounds.Width() / totalExtent.Width();
 		if (fHScrollBar->Proportion() != proportion)
@@ -8880,7 +8888,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		|| (trackingContextMenu && !targetPose))
 		// no change
 		return false;
-	
+
 	fCursorCheck = true;
 	if (fDropTarget && !DragSelectionContains(fDropTarget, dragMessage))
 		HiliteDropTarget(false);
@@ -8905,23 +8913,23 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 			fDropTarget = NULL;
 			fCursorCheck = false;
 		}
-	} 
+	}
 	if (targetModel == NULL)
 		targetModel = TargetModel();
-	
+
 	entry_ref srcRef;
-	if (targetModel->IsDirectory() && dragMessage->HasRef("refs") 
+	if (targetModel->IsDirectory() && dragMessage->HasRef("refs")
 			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
 		Model srcModel (&srcRef);
-		if (!CheckDevicesEqual(&srcRef, targetModel) 
-			&& !srcModel.IsVolume() 
+		if (!CheckDevicesEqual(&srcRef, targetModel)
+			&& !srcModel.IsVolume()
 			&& !srcModel.IsRoot()) {
 			BCursor copyCursor(kCopyCursor);
 			SetViewCursor(&copyCursor);
 			return true;
 		}
 	}
-	
+
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	return true;
 }
@@ -9066,7 +9074,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 		return;
 	}
 
-	// don't unselect the fAlreadySelectedDropTarget 
+	// don't unselect the fAlreadySelectedDropTarget
 	if ((fAlreadySelectedDropTarget == fDropTarget) && !hiliteState) {
 		fAlreadySelectedDropTarget = NULL;
 		return;

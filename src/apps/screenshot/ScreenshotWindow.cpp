@@ -66,8 +66,8 @@ enum {
 class DirectoryRefFilter : public BRefFilter {
 public:
 	virtual			~DirectoryRefFilter() {}
-			bool	Filter(const entry_ref* ref, BNode* node, struct stat* stat,
-						const char* filetype)
+			bool	Filter(const entry_ref* ref, BNode* node,
+						struct stat_beos* stat, const char* filetype)
 					{
 						return node->IsDirectory();
 					}
@@ -501,7 +501,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 {
 	float height = 150.0f;
 
-	float width = (fScreenshot->Bounds().Width() / 
+	float width = (fScreenshot->Bounds().Width() /
 		fScreenshot->Bounds().Height()) * height;
 
 	// to prevent a preview way too wide
@@ -517,7 +517,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 	fPreview->ClearViewBitmap();
 	fPreview->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
 		fPreview->Bounds(), B_FOLLOW_ALL, 0);
-	
+
 	BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
 	if (layout)
 		layout->SetVisibleItem(1L);

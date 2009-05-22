@@ -10,6 +10,12 @@
 #define		BEOS_FS_API_VERSION	2
 
 
+/* helper struct allowing us to avoid problems with the st_*time macros */
+typedef struct {
+    time_t  tv_sec;
+} stat_beos_time;
+
+
 // BeOS structures
 
 typedef struct beos_iovec {
@@ -36,10 +42,10 @@ struct beos_stat {
     off_t			st_size;
     dev_t			st_rdev;
     size_t			st_blksize;
-    time_t			st_atime;
-    time_t			st_mtime;
-    time_t			st_ctime;
-    time_t			st_crtime;
+    stat_beos_time	st_atim;
+    stat_beos_time	st_mtim;
+    stat_beos_time	st_ctim;
+    stat_beos_time	st_crtim;
 };
 
 struct beos_fs_info {
@@ -161,7 +167,7 @@ typedef int	beos_op_read_indexdir(void *ns, void *cookie, long *num,
 typedef int	beos_op_create_index(void *ns, const char *name, int type,
 					int flags);
 typedef int	beos_op_remove_index(void *ns, const char *name);
-typedef	int	beos_op_rename_index(void *ns, const char *oldname, 
+typedef	int	beos_op_rename_index(void *ns, const char *oldname,
 					const char *newname);
 typedef int	beos_op_stat_index(void *ns, const char *name,
 					struct beos_index_info *buf);
