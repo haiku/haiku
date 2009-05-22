@@ -28,38 +28,6 @@ equals_image_name(image_t* image, const char* name)
 }
 
 
-/*!	This function is called when we run BeOS images on Haiku.
-	It allows us to redirect functions to ensure compatibility.
-*/
-static const char*
-beos_compatibility_map_symbol(const char* symbolName)
-{
-	struct symbol_mapping {
-		const char* from;
-		const char* to;
-	};
-	static const struct symbol_mapping kMappings[] = {
-		// TODO: Improve this, and also use it for libnet.so compatibility!
-		// Allow an image to provide a function that will be invoked for every
-		// (transitively) depending image. The function can return a table to
-		// remap symbols (probably better address to address). All the tables
-		// for a single image would be combined into a hash table and an
-		// undefined symbol patcher using this hash table would be added.
-		{"fstat", "__be_fstat"},
-		{"lstat", "__be_lstat"},
-		{"stat", "__be_stat"},
-	};
-	const uint32 kMappingCount = sizeof(kMappings) / sizeof(kMappings[0]);
-
-	for (uint32 i = 0; i < kMappingCount; i++) {
-		if (!strcmp(symbolName, kMappings[i].from))
-			return kMappings[i].to;
-	}
-
-	return symbolName;
-}
-
-
 // #pragma mark -
 
 
@@ -365,13 +333,6 @@ resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
 			struct Elf32_Sym* sharedSym;
 			image_t* sharedImage;
 			const char* symName = SYMNAME(image, sym);
-
-			// patch the symbol name
-			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
-				// The image has been compiled with a BeOS compiler. This means
-				// we'll have to redirect some functions for compatibility.
-				symName = beos_compatibility_map_symbol(symName);
-			}
 
 			// get the version info
 			const elf_version_info* versionInfo = NULL;
