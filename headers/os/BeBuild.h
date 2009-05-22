@@ -48,4 +48,7 @@
 #define _EXPORT
 #define _IMPORT
 
+#define B_DEFINE_SYMBOL_VERSION(function, versionedSymbol)	\
+	__asm__(".symver " function "," versionedSymbol)
+
 #endif	/* _BE_BUILD_H */
