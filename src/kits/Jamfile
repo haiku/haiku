@@ -29,6 +29,8 @@ if $(TARGET_PLATFORM) != haiku {
 
 AddResources libbe.so : libbe_version.rdef ;
 
+SetVersionScript libbe.so : libbe_versions ;
+
 SharedLibrary libbe.so :
 	:
 	<libbe>app_kit.o

@@ -1,0 +1,7 @@
+KERNEL_BASE {
+	global:
+		*;
+};
+
+KERNEL_1_ALPHA1 {
+} KERNEL_BASE;

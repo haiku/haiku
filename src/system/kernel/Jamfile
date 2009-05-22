@@ -18,6 +18,9 @@ UsePrivateHeaders runtime_loader ;
 
 AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 
+SetVersionScript kernel_$(TARGET_ARCH) : kernel_versions ;
+SetVersionScript kernel.so : kernel_versions ;
+
 KernelMergeObject kernel_core.o :
 	boot_item.cpp
 	boot_splash.cpp

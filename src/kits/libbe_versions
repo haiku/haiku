@@ -1,0 +1,5 @@
+LIBBE_BASE {
+};
+
+LIBBE_1_ALPHA1 {
+} LIBBE_BASE;
