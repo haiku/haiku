@@ -52,17 +52,19 @@ rule Link
 # uses separate files, we need to remove the target explicitely first, so that
 # the attributes won't be "leaked".
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) || $(HAIKU_HOST_USE_XATTR) = 1 {
-	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
+	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE VERSION_SCRIPT
 	{
 		$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(LINK_BEGIN_GLUE)" "$(2)" \
-			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" ;
+			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" \
+			-Wl,--version-script,$(VERSION_SCRIPT)
 	}
 } else {
-	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
+	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE VERSION_SCRIPT
 	{
 		$(RM) "$(1)"
 		$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(LINK_BEGIN_GLUE)" "$(2)" \
-			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" ;
+			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" \
+			-Wl,--version-script,$(VERSION_SCRIPT)
 	}
 }
 

@@ -56,7 +56,7 @@ rule KernelLd
 	LocalDepends all : $(1) ;
 	Depends $(1) : $(2) ;
 
-	MakeLocateDebug $(1) ; 
+	MakeLocateDebug $(1) ;
 
 	on $(1) XRes $(1) : $(RESFILES) ;
 	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
@@ -66,9 +66,10 @@ rule KernelLd
 	}
 }
 
-actions KernelLd
+actions KernelLd bind VERSION_SCRIPT
 {
-	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) \
+		--version-script=$(VERSION_SCRIPT)
 }
 
 rule KernelAddon

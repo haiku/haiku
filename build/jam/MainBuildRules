@@ -536,6 +536,21 @@ rule AddResources
 	}
 }
 
+rule SetVersionScript target : versionScript
+{
+	# SetVersionScript <target> : <versionScript>
+	#
+	# Sets the version script for <target>. Grist will be added to
+	# <versionScript> and SEARCH will be set on it.
+
+	versionScript = [ FGristFiles $(versionScript) ] ;
+
+	SEARCH on $(versionScript) += $(SEARCH_SOURCE) ;
+
+	VERSION_SCRIPT on $(target) = $(versionScript) ;
+	Depends $(target) : $(versionScript) ;
+}
+
 rule BuildPlatformObjects
 {
 	# Usage BuildPlatformObjects <sources> ;
