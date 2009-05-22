@@ -47,9 +47,11 @@ int
 internal_function
 __gconv_load_cache (void)
 {
+#if 0
   int fd;
   struct stat64 st;
   struct gconvcache_header *header;
+#endif
 
   /* We cannot use the cache if the GCONV_PATH environment variable is
      set.  */

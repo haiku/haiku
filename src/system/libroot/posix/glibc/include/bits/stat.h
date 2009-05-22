@@ -82,6 +82,7 @@ struct stat
 #define	__S_IWRITE	0200	/* Write by owner.  */
 #define	__S_IEXEC	0100	/* Execute by owner.  */
 
+#if 0
 #ifdef __USE_LARGEFILE64
 struct stat64
   {
@@ -98,4 +99,5 @@ struct stat64
     __time_t st_mtime;		/* Time of last modification.  */
     __time_t st_ctime;		/* Time of last status change.  */
   };
+#endif
 #endif
