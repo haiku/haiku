@@ -88,6 +88,8 @@ usage(void)
 		"\t  [-M mode] [-R filename] [-S filename] "
 #ifndef __HAIKU__
 		"[-m EUI64 | hostname]\n"
+#else
+		"\n"
 #endif
 		"\t-u: specify bus number\n"
 		"\t-p: Display current PHY register settings\n"
