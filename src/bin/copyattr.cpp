@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -431,6 +431,10 @@ copy_entry(const char *sourcePath, const char *destPath,
 			exit(1);
 		}
 
+		// copy attributes (before setting the permissions!)
+		copy_attributes(sourcePath, *sourceNode, destPath, *destNode,
+			parameters);
+
 		// set file owner, group, permissions, times
 		destNode->SetOwner(sourceStat.st_uid);
 		destNode->SetGroup(sourceStat.st_gid);
@@ -450,10 +454,11 @@ copy_entry(const char *sourcePath, const char *destPath,
 		}
 
 		destNode = &_destNode;
-	}
 
-	// copy attributes
-	copy_attributes(sourcePath, *sourceNode, destPath, *destNode, parameters);
+		// copy attributes
+		copy_attributes(sourcePath, *sourceNode, destPath, *destNode,
+			parameters);
+	}
 
 	// the destination node is no longer needed
 	destNode->Unset();
@@ -583,8 +588,8 @@ copy_files(const char **sourcePaths, int sourceCount,
 			// If the path is the root directory or the leaf is "." or "..",
 			// we copy the contents only.
 			int leafLen = sourceLen - leafStart;
-			if (leafLen == 0 || leafLen <= 2
-					&& strncmp(sourcePath + leafStart, "..", leafLen) == 0) {
+			if (leafLen == 0 || (leafLen <= 2
+					&& strncmp(sourcePath + leafStart, "..", leafLen) == 0)) {
 				copySourceContentsOnly = true;
 			}
 		}
