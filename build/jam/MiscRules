@@ -279,8 +279,9 @@ rule DefineBuildProfile name : type : path {
 	# <name> - The name of the build profile.
 	# <type> - The type of the build profile. Must be one of "image" (plain
 	#          disk image), "vmware-image" (VMware disk image), "disk"
-	#          (actual partition or hard disk device), "install" (installation
-	#          in a directory), or "custom" (user-defined).
+	#          (actual partition or hard disk device), "cd-image" (ISO CD
+	#          image), "install" (installation in a directory), or "custom"
+	#          (user-defined).
 	# <path> - The path associated with the profile. Depending on the profile
 	#          type, this is the path to the disk image/VMware image, hard
 	#          disk/partition device, or the installation directory. If the
@@ -325,6 +326,14 @@ rule DefineBuildProfile name : type : path {
 	local startOffset ;
 
 	switch $(type) {
+		case "cd-image" : {
+			targetName ?= $(HAIKU_CD_NAME) ;
+			targetName ?= $(HAIKU_DEFAULT_CD_NAME) ;
+			HAIKU_CD_DIR = $(targetDir) ;
+			HAIKU_CD_NAME = $(targetName) ;
+			buildTarget = haiku-cd ;
+		}
+
 		case "image" : {
 			targetName ?= $(HAIKU_IMAGE_NAME) ;
 			targetName ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
@@ -377,9 +386,9 @@ rule DefineBuildProfile name : type : path {
 		}
 
 		case "mount" : {
-			if $(type) = "install" {
+			if $(type) in "install" "cd-image" {
 				Exit "Build action \"mount\" not supported for profile type"
-					"\"install\"." ;
+					"\"$(type)\"." ;
 			}
 
 			local commandLine = :<build>bfs_shell $(startOffset)

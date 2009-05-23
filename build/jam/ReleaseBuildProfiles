@@ -1,5 +1,6 @@
 DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
 DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
+DefineBuildProfile alpha-cd : cd-image : "haiku-alpha.iso" ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "alpha-*" : {
