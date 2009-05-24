@@ -38,6 +38,8 @@ typedef uint32_t bus_size_t;
 #define mtx_destroy mutex_destroy
 #define mtx_init(lockaddr, name, type, opts) mutex_init(lockaddr, name)
 
+#define wakeup(i) release_sem_etc(i->Sem, 0, B_RELEASE_IF_WAITING_ONLY | B_RELEASE_ALL)
+
 #define splfw() 0
 #define splx(s) 
 

@@ -2209,8 +2209,7 @@ fwohci_tbuf_update(struct fwohci_softc *sc, int dmach)
 	FW_GUNLOCK(fc);
 	splx(s);
 	if (w)
-//		wakeup(it);
-		release_sem(it->Sem);
+		wakeup(it);
 }
 
 static void
@@ -2275,8 +2274,7 @@ fwohci_rbuf_update(struct fwohci_softc *sc, int dmach)
 	if (ir->flag & FWXFERQ_HANDLER) 
 		ir->hand(ir);
 	else
-//		wakeup(ir);
-		release_sem(ir->Sem);
+		wakeup(ir);
 }
 
 void
