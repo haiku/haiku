@@ -1,9 +1,9 @@
 
 resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
-resource(1, "META:TYPE") "video/x-dv";
+resource(1, "META:TYPE") "video/dv";
 
-resource(2, "META:SNIFF_RULE") "0.50 (0x1f0700bf)";
+resource(2, "META:SNIFF_RULE") "0.50 (0x1f0700)";
 
 resource(3, "META:S:DESC") #'MSDC' "DV Movie";
 
