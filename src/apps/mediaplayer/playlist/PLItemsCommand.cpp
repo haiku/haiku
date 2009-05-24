@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include <new>
+
 #include "Playlist.h"
 #include "PlaylistItem.h"
 
