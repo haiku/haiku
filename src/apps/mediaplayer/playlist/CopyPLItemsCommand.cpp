@@ -32,7 +32,7 @@ CopyPLItemsCommand::CopyPLItemsCommand(Playlist* playlist,
 		return;
 	}
 
-	memcpy(fItems, 0, sizeof(PlaylistItem*) * fCount);
+	memset(fItems, 0, sizeof(PlaylistItem*) * fCount);
 
 	// init original entries and
 	for (int32 i = 0; i < fCount; i++) {
