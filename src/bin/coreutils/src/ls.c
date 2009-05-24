@@ -2026,7 +2026,11 @@ decode_switches (int argc, char **argv)
       /* Note we leave %5b etc. alone so user widths/flags are honored.  */
       if (strstr (long_time_format[0],"%b") || strstr (long_time_format[1],"%b"))
 	if (!abmon_init ())
+#ifndef __HAIKU__
 	  error (0, 0, _("error initializing month strings"));
+#else
+	  ;
+#endif
     }
 
   return optind;
