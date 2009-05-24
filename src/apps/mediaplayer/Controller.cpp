@@ -83,34 +83,33 @@ void Controller::Listener::MutedChanged(bool) {}
 
 
 Controller::Controller()
-	: NodeManager(),
-	  fVideoView(NULL),
-	  fVolume(1.0),
-	  fActiveVolume(1.0),
-		// TODO: Implement background volume for inactive players,
-		// but use only if there are multiple players running at all!
-	  fMuted(false),
+	:
+	NodeManager(),
+	fVideoView(NULL),
+	fVolume(1.0),
+	fActiveVolume(1.0),
+	fMuted(false),
 
-	  fItem(NULL),
-	  fMediaFile(NULL),
+	fItem(NULL),
+	fMediaFile(NULL),
 
-	  fVideoSupplier(new ProxyVideoSupplier()),
-	  fAudioSupplier(new ProxyAudioSupplier(this)),
-	  fVideoTrackSupplier(NULL),
-	  fAudioTrackSupplier(NULL),
+	fVideoSupplier(new ProxyVideoSupplier()),
+	fAudioSupplier(new ProxyAudioSupplier(this)),
+	fVideoTrackSupplier(NULL),
+	fAudioTrackSupplier(NULL),
 
-	  fAudioTrackList(4),
-	  fVideoTrackList(2),
+	fAudioTrackList(4),
+	fVideoTrackList(2),
 
-	  fPosition(0),
-	  fDuration(0),
-	  fVideoFrameRate(25.0),
-	  fSeekFrame(-1),
-	  fLastSeekEventTime(LONGLONG_MIN),
+	fPosition(0),
+	fDuration(0),
+	fVideoFrameRate(25.0),
+	fSeekFrame(-1),
+	fLastSeekEventTime(LONGLONG_MIN),
 
-	  fGlobalSettingsListener(this),
+	fGlobalSettingsListener(this),
 
-	  fListeners(4)
+	fListeners(4)
 {
 	Settings::Default()->AddListener(&fGlobalSettingsListener);
 	_AdoptGlobalSettings();
