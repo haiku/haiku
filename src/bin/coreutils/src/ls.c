@@ -1015,10 +1015,10 @@ static char abmon[12][MAX_MON_WIDTH * 2 * MB_LEN_MAX + 1];
 /* minimum width needed to align %b, 0 => don't use precomputed values.  */
 static size_t required_mon_width;
 
+#ifdef HAVE_NL_LANGINFO
 static size_t
 abmon_init (void)
 {
-#ifdef HAVE_NL_LANGINFO
   required_mon_width = MAX_MON_WIDTH;
   size_t curr_max_width;
   do
@@ -1043,10 +1043,10 @@ abmon_init (void)
 	}
     }
   while (curr_max_width > required_mon_width);
-#endif
 
   return required_mon_width;
 }
+#endif
 
 static size_t
 dev_ino_hash (void const *x, size_t table_size)
@@ -2023,13 +2023,11 @@ decode_switches (int argc, char **argv)
 		  }
 	      }
 	  }
+#ifdef HAVE_NL_LANGINFO
       /* Note we leave %5b etc. alone so user widths/flags are honored.  */
       if (strstr (long_time_format[0],"%b") || strstr (long_time_format[1],"%b"))
 	if (!abmon_init ())
-#ifndef __HAIKU__
 	  error (0, 0, _("error initializing month strings"));
-#else
-	  ;
 #endif
     }
 
