@@ -1017,7 +1017,7 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			if ((vol->sectors_per_fat == 0 && (buffer[0x42] != 0x29
 				|| strncmp(buffer + 0x47, vol->vol_label, 11) != 0))
 				|| (vol->sectors_per_fat != 0 && (buffer[0x26] != 0x29
-				|| strncmp(buffer + 0x2b, vol->vol_label, 11) != 0))) {
+				|| strncmp(buffer + 0x2b, vol->vol_label, 11) == 0))) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				block_cache_set_dirty(vol->fBlockCache, 0, false, tid);
 				result = B_ERROR;
@@ -1033,7 +1033,9 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			buffer = diri_init(vol, vol->root_vnode.cluster, vol->vol_entry, &diri);
 
 			// check if it is the same as the old volume label
-			if ((buffer == NULL) || (strncmp(buffer, vol->vol_label, 11))) {
+			dprintf("buffer = %s\n", buffer);
+			dprintf("vol->vol_label = %s\n", vol->vol_label);
+			if ((buffer == NULL) || (strncmp(buffer, vol->vol_label, 11) == 0)) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				diri_free(&diri);
 				result = B_ERROR;
