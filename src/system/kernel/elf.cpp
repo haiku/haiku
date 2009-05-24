@@ -2164,6 +2164,7 @@ error3:
 	free(programHeaders);
 error2:
 	delete_elf_image(image);
+	elfHeader = NULL;
 error1:
 	free(elfHeader);
 error:
