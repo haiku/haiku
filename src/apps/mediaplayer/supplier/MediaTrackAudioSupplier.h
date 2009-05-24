@@ -63,20 +63,17 @@ class MediaTrackAudioSupplier : public AudioTrackSupplier {
 									bigtime_t time);
 
 			void				_ReadCachedFrames(void*& buffer,
-									int64& position, int64& frames);
-			void				_ReadCachedFrames(void*& buffer,
 									int64& position, int64& frames,
 									bigtime_t time);
 
-			status_t			_ReadUncachedFrames(void* buffer,
-									int64 position, int64 frames);
 			status_t			_ReadUncachedFrames(void* buffer,
 									int64 position, int64 frames,
 									bigtime_t time);
 
 			status_t			_FindKeyFrameForward(int64& position);
 			status_t			_FindKeyFrameBackward(int64& position);
-			status_t			_SeekToKeyFrameForward(int64& position);
+// NOTE: unused
+//			status_t			_SeekToKeyFrameForward(int64& position);
 			status_t			_SeekToKeyFrameBackward(int64& position);
 
  private:

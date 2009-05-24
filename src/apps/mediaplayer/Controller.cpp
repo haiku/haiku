@@ -51,10 +51,10 @@
 using std::nothrow;
 
 
-void 
+void
 HandleError(const char *text, status_t err)
 {
-	if (err != B_OK) { 
+	if (err != B_OK) {
 		printf("%s. error 0x%08x (%s)\n",text, (int)err, strerror(err));
 		fflush(NULL);
 		exit(1);
@@ -91,7 +91,7 @@ Controller::Controller()
 		// but use only if there are multiple players running at all!
 	  fMuted(false),
 
-	  fRef(),
+	  fItem(NULL),
 	  fMediaFile(NULL),
 
 	  fVideoSupplier(new ProxyVideoSupplier()),
@@ -185,11 +185,11 @@ Controller::CreateAudioSupplier()
 
 
 status_t
-Controller::SetTo(const entry_ref &ref)
+Controller::SetTo(const PlaylistItemRef& item)
 {
 	BAutolock _(this);
 
-	if (fRef == ref) {
+	if (fItem == item) {
 		if (InitCheck() == B_OK) {
 			if (fAutoplay) {
 				SetPosition(0.0);
@@ -199,14 +199,14 @@ Controller::SetTo(const entry_ref &ref)
 		return B_OK;
 	}
 
-	fRef = ref;
+	fItem = item;
 
 	fAudioSupplier->SetSupplier(NULL, fVideoFrameRate);
 	fVideoSupplier->SetSupplier(NULL);
 
 	fAudioTrackList.MakeEmpty();
 	fVideoTrackList.MakeEmpty();
-	
+
 	ObjectDeleter<BMediaFile> oldMediaFileDeleter(fMediaFile);
 		// BMediaFile destructor will call ReleaseAllTracks()
 	fMediaFile = NULL;
@@ -224,25 +224,26 @@ Controller::SetTo(const entry_ref &ref)
 	fDuration = 0;
 	fVideoFrameRate = 25.0;
 
-	status_t err;
-	
-	BMediaFile* mf = new BMediaFile(&ref);
+	if (fItem.Get() == NULL)
+		return B_BAD_VALUE;
+
+	BMediaFile* mf = fItem->CreateMediaFile();
 	ObjectDeleter<BMediaFile> mediaFileDeleter(mf);
 
-	err = mf->InitCheck();
+	status_t err = mf->InitCheck();
 	if (err != B_OK) {
 		printf("Controller::SetTo: initcheck failed\n");
 		_NotifyFileChanged();
 		return err;
 	}
-	
+
 	int trackcount = mf->CountTracks();
 	if (trackcount <= 0) {
 		printf("Controller::SetTo: trackcount %d\n", trackcount);
 		_NotifyFileChanged();
 		return B_MEDIA_NO_HANDLER;
 	}
-	
+
 	for (int i = 0; i < trackcount; i++) {
 		BMediaTrack* t = mf->TrackAt(i);
 		media_format f;
@@ -253,13 +254,13 @@ Controller::SetTo(const entry_ref &ref)
 			mf->ReleaseTrack(t);
 			continue;
 		}
-		
+
 		if (t->Duration() <= 0) {
 			printf("Controller::SetTo: track index %d has no duration\n",i);
 			mf->ReleaseTrack(t);
 			continue;
 		}
-		
+
 		if (f.IsAudio()) {
 			if (!fAudioTrackList.AddItem(t))
 				return B_NO_MEMORY;
@@ -395,7 +396,7 @@ Controller::VideoTrackCount()
 
 status_t
 Controller::SelectAudioTrack(int n)
-{	
+{
 	BAutolock _(this);
 
 	BMediaTrack* track = (BMediaTrack *)fAudioTrackList.ItemAt(n);
@@ -503,7 +504,7 @@ Controller::Play()
 	//printf("Controller::Play\n");
 
 	BAutolock _(this);
-	
+
 	StartPlaying();
 	fAutoplay = true;
 }
@@ -602,7 +603,7 @@ Controller::VolumeDown()
 
 void
 Controller::ToggleMute()
-{	
+{
 	if (!Lock())
 		return;
 
@@ -624,7 +625,7 @@ Controller::Volume()
 {
 	BAutolock _(this);
 
-	return fVolume;	
+	return fVolume;
 }
 
 
@@ -679,14 +680,9 @@ status_t
 Controller::GetLocation(BString* location)
 {
 	// you need to hold the data lock
-	if (!fMediaFile)
+	if (fItem.Get() == NULL)
 		return B_NO_INIT;
-	BPath path(&fRef);
-	status_t ret = path.InitCheck();
-	if (ret < B_OK)
-		return ret;
-	*location = "";
-	*location << "file://" << path.Path();
+	*location = fItem->LocationURI();
 	return B_OK;
 }
 
@@ -695,9 +691,9 @@ status_t
 Controller::GetName(BString* name)
 {
 	// you need to hold the data lock
-	if (!fMediaFile)
+	if (fItem.Get() == NULL)
 		return B_NO_INIT;
-	*name = fRef.name;
+	*name = fItem->Name();
 	return B_OK;
 }
 

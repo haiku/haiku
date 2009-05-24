@@ -34,6 +34,7 @@
 
 #include "Controller.h"
 #include "ControllerObserver.h"
+#include "PlaylistItem.h"
 
 
 #define NAME "File Info"
@@ -55,7 +56,7 @@ public:
 	virtual				~InfoView();
 	virtual	void		Draw(BRect updateRect);
 
-			status_t	SetIcon(const entry_ref& ref);
+			status_t	SetIcon(const PlaylistItem* item);
 			status_t	SetIcon(const char* mimeType);
 			void		SetGenericIcon();
 
@@ -71,7 +72,7 @@ InfoView::InfoView(BRect frame, const char *name, float divider)
 	  fIconBitmap(NULL)
 {
 	BRect rect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
-	
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fIconBitmap = new BBitmap(rect, B_RGBA32);
 #else
@@ -106,11 +107,9 @@ InfoView::Draw(BRect updateRect)
 
 
 status_t
-InfoView::SetIcon(const entry_ref& ref)
+InfoView::SetIcon(const PlaylistItem* item)
 {
-	BNode node(&ref);
-	BNodeInfo info(&node);
-	return info.GetTrackerIcon(fIconBitmap, B_LARGE_ICON);
+	return item->GetIcon(fIconBitmap, B_LARGE_ICON);
 }
 
 
@@ -180,14 +179,14 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 										  rect.right - 10,
 										  20 + fh.ascent + 5),
 									"filename", "");
-	AddChild(fFilenameView);									
+	AddChild(fFilenameView);
 	fFilenameView->SetFont(&bigFont);
 	fFilenameView->SetViewColor(fInfoView->ViewColor());
 	fFilenameView->SetLowColor(fInfoView->ViewColor());
 #ifdef B_BEOS_VERSION_DANO /* maybe we should support that as well ? */
 	fFilenameView->SetTruncation(B_TRUNCATE_END);
 #endif
-	
+
 	rect.top = BASE_HEIGHT;
 
 	BRect lr(rect);
@@ -403,9 +402,9 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		bigtime_t v;
 
 		//s << d << "µs; ";
-		
+
 		d /= 1000;
-		
+
 		v = d / (3600 * 1000);
 		d = d % (3600 * 1000);
 		bool hours = v > 0;
@@ -423,13 +422,13 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		s << "\n";
 		fContentsView->Insert(s.String());
 		// TODO: demux/video/audio/... perfs (Kb/s)
-		
+
 		fLabelsView->Insert("Display Mode\n");
 		if (fController->IsOverlayActive())
 			fContentsView->Insert("Overlay\n");
 		else
 			fContentsView->Insert("DrawBitmap\n");
-		
+
 		fLabelsView->Insert("\n");
 		fContentsView->Insert("\n");
 	}
@@ -441,8 +440,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	if (which & INFO_FILE) {
 		bool iconSet = false;
 		if (fController->HasFile()) {
-			entry_ref ref = fController->Ref();
-			iconSet = fInfoView->SetIcon(ref) == B_OK;
+			const PlaylistItem* item = fController->Item();
+			iconSet = fInfoView->SetIcon(item) == B_OK;
 			media_file_format fileFormat;
 			BString s;
 			if (fController->GetFileFormatInfo(&fileFormat) == B_OK) {
@@ -470,7 +469,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	}
 
 	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
-		
+
 		BString s;
 		if (fController->GetCopyright(&s) == B_OK && s.Length() > 0) {
 			fLabelsView->Insert("Copyright\n\n");
@@ -480,6 +479,6 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	}
 
 	fController->Unlock();
-	
+
 	ResizeToPreferred();
 }

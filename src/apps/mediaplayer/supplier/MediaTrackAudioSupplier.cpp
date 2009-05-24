@@ -17,7 +17,7 @@ using namespace std;
 
 //#define TRACE_AUDIO_SUPPLIER
 #ifdef TRACE_AUDIO_SUPPLIER
-# define TRACE(x...)	printf("MediaTrackAudioSupplier::"); printf(x)
+# define TRACE(x...)	printf("MediaTrackAudioSupplier::" x)
 #else
 # define TRACE(x...)
 #endif
@@ -123,6 +123,8 @@ MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 		frames);
 	TRACE("  this: %p, fOutOffset: %lld\n", this, fOutOffset);
 
+//printf("MediaTrackAudioSupplier::Read(%p, %lld, %lld)\n", buffer, pos, frames);
+
 	status_t error = InitCheck();
 	if (error != B_OK) {
 		TRACE("Read() done\n");
@@ -141,6 +143,58 @@ MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 	TRACE("  after eliminating the frames after the track end: %p, %lld, %lld\n",
 		buffer, pos, frames);
 
+#if 0
+	const media_format& format = Format();
+	int64 size = format.u.raw_audio.buffer_size;
+	uint32 bytesPerFrame = format.u.raw_audio.channel_count
+		* (format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+	uint32 framesPerBuffer = size / bytesPerFrame;
+
+	if (fMediaTrack->CurrentFrame() != pos) {
+printf("  needing to seek: %lld (%lld)\n", pos,
+	fMediaTrack->CurrentFrame());
+
+		int64 keyFrame = pos;
+		error = fMediaTrack->FindKeyFrameForFrame(&keyFrame,
+			B_MEDIA_SEEK_CLOSEST_BACKWARD);
+		if (error == B_OK) {
+			error = fMediaTrack->SeekToFrame(&keyFrame,
+				B_MEDIA_SEEK_CLOSEST_BACKWARD);
+		}
+		if (error != B_OK) {
+printf("  error seeking to position: %lld (%lld)\n", pos,
+	fMediaTrack->CurrentFrame());
+
+			return error;
+		}
+
+		if (keyFrame < pos) {
+printf("  need to skip %lld frames\n", pos - keyFrame);
+			uint8 dummyBuffer[size];
+			while (pos - keyFrame >= framesPerBuffer) {
+printf("  skipped %lu frames (full buffer)\n", framesPerBuffer);
+				int64 sizeToRead = size;
+				fMediaTrack->ReadFrames(dummyBuffer, &sizeToRead);
+				keyFrame += framesPerBuffer;
+			}
+			int64 restSize = pos - keyFrame;
+			if (restSize > 0) {
+printf("  skipped %lu frames (rest)\n", framesPerBuffer);
+				fMediaTrack->ReadFrames(dummyBuffer, &restSize);
+			}
+		}
+	}
+	while (frames > 0) {
+printf("  reading %lu frames (full buffer)\n", framesPerBuffer);
+		int64 sizeToRead = min_c(size, frames * bytesPerFrame);
+		fMediaTrack->ReadFrames(buffer, &sizeToRead);
+		buffer = (uint8*)buffer + sizeToRead;
+		frames -= framesPerBuffer;
+	}
+printf("  done\n\n");
+
+#else
 	// read the cached frames
 	bigtime_t time = system_time();
 	if (frames > 0)
@@ -152,6 +206,7 @@ MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 	if (frames > 0)
 		_ReadUncachedFrames(buffer, pos, frames, time);
 
+#endif
 	TRACE("Read() done\n");
 
 	return B_OK;
@@ -202,6 +257,8 @@ MediaTrackAudioSupplier::_InitFromTrack()
 		fCountFrames = fMediaTrack->CountFrames();
 
 		TRACE("MediaTrackAudioSupplier: keyframes: %d, frame count: %lld\n",
+			fHasKeyFrames, fCountFrames);
+		printf("MediaTrackAudioSupplier: keyframes: %d, frame count: %lld\n",
 			fHasKeyFrames, fCountFrames);
 	} else
 		fMediaTrack = NULL;
@@ -420,19 +477,6 @@ MediaTrackAudioSupplier::_ReadBuffer(Buffer* buffer, int64 position,
 //
 // Tries to read as much as possible data from the cache. The supplied
 // buffer pointer as well as position and number of frames are adjusted
-// accordingly. The used cache buffers are stamped with the current
-// system time.
-void
-MediaTrackAudioSupplier::_ReadCachedFrames(void*& dest, int64& pos,
-	int64& frames)
-{
-	_ReadCachedFrames(dest, pos, frames, system_time());
-}
-
-// _ReadCachedFrames
-//
-// Tries to read as much as possible data from the cache. The supplied
-// buffer pointer as well as position and number of frames are adjusted
 // accordingly. The used cache buffers are stamped with the supplied
 // time.
 void
@@ -454,8 +498,8 @@ MediaTrackAudioSupplier::_ReadCachedFrames(void*& dest, int64& pos,
 			pos += size;
 			frames -= size;
 			dest = SkipFrames(dest, size);
+			buffer->time_stamp = time;
 		}
-		buffer->time_stamp = time;
 	}
 	// Step backward through the list of cache buffers and try to read as
 	// much data from the end as possible.
@@ -469,21 +513,9 @@ MediaTrackAudioSupplier::_ReadCachedFrames(void*& dest, int64& pos,
 			_CopyFrames(buffer->data, buffer->offset, dest, pos,
 						pos + frames - size, size);
 			frames -= size;
+			buffer->time_stamp = time;
 		}
 	}
-}
-
-// _ReadUncachedFrames
-//
-// Reads /frames/ frames from /position/ into /buffer/. The frames are not
-// read from the cache, but read frames are cached, if possible.
-// New cache buffers are stamped with the system time.
-// If an error occurs, the untouched part of the buffer is set to 0.
-status_t
-MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
-									  int64 frames)
-{
-	return _ReadUncachedFrames(buffer, position, frames, system_time());
 }
 
 // _ReadUncachedFrames
@@ -521,8 +553,10 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 			currentPos += cacheBuffer->size;
 		}
 	}
+
+#if 1
 	// Ensure that all frames up to the next key frame are cached.
-	// This avoids, that each read
+	// This avoids, that each read reaches the BMediaTrack.
 	if (error == B_OK) {
 		int64 nextKeyFrame = currentPos;
 		if (_FindKeyFrameForward(nextKeyFrame) == B_OK) {
@@ -540,6 +574,8 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 			}
 		}
 	}
+#endif
+
 	// on error fill up the buffer with silence
 	if (error != B_OK && frames > 0)
 		ReadSilence(buffer, frames);
@@ -551,17 +587,17 @@ status_t
 MediaTrackAudioSupplier::_FindKeyFrameForward(int64& position)
 {
 	status_t error = B_OK;
-// NOTE: the keyframe version confuses the Frauenhofer MP3 decoder,
-// it works fine with the non-keyframe version, so let's hope this
-// is the case for all other keyframe based BeOS codecs...
-//	if (fHasKeyFrames) {
-//		error = fMediaTrack->FindKeyFrameForFrame(
-//			&position, B_MEDIA_SEEK_CLOSEST_FORWARD);
-//	} else {
+#ifdef __HAIKU__
+	if (fHasKeyFrames) {
+		error = fMediaTrack->FindKeyFrameForFrame(
+			&position, B_MEDIA_SEEK_CLOSEST_FORWARD);
+	} else
+#endif
+	{
 		int64 framesPerBuffer = _FramesPerBuffer();
 		position += framesPerBuffer - 1;
 		position = position % framesPerBuffer;
-//	}
+	}
 	return error;
 }
 
@@ -578,6 +614,7 @@ MediaTrackAudioSupplier::_FindKeyFrameBackward(int64& position)
 	return error;
 }
 
+#if 0
 // _SeekToKeyFrameForward
 status_t
 MediaTrackAudioSupplier::_SeekToKeyFrameForward(int64& position)
@@ -601,6 +638,7 @@ MediaTrackAudioSupplier::_SeekToKeyFrameForward(int64& position)
 	}
 	return error;
 }
+#endif
 
 // _SeekToKeyFrameBackward
 status_t
@@ -614,16 +652,16 @@ MediaTrackAudioSupplier::_SeekToKeyFrameBackward(int64& position)
 		int64 oldPosition = position;
 		error = fMediaTrack->FindKeyFrameForFrame(&position,
 			B_MEDIA_SEEK_CLOSEST_BACKWARD);
-		if (error >= B_OK)
+		if (error == B_OK)
 			error = fMediaTrack->SeekToFrame(&position, 0);
-		if (error < B_OK) {
+		if (error != B_OK) {
 			position = fMediaTrack->CurrentFrame();
-			if (fReportSeekError) {
+//			if (fReportSeekError) {
 				printf("  seek to key frame backward: %lld -> %lld (%lld) "
 					"- %s\n", oldPosition, position,
 					fMediaTrack->CurrentFrame(), strerror(error));
 				fReportSeekError = false;
-			}
+//			}
 		} else {
 			fReportSeekError = true;
 		}

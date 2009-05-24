@@ -31,11 +31,13 @@
 
 #include "ListenerAdapter.h"
 #include "NodeManager.h"
+#include "PlaylistItem.h"
 
 class AudioTrackSupplier;
 class BBitmap;
 class BMediaFile;
 class BMediaTrack;
+class PlaylistItem;
 class ProxyAudioSupplier;
 class ProxyVideoSupplier;
 class SoundOutput;
@@ -78,16 +80,16 @@ public:
 	virtual	AudioSupplier*		CreateAudioSupplier();
 
 	// Controller
-			status_t			SetTo(const entry_ref &ref);
-			entry_ref			Ref() const
-									{ return fRef; }
+			status_t			SetTo(const PlaylistItemRef& item);
+			const PlaylistItem*	Item() const
+									{ return fItem.Get(); }
 			void				PlayerActivated(bool active);
 
 			void				GetSize(int *width, int *height);
 
 			int					AudioTrackCount();
 			int					VideoTrackCount();
-	
+
 			status_t			SelectAudioTrack(int n);
 			int					CurrentAudioTrack();
 			status_t			SelectVideoTrack(int n);
@@ -123,7 +125,7 @@ public:
 
 	// video view
 			void				SetVideoView(VideoView *view);
-	
+
 			bool				IsOverlayActive();
 
 	// notification support
@@ -148,7 +150,7 @@ private:
 			void				_NotifyVolumeChanged(float volume) const;
 			void				_NotifyMutedChanged(bool muted) const;
 
-	// overridden from PlaybackManager so that we 
+	// overridden from PlaybackManager so that we
 	// can use our own Listener mechanism
 	virtual	void				NotifyPlayModeChanged(int32 mode) const;
 	virtual	void				NotifyLoopModeChanged(int32 mode) const;
@@ -167,7 +169,7 @@ private:
 			float				fActiveVolume;
 			bool				fMuted;
 
-			entry_ref			fRef;
+			PlaylistItemRef		fItem;
 			BMediaFile*			fMediaFile;
 
 			ProxyVideoSupplier*	fVideoSupplier;
@@ -194,7 +196,7 @@ private:
 			bool				fLoopMovies;
 			bool				fLoopSounds;
 			uint32				fBackgroundMovieVolumeMode;
-	
+
 			BList				fListeners;
 };
 

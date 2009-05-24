@@ -1,6 +1,6 @@
 /*
- * Copyright © 2008 Stephan Aßmus. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright © 2008-2009 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "RandomizePLItemsCommand.h"
@@ -19,31 +19,33 @@ using std::nothrow;
 
 RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 		 const int32* indices, int32 count)
-	: Command()
-	, fPlaylist(playlist)
-	, fRefs(count > 0 ? new (nothrow) entry_ref[count] : NULL)
-	, fListIndices(count > 0 ? new (nothrow) int32[count] : NULL)
-	, fRandomInternalIndices(count > 0 ? new (nothrow) int32[count] : NULL)
-	, fCount(count)
+	:
+	PLItemsCommand(),
+	fPlaylist(playlist),
+	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
+	fListIndices(count > 0 ? new (nothrow) int32[count] : NULL),
+	fRandomInternalIndices(count > 0 ? new (nothrow) int32[count] : NULL),
+	fCount(count)
 {
-	if (!indices || !fPlaylist || !fRefs || !fListIndices
+	if (!indices || !fPlaylist || !fItems || !fListIndices
 			|| !fRandomInternalIndices) {
 		// indicate a bad object state
-		delete[] fRefs;
-		fRefs = NULL;
+		delete[] fItems;
+		fItems = NULL;
 		return;
 	}
 
 	memcpy(fListIndices, indices, fCount * sizeof(int32));
+	memset(fItems, 0, fCount * sizeof(PlaylistItem*));
 
 	// put the available indices into a "set"
 	BList indexSet;
 	for (int32 i = 0; i < fCount; i++) {
-		if (fPlaylist->GetRefAt(fListIndices[i], &fRefs[i]) < B_OK
-			|| !indexSet.AddItem((void*)i)) {
+		fItems[i] = fPlaylist->ItemAt(fListIndices[i]);
+		if (fItems[i] == NULL || !indexSet.AddItem((void*)i)) {
 			// indicate a bad object state
-			delete[] fRefs;
-			fRefs = NULL;
+			delete[] fItems;
+			fItems = NULL;
 			return;
 		}
 	}
@@ -58,7 +60,7 @@ RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 
 RandomizePLItemsCommand::~RandomizePLItemsCommand()
 {
-	delete[] fRefs;
+	delete[] fItems;
 	delete[] fListIndices;
 	delete[] fRandomInternalIndices;
 }
@@ -67,7 +69,7 @@ RandomizePLItemsCommand::~RandomizePLItemsCommand()
 status_t
 RandomizePLItemsCommand::InitCheck()
 {
-	if (!fRefs)
+	if (!fItems)
 		return B_NO_INIT;
 
 	return B_OK;
@@ -100,36 +102,34 @@ RandomizePLItemsCommand::_Sort(bool random)
 {
 	BAutolock _(fPlaylist);
 
-	// remember currently playling ref in case we move it
-	entry_ref currentRef;
-	bool adjustCurrentRef = fPlaylist->GetRefAt(fPlaylist->CurrentRefIndex(),
-		&currentRef) == B_OK;
+	// remember currently playling item in case we move it
+	PlaylistItem* current = fPlaylist->ItemAt(fPlaylist->CurrentItemIndex());
 
 	// remove refs from playlist
 	for (int32 i = 0; i < fCount; i++) {
 		// "- i" to account for the items already removed
-		fPlaylist->RemoveRef(fListIndices[i] - i, false);
+		fPlaylist->RemoveItem(fListIndices[i] - i, false);
 	}
 
 	// add refs to playlist at the randomized indices
 	if (random) {
 		for (int32 i = 0; i < fCount; i++) {
-			if (!fPlaylist->AddRef(fRefs[fRandomInternalIndices[i]],
+			if (!fPlaylist->AddItem(fItems[fRandomInternalIndices[i]],
 					fListIndices[i])) {
 				return B_NO_MEMORY;
 			}
 		}
 	} else {
 		for (int32 i = 0; i < fCount; i++) {
-			if (!fPlaylist->AddRef(fRefs[i], fListIndices[i])) {
+			if (!fPlaylist->AddItem(fItems[i], fListIndices[i])) {
 				return B_NO_MEMORY;
 			}
 		}
 	}
 
-	// take care about currently played ref
-	if (adjustCurrentRef)
-		fPlaylist->SetCurrentRefIndex(fPlaylist->IndexOf(currentRef));
+	// take care about currently played item
+	if (current != NULL)
+		fPlaylist->SetCurrentItemIndex(fPlaylist->IndexOf(current));
 
 	return B_OK;
 }

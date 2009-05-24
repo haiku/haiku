@@ -14,6 +14,7 @@ class CommandStack;
 class Controller;
 class ControllerObserver;
 class Playlist;
+class PlaylistItem;
 class PlaylistObserver;
 
 class PlaylistListView : public SimpleListView {
@@ -53,7 +54,7 @@ private:
 	class Item;
 
 			void				_FullSync();
-			void				_AddItem(const entry_ref& ref, int32 index);
+			void				_AddItem(PlaylistItem* item, int32 index);
 			void				_RemoveItem(int32 index);
 
 			void				_SetCurrentPlaylistIndex(int32 index);

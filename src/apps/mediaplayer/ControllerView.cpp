@@ -63,18 +63,18 @@ ControllerView::Draw(BRect updateRect)
 
 
 void
-ControllerView::MessageReceived(BMessage *msg)
+ControllerView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
-		case MSG_PLAYLIST_REF_ADDED:
-		case MSG_PLAYLIST_REF_REMOVED:
-		case MSG_PLAYLIST_REFS_SORTED:
-		case MSG_PLAYLIST_CURRENT_REF_CHANGED:
+	switch (message->what) {
+		case MSG_PLAYLIST_ITEM_ADDED:
+		case MSG_PLAYLIST_ITEM_REMOVED:
+		case MSG_PLAYLIST_ITEMS_SORTED:
+		case MSG_PLAYLIST_CURRENT_ITEM_CHANGED:
 			_CheckSkippable();
 			break;
 
 		default:
-			TransportControlGroup::MessageReceived(msg);
+			TransportControlGroup::MessageReceived(message);
 	}
 }
 
@@ -123,7 +123,7 @@ void
 ControllerView::SkipBackward()
 {
 	BAutolock _(fPlaylist);
-	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() - 1);
+	fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() - 1);
 }
 
 
@@ -131,7 +131,7 @@ void
 ControllerView::SkipForward()
 {
 	BAutolock _(fPlaylist);
-	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+	fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() + 1);
 }
 
 

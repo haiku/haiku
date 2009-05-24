@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "ImportPLItemsCommand.h"
@@ -15,6 +12,7 @@
 #include <Autolock.h>
 
 #include "Playlist.h"
+#include "PlaylistItem.h"
 
 
 using std::nothrow;
@@ -22,16 +20,20 @@ using std::nothrow;
 
 ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 		 const BMessage* refsMessage, int32 toIndex)
-	: Command()
-	, fPlaylist(playlist)
+	:
+	PLItemsCommand(),
+	fPlaylist(playlist),
 
-	, fOldRefs(NULL)
-	, fOldCount(0)
+	fOldItems(NULL),
+	fOldCount(0),
 
-	, fNewRefs(NULL)
-	, fNewCount(0)
+	fNewItems(NULL),
+	fNewCount(0),
 
-	, fToIndex(toIndex)
+	fToIndex(toIndex),
+	fPlaylingIndex(0),
+
+	fItemsAdded(false)
 {
 	if (!fPlaylist)
 		return;
@@ -47,38 +49,40 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 		return;
 	}
 
-	fNewRefs = new (nothrow) entry_ref[fNewCount];
-	if (!fNewRefs)
+	fNewItems = new (nothrow) PlaylistItem*[fNewCount];
+	if (!fNewItems)
 		return;
+	memset(fNewItems, 0, fNewCount * sizeof(PlaylistItem*));
 
 	// init new entries
 	for (int32 i = 0; i < fNewCount; i++) {
-		if (temp.GetRefAt(i, &fNewRefs[i]) < B_OK) {
+		fNewItems[i] = temp.ItemAtFast(i)->Clone();
+		if (fNewItems[i] == NULL) {
 			// indicate bad object init
-			delete[] fNewRefs;
-			fNewRefs = NULL;
+			_CleanUp(fNewItems, fNewCount, true);
 			return;
 		}
 	}
 
+	fPlaylingIndex = fPlaylist->CurrentItemIndex();
+
 	if (fToIndex < 0) {
 		fOldCount = fPlaylist->CountItems();
 		if (fOldCount > 0) {
-			fOldRefs = new (nothrow) entry_ref[fOldCount];
-			if (!fOldRefs) {
+			fOldItems = new (nothrow) PlaylistItem*[fOldCount];
+			if (!fOldItems) {
 				// indicate bad object init
-				delete[] fNewRefs;
-				fNewRefs = NULL;
-				return;
+				_CleanUp(fNewItems, fNewCount, true);
 			}
+			memset(fOldItems, 0, fOldCount * sizeof(PlaylistItem*));
 		}
 	}
 
 	for (int32 i = 0; i < fOldCount; i++) {
-		if (fPlaylist->GetRefAt(i, &fOldRefs[i]) < B_OK) {
+		fOldItems[i] = fPlaylist->ItemAtFast(i)->Clone();
+		if (fOldItems[i] == NULL) {
 			// indicate bad object init
-			delete[] fNewRefs;
-			fNewRefs = NULL;
+			_CleanUp(fNewItems, fNewCount, true);
 			return;
 		}
 	}
@@ -87,15 +91,15 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 
 ImportPLItemsCommand::~ImportPLItemsCommand()
 {
-	delete[] fOldRefs;
-	delete[] fNewRefs;
+	_CleanUp(fOldItems, fOldCount, fItemsAdded);
+	_CleanUp(fNewItems, fNewCount, !fItemsAdded);
 }
 
 
 status_t
 ImportPLItemsCommand::InitCheck()
 {
-	if (!fPlaylist || !fNewRefs)
+	if (!fPlaylist || !fNewItems)
 		return B_NO_INIT;
 	return B_OK;
 }
@@ -106,9 +110,11 @@ ImportPLItemsCommand::Perform()
 {
 	BAutolock _(fPlaylist);
 
+	fItemsAdded = true;
+
 	int32 index = fToIndex;
 	if (fToIndex < 0) {
-		fPlaylist->MakeEmpty();
+		fPlaylist->MakeEmpty(false);
 		index = 0;
 	}
 
@@ -116,13 +122,13 @@ ImportPLItemsCommand::Perform()
 
 	// add refs to playlist at the insertion index
 	for (int32 i = 0; i < fNewCount; i++) {
-		if (!fPlaylist->AddRef(fNewRefs[i], index++))
+		if (!fPlaylist->AddItem(fNewItems[i], index++))
 			return B_NO_MEMORY;
 	}
 
 	if (startPlaying) {
 		// open first file
-		fPlaylist->SetCurrentRefIndex(0);
+		fPlaylist->SetCurrentItemIndex(0);
 	}
 
 	return B_OK;
@@ -134,17 +140,22 @@ ImportPLItemsCommand::Undo()
 {
 	BAutolock _(fPlaylist);
 
+	fItemsAdded = false;
+
 	if (fToIndex < 0) {
-		// remove new refs from playlist and restore old refs
-		fPlaylist->MakeEmpty();
+		// remove new items from playlist and restore old refs
+		fPlaylist->MakeEmpty(false);
 		for (int32 i = 0; i < fOldCount; i++) {
-			if (!fPlaylist->AddRef(fOldRefs[i], i))
+			if (!fPlaylist->AddItem(fOldItems[i], i))
 				return B_NO_MEMORY;
 		}
+		// Restore previously playing item
+		if (fPlaylingIndex >= 0)
+			fPlaylist->SetCurrentItemIndex(fPlaylingIndex);
 	} else {
-		// remove refs from playlist
+		// remove new items from playlist
 		for (int32 i = 0; i < fNewCount; i++) {
-			fPlaylist->RemoveRef(fToIndex);
+			fPlaylist->RemoveItem(fToIndex);
 		}
 	}
 
@@ -160,3 +171,4 @@ ImportPLItemsCommand::GetName(BString& name)
 	else
 		name << "Import Entry";
 }
+

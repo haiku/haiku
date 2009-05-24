@@ -5,14 +5,18 @@
 #ifndef PLAYLIST_ITEM_H
 #define PLAYLIST_ITEM_H
 
+#include <Archivable.h>
 #include <List.h>
+#include <NodeInfo.h>
+#include <Referenceable.h>
 #include <String.h>
 
+class BBitmap;
 class BDataIO;
 class BMediaFile;
 class BMessage;
 
-class PlaylistItem {
+class PlaylistItem : public BArchivable, public Referenceable {
 public:
 	class Listener {
 	public:
@@ -26,35 +30,60 @@ public:
 								PlaylistItem();
 	virtual						~PlaylistItem();
 
+	virtual	PlaylistItem*		Clone() const = 0;
+
 	// archiving
-//	virtual	status_t			Unarchive(const BMessage* archive) = 0;
-//	virtual	status_t			Archive(BMessage* into) const = 0;
-//
-//	virtual	status_t			Unflatten(BDataIO* stream) = 0;
-//	virtual	status_t			Flatten(BDataIO* stream) const = 0;
+	virtual	status_t			Archive(BMessage* into,
+									bool deep = true) const = 0;
 
-	// properties
-	virtual	status_t			SetName(const BString& name) = 0;
-	virtual	status_t			GetName(BString& name) const = 0;
+	// attributes
+	typedef enum {
+		ATTR_STRING_NAME		= 'name',
+		ATTR_STRING_KEYWORDS	= 'kwrd',
 
-	virtual	status_t			SetTitle(const BString& title) = 0;
-	virtual	status_t			GetTitle(BString& title) const = 0;
+		ATTR_STRING_AUTHOR		= 'auth',
+		ATTR_STRING_ALBUM		= 'albm',
+		ATTR_STRING_TITLE		= 'titl',
 
-	virtual	status_t			SetAuthor(const BString& author) = 0;
-	virtual	status_t			GetAuthor(BString& author) const = 0;
+		ATTR_INT32_TRACK		= 'trck',
+		ATTR_INT32_YEAR			= 'year',
+		ATTR_INT32_RATING		= 'rtng',
+		ATTR_INT32_BIT_RATE		= 'btrt',
 
-	virtual	status_t			SetAlbum(const BString& album) = 0;
-	virtual	status_t			GetAlbum(BString& album) const = 0;
+		ATTR_INT64_DURATION		= 'drtn'
+	} Attribute;
 
-	virtual	status_t			SetTrackNumber(int32 trackNumber) = 0;
-	virtual	status_t			GetTrackNumber(int32& trackNumber) const = 0;
+	virtual	status_t			SetAttribute(const Attribute& attribute,
+									const BString& string) = 0;
+	virtual	status_t			GetAttribute(const Attribute& attribute,
+									BString& string) const = 0;
 
-	virtual	status_t			SetBitRate(int32 bitRate) = 0;
-	virtual	status_t			GetBitRate(int32& bitRate) const = 0;
+	virtual	status_t			SetAttribute(const Attribute& attribute,
+									const int32& value) = 0;
+	virtual	status_t			GetAttribute(const Attribute& attribute,
+									int32& value) const = 0;
 
-	virtual status_t			GetDuration(bigtime_t& duration) const = 0;
+	virtual	status_t			SetAttribute(const Attribute& attribute,
+									const int64& value) = 0;
+	virtual	status_t			GetAttribute(const Attribute& attribute,
+									int64& value) const = 0;
+
+	// convenience access to attributes
+			BString				Name() const;
+			BString				Author() const;
+			BString				Album() const;
+			BString				Title() const;
+
+			int32				TrackNumber() const;
+			int32				BitRate() const;
+
+			bigtime_t			Duration() const;
 
 	// methods
+	virtual	BString				LocationURI() const = 0;
+	virtual	status_t			GetIcon(BBitmap* bitmap,
+									icon_size iconSize) const = 0;
+
 	virtual	status_t			MoveIntoTrash() = 0;
 	virtual	status_t			RestoreFromTrash() = 0;
 
@@ -71,5 +100,7 @@ protected:
 private:
 			BList				fListeners;
 };
+
+typedef Reference<PlaylistItem> PlaylistItemRef;
 
 #endif // PLAYLIST_ITEM_H

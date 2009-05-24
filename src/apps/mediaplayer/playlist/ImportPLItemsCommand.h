@@ -1,28 +1,23 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef IMPORT_PL_ITEMS_COMMAND_H
 #define IMPORT_PL_ITEMS_COMMAND_H
 
 
-#include "Command.h"
+#include "PLItemsCommand.h"
 
 class BMessage;
-class Playlist;
-struct entry_ref;
 
-class ImportPLItemsCommand : public Command {
- public:
+class ImportPLItemsCommand : public PLItemsCommand {
+public:
 								ImportPLItemsCommand(
 									Playlist* playlist,
 									const BMessage* refsMessage,
 									int32 toIndex);
 	virtual						~ImportPLItemsCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();
@@ -30,13 +25,15 @@ class ImportPLItemsCommand : public Command {
 
 	virtual void				GetName(BString& name);
 
- private:
+private:
 			Playlist*			fPlaylist;
-			entry_ref*			fOldRefs;
+			PlaylistItem**		fOldItems;
 			int32				fOldCount;
-			entry_ref*			fNewRefs;
+			PlaylistItem**		fNewItems;
 			int32				fNewCount;
 			int32				fToIndex;
+			int32				fPlaylingIndex;
+			bool				fItemsAdded;
 };
 
 #endif // IMPORT_PL_ITEMS_COMMAND_H

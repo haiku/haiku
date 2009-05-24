@@ -1,10 +1,8 @@
 /*
- * Copyright 2007-2009, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 #include "PlaylistListView.h"
 
 #include <new>
@@ -29,6 +27,7 @@
 #include "MovePLItemsCommand.h"
 #include "PlaybackState.h"
 #include "Playlist.h"
+#include "PlaylistItem.h"
 #include "PlaylistObserver.h"
 #include "RandomizePLItemsCommand.h"
 #include "RemovePLItemsCommand.h"
@@ -56,32 +55,37 @@ text_offset(const font_height& fh)
 }
 
 
-class PlaylistListView::Item : public SimpleItem {
- public:
-								Item(const entry_ref& ref);
-		virtual					~Item();
+class PlaylistListView::Item : public SimpleItem,
+	public PlaylistItem::Listener {
+public:
+								Item(PlaylistItem* item);
+	virtual						~Item();
 
-				void			Draw(BView* owner, BRect frame,
+			void				Draw(BView* owner, BRect frame,
 									const font_height& fh,
 									bool tintedLine, uint32 mode,
 									bool active,
 									uint32 playbackState);
 
- private:
-				entry_ref		fRef;
+	virtual	void				ItemChanged(const PlaylistItem* item);
+
+private:
+			PlaylistItemRef		fItem;
 
 };
 
 
-PlaylistListView::Item::Item(const entry_ref& ref)
-	: SimpleItem(ref.name),
-	  fRef(ref)
+PlaylistListView::Item::Item(PlaylistItem* item)
+	: SimpleItem(item->Name().String()),
+	  fItem(item)
 {
+	fItem->AddListener(this);
 }
 
 
 PlaylistListView::Item::~Item()
 {
+	fItem->RemoveListener(this);
 }
 
 
@@ -202,6 +206,13 @@ PlaylistListView::Item::Draw(BView* owner, BRect frame, const font_height& fh,
 }
 
 
+void
+PlaylistListView::Item::ItemChanged(const PlaylistItem* item)
+{
+	// TODO: Invalidate
+}
+
+
 // #pragma mark -
 
 
@@ -234,6 +245,8 @@ PlaylistListView::PlaylistListView(BRect frame, Playlist* playlist,
 
 PlaylistListView::~PlaylistListView()
 {
+	for (int32 i = CountItems() - 1; i >= 0; i--)
+		_RemoveItem(i);
 	fPlaylist->RemoveListener(fPlaylistObserver);
 	delete fPlaylistObserver;
 	fController->RemoveListener(fControllerObserver);
@@ -258,24 +271,27 @@ PlaylistListView::MessageReceived(BMessage* message)
 //	message->PrintToStream();
 	switch (message->what) {
 		// PlaylistObserver messages
-		case MSG_PLAYLIST_REF_ADDED: {
-			entry_ref ref;
+		case MSG_PLAYLIST_ITEM_ADDED:
+		{
+			PlaylistItem* item;
 			int32 index;
-			if (message->FindRef("refs", &ref) == B_OK
+			if (message->FindPointer("item", (void**)&item) == B_OK
 				&& message->FindInt32("index", &index) == B_OK)
-				_AddItem(ref, index);
+				_AddItem(item, index);
 			break;
 		}
-		case MSG_PLAYLIST_REF_REMOVED: {
+		case MSG_PLAYLIST_ITEM_REMOVED:
+		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK)
 				_RemoveItem(index);
 			break;
 		}
-		case MSG_PLAYLIST_REFS_SORTED:
+		case MSG_PLAYLIST_ITEMS_SORTED:
 			_FullSync();
 			break;
-		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
+		case MSG_PLAYLIST_CURRENT_ITEM_CHANGED:
+		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK)
 				_SetCurrentPlaylistIndex(index);
@@ -283,7 +299,8 @@ PlaylistListView::MessageReceived(BMessage* message)
 		}
 
 		// ControllerObserver messages
-		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED: {
+		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED:
+		{
 			uint32 state;
 			if (message->FindInt32("state", (int32*)&state) == B_OK)
 				_SetPlaybackState(state);
@@ -330,7 +347,7 @@ PlaylistListView::MouseDown(BPoint where)
 				// only do something if user clicked the same item twice
 				if (fLastClickedItem == item) {
 					BAutolock _(fPlaylist);
-					fPlaylist->SetCurrentRefIndex(i);
+					fPlaylist->SetCurrentItemIndex(i);
 					handled = true;
 				}
 			} else {
@@ -486,16 +503,14 @@ PlaylistListView::_FullSync()
 		scrollBar->SetTarget((BView*)NULL);
 	}
 
-	MakeEmpty();
+	for (int32 i = CountItems() - 1; i >= 0; i--)
+		_RemoveItem(i);
 
 	int32 count = fPlaylist->CountItems();
-	for (int32 i = 0; i < count; i++) {
-		entry_ref ref;
-		if (fPlaylist->GetRefAt(i, &ref) == B_OK)
-			_AddItem(ref, i);
-	}
+	for (int32 i = 0; i < count; i++)
+		_AddItem(fPlaylist->ItemAt(i), i);
 
-	_SetCurrentPlaylistIndex(fPlaylist->CurrentRefIndex());
+	_SetCurrentPlaylistIndex(fPlaylist->CurrentItemIndex());
 	_SetPlaybackState(fController->PlaybackState());
 
 	// reattach scrollbar and sync it by calling FrameResized()
@@ -509,10 +524,13 @@ PlaylistListView::_FullSync()
 
 
 void
-PlaylistListView::_AddItem(const entry_ref& ref, int32 index)
+PlaylistListView::_AddItem(PlaylistItem* _item, int32 index)
 {
-	Item* item = new (nothrow) Item(ref);
-	if (item)
+	if (_item == NULL)
+		return;
+
+	Item* item = new (nothrow) Item(_item);
+	if (item != NULL)
 		AddItem(item, index);
 }
 

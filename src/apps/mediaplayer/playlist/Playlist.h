@@ -2,8 +2,8 @@
  * Playlist.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen 	<marcus@overhagen.de>
- * Copyright (C) 2007 Stephan Aßmus 	<superstippi@gmx.de>
- * Copyright (C) 2008-2009 Fredrik Modéen 	<[FirstName]@[LastName].se> (MIT ok)
+ * Copyright (C) 2007-2009 Stephan Aßmus <superstippi@gmx.de> (MIT ok)
+ * Copyright (C) 2008-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,13 +22,15 @@
 #ifndef __PLAYLIST_H
 #define __PLAYLIST_H
 
-#include <Entry.h>
 #include <List.h>
 #include <Locker.h>
+
+#include "PlaylistItem.h"
 
 class BDataIO;
 class BMessage;
 class BString;
+struct entry_ref;
 
 
 class Playlist : public BLocker {
@@ -38,12 +40,12 @@ public:
 						Listener();
 		virtual			~Listener();
 
-		virtual	void	RefAdded(const entry_ref& ref, int32 index);
-		virtual	void	RefRemoved(int32 index);
+		virtual	void	ItemAdded(PlaylistItem* item, int32 index);
+		virtual	void	ItemRemoved(int32 index);
 
-		virtual	void	RefsSorted();
+		virtual	void	ItemsSorted();
 
-		virtual	void	CurrentRefChanged(int32 newIndex);
+		virtual	void	CurrentItemChanged(int32 newIndex);
 	};
 
 public:
@@ -58,26 +60,26 @@ public:
 
 
 			// list functionality
-			void				MakeEmpty();
+			void				MakeEmpty(bool deleteItems = true);
 			int32				CountItems() const;
 
 			void				Sort();
 
-			bool				AddRef(const entry_ref& ref);
-			bool				AddRef(const entry_ref& ref, int32 index);
-			entry_ref			RemoveRef(int32 index,
+			bool				AddItem(PlaylistItem* item);
+			bool				AddItem(PlaylistItem* item, int32 index);
+			PlaylistItem*		RemoveItem(int32 index,
 									bool careAboutCurrentIndex = true);
 
 			bool				AdoptPlaylist(Playlist& other);
 			bool				AdoptPlaylist(Playlist& other, int32 index);
 
-			int32				IndexOf(const entry_ref& ref) const;
-			status_t			GetRefAt(int32 index, entry_ref* ref) const;
-		//	bool				HasRef(const entry_ref& ref) const;
+			int32				IndexOf(PlaylistItem* item) const;
+			PlaylistItem*		ItemAt(int32 index) const;
+			PlaylistItem*		ItemAtFast(int32 index) const;
 
 			// navigating current ref
-			bool				SetCurrentRefIndex(int32 index);
-			int32				CurrentRefIndex() const;
+			bool				SetCurrentItemIndex(int32 index);
+			int32				CurrentItemIndex() const;
 
 			void				GetSkipInfo(bool* canSkipPrevious,
 									bool* canSkipNext) const;
@@ -95,20 +97,20 @@ public:
 									Playlist* playlist);
 
 private:
-	static	int					playlist_cmp(const void* p1, const void* p2);
 	static	bool 				_IsMediaFile(const BString& mimeString);
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
 	static	BString				_MIMEString(const entry_ref* ref);
-			void				_NotifyRefAdded(const entry_ref& ref,
+
+			void				_NotifyItemAdded(PlaylistItem*,
 									int32 index) const;
-			void				_NotifyRefRemoved(int32 index) const;
-			void				_NotifyRefsSorted() const;
-			void				_NotifyCurrentRefChanged(int32 newIndex) const;
+			void				_NotifyItemRemoved(int32 index) const;
+			void				_NotifyItemsSorted() const;
+			void				_NotifyCurrentItemChanged(int32 newIndex) const;
 
 private:
-			BList				fRefs;
+			BList				fItems;
 			BList				fListeners;
 
 			int32				fCurrentIndex;

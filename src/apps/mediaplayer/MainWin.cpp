@@ -2,7 +2,7 @@
  * MainWin.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2007-2008 Stephan Aßmus <superstippi@gmx.de> (GPL->MIT ok)
+ * Copyright (C) 2007-2009 Stephan Aßmus <superstippi@gmx.de> (GPL->MIT ok)
  * Copyright (C) 2007-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
  * USA.
  *
  */
+
 #include "MainWin.h"
 
 #include <math.h>
@@ -45,6 +46,7 @@
 #include "ControllerObserver.h"
 #include "MainApp.h"
 #include "PeakView.h"
+#include "PlaylistItem.h"
 #include "PlaylistObserver.h"
 #include "PlaylistWindow.h"
 #include "Settings.h"
@@ -379,33 +381,35 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		// PlaylistObserver messages
-		case MSG_PLAYLIST_REF_ADDED: {
-			entry_ref ref;
+		case MSG_PLAYLIST_ITEM_ADDED:
+		{
+			PlaylistItem* item;
 			int32 index;
-			if (msg->FindRef("refs", &ref) == B_OK
+			if (msg->FindPointer("item", (void**)&item) == B_OK
 				&& msg->FindInt32("index", &index) == B_OK) {
-				_AddPlaylistItem(ref, index);
+				_AddPlaylistItem(item, index);
 			}
 			break;
 		}
-		case MSG_PLAYLIST_REF_REMOVED: {
+		case MSG_PLAYLIST_ITEM_REMOVED:
+		{
 			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK) {
+			if (msg->FindInt32("index", &index) == B_OK)
 				_RemovePlaylistItem(index);
-			}
 			break;
 		}
-		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
+		case MSG_PLAYLIST_CURRENT_ITEM_CHANGED:
+		{
 			BAutolock _(fPlaylist);
 
 			int32 index;
 			if (msg->FindInt32("index", &index) < B_OK
-				|| index != fPlaylist->CurrentRefIndex())
+				|| index != fPlaylist->CurrentItemIndex())
 				break;
-			entry_ref ref;
-			if (fPlaylist->GetRefAt(index, &ref) == B_OK) {
-				printf("open ref: %s\n", ref.name);
-				OpenFile(ref);
+			PlaylistItemRef item(fPlaylist->ItemAt(index));
+			if (item.Get() != NULL) {
+				printf("open playlist item: %s\n", item->Name().String());
+				OpenPlaylistItem(item);
 				_MarkPlaylistItem(index);
 			}
 			break;
@@ -416,8 +420,8 @@ MainWin::MessageReceived(BMessage *msg)
 		{
 			BAutolock _(fPlaylist);
 
-			bool hadNext = fPlaylist->SetCurrentRefIndex(
-				fPlaylist->CurrentRefIndex() + 1);
+			bool hadNext = fPlaylist->SetCurrentItemIndex(
+				fPlaylist->CurrentItemIndex() + 1);
 			if (!hadNext) {
 				if (fHasVideo) {
 					if (fCloseWhenDonePlayingMovie)
@@ -434,7 +438,8 @@ MainWin::MessageReceived(BMessage *msg)
 			// notification
 //			_UpdatePlaylistMenu();
 			break;
-		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED: {
+		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED:
+		{
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
 				BMenuItem* item = fVideoTrackMenu->ItemAt(index);
@@ -443,7 +448,8 @@ MainWin::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED: {
+		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED:
+		{
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
 				BMenuItem* item = fAudioTrackMenu->ItemAt(index);
@@ -452,25 +458,29 @@ MainWin::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED: {
+		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED:
+		{
 			uint32 state;
 			if (msg->FindInt32("state", (int32*)&state) == B_OK)
 				fControls->SetPlaybackState(state);
 			break;
 		}
-		case MSG_CONTROLLER_POSITION_CHANGED: {
+		case MSG_CONTROLLER_POSITION_CHANGED:
+		{
 			float position;
 			if (msg->FindFloat("position", &position) == B_OK)
 				fControls->SetPosition(position);
 			break;
 		}
-		case MSG_CONTROLLER_VOLUME_CHANGED: {
+		case MSG_CONTROLLER_VOLUME_CHANGED:
+		{
 			float volume;
 			if (msg->FindFloat("volume", &volume) == B_OK)
 				fControls->SetVolume(volume);
 			break;
 		}
-		case MSG_CONTROLLER_MUTED_CHANGED: {
+		case MSG_CONTROLLER_MUTED_CHANGED:
+		{
 			bool muted;
 			if (msg->FindBool("muted", &muted) == B_OK)
 				fControls->SetMuted(muted);
@@ -481,7 +491,8 @@ MainWin::MessageReceived(BMessage *msg)
 		case M_FILE_NEWPLAYER:
 			gMainApp->NewWindow();
 			break;
-		case M_FILE_OPEN: {
+		case M_FILE_OPEN:
+		{
 			BMessenger target(this);
 			BMessage result(B_REFS_RECEIVED);
 			BMessage appMessage(M_SHOW_OPEN_PANEL);
@@ -499,6 +510,7 @@ MainWin::MessageReceived(BMessage *msg)
 			ShowPlaylistWindow();
 			break;
 		case B_ABOUT_REQUESTED:
+		{
 			BAlert *alert;
 			alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen "
 				", Stephan Aßmus and Frederik Modéen", "Thanks");
@@ -510,6 +522,7 @@ MainWin::MessageReceived(BMessage *msg)
 				alert->Go(NULL); // Asynchronous mode
 			}
 			break;
+		}
 		case M_FILE_CLOSE:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -664,12 +677,13 @@ MainWin::MessageReceived(BMessage *msg)
 				break;
 			}
 */
-		case M_SET_PLAYLIST_POSITION: {
+		case M_SET_PLAYLIST_POSITION:
+		{
 			BAutolock _(fPlaylist);
 
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK)
-				fPlaylist->SetCurrentRefIndex(index);
+				fPlaylist->SetCurrentItemIndex(index);
 			break;
 		}
 
@@ -731,18 +745,18 @@ MainWin::QuitRequested()
 
 
 void
-MainWin::OpenFile(const entry_ref &ref)
+MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 {
-	printf("MainWin::OpenFile\n");
+	printf("MainWin::OpenPlaylistItem\n");
 
-	status_t err = fController->SetTo(ref);
+	status_t err = fController->SetTo(item);
 	if (err != B_OK) {
 		BAutolock _(fPlaylist);
 		if (fPlaylist->CountItems() == 1) {
 			// display error if this is the only file we're supposed to play
 			BString message;
 			message << "The file '";
-			message << ref.name;
+			message << item->Name();
 			message << "' could not be opened.\n\n";
 
 			if (err == B_MEDIA_NO_HANDLER) {
@@ -757,7 +771,7 @@ MainWin::OpenFile(const entry_ref &ref)
 			(new BAlert("error", message.String(), "OK"))->Go();
 		} else {
 			// just go to the next file and don't bother user
-			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+			fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() + 1);
 		}
 		fHasFile = false;
 		fHasVideo = false;
@@ -767,7 +781,7 @@ MainWin::OpenFile(const entry_ref &ref)
 		fHasFile = true;
 		fHasVideo = fController->VideoTrackCount() != 0;
 		fHasAudio = fController->AudioTrackCount() != 0;
-		SetTitle(ref.name);
+		SetTitle(item->Name().String());
 	}
 	_SetupWindow();
 }
@@ -1398,7 +1412,7 @@ MainWin::_KeyDown(BMessage *msg)
 				BAutolock _(fPlaylist);
 				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
 				removeMessage.AddInt32("playlist index",
-					fPlaylist->CurrentRefIndex());
+					fPlaylist->CurrentItemIndex());
 				fPlaylistWindow->PostMessage(&removeMessage);
 				return B_OK;
 			}
@@ -1592,26 +1606,24 @@ MainWin::_UpdatePlaylistMenu()
 
 	int32 count = fPlaylist->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		entry_ref ref;
-		if (fPlaylist->GetRefAt(i, &ref) < B_OK)
-			continue;
-		_AddPlaylistItem(ref, i);
+		PlaylistItem* item = fPlaylist->ItemAtFast(i);
+		_AddPlaylistItem(item, i);
 	}
 	fPlaylistMenu->SetTargetForItems(this);
 
-	_MarkPlaylistItem(fPlaylist->CurrentRefIndex());
+	_MarkPlaylistItem(fPlaylist->CurrentItemIndex());
 
 	fPlaylist->Unlock();
 }
 
 
 void
-MainWin::_AddPlaylistItem(const entry_ref& ref, int32 index)
+MainWin::_AddPlaylistItem(PlaylistItem* item, int32 index)
 {
 	BMessage* message = new BMessage(M_SET_PLAYLIST_POSITION);
 	message->AddInt32("index", index);
-	BMenuItem* item = new BMenuItem(ref.name, message);
-	fPlaylistMenu->AddItem(item, index);
+	BMenuItem* menuItem = new BMenuItem(item->Name().String(), message);
+	fPlaylistMenu->AddItem(menuItem, index);
 }
 
 

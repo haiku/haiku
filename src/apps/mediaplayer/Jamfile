@@ -55,7 +55,7 @@ Application MediaPlayer :
 
 	# playlist
 	CopyPLItemsCommand.cpp
-	EntryRefPlaylistItem.cpp
+	FilePlaylistItem.cpp
 	ImportPLItemsCommand.cpp
 	ListViews.cpp
 	MovePLItemsCommand.cpp
@@ -64,6 +64,7 @@ Application MediaPlayer :
 	PlaylistListView.cpp
 	PlaylistObserver.cpp
 	PlaylistWindow.cpp
+	PLItemsCommand.cpp
 	RandomizePLItemsCommand.cpp
 	RemovePLItemsCommand.cpp
 

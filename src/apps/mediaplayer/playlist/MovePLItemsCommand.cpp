@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "MovePLItemsCommand.h"
@@ -21,20 +18,22 @@ using std::nothrow;
 
 MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
 		 const int32* indices, int32 count, int32 toIndex)
-	: Command()
-	, fPlaylist(playlist)
-	, fRefs(count > 0 ? new (nothrow) entry_ref[count] : NULL)
-	, fIndices(count > 0 ? new (nothrow) int32[count] : NULL)
-	, fToIndex(toIndex)
-	, fCount(count)
+	:
+	PLItemsCommand(),
+	fPlaylist(playlist),
+	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
+	fIndices(count > 0 ? new (nothrow) int32[count] : NULL),
+	fToIndex(toIndex),
+	fCount(count)
 {
-	if (!indices || !fPlaylist || !fRefs || !fIndices) {
+	if (!indices || !fPlaylist || !fItems || !fIndices) {
 		// indicate a bad object state
-		delete[] fRefs;
-		fRefs = NULL;
+		delete[] fItems;
+		fItems = NULL;
 		return;
 	}
 
+	memset(fItems, 0, sizeof(PlaylistItem*) * fCount);
 	memcpy(fIndices, indices, fCount * sizeof(int32));
 
 	// init original entry indices and
@@ -42,10 +41,11 @@ MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
 	// are removed before that index
 	int32 itemsBeforeIndex = 0;
 	for (int32 i = 0; i < fCount; i++) {
-		if (fPlaylist->GetRefAt(fIndices[i], &fRefs[i]) < B_OK) {
+		fItems[i] = fPlaylist->ItemAt(fIndices[i]);
+		if (fItems[i] == NULL) {
 			// indicate a bad object state
-			delete[] fRefs;
-			fRefs = NULL;
+			delete[] fItems;
+			fItems = NULL;
 			return;
 		}
 		if (fIndices[i] < fToIndex)
@@ -57,7 +57,7 @@ MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
 
 MovePLItemsCommand::~MovePLItemsCommand()
 {
-	delete[] fRefs;
+	delete[] fItems;
 	delete[] fIndices;
 }
 
@@ -65,7 +65,7 @@ MovePLItemsCommand::~MovePLItemsCommand()
 status_t
 MovePLItemsCommand::InitCheck()
 {
-	if (!fRefs)
+	if (!fItems)
 		return B_NO_INIT;
 
 	// analyse the move, don't return B_OK in case
@@ -106,21 +106,19 @@ MovePLItemsCommand::Perform()
 
 	status_t ret = B_OK;
 
-	// remember currently playling ref in case we move it
-	entry_ref currentRef;
-	bool adjustCurrentRef = fPlaylist->GetRefAt(fPlaylist->CurrentRefIndex(),
-		&currentRef) == B_OK;
+	// remember currently playling item in case we move it
+	PlaylistItem* current = fPlaylist->ItemAt(fPlaylist->CurrentItemIndex());
 
 	// remove refs from playlist
 	for (int32 i = 0; i < fCount; i++) {
 		// "- i" to account for the items already removed
-		fPlaylist->RemoveRef(fIndices[i] - i, false);
+		fPlaylist->RemoveItem(fIndices[i] - i, false);
 	}
 
 	// add refs to playlist at the insertion index
 	int32 index = fToIndex;
 	for (int32 i = 0; i < fCount; i++) {
-		if (!fPlaylist->AddRef(fRefs[i], index++)) {
+		if (!fPlaylist->AddItem(fItems[i], index++)) {
 			ret = B_NO_MEMORY;
 			break;
 		}
@@ -128,9 +126,9 @@ MovePLItemsCommand::Perform()
 	if (ret < B_OK)
 		return ret;
 
-	// take care about currently played ref
-	if (adjustCurrentRef)
-		fPlaylist->SetCurrentRefIndex(fPlaylist->IndexOf(currentRef));
+	// take care about currently played item
+	if (current != NULL)
+		fPlaylist->SetCurrentItemIndex(fPlaylist->IndexOf(current));
 
 	return B_OK;
 }
@@ -143,20 +141,18 @@ MovePLItemsCommand::Undo()
 
 	status_t ret = B_OK;
 
-	// remember currently playling ref in case we move it
-	entry_ref currentRef;
-	bool adjustCurrentRef = fPlaylist->GetRefAt(fPlaylist->CurrentRefIndex(),
-		&currentRef) == B_OK;
+	// remember currently playling item in case we move it
+	PlaylistItem* current = fPlaylist->ItemAt(fPlaylist->CurrentItemIndex());
 
 	// remove refs from playlist
 	int32 index = fToIndex;
 	for (int32 i = 0; i < fCount; i++) {
-		fPlaylist->RemoveRef(index++, false);
+		fPlaylist->RemoveItem(index++, false);
 	}
 
 	// add ref to playlist at remembered indices
 	for (int32 i = 0; i < fCount; i++) {
-		if (!fPlaylist->AddRef(fRefs[i], fIndices[i])) {
+		if (!fPlaylist->AddItem(fItems[i], fIndices[i])) {
 			ret = B_NO_MEMORY;
 			break;
 		}
@@ -164,9 +160,9 @@ MovePLItemsCommand::Undo()
 	if (ret < B_OK)
 		return ret;
 
-	// take care about currently played ref
-	if (adjustCurrentRef)
-		fPlaylist->SetCurrentRefIndex(fPlaylist->IndexOf(currentRef));
+	// take care about currently played item
+	if (current != NULL)
+		fPlaylist->SetCurrentItemIndex(fPlaylist->IndexOf(current));
 
 	return B_OK;
 }

@@ -2,8 +2,8 @@
  * Playlist.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
- * Copyright (C) 2008-2009 Fredrik Modéen 	<[FirstName]@[LastName].se> (MIT ok)
+ * Copyright (C) 2007-2009 Stephan Aßmus <superstippi@gmx.de> (MIT ok)
+ * Copyright (C) 2008-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,21 +19,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+
 #include "Playlist.h"
 
 #include <debugger.h>
 #include <new>
 #include <stdio.h>
 
+#include <AppFileInfo.h>
+#include <Application.h>
 #include <Autolock.h>
 #include <Directory.h>
+#include <Entry.h>
 #include <File.h>
 #include <Message.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 
+#include "FilePlaylistItem.h"
 #include "FileReadWrite.h"
 
 using std::nothrow;
@@ -42,19 +48,54 @@ using std::nothrow;
 
 Playlist::Listener::Listener() {}
 Playlist::Listener::~Listener() {}
-void Playlist::Listener::RefAdded(const entry_ref& ref, int32 index) {}
-void Playlist::Listener::RefRemoved(int32 index) {}
-void Playlist::Listener::RefsSorted() {}
-void Playlist::Listener::CurrentRefChanged(int32 newIndex) {}
+void Playlist::Listener::ItemAdded(PlaylistItem* item, int32 index) {}
+void Playlist::Listener::ItemRemoved(int32 index) {}
+void Playlist::Listener::ItemsSorted() {}
+void Playlist::Listener::CurrentItemChanged(int32 newIndex) {}
+
+
+// #pragma mark -
+
+
+static void
+make_item_compare_string(const PlaylistItem* item, char* buffer,
+	size_t bufferSize)
+{
+	// TODO: Maybe "location" would be useful here as well.
+//	snprintf(buffer, bufferSize, "%s - %s - %0*ld - %s",
+//		item->Author().String(),
+//		item->Album().String(),
+//		3, item->TrackNumber(),
+//		item->Title().String());
+	snprintf(buffer, bufferSize, "%s", item->LocationURI().String());
+}
+
+
+static int
+playlist_item_compare(const void* _item1, const void* _item2)
+{
+	// compare complete path
+	const PlaylistItem* item1 = *(const PlaylistItem**)_item1;
+	const PlaylistItem* item2 = *(const PlaylistItem**)_item2;
+
+	static const size_t bufferSize = 1024;
+	char string1[bufferSize];
+	make_item_compare_string(item1, string1, bufferSize);
+	char string2[bufferSize];
+	make_item_compare_string(item2, string2, bufferSize);
+
+	return strcmp(string1, string2);
+}
 
 
 // #pragma mark -
 
 
 Playlist::Playlist()
- :	BLocker("playlist lock")
- ,	fRefs()
- ,	fCurrentIndex(-1)
+	:
+	BLocker("playlist lock"),
+	fItems(),
+ 	fCurrentIndex(-1)
 {
 }
 
@@ -71,7 +112,7 @@ Playlist::~Playlist()
 // #pragma mark - archiving
 
 
-static const char* kPathKey = "path";
+static const char* kItemArchiveKey = "item";
 
 
 status_t
@@ -82,15 +123,21 @@ Playlist::Unarchive(const BMessage* archive)
 
 	MakeEmpty();
 
-	BString path;
-	for (int32 i = 0; archive->FindString(kPathKey, i, &path) == B_OK; i++) {
-		BEntry entry(path.String(), false);
-			// don't follow links, we want to do that when opening files only
-		entry_ref ref;
-		if (entry.GetRef(&ref) != B_OK)
+	BMessage itemArchive;
+	for (int32 i = 0;
+		archive->FindMessage(kItemArchiveKey, i, &itemArchive) == B_OK; i++) {
+
+		BArchivable* archivable = instantiate_object(&itemArchive);
+		PlaylistItem* item = dynamic_cast<PlaylistItem*>(archivable);
+		if (!item) {
+			delete archivable;
 			continue;
-		if (!AddRef(ref))
+		}
+
+		if (!AddItem(item)) {
+			delete item;
 			return B_NO_MEMORY;
+		}
 	}
 
 	return B_OK;
@@ -103,13 +150,14 @@ Playlist::Archive(BMessage* into) const
 	if (into == NULL)
 		return B_BAD_VALUE;
 
-	int32 count = fRefs.CountItems();
+	int32 count = CountItems();
 	for (int32 i = 0; i < count; i++) {
-		const entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
-		BPath path(ref);
-		if (path.InitCheck() != B_OK)
-			continue;
-		status_t ret = into->AddString(kPathKey, path.Path());
+		const PlaylistItem* item = ItemAtFast(i);
+		BMessage itemArchive;
+		status_t ret = item->Archive(&itemArchive);
+		if (ret != B_OK)
+			return ret;
+		ret = into->AddMessage(kItemArchiveKey, &itemArchive);
 		if (ret != B_OK)
 			return ret;
 	}
@@ -145,7 +193,6 @@ Playlist::Unflatten(BDataIO* stream)
 	if (ret != B_OK)
 		return ret;
 
-
 	return Unarchive(&archive);
 }
 
@@ -177,54 +224,51 @@ Playlist::Flatten(BDataIO* stream) const
 
 
 void
-Playlist::MakeEmpty()
+Playlist::MakeEmpty(bool deleteItems)
 {
-	int32 count = fRefs.CountItems();
+	int32 count = CountItems();
 	for (int32 i = count - 1; i >= 0; i--) {
-		entry_ref* ref = (entry_ref*)fRefs.RemoveItem(i);
-		_NotifyRefRemoved(i);
-		delete ref;
+		PlaylistItem* item = RemoveItem(i, false);
+		_NotifyItemRemoved(i);
+		if (deleteItems)
+			item->RemoveReference();
 	}
-	SetCurrentRefIndex(-1);
+	SetCurrentItemIndex(-1);
 }
 
 
 int32
 Playlist::CountItems() const
 {
-	return fRefs.CountItems();
+	return fItems.CountItems();
 }
 
 
 void
 Playlist::Sort()
 {
-	fRefs.SortItems(playlist_cmp);
-	_NotifyRefsSorted();
+	fItems.SortItems(playlist_item_compare);
+	_NotifyItemsSorted();
 }
 
 
 bool
-Playlist::AddRef(const entry_ref &ref)
+Playlist::AddItem(PlaylistItem* item)
 {
-	return AddRef(ref, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
 bool
-Playlist::AddRef(const entry_ref &ref, int32 index)
+Playlist::AddItem(PlaylistItem* item, int32 index)
 {
-	entry_ref* copy = new (nothrow) entry_ref(ref);
-	if (!copy)
+	if (!fItems.AddItem(item, index))
 		return false;
-	if (!fRefs.AddItem(copy, index)) {
-		delete copy;
-		return false;
-	}
-	_NotifyRefAdded(ref, index);
 
 	if (index <= fCurrentIndex)
-		SetCurrentRefIndex(fCurrentIndex + 1);
+		SetCurrentItemIndex(fCurrentIndex + 1);
+
+	_NotifyItemAdded(item, index);
 
 	return true;
 }
@@ -244,85 +288,68 @@ Playlist::AdoptPlaylist(Playlist& other, int32 index)
 		return false;
 	// NOTE: this is not intended to merge two "equal" playlists
 	// the given playlist is assumed to be a temporary "dummy"
-	if (fRefs.AddList(&other.fRefs, index)) {
+	if (fItems.AddList(&other.fItems, index)) {
 		// take care of the notifications
-		int32 count = other.fRefs.CountItems();
+		int32 count = other.CountItems();
 		for (int32 i = index; i < index + count; i++) {
-			entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
-			_NotifyRefAdded(*ref, i);
+			PlaylistItem* item = ItemAtFast(i);
+			_NotifyItemAdded(item, i);
 		}
 		if (index <= fCurrentIndex)
-			SetCurrentRefIndex(fCurrentIndex + count);
-		// empty the other list, so that the entry_refs are now ours
-		other.fRefs.MakeEmpty();
+			SetCurrentItemIndex(fCurrentIndex + count);
+		// empty the other list, so that the PlaylistItems are now ours
+		other.fItems.MakeEmpty();
 		return true;
 	}
 	return false;
 }
 
 
-entry_ref
-Playlist::RemoveRef(int32 index, bool careAboutCurrentIndex)
+PlaylistItem*
+Playlist::RemoveItem(int32 index, bool careAboutCurrentIndex)
 {
-	entry_ref _ref;
-	entry_ref* ref = (entry_ref*)fRefs.RemoveItem(index);
-	if (!ref)
-		return _ref;
-	_NotifyRefRemoved(index);
-	_ref = *ref;
-	delete ref;
+	PlaylistItem* item = (PlaylistItem*)fItems.RemoveItem(index);
+	if (!item)
+		return NULL;
+	_NotifyItemRemoved(index);
 
 	if (careAboutCurrentIndex) {
-		if (index == fCurrentIndex)
-			SetCurrentRefIndex(-1);
+		if (index == fCurrentIndex && index >= CountItems())
+			SetCurrentItemIndex(CountItems() - 1);
 		else if (index < fCurrentIndex)
-			SetCurrentRefIndex(fCurrentIndex - 1);
+			SetCurrentItemIndex(fCurrentIndex - 1);
 	}
 
-	return _ref;
+	return item;
 }
 
 
 int32
-Playlist::IndexOf(const entry_ref& _ref) const
+Playlist::IndexOf(PlaylistItem* item) const
 {
-	int32 count = CountItems();
-	for (int32 i = 0; i < count; i++) {
-		entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
-		if (*ref == _ref)
-			return i;
-	}
-	return -1;
+	return fItems.IndexOf(item);
 }
 
 
-status_t
-Playlist::GetRefAt(int32 index, entry_ref* _ref) const
+PlaylistItem*
+Playlist::ItemAt(int32 index) const
 {
-	if (!_ref)
-		return B_BAD_VALUE;
-	entry_ref* ref = (entry_ref*)fRefs.ItemAt(index);
-	if (!ref)
-		return B_BAD_INDEX;
-	*_ref = *ref;
-
-	return B_OK;
+	return (PlaylistItem*)fItems.ItemAt(index);
 }
 
 
-//bool
-//Playlist::HasRef(const entry_ref& ref) const
-//{
-//	return IndexOf(ref) >= 0;
-//}
-
+PlaylistItem*
+Playlist::ItemAtFast(int32 index) const
+{
+	return (PlaylistItem*)fItems.ItemAtFast(index);
+}
 
 
 // #pragma mark - navigation
 
 
 bool
-Playlist::SetCurrentRefIndex(int32 index)
+Playlist::SetCurrentItemIndex(int32 index)
 {
 	bool result = true;
 	if (index >= CountItems() || index < 0) {
@@ -334,13 +361,13 @@ Playlist::SetCurrentRefIndex(int32 index)
 		return result;
 
 	fCurrentIndex = index;
-	_NotifyCurrentRefChanged(fCurrentIndex);
+	_NotifyCurrentItemChanged(fCurrentIndex);
 	return result;
 }
 
 
 int32
-Playlist::CurrentRefIndex() const
+Playlist::CurrentItemIndex() const
 {
 	return fCurrentIndex;
 }
@@ -377,7 +404,7 @@ Playlist::RemoveListener(Listener* listener)
 }
 
 
-// #pragma mark -
+// #pragma mark - support
 
 
 void
@@ -409,7 +436,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 			sortPlaylist = false;
 		} else {
 			AppendToPlaylistRecursive(ref, &subPlaylist);
-			// At least sort the this subsection of the playlist
+			// At least sort this subsection of the playlist
 			// if the whole playlist is not sorted anymore.
 			if (!sortPlaylist)
 				subPlaylist.Sort();
@@ -426,7 +453,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 	if (startPlaying) {
 		// open first file
-		SetCurrentRefIndex(0);
+		SetCurrentItemIndex(0);
 	}
 }
 
@@ -448,11 +475,11 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		while (dir.GetNextRef(&subRef) == B_OK)
 			AppendToPlaylistRecursive(subRef, playlist);
 	} else if (entry.IsFile()) {
-		//printf("Is File\n");
 		BString mimeString = _MIMEString(&ref);
 		if (_IsMediaFile(mimeString)) {
-			//printf("Adding\n");
-			playlist->AddRef(ref);
+			PlaylistItem* item = new (std::nothrow) FilePlaylistItem(ref);
+			if (item == NULL || !playlist->AddItem(item))
+				delete item;
 		} else
 			printf("MIME Type = %s\n", mimeString.String());
 	}
@@ -483,7 +510,10 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 			printf("Line %s\n", path.Path());
 			if (path.Path() != NULL) {
 				if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
-					playlist->AddRef(refPath);
+					PlaylistItem* item
+						= new (std::nothrow) FilePlaylistItem(refPath);
+					if (item == NULL || !playlist->AddItem(item))
+						delete item;
 				} else
 					printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
 			} else
@@ -498,21 +528,7 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 }
 
 
-// #pragma mark -
-
-
-int
-Playlist::playlist_cmp(const void *p1, const void *p2)
-{
-	// compare complete path
-	BEntry a(*(const entry_ref **)p1, false);
-	BEntry b(*(const entry_ref **)p2, false);
-
-	BPath aPath(&a);
-	BPath bPath(&b);
-
-	return strcmp(aPath.Path(), bPath.Path());
-}
+// #pragma mark - private
 
 
 /*static*/ bool
@@ -524,10 +540,29 @@ Playlist::_IsMediaFile(const BString& mimeString)
 	if (fileType.GetSupertype(&superType) != B_OK)
 		return false;
 
-	// TODO: some media files have other super types, I think
-	// for example ASF has "application" super type... so it would
-	// need special handling
-	return (superType == "audio" || superType == "video");
+	// try a shortcut first
+	if (superType == "audio" || superType == "video")
+		return true;
+
+	// Look through our supported types
+	app_info appInfo;
+	if (be_app->GetAppInfo(&appInfo) != B_OK)
+		return false;
+	BFile appFile(&appInfo.ref, B_READ_ONLY);
+	if (appFile.InitCheck() != B_OK)
+		return false;
+	BMessage types;
+	BAppFileInfo appFileInfo(&appFile);
+	if (appFileInfo.GetSupportedTypes(&types) != B_OK)
+		return false;
+
+	const char* type;
+	for (int32 i = 0; types.FindString("types", i, &type) == B_OK; i++) {
+		if (strcasecmp(mimeString.String(), type) == 0)
+			return true;
+	}
+
+	return false;
 }
 
 
@@ -570,50 +605,53 @@ Playlist::_MIMEString(const entry_ref* ref)
 }
 
 
+// #pragma mark - notifications
+
+
 void
-Playlist::_NotifyRefAdded(const entry_ref& ref, int32 index) const
+Playlist::_NotifyItemAdded(PlaylistItem* item, int32 index) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
-		listener->RefAdded(ref, index);
+		listener->ItemAdded(item, index);
 	}
 }
 
 
 void
-Playlist::_NotifyRefRemoved(int32 index) const
+Playlist::_NotifyItemRemoved(int32 index) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
-		listener->RefRemoved(index);
+		listener->ItemRemoved(index);
 	}
 }
 
 
 void
-Playlist::_NotifyRefsSorted() const
+Playlist::_NotifyItemsSorted() const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
-		listener->RefsSorted();
+		listener->ItemsSorted();
 	}
 }
 
 
 void
-Playlist::_NotifyCurrentRefChanged(int32 newIndex) const
+Playlist::_NotifyCurrentItemChanged(int32 newIndex) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
-		listener->CurrentRefChanged(newIndex);
+		listener->CurrentItemChanged(newIndex);
 	}
 }
 

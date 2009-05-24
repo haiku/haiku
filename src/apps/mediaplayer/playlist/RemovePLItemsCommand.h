@@ -1,21 +1,15 @@
 /*
- * Copyright 2007-2009, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2007-2009 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef REMOVE_PL_ITEMS_COMMAND_H
 #define REMOVE_PL_ITEMS_COMMAND_H
 
 
-#include "Command.h"
+#include "PLItemsCommand.h"
 
-struct entry_ref;
-class Playlist;
-
-class RemovePLItemsCommand : public Command {
- public:
+class RemovePLItemsCommand : public PLItemsCommand {
+public:
 								RemovePLItemsCommand(
 									Playlist* playlist,
 									const int32* indices,
@@ -30,14 +24,14 @@ class RemovePLItemsCommand : public Command {
 
 	virtual void				GetName(BString& name);
 
- private:
+private:
 			Playlist*			fPlaylist;
-			entry_ref*			fRefs;
-			BString*			fNamesInTrash;
+			PlaylistItem**		fItems;
 			int32*				fIndices;
 			int32				fCount;
 			bool				fMoveFilesToTrash;
 			bool				fMoveErrorShown;
+			bool				fItemsRemoved;
 };
 
 #endif // REMOVE_PL_ITEMS_COMMAND_H

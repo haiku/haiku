@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PlaylistObserver.h"
@@ -24,10 +21,10 @@ PlaylistObserver::~PlaylistObserver()
 
 
 void
-PlaylistObserver::RefAdded(const entry_ref& ref, int32 index)
+PlaylistObserver::ItemAdded(PlaylistItem* item, int32 index)
 {
-	BMessage message(MSG_PLAYLIST_REF_ADDED);
-	message.AddRef("refs", &ref);
+	BMessage message(MSG_PLAYLIST_ITEM_ADDED);
+	message.AddPointer("item", item);
 	message.AddInt32("index", index);
 
 	DeliverMessage(message);
@@ -35,9 +32,9 @@ PlaylistObserver::RefAdded(const entry_ref& ref, int32 index)
 
 
 void
-PlaylistObserver::RefRemoved(int32 index)
+PlaylistObserver::ItemRemoved(int32 index)
 {
-	BMessage message(MSG_PLAYLIST_REF_REMOVED);
+	BMessage message(MSG_PLAYLIST_ITEM_REMOVED);
 	message.AddInt32("index", index);
 
 	DeliverMessage(message);
@@ -45,18 +42,18 @@ PlaylistObserver::RefRemoved(int32 index)
 
 
 void
-PlaylistObserver::RefsSorted()
+PlaylistObserver::ItemsSorted()
 {
-	BMessage message(MSG_PLAYLIST_REFS_SORTED);
+	BMessage message(MSG_PLAYLIST_ITEMS_SORTED);
 
 	DeliverMessage(message);
 }
 
 
 void
-PlaylistObserver::CurrentRefChanged(int32 newIndex)
+PlaylistObserver::CurrentItemChanged(int32 newIndex)
 {
-	BMessage message(MSG_PLAYLIST_CURRENT_REF_CHANGED);
+	BMessage message(MSG_PLAYLIST_CURRENT_ITEM_CHANGED);
 	message.AddInt32("index", newIndex);
 
 	DeliverMessage(message);
