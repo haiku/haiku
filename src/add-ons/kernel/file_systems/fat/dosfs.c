@@ -1033,8 +1033,6 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			buffer = diri_init(vol, vol->root_vnode.cluster, vol->vol_entry, &diri);
 
 			// check if it is the same as the old volume label
-			dprintf("buffer = %s\n", buffer);
-			dprintf("vol->vol_label = %s\n", vol->vol_label);
 			if ((buffer == NULL) || (strncmp(buffer, vol->vol_label, 11) == 0)) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				diri_free(&diri);
