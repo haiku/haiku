@@ -450,8 +450,6 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 			// if the region still contains any rects
 			// offset to source location again
 			region->OffsetBy(-xOffset, -yOffset);
-			// the part which we can copy is not dirty
-			newDirty->Exclude(region);
 
 			BRegion* allDirtyRegions = fRegionPool.GetRegion(fDirtyRegion);
 			if (allDirtyRegions != NULL) {
@@ -476,13 +474,12 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 
 				fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
 
+				// Prevent those parts from being added to the dirty region...
+				newDirty->Exclude(copyRegion);
+
 				// The parts that could be copied are not dirty (at the
 				// target location!)
 				copyRegion->OffsetBy(xOffset, yOffset);
-				// Prevent those parts to being transfered to the dirty
-				// region...
-				if (allDirtyRegions != NULL)
-					allDirtyRegions->Exclude(copyRegion);
 				// ... and even exclude them from the pending dirty region!
 				if (fPendingUpdateSession->IsUsed())
 					fPendingUpdateSession->DirtyRegion().Exclude(copyRegion);
@@ -493,26 +490,8 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
 			}
 
-			if (allDirtyRegions != NULL) {
-				// Move along the dirty regions and include it in the newDirty
-				// region. TODO: This is disabled for the moment, since it
-				// works fine without excluding the pending region. But there
-				// is one occasion where I observed flickering that could be
-				// explained by disabling this.
-				//allDirtyRegions->OffsetBy(xOffset, yOffset);
-				//// no need to include what's already pending anyways
-				//// NOTE: The left overs of the current update session which
-				//// have been moved are still included!
-				//if (fPendingUpdateSession->IsUsed()) {
-					//allDirtyRegions->Exclude(
-						//&fPendingUpdateSession->DirtyRegion());
-				//}
-				//allDirtyRegions->OffsetBy(-xOffset, -yOffset);
-				// include the left over of the moved dirty regions in the
-				// new dirty region
-				newDirty->Include(allDirtyRegions);
+			if (allDirtyRegions != NULL)
 				fRegionPool.Recycle(allDirtyRegions);
-			}
 		}
 	}
 	// what is left visible from the original region
