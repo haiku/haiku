@@ -633,7 +633,10 @@ UnixEndpoint::Receivable()
 		RETURN_ERROR(ENOTCONN);
 
 	UnixFifoLocker fifoLocker(fReceiveFifo);
-	RETURN_ERROR(fReceiveFifo->Readable());
+	ssize_t readable = fReceiveFifo->Readable();
+	if (readable == 0 && fReceiveFifo->IsWriteShutdown())
+		RETURN_ERROR(ENOTCONN);
+	RETURN_ERROR(readable);
 }
 
 
