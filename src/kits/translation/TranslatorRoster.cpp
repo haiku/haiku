@@ -13,13 +13,12 @@
 	object with the translators that the apps need to access.
 */
 
+#include <TranslatorRoster.h>
 
-#include "FuncTranslator.h"
-#include "TranslatorRosterPrivate.h"
-
-#include <driver_settings.h>
-#include <image.h>
-#include <safemode_defs.h>
+#include <new>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Application.h>
 #include <Autolock.h>
@@ -28,23 +27,26 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <String.h>
-#include <TranslatorRoster.h>
 
-#include <new>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <driver_settings.h>
+#include <image.h>
+#include <safemode_defs.h>
+
+#include "FuncTranslator.h"
+#include "TranslatorRosterPrivate.h"
+
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-extern "C" status_t _kern_get_safemode_option(const char *parameter,
-        char *buffer, size_t *_bufferSize);
+extern "C" status_t _kern_get_safemode_option(const char* parameter,
+        char* buffer, size_t* _bufferSize);
 #else
-extern "C" status_t _kget_safemode_option_(const char *parameter,
-        char *buffer, size_t *_bufferSize);
+extern "C" status_t _kget_safemode_option_(const char* parameter,
+        char* buffer, size_t* _bufferSize);
 #endif
 
 
-#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) \
+	&& !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 // building under R5 or Dano/Zeta
 enum {
 	B_TRANSLATOR_ADDED			= '_ART',
@@ -55,17 +57,18 @@ enum {
 namespace BPrivate {
 
 class QuarantineTranslatorImage {
-	public:
-		QuarantineTranslatorImage(BTranslatorRoster::Private& privateRoster);
-		~QuarantineTranslatorImage();
+public:
+								QuarantineTranslatorImage(
+									BTranslatorRoster::Private& privateRoster);
+								~QuarantineTranslatorImage();
 
-		void Put(const entry_ref& ref);
-		void Remove();
+			void				Put(const entry_ref& ref);
+			void				Remove();
 
-	private:
-		BTranslatorRoster::Private& fRoster;
-		entry_ref	fRef;
-		bool		fRemove;
+private:
+			BTranslatorRoster::Private& fRoster;
+			entry_ref			fRef;
+			bool				fRemove;
 };
 
 }	// namespace BPrivate
@@ -91,14 +94,16 @@ namespace BPrivate {
 
 /*!
 	The purpose of this class is to put a translator entry_ref into - and remove
-	it from the list of translators on destruction (if Remove() was called before).
+	it from the list of translators on destruction (if Remove() was called
+	before).
 
 	This is used in Private::CreateTranslators() in case a translator hides a
-	previous one (ie. if you install a translator in the user's translators directory
-	that has the same name as one in the system's directory, it will hide this
-	entry).
+	previous one (ie. if you install a translator in the user's translators
+	directory that has the same name as one in the system's directory, it will
+	hide this entry).
 */
-QuarantineTranslatorImage::QuarantineTranslatorImage(BTranslatorRoster::Private& privateRoster)
+QuarantineTranslatorImage::QuarantineTranslatorImage(
+	BTranslatorRoster::Private& privateRoster)
 	:
 	fRoster(privateRoster),
 	fRemove(false)
@@ -135,7 +140,8 @@ QuarantineTranslatorImage::Remove()
 
 
 BTranslatorRoster::Private::Private()
-	: BHandler("translator roster"), BLocker("translator list"),
+	:
+	BHandler("translator roster"), BLocker("translator list"),
 	fNextID(1),
 	fLazyScanning(true),
 	fSafeMode(false)
@@ -145,9 +151,11 @@ BTranslatorRoster::Private::Private()
 	size_t parameterLength = sizeof(parameter);
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK)
 #else
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK)
 #endif
 	{
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
@@ -157,9 +165,11 @@ BTranslatorRoster::Private::Private()
 	}
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
+			&parameterLength) == B_OK)
 #else
-	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
+	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
+			&parameterLength) == B_OK)
 #endif
 	{
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
@@ -235,13 +245,15 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 					const char* name;
 					node_ref nodeRef;
 					if (message->FindInt32("device", &nodeRef.device) != B_OK
-						|| message->FindInt64("directory", &nodeRef.node) != B_OK
+						|| message->FindInt64("directory", &nodeRef.node)
+							!= B_OK
 						|| message->FindString("name", &name) != B_OK)
 						break;
 
 					// TODO: make this better (possible under Haiku)
 					snooze(100000);
-						// let the font be written completely before trying to open it
+						// let the font be written completely before trying to
+						// open it
 
 					_EntryAdded(nodeRef, name);
 					break;
@@ -249,17 +261,20 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 
 				case B_ENTRY_MOVED:
 				{
-					// has the entry been moved into a monitored directory or has
-					// it been removed from one?
+					// has the entry been moved into a monitored directory or
+					// has it been removed from one?
 					const char* name;
 					node_ref toNodeRef;
 					node_ref fromNodeRef;
 					node_ref nodeRef;
 
 					if (message->FindInt32("device", &nodeRef.device) != B_OK
-						|| message->FindInt64("to directory", &toNodeRef.node) != B_OK
-						|| message->FindInt64("from directory", (int64 *)&fromNodeRef.node) != B_OK
-						|| message->FindInt64("node", (int64 *)&nodeRef.node) != B_OK
+						|| message->FindInt64("to directory", &toNodeRef.node)
+							!= B_OK
+						|| message->FindInt64("from directory",
+							(int64*)&fromNodeRef.node) != B_OK
+						|| message->FindInt64("node", (int64*)&nodeRef.node)
+							!= B_OK
 						|| message->FindString("name", &name) != B_OK)
 						break;
 
@@ -287,9 +302,9 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 
 					if (_IsKnownDirectory(fromNodeRef)
 						&& _IsKnownDirectory(toNodeRef)) {
-						// TODO: we should rescan for the name, there might be name
-						//	clashes with translators in other directories
-						//	(as well as old ones revealed)
+						// TODO: we should rescan for the name, there might be
+						// name clashes with translators in other directories
+						// (as well as old ones revealed)
 						break;
 					}
 					break;
@@ -300,7 +315,8 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 					node_ref nodeRef;
 					uint64 directoryNode;
 					if (message->FindInt32("device", &nodeRef.device) != B_OK
-						|| message->FindInt64("directory", (int64 *)&directoryNode) != B_OK
+						|| message->FindInt64("directory",
+							(int64*)&directoryNode) != B_OK
 						|| message->FindInt64("node", &nodeRef.node) != B_OK)
 						break;
 
@@ -330,7 +346,8 @@ BTranslatorRoster::Private::AddDefaultPaths()
 		B_BEOS_ADDONS_DIRECTORY,
 	};
 
-	for (uint32 i = fSafeMode ? 1 : 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+	for (uint32 i = fSafeMode ? 1 : 0; i < sizeof(paths) / sizeof(paths[0]);
+			i++) {
 		BPath path;
 		status_t status = find_directory(paths[i], &path, true);
 		if (status == B_OK && path.Append("Translators") == B_OK) {
@@ -487,7 +504,8 @@ BTranslatorRoster::Private::FindTranslator(translator_id id)
 
 
 status_t
-BTranslatorRoster::Private::GetTranslatorData(image_id image, translator_data& data)
+BTranslatorRoster::Private::GetTranslatorData(image_id image,
+	translator_data& data)
 {
 	// If this is a translator add-on, it is in the C format
 	memset(&data, 0, sizeof(translator_data));
@@ -495,28 +513,38 @@ BTranslatorRoster::Private::GetTranslatorData(image_id image, translator_data& d
 	// find all the symbols
 
 	int32* version;
-	if (get_image_symbol(image, "translatorName", B_SYMBOL_TYPE_DATA, (void**)&data.name) < B_OK
-		|| get_image_symbol(image, "translatorInfo", B_SYMBOL_TYPE_DATA, (void**)&data.info) < B_OK
-		|| get_image_symbol(image, "translatorVersion", B_SYMBOL_TYPE_DATA, (void**)&version) < B_OK || version == NULL
-		|| get_image_symbol(image, "inputFormats", B_SYMBOL_TYPE_DATA, (void**)&data.input_formats) < B_OK
-		|| get_image_symbol(image, "outputFormats", B_SYMBOL_TYPE_DATA, (void**)&data.output_formats) < B_OK
-		|| get_image_symbol(image, "Identify", B_SYMBOL_TYPE_TEXT, (void**)&data.identify_hook) < B_OK
-		|| get_image_symbol(image, "Translate", B_SYMBOL_TYPE_TEXT, (void**)&data.translate_hook) < B_OK)
+	if (get_image_symbol(image, "translatorName", B_SYMBOL_TYPE_DATA,
+			(void**)&data.name) < B_OK
+		|| get_image_symbol(image, "translatorInfo", B_SYMBOL_TYPE_DATA,
+			(void**)&data.info) < B_OK
+		|| get_image_symbol(image, "translatorVersion", B_SYMBOL_TYPE_DATA,
+			(void**)&version) < B_OK || version == NULL
+		|| get_image_symbol(image, "inputFormats", B_SYMBOL_TYPE_DATA,
+			(void**)&data.input_formats) < B_OK
+		|| get_image_symbol(image, "outputFormats", B_SYMBOL_TYPE_DATA,
+			(void**)&data.output_formats) < B_OK
+		|| get_image_symbol(image, "Identify", B_SYMBOL_TYPE_TEXT,
+			(void**)&data.identify_hook) < B_OK
+		|| get_image_symbol(image, "Translate", B_SYMBOL_TYPE_TEXT,
+			(void**)&data.translate_hook) < B_OK) {
 		return B_BAD_TYPE;
+	}
 
 	data.version = *version;
 
 	// those calls are optional
-	get_image_symbol(image, "MakeConfig", B_SYMBOL_TYPE_TEXT, (void**)&data.make_config_hook);
-	get_image_symbol(image, "GetConfigMessage", B_SYMBOL_TYPE_TEXT, (void**)&data.get_config_message_hook);
+	get_image_symbol(image, "MakeConfig", B_SYMBOL_TYPE_TEXT,
+		(void**)&data.make_config_hook);
+	get_image_symbol(image, "GetConfigMessage", B_SYMBOL_TYPE_TEXT,
+		(void**)&data.get_config_message_hook);
 
 	return B_OK;
 }
 
 
 status_t
-BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count,
-	BMessage* update)
+BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref,
+	int32& count, BMessage* update)
 {
 	BAutolock locker(this);
 
@@ -556,7 +584,8 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 		// until MakeNthTranslator stops returning them.
 		BTranslator* translator = NULL;
 		int32 created = 0;
-		for (int32 n = 0; (translator = makeNthTranslator(n, image, 0)) != NULL; n++) {
+		for (int32 n = 0; (translator = makeNthTranslator(n, image, 0)) != NULL;
+				n++) {
 			if (AddTranslator(translator, image, &ref, nodeRef.node) == B_OK) {
 				if (update)
 					update->AddInt32("translator_id", translator->fID);
@@ -582,7 +611,8 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 	// add this translator to the list
 	BPrivate::BFuncTranslator* translator = NULL;
 	if (status == B_OK) {
-		translator = new (std::nothrow) BPrivate::BFuncTranslator(translatorData);
+		translator = new (std::nothrow) BPrivate::BFuncTranslator(
+			translatorData);
 		if (translator == NULL)
 			status = B_NO_MEMORY;
 	}
@@ -688,13 +718,15 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 			return pos < 0 ? (status_t)pos : B_IO_ERROR;
 
 		int32 formatsCount = 0;
-		const translation_format* formats = translator.InputFormats(&formatsCount);
-		const translation_format* format = _CheckHints(formats, formatsCount, hintType,
-			hintMIME);
+		const translation_format* formats = translator.InputFormats(
+			&formatsCount);
+		const translation_format* format = _CheckHints(formats, formatsCount,
+			hintType, hintMIME);
 
 		BMessage extension(baseExtension);
 		translator_info info;
-		if (translator.Identify(source, format, &extension, &info, wantType) == B_OK) {
+		if (translator.Identify(source, format, &extension, &info, wantType)
+				== B_OK) {
 			float weight = info.quality * info.capability;
 			if (weight > bestWeight) {
 				if (ioExtension != NULL)
@@ -743,12 +775,14 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 		}
 
 		int32 formatsCount = 0;
-		const translation_format* formats = translator.InputFormats(&formatsCount);
-		const translation_format* format = _CheckHints(formats, formatsCount, hintType,
-			hintMIME);
+		const translation_format* formats = translator.InputFormats(
+			&formatsCount);
+		const translation_format* format = _CheckHints(formats, formatsCount,
+			hintType, hintMIME);
 
 		translator_info info;
-		if (translator.Identify(source, format, ioExtension, &info, wantType) == B_OK) {
+		if (translator.Identify(source, format, ioExtension, &info, wantType)
+				== B_OK) {
 			info.translator = iterator->first;
 			array[count++] = info;
 		}
@@ -758,7 +792,8 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 
 	*_info = array;
 	*_numInfo = count;
-	qsort(array, count, sizeof(translator_info), BTranslatorRoster::Private::_CompareSupport);
+	qsort(array, count, sizeof(translator_info),
+		BTranslatorRoster::Private::_CompareSupport);
 		// translators are sorted by best support
 
 	return B_OK;
@@ -766,7 +801,8 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 
 
 status_t
-BTranslatorRoster::Private::GetAllTranslators(translator_id** _ids, int32* _count)
+BTranslatorRoster::Private::GetAllTranslators(translator_id** _ids,
+	int32* _count)
 {
 	BAutolock locker(this);
 
@@ -971,8 +1007,8 @@ BTranslatorRoster::Private::_FindTranslator(node_ref& nodeRef)
 	chosen.
 */
 int32
-BTranslatorRoster::Private::_CompareTranslatorDirectoryPriority(const entry_ref& a,
-	const entry_ref& b) const
+BTranslatorRoster::Private::_CompareTranslatorDirectoryPriority(
+	const entry_ref& a, const entry_ref& b) const
 {
 	// priority is determined by the order in the list
 
@@ -1057,7 +1093,8 @@ BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef,
 
 
 void
-BTranslatorRoster::Private::_EntryAdded(const node_ref& nodeRef, const char* name)
+BTranslatorRoster::Private::_EntryAdded(const node_ref& nodeRef,
+	const char* name)
 {
 	entry_ref ref;
 	ref.device = nodeRef.device;
@@ -1123,7 +1160,8 @@ BTranslatorRoster::BTranslatorRoster(BMessage* model)
 
 	if (model) {
 		const char* path;
-		for (int32 i = 0; model->FindString("be:translator_path", i, &path) == B_OK; i++) {
+		for (int32 i = 0;
+			model->FindString("be:translator_path", i, &path) == B_OK; i++) {
 			BEntry entry(path);
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK) {
@@ -1165,7 +1203,7 @@ BTranslatorRoster::Archive(BMessage* into, bool deep) const
 }
 
 
-BArchivable *
+BArchivable*
 BTranslatorRoster::Instantiate(BMessage* from)
 {
 	if (!from || !validate_instantiation(from, "BTranslatorRoster"))
@@ -1175,7 +1213,7 @@ BTranslatorRoster::Instantiate(BMessage* from)
 }
 
 
-BTranslatorRoster *
+BTranslatorRoster*
 BTranslatorRoster::Default()
 {
 	static int32 lock = 0;
@@ -1265,7 +1303,7 @@ BTranslatorRoster::IsTranslator(entry_ref* ref)
 		return false;
 
 	// Function pointer used to create post R4.5 style translators
-	BTranslator *(*makeNthTranslator)(int32 n, image_id you, uint32 flags, ...);
+	BTranslator* (*makeNthTranslator)(int32 n, image_id you, uint32 flags, ...);
 
 	status_t status = get_image_symbol(image, "make_nth_translator",
 		B_SYMBOL_TYPE_TEXT, (void**)&makeNthTranslator);
@@ -1305,7 +1343,8 @@ BTranslatorRoster::Identify(BPositionIO* source, BMessage* ioExtension,
 	if (source == NULL || _info == NULL)
 		return B_BAD_VALUE;
 
-	return fPrivate->Identify(source, ioExtension, hintType, hintMIME, wantType, _info);
+	return fPrivate->Identify(source, ioExtension, hintType, hintMIME, wantType,
+		_info);
 }
 
 
@@ -1509,8 +1548,8 @@ BTranslatorRoster::Translate(BPositionIO* source, const translator_info* info,
 	BTranslator* translator = fPrivate->FindTranslator(info->translator);
 	if (translator != NULL) {
 		translator->Acquire();
-			// make sure this translator is not removed while we're playing with it;
-			// translating shouldn't be serialized!
+			// make sure this translator is not removed while we're playing with
+			// it; translating shouldn't be serialized!
 	}
 
 	fPrivate->Unlock();
@@ -1561,8 +1600,8 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator != NULL) {
 		translator->Acquire();
-			// make sure this translator is not removed while we're playing with it;
-			// translating shouldn't be serialized!
+			// make sure this translator is not removed while we're playing with
+			// it; translating shouldn't be serialized!
 	}
 
 	fPrivate->Unlock();
@@ -1574,14 +1613,15 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 	off_t pos = source->Seek(0, SEEK_SET);
 	if (pos == 0) {
 		translator_info info;
-		status = translator->Identify(source, NULL, ioExtension, &info, wantOutType);
+		status = translator->Identify(source, NULL, ioExtension, &info,
+			wantOutType);
 		if (status >= B_OK) {
 			off_t pos = source->Seek(0, SEEK_SET);
 			if (pos != 0)
 				status = pos < 0 ? (status_t)pos : B_IO_ERROR;
 			else {
-				status = translator->Translate(source, &info, ioExtension, wantOutType,
-					destination);
+				status = translator->Translate(source, &info, ioExtension,
+					wantOutType, destination);
 			}
 		}
 	} else
@@ -1606,8 +1646,8 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 		B_NO_TRANSLATOR, \id didn't identify an existing translator
 */
 status_t
-BTranslatorRoster::MakeConfigurationView(translator_id id, BMessage* ioExtension,
-	BView** _view, BRect* _extent)
+BTranslatorRoster::MakeConfigurationView(translator_id id,
+	BMessage* ioExtension, BView** _view, BRect* _extent)
 {
 	if (_view == NULL || _extent == NULL)
 		return B_BAD_VALUE;
@@ -1634,7 +1674,8 @@ BTranslatorRoster::MakeConfigurationView(translator_id id, BMessage* ioExtension
 		B_NO_TRANSLATOR, \id didn't identify an existing translator
 */
 status_t
-BTranslatorRoster::GetConfigurationMessage(translator_id id, BMessage* ioExtension)
+BTranslatorRoster::GetConfigurationMessage(translator_id id,
+	BMessage* ioExtension)
 {
 	if (!ioExtension)
 		return B_BAD_VALUE;
@@ -1713,9 +1754,9 @@ BTranslatorRoster::Version(int32* outCurVersion, int32* outMinVersion,
 	static char vDate[] = __DATE__;
 	if (!vString[0]) {
 		sprintf(vString, "Translation Kit v%d.%d.%d %s\n",
-			static_cast<int>(B_TRANSLATION_MAJOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
-			static_cast<int>(B_TRANSLATION_MINOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
-			static_cast<int>(B_TRANSLATION_REVISION_VERSION(B_TRANSLATION_CURRENT_VERSION)),
+			int(B_TRANSLATION_MAJOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
+			int(B_TRANSLATION_MINOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
+			int(B_TRANSLATION_REVISION_VERSION(B_TRANSLATION_CURRENT_VERSION)),
 			vDate);
 	}
 	*outCurVersion = B_TRANSLATION_CURRENT_VERSION;
