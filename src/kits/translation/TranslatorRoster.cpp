@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1700,8 +1700,10 @@ BTranslatorRoster::operator=(const BTranslatorRoster &tr)
 }
 
 
-const char *
-Version__17BTranslatorRosterPlT1l(int32 *outCurVersion, int32 *outMinVersion,
+#if __GNUC__ == 2	// gcc 2
+
+/*static*/ const char*
+BTranslatorRoster::Version(int32* outCurVersion, int32* outMinVersion,
 	int32 inAppVersion)
 {
 	if (!outCurVersion || !outMinVersion)
@@ -1720,6 +1722,8 @@ Version__17BTranslatorRosterPlT1l(int32 *outCurVersion, int32 *outMinVersion,
 	*outMinVersion = B_TRANSLATION_MIN_VERSION;
 	return vString;
 }
+
+#endif	// gcc 2
 
 
 void BTranslatorRoster::ReservedTranslatorRoster1() {}

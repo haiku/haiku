@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TRANSLATOR_ROSTER_H
@@ -41,7 +41,7 @@ class BTranslatorRoster : public BArchivable {
 			const char* hintMIME = NULL, uint32 wantType = 0);
 
 		virtual status_t GetTranslators(BPositionIO* source,
-			BMessage* ioExtension, translator_info** _info, int32* _numInfo, 
+			BMessage* ioExtension, translator_info** _info, int32* _numInfo,
 			uint32 hintType = 0, const char* hintMIME = NULL,
 			uint32 wantType = 0);
 
@@ -93,6 +93,10 @@ class BTranslatorRoster : public BArchivable {
 		virtual	void ReservedTranslatorRoster6();
 
 		void _Initialize();
+
+		static const char* Version(int32* outCurVersion, int32* outMinVersion,
+			int32 inAppVersion);
+				// for backward compatiblity only
 
 	private:
 		friend class Private;
