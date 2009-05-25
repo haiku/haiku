@@ -36,7 +36,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd
 	funzip fwcontrol
-	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe 
+	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe
 	hd head hey hostname
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
@@ -534,48 +534,9 @@ CopyDirectoryToHaikuImage system data
 #pragma mark - Alternative GCC Libraries
 
 
-# build a zip file with the system libs
-# (used by another jam that wants to build a Haiku with alternative GCC
-# libraries included)
-
-rule ZipTargets zipFile : targets
-{
-	Depends $(zipFile) : <build>zip $(targets) ;
-	ZipTargets1 $(zipFile) : <build>zip $(targets) ;
-}
-
-actions ZipTargets1
-{
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(RM) "$(1)"
-	$(2[1]) -jy "$(1)" $(2[2-])
-}
-
-local alternativeSystemLibsZip = <image>alternative_system_libs.zip ;
-MakeLocate $(alternativeSystemLibsZip) : $(HAIKU_OUTPUT_DIR) ;
-
-# collect the targets we would install in the lib directory
-local alternativeSystemLibs ;
-local libTargets = [ FFilesInHaikuImageDirectory system lib ] ;
-local libTarget ;
-for libTarget in $(libTargets) {
-	alternativeSystemLibs += [ on $(libTarget) return $(TARGET) ] ;
-}
-
-# collect the symlinks we would install in the lib directory
-libTargets = [ FSymlinksInHaikuImageDirectory system lib ] ;
-local tmpAlternativeLibDir
-	= [ FDirName $(HAIKU_OUTPUT_DIR) tmp alternativeLibs ] ;
-for libTarget in $(libTargets) {
-	# We need to create actual symlinks, we can zip later.
-	local symlinkTarget = <alternative-system-lib>$(libTarget:BS) ;
-	MakeLocate $(symlinkTarget) : $(tmpAlternativeLibDir) ;
-	SymLink $(symlinkTarget) : [ on $(libTarget) return $(SYMLINK_TARGET) ] ;
-	alternativeSystemLibs += $(symlinkTarget) ;
-}
-
-ZipTargets $(alternativeSystemLibsZip) : $(alternativeSystemLibs) ;
-
+# We build a zip archive containing the libraries built with the alternative
+# GCC and unzip onto our image. Building the archive is done by a sub-jam.
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) AlternativeGCCArchive ] ;
 
 if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 	# let another jam build a zip with the system libraries
@@ -600,19 +561,10 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 	InvokeSubJam $(otherAlternativeSystemLibsZip)
 		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)
-		: "'<image>alternative_system_libs.zip'" ;
-
-	local libSubDir ;
-
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		libSubDir = gcc4 ;
-	} else {
-		libSubDir = gcc2 ;
-	}
+		: "haiku-alternative-gcc-archive" ;
 
 	# install the alternative libs in the right directory
-	UnzipArchiveToHaikuImage system lib $(libSubDir)
-		: $(otherAlternativeSystemLibsZip) ;
+	UnzipArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
 }
 
 

@@ -946,7 +946,7 @@ rule CreateNetBootArchiveCopyFilesScript script
 
 rule BuildNetBootArchive archive : scripts
 {
-	# BuildHNetBootArchive <archive> : <scripts>  ;
+	# BuildNetBootArchive <archive> : <scripts>  ;
 
 	local mainScript = build_tgz_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
@@ -961,7 +961,65 @@ actions BuildNetBootArchive1
 }
 
 
+#pragma mark - Alternative GCC Archive rules
+
+
+rule AddDirectoryToAlternativeGCCArchive directoryTokens
+{
+	# AddDirectoryToAlternativeGCCArchive <directoryTokens>
+
+	return [ AddDirectoryToContainer
+		$(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME) : $(directoryTokens) ] ;
+}
+
+rule AddFilesToAlternativeGCCArchive directory : targets : destName
+{
+	# AddFilesToAlternativeGCCArchive <directory> : <targets> [ : dest name ]
+
+	AddFilesToContainer $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
+		: $(directory) : $(targets) : $(destName) ;
+}
+
+rule AddSymlinkToAlternativeGCCArchive directoryTokens : linkTarget : linkName
+{
+	# AddSymlinkToAlternativeGCCArchive <directory> : <link target>
+	#	[ : <link name> ] ;
+
+	AddSymlinkToContainer $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
+		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
+}
+
+rule CreateAlternativeGCCArchiveMakeDirectoriesScript script
+{
+	CreateContainerMakeDirectoriesScript
+		$(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME) : $(script) ;
+}
+
+rule CreateAlternativeGCCArchiveCopyFilesScript script
+{
+	CreateContainerCopyFilesScript
+		$(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME) : $(script) ;
+}
+
+rule BuildAlternativeGCCArchive archive : scripts
+{
+	# BuildAlternativeGCCArchive <archive> : <scripts>  ;
+
+	local mainScript = build_zip_archive ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	Depends $(archive) : $(mainScript) $(scripts) ;
+	BuildAlternativeGCCArchive1 $(archive) : $(mainScript) $(scripts) ;
+}
+
+actions BuildAlternativeGCCArchive1
+{
+	$(2[1]) $(1) $(2[2-])
+}
+
+
 #pragma mark - Floppy Boot Archive rules
+
 
 rule AddDirectoryToFloppyBootArchive directoryTokens
 {
