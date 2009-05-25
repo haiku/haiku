@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,24 @@
 #include <Volume.h>
 
 
+class BStatable::Private {
+public:
+	Private(const BStatable* object)
+		:
+		fObject(object)
+	{
+	}
+
+	status_t GetStatBeOS(struct stat_beos* st)
+	{
+		return fObject->_GetStat(st);
+	}
+
+private:
+	const BStatable*	fObject;
+};
+
+
 #if __GNUC__ > 2
 BStatable::~BStatable()
 {
@@ -39,21 +57,6 @@ BStatable::~BStatable()
 	- \c B_BAD_VALUE: The current node does not exist.
 	- \c B_NOT_ALLOWED: Read only node or volume.
 */
-
-
-/*!	\brief GetStat() compatibility version.
-*/
-status_t
-BStatable::_GetStat(struct stat_beos *st) const
-{
-	struct stat newStat;
-	status_t error = GetStat(&newStat);
-	if (error != B_OK)
-		return error;
-
-	convert_to_stat_beos(&newStat, st);
-	return B_OK;
-}
 
 
 /*!	\brief Returns if the current node is a file.
@@ -330,7 +333,14 @@ _OhSoStatable1__9BStatable(const BStatable *self, struct stat *st)
 _ZN9BStatable14_OhSoStatable1Ev(const BStatable *self, struct stat *st)
 #endif
 {
-	return self->GetStat(st);
+	// No Perform() method -- we have to use the old GetStat() method instead.
+	struct stat_beos oldStat;
+	status_t error = BStatable::Private(self).GetStatBeOS(&oldStat);
+	if (error != B_OK)
+		return error;
+
+	convert_from_stat_beos(&oldStat, st);
+	return B_OK;
 }
 
 

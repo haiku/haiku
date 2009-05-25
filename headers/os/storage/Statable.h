@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATABLE_H
@@ -24,7 +24,7 @@ class BStatable {
 #endif
 
 private:
-		virtual status_t _GetStat(struct stat_beos *st) const;
+		virtual status_t _GetStat(struct stat_beos *st) const = 0;
 			// provided for BeOS compatibility
 
 public:
@@ -58,9 +58,12 @@ public:
 
 		status_t GetVolume(BVolume *vol) const;
 
+		class Private;
+
 	private:
 		friend class BEntry;
 		friend class BNode;
+		friend class Private;
 
 		virtual	void _OhSoStatable2();
 		virtual	void _OhSoStatable3();

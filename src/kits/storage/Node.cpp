@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,22 +13,25 @@
 	BNode implementation.
 */
 
-#include "storage_support.h"
-
-#include <Directory.h>
-#include <Entry.h>
-#include <fs_attr.h>
 #include <Node.h>
-#include <String.h>
-#include <TypeConstants.h>
-
-#include <syscalls.h>
 
 #include <errno.h>
 #include <fcntl.h>
 #include <new>
 #include <string.h>
 #include <unistd.h>
+
+#include <compat/sys/stat.h>
+
+#include <Directory.h>
+#include <Entry.h>
+#include <fs_attr.h>
+#include <String.h>
+#include <TypeConstants.h>
+
+#include <syscalls.h>
+
+#include "storage_support.h"
 
 
 //	#pragma mark - node_ref
@@ -188,7 +191,8 @@ BNode::InitCheck() const
 }
 
 
-/*! \brief Fills in the given stat structure with \code stat() \endcode
+/*!	\fn status_t BNode::GetStat(struct stat *st) const
+	\brief Fills in the given stat structure with \code stat() \endcode
 		   information for this object.
 	\param st a pointer to a stat structure to be filled in
 	\return
@@ -196,13 +200,6 @@ BNode::InitCheck() const
 	- \c B_BAD_VALUE: \c NULL \a st.
 	- another error code, e.g., if the object wasn't properly initialized
 */
-status_t
-BNode::GetStat(struct stat *st) const
-{
-	return fCStatus != B_OK
-		? fCStatus
-		: _kern_read_stat(fFd, NULL, false, st, R5_STAT_SIZE);
-}
 
 
 /*! \brief Reinitializes the object to the specified entry_ref.
@@ -283,7 +280,7 @@ void
 BNode::Unset()
 {
 	close_fd();
-	fCStatus = B_NO_INIT;	
+	fCStatus = B_NO_INIT;
 }
 
 
@@ -480,7 +477,7 @@ BNode::GetNextAttrName(char *buffer)
 		return B_BAD_VALUE;	// /new R5 crashed when passed NULL
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;
-		
+
 	BPrivate::Storage::LongDirEntry entry;
 	ssize_t result = _kern_read_dir(fAttrFd, &entry, sizeof(entry), 1);
 	if (result < 0)
@@ -502,7 +499,7 @@ status_t
 BNode::RewindAttrs()
 {
 	if (InitAttrDir() != B_OK)
-		return B_FILE_ERROR;	
+		return B_FILE_ERROR;
 
 	return _kern_rewind_dir(fAttrFd);
 }
@@ -556,14 +553,14 @@ BNode::ReadAttrString(const char *name, BString *result) const
 
 	error = GetAttrInfo(name, &info);
 	if (error != B_OK)
-		return error;		
+		return error;
 
-	// Lock the string's buffer so we can meddle with it	
+	// Lock the string's buffer so we can meddle with it
 	char *data = result->LockBuffer(info.size + 1);
 	if (!data)
 		return B_NO_MEMORY;
 
-	// Read the attribute		
+	// Read the attribute
 	ssize_t bytes = ReadAttr(name, B_STRING_TYPE, 0, data, info.size);
 	// Check for failure
 	if (bytes < 0) {
@@ -574,7 +571,7 @@ BNode::ReadAttrString(const char *name, BString *result) const
 
 	// Null terminate the new string just to be sure (since it *is*
 	// possible to read and write non-NULL-terminated strings)
-	data[bytes] = 0;		
+	data[bytes] = 0;
 	result->UnlockBuffer();
 	return error;
 }
@@ -589,10 +586,10 @@ BNode::operator=(const BNode &node)
 {
 	// No need to do any assignment if already equal
 	if (*this == node)
-		return *this;	
+		return *this;
 
 	// Close down out current state
-	Unset();	
+	Unset();
 	// We have to manually dup the node, because R5::BNode::Dup()
 	// is not declared to be const (which IMO is retarded).
 	fFd = _kern_dup(node.fFd);
@@ -611,7 +608,7 @@ bool
 BNode::operator==(const BNode &node) const
 {
 	if (fCStatus == B_NO_INIT && node.InitCheck() == B_NO_INIT)
-		return true;		
+		return true;
 	if (fCStatus == B_OK && node.InitCheck() == B_OK) {
 		// compare the node_refs
 		node_ref ref1, ref2;
@@ -620,8 +617,8 @@ BNode::operator==(const BNode &node) const
 		if (node.GetNodeRef(&ref2) != B_OK)
 			return false;
 		return (ref1 == ref2);
-	}	
-	return false;	
+	}
+	return false;
 }
 
 
@@ -692,11 +689,11 @@ BNode::close_fd()
 	if (fAttrFd >= 0) {
 		_kern_close(fAttrFd);
 		fAttrFd = -1;
-	}	
+	}
 	if (fFd >= 0) {
 		_kern_close(fFd);
 		fFd = -1;
-	}	
+	}
 }
 
 
@@ -824,7 +821,29 @@ BNode::InitAttrDir()
 		// set close on exec flag
 		fcntl(fAttrFd, F_SETFD, FD_CLOEXEC);
 	}
-	return fCStatus;	
+	return fCStatus;
+}
+
+
+status_t
+BNode::_GetStat(struct stat *st) const
+{
+	return fCStatus != B_OK
+		? fCStatus
+		: _kern_read_stat(fFd, NULL, false, st, sizeof(struct stat));
+}
+
+
+status_t
+BNode::_GetStat(struct stat_beos *st) const
+{
+	struct stat newStat;
+	status_t error = _GetStat(&newStat);
+	if (error != B_OK)
+		return error;
+
+	convert_to_stat_beos(&newStat, st);
+	return B_OK;
 }
 
 
@@ -839,3 +858,29 @@ BNode::InitAttrDir()
 /*!	\var BNode::fCStatus
 	The object's initialization status.
 */
+
+
+// #pragma mark - symbol versions
+
+
+#if __GNUC__ == 2	// gcc 2
+
+// BeOS compatible GetStat()
+B_DEFINE_SYMBOL_VERSION("_GetStat__C5BNodeP9stat_beos",
+	"GetStat__C5BNodeP4stat@LIBBE_BASE");
+
+// Haiku GetStat()
+B_DEFINE_SYMBOL_VERSION("_GetStat__C5BNodeP4stat",
+	"GetStat__C5BNodeP4stat@@LIBBE_1_ALPHA1");
+
+#else	// gcc 4
+
+// BeOS compatible GetStat()
+B_DEFINE_SYMBOL_VERSION("_ZNK5BNode8_GetStatEP9stat_beos",
+	"_ZNK5BNode7GetStatEP4stat@LIBBE_BASE");
+
+// Haiku GetStat()
+B_DEFINE_SYMBOL_VERSION("_ZNK5BNode8_GetStatEP4stat",
+	"_ZNK5BNode7GetStatEP4stat@@LIBBE_1_ALPHA1");
+
+#endif	// gcc 4

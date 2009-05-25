@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,13 +13,7 @@
 	BEntry and entry_ref implementations.
 */
 
-#include <Directory.h>
 #include <Entry.h>
-#include <Path.h>
-#include <SymLink.h>
-#include "storage_support.h"
-
-#include <syscalls.h>
 
 #include <fcntl.h>
 #include <new>
@@ -27,6 +21,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <compat/sys/stat.h>
+
+#include <Directory.h>
+#include <Path.h>
+#include <SymLink.h>
+
+#include <syscalls.h>
+
+#include "storage_support.h"
+
 
 using namespace std;
 
@@ -326,7 +331,8 @@ BEntry::Exists() const
 }
 
 
-/*! \brief Fills in a stat structure for the entry. The information is copied into
+/*!	\fn status_t BEntry::GetStat(struct stat *result) const
+	\brief Fills in a stat structure for the entry. The information is copied into
 	the \c stat structure pointed to by \a result.
 
 	\b NOTE: The BStatable object does not cache the stat structure; every time you
@@ -337,14 +343,6 @@ BEntry::Exists() const
 	- \c B_OK - Success
 	- "error code" - Failure
 */
-status_t
-BEntry::GetStat(struct stat *result) const
-{
-	if (fCStatus != B_OK)
-		return B_NO_INIT;
-
-	return _kern_read_stat(fDirFd, fName, false, result, R5_STAT_SIZE);
-}
 
 
 /*! \brief Reinitializes the BEntry to the path or directory path combination,
@@ -1060,6 +1058,30 @@ BEntry::Dump(const char *name)
 
 }
 
+
+status_t
+BEntry::_GetStat(struct stat *st) const
+{
+	if (fCStatus != B_OK)
+		return B_NO_INIT;
+
+	return _kern_read_stat(fDirFd, fName, false, st, sizeof(struct stat));
+}
+
+
+status_t
+BEntry::_GetStat(struct stat_beos *st) const
+{
+	struct stat newStat;
+	status_t error = _GetStat(&newStat);
+	if (error != B_OK)
+		return error;
+
+	convert_to_stat_beos(&newStat, st);
+	return B_OK;
+}
+
+
 // get_ref_for_path
 /*!	\brief Returns an entry_ref for a given path.
 	\param path The path name referring to the entry
@@ -1103,3 +1125,29 @@ operator<(const entry_ref & a, const entry_ref & b)
 				|| (a.name != NULL && b.name != NULL
 					&& strcmp(a.name, b.name) < 0))))));
 }
+
+
+// #pragma mark - symbol versions
+
+
+#if __GNUC__ == 2	// gcc 2
+
+// BeOS compatible GetStat()
+B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP9stat_beos",
+	"GetStat__C6BEntryP4stat@LIBBE_BASE");
+
+// Haiku GetStat()
+B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
+	"GetStat__C6BEntryP4stat@@LIBBE_1_ALPHA1");
+
+#else	// gcc 4
+
+// BeOS compatible GetStat()
+B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP9stat_beos",
+	"_ZNK6BEntry7GetStatEP4stat@LIBBE_BASE");
+
+// Haiku GetStat()
+B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP4stat",
+	"_ZNK6BEntry7GetStatEP4stat@@LIBBE_1_ALPHA1");
+
+#endif	// gcc 4

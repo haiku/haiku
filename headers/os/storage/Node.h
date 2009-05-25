@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_H
 #define _NODE_H
 
-
 #include <Statable.h>
+
 
 class BDirectory;
 class BEntry;
@@ -22,7 +22,7 @@ struct entry_ref;
 	@version 0.0.0
 */
 struct node_ref {
-	node_ref();	
+	node_ref();
 	node_ref(const node_ref &ref);
 
 	bool operator==(const node_ref &ref) const;
@@ -93,14 +93,12 @@ private:
 	friend class BDirectory;
 	friend class BSymLink;
 
-	virtual void _RudeNode1(); 	
+	virtual void _RudeNode1();
 	virtual void _RudeNode2();
 	virtual void _RudeNode3();
 	virtual void _RudeNode4();
 	virtual void _RudeNode5();
 	virtual void _RudeNode6();
-
-	uint32 rudeData[4];
 
 private:
 	status_t set_fd(int fd);
@@ -112,6 +110,11 @@ private:
 
 	virtual status_t set_stat(struct stat &st, uint32 what);
 
+	status_t _GetStat(struct stat *st) const;
+	virtual status_t _GetStat(struct stat_beos *st) const;
+
+private:
+	uint32 rudeData[4];
 	int fFd;
 	int fAttrFd;
 	status_t fCStatus;
