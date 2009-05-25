@@ -395,6 +395,7 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 		| (volume->GetUniqueID() & INODE_TIME_MASK));
 		// we use Volume::GetUniqueID() to avoid having too many duplicates
 		// in the last_modified index
+	Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(Node().create_time);
 
 	Node().inode_size = HOST_ENDIAN_TO_BFS_INT32(volume->InodeSize());
 

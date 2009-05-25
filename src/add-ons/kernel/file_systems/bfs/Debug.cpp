@@ -121,6 +121,8 @@ dump_inode(const bfs_inode* inode)
 		inode->CreateTime() >> INODE_TIME_SHIFT);
 	kprintf("  last_modified_time = %Ld (%Ld)\n", inode->LastModifiedTime(),
 		inode->LastModifiedTime() >> INODE_TIME_SHIFT);
+	kprintf("  status_change_time = %Ld (%Ld)\n", inode->StatusChangeTime(),
+		inode->StatusChangeTime() >> INODE_TIME_SHIFT);
 	dump_block_run(	"  parent             = ", inode->parent);
 	dump_block_run(	"  attributes         = ", inode->attributes);
 	kprintf("  type               = %u\n", (unsigned)inode->Type());

@@ -188,7 +188,8 @@ struct bfs_inode {
 		data_stream		data;
 		char 			short_symlink[SHORT_SYMLINK_NAME_LENGTH];
 	};
-	int32		pad[4];
+	bigtime_t	status_change_time;
+	int32		pad[2];
 		// we use this member as a doubly linked list link
 
 	small_data	small_data_start[0];
@@ -200,9 +201,13 @@ struct bfs_inode {
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	int32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
-	bigtime_t LastModifiedTime() const { return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
-	bigtime_t CreateTime() const { return BFS_ENDIAN_TO_HOST_INT64(create_time); }
+	bigtime_t LastModifiedTime() const {
+		return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
+	bigtime_t CreateTime() const {
+		return BFS_ENDIAN_TO_HOST_INT64(create_time); }
 	small_data *SmallDataStart() { return small_data_start; }
+	bigtime_t StatusChangeTime() const {
+		return BFS_ENDIAN_TO_HOST_INT64(status_change_time); }
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
