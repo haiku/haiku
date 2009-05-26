@@ -10,6 +10,7 @@
 #include <Path.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -228,13 +229,13 @@ main(int argc, char **argv)
 	}
 
 	// load additional files specified on the command line
-	
+
 	for (int32 i = 1; i < argc; i++) {
 		const char *name = argv[i];
 		if (name[0] == '-')
 			continue;
 
-		// make path absolute, so that load_driver_settings() 
+		// make path absolute, so that load_driver_settings()
 		// doesn't search in the standard directory
 		BPath path(name);
 		load_settings(path.Path());
@@ -244,7 +245,7 @@ main(int argc, char **argv)
 
 	for (uint32 i = 0; i < sizeof(kSettings) / sizeof(char *); i++)
 		check_settings_string(i);
-	
+
 	return 0;
 }
 
