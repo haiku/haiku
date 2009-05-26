@@ -97,6 +97,7 @@ _get_system_info(system_info *info, size_t size)
 	strlcpy(info->kernel_name, kKernelName, B_FILE_NAME_LENGTH);
 	strlcpy(info->kernel_build_date, __DATE__, B_OS_NAME_LENGTH);
 	strlcpy(info->kernel_build_time, __TIME__, B_OS_NAME_LENGTH);
+	info->abi = B_HAIKU_ABI;
 
 	// all other stuff is architecture specific
 	return arch_get_system_info(info, size);

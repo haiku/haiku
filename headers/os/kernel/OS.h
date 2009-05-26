@@ -702,7 +702,10 @@ typedef struct {
 
 	bigtime_t		_busy_wait_time;			/* reserved for whatever */
 	int32			cached_pages;
-	int32			pad[3];   	               	/* just in case... */
+
+	uint32			abi;						/* the system API */
+
+	int32			pad[2];   	               	/* just in case... */
 } system_info;
 
 /* system private, use macro instead */
