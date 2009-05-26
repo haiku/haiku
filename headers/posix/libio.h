@@ -170,14 +170,11 @@ extern "C" {
 #endif
 
 extern int _IO_feof(_IO_FILE *stream);
-extern int _IO_feof_unlocked(_IO_FILE *stream);
+#define    _IO_feof_unlocked(__fp) (((__fp)->_flags & _IO_EOF_SEEN) != 0)
 extern int _IO_ferror(_IO_FILE *stream);
-extern int _IO_ferror_unlocked(_IO_FILE *stream);
+#define    _IO_ferror_unlocked(__fp) (((__fp)->_flags & _IO_ERR_SEEN) != 0)
 extern int _IO_putc(int c, _IO_FILE *stream);
-extern int _IO_putc_unlocked(int c, _IO_FILE *stream);
 extern int _IO_getc(_IO_FILE *stream);
-extern int _IO_getc_unlocked(_IO_FILE *stream);
-extern int _IO_peekc_unlocked(_IO_FILE *stream);
 
 extern int __underflow(_IO_FILE *stream);
 extern int __uflow(_IO_FILE *stream);
@@ -214,54 +211,25 @@ extern _IO_fpos64_t _IO_seekpos(_IO_FILE *, _IO_fpos64_t, int);
 
 extern void _IO_free_backup_area(_IO_FILE *);
 
-#ifdef __cplusplus
-#	define __INLINE inline
+#if  __GNUC__ >= 3
+# define _IO_BE(expr, res) __builtin_expect (expr, res)
 #else
-/* GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
-   inline semantics.  */
-//#if __GNUC_PREREQ(4, 3)  // <- Gives parse error. Don't know why.
-#	if 4 < __GNUC__ || (4 == __GNUC__ && 3 <= __GNUC_MINOR__)
-#		ifdef __STDC__VERSION__
-#			if __STDC__VERSION__ + 0 > 199900
-#				define __INLINE __attribute__((__extern_inline__)) __inline
-#			endif
-#		endif
-#	endif
-#	ifndef __INLINE
-#		define __INLINE extern __inline
-#	endif
+# define _IO_BE(expr, res) (expr)
 #endif
 
-__INLINE int
-_IO_getc_unlocked(_IO_FILE *stream)
-{
-	if (stream->_IO_read_ptr >= stream->_IO_read_end)
-		return __uflow(stream);
-
-	return *(unsigned char *)stream->_IO_read_ptr++;
-}
-
-
-__INLINE int
-_IO_peekc_unlocked(_IO_FILE *stream)
-{
-	if (stream->_IO_read_ptr >= stream->_IO_read_end && __underflow(stream) == EOF)
-		return EOF;
-
-	return *(unsigned char *)stream->_IO_read_ptr;
-}
+#define _IO_getc_unlocked(_fp) \
+       (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
+        ? __uflow (_fp) : *(unsigned char *) (_fp)->_IO_read_ptr++)
+#define _IO_peekc_unlocked(_fp) \
+       (_IO_BE ((_fp)->_IO_read_ptr >= (_fp)->_IO_read_end, 0) \
+          && __underflow (_fp) == EOF ? EOF \
+        : *(unsigned char *) (_fp)->_IO_read_ptr)
+#define _IO_putc_unlocked(_ch, _fp) \
+   (_IO_BE ((_fp)->_IO_write_ptr >= (_fp)->_IO_write_end, 0) \
+    ? __overflow (_fp, (unsigned char) (_ch)) \
+    : (unsigned char) (*(_fp)->_IO_write_ptr++ = (_ch)))
 
 
-__INLINE int
-_IO_putc_unlocked(int c, _IO_FILE *stream)
-{
-	if (stream->_IO_write_ptr >= stream->_IO_write_end)
-		return __overflow(stream, (unsigned char)c);
-
-	return (unsigned char)(*stream->_IO_write_ptr++ = c);
-}
-
-#undef __INLINE
 
 #ifdef __cplusplus
 }
