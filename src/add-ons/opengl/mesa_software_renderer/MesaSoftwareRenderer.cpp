@@ -605,6 +605,9 @@ MesaSoftwareRenderer::_AllocateBitmap()
 {
 	// allocate new size of back buffer bitmap
 	delete fBitmap;
+	fBitmap = NULL;
+	if (fWidth < 1 || fHeight < 1)
+		return;
 	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
 	fBitmap = new BBitmap(rect, fColorSpace);
 	for (uint i = 0; i < fHeight; i++) {
