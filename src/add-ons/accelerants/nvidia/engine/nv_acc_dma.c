@@ -106,11 +106,21 @@ status_t nv_acc_init_dma()
 	}
 
 	/* setup PTIMER: */
-	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
-	/* set timer numerator to 8 (in b0-15) */
-	ACCW(PT_NUMERATOR, 0x00000008);
-	/* set timer denominator to 3 (in b0-15) */
-	ACCW(PT_DENOMINATR, 0x00000003);
+	LOG(4,("ACC_DMA: timer numerator $%08x, denominator $%08x\n", ACCR(PT_NUMERATOR), ACCR(PT_DENOMINATR)));
+
+	/* The NV28 BIOS programs PTIMER like this (see coldstarting in nv_info.c) */
+	//ACCW(PT_NUMERATOR, (si->ps.std_engine_clock * 20));
+	//ACCW(PT_DENOMINATR, 0x00000271);
+	/* Nouveau (march 2009) mentions something like: writing 8 and 3 to these regs breaks the timings
+	 * on the LVDS hardware sequencing microcode. A correct solution involves calculations with the GPU PLL. */
+
+	/* For now use BIOS pre-programmed values if there */
+	if (!ACCR(PT_NUMERATOR) || !ACCR(PT_DENOMINATR)) {
+		/* set timer numerator to 8 (in b0-15) */
+		ACCW(PT_NUMERATOR, 0x00000008);
+		/* set timer denominator to 3 (in b0-15) */
+		ACCW(PT_DENOMINATR, 0x00000003);
+	}
 
 	/* disable timer-alarm INT requests (b0) */
 	ACCW(PT_INTEN, 0x00000000);
