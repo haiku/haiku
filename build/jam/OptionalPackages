@@ -35,6 +35,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	P7zip
 #	Pe
 #	Perl
+#	Rsync
 #	Subversion
 #	Tar
 #	UserlandFS
@@ -504,6 +505,20 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-10-29
 			: $(baseURL)/perl-5.10.0-gcc2-2008-10-29.zip
+			:
+		;
+	}
+}
+
+
+# Rsync
+if [ IsOptionalHaikuImagePackageAdded Rsync ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Rsync available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://dl.hirschkaefer.de/haiku ;
+		InstallOptionalHaikuImagePackage rsync-3.0.6-gcc2-haiku-2009-05-26
+			: $(baseURL)/rsync-3.0.6-gcc2-haiku-2009-05-26.zip
 			:
 		;
 	}
