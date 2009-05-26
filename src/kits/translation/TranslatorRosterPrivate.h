@@ -112,6 +112,7 @@ private:
 			TranslatorMap		fTranslators;
 			MessengerList		fMessengers;
 			EntryRefSet			fRescanEntries;
+			const char*			fABISubDirectory;
 			int32				fNextID;
 			bool				fLazyScanning;
 			bool				fSafeMode;

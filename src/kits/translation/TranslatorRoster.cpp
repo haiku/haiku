@@ -126,6 +126,7 @@ BTranslatorRoster::Private::Private()
 	:
 	BHandler("translator roster"),
 	BLocker("translator list"),
+	fABISubDirectory(NULL),
 	fNextID(1),
 	fLazyScanning(true),
 	fSafeMode(false)
@@ -147,6 +148,23 @@ BTranslatorRoster::Private::Private()
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
+	}
+
+	// We might run in compatibility mode on a system with a different ABI. The
+	// translators matching our ABI can usually be found in respective
+	// subdirectories of the translator directories.
+	system_info info;
+	if (get_system_info(&info) == B_OK
+		&& (info.abi & B_HAIKU_ABI_MAJOR)
+			!= (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR)) {
+			switch (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) {
+				case B_HAIKU_ABI_GCC_2:
+					fABISubDirectory = "gcc2";
+					break;
+				case B_HAIKU_ABI_GCC_4:
+					fABISubDirectory = "gcc4";
+					break;
+			}
 	}
 
 	// we're sneaking us into the BApplication
@@ -387,8 +405,18 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 {
 	BDirectory directory(path);
 	status_t status = directory.InitCheck();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
+
+	// if a subdirectory for our ABI exists, use that instead
+	if (fABISubDirectory != NULL) {
+		BEntry entry(&directory, fABISubDirectory);
+		if (entry.IsDirectory()) {
+			status = directory.SetTo(&entry);
+			if (status != B_OK)
+				return status;
+		}
+	}
 
 	node_ref nodeRef;
 	status = directory.GetNodeRef(&nodeRef);
