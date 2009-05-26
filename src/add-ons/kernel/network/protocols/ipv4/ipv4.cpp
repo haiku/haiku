@@ -1199,7 +1199,7 @@ ipv4_bind(net_protocol *protocol, const struct sockaddr *address)
 
 	// only INADDR_ANY and addresses of local interfaces are accepted:
 	if (((sockaddr_in *)address)->sin_addr.s_addr == INADDR_ANY
-		|| IN_MULTICAST(((sockaddr_in *)address)->sin_addr.s_addr)
+		|| IN_MULTICAST(ntohl(((sockaddr_in *)address)->sin_addr.s_addr))
 		|| sDatalinkModule->is_local_address(sDomain, address, NULL, NULL)) {
 		memcpy(&protocol->socket->address, address, sizeof(struct sockaddr_in));
 		protocol->socket->address.ss_len = sizeof(struct sockaddr_in);
@@ -1267,7 +1267,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		if (protocol && !(protocol->socket->options & SO_BROADCAST))
 			return B_BAD_VALUE;
 		buffer->flags |= MSG_BCAST;
-	} else if (IN_MULTICAST(destination.sin_addr.s_addr)) {
+	} else if (IN_MULTICAST(ntohl(destination.sin_addr.s_addr))) {
 		buffer->flags |= MSG_MCAST;
 	}
 
@@ -1452,7 +1452,7 @@ ipv4_receive_data(net_buffer *buffer)
 
 	if (header.destination == INADDR_BROADCAST) {
 		buffer->flags |= MSG_BCAST;
-	} else if (IN_MULTICAST(header.destination)) {
+	} else if (IN_MULTICAST(ntohl(header.destination))) {
 		buffer->flags |= MSG_MCAST;
 	} else {
 		uint32 matchedAddressType = 0;
