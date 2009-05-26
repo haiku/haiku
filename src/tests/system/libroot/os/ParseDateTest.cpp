@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -31,12 +31,12 @@ parsedate_flags_to_string(time_t result, int flags)
 
 		return "day relative";
 	}
-	
+
 	return "absolute";
 }
 
 
-int 
+int
 main(int argc, char **argv)
 {
 	const char *dates[] = {
@@ -65,6 +65,13 @@ main(int argc, char **argv)
 		"3:33pm GMT",
 		"Mon, June 10th, 1993 10:00:03 am GMT",
 		"Sat, 16 Aug   Ìîñêîâñêîå âðåìÿ (çèìà)",
+		"Mon, June 10th, 1993 10:00:03 am UTC",
+		"Mon, June 10th, 1993 10:00:03 am CEST",
+		"Mon, June 10th, 1993 10:00:03 am +0000",
+		"Mon, June 10th, 1993 10:00:03 am 0000",	// invalid!
+		"Mon, June 10th, 1993 10:00:03 am +0100",
+		"Mon, June 10th, 1993 10:00:03 am -0700",
+		"Mon, June 10th, 1993 06:00:03 am ACDT",
 		NULL
 	};
 
