@@ -13,7 +13,7 @@
 #define B_BEOS_VERSION					B_BEOS_VERSION_5
 #define B_BEOS_VERSION_MAUI				B_BEOS_VERSION_5
 
-// Haiku (API) version
+/* Haiku (API) version */
 #define B_HAIKU_VERSION_BEOS			0x00000001
 #define B_HAIKU_VERSION_BONE			0x00000002
 #define B_HAIKU_VERSION_DANO			0x00000003
@@ -23,7 +23,7 @@
 
 #define B_HAIKU_VERSION					B_HAIKU_VERSION_1_PRE_ALPHA_1
 
-// Haiku ABI
+/* Haiku ABI */
 #define B_HAIKU_ABI_MAJOR				0xffff0000
 #define B_HAIKU_ABI_GCC_2				0x00020000
 #define B_HAIKU_ABI_GCC_4				0x00040000
