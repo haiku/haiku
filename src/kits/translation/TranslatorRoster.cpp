@@ -141,12 +141,12 @@ QuarantineTranslatorImage::Remove()
 
 BTranslatorRoster::Private::Private()
 	:
-	BHandler("translator roster"), BLocker("translator list"),
+	BHandler("translator roster"),
+	BLocker("translator list"),
 	fNextID(1),
 	fLazyScanning(true),
 	fSafeMode(false)
 {
-
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
 
