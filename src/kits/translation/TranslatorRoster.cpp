@@ -31,28 +31,11 @@
 #include <driver_settings.h>
 #include <image.h>
 #include <safemode_defs.h>
+#include <syscalls.h>
 
 #include "FuncTranslator.h"
 #include "TranslatorRosterPrivate.h"
 
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-extern "C" status_t _kern_get_safemode_option(const char* parameter,
-        char* buffer, size_t* _bufferSize);
-#else
-extern "C" status_t _kget_safemode_option_(const char* parameter,
-        char* buffer, size_t* _bufferSize);
-#endif
-
-
-#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) \
-	&& !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-// building under R5 or Dano/Zeta
-enum {
-	B_TRANSLATOR_ADDED			= '_ART',
-	B_TRANSLATOR_REMOVED		= '_RRT',
-};
-#endif
 
 namespace BPrivate {
 
@@ -150,28 +133,16 @@ BTranslatorRoster::Private::Private()
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK)
-#endif
-	{
+			&parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
-			&parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
-			&parameterLength) == B_OK)
-#endif
-	{
+			&parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
