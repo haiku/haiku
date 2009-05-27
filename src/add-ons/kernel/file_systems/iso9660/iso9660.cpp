@@ -730,10 +730,12 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 			size_t bytesRead = 0;
 			result = InitNode(&node, blockData + cookie->pos, &bytesRead,
 				volume->joliet_level);
-			if (result != B_OK)
+
+			// if we hit an entry that we don't support, we just skip it
+			if (result != B_OK && result != B_NOT_SUPPORTED)
 				break;
 
-			if ((node.flags & ISO_IS_ASSOCIATED_FILE) == 0) {
+			if (result == B_OK && (node.flags & ISO_IS_ASSOCIATED_FILE) == 0) {
 				size_t nameBufferSize = bufferSize - sizeof(struct dirent);
 
 				dirent->d_dev = volume->id;
