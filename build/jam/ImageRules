@@ -989,6 +989,14 @@ rule AddSymlinkToAlternativeGCCArchive directoryTokens : linkTarget : linkName
 		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
 }
 
+rule CopyDirectoryToAlternativeGCCArchive directoryTokens : sourceDirectory
+	: targetDirectoryName : excludePatterns : alwaysUpdate
+{
+	CopyDirectoryToContainer $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
+		: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
+		: $(excludePatterns) : $(alwaysUpdate) ;
+}
+
 rule CreateAlternativeGCCArchiveMakeDirectoriesScript script
 {
 	CreateContainerMakeDirectoriesScript
@@ -1015,6 +1023,63 @@ rule BuildAlternativeGCCArchive archive : scripts
 actions BuildAlternativeGCCArchive1
 {
 	$(2[1]) $(1) $(2[2-])
+}
+
+
+#pragma mark - Haiku Hybrid Image rules
+
+
+rule AddFilesToHaikuHybridImage directory : targets : destName
+	: useABISubDir
+{
+	# AddFilesToHaikuHybridImage <directory> : <targets> : <destName>
+	#	: <useABISubDir>
+	#
+	# Convenience rule calling both AddFilesToHaikuImage and
+	# AddFilesToAlternativeGCCArchive.
+	#
+	# <useABISubDir>
+	#	if non-empty, specifies that an ABI subdirectory shall be appended to
+	#	<directory> for the alternative GCC archive.
+
+	local alternativeSubDir ;
+	if $(useABISubDir) {
+		alternativeSubDir = gcc$(HAIKU_GCC_VERSION[1]) ;
+	}
+
+	AddFilesToHaikuImage $(directory) : $(targets) : $(destName) ;
+	AddFilesToAlternativeGCCArchive $(directory) $(alternativeSubDir)
+		: $(targets) : $(destName) ;
+}
+
+rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
+	: useSymlinkABISubDir
+{
+	# AddFilesToHaikuHybridImage <directoryTokens> : <linkTarget> : <linkName>
+	#	: <useSymlinkABISubDir>
+	#
+	# Convenience rule calling both AddSymlinkToHaikuImage and
+	# AddSymlinkToAlternativeGCCArchive.
+	#
+	# <linkTarget>
+	#	Can be a list of components that will be joined to path inserting
+	#	"/"s inbetween.
+	# <useSymlinkABISubDir>
+	#	If non-empty, specifies that an ABI subdirectory shall be inserted
+	#	into <linkTarget> (between the first and second component) for the
+	#	alternative GCC archive.
+
+	local alternativeLinkTarget = $(linkTarget) ;
+	if $(useSymlinkABISubDir) {
+		alternativeLinkTarget = $(linkTarget[1]) gcc$(HAIKU_GCC_VERSION[1])
+			$(linkTarget[2-]) ;
+	}
+	linkTarget = $(linkTarget:J=/) ;
+	alternativeLinkTarget = $(alternativeLinkTarget:J=/) ;
+
+	AddSymlinkToHaikuImage $(directoryTokens) : $(linkTarget) : $(linkName) ;
+	AddSymlinkToAlternativeGCCArchive $(directoryTokens)
+		: $(alternativeLinkTarget) : $(linkName) ;
 }
 
 
