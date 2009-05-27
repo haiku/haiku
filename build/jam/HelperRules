@@ -13,7 +13,7 @@ if ! $(INVOCATION_SUBDIR_SET) {
 			a = $(a[2-]) ;
 			b = $(b[2-]) ;
 		}
-	
+
 		if $(a) {
 			return ;
 		} else {
@@ -65,6 +65,20 @@ rule FGetGrist
 	return [ Match <(.*)> : $(grist) ] ;
 }
 
+rule FSplitString string : delimiterChar
+{
+	local result ;
+
+	while $(string) {
+		local split = [ Match $(delimiterChar)*([^$(delimiterChar)]+)(.*)
+			: $(string) ] ;
+		result += $(split[1]) ;
+		string = $(split[2-]) ;
+	}
+
+	return $(result) ;
+}
+
 rule FSplitPath
 {
 	# SplitPath <path> ;
@@ -87,9 +101,9 @@ rule FTimeZoneBinaries
 	local sources = $(1:G=timezone-source) ;
 	local locate = $(2) ;
 	local setRelativeTimezoneDir = $(3) ;
-	
+
 	local gristedBinaries ;
-	
+
 	local source ;
 	for source in $(sources) {
 		local binaries = [ on $(source) return $(TZ_OBJECTS) ] ;
@@ -149,24 +163,24 @@ rule SetPlatformCompatibilityFlagVariables
 	$(varPrefix)_PLATFORM_BONE_COMPATIBLE = ;
 	$(varPrefix)_PLATFORM_DANO_COMPATIBLE = ;
 	$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = ;
-	
+
 	switch $(platform)
 	{
 		case r5 :
 		{
 			$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = true ;
 		}
-	
-		case bone : 
+
+		case bone :
 		{
 			$(varPrefix)_PLATFORM_BONE_COMPATIBLE = true ;
 		}
-	
+
 		case dano :
 		{
 			$(varPrefix)_PLATFORM_DANO_COMPATIBLE = true ;
 		}
-	
+
 		case haiku_host :
 		{
 			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
