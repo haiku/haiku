@@ -57,6 +57,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	#launch system/apps/Terminal
 else
 	launch system/bin/consoled
+	exit 0 # return so we don't eject and reboot
 fi
 
 # sync disks
