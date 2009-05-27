@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-3/2009.
+	Rudolf Cornelissen 10/2002-5/2009.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -229,6 +229,14 @@ typedef struct { // apsed, see comments in nvidia.settings
 	uint32 ram_clk;
 } nv_settings;
 
+/* monitor info gathered via EDID */
+typedef struct {
+	bool have_edid;			/* have read useable edid info from screen */
+	bool digital;			/* screen connection type: analog (VGA) or digital (DVI) */
+	display_timing timing;	/* 'native modeline' fetched for screen */
+	float aspect;			/* screen's aspect ratio */
+} edid_specs;
+
 /* shared info */
 typedef struct {
   /* a few ID things */
@@ -342,6 +350,8 @@ typedef struct {
 		display_timing p2_timing;	/* 'modeline' fetched for panel 2 */
 		float panel1_aspect;		/* panel's aspect ratio */
 		float panel2_aspect;		/* panel's aspect ratio */
+		edid_specs con1_screen;		/* EDID properties of the screen connected to connector 1 */
+		edid_specs con2_screen;		/* EDID properties of the screen connected to connector 1 */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		bool i2c_bus0;				/* we have a wired I2C bus 0 on board */
 		bool i2c_bus1;				/* we have a wired I2C bus 1 on board */

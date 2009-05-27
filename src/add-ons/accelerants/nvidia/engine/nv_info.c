@@ -3175,8 +3175,7 @@ void dump_pins(void)
 	char *msg = "";
 
 	LOG(2,("INFO: pinsdump follows:\n"));
-	LOG(2,("PLL type: "));
-	if (si->ps.ext_pll) LOG(2,("extended\n")); else LOG(2,("standard\n"));
+	LOG(2,("PLL type: %s\n", si->ps.ext_pll ? "extended" : "standard"));
 	LOG(2,("f_ref: %fMhz\n", si->ps.f_ref));
 	LOG(2,("max_system_vco: %dMhz\n", si->ps.max_system_vco));
 	LOG(2,("min_system_vco: %dMhz\n", si->ps.min_system_vco));
@@ -3198,10 +3197,8 @@ void dump_pins(void)
 	LOG(2,("max_dac2_clock_24: %dMhz\n", si->ps.max_dac2_clock_24));
 	LOG(2,("max_dac2_clock_32: %dMhz\n", si->ps.max_dac2_clock_32));
 	LOG(2,("max_dac2_clock_32dh: %dMhz\n", si->ps.max_dac2_clock_32dh));
-	LOG(2,("secondary_head: "));
-	if (si->ps.secondary_head) LOG(2,("present\n")); else LOG(2,("absent\n"));
-	LOG(2,("tvout: "));
-	if (si->ps.tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
+	LOG(2,("secondary_head: %s\n", si->ps.secondary_head ? "present" : "absent"));
+	LOG(2,("tvout: %s\n", si->ps.tvout ? "present" : "absent"));
 	/* setup TVout logmessage text */
 	switch (si->ps.tv_encoder.type)
 	{
@@ -3268,15 +3265,15 @@ void dump_pins(void)
 	if (si->ps.laptop) LOG(2,("yes\n")); else LOG(2,("no\n"));
 	if (si->ps.tmds1_active)
 	{
-		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is "));
-		if (si->ps.slaved_tmds1) LOG(2,("slaved\n")); else LOG(2,("master\n"));
+		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is %s\n",
+			si->ps.slaved_tmds1 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
 			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.panel1_aspect));
 	}
 	if (si->ps.tmds2_active)
 	{
-		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is "));
-		if (si->ps.slaved_tmds2) LOG(2,("slaved\n")); else LOG(2,("master\n"));
+		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is %s\n",
+			si->ps.slaved_tmds2 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
 			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.panel2_aspect));
 	}

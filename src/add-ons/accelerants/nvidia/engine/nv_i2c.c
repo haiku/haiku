@@ -9,6 +9,8 @@
 
 #include "nv_std.h"
 
+static void i2c_DumpSpecsEDID(edid_specs* specs);
+
 char i2c_flag_error (char ErrNo)
 //error code list:
 //0 - OK status
@@ -340,7 +342,12 @@ status_t i2c_init(void)
 			LOG(4,("I2C: bus #%d wiring check: failed\n", bus));
 	}
 
-	i2c_TestEDID();
+	//i2c_TestEDID();
+	i2c_DetectScreens();
+	LOG(4,("I2C: dumping EDID specs for connector 1:\n"));
+	i2c_DumpSpecsEDID(&si->ps.con1_screen);
+	LOG(4,("I2C: dumping EDID specs for connector 2:\n"));
+	i2c_DumpSpecsEDID(&si->ps.con2_screen);
 
 	return result;
 }
@@ -352,7 +359,7 @@ typedef struct {
 
 /* Dump EDID info in driver's logfile */
 static void
-i2c_edid_dump(edid1_info *edid)
+i2c_DumpEDID(edid1_info *edid)
 {
 	int i, j;
 
@@ -534,7 +541,7 @@ set_signals(void *cookie, int clk, int data)
 }
 
 /* Read EDID information from monitor via the display data channel (DDC) */
-status_t
+static status_t
 i2c_ReadEDID(uint8 BusNR, edid1_info *edid)
 {
 	i2c_bus bus;
@@ -556,8 +563,7 @@ i2c_ReadEDID(uint8 BusNR, edid1_info *edid)
 	if (ddc2_read_edid1(&bus, edid, NULL, NULL) == B_OK) {
 		LOG(4,("I2C: EDID succesfully read from monitor at bus %d\n", BusNR));
 		LOG(4,("I2C: EDID dump follows (bus %d):\n", BusNR));
-//		has_edid = true;
-		i2c_edid_dump(edid);
+		i2c_DumpEDID(edid);
 		LOG(4,("I2C: end EDID dump (bus %d).\n", BusNR));
 	} else {
 		LOG(4,("I2C: reading EDID failed at bus %d!\n", BusNR));
@@ -577,5 +583,138 @@ void i2c_TestEDID(void)
 	for (bus = 0; bus < 4; bus++) {
 		if (i2c_bus[bus])
 			i2c_ReadEDID(bus, &edid);
+	}
+}
+
+static status_t
+i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
+{
+	uint32 i;
+	edid1_detailed_timing edid_timing;
+
+	specs->have_edid = false;
+	specs->timing.h_display = 0;
+	specs->timing.v_display = 0;
+
+	/* find the optimum (native) modeline */
+	for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
+		switch(edid->detailed_monitor[i].monitor_desc_type) {
+		case EDID1_IS_DETAILED_TIMING:
+			// TODO: handle flags correctly!
+			edid_timing = edid->detailed_monitor[i].data.detailed_timing;
+
+			if (edid_timing.pixel_clock <= 0/* || edid_timing.sync != 3*/)
+				break;
+
+			/* we want the optimum (native) modeline only, widescreen if possible.
+			 * So only check for horizontal display, not for vertical display. */
+			if (edid_timing.h_active <= specs->timing.h_display)
+				break;
+
+			specs->timing.pixel_clock = edid_timing.pixel_clock * 10;
+			specs->timing.h_display = edid_timing.h_active;
+			specs->timing.h_sync_start = edid_timing.h_active + edid_timing.h_sync_off;
+			specs->timing.h_sync_end = specs->timing.h_sync_start + edid_timing.h_sync_width;
+			specs->timing.h_total = specs->timing.h_display + edid_timing.h_blank;
+			specs->timing.v_display = edid_timing.v_active;
+			specs->timing.v_sync_start = edid_timing.v_active + edid_timing.v_sync_off;
+			specs->timing.v_sync_end = specs->timing.v_sync_start + edid_timing.v_sync_width;
+			specs->timing.v_total = specs->timing.v_display + edid_timing.v_blank;
+			specs->timing.flags = 0;
+			if (edid_timing.sync == 3) {
+				if (edid_timing.misc & 1)
+					specs->timing.flags |= B_POSITIVE_HSYNC;
+				if (edid_timing.misc & 2)
+					specs->timing.flags |= B_POSITIVE_VSYNC;
+			}
+			if (edid_timing.interlaced)
+				specs->timing.flags |= B_TIMING_INTERLACED;
+			break;
+		}
+	}
+
+	/* check if we actually got a modeline */
+	if (!specs->timing.h_display || !specs->timing.v_display) return B_ERROR;
+
+	/* we succesfully fetched the specs we need */
+	specs->have_edid = true;
+
+	/* determine screen aspect ratio */
+	specs->aspect =
+		(specs->timing.h_display / ((float)specs->timing.v_display));
+
+	/* determine connection type */
+	specs->digital = false;
+	if (edid->display.input_type) specs->digital = true;
+
+	return B_OK;
+}
+
+/* Dump EDID info in driver's logfile */
+static void
+i2c_DumpSpecsEDID(edid_specs* specs)
+{
+	LOG(4,("I2C: specsEDID: have_edid: %s\n", specs->have_edid ? "True" : "False"));
+	if (!specs->have_edid) return;
+	LOG(4,("I2C: specsEDID: timing.pixel_clock %.3f Mhz\n", specs->timing.pixel_clock / 1000.0));
+	LOG(4,("I2C: specsEDID: timing.h_display %d\n", specs->timing.h_display));
+	LOG(4,("I2C: specsEDID: timing.h_sync_start %d\n", specs->timing.h_sync_start));
+	LOG(4,("I2C: specsEDID: timing.h_sync_end %d\n", specs->timing.h_sync_end));
+	LOG(4,("I2C: specsEDID: timing.h_total %d\n", specs->timing.h_total));
+	LOG(4,("I2C: specsEDID: timing.v_display %d\n", specs->timing.v_display));
+	LOG(4,("I2C: specsEDID: timing.v_sync_start %d\n", specs->timing.v_sync_start));
+	LOG(4,("I2C: specsEDID: timing.v_sync_end %d\n", specs->timing.v_sync_end));
+	LOG(4,("I2C: specsEDID: timing.v_total %d\n", specs->timing.v_total));
+	LOG(4,("I2C: specsEDID: timing.flags $%08x\n", specs->timing.flags));
+	LOG(4,("I2C: specsEDID: aspect: %1.2f\n", specs->aspect));
+	LOG(4,("I2C: specsEDID: digital: %s\n", specs->digital ? "True" : "False"));
+}
+
+/* notes:
+ * - con1 resides closest to the mainboard on for example NV25 and NV28, while for
+ *   example on NV34 con2 sits closest to the mainboard.
+ * - con1 is connected to DAC1, and con2 is connected to DAC2 on all pre-NV40
+ *   architecture cards. On later cards it's vice versa. */
+//>>>fixme:
+//- re-check if the latter note is true,
+//- and check if it's dependant on the DAC cross connection switch..
+//- and check if analog or digital connection type influences this..
+void i2c_DetectScreens(void)
+{
+	edid1_info edid;
+
+	si->ps.con1_screen.have_edid = false;
+	si->ps.con2_screen.have_edid = false;
+
+	/* check existance of bus 0 */
+	if (!si->ps.i2c_bus0) return;
+
+	/* check I2C bus 0 for an EDID capable screen */
+	if (i2c_ReadEDID(0, &edid) == B_OK) {
+		/* fetch optimum (native) modeline */
+		switch (si->ps.card_arch) {
+		case NV40A:
+			i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+			break;
+		default:
+			i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
+			break;
+		}
+	}
+
+	/* check existance of bus 1 */
+	if (!si->ps.i2c_bus1) return;
+
+	/* check I2C bus 1 for an EDID screen */
+	if (i2c_ReadEDID(1, &edid) == B_OK) {
+		/* fetch optimum (native) modeline */
+		switch (si->ps.card_arch) {
+		case NV40A:
+			i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
+			break;
+		default:
+			i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+			break;
+		}
 	}
 }
