@@ -55,7 +55,7 @@ rule UserBuildConfigRulePreImage			{ }
 rule UserBuildConfigRulePostImage			{ }
 
 # Include UserBuildConfig.
-{
+if ! $(HAIKU_IGNORE_USER_BUILD_CONFIG) {
 	local userBuildConfig
 		= [ GLOB $(HAIKU_BUILD_RULES_DIR) : UserBuildConfig ] ;
 	if $(userBuildConfig) {
