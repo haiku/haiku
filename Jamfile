@@ -137,19 +137,25 @@ NotFile LocaleKit ;
 Depends LocaleKit :
 	liblocale.so
 	Locale
-	
+
 	# binaries for building localized software on haiku
 	collectcatkeys
 	dumpcatalog
 	linkcatkeys
-	
+
 	# addons
 	LocaleKitCollatorAddons
 	LocaleKitCatalogAddons
-	
+
 	# tests
 	LocaleKitTests
 ;
+
+# Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.
+if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
+	AddOptionalHaikuImagePackages
+		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
+}
 
 # Evaluate optional package dependencies and prepare the optional build
 # features before parsing the Jamfile tree.

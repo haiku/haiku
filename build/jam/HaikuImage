@@ -229,7 +229,7 @@ AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
-AddFilesToHaikuImage system lib : $(SYSTEM_LIBS) ;
+AddFilesToHaikuHybridImage system lib : $(SYSTEM_LIBS) : : true ;
 
 # libnetwork.so replaces quite a few libraries
 SYSTEM_LIBS_LIBNETWORK_ALIASES
@@ -237,20 +237,20 @@ SYSTEM_LIBS_LIBNETWORK_ALIASES
 
 local lib ;
 for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
-	AddSymlinkToHaikuImage system lib : libnetwork.so : $(lib) ;
+	AddFilesToHaikuHybridImage system lib : libnetwork.so : $(lib) : true ;
 }
 
-AddSymlinkToHaikuImage system lib : libbnetapi.so : libnetapi.so ;
+AddFilesToHaikuHybridImage system lib : libbnetapi.so : libnetapi.so : true ;
 
 # libGL.so has GLU (like BeOS) *and* GLUT API built-in
 SYSTEM_LIBS_LIBGL_ALIASES
 	= libGLU.so libglut.so ;
 
 if $(TARGET_ARCH) = x86 {
-local lib ;
-for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
-	AddSymlinkToHaikuImage system lib : libGL.so : $(lib) ;
-}
+	local lib ;
+	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
+		AddFilesToHaikuHybridImage system lib : libGL.so : $(lib) : true ;
+	}
 }
 
 # servers
@@ -453,8 +453,8 @@ AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToHaikuImage system add-ons opengl
 	: Mesa\ Software\ Renderer ;
-AddFilesToHaikuImage system add-ons Translators
-	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
+AddFilesToHaikuHybridImage system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
@@ -531,43 +531,6 @@ CopyDirectoryToHaikuImage system data
 	: licenses : -x .svn ;
 
 
-#pragma mark - Alternative GCC Libraries
-
-
-# We build a zip archive containing the libraries built with the alternative
-# GCC and unzip onto our image. Building the archive is done by a sub-jam.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) AlternativeGCCArchive ] ;
-
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
-	# let another jam build a zip with the system libraries
-	rule InvokeSubJam target : directory : jamLine
-	{
-		DIRECTORY on $(target) = $(directory) ;
-		COMMAND_LINE on $(target) = $(jamLine) ;
-		Always $(target) ;
-		InvokeSubJam1 $(target) ;
-	}
-
-	actions InvokeSubJam1
-	{
-		cd $(DIRECTORY)
-		$(JAM:E=jam) -q $(COMMAND_LINE) ;
-	}
-
-	local otherAlternativeSystemLibsZip
-		= <other-image>alternative_system_libs.zip ;
-	MakeLocate $(otherAlternativeSystemLibsZip)
-		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) ;
-
-	InvokeSubJam $(otherAlternativeSystemLibsZip)
-		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)
-		: "haiku-alternative-gcc-archive" ;
-
-	# install the alternative libs in the right directory
-	UnzipArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
-}
-
-
 #pragma mark - Optional Packages
 
 
@@ -592,6 +555,47 @@ if $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) {
 
 	BuildOptionalPackageDescriptions $(optionalPackageDescriptions)
 		: $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) ;
+}
+
+
+#pragma mark - Alternative GCC Libraries
+
+
+# We build a zip archive containing the libraries built with the alternative
+# GCC and unzip onto our image. Building the archive is done by a sub-jam.
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) AlternativeGCCArchive ] ;
+
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+	# let another jam build a zip with the system libraries
+	rule InvokeSubJam target : directory : jamLine
+	{
+		DIRECTORY on $(target) = $(directory) ;
+		COMMAND_LINE on $(target) = $(jamLine) ;
+		local optionalPackages = $(HAIKU_ADDED_OPTIONAL_PACKAGES:J=/) ;
+		OPTIONAL_PACKAGES on $(target) = $(optionalPackages:E="") ;
+		Always $(target) ;
+		InvokeSubJam1 $(target) ;
+	}
+
+	actions InvokeSubJam1
+	{
+		cd $(DIRECTORY)
+		export HAIKU_IGNORE_USER_BUILD_CONFIG=1
+		export HAIKU_ADD_OPTIONAL_PACKAGES=$(OPTIONAL_PACKAGES)
+		$(JAM:E=jam) -q $(COMMAND_LINE) ;
+	}
+
+	local otherAlternativeSystemLibsZip
+		= <other-image>alternative_system_libs.zip ;
+	MakeLocate $(otherAlternativeSystemLibsZip)
+		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) ;
+
+	InvokeSubJam $(otherAlternativeSystemLibsZip)
+		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)
+		: "haiku-alternative-gcc-archive" ;
+
+	# install the alternative libs in the right directory
+	UnzipArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
 }
 
 

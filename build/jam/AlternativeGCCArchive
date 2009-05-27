@@ -2,28 +2,6 @@
 # the rules building the archive. Included by HaikuImage.
 
 
-# system/lib libraries
-local alternativeSystemLibs ;
-local libTarget ;
-for libTarget in [ FFilesInHaikuImageDirectory system lib ] {
-	alternativeSystemLibs += [ on $(libTarget) return $(TARGET) ] ;
-}
-AddFilesToAlternativeGCCArchive system lib $(HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR)
-	: $(alternativeSystemLibs) ;
-
-# system/lib library symlinks
-for libTarget in [ FSymlinksInHaikuImageDirectory system lib ] {
-	AddSymlinkToAlternativeGCCArchive
-		system lib $(HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR)
-		: [ on $(libTarget) return $(SYMLINK_TARGET) ] : $(libTarget:BS) ;
-}
-
-# translators
-AddFilesToAlternativeGCCArchive
-	system add-ons Translators $(HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR)
-	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
-
-
 #pragma mark - Build The Archive
 
 

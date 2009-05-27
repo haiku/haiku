@@ -170,9 +170,6 @@ StdBinCommands
 	filepanel.cpp
 	: be tracker : $(haiku-utils_rsrc) ;
 
-# cc and c++ wrapper scripts
-SEARCH on cc c++ = $(SUBDIR) ;
-
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
 SubInclude HAIKU_TOP src bin bc ;

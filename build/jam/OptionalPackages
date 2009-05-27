@@ -169,8 +169,12 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddFilesToHaikuImage system bin : bt_dev_info bt_discovery ;
 	AddSymlinkToHaikuImage home config be Preferences
 		: /boot/system/preferences/Bluetooth ;
-	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
-		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
+	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
+		&& $(HAIKU_GCC_VERSION[1]) in 2 4 {
+		local arch = $(TARGET_ARCH) ;
+		local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
+			: /system/lib libbluetooth.so : : true ;
 	}
 }
 
@@ -208,18 +212,30 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		&& $(TARGET_ARCH) = x86 {
 	# gcc and binutils
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
+	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024
-			: $(baseURL)/gcc-2.95.3-haiku-081024.zip ;
-	} else if $(HAIKU_GCC_VERSION[1]) = 4 {
-		local baseURL = http://haiku.mlotz.ch ;
-		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090313
-			: $(baseURL)/gcc-4.3.3-haiku-090313.zip ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024-1
+			: $(baseURL)/gcc-2.95.3-haiku-081024-1.zip ;
+	}
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage gcc-4.3.3-haiku-090313-1
+			: $(baseURL)/gcc-4.3.3-haiku-090313-1.zip ;
 
 		# symlink cpp to g++'s headers
-		AddSymlinkToHaikuImage develop headers
-			: /boot/develop/tools/gnupro/include/g++ : cpp ;
+		AddSymlinkToHaikuImage develop abi x86 gcc4 headers
+			: ../tools/current/include/g++ : cpp ;
+	}
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 {
+		# symlink to libstdc++.so
+		# TODO: This needs to be solved differently! I.e. the build system
+		# (configure) should already produce libstdc++.so.
+		AddSymlinkToHaikuImage system lib
+			: /boot/develop/abi/x86/gcc4/tools/current/lib/libstdc++.so ;
+		AddSymlinkToAlternativeGCCArchive system lib gcc4
+			: /boot/develop/abi/x86/gcc4/tools/current/lib/libstdc++.so ;
 	}
 
 	# other commonly used tools
@@ -237,30 +253,59 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 
 # DevelopmentMin
 if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
+	if ! ( $(HAIKU_GCC_VERSION[1]) in 2 4 ) {
+		Exit "Optional package DevelopmentMin: Unsupported GCC version:"
+			$(HAIKU_GCC_VERSION[1]) ;
+	}
+
+	local arch = $(TARGET_ARCH) ;
+	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+	local abiDirTokens = develop abi $(arch) $(abi) ;
+
 	# glue code
-	AddFilesToHaikuImage develop lib x86 :
-		<src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
-		<src!system!glue>init_term_dyn.o <src!system!glue>start_dyn.o
+	AddFilesToHaikuHybridImage $(abiDirTokens) lib :
+		<src!system!glue!arch!$(arch)>crti.o
+		<src!system!glue!arch!$(arch)>crtn.o
+		<src!system!glue>init_term_dyn.o
+		<src!system!glue>start_dyn.o
 		<src!system!glue>haiku_version_glue.o
 	;
 
 	# kernel
-	AddFilesToHaikuImage develop lib x86 : kernel.so : _KERNEL_ ;
+	AddFilesToHaikuHybridImage $(abiDirTokens) lib : kernel.so : _KERNEL_ ;
 
 	# library symlinks
 	local lib ;
 	for lib in $(SYSTEM_LIBS) libglut.so {
-		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
+		AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
+			: /system/lib $(lib:BS) : : true ;
 	}
 
 	# static libraries
-	AddFilesToHaikuImage develop lib x86 : libncurses.a ;
+	AddFilesToHaikuHybridImage $(abiDirTokens) lib : libncurses.a ;
 
 	# the POSIX error code mapper library
-	AddFilesToHaikuImage develop lib x86 : libposix_error_mapper.a ;
+	AddFilesToHaikuHybridImage $(abiDirTokens) lib : libposix_error_mapper.a ;
 
-	# cc and c++ wrapper scripts
-	AddFilesToHaikuImage system bin : cc c++ ;
+	# symlinks for ABI abstraction
+	AddSymlinkToHaikuImage develop abi : $(arch)/$(abi) : current ;
+	AddSymlinkToHaikuImage develop lib : /boot/develop/abi/current/lib
+		: $(arch) ;
+	AddSymlinkToHaikuImage develop tools
+		: /boot/develop/abi/current/tools/current : gnupro ;
+	AddSymlinkToHaikuImage develop headers
+		: /boot/develop/abi/current/headers/cpp ;
+	AddSymlinkToHaikuHybridImage $(abiDirTokens) library-paths
+		: /boot/common/lib : common : true ;
+	AddSymlinkToHaikuHybridImage $(abiDirTokens) library-paths
+		: /boot/home/config/lib : home : true ;
+
+	# ABI independent stuff
+
+	# scripts: cc and c++ wrapper, setgcc
+	local scripts = cc c++ setgcc ;
+	SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
+	AddFilesToHaikuImage system bin : $(scripts) ;
 
 	# make and mkdepend build tool, which are part of the Haiku source tree
 	# TODO: Both should be removed from the tree, made download packages
@@ -274,8 +319,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	;
 	SEARCH on $(makefileEngineFiles)
 		= [ FDirName $(HAIKU_TOP) data develop ] ;
-	AddFilesToHaikuImage develop etc
-		: $(makefileEngineFiles) ;
+	AddFilesToHaikuImage develop etc : $(makefileEngineFiles) ;
 
 	# headers
 	AddHeaderDirectoryToHaikuImage gnu : 3rdparty ;
@@ -299,8 +343,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
+	# cpp headers
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		AddHeaderDirectoryToHaikuImage cpp ;
+		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
+		CopyDirectoryToHaikuImage $(abiDirTokens) headers
+			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
+		CopyDirectoryToAlternativeGCCArchive $(abiDirTokens) headers
+			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
 	}
 }
 
@@ -416,7 +465,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSH available for $(TARGET_ARCH)" ;
 	} else {
-		if ! $(HAIKU_IMAGE_HOST_NAME) {
+		if ! $(HAIKU_IMAGE_HOST_NAME) && ! $(HAIKU_IGNORE_USER_BUILD_CONFIG) {
 			Exit "Optional package OpenSSH requires the HAIKU_IMAGE_HOST_NAME"
 				"variable to be set!" ;
 		}
@@ -554,6 +603,9 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 
 # UserlandFS
 if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
+	local arch = $(TARGET_ARCH) ;
+	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+
 	# kernel module
 	AddFilesToHaikuImage system add-ons kernel file_systems : userlandfs ;
 
@@ -566,14 +618,22 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 		libuserlandfs_haiku_kernel.so
 		libuserlandfs_fuse.so
 	;
-	AddFilesToHaikuImage system lib : $(userlandfsLibs) ;
+	AddFilesToHaikuHybridImage system lib : $(userlandfsLibs) : : true ;
 
 	# development goodies
 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
+		if ! ( $(HAIKU_GCC_VERSION[1]) in 2 4 ) {
+			Exit "Optional package UserlandFS: Unsupported GCC version:"
+				$(HAIKU_GCC_VERSION[1]) ;
+		}
+
 		# library symlinks
 		local lib ;
 		for lib in $(userlandfsLibs) {
-			AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
+			AddSymlinkToHaikuImage develop abi $(arch) $(abi) lib
+				: /system/lib/$(lib:BS) ;
+			AddSymlinkToAlternativeGCCArchive develop abi $(arch) $(abi) lib
+				: /system/lib/$(arch)/$(lib:BS) ;
 		}
 
 		# FUSE headers
