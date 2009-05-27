@@ -673,7 +673,7 @@ i2c_DumpSpecsEDID(edid_specs* specs)
 /* notes:
  * - con1 resides closest to the mainboard on for example NV25 and NV28, while for
  *   example on NV34 con2 sits closest to the mainboard.
- * - con1 is connected to DAC1, and con2 is connected to DAC2 on all pre-NV40
+ * - i2c bus0 is connected to con1, and i2c bus1 is connected to con2 on all pre-NV40
  *   architecture cards. On later cards it's vice versa. */
 //>>>fixme:
 //- re-check if the latter note is true,

@@ -351,7 +351,7 @@ typedef struct {
 		float panel1_aspect;		/* panel's aspect ratio */
 		float panel2_aspect;		/* panel's aspect ratio */
 		edid_specs con1_screen;		/* EDID properties of the screen connected to connector 1 */
-		edid_specs con2_screen;		/* EDID properties of the screen connected to connector 1 */
+		edid_specs con2_screen;		/* EDID properties of the screen connected to connector 2 */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		bool i2c_bus0;				/* we have a wired I2C bus 0 on board */
 		bool i2c_bus1;				/* we have a wired I2C bus 1 on board */
