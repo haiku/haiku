@@ -4496,10 +4496,6 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			// (and tools)
 			vm_area* area = vm_area_lookup(addressSpace, faultAddress);
 
-// TODO: The user_memcpy() below can cause a deadlock, if it causes a page
-// fault and someone is already waiting for a write lock on the same address
-// space. This thread will then try to acquire the semaphore again and will
-// be queued after the writer.
 			struct thread* thread = thread_get_current_thread();
 			dprintf("vm_page_fault: thread \"%s\" (%ld) in team \"%s\" (%ld) "
 				"tried to %s address %#lx, ip %#lx (\"%s\" +%#lx)\n",
@@ -4509,7 +4505,11 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				faultAddress - (area ? area->base : 0x0));
 
 			// We can print a stack trace of the userland thread here.
-#if 1
+// TODO: The user_memcpy() below can cause a deadlock, if it causes a page
+// fault and someone is already waiting for a write lock on the same address
+// space. This thread will then try to acquire the lock again and will
+// be queued after the writer.
+#if 0
 			if (area) {
 				struct stack_frame {
 					#if defined(__INTEL__) || defined(__POWERPC__) || defined(__M68K__)
