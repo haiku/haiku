@@ -389,20 +389,20 @@ resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
 			if (location == NULL) {
 				switch (lookupError) {
 					case ERROR_NO_SYMBOL:
-						FATAL("elf_resolve_symbol: could not resolve symbol "
-							"'%s'\n", symName);
+						FATAL("%s: Could not resolve symbol '%s'\n",
+							image->path, symName);
 						break;
 					case ERROR_WRONG_TYPE:
-						FATAL("elf_resolve_symbol: found symbol '%s' in shared "
-							"image but wrong type\n", symName);
+						FATAL("%s: Found symbol '%s' in shared image but wrong "
+							"type\n", image->path, symName);
 						break;
 					case ERROR_NOT_EXPORTED:
-						FATAL("elf_resolve_symbol: found symbol '%s', but not "
-							"exported\n", symName);
+						FATAL("%s: Found symbol '%s', but not exported\n",
+							image->path, symName);
 						break;
 					case ERROR_UNPATCHED:
-						FATAL("elf_resolve_symbol: found symbol '%s', but was "
-							"hidden by symbol patchers\n", symName);
+						FATAL("%s: Found symbol '%s', but was hidden by symbol "
+							"patchers\n", image->path, symName);
 						break;
 				}
 
@@ -421,8 +421,9 @@ resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
 			return B_NO_ERROR;
 
 		case SHN_COMMON:
-			// ToDo: finish this
-			FATAL("elf_resolve_symbol: COMMON symbol, finish me!\n");
+			// TODO: finish this
+			FATAL("%s: elf_resolve_symbol: COMMON symbol, finish me!\n",
+				image->path);
 			return B_ERROR; //ERR_NOT_IMPLEMENTED_YET;
 
 		default:

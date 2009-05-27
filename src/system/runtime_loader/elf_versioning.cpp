@@ -21,7 +21,7 @@ assert_defined_image_version(image_t* dependentImage, image_t* image,
 	// later when resolving versioned symbols.
 	if (image->version_definitions == NULL) {
 		FATAL("%s: No version information available (required by %s)\n",
-			image->name, dependentImage->name);
+			image->path, dependentImage->path);
 		return B_OK;
 	}
 
@@ -42,7 +42,7 @@ assert_defined_image_version(image_t* dependentImage, image_t* image,
 
 	// version not found -- fail, if not weak
 	if (!weak) {
-		FATAL("%s: version \"%s\" not found (required by %s)\n", image->name,
+		FATAL("%s: version \"%s\" not found (required by %s)\n", image->path,
 			neededVersion.name, dependentImage->name);
 		return B_MISSING_SYMBOL;
 	}
@@ -66,8 +66,8 @@ init_image_version_infos(image_t* image)
 		Elf32_Verdef* definition = image->version_definitions;
 		for (uint32 i = 0; i < image->num_version_definitions; i++) {
 			if (definition->vd_version != 1) {
-				FATAL("Unsupported version definition revision: %u\n",
-					definition->vd_version);
+				FATAL("%s: Unsupported version definition revision: %u\n",
+					image->path, definition->vd_version);
 				return B_BAD_VALUE;
 			}
 
@@ -84,8 +84,8 @@ init_image_version_infos(image_t* image)
 		Elf32_Verneed* needed = image->needed_versions;
 		for (uint32 i = 0; i < image->num_needed_versions; i++) {
 			if (needed->vn_version != 1) {
-				FATAL("Unsupported version needed revision: %u\n",
-					needed->vn_version);
+				FATAL("%s: Unsupported version needed revision: %u\n",
+					image->path, needed->vn_version);
 				return B_BAD_VALUE;
 			}
 
@@ -177,7 +177,8 @@ check_needed_image_versions(image_t* image)
 		if (dependency == NULL) {
 			// This can't really happen, unless the object file is broken, since
 			// the file should also appear in DT_NEEDED.
-			FATAL("Version dependency \"%s\" not found", fileName);
+			FATAL("%s: Version dependency \"%s\" not found", image->path,
+				fileName);
 			return B_FILE_NOT_FOUND;
 		}
 

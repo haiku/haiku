@@ -24,14 +24,16 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
 {
 	if (sheaderSize > (int)bufferSize) {
-		FATAL("Cannot handle section headers bigger than %lu\n", bufferSize);
+		FATAL("%s: Cannot handle section headers bigger than %lu bytes\n",
+			image->path, bufferSize);
 		return false;
 	}
 
 	// read section headers
 	ssize_t length = _kern_read(fd, eheader.e_shoff, buffer, sheaderSize);
 	if (length != sheaderSize) {
-		FATAL("Could not read section headers: %s\n", strerror(length));
+		FATAL("%s: Could not read section headers: %s\n", image->path,
+			strerror(length));
 		return false;
 	}
 
@@ -40,7 +42,8 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 		= (Elf32_Shdr*)(buffer + eheader.e_shstrndx * eheader.e_shentsize);
 
 	if (sheaderSize + sectionHeader->sh_size > bufferSize) {
-		FATAL("Buffer not big enough for section string section\n");
+		FATAL("%s: Buffer not big enough for section string section\n",
+			image->path);
 		return false;
 	}
 
@@ -48,7 +51,8 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	length = _kern_read(fd, sectionHeader->sh_offset, sectionStrings,
 		sectionHeader->sh_size);
 	if (length != (int)sectionHeader->sh_size) {
-		FATAL("Could not read section string section: %s\n", strerror(length));
+		FATAL("%s: Could not read section string section: %s\n", image->path,
+			strerror(length));
 		return false;
 	}
 
@@ -67,7 +71,7 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	}
 
 	if (commentSize == 0) {
-		FATAL("Could not find .comment section\n");
+		FATAL("%s: Could not find .comment section\n", image->path);
 		return false;
 	}
 
@@ -77,7 +81,8 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 
 	length = _kern_read(fd, commentOffset, buffer, commentSize);
 	if (length != (int)commentSize) {
-		FATAL("Could not read .comment section: %s\n", strerror(length));
+		FATAL("%s: Could not read .comment section: %s\n", image->path,
+			strerror(length));
 		return false;
 	}
 
@@ -218,7 +223,7 @@ analyze_image_haiku_version_and_abi(int fd, image_t* image, Elf32_Ehdr& eheader,
 		// version.
 		if (!analyze_object_gcc_version(fd, image, eheader, sheaderSize,
 				buffer, bufferSize)) {
-			FATAL("Failed to get gcc version for %s\n", image->path);
+			FATAL("%s: Failed to get gcc version.\n", image->path);
 				// not really fatal, actually
 
 			// assume ancient BeOS

@@ -110,7 +110,7 @@ load_immediate_dependencies(image_t *image)
 
 	image->needed = (image_t**)malloc(image->num_needed * sizeof(image_t *));
 	if (image->needed == NULL) {
-		FATAL("failed to allocate needed struct\n");
+		FATAL("%s: Failed to allocate needed struct\n", image->path);
 		KTRACE("rld: load_dependencies(\"%s\", id: %ld) failed: no memory",
 			image->name, image->id);
 		return B_NO_MEMORY;
@@ -207,8 +207,7 @@ relocate_image(image_t *rootImage, image_t *image)
 {
 	status_t status = arch_relocate_image(rootImage, image);
 	if (status < B_OK) {
-		FATAL("troubles relocating: 0x%lx (image: %s, %s)\n", status,
-			image->path, image->name);
+		FATAL("%s: Troubles relocating: %s\n", image->path, strerror(status));
 		return status;
 	}
 

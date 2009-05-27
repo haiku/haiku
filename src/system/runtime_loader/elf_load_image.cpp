@@ -34,7 +34,7 @@ get_program_path()
 
 
 static int32
-count_regions(char const* buff, int phnum, int phentsize)
+count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 {
 	struct Elf32_Phdr* pheaders;
 	int32 count = 0;
@@ -78,8 +78,8 @@ count_regions(char const* buff, int phnum, int phentsize)
 				// we don't use it
 				break;
 			default:
-				FATAL("unhandled pheader type in count 0x%lx\n",
-					pheaders->p_type);
+				FATAL("%s: Unhandled pheader type in count 0x%lx\n",
+					imagePath, pheaders->p_type);
 				return B_BAD_DATA;
 		}
 	}
@@ -194,8 +194,8 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 				// we don't use it
 				break;
 			default:
-				FATAL("unhandled pheader type in parse 0x%lx\n",
-					pheader->p_type);
+				FATAL("%s: Unhandled pheader type in parse 0x%lx\n",
+					image->path, pheader->p_type);
 				return B_BAD_DATA;
 		}
 	}
@@ -400,7 +400,7 @@ load_image(char const* name, image_type type, const char* rpath,
 	fd = open_executable(path, type, rpath, get_program_path(),
 		sSearchPathSubDir);
 	if (fd < 0) {
-		FATAL("cannot open file %s\n", name);
+		FATAL("Cannot open file %s: %s\n", name, strerror(fd));
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
 		return fd;
 	}
@@ -428,42 +428,44 @@ load_image(char const* name, image_type type, const char* rpath,
 	length = _kern_read(fd, 0, &eheader, sizeof(eheader));
 	if (length != sizeof(eheader)) {
 		status = B_NOT_AN_EXECUTABLE;
-		FATAL("troubles reading ELF header\n");
+		FATAL("%s: Troubles reading ELF header\n", path);
 		goto err1;
 	}
 
 	status = parse_elf_header(&eheader, &pheaderSize, &sheaderSize);
 	if (status < B_OK) {
-		FATAL("incorrect ELF header\n");
+		FATAL("%s: Incorrect ELF header\n", path);
 		goto err1;
 	}
 
 	// ToDo: what to do about this restriction??
 	if (pheaderSize > (int)sizeof(pheaderBuffer)) {
-		FATAL("Cannot handle program headers bigger than %lu\n",
-			sizeof(pheaderBuffer));
+		FATAL("%s: Cannot handle program headers bigger than %lu\n",
+			path, sizeof(pheaderBuffer));
 		status = B_UNSUPPORTED;
 		goto err1;
 	}
 
 	length = _kern_read(fd, eheader.e_phoff, pheaderBuffer, pheaderSize);
 	if (length != pheaderSize) {
-		FATAL("Could not read program headers: %s\n", strerror(length));
+		FATAL("%s: Could not read program headers: %s\n", path,
+			strerror(length));
 		status = B_BAD_DATA;
 		goto err1;
 	}
 
-	numRegions = count_regions(pheaderBuffer, eheader.e_phnum,
+	numRegions = count_regions(path, pheaderBuffer, eheader.e_phnum,
 		eheader.e_phentsize);
 	if (numRegions <= 0) {
-		FATAL("Troubles parsing Program headers, numRegions = %ld\n", numRegions);
+		FATAL("%s: Troubles parsing Program headers, numRegions = %ld\n",
+			path, numRegions);
 		status = B_BAD_DATA;
 		goto err1;
 	}
 
 	image = create_image(name, path, numRegions);
 	if (image == NULL) {
-		FATAL("Failed to allocate image_t object\n");
+		FATAL("%s: Failed to allocate image_t object\n", path);
 		status = B_NO_MEMORY;
 		goto err1;
 	}
@@ -474,20 +476,21 @@ load_image(char const* name, image_type type, const char* rpath,
 		goto err2;
 
 	if (!assert_dynamic_loadable(image)) {
-		FATAL("Dynamic segment must be loadable (implementation restriction)\n");
+		FATAL("%s: Dynamic segment must be loadable (implementation "
+			"restriction)\n", image->path);
 		status = B_UNSUPPORTED;
 		goto err2;
 	}
 
 	status = map_image(fd, path, image, type == B_APP_IMAGE);
 	if (status < B_OK) {
-		FATAL("Could not map image: %s\n", strerror(status));
+		FATAL("%s: Could not map image: %s\n", image->path, strerror(status));
 		status = B_ERROR;
 		goto err2;
 	}
 
 	if (!parse_dynamic_segment(image)) {
-		FATAL("Troubles handling dynamic section\n");
+		FATAL("%s: Troubles handling dynamic section\n", image->path);
 		status = B_BAD_DATA;
 		goto err3;
 	}
