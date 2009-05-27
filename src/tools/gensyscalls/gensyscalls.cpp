@@ -521,7 +521,7 @@ public:
 
 	static string _GetPointerType(const char *type)
 	{
-		char *parenthesis = strchr(type, ')');
+		const char *parenthesis = strchr(type, ')');
 		if (!parenthesis)
 			return string(type) + "*";
 		// function pointer type
