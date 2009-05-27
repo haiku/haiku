@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define HVIF_FORMAT_CODE				'HVIF'
 #define HVIF_TRANSLATION_QUALITY		1.0
