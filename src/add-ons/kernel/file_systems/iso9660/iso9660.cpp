@@ -227,7 +227,8 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 	buffer += 2;
 
 	// Fill in directory record.
-	InitNode(&volume->rootDirRec, buffer, NULL, 0);
+	volume->joliet_level = 0;
+	InitNode(volume, &volume->rootDirRec, buffer, NULL);
 
 	volume->rootDirRec.id = ISO_ROOTNODE_ID;
 	buffer += 34;
@@ -283,7 +284,8 @@ InitVolDesc(iso9660_volume *volume, char *buffer)
 
 
 static status_t
-parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
+parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
+	char* end, bool relocated)
 {
 	// Now we're at the start of the rock ridge stuff
 	char* altName = NULL;
@@ -497,11 +499,23 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 
 			// Deep directory record masquerading as a file.
 			case 'CL':
+			{
 				TRACE(("RR: found CL, length %u\n", length));
-				node->flags |= ISO_IS_DIR;
+				// Reinitialize the node with the information at the
+				// "." entry of the pointed to directory data
 				node->startLBN[LSB_DATA] = *(uint32*)(buffer+4);
 				node->startLBN[MSB_DATA] = *(uint32*)(buffer+8);
+
+				char* buffer = (char*)block_cache_get(volume->fBlockCache,
+					node->startLBN[FS_DATA_FORMAT]);
+				if (buffer == NULL)
+					break;
+
+				InitNode(volume, node, buffer, NULL, true);
+				block_cache_put(volume->fBlockCache,
+					node->startLBN[FS_DATA_FORMAT]);
 				break;
+			}
 
 			case 'PL':
 				TRACE(("RR: found PL, length %u\n", length));
@@ -510,8 +524,9 @@ parse_rock_ridge(iso9660_inode* node, char* buffer, char* end)
 			case 'RE':
 				// Relocated directory, we should skip.
 				TRACE(("RR: found RE, length %u\n", length));
-				// TODO: support relocated directories
-				return B_NOT_SUPPORTED;
+				if (!relocated)
+					return B_NOT_SUPPORTED;
+				break;
 
 			case 'TF':
 				TRACE(("RR: found TF, length %u\n", length));
@@ -657,8 +672,10 @@ ISOMount(const char *path, uint32 flags, iso9660_volume **_newVolume,
 
 					// Because Joliet-stuff starts at other sector,
 					// update root directory record.
-					if (volume->joliet_level > 0)
-						InitNode(&volume->rootDirRec, &buffer[156], NULL, 0);
+					if (volume->joliet_level > 0) {
+						InitNode(volume, &volume->rootDirRec, &buffer[156],
+							NULL);
+					}
 				}
 			} else if (*(unsigned char *)buffer == 0xff) {
 				// ISO_VD_END
@@ -728,8 +745,8 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 		if (blockData != NULL && totalRead < cookie->totalSize) {
 			iso9660_inode node;
 			size_t bytesRead = 0;
-			result = InitNode(&node, blockData + cookie->pos, &bytesRead,
-				volume->joliet_level);
+			result = InitNode(volume, &node, blockData + cookie->pos,
+				&bytesRead);
 
 			// if we hit an entry that we don't support, we just skip it
 			if (result != B_OK && result != B_NOT_SUPPORTED)
@@ -786,8 +803,8 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 
 
 status_t
-InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
-	uint8 jolietLevel)
+InitNode(iso9660_volume* volume, iso9660_inode* node, char* buffer,
+	size_t* _bytesRead, bool relocated)
 {
 	uint8 recordLength = *(uint8*)buffer++;
 	size_t nameLength;
@@ -802,10 +819,13 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 
 	char* end = buffer + recordLength;
 
-	node->cache = NULL;
-	node->name = NULL;
-	node->attr.slName = NULL;
-	memset(node->attr.stat, 0, sizeof(node->attr.stat));
+	if (!relocated) {
+		node->cache = NULL;
+		node->name = NULL;
+		node->attr.slName = NULL;
+		memset(node->attr.stat, 0, sizeof(node->attr.stat));
+	} else
+		free(node->attr.slName);
 
 	node->extAttrRecLen = *(uint8*)buffer++;
 	TRACE(("InitNode - ext attr length is %d\n", (int)node->extAttrRecLen));
@@ -843,9 +863,14 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 	buffer += 4;
 	TRACE(("InitNode - volume seq num is %d\n", (int)node->volSeqNum));
 
-	node->name_length = *(uint8*)buffer;
+	nameLength = *(uint8*)buffer;
 	buffer++;
-	TRACE(("InitNode - file id length is %u\n", node->name_length));
+
+	// for relocated directories we take the name from the placeholder entry
+	if (!relocated) {
+		node->name_length = nameLength;
+		TRACE(("InitNode - file id length is %u\n", node->name_length));
+	}
 
 	// Set defaults, in case there is no RockRidge stuff.
 	node->attr.stat[FS_DATA_FORMAT].st_mode |= (node->flags & ISO_IS_DIR) != 0
@@ -857,59 +882,59 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	nameLength = node->name_length;
+	if (!relocated) {
+		// JOLIET extension:
+		// on joliet discs, buffer[0] can be 0 for Unicoded filenames,
+		// so I've added a check here to test explicitely for
+		// directories (which have length 1)
+		// Take care of "." and "..", the first two dirents are
+		// these in iso.
+		if (node->name_length == 1 && buffer[0] == 0) {
+			node->name = strdup(".");
+			node->name_length = 1;
+		} else if (node->name_length == 1 && buffer[0] == 1) {
+			node->name = strdup("..");
+			node->name_length = 2;
+		} else if (volume->joliet_level > 0) {
+			// JOLIET extension: convert Unicode16 string to UTF8
+			// Assume that the unicode->utf8 conversion produces 4 byte
+			// utf8 characters, and allocate that much space
+			node->name = (char*)malloc(node->name_length * 2 + 1);
+			if (node->name == NULL)
+				return B_NO_MEMORY;
 
-	// JOLIET extension:
-	// on joliet discs, buffer[0] can be 0 for Unicoded filenames,
-	// so I've added a check here to test explicitely for
-	// directories (which have length 1)
-	// Take care of "." and "..", the first two dirents are
-	// these in iso.
-	if (node->name_length == 1 && buffer[0] == 0) {
-		node->name = strdup(".");
-		node->name_length = 1;
-	} else if (node->name_length == 1 && buffer[0] == 1) {
-		node->name = strdup("..");
-		node->name_length = 2;
-	} else if (jolietLevel > 0) {
-		// JOLIET extension: convert Unicode16 string to UTF8
-		// Assume that the unicode->utf8 conversion produces 4 byte
-		// utf8 characters, and allocate that much space
-		node->name = (char*)malloc(node->name_length * 2 + 1);
-		if (node->name == NULL)
-			return B_NO_MEMORY;
+			int32 sourceLength = node->name_length;
+			int32 destLength = node->name_length * 2;
 
-		int32 sourceLength = node->name_length;
-		int32 destLength = node->name_length * 2;
+			status_t status = unicode_to_utf8(buffer, &sourceLength,
+				node->name, &destLength);
+			if (status < B_OK) {
+				dprintf("iso9660: error converting unicode->utf8\n");
+				return status;
+			}
 
-		status_t status = unicode_to_utf8(buffer, &sourceLength,
-			node->name, &destLength);
-		if (status < B_OK) {
-			dprintf("iso9660: error converting unicode->utf8\n");
-			return status;
+			node->name[destLength] = '\0';
+			node->name_length = destLength;
+
+			sanitize_iso_name(node, false);
+		} else {
+			node->name = (char*)malloc(node->name_length + 1);
+			if (node->name == NULL)
+				return B_NO_MEMORY;
+
+			// convert all characters to lower case
+			for (uint32 i = 0; i < node->name_length; i++)
+				node->name[i] = tolower(buffer[i]);
+
+			node->name[node->name_length] = '\0';
+
+			sanitize_iso_name(node, true);
 		}
 
-		node->name[destLength] = '\0';
-		node->name_length = destLength;
-
-		sanitize_iso_name(node, false);
-	} else {
-		node->name = (char*)malloc(node->name_length + 1);
-		if (node->name == NULL)
+		if (node->name == NULL) {
+			TRACE(("InitNode - unable to allocate memory!\n"));
 			return B_NO_MEMORY;
-
-		// convert all characters to lower case
-		for (uint32 i = 0; i < node->name_length; i++) {
-			node->name[i] = tolower(buffer[i]);
 		}
-		node->name[node->name_length] = '\0';
-
-		sanitize_iso_name(node, true);
-	}
-
-	if (node->name == NULL) {
-		TRACE(("InitNode - unable to allocate memory!\n"));
-		return B_NO_MEMORY;
 	}
 
 	buffer += nameLength;
@@ -918,7 +943,7 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 
 	TRACE(("DirRec ID String is: %s\n", node->name));
 
-	return parse_rock_ridge(node, buffer, end);
+	return parse_rock_ridge(volume, node, buffer, end, relocated);
 }
 
 

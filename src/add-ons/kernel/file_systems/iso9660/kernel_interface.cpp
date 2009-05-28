@@ -264,8 +264,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			&& totalRead + blockBytesRead < dataLength
 			&& blockData[0] != 0
 			&& !done) {
-			initResult = InitNode(&node, blockData, &bytesRead,
-				ns->joliet_level);
+			initResult = InitNode(ns, &node, blockData, &bytesRead);
 			TRACE(("fs_walk - InitNode returned %s, filename %s, %u bytes "
 				"read\n", strerror(initResult), node.name, (unsigned)bytesRead));
 
@@ -341,7 +340,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 		return B_IO_ERROR;
 	}
 
-	status_t result = InitNode(newNode, data + pos, NULL, ns->joliet_level);
+	status_t result = InitNode(ns, newNode, data + pos, NULL);
 	block_cache_put(ns->fBlockCache, block);
 
 	if (result < B_OK) {
