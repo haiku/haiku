@@ -197,7 +197,7 @@ static FILE * ntfs_log_get_stream(u32 level)
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
 	return NULL;
-#elif
+#else
 	FILE *stream;
 
 	switch (level) {
@@ -407,7 +407,7 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
 	return 0;
-#elif
+#else
 	int ret = 0;
 	int olderr = errno;
 	FILE *stream;
@@ -528,7 +528,7 @@ int ntfs_log_handler_stdout(const char *function, const char *file,
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
 	return 0;
-#elif
+#else
 	if (!data)
 		data = stdout;
 
@@ -563,7 +563,7 @@ int ntfs_log_handler_outerr(const char *function, const char *file,
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
 	return 0;
-#elif
+#else
 	if (!data)
 		data = ntfs_log_get_stream(level);
 
@@ -597,7 +597,7 @@ int ntfs_log_handler_stderr(const char *function, const char *file,
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
 	return 0;
-#elif
+#else
 	if (!data)
 		data = stderr;
 

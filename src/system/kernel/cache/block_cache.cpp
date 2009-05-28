@@ -1947,6 +1947,9 @@ block_notifier_and_writer(void* /*data*/)
 			}
 		}
 	}
+
+	// never can get here
+	return B_OK;
 }
 
 

@@ -632,6 +632,9 @@ undertaker(void* /*args*/)
 		thread_enqueue(thread, &dead_q);
 			// TODO: Use the slab allocator!
 	}
+
+	// never can get here
+	return B_OK;
 }
 
 

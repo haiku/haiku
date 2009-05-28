@@ -756,6 +756,9 @@ object_cache_resizer(void*)
 		if (request->delete_when_done)
 			delete request;
 	}
+
+	// never can get here
+	return B_OK;
 }
 
 

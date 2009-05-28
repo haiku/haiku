@@ -3399,7 +3399,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 
 			be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
 			return true;
-#elif
+#else
 			// Get filename
 			BPath homePath;
 

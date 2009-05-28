@@ -739,6 +739,9 @@ IOScheduler::_RequestNotifier()
 		// notify the request
 		request->NotifyFinished();
 	}
+
+	// never can get here
+	return B_OK;
 }
 
 
