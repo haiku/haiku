@@ -71,6 +71,9 @@ class BInfoWindow : public BWindow {
 		virtual void Show();
 
 	private:
+		void StartWatchingNode();
+		void StartCalcSizeThread();		
+
 		static BRect InfoWindowRect(bool displayingSymlink);
 		static int32 CalcSize(void *); 
 
