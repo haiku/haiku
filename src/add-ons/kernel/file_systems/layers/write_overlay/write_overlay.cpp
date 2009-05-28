@@ -117,6 +117,7 @@ public:
 								size_t *length);
 		status_t			Write(void *cookie, off_t position,
 								const void *buffer, size_t *length);
+		status_t			SetFlags(void *cookie, int flags);
 
 		status_t			CreateDir(const char *name, int perms);
 		status_t			RemoveDir(const char *name);
@@ -358,20 +359,22 @@ OverlayInode::Open(int openMode, void **_cookie)
 	if (!fHasStat)
 		ReadStat(NULL);
 
+	open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	cookie->open_mode = openMode;
+	*_cookie = cookie;
+
 	if (fIsVirtual) {
 		if (openMode & O_TRUNC)
 			fStat.st_size = 0;
 
-		*_cookie = NULL;
 		return B_OK;
 	}
 
 	if (fSuperVnode.ops->open == NULL)
 		return B_UNSUPPORTED;
-
-	open_cookie *cookie = (open_cookie *)malloc(sizeof(open_cookie));
-	if (cookie == NULL)
-		return B_NO_MEMORY;
 
 	if (fOriginalNodeLength < 0) {
 		struct stat stat;
@@ -382,9 +385,6 @@ OverlayInode::Open(int openMode, void **_cookie)
 
 		fOriginalNodeLength = stat.st_size;
 	}
-
-	cookie->open_mode = openMode;
-	*_cookie = cookie;
 
 	if (openMode & O_TRUNC)
 		fStat.st_size = 0;
@@ -416,12 +416,13 @@ OverlayInode::Close(void *_cookie)
 status_t
 OverlayInode::FreeCookie(void *_cookie)
 {
-	if (fIsVirtual)
-		return B_OK;
-
+	status_t result = B_OK;
 	open_cookie *cookie = (open_cookie *)_cookie;
-	status_t result = fSuperVnode.ops->free_cookie(SuperVolume(),
-		&fSuperVnode, cookie->super_cookie);
+	if (!fIsVirtual) {
+		result = fSuperVnode.ops->free_cookie(SuperVolume(),
+			&fSuperVnode, cookie->super_cookie);
+	}
+
 	free(cookie);
 	return result;
 }
@@ -476,6 +477,10 @@ status_t
 OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	size_t *length)
 {
+	open_cookie *cookie = (open_cookie *)_cookie;
+	if (cookie->open_mode & O_APPEND)
+		position = fStat.st_size;
+
 	// find insertion point
 	write_buffer **link = &fWriteBuffers;
 	write_buffer *other = fWriteBuffers;
@@ -559,6 +564,16 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	fStat.st_mtime = time(NULL);
 	notify_stat_changed(SuperVolume()->id, fInodeNumber,
 		B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::SetFlags(void *_cookie, int flags)
+{
+	// we can only handle O_APPEND, O_NONBLOCK is ignored.
+	open_cookie *cookie = (open_cookie *)_cookie;
+	cookie->open_mode = (cookie->open_mode & ~O_APPEND) | (flags & ~O_APPEND);
 	return B_OK;
 }
 
@@ -1063,7 +1078,7 @@ static status_t
 overlay_set_flags(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	int flags)
 {
-	OVERLAY_CALL(set_flags, cookie, flags)
+	return ((OverlayInode *)vnode->private_node)->SetFlags(cookie, flags);
 }
 
 
