@@ -1810,6 +1810,7 @@ overlay_get_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode, int *_type,
 
 		status = node->InitCheck();
 		if (status != B_OK) {
+			vnode->ops->put_vnode(volume->super_volume, vnode, reenter);
 			delete node;
 			return status;
 		}
