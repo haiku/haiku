@@ -993,7 +993,17 @@ overlay_get_vnode_name(fs_volume *volume, fs_vnode *vnode, char *buffer,
 static bool
 overlay_can_page(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(can_page, cookie)
+	TRACE("relaying op: can_page\n");
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	if (node->IsVirtual())
+		return false;
+
+	fs_vnode *superVnode = node->SuperVnode();
+	if (superVnode->ops->can_page != NULL) {
+		return superVnode->ops->can_page(volume->super_volume, superVnode,
+			cookie);
+	}
+
 	return false;
 }
 
