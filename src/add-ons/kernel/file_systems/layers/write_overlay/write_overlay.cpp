@@ -477,9 +477,11 @@ status_t
 OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	size_t *length)
 {
-	open_cookie *cookie = (open_cookie *)_cookie;
-	if (cookie->open_mode & O_APPEND)
-		position = fStat.st_size;
+	if (_cookie != NULL) {
+		open_cookie *cookie = (open_cookie *)_cookie;
+		if (cookie->open_mode & O_APPEND)
+			position = fStat.st_size;
+	}
 
 	// find insertion point
 	write_buffer **link = &fWriteBuffers;
