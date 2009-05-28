@@ -302,8 +302,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# ABI independent stuff
 
-	# scripts: cc and c++ wrapper, setgcc
-	local scripts = cc c++ setgcc ;
+	# scripts: cc and c++ wrapper, freetype-config, setgcc
+	local scripts = cc c++ freetype-config setgcc ;
 	SEARCH on $(scripts) = [ FDirName $(HAIKU_TOP) data bin ] ;
 	AddFilesToHaikuImage system bin : $(scripts) ;
 
