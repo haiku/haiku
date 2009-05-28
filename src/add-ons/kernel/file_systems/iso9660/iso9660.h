@@ -76,10 +76,13 @@ struct rock_ridge_attributes {
 	uint8			slVer;
 };
 
+struct iso9660_volume;
+
 struct iso9660_inode {
 	/* Most drivers will probably want the first things defined here. */
 	ino_t		id;
 	ino_t	 	parID;		// parent vnode ID.
+	struct iso9660_volume* volume;
 	void		*cache;		// for file cache
 
 	// End of members other drivers will definitely want.

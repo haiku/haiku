@@ -38,6 +38,9 @@
 #include "iso9660.h"
 #include "iso9660_identify.h"
 
+// TODO: temporary solution as long as there is no public I/O requests API
+#include <io_requests.h>
+
 
 //#define TRACE_ISO9660
 #ifdef TRACE_ISO9660
@@ -53,6 +56,33 @@ struct identify_cookie {
 
 extern fs_volume_ops gISO9660VolumeOps;
 extern fs_vnode_ops gISO9660VnodeOps;
+
+
+//!	fs_io() callback hook
+static status_t
+iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
+{
+	iso9660_inode* node = (iso9660_inode*)cookie;
+
+	vecs->offset = offset + node->startLBN[FS_DATA_FORMAT]
+		* node->volume->logicalBlkSize[FS_DATA_FORMAT];
+	vecs->length = size;
+
+	*_count = 1;
+
+	return B_OK;
+}
+
+
+//!	fs_io() callback hook
+static status_t
+iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	// nothing to do here...
+	return B_OK;
+}
 
 
 //	#pragma mark - Scanning
@@ -349,7 +379,9 @@ fs_read_vnode(fs_volume* _volume, ino_t vnodeID, fs_vnode* _node,
 		return result;
 	}
 
+	newNode->volume = volume;
 	newNode->id = vnodeID;
+
 	_node->private_node = newNode;
 	_node->ops = &gISO9660VnodeOps;
 	*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode
@@ -415,6 +447,23 @@ fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*  _cookie, off_t pos,
 	size_t vecOffset = 0;
 	return read_file_io_vec_pages(volume->fd, &fileVec, 1, vecs, count,
 		&vecIndex, &vecOffset, &bytesLeft);
+}
+
+
+static status_t
+fs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
+{
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
+
+	if (io_request_is_write(request))
+		return B_READ_ONLY_DEVICE;
+
+	if ((node->flags & ISO_IS_DIR) != 0)
+		return EISDIR;
+
+	return do_iterative_fd_io(volume->fd, request, iterative_io_get_vecs_hook,
+		iterative_io_finished_hook, node);
 }
 
 
@@ -660,7 +709,7 @@ fs_vnode_ops gISO9660VnodeOps = {
 	&fs_read_pages,
 	NULL,
 
-	NULL,   // io()
+	&fs_io,
 	NULL,	// cancel_io()
 
 	/* cache file access */
