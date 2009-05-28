@@ -59,9 +59,9 @@ extern fs_vnode_ops gISO9660VnodeOps;
 
 
 static float
-fs_identify_partition(int fd, partition_data *partition, void **_cookie)
+fs_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
-	iso9660_info *info = new iso9660_info;
+	iso9660_info* info = new iso9660_info;
 
 	status_t status = iso9660_fs_identify(fd, info);
 	if (status != B_OK) {
@@ -75,9 +75,9 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 
 static status_t
-fs_scan_partition(int fd, partition_data *partition, void *_cookie)
+fs_scan_partition(int fd, partition_data* partition, void* _cookie)
 {
-	iso9660_info *info = (iso9660_info *)_cookie;
+	iso9660_info* info = (iso9660_info*)_cookie;
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM | B_PARTITION_READ_ONLY ;
@@ -93,9 +93,9 @@ fs_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
-fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+fs_free_identify_partition_cookie(partition_data* partition, void* _cookie)
 {
-	delete (iso9660_info *)_cookie;
+	delete (iso9660_info*)_cookie;
 }
 
 
@@ -103,18 +103,18 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-fs_mount(fs_volume *_volume, const char *device, uint32 flags,
-	const char *args, ino_t *_rootID)
+fs_mount(fs_volume* _volume, const char* device, uint32 flags,
+	const char* args, ino_t* _rootID)
 {
 	bool allowJoliet = true;
-	iso9660_volume *volume;
+	iso9660_volume* volume;
 
 	// Check for a 'nojoliet' parm
 	// all we check for is the existance of 'nojoliet' in the parms.
 	if (args != NULL) {
 		uint32 i;
-		char *spot;
-		char *buf = strdup(args);
+		char* spot;
+		char* buf = strdup(args);
 
 		uint32 len = strlen(buf);
 		// lower case the parms data
@@ -153,21 +153,21 @@ fs_mount(fs_volume *_volume, const char *device, uint32 flags,
 
 
 static status_t
-fs_unmount(fs_volume *_vol)
+fs_unmount(fs_volume* _volume)
 {
 	status_t result = B_NO_ERROR;
-	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
 
 	TRACE(("fs_unmount - ENTER\n"));
 
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
-	put_vnode(_vol, ISO_ROOTNODE_ID);
+	put_vnode(_volume, ISO_ROOTNODE_ID);
 
-	block_cache_delete(ns->fBlockCache, false);
-	close(ns->fdOfSession);
-	result = close(ns->fd);
+	block_cache_delete(volume->fBlockCache, false);
+	close(volume->fdOfSession);
+	result = close(volume->fd);
 
-	free(ns);
+	free(volume);
 
 	TRACE(("fs_unmount - EXIT, result is %s\n", strerror(result)));
 	return result;
@@ -175,39 +175,41 @@ fs_unmount(fs_volume *_vol)
 
 
 static status_t
-fs_read_fs_stat(fs_volume *_vol, struct fs_info *fss)
+fs_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 {
-	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+
+	info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
+	info->block_size = volume->logicalBlkSize[FS_DATA_FORMAT];
+	info->io_size = 65536;
+	info->total_blocks = volume->volSpaceSize[FS_DATA_FORMAT];
+	info->free_blocks = 0;
+
+	strlcpy(info->device_name, volume->devicePath, sizeof(info->device_name));
+	strlcpy(info->volume_name, volume->volIDString, sizeof(info->volume_name));
+
+	// strip trailing spaces
 	int i;
-
-	fss->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
-	fss->block_size = ns->logicalBlkSize[FS_DATA_FORMAT];
-	fss->io_size = 65536;
-	fss->total_blocks = ns->volSpaceSize[FS_DATA_FORMAT];
-	fss->free_blocks = 0;
-
-	strncpy(fss->device_name, ns->devicePath, sizeof(fss->device_name));
-
-	strncpy(fss->volume_name, ns->volIDString, sizeof(fss->volume_name));
-	for (i = strlen(fss->volume_name) - 1; i >=0 ; i--) {
-		if (fss->volume_name[i] != ' ')
+	for (i = strlen(info->volume_name) - 1; i >=0 ; i--) {
+		if (info->volume_name[i] != ' ')
 			break;
 	}
 
 	if (i < 0)
-		strcpy(fss->volume_name, "UNKNOWN");
+		strcpy(info->volume_name, "UNKNOWN");
 	else
-		fss->volume_name[i + 1] = 0;
+		info->volume_name[i + 1] = 0;
 
-	strcpy(fss->fsh_name, "iso9660");
+	strcpy(info->fsh_name, "iso9660");
 	return B_OK;
 }
 
 
 static status_t
-fs_get_vnode_name(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t bufferSize)
+fs_get_vnode_name(fs_volume* _volume, fs_vnode* _node, char* buffer,
+	size_t bufferSize)
 {
-	iso9660_inode *node = (iso9660_inode*)_node->private_node;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
 	strlcpy(buffer, node->name, bufferSize);
 	return B_OK;
@@ -215,11 +217,11 @@ fs_get_vnode_name(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t bufferS
 
 
 static status_t
-fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
+fs_walk(fs_volume* _volume, fs_vnode* _base, const char* file, ino_t* _vnodeID)
 {
-	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
-	iso9660_inode *baseNode = (iso9660_inode*)_base->private_node;
-	iso9660_inode *newNode = NULL;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+	iso9660_inode* baseNode = (iso9660_inode*)_base->private_node;
+	iso9660_inode* newNode = NULL;
 
 	TRACE(("fs_walk - looking for %s in dir file of length %d\n", file,
 		(int)baseNode->dataLen[FS_DATA_FORMAT]));
@@ -228,12 +230,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 		// base directory
 		TRACE(("fs_walk - found \".\" file.\n"));
 		*_vnodeID = baseNode->id;
-		return get_vnode(_vol, *_vnodeID, NULL);
+		return get_vnode(_volume, *_vnodeID, NULL);
 	} else if (strcmp(file, "..") == 0) {
 		// parent directory
 		TRACE(("fs_walk - found \"..\" file.\n"));
 		*_vnodeID = baseNode->parID;
-		return get_vnode(_vol, *_vnodeID, NULL);
+		return get_vnode(_volume, *_vnodeID, NULL);
 	}
 
 	// look up file in the directory
@@ -245,7 +247,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 
 	while (totalRead < dataLength && !done) {
 		off_t cachedBlock = block;
-		char* blockData = (char*)block_cache_get(ns->fBlockCache, block);
+		char* blockData = (char*)block_cache_get(volume->fBlockCache, block);
 		if (blockData == NULL)
 			break;
 
@@ -260,11 +262,11 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 		// Move to the next block if necessary
 		// Don't go over end of buffer, if dir record sits on boundary.
 
-		while (blockBytesRead < ns->logicalBlkSize[FS_DATA_FORMAT]
+		while (blockBytesRead < volume->logicalBlkSize[FS_DATA_FORMAT]
 			&& totalRead + blockBytesRead < dataLength
 			&& blockData[0] != 0
 			&& !done) {
-			initResult = InitNode(ns, &node, blockData, &bytesRead);
+			initResult = InitNode(volume, &node, blockData, &bytesRead);
 			TRACE(("fs_walk - InitNode returned %s, filename %s, %u bytes "
 				"read\n", strerror(initResult), node.name, (unsigned)bytesRead));
 
@@ -277,8 +279,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 					*_vnodeID = (block << 30) + (blockBytesRead & 0xffffffff);
 					TRACE(("fs_walk - New vnode id is %Ld\n", *_vnodeID));
 
-					result = get_vnode(_vol, *_vnodeID,
-						(void **)&newNode);
+					result = get_vnode(_volume, *_vnodeID, (void**)&newNode);
 					if (result == B_OK) {
 						newNode->parID = baseNode->id;
 						done = true;
@@ -299,12 +300,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 				"%Ld/%u).\n", (unsigned)bytesRead, blockBytesRead,
 				(unsigned)baseNode->dataLen[FS_DATA_FORMAT]));
 		}
-		totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
+		totalRead += volume->logicalBlkSize[FS_DATA_FORMAT];
 		block++;
 
 		TRACE(("fs_walk - moving to next block %Ld, total read %u\n",
 			block, (unsigned)totalRead));
-		block_cache_put(ns->fBlockCache, cachedBlock);
+		block_cache_put(volume->fBlockCache, cachedBlock);
 	}
 
 	TRACE(("fs_walk - EXIT, result is %s, vnid is %Lu\n",
@@ -314,12 +315,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 
 
 static status_t
-fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
-	int *_type, uint32 *_flags, bool reenter)
+fs_read_vnode(fs_volume* _volume, ino_t vnodeID, fs_vnode* _node,
+	int* _type, uint32* _flags, bool reenter)
 {
-	iso9660_volume *ns = (iso9660_volume*)_vol->private_volume;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
 
-	iso9660_inode *newNode = (iso9660_inode*)calloc(sizeof(iso9660_inode), 1);
+	iso9660_inode* newNode = (iso9660_inode*)calloc(sizeof(iso9660_inode), 1);
 	if (newNode == NULL)
 		return B_NO_MEMORY;
 
@@ -329,19 +330,19 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	TRACE(("fs_read_vnode - block = %u, pos = %u, raw = %Lu node %p\n",
 		(unsigned)block, (unsigned) pos, vnodeID, newNode));
 
-	if (pos > ns->logicalBlkSize[FS_DATA_FORMAT]) {
+	if (pos > volume->logicalBlkSize[FS_DATA_FORMAT]) {
 		free(newNode);
 		return B_BAD_VALUE;
 	}
 
-	char *data = (char *)block_cache_get(ns->fBlockCache, block);
+	char* data = (char*)block_cache_get(volume->fBlockCache, block);
 	if (data == NULL) {
 		free(newNode);
 		return B_IO_ERROR;
 	}
 
-	status_t result = InitNode(ns, newNode, data + pos, NULL);
-	block_cache_put(ns->fBlockCache, block);
+	status_t result = InitNode(volume, newNode, data + pos, NULL);
+	block_cache_put(volume->fBlockCache, block);
 
 	if (result < B_OK) {
 		free(newNode);
@@ -356,7 +357,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	*_flags = 0;
 
 	if ((newNode->flags & ISO_IS_DIR) == 0) {
-		newNode->cache = file_cache_create(ns->id, vnodeID,
+		newNode->cache = file_cache_create(volume->id, vnodeID,
 			newNode->dataLen[FS_DATA_FORMAT]);
 	}
 
@@ -387,11 +388,11 @@ fs_release_vnode(fs_volume* /*_volume*/, fs_vnode* _node, bool /*reenter*/)
 
 
 static status_t
-fs_read_pages(fs_volume *_vol, fs_vnode *_node, void * _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*  _cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
 {
-	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
-	iso9660_inode *node = (iso9660_inode *)_node->private_node;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
 	uint32 fileSize = node->dataLen[FS_DATA_FORMAT];
 	size_t bytesLeft = *_numBytes;
@@ -407,27 +408,27 @@ fs_read_pages(fs_volume *_vol, fs_vnode *_node, void * _cookie, off_t pos,
 
 	file_io_vec fileVec;
 	fileVec.offset = pos + node->startLBN[FS_DATA_FORMAT]
-		* ns->logicalBlkSize[FS_DATA_FORMAT];
+		* volume->logicalBlkSize[FS_DATA_FORMAT];
 	fileVec.length = bytesLeft;
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
-	return read_file_io_vec_pages(ns->fd, &fileVec, 1, vecs, count,
+	return read_file_io_vec_pages(volume->fd, &fileVec, 1, vecs, count,
 		&vecIndex, &vecOffset, &bytesLeft);
 }
 
 
 static status_t
-fs_read_stat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
+fs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* st)
 {
-	iso9660_volume *ns = (iso9660_volume*)_vol->private_volume;
-	iso9660_inode *node = (iso9660_inode*)_node->private_node;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 	status_t result = B_NO_ERROR;
 	time_t time;
 
 	TRACE(("fs_read_stat - ENTER\n"));
 
-	st->st_dev = ns->id;
+	st->st_dev = volume->id;
 	st->st_ino = node->id;
 	st->st_nlink = node->attr.stat[FS_DATA_FORMAT].st_nlink;
 	st->st_uid = node->attr.stat[FS_DATA_FORMAT].st_uid;
@@ -448,28 +449,22 @@ fs_read_stat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 
 
 static status_t
-fs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **cookie)
+fs_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode, void** /*cookie*/)
 {
-	status_t result = B_NO_ERROR;
-
-	(void)_vol;
-	(void)cookie;
-
 	// Do not allow any of the write-like open modes to get by
-	if ((omode == O_WRONLY) || (omode == O_RDWR))
-		result = EROFS;
-	else if((omode & O_TRUNC) || (omode & O_CREAT))
-		result = EROFS;
+	if ((openMode & O_RWMASK) == O_WRONLY || (openMode & O_RWMASK) == O_RDWR
+		|| (openMode & O_TRUNC) != 0 || (openMode & O_CREAT) != 0)
+		return EROFS;
 
-	return result;
+	return B_OK;
 }
 
 
 static status_t
-fs_read(fs_volume *_vol, fs_vnode *_node, void *cookie, off_t pos, void *buffer,
-	size_t *_length)
+fs_read(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
+	void* buffer, size_t* _length)
 {
-	iso9660_inode *node = (iso9660_inode *)_node->private_node;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
 	if ((node->flags & ISO_IS_DIR) != 0)
 		return EISDIR;
@@ -489,42 +484,31 @@ fs_read(fs_volume *_vol, fs_vnode *_node, void *cookie, off_t pos, void *buffer,
 
 
 static status_t
-fs_close(fs_volume *_vol, fs_vnode *_node, void *cookie)
+fs_close(fs_volume* /*_volume*/, fs_vnode* /*_node*/, void* /*cookie*/)
 {
-	(void)_vol;
-	(void)_node;
-	(void)cookie;
-
 	return B_OK;
 }
 
 
 static status_t
-fs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *cookie)
+fs_free_cookie(fs_volume* /*_volume*/, fs_vnode* /*_node*/, void* /*cookie*/)
 {
-	(void)_vol;
-	(void)_node;
-	(void)cookie;
-
 	return B_OK;
 }
 
 
 static status_t
-fs_access(fs_volume *_vol, fs_vnode *_node, int mode)
+fs_access(fs_volume* /*_volume*/, fs_vnode* /*_node*/, int /*mode*/)
 {
-	(void)_vol;
-	(void)_node;
-	(void)mode;
-
 	return B_OK;
 }
 
 
 static status_t
-fs_read_link(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *_bufferSize)
+fs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
+	size_t* _bufferSize)
 {
-	iso9660_inode *node = (iso9660_inode *)_node->private_node;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
 	if (!S_ISLNK(node->attr.stat[FS_DATA_FORMAT].st_mode))
 		return B_BAD_VALUE;
@@ -544,7 +528,7 @@ fs_read_link(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *_bufferSize
 static status_t
 fs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 {
-	iso9660_inode *node = (iso9660_inode *)_node->private_node;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
 	TRACE(("fs_open_dir - node is %p\n", node));
 
@@ -567,15 +551,15 @@ fs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 
 
 static status_t
-fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
-	struct dirent *buffer, size_t bufferSize, uint32 *num)
+fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* num)
 {
-	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
-	dircookie *dirCookie = (dircookie *)_cookie;
+	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
+	dircookie* dirCookie = (dircookie*)_cookie;
 
 	TRACE(("fs_read_dir - ENTER\n"));
 
-	status_t result = ISOReadDirEnt(ns, dirCookie, buffer, bufferSize);
+	status_t result = ISOReadDirEnt(volume, dirCookie, buffer, bufferSize);
 
 	// If we succeeded, return 1, the number of dirents we read.
 	if (result == B_OK)
@@ -595,9 +579,9 @@ fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-fs_rewind_dir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
+fs_rewind_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
-	dircookie *cookie = (dircookie*)_cookie;
+	dircookie* cookie = (dircookie*)_cookie;
 
 	cookie->block = cookie->startBlock;
 	cookie->pos = 0;
@@ -606,14 +590,14 @@ fs_rewind_dir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 
 
 static status_t
-fs_close_dir(fs_volume *_vol, fs_vnode *_node, void *cookie)
+fs_close_dir(fs_volume* _volume, fs_vnode* _node, void* cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-fs_free_dir_cookie(fs_volume *_vol, fs_vnode *_node, void *cookie)
+fs_free_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* cookie)
 {
 	free(cookie);
 	return B_OK;
@@ -676,7 +660,7 @@ fs_vnode_ops gISO9660VnodeOps = {
 	&fs_read_pages,
 	NULL,
 
-	NULL,	// io()
+	NULL,   // io()
 	NULL,	// cancel_io()
 
 	/* cache file access */
@@ -778,8 +762,8 @@ static file_system_module_info sISO660FileSystem = {
 	NULL,
 };
 
-module_info *modules[] = {
-	(module_info *)&sISO660FileSystem,
+module_info* modules[] = {
+	(module_info*)&sISO660FileSystem,
 	NULL,
 };
 
