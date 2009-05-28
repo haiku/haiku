@@ -665,7 +665,15 @@ status_t
 AttributeFile::RemoveAttributeFile(fs_volume *overlay, fs_volume *volume,
 	fs_vnode *vnode)
 {
-	if (fAttributeDirInode == 0 || fAttributeFileInode == 0) {
+	bool hasAttributeFile = fAttributeFileInode != 0;
+	ino_t attributeDirInode = fAttributeDirInode;
+
+	// invalidate all of our cached inode numbers
+	fDirectoryInode = 0;
+	fAttributeDirInode = 0;
+	fAttributeFileInode = 0;
+
+	if (!hasAttributeFile) {
 		// there is no backing file at all yet
 		return B_OK;
 	}
@@ -680,7 +688,7 @@ AttributeFile::RemoveAttributeFile(fs_volume *overlay, fs_volume *volume,
 	}
 
 	OverlayInode *overlayInode = NULL;
-	result = get_vnode(overlay, fAttributeDirInode, (void **)&overlayInode);
+	result = get_vnode(overlay, attributeDirInode, (void **)&overlayInode);
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting attribute directory vnode failed: %s\n",
 			strerror(result));
@@ -690,18 +698,18 @@ AttributeFile::RemoveAttributeFile(fs_volume *overlay, fs_volume *volume,
 	fs_vnode attributeDir = *overlayInode->SuperVnode();
 	if (attributeDir.ops->unlink == NULL) {
 		TRACE_ALWAYS("cannot remove attribute file, unlink hook missing\n");
-		put_vnode(volume, fAttributeDirInode);
+		put_vnode(volume, attributeDirInode);
 		return B_UNSUPPORTED;
 	}
 
 	result = attributeDir.ops->unlink(volume, &attributeDir, nameBuffer);
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to unlink attribute file: %s\n", strerror(result));
-		put_vnode(volume, fAttributeDirInode);
+		put_vnode(volume, attributeDirInode);
 		return result;
 	}
 
-	put_vnode(volume, fAttributeDirInode);
+	put_vnode(volume, attributeDirInode);
 	return B_OK;
 }
 
