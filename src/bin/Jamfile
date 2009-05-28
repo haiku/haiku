@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders app shared storage support usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
+UseLibraryHeaders ncurses ;
 
 local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 
@@ -169,6 +170,11 @@ StdBinCommands
 StdBinCommands
 	filepanel.cpp
 	: be tracker : $(haiku-utils_rsrc) ;
+
+# standard commands that need libncurses.a
+StdBinCommands
+	watch.c
+	: libncurses.a : $(haiku-utils_rsrc) ;
 
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
