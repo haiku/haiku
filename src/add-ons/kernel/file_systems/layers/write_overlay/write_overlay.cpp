@@ -1161,6 +1161,7 @@ overlay_rename(fs_volume *volume, fs_vnode *vnode,
 		return result;
 	}
 
+	free(oldName);
 	return B_OK;
 }
 
