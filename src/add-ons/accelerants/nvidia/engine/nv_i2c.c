@@ -674,11 +674,11 @@ i2c_DumpSpecsEDID(edid_specs* specs)
  * - con1 resides closest to the mainboard on for example NV25 and NV28, while for
  *   example on NV34 con2 sits closest to the mainboard.
  * - i2c bus0 is connected to con1, and i2c bus1 is connected to con2 on all pre-NV40
- *   architecture cards. On later cards it's vice versa. */
-//>>>fixme:
-//- re-check if the latter note is true,
-//- and check if it's dependant on the DAC cross connection switch..
-//- and check if analog or digital connection type influences this..
+ *   architecture cards. On later cards it's vice versa. These connections do not depend
+ *   on the analog VGA switch setting (see nv_general_output_select()). It also does
+ *   not depend on the way screens are connected to the cards (DVI/VGA, 1 or 2 screens).
+ * - con1 has CRTC1 and DAC1, and con2 has CRTC2 and DAC2 if nv_general_output_select()
+ *   is set to 'straight' and there are only VGA type screens connected. */
 void i2c_DetectScreens(void)
 {
 	edid1_info edid;
