@@ -1080,7 +1080,8 @@ AttributeEntry::WriteStat(const struct stat *stat, uint32 statMask)
 	OverlayInode *node = (OverlayInode *)vnode->private_node; \
 	fs_vnode *superVnode = node->SuperVnode(); \
 	if (superVnode->ops->op != NULL) \
-		return superVnode->ops->op(volume->super_volume, superVnode, params);
+		return superVnode->ops->op(volume->super_volume, superVnode, params); \
+	return B_UNSUPPORTED;
 
 
 static status_t
@@ -1143,7 +1144,6 @@ static status_t
 overlay_lookup(fs_volume *volume, fs_vnode *vnode, const char *name, ino_t *id)
 {
 	OVERLAY_CALL(lookup, name, id)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1152,14 +1152,21 @@ overlay_get_vnode_name(fs_volume *volume, fs_vnode *vnode, char *buffer,
 	size_t bufferSize)
 {
 	OVERLAY_CALL(get_vnode_name, buffer, bufferSize)
-	return B_UNSUPPORTED;
 }
 
 
 static bool
 overlay_can_page(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	OVERLAY_CALL(can_page, cookie)
+	TRACE("relaying op: can_page\n");
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	fs_vnode *superVnode = node->SuperVnode();
+
+	if (superVnode->ops->can_page != NULL) {
+		return superVnode->ops->can_page(volume->super_volume, superVnode,
+			cookie);
+	}
+
 	return false;
 }
 
@@ -1169,7 +1176,6 @@ overlay_read_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *numBytes)
 {
 	OVERLAY_CALL(read_pages, cookie, pos, vecs, count, numBytes)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1178,7 +1184,6 @@ overlay_write_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *numBytes)
 {
 	OVERLAY_CALL(write_pages, cookie, pos, vecs, count, numBytes)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1188,7 +1193,6 @@ overlay_io(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	io_request *request)
 {
 	OVERLAY_CALL(io, cookie, request)
-	return B_UNSUPPORTED;
 }
 #endif
 
@@ -1198,7 +1202,6 @@ overlay_cancel_io(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	io_request *request)
 {
 	OVERLAY_CALL(cancel_io, cookie, request)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1207,7 +1210,6 @@ overlay_get_file_map(fs_volume *volume, fs_vnode *vnode, off_t offset,
 	size_t size, struct file_io_vec *vecs, size_t *count)
 {
 	OVERLAY_CALL(get_file_map, offset, size, vecs, count)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1216,7 +1218,6 @@ overlay_ioctl(fs_volume *volume, fs_vnode *vnode, void *cookie, ulong op,
 	void *buffer, size_t length)
 {
 	OVERLAY_CALL(ioctl, cookie, op, buffer, length)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1225,7 +1226,6 @@ overlay_set_flags(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	int flags)
 {
 	OVERLAY_CALL(set_flags, cookie, flags)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1234,7 +1234,6 @@ overlay_select(fs_volume *volume, fs_vnode *vnode, void *cookie, uint8 event,
 	selectsync *sync)
 {
 	OVERLAY_CALL(select, cookie, event, sync)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1243,7 +1242,6 @@ overlay_deselect(fs_volume *volume, fs_vnode *vnode, void *cookie, uint8 event,
 	selectsync *sync)
 {
 	OVERLAY_CALL(deselect, cookie, event, sync)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1265,7 +1263,6 @@ overlay_read_symlink(fs_volume *volume, fs_vnode *vnode, char *buffer,
 	size_t *bufferSize)
 {
 	OVERLAY_CALL(read_symlink, buffer, bufferSize)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1274,7 +1271,6 @@ overlay_create_symlink(fs_volume *volume, fs_vnode *vnode, const char *name,
 	const char *path, int mode)
 {
 	OVERLAY_CALL(create_symlink, name, path, mode)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1284,7 +1280,6 @@ overlay_link(fs_volume *volume, fs_vnode *vnode, const char *name,
 {
 	OverlayInode *targetNode = (OverlayInode *)target->private_node;
 	OVERLAY_CALL(link, name, targetNode->SuperVnode())
-	return B_UNSUPPORTED;
 }
 
 
@@ -1292,7 +1287,6 @@ static status_t
 overlay_unlink(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
 	OVERLAY_CALL(unlink, name)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1302,7 +1296,6 @@ overlay_rename(fs_volume *volume, fs_vnode *vnode,
 {
 	OverlayInode *toDirNode = (OverlayInode *)toDir->private_node;
 	OVERLAY_CALL(rename, fromName, toDirNode->SuperVnode(), toName)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1310,7 +1303,6 @@ static status_t
 overlay_access(fs_volume *volume, fs_vnode *vnode, int mode)
 {
 	OVERLAY_CALL(access, mode)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1318,7 +1310,6 @@ static status_t
 overlay_read_stat(fs_volume *volume, fs_vnode *vnode, struct stat *stat)
 {
 	OVERLAY_CALL(read_stat, stat)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1327,7 +1318,6 @@ overlay_write_stat(fs_volume *volume, fs_vnode *vnode, const struct stat *stat,
 	uint32 statMask)
 {
 	OVERLAY_CALL(write_stat, stat, statMask)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1336,7 +1326,6 @@ overlay_create(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int openMode, int perms, void **cookie, ino_t *newVnodeID)
 {
 	OVERLAY_CALL(create, name, openMode, perms, cookie, newVnodeID)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1344,7 +1333,6 @@ static status_t
 overlay_open(fs_volume *volume, fs_vnode *vnode, int openMode, void **cookie)
 {
 	OVERLAY_CALL(open, openMode, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1352,7 +1340,6 @@ static status_t
 overlay_close(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(close, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1360,7 +1347,6 @@ static status_t
 overlay_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(free_cookie, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1369,7 +1355,6 @@ overlay_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
 	OVERLAY_CALL(read, cookie, pos, buffer, length)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1378,7 +1363,6 @@ overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const void *buffer, size_t *length)
 {
 	OVERLAY_CALL(write, cookie, pos, buffer, length)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1387,7 +1371,6 @@ overlay_create_dir(fs_volume *volume, fs_vnode *vnode, const char *name,
 	int perms)
 {
 	OVERLAY_CALL(create_dir, name, perms)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1395,7 +1378,6 @@ static status_t
 overlay_remove_dir(fs_volume *volume, fs_vnode *vnode, const char *name)
 {
 	OVERLAY_CALL(remove_dir, name)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1403,7 +1385,6 @@ static status_t
 overlay_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
 	OVERLAY_CALL(open_dir, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1411,7 +1392,6 @@ static status_t
 overlay_close_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(close_dir, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1419,7 +1399,6 @@ static status_t
 overlay_free_dir_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(free_dir_cookie, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1453,7 +1432,6 @@ static status_t
 overlay_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	OVERLAY_CALL(rewind_dir, cookie)
-	return B_UNSUPPORTED;
 }
 
 
@@ -1649,7 +1627,6 @@ overlay_create_special_node(fs_volume *volume, fs_vnode *vnode,
 	fs_vnode *_superVnode, ino_t *nodeID)
 {
 	OVERLAY_CALL(create_special_node, name, subVnode, mode, flags, _superVnode, nodeID)
-	return B_UNSUPPORTED;
 }
 
 
