@@ -517,11 +517,6 @@ AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
 	if (fFile == NULL)
 		return B_NO_INIT;
 
-	if (fDirectoryInode == 0) {
-		TRACE_ALWAYS("directory inode not known\n");
-		return B_NO_INIT;
-	}
-
 	char nameBuffer[B_FILE_NAME_LENGTH];
 	nameBuffer[sizeof(nameBuffer) - 1] = 0;
 	status_t result = vnode->ops->get_vnode_name(volume, vnode, nameBuffer,
@@ -531,7 +526,25 @@ AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
 		return result;
 	}
 
-	fs_vnode currentVnode;
+	fs_vnode currentVnode = *vnode;
+	if (fDirectoryInode == 0) {
+		if (currentVnode.ops->lookup == NULL) {
+			TRACE_ALWAYS("lookup not possible, lookup hook missing\n");
+			return B_UNSUPPORTED;
+		}
+
+		// see TODO above
+		result = currentVnode.ops->lookup(volume, &currentVnode, "..",
+			&fDirectoryInode);
+		if (result != B_OK) {
+			TRACE_ALWAYS("lookup of parent directory failed: %s\n",
+				strerror(result));
+			return B_UNSUPPORTED;
+		}
+
+		put_vnode(volume, fDirectoryInode);
+	}
+
 	OverlayInode *overlayInode = NULL;
 	if (fAttributeDirInode == 0) {
 		result = get_vnode(overlay, fDirectoryInode, (void **)&overlayInode);
