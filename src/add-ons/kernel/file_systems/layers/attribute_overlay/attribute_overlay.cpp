@@ -1282,7 +1282,8 @@ static status_t
 overlay_link(fs_volume *volume, fs_vnode *vnode, const char *name,
 	fs_vnode *target)
 {
-	OVERLAY_CALL(link, name, target)
+	OverlayInode *targetNode = (OverlayInode *)target->private_node;
+	OVERLAY_CALL(link, name, targetNode->SuperVnode())
 	return B_UNSUPPORTED;
 }
 
@@ -1299,7 +1300,8 @@ static status_t
 overlay_rename(fs_volume *volume, fs_vnode *vnode,
 	const char *fromName, fs_vnode *toDir, const char *toName)
 {
-	OVERLAY_CALL(rename, fromName, toDir, toName)
+	OverlayInode *toDirNode = (OverlayInode *)toDir->private_node;
+	OVERLAY_CALL(rename, fromName, toDirNode->SuperVnode(), toName)
 	return B_UNSUPPORTED;
 }
 
