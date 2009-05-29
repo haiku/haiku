@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -719,19 +719,6 @@ VMAnonymousCache::Merge(VMCache* _source)
 		vm_page* consumerPage = LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		swap_addr_t consumerSwapSlot = _SwapBlockGetAddress(page->cache_offset);
-		if (consumerPage != NULL && consumerPage->state == PAGE_STATE_BUSY
-			&& consumerPage->type == PAGE_TYPE_DUMMY
-			&& consumerSwapSlot == SWAP_SLOT_NONE) {
-			// the page is currently busy taking a read fault - IOW,
-			// vm_soft_fault() has mapped our page so we can just
-			// move it up
-			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
-			RemovePage(consumerPage);
-			consumerPage->state = PAGE_STATE_INACTIVE;
-			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
-			consumerPage = NULL;
-		}
-
 		if (consumerPage == NULL && consumerSwapSlot == SWAP_SLOT_NONE) {
 			// the page is not yet in the consumer cache - move it upwards
 			source->RemovePage(page);

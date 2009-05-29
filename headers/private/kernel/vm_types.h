@@ -129,10 +129,6 @@ enum {
 	CACHE_TYPE_NULL
 };
 
-struct vm_dummy_page : vm_page {
-	ConditionVariable	busy_condition;
-};
-
 struct VMCachePagesTreeDefinition {
 	typedef page_num_t KeyType;
 	typedef	vm_page NodeType;
