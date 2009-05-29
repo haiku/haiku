@@ -35,12 +35,12 @@ arch_int_restore_interrupts_inline(int oldstate)
 	int flags = oldstate ? 0x200 : 0;
 
 	asm volatile("pushfl;\n"
-		"popl	%1;\n"
-		"andl	$0xfffffdff,%1;\n"
-		"orl	%0,%1;\n"
-		"pushl	%1;\n"
+		"popl	%0;\n"
+		"andl	$0xfffffdff,%0;\n"
+		"orl	%1,%0;\n"
+		"pushl	%0;\n"
 		"popfl\n"
-		: : "r" (flags), "r" (0));
+		: "=&r"(flags) : "r"(flags));
 }
 
 
