@@ -14,6 +14,7 @@
 
 #include <util/kernel_cpp.h>
 
+#include <fs_cache.h>
 #include <fs_info.h>
 #include <fs_interface.h>
 
@@ -99,6 +100,8 @@ public:
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 		ino_t				InodeNumber() { return fInodeNumber; }
 
+		void				CreateCache();
+
 		void				SetParentDir(OverlayInode *parentDir);
 		OverlayInode *		ParentDir() { return fParentDir; }
 
@@ -154,6 +157,7 @@ private:
 		bool				fHasStat;
 		bool				fHasDirents;
 		bool				fIsVirtual;
+		void *				fFileCache;
 };
 
 
@@ -187,7 +191,8 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 		fDirentCount(0),
 		fHasStat(false),
 		fHasDirents(false),
-		fIsVirtual(superVnode == NULL)
+		fIsVirtual(superVnode == NULL),
+		fFileCache(NULL)
 {
 	TRACE("inode created %lld\n", fInodeNumber);
 
@@ -214,6 +219,9 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 OverlayInode::~OverlayInode()
 {
 	TRACE("inode destroyed %lld\n", fInodeNumber);
+	if (fFileCache != NULL)
+		file_cache_delete(fFileCache);
+
 	write_buffer *element = fWriteBuffers;
 	while (element) {
 		write_buffer *next = element->next;
@@ -231,6 +239,17 @@ status_t
 OverlayInode::InitCheck()
 {
 	return B_OK;
+}
+
+
+void
+OverlayInode::CreateCache()
+{
+	if (!S_ISDIR(fStat.st_mode) && !S_ISLNK(fStat.st_mode)) {
+		fFileCache = file_cache_create(fStat.st_dev, fStat.st_ino, 0);
+		if (fFileCache != NULL)
+			file_cache_disable(fFileCache);
+	}
 }
 
 
@@ -437,10 +456,19 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 	}
 
 	if (position < fOriginalNodeLength) {
-		open_cookie *cookie = (open_cookie *)_cookie;
+		void *superCookie = NULL;
+		if (_cookie != NULL)
+			superCookie = ((open_cookie *)_cookie)->super_cookie;
+
 		size_t readLength = MIN(fOriginalNodeLength - position, *length);
-		status_t result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
-			cookie->super_cookie, position, buffer, &readLength);
+
+		iovec vector;
+		vector.iov_base = buffer;
+		vector.iov_len = readLength;
+
+		status_t result = fSuperVnode.ops->read_pages(SuperVolume(),
+			&fSuperVnode, superCookie, position, &vector, 1, &readLength);
+
 		if (result != B_OK)
 			return result;
 
@@ -547,6 +575,9 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	if (newEnd > fStat.st_size) {
 		fStat.st_size = newEnd;
 		sizeChanged = true;
+
+		if (fFileCache)
+			file_cache_set_size(fFileCache, newEnd);
 	}
 
 	// populate the buffer with the existing chunks
@@ -899,6 +930,8 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		return result;
 	}
 
+	node->CreateCache();
+
 	if (newInodeNumber != NULL)
 		*newInodeNumber = entry->inode_number;
 	if (_node != NULL)
@@ -1030,7 +1063,32 @@ static status_t
 overlay_read_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *numBytes)
 {
-	OVERLAY_CALL(read_pages, cookie, pos, vecs, count, numBytes)
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	size_t bytesLeft = *numBytes;
+
+	for (size_t i = 0; i < count; i++) {
+		size_t transferBytes = MIN(vecs[i].iov_len, bytesLeft);
+		status_t result = node->Read(cookie, pos, vecs[i].iov_base,
+			&transferBytes);
+		if (result != B_OK) {
+			*numBytes -= bytesLeft;
+			return result;
+		}
+
+		bytesLeft -= transferBytes;
+		if (bytesLeft == 0)
+			return B_OK;
+
+		if (transferBytes < vecs[i].iov_len) {
+			*numBytes -= bytesLeft;
+			return B_OK;
+		}
+
+		pos += transferBytes;
+	}
+
+	*numBytes = 0;
+	return B_OK;
 }
 
 
@@ -1038,7 +1096,32 @@ static status_t
 overlay_write_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *numBytes)
 {
-	OVERLAY_CALL(write_pages, cookie, pos, vecs, count, numBytes)
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	size_t bytesLeft = *numBytes;
+
+	for (size_t i = 0; i < count; i++) {
+		size_t transferBytes = MIN(vecs[i].iov_len, bytesLeft);
+		status_t result = node->Write(cookie, pos, vecs[i].iov_base,
+			&transferBytes);
+		if (result != B_OK) {
+			*numBytes -= bytesLeft;
+			return result;
+		}
+
+		bytesLeft -= transferBytes;
+		if (bytesLeft == 0)
+			return B_OK;
+
+		if (transferBytes < vecs[i].iov_len) {
+			*numBytes -= bytesLeft;
+			return B_OK;
+		}
+
+		pos += transferBytes;
+	}
+
+	*numBytes = 0;
+	return B_OK;
 }
 
 
