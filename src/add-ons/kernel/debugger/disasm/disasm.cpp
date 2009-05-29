@@ -87,13 +87,12 @@ disasm_command(int argc, char **argv)
 static status_t
 std_ops(int32 op, ...)
 {
-	status_t err;
-
 	if (op == B_MODULE_INIT) {
-		err = disasm_arch_init();
-		if (err < 0)
+		status_t err = disasm_arch_init();
+		if (err != B_OK)
 			return err;
-		return add_debugger_command_etc("dis", disasm_command,
+
+		err = add_debugger_command_etc("dis", disasm_command,
 			"Print disassembly at address",
 			"[ -b <back count> ] [ <address>  [ <count> ] ]\n"
 			"Prints disassembly at address.\n"
@@ -103,6 +102,9 @@ std_ops(int32 op, ...)
 			"                     starting at <address>.\n"
 			"  -b <back count>  - Number of instruction to disassemble before\n"
 			"                     <address>.\n", 0);
+		if (err != B_OK)
+			disasm_arch_fini();
+		return err;
 	} else if (op == B_MODULE_UNINIT) {
 		remove_debugger_command("dis", disasm_command);
 		return disasm_arch_fini();
