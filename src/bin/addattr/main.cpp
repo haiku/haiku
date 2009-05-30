@@ -86,8 +86,9 @@ typeForString(const char *string, type_code *_result)
 void
 usage(int returnValue)
 {
-	fprintf(stderr, "usage: %s [-t type] attr value file1 [file2...]\n"
-		"   or: %s [-f value-from-file] [-t type] attr file1 [file2...]\n\n"
+	fprintf(stderr, "usage: %s [-t type] [ -P ] attr value file1 [file2...]\n"
+		"   or: %s [-f value-from-file] [-t type] [ -P ] attr file1 [file2...]\n\n"
+		"\t-P : Don't resolve links\n"
 		"\tType is one of:\n"
 		"\t\tstring, mime, int, llong, float, double, bool, raw\n"
 		"\t\tor a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n"
@@ -148,6 +149,7 @@ main(int argc, char *argv[])
 	char *attrValue = NULL;
 	size_t valueFileLength = 0;
 	int32 i = 1;
+	bool resolveLinks = true;
 
 	if (!strcmp(argv[i], "-f")) {
 		// retrieve attribute value from file
@@ -205,6 +207,12 @@ main(int argc, char *argv[])
 	}
 
 	assertArgument(i, argc);
+	if (!strcmp(argv[i], "-P")) {
+		resolveLinks = false;
+		i++;
+	}
+
+	assertArgument(i, argc);
 	const char *attrName = argv[i++];
 
 	assertArgument(i, argc);
@@ -221,7 +229,7 @@ main(int argc, char *argv[])
 
 	for (; i < argc; i++) {
 		status_t status = addAttr(argv[i], attrType, attrName, attrValue,
-			valueFileLength);
+			valueFileLength, resolveLinks);
 
 		// special case for bool types
 		if (status == B_BAD_VALUE && attrType == B_BOOL_TYPE)

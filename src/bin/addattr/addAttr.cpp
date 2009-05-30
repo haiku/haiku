@@ -135,9 +135,9 @@ writeAttr(int fd, type_code type, const char *name, const char *value, size_t le
 
 status_t
 addAttr(const char *file, type_code type, const char *name,
-	const char *value, size_t length)
+	const char *value, size_t length, bool resolveLinks)
 {
-	int fd = open(file, O_WRONLY);
+	int fd = open(file, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 	if (fd < 0)
 		return errno;
 

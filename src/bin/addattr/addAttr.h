@@ -12,6 +12,6 @@
 
 
 status_t addAttr(const char *file, type_code attrType, const char *attrName,
-	const char *attrValue, size_t length);
+	const char *attrValue, size_t length, bool resolveLinks);
 
 #endif	/* _ADD_ATTR_H */
