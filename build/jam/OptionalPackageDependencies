@@ -7,7 +7,7 @@ OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL 
 OptionalPackageDependencies APR-util : APR ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
-OptionalPackageDependencies DevelopmentBase : DevelopmentMin Yasm ;
+OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
