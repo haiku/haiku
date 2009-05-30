@@ -847,15 +847,17 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 	}
 
 	uint32 x, y;
-	if (!_GetFieldFor(where, x, y)
+	bool isField = _GetFieldFor(where, x, y);
+	if (isField) {
+		fKeyboardX = x;
+		fKeyboardY = y;
+	}
+	if (!isField
 		|| (fField->FlagsAt(x, y) & kInitialValue) != 0
 		|| !fShowCursor && fField->ValueAt(x, y) != 0) {
 		_RemoveHint();
 		return;
 	}
-
-	fKeyboardX = x;
-	fKeyboardY = y;
 
 	if (fShowHintX == x && fShowHintY == y)
 		return;
