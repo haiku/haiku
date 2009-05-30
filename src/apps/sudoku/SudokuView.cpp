@@ -854,6 +854,9 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 		return;
 	}
 
+	fKeyboardX = x;
+	fKeyboardY = y;
+
 	if (fShowHintX == x && fShowHintY == y)
 		return;
 
