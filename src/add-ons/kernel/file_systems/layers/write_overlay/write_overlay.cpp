@@ -56,6 +56,15 @@ struct open_dir_cookie {
 struct overlay_dirent {
 	ino_t			inode_number;
 	char *			name;
+
+	void			remove_and_dispose(fs_volume *volume, ino_t directoryInode)
+					{
+						notify_entry_removed(volume->id, directoryInode,
+							name, inode_number);
+						remove_vnode(volume, inode_number);
+						free(name);
+						free(this);
+					}
 };
 
 
@@ -754,12 +763,9 @@ OverlayInode::AddEntry(overlay_dirent *entry)
 	if (!fHasDirents)
 		_PopulateDirents();
 
-	for (uint32 i = 0; i < fDirentCount; i++) {
-		if (strcmp(fDirents[i]->name, entry->name) == 0) {
-			TRACE("entry \"%s\" exists\n", entry->name);
-			return B_FILE_EXISTS;
-		}
-	}
+	status_t result = RemoveEntry(entry->name, NULL);
+	if (result != B_OK && result != B_ENTRY_NOT_FOUND)
+		return B_FILE_EXISTS;
 
 	overlay_dirent **newDirents = (overlay_dirent **)realloc(fDirents,
 		sizeof(overlay_dirent *) * (fDirentCount + 1));
@@ -768,10 +774,6 @@ OverlayInode::AddEntry(overlay_dirent *entry)
 
 	fDirents = newDirents;
 	fDirents[fDirentCount++] = entry;
-
-	notify_entry_created(SuperVolume()->id, fInodeNumber, entry->name,
-		entry->inode_number);
-
 	return B_OK;
 }
 
@@ -782,6 +784,7 @@ OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 	if (!fHasDirents)
 		_PopulateDirents();
 
+	// TODO: we may not simply remove non-empty directories
 	for (uint32 i = 0; i < fDirentCount; i++) {
 		overlay_dirent *entry = fDirents[i];
 		if (strcmp(entry->name, name) == 0) {
@@ -789,15 +792,10 @@ OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 				fDirents[j - 1] = fDirents[j];
 			fDirentCount--;
 
-			notify_entry_removed(SuperVolume()->id, fInodeNumber, entry->name,
-				entry->inode_number);
-
 			if (_entry != NULL)
 				*_entry = entry;
-			else {
-				free(entry->name);
-				free(entry);
-			}
+			else
+				entry->remove_and_dispose(Volume(), fInodeNumber);
 
 			return B_OK;
 		}
@@ -961,6 +959,9 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 	if (_node != NULL)
 		*_node = node;
 
+	notify_entry_created(SuperVolume()->id, fInodeNumber, entry->name,
+		entry->inode_number);
+
 	return B_OK;
 }
 
@@ -1013,8 +1014,8 @@ overlay_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 
 	status_t result = B_OK;
 	fs_vnode *superVnode = node->SuperVnode();
-	if (superVnode->ops->remove_vnode != NULL) {
-		result = superVnode->ops->remove_vnode(volume->super_volume, superVnode,
+	if (superVnode->ops->put_vnode != NULL) {
+		result = superVnode->ops->put_vnode(volume->super_volume, superVnode,
 			reenter);
 	}
 
@@ -1267,10 +1268,8 @@ overlay_rename(fs_volume *volume, fs_vnode *vnode,
 	entry->name = strdup(toName);
 	if (entry->name == NULL) {
 		entry->name = oldName;
-		if (fromNode->AddEntry(entry) != B_OK) {
-			free(entry->name);
-			free(entry);
-		}
+		if (fromNode->AddEntry(entry) != B_OK)
+			entry->remove_and_dispose(volume, fromNode->InodeNumber());
 
 		return B_NO_MEMORY;
 	}
@@ -1279,15 +1278,15 @@ overlay_rename(fs_volume *volume, fs_vnode *vnode,
 	if (result != B_OK) {
 		free(entry->name);
 		entry->name = oldName;
-		if (fromNode->AddEntry(entry) != B_OK) {
-			free(entry->name);
-			free(entry);
-		}
+		if (fromNode->AddEntry(entry) != B_OK)
+			entry->remove_and_dispose(volume, fromNode->InodeNumber());
 
 		return result;
 	}
 
 	free(oldName);
+	notify_entry_moved(volume->id, fromNode->InodeNumber(), fromName,
+		toNode->InodeNumber(), toName, entry->inode_number);
 	return B_OK;
 }
 
