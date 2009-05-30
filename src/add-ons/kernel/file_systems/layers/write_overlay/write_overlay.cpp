@@ -115,6 +115,7 @@ public:
 		OverlayInode *		ParentDir() { return fParentDir; }
 
 		status_t			Lookup(const char *name, ino_t *inodeNumber);
+		void				SetName(const char *name);
 		status_t			GetName(char *buffer, size_t bufferSize);
 
 		status_t			ReadStat(struct stat *stat);
@@ -292,16 +293,23 @@ OverlayInode::Lookup(const char *name, ino_t *inodeNumber)
 }
 
 
+void
+OverlayInode::SetName(const char *name)
+{
+	fName = name;
+}
+
+
 status_t
 OverlayInode::GetName(char *buffer, size_t bufferSize)
 {
-	if (fIsVirtual) {
-		if (fName == NULL)
-			return B_UNSUPPORTED;
-
+	if (fName != NULL) {
 		strlcpy(buffer, fName, bufferSize);
 		return B_OK;
 	}
+
+	if (fIsVirtual)
+		return B_UNSUPPORTED;
 
 	if (fSuperVnode.ops->get_vnode_name == NULL)
 		return B_UNSUPPORTED;
@@ -465,8 +473,8 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 	size_t bytesLeft = MIN(fStat.st_size - position, *length);
 	*length = bytesLeft;
 
-	void *superCookie = NULL;
-	if (!fIsVirtual && _cookie != NULL)
+	void *superCookie = _cookie;
+	if (!fIsVirtual && !readPages && _cookie != NULL)
 		superCookie = ((open_cookie *)_cookie)->super_cookie;
 
 	while (bytesLeft > 0) {
@@ -1282,6 +1290,14 @@ overlay_rename(fs_volume *volume, fs_vnode *vnode,
 			entry->remove_and_dispose(volume, fromNode->InodeNumber());
 
 		return result;
+	}
+
+	OverlayInode *node = NULL;
+	result = get_vnode(volume, entry->inode_number, (void **)&node);
+	if (result == B_OK && node != NULL) {
+		node->SetName(entry->name);
+		node->SetParentDir(toNode);
+		put_vnode(volume, entry->inode_number);
 	}
 
 	free(oldName);
