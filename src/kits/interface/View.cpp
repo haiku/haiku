@@ -71,21 +71,13 @@ using std::nothrow;
 
 
 static property_info sViewPropInfo[] = {
-	{ "Frame", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the view's frame rectangle.", 0,
+	{ "Frame", { B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "The view's frame rectangle.", 0,
 		{ B_RECT_TYPE }
 	},
-	{ "Frame", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Sets the view's frame rectangle.", 0,
-		{ B_RECT_TYPE }
-	},
-	{ "Hidden", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns wether or not the view is hidden.",
+	{ "Hidden", { B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Whether or not the view is hidden.",
 		0, { B_BOOL_TYPE }
-	},
-	{ "Hidden", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Hides or shows the view.", 0,
-		{ B_BOOL_TYPE }
 	},
 	{ "Shelf", { 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Directs the scripting message to the "
@@ -4060,12 +4052,10 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	switch (propertyInfo.FindMatch(msg, index, specifier, what, property)) {
 		case 0:
 		case 1:
-		case 2:
 		case 3:
-		case 5:
 			return this;
 
-		case 4:
+		case 2:
 			if (fShelf) {
 				msg->PopSpecifier();
 				return fShelf;
@@ -4075,7 +4065,7 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 			replyMsg.AddString("message", "This window doesn't have a shelf");
 			break;
 
-		case 6:
+		case 4:
 		{
 			if (!fFirstChild) {
 				err = B_NAME_NOT_FOUND;
@@ -4225,33 +4215,32 @@ BView::MessageReceived(BMessage* msg)
 	BPropertyInfo propertyInfo(sViewPropInfo);
 	switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
 		case 0:
-			err = replyMsg.AddRect("result", Frame());
+			if (msg->what == B_GET_PROPERTY) {
+				err = replyMsg.AddRect("result", Frame());
+			} else if (msg->what == B_SET_PROPERTY) {
+				BRect newFrame;
+				err = msg->FindRect("data", &newFrame);
+				if (err == B_OK) {
+					MoveTo(newFrame.LeftTop());
+					ResizeTo(newFrame.right, newFrame.bottom);
+				}
+			}
 			break;
 		case 1:
-		{
-			BRect newFrame;
-			err = msg->FindRect("data", &newFrame);
-			if (err == B_OK) {
-				MoveTo(newFrame.LeftTop());
-				ResizeTo(newFrame.right, newFrame.bottom);
+			if (msg->what == B_GET_PROPERTY) {
+				err = replyMsg.AddBool("result", IsHidden());
+			} else if (msg->what == B_SET_PROPERTY) {
+				bool newHiddenState;
+				err = msg->FindBool("data", &newHiddenState);
+				if (err == B_OK) {
+					if (newHiddenState == true)
+						Hide();
+					else 
+						Show();
+				}
 			}
 			break;
-		}
 		case 2:
-			err = replyMsg.AddBool( "result", IsHidden());
-			break;
-		case 3:
-		{
-			bool newHiddenState;
-			err = msg->FindBool("data", &newHiddenState);
-			if (err == B_OK) {
-				if (!IsHidden() && newHiddenState == true)
-					Hide();
-				else if (IsHidden() && newHiddenState == false)
-					Show();
-			}
-		}
-		case 5:
 			err = replyMsg.AddInt32("result", CountChildren());
 			break;
 		default:
