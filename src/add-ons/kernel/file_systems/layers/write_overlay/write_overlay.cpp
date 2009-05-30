@@ -451,54 +451,71 @@ status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 	bool readPages)
 {
-	if (position >= fStat.st_size) {
-		*length = 0;
-		return B_OK;
-	}
+	uint8 *pointer = (uint8 *)buffer;
+	write_buffer *element = fWriteBuffers;
+	size_t bytesLeft = MIN(fStat.st_size - position, *length);
+	*length = bytesLeft;
 
-	if (position < fOriginalNodeLength) {
-		void *superCookie = NULL;
-		if (_cookie != NULL)
-			superCookie = ((open_cookie *)_cookie)->super_cookie;
+	void *superCookie = NULL;
+	if (!fIsVirtual && _cookie != NULL)
+		superCookie = ((open_cookie *)_cookie)->super_cookie;
 
-		size_t readLength = MIN(fOriginalNodeLength - position, *length);
-		status_t result = B_ERROR;
-
-		if (readPages) {
-			iovec vector;
-			vector.iov_base = buffer;
-			vector.iov_len = readLength;
-
-			result = fSuperVnode.ops->read_pages(SuperVolume(),
-				&fSuperVnode, superCookie, position, &vector, 1, &readLength);
-		} else {
-			result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
-				superCookie, position, buffer, &readLength);
+	while (bytesLeft > 0) {
+		size_t gapSize = bytesLeft;
+		if (element != NULL) {
+			gapSize = MIN(bytesLeft, element->position > position ?
+				element->position - position : 0);
 		}
 
-		if (result != B_OK)
-			return result;
+		if (gapSize > 0 && !fIsVirtual && position < fOriginalNodeLength) {
+			// there's a part missing between the read position and our
+			// next position, fill the gap with original file content
+			size_t readLength = MIN(fOriginalNodeLength - position, gapSize);
+			status_t result = B_ERROR;
+			if (readPages) {
+				iovec vector;
+				vector.iov_base = pointer;
+				vector.iov_len = readLength;
 
-		if (readLength < *length)
-			memset((uint8 *)buffer + readLength, 0, *length - readLength);
-	} else
-		memset(buffer, 0, *length);
+				result = fSuperVnode.ops->read_pages(SuperVolume(),
+					&fSuperVnode, superCookie, position, &vector, 1,
+					&readLength);
+			} else {
+				result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
+					superCookie, position, pointer, &readLength);
+			}
 
-	// overlay the read with whatever chunks we have written
-	write_buffer *element = fWriteBuffers;
-	*length = MIN(fStat.st_size - position, *length);
-	off_t end = position + *length;
-	while (element) {
-		if (element->position > end)
+			if (result != B_OK)
+				return result;
+
+			pointer += readLength;
+			position += readLength;
+			bytesLeft -= readLength;
+			gapSize -= readLength;
+		}
+
+		if (gapSize > 0) {
+			// there's a gap before our next position which we cannot
+			// fill with original file content, zero it out
+			memset(pointer, 0, gapSize);
+			bytesLeft -= gapSize;
+			position += gapSize;
+			pointer += gapSize;
+		}
+
+		// we've reached the end
+		if (bytesLeft == 0 || element == NULL)
 			break;
 
 		off_t elementEnd = element->position + element->length;
 		if (elementEnd > position) {
-			off_t copyPosition = MAX(position, element->position);
-			size_t copyLength = MIN(elementEnd - position, *length);
-			memcpy((uint8 *)buffer + (copyPosition - position),
-				element->buffer + (copyPosition - element->position),
+			size_t copyLength = MIN(elementEnd - position, bytesLeft);
+			memcpy(pointer, element->buffer + (position - element->position),
 				copyLength);
+
+			bytesLeft -= copyLength;
+			position += copyLength;
+			pointer += copyLength;
 		}
 
 		element = element->next;
