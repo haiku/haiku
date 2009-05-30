@@ -4564,6 +4564,12 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 			break;
 	}
 
+	// position caret to follow the direction of the selection
+	if (fTrackingMouse->selEnd != fSelEnd)
+		fClickOffset = fTrackingMouse->selEnd;
+	else if (fTrackingMouse->selStart != fSelStart)
+		fClickOffset = fTrackingMouse->selStart;
+
 	Select(fTrackingMouse->selStart, fTrackingMouse->selEnd);
 	_TrackMouse(where, NULL);
 
