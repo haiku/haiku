@@ -468,6 +468,11 @@ status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 	bool readPages)
 {
+	if (position >= fStat.st_size) {
+		*length = 0;
+		return B_OK;
+	}
+
 	uint8 *pointer = (uint8 *)buffer;
 	write_buffer *element = fWriteBuffers;
 	size_t bytesLeft = MIN(fStat.st_size - position, *length);
