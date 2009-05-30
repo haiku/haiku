@@ -3,6 +3,7 @@
 # For transitive dependencies dependants should be listed before their
 # dependencies.
 
+OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies APR-util : APR ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
@@ -10,4 +11,4 @@ OptionalPackageDependencies DevelopmentBase : DevelopmentMin Yasm ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
-OptionalPackageDependencies Subversion : OpenSSL ;
+

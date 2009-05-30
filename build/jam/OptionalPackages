@@ -20,14 +20,19 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	BeOSCompatibility
 #	BePDF
 #	Bluetooth
+#	CDRecord
 #	CVS
 #	Development			- more complete dev environment (including autotools)
 #	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
 #	DevelopmentMin		- development headers, libs, tools, from sources only
 #	Firefox
 #	KeymapSwitcher
+#	LibIconv
 #	LibLayout
+#	LibXML2
 #	Links
+#	Nano
+#	Neon
 #	NetSurf
 #	OpenSound
 #	OpenSSH
@@ -35,7 +40,9 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	P7zip
 #	Pe
 #	Perl
+#	Python
 #	Rsync
+#	SQLite
 #	Subversion
 #	Tar
 #	UserlandFS
@@ -51,9 +58,9 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR available for $(TARGET_ARCH)" ;
 	} else {
-		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage apr-0.9.17-gcc2-2008-05-20
-			: $(baseURL)/apr-0.9.17-gcc2-2008-05-20.zip
+		local baseURL = http://www.haiku-ports.de/packages/dev-libs/apr ;
+		InstallOptionalHaikuImagePackage apr-1.3.3-gcc2-haiku-2009-05-27
+			: $(baseURL)/apr-1.3.3-gcc2-haiku-2009-05-27.zip
 			:
 		;
 	}
@@ -65,9 +72,9 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR-util available for $(TARGET_ARCH)" ;
 	} else {
-		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage apr-util-0.9.15-gcc2-2008-05-15
-			: $(baseURL)/apr-util-0.9.15-gcc2-2008-05-15.zip
+		local baseURL = http://www.haiku-ports.de/packages/dev-libs/apr-util ;
+		InstallOptionalHaikuImagePackage apr-util-1.3.4-gcc2-haiku-2009-05-27
+			: $(baseURL)/apr-util-1.3.4-gcc2-haiku-2009-05-27.zip
 			:
 		;
 	}
@@ -175,6 +182,20 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 		local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
 		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
 			: /system/lib libbluetooth.so : : true ;
+	}
+}
+
+
+# CDRecord
+if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages ;
+		InstallOptionalHaikuImagePackage cdrecord-2.01.01a59-gcc2-haiku-2009-05-26
+			: $(baseURL)/app-cdr/cdrtools/cdrecord-2.01.01a59-gcc2-haiku-2009-05-26.zip
+			:
+		;
 	}
 }
 
@@ -361,8 +382,9 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
-			: http://haiku-files.org/files/optional-packages/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
+			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
  			: apps
  		;
  		AddSymlinkToHaikuImage home config be Applications
@@ -398,6 +420,20 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 }
 
 
+# LibIconv
+if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages/dev-libs/libiconv ;
+		InstallOptionalHaikuImagePackage libiconv-1.13-gcc2-haiku-2009-05-27
+			: $(baseURL)/libiconv-1.13-gcc2-haiku-2009-05-27.zip
+			:
+		;
+	}
+}
+
+
 # LibLayout library
 if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 	if $(TARGET_ARCH) != x86 {
@@ -408,6 +444,20 @@ if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage liblayout-1.4.0-gcc2-2009-03-08
 			: $(baseURL)/liblayout-1.4.0-gcc2-2009-03-08.zip
+			:
+		;
+	}
+}
+
+
+# LibXML2
+if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LibXML2 available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages/dev-libs/libxml2 ;
+		InstallOptionalHaikuImagePackage libxml2-2.7.3-gcc2-haiku-2009-05-27
+			: $(baseURL)/libxml2-2.7.3-gcc2-haiku-2009-05-27.zip
 			:
 		;
 	}
@@ -427,6 +477,34 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/home/config/bin/links ;
+	}
+}
+
+
+# Nano
+if [ IsOptionalHaikuImagePackageAdded Nano ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Nano available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages ;
+		InstallOptionalHaikuImagePackage nano-2.0.9-gcc2-haiku-2009-05-27
+			: $(baseURL)/app-editors/nano/nano-2.0.9-gcc2-haiku-2009-05-27.zip
+			:
+		;
+	}
+}
+
+
+# Neon
+if [ IsOptionalHaikuImagePackageAdded Neon ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages/net-misc/neon ;
+		InstallOptionalHaikuImagePackage neon-0.28.4-gcc2-haiku-2009-05-23
+			: $(baseURL)/neon-0.28.4-gcc2-haiku-2009-05-23.zip
+			:
+		;
 	}
 }
 
@@ -472,9 +550,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 				"variable to be set!" ;
 		}
 
-		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage openssh-5.0p1-gcc2-2008-05-04-1
-			: $(baseURL)/openssh-5.0p1-gcc2-2008-05-04-1.zip
+		local baseURL = http://www.haiku-ports.de/packages/net-misc/openssh ;
+		InstallOptionalHaikuImagePackage openssh-5.2p1-gcc2-haiku-2009-05-27
+			: $(baseURL)/openssh-5.2p1-gcc2-haiku-2009-05-27.zip
 			:
 		;
 
@@ -504,8 +582,9 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package P7zip available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage p7zip-4.65-gcc2-haiku-2009-05-20
-			: http://haiku-files.org/files/optional-packages/p7zip-4.65-gcc2-haiku-2009-05-20.zip
+		local baseURL = http://www.haiku-ports.de/packages/app-arch/p7zip ;
+		InstallOptionalHaikuImagePackage p7zip-4.65-gcc2-haiku-2009-05-24
+			: $(baseURL)/p7zip-4.65-gcc2-haiku-2009-05-24.zip
 			:
 		;
 
@@ -562,6 +641,34 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 }
 
 
+# Python
+if [ IsOptionalHaikuImagePackageAdded Python ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Python available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages/dev-lang/python ;
+		InstallOptionalHaikuImagePackage python-2.6.2-gcc2-haiku-2009-05-27
+			: $(baseURL)/python-2.6.2-gcc2-haiku-2009-05-27.zip
+			:
+		;
+	}
+}
+
+
+# SQLite
+if [ IsOptionalHaikuImagePackageAdded SQLite ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package SQLite available for $(TARGET_ARCH)" ;
+	} else {
+		local baseURL = http://www.haiku-ports.de/packages/dev-db/sqlite ;
+		InstallOptionalHaikuImagePackage sqlite-3.6.14-gcc2-haiku-2009-05-10
+			: $(baseURL)/sqlite-3.6.14-gcc2-haiku-2009-05-10.zip
+			:
+		;
+	}
+}
+
+
 # Rsync
 if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 	if $(TARGET_ARCH) != x86 {
@@ -581,9 +688,10 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage Subversion
-			: http://haiku.mlotz.ch/subversion-1.4.6-haiku-20080628.zip
-			: home
+		local baseURL = http://www.haiku-ports.de/packages/dev-util/subversion ;
+		InstallOptionalHaikuImagePackage subversion-1.6.2-gcc2-haiku-2009-05-20
+			: $(baseURL)/subversion-1.6.2-gcc2-haiku-2009-05-20.zip
+			:
 		;
 	}
 }
