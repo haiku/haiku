@@ -163,7 +163,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 	const char *leafName = NULL;
 	
 	string dirPathString;
-	if (char *lastSlash = strrchr(path, '/')) {
+	if (const char *lastSlash = strrchr(path, '/')) {
 		// found a slash: decompose into dir path and leaf name
 		leafName = lastSlash + 1;
 		if (leafName[0] == '\0') {

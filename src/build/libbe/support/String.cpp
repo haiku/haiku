@@ -2118,7 +2118,7 @@ BString::_DoPrepend(const char *str, int32 count)
 int32
 BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
 {
-	char *ptr = strstr(String() + offset, str);
+	const char *ptr = strstr(String() + offset, str);
 
 	if (ptr != NULL)
 		return ptr - String();
@@ -2130,7 +2130,7 @@ BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
 int32
 BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
 {
-	char *ptr = strcasestr(String() + offset, str);
+	const char *ptr = strcasestr(String() + offset, str);
 
 	if (ptr != NULL)
 		return ptr - String();
@@ -2142,7 +2142,7 @@ BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
 int32
 BString::_ShortFindAfter(const char *str, int32 len) const
 {
-	char *ptr = strstr(String(), str);
+	const char *ptr = strstr(String(), str);
 
 	if (ptr != NULL)
 		return ptr - String();
