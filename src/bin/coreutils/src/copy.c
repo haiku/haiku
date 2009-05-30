@@ -2124,6 +2124,11 @@ copy_internal (char const *src_name, char const *dst_name,
 		 preserving owner/group is a potential security problem.  */
 	    }
 	}
+
+      if (x->ignore_attributes == 0
+            && copy_attributes_by_name(src_name, dst_name, false) != 0)
+        fprintf(stderr, "%s: could not copy attributes\n", src_name);
+
     }
   else
     {
