@@ -91,24 +91,6 @@ struct service_private {
 };
 
 
-static status_t
-find_own_image(image_info* _info)
-{
-	int32 cookie = 0;
-	image_info info;
-	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
-		if (((uint32)info.text <= (uint32)find_own_image
-			&& (uint32)info.text + (uint32)info.text_size > (uint32)find_own_image)) {
-			// found us
-			*_info = info;
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
 char *
 get_next_line(struct service_private* service)
 {
@@ -160,7 +142,7 @@ sv_rewind(struct irs_sv *sv)
 	addr_t addressInImage = (addr_t)&sv_rewind;
 	const char* path = NULL;
 	image_info info;
-	int32 cookie;
+	int32 cookie = 0;
 
 	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
 		if (addressInImage >= (addr_t)info.text
