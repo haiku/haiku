@@ -242,12 +242,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	local baseURL = http://haiku-files.org/files/optional-packages ;
 	InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
 		: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip ;
-	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
-		: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip ;
-	InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
-		: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip ;
 	InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
 		: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip ;
+	local baseURL = http://www.haiku-ports.de/packages ;		
+	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-haiku-2009-05-26
+		: $(baseURL)/sys-devel/flex/flex-2.5.35-gcc2-haiku-2009-05-26.zip ;
+	InstallOptionalHaikuImagePackage jam-gcc2-haiku-2009-05-26
+		: $(baseURL)/dev-util/jam/jam-gcc2-haiku-2009-05-26.zip ;
+
 }
 
 
