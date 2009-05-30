@@ -117,7 +117,7 @@ public:
 		status_t			Close(void *cookie);
 		status_t			FreeCookie(void *cookie);
 		status_t			Read(void *cookie, off_t position, void *buffer,
-								size_t *length);
+								size_t *length, bool readPages);
 		status_t			Write(void *cookie, off_t position,
 								const void *buffer, size_t *length);
 		status_t			SetFlags(void *cookie, int flags);
@@ -448,7 +448,8 @@ OverlayInode::FreeCookie(void *_cookie)
 
 
 status_t
-OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
+OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
+	bool readPages)
 {
 	if (position >= fStat.st_size) {
 		*length = 0;
@@ -461,13 +462,19 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length)
 			superCookie = ((open_cookie *)_cookie)->super_cookie;
 
 		size_t readLength = MIN(fOriginalNodeLength - position, *length);
+		status_t result = B_ERROR;
 
-		iovec vector;
-		vector.iov_base = buffer;
-		vector.iov_len = readLength;
+		if (readPages) {
+			iovec vector;
+			vector.iov_base = buffer;
+			vector.iov_len = readLength;
 
-		status_t result = fSuperVnode.ops->read_pages(SuperVolume(),
-			&fSuperVnode, superCookie, position, &vector, 1, &readLength);
+			result = fSuperVnode.ops->read_pages(SuperVolume(),
+				&fSuperVnode, superCookie, position, &vector, 1, &readLength);
+		} else {
+			result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
+				superCookie, position, buffer, &readLength);
+		}
 
 		if (result != B_OK)
 			return result;
@@ -713,7 +720,7 @@ OverlayInode::ReadSymlink(char *buffer, size_t *bufferSize)
 		if (!S_ISLNK(fStat.st_mode))
 			return B_BAD_VALUE;
 
-		return Read(NULL, 0, buffer, bufferSize);
+		return Read(NULL, 0, buffer, bufferSize, false);
 	}
 
 	if (fSuperVnode.ops->read_symlink == NULL)
@@ -1069,7 +1076,7 @@ overlay_read_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	for (size_t i = 0; i < count; i++) {
 		size_t transferBytes = MIN(vecs[i].iov_len, bytesLeft);
 		status_t result = node->Read(cookie, pos, vecs[i].iov_base,
-			&transferBytes);
+			&transferBytes, true);
 		if (result != B_OK) {
 			*numBytes -= bytesLeft;
 			return result;
@@ -1333,7 +1340,7 @@ overlay_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 {
 	TRACE("read\n");
 	return ((OverlayInode *)vnode->private_node)->Read(cookie, pos, buffer,
-		length);
+		length, false);
 }
 
 
