@@ -3507,11 +3507,13 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 
 		case B_PAGE_UP:
 		{
-			BPoint currentPos = PointAt(fClickOffset);
-
-			currentPos.y -= Bounds().Height();
-			fClickOffset = OffsetAt(LineAt(currentPos));
-			_ScrollBy(0, -1 * Bounds().Height());
+			float lineHeight;
+			BPoint currentPos = PointAt(fClickOffset, &lineHeight);
+			BPoint nextPos(currentPos.x,
+				currentPos.y + lineHeight - Bounds().Height());
+			fClickOffset = OffsetAt(nextPos);
+			nextPos = PointAt(fClickOffset);
+			_ScrollBy(0, nextPos.y - currentPos.y);
 
 			if (!fEditable)
 				break;
@@ -3538,10 +3540,10 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 		case B_PAGE_DOWN:
 		{
 			BPoint currentPos = PointAt(fClickOffset);
-
-			currentPos.y += Bounds().Height();
-			fClickOffset = OffsetAt(LineAt(currentPos));
-			_ScrollBy(0, Bounds().Height());
+			BPoint nextPos(currentPos.x, currentPos.y + Bounds().Height());
+			fClickOffset = OffsetAt(nextPos);
+			nextPos = PointAt(fClickOffset);
+			_ScrollBy(0, nextPos.y - currentPos.y);
 
 			if (!fEditable)
 				break;
