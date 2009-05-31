@@ -41,6 +41,7 @@
 
 using std::nothrow;
 
+static const char *skAutoCreatePrefix = "_HaikuAutoCreated";
 
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
@@ -546,7 +547,7 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 
 	// create a mount point, if none is given
 	bool deleteMountPoint = false;
-	BPath mountPointPath;
+	BPath mountPointPath, markerPath;
 	if (!mountPoint) {
 		// get a unique mount point
 		error = GetMountPoint(&mountPointPath);
@@ -554,10 +555,17 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 			return error;
 
 		mountPoint = mountPointPath.Path();
-
+		markerPath = mountPointPath;
+		markerPath.Append(skAutoCreatePrefix);
+		
 		// create the directory
 		if (mkdir(mountPoint, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
 			return errno;
+			
+		if (mkdir(markerPath.Path(), S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
+			rmdir(mountPoint);
+			return errno;
+		}
 
 		deleteMountPoint = true;
 	}
@@ -567,8 +575,10 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 		mountFlags, parameters);
 
 	// delete the mount point on error, if we created it
-	if (device < B_OK && deleteMountPoint)
+	if (device < B_OK && deleteMountPoint) {
+		rmdir(markerPath.Path());
 		rmdir(mountPoint);
+	}
 
 	// update object, if successful
 	if (device >= 0)
@@ -605,8 +615,19 @@ BPartition::Unmount(uint32 unmountFlags)
 	status = fs_unmount_volume(path.Path(), unmountFlags);
 
 	// update object, if successful
-	if (status == B_OK)
+	if (status == B_OK) {
 		status = Device()->Update();
+
+		// Check if we created this mount point on the fly.
+		// If so, clean it up.
+		BPath markerPath = path;
+		markerPath.Append(skAutoCreatePrefix);
+		BEntry pathEntry (markerPath.Path());
+		if (pathEntry.InitCheck() == B_OK && pathEntry.Exists()) {
+			rmdir(markerPath.Path());
+			rmdir(path.Path());
+		}
+	}
 
 	return status;
 }
