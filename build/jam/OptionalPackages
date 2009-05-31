@@ -407,11 +407,17 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package KeymapSwitcher available for gcc4" ;
+		local baseURL = http://downloads.sourceforge.net/dotmatrix4beos ;
+		InstallOptionalHaikuImagePackage KeymapSwitcher-gcc4-20090531
+			:  $(baseURL)/KeymapSwitcher-1.2.3-gcc4-2009-05-31.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Desktop\ Applets
+			: /boot/common/bin/KeymapSwitcher ;
 	} else {
 		local baseURL = http://downloads.sourceforge.net/dotmatrix4beos ;
-		InstallOptionalHaikuImagePackage KeymapSwitcher-gcc2-20090409
-			:  $(baseURL)/HaikuKeymapSwitcher-package-1.0.2.zip
+		InstallOptionalHaikuImagePackage KeymapSwitcher-gcc2-20090531
+			:  $(baseURL)/KeymapSwitcher-1.2.3-gcc2-2009-05-31.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Desktop\ Applets
