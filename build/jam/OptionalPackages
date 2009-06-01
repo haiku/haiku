@@ -46,6 +46,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Subversion
 #	Tar
 #	UserlandFS
+#	Vim
 #	Vision
 #	VLC
 #	Welcome
@@ -766,6 +767,30 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 		SEARCH on $(fuseHeaders)
 			= [ FDirName $(HAIKU_TOP) headers private userlandfs fuse ] ;
 		AddFilesToHaikuImage develop headers userlandfs fuse : $(fuseHeaders) ;
+	}
+}
+
+
+# Vim
+if [ IsOptionalHaikuImagePackageAdded Vim ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		local baseURL = http://haiku-ports.de/packages/app-editors/vim ;
+		InstallOptionalHaikuImagePackage vim-7.2-gcc4-20090531
+			:  $(baseURL)/vim-7.2-gcc4-haiku-2009-05-31.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/common/bin/gvim ;
+	} else {
+		local baseURL = http://haiku-ports.de/packages/app-editors/vim ;
+		InstallOptionalHaikuImagePackage vim-7.2-gcc2-20090531
+			:  $(baseURL)/vim-7.2-gcc2-haiku-2009-05-31.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/common/bin/gvim ;
 	}
 }
 
