@@ -2318,8 +2318,8 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				// symlink was just "/"
 				nextVnode = vnode;
 			} else {
-				status = vnode_path_to_vnode(vnode, path, traverseLeafLink,
-					count + 1, ioContext, &nextVnode, &lastParentID);
+				status = vnode_path_to_vnode(vnode, path, true, count + 1,
+					ioContext, &nextVnode, &lastParentID);
 			}
 
 			free(buffer);
