@@ -1,4 +1,4 @@
-## BeOS Generic Makefile v2.2 ##
+## BeOS Generic Makefile v2.3 ##
 
 ## Fill in this file to specify the project being created, and the referenced
 ## makefile-engine will do all of the hard work for you.  This handles both

@@ -2,7 +2,7 @@
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
-##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2
+##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3
 
 #	determine wheather running on x86 or ppc
 MACHINE=$(shell uname -m)
@@ -351,9 +351,9 @@ $(OBJ_DIR)/%.o : %.CPP
 
 # rules to compile resource definition files
 $(OBJ_DIR)/%.rsrc : %.rdef
-	$(RESCOMP) -o $@ $<
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o $@ -
 $(OBJ_DIR)/%.rsrc : %.RDEF
-	$(RESCOMP) -o $@ $<
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o $@ -
 
 #	rules to handle lex/flex and yacc/bison files
 
