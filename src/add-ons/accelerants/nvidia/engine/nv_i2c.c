@@ -2,7 +2,7 @@
  * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Rudolf Cornelissen 12/2002-5/2009
+ * Rudolf Cornelissen 12/2002-6/2009
  */
 
 #define MODULE_BIT 0x00004000
@@ -295,6 +295,10 @@ status_t i2c_init(void)
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
+
+	/* on some NV40 architecture cards the i2c busses can be disabled: enable them */
+	if (si->ps.card_arch == NV40A)
+		CRTCW(I2C_LOCK ,(CRTCR(I2C_LOCK) | 0x04));
 
 	/* preset no board wired buses */
 	si->ps.i2c_bus0 = false;
