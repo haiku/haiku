@@ -181,7 +181,8 @@ Services::Services(const BMessage& services)
 
 	_Update(services);
 
-	fListener = spawn_thread(_Listener, "services listener", B_NORMAL_PRIORITY, this);
+	fListener = spawn_thread(_Listener, "services listener", B_NORMAL_PRIORITY,
+		this);
 	if (fListener >= B_OK)
 		resume_thread(fListener);
 }
@@ -419,6 +420,7 @@ Services::_ToService(const BMessage& message, struct service*& service)
 
 	if (i == 0 && (serviceFamily < 0 || servicePort < 0)) {
 		// no address specified
+		printf("service %s has no address specified\n", name);
 		delete service;
 		return B_BAD_VALUE;
 	}
@@ -512,7 +514,7 @@ Services::_LaunchService(struct service& service, int socket)
 		close(socket);
 
 		// build argument array
-		
+
 		const char** args = (const char**)malloc(2 * sizeof(void *));
 		if (args == NULL)
 			exit(1);
