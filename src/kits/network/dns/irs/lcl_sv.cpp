@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -85,13 +85,32 @@
 
 struct service_private {
 	FILE*	file;
-	char	line[BUFSIZ+1];
+	char	line[BUFSIZ + 1];
 	struct servent servent;
 	char*	aliases[IRS_SV_MAXALIASES];
 };
 
 
-char *
+static status_t
+find_own_image(image_info* _info)
+{
+	int32 cookie = 0;
+	image_info info;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		if (((uint32)info.text <= (uint32)find_own_image
+			&& (uint32)info.text + (uint32)info.text_size
+					> (uint32)find_own_image)) {
+			// found us
+			*_info = info;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static char*
 get_next_line(struct service_private* service)
 {
 	if (service->file == NULL)
@@ -139,24 +158,12 @@ sv_rewind(struct irs_sv *sv)
 	// opening the standard file has file has failed, use the attribute
 
 	// find our library image
-	addr_t addressInImage = (addr_t)&sv_rewind;
-	const char* path = NULL;
 	image_info info;
-	int32 cookie = 0;
-
-	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
-		if (addressInImage >= (addr_t)info.text
-			&& addressInImage < (addr_t)info.text + info.text_size) {
-			path = info.name;
-			break;
-		}
-	}
-
-	if (path == NULL)
+	if (find_own_image(&info) != B_OK)
 		return;
 
 	// open the library
-	int libraryFD = open(path, O_RDONLY);
+	int libraryFD = open(info.name, O_RDONLY);
 	if (libraryFD < 0)
 		return;
 
