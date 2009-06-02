@@ -78,7 +78,7 @@ struct mkv_cookie
 };
 
 static uint8 
-matroska_samplerate_to_samplerateindex(float samplerate)
+matroska_samplerate_to_samplerateindex(double samplerate)
 {
 	if (samplerate <= 7350.0) {
 		return 12;
@@ -142,15 +142,15 @@ mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track, uint8 **fakeExtraD
     	profile = 3;
 	}
 
-    uint8 sampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.SamplingFreq);
+    uint8 sampleRateIndex = matroska_samplerate_to_samplerateindex(track->AV.Audio.SamplingFreq);
 
-	TRACE("Profile %d, SampleRate %f, SampleRateIndex %d\n",profile, track->Audio.SamplingFreq, sampleRateIndex);
+	TRACE("Profile %d, SampleRate %f, SampleRateIndex %d\n",profile, track->AV.Audio.SamplingFreq, sampleRateIndex);
     
     // profile			5 bits
     // SampleRateIndex	4 bits
     // Channels			4 Bits
     (*fakeExtraData)[0] = (profile << 3) | ((sampleRateIndex & 0x0E) >> 1);
-    (*fakeExtraData)[1] = ((sampleRateIndex & 0x01) << 7) | (track->Audio.Channels << 3);
+    (*fakeExtraData)[1] = ((sampleRateIndex & 0x01) << 7) | (track->AV.Audio.Channels << 3);
     if (strstr(track->CodecID, "SBR")) {
     	TRACE("Extension SBR Needs more configuration\n");
     	// Sync Extension 0x2b7				11 bits
@@ -160,7 +160,7 @@ mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track, uint8 **fakeExtraD
 		// if SampleRateIndex = 15
 		// ExtendedSamplingFrequency		24 bits
     
-		sampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.OutputSamplingFreq);
+		sampleRateIndex = matroska_samplerate_to_samplerateindex(track->AV.Audio.OutputSamplingFreq);
         (*fakeExtraData)[2] = 0x56;
         (*fakeExtraData)[3] = 0xE5;
         if (sampleRateIndex != 15) {
@@ -168,7 +168,7 @@ mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track, uint8 **fakeExtraD
    	        return 5;
         }
 
-		uint32 sampleRate = uint32(track->Audio.OutputSamplingFreq);
+		uint32 sampleRate = uint32(track->AV.Audio.OutputSamplingFreq);
         
         (*fakeExtraData)[4] = 0x80 | (sampleRateIndex << 3) | ((sampleRate & 0xFFF0 ) >> 4);
         (*fakeExtraData)[5] = (sampleRate & 0x0FFF) << 4;
@@ -185,7 +185,7 @@ mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track, uint8 **fakeExtraD
 const char *
 mkvReader::Copyright()
 {
-	return "Matroska reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen";
+	return "Matroska reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen\nUsing MatroskaParser " B_UTF8_COPYRIGHT " by Mike Matsnev";
 }
 	
 status_t
@@ -296,23 +296,23 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	
 	cookie->audio = false;
 
-	TRACE("video StereoMode: %d\n", cookie->track_info->Video.StereoMode); 
-	TRACE("video DisplayUnit: %d\n", cookie->track_info->Video.DisplayUnit); 
-	TRACE("video AspectRatioType: %d\n", cookie->track_info->Video.AspectRatioType); 
-	TRACE("video PixelWidth: %d\n", cookie->track_info->Video.PixelWidth); 
-	TRACE("video PixelHeight: %d\n", cookie->track_info->Video.PixelHeight); 
-	TRACE("video DisplayWidth: %d\n", cookie->track_info->Video.DisplayWidth); 
-	TRACE("video DisplayHeight: %d\n", cookie->track_info->Video.DisplayHeight); 
-	TRACE("video ColourSpace: %d\n", cookie->track_info->Video.ColourSpace); 
-	TRACE("video GammaValue: %.4f\n", cookie->track_info->Video.GammaValue); 
+	TRACE("video StereoMode: %d\n", cookie->track_info->AV.Video.StereoMode); 
+	TRACE("video DisplayUnit: %d\n", cookie->track_info->AV.Video.DisplayUnit); 
+	TRACE("video AspectRatioType: %d\n", cookie->track_info->AV.Video.AspectRatioType); 
+	TRACE("video PixelWidth: %d\n", cookie->track_info->AV.Video.PixelWidth); 
+	TRACE("video PixelHeight: %d\n", cookie->track_info->AV.Video.PixelHeight); 
+	TRACE("video DisplayWidth: %d\n", cookie->track_info->AV.Video.DisplayWidth); 
+	TRACE("video DisplayHeight: %d\n", cookie->track_info->AV.Video.DisplayHeight); 
+	TRACE("video ColourSpace: %d\n", cookie->track_info->AV.Video.ColourSpace); 
+	TRACE("video GammaValue: %.4f\n", cookie->track_info->AV.Video.GammaValue); 
 
-	TRACE("video Interlaced: %d\n", cookie->track_info->Video.Interlaced);
+	TRACE("video Interlaced: %d\n", cookie->track_info->AV.Video.Interlaced);
 	
 	cookie->frame_rate = get_frame_rate(cookie->track_info->DefaultDuration);
 	cookie->duration = get_duration_in_us(fFileInfo->Duration);
 	cookie->frame_count = get_frame_count_by_default_duration(fFileInfo->Duration, cookie->track_info->DefaultDuration);
 
-	cookie->line_count = cookie->track_info->Video.PixelHeight;
+	cookie->line_count = cookie->track_info->AV.Video.PixelHeight;
 
 	TRACE("mkvReader::Sniff: TimecodeScale %Ld\n", fFileInfo->TimecodeScale);
 	TRACE("mkvReader::Sniff: Duration %Ld\n", fFileInfo->Duration);
@@ -334,10 +334,10 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	uint16 width_aspect_ratio;
 	uint16 height_aspect_ratio;
 	get_pixel_aspect_ratio(&width_aspect_ratio, &height_aspect_ratio,
-						   cookie->track_info->Video.PixelWidth,
-						   cookie->track_info->Video.PixelHeight,
-						   cookie->track_info->Video.DisplayWidth,
-						   cookie->track_info->Video.DisplayHeight);
+						   cookie->track_info->AV.Video.PixelWidth,
+						   cookie->track_info->AV.Video.PixelHeight,
+						   cookie->track_info->AV.Video.DisplayWidth,
+						   cookie->track_info->AV.Video.DisplayHeight);
 
 //	cookie->format.u.encoded_video.max_bit_rate = 
 //	cookie->format.u.encoded_video.avg_bit_rate = 
@@ -349,8 +349,8 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	cookie->format.u.encoded_video.output.pixel_width_aspect = width_aspect_ratio;
 	cookie->format.u.encoded_video.output.pixel_height_aspect = height_aspect_ratio;
 	// cookie->format.u.encoded_video.output.display.format = 0;
-	cookie->format.u.encoded_video.output.display.line_width = cookie->track_info->Video.PixelWidth;
-	cookie->format.u.encoded_video.output.display.line_count = cookie->track_info->Video.PixelHeight;
+	cookie->format.u.encoded_video.output.display.line_width = cookie->track_info->AV.Video.PixelWidth;
+	cookie->format.u.encoded_video.output.display.line_count = cookie->track_info->AV.Video.PixelHeight;
 	cookie->format.u.encoded_video.output.display.bytes_per_row = 0;
 	cookie->format.u.encoded_video.output.display.pixel_offset = 0;
 	cookie->format.u.encoded_video.output.display.line_offset = 0;
@@ -373,14 +373,14 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 
 	cookie->audio = true;
 
-	TRACE("audio SamplingFreq: %.3f\n", cookie->track_info->Audio.SamplingFreq); 
-	TRACE("audio OutputSamplingFreq: %.3f\n", cookie->track_info->Audio.OutputSamplingFreq); 
-	TRACE("audio Channels: %d\n", cookie->track_info->Audio.Channels); 
-	TRACE("audio BitDepth: %d\n", cookie->track_info->Audio.BitDepth);
+	TRACE("audio SamplingFreq: %.3f\n", cookie->track_info->AV.Audio.SamplingFreq); 
+	TRACE("audio OutputSamplingFreq: %.3f\n", cookie->track_info->AV.Audio.OutputSamplingFreq); 
+	TRACE("audio Channels: %d\n", cookie->track_info->AV.Audio.Channels); 
+	TRACE("audio BitDepth: %d\n", cookie->track_info->AV.Audio.BitDepth);
 
 	TRACE("CodecID: %s\n", cookie->track_info->CodecID); 
 
-	cookie->frame_rate = cookie->track_info->Audio.SamplingFreq;
+	cookie->frame_rate = cookie->track_info->AV.Audio.SamplingFreq;
 	cookie->duration = get_duration_in_us(fFileInfo->Duration);
 	cookie->frame_count = get_frame_count_by_frame_rate(fFileInfo->Duration, cookie->frame_rate);
 	
@@ -394,8 +394,8 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 	}
 
 	cookie->format.u.encoded_audio.output.frame_rate = cookie->frame_rate;
-	cookie->format.u.encoded_audio.output.channel_count = cookie->track_info->Audio.Channels;
-	cookie->format.u.encoded_audio.bit_rate = cookie->track_info->Audio.BitDepth * cookie->format.u.encoded_audio.output.channel_count * cookie->frame_rate;
+	cookie->format.u.encoded_audio.output.channel_count = cookie->track_info->AV.Audio.Channels;
+	cookie->format.u.encoded_audio.bit_rate = cookie->track_info->AV.Audio.BitDepth * cookie->format.u.encoded_audio.output.channel_count * cookie->frame_rate;
 
 	cookie->private_data = (uint8 *)cookie->track_info->CodecPrivate;
 	cookie->private_data_size = cookie->track_info->CodecPrivateSize;

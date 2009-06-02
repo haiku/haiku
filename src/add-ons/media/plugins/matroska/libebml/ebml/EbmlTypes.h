@@ -36,8 +36,8 @@
 #include <clocale>
 #include <string>
 
-#include "ebml/c/libebml_t.h"
-#include "ebml/EbmlConfig.h"
+#include "c/libebml_t.h"
+#include "EbmlConfig.h"
 #include "EbmlEndian.h" // binary needs to be defined
 
 START_LIBEBML_NAMESPACE

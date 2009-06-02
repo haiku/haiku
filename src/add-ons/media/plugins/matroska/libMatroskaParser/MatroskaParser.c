@@ -1,32 +1,32 @@
 /*
- * Copyright (c) 2004-2006 Mike Matsnev.  All Rights Reserved.
+ * Copyright (c) 2004-2009 Mike Matsnev.  All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice immediately at the beginning of the file, without modification,
- *    this list of conditions, and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Absolutely no warranty of function or purpose is made by the author
- *    Mike Matsnev.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions 
+ * are met: 
  * 
- * $Id: MatroskaParser.c,v 1.61 2006/10/28 10:39:45 mike Exp $
+ * 1. Redistributions of source code must retain the above copyright 
+ *    notice immediately at the beginning of the file, without modification, 
+ *    this list of conditions, and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the distribution. 
+ * 3. Absolutely no warranty of function or purpose is made by the author 
+ *    Mike Matsnev. 
  * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, 
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ *
+ * $Id: MatroskaParser.c,v >1.61 Unknown mike Exp $
+ *
  */
 
 #include <stdlib.h>
@@ -50,7 +50,7 @@
 #include "MatroskaParser.h"
 
 #ifdef MATROSKA_COMPRESSION_SUPPORT
-#include "zlib.h"
+#include <zlib.h>
 #endif
 
 #define	EBML_VERSION	      1
@@ -96,8 +96,7 @@ static char  *mystrdup(struct InputStream *is,const char *src) {
   return dst;
 }
 
-#ifdef _WIN32
-static void  strlcpy(char *dst,const char *src,unsigned size) {
+static void  mystrlcpy(char *dst,const char *src,unsigned size) {
   unsigned  i;
 
   for (i=0;i+1<size && src[i];++i)
@@ -105,7 +104,6 @@ static void  strlcpy(char *dst,const char *src,unsigned size) {
   if (i<size)
     dst[i] = 0;
 }
-#endif
 
 struct Cue {
   ulonglong	Time;
@@ -240,7 +238,7 @@ static void   myvsnprintf_uint_impl(char **pdest,char *de,int width,int zero,
       int	  rem = (int)(val % base);
       val = val / base;
 
-      *--np = rem < 10 ? rem + '0' : rem - 10 + letter;
+      *--np = (char)(rem < 10 ? rem + '0' : rem - 10 + letter);
     }
 
   rw = (int)(tmp - np + sizeof(tmp) - 1);
@@ -290,7 +288,7 @@ static void   myvsnprintf_int(char **pdest,char *de,int width,int zero,
 static void   myvsnprintf(char *dest,unsigned dsize,const char *fmt,va_list ap) {
   // s,d,x,u,ll
   char	    *de = dest + dsize - 1;
-  int	    state = 0, width = 0, zero = 0, neg = 0, ll = 0;
+  int	    state = 0, width, zero, neg, ll;
 
   if (dsize <= 1) {
     if (dsize > 0)
@@ -687,7 +685,7 @@ static ulonglong readVLUIntImp(MatroskaFile *mf,int *mask) {
 
   c = readch(mf);
   if (c == EOF)
-    return EOF;
+    return 0; // XXX should errorjmp()?
 
   if (c == 0)
     errorjmp(mf,"Invalid first byte of EBML integer: 0");
@@ -1078,6 +1076,8 @@ static void parseSegmentInfo(MatroskaFile *mf,ulonglong toplen) {
 }
 
 static void parseFirstCluster(MatroskaFile *mf,ulonglong toplen) {
+  ulonglong end = filepos(mf) + toplen;
+
   mf->seen.Cluster = 1;
   mf->firstTimecode = 0;
 
@@ -1089,7 +1089,7 @@ static void parseFirstCluster(MatroskaFile *mf,ulonglong toplen) {
       readVLUInt(mf); // track number
       mf->firstTimecode += readSInt(mf, 2);
 
-      skipbytes(mf,start + toplen - filepos(mf));
+      skipbytes(mf,end - filepos(mf));
       return;
     case 0xa0: // BlockGroup
       FOREACH(mf,len)
@@ -1097,7 +1097,7 @@ static void parseFirstCluster(MatroskaFile *mf,ulonglong toplen) {
 	  readVLUInt(mf); // track number
 	  mf->firstTimecode += readSInt(mf,2); 
 
-	  skipbytes(mf,start + toplen - filepos(mf));
+	  skipbytes(mf,end - filepos(mf));
 	  return;
       ENDFOR(mf);
       break;
@@ -1247,7 +1247,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
   ulonglong	    v;
   char		    *cp = NULL, *cs = NULL;
   size_t	    cplen = 0, cslen = 0, cpadd = 0;
-  unsigned	    CompScope = 0, num_comp = 0;
+  unsigned	    CompScope, num_comp = 0;
 
   if (mf->nTracks >= MAX_TRACKS)
     errorjmp(mf,"Too many tracks.");
@@ -1424,7 +1424,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
   // handle compressed CodecPrivate
   if (t.CompEnabled && t.CompMethod == COMP_ZLIB && (CompScope & 2) && cplen > 0) {
     z_stream  zs;
-    char      tmp[64], *ncp;
+    Bytef     tmp[64], *ncp;
     int	      code;
     uLong     ncplen;
 
@@ -1432,7 +1432,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
     if (inflateInit(&zs) != Z_OK)
       errorjmp(mf, "inflateInit failed");
 
-    zs.next_in = cp;
+    zs.next_in = (Bytef *)cp;
     zs.avail_in = cplen;
 
     do {
@@ -1450,7 +1450,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
 
     inflateReset(&zs);
 
-    zs.next_in = cp;
+    zs.next_in = (Bytef *)cp;
     zs.avail_in = cplen;
     zs.next_out = ncp;
     zs.avail_out = ncplen;
@@ -1460,7 +1460,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
 
     inflateEnd(&zs);
 
-    cp = ncp;
+    cp = (char *)ncp;
     cplen = ncplen;
   }
 #endif
@@ -1491,7 +1491,7 @@ static void parseTrackEntry(MatroskaFile *mf,ulonglong toplen) {
   }
   if (cslen) {
     tp->CompMethodPrivate = (char *)(tp+1) + cplen;
-    tp->CompMethodPrivateSize = cslen;
+    tp->CompMethodPrivateSize = (unsigned)cslen;
     memcpy(tp->CompMethodPrivate, cs, cslen);
   }
 
@@ -1982,85 +1982,84 @@ static void parsePointers(MatroskaFile *mf) {
 static void parseSegment(MatroskaFile *mf,ulonglong toplen) {
   ulonglong   nextpos;
   unsigned    nSeekHeads = 0, dontstop = 0;
+  jmp_buf     jb;
 
-  // we want to read data until we find a seekhead or a trackinfo
-  FOREACH(mf,toplen)
-    case 0x114d9b74: // SeekHead
-      if (mf->flags & MKVF_AVOID_SEEKS) {
-	skipbytes(mf,len);
-	break;
-      }
+  memcpy(&jb,&mf->jb,sizeof(jb));
 
-      nextpos = filepos(mf) + len;
-      do {
-	mf->pSeekHead = 0;
-	parseSeekHead(mf,len);
-	++nSeekHeads;
-	if (mf->pSeekHead) { // this is possibly a chained SeekHead
-	  seek(mf,mf->pSeekHead);
-	  id = readID(mf);
-	  if (id==EOF) // chained SeekHead points to EOF?
-	    break;
-	  if (id != 0x114d9b74) // chained SeekHead doesnt point to a SeekHead?
-	    break;
-	  len = readSize(mf);
-	} else if (mf->pSegmentInfo && mf->pTracks && mf->pCues && mf->pCluster) { // we have pointers to all key elements
-	  // XXX EVIL HACK
-	  // Some software doesnt index tags via SeekHead, so we continue
-	  // reading the segment after the second SeekHead
-	  if (mf->pTags || nSeekHeads<2 || filepos(mf)>=start+toplen) {
-	    parsePointers(mf);
-	    return;
+  if (setjmp(mf->jb))
+    mf->flags &= ~MPF_ERROR;
+  else {
+    // we want to read data until we find a seekhead or a trackinfo
+    FOREACH(mf,toplen)
+      case 0x114d9b74: // SeekHead
+        if (mf->flags & MKVF_AVOID_SEEKS) {
+	  skipbytes(mf,len);
+	  break;
+        }
+
+        nextpos = filepos(mf) + len;
+        do {
+	  mf->pSeekHead = 0;
+	  parseSeekHead(mf,len);
+	  ++nSeekHeads;
+	  if (mf->pSeekHead) { // this is possibly a chained SeekHead
+	    seek(mf,mf->pSeekHead);
+	    id = readID(mf);
+	    if (id==EOF) // chained SeekHead points to EOF?
+	      break;
+	    if (id != 0x114d9b74) // chained SeekHead doesnt point to a SeekHead?
+	      break;
+	    len = readSize(mf);
 	  }
-	  // reset nextpos pointer to current position
-	  nextpos = filepos(mf);
-	  dontstop = 1;
-	}
-      } while (mf->pSeekHead);
-      seek(mf,nextpos); // resume reading segment
-      break;
-    case 0x1549a966: // SegmentInfo
-      mf->pSegmentInfo = cur;
-      parseSegmentInfo(mf,len);
-      break;
-    case 0x1f43b675: // Cluster
-      if (!mf->pCluster)
-	mf->pCluster = cur;
-      if (mf->seen.Cluster)
-	skipbytes(mf,len);
-      else
-	parseFirstCluster(mf,len);
-      break;
-    case 0x1654ae6b: // Tracks
-      mf->pTracks = cur;
-      parseTracks(mf,len);
-      break;
-    case 0x1c53bb6b: // Cues
-      mf->pCues = cur;
-      parseCues(mf,len);
-      break;
-    case 0x1941a469: // Attachments
-      mf->pAttachments = cur;
-      parseAttachments(mf,len);
-      break;
-    case 0x1043a770: // Chapters
-      mf->pChapters = cur;
-      parseChapters(mf,len);
-      break;
-    case 0x1254c367: // Tags
-      mf->pTags = cur;
-      parseTags(mf,len);
-      break;
-  ENDFOR1(mf);
-    // if we have pointers to all key elements
-    if (!dontstop && mf->pSegmentInfo && mf->pTracks && mf->pCluster)
-      break;
-  ENDFOR2();
+        } while (mf->pSeekHead && nSeekHeads < 10);
+        seek(mf,nextpos); // resume reading segment
+        break;
+      case 0x1549a966: // SegmentInfo
+        mf->pSegmentInfo = cur;
+        parseSegmentInfo(mf,len);
+        break;
+      case 0x1f43b675: // Cluster
+        if (!mf->pCluster)
+	  mf->pCluster = cur;
+        if (mf->seen.Cluster)
+	  skipbytes(mf,len);
+        else
+	  parseFirstCluster(mf,len);
+        break;
+      case 0x1654ae6b: // Tracks
+        mf->pTracks = cur;
+        parseTracks(mf,len);
+        break;
+      case 0x1c53bb6b: // Cues
+        mf->pCues = cur;
+        parseCues(mf,len);
+        break;
+      case 0x1941a469: // Attachments
+        mf->pAttachments = cur;
+        parseAttachments(mf,len);
+        break;
+      case 0x1043a770: // Chapters
+        mf->pChapters = cur;
+        parseChapters(mf,len);
+        break;
+      case 0x1254c367: // Tags
+        mf->pTags = cur;
+        parseTags(mf,len);
+        break;
+    ENDFOR1(mf);
+      // if we have pointers to all key elements
+      if (!dontstop && mf->pSegmentInfo && mf->pTracks && mf->pCluster)
+        break;
+    ENDFOR2();
+  }
+
+  memcpy(&mf->jb,&jb,sizeof(jb));
+
   parsePointers(mf);
 }
 
 static void parseBlockAdditions(MatroskaFile *mf, ulonglong toplen, ulonglong timecode, unsigned track) {
-  ulonglong	add_id = 1, add_pos = 0, add_len = 0;
+  ulonglong	add_id = 1, add_pos, add_len;
   unsigned char	have_add;
 
   FOREACH(mf, toplen)
@@ -2095,7 +2094,6 @@ static void parseBlockGroup(MatroskaFile *mf,ulonglong toplen,ulonglong timecode
   ulonglong	v;
   ulonglong	duration = 0;
   ulonglong	dpos;
-//  unsigned	add_id = 0;
   struct QueueEntry *qe,*qf = NULL;
   unsigned char	have_duration = 0, have_block = 0;
   unsigned char	gap = 0;
@@ -2152,10 +2150,10 @@ found:
 	errorjmp(mf,"Unexpected EOF while reading Block flags");
 
       if (blockex)
-	ref = !(c & 0x80);
+	ref = (unsigned char)!(c & 0x80);
 
-      gap = c & 0x1;
-      lacing = (c >> 1) & 3;
+      gap = (unsigned char)(c & 0x1);
+      lacing = (unsigned char)((c >> 1) & 3);
 
       if (lacing) {
 	c = readch(mf);
@@ -2474,7 +2472,7 @@ static void reindex(MatroskaFile *mf) {
   jmp_buf     jb;
   ulonglong   pos = mf->pCluster;
   ulonglong   step = 10*1024*1024;
-  ulonglong   size, tc = 0, isize;
+  ulonglong   size, tc, isize;
   longlong    next_cluster;
   int	      id, have_tc, bad;
   struct Cue  *cue;
@@ -2762,7 +2760,7 @@ MatroskaFile  *mkv_OpenEx(InputStream *io,
 {
   MatroskaFile	*mf = io->memalloc(io,sizeof(*mf));
   if (mf == NULL) {
-    strlcpy(err_msg,"Out of memory",msgsize);
+    mystrlcpy(err_msg,"Out of memory",msgsize);
     return NULL;
   }
 
@@ -2776,7 +2774,7 @@ MatroskaFile  *mkv_OpenEx(InputStream *io,
     seek(mf,base);
     parseFile(mf);
   } else { // parser error
-    strlcpy(err_msg,mf->errmsg,msgsize);
+    mystrlcpy(err_msg,mf->errmsg,msgsize);
     mkv_Close(mf);
     return NULL;
   }
@@ -2917,7 +2915,7 @@ void  mkv_Seek(MatroskaFile *mf,ulonglong timecode,unsigned flags) {
 
       mkv_SetTrackMask(mf,mf->trackMask);
 
-      if (flags & MKVF_SEEK_TO_PREV_KEYFRAME) {
+      if (flags & (MKVF_SEEK_TO_PREV_KEYFRAME | MKVF_SEEK_TO_PREV_KEYFRAME_STRICT)) {
 	// we do this in two stages
 	// a. find the last keyframes before the require position
 	// b. seek to them
@@ -2932,7 +2930,7 @@ void  mkv_Seek(MatroskaFile *mf,ulonglong timecode,unsigned flags) {
 	  EmptyQueues(mf);
 
 	  mf->readPosition = mf->Cues[j].Position + mf->pSegment;
-	  mf->tcCluster = mf->Cues[j].Time / mf->Seg.TimecodeScale;
+	  mf->tcCluster = mf->Cues[j].Time;
 
 	  for (;;) {
 	    if ((ret = fillQueues(mf,0)) < 0 || ret == RBRESYNC)
@@ -2940,7 +2938,7 @@ void  mkv_Seek(MatroskaFile *mf,ulonglong timecode,unsigned flags) {
 
 	    // drain queues until we get to the required timecode
 	    for (n=0;n<mf->nTracks;++n) {
-	      if (mf->Queues[n].head && mf->Queues[n].head->Start<timecode) {
+	      if (mf->Queues[n].head && (mf->Queues[n].head->Start<timecode || (m_seendf[n] == 0 && m_kftime[n] == MAXU64))) {
 		if (IS_DELTA(mf->Queues[n].head))
 		  m_seendf[n] = 1;
 		else
@@ -2956,9 +2954,14 @@ void  mkv_Seek(MatroskaFile *mf,ulonglong timecode,unsigned flags) {
 		QFree(mf,QGet(&mf->Queues[n]));
 	      }
 
-	      if (mf->Queues[n].head && (mf->Tracks[n]->Type != TT_AUDIO || mf->Queues[n].head->Start<=timecode))
-		if (!IS_DELTA(mf->Queues[n].head))
-		  m_kftime[n] = mf->Queues[n].head->Start;
+              // We've drained the queue, so the frame at head is the next one past the requered point.
+              // In strict mode we are done, but when seeking is not strict we use the head frame
+              // if it's not an audio track (we accept preroll within a frame for audio), and the head frame
+              // is a keyframe
+              if (!(flags & MKVF_SEEK_TO_PREV_KEYFRAME_STRICT))
+	        if (mf->Queues[n].head && (mf->Tracks[n]->Type != TT_AUDIO || mf->Queues[n].head->Start<=timecode))
+		  if (!IS_DELTA(mf->Queues[n].head))
+		    m_kftime[n] = mf->Queues[n].head->Start;
 	    }
 
 	    for (n=0;n<mf->nTracks;++n)
@@ -2987,7 +2990,7 @@ again:;
       EmptyQueues(mf);
 
       mf->readPosition = mf->Cues[j].Position + mf->pSegment;
-      mf->tcCluster = mf->Cues[j].Time / mf->Seg.TimecodeScale;
+      mf->tcCluster = mf->Cues[j].Time;
 
       for (mask=0;;) {
 	if ((ret = fillQueues(mf,mask)) < 0 || ret == RBRESYNC)
@@ -3182,30 +3185,30 @@ CompressedStream  *cs_Create(/* in */	MatroskaFile *mf,
 
   ti = mkv_GetTrackInfo(mf, tracknum);
   if (ti == NULL) {
-    strlcpy(errormsg, "No such track.", msgsize);
+    mystrlcpy(errormsg, "No such track.", msgsize);
     return NULL;
   }
 
   if (!ti->CompEnabled) {
-    strlcpy(errormsg, "Track is not compressed.", msgsize);
+    mystrlcpy(errormsg, "Track is not compressed.", msgsize);
     return NULL;
   }
 
   if (ti->CompMethod != COMP_ZLIB) {
-    strlcpy(errormsg, "Unsupported compression method.", msgsize);
+    mystrlcpy(errormsg, "Unsupported compression method.", msgsize);
     return NULL;
   }
 
   cs = mf->cache->memalloc(mf->cache,sizeof(*cs));
   if (cs == NULL) {
-    strlcpy(errormsg, "Ouf of memory.", msgsize);
+    mystrlcpy(errormsg, "Ouf of memory.", msgsize);
     return NULL;
   }
 
   memset(&cs->zs,0,sizeof(cs->zs));
   code = inflateInit(&cs->zs);
   if (code != Z_OK) {
-    strlcpy(errormsg, "ZLib error.", msgsize);
+    mystrlcpy(errormsg, "ZLib error.", msgsize);
     mf->cache->memfree(mf->cache,cs);
     return NULL;
   }
@@ -3243,7 +3246,6 @@ int          mkv_ReadData(MatroskaFile *mf,ulonglong FilePos, void *Buffer,unsig
        return (mf->cache->read(mf->cache, FilePos, Buffer, Count) != Count);
 }
 
-
 /* read and decode more data from current frame, return number of bytes decoded,
  * 0 on end of frame, or -1 on error */
 int		  cs_ReadData(CompressedStream *cs,char *buffer,unsigned bufsize)
@@ -3267,7 +3269,7 @@ int		  cs_ReadData(CompressedStream *cs,char *buffer,unsigned bufsize)
       cs->decoded_ptr += todo;
     } else {
       /* setup output buffer */
-      cs->zs.next_out = cs->decoded_buffer;
+      cs->zs.next_out = (Bytef *)cs->decoded_buffer;
       cs->zs.avail_out = sizeof(cs->decoded_buffer);
 
       /* try to read more data */
@@ -3277,11 +3279,11 @@ int		  cs_ReadData(CompressedStream *cs,char *buffer,unsigned bufsize)
 	  todo = sizeof(cs->frame_buffer);
 
 	if (cs->mf->cache->read(cs->mf->cache, cs->frame_pos, cs->frame_buffer, todo) != (int)todo) {
-	  strlcpy(cs->errmsg, "File read failed", sizeof(cs->errmsg));
+	  mystrlcpy(cs->errmsg, "File read failed", sizeof(cs->errmsg));
 	  return -1;
 	}
 
-	cs->zs.next_in = cs->frame_buffer;
+	cs->zs.next_in = (Bytef *)cs->frame_buffer;
 	cs->zs.avail_in = todo;
 
 	cs->frame_pos += todo;
@@ -3291,7 +3293,7 @@ int		  cs_ReadData(CompressedStream *cs,char *buffer,unsigned bufsize)
       /* try to decode more data */
       code = inflate(&cs->zs,Z_NO_FLUSH);
       if (code != Z_OK && code != Z_STREAM_END) {
-	strlcpy(cs->errmsg, "ZLib error.", sizeof(cs->errmsg));
+	mystrlcpy(cs->errmsg, "ZLib error.", sizeof(cs->errmsg));
 	return -1;
       }
 
