@@ -32,13 +32,12 @@ static void i2c_select_bus_set(bool set)
 	if (!si->ps.secondary_head) return;
 
 	/* select GPU I/O pins set to connect to I2C 'registers' */
-	if (set)
-	{
+	if (set) {
+		/* this setup wires the 'I2C registers' to unknown I/O pins on the GPU? */
 		NV_REG32(NV32_FUNCSEL) &= ~0x00000010;
 		NV_REG32(NV32_2FUNCSEL) |= 0x00000010;
-	}
-	else
-	{
+	} else {
+		/* this setup wires the 'I2C registers' to the I2C buses */
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00000010;
 		NV_REG32(NV32_FUNCSEL) |= 0x00000010;
 	}
@@ -48,21 +47,28 @@ static void OutSCL(uint8 BusNR, bool Bit)
 {
 	uint8 data;
 
-	if (BusNR & 0x01)
-	{
-		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_1, (data | 0x20));
-		else
-			CRTCW(WR_I2CBUS_1, (data & ~0x20));
-	}
-	else
-	{
+	switch (BusNR) {
+	case 0:
 		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
 		if (Bit)
 			CRTCW(WR_I2CBUS_0, (data | 0x20));
 		else
 			CRTCW(WR_I2CBUS_0, (data & ~0x20));
+		break;
+	case 1:
+		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_1, (data | 0x20));
+		else
+			CRTCW(WR_I2CBUS_1, (data & ~0x20));
+		break;
+	case 2:
+		data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_2, (data | 0x20));
+		else
+			CRTCW(WR_I2CBUS_2, (data & ~0x20));
+		break;
 	}
 }
 
@@ -70,33 +76,43 @@ static void OutSDA(uint8 BusNR, bool Bit)
 {
 	uint8 data;
 	
-	if (BusNR & 0x01)
-	{
-		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_1, (data | 0x10));
-		else
-			CRTCW(WR_I2CBUS_1, (data & ~0x10));
-	}
-	else
-	{
+	switch (BusNR) {
+	case 0:
 		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
 		if (Bit)
 			CRTCW(WR_I2CBUS_0, (data | 0x10));
 		else
 			CRTCW(WR_I2CBUS_0, (data & ~0x10));
+		break;
+	case 1:
+		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_1, (data | 0x10));
+		else
+			CRTCW(WR_I2CBUS_1, (data & ~0x10));
+		break;
+	case 2:
+		data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_2, (data | 0x10));
+		else
+			CRTCW(WR_I2CBUS_2, (data & ~0x10));
+		break;
 	}
 }
 
 static bool InSCL(uint8 BusNR)
 {
-	if (BusNR & 0x01)
-	{
-		if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
-	}
-	else
-	{
+	switch (BusNR) {
+	case 0:
 		if ((CRTCR(RD_I2CBUS_0) & 0x04)) return true;
+		break;
+	case 1:
+		if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
+		break;
+	case 2:
+		if ((CRTCR(RD_I2CBUS_2) & 0x04)) return true;
+		break;
 	}
 
 	return false;
@@ -104,13 +120,16 @@ static bool InSCL(uint8 BusNR)
 
 static bool InSDA(uint8 BusNR)
 {
-	if (BusNR & 0x01)
-	{
-		if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
-	}
-	else
-	{
+	switch (BusNR) {
+	case 0:
 		if ((CRTCR(RD_I2CBUS_0) & 0x08)) return true;
+		break;
+	case 1:
+		if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
+		break;
+	case 2:
+		if ((CRTCR(RD_I2CBUS_2) & 0x08)) return true;
+		break;
 	}
 
 	return false;
@@ -119,14 +138,11 @@ static bool InSDA(uint8 BusNR)
 static void TXBit (uint8 BusNR, bool Bit)
 {
 	/* send out databit */
-	if (Bit)
-	{
+	if (Bit) {
 		OutSDA(BusNR, true);
 		snooze(3);
 		if (!InSDA(BusNR)) i2c_flag_error (2);
-	}
-	else
-	{
+	} else {
 		OutSDA(BusNR, false);
 	}
 	/* generate clock pulse */
@@ -162,9 +178,6 @@ static uint8 RXBit (uint8 BusNR)
 
 void i2c_bstart (uint8 BusNR)
 {
-	/* select GPU I/O pins set */
-	i2c_select_bus_set(BusNR & 0x02);
-
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
@@ -187,9 +200,6 @@ void i2c_bstart (uint8 BusNR)
 
 void i2c_bstop (uint8 BusNR)
 {
-	/* select GPU I/O pins set */
-	i2c_select_bus_set(BusNR & 0x02);
-
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
@@ -214,15 +224,11 @@ uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 {
 	uint8 cnt, bit, byte = 0;
 
-	/* select GPU I/O pins set */
-	i2c_select_bus_set(BusNR & 0x02);
-
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
 	/* read data */
-	for (cnt = 8; cnt > 0; cnt--)
-	{
+	for (cnt = 8; cnt > 0; cnt--) {
 		byte <<= 1;
 		bit = RXBit (BusNR);
 		byte += bit;
@@ -242,15 +248,11 @@ bool i2c_writebyte (uint8 BusNR, uint8 byte)
 	bool bit;
 	uint8 tmp = byte;
 
-	/* select GPU I/O pins set */
-	i2c_select_bus_set(BusNR & 0x02);
-
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
 	/* write data */
-	for (cnt = 8; cnt > 0; cnt--)
-	{
+	for (cnt = 8; cnt > 0; cnt--) {
 		bit = (tmp & 0x80);
 		TXBit (BusNR, bit);
 		tmp <<= 1;
@@ -270,9 +272,7 @@ void i2c_readbuffer (uint8 BusNR, uint8* buf, uint8 size)
 	uint8 cnt;
 
 	for (cnt = 0; cnt < size; cnt++)
-	{
 		buf[cnt] = i2c_readbyte(BusNR, buf[cnt]);
-	}
 }
 
 void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size)
@@ -280,9 +280,7 @@ void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size)
 	uint8 cnt;
 
 	for (cnt = 0; cnt < size; cnt++)
-	{
 		i2c_writebyte(BusNR, buf[cnt]);
-	}
 }
 
 status_t i2c_init(void)
@@ -292,6 +290,9 @@ status_t i2c_init(void)
 	status_t result = B_ERROR;
 
 	LOG(4,("I2C: searching for wired I2C buses...\n"));
+
+	/* select GPU I/O pins for I2C buses */
+	i2c_select_bus_set(false);
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -304,15 +305,16 @@ status_t i2c_init(void)
 	si->ps.i2c_bus0 = false;
 	si->ps.i2c_bus1 = false;
 	si->ps.i2c_bus2 = false;
-	si->ps.i2c_bus3 = false;
 
 	/* set number of buses to test for */
 	buses = 2;
-	if (si->ps.secondary_head) buses = 4;
+
+	/* newer cards (can) have a third bus.. */
+	if (((si->ps.card_arch == NV10A) && (si->ps.card_type >= NV17)) || (si->ps.card_arch >= NV30A))
+		buses = 3;
 
 	/* find existing buses */
-	for (bus = 0; bus < buses; bus++)
-	{
+	for (bus = 0; bus < buses; bus++) {
 		/* reset status */
 		i2c_flag_error (-1);
 		snooze(6);
@@ -335,30 +337,29 @@ status_t i2c_init(void)
 		i2c_bstop(bus);
 	}
 
-	for (bus = 0; bus < buses; bus++)
-	{
-		if (i2c_bus[bus])
-		{
+	for (bus = 0; bus < buses; bus++) {
+		if (i2c_bus[bus]) {
 			LOG(4,("I2C: bus #%d wiring check: passed\n", bus));
 			result = B_OK;
-		}
-		else
+		} else {
 			LOG(4,("I2C: bus #%d wiring check: failed\n", bus));
+		}
 	}
 
-	//i2c_TestEDID();
-	i2c_DetectScreens();
-	LOG(4,("I2C: dumping EDID specs for connector 1:\n"));
-	i2c_DumpSpecsEDID(&si->ps.con1_screen);
-	LOG(4,("I2C: dumping EDID specs for connector 2:\n"));
-	i2c_DumpSpecsEDID(&si->ps.con2_screen);
+	//fixme: testing again..
+	i2c_TestEDID();
+//	i2c_DetectScreens();
+//	LOG(4,("I2C: dumping EDID specs for connector 1:\n"));
+//	i2c_DumpSpecsEDID(&si->ps.con1_screen);
+//	LOG(4,("I2C: dumping EDID specs for connector 2:\n"));
+//	i2c_DumpSpecsEDID(&si->ps.con2_screen);
 
 	return result;
 }
 
 /*** DDC/EDID library use ***/
 typedef struct {
-	uint32 port;
+	uint8 port;
 } ddc_port_info;
 
 /* Dump EDID info in driver's logfile */
@@ -558,8 +559,8 @@ i2c_ReadEDID(uint8 BusNR, edid1_info *edid)
 	bus.get_signals = &get_signals;
 	ddc2_init_timing(&bus);
 
-	/* select GPU I/O pins set */
-	i2c_select_bus_set(BusNR & 0x02);
+	/* select GPU I/O pins for I2C buses */
+	i2c_select_bus_set(false);
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -584,7 +585,7 @@ void i2c_TestEDID(void)
 	bool *i2c_bus = &(si->ps.i2c_bus0);
 
 	/* test wired bus(es) */
-	for (bus = 0; bus < 4; bus++) {
+	for (bus = 0; bus < 3; bus++) {
 		if (i2c_bus[bus])
 			i2c_ReadEDID(bus, &edid);
 	}
@@ -683,6 +684,7 @@ i2c_DumpSpecsEDID(edid_specs* specs)
  *   not depend on the way screens are connected to the cards (DVI/VGA, 1 or 2 screens).
  * - con1 has CRTC1 and DAC1, and con2 has CRTC2 and DAC2 if nv_general_output_select()
  *   is set to 'straight' and there are only VGA type screens connected. */
+//fixme: take third I2C bus into account..
 void i2c_DetectScreens(void)
 {
 	edid1_info edid;

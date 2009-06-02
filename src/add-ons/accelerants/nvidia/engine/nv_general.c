@@ -92,7 +92,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.91 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.92 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
