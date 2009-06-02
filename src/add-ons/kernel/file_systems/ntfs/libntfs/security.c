@@ -43,6 +43,7 @@
 #include "attrib.h"
 #include "security.h"
 #include "misc.h"
+#include "bitmap.h"
 
 /*
  * The zero GUID.
@@ -336,5 +337,34 @@ int ntfs_sd_add_everyone(ntfs_inode *ni)
 	
 	free(sd);
 	return ret;
+}
+
+/**
+ * ntfs_security_hash - calculate the hash of a security descriptor
+ * @sd:         self-relative security descriptor whose hash to calculate
+ * @length:     size in bytes of the security descritor @sd
+ *
+ * Calculate the hash of the self-relative security descriptor @sd of length
+ * @length bytes.
+ *
+ * This hash is used in the $Secure system file as the primary key for the $SDH
+ * index and is also stored in the header of each security descriptor in the
+ * $SDS data stream as well as in the index data of both the $SII and $SDH
+ * indexes.  In all three cases it forms part of the SDS_ENTRY_HEADER
+ * structure.
+ *
+ * Return the calculated security hash in little endian.
+ */
+le32 ntfs_security_hash(const SECURITY_DESCRIPTOR_RELATIVE *sd, const u32 len)
+{
+        const le32 *pos = (const le32 *)sd;
+        const le32 *end = pos + (len >> 2);
+        u32 hash = 0;
+
+        while (pos < end) {
+                hash = le32_to_cpup(pos) + ntfs_rol32(hash, 3);
+		pos++;
+	}
+        return cpu_to_le32(hash);
 }
 

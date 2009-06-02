@@ -1,9 +1,10 @@
 /*
  * dir.h - Exports for directory handling. Originated from the Linux-NTFS project.
  *
- * Copyright (c) 2002 Anton Altaparmakov
+ * Copyright (c) 2002      Anton Altaparmakov
  * Copyright (c) 2005-2006 Yura Pakhuchiy
  * Copyright (c) 2004-2005 Richard Russon
+ * Copyright (c) 2005-2008 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -28,16 +29,9 @@
 
 #define PATH_SEP '/'
 
+#ifdef __HAIKU__
 #ifndef MAX_PATH
 #define MAX_PATH 1024
-#endif
-
-/*
- * We do not have S_IFSOCK under BeOS/Haiku
- */
-#if defined(__BEOS__) || defined(__HAIKU__)
-#ifndef S_IFSOCK
-#define S_IFSOCK 0140000
 #endif
 #endif
 
@@ -82,7 +76,7 @@ extern ntfs_inode *ntfs_create(ntfs_inode *dir_ni, ntfschar *name, u8 name_len,
 extern ntfs_inode *ntfs_create_device(ntfs_inode *dir_ni,
 		ntfschar *name, u8 name_len, dev_t type, dev_t dev);
 extern ntfs_inode *ntfs_create_symlink(ntfs_inode *dir_ni,
-		ntfschar *name, u8 name_len, ntfschar *target, u8 target_len);
+		ntfschar *name, u8 name_len, ntfschar *target, int target_len);
 extern int ntfs_check_empty_dir(ntfs_inode *ni);
 extern int ntfs_delete(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
 		u8 name_len);

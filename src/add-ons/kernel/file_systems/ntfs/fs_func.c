@@ -123,7 +123,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	if(!ioctl(fd,B_GET_PATH_FOR_DEVICE,devpath))
 		return -1;
 	//try mount
-	ntVolume = utils_mount_volume(devpath,MS_RDONLY|MS_NOATIME,true);
+	ntVolume = utils_mount_volume(devpath,MS_RDONLY,true);
 	if(!ntVolume)
 		return -1;
 
@@ -208,8 +208,8 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 		mnt_flags |= MS_RDONLY;
 		ns->flags |= B_MOUNT_READ_ONLY;
 	}
-	if (ns->noatime)
-		mnt_flags |= MS_NOATIME;
+//	if (ns->noatime)
+//		mnt_flags |= MS_NOATIME;
 
 	ns->ntvol=utils_mount_volume(device,mnt_flags,true);
 	if(ns->ntvol!=NULL)
@@ -367,7 +367,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 			result = ENOENT;
 	} else {
 			unicode = ntfs_calloc(MAX_PATH);
-			len = ntfs_mbstoucs(file, &unicode, MAX_PATH);
+			len = ntfs_mbstoucs(file, &unicode);
 			if (len < 0) {
 				result = EILSEQ;
 				goto exit;
@@ -882,7 +882,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 		goto exit;
 	}
 
-	uname_len = ntfs_mbstoucs(name, &uname, 0);
+	uname_len = ntfs_mbstoucs(name, &uname);
 	if (uname_len < 0) {
 		result = EINVAL;
 		goto exit;
@@ -1285,13 +1285,13 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char 
 			goto exit;
 	}
 
-	uname_len = ntfs_mbstoucs(name, &uname, 0);
+	uname_len = ntfs_mbstoucs(name, &uname);
 	if (uname_len < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	utarget_len = ntfs_mbstoucs(target, &utarget, 0);
+	utarget_len = ntfs_mbstoucs(target, &utarget);
 	if (utarget_len < 0) {
 		result = EINVAL;
 		goto exit;
@@ -1380,7 +1380,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		goto exit;
 	}
 
-	uname_len = ntfs_mbstoucs(name, &uname, 0);
+	uname_len = ntfs_mbstoucs(name, &uname);
 	if (uname_len < 0) {
 		result = EINVAL;
 		goto exit;
@@ -1475,13 +1475,13 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir
 		goto	exit;
 
 	//convert names from utf8 to unicode string
-	unewname_len = ntfs_mbstoucs(newname, &unewname, 0);
+	unewname_len = ntfs_mbstoucs(newname, &unewname);
 	if (unewname_len < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	uoldname_len = ntfs_mbstoucs(oldname, &uoldname, 0);
+	uoldname_len = ntfs_mbstoucs(oldname, &uoldname);
 	if (uoldname_len < 0) {
 		result = EINVAL;
 		goto exit;
@@ -1544,12 +1544,13 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir
 				goto exit;
 			}
 
-			ntfs_delete(oi, odi, uoldname, uoldname_len);
-
 			onode->parent_vnid = MREF( ndi->mft_no );
-
+			
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( ndi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
+
+			ntfs_delete(oi, odi, uoldname, uoldname_len);
+			oi = odi = NULL; /* ntfs_delete() always closes ni and dir_ni */
 
 			put_vnode(_vol, onode->vnid );
 
@@ -1590,10 +1591,12 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir
 				goto exit;
 			}
 
-			ntfs_delete(oi, odi, uoldname, uoldname_len);
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( odi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
 			put_vnode(_vol, onode->vnid );
+
+			ntfs_delete(oi, odi, uoldname, uoldname_len);
+			oi = odi = NULL; /* ntfs_delete() always closes ni and dir_ni */
 	}
 
 
@@ -1626,7 +1629,7 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool	isdir)
 	int 		uname_len;
 	status_t	result = B_NO_ERROR;
 
-	uname_len = ntfs_mbstoucs(name, &uname, 0);
+	uname_len = ntfs_mbstoucs(name, &uname);
 	if (uname_len < 0) {
 		result = EINVAL;
 		goto exit1;
@@ -1675,8 +1678,8 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool	isdir)
 
 	if(ntfs_delete(ni, bi, uname, uname_len))
 	 	result = errno;
-	else
-		ni = NULL;
+
+	ni = bi = NULL;
 
 	node->parent_vnid = dir->vnid;
 
@@ -1760,7 +1763,7 @@ fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	ERRPRINT("fs_unlink  - ENTER:  name %s\n", name==NULL?"NULL":name);
 
-	if( ns == NULL || dir == NULL || name ==NULL) {
+	if( ns == NULL || dir == NULL || name == NULL) {
 		result = EINVAL;
 		goto exit;
 	}

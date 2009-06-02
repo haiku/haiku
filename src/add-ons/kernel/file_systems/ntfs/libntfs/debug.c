@@ -63,9 +63,15 @@ void ntfs_debug_runlist_dump(const runlist_element *rl)
 
 			if (idx > -LCN_EINVAL - 1)
 				idx = 4;
-			ntfs_log_debug("%-16llx %s %-16llx%s\n", rl[i].vcn, lcn_str[idx], rl[i].length, rl[i].length ? "" : " (runlist end)");
+			ntfs_log_debug("%-16lld %s %-16lld%s\n", 
+				       (long long)rl[i].vcn, lcn_str[idx], 
+				       (long long)rl[i].length, 
+				       rl[i].length ? "" : " (runlist end)");
 		} else
-			ntfs_log_debug("%-16llx %-16llx  %-16llx%s\n", rl[i].vcn, rl[i].lcn, rl[i].length, rl[i].length ? "" : " (runlist end)");
+			ntfs_log_debug("%-16lld %-16lld  %-16lld%s\n", 
+				       (long long)rl[i].vcn, (long long)rl[i].lcn, 
+				       (long long)rl[i].length, 
+				       rl[i].length ? "" : " (runlist end)");
 	} while (rl[i++].length);
 }
 

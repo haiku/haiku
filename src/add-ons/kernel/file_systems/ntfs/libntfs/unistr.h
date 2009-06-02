@@ -57,7 +57,7 @@ extern int ntfs_file_values_compare(const FILE_NAME_ATTR *file_name_attr1,
 
 extern int ntfs_ucstombs(const ntfschar *ins, const int ins_len, char **outs,
 		int outs_len);
-extern int ntfs_mbstoucs(const char *ins, ntfschar **outs, int outs_len);
+extern int ntfs_mbstoucs(const char *ins, ntfschar **outs);
 
 extern void ntfs_upcase_table_build(ntfschar *uc, u32 uc_len);
 

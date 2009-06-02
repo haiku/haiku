@@ -111,9 +111,7 @@ static int ntfs_device_unix_io_open(struct ntfs_device *dev, int flags)
 	
 	if ((flags & O_RDWR) != O_RDWR)
 		NDevSetReadOnly(dev);
-
-/* locking not implemented in BeOS */
-#if !defined(__BEOS__) && !defined(__HAIKU__)		
+	
 	memset(&flk, 0, sizeof(flk));
 	if (NDevReadOnly(dev))
 		flk.l_type = F_RDLCK;
@@ -129,7 +127,7 @@ static int ntfs_device_unix_io_open(struct ntfs_device *dev, int flags)
 			ntfs_log_perror("Failed to close '%s'", dev->d_name);
 		goto err_out;
 	}
-#endif	
+	
 	NDevSetOpen(dev);
 	return 0;
 err_out:
@@ -161,15 +159,13 @@ static int ntfs_device_unix_io_close(struct ntfs_device *dev)
 			ntfs_log_perror("Failed to fsync device %s", dev->d_name);
 			return -1;
 		}
-/* locking not implemented in BeOS */
-#if !defined(__BEOS__) && !defined(__HAIKU__)				
+
 	memset(&flk, 0, sizeof(flk));
 	flk.l_type = F_UNLCK;
 	flk.l_whence = SEEK_SET;
 	flk.l_start = flk.l_len = 0LL;
 	if (fcntl(DEV_FD(dev), F_SETLK, &flk))
 		ntfs_log_perror("Could not unlock %s", dev->d_name);
-#endif		
 	if (close(DEV_FD(dev))) {
 		ntfs_log_perror("Failed to close device %s", dev->d_name);
 		return -1;
@@ -247,11 +243,7 @@ static s64 ntfs_device_unix_io_write(struct ntfs_device *dev, const void *buf,
 static s64 ntfs_device_unix_io_pread(struct ntfs_device *dev, void *buf,
 		s64 count, s64 offset)
 {
-#if defined(__BEOS__) || defined(__HAIKU__)
-	return read_pos(DEV_FD(dev), offset, buf,count);
-#else
 	return pread(DEV_FD(dev), buf, count, offset);
-#endif
 }
 
 /**
@@ -273,11 +265,7 @@ static s64 ntfs_device_unix_io_pwrite(struct ntfs_device *dev, const void *buf,
 		return -1;
 	}
 	NDevSetDirty(dev);
-#if defined(__BEOS__) || defined(__HAIKU__)
-	return write_pos(DEV_FD(dev), offset, buf,count);
-#else	
 	return pwrite(DEV_FD(dev), buf, count, offset);
-#endif
 }
 
 /**

@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ntfs ;
 
 SubDirHdrs [ FDirName $(SUBDIR) libntfs ] ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirCcFlags -DHAVE_CONFIG_H=1 ;
 SubDirC++Flags -DHAVE_CONFIG_H=1 ;
 

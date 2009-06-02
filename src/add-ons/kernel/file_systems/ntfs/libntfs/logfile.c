@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2002-2005 Anton Altaparmakov
  * Copyright (c) 2005 Yura Pakhuchiy
- * Copyright (c) 2005-2006 Szabolcs Szakacsits
+ * Copyright (c) 2005-2009 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -676,8 +676,8 @@ BOOL ntfs_is_logfile_clean(ntfs_attr *log_na, RESTART_PAGE_HEADER *rp)
 	 */
 	if (ra->client_in_use_list != LOGFILE_NO_CLIENT &&
 			!(ra->flags & RESTART_VOLUME_IS_CLEAN)) {
-		ntfs_log_error("$LogFile indicates unclean shutdown (%d, %d)\n",
-			       le16_to_cpu(ra->client_in_use_list),
+		ntfs_log_error("The disk contains an unclean file system (%d, "
+			       "%d).\n", le16_to_cpu(ra->client_in_use_list),
 			       le16_to_cpu(ra->flags));
 		return FALSE;
 	}

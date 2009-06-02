@@ -69,12 +69,10 @@
 #include "volume.h"
 #include "debug.h"
 #include "dir.h"
-#include "version.h"
 #include "logging.h"
 #include "misc.h"
 
 const char *ntfs_bugs = "Developers' email address: "NTFS_DEV_LIST"\n";
-const char *ntfs_home = "Linux NTFS homepage: http://www.linux-ntfs.org\n";
 const char *ntfs_gpl = "This program is free software, released under the GNU "
 	"General Public License\nand you are welcome to redistribute it under "
 	"certain conditions.  It comes with\nABSOLUTELY NO WARRANTY; for "
@@ -82,23 +80,6 @@ const char *ntfs_gpl = "This program is free software, released under the GNU "
 	"\"COPYING\" distributed with this program, or online at:\n"
 	"http://www.gnu.org/copyleft/gpl.html\n";
 
-/**
- * utils_set_locale
- */
- /*
-int utils_set_locale(void)
-{
-	const char *locale;
-
-	locale = setlocale(LC_ALL, "");
-	if (!locale) {
-		locale = setlocale(LC_ALL, NULL);
-		ntfs_log_error("Couldn't set local environment, using default '%s'.\n", locale);
-		return 1;
-	} else {
-		return 0;
-	}
-}*/
 
 /**
  * utils_valid_device - Perform some safety checks on the device, before we start

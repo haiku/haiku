@@ -1,10 +1,10 @@
 /*
  * inode.h - Defines for NTFS inode handling. Originated from the Linux-NTFS project.
  *
- * Copyright (c) 2001,2002 Anton Altaparmakov
- * Copyright (c) 2004-2005 Yura Pakhuchiy
+ * Copyright (c) 2001-2004 Anton Altaparmakov
+ * Copyright (c) 2004-2007 Yura Pakhuchiy
  * Copyright (c) 2004-2005 Richard Russon
- * Copyright (c) 2006 Szabolcs Szakacsits
+ * Copyright (c) 2006-2008 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -85,16 +85,13 @@ typedef enum {
 #define NInoAttrListTestAndSetDirty(ni)	    test_and_set_nino_al_flag(ni, Dirty)
 #define NInoAttrListTestAndClearDirty(ni) test_and_clear_nino_al_flag(ni, Dirty)
 
-#define NInoFileNameDirty(ni)			\
-					  test_nino_flag(ni, FileNameDirty)
-#define NInoFileNameSetDirty(ni)		\
-					   set_nino_flag(ni, FileNameDirty)
-#define NInoFileNameClearDirty(ni)		\
-					 clear_nino_flag(ni, FileNameDirty)
+#define NInoFileNameDirty(ni)                 test_nino_flag(ni, FileNameDirty)
+#define NInoFileNameSetDirty(ni)               set_nino_flag(ni, FileNameDirty)
+#define NInoFileNameClearDirty(ni)           clear_nino_flag(ni, FileNameDirty)
 #define NInoFileNameTestAndSetDirty(ni)		\
-				  test_and_set_nino_flag(ni, FileNameDirty)
+				      test_and_set_nino_flag(ni, FileNameDirty)
 #define NInoFileNameTestAndClearDirty(ni)	\
-				test_and_clear_nino_flag(ni, FileNameDirty)
+				    test_and_clear_nino_flag(ni, FileNameDirty)
 
 /**
  * struct _ntfs_inode - The NTFS in-memory inode structure.
@@ -130,12 +127,14 @@ struct _ntfs_inode {
 					   inode of the base mft record. */
 	};
 
-	/* Temp: for directory handling */
-	void *private_data;	/* ntfs_dt containing this inode */
-	int ref_count;
-
 	/* Below fields are valid only for base inode. */
-	s64 data_size;		/* Data size stored in the filename index. */
+
+	/*
+	 * These two fields are used to sync filename index and guaranteed to be
+	 * correct, however value in index itself maybe wrong (windows itself
+	 * do not update them properly).
+	 */
+	s64 data_size;		/* Data size of unnamed DATA attribute. */
 	s64 allocated_size;	/* Allocated size stored in the filename
 				   index. (NOTE: Equal to allocated size of
 				   the unnamed data attribute for normal or
@@ -143,11 +142,27 @@ struct _ntfs_inode {
 				   of the unnamed data attribute for sparse or
 				   compressed files.) */
 
+	/*
+	 * These four fields are copy of relevant fields from
+	 * STANDARD_INFORMATION attribute and used to sync it and FILE_NAME
+	 * attribute in the index.
+	 */
 	time_t creation_time;
 	time_t last_data_change_time;
 	time_t last_mft_change_time;
 	time_t last_access_time;
 };
+
+typedef enum {
+	NTFS_UPDATE_ATIME = 1 << 0,
+	NTFS_UPDATE_MTIME = 1 << 1,
+	NTFS_UPDATE_CTIME = 1 << 2,
+} ntfs_time_update_flags;
+
+#define NTFS_UPDATE_MCTIME  (NTFS_UPDATE_MTIME | NTFS_UPDATE_CTIME)
+#define NTFS_UPDATE_AMCTIME (NTFS_UPDATE_ATIME | NTFS_UPDATE_MCTIME)
+
+extern ntfs_inode *ntfs_inode_base(ntfs_inode *ni);
 
 extern ntfs_inode *ntfs_inode_allocate(ntfs_volume *vol);
 
@@ -162,8 +177,7 @@ extern int ntfs_inode_attach_all_extents(ntfs_inode *ni);
 
 extern void ntfs_inode_mark_dirty(ntfs_inode *ni);
 
-extern void ntfs_inode_update_atime(ntfs_inode *ni);
-extern void ntfs_inode_update_time(ntfs_inode *ni);
+extern void ntfs_inode_update_times(ntfs_inode *ni, ntfs_time_update_flags mask);
 
 extern int ntfs_inode_sync(ntfs_inode *ni);
 

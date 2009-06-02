@@ -1,7 +1,8 @@
 /*
  * logging.h - Centralised logging. Originated from the Linux-NTFS project.
  *
- * Copyright (c) 2005 Richard Russon
+ * Copyright (c) 2005      Richard Russon
+ * Copyright (c) 2007-2008 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -37,7 +38,12 @@ typedef int (ntfs_log_handler)(const char *function, const char *file, int line,
 	u32 level, void *data, const char *format, va_list args);
 
 /* Set the logging handler from one of the functions, below. */
+#ifdef __HAIKU__
 void ntfs_log_set_handler(ntfs_log_handler *handler);
+#else
+void ntfs_log_set_handler(ntfs_log_handler *handler 
+			  __attribute__((format(printf, 6, 0))));	  
+#endif
 
 /* Logging handlers */
 ntfs_log_handler ntfs_log_handler_syslog  __attribute__((format(printf, 6, 0)));
@@ -75,6 +81,8 @@ int ntfs_log_redirect(const char *function, const char *file, int line,
 #define NTFS_LOG_LEVEL_ERROR	(1 <<  7) /* Operation failed, no damage done */
 #define NTFS_LOG_LEVEL_PERROR	(1 <<  8) /* Message : standard error description */
 #define NTFS_LOG_LEVEL_CRITICAL	(1 <<  9) /* Operation failed,damage may have occurred */
+#define NTFS_LOG_LEVEL_ENTER	(1 << 10) /* Enter a function */
+#define NTFS_LOG_LEVEL_LEAVE	(1 << 11) /* Leave a function  */
 
 /* Logging style flags - Manage the style of the output */
 #define NTFS_LOG_FLAG_PREFIX	(1 << 0) /* Prefix messages with "ERROR: ", etc */
@@ -82,7 +90,6 @@ int ntfs_log_redirect(const char *function, const char *file, int line,
 #define NTFS_LOG_FLAG_LINE	(1 << 2) /* Show the line number of the message */
 #define NTFS_LOG_FLAG_FUNCTION	(1 << 3) /* Show the function name containing the message */
 #define NTFS_LOG_FLAG_ONLYNAME	(1 << 4) /* Only display the filename, not the pathname */
-#define NTFS_LOG_FLAG_COLOUR	(1 << 5) /* Colour highlight some messages */
 
 /* Macros to simplify logging.  One for each level defined above.
  * Note, ntfs_log_debug/trace have effect only if DEBUG is defined.
@@ -102,9 +109,13 @@ int ntfs_log_redirect(const char *function, const char *file, int line,
 #ifdef DEBUG
 #define ntfs_log_debug(FORMAT, ARGS...) ntfs_log_redirect(__FUNCTION__,__FILE__,__LINE__,NTFS_LOG_LEVEL_DEBUG,NULL,FORMAT,##ARGS)
 #define ntfs_log_trace(FORMAT, ARGS...) ntfs_log_redirect(__FUNCTION__,__FILE__,__LINE__,NTFS_LOG_LEVEL_TRACE,NULL,FORMAT,##ARGS)
+#define ntfs_log_enter(FORMAT, ARGS...) ntfs_log_redirect(__FUNCTION__,__FILE__,__LINE__,NTFS_LOG_LEVEL_ENTER,NULL,FORMAT,##ARGS)
+#define ntfs_log_leave(FORMAT, ARGS...) ntfs_log_redirect(__FUNCTION__,__FILE__,__LINE__,NTFS_LOG_LEVEL_LEAVE,NULL,FORMAT,##ARGS)
 #else
 #define ntfs_log_debug(FORMAT, ARGS...)do {} while (0)
 #define ntfs_log_trace(FORMAT, ARGS...)do {} while (0)
+#define ntfs_log_enter(FORMAT, ARGS...)do {} while (0)
+#define ntfs_log_leave(FORMAT, ARGS...)do {} while (0)
 #endif /* DEBUG */
 
 #endif /* _LOGGING_H_ */

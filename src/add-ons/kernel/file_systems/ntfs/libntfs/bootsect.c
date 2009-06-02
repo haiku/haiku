@@ -2,7 +2,7 @@
  * bootsect.c - Boot sector handling code. Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2000-2006 Anton Altaparmakov
- * Copyright (c) 2003-2006 Szabolcs Szakacsits
+ * Copyright (c) 2003-2008 Szabolcs Szakacsits
  * Copyright (c)      2005 Yura Pakhuchiy
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -151,6 +151,13 @@ not_ntfs:
 	return ret;
 }
 
+static const char *last_sector_error =
+"HINTS: Either the volume is a RAID/LDM but it wasn't setup yet,\n"
+"   or it was not setup correctly (e.g. by not using mdadm --build ...),\n"
+"   or a wrong device is tried to be mounted,\n"
+"   or the partition table is corrupt (partition is smaller than NTFS),\n"
+"   or the NTFS boot sector is corrupt (NTFS size is not valid).\n";
+
 /**
  * ntfs_boot_sector_parse - setup an ntfs volume from an ntfs boot sector
  * @vol:	ntfs_volume to setup
@@ -188,7 +195,7 @@ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
 	}
 	
 	sectors = sle64_to_cpu(bs->number_of_sectors);
-	ntfs_log_debug("NumberOfSectors = %lld\n", sectors);
+	ntfs_log_debug("NumberOfSectors = %lld\n", (long long)sectors);
 	if (!sectors) {
 		ntfs_log_error("Volume size is set to zero.\n");
 		return -1;
@@ -198,9 +205,7 @@ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
 				  SEEK_SET) == -1) {
 		ntfs_log_perror("Failed to read last sector (%lld)",
 			       	(long long)sectors);
-		ntfs_log_error("Perhaps the volume is a RAID/LDM but it wasn't "
-			       "setup yet, or the\nwrong device was used, "
-			       "or the partition table is incorrect.\n" );
+		ntfs_log_error("%s", last_sector_error);
 		return -1;
 	}
 	
@@ -208,8 +213,8 @@ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
 
 	vol->mft_lcn = sle64_to_cpu(bs->mft_lcn);
 	vol->mftmirr_lcn = sle64_to_cpu(bs->mftmirr_lcn);
-	ntfs_log_debug("MFT LCN = 0x%llx\n", vol->mft_lcn);
-	ntfs_log_debug("MFTMirr LCN = 0x%llx\n", vol->mftmirr_lcn);
+	ntfs_log_debug("MFT LCN = %lld\n", (long long)vol->mft_lcn);
+	ntfs_log_debug("MFTMirr LCN = %lld\n", (long long)vol->mftmirr_lcn);
 	if (vol->mft_lcn     > vol->nr_clusters ||
 	    vol->mftmirr_lcn > vol->nr_clusters) {
 		ntfs_log_error("$MFT LCN (%lld) or $MFTMirr LCN (%lld) is "

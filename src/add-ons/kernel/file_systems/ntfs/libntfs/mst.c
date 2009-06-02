@@ -2,7 +2,7 @@
  * mst.c - Multi sector fixup handling code. Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2000-2004 Anton Altaparmakov
- * Copyright (c)      2006 Szabolcs Szakacsits
+ * Copyright (c) 2006-2009 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -63,6 +63,9 @@ int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
 			(u32)(usa_ofs + (usa_count * 2)) > size ||
 			(size >> NTFS_BLOCK_SIZE_BITS) != usa_count) {
 		errno = EINVAL;
+		ntfs_log_perror("%s: magic: 0x%08x  size: %d  usa_ofs: %d  "
+				"usa_count: %d", __FUNCTION__, *(le32 *)b,
+				size, usa_ofs, usa_count);
 		return -1;
 	}
 	/* Position of usn in update sequence array. */
@@ -89,8 +92,12 @@ int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
 			 * Set the magic to "BAAD" and return failure.
 			 * Note that magic_BAAD is already converted to le32.
 			 */
-			b->magic = magic_BAAD;
 			errno = EIO;
+			ntfs_log_perror("Incomplete multi-sector transfer: "
+				"magic: 0x%08x  size: %d  usa_ofs: %d  usa_count:"
+				" %d  data: %d  usn: %d", *(le32 *)b, size,
+				usa_ofs, usa_count, *data_pos, usn);
+			b->magic = magic_BAAD;
 			return -1;
 		}
 		data_pos += NTFS_BLOCK_SIZE/sizeof(u16);
@@ -142,6 +149,7 @@ int ntfs_mst_pre_write_fixup(NTFS_RECORD *b, const u32 size)
 	if (!b || ntfs_is_baad_record(b->magic) ||
 			ntfs_is_hole_record(b->magic)) {
 		errno = EINVAL;
+		ntfs_log_perror("%s: bad argument", __FUNCTION__);
 		return -1;
 	}
 	/* Setup the variables. */
@@ -153,6 +161,7 @@ int ntfs_mst_pre_write_fixup(NTFS_RECORD *b, const u32 size)
 			(u32)(usa_ofs + (usa_count * 2)) > size ||
 			(size >> NTFS_BLOCK_SIZE_BITS) != usa_count) {
 		errno = EINVAL;
+		ntfs_log_perror("%s", __FUNCTION__);
 		return -1;
 	}
 	/* Position of usn in update sequence array. */

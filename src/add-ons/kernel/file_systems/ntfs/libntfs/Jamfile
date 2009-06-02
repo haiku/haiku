@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirCcFlags -Wall -Wno-multichar -DHAVE_CONFIG_H=1 ;
 
 StaticLibrary libntfs.a :
@@ -27,7 +25,6 @@ StaticLibrary libntfs.a :
 	runlist.c
 	security.c
 	unistr.c
-	version.c
 	volume.c
 ;
 

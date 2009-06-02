@@ -4,7 +4,7 @@
  * Copyright (c) 2004 Anton Altaparmakov
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2005 Yura Pakhuchiy
- * Copyright (c) 2006 Szabolcs Szakacsits
+ * Copyright (c) 2006-2008 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -48,7 +48,6 @@
  * @actx:		attribute search context if in root or NULL otherwise
  * @ia:			index block if @is_in_root is FALSE or NULL otherwise
  * @ia_na:		opened INDEX_ALLOCATION attribute
- * @ib_vcn:		VCN from which @ia where read from
  * @parent_pos:		parent entries' positions in the index block
  * @parent_vcn:		entry's parent node or VCN_INDEX_ROOT_PARENT
  * @new_vcn:            new VCN if we need to create a new index block
@@ -64,11 +63,11 @@
  * simply points into @entry.  This is probably what the user is interested in.
  *
  * If @is_in_root is TRUE, @entry is in the index root attribute @ir described
- * by the attribute search context @actx and inode @ni.  @ia, @ib_vcn and
+ * by the attribute search context @actx and inode @ni.  @ia and
  * @ib_dirty are undefined in this case.
  *
  * If @is_in_root is FALSE, @entry is in the index allocation attribute and @ia
- * and @ib_vcn point to the index allocation block and VCN where it's placed,
+ * point to the index allocation block and VCN where it's placed,
  * respectively. @ir and @actx are NULL in this case. @ia_na is opened
  * INDEX_ALLOCATION attribute. @ib_dirty is TRUE if index block was changed and
  * FALSE otherwise.
@@ -96,9 +95,7 @@ typedef struct {
 	INDEX_BLOCK *ib;
 	ntfs_attr *ia_na;
 	int parent_pos[MAX_PARENT_VCN];  /* parent entries' positions */
-	VCN ib_vcn;
 	VCN parent_vcn[MAX_PARENT_VCN]; /* entry's parent nodes */
-	int max_depth;	     /* number of the parent nodes 	*/
 	int pindex;	     /* maximum it's the number of the parent nodes  */
 	BOOL ib_dirty;
 	u32 block_size;
@@ -115,7 +112,7 @@ extern int ntfs_index_lookup(const void *key, const int key_len,
 
 extern int ntfs_index_add_filename(ntfs_inode *ni, FILE_NAME_ATTR *fn,
 		MFT_REF mref);
-extern int ntfs_index_rm(ntfs_index_context *ictx);
+extern int ntfs_index_remove(ntfs_inode *ni, const void *key, const int keylen);
 
 extern INDEX_ROOT *ntfs_index_root_get(ntfs_inode *ni, ATTR_RECORD *attr);
 

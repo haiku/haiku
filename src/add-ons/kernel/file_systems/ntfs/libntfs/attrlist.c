@@ -145,7 +145,6 @@ int ntfs_attrlist_entry_add(ntfs_inode *ni, ATTR_RECORD *attr)
 	ctx = ntfs_attr_get_search_ctx(ni, NULL);
 	if (!ctx) {
 		err = errno;
-		ntfs_log_trace("Failed to obtain attribute search context.\n");
 		goto err_out;
 	}
 	if (!ntfs_attr_lookup(attr->type, (attr->name_length) ? (ntfschar*)

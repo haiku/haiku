@@ -24,8 +24,6 @@
 extern "C" {
 #endif
 
-#ifdef __HAIKU__
-
 #include <fs_interface.h>
 #include <kernel/lock.h>
 #include <fs_info.h>
@@ -38,15 +36,6 @@ extern "C" {
 #include <NodeMonitor.h>
 #include <util/kernel_cpp.h>
 
-#else
-
-#include "fsproto.h"
-#include "lock.h"
-
-#define publish_vnode new_vnode
-
-#endif
-
 #include "config.h"
 #include "attrib.h"
 #include "inode.h"
@@ -56,7 +45,6 @@ extern "C" {
 #include "layout.h"
 #include "index.h"
 #include "utils.h"
-#include "version.h"
 #include "ntfstime.h"
 #include "misc.h"
 #include "utils.h"
@@ -111,16 +99,10 @@ typedef struct nspace
 {
 	ntfs_volume	*ntvol;
 	char		devicePath[MAX_PATH];
-#ifdef __HAIKU__
 	dev_t		id;
-#else
-	nspace_id	id;
-#endif
 	int			free_cluster_count;
 	char		volumeLabel[MAX_PATH];
-
 	ulong 		flags;
-
 	int 		state;
 	s64 		free_clusters;
 	long 		free_mft;
@@ -131,10 +113,7 @@ typedef struct nspace
 	BOOL 		debug;
 	BOOL 		noatime;
 	BOOL 		no_detach;
-
-
 	lock		vlock;
-
 } nspace;
 
 

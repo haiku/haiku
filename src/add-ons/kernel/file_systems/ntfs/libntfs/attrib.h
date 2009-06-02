@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2000-2004 Anton Altaparmakov
  * Copyright (c) 2004-2005 Yura Pakhuchiy
- * Copyright (c) 2006 Szabolcs Szakacsits
+ * Copyright (c) 2006-2007 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -91,6 +91,8 @@ extern int ntfs_attr_lookup(const ATTR_TYPES type, const ntfschar *name,
 		const u32 name_len, const IGNORE_CASE_BOOL ic,
 		const VCN lowest_vcn, const u8 *val, const u32 val_len,
 		ntfs_attr_search_ctx *ctx);
+
+extern int ntfs_attr_position(const ATTR_TYPES type, ntfs_attr_search_ctx *ctx);
 
 extern ATTR_DEF *ntfs_attr_find_in_attrdef(const ntfs_volume *vol,
 		const ATTR_TYPES type);
@@ -185,7 +187,8 @@ struct _ntfs_attr {
 };
 
 /**
- * enum ntfs_attr_state_bits - bits for the state field in the ntfs_attr structure
+ * enum ntfs_attr_state_bits - bits for the state field in the ntfs_attr
+ * structure
  */
 typedef enum {
 	NA_Initialized,		/* 1: structure is initialized. */
@@ -204,30 +207,15 @@ typedef enum {
 #define NAttrSetNonResident(na)		  set_nattr_flag(na, NonResident)
 #define NAttrClearNonResident(na)	clear_nattr_flag(na, NonResident)
 
-#define GenNAttrIno(func_name,flag)				\
-static inline int NAttr##func_name(ntfs_attr *na)		\
-{								\
-	if (na->type == AT_DATA && na->name == AT_UNNAMED)	\
-		return (na->ni->flags & FILE_ATTR_##flag);	\
-	return 0;						\
-}								\
-static inline void NAttrSet##func_name(ntfs_attr *na)		\
-{								\
-	if (na->type == AT_DATA && na->name == AT_UNNAMED)	\
-		na->ni->flags |= FILE_ATTR_##flag;		\
-	else							\
-		ntfs_log_trace("BUG! Should be called only for "\
-			"unnamed data attribute.\n");		\
-}								\
-static inline void NAttrClear##func_name(ntfs_attr *na)		\
-{								\
-	if (na->type == AT_DATA && na->name == AT_UNNAMED)	\
-		na->ni->flags &= ~FILE_ATTR_##flag;		\
-}
+#define GenNAttrIno(func_name, flag)			\
+extern int NAttr##func_name(ntfs_attr *na);		\
+extern void NAttrSet##func_name(ntfs_attr *na);		\
+extern void NAttrClear##func_name(ntfs_attr *na);
 
-GenNAttrIno(Compressed, COMPRESSED)
-GenNAttrIno(Encrypted, ENCRYPTED)
-GenNAttrIno(Sparse, SPARSE_FILE)
+GenNAttrIno(Compressed, FILE_ATTR_COMPRESSED)
+GenNAttrIno(Encrypted, 	FILE_ATTR_ENCRYPTED)
+GenNAttrIno(Sparse, 	FILE_ATTR_SPARSE_FILE)
+#undef GenNAttrIno
 
 /**
  * union attr_val - Union of all known attribute values
@@ -318,7 +306,6 @@ extern int ntfs_attr_update_mapping_pairs(ntfs_attr *na, VCN from_vcn);
 
 extern int ntfs_attr_truncate(ntfs_attr *na, const s64 newsize);
 
-// FIXME / TODO: Above here the file is cleaned up. (AIA)
 /**
  * get_attribute_value_length - return the length of the value of an attribute
  * @a:	pointer to a buffer containing the attribute record
@@ -355,6 +342,7 @@ extern int   ntfs_attr_exist(ntfs_inode *ni, const ATTR_TYPES type,
 			     ntfschar *name, u32 name_len);
 extern int   ntfs_attr_remove(ntfs_inode *ni, const ATTR_TYPES type,
 			      ntfschar *name, u32 name_len);
+extern s64   ntfs_attr_get_free_bits(ntfs_attr *na);
 
 #endif /* defined _NTFS_ATTRIB_H */
 

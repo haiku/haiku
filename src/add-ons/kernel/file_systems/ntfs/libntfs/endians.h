@@ -48,9 +48,6 @@
 #ifdef HAVE_SYS_BYTEORDER_H
 #include <sys/byteorder.h>
 #endif
-#ifdef HAVE_BYTEORDER_H
-#include <byteorder.h>
-#endif
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif

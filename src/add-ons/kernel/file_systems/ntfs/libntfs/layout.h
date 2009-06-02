@@ -2340,17 +2340,18 @@ typedef struct {
 					   control entry in the data part of
 					   the index. */
 	} __attribute__((__packed__)) key;
-	/* The (optional) index data is inserted here when creating. */
-	// VCN vcn;	   If INDEX_ENTRY_NODE bit in ie_flags is set, the last
-	//		   eight bytes of this index entry contain the virtual
-	//		   cluster number of the index block that holds the
-	//		   entries immediately preceding the current entry. 
-	//
-	//		   If the key_length is zero, then the vcn immediately
-	//		   follows the INDEX_ENTRY_HEADER. 
-	//
-	//		   The address of the vcn of "ie" INDEX_ENTRY is given by 
-	//		   (char*)ie + le16_to_cpu(ie->length) - sizeof(VCN)
+	/* The (optional) index data is inserted here when creating.
+	VCN vcn;	   If INDEX_ENTRY_NODE bit in ie_flags is set, the last
+			   eight bytes of this index entry contain the virtual
+			   cluster number of the index block that holds the
+			   entries immediately preceding the current entry. 
+	
+			   If the key_length is zero, then the vcn immediately
+			   follows the INDEX_ENTRY_HEADER. 
+	
+			   The address of the vcn of "ie" INDEX_ENTRY is given by 
+			   (char*)ie + le16_to_cpu(ie->length) - sizeof(VCN)
+	*/
 } __attribute__((__packed__)) INDEX_ENTRY;
 
 /**

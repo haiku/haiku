@@ -26,6 +26,7 @@ typedef struct dircookie
 {
 	u64					pos;
 	int					readed;		
+	int					last;
 	ino_t				ino;
 	BOOL 				show_sys_files;	
 	char 				name[MAX_PATH];

@@ -4,7 +4,7 @@
  * Copyright (c) 2000-2004 Anton Altaparmakov
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2005-2006 Yura Pakhuchiy
- * Copyright (c) 2005-2006 Szabolcs Szakacsits
+ * Copyright (c) 2005-2009 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -43,29 +43,20 @@
 #endif
 
 /*
- * Under Cygwin, DJGPP and FreeBSD we do not have MS_RDONLY and MS_NOATIME,
+ * Under Cygwin, DJGPP and FreeBSD we do not have MS_RDONLY,
  * so we define them ourselves.
  */
 #ifndef MS_RDONLY
 #define MS_RDONLY 1
 #endif
-/*
- * Solaris defines MS_RDONLY but not MS_NOATIME thus we need to carefully
- * define MS_NOATIME.
- */
-#ifndef MS_NOATIME
-#if (MS_RDONLY != 1)
-#	define MS_NOATIME 1
-#else
-#	define MS_NOATIME 2
-#endif
-#endif
 
 #define MS_EXCLUSIVE 0x08000000
 
-#ifndef MS_FORCE
-#define MS_FORCE     0x10000000
+#ifndef MS_RECOVER
+#define MS_RECOVER   0x10000000
 #endif
+
+#define MS_IGNORE_HIBERFILE   0x20000000
 
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
@@ -89,6 +80,22 @@ typedef enum {
 
 extern int ntfs_check_if_mounted(const char *file, unsigned long *mnt_flags);
 
+typedef enum {
+	NTFS_VOLUME_OK			= 0,
+	NTFS_VOLUME_SYNTAX_ERROR	= 11,
+	NTFS_VOLUME_NOT_NTFS		= 12,
+	NTFS_VOLUME_CORRUPT		= 13,
+	NTFS_VOLUME_HIBERNATED		= 14,
+	NTFS_VOLUME_UNCLEAN_UNMOUNT	= 15,
+	NTFS_VOLUME_LOCKED		= 16,
+	NTFS_VOLUME_RAID		= 17,
+	NTFS_VOLUME_UNKNOWN_REASON	= 18,
+	NTFS_VOLUME_NO_PRIVILEGE	= 19,
+	NTFS_VOLUME_OUT_OF_MEMORY	= 20,
+	NTFS_VOLUME_FUSE_ERROR		= 21,
+	NTFS_VOLUME_INSECURE		= 22
+} ntfs_volume_status;
+
 /**
  * enum ntfs_volume_state_bits -
  *
@@ -98,7 +105,6 @@ typedef enum {
 	NV_ReadOnly,		/* 1: Volume is read-only. */
 	NV_CaseSensitive,	/* 1: Volume is mounted case-sensitive. */
 	NV_LogFileEmpty,	/* 1: $logFile journal is empty. */
-	NV_NoATime,		/* 1: Do not update access time. */
 } ntfs_volume_state_bits;
 
 #define  test_nvol_flag(nv, flag)	 test_bit(NV_##flag, (nv)->state)
@@ -116,10 +122,6 @@ typedef enum {
 #define NVolLogFileEmpty(nv)		 test_nvol_flag(nv, LogFileEmpty)
 #define NVolSetLogFileEmpty(nv)		  set_nvol_flag(nv, LogFileEmpty)
 #define NVolClearLogFileEmpty(nv)	clear_nvol_flag(nv, LogFileEmpty)
-
-#define NVolNoATime(nv)			 test_nvol_flag(nv, NoATime)
-#define NVolSetNoATime(nv)		  set_nvol_flag(nv, NoATime)
-#define NVolClearNoATime(nv)		clear_nvol_flag(nv, NoATime)
 
 /*
  * NTFS version 1.1 and 1.2 are used by Windows NT4.
@@ -212,11 +214,12 @@ struct _ntfs_volume {
 	s32 attrdef_len;	/* Size of the attribute definition table in
 				   bytes. */
 
-	/* Temp: for directory handling */
-	void *private_data;	/* ntfs_dir for . */
-	void *private_bmp1;	/* ntfs_bmp for $MFT/$BITMAP */
-	void *private_bmp2;	/* ntfs_bmp for $Bitmap */
+	s64 free_clusters; 	/* Track the number of free clusters which
+				   greatly improves statfs() performance */
+	s64 free_mft_records; 	/* Same for free mft records (see above) */
 };
+
+extern const char *ntfs_home;
 
 extern ntfs_volume *ntfs_volume_alloc(void);
 
@@ -230,9 +233,15 @@ extern ntfs_volume *ntfs_mount(const char *name, unsigned long flags);
 extern int ntfs_umount(ntfs_volume *vol, const BOOL force);
 
 extern int ntfs_version_is_supported(ntfs_volume *vol);
+extern int ntfs_volume_check_hiberfile(ntfs_volume *vol, int verbose);
 extern int ntfs_logfile_reset(ntfs_volume *vol);
 
 extern int ntfs_volume_write_flags(ntfs_volume *vol, const u16 flags);
+
+extern int ntfs_volume_error(int err);
+extern void ntfs_mount_error(const char *vol, const char *mntpoint, int err);
+
+extern int ntfs_set_locale(void);
 
 #endif /* defined _NTFS_VOLUME_H */
 

@@ -70,5 +70,27 @@ static __inline__ int ntfs_bitmap_clear_bit(ntfs_attr *na, s64 bit)
 	return ntfs_bitmap_clear_run(na, bit, 1);
 }
 
+/*
+ * rol32 - rotate a 32-bit value left
+ *
+ * @word: value to rotate
+ * @shift: bits to roll
+ */
+static __inline__ u32 ntfs_rol32(u32 word, unsigned int shift)
+{
+        return (word << shift) | (word >> (32 - shift));
+}
+
+/*
+ * ror32 - rotate a 32-bit value right
+ *
+ * @word: value to rotate
+ * @shift: bits to roll
+ */
+static __inline__ u32 ntfs_ror32(u32 word, unsigned int shift)
+{
+        return (word >> shift) | (word << (32 - shift));
+}
+
 #endif /* defined _NTFS_BITMAP_H */
 

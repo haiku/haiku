@@ -52,6 +52,10 @@ typedef struct ntfs_volume ntfs_volume;
 #include "types.h"
 #include "device.h"
 
+#ifndef MAX_PATH
+#define MAX_PATH 1024
+#endif
+
 #ifndef NTFS_BLOCK_SIZE
 #define NTFS_BLOCK_SIZE		512
 #define NTFS_BLOCK_SIZE_BITS	9

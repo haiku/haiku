@@ -34,18 +34,3 @@ void *ntfs_malloc(size_t size)
 	return p;
 }
 
-#if defined(__BEOS__) || defined(__HAIKU__)
-#include <stdio.h>
-int ntfs_snprintf(char *buff, size_t size, const char *format, ...)
-{
- 	int ret;
- 	char buffer[BUF_SIZE];	
- 	va_list args;
- 	va_start(args, format);
- 	memset(buffer,0,BUF_SIZE);
- 	ret = sprintf(buffer, format, args);
- 	va_end(args);
- 	strncpy(buff,buffer,size);
- 	return ret;
- }
-#endif

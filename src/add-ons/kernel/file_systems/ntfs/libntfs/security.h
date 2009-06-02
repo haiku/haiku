@@ -55,4 +55,7 @@ extern char *ntfs_sid_to_mbs(const SID *sid, char *sid_str,
 extern void ntfs_generate_guid(GUID *guid);
 extern int ntfs_sd_add_everyone(ntfs_inode *ni);
 
+extern le32 ntfs_security_hash(const SECURITY_DESCRIPTOR_RELATIVE *sd, 
+			       const u32 len);
+
 #endif /* defined _NTFS_SECURITY_H */

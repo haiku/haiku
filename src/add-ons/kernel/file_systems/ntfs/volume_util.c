@@ -35,7 +35,6 @@
 #include "inode.h"
 #include "runlist.h"
 #include "utils.h"
-#include "version.h"
 #include "ntfs.h"
 #include "volume_util.h"
 
@@ -166,7 +165,7 @@ int ntfs_change_label(ntfs_volume *vol, char *label)
 			goto err_out;
 		}
 	}
-	label_len = ntfs_mbstoucs(label, &new_label, 0);
+	label_len = ntfs_mbstoucs(label, &new_label);
 	if (label_len == -1) {
 		ntfs_log_perror("Unable to convert label string to Unicode");
 		goto err_out;

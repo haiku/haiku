@@ -178,7 +178,7 @@ s64 ntfs_pread(struct ntfs_device *dev, const s64 pos, s64 count, void *b)
 	s64 br, total;
 	struct ntfs_device_operations *dops;
 
-	ntfs_log_trace("Entering for pos 0x%llx, count 0x%llx.\n", pos, count);
+	ntfs_log_trace("pos %lld, count %lld\n",(long long)pos,(long long)count);
 	
 	if (!b || count < 0 || pos < 0) {
 		errno = EINVAL;
@@ -229,7 +229,8 @@ s64 ntfs_pwrite(struct ntfs_device *dev, const s64 pos, s64 count,
 	s64 written, total, ret = -1;
 	struct ntfs_device_operations *dops;
 
-	ntfs_log_trace("Entering for pos 0x%llx, count 0x%llx.\n", pos, count);
+	ntfs_log_trace("pos %lld, count %lld\n",(long long)pos,(long long)count);
+
 	if (!b || count < 0 || pos < 0) {
 		errno = EINVAL;
 		goto out;

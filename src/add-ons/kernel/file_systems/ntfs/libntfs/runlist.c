@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2002-2005 Anton Altaparmakov
  * Copyright (c) 2002-2005 Richard Russon
- * Copyright (c) 2002-2006 Szabolcs Szakacsits
+ * Copyright (c) 2002-2008 Szabolcs Szakacsits
  * Copyright (c) 2004 Yura Pakhuchiy
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -463,39 +463,10 @@ static runlist_element *ntfs_rl_split(runlist_element *dst, int dsize,
 
 
 /**
- * ntfs_runlists_merge - merge two runlists into one
- * @drl:	original runlist to be worked on
- * @srl:	new runlist to be merged into @drl
- *
- * First we sanity check the two runlists @srl and @drl to make sure that they
- * are sensible and can be merged. The runlist @srl must be either after the
- * runlist @drl or completely within a hole (or unmapped region) in @drl.
- *
- * Merging of runlists is necessary in two cases:
- *   1. When attribute lists are used and a further extent is being mapped.
- *   2. When new clusters are allocated to fill a hole or extend a file.
- *
- * There are four possible ways @srl can be merged. It can:
- *	- be inserted at the beginning of a hole,
- *	- split the hole in two and be inserted between the two fragments,
- *	- be appended at the end of a hole, or it can
- *	- replace the whole hole.
- * It can also be appended to the end of the runlist, which is just a variant
- * of the insert case.
- *
- * On success, return a pointer to the new, combined, runlist. Note, both
- * runlists @drl and @srl are deallocated before returning so you cannot use
- * the pointers for anything any more. (Strictly speaking the returned runlist
- * may be the same as @dst but this is irrelevant.)
- *
- * On error, return NULL, with errno set to the error code. Both runlists are
- * left unmodified. The following error codes are defined:
- *	ENOMEM		Not enough memory to allocate runlist array.
- *	EINVAL		Invalid parameters were passed in.
- *	ERANGE		The runlists overlap and cannot be merged.
+ * ntfs_runlists_merge_i - see ntfs_runlists_merge
  */
-runlist_element *ntfs_runlists_merge(runlist_element *drl,
-		runlist_element *srl)
+static runlist_element *ntfs_runlists_merge_i(runlist_element *drl, 
+					      runlist_element *srl)
 {
 	int di, si;		/* Current index into @[ds]rl. */
 	int sstart;		/* First index with lcn > LCN_RL_NOT_MAPPED. */
@@ -544,9 +515,8 @@ runlist_element *ntfs_runlists_merge(runlist_element *drl,
 
 	/* Can't have an entirely unmapped source runlist. */
 	if (!srl[si].length) {
-		ntfs_log_debug("Eeek! ntfs_runlists_merge() received entirely "
-				"unmapped source runlist.\n");
 		errno = EINVAL;
+		ntfs_log_perror("%s: unmapped source runlist", __FUNCTION__);
 		return NULL;
 	}
 
@@ -567,8 +537,8 @@ runlist_element *ntfs_runlists_merge(runlist_element *drl,
 	/* Sanity check for illegal overlaps. */
 	if ((drl[di].vcn == srl[si].vcn) && (drl[di].lcn >= 0) &&
 			(srl[si].lcn >= 0)) {
-		ntfs_log_debug("Run lists overlap. Cannot merge!\n");
 		errno = ERANGE;
+		ntfs_log_perror("Run lists overlap. Cannot merge");
 		return NULL;
 	}
 
@@ -703,6 +673,49 @@ critical_error:
 }
 
 /**
+ * ntfs_runlists_merge - merge two runlists into one
+ * @drl:	original runlist to be worked on
+ * @srl:	new runlist to be merged into @drl
+ *
+ * First we sanity check the two runlists @srl and @drl to make sure that they
+ * are sensible and can be merged. The runlist @srl must be either after the
+ * runlist @drl or completely within a hole (or unmapped region) in @drl.
+ *
+ * Merging of runlists is necessary in two cases:
+ *   1. When attribute lists are used and a further extent is being mapped.
+ *   2. When new clusters are allocated to fill a hole or extend a file.
+ *
+ * There are four possible ways @srl can be merged. It can:
+ *	- be inserted at the beginning of a hole,
+ *	- split the hole in two and be inserted between the two fragments,
+ *	- be appended at the end of a hole, or it can
+ *	- replace the whole hole.
+ * It can also be appended to the end of the runlist, which is just a variant
+ * of the insert case.
+ *
+ * On success, return a pointer to the new, combined, runlist. Note, both
+ * runlists @drl and @srl are deallocated before returning so you cannot use
+ * the pointers for anything any more. (Strictly speaking the returned runlist
+ * may be the same as @dst but this is irrelevant.)
+ *
+ * On error, return NULL, with errno set to the error code. Both runlists are
+ * left unmodified. The following error codes are defined:
+ *	ENOMEM		Not enough memory to allocate runlist array.
+ *	EINVAL		Invalid parameters were passed in.
+ *	ERANGE		The runlists overlap and cannot be merged.
+ */
+runlist_element *ntfs_runlists_merge(runlist_element *drl,
+		runlist_element *srl)
+{
+	runlist_element *rl; 
+	
+	ntfs_log_enter("Entering\n");
+	rl = ntfs_runlists_merge_i(drl, srl);
+	ntfs_log_leave("\n");
+	return rl;
+}
+
+/**
  * ntfs_mapping_pairs_decompress - convert mapping pairs array to runlist
  * @vol:	ntfs volume on which the attribute resides
  * @attr:	attribute record whose mapping pairs array to decompress
@@ -729,7 +742,7 @@ critical_error:
  * two into one, if that is possible (we check for overlap and discard the new
  * runlist if overlap present before returning NULL, with errno = ERANGE).
  */
-runlist_element *ntfs_mapping_pairs_decompress(const ntfs_volume *vol,
+runlist_element *ntfs_mapping_pairs_decompress_i(const ntfs_volume *vol,
 		const ATTR_RECORD *attr, runlist_element *old_rl)
 {
 	VCN vcn;		/* Current vcn. */
@@ -951,6 +964,17 @@ err_out:
 	free(rl);
 	errno = EIO;
 	return NULL;
+}
+
+runlist_element *ntfs_mapping_pairs_decompress(const ntfs_volume *vol,
+		const ATTR_RECORD *attr, runlist_element *old_rl)
+{
+	runlist_element *rle; 
+	
+	ntfs_log_enter("Entering\n");
+	rle = ntfs_mapping_pairs_decompress_i(vol, attr, old_rl);
+	ntfs_log_leave("\n");
+	return rle;
 }
 
 /**
@@ -1642,16 +1666,16 @@ int ntfs_rl_sparse(runlist *rl)
 	runlist *rlc;
 
 	if (!rl) {
-		ntfs_log_trace("Invalid argument passed.\n");
 		errno = EINVAL;
+		ntfs_log_perror("%s: ", __FUNCTION__);
 		return -1;
 	}
 
 	for (rlc = rl; rlc->length; rlc++)
 		if (rlc->lcn < 0) {
 			if (rlc->lcn != LCN_HOLE) {
-				ntfs_log_trace("Received unmapped runlist.\n");
 				errno = EINVAL;
+				ntfs_log_perror("%s: bad runlist", __FUNCTION__);
 				return -1;
 			}
 			return 1;
@@ -1672,16 +1696,16 @@ s64 ntfs_rl_get_compressed_size(ntfs_volume *vol, runlist *rl)
 	s64 ret = 0;
 
 	if (!rl) {
-		ntfs_log_trace("Invalid argument passed.\n");
 		errno = EINVAL;
+		ntfs_log_perror("%s: ", __FUNCTION__);
 		return -1;
 	}
 
 	for (rlc = rl; rlc->length; rlc++) {
 		if (rlc->lcn < 0) {
 			if (rlc->lcn != LCN_HOLE) {
-				ntfs_log_trace("Received unmapped runlist.\n");
 				errno = EINVAL;
+				ntfs_log_perror("%s: bad runlist", __FUNCTION__);
 				return -1;
 			}
 		} else

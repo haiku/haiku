@@ -2,7 +2,7 @@
  * volume.c - NTFS volume handling code. Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2000-2006 Anton Altaparmakov
- * Copyright (c) 2002-2006 Szabolcs Szakacsits
+ * Copyright (c) 2002-2009 Szabolcs Szakacsits
  * Copyright (c) 2004-2005 Richard Russon
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -49,7 +49,11 @@
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
 
+#include "compat.h"
 #include "volume.h"
 #include "attrib.h"
 #include "mft.h"
@@ -63,9 +67,51 @@
 #include "logging.h"
 #include "misc.h"
 
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif
+const char *ntfs_home = 
+"Ntfs-3g news, support and information:  http://ntfs-3g.org\n";
+
+static const char *invalid_ntfs_msg =
+"The device '%s' doesn't seem to have a valid NTFS.\n"
+"Maybe the wrong device is used? Or the whole disk instead of a\n"
+"partition (e.g. /dev/sda, not /dev/sda1)? Or the other way around?\n";
+
+static const char *corrupt_volume_msg =
+"NTFS is either inconsistent, or there is a hardware fault, or it's a\n"
+"SoftRAID/FakeRAID hardware. In the first case run chkdsk /f on Windows\n"
+"then reboot into Windows twice. The usage of the /f parameter is very\n"
+"important! If the device is a SoftRAID/FakeRAID then first activate\n"
+"it and mount a different device under the /dev/mapper/ directory, (e.g.\n"
+"/dev/mapper/nvidia_eahaabcc1). Please see the 'dmraid' documentation\n"
+"for more details.\n";
+
+static const char *hibernated_volume_msg =
+"The NTFS partition is hibernated. Please resume and shutdown Windows\n"
+"properly, or mount the volume read-only with the 'ro' mount option, or\n"
+"mount the volume read-write with the 'remove_hiberfile' mount option.\n"
+"For example type on the command line:\n"
+"\n"
+"            mount -t ntfs-3g -o remove_hiberfile %s %s\n"
+"\n";
+
+static const char *unclean_journal_msg =
+"Write access is denied because the disk wasn't safely powered\n"
+"off and the 'norecover' mount option was specified.\n";
+
+static const char *opened_volume_msg =
+"Mount is denied because the NTFS volume is already exclusively opened.\n"
+"The volume may be already mounted, or another software may use it which\n"
+"could be identified for example by the help of the 'fuser' command.\n";
+
+static const char *fakeraid_msg =
+"Either the device is missing or it's powered down, or you have\n"
+"SoftRAID hardware and must use an activated, different device under\n" 
+"/dev/mapper/, (e.g. /dev/mapper/nvidia_eahaabcc1) to mount NTFS.\n"
+"Please see the 'dmraid' documentation for help.\n";
+
+static const char *access_denied_msg =
+"Please check '%s' and the ntfs-3g binary permissions,\n"
+"and the mounting user ID. More explanation is provided at\n"
+"http://ntfs-3g.org/support.html#unprivileged\n";
 
 /**
  * ntfs_volume_alloc - Create an NTFS volume object and initialise it
@@ -76,17 +122,15 @@
  */
 ntfs_volume *ntfs_volume_alloc(void)
 {
-	return calloc(1, sizeof(ntfs_volume));
+	return ntfs_calloc(sizeof(ntfs_volume));
 }
-
 
 static void ntfs_attr_free(ntfs_attr **na)
 {
 	if (na && *na) {
 		ntfs_attr_close(*na);
 		*na = NULL;
-	} else
-		ntfs_log_error("Tried to free NULL attribute pointer (%p)\n", na);
+	}
 }
 
 static int ntfs_inode_free(ntfs_inode **ni)
@@ -96,8 +140,7 @@ static int ntfs_inode_free(ntfs_inode **ni)
 	if (ni && *ni) {
 		ret = ntfs_inode_close(*ni);
 		*ni = NULL;
-	} else
-		ntfs_log_error("Tried to free NULL inode pointer (%p)\n", ni);
+	} 
 	
 	return ret;
 }
@@ -211,25 +254,14 @@ static int ntfs_mft_load(ntfs_volume *vol)
 		ntfs_log_perror("Error reading $MFT");
 		goto error_exit;
 	}
-	if (ntfs_is_baad_record(mb->magic)) {
-		ntfs_log_error("Incomplete multi sector transfer detected in "
-				"$MFT.\n");
-		goto io_error_exit;
-	}
-	if (!ntfs_is_mft_record(mb->magic)) {
-		ntfs_log_error("$MFT has invalid magic.\n");
-		goto io_error_exit;
-	}
-	ctx = ntfs_attr_get_search_ctx(vol->mft_ni, NULL);
-	if (!ctx) {
-		ntfs_log_perror("Failed to allocate attribute search context");
+	
+	if (ntfs_mft_record_check(vol, 0, mb))
 		goto error_exit;
-	}
-	if (p2n(ctx->attr) < p2n(mb) ||
-			(char*)ctx->attr > (char*)mb + vol->mft_record_size) {
-		ntfs_log_error("$MFT is corrupt.\n");
-		goto io_error_exit;
-	}
+	
+	ctx = ntfs_attr_get_search_ctx(vol->mft_ni, NULL);
+	if (!ctx)
+		goto error_exit;
+
 	/* Find the $ATTRIBUTE_LIST attribute in $MFT if present. */
 	if (ntfs_attr_lookup(AT_ATTRIBUTE_LIST, AT_UNNAMED, 0, 0, 0, NULL, 0,
 			ctx)) {
@@ -429,13 +461,10 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	ntfs_volume *vol;
 	NTFS_BOOT_SECTOR *bs;
 	int eo;
-#ifdef DEBUG
-	const char *OK = "OK\n";
-	const char *FAILED = "FAILED\n";
-#endif
 
 	if (!dev || !dev->d_ops || !dev->d_name) {
 		errno = EINVAL;
+		ntfs_log_perror("%s: dev = %p", __FUNCTION__, dev);
 		return NULL;
 	}
 
@@ -447,6 +476,7 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	vol = ntfs_volume_alloc();
 	if (!vol)
 		goto error_exit;
+	
 	/* Create the default upcase table. */
 	vol->upcase_len = 65536;
 	vol->upcase = ntfs_malloc(vol->upcase_len * sizeof(ntfschar));
@@ -455,32 +485,29 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	
 	ntfs_upcase_table_build(vol->upcase,
 			vol->upcase_len * sizeof(ntfschar));
+	
 	if (flags & MS_RDONLY)
 		NVolSetReadOnly(vol);
-	if (flags & MS_NOATIME)
-		NVolSetNoATime(vol);
-	ntfs_log_debug("Reading bootsector... ");
-	if (dev->d_ops->open(dev, NVolReadOnly(vol) ? O_RDONLY: O_RDWR)) {
-		ntfs_log_debug(FAILED);
-		ntfs_log_perror("Error opening partition device");
+	
+	/* ...->open needs bracketing to compile with glibc 2.7 */
+	if ((dev->d_ops->open)(dev, NVolReadOnly(vol) ? O_RDONLY: O_RDWR)) {
+		ntfs_log_perror("Error opening '%s'", dev->d_name);
 		goto error_exit;
 	}
 	/* Attach the device to the volume. */
 	vol->dev = dev;
+	
 	/* Now read the bootsector. */
 	br = ntfs_pread(dev, 0, sizeof(NTFS_BOOT_SECTOR), bs);
 	if (br != sizeof(NTFS_BOOT_SECTOR)) {
-		ntfs_log_debug(FAILED);
 		if (br != -1)
 			errno = EINVAL;
 		if (!br)
-			ntfs_log_error("Partition is smaller than bootsector "
-				       "size.\n");
+			ntfs_log_error("Failed to read bootsector (size=0)\n");
 		else
 			ntfs_log_perror("Error reading bootsector");
 		goto error_exit;
 	}
-	ntfs_log_debug(OK);
 	if (!ntfs_boot_sector_is_ntfs(bs)) {
 		errno = EINVAL;
 		goto error_exit;
@@ -498,9 +525,7 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 				"%s\n", strerror(errno));
 	
 	/* We now initialize the cluster allocator. */
-
-	mft_zone_size = min(vol->nr_clusters >> 3,      /* 12.5% */
-			    200 * 1000 * 1024 >> vol->cluster_size_bits);
+	mft_zone_size = vol->nr_clusters >> 3;      /* 12.5% */
 
 	/* Setup the mft zone. */
 	vol->mft_zone_start = vol->mft_zone_pos = vol->mft_lcn;
@@ -540,9 +565,9 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	 * respective zone.
 	 */
 	vol->data1_zone_pos = vol->mft_zone_end;
-	ntfs_log_debug("data1_zone_pos = 0x%llx\n", vol->data1_zone_pos);
+	ntfs_log_debug("data1_zone_pos = %lld\n", (long long)vol->data1_zone_pos);
 	vol->data2_zone_pos = 0;
-	ntfs_log_debug("data2_zone_pos = 0x%llx\n", vol->data2_zone_pos);
+	ntfs_log_debug("data2_zone_pos = %lld\n", (long long)vol->data2_zone_pos);
 
 	/* Set the mft data allocation position to mft record 24. */
 	vol->mft_data_pos = 24;
@@ -552,22 +577,16 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	 */
 
 	/* Need to setup $MFT so we can use the library read functions. */
-	ntfs_log_debug("Loading $MFT... ");
 	if (ntfs_mft_load(vol) < 0) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to load $MFT");
 		goto error_exit;
 	}
-	ntfs_log_debug(OK);
 
 	/* Need to setup $MFTMirr so we can use the write functions, too. */
-	ntfs_log_debug("Loading $MFTMirr... ");
 	if (ntfs_mftmirr_load(vol) < 0) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to load $MFTMirr");
 		goto error_exit;
 	}
-	ntfs_log_debug(OK);
 	return vol;
 error_exit:
 	eo = errno;
@@ -646,7 +665,7 @@ static ntfs_inode *ntfs_hiberfile_open(ntfs_volume *vol)
 		return NULL;
 	}
 
-	unicode_len = ntfs_mbstoucs(hiberfile, &unicode, 0);
+	unicode_len = ntfs_mbstoucs(hiberfile, &unicode);
 	if (unicode_len < 0) {
 		ntfs_log_perror("Couldn't convert 'hiberfil.sys' to Unicode");
 		goto out;
@@ -684,11 +703,11 @@ out:
  * Return:  0 if Windows isn't hibernated for sure
  *         -1 otherwise and errno is set to the appropriate value
  */
-static int ntfs_volume_check_hiberfile(ntfs_volume *vol)
+int ntfs_volume_check_hiberfile(ntfs_volume *vol, int verbose)
 {
 	ntfs_inode *ni;
 	ntfs_attr *na = NULL;
-	int i, bytes_read, err;
+	int bytes_read, err;
 	char *buf = NULL;
 
 	ni = ntfs_hiberfile_open(vol);
@@ -714,22 +733,17 @@ static int ntfs_volume_check_hiberfile(ntfs_volume *vol)
 		goto out;
 	}
 	if (bytes_read < NTFS_HIBERFILE_HEADER_SIZE) {
-		ntfs_log_error("Hibernated non-system partition, refused to "
-			       "mount.\n");
+		if (verbose)
+			ntfs_log_error("Hibernated non-system partition, "
+				       "refused to mount.\n");
 		errno = EPERM;
 		goto out;
 	}
 	if (memcmp(buf, "hibr", 4) == 0) {
-		ntfs_log_error("Windows is hibernated, refused to mount.\n");
+		if (verbose)
+			ntfs_log_error("Windows is hibernated, refused to mount.\n");
 		errno = EPERM;
 		goto out;
-	}
-	for (i = 0; i < NTFS_HIBERFILE_HEADER_SIZE; i++) {
-		if (buf[i]) {
-			ntfs_log_error("Windows is hibernated, won't mount.\n");
-			errno = EPERM;
-			goto out;
-		}
 	}
         /* All right, all header bytes are zero */
 	errno = 0;
@@ -753,10 +767,9 @@ out:
  * to mount as the ntfs volume.
  *
  * @flags is an optional second parameter. The same flags are used as for
- * the mount system call (man 2 mount). Currently only the following flags
- * are implemented:
+ * the mount system call (man 2 mount). Currently only the following flag
+ * is implemented:
  *	MS_RDONLY	- mount volume read-only
- *	MS_NOATIME	- do not update access time
  *
  * The function opens the device @dev and verifies that it contains a valid
  * bootsector. Then, it allocates an ntfs_volume structure and initializes
@@ -770,10 +783,6 @@ out:
 ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 {
 	s64 l;
-#ifdef DEBUG
-	const char *OK = "OK\n";
-	const char *FAILED = "FAILED\n";
-#endif	
 	ntfs_volume *vol;
 	u8 *m = NULL, *m2 = NULL;
 	ntfs_attr_search_ctx *ctx = NULL;
@@ -786,10 +795,8 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	u32 u;
 
 	vol = ntfs_volume_startup(dev, flags);
-	if (!vol) {
-		ntfs_log_perror("Failed to startup volume");
+	if (!vol)
 		return NULL;
-	}
 
 	/* Load data from $MFT and $MFTMirr and compare the contents. */
 	m  = ntfs_malloc(vol->mftmirr_size << vol->mft_record_size_bits);
@@ -819,7 +826,7 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		}
 		vol->mftmirr_size = l;
 	}
-	ntfs_log_debug("Comparing $MFTMirr to $MFT... ");
+	ntfs_log_debug("Comparing $MFTMirr to $MFT...\n");
 	for (i = 0; i < vol->mftmirr_size; ++i) {
 		MFT_RECORD *mrec, *mrec2;
 		const char *ESTR[12] = { "$MFT", "$MFTMirr", "$LogFile",
@@ -837,14 +844,12 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		mrec = (MFT_RECORD*)(m + i * vol->mft_record_size);
 		if (mrec->flags & MFT_RECORD_IN_USE) {
 			if (ntfs_is_baad_recordp(mrec)) {
-				ntfs_log_debug("FAILED\n");
 				ntfs_log_error("$MFT error: Incomplete multi "
 					       "sector transfer detected in "
 					       "'%s'.\n", s);
 				goto io_error_exit;
 			}
 			if (!ntfs_is_mft_recordp(mrec)) {
-				ntfs_log_debug("FAILED\n");
 				ntfs_log_error("$MFT error: Invalid mft "
 						"record for '%s'.\n", s);
 				goto io_error_exit;
@@ -853,62 +858,59 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		mrec2 = (MFT_RECORD*)(m2 + i * vol->mft_record_size);
 		if (mrec2->flags & MFT_RECORD_IN_USE) {
 			if (ntfs_is_baad_recordp(mrec2)) {
-				ntfs_log_debug("FAILED\n");
 				ntfs_log_error("$MFTMirr error: Incomplete "
 						"multi sector transfer "
 						"detected in '%s'.\n", s);
 				goto io_error_exit;
 			}
 			if (!ntfs_is_mft_recordp(mrec2)) {
-				ntfs_log_debug("FAILED\n");
 				ntfs_log_error("$MFTMirr error: Invalid mft "
 						"record for '%s'.\n", s);
 				goto io_error_exit;
 			}
 		}
 		if (memcmp(mrec, mrec2, ntfs_mft_record_get_data_size(mrec))) {
-			ntfs_log_debug(FAILED);
 			ntfs_log_error("$MFTMirr does not match $MFT (record "
 				       "%d).\n", i);
 			goto io_error_exit;
 		}
 	}
-	ntfs_log_debug(OK);
 
 	free(m2);
 	free(m);
 	m = m2 = NULL;
 
 	/* Now load the bitmap from $Bitmap. */
-	ntfs_log_debug("Loading $Bitmap... ");
+	ntfs_log_debug("Loading $Bitmap...\n");
 	vol->lcnbmp_ni = ntfs_inode_open(vol, FILE_Bitmap);
 	if (!vol->lcnbmp_ni) {
-		ntfs_log_debug(FAILED);
-		ntfs_log_perror("Failed to open inode");
+		ntfs_log_perror("Failed to open inode FILE_Bitmap");
 		goto error_exit;
 	}
-	/* Get an ntfs attribute for $Bitmap/$DATA. */
+	
 	vol->lcnbmp_na = ntfs_attr_open(vol->lcnbmp_ni, AT_DATA, AT_UNNAMED, 0);
 	if (!vol->lcnbmp_na) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to open ntfs attribute");
 		goto error_exit;
 	}
-	/* Done with the $Bitmap mft record. */
-	ntfs_log_debug(OK);
+	
+	if (vol->lcnbmp_na->data_size > vol->lcnbmp_na->allocated_size) {
+		ntfs_log_error("Corrupt cluster map size (%lld > %lld)\n",
+				(long long)vol->lcnbmp_na->data_size, 
+				(long long)vol->lcnbmp_na->allocated_size);
+		goto io_error_exit;
+	}
 
 	/* Now load the upcase table from $UpCase. */
-	ntfs_log_debug("Loading $UpCase... ");
+	ntfs_log_debug("Loading $UpCase...\n");
 	ni = ntfs_inode_open(vol, FILE_UpCase);
 	if (!ni) {
-		ntfs_log_debug(FAILED);
-		ntfs_log_perror("Failed to open inode");
+		ntfs_log_perror("Failed to open inode FILE_UpCase");
 		goto error_exit;
 	}
 	/* Get an ntfs attribute for $UpCase/$DATA. */
 	na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
 	if (!na) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to open ntfs attribute");
 		goto error_exit;
 	}
@@ -919,7 +921,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	 * characters.
 	 */
 	if (na->data_size & ~0x1ffffffffULL) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("Error: Upcase table is too big (max 32-bit "
 				"allowed).\n");
 		errno = EINVAL;
@@ -930,15 +931,12 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		/* Throw away default table. */
 		free(vol->upcase);
 		vol->upcase = ntfs_malloc(na->data_size);
-		if (!vol->upcase) {
-			ntfs_log_debug(FAILED);
+		if (!vol->upcase)
 			goto error_exit;
-		}
 	}
 	/* Read in the $DATA attribute value into the buffer. */
 	l = ntfs_attr_pread(na, 0, na->data_size, vol->upcase);
 	if (l != na->data_size) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("Failed to read $UpCase, unexpected length "
 			       "(%lld != %lld).\n", (long long)l,
 			       (long long)na->data_size);
@@ -946,7 +944,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		goto error_exit;
 	}
 	/* Done with the $UpCase mft record. */
-	ntfs_log_debug(OK);
 	ntfs_attr_close(na);
 	if (ntfs_inode_close(ni)) {
 		ntfs_log_perror("Failed to close $UpCase");
@@ -957,24 +954,20 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	 * Now load $Volume and set the version information and flags in the
 	 * vol structure accordingly.
 	 */
-	ntfs_log_debug("Loading $Volume... ");
+	ntfs_log_debug("Loading $Volume...\n");
 	vol->vol_ni = ntfs_inode_open(vol, FILE_Volume);
 	if (!vol->vol_ni) {
-		ntfs_log_debug(FAILED);
-		ntfs_log_perror("Failed to open inode");
+		ntfs_log_perror("Failed to open inode FILE_Volume");
 		goto error_exit;
 	}
 	/* Get a search context for the $Volume/$VOLUME_INFORMATION lookup. */
 	ctx = ntfs_attr_get_search_ctx(vol->vol_ni, NULL);
-	if (!ctx) {
-		ntfs_log_debug(FAILED);
-		ntfs_log_perror("Failed to allocate attribute search context");
+	if (!ctx)
 		goto error_exit;
-	}
+
 	/* Find the $VOLUME_INFORMATION attribute. */
 	if (ntfs_attr_lookup(AT_VOLUME_INFORMATION, AT_UNNAMED, 0, 0, 0, NULL,
 			0, ctx)) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("$VOLUME_INFORMATION attribute not found in "
 				"$Volume");
 		goto error_exit;
@@ -982,7 +975,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	a = ctx->attr;
 	/* Has to be resident. */
 	if (a->non_resident) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("Attribute $VOLUME_INFORMATION must be "
 			       "resident but it isn't.\n");
 		errno = EIO;
@@ -995,7 +987,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 			le32_to_cpu(ctx->mrec->bytes_in_use) ||
 			le16_to_cpu(a->value_offset) + le32_to_cpu(
 			a->value_length) > le32_to_cpu(a->length)) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("$VOLUME_INFORMATION in $Volume is corrupt.\n");
 		errno = EIO;
 		goto error_exit;
@@ -1013,7 +1004,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	if (ntfs_attr_lookup(AT_VOLUME_NAME, AT_UNNAMED, 0, 0, 0, NULL, 0,
 			ctx)) {
 		if (errno != ENOENT) {
-			ntfs_log_debug(FAILED);
 			ntfs_log_perror("Failed to lookup of $VOLUME_NAME in "
 					"$Volume failed");
 			goto error_exit;
@@ -1024,16 +1014,13 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		 * had zero length.
 		 */
 		vol->vol_name = ntfs_malloc(1);
-		if (!vol->vol_name) {
-			ntfs_log_debug(FAILED);
+		if (!vol->vol_name)
 			goto error_exit;
-		}
 		vol->vol_name[0] = '\0';
 	} else {
 		a = ctx->attr;
 		/* Has to be resident. */
 		if (a->non_resident) {
-			ntfs_log_debug(FAILED);
 			ntfs_log_error("$VOLUME_NAME must be resident.\n");
 			errno = EIO;
 			goto error_exit;
@@ -1052,10 +1039,9 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 			ntfs_log_debug("Forcing name into ASCII by replacing "
 				"non-ASCII characters with underscores.\n");
 			vol->vol_name = ntfs_malloc(u + 1);
-			if (!vol->vol_name) {
-				ntfs_log_debug(FAILED);
+			if (!vol->vol_name)
 				goto error_exit;
-			}
+			
 			for (j = 0; j < (s32)u; j++) {
 				ntfschar uc = le16_to_cpu(vname[j]);
 				if (uc > 0xff)
@@ -1065,27 +1051,23 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 			vol->vol_name[u] = '\0';
 		}
 	}
-	ntfs_log_debug(OK);
 	ntfs_attr_put_search_ctx(ctx);
 	ctx = NULL;
 	/* Now load the attribute definitions from $AttrDef. */
-	ntfs_log_debug("Loading $AttrDef... ");
+	ntfs_log_debug("Loading $AttrDef...\n");
 	ni = ntfs_inode_open(vol, FILE_AttrDef);
 	if (!ni) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to open $AttrDef");
 		goto error_exit;
 	}
 	/* Get an ntfs attribute for $AttrDef/$DATA. */
 	na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
 	if (!na) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_perror("Failed to open ntfs attribute");
 		goto error_exit;
 	}
 	/* Check we don't overflow 32-bits. */
 	if (na->data_size > 0xffffffffLL) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("Attribute definition table is too big (max "
 			       "32-bit allowed).\n");
 		errno = EINVAL;
@@ -1093,14 +1075,11 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	}
 	vol->attrdef_len = na->data_size;
 	vol->attrdef = ntfs_malloc(na->data_size);
-	if (!vol->attrdef) {
-		ntfs_log_debug(FAILED);
+	if (!vol->attrdef)
 		goto error_exit;
-	}
 	/* Read in the $DATA attribute value into the buffer. */
 	l = ntfs_attr_pread(na, 0, na->data_size, vol->attrdef);
 	if (l != na->data_size) {
-		ntfs_log_debug(FAILED);
 		ntfs_log_error("Failed to read $AttrDef, unexpected length "
 			       "(%lld != %lld).\n", (long long)l,
 			       (long long)na->data_size);
@@ -1108,7 +1087,6 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 		goto error_exit;
 	}
 	/* Done with the $AttrDef mft record. */
-	ntfs_log_debug(OK);
 	ntfs_attr_close(na);
 	if (ntfs_inode_close(ni)) {
 		ntfs_log_perror("Failed to close $AttrDef");
@@ -1119,12 +1097,14 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	 * We care only about read-write mounts.
 	 */
 	if (!(flags & MS_RDONLY)) {
-		if (ntfs_volume_check_hiberfile(vol) < 0)
+		if (!(flags & MS_IGNORE_HIBERFILE) && 
+		    ntfs_volume_check_hiberfile(vol, 1) < 0)
 			goto error_exit;
 		if (ntfs_volume_check_logfile(vol) < 0) {
-			if (!(flags & MS_FORCE))
+			if (!(flags & MS_RECOVER))
 				goto error_exit;
-			ntfs_log_info("WARNING: Forced mount, reset $LogFile.\n");
+			ntfs_log_info("The file system wasn't safely "
+				      "closed on Windows. Fixing.\n");
 			if (ntfs_logfile_reset(vol))
 				goto error_exit;
 		}
@@ -1154,9 +1134,8 @@ error_exit:
  *
  * @flags is an optional second parameter. The same flags are used as for
  * the mount system call (man 2 mount). Currently only the following flags
- * are implemented:
+ * is implemented:
  *	MS_RDONLY	- mount volume read-only
- *	MS_NOATIME	- do not update access time
  *
  * The function opens the device or file @name and verifies that it contains a
  * valid bootsector. Then, it allocates an ntfs_volume structure and initializes
@@ -1463,10 +1442,9 @@ int ntfs_volume_write_flags(ntfs_volume *vol, const u16 flags)
 	}
 	/* Get a pointer to the volume information attribute. */
 	ctx = ntfs_attr_get_search_ctx(vol->vol_ni, NULL);
-	if (!ctx) {
-		ntfs_log_perror("Failed to allocate attribute search context");
+	if (!ctx)
 		return -1;
-	}
+
 	if (ntfs_attr_lookup(AT_VOLUME_INFORMATION, AT_UNNAMED, 0, 0, 0, NULL,
 			0, ctx)) {
 		ntfs_log_error("Attribute $VOLUME_INFORMATION was not found "
@@ -1497,13 +1475,92 @@ int ntfs_volume_write_flags(ntfs_volume *vol, const u16 flags)
 	vol->flags = c->flags = flags & VOLUME_FLAGS_MASK;
 	/* Write them to disk. */
 	ntfs_inode_mark_dirty(vol->vol_ni);
-	if (ntfs_inode_sync(vol->vol_ni)) {
-		ntfs_log_perror("Error writing $Volume");
+	if (ntfs_inode_sync(vol->vol_ni))
 		goto err_out;
-	}
+
 	ret = 0; /* success */
 err_out:
 	ntfs_attr_put_search_ctx(ctx);
 	return ret;
+}
+
+int ntfs_volume_error(int err)
+{
+	int ret;
+
+	switch (err) {
+		case 0:
+			ret = NTFS_VOLUME_OK;
+			break;
+		case EINVAL:
+			ret = NTFS_VOLUME_NOT_NTFS;
+			break;
+		case EIO:
+			ret = NTFS_VOLUME_CORRUPT;
+			break;
+		case EPERM:
+			ret = NTFS_VOLUME_HIBERNATED;
+			break;
+		case EOPNOTSUPP:
+			ret = NTFS_VOLUME_UNCLEAN_UNMOUNT;
+			break;
+		case EBUSY:
+			ret = NTFS_VOLUME_LOCKED;
+			break;
+		case ENXIO:
+			ret = NTFS_VOLUME_RAID;
+			break;
+		case EACCES:
+			ret = NTFS_VOLUME_NO_PRIVILEGE;
+			break;
+		default:
+			ret = NTFS_VOLUME_UNKNOWN_REASON;
+			break;
+	}
+	return ret;
+}
+
+
+void ntfs_mount_error(const char *volume, const char *mntpoint, int err)
+{
+	switch (err) {
+		case NTFS_VOLUME_NOT_NTFS:
+			ntfs_log_error(invalid_ntfs_msg, volume);
+			break;
+		case NTFS_VOLUME_CORRUPT:
+			ntfs_log_error("%s", corrupt_volume_msg);
+			break;
+		case NTFS_VOLUME_HIBERNATED:
+			ntfs_log_error(hibernated_volume_msg, volume, mntpoint);
+			break;
+		case NTFS_VOLUME_UNCLEAN_UNMOUNT:
+			ntfs_log_error("%s", unclean_journal_msg);
+			break;
+		case NTFS_VOLUME_LOCKED:
+			ntfs_log_error("%s", opened_volume_msg);
+			break;
+		case NTFS_VOLUME_RAID:
+			ntfs_log_error("%s", fakeraid_msg);
+			break;
+		case NTFS_VOLUME_NO_PRIVILEGE:
+			ntfs_log_error(access_denied_msg, volume);
+			break;
+	}
+}
+
+int ntfs_set_locale(void)
+{
+#ifndef __HAIKU__
+	const char *locale;
+
+	locale = setlocale(LC_ALL, "");
+	if (!locale) {
+		locale = setlocale(LC_ALL, NULL);
+		ntfs_log_error("Couldn't set local environment, using default "
+			       "'%s'.\n", locale);
+		return 1;
+	}
+#endif
+	return 0;
 }
 

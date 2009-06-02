@@ -38,10 +38,6 @@
 #include "ntfsdir.h"
 
 //callback function for readdir()
-static	int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
-		const int name_len, const int name_type, const s64 pos,
-		const MFT_REF mref, const unsigned dt_type);
-
 static int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 		const int name_len, const int name_type, const s64 pos,
 		const MFT_REF mref, const unsigned dt_type)
@@ -58,13 +54,17 @@ static int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 	 	  	cookie->readed = 0;
 			return -1;	 	  	
 	 	  } else {
-			if (ntfs_ucstombs(name, name_len, &filename, 0) < 0)
-				return -1;			
-			strcpy(cookie->name,filename);
-		    cookie->ino=MREF(mref);
-		    cookie->readed = 1;
-		    return 0;
-		  }
+			if (ntfs_ucstombs(name, name_len, &filename, 0) >= 0) {
+				if(filename) {
+					strcpy(cookie->name,filename);
+				    cookie->ino=MREF(mref);
+				    cookie->readed = 1;
+		    		free(filename);
+		    		return 0;
+				}
+			}
+			return -1;
+	 	  }
  	 }
 	return 0;
 }
@@ -114,6 +114,7 @@ fs_opendir( fs_volume *_vol, fs_vnode *_node, void** _cookie )
 		cookie->pos = 0;	
 		cookie->ino = 0;	
 		cookie->readed = 0;	
+		cookie->last = 0;			
 		cookie->name[0] = 0;
 		cookie->show_sys_files = ns->show_sys_files;
 		*_cookie = (void*)cookie;
@@ -159,36 +160,37 @@ fs_readdir( fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 	
 	LOCK_VOL(ns);
 	
-	ERRPRINT("fs_readdir - ENTER\n");
+	ERRPRINT("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",sizeof(buf),bufsize,*num);
 	
 	if (!ns || !node || !cookie || !num || bufsize < sizeof(buf)) {
 	 	result = EINVAL;
 		goto exit;
 	 }
 	
-	if(cookie->readed == 1) {
+	if(cookie->readed == 1 || cookie->last == 1) {
 		 result = ENOENT;
 		 goto exit;
 	 }
 	 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);		
 	if(ni==NULL) {
-		ERRPRINT("fs_readdir - Dir not opened\n");
+		ERRPRINT("fs_readdir - dir not opened\n");
 		result = ENOENT;
 		goto exit;
 	}	 
 		
 	result = ntfs_readdir(ni, &cookie->pos, cookie, (ntfs_filldir_t)_ntfs_dirent_filler);		
-	if(result==0) {
-		realLen = nameLength>255?255:nameLength;
-		buf->d_dev = ns->id;
-		buf->d_ino = cookie->ino;	
-		memcpy(buf->d_name,cookie->name, realLen+1);
-		buf->d_reclen = sizeof(buf) + realLen - 1;
-		result = B_NO_ERROR;
-	}
-	else
-		result = ENOENT;	
+
+	realLen = nameLength>255?255:nameLength;
+	buf->d_dev = ns->id;
+	buf->d_ino = cookie->ino;	
+	memcpy(buf->d_name,cookie->name, realLen+1);
+	buf->d_reclen = sizeof(buf) + realLen - 1;
+
+	if(result==0)
+		cookie->last = 1;
+		
+	result = B_NO_ERROR;
 			
 	ERRPRINT("fs_readdir - FILE: [%s]\n",buf->d_name);
 
@@ -225,6 +227,7 @@ fs_rewinddir( fs_volume *_vol, fs_vnode *vnode, void *_cookie )
 		cookie->pos = 0;	
 		cookie->ino = 0;	
 		cookie->readed = 0;	
+		cookie->last = 0;	
 		cookie->name[0] = 0;
 		result = B_NO_ERROR;
 	}

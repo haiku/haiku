@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2000-2002 Anton Altaparmakov
  * Copyright (c) 2004-2005 Richard Russon
- * Copyright (c) 2006 Szabolcs Szakacsits
+ * Copyright (c) 2006-2008 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -27,6 +27,7 @@
 #include "volume.h"
 #include "inode.h"
 #include "layout.h"
+#include "logging.h"
 
 extern int ntfs_mft_records_read(const ntfs_volume *vol, const MFT_REF mref,
 		const s64 count, MFT_RECORD *b);
@@ -49,8 +50,16 @@ extern int ntfs_mft_records_read(const ntfs_volume *vol, const MFT_REF mref,
 static __inline__ int ntfs_mft_record_read(const ntfs_volume *vol,
 		const MFT_REF mref, MFT_RECORD *b)
 {
-	return ntfs_mft_records_read(vol, mref, 1, b);
+	int ret; 
+	
+	ntfs_log_enter("Entering for inode %lld\n", (long long)MREF(mref));
+	ret = ntfs_mft_records_read(vol, mref, 1, b);
+	ntfs_log_leave("\n");
+	return ret;
 }
+
+extern int ntfs_mft_record_check(const ntfs_volume *vol, const MFT_REF mref, 
+		MFT_RECORD *m);
 
 extern int ntfs_file_record_read(const ntfs_volume *vol, const MFT_REF mref,
 		MFT_RECORD **mrec, ATTR_RECORD **attr);
@@ -76,7 +85,12 @@ extern int ntfs_mft_records_write(const ntfs_volume *vol, const MFT_REF mref,
 static __inline__ int ntfs_mft_record_write(const ntfs_volume *vol,
 		const MFT_REF mref, MFT_RECORD *b)
 {
-	return ntfs_mft_records_write(vol, mref, 1, b);
+	int ret; 
+	
+	ntfs_log_enter("Entering for inode %lld\n", (long long)MREF(mref));
+	ret = ntfs_mft_records_write(vol, mref, 1, b);
+	ntfs_log_leave("\n");
+	return ret;
 }
 
 /**

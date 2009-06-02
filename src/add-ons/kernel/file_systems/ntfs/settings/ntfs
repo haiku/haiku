@@ -4,5 +4,5 @@
 # /boot/home/config/settings/kernel/drivers/
 #
 hide_sys_files	true
-read_only	true
+read_only	false
 no_atime	true
