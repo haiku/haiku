@@ -107,7 +107,7 @@ CreateFileCache(BDataIO *dataio)
 	io->filecache.read = &stream_read;
 	io->filecache.scan = &stream_scan;
 //	io->filecache.close = &stream_close;
-	io->filecache.getsize = &stream_getsize;
+	io->filecache.getcachesize = &stream_getsize;
 	io->filecache.geterror = &stream_geterror;
 	io->filecache.memalloc = &stream_memalloc;
 	io->filecache.memrealloc = &stream_memrealloc;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2005 Mike Matsnev.  All Rights Reserved.
+ * Copyright (c) 2004-2006 Mike Matsnev.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: MatroskaParser.h,v 1.10 2005/01/10 04:52:34 mike Exp $
+ * $Id: MatroskaParser.h,v 1.19 2006/03/11 10:57:13 mike Exp $
  * 
  */
 
@@ -84,15 +84,17 @@ struct InputStream {
   /* scan for a four byte signature, bytes must be nonzero */
   longlong    (*scan)(struct InputStream *cc,ulonglong start,unsigned signature);
   /* get cache size, this is used to cap readahead */
-  unsigned    (*getsize)(struct InputStream *cc);
+  unsigned    (*getcachesize)(struct InputStream *cc);
   /* fetch last error message */
   const char *(*geterror)(struct InputStream *cc);
   /* memory allocation */
   void	      *(*memalloc)(struct InputStream *cc,size_t size);
   void	      *(*memrealloc)(struct InputStream *cc,void *mem,size_t newsize);
   void	      (*memfree)(struct InputStream *cc,void *mem);
-  // zero return causes parser to abort open
+  /* zero return causes parser to abort open */
   int	      (*progress)(struct InputStream *cc,ulonglong cur,ulonglong max);
+  /* get file size, optional, can be NULL or return -1 if filesize is unknown */
+  longlong    (*getfilesize)(struct InputStream *cc);
 };
 
 typedef struct InputStream InputStream;
@@ -103,6 +105,9 @@ struct MatroskaFile; /* opaque */
 typedef struct MatroskaFile MatroskaFile;
 
 #define	COMP_ZLIB   0
+#define	COMP_BZIP   1
+#define	COMP_LZO1X  2
+#define	COMP_PREPEND 3
 
 #define	TT_VIDEO    1
 #define	TT_AUDIO    2
@@ -120,6 +125,9 @@ struct TrackInfo {
   void		  *CodecPrivate;
   unsigned	  CodecPrivateSize;
   unsigned	  CompMethod;
+  void		  *CompMethodPrivate;
+  unsigned	  CompMethodPrivateSize;
+  unsigned	  MaxBlockAdditionID;
   struct {
     unsigned int  Enabled:1;
     unsigned int  Default:1;
@@ -137,6 +145,7 @@ struct TrackInfo {
       unsigned int    PixelHeight;
       unsigned int    DisplayWidth;
       unsigned int    DisplayHeight;
+      unsigned int    CropL, CropT, CropR, CropB;
       unsigned int    ColourSpace;
       MKFLOAT	      GammaValue;
       struct {
@@ -149,11 +158,11 @@ struct TrackInfo {
       unsigned char   Channels;
       unsigned char   BitDepth;
     } Audio;
-  };
+  } AV;
 
   /* various strings */
   char			*Name;
-  char			*Language;
+  char			Language[4];
   char			*CodecID;
 };
 
@@ -171,7 +180,8 @@ struct SegmentInfo {
   char			*WritingApp;
   ulonglong		TimecodeScale;
   ulonglong		Duration;
-  ulonglong		DateUTC;
+  longlong		DateUTC;
+  char			DateUTCValid;
 };
 
 typedef struct SegmentInfo SegmentInfo;
@@ -189,20 +199,20 @@ typedef struct Attachment Attachment;
 
 struct ChapterDisplay {
   char			*String;
-  char			*Language;
-  char			*Country;
+  char			Language[4];
+  char			Country[4];
 };
 
 struct ChapterCommand {
   unsigned		Time;
   unsigned		CommandLength;
-  char			*Command;
+  void			*Command;
 };
 
 struct ChapterProcess {
   unsigned		CodecID;
   unsigned		CodecPrivateLength;
-  char			*CodecPrivate;
+  void			*CodecPrivate;
   unsigned		nCommands,nCommandsSize;
   struct ChapterCommand	*Commands;
 };
@@ -220,6 +230,8 @@ struct Chapter {
   struct Chapter	*Children;
   unsigned		nProcess,nProcessSize;
   struct ChapterProcess	*Process;
+
+  char			SegmentUID[16];
 
   struct {
     unsigned int	Hidden:1;
@@ -245,7 +257,7 @@ struct Target {
 struct SimpleTag {
   char		    *Name;
   char		    *Value;
-  char		    *Language;
+  char		    Language[4];
   unsigned	    Default:1;
 };
 
@@ -324,10 +336,12 @@ X int	      mkv_TruncFloat(MKFLOAT f);
  */
 
 /* frame flags */
-#define	FRAME_KF	      0x00000001
-#define	FRAME_UNKNOWN_START   0x00000002
-#define	FRAME_UNKNOWN_END     0x00000004
-#define	FRAME_GAP	      0x00000008
+#define	FRAME_UNKNOWN_START   0x00000001
+#define	FRAME_UNKNOWN_END     0x00000002
+#define	FRAME_KF	      0x00000004
+#define	FRAME_GAP	      0x00800000
+#define	FRAME_STREAM_MASK     0xff000000
+#define	FRAME_STREAM_SHIFT    24
 
 /* This sets the masking flags for the parser,
  *  masked tracks [with 1s in their bit positions]
@@ -350,14 +364,8 @@ X int	      mkv_ReadFrame(/* in */  MatroskaFile *mf,
 			    /* out */ unsigned int *FrameSize /* in bytes */,
 			    /* out */ unsigned int *FrameFlags);
 
-/* Read raw frame data, invokes underlying io methods,
- * but keeps track of the file pointer for internal buffering.
- * Returns the -1 if error occurred, or 0 on success
- */
-X int	      mkv_ReadData(/* in */   MatroskaFile *mf,
-			   /* in */   ulonglong FilePos,
-			   /* out */  void *Buffer,
-			   /* in */   unsigned int Count);
+int          mkv_ReadData(MatroskaFile *mf,ulonglong FilePos, void *Buffer,unsigned int Count);
+
 
 #ifdef MATROSKA_COMPRESSION_SUPPORT
 /* Compressed streams support */
