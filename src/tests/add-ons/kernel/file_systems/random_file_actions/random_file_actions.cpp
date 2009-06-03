@@ -167,7 +167,7 @@ usage(int status)
 		"\t\t\t\tmeaning only check once at the end.\n"
 		"  -n, --no-cache\t\tDisables the file cache when doing I/O on\n"
 		"\t\t\t\ta file.\n"
-		"  -a, --always-check\tAlways check contents before removing data.\n"
+		"  -a, --always-check\t\tAlways check contents before removing data.\n"
 		"  -k, --keep-dirty\t\tDo not remove the working files on quit.\n"
 		"  -v, --verbose\t\t\tShow the actions as being performed\n",
 		kProgramName, kDefaultRunCount, kDefaultFileCount, kDefaultDirCount,
@@ -486,7 +486,7 @@ create_dir(EntryVector& dirs)
 	std::string parent = choose_parent(dirs);
 	std::string name = create_name(parent, "dir");
 
-	action("create dir %s", name.c_str());
+	action("create dir %s (identifier %lu)", name.c_str(), sCount);
 
 	if (mkdir(name.c_str(), 0777) != 0)
 		error("creating dir \"%s\" failed: %s", name.c_str(), strerror(errno));
@@ -534,7 +534,7 @@ create_file(const EntryVector& dirs, EntryVector& files)
 	std::string parent = choose_parent(dirs);
 	std::string name = create_name(parent, "file");
 
-	action("create file %s", name.c_str());
+	action("create file %s (identifier %lu)", name.c_str(), sCount);
 
 	int fd = open_file(name, O_RDWR | O_CREAT | O_TRUNC);
 	if (fd < 0)
