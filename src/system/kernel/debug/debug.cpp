@@ -714,14 +714,23 @@ kernel_debugger_loop(void)
 
 		int rc = evaluate_debug_command(line);
 
-		if (rc == B_KDEBUG_QUIT)
-			break;	// okay, exit now.
+		if (rc == B_KDEBUG_QUIT) {
+			// okay, exit now.
+			break;
+		}
 
 		// If the command is continuable, remember the current line index.
 		continuableLine = (rc == B_KDEBUG_CONT ? sCurrentLine : -1);
 
-		if (++sCurrentLine >= HISTORY_SIZE)
-			sCurrentLine = 0;
+		int previousLine = sCurrentLine - 1;
+		if (previousLine < 0)
+			previousLine = HISTORY_SIZE - 1;
+
+		// Only use the next slot in the history, if the entries differ
+		if (strcmp(sLineBuffer[sCurrentLine], sLineBuffer[previousLine])) {
+			if (++sCurrentLine >= HISTORY_SIZE)
+				sCurrentLine = 0;
+		}
 	}
 
 	delete_debug_alloc_pool(allocPool);
