@@ -346,13 +346,11 @@ status_t i2c_init(void)
 		}
 	}
 
-	//fixme: testing again..
-	i2c_TestEDID();
-//	i2c_DetectScreens();
-//	LOG(4,("I2C: dumping EDID specs for connector 1:\n"));
-//	i2c_DumpSpecsEDID(&si->ps.con1_screen);
-//	LOG(4,("I2C: dumping EDID specs for connector 2:\n"));
-//	i2c_DumpSpecsEDID(&si->ps.con2_screen);
+	i2c_DetectScreens();
+	LOG(4,("I2C: dumping EDID specs for connector 1:\n"));
+	i2c_DumpSpecsEDID(&si->ps.con1_screen);
+	LOG(4,("I2C: dumping EDID specs for connector 2:\n"));
+	i2c_DumpSpecsEDID(&si->ps.con2_screen);
 
 	return result;
 }
@@ -682,9 +680,10 @@ i2c_DumpSpecsEDID(edid_specs* specs)
  *   architecture cards. On later cards it's vice versa. These connections do not depend
  *   on the analog VGA switch setting (see nv_general_output_select()). It also does
  *   not depend on the way screens are connected to the cards (DVI/VGA, 1 or 2 screens).
+ * - on some NV40 architecture cards i2c bus2 connects to con2 instead of i2c bus0. This
+ *   is confirmed on GeForce FX 6600 (NV43, id 0x0141) and GeForce 7300 (G72, id 0x01d1). 
  * - con1 has CRTC1 and DAC1, and con2 has CRTC2 and DAC2 if nv_general_output_select()
  *   is set to 'straight' and there are only VGA type screens connected. */
-//fixme: take third I2C bus into account..
 void i2c_DetectScreens(void)
 {
 	edid1_info edid;
@@ -693,34 +692,54 @@ void i2c_DetectScreens(void)
 	si->ps.con2_screen.have_edid = false;
 
 	/* check existance of bus 0 */
-	if (!si->ps.i2c_bus0) return;
-
-	/* check I2C bus 0 for an EDID capable screen */
-	if (i2c_ReadEDID(0, &edid) == B_OK) {
-		/* fetch optimum (native) modeline */
-		switch (si->ps.card_arch) {
-		case NV40A:
-			i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
-			break;
-		default:
-			i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
-			break;
+	if (si->ps.i2c_bus0) {
+		/* check I2C bus 0 for an EDID capable screen */
+		if (i2c_ReadEDID(0, &edid) == B_OK) {
+			/* fetch optimum (native) modeline */
+			switch (si->ps.card_arch) {
+			case NV40A:
+				i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+				break;
+			default:
+				i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
+				break;
+			}
 		}
 	}
 
 	/* check existance of bus 1 */
-	if (!si->ps.i2c_bus1) return;
+	if (si->ps.i2c_bus1) {
+		/* check I2C bus 1 for an EDID screen */
+		if (i2c_ReadEDID(1, &edid) == B_OK) {
+			/* fetch optimum (native) modeline */
+			switch (si->ps.card_arch) {
+			case NV40A:
+				i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
+				break;
+			default:
+				i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+				break;
+			}
+		}
+	}
 
-	/* check I2C bus 1 for an EDID screen */
-	if (i2c_ReadEDID(1, &edid) == B_OK) {
-		/* fetch optimum (native) modeline */
-		switch (si->ps.card_arch) {
-		case NV40A:
-			i2c_ExtractSpecsEDID(&edid, &si->ps.con1_screen);
-			break;
-		default:
-			i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
-			break;
+	/* check existance of bus 2 */
+	if (si->ps.i2c_bus2) {
+		/* check I2C bus 2 for an EDID screen */
+		if (i2c_ReadEDID(2, &edid) == B_OK) {
+			/* fetch optimum (native) modeline */
+			switch (si->ps.card_arch) {
+			case NV40A:
+				if (!si->ps.con2_screen.have_edid) {
+					i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+				} else {
+					LOG(4,("I2C: DetectScreens: WARNING, unexpected behaviour detected!\n"));
+				}
+				break;
+			default:
+				LOG(4,("I2C: DetectScreens: WARNING, unexpected behaviour detected!\n"));
+				break;
+			}
 		}
 	}
 }
