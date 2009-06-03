@@ -133,8 +133,6 @@ dump_inode(const bfs_inode* inode)
 	dump_data_stream(&(inode->data));
 	kprintf("  --\n  pad[0]             = %08x\n", (int)inode->pad[0]);
 	kprintf("  pad[1]             = %08x\n", (int)inode->pad[1]);
-	kprintf("  pad[2]             = %08x\n", (int)inode->pad[2]);
-	kprintf("  pad[3]             = %08x\n", (int)inode->pad[3]);
 }
 
 
