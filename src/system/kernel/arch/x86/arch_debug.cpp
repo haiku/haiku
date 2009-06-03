@@ -14,6 +14,7 @@
 
 #include <cpu.h>
 #include <debug.h>
+#include <debug_heap.h>
 #include <elf.h>
 #include <kernel.h>
 #include <kimage.h>
@@ -116,12 +117,18 @@ static status_t
 print_demangled_call(const char* image, const char* symbol, addr_t args,
 	bool noObjectMethod, bool addDebugVariables)
 {
+	static const size_t kBufferSize = 256;
+	char* buffer = (char*)debug_malloc(kBufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
 	bool isObjectMethod;
-	char buffer[64];
-	const char* name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
+	const char* name = debug_demangle_symbol(symbol, buffer, kBufferSize,
 		&isObjectMethod);
-	if (name == NULL)
+	if (name == NULL) {
+		debug_free(buffer);
 		return B_ERROR;
+	}
 
 	uint32* arg = (uint32*)args;
 
@@ -145,7 +152,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 	int32 type, i = 0;
 	uint32 cookie = 0;
 	while (debug_get_next_demangled_argument(&cookie, symbol, buffer,
-			sizeof(buffer), &type, &length) == B_OK) {
+			kBufferSize, &type, &length) == B_OK) {
 		if (i++ > 0)
 			kprintf(", ");
 
@@ -223,7 +230,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		if (type == B_STRING_TYPE) {
 			if (value == 0)
 				kprintf(" \33[31m\"<NULL>\"\33[0m");
-			else if (user_strlcpy(buffer, (char*)value, sizeof(buffer)) < B_OK)
+			else if (user_strlcpy(buffer, (char*)value, kBufferSize) < B_OK)
 				kprintf(" \33[31m\"<???>\"\33[0m");
 			else
 				kprintf(" \33[36m\"%s\"\33[0m", buffer);
@@ -233,6 +240,8 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			set_debug_argument_variable(i, value);
 		arg = (uint32*)((uint8*)arg + length);
 	}
+
+	debug_free(buffer);
 
 	kprintf(")");
 	return B_OK;
