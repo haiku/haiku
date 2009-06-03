@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -13,6 +13,7 @@
 
 #include <cpu.h>
 #include <debug.h>
+#include <debug_heap.h>
 #include <debug_paranoia.h>
 #include <driver_settings.h>
 #include <frame_buffer_console.h>
@@ -665,6 +666,8 @@ kernel_debugger_loop(void)
 	int32 previousCPU = sDebuggerOnCPU;
 	sDebuggerOnCPU = smp_get_current_cpu();
 
+	DebugAllocPool* allocPool = create_debug_alloc_pool();
+
 	kprintf("Welcome to Kernel Debugging Land...\n");
 
 	if (struct thread* thread = thread_get_current_thread()) {
@@ -720,6 +723,8 @@ kernel_debugger_loop(void)
 		if (++sCurrentLine >= HISTORY_SIZE)
 			sCurrentLine = 0;
 	}
+
+	delete_debug_alloc_pool(allocPool);
 
 	sDebuggerOnCPU = previousCPU;
 }
@@ -1210,6 +1215,7 @@ debug_init_post_vm(kernel_args* args)
 
 	debug_builtin_commands_init();
 
+	debug_heap_init();
 	debug_variables_init();
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);

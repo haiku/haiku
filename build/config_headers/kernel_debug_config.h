@@ -18,6 +18,9 @@
 // benaphore-style.
 #define KDEBUG							KDEBUG_LEVEL_2
 
+// Size of the heap used by the kernel debugger.
+#define KDEBUG_HEAP						(64 * 1024)
+
 // Set to 0 to disable support for kernel breakpoints.
 #define KERNEL_BREAKPOINTS				1
 

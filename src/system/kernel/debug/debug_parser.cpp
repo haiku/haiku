@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de
  * Copyright 2006, Stephan Aßmus, superstippi@gmx.de
  * Distributed under the terms of the MIT License.
  */
@@ -13,6 +13,8 @@
 #include <string.h>
 
 #include <KernelExport.h>
+
+#include <debug_heap.h>
 
 #include "debug_commands.h"
 #include "debug_variables.h"
@@ -46,7 +48,6 @@ static const int kMaxTokenLength = 128;
 static const int kJumpBufferCount = 10;
 
 static const int kMaxArgumentCount = 64;
-static const size_t kTemporaryStorageSize = 10240;
 
 static jmp_buf sJumpBuffers[kJumpBufferCount];
 static int sNextJumpBufferIndex = 0;
@@ -56,10 +57,6 @@ static int	sExceptionPosition;
 
 static char sTempBuffer[128];
 	// for composing debug output etc.
-
-// temporary storage for command argument vectors and the arguments itself
-static uint8	sTemporaryStorage[kTemporaryStorageSize];
-static size_t	sTemporaryStorageUsed = 0;
 
 enum {
 	TOKEN_ASSIGN_FLAG			= 0x100,
@@ -143,44 +140,16 @@ parse_exception(const char* message, int32 position)
 }
 
 
-// #pragma mark - temporary storage
-
-
 static void*
-allocate_temp_storage(size_t size)
+checked_malloc(size_t size)
 {
-	// 8 byte align
-	size = (size + 7) & ~7;
-
-	if (sTemporaryStorageUsed + size > kTemporaryStorageSize) {
-		parse_exception("out of temporary storage for command execution", -1);
+	void* address = debug_malloc(size);
+	if (address == NULL) {
+		parse_exception("out of memory for command execution", -1);
 		return NULL;
 	}
 
-	void* buffer = sTemporaryStorage + sTemporaryStorageUsed;
-	sTemporaryStorageUsed += size;
-
-	return buffer;
-}
-
-
-static void
-free_temp_storage(void* _buffer)
-{
-	uint8* buffer = (uint8*)_buffer;
-
-	if (buffer == NULL)
-		return;
-
-	// must be freed in the reverse allocation order
-	if (buffer < sTemporaryStorage
-		|| buffer > sTemporaryStorage + sTemporaryStorageUsed) {
-		panic("Invalid pointer passed to free_temp_storage(): %p, temp "
-			"storage base: %p", buffer, sTemporaryStorage);
-		return;
-	}
-
-	sTemporaryStorageUsed = buffer - sTemporaryStorage;
+	return address;
 }
 
 
@@ -750,7 +719,7 @@ ExpressionParser::_ParseExpression(bool expectAssignment)
 uint64
 ExpressionParser::_ParseCommandPipe(int& returnCode)
 {
-	debugger_command_pipe* pipe = (debugger_command_pipe*)allocate_temp_storage(
+	debugger_command_pipe* pipe = (debugger_command_pipe*)checked_malloc(
 		sizeof(debugger_command_pipe));
 
 	pipe->segment_count = 0;
@@ -773,7 +742,7 @@ ExpressionParser::_ParseCommandPipe(int& returnCode)
 	// invoke the pipe
 	returnCode = invoke_debugger_command_pipe(pipe);
 
-	free_temp_storage(pipe);
+	debug_free(pipe);
 
 	return get_debug_variable("_", 0);
 }
@@ -806,8 +775,7 @@ ExpressionParser::_ParseCommand(debugger_command_pipe_segment& segment)
 	}
 
 	// allocate temporary buffer for the argument vector
-	char** argv = (char**)allocate_temp_storage(
-		kMaxArgumentCount * sizeof(char*));
+	char** argv = (char**)checked_malloc(kMaxArgumentCount * sizeof(char*));
 	int argc = 0;
 	argv[argc++] = (char*)command->name;
 
@@ -955,7 +923,7 @@ ExpressionParser::_AddArgument(int& argc, char** argv, const char* argument,
 	if (length < 0)
 		length = strlen(argument);
 	length++;
-	char* buffer = (char*)allocate_temp_storage(length);
+	char* buffer = (char*)checked_malloc(length);
 	strlcpy(buffer, argument, length);
 
 	argv[argc++] = buffer;
@@ -1169,9 +1137,8 @@ evaluate_debug_expression(const char* expression, uint64* _result, bool silent)
 
 	bool success;
 	uint64 result;
-	void* temporaryStorageMark = allocate_temp_storage(0);
-		// get a temporary storage mark, so we can cleanup everything that
-		// is allocated during the evaluation
+	DebugAllocPoolScope allocPoolScope;
+		// Will clean up all allocations when we return.
 
 	if (setjmp(sJumpBuffers[sNextJumpBufferIndex++]) == 0) {
 		result = ExpressionParser().EvaluateExpression(expression);
@@ -1190,9 +1157,6 @@ evaluate_debug_expression(const char* expression, uint64* _result, bool silent)
 
 	sNextJumpBufferIndex--;
 
-	// cleanup temp allocations
-	free_temp_storage(temporaryStorageMark);
-
 	if (success && _result != NULL)
 		*_result = result;
 
@@ -1210,9 +1174,8 @@ evaluate_debug_command(const char* commandLine)
 	}
 
 	int returnCode = 0;
-	void* temporaryStorageMark = allocate_temp_storage(0);
-		// get a temporary storage mark, so we can cleanup everything that
-		// is allocated during the evaluation
+	DebugAllocPoolScope allocPoolScope;
+		// Will clean up all allocations when we return.
 
 	if (setjmp(sJumpBuffers[sNextJumpBufferIndex++]) == 0) {
 		ExpressionParser().EvaluateCommand(commandLine, returnCode);
@@ -1225,9 +1188,6 @@ evaluate_debug_command(const char* commandLine)
 	}
 
 	sNextJumpBufferIndex--;
-
-	// cleanup temp allocations
-	free_temp_storage(temporaryStorageMark);
 
 	return returnCode;
 }
@@ -1244,9 +1204,8 @@ parse_next_debug_command_argument(const char** expressionString, char* buffer,
 	}
 
 	status_t error;
-	void* temporaryStorageMark = allocate_temp_storage(0);
-		// get a temporary storage mark, so we can cleanup everything that
-		// is allocated during the evaluation
+	DebugAllocPoolScope allocPoolScope;
+		// Will clean up all allocations when we return.
 
 	if (setjmp(sJumpBuffers[sNextJumpBufferIndex++]) == 0) {
 		error = ExpressionParser().ParseNextCommandArgument(expressionString,
@@ -1261,9 +1220,6 @@ parse_next_debug_command_argument(const char** expressionString, char* buffer,
 	}
 
 	sNextJumpBufferIndex--;
-
-	// cleanup temp allocations
-	free_temp_storage(temporaryStorageMark);
 
 	return error;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
@@ -16,6 +16,7 @@
 #include <KernelExport.h>
 
 #include <debug.h>
+#include <debug_heap.h>
 #include <lock.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -272,6 +273,9 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 
 	// replace argv[0] with the actual command name
 	argv[0] = (char *)command->name;
+
+	DebugAllocPoolScope allocPoolScope;
+		// Will automatically clean up all allocations the command leaves over.
 
 	// Invoking the command directly might be useful when debugging debugger
 	// commands.
