@@ -301,7 +301,7 @@ VolumeControl::DrawBar()
 
 		int32 min, max;
 		GetLimits(&min, &max);
-		float position = 1.0f * (max - min - max) / (max - min);
+		float position = (float)min / (min - max);
 
 		be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
 			rightFillColor, position, flags, Orientation());
