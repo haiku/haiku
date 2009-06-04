@@ -183,8 +183,8 @@ AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
-	: $(X86_ONLY)<kdebug>disasm <kdebug>hangman <kdebug>invalidate_on_exit
-	<kdebug>usb_keyboard <kdebug>run_on_exit ;
+	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>run_on_exit ;
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
@@ -197,11 +197,6 @@ AddFilesToHaikuImage system add-ons kernel interrupt_controllers
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
-
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		AddFilesToHaikuImage system add-ons kernel debugger demangle :
-			<kdebug>gcc2 ;
-	}
 }
 
 # drivers

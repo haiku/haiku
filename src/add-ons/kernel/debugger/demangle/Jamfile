@@ -2,34 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel debugger demangle ;
 
 UsePrivateHeaders kernel ;
 
-# GCC3/4 only solution (using parts of libsubc++)
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	rule ExtractObject
-	{
-		SetupKernel $(2) ;
-		Depends $(1) : $(2) ;
-		Objects $(1) ;
-
-		MakeLocateDebug $(1) ;
-	}
-
-	actions ExtractObject
-	{
-		#$(TARGET_AR) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
-		pwd
-		echo $(TARGET_AR) -x "$(2)" "$(1)"
-	}
-
-	ExtractObject cp-demangle.o : $(TARGET_STATIC_LIBSUPC++) foo ;
-
-	KernelAddon <kdebug>gcc3+ :
-		gcc3+.cpp
-		cp-demangle.o
-	;
-}
-
-# GCC2 solution
-
-KernelAddon <kdebug>gcc2 :
+KernelAddon <kdebug>demangle :
+	demangle.cpp
 	gcc2.cpp
+	gcc3+.cpp
 ;

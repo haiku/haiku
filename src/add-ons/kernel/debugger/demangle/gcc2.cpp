@@ -12,6 +12,8 @@
 
 #include <debug.h>
 
+#include "demangle.h"
+
 
 //#define TRACE_GCC2_DEMANGLER
 #ifdef TRACE_GCC2_DEMANGLER
@@ -420,7 +422,7 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 
 
 const char*
-demangle_symbol(const char* name, char* buffer, size_t bufferSize,
+demangle_symbol_gcc2(const char* name, char* buffer, size_t bufferSize,
 	bool* _isObjectMethod)
 {
 	size_t nameLength;
@@ -467,44 +469,9 @@ demangle_symbol(const char* name, char* buffer, size_t bufferSize,
 
 
 status_t
-get_next_argument(uint32* _cookie, const char* symbol, char* name,
+get_next_argument_gcc2(uint32* _cookie, const char* symbol, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength)
 {
 	return get_next_argument_internal(_cookie, symbol, name, nameSize, _type,
 		_argumentLength, false);
 }
-
-
-static status_t
-std_ops(int32 op, ...)
-{
-#if __GNUC__ != 2
-	return B_NOT_SUPPORTED;
-#else
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-	}
-
-	return B_BAD_VALUE;
-#endif
-}
-
-
-static struct debugger_demangle_module_info sModuleInfo = {
-	{
-		"debugger/demangle/gcc2/v1",
-		0,
-		std_ops
-	},
-
-	demangle_symbol,
-	get_next_argument,
-};
-
-module_info *modules[] = {
-	(module_info *)&sModuleInfo,
-	NULL
-};
-
