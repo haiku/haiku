@@ -252,15 +252,14 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 	hash_remove(fs->vnode_hash, vnode);
 
 	if (S_ISCHR(vnode->stream.type)) {
-		// pass the call through to the underlying device
-		vnode->stream.u.dev.device->Removed();
-
-		// for partitions, we have to release the raw device but must
-		// not free the device info as it was inherited from the raw
-		// device and is still in use there
-		if (vnode->stream.u.dev.partition) {
-			put_vnode(fs->volume,
-				vnode->stream.u.dev.partition->raw_device->id);
+		if (vnode->stream.u.dev.partition == NULL) {
+			// pass the call through to the underlying device
+			vnode->stream.u.dev.device->Removed();
+		} else {
+			// for partitions, we have to release the raw device but must
+			// not free the device info as it was inherited from the raw
+			// device and is still in use there
+			put_vnode(fs->volume, vnode->stream.u.dev.partition->raw_device->id);
 		}
 	}
 
@@ -385,7 +384,7 @@ add_partition(struct devfs* fs, struct devfs_vnode* device, const char* name,
 		return B_BAD_VALUE;
 
 	// we don't support nested partitions
-	if (device->stream.u.dev.partition)
+	if (device->stream.u.dev.partition != NULL)
 		return B_BAD_VALUE;
 
 	// reduce checks to a minimum - things like negative offsets could be useful
@@ -1225,11 +1224,11 @@ devfs_read(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition) {
+	if (vnode->stream.u.dev.partition != NULL) {
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
-		translate_partition_access(vnode->stream.u.dev.partition, pos,
-			*_length);
+
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
 	}
 
 	if (*_length == 0)
@@ -1257,11 +1256,11 @@ devfs_write(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition) {
+	if (vnode->stream.u.dev.partition != NULL) {
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
-		translate_partition_access(vnode->stream.u.dev.partition, pos,
-			*_length);
+
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
 	}
 
 	if (*_length == 0)
@@ -1458,7 +1457,7 @@ devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 		switch (op) {
 			case B_GET_GEOMETRY:
 			{
-				struct devfs_partition *partition
+				struct devfs_partition* partition
 					= vnode->stream.u.dev.partition;
 				if (partition == NULL)
 					break;
@@ -1498,7 +1497,7 @@ devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 
 			case B_GET_PARTITION_INFO:
 			{
-				struct devfs_partition *partition
+				struct devfs_partition* partition
 					= vnode->stream.u.dev.partition;
 				if (!S_ISCHR(vnode->stream.type)
 					|| partition == NULL
@@ -1638,9 +1637,10 @@ devfs_read_pages(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition) {
+	if (vnode->stream.u.dev.partition != NULL) {
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
+
 		translate_partition_access(vnode->stream.u.dev.partition, pos,
 			*_numBytes);
 	}
@@ -1696,9 +1696,10 @@ devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition) {
+	if (vnode->stream.u.dev.partition != NULL) {
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
+
 		translate_partition_access(vnode->stream.u.dev.partition, pos,
 			*_numBytes);
 	}
@@ -1755,7 +1756,7 @@ devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
 		return B_NOT_ALLOWED;
 	}
 
-	if (vnode->stream.u.dev.partition) {
+	if (vnode->stream.u.dev.partition != NULL) {
 		if (request->Offset() + request->Length()
 				>= vnode->stream.u.dev.partition->info.size) {
 			return B_BAD_VALUE;
