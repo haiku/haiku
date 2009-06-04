@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -280,13 +280,15 @@ FileMap::_InvalidateAfter(off_t offset)
 	uint32 index;
 	file_extent* extent = _FindExtent(offset, &index);
 	if (extent != NULL) {
-		_MakeSpace(index + 1);
+		uint32 resizeTo = index + 1;
 
 		if (extent->offset + extent->disk.length > offset) {
 			extent->disk.length = offset - extent->offset;
 			if (extent->disk.length == 0)
-				_MakeSpace(index);
+				resizeTo = index;
 		}
+
+		_MakeSpace(resizeTo);
 	}
 }
 
