@@ -194,7 +194,7 @@ Map::GetFileMap(off_t offset, off_t length, file_io_vec* vecs,
 		if (count >= *_vecCount)
 			return B_BUFFER_OVERFLOW;
 		if ((uint32)index >= fCount)
-			return B_OK;
+			break;
 
 		off_t diff = offset - fOffsets[index];
 		vecs[count].offset = fVecs[index].offset + diff;
@@ -208,6 +208,7 @@ Map::GetFileMap(off_t offset, off_t length, file_io_vec* vecs,
 		count++;
 	}
 
+	*_vecCount = count;
 	return B_OK;
 }
 
@@ -312,6 +313,23 @@ main(int argc, char** argv)
 	map.SetSize(0).Clear();
 	map.Test();
 	map.Add(0, 8192, 1000).SetSize(7777);
+	map.Test();
+
+	map.SetTo("shrink2", 8888);
+	map.Add(0, 10000, 3330000);
+	map.Test();
+	map.SetSize(0);
+	map.SetSize(4444);
+	map.Clear();
+	map.Add(0, 5000, 2220000);
+	map.Test();
+
+	map.SetTo("shrink3", 256000);
+	map.Add(0, 98304, 188074464);
+	map.Add(98304, 38912, 189057024);
+	map.Add(137216, 118784, 189177856);
+	map.Test();
+	map.SetSize(0);
 	map.Test();
 
 	return 0;
