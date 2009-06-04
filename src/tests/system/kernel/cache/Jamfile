@@ -21,7 +21,12 @@ SimpleTest block_cache_test :
 	block_cache_test.cpp
 	: libkernelland_emu.so ;
 
+SimpleTest file_map_test :
+	file_map_test.cpp
+	file_map.cpp
+	: libkernelland_emu.so ;
+
 SimpleTest pages_io_test :
 	pages_io_test.cpp
-	;
+;
 
