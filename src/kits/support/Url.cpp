@@ -9,7 +9,6 @@
 
 /*! Url class for parsing an URL and opening it with its preferred handler. */
 
-#define DEBUG 0
 
 #include <Debug.h>
 #include <MimeType.h>
@@ -17,6 +16,7 @@
 #include <StorageDefs.h>
 
 #include <Url.h>
+
 
 namespace BPrivate {
 namespace Support {
