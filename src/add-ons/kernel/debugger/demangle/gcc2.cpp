@@ -349,8 +349,8 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 					return B_LINK_LIMIT;
 
 				// it's a repeat case
-				status_t status = get_next_argument_internal(&index, symbol, name,
-					nameSize, _type, _argumentLength, true);
+				status_t status = get_next_argument_internal(&index, symbol,
+					name, nameSize, _type, _argumentLength, true);
 				if (status == B_OK)
 					(*_cookie)++;
 				return status;
@@ -472,6 +472,14 @@ status_t
 get_next_argument_gcc2(uint32* _cookie, const char* symbol, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength)
 {
-	return get_next_argument_internal(_cookie, symbol, name, nameSize, _type,
-		_argumentLength, false);
+	status_t error = get_next_argument_internal(_cookie, symbol, name, nameSize,
+		_type, _argumentLength, false);
+	if (error != B_OK)
+		return error;
+
+	// append the missing '*'/'&' for pointer/ref types
+	if (name[0] != '\0' && (*_type == B_POINTER_TYPE || *_type == B_REF_TYPE))
+		strlcat(name, *_type == B_POINTER_TYPE ? "*" : "&", nameSize);
+
+	return B_OK;
 }

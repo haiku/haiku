@@ -204,10 +204,8 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 				kprintf("\33[34m%s\33[0m", value ? "true" : "false");
 				break;
 			default:
-				if (buffer[0]) {
-					kprintf("%s%s: ", buffer, type == B_POINTER_TYPE ? "*"
-						: type == B_REF_TYPE ? "&" : "");
-				}
+				if (buffer[0])
+					kprintf("%s: ", buffer);
 
 				if (length == 4) {
 					value = *(uint32*)arg;
