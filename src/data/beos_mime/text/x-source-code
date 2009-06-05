@@ -16,6 +16,7 @@ resource(4, "META:EXTENS") message(234) {
 	"extensions" = "c",
 	"extensions" = "cc",
 	"extensions" = "cpp",
+	"extensions" = "e",
 	"extensions" = "h",
 	"extensions" = "h++",
 	"extensions" = "inc",
@@ -24,6 +25,8 @@ resource(4, "META:EXTENS") message(234) {
 	"extensions" = "pl",
 	"extensions" = "pp",
 	"extensions" = "py",
+	"extensions" = "rb",
+	"extensions" = "rexx",
 	"extensions" = "S",
 	"type" = "text/x-source-code"
 };
