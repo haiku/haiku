@@ -1,15 +1,22 @@
 /*
  * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 
+#include <set>
+#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 
-#include <set>
-#include <string>
+#include <Path.h>
+#include <String.h>
+#include <fs_volume.h>
 
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
@@ -18,20 +25,17 @@
 #include <DiskDeviceList.h>
 #include <Partition.h>
 
-#include <Path.h>
-#include <fs_volume.h>
-
 using std::set;
 using std::string;
 
-extern const char *__progname;
+extern const char* __progname;
 
 
 typedef set<string> StringSet;
 
 // usage
-static const char *kUsage =
-	"%s <options> [ <volume name> ... ]\n"
+static const char* kUsage =
+	"Usage: %s <options> [ <volume name> ... ]\n\n"
 	"Mounts the volume with name <volume name>, if given. Lists info about\n"
 	"mounted and mountable volumes and mounts/unmounts volumes.\n"
 	"\n"
@@ -40,51 +44,53 @@ static const char *kUsage =
 	"\n"
 	"Options:\n"
 	"[general]\n"
-	"  -s                 - silent; don't print info about (un)mounting\n"
-	"  -h, --help         - print this info text\n"
+	"  -s                    - silent; don't print info about (un)mounting\n"
+	"  -h, --help            - print this info text\n"
 	"\n"
 	"[mounting]\n"
-	"  -all               - mount all mountable volumes\n"
-	"  -allbfs            - mount all mountable BFS volumes\n"
-	"  -allhfs            - mount all mountable HFS volumes\n"
-	"  -alldos            - mount all mountable DOS volumes\n"
-	"  -ro                - mount volumes read-only\n"
-	"  -unmount <volume>  - unmount the volume with the name <volume>\n"
+	"  -all                  - mount all mountable volumes\n"
+	"  -allbfs               - mount all mountable BFS volumes\n"
+	"  -allhfs               - mount all mountable HFS volumes\n"
+	"  -alldos               - mount all mountable DOS volumes\n"
+	"  -ro, -readonly        - mount volumes read-only\n"
+	"  -u, -unmount <volume> - unmount the volume with the name <volume>\n"
 	"\n"
 	"[info]\n"
-	"  -p, -l             - list all mounted and mountable volumes\n"
-	"  -lh                - list all existing volumes (incl. not-mountable ones)\n"
-	"  -dd                - list all disk existing devices\n"
+	"  -p, -l                - list all mounted and mountable volumes\n"
+	"  -lh                   - list all existing volumes (incl. not-mountable "
+		"ones)\n"
+	"  -dd                   - list all disk existing devices\n"
 	"\n"
 	"[obsolete]\n"
-	"  -r                 - ignored\n"
-	"  -publishall        - ignored\n"
-	"  -publishbfs        - ignored\n"
-	"  -publishhfs        - ignored\n"
-	"  -publishdos        - ignored\n";
-
-// application name
-const char *kAppName = __progname;
+	"  -r                    - ignored\n"
+	"  -publishall           - ignored\n"
+	"  -publishbfs           - ignored\n"
+	"  -publishhfs           - ignored\n"
+	"  -publishdos           - ignored\n";
 
 
-// print_usage
-static
-void
+const char* kAppName = __progname;
+
+static int sVolumeNameWidth = B_OS_NAME_LENGTH;
+static int sFSNameWidth = 25;
+
+
+static void
 print_usage(bool error)
 {
 	fprintf(error ? stderr : stdout, kUsage, kAppName);
 }
 
-// print_usage_and_exit
-static
-void
+
+static void
 print_usage_and_exit(bool error)
 {
 	print_usage(error);
 	exit(error ? 0 : 1);
 }
 
-static const char *
+
+static const char*
 size_string(int64 size)
 {
 	double blocks = size;
@@ -93,7 +99,7 @@ size_string(int64 size)
 	if (size < 1024)
 		sprintf(string, "%Ld", size);
 	else {
-		char *units[] = {"K", "M", "G", NULL};
+		char* units[] = {"K", "M", "G", NULL};
 		int32 i = -1;
 
 		do {
@@ -113,27 +119,28 @@ size_string(int64 size)
 
 struct MountVisitor : public BDiskDeviceVisitor {
 	MountVisitor()
-		: silent(false),
-		  mountAll(false),
-		  mountBFS(false),
-		  mountHFS(false),
-		  mountDOS(false),
-		  readOnly(false)
+		:
+		silent(false),
+		mountAll(false),
+		mountBFS(false),
+		mountHFS(false),
+		mountDOS(false),
+		readOnly(false)
 	{
 	}
 
-	virtual bool Visit(BDiskDevice *device)
+	virtual bool Visit(BDiskDevice* device)
 	{
 		return Visit(device, 0);
 	}
 
-	virtual bool Visit(BPartition *partition, int32 level)
+	virtual bool Visit(BPartition* partition, int32 level)
 	{
 		// get name and type
-		const char *name = partition->ContentName();
+		const char* name = partition->ContentName();
 		if (!name)
 			name = partition->Name();
-		const char *type = partition->ContentType();
+		const char* type = partition->ContentType();
 
 		// check whether to mount
 		bool mount = false;
@@ -165,7 +172,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 		bool unmount = false;
 		if (name && toUnmount.find(name) != toUnmount.end()) {
 			toUnmount.erase(name);
-			if (!partition->IsMounted()) {
+			if (partition->IsMounted()) {
 				unmount = true;
 				mount = false;
 			} else if (!silent)
@@ -180,7 +187,8 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				if (error >= B_OK) {
 					BPath mountPoint;
 					partition->GetMountPoint(&mountPoint);
-					printf("Volume `%s' mounted successfully at '%s'.\n", name, mountPoint.Path());
+					printf("Volume `%s' mounted successfully at '%s'.\n", name,
+						mountPoint.Path());
 				} else {
 					fprintf(stderr, "Failed to mount volume `%s': %s\n",
 						name, strerror(error));
@@ -224,15 +232,15 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 		return listMountablePartitions || listAllPartitions;
 	}
 
-	virtual bool Visit(BDiskDevice *device)
+	virtual bool Visit(BDiskDevice* device)
 	{
 		return Visit(device, 0);
 	}
 
-	virtual bool Visit(BPartition *partition, int32 level)
+	virtual bool Visit(BPartition* partition, int32 level)
 	{
 		// get name and type
-		const char *name = partition->ContentName();
+		const char* name = partition->ContentName();
 		if (name == NULL || name[0] == '\0') {
 			name = partition->Name();
 			if (name == NULL || name[0] == '\0') {
@@ -242,7 +250,7 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 					name = "";
 			}
 		}
-		const char *type = partition->ContentType();
+		const char* type = partition->ContentType();
 		if (type == NULL)
 			type = "<unknown>";
 
@@ -264,9 +272,10 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 		if (partition->IsMounted())
 			partition->GetMountPoint(&mountPoint);
 
-		printf("%-14s %-20s %8s %s  (%s)\n",
-			name, type, size_string(partition->Size()),
+		printf("%-*s %-*s %8s %s%s(%s)\n", sVolumeNameWidth, name,
+			sFSNameWidth, type, size_string(partition->Size()),
 			partition->IsMounted() ? mountPoint.Path() : "",
+			partition->IsMounted() ? "  " : "",
 			path.Path() + skip);
 		return false;
 	}
@@ -280,19 +289,19 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
-	if (argc < 2)
-		print_usage_and_exit(true);
-
 	MountVisitor mountVisitor;
 	PrintPartitionsVisitor printPartitionsVisitor;
 	bool listAllDevices = false;
 
+	if (argc < 2)
+		printPartitionsVisitor.listMountablePartitions = true;
+
 	// parse arguments
 
 	for (int argi = 1; argi < argc; argi++) {
-		const char *arg = argv[argi];
+		const char* arg = argv[argi];
 
 		if (arg[0] != '\0' && arg[0] != '-') {
 			mountVisitor.toMount.insert(arg);
@@ -308,9 +317,9 @@ main(int argc, char **argv)
 			mountVisitor.mountHFS = true;
 		} else if (strcmp(arg, "-alldos") == 0) {
 			mountVisitor.mountDOS = true;
-		} else if (strcmp(arg, "-ro") == 0) {
+		} else if (strcmp(arg, "-ro") == 0 || strcmp(arg, "-readonly") == 0) {
 			mountVisitor.readOnly = true;
-		} else if (strcmp(arg, "-unmount") == 0) {
+		} else if (strcmp(arg, "-u") == 0 || strcmp(arg, "-unmount") == 0) {
 			argi++;
 			if (argi >= argc)
 				print_usage_and_exit(true);
@@ -399,8 +408,8 @@ main(int argc, char **argv)
 		}
 		for (StringSet::iterator it = mountVisitor.toUnmount.begin();
 				it != mountVisitor.toUnmount.end(); it++) {
-			fprintf(stderr, "Failed to unmount volume `%s': Volume not found.\n",
-				(*it).c_str());
+			fprintf(stderr, "Failed to unmount volume `%s': Volume not "
+				"found.\n", (*it).c_str());
 		}
 	}
 
@@ -418,9 +427,23 @@ main(int argc, char **argv)
 		// TODO
 	}
 
+	// determine width of the terminal in order to shrink the columns if needed
+	if (isatty(STDOUT_FILENO)) {
+		winsize size;
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &size, sizeof(winsize)) == 0) {
+			if (size.ws_col < 95) {
+				sVolumeNameWidth -= (95 - size.ws_col) / 2;
+				sFSNameWidth -= (95 - size.ws_col) / 2;
+			}
+		}
+	}
+
 	if (printPartitionsVisitor.IsUsed()) {
-		puts("Volume         File System              Size Mounted At (Device)");
-		puts("---------------------------------------------------------------------");
+		printf("%-*s %-*s     Size Mounted At (Device)\n",
+			sVolumeNameWidth, "Volume", sFSNameWidth, "File System");
+		BString separator;
+		separator.SetTo('-', sVolumeNameWidth + sFSNameWidth + 35);
+		puts(separator.String());
 
 		if (printPartitionsVisitor.listAllPartitions)
 			deviceList.VisitEachPartition(&printPartitionsVisitor);
