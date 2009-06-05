@@ -100,6 +100,7 @@ SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 	$(X86_ONLY)nvidia.accelerant $(X86_ONLY)matrox.accelerant
 	$(X86_ONLY)neomagic.accelerant $(X86_ONLY)intel_extreme.accelerant
 	$(X86_ONLY)s3.accelerant $(X86_ONLY)vesa.accelerant
+	$(X86_ONLY)ati.accelerant
 	#$(X86_ONLY)via.accelerant
 	#$(X86_ONLY)vmware.accelerant
 ;
@@ -142,6 +143,7 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
+	$(X86_ONLY)ati
 ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ;
 SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x

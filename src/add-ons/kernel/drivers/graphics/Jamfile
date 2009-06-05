@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics ;
 
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics ati ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics common ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics et6x00 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics intel_extreme ;
@@ -14,5 +15,3 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics via ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vmware ;
-
-SubIncludeGPL HAIKU_TOP src add-ons kernel drivers graphics atimach64 ;
