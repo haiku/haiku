@@ -15,7 +15,6 @@ SubInclude HAIKU_TOP src preferences keymap ;
 SubInclude HAIKU_TOP src preferences locale ;
 SubInclude HAIKU_TOP src preferences mail ;
 SubInclude HAIKU_TOP src preferences media ;
-SubInclude HAIKU_TOP src preferences menu ;
 SubInclude HAIKU_TOP src preferences mouse ;
 SubInclude HAIKU_TOP src preferences network ;
 SubInclude HAIKU_TOP src preferences print ;
