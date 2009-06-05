@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CIRCULAR_BUFFER_H
@@ -40,7 +40,12 @@ public:
 
 		fSize = size;
 		fBuffer = (Type*)malloc(fSize * sizeof(Type));
-		return fBuffer != NULL ? B_OK : B_NO_MEMORY;
+		if (fBuffer == NULL) {
+			fSize = 0;
+			return B_NO_MEMORY;
+		}
+
+		return B_OK;
 	}
 
 	void MakeEmpty()
@@ -61,7 +66,7 @@ public:
 
 	Type* ItemAt(int32 index) const
 	{
-		if (index >= (int32)fIn || index < 0)
+		if (index >= (int32)fIn || index < 0 || fBuffer == NULL)
 			return NULL;
 
 		return &fBuffer[(fFirst + index) % fSize];
@@ -75,7 +80,8 @@ public:
 		else
 			index = fFirst++;
 
-		fBuffer[index % fSize] = item;
+		if (fBuffer != NULL)
+			fBuffer[index % fSize] = item;
 	}
 
 	size_t Size() const

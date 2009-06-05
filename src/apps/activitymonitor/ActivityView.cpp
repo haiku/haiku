@@ -225,6 +225,11 @@ void
 ViewHistory::Update(DataHistory* history, int32 width, int32 resolution,
 	bigtime_t toTime, bigtime_t step, bigtime_t refresh)
 {
+	if (width > 16384) {
+		// ignore this - it seems the view hasn't been layouted yet
+		return;
+	}
+
 	// Check if we need to invalidate the existing values
 	if ((int32)fValues.Size() != width
 		|| fResolution != resolution
