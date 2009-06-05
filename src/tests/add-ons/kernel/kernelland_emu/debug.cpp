@@ -106,6 +106,22 @@ dprintf(const char *format,...)
 
 
 extern "C" void
+dprintf_no_syslog(const char *format,...)
+{
+	if (!gDebugOutputEnabled)
+		return;
+
+	va_list args;
+	va_start(args, format);
+	printf("\33[34m");
+	vprintf(format, args);
+	printf("\33[0m");
+	fflush(stdout);
+	va_end(args);
+}
+
+
+extern "C" void
 kprintf(const char *format,...)
 {
 	va_list args;
