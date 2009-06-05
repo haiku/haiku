@@ -2971,6 +2971,14 @@ static void pinsnv20_arch_fake(void)
 	si->ps.std_memory_clock = 200;
 }
 
+/*	notes on PLL's:
+	on NV34, GeForce FX 5200, id 0x0322 DAC1 PLL observed behaviour:
+	- Fcomp may be as high as 27Mhz (BIOS), and current set range seems ok as well;
+	- Fvco may not be as low as 216Mhz (DVI pixelclock intermittant locking error,
+	  visible as horizontal shifting picture and black screen (out of range): both intermittant);
+	- Fvco may be as high as 432Mhz (BIOS);
+	- This is not an extended PLL: the second divisor register does not do anything.
+*/
 static void pinsnv30_arch_fake(void)
 {
 	/* determine PLL type */
