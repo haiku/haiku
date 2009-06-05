@@ -8,9 +8,10 @@
 
 #include "accelerant.h"
 
-#include <create_display_modes.h>		// common accelerant header file
+#include <string.h>
 #include <unistd.h>
 
+#include <create_display_modes.h>		// common accelerant header file
 
 
 static display_mode*
