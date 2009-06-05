@@ -55,15 +55,16 @@ static struct {
 
 // This can be used by other code to see if there is a boot file system already
 dev_t gBootDevice = -1;
+bool gReadOnlyBootDevice = false;
 
 
 /*!	No image was chosen - prefer disks with names like "Haiku", or "System"
  */
 int
-compare_image_boot(const void *_a, const void *_b)
+compare_image_boot(const void* _a, const void* _b)
 {
-	KPartition *a = *(KPartition **)_a;
-	KPartition *b = *(KPartition **)_b;
+	KPartition* a = *(KPartition**)_a;
+	KPartition* b = *(KPartition**)_b;
 
 	if (a->ContentName() != NULL) {
 		if (b->ContentName() == NULL)
@@ -95,13 +96,15 @@ compare_image_boot(const void *_a, const void *_b)
 	compare_image_boot().
 */
 static int
-compare_cd_boot(const void *_a, const void *_b)
+compare_cd_boot(const void* _a, const void* _b)
 {
-	KPartition *a = *(KPartition **)_a;
-	KPartition *b = *(KPartition **)_b;
+	KPartition* a = *(KPartition**)_a;
+	KPartition* b = *(KPartition**)_b;
 
-	bool aIsCD = a->Type() != NULL && !strcmp(a->Type(), kPartitionTypeDataSession);
-	bool bIsCD = b->Type() != NULL && !strcmp(b->Type(), kPartitionTypeDataSession);
+	bool aIsCD = a->Type() != NULL
+		&& !strcmp(a->Type(), kPartitionTypeDataSession);
+	bool bIsCD = b->Type() != NULL
+		&& !strcmp(b->Type(), kPartitionTypeDataSession);
 
 	int compare = (int)aIsCD - (int)bIsCD;
 	if (compare != 0)
@@ -118,7 +121,7 @@ compare_cd_boot(const void *_a, const void *_b)
 	boot/platform/bios_ia32/devices.cpp (or similar solutions).
 */
 static uint32
-compute_check_sum(KDiskDevice *device, off_t offset)
+compute_check_sum(KDiskDevice* device, off_t offset)
 {
 	char buffer[512];
 	ssize_t bytesRead = read_pos(device->FD(), offset, buffer, sizeof(buffer));
@@ -128,10 +131,11 @@ compute_check_sum(KDiskDevice *device, off_t offset)
 	if (bytesRead < (ssize_t)sizeof(buffer))
 		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
 
-	uint32 *array = (uint32 *)buffer;
+	uint32* array = (uint32*)buffer;
 	uint32 sum = 0;
 
-	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++) {
+	for (uint32 i = 0;
+			i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++) {
 		sum += array[i];
 	}
 
@@ -181,7 +185,7 @@ public:
 bool
 DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 {
-	disk_identifier *disk;
+	disk_identifier* disk;
 	int32 diskIdentifierSize;
 	if (fBootVolume.FindData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 			(const void**)&disk, &diskIdentifierSize) != B_OK) {
@@ -195,7 +199,8 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 	switch (disk->bus_type) {
 		case PCI_BUS:
 		case LEGACY_BUS:
-			// TODO: implement this! (and then enable this feature in the boot loader)
+			// TODO: implement this! (and then enable this feature in the boot
+			// loader)
 			// (we need a way to get the device_node of a device, then)
 			break;
 
@@ -244,13 +249,13 @@ DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
 	if (!fBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// the simple case: we can just boot from the selected boot
 		// device
-		if (partition->Offset() == fBootVolume.GetInt64(
-				BOOT_VOLUME_PARTITION_OFFSET, 0)) {
+		if (partition->Offset()
+				== fBootVolume.GetInt64(BOOT_VOLUME_PARTITION_OFFSET, 0)) {
 			foundForSure = true;
 			return true;
 		}
 	} else {
-		// for now, we will just collect all BFS volumes
+		// for now, we will just collect all BFS/ISO9660 volumes
 		if (fMethod == BOOT_METHOD_CD
 			&& fBootVolume.GetBool(BOOT_VOLUME_USER_SELECTED, false)
 			&& partition->Type() != NULL
@@ -272,7 +277,7 @@ DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
 void
 DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 {
-	qsort(partitions, count, sizeof(KPartition *),
+	qsort(partitions, count, sizeof(KPartition*),
 		fMethod == BOOT_METHOD_CD ? compare_cd_boot : compare_image_boot);
 }
 
@@ -287,7 +292,7 @@ DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 	The boot code should then just try them one by one.
 */
 static status_t
-get_boot_partitions(kernel_args *args, PartitionStack &partitions)
+get_boot_partitions(kernel_args* args, PartitionStack& partitions)
 {
 	const KMessage& bootVolume = args->boot_volume;
 
@@ -295,9 +300,9 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 	bootVolume.Dump(&dprintf);
 
 	// create boot method
-	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD,
-		BOOT_METHOD_DEFAULT);
-dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
+	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT);
+	dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
+
 	BootMethod* bootMethod = NULL;
 	switch (bootMethodType) {
 		case BOOT_METHOD_NET:
@@ -425,7 +430,7 @@ vfs_bootstrap_file_systems(void)
 
 
 void
-vfs_mount_boot_file_system(kernel_args *args)
+vfs_mount_boot_file_system(kernel_args* args)
 {
 	PartitionStack partitions;
 	status_t status = get_boot_partitions(args, partitions);
@@ -436,20 +441,25 @@ vfs_mount_boot_file_system(kernel_args *args)
 		panic("did not find any boot partitions!");
 	}
 
-	KPartition *bootPartition;
+	KPartition* bootPartition;
 	while (partitions.Pop(&bootPartition)) {
 		KPath path;
 		if (bootPartition->GetPath(&path) != B_OK)
 			panic("could not get boot device!\n");
 
 		const char *fsName = NULL;
-		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0)
+		bool readOnly = false;
+		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0) {
 			fsName = "iso9660:write_overlay:attribute_overlay";
+			readOnly = true;
+		}
 
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
 		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
-		if (gBootDevice >= B_OK)
+		if (gBootDevice >= B_OK) {
+			gReadOnlyBootDevice = true;
 			break;
+		}
 	}
 
 	if (gBootDevice < B_OK)

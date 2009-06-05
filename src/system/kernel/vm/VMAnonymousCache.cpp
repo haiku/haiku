@@ -1,7 +1,7 @@
 /*
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -20,6 +20,7 @@
 #include <NodeMonitor.h>
 
 #include <arch_config.h>
+#include <boot_device.h>
 #include <driver_settings.h>
 #include <fs/fd.h>
 #include <fs_interface.h>
@@ -1006,7 +1007,7 @@ VMAnonymousCache::_Commit(off_t size)
 
 
 status_t
-swap_file_add(char *path)
+swap_file_add(const char *path)
 {
 	// open the file
 	int fd = open(path, O_RDWR | O_NOCACHE, S_IRUSR | S_IWUSR);
@@ -1083,7 +1084,7 @@ swap_file_add(char *path)
 
 
 status_t
-swap_file_delete(char *path)
+swap_file_delete(const char *path)
 {
 	vnode *node = NULL;
 	status_t status = vfs_get_vnode_from_path(path, true, &node);
@@ -1173,6 +1174,11 @@ swap_init(void)
 void
 swap_init_post_modules()
 {
+	// Never try to create a swap file on a read-only device - when booting
+	// from CD, the write overlay is used.
+	if (gReadOnlyBootDevice)
+		return;
+
 	off_t size = 0;
 
 	void *settings = load_driver_settings("virtual_memory");
@@ -1208,13 +1214,13 @@ swap_init_post_modules()
 
 	close(fd);
 
-	error = swap_file_add((char *)"/var/swap");
+	error = swap_file_add("/var/swap");
 	if (error != B_OK)
 		dprintf("Failed to add swap file /var/swap: %s\n", strerror(error));
 }
 
 
-// used by page daemon to free swap space
+//! Used by page daemon to free swap space.
 bool
 swap_free_page_swap_space(vm_page *page)
 {
