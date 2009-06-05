@@ -6,6 +6,7 @@
  *		Jérôme Duval,
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  *		Axel Dörfler (axeld@pinc-software.de)
+ *		Philippe Saint-Pierre stpere@gmail.com
  */
 
 #include "MouseView.h"
@@ -21,9 +22,9 @@
 #include <Slider.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
+#include <TranslatorFormats.h>
 #include <Window.h>
 
-#include "MouseBitmap.h"
 #include "MouseConstants.h"
 #include "MouseSettings.h"
 #include "MouseWindow.h"
@@ -83,15 +84,8 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	fButtons(0),
 	fOldButtons(0)
 {
-	fMouseBitmap = new BBitmap(BRect(0, 0, kMouseWidth - 1, kMouseHeight - 1), B_CMAP8);
-	fMouseBitmap->SetBits(kMouseBits, sizeof(kMouseBits), 0, kMouseColorSpace);
-
-	fMouseDownBitmap = new BBitmap(BRect(0, 0, kMouseDownWidth - 1, kMouseDownHeight - 1), B_CMAP8);
-	fMouseDownBitmap->SetBits(kMouseDownBits, sizeof(kMouseDownBits), 0, kMouseDownColorSpace);
-
-	// ToDo: move these images to the resources as well
-	//fMouseBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "mouse_bmap");
-	//fMouseDownBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "pressed_mouse_bmap");
+	fMouseBitmap = BTranslationUtils::GetBitmap("mouse_bmap");
+	fMouseDownBitmap = BTranslationUtils::GetBitmap("pressed_mouse_bmap");
 
 	fMouseDownBounds = fMouseDownBitmap->Bounds();
 	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
