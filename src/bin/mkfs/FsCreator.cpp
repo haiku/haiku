@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -172,15 +172,18 @@ FsCreator::Run()
 			return true;
 	}
 
+	BString contentName = partition->ContentName();
+		// CommitModifications() will invalidate our partition object
+
 	status = device.CommitModifications();
 	if (status == B_OK) {
 		if (fVerbose) {
-			std::cout << "Volume " << partition->ContentName()
-				<< " has been initialized successfully!\n";
+			std::cout << "Volume \"" << contentName.String()
+				<< "\" has been initialized successfully!" << std::endl;
 		}
 	} else {
-		std::cout << kProgramName << ": Initialization of "
-			<< partition->ContentName() << " failed: " << strerror(status)
+		std::cout << kProgramName << ": Initialization of \""
+			<< contentName.String() << "\" failed: " << strerror(status)
 			<< std::endl;
 		return false;
 	}
