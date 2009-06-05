@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VESA_H
@@ -139,6 +139,15 @@ struct crtc_info_block {
 #define CRTC_INTERLACED			0x02
 #define CRTC_NEGATIVE_HSYNC		0x04
 #define CRTC_NEGATIVE_VSYNC		0x08
+
+
+/* Power Management */
+
+#define DPMS_ON					0x00
+#define DPMS_STANDBY			0x01
+#define	DPMS_SUSPEND			0x02
+#define DPMS_OFF				0x04
+#define DPMS_REDUCED_ON			0x08
 
 
 /* VBE 3.0 protected mode interface

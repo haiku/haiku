@@ -1,7 +1,8 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <string.h>
 
@@ -14,7 +15,7 @@
 
 //#define TRACE_MODE
 #ifdef TRACE_MODE
-extern "C" void _sPrintf(const char *format, ...);
+extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -46,9 +47,9 @@ get_color_space_for_depth(uint32 depth)
 
 /*!	Checks if the specified \a mode can be set using VESA. */
 static bool
-is_mode_supported(display_mode *mode)
+is_mode_supported(display_mode* mode)
 {
-	vesa_mode *modes = gInfo->vesa_modes;
+	vesa_mode* modes = gInfo->vesa_modes;
 
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
@@ -96,7 +97,7 @@ vesa_accelerant_mode_count(void)
 
 
 status_t
-vesa_get_mode_list(display_mode *modeList)
+vesa_get_mode_list(display_mode* modeList)
 {
 	TRACE(("vesa_get_mode_info()\n"));
 	memcpy(modeList, gInfo->mode_list,
@@ -106,15 +107,15 @@ vesa_get_mode_list(display_mode *modeList)
 
 
 status_t
-vesa_propose_display_mode(display_mode *target, const display_mode *low,
-	const display_mode *high)
+vesa_propose_display_mode(display_mode* target, const display_mode* low,
+	const display_mode* high)
 {
 	TRACE(("vesa_propose_display_mode()\n"));
 
 	// just search for the specified mode in the list
 
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *current = &gInfo->mode_list[i];
+		display_mode* current = &gInfo->mode_list[i];
 
 		if (target->virtual_width != current->virtual_width
 			|| target->virtual_height != current->virtual_height
@@ -129,7 +130,7 @@ vesa_propose_display_mode(display_mode *target, const display_mode *low,
 
 
 status_t
-vesa_set_display_mode(display_mode *_mode)
+vesa_set_display_mode(display_mode* _mode)
 {
 	TRACE(("vesa_set_display_mode()\n"));
 
@@ -137,8 +138,8 @@ vesa_set_display_mode(display_mode *_mode)
 	if (vesa_propose_display_mode(&mode, &mode, &mode) != B_OK)
 		return B_BAD_VALUE;
 
-	vesa_mode *modes = gInfo->vesa_modes;
-	for (unsigned int i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
+	vesa_mode* modes = gInfo->vesa_modes;
+	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
 		// TODO: list is ordered, we could use binary search
 		if (modes[i].width == mode.virtual_width
@@ -153,7 +154,7 @@ vesa_set_display_mode(display_mode *_mode)
 
 
 status_t
-vesa_get_display_mode(display_mode *_currentMode)
+vesa_get_display_mode(display_mode* _currentMode)
 {
 	TRACE(("vesa_get_display_mode()\n"));
 	*_currentMode = gInfo->shared_info->current_mode;
@@ -162,7 +163,7 @@ vesa_get_display_mode(display_mode *_currentMode)
 
 
 status_t
-vesa_get_edid_info(void *info, size_t size, uint32 *_version)
+vesa_get_edid_info(void* info, size_t size, uint32* _version)
 {
 	TRACE(("intel_get_edid_info()\n"));
 
@@ -178,7 +179,7 @@ vesa_get_edid_info(void *info, size_t size, uint32 *_version)
 
 
 status_t
-vesa_get_frame_buffer_config(frame_buffer_config *config)
+vesa_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("vesa_get_frame_buffer_config()\n"));
 
@@ -191,20 +192,21 @@ vesa_get_frame_buffer_config(frame_buffer_config *config)
 
 
 status_t
-vesa_get_pixel_clock_limits(display_mode *mode, uint32 *low, uint32 *high)
+vesa_get_pixel_clock_limits(display_mode* mode, uint32* low, uint32* high)
 {
 	TRACE(("vesa_get_pixel_clock_limits()\n"));
 
-	// ToDo: do some real stuff here (taken from radeon driver)
-	uint32 total_pix = (uint32)mode->timing.h_total * (uint32)mode->timing.v_total;
-	uint32 clock_limit = 2000000;
+	// TODO: do some real stuff here (taken from radeon driver)
+	uint32 totalPixel = (uint32)mode->timing.h_total
+		* (uint32)mode->timing.v_total;
+	uint32 clockLimit = 2000000;
 
-	/* lower limit of about 48Hz vertical refresh */
-	*low = (total_pix * 48L) / 1000L;
-	if (*low > clock_limit)
+	// lower limit of about 48Hz vertical refresh
+	*low = totalPixel * 48L / 1000L;
+	if (*low > clockLimit)
 		return B_ERROR;
 
-	*high = clock_limit;
+	*high = clockLimit;
 	return B_OK;
 }
 
@@ -218,7 +220,7 @@ vesa_move_display(uint16 h_display_start, uint16 v_display_start)
 
 
 status_t
-vesa_get_timing_constraints(display_timing_constraints *dtc)
+vesa_get_timing_constraints(display_timing_constraints* constraints)
 {
 	TRACE(("vesa_get_timing_constraints()\n"));
 	return B_ERROR;
@@ -226,7 +228,7 @@ vesa_get_timing_constraints(display_timing_constraints *dtc)
 
 
 void
-vesa_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
+vesa_set_indexed_colors(uint count, uint8 first, uint8* colors, uint32 flags)
 {
 	TRACE(("vesa_set_indexed_colors()\n"));
 	vga_set_indexed_colors_args args;

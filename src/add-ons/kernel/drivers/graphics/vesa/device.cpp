@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,53 +32,23 @@
 #endif
 
 
-/* device hooks prototypes */
-
-static status_t device_open(const char *, uint32, void **);
-static status_t device_close(void *);
-static status_t device_free(void *);
-static status_t device_ioctl(void *, uint32, void *, size_t);
-static status_t device_read(void *, off_t, void *, size_t *);
-static status_t device_write(void *, off_t, const void *, size_t *);
-
-
-device_hooks gDeviceHooks = {
-	device_open,
-	device_close,
-	device_free,
-	device_ioctl,
-	device_read,
-	device_write,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
-
-//	#pragma mark -
-//	the device will be accessed through the following functions (a.k.a. device hooks)
-
-
 static status_t
-device_open(const char *name, uint32 flags, void **_cookie)
+device_open(const char* name, uint32 flags, void** _cookie)
 {
 	int id;
 
 	// find accessed device
-	{
-		char *thisName;
+	char* thisName;
 
-		// search for device name
-		for (id = 0; (thisName = gDeviceNames[id]) != NULL; id++) {
-			if (!strcmp(name, thisName))
-				break;
-		}
-		if (!thisName)
-			return EINVAL;
+	// search for device name
+	for (id = 0; (thisName = gDeviceNames[id]) != NULL; id++) {
+		if (!strcmp(name, thisName))
+			break;
 	}
+	if (thisName == NULL)
+		return B_BAD_VALUE;
 
-	vesa_info *info = gDeviceInfo[id];
+	vesa_info* info = gDeviceInfo[id];
 	*_cookie = info;
 
 	acquire_lock(&gLock);
@@ -100,16 +70,16 @@ device_open(const char *name, uint32 flags, void **_cookie)
 
 
 static status_t
-device_close(void *cookie)
+device_close(void* cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-device_free(void *cookie)
+device_free(void* cookie)
 {
-	struct vesa_info *info = (vesa_info *)cookie;
+	struct vesa_info* info = (vesa_info*)cookie;
 
 	acquire_lock(&gLock);
 
@@ -124,26 +94,26 @@ device_free(void *cookie)
 
 
 static status_t
-device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
+device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 {
-	struct vesa_info *info = (vesa_info *)cookie;
+	struct vesa_info* info = (vesa_info*)cookie;
 
 	switch (msg) {
 		case B_GET_ACCELERANT_SIGNATURE:
 			dprintf(DEVICE_NAME ": acc: %s\n", VESA_ACCELERANT_NAME);
-			if (user_strlcpy((char *)buffer, VESA_ACCELERANT_NAME,
+			if (user_strlcpy((char*)buffer, VESA_ACCELERANT_NAME,
 					B_FILE_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
 			return B_OK;
 
-		// needed to share data between kernel and accelerant		
+		// needed to share data between kernel and accelerant
 		case VESA_GET_PRIVATE_DATA:
 			return user_memcpy(buffer, &info->shared_area, sizeof(area_id));
 
 		// needed for cloning
 		case VESA_GET_DEVICE_NAME:
-			if (user_strlcpy((char *)buffer, gDeviceNames[info->id],
+			if (user_strlcpy((char*)buffer, gDeviceNames[info->id],
 					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
@@ -151,13 +121,39 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 
 		case VESA_SET_DISPLAY_MODE:
 		{
-			unsigned int mode;
+			if (bufferLength != sizeof(uint32))
+				return B_BAD_VALUE;
 
-			if (bufferLength != sizeof(mode)
-				|| user_memcpy(&mode, buffer, sizeof(mode)) < B_OK)
+			uint32 mode;
+			if (user_memcpy(&mode, buffer, sizeof(uint32)) < B_OK)
 				return B_BAD_ADDRESS;
 
 			return vesa_set_display_mode(*info, mode);
+		}
+
+		case VESA_GET_DPMS_MODE:
+		{
+			if (bufferLength != sizeof(uint32))
+				return B_BAD_VALUE;
+
+			uint32 mode;
+			status_t status = vesa_get_dpms_mode(*info, mode);
+			if (status != B_OK)
+				return status;
+
+			return user_memcpy(buffer, &mode, sizeof(mode));
+		}
+
+		case VESA_SET_DPMS_MODE:
+		{
+			if (bufferLength != sizeof(uint32))
+				return B_BAD_VALUE;
+
+			uint32 mode;
+			if (user_memcpy(&mode, buffer, sizeof(uint32)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return vesa_set_dpms_mode(*info, mode);
 		}
 
 		case VGA_SET_INDEXED_COLORS:
@@ -181,7 +177,9 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 		}
 
 		default:
-			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %lu)\n", msg, bufferLength));
+			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %lu)\n",
+				msg, bufferLength));
+			break;
 	}
 
 	return B_DEV_INVALID_IOCTL;
@@ -189,17 +187,31 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 
 
 static status_t
-device_read(void */*cookie*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
+device_read(void* /*cookie*/, off_t /*pos*/, void* /*buffer*/, size_t* _length)
 {
-	*_length = 0;	
+	*_length = 0;
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-device_write(void */*cookie*/, off_t /*pos*/, const void */*buffer*/, size_t *_length)
+device_write(void* /*cookie*/, off_t /*pos*/, const void* /*buffer*/,
+	size_t* _length)
 {
-	*_length = 0;	
+	*_length = 0;
 	return B_NOT_ALLOWED;
 }
 
+
+device_hooks gDeviceHooks = {
+	device_open,
+	device_close,
+	device_free,
+	device_ioctl,
+	device_read,
+	device_write,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VESA_INFO_H
@@ -40,6 +40,7 @@ struct vesa_shared_info {
 
 	edid1_info		edid_info;
 	bool			has_edid;
+	uint32			dpms_capabilities;
 };
 
 //----------------- ioctl() interface ----------------
@@ -49,6 +50,8 @@ enum {
 	VESA_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 	VESA_GET_DEVICE_NAME,
 	VESA_SET_DISPLAY_MODE,
+	VESA_GET_DPMS_MODE,
+	VESA_SET_DPMS_MODE,
 
 	VGA_SET_INDEXED_COLORS,
 	VGA_PLANAR_BLIT,
