@@ -70,8 +70,8 @@ export SAFEMODE=`/bin/safemode`
 launchscript $SCRIPTS/SetupEnvironment
 
 # If the boot volume is a CD we use another script
-iw=`/bin/isvolume -readonly-partition /boot`
-if [ "$iw" = "yes" ]; then
+isReadOnly=`/bin/isvolume -readonly-partition /boot`
+if [ "$isReadOnly" = "yes" ]; then
 	# block the CD tray (avoid accidental ejection)
 	# This option stays 'on' even if we continue booting to the desktop.
 	/bin/eject -b /boot
@@ -105,7 +105,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
-if [ "$iw" = "yes" ]; then
+if [ "$isReadOnly" = "yes" ]; then
 	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Installer" "Desktop"
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
