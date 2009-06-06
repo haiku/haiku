@@ -13,6 +13,7 @@ Application CDPlayer :
 	TwoStateDrawButton.cpp
 	VolumeSlider.cpp
 
-	: be $(TARGET_SELECT_UNAME_ETC_LIB) $(TARGET_NETAPI_LIB) translation textencoding 
+	: be $(TARGET_SELECT_UNAME_ETC_LIB) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+		translation textencoding
 	: CDPlayer.rdef
 ;
