@@ -1,6 +1,10 @@
 #ifndef _PLUGIN_MANAGER_H
 #define _PLUGIN_MANAGER_H
 
+
+#include <string.h>
+
+
 #include "ReaderPlugin.h"
 #include "DecoderPlugin.h"
 #include <TList.h>
