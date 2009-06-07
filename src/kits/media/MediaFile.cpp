@@ -78,16 +78,25 @@ BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 status_t
 BMediaFile::SetTo(const entry_ref* ref)
 {
-	debugger("BMediaFile::SetTo not implemented");
-	return B_OK;
+	CALLED();
+
+	_UnInit();
+	fDeleteSource = true;
+	_InitReader(new (std::nothrow) BFile(ref, O_RDONLY));
+
+	return fErr;
 }
 
 
 status_t
 BMediaFile::SetTo(BDataIO* destination)
 {
-	debugger("BMediaFile::SetTo not implemented");
-	return B_OK;
+	CALLED();
+
+	_UnInit();
+	_InitReader(destination);
+
+	return fErr;
 }
 
 
@@ -95,11 +104,7 @@ BMediaFile::~BMediaFile()
 {
 	CALLED();
 
-	ReleaseAllTracks();
-	delete[] fTrackList;
-	delete fExtractor;
-	if (fDeleteSource)
-		delete fSource;
+	_UnInit();
 }
 
 
@@ -356,6 +361,23 @@ BMediaFile::_Init()
 	fWriter = NULL;
 	fWriterID = 0;
 	fFileClosed = false;
+}
+
+
+void
+BMediaFile::_UnInit()
+{
+	ReleaseAllTracks();
+	delete[] fTrackList;
+	fTrackList = NULL;
+	fTrackNum = 0;
+	delete fExtractor;
+	fExtractor = NULL;
+	if (fDeleteSource) {
+		delete fSource;
+		fSource = NULL;
+		fDeleteSource = false;
+	}
 }
 
 

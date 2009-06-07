@@ -157,6 +157,7 @@ private:
 			BMediaTrack**		fTrackList;
 
 			void				_Init();
+			void				_UnInit();
 			void				_InitReader(BDataIO* source, int32 flags = 0);
 			void				_InitWriter(BDataIO* source,
 									const media_file_format* mfi, int32 flags);
