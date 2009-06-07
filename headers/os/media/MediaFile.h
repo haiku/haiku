@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2002 - 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MEDIA_FILE_H
 #define	_MEDIA_FILE_H
 
-#include <kernel/image.h>
+#include <image.h>
 #include <List.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
