@@ -392,8 +392,10 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 {
 	CALLED();
 
-	if (source == NULL)
+	if (source == NULL) {
+		fErr = B_NO_MEMORY;
 		return;
+	}
 
 	fSource = source;
 
