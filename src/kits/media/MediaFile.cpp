@@ -80,6 +80,9 @@ BMediaFile::SetTo(const entry_ref* ref)
 {
 	CALLED();
 
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
 	_UnInit();
 	fDeleteSource = true;
 	_InitReader(new (std::nothrow) BFile(ref, O_RDONLY));
@@ -92,6 +95,9 @@ status_t
 BMediaFile::SetTo(BDataIO* destination)
 {
 	CALLED();
+
+	if (destination == NULL)
+		return B_BAD_VALUE;
 
 	_UnInit();
 	_InitReader(destination);
