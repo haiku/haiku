@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "efi_gpt.h"
 
 #include <KernelExport.h>
@@ -39,7 +38,7 @@ struct static_guid {
 	uint64	data4;
 
 	inline bool operator==(const guid &other) const;
-};
+} _PACKED;
 
 const static struct type_map {
 	static_guid	guid;
@@ -48,7 +47,7 @@ const static struct type_map {
 	{{0x48465300, 0x0000, 0x11aa, 0xaa1100306543ECACLL}, "HFS+ File System"}
 };
 
- 
+
 namespace EFI {
 
 class Header {
@@ -170,7 +169,8 @@ Header::Header(int fd, off_t block, uint32 blockSize)
 
 	// read and check the partition table header
 
-	ssize_t bytesRead = read_pos(fd, block * blockSize, &fHeader, sizeof(fHeader));
+	ssize_t bytesRead = read_pos(fd, block * blockSize, &fHeader,
+		sizeof(fHeader));
 	if (bytesRead != (ssize_t)sizeof(fHeader)) {
 		if (bytesRead < B_OK)
 			fStatus = bytesRead;
@@ -249,11 +249,13 @@ Header::_ValidateCRC(uint8 *data, size_t size) const
 const char *
 Header::_PrintGUID(const guid_t &id)
 {
-	static char guid[48];	
-	snprintf(guid, sizeof(guid), "%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+	static char guid[48];
+	snprintf(guid, sizeof(guid),
+		"%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		B_LENDIAN_TO_HOST_INT32(id.data1), B_LENDIAN_TO_HOST_INT16(id.data2),
-		B_LENDIAN_TO_HOST_INT16(id.data3), id.data4[0], id.data4[1], id.data4[2],
-		id.data4[3], id.data4[4], id.data4[5], id.data4[6], id.data4[7]);
+		B_LENDIAN_TO_HOST_INT16(id.data3), id.data4[0], id.data4[1],
+		id.data4[2], id.data4[3], id.data4[4], id.data4[5], id.data4[6],
+		id.data4[7]);
 	return guid;
 }
 
@@ -286,7 +288,8 @@ Header::_DumpPartitions()
 		if (entry.partition_type == kEmptyGUID)
 			continue;
 
-		dprintf("[%3ld] partition type: %s\n", i, _PrintGUID(entry.partition_type));
+		dprintf("[%3ld] partition type: %s\n", i,
+			_PrintGUID(entry.partition_type));
 		dprintf("      unique id: %s\n", _PrintGUID(entry.unique_guid));
 		dprintf("      start block: %Ld\n", entry.StartBlock());
 		dprintf("      end block: %Ld\n", entry.EndBlock());
@@ -323,8 +326,8 @@ efi_gpt_std_ops(int32 op, ...)
 static float
 efi_gpt_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	EFI::Header *header = new (std::nothrow) EFI::Header(fd, EFI_HEADER_LOCATION,
-		partition->block_size);
+	EFI::Header *header = new (std::nothrow) EFI::Header(fd,
+		EFI_HEADER_LOCATION, partition->block_size);
 	status_t status = header->InitCheck();
 	if (status < B_OK) {
 		delete header;
@@ -356,13 +359,16 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 		if (entry.partition_type == kEmptyGUID)
 			continue;
 
-		if (entry.EndBlock() * partition->block_size > (uint64)partition->size) {
+		if (entry.EndBlock() * partition->block_size
+				> (uint64)partition->size) {
 			TRACE(("efi_gpt: child partition exceeds existing space (%Ld MB)\n",
-				(entry.EndBlock() - entry.StartBlock()) * partition->block_size / 1024 / 1024));
+				(entry.EndBlock() - entry.StartBlock()) * partition->block_size
+				/ 1024 / 1024));
 			continue;
 		}
 
-		partition_data *child = create_child_partition(partition->id, index++, -1);
+		partition_data *child = create_child_partition(partition->id, index++,
+			-1);
 		if (child == NULL) {
 			TRACE(("efi_gpt: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
@@ -373,8 +379,10 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 		child->name = strdup(name);
 		child->type = strdup(get_partition_type(entry.partition_type));
 
-		child->offset = partition->offset + entry.StartBlock() * partition->block_size;
-		child->size = (entry.EndBlock() - entry.StartBlock()) * partition->block_size;			
+		child->offset = partition->offset + entry.StartBlock()
+			* partition->block_size;
+		child->size = (entry.EndBlock() - entry.StartBlock())
+			* partition->block_size;
 		child->block_size = partition->block_size;
 	}
 
@@ -416,4 +424,3 @@ partition_module_info *modules[] = {
 	NULL
 };
 #endif
-
