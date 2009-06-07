@@ -150,9 +150,8 @@ private:
 			return false;
 		delete items[index];
 		item_count--;
-		items[index] = items[item_count];
-		if (index == item_iter)
-			item_iter--;
+		for (int i = index; i < item_count; i++)
+			items[i] = items[i + 1];
 		return true;
 	}
 
