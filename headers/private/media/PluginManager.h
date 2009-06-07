@@ -36,6 +36,15 @@ private:
 		int			usecount;
 		MediaPlugin *plugin;
 		image_id	image;
+
+		plugin_info& operator=(const plugin_info& other)
+		{
+			strcpy(name, other.name);
+			usecount = other.usecount;
+			plugin = other.plugin;
+			image = other.image;
+			return *this;
+		}
 	};
 
 	List<plugin_info> *fPluginList;

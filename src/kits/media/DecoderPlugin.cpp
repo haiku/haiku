@@ -1,18 +1,20 @@
 /* 
-** Copyright 2004, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
-
+ * Copyright 2004, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "DecoderPlugin.h"
 
-#include <MediaFormats.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <MediaFormats.h>
+
 
 Decoder::Decoder()
- :	fChunkProvider(NULL)
+	:
+	fChunkProvider(NULL),
+	fMediaPlugin(NULL)
 {
 }
 
@@ -38,6 +40,18 @@ Decoder::SetChunkProvider(ChunkProvider *provider)
 	fChunkProvider = provider;
 }
 
+
+status_t
+Decoder::Perform(perform_code code, void* _data)
+{
+	return B_OK;
+}
+
+void Decoder::_ReservedDecoder1() {}
+void Decoder::_ReservedDecoder2() {}
+void Decoder::_ReservedDecoder3() {}
+void Decoder::_ReservedDecoder4() {}
+void Decoder::_ReservedDecoder5() {}
 
 //	#pragma mark -
 

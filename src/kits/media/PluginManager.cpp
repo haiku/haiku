@@ -49,7 +49,7 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 			return B_ERROR;
 		}
 
-		ReaderPlugin *readerPlugin = dynamic_cast<ReaderPlugin *>(plugin);
+		ReaderPlugin *readerPlugin = dynamic_cast<ReaderPlugin*>(plugin);
 		if (!readerPlugin) {
 			printf("PluginManager::CreateReader: dynamic_cast failed\n");
 			PutPlugin(plugin);
@@ -57,7 +57,7 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 		}
 
 		*reader = readerPlugin->NewReader();
-		if (! *reader) {
+		if (*reader == NULL) {
 			printf("PluginManager::CreateReader: NewReader failed\n");
 			PutPlugin(plugin);
 			return B_ERROR;
@@ -65,6 +65,7 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 
 		seekable_source->Seek(0, SEEK_SET);
 		(*reader)->Setup(seekable_source);
+		(*reader)->fMediaPlugin = plugin;
 
 		if ((*reader)->Sniff(streamCount) == B_OK) {
 			TRACE("PluginManager::CreateReader: Sniff success "
@@ -73,9 +74,7 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 			return B_OK;
 		}
 
-		// _DestroyReader(*reader);
-		delete *reader;
-		PutPlugin(plugin);
+		DestroyReader(*reader);
 	}
 
 	TRACE("PluginManager::CreateReader leave\n");
@@ -84,10 +83,18 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 
 
 void
-PluginManager::DestroyReader(Reader *reader)
+PluginManager::DestroyReader(Reader* reader)
 {
-	// ToDo: must call put plugin
-	delete reader;
+	if (reader != NULL) {
+		TRACE("PluginManager::DestroyReader(%p (plugin: %p))\n", reader,
+			reader->fMediaPlugin);
+		// NOTE: We have to put the plug-in after deleting the reader,
+		// since otherwise we may actually unload the code for the
+		// destructor...
+		MediaPlugin* plugin = reader->fMediaPlugin;
+		delete reader;
+		PutPlugin(plugin);
+	}
 }
 
 
@@ -108,7 +115,7 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 		return ret;
 	}
 
-	MediaPlugin *plugin = GetPlugin(reply.ref);
+	MediaPlugin* plugin = GetPlugin(reply.ref);
 	if (!plugin) {
 		printf("PluginManager::CreateDecoder: GetPlugin failed\n");
 		return B_ERROR;
@@ -127,6 +134,8 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 		PutPlugin(plugin);
 		return B_ERROR;
 	}
+	TRACE("  created decoder: %p\n", *_decoder);
+	(*_decoder)->fMediaPlugin = plugin;
 
 	TRACE("PluginManager::CreateDecoder leave\n");
 
@@ -161,8 +170,16 @@ PluginManager::GetDecoderInfo(Decoder *decoder,
 void
 PluginManager::DestroyDecoder(Decoder *decoder)
 {
-	// ToDo: must call put plugin
-	delete decoder;
+	if (decoder != NULL) {
+		TRACE("PluginManager::DestroyDecoder(%p, plugin: %p)\n", decoder,
+			decoder->fMediaPlugin);
+		// NOTE: We have to put the plug-in after deleting the decoder,
+		// since otherwise we may actually unload the code for the
+		// destructor...
+		MediaPlugin* plugin = decoder->fMediaPlugin;
+		delete decoder;
+		PutPlugin(plugin);
+	}
 }
 
 
@@ -180,14 +197,13 @@ PluginManager::PluginManager()
 PluginManager::~PluginManager()
 {
 	CALLED();
-	while (!fPluginList->IsEmpty()) {
+	for (int i = fPluginList->CountItems() - 1; i >= 0; i--) {
 		plugin_info *info = NULL;
-		fPluginList->Get(fPluginList->CountItems() - 1, &info);
+		fPluginList->Get(i, &info);
 		printf("PluginManager: Error, unloading PlugIn %s with usecount "
 			"%d\n", info->name, info->usecount);
 		delete info->plugin;
 		unload_add_on(info->image);
-		fPluginList->Remove(fPluginList->CountItems() - 1);
 	}
 	delete fLocker;
 }
@@ -196,6 +212,7 @@ PluginManager::~PluginManager()
 MediaPlugin *
 PluginManager::GetPlugin(const entry_ref &ref)
 {
+	TRACE("PluginManager::GetPlugin(%s)\n", ref.name);
 	fLocker->Lock();
 	
 	MediaPlugin *plugin;
@@ -206,6 +223,7 @@ PluginManager::GetPlugin(const entry_ref &ref)
 		if (0 == strcmp(ref.name, pinfo->name)) {
 			plugin = pinfo->plugin;
 			pinfo->usecount++;
+			TRACE("  found existing plugin: %p\n", pinfo->plugin);
 			fLocker->Unlock();
 			return plugin;
 		}
@@ -224,6 +242,7 @@ PluginManager::GetPlugin(const entry_ref &ref)
 	TRACE("PluginManager: PlugIn %s loaded\n", ref.name);
 
 	plugin = info.plugin;
+	TRACE("  loaded plugin: %p\n", plugin);
 	
 	fLocker->Unlock();
 	return plugin;
@@ -231,8 +250,9 @@ PluginManager::GetPlugin(const entry_ref &ref)
 
 
 void
-PluginManager::PutPlugin(MediaPlugin *plugin)
+PluginManager::PutPlugin(MediaPlugin* plugin)
 {
+	TRACE("PluginManager::PutPlugin()\n");
 	fLocker->Lock();
 	
 	plugin_info *pinfo;
@@ -241,7 +261,9 @@ PluginManager::PutPlugin(MediaPlugin *plugin)
 		if (plugin == pinfo->plugin) {
 			pinfo->usecount--;
 			if (pinfo->usecount == 0) {
+				TRACE("  deleting %p\n", pinfo->plugin);
 				delete pinfo->plugin;
+				TRACE("  unloading add-on: %ld\n\n", pinfo->image);
 				unload_add_on(pinfo->image);
 				fPluginList->RemoveCurrent();
 			}
@@ -266,6 +288,7 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin,
 
 	image_id id;
 	id = load_add_on(p.Path());
+	TRACE("  loaded add-on: %ld\n", id);
 	if (id < 0)
 		return B_ERROR;
 		

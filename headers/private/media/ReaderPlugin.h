@@ -6,6 +6,8 @@
 
 namespace BPrivate { namespace media {
 
+class PluginManager;
+
 enum {
 	B_MEDIA_SEEK_TO_TIME	= 0x10000,
 	B_MEDIA_SEEK_TO_FRAME	= 0x20000
@@ -41,12 +43,26 @@ public:
 									media_header* mediaHeader) = 0;
 	
 			BDataIO*			Source() const;
-	
+
+	virtual status_t			Perform(perform_code code, void* data);
+
 private:
+	virtual void				_ReservedReader1();
+	virtual void				_ReservedReader2();
+	virtual void				_ReservedReader3();
+	virtual void				_ReservedReader4();
+	virtual void				_ReservedReader5();
+
 public: // XXX for test programs only
 			void				Setup(BDataIO* source);
 
 			BDataIO*			fSource;
+
+	// needed for plug-in reference count management
+	friend class PluginManager;
+			MediaPlugin*		fMediaPlugin;
+
+			uint32				fReserved[5];
 };
 
 

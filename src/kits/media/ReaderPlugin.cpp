@@ -1,8 +1,17 @@
+/* 
+ * Copyright 2004, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "ReaderPlugin.h"
+
+#include <stdio.h>
 
 
 Reader::Reader()
- :	fSource(0)
+	:
+	fSource(0),
+	fMediaPlugin(NULL)
 {
 }
 
@@ -38,3 +47,17 @@ Reader::Setup(BDataIO *source)
 {
 	fSource = source;
 }
+
+
+status_t
+Reader::Perform(perform_code code, void* _data)
+{
+	return B_OK;
+}
+
+void Reader::_ReservedReader1() {}
+void Reader::_ReservedReader2() {}
+void Reader::_ReservedReader3() {}
+void Reader::_ReservedReader4() {}
+void Reader::_ReservedReader5() {}
+
