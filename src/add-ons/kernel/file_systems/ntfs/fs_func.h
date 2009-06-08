@@ -19,10 +19,9 @@
  * file COPYING); if not, write to the Free Software Foundation,Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
- 
-#ifndef _fs_FUNC_H_
-#define _fs_FUNC_H_ 
- 
+#ifndef NTFS_FS_FUNC_H
+#define NTFS_FS_FUNC_H
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -42,52 +41,68 @@
 #include "lock.h"
 #include "volume_util.h"
 
-#define FS_DIR_MODE		S_IFDIR | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
-#define FS_FILE_MODE	S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
-#define FS_SLNK_MODE	S_IFLNK | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH
+#define FS_DIR_MODE		S_IFDIR | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+	S_IWGRP | S_IWOTH
+#define FS_FILE_MODE	S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+	S_IWGRP | S_IWOTH
+#define FS_SLNK_MODE	S_IFLNK | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+	S_IWGRP | S_IWOTH
 
 
 extern fs_vnode_ops gNTFSVnodeOps;
 extern fs_volume_ops gNTFSVolumeOps;
 
 
-float		fs_identify_partition(int fd, partition_data *partition, void **_cookie);
+float		fs_identify_partition(int fd, partition_data *partition,
+				void **_cookie);
 status_t	fs_scan_partition(int fd, partition_data *partition, void *_cookie);
-void		fs_free_identify_partition_cookie(partition_data *partition, void *_cookie);
+void		fs_free_identify_partition_cookie(partition_data *partition,
+				void *_cookie);
 
-status_t	fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino_t *vnid);
-status_t	fs_create_symlink(fs_volume *volume, fs_vnode *dir, const char *name, const char *target, int mode);
-status_t   	fs_create(fs_volume *volume, fs_vnode *dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid);
-status_t	fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid);
-status_t	fs_get_vnode_name(fs_volume *volume, fs_vnode *vnode, char *buffer, size_t bufferSize);
+status_t	fs_mount(fs_volume *_vol, const char *device, ulong flags,
+				const char *args, ino_t *vnid);
+status_t	fs_create_symlink(fs_volume *volume, fs_vnode *dir, const char *name,
+				const char *target, int mode);
+status_t   	fs_create(fs_volume *volume, fs_vnode *dir, const char *name,
+				int omode, int perms, void **_cookie, ino_t *_vnid);
+status_t	fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file,
+				ino_t *vnid);
+status_t	fs_get_vnode_name(fs_volume *volume, fs_vnode *vnode, char *buffer,
+				size_t bufferSize);
 status_t	fs_unmount(fs_volume *_vol);
 status_t	fs_rfsstat(fs_volume *_vol, struct fs_info *);
 status_t  	fs_wfsstat(fs_volume *_vol, const struct fs_info *fss, uint32 mask);
 status_t 	fs_sync(fs_volume *_vol);
-status_t	fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *_flags, bool reenter);
+status_t	fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node,
+				int *_type, uint32 *_flags, bool reenter);
 status_t	fs_write_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
 status_t    fs_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
 status_t	fs_access(fs_volume *volume, fs_vnode *vnode, int mode);
 status_t	fs_rstat(fs_volume *volume, fs_vnode *vnode, struct stat *st);
-status_t	fs_wstat(fs_volume *volume, fs_vnode *vnode, const struct stat *st, uint32 mask);
-status_t	fs_open(fs_volume *volume, fs_vnode *vnode, int omode, void **cookie);
+status_t	fs_wstat(fs_volume *volume, fs_vnode *vnode, const struct stat *st,
+				uint32 mask);
+status_t	fs_open(fs_volume *volume, fs_vnode *vnode, int omode,
+				void **cookie);
 status_t	fs_close(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
-status_t	fs_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, void *buf, size_t *len);
-status_t	fs_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, const void *buf, size_t *len);
-status_t	fs_mkdir(fs_volume *volume, fs_vnode *parent, const char *name,	int perms);
+status_t	fs_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
+				void *buf, size_t *len);
+status_t	fs_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
+				const void *buf, size_t *len);
+status_t	fs_mkdir(fs_volume *volume, fs_vnode *parent, const char *name,
+				int perms);
 status_t 	fs_rmdir(fs_volume *volume, fs_vnode *parent, const char *name);
 status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
-status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
+status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie,
+				struct dirent *buf, size_t bufsize, uint32 *num);
 status_t	fs_rewinddir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_closedir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
-status_t 	fs_readlink(fs_volume *volume, fs_vnode *link, char *buf, size_t *bufsize);
+status_t 	fs_readlink(fs_volume *volume, fs_vnode *link, char *buf,
+				size_t *bufsize);
 status_t 	fs_fsync(fs_volume *_vol, fs_vnode *_node);
-status_t    fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName, fs_vnode *toDir, const char *toName);
+status_t    fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName,
+				fs_vnode *toDir, const char *toName);
 status_t    fs_unlink(fs_volume *volume, fs_vnode *dir, const char *name);
 
-
-status_t 	do_unlink(fs_volume *volume, vnode *dir, const char *name, bool isdir);
-
-#endif
+#endif	// NTFS_FS_FUNC_H

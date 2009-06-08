@@ -66,7 +66,7 @@ get_node_type(ntfs_inode* ni, int* _type)
 	if (!na)
 		return ENOENT;
 
-	if (!ni->flags & FILE_ATTR_HIDDEN) {
+	if (!(ni->flags & FILE_ATTR_HIDDEN)) {
 		if (na->data_size == 0)
 			*_type = S_IFIFO;
 	}
@@ -101,9 +101,9 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
 	NTFS_BOOT_SECTOR boot;
 	identify_cookie *cookie;
-	ntfs_volume		*ntVolume;
-	uint8			*buf=(uint8*)&boot;
-	char			devpath[256];
+	ntfs_volume *ntVolume;
+	uint8 *buf = (uint8*)&boot;
+	char devpath[256];
 
 	// read in the boot sector
 	ERRPRINT("fs_identify_partition: read in the boot sector\n");
@@ -112,40 +112,41 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	}
 
 	// check boot signature
-	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+	if ((buf[0x1fe] != 0x55 || buf[0x1ff] != 0xaa) && buf[0x15] == 0xf8)
 		return -1;
 
-	//check boot signature NTFS
-	if (memcmp(buf+3, "NTFS    ", 8)!=0)
+	// check boot signature NTFS
+	if (memcmp(buf + 3, "NTFS    ", 8) != 0)
 		return -1;
 
-	//get path for device
-	if(!ioctl(fd,B_GET_PATH_FOR_DEVICE,devpath))
-		return -1;
-	//try mount
-	ntVolume = utils_mount_volume(devpath,MS_RDONLY,true);
-	if(!ntVolume)
+	// get path for device
+	if (!ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath))
 		return -1;
 
-	//allocate identify_cookie
+	// try mount
+	ntVolume = utils_mount_volume(devpath, MS_RDONLY, true);
+	if (!ntVolume)
+		return -1;
+
+	// allocate identify_cookie
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
 	if (!cookie)
 		return -1;
 
-	memcpy(&(cookie->boot),&boot,512);
+	memcpy(&cookie->boot, &boot, 512);
 
-	strcpy(cookie->label,"NTFS Volume");
+	strcpy(cookie->label, "NTFS Volume");
 
-	if(ntVolume->vol_name)
-		if(strlen(ntVolume->vol_name)>0)
-			strcpy(cookie->label,ntVolume->vol_name);
+	if (ntVolume->vol_name && ntVolume->vol_name[0] != '\0')
+		strcpy(cookie->label, ntVolume->vol_name);
 
-	ntfs_umount( ntVolume, true );
+	ntfs_umount(ntVolume, true);
 
 	*_cookie = cookie;
 
 	return 0.8f;
 }
+
 
 status_t
 fs_scan_partition(int fd, partition_data *partition, void *_cookie)
@@ -153,11 +154,13 @@ fs_scan_partition(int fd, partition_data *partition, void *_cookie)
 	identify_cookie *cookie = (identify_cookie *)_cookie;
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
-	partition->content_size = sle64_to_cpu(cookie->boot.number_of_sectors) * le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
+	partition->content_size = sle64_to_cpu(cookie->boot.number_of_sectors)
+		* le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
 	partition->block_size = le16_to_cpu(cookie->boot.bpb.bytes_per_sector);
 	partition->content_name = strdup(cookie->label);
 	return B_OK;
 }
+
 
 void
 fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
@@ -168,30 +171,30 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 status_t
-fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino_t *_rootID)
+fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
+	ino_t *_rootID)
 {
-	nspace		*ns;
-	vnode		*newNode = NULL;
-	char 		lockname[32];
-	void 		*handle;
-	unsigned long mnt_flags = 0;
-	status_t	result = B_NO_ERROR;
+	nspace *ns;
+	vnode *newNode = NULL;
+	char lockname[32];
+	void *handle;
+	unsigned long mountFlags = 0;
+	status_t result = B_NO_ERROR;
 
 	ERRPRINT("fs_mount - ENTER\n");
 
 	ns = ntfs_malloc(sizeof(nspace));
 	if (!ns) {
 		result = ENOMEM;
-		goto	exit;
+		goto exit;
 	}
 
 	*ns = (nspace) {
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
 		.show_sys_files = false,
-		.ro = false
+		.ro = false,
+		.flags = 0
 	};
-
-	ns->flags = flags;
 
 	strcpy(ns->devicePath,device);
 
@@ -199,20 +202,24 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 	recursive_lock_init_etc(&(ns->vlock), lockname, MUTEX_FLAG_CLONE_NAME);
 
 	handle = load_driver_settings("ntfs");
-	ns->show_sys_files = ! (strcasecmp(get_driver_parameter(handle, "hide_sys_files", "true", "true"), "true") == 0);
-	ns->ro = strcasecmp(get_driver_parameter(handle, "read_only", "false", "false"), "false") != 0;
-	ns->noatime = strcasecmp(get_driver_parameter(handle, "no_atime", "true", "true"), "true") == 0;
+	ns->show_sys_files = ! (strcasecmp(get_driver_parameter(handle,
+		"hide_sys_files", "true", "true"), "true") == 0);
+	ns->ro = strcasecmp(get_driver_parameter(handle, "read_only", "false",
+		"false"), "false") != 0;
+	ns->noatime = strcasecmp(get_driver_parameter(handle, "no_atime", "true",
+		"true"), "true") == 0;
 	unload_driver_settings(handle);
 
-	if (ns->ro || ns->flags & B_MOUNT_READ_ONLY) {
-		mnt_flags |= MS_RDONLY;
-		ns->flags |= B_MOUNT_READ_ONLY;
+	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0) {
+		mountFlags |= MS_RDONLY;
+		ns->flags |= B_FS_IS_READONLY;
 	}
 //	if (ns->noatime)
 //		mnt_flags |= MS_NOATIME;
 
-	ns->ntvol=utils_mount_volume(device,mnt_flags,true);
-	if(ns->ntvol!=NULL)
+	// TODO: this does not take read-only volumes into account!
+	ns->ntvol = utils_mount_volume(device, mountFlags, true);
+	if (ns->ntvol != NULL)
 		result = B_NO_ERROR;
 	else
 		result = errno;
@@ -223,22 +230,20 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 		_vol->private_volume = (void *)ns;
 		_vol->ops = &gNTFSVolumeOps;
 
-		newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
-		if ( newNode == NULL )
+		newNode = (vnode*)ntfs_calloc(sizeof(vnode));
+		if (newNode == NULL)
 			result = ENOMEM;
 		else {
-
 			newNode->vnid = *_rootID;
 			newNode->parent_vnid = -1;
 
-			result = publish_vnode( _vol, *_rootID, (void*)newNode,
+			result = publish_vnode(_vol, *_rootID, (void*)newNode,
 				&gNTFSVnodeOps, S_IFDIR, 0);
-			if ( result != B_NO_ERROR )	{
-				free( ns );
+			if (result != B_NO_ERROR) {
+				free(ns);
 				result = EINVAL;
-				goto	exit;
-			}
-			else {
+				goto exit;
+			} else {
 				result = B_NO_ERROR;
 				ntfs_mark_free_space_outdated(ns);
 				ntfs_calc_free_space(ns);
@@ -247,36 +252,37 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino
 	}
 
 exit:
-
 	ERRPRINT("fs_mount - EXIT, result code is %s\n", strerror(result));
 
 	return result;
 }
 
+
 status_t
 fs_unmount(fs_volume *_vol)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	status_t result = B_NO_ERROR;
 
 	ERRPRINT("fs_unmount - ENTER\n");
 
-	ntfs_umount( ns->ntvol, true );
+	ntfs_umount(ns->ntvol, true);
 
 	recursive_lock_destroy(&(ns->vlock));
 
-	free( ns );
+	free(ns);
 
 	ERRPRINT("fs_unmount - EXIT, result is %s\n", strerror(result));
 
 	return result;
 }
 
+
 status_t
-fs_rfsstat( fs_volume *_vol, struct fs_info * fss )
+fs_rfsstat(fs_volume *_vol, struct fs_info *fss)
 {
-	nspace	*ns = (nspace*)_vol->private_volume;
-	int 	i;
+	nspace *ns = (nspace*)_vol->private_volume;
+	int i;
 
 	LOCK_VOL(ns);
 
@@ -286,23 +292,25 @@ fs_rfsstat( fs_volume *_vol, struct fs_info * fss )
 
 	fss->dev = ns->id;
 	fss->root = FILE_root;
-	fss->flags = B_FS_IS_PERSISTENT|B_FS_HAS_MIME|B_FS_HAS_ATTR;
+	fss->flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME | B_FS_HAS_ATTR | ns->flags;
+
 	fss->block_size = ns->ntvol->cluster_size;
 	fss->io_size = 65536;
 	fss->total_blocks = ns->ntvol->nr_clusters;
 	fss->free_blocks = ns->free_clusters;
-	strncpy( fss->device_name, ns->devicePath, sizeof(fss->device_name));
-	strncpy( fss->volume_name, ns->ntvol->vol_name, sizeof(fss->volume_name) );
+	strncpy(fss->device_name, ns->devicePath, sizeof(fss->device_name));
+	strncpy(fss->volume_name, ns->ntvol->vol_name, sizeof(fss->volume_name));
 
-	for (i = strlen(fss->volume_name)-1; i >=0 ; i--)
+	for (i = strlen(fss->volume_name) - 1; i >=0 ; i--) {
 		if (fss->volume_name[i] != ' ')
 			break;
+	}
 	if (i < 0)
 		strcpy(fss->volume_name, "NTFS Untitled");
 	else
 		fss->volume_name[i + 1] = 0;
 
-	strcpy( fss->fsh_name, "NTFS" );
+	strcpy(fss->fsh_name, "NTFS");
 
 	ERRPRINT("fs_rfsstat - EXIT\n");
 
@@ -313,10 +321,10 @@ fs_rfsstat( fs_volume *_vol, struct fs_info * fss )
 
 
 status_t
-fs_wfsstat( fs_volume *_vol, const struct fs_info * fss, uint32 mask)
+fs_wfsstat(fs_volume *_vol, const struct fs_info *fss, uint32 mask)
 {
-	nspace* 	ns = (nspace*)_vol->private_volume;
-	status_t	result = B_NO_ERROR;
+	nspace* ns = (nspace*)_vol->private_volume;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -326,79 +334,78 @@ fs_wfsstat( fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 	LOCK_VOL(ns);
 
 	if (mask & FS_WRITE_FSINFO_NAME) {
-		result = ntfs_change_label( ns->ntvol,  (char*)fss->volume_name );
+		result = ntfs_change_label(ns->ntvol, (char*)fss->volume_name);
 		goto exit;
 	}
 
 exit:
-
 	UNLOCK_VOL(ns);
 
 	return result;
 }
 
+
 status_t
 fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*baseNode = (vnode*)_dir->private_node;
-	vnode		*newNode = NULL;
-	ntfschar 	*unicode = NULL;
-	ntfs_inode 	*bi = NULL;
-	status_t	result = B_NO_ERROR;
-	int			len;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *baseNode = (vnode*)_dir->private_node;
+	vnode *newNode = NULL;
+	ntfschar *unicode = NULL;
+	ntfs_inode *bi = NULL;
+	status_t result = B_NO_ERROR;
+	int len;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_walk - ENTER : find for \"%s\"\n",file);
 
-	if(ns == NULL || _dir == NULL || file == NULL || vnid == NULL) {
-	  result = EINVAL;
-	  goto	exit;
-	 }
+	if (ns == NULL || _dir == NULL || file == NULL || vnid == NULL) {
+		result = EINVAL;
+		goto exit;
+	}
 
-	if ( !strcmp( file, "." ) )	{
+	if (!strcmp(file, ".")) {
 		*vnid = baseNode->vnid;
-		if ( get_vnode( _vol, *vnid, (void**)&newNode ) != 0 )
+		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
 			result = ENOENT;
-	} else if ( !strcmp( file, ".." ) && baseNode->vnid != FILE_root ) {
+	} else if (!strcmp(file, "..") && baseNode->vnid != FILE_root) {
 		*vnid = baseNode->parent_vnid;
-		if ( get_vnode( _vol, *vnid, (void**)&newNode ) != 0 )
+		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
 			result = ENOENT;
 	} else {
-			unicode = ntfs_calloc(MAX_PATH);
-			len = ntfs_mbstoucs(file, &unicode);
-			if (len < 0) {
-				result = EILSEQ;
-				goto exit;
-		 	}
+		unicode = ntfs_calloc(MAX_PATH);
+		len = ntfs_mbstoucs(file, &unicode);
+		if (len < 0) {
+			result = EILSEQ;
+			goto exit;
+		}
 
-			bi = ntfs_inode_open(ns->ntvol, baseNode->vnid);
-			if(!bi) {
-				result = ENOENT;
-				goto exit;
-			}
+		bi = ntfs_inode_open(ns->ntvol, baseNode->vnid);
+		if (!bi) {
+			result = ENOENT;
+			goto exit;
+		}
 
-			*vnid = MREF( ntfs_inode_lookup_by_name(bi, unicode, len) );
-			ERRPRINT("fs_walk - VNID = %d\n",*vnid);
+		*vnid = MREF(ntfs_inode_lookup_by_name(bi, unicode, len));
+		ERRPRINT("fs_walk - VNID = %d\n",*vnid);
 
-			ntfs_inode_close(bi);
-			free(unicode);
+		ntfs_inode_close(bi);
+		free(unicode);
 
-			if ( *vnid == (u64) -1 ) {
-				result = EINVAL;
-				goto exit;
-			}
+		if (*vnid == (u64)-1) {
+			result = EINVAL;
+			goto exit;
+		}
 
-			if( get_vnode( _vol, *vnid, (void**)&newNode ) !=0 )
-				result = ENOENT;
+		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
+			result = ENOENT;
 
-			if(newNode!=NULL)
-				newNode->parent_vnid = baseNode->vnid;
+		if (newNode!=NULL)
+			newNode->parent_vnid = baseNode->vnid;
 	}
 
 exit:
-
 	ERRPRINT("fs_walk - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
@@ -406,37 +413,39 @@ exit:
 	return result;
 }
 
-status_t
-fs_get_vnode_name(fs_volume *_vol, fs_vnode *_vnode, char *buffer, size_t bufferSize)
-{
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode   	*node = (vnode*)_vnode->private_node;
-	ntfs_inode	*ni=NULL;
-	status_t	result = B_NO_ERROR;
 
-	char 	path[MAX_PATH];
-	char 	*name;
+status_t
+fs_get_vnode_name(fs_volume *_vol, fs_vnode *_vnode, char *buffer,
+	size_t bufferSize)
+{
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_vnode->private_node;
+	ntfs_inode *ni = NULL;
+	status_t result = B_NO_ERROR;
+
+	char path[MAX_PATH];
+	char *name;
 
 	LOCK_VOL(ns);
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = ENOENT;
-			goto exit;
+	if (ni == NULL) {
+		result = ENOENT;
+		goto exit;
 	}
 
-	if(utils_inode_get_name(ni, path, MAX_PATH)==0) {
+	if (utils_inode_get_name(ni, path, MAX_PATH) == 0) {
 		result = EINVAL;
-		goto	exit;
+		goto exit;
 	}
+
 	name = strrchr(path, '/');
 	name++;
 
 	strlcpy(buffer, name, bufferSize);
 
 exit:
-
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	UNLOCK_VOL(ns);
@@ -446,14 +455,15 @@ exit:
 
 
 status_t
-fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *_flags, bool reenter)
+fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
+	uint32 *_flags, bool reenter)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*newNode = NULL;
-	ntfs_inode	*ni=NULL;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *newNode = NULL;
+	ntfs_inode *ni = NULL;
+	status_t result = B_NO_ERROR;
 
-	if ( !reenter )
+	if (!reenter)
 		LOCK_VOL(ns);
 
 	ERRPRINT("fs_read_vnode - ENTER\n");
@@ -462,8 +472,8 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *
 	_node->ops = &gNTFSVnodeOps;
 	_flags = 0;
 
-	newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
-	if ( newNode != NULL ) {
+	newNode = (vnode*)ntfs_calloc(sizeof(vnode));
+	if (newNode != NULL) {
 		char *name = NULL;
 
 		ni = ntfs_inode_open(ns->ntvol, vnid);
@@ -480,23 +490,22 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *
 		newNode->vnid = vnid;
 		newNode->parent_vnid = ntfs_get_parent_ref(ni);
 
-		if( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY )
+		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
 			set_mime(newNode, ".***");
 		else {
 			name = (char*)malloc(MAX_PATH);
-			if(name!=NULL) {
-				if(utils_inode_get_name(ni, name,MAX_PATH)==1)
+			if (name != NULL) {
+				if (utils_inode_get_name(ni, name,MAX_PATH) == 1)
 					set_mime(newNode, name);
 				free(name);
 			}
 		}
 
 		_node->private_node = newNode;
-	}
-	else
+	} else
 		result = ENOMEM;
-exit:
 
+exit:
 	if (ni != NULL)
 		ntfs_inode_close(ni);
 
@@ -505,78 +514,80 @@ exit:
 
 	ERRPRINT("fs_read_vnode - EXIT, result is %s\n", strerror(result));
 
-	if ( !reenter )
+	if (!reenter)
 		UNLOCK_VOL(ns);
 
 	return result;
 }
 
-status_t
-fs_write_vnode( fs_volume *_vol, fs_vnode *_node, bool reenter )
-{
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	status_t	result = B_NO_ERROR;
 
-	if ( !reenter )
+status_t
+fs_write_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
+{
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	status_t result = B_NO_ERROR;
+
+	if (!reenter)
 		LOCK_VOL(ns);
 
 	ERRPRINT("fs_write_vnode - ENTER (%Ld)\n", node->vnid);
 
-	if (node)
-		free( node );
+	free(node);
 
 	ERRPRINT("fs_write_vnode - EXIT\n");
 
-	if ( !reenter )
+	if (!reenter)
 		UNLOCK_VOL(ns);
 
 	return result;
 }
 
-status_t
-fs_remove_vnode( fs_volume *_vol, fs_vnode *_node, bool reenter )
-{
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	status_t	result = B_NO_ERROR;
 
-	if ( !reenter )
+status_t
+fs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
+{
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	status_t result = B_NO_ERROR;
+
+	// TODO: this does not look right! The space if the node must be freed *here*
+	if (!reenter)
 		LOCK_VOL(ns);
 
 	ERRPRINT("fs_remove_vnode - ENTER (%Ld)\n", node->vnid);
 
-	if(node)
-		free(node);
+	free(node);
 
 	ERRPRINT("fs_remove_vnode - EXIT, result is %s\n", strerror(result));
 
-	if ( !reenter )
+	if (!reenter)
 	 	UNLOCK_VOL(ns);
 
 	return result;
 }
 
+
 status_t
-fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
+fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	ntfs_inode 	*ni = NULL;
-	ntfs_attr 	*na;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	ntfs_inode *ni = NULL;
+	ntfs_attr *na;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_rstat - ENTER:\n");
 
-	if(ns==NULL || node ==NULL ||stbuf==NULL) {
+	if (ns == NULL || node == NULL ||stbuf == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
+	if (ni == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
@@ -584,7 +595,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 	stbuf->st_dev = ns->id;
 	stbuf->st_ino = MREF(ni->mft_no);
 
-	if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
+	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 		stbuf->st_mode = FS_DIR_MODE;
 		na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
 		if (na) {
@@ -608,12 +619,14 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 
 		stbuf->st_size = na->data_size;
 
-		if (!ni->flags & FILE_ATTR_HIDDEN) {
+		if (!(ni->flags & FILE_ATTR_HIDDEN)) {
 			if (na->data_size == 0)
 			stbuf->st_mode = S_IFIFO;
 		}
 
-		if (na->data_size <= sizeof(INTX_FILE_TYPES) + sizeof(ntfschar) * MAX_PATH && na->data_size >sizeof(INTX_FILE_TYPES)) {
+		if (na->data_size <= sizeof(INTX_FILE_TYPES)
+				+ sizeof(ntfschar) * MAX_PATH
+			&& na->data_size >sizeof(INTX_FILE_TYPES)) {
 			INTX_FILE *intx_file;
 
 			intx_file = ntfs_malloc(na->data_size);
@@ -622,7 +635,8 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 				ntfs_attr_close(na);
 				goto exit;
 			}
-			if (ntfs_attr_pread(na, 0, na->data_size,intx_file) != na->data_size) {
+			if (ntfs_attr_pread(na, 0, na->data_size,intx_file)
+					!= na->data_size) {
 				result = EINVAL;
 				free(intx_file);
 				ntfs_attr_close(na);
@@ -637,7 +651,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 	}
 
 	if (ns->flags & B_FS_IS_READONLY) {
-			stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+		stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 	}
 
 	stbuf->st_uid = 0;
@@ -647,8 +661,7 @@ fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 	stbuf->st_mtime = ni->last_data_change_time;
 
 exit:
-
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	ERRPRINT("fs_rstat - EXIT, result is %s\n", strerror(result));
@@ -656,35 +669,33 @@ exit:
 	UNLOCK_VOL(ns);
 
 	return result;
-
 }
 
+
 status_t
-fs_wstat( fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask )
+fs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	ntfs_inode 	*ni = NULL;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	ntfs_inode *ni = NULL;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_wstat: ENTER\n");
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = ENOENT;
-			goto exit;
+	if (ni == NULL) {
+		result = ENOENT;
+		goto exit;
 	}
 
-	if ( mask & B_STAT_SIZE ) {
-
+	if (mask & B_STAT_SIZE) {
 		ERRPRINT("fs_wstat: setting file size to %Lx\n", st->st_size);
 
-		if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
+		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 			result = EISDIR;
 		} else {
-
 			ntfs_attr *na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
 			if (!na) {
 				result = EINVAL;
@@ -701,7 +712,6 @@ fs_wstat( fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask )
 	}
 
 	if (mask & B_STAT_MODIFICATION_TIME) {
-
 		ERRPRINT("fs_wstat: setting modification time\n");
 
 		ni->last_access_time = st->st_atime;
@@ -712,8 +722,7 @@ fs_wstat( fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask )
 	}
 
 exit:
-
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	ERRPRINT("fs_wstat: EXIT with (%s)\n", strerror(result));
@@ -744,10 +753,10 @@ fs_sync(fs_volume *_vol)
 status_t
 fs_fsync(fs_volume *_vol, fs_vnode *_node)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	ntfs_inode 	*ni = NULL;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	ntfs_inode *ni = NULL;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
@@ -759,16 +768,15 @@ fs_fsync(fs_volume *_vol, fs_vnode *_node)
 	}
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = ENOENT;
-			goto exit;
+	if (ni == NULL) {
+		result = ENOENT;
+		goto exit;
 	}
 
 	ntfs_inode_sync(ni);
 
 exit:
-
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	ERRPRINT("fs_fsync: EXIT\n");
@@ -778,56 +786,54 @@ exit:
 	return result;
 }
 
+
 status_t
 fs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	filecookie	*cookie=NULL;
-	ntfs_inode	*ni=NULL;
-	ntfs_attr 	*na = NULL;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	filecookie *cookie = NULL;
+	ntfs_inode *ni = NULL;
+	ntfs_attr *na = NULL;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_open - ENTER\n");
 
-	if(node==NULL) {
+	if (node == NULL) {
 		result = EINVAL;
-		goto	exit;
+		goto exit;
 	}
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = errno;
-			goto exit;
+	if (ni == NULL) {
+		result = errno;
+		goto exit;
 	}
 
-	if(omode & O_TRUNC) {
-			na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
-			if(na) {
-				if(ntfs_attr_truncate(na, 0))
-					result = errno;
-			} else
+	if (omode & O_TRUNC) {
+		na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
+		if (na) {
+			if (ntfs_attr_truncate(na, 0))
 				result = errno;
-		}
+		} else
+			result = errno;
+	}
 
-	cookie = (filecookie*)ntfs_calloc( sizeof(filecookie) );
+	cookie = (filecookie*)ntfs_calloc(sizeof(filecookie));
 
-	if ( cookie != NULL )
-	{
+	if (cookie != NULL) {
 		cookie->omode = omode;
 		*_cookie = (void*)cookie;
-	}
-	else
+	} else
 		result = ENOMEM;
 
 exit:
-
-	if(na)
+	if (na)
 		ntfs_attr_close(na);
 
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	ERRPRINT("fs_open - EXIT\n");
@@ -839,18 +845,19 @@ exit:
 
 
 status_t
-fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid)
+fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
+	int perms, void **_cookie, ino_t *_vnid)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*dir = (vnode*)_dir->private_node;
-	filecookie	*cookie = NULL;
-	vnode		*newNode = NULL;
-	ntfs_attr 	*na = NULL;
-	ntfs_inode	*ni=NULL;
-	ntfs_inode	*bi=NULL;
-	ntfschar 	*uname = NULL;
-	status_t	result = B_NO_ERROR;
-	int 		uname_len;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *dir = (vnode*)_dir->private_node;
+	filecookie *cookie = NULL;
+	vnode *newNode = NULL;
+	ntfs_attr *na = NULL;
+	ntfs_inode *ni = NULL;
+	ntfs_inode *bi = NULL;
+	ntfschar *uname = NULL;
+	status_t result = B_NO_ERROR;
+	int unameLength;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -861,64 +868,65 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 
 	ERRPRINT("fs_create - ENTER: name=%s\n",name);
 
-	if(_vol==NULL || _dir==NULL) {
+	if (_vol == NULL || _dir == NULL) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	if (name == NULL || *name == '\0' || strchr(name, '/') || strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+	if (name == NULL || *name == '\0' || strchr(name, '/')
+		|| strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
 		result =  EINVAL;
 		goto exit;
 	}
 
 	bi = ntfs_inode_open(ns->ntvol, dir->vnid);
-	if(bi==NULL) {
-			result = ENOENT;
-			goto exit;
-	}
-
-	if ( !bi->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
-		result =  EINVAL;
+	if (bi == NULL) {
+		result = ENOENT;
 		goto exit;
 	}
 
-	uname_len = ntfs_mbstoucs(name, &uname);
-	if (uname_len < 0) {
+	if (!(bi->mrec->flags & MFT_RECORD_IS_DIRECTORY)) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	cookie = (filecookie*)ntfs_calloc( sizeof(filecookie) );
+	unameLength = ntfs_mbstoucs(name, &uname);
+	if (unameLength < 0) {
+		result = EINVAL;
+		goto exit;
+	}
 
-	if ( cookie != NULL ) {
+	cookie = (filecookie*)ntfs_calloc(sizeof(filecookie));
+
+	if (cookie != NULL) {
 		cookie->omode = omode;
 	} else {
 		result = ENOMEM;
-		goto	exit;
+		goto exit;
 	}
 
 	ni = ntfs_pathname_to_inode(ns->ntvol, bi, name);
-	if(ni)	{  //file exist
-		*_vnid	= MREF( ni->mft_no );
-		if(omode & O_TRUNC) {
+	if (ni) {
+		// file exists
+		*_vnid	= MREF(ni->mft_no);
+		if (omode & O_TRUNC) {
 			na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
-			if(na) {
-				if(ntfs_attr_truncate(na, 0))
+			if (na) {
+				if (ntfs_attr_truncate(na, 0))
 					result = errno;
 			} else
 				result = errno;
 		}
 	} else {
-		ni = ntfs_create(bi, uname, uname_len, S_IFREG);
-
+		ni = ntfs_create(bi, uname, unameLength, S_IFREG);
 		if (ni)	{
-			*_vnid = MREF( ni->mft_no );
+			*_vnid = MREF(ni->mft_no);
 
-			newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
-			if(newNode==NULL) {
-			 	result=ENOMEM;
+			newNode = (vnode*)ntfs_calloc(sizeof(vnode));
+			if (newNode == NULL) {
+			 	result = ENOMEM;
 			 	goto exit;
-			 }
+			}
 
 			newNode->vnid = *_vnid;
 			newNode->parent_vnid = MREF(bi->mft_no);
@@ -930,8 +938,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 
 			ntfs_mark_free_space_outdated(ns);
 
-			notify_entry_created(ns->id, MREF( bi->mft_no ), name, *_vnid);
-
+			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);
 		} else
 			result = errno;
 	}
@@ -939,47 +946,47 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perm
 	free(uname);
 
 exit:
-
-	if(result >= B_OK) {
+	if (result >= B_OK) {
 		*_cookie = cookie;
 	} else
 		free(cookie);
 
-	if(na)
+	if (na)
 		ntfs_attr_close(na);
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
-	if(bi)
+	if (bi)
 		ntfs_inode_close(bi);
 
 	ERRPRINT("fs_create - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
 
-	return 		result;
+	return result;
 }
 
+
 status_t
-fs_read( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf, size_t *len )
+fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
+	size_t *len)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_dir->private_node;
-	//filecookie *cookie = (filecookie*)_cookie;  //temporary not used
-	ntfs_inode 	*ni = NULL;
-	ntfs_attr 	*na = NULL;
-	size_t 		size = *len;
-	int 		total = 0;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_dir->private_node;
+	ntfs_inode *ni = NULL;
+	ntfs_attr *na = NULL;
+	size_t  size = *len;
+	int total = 0;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_read - ENTER\n");
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			*len = 0;
-			result = ENOENT;
-			goto exit2;
+	if (ni == NULL) {
+		*len = 0;
+		result = ENOENT;
+		goto exit2;
 	}
 
 	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
@@ -989,7 +996,7 @@ fs_read( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf
 		goto exit2;
 	}
 
-	if(offset < 0) {
+	if (offset < 0) {
 		*len = 0;
 		result = EINVAL;
 		goto exit2;
@@ -1003,6 +1010,7 @@ fs_read( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf
 	}
 	if (offset + size > na->data_size)
 		size = na->data_size - offset;
+
 	while (size) {
 		result = ntfs_attr_pread(na, offset, size, buf);
 		if (result < (s64)size)
@@ -1018,13 +1026,12 @@ fs_read( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf
 	}
 	result = total;
 	*len = result;
-exit:
 
+exit:
 	if (na)
 		ntfs_attr_close(na);
 
 exit2:
-
 	if (ni)
 		ntfs_inode_close(ni);
 
@@ -1037,16 +1044,17 @@ exit2:
 
 
 status_t
-fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const void *buf, size_t *len )
+fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
+	const void *buf, size_t *len)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_dir->private_node;
-	filecookie	*cookie = (filecookie*)_cookie;
-	ntfs_inode 	*ni = NULL;
-	ntfs_attr 	*na = NULL;
-	int 		total = 0;
-	size_t 		size=*len;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_dir->private_node;
+	filecookie *cookie = (filecookie*)_cookie;
+	ntfs_inode *ni = NULL;
+	ntfs_attr *na = NULL;
+	int total = 0;
+	size_t size = *len;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1055,23 +1063,23 @@ fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const vo
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_write - ENTER, offset=%d, len=%d\n",(int)offset, (int)(*len));
+	ERRPRINT("fs_write - ENTER, offset=%d, len=%d\n", (int)offset, (int)(*len));
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			*len = 0;
-			result = ENOENT;
-			goto exit2;
+	if (ni == NULL) {
+		*len = 0;
+		result = ENOENT;
+		goto exit2;
 	}
 
-	if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
+	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 		ERRPRINT(("fs_write - called on directory.\n"));
 		*len = 0;
 		result = EISDIR;
 		goto exit2;
 	}
 
-	if(offset < 0) {
+	if (offset < 0) {
 		ERRPRINT(("fs_write - offset < 0.\n"));
 		*len = 0;
 		result = EINVAL;
@@ -1091,7 +1099,7 @@ fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const vo
 
 	if (offset + size > na->data_size) {
 		ntfs_mark_free_space_outdated(ns);
-		if(ntfs_attr_truncate(na, offset + size))
+		if (ntfs_attr_truncate(na, offset + size))
 			size = na->data_size - offset;
 		else
 			notify_stat_changed(ns->id, MREF(ni->mft_no), B_STAT_SIZE);
@@ -1114,15 +1122,16 @@ fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const vo
 	*len = total;
 	ERRPRINT(("fs_write - OK\n"));
 	result = B_NO_ERROR;
+
 exit:
 	if (na)
 		ntfs_attr_close(na);
 exit2:
-
 	if (ni)
 		ntfs_inode_close(ni);
 
-	ERRPRINT("fs_write - EXIT, result is %s, writed %d bytes\n", strerror(result),(int)(*len));
+	ERRPRINT("fs_write - EXIT, result is %s, writed %d bytes\n",
+		strerror(result), (int)(*len));
 
 	UNLOCK_VOL(ns);
 
@@ -1139,20 +1148,21 @@ fs_close(fs_volume *_vol, fs_vnode *_node, void *cookie)
 	return B_NO_ERROR;
 }
 
+
 status_t
-fs_free_cookie( fs_volume *_vol, fs_vnode *_node, void *cookie )
+fs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *cookie)
 {
 	ERRPRINT("fs_free_cookie - ENTER\n");
 
-	if(cookie)
-		free(cookie);
+	free(cookie);
 
 	ERRPRINT("fs_free_cookie - EXIT\n");
 	return B_NO_ERROR;
 }
 
+
 status_t
-fs_access( fs_volume *_vol, fs_vnode *_node, int mode )
+fs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 {
 	ERRPRINT("fs_access - ENTER\n");
 
@@ -1160,31 +1170,32 @@ fs_access( fs_volume *_vol, fs_vnode *_node, int mode )
 	return B_NO_ERROR;
 }
 
+
 status_t
-fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buff, size_t *buff_size)
+fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *bufferSize)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	ntfs_attr 	*na = NULL;
-	INTX_FILE 	*intx_file = NULL;
-	ntfs_inode 	*ni = NULL;
-	char 		*buf = NULL;
-	status_t	result = B_NO_ERROR;
-	int 		l=0;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	ntfs_attr *na = NULL;
+	INTX_FILE *intxFile = NULL;
+	ntfs_inode *ni = NULL;
+	char *tempBuffer = NULL;
+	status_t result = B_NO_ERROR;
+	int l = 0;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_readlink - ENTER\n");
 
-	if(ns==NULL || node==NULL || buff ==NULL || buff_size ==NULL) {
+	if (ns == NULL || node == NULL || buffer == NULL || bufferSize == NULL) {
 		result = EINVAL;
-		goto	exit;
+		goto exit;
 	}
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = ENOENT;
-			goto exit;
+	if (ni == NULL) {
+		result = ENOENT;
+		goto exit;
 	}
 
 	/* Sanity checks. */
@@ -1201,51 +1212,53 @@ fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buff, size_t *buff_size)
 		result = EINVAL;
 		goto exit;
 	}
-	if (na->data_size > sizeof(INTX_FILE_TYPES) +
-			sizeof(ntfschar) * MAX_PATH) {
+	if (na->data_size > sizeof(INTX_FILE_TYPES) + sizeof(ntfschar) * MAX_PATH) {
 		result = ENAMETOOLONG;
 		goto exit;
 	}
 	/* Receive file content. */
-	intx_file = ntfs_malloc(na->data_size);
-	if (!intx_file) {
+	intxFile = ntfs_malloc(na->data_size);
+	if (!intxFile) {
 		result = errno;
 		goto exit;
 	}
-	if (ntfs_attr_pread(na, 0, na->data_size, intx_file) != na->data_size) {
+	if (ntfs_attr_pread(na, 0, na->data_size, intxFile) != na->data_size) {
 		result = errno;
 		goto exit;
 	}
 	/* Sanity check. */
-	if (intx_file->magic != INTX_SYMBOLIC_LINK) {
+	if (intxFile->magic != INTX_SYMBOLIC_LINK) {
 		result = EINVAL;
 		goto exit;
 	}
 	/* Convert link from unicode to local encoding. */
-	l = ntfs_ucstombs(intx_file->target, (na->data_size - offsetof(INTX_FILE, target)) / sizeof(ntfschar), &buf, 0);
+	l = ntfs_ucstombs(intxFile->target,
+		(na->data_size - offsetof(INTX_FILE, target)) / sizeof(ntfschar),
+		&tempBuffer, 0);
 
-	if ( l < 0)	{
+	if (l < 0) {
 		result = errno;
 		goto exit;
 	}
+	if (tempBuffer == NULL) {
+		result = B_NO_MEMORY;
+		goto exit;
+	}
 
-	ERRPRINT("fs_readlink - LINK:[%s]\n",buf);
+	ERRPRINT("fs_readlink - LINK:[%s]\n", buffer);
 
-	strcpy(buff,buf);
-	if(buf)
-		free(buf);
+	strlcpy(buffer, tempBuffer, *bufferSize);
+	free(tempBuffer);
 
-	*buff_size = l+1;
+	*bufferSize = l + 1;
 
 	result = B_NO_ERROR;
 
 exit:
-
-	if (intx_file)
-		free(intx_file);
+	free(intxFile);
 	if (na)
 		ntfs_attr_close(na);
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
 
 	ERRPRINT("fs_readlink - EXIT, result is %s\n", strerror(result));
@@ -1255,84 +1268,88 @@ exit:
 	return result;
 }
 
+
 status_t
-fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char *target, int mode)
+fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
+	const char *target, int mode)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*dir = (vnode*)_dir->private_node;
-	ntfs_inode	*sym = NULL;
-	ntfs_inode	*bi = NULL;
-	vnode		*symnode = NULL;
-	ntfschar 	*uname = NULL,
-				*utarget = NULL;
-	int			uname_len,
-				utarget_len;
-	status_t	result = B_NO_ERROR;
-	int 		fmode;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *dir = (vnode*)_dir->private_node;
+	ntfs_inode *sym = NULL;
+	ntfs_inode *bi = NULL;
+	vnode *symnode = NULL;
+	ntfschar *uname = NULL;
+	ntfschar *utarget = NULL;
+	int unameLength;
+	int utargetLength;
+	status_t result = B_NO_ERROR;
+	int fmode;
 
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_symlink - ENTER, name=%s, path=%s\n",name, target);
 
-	if(ns == NULL || dir == NULL || name == NULL || target == NULL) {
+	if (ns == NULL || dir == NULL || name == NULL || target == NULL) {
 		result = EINVAL;
-		goto	exit;
+		goto exit;
 	}
 
 	bi = ntfs_inode_open(ns->ntvol, dir->vnid);
-	if(bi==NULL) {
-			result = ENOENT;
-			goto exit;
+	if (bi == NULL) {
+		result = ENOENT;
+		goto exit;
 	}
 
-	uname_len = ntfs_mbstoucs(name, &uname);
-	if (uname_len < 0) {
+	unameLength = ntfs_mbstoucs(name, &uname);
+	if (unameLength < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	utarget_len = ntfs_mbstoucs(target, &utarget);
-	if (utarget_len < 0) {
+	utargetLength = ntfs_mbstoucs(target, &utarget);
+	if (utargetLength < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	sym = ntfs_create_symlink(bi, uname, uname_len, utarget, utarget_len);
-	if(sym==NULL) {
+	sym = ntfs_create_symlink(bi, uname, unameLength, utarget, utargetLength);
+	if (sym == NULL) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	symnode = (vnode*)ntfs_calloc( sizeof(vnode) );
-	if(symnode==NULL) {
+	symnode = (vnode*)ntfs_calloc(sizeof(vnode));
+	if (symnode == NULL) {
 	 	result = ENOMEM;
 	 	goto exit;
-	 }
+	}
 
 	symnode->vnid = MREF(sym->mft_no);
 	symnode->parent_vnid = MREF(bi->mft_no);
 
-	if(sym->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
-			set_mime(symnode, ".***");
-			fmode = FS_DIR_MODE;
+	if (sym->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		set_mime(symnode, ".***");
+		fmode = FS_DIR_MODE;
 	} else {
-			set_mime(symnode, name);
-			fmode = FS_FILE_MODE;
+		set_mime(symnode, name);
+		fmode = FS_FILE_MODE;
 	}
 
-	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,
-			&gNTFSVnodeOps, S_IFLNK | fmode, 0)) != 0)
-		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(result));
+	result = publish_vnode(_vol, MREF(sym->mft_no), symnode, &gNTFSVnodeOps,
+		S_IFLNK | fmode, 0);
+	if (result != 0) {
+		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n",
+			MREF(sym->mft_no), strerror(result));
+	}
 
-	put_vnode(_vol, MREF(sym->mft_no) );
+	put_vnode(_vol, MREF(sym->mft_no));
 
 	notify_entry_created(ns->id, MREF( bi->mft_no ), name, MREF(sym->mft_no));
 
 exit:
-
-	if(sym)
+	if (sym)
 		ntfs_inode_close(sym);
-	if(bi)
+	if (bi)
 		ntfs_inode_close(bi);
 
 	ERRPRINT("fs_symlink - EXIT, result is %s\n", strerror(result));
@@ -1346,14 +1363,14 @@ exit:
 status_t
 fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*dir = (vnode*)_dir->private_node;
-	vnode		*newNode =NULL;
-	ntfschar 	*uname = NULL;
-	int 		uname_len;
-	ntfs_inode	*ni = NULL;
-	ntfs_inode	*bi = NULL;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *dir = (vnode*)_dir->private_node;
+	vnode *newNode =NULL;
+	ntfschar *uname = NULL;
+	int unameLength;
+	ntfs_inode *ni = NULL;
+	ntfs_inode *bi = NULL;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1364,39 +1381,38 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 
 	ERRPRINT("fs_mkdir - ENTER: name=%s\n",name);
 
-	if(_vol==NULL || _dir==NULL || name==NULL) {
+	if (_vol == NULL || _dir == NULL || name == NULL) {
 	 	result = EINVAL;
 	 	goto exit;
 	}
 
 	bi = ntfs_inode_open(ns->ntvol, dir->vnid);
-	if(bi==NULL) {
+	if (bi == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
 
-	if (! bi->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
-		result =  EINVAL;
-		goto exit;
-	}
-
-	uname_len = ntfs_mbstoucs(name, &uname);
-	if (uname_len < 0) {
+	if (!(bi->mrec->flags & MFT_RECORD_IS_DIRECTORY)) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	ni = ntfs_create(bi, uname, uname_len, S_IFDIR);
+	unameLength = ntfs_mbstoucs(name, &uname);
+	if (unameLength < 0) {
+		result = EINVAL;
+		goto exit;
+	}
 
+	ni = ntfs_create(bi, uname, unameLength, S_IFDIR);
 	if (ni)	{
-		ino_t vnid = MREF( ni->mft_no );
+		ino_t vnid = MREF(ni->mft_no);
 
-		newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
-		if(newNode==NULL) {
-		 	result=ENOMEM;
+		newNode = (vnode*)ntfs_calloc(sizeof(vnode));
+		if (newNode == NULL) {
+		 	result = ENOMEM;
 		 	ntfs_inode_close(ni);
 		 	goto exit;
-		 }
+		}
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = MREF(bi->mft_no);
@@ -1409,47 +1425,47 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 
 		ntfs_mark_free_space_outdated(ns);
 
-		notify_entry_created(ns->id, MREF( bi->mft_no ), name, vnid);
-	}
-	else
+		notify_entry_created(ns->id, MREF(bi->mft_no), name, vnid);
+	} else
 		result = errno;
 
 exit:
-
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
-	if(bi)
+	if (bi)
 		ntfs_inode_close(bi);
 
 	ERRPRINT("fs_mkdir - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
 
-	return 		result;
+	return result;
 }
 
+
 status_t
-fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir, const char *newname)
+fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir,
+	const char *newname)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*odir = (vnode*)_odir->private_node;
-	vnode		*ndir = (vnode*)_ndir->private_node;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *odir = (vnode*)_odir->private_node;
+	vnode *ndir = (vnode*)_ndir->private_node;
 
-	vnode		*onode = NULL;
-	vnode		*nnode = NULL;
+	vnode *onode = NULL;
+	vnode *nnode = NULL;
 
-	ino_t	ovnid,nvnid;
+	ino_t ovnid, nvnid;
 
-	ntfs_inode	*oi  = NULL;
-	ntfs_inode	*ndi = NULL;
-	ntfs_inode	*odi = NULL;
+	ntfs_inode *oi = NULL;
+	ntfs_inode *ndi = NULL;
+	ntfs_inode *odi = NULL;
 
-	ntfschar 	*unewname = NULL,
-				*uoldname=NULL;
-	int			unewname_len,
-				uoldname_len;
+	ntfschar *unewname = NULL;
+	ntfschar *uoldname = NULL;
+	int unewnameLength;
+	int uoldnameLength;
 
-	status_t	result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1467,146 +1483,149 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir
 		|| !strcmp(newname, ".") || !strcmp(newname, "..")
 		|| strchr(newname, '/') != NULL) {
 		result = EINVAL;
-		goto	exit;
+		goto exit;
 	}
 
-	//stupid renaming check
+	// stupid renaming check
 	if (odir == ndir && !strcmp(oldname, newname))
-		goto	exit;
+		goto exit;
 
-	//convert names from utf8 to unicode string
-	unewname_len = ntfs_mbstoucs(newname, &unewname);
-	if (unewname_len < 0) {
+	// convert names from utf8 to unicode string
+	unewnameLength = ntfs_mbstoucs(newname, &unewname);
+	if (unewnameLength < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	uoldname_len = ntfs_mbstoucs(oldname, &uoldname);
-	if (uoldname_len < 0) {
+	uoldnameLength = ntfs_mbstoucs(oldname, &uoldname);
+	if (uoldnameLength < 0) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	//open source directory inode
+	// open source directory inode
 	odi = ntfs_inode_open(ns->ntvol, odir->vnid);
-	if(odi==NULL) {
+	if (odi == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
 
-	ovnid = MREF( ntfs_inode_lookup_by_name(odi, uoldname, uoldname_len) );
+	ovnid = MREF(ntfs_inode_lookup_by_name(odi, uoldname, uoldnameLength));
 	if (ovnid == (u64) -1) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	result = get_vnode( _vol, ovnid, (void**)&onode );
-	if( result != B_NO_ERROR)
-		goto	exit;
+	result = get_vnode(_vol, ovnid, (void**)&onode);
+	if (result != B_NO_ERROR)
+		goto exit;
 
 
-	if(odir != ndir) {	//moving
-			ndi = ntfs_inode_open(ns->ntvol, ndir->vnid);
-			if(ndi!=NULL) {
-				nvnid = MREF( ntfs_inode_lookup_by_name(ndi, unewname, unewname_len) );
-				if (nvnid != (u64) -1)
-					get_vnode( _vol, nvnid, (void**)&nnode );
-			}
-
-			if(nnode!=NULL) {
-				result = EINVAL;
-				put_vnode(_vol, nnode->vnid);
-				goto exit;
-			}
-
-			oi = ntfs_inode_open(ns->ntvol, onode->vnid);
-			if(oi==NULL) {
-				result = EINVAL;
-				goto exit;
-			}
-
-			if (ntfs_link(oi, ndi, unewname, unewname_len))  {
-	 			ntfs_inode_close(oi);
-				result = EINVAL;
-				goto exit;
-			}
-
-			if(oi->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-					set_mime(onode, ".***");
-			else
-					set_mime(onode, newname);
-
-			ntfs_inode_close(oi);
-
-			oi = ntfs_inode_open(ns->ntvol, onode->vnid);
-			if(oi==NULL) {
-				result = EINVAL;
-				goto exit;
-			}
-
-			onode->parent_vnid = MREF( ndi->mft_no );
-			
-			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( ndi->mft_no ), newname, onode->vnid );
-			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
-
-			ntfs_delete(oi, odi, uoldname, uoldname_len);
-			oi = odi = NULL; /* ntfs_delete() always closes ni and dir_ni */
-
-			put_vnode(_vol, onode->vnid );
-
-	} else { //renaming
-
-			nvnid = MREF( ntfs_inode_lookup_by_name(odi, unewname, unewname_len) );
+	if (odir != ndir) {
+		// moving
+		ndi = ntfs_inode_open(ns->ntvol, ndir->vnid);
+		if (ndi != NULL) {
+			nvnid = MREF(ntfs_inode_lookup_by_name(ndi, unewname,
+				unewnameLength));
 			if (nvnid != (u64) -1)
-					get_vnode( _vol, nvnid, (void**)&nnode );
+				get_vnode(_vol, nvnid, (void**)&nnode);
+		}
 
-			if(nnode!=NULL) {
-				result = EINVAL;
-				put_vnode( _vol, nnode->vnid);
-				goto exit;
-			}
+		if (nnode != NULL) {
+			result = EINVAL;
+			put_vnode(_vol, nnode->vnid);
+			goto exit;
+		}
 
-			oi = ntfs_inode_open(ns->ntvol, onode->vnid);
-			if(oi==NULL) {
-				result = EINVAL;
-				goto exit;
-			}
+		oi = ntfs_inode_open(ns->ntvol, onode->vnid);
+		if (oi == NULL) {
+			result = EINVAL;
+			goto exit;
+		}
 
-			if (ntfs_link(oi, odi, unewname, unewname_len))  {
-	 			ntfs_inode_close(oi);
-				result = EINVAL;
-				goto exit;
-			}
+		if (ntfs_link(oi, ndi, unewname, unewnameLength)) {
+ 			ntfs_inode_close(oi);
+			result = EINVAL;
+			goto exit;
+		}
 
-			if(oi->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-					set_mime(onode, ".***");
-			else
-					set_mime(onode, newname);
+		if (oi->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+			set_mime(onode, ".***");
+		else
+			set_mime(onode, newname);
 
-			ntfs_inode_close(oi);
+		ntfs_inode_close(oi);
 
-			oi = ntfs_inode_open(ns->ntvol, onode->vnid);
-			if(oi==NULL) {
-				result = EINVAL;
-				goto exit;
-			}
+		oi = ntfs_inode_open(ns->ntvol, onode->vnid);
+		if (oi == NULL) {
+			result = EINVAL;
+			goto exit;
+		}
 
-			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( odi->mft_no ), newname, onode->vnid );
-			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
-			put_vnode(_vol, onode->vnid );
+		onode->parent_vnid = MREF(ndi->mft_no);
 
-			ntfs_delete(oi, odi, uoldname, uoldname_len);
-			oi = odi = NULL; /* ntfs_delete() always closes ni and dir_ni */
+		notify_entry_moved(ns->id, MREF(odi->mft_no), oldname, MREF(ndi->mft_no),
+			newname, onode->vnid);
+
+		ntfs_delete(oi, odi, uoldname, uoldnameLength);
+		oi = odi = NULL;
+			/* ntfs_delete() always closes ni and dir_ni */
+
+		put_vnode(_vol, onode->vnid);
+	} else {
+		// renaming
+
+		nvnid = MREF(ntfs_inode_lookup_by_name(odi, unewname, unewnameLength));
+		if (nvnid != (u64) -1)
+			get_vnode(_vol, nvnid, (void**)&nnode);
+
+		if (nnode != NULL) {
+			result = EINVAL;
+			put_vnode(_vol, nnode->vnid);
+			goto exit;
+		}
+
+		oi = ntfs_inode_open(ns->ntvol, onode->vnid);
+		if (oi == NULL) {
+			result = EINVAL;
+			goto exit;
+		}
+
+		if (ntfs_link(oi, odi, unewname, unewnameLength))  {
+ 			ntfs_inode_close(oi);
+			result = EINVAL;
+			goto exit;
+		}
+
+		if (oi->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+			set_mime(onode, ".***");
+		else
+			set_mime(onode, newname);
+
+		ntfs_inode_close(oi);
+
+		oi = ntfs_inode_open(ns->ntvol, onode->vnid);
+		if (oi == NULL) {
+			result = EINVAL;
+			goto exit;
+		}
+
+		notify_entry_moved(ns->id, MREF(odi->mft_no), oldname, MREF(odi->mft_no),
+			newname, onode->vnid);
+		put_vnode(_vol, onode->vnid);
+
+		ntfs_delete(oi, odi, uoldname, uoldnameLength);
+		oi = odi = NULL;
+			/* ntfs_delete() always closes ni and dir_ni */
 	}
 
-
 exit:
-	if(unewname!=NULL)free(unewname);
-	if(uoldname!=NULL)free(uoldname);
+	free(unewname);
+	free(uoldname);
 
-	if(odi)
+	if (odi)
 		ntfs_inode_close(odi);
-	if(ndi)
+	if (ndi)
 		ntfs_inode_close(ndi);
 
 	ERRPRINT("fs_rename - EXIT, result is %s\n", strerror(result));
@@ -1614,69 +1633,69 @@ exit:
 	UNLOCK_VOL(ns);
 
 	return result;
-
 }
 
-status_t
-do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool	isdir)
-{
-	nspace		*vol = (nspace*)_vol->private_volume;
-	ino_t 		vnid;
-	vnode 		*node = NULL;
-	ntfs_inode	*ni = NULL;
-	ntfs_inode 	*bi = NULL;
-	ntfschar 	*uname = NULL;
-	int 		uname_len;
-	status_t	result = B_NO_ERROR;
 
-	uname_len = ntfs_mbstoucs(name, &uname);
-	if (uname_len < 0) {
+static status_t
+do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
+{
+	nspace *vol = (nspace*)_vol->private_volume;
+	ino_t vnid;
+	vnode *node = NULL;
+	ntfs_inode *ni = NULL;
+	ntfs_inode *bi = NULL;
+	ntfschar *uname = NULL;
+	int unameLength;
+	status_t result = B_NO_ERROR;
+
+	unameLength = ntfs_mbstoucs(name, &uname);
+	if (unameLength < 0) {
 		result = EINVAL;
 		goto exit1;
 	}
 
 	bi = ntfs_inode_open(vol->ntvol, dir->vnid);
-	if(bi==NULL) {
+	if (bi == NULL) {
 		result = ENOENT;
 		goto exit1;
 	}
 
-	vnid = MREF( ntfs_inode_lookup_by_name(bi, uname, uname_len) );
+	vnid = MREF(ntfs_inode_lookup_by_name(bi, uname, unameLength));
 
 	if ( vnid == (u64) -1 || vnid == FILE_root)	{
 		result = EINVAL;
 		goto exit1;
 	}
 
-	result = get_vnode(_vol, vnid, (void**) & node);
+	result = get_vnode(_vol, vnid, (void**)&node);
 
-	if(result != B_NO_ERROR || node==NULL)
-	{
+	if (result != B_NO_ERROR || node==NULL) {
 		result = ENOENT;
-		goto	exit1;
+		goto exit1;
 	}
 
 	ni = ntfs_inode_open(vol->ntvol, node->vnid);
-	if(ni==NULL) {
-			result = ENOENT;
-			goto exit2;
+	if (ni == NULL) {
+		result = ENOENT;
+		goto exit2;
 	}
 
-	if(isdir) {
-		if (!ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+	if (isdir) {
+		if (!(ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)) {
 			result = ENOTDIR;
 			goto exit2;
 		}
 		if (ntfs_check_empty_dir(ni)<0)	{
 			result = ENOTEMPTY;
-			goto	exit2;
-		}
-	} else if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
-			result = EISDIR;
 			goto exit2;
 		}
+	} else if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		result = EISDIR;
+		goto exit2;
+	}
 
-	if(ntfs_delete(ni, bi, uname, uname_len))
+	// TODO: the file must not be deleted here, only unlinked!
+	if (ntfs_delete(ni, bi, uname, unameLength))
 	 	result = errno;
 
 	ni = bi = NULL;
@@ -1686,16 +1705,15 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool	isdir)
 	notify_entry_removed(vol->id, dir->vnid, name, vnid);
 
 	result = remove_vnode(_vol, vnid);
+
 exit2:
 	put_vnode(_vol, vnid);
 exit1:
-	if(uname!=NULL)
-		free(uname);
+	free(uname);
 
-	if(ni)
+	if (ni)
 		ntfs_inode_close(ni);
-
-	if(bi)
+	if (bi)
 		ntfs_inode_close(bi);
 
 	return result;
@@ -1705,9 +1723,9 @@ exit1:
 status_t
 fs_rmdir(fs_volume *_vol, fs_vnode *_dir, const char *name)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*dir = (vnode*)_dir->private_node;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *dir = (vnode*)_dir->private_node;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1718,7 +1736,7 @@ fs_rmdir(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	ERRPRINT("fs_rmdir  - ENTER:  name %s\n", name==NULL?"NULL":name);
 
-	if( ns == NULL || dir == NULL || name ==NULL) {
+	if (ns == NULL || dir == NULL || name == NULL) {
 		result = EINVAL;
 		goto exit1;
 	}
@@ -1735,10 +1753,10 @@ fs_rmdir(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	result = do_unlink(_vol, dir, name, true);
 
+	// TODO: space must not be freed here, but in fs_remove_vnode()!!!
 	ntfs_mark_free_space_outdated(ns);
 
 exit1:
-
 	ERRPRINT("fs_rmdir - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
@@ -1750,9 +1768,9 @@ exit1:
 status_t
 fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*dir = (vnode*)_dir->private_node;
-	status_t	result = B_NO_ERROR;
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *dir = (vnode*)_dir->private_node;
+	status_t result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1763,7 +1781,7 @@ fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	ERRPRINT("fs_unlink  - ENTER:  name %s\n", name==NULL?"NULL":name);
 
-	if( ns == NULL || dir == NULL || name == NULL) {
+	if (ns == NULL || dir == NULL || name == NULL) {
 		result = EINVAL;
 		goto exit;
 	}
@@ -1780,10 +1798,10 @@ fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	result = do_unlink(_vol, dir, name, false);
 
+	// TODO: space must not be freed here, but in fs_remove_vnode()!!!
 	ntfs_mark_free_space_outdated(ns);
 
 exit:
-
 	ERRPRINT("fs_unlink - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
