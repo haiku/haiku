@@ -42,9 +42,8 @@ TermScrollView::TermScrollView(const char* name, BView* child, BView* target,
 		BRect frame(fVerticalScrollBar->Frame());
 		RemoveChild(fVerticalScrollBar);
 
-		// Overlap one pixel at the top and the bottom of the scroll bar with
-		// the menu respectively resize knob for aesthetical reasons.
-		frame.top -= 1;
+		// Overlap one pixel at the bottom of the scroll bar with
+		// the resize knob for aesthetical reasons.
 		frame.bottom -= B_H_SCROLL_BAR_HEIGHT - 1;
 
 		TermScrollBar* scrollBar = new TermScrollBar(frame, "_VSB_", target, 0,
