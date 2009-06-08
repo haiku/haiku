@@ -292,12 +292,7 @@ for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 
 # Deskbar Preferences links
 AddDirectoryToHaikuImage home config be Preferences ;
-# TODO/NOTE: Cannot use $(SYSTEM_PREFERENCES) here since there is
-# "<preferences>Tracker"...
-DESKBAR_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
-	E-mail FileTypes Fonts Keyboard Keymap Locale Media Menu Mouse Network
-	Printers Screen ScreenSaver Sounds Time Touchpad Tracker VirtualMemory
-;
+DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToHaikuImage home config be Preferences
 		: /boot/system/preferences/$(linkTarget) : $(linkTarget) ;
