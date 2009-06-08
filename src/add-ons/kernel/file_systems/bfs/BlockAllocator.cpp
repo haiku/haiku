@@ -1233,8 +1233,9 @@ BlockAllocator::StopChecking(check_control* control)
 		// TODO: update the allocation groups used blocks info
 		for (uint32 i = size >> 2; i-- > 0;) {
 			uint32 compare = 1;
+			// Count the number of bits set
 			for (int16 j = 0; j < 32; j++, compare <<= 1) {
-				if (compare & fCheckBitmap[i])
+				if ((compare & fCheckBitmap[i]) != 0)
 					usedBlocks++;
 			}
 		}
@@ -1247,10 +1248,28 @@ BlockAllocator::StopChecking(check_control* control)
 		// Should we fix errors? Were there any errors we can fix?
 		if ((control->flags & BFS_FIX_BITMAP_ERRORS) != 0
 			&& (control->stats.freed != 0 || control->stats.missing != 0)) {
-			// if so, write the check bitmap back over the original one,
+			// If so, write the check bitmap back over the original one,
 			// and use transactions here to play safe - we even use several
 			// transactions, so that we don't blow the maximum log size
-			// on large disks; since we don't need to make this atomic
+			// on large disks, since we don't need to make this atomic.
+#if 0
+			// prints the blocks that differ
+			off_t block = 0;
+			for (int32 i = 0; i < fNumGroups; i++) {
+				AllocationBlock cached(fVolume);
+				for (uint32 j = 0; j < fGroups[i].NumBlocks(); j++) {
+					cached.SetTo(fGroups[i], j);
+					for (uint32 k = 0; k < cached.NumBlockBits(); k++) {
+						if (cached.IsUsed(k) != _CheckBitmapIsUsedAt(block)) {
+							dprintf("differ block %lld (should be %d)\n", block,
+								_CheckBitmapIsUsedAt(block));
+						}
+						block++;
+					}
+				}
+			}
+#endif
+
 			fVolume->SuperBlock().used_blocks
 				= HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 
@@ -1442,10 +1461,6 @@ BlockAllocator::CheckNextNode(check_control* control)
 				return B_OK;
 			}
 
-			// If the inode has an attribute directory, push it on the stack
-			if (!inode->Attributes().IsZero())
-				cookie->stack.Push(inode->Attributes());
-
 			// push the directory on the stack so that it will be scanned later
 			if (inode->IsContainer() && !inode->IsIndex())
 				cookie->stack.Push(inode->BlockRun());
@@ -1554,6 +1569,8 @@ BlockAllocator::CheckBlockRun(block_run run, const char* type,
 					if (firstSet == -1) {
 						firstSet = firstGroupBlock + offset;
 						control->errors |= BFS_BLOCKS_ALREADY_SET;
+						dprintf("block %lld is already set!!!\n",
+							firstGroupBlock + offset);
 					}
 					control->stats.already_set++;
 				} else {
@@ -1601,8 +1618,14 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 		return B_BAD_VALUE;
 
 	status_t status = CheckBlockRun(inode->BlockRun(), "inode", control);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
+
+	// If the inode has an attribute directory, push it on the stack
+	if (!inode->Attributes().IsZero()) {
+		check_cookie* cookie = (check_cookie*)control->cookie;
+		cookie->stack.Push(inode->Attributes());
+	}
 
 	if (inode->IsSymLink() && (inode->Flags() & INODE_LONG_SYMLINK) == 0) {
 		// symlinks may not have a valid data stream
