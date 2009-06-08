@@ -68,8 +68,9 @@ public:
 			return false;
 		delete items[index];
 		item_count--;
-		for (int i = index; i < item_count; i++)
-			items[i] = items[i + 1];
+		items[index] = items[item_count];
+		if (index == item_iter)
+			item_iter--;
 		return true;
 	}
 	
