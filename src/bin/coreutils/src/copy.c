@@ -153,15 +153,17 @@ copy_attributes(int fromFd, int toFd)
 		if (fs_stat_attr(fromFd, dirent->d_name, &info) != 0)
 			continue;
 
-		while (info.size > 0) {
+		while (info.size >= 0) {
 			ssize_t bytesRead, bytesWritten;
-			
-			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos, buffer, sizeof(buffer));
-			if (bytesRead <= 0)
+
+			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos,
+				buffer, sizeof(buffer));
+			if (bytesRead < 0)
 				break;
-			
-			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos, buffer, bytesRead);
-			if (bytesWritten != bytesRead)
+
+			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos,
+				buffer, bytesRead);
+			if (bytesWritten != bytesRead || bytesRead == 0)
 				break;
 
 			pos += bytesWritten;
@@ -189,7 +191,7 @@ copy_attributes_by_name(const char *from, const char *to, int resolveLinks)
 	}
 
 	result = copy_attributes(fromFd, toFd);
-	
+
 	close(fromFd);
 	close(toFd);
 
