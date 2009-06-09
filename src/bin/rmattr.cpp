@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,8 +29,9 @@ int gCurrentFile;
 void
 usage()
 {
-	printf("usage: %s [-p] attr filename1 [filename2...]\n"
+	printf("usage: %s [-P] [-p] attr filename1 [filename2...]\n"
 		"\t'attr' is the name of an attribute of the file\n"
+		"\t-P : Don't resolve links\n"
 		"\tIf '-p' is specified, 'attr' is regarded as a pattern.\n", kProgramName);
 
 	exit(1);	
@@ -91,31 +92,37 @@ remove_attribute(int fd, const char* attribute, bool isPattern)
 int
 main(int argc, const char **argv)
 {
-	// Make sure we have the minimum number of arguments.
-	if (argc < 3)
-		usage();
-
 	bool isPattern = false;
-	int attr = 1;
-	if (!strcmp(argv[attr], "-p")) {
-		isPattern = true;
-		attr++;
+	bool resolveLinks = true;
 
-		if (argc < 4)
-			usage();
+	/* get all options */
+
+	while (*++argv) {
+		const char *arg = *argv;
+		argc--;
+		if (*arg != '-')
+			break;
+		if (!strcmp(arg, "-P"))
+			resolveLinks = false;
+		else if (!strcmp(arg, "-p"))
+			isPattern = true;
 	}
 
-	for (int32 i = attr + 1; i < argc; i++) {
-		int fd = open(argv[i], O_WRONLY);
+	// Make sure we have the minimum number of arguments.
+	if (argc < 2)
+		usage();
+
+	for (int32 i = 1; i < argc; i++) {
+		int fd = open(argv[i], O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 		if (fd < 0) {
 			fprintf(stderr, "%s: can\'t open file %s to remove attribute: %s\n", 
 				kProgramName, argv[i], strerror(errno));
 			return 1;
 		}
 
-		if (remove_attribute(fd, argv[attr], isPattern) != B_OK) {
+		if (remove_attribute(fd, argv[0], isPattern) != B_OK) {
 			fprintf(stderr, "%s: error removing attribute %s from %s: %s\n", 
-				kProgramName, argv[attr], argv[i], strerror(errno));
+				kProgramName, argv[0], argv[i], strerror(errno));
 		}
 
 		close(fd);
