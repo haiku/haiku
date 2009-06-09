@@ -25,7 +25,8 @@ public:
 							BPath(const BEntry* entry);
 							BPath(const char* dir, const char* leaf = NULL,
 								bool normalize = false);
-							BPath(const BDirectory* dir, const char* leaf,
+							BPath(const BDirectory* dir, 
+								const char* leaf = NULL,
 								bool normalize = false);
 
 	virtual					~BPath();
@@ -36,7 +37,8 @@ public:
 			status_t		SetTo(const BEntry* entry);
 			status_t		SetTo(const char* path, const char* leaf = NULL,
 								bool normalize = false);
-			status_t		SetTo(const BDirectory* dir, const char* path,
+			status_t		SetTo(const BDirectory* dir, 
+								const char* leaf = NULL,
 								bool normalize = false);
 			void			Unset();
 
