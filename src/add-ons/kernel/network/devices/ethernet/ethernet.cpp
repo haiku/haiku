@@ -365,7 +365,7 @@ ethernet_set_promiscuous(net_device *_device, bool promiscuous)
 	ethernet_device *device = (ethernet_device *)_device;
 
 	int32 value = (int32)promiscuous;
-	if (ioctl(device->fd, ETHER_GETADDR, &value, sizeof(value)) < 0)
+	if (ioctl(device->fd, ETHER_SETPROMISC, &value, sizeof(value)) < 0)
 		return EOPNOTSUPP;
 
 	return B_OK;
