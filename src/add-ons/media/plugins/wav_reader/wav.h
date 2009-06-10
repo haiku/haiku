@@ -56,6 +56,7 @@ struct wave_format_ex {
 	uint16 block_align;
 	uint16 bits_per_sample;
 	uint16 extra_size;
+	uint8  extra_data[64];  // allow for 64 bytes of extra data
 };
 
 struct mpeg3_wav_format {

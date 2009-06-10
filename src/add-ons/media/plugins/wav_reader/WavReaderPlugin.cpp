@@ -31,7 +31,7 @@
 #include "WavReaderPlugin.h"
 #include "RawFormats.h"
 
-//#define TRACE_WAVE_READER
+#define TRACE_WAVE_READER
 #ifdef TRACE_WAVE_READER
   #define TRACE printf
 #else
@@ -136,11 +136,12 @@ WavReader::Sniff(int32 *streamCount)
 		return B_ERROR;
 	}
 	
-	format_struct format;
-	wave_format_ex wav_format;
+	wave_format_ex format;
 	format_struct_extensible format_ext;
 	mpeg1_wav_format mpeg1_format;
 	mpeg3_wav_format mpeg3_format;
+	
+	uint32 wavFmtSize = sizeof(format_struct) + 2;
 	
 	fact_struct fact;
 	
@@ -167,49 +168,56 @@ WavReader::Sniff(int32 *streamCount)
 		switch (UINT32(chunk.fourcc)) {
 			case FOURCC('f','m','t',' '):
 				// So what do we have a std format structure, a wav_format structure or a extended structure
-				if (UINT32(chunk.len) >= sizeof(wav_format)) {
-					// Read both format and wav format
-					if (sizeof(format) != Source()->ReadAt(pos, &format, sizeof(format))) {
+				if (UINT32(chunk.len) >= wavFmtSize) {
+					// Must be some sort of extended format structure
+					// First Read common data + extra size
+					if (wavFmtSize != Source()->ReadAt(pos, &format, wavFmtSize)) {
 						ERROR("WavReader::Sniff: format chunk reading failed\n");
 						break;
 					}
-					if (sizeof(wav_format) != Source()->ReadAt(pos, &wav_format, sizeof(wav_format))) {
-						ERROR("WavReader::Sniff: format chunk reading failed\n");
-						break;
+
+					// If extra size seems valid then re-read with the extra data included
+					if (UINT16(format.extra_size) > 0 && UINT16(format.extra_size) < 64) {
+						// Read the extra data we need to pass across to the decoder
+						if ((wavFmtSize + format.extra_size) != Source()->ReadAt(pos, &format, wavFmtSize + format.extra_size)) {
+							ERROR("WavReader::Sniff: format extensible chunk reading failed\n");
+							break;
+						}
 					}
 					foundFmt = true;
-					
-					if (UINT16(wav_format.extra_size) == 12) {
+
+					// Check for structure we recognise and might need values from.										
+					if (UINT16(format.extra_size) == 12) {
 						// MPEG3 WAV FORMAT Structure
 						if (sizeof(mpeg3_format) != Source()->ReadAt(pos, &mpeg3_format, sizeof(mpeg3_format))) {
 							ERROR("WavReader::Sniff: format chunk reading failed\n");
 							break;
 						}
 						foundMPEG3 = true;
-					}
-					if (UINT16(wav_format.extra_size) == 22) {
-						// MPEG1 WAV FORMAT Structure
-						if (sizeof(mpeg1_format) != Source()->ReadAt(pos, &mpeg1_format, sizeof(mpeg1_format))) {
-							ERROR("WavReader::Sniff: format chunk reading failed\n");
-							break;
+					} else if (UINT16(format.extra_size) == 22) {
+						if (UINT16(format.format_tag) == 0xfffe) {
+							// GUID structure
+							if (sizeof(format_ext) != Source()->ReadAt(pos, &format_ext, sizeof(format_ext))) {
+								ERROR("WavReader::Sniff: format extensible chunk reading failed\n");
+								break;
+							}
+							foundFmtExt = true;
+						} else {
+							// MPEG1 WAV FORMAT Structure
+							if (sizeof(mpeg1_format) != Source()->ReadAt(pos, &mpeg1_format, sizeof(mpeg1_format))) {
+								ERROR("WavReader::Sniff: format chunk reading failed\n");
+								break;
+							}
+							foundMPEG1 = true;
 						}
-						foundMPEG1 = true;
 					}
-					
-				} else if (UINT32(chunk.len) >= sizeof(format)) {
-					if (sizeof(format) != Source()->ReadAt(pos, &format, sizeof(format))) {
+				} else if (UINT32(chunk.len) >= wavFmtSize - 2) {
+					if ((wavFmtSize - 2) != Source()->ReadAt(pos, &format, wavFmtSize - 2)) {
 						ERROR("WavReader::Sniff: format chunk reading failed\n");
 						break;
 					}
+					format.extra_size = 0;
 					foundFmt = true;
-					
-					if (UINT32(chunk.len) >= sizeof(format_ext) && UINT16(format.format_tag) == 0xfffe) {
-						if (sizeof(format_ext) != Source()->ReadAt(pos, &format_ext, sizeof(format_ext))) {
-							ERROR("WavReader::Sniff: format extensible chunk reading failed\n");
-							break;
-						}
-						foundFmtExt = true;
-					}
 				}
 				break;
 			case FOURCC('f','a','c','t'):
@@ -260,8 +268,8 @@ WavReader::Sniff(int32 *streamCount)
 	TRACE("  avg_bytes_per_sec     %ld\n", UINT32(format.avg_bytes_per_sec));
 	TRACE("  block_align           %d\n", UINT16(format.block_align));
 	TRACE("  bits_per_sample       %d\n", UINT16(format.bits_per_sample));
+	TRACE("  ext_size              %d\n", UINT16(format.extra_size));
 	if (foundFmtExt) {
-		TRACE("  ext_size              %d\n", UINT16(format_ext.ext_size));
 		TRACE("  valid_bits_per_sample %d\n", UINT16(format_ext.valid_bits_per_sample));
 		TRACE("  channel_mask          %ld\n", UINT32(format_ext.channel_mask));
 		TRACE("  guid[0-1] format      0x%04x\n", (format_ext.guid[1] << 8) | format_ext.guid[0]);
@@ -292,7 +300,10 @@ WavReader::Sniff(int32 *streamCount)
 		fBufferSize = BUFFER_SIZE;
 	}
 
-	fMetaData.extra_size = 0;
+	fMetaData.extra_size = format.extra_size;
+	if (fMetaData.extra_size > 0) {
+		fMetaData.extra_data = format.extra_data;
+	}
 	fMetaData.channels = UINT16(format.channels);
 	fMetaData.samples_per_sec = UINT32(format.samples_per_sec);
 	fMetaData.block_align = UINT16(format.block_align);
@@ -420,9 +431,9 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 		data->format.u.encoded_audio.output.channel_count = fMetaData.channels;
 	}
 	
-	printf("SetMetaData called with size %ld\n",sizeof(wave_format_ex));
+	printf("SetMetaData called with size %ld\n",sizeof(format_struct) + fMetaData.extra_size + 2);
 	
-	if (data->format.SetMetaData(&fMetaData, sizeof(wave_format_ex)) != B_OK) {
+	if (data->format.SetMetaData(&fMetaData, (sizeof(format_struct) + fMetaData.extra_size + 2)) != B_OK) {
 		ERROR("WavReader::Failed to SetMetaData\n");
 		delete data;
 		return B_ERROR;
@@ -457,7 +468,7 @@ WavReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	*duration = data->duration;
 	*format = data->format;
 	*infoBuffer = &fMetaData;
-	*infoSize = sizeof(wave_format_ex);
+	*infoSize = (sizeof(format_struct) + fMetaData.extra_size + 2);
 	return B_OK;
 }
 
