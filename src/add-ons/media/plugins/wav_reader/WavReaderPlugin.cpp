@@ -302,7 +302,7 @@ WavReader::Sniff(int32 *streamCount)
 
 	fMetaData.extra_size = format.extra_size;
 	if (fMetaData.extra_size > 0) {
-		fMetaData.extra_data = format.extra_data;
+		memcpy(fMetaData.extra_data, format.extra_data, format.extra_size);
 	}
 	fMetaData.channels = UINT16(format.channels);
 	fMetaData.samples_per_sec = UINT32(format.samples_per_sec);
