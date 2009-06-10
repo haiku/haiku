@@ -186,7 +186,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 				}
 				TRACE("avCodec: found decoder %s\n",fCodec->name);
 				
-				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY && infoSize == sizeof(wave_format_ex)) {
+				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY && infoSize >= sizeof(wave_format_ex)) {
 					const wave_format_ex *wfmt_data
 						= (const wave_format_ex *)infoBuffer;
 					size_t wfmt_size = infoSize;
@@ -595,9 +595,15 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			diff2 += prof_t3 - prof_t2;
 			prof_cnt++;
 			if (!(fFrame % 10)) {
-				TRACE("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
-					isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt,
-					fFrame);
+				if (info) {
+					TRACE("[%c] profile: d1 = %lld, d2 = %lld (%Ld) required %Ld\n",
+						isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt,
+						fFrame, info->time_to_decode);
+				} else {
+					TRACE("[%c] profile: d1 = %lld, d2 = %lld (%Ld) required %Ld\n",
+						isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt,
+						fFrame, bigtime_t(1000000LL / fOutputFrameRate));
+				}
 			}
 #endif
 		}
