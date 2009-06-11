@@ -6086,6 +6086,12 @@ common_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 
 	FUNCTION(("common_read_stat: stat %p\n", stat));
 
+	// TODO: remove this once all file systems properly set them!
+	stat->st_crtim.tv_nsec = 0;
+	stat->st_ctim.tv_nsec = 0;
+	stat->st_mtim.tv_nsec = 0;
+	stat->st_atim.tv_nsec = 0;
+
 	status_t status = FS_CALL(vnode, read_stat, stat);
 
 	// fill in the st_dev and st_ino fields
