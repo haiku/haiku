@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -956,6 +956,51 @@ get_node_at_offset(net_buffer_private *buffer, size_t offset)
 }
 
 
+/*!	Appends up to \a size bytes from the data of the \a from net_buffer to the
+	\a to net_buffer. The source buffer will remain unchanged.
+*/
+static status_t
+append_data_from_buffer(net_buffer *to, const net_buffer *from, size_t size)
+{
+	net_buffer_private *source = (net_buffer_private *)from;
+	net_buffer_private *dest = (net_buffer_private *)to;
+
+	if (size > from->size)
+		return B_BAD_VALUE;
+	if (size == 0)
+		return B_OK;
+
+	data_node *nodeTo = get_node_at_offset(source, size);
+	if (nodeTo == NULL)
+		return B_BAD_VALUE;
+
+	data_node *node = (data_node *)list_get_first_item(&source->buffers);
+	if (node == NULL) {
+		CHECK_BUFFER(source);
+		return B_ERROR;
+	}
+
+	while (node != nodeTo) {
+		if (append_data(dest, node->start, node->used) < B_OK) {
+			CHECK_BUFFER(dest);
+			return B_ERROR;
+		}
+
+		node = (data_node *)list_get_next_item(&source->buffers, node);
+	}
+
+	int32 diff = node->offset + node->used - size;
+	if (append_data(dest, node->start, node->used - diff) < B_OK) {
+		CHECK_BUFFER(dest);
+		return B_ERROR;
+	}
+
+	CHECK_BUFFER(dest);
+
+	return B_OK;
+}
+
+
 static void
 copy_metadata(net_buffer *destination, const net_buffer *source)
 {
@@ -1213,19 +1258,15 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 /*!
 	Split the buffer at offset, the header data
 	is returned as new buffer.
-	TODO: optimize and avoid making a copy.
 */
 static net_buffer *
 split_buffer(net_buffer *from, uint32 offset)
 {
-	// TODO: Copying the whole buffer becomes less and less efficient with
-	// greater size - offset differences. What we actually want is a method
-	// to copy data from one buffer to another. Then the following should be:
-	// create buffer, resize, copy data. An additional append_data_from_buffer()
-	// method would be even better.
-	net_buffer *buffer = duplicate_buffer(from);
+	net_buffer *buffer = create_buffer(DATA_NODE_SIZE);
 	if (buffer == NULL)
 		return NULL;
+
+	copy_metadata(buffer, from);
 
 	ParanoiaChecker _(from);
 	ParanoiaChecker _2(buffer);
@@ -1233,7 +1274,7 @@ split_buffer(net_buffer *from, uint32 offset)
 	TRACE(("%ld: split_buffer(buffer %p -> %p, offset %ld)\n",
 		find_thread(NULL), from, buffer, offset));
 
-	if (trim_data(buffer, offset) == B_OK) {
+	if (append_data_from_buffer(buffer, from, offset) == B_OK) {
 		if (remove_header(from, offset) == B_OK) {
 			CHECK_BUFFER(from);
 			CHECK_BUFFER(buffer);
