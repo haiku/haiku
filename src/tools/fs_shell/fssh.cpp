@@ -321,7 +321,7 @@ void
 print_flag(uint32_t deviceFlags, uint32_t testFlag, const char *yes,
 	const char *no)
 {
-	printf((deviceFlags & testFlag) != 0 ? yes : no);
+	printf("%s", (deviceFlags & testFlag) != 0 ? yes : no);
 }
 
 
@@ -573,6 +573,26 @@ remove_entry(int dir, const char *entry, bool recursive, bool force)
 	}
 
 	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+move_entry(int dir, const char *entry, int targetDir, const char* target,
+	bool force)
+{
+	// stat the file
+	struct fssh_stat st;
+	fssh_status_t status = _kern_read_stat(dir, entry, false, &st, sizeof(st));
+	if (status != FSSH_B_OK) {
+		if (force && status == FSSH_B_ENTRY_NOT_FOUND)
+			return FSSH_B_OK;
+
+		fprintf(stderr, "Error: Failed to move \"%s\": %s\n", entry,
+			fssh_strerror(status));
+		return status;
+	}
+
+	return _kern_rename(dir, entry, targetDir, target);
 }
 
 
@@ -962,6 +982,80 @@ command_mkindex(int argc, const char* const* argv)
 
 
 static fssh_status_t
+command_mv(int argc, const char* const* argv)
+{
+	bool force = false;
+
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Error: Invalid option \"-\"\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'f':
+					force = true;
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown option \"-%c\"\n", arg[i]);
+					return FSSH_B_BAD_VALUE;
+			}
+		}
+	}
+
+	// check params
+	int count = argc - 1 - argi;
+	if (count <= 0) {
+		fprintf(stderr, "Usage: %s [-f] <file>... <target>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	const char* target = argv[argc - 1];
+
+	// stat the target
+	struct fssh_stat st;
+	fssh_status_t status = _kern_read_stat(-1, target, true, &st, sizeof(st));
+	if (status != FSSH_B_OK && count != 1) {
+		fprintf(stderr, "Error: Failed to stat target \"%s\": %s\n", target,
+			fssh_strerror(status));
+		return status;
+	}
+
+	if (status == FSSH_B_OK && FSSH_S_ISDIR(st.fssh_st_mode)) {
+		// move several entries
+		int targetDir = _kern_open_dir(-1, target);
+		if (targetDir < 0) {
+			fprintf(stderr, "Error: Failed to open dir \"%s\": %s\n", target,
+				fssh_strerror(targetDir));
+			return targetDir;
+		}
+
+		// move loop
+		for (; argi < argc - 1; argi++) {
+			status = move_entry(-1, argv[argi], targetDir, argv[argi], force);
+			if (status != FSSH_B_OK) {
+				_kern_close(targetDir);
+				return status;
+			}
+		}
+
+		_kern_close(targetDir);
+		return FSSH_B_OK;
+	}
+
+	// rename single entry
+	return move_entry(-1, argv[argi], -1, target, force);
+}
+
+
+static fssh_status_t
 command_query(int argc, const char* const* argv)
 {
 	if (argc != 2) {
@@ -1024,7 +1118,7 @@ command_quit(int argc, const char* const* argv)
 
 
 static fssh_status_t
-command_rm(int argc, char **argv)
+command_rm(int argc, const char* const* argv)
 {
 	bool recursive = false;
 	bool force = false;
@@ -1099,6 +1193,7 @@ register_commands()
 		command_ls,			"ls",			"list files or directories",
 		command_mkdir,		"mkdir",		"create directories",
 		command_mkindex,	"mkindex",		"create an index",
+		command_mv,			"mv",			"move/rename files and directories",
 		command_query,		"query",		"query for files",
 		command_quit,		"quit/exit",	"quit the shell",
 		command_rm,			"rm",			"remove files and directories",
