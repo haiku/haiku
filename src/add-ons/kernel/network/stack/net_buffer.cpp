@@ -54,27 +54,27 @@ struct header_space {
 };
 
 struct free_data {
-	struct free_data *next;
-	uint16		size;
+	struct free_data* next;
+	uint16			size;
 };
 
 struct data_header {
-	int32		ref_count;
-	addr_t		physical_address;
-	free_data	*first_free;
-	uint8		*data_end;
+	int32			ref_count;
+	addr_t			physical_address;
+	free_data*		first_free;
+	uint8*			data_end;
 	header_space	space;
-	uint16		tail_space;
+	uint16			tail_space;
 };
 
 struct data_node {
 	struct list_link link;
-	struct data_header *header;
-	struct data_header *located;
-	size_t		offset;			// the net_buffer-wide offset of this node
-	uint8		*start;			// points to the start of the data
-	uint16		flags;
-	uint16		used;			// defines how much memory is used by this node
+	struct data_header* header;
+	struct data_header* located;
+	size_t			offset;		// the net_buffer-wide offset of this node
+	uint8*			start;		// points to the start of the data
+	uint16			flags;
+	uint16			used;		// defines how much memory is used by this node
 
 	uint16 HeaderSpace() const
 	{
@@ -124,14 +124,14 @@ struct data_node {
 };
 
 struct net_buffer_private : net_buffer {
-	struct list			buffers;
-	data_header			*allocation_header;	// the current place where we
-											// allocate header space (nodes,...)
+	struct list					buffers;
+	data_header*				allocation_header;
+		// the current place where we allocate header space (nodes, ...)
 	ancillary_data_container*	ancillary_data;
 
 	struct {
-		struct sockaddr_storage source;
-		struct sockaddr_storage destination;
+		struct sockaddr_storage	source;
+		struct sockaddr_storage	destination;
 	} storage;
 };
 
@@ -141,17 +141,17 @@ struct net_buffer_private : net_buffer {
 #define MAX_FREE_BUFFER_SIZE			(BUFFER_SIZE - DATA_HEADER_SIZE)
 
 
-static object_cache *sNetBufferCache;
-static object_cache *sDataNodeCache;
+static object_cache* sNetBufferCache;
+static object_cache* sDataNodeCache;
 
 
-static status_t append_data(net_buffer *buffer, const void *data, size_t size);
-static status_t trim_data(net_buffer *_buffer, size_t newSize);
-static status_t remove_header(net_buffer *_buffer, size_t bytes);
-static status_t remove_trailer(net_buffer *_buffer, size_t bytes);
-static status_t append_cloned_data(net_buffer *_buffer, net_buffer *_source,
+static status_t append_data(net_buffer* buffer, const void* data, size_t size);
+static status_t trim_data(net_buffer* _buffer, size_t newSize);
+static status_t remove_header(net_buffer* _buffer, size_t bytes);
+static status_t remove_trailer(net_buffer* _buffer, size_t bytes);
+static status_t append_cloned_data(net_buffer* _buffer, net_buffer* _source,
 					uint32 offset, size_t bytes);
-static status_t read_data(net_buffer *_buffer, size_t offset, void *data,
+static status_t read_data(net_buffer* _buffer, size_t offset, void* data,
 					size_t size);
 
 
@@ -170,389 +170,389 @@ namespace NetBufferTracing {
 
 
 class NetBufferTraceEntry : public AbstractTraceEntry {
-	public:
-		NetBufferTraceEntry(net_buffer* buffer)
-			:
-			fBuffer(buffer)
-		{
+public:
+	NetBufferTraceEntry(net_buffer* buffer)
+		:
+		fBuffer(buffer)
+	{
 #if NET_BUFFER_TRACING_STACK_TRACE
-		fStackTrace = capture_tracing_stack_trace(
-			NET_BUFFER_TRACING_STACK_TRACE, 0, false);
+	fStackTrace = capture_tracing_stack_trace(
+		NET_BUFFER_TRACING_STACK_TRACE, 0, false);
 #endif
-		}
+	}
 
 #if NET_BUFFER_TRACING_STACK_TRACE
-		virtual void DumpStackTrace(TraceOutput& out)
-		{
-			out.PrintStackTrace(fStackTrace);
-		}
+	virtual void DumpStackTrace(TraceOutput& out)
+	{
+		out.PrintStackTrace(fStackTrace);
+	}
 #endif
 
-	protected:
-		net_buffer*	fBuffer;
+protected:
+	net_buffer*	fBuffer;
 #if NET_BUFFER_TRACING_STACK_TRACE
-		tracing_stack_trace* fStackTrace;
+	tracing_stack_trace* fStackTrace;
 #endif
 };
 
 
 class Create : public NetBufferTraceEntry {
-	public:
-		Create(size_t headerSpace, net_buffer* buffer)
-			:
-			NetBufferTraceEntry(buffer),
-			fHeaderSpace(headerSpace)
-		{
-			Initialized();
-		}
+public:
+	Create(size_t headerSpace, net_buffer* buffer)
+		:
+		NetBufferTraceEntry(buffer),
+		fHeaderSpace(headerSpace)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer create: header space: %lu -> buffer: %p",
-				fHeaderSpace, fBuffer);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer create: header space: %lu -> buffer: %p",
+			fHeaderSpace, fBuffer);
+	}
 
-	private:
-		size_t		fHeaderSpace;
+private:
+	size_t		fHeaderSpace;
 };
 
 
 class Free : public NetBufferTraceEntry {
-	public:
-		Free(net_buffer* buffer)
-			:
-			NetBufferTraceEntry(buffer)
-		{
-			Initialized();
-		}
+public:
+	Free(net_buffer* buffer)
+		:
+		NetBufferTraceEntry(buffer)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer free: buffer: %p", fBuffer);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer free: buffer: %p", fBuffer);
+	}
 };
 
 
 class Duplicate : public NetBufferTraceEntry {
-	public:
-		Duplicate(net_buffer* buffer, net_buffer* clone)
-			:
-			NetBufferTraceEntry(buffer),
-			fClone(clone)
-		{
-			Initialized();
-		}
+public:
+	Duplicate(net_buffer* buffer, net_buffer* clone)
+		:
+		NetBufferTraceEntry(buffer),
+		fClone(clone)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer dup: buffer: %p -> %p", fBuffer, fClone);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer dup: buffer: %p -> %p", fBuffer, fClone);
+	}
 
-	private:
-		net_buffer*		fClone;
+private:
+	net_buffer*		fClone;
 };
 
 
 class Clone : public NetBufferTraceEntry {
-	public:
-		Clone(net_buffer* buffer, bool shareFreeSpace, net_buffer* clone)
-			:
-			NetBufferTraceEntry(buffer),
-			fClone(clone),
-			fShareFreeSpace(shareFreeSpace)
-		{
-			Initialized();
-		}
+public:
+	Clone(net_buffer* buffer, bool shareFreeSpace, net_buffer* clone)
+		:
+		NetBufferTraceEntry(buffer),
+		fClone(clone),
+		fShareFreeSpace(shareFreeSpace)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer clone: buffer: %p, share free space: %s "
-				"-> %p", fBuffer, fShareFreeSpace ? "true" : "false", fClone);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer clone: buffer: %p, share free space: %s "
+			"-> %p", fBuffer, fShareFreeSpace ? "true" : "false", fClone);
+	}
 
-	private:
-		net_buffer*		fClone;
-		bool			fShareFreeSpace;
+private:
+	net_buffer*		fClone;
+	bool			fShareFreeSpace;
 };
 
 
 class Split : public NetBufferTraceEntry {
-	public:
-		Split(net_buffer* buffer, uint32 offset, net_buffer* newBuffer)
-			:
-			NetBufferTraceEntry(buffer),
-			fNewBuffer(newBuffer),
-			fOffset(offset)
-		{
-			Initialized();
-		}
+public:
+	Split(net_buffer* buffer, uint32 offset, net_buffer* newBuffer)
+		:
+		NetBufferTraceEntry(buffer),
+		fNewBuffer(newBuffer),
+		fOffset(offset)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer split: buffer: %p, offset: %lu "
-				"-> %p", fBuffer, fOffset, fNewBuffer);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer split: buffer: %p, offset: %lu "
+			"-> %p", fBuffer, fOffset, fNewBuffer);
+	}
 
-	private:
-		net_buffer*		fNewBuffer;
-		uint32			fOffset;
+private:
+	net_buffer*		fNewBuffer;
+	uint32			fOffset;
 };
 
 
 class Merge : public NetBufferTraceEntry {
-	public:
-		Merge(net_buffer* buffer, net_buffer* otherBuffer, bool after)
-			:
-			NetBufferTraceEntry(buffer),
-			fOtherBuffer(otherBuffer),
-			fAfter(after)
-		{
-			Initialized();
-		}
+public:
+	Merge(net_buffer* buffer, net_buffer* otherBuffer, bool after)
+		:
+		NetBufferTraceEntry(buffer),
+		fOtherBuffer(otherBuffer),
+		fAfter(after)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer merge: buffers: %p + %p, after: %s "
-				"-> %p", fBuffer, fOtherBuffer, fAfter ? "true" : "false",
-				fOtherBuffer);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer merge: buffers: %p + %p, after: %s "
+			"-> %p", fBuffer, fOtherBuffer, fAfter ? "true" : "false",
+			fOtherBuffer);
+	}
 
-	private:
-		net_buffer*		fOtherBuffer;
-		bool			fAfter;
+private:
+	net_buffer*		fOtherBuffer;
+	bool			fAfter;
 };
 
 
 class AppendCloned : public NetBufferTraceEntry {
-	public:
-		AppendCloned(net_buffer* buffer, net_buffer* source, uint32 offset,
-			size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fSource(source),
-			fOffset(offset),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	AppendCloned(net_buffer* buffer, net_buffer* source, uint32 offset,
+		size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fSource(source),
+		fOffset(offset),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer append cloned: buffer: %p, from: %p, "
-				"offset: %lu, size: %lu", fBuffer, fSource, fOffset, fSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer append cloned: buffer: %p, from: %p, "
+			"offset: %lu, size: %lu", fBuffer, fSource, fOffset, fSize);
+	}
 
-	private:
-		net_buffer*		fSource;
-		uint32			fOffset;
-		size_t			fSize;
+private:
+	net_buffer*		fSource;
+	uint32			fOffset;
+	size_t			fSize;
 };
 
 
 class PrependSize : public NetBufferTraceEntry {
-	public:
-		PrependSize(net_buffer* buffer, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	PrependSize(net_buffer* buffer, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer prepend size: buffer: %p, size: %lu", fBuffer,
-				fSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer prepend size: buffer: %p, size: %lu", fBuffer,
+			fSize);
+	}
 
-	private:
-		size_t			fSize;
+private:
+	size_t			fSize;
 };
 
 
 class AppendSize : public NetBufferTraceEntry {
-	public:
-		AppendSize(net_buffer* buffer, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	AppendSize(net_buffer* buffer, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer append size: buffer: %p, size: %lu", fBuffer,
-				fSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer append size: buffer: %p, size: %lu", fBuffer,
+			fSize);
+	}
 
-	private:
-		size_t			fSize;
+private:
+	size_t			fSize;
 };
 
 
 class RemoveHeader : public NetBufferTraceEntry {
-	public:
-		RemoveHeader(net_buffer* buffer, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	RemoveHeader(net_buffer* buffer, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer remove header: buffer: %p, size: %lu",
-				fBuffer, fSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer remove header: buffer: %p, size: %lu",
+			fBuffer, fSize);
+	}
 
-	private:
-		size_t			fSize;
+private:
+	size_t			fSize;
 };
 
 
 class Trim : public NetBufferTraceEntry {
-	public:
-		Trim(net_buffer* buffer, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	Trim(net_buffer* buffer, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer trim: buffer: %p, size: %lu",
-				fBuffer, fSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer trim: buffer: %p, size: %lu",
+			fBuffer, fSize);
+	}
 
-	private:
-		size_t			fSize;
+private:
+	size_t			fSize;
 };
 
 
 class Read : public NetBufferTraceEntry {
-	public:
-		Read(net_buffer* buffer, uint32 offset, void* data, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fData(data),
-			fOffset(offset),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	Read(net_buffer* buffer, uint32 offset, void* data, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fData(data),
+		fOffset(offset),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer read: buffer: %p, offset: %lu, size: %lu, "
-				"data: %p", fBuffer, fOffset, fSize, fData);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer read: buffer: %p, offset: %lu, size: %lu, "
+			"data: %p", fBuffer, fOffset, fSize, fData);
+	}
 
-	private:
-		void*			fData;
-		uint32			fOffset;
-		size_t			fSize;
+private:
+	void*			fData;
+	uint32			fOffset;
+	size_t			fSize;
 };
 
 
 class Write : public NetBufferTraceEntry {
-	public:
-		Write(net_buffer* buffer, uint32 offset, const void* data, size_t size)
-			:
-			NetBufferTraceEntry(buffer),
-			fData(data),
-			fOffset(offset),
-			fSize(size)
-		{
-			Initialized();
-		}
+public:
+	Write(net_buffer* buffer, uint32 offset, const void* data, size_t size)
+		:
+		NetBufferTraceEntry(buffer),
+		fData(data),
+		fOffset(offset),
+		fSize(size)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer write: buffer: %p, offset: %lu, size: %lu, "
-				"data: %p", fBuffer, fOffset, fSize, fData);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer write: buffer: %p, offset: %lu, size: %lu, "
+			"data: %p", fBuffer, fOffset, fSize, fData);
+	}
 
-	private:
-		const void*		fData;
-		uint32			fOffset;
-		size_t			fSize;
+private:
+	const void*		fData;
+	uint32			fOffset;
+	size_t			fSize;
 };
 
 
 #if NET_BUFFER_TRACING >= 2
 
 class DataHeaderTraceEntry : public AbstractTraceEntry {
-	public:
-		DataHeaderTraceEntry(data_header* header)
-			:
-			fHeader(header)
-		{
-		}
+public:
+	DataHeaderTraceEntry(data_header* header)
+		:
+		fHeader(header)
+	{
+	}
 
-	protected:
-		data_header*	fHeader;
+protected:
+	data_header*	fHeader;
 };
 
 
 class CreateDataHeader : public DataHeaderTraceEntry {
-	public:
-		CreateDataHeader(data_header* header)
-			:
-			DataHeaderTraceEntry(header)
-		{
-			Initialized();
-		}
+public:
+	CreateDataHeader(data_header* header)
+		:
+		DataHeaderTraceEntry(header)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer data header create:  header: %p", fHeader);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer data header create:  header: %p", fHeader);
+	}
 };
 
 
 class AcquireDataHeader : public DataHeaderTraceEntry {
-	public:
-		AcquireDataHeader(data_header* header, int32 refCount)
-			:
-			DataHeaderTraceEntry(header),
-			fRefCount(refCount)
-		{
-			Initialized();
-		}
+public:
+	AcquireDataHeader(data_header* header, int32 refCount)
+		:
+		DataHeaderTraceEntry(header),
+		fRefCount(refCount)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer data header acquire: header: %p "
-				"-> ref count: %ld", fHeader, fRefCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer data header acquire: header: %p "
+			"-> ref count: %ld", fHeader, fRefCount);
+	}
 
-	private:
-		int32			fRefCount;
+private:
+	int32			fRefCount;
 };
 
 
 class ReleaseDataHeader : public DataHeaderTraceEntry {
-	public:
-		ReleaseDataHeader(data_header* header, int32 refCount)
-			:
-			DataHeaderTraceEntry(header),
-			fRefCount(refCount)
-		{
-			Initialized();
-		}
+public:
+	ReleaseDataHeader(data_header* header, int32 refCount)
+		:
+		DataHeaderTraceEntry(header),
+		fRefCount(refCount)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("net buffer data header release: header: %p "
-				"-> ref count: %ld", fHeader, fRefCount);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("net buffer data header release: header: %p "
+			"-> ref count: %ld", fHeader, fRefCount);
+	}
 
-	private:
-		int32			fRefCount;
+private:
+	int32			fRefCount;
 };
 
 #	define T2(x)	new(std::nothrow) NetBufferTracing::x
@@ -572,17 +572,19 @@ class ReleaseDataHeader : public DataHeaderTraceEntry {
 
 #if 1
 static void
-dump_buffer(net_buffer *_buffer)
+dump_buffer(net_buffer* _buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	dprintf("buffer %p, size %ld\n", buffer, buffer->size);
-	data_node *node = NULL;
-	while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
-		dprintf("  node %p, offset %lu, used %u, header %u, tail %u, header %p\n",
-			node, node->offset, node->used, node->HeaderSpace(), node->TailSpace(), node->header);
-		//dump_block((char *)node->start, node->used, "    ");
-		dump_block((char *)node->start, min_c(node->used, 32), "    ");
+	data_node* node = NULL;
+	while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
+			!= NULL) {
+		dprintf("  node %p, offset %lu, used %u, header %u, tail %u, "
+			"header %p\n", node, node->offset, node->used, node->HeaderSpace(),
+			node->TailSpace(), node->header);
+		//dump_block((char*)node->start, node->used, "    ");
+		dump_block((char*)node->start, min_c(node->used, 32), "    ");
 	}
 }
 #endif
@@ -606,14 +608,14 @@ dump_net_buffer_stats(int argc, char** argv)
 #if PARANOID_BUFFER_CHECK
 
 static void
-check_buffer(net_buffer *_buffer)
+check_buffer(net_buffer* _buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private*)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	// sum up the size of all nodes
 	size_t size = 0;
 
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	while (node != NULL) {
 		if (node->offset != size) {
 			panic("net_buffer %p: bad node %p offset (%lu vs. %lu)",
@@ -621,7 +623,7 @@ check_buffer(net_buffer *_buffer)
 			return;
 		}
 		size += node->used;
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	if (size != buffer->size) {
@@ -634,7 +636,7 @@ check_buffer(net_buffer *_buffer)
 
 #if 0
 static void
-check_buffer_contents(net_buffer *buffer, size_t offset, const void* data,
+check_buffer_contents(net_buffer* buffer, size_t offset, const void* data,
 	size_t size)
 {
 	void* bufferData = malloc(size);
@@ -660,7 +662,7 @@ check_buffer_contents(net_buffer *buffer, size_t offset, const void* data,
 
 
 static void
-check_buffer_contents(net_buffer *buffer, size_t offset, net_buffer *source,
+check_buffer_contents(net_buffer* buffer, size_t offset, net_buffer* source,
 	size_t sourceOffset, size_t size)
 {
 	void* bufferData = malloc(size);
@@ -685,31 +687,31 @@ check_buffer_contents(net_buffer *buffer, size_t offset, net_buffer *source,
 #endif	// !PARANOID_BUFFER_CHECK
 
 
-static inline data_header *
+static inline data_header*
 allocate_data_header()
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	atomic_add(&sAllocatedDataHeaderCount, 1);
 	atomic_add(&sEverAllocatedDataHeaderCount, 1);
 #endif
-	return (data_header *)object_cache_alloc(sDataNodeCache, CACHE_DONT_SLEEP);
+	return (data_header*)object_cache_alloc(sDataNodeCache, CACHE_DONT_SLEEP);
 }
 
 
-static inline net_buffer_private *
+static inline net_buffer_private*
 allocate_net_buffer()
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	atomic_add(&sAllocatedNetBufferCount, 1);
 	atomic_add(&sEverAllocatedNetBufferCount, 1);
 #endif
-	return (net_buffer_private *)object_cache_alloc(sNetBufferCache,
+	return (net_buffer_private*)object_cache_alloc(sNetBufferCache,
 		CACHE_DONT_SLEEP);
 }
 
 
 static inline void
-free_data_header(data_header *header)
+free_data_header(data_header* header)
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	if (header != NULL)
@@ -720,7 +722,7 @@ free_data_header(data_header *header)
 
 
 static inline void
-free_net_buffer(net_buffer_private *buffer)
+free_net_buffer(net_buffer_private* buffer)
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	if (buffer != NULL)
@@ -730,10 +732,10 @@ free_net_buffer(net_buffer_private *buffer)
 }
 
 
-static data_header *
+static data_header*
 create_data_header(size_t headerSpace)
 {
-	data_header *header = allocate_data_header();
+	data_header* header = allocate_data_header();
 	if (header == NULL)
 		return NULL;
 
@@ -742,8 +744,8 @@ create_data_header(size_t headerSpace)
 		// TODO: initialize this correctly
 	header->space.size = headerSpace;
 	header->space.free = headerSpace;
-	header->data_end = (uint8 *)header + DATA_HEADER_SIZE;
-	header->tail_space = (uint8 *)header + BUFFER_SIZE - header->data_end
+	header->data_end = (uint8*)header + DATA_HEADER_SIZE;
+	header->tail_space = (uint8*)header + BUFFER_SIZE - header->data_end
 		- headerSpace;
 	header->first_free = NULL;
 
@@ -754,7 +756,7 @@ create_data_header(size_t headerSpace)
 
 
 static void
-release_data_header(data_header *header)
+release_data_header(data_header* header)
 {
 	int32 refCount = atomic_add(&header->ref_count, -1);
 	T2(ReleaseDataHeader(header, refCount - 1));
@@ -767,7 +769,7 @@ release_data_header(data_header *header)
 
 
 inline void
-acquire_data_header(data_header *header)
+acquire_data_header(data_header* header)
 {
 	int32 refCount = atomic_add(&header->ref_count, 1);
 	(void)refCount;
@@ -776,12 +778,12 @@ acquire_data_header(data_header *header)
 
 
 static void
-free_data_header_space(data_header *header, uint8 *data, size_t size)
+free_data_header_space(data_header* header, uint8* data, size_t size)
 {
 	if (size < sizeof(free_data))
 		size = sizeof(free_data);
 
-	free_data *freeData = (free_data *)data;
+	free_data* freeData = (free_data*)data;
 	freeData->next = header->first_free;
 	freeData->size = size;
 
@@ -789,11 +791,10 @@ free_data_header_space(data_header *header, uint8 *data, size_t size)
 }
 
 
-/*!
-	Tries to allocate \a size bytes from the free space in the header.
+/*!	Tries to allocate \a size bytes from the free space in the header.
 */
-static uint8 *
-alloc_data_header_space(data_header *header, size_t size)
+static uint8*
+alloc_data_header_space(data_header* header, size_t size)
 {
 	if (size < sizeof(free_data))
 		size = sizeof(free_data);
@@ -801,25 +802,26 @@ alloc_data_header_space(data_header *header, size_t size)
 
 	if (header->first_free != NULL && header->first_free->size >= size) {
 		// the first entry of the header space matches the allocation's needs
-// TODO: If the free space is greater than what shall be allocated, we leak
-// the remainder of the space. We should only allocate multiples of
-// _ALIGN(sizeof(free_data)) and split free space in this case. It's not that
-// pressing, since the only thing allocated ATM are data_nodes, and thus the
-// free space entries will always have the right size.
-		uint8 *data = (uint8 *)header->first_free;
+
+		// TODO: If the free space is greater than what shall be allocated, we
+		// leak the remainder of the space. We should only allocate multiples of
+		// _ALIGN(sizeof(free_data)) and split free space in this case. It's not
+		// that pressing, since the only thing allocated ATM are data_nodes, and
+		// thus the free space entries will always have the right size.
+		uint8* data = (uint8*)header->first_free;
 		header->first_free = header->first_free->next;
 		return data;
 	}
 
 	if (header->space.free < size) {
 		// there is no free space left, search free list
-		free_data *freeData = header->first_free;
-		free_data *last = NULL;
+		free_data* freeData = header->first_free;
+		free_data* last = NULL;
 		while (freeData != NULL) {
 			if (last != NULL && freeData->size >= size) {
 				// take this one
 				last->next = freeData->next;
-				return (uint8 *)freeData;
+				return (uint8*)freeData;
 			}
 
 			last = freeData;
@@ -831,7 +833,7 @@ alloc_data_header_space(data_header *header, size_t size)
 
 	// allocate new space
 
-	uint8 *data = header->data_end;
+	uint8* data = header->data_end;
 	header->data_end += size;
 	header->space.free -= size;
 
@@ -839,15 +841,15 @@ alloc_data_header_space(data_header *header, size_t size)
 }
 
 
-static uint8 *
-alloc_data_header_space(net_buffer_private *buffer, size_t size,
-	data_header **_header = NULL)
+static uint8*
+alloc_data_header_space(net_buffer_private* buffer, size_t size,
+	data_header** _header = NULL)
 {
 	// try to allocate in our current allocation header
-	uint8 *allocated = alloc_data_header_space(buffer->allocation_header, size);
+	uint8* allocated = alloc_data_header_space(buffer->allocation_header, size);
 	if (allocated == NULL) {
 		// not enough header space left -- create a fresh buffer for headers
-		data_header *header = create_data_header(MAX_FREE_BUFFER_SIZE);
+		data_header* header = create_data_header(MAX_FREE_BUFFER_SIZE);
 		if (header == NULL)
 			return NULL;
 
@@ -868,10 +870,10 @@ alloc_data_header_space(net_buffer_private *buffer, size_t size,
 }
 
 
-static data_node *
-add_first_data_node(data_header *header)
+static data_node*
+add_first_data_node(data_header* header)
 {
-	data_node *node = (data_node *)alloc_data_header_space(header,
+	data_node* node = (data_node*)alloc_data_header_space(header,
 		sizeof(data_node));
 	if (node == NULL)
 		return NULL;
@@ -893,11 +895,11 @@ add_first_data_node(data_header *header)
 }
 
 
-static data_node *
-add_data_node(net_buffer_private *buffer, data_header *header)
+static data_node*
+add_data_node(net_buffer_private* buffer, data_header* header)
 {
-	data_header *located;
-	data_node *node = (data_node *)alloc_data_header_space(buffer,
+	data_header* located;
+	data_node* node = (data_node*)alloc_data_header_space(buffer,
 		sizeof(data_node), &located);
 	if (node == NULL)
 		return NULL;
@@ -918,9 +920,9 @@ add_data_node(net_buffer_private *buffer, data_header *header)
 
 
 void
-remove_data_node(data_node *node)
+remove_data_node(data_node* node)
 {
-	data_header *located = node->located;
+	data_header* located = node->located;
 
 	TRACE(("%ld:   remove data node %p from header %p (located %p)\n",
 		find_thread(NULL), node, node->header, located));
@@ -936,18 +938,18 @@ remove_data_node(data_node *node)
 	if (located == NULL)
 		return;
 
-	free_data_header_space(located, (uint8 *)node, sizeof(data_node));
+	free_data_header_space(located, (uint8*)node, sizeof(data_node));
 
 	release_data_header(located);
 }
 
 
-static inline data_node *
-get_node_at_offset(net_buffer_private *buffer, size_t offset)
+static inline data_node*
+get_node_at_offset(net_buffer_private* buffer, size_t offset)
 {
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	while (node->offset + node->used <= offset) {
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return NULL;
 	}
@@ -960,21 +962,21 @@ get_node_at_offset(net_buffer_private *buffer, size_t offset)
 	\a to net_buffer. The source buffer will remain unchanged.
 */
 static status_t
-append_data_from_buffer(net_buffer *to, const net_buffer *from, size_t size)
+append_data_from_buffer(net_buffer* to, const net_buffer* from, size_t size)
 {
-	net_buffer_private *source = (net_buffer_private *)from;
-	net_buffer_private *dest = (net_buffer_private *)to;
+	net_buffer_private* source = (net_buffer_private*)from;
+	net_buffer_private* dest = (net_buffer_private*)to;
 
 	if (size > from->size)
 		return B_BAD_VALUE;
 	if (size == 0)
 		return B_OK;
 
-	data_node *nodeTo = get_node_at_offset(source, size);
+	data_node* nodeTo = get_node_at_offset(source, size);
 	if (nodeTo == NULL)
 		return B_BAD_VALUE;
 
-	data_node *node = (data_node *)list_get_first_item(&source->buffers);
+	data_node* node = (data_node*)list_get_first_item(&source->buffers);
 	if (node == NULL) {
 		CHECK_BUFFER(source);
 		return B_ERROR;
@@ -986,7 +988,7 @@ append_data_from_buffer(net_buffer *to, const net_buffer *from, size_t size)
 			return B_ERROR;
 		}
 
-		node = (data_node *)list_get_next_item(&source->buffers, node);
+		node = (data_node*)list_get_next_item(&source->buffers, node);
 	}
 
 	int32 diff = node->offset + node->used - size;
@@ -1002,7 +1004,7 @@ append_data_from_buffer(net_buffer *to, const net_buffer *from, size_t size)
 
 
 static void
-copy_metadata(net_buffer *destination, const net_buffer *source)
+copy_metadata(net_buffer* destination, const net_buffer* source)
 {
 	memcpy(destination->source, source->source,
 		min_c(source->source->sa_len, sizeof(sockaddr_storage)));
@@ -1021,10 +1023,10 @@ copy_metadata(net_buffer *destination, const net_buffer *source)
 //	#pragma mark - module API
 
 
-static net_buffer *
+static net_buffer*
 create_buffer(size_t headerSpace)
 {
-	net_buffer_private *buffer = allocate_net_buffer();
+	net_buffer_private* buffer = allocate_net_buffer();
 	if (buffer == NULL)
 		return NULL;
 
@@ -1037,22 +1039,22 @@ create_buffer(size_t headerSpace)
 	else if (headerSpace > MAX_FREE_BUFFER_SIZE)
 		headerSpace = MAX_FREE_BUFFER_SIZE;
 
-	data_header *header = create_data_header(headerSpace);
+	data_header* header = create_data_header(headerSpace);
 	if (header == NULL) {
 		free_net_buffer(buffer);
 		return NULL;
 	}
 	buffer->allocation_header = header;
 
-	data_node *node = add_first_data_node(header);
+	data_node* node = add_first_data_node(header);
 
 	list_init(&buffer->buffers);
 	list_add_item(&buffer->buffers, node);
 
 	buffer->ancillary_data = NULL;
 
-	buffer->source = (sockaddr *)&buffer->storage.source;
-	buffer->destination = (sockaddr *)&buffer->storage.destination;
+	buffer->source = (sockaddr*)&buffer->storage.source;
+	buffer->destination = (sockaddr*)&buffer->storage.destination;
 
 	buffer->storage.source.ss_len = 0;
 	buffer->storage.destination.ss_len = 0;
@@ -1076,9 +1078,9 @@ create_buffer(size_t headerSpace)
 
 
 static void
-free_buffer(net_buffer *_buffer)
+free_buffer(net_buffer* _buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	TRACE(("%ld: free buffer %p\n", find_thread(NULL), buffer));
 	T(Free(buffer));
@@ -1086,8 +1088,8 @@ free_buffer(net_buffer *_buffer)
 	CHECK_BUFFER(buffer);
 	DELETE_PARANOIA_CHECK_SET(buffer);
 
-	data_node *node;
-	while ((node = (data_node *)list_remove_head_item(&buffer->buffers)) != NULL) {
+	while (data_node* node
+			= (data_node*)list_remove_head_item(&buffer->buffers)) {
 		remove_data_node(node);
 	}
 
@@ -1102,10 +1104,10 @@ free_buffer(net_buffer *_buffer)
 /*!	Creates a duplicate of the \a buffer. The new buffer does not share internal
 	storage; they are completely independent from each other.
 */
-static net_buffer *
-duplicate_buffer(net_buffer *_buffer)
+static net_buffer*
+duplicate_buffer(net_buffer* _buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	ParanoiaChecker _(buffer);
 
@@ -1114,7 +1116,7 @@ duplicate_buffer(net_buffer *_buffer)
 	// TODO: We might want to choose a better header space. The minimal
 	// one doesn't allow to prepend any data without allocating a new header.
 	// The same holds for appending cloned data.
-	net_buffer *duplicate = create_buffer(DATA_NODE_SIZE);
+	net_buffer* duplicate = create_buffer(DATA_NODE_SIZE);
 	if (duplicate == NULL)
 		return NULL;
 
@@ -1122,7 +1124,7 @@ duplicate_buffer(net_buffer *_buffer)
 
 	// copy the data from the source buffer
 
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	while (node != NULL) {
 		if (append_data(duplicate, node->start, node->used) < B_OK) {
 			free_buffer(duplicate);
@@ -1130,7 +1132,7 @@ duplicate_buffer(net_buffer *_buffer)
 			return NULL;
 		}
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	copy_metadata(duplicate, buffer);
@@ -1153,17 +1155,17 @@ duplicate_buffer(net_buffer *_buffer)
 	are using this, it's your responsibility that only one of the buffers
 	will do this.
 */
-static net_buffer *
-clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
+static net_buffer*
+clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 {
-// TODO: See, if the commented out code can be fixed in a safe way. We could
-// probably place cloned nodes on a header not belonging to our buffer, if
-// we don't free the header space for the node when removing it. Otherwise we
-// mess with the header's free list which might at the same time be accessed
-// by another thread.
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	// TODO: See, if the commented out code can be fixed in a safe way. We could
+	// probably place cloned nodes on a header not belonging to our buffer, if
+	// we don't free the header space for the node when removing it. Otherwise we
+	// mess with the header's free list which might at the same time be accessed
+	// by another thread.
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
-	net_buffer *clone = create_buffer(MAX_FREE_BUFFER_SIZE);
+	net_buffer* clone = create_buffer(MAX_FREE_BUFFER_SIZE);
 	if (clone == NULL)
 		return NULL;
 
@@ -1181,27 +1183,27 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	TRACE(("%ld: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
-	net_buffer_private *clone = allocate_net_buffer();
+	net_buffer_private* clone = allocate_net_buffer();
 	if (clone == NULL)
 		return NULL;
 
 	TRACE(("%ld:   clone: %p\n", find_thread(NULL), buffer));
 
-	data_node *sourceNode = (data_node *)list_get_first_item(&buffer->buffers);
+	data_node* sourceNode = (data_node*)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
 		free_net_buffer(clone);
 		return NULL;
 	}
 
-	clone->source = (sockaddr *)&clone->storage.source;
-	clone->destination = (sockaddr *)&clone->storage.destination;
+	clone->source = (sockaddr*)&clone->storage.source;
+	clone->destination = (sockaddr*)&clone->storage.destination;
 
 	list_init(&clone->buffers);
 
 	// grab reference to this buffer - all additional nodes will get
 	// theirs in add_data_node()
 	acquire_data_header(sourceNode->header);
-	data_node *node = &clone->first_node;
+	data_node* node = &clone->first_node;
 	node->header = sourceNode->header;
 	node->located = NULL;
 	node->used_header_space = &node->own_header_space;
@@ -1226,7 +1228,8 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 		// add node to clone's list of buffers
 		list_add_item(&clone->buffers, node);
 
-		sourceNode = (data_node *)list_get_next_item(&buffer->buffers, sourceNode);
+		sourceNode = (data_node*)list_get_next_item(&buffer->buffers,
+			sourceNode);
 		if (sourceNode == NULL)
 			break;
 
@@ -1255,14 +1258,13 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 }
 
 
-/*!
-	Split the buffer at offset, the header data
+/*!	Split the buffer at offset, the header data
 	is returned as new buffer.
 */
-static net_buffer *
-split_buffer(net_buffer *from, uint32 offset)
+static net_buffer*
+split_buffer(net_buffer* from, uint32 offset)
 {
-	net_buffer *buffer = create_buffer(DATA_NODE_SIZE);
+	net_buffer* buffer = create_buffer(DATA_NODE_SIZE);
 	if (buffer == NULL)
 		return NULL;
 
@@ -1289,17 +1291,16 @@ split_buffer(net_buffer *from, uint32 offset)
 }
 
 
-/*!
-	Merges the second buffer with the first. If \a after is \c true, the
+/*!	Merges the second buffer with the first. If \a after is \c true, the
 	second buffer's contents will be appended to the first ones, else they
 	will be prepended.
 	The second buffer will be freed if this function succeeds.
 */
 static status_t
-merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
+merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	net_buffer_private *with = (net_buffer_private *)_with;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	net_buffer_private* with = (net_buffer_private*)_with;
 	if (with == NULL)
 		return B_BAD_VALUE;
 
@@ -1317,16 +1318,16 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 	// TODO: this is currently very simplistic, I really need to finish the
 	//	harder part of this implementation (data_node management per header)
 
-	data_node *before = NULL;
+	data_node* before = NULL;
 
-// TODO: Do allocating nodes (the only part that can fail) upfront. Put them
-// in a list, so we can easily clean up, if necessary.
+	// TODO: Do allocating nodes (the only part that can fail) upfront. Put them
+	// in a list, so we can easily clean up, if necessary.
 
 	if (!after) {
 		// change offset of all nodes already in the buffer
-		data_node *node = NULL;
+		data_node* node = NULL;
 		while (true) {
-			node = (data_node *)list_get_next_item(&buffer->buffers, node);
+			node = (data_node*)list_get_next_item(&buffer->buffers, node);
 			if (node == NULL)
 				break;
 
@@ -1336,21 +1337,21 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		}
 	}
 
-	data_node *last = NULL;
+	data_node* last = NULL;
 
 	while (true) {
-		data_node *node = (data_node *)list_get_next_item(&with->buffers, last);
+		data_node* node = (data_node*)list_get_next_item(&with->buffers, last);
 		if (node == NULL)
 			break;
 
-		if ((uint8 *)node > (uint8 *)node->header
-			&& (uint8 *)node < (uint8 *)node->header + BUFFER_SIZE) {
+		if ((uint8*)node > (uint8*)node->header
+			&& (uint8*)node < (uint8*)node->header + BUFFER_SIZE) {
 			// The node is already in the buffer, we can just move it
 			// over to the new owner
 			list_remove_item(&with->buffers, node);
 		} else {
 			// we need a new place for this node
-			data_node *newNode = add_data_node(buffer, node->header);
+			data_node* newNode = add_data_node(buffer, node->header);
 			if (newNode == NULL) {
 				// TODO: try to revert buffers to their initial state!!
 				return ENOBUFS;
@@ -1390,9 +1391,9 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		bounds.
 */
 static status_t
-write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
+write_data(net_buffer* _buffer, size_t offset, const void* data, size_t size)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	T(Write(buffer, offset, data, size));
 
@@ -1404,7 +1405,7 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 		return B_OK;
 
 	// find first node to write into
-	data_node *node = get_node_at_offset(buffer, offset);
+	data_node* node = get_node_at_offset(buffer, offset);
 	if (node == NULL)
 		return B_BAD_VALUE;
 
@@ -1419,9 +1420,9 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 			break;
 
 		offset = 0;
-		data = (void *)((uint8 *)data + written);
+		data = (void*)((uint8*)data + written);
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_BAD_VALUE;
 	}
@@ -1433,9 +1434,9 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 
 
 static status_t
-read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
+read_data(net_buffer* _buffer, size_t offset, void* data, size_t size)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	T(Read(buffer, offset, data, size));
 
@@ -1447,7 +1448,7 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 		return B_OK;
 
 	// find first node to read from
-	data_node *node = get_node_at_offset(buffer, offset);
+	data_node* node = get_node_at_offset(buffer, offset);
 	if (node == NULL)
 		return B_BAD_VALUE;
 
@@ -1462,9 +1463,9 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 			break;
 
 		offset = 0;
-		data = (void *)((uint8 *)data + bytesRead);
+		data = (void*)((uint8*)data + bytesRead);
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_BAD_VALUE;
 	}
@@ -1476,10 +1477,10 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 
 
 static status_t
-prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
+prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 
 	T(PrependSize(buffer, size));
 
@@ -1497,15 +1498,15 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		do {
 			if (node->HeaderSpace() == 0) {
 				size_t headerSpace = MAX_FREE_BUFFER_SIZE;
-				data_header *header = create_data_header(headerSpace);
+				data_header* header = create_data_header(headerSpace);
 				if (header == NULL) {
 					remove_header(buffer, sizePrepended);
 					return B_NO_MEMORY;
 				}
 
-				data_node *previous = node;
+				data_node* previous = node;
 
-				node = (data_node *)add_first_data_node(header);
+				node = (data_node*)add_first_data_node(header);
 
 				list_insert_item_before(&buffer->buffers, previous, node);
 
@@ -1527,7 +1528,7 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 		size_t offset = 0;
 		node = NULL;
-		while ((node = (data_node *)list_get_next_item(&buffer->buffers,
+		while ((node = (data_node*)list_get_next_item(&buffer->buffers,
 				node)) != NULL) {
 			node->offset = offset;
 			offset += node->used;
@@ -1545,7 +1546,8 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 			*_contiguousBuffer = node->start;
 
 		// adjust offset of following nodes
-		while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
+		while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
+				!= NULL) {
 			node->offset += size;
 		}
 	}
@@ -1563,9 +1565,9 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 
 static status_t
-prepend_data(net_buffer *buffer, const void *data, size_t size)
+prepend_data(net_buffer* buffer, const void* data, size_t size)
 {
-	void *contiguousBuffer;
+	void* contiguousBuffer;
 	status_t status = prepend_size(buffer, size, &contiguousBuffer);
 	if (status < B_OK)
 		return status;
@@ -1583,10 +1585,10 @@ prepend_data(net_buffer *buffer, const void *data, size_t size)
 
 
 static status_t
-append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
+append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_last_item(&buffer->buffers);
 
 	T(AppendSize(buffer, size));
 
@@ -1618,7 +1620,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 				sizeUsed = size - sizeAdded;
 			}
 
-			data_header *header = create_data_header(headerSpace);
+			data_header* header = create_data_header(headerSpace);
 			if (header == NULL) {
 				remove_trailer(buffer, sizeAdded);
 				return B_NO_MEMORY;
@@ -1672,11 +1674,11 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 
 static status_t
-append_data(net_buffer *buffer, const void *data, size_t size)
+append_data(net_buffer* buffer, const void* data, size_t size)
 {
 	size_t used = buffer->size;
 
-	void *contiguousBuffer;
+	void* contiguousBuffer;
 	status_t status = append_size(buffer, size, &contiguousBuffer);
 	if (status < B_OK)
 		return status;
@@ -1690,13 +1692,12 @@ append_data(net_buffer *buffer, const void *data, size_t size)
 }
 
 
-/*!
-	Removes bytes from the beginning of the buffer.
+/*!	Removes bytes from the beginning of the buffer.
 */
 static status_t
-remove_header(net_buffer *_buffer, size_t bytes)
+remove_header(net_buffer* _buffer, size_t bytes)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	T(RemoveHeader(buffer, bytes));
 
@@ -1710,10 +1711,10 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	//dump_buffer(buffer);
 
 	size_t left = bytes;
-	data_node *node = NULL;
+	data_node* node = NULL;
 
 	while (left >= 0) {
-		node = (data_node *)list_get_first_item(&buffer->buffers);
+		node = (data_node*)list_get_first_item(&buffer->buffers);
 		if (node == NULL) {
 			if (left == 0)
 				break;
@@ -1740,13 +1741,13 @@ remove_header(net_buffer *_buffer, size_t bytes)
 		node->AddHeaderSpace(cut);
 		node->used -= cut;
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	// adjust offset of following nodes
 	while (node != NULL) {
 		node->offset -= bytes;
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	buffer->size -= bytes;
@@ -1761,24 +1762,22 @@ remove_header(net_buffer *_buffer, size_t bytes)
 }
 
 
-/*!
-	Removes bytes from the end of the buffer.
+/*!	Removes bytes from the end of the buffer.
 */
 static status_t
-remove_trailer(net_buffer *buffer, size_t bytes)
+remove_trailer(net_buffer* buffer, size_t bytes)
 {
 	return trim_data(buffer, buffer->size - bytes);
 }
 
 
-/*!
-	Trims the buffer to the specified \a newSize by removing space from
+/*!	Trims the buffer to the specified \a newSize by removing space from
 	the end of the buffer.
 */
 static status_t
-trim_data(net_buffer *_buffer, size_t newSize)
+trim_data(net_buffer* _buffer, size_t newSize)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 	TRACE(("%ld: trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
 		find_thread(NULL), buffer, newSize, buffer->size));
 	T(Trim(buffer, newSize));
@@ -1791,7 +1790,7 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	if (newSize == buffer->size)
 		return B_OK;
 
-	data_node *node = get_node_at_offset(buffer, newSize);
+	data_node* node = get_node_at_offset(buffer, newSize);
 	if (node == NULL) {
 		// trim size greater than buffer size
 		return B_BAD_VALUE;
@@ -1802,10 +1801,10 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	node->used -= diff;
 
 	if (node->used > 0)
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 
 	while (node != NULL) {
-		data_node *next = (data_node *)list_get_next_item(&buffer->buffers, node);
+		data_node* next = (data_node*)list_get_next_item(&buffer->buffers, node);
 		list_remove_item(&buffer->buffers, node);
 		remove_data_node(node);
 
@@ -1824,19 +1823,18 @@ trim_data(net_buffer *_buffer, size_t newSize)
 }
 
 
-/*!
-	Appends data coming from buffer \a source to the buffer \a buffer. It only
+/*!	Appends data coming from buffer \a source to the buffer \a buffer. It only
 	clones the data, though, that is the data is not copied, just referenced.
 */
 static status_t
-append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
+append_cloned_data(net_buffer* _buffer, net_buffer* _source, uint32 offset,
 	size_t bytes)
 {
 	if (bytes == 0)
 		return B_OK;
 
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	net_buffer_private *source = (net_buffer_private *)_source;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	net_buffer_private* source = (net_buffer_private*)_source;
 	TRACE(("%ld: append_cloned_data(buffer %p, source %p, offset = %ld, "
 		"bytes = %ld)\n", find_thread(NULL), buffer, source, offset, bytes));
 	T(AppendCloned(buffer, source, offset, bytes));
@@ -1848,7 +1846,7 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 		return B_BAD_VALUE;
 
 	// find data_node to start with from the source buffer
-	data_node *node = get_node_at_offset(source, offset);
+	data_node* node = get_node_at_offset(source, offset);
 	if (node == NULL) {
 		// trim size greater than buffer size
 		return B_BAD_VALUE;
@@ -1857,7 +1855,7 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 	size_t sizeAppended = 0;
 
 	while (node != NULL && bytes > 0) {
-		data_node *clone = add_data_node(buffer, node->header);
+		data_node* clone = add_data_node(buffer, node->header);
 		if (clone == NULL) {
 			remove_trailer(buffer, sizeAppended);
 			return ENOBUFS;
@@ -1877,7 +1875,7 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 		bytes -= clone->used;
 		buffer->size += clone->used;
 		sizeAppended += clone->used;
-		node = (data_node *)list_get_next_item(&source->buffers, node);
+		node = (data_node*)list_get_next_item(&source->buffers, node);
 	}
 
 	if (bytes != 0)
@@ -1895,21 +1893,20 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 
 
 void
-set_ancillary_data(net_buffer *buffer, ancillary_data_container *container)
+set_ancillary_data(net_buffer* buffer, ancillary_data_container* container)
 {
 	((net_buffer_private*)buffer)->ancillary_data = container;
 }
 
 
 ancillary_data_container*
-get_ancillary_data(net_buffer *buffer)
+get_ancillary_data(net_buffer* buffer)
 {
 	return ((net_buffer_private*)buffer)->ancillary_data;
 }
 
 
-/*!
-	Moves all ancillary data from buffer \c from to the end of the list of
+/*!	Moves all ancillary data from buffer \c from to the end of the list of
 	ancillary data of buffer \c to. Note, that this is the only function that
 	transfers or copies ancillary data from one buffer to another.
 
@@ -1918,11 +1915,11 @@ get_ancillary_data(net_buffer *buffer)
 	\return A pointer to the first of the moved ancillary data, if any, \c NULL
 		otherwise.
 */
-static void *
-transfer_ancillary_data(net_buffer *_from, net_buffer *_to)
+static void*
+transfer_ancillary_data(net_buffer* _from, net_buffer* _to)
 {
-	net_buffer_private *from = (net_buffer_private *)_from;
-	net_buffer_private *to = (net_buffer_private *)_to;
+	net_buffer_private* from = (net_buffer_private*)_from;
+	net_buffer_private* to = (net_buffer_private*)_to;
 
 	if (from == NULL || to == NULL)
 		return NULL;
@@ -1938,7 +1935,7 @@ transfer_ancillary_data(net_buffer *_from, net_buffer *_to)
 	}
 
 	// both have ancillary data
-	void *data = move_ancillary_data(from->ancillary_data,
+	void* data = move_ancillary_data(from->ancillary_data,
 		to->ancillary_data);
 	delete_ancillary_data_container(from->ancillary_data);
 	from->ancillary_data = NULL;
@@ -1947,8 +1944,7 @@ transfer_ancillary_data(net_buffer *_from, net_buffer *_to)
 }
 
 
-/*!
-	Tries to directly access the requested space in the buffer.
+/*!	Tries to directly access the requested space in the buffer.
 	If the space is contiguous, the function will succeed and place a pointer
 	to that space into \a _contiguousBuffer.
 
@@ -1956,20 +1952,21 @@ transfer_ancillary_data(net_buffer *_from, net_buffer *_to)
 	\return B_ERROR in case the buffer is not contiguous at that location.
 */
 static status_t
-direct_access(net_buffer *_buffer, uint32 offset, size_t size,
-	void **_contiguousBuffer)
+direct_access(net_buffer* _buffer, uint32 offset, size_t size,
+	void** _contiguousBuffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	ParanoiaChecker _(buffer);
 
-	//TRACE(("direct_access(buffer %p, offset %ld, size %ld)\n", buffer, offset, size));
+	//TRACE(("direct_access(buffer %p, offset %ld, size %ld)\n", buffer, offset,
+	//	size));
 
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
 
 	// find node to access
-	data_node *node = get_node_at_offset(buffer, offset);
+	data_node* node = get_node_at_offset(buffer, offset);
 	if (node == NULL)
 		return B_BAD_VALUE;
 
@@ -1984,15 +1981,15 @@ direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 
 
 static int32
-checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
+checksum_data(net_buffer* _buffer, uint32 offset, size_t size, bool finalize)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	if (offset + size > buffer->size || size == 0)
 		return B_BAD_VALUE;
 
 	// find first node to read from
-	data_node *node = get_node_at_offset(buffer, offset);
+	data_node* node = get_node_at_offset(buffer, offset);
 	if (node == NULL)
 		return B_ERROR;
 
@@ -2017,7 +2014,7 @@ checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
 
 		offset = 0;
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return B_ERROR;
 	}
@@ -2034,10 +2031,10 @@ checksum_data(net_buffer *_buffer, uint32 offset, size_t size, bool finalize)
 
 
 static uint32
-get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
+get_iovecs(net_buffer* _buffer, struct iovec* iovecs, uint32 vecCount)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
 	while (node != NULL && count < vecCount) {
@@ -2047,7 +2044,7 @@ get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 			count++;
 		}
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	return count;
@@ -2055,17 +2052,17 @@ get_iovecs(net_buffer *_buffer, struct iovec *iovecs, uint32 vecCount)
 
 
 static uint32
-count_iovecs(net_buffer *_buffer)
+count_iovecs(net_buffer* _buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 	uint32 count = 0;
 
 	while (node != NULL) {
 		if (node->used > 0)
 			count++;
 
-		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+		node = (data_node*)list_get_next_item(&buffer->buffers, node);
 	}
 
 	return count;
@@ -2073,7 +2070,7 @@ count_iovecs(net_buffer *_buffer)
 
 
 static void
-swap_addresses(net_buffer *buffer)
+swap_addresses(net_buffer* buffer)
 {
 	std::swap(buffer->source, buffer->destination);
 }
