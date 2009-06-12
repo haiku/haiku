@@ -43,6 +43,7 @@ WebCamMediaAddOn::WebCamMediaAddOn(image_id imid)
 
 WebCamMediaAddOn::~WebCamMediaAddOn()
 {
+	fRoster->Stop();
 	delete fRoster;
 }
 
