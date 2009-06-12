@@ -105,8 +105,13 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 	if (tfd & (ATA_ERR | ATA_DF)) {
 		uint8 status = tfd & 0xff;
 		uint8 error = (tfd >> 8) & 0xff;
-		dprintf("ahci: sata_request::finish ATA command 0x%02x failed\n", fFis[2]);
-		dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n", status, error);
+
+		if (!is_test_unit_ready()) {
+			dprintf("ahci: sata_request::finish ATA command 0x%02x failed\n",
+				fFis[2]);
+			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n",
+				status, error);
+		}
 	}
 
 	if (fCcb) {
@@ -116,13 +121,16 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 		if (tfd & (ATA_ERR | ATA_DF)) {
 			fCcb->subsys_status = SCSI_REQ_CMP_ERR;
 			if (fIsATAPI) {
-				dprintf("ahci: sata_request::finish ATAPI packet %02x %02x %02x %02x "
+				if (!is_test_unit_ready()) {
+					dprintf("ahci: sata_request::finish ATAPI packet %02x %02x %02x %02x "
 						"%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x (len %d)\n",
 						fCcb->cdb[0], fCcb->cdb[1], fCcb->cdb[2], fCcb->cdb[3],
 						fCcb->cdb[4], fCcb->cdb[5], fCcb->cdb[6], fCcb->cdb[7],
 						fCcb->cdb[8], fCcb->cdb[9], fCcb->cdb[10], fCcb->cdb[11],
 						fCcb->cdb[12], fCcb->cdb[13], fCcb->cdb[14], fCcb->cdb[15],
 						fCcb->cdb_length);
+				}
+
 				fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
 			} else {
 				// TODO ATA error handling goes here

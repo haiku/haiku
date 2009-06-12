@@ -67,6 +67,7 @@ private:
 	uint32							fSectorSize;
 	uint64							fSectorCount;
 	bool							fIsATAPI;
+	bool							fTestUnitReadyActive;
 	bool							fResetPort;
 	bool							fError;
 

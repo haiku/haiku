@@ -43,6 +43,7 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	fSectorSize(0),
 	fSectorCount(0),
 	fIsATAPI(false),
+	fTestUnitReadyActive(false),
 	fResetPort(false),
 	fError(false)
 {
@@ -140,7 +141,6 @@ AHCIPort::Init2()
 	FlushPostedWrites();
 
 	ResetPort(true);
-	PostReset();
 
 	TRACE("ie   0x%08lx\n", fRegs->ie);
 	TRACE("is   0x%08lx\n", fRegs->is);
@@ -233,7 +233,8 @@ AHCIPort::ResetDevice()
 status_t
 AHCIPort::ResetPort(bool forceDeviceReset)
 {
-	TRACE("AHCIPort::ResetPort port %d\n", fIndex);
+	if (!fTestUnitReadyActive)
+		TRACE("AHCIPort::ResetPort port %d\n", fIndex);
 
 	// stop DMA engine
 	fRegs->cmd &= ~PORT_CMD_ST;
@@ -246,8 +247,10 @@ AHCIPort::ResetPort(bool forceDeviceReset)
 
 	bool deviceBusy = fRegs->tfd & (ATA_BSY | ATA_DRQ);
 
-	TRACE("AHCIPort::ResetPort port %d, deviceBusy %d, forceDeviceReset %d\n",
-		  fIndex, deviceBusy, forceDeviceReset);
+	if (!fTestUnitReadyActive) {
+		TRACE("AHCIPort::ResetPort port %d, deviceBusy %d, "
+			"forceDeviceReset %d\n", fIndex, deviceBusy, forceDeviceReset);
+	}
 
 	if (deviceBusy || forceDeviceReset)
 		ResetDevice();
@@ -256,14 +259,15 @@ AHCIPort::ResetPort(bool forceDeviceReset)
 	fRegs->cmd |= PORT_CMD_ST;
 	FlushPostedWrites();
 
-	return B_OK;
+	return PostReset();
 }
 
 
 status_t
 AHCIPort::PostReset()
 {
-	TRACE("AHCIPort::PostReset port %d\n", fIndex);
+	if (!fTestUnitReadyActive)
+		TRACE("AHCIPort::PostReset port %d\n", fIndex);
 
 	if ((fRegs->ssts & 0xf) != 0x3 || (fRegs->tfd & 0xff) == 0x7f) {
 		TRACE("AHCIPort::PostReset port %d: no device\n", fIndex);
@@ -289,9 +293,11 @@ AHCIPort::PostReset()
 		fRegs->cmd &= ~PORT_CMD_ATAPI;
 	FlushPostedWrites();
 
-	TRACE("device signature 0x%08lx (%s)\n", fRegs->sig,
-		(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ?
-			"ATA" : "unknown");
+	if (!fTestUnitReadyActive) {
+		TRACE("device signature 0x%08lx (%s)\n", fRegs->sig,
+			(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ?
+				"ATA" : "unknown");
+	}
 
 	return B_OK;
 }
@@ -345,20 +351,25 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 {
 	uint32 ci = fRegs->ci;
 
-	TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08lx, "
-		"is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+	if (!fTestUnitReadyActive) {
+		TRACE("AHCIPort::InterruptErrorHandler port %d, "
+			"fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex,
+			fCommandsActive, is, ci);
 
-	TRACE("ssts 0x%08lx\n", fRegs->ssts);
-	TRACE("sctl 0x%08lx\n", fRegs->sctl);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
-	TRACE("sact 0x%08lx\n", fRegs->sact);
+		TRACE("ssts 0x%08lx\n", fRegs->ssts);
+		TRACE("sctl 0x%08lx\n", fRegs->sctl);
+		TRACE("serr 0x%08lx\n", fRegs->serr);
+		TRACE("sact 0x%08lx\n", fRegs->sact);
+	}
 
 	// read and clear SError
 	uint32 serr = fRegs->serr;
 	fRegs->serr = serr;
 
 	if (is & PORT_INT_TFE) {
-		TRACE("Task File Error\n");
+		if (!fTestUnitReadyActive)
+			TRACE("Task File Error\n");
+
 		fResetPort = true;
 		fError = true;
 	}
@@ -740,6 +751,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	fCommandList->cfl = 5; // 20 bytes, length in DWORDS 
 	memcpy((char *)fCommandTable->cfis, request->fis(), 20);
 
+	fTestUnitReadyActive = request->is_test_unit_ready();
 	if (request->is_atapi()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
 		memset((char *)fCommandTable->acmd, 0, 32);
@@ -755,7 +767,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	if (wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 1000000) < B_OK) {
 		TRACE("ExecuteAtaRequest port %d: device is busy\n", fIndex);
-		fResetPort = true;
+		ResetPort();
 		FinishTransfer();
 		request->abort();
 		return;
@@ -763,9 +775,9 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	cpu_status cpu = disable_interrupts();
 	acquire_spinlock(&fSpinlock);
+	fCommandsActive |= 1;
 	fRegs->ci = 1;
 	FlushPostedWrites();
-	fCommandsActive |= 1;
 	release_spinlock(&fSpinlock);
 	restore_interrupts(cpu);
 
@@ -790,13 +802,17 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	TRACE("tfd  0x%08lx\n", fRegs->tfd);
 */
 
+	if (fResetPort || status == B_TIMED_OUT) {
+		fResetPort = false;
+		ResetPort();
+	}
+
 	size_t bytesTransfered = fCommandList->prdbc;
 
 	FinishTransfer();
 
 	if (status == B_TIMED_OUT) {
 		TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
-		fResetPort = true;
 		request->abort();
 	} else {
 		request->finish(tfd, bytesTransfered);
@@ -807,12 +823,6 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
-	if (fResetPort) {
-		fResetPort = false;
-		ResetPort();
-		PostReset();
-	}
-
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 	if (fIsATAPI && request->cdb[0] != SCSI_OP_INQUIRY) {

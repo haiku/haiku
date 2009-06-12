@@ -6,6 +6,7 @@
 #define _SATA_REQUEST_H
 
 #include "ahci_defs.h"
+#include "scsi_cmds.h"
 
 class sata_request
 {
@@ -22,6 +23,7 @@ public:
 
 	void			set_atapi_cmd(size_t transferLength);
 	bool 			is_atapi();
+	bool			is_test_unit_ready();
 
 	scsi_ccb *		ccb();
 	const void *	fis();
@@ -62,6 +64,13 @@ inline bool
 sata_request::is_atapi()
 {
 	return fIsATAPI;
+}
+
+
+inline bool
+sata_request::is_test_unit_ready()
+{
+	return fIsATAPI && fCcb != NULL && fCcb->cdb[0] == SCSI_OP_TEST_UNIT_READY;
 }
 
 
