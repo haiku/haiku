@@ -825,7 +825,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
-	if (fIsATAPI && request->cdb[0] != SCSI_OP_INQUIRY) {
+	if (fIsATAPI) {
 		bool isWrite = false;
 		switch (request->flags & SCSI_DIR_MASK) {
 			case SCSI_DIR_NONE:
