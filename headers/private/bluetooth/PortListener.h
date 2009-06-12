@@ -1,3 +1,7 @@
+/*
+ * Copyright 2009 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
 #ifndef	PORTLISTENER_H_
 #define	PORTLISTENER_H_
 
@@ -6,7 +10,7 @@
 
 template <
 	typename TYPE,
-	ssize_t MAX_MESSAGE_SIZE	= 256,
+	ssize_t MAX_MESSAGE_SIZE = 256,
 	size_t MAX_MESSAGE_DEEP	= 16,
 	uint32 PRIORITY	= B_URGENT_DISPLAY_PRIORITY>
 class PortListener {
@@ -18,13 +22,12 @@ class PortListener {
 		port_listener_func func;
 	} fInformation;
 
-
-	public:	
+	public:
 		PortListener(const char* name, port_listener_func handler) 
 		{
 			fInformation.func = handler;
 			fInformation.port = &fPort;
-			
+
 			InitCheck();
 			fPortName = strdup(name);
 			fThreadName = strdup(name);
@@ -48,9 +51,9 @@ class PortListener {
 
 
 		status_t TriggerCode(int32 code) {
-			
+
 			return write_port(fPort, code, NULL, 0);
-	
+
 		}	
 
 
@@ -77,10 +80,10 @@ class PortListener {
 					MAX_MESSAGE_DEEP, PRIORITY>::threadFunction, fThreadName,	PRIORITY, &fInformation);
 #endif
 			}
-		
+
 			if (fThread	< B_OK)
 				return fThread;
-		
+
 			return B_OK;
 		}
 
@@ -97,6 +100,7 @@ class PortListener {
 
 
 		status_t Stop()	{
+			
 			status_t status;
 			
 			wait_for_thread(fThread, &status);
