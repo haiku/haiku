@@ -15,7 +15,7 @@ public:
 									void* targetCookie);
 
 protected:
-								~AbstractModelLoader();
+	virtual						~AbstractModelLoader();
 
 public:
 	virtual	status_t			StartLoading();
