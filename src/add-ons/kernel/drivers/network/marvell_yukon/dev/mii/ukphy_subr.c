@@ -38,7 +38,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/ukphy_subr.c,v 1.8.8.1 2006/07/19 04:40:26 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * Subroutines shared by the ukphy driver and other PHY drivers.
@@ -112,10 +112,10 @@ ukphy_status(struct mii_softc *phy)
 		else if ((gtcr & GTCR_ADV_1000THDX) &&
 		    (gtsr & GTSR_LP_1000THDX))
 			mii->mii_media_active |= IFM_1000_T;
-		else if (anlpar & ANLPAR_T4)
-			mii->mii_media_active |= IFM_100_T4;
 		else if (anlpar & ANLPAR_TX_FD)
 			mii->mii_media_active |= IFM_100_TX|IFM_FDX;
+		else if (anlpar & ANLPAR_T4)
+			mii->mii_media_active |= IFM_100_T4;
 		else if (anlpar & ANLPAR_TX)
 			mii->mii_media_active |= IFM_100_TX;
 		else if (anlpar & ANLPAR_10_FD)

@@ -93,7 +93,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*$FreeBSD: src/sys/dev/msk/if_mskreg.h,v 1.11 2007/12/05 09:41:58 remko Exp $*/
+/*$FreeBSD$*/
 
 /*
  * SysKonnect PCI vendor ID
@@ -130,13 +130,19 @@
 #define DEVICEID_MRVL_8035	0x4350
 #define DEVICEID_MRVL_8036	0x4351
 #define DEVICEID_MRVL_8038	0x4352
-#define DEVICEID_MRVL_8039	0X4353
+#define DEVICEID_MRVL_8039	0x4353
+#define DEVICEID_MRVL_8040	0x4354
+#define DEVICEID_MRVL_8040T	0x4355
+#define DEVICEID_MRVL_8048	0x435A
 #define DEVICEID_MRVL_4360	0x4360
 #define DEVICEID_MRVL_4361	0x4361
 #define DEVICEID_MRVL_4362	0x4362
 #define DEVICEID_MRVL_4363	0x4363
 #define DEVICEID_MRVL_4364	0x4364
+#define DEVICEID_MRVL_4365	0x4365
 #define DEVICEID_MRVL_436A	0x436A
+#define DEVICEID_MRVL_436B	0x436B
+#define DEVICEID_MRVL_436C	0x436C
 
 /*
  * D-Link gigabit ethernet device ID
@@ -221,6 +227,8 @@
 #define PCI_OUR_REG_3	0x80	/* 32 bit Our Register 3 */
 #define PCI_OUR_REG_4	0x84	/* 32 bit Our Register 4 */
 #define PCI_OUR_REG_5	0x88	/* 32 bit Our Register 5 */
+#define PCI_CFG_REG_0	0x90	/* 32 bit Config Register 0 */
+#define PCI_CFG_REG_1	0x94	/* 32 bit Config Register 1 */
 
 /* PCI Express Capability */
 #define PEX_CAP_ID	0xe0	/*  8 bit PEX Capability ID */
@@ -320,6 +328,56 @@
 #define	PCI_ASPM_A1_MODE_SELECT	BIT_2	/* A1 Mode Select (A1 only) */
 #define	PCI_CLK_GATE_PEX_UNIT_ENA	BIT_1	/* Enable Gate PEX Unit Clock */
 #define	PCI_CLK_GATE_ROOT_COR_ENA	BIT_0	/* Enable Gate Root Core Clock */
+
+/* PCI_OUR_REG_5	32 bit	Our Register 5 (Yukon-ECU only) */
+						/* Bit 31..27: for A3 & later */
+#define	PCI_CTL_DIV_CORE_CLK_ENA	BIT_31	/* Divide Core Clock Enable */
+#define	PCI_CTL_SRESET_VMAIN_AV		BIT_30	/* Soft Reset for Vmain_av De-Glitch */
+#define	PCI_CTL_BYPASS_VMAIN_AV		BIT_29	/* Bypass En. for Vmain_av De-Glitch */
+#define	PCI_CTL_TIM_VMAIN_AV1		BIT_28	/* Bit 28..27: Timer Vmain_av Mask */
+#define	PCI_CTL_TIM_VMAIN_AV0		BIT_27	/* Bit 28..27: Timer Vmain_av Mask */
+#define	PCI_CTL_TIM_VMAIN_AV_MSK	(BIT_28 | BIT_27)
+					/* Bit 26..16: Release Clock on Event */
+#define	PCI_REL_PCIE_RST_DE_ASS		BIT_26	/* PCIe Reset De-Asserted */
+#define	PCI_REL_GPHY_REC_PACKET		BIT_25	/* GPHY Received Packet */
+#define	PCI_REL_INT_FIFO_N_EMPTY	BIT_24	/* Internal FIFO Not Empty */
+#define	PCI_REL_MAIN_PWR_AVAIL		BIT_23	/* Main Power Available */
+#define	PCI_REL_CLKRUN_REQ_REL		BIT_22	/* CLKRUN Request Release */
+#define	PCI_REL_PCIE_RESET_ASS		BIT_21	/* PCIe Reset Asserted */
+#define	PCI_REL_PME_ASSERTED		BIT_20	/* PME Asserted */
+#define	PCI_REL_PCIE_EXIT_L1_ST		BIT_19	/* PCIe Exit L1 State */
+#define	PCI_REL_LOADER_NOT_FIN		BIT_18	/* EPROM Loader Not Finished */
+#define	PCI_REL_PCIE_RX_EX_IDLE		BIT_17	/* PCIe Rx Exit Electrical Idle State */
+#define	PCI_REL_GPHY_LINK_UP		BIT_16	/* GPHY Link Up */
+					/* Bit 10.. 0: Mask for Gate Clock */
+#define	PCI_GAT_PCIE_RST_ASSERTED	BIT_10	/* PCIe Reset Asserted */
+#define	PCI_GAT_GPHY_N_REC_PACKET	BIT_9	/* GPHY Not Received Packet */
+#define	PCI_GAT_INT_FIFO_EMPTY		BIT_8	/* Internal FIFO Empty */
+#define	PCI_GAT_MAIN_PWR_N_AVAIL	BIT_7	/* Main Power Not Available */
+#define	PCI_GAT_CLKRUN_REQ_REL		BIT_6	/* CLKRUN Not Requested */
+#define	PCI_GAT_PCIE_RESET_ASS		BIT_5	/* PCIe Reset Asserted */
+#define	PCI_GAT_PME_DE_ASSERTED		BIT_4	/* PME De-Asserted */
+#define	PCI_GAT_PCIE_ENTER_L1_ST	BIT_3	/* PCIe Enter L1 State */
+#define	PCI_GAT_LOADER_FINISHED		BIT_2	/* EPROM Loader Finished */
+#define	PCI_GAT_PCIE_RX_EL_IDLE		BIT_1	/* PCIe Rx Electrical Idle State */
+#define	PCI_GAT_GPHY_LINK_DOWN		BIT_0	/* GPHY Link Down */
+
+/* PCI_CFG_REG_1	32 bit	Config Register 1 */
+#define	PCI_CF1_DIS_REL_EVT_RST		BIT_24	/* Dis. Rel. Event during PCIE reset */
+						/* Bit 23..21: Release Clock on Event */
+#define	PCI_CF1_REL_LDR_NOT_FIN		BIT_23	/* EEPROM Loader Not Finished */
+#define	PCI_CF1_REL_VMAIN_AVLBL		BIT_22	/* Vmain available */
+#define	PCI_CF1_REL_PCIE_RESET		BIT_21	/* PCI-E reset */
+						/* Bit 20..18: Gate Clock on Event */
+#define	PCI_CF1_GAT_LDR_NOT_FIN		BIT_20	/* EEPROM Loader Finished */
+#define	PCI_CF1_GAT_PCIE_RX_IDLE	BIT_19	/* PCI-E Rx Electrical idle */
+#define	PCI_CF1_GAT_PCIE_RESET		BIT_18	/* PCI-E Reset */
+#define	PCI_CF1_PRST_PHY_CLKREQ		BIT_17	/* Enable PCI-E rst & PM2PHY gen. CLKREQ */
+#define	PCI_CF1_PCIE_RST_CLKREQ		BIT_16	/* Enable PCI-E rst generate CLKREQ */
+
+#define	PCI_CF1_ENA_CFG_LDR_DONE	BIT_8	/* Enable core level Config loader done */
+#define	PCI_CF1_ENA_TXBMU_RD_IDLE	BIT_1	/* Enable TX BMU Read  IDLE for ASPM */
+#define	PCI_CF1_ENA_TXBMU_WR_IDLE	BIT_0	/* Enable TX BMU Write IDLE for ASPM */
 
 /* PEX_DEV_CTRL	16 bit	PEX Device Control (Yukon-2) */
 #define PEX_DC_MAX_RRS_MSK	(7<<12)	/* Bit 14..12:	Max. Read Request Size */
@@ -617,6 +675,7 @@
 #define B28_Y2_SMB_CSD_REG	0x0e44	/* 32 bit ASF SMB Control/Status/Data */
 #define B28_Y2_ASF_IRQ_V_BASE	0x0e60	/* 32 bit ASF IRQ Vector Base */
 #define B28_Y2_ASF_STAT_CMD	0x0e68	/* 32 bit ASF Status and Command Reg */
+#define B28_Y2_ASF_HCU_CCSR	0x0e68	/* 32 bit ASF HCU CCSR (Yukon EX) */
 #define B28_Y2_ASF_HOST_COM	0x0e6c	/* 32 bit ASF Host Communication Reg */
 #define B28_Y2_DATA_REG_1	0x0e70	/* 32 bit ASF/Host Data Register 1 */
 #define B28_Y2_DATA_REG_2	0x0e74	/* 32 bit ASF/Host Data Register 2 */
@@ -826,8 +885,10 @@
 #define CHIP_ID_YUKON_LP	0xb2 /* Chip ID for YUKON-LP */
 #define CHIP_ID_YUKON_XL	0xb3 /* Chip ID for YUKON-2 XL */
 #define CHIP_ID_YUKON_EC_U	0xb4 /* Chip ID for YUKON-2 EC Ultra */
+#define CHIP_ID_YUKON_EX	0xb5 /* Chip ID for YUKON-2 Extreme */
 #define CHIP_ID_YUKON_EC	0xb6 /* Chip ID for YUKON-2 EC */
 #define CHIP_ID_YUKON_FE	0xb7 /* Chip ID for YUKON-2 FE */
+#define CHIP_ID_YUKON_FE_P	0xb8 /* Chip ID for YUKON-2 FE+ */
 
 #define	CHIP_REV_YU_XL_A0	0 /* Chip Rev. for Yukon-2 A0 */
 #define	CHIP_REV_YU_XL_A1	1 /* Chip Rev. for Yukon-2 A1 */
@@ -840,6 +901,11 @@
 
 #define	CHIP_REV_YU_EC_U_A0	1
 #define	CHIP_REV_YU_EC_U_A1	2
+
+#define	CHIP_REV_YU_FE_P_A0	0 /* Chip Rev. for Yukon-2 FE+ A0 */
+
+#define	CHIP_REV_YU_EX_A0	1 /* Chip Rev. for Yukon-2 EX A0 */
+#define	CHIP_REV_YU_EX_B0	2 /* Chip Rev. for Yukon-2 EX B0 */
 
 /*	B2_Y2_CLK_GATE	 8 bit	Clock Gating (Yukon-2 only) */
 #define Y2_STATUS_LNK2_INAC	BIT_7	/* Status Link 2 inactiv (0 = activ) */
@@ -904,6 +970,18 @@
 #define TST_FRC_APERR_T		BIT_2	/* force ADDRPERR on TRG */
 #define TST_CFG_WRITE_ON	BIT_1	/* Enable  Config Reg WR */
 #define TST_CFG_WRITE_OFF	BIT_0	/* Disable Config Reg WR */
+
+/*	B2_GP_IO */
+#define	GLB_GPIO_CLK_DEB_ENA	BIT_31	/* Clock Debug Enable */
+#define	GLB_GPIO_CLK_DBG_MSK	0x3c000000	/* Clock Debug */
+
+#define	GLB_GPIO_INT_RST_D3_DIS	BIT_15	/* Disable Internal Reset After D3 to D0 */
+#define	GLB_GPIO_LED_PAD_SPEED_UP	BIT_14	/* LED PAD Speed Up */
+#define	GLB_GPIO_STAT_RACE_DIS	BIT_13	/* Status Race Disable */
+#define	GLB_GPIO_TEST_SEL_MSK	0x00001800	/* Testmode Select */
+#define	GLB_GPIO_TEST_SEL_BASE	BIT_11
+#define	GLB_GPIO_RAND_ENA	BIT_10	/* Random Enable */
+#define	GLB_GPIO_RAND_BIT_1	BIT_9	/* Random Bit 1 */
 
 /*	B2_I2C_CTRL	32 bit	I2C HW Control Register */
 #define I2C_FLAG	BIT_31		/* Start read/write if WR */
@@ -1026,13 +1104,16 @@
 					/* Bit 10..0: same as for Rx */
 
 /*	Q_F		32 bit	Flag Register */
-#define F_ALM_FULL	BIT_27	/* Rx FIFO: almost full */
-#define F_EMPTY		BIT_27	/* Tx FIFO: empty flag */
-#define F_FIFO_EOF	BIT_26	/* Tag (EOF Flag) bit in FIFO */
-#define F_WM_REACHED	BIT_25	/* Watermark reached */
-#define F_M_RX_RAM_DIS	BIT_24	/* MAC Rx RAM Read Port disable */
-#define F_FIFO_LEVEL	(0x1f<<16)	/* Bit 23..16:	# of Qwords in FIFO */
-#define F_WATER_MARK	0x0007ff	/* Bit 10.. 0:	Watermark */
+#define F_TX_CHK_AUTO_OFF	BIT_31	/* Tx checksum auto-calc Off(Yukon EX)*/
+#define F_TX_CHK_AUTO_ON	BIT_30	/* Tx checksum auto-calc On(Yukon EX)*/
+#define F_ALM_FULL		BIT_28	/* Rx FIFO: almost full */
+#define F_EMPTY			BIT_27	/* Tx FIFO: empty flag */
+#define F_FIFO_EOF		BIT_26	/* Tag (EOF Flag) bit in FIFO */
+#define F_WM_REACHED		BIT_25	/* Watermark reached */
+#define F_M_RX_RAM_DIS		BIT_24	/* MAC Rx RAM Read Port disable */
+#define F_FIFO_LEVEL		(0x1f<<16)
+					/* Bit 23..16:	# of Qwords in FIFO */
+#define F_WATER_MARK		0x0007ff/* Bit 10.. 0:	Watermark */
 
 /* Queue Prefetch Unit Offsets, use Y2_PREF_Q_ADDR() to address (Yukon-2 only)*/
 /* PREF_UNIT_CTRL_REG	32 bit	Prefetch Control register */
@@ -1614,6 +1695,8 @@
 			(GM_MIB_CNT_BASE + 24)	/* Multicast Frames Received OK */
 #define GM_RXF_FCS_ERR \
 			(GM_MIB_CNT_BASE + 32)	/* Rx Frame Check Seq. Error */
+#define GM_RXF_SPARE1 \
+			(GM_MIB_CNT_BASE + 40)	/* Rx spare 1 */
 #define GM_RXO_OK_LO \
 			(GM_MIB_CNT_BASE + 48)	/* Octets Received OK Low */
 #define GM_RXO_OK_HI \
@@ -1644,8 +1727,12 @@
 			(GM_MIB_CNT_BASE + 152)	/* Rx Frame too Long Error */
 #define GM_RXF_JAB_PKT \
 			(GM_MIB_CNT_BASE + 160)	/* Rx Jabber Packet Frame */
+#define GM_RXF_SPARE2 \
+			(GM_MIB_CNT_BASE + 168)	/* Rx spare 2 */
 #define GM_RXE_FIFO_OV \
 			(GM_MIB_CNT_BASE + 176)	/* Rx FIFO overflow Event */
+#define GM_RXF_SPARE3 \
+			(GM_MIB_CNT_BASE + 184)	/* Rx spare 3 */
 #define GM_TXF_UC_OK \
 			(GM_MIB_CNT_BASE + 192)	/* Unicast Frames Xmitted OK */
 #define GM_TXF_BC_OK \
@@ -1672,6 +1759,8 @@
 			(GM_MIB_CNT_BASE + 280)	/* 1024-1518 Byte Tx Frame */
 #define GM_TXF_MAX_SZ \
 			(GM_MIB_CNT_BASE + 288)	/* 1519-MaxSize Byte Tx Frame */
+#define GM_TXF_SPARE1 \
+			(GM_MIB_CNT_BASE + 296)	/* Tx spare 1 */
 #define GM_TXF_COL \
 			(GM_MIB_CNT_BASE + 304)	/* Tx Collision */
 #define GM_TXF_LAT_COL \
@@ -1818,6 +1907,7 @@
 			GMR_FS_LONG_ERR | \
 			GMR_FS_MII_ERR | \
 			GMR_FS_BAD_FC | \
+			GMR_FS_GOOD_FC | \
 			GMR_FS_UN_SIZE | \
 			GMR_FS_JABBER)
 
@@ -1846,6 +1936,10 @@
 #define RX_TRUNC_OFF		BIT_26	/* disable packet truncation */
 #define RX_VLAN_STRIP_ON	BIT_25	/* enable  VLAN stripping */
 #define RX_VLAN_STRIP_OFF	BIT_24	/* disable VLAN stripping */
+#define GMF_RX_OVER_ON		BIT_19	/* enable flushing on receive overrun */
+#define GMF_RX_OVER_OFF		BIT_18	/* disable flushing on receive overrun */
+#define GMF_ASF_RX_OVER_ON	BIT_17	/* enable flushing of ASF when overrun */
+#define GMF_ASF_RX_OVER_OFF	BIT_16	/* disable flushing of ASF when overrun */
 #define GMF_WP_TST_ON		BIT_14	/* Write Pointer Test On */
 #define GMF_WP_TST_OFF		BIT_13	/* Write Pointer Test Off */
 #define GMF_WP_STEP		BIT_12	/* Write Pointer Step/Increment */
@@ -1907,6 +2001,28 @@
 #define Y2_ASF_UC_STATE	(3<<2)	/* ASF uC State */
 #define Y2_ASF_CLK_HALT	0	/* ASF system clock stopped */
 
+/* B28_Y2_ASF_HCU_CCSR	32bit CPU Control and Status Register (Yukon EX) */
+#define	Y2_ASF_HCU_CCSR_SMBALERT_MONITOR	BIT_27	/* SMBALERT pin monitor */
+#define	Y2_ASF_HCU_CCSR_CPU_SLEEP	BIT_26	/* CPU sleep status */
+#define	Y2_ASF_HCU_CCSR_CS_TO		BIT_25	/* Clock Stretching Timeout */
+#define	Y2_ASF_HCU_CCSR_WDOG		BIT_24	/* Watchdog Reset */
+#define	Y2_ASF_HCU_CCSR_CLR_IRQ_HOST	BIT_17	/* Clear IRQ_HOST */
+#define	Y2_ASF_HCU_CCSR_SET_IRQ_HCU	BIT_16	/* Set IRQ_HCU */
+#define	Y2_ASF_HCU_CCSR_AHB_RST		BIT_9	/* Reset AHB bridge */
+#define	Y2_ASF_HCU_CCSR_CPU_RST_MODE	BIT_8	/* CPU Reset Mode */
+#define	Y2_ASF_HCU_CCSR_SET_SYNC_CPU	BIT_5
+#define	Y2_ASF_HCU_CCSR_CPU_CLK_DIVIDE1	BIT_4
+#define	Y2_ASF_HCU_CCSR_CPU_CLK_DIVIDE0	BIT_3
+#define	Y2_ASF_HCU_CCSR_CPU_CLK_DIVIDE_MSK	(BIT_4 | BIT_3)	/* CPU Clock Divide */
+#define	Y2_ASF_HCU_CCSR_CPU_CLK_DIVIDE_BASE	BIT_3
+#define	Y2_ASF_HCU_CCSR_OS_PRSNT	BIT_2	/* ASF OS Present */
+	/* Microcontroller State */
+#define	Y2_ASF_HCU_CCSR_UC_STATE_MSK	3
+#define	Y2_ASF_HCU_CCSR_UC_STATE_BASE	BIT_0
+#define	Y2_ASF_HCU_CCSR_ASF_RESET	0
+#define	Y2_ASF_HCU_CCSR_ASF_HALTED	BIT_1
+#define	Y2_ASF_HCU_CCSR_ASF_RUNNING	BIT_0
+
 /* B28_Y2_ASF_HOST_COM	32 bit	ASF Host Communication Reg */
 /* This register is used by the ASF firmware */
 #define Y2_ASF_CLR_ASFI	BIT_1	/* Clear host IRQ */
@@ -1920,6 +2036,14 @@
 #define SC_STAT_RST_SET	BIT_0	/* Set   Status Unit Reset */
 
 /*	GMAC_CTRL	32 bit	GMAC Control Reg (YUKON only) */
+#define GMC_SEC_RST	BIT_15	/* MAC SEC RST */
+#define GMC_SEC_RST_OFF	BIT_14	/* MAC SEC RST Off */
+#define GMC_BYP_MACSECRX_ON	BIT_13	/* Bypass MAC SEC RX */
+#define GMC_BYP_MACSECRX_OFF	BIT_12	/* Bypass MAC SEC RX Off */
+#define GMC_BYP_MACSECTX_ON	BIT_11	/* Bypass MAC SEC TX */
+#define GMC_BYP_MACSECTX_OFF	BIT_10	/* Bypass MAC SEC TX Off */
+#define GMC_BYP_RETR_ON	BIT_9	/* Bypass MAC retransmit FIFO On */
+#define GMC_BYP_RETR_OFF	BIT_8	/* Bypass MAC retransmit FIFO Off */
 #define GMC_H_BURST_ON	BIT_7	/* Half Duplex Burst Mode On */
 #define GMC_H_BURST_OFF	BIT_6	/* Half Duplex Burst Mode Off */
 #define GMC_F_LOOPB_ON	BIT_5	/* FIFO Loopback On */
@@ -2113,6 +2237,8 @@ struct msk_stat_desc {
 #define OP_ADDR64VLAN	(OP_ADDR64 | OP_VLAN)
 #define OP_LRGLEN	0x24000000
 #define OP_LRGLENVLAN	(OP_LRGLEN | OP_VLAN)
+#define OP_MSS		0x28000000
+#define OP_MSSVLAN	(OP_MSS | OP_VLAN)
 #define OP_BUFFER	0x40000000
 #define OP_PACKET	0x41000000
 #define OP_LARGESEND	0x43000000
@@ -2131,7 +2257,18 @@ struct msk_stat_desc {
 #define OP_PUTIDX	0x70000000
 
 #define	STLE_OP_MASK	0xff000000
+#define	STLE_CSS_MASK	0x00ff0000
 #define	STLE_LEN_MASK	0x0000ffff
+
+/* CSS defined in status LE(valid for descriptor V2 format). */
+#define	CSS_TCPUDP_CSUM_OK	0x00800000
+#define	CSS_UDP			0x00400000
+#define	CSS_TCP			0x00200000
+#define	CSS_IPFRAG		0x00100000
+#define	CSS_IPV6		0x00080000
+#define	CSS_IPV4_CSUM_OK	0x00040000
+#define	CSS_IPV4		0x00020000
+#define	CSS_PORT		0x00010000
 
 /* Descriptor Bit Definition */
 /*	TxCtrl		Transmit Buffer Control Field */
@@ -2157,12 +2294,12 @@ struct msk_stat_desc {
 
 #define MSK_TX_RING_CNT		256
 #define MSK_RX_RING_CNT		256
+#define	MSK_RX_BUF_ALIGN	8
 #define MSK_JUMBO_RX_RING_CNT	MSK_RX_RING_CNT
 #define	MSK_STAT_RING_CNT	((1 + 3) * (MSK_TX_RING_CNT + MSK_RX_RING_CNT))
 #define MSK_MAXTXSEGS		32
 #define	MSK_TSO_MAXSGSIZE	4096
 #define	MSK_TSO_MAXSIZE		(65535 + sizeof(struct ether_vlan_header))
-#define	MSK_MAXRXSEGS		32
 
 /*
  * It seems that the hardware requires extra decriptors(LEs) to offload
@@ -2189,20 +2326,6 @@ struct msk_stat_desc {
 #define MSK_MAX_FRAMELEN		\
 	(ETHER_MAX_LEN + ETHER_VLAN_ENCAP_LEN - ETHER_CRC_LEN)
 #define MSK_MIN_FRAMELEN	(ETHER_MIN_LEN - ETHER_CRC_LEN)
-#define MSK_JSLOTS		((MSK_RX_RING_CNT * 3) / 2)
-
-#define MSK_JRAWLEN		(MSK_JUMBO_FRAMELEN + ETHER_ALIGN)
-#define MSK_JLEN		(MSK_JRAWLEN + (sizeof(uint64_t) - \
-	(MSK_JRAWLEN % sizeof(uint64_t))))
-#define MSK_JPAGESZ PAGE_SIZE
-#define MSK_RESID		\
-	(MSK_JPAGESZ - (MSK_JLEN * MSK_JSLOTS) % MSK_JPAGESZ)
-#define MSK_JMEM		((MSK_JLEN * MSK_JSLOTS) + MSK_RESID)
-
-struct msk_jpool_entry {
-	int                             slot;
-	SLIST_ENTRY(msk_jpool_entry)	jpool_entries;
-};
 
 struct msk_txdesc {
 	struct mbuf		*tx_m;
@@ -2228,10 +2351,6 @@ struct msk_chain_data {
 	bus_dmamap_t		msk_rx_ring_map;
 	bus_dmamap_t		msk_rx_sparemap;
 	bus_dma_tag_t		msk_jumbo_rx_tag;
-	bus_dma_tag_t		msk_jumbo_tag;
-	bus_dmamap_t		msk_jumbo_map;
-	bus_dma_tag_t		msk_jumbo_mtag;
-	caddr_t			msk_jslots[MSK_JSLOTS];
 	struct msk_rxdesc	msk_jumbo_rxdesc[MSK_JUMBO_RX_RING_CNT];
 	bus_dma_tag_t		msk_jumbo_rx_ring_tag;
 	bus_dmamap_t		msk_jumbo_rx_ring_map;
@@ -2253,8 +2372,6 @@ struct msk_ring_data {
 	bus_addr_t		msk_rx_ring_paddr;
 	struct msk_rx_desc	*msk_jumbo_rx_ring;
 	bus_addr_t		msk_jumbo_rx_ring_paddr;
-	void			*msk_jumbo_buf;
-	bus_addr_t		msk_jumbo_buf_paddr;
 };
 
 #define MSK_TX_RING_ADDR(sc, i)	\
@@ -2289,6 +2406,52 @@ struct msk_ring_data {
 /* Forward decl. */
 struct msk_if_softc;
 
+struct msk_hw_stats {
+	/* Rx stats. */
+	uint32_t rx_ucast_frames;
+	uint32_t rx_bcast_frames;
+	uint32_t rx_pause_frames;
+	uint32_t rx_mcast_frames;
+	uint32_t rx_crc_errs;
+	uint32_t rx_spare1;
+	uint64_t rx_good_octets;
+	uint64_t rx_bad_octets;
+	uint32_t rx_runts;
+	uint32_t rx_runt_errs;
+	uint32_t rx_pkts_64;
+	uint32_t rx_pkts_65_127;
+	uint32_t rx_pkts_128_255;
+	uint32_t rx_pkts_256_511;
+	uint32_t rx_pkts_512_1023;
+	uint32_t rx_pkts_1024_1518;
+	uint32_t rx_pkts_1519_max;
+	uint32_t rx_pkts_too_long;
+	uint32_t rx_pkts_jabbers;
+	uint32_t rx_spare2;
+	uint32_t rx_fifo_oflows;
+	uint32_t rx_spare3;
+	/* Tx stats. */
+	uint32_t tx_ucast_frames;
+	uint32_t tx_bcast_frames;
+	uint32_t tx_pause_frames;
+	uint32_t tx_mcast_frames;
+	uint64_t tx_octets;
+	uint32_t tx_pkts_64;
+	uint32_t tx_pkts_65_127;
+	uint32_t tx_pkts_128_255;
+	uint32_t tx_pkts_256_511;
+	uint32_t tx_pkts_512_1023;
+	uint32_t tx_pkts_1024_1518;
+	uint32_t tx_pkts_1519_max;
+	uint32_t tx_spare1;
+	uint32_t tx_colls;
+	uint32_t tx_late_colls;
+	uint32_t tx_excess_colls;
+	uint32_t tx_multi_colls;
+	uint32_t tx_single_colls;
+	uint32_t tx_underflows;
+};
+
 /* Softc for the Marvell Yukon II controller. */
 struct msk_softc {
 	struct resource		*msk_res[1];	/* I/O resource */
@@ -2306,9 +2469,8 @@ struct msk_softc {
 	uint32_t		msk_coppertype;
 	uint32_t		msk_intrmask;
 	uint32_t		msk_intrhwemask;
-	int			msk_suspended;
+	uint32_t		msk_pflags;
 	int			msk_clock;
-	int			msk_msi;
 	struct msk_if_softc	*msk_if[2];
 	device_t		msk_devs[2];
 	int			msk_txqsize;
@@ -2346,7 +2508,20 @@ struct msk_if_softc {
 	int			msk_framesize;
 	int			msk_phytype;
 	int			msk_phyaddr;
-	int			msk_link;
+	uint32_t		msk_flags;
+#define	MSK_FLAG_MSI		0x0001
+#define	MSK_FLAG_FASTETHER	0x0004
+#define	MSK_FLAG_JUMBO		0x0008
+#define	MSK_FLAG_JUMBO_NOCSUM	0x0010
+#define	MSK_FLAG_RAMBUF		0x0020
+#define	MSK_FLAG_DESCV2		0x0040
+#define	MSK_FLAG_AUTOTX_CSUM	0x0080
+#define	MSK_FLAG_NOHWVLAN	0x0100
+#define	MSK_FLAG_NORXCHK	0x0200
+#define	MSK_FLAG_NORX_CSUM	0x0400
+#define	MSK_FLAG_SUSPEND	0x2000
+#define	MSK_FLAG_DETACH		0x4000
+#define	MSK_FLAG_LINK		0x8000
 	struct callout		msk_tick_ch;
 	int			msk_watchdog_timer;
 	uint32_t		msk_txq;	/* Tx. Async Queue offset */
@@ -2355,18 +2530,11 @@ struct msk_if_softc {
 	struct msk_chain_data	msk_cdata;
 	struct msk_ring_data	msk_rdata;
 	struct msk_softc	*msk_softc;	/* parent controller */
-	struct task		msk_link_task;
+	struct msk_hw_stats	msk_stats;
 	struct task		msk_tx_task;
 	int			msk_if_flags;
-	int			msk_detach;
 	uint16_t		msk_vtag;	/* VLAN tag id. */
-	SLIST_HEAD(__msk_jfreehead, msk_jpool_entry)	msk_jfree_listhead;
-	SLIST_HEAD(__msk_jinusehead, msk_jpool_entry)	msk_jinuse_listhead;
-	struct mtx		msk_jlist_mtx;
 };
-
-#define	MSK_JLIST_LOCK(_sc)	mtx_lock(&(_sc)->msk_jlist_mtx)
-#define	MSK_JLIST_UNLOCK(_sc)	mtx_unlock(&(_sc)->msk_jlist_mtx)
 
 #define MSK_TIMEOUT	1000
 #define	MSK_PHY_POWERUP		1
