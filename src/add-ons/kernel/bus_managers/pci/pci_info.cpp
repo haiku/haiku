@@ -235,7 +235,7 @@ get_capability_name(uint8 cap_id)
 		case PCI_cap_id_msi:
 			return "MSI";
 		case PCI_cap_id_chswp:
-			return "chswp";
+			return "CompactPCIHotSwap";
 		case PCI_cap_id_pcix:
 			return "PCI-X";
 		case PCI_cap_id_ldt:
@@ -248,12 +248,20 @@ get_capability_name(uint8 cap_id)
 			return "cpci_rsrcctl";
 		case PCI_cap_id_hotplug:
 			return "HotPlug";
+		case PCI_cap_id_subvendor:
+			return "subvendor";
+		case PCI_cap_id_agp8x:
+			return "AGP8x";
+		case PCI_cap_id_secure_dev:
+			return "Secure Device";
 		case PCI_cap_id_pcie:
 			return "PCIe";
 		case PCI_cap_id_msix:
 			return "MSI-X";
 		case PCI_cap_id_sata:
 			return "SATA";
+		case PCI_cap_id_pciaf:
+			return "AdvancedFeatures";
 		default:
 			return NULL;
 	}

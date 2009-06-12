@@ -265,8 +265,8 @@ struct pci_module_info {
 #define PCI_input					0x09	/* input devices */
 #define PCI_docking_station			0x0a	/* docking stations */
 #define PCI_processor				0x0b	/* processors */
-#define PCI_serial_bus				0x0c	/* serial_bus_controller */
-#define PCI_wireless				0x0d
+#define PCI_serial_bus				0x0c	/* serial bus controllers */
+#define PCI_wireless				0x0d	/* wireless controllers */
 #define PCI_intelligent_io			0x0e
 #define PCI_satellite_communications 0x0f
 #define PCI_encryption_decryption	0x10
@@ -362,8 +362,10 @@ struct pci_module_info {
 #define PCI_pcmcia			0x05			/* PCMCIA bridge */
 #define PCI_nubus			0x06			/* NuBus bridge */
 #define PCI_cardbus			0x07			/* CardBus bridge */
-#define PCI_raceway         0x08            /* RACEway bridge */
-#define PCI_bridge_other	0x80			/* other bridge device */
+#define PCI_raceway			0x08			/* RACEway bridge */
+#define PCI_bridge_transparent		0x09			/* PCI transparent */
+#define PCI_bridge_infiniband		0x0a			/* Infiniband */
+#define PCI_bridge_other		0x80			/* other bridge device */
 
 
 /* ---
@@ -469,6 +471,7 @@ struct pci_module_info {
 --- */
 
 #define PCI_docking_generic		0x00	/* generic docking station */
+#define PCI_docking_other		0x80	/* other docking stations */
 
 /* ---
 	values for the class_sub field for class_base = 0x0b (processor)
@@ -492,6 +495,11 @@ struct pci_module_info {
 #define PCI_ssa					0x02	/* SSA */
 #define PCI_usb					0x03	/* Universal Serial Bus */
 #define PCI_fibre_channel		0x04	/* Fibre channel */
+#define PCI_smbus			0x05
+#define PCI_infiniband			0x06
+#define PCI_ipmi			0x07
+#define PCI_sercos			0x08
+#define PCI_canbus			0x09
 
 /* ---
 	values of the class_api field for
@@ -503,6 +511,17 @@ struct pci_module_info {
 #define PCI_usb_ohci			0x10	/* Open Host Controller Interface */
 #define PCI_usb_ehci			0x20	/* Enhanced Host Controller Interface */
 
+/* ---
+	values for the class_sub field for class_base = 0x0d (wireless controller)
+--- */
+#define PCI_wireless_irda			0x00
+#define PCI_wireless_consumer_ir		0x01
+#define PCI_wireless_rf				0x02
+#define PCI_wireless_bluetooth			0x03
+#define PCI_wireless_broadband			0x04
+#define PCI_wireless_80211A			0x10
+#define PCI_wireless_80211B			0x20
+#define PCI_wireless_other			0x80
 
 /* ---
 	masks for command register bits
@@ -614,22 +633,26 @@ struct pci_module_info {
 #define PCI_pin_max             0x04
 
 /** PCI Capability Codes */
-#define PCI_cap_id_reserved     0x00
-#define PCI_cap_id_pm           0x01      /* Power management */
-#define PCI_cap_id_agp          0x02      /* AGP */
-#define PCI_cap_id_vpd          0x03      /* Vital product data */
-#define PCI_cap_id_slotid       0x04      /* Slot ID */
-#define PCI_cap_id_msi          0x05      /* Message signalled interrupt */
-#define PCI_cap_id_chswp        0x06      /* Compact PCI HotSwap */
-#define PCI_cap_id_pcix         0x07      /* PCI-X */
-#define PCI_cap_id_ldt          0x08
-#define PCI_cap_id_vendspec     0x09
-#define PCI_cap_id_debugport    0x0a
+#define PCI_cap_id_reserved	0x00
+#define PCI_cap_id_pm		0x01      /* Power management */
+#define PCI_cap_id_agp		0x02      /* AGP */
+#define PCI_cap_id_vpd		0x03      /* Vital product data */
+#define PCI_cap_id_slotid	0x04      /* Slot ID */
+#define PCI_cap_id_msi		0x05      /* Message signalled interrupt */
+#define PCI_cap_id_chswp	0x06      /* Compact PCI HotSwap */
+#define PCI_cap_id_pcix		0x07      /* PCI-X */
+#define PCI_cap_id_ldt		0x08
+#define PCI_cap_id_vendspec	0x09
+#define PCI_cap_id_debugport	0x0a
 #define PCI_cap_id_cpci_rsrcctl 0x0b
 #define PCI_cap_id_hotplug      0x0c
-#define PCI_cap_id_pcie			0x10	  /* PCIe (PCI express) */
-#define PCI_cap_id_msix			0x11      /* MSI-X */
-#define PCI_cap_id_sata         0x12      /* Serial ATA Capability */
+#define PCI_cap_id_subvendor	0x0d
+#define PCI_cap_id_agp8x	0x0e
+#define PCI_cap_id_secure_dev	0x0f
+#define PCI_cap_id_pcie		0x10	/* PCIe (PCI express) */
+#define PCI_cap_id_msix		0x11	/* MSI-X */
+#define PCI_cap_id_sata		0x12	/* Serial ATA Capability */
+#define PCI_cap_id_pciaf	0x13	/* PCI Advanced Features */
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03
