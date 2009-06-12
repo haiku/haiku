@@ -8,9 +8,7 @@ AddResources bluetooth_server : server-bluetooth.rdef ;
 
 Server bluetooth_server
  	:
-	BPortNot.cpp
 	BluetoothServer.cpp
-#	CommandManager.cpp
 	DeviceManager.cpp
 	HCIControllerAccessor.cpp
 	HCITransportAccessor.cpp

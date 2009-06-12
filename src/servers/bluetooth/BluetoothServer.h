@@ -9,20 +9,21 @@
 #define _BLUETOOTH_SERVER_APP_H
 
 #include <stdlib.h>
-#include <Application.h>
-#include <OS.h>
-#include <ObjectList.h>
 
-#include "BPortNot.h"
-#include "HCIDelegate.h"
-#include "DeviceManager.h"
-#include "LocalDeviceImpl.h"
+#include <Application.h>
+#include <ObjectList.h>
+#include <OS.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_transport.h>
 #include <bluetooth/HCI/btHCI_command.h>
 
+#include "HCIDelegate.h"
+#include "DeviceManager.h"
+#include "LocalDeviceImpl.h"
+
+#include <PortListener.h>
 
 #define BT "bluetooth_server: "
 
@@ -37,7 +38,7 @@ typedef enum {
 #define BLACKBOARD_LD(X) (BLACKBOARD_END+X-HCI_DEVICE_INDEX_OFFSET)
 
 typedef BObjectList<LocalDeviceImpl> LocalDevicesList;
-
+typedef PortListener<struct hci_event_header> BluetoothPortListener;
 
 class BluetoothServer : public BApplication
 {
@@ -52,9 +53,7 @@ public:
 
 	virtual void AppActivated(bool act);
 	virtual void MessageReceived(BMessage *message);
-	
-	
-	static int32 notification_Thread(void* data);
+
 	static int32 sdp_server_Thread(void* data);
 	
 	/* Messages reply */
@@ -66,7 +65,7 @@ public:
 
 
     LocalDeviceImpl*    LocateLocalDeviceImpl(hci_id hid);
-
+	
 private:
 
 	LocalDeviceImpl*	LocateDelegateFromMessage(BMessage* message);
@@ -74,12 +73,13 @@ private:
 	void 				ShowWindow(BWindow* pWindow);
 
 	LocalDevicesList   	fLocalDevicesList;
-	// UI
+
 
 	// Notification system
-	thread_id				fEventListener;
+	BluetoothPortListener*	fEventListener2;
+	
 	DeviceManager*			fDeviceManager;
-
+	
 	BPoint 					fCenter;
 };
 

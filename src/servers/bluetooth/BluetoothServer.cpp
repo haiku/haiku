@@ -2,7 +2,6 @@
  * Copyright 2007-2009 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 #include <stdio.h>
@@ -28,6 +27,28 @@
 #include "Output.h"
 
 
+status_t
+DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
+{
+	// we only handle events
+	if (GET_PORTCODE_TYPE(code)!= BT_EVENT) {
+		Output::Instance()->Post("Wrong type frame code", BLACKBOARD_GENERAL);
+		return B_OK;
+	}
+	
+	// fetch the LocalDevice who belongs this event 	    
+    LocalDeviceImpl* lDeviceImplementation = ((BluetoothServer*)be_app)->LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
+	if (lDeviceImplementation == NULL) {
+		Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_GENERAL);
+		return B_OK;
+	}
+
+	lDeviceImplementation->HandleEvent(header);
+	
+	return B_OK;
+}
+
+
 BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 {
 	Output::Instance()->Run();
@@ -42,9 +63,9 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
-	// TODO: Some events should be handled faster than in KL...
-	fEventListener = spawn_thread(notification_Thread, "BT port listener" ,
-					B_URGENT_DISPLAY_PRIORITY , this);
+	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME, 
+		(BluetoothPortListener::port_listener_func)&DispatchEvent);				
+	
 
 }
 
@@ -80,13 +101,12 @@ void BluetoothServer::ReadyToRun(void)
 	fDeviceManager->StartMonitoringDevice("bluetooth/h3");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h4");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h5");
-	// Launch the notifier thread
-	if ( resume_thread(fEventListener) != B_OK ) 
-	{
-		Output::Instance()->Post("Bluetooth port listener failed\n", BLACKBOARD_GENERAL);
-	}
 
-	Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
+	if (fEventListener2->Launch() != B_OK)
+		Output::Instance()->Post("Bluetooth port listener failed\n", BLACKBOARD_GENERAL);
+	else
+		Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
+
 }
 
 
@@ -174,6 +194,7 @@ void BluetoothServer::MessageReceived(BMessage *message)
 #if 0
 #pragma mark -
 #endif
+
 
 LocalDeviceImpl* 
 BluetoothServer::LocateDelegateFromMessage(BMessage* message)
@@ -368,16 +389,6 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 #if 0
 #pragma mark -
 #endif
-
-
-int32 
-BluetoothServer::notification_Thread(void* data)
-{
-	BPortNot notifierd((BluetoothServer*)data, BT_USERLAND_PORT_NAME);
-	
-	notifierd.loop();
-	return B_NO_ERROR;
-}
 
 int32 
 BluetoothServer::sdp_server_Thread(void* data)
