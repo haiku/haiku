@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_SYS_STAT_H_
@@ -20,10 +20,10 @@ struct fssh_stat {
 	fssh_off_t			fssh_st_size;		/* size in bytes of this file */
 	fssh_dev_t			fssh_st_rdev;		/* device type (not used) */
 	fssh_size_t			fssh_st_blksize;	/* preferred block size for i/o */
-	fssh_time_t			fssh_st_atime;		/* last access time */
-	fssh_time_t			fssh_st_mtime;		/* last modification time */
-	fssh_time_t			fssh_st_ctime;		/* last change time, not creation time */
-	fssh_time_t			fssh_st_crtime;		/* creation time */
+	fssh_timespec		fssh_st_atim;		/* last access time */
+	fssh_timespec		fssh_st_mtim;		/* last modification time */
+	fssh_timespec		fssh_st_ctim;		/* last change time, not creation time */
+	fssh_timespec		fssh_st_crtim;		/* creation time */
 
 	// Haiku extensions:
 	// TODO: we might also define special types for files and TTYs
@@ -33,6 +33,12 @@ struct fssh_stat {
 	fssh_off_t			fssh_st_blocks;		/* number of blocks allocated for object */
 };
 typedef struct fssh_stat fssh_struct_stat;
+
+/* compatibility with older apps */
+#define fssh_st_atime	fssh_st_atim.tv_sec
+#define fssh_st_mtime	fssh_st_mtim.tv_sec
+#define fssh_st_ctime	fssh_st_ctim.tv_sec
+#define fssh_st_crtime	fssh_st_crtim.tv_sec
 
 /* extended file types */
 #define FSSH_S_ATTR_DIR			01000000000	/* attribute directory */

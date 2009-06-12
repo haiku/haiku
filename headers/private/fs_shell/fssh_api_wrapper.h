@@ -1221,6 +1221,10 @@
 #define st_size		fssh_st_size
 #define st_rdev		fssh_st_rdev
 #define st_blksize	fssh_st_blksize
+#define st_atim		fssh_st_atim
+#define st_mtim		fssh_st_mtim
+#define st_ctim		fssh_st_ctim
+#define st_crtim	fssh_st_crtim
 #define st_atime	fssh_st_atime
 #define st_mtime	fssh_st_mtime
 #define st_ctime	fssh_st_ctime

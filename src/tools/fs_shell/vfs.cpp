@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* Virtual File System and File System Interface Layer */
+/*! Virtual File System and File System Interface Layer */
 
 #include "vfs.h"
 
@@ -3827,6 +3827,11 @@ common_read_stat(struct file_descriptor *descriptor, struct fssh_stat *stat)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("common_read_stat: stat %p\n", stat));
+
+	stat->fssh_st_atim.tv_nsec = 0;
+	stat->fssh_st_mtim.tv_nsec = 0;
+	stat->fssh_st_ctim.tv_nsec = 0;
+	stat->fssh_st_crtim.tv_nsec = 0;
 
 	fssh_status_t status = FS_CALL(vnode, read_stat, stat);
 
