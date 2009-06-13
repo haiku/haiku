@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BLUETOOTH_SERVER_APP_H
 #define _BLUETOOTH_SERVER_APP_H
 
@@ -38,7 +35,10 @@ typedef enum {
 #define BLACKBOARD_LD(X) (BLACKBOARD_END+X-HCI_DEVICE_INDEX_OFFSET)
 
 typedef BObjectList<LocalDeviceImpl> LocalDevicesList;
-typedef PortListener<struct hci_event_header> BluetoothPortListener;
+typedef PortListener<struct hci_event_header, 
+	HCI_MAX_EVENT_SIZE, // Event Body can hold max 255 + 2 header
+	24					// Some devices have sent chunks of 24 events(inquiry result)
+	> BluetoothPortListener;
 
 class BluetoothServer : public BApplication
 {

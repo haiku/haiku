@@ -32,14 +32,16 @@ DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
 {
 	// we only handle events
 	if (GET_PORTCODE_TYPE(code)!= BT_EVENT) {
-		Output::Instance()->Post("Wrong type frame code", BLACKBOARD_GENERAL);
+		Output::Instance()->Post("Wrong type frame code", BLACKBOARD_KIT);
 		return B_OK;
 	}
 	
 	// fetch the LocalDevice who belongs this event 	    
-    LocalDeviceImpl* lDeviceImplementation = ((BluetoothServer*)be_app)->LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
+    LocalDeviceImpl* lDeviceImplementation = ((BluetoothServer*)be_app)->
+    	LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
+    	
 	if (lDeviceImplementation == NULL) {
-		Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_GENERAL);
+		Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_KIT);
 		return B_OK;
 	}
 

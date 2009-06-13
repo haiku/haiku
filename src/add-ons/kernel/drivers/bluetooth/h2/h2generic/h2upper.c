@@ -14,7 +14,7 @@
 #include "h2transactions.h"
 #include "snet_buffer.h"
 
-//#define BT_DEBUG_THIS_MODULE
+#define BT_DEBUG_THIS_MODULE
 #include <btDebug.h>
 
 
@@ -93,14 +93,14 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 
     if (type == BT_EVENT) {
 		snet_buffer* snbuf = (snet_buffer*)buf;
-		flowf("to btDataCore\n");
 		btCoreData->PostEvent(bdev->ndev, snb_get(snbuf), (size_t)snb_size(snbuf));
 		snb_park(&bdev->snetBufferRecycleTrash, snbuf);
+		debugf("to btDataCore len=%d\n", snb_size(snbuf));
 	} else {
 		net_buffer* nbuf = (net_buffer*) buf;
   		/* No need to free the buffer at allocation is gonna be reused */
-  		flowf("to net_device\n");
 		btDevices->receive_data(bdev->ndev, &nbuf);
+		flowf("to net_device\n");
     }
 
     return err;

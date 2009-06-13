@@ -164,6 +164,8 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	//bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer/slower option
 	status_t    error;
 
+	debugf("cookie@%p status=%ld len=%ld\n", cookie, status, actual_len);
+
 	if (bdev == NULL)
 		return;
 

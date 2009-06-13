@@ -75,7 +75,7 @@ typedef struct bt_hci_device {
 #define BT_IOCTLS_OFFSET 3000
 
 enum {
-	ISSUE_BT_COMMAND = B_DEVICE_OP_CODES_END + BT_IOCTLS_OFFSET,
+	ISSUE_BT_COMMAND = B_DEVICE_OP_CODES_END + BT_IOCTLS_OFFSET, //12999
 	GET_STATS,
 	GET_NOTIFICATION_PORT,
 	GET_HCI_ID,
@@ -89,7 +89,7 @@ enum {
 
 /*  Port drivers can use to send information (1 for all for
 	at moment refer to ioctl GET_NOTIFICATION_PORT)*/
-#define BT_USERLAND_PORT_NAME "bluetooth kernel-user Land"
+#define BT_USERLAND_PORT_NAME "Kernel-User Event"
 #define BLUETOOTH_CONNECTION_PORT "bluetooth connection port"
 #define BLUETOOTH_CONNECTION_SCHED_PORT "bluetooth con sched port"
 

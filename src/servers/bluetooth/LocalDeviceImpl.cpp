@@ -481,8 +481,8 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 	// Handle command complete information
 	request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
-	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) for %s\n",__FUNCTION__,
-		event->ncmd,GetCommand(opcodeExpected));
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) %x for %s\n",__FUNCTION__,
+		event->ncmd, event->status, GetCommand(event->opcode));
 
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
