@@ -151,7 +151,7 @@ generic_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 	uint64 base = x86_read_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index * 2);
 
 	*_base = base & ~(B_PAGE_SIZE - 1);
-	*_length = (~mask & gPhysicalMask) + 1;
+	*_length = (~mask & gPhysicalMask) + B_PAGE_SIZE;
 	*_type = base & 0xff;
 
 	return B_OK;
