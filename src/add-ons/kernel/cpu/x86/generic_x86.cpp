@@ -101,8 +101,12 @@ generic_init_mtrrs(uint32 count)
 
 	// but turn on variable MTRR functionality
 
+	// we need to ensure that the default type is uncacheable, otherwise
+	// clearing the mtrrs could result in ranges that aren't supposed to be
+	// cacheable to become cacheable due to the default type
+
 	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
-		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) | IA32_MTRR_ENABLE);
+		(x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~0xff) | IA32_MTRR_ENABLE);
 }
 
 
