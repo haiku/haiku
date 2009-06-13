@@ -6,4 +6,5 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 KernelAddon efi_gpt :
 	efi_gpt.cpp
+	PartitionLocker.cpp
 	;
