@@ -14,16 +14,10 @@ template <
 	size_t MAX_MESSAGE_DEEP	= 16,
 	uint32 PRIORITY	= B_URGENT_DISPLAY_PRIORITY>
 class PortListener {
-
-	typedef status_t (*port_listener_func)(TYPE*, int32, size_t);
-
-	struct PortListenerInfo {
-		port_id* port;
-		port_listener_func func;
-	} fInformation;
-
 	public:
-		PortListener(const char* name, port_listener_func handler) 
+		typedef status_t (*port_listener_func)(TYPE*, int32, size_t);
+
+		PortListener(const char* name, port_listener_func handler)
 		{
 			fInformation.func = handler;
 			fInformation.port = &fPort;
@@ -35,8 +29,8 @@ class PortListener {
 		}
 
 
-		~PortListener()	{
-			
+		~PortListener()
+		{
 			status_t status;
 
 			close_port(fPort);
@@ -45,27 +39,24 @@ class PortListener {
 	
 			delete fThreadName;
 			delete fPortName;
-			
-			return status;
 		}
 
 
-		status_t TriggerCode(int32 code) {
-
+		status_t TriggerCode(int32 code)
+		{
 			return write_port(fPort, code, NULL, 0);
+		}
 
-		}	
 
-
-		status_t InitCheck() {
-
+		status_t InitCheck()
+		{
 			// Create Port
-			fPort =	find_port(fPortName);
+			fPort = find_port(fPortName);
 			if (fPort == B_NAME_NOT_FOUND) {
-				fPort =	create_port(MAX_MESSAGE_DEEP, fPortName);
+				fPort = create_port(MAX_MESSAGE_DEEP, fPortName);
 			}
 
-			if (fPort <	B_OK) 
+			if (fPort < B_OK) 
 				return fPort;
 
 			// Create Thread
@@ -73,43 +64,49 @@ class PortListener {
 			fThread = find_thread(fThreadName);
 			if (fThread < B_OK) {
 #ifdef KERNEL_LAND
-				fThread	= spawn_kernel_thread((thread_func)&PortListener<TYPE,MAX_MESSAGE_SIZE,
+				fThread = spawn_kernel_thread((thread_func)&PortListener<TYPE,MAX_MESSAGE_SIZE,
 					MAX_MESSAGE_DEEP, PRIORITY>::threadFunction, fThreadName, PRIORITY, &fInformation);
 #else
-				fThread	= spawn_thread((thread_func)&PortListener<TYPE,MAX_MESSAGE_SIZE, 
-					MAX_MESSAGE_DEEP, PRIORITY>::threadFunction, fThreadName,	PRIORITY, &fInformation);
+				fThread = spawn_thread((thread_func)&PortListener<TYPE,MAX_MESSAGE_SIZE, 
+					MAX_MESSAGE_DEEP, PRIORITY>::threadFunction, fThreadName, PRIORITY, &fInformation);
 #endif
 			}
 
-			if (fThread	< B_OK)
+			if (fThread < B_OK)
 				return fThread;
 
 			return B_OK;
 		}
 
 
-		status_t Launch() {
-			
+		status_t Launch()
+		{
 			status_t check = InitCheck();
 			
-			if (check <	B_OK)
+			if (check < B_OK)
 				return check;
 
 			return resume_thread(fThread);
 		}
 
 
-		status_t Stop()	{
-			
+		status_t Stop()
+		{
 			status_t status;
-			
 			wait_for_thread(fThread, &status);
 	
 			return status;
 		}
 
-	private:		
-		port_id	fPort;
+		
+
+	private:
+		struct PortListenerInfo {
+			port_id* port;
+			port_listener_func func;
+		} fInformation;
+
+		port_id fPort;
 		thread_id fThread;
 		char* fThreadName;
 		char* fPortName;
@@ -127,9 +124,9 @@ class PortListener {
 			
 			TYPE* buffer = (TYPE*)malloc(MAX_MESSAGE_SIZE);
 		
-			while ((ssizePort =	port_buffer_size(*port)) !=	B_BAD_PORT_ID) { 
+			while ((ssizePort = port_buffer_size(*port)) != B_BAD_PORT_ID) {
 		
-				if (ssizePort <= 0)	{					
+				if (ssizePort <= 0) {
 					snooze(500*1000);
 					continue;
 				}
@@ -139,7 +136,7 @@ class PortListener {
 					continue;
 				}
 				
-				ssizeRead =	read_port(*port, &code,	(void*)buffer, ssizePort);				 
+				ssizeRead = read_port(*port, &code, (void*)buffer, ssizePort);
 		
 				if (ssizeRead != ssizePort)
 					continue;
@@ -152,7 +149,7 @@ class PortListener {
 			
 			free(buffer);
 			
-			if (ssizePort == B_BAD_PORT_ID) // the port dissapeared
+			if (ssizePort == B_BAD_PORT_ID) // the port disappeared
 				return ssizePort;
 				
 			return status;
@@ -160,5 +157,5 @@ class PortListener {
 
 }; // PortListener
 
-
 #endif // PORTLISTENER_H_
+

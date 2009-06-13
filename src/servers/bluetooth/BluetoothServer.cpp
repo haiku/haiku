@@ -63,8 +63,8 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
-	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME, 
-		(BluetoothPortListener::port_listener_func)&DispatchEvent);				
+	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME,
+		(BluetoothPortListener::port_listener_func)&DispatchEvent);
 	
 
 }
