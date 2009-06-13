@@ -19,9 +19,9 @@
 
 //#define TRACE_MTRR
 #ifdef TRACE_MTRR
-#	define TRACE(x) dprintf x
+#	define TRACE(x...)	dprintf("mtrr: "x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)	/* nothing */
 #endif
 
 
@@ -44,6 +44,28 @@ struct mtrr_capabilities {
 uint64 gPhysicalMask = 0;
 
 
+#ifdef TRACE_MTRR
+static const char *
+mtrr_type_to_string(uint8 type)
+{
+	switch (type) {
+		case 0:
+			return "uncacheable";
+		case 1:
+			return "write combining";
+		case 4:
+			return "write-through";
+		case 5:
+			return "write-protected";
+		case 6:
+			return "write-back";
+		default:
+			return "reserved";
+	}
+}
+#endif // TRACE_MTRR
+
+
 uint32
 generic_count_mtrrs(void)
 {
@@ -52,7 +74,8 @@ generic_count_mtrrs(void)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
-	TRACE(("CPU has %u variable range MTRs.\n", (uint8)capabilities.variable_ranges));
+	TRACE("CPU has %u variable range MTRRs.\n",
+		(uint8)capabilities.variable_ranges);
 	return capabilities.variable_ranges;
 }
 
@@ -66,7 +89,7 @@ generic_init_mtrrs(uint32 count)
 	// disable and clear all MTRRs
 	// (we leave the fixed MTRRs as is)
 	// TODO: check if the fixed MTRRs are set on all CPUs identically?
-	TRACE(("generic_init_mtrrs(count = %ld)\n", count));
+	TRACE("generic_init_mtrrs(count = %ld)\n", count);
 
 	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
 		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~IA32_MTRR_ENABLE);
@@ -86,16 +109,16 @@ generic_init_mtrrs(uint32 count)
 void
 generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
-	index *= 2;
-		// there are two registers per slot
-
 	uint64 mask = length - 1;
 	mask = ~mask & gPhysicalMask;
 
-	TRACE(("MTRR %ld: new mask %Lx)\n", index, mask));
-	TRACE(("  mask test base: %Lx)\n", mask & base));
-	TRACE(("  mask test middle: %Lx)\n", mask & (base + length / 2)));
-	TRACE(("  mask test end: %Lx)\n", mask & (base + length)));
+	TRACE("MTRR %lu: new mask %Lx\n", index, mask);
+	TRACE("  mask test base: %Lx\n", mask & base);
+	TRACE("  mask test middle: %Lx\n", mask & (base + length / 2));
+	TRACE("  mask test end: %Lx\n", mask & (base + length));
+
+	index *= 2;
+		// there are two registers per slot
 
 	// First, disable MTRR
 
@@ -112,6 +135,9 @@ generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 		// reset base as well
 		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index, 0);
 	}
+
+	TRACE("mtrrs now:\n");
+	generic_dump_mtrrs(generic_count_mtrrs());
 }
 
 
@@ -150,8 +176,8 @@ generic_mtrr_compute_physical_mask(void)
 
 	gPhysicalMask = ((1ULL << bits) - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE(("CPU has %ld physical address bits, physical mask is %016Lx\n",
-		bits, gPhysicalMask));
+	TRACE("CPU has %ld physical address bits, physical mask is %016Lx\n",
+		bits, gPhysicalMask);
 
 	return B_OK;
 }
@@ -160,25 +186,29 @@ generic_mtrr_compute_physical_mask(void)
 void
 generic_dump_mtrrs(uint32 count)
 {
+#ifdef TRACE_MTRR
 	if (count == 0)
 		return;
 
-	if (x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & IA32_MTRR_ENABLE) {
-		TRACE(("MTRR enabled\n"));
-	} else {
-		TRACE(("MTRR disabled\n"));
-	}
+	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE);
+	TRACE("MTRRs are %sabled\n",
+		(defaultType & IA32_MTRR_ENABLE) != 0 ? "en" : "dis");
+	TRACE("default type is %u %s\n",
+		(uint8)defaultType, mtrr_type_to_string(defaultType));
+	TRACE("fixed range MTRRs are %sabled\n",
+		(defaultType & IA32_MTRR_ENABLE_FIXED) != 0 ? "en" : "dis");
 
 	for (uint32 i = 0; i < count; i++) {
 		uint64 base;
 		uint64 length;
 		uint8 type;
 		if (generic_get_mtrr(i, &base, &length, &type) == B_OK) {
-			TRACE(("  %ld: 0x%Lx, 0x%Lx, %u\n", i, base, length, type));
-		} else {
-			TRACE(("  %ld: empty\n", i));
-		}
+			TRACE("%lu: base: 0x%Lx; length: 0x%Lx; type: %u %s\n",
+				i, base, length, type, mtrr_type_to_string(type));
+		} else
+			TRACE("%lu: empty\n", i);
 	}
+#endif // TRACE_MTRR
 }
 
 
