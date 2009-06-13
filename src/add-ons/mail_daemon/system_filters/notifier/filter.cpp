@@ -8,6 +8,7 @@
 #include <String.h>
 #include <Alert.h>
 #include <Beep.h>
+#include <Path.h>
 #include <Application.h>
 
 #include <MailAddon.h>
@@ -63,15 +64,20 @@ status_t NotifyFilter::InitCheck(BString* err)
 	return B_OK;
 }
 
-status_t NotifyFilter::ProcessMailMessage(BPositionIO**, BEntry*, BMessage*headers, BPath*, const char*)
+status_t NotifyFilter::ProcessMailMessage(BPositionIO**, BEntry*, BMessage*headers, BPath*path, const char*)
 {
 	if (callback == NULL) {
 		callback = new NotifyCallback(strategy,_runner,this);
 		_runner->RegisterProcessCallback(callback);
 	}
 	
-	if (!headers->FindBool("ENTIRE_MESSAGE"))	
-		callback->num_messages ++;
+	if (!headers->FindBool("ENTIRE_MESSAGE")) {	
+		BString status;
+		headers->FindString("STATUS", &status);
+		// do not notify about auto-read messages
+		if (status.Compare("Read") != 0)
+			callback->num_messages ++;
+	}
 	
 	return B_OK;
 }
