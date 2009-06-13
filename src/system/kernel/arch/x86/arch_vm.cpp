@@ -272,33 +272,48 @@ set_memory_write_back(int32 id, uint64 base, uint64 length)
 
 #ifdef TRACE_MTRR
 	dprintf("solutions: ");
-	for (int i=0; i<sSolutionCount; i++) {
-                dprintf("0x%Lx ", sSolutions[i]);
-        }
-        dprintf("\n");
+	for (int i=0; i<sSolutionCount; i++)
+		dprintf("0x%Lx ", sSolutions[i]);
+	dprintf("\n");
 #endif
 
-	bool nextDown = false;
-	for (int i = 0; i < sSolutionCount; i++) {
-		if (sSolutions[i] < 0) {
-			if (nextDown)
-				base += sSolutions[i];
-			err = set_memory_type(id, base, -sSolutions[i], nextDown ? B_MTR_UC : B_MTR_WB);
-			if (err != B_OK) {
-				dprintf("set_memory_type returned %s (0x%lx)\n", strerror(err), err);
+	for (int run = 0; run < 2; run++) {
+		bool nextDown = false;
+		uint64 newBase = base;
+
+		for (int i = 0; i < sSolutionCount; i++) {
+			if (sSolutions[i] < 0) {
+				if (nextDown)
+					newBase += sSolutions[i];
+
+				if ((run == 0) == nextDown) {
+					err = set_memory_type(id, newBase, -sSolutions[i],
+						nextDown ? B_MTR_UC : B_MTR_WB);
+					if (err != B_OK) {
+						dprintf("set_memory_type returned %s (0x%lx)\n",
+							strerror(err), err);
+					}
+				}
+
+				if (!nextDown)
+					newBase -= sSolutions[i];
+				nextDown = !nextDown;
+			} else {
+				if (nextDown)
+					newBase -= sSolutions[i];
+
+				if ((run == 0) == nextDown) {
+					err = set_memory_type(id, newBase, sSolutions[i],
+						nextDown ? B_MTR_UC : B_MTR_WB);
+					if (err != B_OK) {
+						dprintf("set_memory_type returned %s (0x%lx)\n",
+							strerror(err), err);
+					}
+				}
+
+				if (!nextDown)
+					newBase += sSolutions[i];
 			}
-			if (!nextDown)
-				base -= sSolutions[i];
-			nextDown = !nextDown;
-		} else {
-			if (nextDown)
-				base -= sSolutions[i];
-			err = set_memory_type(id, base, sSolutions[i], nextDown ? B_MTR_UC : B_MTR_WB);
-			if (err != B_OK) {
-				dprintf("set_memory_type returned %s (0x%lx)\n", strerror(err), err);
-			}
-			if (!nextDown)
-				base += sSolutions[i];
 		}
 	}
 }
