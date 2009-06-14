@@ -35,7 +35,7 @@ const uint32 ML_INIT_MEDIA = 'MlIM';
 
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame) 
-: BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+: BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fCurrentNode(NULL),
 	fParamWeb(NULL),
 	fAlert(NULL),
@@ -172,59 +172,36 @@ MediaWindow::InitWindow(void)
 	fIcons.AddItem(icon);
 
 	const float scrollWidth = 9 * be_plain_font->Size() + 30;
-	const float contentWidth = 34 * be_plain_font->Size();
-	float totalWidthFont = scrollWidth + contentWidth + 14 * 3;
-	const float totalWidth = (605.0 > totalWidthFont) ?
-		605.0 : totalWidthFont;
 
-	BRect bounds = Bounds(); // the whole view
-	// Create the OutlineView
-	font_height titleHeightStruct;
-	be_bold_font->GetHeight(&titleHeightStruct);
-	float titleHeight = titleHeightStruct.ascent + titleHeightStruct.descent
-		+ titleHeightStruct.leading + 1;
-
-	BRect menuRect(bounds.left + 14, bounds.top + 14, scrollWidth,
-		bounds.bottom - 14);
-	BRect titleRect(menuRect.right + 14, menuRect.top,
-		totalWidth - 10, menuRect.top + titleHeight);
-	BRect availableRect(menuRect.right + 15, titleRect.bottom + 12,
-		totalWidth - 14, bounds.bottom - 16);
-	BRect barRect(titleRect.left, titleRect.bottom + 10,
-		titleRect.right - 2, titleRect.bottom + 11);
-
-	fListView = new BListView(menuRect, "media_list_view",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	fListView = new BListView("media_list_view");
 	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
 	
 	// Add ScrollView to Media Menu
 	BScrollView *scrollView = new BScrollView("listscroller",
-		fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false,
-		B_FANCY_BORDER);
+		fListView, 0, false, false, B_FANCY_BORDER);
 	scrollView->SetExplicitMinSize(BSize(scrollWidth, B_SIZE_UNSET));
 	scrollView->SetExplicitMaxSize(BSize(scrollWidth, B_SIZE_UNSET));
 
 	// Create the Views
-	fBox = new BBox(bounds, "background", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
+	fBox = new BBox("background", B_WILL_DRAW | B_FRAME_EVENTS, 
+		B_PLAIN_BORDER);
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	GetLayout()->AddView(fBox);
 	
 	// StringViews
 	rgb_color titleFontColor = { 0,0,0,0 };
-	fTitleView = new BStringView(titleRect, "AudioSettings",
-		"Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fTitleView = new BStringView("AudioSettings",
+		"Audio Settings", B_WILL_DRAW);
 	fTitleView->SetFont(be_bold_font);
 	fTitleView->SetHighColor(titleFontColor);
 	
-	fContentView = new BBox(availableRect, "contentView",
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
+	fContentView = new BBox("contentView", B_WILL_DRAW | B_FRAME_EVENTS, 
+		B_NO_BORDER);
 	
-	BRect settingsRect(0, 0, availableRect.Width(), availableRect.Height());
-	fAudioView = new SettingsView(settingsRect, false);
-	fVideoView = new SettingsView(settingsRect, true);
+	fAudioView = new SettingsView(false);
+	fVideoView = new SettingsView(true);
 	
-	fBar = new BarView(barRect);
+	fBar = new BarView();
 	BGroupView* titleGroupView = new BGroupView(B_HORIZONTAL);
 	titleGroupView->GroupLayout()->AddView(fTitleView);
 	titleGroupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
@@ -252,11 +229,6 @@ MediaWindow::InitWindow(void)
 		if (IsHidden())
 			Show();
 	}
-	
-	// Set window limits
-	ResizeTo(totalWidth + 14, bounds.Height());
-	SetZoomLimits(totalWidth + 14, bounds.Height());
-	SetSizeLimits(totalWidth + 14, 100000, bounds.Height(), 100000);
 }
 
 
@@ -705,7 +677,7 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 {
 	MediaAlert *alert = static_cast<MediaAlert*>(cookie);
 	PRINT(("stage : %i\n", stage));
-	char *string = "Unknown stage"; 
+	const char *string = "Unknown stage"; 
 	switch (stage) {
 		case 10:
 			string = "Stopping Media Server" B_UTF8_ELLIPSIS;
