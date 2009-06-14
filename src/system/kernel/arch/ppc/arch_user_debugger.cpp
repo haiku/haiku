@@ -55,6 +55,14 @@ arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 
 
 status_t
+arch_get_thread_debug_cpu_state(struct thread *thread,
+	struct debug_cpu_state *cpuState)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
 arch_set_breakpoint(void *address)
 {
 	return B_ERROR;

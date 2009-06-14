@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -58,6 +58,31 @@ static const uint32 sDR6B[4] = {
 // Enables a hack to make single stepping work under qemu. Set via kernel
 // driver settings.
 static bool sQEmuSingleStepHack = false;
+
+
+static void
+get_iframe_registers(struct iframe *frame, struct debug_cpu_state *cpuState)
+{
+	cpuState->gs = frame->gs;
+	cpuState->fs = frame->fs;
+	cpuState->es = frame->es;
+	cpuState->ds = frame->ds;
+	cpuState->edi = frame->edi;
+	cpuState->esi = frame->esi;
+	cpuState->ebp = frame->ebp;
+	cpuState->esp = frame->esp;
+	cpuState->ebx = frame->ebx;
+	cpuState->edx = frame->orig_edx;
+	cpuState->ecx = frame->ecx;
+	cpuState->eax = frame->orig_eax;
+	cpuState->vector = frame->vector;
+	cpuState->error_code = frame->error_code;
+	cpuState->eip = frame->eip;
+	cpuState->cs = frame->cs;
+	cpuState->eflags = frame->flags;
+	cpuState->user_esp = frame->user_esp;
+	cpuState->user_ss = frame->user_ss;
+}
 
 
 static inline void
@@ -562,7 +587,7 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 		frame->edi = cpuState->edi;
 		frame->esi = cpuState->esi;
 		frame->ebp = cpuState->ebp;
-		frame->esp = cpuState->esp;
+//		frame->esp = cpuState->esp;
 		frame->ebx = cpuState->ebx;
 		frame->edx = cpuState->edx;
 		frame->ecx = cpuState->ecx;
@@ -586,27 +611,27 @@ arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 		i386_fnsave(cpuState->extended_regs);
 			// For this to be correct the calling function must not use these
 			// registers (not even indirectly).
-
-		cpuState->gs = frame->gs;
-		cpuState->fs = frame->fs;
-		cpuState->es = frame->es;
-		cpuState->ds = frame->ds;
-		cpuState->edi = frame->edi;
-		cpuState->esi = frame->esi;
-		cpuState->ebp = frame->ebp;
-		cpuState->esp = frame->esp;
-		cpuState->ebx = frame->ebx;
-		cpuState->edx = frame->orig_edx;
-		cpuState->ecx = frame->ecx;
-		cpuState->eax = frame->orig_eax;
-		cpuState->vector = frame->vector;
-		cpuState->error_code = frame->error_code;
-		cpuState->eip = frame->eip;
-		cpuState->cs = frame->cs;
-		cpuState->eflags = frame->flags;
-		cpuState->user_esp = frame->user_esp;
-		cpuState->user_ss = frame->user_ss;
+		get_iframe_registers(frame, cpuState);
 	}
+}
+
+
+/*!	\brief Returns the CPU state for the given thread.
+	The thread must not be running and the threads spinlock must be held.
+*/
+status_t
+arch_get_thread_debug_cpu_state(struct thread *thread,
+	struct debug_cpu_state *cpuState)
+{
+	struct iframe *frame = i386_get_thread_user_iframe(thread);
+	if (frame == NULL)
+		return B_BAD_VALUE;
+
+	get_iframe_registers(frame, cpuState);
+	memcpy(cpuState->extended_regs, thread->arch_info.fpu_state,
+		sizeof(cpuState->extended_regs));
+
+	return B_OK;
 }
 
 
@@ -801,15 +826,9 @@ x86_handle_debug_exception(struct iframe *frame)
 		bool watchpoint = true;
 		for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
 			if (dr6 & (1 << sDR6B[i])) {
-				// If it is an instruction breakpoint, we need to set RF in
-				// EFLAGS to prevent triggering the same exception
-				// again (breakpoint instructions are triggered *before*
-				// executing the instruction).
 				uint32 type = (dr7 >> sDR7RW[i]) & 0x3;
-				if (type == X86_INSTRUCTION_BREAKPOINT) {
-					frame->flags |= (1 << X86_EFLAGS_RF);
+				if (type == X86_INSTRUCTION_BREAKPOINT)
 					watchpoint = false;
-				}
 			}
 		}
 

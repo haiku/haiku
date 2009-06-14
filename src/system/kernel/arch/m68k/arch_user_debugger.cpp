@@ -45,14 +45,14 @@ arch_update_thread_single_step()
 {
 	if (struct iframe* frame = m68k_get_user_iframe()) {
 		struct thread* thread = thread_get_current_thread();
-	
+
 		// set/clear T1 in SR depending on if single stepping is desired
 		// T1 T0
 		// 0  0  no tracing
 		// 0  1  trace on flow
 		// 1  0  single step
 		// 1  1  undef
-		// note 060 and 020(?) only have T1 bit, 
+		// note 060 and 020(?) only have T1 bit,
 		// but this should be compatible as well.
 		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP) {
 			frame->cpu.sr &= ~(M68K_SR_T_MASK);
@@ -73,6 +73,14 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 void
 arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 {
+}
+
+
+status_t
+arch_get_thread_debug_cpu_state(struct thread *thread,
+	struct debug_cpu_state *cpuState)
+{
+	return B_UNSUPPORTED;
 }
 
 

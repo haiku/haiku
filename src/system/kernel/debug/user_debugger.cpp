@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 
 #include <arch/debug.h>
 #include <arch/user_debugger.h>
+#include <commpage_defs.h>
 #include <cpu.h>
 #include <debugger.h>
 #include <kernel.h>
@@ -1412,6 +1413,26 @@ nub_thread_cleanup(struct thread *nubThread)
 }
 
 
+/*!	\brief Returns whether the given address can be accessed in principle.
+	No check whether there's an actually accessible area is performed, though.
+*/
+static bool
+can_access_address(const void* address, bool write)
+{
+	// user addresses are always fine
+	if (IS_USER_ADDRESS(address))
+		return true;
+
+	// a commpage address can at least be read
+	if ((addr_t)address >= USER_COMMPAGE_ADDR
+		&& (addr_t)address < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
+		return !write;
+	}
+
+	return false;
+}
+
+
 /**	\brief Reads data from user memory.
  *
  *	Tries to read \a size bytes of data from user memory address \a address
@@ -1435,7 +1456,7 @@ read_user_memory(const void *_address, void *_buffer, int32 size,
 	char *buffer = (char*)_buffer;
 
 	// check the parameters
-	if (!IS_USER_ADDRESS(address))
+	if (!can_access_address(address, false))
 		return B_BAD_ADDRESS;
 	if (size <= 0)
 		return B_BAD_VALUE;
@@ -1446,7 +1467,7 @@ read_user_memory(const void *_address, void *_buffer, int32 size,
 	bytesRead = 0;
 	while (size > 0) {
 		// check whether we're still in user address space
-		if (!IS_USER_ADDRESS(address)) {
+		if (!can_access_address(address, false)) {
 			error = B_BAD_ADDRESS;
 			break;
 		}
@@ -1486,7 +1507,7 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 	const char *buffer = (const char*)_buffer;
 
 	// check the parameters
-	if (!IS_USER_ADDRESS(address))
+	if (!can_access_address(address, true))
 		return B_BAD_ADDRESS;
 	if (size <= 0)
 		return B_BAD_VALUE;
@@ -1497,7 +1518,7 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 	bytesWritten = 0;
 	while (size > 0) {
 		// check whether we're still in user address space
-		if (!IS_USER_ADDRESS(address)) {
+		if (!can_access_address(address, true)) {
 			error = B_BAD_ADDRESS;
 			break;
 		}
@@ -1589,7 +1610,7 @@ debug_nub_thread_get_thread_debug_port(struct thread *nubThread,
 		else if (thread->debug_info.flags & B_THREAD_DEBUG_STOPPED)
 			threadDebugPort = thread->debug_info.debug_port;
 		else
-			result = B_BAD_VALUE;
+			result = B_BAD_THREAD_STATE;
 	} else
 		result = B_BAD_THREAD_ID;
 
@@ -1677,7 +1698,7 @@ debug_nub_thread(void *)
 				status_t result = B_OK;
 
 				// check the parameters
-				if (!IS_USER_ADDRESS(address))
+				if (!can_access_address(address, false))
 					result = B_BAD_ADDRESS;
 				else if (size <= 0 || size > B_MAX_READ_WRITE_MEMORY_SIZE)
 					result = B_BAD_VALUE;
@@ -1713,7 +1734,7 @@ debug_nub_thread(void *)
 				status_t result = B_OK;
 
 				// check the parameters
-				if (!IS_USER_ADDRESS(address))
+				if (!can_access_address(address, true))
 					result = B_BAD_ADDRESS;
 				else if (size <= 0 || size > realSize)
 					result = B_BAD_VALUE;
@@ -1897,7 +1918,7 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !IS_USER_ADDRESS(address))
+				if (address == NULL || !can_access_address(address, false))
 					result = B_BAD_ADDRESS;
 
 				// set the breakpoint
@@ -1925,7 +1946,7 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !IS_USER_ADDRESS(address))
+				if (address == NULL || !can_access_address(address, false))
 					result = B_BAD_ADDRESS;
 
 				// clear the breakpoint
@@ -1952,7 +1973,7 @@ debug_nub_thread(void *)
 
 				// check the address and size
 				status_t result = B_OK;
-				if (address == NULL || !IS_USER_ADDRESS(address))
+				if (address == NULL || !can_access_address(address, false))
 					result = B_BAD_ADDRESS;
 				if (length < 0)
 					result = B_BAD_VALUE;
@@ -1982,7 +2003,7 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !IS_USER_ADDRESS(address))
+				if (address == NULL || !can_access_address(address, false))
 					result = B_BAD_ADDRESS;
 
 				// clear the watchpoint
@@ -2928,6 +2949,49 @@ _user_debug_thread(thread_id threadID)
 }
 
 
+status_t
+_user_get_thread_cpu_state(thread_id threadID,
+	struct debug_cpu_state *userCPUState)
+{
+	TRACE(("[%ld] _user_get_thread_cpu_state(%ld, %p)\n", find_thread(NULL),
+		threadID, userCPUState));
+
+	if (userCPUState == NULL || !IS_USER_ADDRESS(userCPUState))
+		return B_BAD_ADDRESS;
+
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+	// get and check the thread
+	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	if (thread == NULL) {
+		// thread doesn't exist any longer
+		return B_BAD_THREAD_ID;
+	} else if (thread->team == team_get_kernel_team()) {
+		// we can't debug the kernel team
+		return B_NOT_ALLOWED;
+	} else if (thread->debug_info.flags & B_THREAD_DEBUG_DYING) {
+		// the thread is already dying
+		return B_BAD_THREAD_ID;
+	} else if (thread->debug_info.flags & B_THREAD_DEBUG_NUB_THREAD) {
+		// don't play with the nub thread
+		return B_NOT_ALLOWED;
+	} else if (thread->state == B_THREAD_RUNNING) {
+		// thread is running -- no way to get its CPU state
+		return B_BAD_THREAD_STATE;
+	}
+
+	// get the CPU state
+	debug_cpu_state cpuState;
+	status_t error = arch_get_thread_debug_cpu_state(thread, &cpuState);
+	if (error != B_OK)
+		return error;
+
+	locker.Unlock();
+
+	return user_memcpy(userCPUState, &cpuState, sizeof(cpuState));
+}
+
+
 void
 _user_wait_for_debugger(void)
 {
@@ -2942,7 +3006,7 @@ _user_set_debugger_breakpoint(void *address, uint32 type, int32 length,
 	bool watchpoint)
 {
 	// check the address and size
-	if (address == NULL || !IS_USER_ADDRESS(address))
+	if (address == NULL || !can_access_address(address, false))
 		return B_BAD_ADDRESS;
 	if (watchpoint && length < 0)
 		return B_BAD_VALUE;
@@ -2975,7 +3039,7 @@ status_t
 _user_clear_debugger_breakpoint(void *address, bool watchpoint)
 {
 	// check the address
-	if (address == NULL || !IS_USER_ADDRESS(address))
+	if (address == NULL || !can_access_address(address, false))
 		return B_BAD_ADDRESS;
 
 	// check whether a debugger is installed already

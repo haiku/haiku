@@ -253,6 +253,11 @@ STATIC_FUNCTION(int_bottom):
 
 	movl	%esp, %ebp		// frame pointer is the iframe
 
+	// Set the RF (resume flag) in EFLAGS. This prevents an instruction
+	// breakpoint on the instruction we're returning to to trigger a debug
+	// exception.
+	orl		$0x10000, IFRAME_flags(%ebp);
+
 	testl	$0x20000, IFRAME_flags(%ebp)	// VM86 mode
 	jnz		int_bottom_vm86
 	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)	// user mode

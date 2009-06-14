@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, The Haiku Team. All rights reserved.
+ * Copyright 2002-2009, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -18,6 +18,8 @@ extern "C" {
 
 struct iframe *i386_get_user_iframe(void);
 struct iframe *i386_get_current_iframe(void);
+struct iframe *i386_get_thread_user_iframe(struct thread *thread);
+
 void *x86_next_page_directory(struct thread *from, struct thread *to);
 
 void x86_restart_syscall(struct iframe* frame);

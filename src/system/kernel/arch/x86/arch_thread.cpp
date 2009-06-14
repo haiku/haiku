@@ -90,10 +90,8 @@ arch_thread_init(struct kernel_args *args)
 
 
 static struct iframe *
-find_previous_iframe(addr_t frame)
+find_previous_iframe(struct thread *thread, addr_t frame)
 {
-	struct thread *thread = thread_get_current_thread();
-
 	// iterate backwards through the stack frames, until we hit an iframe
 	while (frame >= thread->kernel_stack_base
 		&& frame < thread->kernel_stack_top) {
@@ -117,7 +115,7 @@ get_previous_iframe(struct iframe* frame)
 	if (frame == NULL)
 		return NULL;
 
-	return find_previous_iframe(frame->ebp);
+	return find_previous_iframe(thread_get_current_thread(), frame->ebp);
 }
 
 
@@ -130,7 +128,7 @@ get_previous_iframe(struct iframe* frame)
 static struct iframe*
 get_current_iframe(void)
 {
-	return find_previous_iframe(x86_read_ebp());
+	return find_previous_iframe(thread_get_current_thread(), x86_read_ebp());
 }
 
 
@@ -156,11 +154,37 @@ i386_get_user_iframe(void)
 }
 
 
+/*!	\brief Like i386_get_user_iframe(), just for the given thread.
+	The thread must not be running and the threads spinlock must be held.
+*/
+struct iframe *
+i386_get_thread_user_iframe(struct thread *thread)
+{
+	if (thread->state == B_THREAD_RUNNING)
+		return NULL;
+
+	// read %ebp from the thread's stack stored by a pushad
+	addr_t ebp = thread->arch_info.current_stack.esp[2];
+
+	// find the user iframe
+	struct iframe *frame = find_previous_iframe(thread, ebp);
+
+	while (frame != NULL) {
+		if (IFRAME_IS_USER(frame))
+			return frame;
+		frame = get_previous_iframe(frame);
+	}
+
+	return NULL;
+}
+
+
 struct iframe *
 i386_get_current_iframe(void)
 {
 	return get_current_iframe();
 }
+
 
 void *
 x86_next_page_directory(struct thread *from, struct thread *to)
