@@ -48,9 +48,9 @@ extern status_t	clear_debugger_watchpoint(void *address);
 // team debugging flags
 enum {
 	// event mask: If a flag is set, any of the team's threads will stop when
-	// the respective event occurs. All flags are enabled by default. Always
-	// enabled are debugger() calls and hardware exceptions, as well as the
-	// deletion of the debugged team.
+	// the respective event occurs. None of the flags are enabled by default.
+	// Always enabled are debugger() calls and hardware exceptions, as well as
+	// the deletion of the debugged team.
 	B_TEAM_DEBUG_SIGNALS						= 0x00010000,
 	B_TEAM_DEBUG_PRE_SYSCALL					= 0x00020000,
 	B_TEAM_DEBUG_POST_SYSCALL					= 0x00040000,
