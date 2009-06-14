@@ -15,9 +15,9 @@
 #include <Debug.h>
 #include <Screen.h>
 
-#include "Filter.h"
+#include <syscalls.h>
 
-extern "C" int  _kget_cpu_state_(int cpu);
+#include "Filter.h"
 
 
 // Implementation of FilterThread
@@ -44,7 +44,7 @@ FilterThread::~FilterThread()
 	fFilter->FilterThreadDone();
 }
 
-status_t 
+status_t
 FilterThread::worker_thread(void* data)
 {
 	FilterThread* thread = (FilterThread*)data;
@@ -87,12 +87,12 @@ Filter::Filter(BBitmap* image, BMessenger listener, uint32 what)
 	, fDestImage(NULL)
 {
 	fCPUCount = NumberOfActiveCPUs();
-	
+
 	fWaitForThreads = create_sem(0, "wait_for_threads");
-	
+
 	#if TIME_FILTER
 	fStopWatch = NULL;
-	#endif	
+	#endif
 }
 
 Filter::~Filter()
@@ -123,19 +123,19 @@ void
 Filter::Start(bool async)
 {
 	if (fStarted || fSrcImage == NULL) return;
-	
+
 	#if TIME_FILTER
 		fStopWatch = new BStopWatch("Filter Time");
 	#endif
-	
+
 	fN = NumberOfThreads();
 	fNumberOfThreads = fN;
-	fIsRunning = true;	
+	fIsRunning = true;
 	fStarted = true;
 
 	// start first filter thread
 	new FilterThread(this, 0, fN, !async);
-	
+
 	if (!async) {
 		Wait();
 	}
@@ -238,7 +238,7 @@ Filter::NumberOfActiveCPUs() const
 	count = info.cpu_count;
 	int32 cpuCount = 0;
 	for (int i = 0; i < count; i ++) {
-		if (_kget_cpu_state_(i))
+		if (_kern_cpu_enabled(i))
 			cpuCount++;
 	}
 	if (cpuCount == 0)
@@ -271,19 +271,19 @@ Scaler::CreateDestImage(BBitmap* srcImage)
 
 	BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 	BBitmap* destImage = new BBitmap(dest, fDither ? B_CMAP8 : srcImage->ColorSpace());
-	
+
 	if (!IsBitmapValid(destImage)) {
 		delete destImage;
 		return NULL;
 	}
-	
-	if (fDither) 
+
+	if (fDither)
 	{
 		BRect dest_rect(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 		fScaledImage = new BBitmap(dest_rect, srcImage->ColorSpace());
 		if (!IsBitmapValid(fScaledImage)) {
 			delete destImage;
-			delete fScaledImage; 
+			delete fScaledImage;
 			fScaledImage = NULL;
 			return NULL;
 		}
@@ -330,17 +330,17 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 
 	src = GetSrcImage();
 	dest = fScaledImage;
-		
+
 	srcW = src->Bounds().IntegerWidth();
 	srcH = src->Bounds().IntegerHeight();
 	destW = dest->Bounds().IntegerWidth();
 	destH = dest->Bounds().IntegerHeight();
-	
+
 	srcBits = (uchar*)src->Bits();
 	destBits = (uchar*)dest->Bits();
 	srcBPR = src->BytesPerRow();
 	destBPR = dest->BytesPerRow();
-	
+
 	columnData = new ColumnData[destW];
 	cd = columnData;
 	for (i = 0; i < destW; i ++, cd++) {
@@ -351,7 +351,7 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 	}
 
 	destDataRow = destBits + fromRow * destBPR;
-		
+
 	for (y = fromRow; IsRunning() && y <= toRow; y ++, destDataRow += destBPR) {
 		float row;
 		intType srcRow;
@@ -368,7 +368,7 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 
 		srcData = srcBits + srcRow * srcBPR;
 		destData = destDataRow;
-	
+
 		if (y < destH) {
 			float a0, a1;
 			const uchar *a, *b, *c, *d;
@@ -378,10 +378,10 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 				b = a + kBPP;
 				c = a + srcBPR;
 				d = c + kBPP;
-				
+
 				a0 = columnData[x].alpha0;
 				a1 = columnData[x].alpha1;
-				
+
 				destData[0] = static_cast<uchar>(
 								(a[0] * a0 + b[0] * a1) * alpha0 +
 								(c[0] * a0 + d[0] * a1) * alpha1);
@@ -395,11 +395,11 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 								(a[3] * a0 + b[3] * a1) * alpha0 +
 								(c[3] * a0 + d[3] * a1) * alpha1);
 			}
-			
+
 			// right column
 			a = srcData + srcW * kBPP;
 			c = a + srcBPR;
-			
+
 			destData[0] = static_cast<uchar>(a[0] * alpha0 + c[0] * alpha1);
 			destData[1] = static_cast<uchar>(a[1] * alpha0 + c[1] * alpha1);
 			destData[2] = static_cast<uchar>(a[2] * alpha0 + c[2] * alpha1);
@@ -410,16 +410,16 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 			for (x = 0; x < destW; x ++, destData += kBPP) {
 				a = srcData + columnData[x].srcColumn * kBPP;
 				b = a + kBPP;
-				
+
 				a0 = columnData[x].alpha0;
 				a1 = columnData[x].alpha1;
-				
+
 				destData[0] = static_cast<uchar>(a[0] * a0 + b[0] * a1);
 				destData[1] = static_cast<uchar>(a[1] * a0 + b[1] * a1);
 				destData[2] = static_cast<uchar>(a[2] * a0 + b[2] * a1);
 				destData[3] = static_cast<uchar>(a[3] * a0 + b[3] * a1);
 			}
-			
+
 			// bottom, right pixel
 			a = srcData + srcW * kBPP;
 
@@ -428,9 +428,9 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 			destData[2] = a[2];
 			destData[3] = a[3];
 		}
-	
+
 	}
-	
+
 	delete[] columnData;
 }
 
@@ -464,22 +464,22 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 
 	src = GetSrcImage();
 	dest = fScaledImage;
-		
+
 	srcW = src->Bounds().IntegerWidth();
 	srcH = src->Bounds().IntegerHeight();
 	destW = dest->Bounds().IntegerWidth();
 	destH = dest->Bounds().IntegerHeight();
-	
+
 	srcBits = (uchar*)src->Bits();
 	destBits = (uchar*)dest->Bits();
 	srcBPR = src->BytesPerRow();
 	destBPR = dest->BytesPerRow();
-	
-	fixed_point fpSrcW = to_fixed_point(srcW); 
+
+	fixed_point fpSrcW = to_fixed_point(srcW);
 	fixed_point fpDestW = to_fixed_point(destW);
 	fixed_point fpSrcH = to_fixed_point(srcH);
 	fixed_point fpDestH = to_fixed_point(destH);
-	
+
 	columnData = new ColumnDataFP[destW];
 	cd = columnData;
 	for (i = 0; i < destW; i ++, cd++) {
@@ -490,7 +490,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 	}
 
 	destDataRow = destBits + fromRow * destBPR;
-		
+
 	for (y = fromRow; IsRunning() && y <= toRow; y ++, destDataRow += destBPR) {
 		fixed_point row;
 		intType srcRow;
@@ -514,7 +514,7 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 							(c[i] * a0 + d[i] * a1) * alpha1))
 		#define V2(i) from_fixed_point(a[i] * alpha0 + c[i] * alpha1);
 		#define H2(i) from_fixed_point(a[i] * a0 + b[i] * a1);
-	
+
 		if (y < destH) {
 			fixed_point a0, a1;
 			const uchar *a, *b, *c, *d;
@@ -524,20 +524,20 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 				b = a + kBPP;
 				c = a + srcBPR;
 				d = c + kBPP;
-				
+
 				a0 = columnData[x].alpha0;
 				a1 = columnData[x].alpha1;
-				
+
 				destData[0] = I4(0);
 				destData[1] = I4(1);
 				destData[2] = I4(2);
 				destData[3] = I4(3);
 			}
-			
+
 			// right column
 			a = srcData + srcW * kBPP;
 			c = a + srcBPR;
-			
+
 			destData[0] = V2(0);
 			destData[1] = V2(1);
 			destData[2] = V2(2);
@@ -548,16 +548,16 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 			for (x = 0; x < destW; x ++, destData += kBPP) {
 				a = srcData + columnData[x].srcColumn * kBPP;
 				b = a + kBPP;
-				
+
 				a0 = columnData[x].alpha0;
 				a1 = columnData[x].alpha1;
-				
+
 				destData[0] = H2(0);
 				destData[1] = H2(1);
 				destData[2] = H2(2);
 				destData[3] = H2(3);
 			}
-			
+
 			// bottom, right pixel
 			a = srcData + srcW * kBPP;
 
@@ -566,9 +566,9 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 			destData[2] = a[2];
 			destData[3] = a[3];
 		}
-	
+
 	}
-	
+
 	delete[] columnData;
 }
 
@@ -578,15 +578,15 @@ Scaler::RowValues(float* sum, const uchar* src, intType srcW, intType fromX, int
 	sum[0] = a0X * src[0];
 	sum[1] = a0X * src[1];
 	sum[2] = a0X * src[2];
-	
+
 	src += kBPP;
-	
+
 	for (int32 x = fromX+1; x < toX; x ++, src += kBPP) {
 		sum[0] += src[0];
 		sum[1] += src[1];
 		sum[2] += src[2];
 	}
-	
+
 	if (toX <= srcW) {
 		sum[0] += a1X * src[0];
 		sum[1] += a1X * src[1];
@@ -620,19 +620,19 @@ Scaler::DownScaleBilinear(intType fromRow, int32 toRow)
 
 	src = GetSrcImage();
 	dest = fScaledImage;
-		
+
 	srcW = src->Bounds().IntegerWidth();
 	srcH = src->Bounds().IntegerHeight();
 	destW = dest->Bounds().IntegerWidth();
 	destH = dest->Bounds().IntegerHeight();
-	
+
 	srcBits = (uchar*)src->Bits();
 	destBits = (uchar*)dest->Bits();
 	srcBPR = src->BytesPerRow();
 	destBPR = dest->BytesPerRow();
-	
+
 	destDataRow = destBits + fromRow * destBPR;
-	
+
 	const float deltaX = (srcW + 1.0) / (destW + 1.0);
 	const float deltaY = (srcH + 1.0) / (destH + 1.0);
 	const float deltaXY = deltaX * deltaY;
@@ -642,61 +642,61 @@ Scaler::DownScaleBilinear(intType fromRow, int32 toRow)
 	for (x = 0; x <= destW; x ++, cd ++) {
 		const float fFromX = x * deltaX;
 		const float fToX = fFromX + deltaX;
-			
+
 		cd->from = (intType)fFromX;
 		cd->to = (intType)fToX;
-		
+
 		cd->alpha0 = 1.0 - (fFromX - cd->from);
-		cd->alpha1 = fToX - cd->to;		
+		cd->alpha1 = fToX - cd->to;
 	}
-		
+
 	for (y = fromRow; IsRunning() && y <= toRow; y ++, destDataRow += destBPR) {
 		const float fFromY = y * deltaY;
 		const float fToY = fFromY + deltaY;
-		
+
 		const intType fromY = (intType)fFromY;
 		const intType toY = (intType)fToY;
-		
+
 		const float a0Y = 1.0 - (fFromY - fromY);
-		const float a1Y = fToY - toY;	
-			
+		const float a1Y = fToY - toY;
+
 		const uchar* srcDataRow = srcBits + fromY * srcBPR;
 		destData = destDataRow;
-	
+
 		cd = columnData;
 		for (x = 0; x <= destW; x ++, destData += kBPP, cd ++) {
 			const intType fromX = cd->from;
 			const intType toX = cd->to;
-			
+
 			const float a0X = cd->alpha0;
 			const float a1X = cd->alpha1;
 
 			srcData = srcDataRow + fromX * kBPP;
-														
+
 			float totalSum[3];
 			float sum[3];
-			
+
 			RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, kBPP);
 			totalSum[0] = a0Y * sum[0];
 			totalSum[1] = a0Y * sum[1];
 			totalSum[2] = a0Y * sum[2];
-			
+
 			srcData += srcBPR;
-			
+
 			for (int32 r = fromY+1; r < toY; r ++, srcData += srcBPR) {
 				RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, kBPP);
 				totalSum[0] += sum[0];
 				totalSum[1] += sum[1];
 				totalSum[2] += sum[2];
 			}
-			
+
 			if (toY <= srcH) {
 				RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, kBPP);
 				totalSum[0] += a1Y * sum[0];
 				totalSum[1] += a1Y * sum[1];
 				totalSum[2] += a1Y * sum[2];
 			}
-			
+
 			destData[0] = static_cast<uchar>(totalSum[0] / deltaXY);
 			destData[1] = static_cast<uchar>(totalSum[1] / deltaXY);
 			destData[2] = static_cast<uchar>(totalSum[2] / deltaXY);
@@ -715,7 +715,7 @@ typedef struct {
 	intType error[3];
 } DitheringColumnData;
 
-uchar 
+uchar
 Scaler::Limit(intType value)
 {
 	if (value < 0) {
@@ -749,7 +749,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 	DitheringColumnData* cd;
 	BScreen screen;
 	intType error[3], err[3];
-	
+
 	src = fScaledImage;
 	dest = GetDestImage();
 
@@ -757,20 +757,20 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 	ASSERT(dest->ColorSpace() == B_CMAP8);
 	ASSERT(src->Bounds().IntegerWidth() == dest->Bounds().IntegerWidth());
 	ASSERT(src->Bounds().IntegerHeight() == dest->Bounds().IntegerHeight());
-	
+
 	destW = dest->Bounds().IntegerWidth();
 	destH = dest->Bounds().IntegerHeight();
-	
+
 	srcBits = (uchar*)src->Bits();
 	srcBPR = src->BytesPerRow();
 	destBits = (uchar*)dest->Bits();
 	destBPR = dest->BytesPerRow();
-	
+
 	// Allocate space for sentinel at left and right bounds,
 	// so that columnData[-1] and columnData[destW+1] can be safely accessed
 	columnData0 = new DitheringColumnData[destW+3];
 	columnData = columnData0 + 1;
-		
+
 	// clear error
 	cd = columnData;
 	for (x = destW; x >= 0; x --, cd ++) {
@@ -787,38 +787,38 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 		for (x = 0; x <= destW; x ++, srcData += kBPP, destData += 1) {
 			rgb_color color, actualColor;
 			uint8 index;
-			
+
 			color.red = Limit(srcData[2] + error[0] / 16);
 			color.green = Limit(srcData[1] + error[1] / 16);
 			color.blue = Limit(srcData[0] + error[2] / 16);
-			
+
 			index = screen.IndexForColor(color);
 			actualColor = screen.ColorForIndex(index);
-			
+
 			*destData = index;
-			
+
 			err[0] = color.red - actualColor.red;
 			err[1] = color.green -actualColor.green;
 			err[2] = color.blue -actualColor.blue;
-			
+
 			// distribute error
 			// get error for next pixel
 			cd = &columnData[x+1];
 			error[0] = cd->error[0] + 7 * err[0];
 			error[1] = cd->error[1] + 7 * err[1];
 			error[2] = cd->error[2] + 7 * err[2];
-			
+
 			// set error for right pixel below current pixel
 			cd->error[0] = err[0];
 			cd->error[1] = err[1];
 			cd->error[2] = err[2];
-			
+
 			// add error for pixel below current pixel
 			cd --;
 			cd->error[0] += 5 * err[0];
 			cd->error[1] += 5 * err[1];
 			cd->error[2] += 5 * err[2];
-			
+
 			// add error for left pixel below current pixel
 			cd --;
 			cd->error[0] += 3 * err[0];
@@ -837,38 +837,38 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 		for (x = 0; x <= destW; x ++, srcData -= kBPP, destData -= 1) {
 			rgb_color color, actualColor;
 			uint8 index;
-			
+
 			color.red = Limit(srcData[2] + error[0] / 16);
 			color.green = Limit(srcData[1] + error[1] / 16);
 			color.blue = Limit(srcData[0] + error[2] / 16);
-			
+
 			index = screen.IndexForColor(color);
 			actualColor = screen.ColorForIndex(index);
-			
+
 			*destData = index;
-			
+
 			err[0] = color.red - actualColor.red;
 			err[1] = color.green -actualColor.green;
 			err[2] = color.blue -actualColor.blue;
-			
+
 			// distribute error
 			// get error for next pixel
 			cd = &columnData[x-1];
 			error[0] = cd->error[0] + 7 * err[0];
 			error[1] = cd->error[1] + 7 * err[1];
 			error[2] = cd->error[2] + 7 * err[2];
-			
+
 			// set error for left pixel below current pixel
 			cd->error[0] = err[0];
 			cd->error[1] = err[1];
 			cd->error[2] = err[2];
-			
+
 			// add error for pixel below current pixel
 			cd ++;
 			cd->error[0] += 5 * err[0];
 			cd->error[1] += 5 * err[1];
 			cd->error[2] += 5 * err[2];
-			
+
 			// add error for right pixel below current pixel
 			cd ++;
 			cd->error[0] += 3 * err[0];
@@ -888,7 +888,7 @@ Scaler::GetNumberOfUnits()
 
 void
 Scaler::Run(int32 i, int32 n)
-{	
+{
 	int32 from, to, height, imageHeight;
 	imageHeight = GetDestImage()->Bounds().IntegerHeight() + 1;
 	height = imageHeight / n;
@@ -930,28 +930,28 @@ ImageProcessor::CreateDestImage(BBitmap* /* srcImage */)
 	color_space cs;
 	BBitmap* bm;
 	BRect rect;
-	
+
 	if (GetSrcImage() == NULL) return NULL;
-	
+
 	cs = GetSrcImage()->ColorSpace();
-	fBPP = BytesPerPixel(cs);	
+	fBPP = BytesPerPixel(cs);
 	if (fBPP < 1) return NULL;
-	
+
 	fWidth = GetSrcImage()->Bounds().IntegerWidth();
 	fHeight = GetSrcImage()->Bounds().IntegerHeight();
-	
+
 	if (fOp == kRotateClockwise || fOp == kRotateCounterClockwise) {
 		rect.Set(0, 0, fHeight, fWidth);
 	} else {
 		rect.Set(0, 0, fWidth, fHeight);
 	}
-	
+
 	bm = new BBitmap(rect, cs);
 	if (!IsBitmapValid(bm)) {
 		delete bm;
 		return NULL;
 	}
-	
+
 	fSrcBPR = GetSrcImage()->BytesPerRow();
 	fDestBPR = bm->BytesPerRow();
 
@@ -964,7 +964,7 @@ ImageProcessor::GetNumberOfUnits()
 	return GetSrcImage()->Bounds().IntegerHeight() + 1;
 }
 
-int32 
+int32
 ImageProcessor::BytesPerPixel(color_space cs) const
 {
 	switch (cs) {
@@ -1042,7 +1042,7 @@ ImageProcessor::Run(int32 i, int32 n)
 	} else {
 		to = from + height - 1;
 	}
-	
+
 	int32 x, y, destX, destY;
 	const uchar* src = (uchar*)GetSrcImage()->Bits();
 	uchar* dest = (uchar*)GetDestImage()->Bits();

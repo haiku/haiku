@@ -10,11 +10,16 @@
 
 
 #include "CPUButton.h"
+
+#include <stdlib.h>
+
+#include <Alert.h>
+
+#include <syscalls.h>
+
 #include "PulseApp.h"
 #include "PulseView.h"
 #include "Common.h"
-#include <interface/Alert.h>
-#include <stdlib.h>
 
 
 CPUButton::CPUButton(BRect rect, const char *name, const char *label, BMessage *message)
@@ -173,13 +178,13 @@ status_t
 CPUButton::Invoke(BMessage *message)
 {
 	if (!LastEnabledCPU(fCPU)) {
-		_kset_cpu_state_(fCPU, Value());
+		_kern_set_cpu_enabled(fCPU, Value());
 	} else {
 		BAlert *alert = new BAlert(NULL, "You can't disable the last active CPU.", "OK");
 		alert->Go(NULL);
 		SetValue(!Value());
 	}
-	
+
 	return B_OK;
 }
 
@@ -216,7 +221,7 @@ CPUButton::MessageReceived(BMessage *message)
 		}
 		case PV_REPLICANT_PULSE: {
 			// Make sure we're consistent with our CPU
-			if (_kget_cpu_state_(fCPU) != Value() && !IsTracking())
+			if (_kern_cpu_enabled(fCPU) != Value() && !IsTracking())
 				SetValue(!Value());
 			break;
 		}

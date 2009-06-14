@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps pulse ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
+UsePrivateSystemHeaders ;
 UsePrivateHeaders shared ;
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
@@ -22,8 +21,8 @@ Application Pulse :
 	ProgressBar.cpp
 	PulseApp.cpp
 	PulseView.cpp
-	PulseWindow.cpp 
+	PulseWindow.cpp
 
-	: be  
-	: Pulse.rdef 
+	: be
+	: Pulse.rdef
 ;

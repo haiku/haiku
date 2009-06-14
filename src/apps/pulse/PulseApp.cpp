@@ -12,18 +12,21 @@
 
 
 #include "PulseApp.h"
-#include "Common.h"
-#include "PulseWindow.h"
-#include "DeskbarPulseView.h"
-
-#include <Alert.h>
-#include <Rect.h>
-#include <Deskbar.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+
+#include <Alert.h>
+#include <Rect.h>
+#include <Deskbar.h>
+
+#include <syscalls.h>
+
+#include "Common.h"
+#include "PulseWindow.h"
+#include "DeskbarPulseView.h"
 
 
 PulseApp::PulseApp(int argc, char **argv)
@@ -60,7 +63,7 @@ PulseApp::PulseApp(int argc, char **argv)
 						uint32 rgb = strtoul(optarg, NULL, 0);
 						rgb = rgb << 8;
 						rgb |= 0x000000ff;
-						
+
 						switch (option_index) {
 							case 2:
 								framecolor = rgb;
@@ -90,7 +93,7 @@ PulseApp::PulseApp(int argc, char **argv)
 				break;
 		}
 	}
-	
+
 	if (deskbar) {
 		prefs->window_mode = DESKBAR_MODE;
 		if (activecolor != 0)
@@ -171,7 +174,7 @@ LastEnabledCPU(int my_cpu)
 	for (int x = 0; x < sys_info.cpu_count; x++) {
 		if (x == my_cpu)
 			continue;
-		if (_kget_cpu_state_(x) == 1)
+		if (_kern_cpu_enabled(x) == 1)
 			return false;
 	}
 	return true;
@@ -211,7 +214,7 @@ LoadInDeskbar()
 		delete deskbar;
 		return false;
 	}
-	
+
 	// Must be 16 pixels high, the width is retrieved from the Prefs class
 	int width = pulseapp->prefs->deskbar_icon_width;
 	int min_width = GetMinimumViewWidth();
@@ -219,7 +222,7 @@ LoadInDeskbar()
 		pulseapp->prefs->deskbar_icon_width = min_width;
 		width = min_width;
 	}
-			
+
 	BRect rect(0, 0, width - 1, 15);
 	DeskbarPulseView *replicant = new DeskbarPulseView(rect);
 	status_t err = deskbar->AddItem(replicant);

@@ -21,18 +21,9 @@
 
 #include "ProcessController.h"
 
-#include "AutoIcon.h"
-#include "Colors.h"
-#include "IconMenuItem.h"
-#include "MemoryBarMenu.h"
-#include "MemoryBarMenuItem.h"
-#include "PCWorld.h"
-#include "Preferences.h"
-#include "QuitMenu.h"
-#include "TeamBarMenu.h"
-#include "TeamBarMenuItem.h"
-#include "ThreadBarMenu.h"
-#include "Utilities.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Alert.h>
 #include <Bitmap.h>
@@ -49,9 +40,21 @@
 #include <Screen.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <syscalls.h>
+
+#include "AutoIcon.h"
+#include "Colors.h"
+#include "IconMenuItem.h"
+#include "MemoryBarMenu.h"
+#include "MemoryBarMenuItem.h"
+#include "PCWorld.h"
+#include "Preferences.h"
+#include "QuitMenu.h"
+#include "TeamBarMenu.h"
+#include "TeamBarMenuItem.h"
+#include "ThreadBarMenu.h"
+#include "Utilities.h"
+
 
 const char* kDeskbarItemName = "ProcessController";
 const char* kClassName = "ProcessController";
@@ -340,7 +343,7 @@ ProcessController::MessageReceived(BMessage *message)
 			if (message->FindInt32 ("cpu", &cpu) == B_OK) {
 				bool last = true;
 				for (int p = 0; p < gCPUcount; p++) {
-					if (p != cpu && _kget_cpu_state_(p)) {
+					if (p != cpu && _kern_cpu_enabled(p)) {
 						last = false;
 						break;
 					}
@@ -350,7 +353,7 @@ ProcessController::MessageReceived(BMessage *message)
 						"That's no Fun!", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					alert->Go();
 				} else
-					_kset_cpu_state_(cpu, !_kget_cpu_state_(cpu));
+					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
 			}
 			break;
 		}
@@ -674,7 +677,7 @@ thread_popup(void *arg)
 			BMessage* m = new BMessage ('CPU ');
 			m->AddInt32 ("cpu", i);
 			item = new IconMenuItem (gPCView->fProcessorIcon, item_name, m);
-			if (_kget_cpu_state_(i))
+			if (_kern_cpu_enabled(i))
 				item->SetMarked (true);
 			item->SetTarget(gPCView);
 			addtopbottom(item);
