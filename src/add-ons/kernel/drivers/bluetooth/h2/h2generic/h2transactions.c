@@ -164,12 +164,12 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	//bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer/slower option
 	status_t    error;
 
-	debugf("cookie@%p status=%ld len=%ld\n", cookie, status, actual_len);
+	debugf("cookie@%p status=%s len=%ld\n", cookie, strerror(status), actual_len);
 
 	if (bdev == NULL)
 		return;
 
-	if (status == B_CANCELED) // or not running anymore...
+	if (status == B_CANCELED || status == B_DEV_CRC_ERROR) // or not running anymore...
 		return;
 
 	if (status != B_OK || actual_len == 0)
@@ -210,7 +210,7 @@ acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	if (bdev == NULL)
 		return;
 
-	if (status == B_CANCELED) // or not running anymore...
+	if (status == B_CANCELED || status == B_DEV_CRC_ERROR) // or not running anymore...
 		return;
 
 	if (status != B_OK || actual_len == 0)
@@ -312,7 +312,7 @@ command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	snet_buffer* snbuf = (snet_buffer*)cookie;
 	bt_usb_dev* bdev = snb_cookie(snbuf);
 
-	debugf("len = %ld @%p\n", actual_len, data);
+	debugf("status = %ld len = %ld @%p\n", status, actual_len, data);
 
 	if (status == B_OK) {
 		bdev->stat.successfulTX++;
@@ -379,7 +379,7 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	snb_set_cookie(snbuf, bdev);
 
 	debugf("@%p\n", snb_get(snbuf));
-
+	
 	error = usb->queue_request(bdev->dev, bRequestType, bRequest,
 								value, wIndex, wLength,	snb_get(snbuf),
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU								

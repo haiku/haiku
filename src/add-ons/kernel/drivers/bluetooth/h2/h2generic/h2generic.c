@@ -374,23 +374,21 @@ device_removed(void* cookie)
 	flowf("Cancelling queues...\n");
 	if (bdev->intr_in_ep != NULL) {
 		usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
-		flowf("Cancelling impossible EVENTS\n");
+		flowf("Cancelling possible EVENTS\n");
 	}
 
 	if (bdev->bulk_in_ep!=NULL) {
 		usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
-		flowf("Cancelling impossible ACL in\n");
+		flowf("Cancelling possible ACL in\n");
 	}
 
 	if (bdev->bulk_out_ep!=NULL) {
 		usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
-		flowf("Cancelling impossible ACL out\n");
+		flowf("Cancelling possible ACL out\n");
 	}
 
 	bdev->connected = false;
 	
-	// TODO: place this in the appropiated hook
-	// kill_device(bdev);
 
 	return B_OK;
 }
@@ -533,6 +531,24 @@ device_close(void *cookie)
 
 	// Clean queues
 
+	if (bdev->connected == true) {
+		flowf("Cancelling queues...\n");
+		if (bdev->intr_in_ep != NULL) {
+			usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
+			flowf("Cancelling possible EVENTS\n");
+		}
+	
+		if (bdev->bulk_in_ep!=NULL) {
+			usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
+			flowf("Cancelling possible ACL in\n");
+		}
+	
+		if (bdev->bulk_out_ep!=NULL) {
+			usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
+			flowf("Cancelling possible ACL out\n");
+		}
+	}
+	
 	// TX
 	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
 		if (i == BT_COMMAND)
@@ -578,14 +594,9 @@ device_free (void *cookie)
 
 	debugf("device_free() called on %s \n",BLUETOOTH_DEVICE_PATH);
 
-
-	if (--bdev->open_count == 0) {
-
-		/* GotoLowPower */
-		// interesting .....
-	} else {
-		/* The last client has closed, and the device is no longer
-		   connected, so remove it from the list. */
+	if (!bdev->connected) {
+		flowf("Device not present can be killed\n");
+		kill_device(bdev);
 	}
 
 	return err;
