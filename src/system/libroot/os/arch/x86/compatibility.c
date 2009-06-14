@@ -3,21 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
-// TODO: temporary measurement to fix the build with GCC 4 - in the end, these
-//	private syscalls shouldn't be used anywhere in the Haiku tree, at the very
-//	least they should only be used when compiling for GCC 2.95.3, though.
-#if __GNUC__ < 30
-
 //!	This file includes some known R5 syscalls
+
+#include <errno.h>
+#include <sys/resource.h>
+#include <sys/stat.h>
 
 #include <SupportDefs.h>
 #include <fs_info.h>
 
 #include <syscalls.h>
-
-#include <errno.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
 
 
 int _kset_mon_limit_(int num);
@@ -103,6 +98,3 @@ _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *info)
 
 	return fs_stat_dev(device, info);
 }
-
-
-#endif	// __GNUC__ < 3
