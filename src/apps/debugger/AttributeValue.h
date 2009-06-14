@@ -66,4 +66,33 @@ struct DynamicAttributeValue {
 };
 
 
+struct DeclarationLocation {
+	uint32	file;
+	uint32	line;
+	uint32	column;
+
+	DeclarationLocation()
+		:
+		file(0),
+		line(0),
+		column(0)
+	{
+	}
+
+	void SetFile(uint32 file)
+	{
+		this->file = file;
+	}
+
+	void SetLine(uint32 line)
+	{
+		this->line = line;
+	}
+
+	void SetColumn(uint32 column)
+	{
+		this->column = column;
+	}
+};
+
 #endif	// ATTRIBUTE_VALUE_H

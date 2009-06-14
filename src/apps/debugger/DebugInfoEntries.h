@@ -246,8 +246,14 @@ class DIEDeclaredType : public DIEType {
 public:
 								DIEDeclaredType();
 
+	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
-// DECL
 // DW_AT_accessibility		// !file, !pointer to member
 // DW_AT_declaration		// !file
 // DW_AT_abstract_origin	// !interface
@@ -255,6 +261,7 @@ public:
 // DW_AT_visibility			// !interface
 
 protected:
+			DeclarationLocation	fDeclarationLocation;
 };
 
 
@@ -759,8 +766,15 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DECL
+	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DeclarationLocation	fDeclarationLocation;
 };
 
 
@@ -810,9 +824,18 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
-// DECL
 // DW_AT_description
+
+private:
+			DeclarationLocation	fDeclarationLocation;
 };
 
 
@@ -852,12 +875,16 @@ public:
 
 	virtual	status_t			AddAttribute_count(uint16 attributeName,
 									const AttributeValue& value);
-
-// TODO:
-// DECL
+	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
+									const AttributeValue& value);
 
 private:
 			uint64				fBlockSize;
+			DeclarationLocation	fDeclarationLocation;
 };
 
 

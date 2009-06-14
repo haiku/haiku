@@ -273,6 +273,33 @@ DIEDeclaredType::DIEDeclaredType()
 }
 
 
+status_t
+DIEDeclaredType::AddAttribute_decl_file(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetFile(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_decl_line(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetLine(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_decl_column(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetColumn(value.constant);
+	return B_OK;
+}
+
+
 // #pragma mark - DIEDerivedType
 
 
@@ -1128,6 +1155,33 @@ DIEVolatileType::Tag() const
 }
 
 
+status_t
+DIEVolatileType::AddAttribute_decl_file(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetFile(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEVolatileType::AddAttribute_decl_line(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetLine(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEVolatileType::AddAttribute_decl_column(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetColumn(value.constant);
+	return B_OK;
+}
+
+
 // #pragma mark - DIEDwarfProcedure
 
 
@@ -1218,6 +1272,33 @@ DIEUnspecifiedType::Tag() const
 }
 
 
+status_t
+DIEUnspecifiedType::AddAttribute_decl_file(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetFile(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEUnspecifiedType::AddAttribute_decl_line(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetLine(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEUnspecifiedType::AddAttribute_decl_column(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetColumn(value.constant);
+	return B_OK;
+}
+
+
 // #pragma mark - DIEPartialUnit
 
 
@@ -1285,6 +1366,33 @@ DIESharedType::AddAttribute_count(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fBlockSize = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESharedType::AddAttribute_decl_file(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetFile(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIESharedType::AddAttribute_decl_line(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetLine(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIESharedType::AddAttribute_decl_column(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclarationLocation.SetColumn(value.constant);
 	return B_OK;
 }
 
