@@ -10,6 +10,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/resource.h>
 
 #include <Directory.h>
 #include <fs_attr.h>
@@ -52,6 +53,12 @@ CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
 
 	if (fWriterThread >= B_OK)
 		resume_thread(fWriterThread);
+
+	// ask for a bunch more file descriptors so that nested copying works well
+	struct rlimit rl;
+	rl.rlim_cur = 512;
+	rl.rlim_max = RLIM_SAVED_MAX;
+	setrlimit(RLIMIT_NOFILE, &rl);
 }
 
 
