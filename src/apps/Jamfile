@@ -12,6 +12,7 @@ HaikuSubInclude clock ;
 HaikuSubInclude codycam ;
 HaikuSubInclude cortex ;
 HaikuSubInclude debuganalyzer ;
+HaikuSubInclude debugger ;
 HaikuSubInclude deskbar ;
 HaikuSubInclude deskcalc ;
 HaikuSubInclude diskprobe ;
