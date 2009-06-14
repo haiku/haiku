@@ -34,6 +34,8 @@ All rights reserved.
 
 // Implementation for the public FilePanel object.
 
+#include <sys/resource.h>
+
 #include <BeBuild.h>
 #include <Debug.h>
 #include <FilePanel.h>
@@ -50,7 +52,6 @@ All rights reserved.
 #ifndef _IMPEXP_TRACKER
 #	define _IMPEXP_TRACKER
 #endif
-extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
 
 // these two calls are deprecated
 extern _IMPEXP_TRACKER void run_open_panel();
@@ -80,9 +81,13 @@ BFilePanel::BFilePanel(file_panel_mode mode, BMessenger *target,
 {
 	// boost file descriptor limit so file panels in other apps don't have
 	// problems
-	_kset_fd_limit_ (512);
+	struct rlimit rl;
+	rl.rlim_cur = 512;
+	rl.rlim_max = RLIM_SAVED_MAX;
+	setrlimit(RLIMIT_NOFILE, &rl);
+
 	BEntry startDir(ref);
-	fWindow = new TFilePanel(mode, target, &startDir, nodeFlavors, 
+	fWindow = new TFilePanel(mode, target, &startDir, nodeFlavors,
 		multipleSelection, message, filter, 0, B_DOCUMENT_WINDOW_LOOK,
 		modal ? B_MODAL_APP_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL,
 		hideWhenDone);
@@ -109,14 +114,14 @@ BFilePanel::Show()
 	// just pull it to us
 	uint32 workspace = 1UL << (uint32)current_workspace();
 	uint32 windowWorkspaces = fWindow->Workspaces();
-	if (!(windowWorkspaces & workspace)) 
+	if (!(windowWorkspaces & workspace))
 		// window in a different workspace, reopen in current
 		fWindow->SetWorkspaces(workspace);
 
-	if (!IsShowing()) 
+	if (!IsShowing())
 		fWindow->Show();
 
-	fWindow->Activate();	
+	fWindow->Activate();
 }
 
 void
@@ -198,7 +203,7 @@ BFilePanel::Refresh()
 	AutoLock<BWindow> lock(fWindow);
 	if (!lock)
 		return;
-	
+
 	static_cast<TFilePanel *>(fWindow)->Refresh();
 }
 
@@ -228,7 +233,7 @@ BFilePanel::SetButtonLabel(file_panel_button button, const char *text)
 	AutoLock<BWindow> lock(fWindow);
 	if (!lock)
 		return;
-	
+
 	static_cast<TFilePanel *>(fWindow)->SetButtonLabel(button, text);
 }
 
@@ -267,7 +272,7 @@ BFilePanel::SetPanelDirectory(const char *path)
 {
 	entry_ref ref;
 	status_t err = get_ref_for_path(path, &ref);
-	if (err < B_OK) 
+	if (err < B_OK)
 	  return;
 
 	AutoLock<BWindow> lock(fWindow);
@@ -317,7 +322,7 @@ BFilePanel::GetNextSelectedRef(entry_ref *ref)
 	AutoLock<BWindow> lock(fWindow);
 	if (!lock)
 		return B_ERROR;
-	
+
 	return static_cast<TFilePanel *>(fWindow)->GetNextEntryRef(ref);
 
 }
@@ -329,8 +334,8 @@ BFilePanel::SetHideWhenDone(bool on)
 	AutoLock<BWindow> lock(fWindow);
 	if (!lock)
 		return;
-	
-	static_cast<TFilePanel *>(fWindow)->SetHideWhenDone(on);  
+
+	static_cast<TFilePanel *>(fWindow)->SetHideWhenDone(on);
 }
 
 bool

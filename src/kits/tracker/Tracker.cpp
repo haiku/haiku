@@ -32,8 +32,10 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include <Alert.h>
@@ -90,9 +92,6 @@ All rights reserved.
 #ifndef _IMPEXP_ROOT
 #	define _IMPEXP_ROOT
 #endif
-extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
-extern "C" _IMPEXP_ROOT int _kset_mon_limit_(int num);
-	// from priv_syscalls.h
 
 const int32 DEFAULT_MON_NUM = 4096;
 	// copied from fsil.c
@@ -109,14 +108,14 @@ namespace BPrivate {
 
 NodePreloader *gPreloader = NULL;
 
-void 
+void
 InitIconPreloader()
 {
 	static int32 lock = 0;
 
 	if (atomic_add(&lock, 1) != 0) {
 		// Just wait for the icon cache to be instantiated
-		int32 tries = 20;	
+		int32 tries = 20;
 		while (IconCache::sIconCache == NULL && tries-- > 0)
 			snooze(10000);
 		return;
@@ -166,7 +165,7 @@ GetVolumeFlags(Model *model)
 	}
 	if (!fs_stat_dev(model->NodeRef()->device,&info))
 		return info.flags;
-	
+
 	return B_FS_HAS_ATTR;
 }
 
@@ -176,7 +175,7 @@ HideVarDir()
 {
 	BPath path;
 	status_t err = find_directory(B_COMMON_VAR_DIRECTORY, &path);
-	
+
 	if (err != B_OK){
 		PRINT(("var err = %s\n", strerror(err)));
 		return;
@@ -188,7 +187,7 @@ HideVarDir()
 		// make var dir invisible
 		info.fInvisible = true;
 		info.fInitedDirectory = -1;
-		
+
 		if (varDirectory.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &info, sizeof(info))
 			== sizeof(info))
 			varDirectory.RemoveAttr(kAttrPoseInfoForeign);
@@ -203,17 +202,19 @@ TTracker::TTracker()
 	:	BApplication(kTrackerSignature),
 	fSettingsWindow(NULL)
 {
-	// set the cwd to /boot/home, anything that's launched 
-	// from Tracker will automatically inherit this 
+	// set the cwd to /boot/home, anything that's launched
+	// from Tracker will automatically inherit this
 	BPath homePath;
-	
+
 	if (find_directory(B_USER_DIRECTORY, &homePath) == B_OK)
 		chdir(homePath.Path());
-	
-	_kset_fd_limit_(512);
-		// ask for a bunch more file descriptors so that nested copying
-		// works well
-	
+
+	// ask for a bunch more file descriptors so that nested copying works well
+	struct rlimit rl;
+	rl.rlim_cur = 512;
+	rl.rlim_max = RLIM_SAVED_MAX;
+	setrlimit(RLIMIT_NOFILE, &rl);
+
 	fNodeMonitorCount = DEFAULT_MON_NUM;
 
 #ifdef CHECK_OPEN_MODEL_LEAKS
@@ -261,7 +262,7 @@ TTracker::QuitRequested()
 
 	gStatusWindow->AttemptToQuit();
 		// try quitting the copy/move/empty trash threads
-		
+
 	BVolume bootVolume;
 	DEBUG_ONLY(status_t err =) BVolumeRoster().GetBootVolume(&bootVolume);
 	ASSERT(err == B_OK);
@@ -311,8 +312,8 @@ TTracker::QuitRequested()
 						message.AddInt8(path.Path(), flags);
 					}
 				}
-			}	
-			window->Unlock();		
+			}
+			window->Unlock();
 		}
 	}
 	lock.Unlock();
@@ -351,15 +352,15 @@ TTracker::Quit()
 	fAutoMounter->Lock();
 	fAutoMounter->QuitRequested();	// automounter does some stuff in QuitRequested
 	fAutoMounter->Quit();			// but we really don't care if it is cooperating or not
-	
+
 	fClipboardRefsWatcher->Lock();
 	fClipboardRefsWatcher->Quit();
-	
+
 	fTrashWatcher->Lock();
 	fTrashWatcher->Quit();
 
 	WellKnowEntryList::Quit();
-	
+
 	delete gPreloader;
 	delete fTaskLoop;
 	delete IconCache::sIconCache;
@@ -397,7 +398,7 @@ TTracker::MessageReceived(BMessage *message)
 				CloseWindowAndChildren(itemNode);
 				break;
 			}
-			
+
 		case kCloseAllWindows:
 			CloseAllWindows();
 			break;
@@ -451,7 +452,7 @@ TTracker::MessageReceived(BMessage *message)
 			// show the addprinter window
 			run_add_printer_panel();
 			break;
-			
+
 		case kMakeActivePrinter:
 			// get the current selection
 			SetDefaultPrinter(message);
@@ -642,7 +643,7 @@ protected:
 };
 
 
-bool 
+bool
 TTracker::LaunchAndCloseParentIfOK(const entry_ref *launchThis,
 	const node_ref *closeThis, const BMessage *messageToBundle)
 {
@@ -651,7 +652,7 @@ TTracker::LaunchAndCloseParentIfOK(const entry_ref *launchThis,
 		refsReceived = *messageToBundle;
 		refsReceived.what = B_REFS_RECEIVED;
 	}
-	refsReceived.AddRef("refs", launchThis);	
+	refsReceived.AddRef("refs", launchThis);
 	// synchronous launch, we are already in our own thread
 	if (TrackerLaunch(&refsReceived, false) == B_OK) {
 		// if launched fine, close parent window in a bit
@@ -691,7 +692,7 @@ TTracker::OpenRef(const entry_ref *ref, const node_ref *nodeToClose,
 			alert->Go();
 			return result;
 		}
-	} else 
+	} else
 		model = new Model(&entry);
 
 	result = model->InitCheck();
@@ -850,7 +851,7 @@ TTracker::ArgvReceived(int32 argc, char **argv)
 		for (int32 index = 1; index < argc; index++) {
 			BEntry entry;
 			if (entry.SetTo(&workingDirectory, argv[index]) == B_OK
-				&& entry.GetRef(&ref) == B_OK) 
+				&& entry.GetRef(&ref) == B_OK)
 				OpenRef(&ref);
 			else if (get_ref_for_path(argv[index], &ref) == B_OK)
 				OpenRef(&ref);
@@ -870,13 +871,13 @@ TTracker::OpenContainerWindow(Model *model, BMessage *originalRefsList,
 		window = FindContainerWindow(model->NodeRef());
 
 	bool someWindowActivated = false;
-	
-	uint32 workspace = (uint32)(1 << current_workspace());		
+
+	uint32 workspace = (uint32)(1 << current_workspace());
 	int32 windowCount = 0;
-	
+
 	while (window) {
 		// At least one window open, just pull to front
-		// make sure we don't jerk workspaces around		
+		// make sure we don't jerk workspaces around
 		uint32 windowWorkspaces = window->Workspaces();
 		if (windowWorkspaces & workspace) {
 			window->Activate();
@@ -884,13 +885,13 @@ TTracker::OpenContainerWindow(Model *model, BMessage *originalRefsList,
 		}
 		window = FindContainerWindow(model->NodeRef(), ++windowCount);
 	}
-	
+
 	if (someWindowActivated) {
 		delete model;
-		return;	
+		return;
 	} // If no window was actiated, (none in the current workspace
 	  // we open a new one.
-	
+
 	if (openSelector == kRunOpenWithWindow) {
 		BMessage *refList = NULL;
 		if (!originalRefsList) {
@@ -914,12 +915,12 @@ TTracker::OpenContainerWindow(Model *model, BMessage *originalRefsList,
 	} else
 		// window will adopt the model
 		window = new BContainerWindow(&fWindowList, openFlags);
-	
+
 	if (model)
 		window->CreatePoseView(model);
 
 	BMessage restoreStateMessage(kRestoreState);
-	
+
 	if (stateMessage)
 		restoreStateMessage.AddMessage("state", stateMessage);
 
@@ -941,7 +942,7 @@ TTracker::EditQueries(const BMessage *message)
 		entry_ref ref;
 		message->FindRef("refs", index, &ref);
 		BEntry entry(&ref, true);
-		if (entry.InitCheck() == B_OK && entry.Exists()) 
+		if (entry.InitCheck() == B_OK && entry.Exists())
 			(new FindWindow(&ref, editOnlyIfTemplate))->Show();
 	}
 }
@@ -1000,7 +1001,7 @@ BContainerWindow *
 TTracker::FindContainerWindow(const node_ref *node, int32 number) const
 {
 	ASSERT(fWindowList.IsLocked());
-	
+
 	int32 count = fWindowList.CountItems();
 
 	int32 windowsFound = 0;
@@ -1008,7 +1009,7 @@ TTracker::FindContainerWindow(const node_ref *node, int32 number) const
 	for (int32 index = 0; index < count; index++) {
 		BContainerWindow *window = dynamic_cast<BContainerWindow *>
 			(fWindowList.ItemAt(index));
-			
+
 		if (window && window->IsShowing(node) && number == windowsFound++)
 			return window;
 	}
@@ -1020,7 +1021,7 @@ BContainerWindow *
 TTracker::FindContainerWindow(const entry_ref *entry, int32 number) const
 {
 	ASSERT(fWindowList.IsLocked());
-	
+
 	int32 count = fWindowList.CountItems();
 
 	int32 windowsFound = 0;
@@ -1036,7 +1037,7 @@ TTracker::FindContainerWindow(const entry_ref *entry, int32 number) const
 }
 
 
-bool 
+bool
 TTracker::EntryHasWindowOpen(const entry_ref *entry)
 {
 	AutoLock<WindowList> lock(&fWindowList);
@@ -1049,15 +1050,15 @@ TTracker::FindParentContainerWindow(const entry_ref *ref) const
 {
 	BEntry entry(ref);
 	BEntry parent;
-	
+
 	if (entry.GetParent(&parent) != B_OK)
 		return NULL;
-	
+
 	entry_ref parentRef;
 	parent.GetRef(&parentRef);
 
 	ASSERT(fWindowList.IsLocked());
-	
+
 	int32 count = fWindowList.CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BContainerWindow *window = dynamic_cast<BContainerWindow *>
@@ -1073,7 +1074,7 @@ BInfoWindow *
 TTracker::FindInfoWindow(const node_ref* node) const
 {
 	ASSERT(fWindowList.IsLocked());
-	
+
 	int32 count = fWindowList.CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BInfoWindow *window = dynamic_cast<BInfoWindow *>
@@ -1085,7 +1086,7 @@ TTracker::FindInfoWindow(const node_ref* node) const
 }
 
 
-bool 
+bool
 TTracker::QueryActiveForDevice(dev_t device)
 {
 	AutoLock<WindowList> lock(&fWindowList);
@@ -1103,7 +1104,7 @@ TTracker::QueryActiveForDevice(dev_t device)
 }
 
 
-void 
+void
 TTracker::CloseActiveQueryWindows(dev_t device)
 {
 	// used when trying to unmount a volume - an active query would prevent that from
@@ -1143,8 +1144,8 @@ TTracker::SaveAllPoseLocations()
 		if (window) {
 			AutoLock<BWindow> lock(window);
 			BDeskWindow *deskWindow = dynamic_cast<BDeskWindow *>(window);
-		
-			if (deskWindow) 
+
+			if (deskWindow)
 				deskWindow->SaveDesktopPoseLocations();
 			else
 				window->PoseView()->SavePoseLocations();
@@ -1174,7 +1175,7 @@ TTracker::CloseWindowAndChildren(const node_ref *node)
 
 			if ((*window->TargetModel()->NodeRef() == *node)
 				|| dir.Contains(&wind_entry)) {
-				
+
 				// ToDo:
 				// get rid of the Remove here, BContainerWindow::Quit does it
 				fWindowList.RemoveItemAt(index);
@@ -1203,11 +1204,11 @@ TTracker::CloseAllInWorkspace()
 		BWindow *window = fWindowList.ItemAt(index);
 		if (window->Workspaces() & currentWorkspace)
 			// avoid the desktop
-			if (!dynamic_cast<BDeskWindow *>(window) 
+			if (!dynamic_cast<BDeskWindow *>(window)
 				&& !dynamic_cast<BStatusWindow *>(window))
 				window->PostMessage(B_QUIT_REQUESTED);
-	}	
-}	
+	}
+}
 
 
 void
@@ -1235,7 +1236,7 @@ TTracker::CloseAllWindows()
 				// ToDo:
 				// get rid of the Remove here, BContainerWindow::Quit does it
 			fWindowList.RemoveItemAt(index);
-	}	
+	}
 }
 
 
@@ -1325,7 +1326,7 @@ TTracker::ReadyToRun()
 	InstallDefaultTemplates();
 	InstallIndices();
 	InstallTemporaryBackgroundImages();
-	
+
 	HideVarDir();
 
 	fTrashWatcher = new BTrashWatcher();
@@ -1333,13 +1334,13 @@ TTracker::ReadyToRun()
 
 	fClipboardRefsWatcher = new BClipboardRefsWatcher();
 	fClipboardRefsWatcher->Run();
-	
+
 	fAutoMounter = new AutoMounter();
 	fAutoMounter->Run();
-	
+
 	fTaskLoop = new StandAloneTaskLoop(true);
 
-	// open desktop window 
+	// open desktop window
 	BContainerWindow *deskWindow = NULL;
 	BVolume	bootVolume;
 	BVolumeRoster().GetBootVolume(&bootVolume);
@@ -1389,9 +1390,9 @@ MimeTypeList *
 TTracker::MimeTypes() const
 {
 	return fMimeTypeList;
-}	
+}
 
-void 
+void
 TTracker::SelectChildInParentSoon(const entry_ref *parent,
 	const node_ref *child)
 {
@@ -1400,7 +1401,7 @@ TTracker::SelectChildInParentSoon(const entry_ref *parent,
 		100000, 200000, 5000000);
 }
 
-void 
+void
 TTracker::CloseParentWaitingForChildSoon(const entry_ref *child,
 	const node_ref *parent)
 {
@@ -1409,7 +1410,7 @@ TTracker::CloseParentWaitingForChildSoon(const entry_ref *child,
 		200000, 100000, 5000000);
 }
 
-void 
+void
 TTracker::SelectPoseAtLocationSoon(node_ref parent, BPoint pointInPose)
 {
 	fTaskLoop->RunLater(NewMemberFunctionObject
@@ -1417,7 +1418,7 @@ TTracker::SelectPoseAtLocationSoon(node_ref parent, BPoint pointInPose)
 		100000);
 }
 
-void 
+void
 TTracker::SelectPoseAtLocationInParent(node_ref parent, BPoint pointInPose)
 {
 	AutoLock<WindowList> lock(&fWindowList);
@@ -1428,12 +1429,12 @@ TTracker::SelectPoseAtLocationInParent(node_ref parent, BPoint pointInPose)
 	}
 }
 
-bool 
+bool
 TTracker::CloseParentWaitingForChild(const entry_ref *child,
 	const node_ref *parent)
 {
 	AutoLock<WindowList> lock(&fWindowList);
-	
+
 	BContainerWindow *parentWindow = FindContainerWindow(parent);
 	if (!parentWindow)
 		// parent window already closed, give up
@@ -1452,10 +1453,10 @@ TTracker::CloseParentWaitingForChild(const entry_ref *child,
 		if (!window->IsHidden())
 			return CloseParentWindowCommon(parentWindow);
 	}
-	return false;	
+	return false;
 }
 
-void 
+void
 TTracker::CloseParent(node_ref parent)
 {
 	AutoLock<WindowList> lock(&fWindowList);
@@ -1482,11 +1483,11 @@ TTracker::ShowSettingsWindow()
 	}
 }
 
-bool 
+bool
 TTracker::CloseParentWindowCommon(BContainerWindow *window)
 {
 	ASSERT(fWindowList.IsLocked());
-	
+
 	if (dynamic_cast<BDeskWindow *>(window))
 		// don't close the destop
 		return false;
@@ -1495,18 +1496,18 @@ TTracker::CloseParentWindowCommon(BContainerWindow *window)
 	return true;
 }
 
-bool 
+bool
 TTracker::SelectChildInParent(const entry_ref *parent, const node_ref *child)
 {
 	AutoLock<WindowList> lock(&fWindowList);
-	
+
 	BContainerWindow *window = FindContainerWindow(parent);
-	if (!window) 
+	if (!window)
 		// parent window already closed, give up
 		return false;
 
 	AutoLock<BWindow> windowLock(window);
-	
+
 	if (windowLock.IsLocked()) {
 		BPoseView *view = window->PoseView();
 		int32 index;
@@ -1516,18 +1517,24 @@ TTracker::SelectChildInParent(const entry_ref *parent, const node_ref *child)
 			return true;
 		}
 	}
-	return false;	
+	return false;
 }
 
 const int32 kNodeMonitorBumpValue = 512;
 
-status_t 
+status_t
 TTracker::NeedMoreNodeMonitors()
 {
 	fNodeMonitorCount += kNodeMonitorBumpValue;
 	PRINT(("bumping nodeMonitorCount to %d\n", fNodeMonitorCount));
 
-	return _kset_mon_limit_(fNodeMonitorCount);
+	struct rlimit rl;
+	rl.rlim_cur = fNodeMonitorCount;
+	rl.rlim_max = RLIM_SAVED_MAX;
+	if (setrlimit(RLIMIT_NOVMON, &rl) < 0)
+		return errno;
+	return B_OK;
+
 }
 
 status_t
@@ -1570,7 +1577,7 @@ TTracker::AutoMounterLoop()
 }
 
 
-bool 
+bool
 TTracker::InTrashNode(const entry_ref *node) const
 {
 	return FSInTrashDir(node);
@@ -1588,5 +1595,5 @@ bool
 TTracker::IsTrashNode(const node_ref *node) const
 {
 	return fTrashWatcher->IsTrashNode(node);
-}	
+}
 
