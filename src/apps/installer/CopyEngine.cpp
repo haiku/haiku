@@ -263,8 +263,11 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 		return ret;
 
 	ret = create_directory(_destination, 0777);
-	if (ret < B_OK && ret != B_FILE_EXISTS)
+	if (ret < B_OK && ret != B_FILE_EXISTS) {
+		fprintf(stderr, "Could not create '%s': %s\n", _destination,
+			strerror(ret));
 		return ret;
+	}
 
 	BDirectory destination(_destination);
 	ret = destination.InitCheck();
@@ -301,10 +304,24 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			// handle recursive directory copy
 
 			if (copy.Exists()) {
-				// Do not overwrite attributes on folders that exist.
-				// This should work better when the install target already
-				// contains a Haiku installation.
-				copyAttributes = false;
+				ret = B_OK;
+				if (copy.IsDirectory()) {
+					if (_ShouldClobberFolder(name, statInfo, level))
+						ret = _RemoveFolder(copy);
+					else {
+						// Do not overwrite attributes on folders that exist.
+						// This should work better when the install target
+						// already contains a Haiku installation.
+						copyAttributes = false;
+					}
+				} else
+					ret = copy.Remove();
+
+				if (ret != B_OK) {
+					fprintf(stderr, "Failed to make room for folder '%s': "
+						"%s\n", name, strerror(ret));
+					return ret;
+				}
 			}
 
 			BPath srcFolder;
@@ -329,34 +346,51 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 				// We are supposed to quit
 				return B_CANCELED;
 			}
-		} else if (S_ISLNK(statInfo.st_mode)) {
-			// copy symbolic links
-			BSymLink srcLink(&entry);
-			if (ret < B_OK)
-				return ret;
-
-			char linkPath[B_PATH_NAME_LENGTH];
-			ssize_t read = srcLink.ReadLink(linkPath, B_PATH_NAME_LENGTH - 1);
-			if (read < 0)
-				return (status_t)read;
-
-			// just in case it already exists...
-			copy.Remove();
-
-			BSymLink dstLink;
-			ret = destination.CreateSymLink(name, linkPath, &dstLink);
-			if (ret < B_OK)
-				return ret;
 		} else {
-			// copy file data
-			// NOTE: Do not pass the locker, we simply keep holding the lock!
-			ret = CopyFile(entry, copy);
-			if (ret < B_OK)
-				return ret;
+			if (copy.Exists()) {
+				if (copy.IsDirectory())
+					ret = _RemoveFolder(copy);
+				else
+					ret = copy.Remove();
+				if (ret != B_OK) {
+					fprintf(stderr, "Failed to make room for entry '%s': "
+						"%s\n", name, strerror(ret));
+					return ret;
+				}
+			}
+			if (S_ISLNK(statInfo.st_mode)) {
+				// copy symbolic links
+				BSymLink srcLink(&entry);
+				if (ret < B_OK)
+					return ret;
+	
+				char linkPath[B_PATH_NAME_LENGTH];
+				ssize_t read = srcLink.ReadLink(linkPath, B_PATH_NAME_LENGTH - 1);
+				if (read < 0)
+					return (status_t)read;
+	
+				// just in case it already exists...
+				copy.Remove();
+	
+				BSymLink dstLink;
+				ret = destination.CreateSymLink(name, linkPath, &dstLink);
+				if (ret < B_OK)
+					return ret;
+			} else {
+				// copy file data
+				// NOTE: Do not pass the locker, we simply keep holding the lock!
+				ret = CopyFile(entry, copy);
+				if (ret < B_OK)
+					return ret;
+			}
 		}
 
 		if (!copyAttributes)
 			continue;
+
+		ret = copy.SetTo(&destination, name);
+		if (ret != B_OK)
+			return ret;
 
 		// copy attributes
 		BNode sourceNode(&entry);
@@ -396,6 +430,30 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 }
 
 
+status_t
+CopyEngine::_RemoveFolder(BEntry& entry)
+{
+	BDirectory directory(&entry);
+	status_t ret = directory.InitCheck();
+	if (ret != B_OK)
+		return ret;
+
+	BEntry subEntry;
+	while (directory.GetNextEntry(&subEntry) == B_OK) {
+		if (subEntry.IsDirectory()) {
+			ret = _RemoveFolder(subEntry);
+			if (ret != B_OK)
+				return ret;
+		} else {
+			ret = subEntry.Remove();
+			if (ret != B_OK)
+				return ret;
+		}
+	}
+	return entry.Remove();
+}
+
+
 void
 CopyEngine::_UpdateProgress()
 {
@@ -427,6 +485,24 @@ CopyEngine::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
 		}
 	}
 	return true;
+}
+
+
+bool
+CopyEngine::_ShouldClobberFolder(const char* name, const struct stat& statInfo,
+	int32 level) const
+{
+	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
+		if (strcmp("system", name) == 0) {
+			printf("clobbering '%s'.\n", name);
+			return true;
+		}
+//		if (strcmp("develop", name) == 0) {
+//			printf("clobbering '%s'.\n", name);
+//			return true;
+//		}
+	}
+	return false;
 }
 
 

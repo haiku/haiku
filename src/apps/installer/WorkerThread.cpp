@@ -234,14 +234,14 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 
 
 void
-WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
+WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 {
 	CALLED();
 
 	BPath targetDirectory, srcDirectory;
 	BDirectory targetDir;
 	BDiskDevice device;
-	BPartition *partition;
+	BPartition* partition;
 	BVolume targetVolume;
 	status_t err = B_OK;
 	int32 entries = 0;
@@ -250,8 +250,8 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 	BMessenger messenger(fWindow);
 	CopyEngine engine(messenger, new BMessage(MSG_STATUS_MESSAGE));
 
-	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
-	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
+	PartitionMenuItem* targetItem = (PartitionMenuItem*)targetMenu->FindMarked();
+	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
 	if (!srcItem || !targetItem) {
 		ERR("bad menu items\n");
 		goto error;
@@ -381,7 +381,12 @@ WorkerThread::_PerformInstall(BMenu *srcMenu, BMenu *targetMenu)
 	}
 	if (entries != 0
 		&& ((new BAlert("", "The target volume is not empty. Are you sure you "
-			"want to install anyway?", "Install Anyway", "Cancel", 0,
+			"want to install anyway?\n\nNote: The 'system' folder will be a "
+			"clean copy from the source volume, all other folders will be "
+			"merged, whereas files and links that exist on both the source "
+			"and target volume will be overwritten with the source volume "
+			"version.",
+			"Install Anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		err = B_CANCELED;
 		goto error;

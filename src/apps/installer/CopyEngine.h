@@ -48,6 +48,12 @@ private:
 									const struct stat& statInfo,
 									int32 level) const;
 
+			bool				_ShouldClobberFolder(const char* name,
+									const struct stat& statInfo,
+									int32 level) const;
+
+			status_t			_RemoveFolder(BEntry& entry);
+
 			void				_UpdateProgress();
 
 	static	int32				_WriteThreadEntry(void* cookie);

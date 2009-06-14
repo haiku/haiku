@@ -373,15 +373,12 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				(new BAlert("error", errorMessage, "Ok"))->Go();
 			}
 
-			fInstallStatus = kReadyForInstall;
-			fBeginButton->SetEnabled(true);
 			_DisableInterface(false);
 
 			fProgressLayoutItem->SetVisible(false);
 			fPkgSwitchLayoutItem->SetVisible(true);
 			_ShowOptionalPackages();
-
-			fBeginButton->SetLabel("Begin");
+			_UpdateControls();
 			break;
 		}
 		case START_SCAN:
