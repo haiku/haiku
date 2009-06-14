@@ -45,6 +45,13 @@ struct DynamicAttributeValue {
 	};
 	uint8				attributeClass;
 
+	DynamicAttributeValue()
+		:
+		attributeClass(ATTRIBUTE_CLASS_CONSTANT)
+	{
+		this->constant = 0;
+	}
+
 	void SetTo(uint64 constant)
 	{
 		this->constant = constant;
