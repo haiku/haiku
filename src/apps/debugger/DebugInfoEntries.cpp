@@ -360,6 +360,14 @@ DIECompoundType::DIECompoundType()
 }
 
 
+status_t
+DIECompoundType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
 // #pragma mark - DIEClassBaseType
 
 
@@ -373,8 +381,6 @@ DIEClassBaseType::DIEClassBaseType()
 
 DIEArrayType::DIEArrayType()
 	:
-	fBitStride(0),
-	fByteSize(0),
 	fOrdering(DW_ORD_row_major)
 {
 }
@@ -422,8 +428,7 @@ status_t
 DIEArrayType::AddAttribute_bit_stride(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fBitStride = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fBitStride, value);
 }
 
 
@@ -431,8 +436,7 @@ status_t
 DIEArrayType::AddAttribute_stride_size(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fBitStride = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fBitStride, value);
 }
 
 
@@ -440,8 +444,7 @@ status_t
 DIEArrayType::AddAttribute_byte_size(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fByteSize = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fByteSize, value);
 }
 
 
@@ -871,10 +874,7 @@ DIEAccessDeclaration::Tag() const
 DIEBaseType::DIEBaseType()
 	:
 	fEncoding(0),
-	fEndianity(0),
-	fByteSize(0),
-	fBitSize(0),
-	fBitOffset(0)
+	fEndianity(0)
 {
 }
 
@@ -899,8 +899,7 @@ status_t
 DIEBaseType::AddAttribute_byte_size(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fByteSize = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fByteSize, value);
 }
 
 
@@ -908,8 +907,7 @@ status_t
 DIEBaseType::AddAttribute_bit_size(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fBitSize = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fBitSize, value);
 }
 
 
@@ -917,8 +915,7 @@ status_t
 DIEBaseType::AddAttribute_bit_offset(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fBitOffset = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fBitOffset, value);
 }
 
 
@@ -1379,9 +1376,8 @@ DIECondition::Tag() const
 
 
 DIESharedType::DIESharedType()
-	:
-	fBlockSize(DWARF_ADDRESS_MAX)
 {
+	fBlockSize.SetTo(DWARF_ADDRESS_MAX);
 }
 
 
@@ -1396,8 +1392,7 @@ status_t
 DIESharedType::AddAttribute_count(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fBlockSize = value.constant;
-	return B_OK;
+	return SetDynamicAttributeValue(fBlockSize, value);
 }
 
 

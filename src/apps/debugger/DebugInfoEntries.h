@@ -291,11 +291,15 @@ class DIECompoundType : public DIEDeclaredType {
 public:
 								DIECompoundType();
 
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !interface
+
 // TODO:
-// DW_AT_byte_size			// !interface
 // DW_AT_specification		// !interface
 
 protected:
+			DynamicAttributeValue fByteSize;
 };
 
 
@@ -335,10 +339,10 @@ public:
 // DW_AT_specification
 
 private:
-			uint64				fBitStride;
-			dwarf_addr_t		fByteSize;
-			uint8				fOrdering;
+			DynamicAttributeValue fBitStride;
+			DynamicAttributeValue fByteSize;
 			DebugInfoEntryList	fDimensions;
+			uint8				fOrdering;
 };
 
 
@@ -628,11 +632,11 @@ public:
 // DW_AT_small
 
 private:
+			DynamicAttributeValue fByteSize;
+			DynamicAttributeValue fBitOffset;
+			DynamicAttributeValue fBitSize;
 			uint8				fEncoding;
 			uint8				fEndianity;
-			uint16				fByteSize;
-			uint16				fBitSize;
-			uint16				fBitOffset;
 };
 
 
@@ -890,7 +894,7 @@ public:
 									const AttributeValue& value);
 
 private:
-			uint64				fBlockSize;
+			DynamicAttributeValue fBlockSize;
 			DeclarationLocation	fDeclarationLocation;
 };
 
