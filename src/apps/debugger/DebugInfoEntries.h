@@ -252,16 +252,26 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_accessibility(uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !file, !pointer to member
+	virtual	status_t			AddAttribute_declaration(uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !file
+	virtual	status_t			AddAttribute_abstract_origin(
+									uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !interface
 
 // TODO:
-// DW_AT_accessibility		// !file, !pointer to member
-// DW_AT_declaration		// !file
-// DW_AT_abstract_origin	// !interface
 // DW_AT_description		// !interface
 // DW_AT_visibility			// !interface
 
 protected:
 			DeclarationLocation	fDeclarationLocation;
+			DebugInfoEntry*		fAbstractOrigin;
+			uint8				fAccessibility;
+			bool				fDeclaration;
 };
 
 
@@ -271,9 +281,6 @@ public:
 
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
 									const AttributeValue& value);
-
-// TODO:
-// DW_AT_type
 
 protected:
 			DIEType*			fType;

@@ -269,6 +269,10 @@ DIEAddressingType::AddAttribute_address_class(uint16 attributeName,
 
 
 DIEDeclaredType::DIEDeclaredType()
+	:
+	fAbstractOrigin(NULL),
+	fAccessibility(0),
+	fDeclaration(false)
 {
 }
 
@@ -296,6 +300,33 @@ DIEDeclaredType::AddAttribute_decl_column(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fDeclarationLocation.SetColumn(value.constant);
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_accessibility(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAccessibility = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_declaration(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclaration = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_abstract_origin(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAbstractOrigin = value.reference;
 	return B_OK;
 }
 
