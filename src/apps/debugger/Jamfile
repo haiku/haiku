@@ -21,3 +21,5 @@ Application Debugger :
 
 	: $(TARGET_LIBSUPC++)
 ;
+
+HaikuSubInclude gui running_teams_window ;

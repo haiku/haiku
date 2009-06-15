@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps debugger gui running_teams_window ;
+
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
+
+UsePrivateHeaders debug ;
+UsePrivateSystemHeaders ;
+
+Application hdb :
+	hdb.cpp 
+	RunningTeamsWindow.cpp 
+	TeamsListView.cpp 
+	TeamWindow.cpp
+
+	: be tracker translation libdebug.so
+;
