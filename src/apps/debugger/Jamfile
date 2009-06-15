@@ -7,15 +7,17 @@ UsePrivateHeaders kernel shared ;
 UsePrivateSystemHeaders ;
 
 Application Debugger :
-	attribute_classes.cpp
-	AttributeValue.cpp
 	debugger.cpp
-	DebugInfoEntries.cpp
-	DebugInfoEntry.cpp
-	DwarfManager.cpp
 	ElfFile.cpp
-	SourceLanguageInfo.cpp
-	tag_names.cpp
+
+# DWARF
+#	attribute_classes.cpp
+#	AttributeValue.cpp
+#	DebugInfoEntries.cpp
+#	DebugInfoEntry.cpp
+#	DwarfManager.cpp
+#	SourceLanguageInfo.cpp
+3	tag_names.cpp
 
 	: $(TARGET_LIBSUPC++)
 ;
