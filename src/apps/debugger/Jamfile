@@ -17,7 +17,7 @@ Application Debugger :
 #	DebugInfoEntry.cpp
 #	DwarfManager.cpp
 #	SourceLanguageInfo.cpp
-3	tag_names.cpp
+#	tag_names.cpp
 
 	: $(TARGET_LIBSUPC++)
 ;
