@@ -89,7 +89,7 @@ struct legacy_driver {
 	const char*		name;
 	dev_t			device;
 	ino_t			node;
-	time_t			last_modified;
+	timespec		last_modified;
 	image_id		image;
 	uint32			devices_used;
 	bool			binary_updated;
@@ -567,7 +567,7 @@ add_driver(const char *path, image_id image)
 	driver->device = stat.st_dev;
 	driver->node = stat.st_ino;
 	driver->image = image;
-	driver->last_modified = stat.st_mtime;
+	driver->last_modified = stat.st_mtim;
 	driver->devices_used = 0;
 	driver->binary_updated = false;
 	driver->priority = priority;
@@ -756,7 +756,8 @@ dump_driver(int argc, char** argv)
 	kprintf(" image:          %ld\n", driver->image);
 	kprintf(" device:         %ld\n", driver->device);
 	kprintf(" node:           %Ld\n", driver->node);
-	kprintf(" last modified:  %ld\n", driver->last_modified);
+	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
+		driver->last_modified.tv_nsec);
 	kprintf(" devs used:      %ld\n", driver->devices_used);
 	kprintf(" devs published: %ld\n", driver->devices.Count());
 	kprintf(" binary updated: %d\n", driver->binary_updated);

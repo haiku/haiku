@@ -1,6 +1,6 @@
 /*
  * Copyright 2007-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -137,11 +137,11 @@ class Inode {
 		status_t	InitCheck();
 
 		bool		IsActive() const { return fActive; }
-		time_t		CreationTime() const { return fCreationTime; }
-		void		SetCreationTime(time_t creationTime)
+		timespec	CreationTime() const { return fCreationTime; }
+		void		SetCreationTime(timespec creationTime)
 						{ fCreationTime = creationTime; }
-		time_t		ModificationTime() const { return fModificationTime; }
-		void		SetModificationTime(time_t modificationTime)
+		timespec	ModificationTime() const { return fModificationTime; }
+		void		SetModificationTime(timespec modificationTime)
 						{ fModificationTime = modificationTime; }
 
 		mutex		*RequestLock() { return &fRequestLock; }
@@ -171,8 +171,8 @@ class Inode {
 		status_t	Deselect(uint8 event, selectsync *sync, int openMode);
 
 	private:
-		time_t		fCreationTime;
-		time_t		fModificationTime;
+		timespec	fCreationTime;
+		timespec	fModificationTime;
 
 		RingBuffer	fBuffer;
 
@@ -319,7 +319,10 @@ Inode::Inode()
 	fWriteCondition.Publish(this, "pipe");
 	mutex_init(&fRequestLock, "pipe request");
 
-	fCreationTime = fModificationTime = time(NULL);
+	bigtime_t time = real_time_clock();
+	fModificationTime.tv_sec = time / 1000000;
+	fModificationTime.tv_nsec = (time % 1000000) * 1000;
+	fCreationTime = fModificationTime;
 }
 
 
@@ -855,10 +858,10 @@ fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
 
 	st->st_blksize = 4096;
 
-// TODO: Just pass the changes to our modification time on to the super node.
-	st->st_atime = time(NULL);
-	st->st_mtime = st->st_ctime = fifo->ModificationTime();
-//	st->st_crtime = inode->CreationTime();
+	// TODO: Just pass the changes to our modification time on to the super node.
+	st->st_atim.tv_sec = time(NULL);
+	st->st_atim.tv_nsec = 0;
+	st->st_mtim = st->st_ctim = fifo->ModificationTime();
 
 	return B_OK;
 }

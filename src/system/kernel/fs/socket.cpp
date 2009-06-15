@@ -288,12 +288,16 @@ socket_read_stat(struct file_descriptor *descriptor, struct stat *st)
 	st->st_size = 0;
 	st->st_rdev = 0;
 	st->st_blksize = 1024;	// use MTU for datagram sockets?
-	time_t now = time(NULL);
-	st->st_atime = now;
-	st->st_mtime = now;
-	st->st_ctime = now;
-	st->st_crtime = now;
 	st->st_type = 0;
+
+	timespec now;
+	now.tv_sec = time(NULL);
+	now.tv_nsec = 0;
+
+	st->st_atim = now;
+	st->st_mtim = now;
+	st->st_ctim = now;
+	st->st_crtim = now;
 
 	return B_OK;
 }

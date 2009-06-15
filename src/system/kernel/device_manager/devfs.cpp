@@ -84,8 +84,8 @@ struct devfs_vnode {
 	struct devfs_vnode*	all_next;
 	ino_t				id;
 	char*				name;
-	time_t				modification_time;
-	time_t				creation_time;
+	timespec			modification_time;
+	timespec			creation_time;
 	uid_t				uid;
 	gid_t				gid;
 	struct devfs_vnode*	parent;
@@ -149,6 +149,18 @@ static struct devfs* sDeviceFileSystem = NULL;
 
 
 //	#pragma mark - devfs private
+
+
+static timespec
+current_timespec()
+{
+	bigtime_t time = real_time_clock_usecs();
+
+	timespec tv;
+	tv.tv_sec = time / 1000000;
+	tv.tv_nsec = (time % 1000000) * 1000;
+	return tv;
+}
 
 
 static int32
@@ -228,7 +240,7 @@ devfs_create_vnode(struct devfs* fs, devfs_vnode* parent, const char* name)
 		return NULL;
 	}
 
-	vnode->creation_time = vnode->modification_time = time(NULL);
+	vnode->creation_time = vnode->modification_time = current_timespec();
 	vnode->uid = geteuid();
 	vnode->gid = parent ? parent->gid : getegid();
 		// inherit group from parent if possible
@@ -333,7 +345,7 @@ devfs_insert_in_dir(struct devfs_vnode* dir, struct devfs_vnode* vnode)
 	}
 
 	vnode->parent = dir;
-	dir->modification_time = time(NULL);
+	dir->modification_time = current_timespec();
 
 	notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name,
 		vnode->id);
@@ -360,7 +372,7 @@ devfs_remove_from_dir(struct devfs_vnode* dir, struct devfs_vnode* removeNode)
 			else
 				dir->stream.u.dir.dir_head = vnode->dir_next;
 			vnode->dir_next = NULL;
-			dir->modification_time = time(NULL);
+			dir->modification_time = current_timespec();
 
 			notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name,
 				vnode->id);
@@ -1796,11 +1808,11 @@ devfs_read_stat(fs_volume* _volume, fs_vnode* _vnode, struct stat* stat)
 	stat->st_uid = vnode->uid;
 	stat->st_gid = vnode->gid;
 
-	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = vnode->modification_time;
-	stat->st_crtime = vnode->creation_time;
+	stat->st_atim = current_timespec();
+	stat->st_mtim = stat->st_ctim = vnode->modification_time;
+	stat->st_crtim = vnode->creation_time;
 
-	// ToDo: this only works for partitions right now - if we should decide
+	// TODO: this only works for partitions right now - if we should decide
 	//	to keep this feature, we should have a better solution
 	if (S_ISCHR(vnode->stream.type)) {
 		//device_geometry geometry;
@@ -1854,9 +1866,9 @@ devfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 		vnode->gid = stat->st_gid;
 
 	if (statMask & B_STAT_MODIFICATION_TIME)
-		vnode->modification_time = stat->st_mtime;
+		vnode->modification_time = stat->st_mtim;
 	if (statMask & B_STAT_CREATION_TIME)
-		vnode->creation_time = stat->st_crtime;
+		vnode->creation_time = stat->st_crtim;
 
 	notify_stat_changed(fs->id, vnode->id, statMask);
 	return B_OK;

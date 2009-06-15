@@ -60,8 +60,8 @@ struct rootfs_vnode {
 	struct rootfs_vnode*		all_next;
 	ino_t						id;
 	char*						name;
-	time_t						modification_time;
-	time_t						creation_time;
+	timespec					modification_time;
+	timespec					creation_time;
 	uid_t						uid;
 	gid_t						gid;
 	struct rootfs_vnode*		parent;
@@ -100,6 +100,18 @@ namespace {
 }
 
 #define ROOTFS_HASH_SIZE 16
+
+
+static timespec
+current_timespec()
+{
+	bigtime_t time = real_time_clock_usecs();
+
+	timespec tv;
+	tv.tv_sec = time / 1000000;
+	tv.tv_nsec = (time % 1000000) * 1000;
+	return tv;
+}
 
 
 static uint32
@@ -150,7 +162,7 @@ rootfs_create_vnode(struct rootfs* fs, struct rootfs_vnode* parent,
 
 	vnode->id = fs->next_vnode_id++;
 	vnode->stream.type = type;
-	vnode->creation_time = vnode->modification_time = time(NULL);
+	vnode->creation_time = vnode->modification_time = current_timespec();
 	vnode->uid = geteuid();
 	vnode->gid = parent ? parent->gid : getegid();
 		// inherit group from parent if possible
@@ -235,7 +247,7 @@ rootfs_insert_in_dir(struct rootfs* fs, struct rootfs_vnode* dir,
 	}
 
 	vnode->parent = dir;
-	dir->modification_time = time(NULL);
+	dir->modification_time = current_timespec();
 
 	notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
 	return B_OK;
@@ -261,7 +273,7 @@ rootfs_remove_from_dir(struct rootfs* fs, struct rootfs_vnode* dir,
 				dir->stream.dir.dir_head = vnode->dir_next;
 			vnode->dir_next = NULL;
 
-			dir->modification_time = time(NULL);
+			dir->modification_time = current_timespec();
 			notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
 			return B_OK;
 		}
@@ -1002,9 +1014,10 @@ rootfs_read_stat(fs_volume* _volume, fs_vnode* _v, struct stat* stat)
 	stat->st_uid = vnode->uid;
 	stat->st_gid = vnode->gid;
 
-	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = vnode->modification_time;
-	stat->st_crtime = vnode->creation_time;
+	stat->st_atim.tv_sec = real_time_clock();
+	stat->st_atim.tv_nsec = 0;
+	stat->st_mtim = stat->st_ctim = vnode->modification_time;
+	stat->st_crtim = vnode->creation_time;
 
 	return B_OK;
 }
@@ -1037,9 +1050,9 @@ rootfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 		vnode->gid = stat->st_gid;
 
 	if ((statMask & B_STAT_MODIFICATION_TIME) != 0)
-		vnode->modification_time = stat->st_mtime;
+		vnode->modification_time = stat->st_mtim;
 	if ((statMask & B_STAT_CREATION_TIME) != 0)
-		vnode->creation_time = stat->st_crtime;
+		vnode->creation_time = stat->st_crtim;
 
 	mutex_unlock(&fs->lock);
 
