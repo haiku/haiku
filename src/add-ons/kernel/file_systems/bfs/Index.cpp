@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -390,9 +390,7 @@ Index::UpdateLastModified(Transaction &transaction, Inode* inode,
 
 	bigtime_t oldModified = inode->OldLastModified();
 	if (modified == -1)
-		modified = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
-	modified &= ~INODE_TIME_MASK;
-	modified |= fVolume->GetUniqueID() & INODE_TIME_MASK;
+		modified = bfs_inode::ToInode(real_time_clock_usecs());
 
 	status_t status = Update(transaction, "last_modified", B_INT64_TYPE,
 		(uint8*)&oldModified, sizeof(int64), (uint8*)&modified,

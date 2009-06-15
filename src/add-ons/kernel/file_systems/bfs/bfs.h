@@ -28,7 +28,8 @@ struct block_run {
 	uint16		start;
 	uint16		length;
 
-	int32 AllocationGroup() const { return BFS_ENDIAN_TO_HOST_INT32(allocation_group); }
+	int32 AllocationGroup() const
+		{ return BFS_ENDIAN_TO_HOST_INT32(allocation_group); }
 	uint16 Start() const { return BFS_ENDIAN_TO_HOST_INT16(start); }
 	uint16 Length() const { return BFS_ENDIAN_TO_HOST_INT16(length); }
 
@@ -87,9 +88,11 @@ struct disk_super_block {
 	off_t NumBlocks() const { return BFS_ENDIAN_TO_HOST_INT64(num_blocks); }
 	off_t UsedBlocks() const { return BFS_ENDIAN_TO_HOST_INT64(used_blocks); }
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
-	int32 BlocksPerAllocationGroup() const { return BFS_ENDIAN_TO_HOST_INT32(blocks_per_ag); }
+	int32 BlocksPerAllocationGroup() const
+		{ return BFS_ENDIAN_TO_HOST_INT32(blocks_per_ag); }
 	int32 AllocationGroups() const { return BFS_ENDIAN_TO_HOST_INT32(num_ags); }
-	int32 AllocationGroupShift() const { return BFS_ENDIAN_TO_HOST_INT32(ag_shift); }
+	int32 AllocationGroupShift() const
+		{ return BFS_ENDIAN_TO_HOST_INT32(ag_shift); }
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	off_t LogStart() const { return BFS_ENDIAN_TO_HOST_INT64(log_start); }
 	off_t LogEnd() const { return BFS_ENDIAN_TO_HOST_INT64(log_end); }
@@ -121,10 +124,14 @@ struct data_stream {
 	off_t		max_double_indirect_range;
 	off_t		size;
 
-	off_t MaxDirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_direct_range); }
-	off_t MaxIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_indirect_range); }
-	off_t MaxDoubleIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_double_indirect_range); }
-	off_t Size() const { return BFS_ENDIAN_TO_HOST_INT64(size); }
+	off_t MaxDirectRange() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(max_direct_range); }
+	off_t MaxIndirectRange() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(max_indirect_range); }
+	off_t MaxDoubleIndirectRange() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(max_double_indirect_range); }
+	off_t Size() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(size); }
 } _PACKED;
 
 // This defines the size of the indirect and double indirect
@@ -168,6 +175,13 @@ class Volume;
 #define SHORT_SYMLINK_NAME_LENGTH	144
 	// length incl. terminating '\0'
 
+#define INODE_MAGIC1			0x3bbe0ad9
+#define INODE_FILE_NAME_LENGTH	256
+#define INODE_TIME_SHIFT		16
+#define INODE_TIME_MASK			0xffff
+
+inline uint32 unique_from_nsec(uint32 time);
+
 struct bfs_inode {
 	int32		magic1;
 	inode_addr	inode_num;
@@ -175,8 +189,8 @@ struct bfs_inode {
 	int32		gid;
 	int32		mode;				// see sys/stat.h
 	int32		flags;
-	bigtime_t	create_time;
-	bigtime_t	last_modified_time;
+	int64		create_time;
+	int64		last_modified_time;
 	inode_addr	parent;
 	inode_addr	attributes;
 	uint32		type;				// attribute type
@@ -201,22 +215,29 @@ struct bfs_inode {
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	int32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
-	bigtime_t LastModifiedTime() const {
-		return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
-	bigtime_t CreateTime() const {
-		return BFS_ENDIAN_TO_HOST_INT64(create_time); }
-	small_data *SmallDataStart() { return small_data_start; }
-	bigtime_t StatusChangeTime() const {
-		return BFS_ENDIAN_TO_HOST_INT64(status_change_time); }
+	int64 LastModifiedTime() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
+	int64 CreateTime() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(create_time); }
+	int64 StatusChangeTime() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(status_change_time); }
+	small_data* SmallDataStart() { return small_data_start; }
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
-} _PACKED;
 
-#define INODE_MAGIC1			0x3bbe0ad9
-#define INODE_TIME_SHIFT		16
-#define INODE_TIME_MASK			0xffff
-#define INODE_FILE_NAME_LENGTH	256
+	static int64 ToInode(bigtime_t time)
+		{ return ((time / 1000000) << INODE_TIME_SHIFT)
+			+ unique_from_nsec((time % 1000000) * 1000); }
+	static int64 ToInode(const timespec& tv)
+		{ return ((int64)tv.tv_sec << INODE_TIME_SHIFT)
+			+ unique_from_nsec(tv.tv_nsec); }
+
+	static time_t ToSecs(bigtime_t time)
+		{ return time >> INODE_TIME_SHIFT; }
+	static uint32 ToUsecs(bigtime_t time)
+		{ return (time & INODE_TIME_MASK) << 14; }
+} _PACKED;
 
 enum inode_flags {
 	INODE_IN_USE			= 0x00000001,	// always set
@@ -235,6 +256,7 @@ enum inode_flags {
 	INODE_DONT_FREE_SPACE	= 0x00080000
 };
 
+
 //**************************************
 
 struct file_cookie {
@@ -250,6 +272,24 @@ struct file_cookie {
 #define INODE_NOTIFICATION_INTERVAL	1000000LL
 
 //**************************************
+
+
+/*!	Converts the nano seconds given to the internal 16 bit resolution that
+	BFS uses. If \a time is zero, 12 bits will get a monotonically increasing
+	number. For all other values, only the lower 4 bits are changed this way.
+
+	This is done to decrease the number of duplicate time values, which speeds
+	up the way BFS handles the time indices.
+*/
+inline uint32
+unique_from_nsec(uint32 time)
+{
+	static vint32 number;
+	if (time != 0)
+		return ((time >> 14) & INODE_TIME_MASK) | (++number & 0xf);
+
+	return ++number & 0xfff;
+}
 
 
 inline int32

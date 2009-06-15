@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -279,7 +279,6 @@ Volume::Volume(fs_volume* volume)
 	fRootNode(NULL),
 	fIndicesNode(NULL),
 	fDirtyCachedBlocks(0),
-	fUniqueID(0),
 	fFlags(0),
 	fCheckingThread(-1)
 {

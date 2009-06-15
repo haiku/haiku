@@ -117,12 +117,15 @@ dump_inode(const bfs_inode* inode)
 	kprintf("  gid                = %u\n", (unsigned)inode->GroupID());
 	kprintf("  mode               = %08x\n", (int)inode->Mode());
 	kprintf("  flags              = %08x\n", (int)inode->Flags());
-	kprintf("  create_time        = %Ld (%Ld)\n", inode->CreateTime(),
-		inode->CreateTime() >> INODE_TIME_SHIFT);
-	kprintf("  last_modified_time = %Ld (%Ld)\n", inode->LastModifiedTime(),
-		inode->LastModifiedTime() >> INODE_TIME_SHIFT);
-	kprintf("  status_change_time = %Ld (%Ld)\n", inode->StatusChangeTime(),
-		inode->StatusChangeTime() >> INODE_TIME_SHIFT);
+	kprintf("  create_time        = %llx (%ld.%u)\n", inode->CreateTime(),
+		bfs_inode::ToSecs(inode->CreateTime()),
+		(unsigned)bfs_inode::ToUsecs(inode->CreateTime()));
+	kprintf("  last_modified_time = %llx (%ld.%u)\n", inode->LastModifiedTime(),
+		bfs_inode::ToSecs(inode->LastModifiedTime()),
+		(unsigned)bfs_inode::ToUsecs(inode->LastModifiedTime()));
+	kprintf("  status_change_time = %llx (%ld.%u)\n", inode->StatusChangeTime(),
+		bfs_inode::ToSecs(inode->StatusChangeTime()),
+		(unsigned)bfs_inode::ToUsecs(inode->StatusChangeTime()));
 	dump_block_run(	"  parent             = ", inode->parent);
 	dump_block_run(	"  attributes         = ", inode->attributes);
 	kprintf("  type               = %u\n", (unsigned)inode->Type());

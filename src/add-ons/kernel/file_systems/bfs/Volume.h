@@ -126,8 +126,6 @@ public:
 
 			void*			BlockCache() { return fBlockCache; }
 
-			uint32			GetUniqueID();
-
 	static	status_t		CheckSuperBlock(const uint8* data,
 								uint32* _offset = NULL);
 	static	status_t		Identify(int fd, disk_super_block* superBlock);
@@ -155,7 +153,6 @@ protected:
 			mutex			fQueryLock;
 			SinglyLinkedList<Query> fQueries;
 
-			int32			fUniqueID;
 			uint32			fFlags;
 
 			void*			fBlockCache;
@@ -225,11 +222,5 @@ Volume::GetJournal(off_t /*refBlock*/) const
 	 return fJournal;
 }
 
-
-inline uint32
-Volume::GetUniqueID()
-{
-	 return atomic_add(&fUniqueID, 1);
-}
 
 #endif	// VOLUME_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -389,13 +389,8 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 	Node().mode = HOST_ENDIAN_TO_BFS_INT32(mode);
 	Node().flags = HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 
-	Node().create_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)time(NULL)
-		<< INODE_TIME_SHIFT);
-	Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64(Node().create_time
-		| (volume->GetUniqueID() & INODE_TIME_MASK));
-		// we use Volume::GetUniqueID() to avoid having too many duplicates
-		// in the last_modified index
-	Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(Node().create_time);
+	Node().create_time = Node().last_modified_time = Node().status_change_time
+		= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(real_time_clock_usecs()));
 
 	Node().inode_size = HOST_ENDIAN_TO_BFS_INT32(volume->InodeSize());
 
@@ -1468,8 +1463,8 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
 	// TODO: should update the internal last modified time only at this point!
-	Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)time(NULL)
-		<< INODE_TIME_SHIFT);
+	Node().last_modified_time
+		= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(real_time_clock_usecs()));
 
 	// TODO: support INODE_LOGGED!
 
