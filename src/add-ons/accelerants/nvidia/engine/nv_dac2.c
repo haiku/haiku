@@ -1,12 +1,13 @@
 /* program the secondary DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-9/2004
+   Rudolf Cornelissen 12/2003-6/2009
 */
 
 #define MODULE_BIT 0x00001000
 
 #include "nv_std.h"
 
+static void nv_dac2_dump_pix_pll(void);
 static status_t nv10_nv20_dac2_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
@@ -145,7 +146,6 @@ if (1)
 status_t nv_dac2_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
-//	uint time = 0;
 
 	float pix_setting, req_pclk;
 	status_t result;
@@ -157,7 +157,11 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
 	if (si->ps.tmds2_active && !si->settings.pgm_panel)
 	{
-		LOG(4,("DAC2: Not programming DFP refresh (specified in nv.settings)\n"));
+		LOG(4,("DAC2: Not programming DFP refresh (specified in nvidia.settings)\n"));
+
+		/* dump current setup for learning purposes */
+		nv_dac2_dump_pix_pll();
+
 		return B_OK;
 	}
 
@@ -182,9 +186,8 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 		return result;
 	}
 
-	/*reprogram (disable,select,wait for stability,enable)*/
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
+	/* dump old setup for learning purposes */
+	nv_dac2_dump_pix_pll();
 
 	/* program new frequency */
 	DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));
@@ -192,27 +195,56 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
 	if (si->ps.ext_pll) DAC2W(PIXPLLC2, 0x80000401);
 
-	/* Wait for the PIXPLL frequency to lock until timeout occurs */
-//fixme: do NV cards have a LOCK indication bit??
-/*	while((!(DXIR(PIXPLLSTAT)&0x40)) & (time <= 2000))
-	{
-		time++;
-		snooze(1);
-	}
-	
-	if (time > 2000)
-		LOG(2,("DAC: PIX PLL frequency not locked!\n"));
-	else
-		LOG(2,("DAC: PIX PLL frequency locked\n"));
-	DXIW(PIXCLKCTRL,DXIR(PIXCLKCTRL)&0x0B);         //enable the PIXPLL
-*/
-
-//for now:
-	/* Give the PIXPLL frequency some time to lock... */
+	/* Give the PIXPLL frequency some time to lock... (there's no indication bit available) */
 	snooze(1000);
 	LOG(2,("DAC2: PIX PLL frequency should be locked now...\n"));
 
 	return B_OK;
+}
+
+static void nv_dac2_dump_pix_pll(void)
+{
+	uint32 dividers1, dividers2;
+	uint8 m1, n1, p1;
+	uint8 m2 = 1, n2 = 1;
+	float f_vco, f_phase, f_pixel;
+
+	LOG(2,("DAC2: dumping current pixelPLL settings:\n"));
+
+	dividers1 = DAC2R(PIXPLLC);
+	m1 = (dividers1 & 0x000000ff);
+	n1 = (dividers1 & 0x0000ff00) >> 8;
+	p1 = 0x01 << ((dividers1 & 0x00070000) >> 16);
+	LOG(2,("DAC2: divider1 settings ($%08x): M1=%d, N1=%d, P1=%d\n", dividers1, m1, n1, p1));
+
+	if (si->ps.ext_pll) {
+		dividers2 = DAC2R(PIXPLLC2);
+		if (dividers2 & 0x8000000) {
+			/* the extended PLL part is enabled */
+			m2 = (dividers2 & 0x000000ff);
+			n2 = (dividers2 & 0x0000ff00) >> 8;
+			LOG(2,("DAC2: divider2 is enabled, settings ($%08x): M2=%d, N2=%d\n", dividers2, m2, n2));
+		} else {
+			LOG(2,("DAC2: divider2 is disabled ($%08x)\n", dividers2));
+		}
+	}
+
+	/* log the frequencies found */
+	f_phase = si->ps.f_ref / (m1 * m2);
+	f_vco = (f_phase * n1 * n2);
+	f_pixel = f_vco / p1;
+
+	LOG(2,("DAC2: phase discriminator frequency is %fMhz\n", f_phase));
+	LOG(2,("DAC2: VCO frequency is %fMhz\n", f_vco));
+	LOG(2,("DAC2: pixelclock is %fMhz\n", f_pixel));
+	LOG(2,("DAC2: end of dump.\n"));
+
+	/* apparantly if a VESA modecall during boot fails we need to explicitly select the PLL's
+	 * again (was already done during driver init) if we readout the current PLL setting.. */
+	if (si->ps.secondary_head)
+		DACW(PLLSEL, 0x30000f00);
+	else
+		DACW(PLLSEL, 0x10000700);
 }
 
 /* find nearest valid pix pll */
@@ -235,24 +267,6 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	/* determine the max. reference-frequency postscaler setting for the 
-	 * current card (see G100, G200 and G400 specs). */
-/*	switch(si->ps.card_type)
-	{
-	case G100:
-		LOG(4,("DAC: G100 restrictions apply\n"));
-		m_max = 7;
-		break;
-	case G200:
-		LOG(4,("DAC: G200 restrictions apply\n"));
-		m_max = 7;
-		break;
-	default:
-		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
-		m_max = 32;
-		break;
-	}
-*/
 	LOG(4,("DAC2: NV10/NV20 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
