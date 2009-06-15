@@ -151,8 +151,13 @@ BFileGameSound::BFileGameSound(const char *file,
 
 BFileGameSound::~BFileGameSound()
 {
-	if (fReadThread >= 0)
+	if (fReadThread >= 0) {
+		// TODO: kill_thread() is very bad, since it will leak any resources
+		// that the thread had allocated. It will also keep locks locked that
+		// the thread holds! Set a flag to make the thread quit and use
+		// wait_for_thread() here!
 		kill_thread(fReadThread);
+	}
 
 	if (fAudioStream) {
 		if (fAudioStream->stream)
@@ -223,7 +228,7 @@ BFileGameSound::FillBuffer(void *inBuffer,
 	// fPlayPosition is where we got up to in the input buffer after last call
 
 	size_t out_offset = 0;
-	
+
 	while (inByteCount > 0 && !fPaused) {
 		if (!fPaused || fPausing) {
 			printf("mixout %ld, inByteCount %ld, decin %ld, BufferSize %ld\n",out_offset, inByteCount, fPlayPosition, fBufferSize);
@@ -233,14 +238,14 @@ BFileGameSound::FillBuffer(void *inBuffer,
 
 			if (fPausing) {
 				Lock();
-		
+
 				bool rampDone = false;
 				size_t bytes = fBufferSize - fPlayPosition;
-				
+
 				if (bytes > inByteCount) {
 					bytes = inByteCount;
 				}
-				
+
 				// Fill the requested buffer, stopping if the paused flag is set
 				char * buffer = (char*)inBuffer;
 
@@ -248,24 +253,24 @@ BFileGameSound::FillBuffer(void *inBuffer,
 					case gs_audio_format::B_GS_U8:
 						rampDone = ::FillBuffer(fPausing, (uint8*)&buffer[out_offset], (uint8*)&fBuffer[fPlayPosition], &bytes);
 						break;
-			
+
 					case gs_audio_format::B_GS_S16:
 						rampDone = ::FillBuffer(fPausing, (int16*)&buffer[out_offset], (int16*)&fBuffer[fPlayPosition], &bytes);
 						break;
-			
+
 					case gs_audio_format::B_GS_S32:
 						rampDone = ::FillBuffer(fPausing, (int32*)&buffer[out_offset], (int32*)&fBuffer[fPlayPosition], &bytes);
 						break;
-			
+
 					case gs_audio_format::B_GS_F:
 						rampDone = ::FillBuffer(fPausing, (float*)&buffer[out_offset], (float*)&fBuffer[fPlayPosition], &bytes);
 						break;
 				}
-			
+
 				inByteCount -= bytes;
 				out_offset += bytes;
 				fPlayPosition += bytes;
-			
+
 				// We finished ramping
 				if (rampDone) {
 
@@ -274,14 +279,14 @@ BFileGameSound::FillBuffer(void *inBuffer,
 						buffer[out_offset++] = fBuffer[fPlayPosition++];
 						inByteCount--;
 					}
-				
+
 					delete fPausing;
 					fPausing = NULL;
 				}
-							
+
 				Unlock();
 			} else {
-		
+
 				char * buffer = (char*)inBuffer;
 
 				// We need to be able to stop asap when the pause flag is flipped.
@@ -410,7 +415,7 @@ BFileGameSound::Load()
 	fAudioStream->stream->ReadFrames(fBuffer, &frames);
 	fBufferSize = frames * fFrameSize;
 	fPlayPosition = 0;
-	
+
 	if (fBufferSize <= 0) {
 		// EOF
 		if (fLooping) {
@@ -421,7 +426,7 @@ BFileGameSound::Load()
 			StopPlaying();
 		}
 	}
-		
+
 	return true;
 }
 

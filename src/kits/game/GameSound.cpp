@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright 2001-2002, Haiku Inc.
  * Authors:
  *		Christopher ML Zumwalt May (zummy@users.sf.net)
- * 
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,9 @@ using std::nothrow;
 BGameSound::BGameSound(BGameSoundDevice *device)
 		:	fSound(-1)
 {
+	// TODO: device is ignored!
+	// NOTE: BeBook documents that BGameSoundDevice must currently always
+	// be NULL...
 	fDevice = GetDefaultDevice();
 	fInitError = fDevice->InitCheck();
 }
@@ -32,9 +35,10 @@ BGameSound::BGameSound(const BGameSound &other)
 		:	fSound(-1)
 {
 	memcpy(&fFormat, &other.fFormat, sizeof(gs_audio_format));
+	// TODO: device from other is ignored!
 	fDevice = GetDefaultDevice();
-	
-	fInitError = fDevice->InitCheck();	
+
+	fInitError = fDevice->InitCheck();
 }
 
 
@@ -42,7 +46,7 @@ BGameSound::~BGameSound()
 {
 	if (fSound >= 0)
 		fDevice->ReleaseBuffer(fSound);
-		
+
 	ReleaseDevice();
 }
 
@@ -57,6 +61,7 @@ BGameSound::InitCheck() const
 BGameSoundDevice *
 BGameSound::Device() const
 {
+	// TODO: Must return NULL if default device is being used!
 	return fDevice;
 }
 
@@ -64,6 +69,8 @@ BGameSound::Device() const
 gs_id
 BGameSound::ID() const
 {
+	// TODO: Should be 0 if no sound has been selected! But fSound
+	// is initialized with -1 in the constructors.
 	return fSound;
 }
 
@@ -103,13 +110,13 @@ BGameSound::SetGain(float gain,
 					bigtime_t duration)
 {
 	gs_attribute attribute;
-	
+
 	attribute.attribute = B_GS_GAIN;
 	attribute.value = gain;
 	attribute.duration = duration;
 	attribute.flags = 0;
-	
-	return fDevice->SetAttributes(fSound, &attribute, 1); 
+
+	return fDevice->SetAttributes(fSound, &attribute, 1);
 }
 
 
@@ -118,12 +125,12 @@ BGameSound::SetPan(float pan,
 				   bigtime_t duration)
 {
 	gs_attribute attribute;
-	
+
 	attribute.attribute = B_GS_PAN;
 	attribute.value = pan;
 	attribute.duration = duration;
 	attribute.flags = 0;
-	
+
 	return fDevice->SetAttributes(fSound, &attribute, 1);
 }
 
@@ -132,13 +139,13 @@ float
 BGameSound::Gain()
 {
 	gs_attribute attribute;
-	
+
 	attribute.attribute = B_GS_GAIN;
 	attribute.flags = 0;
-	
+
 	if (fDevice->GetAttributes(fSound, &attribute, 1) != B_OK)
 		return 0.0;
-		
+
 	return attribute.value;
 }
 
@@ -147,13 +154,13 @@ float
 BGameSound::Pan()
 {
 	gs_attribute attribute;
-	
+
 	attribute.attribute = B_GS_PAN;
 	attribute.flags = 0;
-	
+
 	if (fDevice->GetAttributes(fSound, &attribute, 1) != B_OK)
 		return 0.0;
-		
+
 	return attribute.value;
 }
 
@@ -247,7 +254,7 @@ BGameSound::Init(gs_id handle)
 {
 	if (fSound < 0)
 		fSound = handle;
-		 		
+
 	return B_OK;
 }
 
@@ -257,10 +264,12 @@ BGameSound::operator=(const BGameSound &other)
 {
 	if (fSound)
 		fDevice->ReleaseBuffer(fSound);
-	
+
 	fSound = other.fSound;
 	fInitError = other.fInitError;
-	
+
+	// TODO: This would need to acquire the sound another time!
+
 	return this;
 }
 */
@@ -269,7 +278,7 @@ BGameSound::operator=(const BGameSound &other)
  *
  * BGameSound::BGameSound()
  */
- 
+
 
 status_t
 BGameSound::_Reserved_BGameSound_0(int32 arg, ...)
