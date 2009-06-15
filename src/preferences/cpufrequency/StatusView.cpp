@@ -7,7 +7,8 @@
  */
 
 #include "StatusView.h"
-#include "CPUFrequencyView.h"
+
+#include <string.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -19,14 +20,16 @@
 #include <Roster.h>
 #include <TextView.h>
 
-#include <string.h>
+#include "CPUFrequencyView.h"
+
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+
 
 #define MAX_FREQ_STRING "9999MHz"
 
 // messages FrequencySwitcher
-const uint32 kMsgDynamicPolicyPuls = '&dpp';
+const uint32 kMsgDynamicPolicyPulse = '&dpp';
 
 // messages menu
 const uint32 kMsgPolicyDynamic = 'pody';
@@ -40,15 +43,14 @@ const char* kDeskbarItemName = "CPUFreqStatusView";
 
 
 FrequencySwitcher::FrequencySwitcher(CPUFreqDriverInterface* interface,
-										BHandler* target)
-	:	BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
-		fDriverInterface(interface),
-		fTarget(target),
-		fMessageRunner(NULL),
-		fCurrentFrequency(NULL),
-		fDynamicPolicyStarted(false)
+		BHandler* target)
+	: BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
+	fDriverInterface(interface),
+	fTarget(target),
+	fMessageRunner(NULL),
+	fCurrentFrequency(NULL),
+	fDynamicPolicyStarted(false)
 {
-
 }
 
 
@@ -60,10 +62,10 @@ FrequencySwitcher::~FrequencySwitcher()
 
 
 filter_result
-FrequencySwitcher::Filter(BMessage *message, BHandler **target)
+FrequencySwitcher::Filter(BMessage* message, BHandler** target)
 {
 	filter_result result = B_DISPATCH_MESSAGE;
-	if (message->what == kMsgDynamicPolicyPuls) {
+	if (message->what == kMsgDynamicPolicyPulse) {
 		_CalculateDynamicState();
 		result = B_SKIP_MESSAGE;
 	}
@@ -79,32 +81,31 @@ FrequencySwitcher::SetMode(const freq_preferences& pref)
 	freq_info* currentState = fDriverInterface->GetCurrentFrequencyState();
 	freq_info* state = NULL;
 	bool isDynamic = false;
-	
+
 	switch (pref.mode) {
 		case DYNAMIC:
 			isDynamic = true;
 			fSteppingThreshold = pref.stepping_threshold;
-			if (fMessageRunner && fIntegrationTime != pref.integration_time)
-			{
+			if (fMessageRunner && fIntegrationTime != pref.integration_time) {
 				fIntegrationTime = pref.integration_time;
 				fMessageRunner->SetInterval(fIntegrationTime);
 			}
 			if (!fDynamicPolicyStarted)
 				_StartDynamicPolicy(true, pref);
 			break;
-		
+
 		case PERFORMANCE:
 			state = list->ItemAt(int32(0));
 			if (state != currentState)
 				fDriverInterface->SetFrequencyState(state);
 			break;
-		
+
 		case LOW_ENERGIE:
 			state = list->ItemAt(stateCount - 1);
 			if (state != currentState)
 				fDriverInterface->SetFrequencyState(state);
 			break;
-		
+
 		case CUSTOM:
 			if (pref.custom_stepping < stateCount) {
 				state = list->ItemAt(pref.custom_stepping);
@@ -112,7 +113,7 @@ FrequencySwitcher::SetMode(const freq_preferences& pref)
 			}
 			break;
 	}
-	
+
 	if (!isDynamic && fDynamicPolicyStarted) {
 		fDynamicPolicyStarted = false;
 		_StartDynamicPolicy(false, pref);
@@ -127,26 +128,24 @@ FrequencySwitcher::_CalculateDynamicState()
 	get_system_info(&sysInfo);
 	bigtime_t now = system_time();
 	bigtime_t activeTime = sysInfo.cpu_infos[0].active_time;
-	
-	// if the dynamic mode is not started firt init the prev values
+
+	// if the dynamic mode is not started first init the prev values
 	if (!fDynamicPolicyStarted) {
 		fPrevActiveTime = activeTime;
 		fPrevTime = now;
 		fDynamicPolicyStarted = true;
-	}
-	else {
+	} else {
 		float usage = (float)(activeTime - fPrevActiveTime )
 						/ (now - fPrevTime);
 		if (usage >= 1.0)
 			usage = 0.9999999;
-			
+
 		int32 numberOfStates = fDriverInterface->GetNumberOfFrequencyStates();
 		for (int i = 0; i < numberOfStates; i++) {
 			float usageOfStep = ColorStepView::UsageOfStep(i, numberOfStates,
-														fSteppingThreshold);
+				fSteppingThreshold);
 
-			if (usage < usageOfStep)
-			{
+			if (usage < usageOfStep) {
 				StateList* list = fDriverInterface->GetCpuFrequencyStates();
 				freq_info* newState = list->ItemAt(numberOfStates - 1 - i);
 				if (newState != fCurrentFrequency) {
@@ -154,7 +153,7 @@ FrequencySwitcher::_CalculateDynamicState()
 					fDriverInterface->SetFrequencyState(newState);
 					fCurrentFrequency = newState;
 				}
-				break;	
+				break;
 			}
 		}
 		fPrevActiveTime = activeTime;
@@ -164,48 +163,46 @@ FrequencySwitcher::_CalculateDynamicState()
 
 
 void
-FrequencySwitcher::_StartDynamicPolicy(bool start,
-										const freq_preferences& pref)
+FrequencySwitcher::_StartDynamicPolicy(bool start, const freq_preferences& pref)
 {
 	if (start) {
 		if (!fMessageRunner) {
 			fIntegrationTime = pref.integration_time;
 			fMessageRunner = new BMessageRunner(fTarget,
-											new BMessage(kMsgDynamicPolicyPuls)
-											, pref.integration_time, -1);
+				new BMessage(kMsgDynamicPolicyPulse), pref.integration_time, -1);
 			fCurrentFrequency = fDriverInterface->GetCurrentFrequencyState();
 		}
-	}
-	else {
-		if (fMessageRunner) {
-			delete fMessageRunner;
-			fMessageRunner = NULL;
-		}
+	} else {
+		delete fMessageRunner;
+		fMessageRunner = NULL;
 	}
 }
 
 
+//	#pragma mark -
+
+
 FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
-								PreferencesStorage<freq_preferences> * storage,
-								CPUFreqDriverInterface* interface)
-	:	BMessageFilter(B_PROGRAMMED_DELIVERY, B_LOCAL_SOURCE),
-		fTarget(target),
-		fStorage(storage),
-		fInterface(interface)
+		PreferencesStorage<freq_preferences>* storage,
+		CPUFreqDriverInterface* interface)
+	: BMessageFilter(B_PROGRAMMED_DELIVERY, B_LOCAL_SOURCE),
+	fTarget(target),
+	fStorage(storage),
+	fInterface(interface)
 {
 	fDynamicPerformance = new BMenuItem("Dynamic Performance",
-											new BMessage(kMsgPolicyDynamic));
+		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem("High Performance",
-										new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem("Low Energie",
-									new BMessage(kMsgPolicyLowEnergy));
-	
+		new BMessage(kMsgPolicyPerformance));
+	fLowEnergie = new BMenuItem("Low Energy",
+		new BMessage(kMsgPolicyLowEnergy));
+
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
-	
+
 	fCustomStateMenu = new BMenu("Set State");
-			
+
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
 		freq_info* info = stateList->ItemAt(i);
@@ -213,16 +210,16 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 		label << info->frequency;
 		label += " MHz";
 		fCustomStateMenu->AddItem(new BMenuItem(label.String(),
-										new BMessage(kMsgPolicySetState)));
+			new BMessage(kMsgPolicySetState)));
 	}
-	
+
 	menu->AddItem(fCustomStateMenu);
-	
+
 	// set the target of the items
 	fDynamicPerformance->SetTarget(fTarget);
 	fHighPerformance->SetTarget(fTarget);
 	fLowEnergie->SetTarget(fTarget);
-	
+
 	fCustomStateMenu->SetTargetForItems(fTarget);
 }
 
@@ -242,19 +239,18 @@ FrequencyMenu::_SetL1MenuLabelFrom(BMenuItem* item)
 
 
 filter_result
-FrequencyMenu::Filter(BMessage *msg, BHandler **target)
+FrequencyMenu::Filter(BMessage* msg, BHandler** target)
 {
 	filter_result result = B_DISPATCH_MESSAGE;
-	
+
 	BMenuItem* item, *superItem, *markedItem;
 	msg->FindPointer("source", (void**)&item);
-	if (!item) {
+	if (!item)
 		return result;
-	}
-		
+
 	bool safeChanges = false;
 	freq_preferences* pref = fStorage->GetPreferences();
-	
+
 	switch (msg->what) {
 		case kMsgPolicyDynamic:
 			pref->mode = DYNAMIC;
@@ -262,25 +258,25 @@ FrequencyMenu::Filter(BMessage *msg, BHandler **target)
 			safeChanges = true;
 			msg->what = kUpdatedPreferences;
 			break;
-			
+
 		case kMsgPolicyPerformance:
 			pref->mode = PERFORMANCE;
 			_SetL1MenuLabelFrom(item);
 			safeChanges = true;
 			msg->what = kUpdatedPreferences;
 			break;
-			
+
 		case kMsgPolicyLowEnergy:
 			pref->mode = LOW_ENERGIE;
 			_SetL1MenuLabelFrom(item);
 			safeChanges = true;
 			msg->what = kUpdatedPreferences;
 			break;
-			
+
 		case kMsgPolicySetState:
 			pref->mode = CUSTOM;
 			pref->custom_stepping = item->Menu()->IndexOf(item);
-			
+
 			superItem = item->Menu()->Supermenu()->Superitem();
 			if (superItem)
 				superItem->SetLabel(item->Label());
@@ -291,15 +287,15 @@ FrequencyMenu::Filter(BMessage *msg, BHandler **target)
 			if (markedItem)
 				markedItem->SetMarked(false);
 			item->SetMarked(true);
-			
+
 			safeChanges = true;
 			msg->what = kUpdatedPreferences;
 			break;
 	}
-	
+
 	if (safeChanges)
 		fStorage->SavePreferences();
-		
+
 	return result;
 }
 
@@ -307,39 +303,43 @@ FrequencyMenu::Filter(BMessage *msg, BHandler **target)
 void
 FrequencyMenu::UpdateMenu()
 {
-	BMenuItem* customItem, *markedItem, *superItem;
-	
 	freq_preferences* pref = fStorage->GetPreferences();
 	switch (pref->mode) {
 		case DYNAMIC:
 			_SetL1MenuLabelFrom(fDynamicPerformance);
 			break;
-			
+
 		case PERFORMANCE:
 			_SetL1MenuLabelFrom(fHighPerformance);
 			break;
-		
+
 		case LOW_ENERGIE:
 			_SetL1MenuLabelFrom(fLowEnergie);
 			break;
-		
+
 		case CUSTOM:
-			markedItem = fCustomStateMenu->FindMarked();
+		{
+			BMenuItem* markedItem = fCustomStateMenu->FindMarked();
 			if (markedItem)
 				markedItem->SetMarked(false);
-			customItem = fCustomStateMenu->ItemAt(pref->custom_stepping);
+			BMenuItem* customItem
+				= fCustomStateMenu->ItemAt(pref->custom_stepping);
 			if (customItem)
 				customItem->SetMarked(true);
-			superItem = fCustomStateMenu->Supermenu()->Superitem();
+			BMenuItem* superItem = fCustomStateMenu->Supermenu()->Superitem();
 			if (superItem && customItem)
-				superItem->SetLabel(customItem->Label());	
-			break;	
+				superItem->SetLabel(customItem->Label());
+			break;
+		}
 	}
 }
 
 
+//	#pragma mark -
+
+
 StatusView::StatusView(BRect frame,	bool inDeskbar,
-						PreferencesStorage<freq_preferences>* storage)
+		PreferencesStorage<freq_preferences>* storage)
 	: BView(frame, kDeskbarItemName, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
@@ -355,17 +355,16 @@ StatusView::StatusView(BRect frame,	bool inDeskbar,
 			B_FOLLOW_NONE);
 		AddChild(fDragger);
 	}
-	
+
 	if (storage) {
 		fOwningStorage = false;
 		fStorage = storage;
-	}
-	else {
+	} else {
 		fOwningStorage = true;
 		fStorage = new PreferencesStorage<freq_preferences>("CPUFrequency",
-																kDefaultPreferences);
+			kDefaultPreferences);
 	}
-	
+
 	_Init();
 }
 
@@ -383,7 +382,7 @@ StatusView::StatusView(BMessage* archive)
 
 	fOwningStorage = true;
 	fStorage = new PreferencesStorage<freq_preferences>(kPreferencesFileName,
-															kDefaultPreferences);
+		kDefaultPreferences);
 	_Init();
 }
 
@@ -426,7 +425,7 @@ StatusView::_Quit()
 }
 
 
-StatusView *
+StatusView*
 StatusView::Instantiate(BMessage* archive)
 {
 	if (!validate_instantiation(archive, "StatusView"))
@@ -459,30 +458,29 @@ StatusView::AttachedToWindow()
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	SetLowColor(ViewColor());
-	
+
 	// watching if the driver change the frequency
 	fDriverInterface.StartWatching(this);
 
 	// monitor preferences file
 	fPrefFileWatcher = new PrefFileWatcher<freq_preferences>(fStorage, this);
 	AddFilter(fPrefFileWatcher);
-	
+
 	// FrequencySwitcher
 	fFrequencySwitcher = new FrequencySwitcher(&fDriverInterface, this);
 	fFrequencySwitcher->SetMode(*(fStorage->GetPreferences()));
 	AddFilter(fFrequencySwitcher);
-	
+
 	// perferences menu
 	fPreferencesMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	fPreferencesMenuFilter = new FrequencyMenu(fPreferencesMenu, this,
-													fStorage,
-													&fDriverInterface);
-	
+	fPreferencesMenuFilter = new FrequencyMenu(fPreferencesMenu, this, fStorage,
+		&fDriverInterface);
+
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
 	fOpenPrefItem = new BMenuItem("Open Speedstep Preferences" B_UTF8_ELLIPSIS,
-									new BMessage(kMsgOpenSSPreferences));
+		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
@@ -492,7 +490,7 @@ StatusView::AttachedToWindow()
 		fQuitItem->SetTarget(this);
 	}
 	AddFilter(fPreferencesMenuFilter);
-	
+
 	fPreferencesMenuFilter->UpdateMenu();
 }
 
@@ -501,7 +499,7 @@ void
 StatusView::DetachedFromWindow()
 {
 	fDriverInterface.StopWatching();
-	
+
 	if (RemoveFilter(fPrefFileWatcher))
 		delete fPrefFileWatcher;
 	if (RemoveFilter(fFrequencySwitcher))
@@ -525,16 +523,16 @@ StatusView::MessageReceived(BMessage* message)
 			_SetupNewFreqString();
 			Invalidate();
 			break;
-		
+
 		case kUpdatedPreferences:
 			fFrequencySwitcher->SetMode(*(fStorage->GetPreferences()));
 			fPreferencesMenuFilter->UpdateMenu();
 			break;
-		
+
 		case B_ABOUT_REQUESTED:
 			_AboutRequested();
 			break;
-				
+
 		case B_QUIT_REQUESTED:
 			_Quit();
 			break;
@@ -558,9 +556,9 @@ StatusView::Draw(BRect updateRect)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float height = fontHeight.ascent + fontHeight.descent;
-	
+
 	MovePenTo(0, height);
-	
+
 	DrawString(fFreqString.String());
 }
 
@@ -612,13 +610,13 @@ StatusView::UpdateCPUFreqState()
 	fFrequencySwitcher->SetMode(*(fStorage->GetPreferences()));
 }
 
-			
+
 void
 StatusView::_Init()
 {
 	fShowPopUpMenu = true;
 	fCurrentFrequency = fDriverInterface.GetCurrentFrequencyState();
-	
+
 	_SetupNewFreqString();
 }
 
@@ -626,10 +624,10 @@ StatusView::_Init()
 void
 StatusView::_SetupNewFreqString()
 {
-	if (fCurrentFrequency)
+	if (fCurrentFrequency) {
 		fFreqString = ColorStepView::CreateFrequencyString(
 			fCurrentFrequency->frequency);
-	else 
+	} else
 		fFreqString = "? MHz";
 
 	ResizeToPreferred();
@@ -663,7 +661,10 @@ StatusView::_OpenPreferences()
 }
 
 
-extern "C" _EXPORT BView *
+//	#pragma mark -
+
+
+extern "C" _EXPORT BView*
 instantiate_deskbar_item(void)
 {
 	return new StatusView(BRect(0, 0, 15, 15), true, NULL);
