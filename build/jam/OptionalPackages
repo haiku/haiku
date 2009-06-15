@@ -21,6 +21,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	BePDF
 #	Bluetooth
 #	CDRecord
+#	CLucene
 #	CVS
 #	Development			- more complete dev environment (including autotools)
 #	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
@@ -195,6 +196,22 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 		local baseURL = http://www.haiku-ports.de/packages ;
 		InstallOptionalHaikuImagePackage cdrecord-2.01.01a59-gcc2-haiku-2009-05-26
 			: $(baseURL)/app-cdr/cdrtools/cdrecord-2.01.01a59-gcc2-haiku-2009-05-26.zip
+			:
+		;
+	}
+}
+
+
+# CLucene
+if [ IsOptionalHaikuImagePackageAdded CLucene ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package CLucene available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package CLucene available for GCC2" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage clucene-0.9.21svn-x86-gcc4-haiku-2009-06-11
+			: $(baseURL)/clucene-0.9.21svn-x86-gcc4-haiku-2009-06-11.zip
 			:
 		;
 	}
