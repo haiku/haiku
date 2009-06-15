@@ -241,7 +241,7 @@ DIEModifiedType::AddAttribute_type(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fType = dynamic_cast<DIEType*>(value.reference);
-	return B_OK;
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -270,6 +270,7 @@ DIEAddressingType::AddAttribute_address_class(uint16 attributeName,
 
 DIEDeclaredType::DIEDeclaredType()
 	:
+	fDescription(NULL),
 	fAbstractOrigin(NULL),
 	fAccessibility(0),
 	fDeclaration(false)
@@ -277,30 +278,10 @@ DIEDeclaredType::DIEDeclaredType()
 }
 
 
-status_t
-DIEDeclaredType::AddAttribute_decl_file(uint16 attributeName,
-	const AttributeValue& value)
+const char*
+DIEDeclaredType::Description() const
 {
-	fDeclarationLocation.SetFile(value.constant);
-	return B_OK;
-}
-
-
-status_t
-DIEDeclaredType::AddAttribute_decl_line(uint16 attributeName,
-	const AttributeValue& value)
-{
-	fDeclarationLocation.SetLine(value.constant);
-	return B_OK;
-}
-
-
-status_t
-DIEDeclaredType::AddAttribute_decl_column(uint16 attributeName,
-	const AttributeValue& value)
-{
-	fDeclarationLocation.SetColumn(value.constant);
-	return B_OK;
+	return fDescription;
 }
 
 
@@ -323,11 +304,27 @@ DIEDeclaredType::AddAttribute_declaration(uint16 attributeName,
 
 
 status_t
+DIEDeclaredType::AddAttribute_description(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDescription = value.string;
+	return B_OK;
+}
+
+
+status_t
 DIEDeclaredType::AddAttribute_abstract_origin(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAbstractOrigin = value.reference;
 	return B_OK;
+}
+
+
+DeclarationLocation*
+DIEDeclaredType::GetDeclarationLocation()
+{
+	return &fDeclarationLocation;
 }
 
 
@@ -346,7 +343,7 @@ DIEDerivedType::AddAttribute_type(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fType = dynamic_cast<DIEType*>(value.reference);
-	return B_OK;
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -356,7 +353,22 @@ DIEDerivedType::AddAttribute_type(uint16 attributeName,
 
 
 DIECompoundType::DIECompoundType()
+	:
+	fSpecification(NULL)
 {
+}
+
+
+status_t
+DIECompoundType::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_member) {
+		// TODO: Not for interfaces!
+		fDataMembers.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredType::AddChild(child);
 }
 
 
@@ -368,6 +380,15 @@ DIECompoundType::AddAttribute_byte_size(uint16 attributeName,
 }
 
 
+status_t
+DIECompoundType::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIECompoundType*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
+}
+
+
 // #pragma mark - DIEClassBaseType
 
 
@@ -376,11 +397,158 @@ DIEClassBaseType::DIEClassBaseType()
 }
 
 
+status_t
+DIEClassBaseType::AddChild(DebugInfoEntry* child)
+{
+	switch (child->Tag()) {
+		case DW_TAG_inheritance:
+			fDataMembers.Add(child);
+			return B_OK;
+		case DW_TAG_friend:
+			fFriends.Add(child);
+			return B_OK;
+		case DW_TAG_access_declaration:
+			fAccessDeclarations.Add(child);
+			return B_OK;
+		case DW_TAG_subprogram:
+			fMemberFunctions.Add(child);
+			return B_OK;
+// TODO: Templates!
+// TODO: Variants!
+		default:
+			return DIECompoundType::AddChild(child);
+	}
+}
+
+
+// #pragma mark - DIENamedBase
+
+
+DIENamedBase::DIENamedBase()
+	:
+	fName(NULL),
+	fDescription(NULL)
+{
+}
+
+
+const char*
+DIENamedBase::Name() const
+{
+	return fName;
+}
+
+
+const char*
+DIENamedBase::Description() const
+{
+	return fDescription;
+}
+
+
+status_t
+DIENamedBase::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIENamedBase::AddAttribute_description(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDescription = value.string;
+	return B_OK;
+}
+
+
+// #pragma mark - DIEDeclaredBase
+
+
+DIEDeclaredBase::DIEDeclaredBase()
+{
+}
+
+
+DeclarationLocation*
+DIEDeclaredBase::GetDeclarationLocation()
+{
+	return &fDeclarationLocation;
+}
+
+
+// #pragma mark - DIEDeclaredNamedBase
+
+
+DIEDeclaredNamedBase::DIEDeclaredNamedBase()
+	:
+	fName(NULL),
+	fDescription(NULL),
+	fAccessibility(0),
+	fVisibility(0),
+	fDeclaration(false)
+{
+}
+
+
+const char*
+DIEDeclaredNamedBase::Name() const
+{
+	return fName;
+}
+
+
+const char*
+DIEDeclaredNamedBase::Description() const
+{
+	return fDescription;
+}
+
+
+status_t
+DIEDeclaredNamedBase::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredNamedBase::AddAttribute_description(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDescription = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredNamedBase::AddAttribute_accessibility(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAccessibility = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredNamedBase::AddAttribute_declaration(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fDeclaration = value.flag;
+	return B_OK;
+}
+
+
 // #pragma mark - DIEArrayType
 
 
 DIEArrayType::DIEArrayType()
 	:
+	fSpecification(NULL),
 	fOrdering(DW_ORD_row_major)
 {
 }
@@ -448,6 +616,15 @@ DIEArrayType::AddAttribute_byte_size(uint16 attributeName,
 }
 
 
+status_t
+DIEArrayType::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIEArrayType*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
+}
+
+
 // #pragma mark - DIEClassType
 
 
@@ -482,6 +659,8 @@ DIEEntryPoint::Tag() const
 
 
 DIEEnumerationType::DIEEnumerationType()
+	:
+	fSpecification(NULL)
 {
 }
 
@@ -490,6 +669,51 @@ uint16
 DIEEnumerationType::Tag() const
 {
 	return DW_TAG_enumeration_type;
+}
+
+
+status_t
+DIEEnumerationType::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_enumerator) {
+		fEnumerators.Add(child);
+		return B_OK;
+	}
+
+	return DIEDerivedType::AddChild(child);
+}
+
+
+status_t
+DIEEnumerationType::AddAttribute_bit_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fBitStride, value);
+}
+
+
+status_t
+DIEEnumerationType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
+status_t
+DIEEnumerationType::AddAttribute_byte_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteStride, value);
+}
+
+
+status_t
+DIEEnumerationType::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIEEnumerationType*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -572,6 +796,8 @@ DIEMember::Tag() const
 
 
 DIEPointerType::DIEPointerType()
+	:
+	fSpecification(NULL)
 {
 }
 
@@ -580,6 +806,15 @@ uint16
 DIEPointerType::Tag() const
 {
 	return DW_TAG_pointer_type;
+}
+
+
+status_t
+DIEPointerType::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIEPointerType*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -628,6 +863,14 @@ DIEStringType::Tag() const
 }
 
 
+status_t
+DIEStringType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
 // #pragma mark - DIEStructureType
 
 
@@ -647,6 +890,10 @@ DIEStructureType::Tag() const
 
 
 DIESubroutineType::DIESubroutineType()
+	:
+	fReturnType(NULL),
+	fAddressClass(0),
+	fPrototyped(false)
 {
 }
 
@@ -655,6 +902,48 @@ uint16
 DIESubroutineType::Tag() const
 {
 	return DW_TAG_subroutine_type;
+}
+
+
+status_t
+DIESubroutineType::AddChild(DebugInfoEntry* child)
+{
+	switch (child->Tag()) {
+		case DW_TAG_formal_parameter:
+		case DW_TAG_unspecified_parameters:
+			fParameters.Add(child);
+			return B_OK;
+		default:
+			return DIEDeclaredType::AddChild(child);
+	}
+}
+
+
+status_t
+DIESubroutineType::AddAttribute_address_class(uint16 attributeName,
+	const AttributeValue& value)
+{
+// TODO: How is the address class handled?
+	fAddressClass = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESubroutineType::AddAttribute_prototyped(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fPrototyped = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIESubroutineType::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fReturnType = dynamic_cast<DIEType*>(value.reference);
+	return fReturnType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -797,6 +1086,9 @@ DIEModule::Tag() const
 
 
 DIEPointerToMemberType::DIEPointerToMemberType()
+	:
+	fContainingType(NULL),
+	fAddressClass(0)
 {
 }
 
@@ -805,6 +1097,25 @@ uint16
 DIEPointerToMemberType::Tag() const
 {
 	return DW_TAG_ptr_to_member_type;
+}
+
+
+status_t
+DIEPointerToMemberType::AddAttribute_address_class(uint16 attributeName,
+	const AttributeValue& value)
+{
+// TODO: How is the address class handled?
+	fAddressClass = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIEPointerToMemberType::AddAttribute_containing_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fContainingType = dynamic_cast<DIECompoundType*>(value.reference);
+	return fContainingType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -823,10 +1134,20 @@ DIESetType::Tag() const
 }
 
 
+status_t
+DIESetType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
 // #pragma mark - DIESubrangeType
 
 
 DIESubrangeType::DIESubrangeType()
+	:
+	fThreadsScaled(false)
 {
 }
 
@@ -835,6 +1156,63 @@ uint16
 DIESubrangeType::Tag() const
 {
 	return DW_TAG_subrange_type;
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_bit_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fBitStride, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_byte_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteStride, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_count(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fCount, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_lower_bound(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fLowerBound, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_upper_bound(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fUpperBound, value);
+}
+
+
+status_t
+DIESubrangeType::AddAttribute_threads_scaled(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fThreadsScaled = value.flag;
+	return B_OK;
 }
 
 
@@ -988,6 +1366,14 @@ DIEEnumerator::Tag() const
 }
 
 
+status_t
+DIEEnumerator::AddAttribute_const_value(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetConstantAttributeValue(fValue, value);
+}
+
+
 // #pragma mark - DIEFileType
 
 
@@ -1000,6 +1386,14 @@ uint16
 DIEFileType::Tag() const
 {
 	return DW_TAG_file_type;
+}
+
+
+status_t
+DIEFileType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
 }
 
 

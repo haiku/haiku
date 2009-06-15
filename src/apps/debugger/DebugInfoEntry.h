@@ -21,6 +21,8 @@ enum {
 
 
 class AttributeValue;
+class ConstantAttributeValue;
+class DeclarationLocation;
 class DynamicAttributeValue;
 struct SourceLanguageInfo;
 
@@ -45,9 +47,16 @@ public:
 	virtual	bool				IsType() const;
 
 	virtual	const char*			Name() const;
+	virtual	const char*			Description() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
+	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
+									const AttributeValue& value);
 	virtual	status_t			AddAttribute_sibling(uint16 attributeName,
 									const AttributeValue& value);
 
@@ -90,9 +99,6 @@ public:
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(calling_convention)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(count)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(data_member_location)
-	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_column)
-	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_file)
-	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_line)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(declaration)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(discr_list)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(encoding)
@@ -140,8 +146,13 @@ public:
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(recursive)
 
 protected:
+	virtual	DeclarationLocation* GetDeclarationLocation();
+
 			status_t	 		SetDynamicAttributeValue(
 									DynamicAttributeValue& toSet,
+									const AttributeValue& value);
+			status_t	 		SetConstantAttributeValue(
+									ConstantAttributeValue& toSet,
 									const AttributeValue& value);
 };
 

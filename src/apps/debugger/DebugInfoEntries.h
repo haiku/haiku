@@ -238,7 +238,7 @@ public:
 									const AttributeValue& value);
 
 protected:
-			uint64				fAddressClass;
+			uint8				fAddressClass;
 };
 
 
@@ -246,28 +246,30 @@ class DIEDeclaredType : public DIEType {
 public:
 								DIEDeclaredType();
 
-	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_decl_line(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
-									const AttributeValue& value);
+	virtual	const char*			Description() const;
+
 	virtual	status_t			AddAttribute_accessibility(uint16 attributeName,
 									const AttributeValue& value);
 										// TODO: !file, !pointer to member
 	virtual	status_t			AddAttribute_declaration(uint16 attributeName,
 									const AttributeValue& value);
 										// TODO: !file
+	virtual	status_t			AddAttribute_description(uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !interface
 	virtual	status_t			AddAttribute_abstract_origin(
 									uint16 attributeName,
 									const AttributeValue& value);
 										// TODO: !interface
 
 // TODO:
-// DW_AT_description		// !interface
 // DW_AT_visibility			// !interface
 
 protected:
+	virtual	DeclarationLocation* GetDeclarationLocation();
+
+protected:
+			const char*			fDescription;
 			DeclarationLocation	fDeclarationLocation;
 			DebugInfoEntry*		fAbstractOrigin;
 			uint8				fAccessibility;
@@ -291,15 +293,19 @@ class DIECompoundType : public DIEDeclaredType {
 public:
 								DIECompoundType();
 
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
 									const AttributeValue& value);
 										// TODO: !interface
-
-// TODO:
-// DW_AT_specification		// !interface
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
+										// TODO: !interface
 
 protected:
 			DynamicAttributeValue fByteSize;
+			DIECompoundType*	fSpecification;
+			DebugInfoEntryList	fDataMembers;
 };
 
 
@@ -307,9 +313,69 @@ class DIEClassBaseType : public DIECompoundType {
 public:
 								DIEClassBaseType();
 
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
 protected:
+			DebugInfoEntryList	fBaseTypes;
+			DebugInfoEntryList	fFriends;
+			DebugInfoEntryList	fAccessDeclarations;
+			DebugInfoEntryList	fMemberFunctions;
 };
 
+
+class DIENamedBase : public DebugInfoEntry {
+public:
+								DIENamedBase();
+
+	virtual	const char*			Name() const;
+	virtual	const char*			Description() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_description(uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			const char*			fName;
+			const char*			fDescription;
+};
+
+
+class DIEDeclaredBase : public DebugInfoEntry {
+public:
+								DIEDeclaredBase();
+
+protected:
+	virtual	DeclarationLocation* GetDeclarationLocation();
+
+protected:
+			DeclarationLocation	fDeclarationLocation;
+};
+
+
+class DIEDeclaredNamedBase : public DIEDeclaredBase {
+public:
+								DIEDeclaredNamedBase();
+
+	virtual	const char*			Name() const;
+	virtual	const char*			Description() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_description(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_accessibility(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_declaration(uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			const char*			fName;
+			const char*			fDescription;
+			uint8				fAccessibility;
+			uint8				fVisibility;
+			bool				fDeclaration;
+};
 
 
 // #pragma mark -
@@ -334,14 +400,14 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
 									const AttributeValue& value);
-
-// TODO:
-// DW_AT_specification
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
 
 private:
 			DynamicAttributeValue fBitStride;
 			DynamicAttributeValue fByteSize;
 			DebugInfoEntryList	fDimensions;
+			DIEArrayType*		fSpecification;
 			uint8				fOrdering;
 };
 
@@ -359,6 +425,17 @@ public:
 								DIEEntryPoint();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_address_class
+// DW_AT_description
+// DW_AT_frame_base
+// DW_AT_low_pc
+// DW_AT_name
+// DW_AT_return_addr
+// DW_AT_segment
+// DW_AT_static_link
+// DW_AT_type
 };
 
 
@@ -368,51 +445,101 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_bit_stride
-// DW_AT_byte_size
-// DW_AT_byte_stride
-// DW_AT_specification
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_stride(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fBitStride;
+			DynamicAttributeValue fByteSize;
+			DynamicAttributeValue fByteStride;
+			DIEEnumerationType*	fSpecification;
+			DebugInfoEntryList	fEnumerators;
 };
 
 
-class DIEFormalParameter : public DebugInfoEntry {
+class DIEFormalParameter : public DIEDeclaredNamedBase {
 public:
 								DIEFormalParameter();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_artificial
+// DW_AT_const_value
+// DW_AT_default_value
+// DW_AT_endianity
+// DW_AT_is_optional
+// DW_AT_location
+// DW_AT_segment
+// DW_AT_type
+// DW_AT_variable_parameter
 };
 
 
-class DIEImportedDeclaration : public DebugInfoEntry {
+class DIEImportedDeclaration : public DIEDeclaredNamedBase {
 public:
 								DIEImportedDeclaration();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_import
+// DW_AT_start_scope
 };
 
 
-class DIELabel : public DebugInfoEntry {
+class DIELabel : public DIEDeclaredNamedBase {
 public:
 								DIELabel();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_low_pc
+// DW_AT_segment
+// DW_AT_start_scope
 };
 
 
-class DIELexicalBlock : public DebugInfoEntry {
+class DIELexicalBlock : public DIENamedBase {
 public:
 								DIELexicalBlock();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_high_pc
+// DW_AT_low_pc
+// DW_AT_ranges
+// DW_AT_segment
 };
 
 
-class DIEMember : public DebugInfoEntry {
+class DIEMember : public DIEDeclaredNamedBase {
 public:
 								DIEMember();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_bit_offset
+// DW_AT_bit_size
+// DW_AT_byte_size
+// DW_AT_data_member_location
+// DW_AT_mutable
+// DW_AT_type
+
 };
 
 
@@ -422,8 +549,11 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_specification
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DIEPointerType*		fSpecification;
 };
 
 
@@ -449,8 +579,12 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fByteSize;
 // TODO:
-// DW_AT_byte_size
 // DW_AT_string_length
 };
 
@@ -469,10 +603,20 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_address_class
-// DW_AT_prototyped
-// DW_AT_type
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+	virtual	status_t			AddAttribute_address_class(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_prototyped(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			DebugInfoEntryList	fParameters;
+			DIEType*			fReturnType;
+			uint8				fAddressClass;
+			bool				fPrototyped;
 };
 
 
@@ -492,43 +636,70 @@ public:
 };
 
 
-class DIEUnspecifiedParameters : public DebugInfoEntry {
+class DIEUnspecifiedParameters : public DIEDeclaredBase {
 public:
 								DIEUnspecifiedParameters();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_artificial
 };
 
 
-class DIEVariant : public DebugInfoEntry {
+class DIEVariant : public DIEDeclaredBase {
 public:
 								DIEVariant();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_accessibility
+// DW_AT_abstract_origin
+// DW_AT_declaration
+// DW_AT_discr_list
+// DW_AT_discr_value
 };
 
 
-class DIECommonBlock : public DebugInfoEntry {
+class DIECommonBlock : public DIEDeclaredNamedBase {
 public:
 								DIECommonBlock();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_location
+// DW_AT_segment
 };
 
 
-class DIECommonInclusion : public DebugInfoEntry {
+class DIECommonInclusion : public DIEDeclaredBase {
 public:
 								DIECommonInclusion();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_common_reference
+// DW_AT_declaration
+// DW_AT_visibility
+
 };
 
 
-class DIEInheritance : public DebugInfoEntry {
+class DIEInheritance : public DIEDeclaredBase {
 public:
 								DIEInheritance();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_accessibility
+// DW_AT_data_member_location
+// DW_AT_type
+// DW_AT_virtuality
 };
 
 
@@ -537,14 +708,37 @@ public:
 								DIEInlinedSubroutine();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_call_column
+// DW_AT_call_file
+// DW_AT_call_line
+// DW_AT_entry_pc
+// DW_AT_high_pc
+// DW_AT_low_pc
+// DW_AT_ranges
+// DW_AT_return_addr
+// DW_AT_segment
+// DW_AT_start_scope
+// DW_AT_trampoline
 };
 
 
-class DIEModule : public DebugInfoEntry {
+class DIEModule : public DIEDeclaredNamedBase {
 public:
 								DIEModule();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_entry_pc
+// DW_AT_high_pc
+// DW_AT_low_pc
+// DW_AT_priority
+// DW_AT_ranges
+// DW_AT_segment
+// DW_AT_specification
 };
 
 
@@ -554,9 +748,16 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	status_t			AddAttribute_address_class(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_containing_type(
+									uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			DIECompoundType*	fContainingType;
+			uint8				fAddressClass;
 // TODO:
-// DW_AT_address_class
-// DW_AT_containing_type
 // DW_AT_use_location
 };
 
@@ -567,8 +768,11 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_byte_size
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fByteSize;
 };
 
 
@@ -578,14 +782,29 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_bit_stride
-// DW_AT_byte_size
-// DW_AT_byte_stride
-// DW_AT_count
-// DW_AT_lower_bound
-// DW_AT_threads_scaled
-// DW_AT_upper_bound
+	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_stride(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_count(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_lower_bound(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_upper_bound(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_threads_scaled(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fBitStride;
+			DynamicAttributeValue fByteSize;
+			DynamicAttributeValue fByteStride;
+			DynamicAttributeValue fCount;
+			DynamicAttributeValue fLowerBound;
+			DynamicAttributeValue fUpperBound;
+			bool				fThreadsScaled;
 };
 
 
@@ -594,10 +813,22 @@ public:
 								DIEWithStatement();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_accessibility
+// DW_AT_address_class
+// DW_AT_declaration
+// DW_AT_high_pc
+// DW_AT_location
+// DW_AT_low_pc
+// DW_AT_ranges
+// DW_AT_segment
+// DW_AT_type
+// DW_AT_visibility
 };
 
 
-class DIEAccessDeclaration : public DebugInfoEntry {
+class DIEAccessDeclaration : public DIEDeclaredNamedBase {
 public:
 								DIEAccessDeclaration();
 
@@ -645,6 +876,13 @@ public:
 								DIECatchBlock();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_high_pc
+// DW_AT_low_pc
+// DW_AT_ranges
+// DW_AT_segment
 };
 
 
@@ -656,19 +894,32 @@ public:
 };
 
 
-class DIEConstant : public DebugInfoEntry {
+class DIEConstant : public DIEDeclaredNamedBase {
 public:
 								DIEConstant();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_const_value
+// DW_AT_endianity
+// DW_AT_external
+// DW_AT_start_scope
+// DW_AT_type
 };
 
 
-class DIEEnumerator : public DebugInfoEntry {
+class DIEEnumerator : public DIEDeclaredNamedBase {
 public:
 								DIEEnumerator();
 
 	virtual	uint16				Tag() const;
+
+	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			ConstantAttributeValue fValue;
 };
 
 
@@ -678,32 +929,45 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_byte_size
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fByteSize;
 };
 
 
-class DIEFriend : public DebugInfoEntry {
+class DIEFriend : public DIEDeclaredBase {
 public:
 								DIEFriend();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_friend
 };
 
 
-class DIENameList : public DebugInfoEntry {
+class DIENameList : public DIEDeclaredNamedBase {
 public:
 								DIENameList();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
 };
 
 
-class DIENameListItem : public DebugInfoEntry {
+class DIENameListItem : public DIEDeclaredBase {
 public:
 								DIENameListItem();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_namelist_item
 };
 
 
@@ -715,35 +979,76 @@ public:
 };
 
 
-class DIESubprogram : public DebugInfoEntry {
+class DIESubprogram : public DIEDeclaredNamedBase {
 public:
 								DIESubprogram();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_address_class
+// DW_AT_artificial
+// DW_AT_calling_convention
+// DW_AT_elemental
+// DW_AT_entry_pc
+// DW_AT_explicit
+// DW_AT_external
+// DW_AT_frame_base
+// DW_AT_high_pc
+// DW_AT_inline
+// DW_AT_low_pc
+// DW_AT_object_pointer
+// DW_AT_prototyped
+// DW_AT_pure
+// DW_AT_ranges
+// DW_AT_recursive
+// DW_AT_return_addr
+// DW_AT_segment
+// DW_AT_specification
+// DW_AT_start_scope
+// DW_AT_static_link
+// DW_AT_trampoline
+// DW_AT_type
+// DW_AT_virtuality
+// DW_AT_vtable_elem_location
 };
 
 
-class DIETemplateTypeParameter : public DebugInfoEntry {
+class DIETemplateTypeParameter : public DIEDeclaredNamedBase {
 public:
 								DIETemplateTypeParameter();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_type
 };
 
 
-class DIETemplateValueParameter : public DebugInfoEntry {
+class DIETemplateValueParameter : public DIEDeclaredNamedBase {
 public:
 								DIETemplateValueParameter();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_const_value
+// DW_AT_type
 };
 
 
-class DIEThrownType : public DebugInfoEntry {
+class DIEThrownType : public DIEDeclaredBase {
 public:
 								DIEThrownType();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_allocated
+// DW_AT_associated
+// DW_AT_data_location
+// DW_AT_type
 };
 
 
@@ -752,22 +1057,47 @@ public:
 								DIETryBlock();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_high_pc
+// DW_AT_low_pc
+// DW_AT_ranges
+// DW_AT_segment
 };
 
 
-class DIEVariantPart : public DebugInfoEntry {
+class DIEVariantPart : public DIEDeclaredBase {
 public:
 								DIEVariantPart();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_accessibility
+// DW_AT_declaration
+// DW_AT_discr
+// DW_AT_type
 };
 
 
-class DIEVariable : public DebugInfoEntry {
+class DIEVariable : public DIEDeclaredNamedBase {
 public:
 								DIEVariable();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_abstract_origin
+// DW_AT_const_value
+// DW_AT_endianity
+// DW_AT_external
+// DW_AT_location
+// DW_AT_segment
+// DW_AT_specification
+// DW_AT_start_scope
+// DW_AT_type
 };
 
 
@@ -794,6 +1124,9 @@ public:
 								DIEDwarfProcedure();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_location
 };
 
 
@@ -813,19 +1146,27 @@ public:
 };
 
 
-class DIENamespace : public DebugInfoEntry {
+class DIENamespace : public DIEDeclaredNamedBase {
 public:
 								DIENamespace();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_extension
+// DW_AT_start_scope
 };
 
 
-class DIEImportedModule : public DebugInfoEntry {
+class DIEImportedModule : public DIEDeclaredBase {
 public:
 								DIEImportedModule();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_import
+// DW_AT_start_scope
 };
 
 
@@ -866,16 +1207,18 @@ public:
 								DIEImportedUnit();
 
 	virtual	uint16				Tag() const;
+
+// TODO:
+// DW_AT_import
 };
 
 
-class DIECondition : public DebugInfoEntry {
+class DIECondition : public DIEDeclaredNamedBase {
 public:
 								DIECondition();
 
 	virtual	uint16				Tag() const;
 };
-
 
 
 class DIESharedType : public DIEModifiedType {

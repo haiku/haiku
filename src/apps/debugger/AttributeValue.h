@@ -73,6 +73,45 @@ struct DynamicAttributeValue {
 };
 
 
+struct ConstantAttributeValue {
+	union {
+		uint64				constant;
+		const char*			string;
+		struct {
+			const void*		data;
+			dwarf_size_t	length;
+		}					block;
+	};
+	uint8				attributeClass;
+
+	ConstantAttributeValue()
+		:
+		attributeClass(ATTRIBUTE_CLASS_CONSTANT)
+	{
+		this->constant = 0;
+	}
+
+	void SetTo(uint64 constant)
+	{
+		this->constant = constant;
+		attributeClass = ATTRIBUTE_CLASS_CONSTANT;
+	}
+
+	void SetTo(const char* string)
+	{
+		this->string = string;
+		attributeClass = ATTRIBUTE_CLASS_STRING;
+	}
+
+	void SetTo(const void* data, dwarf_size_t length)
+	{
+		block.data = data;
+		block.length = length;
+		attributeClass = ATTRIBUTE_CLASS_BLOCK;
+	}
+};
+
+
 struct DeclarationLocation {
 	uint32	file;
 	uint32	line;

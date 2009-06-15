@@ -58,11 +58,57 @@ DebugInfoEntry::Name() const
 }
 
 
+const char*
+DebugInfoEntry::Description() const
+{
+	return NULL;
+}
+
+
 status_t
 DebugInfoEntry::AddChild(DebugInfoEntry* child)
 {
 	// ignore children where we don't expect them
 	return ENTRY_NOT_HANDLED;
+}
+
+
+status_t
+DebugInfoEntry::AddAttribute_decl_file(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (DeclarationLocation* location = GetDeclarationLocation()) {
+		location->SetFile(value.constant);
+		return B_OK;
+	}
+
+	return ATTRIBUTE_NOT_HANDLED;
+}
+
+
+status_t
+DebugInfoEntry::AddAttribute_decl_line(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (DeclarationLocation* location = GetDeclarationLocation()) {
+		location->SetLine(value.constant);
+		return B_OK;
+	}
+
+	return ATTRIBUTE_NOT_HANDLED;
+}
+
+
+status_t
+DebugInfoEntry::AddAttribute_decl_column(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (DeclarationLocation* location = GetDeclarationLocation()) {
+		location->SetColumn(value.constant);
+		return B_OK;
+	}
+
+	return ATTRIBUTE_NOT_HANDLED;
 }
 
 
@@ -113,9 +159,6 @@ DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(base_types)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(calling_convention)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(count)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(data_member_location)
-DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_column)
-DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_file)
-DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(decl_line)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(declaration)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(discr_list)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(encoding)
@@ -163,6 +206,13 @@ DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(pure)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(recursive)
 
 
+DeclarationLocation*
+DebugInfoEntry::GetDeclarationLocation()
+{
+	return NULL;
+}
+
+
 status_t
 DebugInfoEntry::SetDynamicAttributeValue(DynamicAttributeValue& toSet,
 	const AttributeValue& value)
@@ -173,6 +223,26 @@ DebugInfoEntry::SetDynamicAttributeValue(DynamicAttributeValue& toSet,
 			return B_OK;
 		case ATTRIBUTE_CLASS_REFERENCE:
 			toSet.SetTo(value.reference);
+			return B_OK;
+		case ATTRIBUTE_CLASS_BLOCK:
+			toSet.SetTo(value.block.data, value.block.length);
+			return B_OK;
+		default:
+			return B_BAD_DATA;
+	}
+}
+
+
+status_t
+DebugInfoEntry::SetConstantAttributeValue(ConstantAttributeValue& toSet,
+	const AttributeValue& value)
+{
+	switch (value.attributeClass) {
+		case ATTRIBUTE_CLASS_CONSTANT:
+			toSet.SetTo(value.constant);
+			return B_OK;
+		case ATTRIBUTE_CLASS_STRING:
+			toSet.SetTo(value.string);
 			return B_OK;
 		case ATTRIBUTE_CLASS_BLOCK:
 			toSet.SetTo(value.block.data, value.block.length);
