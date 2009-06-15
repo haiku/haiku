@@ -241,10 +241,7 @@ static void nv_dac2_dump_pix_pll(void)
 
 	/* apparantly if a VESA modecall during boot fails we need to explicitly select the PLL's
 	 * again (was already done during driver init) if we readout the current PLL setting.. */
-	if (si->ps.secondary_head)
-		DACW(PLLSEL, 0x30000f00);
-	else
-		DACW(PLLSEL, 0x10000700);
+	DACW(PLLSEL, 0x30000f00);
 }
 
 /* find nearest valid pix pll */
