@@ -146,12 +146,9 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 	if (message->what == B_KEY_DOWN
 		&& message->FindInt32("key", &key) == B_OK
 		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
-		// Check for safe video mode (F12 + l-cmd + l-ctrl + l-shift)
-		if (key == B_F12_KEY
-			&& (modifiers & (B_LEFT_COMMAND_KEY
-					| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0) {
-			// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN.
-			STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+		// Check for safe video mode (cmd + ctrl + escape)
+		if (key == 0x01 && (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY)) != 0) {
+			system("screenmode --fall-back &");
 			return B_SKIP_MESSAGE;
 		}
 
