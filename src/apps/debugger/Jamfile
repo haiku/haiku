@@ -10,6 +10,11 @@ Application Debugger :
 	debugger.cpp
 	ElfFile.cpp
 
+	Image.cpp
+	TeamDebugger.cpp
+	Team.cpp
+	Thread.cpp
+
 # DWARF
 #	attribute_classes.cpp
 #	AttributeValue.cpp
@@ -19,6 +24,7 @@ Application Debugger :
 #	SourceLanguageInfo.cpp
 #	tag_names.cpp
 
-	: $(TARGET_LIBSUPC++)
+	: $(TARGET_LIBSUPC++) be
 ;
 
+HaikuSubInclude gui running_teams_window ;

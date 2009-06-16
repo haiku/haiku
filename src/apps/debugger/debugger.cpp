@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#include "DwarfManager.h"
+//#include "DwarfManager.h"
 
 
 int
@@ -18,9 +18,10 @@ main(int argc, const char* const* argv)
 
 	const char* fileName = argv[1];
 
-	DwarfManager manager;
-	manager.LoadFile(fileName);
-	manager.FinishLoading();
+//	DwarfManager manager;
+//	manager.LoadFile(fileName);
+//	manager.FinishLoading();
+(void)fileName;
 
 	return 0;
 }
