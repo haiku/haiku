@@ -25,6 +25,9 @@ public:
 	inline	bool				Insert(const Element& element, int index);
 	inline	bool				Remove(int index);
 
+			void				Clear();
+	inline	void				MakeEmpty();
+
 	inline	Element&			ElementAt(int index);
 	inline	const Element&		ElementAt(int index) const;
 
@@ -116,6 +119,29 @@ Array<Element>::Remove(int index)
 
 	fSize--;
 	return true;
+}
+
+
+template<typename Element>
+void
+Array<Element>::Clear()
+{
+	if (fSize == 0)
+		return;
+
+	free(fElements);
+
+	fElements = NULL;
+	fSize = 0;
+	fCapacity = 0;
+}
+
+
+template<typename Element>
+void
+Array<Element>::MakeEmpty()
+{
+	Clear();
 }
 
 
