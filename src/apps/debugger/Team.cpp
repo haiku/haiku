@@ -8,6 +8,9 @@
 #include <new>
 
 
+// #pragma mark - Team
+
+
 Team::Team(team_id teamID)
 	:
 	fID(teamID)
@@ -18,10 +21,10 @@ Team::Team(team_id teamID)
 Team::~Team()
 {
 	while (Image* image = fImages.RemoveHead())
-		delete image;
+		image->RemoveReference();
 
 	while (Thread* thread = fThreads.RemoveHead())
-		delete thread;
+		thread->RemoveReference();
 }
 
 
@@ -43,6 +46,7 @@ void
 Team::AddThread(Thread* thread)
 {
 	fThreads.Add(thread);
+	_NotifyThreadAdded(thread);
 }
 	
 
@@ -73,6 +77,7 @@ void
 Team::RemoveThread(Thread* thread)
 {
 	fThreads.Remove(thread);
+	_NotifyThreadRemoved(thread);
 }
 
 
@@ -84,7 +89,7 @@ Team::RemoveThread(thread_id threadID)
 		return false;
 
 	RemoveThread(thread);
-	delete thread;
+	thread->RemoveReference();
 	return true;
 }
 
@@ -102,10 +107,18 @@ Team::ThreadByID(thread_id threadID) const
 }
 
 
+const ThreadList&
+Team::Threads() const
+{
+	return fThreads;
+}
+
+
 void
 Team::AddImage(Image* image)
 {
 	fImages.Add(image);
+	_NotifyImageAdded(image);
 }
 
 
@@ -135,6 +148,7 @@ void
 Team::RemoveImage(Image* image)
 {
 	fImages.Remove(image);
+	_NotifyImageRemoved(image);
 }
 
 
@@ -146,7 +160,7 @@ Team::RemoveImage(image_id imageID)
 		return false;
 
 	RemoveImage(image);
-	delete image;
+	image->RemoveReference();
 	return true;
 }
 
@@ -161,4 +175,96 @@ Team::ImageByID(image_id imageID) const
 	}
 
 	return NULL;
+}
+
+
+const ImageList&
+Team::Images() const
+{
+	return fImages;
+}
+
+
+void
+Team::AddListener(Listener* listener)
+{
+	fListeners.Add(listener);
+}
+
+
+void
+Team::RemoveListener(Listener* listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+void
+Team::_NotifyThreadAdded(Thread* thread)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ThreadAdded(this, thread);
+	}
+}
+
+
+void
+Team::_NotifyThreadRemoved(Thread* thread)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ThreadRemoved(this, thread);
+	}
+}
+
+
+void
+Team::_NotifyImageAdded(Image* image)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ImageAdded(this, image);
+	}
+}
+
+
+void
+Team::_NotifyImageRemoved(Image* image)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ImageRemoved(this, image);
+	}
+}
+
+
+// #pragma mark - Listener
+
+Team::Listener::~Listener()
+{
+}
+
+
+void
+Team::Listener::ThreadAdded(Team* team, Thread* thread)
+{
+}
+
+
+void
+Team::Listener::ThreadRemoved(Team* team, Thread* thread)
+{
+}
+
+
+void
+Team::Listener::ImageAdded(Team* team, Image* image)
+{
+}
+
+
+void
+Team::Listener::ImageRemoved(Team* team, Image* image)
+{
 }

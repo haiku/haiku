@@ -9,6 +9,8 @@
 
 #include <new>
 
+#include <Message.h>
+
 #include <AutoLocker.h>
 
 #include "Team.h"
@@ -16,12 +18,13 @@
 
 TeamDebugger::TeamDebugger()
 	:
-	fLock("team debugger"),
+	BLooper("team debugger"),
 	fTeam(NULL),
 	fTeamID(-1),
 	fDebuggerPort(-1),
 	fNubPort(-1),
 	fDebugEventListener(-1),
+	fTeamWindow(NULL),
 	fTerminating(false)
 {
 }
@@ -29,7 +32,7 @@ TeamDebugger::TeamDebugger()
 
 TeamDebugger::~TeamDebugger()
 {
-	AutoLocker<BLocker> locker(fLock);
+	AutoLocker<BLooper> locker(this);
 
 	fTerminating = true;
 
@@ -46,22 +49,18 @@ TeamDebugger::~TeamDebugger()
 
 
 status_t
-TeamDebugger::Init(team_id teamID)
+TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 {
 	fTeamID = teamID;
 
-	status_t error = fLock.InitCheck();
-	if (error != B_OK)
-		return error;
-
 	// check whether the team exists at all
 	team_info teamInfo;
-	error = get_team_info(fTeamID, &teamInfo);
+	status_t error = get_team_info(fTeamID, &teamInfo);
 	if (error != B_OK)
 		return error;
 
 	// create a team object
-	fTeam = new(std::nothrow) Team(fTeamID);
+	fTeam = new(std::nothrow) ::Team(fTeamID);
 	if (fTeam == NULL)
 		return B_NO_MEMORY;
 
@@ -86,7 +85,7 @@ TeamDebugger::Init(team_id teamID)
 // TODO: Set the debug event flags!
 
 	// get the initial state of the team
-	AutoLocker<Team> teamLocker(fTeam);
+	AutoLocker< ::Team> teamLocker(fTeam);
 
 	thread_info threadInfo;
 	int32 cookie = 0;
@@ -113,7 +112,44 @@ TeamDebugger::Init(team_id teamID)
 
 	resume_thread(fDebugEventListener);
 
+	// run looper
+	thread_id looperThread = Run();
+	if (looperThread < 0)
+		return looperThread;
+
+	// create the team window
+	try {
+		fTeamWindow = TeamWindow::Create(fTeam, this);
+	} catch (...) {
+		// TODO: Notify the user!
+		fprintf(stderr, "Error: Failed to create team window!\n");
+		return B_NO_MEMORY;
+	}
+
+	fTeamWindow->Show();
+
+	// if requested, stop the given thread
+	if (threadID >= 0) {
+		if (stopInMain) {
+			// TODO: Set a temporary breakpoint in main and run the thread.
+		} else {
+			debug_thread(threadID);
+				// TODO: Superfluous, if the thread is already stopped.
+		}
+	}
+
 	return B_OK;
+}
+
+
+void
+TeamDebugger::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
 }
 
 

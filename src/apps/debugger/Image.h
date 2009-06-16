@@ -7,10 +7,11 @@
 
 #include <image.h>
 
+#include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
 
-class Image : public DoublyLinkedListLinkImpl<Image> {
+class Image : public Referenceable, public DoublyLinkedListLinkImpl<Image> {
 public:
 								Image(const image_info& imageInfo);
 								~Image();

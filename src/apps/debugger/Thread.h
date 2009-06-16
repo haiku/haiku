@@ -8,10 +8,11 @@
 #include <OS.h>
 #include <String.h>
 
+#include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
 
-class Thread : public DoublyLinkedListLinkImpl<Thread> {
+class Thread : public Referenceable, public DoublyLinkedListLinkImpl<Thread> {
 public:
 								Thread(thread_id threadID);
 								~Thread();

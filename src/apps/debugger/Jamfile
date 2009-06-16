@@ -3,17 +3,33 @@ SubDir HAIKU_TOP src apps debugger ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
-UsePrivateHeaders kernel shared ;
+UsePrivateHeaders interface kernel shared ;
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
+
+local debugAnalyzerSources
+	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
+SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
+SubDirHdrs [ FDirName $(debugAnalyzerSources) util ] ;
+
 Application Debugger :
-	debugger.cpp
+	Debugger.cpp
 	ElfFile.cpp
 
 	Image.cpp
 	TeamDebugger.cpp
 	Team.cpp
 	Thread.cpp
+
+	# DebugAnalyzer:util
+	Variant.cpp
+
+	# gui/team_window
+	TeamWindow.cpp
+	ThreadListView.cpp
 
 # DWARF
 #	attribute_classes.cpp
@@ -24,7 +40,19 @@ Application Debugger :
 #	SourceLanguageInfo.cpp
 #	tag_names.cpp
 
-	: $(TARGET_LIBSUPC++) be
+	:
+	<nogrist>DebugAnalyzer_gui_table.o
+
+	<bin>debug_utils.a
+	libcolumnlistview.a
+
+	$(TARGET_LIBSTDC++)
+	be
+
+	: Debugger.rdef
 ;
+
+SEARCH on [ FGristFiles Variant.cpp ]
+	= [ FDirName $(debugAnalyzerSources) util ] ;
 
 HaikuSubInclude gui running_teams_window ;
