@@ -113,7 +113,7 @@ struct efi_partition_entry {
 	void SetBlockCount(uint64 blockCount)
 		{ SetEndBlock(StartBlock() + blockCount - 1); }
 	uint64 BlockCount() const
-		{ return EndBlock() - StartBlock(); }
+		{ return EndBlock() - StartBlock() + 1; }
 } _PACKED;
 
 #endif	/* EFI_GPT_H */

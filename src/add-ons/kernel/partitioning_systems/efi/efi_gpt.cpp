@@ -506,6 +506,13 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
+efi_gpt_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+{
+	// Cookie is freed in efi_gpt_free_partition_content_cookie().
+}
+
+
+static void
 efi_gpt_free_partition_content_cookie(partition_data *partition)
 {
 	delete (EFI::Header *)partition->content_cookie;
@@ -1222,7 +1229,7 @@ partition_module_info gEFIPartitionModule = {
 	// scanning
 	efi_gpt_identify_partition,
 	efi_gpt_scan_partition,
-	NULL, // free_identify_partition_cookie
+	efi_gpt_free_identify_partition_cookie,
 	NULL, // free_partition_cookie
 	efi_gpt_free_partition_content_cookie,
 
