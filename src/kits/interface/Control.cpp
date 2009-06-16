@@ -163,6 +163,27 @@ BControl::AttachedToWindow()
 
 
 void
+BControl::DetachedFromWindow()
+{
+	BView::DetachedFromWindow();
+}
+
+
+void
+BControl::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BControl::AllDetached()
+{
+	BView::AllDetached();
+}
+
+
+void
 BControl::MessageReceived(BMessage *message)
 {
 	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
@@ -215,7 +236,7 @@ BControl::MessageReceived(BMessage *message)
 				}
 			}
 		}
-		
+
 		if (handled) {
 			message->SendReply(&reply);
 			return;
@@ -275,13 +296,6 @@ void
 BControl::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	BView::MouseMoved(point, transit, message);
-}
-
-
-void
-BControl::DetachedFromWindow()
-{
-	BView::DetachedFromWindow();
 }
 
 
@@ -439,20 +453,6 @@ BControl::GetSupportedSuites(BMessage *message)
 	message->AddFlat("messages", &propInfo);
 
 	return BView::GetSupportedSuites(message);
-}
-
-
-void
-BControl::AllAttached()
-{
-	BView::AllAttached();
-}
-
-
-void
-BControl::AllDetached()
-{
-	BView::AllDetached();
 }
 
 
