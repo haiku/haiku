@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-5/2009
+   Rudolf Cornelissen 7/2003-6/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2196,6 +2196,16 @@ void fake_panel_start(void)
 	}
 }
 
+/* notes:
+ * - Since laptops don't have edid for their internal panels, and we can't switch
+ *   digitally connected external panels to DAC's, we keep needing the info fetched
+ *   from card programming done by the cardBIOS.
+ * - Because we can only output modes on digitally connected panels upto/including
+ *   the modeline programmed into the GPU by the cardBIOS we don't use the actual
+ *   native modelines fetched via EDID for digitally connected panels.
+ * - If the BIOS didn't program a modeline in the GPU for a digitally connected panel
+ *   we can't use that panel. 
+ * - The above restrictions exist due to missing nVidia hardware specs. */
 static void detect_panels()
 {
 	/* detect if the BIOS enabled LCD's (internal panels or DVI) or TVout */
@@ -2569,11 +2579,20 @@ static void setup_output_matrix()
 			/* presetup by the card's BIOS, we can't change this (lack of info) */
 			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
 			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
-			/* detect analog monitors (confirmed working OK on NV18, NV28 and NV34): */
-			/* sense analog monitor on primary connector */
-			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
-			/* sense analog monitor on secondary connector */
-			if (nv_dac2_crt_connected()) si->ps.monitors |= 0x20;
+			/* detect analog monitors. First try EDID, else use load sensing. */
+			/* (load sensing is confirmed working OK on NV18, NV28 and NV34.) */
+			/* primary connector: */
+			if (si->ps.con1_screen.have_edid) {
+				if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+			} else {
+				if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			}
+			/* secondary connector */
+			if (si->ps.con2_screen.have_edid) {
+				if (!si->ps.con2_screen.digital) si->ps.monitors |= 0x20;
+			} else {
+				if (nv_dac2_crt_connected()) si->ps.monitors |= 0x20;
+			}
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
@@ -2680,9 +2699,14 @@ static void setup_output_matrix()
 			/* presetup by the card's BIOS, we can't change this (lack of info) */
 			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
 			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
-			/* detect analog monitor (confirmed working OK on NV11): */
-			/* sense analog monitor on primary connector */
-			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			/* detect analog monitors. First try EDID, else use load sensing. */
+			/* (load sensing is confirmed working OK on NV11.) */
+			/* primary connector: */
+			if (si->ps.con1_screen.have_edid) {
+				if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+			} else {
+				if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			}
 			/* (sense analog monitor on secondary connector is impossible on NV11) */
 
 			/* setup correct output and head use */
@@ -2738,9 +2762,14 @@ static void setup_output_matrix()
 	{
 		/* presetup by the card's BIOS, we can't change this (lack of info) */
 		if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
-		/* detect analog monitor (confirmed working OK on all cards): */
-		/* sense analog monitor on primary connector */
-		if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+		/* detect analog monitors. First try EDID, else use load sensing. */
+		/* (load sensing is confirmed working OK on all cards.) */
+		/* primary connector: */
+		if (si->ps.con1_screen.have_edid) {
+			if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+		} else {
+			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+		}
 
 		//fixme? add TVout (only, so no CRT connected) support...
 	}

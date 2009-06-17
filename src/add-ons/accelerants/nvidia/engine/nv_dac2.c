@@ -12,16 +12,22 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /* see if an analog VGA monitor is connected to connector #2 */
-//fixme if possible: on NV40 arch (confirmed NV43) this routine always find a monitor!
 bool nv_dac2_crt_connected()
 {
 	uint32 output, dac;
 	bool present;
 
+	switch(si->ps.card_type) {
 	/* NOTE:
 	 * NV11 can't do this: It will report DAC1 status instead because it HAS no
 	 * actual secondary DAC function. */
 	/* (It DOES have a secondary palette RAM and pixelclock PLL though.) */
+	case NV11:
+	/* on NV40 arch (confirmed NV43) this routine always finds a monitor (doesn't work). */
+	case NV43:
+		LOG(4,("DAC2: no load detection available. reporting no CRT detected on connector #2\n"));
+		return false;
+	}
 
 	/* save output connector setting */
 	output = DAC2R(OUTPUT);
