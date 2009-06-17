@@ -30,7 +30,6 @@ public:
 	virtual	bool				QuitRequested();
 
 private:
-	static	BString				_GetWindowTitle(::Team* team);
 			void				_Init();
 
 private:
