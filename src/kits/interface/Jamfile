@@ -114,6 +114,7 @@ MergeObject <libbe>interface_kit.o :
 	SplitLayoutBuilder.cpp
 	SplitView.cpp
 	StatusBar.cpp
+	StringItem.cpp
 	StringView.cpp
 	TabView.cpp
 	TextControl.cpp
