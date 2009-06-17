@@ -950,25 +950,24 @@ user_debug_thread_created(thread_id threadID)
 void
 user_debug_thread_deleted(team_id teamID, thread_id threadID)
 {
+	// Things are a bit complicated here, since this thread no longer belongs to
+	// the debugged team (but to the kernel). So we can't use debugger_write().
+
 	// get the team debug flags and debugger port
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
 	struct team *team = team_get_team_struct_locked(teamID);
+	if (team == NULL)
+		return;
 
-	int32 teamDebugFlags = 0;
-	port_id debuggerPort = -1;
-	if (team) {
-		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+	SpinLocker debugInfoLocker(team->debug_info.lock);
 
-		teamDebugFlags = atomic_get(&team->debug_info.flags);
-		debuggerPort = team->debug_info.debugger_port;
+	int32 teamDebugFlags = atomic_get(&team->debug_info.flags);
+	port_id debuggerPort = team->debug_info.debugger_port;
+	sem_id writeLock = team->debug_info.debugger_write_lock;
 
-		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-	}
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	debugInfoLocker.Unlock();
+	teamLocker.Unlock();
 
 	// check, if a debugger is installed and is interested in thread events
 	if (~teamDebugFlags
@@ -976,16 +975,41 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 		return;
 	}
 
-	// notify the debugger
-	if (debuggerPort >= 0) {
+	// acquire the debugger write lock
+	status_t error = acquire_sem_etc(writeLock, 1, B_KILL_CAN_INTERRUPT, 0);
+	if (error != B_OK)
+		return;
+
+	// re-get the team debug info -- we need to check whether anything changed
+	teamLocker.Lock();
+
+	team = team_get_team_struct_locked(teamID);
+	if (team == NULL)
+		return;
+
+	debugInfoLocker.Lock();
+
+	teamDebugFlags = atomic_get(&team->debug_info.flags);
+	port_id newDebuggerPort = team->debug_info.debugger_port;
+
+	debugInfoLocker.Unlock();
+	teamLocker.Unlock();
+
+	// Send the message only if the debugger hasn't changed in the meantime or
+	// the team is about to be handed over.
+	if (newDebuggerPort == debuggerPort
+		|| (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDOVER) == 0) {
 		debug_thread_deleted message;
 		message.origin.thread = threadID;
 		message.origin.team = teamID;
 		message.origin.nub_port = -1;
-		debugger_write(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
-			&message, sizeof(message), true);
-			// TODO: Would it be OK to wait here?
+
+		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
+			&message, sizeof(message), B_KILL_CAN_INTERRUPT, 0);
 	}
+
+	// release the debugger write lock
+	release_sem(writeLock);
 }
 
 
