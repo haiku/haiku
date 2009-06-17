@@ -1,16 +1,14 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <sys/stat.h>
-#include <syscalls.h>
 #include <errno.h>
 
-
-extern mode_t __gUmask;
-	// declared in sys/umask.c
+#include <syscalls.h>
+#include <umask.h>
 
 
 #define RETURN_AND_SET_ERRNO(err) \

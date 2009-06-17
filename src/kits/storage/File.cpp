@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,17 +19,13 @@
 #include "storage_support.h"
 
 #include <syscalls.h>
-
-
-extern mode_t __gUmask;
-	// declared in sys/umask.c
+#include <umask.h>
 
 
 //! Creates an uninitialized BFile.
 BFile::BFile()
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 }
 
@@ -39,9 +35,8 @@ BFile::BFile()
 	\param file the BFile object to be copied
 */
 BFile::BFile(const BFile &file)
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 	*this = file;
 }
@@ -54,9 +49,8 @@ BFile::BFile(const BFile &file)
 	\see SetTo() for values for \a openMode
 */
 BFile::BFile(const entry_ref *ref, uint32 openMode)
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 	SetTo(ref, openMode);
 }
@@ -69,9 +63,8 @@ BFile::BFile(const entry_ref *ref, uint32 openMode)
 	\see SetTo() for values for \a openMode
 */
 BFile::BFile(const BEntry *entry, uint32 openMode)
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 	SetTo(entry, openMode);
 }
@@ -84,9 +77,8 @@ BFile::BFile(const BEntry *entry, uint32 openMode)
 	\see SetTo() for values for \a openMode
 */
 BFile::BFile(const char *path, uint32 openMode)
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 	SetTo(path, openMode);
 }
@@ -102,9 +94,8 @@ BFile::BFile(const char *path, uint32 openMode)
 	\see SetTo() for values for \a openMode
 */
 BFile::BFile(const BDirectory *dir, const char *path, uint32 openMode)
-	 : BNode(),
-	   BPositionIO(),
-	   fMode(0)
+	:
+	fMode(0)
 {
 	SetTo(dir, path, openMode);
 }

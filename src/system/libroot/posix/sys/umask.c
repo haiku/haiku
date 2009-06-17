@@ -1,12 +1,14 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <sys/stat.h>
-#include <syscalls.h>
 #include <errno.h>
+
+#include <syscalls.h>
+#include <umask.h>
 
 
 mode_t __gUmask = 022;

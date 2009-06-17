@@ -24,10 +24,7 @@
 #include <SymLink.h>
 
 #include <syscalls.h>
-
-
-extern mode_t __gUmask;
-	// declared in sys/umask.c
+#include <umask.h>
 
 
 //! Creates an uninitialized BDirectory object.
@@ -41,7 +38,7 @@ BDirectory::BDirectory()
 /*!	\brief Creates a copy of the supplied BDirectory.
 	\param dir the BDirectory object to be copied
 */
-BDirectory::BDirectory(const BDirectory &dir)
+BDirectory::BDirectory(const BDirectory& dir)
 	:
 	fDirFd(-1)
 {
@@ -53,7 +50,7 @@ BDirectory::BDirectory(const BDirectory &dir)
 	to by the supplied entry_ref.
 	\param ref the entry_ref referring to the directory
 */
-BDirectory::BDirectory(const entry_ref *ref)
+BDirectory::BDirectory(const entry_ref* ref)
 	:
 	fDirFd(-1)
 {
@@ -65,7 +62,7 @@ BDirectory::BDirectory(const entry_ref *ref)
 	to by the supplied node_ref.
 	\param nref the node_ref referring to the directory
 */
-BDirectory::BDirectory(const node_ref *nref)
+BDirectory::BDirectory(const node_ref* nref)
 	:
 	fDirFd(-1)
 {
@@ -77,7 +74,7 @@ BDirectory::BDirectory(const node_ref *nref)
 	to by the supplied BEntry.
 	\param entry the BEntry referring to the directory
 */
-BDirectory::BDirectory(const BEntry *entry)
+BDirectory::BDirectory(const BEntry* entry)
 	:
 	fDirFd(-1)
 {
@@ -89,7 +86,7 @@ BDirectory::BDirectory(const BEntry *entry)
 	to by the supplied path name.
 	\param path the directory's path name
 */
-BDirectory::BDirectory(const char *path)
+BDirectory::BDirectory(const char* path)
 	:
 	fDirFd(-1)
 {
@@ -103,7 +100,7 @@ BDirectory::BDirectory(const char *path)
 		   given
 	\param path the directory's path name relative to \a dir
 */
-BDirectory::BDirectory(const BDirectory *dir, const char *path)
+BDirectory::BDirectory(const BDirectory* dir, const char* path)
 	:
 	fDirFd(-1)
 {
@@ -140,7 +137,7 @@ BDirectory::~BDirectory()
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::SetTo(const entry_ref *ref)
+BDirectory::SetTo(const entry_ref* ref)
 {
 	// open node
 	status_t error = _SetTo(ref, true);
@@ -177,7 +174,7 @@ BDirectory::SetTo(const entry_ref *ref)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::SetTo(const node_ref *nref)
+BDirectory::SetTo(const node_ref* nref)
 {
 	Unset();
 	status_t error = (nref ? B_OK : B_BAD_VALUE);
@@ -205,7 +202,7 @@ BDirectory::SetTo(const node_ref *nref)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::SetTo(const BEntry *entry)
+BDirectory::SetTo(const BEntry* entry)
 {
 	if (!entry) {
 		Unset();
@@ -249,7 +246,7 @@ BDirectory::SetTo(const BEntry *entry)
 	- \c B_NOT_A_DIRECTORY: \a path includes a non-directory.
 */
 status_t
-BDirectory::SetTo(const char *path)
+BDirectory::SetTo(const char* path)
 {
 	// open node
 	status_t error = _SetTo(-1, path, true);
@@ -290,7 +287,7 @@ BDirectory::SetTo(const char *path)
 	- \c B_NOT_A_DIRECTORY: \a path includes a non-directory.
 */
 status_t
-BDirectory::SetTo(const BDirectory *dir, const char *path)
+BDirectory::SetTo(const BDirectory* dir, const char* path)
 {
 	if (!dir || !path || BPrivate::Storage::is_absolute_path(path)) {
 		Unset();
@@ -344,7 +341,7 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::GetEntry(BEntry *entry) const
+BDirectory::GetEntry(BEntry* entry) const
 {
 	if (!entry)
 		return B_BAD_VALUE;
@@ -402,24 +399,27 @@ BDirectory::IsRootDirectory() const
 		  function does.
 */
 status_t
-BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
+BDirectory::FindEntry(const char* path, BEntry* entry, bool traverse) const
 {
-	status_t error = (path && entry ? B_OK : B_BAD_VALUE);
-	if (entry)
+	if (path == NULL || entry == NULL)
+		return B_BAD_VALUE;
+
+	entry->Unset();
+
+	// init a potentially abstract entry
+	status_t status;
+	if (InitCheck() == B_OK)
+		status = entry->SetTo(this, path, traverse);
+	else
+		status = entry->SetTo(path, traverse);
+
+	// fail, if entry is abstract
+	if (status == B_OK && !entry->Exists()) {
+		status = B_ENTRY_NOT_FOUND;
 		entry->Unset();
-	if (error == B_OK) {
-		// init a potentially abstract entry
-		if (InitCheck() == B_OK)
-			error = entry->SetTo(this, path, traverse);
-		else
-			error = entry->SetTo(path, traverse);
-		// fail, if entry is abstract
-		if (error == B_OK && !entry->Exists()) {
-			error = B_ENTRY_NOT_FOUND;
-			entry->Unset();
-		}
 	}
-	return error;
+
+	return status;
 }
 
 
@@ -449,7 +449,7 @@ BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
 	- \c false, otherwise
 */
 bool
-BDirectory::Contains(const char *path, int32 nodeFlags) const
+BDirectory::Contains(const char* path, int32 nodeFlags) const
 {
 	// check initialization and parameters
 	if (InitCheck() != B_OK)
@@ -484,7 +484,7 @@ BDirectory::Contains(const char *path, int32 nodeFlags) const
 	- \c false, otherwise
 */
 bool
-BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
+BDirectory::Contains(const BEntry* entry, int32 nodeFlags) const
 {
 	// check, if the entry exists at all
 	if (entry == NULL || !entry->Exists() || InitCheck() != B_OK)
@@ -522,7 +522,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 }
 
 
-/*!	\fn status_t BDirectory::GetStatFor(const char *path, struct stat *st) const
+/*!	\fn status_t BDirectory::GetStatFor(const char* path, struct stat* st) const
 	\brief Returns the stat structure of the entry referred to by the supplied
 	path name.
 	\param path the entry's path name. May be relative to this directory or
@@ -563,7 +563,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::GetNextEntry(BEntry *entry, bool traverse)
+BDirectory::GetNextEntry(BEntry* entry, bool traverse)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -596,7 +596,7 @@ BDirectory::GetNextEntry(BEntry *entry, bool traverse)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::GetNextRef(entry_ref *ref)
+BDirectory::GetNextRef(entry_ref* ref)
 {
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && InitCheck() != B_OK)
@@ -643,7 +643,7 @@ BDirectory::GetNextRef(entry_ref *ref)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 int32
-BDirectory::GetNextDirents(dirent *buf, size_t bufSize, int32 count)
+BDirectory::GetNextDirents(dirent* buf, size_t bufSize, int32 count)
 {
 	if (!buf)
 		return B_BAD_VALUE;
@@ -725,7 +725,7 @@ BDirectory::CountEntries()
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::CreateDirectory(const char *path, BDirectory *dir)
+BDirectory::CreateDirectory(const char* path, BDirectory* dir)
 {
 	if (!path)
 		return B_BAD_VALUE;
@@ -774,15 +774,16 @@ BDirectory::CreateDirectory(const char *path, BDirectory *dir)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
+BDirectory::CreateFile(const char* path, BFile* file, bool failIfExists)
 {
 	if (!path)
 		return B_BAD_VALUE;
+
 	// Let BFile do the dirty job.
 	uint32 openMode = B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE
 		| (failIfExists ? B_FAIL_IF_EXISTS : 0);
 	BFile tmpFile;
-	BFile *realFile = file ? file : &tmpFile;
+	BFile* realFile = file ? file : &tmpFile;
 	status_t error = B_OK;
 	if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 		error = realFile->SetTo(this, path, openMode);
@@ -814,8 +815,8 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
 */
 status_t
-BDirectory::CreateSymLink(const char *path, const char *linkToPath,
-	BSymLink *link)
+BDirectory::CreateSymLink(const char* path, const char* linkToPath,
+	BSymLink* link)
 {
 	if (!path || !linkToPath)
 		return B_BAD_VALUE;
@@ -843,8 +844,8 @@ BDirectory::CreateSymLink(const char *path, const char *linkToPath,
 	\param dir the original BDirectory
 	\return a reference to this BDirectory
 */
-BDirectory &
-BDirectory::operator=(const BDirectory &dir)
+BDirectory&
+BDirectory::operator=(const BDirectory& dir)
 {
 	if (&dir != this) {	// no need to assign us to ourselves
 		Unset();
@@ -856,7 +857,7 @@ BDirectory::operator=(const BDirectory &dir)
 
 
 status_t
-BDirectory::_GetStatFor(const char *path, struct stat *st) const
+BDirectory::_GetStatFor(const char* path, struct stat* st) const
 {
 	if (!st)
 		return B_BAD_VALUE;
@@ -873,7 +874,7 @@ BDirectory::_GetStatFor(const char *path, struct stat *st) const
 
 
 status_t
-BDirectory::_GetStatFor(const char *path, struct stat_beos *st) const
+BDirectory::_GetStatFor(const char* path, struct stat_beos* st) const
 {
 	struct stat newStat;
 	status_t error = _GetStatFor(path, &newStat);
@@ -940,10 +941,11 @@ BDirectory::get_fd() const
 	\todo Check for efficency.
 */
 status_t
-create_directory(const char *path, mode_t mode)
+create_directory(const char* path, mode_t mode)
 {
 	if (!path)
 		return B_BAD_VALUE;
+
 	// That's the strategy: We start with the first component of the supplied
 	// path, create a BPath object from it and successively add the following
 	// components. Each time we get a new path, we check, if the entry it
@@ -951,7 +953,7 @@ create_directory(const char *path, mode_t mode)
 	// to create it. This goes on, until we're done with the input path or
 	// an error occurs.
 	BPath dirPath;
-	char *component;
+	char* component;
 	int32 nextComponent;
 	do {
 		// get the next path component
@@ -959,6 +961,7 @@ create_directory(const char *path, mode_t mode)
 			component, nextComponent);
 		if (error != B_OK)
 			return error;
+
 		// append it to the BPath
 		if (dirPath.InitCheck() == B_NO_INIT)	// first component
 			error = dirPath.SetTo(component);
@@ -968,11 +971,13 @@ create_directory(const char *path, mode_t mode)
 		if (error != B_OK)
 			return error;
 		path += nextComponent;
+
 		// create a BEntry from the BPath
 		BEntry entry;
 		error = entry.SetTo(dirPath.Path(), true);
 		if (error != B_OK)
 			return error;
+
 		// check, if it exists
 		if (entry.Exists()) {
 			// yep, it exists

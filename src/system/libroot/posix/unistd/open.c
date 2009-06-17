@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Manuel J. Petit. All rights reserved.
@@ -13,16 +13,14 @@
 #include <errno.h>
 
 #include <syscalls.h>
-
-
-extern mode_t __gUmask;
-	// declared in sys/umask.c
+#include <umask.h>
 
 
 int
 creat(const char *path, mode_t mode)
 {
-	int status = _kern_open(-1, path, O_CREAT | O_TRUNC | O_WRONLY, mode & ~__gUmask);
+	int status = _kern_open(-1, path, O_CREAT | O_TRUNC | O_WRONLY,
+		mode & ~__gUmask);
 		// adapt the permissions as required by POSIX
 	if (status < 0) {
 		errno = status;

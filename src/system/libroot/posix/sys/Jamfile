@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix sys ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders libroot shared ;
 UsePrivateSystemHeaders ;
 
 MergeObject posix_sys.o :
