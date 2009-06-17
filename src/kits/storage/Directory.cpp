@@ -980,7 +980,7 @@ create_directory(const char *path, mode_t mode)
 				return B_NOT_A_DIRECTORY;
 		} else {
 			// it doesn't exist -- create it
-			error = _kern_create_dir(-1, dirPath.Path(), mode);
+			error = _kern_create_dir(-1, dirPath.Path(), mode & ~__gUmask);
 			if (error != B_OK)
 				return error;
 		}
