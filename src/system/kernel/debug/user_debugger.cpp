@@ -355,7 +355,7 @@ user_debug_prepare_for_exec()
 	struct team *team = thread->team;
 
 	// If a debugger is installed for the team and the thread debug stuff
-	// initialized, changed the ownership of the debug port for the thread
+	// initialized, change the ownership of the debug port for the thread
 	// to the kernel team, since exec_team() deletes all ports owned by this
 	// team. We change the ownership back later.
 	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
@@ -458,8 +458,6 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 				"%s\n", strerror(port));
 			return port;
 		}
-
-		setPort = true;
 	}
 
 	// check the debug info structures once more: get the debugger port, set
@@ -1334,9 +1332,10 @@ user_debug_thread_scheduled(struct thread* thread)
 }
 
 
-/**	\brief Called by the debug nub thread of a team to broadcast a message
- *		   that are initialized for debugging (and thus have a debug port).
- */
+/*!	\brief Called by the debug nub thread of a team to broadcast a message to
+		all threads of the team that are initialized for debugging (and
+		thus have a debug port).
+*/
 static void
 broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
 	const void *message, int32 size)
