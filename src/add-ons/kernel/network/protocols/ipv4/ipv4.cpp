@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1718,6 +1718,10 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_deliver_data,
 	ipv4_error,
 	ipv4_error_reply,
+	NULL,		// add_ancillary_data()
+	NULL,		// process_ancillary_data()
+	NULL,		// send_data_no_buffer()
+	NULL		// read_data_no_buffer()
 };
 
 module_dependency module_dependencies[] = {

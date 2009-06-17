@@ -841,9 +841,13 @@ net_protocol_module_info sTCPModule = {
 	tcp_get_domain,
 	tcp_get_mtu,
 	tcp_receive_data,
-	NULL,
+	NULL,		// deliver_data()
 	tcp_error,
 	tcp_error_reply,
+	NULL,		// add_ancillary_data()
+	NULL,		// process_ancillary_data()
+	NULL,		// send_data_no_buffer()
+	NULL		// read_data_no_buffer()
 };
 
 module_dependency module_dependencies[] = {

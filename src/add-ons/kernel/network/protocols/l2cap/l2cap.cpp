@@ -378,9 +378,13 @@ net_protocol_module_info gL2CAPModule = {
 	l2cap_get_domain,
 	l2cap_get_mtu,
 	l2cap_receive_data,
-	NULL,
+	NULL,		// deliver_data()
 	l2cap_error,
 	l2cap_error_reply,
+	NULL,		// add_ancillary_data()
+	NULL,		// process_ancillary_data()
+	NULL,		// send_data_no_buffer()
+	NULL		// read_data_no_buffer()
 };
 
 module_dependency module_dependencies[] = {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -369,9 +369,13 @@ net_protocol_module_info sICMPModule = {
 	icmp_get_domain,
 	icmp_get_mtu,
 	icmp_receive_data,
-	NULL,
+	NULL,		// deliver_data()
 	icmp_error,
 	icmp_error_reply,
+	NULL,		// add_ancillary_data()
+	NULL,		// process_ancillary_data()
+	NULL,		// send_data_no_buffer()
+	NULL		// read_data_no_buffer()
 };
 
 module_dependency module_dependencies[] = {
