@@ -77,8 +77,6 @@ static bool
 parse_arguments(int argc, const char* const* argv, bool noOutput,
 	Options& options)
 {
-printf("parse_arguments(): argc: %d\n", argc);
-
 	optind = 1;
 
 	while (true) {
@@ -145,7 +143,6 @@ printf("parse_arguments(): argc: %d\n", argc);
 	if (options.commandLineArgc > 0)
 		exclusiveParams++;
 
-printf("exclusiveParams: %d\n", exclusiveParams);
 	if (exclusiveParams == 0) {
 		// TODO: Support!
 		if (noOutput)
