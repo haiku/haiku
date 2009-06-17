@@ -28,6 +28,7 @@ Application Debugger :
 	Variant.cpp
 
 	# gui/team_window
+	ImageListView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
 

@@ -10,6 +10,7 @@
 
 
 class BTabView;
+class ImageListView;
 class Team;
 class ThreadListView;
 
@@ -37,6 +38,7 @@ private:
 			Listener*			fListener;
 			BTabView*			fTabView;
 			ThreadListView*		fThreadListView;
+			ImageListView*		fImageListView;
 };
 
 

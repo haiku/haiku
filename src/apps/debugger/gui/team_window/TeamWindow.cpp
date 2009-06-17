@@ -8,7 +8,10 @@
 #include <GroupLayoutBuilder.h>
 #include <Message.h>
 #include <TabView.h>
+#include <SplitView.h>
+#include <TextView.h>
 
+#include "ImageListView.h"
 #include "Team.h"
 #include "ThreadListView.h"
 
@@ -18,12 +21,13 @@
 
 TeamWindow::TeamWindow(::Team* team, Listener* listener)
 	:
-	BWindow(BRect(100, 100, 399, 299), _GetWindowTitle(team).String(),
+	BWindow(BRect(100, 100, 699, 499), _GetWindowTitle(team).String(),
 		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fTeam(team),
 	fListener(listener),
 	fTabView(NULL),
-	fThreadListView(NULL)
+	fThreadListView(NULL),
+	fImageListView(NULL)
 {
 }
 
@@ -83,16 +87,26 @@ TeamWindow::_Init()
 	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
 	SetLayout(rootLayout);
 
-	fTabView = new BTabView("tab view");
-
+	BSplitView* mainSplitView = new BSplitView(B_VERTICAL, 3.0f);
 	BGroupLayoutBuilder(rootLayout)
-		.Add(fTabView);
+		.Add(mainSplitView);
+	
+	fTabView = new BTabView("tab view");
+	mainSplitView->AddChild(fTabView, 0.4f);
 
 	fTabView->AddTab(fThreadListView = ThreadListView::Create());
 //	fTabView->AddTab(fTeamsPage = new TeamsPage(this));
 //	fTabView->AddTab(fThreadsPage = new ThreadsPage(this));
 
+	BSplitView* imageAndSourceSplitView = new BSplitView(B_HORIZONTAL, 3.0f);
+	mainSplitView->AddChild(imageAndSourceSplitView);
+
+	fImageListView = ImageListView::Create();
+	imageAndSourceSplitView->AddChild(fImageListView);
+	imageAndSourceSplitView->AddChild(new BTextView("source view"), 2.0f);
+
 	fThreadListView->SetTeam(fTeam);
+	fImageListView->SetTeam(fTeam);
 }
 
 
