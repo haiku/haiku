@@ -43,22 +43,46 @@ public:
 
 	bool Update()
 	{
-		for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++)
-			thread->RemoveReference();
-		fThreads.MakeEmpty();
+		if (fTeam == NULL) {
+			for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++)
+				thread->RemoveReference();
+			fThreads.MakeEmpty();
 
-		if (fTeam == NULL)
 			return true;
+		}
 
 		AutoLocker<Team> locker(fTeam);
 
-		for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
-				Thread* thread = it.Next();) {
-			if (!fThreads.AddItem(thread))
+		ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
+		Thread* newThread = it.Next();
+		int32 index = 0;
+
+		// remove no longer existing threads
+		while (Thread* oldThread = fThreads.ItemAt(index)) {
+			if (oldThread == newThread) {
+				index++;
+				newThread = it.Next();
+			} else {
+				// TODO: Not particularly efficient!
+				fThreads.RemoveItemAt(index);
+				oldThread->RemoveReference();
+				NotifyRowsRemoved(index, 1);
+			}
+		}
+
+		// add new threads
+		int32 countBefore = fThreads.CountItems();
+		while (newThread != NULL) {
+			if (!fThreads.AddItem(newThread))
 				return false;
 
-			thread->AddReference();
+			newThread->AddReference();
+			newThread = it.Next();
 		}
+
+		int32 count = fThreads.CountItems();
+		if (count > countBefore)
+			NotifyRowsAdded(countBefore, count - countBefore);
 
 		return true;
 	}
@@ -169,11 +193,8 @@ ThreadListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_SYNC_THREAD_LIST:
-			if (fThreadsTableModel != NULL) {
-				fThreadsTable->SetTableModel(NULL);
+			if (fThreadsTableModel != NULL)
 				fThreadsTableModel->Update();
-				fThreadsTable->SetTableModel(fThreadsTableModel);
-			}
 			break;
 		default:
 			BGroupView::MessageReceived(message);
