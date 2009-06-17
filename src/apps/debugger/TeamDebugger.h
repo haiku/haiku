@@ -8,6 +8,7 @@
 #include <debugger.h>
 #include <Looper.h>
 
+#include <debug_support.h>
 #include <util/DoublyLinkedList.h>
 
 #include "TeamWindow.h"
@@ -37,11 +38,21 @@ private:
 			void				_HandleDebuggerMessage(int32 messageCode,
 									const debug_debugger_message_data& message);
 
+			bool				_HandleThreadCreated(
+									const debug_thread_created& message);
+			bool				_HandleThreadDeleted(
+									const debug_thread_deleted& message);
+			bool				_HandleImageCreated(
+									const debug_image_created& message);
+			bool				_HandleImageDeleted(
+									const debug_image_deleted& message);
+
 private:
 			::Team*				fTeam;
 			team_id				fTeamID;
 			port_id				fDebuggerPort;
 			port_id				fNubPort;
+			debug_context		fDebugContext;
 			thread_id			fDebugEventListener;
 			TeamWindow*			fTeamWindow;
 	volatile bool				fTerminating;

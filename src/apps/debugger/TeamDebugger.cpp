@@ -13,6 +13,8 @@
 
 #include <AutoLocker.h>
 
+#include "debug_utils.h"
+
 #include "Team.h"
 
 
@@ -82,7 +84,14 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	if (fNubPort < 0)
 		return fNubPort;
 
-// TODO: Set the debug event flags!
+	// init debug context
+	error = init_debug_context(&fDebugContext, fTeamID, fNubPort);
+	if (error != B_OK)
+		return error;
+
+	// set team debugging flags
+	set_team_debugging_flags(fNubPort,
+		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
@@ -199,32 +208,48 @@ void
 TeamDebugger::_HandleDebuggerMessage(int32 messageCode,
 	const debug_debugger_message_data& message)
 {
+printf("TeamDebugger::_HandleDebuggerMessage(): %ld\n", messageCode);
+	bool handled = false;
+
 	switch (messageCode) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
+printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
+printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
+printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
+printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
+printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
+printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", message.origin.thread);
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
+printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n", message.origin.team);
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
+printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", message.origin.team);
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+			handled = _HandleThreadCreated(message.thread_created);
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
+			handled = _HandleThreadDeleted(message.thread_deleted);
 			break;
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
+			handled = _HandleImageCreated(message.image_created);
 			break;
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
+			handled = _HandleImageDeleted(message.image_deleted);
 			break;
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
@@ -238,4 +263,43 @@ TeamDebugger::_HandleDebuggerMessage(int32 messageCode,
 				"%ld\n", fTeamID, messageCode);
 			break;
 	}
+
+	if (!handled && message.origin.thread >= 0 && message.origin.nub_port >= 0)
+		continue_thread(message.origin.nub_port, message.origin.thread);
+}
+
+
+bool
+TeamDebugger::_HandleThreadCreated(const debug_thread_created& message)
+{
+	AutoLocker< ::Team> locker(fTeam);
+	fTeam->AddThread(message.new_thread);
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandleThreadDeleted(const debug_thread_deleted& message)
+{
+	AutoLocker< ::Team> locker(fTeam);
+	fTeam->RemoveThread(message.origin.thread);
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandleImageCreated(const debug_image_created& message)
+{
+	AutoLocker< ::Team> locker(fTeam);
+	fTeam->AddImage(message.info);
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandleImageDeleted(const debug_image_deleted& message)
+{
+	AutoLocker< ::Team> locker(fTeam);
+	fTeam->RemoveImage(message.info.id);
+	return false;
 }

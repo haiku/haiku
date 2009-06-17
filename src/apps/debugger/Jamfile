@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps debugger ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
-UsePrivateHeaders interface kernel shared ;
+UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
@@ -47,7 +47,7 @@ Application Debugger :
 	libcolumnlistview.a
 
 	$(TARGET_LIBSTDC++)
-	be
+	be debug
 
 	: Debugger.rdef
 ;
