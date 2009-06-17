@@ -9,16 +9,23 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
-#include <math.h>
-#include <stdio.h>
+#include <View.h>
 
 #include <new>
+
+#include <math.h>
+#include <stdio.h>
 
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <Cursor.h>
 #include <File.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
 #include <InterfaceDefs.h>
 #include <Layout.h>
 #include <LayoutContext.h>
@@ -35,14 +42,7 @@
 #include <Shape.h>
 #include <Shelf.h>
 #include <String.h>
-#include <View.h>
 #include <Window.h>
-
-#include <GradientLinear.h>
-#include <GradientRadial.h>
-#include <GradientRadialFocus.h>
-#include <GradientDiamond.h>
-#include <GradientConic.h>
 
 #include <AppMisc.h>
 #include <AppServerLink.h>
@@ -154,13 +154,11 @@ ViewState::ViewState()
 	font_flags = font.Flags();
 	font_aliasing = false;
 
-	/*
-		INFO: We include(invalidate) only B_VIEW_CLIP_REGION_BIT flag
-		because we should get the clipping region from app_server.
-		The other flags do not need to be included because the data they
-		represent is already in sync with app_server - app_server uses the
-		same init(default) values.
-	*/
+	// We only keep the B_VIEW_CLIP_REGION_BIT flag invalidated,
+	// because we should get the clipping region from app_server.
+	// The other flags do not need to be included because the data they
+	// represent is already in sync with app_server - app_server uses the
+	// same init (default) values.
 	valid_flags = ~B_VIEW_CLIP_REGION_BIT;
 
 	archiving_flags = B_VIEW_FRAME_BIT | B_VIEW_RESIZE_BIT;
@@ -240,9 +238,9 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 		link.Attach<int32>(-1);
 	}
 
-	//	Although we might have a 'local' clipping region, when we call
-	//	BView::GetClippingRegion() we ask for the 'global' one and it
-	//	is kept on server, so we must invalidate B_VIEW_CLIP_REGION_BIT flag
+	// Although we might have a 'local' clipping region, when we call
+	// BView::GetClippingRegion() we ask for the 'global' one and it
+	// is kept on server, so we must invalidate B_VIEW_CLIP_REGION_BIT flag
 
 	valid_flags = ~B_VIEW_CLIP_REGION_BIT;
 }
@@ -317,16 +315,17 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 
 struct BView::LayoutData {
 	LayoutData()
-		: fMinSize(),
-		  fMaxSize(),
-		  fPreferredSize(),
-		  fAlignment(),
-		  fLayoutInvalidationDisabled(0),
-		  fLayout(NULL),
-		  fLayoutContext(NULL),
-		  fLayoutValid(true),		// <- TODO: Rethink this!
-		  fLayoutInProgress(false),
-		  fNeedsRelayout(true)
+		:
+		fMinSize(),
+		fMaxSize(),
+		fPreferredSize(),
+		fAlignment(),
+		fLayoutInvalidationDisabled(0),
+		fLayout(NULL),
+		fLayoutContext(NULL),
+		fLayoutValid(true),		// <- TODO: Rethink this!
+		fLayoutInProgress(false),
+		fNeedsRelayout(true)
 	{
 	}
 
@@ -470,7 +469,7 @@ BView::Archive(BMessage *data, bool deep) const
 	if (ret != B_OK)
 		return ret;
 
-	if (fState->archiving_flags & B_VIEW_FRAME_BIT)
+	if ((fState->archiving_flags & B_VIEW_FRAME_BIT) != 0)
 		ret = data->AddRect("_frame", Bounds().OffsetToCopy(fParentOffset));
 
 	if (ret == B_OK)
@@ -479,13 +478,13 @@ BView::Archive(BMessage *data, bool deep) const
 	if (ret == B_OK)
 		ret = data->AddInt32("_flags", Flags());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_EVENT_MASK_BIT) {
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_EVENT_MASK_BIT) != 0) {
 		ret = data->AddInt32("_evmask", fEventMask);
 		if (ret == B_OK)
 			ret = data->AddInt32("_evmask", fEventOptions);
 	}
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_FONT_BIT) {
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_FONT_BIT) != 0) {
 		BFont font;
 		GetFont(&font);
 
@@ -516,16 +515,16 @@ BView::Archive(BMessage *data, bool deep) const
 //		ret = data->AddInt32("_dbuf", 1);
 //	}
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_ORIGIN_BIT)
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_ORIGIN_BIT) != 0)
 		ret = data->AddPoint("_origin", Origin());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_PEN_SIZE_BIT)
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_PEN_SIZE_BIT) != 0)
 		ret = data->AddFloat("_psize", PenSize());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_PEN_LOCATION_BIT)
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_PEN_LOCATION_BIT) != 0)
 		ret = data->AddPoint("_ploc", PenLocation());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_LINE_MODES_BIT) {
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_LINE_MODES_BIT) != 0) {
 		ret = data->AddInt16("_lmcapjoin", (int16)LineCapMode());
 		if (ret == B_OK)
 			ret = data->AddInt16("_lmcapjoin", (int16)LineJoinMode());
@@ -533,7 +532,7 @@ BView::Archive(BMessage *data, bool deep) const
 			ret = data->AddFloat("_lmmiter", LineMiterLimit());
 	}
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_BLENDING_BIT) {
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_BLENDING_BIT) != 0) {
 		source_alpha alphaSourceMode;
 		alpha_function alphaFunctionMode;
 		GetBlendingMode(&alphaSourceMode, &alphaFunctionMode);
@@ -543,7 +542,7 @@ BView::Archive(BMessage *data, bool deep) const
 			ret = data->AddInt16("_blend", (int16)alphaFunctionMode);
 	}
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_DRAWING_MODE_BIT)
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_DRAWING_MODE_BIT) != 0)
 		ret = data->AddInt32("_dmod", DrawingMode());
 
 	if (deep) {
@@ -567,12 +566,15 @@ BView::~BView()
 {
 	STRACE(("BView(%s)::~BView()\n", this->Name()));
 
-	if (fOwner)
-		debugger("Trying to delete a view that belongs to a window. Call RemoveSelf first.");
+	if (fOwner) {
+		debugger("Trying to delete a view that belongs to a window. "
+			"Call RemoveSelf first.");
+	}
 
 	RemoveSelf();
 
-	// TODO: see about BShelf! must I delete it here? is it deleted by the window?
+	// TODO: see about BShelf! must I delete it here? is it deleted by
+	// the window?
 
 	// we also delete all our children
 
@@ -627,6 +629,7 @@ BView::_ConvertToParent(BPoint *point, bool checkLock) const
 	point->y += -fBounds.top + fParentOffset.y;
 }
 
+
 void
 BView::ConvertToParent(BPoint *point) const
 {
@@ -657,6 +660,7 @@ BView::_ConvertFromParent(BPoint *point, bool checkLock) const
 	point->x += -fParentOffset.x + fBounds.left;
 	point->y += -fParentOffset.y + fBounds.top;
 }
+
 
 void
 BView::ConvertFromParent(BPoint *point) const
@@ -2195,7 +2199,7 @@ BView::SetFont(const BFont* font, uint32 mask)
 	if (mask == B_FONT_ALL) {
 		fState->font = *font;
 	} else {
-		// ToDo: move this into a BFont method
+		// TODO: move this into a BFont method
 		if (mask & B_FONT_FAMILY_AND_STYLE)
 			fState->font.SetFamilyAndStyle(font->FamilyAndStyle());
 
@@ -2230,8 +2234,10 @@ BView::SetFont(const BFont* font, uint32 mask)
 		_CheckLockAndSwitchCurrent();
 
 		fState->UpdateServerFontState(*fOwner->fLink);
+		fState->valid_flags |= B_VIEW_FONT_BIT;
 	}
 
+	fState->archiving_flags |= B_VIEW_FONT_BIT;
 	// TODO: InvalidateLayout() here for convenience?
 }
 
@@ -2239,6 +2245,15 @@ BView::SetFont(const BFont* font, uint32 mask)
 void
 BView::GetFont(BFont *font) const
 {
+	if (!fState->IsValid(B_VIEW_FONT_BIT)) {
+		// we don't keep graphics state information, therefor
+		// we need to ask the server for the origin after PopState()
+		_CheckOwnerLockAndSwitchCurrent();
+
+		// TODO: add a font getter!
+		fState->UpdateFrom(*fOwner->fLink);
+	}
+
 	*font = fState->font;
 }
 
@@ -5142,6 +5157,7 @@ BView::_Draw(BRect updateRect)
 	PopState();
 	Flush();
 }
+
 
 void
 BView::_DrawAfterChildren(BRect updateRect)
