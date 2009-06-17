@@ -16,7 +16,7 @@
 class TreeTable;
 
 
-class TreeTableModel : public AbstractTableModel {
+class TreeTableModel : public AbstractTableModelBase {
 public:
 	virtual						~TreeTableModel();
 

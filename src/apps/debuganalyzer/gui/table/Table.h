@@ -7,6 +7,9 @@
 
 #include <ColumnTypes.h>
 
+#include <ObjectList.h>
+#include <util/DoublyLinkedList.h>
+
 #include "table/AbstractTable.h"
 #include "table/TableColumn.h"
 
@@ -14,9 +17,21 @@
 
 
 class Table;
+class TableModel;
 
 
-class TableModel : public AbstractTableModel {
+class TableModelListener : public DoublyLinkedListLinkImpl<TableModelListener> {
+public:
+	virtual						~TableModelListener();
+
+	virtual	void				TableRowsAdded(TableModel* model,
+									int32 rowIndex, int32 count);
+	virtual	void				TableRowsRemoved(TableModel* model,
+									int32 rowIndex, int32 count);
+};
+
+
+class TableModel : public AbstractTableModelBase {
 public:
 	virtual						~TableModel();
 
@@ -24,6 +39,19 @@ public:
 
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
 									Variant& value) = 0;
+
+	virtual	void				AddListener(TableModelListener* listener);
+	virtual	void				RemoveListener(TableModelListener* listener);
+
+protected:
+			typedef DoublyLinkedList<TableModelListener> ListenerList;
+
+protected:
+			void				NotifyRowsAdded(int32 rowIndex, int32 count);
+			void				NotifyRowsRemoved(int32 rowIndex, int32 count);
+
+protected:
+			ListenerList		fListeners;
 };
 
 
@@ -35,7 +63,7 @@ public:
 };
 
 
-class Table : public AbstractTable {
+class Table : public AbstractTable, private TableModelListener {
 public:
 								Table(const char* name, uint32 flags,
 									border_style borderStyle = B_NO_BORDER,
@@ -56,15 +84,23 @@ protected:
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
 
 private:
+	virtual	void				TableRowsAdded(TableModel* model,
+									int32 rowIndex, int32 count);
+	virtual	void				TableRowsRemoved(TableModel* model,
+									int32 rowIndex, int32 count);
+
+private:
 			class Column;
 
 			typedef BObjectList<TableListener>	ListenerList;
+			typedef BObjectList<BRow> RowList;
 
 private:
 	virtual	void				ItemInvoked();
 
 private:
 			TableModel*			fModel;
+			RowList				fRows;
 			ListenerList		fListeners;
 };
 

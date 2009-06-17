@@ -60,7 +60,7 @@ public:
 									TableColumn* tableColumn);
 	virtual						~Column();
 
-	virtual	void				SetModel(AbstractTableModel* model);
+	virtual	void				SetModel(AbstractTableModelBase* model);
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -91,7 +91,7 @@ TreeTable::Column::~Column()
 
 
 void
-TreeTable::Column::SetModel(AbstractTableModel* model)
+TreeTable::Column::SetModel(AbstractTableModelBase* model)
 {
 	fModel = dynamic_cast<TreeTableModel*>(model);
 }

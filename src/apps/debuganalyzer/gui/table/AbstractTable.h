@@ -12,9 +12,9 @@
 class TableColumn;
 
 
-class AbstractTableModel {
+class AbstractTableModelBase {
 public:
-	virtual						~AbstractTableModel();
+	virtual						~AbstractTableModelBase();
 
 	virtual	int32				CountColumns() const = 0;
 };
@@ -53,7 +53,7 @@ public:
 								AbstractColumn(TableColumn* tableColumn);
 	virtual						~AbstractColumn();
 
-	virtual	void				SetModel(AbstractTableModel* model) = 0;
+	virtual	void				SetModel(AbstractTableModelBase* model) = 0;
 
 			TableColumn*		GetTableColumn() const	{ return fTableColumn; }
 

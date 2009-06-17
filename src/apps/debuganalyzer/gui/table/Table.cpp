@@ -29,11 +29,67 @@ private:
 };
 
 
+// #pragma mark - TableModelListener
+
+
+TableModelListener::~TableModelListener()
+{
+}
+
+
+void
+TableModelListener::TableRowsAdded(TableModel* model, int32 rowIndex,
+	int32 count)
+{
+}
+
+
+void
+TableModelListener::TableRowsRemoved(TableModel* model, int32 rowIndex,
+	int32 count)
+{
+}
+
+
 // #pragma mark - TableModel
 
 
 TableModel::~TableModel()
 {
+}
+
+
+void
+TableModel::AddListener(TableModelListener* listener)
+{
+	fListeners.Add(listener);
+}
+
+
+void
+TableModel::RemoveListener(TableModelListener* listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+void
+TableModel::NotifyRowsAdded(int32 rowIndex, int32 count)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			TableModelListener* listener = it.Next();) {
+		listener->TableRowsAdded(this, rowIndex, count);
+	}
+}
+
+
+void
+TableModel::NotifyRowsRemoved(int32 rowIndex, int32 count)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			TableModelListener* listener = it.Next();) {
+		listener->TableRowsRemoved(this, rowIndex, count);
+	}
 }
 
 
@@ -60,7 +116,7 @@ public:
 									TableColumn* tableColumn);
 	virtual						~Column();
 
-	virtual	void				SetModel(AbstractTableModel* model);
+	virtual	void				SetModel(AbstractTableModelBase* model);
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -91,7 +147,7 @@ Table::Column::~Column()
 
 
 void
-Table::Column::SetModel(AbstractTableModel* model)
+Table::Column::SetModel(AbstractTableModelBase* model)
 {
 	fModel = dynamic_cast<TableModel*>(model);
 }
@@ -196,6 +252,8 @@ Table::~Table()
 {
 	for (int32 i = CountColumns() - 1; i >= 0; i--)
 		RemoveColumn(ColumnAt(i));
+
+	// rows are deleted by the BColumnListView destructor automatically
 }
 
 
@@ -206,6 +264,9 @@ Table::SetTableModel(TableModel* model)
 		return;
 
 	if (fModel != NULL) {
+		fModel->RemoveListener(this);
+
+		fRows.MakeEmpty();
 		Clear();
 
 		for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
@@ -217,14 +278,44 @@ Table::SetTableModel(TableModel* model)
 	if (fModel == NULL)
 		return;
 
+	fModel->AddListener(this);
+
 	for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 		column->SetModel(fModel);
 
+	TableRowsAdded(fModel, 0, fModel->CountRows());
+}
+
+
+bool
+Table::AddTableListener(TableListener* listener)
+{
+	return fListeners.AddItem(listener);
+}
+
+
+void
+Table::RemoveTableListener(TableListener* listener)
+{
+	fListeners.RemoveItem(listener);
+}
+
+
+AbstractTable::AbstractColumn*
+Table::CreateColumn(TableColumn* column)
+{
+	return new Column(fModel, column);
+}
+
+
+void
+Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
+{
 	// create the rows
-	int32 rowCount = fModel->CountRows();
+	int32 endRow = rowIndex + count;
 	int32 columnCount = fModel->CountColumns();
 
-	for (int32 i = 0; i < rowCount; i++) {
+	for (int32 i = rowIndex; i < endRow; i++) {
 		// create row
 		BRow* row = new(std::nothrow) BRow();
 		if (row == NULL) {
@@ -247,29 +338,26 @@ Table::SetTableModel(TableModel* model)
 		}
 
 		// add row
-		AddRow(row);
+		if (!fRows.AddItem(row, i)) {
+			// TODO: Report error!
+			delete row;
+			return;
+		}
+
+		AddRow(row, i);
 	}
 }
 
 
-bool
-Table::AddTableListener(TableListener* listener)
-{
-	return fListeners.AddItem(listener);
-}
-
-
 void
-Table::RemoveTableListener(TableListener* listener)
+Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 {
-	fListeners.RemoveItem(listener);
-}
-
-
-AbstractTable::AbstractColumn*
-Table::CreateColumn(TableColumn* column)
-{
-	return new Column(fModel, column);
+	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
+		if (BRow* row = fRows.RemoveItemAt(i)) {
+			RemoveRow(row);
+			delete row;
+		}
+	}
 }
 
 

@@ -10,10 +10,10 @@
 #include "table/TableColumn.h"
 
 
-// #pragma mark - AbstractTableModel
+// #pragma mark - AbstractTableModelBase
 
 
-AbstractTableModel::~AbstractTableModel()
+AbstractTableModelBase::~AbstractTableModelBase()
 {
 }
 
