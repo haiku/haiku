@@ -73,6 +73,15 @@ Team::AddThread(const thread_info& threadInfo, Thread** _thread)
 }
 
 
+status_t
+Team::AddThread(thread_id threadID, Thread** _thread)
+{
+	thread_info threadInfo;
+	status_t error = get_thread_info(threadID, &threadInfo);
+	return error == B_OK ? AddThread(threadInfo, _thread) : error;
+}
+
+
 void
 Team::RemoveThread(Thread* thread)
 {

@@ -29,6 +29,8 @@ public:
 			void				AddThread(Thread* thread);
 			status_t			AddThread(const thread_info& threadInfo,
 									Thread** _thread = NULL);
+			status_t			AddThread(thread_id threadID,
+									Thread** _thread = NULL);
 			void				RemoveThread(Thread* thread);
 			bool				RemoveThread(thread_id threadID);
 			Thread*				ThreadByID(thread_id threadID) const;
