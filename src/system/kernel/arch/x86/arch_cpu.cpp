@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -128,7 +128,8 @@ acpi_shutdown(void)
 static void
 disable_caches()
 {
-	x86_write_cr0((x86_read_cr0() | CR0_CACHE_DISABLE) & ~CR0_NOT_WRITE_THROUGH);
+	x86_write_cr0((x86_read_cr0() | CR0_CACHE_DISABLE)
+		& ~CR0_NOT_WRITE_THROUGH);
 	wbinvd();
 	arch_cpu_global_TLB_invalidate();
 }
@@ -140,14 +141,16 @@ enable_caches()
 {
 	wbinvd();
 	arch_cpu_global_TLB_invalidate();
-	x86_write_cr0(x86_read_cr0() & ~(CR0_CACHE_DISABLE | CR0_NOT_WRITE_THROUGH));
+	x86_write_cr0(x86_read_cr0()
+		& ~(CR0_CACHE_DISABLE | CR0_NOT_WRITE_THROUGH));
 }
 
 
 static void
 set_mtrr(void *_parameter, int cpu)
 {
-	struct set_mtrr_parameter *parameter = (struct set_mtrr_parameter *)_parameter;
+	struct set_mtrr_parameter *parameter
+		= (struct set_mtrr_parameter *)_parameter;
 
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
@@ -244,8 +247,7 @@ load_tss(int cpu)
 static void
 init_double_fault(int cpuNum)
 {
-	/* set up the double fault tss */
-	/* TODO: Axel - fix SMP support */
+	// set up the double fault TSS
 	struct tss *tss = &gCPU[cpuNum].arch.double_fault_tss;
 
 	memset(tss, 0, sizeof(struct tss));
@@ -426,15 +428,26 @@ detect_cpu(int currentCPU)
 		// build the model string (need to swap ecx/edx data before copying)
 		unsigned int temp;
 		memset(cpu->arch.model_name, 0, sizeof(cpu->arch.model_name));
+
 		get_current_cpuid(&cpuid, 0x80000002);
-		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
+		temp = cpuid.regs.edx;
+		cpuid.regs.edx = cpuid.regs.ecx;
+		cpuid.regs.ecx = temp;
 		memcpy(cpu->arch.model_name, cpuid.as_chars, sizeof(cpuid.as_chars));
+
 		get_current_cpuid(&cpuid, 0x80000003);
-		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
-		memcpy(cpu->arch.model_name + 16, cpuid.as_chars, sizeof(cpuid.as_chars));
+		temp = cpuid.regs.edx;
+		cpuid.regs.edx = cpuid.regs.ecx;
+		cpuid.regs.ecx = temp;
+		memcpy(cpu->arch.model_name + 16, cpuid.as_chars,
+			sizeof(cpuid.as_chars));
+
 		get_current_cpuid(&cpuid, 0x80000004);
-		temp = cpuid.regs.edx; cpuid.regs.edx = cpuid.regs.ecx; cpuid.regs.ecx = temp;
-		memcpy(cpu->arch.model_name + 32, cpuid.as_chars, sizeof(cpuid.as_chars));
+		temp = cpuid.regs.edx;
+		cpuid.regs.edx = cpuid.regs.ecx;
+		cpuid.regs.ecx = temp;
+		memcpy(cpu->arch.model_name + 32, cpuid.as_chars,
+			sizeof(cpuid.as_chars));
 
 		// some cpus return a right-justified string
 		int32 i = 0;
@@ -714,8 +727,10 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 	}
 }
 
+
 ssize_t
-arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
+arch_cpu_user_strlcpy(char *to, const char *from, size_t size,
+	addr_t *faultHandler)
 {
 	int fromLength = 0;
 	addr_t oldFaultHandler = *faultHandler;
@@ -817,7 +832,7 @@ void
 arch_cpu_memory_read_barrier(void)
 {
 	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0,0(%%esp);" : : : "memory");
+	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
 }
 
 
@@ -825,6 +840,6 @@ void
 arch_cpu_memory_write_barrier(void)
 {
 	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0,0(%%esp);" : : : "memory");
+	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
 }
 
