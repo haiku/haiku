@@ -1354,7 +1354,8 @@ broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
 		struct thread *thread
 			= thread_get_thread_struct_locked(threadInfo.thread);
 		if (thread && thread != nubThread && thread->team == nubThread->team
-			&& thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED) {
+			&& (thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED) != 0
+			&& (thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) != 0) {
 			threadDebugPort = thread->debug_info.debug_port;
 			threadID = thread->id;
 		}
