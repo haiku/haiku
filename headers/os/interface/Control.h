@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
- #ifndef _CONTROL_H
+#ifndef _CONTROL_H
 #define _CONTROL_H
 
 #include <Invoker.h>
