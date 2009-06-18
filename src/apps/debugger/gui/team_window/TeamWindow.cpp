@@ -14,6 +14,8 @@
 #include <SplitView.h>
 #include <TextView.h>
 
+#include <AutoLocker.h>
+
 #include "ImageListView.h"
 #include "MessageCodes.h"
 #include "TeamDebugModel.h"
@@ -42,11 +44,14 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	if (team->ID() >= 0)
 		name << " (" << team->ID() << ")";
 	SetTitle(name.String());
+
+	team->AddListener(this);
 }
 
 
 TeamWindow::~TeamWindow()
 {
+	fDebugModel->GetTeam()->RemoveListener(this);
 }
 
 
@@ -71,17 +76,28 @@ TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_THREAD_RUN:
-printf("MSG_THREAD_RUN\n");
-			break;
+		case MSG_THREAD_STOP:
 		case MSG_THREAD_STEP_OVER:
-printf("MSG_THREAD_STEP_OVER\n");
-			break;
 		case MSG_THREAD_STEP_INTO:
-printf("MSG_THREAD_STEP_INTO\n");
-			break;
 		case MSG_THREAD_STEP_OUT:
-printf("MSG_THREAD_STEP_OUT\n");
+			if (fActiveThread != NULL) {
+				fListener->ThreadActionRequested(this, fActiveThread->ID(),
+					message->what);
+			}
 			break;
+
+		case MSG_THREAD_STATE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleThreadStateChanged(threadID);
+			break;
+		}
+//		case MSG_THREAD_CPU_STATE_CHANGED:
+//		case MSG_THREAD_STACK_TRACE_CHANGED:
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -100,6 +116,33 @@ void
 TeamWindow::ThreadSelectionChanged(::Thread* thread)
 {
 	_SetActiveThread(thread);
+}
+
+
+void
+TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STATE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+TeamWindow::ThreadCpuStateChanged(const Team::ThreadEvent& event)
+{
+//	BMessage message(MSG_THREAD_CPU_STATE_CHANGED);
+//	message.AddInt32("thread", event.GetThread()->ID());
+//	PostMessage(&message);
+}
+
+
+void
+TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
+{
+//	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
+//	message.AddInt32("thread", event.GetThread()->ID());
+//	PostMessage(&message);
 }
 
 
@@ -155,6 +198,7 @@ TeamWindow::_Init()
 	fRunButton->SetTarget(this);
 	fStepOutButton->SetTarget(this);
 
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
 }
 
@@ -167,6 +211,7 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 
 	fActiveThread = thread;
 
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
 }
 
@@ -186,6 +231,7 @@ TeamWindow::_UpdateRunButtons()
 			break;
 		case THREAD_STATE_RUNNING:
 			fRunButton->SetLabel("Stop");
+			fRunButton->SetMessage(new BMessage(MSG_THREAD_STOP));
 			fRunButton->SetEnabled(true);
 			fStepOverButton->SetEnabled(false);
 			fStepIntoButton->SetEnabled(false);
@@ -193,6 +239,7 @@ TeamWindow::_UpdateRunButtons()
 			break;
 		case THREAD_STATE_STOPPED:
 			fRunButton->SetLabel("Run");
+			fRunButton->SetMessage(new BMessage(MSG_THREAD_RUN));
 			fRunButton->SetEnabled(true);
 			fStepOverButton->SetEnabled(true);
 			fStepIntoButton->SetEnabled(true);
@@ -202,16 +249,21 @@ TeamWindow::_UpdateRunButtons()
 }
 
 
+void
+TeamWindow::_HandleThreadStateChanged(thread_id threadID)
+{
+	// ATM we're only interested in the currently selected thread
+	if (fActiveThread == NULL || threadID != fActiveThread->ID())
+		return;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	_UpdateRunButtons();
+}
+
+
 // #pragma mark - Listener
 
 
 TeamWindow::Listener::~Listener()
 {
-}
-
-
-bool
-TeamWindow::Listener::TeamWindowQuitRequested(TeamWindow* window)
-{
-	return true;
 }

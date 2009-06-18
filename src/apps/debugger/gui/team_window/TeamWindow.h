@@ -8,17 +8,18 @@
 #include <String.h>
 #include <Window.h>
 
+#include "Team.h"
 #include "ThreadListView.h"
 
 
 class BButton;
 class BTabView;
 class ImageListView;
-class Team;
 class TeamDebugModel;
 
 
-class TeamWindow : public BWindow, private ThreadListView::Listener {
+class TeamWindow : public BWindow, private ThreadListView::Listener,
+	Team::Listener {
 public:
 	class Listener;
 
@@ -38,10 +39,20 @@ private:
 	// ThreadListView::Listener
 	virtual	void				ThreadSelectionChanged(::Thread* thread);
 
+	// Team::Listener
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
+	virtual	void				ThreadCpuStateChanged(
+									const Team::ThreadEvent& event);
+	virtual	void				ThreadStackTraceChanged(
+									const Team::ThreadEvent& event);
+
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
 			void				_UpdateRunButtons();
+
+			void				_HandleThreadStateChanged(thread_id threadID);
 
 private:
 			TeamDebugModel*		fDebugModel;
@@ -61,7 +72,9 @@ class TeamWindow::Listener {
 public:
 	virtual						~Listener();
 
-	virtual	bool				TeamWindowQuitRequested(TeamWindow* window);
+	virtual	void				ThreadActionRequested(TeamWindow* window,
+									thread_id threadID, uint32 action) = 0;
+	virtual	bool				TeamWindowQuitRequested(TeamWindow* window) = 0;
 };
 
 

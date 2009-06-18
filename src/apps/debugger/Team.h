@@ -18,7 +18,11 @@ enum {
 	TEAM_EVENT_THREAD_ADDED,
 	TEAM_EVENT_THREAD_REMOVED,
 	TEAM_EVENT_IMAGE_ADDED,
-	TEAM_EVENT_IMAGE_REMOVED
+	TEAM_EVENT_IMAGE_REMOVED,
+
+	TEAM_EVENT_THREAD_STATE_CHANGED,
+	TEAM_EVENT_THREAD_CPU_STATE_CHANGED,
+	TEAM_EVENT_THREAD_STACK_TRACE_CHANGED
 };
 
 
@@ -58,6 +62,11 @@ public:
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
+
+			// service methods for Thread
+			void				NotifyThreadStateChanged(Thread* thread);
+			void				NotifyThreadCpuStateChanged(Thread* thread);
+			void				NotifyThreadStackTraceChanged(Thread* thread);
 
 private:
 			typedef DoublyLinkedList<Listener> ListenerList;
@@ -121,6 +130,13 @@ public:
 
 	virtual	void				ImageAdded(const Team::ImageEvent& event);
 	virtual	void				ImageRemoved(const Team::ImageEvent& event);
+
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
+	virtual	void				ThreadCpuStateChanged(
+									const Team::ThreadEvent& event);
+	virtual	void				ThreadStackTraceChanged(
+									const Team::ThreadEvent& event);
 };
 
 

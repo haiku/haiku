@@ -17,6 +17,7 @@
 
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "MessageCodes.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
 
@@ -168,10 +169,41 @@ void
 TeamDebugger::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_THREAD_RUN:
+		case MSG_THREAD_STOP:
+		case MSG_THREAD_STEP_OVER:
+		case MSG_THREAD_STEP_INTO:
+		case MSG_THREAD_STEP_OUT:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleThreadAction(threadID, message->what);
+			break;
+		}
 		default:
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+TeamDebugger::ThreadActionRequested(TeamWindow* window, thread_id threadID,
+	uint32 action)
+{
+	BMessage message(action);
+	message.AddInt32("thread", threadID);
+	PostMessage(&message);
+}
+
+
+bool
+TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
+{
+	// TODO:...
+	return true;
 }
 
 
@@ -222,30 +254,43 @@ printf("TeamDebugger::_HandleDebuggerMessage(): %d\n", event->EventType());
 	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
 printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", event->Thread());
+			handled = _HandleThreadDebugged(
+				dynamic_cast<ThreadDebuggedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
 printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", event->Thread());
+			handled = _HandleDebuggerCall(
+				dynamic_cast<DebuggerCallEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
 printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", event->Thread());
+			handled = _HandleBreakpointHit(
+				dynamic_cast<BreakpointHitEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
 printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", event->Thread());
+			handled = _HandleWatchpointHit(
+				dynamic_cast<WatchpointHitEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", event->Thread());
+			handled = _HandleSingleStep(dynamic_cast<SingleStepEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", event->Thread());
+			handled = _HandleExceptionOccurred(
+				dynamic_cast<ExceptionOccurredEvent*>(event));
 			break;
 //		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 //printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
 //			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
+			// TODO: Handle!
 printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n", event->Team());
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
 printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
+			// TODO: Handle!
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 			handled = _HandleThreadCreated(
@@ -278,6 +323,70 @@ printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
 
 	if (!handled && event->ThreadStopped())
 		fDebuggerInterface->ContinueThread(event->Thread());
+}
+
+
+bool
+TeamDebugger::_HandleThreadStopped(thread_id threadID, CpuState* cpuState)
+{
+	// get the thread
+	AutoLocker< ::Team> locker(fTeam);
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return false;
+
+	// update the thread state
+	thread->SetState(THREAD_STATE_STOPPED);
+
+	if (cpuState != NULL) {
+		thread->SetCpuState(cpuState);
+	} else {
+		// TODO: Trigger updating the CPU state!
+	}
+
+	return true;
+}
+
+
+bool
+TeamDebugger::_HandleThreadDebugged(ThreadDebuggedEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), NULL);
+}
+
+
+bool
+TeamDebugger::_HandleDebuggerCall(DebuggerCallEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), NULL);
+}
+
+
+bool
+TeamDebugger::_HandleBreakpointHit(BreakpointHitEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
+}
+
+
+bool
+TeamDebugger::_HandleWatchpointHit(WatchpointHitEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
+}
+
+
+bool
+TeamDebugger::_HandleSingleStep(SingleStepEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
+}
+
+
+bool
+TeamDebugger::_HandleExceptionOccurred(ExceptionOccurredEvent* event)
+{
+	return _HandleThreadStopped(event->Thread(), NULL);
 }
 
 
@@ -338,4 +447,54 @@ TeamDebugger::_UpdateThreadState(::Thread* thread)
 
 	thread->SetState(newState);
 	thread->SetCpuState(state);
+}
+
+
+void
+TeamDebugger::_HandleThreadAction(thread_id threadID, uint32 action)
+{
+	AutoLocker< ::Team> locker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL || thread->State() == THREAD_STATE_UNKNOWN)
+		return;
+
+	// When stop is requested, thread must be running, otherwise stopped.
+	if (action == MSG_THREAD_STOP
+			? thread->State() != THREAD_STATE_RUNNING
+			: thread->State() != THREAD_STATE_STOPPED) {
+		return;
+	}
+
+	// When continuing the thread update thread state before actually issuing
+	// the command, since we need to unlock.
+	if (action != MSG_THREAD_STOP)
+		thread->SetState(THREAD_STATE_RUNNING);
+
+	locker.Unlock();
+
+	switch (action) {
+		case MSG_THREAD_RUN:
+printf("MSG_THREAD_RUN\n");
+			fDebuggerInterface->ContinueThread(threadID);
+			break;
+		case MSG_THREAD_STOP:
+printf("MSG_THREAD_STOP\n");
+			fDebuggerInterface->StopThread(threadID);
+			break;
+		case MSG_THREAD_STEP_OVER:
+printf("MSG_THREAD_STEP_OVER\n");
+			fDebuggerInterface->SingleStepThread(threadID);
+			break;
+		case MSG_THREAD_STEP_INTO:
+printf("MSG_THREAD_STEP_INTO\n");
+			fDebuggerInterface->SingleStepThread(threadID);
+			break;
+		case MSG_THREAD_STEP_OUT:
+printf("MSG_THREAD_STEP_OUT\n");
+			fDebuggerInterface->SingleStepThread(threadID);
+			break;
+
+// TODO: Handle stepping correctly!
+	}
 }

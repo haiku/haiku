@@ -34,6 +34,8 @@ public:
 	virtual	status_t			SetTeamDebuggingFlags(uint32 flags);
 
 	virtual	status_t			ContinueThread(thread_id thread);
+	virtual	status_t			StopThread(thread_id thread);
+	virtual	status_t			SingleStepThread(thread_id thread);
 
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);

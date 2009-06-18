@@ -132,6 +132,26 @@ DebuggerInterface::ContinueThread(thread_id thread)
 
 
 status_t
+DebuggerInterface::StopThread(thread_id thread)
+{
+	return debug_thread(thread);
+}
+
+
+status_t
+DebuggerInterface::SingleStepThread(thread_id thread)
+{
+	debug_nub_continue_thread continueMessage;
+	continueMessage.thread = thread;
+	continueMessage.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
+	continueMessage.single_step = true;
+
+	return write_port(fNubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
+		&continueMessage, sizeof(continueMessage));
+}
+
+
+status_t
 DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 {
 	thread_info threadInfo;

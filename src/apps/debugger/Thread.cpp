@@ -7,6 +7,7 @@
 
 #include "CpuState.h"
 #include "StackTrace.h"
+#include "Team.h"
 
 
 Thread::Thread(Team* team, thread_id threadID)
@@ -56,6 +57,8 @@ Thread::SetState(uint32 state)
 		SetCpuState(NULL);
 		SetStackTrace(NULL);
 	}
+
+	fTeam->NotifyThreadStateChanged(this);
 }
 
 
@@ -72,7 +75,10 @@ Thread::SetCpuState(CpuState* state)
 
 	if (fCpuState != NULL)
 		fCpuState->AddReference();
+
+	fTeam->NotifyThreadCpuStateChanged(this);
 }
+
 
 void
 Thread::SetStackTrace(StackTrace* trace)
@@ -87,4 +93,6 @@ Thread::SetStackTrace(StackTrace* trace)
 
 	if (fStackTrace != NULL)
 		fStackTrace->AddReference();
+
+	fTeam->NotifyThreadStackTraceChanged(this);
 }

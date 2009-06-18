@@ -205,6 +205,39 @@ Team::RemoveListener(Listener* listener)
 
 
 void
+Team::NotifyThreadStateChanged(Thread* thread)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ThreadStateChanged(
+			ThreadEvent(TEAM_EVENT_THREAD_STATE_CHANGED, thread));
+	}
+}
+
+
+void
+Team::NotifyThreadCpuStateChanged(Thread* thread)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ThreadCpuStateChanged(
+			ThreadEvent(TEAM_EVENT_THREAD_CPU_STATE_CHANGED, thread));
+	}
+}
+
+
+void
+Team::NotifyThreadStackTraceChanged(Thread* thread)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ThreadStackTraceChanged(
+			ThreadEvent(TEAM_EVENT_THREAD_STACK_TRACE_CHANGED, thread));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -305,5 +338,23 @@ Team::Listener::ImageAdded(const Team::ImageEvent& event)
 
 void
 Team::Listener::ImageRemoved(const Team::ImageEvent& event)
+{
+}
+
+
+void
+Team::Listener::ThreadStateChanged(const Team::ThreadEvent& event)
+{
+}
+
+
+void
+Team::Listener::ThreadCpuStateChanged(const Team::ThreadEvent& event)
+{
+}
+
+
+void
+Team::Listener::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 {
 }
