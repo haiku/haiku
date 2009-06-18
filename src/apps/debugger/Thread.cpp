@@ -6,9 +6,11 @@
 #include "Thread.h"
 
 
-Thread::Thread(thread_id threadID)
+Thread::Thread(Team* team, thread_id threadID)
 	:
-	fID(threadID)
+	fTeam(team),
+	fID(threadID),
+	fState(THREAD_STATE_UNKNOWN)
 {
 }
 
@@ -29,4 +31,11 @@ void
 Thread::SetName(const BString& name)
 {
 	fName = name;
+}
+
+
+void
+Thread::SetState(uint32 state)
+{
+	fState = state;
 }

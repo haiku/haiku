@@ -7,6 +7,8 @@
 
 #include <new>
 
+#include <AutoLocker.h>
+
 
 // #pragma mark - Team
 
@@ -53,7 +55,7 @@ Team::AddThread(Thread* thread)
 status_t
 Team::AddThread(const thread_info& threadInfo, Thread** _thread)
 {
-	Thread* thread = new(std::nothrow) Thread(threadInfo.thread);
+	Thread* thread = new(std::nothrow) Thread(this, threadInfo.thread);
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
@@ -134,7 +136,7 @@ Team::AddImage(Image* image)
 status_t
 Team::AddImage(const image_info& imageInfo, Image** _image)
 {
-	Image* image = new(std::nothrow) Image(imageInfo);
+	Image* image = new(std::nothrow) Image(this, imageInfo);
 	if (image == NULL)
 		return B_NO_MEMORY;
 
@@ -197,6 +199,7 @@ Team::Images() const
 void
 Team::AddListener(Listener* listener)
 {
+	AutoLocker<Team> locker(this);
 	fListeners.Add(listener);
 }
 
@@ -204,6 +207,7 @@ Team::AddListener(Listener* listener)
 void
 Team::RemoveListener(Listener* listener)
 {
+	AutoLocker<Team> locker(this);
 	fListeners.Remove(listener);
 }
 
@@ -213,7 +217,7 @@ Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->ThreadAdded(this, thread);
+		listener->ThreadAdded(ThreadEvent(TEAM_EVENT_THREAD_ADDED, thread));
 	}
 }
 
@@ -223,7 +227,7 @@ Team::_NotifyThreadRemoved(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->ThreadRemoved(this, thread);
+		listener->ThreadRemoved(ThreadEvent(TEAM_EVENT_THREAD_REMOVED, thread));
 	}
 }
 
@@ -233,7 +237,7 @@ Team::_NotifyImageAdded(Image* image)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->ImageAdded(this, image);
+		listener->ImageAdded(ImageEvent(TEAM_EVENT_IMAGE_ADDED, image));
 	}
 }
 
@@ -243,12 +247,46 @@ Team::_NotifyImageRemoved(Image* image)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->ImageRemoved(this, image);
+		listener->ImageRemoved(ImageEvent(TEAM_EVENT_IMAGE_REMOVED, image));
 	}
 }
 
 
+// #pragma mark - Event
+
+
+Team::Event::Event(uint32 type, Team* team)
+	:
+	fEventType(type),
+	fTeam(team)
+{
+}
+
+
+// #pragma mark - ThreadEvent
+
+
+Team::ThreadEvent::ThreadEvent(uint32 type, Thread* thread)
+	:
+	Event(type, thread->GetTeam()),
+	fThread(thread)
+{
+}
+
+
+// #pragma mark - ImageEvent
+
+
+Team::ImageEvent::ImageEvent(uint32 type, Image* image)
+	:
+	Event(type, image->GetTeam()),
+	fImage(image)
+{
+}
+
+
 // #pragma mark - Listener
+
 
 Team::Listener::~Listener()
 {
@@ -256,24 +294,24 @@ Team::Listener::~Listener()
 
 
 void
-Team::Listener::ThreadAdded(Team* team, Thread* thread)
+Team::Listener::ThreadAdded(const Team::ThreadEvent& event)
 {
 }
 
 
 void
-Team::Listener::ThreadRemoved(Team* team, Thread* thread)
+Team::Listener::ThreadRemoved(const Team::ThreadEvent& event)
 {
 }
 
 
 void
-Team::Listener::ImageAdded(Team* team, Image* image)
+Team::Listener::ImageAdded(const Team::ImageEvent& event)
 {
 }
 
 
 void
-Team::Listener::ImageRemoved(Team* team, Image* image)
+Team::Listener::ImageRemoved(const Team::ImageEvent& event)
 {
 }

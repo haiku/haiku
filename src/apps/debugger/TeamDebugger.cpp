@@ -16,12 +16,14 @@
 #include "debug_utils.h"
 
 #include "Team.h"
+#include "TeamDebugModel.h"
 
 
 TeamDebugger::TeamDebugger()
 	:
 	BLooper("team debugger"),
 	fTeam(NULL),
+	fDebugModel(NULL),
 	fTeamID(-1),
 	fDebuggerPort(-1),
 	fNubPort(-1),
@@ -29,6 +31,7 @@ TeamDebugger::TeamDebugger()
 	fTeamWindow(NULL),
 	fTerminating(false)
 {
+	fDebugContext.reply_port = -1;
 }
 
 
@@ -46,6 +49,9 @@ TeamDebugger::~TeamDebugger()
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
+	destroy_debug_context(&fDebugContext);
+
+	delete fDebugModel;
 	delete fTeam;
 }
 
@@ -71,6 +77,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 	fTeam->SetName(teamInfo.args);
 		// TODO: Set a better name!
+
+	// create the team debug model
+	fDebugModel = new(std::nothrow) TeamDebugModel(fTeam);
+	if (fDebugModel == NULL)
+		return B_NO_MEMORY;
+
+	error = fDebugModel->Init();
+	if (error != B_OK)
+		return error;
 
 	// create debugger port
 	char buffer[128];
@@ -99,9 +114,12 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	thread_info threadInfo;
 	int32 cookie = 0;
 	while (get_next_thread_info(fTeamID, &cookie, &threadInfo) == B_OK) {
-		error = fTeam->AddThread(threadInfo);
+		::Thread* thread;
+		error = fTeam->AddThread(threadInfo, &thread);
 		if (error != B_OK)
 			return error;
+
+		_UpdateThreadState(thread);
 	}
 
 	image_info imageInfo;
@@ -128,7 +146,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// create the team window
 	try {
-		fTeamWindow = TeamWindow::Create(fTeam, this);
+		fTeamWindow = TeamWindow::Create(fDebugModel, this);
 	} catch (...) {
 		// TODO: Notify the user!
 		fprintf(stderr, "Error: Failed to create team window!\n");
@@ -302,4 +320,29 @@ TeamDebugger::_HandleImageDeleted(const debug_image_deleted& message)
 	AutoLocker< ::Team> locker(fTeam);
 	fTeam->RemoveImage(message.info.id);
 	return false;
+}
+
+
+void
+TeamDebugger::_UpdateThreadState(::Thread* thread)
+{
+	debug_nub_get_cpu_state message;
+	message.reply_port = fDebugContext.reply_port;
+	message.thread = thread->ID();
+
+	debug_nub_get_cpu_state_reply reply;
+
+	status_t error = send_debug_message(&fDebugContext,
+		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), &reply,
+		sizeof(reply));
+
+	uint32 newState = THREAD_STATE_UNKNOWN;
+	if (error == B_OK) {
+		if (reply.error == B_OK)
+			newState = THREAD_STATE_STOPPED;
+		else if (reply.error == B_BAD_THREAD_STATE)
+			newState = THREAD_STATE_RUNNING;
+	}
+
+	thread->SetState(newState);
 }

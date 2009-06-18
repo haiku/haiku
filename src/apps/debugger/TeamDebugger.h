@@ -15,6 +15,7 @@
 
 
 class Team;
+class TeamDebugModel;
 
 
 class TeamDebugger :  public DoublyLinkedListLinkImpl<TeamDebugger>,
@@ -47,8 +48,11 @@ private:
 			bool				_HandleImageDeleted(
 									const debug_image_deleted& message);
 
+			void				_UpdateThreadState(::Thread* thread);
+
 private:
 			::Team*				fTeam;
+			TeamDebugModel*		fDebugModel;
 			team_id				fTeamID;
 			port_id				fDebuggerPort;
 			port_id				fNubPort;

@@ -129,12 +129,13 @@ private:
 // #pragma mark - ThreadListView
 
 
-ThreadListView::ThreadListView()
+ThreadListView::ThreadListView(Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
 	fTeam(NULL),
 	fThreadsTable(NULL),
-	fThreadsTableModel(NULL)
+	fThreadsTableModel(NULL),
+	fListener(listener)
 {
 	SetName("Threads");
 }
@@ -149,9 +150,9 @@ ThreadListView::~ThreadListView()
 
 
 /*static*/ ThreadListView*
-ThreadListView::Create()
+ThreadListView::Create(Listener* listener)
 {
-	ThreadListView* self = new ThreadListView;
+	ThreadListView* self = new ThreadListView(listener);
 
 	try {
 		self->_Init();
@@ -204,16 +205,30 @@ ThreadListView::MessageReceived(BMessage* message)
 
 
 void
-ThreadListView::ThreadAdded(Team* team, Thread* thread)
+ThreadListView::ThreadAdded(const Team::ThreadEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_THREAD_LIST, this);
 }
 
 
 void
-ThreadListView::ThreadRemoved(Team* team, Thread* thread)
+ThreadListView::ThreadRemoved(const Team::ThreadEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_THREAD_LIST, this);
+}
+
+
+
+void
+ThreadListView::TableSelectionChanged(Table* table)
+{
+	Thread* thread = NULL;
+	if (fThreadsTableModel != NULL) {
+		TableSelectionModel* selectionModel = table->SelectionModel();
+		thread = fThreadsTableModel->ThreadAt(selectionModel->RowAt(0));
+	}
+
+	fListener->ThreadSelectionChanged(thread);
 }
 
 
@@ -233,12 +248,21 @@ ThreadListView::_Init()
 {
 	fThreadsTable = new Table("threads list", 0);
 	AddChild(fThreadsTable->ToView());
-	
+
 	// columns
 	fThreadsTable->AddColumn(new Int32TableColumn(0, "ID", 40, 20, 1000,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	
+
+	fThreadsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fThreadsTable->AddTableListener(this);
+}
+
+
+// #pragma mark - Listener
+
+
+ThreadListView::Listener::~Listener()
+{
 }

@@ -20,8 +20,9 @@ Application Debugger :
 	ElfFile.cpp
 
 	Image.cpp
-	TeamDebugger.cpp
 	Team.cpp
+	TeamDebugger.cpp
+	TeamDebugModel.cpp
 	Thread.cpp
 
 	# DebugAnalyzer:util

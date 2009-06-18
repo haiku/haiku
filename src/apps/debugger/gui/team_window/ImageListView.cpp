@@ -204,14 +204,14 @@ ImageListView::MessageReceived(BMessage* message)
 
 
 void
-ImageListView::ImageAdded(Team* team, Image* image)
+ImageListView::ImageAdded(const Team::ImageEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_IMAGE_LIST, this);
 }
 
 
 void
-ImageListView::ImageRemoved(Team* team, Image* image)
+ImageListView::ImageRemoved(const Team::ImageEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_IMAGE_LIST, this);
 }

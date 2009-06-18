@@ -11,13 +11,19 @@
 #include "Team.h"
 
 
+class Thread;
+
+
 class ThreadListView : public BGroupView, private Team::Listener,
 	private TableListener {
 public:
-								ThreadListView();
+	class Listener;
+
+public:
+								ThreadListView(Listener* listener);
 								~ThreadListView();
 
-	static	ThreadListView*		Create();
+	static	ThreadListView*		Create(Listener* listener);
 									// throws
 
 			void				SetTeam(Team* team);
@@ -29,10 +35,11 @@ private:
 
 private:
 	// Team::Listener
-	virtual	void				ThreadAdded(Team* team, Thread* thread);
-	virtual	void				ThreadRemoved(Team* team, Thread* thread);
+	virtual	void				ThreadAdded(const Team::ThreadEvent& event);
+	virtual	void				ThreadRemoved(const Team::ThreadEvent& event);
 
 	// TableListener
+	virtual	void				TableSelectionChanged(Table* table);
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
 
 			void				_Init();
@@ -41,6 +48,15 @@ private:
 			Team*				fTeam;
 			Table*				fThreadsTable;
 			ThreadsTableModel*	fThreadsTableModel;
+			Listener*			fListener;
+};
+
+
+class ThreadListView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				ThreadSelectionChanged(Thread* thread) = 0;
 };
 
 

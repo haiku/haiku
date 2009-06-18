@@ -29,8 +29,8 @@ private:
 
 private:
 	// Team::Listener
-	virtual	void				ImageAdded(Team* team, Image* image);
-	virtual	void				ImageRemoved(Team* team, Image* image);
+	virtual	void				ImageAdded(const Team::ImageEvent& event);
+	virtual	void				ImageRemoved(const Team::ImageEvent& event);
 
 	// TableListener
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);

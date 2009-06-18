@@ -8,36 +8,52 @@
 #include <String.h>
 #include <Window.h>
 
+#include "ThreadListView.h"
 
+
+class BButton;
 class BTabView;
 class ImageListView;
 class Team;
-class ThreadListView;
+class TeamDebugModel;
 
 
-class TeamWindow : public BWindow {
+class TeamWindow : public BWindow, private ThreadListView::Listener {
 public:
 	class Listener;
 
 public:
-								TeamWindow(::Team* team, Listener* listener);
+								TeamWindow(TeamDebugModel* debugModel,
+									Listener* listener);
 								~TeamWindow();
 
-	static	TeamWindow*			Create(::Team* team, Listener* listener);
+	static	TeamWindow*			Create(TeamDebugModel* debugModel,
+									Listener* listener);
 									// throws
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 private:
+	// ThreadListView::Listener
+	virtual	void				ThreadSelectionChanged(::Thread* thread);
+
 			void				_Init();
 
+			void				_SetActiveThread(::Thread* thread);
+			void				_UpdateRunButtons();
+
 private:
-			::Team*				fTeam;
+			TeamDebugModel*		fDebugModel;
+			::Thread*			fActiveThread;
 			Listener*			fListener;
 			BTabView*			fTabView;
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
+			BButton*			fRunButton;
+			BButton*			fStepOverButton;
+			BButton*			fStepIntoButton;
+			BButton*			fStepOutButton;
 };
 
 

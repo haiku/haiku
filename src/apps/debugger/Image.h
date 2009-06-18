@@ -11,18 +11,24 @@
 #include <util/DoublyLinkedList.h>
 
 
+class Team;
+
+
 class Image : public Referenceable, public DoublyLinkedListLinkImpl<Image> {
 public:
-								Image(const image_info& imageInfo);
+								Image(Team* team, const image_info& imageInfo);
 								~Image();
 
 			status_t			Init();
 
+			
+			Team*				GetTeam() const	{ return fTeam; }
 			image_id			ID() const		{ return fInfo.id; }
 			const char*			Name() const	{ return fInfo.name; }
 			const image_info&	Info() const	{ return fInfo; }
 
 private:
+			Team*				fTeam;
 			image_info			fInfo;
 };
 
