@@ -129,8 +129,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	snprintf(buffer, sizeof(buffer), "team %ld debug listener", fTeamID);
 	fDebugEventListener = spawn_thread(_DebugEventListenerEntry, buffer,
 		B_NORMAL_PRIORITY, this);
-//	if (fDebugEventListener < 0)
-	if (fDebugEventListener < NULL)
+	if (fDebugEventListener < 0)
 		return fDebugEventListener;
 
 	resume_thread(fDebugEventListener);
