@@ -33,6 +33,10 @@ public:
 			void				ResizeColumnToPreferred(int32 index);
 			void				ResizeAllColumnsToPreferred();
 
+			list_view_type		SelectionMode() const;
+			void				SetSelectionMode(list_view_type type);
+			void 				DeselectAll();
+
 protected:
 			class AbstractColumn;
 

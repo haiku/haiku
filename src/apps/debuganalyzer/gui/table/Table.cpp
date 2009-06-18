@@ -93,10 +93,93 @@ TableModel::NotifyRowsRemoved(int32 rowIndex, int32 count)
 }
 
 
+// #pragma mark - TableSelectionModel
+
+TableSelectionModel::TableSelectionModel(Table* table)
+	:
+	fTable(table),
+	fRows(NULL),
+	fRowCount(-1)
+{
+}
+
+
+TableSelectionModel::~TableSelectionModel()
+{
+	delete[] fRows;
+}
+
+
+int32
+TableSelectionModel::CountRows()
+{
+	_Update();
+
+	return fRowCount;
+}
+
+
+int32
+TableSelectionModel::RowAt(int32 index)
+{
+	_Update();
+
+	return index >= 0 && index < fRowCount ? fRows[index] : -1;
+}
+
+
+void
+TableSelectionModel::_SelectionChanged()
+{
+	if (fRowCount >= 0) {
+		fRowCount = -1;
+		delete[] fRows;
+		fRows = NULL;
+	}
+}
+
+
+void
+TableSelectionModel::_Update()
+{
+	if (fRowCount >= 0)
+		return;
+
+	// count the rows
+	fRowCount = 0;
+	BRow* row = NULL;
+	while ((row = fTable->CurrentSelection(row)) != NULL)
+		fRowCount++;
+
+	if (fRowCount == 0)
+		return;
+
+	// allocate row array
+	fRows = new(std::nothrow) int32[fRowCount];
+	if (fRows == NULL) {
+		fRowCount = 0;
+		return;
+	}
+
+	// get the rows
+	row = NULL;
+	int32 index = 0;
+	while ((row = fTable->CurrentSelection(row)) != NULL)
+		fRows[index++] = fTable->_ModelIndexOfRow(row);
+}
+
+
+
 // #pragma mark - TableListener
 
 
 TableListener::~TableListener()
+{
+}
+
+
+void
+TableListener::TableSelectionChanged(Table* table)
 {
 }
 
@@ -233,7 +316,9 @@ Table::Table(const char* name, uint32 flags, border_style borderStyle,
 	bool showHorizontalScrollbar)
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL)
+	fModel(NULL),
+	fSelectionModel(this),
+	fIgnoreSelectionChange(0)
 {
 }
 
@@ -242,7 +327,9 @@ Table::Table(TableModel* model, const char* name, uint32 flags,
 	border_style borderStyle, bool showHorizontalScrollbar)
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL)
+	fModel(NULL),
+	fSelectionModel(this),
+	fIgnoreSelectionChange(0)
 {
 	SetTableModel(model);
 }
@@ -287,6 +374,38 @@ Table::SetTableModel(TableModel* model)
 }
 
 
+TableSelectionModel*
+Table::SelectionModel()
+{
+	return &fSelectionModel;
+}
+
+
+void
+Table::SelectRow(int32 rowIndex, bool extendSelection)
+{
+	BRow* row = fRows.ItemAt(rowIndex);
+	if (row == NULL)
+		return;
+
+	if (!extendSelection) {
+		fIgnoreSelectionChange++;
+		DeselectAll();
+		fIgnoreSelectionChange--;
+	}
+
+	AddToSelection(row);
+}
+
+
+void
+Table::DeselectRow(int32 rowIndex)
+{
+	if (BRow* row = fRows.ItemAt(rowIndex))
+		Deselect(row);
+}
+
+
 bool
 Table::AddTableListener(TableListener* listener)
 {
@@ -298,6 +417,22 @@ void
 Table::RemoveTableListener(TableListener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+void
+Table::SelectionChanged()
+{
+	if (fIgnoreSelectionChange > 0)
+		return;
+
+	fSelectionModel._SelectionChanged();
+
+	if (!fListeners.IsEmpty()) {
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--)
+			fListeners.ItemAt(i)->TableSelectionChanged(this);
+	}
 }
 
 
@@ -367,15 +502,25 @@ Table::ItemInvoked()
 	if (fListeners.IsEmpty())
 		return;
 
-	BRow* row = CurrentSelection();
-	if (row == NULL)
-		return;
-
-	TableField* field = dynamic_cast<TableField*>(row->GetField(0));
-	if (field == NULL)
+	int32 index = _ModelIndexOfRow(CurrentSelection());
+	if (index < 0)
 		return;
 
 	int32 listenerCount = fListeners.CountItems();
 	for (int32 i = listenerCount - 1; i >= 0; i--)
-		fListeners.ItemAt(i)->TableRowInvoked(this, field->RowIndex());
+		fListeners.ItemAt(i)->TableRowInvoked(this, index);
+}
+
+
+int32
+Table::_ModelIndexOfRow(BRow* row)
+{
+	if (row == NULL)
+		return -1;
+
+	TableField* field = dynamic_cast<TableField*>(row->GetField(0));
+	if (field == NULL)
+		return -1;
+
+	return field->RowIndex();
 }

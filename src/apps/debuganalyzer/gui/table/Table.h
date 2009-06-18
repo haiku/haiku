@@ -55,10 +55,33 @@ protected:
 };
 
 
+class TableSelectionModel {
+public:
+								TableSelectionModel(Table* table);
+								~TableSelectionModel();
+
+			int32				CountRows();
+			int32				RowAt(int32 index);
+
+private:
+			friend class Table;
+
+private:
+			void				_SelectionChanged();
+			void				_Update();
+
+private:
+			Table*				fTable;
+			int32*				fRows;
+			int32				fRowCount;
+};
+
+
 class TableListener {
 public:
 	virtual						~TableListener();
 
+	virtual	void				TableSelectionChanged(Table* table);
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
 };
 
@@ -77,10 +100,17 @@ public:
 			void				SetTableModel(TableModel* model);
 			TableModel*			GetTableModel() const	{ return fModel; }
 
+			TableSelectionModel* SelectionModel();
+
+			void				SelectRow(int32 rowIndex, bool extendSelection);
+			void				DeselectRow(int32 rowIndex);
+
 			bool				AddTableListener(TableListener* listener);
 			void				RemoveTableListener(TableListener* listener);
 
 protected:
+	virtual	void				SelectionChanged();
+
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
 
 private:
@@ -92,16 +122,22 @@ private:
 private:
 			class Column;
 
+			friend class TableSelectionModel;
+
 			typedef BObjectList<TableListener>	ListenerList;
 			typedef BObjectList<BRow> RowList;
 
 private:
 	virtual	void				ItemInvoked();
 
+			int32				_ModelIndexOfRow(BRow* row);
+
 private:
 			TableModel*			fModel;
 			RowList				fRows;
+			TableSelectionModel	fSelectionModel;
 			ListenerList		fListeners;
+			int32				fIgnoreSelectionChange;
 };
 
 

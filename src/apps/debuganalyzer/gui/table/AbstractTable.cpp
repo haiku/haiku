@@ -82,3 +82,24 @@ AbstractTable::ResizeAllColumnsToPreferred()
 {
 	BColumnListView::ResizeAllColumnsToPreferred();
 }
+
+
+list_view_type
+AbstractTable::SelectionMode() const
+{
+	return BColumnListView::SelectionMode();
+}
+
+
+void
+AbstractTable::SetSelectionMode(list_view_type type)
+{
+	BColumnListView::SetSelectionMode(type);
+}
+
+
+void
+AbstractTable::DeselectAll()
+{
+	BColumnListView::DeselectAll();
+}
