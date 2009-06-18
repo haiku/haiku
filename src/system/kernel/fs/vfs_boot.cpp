@@ -447,7 +447,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 		if (bootPartition->GetPath(&path) != B_OK)
 			panic("could not get boot device!\n");
 
-		const char *fsName = NULL;
+		const char* fsName = NULL;
 		bool readOnly = false;
 		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0) {
 			fsName = "iso9660:write_overlay:attribute_overlay";
@@ -457,7 +457,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
 		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
 		if (gBootDevice >= B_OK) {
-			gReadOnlyBootDevice = true;
+			gReadOnlyBootDevice = readOnly;
 			break;
 		}
 	}
