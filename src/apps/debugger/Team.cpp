@@ -50,12 +50,13 @@ Team::AddThread(Thread* thread)
 	fThreads.Add(thread);
 	_NotifyThreadAdded(thread);
 }
-	
+
+
 
 status_t
-Team::AddThread(const thread_info& threadInfo, Thread** _thread)
+Team::AddThread(const ThreadInfo& threadInfo, Thread** _thread)
 {
-	Thread* thread = new(std::nothrow) Thread(this, threadInfo.thread);
+	Thread* thread = new(std::nothrow) Thread(this, threadInfo.ThreadID());
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
@@ -65,22 +66,13 @@ Team::AddThread(const thread_info& threadInfo, Thread** _thread)
 		return error;
 	}
 
-	thread->SetName(threadInfo.name);
+	thread->SetName(threadInfo.Name());
 	AddThread(thread);
 
 	if (_thread != NULL)
 		*_thread = thread;
 
 	return B_OK;
-}
-
-
-status_t
-Team::AddThread(thread_id threadID, Thread** _thread)
-{
-	thread_info threadInfo;
-	status_t error = get_thread_info(threadID, &threadInfo);
-	return error == B_OK ? AddThread(threadInfo, _thread) : error;
 }
 
 
@@ -134,7 +126,7 @@ Team::AddImage(Image* image)
 
 
 status_t
-Team::AddImage(const image_info& imageInfo, Image** _image)
+Team::AddImage(const ImageInfo& imageInfo, Image** _image)
 {
 	Image* image = new(std::nothrow) Image(this, imageInfo);
 	if (image == NULL)

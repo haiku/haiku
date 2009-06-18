@@ -15,6 +15,8 @@
 
 #include "debug_utils.h"
 
+#include "CpuState.h"
+#include "DebuggerInterface.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
 
@@ -25,13 +27,11 @@ TeamDebugger::TeamDebugger()
 	fTeam(NULL),
 	fDebugModel(NULL),
 	fTeamID(-1),
-	fDebuggerPort(-1),
-	fNubPort(-1),
+	fDebuggerInterface(NULL),
 	fDebugEventListener(-1),
 	fTeamWindow(NULL),
 	fTerminating(false)
 {
-	fDebugContext.reply_port = -1;
 }
 
 
@@ -41,18 +41,16 @@ TeamDebugger::~TeamDebugger()
 
 	fTerminating = true;
 
-	if (fDebuggerPort >= 0)
-		delete_port(fDebuggerPort);
+	fDebuggerInterface->Close();
 
 	locker.Unlock();
 
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
-	destroy_debug_context(&fDebugContext);
-
 	delete fDebugModel;
 	delete fTeam;
+	delete fDebuggerInterface;
 }
 
 
@@ -87,54 +85,52 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	if (error != B_OK)
 		return error;
 
-	// create debugger port
-	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "team %ld debugger", fTeamID);
-	fDebuggerPort = create_port(100, buffer);
-	if (fDebuggerPort < 0)
-		return fDebuggerPort;
+	// create debugger interface
+	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
+	if (fDebuggerInterface == NULL)
+		return B_NO_MEMORY;
 
-	// install as team debugger
-	fNubPort = install_team_debugger(fTeamID, fDebuggerPort);
-	if (fNubPort < 0)
-		return fNubPort;
-
-	// init debug context
-	error = init_debug_context(&fDebugContext, fTeamID, fNubPort);
+	error = fDebuggerInterface->Init();
 	if (error != B_OK)
 		return error;
 
 	// set team debugging flags
-	set_team_debugging_flags(fNubPort,
+	fDebuggerInterface->SetTeamDebuggingFlags(
 		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
 
-	thread_info threadInfo;
-	int32 cookie = 0;
-	while (get_next_thread_info(fTeamID, &cookie, &threadInfo) == B_OK) {
-		::Thread* thread;
-		error = fTeam->AddThread(threadInfo, &thread);
-		if (error != B_OK)
-			return error;
+	{
+		BObjectList<ThreadInfo> threadInfos(20, true);
+		status_t error = fDebuggerInterface->GetThreadInfos(threadInfos);
+		for (int32 i = 0; ThreadInfo* info = threadInfos.ItemAt(i); i++) {
+			::Thread* thread;
+			error = fTeam->AddThread(*info, &thread);
+			if (error != B_OK)
+				return error;
 
-		_UpdateThreadState(thread);
+			_UpdateThreadState(thread);
+		}
 	}
 
-	image_info imageInfo;
-	cookie = 0;
-	while (get_next_image_info(fTeamID, &cookie, &imageInfo) == B_OK) {
-		error = fTeam->AddImage(imageInfo);
-		if (error != B_OK)
-			return error;
+	{
+		BObjectList<ImageInfo> imageInfos(20, true);
+		status_t error = fDebuggerInterface->GetImageInfos(imageInfos);
+		for (int32 i = 0; ImageInfo* info = imageInfos.ItemAt(i); i++) {
+			error = fTeam->AddImage(*info);
+			if (error != B_OK)
+				return error;
+		}
 	}
 
 	// create the debug event listener
+	char buffer[128];
 	snprintf(buffer, sizeof(buffer), "team %ld debug listener", fTeamID);
 	fDebugEventListener = spawn_thread(_DebugEventListenerEntry, buffer,
 		B_NORMAL_PRIORITY, this);
-	if (fDebugEventListener < 0)
+//	if (fDebugEventListener < 0)
+	if (fDebugEventListener < NULL)
 		return fDebugEventListener;
 
 	resume_thread(fDebugEventListener);
@@ -191,31 +187,27 @@ status_t
 TeamDebugger::_DebugEventListener()
 {
 	while (!fTerminating) {
-		// read the next message
-		debug_debugger_message_data message;
-		int32 messageCode;
-		ssize_t size = read_port(fDebuggerPort, &messageCode, &message,
-			sizeof(message));
-		if (size < 0) {
-			if (size == B_INTERRUPTED)
-				continue;
-// TODO: Error handling!
+		// get the next event
+		DebugEvent* event;
+		status_t error = fDebuggerInterface->GetNextDebugEvent(event);
+		if (error != B_OK)
 			break;
-		}
+				// TODO: Error handling!
 
-		if (message.origin.team != fTeamID) {
-printf("TeamDebugger for team %ld: received message from team %ld!\n", fTeamID,
-message.origin.team);
+
+		if (event->Team() != fTeamID) {
+printf("TeamDebugger for team %ld: received event from team %ld!\n", fTeamID,
+event->Team());
 			continue;
 		}
 
-		_HandleDebuggerMessage(messageCode, message);
+		_HandleDebuggerMessage(event);
 
-		if (messageCode == B_DEBUGGER_MESSAGE_TEAM_DELETED
-			|| messageCode == B_DEBUGGER_MESSAGE_TEAM_EXEC) {
-			// TODO:...
-			break;
-		}
+//		if (event->EventType() == B_DEBUGGER_MESSAGE_TEAM_DELETED
+//			|| event->EventType() == B_DEBUGGER_MESSAGE_TEAM_EXEC) {
+//			// TODO:...
+//			break;
+//		}
 	}
 
 	return B_OK;
@@ -223,51 +215,54 @@ message.origin.team);
 
 
 void
-TeamDebugger::_HandleDebuggerMessage(int32 messageCode,
-	const debug_debugger_message_data& message)
+TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 {
-printf("TeamDebugger::_HandleDebuggerMessage(): %ld\n", messageCode);
+printf("TeamDebugger::_HandleDebuggerMessage(): %d\n", event->EventType());
 	bool handled = false;
 
-	switch (messageCode) {
+	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
-printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", event->Thread());
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", event->Thread());
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
-printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", event->Thread());
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
-printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", event->Thread());
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
-printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", event->Thread());
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", message.origin.thread);
+printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", event->Thread());
 			break;
-		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
-printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
-			break;
+//		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+//printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
+//			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n", message.origin.team);
+printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n", event->Team());
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
-printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", message.origin.team);
+printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
-			handled = _HandleThreadCreated(message.thread_created);
+			handled = _HandleThreadCreated(
+				dynamic_cast<ThreadCreatedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-			handled = _HandleThreadDeleted(message.thread_deleted);
+			handled = _HandleThreadDeleted(
+				dynamic_cast<ThreadDeletedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-			handled = _HandleImageCreated(message.image_created);
+			handled = _HandleImageCreated(
+				dynamic_cast<ImageCreatedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-			handled = _HandleImageDeleted(message.image_deleted);
+			handled = _HandleImageDeleted(
+				dynamic_cast<ImageDeletedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
@@ -277,48 +272,54 @@ printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", message.origin.team);
 			// not interested
 			break;
 		default:
-			printf("TeamDebugger for team %ld: unknown message from kernel: "
-				"%ld\n", fTeamID, messageCode);
+			printf("TeamDebugger for team %ld: unknown event type: "
+				"%d\n", fTeamID, event->EventType());
 			break;
 	}
 
-	if (!handled && message.origin.thread >= 0 && message.origin.nub_port >= 0)
-		continue_thread(message.origin.nub_port, message.origin.thread);
+	if (!handled && event->ThreadStopped())
+		fDebuggerInterface->ContinueThread(event->Thread());
 }
 
 
 bool
-TeamDebugger::_HandleThreadCreated(const debug_thread_created& message)
+TeamDebugger::_HandleThreadCreated(ThreadCreatedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
-	fTeam->AddThread(message.new_thread);
+
+	ThreadInfo info;
+	status_t error = fDebuggerInterface->GetThreadInfo(event->NewThread(),
+		info);
+	if (error == B_OK)
+		fTeam->AddThread(info);
+
 	return false;
 }
 
 
 bool
-TeamDebugger::_HandleThreadDeleted(const debug_thread_deleted& message)
+TeamDebugger::_HandleThreadDeleted(ThreadDeletedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
-	fTeam->RemoveThread(message.origin.thread);
+	fTeam->RemoveThread(event->Thread());
 	return false;
 }
 
 
 bool
-TeamDebugger::_HandleImageCreated(const debug_image_created& message)
+TeamDebugger::_HandleImageCreated(ImageCreatedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
-	fTeam->AddImage(message.info);
+	fTeam->AddImage(event->GetImageInfo());
 	return false;
 }
 
 
 bool
-TeamDebugger::_HandleImageDeleted(const debug_image_deleted& message)
+TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
-	fTeam->RemoveImage(message.info.id);
+	fTeam->RemoveImage(event->GetImageInfo().ImageID());
 	return false;
 }
 
@@ -326,23 +327,15 @@ TeamDebugger::_HandleImageDeleted(const debug_image_deleted& message)
 void
 TeamDebugger::_UpdateThreadState(::Thread* thread)
 {
-	debug_nub_get_cpu_state message;
-	message.reply_port = fDebugContext.reply_port;
-	message.thread = thread->ID();
-
-	debug_nub_get_cpu_state_reply reply;
-
-	status_t error = send_debug_message(&fDebugContext,
-		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), &reply,
-		sizeof(reply));
+	CpuState* state = NULL;
+	status_t error = fDebuggerInterface->GetCpuState(thread->ID(), state);
 
 	uint32 newState = THREAD_STATE_UNKNOWN;
 	if (error == B_OK) {
-		if (reply.error == B_OK)
-			newState = THREAD_STATE_STOPPED;
-		else if (reply.error == B_BAD_THREAD_STATE)
-			newState = THREAD_STATE_RUNNING;
-	}
+		newState = THREAD_STATE_STOPPED;
+		state->RemoveReference();
+	} else if (error == B_BAD_THREAD_STATE)
+		newState = THREAD_STATE_RUNNING;
 
 	thread->SetState(newState);
 }

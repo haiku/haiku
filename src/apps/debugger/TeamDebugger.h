@@ -11,9 +11,11 @@
 #include <debug_support.h>
 #include <util/DoublyLinkedList.h>
 
+#include "DebugEvent.h"
 #include "TeamWindow.h"
 
 
+class DebuggerInterface;
 class Team;
 class TeamDebugModel;
 
@@ -36,17 +38,16 @@ private:
 	static	status_t			_DebugEventListenerEntry(void* data);
 			status_t			_DebugEventListener();
 
-			void				_HandleDebuggerMessage(int32 messageCode,
-									const debug_debugger_message_data& message);
+			void				_HandleDebuggerMessage(DebugEvent* event);
 
 			bool				_HandleThreadCreated(
-									const debug_thread_created& message);
+									ThreadCreatedEvent* event);
 			bool				_HandleThreadDeleted(
-									const debug_thread_deleted& message);
+									ThreadDeletedEvent* event);
 			bool				_HandleImageCreated(
-									const debug_image_created& message);
+									ImageCreatedEvent* event);
 			bool				_HandleImageDeleted(
-									const debug_image_deleted& message);
+									ImageDeletedEvent* event);
 
 			void				_UpdateThreadState(::Thread* thread);
 
@@ -54,9 +55,8 @@ private:
 			::Team*				fTeam;
 			TeamDebugModel*		fDebugModel;
 			team_id				fTeamID;
-			port_id				fDebuggerPort;
 			port_id				fNubPort;
-			debug_context		fDebugContext;
+			DebuggerInterface*	fDebuggerInterface;
 			thread_id			fDebugEventListener;
 			TeamWindow*			fTeamWindow;
 	volatile bool				fTerminating;

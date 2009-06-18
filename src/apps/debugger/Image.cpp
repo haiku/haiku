@@ -6,7 +6,7 @@
 #include "Image.h"
 
 
-Image::Image(Team* team,const image_info& imageInfo)
+Image::Image(Team* team,const ImageInfo& imageInfo)
 	:
 	fTeam(team),
 	fInfo(imageInfo)

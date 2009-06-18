@@ -8,7 +8,9 @@
 #include <Locker.h>
 
 #include "Image.h"
+#include "ImageInfo.h"
 #include "Thread.h"
+#include "ThreadInfo.h"
 
 
 // team event types
@@ -39,9 +41,7 @@ public:
 			void				SetName(const BString& name);
 
 			void				AddThread(Thread* thread);
-			status_t			AddThread(const thread_info& threadInfo,
-									Thread** _thread = NULL);
-			status_t			AddThread(thread_id threadID,
+			status_t			AddThread(const ThreadInfo& threadInfo,
 									Thread** _thread = NULL);
 			void				RemoveThread(Thread* thread);
 			bool				RemoveThread(thread_id threadID);
@@ -49,7 +49,7 @@ public:
 			const ThreadList&	Threads() const;
 
 			void				AddImage(Image* image);
-			status_t			AddImage(const image_info& imageInfo,
+			status_t			AddImage(const ImageInfo& imageInfo,
 									Image** _image = NULL);
 			void				RemoveImage(Image* image);
 			bool				RemoveImage(image_id imageID);

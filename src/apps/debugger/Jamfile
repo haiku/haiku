@@ -6,6 +6,7 @@ C++FLAGS += -Werror ;
 UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 
 local debugAnalyzerSources
@@ -16,14 +17,16 @@ SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) util ] ;
 
 Application Debugger :
+	CpuState.cpp
 	Debugger.cpp
-	ElfFile.cpp
-
+#	ElfFile.cpp
 	Image.cpp
+	ImageInfo.cpp
 	Team.cpp
 	TeamDebugger.cpp
 	TeamDebugModel.cpp
 	Thread.cpp
+	ThreadInfo.cpp
 
 	# DebugAnalyzer:util
 	Variant.cpp
@@ -32,6 +35,10 @@ Application Debugger :
 	ImageListView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
+
+	# debugger_interface
+	DebugEvent.cpp
+	DebuggerInterface.cpp
 
 # DWARF
 #	attribute_classes.cpp
