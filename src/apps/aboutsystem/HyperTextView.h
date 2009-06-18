@@ -29,6 +29,9 @@ public:
 
 class HyperTextView : public BTextView {
 public:
+								HyperTextView(const char* name,
+									uint32 flags = B_WILL_DRAW
+										| B_PULSE_NEEDED);
 								HyperTextView(BRect frame, const char* name,
 									BRect textRect, uint32 resizeMask,
 									uint32 flags = B_WILL_DRAW

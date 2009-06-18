@@ -23,6 +23,7 @@
 #include <FindDirectory.h>
 #include <Font.h>
 #include <fs_attr.h>
+#include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <OS.h>
@@ -67,71 +68,102 @@ static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
 
 
 class AboutApp : public BApplication {
-	public:
+public:
 								AboutApp();
 };
 
 class AboutWindow : public BWindow {
-	public:
-								AboutWindow();
+public:
+							AboutWindow();
 
-		virtual	bool			QuitRequested();
+	virtual	bool			QuitRequested();
+};
+
+class LogoView : public BView {
+public:
+							LogoView();
+	virtual					~LogoView();
+
+	virtual	BSize			MinSize();
+	virtual	BSize			MaxSize();
+
+	virtual void			Draw(BRect updateRect);
+
+private:
+			BBitmap*		fLogo;
+};
+
+class CropView : public BView {
+public:
+							CropView(BView* target, int32 left, int32 top,
+								int32 right, int32 bottom);
+	virtual					~CropView();
+
+	virtual	BSize			MinSize();
+	virtual	BSize			MaxSize();
+
+	virtual void			DoLayout();
+
+private:
+			BView*			fTarget;
+			int32			fCropLeft;
+			int32			fCropTop;
+			int32			fCropRight;
+			int32			fCropBottom;
 };
 
 class AboutView : public BView {
 public:
-								AboutView(const BRect& frame);
-								~AboutView();
+							AboutView();
+							~AboutView();
 
-		virtual void			AttachedToWindow();
-		virtual void			Pulse();
+	virtual void			AttachedToWindow();
+	virtual void			Pulse();
 
-		virtual void			FrameResized(float width, float height);
-		virtual void			Draw(BRect updateRect);
-		virtual void			MessageReceived(BMessage* msg);
-		virtual void			MouseDown(BPoint point);
+	virtual void			MessageReceived(BMessage* msg);
+	virtual void			MouseDown(BPoint point);
 
-				void			AddCopyrightEntry(const char* name,
-									const char* text,
-									const StringVector& licenses,
-									const char* url);
-				void			AddCopyrightEntry(const char* name,
-									const char* text, const char* url = NULL);
-				void			PickRandomHaiku();
+			void			AddCopyrightEntry(const char* name,
+								const char* text,
+								const StringVector& licenses,
+								const char* url);
+			void			AddCopyrightEntry(const char* name,
+								const char* text, const char* url = NULL);
+			void			PickRandomHaiku();
 
 
 private:
-				typedef std::map<std::string, PackageCredit*> PackageCreditMap;
+	typedef std::map<std::string, PackageCredit*> PackageCreditMap;
 
 private:
-				status_t		_GetLicensePath(const char* license,
-									BPath& path);
-				void			_AddCopyrightsFromAttribute();
-				void			_AddPackageCredit(const PackageCredit& package);
-				void			_AddPackageCreditEntries();
+			BView*			_CreateLabel(const char* name, const char* label);
+			BView*			_CreateCreditsView();
+			status_t		_GetLicensePath(const char* license,
+								BPath& path);
+			void			_AddCopyrightsFromAttribute();
+			void			_AddPackageCredit(const PackageCredit& package);
+			void			_AddPackageCreditEntries();
 
-				BStringView*	fMemView;
-				BTextView*		fUptimeView;
-				BView*			fInfoView;
-				HyperTextView*	fCreditsView;
+			BStringView*	fMemView;
+			BTextView*		fUptimeView;
+			BView*			fInfoView;
+			HyperTextView*	fCreditsView;
 
-				BBitmap*		fLogo;
+			BBitmap*		fLogo;
 
-				BPoint			fDrawPoint;
-
-				bigtime_t		fLastActionTime;
-				BMessageRunner*	fScrollRunner;
-				PackageCreditMap fPackageCredits;
+			bigtime_t		fLastActionTime;
+			BMessageRunner*	fScrollRunner;
+			PackageCreditMap fPackageCredits;
 };
 
 
 //	#pragma mark -
 
 
-AboutApp::AboutApp(void)
+AboutApp::AboutApp()
 	: BApplication("application/x-vnd.Haiku-About")
 {
-	AboutWindow *window = new AboutWindow();
+	AboutWindow* window = new AboutWindow();
 	window->Show();
 }
 
@@ -141,10 +173,15 @@ AboutApp::AboutApp(void)
 
 AboutWindow::AboutWindow()
 	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+			B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
-	AboutView *view = new AboutView(Bounds());
-	AddChild(view);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(new AboutView());
+
+	// Make sure we take the minimal window size into account when centering
+	BSize size = GetLayout()->MinSize();
+	ResizeTo(max_c(size.width, Bounds().Width()),
+		max_c(size.height, Bounds().Height()));
 
 	MoveTo((BScreen().Frame().Width() - Bounds().Width()) / 2,
 		(BScreen().Frame().Height() - Bounds().Height()) / 2 );
@@ -159,58 +196,136 @@ AboutWindow::QuitRequested()
 }
 
 
-AboutView::AboutView(const BRect &rect)
-	: BView(rect, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
+//	#pragma mark - LogoView
+
+
+LogoView::LogoView()
+	: BView("logo", B_WILL_DRAW)
+{
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
+	SetViewColor(255, 255, 255);
+}
+
+
+LogoView::~LogoView()
+{
+	delete fLogo;
+}
+
+
+BSize
+LogoView::MinSize()
+{
+	if (fLogo == NULL)
+		return BSize(0, 0);
+
+	return BSize(fLogo->Bounds().Width(), fLogo->Bounds().Height());
+}
+
+
+BSize
+LogoView::MaxSize()
+{
+	if (fLogo == NULL)
+		return BSize(0, 0);
+
+	return BSize(B_SIZE_UNLIMITED, fLogo->Bounds().Height());
+}
+
+
+void
+LogoView::Draw(BRect updateRect)
+{
+	if (fLogo != NULL) {
+		DrawBitmap(fLogo,
+			BPoint((Bounds().Width() - fLogo->Bounds().Width()) / 2, 0));
+	}
+}
+
+
+//	#pragma mark - CropView
+
+
+CropView::CropView(BView* target, int32 left, int32 top, int32 right,
+		int32 bottom)
+	: BView("crop view", 0),
+	fTarget(target),
+	fCropLeft(left),
+	fCropTop(top),
+	fCropRight(right),
+	fCropBottom(bottom)
+{
+	AddChild(target);
+}
+
+
+CropView::~CropView()
+{
+}
+
+
+BSize
+CropView::MinSize()
+{
+	if (fTarget == NULL)
+		return BSize();
+
+	BSize size = fTarget->MinSize();
+	if (size.width != B_SIZE_UNSET)
+		size.width -= fCropLeft + fCropRight;
+	if (size.height != B_SIZE_UNSET)
+		size.height -= fCropTop + fCropBottom;
+
+	return size;
+}
+
+
+BSize
+CropView::MaxSize()
+{
+	if (fTarget == NULL)
+		return BSize();
+
+	BSize size = fTarget->MaxSize();
+	if (size.width != B_SIZE_UNSET)
+		size.width -= fCropLeft + fCropRight;
+	if (size.height != B_SIZE_UNSET)
+		size.height -= fCropTop + fCropBottom;
+
+	return size;
+}
+
+
+void
+CropView::DoLayout()
+{
+	BView::DoLayout();
+
+	if (fTarget == NULL)
+		return;
+
+	fTarget->MoveTo(-fCropLeft, -fCropTop);
+	fTarget->ResizeTo(Bounds().Width() + fCropLeft + fCropRight,
+		Bounds().Height() + fCropTop + fCropBottom);
+}
+
+
+//	#pragma mark - AboutView
+
+
+AboutView::AboutView()
+	: BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),
 	fLastActionTime(system_time()),
 	fScrollRunner(NULL)
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
-	if (fLogo) {
-		fDrawPoint.x = (225-fLogo->Bounds().Width()) / 2;
-		fDrawPoint.y = 0;
-	}
-
 	// Begin Construction of System Information controls
-
-	font_height height;
-	float labelHeight, textHeight;
 
 	system_info systemInfo;
 	get_system_info(&systemInfo);
 
-	be_plain_font->GetHeight(&height);
-	textHeight = height.ascent + height.descent + height.leading;
-
-	be_bold_font->GetHeight(&height);
-	labelHeight = height.ascent + height.descent + height.leading;
-
-	BRect r(0, 0, 225, Bounds().bottom);
-	if (fLogo)
-		r.OffsetBy(0, fLogo->Bounds().Height());
-
-	fInfoView = new BView(r, "infoview", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-		B_WILL_DRAW);
-	fInfoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fInfoView->SetLowColor(fInfoView->ViewColor());
-	fInfoView->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-	AddChild(fInfoView);
-
-	// Add all the various labels for system infomation
-
-	BStringView *stringView;
+	// Create all the various labels for system infomation
 
 	// OS Version
-	r.Set(5, 5, 224, labelHeight + 5);
-	stringView = new BStringView(r, "oslabel", "Version:");
-	stringView->SetFont(be_bold_font);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
-
-	// we update "labelHeight" to the actual height of the string view
-	labelHeight = stringView->Bounds().Height();
-
-	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight;
 
 	char string[1024];
 	strcpy(string, "Unknown");
@@ -244,9 +359,9 @@ AboutView::AboutView(const BRect &rect)
 		}
 	}
 
-	stringView = new BStringView(r, "ostext", string);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	BStringView* versionView = new BStringView("ostext", string);
+	versionView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	// GCC version
 #if __GNUC__ != 2
@@ -255,37 +370,26 @@ AboutView::AboutView(const BRect &rect)
 
 	snprintf(string, sizeof(string), "GCC %d", __GNUC__);
 
-	stringView = new BStringView(r, "gcctext", string);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	BStringView* gccView = new BStringView("gcctext", string);
+	gccView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 #endif
 
 	// CPU count, type and clock speed
-	r.OffsetBy(0, textHeight * 1.5);
-	r.bottom = r.top + labelHeight;
-
-	if (systemInfo.cpu_count > 1)
-		sprintf(string, "%ld Processors:", systemInfo.cpu_count);
-	else
-		strcpy(string, "Processor:");
-
-	stringView = new BStringView(r, "cpulabel", string);
-	stringView->SetFont(be_bold_font);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	char processorLabel[256];
+	if (systemInfo.cpu_count > 1) {
+		snprintf(processorLabel, sizeof(processorLabel), "%ld Processors:",
+			systemInfo.cpu_count);
+	} else
+		strlcpy(processorLabel, "Processor:", sizeof(processorLabel));
 
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(systemInfo.cpu_type)
 		<< " " << get_cpu_model_string(&systemInfo);
 
-	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight;
-	stringView = new BStringView(r, "cputext", cpuType.String());
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
-
-	r.OffsetBy(0, textHeight);
-	r.bottom = r.top + textHeight;
+	BStringView* cpuView = new BStringView("cputext", cpuType.String());
+	cpuView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	int32 clockSpeed = get_rounded_cpu_speed();
 	if (clockSpeed < 1000)
@@ -293,80 +397,274 @@ AboutView::AboutView(const BRect &rect)
 	else
 		sprintf(string,"%.2f GHz", clockSpeed / 1000.0f);
 
-	stringView = new BStringView(r, "mhztext", string);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	BStringView* frequencyView = new BStringView("frequencytext", string);
+	frequencyView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	// RAM
-	r.OffsetBy(0, textHeight * 1.5);
-	r.bottom = r.top + labelHeight;
-	stringView = new BStringView(r, "ramlabel", "Memory:");
-	stringView->SetFont(be_bold_font);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
-
-	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight;
-
-	fMemView = new BStringView(r, "ramtext", "");
-	fInfoView->AddChild(fMemView);
-	fMemView->SetText(MemUsageToString(string, sizeof(string), &systemInfo));
+	fMemView = new BStringView("ramtext",
+		MemUsageToString(string, sizeof(string), &systemInfo));
+	fMemView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	// Kernel build time/date
-	r.OffsetBy(0, textHeight * 1.5);
-	r.bottom = r.top + labelHeight;
-	stringView = new BStringView(r, "kernellabel", "Kernel:");
-	stringView->SetFont(be_bold_font);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
-
-	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight;
-
 	snprintf(string, sizeof(string), "%s %s",
 		systemInfo.kernel_build_date, systemInfo.kernel_build_time);
 
-	stringView = new BStringView(r, "kerneltext", string);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
+	BStringView* kernelView = new BStringView("kerneltext", string);
+	kernelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
 	// Uptime
-	r.OffsetBy(0, textHeight * 1.5);
-	r.bottom = r.top + labelHeight;
-	stringView = new BStringView(r, "uptimelabel", "Time Running:");
-	stringView->SetFont(be_bold_font);
-	fInfoView->AddChild(stringView);
-	stringView->ResizeToPreferred();
-
-	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight * 3;
-
-	fUptimeView = new BTextView(r, "uptimetext", r.OffsetToCopy(0,0), B_FOLLOW_ALL);
+	fUptimeView = new BTextView("uptimetext");
 	fUptimeView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fUptimeView->MakeEditable(false);
 	fUptimeView->MakeSelectable(false);
 	fUptimeView->SetWordWrap(true);
-	fInfoView->AddChild(fUptimeView);
-	// string width changes, so we don't do ResizeToPreferred()
 
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 
-	// Begin construction of the credits view
-	r = Bounds();
-	r.left += fInfoView->Bounds().right + 1;
-	r.right -= B_V_SCROLL_BAR_WIDTH;
+	const float offset = 5;
 
-	fCreditsView = new HyperTextView(r, "credits",
-		r.OffsetToCopy(0, 0).InsetByCopy(5, 5), B_FOLLOW_ALL);
-	fCreditsView->SetFlags(fCreditsView->Flags() | B_FRAME_EVENTS );
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+
+	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
+		.AddGroup(B_VERTICAL)
+			.Add(new LogoView())
+			.AddGroup(B_VERTICAL)
+				.Add(_CreateLabel("oslabel", "Version:"))
+				.Add(versionView)
+#if __GNUC__ != 2
+				.Add(gccView)
+#endif
+				.AddStrut(offset)
+				.Add(_CreateLabel("cpulabel", processorLabel))
+				.Add(cpuView)
+				.Add(frequencyView)
+				.AddStrut(offset)
+				.Add(_CreateLabel("memlabel", "Memory:"))
+				.Add(fMemView)
+				.AddStrut(offset)
+				.Add(_CreateLabel("kernellabel", "Kernel:"))
+				.Add(kernelView)
+				.AddStrut(offset)
+				.Add(_CreateLabel("uptimelabel", "Time Running:"))
+				.Add(fUptimeView)
+				.SetInsets(5, 5, 5, 5)
+			.End()
+			// TODO: investigate: adding this causes the time to be cut
+			//.AddGlue()
+		.End()
+		.Add(_CreateCreditsView());
+
+	float min = fMemView->MinSize().width * 1.1f;
+	fCreditsView->SetExplicitMinSize(BSize(min, min));
+}
+
+
+AboutView::~AboutView()
+{
+	delete fScrollRunner;
+}
+
+
+void
+AboutView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	Window()->SetPulseRate(500000);
+	SetEventMask(B_POINTER_EVENTS);
+}
+
+
+void
+AboutView::MouseDown(BPoint point)
+{
+	BRect r(92, 26, 105, 31);
+	if (r.Contains(point)) {
+		printf("Easter Egg\n");
+		PickRandomHaiku();
+	}
+
+	if (Bounds().Contains(point)) {
+		fLastActionTime = system_time();
+		delete fScrollRunner;
+		fScrollRunner = NULL;
+	}
+}
+
+
+void
+AboutView::Pulse()
+{
+	char string[255];
+	system_info info;
+	get_system_info(&info);
+	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
+	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
+
+	if (fScrollRunner == NULL && system_time() > fLastActionTime + 10000000) {
+		BMessage message(SCROLL_CREDITS_VIEW);
+		//fScrollRunner = new BMessageRunner(this, &message, 25000, -1);
+	}
+}
+
+
+void
+AboutView::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case SCROLL_CREDITS_VIEW:
+		{
+			BScrollBar *scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
+			if (scrollBar == NULL)
+				break;
+			float max, min;
+			scrollBar->GetRange(&min, &max);
+			if (scrollBar->Value() < max)
+				fCreditsView->ScrollBy(0, 1);
+
+			break;
+		}
+
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
+}
+
+
+void
+AboutView::AddCopyrightEntry(const char *name, const char *text,
+	const char *url)
+{
+	AddCopyrightEntry(name, text, StringVector(), url);
+}
+
+
+void
+AboutView::AddCopyrightEntry(const char *name, const char *text,
+	const StringVector& licenses, const char *url)
+{
+	BFont font(be_bold_font);
+	//font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuYellow);
+	fCreditsView->Insert(name);
+	fCreditsView->Insert("\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(text);
+	fCreditsView->Insert("\n");
+
+	if (licenses.CountStrings() > 0) {
+		if (licenses.CountStrings() > 1)
+			fCreditsView->Insert("Licenses: ");
+		else
+			fCreditsView->Insert("License: ");
+
+		for (int32 i = 0; i < licenses.CountStrings(); i++) {
+			const char* license = licenses.StringAt(i);
+
+			if (i > 0)
+				fCreditsView->Insert(", ");
+
+			BPath licensePath;
+			if (_GetLicensePath(license, licensePath) == B_OK) {
+				fCreditsView->InsertHyperText(license,
+					new OpenFileAction(licensePath.Path()));
+			} else
+				fCreditsView->Insert(license);
+		}
+
+		fCreditsView->Insert("\n");
+	}
+
+	if (url) {
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
+		fCreditsView->InsertHyperText(url, new URLAction(url));
+		fCreditsView->Insert("\n");
+	}
+	fCreditsView->Insert("\n");
+}
+
+
+void
+AboutView::PickRandomHaiku()
+{
+	BFile fortunes(
+#ifdef __HAIKU__
+		"/etc/fortunes/Haiku",
+#else
+		"data/etc/fortunes/Haiku",
+#endif
+		B_READ_ONLY);
+	struct stat st;
+	if (fortunes.InitCheck() < B_OK)
+		return;
+	if (fortunes.GetStat(&st) < B_OK)
+		return;
+	char *buff = (char *)malloc((size_t)st.st_size + 1);
+	if (!buff)
+		return;
+	buff[(size_t)st.st_size] = '\0';
+	BList haikuList;
+	if (fortunes.Read(buff, (size_t)st.st_size) == (ssize_t)st.st_size) {
+		char *p = buff;
+		while (p && *p) {
+			char *e = strchr(p, '%');
+			BString *s = new BString(p, e ? (e - p) : -1);
+			haikuList.AddItem(s);
+			p = e;
+			if (p && (*p == '%'))
+				p++;
+			if (p && (*p == '\n'))
+				p++;
+		}
+	}
+	free(buff);
+	if (haikuList.CountItems() < 1)
+		return;
+	BString *s = (BString *)haikuList.ItemAt(rand() % haikuList.CountItems());
+	BFont font(be_bold_font);
+	font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+	fCreditsView->SelectAll();
+	fCreditsView->Delete();
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(s->String());
+	fCreditsView->Insert("\n");
+	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
+		delete s;
+	}
+}
+
+
+BView*
+AboutView::_CreateLabel(const char* name, const char* label)
+{
+	BStringView* labelView = new BStringView(name, label);
+	labelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	labelView->SetFont(be_bold_font);
+	return labelView;
+}
+
+
+BView*
+AboutView::_CreateCreditsView()
+{
+	// Begin construction of the credits view
+	fCreditsView = new HyperTextView("credits");
+	fCreditsView->SetFlags(fCreditsView->Flags() | B_FRAME_EVENTS);
 	fCreditsView->SetStylable(true);
 	fCreditsView->MakeEditable(false);
 	fCreditsView->SetWordWrap(true);
+	fCreditsView->SetInsets(5, 5, 5, 5);
 
-	BScrollView *creditsScroller = new BScrollView("creditsScroller",
-		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true,
+	BScrollView* creditsScroller = new BScrollView("creditsScroller",
+		fCreditsView, B_WILL_DRAW | B_FRAME_EVENTS, false, true,
 		B_PLAIN_BORDER);
-	AddChild(creditsScroller);
 
 	// Haiku copyright
 	BFont font(be_bold_font);
@@ -375,6 +673,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("Haiku\n");
 
+	char string[1024];
 	time_t time = ::time(NULL);
 	struct tm* tm = localtime(&time);
 	int32 year = tm->tm_year + 1900;
@@ -857,202 +1156,8 @@ AboutView::AboutView(const BRect &rect)
 
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
-}
 
-
-AboutView::~AboutView(void)
-{
-	delete fScrollRunner;
-}
-
-
-void
-AboutView::AttachedToWindow(void)
-{
-	BView::AttachedToWindow();
-	Window()->SetPulseRate(500000);
-	SetEventMask(B_POINTER_EVENTS);
-}
-
-
-void
-AboutView::MouseDown(BPoint pt)
-{
-	BRect r(92, 26, 105, 31);
-	if (r.Contains(pt)) {
-		printf("Easter Egg\n");
-		PickRandomHaiku();
-	}
-
-	if (Bounds().Contains(pt)) {
-		fLastActionTime = system_time();
-		delete fScrollRunner;
-		fScrollRunner = NULL;
-	}
-}
-
-
-void
-AboutView::FrameResized(float width, float height)
-{
-	BRect r = fCreditsView->Bounds();
-	r.OffsetTo(B_ORIGIN);
-	r.InsetBy(3, 3);
-	fCreditsView->SetTextRect(r);
-}
-
-
-void
-AboutView::Draw(BRect update)
-{
-	if (fLogo)
-		DrawBitmap(fLogo, fDrawPoint);
-}
-
-
-void
-AboutView::Pulse(void)
-{
-	char string[255];
-	system_info info;
-	get_system_info(&info);
-	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
-	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
-
-	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
-		BMessage message(SCROLL_CREDITS_VIEW);
-		//fScrollRunner = new BMessageRunner(this, &message, 300000, -1);
-	}
-}
-
-
-void
-AboutView::MessageReceived(BMessage *msg)
-{
-	switch (msg->what) {
-		case SCROLL_CREDITS_VIEW:
-		{
-			BScrollBar *scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
-			if (scrollBar == NULL)
-				break;
-			float max, min;
-			scrollBar->GetRange(&min, &max);
-			if (scrollBar->Value() < max)
-				fCreditsView->ScrollBy(0, 5);
-
-			break;
-		}
-
-		default:
-			BView::MessageReceived(msg);
-			break;
-	}
-}
-
-
-void
-AboutView::AddCopyrightEntry(const char *name, const char *text,
-	const char *url)
-{
-	AddCopyrightEntry(name, text, StringVector(), url);
-}
-
-
-void
-AboutView::AddCopyrightEntry(const char *name, const char *text,
-	const StringVector& licenses, const char *url)
-{
-	BFont font(be_bold_font);
-	//font.SetSize(be_bold_font->Size());
-	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuYellow);
-	fCreditsView->Insert(name);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(text);
-	fCreditsView->Insert("\n");
-
-	if (licenses.CountStrings() > 0) {
-		if (licenses.CountStrings() > 1)
-			fCreditsView->Insert("Licenses: ");
-		else
-			fCreditsView->Insert("License: ");
-
-		for (int32 i = 0; i < licenses.CountStrings(); i++) {
-			const char* license = licenses.StringAt(i);
-
-			if (i > 0)
-				fCreditsView->Insert(", ");
-
-			BPath licensePath;
-			if (_GetLicensePath(license, licensePath) == B_OK) {
-				fCreditsView->InsertHyperText(license,
-					new OpenFileAction(licensePath.Path()));
-			} else
-				fCreditsView->Insert(license);
-		}
-
-		fCreditsView->Insert("\n");
-	}
-
-	if (url) {
-		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-		fCreditsView->InsertHyperText(url, new URLAction(url));
-		fCreditsView->Insert("\n");
-	}
-	fCreditsView->Insert("\n");
-}
-
-
-void
-AboutView::PickRandomHaiku()
-{
-	BFile fortunes(
-#ifdef __HAIKU__
-		"/etc/fortunes/Haiku",
-#else
-		"data/etc/fortunes/Haiku",
-#endif
-		B_READ_ONLY);
-	struct stat st;
-	if (fortunes.InitCheck() < B_OK)
-		return;
-	if (fortunes.GetStat(&st) < B_OK)
-		return;
-	char *buff = (char *)malloc((size_t)st.st_size + 1);
-	if (!buff)
-		return;
-	buff[(size_t)st.st_size] = '\0';
-	BList haikuList;
-	if (fortunes.Read(buff, (size_t)st.st_size) == (ssize_t)st.st_size) {
-		char *p = buff;
-		while (p && *p) {
-			char *e = strchr(p, '%');
-			BString *s = new BString(p, e ? (e - p) : -1);
-			haikuList.AddItem(s);
-			p = e;
-			if (p && (*p == '%'))
-				p++;
-			if (p && (*p == '\n'))
-				p++;
-		}
-	}
-	free(buff);
-	if (haikuList.CountItems() < 1)
-		return;
-	BString *s = (BString *)haikuList.ItemAt(rand() % haikuList.CountItems());
-	BFont font(be_bold_font);
-	font.SetSize(be_bold_font->Size());
-	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
-	fCreditsView->SelectAll();
-	fCreditsView->Delete();
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(s->String());
-	fCreditsView->Insert("\n");
-	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
-		delete s;
-	}
+	return new CropView(creditsScroller, 0, 1, 1, 1);
 }
 
 

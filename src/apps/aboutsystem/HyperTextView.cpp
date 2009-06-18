@@ -86,6 +86,13 @@ public:
 };
 
 
+HyperTextView::HyperTextView(const char* name, uint32 flags)
+	:
+	BTextView(name, flags),
+	fActionInfos(new ActionInfoList(100, true))
+{
+}
+
 
 HyperTextView::HyperTextView(BRect frame, const char* name, BRect textRect,
 	uint32 resizeMask, uint32 flags)
