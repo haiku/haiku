@@ -9,6 +9,11 @@
 
 #include <stdio.h>
 
+#include <Locker.h>
+
+#include <AutoLocker.h>
+#include <util/DoublyLinkedList.h>
+
 #include "debug_utils.h"
 
 #include "ArchitectureX86.h"
@@ -18,14 +23,211 @@
 #include "ThreadInfo.h"
 
 
+// number of debug contexts the pool does initially create
+static const int kInitialDebugContextCount = 3;
+
+// maximum number of debug contexts in the pool
+static const int kMaxDebugContextCount = 10;
+
+
+struct DebuggerInterface::DebugContext : debug_context,
+		DoublyLinkedListLinkImpl<DebugContext> {
+	DebugContext()
+	{
+		team = -1;
+		nub_port = -1;
+		reply_port = -1;
+	}
+
+	~DebugContext()
+	{
+		if (reply_port >= 0)
+			destroy_debug_context(this);
+	}
+
+	status_t Init(team_id team, port_id nubPort)
+	{
+		return init_debug_context(this, team, nubPort);
+	}
+
+	void Close()
+	{
+		if (reply_port >= 0) {
+			destroy_debug_context(this);
+			team = -1;
+			nub_port = -1;
+			reply_port = -1;
+		}
+	}
+};
+
+
+struct DebuggerInterface::DebugContextPool {
+	DebugContextPool(team_id team, port_id nubPort)
+		:
+		fLock("debug context pool"),
+		fTeam(team),
+		fNubPort(nubPort),
+		fBlockSem(-1),
+		fContextCount(0),
+		fWaiterCount(0),
+		fClosed(false)
+	{
+	}
+
+	~DebugContextPool()
+	{
+		AutoLocker<BLocker> locker(fLock);
+
+		while (DebugContext* context = fFreeContexts.RemoveHead())
+			delete context;
+
+		if (fBlockSem >= 0)
+			delete_sem(fBlockSem);
+	}
+
+	status_t Init()
+	{
+		status_t error = fLock.InitCheck();
+		if (error != B_OK)
+			return error;
+
+		fBlockSem = create_sem(0, "debug context pool block");
+		if (fBlockSem < 0)
+			return fBlockSem;
+
+		for (int i = 0; i < kInitialDebugContextCount; i++) {
+			DebugContext* context;
+			error = _CreateDebugContext(context);
+			if (error != B_OK)
+				return error;
+
+			fFreeContexts.Add(context);
+		}
+
+		return B_OK;
+	}
+
+	void Close()
+	{
+		AutoLocker<BLocker> locker(fLock);
+		fClosed = true;
+
+		for (DebugContextList::Iterator it = fFreeContexts.GetIterator();
+				DebugContext* context = it.Next();) {
+			context->Close();
+		}
+
+		for (DebugContextList::Iterator it = fUsedContexts.GetIterator();
+				DebugContext* context = it.Next();) {
+			context->Close();
+		}
+	}
+
+	DebugContext* GetContext()
+	{
+		AutoLocker<BLocker> locker(fLock);
+		DebugContext* context = fFreeContexts.RemoveHead();
+
+		if (context == NULL) {
+			if (fContextCount >= kMaxDebugContextCount
+				|| _CreateDebugContext(context) != B_OK) {
+				// wait for a free context
+				while (context == NULL) {
+					fWaiterCount++;
+					locker.Unlock();
+					while (acquire_sem(fBlockSem) != B_OK);
+					locker.Lock();
+					context = fFreeContexts.RemoveHead();
+				}
+			}
+		}
+
+		fUsedContexts.Add(context);
+
+		return context;
+	}
+
+	void PutContext(DebugContext* context)
+	{
+		AutoLocker<BLocker> locker(fLock);
+		fUsedContexts.Remove(context);
+		fFreeContexts.Add(context);
+
+		if (fWaiterCount > 0)
+			release_sem(fBlockSem);
+	}
+
+private:
+	typedef DoublyLinkedList<DebugContext> DebugContextList;
+
+private:
+	status_t _CreateDebugContext(DebugContext*& _context)
+	{
+		DebugContext* context = new(std::nothrow) DebugContext;
+		if (context == NULL)
+			return B_NO_MEMORY;
+
+		if (!fClosed) {
+			status_t error = context->Init(fTeam, fNubPort);
+			if (error != B_OK) {
+				delete context;
+				return error;
+			}
+		}
+
+		fContextCount++;
+
+		_context = context;
+		return B_OK;
+	}
+
+private:
+	BLocker				fLock;
+	team_id				fTeam;
+	port_id				fNubPort;
+	sem_id				fBlockSem;
+	int32				fContextCount;
+	int32				fWaiterCount;
+	DebugContextList	fFreeContexts;
+	DebugContextList	fUsedContexts;
+	bool				fClosed;
+};
+
+
+struct DebuggerInterface::DebugContextGetter {
+	DebugContextGetter(DebugContextPool* pool)
+		:
+		fPool(pool),
+		fContext(pool->GetContext())
+	{
+	}
+
+	~DebugContextGetter()
+	{
+		fPool->PutContext(fContext);
+	}
+
+	DebugContext* Context() const
+	{
+		return fContext;
+	}
+
+private:
+	DebugContextPool*	fPool;
+	DebugContext*		fContext;
+};
+
+// #pragma mark - DebuggerInterface
+
 DebuggerInterface::DebuggerInterface(team_id teamID)
 	:
 	fTeamID(teamID),
 	fDebuggerPort(-1),
 	fNubPort(-1),
+	fDebugContextPool(NULL),
 	fArchitecture(NULL)
 {
-	fDebugContext.reply_port = -1;
 }
 
 
@@ -33,9 +235,9 @@ DebuggerInterface::~DebuggerInterface()
 {
 	fArchitecture->RemoveReference();
 
-	destroy_debug_context(&fDebugContext);
-
 	Close();
+
+	delete fDebugContextPool;
 }
 
 
@@ -64,8 +266,12 @@ DebuggerInterface::Init()
 	if (fNubPort < 0)
 		return fNubPort;
 
-	// init debug context
-	status_t error = init_debug_context(&fDebugContext, fTeamID, fNubPort);
+	// create debug context pool
+	fDebugContextPool = new(std::nothrow) DebugContextPool(fTeamID, fNubPort);
+	if (fDebugContextPool == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fDebugContextPool->Init();
 	if (error != B_OK)
 		return error;
 
@@ -203,13 +409,15 @@ DebuggerInterface::GetThreadInfo(thread_id thread, ThreadInfo& info)
 status_t
 DebuggerInterface::GetCpuState(thread_id thread, CpuState*& _state)
 {
+	DebugContextGetter contextGetter(fDebugContextPool);
+
 	debug_nub_get_cpu_state message;
-	message.reply_port = fDebugContext.reply_port;
+	message.reply_port = contextGetter.Context()->reply_port;
 	message.thread = thread;
 
 	debug_nub_get_cpu_state_reply reply;
 
-	status_t error = send_debug_message(&fDebugContext,
+	status_t error = send_debug_message(contextGetter.Context(),
 		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), &reply,
 		sizeof(reply));
 	if (error != B_OK)

@@ -47,6 +47,11 @@ public:
 										// returns a reference to the caller
 
 private:
+	struct DebugContext;
+	struct DebugContextPool;
+	struct DebugContextGetter;
+
+private:
 			status_t			_CreateDebugEvent(int32 messageCode,
 									const debug_debugger_message_data& message,
 									bool& _ignore, DebugEvent*& _event);
@@ -55,8 +60,7 @@ private:
 			team_id				fTeamID;
 			port_id				fDebuggerPort;
 			port_id				fNubPort;
-			debug_context		fDebugContext;
-				// TODO: Use a debug context pool!
+			DebugContextPool*	fDebugContextPool;
 			Architecture*		fArchitecture;
 };
 
