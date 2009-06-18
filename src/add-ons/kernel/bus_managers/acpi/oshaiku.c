@@ -125,14 +125,14 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <OS.h>
-
+	
 #ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #include <vm.h>
 #include <PCI.h>
 extern pci_module_info *gPCIManager;
 #include <dpc.h>
-extern dpc_module_info *gDPC;
+dpc_module_info *gDPC = NULL;
 extern void *gDPCHandle;
 #endif
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Clemens Zeidler, haiku@clemens-zeidler.de
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Bryan Varner. All rights reserved.
  * Copyright 2005, Nathan Whitehorn. All rights reserved.
@@ -170,6 +171,98 @@ acpi_std_ops(int32 op,...)
 	return B_OK;
 }
 
+
+status_t
+get_handle(acpi_handle parent, char *pathname, acpi_handle *retHandle)
+{
+	return AcpiGetHandle(parent, pathname, retHandle) == AE_OK
+		? B_OK : B_ERROR;
+}
+
+
+status_t
+acquire_global_lock(uint16 timeout, uint32 *handle)
+{
+	return AcpiAcquireGlobalLock(timeout, (UINT32*)handle) == AE_OK
+		? B_OK : B_ERROR;
+}
+
+
+status_t
+release_global_lock(uint32 handle)
+{
+	return AcpiReleaseGlobalLock(handle) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+install_notify_handler(acpi_handle device, uint32 handlerType,
+	acpi_notify_handler handler, void *context)
+{
+	return AcpiInstallNotifyHandler(device, handlerType,
+		(ACPI_NOTIFY_HANDLER)handler, context) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+remove_notify_handler(acpi_handle device, uint32 handlerType,
+	acpi_notify_handler handler)
+{
+	return AcpiRemoveNotifyHandler(device, handlerType,
+		(ACPI_NOTIFY_HANDLER)handler) == AE_OK ? B_OK : B_ERROR;
+}
+
+    
+status_t
+enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags)
+{	
+	return AcpiEnableGpe(handle, gpeNumber, flags) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+set_gpe_type(acpi_handle handle, uint32 gpeNumber, uint8 type)
+{	
+	return AcpiSetGpeType(handle, gpeNumber, type) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
+	acpi_event_handler handler, void *data)
+{		
+	return AcpiInstallGpeHandler(handle, gpeNumber, type,
+		(ACPI_EVENT_HANDLER)handler, data) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+remove_gpe_handler(acpi_handle handle, uint32 gpeNumber,
+	acpi_event_handler address)
+{
+	return AcpiRemoveGpeHandler(handle, gpeNumber, (ACPI_EVENT_HANDLER)address)
+		== AE_OK ? B_OK : B_ERROR;
+}
+
+	
+status_t
+install_address_space_handler(acpi_handle handle, uint32 spaceId,
+	acpi_adr_space_handler handler, acpi_adr_space_setup setup,	void *data)
+{	
+	return AcpiInstallAddressSpaceHandler(handle, spaceId,
+		(ACPI_ADR_SPACE_HANDLER)handler, (ACPI_ADR_SPACE_SETUP)setup, data)
+		== AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+remove_address_space_handler(acpi_handle handle, uint32 spaceId,
+	acpi_adr_space_handler handler)
+{	
+	return AcpiRemoveAddressSpaceHandler(handle, spaceId,
+		(ACPI_ADR_SPACE_HANDLER)handler) == AE_OK ? B_OK : B_ERROR;
+}
+					
 
 void
 enable_fixed_event(uint32 event)
@@ -391,29 +484,16 @@ evaluate_object(const char* object, acpi_object_type* returnValue,
 
 
 status_t
-evaluate_method(const char* object, const char* method,
-	acpi_object_type *returnValue, size_t bufferLength, acpi_object_type *args,
-	int numArgs)
+evaluate_method(acpi_handle handle, const char* method,
+	acpi_objects *args, acpi_data *returnValue)
 {
-	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
-	ACPI_OBJECT_LIST acpiArgs;
-	ACPI_HANDLE handle;
-
-	if (AcpiGetHandle(NULL, (ACPI_STRING)object, &handle) != AE_OK)
-		return B_ENTRY_NOT_FOUND;
-
-	buffer.Pointer = returnValue;
-	buffer.Length = bufferLength;
-
-	acpiArgs.Count = numArgs;
-	acpiArgs.Pointer = (ACPI_OBJECT *)args;
-
+	
 	status = AcpiEvaluateObject(handle, (ACPI_STRING)method,
-		args != NULL ? &acpiArgs : NULL, returnValue != NULL ? &buffer : NULL);
+		(ACPI_OBJECT_LIST*)args, (ACPI_BUFFER*)returnValue);
 	if (status == AE_BUFFER_OVERFLOW)
 		dprintf("evaluate_method: the passed buffer is too small!\n");
-
+		
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -475,6 +555,17 @@ struct acpi_module_info gACPIModule = {
 		acpi_std_ops
 	},
 
+	get_handle,
+	acquire_global_lock,
+	release_global_lock,
+	install_notify_handler,
+	remove_notify_handler,
+	enable_gpe,
+	set_gpe_type,
+	install_gpe_handler,
+	remove_gpe_handler,
+	install_address_space_handler,
+	remove_address_space_handler,
 	enable_fixed_event,
 	disable_fixed_event,
 	fixed_event_status,

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Clemens Zeidler. All rights reserved.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -22,7 +23,6 @@
 
 device_manager_info *gDeviceManager = NULL;
 pci_module_info *gPCIManager = NULL;
-dpc_module_info *gDPC = NULL;
 
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
@@ -217,6 +217,17 @@ static struct acpi_root_info sACPIRootModule = {
 		NULL,	// device removed
 	},
 
+	get_handle,
+	acquire_global_lock,
+	release_global_lock,
+	install_notify_handler,
+	remove_notify_handler,
+	enable_gpe,
+	set_gpe_type,
+	install_gpe_handler,
+	remove_gpe_handler,
+	install_address_space_handler,
+	remove_address_space_handler,
 	enable_fixed_event,
 	disable_fixed_event,
 	fixed_event_status,

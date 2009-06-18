@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Clemens Zeidler. All rights reserved.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -9,15 +10,40 @@
 #include <stdlib.h>
 
 #include "acpi_priv.h"
+#include "acpi.h"
 
-// information about one ACPI device
-typedef struct acpi_device_info {
-	char			*path;			// path
-	uint32			type;			// type	
-	device_node		*node;
-	char			name[32];		// name (for fast log)
-} acpi_device_info;
 
+static status_t
+acpi_install_notify_handler(acpi_device device,	uint32 handlerType,
+	acpi_notify_handler handler, void *context)
+{
+	return install_notify_handler(device->handle, handlerType, handler,
+		context);
+}
+
+static status_t
+acpi_remove_notify_handler(acpi_device device, uint32 handlerType,
+	acpi_notify_handler handler)
+{
+	return remove_notify_handler(device->handle, handlerType, handler);
+}
+
+
+static status_t
+acpi_install_address_space_handler(acpi_device device, uint32 spaceId,
+	acpi_adr_space_handler handler,	acpi_adr_space_setup setup,	void *data)
+{
+	return install_address_space_handler(device->handle, spaceId, handler,
+		setup, data);
+}
+
+static status_t
+acpi_remove_address_space_handler(acpi_device device, uint32 spaceId,
+	acpi_adr_space_handler handler)
+{
+	return remove_address_space_handler(device->handle, spaceId, handler);
+}
+					
 
 static uint32 
 acpi_get_object_type(acpi_device device)
@@ -39,18 +65,19 @@ acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_
 
 
 static status_t 
-acpi_evaluate_method(acpi_device device, const char *method, acpi_object_type *return_value, 
-	size_t buf_len, acpi_object_type *args, int num_args) 
+acpi_evaluate_method(acpi_device device, const char *method,
+	acpi_objects *args, acpi_data *returnValue) 
 {
-	return evaluate_method(device->path, method, return_value, buf_len, args, num_args);
+	return evaluate_method(device->handle, method, args, returnValue);
 }
 
 
 static status_t
 acpi_device_init_driver(device_node *node, void **cookie)
 {
+	ACPI_HANDLE handle;
 	const char *path;
-	acpi_device_info *device;
+	acpi_device_cookie *device;
 	status_t status = B_OK;
 	uint32 type;
 	
@@ -62,9 +89,13 @@ acpi_device_init_driver(device_node *node, void **cookie)
 	device = malloc(sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
-
+	
 	memset(device, 0, sizeof(*device));
 
+	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	device->handle = handle;
 	device->path = strdup(path);
 	device->type = type;
 	device->node = node;
@@ -81,7 +112,7 @@ acpi_device_init_driver(device_node *node, void **cookie)
 static void
 acpi_device_uninit_driver(void *cookie)
 {
-	acpi_device_info *device = cookie;
+	acpi_device_cookie *device = cookie;
 	
 	free(device->path);
 	free(device);
@@ -100,6 +131,7 @@ acpi_device_std_ops(int32 op, ...)
 	return B_BAD_VALUE;
 }
 
+					
 acpi_device_module_info gACPIDeviceModule = {
 	{
 		{
@@ -116,6 +148,10 @@ acpi_device_module_info gACPIDeviceModule = {
 		NULL,	// rescan devices
 		NULL,	// device removed
 	},
+	acpi_install_notify_handler,
+	acpi_remove_notify_handler,
+	acpi_install_address_space_handler,
+	acpi_remove_address_space_handler,
 	acpi_get_object_type,
 	acpi_get_object,
 	acpi_evaluate_method,

@@ -15,54 +15,29 @@ typedef struct acpi_object_type acpi_object_type;
 
 #define B_ACPI_MODULE_NAME "bus_managers/acpi/v1"
 
-struct acpi_module_info {
-	module_info info;
+/* This must be uint64 for 64 bit! */
+typedef uint32 acpi_physical_address;
+typedef uint32 acpi_io_address;
+typedef uint32 acpi_size;
 
-	/* Fixed Event Management */
-
-	void		(*enable_fixed_event)(uint32 event);
-	void		(*disable_fixed_event)(uint32 event);
-
-	uint32		(*fixed_event_status) (uint32 event);
-					/* Returns 1 if event set, 0 otherwise */
-	void		(*reset_fixed_event) (uint32 event);
-
-	status_t	(*install_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler, void *data);
-	status_t	(*remove_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler);
-
-	/* Namespace Access */
-
-	status_t	(*get_next_entry)(uint32 objectType, const char *base,
-					char *result, size_t length, void **_counter);
-	status_t	(*get_device)(const char *hid, uint32 index, char *result,
-					size_t resultLength);
-
-	status_t	(*get_device_hid)(const char *path, char *hid, size_t hidLength);
-	uint32		(*get_object_type)(const char *path);
-	status_t	(*get_object)(const char *path,
-					acpi_object_type **_returnValue);
-	status_t	(*get_object_typed)(const char *path,
-					acpi_object_type **_returnValue, uint32 objectType);
-
-	/* Control method execution and data acquisition */
-
-	status_t	(*evaluate_object)(const char *object,
-					acpi_object_type *returnValue, size_t bufferLength);
-	status_t	(*evaluate_method)(const char *object, const char *method,
-					acpi_object_type *returnValue, size_t bufferLength,
-					acpi_object_type *args, int numArgs);
-
-	/* Power state setting */
-
-	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
-					size_t size);
-	status_t	(*enter_sleep_state)(uint8 state);
-};
-
+/* Actually a ptr to a NS Node */
+typedef void *				acpi_handle;
 
 #ifndef __ACTYPES_H__
+
+/* Address Space (Operation Region) Types */
+
+enum {
+	ACPI_ADR_SPACE_SYSTEM_MEMORY	= 0,
+	ACPI_ADR_SPACE_SYSTEM_IO		= 1,
+	ACPI_ADR_SPACE_PCI_CONFIG		= 2,
+	ACPI_ADR_SPACE_EC				= 3,
+	ACPI_ADR_SPACE_SMBUS			= 4,
+	ACPI_ADR_SPACE_CMOS 			= 5,
+	ACPI_ADR_SPACE_PCI_BAR_TARGET	= 6,
+	ACPI_ADR_SPACE_DATA_TABLE		= 7,
+	ACPI_ADR_SPACE_FIXED_HARDWARE	= 127
+};
 
 /* ACPI fixed event types */
 
@@ -91,7 +66,8 @@ enum {
 	ACPI_TYPE_POWER,
 	ACPI_TYPE_PROCESSOR,
 	ACPI_TYPE_THERMAL,
-	ACPI_TYPE_BUFFER_FIELD
+	ACPI_TYPE_BUFFER_FIELD,
+	ACPI_TYPE_LOCAL_REFERENCE = 0x14
 };
 
 /* ACPI control method arg type */
@@ -112,6 +88,12 @@ struct acpi_object_type {
 			uint32 count;
 			acpi_object_type *objects;
 		} package;
+		struct
+	    {
+	        uint32 type;
+	        uint32 actual_type;
+	        acpi_handle handle;
+	    } reference;
 		struct {
 			uint32 cpu_id;
 			int pblk_address;
@@ -124,7 +106,126 @@ struct acpi_object_type {
 	} data;
 };
 
+
+/*
+ * List of objects, used as a parameter list for control method evaluation
+ */
+typedef struct acpi_objects {
+    uint32				count;
+    acpi_object_type	*pointer;
+} acpi_objects;
+
+
+typedef struct acpi_data {
+    acpi_size			length;         /* Length in bytes of the buffer */
+    void				*pointer;       /* pointer to buffer */
+} acpi_data;
+
+
+enum {
+	ACPI_ALLOCATE_BUFFER = -1,
+};
+
+    
 #endif	// __ACTYPES_H__
+
+
+typedef uint32 (*acpi_event_handler)(void *Context);
+
+typedef status_t (*acpi_adr_space_handler)(uint32 function,
+	acpi_physical_address address, uint32 bitWidth, int *value,
+	void *handlerContext, void *regionContext);
+
+typedef status_t (*acpi_adr_space_setup)(acpi_handle regionHandle,
+	uint32 function, void *handlerContext, void **regionContext);
+
+typedef void (*acpi_notify_handler)(acpi_handle device, uint32 value,
+	void *context);
+
+
+struct acpi_module_info {
+	module_info info;
+
+	status_t	(*get_handle)(acpi_handle parent, char *pathname,
+					acpi_handle *retHandle);
+    
+	/* Global Lock */
+
+	status_t	(*acquire_global_lock)(uint16 timeout, uint32 *handle);
+	status_t	(*release_global_lock)(uint32 handle);
+
+	/* Notify Handler */
+
+    status_t	(*install_notify_handler)(acpi_handle device,
+    				uint32 handlerType, acpi_notify_handler handler,
+    				void *context);
+	status_t	(*remove_notify_handler)(acpi_handle device,
+    				uint32 handlerType, acpi_notify_handler handler);
+
+	/* GPE Handler */
+	
+	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber,
+					uint32 flags);
+	status_t	(*set_gpe_type)(acpi_handle handle, uint32 gpeNumber,
+					uint8 type);
+	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
+					uint32 type, acpi_event_handler handler, void *data);
+	status_t	(*remove_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
+					acpi_event_handler address);
+
+	/* Address Space Handler */
+	
+	status_t	(*install_address_space_handler)(acpi_handle handle,
+					uint32 spaceId,
+					acpi_adr_space_handler handler,
+					acpi_adr_space_setup setup,	void *data);
+	status_t	(*remove_address_space_handler)(acpi_handle handle,
+					uint32 spaceId,
+					acpi_adr_space_handler handler);
+
+	/* Fixed Event Management */
+
+	void		(*enable_fixed_event)(uint32 event);
+	void		(*disable_fixed_event)(uint32 event);
+
+	uint32		(*fixed_event_status) (uint32 event);
+					/* Returns 1 if event set, 0 otherwise */
+	void		(*reset_fixed_event) (uint32 event);
+
+	status_t	(*install_fixed_event_handler)(uint32 event,
+					interrupt_handler *handler, void *data);
+	status_t	(*remove_fixed_event_handler)(uint32 event,
+					interrupt_handler *handler);
+
+	/* Namespace Access */
+
+	status_t	(*get_next_entry)(uint32 objectType, const char *base,
+					char *result, size_t length, void **_counter);
+	status_t	(*get_device)(const char *hid, uint32 index, char *result,
+					size_t resultLength);
+
+	status_t	(*get_device_hid)(const char *path, char *hid,
+					size_t hidLength);
+	uint32		(*get_object_type)(const char *path);
+	status_t	(*get_object)(const char *path,
+					acpi_object_type **_returnValue);
+	status_t	(*get_object_typed)(const char *path,
+					acpi_object_type **_returnValue, uint32 objectType);
+
+	/* Control method execution and data acquisition */
+
+	status_t	(*evaluate_object)(const char* object,
+					acpi_object_type *returnValue, size_t bufferLength);
+	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
+					acpi_objects *args, acpi_data *returnValue);
+
+	/* Power state setting */
+
+	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
+					size_t size);
+	status_t	(*enter_sleep_state)(uint8 state);
+};
+
 
 /* Sleep states */
 
@@ -143,11 +244,28 @@ enum {
 #define ACPI_DEVICE_TYPE_ITEM	"acpi/type"
 
 
-typedef struct acpi_device_info *acpi_device;
+typedef struct acpi_device_cookie *acpi_device;
 
 //	Interface to one ACPI device.
 typedef struct acpi_device_module_info {
 	driver_module_info info;
+
+	/* Notify Handler */
+
+	status_t	(*install_notify_handler)(acpi_device device,
+    				uint32 handlerType, acpi_notify_handler handler,
+    				void *context);
+	status_t	(*remove_notify_handler)(acpi_device device,
+    				uint32 handlerType, acpi_notify_handler handler);
+
+	/* Address Space Handler */
+	status_t	(*install_address_space_handler)(acpi_device device,
+					uint32 spaceId,
+					acpi_adr_space_handler handler,
+					acpi_adr_space_setup setup,	void *data);
+	status_t	(*remove_address_space_handler)(acpi_device device,
+					uint32 spaceId,
+					acpi_adr_space_handler handler);
 
 	/* Namespace Access */
 	uint32		(*get_object_type)(acpi_device device);
@@ -156,8 +274,7 @@ typedef struct acpi_device_module_info {
 
 	/* Control method execution and data acquisition */
 	status_t	(*evaluate_method)(acpi_device device, const char *method,
-					acpi_object_type *returnValue, size_t bufferLength,
-					acpi_object_type *args, int numArgs);
+					acpi_objects *args, acpi_data *returnValue);
 } acpi_device_module_info;
 
 
