@@ -365,9 +365,6 @@ AboutView::AboutView()
 
 	// GCC version
 #if __GNUC__ != 2
-	r.OffsetBy(0, textHeight);
-	r.bottom = r.top + textHeight;
-
 	snprintf(string, sizeof(string), "GCC %d", __GNUC__);
 
 	BStringView* gccView = new BStringView("gcctext", string);
