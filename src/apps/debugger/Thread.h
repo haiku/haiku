@@ -12,6 +12,8 @@
 #include <util/DoublyLinkedList.h>
 
 
+class CpuState;
+class StackTrace;
 class Team;
 
 
@@ -38,11 +40,19 @@ public:
 			uint32				State() const	{ return fState; }
 			void				SetState(uint32 state);
 
+			CpuState*			GetCpuState() const	{ return fCpuState; }
+			void				SetCpuState(CpuState* state);
+
+			StackTrace*			GetStackTrace() const	{ return fStackTrace; }
+			void				SetStackTrace(StackTrace* trace);
+
 private:
 			Team*				fTeam;
 			thread_id			fID;
 			BString				fName;
 			uint32				fState;
+			CpuState*			fCpuState;
+			StackTrace*			fStackTrace;
 };
 
 

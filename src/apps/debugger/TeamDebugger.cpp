@@ -337,4 +337,5 @@ TeamDebugger::_UpdateThreadState(::Thread* thread)
 		newState = THREAD_STATE_RUNNING;
 
 	thread->SetState(newState);
+	thread->SetCpuState(state);
 }

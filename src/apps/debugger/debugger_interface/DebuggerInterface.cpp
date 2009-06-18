@@ -11,6 +11,7 @@
 
 #include "debug_utils.h"
 
+#include "ArchitectureX86.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
@@ -21,7 +22,8 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 	:
 	fTeamID(teamID),
 	fDebuggerPort(-1),
-	fNubPort(-1)
+	fNubPort(-1),
+	fArchitecture(NULL)
 {
 	fDebugContext.reply_port = -1;
 }
@@ -29,6 +31,8 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 
 DebuggerInterface::~DebuggerInterface()
 {
+	fArchitecture->RemoveReference();
+
 	destroy_debug_context(&fDebugContext);
 
 	Close();
@@ -38,6 +42,16 @@ DebuggerInterface::~DebuggerInterface()
 status_t
 DebuggerInterface::Init()
 {
+	// create the architecture
+#ifdef ARCH_x86
+	fArchitecture = new(std::nothrow) ArchitectureX86(this);
+#else
+	return B_UNSUPPORTED;
+#endif
+
+	if (fArchitecture == NULL)
+		return B_NO_MEMORY;
+
 	// create debugger port
 	char buffer[128];
 	snprintf(buffer, sizeof(buffer), "team %ld debugger", fTeamID);
@@ -211,20 +225,47 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 				(target_addr_t)message.debugger_call.message);
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
+		{
+			CpuState* state = NULL;
+			status_t error = fArchitecture->CreateCpuState(
+				&message.breakpoint_hit.cpu_state,
+				sizeof(debug_cpu_state), state);
+			if (error != B_OK)
+				return error;
+
 			event = new(std::nothrow) BreakpointHitEvent(message.origin.team,
-				message.origin.thread, NULL);
-					// TODO: CpuState!
+				message.origin.thread, state);
+			state->RemoveReference();
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
+		{
+			CpuState* state = NULL;
+			status_t error = fArchitecture->CreateCpuState(
+				&message.watchpoint_hit.cpu_state,
+				sizeof(debug_cpu_state), state);
+			if (error != B_OK)
+				return error;
+
 			event = new(std::nothrow) WatchpointHitEvent(message.origin.team,
-				message.origin.thread, NULL);
-					// TODO: CpuState!
+				message.origin.thread, state);
+			state->RemoveReference();
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
+		{
+			CpuState* state = NULL;
+			status_t error = fArchitecture->CreateCpuState(
+				&message.single_step.cpu_state,
+				sizeof(debug_cpu_state), state);
+			if (error != B_OK)
+				return error;
+
 			event = new(std::nothrow) SingleStepEvent(message.origin.team,
-				message.origin.thread, NULL);
-					// TODO: CpuState!
+				message.origin.thread, state);
+			state->RemoveReference();
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			event = new(std::nothrow) ExceptionOccurredEvent(
 				message.origin.team, message.origin.thread,

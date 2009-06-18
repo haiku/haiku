@@ -11,6 +11,7 @@
 #include <ObjectList.h>
 
 
+class Architecture;
 class CpuState;
 class DebugEvent;
 class ImageInfo;
@@ -24,6 +25,9 @@ public:
 
 			status_t			Init();
 			void				Close();
+
+			Architecture*		GetArchitecture() const
+									{ return fArchitecture; }
 
 	virtual	status_t			GetNextDebugEvent(DebugEvent*& _event);
 
@@ -50,6 +54,8 @@ private:
 			port_id				fDebuggerPort;
 			port_id				fNubPort;
 			debug_context		fDebugContext;
+				// TODO: Use a debug context pool!
+			Architecture*		fArchitecture;
 };
 
 #endif	// DEBUGGER_INTERFACE_H

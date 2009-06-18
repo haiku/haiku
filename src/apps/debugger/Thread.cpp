@@ -5,18 +5,27 @@
 
 #include "Thread.h"
 
+#include "CpuState.h"
+#include "StackTrace.h"
+
 
 Thread::Thread(Team* team, thread_id threadID)
 	:
 	fTeam(team),
 	fID(threadID),
-	fState(THREAD_STATE_UNKNOWN)
+	fState(THREAD_STATE_UNKNOWN),
+	fCpuState(NULL),
+	fStackTrace(NULL)
 {
 }
 
 
 Thread::~Thread()
 {
+	if (fCpuState != NULL)
+		fCpuState->RemoveReference();
+	if (fStackTrace != NULL)
+		fStackTrace->RemoveReference();
 }
 
 
@@ -37,5 +46,45 @@ Thread::SetName(const BString& name)
 void
 Thread::SetState(uint32 state)
 {
+	if (state == fState)
+		return;
+
 	fState = state;
+
+	// unset CPU state and stack trace, if the thread isn't stopped
+	if (fState != THREAD_STATE_STOPPED) {
+		SetCpuState(NULL);
+		SetStackTrace(NULL);
+	}
+}
+
+
+void
+Thread::SetCpuState(CpuState* state)
+{
+	if (state == fCpuState)
+		return;
+
+	if (fCpuState != NULL)
+		fCpuState->RemoveReference();
+
+	fCpuState = state;
+
+	if (fCpuState != NULL)
+		fCpuState->AddReference();
+}
+
+void
+Thread::SetStackTrace(StackTrace* trace)
+{
+	if (trace == fStackTrace)
+		return;
+
+	if (fStackTrace != NULL)
+		fStackTrace->RemoveReference();
+
+	fStackTrace = trace;
+
+	if (fStackTrace != NULL)
+		fStackTrace->AddReference();
 }

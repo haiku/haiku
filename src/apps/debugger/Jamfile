@@ -6,6 +6,8 @@ C++FLAGS += -Werror ;
 UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 
@@ -17,7 +19,6 @@ SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) util ] ;
 
 Application Debugger :
-	CpuState.cpp
 	Debugger.cpp
 #	ElfFile.cpp
 	Image.cpp
@@ -28,17 +29,27 @@ Application Debugger :
 	Thread.cpp
 	ThreadInfo.cpp
 
-	# DebugAnalyzer:util
-	Variant.cpp
+	# arch
+	Architecture.cpp
+	CpuState.cpp
+	StackFrame.cpp
+	StackTrace.cpp
+
+	# arch/x86
+	ArchitectureX86.cpp
+	CpuStateX86.cpp
+
+	# debugger_interface
+	DebugEvent.cpp
+	DebuggerInterface.cpp
 
 	# gui/team_window
 	ImageListView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
 
-	# debugger_interface
-	DebugEvent.cpp
-	DebuggerInterface.cpp
+	# DebugAnalyzer:util
+	Variant.cpp
 
 # DWARF
 #	attribute_classes.cpp

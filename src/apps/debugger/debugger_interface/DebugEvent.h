@@ -7,11 +7,9 @@
 
 #include <debugger.h>
 
+#include "ArchitectureTypes.h"
 #include "ImageInfo.h"
 
-
-typedef uint64 target_addr_t;
-	// TODO: Define elsewhere!
 
 class CpuState;
 
