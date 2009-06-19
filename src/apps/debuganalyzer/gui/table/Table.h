@@ -20,7 +20,7 @@ class Table;
 class TableModel;
 
 
-class TableModelListener : public DoublyLinkedListLinkImpl<TableModelListener> {
+class TableModelListener {
 public:
 	virtual						~TableModelListener();
 
@@ -42,11 +42,11 @@ public:
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
 									Variant& value) = 0;
 
-	virtual	void				AddListener(TableModelListener* listener);
+	virtual	bool				AddListener(TableModelListener* listener);
 	virtual	void				RemoveListener(TableModelListener* listener);
 
 protected:
-			typedef DoublyLinkedList<TableModelListener> ListenerList;
+			typedef BObjectList<TableModelListener> ListenerList;
 
 protected:
 			void				NotifyRowsAdded(int32 rowIndex, int32 count);

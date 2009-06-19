@@ -66,25 +66,26 @@ TableModel::~TableModel()
 }
 
 
-void
+bool
 TableModel::AddListener(TableModelListener* listener)
 {
-	fListeners.Add(listener);
+	return fListeners.AddItem(listener);
 }
 
 
 void
 TableModel::RemoveListener(TableModelListener* listener)
 {
-	fListeners.Remove(listener);
+	fListeners.RemoveItem(listener);
 }
 
 
 void
 TableModel::NotifyRowsAdded(int32 rowIndex, int32 count)
 {
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			TableModelListener* listener = it.Next();) {
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableRowsAdded(this, rowIndex, count);
 	}
 }
@@ -93,8 +94,9 @@ TableModel::NotifyRowsAdded(int32 rowIndex, int32 count)
 void
 TableModel::NotifyRowsRemoved(int32 rowIndex, int32 count)
 {
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			TableModelListener* listener = it.Next();) {
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableRowsRemoved(this, rowIndex, count);
 	}
 }
@@ -103,8 +105,9 @@ TableModel::NotifyRowsRemoved(int32 rowIndex, int32 count)
 void
 TableModel::NotifyRowsChanged(int32 rowIndex, int32 count)
 {
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			TableModelListener* listener = it.Next();) {
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TableModelListener* listener = fListeners.ItemAt(i);
 		listener->TableRowsChanged(this, rowIndex, count);
 	}
 }
