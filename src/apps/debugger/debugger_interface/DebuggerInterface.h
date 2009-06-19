@@ -10,6 +10,8 @@
 #include <debug_support.h>
 #include <ObjectList.h>
 
+#include "ArchitectureTypes.h"
+
 
 class Architecture;
 class CpuState;
@@ -45,6 +47,9 @@ public:
 	virtual	status_t			GetCpuState(thread_id thread,
 									CpuState*& _state);
 										// returns a reference to the caller
+
+	ssize_t						ReadMemory(target_addr_t address, void* buffer,
+									size_t size);
 
 private:
 	struct DebugContext;

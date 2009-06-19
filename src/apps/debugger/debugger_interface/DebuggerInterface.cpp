@@ -434,6 +434,16 @@ DebuggerInterface::GetCpuState(thread_id thread, CpuState*& _state)
 }
 
 
+ssize_t
+DebuggerInterface::ReadMemory(target_addr_t address, void* buffer, size_t size)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	return debug_read_memory(contextGetter.Context(),
+		(const void*)(addr_t)address, buffer, size);
+}
+
+
 status_t
 DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 	const debug_debugger_message_data& message, bool& _ignore,
