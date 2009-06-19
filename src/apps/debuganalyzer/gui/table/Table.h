@@ -28,6 +28,8 @@ public:
 									int32 rowIndex, int32 count);
 	virtual	void				TableRowsRemoved(TableModel* model,
 									int32 rowIndex, int32 count);
+	virtual	void				TableRowsChanged(TableModel* model,
+									int32 rowIndex, int32 count);
 };
 
 
@@ -49,6 +51,7 @@ protected:
 protected:
 			void				NotifyRowsAdded(int32 rowIndex, int32 count);
 			void				NotifyRowsRemoved(int32 rowIndex, int32 count);
+			void				NotifyRowsChanged(int32 rowIndex, int32 count);
 
 protected:
 			ListenerList		fListeners;
@@ -117,6 +120,8 @@ private:
 	virtual	void				TableRowsAdded(TableModel* model,
 									int32 rowIndex, int32 count);
 	virtual	void				TableRowsRemoved(TableModel* model,
+									int32 rowIndex, int32 count);
+	virtual	void				TableRowsChanged(TableModel* model,
 									int32 rowIndex, int32 count);
 
 private:

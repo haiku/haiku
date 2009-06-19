@@ -51,6 +51,13 @@ TableModelListener::TableRowsRemoved(TableModel* model, int32 rowIndex,
 }
 
 
+void
+TableModelListener::TableRowsChanged(TableModel* model, int32 rowIndex,
+	int32 count)
+{
+}
+
+
 // #pragma mark - TableModel
 
 
@@ -89,6 +96,16 @@ TableModel::NotifyRowsRemoved(int32 rowIndex, int32 count)
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			TableModelListener* listener = it.Next();) {
 		listener->TableRowsRemoved(this, rowIndex, count);
+	}
+}
+
+
+void
+TableModel::NotifyRowsChanged(int32 rowIndex, int32 count)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			TableModelListener* listener = it.Next();) {
+		listener->TableRowsChanged(this, rowIndex, count);
 	}
 }
 
@@ -492,6 +509,17 @@ Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 			RemoveRow(row);
 			delete row;
 		}
+	}
+}
+
+
+void
+Table::TableRowsChanged(TableModel* model, int32 rowIndex, int32 count)
+{
+	int32 endIndex = rowIndex + count;
+	for (int32 i = rowIndex; i < endIndex; i++) {
+		if (BRow* row = fRows.ItemAt(i))
+			UpdateRow(row);
 	}
 }
 
