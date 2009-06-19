@@ -254,6 +254,10 @@ DebuggerInterface::Init()
 	if (fArchitecture == NULL)
 		return B_NO_MEMORY;
 
+	status_t error = fArchitecture->Init();
+	if (error != B_OK)
+		return error;
+
 	// create debugger port
 	char buffer[128];
 	snprintf(buffer, sizeof(buffer), "team %ld debugger", fTeamID);
@@ -271,7 +275,7 @@ DebuggerInterface::Init()
 	if (fDebugContextPool == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fDebugContextPool->Init();
+	error = fDebugContextPool->Init();
 	if (error != B_OK)
 		return error;
 
@@ -425,13 +429,8 @@ DebuggerInterface::GetCpuState(thread_id thread, CpuState*& _state)
 	if (reply.error != B_OK)
 		return reply.error;
 
-	// TODO: Correctly create the state...
-	CpuState* state = new(std::nothrow) CpuState;
-	if (state == NULL)
-		return B_NO_MEMORY;
-
-	_state = state;
-	return B_OK;
+	return fArchitecture->CreateCpuState(&reply.cpu_state,
+		sizeof(debug_cpu_state), _state);
 }
 
 

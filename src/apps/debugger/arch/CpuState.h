@@ -9,10 +9,18 @@
 
 #include <Referenceable.h>
 
+#include "Variant.h"
+
+
+class Register;
+
 
 class CpuState : public Referenceable {
 public:
 	virtual						~CpuState();
+
+	virtual	bool				GetRegisterValue(const Register* reg,
+									Variant& _value) = 0;
 };
 
 

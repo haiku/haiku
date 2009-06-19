@@ -16,3 +16,10 @@ Architecture::Architecture(DebuggerInterface* debuggerInterface)
 Architecture::~Architecture()
 {
 }
+
+
+status_t
+Architecture::Init()
+{
+	return B_OK;
+}

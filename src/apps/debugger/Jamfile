@@ -32,6 +32,7 @@ Application Debugger :
 	# arch
 	Architecture.cpp
 	CpuState.cpp
+	Register.cpp
 	StackFrame.cpp
 	StackTrace.cpp
 
