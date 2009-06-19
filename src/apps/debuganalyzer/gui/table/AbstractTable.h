@@ -37,6 +37,12 @@ public:
 			void				SetSelectionMode(list_view_type type);
 			void 				DeselectAll();
 
+			void				SetSortingEnabled(bool enabled);
+			bool				SortingEnabled() const;
+			void				SetSortColumn(TableColumn* column, bool add,
+									bool ascending);
+			void				ClearSortColumns();
+
 protected:
 			class AbstractColumn;
 
@@ -44,6 +50,8 @@ protected:
 
 protected:
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column) = 0;
+
+			AbstractColumn*		GetColumn(TableColumn* column) const;
 
 protected:
 			ColumnList			fColumns;

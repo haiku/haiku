@@ -103,3 +103,44 @@ AbstractTable::DeselectAll()
 {
 	BColumnListView::DeselectAll();
 }
+
+
+void
+AbstractTable::SetSortingEnabled(bool enabled)
+{
+	BColumnListView::SetSortingEnabled(enabled);
+}
+
+
+bool
+AbstractTable::SortingEnabled() const
+{
+	return BColumnListView::SortingEnabled();
+}
+
+
+void
+AbstractTable::SetSortColumn(TableColumn* column, bool add, bool ascending)
+{
+	if (AbstractColumn* privateColumn = GetColumn(column))
+		BColumnListView::SetSortColumn(privateColumn, add, ascending);
+}
+
+
+void
+AbstractTable::ClearSortColumns()
+{
+	BColumnListView::ClearSortColumns();
+}
+
+
+AbstractTable::AbstractColumn*
+AbstractTable::GetColumn(TableColumn* column) const
+{
+	for (int32 i = 0; AbstractColumn* privateColumn = fColumns.ItemAt(i); i++) {
+		if (privateColumn->GetTableColumn() == column)
+			return privateColumn;
+	}
+
+	return NULL;
+}
