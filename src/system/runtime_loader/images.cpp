@@ -154,6 +154,30 @@ topological_sort(image_t* image, uint32 slot, image_t** initList,
 }
 
 
+/*!	Finds the load address and address specifier of the given image region.
+*/
+static void
+get_image_region_load_address(image_t* image, uint32 index, int32 lastDelta,
+	bool fixed, addr_t& loadAddress, uint32& addressSpecifier)
+{
+	if (image->dynamic_ptr != 0 && !fixed) {
+		// relocatable image... we can afford to place wherever
+		if (index == 0) {
+			// but only the first segment gets a free ride
+			loadAddress = RLD_PROGRAM_BASE;
+			addressSpecifier = B_BASE_ADDRESS;
+		} else {
+			loadAddress = image->regions[index].vmstart + lastDelta;
+			addressSpecifier = B_EXACT_ADDRESS;
+		}
+	} else {
+		// not relocatable, put it where it asks or die trying
+		loadAddress = image->regions[index].vmstart;
+		addressSpecifier = B_EXACT_ADDRESS;
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -260,74 +284,95 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	else
 		baseName = path;
 
-	for (uint32 i = 0; i < image->num_regions; i++) {
-		char regionName[B_OS_NAME_LENGTH];
-		addr_t loadAddress;
-		uint32 addressSpecifier;
+	// determine how much space we need for all loaded segments
 
+	addr_t reservedAddress = 0;
+	addr_t loadAddress;
+	size_t reservedSize = 0;
+	size_t length = 0;
+	uint32 addressSpecifier = B_ANY_ADDRESS;
+
+	for (uint32 i = 0; i < image->num_regions; i++) {
 		// for BeOS compatibility: if we load an old BeOS executable, we
 		// have to relocate it, if possible - we recognize it because the
 		// vmstart is set to 0 (hopefully always)
 		if (fixed && image->regions[i].vmstart == 0)
 			fixed = false;
 
+		uint32 regionAddressSpecifier;
+		get_image_region_load_address(image, i,
+			loadAddress - image->regions[i - 1].vmstart, fixed,
+			loadAddress, regionAddressSpecifier);
+		if (i == 0) {
+			reservedAddress = loadAddress;
+			addressSpecifier = regionAddressSpecifier;
+		}
+
+		length += TO_PAGE_SIZE(image->regions[i].vmsize
+			+ (loadAddress % B_PAGE_SIZE));
+
+		size_t size = TO_PAGE_SIZE(loadAddress + image->regions[i].vmsize)
+			- reservedAddress;
+		if (size > reservedSize)
+			reservedSize = size;
+	}
+
+	// Check whether the segments have an unreasonable amount of unused space
+	// inbetween.
+	if (reservedSize > length + 8 * 1024)
+		return B_BAD_DATA;
+
+	// reserve that space and allocate the areas from that one
+	if (_kern_reserve_address_range(&reservedAddress, addressSpecifier,
+			reservedSize) != B_OK)
+		return B_NO_MEMORY;
+
+	for (uint32 i = 0; i < image->num_regions; i++) {
+		char regionName[B_OS_NAME_LENGTH];
+
 		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
-		if (image->dynamic_ptr && !fixed) {
-			// relocatable image... we can afford to place wherever
-			if (i == 0) {
-				// but only the first segment gets a free ride
-				loadAddress = RLD_PROGRAM_BASE;
-				addressSpecifier = B_BASE_ADDRESS;
-			} else {
-				loadAddress = image->regions[i].vmstart
-					+ image->regions[i-1].delta;
-				addressSpecifier = B_EXACT_ADDRESS;
-			}
-		} else {
-			// not relocatable, put it where it asks or die trying
-			loadAddress = image->regions[i].vmstart;
-			addressSpecifier = B_EXACT_ADDRESS;
-		}
+		get_image_region_load_address(image, i, image->regions[i - 1].delta,
+			fixed, loadAddress, addressSpecifier);
 
-		if (image->regions[i].flags & RFLAG_ANON) {
+		// If the image position is arbitrary, we must let it point to the start
+		// of the reserved address range.
+		if (addressSpecifier != B_EXACT_ADDRESS)
+			loadAddress = reservedAddress;
+
+		if ((image->regions[i].flags & RFLAG_ANON) != 0) {
 			image->regions[i].id = _kern_create_area(regionName,
-				(void**)&loadAddress, addressSpecifier,
+				(void**)&loadAddress, B_EXACT_ADDRESS,
 				image->regions[i].vmsize, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA);
 
-			if (image->regions[i].id < 0)
+			if (image->regions[i].id < 0) {
+				_kern_unreserve_address_range(reservedAddress, reservedSize);
 				return image->regions[i].id;
-
-			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
-			image->regions[i].vmstart = loadAddress;
+			}
 		} else {
 			image->regions[i].id = _kern_map_file(regionName,
-				(void**)&loadAddress, addressSpecifier,
+				(void**)&loadAddress, B_EXACT_ADDRESS,
 				image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
 				REGION_PRIVATE_MAP, false, fd,
 				PAGE_BASE(image->regions[i].fdstart));
 
-			if (image->regions[i].id < 0)
+			if (image->regions[i].id < 0) {
+				_kern_unreserve_address_range(reservedAddress, reservedSize);
 				return image->regions[i].id;
+			}
 
 			TRACE(("\"%s\" at %p, 0x%lx bytes (%s)\n", path,
 				(void *)loadAddress, image->regions[i].vmsize,
 				image->regions[i].flags & RFLAG_RW ? "rw" : "read-only"));
 
-			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
-			image->regions[i].vmstart = loadAddress;
-
 			// handle trailer bits in data segment
 			if (image->regions[i].flags & RFLAG_RW) {
-				addr_t startClearing;
-				addr_t toClear;
-
-				startClearing = image->regions[i].vmstart
+				addr_t startClearing = loadAddress
 					+ PAGE_OFFSET(image->regions[i].start)
 					+ image->regions[i].size;
-				toClear = image->regions[i].vmsize
+				addr_t toClear = image->regions[i].vmsize
 					- PAGE_OFFSET(image->regions[i].start)
 					- image->regions[i].size;
 
@@ -336,9 +381,12 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 				memset((void *)startClearing, 0, toClear);
 			}
 		}
+
+		image->regions[i].delta = loadAddress - image->regions[i].vmstart;
+		image->regions[i].vmstart = loadAddress;
 	}
 
-	if (image->dynamic_ptr)
+	if (image->dynamic_ptr != 0)
 		image->dynamic_ptr += image->regions[0].delta;
 
 	return B_OK;

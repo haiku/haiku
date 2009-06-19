@@ -1632,7 +1632,7 @@ map_backing_store(vm_address_space* addressSpace, vm_cache* cache,
 	}
 
 	status = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
-	if (status < B_OK)
+	if (status != B_OK)
 		goto err2;
 
 	// attach the cache to the area
@@ -1741,7 +1741,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 
 	status_t status = insert_area(locker.AddressSpace(), _address, addressSpec,
 		size, area);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		free(area);
 		return status;
 	}
@@ -5907,8 +5907,7 @@ delete_area(area_id area)
 
 
 status_t
-_user_reserve_heap_address_range(addr_t* userAddress, uint32 addressSpec,
-	addr_t size)
+_user_reserve_address_range(addr_t* userAddress, uint32 addressSpec, addr_t size)
 {
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
@@ -5920,22 +5919,30 @@ _user_reserve_heap_address_range(addr_t* userAddress, uint32 addressSpec,
 	addr_t address;
 
 	if (!IS_USER_ADDRESS(userAddress)
-		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		|| user_memcpy(&address, userAddress, sizeof(address)) != B_OK)
 		return B_BAD_ADDRESS;
 
 	status_t status = vm_reserve_address_range(
 		vm_current_user_address_space_id(), (void**)&address, addressSpec, size,
 		RESERVED_AVOID_BASE);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
+	if (user_memcpy(userAddress, &address, sizeof(address)) != B_OK) {
 		vm_unreserve_address_range(vm_current_user_address_space_id(),
 			(void*)address, size);
 		return B_BAD_ADDRESS;
 	}
 
 	return B_OK;
+}
+
+
+status_t
+_user_unreserve_address_range(addr_t address, addr_t size)
+{
+	return vm_unreserve_address_range(vm_current_user_address_space_id(),
+		(void*)address, size);
 }
 
 

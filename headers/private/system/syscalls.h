@@ -373,8 +373,9 @@ extern status_t		_kern_set_area_protection(area_id area,
 extern area_id		_kern_clone_area(const char *name, void **_address,
 						uint32 addressSpec, uint32 protection,
 						area_id sourceArea);
-extern status_t		_kern_reserve_heap_address_range(addr_t* _address,
+extern status_t		_kern_reserve_address_range(addr_t* _address,
 						uint32 addressSpec, addr_t size);
+extern status_t		_kern_unreserve_address_range(addr_t address, addr_t size);
 
 extern area_id		_kern_map_file(const char *name, void **address,
 						int addressSpec, size_t size, int protection,

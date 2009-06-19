@@ -1,13 +1,12 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	Note, this class don't provide any locking whatsoever - you are
+/*!	Note, this class don't provide any locking whatsoever - you are
 	supposed to have a BPrivate::AppServerLink object around which
 	does the necessary locking.
 	However, this is not enforced in the methods here, you have to
@@ -74,14 +73,16 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base
 	if (!readOnly) {
 		// reserve 128 MB of space for the area
 		base = (void*)0x60000000;
-		status = _kern_reserve_heap_address_range((addr_t*)&base,
-			B_BASE_ADDRESS, 128 * 1024 * 1024);
+		status = _kern_reserve_address_range((addr_t*)&base, B_BASE_ADDRESS,
+			128 * 1024 * 1024);
 		addressSpec = status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS;
 	}
 #endif
 
-	mapping->local_area = clone_area(readOnly ? "server read-only memory" : "server_memory",
-		&base, addressSpec, B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
+	mapping->local_area = clone_area(readOnly
+			? "server read-only memory" : "server_memory",
+		&base, addressSpec,
+		B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
 	if (mapping->local_area < B_OK) {
 		status = mapping->local_area;
 
@@ -118,7 +119,8 @@ ServerMemoryAllocator::RemoveArea(area_id serverArea)
 
 
 status_t
-ServerMemoryAllocator::AreaAndBaseFor(area_id serverArea, area_id& _area, uint8*& _base)
+ServerMemoryAllocator::AreaAndBaseFor(area_id serverArea, area_id& _area,
+	uint8*& _base)
 {
 	for (int32 i = fAreas.CountItems(); i-- > 0;) {
 		area_mapping* mapping = (area_mapping*)fAreas.ItemAt(i);
