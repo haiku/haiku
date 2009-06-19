@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -67,7 +67,7 @@ area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
 area_id vm_map_file(team_id aid, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping,
-			int fd, off_t offset);
+			bool unmapAddressRange, int fd, off_t offset);
 struct VMCache *vm_area_get_locked_cache(struct vm_area *area);
 void vm_area_put_locked_cache(struct VMCache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address,
@@ -87,7 +87,7 @@ bool vm_test_map_modification(struct vm_page *page);
 int32 vm_test_map_activation(struct vm_page *page, bool *_modified);
 void vm_clear_map_flags(struct vm_page *page, uint32 flags);
 void vm_remove_all_page_mappings(struct vm_page *page, uint32 *_flags);
-bool vm_unmap_page(struct vm_area* area, addr_t virtualAddress, 
+bool vm_unmap_page(struct vm_area* area, addr_t virtualAddress,
 	bool preserveModified);
 status_t vm_unmap_pages(struct vm_area *area, addr_t base, size_t length,
 			bool preserveModified);
@@ -121,7 +121,8 @@ area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 status_t _user_delete_area(area_id area);
 
 area_id _user_map_file(const char *uname, void **uaddress, int addressSpec,
-			size_t size, int protection, int mapping, int fd, off_t offset);
+			size_t size, int protection, int mapping, bool unmapAddressRange,
+			int fd, off_t offset);
 status_t _user_unmap_memory(void *address, size_t size);
 status_t _user_set_memory_protection(void* address, size_t size,
 			int protection);

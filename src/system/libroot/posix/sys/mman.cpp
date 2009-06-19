@@ -125,7 +125,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 
 	// ask the kernel to map
 	area_id area = _kern_map_file("mmap area", &address, addressSpec,
-		length, areaProtection, mapping, fd, offset);
+		length, areaProtection, mapping, true, fd, offset);
 	if (area < 0) {
 		errno = area;
 		return MAP_FAILED;

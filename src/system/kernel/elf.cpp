@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -1802,7 +1802,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				B_EXACT_ADDRESS, fileUpperBound,
-				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
+				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP, false,
 				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
@@ -1850,7 +1850,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				B_EXACT_ADDRESS, segmentSize,
-				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
+				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP, false,
 				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));

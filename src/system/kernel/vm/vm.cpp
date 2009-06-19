@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -2252,8 +2252,8 @@ pre_map_area_pages(vm_area* area, VMCache* cache)
 */
 static area_id
 _vm_map_file(team_id team, const char* name, void** _address,
-	uint32 addressSpec, size_t size, uint32 protection, uint32 mapping, int fd,
-	off_t offset, bool kernel)
+	uint32 addressSpec, size_t size, uint32 protection, uint32 mapping,
+	bool unmapAddressRange, int fd, off_t offset, bool kernel)
 {
 	// TODO: for binary files, we want to make sure that they get the
 	//	copy of a file at a given time, ie. later changes should not
@@ -2267,10 +2267,11 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 	if (mapping == REGION_NO_PRIVATE_MAP)
 		protection |= B_SHARED_AREA;
+	if (addressSpec != B_EXACT_ADDRESS)
+		unmapAddressRange = false;
 
 	if (fd < 0) {
-		uint32 flags = addressSpec == B_EXACT_ADDRESS
-			? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
+		uint32 flags = unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
 		return vm_create_anonymous_area(team, name, _address, addressSpec, size,
 			B_NO_LOCK, protection, flags, kernel);
 	}
@@ -2345,7 +2346,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	vm_area* area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name,
-		addressSpec == B_EXACT_ADDRESS, kernel);
+		unmapAddressRange, kernel);
 
 	if (status != B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -2374,13 +2375,14 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 area_id
 vm_map_file(team_id aid, const char* name, void** address, uint32 addressSpec,
-	addr_t size, uint32 protection, uint32 mapping, int fd, off_t offset)
+	addr_t size, uint32 protection, uint32 mapping, bool unmapAddressRange,
+	int fd, off_t offset)
 {
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
 	return _vm_map_file(aid, name, address, addressSpec, size, protection,
-		mapping, fd, offset, true);
+		mapping, unmapAddressRange, fd, offset, true);
 }
 
 
@@ -6148,7 +6150,8 @@ _user_delete_area(area_id area)
 
 area_id
 _user_map_file(const char* userName, void** userAddress, int addressSpec,
-	size_t size, int protection, int mapping, int fd, off_t offset)
+	size_t size, int protection, int mapping, bool unmapAddressRange, int fd,
+	off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
 	void* address;
@@ -6173,7 +6176,8 @@ _user_map_file(const char* userName, void** userAddress, int addressSpec,
 		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 
 	area = _vm_map_file(vm_current_user_address_space_id(), name, &address,
-		addressSpec, size, protection, mapping, fd, offset, false);
+		addressSpec, size, protection, mapping, unmapAddressRange, fd, offset,
+		false);
 	if (area < B_OK)
 		return area;
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -306,7 +306,8 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 			image->regions[i].id = _kern_map_file(regionName,
 				(void**)&loadAddress, addressSpecifier,
 				image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP, fd, PAGE_BASE(image->regions[i].fdstart));
+				REGION_PRIVATE_MAP, false, fd,
+				PAGE_BASE(image->regions[i].fdstart));
 
 			if (image->regions[i].id < 0)
 				return image->regions[i].id;
