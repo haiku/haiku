@@ -43,7 +43,7 @@ GetCpuStateJob::Do()
 	status_t error = fDebuggerInterface->GetCpuState(fThread->ID(), state);
 	if (error != B_OK)
 		return error;
-	Reference<CpuState> reference(state);
+	Reference<CpuState> reference(state, true);
 
 	AutoLocker<Team> locker(fThread->GetTeam());
 
