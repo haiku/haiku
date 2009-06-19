@@ -43,7 +43,7 @@ CpuStateX86::~CpuStateX86()
 
 
 bool
-CpuStateX86::GetRegisterValue(const Register* reg, Variant& _value)
+CpuStateX86::GetRegisterValue(const Register* reg, BVariant& _value)
 {
 	int32 index = reg->Index();
 	if (!IsRegisterSet(index))

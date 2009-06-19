@@ -33,7 +33,7 @@ public:
 		return fModel->CountThreads();
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		Model::Thread* thread = fModel->ThreadAt(rowIndex);
 		if (thread == NULL)
@@ -44,7 +44,7 @@ public:
 				value.SetTo(thread->ID());
 				return true;
 			case 1:
-				value.SetTo(thread->Name(), VARIANT_DONT_COPY_DATA);
+				value.SetTo(thread->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 2:
 			{

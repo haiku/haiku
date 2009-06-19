@@ -97,7 +97,7 @@ public:
 		return fImages.CountItems();
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		Image* image = fImages.ItemAt(rowIndex);
 		if (image == NULL)
@@ -108,7 +108,7 @@ public:
 				value.SetTo(image->ID());
 				return true;
 			case 1:
-				value.SetTo(image->Name(), VARIANT_DONT_COPY_DATA);
+				value.SetTo(image->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			default:
 				return false;
@@ -233,12 +233,12 @@ ImageListView::_Init()
 {
 	fImagesTable = new Table("images list", 0);
 	AddChild(fImagesTable->ToView());
-	
+
 	// columns
 	fImagesTable->AddColumn(new Int32TableColumn(0, "ID", 40, 20, 1000,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fImagesTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	
+
 	fImagesTable->AddTableListener(this);
 }

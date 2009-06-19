@@ -6,11 +6,10 @@
 #define TREE_TABLE_H
 
 #include <ColumnTypes.h>
+#include <Variant.h>
 
 #include "table/AbstractTable.h"
 #include "table/TableColumn.h"
-
-#include "Variant.h"
 
 
 class TreeTable;
@@ -27,7 +26,7 @@ public:
 	virtual	void*				ChildAt(void* parent, int32 index) const = 0;
 
 	virtual	bool				GetValueAt(void* object, int32 columnIndex,
-									Variant& value) = 0;
+									BVariant& value) = 0;
 };
 
 

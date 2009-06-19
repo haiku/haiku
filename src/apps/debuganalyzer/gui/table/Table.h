@@ -9,11 +9,10 @@
 
 #include <ObjectList.h>
 #include <util/DoublyLinkedList.h>
+#include <Variant.h>
 
 #include "table/AbstractTable.h"
 #include "table/TableColumn.h"
-
-#include "Variant.h"
 
 
 class Table;
@@ -40,7 +39,7 @@ public:
 	virtual	int32				CountRows() const = 0;
 
 	virtual	bool				GetValueAt(int32 rowIndex, int32 columnIndex,
-									Variant& value) = 0;
+									BVariant& value) = 0;
 
 	virtual	bool				AddListener(TableModelListener* listener);
 	virtual	void				RemoveListener(TableModelListener* listener);

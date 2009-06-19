@@ -47,7 +47,7 @@ public:
 	virtual						~CpuStateX86();
 
 	virtual	bool				GetRegisterValue(const Register* reg,
-									Variant& _value);
+									BVariant& _value);
 
 			bool				IsRegisterSet(int32 index) const;
 			uint32				IntRegisterValue(int32 index) const;

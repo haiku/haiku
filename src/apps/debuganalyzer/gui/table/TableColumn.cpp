@@ -39,20 +39,20 @@ TableColumn::DrawTitle(BRect rect, BView* targetView)
 
 
 void
-TableColumn::DrawValue(const Variant& value, BRect rect, BView* targetView)
+TableColumn::DrawValue(const BVariant& value, BRect rect, BView* targetView)
 {
 }
 
 
 int
-TableColumn::CompareValues(const Variant& a, const Variant& b)
+TableColumn::CompareValues(const BVariant& a, const BVariant& b)
 {
 	return 0;
 }
 
 
 float
-TableColumn::GetPreferredWidth(const Variant& value, BView* parent) const
+TableColumn::GetPreferredWidth(const BVariant& value, BView* parent) const
 {
 	return Width();
 }

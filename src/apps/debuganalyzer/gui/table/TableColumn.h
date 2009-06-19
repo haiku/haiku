@@ -8,7 +8,7 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
-#include "Variant.h"
+#include <Variant.h>
 
 
 class BString;
@@ -33,13 +33,13 @@ public:
 	virtual	void				GetColumnName(BString* into) const;
 
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
-	virtual	void				DrawValue(const Variant& value, BRect rect,
+	virtual	void				DrawValue(const BVariant& value, BRect rect,
 									BView* targetView);
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
-	virtual	float				GetPreferredWidth(const Variant& value,
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
+	virtual	float				GetPreferredWidth(const BVariant& value,
 									BView* parent) const;
-			
+
 private:
 			int32				fModelIndex;
 			float				fWidth;

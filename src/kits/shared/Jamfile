@@ -20,4 +20,5 @@ StaticLibrary libshared.a :
 	DragTrackingFilter.cpp
 	HashString.cpp
 	RWLockManager.cpp
+	Variant.cpp
 ;

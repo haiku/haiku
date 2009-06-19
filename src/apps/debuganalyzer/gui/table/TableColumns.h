@@ -23,12 +23,12 @@ protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
 	virtual	void				GetColumnName(BString* into) const;
 
-	virtual	void				DrawValue(const Variant& value, BRect rect,
+	virtual	void				DrawValue(const BVariant& value, BRect rect,
 									BView* targetView);
-	virtual	float				GetPreferredWidth(const Variant& value,
+	virtual	float				GetPreferredWidth(const BVariant& value,
 									BView* parent) const;
 
-	virtual	BField*				PrepareField(const Variant& value) const = 0;
+	virtual	BField*				PrepareField(const BVariant& value) const = 0;
 
 protected:
 			BColumn*			fColumnDelegate;
@@ -45,10 +45,10 @@ public:
 	virtual						~StringTableColumn();
 
 protected:
-	virtual	BField*				PrepareField(const Variant& value) const;
+	virtual	BField*				PrepareField(const BVariant& value) const;
 
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
 
 private:
 			BStringColumn		fColumn;
@@ -65,10 +65,10 @@ public:
 									alignment align = B_ALIGN_RIGHT);
 
 protected:
-	virtual	BField*				PrepareField(const Variant& value) const;
+	virtual	BField*				PrepareField(const BVariant& value) const;
 
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
 };
 
 
@@ -81,10 +81,10 @@ public:
 									alignment align = B_ALIGN_RIGHT);
 
 protected:
-	virtual	BField*				PrepareField(const Variant& value) const;
+	virtual	BField*				PrepareField(const BVariant& value) const;
 
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
 };
 
 
@@ -98,10 +98,10 @@ public:
 									alignment align = B_ALIGN_RIGHT);
 
 protected:
-	virtual	BField*				PrepareField(const Variant& value) const;
+	virtual	BField*				PrepareField(const BVariant& value) const;
 
-	virtual	int					CompareValues(const Variant& a,
-									const Variant& b);
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
 
 private:
 			bool				fInvalidFirst;

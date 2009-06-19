@@ -31,15 +31,15 @@ public:
 	}
 
 protected:
-	virtual BField* PrepareField(const Variant& value) const
+	virtual BField* PrepareField(const BVariant& value) const
 	{
 		char buffer[64];
 		return StringTableColumn::PrepareField(
-			Variant(_ToString(value, buffer, sizeof(buffer)),
-				VARIANT_DONT_COPY_DATA));
+			BVariant(_ToString(value, buffer, sizeof(buffer)),
+				B_VARIANT_DONT_COPY_DATA));
 	}
 
-	virtual int CompareValues(const Variant& a, const Variant& b)
+	virtual int CompareValues(const BVariant& a, const BVariant& b)
 	{
 		// If neither value is a number, compare the strings. If only one value
 		// is a number, it is considered to be greater.
@@ -49,10 +49,10 @@ protected:
 			char bufferA[64];
 			char bufferB[64];
 			return StringTableColumn::CompareValues(
-				Variant(_ToString(a, bufferA, sizeof(bufferA)),
-					VARIANT_DONT_COPY_DATA),
-				Variant(_ToString(b, bufferB, sizeof(bufferB)),
-					VARIANT_DONT_COPY_DATA));
+				BVariant(_ToString(a, bufferA, sizeof(bufferA)),
+					B_VARIANT_DONT_COPY_DATA),
+				BVariant(_ToString(b, bufferB, sizeof(bufferB)),
+					B_VARIANT_DONT_COPY_DATA));
 		}
 
 		if (!b.IsNumber())
@@ -71,7 +71,7 @@ protected:
 	}
 
 private:
-	const char* _ToString(const Variant& value, char* buffer,
+	const char* _ToString(const BVariant& value, char* buffer,
 		size_t bufferSize) const
 	{
 		if (!value.IsNumber())
@@ -139,7 +139,7 @@ public:
 		return fArchitecture->CountRegisters();
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		if (rowIndex < 0 || rowIndex >= fArchitecture->CountRegisters())
 			return false;
@@ -148,13 +148,13 @@ public:
 
 		switch (columnIndex) {
 			case 0:
-				value.SetTo(reg->Name(), VARIANT_DONT_COPY_DATA);
+				value.SetTo(reg->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 1:
 				if (fCpuState == NULL)
 					return false;
 				if (!fCpuState->GetRegisterValue(reg, value))
-					value.SetTo("?", VARIANT_DONT_COPY_DATA);
+					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
 				return true;
 			default:
 				return false;

@@ -16,7 +16,6 @@ local debugAnalyzerSources
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
-SubDirHdrs [ FDirName $(debugAnalyzerSources) util ] ;
 
 Application Debugger :
 	Debugger.cpp
@@ -54,9 +53,6 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 
-	# DebugAnalyzer:util
-	Variant.cpp
-
 # DWARF
 #	attribute_classes.cpp
 #	AttributeValue.cpp
@@ -71,14 +67,12 @@ Application Debugger :
 
 	<bin>debug_utils.a
 	libcolumnlistview.a
+	libshared.a
 
 	$(TARGET_LIBSTDC++)
 	be debug
 
 	: Debugger.rdef
 ;
-
-SEARCH on [ FGristFiles Variant.cpp ]
-	= [ FDirName $(debugAnalyzerSources) util ] ;
 
 HaikuSubInclude gui running_teams_window ;

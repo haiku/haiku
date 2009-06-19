@@ -41,7 +41,7 @@ DelagateBasedTableColumn::GetColumnName(BString* into) const
 
 
 void
-DelagateBasedTableColumn::DrawValue(const Variant& value, BRect rect,
+DelagateBasedTableColumn::DrawValue(const BVariant& value, BRect rect,
 	BView* targetView)
 {
 	fColumnDelegate->DrawField(PrepareField(value), rect, targetView);
@@ -49,7 +49,7 @@ DelagateBasedTableColumn::DrawValue(const Variant& value, BRect rect,
 
 
 float
-DelagateBasedTableColumn::GetPreferredWidth(const Variant& value,
+DelagateBasedTableColumn::GetPreferredWidth(const BVariant& value,
 	BView* parent) const
 {
 	return fColumnDelegate->GetPreferredWidth(PrepareField(value), parent);
@@ -77,7 +77,7 @@ StringTableColumn::~StringTableColumn()
 
 
 BField*
-StringTableColumn::PrepareField(const Variant& value) const
+StringTableColumn::PrepareField(const BVariant& value) const
 {
 	fField.SetString(value.ToString());
 	fField.SetWidth(Width());
@@ -86,7 +86,7 @@ StringTableColumn::PrepareField(const Variant& value) const
 
 
 int
-StringTableColumn::CompareValues(const Variant& a, const Variant& b)
+StringTableColumn::CompareValues(const BVariant& a, const BVariant& b)
 {
 	return strcasecmp(a.ToString(), b.ToString());
 }
@@ -106,17 +106,17 @@ Int32TableColumn::Int32TableColumn(int32 modelIndex, const char* title,
 
 
 BField*
-Int32TableColumn::PrepareField(const Variant& value) const
+Int32TableColumn::PrepareField(const BVariant& value) const
 {
 	char buffer[16];
 	snprintf(buffer, sizeof(buffer), "%ld", value.ToInt32());
 	return StringTableColumn::PrepareField(
-		Variant(buffer, VARIANT_DONT_COPY_DATA));
+		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }
 
 
 int
-Int32TableColumn::CompareValues(const Variant& a, const Variant& b)
+Int32TableColumn::CompareValues(const BVariant& a, const BVariant& b)
 {
 	return a.ToInt32() - b.ToInt32();
 }
@@ -136,17 +136,17 @@ Int64TableColumn::Int64TableColumn(int32 modelIndex, const char* title,
 
 
 BField*
-Int64TableColumn::PrepareField(const Variant& value) const
+Int64TableColumn::PrepareField(const BVariant& value) const
 {
 	char buffer[32];
 	snprintf(buffer, sizeof(buffer), "%lld", value.ToInt64());
 	return StringTableColumn::PrepareField(
-		Variant(buffer, VARIANT_DONT_COPY_DATA));
+		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }
 
 
 int
-Int64TableColumn::CompareValues(const Variant& a, const Variant& b)
+Int64TableColumn::CompareValues(const BVariant& a, const BVariant& b)
 {
 	int64 diff = a.ToInt64() - b.ToInt64();
 	if (diff == 0)
@@ -170,12 +170,12 @@ BigtimeTableColumn::BigtimeTableColumn(int32 modelIndex, const char* title,
 
 
 BField*
-BigtimeTableColumn::PrepareField(const Variant& value) const
+BigtimeTableColumn::PrepareField(const BVariant& value) const
 {
 	bigtime_t time = value.ToInt64();
 	if (time < 0) {
 		return StringTableColumn::PrepareField(
-			Variant("-", VARIANT_DONT_COPY_DATA));
+			BVariant("-", B_VARIANT_DONT_COPY_DATA));
 	}
 
 	int micros = int(time % 1000000);
@@ -189,19 +189,19 @@ BigtimeTableColumn::PrepareField(const Variant& value) const
 	snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d:%06d", time, minutes,
 		seconds, micros);
 	return StringTableColumn::PrepareField(
-		Variant(buffer, VARIANT_DONT_COPY_DATA));
+		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }
 
 
 int
-BigtimeTableColumn::CompareValues(const Variant& _a, const Variant& _b)
+BigtimeTableColumn::CompareValues(const BVariant& _a, const BVariant& _b)
 {
 	bigtime_t a = _a.ToInt64();
 	bigtime_t b = _b.ToInt64();
 
 	if (a == b)
 		return 0;
-	
+
 	if (a < 0)
 		return fInvalidFirst ? -1 : 1;
 	if (b < 0)

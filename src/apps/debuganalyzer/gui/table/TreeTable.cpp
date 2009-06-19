@@ -112,7 +112,7 @@ TreeTable::Column::DrawField(BField* _field, BRect rect, BView* targetView)
 		return;
 
 	int32 modelIndex = fTableColumn->ModelIndex();
-	Variant value;
+	BVariant value;
 	if (!fModel->GetValueAt(field->Object(), modelIndex, value))
 		return;
 	fTableColumn->DrawValue(value, rect, targetView);
@@ -134,9 +134,9 @@ TreeTable::Column::CompareFields(BField* _field1, BField* _field2)
 		return 1;
 
 	int32 modelIndex = fTableColumn->ModelIndex();
-	Variant value1;
+	BVariant value1;
 	bool valid1 = fModel->GetValueAt(field1->Object(), modelIndex, value1);
-	Variant value2;
+	BVariant value2;
 	bool valid2 = fModel->GetValueAt(field2->Object(), modelIndex, value2);
 
 	if (!valid1)
@@ -163,7 +163,7 @@ TreeTable::Column::GetPreferredWidth(BField* _field, BView* parent) const
 		return Width();
 
 	int32 modelIndex = fTableColumn->ModelIndex();
-	Variant value;
+	BVariant value;
 	if (!fModel->GetValueAt(field->Object(), modelIndex, value))
 		return Width();
 	return fTableColumn->GetPreferredWidth(value, parent);

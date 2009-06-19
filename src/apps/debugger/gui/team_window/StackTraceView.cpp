@@ -29,16 +29,16 @@ public:
 	}
 
 protected:
-	virtual BField* PrepareField(const Variant& value) const
+	virtual BField* PrepareField(const BVariant& value) const
 	{
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "%#llx", value.ToUInt64());
 
 		return StringTableColumn::PrepareField(
-			Variant(buffer, VARIANT_DONT_COPY_DATA));
+			BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 	}
 
-	virtual int CompareValues(const Variant& a, const Variant& b)
+	virtual int CompareValues(const BVariant& a, const BVariant& b)
 	{
 		uint64 valueA = a.ToUInt64();
 		uint64 valueB = b.ToUInt64();
@@ -102,7 +102,7 @@ public:
 		return fFrames.CountItems();
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		StackFrame* frame = fFrames.ItemAt(rowIndex);
 		if (frame == NULL)

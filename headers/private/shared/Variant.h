@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef VARIANT_H
-#define VARIANT_H
+#ifndef _VARIANT_H
+#define _VARIANT_H
 
 
 #include <SupportDefs.h>
@@ -11,31 +11,31 @@
 
 
 enum {
-	VARIANT_DONT_COPY_DATA	= 0x01,
-	VARIANT_OWNS_DATA		= 0x02
+	B_VARIANT_DONT_COPY_DATA	= 0x01,
+	B_VARIANT_OWNS_DATA			= 0x02
 };
 
 
-class Variant {
+class BVariant {
 public:
-	inline						Variant();
-	inline						Variant(int8 value);
-	inline						Variant(uint8 value);
-	inline						Variant(int16 value);
-	inline						Variant(uint16 value);
-	inline						Variant(int32 value);
-	inline						Variant(uint32 value);
-	inline						Variant(int64 value);
-	inline						Variant(uint64 value);
-	inline						Variant(float value);
-	inline						Variant(double value);
-	inline						Variant(const void* value);
-	inline						Variant(const char* value,
+	inline						BVariant();
+	inline						BVariant(int8 value);
+	inline						BVariant(uint8 value);
+	inline						BVariant(int16 value);
+	inline						BVariant(uint16 value);
+	inline						BVariant(int32 value);
+	inline						BVariant(uint32 value);
+	inline						BVariant(int64 value);
+	inline						BVariant(uint64 value);
+	inline						BVariant(float value);
+	inline						BVariant(double value);
+	inline						BVariant(const void* value);
+	inline						BVariant(const char* value,
 									uint32 flags = 0);
-	inline						Variant(const Variant& other);
-								~Variant();
+	inline						BVariant(const BVariant& other);
+								~BVariant();
 
-	inline	void				SetTo(const Variant& other);
+	inline	void				SetTo(const BVariant& other);
 	inline	void				SetTo(int8 value);
 	inline	void				SetTo(uint8 value);
 	inline	void				SetTo(int16 value);
@@ -51,7 +51,7 @@ public:
 									uint32 flags = 0);
 			void				Unset();
 
-	inline	Variant&			operator=(const Variant& other);
+	inline	BVariant&			operator=(const BVariant& other);
 
 			type_code			Type() const		{ return fType; }
 
@@ -74,7 +74,7 @@ public:
 			const char*			ToString() const;
 
 private:
-			void				_SetTo(const Variant& other);
+			void				_SetTo(const BVariant& other);
 			void				_SetTo(int8 value);
 			void				_SetTo(uint8 value);
 			void				_SetTo(int16 value);
@@ -112,7 +112,7 @@ private:
 };
 
 
-Variant::Variant()
+BVariant::BVariant()
 	:
 	fType(0),
 	fFlags(0)
@@ -120,86 +120,86 @@ Variant::Variant()
 }
 
 
-Variant::Variant(int8 value)
+BVariant::BVariant(int8 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(uint8 value)
+BVariant::BVariant(uint8 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(int16 value)
+BVariant::BVariant(int16 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(uint16 value)
+BVariant::BVariant(uint16 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(int32 value)
+BVariant::BVariant(int32 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(uint32 value)
+BVariant::BVariant(uint32 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(int64 value)
+BVariant::BVariant(int64 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(uint64 value)
+BVariant::BVariant(uint64 value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(float value)
+BVariant::BVariant(float value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(double value)
+BVariant::BVariant(double value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(const void* value)
+BVariant::BVariant(const void* value)
 {
 	_SetTo(value);
 }
 
 
-Variant::Variant(const char* value, uint32 flags)
+BVariant::BVariant(const char* value, uint32 flags)
 {
 	_SetTo(value, flags);
 }
 
 
-Variant::Variant(const Variant& other)
+BVariant::BVariant(const BVariant& other)
 {
 	_SetTo(other);
 }
 
 
-Variant&
-Variant::operator=(const Variant& other)
+BVariant&
+BVariant::operator=(const BVariant& other)
 {
 	Unset();
 	_SetTo(other);
@@ -208,7 +208,7 @@ Variant::operator=(const Variant& other)
 
 
 void
-Variant::SetTo(const Variant& other)
+BVariant::SetTo(const BVariant& other)
 {
 	Unset();
 	_SetTo(other);
@@ -216,7 +216,7 @@ Variant::SetTo(const Variant& other)
 
 
 void
-Variant::SetTo(int8 value)
+BVariant::SetTo(int8 value)
 {
 	Unset();
 	_SetTo(value);
@@ -224,7 +224,7 @@ Variant::SetTo(int8 value)
 
 
 void
-Variant::SetTo(uint8 value)
+BVariant::SetTo(uint8 value)
 {
 	Unset();
 	_SetTo(value);
@@ -232,7 +232,7 @@ Variant::SetTo(uint8 value)
 
 
 void
-Variant::SetTo(int16 value)
+BVariant::SetTo(int16 value)
 {
 	Unset();
 	_SetTo(value);
@@ -240,7 +240,7 @@ Variant::SetTo(int16 value)
 
 
 void
-Variant::SetTo(uint16 value)
+BVariant::SetTo(uint16 value)
 {
 	Unset();
 	_SetTo(value);
@@ -248,7 +248,7 @@ Variant::SetTo(uint16 value)
 
 
 void
-Variant::SetTo(int32 value)
+BVariant::SetTo(int32 value)
 {
 	Unset();
 	_SetTo(value);
@@ -256,7 +256,7 @@ Variant::SetTo(int32 value)
 
 
 void
-Variant::SetTo(uint32 value)
+BVariant::SetTo(uint32 value)
 {
 	Unset();
 	_SetTo(value);
@@ -264,7 +264,7 @@ Variant::SetTo(uint32 value)
 
 
 void
-Variant::SetTo(int64 value)
+BVariant::SetTo(int64 value)
 {
 	Unset();
 	_SetTo(value);
@@ -272,7 +272,7 @@ Variant::SetTo(int64 value)
 
 
 void
-Variant::SetTo(uint64 value)
+BVariant::SetTo(uint64 value)
 {
 	Unset();
 	_SetTo(value);
@@ -280,7 +280,7 @@ Variant::SetTo(uint64 value)
 
 
 void
-Variant::SetTo(float value)
+BVariant::SetTo(float value)
 {
 	Unset();
 	_SetTo(value);
@@ -288,7 +288,7 @@ Variant::SetTo(float value)
 
 
 void
-Variant::SetTo(double value)
+BVariant::SetTo(double value)
 {
 	Unset();
 	_SetTo(value);
@@ -296,7 +296,7 @@ Variant::SetTo(double value)
 
 
 void
-Variant::SetTo(const void* value)
+BVariant::SetTo(const void* value)
 {
 	Unset();
 	_SetTo(value);
@@ -304,11 +304,11 @@ Variant::SetTo(const void* value)
 
 
 void
-Variant::SetTo(const char* value, uint32 flags)
+BVariant::SetTo(const char* value, uint32 flags)
 {
 	Unset();
 	_SetTo(value, flags);
 }
 
 
-#endif	// VARIANT_H
+#endif	// _VARIANT_H

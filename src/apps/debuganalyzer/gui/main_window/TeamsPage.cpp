@@ -33,7 +33,7 @@ public:
 		return fModel->CountTeams();
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		Model::Team* team = fModel->TeamAt(rowIndex);
 		if (team == NULL)
@@ -44,7 +44,7 @@ public:
 				value.SetTo(team->ID());
 				return true;
 			case 1:
-				value.SetTo(team->Name(), VARIANT_DONT_COPY_DATA);
+				value.SetTo(team->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 2:
 				value.SetTo(team->CreationTime());

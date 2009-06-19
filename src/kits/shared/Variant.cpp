@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "Variant.h"
+#include <Variant.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +11,7 @@
 
 template<typename NumberType>
 inline NumberType
-Variant::_ToNumber() const
+BVariant::_ToNumber() const
 {
 	switch (fType) {
 		case B_INT8_TYPE:
@@ -40,16 +40,16 @@ Variant::_ToNumber() const
 }
 
 
-Variant::~Variant()
+BVariant::~BVariant()
 {
 	Unset();
 }
 
 
 void
-Variant::Unset()
+BVariant::Unset()
 {
-	if ((fFlags & VARIANT_OWNS_DATA) != 0) {
+	if ((fFlags & B_VARIANT_OWNS_DATA) != 0) {
 		switch (fType) {
 			case B_STRING_TYPE:
 				free(fString);
@@ -65,7 +65,7 @@ Variant::Unset()
 
 
 bool
-Variant::IsNumber() const
+BVariant::IsNumber() const
 {
 	switch (fType) {
 		case B_INT8_TYPE:
@@ -86,7 +86,7 @@ Variant::IsNumber() const
 
 
 bool
-Variant::IsInteger() const
+BVariant::IsInteger() const
 {
 	switch (fType) {
 		case B_INT8_TYPE:
@@ -105,7 +105,7 @@ Variant::IsInteger() const
 
 
 bool
-Variant::IsFloat() const
+BVariant::IsFloat() const
 {
 	switch (fType) {
 		case B_FLOAT_TYPE:
@@ -118,110 +118,110 @@ Variant::IsFloat() const
 
 
 int8
-Variant::ToInt8() const
+BVariant::ToInt8() const
 {
 	return _ToNumber<int8>();
 }
 
 
 uint8
-Variant::ToUInt8() const
+BVariant::ToUInt8() const
 {
 	return _ToNumber<uint8>();
 }
 
 
 int16
-Variant::ToInt16() const
+BVariant::ToInt16() const
 {
 	return _ToNumber<int16>();
 }
 
 
 uint16
-Variant::ToUInt16() const
+BVariant::ToUInt16() const
 {
 	return _ToNumber<uint16>();
 }
 
 
 int32
-Variant::ToInt32() const
+BVariant::ToInt32() const
 {
 	return _ToNumber<int32>();
 }
 
 
 uint32
-Variant::ToUInt32() const
+BVariant::ToUInt32() const
 {
 	return _ToNumber<uint32>();
 }
 
 
 int64
-Variant::ToInt64() const
+BVariant::ToInt64() const
 {
 	return _ToNumber<int64>();
 }
 
 
 uint64
-Variant::ToUInt64() const
+BVariant::ToUInt64() const
 {
 	return _ToNumber<uint64>();
 }
 
 
 float
-Variant::ToFloat() const
+BVariant::ToFloat() const
 {
 	return _ToNumber<float>();
 }
 
 
 double
-Variant::ToDouble() const
+BVariant::ToDouble() const
 {
 	return _ToNumber<double>();
 }
 
 
 void*
-Variant::ToPointer() const
+BVariant::ToPointer() const
 {
 	return fType == B_POINTER_TYPE ? fString : NULL;
 }
 
 
 const char*
-Variant::ToString() const
+BVariant::ToString() const
 {
 	return fType == B_STRING_TYPE ? fString : NULL;
 }
 
 
 void
-Variant::_SetTo(const Variant& other)
+BVariant::_SetTo(const BVariant& other)
 {
-	if ((other.fFlags & VARIANT_OWNS_DATA) != 0) {
+	if ((other.fFlags & B_VARIANT_OWNS_DATA) != 0) {
 		switch (other.fType) {
 			case B_STRING_TYPE:
 				fType = B_STRING_TYPE;
 				fString = strdup(other.fString);
-				fFlags = VARIANT_OWNS_DATA;
+				fFlags = B_VARIANT_OWNS_DATA;
 				return;
 			default:
 				break;
 		}
 	}
 
-	memcpy(this, &other, sizeof(Variant));
+	memcpy(this, &other, sizeof(BVariant));
 }
 
 
 void
-Variant::_SetTo(int8 value)
+BVariant::_SetTo(int8 value)
 {
 	fType = B_INT8_TYPE;
 	fFlags = 0;
@@ -230,7 +230,7 @@ Variant::_SetTo(int8 value)
 
 
 void
-Variant::_SetTo(uint8 value)
+BVariant::_SetTo(uint8 value)
 {
 	fType = B_UINT8_TYPE;
 	fFlags = 0;
@@ -239,7 +239,7 @@ Variant::_SetTo(uint8 value)
 
 
 void
-Variant::_SetTo(int16 value)
+BVariant::_SetTo(int16 value)
 {
 	fType = B_INT16_TYPE;
 	fFlags = 0;
@@ -248,7 +248,7 @@ Variant::_SetTo(int16 value)
 
 
 void
-Variant::_SetTo(uint16 value)
+BVariant::_SetTo(uint16 value)
 {
 	fType = B_UINT16_TYPE;
 	fFlags = 0;
@@ -257,7 +257,7 @@ Variant::_SetTo(uint16 value)
 
 
 void
-Variant::_SetTo(int32 value)
+BVariant::_SetTo(int32 value)
 {
 	fType = B_INT32_TYPE;
 	fFlags = 0;
@@ -266,7 +266,7 @@ Variant::_SetTo(int32 value)
 
 
 void
-Variant::_SetTo(uint32 value)
+BVariant::_SetTo(uint32 value)
 {
 	fType = B_UINT32_TYPE;
 	fFlags = 0;
@@ -275,7 +275,7 @@ Variant::_SetTo(uint32 value)
 
 
 void
-Variant::_SetTo(int64 value)
+BVariant::_SetTo(int64 value)
 {
 	fType = B_INT64_TYPE;
 	fFlags = 0;
@@ -284,7 +284,7 @@ Variant::_SetTo(int64 value)
 
 
 void
-Variant::_SetTo(uint64 value)
+BVariant::_SetTo(uint64 value)
 {
 	fType = B_UINT64_TYPE;
 	fFlags = 0;
@@ -293,7 +293,7 @@ Variant::_SetTo(uint64 value)
 
 
 void
-Variant::_SetTo(float value)
+BVariant::_SetTo(float value)
 {
 	fType = B_FLOAT_TYPE;
 	fFlags = 0;
@@ -302,7 +302,7 @@ Variant::_SetTo(float value)
 
 
 void
-Variant::_SetTo(double value)
+BVariant::_SetTo(double value)
 {
 	fType = B_DOUBLE_TYPE;
 	fFlags = 0;
@@ -311,7 +311,7 @@ Variant::_SetTo(double value)
 
 
 void
-Variant::_SetTo(const void* value)
+BVariant::_SetTo(const void* value)
 {
 	fType = B_POINTER_TYPE;
 	fFlags = 0;
@@ -320,18 +320,18 @@ Variant::_SetTo(const void* value)
 
 
 void
-Variant::_SetTo(const char* value, uint32 flags)
+BVariant::_SetTo(const char* value, uint32 flags)
 {
 	fType = B_STRING_TYPE;
 	fFlags = 0;
 
 	if (value != NULL) {
-		if ((flags & VARIANT_DONT_COPY_DATA) == 0) {
+		if ((flags & B_VARIANT_DONT_COPY_DATA) == 0) {
 			fString = strdup(value);
-			fFlags |= VARIANT_OWNS_DATA;
+			fFlags |= B_VARIANT_OWNS_DATA;
 		} else {
 			fString = (char*)value;
-			fFlags |= flags & VARIANT_OWNS_DATA;
+			fFlags |= flags & B_VARIANT_OWNS_DATA;
 		}
 	} else
 		fString = NULL;

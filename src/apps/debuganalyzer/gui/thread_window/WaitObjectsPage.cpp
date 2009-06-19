@@ -55,7 +55,7 @@ public:
 		return 6;
 	}
 
-	virtual bool GetValueAt(void* object, int32 columnIndex, Variant& value)
+	virtual bool GetValueAt(void* object, int32 columnIndex, BVariant& value)
 	{
 		return ((Node*)object)->GetValueAt(columnIndex, value);
 	}
@@ -66,7 +66,7 @@ private:
 
 		virtual int32 CountChildren() const = 0;
 		virtual void* ChildAt(int32 index) const = 0;
-		virtual bool GetValueAt(int32 columnIndex, Variant& value) = 0;
+		virtual bool GetValueAt(int32 columnIndex, BVariant& value) = 0;
 	};
 
 	struct ObjectNode : Node {
@@ -88,7 +88,7 @@ private:
 			return NULL;
 		}
 
-		virtual bool GetValueAt(int32 columnIndex, Variant& value)
+		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
 		{
 			return _GetWaitObjectValueAt(object, columnIndex, value);
 		}
@@ -123,7 +123,7 @@ private:
 			return objectNodes.ItemAt(index);
 		}
 
-		virtual bool GetValueAt(int32 columnIndex, Variant& value)
+		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
 		{
 			if (columnIndex <= 2) {
 				return _GetWaitObjectValueAt(group->WaitObjectAt(0),
@@ -174,7 +174,7 @@ private:
 			return groupNodes.ItemAt(index);
 		}
 
-		virtual bool GetValueAt(int32 columnIndex, Variant& value)
+		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
 		{
 			return false;
 		}
@@ -215,15 +215,15 @@ private:
 	}
 
 	static bool _GetWaitObjectValueAt(Model::ThreadWaitObject* waitObject,
-		int32 columnIndex, Variant& value)
+		int32 columnIndex, BVariant& value)
 	{
 		switch (columnIndex) {
 			case 0:
 				value.SetTo(_TypeToString(waitObject->Type()),
-					VARIANT_DONT_COPY_DATA);
+					B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 1:
-				value.SetTo(waitObject->Name(), VARIANT_DONT_COPY_DATA);
+				value.SetTo(waitObject->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 2:
 			{

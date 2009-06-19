@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps debuganalyzer ;
 UsePrivateHeaders debug interface kernel shared ;
 UsePrivateSystemHeaders ;
 
-HAIKU_DEBUG_ANALYZER_HEADERS = 
+HAIKU_DEBUG_ANALYZER_HEADERS =
 	$(SUBDIR)
 	[ FDirName $(SUBDIR) gui ]
 	[ FDirName $(SUBDIR) model ]
@@ -24,7 +24,7 @@ Application DebugAnalyzer
 	<nogrist>DebugAnalyzer_model_loader.o
 	<nogrist>DebugAnalyzer_util.o
 
-	libcolumnlistview.a libdebug.so be
+	libcolumnlistview.a libshared.a libdebug.so be
 	:
 	DebugAnalyzer.rdef
 ;
