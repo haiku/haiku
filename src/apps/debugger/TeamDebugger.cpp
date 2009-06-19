@@ -17,6 +17,7 @@
 
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "Jobs.h"
 #include "MessageCodes.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
@@ -29,6 +30,7 @@ TeamDebugger::TeamDebugger()
 	fDebugModel(NULL),
 	fTeamID(-1),
 	fDebuggerInterface(NULL),
+	fWorker(NULL),
 	fDebugEventListener(-1),
 	fTeamWindow(NULL),
 	fTerminating(false)
@@ -43,15 +45,17 @@ TeamDebugger::~TeamDebugger()
 	fTerminating = true;
 
 	fDebuggerInterface->Close();
+	fWorker->ShutDown();
 
 	locker.Unlock();
 
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
+	delete fDebuggerInterface;
+	delete fWorker;
 	delete fDebugModel;
 	delete fTeam;
-	delete fDebuggerInterface;
 }
 
 
@@ -83,6 +87,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fDebugModel->Init();
+	if (error != B_OK)
+		return error;
+
+	// create our worker
+	fWorker = new(std::nothrow) Worker;
+	if (fWorker == NULL)
+		return B_NO_MEMORY;
+
+	error = fWorker->Init();
 	if (error != B_OK)
 		return error;
 
@@ -204,6 +217,27 @@ TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
 {
 	// TODO:...
 	return true;
+}
+
+
+void
+TeamDebugger::JobDone(Job* job)
+{
+printf("TeamDebugger::JobDone(%p)\n", job);
+}
+
+
+void
+TeamDebugger::JobFailed(Job* job)
+{
+printf("TeamDebugger::JobFailed(%p)\n", job);
+}
+
+
+void
+TeamDebugger::JobAborted(Job* job)
+{
+printf("TeamDebugger::JobAborted(%p)\n", job);
 }
 
 
@@ -335,14 +369,7 @@ TeamDebugger::_HandleThreadStopped(thread_id threadID, CpuState* cpuState)
 	if (thread == NULL)
 		return false;
 
-	// update the thread state
-	thread->SetState(THREAD_STATE_STOPPED);
-
-	if (cpuState != NULL) {
-		thread->SetCpuState(cpuState);
-	} else {
-		// TODO: Trigger updating the CPU state!
-	}
+	_SetThreadState(thread, THREAD_STATE_STOPPED, cpuState);
 
 	return true;
 }
@@ -435,18 +462,42 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 void
 TeamDebugger::_UpdateThreadState(::Thread* thread)
 {
-	CpuState* state = NULL;
-	status_t error = fDebuggerInterface->GetCpuState(thread->ID(), state);
+	CpuState* cpuState = NULL;
+	status_t error = fDebuggerInterface->GetCpuState(thread->ID(), cpuState);
 
 	uint32 newState = THREAD_STATE_UNKNOWN;
 	if (error == B_OK) {
 		newState = THREAD_STATE_STOPPED;
-		state->RemoveReference();
+		cpuState->RemoveReference();
 	} else if (error == B_BAD_THREAD_STATE)
 		newState = THREAD_STATE_RUNNING;
 
-	thread->SetState(newState);
-	thread->SetCpuState(state);
+	_SetThreadState(thread, newState, cpuState);
+}
+
+
+void
+TeamDebugger::_SetThreadState(::Thread* thread, uint32 state,
+	CpuState* cpuState)
+{
+	// update the thread state
+	uint32 oldState = thread->State();
+	thread->SetState(state);
+
+	// cancel jobs for this thread
+	if (oldState == THREAD_STATE_STOPPED)
+		fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_CPU_STATE));
+
+	if (state == THREAD_STATE_STOPPED) {
+		if (cpuState != NULL) {
+			thread->SetCpuState(cpuState);
+		} else {
+			// trigger updating the CPU state
+			fWorker->ScheduleJob(new(std::nothrow) GetCpuStateJob(
+					fDebuggerInterface, thread),
+				this);
+		}
+	}
 }
 
 
@@ -469,7 +520,7 @@ TeamDebugger::_HandleThreadAction(thread_id threadID, uint32 action)
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
 	if (action != MSG_THREAD_STOP)
-		thread->SetState(THREAD_STATE_RUNNING);
+		_SetThreadState(thread, THREAD_STATE_RUNNING, NULL);
 
 	locker.Unlock();
 

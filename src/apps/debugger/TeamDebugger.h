@@ -13,6 +13,7 @@
 
 #include "DebugEvent.h"
 #include "TeamWindow.h"
+#include "Worker.h"
 
 
 class DebuggerInterface;
@@ -21,7 +22,7 @@ class TeamDebugModel;
 
 
 class TeamDebugger :  public DoublyLinkedListLinkImpl<TeamDebugger>,
-	private BLooper, private TeamWindow::Listener {
+	private BLooper, private TeamWindow::Listener, private JobListener {
 public:
 								TeamDebugger();
 								~TeamDebugger();
@@ -38,6 +39,11 @@ private:
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action);
 	virtual	bool				TeamWindowQuitRequested(TeamWindow* window);
+
+	// JobListener
+	virtual	void				JobDone(Job* job);
+	virtual	void				JobFailed(Job* job);
+	virtual	void				JobAborted(Job* job);
 
 private:
 	static	status_t			_DebugEventListenerEntry(void* data);
@@ -70,6 +76,8 @@ private:
 									ImageDeletedEvent* event);
 
 			void				_UpdateThreadState(::Thread* thread);
+			void				_SetThreadState(::Thread* thread, uint32 state,
+									CpuState* cpuState);
 
 			void				_HandleThreadAction(thread_id threadID,
 									uint32 action);
@@ -80,6 +88,7 @@ private:
 			team_id				fTeamID;
 			port_id				fNubPort;
 			DebuggerInterface*	fDebuggerInterface;
+			Worker*				fWorker;
 			thread_id			fDebugEventListener;
 			TeamWindow*			fTeamWindow;
 	volatile bool				fTerminating;

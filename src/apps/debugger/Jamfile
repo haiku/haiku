@@ -23,11 +23,13 @@ Application Debugger :
 #	ElfFile.cpp
 	Image.cpp
 	ImageInfo.cpp
+	Jobs.cpp
 	Team.cpp
 	TeamDebugger.cpp
 	TeamDebugModel.cpp
 	Thread.cpp
 	ThreadInfo.cpp
+	Worker.cpp
 
 	# arch
 	Architecture.cpp
