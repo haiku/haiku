@@ -15,6 +15,7 @@
 class BButton;
 class BTabView;
 class ImageListView;
+class RegisterView;
 class TeamDebugModel;
 
 
@@ -53,14 +54,17 @@ private:
 			void				_UpdateRunButtons();
 
 			void				_HandleThreadStateChanged(thread_id threadID);
+			void				_HandleCpuStateChanged(thread_id threadID);
 
 private:
 			TeamDebugModel*		fDebugModel;
 			::Thread*			fActiveThread;
 			Listener*			fListener;
 			BTabView*			fTabView;
+			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
+			RegisterView*		fRegisterView;
 			BButton*			fRunButton;
 			BButton*			fStepOverButton;
 			BButton*			fStepIntoButton;

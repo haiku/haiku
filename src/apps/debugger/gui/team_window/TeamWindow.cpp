@@ -16,8 +16,10 @@
 
 #include <AutoLocker.h>
 
+#include "CpuState.h"
 #include "ImageListView.h"
 #include "MessageCodes.h"
+#include "RegisterView.h"
 #include "TeamDebugModel.h"
 
 
@@ -32,8 +34,10 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fActiveThread(NULL),
 	fListener(listener),
 	fTabView(NULL),
+	fLocalsTabView(NULL),
 	fThreadListView(NULL),
 	fImageListView(NULL),
+	fRegisterView(NULL),
 	fRunButton(NULL),
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
@@ -95,7 +99,16 @@ TeamWindow::MessageReceived(BMessage* message)
 			_HandleThreadStateChanged(threadID);
 			break;
 		}
-//		case MSG_THREAD_CPU_STATE_CHANGED:
+		case MSG_THREAD_CPU_STATE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleCpuStateChanged(threadID);
+			break;
+		}
+
 //		case MSG_THREAD_STACK_TRACE_CHANGED:
 
 		default:
@@ -131,18 +144,18 @@ TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 void
 TeamWindow::ThreadCpuStateChanged(const Team::ThreadEvent& event)
 {
-//	BMessage message(MSG_THREAD_CPU_STATE_CHANGED);
-//	message.AddInt32("thread", event.GetThread()->ID());
-//	PostMessage(&message);
+	BMessage message(MSG_THREAD_CPU_STATE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
 }
 
 
 void
 TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 {
-//	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
-//	message.AddInt32("thread", event.GetThread()->ID());
-//	PostMessage(&message);
+	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
 }
 
 
@@ -162,7 +175,7 @@ TeamWindow::_Init()
 				.End()
 				.AddSplit(B_HORIZONTAL, 3.0f)
 					.Add(new BTextView("source view"), 3.0f)
-					.Add(new BTextView("variables view"))
+					.Add(fLocalsTabView = new BTabView("locals view"))
 				.End()
 			.End()
 		.End();
@@ -182,6 +195,14 @@ TeamWindow::_Init()
 	BLayoutBuilder::Split<>(imagesGroup)
 		.Add(fImageListView = ImageListView::Create())
 		.Add(new BTextView("source files"));
+
+	// add local variables tab
+	BView* tab = new BTextView("Variables");
+	fLocalsTabView->AddTab(tab);
+
+	// add registers tab
+	tab = fRegisterView = RegisterView::Create(fDebugModel->GetArchitecture());
+	fLocalsTabView->AddTab(tab);
 
 	fThreadListView->SetTeam(fDebugModel->GetTeam());
 	fImageListView->SetTeam(fDebugModel->GetTeam());
@@ -210,6 +231,15 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
+
+	CpuState* cpuState = fActiveThread != NULL
+		? fActiveThread->GetCpuState() : NULL;
+	Reference<CpuState> reference(cpuState);
+		// hold a reference until the register view has one
+
+	locker.Unlock();
+
+	fRegisterView->SetCpuState(cpuState);
 }
 
 
@@ -255,6 +285,26 @@ TeamWindow::_HandleThreadStateChanged(thread_id threadID)
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
+}
+
+
+void
+TeamWindow::_HandleCpuStateChanged(thread_id threadID)
+{
+	// We're only interested in the currently selected thread
+	if (fActiveThread == NULL || threadID != fActiveThread->ID())
+		return;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	CpuState* cpuState = fActiveThread != NULL
+		? fActiveThread->GetCpuState() : NULL;
+	Reference<CpuState> reference(cpuState);
+		// hold a reference until the register view has one
+
+	locker.Unlock();
+
+	fRegisterView->SetCpuState(cpuState);
 }
 
 
