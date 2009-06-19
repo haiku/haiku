@@ -55,6 +55,11 @@ public:
 
 			type_code			Type() const		{ return fType; }
 
+			bool				IsNumber() const;
+			bool				IsInteger() const;
+			bool				IsFloat() const;
+									// floating point, not just float
+
 			int8				ToInt8() const;
 			uint8				ToUInt8() const;
 			int16				ToInt16() const;

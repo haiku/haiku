@@ -64,6 +64,59 @@ Variant::Unset()
 }
 
 
+bool
+Variant::IsNumber() const
+{
+	switch (fType) {
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+bool
+Variant::IsInteger() const
+{
+	switch (fType) {
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+bool
+Variant::IsFloat() const
+{
+	switch (fType) {
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+
 int8
 Variant::ToInt8() const
 {
