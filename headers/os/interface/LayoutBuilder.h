@@ -11,6 +11,7 @@
 #include <GroupView.h>
 #include <SpaceLayoutItem.h>
 #include <SplitView.h>
+#include <Window.h>
 
 
 namespace BLayoutBuilder {
@@ -48,6 +49,9 @@ public:
 public:
 	inline						Group(enum orientation orientation
 										= B_HORIZONTAL,
+									float spacing = 0.0f);
+	inline						Group(BWindow* window,
+									enum orientation orientation = B_HORIZONTAL,
 									float spacing = 0.0f);
 	inline						Group(BGroupLayout* layout);
 	inline						Group(BGroupView* view);
@@ -94,6 +98,9 @@ public:
 
 public:
 	inline						Grid(float horizontalSpacing = 0.0f,
+									float verticalSpacing = 0.0f);
+	inline						Grid(BWindow* window,
+									float horizontalSpacing = 0.0f,
 									float verticalSpacing = 0.0f);
 	inline						Grid(BGridLayout* layout);
 	inline						Grid(BGridView* view);
@@ -210,6 +217,16 @@ Group<ParentBuilder>::Group(enum orientation orientation, float spacing)
 	:
 	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
 {
+}
+
+
+template<typename ParentBuilder>
+Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
+	float spacing)
+	:
+	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
+{
+	window->SetLayout(fLayout);
 }
 
 
@@ -389,6 +406,16 @@ Grid<ParentBuilder>::Grid(float horizontalSpacing, float verticalSpacing)
 	:
 	fLayout((new BGridView(horizontalSpacing, verticalSpacing))->GridLayout())
 {
+}
+
+
+template<typename ParentBuilder>
+Grid<ParentBuilder>::Grid(BWindow* window, float horizontalSpacing,
+	float verticalSpacing)
+	:
+	fLayout((new BGridView(horizontalSpacing, verticalSpacing))->GridLayout())
+{
+	window->SetLayout(fLayout);
 }
 
 

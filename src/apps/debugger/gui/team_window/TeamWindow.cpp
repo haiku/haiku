@@ -149,10 +149,7 @@ TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 void
 TeamWindow::_Init()
 {
-	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
-	SetLayout(rootLayout);
-
-	BLayoutBuilder::Group<>(rootLayout)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddSplit(B_VERTICAL, 3.0f)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
 			.AddGroup(B_VERTICAL, 4.0f)
