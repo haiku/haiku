@@ -41,6 +41,7 @@ Application Debugger :
 	# arch/x86
 	ArchitectureX86.cpp
 	CpuStateX86.cpp
+	StackFrameX86.cpp
 
 	# debugger_interface
 	DebugEvent.cpp
@@ -48,6 +49,8 @@ Application Debugger :
 
 	# gui/team_window
 	ImageListView.cpp
+	RegisterView.cpp
+	StackTraceView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
 

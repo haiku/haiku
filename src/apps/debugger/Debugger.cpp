@@ -13,6 +13,8 @@
 #include <Application.h>
 #include <Message.h>
 
+#include <ObjectList.h>
+
 #include "debug_utils.h"
 
 #include "TeamDebugger.h"
@@ -216,7 +218,7 @@ printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
 			stopInMain = true;
 		}
 
-		// If we've got 
+		// If we've got
 		if (team < 0) {
 printf("no team yet, getting thread info...\n");
 			thread_info threadInfo;
@@ -245,12 +247,10 @@ printf("There's already a debugger for team: %ld\n", team);
 			fprintf(stderr, "Error: Out of memory!\n");
 		}
 
-		if (debugger->Init(team, thread, stopInMain) == B_OK)
-{
+		if (debugger->Init(team, thread, stopInMain) == B_OK
+			&& fTeamDebuggers.AddItem(debugger)) {
 printf("debugger for team %ld created and initialized successfully!\n", team);
-			fTeamDebuggers.Add(debugger);
-}
-		else
+		} else
 			delete debugger;
 	}
 
@@ -261,13 +261,13 @@ printf("debugger for team %ld created and initialized successfully!\n", team);
 	}
 
 private:
-	typedef DoublyLinkedList<TeamDebugger>	TeamDebuggerList;
+	typedef BObjectList<TeamDebugger>	TeamDebuggerList;
 
 private:
 	TeamDebugger* _TeamDebuggerForTeam(team_id teamID) const
 	{
-		for (TeamDebuggerList::ConstIterator it = fTeamDebuggers.GetIterator();
-				TeamDebugger* debugger = it.Next();) {
+		for (int32 i = 0; TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
+				i++) {
 			if (debugger->TeamID() == teamID)
 				return debugger;
 		}

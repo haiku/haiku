@@ -23,6 +23,8 @@ public:
 
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state);
+	virtual	status_t			CreateStackTrace(Team* team, CpuState* cpuState,
+									StackTrace*& _stackTrace);
 
 private:
 			void				_AddRegister(int32 index, const char* name,

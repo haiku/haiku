@@ -13,6 +13,8 @@
 class CpuState;
 class DebuggerInterface;
 class Register;
+class StackTrace;
+class Team;
 
 
 class Architecture : public Referenceable {
@@ -28,6 +30,9 @@ public:
 
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state) = 0;
+	virtual	status_t			CreateStackTrace(Team* team, CpuState* cpuState,
+									StackTrace*& _stackTrace) = 0;
+										// team is not locked
 
 protected:
 			DebuggerInterface*	fDebuggerInterface;

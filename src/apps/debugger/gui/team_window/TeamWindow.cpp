@@ -20,6 +20,8 @@
 #include "ImageListView.h"
 #include "MessageCodes.h"
 #include "RegisterView.h"
+#include "StackTrace.h"
+#include "StackTraceView.h"
 #include "TeamDebugModel.h"
 
 
@@ -38,6 +40,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fThreadListView(NULL),
 	fImageListView(NULL),
 	fRegisterView(NULL),
+	fStackTraceView(NULL),
 	fRunButton(NULL),
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
@@ -109,7 +112,15 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-//		case MSG_THREAD_STACK_TRACE_CHANGED:
+		case MSG_THREAD_STACK_TRACE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleStackTraceChanged(threadID);
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -186,7 +197,7 @@ TeamWindow::_Init()
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
 		.Add(fThreadListView = ThreadListView::Create(this))
-		.Add(new BTextView("stack frames"));
+		.Add(fStackTraceView = StackTraceView::Create());
 
 	// add images tab
 	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL);
@@ -234,12 +245,18 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 
 	CpuState* cpuState = fActiveThread != NULL
 		? fActiveThread->GetCpuState() : NULL;
-	Reference<CpuState> reference(cpuState);
+	Reference<CpuState> cpuStateReference(cpuState);
+		// hold a reference until the register view has one
+
+	StackTrace* stackTrace = fActiveThread != NULL
+		? fActiveThread->GetStackTrace() : NULL;
+	Reference<StackTrace> stackTraceReference(stackTrace);
 		// hold a reference until the register view has one
 
 	locker.Unlock();
 
 	fRegisterView->SetCpuState(cpuState);
+	fStackTraceView->SetStackTrace(stackTrace);
 }
 
 
@@ -305,6 +322,26 @@ TeamWindow::_HandleCpuStateChanged(thread_id threadID)
 	locker.Unlock();
 
 	fRegisterView->SetCpuState(cpuState);
+}
+
+
+void
+TeamWindow::_HandleStackTraceChanged(thread_id threadID)
+{
+	// We're only interested in the currently selected thread
+	if (fActiveThread == NULL || threadID != fActiveThread->ID())
+		return;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	StackTrace* stackTrace = fActiveThread != NULL
+		? fActiveThread->GetStackTrace() : NULL;
+	Reference<StackTrace> stackTraceReference(stackTrace);
+		// hold a reference until the register view has one
+
+	locker.Unlock();
+
+	fStackTraceView->SetStackTrace(stackTrace);
 }
 
 

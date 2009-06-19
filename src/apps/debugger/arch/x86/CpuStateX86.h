@@ -42,6 +42,7 @@ enum {
 
 class CpuStateX86 : public CpuState {
 public:
+								CpuStateX86();
 								CpuStateX86(const debug_cpu_state_x86& state);
 	virtual						~CpuStateX86();
 

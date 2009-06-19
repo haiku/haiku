@@ -19,7 +19,6 @@
 #include "DebuggerInterface.h"
 #include "Jobs.h"
 #include "MessageCodes.h"
-#include "Team.h"
 #include "TeamDebugModel.h"
 
 
@@ -80,6 +79,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 	fTeam->SetName(teamInfo.args);
 		// TODO: Set a better name!
+
+	fTeam->AddListener(this);
 
 	// create our worker
 	fWorker = new(std::nothrow) Worker;
@@ -196,6 +197,35 @@ TeamDebugger::MessageReceived(BMessage* message)
 			_HandleThreadAction(threadID, message->what);
 			break;
 		}
+
+		case MSG_THREAD_STATE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleThreadStateChanged(threadID);
+			break;
+		}
+		case MSG_THREAD_CPU_STATE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleCpuStateChanged(threadID);
+			break;
+		}
+		case MSG_THREAD_STACK_TRACE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) != B_OK)
+				break;
+
+			_HandleStackTraceChanged(threadID);
+			break;
+		}
+
 		default:
 			BLooper::MessageReceived(message);
 			break;
@@ -239,6 +269,33 @@ void
 TeamDebugger::JobAborted(Job* job)
 {
 printf("TeamDebugger::JobAborted(%p)\n", job);
+}
+
+
+void
+TeamDebugger::ThreadStateChanged(const ::Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STATE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ThreadCpuStateChanged(const ::Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_CPU_STATE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
 }
 
 
@@ -481,24 +538,8 @@ void
 TeamDebugger::_SetThreadState(::Thread* thread, uint32 state,
 	CpuState* cpuState)
 {
-	// update the thread state
-	uint32 oldState = thread->State();
 	thread->SetState(state);
-
-	// cancel jobs for this thread
-	if (oldState == THREAD_STATE_STOPPED)
-		fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_CPU_STATE));
-
-	if (state == THREAD_STATE_STOPPED) {
-		if (cpuState != NULL) {
-			thread->SetCpuState(cpuState);
-		} else {
-			// trigger updating the CPU state
-			fWorker->ScheduleJob(new(std::nothrow) GetCpuStateJob(
-					fDebuggerInterface, thread),
-				this);
-		}
-	}
+	thread->SetCpuState(cpuState);
 }
 
 
@@ -549,4 +590,56 @@ printf("MSG_THREAD_STEP_OUT\n");
 
 // TODO: Handle stepping correctly!
 	}
+}
+
+
+void
+TeamDebugger::_HandleThreadStateChanged(thread_id threadID)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return;
+
+	// cancel jobs for this thread
+	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_CPU_STATE));
+	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_STACK_TRACE));
+
+	// If the thread is stopped and has no CPU state yet, schedule a job.
+	if (thread->State() == THREAD_STATE_STOPPED
+			&& thread->GetCpuState() == NULL) {
+		fWorker->ScheduleJob(
+			new(std::nothrow) GetCpuStateJob(fDebuggerInterface, thread),
+			this);
+	}
+}
+
+
+void
+TeamDebugger::_HandleCpuStateChanged(thread_id threadID)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return;
+
+	// cancel stack trace job for this thread
+	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_STACK_TRACE));
+
+	// If the thread has a CPU state, but no stack trace yet, schedule a job.
+	if (thread->GetCpuState() != NULL && thread->GetStackTrace() == NULL) {
+		fWorker->ScheduleJob(
+			new(std::nothrow) GetStackTraceJob(fDebuggerInterface,
+				fDebuggerInterface->GetArchitecture(), thread),
+			this);
+	}
+}
+
+
+void
+TeamDebugger::_HandleStackTraceChanged(thread_id threadID)
+{
+printf("TeamDebugger::_HandleStackTraceChanged()\n");
 }

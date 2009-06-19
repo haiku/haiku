@@ -9,20 +9,19 @@
 #include <Looper.h>
 
 #include <debug_support.h>
-#include <util/DoublyLinkedList.h>
 
 #include "DebugEvent.h"
+#include "Team.h"
 #include "TeamWindow.h"
 #include "Worker.h"
 
 
 class DebuggerInterface;
-class Team;
 class TeamDebugModel;
 
 
-class TeamDebugger :  public DoublyLinkedListLinkImpl<TeamDebugger>,
-	private BLooper, private TeamWindow::Listener, private JobListener {
+class TeamDebugger : private BLooper, private TeamWindow::Listener,
+	private JobListener, private Team::Listener {
 public:
 								TeamDebugger();
 								~TeamDebugger();
@@ -44,6 +43,14 @@ private:
 	virtual	void				JobDone(Job* job);
 	virtual	void				JobFailed(Job* job);
 	virtual	void				JobAborted(Job* job);
+
+	// Team::Listener
+	virtual	void				ThreadStateChanged(
+									const ::Team::ThreadEvent& event);
+	virtual	void				ThreadCpuStateChanged(
+									const ::Team::ThreadEvent& event);
+	virtual	void				ThreadStackTraceChanged(
+									const ::Team::ThreadEvent& event);
 
 private:
 	static	status_t			_DebugEventListenerEntry(void* data);
@@ -81,6 +88,10 @@ private:
 
 			void				_HandleThreadAction(thread_id threadID,
 									uint32 action);
+
+			void				_HandleThreadStateChanged(thread_id threadID);
+			void				_HandleCpuStateChanged(thread_id threadID);
+			void				_HandleStackTraceChanged(thread_id threadID);
 
 private:
 			::Team*				fTeam;

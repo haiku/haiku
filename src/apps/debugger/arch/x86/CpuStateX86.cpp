@@ -8,6 +8,13 @@
 #include "Register.h"
 
 
+CpuStateX86::CpuStateX86()
+	:
+	fSetRegisters()
+{
+}
+
+
 CpuStateX86::CpuStateX86(const debug_cpu_state_x86& state)
 	:
 	fSetRegisters()

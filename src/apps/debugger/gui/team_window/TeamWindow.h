@@ -16,6 +16,7 @@ class BButton;
 class BTabView;
 class ImageListView;
 class RegisterView;
+class StackTraceView;
 class TeamDebugModel;
 
 
@@ -55,6 +56,7 @@ private:
 
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
+			void				_HandleStackTraceChanged(thread_id threadID);
 
 private:
 			TeamDebugModel*		fDebugModel;
@@ -65,6 +67,7 @@ private:
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
 			RegisterView*		fRegisterView;
+			StackTraceView*		fStackTraceView;
 			BButton*			fRunButton;
 			BButton*			fStepOverButton;
 			BButton*			fStepIntoButton;
