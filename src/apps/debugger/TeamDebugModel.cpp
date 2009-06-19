@@ -13,9 +13,12 @@
 // #pragma mark - TeamDebugModel
 
 
-TeamDebugModel::TeamDebugModel(Team* team)
+TeamDebugModel::TeamDebugModel(Team* team, DebuggerInterface* debuggerInterface,
+	Architecture* architecture)
 	:
-	fTeam(team)
+	fTeam(team),
+	fDebuggerInterface(debuggerInterface),
+	fArchitecture(architecture)
 {
 }
 

@@ -81,15 +81,6 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	fTeam->SetName(teamInfo.args);
 		// TODO: Set a better name!
 
-	// create the team debug model
-	fDebugModel = new(std::nothrow) TeamDebugModel(fTeam);
-	if (fDebugModel == NULL)
-		return B_NO_MEMORY;
-
-	error = fDebugModel->Init();
-	if (error != B_OK)
-		return error;
-
 	// create our worker
 	fWorker = new(std::nothrow) Worker;
 	if (fWorker == NULL)
@@ -105,6 +96,16 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fDebuggerInterface->Init();
+	if (error != B_OK)
+		return error;
+
+	// create the team debug model
+	fDebugModel = new(std::nothrow) TeamDebugModel(fTeam, fDebuggerInterface,
+		fDebuggerInterface->GetArchitecture());
+	if (fDebugModel == NULL)
+		return B_NO_MEMORY;
+
+	error = fDebugModel->Init();
 	if (error != B_OK)
 		return error;
 

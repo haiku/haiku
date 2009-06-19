@@ -14,13 +14,19 @@
 //};
 
 
+class Architecture;
+class DebuggerInterface;
+
+
 class TeamDebugModel {
 public:
 			class Event;
 			class Listener;
 
 public:
-								TeamDebugModel(Team* team);
+								TeamDebugModel(Team* team,
+									DebuggerInterface* debuggerInterface,
+									Architecture* architecture);
 								~TeamDebugModel();
 
 			status_t			Init();
@@ -29,6 +35,10 @@ public:
 			void				Unlock()	{ fTeam->Unlock(); }
 
 			Team*				GetTeam() const	{ return fTeam; }
+			DebuggerInterface*	GetDebuggerInterface() const
+									{ return fDebuggerInterface; }
+			Architecture*		GetArchitecture() const
+									{ return fArchitecture; }
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
@@ -38,6 +48,8 @@ private:
 
 private:
 			Team*				fTeam;
+			DebuggerInterface*	fDebuggerInterface;
+			Architecture*		fArchitecture;
 			ListenerList		fListeners;
 };
 
