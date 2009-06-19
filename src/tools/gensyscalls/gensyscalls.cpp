@@ -19,30 +19,33 @@
 
 using std::vector;
 
-// usage
-const char *kUsage =
-"Usage: gensyscalls [ -c <calls> ] [ -d <dispatcher> ] [ -n <numbers> ]\n"
-"                   [ -t <table> ] [ -s <strace> ]\n"
-"\n"
-"The command is able to generate several syscalls related source files.\n"
-"\n"
-"  <calls>                - Output: The assembly source file implementing the\n"
-"                           actual syscalls.\n"
-"  <dispatcher>           - Output: The C source file to be included by the\n"
-"                           syscall dispatcher source file.\n"
-"  <numbers>              - Output: The C/assembly include files defining the\n"
-"                           syscall numbers.\n"
-"  <table>                - Output: A C source file containing an array with\n"
-"                           infos about the syscalls\n"
-"  <strace>               - Output: A C source file for strace support.\n"
-;
 
 // print_usage
-static
-void
+static void
 print_usage(bool error)
 {
-	fprintf((error ? stderr : stdout), kUsage);
+	fprintf(error ? stderr : stdout,
+		"Usage: gensyscalls [ -c <calls> ] [ -d <dispatcher> ] [ -n <numbers> "
+			"]\n"
+		"                   [ -t <table> ] [ -s <strace> ]\n"
+		"\n"
+		"The command is able to generate several syscalls related source "
+			"files.\n"
+		"\n"
+		"  <calls>                - Output: The assembly source file "
+			"implementing the\n"
+		"                           actual syscalls.\n"
+		"  <dispatcher>           - Output: The C source file to be included by "
+			"the\n"
+		"                           syscall dispatcher source file.\n"
+		"  <numbers>              - Output: The C/assembly include files "
+			"defining the\n"
+		"                           syscall numbers.\n"
+		"  <table>                - Output: A C source file containing an array "
+			"with\n"
+		"                           infos about the syscalls\n"
+		"  <strace>               - Output: A C source file for strace "
+			"support.\n");
 }
 
 
@@ -90,7 +93,7 @@ Syscall::Syscall(const char* name, const char* kernelName)
 Syscall::~Syscall()
 {
 	delete fReturnType;
-	
+
 	int count = CountParameters();
 	for (int i = 0; i < count; i++)
 		delete ParameterAt(i);
@@ -278,7 +281,7 @@ public:
 		ofstream file(filename, ofstream::out | ofstream::trunc);
 		if (!file.is_open())
 			throw IOException(string("Failed to open `") + filename + "'.");
-		
+
 		// output the syscalls definitions
 		for (int i = 0; i < fSyscallCount; i++) {
 			const Syscall* syscall = fSyscallVector->SyscallAt(i);
@@ -466,7 +469,7 @@ public:
 			<< "(void)handler;" << endl;
 
 		int chunkSize = (fSyscallCount + 19) / 20;
-		
+
 		// iterate through the syscalls
 		for (int i = 0; i < fSyscallCount; i++) {
 			const Syscall* syscall = fSyscallVector->SyscallAt(i);
@@ -535,14 +538,14 @@ public:
 			// pointer type
 			// check, if it is a string constant ("const char *" or
 			// "char const *")
-			if (_GetTypeCodeTokenize(typeName) == "const"
+			if ((_GetTypeCodeTokenize(typeName) == "const"
 					&& _GetTypeCodeTokenize(typeName) == "char"
 					&& _GetTypeCodeTokenize(typeName) == "*"
-					&& _GetTypeCodeTokenize(typeName) == ""
-				|| _GetTypeCodeTokenize(typeName) == "char"
+					&& _GetTypeCodeTokenize(typeName) == "")
+				|| (_GetTypeCodeTokenize(typeName) == "char"
 					&& _GetTypeCodeTokenize(typeName) == "const"
 					&& _GetTypeCodeTokenize(typeName) == "*"
-					&& _GetTypeCodeTokenize(typeName) == "") {
+					&& _GetTypeCodeTokenize(typeName) == "")) {
 				return "B_STRING_TYPE";
 			}
 
