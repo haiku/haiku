@@ -317,7 +317,7 @@ public:
 								const BGradient& gradient);
 			void			FillPolygon(const BPoint* ptArray, int32 numPts,
 								BRect bounds, const BGradient& gradient);
-	
+
 			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 								BRect bounds, pattern p = B_SOLID_HIGH);
 			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
@@ -356,7 +356,7 @@ public:
 			void			FillEllipse(BPoint center, float xRadius,
 								float yRadius, const BGradient& gradient);
 			void			FillEllipse(BRect r, const BGradient& gradient);
-	
+
 			void			StrokeArc(BPoint center, float xRadius,
 								float yRadius, float startAngle, float arcAngle,
 								pattern p = B_SOLID_HIGH);
@@ -372,14 +372,14 @@ public:
 								const BGradient& gradient);
 			void			FillArc(BRect r, float startAngle, float arcAngle,
 								const BGradient& gradient);
-	
+
 			void			StrokeBezier(BPoint* controlPoints,
 								pattern p = B_SOLID_HIGH);
 			void			FillBezier(BPoint* controlPoints,
 								pattern p = B_SOLID_HIGH);
 			void			FillBezier(BPoint* controlPoints,
 							   const BGradient& gradient);
-	
+
 			void			StrokeShape(BShape* shape,
 								pattern p = B_SOLID_HIGH);
 			void			FillShape(BShape* shape, pattern p = B_SOLID_HIGH);
@@ -622,7 +622,7 @@ private:
 			void 			_PrintToStream();
 			void			_PrintTree();
 
-			int32			server_token;
+			int32			fServerToken;
 			uint32			fFlags;
 			BPoint			fParentOffset;
 			BWindow*		fOwner;

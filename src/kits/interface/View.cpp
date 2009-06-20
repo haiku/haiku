@@ -1000,7 +1000,7 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 
 	ViewSetViewCursorInfo info;
 	info.cursorToken = cursor->fServerToken;
-	info.viewToken = _get_object_token_(this); // TODO: Use server_token!
+	info.viewToken = fServerToken;
 	info.sync = sync;
 
 	BPrivate::AppServerLink link;
@@ -3906,8 +3906,7 @@ BView::_RemoveSelf()
 	if (owner != NULL && !fTopLevelView) {
 		// the top level view is deleted by the app_server automatically
 		owner->fLink->StartMessage(AS_VIEW_DELETE);
-		// TODO: Use server_token
-		owner->fLink->Attach<int32>(_get_object_token_(this));
+		owner->fLink->Attach<int32>(fServerToken);
 	}
 
 	parent->InvalidateLayout();
@@ -4646,6 +4645,7 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode,
 
 	fParentOffset.Set(frame.left, frame.top);
 
+	fServerToken = _get_object_token_(this);
 	fOwner = NULL;
 	fParent = NULL;
 	fNextSibling = NULL;
@@ -4902,8 +4902,7 @@ BView::_CreateSelf()
 	else
  		fOwner->fLink->StartMessage(AS_VIEW_CREATE);
 
-		// TODO: Use server_token
-	fOwner->fLink->Attach<int32>(_get_object_token_(this));
+	fOwner->fLink->Attach<int32>(fServerToken);
 	fOwner->fLink->AttachString(Name());
 	fOwner->fLink->Attach<BRect>(Frame());
 	fOwner->fLink->Attach<BPoint>(LeftTop());
@@ -4916,8 +4915,7 @@ BView::_CreateSelf()
 	if (fTopLevelView)
 		fOwner->fLink->Attach<int32>(B_NULL_TOKEN);
 	else
-		// TODO: Use server_token
-		fOwner->fLink->Attach<int32>(_get_object_token_(fParent));
+		fOwner->fLink->Attach<int32>(fParent->fServerToken);
 	fOwner->fLink->Flush();
 
 	_CheckOwnerLockAndSwitchCurrent();
@@ -5125,8 +5123,7 @@ BView::_Detach()
 		if (fOwner->fLastMouseMovedView == this)
 			fOwner->fLastMouseMovedView = NULL;
 
-		// TODO: Use server_token
-		if (fOwner->fLastViewToken == _get_object_token_(this))
+		if (fOwner->fLastViewToken == fServerToken)
 			fOwner->fLastViewToken = B_NULL_TOKEN;
 
 		_SetOwner(NULL);
@@ -5343,15 +5340,12 @@ BView::_CheckLock() const
 void
 BView::_SwitchServerCurrentView() const
 {
-		// TODO: Use server_token
-	int32 serverToken = _get_object_token_(this);
-
-	if (fOwner->fLastViewToken != serverToken) {
-		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
+	if (fOwner->fLastViewToken != fServerToken) {
+		STRACE(("contacting app_server... sending token: %ld\n", fServerToken));
 		fOwner->fLink->StartMessage(AS_SET_CURRENT_VIEW);
-		fOwner->fLink->Attach<int32>(serverToken);
+		fOwner->fLink->Attach<int32>(fServerToken);
 
-		fOwner->fLastViewToken = serverToken;
+		fOwner->fLastViewToken = fServerToken;
 	} else {
 		STRACE(("quiet2\n"));
 	}
@@ -5510,7 +5504,7 @@ BView::_PrintToStream()
 	fNextSibling ? fNextSibling->Name() : "NULL",
 	fPreviousSibling ? fPreviousSibling->Name() : "NULL",
 	fOwner ? fOwner->Name() : "NULL",
-	_get_object_token_(this),
+	fServerToken,
 	fFlags,
 	fParentOffset.x, fParentOffset.y,
 	fBounds.left, fBounds.top, fBounds.right, fBounds.bottom,

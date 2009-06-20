@@ -2905,7 +2905,7 @@ BWindow::_CreateTopView()
 	fTopView->fTopLevelView = true;
 
 	//inhibit check_lock()
-	fLastViewToken = _get_object_token_(fTopView);
+	fLastViewToken = fTopView->fServerToken;
 
 	// set fTopView's owner, add it to window's eligible handler list
 	// and also set its next handler to be this window.
@@ -3089,7 +3089,7 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message,
 			cookie.focus_token = _get_object_token_(*_target);
 
 		if (fLastMouseMovedView != NULL && cookie.message->what == B_MOUSE_MOVED)
-			cookie.last_view_token = _get_object_token_(fLastMouseMovedView);
+			cookie.last_view_token = fLastMouseMovedView->fServerToken;
 
 		*_usePreferred = false;
 	}
@@ -3553,8 +3553,10 @@ BView *
 BWindow::_FindView(int32 token)
 {
 	BHandler* handler;
-	if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN, (void**)&handler) != B_OK)
+	if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
+			(void**)&handler) != B_OK) {
 		return NULL;
+	}
 
 	// the view must belong to us in order to be found by this method
 	BView* view = dynamic_cast<BView*>(handler);
