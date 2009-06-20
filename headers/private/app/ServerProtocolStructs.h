@@ -55,6 +55,7 @@ struct ViewDragImageInfo {
 
 struct ViewSetViewCursorInfo {
 	int32						cursorToken;
+	int32						viewToken;
 	bool						sync;
 };
 

@@ -10,7 +10,7 @@
 
 /*!
 	Although descended from ServerBitmaps, ServerCursors are not handled by
-	the BitmapManager - they are allocated like any other object. Unlike BeOS 
+	the BitmapManager - they are allocated like any other object. Unlike BeOS
 	R5, cursors can be any size or color space, and this class accomodates and
 	expands the R5 API.
 */
@@ -33,19 +33,17 @@ using std::nothrow;
 	\param flags ServerBitmap flags. See Bitmap.h.
 	\param hotspot Hotspot of the cursor
 	\param bytesperline Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
-	
+
 */
-ServerCursor::ServerCursor(BRect r, color_space format,
-						   int32 flags, BPoint hotspot,
-						   int32 bytesPerRow,
-						   screen_id screen)
-	: ServerBitmap(r, format, flags, bytesPerRow, screen),
-	  fHotSpot(hotspot),
-	  fOwningTeam(-1),
-	  fReferenceCount(1),
-	  fCursorData(NULL),
-	  fManager(NULL),
-	  fPendingViewCursor(0)
+ServerCursor::ServerCursor(BRect r, color_space format, int32 flags,
+		BPoint hotspot, int32 bytesPerRow, screen_id screen)
+	:
+	ServerBitmap(r, format, flags, bytesPerRow, screen),
+	fHotSpot(hotspot),
+	fOwningTeam(-1),
+	fReferenceCount(1),
+	fCursorData(NULL),
+	fManager(NULL)
 {
 	fHotSpot.ConstrainTo(Bounds());
 	_AllocateBuffer();
@@ -57,13 +55,13 @@ ServerCursor::ServerCursor(BRect r, color_space format,
 	\param data Pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
 */
 ServerCursor::ServerCursor(const uint8* data)
-	: ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
-	  fHotSpot(0, 0),
-	  fOwningTeam(-1),
-	  fReferenceCount(1),
-	  fCursorData(NULL),
-	  fManager(NULL),
-	  fPendingViewCursor(0)
+	:
+	ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
+	fHotSpot(0, 0),
+	fOwningTeam(-1),
+	fReferenceCount(1),
+	fCursorData(NULL),
+	fManager(NULL)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
@@ -72,7 +70,7 @@ ServerCursor::ServerCursor(const uint8* data)
 	// to RGBA32 (little endian). Eventually, there will be support for 16 and
 	// 8-bit depths
 	// NOTE: review this once we have working PPC graphics cards (big endian).
-	if (data) {	
+	if (data) {
 		_AllocateBuffer();
 		uint8* buffer = Bits();
 		if (!buffer)
@@ -123,17 +121,16 @@ ServerCursor::ServerCursor(const uint8* data)
 	\param data Pointer to bitmap data in memory,
 	the padding bytes should be contained when format less than 32 bpp.
 */
-ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
-						   uint32 width, uint32 height,
-						   color_space format)
-	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
-	  fHotSpot(0, 0),
-	  fOwningTeam(-1),
-	  fReferenceCount(1),
-	  fCursorData(NULL),
-	  fManager(NULL),
-	  fPendingViewCursor(0)
-{	
+ServerCursor::ServerCursor(const uint8* alreadyPaddedData, uint32 width,
+		uint32 height, color_space format)
+	:
+	ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
+	fHotSpot(0, 0),
+	fOwningTeam(-1),
+	fReferenceCount(1),
+	fCursorData(NULL),
+	fManager(NULL)
+{
 	_AllocateBuffer();
 	if (Bits())
 		memcpy(Bits(), alreadyPaddedData, BitsLength());
@@ -145,19 +142,19 @@ ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
 	\param cursor cursor to copy
 */
 ServerCursor::ServerCursor(const ServerCursor* cursor)
-	: ServerBitmap(cursor),
-	  fHotSpot(0, 0),
-	  fOwningTeam(-1),
-	  fReferenceCount(1),
-	  fCursorData(NULL),
-	  fManager(NULL),
-	  fPendingViewCursor(0)
+	:
+	ServerBitmap(cursor),
+	fHotSpot(0, 0),
+	fOwningTeam(-1),
+	fReferenceCount(1),
+	fCursorData(NULL),
+	fManager(NULL)
 {
 	// TODO: Hm. I don't move this into the if clause,
 	// because it might break code elsewhere.
 	_AllocateBuffer();
 
-	if (cursor) {	
+	if (cursor) {
 		if (Bits() && cursor->Bits())
 			memcpy(Bits(), cursor->Bits(), BitsLength());
 		fHotSpot = cursor->fHotSpot;
@@ -193,11 +190,6 @@ bool
 ServerCursor::Release()
 {
 	if (atomic_add(&fReferenceCount, -1) == 1) {
-		if (fPendingViewCursor > 0) {
-			// There is a SetViewCursor() waiting to be carried out
-			return false;
-		}
-
 		if (fManager && !fManager->RemoveCursor(this))
 			return false;
 
@@ -205,13 +197,6 @@ ServerCursor::Release()
 		return true;
 	}
 	return false;
-}
-
-
-void
-ServerCursor::SetPendingViewCursor(bool pending)
-{
-	atomic_add(&fPendingViewCursor, pending ? 1 : -1);
 }
 
 

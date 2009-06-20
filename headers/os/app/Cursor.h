@@ -41,8 +41,9 @@ private:
 
 			int32				fServerToken;
 			bool				fNeedToFree;
-	mutable	bool				fPendingViewCursor;
 
+			bool				_reservedWasPendingViewCursor;
+				// Probably bogus because of padding.
 			uint32				_reserved[6];
 };
 

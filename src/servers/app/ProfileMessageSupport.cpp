@@ -45,6 +45,7 @@ string_for_message_code(uint32 code, BString& string)
 
 		// Cursor commands
 		case AS_SET_CURSOR: string = "AS_SET_CURSOR"; break;
+		case AS_SET_VIEW_CURSOR: string = "AS_SET_VIEW_CURSOR"; break;
 
 		case AS_SHOW_CURSOR: string = "AS_SHOW_CURSOR"; break;
 		case AS_HIDE_CURSOR: string = "AS_HIDE_CURSOR"; break;
@@ -52,6 +53,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_QUERY_CURSOR_HIDDEN: string = "AS_QUERY_CURSOR_HIDDEN"; break;
 
 		case AS_CREATE_CURSOR: string = "AS_CREATE_CURSOR"; break;
+		case AS_REFERENCE_CURSOR: string = "AS_REFERENCE_CURSOR"; break;
 		case AS_DELETE_CURSOR: string = "AS_DELETE_CURSOR"; break;
 
 		case AS_BEGIN_RECT_TRACKING: string = "AS_BEGIN_RECT_TRACKING"; break;
@@ -64,7 +66,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_QUIT_WINDOW: string = "AS_QUIT_WINDOW"; break;
 		case AS_SEND_BEHIND: string = "AS_SEND_BEHIND"; break;
 		case AS_SET_LOOK: string = "AS_SET_LOOK"; break;
-		case AS_SET_FEEL: string = "AS_SET_FEEL"; break; 
+		case AS_SET_FEEL: string = "AS_SET_FEEL"; break;
 		case AS_SET_FLAGS: string = "AS_SET_FLAGS"; break;
 		case AS_DISABLE_UPDATES: string = "AS_DISABLE_UPDATES"; break;
 		case AS_ENABLE_UPDATES: string = "AS_ENABLE_UPDATES"; break;
@@ -140,7 +142,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_GET_ACCELERANT_INFO: string = "AS_GET_ACCELERANT_INFO"; break;
 		case AS_GET_MONITOR_INFO: string = "AS_GET_MONITOR_INFO"; break;
 		case AS_GET_FRAME_BUFFER_CONFIG: string = "AS_GET_FRAME_BUFFER_CONFIG"; break;
-	
+
 		case AS_SET_DPMS: string = "AS_SET_DPMS"; break;
 		case AS_GET_DPMS_STATE: string = "AS_GET_DPMS_STATE"; break;
 		case AS_GET_DPMS_CAPABILITIES: string = "AS_GET_DPMS_CAPABILITIES"; break;
@@ -174,7 +176,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_GET_DECORATOR_SETTINGS: string = "AS_GET_DECORATOR_SETTINGS"; break;
 		case AS_GET_SHOW_ALL_DRAGGERS: string = "AS_GET_SHOW_ALL_DRAGGERS"; break;
 		case AS_SET_SHOW_ALL_DRAGGERS: string = "AS_SET_SHOW_ALL_DRAGGERS"; break;
-		
+
 		// Subpixel antialiasing & hinting
 		case AS_SET_SUBPIXEL_ANTIALIASING: string = "AS_SET_SUBPIXEL_ANTIALIASING"; break;
 		case AS_GET_SUBPIXEL_ANTIALIASING: string = "AS_GET_SUBPIXEL_ANTIALIASING"; break;
@@ -240,7 +242,6 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_VIEW_SET_ORIGIN: string = "AS_VIEW_SET_ORIGIN"; break;
 		case AS_VIEW_GET_ORIGIN: string = "AS_VIEW_GET_ORIGIN"; break;
 		case AS_VIEW_RESIZE_MODE: string = "AS_VIEW_RESIZE_MODE"; break;
-		case AS_VIEW_SET_CURSOR: string = "AS_VIEW_SET_CURSOR"; break;
 		case AS_VIEW_BEGIN_RECT_TRACK: string = "AS_VIEW_BEGIN_RECT_TRACK"; break;
 		case AS_VIEW_END_RECT_TRACK: string = "AS_VIEW_END_RECT_TRACK"; break;
 		case AS_VIEW_DRAG_RECT: string = "AS_VIEW_DRAG_RECT"; break;
@@ -296,7 +297,7 @@ string_for_message_code(uint32 code, BString& string)
 		// BDirectWindow codes
 		case AS_DIRECT_WINDOW_GET_SYNC_DATA: string = "AS_DIRECT_WINDOW_GET_SYNC_DATA"; break;
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN: string = "AS_DIRECT_WINDOW_SET_FULLSCREEN"; break;
-	
+
 		default:
 			string << "unkown code: " << code;
 			break;

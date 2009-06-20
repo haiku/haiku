@@ -1291,10 +1291,8 @@ View::SetCursor(ServerCursor *cursor)
 
 	fCursor = cursor;
 
-	if (fCursor) {
+	if (fCursor)
 		fCursor->Acquire();
-		fCursor->SetPendingViewCursor(false);
-	}
 }
 
 

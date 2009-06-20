@@ -996,26 +996,21 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 	if (cursor == NULL || fOwner == NULL)
 		return;
 
-	_CheckLockAndSwitchCurrent();
+	_CheckLock();
 
-	fOwner->fLink->StartMessage(AS_VIEW_SET_CURSOR);
 	ViewSetViewCursorInfo info;
 	info.cursorToken = cursor->fServerToken;
+	info.viewToken = _get_object_token_(this); // TODO: Use server_token!
 	info.sync = sync;
-	fOwner->fLink->Attach<ViewSetViewCursorInfo>(info);
 
-	if (!sync) {
-		cursor->fPendingViewCursor = true;
-			// this avoids a race condition in case the cursor is
-			// immediately deleted after this call, as the deletion
-			// is handled by the application, not the window
-	} else {
-		// make sure the server has processed the
-		// message and "acquired" the cursor in
-		// the window thread before returning from
-		// this function
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_VIEW_CURSOR);
+	link.Attach<ViewSetViewCursorInfo>(info);
+
+	if (sync) {
+		// Make sure the server has processed the message.
 		int32 code;
-		fOwner->fLink->FlushWithReply(code);
+		link.FlushWithReply(code);
 	}
 }
 
@@ -3911,6 +3906,7 @@ BView::_RemoveSelf()
 	if (owner != NULL && !fTopLevelView) {
 		// the top level view is deleted by the app_server automatically
 		owner->fLink->StartMessage(AS_VIEW_DELETE);
+		// TODO: Use server_token
 		owner->fLink->Attach<int32>(_get_object_token_(this));
 	}
 
@@ -4250,7 +4246,7 @@ BView::MessageReceived(BMessage* msg)
 				if (err == B_OK) {
 					if (newHiddenState == true)
 						Hide();
-					else 
+					else
 						Show();
 				}
 			}
@@ -4906,6 +4902,7 @@ BView::_CreateSelf()
 	else
  		fOwner->fLink->StartMessage(AS_VIEW_CREATE);
 
+		// TODO: Use server_token
 	fOwner->fLink->Attach<int32>(_get_object_token_(this));
 	fOwner->fLink->AttachString(Name());
 	fOwner->fLink->Attach<BRect>(Frame());
@@ -4919,6 +4916,7 @@ BView::_CreateSelf()
 	if (fTopLevelView)
 		fOwner->fLink->Attach<int32>(B_NULL_TOKEN);
 	else
+		// TODO: Use server_token
 		fOwner->fLink->Attach<int32>(_get_object_token_(fParent));
 	fOwner->fLink->Flush();
 
@@ -5127,6 +5125,7 @@ BView::_Detach()
 		if (fOwner->fLastMouseMovedView == this)
 			fOwner->fLastMouseMovedView = NULL;
 
+		// TODO: Use server_token
 		if (fOwner->fLastViewToken == _get_object_token_(this))
 			fOwner->fLastViewToken = B_NULL_TOKEN;
 
@@ -5344,6 +5343,7 @@ BView::_CheckLock() const
 void
 BView::_SwitchServerCurrentView() const
 {
+		// TODO: Use server_token
 	int32 serverToken = _get_object_token_(this);
 
 	if (fOwner->fLastViewToken != serverToken) {

@@ -1539,37 +1539,6 @@ fDesktop->LockSingleWindow();
 			fCurrentView->SetResizeMode(resizeMode);
 			break;
 		}
-		case AS_VIEW_SET_CURSOR:
-		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_CURSOR: View: %s\n",
-				Title(), fCurrentView->Name()));
-
-			ViewSetViewCursorInfo info;
-			if (link.Read<ViewSetViewCursorInfo>(&info) != B_OK)
-				break;
-
-			if (!fDesktop->GetCursorManager().Lock())
-				break;
-
-			ServerCursor* cursor
-				= fDesktop->GetCursorManager().FindCursor(info.cursorToken);
-			fCurrentView->SetCursor(cursor);
-
-			fDesktop->GetCursorManager().Unlock();
-
-			if (fWindow->IsFocus()) {
-				// The cursor might need to be updated now
-				if (fDesktop->ViewUnderMouse(fWindow) == fCurrentView->Token())
-					fServerApp->SetCurrentCursor(cursor);
-			}
-			if (info.sync) {
-				// sync the client (it can now delete the cursor)
-				fLink.StartMessage(B_OK);
-				fLink.Flush();
-			}
-
-			break;
-		}
 		case AS_VIEW_SET_FLAGS:
 		{
 			uint32 flags;

@@ -52,8 +52,6 @@ class ServerCursor : public ServerBitmap {
 			bool			Release();
 			int32			ReferenceCount() { return fReferenceCount; }
 
-			void			SetPendingViewCursor(bool pending);
-
 			void			AttachedToManager(CursorManager* manager);
 
 			const uint8*	CursorData() const
@@ -67,7 +65,6 @@ class ServerCursor : public ServerBitmap {
 			vint32			fReferenceCount;
 			uint8*			fCursorData;
 			CursorManager*	fManager;
-			vint32			fPendingViewCursor;
 };
 
 
