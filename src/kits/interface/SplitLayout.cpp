@@ -575,8 +575,8 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 		return false;
 	}
 
-	int32 index;
-	if (SplitterItem* splitItem = _SplitterItemAt(point, &index)) {
+	int32 index = -1;
+	if (_SplitterItemAt(point, &index) != NULL) {
 		fDraggingStartPoint = View()->ConvertToScreen(point);
 		fDraggingStartValue = _SplitterValue(index);
 		fDraggingCurrentValue = fDraggingStartValue;
