@@ -9,6 +9,7 @@
 
 #include "BasicFunctionDebugInfo.h"
 #include "DebuggerInterface.h"
+#include "Demangler.h"
 #include "SymbolInfo.h"
 
 
@@ -72,8 +73,8 @@ DebuggerDebugInfo::FindFunction(target_addr_t address)
 		return NULL;
 
 	return new(std::nothrow) BasicFunctionDebugInfo(this, symbolInfo->Address(),
-		symbolInfo->Size(), symbolInfo->Name(), symbolInfo->Name());
-			// TODO: Demangle!
+		symbolInfo->Size(), symbolInfo->Name(),
+		Demangler::Demangle(symbolInfo->Name()));
 }
 
 

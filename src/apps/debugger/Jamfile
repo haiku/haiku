@@ -16,6 +16,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
 
+SubDirHdrs [ FDirName $(SUBDIR) demangler ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 
@@ -75,6 +76,7 @@ Application Debugger :
 #	tag_names.cpp
 
 	:
+	<nogrist>Debugger_demangler.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
 	<bin>debug_utils.a
@@ -87,4 +89,5 @@ Application Debugger :
 	: Debugger.rdef
 ;
 
+HaikuSubInclude demangler ;
 HaikuSubInclude gui running_teams_window ;

@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src apps debugger demangler ;
+
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
+
+UsePrivateHeaders kernel ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel debugger demangle ] ;
+
+
+MergeObject Debugger_demangler.o
+	:
+	Demangler.cpp
+
+	gcc3+.cpp
+;
