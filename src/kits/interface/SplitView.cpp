@@ -5,12 +5,45 @@
 
 #include <SplitView.h>
 
+#include <stdio.h>
+
+#include <ControlLook.h>
+#include <Cursor.h>
+
 #include "SplitLayout.h"
+
+
+static const unsigned char kHSplitterCursor[] = {
+	16, 1, 8, 8,
+	0x03, 0xc0, 0x02, 0x40, 0x02, 0x40, 0x02, 0x40,
+	0x1a, 0x58, 0x2a, 0x54, 0x4a, 0x52, 0x8a, 0x51,
+	0x8a, 0x51, 0x4a, 0x52, 0x2a, 0x54, 0x1a, 0x58,
+	0x02, 0x40, 0x02, 0x40, 0x02, 0x40, 0x03, 0xc0,
+
+	0x03, 0xc0, 0x03, 0xc0, 0x03, 0xc0, 0x03, 0xc0,
+	0x1b, 0xd8, 0x3b, 0xdc, 0x7b, 0xde, 0xfb, 0xdf,
+	0xfb, 0xdf, 0x7b, 0xde, 0x3b, 0xdc, 0x1b, 0xd8,
+	0x03, 0xc0, 0x03, 0xc0, 0x03, 0xc0, 0x03, 0xc0
+};
+
+static const unsigned char kVSplitterCursor[] = {
+	16, 1, 8, 8,
+	0x01, 0x80, 0x02, 0x40, 0x04, 0x20, 0x08, 0x10,
+	0x0f, 0xf0, 0x00, 0x00, 0xff, 0xff, 0x80, 0x01,
+	0x80, 0x01, 0xff, 0xff, 0x00, 0x00, 0x0f, 0xf0,
+	0x08, 0x10, 0x04, 0x20, 0x02, 0x40, 0x01, 0x80,
+
+	0x01, 0x80, 0x03, 0xc0, 0x07, 0xe0, 0x0f, 0xf0,
+	0x0f, 0xf0, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x0f, 0xf0,
+	0x0f, 0xf0, 0x07, 0xe0, 0x03, 0xc0, 0x01, 0x80
+};
 
 
 // constructor
 BSplitView::BSplitView(enum orientation orientation, float spacing)
-	: BView(NULL,
+	:
+	BView(NULL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INVALIDATE_AFTER_LAYOUT,
 		fSplitLayout = new BSplitLayout(orientation, spacing))
 {
@@ -136,7 +169,8 @@ BSplitView::Draw(BRect updateRect)
 	int32 count = fSplitLayout->CountItems();
 	for (int32 i = 0; i < count - 1; i++) {
 		BRect frame = fSplitLayout->SplitterItemFrame(i);
-		DrawSplitter(frame, Orientation(), draggedSplitterIndex == i);
+		DrawSplitter(frame, updateRect, Orientation(),
+			draggedSplitterIndex == i);
 	}
 }
 
@@ -144,7 +178,8 @@ BSplitView::Draw(BRect updateRect)
 void
 BSplitView::MouseDown(BPoint where)
 {
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	SetMouseEventMask(B_POINTER_EVENTS,
+		B_LOCK_WINDOW_FOCUS | B_SUSPEND_VIEW_FOCUS);
 
 	if (fSplitLayout->StartDraggingSplitter(where))
 		Invalidate();
@@ -164,7 +199,17 @@ BSplitView::MouseUp(BPoint where)
 void
 BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
+	BCursor cursor(B_CURSOR_SYSTEM_DEFAULT);
+
 	int32 splitterIndex = fSplitLayout->DraggedSplitter();
+
+	if (splitterIndex >= 0 || fSplitLayout->IsAboveSplitter(where)) {
+		if (Orientation() == B_VERTICAL)
+			cursor = BCursor(kVSplitterCursor);
+		else
+			cursor = BCursor(kHSplitterCursor);
+	}
+
 	if (splitterIndex >= 0) {
 		BRect oldFrame = fSplitLayout->SplitterItemFrame(splitterIndex);
 		if (fSplitLayout->DragSplitter(where)) {
@@ -172,6 +217,8 @@ BSplitView::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 			Invalidate(fSplitLayout->SplitterItemFrame(splitterIndex));
 		}
 	}
+
+	SetViewCursor(&cursor, true);
 }
 
 // SetLayout
@@ -183,13 +230,18 @@ BSplitView::SetLayout(BLayout* layout)
 
 // DrawSplitter
 void
-BSplitView::DrawSplitter(BRect frame, enum orientation orientation,
-	bool pressed)
+BSplitView::DrawSplitter(BRect frame, const BRect& updateRect,
+	enum orientation orientation, bool pressed)
 {
-	rgb_color black = { 0, 0, 0, 255 };
-	rgb_color white = { 255, 255, 255, 255 };
+	_DrawDefaultSplitter(this, frame, updateRect, orientation, pressed);
+}
 
-	SetHighColor(pressed ? white : black);
-
-	FillRect(frame);
+// _DrawDefaultSplitter
+void
+BSplitView::_DrawDefaultSplitter(BView* view, BRect frame,
+	const BRect& updateRect, enum orientation orientation, bool pressed)
+{
+	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
+	be_control_look->DrawSplitter(view, frame, updateRect, view->ViewColor(),
+		orientation, flags, 0);
 }

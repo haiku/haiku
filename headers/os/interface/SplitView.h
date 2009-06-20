@@ -55,10 +55,12 @@ public:
 
 protected:
 	virtual	void				DrawSplitter(BRect frame,
+									const BRect& updateRect,
 									enum orientation orientation, bool pressed);
 
 private:
 	static	void				_DrawDefaultSplitter(BView* view, BRect frame,
+									const BRect& updateRect,
 									enum orientation orientation, bool pressed);
 
 private:

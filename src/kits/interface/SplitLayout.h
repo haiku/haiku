@@ -80,13 +80,14 @@ public:
 
 	// interface for BSplitView
 			BRect				SplitterItemFrame(int32 index) const;
+			bool				IsAboveSplitter(const BPoint& point) const;
 
 			bool				StartDraggingSplitter(BPoint point);
 			bool				DragSplitter(BPoint point);
 			bool				StopDraggingSplitter();
 			int32				DraggedSplitter() const;
 
-protected:	
+protected:
 	virtual	void				ItemAdded(BLayoutItem* item);
 	virtual	void				ItemRemoved(BLayoutItem* item);
 
@@ -98,6 +99,8 @@ private:
 			void				_InvalidateLayout(bool invalidateView);
 			void				_InvalidateCachedHeightForWidth();
 
+			SplitterItem*		_SplitterItemAt(const BPoint& point,
+									int32* index = NULL) const;
 			SplitterItem*		_SplitterItemAt(int32 index) const;
 
 			void				_GetSplitterValueRange(int32 index,
@@ -150,7 +153,7 @@ private:
 
 			LayoutInfo*			fHorizontalLayoutInfo;
 			LayoutInfo*			fVerticalLayoutInfo;
-	
+
 			BList				fHeightForWidthItems;
 			// Incorporates the children's height for width constraints for a
 			// concrete width. Cloned lazily from fVerticalLayout when needed.
@@ -165,7 +168,7 @@ private:
 			float				fCachedMinHeightForWidth;
 			float				fCachedMaxHeightForWidth;
 			float				fCachedPreferredHeightForWidth;
-	
+
 			BPoint				fDraggingStartPoint;
 			int32				fDraggingStartValue;
 			int32				fDraggingCurrentValue;

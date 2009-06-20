@@ -140,7 +140,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 	  fRightInset(0),
 	  fTopInset(0),
 	  fBottomInset(0),
-	  fSplitterSize(3),
+	  fSplitterSize(6),
 	  fSpacing(spacing),
 
 	  fSplitterItems(),
@@ -153,7 +153,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 	  fVerticalLayouter(NULL),
 	  fHorizontalLayoutInfo(NULL),
 	  fVerticalLayoutInfo(NULL),
-	
+
 	  fHeightForWidthItems(),
 	  fHeightForWidthVerticalLayouter(NULL),
 	  fHeightForWidthHorizontalLayoutInfo(NULL),
@@ -165,7 +165,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 	  fCachedMinHeightForWidth(-1),
 	  fCachedMaxHeightForWidth(-1),
 	  fCachedPreferredHeightForWidth(-1),
-	
+
 	  fDraggingStartPoint(),
 	  fDraggingStartValue(0),
 	  fDraggingCurrentValue(0),
@@ -482,7 +482,7 @@ BSplitLayout::LayoutView()
 		verticalLayouter = fHeightForWidthVerticalLayouter;
 	} else
 		verticalLayouter = fVerticalLayouter;
-	
+
 	verticalLayouter->Layout(fVerticalLayoutInfo, size.height);
 
 	float xOffset = fLeftInset;
@@ -551,6 +551,13 @@ BSplitLayout::SplitterItemFrame(int32 index) const
 	return BRect();
 }
 
+// IsAboveSplitter
+bool
+BSplitLayout::IsAboveSplitter(const BPoint& point) const
+{
+	return _SplitterItemAt(point) != NULL;
+}
+
 // StartDraggingSplitter
 bool
 BSplitLayout::StartDraggingSplitter(BPoint point)
@@ -568,18 +575,14 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 		return false;
 	}
 
-	int32 splitterCount = fSplitterItems.CountItems();
-	for (int32 i = 0; i < splitterCount; i++) {
-		SplitterItem* splitItem = _SplitterItemAt(i);
-		BRect frame = splitItem->Frame();
-		if (frame.Contains(point)) {
-			fDraggingStartPoint = View()->ConvertToScreen(point);
-			fDraggingStartValue = _SplitterValue(i);
-			fDraggingCurrentValue = fDraggingStartValue;
-			fDraggingSplitterIndex = i;
+	int32 index;
+	if (SplitterItem* splitItem = _SplitterItemAt(point, &index)) {
+		fDraggingStartPoint = View()->ConvertToScreen(point);
+		fDraggingStartValue = _SplitterValue(index);
+		fDraggingCurrentValue = fDraggingStartValue;
+		fDraggingSplitterIndex = index;
 
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -692,6 +695,23 @@ BSplitLayout::_InvalidateCachedHeightForWidth()
 
 // _SplitterItemAt
 BSplitLayout::SplitterItem*
+BSplitLayout::_SplitterItemAt(const BPoint& point, int32* index) const
+{
+	int32 splitterCount = fSplitterItems.CountItems();
+	for (int32 i = 0; i < splitterCount; i++) {
+		SplitterItem* splitItem = _SplitterItemAt(i);
+		BRect frame = splitItem->Frame();
+		if (frame.Contains(point)) {
+			if (index != NULL)
+				*index = i;
+			return splitItem;
+		}
+	}
+	return NULL;
+}
+
+// _SplitterItemAt
+BSplitLayout::SplitterItem*
 BSplitLayout::_SplitterItemAt(int32 index) const
 {
 	return (SplitterItem*)fSplitterItems.ItemAt(index);
@@ -778,7 +798,7 @@ BSplitLayout::_LayoutItem(BLayoutItem* item, ItemLayoutInfo* info)
 	bool visibilityChanged = (info->isVisible != isVisible);
 	if (visibilityChanged)
 		item->SetVisible(info->isVisible);
-	
+
 	// nothing more to do, if the item is not visible
 	if (!info->isVisible)
 		return;
@@ -1070,7 +1090,7 @@ BSplitLayout::_ValidateMinMax()
 	fHeightForWidthItems.MakeEmpty();
 
 	_InvalidateCachedHeightForWidth();
-	
+
 	// filter the visible items
 	int32 itemCount = CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
@@ -1084,7 +1104,7 @@ BSplitLayout::_ValidateMinMax()
 		if (item->HasHeightForWidth())
 			fHeightForWidthItems.AddItem(item);
 	}
-	itemCount = fVisibleItems.CountItems();		
+	itemCount = fVisibleItems.CountItems();
 
 	// create the layouters
 	Layouter* itemLayouter = new SimpleLayouter(itemCount, 0);
@@ -1161,7 +1181,7 @@ BSplitLayout::_InternalGetHeightForWidth(float width, bool realLayout,
 			}
 			horizontalLayoutInfo = fHeightForWidthHorizontalLayoutInfo;
 		}
-		
+
 		// do the horizontal layout (already done when doing this for the real
 		// layout)
 		if (!realLayout)
@@ -1223,7 +1243,7 @@ BSplitLayout::_AddInsets(BSize size)
 	float spacing = _SplitterSpace();
 	if (fOrientation == B_HORIZONTAL)
 		size.width = BLayoutUtils::AddDistances(size.width, spacing - 1);
-	else 
+	else
 		size.height = BLayoutUtils::AddDistances(size.height, spacing - 1);
 
 	return size;
@@ -1257,7 +1277,7 @@ BSplitLayout::_SubtractInsets(BSize size)
 	float spacing = _SplitterSpace();
 	if (fOrientation == B_HORIZONTAL)
 		size.width = BLayoutUtils::SubtractDistances(size.width, spacing - 1);
-	else 
+	else
 		size.height = BLayoutUtils::SubtractDistances(size.height, spacing - 1);
 
 	return size;

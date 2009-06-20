@@ -239,7 +239,7 @@ BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 	if (popupIndicator) {
 		BRect leftRect(rect);
 		leftRect.right -= 10;
-	
+
 		BRect rightRect(rect);
 		rightRect.left = rightRect.right - 9;
 
@@ -272,7 +272,7 @@ BControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 
 		view->SetHighColor(markColor);
 		view->FillTriangle(triangle[0], triangle[1], triangle[2]);
-	
+
 		view->SetFlags(viewFlags);
 
 		rect = leftRect;
@@ -424,7 +424,7 @@ BControlLook::DrawStatusBar(BView* view, BRect& rect, const BRect& updateRect,
 
 	_DrawOuterResessedFrame(view, rect, base, 0.6);
 
-	// colors 
+	// colors
 	rgb_color dark1BorderColor = tint_color(base, 1.3);
 	rgb_color dark2BorderColor = tint_color(base, 1.2);
 	rgb_color dark1FilledBorderColor = tint_color(barColor, 1.20);
@@ -869,7 +869,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		rightBarSide.top = sliderPosition;
 	}
 
-	// fill the background for the corners, exclude the middle bar for now 
+	// fill the background for the corners, exclude the middle bar for now
 	BRegion region(rect);
 	region.Exclude(rightBarSide);
 	view->ConstrainClippingRegion(&region);
@@ -879,7 +879,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	DrawSliderBar(view, rect, updateRect, base, leftFillColor, flags,
 		orientation);
 
-	view->PopState();	
+	view->PopState();
 
 	region.Set(rect);
 	region.Exclude(leftBarSide);
@@ -890,7 +890,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	DrawSliderBar(view, rect, updateRect, base, rightFillColor, flags,
 		orientation);
 
-	view->PopState();	
+	view->PopState();
 
 	view->ConstrainClippingRegion(NULL);
 }
@@ -921,7 +921,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		barRect.bottom -= ceilf(barRect.Width() / 2);
 	}
 
-	// fill the background for the corners, exclude the middle bar for now 
+	// fill the background for the corners, exclude the middle bar for now
 	BRegion region(rect);
 	region.Exclude(barRect);
 	view->ConstrainClippingRegion(&region);
@@ -968,7 +968,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		_DrawRoundBarCorner(view, leftCorner, updateRect, edgeLightColor,
 			edgeShadowColor, frameLightColor, frameShadowColor, fillLightColor,
 			fillShadowColor, 1.0, 1.0, 0.0, -1.0, orientation);
-	
+
 		_DrawRoundBarCorner(view, rightCorner, updateRect, edgeLightColor,
 			edgeShadowColor, frameLightColor, frameShadowColor, fillLightColor,
 			fillShadowColor, 0.0, 1.0, -1.0, -1.0, orientation);
@@ -976,7 +976,7 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		_DrawRoundBarCorner(view, leftCorner, updateRect, edgeLightColor,
 			edgeShadowColor, frameLightColor, frameShadowColor, fillLightColor,
 			fillShadowColor, 1.0, 1.0, -1.0, 0.0, orientation);
-	
+
 		_DrawRoundBarCorner(view, rightCorner, updateRect, edgeLightColor,
 			edgeShadowColor, frameLightColor, frameShadowColor, fillLightColor,
 			fillShadowColor, 1.0, 0.0, -1.0, -1.0, orientation);
@@ -1031,7 +1031,7 @@ BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 		// figure out the tints to be used
 		float frameLightTint;
 		float frameShadowTint;
-	
+
 		if (flags & B_DISABLED) {
 			frameLightTint = 1.30;
 			frameShadowTint = 1.35;
@@ -1040,7 +1040,7 @@ BControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 			frameLightTint = 1.6;
 			frameShadowTint = 1.65;
 		}
-	
+
 		frameLightColor = tint_color(base, frameLightTint);
 		frameShadowColor = tint_color(base, frameShadowTint);
 	}
@@ -1143,7 +1143,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 		// figure out the tints to be used
 		float frameLightTint;
 		float frameShadowTint;
-	
+
 		if (flags & B_DISABLED) {
 			frameLightTint = 1.30;
 			frameShadowTint = 1.35;
@@ -1152,7 +1152,7 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 			frameLightTint = 1.6;
 			frameShadowTint = 1.65;
 		}
-	
+
 		frameLightColor = tint_color(base, frameLightTint);
 		frameShadowColor = tint_color(base, frameShadowTint);
 	}
@@ -1440,6 +1440,113 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 }
 
 
+void
+BControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
+	const rgb_color& base, enum orientation orientation, uint32 flags,
+	uint32 borders)
+{
+	rgb_color background;
+	if ((flags & (B_CLICKED | B_ACTIVATED)) != 0)
+		background = tint_color(base, B_DARKEN_1_TINT);
+	else
+		background = base;
+
+	rgb_color light = tint_color(background, 0.6);
+	rgb_color shadow = tint_color(background, 1.21);
+
+	// frame
+	if (borders != 0 && rect.Width() > 3 && rect.Height() > 3)
+		DrawRaisedBorder(view, rect, updateRect, background, flags, borders);
+
+	// dots and rest of background
+	if (orientation == B_HORIZONTAL) {
+		if (rect.Width() > 2) {
+			// background on left/right
+			BRegion region(rect);
+			rect.left = floorf((rect.left + rect.right) / 2.0 - 0.5);
+			rect.right = rect.left + 1;
+			region.Exclude(rect);
+			view->SetHighColor(background);
+			view->FillRegion(&region);
+		}
+
+		BPoint dot = rect.LeftTop();
+		BPoint stop = rect.LeftBottom();
+		int32 num = 1;
+		while (dot.y <= stop.y) {
+			rgb_color col1;
+			rgb_color col2;
+			switch (num) {
+				case 1:
+					col1 = background;
+					col2 = background;
+					break;
+				case 2:
+					col1 = shadow;
+					col2 = background;
+					break;
+				case 3:
+					col1 = background;
+					col2 = light;
+					num = 0;
+					break;
+			}
+			view->SetHighColor(col1);
+			view->StrokeLine(dot, dot, B_SOLID_HIGH);
+			view->SetHighColor(col2);
+			dot.x++;
+			view->StrokeLine(dot, dot, B_SOLID_HIGH);
+			dot.x -= 1.0;
+			// next pixel
+			num++;
+			dot.y++;
+		}
+	} else {
+		if (rect.Height() > 2) {
+			// background on left/right
+			BRegion region(rect);
+			rect.top = floorf((rect.top + rect.bottom) / 2.0 - 0.5);
+			rect.bottom = rect.top + 1;
+			region.Exclude(rect);
+			view->SetHighColor(background);
+			view->FillRegion(&region);
+		}
+
+		BPoint dot = rect.LeftTop();
+		BPoint stop = rect.RightTop();
+		int32 num = 1;
+		while (dot.x <= stop.x) {
+			rgb_color col1;
+			rgb_color col2;
+			switch (num) {
+				case 1:
+					col1 = background;
+					col2 = background;
+					break;
+				case 2:
+					col1 = shadow;
+					col2 = background;
+					break;
+				case 3:
+					col1 = background;
+					col2 = light;
+					num = 0;
+					break;
+			}
+			view->SetHighColor(col1);
+			view->StrokeLine(dot, dot, B_SOLID_HIGH);
+			view->SetHighColor(col2);
+			dot.y++;
+			view->StrokeLine(dot, dot, B_SOLID_HIGH);
+			dot.y -= 1.0;
+			// next pixel
+			num++;
+			dot.x++;
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -1601,7 +1708,7 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 
 	// truncate the label if necessary and get the width and height
 	BString truncatedLabel(label);
-	
+
 	BFont font;
 	view->GetFont(&font);
 
@@ -1765,7 +1872,7 @@ BControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
 		// colors
 		float tintLight = kEdgeBevelLightTint;
 		float tintShadow = kEdgeBevelShadowTint;
-	
+
 		if (contrast == 0.0) {
 			tintLight = B_NO_TINT;
 			tintShadow = B_NO_TINT;
@@ -1773,10 +1880,10 @@ BControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
 			tintLight = B_NO_TINT + (tintLight - B_NO_TINT) * contrast;
 			tintShadow = B_NO_TINT + (tintShadow - B_NO_TINT) * contrast;
 		}
-	
+
 		rgb_color borderBevelShadow = tint_color(base, tintShadow);
 		rgb_color borderBevelLight = tint_color(base, tintLight);
-	
+
 		if (brightness < 1.0) {
 			borderBevelShadow.red = uint8(borderBevelShadow.red * brightness);
 			borderBevelShadow.green = uint8(borderBevelShadow.green * brightness);
@@ -1785,7 +1892,7 @@ BControlLook::_DrawOuterResessedFrame(BView* view, BRect& rect,
 			borderBevelLight.green = uint8(borderBevelLight.green * brightness);
 			borderBevelLight.blue = uint8(borderBevelLight.blue * brightness);
 		}
-	
+
 		_DrawFrame(view, rect, borderBevelShadow, borderBevelShadow,
 			borderBevelLight, borderBevelLight, borders);
 	}
