@@ -11,6 +11,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
@@ -21,23 +22,14 @@ SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 Application Debugger :
 	Debugger.cpp
 #	ElfFile.cpp
-	Image.cpp
-	ImageInfo.cpp
 	Jobs.cpp
-	SymbolInfo.cpp
-	Team.cpp
 	TeamDebugger.cpp
-	TeamDebugModel.cpp
-	Thread.cpp
-	ThreadInfo.cpp
 	Worker.cpp
 
 	# arch
 	Architecture.cpp
 	CpuState.cpp
 	Register.cpp
-	StackFrame.cpp
-	StackTrace.cpp
 
 	# arch/x86
 	ArchitectureX86.cpp
@@ -61,6 +53,17 @@ Application Debugger :
 	StackTraceView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
+
+	# model
+	Image.cpp
+	ImageInfo.cpp
+	StackFrame.cpp
+	StackTrace.cpp
+	SymbolInfo.cpp
+	Team.cpp
+	TeamDebugModel.cpp
+	Thread.cpp
+	ThreadInfo.cpp
 
 # DWARF
 #	attribute_classes.cpp
