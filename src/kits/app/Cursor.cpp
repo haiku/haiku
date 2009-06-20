@@ -63,6 +63,16 @@ BCursor::BCursor(const void *cursorData)
 }
 
 
+BCursor::BCursor(const BCursor& other)
+	:
+	fServerToken(-1),
+	fNeedToFree(false),
+	fPendingViewCursor(false)
+{
+	*this = other;
+}
+
+
 BCursor::BCursor(BMessage *data)
 {
 	// undefined on BeOS
@@ -74,14 +84,7 @@ BCursor::BCursor(BMessage *data)
 
 BCursor::~BCursor()
 {
-	// Notify server to deallocate server-side objects for this cursor
-	if (fNeedToFree) {
-		BPrivate::AppServerLink link;
-		link.StartMessage(AS_DELETE_CURSOR);
-		link.Attach<int32>(fServerToken);
-		link.Attach<bool>(fPendingViewCursor);
-		link.Flush();
-	}
+	_FreeCursorData();
 }
 
 
@@ -101,6 +104,42 @@ BCursor::Instantiate(BMessage *data)
 }
 
 
+BCursor&
+BCursor::operator=(const BCursor& other)
+{
+	if (&other != this && other != *this) {
+		_FreeCursorData();
+
+		fServerToken = other.fServerToken;
+		fNeedToFree = other.fNeedToFree;
+		fPendingViewCursor = false;
+
+		if (fNeedToFree) {
+			// Tell app_server that there is another reference for this
+			// cursor data!
+			BPrivate::AppServerLink link;
+			link.StartMessage(AS_REFERENCE_CURSOR);
+			link.Attach<int32>(fServerToken);
+		}
+	}
+	return *this;
+}
+
+
+bool
+BCursor::operator==(const BCursor& other) const
+{
+	return fServerToken == other.fServerToken;
+}
+
+
+bool
+BCursor::operator!=(const BCursor& other) const
+{
+	return fServerToken != other.fServerToken;
+}
+
+
 status_t
 BCursor::Perform(perform_code d, void *arg)
 {
@@ -112,3 +151,18 @@ void BCursor::_ReservedCursor1() {}
 void BCursor::_ReservedCursor2() {}
 void BCursor::_ReservedCursor3() {}
 void BCursor::_ReservedCursor4() {}
+
+
+void
+BCursor::_FreeCursorData()
+{
+	// Notify server to deallocate server-side objects for this cursor
+	if (fNeedToFree) {
+		BPrivate::AppServerLink link;
+		link.StartMessage(AS_DELETE_CURSOR);
+		link.Attach<int32>(fServerToken);
+		link.Attach<bool>(fPendingViewCursor);
+		link.Flush();
+	}
+}
+

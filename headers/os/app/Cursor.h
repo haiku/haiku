@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CURSOR_H
@@ -11,31 +11,39 @@
 
 
 class BCursor : BArchivable {
-	public:
-		BCursor(const void* cursorData);
-		BCursor(BMessage* data);
-		virtual	~BCursor();
+public:
+								BCursor(const void* cursorData);
+								BCursor(const BCursor& other);
+								BCursor(BMessage* data);
+	virtual	~BCursor();
 
-		virtual	status_t	Archive(BMessage* archive, bool deep = true) const;
-		static BArchivable*	Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
 
-	private:
-		virtual status_t	Perform(perform_code d, void* arg);
+			BCursor&			operator=(const BCursor& other);
+			bool				operator==(const BCursor& other) const;
+			bool				operator!=(const BCursor& other) const;
 
-		virtual	void		_ReservedCursor1();
-		virtual	void		_ReservedCursor2();
-		virtual	void		_ReservedCursor3();
-		virtual	void		_ReservedCursor4();
+private:
+	virtual	status_t			Perform(perform_code d, void* arg);
 
-	private:
-		friend class BApplication;
-		friend class BView;
+	virtual	void				_ReservedCursor1();
+	virtual	void				_ReservedCursor2();
+	virtual	void				_ReservedCursor3();
+	virtual	void				_ReservedCursor4();
 
-		int32				fServerToken;
-		bool				fNeedToFree;
-		mutable bool		fPendingViewCursor;
+			void				_FreeCursorData();
 
-		uint32				_reserved[6];
+private:
+	friend class BApplication;
+	friend class BView;
+
+			int32				fServerToken;
+			bool				fNeedToFree;
+	mutable	bool				fPendingViewCursor;
+
+			uint32				_reserved[6];
 };
 
 #endif	// _CURSOR_H

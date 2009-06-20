@@ -939,7 +939,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (link.Read(cursorData, sizeof(cursorData)) >= B_OK) {
 				cursor = fDesktop->GetCursorManager().CreateCursor(fClientTeam,
-																   cursorData);
+					cursorData);
 				if (cursor == NULL)
 					status = B_NO_MEMORY;
 			}
@@ -952,6 +952,27 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(status);
 
 			fLink.Flush();
+			break;
+		}
+		case AS_REFERENCE_CURSOR:
+		{
+			STRACE(("ServerApp %s: Reference BCursor\n", Signature()));
+			// Attached data:
+			// 1) int32 token ID of the cursor to reference
+			int32 token;
+			if (link.Read<int32>(&token) != B_OK)
+				break;
+
+			if (!fDesktop->GetCursorManager().Lock())
+				break;
+
+			ServerCursor* cursor
+				= fDesktop->GetCursorManager().FindCursor(token);
+			if (cursor != NULL)
+				cursor->Acquire();
+
+			fDesktop->GetCursorManager().Unlock();
+
 			break;
 		}
 		case AS_DELETE_CURSOR:
@@ -968,8 +989,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (!fDesktop->GetCursorManager().Lock())
 				break;
 
-			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
-			if (cursor) {
+			ServerCursor* cursor
+				= fDesktop->GetCursorManager().FindCursor(token);
+			if (cursor != NULL) {
 				if (pendingViewCursor)
 					cursor->SetPendingViewCursor(true);
 
