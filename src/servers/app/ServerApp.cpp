@@ -931,43 +931,44 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (fDesktop->GetCursorManager().Lock()) {
 				ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(
 					info.cursorToken);
-				// If we found a cursor, make sure it doesn't go away.
+				// If we found a cursor, make sure it doesn't go away. If we
+				// get a NULL cursor, it probably means we are supposed to use
+				// the system default cursor.
 				if (cursor != NULL)
 					cursor->Acquire();
 
 				fDesktop->GetCursorManager().Unlock();
 
-				if (cursor != NULL) {
-					// We need to acquire the write lock here, since we cannot
-					// afford that the window thread to which the view belongs
-					// is running and messing with that same view.
-					fDesktop->LockAllWindows();
+				// We need to acquire the write lock here, since we cannot
+				// afford that the window thread to which the view belongs
+				// is running and messing with that same view.
+				fDesktop->LockAllWindows();
 
-					// Find the corresponding view by the given token. It's ok
-					// if this view does not exist anymore, since it may have
-					// already be deleted in the window thread before this
-					// message got here.
-					View* view;
-					if (fViewTokens.GetToken(info.viewToken, B_HANDLER_TOKEN,
-						(void**)&view) == B_OK) {
-						// Set the cursor on the view.
-						view->SetCursor(cursor);
+				// Find the corresponding view by the given token. It's ok
+				// if this view does not exist anymore, since it may have
+				// already be deleted in the window thread before this
+				// message got here.
+				View* view;
+				if (fViewTokens.GetToken(info.viewToken, B_HANDLER_TOKEN,
+					(void**)&view) == B_OK) {
+					// Set the cursor on the view.
+					view->SetCursor(cursor);
 
-						// The cursor might need to be updated now.
-						Window* window = view->Window();
-						if (window != NULL && window->IsFocus()) {
-							if (fDesktop->ViewUnderMouse(window)
-								== view->Token()) {
-								SetCurrentCursor(cursor);
-							}
+					// The cursor might need to be updated now.
+					Window* window = view->Window();
+					if (window != NULL && window->IsFocus()) {
+						if (fDesktop->ViewUnderMouse(window)
+							== view->Token()) {
+							SetCurrentCursor(cursor);
 						}
 					}
-
-					fDesktop->UnlockAllWindows();
-
-					// Release the temporary reference.
-					cursor->Release();
 				}
+
+				fDesktop->UnlockAllWindows();
+
+				// Release the temporary reference.
+				if (cursor != NULL)
+					cursor->Release();
 			}
 
 			if (info.sync) {
