@@ -166,6 +166,13 @@ ThreadListView::Create(Listener* listener)
 
 
 void
+ThreadListView::UnsetListener()
+{
+	fListener = NULL;
+}
+
+
+void
 ThreadListView::SetTeam(Team* team)
 {
 	if (team == fTeam)
@@ -222,6 +229,9 @@ ThreadListView::ThreadRemoved(const Team::ThreadEvent& event)
 void
 ThreadListView::TableSelectionChanged(Table* table)
 {
+	if (fListener == NULL)
+		return;
+
 	Thread* thread = NULL;
 	if (fThreadsTableModel != NULL) {
 		TableSelectionModel* selectionModel = table->SelectionModel();
@@ -229,17 +239,6 @@ ThreadListView::TableSelectionChanged(Table* table)
 	}
 
 	fListener->ThreadSelectionChanged(thread);
-}
-
-
-void
-ThreadListView::TableRowInvoked(Table* table, int32 rowIndex)
-{
-//	if (fThreadsTableModel != NULL) {
-//		Thread* thread = fThreadsTableModel->ThreadAt(rowIndex);
-//		if (thread != NULL)
-//			fParent->OpenThreadWindow(thread);
-//	}
 }
 
 

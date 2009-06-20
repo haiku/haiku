@@ -8,6 +8,7 @@
 #include <String.h>
 #include <Window.h>
 
+#include "StackTraceView.h"
 #include "Team.h"
 #include "ThreadListView.h"
 
@@ -16,12 +17,11 @@ class BButton;
 class BTabView;
 class ImageListView;
 class RegisterView;
-class StackTraceView;
 class TeamDebugModel;
 
 
 class TeamWindow : public BWindow, private ThreadListView::Listener,
-	Team::Listener {
+	StackTraceView::Listener, Team::Listener {
 public:
 	class Listener;
 
@@ -41,6 +41,9 @@ private:
 	// ThreadListView::Listener
 	virtual	void				ThreadSelectionChanged(::Thread* thread);
 
+	// StackTraceView::Listener
+	virtual	void				StackFrameSelectionChanged(StackFrame* frame);
+
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
@@ -52,6 +55,8 @@ private:
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
+			void				_SetActiveStackFrame(StackFrame* frame);
+			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
 
 			void				_HandleThreadStateChanged(thread_id threadID);
@@ -61,6 +66,7 @@ private:
 private:
 			TeamDebugModel*		fDebugModel;
 			::Thread*			fActiveThread;
+			StackFrame*			fActiveStackFrame;
 			Listener*			fListener;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;

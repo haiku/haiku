@@ -11,13 +11,21 @@
 #include "Team.h"
 
 
+class StackFrame;
+
+
 class StackTraceView : public BGroupView, private TableListener {
 public:
-								StackTraceView();
+	class Listener;
+
+public:
+								StackTraceView(Listener* listener);
 								~StackTraceView();
 
-	static	StackTraceView*		Create();
+	static	StackTraceView*		Create(Listener* listener);
 									// throws
+
+			void				UnsetListener();
 
 			void				SetStackTrace(StackTrace* stackTrace);
 
@@ -26,6 +34,7 @@ private:
 
 private:
 	// TableListener
+	virtual	void				TableSelectionChanged(Table* table);
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
 
 			void				_Init();
@@ -34,6 +43,16 @@ private:
 			StackTrace*			fStackTrace;
 			Table*				fFramesTable;
 			FramesTableModel*	fFramesTableModel;
+			Listener*			fListener;
+};
+
+
+class StackTraceView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				StackFrameSelectionChanged(
+									StackFrame* frame) = 0;
 };
 
 

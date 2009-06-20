@@ -135,6 +135,11 @@ public:
 		}
 	}
 
+	StackFrame* FrameAt(int32 index) const
+	{
+		return fStackTrace != NULL ? fStackTrace->FrameAt(index) : NULL;
+	}
+
 private:
 	StackTrace*				fStackTrace;
 };
@@ -143,11 +148,12 @@ private:
 // #pragma mark - StackTraceView
 
 
-StackTraceView::StackTraceView()
+StackTraceView::StackTraceView(Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
 	fFramesTable(NULL),
-	fFramesTableModel(NULL)
+	fFramesTableModel(NULL),
+	fListener(listener)
 {
 	SetName("Stack Trace");
 }
@@ -162,9 +168,9 @@ StackTraceView::~StackTraceView()
 
 
 /*static*/ StackTraceView*
-StackTraceView::Create()
+StackTraceView::Create(Listener* listener)
 {
-	StackTraceView* self = new StackTraceView();
+	StackTraceView* self = new StackTraceView(listener);
 
 	try {
 		self->_Init();
@@ -174,6 +180,13 @@ StackTraceView::Create()
 	}
 
 	return self;
+}
+
+
+void
+StackTraceView::UnsetListener()
+{
+	fListener = NULL;
 }
 
 
@@ -196,6 +209,19 @@ StackTraceView::SetStackTrace(StackTrace* stackTrace)
 
 
 void
+StackTraceView::TableSelectionChanged(Table* table)
+{
+	if (fListener == NULL)
+		return;
+
+	StackFrame* frame
+		= fFramesTableModel->FrameAt(table->SelectionModel()->RowAt(0));
+
+	fListener->StackFrameSelectionChanged(frame);
+}
+
+
+void
 StackTraceView::TableRowInvoked(Table* table, int32 rowIndex)
 {
 }
@@ -213,11 +239,20 @@ StackTraceView::_Init()
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fFramesTable->AddColumn(new TargetAddressValueColumn(1, "IP", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fFramesTable->AddColumn(new StringTableColumn(2, "Function", 80, 40, 1000,
+	fFramesTable->AddColumn(new StringTableColumn(2, "Function", 300, 100, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fFramesTableModel = new FramesTableModel();
 	fFramesTable->SetTableModel(fFramesTableModel);
 
+	fFramesTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fFramesTable->AddTableListener(this);
+}
+
+
+// #pragma mark - Listener
+
+
+StackTraceView::Listener::~Listener()
+{
 }

@@ -34,6 +34,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 		B_ASYNCHRONOUS_CONTROLS),
 	fDebugModel(debugModel),
 	fActiveThread(NULL),
+	fActiveStackFrame(NULL),
 	fListener(listener),
 	fTabView(NULL),
 	fLocalsTabView(NULL),
@@ -58,6 +59,11 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 
 TeamWindow::~TeamWindow()
 {
+	if (fThreadListView != NULL)
+		fThreadListView->UnsetListener();
+	if (fStackTraceView != NULL)
+		fStackTraceView->UnsetListener();
+
 	fDebugModel->GetTeam()->RemoveListener(this);
 }
 
@@ -144,6 +150,13 @@ TeamWindow::ThreadSelectionChanged(::Thread* thread)
 
 
 void
+TeamWindow::StackFrameSelectionChanged(StackFrame* frame)
+{
+	_SetActiveStackFrame(frame);
+}
+
+
+void
 TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STATE_CHANGED);
@@ -197,7 +210,7 @@ TeamWindow::_Init()
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
 		.Add(fThreadListView = ThreadListView::Create(this))
-		.Add(fStackTraceView = StackTraceView::Create());
+		.Add(fStackTraceView = StackTraceView::Create(this));
 
 	// add images tab
 	BSplitView* imagesGroup = new BSplitView(B_HORIZONTAL);
@@ -243,11 +256,6 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
 
-	CpuState* cpuState = fActiveThread != NULL
-		? fActiveThread->GetCpuState() : NULL;
-	Reference<CpuState> cpuStateReference(cpuState);
-		// hold a reference until the register view has one
-
 	StackTrace* stackTrace = fActiveThread != NULL
 		? fActiveThread->GetStackTrace() : NULL;
 	Reference<StackTrace> stackTraceReference(stackTrace);
@@ -255,8 +263,49 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 
 	locker.Unlock();
 
-	fRegisterView->SetCpuState(cpuState);
 	fStackTraceView->SetStackTrace(stackTrace);
+	_UpdateCpuState();
+}
+
+
+void
+TeamWindow::_SetActiveStackFrame(StackFrame* frame)
+{
+	if (frame == fActiveStackFrame)
+		return;
+
+	if (fActiveStackFrame != NULL)
+		fActiveStackFrame->RemoveReference();
+
+	fActiveStackFrame = frame;
+
+	if (fActiveStackFrame != NULL)
+		fActiveStackFrame->AddReference();
+
+	_UpdateCpuState();
+}
+
+
+void
+TeamWindow::_UpdateCpuState()
+{
+	// get the CPU state
+	CpuState* cpuState = NULL;
+	Reference<CpuState> cpuStateReference;
+		// hold a reference until the register view has one
+
+	if (fActiveThread != NULL) {
+		// Get the CPU state from the active stack frame or the thread directly.
+		if (fActiveStackFrame == NULL) {
+			AutoLocker<TeamDebugModel> locker(fDebugModel);
+			cpuState = fActiveThread->GetCpuState();
+			cpuStateReference.SetTo(cpuState);
+			locker.Unlock();
+		} else
+			cpuState = fActiveStackFrame->GetCpuState();
+	}
+
+	fRegisterView->SetCpuState(cpuState);
 }
 
 
@@ -312,16 +361,7 @@ TeamWindow::_HandleCpuStateChanged(thread_id threadID)
 	if (fActiveThread == NULL || threadID != fActiveThread->ID())
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
-
-	CpuState* cpuState = fActiveThread != NULL
-		? fActiveThread->GetCpuState() : NULL;
-	Reference<CpuState> reference(cpuState);
-		// hold a reference until the register view has one
-
-	locker.Unlock();
-
-	fRegisterView->SetCpuState(cpuState);
+	_UpdateCpuState();
 }
 
 
