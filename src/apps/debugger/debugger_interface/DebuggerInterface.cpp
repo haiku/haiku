@@ -20,6 +20,7 @@
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
+#include "SymbolInfo.h"
 #include "ThreadInfo.h"
 
 
@@ -386,12 +387,58 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 	int32 cookie = 0;
 	while (get_next_image_info(fTeamID, &cookie, &imageInfo) == B_OK) {
 		ImageInfo* info = new(std::nothrow) ImageInfo(fTeamID, imageInfo.id,
-			imageInfo.name);
+			imageInfo.name, (addr_t)imageInfo.text, imageInfo.text_size,
+			(addr_t)imageInfo.data, imageInfo.data_size);
 		if (info == NULL || !infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;
 		}
 	}
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetSymbolInfos(team_id team, image_id image,
+	BObjectList<SymbolInfo>& infos)
+{
+	// create a lookup context
+// TODO: It's too expensive to create a lookup context for each image!
+	debug_symbol_lookup_context* lookupContext;
+	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	if (error != B_OK)
+		return error;
+
+	// create a symbol iterator
+	debug_symbol_iterator* iterator;
+	error = debug_create_image_symbol_iterator(
+		lookupContext, image, &iterator);
+	if (error != B_OK) {
+		debug_delete_symbol_lookup_context(lookupContext);
+		return error;
+	}
+
+	// get the symbols
+	char name[1024];
+	int32 type;
+	void* address;
+	size_t size;
+	while (debug_next_image_symbol(iterator, name, sizeof(name), &type,
+			&address, &size) == B_OK) {
+		SymbolInfo* info = new(std::nothrow) SymbolInfo(
+			(target_addr_t)(addr_t)address, size, type, name);
+		if (info == NULL)
+			break;
+		if (!infos.AddItem(info)) {
+			delete info;
+			break;
+		}
+	}
+
+	// delete the symbol iterator and lookup context
+	debug_delete_symbol_iterator(iterator);
+	debug_delete_symbol_lookup_context(lookupContext);
 
 	return B_OK;
 }
@@ -536,14 +583,18 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 		{
 			const image_info& info = message.image_created.info;
 			event = new(std::nothrow) ImageCreatedEvent(message.origin.team,
-				message.origin.thread, ImageInfo(fTeamID, info.id, info.name));
+				message.origin.thread,
+				ImageInfo(fTeamID, info.id, info.name, (addr_t)info.text,
+					info.text_size, (addr_t)info.data, info.data_size));
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 		{
 			const image_info& info = message.image_deleted.info;
 			event = new(std::nothrow) ImageDeletedEvent(message.origin.team,
-				message.origin.thread, ImageInfo(fTeamID, info.id, info.name));
+				message.origin.thread,
+				ImageInfo(fTeamID, info.id, info.name, (addr_t)info.text,
+					info.text_size, (addr_t)info.data, info.data_size));
 			break;
 		}
 		default:

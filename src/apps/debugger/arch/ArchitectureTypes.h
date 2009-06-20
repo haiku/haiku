@@ -7,6 +7,7 @@
 
 
 typedef uint64 target_addr_t;
+typedef uint64 target_size_t;
 
 
 

@@ -5,6 +5,8 @@
 #ifndef STACK_TRACE_H
 #define STACK_TRACE_H
 
+#include <ObjectList.h>
+
 #include "StackFrame.h"
 
 
@@ -13,15 +15,14 @@ public:
 								StackTrace();
 	virtual						~StackTrace();
 
-			void				AddFrame(StackFrame* frame);
-									// takes over reference
+			bool				AddFrame(StackFrame* frame);
+									// takes over reference (also on error)
 
-			const StackFrameList& Frames() const	{ return fStackFrames; }
+			int32				CountFrames() const;
+			StackFrame*			FrameAt(int32 index) const;
 
-			StackFrame*			TopFrame() const
-									{ return fStackFrames.Head(); }
-			StackFrame*			BottomFrame() const
-									{ return fStackFrames.Tail(); }
+private:
+			typedef BObjectList<StackFrame> StackFrameList;
 
 private:
 			StackFrameList		fStackFrames;

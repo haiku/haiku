@@ -8,7 +8,6 @@
 #include <OS.h>
 
 #include <Referenceable.h>
-#include <util/DoublyLinkedList.h>
 
 #include "ArchitectureTypes.h"
 
@@ -22,25 +21,39 @@ enum stack_frame_type {
 
 
 class CpuState;
+class Image;
+class FunctionDebugInfo;
 
 
-class StackFrame : public Referenceable,
-	public DoublyLinkedListLinkImpl<StackFrame> {
+class StackFrame : public Referenceable {
 public:
-	virtual						~StackFrame();
+								StackFrame(stack_frame_type type,
+									CpuState* cpuState,
+									target_addr_t frameAddress);
+								~StackFrame();
 
-	virtual	stack_frame_type	Type() const = 0;
+			stack_frame_type	Type() const			{ return fType; }
+			CpuState*			GetCpuState() const		{ return fCpuState; }
+			target_addr_t		InstructionPointer() const;
+			target_addr_t		FrameAddress() const { return fFrameAddress; }
 
-	virtual	CpuState*			GetCpuState() const = 0;
+			target_addr_t		ReturnAddress() const { return fReturnAddress; }
+			void				SetReturnAddress(target_addr_t address);
 
-	virtual	target_addr_t		InstructionPointer() const = 0;
-	virtual	target_addr_t		FrameAddress() const = 0;
-	virtual	target_addr_t		ReturnAddress() const = 0;
-	virtual	target_addr_t		PreviousFrameAddress() const = 0;
+			Image*				GetImage() const		{ return fImage; }
+			void				SetImage(Image* image);
+
+			FunctionDebugInfo*	Function() const		{ return fFunction; }
+			void				SetFunction(FunctionDebugInfo* function);
+
+private:
+			stack_frame_type	fType;
+			CpuState*			fCpuState;
+			target_addr_t		fFrameAddress;
+			target_addr_t		fReturnAddress;
+			Image*				fImage;
+			FunctionDebugInfo*	fFunction;
 };
-
-
-typedef DoublyLinkedList<StackFrame> StackFrameList;
 
 
 #endif	// STACK_FRAME_H

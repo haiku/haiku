@@ -46,6 +46,7 @@ public:
 								CpuStateX86(const debug_cpu_state_x86& state);
 	virtual						~CpuStateX86();
 
+	virtual	target_addr_t		InstructionPointer() const;
 	virtual	bool				GetRegisterValue(const Register* reg,
 									BVariant& _value);
 

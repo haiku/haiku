@@ -11,6 +11,8 @@
 
 #include "table/TableColumns.h"
 
+#include "FunctionDebugInfo.h"
+#include "Image.h"
 #include "StackTrace.h"
 
 
@@ -66,30 +68,14 @@ public:
 	void SetStackTrace(StackTrace* stackTrace)
 	{
 		// unset old frames
-		if (fFrames.CountItems() > 0) {
-			NotifyRowsRemoved(0, fFrames.CountItems());
-
-			for (int32 i = 0; StackFrame* frame = fFrames.ItemAt(i); i++)
-				frame->RemoveReference();
-
-			fFrames.MakeEmpty();
-		}
+		if (fStackTrace != NULL && fStackTrace->CountFrames())
+			NotifyRowsRemoved(0, fStackTrace->CountFrames());
 
 		fStackTrace = stackTrace;
 
 		// set new frames
-		if (fStackTrace != NULL) {
-			for (StackFrameList::ConstIterator it
-						= fStackTrace->Frames().GetIterator();
-					StackFrame* frame = it.Next();) {
-				if (!fFrames.AddItem(frame))
-					return;
-				frame->AddReference();
-			}
-
-			if (fFrames.CountItems() > 0)
-				NotifyRowsAdded(0, fFrames.CountItems());
-		}
+		if (fStackTrace != NULL && fStackTrace->CountFrames() > 0)
+			NotifyRowsAdded(0, fStackTrace->CountFrames());
 	}
 
 	virtual int32 CountColumns() const
@@ -99,12 +85,13 @@ public:
 
 	virtual int32 CountRows() const
 	{
-		return fFrames.CountItems();
+		return fStackTrace != NULL ? fStackTrace->CountFrames() : 0;
 	}
 
 	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
-		StackFrame* frame = fFrames.ItemAt(rowIndex);
+		StackFrame* frame
+			= fStackTrace != NULL ? fStackTrace->FrameAt(rowIndex) : NULL;
 		if (frame == NULL)
 			return false;
 
@@ -116,8 +103,33 @@ public:
 				value.SetTo(frame->InstructionPointer());
 				return true;
 			case 2:
-				// TODO: function name...
-				return false;
+			{
+				Image* image = frame->GetImage();
+				FunctionDebugInfo* function = frame->Function();
+				if (image == NULL && function == NULL) {
+					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
+					return true;
+				}
+
+				BString name;
+				target_addr_t baseAddress;
+				if (function != NULL) {
+					name = function->PrettyName();
+					baseAddress = function->Address();
+				} else {
+					name = image->Name();
+					baseAddress = image->Info().TextBase();
+				}
+
+				char offset[32];
+				snprintf(offset, sizeof(offset), " + %#llx",
+					frame->InstructionPointer() - baseAddress);
+
+				name << offset;
+				value.SetTo(name.String());
+
+				return true;
+			}
 			default:
 				return false;
 		}
@@ -125,7 +137,6 @@ public:
 
 private:
 	StackTrace*				fStackTrace;
-	BObjectList<StackFrame>	fFrames;
 };
 
 

@@ -58,6 +58,7 @@ public:
 			void				RemoveImage(Image* image);
 			bool				RemoveImage(image_id imageID);
 			Image*				ImageByID(image_id imageID) const;
+			Image*				ImageByAddress(target_addr_t address) const;
 			const ImageList&	Images() const;
 
 			void				AddListener(Listener* listener);

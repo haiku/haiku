@@ -8,6 +8,7 @@ UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 
@@ -23,6 +24,7 @@ Application Debugger :
 	Image.cpp
 	ImageInfo.cpp
 	Jobs.cpp
+	SymbolInfo.cpp
 	Team.cpp
 	TeamDebugger.cpp
 	TeamDebugModel.cpp
@@ -40,7 +42,14 @@ Application Debugger :
 	# arch/x86
 	ArchitectureX86.cpp
 	CpuStateX86.cpp
-	StackFrameX86.cpp
+
+	# debug_info
+	BasicFunctionDebugInfo.cpp
+	DebuggerDebugInfo.cpp
+	DebugInfo.cpp
+	FunctionDebugInfo.cpp
+	ImageDebugInfo.cpp
+	ImageDebugInfoProvider.cpp
 
 	# debugger_interface
 	DebugEvent.cpp

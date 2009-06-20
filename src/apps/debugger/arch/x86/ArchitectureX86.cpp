@@ -11,8 +11,7 @@
 
 #include "CpuStateX86.h"
 #include "DebuggerInterface.h"
-#include "StackFrameX86.h"
-#include "StackTrace.h"
+#include "StackFrame.h"
 
 
 ArchitectureX86::ArchitectureX86(DebuggerInterface* debuggerInterface)
@@ -104,59 +103,38 @@ ArchitectureX86::CreateCpuState(const void* cpuStateData, size_t size,
 
 
 status_t
-ArchitectureX86::CreateStackTrace(Team* team, CpuState* _cpuState,
-	StackTrace*& _stackTrace)
+ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
+	CpuState* _cpuState, StackFrame*& _previousFrame,
+	CpuState*& _previousCpuState)
 {
 	CpuStateX86* cpuState = dynamic_cast<CpuStateX86*>(_cpuState);
 
-	// create the object
-	StackTrace* stackTrace = new(std::nothrow) StackTrace;
-	if (stackTrace == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<StackTrace> stackTraceDeleter(stackTrace);
+	uint32 framePointer = cpuState->IntRegisterValue(X86_REGISTER_EBP);
 
-	// create the top frame
-	StackFrameX86* frame = new StackFrameX86(STACK_FRAME_TYPE_TOP, cpuState);
+	// create the stack frame
+	StackFrame* frame = new(std::nothrow) StackFrame(
+		STACK_FRAME_TYPE_STANDARD, cpuState, framePointer);
 	if (frame == NULL)
 		return B_NO_MEMORY;
-	stackTrace->AddFrame(frame);
+	Reference<StackFrame> frameReference(frame, true);
 
-	while (true) {
-		uint32 framePointer = (uint32)frame->FrameAddress();
-		if (framePointer == 0)
-			break;
-
-		// get previous frame and return address
-		uint32 frameData[2];
-		ssize_t bytesRead = fDebuggerInterface->ReadMemory(framePointer,
-			frameData, 8);
-		if (bytesRead != 8)
-			break;
-
-		frame->SetPreviousAddresses(frameData[0], frameData[1]);
-
-		if (frameData[0] == 0 || frameData[1] == 0)
-			break;
-
+	// read the previous frame and return address and create the CPU state
+	CpuStateX86* previousCpuState = NULL;
+	uint32 frameData[2];
+	if (framePointer != 0
+		&& fDebuggerInterface->ReadMemory(framePointer, frameData, 8) == 8) {
 		// prepare the previous CPU state
-		cpuState = new(std::nothrow) CpuStateX86;
-		if (cpuState == NULL)
+		previousCpuState = new(std::nothrow) CpuStateX86;
+		if (previousCpuState == NULL)
 			return B_NO_MEMORY;
-		Reference<CpuState> cpuStateReference(cpuState, true);
 
-		cpuState->SetIntRegister(X86_REGISTER_EBP, frameData[0]);
-		cpuState->SetIntRegister(X86_REGISTER_EIP, frameData[1]);
+		previousCpuState->SetIntRegister(X86_REGISTER_EBP, frameData[0]);
+		previousCpuState->SetIntRegister(X86_REGISTER_EIP, frameData[1]);
 			// TODO: Actually it's the instruction before!
-
-		// create the next frame
-		frame = new StackFrameX86(STACK_FRAME_TYPE_STANDARD, cpuState);
-		if (frame == NULL)
-			return B_NO_MEMORY;
-		stackTrace->AddFrame(frame);
 	}
 
-	stackTraceDeleter.Detach();
-	_stackTrace = stackTrace;
+	_previousFrame = frameReference.Detach();
+	_previousCpuState = previousCpuState;
 	return B_OK;
 }
 

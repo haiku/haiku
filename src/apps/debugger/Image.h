@@ -13,6 +13,7 @@
 #include "ImageInfo.h"
 
 
+class ImageDebugInfo;
 class Team;
 
 
@@ -24,14 +25,20 @@ public:
 			status_t			Init();
 
 
-			Team*				GetTeam() const	{ return fTeam; }
-			image_id			ID() const		{ return fInfo.ImageID(); }
-			const char*			Name() const	{ return fInfo.Name(); }
-			const ImageInfo&	Info() const	{ return fInfo; }
+			Team*				GetTeam() const		{ return fTeam; }
+			image_id			ID() const			{ return fInfo.ImageID(); }
+			const char*			Name() const		{ return fInfo.Name(); }
+			const ImageInfo&	Info() const		{ return fInfo; }
+
+			ImageDebugInfo*		GetImageDebugInfo() const { return fDebugInfo; }
+			void				SetImageDebugInfo(ImageDebugInfo* debugInfo);
+
+			bool				ContainsAddress(target_addr_t address) const;
 
 private:
 			Team*				fTeam;
 			ImageInfo			fInfo;
+			ImageDebugInfo*		fDebugInfo;
 };
 
 

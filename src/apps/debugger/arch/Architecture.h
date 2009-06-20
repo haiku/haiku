@@ -12,7 +12,11 @@
 
 class CpuState;
 class DebuggerInterface;
+class FunctionDebugInfo;
+class Image;
+class ImageDebugInfoProvider;
 class Register;
+class StackFrame;
 class StackTrace;
 class Team;
 
@@ -30,8 +34,19 @@ public:
 
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state) = 0;
-	virtual	status_t			CreateStackTrace(Team* team, CpuState* cpuState,
-									StackTrace*& _stackTrace) = 0;
+	virtual	status_t			CreateStackFrame(Image* image,
+									FunctionDebugInfo* function,
+									CpuState* cpuState,
+									StackFrame*& _previousFrame,
+									CpuState*& _previousCpuState) = 0;
+										// returns reference to previous frame
+										// and CPU state; returned CPU state
+										// can be NULL
+
+			status_t			CreateStackTrace(Team* team,
+									ImageDebugInfoProvider* imageInfoProvider,
+									CpuState* cpuState,
+									StackTrace*& _stackTrace);
 										// team is not locked
 
 protected:

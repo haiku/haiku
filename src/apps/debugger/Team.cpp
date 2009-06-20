@@ -181,6 +181,19 @@ Team::ImageByID(image_id imageID) const
 }
 
 
+Image*
+Team::ImageByAddress(target_addr_t address) const
+{
+	for (ImageList::ConstIterator it = fImages.GetIterator();
+			Image* image = it.Next();) {
+		if (image->ContainsAddress(address))
+			return image;
+	}
+
+	return NULL;
+}
+
+
 const ImageList&
 Team::Images() const
 {

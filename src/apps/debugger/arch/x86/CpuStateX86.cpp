@@ -42,6 +42,14 @@ CpuStateX86::~CpuStateX86()
 }
 
 
+target_addr_t
+CpuStateX86::InstructionPointer() const
+{
+	return IsRegisterSet(X86_REGISTER_EIP)
+		? IntRegisterValue(X86_REGISTER_EIP) : 0;
+}
+
+
 bool
 CpuStateX86::GetRegisterValue(const Register* reg, BVariant& _value)
 {

@@ -13,13 +13,31 @@ StackTrace::StackTrace()
 
 StackTrace::~StackTrace()
 {
-	while (StackFrame* frame = fStackFrames.RemoveHead())
+	for (int32 i = 0; StackFrame* frame = FrameAt(i); i++)
 		frame->RemoveReference();
 }
 
 
-void
+bool
 StackTrace::AddFrame(StackFrame* frame)
 {
-	fStackFrames.Add(frame);
+	if (fStackFrames.AddItem(frame))
+		return true;
+
+	frame->RemoveReference();
+	return false;
+}
+
+
+int32
+StackTrace::CountFrames() const
+{
+	return fStackFrames.CountItems();
+}
+
+
+StackFrame*
+StackTrace::FrameAt(int32 index) const
+{
+	return fStackFrames.ItemAt(index);
 }
