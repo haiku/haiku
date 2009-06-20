@@ -23,7 +23,7 @@ class ThreadInfo;
 class DebuggerInterface {
 public:
 								DebuggerInterface(team_id teamID);
-								~DebuggerInterface();
+	virtual							~DebuggerInterface();
 
 			status_t			Init();
 			void				Close();
