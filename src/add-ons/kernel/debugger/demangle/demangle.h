@@ -22,6 +22,10 @@ const char*	demangle_symbol_gcc3(const char* name, char* buffer,
 status_t	get_next_argument_gcc3(uint32* _cookie, const char* symbol,
 				char* name, size_t nameSize, int32* _type,
 				size_t* _argumentLength);
+#ifndef _KERNEL_MODE
+const char*	demangle_name_gcc3(const char* name, char* buffer,
+				size_t bufferSize);
+#endif
 
 
 #endif	// DEMANGLE_H

@@ -3870,3 +3870,19 @@ get_next_argument_gcc3(uint32* _cookie, const char* mangledName, char* name,
 	++*_cookie;
 	return B_OK;
 }
+
+
+#ifndef _KERNEL_MODE
+
+const char*
+demangle_name_gcc3(const char* mangledName, char* buffer, size_t bufferSize)
+{
+
+	Demangler demangler;
+	DemanglingInfo info(false);
+	if (demangler.Demangle(mangledName, buffer, bufferSize, info) != ERROR_OK)
+		return NULL;
+	return buffer;
+}
+
+#endif
