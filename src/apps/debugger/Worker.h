@@ -146,6 +146,7 @@ public:
 									JobListener* listener = NULL);
 										// always takes over ownership
 			void				AbortJob(const JobKey& key);
+			Job*				GetJob(const JobKey& key);
 
 			status_t			AddListener(const JobKey& key,
 									JobListener* listener);

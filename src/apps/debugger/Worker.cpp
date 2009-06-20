@@ -247,6 +247,14 @@ Worker::AbortJob(const JobKey& key)
 }
 
 
+Job*
+Worker::GetJob(const JobKey& key)
+{
+	AutoLocker<Worker> locker(this);
+	return fJobs.Lookup(key);
+}
+
+
 status_t
 Worker::AddListener(const JobKey& key, JobListener* listener)
 {
