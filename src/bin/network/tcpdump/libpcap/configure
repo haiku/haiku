@@ -5235,7 +5235,7 @@ elif test -c /dev/enet ; then		# check again in case not readable
 	V_PCAP=enet
 elif test -c /dev/nit ; then		# check again in case not readable
 	V_PCAP=snit
-elif test -r /boot/beos ; then
+elif test -r /boot/system ; then
 	V_PCAP=haiku
 else
 	V_PCAP=null
