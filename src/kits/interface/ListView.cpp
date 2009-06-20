@@ -129,6 +129,7 @@ BListView::BListView(BMessage* archive)
 
 BListView::~BListView()
 {
+	// NOTE: According to BeBook, BListView does not free the items itself.
 	delete fTrack;
 	SetSelectionMessage(NULL);
 }
