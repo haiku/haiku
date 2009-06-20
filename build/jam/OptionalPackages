@@ -5,7 +5,7 @@
 # Detect a hybrid GCC2/GCC4 image and disable the checks for unavailable GCC4
 # packages. (It does not matter if a package was built with either compiler,
 # the system should have the respective other system libs.)
-local isHybridBuild = 0 ;
+local isHybridBuild ;
 if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 	isHybridBuild = 1 ;
 }
@@ -87,7 +87,7 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Beam available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Beam available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Beam
@@ -117,7 +117,7 @@ if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeHappy available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package BeHappy available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage BeHappy
@@ -134,7 +134,7 @@ if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeOSCompatibility available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package BeOSCompatibility available for gcc4" ;
 	} else {
 		Echo "Warning: Adding BeOS compatibility symlinks. This will go away. Please fix your apps!" ;
@@ -152,7 +152,7 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BePDF available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package BePDF available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage BePDF-1.1.1b1.x86
@@ -206,7 +206,7 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CLucene available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) < 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
 		Echo "No optional package CLucene available for GCC2" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -283,7 +283,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip ;
 	InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
 		: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip ;
-	local baseURL = http://www.haiku-ports.de/packages ;		
+	local baseURL = http://www.haiku-ports.de/packages ;
 	InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-haiku-2009-05-26
 		: $(baseURL)/sys-devel/flex/flex-2.5.35-gcc2-haiku-2009-05-26.zip ;
 	InstallOptionalHaikuImagePackage jam-gcc2-haiku-2009-05-26
@@ -399,7 +399,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
 			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
@@ -424,7 +424,7 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		local baseURL = http://downloads.sourceforge.net/dotmatrix4beos ;
 		InstallOptionalHaikuImagePackage KeymapSwitcher-gcc4-20090531
 			:  $(baseURL)/KeymapSwitcher-1.2.3-gcc4-2009-05-31.zip
@@ -492,7 +492,7 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 if [ IsOptionalHaikuImagePackageAdded Links ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Links available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Links available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Links
@@ -537,7 +537,7 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package NetSurf available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package NetSurf available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage NetSurf
@@ -603,7 +603,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package P7zip available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package P7zip available for gcc4" ;
 	} else {
 		local baseURL = http://www.haiku-ports.de/packages/app-arch/p7zip ;
@@ -792,7 +792,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 if [ IsOptionalHaikuImagePackageAdded Vim ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		local baseURL = http://haiku-ports.de/packages/app-editors/vim ;
 		InstallOptionalHaikuImagePackage vim-7.2-gcc4-20090531
 			:  $(baseURL)/vim-7.2-gcc4-haiku-2009-05-31.zip
@@ -838,7 +838,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package VLC available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package VLC available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -874,7 +874,7 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package WonderBrush available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
 		local baseURL = http://www.yellowbites.com/downloads ;
