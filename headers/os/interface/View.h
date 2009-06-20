@@ -622,7 +622,8 @@ private:
 			void 			_PrintToStream();
 			void			_PrintTree();
 
-			int32			fServerToken;
+			int32			_unused_int1;
+
 			uint32			fFlags;
 			BPoint			fParentOffset;
 			BWindow*		fOwner;

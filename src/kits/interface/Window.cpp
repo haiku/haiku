@@ -2905,7 +2905,7 @@ BWindow::_CreateTopView()
 	fTopView->fTopLevelView = true;
 
 	//inhibit check_lock()
-	fLastViewToken = fTopView->fServerToken;
+	fLastViewToken = _get_object_token_(fTopView);
 
 	// set fTopView's owner, add it to window's eligible handler list
 	// and also set its next handler to be this window.
@@ -3089,7 +3089,7 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message,
 			cookie.focus_token = _get_object_token_(*_target);
 
 		if (fLastMouseMovedView != NULL && cookie.message->what == B_MOUSE_MOVED)
-			cookie.last_view_token = fLastMouseMovedView->fServerToken;
+			cookie.last_view_token = _get_object_token_(fLastMouseMovedView);
 
 		*_usePreferred = false;
 	}
