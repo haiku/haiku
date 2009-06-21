@@ -20,7 +20,9 @@ public:
 };
 
 
-class AbstractTable : protected BColumnListView {
+// NOTE: Intention is to inherit from "protected BColumnListView", but GCC2
+// has problems dynamic_casting a BHandler pointer to a BView then...
+class AbstractTable : public BColumnListView {
 public:
 								AbstractTable(const char* name, uint32 flags,
 									border_style borderStyle = B_NO_BORDER,
