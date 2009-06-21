@@ -71,3 +71,10 @@ ContiguousStatement::AddressRangeAt(int32 index) const
 {
 	return index == 0 ? fRange : TargetAddressRange();
 }
+
+
+bool
+ContiguousStatement::ContainsAddress(target_addr_t address) const
+{
+	return fRange.Contains(address);
+}
