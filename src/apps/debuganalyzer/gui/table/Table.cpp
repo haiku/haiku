@@ -426,6 +426,13 @@ Table::DeselectRow(int32 rowIndex)
 }
 
 
+void
+Table::DeselectAllRows()
+{
+	DeselectAll();
+}
+
+
 bool
 Table::AddTableListener(TableListener* listener)
 {

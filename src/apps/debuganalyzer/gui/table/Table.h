@@ -106,6 +106,7 @@ public:
 
 			void				SelectRow(int32 rowIndex, bool extendSelection);
 			void				DeselectRow(int32 rowIndex);
+			void				DeselectAllRows();
 
 			bool				AddTableListener(TableListener* listener);
 			void				RemoveTableListener(TableListener* listener);
