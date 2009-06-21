@@ -78,7 +78,7 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLDirectMode GLTeapot Mandelbrot Pairs
 	Playground Pulse Sudoku Gradients
 ;
-SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
+SYSTEM_LIBS = libbe.so $(HAIKU_SHARED_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
 	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
 	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
@@ -233,12 +233,17 @@ AddFilesToHaikuHybridImage system lib : $(SYSTEM_LIBS) : : true ;
 SYSTEM_LIBS_LIBNETWORK_ALIASES
 	= libsocket.so libbind.so libnet.so ;
 
-local lib ;
-for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
-	AddSymlinkToHaikuHybridImage system lib : libnetwork.so : $(lib) ;
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	local lib ;
+	for lib in $(SYSTEM_LIBS_LIBNETWORK_ALIASES) {
+		AddSymlinkToHaikuHybridImage system lib : libnetwork.so : $(lib)
+			: : true ;
+	}
+
+	AddSymlinkToHaikuHybridImage system lib : libbnetapi.so : libnetapi.so
+		: : true ;
 }
 
-AddSymlinkToHaikuHybridImage system lib : libbnetapi.so : libnetapi.so ;
 
 # libGL.so has GLU (like BeOS) *and* GLUT API built-in
 SYSTEM_LIBS_LIBGL_ALIASES
@@ -247,7 +252,7 @@ SYSTEM_LIBS_LIBGL_ALIASES
 if $(TARGET_ARCH) = x86 {
 	local lib ;
 	for lib in $(SYSTEM_LIBS_LIBGL_ALIASES) {
-		AddSymlinkToHaikuHybridImage system lib : libGL.so : $(lib) ;
+		AddSymlinkToHaikuHybridImage system lib : libGL.so : $(lib) : : true ;
 	}
 }
 
