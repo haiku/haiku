@@ -365,6 +365,7 @@ if $(HAIKU_SHARED_LIBSTDC++) {
 	HAIKU_LIBSTDC++ = $(HAIKU_STATIC_LIBSTDC++) ;
 } else {
 	HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+	HAIKU_SHARED_LIBSTDC++ = $(HAIKU_LIBSTDC++) ;
 }
 
 # the C++ support library
