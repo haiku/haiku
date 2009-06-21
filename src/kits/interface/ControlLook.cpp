@@ -1433,8 +1433,13 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 		frameShadowColor,
 		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
 
-	_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor, bevelLightColor,
-		bevelLightColor, B_LEFT_BORDER & ~borders);
+	if (rect.IsValid()) {
+		_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
+			bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
+	} else {
+		if ((B_LEFT_BORDER & ~borders) != 0)
+			rect.left++;
+	}
 
 	view->FillRect(rect, fillGradient);
 }

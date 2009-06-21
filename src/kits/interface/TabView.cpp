@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -851,14 +851,17 @@ BTabView::DrawTabs()
 
 	if (be_control_look != NULL) {
 		BRect frame(Bounds());
-		frame.left = left;
-		frame.bottom = fTabHeight;
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
-		if (left == 0)
-			borders |= BControlLook::B_LEFT_BORDER;
-		be_control_look->DrawInactiveTab(this, frame, frame, base, 0, borders);
+		if (left < frame.right) {
+			frame.left = left;
+			frame.bottom = fTabHeight;
+			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+			uint32 borders = BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
+			if (left == 0)
+				borders |= BControlLook::B_LEFT_BORDER;
+			be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
+				borders);
+		}
 	}
 
 	if (fSelection < CountTabs())
@@ -1061,9 +1064,11 @@ BTabView::GetPreferredSize(float *width, float *height)
 BSize
 BTabView::MinSize()
 {
-	BSize size = fContainerView->MinSize();
-	size.height += TabHeight() + 6.0f;
-	size.width += 6.0f;
+	BSize size(_TabsMinSize());
+	BSize containerSize = fContainerView->MinSize();
+	if (containerSize.width > size.width)
+		size.width = containerSize.width;
+	size.height += containerSize.height;
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -1071,9 +1076,11 @@ BTabView::MinSize()
 BSize
 BTabView::MaxSize()
 {
-	BSize size = fContainerView->MaxSize();
-	size.height += TabHeight() + 6.0f;
-	size.width += 6.0f;
+	BSize size(_TabsMinSize());
+	BSize containerSize = fContainerView->MaxSize();
+	if (containerSize.width > size.width)
+		size.width = containerSize.width;
+	size.height += containerSize.height;
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
@@ -1081,9 +1088,11 @@ BTabView::MaxSize()
 BSize
 BTabView::PreferredSize()
 {
-	BSize size = fContainerView->PreferredSize();
-	size.height += TabHeight() + 6.0f;
-	size.width += 6.0f;
+	BSize size(_TabsMinSize());
+	BSize containerSize = fContainerView->PreferredSize();
+	if (containerSize.width > size.width)
+		size.width = containerSize.width;
+	size.height += containerSize.height;
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
 
@@ -1291,6 +1300,28 @@ BTabView::_InitObject(bool layouted, button_width width)
 }
 
 
+BSize
+BTabView::_TabsMinSize() const
+{
+	BSize size(0.0f, TabHeight() + 6.0f);
+	int32 count = min_c(2, CountTabs());
+	for (int32 i = 0; i < count; i++) {
+		BRect frame = TabFrame(i);
+		size.width += frame.Width();
+	}
+
+	if (count < CountTabs()) {
+		// TODO: Add size for yet to be implemented buttons that allow
+		// "scrolling" the displayed tabs left/right.
+	}
+
+	return size;
+}
+
+
+// #pragma mark - FBC and forbidden
+
+
 void BTabView::_ReservedTabView1() {}
 void BTabView::_ReservedTabView2() {}
 void BTabView::_ReservedTabView3() {}
@@ -1305,14 +1336,15 @@ void BTabView::_ReservedTabView11() {}
 void BTabView::_ReservedTabView12() {}
 
 
-BTabView::BTabView(const BTabView &tabView)
+BTabView::BTabView(const BTabView& tabView)
 	: BView(tabView)
 {
 	// this is private and not functional, but exported
 }
 
 
-BTabView &BTabView::operator=(const BTabView &)
+BTabView&
+BTabView::operator=(const BTabView&)
 {
 	// this is private and not functional, but exported
 	return *this;
