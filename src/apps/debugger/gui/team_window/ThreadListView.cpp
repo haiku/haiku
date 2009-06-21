@@ -245,7 +245,7 @@ ThreadListView::TableSelectionChanged(Table* table)
 void
 ThreadListView::_Init()
 {
-	fThreadsTable = new Table("threads list", 0);
+	fThreadsTable = new Table("threads list", 0, B_FANCY_BORDER);
 	AddChild(fThreadsTable->ToView());
 
 	// columns

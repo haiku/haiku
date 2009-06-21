@@ -230,7 +230,7 @@ StackTraceView::TableRowInvoked(Table* table, int32 rowIndex)
 void
 StackTraceView::_Init()
 {
-	fFramesTable = new Table("register list", 0);
+	fFramesTable = new Table("register list", 0, B_FANCY_BORDER);
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
 

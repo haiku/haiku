@@ -232,7 +232,7 @@ RegisterView::TableRowInvoked(Table* table, int32 rowIndex)
 void
 RegisterView::_Init()
 {
-	fRegisterTable = new Table("register list", 0);
+	fRegisterTable = new Table("register list", 0, B_FANCY_BORDER);
 	AddChild(fRegisterTable->ToView());
 
 	// columns

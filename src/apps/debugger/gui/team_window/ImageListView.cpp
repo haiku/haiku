@@ -231,7 +231,7 @@ ImageListView::TableRowInvoked(Table* table, int32 rowIndex)
 void
 ImageListView::_Init()
 {
-	fImagesTable = new Table("images list", 0);
+	fImagesTable = new Table("images list", 0, B_FANCY_BORDER);
 	AddChild(fImagesTable->ToView());
 
 	// columns
