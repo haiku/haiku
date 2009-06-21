@@ -28,6 +28,7 @@ public:
 			void				UnsetListener();
 
 			void				SetStackTrace(StackTrace* stackTrace);
+			void				SetStackFrame(StackFrame* stackFrame);
 
 private:
 			class FramesTableModel;

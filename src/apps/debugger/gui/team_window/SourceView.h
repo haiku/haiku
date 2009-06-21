@@ -8,9 +8,12 @@
 #include <Font.h>
 #include <View.h>
 
+#include "ArchitectureTypes.h"
+
 
 class SourceCode;
 class StackFrame;
+class StackTrace;
 class TeamDebugModel;
 
 
@@ -29,8 +32,12 @@ public:
 
 			void				UnsetListener();
 
-			void				SetStackFrame(StackFrame* frame);
-			void				UpdateSourceCode();
+			void				SetStackTrace(StackTrace* stackTrace);
+			void				SetStackFrame(StackFrame* stackFrame);
+			void				SetSourceCode(SourceCode* sourceCode);
+
+			bool				ScrollToAddress(target_addr_t address);
+			bool				ScrollToLine(uint32 line);
 
 	virtual	void				TargetedByScrollView(BScrollView* scrollView);
 
@@ -41,6 +48,7 @@ public:
 	virtual	void				DoLayout();
 
 private:
+			class BaseView;
 			class MarkerView;
 			class TextView;
 
@@ -54,9 +62,11 @@ private:
 			void				_Init();
 			void				_UpdateScrollBars();
 			BSize				_DataRectSize() const;
+			BRect				_VisibleRect() const;
 
 private:
 			TeamDebugModel*		fDebugModel;
+			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
 			SourceCode*			fSourceCode;
 			MarkerView*			fMarkerView;

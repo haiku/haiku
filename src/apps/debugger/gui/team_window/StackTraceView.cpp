@@ -210,6 +210,22 @@ StackTraceView::SetStackTrace(StackTrace* stackTrace)
 
 
 void
+StackTraceView::SetStackFrame(StackFrame* stackFrame)
+{
+	if (fStackTrace != NULL && stackFrame != NULL) {
+		for (int32 i = 0; StackFrame* other = fStackTrace->FrameAt(i); i++) {
+			if (stackFrame == other) {
+				fFramesTable->SelectRow(i, false);
+				return;
+			}
+		}
+	}
+
+	fFramesTable->DeselectAllRows();
+}
+
+
+void
 StackTraceView::TableSelectionChanged(Table* table)
 {
 	if (fListener == NULL)

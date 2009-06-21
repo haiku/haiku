@@ -21,6 +21,7 @@
 #include "ImageListView.h"
 #include "MessageCodes.h"
 #include "RegisterView.h"
+#include "SourceCode.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
 #include "TeamDebugModel.h"
@@ -35,7 +36,9 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 		B_ASYNCHRONOUS_CONTROLS),
 	fDebugModel(debugModel),
 	fActiveThread(NULL),
+	fActiveStackTrace(NULL),
 	fActiveStackFrame(NULL),
+	fActiveSourceCode(NULL),
 	fListener(listener),
 	fTabView(NULL),
 	fLocalsTabView(NULL),
@@ -69,6 +72,15 @@ TeamWindow::~TeamWindow()
 		fSourceView->UnsetListener();
 
 	fDebugModel->GetTeam()->RemoveListener(this);
+
+	if (fActiveSourceCode != NULL)
+		fActiveSourceCode->RemoveReference();
+	if (fActiveStackFrame != NULL)
+		fActiveStackFrame->RemoveReference();
+	if (fActiveStackTrace != NULL)
+		fActiveStackTrace->RemoveReference();
+	if (fActiveThread != NULL)
+		fActiveThread->RemoveReference();
 }
 
 
@@ -283,7 +295,13 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 	if (thread == fActiveThread)
 		return;
 
+	if (fActiveThread != NULL)
+		fActiveThread->RemoveReference();
+
 	fActiveThread = thread;
+
+	if (fActiveThread != NULL)
+		fActiveThread->AddReference();
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
@@ -295,8 +313,30 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 
 	locker.Unlock();
 
-	fStackTraceView->SetStackTrace(stackTrace);
+	_SetActiveStackTrace(stackTrace);
 	_UpdateCpuState();
+}
+
+
+void
+TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
+{
+	if (stackTrace == fActiveStackTrace)
+		return;
+
+	if (fActiveStackTrace != NULL)
+		fActiveStackTrace->RemoveReference();
+
+	fActiveStackTrace = stackTrace;
+
+	if (fActiveStackTrace != NULL)
+		fActiveStackTrace->AddReference();
+
+	fStackTraceView->SetStackTrace(fActiveStackTrace);
+	fSourceView->SetStackTrace(fActiveStackTrace);
+
+	if (fActiveStackTrace != NULL)
+		_SetActiveStackFrame(fActiveStackTrace->FrameAt(0));
 }
 
 
@@ -315,9 +355,17 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 
 	fActiveStackFrame = frame;
 
+	SourceCode* sourceCode = NULL;
+	Reference<SourceCode> sourceCodeReference;
+	bool setSourceCode = false;
+
 	if (fActiveStackFrame != NULL) {
 		fActiveStackFrame->AddReference();
 		fActiveStackFrame->AddListener(this);
+
+		sourceCode = fActiveStackFrame->GetSourceCode();
+		sourceCodeReference.SetTo(sourceCode);
+		setSourceCode = true;
 
 		// If the source code is not loaded yet, request it.
 		if (fActiveStackFrame->SourceCodeState() == STACK_SOURCE_NOT_LOADED)
@@ -328,7 +376,29 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 
 	locker.Unlock();
 
+	if (setSourceCode)
+		_SetActiveSourceCode(sourceCode);
+
+	fStackTraceView->SetStackFrame(fActiveStackFrame);
 	fSourceView->SetStackFrame(fActiveStackFrame);
+}
+
+
+void
+TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
+{
+	if (sourceCode == fActiveSourceCode)
+		return;
+
+	if (fActiveSourceCode != NULL)
+		fActiveSourceCode->RemoveReference();
+
+	fActiveSourceCode = sourceCode;
+
+	if (fActiveSourceCode != NULL)
+		fActiveSourceCode->AddReference();
+
+	fSourceView->SetSourceCode(fActiveSourceCode);
 }
 
 
@@ -427,14 +497,26 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 
 	locker.Unlock();
 
-	fStackTraceView->SetStackTrace(stackTrace);
+	_SetActiveStackTrace(stackTrace);
 }
 
 
 void
 TeamWindow::_HandleSourceCodeChanged()
 {
-	fSourceView->UpdateSourceCode();
+	// If we don't have an active stack frame anymore, the message is obsolete.
+	if (fActiveStackFrame == NULL)
+		return;
+
+	// get a reference to the source code
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	SourceCode* sourceCode = fActiveStackFrame->GetSourceCode();
+	Reference<SourceCode> sourceCodeReference(sourceCode);
+
+	locker.Unlock();
+
+	_SetActiveSourceCode(sourceCode);
 }
 
 

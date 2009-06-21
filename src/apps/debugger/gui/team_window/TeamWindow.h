@@ -19,6 +19,7 @@ class BButton;
 class BTabView;
 class ImageListView;
 class RegisterView;
+class SourceCode;
 class TeamDebugModel;
 
 
@@ -64,7 +65,9 @@ private:
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
+			void				_SetActiveStackTrace(StackTrace* stackTrace);
 			void				_SetActiveStackFrame(StackFrame* frame);
+			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
 
@@ -76,7 +79,9 @@ private:
 private:
 			TeamDebugModel*		fDebugModel;
 			::Thread*			fActiveThread;
+			StackTrace*			fActiveStackTrace;
 			StackFrame*			fActiveStackFrame;
+			SourceCode*			fActiveSourceCode;
 			Listener*			fListener;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;
