@@ -151,6 +151,7 @@ private:
 StackTraceView::StackTraceView(Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
+	fStackTrace(NULL),
 	fFramesTable(NULL),
 	fFramesTableModel(NULL),
 	fListener(listener)
@@ -218,12 +219,6 @@ StackTraceView::TableSelectionChanged(Table* table)
 		= fFramesTableModel->FrameAt(table->SelectionModel()->RowAt(0));
 
 	fListener->StackFrameSelectionChanged(frame);
-}
-
-
-void
-StackTraceView::TableRowInvoked(Table* table, int32 rowIndex)
-{
 }
 
 

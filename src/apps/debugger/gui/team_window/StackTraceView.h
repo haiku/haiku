@@ -35,7 +35,6 @@ private:
 private:
 	// TableListener
 	virtual	void				TableSelectionChanged(Table* table);
-	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
 
 			void				_Init();
 
