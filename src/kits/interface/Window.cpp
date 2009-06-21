@@ -1245,9 +1245,10 @@ FrameMoved(origin);
 						= (ViewUpdateInfo*)infos.ItemAtFast(i);
 					if (BView* view = _FindView(info->token))
 						view->_Draw(info->updateRect);
-					else
+					else {
 						printf("_UPDATE_ - didn't find view by token: %ld\n",
 							info->token);
+					}
 //drawTime += system_time() - drawStart;
 				}
 				// NOTE: The tokens are actually hirachically sorted,
