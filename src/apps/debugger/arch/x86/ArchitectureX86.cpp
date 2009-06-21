@@ -176,7 +176,7 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 				instructionSize, breakpointAllowed) == B_OK) {
 		Statement* statement = new(std::nothrow) ContiguousStatement(
 			SourceLocation(lineIndex), SourceLocation(lineIndex + 1),
-			TargetAddressRange(instructionAddress, instructionAddress));
+			TargetAddressRange(instructionAddress, instructionSize));
 		if (statement == NULL)
 			return B_NO_MEMORY;
 
