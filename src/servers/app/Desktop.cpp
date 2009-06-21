@@ -147,8 +147,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		&& message->FindInt32("key", &key) == B_OK
 		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
 		// Check for safe video mode (cmd + ctrl + escape)
-		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0 &&
-			(modifiers & B_CONTROL_KEY) != 0) {
+		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0 
+			&& (modifiers & B_CONTROL_KEY) != 0) {
 			system("screenmode --fall-back &");
 			return B_SKIP_MESSAGE;
 		}
