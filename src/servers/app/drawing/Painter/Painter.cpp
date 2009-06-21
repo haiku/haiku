@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2009, Christian Packmann.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * Copyright 2005-2009, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
- *
- * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
- * rendering pipe-lines for stroke, fills, bitmap and text rendering.
  */
+
+/*! API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
+	rendering pipe-lines for stroke, fills, bitmap and text rendering.*/
 
 #include <new>
 #include <stdio.h>
@@ -54,6 +55,8 @@
 
 #include "Painter.h"
 
+#include "AppServer.h"
+
 using std::nothrow;
 
 #undef TRACE
@@ -78,41 +81,43 @@ using std::nothrow;
 
 // constructor
 Painter::Painter()
-	: fBuffer(),
-	  fPixelFormat(fBuffer, &fPatternHandler),
-	  fBaseRenderer(fPixelFormat),
-	  fUnpackedScanline(),
-	  fPackedScanline(),
-	  fSubpixPackedScanline(),
-	  fSubpixUnpackedScanline(),
-	  fSubpixRasterizer(),
-	  fRasterizer(),
-	  fSubpixRenderer(fBaseRenderer),
-	  fRenderer(fBaseRenderer),
-	  fRendererBin(fBaseRenderer),
+	:
+	fBuffer(),
+	fPixelFormat(fBuffer, &fPatternHandler),
+	fBaseRenderer(fPixelFormat),
+	fUnpackedScanline(),
+	fPackedScanline(),
+	fSubpixPackedScanline(),
+	fSubpixUnpackedScanline(),
+	fSubpixRasterizer(),
+	fRasterizer(),
+	fSubpixRenderer(fBaseRenderer),
+	fRenderer(fBaseRenderer),
+	fRendererBin(fBaseRenderer),
 
-	  fPath(),
-	  fCurve(fPath),
+	fPath(),
+	fCurve(fPath),
 
-	  fSubpixelPrecise(false),
-	  fValidClipping(false),
-	  fDrawingText(false),
-	  fAttached(false),
+	fSubpixelPrecise(false),
+	fValidClipping(false),
+	fDrawingText(false),
+	fAttached(false),
 
-	  fPenSize(1.0),
-	  fClippingRegion(NULL),
-	  fDrawingMode(B_OP_COPY),
-	  fAlphaSrcMode(B_PIXEL_ALPHA),
-	  fAlphaFncMode(B_ALPHA_OVERLAY),
-	  fLineCapMode(B_BUTT_CAP),
-	  fLineJoinMode(B_MITER_JOIN),
-	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
+	fPenSize(1.0),
+	fClippingRegion(NULL),
+	fDrawingMode(B_OP_COPY),
+	fAlphaSrcMode(B_PIXEL_ALPHA),
+	fAlphaFncMode(B_ALPHA_OVERLAY),
+	fLineCapMode(B_BUTT_CAP),
+	fLineJoinMode(B_MITER_JOIN),
+	fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
-	  fPatternHandler(),
-	  fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
+	fPatternHandler(),
+	fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
 		fSubpixUnpackedScanline, fSubpixRasterizer)
 {
-	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
+		false);
 
 #if ALIASED_DRAWING
 	fRasterizer.gamma(agg::gamma_threshold(0.5));
@@ -131,8 +136,9 @@ Painter::~Painter()
 void
 Painter::AttachToBuffer(RenderingBuffer* buffer)
 {
-	if (buffer && buffer->InitCheck() >= B_OK &&
-		(buffer->ColorSpace() == B_RGBA32 || buffer->ColorSpace() == B_RGB32)) {
+	if (buffer && buffer->InitCheck() >= B_OK
+		&& (buffer->ColorSpace() == B_RGBA32
+			|| buffer->ColorSpace() == B_RGB32)) {
 		// TODO: implement drawing on B_RGB24, B_RGB15, B_RGB16,
 		// B_CMAP8 and B_GRAY8 :-[
 		// (if ever we want to support some devices where this gives
@@ -2207,8 +2213,24 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	const uint32 dstBPR = fBuffer.stride();
 	const uint32 srcBPR = srcBuffer.stride();
 
-	bool optimizeForLowFilterRatio = xScale == yScale
-		&& (xScale == 1.5 || xScale == 2.0 || xScale == 2.5 || xScale == 3.0);
+	// Figure out which version of the code we want to use...
+	enum {
+		kOptimizeForLowFilterRatio = 0,
+		kUsePlainCVersion,
+		kUseSIMDVersion
+	};
+
+	int codeSelect = kUsePlainCVersion;
+
+	uint32 neededSIMDFlags = (APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE);
+	if ((gAppServerSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
+		codeSelect = kUseSIMDVersion;
+	else {
+		if (xScale == yScale && (xScale == 1.5 || xScale == 2.0
+			|| xScale == 2.5 || xScale == 3.0)) {
+			codeSelect = kOptimizeForLowFilterRatio;
+		}
+	}
 
 	// iterate over clipping boxes
 	fBaseRenderer.first_clip_box();
@@ -2236,161 +2258,248 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 //printf("x: %ld - %ld\n", xIndexL, xIndexR);
 //printf("y: %ld - %ld\n", y1, y2);
 
-		if (optimizeForLowFilterRatio) {
-			// In this mode, we anticipate to hit many destination pixels that
-			// map directly to a source pixel, we have more branches in the
-			// inner loop but save time because of the special cases. If there
-			// are too few direct hit pixels, the branches only waste time.
-			for (; y1 <= y2; y1++) {
-				// cache the weight of the top and bottom row
-				const uint16 wTop = yWeights[y1].weight;
-				const uint16 wBottom = 255 - yWeights[y1].weight;
+		switch (codeSelect) {
+			case kOptimizeForLowFilterRatio:
+			{
+				// In this mode, we anticipate to hit many destination pixels
+				// that map directly to a source pixel, we have more branches
+				// in the inner loop but save time because of the special
+				// cases. If there are too few direct hit pixels, the branches
+				// only waste time.
+				for (; y1 <= y2; y1++) {
+					// cache the weight of the top and bottom row
+					const uint16 wTop = yWeights[y1].weight;
+					const uint16 wBottom = 255 - yWeights[y1].weight;
 
-				// buffer offset into source (top row)
-				register const uint8* src
-					= srcBuffer.row_ptr(yWeights[y1].index);
-				// buffer handle for destination to be incremented per pixel
-				register uint8* d = dst;
+					// buffer offset into source (top row)
+					register const uint8* src
+						= srcBuffer.row_ptr(yWeights[y1].index);
+					// buffer handle for destination to be incremented per
+					// pixel
+					register uint8* d = dst;
 
-				if (wTop == 255) {
-					for (int32 x = xIndexL; x <= xIndexR; x++) {
-						const uint8* s = src + xWeights[x].index;
-						// This case is important to prevent out
-						// of bounds access at bottom edge of the source
-						// bitmap. If the scale is low and integer, it will
-						// also help the speed.
-						if (xWeights[x].weight == 255) {
-							// As above, but to prevent out of bounds
-							// on the right edge.
-							*(uint32*)d = *(uint32*)s;
-						} else {
-							// Only the left and right pixels are interpolated,
-							// since the top row has 100% weight.
-							const uint16 wLeft = xWeights[x].weight;
-							const uint16 wRight = 255 - wLeft;
-							d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
-							d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
-							d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+					if (wTop == 255) {
+						for (int32 x = xIndexL; x <= xIndexR; x++) {
+							const uint8* s = src + xWeights[x].index;
+							// This case is important to prevent out
+							// of bounds access at bottom edge of the source
+							// bitmap. If the scale is low and integer, it will
+							// also help the speed.
+							if (xWeights[x].weight == 255) {
+								// As above, but to prevent out of bounds
+								// on the right edge.
+								*(uint32*)d = *(uint32*)s;
+							} else {
+								// Only the left and right pixels are
+								// interpolated, since the top row has 100%
+								// weight.
+								const uint16 wLeft = xWeights[x].weight;
+								const uint16 wRight = 255 - wLeft;
+								d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+								d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+								d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+							}
+							d += 4;
 						}
-						d += 4;
-					}
-				} else {
-					for (int32 x = xIndexL; x <= xIndexR; x++) {
-						const uint8* s = src + xWeights[x].index;
-						if (xWeights[x].weight == 255) {
-							// Prevent out of bounds access on the right edge
-							// or simply speed up.
-							const uint8* sBottom = s + srcBPR;
-							d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
-							d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
-							d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
-						} else {
-							// calculate the weighted sum of all four
-							// interpolated pixels
-							const uint16 wLeft = xWeights[x].weight;
-							const uint16 wRight = 255 - wLeft;
-							// left and right of top row
-							uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
-							uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
-							uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
+					} else {
+						for (int32 x = xIndexL; x <= xIndexR; x++) {
+							const uint8* s = src + xWeights[x].index;
+							if (xWeights[x].weight == 255) {
+								// Prevent out of bounds access on the right
+								// edge or simply speed up.
+								const uint8* sBottom = s + srcBPR;
+								d[0] = (s[0] * wTop + sBottom[0] * wBottom)
+									>> 8;
+								d[1] = (s[1] * wTop + sBottom[1] * wBottom)
+									>> 8;
+								d[2] = (s[2] * wTop + sBottom[2] * wBottom)
+									>> 8;
+							} else {
+								// calculate the weighted sum of all four
+								// interpolated pixels
+								const uint16 wLeft = xWeights[x].weight;
+								const uint16 wRight = 255 - wLeft;
+								// left and right of top row
+								uint32 t0 = (s[0] * wLeft + s[4] * wRight)
+									* wTop;
+								uint32 t1 = (s[1] * wLeft + s[5] * wRight)
+									* wTop;
+								uint32 t2 = (s[2] * wLeft + s[6] * wRight)
+									* wTop;
 
-							// left and right of bottom row
-							s += srcBPR;
-							t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
-							t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
-							t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
+								// left and right of bottom row
+								s += srcBPR;
+								t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
+								t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
+								t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
 
-							d[0] = t0 >> 16;
-							d[1] = t1 >> 16;
-							d[2] = t2 >> 16;
+								d[0] = t0 >> 16;
+								d[1] = t1 >> 16;
+								d[2] = t2 >> 16;
+							}
+							d += 4;
 						}
-						d += 4;
 					}
+					dst += dstBPR;
 				}
-				dst += dstBPR;
+				break;
 			}
-		} else {
-			// In this mode we anticipate many pixels wich need filtering,
-			// there are no special cases for direct hit pixels except for the
-			// last column/row and the right/bottom corner pixel.
 
-			// The last column/row handling does not need to be performed
-			// for all clipping rects!
-			int32 yMax = y2;
-			if (yWeights[yMax].weight == 255)
-				yMax--;
-			int32 xIndexMax = xIndexR;
-			if (xWeights[xIndexMax].weight == 255)
-				xIndexMax--;
+			case kUsePlainCVersion:
+			{
+				// In this mode we anticipate many pixels wich need filtering,
+				// there are no special cases for direct hit pixels except for
+				// the last column/row and the right/bottom corner pixel.
 
-			for (; y1 <= yMax; y1++) {
-				// cache the weight of the top and bottom row
-				const uint16 wTop = yWeights[y1].weight;
-				const uint16 wBottom = 255 - yWeights[y1].weight;
+				// The last column/row handling does not need to be performed
+				// for all clipping rects!
+				int32 yMax = y2;
+				if (yWeights[yMax].weight == 255)
+					yMax--;
+				int32 xIndexMax = xIndexR;
+				if (xWeights[xIndexMax].weight == 255)
+					xIndexMax--;
 
-				// buffer offset into source (top row)
+				for (; y1 <= yMax; y1++) {
+					// cache the weight of the top and bottom row
+					const uint16 wTop = yWeights[y1].weight;
+					const uint16 wBottom = 255 - yWeights[y1].weight;
+
+					// buffer offset into source (top row)
+					register const uint8* src
+						= srcBuffer.row_ptr(yWeights[y1].index);
+					// buffer handle for destination to be incremented per
+					// pixel
+					register uint8* d = dst;
+
+					for (int32 x = xIndexL; x <= xIndexMax; x++) {
+						const uint8* s = src + xWeights[x].index;
+						// calculate the weighted sum of all four
+						// interpolated pixels
+						const uint16 wLeft = xWeights[x].weight;
+						const uint16 wRight = 255 - wLeft;
+						// left and right of top row
+						uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
+						uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
+						uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
+
+						// left and right of bottom row
+						s += srcBPR;
+						t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
+						t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
+						t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
+						d[0] = t0 >> 16;
+						d[1] = t1 >> 16;
+						d[2] = t2 >> 16;
+						d += 4;
+					}
+					// last column of pixels if necessary
+					if (xIndexMax < xIndexR) {
+						const uint8* s = src + xWeights[xIndexR].index;
+						const uint8* sBottom = s + srcBPR;
+						d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+						d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+						d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+					}
+
+					dst += dstBPR;
+				}
+
+				// last row of pixels if necessary
+				// buffer offset into source (bottom row)
 				register const uint8* src
-					= srcBuffer.row_ptr(yWeights[y1].index);
+					= srcBuffer.row_ptr(yWeights[y2].index);
 				// buffer handle for destination to be incremented per pixel
 				register uint8* d = dst;
 
-				for (int32 x = xIndexL; x <= xIndexMax; x++) {
-					const uint8* s = src + xWeights[x].index;
-					// calculate the weighted sum of all four
-					// interpolated pixels
-					const uint16 wLeft = xWeights[x].weight;
-					const uint16 wRight = 255 - wLeft;
-					// left and right of top row
-					uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
-					uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
-					uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
-
-					// left and right of bottom row
-					s += srcBPR;
-					t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
-					t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
-					t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
-					d[0] = t0 >> 16;
-					d[1] = t1 >> 16;
-					d[2] = t2 >> 16;
-					d += 4;
+				if (yMax < y2) {
+					for (int32 x = xIndexL; x <= xIndexMax; x++) {
+						const uint8* s = src + xWeights[x].index;
+						const uint16 wLeft = xWeights[x].weight;
+						const uint16 wRight = 255 - wLeft;
+						d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+						d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+						d += 4;
+					}
 				}
-				// last column of pixels if necessary
-				if (xIndexMax < xIndexR) {
+
+				// pixel in bottom right corner if necessary
+				if (yMax < y2 && xIndexMax < xIndexR) {
 					const uint8* s = src + xWeights[xIndexR].index;
-					const uint8* sBottom = s + srcBPR;
-					d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
-					d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
-					d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+					*(uint32*)d = *(uint32*)s;
+				}
+				break;
+			}
+
+			case kUseSIMDVersion:
+			{
+				// Basically the same as the "standard" mode, but we use SIMD
+				// routines for the processing of the single display lines.
+
+				// The last column/row handling does not need to be performed
+				// for all clipping rects!
+				int32 yMax = y2;
+				if (yWeights[yMax].weight == 255)
+					yMax--;
+				int32 xIndexMax = xIndexR;
+				if (xWeights[xIndexMax].weight == 255)
+					xIndexMax--;
+
+				for (; y1 <= yMax; y1++) {
+					// cache the weight of the top and bottom row
+					const uint16 wTop = yWeights[y1].weight;
+					const uint16 wBottom = 255 - yWeights[y1].weight;
+
+					// buffer offset into source (top row)
+					const uint8* src = srcBuffer.row_ptr(yWeights[y1].index);
+					// buffer handle for destination to be incremented per
+					// pixel
+					uint8* d = dst;
+					bilinear_scale_xloop_mmxsse(src, dst, xWeights,	xIndexL,
+						xIndexMax, wTop, srcBPR);
+					// increase pointer by processed pixels
+					d += (xIndexMax - xIndexL + 1) * 4;
+
+					// last column of pixels if necessary
+					if (xIndexMax < xIndexR) {
+						const uint8* s = src + xWeights[xIndexR].index;
+						const uint8* sBottom = s + srcBPR;
+						d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+						d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+						d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+					}
+
+					dst += dstBPR;
 				}
 
-				dst += dstBPR;
-			}
+				// last row of pixels if necessary
+				// buffer offset into source (bottom row)
+				register const uint8* src
+					= srcBuffer.row_ptr(yWeights[y2].index);
+				// buffer handle for destination to be incremented per pixel
+				register uint8* d = dst;
 
-			// last row of pixels if necessary
-			// buffer offset into source (bottom row)
-			register const uint8* src = srcBuffer.row_ptr(yWeights[y2].index);
-			// buffer handle for destination to be incremented per pixel
-			register uint8* d = dst;
-
-			if (yMax < y2) {
-				for (int32 x = xIndexL; x <= xIndexMax; x++) {
-					const uint8* s = src + xWeights[x].index;
-					const uint16 wLeft = xWeights[x].weight;
-					const uint16 wRight = 255 - wLeft;
-					d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
-					d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
-					d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
-					d += 4;
+				if (yMax < y2) {
+					for (int32 x = xIndexL; x <= xIndexMax; x++) {
+						const uint8* s = src + xWeights[x].index;
+						const uint16 wLeft = xWeights[x].weight;
+						const uint16 wRight = 255 - wLeft;
+						d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+						d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+						d += 4;
+					}
 				}
-			}
 
-			// pixel in bottom right corner if necessary
-			if (yMax < y2 && xIndexMax < xIndexR) {
-				const uint8* s = src + xWeights[xIndexR].index;
-				*(uint32*)d = *(uint32*)s;
+				// pixel in bottom right corner if necessary
+				if (yMax < y2 && xIndexMax < xIndexR) {
+					const uint8* s = src + xWeights[xIndexR].index;
+					*(uint32*)d = *(uint32*)s;
+				}
+				break;
 			}
-		}
+		} // switch(codeselect)
 	} while (fBaseRenderer.next_clip_box());
 
 #ifdef FILTER_INFOS_ON_HEAP

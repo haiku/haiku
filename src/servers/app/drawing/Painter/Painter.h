@@ -24,6 +24,15 @@
 #include <Font.h>
 #include <Rect.h>
 
+
+// Prototypes for assembler routines
+extern "C" {
+	void bilinear_scale_xloop_mmxsse(const uint8* src, void* dst, void* xWeights,
+		uint32 xmin, uint32 xmax, uint32 wTop, uint32 srcBPR );
+}
+
+extern uint32 gAppServerSIMDFlags;
+
 class BBitmap;
 class BRegion;
 class BGradient;

@@ -56,5 +56,10 @@ class AppServer : public MessageLooper  {
 
 extern BitmapManager *gBitmapManager;
 extern port_id gAppServerPort;
+extern uint32 gAppServerSIMDFlags;
+
+// Defines for SIMD support. Early implementation, subject to change
+#define APPSERVER_SIMD_MMX	(1 << 0)
+#define APPSERVER_SIMD_SSE	(1 << 1)
 
 #endif	/* APP_SERVER_H */

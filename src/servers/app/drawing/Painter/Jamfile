@@ -21,4 +21,6 @@ StaticLibrary libpainter.a :
 	PixelFormat.cpp
 
 	AGGTextRenderer.cpp
+
+	painter_bilinear_scale.nasm
 ;
