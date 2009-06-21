@@ -1053,10 +1053,10 @@ rule AddFilesToHaikuHybridImage directory : targets : destName
 }
 
 rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
-	: useSymlinkABISubDir
+	: useSymlinkTargetABISubDir : useABISubDir
 {
 	# AddFilesToHaikuHybridImage <directoryTokens> : <linkTarget> : <linkName>
-	#	: <useSymlinkABISubDir>
+	#	[ : <useSymlinkTargetABISubDir> [ :  <useABISubDir> ] ]
 	#
 	# Convenience rule calling both AddSymlinkToHaikuImage and
 	# AddSymlinkToAlternativeGCCArchive.
@@ -1064,13 +1064,21 @@ rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
 	# <linkTarget>
 	#	Can be a list of components that will be joined to path inserting
 	#	"/"s inbetween.
-	# <useSymlinkABISubDir>
+	# <useSymlinkTargetABISubDir>
 	#	If non-empty, specifies that an ABI subdirectory shall be inserted
 	#	into <linkTarget> (between the first and second component) for the
 	#	alternative GCC archive.
+	# <useABISubDir>
+	#	If non-empty, specifies that an ABI subdirectory part shall be appended
+	#	to the directory tokens for the alternative GCC archive.
+
+	local alternativeDirTokens = $(directoryTokens) ;
+	if $(useABISubDir) {
+		alternativeDirTokens += gcc$(HAIKU_GCC_VERSION[1]) ;
+	}
 
 	local alternativeLinkTarget = $(linkTarget) ;
-	if $(useSymlinkABISubDir) {
+	if $(useSymlinkTargetABISubDir) {
 		alternativeLinkTarget = $(linkTarget[1]) gcc$(HAIKU_GCC_VERSION[1])
 			$(linkTarget[2-]) ;
 	}
@@ -1078,7 +1086,7 @@ rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
 	alternativeLinkTarget = $(alternativeLinkTarget:J=/) ;
 
 	AddSymlinkToHaikuImage $(directoryTokens) : $(linkTarget) : $(linkName) ;
-	AddSymlinkToAlternativeGCCArchive $(directoryTokens)
+	AddSymlinkToAlternativeGCCArchive $(alternativeDirTokens)
 		: $(alternativeLinkTarget) : $(linkName) ;
 }
 
