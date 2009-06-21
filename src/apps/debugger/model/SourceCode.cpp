@@ -53,6 +53,19 @@ SourceCode::StatementAt(int32 index) const
 }
 
 
+Statement*
+SourceCode::StatementAtAddress(target_addr_t address) const
+{
+	// TODO: Optimize!
+	for (int32 i = 0; Statement* statement = fStatements.ItemAt(i); i++) {
+		if (statement->ContainsAddress(address))
+			return statement;
+	}
+
+	return NULL;
+}
+
+
 bool
 SourceCode::AddLine(const char* _line)
 {

@@ -24,6 +24,7 @@ public:
 
 			int32				CountStatements() const;
 			Statement*			StatementAt(int32 index) const;
+			Statement*			StatementAtAddress(target_addr_t address) const;
 
 			bool				AddLine(const char* line);
 									// clones
