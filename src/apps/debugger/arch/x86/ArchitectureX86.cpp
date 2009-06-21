@@ -7,11 +7,18 @@
 
 #include <new>
 
+#include <String.h>
+
 #include <AutoDeleter.h>
 
 #include "CpuStateX86.h"
 #include "DebuggerInterface.h"
+#include "FunctionDebugInfo.h"
+#include "SourceCode.h"
 #include "StackFrame.h"
+#include "Statement.h"
+
+#include "disasm/DisassemblerX86.h"
 
 
 ArchitectureX86::ArchitectureX86(DebuggerInterface* debuggerInterface)
@@ -135,6 +142,51 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 
 	_previousFrame = frameReference.Detach();
 	_previousCpuState = previousCpuState;
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
+	const void* buffer, size_t bufferSize, SourceCode*& _sourceCode)
+{
+	SourceCode* source = new(std::nothrow) SourceCode;
+	if (source == NULL)
+		return B_NO_MEMORY;
+	Reference<SourceCode> sourceReference(source, true);
+
+	// init disassembler
+	DisassemblerX86 disassembler;
+	status_t error = disassembler.Init(function->Address(), buffer, bufferSize);
+	if (error != B_OK)
+		return error;
+
+	// add a function name line
+	BString functionName(function->PrettyName());
+	if (!source->AddLine((functionName << ':').String()))
+		return B_NO_MEMORY;
+	uint32 lineIndex = 1;
+
+	// disassemble the instructions
+	BString line;
+	target_addr_t instructionAddress;
+	target_size_t instructionSize;
+	bool breakpointAllowed;
+	while (disassembler.GetNextInstruction(line, instructionAddress,
+				instructionSize, breakpointAllowed) == B_OK) {
+		Statement* statement = new(std::nothrow) ContiguousStatement(
+			SourceLocation(lineIndex), SourceLocation(lineIndex + 1),
+			TargetAddressRange(instructionAddress, instructionAddress));
+		if (statement == NULL)
+			return B_NO_MEMORY;
+
+		if (!source->AddStatement(statement) || !source->AddLine(line.String()))
+			return B_NO_MEMORY;
+
+		lineIndex++;
+	}
+
+	_sourceCode = sourceReference.Detach();
 	return B_OK;
 }
 

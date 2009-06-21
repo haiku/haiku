@@ -15,6 +15,7 @@ class CpuState;
 class DebuggerInterface;
 class FunctionDebugInfo;
 class Image;
+class SourceCode;
 class StackFrame;
 
 
@@ -33,6 +34,9 @@ public:
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
 										// can be NULL; can return B_UNSUPPORTED
+	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
+									SourceCode*& _sourceCode) = 0;
+										// returns reference
 };
 
 

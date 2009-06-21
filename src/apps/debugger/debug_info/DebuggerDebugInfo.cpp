@@ -5,8 +5,12 @@
 
 #include "DebuggerDebugInfo.h"
 
+#include <algorithm>
 #include <new>
 
+#include <AutoDeleter.h>
+
+#include "Architecture.h"
 #include "BasicFunctionDebugInfo.h"
 #include "DebuggerInterface.h"
 #include "Demangler.h"
@@ -84,6 +88,29 @@ DebuggerDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 	CpuState*& _previousCpuState)
 {
 	return B_UNSUPPORTED;
+}
+
+
+status_t
+DebuggerDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
+	SourceCode*& _sourceCode)
+{
+	// allocate a buffer for the function code
+	static const target_size_t kMaxBufferSize = 64 * 1024;
+	target_size_t bufferSize = std::min(function->Size(), kMaxBufferSize);
+	void* buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+
+	// read the function code
+	ssize_t bytesRead = fDebuggerInterface->ReadMemory(function->Address(),
+		buffer, bufferSize);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	return fArchitecture->DisassembleCode(function, buffer, bytesRead,
+		_sourceCode);
 }
 
 

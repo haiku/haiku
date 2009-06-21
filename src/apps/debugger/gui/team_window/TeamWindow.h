@@ -8,6 +8,8 @@
 #include <String.h>
 #include <Window.h>
 
+#include "SourceView.h"
+#include "StackFrame.h"
 #include "StackTraceView.h"
 #include "Team.h"
 #include "ThreadListView.h"
@@ -21,7 +23,8 @@ class TeamDebugModel;
 
 
 class TeamWindow : public BWindow, private ThreadListView::Listener,
-	StackTraceView::Listener, Team::Listener {
+	StackTraceView::Listener, SourceView::Listener, Team::Listener,
+	StackFrame::Listener {
 public:
 	class Listener;
 
@@ -44,6 +47,9 @@ private:
 	// StackTraceView::Listener
 	virtual	void				StackFrameSelectionChanged(StackFrame* frame);
 
+	// StackTraceView::Listener
+	// nothing yet
+
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
@@ -51,6 +57,9 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+
+	// StackFrame::Listener
+	virtual	void				StackFrameSourceCodeChanged(StackFrame* frame);
 
 			void				_Init();
 
@@ -62,6 +71,7 @@ private:
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
+			void				_HandleSourceCodeChanged();
 
 private:
 			TeamDebugModel*		fDebugModel;
@@ -74,6 +84,7 @@ private:
 			ImageListView*		fImageListView;
 			RegisterView*		fRegisterView;
 			StackTraceView*		fStackTraceView;
+			SourceView*			fSourceView;
 			BButton*			fRunButton;
 			BButton*			fStepOverButton;
 			BButton*			fStepIntoButton;
@@ -85,6 +96,8 @@ class TeamWindow::Listener {
 public:
 	virtual						~Listener();
 
+	virtual	void				StackFrameSourceCodeRequested(
+									TeamWindow* window, StackFrame* frame) = 0;
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action) = 0;
 	virtual	bool				TeamWindowQuitRequested(TeamWindow* window) = 0;

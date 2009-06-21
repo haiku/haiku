@@ -35,6 +35,8 @@ private:
 	virtual	void				MessageReceived(BMessage* message);
 
 	// TeamWindow::Listener
+	virtual	void				StackFrameSourceCodeRequested(
+									TeamWindow* window, StackFrame* frame);
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action);
 	virtual	bool				TeamWindowQuitRequested(TeamWindow* window);

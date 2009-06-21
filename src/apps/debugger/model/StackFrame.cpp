@@ -8,6 +8,10 @@
 #include "CpuState.h"
 #include "FunctionDebugInfo.h"
 #include "Image.h"
+#include "SourceCode.h"
+
+
+// #pragma mark - StackFrame
 
 
 StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
@@ -18,7 +22,9 @@ StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
 	fFrameAddress(frameAddress),
 	fReturnAddress(0),
 	fImage(NULL),
-	fFunction(NULL)
+	fFunction(NULL),
+	fSourceCode(NULL),
+	fSourceCodeState(STACK_SOURCE_NOT_LOADED)
 {
 	fCpuState->AddReference();
 }
@@ -26,6 +32,7 @@ StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
 
 StackFrame::~StackFrame()
 {
+	SetSourceCode(NULL, STACK_SOURCE_NOT_LOADED);
 	SetImage(NULL);
 	SetFunction(NULL);
 	fCpuState->RemoveReference();
@@ -69,4 +76,52 @@ StackFrame::SetFunction(FunctionDebugInfo* function)
 
 	if (fFunction != NULL)
 		fFunction->AddReference();
+}
+
+
+void
+StackFrame::SetSourceCode(SourceCode* source, stack_frame_source_state state)
+{
+	if (fSourceCode != NULL)
+		fSourceCode->RemoveReference();
+
+	fSourceCode = source;
+	fSourceCodeState = state;
+
+	if (fSourceCode != NULL)
+		fSourceCode->AddReference();
+
+	// notify listeners
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->StackFrameSourceCodeChanged(this);
+	}
+}
+
+
+void
+StackFrame::AddListener(Listener* listener)
+{
+	fListeners.Add(listener);
+}
+
+
+void
+StackFrame::RemoveListener(Listener* listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+// #pragma mark - Listener
+
+
+StackFrame::Listener::~Listener()
+{
+}
+
+
+void
+StackFrame::Listener::StackFrameSourceCodeChanged(StackFrame* frame)
+{
 }

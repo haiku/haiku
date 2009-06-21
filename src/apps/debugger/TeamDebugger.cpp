@@ -234,6 +234,30 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 
 void
+TeamDebugger::StackFrameSourceCodeRequested(TeamWindow* window,
+	StackFrame* frame)
+{
+	// mark loading
+	AutoLocker< ::Team> locker(fTeam);
+	if (frame->SourceCodeState() != STACK_SOURCE_NOT_LOADED)
+		return;
+	frame->SetSourceCode(NULL, STACK_SOURCE_LOADING);
+	locker.Unlock();
+
+	// schedule the job
+	if (fWorker->ScheduleJob(
+			new(std::nothrow) LoadSourceCodeJob(fDebuggerInterface,
+				fDebuggerInterface->GetArchitecture(), fTeam, frame),
+			this) != B_OK) {
+		// scheduling failed -- mark unavailable
+		locker.Lock();
+		frame->SetSourceCode(NULL, STACK_SOURCE_UNAVAILABLE);
+		locker.Unlock();
+	}
+}
+
+
+void
 TeamDebugger::ThreadActionRequested(TeamWindow* window, thread_id threadID,
 	uint32 action)
 {
@@ -269,6 +293,8 @@ void
 TeamDebugger::JobAborted(Job* job)
 {
 printf("TeamDebugger::JobAborted(%p)\n", job);
+	// TODO: For a stack frame source loader thread we should reset the
+	// loading state! Asynchronously due to locking order.
 }
 
 

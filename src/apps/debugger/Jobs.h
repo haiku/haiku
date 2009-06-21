@@ -13,6 +13,8 @@ class Architecture;
 class CpuState;
 class DebuggerInterface;
 class Image;
+class StackFrame;
+class Team;
 class Thread;
 
 
@@ -20,7 +22,8 @@ class Thread;
 enum {
 	JOB_TYPE_GET_CPU_STATE,
 	JOB_TYPE_GET_STACK_TRACE,
-	JOB_TYPE_LOAD_IMAGE_DEBUG_INFO
+	JOB_TYPE_LOAD_IMAGE_DEBUG_INFO,
+	JOB_TYPE_LOAD_SOURCE_CODE
 };
 
 
@@ -78,6 +81,25 @@ private:
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			Image*				fImage;
+};
+
+
+class LoadSourceCodeJob : public Job {
+public:
+								LoadSourceCodeJob(
+									DebuggerInterface* debuggerInterface,
+									Architecture* architecture,
+									Team* team, StackFrame* stackFrame);
+	virtual						~LoadSourceCodeJob();
+
+	virtual	JobKey				Key() const;
+	virtual	status_t			Do();
+
+private:
+			DebuggerInterface*	fDebuggerInterface;
+			Architecture*		fArchitecture;
+			Team*				fTeam;
+			StackFrame*			fStackFrame;
 };
 
 

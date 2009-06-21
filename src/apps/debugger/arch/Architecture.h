@@ -16,6 +16,7 @@ class FunctionDebugInfo;
 class Image;
 class ImageDebugInfoProvider;
 class Register;
+class SourceCode;
 class StackFrame;
 class StackTrace;
 class Team;
@@ -42,6 +43,9 @@ public:
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
 										// can be NULL
+	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
+									const void* buffer, size_t bufferSize,
+									SourceCode*& _sourceCode) = 0;
 
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,

@@ -51,6 +51,7 @@ Application Debugger :
 	# gui/team_window
 	ImageListView.cpp
 	RegisterView.cpp
+	SourceView.cpp
 	StackTraceView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
@@ -58,8 +59,10 @@ Application Debugger :
 	# model
 	Image.cpp
 	ImageInfo.cpp
+	SourceCode.cpp
 	StackFrame.cpp
 	StackTrace.cpp
+	Statement.cpp
 	SymbolInfo.cpp
 	Team.cpp
 	TeamDebugModel.cpp
@@ -77,8 +80,10 @@ Application Debugger :
 
 	:
 	<nogrist>Debugger_demangler.o
+	<nogrist>Debugger_disasm_x86.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
+	libudis86.a
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
@@ -89,5 +94,6 @@ Application Debugger :
 	: Debugger.rdef
 ;
 
+HaikuSubInclude arch x86 disasm ;
 HaikuSubInclude demangler ;
 HaikuSubInclude gui running_teams_window ;

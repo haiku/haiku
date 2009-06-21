@@ -28,6 +28,9 @@ public:
 									CpuState* cpuState,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
+	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
+									const void* buffer, size_t bufferSize,
+									SourceCode*& _sourceCode);
 
 private:
 			void				_AddRegister(int32 index, const char* name,

@@ -11,6 +11,7 @@
 #include <LayoutBuilder.h>
 #include <Message.h>
 #include <TabView.h>
+#include <ScrollView.h>
 #include <SplitView.h>
 #include <TextView.h>
 
@@ -42,6 +43,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fImageListView(NULL),
 	fRegisterView(NULL),
 	fStackTraceView(NULL),
+	fSourceView(NULL),
 	fRunButton(NULL),
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
@@ -63,6 +65,8 @@ TeamWindow::~TeamWindow()
 		fThreadListView->UnsetListener();
 	if (fStackTraceView != NULL)
 		fStackTraceView->UnsetListener();
+	if (fSourceView != NULL)
+		fSourceView->UnsetListener();
 
 	fDebugModel->GetTeam()->RemoveListener(this);
 }
@@ -128,6 +132,11 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_STACK_FRAME_SOURCE_CODE_CHANGED:
+		{
+			_HandleSourceCodeChanged();
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -184,8 +193,19 @@ TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 
 
 void
+TeamWindow::StackFrameSourceCodeChanged(StackFrame* frame)
+{
+printf("TeamWindow::StackFrameSourceCodeChanged(%p): source: %p, state: %d\n",
+frame, frame->GetSourceCode(), frame->SourceCodeState());
+	PostMessage(MSG_STACK_FRAME_SOURCE_CODE_CHANGED);
+}
+
+
+void
 TeamWindow::_Init()
 {
+	BScrollView* sourceScrollView;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddSplit(B_VERTICAL, 3.0f)
 			.AddGroup(B_VERTICAL, 0.0f, 0.4f)
@@ -202,7 +222,8 @@ TeamWindow::_Init()
 					.SetInsets(4.0f, 0.0f, 4.0f, 0.0f)
 				.End()
 				.AddSplit(B_HORIZONTAL, 3.0f)
-					.Add(new BTextView("source view"), 3.0f)
+					.Add(sourceScrollView = new BScrollView("source scroll",
+						NULL, 0, true, true), 3.0f)
 					.AddGroup(B_VERTICAL)
 						.Add(fLocalsTabView = new BTabView("locals view"))
 						.SetInsets(0.0f, 0.0f, 4.0f, 4.0f)
@@ -210,6 +231,10 @@ TeamWindow::_Init()
 				.End()
 			.End()
 		.End();
+
+	// add source view
+	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fDebugModel,
+		this));
 
 	// add threads tab
 	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL);
@@ -281,15 +306,29 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 	if (frame == fActiveStackFrame)
 		return;
 
-	if (fActiveStackFrame != NULL)
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	if (fActiveStackFrame != NULL) {
+		fActiveStackFrame->RemoveListener(this);
 		fActiveStackFrame->RemoveReference();
+	}
 
 	fActiveStackFrame = frame;
 
-	if (fActiveStackFrame != NULL)
+	if (fActiveStackFrame != NULL) {
 		fActiveStackFrame->AddReference();
+		fActiveStackFrame->AddListener(this);
+
+		// If the source code is not loaded yet, request it.
+		if (fActiveStackFrame->SourceCodeState() == STACK_SOURCE_NOT_LOADED)
+			fListener->StackFrameSourceCodeRequested(this, fActiveStackFrame);
+	}
 
 	_UpdateCpuState();
+
+	locker.Unlock();
+
+	fSourceView->SetStackFrame(fActiveStackFrame);
 }
 
 
@@ -389,6 +428,13 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 	locker.Unlock();
 
 	fStackTraceView->SetStackTrace(stackTrace);
+}
+
+
+void
+TeamWindow::_HandleSourceCodeChanged()
+{
+	fSourceView->UpdateSourceCode();
 }
 
 
