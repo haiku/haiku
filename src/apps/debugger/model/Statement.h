@@ -49,6 +49,9 @@ public:
 									const SourceLocation& end,
 									const TargetAddressRange& range);
 
+			const TargetAddressRange& AddressRange() const
+										{ return fRange; }
+
 	virtual	TargetAddressRange	CoveringAddressRange() const;
 
 	virtual	int32				CountAddressRanges() const;
