@@ -364,6 +364,35 @@ DebuggerInterface::SingleStepThread(thread_id thread)
 
 
 status_t
+DebuggerInterface::InstallBreakpoint(target_addr_t address)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_set_breakpoint message;
+	message.reply_port = contextGetter.Context()->reply_port;
+	message.address = (void*)(addr_t)address;
+
+	debug_nub_set_breakpoint_reply reply;
+
+	status_t error = send_debug_message(contextGetter.Context(),
+		B_DEBUG_MESSAGE_SET_BREAKPOINT, &message, sizeof(message), &reply,
+		sizeof(reply));
+	return error == B_OK ? reply.error : error;
+}
+
+
+status_t
+DebuggerInterface::UninstallBreakpoint(target_addr_t address)
+{
+	debug_nub_clear_breakpoint message;
+	message.address = (void*)(addr_t)address;
+
+	return write_port(fNubPort, B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,
+		&message, sizeof(message));
+}
+
+
+status_t
 DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 {
 	thread_info threadInfo;

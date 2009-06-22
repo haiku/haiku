@@ -40,6 +40,9 @@ public:
 	virtual	status_t			StopThread(thread_id thread);
 	virtual	status_t			SingleStepThread(thread_id thread);
 
+	virtual	status_t			InstallBreakpoint(target_addr_t address);
+	virtual	status_t			UninstallBreakpoint(target_addr_t address);
+
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
