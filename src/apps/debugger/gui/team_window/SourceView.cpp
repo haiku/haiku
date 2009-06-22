@@ -29,332 +29,456 @@ static const float kMinViewHeight = 80.0f;
 
 class SourceView::BaseView : public BView {
 public:
-	BaseView(const char* name, SourceView* sourceView, FontInfo* fontInfo)
-		:
-		BView(name, B_WILL_DRAW | B_SUBPIXEL_PRECISE),
-		fSourceView(sourceView),
-		fFontInfo(fontInfo),
-		fSourceCode(NULL)
-	{
-	}
+								BaseView(const char* name,
+									SourceView* sourceView, FontInfo* fontInfo);
 
-	virtual void SetSourceCode(SourceCode* sourceCode)
-	{
-		fSourceCode = sourceCode;
+	virtual	void				SetSourceCode(SourceCode* sourceCode);
 
-		InvalidateLayout();
-		Invalidate();
-	}
-
-	virtual BSize PreferredSize()
-	{
-		return MinSize();
-	}
+	virtual	BSize				PreferredSize();
 
 protected:
-	int32 LineCount() const
-	{
-		return fSourceCode != NULL ? fSourceCode->CountLines() : 0;
-	}
+	inline	int32				LineCount() const;
 
-	float TotalHeight() const
-	{
-		float height = LineCount() * fFontInfo->lineHeight - 1;
-		return std::max(height, kMinViewHeight);
-	}
+	inline	float				TotalHeight() const;
 
-	void GetLineRange(BRect rect, int32& minLine, int32& maxLine)
-	{
-		int32 lineHeight = (int32)fFontInfo->lineHeight;
-		minLine = (int32)rect.top / lineHeight;
-		maxLine = ((int32)ceilf(rect.bottom) + lineHeight - 1) / lineHeight;
-		minLine = std::max(minLine, 0L);
-		maxLine = std::min(maxLine, fSourceCode->CountLines() - 1);
-	}
+			void				GetLineRange(BRect rect, int32& minLine,
+									int32& maxLine);
 
 
 protected:
-	SourceView*	fSourceView;
-	FontInfo*	fFontInfo;
-	SourceCode*	fSourceCode;
+			SourceView*			fSourceView;
+			FontInfo*			fFontInfo;
+			SourceCode*			fSourceCode;
 };
 
 
 class SourceView::MarkerView : public BaseView {
 public:
-	MarkerView(SourceView* sourceView, FontInfo* fontInfo)
-		:
-		BaseView("source marker view", sourceView, fontInfo),
-		fStackTrace(NULL),
-		fStackFrame(NULL),
-		fMarkers(20, true),
-		fMarkersValid(false)
-	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	}
+								MarkerView(SourceView* sourceView,
+									FontInfo* fontInfo);
+								~MarkerView();
 
-	~MarkerView()
-	{
-	}
+	virtual	void				SetSourceCode(SourceCode* sourceCode);
 
-	virtual void SetSourceCode(SourceCode* sourceCode)
-	{
-		fMarkers.MakeEmpty();
-		fMarkersValid = false;
-		BaseView::SetSourceCode(sourceCode);
-	}
+			void				SetStackTrace(StackTrace* stackTrace);
+			void				SetStackFrame(StackFrame* stackFrame);
 
-	void SetStackTrace(StackTrace* stackTrace)
-	{
-		fStackTrace = stackTrace;
-		fMarkers.MakeEmpty();
-		fMarkersValid = false;
-		Invalidate();
-	}
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
 
-	void SetStackFrame(StackFrame* stackFrame)
-	{
-		fStackFrame = stackFrame;
-		fMarkers.MakeEmpty();
-		fMarkersValid = false;
-		Invalidate();
-	}
-
-	virtual BSize MinSize()
-	{
-		return BSize(40, TotalHeight());
-	}
-
-	virtual BSize MaxSize()
-	{
-		return BSize(MinSize().width, B_SIZE_UNLIMITED);
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
-		_UpdateMarkers();
-
-		if (fSourceCode == NULL || fMarkers.IsEmpty())
-			return;
-
-		// get the lines intersecting with the update rect
-		int32 minLine, maxLine;
-		GetLineRange(updateRect, minLine, maxLine);
-
-		// draw the markers
-		float width = Bounds().Width();
-		// TODO: The markers should be sorted, so we don't need to iterate over
-		// all of them.
-		for (int32 i = 0; Marker* marker = fMarkers.ItemAt(i); i++) {
-			int32 line = marker->Line();
-			if (line < minLine || line > maxLine)
-				continue;
-
-			float y = (float)line * fFontInfo->lineHeight;
-			BRect rect(0, y, width, y + fFontInfo->lineHeight - 1);
-			marker->Draw(this, rect);
-		}
-
-		// TODO: Draw possible breakpoint marks!
-	}
+	virtual	void				Draw(BRect updateRect);
 
 private:
-	struct Marker {
-		Marker(uint32 line)
-			:
-			fLine(line)
-		{
-		}
+			struct Marker;
+			struct InstructionPointerMarker;
 
-		virtual ~Marker()
-		{
-		}
-
-		uint32 Line() const
-		{
-			return fLine;
-		}
-
-		virtual void Draw(MarkerView* view, BRect rect) = 0;
-
-	private:
-		uint32	fLine;
-	};
-
-	struct InstructionPointerMarker : Marker {
-		InstructionPointerMarker(uint32 line, bool topIP, bool currentIP)
-			:
-			Marker(line),
-			fIsTopIP(topIP),
-			fIsCurrentIP(currentIP)
-		{
-		}
-
-		virtual void Draw(MarkerView* view, BRect rect)
-		{
-			// Get the arrow color -- for the top IP, if current, we use blue,
-			// otherwise a gray.
-			rgb_color color;
-			if (fIsCurrentIP && fIsTopIP) {
-				color.set_to(0, 0, 255, 255);
-			} else {
-				color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-					B_DARKEN_3_TINT);
-			}
-
-			// Draw a filled array for the current IP, otherwise just an
-			// outline.
-			BPoint tip(rect.right - 3.5f, floorf((rect.top + rect.bottom) / 2));
-			if (fIsCurrentIP) {
-				_DrawArrow(view, tip, BSize(10, 10), BSize(5, 5), color, true);
-			} else {
-				_DrawArrow(view, tip + BPoint(-0.5f, 0), BSize(9, 8),
-					BSize(5, 4), color, false);
-			}
-		}
-
-	private:
-		void _DrawArrow(BView* view, BPoint tip, BSize size, BSize base,
-			const rgb_color& color, bool fill)
-		{
-			view->SetHighColor(color);
-
-			float baseTop = tip.y - base.height / 2;
-			float baseBottom = tip.y + base.height / 2;
-			float top = tip.y - size.height / 2;
-			float bottom = tip.y + size.height / 2;
-			float left = tip.x - size.width;
-			float middle = left + base.width;
-
-			BPoint points[7];
-			points[0].Set(tip.x, tip.y);
-			points[1].Set(middle, top);
-			points[2].Set(middle, baseTop);
-			points[3].Set(left, baseTop);
-			points[4].Set(left, baseBottom);
-			points[5].Set(middle, baseBottom);
-			points[6].Set(middle, bottom);
-
-			if (fill)
-				view->FillPolygon(points, 7);
-			else
-				view->StrokePolygon(points, 7);
-		}
-
-	private:
-		bool	fIsTopIP;
-		bool	fIsCurrentIP;
-	};
-
-	typedef BObjectList<Marker>	MarkerList;
+			typedef BObjectList<Marker>	MarkerList;
 
 private:
-	void _UpdateMarkers()
-	{
-		if (fMarkersValid)
-			return;
-
-		fMarkers.MakeEmpty();
-
-		if (fSourceCode != NULL && fStackTrace != NULL) {
-			for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
-					i++) {
-				target_addr_t ip = frame->InstructionPointer();
-				Statement* statement = fSourceCode->StatementAtAddress(ip);
-				if (statement == NULL)
-					continue;
-				uint32 line = statement->StartSourceLocation().Line();
-				if (line >= (uint32)LineCount())
-					continue;
-
-				Marker* marker = new(std::nothrow) InstructionPointerMarker(
-					line, i == 0, frame == fStackFrame);
-				if (marker == NULL || !fMarkers.AddItem(marker)) {
-					delete marker;
-					break;
-				}
-			}
-		}
-		// TODO: Filter duplicate IP markers (recursive functions)!
-
-		fMarkersValid = true;
-	}
+			void				_UpdateMarkers();
 
 private:
-	StackTrace*	fStackTrace;
-	StackFrame*	fStackFrame;
-	MarkerList	fMarkers;
-	bool		fMarkersValid;
+			StackTrace*			fStackTrace;
+			StackFrame*			fStackFrame;
+			MarkerList			fMarkers;
+			bool				fMarkersValid;
+};
+
+
+struct SourceView::MarkerView::Marker {
+								Marker(uint32 line);
+	virtual						~Marker();
+
+	inline	uint32				Line() const;
+
+	virtual	void				Draw(MarkerView* view, BRect rect) = 0;
+
+private:
+	uint32	fLine;
+};
+
+
+struct SourceView::MarkerView::InstructionPointerMarker : Marker {
+								InstructionPointerMarker(uint32 line,
+									bool topIP, bool currentIP);
+
+	virtual	void				Draw(MarkerView* view, BRect rect);
+
+private:
+			void				_DrawArrow(BView* view, BPoint tip, BSize size,
+									BSize base, const rgb_color& color,
+									bool fill);
+
+private:
+			bool				fIsTopIP;
+			bool				fIsCurrentIP;
 };
 
 
 class SourceView::TextView : public BaseView {
 public:
-	TextView(SourceView* sourceView, FontInfo* fontInfo)
-		:
-		BaseView("source text view", sourceView, fontInfo),
-		fMaxLineWidth(-1)
-	{
-		SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-		fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	}
+								TextView(SourceView* sourceView,
+									FontInfo* fontInfo);
 
-	virtual void SetSourceCode(SourceCode* sourceCode)
-	{
-		fMaxLineWidth = -1;
-		BaseView::SetSourceCode(sourceCode);
-	}
+	virtual	void				SetSourceCode(SourceCode* sourceCode);
 
-	virtual BSize MinSize()
-	{
-		return BSize(kLeftTextMargin + _MaxLineWidth() - 1, TotalHeight());
-	}
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
 
-	virtual BSize MaxSize()
-	{
-		return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
-		if (fSourceCode == NULL)
-			return;
-
-		// get the lines intersecting with the update rect
-		int32 minLine, maxLine;
-		GetLineRange(updateRect, minLine, maxLine);
-
-		// draw the affected lines
-		SetHighColor(fTextColor);
-		SetFont(&fFontInfo->font);
-		for (int32 i = minLine; i <= maxLine; i++) {
-			float y = (float)(i + 1) * fFontInfo->lineHeight
-				- fFontInfo->fontHeight.descent;
-			DrawString(fSourceCode->LineAt(i), BPoint(kLeftTextMargin, y));
-		}
-	}
+	virtual	void				Draw(BRect updateRect);
 
 private:
-	float _MaxLineWidth()
-	{
-		if (fMaxLineWidth >= 0)
-			return fMaxLineWidth;
+			float				_MaxLineWidth();
 
-		fMaxLineWidth = 0;
-		if (fSourceCode != NULL) {
-			for (int32 i = 0; const char* line = fSourceCode->LineAt(i); i++) {
-				fMaxLineWidth = std::max(fMaxLineWidth,
-					fFontInfo->font.StringWidth(line));
+private:
+			float				fMaxLineWidth;
+			rgb_color			fTextColor;
+};
+
+
+// #pragma mark - BaseView
+
+
+SourceView::BaseView::BaseView(const char* name, SourceView* sourceView,
+	FontInfo* fontInfo)
+	:
+	BView(name, B_WILL_DRAW | B_SUBPIXEL_PRECISE),
+	fSourceView(sourceView),
+	fFontInfo(fontInfo),
+	fSourceCode(NULL)
+{
+}
+
+void
+SourceView::BaseView::SetSourceCode(SourceCode* sourceCode)
+{
+	fSourceCode = sourceCode;
+
+	InvalidateLayout();
+	Invalidate();
+}
+
+
+BSize
+SourceView::BaseView::PreferredSize()
+{
+	return MinSize();
+}
+
+
+int32
+SourceView::BaseView::LineCount() const
+{
+	return fSourceCode != NULL ? fSourceCode->CountLines() : 0;
+}
+
+
+float
+SourceView::BaseView::TotalHeight() const
+{
+	float height = LineCount() * fFontInfo->lineHeight - 1;
+	return std::max(height, kMinViewHeight);
+}
+
+
+void
+SourceView::BaseView::GetLineRange(BRect rect, int32& minLine, int32& maxLine)
+{
+	int32 lineHeight = (int32)fFontInfo->lineHeight;
+	minLine = (int32)rect.top / lineHeight;
+	maxLine = ((int32)ceilf(rect.bottom) + lineHeight - 1) / lineHeight;
+	minLine = std::max(minLine, 0L);
+	maxLine = std::min(maxLine, fSourceCode->CountLines() - 1);
+}
+
+
+// #pragma mark - MarkerView::Marker
+
+
+SourceView::MarkerView::Marker::Marker(uint32 line)
+	:
+	fLine(line)
+{
+}
+
+
+SourceView::MarkerView::Marker::~Marker()
+{
+}
+
+
+uint32
+SourceView::MarkerView::Marker::Line() const
+{
+	return fLine;
+}
+
+
+// #pragma mark - MarkerView::InstructionPointerMarker
+
+
+SourceView::MarkerView::InstructionPointerMarker::InstructionPointerMarker(
+	uint32 line, bool topIP, bool currentIP)
+	:
+	Marker(line),
+	fIsTopIP(topIP),
+	fIsCurrentIP(currentIP)
+{
+}
+
+
+void
+SourceView::MarkerView::InstructionPointerMarker::Draw(MarkerView* view,
+	BRect rect)
+{
+	// Get the arrow color -- for the top IP, if current, we use blue,
+	// otherwise a gray.
+	rgb_color color;
+	if (fIsCurrentIP && fIsTopIP) {
+		color.set_to(0, 0, 255, 255);
+	} else {
+		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_3_TINT);
+	}
+
+	// Draw a filled array for the current IP, otherwise just an
+	// outline.
+	BPoint tip(rect.right - 3.5f, floorf((rect.top + rect.bottom) / 2));
+	if (fIsCurrentIP) {
+		_DrawArrow(view, tip, BSize(10, 10), BSize(5, 5), color, true);
+	} else {
+		_DrawArrow(view, tip + BPoint(-0.5f, 0), BSize(9, 8),
+			BSize(5, 4), color, false);
+	}
+}
+
+
+void
+SourceView::MarkerView::InstructionPointerMarker::_DrawArrow(BView* view,
+	BPoint tip, BSize size, BSize base, const rgb_color& color, bool fill)
+{
+	view->SetHighColor(color);
+
+	float baseTop = tip.y - base.height / 2;
+	float baseBottom = tip.y + base.height / 2;
+	float top = tip.y - size.height / 2;
+	float bottom = tip.y + size.height / 2;
+	float left = tip.x - size.width;
+	float middle = left + base.width;
+
+	BPoint points[7];
+	points[0].Set(tip.x, tip.y);
+	points[1].Set(middle, top);
+	points[2].Set(middle, baseTop);
+	points[3].Set(left, baseTop);
+	points[4].Set(left, baseBottom);
+	points[5].Set(middle, baseBottom);
+	points[6].Set(middle, bottom);
+
+	if (fill)
+		view->FillPolygon(points, 7);
+	else
+		view->StrokePolygon(points, 7);
+}
+
+
+// #pragma mark - MarkerView
+
+
+SourceView::MarkerView::MarkerView(SourceView* sourceView, FontInfo* fontInfo)
+	:
+	BaseView("source marker view", sourceView, fontInfo),
+	fStackTrace(NULL),
+	fStackFrame(NULL),
+	fMarkers(20, true),
+	fMarkersValid(false)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+SourceView::MarkerView::~MarkerView()
+{
+}
+
+
+void
+SourceView::MarkerView::SetSourceCode(SourceCode* sourceCode)
+{
+	fMarkers.MakeEmpty();
+	fMarkersValid = false;
+	BaseView::SetSourceCode(sourceCode);
+}
+
+
+void
+SourceView::MarkerView::SetStackTrace(StackTrace* stackTrace)
+{
+	fStackTrace = stackTrace;
+	fMarkers.MakeEmpty();
+	fMarkersValid = false;
+	Invalidate();
+}
+
+
+void
+SourceView::MarkerView::SetStackFrame(StackFrame* stackFrame)
+{
+	fStackFrame = stackFrame;
+	fMarkers.MakeEmpty();
+	fMarkersValid = false;
+	Invalidate();
+}
+
+
+BSize
+SourceView::MarkerView::MinSize()
+{
+	return BSize(40, TotalHeight());
+}
+
+
+BSize
+SourceView::MarkerView::MaxSize()
+{
+	return BSize(MinSize().width, B_SIZE_UNLIMITED);
+}
+
+void
+SourceView::MarkerView::Draw(BRect updateRect)
+{
+	_UpdateMarkers();
+
+	if (fSourceCode == NULL || fMarkers.IsEmpty())
+		return;
+
+	// get the lines intersecting with the update rect
+	int32 minLine, maxLine;
+	GetLineRange(updateRect, minLine, maxLine);
+
+	// draw the markers
+	float width = Bounds().Width();
+	// TODO: The markers should be sorted, so we don't need to iterate over
+	// all of them.
+	for (int32 i = 0; Marker* marker = fMarkers.ItemAt(i); i++) {
+		int32 line = marker->Line();
+		if (line < minLine || line > maxLine)
+			continue;
+
+		float y = (float)line * fFontInfo->lineHeight;
+		BRect rect(0, y, width, y + fFontInfo->lineHeight - 1);
+		marker->Draw(this, rect);
+	}
+
+	// TODO: Draw possible breakpoint marks!
+}
+
+
+void
+SourceView::MarkerView::_UpdateMarkers()
+{
+	if (fMarkersValid)
+		return;
+
+	fMarkers.MakeEmpty();
+
+	if (fSourceCode != NULL && fStackTrace != NULL) {
+		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
+				i++) {
+			target_addr_t ip = frame->InstructionPointer();
+			Statement* statement = fSourceCode->StatementAtAddress(ip);
+			if (statement == NULL)
+				continue;
+			uint32 line = statement->StartSourceLocation().Line();
+			if (line >= (uint32)LineCount())
+				continue;
+
+			Marker* marker = new(std::nothrow) InstructionPointerMarker(
+				line, i == 0, frame == fStackFrame);
+			if (marker == NULL || !fMarkers.AddItem(marker)) {
+				delete marker;
+				break;
 			}
 		}
+	}
+	// TODO: Filter duplicate IP markers (recursive functions)!
 
+	fMarkersValid = true;
+}
+
+
+// #pragma mark - TextView
+
+
+SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
+	:
+	BaseView("source text view", sourceView, fontInfo),
+	fMaxLineWidth(-1)
+{
+	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+}
+
+
+void
+SourceView::TextView::SetSourceCode(SourceCode* sourceCode)
+{
+	fMaxLineWidth = -1;
+	BaseView::SetSourceCode(sourceCode);
+}
+
+
+BSize
+SourceView::TextView::MinSize()
+{
+	return BSize(kLeftTextMargin + _MaxLineWidth() - 1, TotalHeight());
+}
+
+
+BSize
+SourceView::TextView::MaxSize()
+{
+	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+}
+
+
+void
+SourceView::TextView::Draw(BRect updateRect)
+{
+	if (fSourceCode == NULL)
+		return;
+
+	// get the lines intersecting with the update rect
+	int32 minLine, maxLine;
+	GetLineRange(updateRect, minLine, maxLine);
+
+	// draw the affected lines
+	SetHighColor(fTextColor);
+	SetFont(&fFontInfo->font);
+	for (int32 i = minLine; i <= maxLine; i++) {
+		float y = (float)(i + 1) * fFontInfo->lineHeight
+			- fFontInfo->fontHeight.descent;
+		DrawString(fSourceCode->LineAt(i), BPoint(kLeftTextMargin, y));
+	}
+}
+
+
+float
+SourceView::TextView::_MaxLineWidth()
+{
+	if (fMaxLineWidth >= 0)
 		return fMaxLineWidth;
+
+	fMaxLineWidth = 0;
+	if (fSourceCode != NULL) {
+		for (int32 i = 0; const char* line = fSourceCode->LineAt(i); i++) {
+			fMaxLineWidth = std::max(fMaxLineWidth,
+				fFontInfo->font.StringWidth(line));
+		}
 	}
 
-private:
-	float		fMaxLineWidth;
-	rgb_color	fTextColor;
-};
+	return fMaxLineWidth;
+}
 
 
 // #pragma mark - SourceView
