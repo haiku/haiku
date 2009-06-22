@@ -158,7 +158,7 @@ status_t nv_dac_set_pix_pll(display_mode target)
 	 * note:
 	 * this assumes the cards BIOS correctly programmed the panel (is likely) */
 	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
-	if (si->ps.tmds1_active && !si->settings.pgm_panel)
+	if ((si->ps.monitors & CRTC1_TMDS) && !si->settings.pgm_panel)
 	{
 		LOG(4,("DAC: Not programming DFP refresh (specified in nvidia.settings)\n"));
 
@@ -171,7 +171,7 @@ status_t nv_dac_set_pix_pll(display_mode target)
 	/* fix a DVI or laptop flatpanel to 60Hz refresh! */
 	/* Note:
 	 * The pixelclock drives the flatpanel modeline, not the CRTC modeline. */
-	if (si->ps.tmds1_active)
+	if (si->ps.monitors & CRTC1_TMDS)
 	{
 		LOG(4,("DAC: Fixing DFP refresh to 60Hz!\n"));
 

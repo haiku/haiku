@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-2/2006
+   Rudolf Cornelissen 11/2002-6/2009
 */
 
 #define MODULE_BIT 0x00020000
@@ -203,7 +203,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 	 *   wide horizontal stripes. This can be observed earliest on fullscreen overlay,
 	 *   and if it gets worse, also normal desktop output will suffer. The stripes
 	 *   are mainly visible at the left of the screen, over the entire screen height. */
-	if (si->ps.tmds2_active)
+	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		LOG(2,("CRTC2: DFP active: tuning modeline\n"));
 
@@ -393,10 +393,10 @@ status_t nv_crtc2_set_timing(display_mode target)
 
 	/* disable CRTC slaved mode unless a panel is in use */
 	// fixme: this kills TVout when it was in use...
-	if (!si->ps.tmds2_active) CRTC2W(PIXEL, (CRTC2R(PIXEL) & 0x7f));
+	if (!(si->ps.monitors & CRTC2_TMDS)) CRTC2W(PIXEL, (CRTC2R(PIXEL) & 0x7f));
 
 	/* setup flatpanel if connected and active */
-	if (si->ps.tmds2_active)
+	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		uint32 iscale_x, iscale_y;
 
@@ -468,7 +468,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 			 * 1400 x 1050 (1.33). */
 			/* NOTE:
 			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
-			if ((iscale_x != (1 << 12)) && (si->ps.panel2_aspect > (dm_aspect + 0.10)))
+			if ((iscale_x != (1 << 12)) && (si->ps.crtc2_aspect > (dm_aspect + 0.10)))
 			{
 				uint16 diff;
 
@@ -488,7 +488,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 			/* correct for portrait panels... */
 			/* NOTE:
 			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
-			if ((iscale_y != (1 << 12)) && (si->ps.panel2_aspect < (dm_aspect - 0.10)))
+			if ((iscale_y != (1 << 12)) && (si->ps.crtc2_aspect < (dm_aspect - 0.10)))
 			{
 				LOG(2,("CRTC2: (relative) portrait panel: should tune vertical scaling\n"));
 				/* fixme: implement if this kind of portrait panels exist on nVidia... */
@@ -575,7 +575,7 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v, bool do_panel)
 		/* end synchronous reset because display should be enabled */
 		SEQW(RESET, 0x03);
 
-		if (do_panel && si->ps.tmds2_active)
+		if (do_panel && (si->ps.monitors & CRTC2_TMDS))
 		{
 			if (!si->ps.laptop)
 			{
@@ -604,7 +604,7 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v, bool do_panel)
 			else
 			{
 				//fixme: see if LVDS head can be determined with two panels there...
-				if (!si->ps.tmds1_active && (si->ps.card_type != NV11))
+				if (!(si->ps.monitors & CRTC1_TMDS) && (si->ps.card_type != NV11))
 				{
 					/* b2 = 0 = enable laptop panel backlight */
 					/* note: this seems to be a write-only register. */
@@ -622,7 +622,7 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v, bool do_panel)
 		/* turn screen off */
 		SEQW(CLKMODE, (temp | 0x20));
 
-		if (do_panel && si->ps.tmds2_active)
+		if (do_panel && (si->ps.monitors & CRTC2_TMDS))
 		{
 			if (!si->ps.laptop)
 			{
@@ -646,7 +646,7 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v, bool do_panel)
 			else
 			{
 				//fixme: see if LVDS head can be determined with two panels there...
-				if (!si->ps.tmds1_active && (si->ps.card_type != NV11))
+				if (!(si->ps.monitors & CRTC1_TMDS) && (si->ps.card_type != NV11))
 				{
 					/* b2 = 1 = disable laptop panel backlight */
 					/* note: this seems to be a write-only register. */

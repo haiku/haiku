@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-4/2006
+	Rudolf Cornelissen 9/2002-6/2009
 */
 
 #define MODULE_BIT 0x00400000
@@ -15,9 +15,6 @@
 /* mode flags will be setup as status info by PROPOSEMODE! */
 #define MODE_FLAGS 0
 #define MODE_COUNT (sizeof (mode_list) / sizeof (display_mode))
-
-/*some monitors only handle a fixed set of modes*/
-#include "valid_mode_list"
 
 /* Standard VESA modes,
  * plus panel specific resolution modes which are internally modified during run-time depending on the requirements of the actual
@@ -129,55 +126,6 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 	LOG(1, ("PROPOSEMODE: (ENTER) requested virtual_width %d, virtual_height %d\n",
 		target->virtual_width, target->virtual_height));
 
-	/*check valid list:
-		if (VALID_REQUIRED is set)
-		{
-			if (find modes with same size)
-			{
-				pick one with nearest pixel clock
-			}
-			else
-			{
-				pick next largest with nearest pixel clock and modify visible portion as far as possible
-			}
-		}
-	*/
-
-#ifdef VALID_MODE_REQUIRED
-	{
-		int i;
-		int closest_mode_ptr;
-		uint32 closest_mode_clock;
-
-		LOG(1, ("PROPOSEMODE: valid mode required!\n"));
-
-		closest_mode_ptr = 0xbad;
-		closest_mode_clock = 0;
-		for (i = 0; i < VALID_MODES; i++) {
-			/*check size is ok and clock is better than any found before*/
-			if (target->timing.h_display == valid_mode_list[i].h_display
-				&& target->timing.v_display == valid_mode_list[i].v_display) {
-				if (abs(valid_mode_list[i].pixel_clock-target->timing.pixel_clock)
-						< abs(closest_mode_clock-target->timing.pixel_clock)) {
-					closest_mode_clock = valid_mode_list[i].pixel_clock;
-					closest_mode_ptr = i;
-				}
-			}
-		}
-
-		if (closest_mode_ptr == 0xbad) {
-			/* if no modes of correct size */
-			LOG(4, ("PROPOSEMODE: no valid mode found, aborted.\n"));
-			return B_ERROR;
-		} else {
-			target->timing = valid_mode_list[closest_mode_ptr];
-			/* I require this refresh */
-			target_refresh = ((double)target->timing.pixel_clock * 1000.0)
-				/ ((double)target->timing.h_total * (double)target->timing.v_total);
-		}
-	}
-#endif
-
 	/*find a nearby valid timing from that given*/
 	result = head1_validate_timing(&target->timing.h_display,
 		&target->timing.h_sync_start, &target->timing.h_sync_end,
@@ -198,25 +146,33 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		/* NOTE:
 		 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
 		switch (si->ps.monitors) {
-			case 0x01: /* digital panel on head 1, nothing on head 2 */
-				if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
+			case CRTC1_TMDS: /* digital panel on head 1, nothing on head 2 */
+				if (si->ps.crtc1_aspect < (target_aspect - 0.10)) {
 					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
-			case 0x10: /* nothing on head 1, digital panel on head 2 */
-				if (si->ps.panel2_aspect < (target_aspect - 0.10)) {
+			case CRTC2_TMDS: /* nothing on head 1, digital panel on head 2 */
+				if (si->ps.crtc2_aspect < (target_aspect - 0.10)) {
 					LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
-			case 0x11: /* digital panels on both heads */
-				if ((si->ps.panel1_aspect < (target_aspect - 0.10))
-					|| (si->ps.panel2_aspect < (target_aspect - 0.10))) {
+			case CRTC1_TMDS | CRTC2_TMDS: /* digital panels on both heads */
+				if ((si->ps.crtc1_aspect < (target_aspect - 0.10))
+					|| (si->ps.crtc2_aspect < (target_aspect - 0.10))) {
 					LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
+//
+//			case CRTC1_VGA: /* analog connected screen on head 1, nothing on head 2 */
+//				if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
+//					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
+//					return B_ERROR;
+//				}
+//				break;
+//
 			default:
 				/* at least one analog monitor is connected, or nothing detected at all */
 				/* (if forcing widescreen type was requested don't block mode) */
@@ -232,12 +188,12 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		if (target_aspect > 1.61 && !si->settings.force_ws) {
 			status_t panel_TV_stat = B_ERROR;
 
-			if (si->ps.tmds1_active) {
+			if (si->ps.monitors & CRTC1_TMDS) {
 				if (target->timing.h_display == si->ps.p1_timing.h_display
 					&& target->timing.v_display == si->ps.p1_timing.v_display)
 					panel_TV_stat = B_OK;
 			}
-			if (si->ps.tmds2_active) {
+			if (si->ps.monitors & CRTC2_TMDS) {
 				if (target->timing.h_display == si->ps.p2_timing.h_display
 					&& target->timing.v_display == si->ps.p2_timing.v_display)
 					panel_TV_stat = B_OK;
@@ -250,14 +206,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 	}
 
 	/* check if panel(s) can display the requested resolution (if connected) */
-	if (si->ps.tmds1_active) {
+	if (si->ps.monitors & CRTC1_TMDS) {
 		if (target->timing.h_display > si->ps.p1_timing.h_display
 			|| target->timing.v_display > si->ps.p1_timing.v_display) {
 			LOG(4, ("PROPOSEMODE: panel1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
-	if (si->ps.tmds2_active) {
+	if (si->ps.monitors & CRTC2_TMDS) {
 		if (target->timing.h_display > si->ps.p2_timing.h_display
 			|| target->timing.v_display > si->ps.p2_timing.v_display) {
 			LOG(4, ("PROPOSEMODE: panel2 can't display requested resolution, aborted.\n"));

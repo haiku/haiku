@@ -2280,16 +2280,15 @@ static void detect_panels()
 	/* do some presets */
 	si->ps.p1_timing.h_display = 0;
 	si->ps.p1_timing.v_display = 0;
-	si->ps.panel1_aspect = 0;
+	si->ps.crtc1_aspect = 0;
 	si->ps.p2_timing.h_display = 0;
 	si->ps.p2_timing.v_display = 0;
-	si->ps.panel2_aspect = 0;
+	si->ps.crtc2_aspect = 0;
 	si->ps.slaved_tmds1 = false;
 	si->ps.slaved_tmds2 = false;
 	si->ps.master_tmds1 = false;
 	si->ps.master_tmds2 = false;
-	si->ps.tmds1_active = false;
-	si->ps.tmds2_active = false;
+	si->ps.monitors = 0x00;
 	/* determine the situation we are in... (regarding flatpanels) */
 	/* fixme: add VESA DDC EDID stuff one day... */
 	/* fixme: find out how to program those transmitters one day instead of
@@ -2322,7 +2321,7 @@ static void detect_panels()
 		if ((width >= 640) && (height >= 480))
 		{
 			si->ps.slaved_tmds1 = true;
-			si->ps.tmds1_active = true;
+			si->ps.monitors |= CRTC1_TMDS;
 			si->ps.p1_timing.h_display = width;
 			si->ps.p1_timing.v_display = height;
 		}
@@ -2335,7 +2334,7 @@ static void detect_panels()
 		if ((width >= 640) && (height >= 480))
 		{
 			si->ps.slaved_tmds2 = true;
-			si->ps.tmds2_active = true;
+			si->ps.monitors |= CRTC2_TMDS;
 			si->ps.p2_timing.h_display = width;
 			si->ps.p2_timing.v_display = height;
 		}
@@ -2349,7 +2348,7 @@ static void detect_panels()
 		if ((width >= 640) && (height >= 480))
 		{
 			si->ps.master_tmds1 = true;
-			si->ps.tmds1_active = true;
+			si->ps.monitors |= CRTC1_TMDS;
 			si->ps.p1_timing.h_display = width;
 			si->ps.p1_timing.v_display = height;
 		}
@@ -2363,7 +2362,7 @@ static void detect_panels()
 		if ((width >= 640) && (height >= 480))
 		{
 			si->ps.master_tmds2 = true;
-			si->ps.tmds2_active = true;
+			si->ps.monitors |= CRTC2_TMDS;
 			si->ps.p2_timing.h_display = width;
 			si->ps.p2_timing.v_display = height;
 		}
@@ -2372,7 +2371,8 @@ static void detect_panels()
 	//fixme...:
 	//we are assuming that no DVI is used as external monitor on laptops;
 	//otherwise we probably get into trouble here if the checked specs match.
-	if (si->ps.laptop && si->ps.tmds1_active && si->ps.tmds2_active &&
+	if (si->ps.laptop &&
+		((si->ps.monitors & (CRTC1_TMDS | CRTC2_TMDS)) == (CRTC1_TMDS | CRTC2_TMDS)) &&
 		((DACR(FP_TG_CTRL) & 0x80000000) == (DAC2R(FP_TG_CTRL) & 0x80000000)) &&
 		(si->ps.p1_timing.h_display == si->ps.p2_timing.h_display) &&
 		(si->ps.p1_timing.v_display == si->ps.p2_timing.v_display))
@@ -2384,7 +2384,7 @@ static void detect_panels()
 			/* LVDS panel is _always_ on CRTC2, so clear false primary detection */
 			si->ps.slaved_tmds1 = false;
 			si->ps.master_tmds1 = false;
-			si->ps.tmds1_active = false;
+			si->ps.monitors &= ~CRTC1_TMDS;
 			si->ps.p1_timing.h_display = 0;
 			si->ps.p1_timing.v_display = 0;
 		}
@@ -2395,7 +2395,7 @@ static void detect_panels()
 				/* LVDS panel is on CRTC2, so clear false primary detection */
 				si->ps.slaved_tmds1 = false;
 				si->ps.master_tmds1 = false;
-				si->ps.tmds1_active = false;
+				si->ps.monitors &= ~CRTC1_TMDS;
 				si->ps.p1_timing.h_display = 0;
 				si->ps.p1_timing.v_display = 0;
 			}
@@ -2404,7 +2404,7 @@ static void detect_panels()
 				/* LVDS panel is on CRTC1, so clear false secondary detection */
 				si->ps.slaved_tmds2 = false;
 				si->ps.master_tmds2 = false;
-				si->ps.tmds2_active = false;
+				si->ps.monitors &= ~CRTC2_TMDS;
 				si->ps.p2_timing.h_display = 0;
 				si->ps.p2_timing.v_display = 0;
 			}
@@ -2412,13 +2412,13 @@ static void detect_panels()
 	}
 
 	/* fetch panel(s) modeline(s) */
-	if (si->ps.tmds1_active)
+	if (si->ps.monitors & CRTC1_TMDS)
 	{
 		/* determine panel aspect ratio */
-		si->ps.panel1_aspect =
+		si->ps.crtc1_aspect =
 			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
 		/* force widescreen type if requested */
-		if (si->settings.force_ws) si->ps.panel1_aspect = 1.60;
+		if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p1_timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p1_timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2438,13 +2438,13 @@ static void detect_panels()
 		si->ps.p1_timing.pixel_clock =
 			(si->ps.p1_timing.h_total * si->ps.p1_timing.v_total * 60) / 1000;
 	}
-	if (si->ps.tmds2_active)
+	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		/* determine panel aspect ratio */
-		si->ps.panel2_aspect =
+		si->ps.crtc2_aspect =
 			(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
 		/* force widescreen type if requested */
-		if (si->settings.force_ws) si->ps.panel2_aspect = 1.60;
+		if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p2_timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p2_timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2533,7 +2533,7 @@ static void detect_panels()
 	 *   but only after a failed VESA modeswitch by the HAIKU kernel
 	 *   at boot time caused by a BIOS fault inside the gfx card: it says
 	 *   it can do VESA 1280x1024x32 on CRTC1/DAC1 but it fails: no signal. */
-	if (si->ps.tmds1_active && (si->ps.card_type != NV11))
+	if ((si->ps.monitors & CRTC1_TMDS) && (si->ps.card_type != NV11))
 	{
 		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
 		 * b0-7 = adress, b16 = 1 = write_enable */
@@ -2544,7 +2544,7 @@ static void detect_panels()
 		else
 			LOG(2,("INFO: Flatpanel on head 1 is TMDS type\n"));
 	}
-	if (si->ps.tmds2_active && (si->ps.card_type != NV11))
+	if ((si->ps.monitors & CRTC2_TMDS) && (si->ps.card_type != NV11))
 	{
 		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
 		 * b0-7 = adress, b16 = 1 = write_enable */
@@ -2562,8 +2562,6 @@ static void detect_panels()
 static void setup_output_matrix()
 {
 	/* setup defaults: */
-	/* no monitors (output devices) detected */
-	si->ps.monitors = 0x00;
 	/* head 1 will be the primary head */
 	si->ps.crtc2_prim = false;
 
@@ -2576,22 +2574,28 @@ static void setup_output_matrix()
 			/* connect analog outputs straight through */
 			nv_general_output_select(false);
 
-			/* presetup by the card's BIOS, we can't change this (lack of info) */
-			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
-			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
+			/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
+			 * we can't change this (lack of info) */
+
 			/* detect analog monitors. First try EDID, else use load sensing. */
 			/* (load sensing is confirmed working OK on NV18, NV28 and NV34.) */
 			/* primary connector: */
 			if (si->ps.con1_screen.have_edid) {
-				if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+				if (!si->ps.con1_screen.digital) {
+					si->ps.monitors |= CRTC1_VGA;
+					si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
+				}
 			} else {
-				if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+				if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
 			}
 			/* secondary connector */
 			if (si->ps.con2_screen.have_edid) {
-				if (!si->ps.con2_screen.digital) si->ps.monitors |= 0x20;
+				if (!si->ps.con2_screen.digital) {
+					si->ps.monitors |= CRTC2_VGA;
+					si->ps.crtc2_aspect = si->ps.con2_screen.aspect;
+				}
 			} else {
-				if (nv_dac2_crt_connected()) si->ps.monitors |= 0x20;
+				if (nv_dac2_crt_connected()) si->ps.monitors |= CRTC2_VGA;
 			}
 
 			/* setup correct output and head use */
@@ -2619,6 +2623,9 @@ static void setup_output_matrix()
 				LOG(2,("INFO: correcting...\n"));
 				/* cross connect analog outputs so analog panel or CRT gets head 2 */
 				nv_general_output_select(true);
+				si->ps.monitors = 0x21;
+				si->ps.crtc1_aspect = si->ps.con2_screen.aspect;
+				si->ps.crtc2_aspect = si->ps.con1_screen.aspect;
 				LOG(2,("INFO: head 1 has a digital panel;\n"));
 				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
@@ -2641,6 +2648,9 @@ static void setup_output_matrix()
 				LOG(2,("INFO: correcting...\n"));
 				/* cross connect analog outputs so analog panel or CRT gets head 1 */
 				nv_general_output_select(true);
+				si->ps.monitors = 0x12;
+				si->ps.crtc1_aspect = si->ps.con2_screen.aspect;
+				si->ps.crtc2_aspect = si->ps.con1_screen.aspect;
 				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
 				LOG(2,("INFO: head 2 has a digital panel:\n"));
 				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
@@ -2696,16 +2706,16 @@ static void setup_output_matrix()
 			/* confirmed no analog output switch-options for NV11 */
 			LOG(2,("INFO: NV11 outputs are hardwired to be straight-through\n"));
 
-			/* presetup by the card's BIOS, we can't change this (lack of info) */
-			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
-			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
+			/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
+			 * we can't change this (lack of info) */
+
 			/* detect analog monitors. First try EDID, else use load sensing. */
 			/* (load sensing is confirmed working OK on NV11.) */
 			/* primary connector: */
 			if (si->ps.con1_screen.have_edid) {
-				if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+				if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
 			} else {
-				if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+				if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
 			}
 			/* (sense analog monitor on secondary connector is impossible on NV11) */
 
@@ -2760,15 +2770,16 @@ static void setup_output_matrix()
 	}
 	else /* singlehead cards */
 	{
-		/* presetup by the card's BIOS, we can't change this (lack of info) */
-		if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
+		/* panels are pre-setup by the card's BIOS,
+		 * we can't change this (lack of info) */
+
 		/* detect analog monitors. First try EDID, else use load sensing. */
 		/* (load sensing is confirmed working OK on all cards.) */
 		/* primary connector: */
 		if (si->ps.con1_screen.have_edid) {
-			if (!si->ps.con1_screen.digital) si->ps.monitors |= 0x02;
+			if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
 		} else {
-			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
 		}
 
 		//fixme? add TVout (only, so no CRT connected) support...
@@ -2777,7 +2788,7 @@ static void setup_output_matrix()
 
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 {
-	if (si->ps.tmds1_active)
+	if (si->ps.monitors |= CRTC1_TMDS)
 	{
 		/* timing ('modeline') */
 		p1->timing = si->ps.p1_timing;
@@ -2793,7 +2804,7 @@ void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 	else
 		*pan1 = false;
 
-	if (si->ps.tmds2_active)
+	if (si->ps.monitors |= CRTC2_TMDS)
 	{
 		/* timing ('modeline') */
 		p2->timing = si->ps.p2_timing;
@@ -3300,19 +3311,19 @@ void dump_pins(void)
 	LOG(2,("card memory_size: %3.3fMb\n", (si->ps.memory_size / (1024.0 * 1024.0))));
 	LOG(2,("laptop: "));
 	if (si->ps.laptop) LOG(2,("yes\n")); else LOG(2,("no\n"));
-	if (si->ps.tmds1_active)
+	if (si->ps.monitors & CRTC1_TMDS)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is %s\n",
 			si->ps.slaved_tmds1 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.panel1_aspect));
+			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.crtc1_aspect));
 	}
-	if (si->ps.tmds2_active)
+	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is %s\n",
 			si->ps.slaved_tmds2 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.panel2_aspect));
+			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.crtc2_aspect));
 	}
 	LOG(2,("monitor (output devices) setup matrix: $%02x\n", si->ps.monitors));
 	LOG(2,("INFO: end pinsdump.\n"));

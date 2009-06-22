@@ -41,6 +41,12 @@ typedef struct {
 
 #define NV_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
 
+/* monitor setup */
+#define CRTC1_TMDS	0x01
+#define CRTC2_TMDS	0x10
+#define CRTC1_VGA	0x02
+#define CRTC2_VGA	0x20
+
 /* dualhead extensions to flags */
 #define DUALHEAD_OFF (0<<6)
 #define DUALHEAD_CLONE (1<<6)
@@ -344,12 +350,10 @@ typedef struct {
 		bool slaved_tmds2;			/* external TMDS encoder active on CRTC2 */
 		bool master_tmds1;			/* on die TMDS encoder active on CRTC1 */
 		bool master_tmds2;			/* on die TMDS encoder active on CRTC2 */
-		bool tmds1_active;			/* found panel on CRTC1 that is active */
-		bool tmds2_active;			/* found panel on CRTC2 that is active */
 		display_timing p1_timing;	/* 'modeline' fetched for panel 1 */
 		display_timing p2_timing;	/* 'modeline' fetched for panel 2 */
-		float panel1_aspect;		/* panel's aspect ratio */
-		float panel2_aspect;		/* panel's aspect ratio */
+		float crtc1_aspect;			/* screen's aspect ratio */
+		float crtc2_aspect;			/* screen's aspect ratio */
 		edid_specs con1_screen;		/* EDID properties of the screen connected to connector 1 */
 		edid_specs con2_screen;		/* EDID properties of the screen connected to connector 2 */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */

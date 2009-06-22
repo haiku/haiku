@@ -690,6 +690,8 @@ void i2c_DetectScreens(void)
 
 	si->ps.con1_screen.have_edid = false;
 	si->ps.con2_screen.have_edid = false;
+	si->ps.con1_screen.aspect = 0;
+	si->ps.con2_screen.aspect = 0;
 
 	/* check existance of bus 0 */
 	if (si->ps.i2c_bus0) {
