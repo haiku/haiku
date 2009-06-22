@@ -11,7 +11,7 @@
 #include <util/DoublyLinkedList.h>
 
 
-class ConditionVariable;
+struct ConditionVariable;
 struct mutex;
 struct rw_lock;
 struct thread;

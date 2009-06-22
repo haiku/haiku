@@ -16,7 +16,7 @@
 #include <util/OpenHashTable.h>
 
 
-class ConditionVariable;
+struct ConditionVariable;
 
 
 struct ConditionVariableEntry
@@ -42,11 +42,11 @@ private:
 			struct thread*		fThread;
 			status_t			fWaitStatus;
 
-			friend class ConditionVariable;
+			friend struct ConditionVariable;
 };
 
 
-class ConditionVariable : protected HashTableLink<ConditionVariable> {
+struct ConditionVariable : protected HashTableLink<ConditionVariable> {
 public:
 			void				Init(const void* object,
 									const char* objectType);
@@ -82,8 +82,8 @@ protected:
 			const char*			fObjectType;
 			EntryList			fEntries;
 
-			friend class ConditionVariableEntry;
-			friend class ConditionVariableHashDefinition;
+			friend struct ConditionVariableEntry;
+			friend struct ConditionVariableHashDefinition;
 };
 
 

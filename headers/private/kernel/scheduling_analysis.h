@@ -9,7 +9,7 @@
 #include <thread_defs.h>
 
 
-class ConditionVariable;
+struct ConditionVariable;
 struct mutex;
 struct rw_lock;
 
