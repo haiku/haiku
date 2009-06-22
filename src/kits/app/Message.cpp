@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Copyright 2005-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2325,9 +2325,13 @@ BMessage::Has##typeName(const char *name, int32 index) const				\
 DEFINE_FUNCTIONS(BPoint, Point, B_POINT_TYPE);
 DEFINE_FUNCTIONS(BRect, Rect, B_RECT_TYPE);
 DEFINE_FUNCTIONS(int8, Int8, B_INT8_TYPE);
+DEFINE_FUNCTIONS(uint8, UInt8, B_UINT8_TYPE);
 DEFINE_FUNCTIONS(int16, Int16, B_INT16_TYPE);
+DEFINE_FUNCTIONS(uint16, UInt16, B_UINT16_TYPE);
 DEFINE_FUNCTIONS(int32, Int32, B_INT32_TYPE);
+DEFINE_FUNCTIONS(uint32, UInt32, B_UINT32_TYPE);
 DEFINE_FUNCTIONS(int64, Int64, B_INT64_TYPE);
+DEFINE_FUNCTIONS(uint64, UInt64, B_UINT64_TYPE);
 DEFINE_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
 DEFINE_FUNCTIONS(float, Float, B_FLOAT_TYPE);
 DEFINE_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
