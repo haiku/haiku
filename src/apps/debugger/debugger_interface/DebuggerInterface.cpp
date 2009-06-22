@@ -12,6 +12,7 @@
 #include <Locker.h>
 
 #include <AutoLocker.h>
+#include <commpage_defs.h>
 #include <util/DoublyLinkedList.h>
 
 #include "debug_utils.h"
@@ -383,6 +384,7 @@ DebuggerInterface::GetThreadInfos(BObjectList<ThreadInfo>& infos)
 status_t
 DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 {
+	// get the team's images
 	image_info imageInfo;
 	int32 cookie = 0;
 	while (get_next_image_info(fTeamID, &cookie, &imageInfo) == B_OK) {
@@ -392,6 +394,24 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 		if (info == NULL || !infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;
+		}
+	}
+
+	// Also add the "commpage" image, which belongs to the kernel, but is used
+	// by userland teams.
+	cookie = 0;
+	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &imageInfo) == B_OK) {
+		if ((addr_t)imageInfo.text >= USER_COMMPAGE_ADDR
+			&& (addr_t)imageInfo.text < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
+			ImageInfo* info = new(std::nothrow) ImageInfo(B_SYSTEM_TEAM,
+				imageInfo.id, imageInfo.name, (addr_t)imageInfo.text,
+				imageInfo.text_size, (addr_t)imageInfo.data,
+				imageInfo.data_size);
+			if (info == NULL || !infos.AddItem(info)) {
+				delete info;
+				return B_NO_MEMORY;
+			}
+			break;
 		}
 	}
 
