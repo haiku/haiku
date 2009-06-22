@@ -13,8 +13,8 @@
 
 #include "CpuStateX86.h"
 #include "DebuggerInterface.h"
+#include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
-#include "SourceCode.h"
 #include "StackFrame.h"
 #include "Statement.h"
 
@@ -150,10 +150,10 @@ status_t
 ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	const void* buffer, size_t bufferSize, SourceCode*& _sourceCode)
 {
-	SourceCode* source = new(std::nothrow) SourceCode;
+	DisassembledCode* source = new(std::nothrow) DisassembledCode;
 	if (source == NULL)
 		return B_NO_MEMORY;
-	Reference<SourceCode> sourceReference(source, true);
+	Reference<DisassembledCode> sourceReference(source, true);
 
 	// init disassembler
 	DisassemblerX86 disassembler;
@@ -163,9 +163,8 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 
 	// add a function name line
 	BString functionName(function->PrettyName());
-	if (!source->AddLine((functionName << ':').String()))
+	if (!source->AddCommentLine((functionName << ':').String()))
 		return B_NO_MEMORY;
-	uint32 lineIndex = 1;
 
 	// disassemble the instructions
 	BString line;
@@ -174,16 +173,10 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	bool breakpointAllowed;
 	while (disassembler.GetNextInstruction(line, instructionAddress,
 				instructionSize, breakpointAllowed) == B_OK) {
-		Statement* statement = new(std::nothrow) ContiguousStatement(
-			SourceLocation(lineIndex), SourceLocation(lineIndex + 1),
-			TargetAddressRange(instructionAddress, instructionSize));
-		if (statement == NULL)
+		if (!source->AddInstructionLine(line, instructionAddress,
+				instructionSize, breakpointAllowed)) {
 			return B_NO_MEMORY;
-
-		if (!source->AddStatement(statement) || !source->AddLine(line.String()))
-			return B_NO_MEMORY;
-
-		lineIndex++;
+		}
 	}
 
 	_sourceCode = sourceReference.Detach();
