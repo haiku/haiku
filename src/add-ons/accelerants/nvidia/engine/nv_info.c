@@ -2788,7 +2788,7 @@ static void setup_output_matrix()
 
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 {
-	if (si->ps.monitors |= CRTC1_TMDS)
+	if (si->ps.monitors & CRTC1_TMDS)
 	{
 		/* timing ('modeline') */
 		p1->timing = si->ps.p1_timing;
@@ -2804,7 +2804,7 @@ void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 	else
 		*pan1 = false;
 
-	if (si->ps.monitors |= CRTC2_TMDS)
+	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		/* timing ('modeline') */
 		p2->timing = si->ps.p2_timing;
