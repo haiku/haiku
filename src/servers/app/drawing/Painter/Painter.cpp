@@ -351,7 +351,7 @@ Painter::SetFont(const DrawState* state)
 {
 	fTextRenderer.SetFont(state->Font());
 	fTextRenderer.SetAntialiasing(!state->ForceFontAliasing()
-		&& (state->Font().Flags() & B_DISABLE_ANTIALIASING) != 0);
+		&& (state->Font().Flags() & B_DISABLE_ANTIALIASING) == 0);
 }
 
 
