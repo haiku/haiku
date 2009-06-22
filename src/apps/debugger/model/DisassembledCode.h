@@ -27,6 +27,8 @@ public:
 	virtual	Statement*			StatementAtLine(int32 index) const;
 	virtual	Statement*			StatementAtAddress(target_addr_t address) const;
 
+	virtual	TargetAddressRange	StatementAddressRange() const;
+
 public:
 			bool				AddCommentLine(const BString& line);
 			bool				AddInstructionLine(const BString& line,

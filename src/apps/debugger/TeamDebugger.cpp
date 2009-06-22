@@ -5,10 +5,12 @@
 
 #include "TeamDebugger.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include <new>
 
+#include <Alert.h>
 #include <Message.h>
 
 #include <AutoLocker.h>
@@ -19,6 +21,7 @@
 #include "DebuggerInterface.h"
 #include "Jobs.h"
 #include "MessageCodes.h"
+#include "Statement.h"
 #include "TeamDebugModel.h"
 
 
@@ -198,6 +201,24 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_SET_BREAKPONT:
+		case MSG_CLEAR_BREAKPONT:
+		{
+			uint64 address;
+			if (message->FindUInt64("address", &address) != B_OK)
+				break;
+
+			if (message->what == MSG_SET_BREAKPONT) {
+				bool enabled;
+				if (message->FindBool("enabled", &enabled) != B_OK)
+					enabled = true;
+
+				_HandleSetUserBreakpoint(address, enabled);
+			} else
+				_HandleClearUserBreakpoint(address);
+			break;
+		}
+
 		case MSG_THREAD_STATE_CHANGED:
 		{
 			int32 threadID;
@@ -263,6 +284,25 @@ TeamDebugger::ThreadActionRequested(TeamWindow* window, thread_id threadID,
 {
 	BMessage message(action);
 	message.AddInt32("thread", threadID);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled)
+{
+	BMessage message(MSG_SET_BREAKPONT);
+	message.AddUInt64("address", (uint64)address);
+	message.AddBool("enabled", enabled);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ClearBreakpointRequested(target_addr_t address)
+{
+	BMessage message(MSG_CLEAR_BREAKPONT);
+	message.AddUInt64("address", (uint64)address);
 	PostMessage(&message);
 }
 
@@ -569,6 +609,73 @@ TeamDebugger::_SetThreadState(::Thread* thread, uint32 state,
 }
 
 
+status_t
+TeamDebugger::_SetUserBreakpoint(target_addr_t address, bool enabled)
+{
+	user_breakpoint_state state = enabled
+		? USER_BREAKPOINT_ENABLED : USER_BREAKPOINT_DISABLED;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	// If there already is a breakpoint, it might already have the requested
+	// state.
+	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	if (breakpoint != NULL && breakpoint->UserState() == state)
+		return B_OK;
+
+	// create a breakpoint, if it doesn't exist yet
+	if (breakpoint == NULL) {
+		Image* image = fTeam->ImageByAddress(address);
+		if (image == NULL)
+			return B_OK;
+
+		breakpoint = new(std::nothrow) Breakpoint(image, address);
+		if (breakpoint == NULL)
+			return B_NO_MEMORY;
+
+		if (!fDebugModel->AddBreakpoint(breakpoint))
+			return B_NO_MEMORY;
+	}
+
+	user_breakpoint_state oldState = breakpoint->UserState();
+
+	// set the breakpoint state
+	breakpoint->SetUserState(state);
+	fDebugModel->NotifyUserBreakpointChanged(breakpoint);
+
+	bool install = breakpoint->ShouldBeInstalled();
+	if (breakpoint->IsInstalled() == install)
+		return B_OK;
+
+	// The breakpoint needs to be installed/uninstalled.
+	locker.Unlock();
+
+	status_t error = install
+		? fDebuggerInterface->InstallBreakpoint(address)
+		: fDebuggerInterface->UninstallBreakpoint(address);
+
+	locker.Lock();
+
+	breakpoint = fDebugModel->BreakpointAtAddress(address);
+
+	// Mark the breakpoint installed/uninstalled, if everything went fine.
+	if (error == B_OK) {
+		breakpoint->SetInstalled(install);
+printf("-> breakpoint %sinstalled successfully!\n", install ? "" : "un");
+		return B_OK;
+	}
+
+	// revert on error
+	breakpoint->SetUserState(oldState);
+	fDebugModel->NotifyUserBreakpointChanged(breakpoint);
+
+	if (breakpoint->IsUnused())
+		fDebugModel->RemoveBreakpoint(breakpoint);
+
+	return error;
+}
+
+
 void
 TeamDebugger::_HandleThreadAction(thread_id threadID, uint32 action)
 {
@@ -616,6 +723,47 @@ printf("MSG_THREAD_STEP_OUT\n");
 
 // TODO: Handle stepping correctly!
 	}
+}
+
+
+void
+TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
+{
+printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
+	status_t error = _SetUserBreakpoint(address, enabled);
+	if (error != B_OK) {
+		_NotifyUser("Install Breakpoint", "Failed to install breakpoint: %s",
+			strerror(error));
+	}
+}
+
+
+void
+TeamDebugger::_HandleClearUserBreakpoint(target_addr_t address)
+{
+printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	if (breakpoint == NULL || breakpoint->UserState() == USER_BREAKPOINT_NONE)
+		return;
+
+	// set the breakpoint state
+	breakpoint->SetUserState(USER_BREAKPOINT_NONE);
+	fDebugModel->NotifyUserBreakpointChanged(breakpoint);
+
+	// check whether the breakpoint needs to be uninstalled
+	bool uninstall = !breakpoint->ShouldBeInstalled()
+		&& breakpoint->IsInstalled();
+
+	// if unused remove it
+	if (breakpoint->IsUnused())
+		fDebugModel->RemoveBreakpoint(breakpoint);
+
+	locker.Unlock();
+
+	if (uninstall)
+		fDebuggerInterface->UninstallBreakpoint(address);
 }
 
 
@@ -668,4 +816,26 @@ void
 TeamDebugger::_HandleStackTraceChanged(thread_id threadID)
 {
 printf("TeamDebugger::_HandleStackTraceChanged()\n");
+}
+
+
+void
+TeamDebugger::_NotifyUser(const char* title, const char* text,...)
+{
+	// print the message
+	char buffer[1024];
+	va_list args;
+	va_start(args, text);
+	vsnprintf(buffer, sizeof(buffer), text, args);
+	va_end(args);
+
+	// show the alert
+	BAlert* alert = new(std::nothrow) BAlert(title, buffer, "OK",
+		NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	if (alert != NULL)
+		alert->Go(NULL);
+
+	// TODO: We need to let the alert run asynchronously, but we shouldn't just
+	// create it and don't care anymore. Maybe an error window, which can
+	// display a list of errors would be the better choice.
 }

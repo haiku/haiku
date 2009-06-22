@@ -57,6 +57,7 @@ Application Debugger :
 	ThreadListView.cpp
 
 	# model
+	Breakpoint.cpp
 	DisassembledCode.cpp
 	Image.cpp
 	ImageInfo.cpp

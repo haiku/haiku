@@ -7,7 +7,7 @@
 
 #include <Referenceable.h>
 
-#include "ArchitectureTypes.h"
+#include "TargetAddressRange.h"
 
 
 class Statement;
@@ -25,6 +25,8 @@ public:
 	virtual	Statement*			StatementAtLine(int32 index) const = 0;
 	virtual	Statement*			StatementAtAddress(target_addr_t address)
 									const = 0;
+
+	virtual	TargetAddressRange	StatementAddressRange() const = 0;
 };
 
 

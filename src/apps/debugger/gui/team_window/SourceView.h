@@ -11,9 +11,11 @@
 #include "ArchitectureTypes.h"
 
 
+class Breakpoint;
 class SourceCode;
 class StackFrame;
 class StackTrace;
+class Statement;
 class TeamDebugModel;
 
 
@@ -35,6 +37,8 @@ public:
 			void				SetStackTrace(StackTrace* stackTrace);
 			void				SetStackFrame(StackFrame* stackFrame);
 			void				SetSourceCode(SourceCode* sourceCode);
+
+			void				UserBreakpointChanged(target_addr_t address);
 
 			bool				ScrollToAddress(target_addr_t address);
 			bool				ScrollToLine(uint32 line);
@@ -80,8 +84,10 @@ class SourceView::Listener {
 public:
 	virtual						~Listener();
 
-//	virtual	void				StackFrameSelectionChanged(
-//									StackFrame* frame) = 0;
+	virtual	void				SetBreakpointRequested(
+									target_addr_t address, bool enabled) = 0;
+	virtual	void				ClearBreakpointRequested(
+									target_addr_t address) = 0;
 };
 
 

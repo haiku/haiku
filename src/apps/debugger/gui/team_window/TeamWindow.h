@@ -12,6 +12,7 @@
 #include "StackFrame.h"
 #include "StackTraceView.h"
 #include "Team.h"
+#include "TeamDebugModel.h"
 #include "ThreadListView.h"
 
 
@@ -20,12 +21,11 @@ class BTabView;
 class ImageListView;
 class RegisterView;
 class SourceCode;
-class TeamDebugModel;
 
 
 class TeamWindow : public BWindow, private ThreadListView::Listener,
 	StackTraceView::Listener, SourceView::Listener, Team::Listener,
-	StackFrame::Listener {
+	private TeamDebugModel::Listener, StackFrame::Listener {
 public:
 	class Listener;
 
@@ -48,8 +48,10 @@ private:
 	// StackTraceView::Listener
 	virtual	void				StackFrameSelectionChanged(StackFrame* frame);
 
-	// StackTraceView::Listener
-	// nothing yet
+	// SourceView::Listener
+	virtual	void				SetBreakpointRequested(target_addr_t address,
+									bool enabled);
+	virtual	void				ClearBreakpointRequested(target_addr_t address);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
@@ -58,6 +60,11 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+
+	// TeamDebugModel::Listener
+	virtual	void				UserBreakpointChanged(
+									const TeamDebugModel::BreakpointEvent&
+										event);
 
 	// StackFrame::Listener
 	virtual	void				StackFrameSourceCodeChanged(StackFrame* frame);
@@ -75,6 +82,8 @@ private:
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
 			void				_HandleSourceCodeChanged();
+			void				_HandleUserBreakpointChanged(
+									target_addr_t address);
 
 private:
 			TeamDebugModel*		fDebugModel;
@@ -105,6 +114,10 @@ public:
 									TeamWindow* window, StackFrame* frame) = 0;
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action) = 0;
+	virtual	void				SetBreakpointRequested(target_addr_t address,
+									bool enabled) = 0;
+	virtual	void				ClearBreakpointRequested(
+									target_addr_t address) = 0;
 	virtual	bool				TeamWindowQuitRequested(TeamWindow* window) = 0;
 };
 

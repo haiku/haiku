@@ -39,6 +39,9 @@ private:
 									TeamWindow* window, StackFrame* frame);
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action);
+	virtual	void				SetBreakpointRequested(target_addr_t address,
+									bool enabled);
+	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	bool				TeamWindowQuitRequested(TeamWindow* window);
 
 	// JobListener
@@ -88,12 +91,22 @@ private:
 			void				_SetThreadState(::Thread* thread, uint32 state,
 									CpuState* cpuState);
 
+			status_t			_SetUserBreakpoint(target_addr_t address,
+									bool enabled);
+
 			void				_HandleThreadAction(thread_id threadID,
 									uint32 action);
+			void				_HandleSetUserBreakpoint(target_addr_t address,
+									bool enabled);
+			void				_HandleClearUserBreakpoint(
+									target_addr_t address);
 
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
+
+			void				_NotifyUser(const char* title,
+									const char* text,...);
 
 private:
 			::Team*				fTeam;

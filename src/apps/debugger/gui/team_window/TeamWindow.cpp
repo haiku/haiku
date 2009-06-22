@@ -24,7 +24,6 @@
 #include "SourceCode.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
-#include "TeamDebugModel.h"
 
 
 // #pragma mark - TeamWindow
@@ -58,6 +57,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 		name << " (" << team->ID() << ")";
 	SetTitle(name.String());
 
+	fDebugModel->AddListener(this);
 	team->AddListener(this);
 }
 
@@ -72,6 +72,7 @@ TeamWindow::~TeamWindow()
 		fSourceView->UnsetListener();
 
 	fDebugModel->GetTeam()->RemoveListener(this);
+	fDebugModel->RemoveListener(this);
 
 	if (fActiveSourceCode != NULL)
 		fActiveSourceCode->RemoveReference();
@@ -144,9 +145,20 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_USER_BREAKPOINT_CHANGED:
+		{
+			uint64 address;
+			if (message->FindUInt64("address", &address) != B_OK)
+				break;
+
+			_HandleUserBreakpointChanged(address);
+			break;
+		}
+
 		case MSG_STACK_FRAME_SOURCE_CODE_CHANGED:
 		{
 			_HandleSourceCodeChanged();
+			break;
 		}
 
 		default:
@@ -178,6 +190,20 @@ TeamWindow::StackFrameSelectionChanged(StackFrame* frame)
 
 
 void
+TeamWindow::SetBreakpointRequested(target_addr_t address, bool enabled)
+{
+	fListener->SetBreakpointRequested(address, enabled);
+}
+
+
+void
+TeamWindow::ClearBreakpointRequested(target_addr_t address)
+{
+	fListener->ClearBreakpointRequested(address);
+}
+
+
+void
 TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STATE_CHANGED);
@@ -200,6 +226,16 @@ TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
 	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+
+void
+TeamWindow::UserBreakpointChanged(const TeamDebugModel::BreakpointEvent& event)
+{
+	BMessage message(MSG_USER_BREAKPOINT_CHANGED);
+	message.AddUInt64("address", event.GetBreakpoint()->Address());
 	PostMessage(&message);
 }
 
@@ -517,6 +553,13 @@ TeamWindow::_HandleSourceCodeChanged()
 	locker.Unlock();
 
 	_SetActiveSourceCode(sourceCode);
+}
+
+
+void
+TeamWindow::_HandleUserBreakpointChanged(target_addr_t address)
+{
+	fSourceView->UserBreakpointChanged(address);
 }
 
 

@@ -86,6 +86,20 @@ DisassembledCode::StatementAtAddress(target_addr_t address) const
 }
 
 
+TargetAddressRange
+DisassembledCode::StatementAddressRange() const
+{
+	if (fStatements.IsEmpty())
+		return TargetAddressRange();
+
+	ContiguousStatement* first = fStatements.ItemAt(0);
+	ContiguousStatement* last
+		= fStatements.ItemAt(fStatements.CountItems() - 1);
+	return TargetAddressRange(first->AddressRange().Start(),
+		last->AddressRange().End());
+}
+
+
 bool
 DisassembledCode::AddCommentLine(const BString& line)
 {
@@ -101,8 +115,7 @@ DisassembledCode::AddInstructionLine(const BString& line, target_addr_t address,
 
 	ContiguousStatement* statement = new(std::nothrow) ContiguousStatement(
 		SourceLocation(lineIndex), SourceLocation(lineIndex + 1),
-		TargetAddressRange(address, size));
-			// TODO: breakpointAllowed!
+		TargetAddressRange(address, size), breakpointAllowed);
 	if (statement == NULL)
 		return false;
 

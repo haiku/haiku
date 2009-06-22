@@ -26,20 +26,26 @@ public:
 
 	virtual	bool				ContainsAddress(target_addr_t address)
 									const = 0;
+
+	virtual	bool				BreakpointAllowed() const = 0;
 };
 
 
 class AbstractStatement : public Statement {
 public:
 								AbstractStatement(const SourceLocation& start,
-									const SourceLocation& end);
+									const SourceLocation& end,
+									bool breakpointAllowed);
 
 	virtual	SourceLocation		StartSourceLocation() const;
 	virtual	SourceLocation		EndSourceLocation() const;
 
+	virtual	bool				BreakpointAllowed() const;
+
 protected:
 			SourceLocation		fStart;
 			SourceLocation		fEnd;
+			bool				fBreakpointAllowed;
 };
 
 
@@ -47,7 +53,8 @@ class ContiguousStatement : public AbstractStatement {
 public:
 								ContiguousStatement(const SourceLocation& start,
 									const SourceLocation& end,
-									const TargetAddressRange& range);
+									const TargetAddressRange& range,
+									bool breakpointAllowed);
 
 			const TargetAddressRange& AddressRange() const
 										{ return fRange; }
