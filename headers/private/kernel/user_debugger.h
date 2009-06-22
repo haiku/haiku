@@ -193,7 +193,6 @@ extern "C" {
 // service calls
 
 void clear_team_debug_info(struct team_debug_info *info, bool initLock);
-void destroy_team_debug_info(struct team_debug_info *info);
 
 void init_thread_debug_info(struct thread_debug_info *info);
 void clear_thread_debug_info(struct thread_debug_info *info, bool dying);

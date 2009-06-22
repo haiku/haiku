@@ -240,7 +240,7 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
  *	4. release `lock'
  *	5. call destroy_team_debug_info() on the copied team debug info
  */
-void
+static void
 destroy_team_debug_info(struct team_debug_info *info)
 {
 	if (info) {
