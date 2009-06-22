@@ -17,25 +17,6 @@
 #include "SymbolInfo.h"
 
 
-struct DebuggerDebugInfo::FindByAddressPredicate : UnaryPredicate<SymbolInfo> {
-	FindByAddressPredicate(target_addr_t address)
-		:
-		fAddress(address)
-	{
-	}
-
-	virtual int operator()(const SymbolInfo* info) const
-	{
-		if (fAddress < info->Address())
-			return -1;
-		return fAddress < info->Address() + info->Size() ? 0 : 1;
-	}
-
-private:
-	target_addr_t	fAddress;
-};
-
-
 DebuggerDebugInfo::DebuggerDebugInfo(const ImageInfo& imageInfo,
 	DebuggerInterface* debuggerInterface, Architecture* architecture)
 	:
