@@ -5,10 +5,14 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-/*! API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
-	rendering pipe-lines for stroke, fills, bitmap and text rendering.*/
+/*!	API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
+	rendering pipe-lines for stroke, fills, bitmap and text rendering.
+*/
+
+#include "Painter.h"
 
 #include <new>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -52,8 +56,6 @@
 #include "ServerBitmap.h"
 #include "ServerFont.h"
 #include "SystemPalette.h"
-
-#include "Painter.h"
 
 #include "AppServer.h"
 
@@ -125,12 +127,15 @@ Painter::Painter()
 #endif
 }
 
+
 // destructor
 Painter::~Painter()
 {
 }
 
+
 // #pragma mark -
+
 
 // AttachToBuffer
 void
@@ -158,6 +163,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 	}
 }
 
+
 // DetachFromBuffer
 void
 Painter::DetachFromBuffer()
@@ -167,6 +173,7 @@ Painter::DetachFromBuffer()
 	fValidClipping = false;
 }
 
+
 // Bounds
 BRect
 Painter::Bounds() const
@@ -174,7 +181,9 @@ Painter::Bounds() const
 	return BRect(0, 0, fBuffer.width() - 1, fBuffer.height() - 1);
 }
 
+
 // #pragma mark -
+
 
 // SetDrawState
 void
@@ -222,7 +231,9 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 		_UpdateDrawingMode();
 }
 
+
 // #pragma mark - state
+
 
 // ConstrainClipping
 void
@@ -239,6 +250,7 @@ Painter::ConstrainClipping(const BRegion* region)
 	}
 }
 
+
 // SetHighColor
 void
 Painter::SetHighColor(const rgb_color& color)
@@ -250,6 +262,7 @@ Painter::SetHighColor(const rgb_color& color)
 		_SetRendererColor(color);
 }
 
+
 // SetLowColor
 void
 Painter::SetLowColor(const rgb_color& color)
@@ -258,6 +271,7 @@ Painter::SetLowColor(const rgb_color& color)
 	if (*(fPatternHandler.GetR5Pattern()) == B_SOLID_LOW)
 		_SetRendererColor(color);
 }
+
 
 // SetDrawingMode
 void
@@ -282,12 +296,14 @@ Painter::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
 	}
 }
 
+
 // SetPenSize
 void
 Painter::SetPenSize(float size)
 {
 	fPenSize = size;
 }
+
 
 // SetStrokeMode
 void
@@ -297,6 +313,7 @@ Painter::SetStrokeMode(cap_mode lineCap, join_mode joinMode, float miterLimit)
 	fLineJoinMode = joinMode;
 	fMiterLimit = miterLimit;
 }
+
 
 // SetPattern
 void
@@ -318,25 +335,28 @@ Painter::SetPattern(const pattern& p, bool drawingText)
 	}
 }
 
+
 // SetFont
 void
 Painter::SetFont(const ServerFont& font)
 {
 	fTextRenderer.SetFont(font);
-	fTextRenderer.SetAntialiasing(
-		!(font.Flags() & B_DISABLE_ANTIALIASING));
+	fTextRenderer.SetAntialiasing(!(font.Flags() & B_DISABLE_ANTIALIASING));
 }
+
 
 // SetFont
 void
 Painter::SetFont(const DrawState* state)
 {
 	fTextRenderer.SetFont(state->Font());
-	fTextRenderer.SetAntialiasing(!(state->ForceFontAliasing()
-		|| state->Font().Flags() & B_DISABLE_ANTIALIASING));
+	fTextRenderer.SetAntialiasing(!state->ForceFontAliasing()
+		&& (state->Font().Flags() & B_DISABLE_ANTIALIASING) != 0);
 }
 
+
 // #pragma mark - drawing
+
 
 // StrokeLine
 void
@@ -352,7 +372,6 @@ Painter::StrokeLine(BPoint a, BPoint b)
 	// first, try an optimized version
 	if (fPenSize == 1.0
 		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
-
 		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH
 			&& StraightLine(a, b, fPatternHandler.HighColor())) {
@@ -429,6 +448,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 	}
 }
 
+
 // StraightLine
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
@@ -500,7 +520,9 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	return false;
 }
 
+
 // #pragma mark -
+
 
 // StrokeTriangle
 BRect
@@ -509,12 +531,14 @@ Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 	return _DrawTriangle(pt1, pt2, pt3, false);
 }
 
+
 // FillTriangle
 BRect
 Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 {
 	return _DrawTriangle(pt1, pt2, pt3, true);
 }
+
 
 // FillTriangle
 BRect
@@ -538,15 +562,14 @@ Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	return _FillPath(fPath, gradient);
 }
 
+
 // DrawPolygon
 BRect
-Painter::DrawPolygon(BPoint* p, int32 numPts,
-					 bool filled, bool closed) const
+Painter::DrawPolygon(BPoint* p, int32 numPts, bool filled, bool closed) const
 {
 	CHECK_CLIPPING
 
 	if (numPts > 0) {
-
 		fPath.remove_all();
 
 		_Transform(p);
@@ -563,21 +586,21 @@ Painter::DrawPolygon(BPoint* p, int32 numPts,
 
 		if (filled)
 			return _FillPath(fPath);
-		else
-			return _StrokePath(fPath);
+
+		return _StrokePath(fPath);
 	}
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
+
 // FillPolygon
 BRect
-Painter::FillPolygon(BPoint* p, int32 numPts,
-					 const BGradient& gradient, bool closed) const
+Painter::FillPolygon(BPoint* p, int32 numPts, const BGradient& gradient,
+	bool closed) const
 {
 	CHECK_CLIPPING
 
 	if (numPts > 0) {
-
 		fPath.remove_all();
 
 		_Transform(p);
@@ -597,6 +620,7 @@ Painter::FillPolygon(BPoint* p, int32 numPts,
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
+
 // DrawBezier
 BRect
 Painter::DrawBezier(BPoint* p, bool filled) const
@@ -611,18 +635,16 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 	_Transform(&(p[3]));
 
 	fPath.move_to(p[0].x, p[0].y);
-	fPath.curve4(p[1].x, p[1].y,
-				 p[2].x, p[2].y,
-				 p[3].x, p[3].y);
-
+	fPath.curve4(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 
 	if (filled) {
 		fPath.close_polygon();
 		return _FillPath(fCurve);
-	} else {
-		return _StrokePath(fCurve);
 	}
+
+	return _StrokePath(fCurve);
 }
+
 
 // FillBezier
 BRect
@@ -638,10 +660,7 @@ Painter::FillBezier(BPoint* p, const BGradient& gradient) const
 	_Transform(&(p[3]));
 
 	fPath.move_to(p[0].x, p[0].y);
-	fPath.curve4(p[1].x, p[1].y,
-				 p[2].x, p[2].y,
-				 p[3].x, p[3].y);
-
+	fPath.curve4(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 
 	fPath.close_polygon();
 	return _FillPath(fCurve, gradient);
@@ -677,9 +696,8 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				fPath.curve4(points[0].x, points[0].y,
-							 points[1].x, points[1].y,
-							 points[2].x, points[2].y);
+				fPath.curve4(points[0].x, points[0].y, points[1].x, points[1].y,
+					points[2].x, points[2].y);
 				points += 3;
 				count -= 3;
 			}
@@ -691,15 +709,15 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 
 	if (filled)
 		return _FillPath(fCurve);
-	else
-		return _StrokePath(fCurve);
+
+	return _StrokePath(fCurve);
 }
+
 
 // FillShape
 BRect
 Painter::FillShape(const int32& opCount, const uint32* opList,
-	const int32& ptCount, const BPoint* points,
-	const BGradient& gradient) const
+	const int32& ptCount, const BPoint* points, const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 
@@ -725,9 +743,8 @@ Painter::FillShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				fPath.curve4(points[0].x, points[0].y,
-							 points[1].x, points[1].y,
-							 points[2].x, points[2].y);
+				fPath.curve4(points[0].x, points[0].y, points[1].x, points[1].y,
+					points[2].x, points[2].y);
 				points += 3;
 				count -= 3;
 			}
@@ -739,6 +756,7 @@ Painter::FillShape(const int32& opCount, const uint32* opList,
 
 	return _FillPath(fCurve, gradient);
 }
+
 
 // StrokeRect
 BRect
@@ -757,13 +775,11 @@ Painter::StrokeRect(const BRect& r) const
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
-			StrokeRect(rect,
-					   fPatternHandler.HighColor());
+			StrokeRect(rect, fPatternHandler.HighColor());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
-			StrokeRect(rect,
-					   fPatternHandler.LowColor());
+			StrokeRect(rect, fPatternHandler.LowColor());
 			return _Clipped(rect);
 		}
 	}
@@ -791,19 +807,17 @@ Painter::StrokeRect(const BRect& r) const
 	return _StrokePath(fPath);
 }
 
+
 // StrokeRect
 void
 Painter::StrokeRect(const BRect& r, const rgb_color& c) const
 {
-	StraightLine(BPoint(r.left, r.top),
-				 BPoint(r.right - 1, r.top), c);
-	StraightLine(BPoint(r.right, r.top),
-				 BPoint(r.right, r.bottom - 1), c);
-	StraightLine(BPoint(r.right, r.bottom),
-				 BPoint(r.left + 1, r.bottom), c);
-	StraightLine(BPoint(r.left, r.bottom),
-				 BPoint(r.left, r.top + 1), c);
+	StraightLine(BPoint(r.left, r.top), BPoint(r.right - 1, r.top), c);
+	StraightLine(BPoint(r.right, r.top), BPoint(r.right, r.bottom - 1), c);
+	StraightLine(BPoint(r.right, r.bottom), BPoint(r.left + 1, r.bottom), c);
+	StraightLine(BPoint(r.left, r.bottom), BPoint(r.left, r.top + 1), c);
 }
+
 
 // FillRect
 BRect
@@ -846,7 +860,6 @@ Painter::FillRect(const BRect& r) const
 		}
 	}
 
-
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
 	// to the bottom-right (.9999, .9999) corner of pixels
@@ -862,6 +875,7 @@ Painter::FillRect(const BRect& r) const
 
 	return _FillPath(fPath);
 }
+
 
 // FillRect
 BRect
@@ -907,6 +921,7 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 	return _FillPath(fPath, gradient);
 }
 
+
 // FillRect
 void
 Painter::FillRect(const BRect& r, const rgb_color& c) const
@@ -940,16 +955,16 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 //					for (int32 x = x1; x <= x2; x++) {
 //						*handle++ = color.data32;
 //					}
-gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
+				gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
 			}
 		}
 	} while (fBaseRenderer.next_clip_box());
 }
 
+
 // FillRectVerticalGradient
 void
-Painter::FillRectVerticalGradient(BRect r,
-	const BGradientLinear& gradient) const
+Painter::FillRectVerticalGradient(BRect r, const BGradientLinear& gradient) const
 {
 	if (!fValidClipping)
 		return;
@@ -998,6 +1013,7 @@ Painter::FillRectVerticalGradient(BRect r,
 	} while (fBaseRenderer.next_clip_box());
 }
 
+
 // FillRectNoClipping
 void
 Painter::FillRectNoClipping(const clipping_rect& r, const rgb_color& c) const
@@ -1025,6 +1041,7 @@ Painter::FillRectNoClipping(const clipping_rect& r, const rgb_color& c) const
 	}
 }
 
+
 // StrokeRoundRect
 BRect
 Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
@@ -1045,82 +1062,84 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		rect.radius(xRadius, yRadius);
 
 		return _StrokePath(rect);
-	} else {
-		// NOTE: This implementation might seem a little strange, but it makes
-		// stroked round rects look like on R5. A more correct way would be to
-		// use _StrokePath() as above (independent from fPenSize).
-		// The fact that the bounding box of the round rect is not enlarged
-		// by fPenSize/2 is actually on purpose, though one could argue it is
-		// unexpected.
+	}
 
-		// enclose the right and bottom edge
-		rb.x++;
-		rb.y++;
+	// NOTE: This implementation might seem a little strange, but it makes
+	// stroked round rects look like on R5. A more correct way would be to
+	// use _StrokePath() as above (independent from fPenSize).
+	// The fact that the bounding box of the round rect is not enlarged
+	// by fPenSize/2 is actually on purpose, though one could argue it is
+	// unexpected.
 
-		agg::rounded_rect outer;
-		outer.rect(lt.x, lt.y, rb.x, rb.y);
-		outer.radius(xRadius, yRadius);
+	// enclose the right and bottom edge
+	rb.x++;
+	rb.y++;
 
-		if (gSubpixelAntialiasing) {
-			fSubpixRasterizer.reset();
-			fSubpixRasterizer.add_path(outer);
+	agg::rounded_rect outer;
+	outer.rect(lt.x, lt.y, rb.x, rb.y);
+	outer.radius(xRadius, yRadius);
 
-			// don't add an inner hole if the "size is negative", this avoids
-			// some defects that can be observed on R5 and could be regarded
-			// as a bug.
-			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
-				agg::rounded_rect inner;
-				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
-					rb.y - fPenSize);
-				inner.radius(max_c(0.0, xRadius - fPenSize),
-					max_c(0.0, yRadius - fPenSize));
+	if (gSubpixelAntialiasing) {
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(outer);
 
-				fSubpixRasterizer.add_path(inner);
-			}
+		// don't add an inner hole if the "size is negative", this avoids
+		// some defects that can be observed on R5 and could be regarded
+		// as a bug.
+		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
+			agg::rounded_rect inner;
+			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
+				rb.y - fPenSize);
+			inner.radius(max_c(0.0, xRadius - fPenSize),
+				max_c(0.0, yRadius - fPenSize));
 
-			// make the inner rect work as a hole
-			fSubpixRasterizer.filling_rule(agg::fill_even_odd);
-
-			if (fPenSize > 2)
-				agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
-					fSubpixRenderer);
-			else
-				agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
-					fSubpixRenderer);
-
-			fSubpixRasterizer.filling_rule(agg::fill_non_zero);
-		} else {
-			fRasterizer.reset();
-			fRasterizer.add_path(outer);
-
-			// don't add an inner hole if the "size is negative", this avoids
-			// some defects that can be observed on R5 and could be regarded as
-			// a bug.
-			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
-				agg::rounded_rect inner;
-				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
-					rb.y - fPenSize);
-				inner.radius(max_c(0.0, xRadius - fPenSize),
-					max_c(0.0, yRadius - fPenSize));
-
-				fRasterizer.add_path(inner);
-			}
-
-			// make the inner rect work as a hole
-			fRasterizer.filling_rule(agg::fill_even_odd);
-
-			if (fPenSize > 2)
-				agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-			else
-				agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-
-			// reset to default
-			fRasterizer.filling_rule(agg::fill_non_zero);
+			fSubpixRasterizer.add_path(inner);
 		}
 
-		return _Clipped(_BoundingBox(outer));
+		// make the inner rect work as a hole
+		fSubpixRasterizer.filling_rule(agg::fill_even_odd);
+
+		if (fPenSize > 2) {
+			agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
+				fSubpixRenderer);
+		} else {
+			agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
+				fSubpixRenderer);
+		}
+
+		fSubpixRasterizer.filling_rule(agg::fill_non_zero);
+	} else {
+		fRasterizer.reset();
+		fRasterizer.add_path(outer);
+
+		// don't add an inner hole if the "size is negative", this avoids
+		// some defects that can be observed on R5 and could be regarded as
+		// a bug.
+		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
+			agg::rounded_rect inner;
+			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
+				rb.y - fPenSize);
+			inner.radius(max_c(0.0, xRadius - fPenSize),
+				max_c(0.0, yRadius - fPenSize));
+
+			fRasterizer.add_path(inner);
+		}
+
+		// make the inner rect work as a hole
+		fRasterizer.filling_rule(agg::fill_even_odd);
+
+		if (fPenSize > 2)
+			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+		else
+			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
+
+		// reset to default
+		fRasterizer.filling_rule(agg::fill_non_zero);
 	}
+
+	return _Clipped(_BoundingBox(outer));
 }
+
 
 // FillRoundRect
 BRect
@@ -1146,10 +1165,11 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 	return _FillPath(rect);
 }
 
+
 // FillRoundRect
 BRect
 Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
-	 const BGradient& gradient) const
+	const BGradient& gradient) const
 {
 	CHECK_CLIPPING
 
@@ -1171,6 +1191,7 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
 	return _FillPath(rect, gradient);
 }
 
+
 // AlignEllipseRect
 void
 Painter::AlignEllipseRect(BRect* rect, bool filled) const
@@ -1187,6 +1208,7 @@ Painter::AlignEllipseRect(BRect* rect, bool filled) const
 		}
 	}
 }
+
 
 // DrawEllipse
 BRect
@@ -1210,58 +1232,56 @@ Painter::DrawEllipse(BRect r, bool fill) const
 		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
 		return _FillPath(path);
-	} else {
-		// NOTE: This implementation might seem a little strange, but it makes
-		// stroked ellipses look like on R5. A more correct way would be to use
-		// _StrokePath(), but it currently has its own set of problems with narrow
-		// ellipses (for small xRadii or yRadii).
-		float inset = fPenSize / 2.0;
-		agg::ellipse inner(center.x, center.y,
-						   max_c(0.0, xRadius - inset),
-						   max_c(0.0, yRadius - inset),
-						   divisions);
-		agg::ellipse outer(center.x, center.y,
-						   xRadius + inset,
-						   yRadius + inset,
-						   divisions);
+	}
 
-		if (gSubpixelAntialiasing) {
-			fSubpixRasterizer.reset();
-			fSubpixRasterizer.add_path(outer);
-			fSubpixRasterizer.add_path(inner);
+	// NOTE: This implementation might seem a little strange, but it makes
+	// stroked ellipses look like on R5. A more correct way would be to use
+	// _StrokePath(), but it currently has its own set of problems with
+	// narrow ellipses (for small xRadii or yRadii).
+	float inset = fPenSize / 2.0;
+	agg::ellipse inner(center.x, center.y, max_c(0.0, xRadius - inset),
+		max_c(0.0, yRadius - inset), divisions);
+	agg::ellipse outer(center.x, center.y, xRadius + inset, yRadius + inset,
+		divisions);
 
-			// make the inner ellipse work as a hole
-			fSubpixRasterizer.filling_rule(agg::fill_even_odd);
+	if (gSubpixelAntialiasing) {
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(outer);
+		fSubpixRasterizer.add_path(inner);
 
-			if (fPenSize > 4)
-				agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
-					fSubpixRenderer);
-			else
-				agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
-					fSubpixRenderer);
+		// make the inner ellipse work as a hole
+		fSubpixRasterizer.filling_rule(agg::fill_even_odd);
 
-			// reset to default
-			fSubpixRasterizer.filling_rule(agg::fill_non_zero);
+		if (fPenSize > 4) {
+			agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
+				fSubpixRenderer);
 		} else {
-			fRasterizer.reset();
-			fRasterizer.add_path(outer);
-			fRasterizer.add_path(inner);
-
-			// make the inner ellipse work as a hole
-			fRasterizer.filling_rule(agg::fill_even_odd);
-
-			if (fPenSize > 4)
-				agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-			else
-				agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-
-			// reset to default
-			fRasterizer.filling_rule(agg::fill_non_zero);
+			agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
+				fSubpixRenderer);
 		}
 
-		return _Clipped(_BoundingBox(outer));
+		// reset to default
+		fSubpixRasterizer.filling_rule(agg::fill_non_zero);
+	} else {
+		fRasterizer.reset();
+		fRasterizer.add_path(outer);
+		fRasterizer.add_path(inner);
+
+		// make the inner ellipse work as a hole
+		fRasterizer.filling_rule(agg::fill_even_odd);
+
+		if (fPenSize > 4)
+			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+		else
+			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
+
+		// reset to default
+		fRasterizer.filling_rule(agg::fill_non_zero);
 	}
+
+	return _Clipped(_BoundingBox(outer));
 }
+
 
 // FillEllipse
 BRect
@@ -1286,6 +1306,7 @@ Painter::FillEllipse(BRect r, const BGradient& gradient) const
 	return _FillPath(path, gradient);
 }
 
+
 // StrokeArc
 BRect
 Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
@@ -1297,14 +1318,15 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	double angleRad = (angle * PI) / 180.0;
 	double spanRad = (span * PI) / 180.0;
-	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius,
-						-angleRad, -spanRad);
+	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
+		-spanRad);
 
 	agg::conv_curve<agg::bezier_arc> path(arc);
 	path.approximation_scale(2.0);
 
 	return _StrokePath(path);
 }
+
 
 // FillArc
 BRect
@@ -1317,8 +1339,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	double angleRad = (angle * PI) / 180.0;
 	double spanRad = (span * PI) / 180.0;
-	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius,
-						-angleRad, -spanRad);
+	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
+		-spanRad);
 
 	agg::conv_curve<agg::bezier_arc> segmentedArc(arc);
 
@@ -1342,6 +1364,7 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 	return _FillPath(fPath);
 }
 
+
 // FillArc
 BRect
 Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
@@ -1353,8 +1376,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	double angleRad = (angle * PI) / 180.0;
 	double spanRad = (span * PI) / 180.0;
-	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius,
-						-angleRad, -spanRad);
+	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
+		-spanRad);
 
 	agg::conv_curve<agg::bezier_arc> segmentedArc(arc);
 
@@ -1378,7 +1401,9 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 	return _FillPath(fPath, gradient);
 }
 
+
 // #pragma mark -
+
 
 // DrawString
 BRect
@@ -1408,6 +1433,7 @@ Painter::DrawString(const char* utf8String, uint32 length, BPoint baseLine,
 	return _Clipped(bounds);
 }
 
+
 // BoundingBox
 BRect
 Painter::BoundingBox(const char* utf8String, uint32 length, BPoint baseLine,
@@ -1424,6 +1450,7 @@ Painter::BoundingBox(const char* utf8String, uint32 length, BPoint baseLine,
 		baseLine, dummy, true, penLocation, delta, cacheReference);
 }
 
+
 // StringWidth
 float
 Painter::StringWidth(const char* utf8String, uint32 length,
@@ -1432,7 +1459,9 @@ Painter::StringWidth(const char* utf8String, uint32 length,
 	return Font().StringWidth(utf8String, length, delta);
 }
 
+
 // #pragma mark -
+
 
 // DrawBitmap
 BRect
@@ -1467,7 +1496,9 @@ Painter::DrawBitmap(const ServerBitmap* bitmap, BRect bitmapRect,
 	return touched;
 }
 
+
 // #pragma mark -
+
 
 // FillRegion
 BRect
@@ -1484,6 +1515,7 @@ Painter::FillRegion(const BRegion* region) const
 	return touched;
 }
 
+
 // FillRegion
 BRect
 Painter::FillRegion(const BRegion* region, const BGradient& gradient) const
@@ -1499,6 +1531,7 @@ Painter::FillRegion(const BRegion* region, const BGradient& gradient) const
 	return touched;
 }
 
+
 // InvertRect
 BRect
 Painter::InvertRect(const BRect& r) const
@@ -1506,9 +1539,9 @@ Painter::InvertRect(const BRect& r) const
 	CHECK_CLIPPING
 
 	BRegion region(r);
-	if (fClippingRegion) {
+	if (fClippingRegion)
 		region.IntersectWith(fClippingRegion);
-	}
+
 	// implementation only for B_RGB32 at the moment
 	int32 count = region.CountRects();
 	for (int32 i = 0; i < count; i++) {
@@ -1519,6 +1552,7 @@ Painter::InvertRect(const BRect& r) const
 
 
 // #pragma mark - private
+
 
 // _Transform
 inline void
@@ -1539,6 +1573,7 @@ Painter::_Transform(BPoint* point, bool centerOffset) const
 	}
 }
 
+
 // _Transform
 inline BPoint
 Painter::_Transform(const BPoint& point, bool centerOffset) const
@@ -1548,15 +1583,17 @@ Painter::_Transform(const BPoint& point, bool centerOffset) const
 	return ret;
 }
 
+
 // _Clipped
 BRect
 Painter::_Clipped(const BRect& rect) const
 {
-	if (rect.IsValid()) {
+	if (rect.IsValid())
 		return BRect(rect & fClippingRegion->Frame());
-	}
+
 	return BRect(rect);
 }
+
 
 // _UpdateDrawingMode
 void
@@ -1580,32 +1617,29 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// When a solid pattern is used, _SetRendererColor()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
-	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode,
-								fAlphaFncMode, drawingText);
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
+		drawingText);
 	if (drawingText)
 		fPatternHandler.MakeOpCopyColorCache();
 }
+
 
 // _SetRendererColor
 void
 Painter::_SetRendererColor(const rgb_color& color) const
 {
-	fRenderer.color(agg::rgba(color.red / 255.0,
-							  color.green / 255.0,
-							  color.blue / 255.0,
-							  color.alpha / 255.0));
-	fSubpixRenderer.color(agg::rgba(color.red / 255.0,
-							  color.green / 255.0,
-							  color.blue / 255.0,
-							  color.alpha / 255.0));
+	fRenderer.color(agg::rgba(color.red / 255.0, color.green / 255.0,
+		color.blue / 255.0, color.alpha / 255.0));
+	fSubpixRenderer.color(agg::rgba(color.red / 255.0, color.green / 255.0,
+		color.blue / 255.0, color.alpha / 255.0));
 // TODO: bitmap fonts not yet correctly setup in AGGTextRenderer
-//	fRendererBin.color(agg::rgba(color.red / 255.0,
-//								 color.green / 255.0,
-//								 color.blue / 255.0,
-//								 color.alpha / 255.0));
+//	fRendererBin.color(agg::rgba(color.red / 255.0, color.green / 255.0,
+//		color.blue / 255.0, color.alpha / 255.0));
 }
 
+
 // #pragma mark -
+
 
 // _DrawTriangle
 inline BRect
@@ -1627,14 +1661,15 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 
 	if (fill)
 		return _FillPath(fPath);
-	else
-		return _StrokePath(fPath);
+
+	return _StrokePath(fPath);
 }
+
 
 // copy_bitmap_row_cmap8_copy
 static inline void
 copy_bitmap_row_cmap8_copy(uint8* dst, const uint8* src, int32 numPixels,
-						   const rgb_color* colorMap)
+	const rgb_color* colorMap)
 {
 	uint32* d = (uint32*)dst;
 	const uint8* s = src;
@@ -1643,6 +1678,7 @@ copy_bitmap_row_cmap8_copy(uint8* dst, const uint8* src, int32 numPixels,
 		*d++ = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
 	}
 }
+
 
 // copy_bitmap_row_cmap8_over
 static inline void
@@ -1659,6 +1695,7 @@ copy_bitmap_row_cmap8_over(uint8* dst, const uint8* src, int32 numPixels,
 	}
 }
 
+
 // copy_bitmap_row_bgr32_copy
 static inline void
 copy_bitmap_row_bgr32_copy(uint8* dst, const uint8* src, int32 numPixels,
@@ -1666,6 +1703,7 @@ copy_bitmap_row_bgr32_copy(uint8* dst, const uint8* src, int32 numPixels,
 {
 	memcpy(dst, src, numPixels * 4);
 }
+
 
 // copy_bitmap_row_bgr32_over
 static inline void
@@ -1681,6 +1719,7 @@ copy_bitmap_row_bgr32_over(uint8* dst, const uint8* src, int32 numPixels,
 		s++;
 	}
 }
+
 
 // copy_bitmap_row_bgr32_alpha
 static inline void
@@ -1708,6 +1747,7 @@ copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
 }
 
 
+// _TransparentMagicToAlpha
 template<typename sourcePixel>
 void
 Painter::_TransparentMagicToAlpha(sourcePixel* buffer, uint32 width,
@@ -1799,7 +1839,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
 					srcBuffer, (int32)xOffset, (int32)yOffset, viewRect);
 				return;
-			} else if (fDrawingMode == B_OP_OVER) {
+			}
+			if (fDrawingMode == B_OP_OVER) {
 				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
 					srcBuffer, (int32)xOffset, (int32)yOffset, viewRect);
 				return;
@@ -1815,8 +1856,6 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 
 	BBitmap* temp = NULL;
 	ObjectDeleter<BBitmap> tempDeleter;
-
-
 
 	if ((format != B_RGBA32 && format != B_RGB32)
 		|| (format == B_RGB32 && fDrawingMode != B_OP_COPY
@@ -1888,8 +1927,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer,
 				(int32)xOffset, (int32)yOffset, viewRect);
 			return;
-		} else if (fDrawingMode == B_OP_OVER
-			|| (fDrawingMode == B_OP_ALPHA
+		}
+		if (fDrawingMode == B_OP_OVER || (fDrawingMode == B_OP_ALPHA
 				 && fAlphaSrcMode == B_PIXEL_ALPHA
 				 && fAlphaFncMode == B_ALPHA_OVERLAY)) {
 			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4, srcBuffer,
@@ -1899,7 +1938,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	}
 
 	if (fDrawingMode == B_OP_COPY) {
-		if (options & B_FILTER_BITMAP_BILINEAR) {
+		if ((options & B_FILTER_BITMAP_BILINEAR) != 0) {
 			_DrawBitmapBilinearCopy32(srcBuffer, xOffset, yOffset, xScale,
 				yScale, viewRect);
 		} else {
@@ -1914,7 +1953,9 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		options);
 }
 
+
 #define DEBUG_DRAW_BITMAP 0
+
 
 // _DrawBitmapNoScale32
 template <class F>
@@ -1967,8 +2008,7 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 					+ (x1 - xOffset) * bytesPerSourcePixel;
 
 				for (; y1 <= y2; y1++) {
-					copyRowFunction(dstHandle, srcHandle, x2 - x1 + 1,
-									colorMap);
+					copyRowFunction(dstHandle, srcHandle, x2 - x1 + 1, colorMap);
 
 					dstHandle += dstBPR;
 					srcHandle += srcBPR;
@@ -1978,13 +2018,14 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 	} while (fBaseRenderer.next_clip_box());
 }
 
+
 // _DrawBitmapNearestNeighborCopy32
 void
 Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 	double xOffset, double yOffset, double xScale, double yScale,
 	BRect viewRect) const
 {
-//bigtime_t now = system_time();
+	//bigtime_t now = system_time();
 	uint32 dstWidth = viewRect.IntegerWidth() + 1;
 	uint32 dstHeight = viewRect.IntegerHeight() + 1;
 	uint32 srcWidth = srcBuffer.width();
@@ -2099,13 +2140,14 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 //printf("draw bitmap %.5fx%.5f: %lld\n", xScale, yScale, system_time() - now);
 }
 
+
 // _DrawBitmapBilinearCopy32
 void
 Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	double xOffset, double yOffset, double xScale, double yScale,
 	BRect viewRect) const
 {
-//bigtime_t now = system_time();
+	//bigtime_t now = system_time();
 	uint32 dstWidth = viewRect.IntegerWidth() + 1;
 	uint32 dstHeight = viewRect.IntegerHeight() + 1;
 	uint32 srcWidth = srcBuffer.width();
@@ -2216,13 +2258,13 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	// Figure out which version of the code we want to use...
 	enum {
 		kOptimizeForLowFilterRatio = 0,
-		kUsePlainCVersion,
+		kUseDefaultVersion,
 		kUseSIMDVersion
 	};
 
-	int codeSelect = kUsePlainCVersion;
+	int codeSelect = kUseDefaultVersion;
 
-	uint32 neededSIMDFlags = (APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE);
+	uint32 neededSIMDFlags = APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE;
 	if ((gAppServerSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
 		codeSelect = kUseSIMDVersion;
 	else {
@@ -2345,7 +2387,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 				break;
 			}
 
-			case kUsePlainCVersion:
+			case kUseDefaultVersion:
 			{
 				// In this mode we anticipate many pixels wich need filtering,
 				// there are no special cases for direct hit pixels except for
@@ -2432,6 +2474,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 				break;
 			}
 
+#ifdef __INTEL__
 			case kUseSIMDVersion:
 			{
 				// Basically the same as the "standard" mode, but we use SIMD
@@ -2499,7 +2542,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 				}
 				break;
 			}
-		} // switch(codeselect)
+#endif	// __INTEL__
+		}
 	} while (fBaseRenderer.next_clip_box());
 
 #ifdef FILTER_INFOS_ON_HEAP
@@ -2508,6 +2552,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 #endif
 //printf("draw bitmap %.5fx%.5f: %lld\n", xScale, yScale, system_time() - now);
 }
+
 
 // _DrawBitmapGeneric32
 void
@@ -2527,9 +2572,9 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	pixfmt_image pixf_img(srcBuffer);
 
 	agg::trans_affine srcMatrix;
-// NOTE: R5 seems to ignore this offset when drawing bitmaps
-//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left,
-//											   -actualBitmapRect.top);
+	// NOTE: R5 seems to ignore this offset when drawing bitmaps
+	//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left,
+	//		-actualBitmapRect.top);
 
 	agg::trans_affine imgMatrix;
 	imgMatrix *= agg::trans_affine_translation(xOffset - viewRect.left,
@@ -2588,6 +2633,7 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	}
 }
 
+
 // _InvertRect32
 void
 Painter::_InvertRect32(BRect r) const
@@ -2604,6 +2650,7 @@ Painter::_InvertRect32(BRect r) const
 		}
 	}
 }
+
 
 // _BlendRect32
 void
@@ -2631,14 +2678,17 @@ Painter::_BlendRect32(const BRect& r, const rgb_color& c) const
 
 			uint8* offset = dst + x1 * 4 + y1 * bpr;
 			for (; y1 <= y2; y1++) {
-				blend_line32(offset, x2 - x1 + 1, c.red, c.green, c.blue, c.alpha);
+				blend_line32(offset, x2 - x1 + 1, c.red, c.green, c.blue,
+					c.alpha);
 				offset += bpr;
 			}
 		}
 	} while (fBaseRenderer.next_clip_box());
 }
 
+
 // #pragma mark -
+
 
 template<class VertexSource>
 BRect
@@ -2654,6 +2704,7 @@ Painter::_BoundingBox(VertexSource& path) const
 	return BRect(left, top, right, bottom);
 }
 
+
 // agg_line_cap_mode_for
 inline agg::line_cap_e
 agg_line_cap_mode_for(cap_mode mode)
@@ -2668,6 +2719,7 @@ agg_line_cap_mode_for(cap_mode mode)
 	}
 	return agg::butt_cap;
 }
+
 
 // agg_line_join_mode_for
 inline agg::line_join_e
@@ -2699,14 +2751,12 @@ Painter::_StrokePath(VertexSource& path) const
 	stroke.miter_limit(fMiterLimit);
 
 	if (gSubpixelAntialiasing) {
-
 		fSubpixRasterizer.reset();
 		fSubpixRasterizer.add_path(stroke);
 
 		agg::render_scanlines(fSubpixRasterizer,
 			fSubpixPackedScanline, fSubpixRenderer);
 	} else {
-
 		fRasterizer.reset();
 		fRasterizer.add_path(stroke);
 
@@ -2720,13 +2770,13 @@ Painter::_StrokePath(VertexSource& path) const
 	return _Clipped(touched);
 }
 
+
 // _FillPath
 template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
 {
 	if (gSubpixelAntialiasing) {
-
 		fSubpixRasterizer.reset();
 		fSubpixRasterizer.add_path(path);
 		agg::render_scanlines(fSubpixRasterizer,
@@ -2739,6 +2789,7 @@ Painter::_FillPath(VertexSource& path) const
 
 	return _Clipped(_BoundingBox(path));
 }
+
 
 // _FillPath
 template<class VertexSource>
@@ -2785,6 +2836,7 @@ Painter::_FillPath(VertexSource& path, const BGradient& gradient) const
 
 	return _Clipped(_BoundingBox(path));
 }
+
 
 // _MakeGradient
 void
@@ -2865,6 +2917,7 @@ Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
 	}
 }
 
+
 // _MakeGradient
 template<class Array>
 void
@@ -2895,25 +2948,27 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 	}
 }
 
+
 // _CalcLinearGradientTransform
 void Painter::_CalcLinearGradientTransform(BPoint startPoint, BPoint endPoint,
-										   agg::trans_affine& mtx,
-										   float gradient_d2) const
+	agg::trans_affine& matrix, float gradient_d2) const
 {
 	float dx = endPoint.x - startPoint.x;
 	float dy = endPoint.y - startPoint.y;
-	mtx.reset();
-	mtx *= agg::trans_affine_scaling(sqrt(dx * dx + dy * dy) / gradient_d2);
-	mtx *= agg::trans_affine_rotation(atan2(dy, dx));
-	mtx *= agg::trans_affine_translation(startPoint.x, startPoint.y);
-	mtx.invert();
+
+	matrix.reset();
+	matrix *= agg::trans_affine_scaling(sqrt(dx * dx + dy * dy) / gradient_d2);
+	matrix *= agg::trans_affine_rotation(atan2(dy, dx));
+	matrix *= agg::trans_affine_translation(startPoint.x, startPoint.y);
+	matrix.invert();
 }
+
 
 // _FillPathGradientLinear
 template<class VertexSource>
 void
 Painter::_FillPathGradientLinear(VertexSource& path,
-								 const BGradientLinear& linear) const
+	const BGradientLinear& linear) const
 {
 	GTRACE("Painter::_FillPathGradientLinear\n");
 
@@ -2930,31 +2985,32 @@ Painter::_FillPathGradientLinear(VertexSource& path,
 				span_gradient_type> renderer_gradient_type;
 
 	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMtx;
-	interpolator_type spanInterpolator(gradientMtx);
+	agg::trans_affine gradientMatrix;
+	interpolator_type spanInterpolator(gradientMatrix);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
 	_MakeGradient(colorArray, linear);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
-									colorArray, 0, 100);
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-											spanGradient);
+		spanGradient);
 
-	_CalcLinearGradientTransform(start, end, gradientMtx);
+	_CalcLinearGradientTransform(start, end, gradientMatrix);
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
 	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
 }
 
+
 // _FillPathGradientRadial
 template<class VertexSource>
 void
 Painter::_FillPathGradientRadial(VertexSource& path,
-								 const BGradientRadial& radial) const
+	const BGradientRadial& radial) const
 {
 	GTRACE("Painter::_FillPathGradientRadial\n");
 
@@ -2972,22 +3028,22 @@ Painter::_FillPathGradientRadial(VertexSource& path,
 	span_gradient_type> renderer_gradient_type;
 
 	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMtx;
-	interpolator_type spanInterpolator(gradientMtx);
+	agg::trans_affine gradientMatrix;
+	interpolator_type spanInterpolator(gradientMatrix);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
 	_MakeGradient(colorArray, radial);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
-									colorArray, 0, 100);
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-											spanGradient);
+		spanGradient);
 
-	gradientMtx.reset();
-	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
-	gradientMtx.invert();
+	gradientMatrix.reset();
+	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
+	gradientMatrix.invert();
 
 //	_CalcLinearGradientTransform(start, end, gradientMtx);
 
@@ -2996,11 +3052,12 @@ Painter::_FillPathGradientRadial(VertexSource& path,
 	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
 }
 
+
 // _FillPathGradientRadialFocus
 template<class VertexSource>
 void
 Painter::_FillPathGradientRadialFocus(VertexSource& path,
-							const BGradientRadialFocus& focus) const
+	const BGradientRadialFocus& focus) const
 {
 	GTRACE("Painter::_FillPathGradientRadialFocus\n");
 
@@ -3019,35 +3076,36 @@ Painter::_FillPathGradientRadialFocus(VertexSource& path,
 	span_gradient_type> renderer_gradient_type;
 
 	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMtx;
-	interpolator_type spanInterpolator(gradientMtx);
+	agg::trans_affine gradientMatrix;
+	interpolator_type spanInterpolator(gradientMatrix);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
 	_MakeGradient(colorArray, focus);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
-									colorArray, 0, 100);
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-											spanGradient);
+		spanGradient);
 
-	gradientMtx.reset();
-	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
-	gradientMtx.invert();
+	gradientMatrix.reset();
+	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
+	gradientMatrix.invert();
 
-	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
 	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
 }
 
+
 // _FillPathGradientDiamond
 template<class VertexSource>
 void
 Painter::_FillPathGradientDiamond(VertexSource& path,
-								  const BGradientDiamond& diamond) const
+	const BGradientDiamond& diamond) const
 {
 	GTRACE("Painter::_FillPathGradientDiamond\n");
 
@@ -3064,35 +3122,36 @@ Painter::_FillPathGradientDiamond(VertexSource& path,
 	span_gradient_type> renderer_gradient_type;
 
 	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMtx;
-	interpolator_type spanInterpolator(gradientMtx);
+	agg::trans_affine gradientMatrix;
+	interpolator_type spanInterpolator(gradientMatrix);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
 	_MakeGradient(colorArray, diamond);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
-									colorArray, 0, 100);
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-											spanGradient);
+		spanGradient);
 
-	gradientMtx.reset();
-	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
-	gradientMtx.invert();
+	gradientMatrix.reset();
+	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
+	gradientMatrix.invert();
 
-	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
 	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
 }
 
+
 // _FillPathGradientConic
 template<class VertexSource>
 void
 Painter::_FillPathGradientConic(VertexSource& path,
-								const BGradientConic& conic) const
+	const BGradientConic& conic) const
 {
 	GTRACE("Painter::_FillPathGradientConic\n");
 
@@ -3109,24 +3168,24 @@ Painter::_FillPathGradientConic(VertexSource& path,
 	span_gradient_type> renderer_gradient_type;
 
 	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMtx;
-	interpolator_type spanInterpolator(gradientMtx);
+	agg::trans_affine gradientMatrix;
+	interpolator_type spanInterpolator(gradientMatrix);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
 	_MakeGradient(colorArray, conic);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
-									colorArray, 0, 100);
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-											spanGradient);
+		spanGradient);
 
-	gradientMtx.reset();
-	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
-	gradientMtx.invert();
+	gradientMatrix.reset();
+	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
+	gradientMatrix.invert();
 
-	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);

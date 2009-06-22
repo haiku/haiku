@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -39,11 +39,13 @@ BTokenSpace gTokenSpace;
 uint32 gAppServerSIMDFlags = 0;
 
 
-/*! Detect SIMD flags for use in AppServer. Checks all CPUs in the system
-	and chooses the minimum supported set of instructions. */
+/*!	Detect SIMD flags for use in AppServer. Checks all CPUs in the system
+	and chooses the minimum supported set of instructions.
+*/
 static void
 detect_simd()
 {
+#if __INTEL__
 	// Only scan CPUs for which we are certain the SIMD flags are properly
 	// defined.
 	char* vendorNames[] = {
@@ -56,15 +58,15 @@ detect_simd()
 		0
 	};
 
-	system_info sysInfo;
-	if (get_system_info(&sysInfo) != B_OK || sysInfo.cpu_count < 1)
+	system_info systemInfo;
+	if (get_system_info(&systemInfo) != B_OK)
 		return;
 
 	// We start out with all flags set and end up with only those flags
 	// supported across all CPUs found.
 	uint32 appServerSIMD = 0xffffffff;
 
-	for (int32 cpu = 0; cpu < sysInfo.cpu_count; cpu++) {
+	for (int32 cpu = 0; cpu < systemInfo.cpu_count; cpu++) {
 		cpuid_info cpuInfo;
 		get_cpuid(&cpuInfo, 0, cpu);
 
@@ -95,7 +97,11 @@ detect_simd()
 		appServerSIMD &= cpuSIMD;
 	}
 	gAppServerSIMDFlags = appServerSIMD;
+#endif	// __INTEL__
 }
+
+
+//	#pragma mark -
 
 
 /*!
@@ -138,13 +144,10 @@ AppServer::AppServer()
 
 	// Initialize SIMD flags
 	detect_simd();
-#if 0
-	_LaunchCursorThread();
-#endif
 }
 
-/*!
-	\brief Destructor
+
+/*!	\brief Destructor
 	Reached only when the server is asked to shut down in Test mode.
 */
 AppServer::~AppServer()
@@ -161,9 +164,6 @@ AppServer::~AppServer()
 }
 
 
-/*!
-	\brief The call that starts it all...
-*/
 void
 AppServer::RunLooper()
 {
@@ -172,8 +172,7 @@ AppServer::RunLooper()
 }
 
 
-/*!
-	\brief Creates a desktop object for an authorized user
+/*!	\brief Creates a desktop object for an authorized user
 */
 Desktop *
 AppServer::_CreateDesktop(uid_t userID)
@@ -205,8 +204,7 @@ AppServer::_CreateDesktop(uid_t userID)
 }
 
 
-/*!
-	\brief Finds the desktop object that belongs to a certain user
+/*!	\brief Finds the desktop object that belongs to a certain user
 */
 Desktop *
 AppServer::_FindDesktop(uid_t userID)
@@ -224,8 +222,7 @@ AppServer::_FindDesktop(uid_t userID)
 }
 
 
-/*!
-	\brief Message handling function for all messages sent to the app_server
+/*!	\brief Message handling function for all messages sent to the app_server
 	\param code ID of the message sent
 	\param buffer Attachment buffer for the message.
 

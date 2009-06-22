@@ -12,6 +12,11 @@ UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
 
+local PAINTER_ARCH_SOURCES ;
+if $(TARGET_ARCH) = x86 {
+	PAINTER_ARCH_SOURCES = painter_bilinear_scale.nasm ;
+}
+
 StaticLibrary libpainter.a :
 	GlobalSubpixelSettings.cpp
 	Painter.cpp
@@ -22,5 +27,5 @@ StaticLibrary libpainter.a :
 
 	AGGTextRenderer.cpp
 
-	painter_bilinear_scale.nasm
+	$(PAINTER_ARCH_SOURCES)
 ;
