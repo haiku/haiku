@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.91, Rudolf)</h1></p>
+<p><h1>head (SVN 0.93, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -12,16 +12,17 @@
 <li>Modified two default settings for the driver:
 <ul>
 <li>'pgm_panel' is now preset to 'false' since this will probably increase chances of a good picture on panels outthere.
-<li>'force_ws' is now (re-enabled but) preset to 'true' since the number of widescreen monitors outthere is rapidly becoming mainstream.<br> <strong>Note please:</strong><br>
-'force_ws' was hardcoded to setting 'true' some time ago by the Haiku team because of these monitors.
+<li>'force_ws' is (re-enabled and) preset to 'false' since automatic widescreen detection now works for both analog and digital screens (thanks to added DDC/EDID processing).<br> <strong>Note please:</strong><br>
+'force_ws' was hardcoded to setting 'true' some time ago by the Haiku team because of lacking analog monitor widescreen autodetection.
 </ul>
 <li>Added 'block_acc' option in nvidia.settings to completely disable the acceleration engine. Use this as a work-around if the acceleration engine misbehaves.
 <li>Fixed card/system hanging after trying to log LVDS/TMDS distinction info. This (at least) fixes one NV34 trying to startup after a failed kernel VESA modeswitch without using the driver's coldstart option. Might very well help on other type cards too.
 <li>HDTV video upto/including 1920x1080p can now be played back using overlay on Geforce cards where overlay is supported. On TNT1/TNT2/TNT2-M64 this can't be done and bitmap output is used.
-<li>Added partial DDC/EDID support: dumping monitor specs to logfile only for now.
+<li>Added partial DDC/EDID support: dumping monitor specs to logfile, detecting analog connected screens and doing analog widescreen autodetection.
 <li>Added confirmed support for laptop card with ID 0x01d7: Quadro NVS 110M/GeForce 7300 Go. Also fixed support for laptop card with ID 0x01d8: GeForce 7400 Go: the 'laptop' definition was missing here.
 <li>Fixed acceleration engine crashes on at least G72 cards (Geforce 7300/7400/7500) by powering up new part(s) of the acceleration engines too..
 <li>Modified GPU PTimer programming which according to the Nouveau project fixes LVDS panel programming in some cases.
+<li>Corrected/Added detection of third I2C bus on cards that support it. The old detection method for a third and (non-existing) fourth bus was faulty. The driver uses I2C channels for monitor DDC/EDID and TVencoder communications.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
@@ -251,7 +252,7 @@ The features below are shutdown because they are possibly dangerous without feed
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>Extend TVout feature to support more encoder-types (Chrontel, Philips);
-	<li>Improve/extend various stuff when/if possible (like adding DDC/EDID, GTF).
+	<li>Improve/extend various stuff when/if possible (like extending the use of DDC/EDID).
 </ul>
 </p>
 </body>

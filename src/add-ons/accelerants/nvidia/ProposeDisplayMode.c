@@ -19,6 +19,7 @@
 /* Standard VESA modes,
  * plus panel specific resolution modes which are internally modified during run-time depending on the requirements of the actual
  * panel connected. The modes as listed here, should timing-wise be as compatible with analog (CRT) monitors as can be... */
+//fixme: if EDID monitor found create list via common EDID code...
 static const display_mode mode_list[] = {
 /* 4:3 modes; 307.2k pixels */
 { { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
@@ -85,8 +86,10 @@ static const display_mode mode_list[] = {
 /* 16:10 panel mode; 2.304M pixels */
 { { 193160, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 //{ { 160000, 1920, 2010, 2060, 2110, 1200, 1202, 1208, 1235, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
-/* 16:9 panel mode; 1280x720 */
+/* 16:9 panel mode; 1280x720 (HDTV 1280x720p) */
 { { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X720) */
+/* fixme, add: 16:9 panel mode; 1366x768 (HDTV '1280x720p') */
+/* fixme, add: 16:9 panel mode; 1920x1080 (HDTV 1920x1080p) */
 };
 
 
@@ -140,86 +143,82 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 	/* disable aspect checks for a requested TVout mode when mode is TVout capable */
 	if (!si->ps.tvout
 		|| !(BT_check_tvmode(*target) && (target->flags & TV_BITS))) {
-		/* check if all connected output devices can display the requested mode's aspect: */
+		/* check if all connected output devices can display the requested mode's aspect.
+		 * assuming 16:10 screens can display non-WS modes, but cannot (correctly) display 16:9 modes;
+		 * assuming  16:9 screens can display non-WS modes, and can display 16:10 modes. */
 		/* calculate display mode aspect */
 		target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
 		/* NOTE:
 		 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
 		switch (si->ps.monitors) {
-			case CRTC1_TMDS: /* digital panel on head 1, nothing on head 2 */
-				if (si->ps.crtc1_aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-			case CRTC2_TMDS: /* nothing on head 1, digital panel on head 2 */
-				if (si->ps.crtc2_aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-			case CRTC1_TMDS | CRTC2_TMDS: /* digital panels on both heads */
-				if ((si->ps.crtc1_aspect < (target_aspect - 0.10))
-					|| (si->ps.crtc2_aspect < (target_aspect - 0.10))) {
-					LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-//
-//			case CRTC1_VGA: /* analog connected screen on head 1, nothing on head 2 */
-//				if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
-//					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
-//					return B_ERROR;
-//				}
-//				break;
-//
-			default:
-				/* at least one analog monitor is connected, or nothing detected at all */
-				/* (if forcing widescreen type was requested don't block mode) */
+			case 0: /* no monitor found at all */
+				/* if forcing widescreen type was requested don't block mode */
 				if (target_aspect > 1.34 && !si->settings.force_ws) {
 					LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
-		}
-
-		/* only export widescreen panel-TV modes when an exact resolution match exists,
-		 * to prevent the modelist from becoming too crowded */
-		if (target_aspect > 1.61 && !si->settings.force_ws) {
-			status_t panel_TV_stat = B_ERROR;
-
-			if (si->ps.monitors & CRTC1_TMDS) {
-				if (target->timing.h_display == si->ps.p1_timing.h_display
-					&& target->timing.v_display == si->ps.p1_timing.v_display)
-					panel_TV_stat = B_OK;
-			}
-			if (si->ps.monitors & CRTC2_TMDS) {
-				if (target->timing.h_display == si->ps.p2_timing.h_display
-					&& target->timing.v_display == si->ps.p2_timing.v_display)
-					panel_TV_stat = B_OK;
-			}
-			if (panel_TV_stat != B_OK) {
-				LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
-				return B_ERROR;
-			}
+			case CRTC1_TMDS:	/* digital panel on head 1, nothing on head 2 */
+			case CRTC1_VGA:		/* analog connected screen on head 1, nothing on head 2 */
+				if (si->ps.crtc1_aspect < (target_aspect - 0.10)) {
+					LOG(4, ("PROPOSEMODE: screen at crtc1 is not widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
+			case CRTC2_TMDS:	/* nothing on head 1, digital panel on head 2 */
+			case CRTC2_VGA:		/* analog connected screen on head 2, nothing on head 1 */
+				if (si->ps.crtc2_aspect < (target_aspect - 0.10)) {
+					LOG(4, ("PROPOSEMODE: screen at crtc2 is not widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
+			case CRTC1_TMDS | CRTC2_TMDS:	/* digital panels on both heads */
+			case CRTC1_VGA | CRTC2_VGA:		/* analog connected screens on both heads */
+			case CRTC1_TMDS | CRTC2_VGA:	/* digital panel on head 1, analog connected screen on head 2 */
+			case CRTC1_VGA | CRTC2_TMDS:	/* analog connected screen on head 1, digital panel on head 2 */
+			default:						/* more than two screens connected (illegal setup) */
+				if ((si->ps.crtc1_aspect < (target_aspect - 0.10)) ||
+					(si->ps.crtc2_aspect < (target_aspect - 0.10))) {
+					LOG(4, ("PROPOSEMODE: not all connected screens are widescreen type, aborted.\n"));
+					return B_ERROR;
+				}
+				break;
 		}
 	}
 
-	/* check if panel(s) can display the requested resolution (if connected) */
+	/* check if screen(s) can display the requested resolution (if connected) */
 	if (si->ps.monitors & CRTC1_TMDS) {
 		if (target->timing.h_display > si->ps.p1_timing.h_display
 			|| target->timing.v_display > si->ps.p1_timing.v_display) {
-			LOG(4, ("PROPOSEMODE: panel1 can't display requested resolution, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: panel at crtc11 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
 	if (si->ps.monitors & CRTC2_TMDS) {
 		if (target->timing.h_display > si->ps.p2_timing.h_display
 			|| target->timing.v_display > si->ps.p2_timing.v_display) {
-			LOG(4, ("PROPOSEMODE: panel2 can't display requested resolution, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: panel at crtc2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
+//still expand/update concerning edid, among others.. (setup accounting for cross-connected vga screens...):
+/*
+	if (si->ps.monitors & CRTC1_VGA) {
+		if (target->timing.h_display > si->ps.xxx_timing.h_display
+			|| target->timing.v_display > si->ps.xxx_timing.v_display) {
+			LOG(4, ("PROPOSEMODE: analog screen at crtc1 can't display requested resolution, aborted.\n"));
+			return B_ERROR;
+		}
+	}
+	if (si->ps.monitors & CRTC2_VGA) {
+		if (target->timing.h_display > si->ps.yyy_timing.h_display
+			|| target->timing.v_display > si->ps.yyy_timing.v_display) {
+			LOG(4, ("PROPOSEMODE: analog screen at crtc2 can't display requested resolution, aborted.\n"));
+			return B_ERROR;
+		}
+	}
+*/
+//end still update.
 
 	/* validate display vs. virtual */
 	if (target->timing.h_display > target->virtual_width || want_same_width)

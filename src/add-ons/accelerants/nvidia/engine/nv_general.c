@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-5/2009
+   Rudolf Cornelissen 10/2002-6/2009
    tst..
 */
 
@@ -92,7 +92,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.92 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.93 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)

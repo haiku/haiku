@@ -2191,7 +2191,7 @@ void fake_panel_start(void)
 	/* select other CRTC for primary head use if specified by user in settings file */
 	if (si->ps.secondary_head && si->settings.switchhead)
 	{
-		LOG(2,("INFO: inverting head use (specified in settings file)\n"));
+		LOG(2,("INFO: inverting head use (specified in nvidia.settings file)\n"));
 		si->ps.crtc2_prim = !si->ps.crtc2_prim;
 	}
 }
@@ -2584,18 +2584,34 @@ static void setup_output_matrix()
 				if (!si->ps.con1_screen.digital) {
 					si->ps.monitors |= CRTC1_VGA;
 					si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
 				}
 			} else {
-				if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
+				if (nv_dac_crt_connected()) {
+					si->ps.monitors |= CRTC1_VGA;
+					/* assume 4:3 monitor */
+					si->ps.crtc1_aspect = 1.33;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
+				}
 			}
 			/* secondary connector */
 			if (si->ps.con2_screen.have_edid) {
 				if (!si->ps.con2_screen.digital) {
 					si->ps.monitors |= CRTC2_VGA;
 					si->ps.crtc2_aspect = si->ps.con2_screen.aspect;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
 				}
 			} else {
-				if (nv_dac2_crt_connected()) si->ps.monitors |= CRTC2_VGA;
+				if (nv_dac2_crt_connected()) {
+					si->ps.monitors |= CRTC2_VGA;
+					/* assume 4:3 monitor */
+					si->ps.crtc2_aspect = 1.33;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
+				}
 			}
 
 			/* setup correct output and head use */
@@ -2713,9 +2729,20 @@ static void setup_output_matrix()
 			/* (load sensing is confirmed working OK on NV11.) */
 			/* primary connector: */
 			if (si->ps.con1_screen.have_edid) {
-				if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
+				if (!si->ps.con1_screen.digital) {
+					si->ps.monitors |= CRTC1_VGA;
+					si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
+				}
 			} else {
-				if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
+				if (nv_dac_crt_connected()) {
+					si->ps.monitors |= CRTC1_VGA;
+					/* assume 4:3 monitor */
+					si->ps.crtc1_aspect = 1.33;
+					/* force widescreen type if requested */
+					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
+				}
 			}
 			/* (sense analog monitor on secondary connector is impossible on NV11) */
 
@@ -2777,9 +2804,20 @@ static void setup_output_matrix()
 		/* (load sensing is confirmed working OK on all cards.) */
 		/* primary connector: */
 		if (si->ps.con1_screen.have_edid) {
-			if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
+			if (!si->ps.con1_screen.digital) {
+				si->ps.monitors |= CRTC1_VGA;
+				si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
+				/* force widescreen type if requested */
+				if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
+			}
 		} else {
-			if (nv_dac_crt_connected()) si->ps.monitors |= CRTC1_VGA;
+			if (nv_dac_crt_connected()) {
+				si->ps.monitors |= CRTC1_VGA;
+				/* assume 4:3 monitor */
+				si->ps.crtc1_aspect = 1.33;
+				/* force widescreen type if requested */
+				if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
+			}
 		}
 
 		//fixme? add TVout (only, so no CRT connected) support...

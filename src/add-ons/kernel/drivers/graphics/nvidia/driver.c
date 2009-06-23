@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-3/2009.
+	Rudolf Cornelissen 3/2002-6/2009.
 */
 
 
@@ -379,7 +379,7 @@ static nv_settings sSettings = { // see comments in nvidia.settings
 	true,					// dma_acc
 	false,					// vga_on_tv
 	false,					// force_sync
-	true,					// force_ws
+	false,					// force_ws
 	false,					// block_acc
 	0,						// gpu_clk
 	0,						// ram_clk

@@ -53,7 +53,7 @@ Geforce 8xxx and later series cards (NV50, G80, also known as GPGPU, general pur
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
 	<li><strong>NV40 architecture cards:</strong> (GeForce 6xxx, but 6800 AGP seems to be OK)<br>
- 	Secondary analog monitor detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
+ 	Secondary analog monitor load detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
 </ul>
 <br>
 <hr>
@@ -229,11 +229,9 @@ If you select <strong>force_sync false</strong> the driver's 3D accelerant will 
 	<li><strong>force_ws:</strong><br>
 This option (if enabled) overrules the aspect ratio detection for screens inside the driver. When set to <strong>true</strong> it forces all monitors to be treated as widescreen types.
 	<ul>
-		<li><strong>false:</strong><br>
-If you select <strong>force_ws false</strong> the driver will autodetect the screen's aspect ratio if it can, otherwise it will force 4:3 aspect. Screens that are connected with a DVI cable and screens inside a laptop are autodetected (according to the cardBIOS presets done), but analog connected screens will always make the driver block widescreen modes. Connected analog TV sets are always treated like widescreen devices though.
-		<li><strong>true:</strong> (default setting) <br> With this setting all monitors are treated as being widescreen types. This setting should only be used if you are having trouble using a widescreen monitor, because on non-widescreen monitors there's a (small) chance of destroying them if used with a widescreen mode. So use this setting with care.<br>
-<strong>Note please:</strong><br>
-The default setting was changed from <strong>false</strong> to being <strong>true</strong> on request by Haiku because widescreen monitors are rapidly becoming commonplace these days. In the future EDID will be implemented in the driver to actually fetch this info from the connected screens.
+		<li><strong>false:</strong> (default setting)<br>
+If you select <strong>force_ws false</strong> the driver will autodetect the screen's aspect ratio if it can, otherwise it will force 4:3 aspect. Screens that are connected with a DVI cable and screens inside a laptop are autodetected (according to the cardBIOS presets done), analog connected screens will also be autodetected if DDC/EDID works: otherwise the driver blocks widescreen modes. Connected analog TV sets are always treated like widescreen devices though.
+		<li><strong>true:</strong><br> With this setting all monitors are treated as being widescreen types. This setting should only be used if you are having trouble using a widescreen monitor, because on non-widescreen monitors there's a (small) chance of destroying them if used with a widescreen mode. Some non-widescreen monitors will simply shut-off or display a black screen. So use this setting with care.<br>
 	</ul>
 <li><strong>primary:</strong> (set to disabled by default)<br>
 Primary lets you force a certain card to be used as primary card in your system if you have multiple graphics cards installed: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also set 'usebios false' as otherwise the card(s) aren't coldstarted by the driver.<br>
@@ -255,6 +253,6 @@ The acceleration engine is disabled.
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on May 1, 2009)</p>
+<p>(Page last updated on June 23, 2009)</p>
 </body>
 </html>
