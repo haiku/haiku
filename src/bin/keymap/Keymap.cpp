@@ -20,7 +20,6 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
-#include <TextView.h>
 
 
 #define CHARS_TABLE_MAXSIZE  10000
@@ -620,6 +619,7 @@ Keymap::SaveAsSource(const char* name)
 	if (file == NULL)
 		return errno;
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	text_run_array* textRuns;
 	_SaveSourceText(file, &textRuns);
 
@@ -635,6 +635,9 @@ Keymap::SaveAsSource(const char* name)
 
 		BTextView::FreeRunArray(textRuns);
 	}
+#else
+	_SaveSourceText(file);
+#endif
 
 	return B_OK;
 }
@@ -643,7 +646,7 @@ Keymap::SaveAsSource(const char* name)
 status_t
 Keymap::SaveAsSource(FILE* file)
 {
-	_SaveSourceText(file, NULL);
+	_SaveSourceText(file);
 	return B_OK;
 }
 
@@ -1128,6 +1131,7 @@ Keymap::GetKey(char* chars, int32 offset, char* string)
 }
 
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 void
 Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 {
@@ -1136,9 +1140,16 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		runs = BTextView::AllocRunArray(8);
 		*_textRuns = runs;
 	}
+#else
+void
+Keymap::_SaveSourceText(FILE* file)
+{
+#endif
 
 	static const rgb_color kCommentColor = (rgb_color){200, 92, 92, 255};
 	static const rgb_color kTextColor = (rgb_color){0, 0, 0, 255};
+
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	BFont font = *be_fixed_font;
 
 	if (runs != NULL) {
@@ -1146,17 +1157,20 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		runs->runs[0].font = font;
 		runs->runs[0].color = kCommentColor;
 	}
+#endif
 
 	int bytes = fprintf(file, "#!/bin/keymap -l\n"
 		"#\n"
 		"#\tRaw key numbering for 101 keyboard...\n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[1].offset = bytes;
 		runs->runs[1].font = font;
 		runs->runs[1].font.SetSize(9);
 		runs->runs[1].color = kCommentColor;
 	}
+#endif
 
 	bytes += fprintf(file, "#                                                                                        [sys]       [brk]\n"
 		"#                                                                                         0x7e        0x7f\n"
@@ -1178,11 +1192,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		"# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
 		"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[2].offset = bytes;
 		runs->runs[2].font = font;
 		runs->runs[2].color = kCommentColor;
 	}
+#endif
 
 	bytes += fprintf(file, "#\n"
 		"#\tNOTE: On a Microsoft Natural Keyboard:\n"
@@ -1195,11 +1211,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		"#\t\t\tkeypad '='   = 0x6a\n"
 		"#\t\t\tpower key    = 0x6b\n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[3].offset = bytes;
 		runs->runs[3].font = *be_fixed_font;
 		runs->runs[3].color = kTextColor;
 	}
+#endif
 
 	bytes += fprintf(file, "Version = %ld\n"
 		"CapsLock = 0x%02lx\n"
@@ -1219,11 +1237,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		fKeys.right_command_key, fKeys.left_control_key, fKeys.right_control_key,
 		fKeys.left_option_key, fKeys.right_option_key, fKeys.menu_key);
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[4].offset = bytes;
 		runs->runs[4].font = *be_fixed_font;
 		runs->runs[4].color = kCommentColor;
 	}
+#endif
 
 	bytes += fprintf(file, "#\n"
 		"# Lock settings\n"
@@ -1234,11 +1254,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		"#   LockSettings = CapsLock NumLock ScrollLock\n"
 		"#\n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[5].offset = bytes;
 		runs->runs[5].font = *be_fixed_font;
 		runs->runs[5].color = kTextColor;
 	}
+#endif
 
 	bytes += fprintf(file, "LockSettings = ");
 	if ((fKeys.lock_settings & B_CAPS_LOCK) != 0)
@@ -1249,11 +1271,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		bytes += fprintf(file, "ScrollLock ");
 	bytes += fprintf(file, "\n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[6].offset = bytes;
 		runs->runs[6].font = *be_fixed_font;
 		runs->runs[6].color = kCommentColor;
 	}
+#endif
 
 	bytes += fprintf(file, "# Legend:\n"
 		"#   n = Normal\n"
@@ -1263,11 +1287,13 @@ Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 		"#   o = Option\n"
 		"# Key      n        s        c        o        os       C        Cs       Co       Cos     \n");
 
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (runs != NULL) {
 		runs->runs[7].offset = bytes;
 		runs->runs[7].font = *be_fixed_font;
 		runs->runs[7].color = kTextColor;
 	}
+#endif
 
 	for (int idx = 0; idx < 128; idx++) {
 		char normalKey[32];
