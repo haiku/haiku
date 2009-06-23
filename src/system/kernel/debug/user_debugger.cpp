@@ -223,8 +223,10 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
 		info->causing_thread = -1;
 		info->image_event = 0;
 
-		if (initLock)
+		if (initLock) {
 			B_INITIALIZE_SPINLOCK(&info->lock);
+			info->debugger_changed_condition = NULL;
+		}
 	}
 }
 
@@ -345,6 +347,90 @@ destroy_thread_debug_info(struct thread_debug_info *info)
 
 		atomic_set(&info->flags, 0);
 	}
+}
+
+
+static status_t
+prepare_debugger_change(team_id teamID, ConditionVariable& condition,
+	struct team*& team)
+{
+	// We look up the team by ID, even in case of the current team, so we can be
+	// sure, that the team is not already dying.
+	if (teamID == B_CURRENT_TEAM)
+		teamID = thread_get_current_thread()->team->id;
+
+	while (true) {
+		// get the team
+		InterruptsSpinLocker teamLocker(gTeamSpinlock);
+
+		team = team_get_team_struct_locked(teamID);
+		if (team == NULL)
+			return B_BAD_TEAM_ID;
+
+		// don't allow messing with the kernel team
+		if (team == team_get_kernel_team())
+			return B_NOT_ALLOWED;
+
+		// check whether the condition is already set
+		SpinLocker threadLocker(gThreadSpinlock);
+		SpinLocker debugInfoLocker(team->debug_info.lock);
+
+		if (team->debug_info.debugger_changed_condition == NULL) {
+			// nobody there yet -- set our condition variable and be done
+			team->debug_info.debugger_changed_condition = &condition;
+			return B_OK;
+		}
+
+		// we'll have to wait
+		ConditionVariableEntry entry;
+		team->debug_info.debugger_changed_condition->Add(&entry);
+
+		debugInfoLocker.Unlock();
+		threadLocker.Unlock();
+		teamLocker.Unlock();
+
+		entry.Wait();
+	}
+}
+
+
+static void
+prepare_debugger_change(struct team* team, ConditionVariable& condition)
+{
+	while (true) {
+		// check whether the condition is already set
+		InterruptsSpinLocker threadLocker(gThreadSpinlock);
+		SpinLocker debugInfoLocker(team->debug_info.lock);
+
+		if (team->debug_info.debugger_changed_condition == NULL) {
+			// nobody there yet -- set our condition variable and be done
+			team->debug_info.debugger_changed_condition = &condition;
+			return;
+		}
+
+		// we'll have to wait
+		ConditionVariableEntry entry;
+		team->debug_info.debugger_changed_condition->Add(&entry);
+
+		debugInfoLocker.Unlock();
+		threadLocker.Unlock();
+
+		entry.Wait();
+	}
+}
+
+
+static void
+finish_debugger_change(struct team* team)
+{
+	// unset our condition variable and notify all threads waiting on it
+	InterruptsSpinLocker threadLocker(gThreadSpinlock);
+	SpinLocker debugInfoLocker(team->debug_info.lock);
+
+	ConditionVariable* condition = team->debug_info.debugger_changed_condition;
+	team->debug_info.debugger_changed_condition = NULL;
+
+	condition->NotifyAll(true);
 }
 
 
@@ -1406,11 +1492,13 @@ nub_thread_cleanup(struct thread *nubThread)
 	TRACE(("nub_thread_cleanup(%ld): debugger port: %ld\n", nubThread->id,
 		nubThread->team->debug_info.debugger_port));
 
+	ConditionVariable debugChangeCondition;
+	prepare_debugger_change(nubThread->team, debugChangeCondition);
+
 	team_debug_info teamDebugInfo;
 	bool destroyDebugInfo = false;
 
 	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
 	GRAB_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 
 	team_debug_info &info = nubThread->team->debug_info;
@@ -1425,8 +1513,9 @@ nub_thread_cleanup(struct thread *nubThread)
 	update_threads_debugger_installed_flag(nubThread->team);
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
-	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
+
+	finish_debugger_change(nubThread->team);
 
 	if (destroyDebugInfo)
 		destroy_team_debug_info(&teamDebugInfo);
@@ -2526,13 +2615,23 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	}
 	team_id debuggerTeam = debuggerPortInfo.team;
 
-	// check the debugger team: It must neither be the kernel team nor the
-	// debugged team
+	// Check the debugger team: It must neither be the kernel team nor the
+	// debugged team.
 	if (debuggerTeam == team_get_kernel_team_id() || debuggerTeam == teamID) {
 		TRACE(("install_team_debugger(): Can't debug kernel or debugger team. "
 			"debugger: %ld, debugged: %ld\n", debuggerTeam, teamID));
 		return B_NOT_ALLOWED;
 	}
+
+	// get the team
+	struct team* team;
+	ConditionVariable debugChangeCondition;
+	error = prepare_debugger_change(teamID, debugChangeCondition, team);
+	if (error != B_OK)
+		return error;
+
+	// get the real team ID
+	teamID = team->id;
 
 	// check, if a debugger is already installed
 
@@ -2544,90 +2643,73 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	port_id nubPort = -1;
 
 	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-	// get a real team ID
-	// We look up the team by ID, even in case of the current team, so we can be
-	// sure, that the team is not already dying.
-	if (teamID == B_CURRENT_TEAM)
-		teamID = thread_get_current_thread()->team->id;
+	int32 teamDebugFlags = team->debug_info.flags;
 
-	struct team *team = team_get_team_struct_locked(teamID);
-
-	if (team) {
-		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-		int32 teamDebugFlags = team->debug_info.flags;
-
-		if (team == team_get_kernel_team()) {
-			// don't allow to debug the kernel
-			error = B_NOT_ALLOWED;
-		} else if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-			// There's already a debugger installed.
-			if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDOVER) {
-				if (dontReplace) {
-					// We're fine with already having a debugger.
-					error = B_OK;
-					done = true;
-					result = team->debug_info.nub_port;
-				} else if (
-					teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) {
-					// Another debugger is in the process of installing itself
-					// as the team's debugger.
-					error = (dontReplace ? B_OK : B_BAD_VALUE);
-					done = true;
-					result = team->debug_info.nub_port;
-				} else {
-					// a handover to another debugger is requested
-					// Set the handing-over flag -- we'll clear both flags after
-					// having sent the handed-over message to the new debugger.
-					atomic_or(&team->debug_info.flags,
-						B_TEAM_DEBUG_DEBUGGER_HANDING_OVER);
-
-					oldDebuggerPort = team->debug_info.debugger_port;
-					result = nubPort = team->debug_info.nub_port;
-					if (causingThread < 0)
-						causingThread = team->debug_info.causing_thread;
-
-					// set the new debugger
-					install_team_debugger_init_debug_infos(team, debuggerTeam,
-						debuggerPort, nubPort, team->debug_info.nub_thread,
-						team->debug_info.debugger_write_lock, causingThread);
-
-					releaseDebugInfoLock = false;
-					handOver = true;
-					done = true;
-
-					// finally set the new port owner
-					if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
-						// The old debugger must just have died. Just proceed as
-						// if there was no debugger installed. We may still be too
-						// early, in which case we'll fail, but this race condition
-						// should be unbelievably rare and relatively harmless.
-						handOver = false;
-						done = false;
-					}
-				}
-			} else {
-				// there's already a debugger installed
+	if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		// There's already a debugger installed.
+		if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDOVER) {
+			if (dontReplace) {
+				// We're fine with already having a debugger.
+				error = B_OK;
+				done = true;
+				result = team->debug_info.nub_port;
+			} else if (
+				teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) {
+				// Another debugger is in the process of installing itself
+				// as the team's debugger.
 				error = (dontReplace ? B_OK : B_BAD_VALUE);
 				done = true;
 				result = team->debug_info.nub_port;
+			} else {
+				// a handover to another debugger is requested
+				// Set the handing-over flag -- we'll clear both flags after
+				// having sent the handed-over message to the new debugger.
+				atomic_or(&team->debug_info.flags,
+					B_TEAM_DEBUG_DEBUGGER_HANDING_OVER);
+
+				oldDebuggerPort = team->debug_info.debugger_port;
+				result = nubPort = team->debug_info.nub_port;
+				if (causingThread < 0)
+					causingThread = team->debug_info.causing_thread;
+
+				// set the new debugger
+				install_team_debugger_init_debug_infos(team, debuggerTeam,
+					debuggerPort, nubPort, team->debug_info.nub_thread,
+					team->debug_info.debugger_write_lock, causingThread);
+
+				releaseDebugInfoLock = false;
+				handOver = true;
+				done = true;
+
+				// finally set the new port owner
+				if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
+					// The old debugger must just have died. Just proceed as
+					// if there was no debugger installed. We may still be too
+					// early, in which case we'll fail, but this race condition
+					// should be unbelievably rare and relatively harmless.
+					handOver = false;
+					done = false;
+				}
 			}
-		} else if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_DISABLED) != 0
-			&& useDefault) {
-			// No debugger yet, disable_debugger() had been invoked, and we
-			// would install the default debugger. Just fail.
-			error = B_BAD_VALUE;
+		} else {
+			// there's already a debugger installed
+			error = (dontReplace ? B_OK : B_BAD_VALUE);
+			done = true;
+			result = team->debug_info.nub_port;
 		}
+	} else if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_DISABLED) != 0
+		&& useDefault) {
+		// No debugger yet, disable_debugger() had been invoked, and we
+		// would install the default debugger. Just fail.
+		error = B_BAD_VALUE;
+	}
 
-		// in case of a handover the lock has already been released
-		if (releaseDebugInfoLock)
-			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-	} else
-		error = B_BAD_TEAM_ID;
+	// in case of a handover the lock has already been released
+	if (releaseDebugInfoLock)
+		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	if (handOver) {
@@ -2650,30 +2732,24 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		}
 
 		// clear the handed-over and handing-over flags
-		cpu_status state = disable_interrupts();
-		GRAB_TEAM_LOCK();
+		state = disable_interrupts();
+		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		team = team_get_team_struct_locked(teamID);
+		int32 teamDebugFlags = team->debug_info.flags;
 
-		if (team) {
-			GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-			int32 teamDebugFlags = team->debug_info.flags;
-
-			if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) != 0
-				&& (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) != 0
-				&& team->debug_info.debugger_port == debuggerPort) {
-				// Everything is as we left it above, so just clear the flags.
-				atomic_and(&team->debug_info.flags,
-					~(B_TEAM_DEBUG_DEBUGGER_HANDOVER
-						| B_TEAM_DEBUG_DEBUGGER_HANDING_OVER));
-			}
-
-			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+		if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) != 0
+			&& (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) != 0
+			&& team->debug_info.debugger_port == debuggerPort) {
+			// Everything is as we left it above, so just clear the flags.
+			atomic_and(&team->debug_info.flags,
+				~(B_TEAM_DEBUG_DEBUGGER_HANDOVER
+					| B_TEAM_DEBUG_DEBUGGER_HANDING_OVER));
 		}
 
-		RELEASE_TEAM_LOCK();
+		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 		restore_interrupts(state);
+
+		finish_debugger_change(team);
 
 		// notify the nub thread
 		kill_interruptable_write_port(nubPort, B_DEBUG_MESSAGE_HANDED_OVER,
@@ -2697,6 +2773,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	if (done || error != B_OK) {
 		TRACE(("install_team_debugger() done1: %ld\n",
 			(error == B_OK ? result : error)));
+		finish_debugger_change(team);
 		return (error == B_OK ? result : error);
 	}
 
@@ -2736,32 +2813,25 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	// now adjust the debug info accordingly
 	if (error == B_OK) {
 		state = disable_interrupts();
-		GRAB_TEAM_LOCK();
+		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		// look up again, to make sure the team isn't dying
-		team = team_get_team_struct_locked(teamID);
+		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+			// there's already a debugger installed
+			error = (dontReplace ? B_OK : B_BAD_VALUE);
+			done = true;
+			result = team->debug_info.nub_port;
 
-		if (team) {
-			GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+		} else {
+			install_team_debugger_init_debug_infos(team, debuggerTeam,
+				debuggerPort, nubPort, nubThread, debuggerWriteLock,
+				causingThread);
+		}
 
-			if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-				// there's already a debugger installed
-				error = (dontReplace ? B_OK : B_BAD_VALUE);
-				done = true;
-				result = team->debug_info.nub_port;
-
-				RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-			} else {
-				install_team_debugger_init_debug_infos(team, debuggerTeam,
-					debuggerPort, nubPort, nubThread, debuggerWriteLock,
-					causingThread);
-			}
-		} else
-			error = B_BAD_TEAM_ID;
-
-		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 	}
+
+	finish_debugger_change(team);
 
 	// if everything went fine, resume the nub thread, otherwise clean up
 	if (error == B_OK && !done) {
@@ -2882,35 +2952,28 @@ _user_install_team_debugger(team_id teamID, port_id debuggerPort)
 status_t
 _user_remove_team_debugger(team_id teamID)
 {
+	struct team* team;
+	ConditionVariable debugChangeCondition;
+	status_t error = prepare_debugger_change(teamID, debugChangeCondition,
+		team);
+	if (error != B_OK)
+		return error;
+
+	InterruptsSpinLocker debugInfoLocker(team->debug_info.lock);
+
 	struct team_debug_info info;
+	if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		// there's a debugger installed
+		info = team->debug_info;
+		clear_team_debug_info(&team->debug_info, false);
+	} else {
+		// no debugger installed
+		error = B_BAD_VALUE;
+	}
 
-	status_t error = B_OK;
+	debugInfoLocker.Unlock();
 
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	struct team *team = (teamID == B_CURRENT_TEAM
-		? thread_get_current_thread()->team
-		: team_get_team_struct_locked(teamID));
-
-	if (team) {
-		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-			// there's a debugger installed
-			info = team->debug_info;
-			clear_team_debug_info(&team->debug_info, false);
-		} else {
-			// no debugger installed
-			error = B_BAD_VALUE;
-		}
-
-		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-	} else
-		error = B_BAD_TEAM_ID;
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	finish_debugger_change(team);
 
 	// clean up the info, if there was a debugger installed
 	if (error == B_OK)

@@ -1400,6 +1400,8 @@ thread_exit(void)
 
 	struct job_control_entry *death = NULL;
 	struct death_entry* threadDeathEntry = NULL;
+	ConditionVariableEntry waitForDebuggerEntry;
+	bool waitForDebugger = false;
 
 	if (team != team_get_kernel_team()) {
 		user_debug_thread_exiting(thread);
@@ -1430,6 +1432,16 @@ thread_exit(void)
 		cachedDeathSem = team->death_sem;
 
 		if (deleteTeam) {
+			// If a debugger change is in progess for the team, we'll have to
+			// wait until it is done later.
+			GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+			if (team->debug_info.debugger_changed_condition != NULL) {
+				team->debug_info.debugger_changed_condition->Add(
+					&waitForDebuggerEntry);
+				waitForDebugger = true;
+			}
+			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
 			struct team *parent = team->parent;
 
 			// remember who our parent was so we can send a signal
@@ -1500,6 +1512,10 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
+		// wait for a debugger change to be finished first
+		if (waitForDebugger)
+			waitForDebuggerEntry.Wait();
+
 		team_delete_team(team);
 
 		// we need to delete any death entry that made it to here

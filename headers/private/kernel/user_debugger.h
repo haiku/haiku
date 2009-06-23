@@ -20,6 +20,7 @@
 #define	B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD	70			/* in % */
 
 
+struct ConditionVariable;
 struct function_profile_info;
 struct thread;
 
@@ -60,6 +61,14 @@ struct team_debug_info {
 		// debugger attachment (or no debugger installed)
 	vint32		image_event;
 		// counter incremented whenever an image is created/deleted
+
+	struct ConditionVariable* debugger_changed_condition;
+		// Set whenever someone is going (or planning) to change the debugger.
+		// If one wants to do the same, one has to wait for this condition.
+		// Both threads lock (outer) and team debug info lock (inner) have to
+		// be held when accessing this field. After setting to a condition
+		// variable the thread won't be deleted (until unsetting it) -- it might
+		// be removed from the team hash table, though.
 
 	struct arch_team_debug_info	arch_info;
 };
