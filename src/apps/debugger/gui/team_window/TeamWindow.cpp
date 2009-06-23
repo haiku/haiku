@@ -32,7 +32,7 @@
 TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	:
 	BWindow(BRect(100, 100, 899, 699), "Team", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS),
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fDebugModel(debugModel),
 	fActiveThread(NULL),
 	fActiveStackTrace(NULL),
@@ -256,10 +256,8 @@ TeamWindow::_Init()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddSplit(B_VERTICAL, 3.0f)
-			.AddGroup(B_VERTICAL, 0.0f, 0.4f)
-				.Add(fTabView = new BTabView("tab view"))
-				.SetInsets(4.0f, 4.0f, 4.0f, 0.0f)
-			.End()
+			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+			.Add(fTabView = new BTabView("tab view"), 0.4f)
 			.AddGroup(B_VERTICAL, 4.0f)
 				.AddGroup(B_HORIZONTAL, 4.0f)
 					.Add(fRunButton = new BButton("Run"))
@@ -267,15 +265,11 @@ TeamWindow::_Init()
 					.Add(fStepIntoButton = new BButton("Step Into"))
 					.Add(fStepOutButton = new BButton("Step Out"))
 					.AddGlue()
-					.SetInsets(4.0f, 0.0f, 4.0f, 0.0f)
 				.End()
 				.AddSplit(B_HORIZONTAL, 3.0f)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
-					.AddGroup(B_VERTICAL)
-						.Add(fLocalsTabView = new BTabView("locals view"))
-						.SetInsets(0.0f, 0.0f, 4.0f, 4.0f)
-					.End()
+					.Add(fLocalsTabView = new BTabView("locals view"))
 				.End()
 			.End()
 		.End();
