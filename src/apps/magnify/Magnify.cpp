@@ -494,7 +494,7 @@ TWindow::SetPrefs()
 		long ref;
 
 		path.Append (kPrefsFileName);
-		if ((ref = creat(path.Path(), O_RDWR)) >= 0) {
+		if ((ref = creat(path.Path(), S_IRUSR | S_IWUSR)) >= 0) {
 			float version = kCurrentVersion;
 
 			lseek (ref, 0, SEEK_SET);
@@ -1683,7 +1683,7 @@ TMagnify::SaveImage(entry_ref* ref, char* name, bool selectionOnly)
 
 
 void
-TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
+TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, const char* name) const
 {
 	int32 bytesPerPixel;
 	const char *kColorSpaceName;

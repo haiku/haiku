@@ -114,7 +114,8 @@ class TMagnify : public BView {
 
 		void			StartSave();
 		void			SaveImage(entry_ref* ref, char* name, bool selectionOnly=false);
-		void 			SaveBits(BFile* file, const BBitmap *bitmap, char* name) const;
+		void 			SaveBits(BFile* file, const BBitmap *bitmap,
+							const char* name) const;
 		void			EndSave();
 
 	private:
