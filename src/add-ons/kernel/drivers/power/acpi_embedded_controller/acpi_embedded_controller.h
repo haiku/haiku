@@ -48,7 +48,7 @@
 
 
 dpc_module_info *gDPC = NULL;
-void *gDPCHandle;
+void *gDPCHandle = NULL;
 
 
 #define ACPI_GPE_EDGE_TRIGGERED         (uint8) 0x00

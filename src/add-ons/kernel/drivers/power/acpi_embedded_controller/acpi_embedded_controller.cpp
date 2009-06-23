@@ -52,8 +52,10 @@
 #define ACPI_EC_PATHID_GENERATOR "embedded_controller/path_id"
 
 device_manager_info *gDeviceManager = NULL;
-
 pci_module_info *gPCIManager = NULL;
+
+// cpu frequency
+int64 gHz;
 
 
 uint8
@@ -259,6 +261,13 @@ static status_t
 embedded_controller_init_driver(device_node *dev, void **_driverCookie)
 {
 	TRACE("init driver\n");
+	// first get the cpu speed, needed to calculate a timeout
+	// ToDo: catch frequency changes
+	system_info systemInfo;
+	if (get_system_info(&systemInfo) != B_OK)
+		return B_ERROR;
+	gHz = systemInfo.cpu_clock_speed;
+	
 	acpi_ec_softc  *sc;
 	sc = (acpi_ec_softc*)malloc(sizeof(acpi_ec_softc));
     memset(sc, 0, sizeof(acpi_ec_softc));
@@ -428,6 +437,8 @@ embedded_controller_uninit_driver(void *driverCookie)
 	free(sc);
 	put_module(B_ACPI_MODULE_NAME);
 	put_module(B_DPC_MODULE_NAME);
+	gDPC = NULL;
+	gDPCHandle = NULL;
 }
 
 
@@ -560,7 +571,7 @@ EcGpeQueryHandler(void *context)
     EcUnlock(sc);
 
     /* Ignore the value for "no outstanding event". (13.3.5) */
-    TRACE("ec query ok,%s running _Q%02X\n", Data ? "" : " not", data);
+    TRACE("ec query ok,%s running _Q%02X\n", data ? "" : " not", data);
     if (data == 0)
         return;
 
@@ -753,7 +764,15 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
             spin(EC_POLL_DELAY);
         }
     } else {
-        // ToDo: scale timeout for slow cpu see BSD code...
+    	bigtime_t slp_ival = gHz / 1000;
+        if (slp_ival != 0) {
+            count = ec_timeout;
+        } else {
+            /* hz has less than 1 ms resolution so scale timeout. */
+            slp_ival = 1;
+            count = ec_timeout / (1000 / gHz);
+        }
+
         count = ec_timeout;
 		
 		/*
@@ -775,7 +794,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
                 if (status == B_OK)
                     break;
             }
-            sc->ec_condition_var.Wait();
+            sc->ec_condition_var.Wait(0, slp_ival);
         }
 
         /*
@@ -787,7 +806,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
         if (status != B_OK) {
             status = EcCheckStatus(sc, "sleep_end", event);
             TRACE("wait timed out (%sresponse), forcing polled mode\n",
-                Status == B_OK ? "" : "no ");
+                status == B_OK ? "" : "no ");
             ec_polled_mode = TRUE;
         }
     }
@@ -850,7 +869,7 @@ EcRead(struct acpi_ec_softc *sc, uint8 address, uint8 *readData)
     uint8 data;
     u_int gen_count;
 
-	TRACE("ec read from %#x\n", Address);
+	TRACE("ec read from %#x\n", address);
 
     /* If we can't start burst mode, continue anyway. */
     status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
