@@ -230,7 +230,6 @@ TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 }
 
 
-
 void
 TeamWindow::UserBreakpointChanged(const TeamDebugModel::BreakpointEvent& event)
 {
