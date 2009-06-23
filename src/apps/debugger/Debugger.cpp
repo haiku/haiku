@@ -271,7 +271,16 @@ printf("debugger for team %ld created and initialized successfully!\n", team);
 	{
 		// TODO:...
 //		return true;
-return BApplication::QuitRequested();
+		// NOTE: The default implementation will just ask all windows'
+		// QuitRequested() hooks. This in turn will ask the TeamWindows.
+		// For now, this is what we want. If we have more windows later,
+		// like the global TeamsWindow, then we want to just ask the
+		// TeamDebuggers, the TeamsWindow should of course not go away already
+		// if one or more TeamDebuggers want to stay later. There are multiple
+		// ways how to do this. For examaple, TeamDebugger could get a
+		// QuitReqested() hook or the TeamsWindow and other global windows
+		// could always return false in their QuitRequested().
+		return BApplication::QuitRequested();
 	}
 
 private:
