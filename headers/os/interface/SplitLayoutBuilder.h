@@ -24,6 +24,9 @@ public:
 
 			BSplitLayoutBuilder& SetCollapsible(bool collapsible);
 
+			BSplitLayoutBuilder& SetInsets(float left, float top, float right,
+									float bottom);
+
 								operator BSplitView*();
 
 private:

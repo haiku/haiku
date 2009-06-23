@@ -175,6 +175,9 @@ public:
 	inline	ThisBuilder&		SetCollapsible(int32 first, int32 last,
 									bool collapsible);
 
+	inline	ThisBuilder&		SetInsets(float left, float top, float right,
+									float bottom);
+
 	inline						operator BSplitView*();
 
 private:
@@ -698,6 +701,16 @@ typename Split<ParentBuilder>::ThisBuilder&
 Split<ParentBuilder>::SetCollapsible(int32 first, int32 last, bool collapsible)
 {
 	fView->SetCollapsible(first, last, collapsible);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::ThisBuilder&
+Split<ParentBuilder>::SetInsets(float left, float top, float right,
+	float bottom)
+{
+	fView->SetInsets(left, top, right, bottom);
 	return *this;
 }
 

@@ -192,7 +192,8 @@ BSplitLayout::SetInsets(float left, float top, float right, float bottom)
 
 // GetInsets
 void
-BSplitLayout::GetInsets(float* left, float* top, float* right, float* bottom)
+BSplitLayout::GetInsets(float* left, float* top, float* right,
+	float* bottom) const
 {
 	if (left)
 		*left = fLeftInset;

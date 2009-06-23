@@ -81,6 +81,15 @@ BSplitLayoutBuilder::SetCollapsible(bool collapsible)
 	return *this;
 }
 
+// SetInsets
+BSplitLayoutBuilder&
+BSplitLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
+{
+	fView->SetInsets(left, top, right, bottom);
+
+	return *this;
+}
+
 // cast operator BSplitView*
 BSplitLayoutBuilder::operator BSplitView*()
 {

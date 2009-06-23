@@ -17,6 +17,11 @@ public:
 									float spacing = 0.0f);
 	virtual						~BSplitView();
 
+			void				SetInsets(float left, float top, float right,
+									float bottom);
+			void				GetInsets(float* left, float* top, float* right,
+									float* bottom) const;
+
 			float				Spacing() const;
 			void				SetSpacing(float spacing);
 

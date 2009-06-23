@@ -30,7 +30,7 @@ public:
 			void				SetInsets(float left, float top, float right,
 									float bottom);
 			void				GetInsets(float* left, float* top, float* right,
-									float* bottom);
+									float* bottom) const;
 
 			float				Spacing() const;
 			void				SetSpacing(float spacing);

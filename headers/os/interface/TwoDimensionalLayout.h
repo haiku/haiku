@@ -18,7 +18,7 @@ public:
 			void				SetInsets(float left, float top, float right,
 									float bottom);
 			void				GetInsets(float* left, float* top, float* right,
-									float* bottom);
+									float* bottom) const;
 
 			void				AlignLayoutWith(BTwoDimensionalLayout* other,
 									enum orientation orientation);
@@ -58,7 +58,7 @@ protected:
 	virtual	void				PrepareItems(enum orientation orientation);
 	virtual	bool				HasMultiColumnItems();
 	virtual	bool				HasMultiRowItems();
-	
+
 	virtual	int32				InternalCountColumns() = 0;
 	virtual	int32				InternalCountRows() = 0;
 	virtual	void				GetColumnRowConstraints(

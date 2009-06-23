@@ -59,13 +59,13 @@ public:
 	virtual	Layouter*			GetLayouter(bool minMax);
 
 			LayoutInfo*			GetLayoutInfo();
-	
+
 			void				AddLocalLayouter(LocalLayouter* localLayouter);
 			void				RemoveLocalLayouter(
 									LocalLayouter* localLayouter);
 
 			void				AbsorbCompoundLayouter(CompoundLayouter* other);
-	
+
 	virtual	void				InvalidateLayout();
 			bool				IsMinMaxValid();
 			void				ValidateMinMax();
@@ -105,7 +105,7 @@ public:
 	virtual	void				InvalidateLayout();
 
 			void				InvalidateHeightForWidth();
-	
+
 			void				InternalGetHeightForWidth(
 									LocalLayouter* localLayouter,
 									BLayoutContext* context,
@@ -148,7 +148,7 @@ public:
 			void				Layout(BSize size);
 
 			BRect				ItemFrame(Dimensions itemDimensions);
-	
+
 			void				ValidateMinMax();
 
 			void				DoHorizontalLayout(float width);
@@ -159,7 +159,7 @@ public:
 
 			void				AlignWith(LocalLayouter* other,
 									enum orientation orientation);
-	
+
 
 	// interface for the compound layout context
 
@@ -183,14 +183,14 @@ public:
 									Layouter* layouter,
 									BLayoutContext* context);
 			void				SetHeightForWidthConstraintsAdded(bool added);
-	
+
 			void				SetCompoundLayouter(
 									CompoundLayouter* compoundLayouter,
 									enum orientation orientation);
 
 			void				InternalInvalidateLayout(
 									CompoundLayouter* compoundLayouter);
-	
+
 	// implementation private
 private:
 			BTwoDimensionalLayout*	fLayout;
@@ -202,7 +202,7 @@ private:
 			BLayoutContext*		fHorizontalLayoutContext;
 			float				fHorizontalLayoutWidth;
 			bool				fHeightForWidthConstraintsAdded;
-	
+
 			void				_SetHorizontalLayoutContext(
 									BLayoutContext* context, float width);
 
@@ -248,7 +248,7 @@ BTwoDimensionalLayout::SetInsets(float left, float top, float right,
 // GetInsets
 void
 BTwoDimensionalLayout::GetInsets(float* left, float* top, float* right,
-	float* bottom)
+	float* bottom) const
 {
 	if (left)
 		*left = fLeftInset;
@@ -379,7 +379,7 @@ frame.PrintToStream();
 //	preferredHeight);
 //}
 }
-			
+
 			item->AlignInFrame(frame);
 		}
 //else
@@ -499,7 +499,7 @@ BTwoDimensionalLayout::CompoundLayouter::GetLayoutInfo()
 	return fLayoutInfo;
 }
 
-// AddLocalLayouter	
+// AddLocalLayouter
 void
 BTwoDimensionalLayout::CompoundLayouter::AddLocalLayouter(
 	LocalLayouter* localLayouter)
@@ -536,7 +536,7 @@ BTwoDimensionalLayout::CompoundLayouter::AbsorbCompoundLayouter(
 		AddLocalLayouter(layouter);
 		layouter->SetCompoundLayouter(this, fOrientation);
 	}
-	
+
 	InvalidateLayout();
 }
 
@@ -605,7 +605,7 @@ BTwoDimensionalLayout::CompoundLayouter::Layout(float size,
 	LocalLayouter* localLayouter, BLayoutContext* context)
 {
 	ValidateMinMax();
-	
+
 	if (context != fLayoutContext || fLastLayoutSize != size) {
 		DoLayout(size, localLayouter, context);
 		fLayoutContext = context;
@@ -852,7 +852,7 @@ BTwoDimensionalLayout::VerticalCompoundLayouter
 		fHeightForWidthLayoutContext->AddListener(this);
 
 	InvalidateHeightForWidth();
-	
+
 	return true;
 }
 
@@ -868,7 +868,7 @@ BTwoDimensionalLayout::VerticalCompoundLayouter::LayoutContextLeft(
 // #pragma mark - LocalLayouter
 
 
-// constructor								
+// constructor
 BTwoDimensionalLayout::LocalLayouter::LocalLayouter(
 		BTwoDimensionalLayout* layout)
 	: fLayout(layout),
@@ -1100,7 +1100,7 @@ BTwoDimensionalLayout::LocalLayouter::AddHeightForWidthConstraints(
 		return false;
 
 	LayoutInfo* hLayoutInfo = fHLayouter->GetLayoutInfo();
-	
+
 	// add the children's height for width constraints
 	int32 itemCount = fHeightForWidthItems.CountItems();
 	for (int32 i = 0; i < itemCount; i++) {

@@ -55,6 +55,21 @@ BSplitView::~BSplitView()
 {
 }
 
+// SetInsets
+void
+BSplitView::SetInsets(float left, float top, float right, float bottom)
+{
+	fSplitLayout->SetInsets(left, top, right, bottom);
+}
+
+// GetInsets
+void
+BSplitView::GetInsets(float* left, float* top, float* right,
+	float* bottom) const
+{
+	fSplitLayout->GetInsets(left, top, right, bottom);
+}
+
 // Spacing
 float
 BSplitView::Spacing() const
