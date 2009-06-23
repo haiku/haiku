@@ -708,7 +708,7 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 
 		for (size_t i = 0; i < (size / (B_PAGE_SIZE * 1024));
 				i++, virtualTable += B_PAGE_SIZE) {
-			addr_t physicalTable;
+			addr_t physicalTable = 0;
 			early_query(virtualTable, &physicalTable);
 			page_directory_entry* entry = &sPageHolePageDir[
 				(address / (B_PAGE_SIZE * 1024)) + i];

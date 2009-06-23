@@ -646,7 +646,7 @@ struct realtime_sem_context {
 		uint32 semCount, sem_t* userSem, sem_t*& _usedUserSem, int32_t& _id,
 		bool& _created)
 	{
-		NamedSem* sem;
+		NamedSem* sem = NULL;
 		status_t error = sSemTable.OpenNamedSem(name, openFlags, mode, semCount,
 			sem, _created);
 		if (error != B_OK)
