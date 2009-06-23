@@ -1,10 +1,10 @@
 /*
- *	Copyright (c) 2004-2006, Haiku, Inc.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  *
- *  This software is part of the Haiku distribution and is covered 
- *  by the Haiku license.
- *
- *  Author: Jérôme Duval
+ * Authors:
+ *		Jérôme Duval
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 #ifndef KEYMAP_H
 #define KEYMAP_H
@@ -18,34 +18,44 @@
 
 
 class Keymap {
-	public:
-		Keymap();
-		~Keymap();
+public:
+							Keymap();
+							~Keymap();
 
-		status_t LoadCurrent();
-		status_t Load(entry_ref &ref);
-		status_t Save(entry_ref &ref);
-		status_t LoadSource(FILE *f);
-		status_t LoadSourceFromRef(entry_ref &ref);
-		void SaveAsCurrent();
-		void SaveAsHeader(entry_ref &ref, const char *mapname);
-		status_t Use();
-		void Dump();
-		bool IsModifierKey(uint32 keyCode);
-		uint8 IsDeadKey(uint32 keyCode, uint32 modifiers);
-		bool IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey);
-		void GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
-			char** chars, int32* numBytes);
-		void RestoreSystemDefault();
-		static void GetKey(char *chars, int32 offset, char* string);
+			status_t		LoadCurrent();
+			status_t		Load(const char* name);
+			status_t		Load(FILE* file);
+			status_t		LoadSource(const char* name);
+			status_t		LoadSource(FILE* file);
+			status_t		SaveAsCurrent();
+			status_t		Save(const char* name);
+			status_t		SaveAsSource(const char* name);
+			status_t		SaveAsSource(FILE* file);
+			status_t		SaveAsCppHeader(const char* name,
+								const char* mapName);
 
-	private:
-		void ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset);
-		void ComputeTables(const char *buffer, struct re_registers &regs, uint32 &table);
+			status_t		Use();
 
-		char *fChars;
-		key_map fKeys;
-		uint32 fCharsSize;
+			bool			IsModifierKey(uint32 keyCode);
+			uint8			IsDeadKey(uint32 keyCode, uint32 modifiers);
+			bool			IsDeadSecondKey(uint32 keyCode, uint32 modifiers,
+								uint8 activeDeadKey);
+			void			GetChars(uint32 keyCode, uint32 modifiers,
+								uint8 activeDeadKey, char** chars,
+								int32* numBytes);
+			void			RestoreSystemDefault();
+	static	void			GetKey(char* chars, int32 offset, char* string);
+
+private:
+			void			_SaveSourceText(FILE* file);
+			void			_ComputeChars(const char* buffer,
+								struct re_registers& regs, int i, int& offset);
+			void			_ComputeTables(const char* buffer,
+								struct re_registers& regs, uint32& table);
+
+			char*			fChars;
+			key_map			fKeys;
+			uint32			fCharsSize;
 };
 
 #define KEYMAP_ERROR_UNKNOWN_VERSION	(B_ERRORS_END + 1)

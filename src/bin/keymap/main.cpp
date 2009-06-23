@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2004-2006, Haiku, Inc.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  *
- * This software is part of the Haiku distribution and is covered
- * by the MIT license.
- *
- * Author: Jérôme Duval
+ * Authors:
+ *		Jérôme Duval
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
 
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,21 +25,27 @@ static const char *sProgramName = __progname;
 
 
 static void
-usage(void)
+usage()
 {
-	printf("usage: %s {-o output_file} -[d|l|r|c|b|h input_file]\n"
-		"  -o  change output file to output_file (default:keymap.out)\n"
-		"  -d  dump key map to standard output\n"
-		"  -l  load key map from standard input\n"
-		"  -b  load binary key map from file\n"
-		"  -r  restore system default key map\n"
-		"  -c  compile source keymap to binary\n"
-		"  -h  compile source keymap to header\n",
+	printf("usage: %s {-o <output-file>} [-[l|r] | -[b|h|c|d <input-file>]]\n"
+		"  -o, --output       Change output file to output-file (default: "
+			"keymap.out|h).\n"
+		"  -d, --dump         Decompile key map to standard output (can be "
+			"redirected\n"
+		"                     via -o).\n"
+		"  -l, --load         Load key map. If no input-file is specified, it "
+			"will be\n"
+		"                     read from standard input.\n"
+		"  -s, --load-source  Load source key map from standard input when no\n"
+		"                     input-file is specified.\n"
+		"  -r, --restore      Restore system default key map.\n"
+		"  -c, --compile      Compile source keymap to binary.\n"
+		"  -h, --header       Translate source keymap to C++ header.\n",
 		sProgramName);
 }
 
 
-static const char *
+static const char*
 keymap_error(status_t status)
 {
 	if (status == KEYMAP_ERROR_UNKNOWN_VERSION)
@@ -49,15 +56,24 @@ keymap_error(status_t status)
 
 
 static void
-load_keymap_source(Keymap& keymap, const char* name)
+load_keymap(Keymap& keymap, const char* name, bool source)
 {
-	entry_ref ref;
-	get_ref_for_path(name, &ref);
+	status_t status;
+	if (source) {
+		if (name != NULL)
+			status = keymap.LoadSource(name);
+		else
+			status = keymap.LoadSource(stdin);
+	} else {
+		if (name != NULL)
+			status = keymap.Load(name);
+		else
+			status = keymap.Load(stdin);
+	}
 
-	status_t status = keymap.LoadSourceFromRef(ref);
 	if (status != B_OK) {
-		fprintf(stderr, "%s: error when loading the keymap: %s\n",
-			sProgramName, keymap_error(status));
+		fprintf(stderr, "%s: error when loading the keymap: %s\n", sProgramName,
+			keymap_error(status));
 		exit(1);
 	}
 }
@@ -66,81 +82,152 @@ load_keymap_source(Keymap& keymap, const char* name)
 int
 main(int argc, char **argv)
 {
-	char operation = ' ';
-	entry_ref outputRef;
-	get_ref_for_path("keymap.out", &outputRef);
+	const char* output = NULL;
+	const char* input = NULL;
+	enum {
+		kUnspecified,
+		kLoadBinary,
+		kLoadText,
+		kSaveText,
+		kRestore,
+		kCompile,
+		kSaveHeader,
+	} mode = kUnspecified;
 
-	for (int i = 1; i < argc; i++) {
-		if (strncmp(argv[i], "-", 1) == 0) {
-			if (strlen(argv[i]) > 1)
-				operation = argv[i][1];
-			else 
+	static struct option const kLongOptions[] = {
+		{"output", required_argument, 0, 'o'},
+		{"dump", optional_argument, 0, 'd'},
+		{"load", optional_argument, 0, 'l'},
+		{"load-source", optional_argument, 0, 's'},
+		{"restore", no_argument, 0, 'r'},
+		{"compile", optional_argument, 0, 'c'},
+		{"header", optional_argument, 0, 'h'},
+		{"help", no_argument, 0, 'H'},
+		{NULL}
+	};
+
+	int c;
+	while ((c = getopt_long(argc, argv, "o:dblsrchH", kLongOptions,
+			NULL)) != -1) {
+		switch (c) {
+			case 0:
+				break;
+			case 'o':
+				output = optarg;
+				break;
+			case 'd':
+				mode = kSaveText;
+				input = optarg;
+				break;
+			case 'l':
+			case 'b':
+				mode = kLoadBinary;
+				input = optarg;
+				break;
+			case 's':
+				mode = kLoadText;
+				input = optarg;
+				break;
+			case 'r':
+				mode = kRestore;
+				break;
+			case 'c':
+				mode = kCompile;
+				input = optarg;
+				break;
+			case 'h':
+				mode = kSaveHeader;
+				input = optarg;
 				break;
 
-			if (operation == 'd') {
-				Keymap keymap;
-				if (keymap.LoadCurrent() != B_OK) {
-					fprintf(stderr, "%s: error while getting current keymap!\n", sProgramName);
-					return 1;
-				}
-				keymap.Dump();
-				return 0;
-			} else if (operation == 'r') {
-				Keymap keymap;
-				keymap.RestoreSystemDefault();
-				printf("System default key map restored.\n");
-				return 0;
-			} else if (operation == 'l') {
-				Keymap keymap;
-				status_t status = keymap.LoadSource(stdin);
-				if (status != B_OK) {
-					fprintf(stderr, "%s: error when loading the keymap: %s\n",
-						sProgramName, keymap_error(status));
-					return 1;
-				}
-				keymap.SaveAsCurrent();
-				printf("Key map loaded.\n");
-				return 0;
-			} 
-		} else {
-			// TODO: the actual action should be issued *AFTER* the command line
-			//	has been parsed, not mixed in.
-			if (operation == 'o') {
-				get_ref_for_path(argv[i], &outputRef);
-			} else if (operation == 'c') {
-				Keymap keymap;
-				load_keymap_source(keymap, argv[i]);
-
-				status_t status = keymap.Save(outputRef);
-				if (status < B_OK) {
-					fprintf(stderr, "%s: error saving \"%s\": %s\n", sProgramName,
-						argv[i], strerror(status));
-					return 1;
-				}
-				return 0;
-			} else if (operation == 'h') {
-		        Keymap keymap;
-				load_keymap_source(keymap, argv[i]);
-				keymap.SaveAsHeader(outputRef, argv[i]);
-				return 0;
-			} else if (operation == 'b') {
-				entry_ref ref;
-				get_ref_for_path(argv[i], &ref);
-				Keymap keymap;
-				status_t status = keymap.Load(ref);
-				if (status != B_OK) {
-					fprintf(stderr, "%s: error when loading the keymap: %s\n",
-						sProgramName, keymap_error(status));
-					return 1;
-				}
-				keymap.SaveAsCurrent();
-				printf("Key map loaded.\n");
-				return 0;
-			} else 
+			case 'H':
+			default:
+				usage();
 				break;
 		}
 	}
 
-	usage();
-	return 1;
+	if (argc > optind && input == NULL)
+		input = argv[optind];
+
+	Keymap keymap;
+
+	switch (mode) {
+		case kUnspecified:
+			usage();
+			break;
+
+		case kLoadBinary:
+		case kLoadText:
+		{
+			load_keymap(keymap, input, mode == kLoadText);
+
+			status_t status = keymap.SaveAsCurrent();
+			if (status != B_OK) {
+				fprintf(stderr, "%s: error when saving as current: %s",
+					sProgramName, strerror(status));
+				return 1;
+			}
+
+			printf("Key map loaded.\n");
+			break;
+		}
+
+		case kSaveText:
+		{
+			if (input == NULL) {
+				status_t status = keymap.LoadCurrent();
+				if (status != B_OK) {
+					fprintf(stderr, "%s: error while getting keymap: %s!\n",
+						sProgramName, keymap_error(status));
+					return 1;
+				}
+			} else
+				load_keymap(keymap, input, false);
+
+			if (output != NULL)
+				keymap.SaveAsSource(output);
+			else
+				keymap.SaveAsSource(stdout);
+			break;
+		}
+
+		case kRestore:
+			keymap.RestoreSystemDefault();
+			break;
+
+		case kCompile:
+		{
+			load_keymap(keymap, input, true);
+
+			if (output == NULL)
+				output = "keymap.out";
+
+			status_t status = keymap.Save(output);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: error saving \"%s\": %s\n", sProgramName,
+					output, strerror(status));
+				return 1;
+			}
+			break;
+		}
+
+		case kSaveHeader:
+		{
+			load_keymap(keymap, input, true);
+
+			if (output == NULL)
+				output = "keymap.h";
+
+			status_t status = keymap.SaveAsCppHeader(output, input);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: error saving \"%s\": %s\n", sProgramName,
+					output, strerror(status));
+				return 1;
+			}
+			break;
+		}
+	}
+
+	return 0;
 }
