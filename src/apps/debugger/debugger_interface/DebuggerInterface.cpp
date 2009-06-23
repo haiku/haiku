@@ -237,7 +237,7 @@ DebuggerInterface::~DebuggerInterface()
 {
 	fArchitecture->RemoveReference();
 
-	Close();
+	Close(false);
 
 	delete fDebugContextPool;
 }
@@ -286,8 +286,13 @@ DebuggerInterface::Init()
 
 
 void
-DebuggerInterface::Close()
+DebuggerInterface::Close(bool killTeam)
 {
+	if (killTeam)
+		kill_team(fTeamID);
+	else if (fNubPort >= 0)
+		remove_team_debugger(fTeamID);
+
 	if (fDebuggerPort >= 0)
 		delete_port(fDebuggerPort);
 }

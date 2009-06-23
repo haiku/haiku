@@ -48,16 +48,16 @@ TeamDebugger::~TeamDebugger()
 
 	fTerminating = true;
 
-	fDebuggerInterface->Close();
-	fWorker->ShutDown();
+	if (fDebuggerInterface != NULL)
+		fDebuggerInterface->Close(fKillTeamOnQuit);
+
+	if (fWorker != NULL)
+		fWorker->ShutDown();
 
 	locker.Unlock();
 
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
-
-	if (fKillTeamOnQuit && fTeam != NULL)
-		kill_team(fTeam->ID());
 
 	delete fDebuggerInterface;
 	delete fWorker;

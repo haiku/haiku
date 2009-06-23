@@ -27,7 +27,7 @@ public:
 	virtual						~DebuggerInterface();
 
 			status_t			Init();
-			void				Close();
+			void				Close(bool killTeam);
 
 			Architecture*		GetArchitecture() const
 									{ return fArchitecture; }
