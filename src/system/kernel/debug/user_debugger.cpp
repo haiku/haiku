@@ -12,7 +12,6 @@
 
 #include <arch/debug.h>
 #include <arch/user_debugger.h>
-#include <commpage_defs.h>
 #include <cpu.h>
 #include <debugger.h>
 #include <kernel.h>
@@ -32,12 +31,21 @@
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
 
+#include "BreakpointManager.h"
+
+
 //#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
+
+
+// TODO: Since the introduction of team_debug_info::debugger_changed_condition
+// there's some potential for simplifications. E.g. clear_team_debug_info() and
+// destroy_team_debug_info() are now only used in nub_thread_cleanup() (plus
+// arch_clear_team_debug_info() in install_team_debugger_init_debug_infos()).
 
 
 static port_id sDefaultDebuggerPort = -1;
@@ -222,6 +230,7 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
 		info->debugger_write_lock = -1;
 		info->causing_thread = -1;
 		info->image_event = 0;
+		info->breakpoint_manager = NULL;
 
 		if (initLock) {
 			B_INITIALIZE_SPINLOCK(&info->lock);
@@ -247,6 +256,10 @@ destroy_team_debug_info(struct team_debug_info *info)
 {
 	if (info) {
 		arch_destroy_team_debug_info(&info->arch_info);
+
+		// delete the breakpoint manager
+		delete info->breakpoint_manager ;
+		info->breakpoint_manager = NULL;
 
 		// delete the debugger port write lock
 		if (info->debugger_write_lock >= 0) {
@@ -777,6 +790,20 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 			requireDebugger, restart);
 	} while (result >= 0 && restart);
 
+	// Prepare to continue -- we install a debugger change condition, so no-one
+	// will change the debugger while we're playing with the breakpoint manager.
+	// TODO: Maybe better use ref-counting and a flag in the breakpoint manager.
+	struct team* team = thread_get_current_thread()->team;
+	ConditionVariable debugChangeCondition;
+	prepare_debugger_change(team, debugChangeCondition);
+
+	if (team->debug_info.breakpoint_manager != NULL) {
+		team->debug_info.breakpoint_manager->PrepareToContinue(
+			arch_debug_get_interrupt_pc());
+	}
+
+	finish_debugger_change(team);
+
 	return result;
 }
 
@@ -966,7 +993,6 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 		message.origin.nub_port = -1;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
 			sizeof(message), B_RELATIVE_TIMEOUT, 0);
-			// TODO: Would it be OK to wait here?
 	}
 }
 
@@ -1217,7 +1243,6 @@ user_debug_breakpoint_hit(bool software)
 {
 	// prepare the message
 	debug_breakpoint_hit message;
-	message.software = software;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
 	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_BREAKPOINT_HIT, &message,
@@ -1515,6 +1540,9 @@ nub_thread_cleanup(struct thread *nubThread)
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 	restore_interrupts(state);
 
+	if (destroyDebugInfo)
+		teamDebugInfo.breakpoint_manager->RemoveAllBreakpoints();
+
 	finish_debugger_change(nubThread->team);
 
 	if (destroyDebugInfo)
@@ -1523,183 +1551,6 @@ nub_thread_cleanup(struct thread *nubThread)
 	// notify all threads that the debugger is gone
 	broadcast_debugged_thread_message(nubThread,
 		B_DEBUGGED_THREAD_DEBUGGER_CHANGED, NULL, 0);
-}
-
-
-/*!	\brief Returns whether the given address can be accessed in principle.
-	No check whether there's an actually accessible area is performed, though.
-*/
-static bool
-can_access_address(const void* address, bool write)
-{
-	// user addresses are always fine
-	if (IS_USER_ADDRESS(address))
-		return true;
-
-	// a commpage address can at least be read
-	if ((addr_t)address >= USER_COMMPAGE_ADDR
-		&& (addr_t)address < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
-		return !write;
-	}
-
-	return false;
-}
-
-
-/**	\brief Reads data from user memory.
- *
- *	Tries to read \a size bytes of data from user memory address \a address
- *	into the supplied buffer \a buffer. If only a part could be read the
- *	function won't fail. The number of bytes actually read is return through
- *	\a bytesRead.
- *
- *	\param address The user memory address from which to read.
- *	\param buffer The buffer into which to write.
- *	\param size The number of bytes to read.
- *	\param bytesRead Will be set to the number of bytes actually read.
- *	\return \c B_OK, if reading went fine. Then \a bytesRead will be set to
- *			the amount of data actually read. An error indicates that nothing
- *			has been read.
- */
-static status_t
-read_user_memory(const void *_address, void *_buffer, int32 size,
-	int32 &bytesRead)
-{
-	const char *address = (const char*)_address;
-	char *buffer = (char*)_buffer;
-
-	// check the parameters
-	if (!can_access_address(address, false))
-		return B_BAD_ADDRESS;
-	if (size <= 0)
-		return B_BAD_VALUE;
-
-	// If the region to be read crosses page boundaries, we split it up into
-	// smaller chunks.
-	status_t error = B_OK;
-	bytesRead = 0;
-	while (size > 0) {
-		// check whether we're still in user address space
-		if (!can_access_address(address, false)) {
-			error = B_BAD_ADDRESS;
-			break;
-		}
-
-		// don't cross page boundaries in a single read
-		int32 toRead = size;
-		int32 maxRead = B_PAGE_SIZE - (addr_t)address % B_PAGE_SIZE;
-		if (toRead > maxRead)
-			toRead = maxRead;
-
-		error = user_memcpy(buffer, address, toRead);
-		if (error != B_OK)
-			break;
-
-		bytesRead += toRead;
-		address += toRead;
-		buffer += toRead;
-		size -= toRead;
-	}
-
-	// If reading fails, we only fail, if we haven't read anything yet.
-	if (error != B_OK) {
-		if (bytesRead > 0)
-			return B_OK;
-		return error;
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-write_user_memory(void *_address, const void *_buffer, int32 size,
-	int32 &bytesWritten)
-{
-	char *address = (char*)_address;
-	const char *buffer = (const char*)_buffer;
-
-	// check the parameters
-	if (!can_access_address(address, true))
-		return B_BAD_ADDRESS;
-	if (size <= 0)
-		return B_BAD_VALUE;
-
-	// If the region to be written crosses area boundaries, we split it up into
-	// smaller chunks.
-	status_t error = B_OK;
-	bytesWritten = 0;
-	while (size > 0) {
-		// check whether we're still in user address space
-		if (!can_access_address(address, true)) {
-			error = B_BAD_ADDRESS;
-			break;
-		}
-
-		// get the area for the address (we need to use _user_area_for(), since
-		// we're looking for a user area)
-		area_id area = _user_area_for((void*)address);
-		if (area < 0) {
-			TRACE(("write_user_memory(): area not found for address: %p: "
-				"%lx\n", address, area));
-			error = area;
-			break;
-		}
-
-		area_info areaInfo;
-		status_t error = get_area_info(area, &areaInfo);
-		if (error != B_OK) {
-			TRACE(("write_user_memory(): failed to get info for area %ld: "
-				"%lx\n", area, error));
-			error = B_BAD_ADDRESS;
-			break;
-		}
-
-		// restrict this round of writing to the found area
-		int32 toWrite = size;
-		int32 maxWrite = (char*)areaInfo.address + areaInfo.size - address;
-		if (toWrite > maxWrite)
-			toWrite = maxWrite;
-
-		// if the area is read-only, we temporarily need to make it writable
-		bool protectionChanged = false;
-		if (!(areaInfo.protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA))) {
-			error = set_area_protection(area,
-				areaInfo.protection | B_WRITE_AREA);
-			if (error != B_OK) {
-				TRACE(("write_user_memory(): failed to set new protection for "
-					"area %ld: %lx\n", area, error));
-				break;
-			}
-			protectionChanged = true;
-		}
-
-		// copy the memory
-		error = user_memcpy(address, buffer, toWrite);
-
-		// reset the area protection
-		if (protectionChanged)
-			set_area_protection(area, areaInfo.protection);
-
-		if (error != B_OK) {
-			TRACE(("write_user_memory(): user_memcpy() failed: %lx\n", error));
-			break;
-		}
-
-		bytesWritten += toWrite;
-		address += toWrite;
-		buffer += toWrite;
-		size -= toWrite;
-	}
-
-	// If writing fails, we only fail, if we haven't written anything yet.
-	if (error != B_OK) {
-		if (bytesWritten > 0)
-			return B_OK;
-		return error;
-	}
-
-	return B_OK;
 }
 
 
@@ -1755,6 +1606,8 @@ debug_nub_thread(void *)
 
 	port_id port = nubThread->team->debug_info.nub_port;
 	sem_id writeLock = nubThread->team->debug_info.debugger_write_lock;
+	BreakpointManager* breakpointManager
+		= nubThread->team->debug_info.breakpoint_manager;
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 	restore_interrupts(state);
@@ -1811,16 +1664,16 @@ debug_nub_thread(void *)
 				status_t result = B_OK;
 
 				// check the parameters
-				if (!can_access_address(address, false))
+				if (!BreakpointManager::CanAccessAddress(address, false))
 					result = B_BAD_ADDRESS;
 				else if (size <= 0 || size > B_MAX_READ_WRITE_MEMORY_SIZE)
 					result = B_BAD_VALUE;
 
 				// read the memory
-				int32 bytesRead = 0;
+				size_t bytesRead = 0;
 				if (result == B_OK) {
-					result = read_user_memory(address, reply.read_memory.data,
-						size, bytesRead);
+					result = breakpointManager->ReadMemory(address,
+						reply.read_memory.data, size, bytesRead);
 				}
 				reply.read_memory.error = result;
 
@@ -1847,15 +1700,15 @@ debug_nub_thread(void *)
 				status_t result = B_OK;
 
 				// check the parameters
-				if (!can_access_address(address, true))
+				if (!BreakpointManager::CanAccessAddress(address, true))
 					result = B_BAD_ADDRESS;
 				else if (size <= 0 || size > realSize)
 					result = B_BAD_VALUE;
 
 				// write the memory
-				int32 bytesWritten = 0;
+				size_t bytesWritten = 0;
 				if (result == B_OK) {
-					result = write_user_memory(address, data, size,
+					result = breakpointManager->WriteMemory(address, data, size,
 						bytesWritten);
 				}
 				reply.write_memory.error = result;
@@ -2031,12 +1884,14 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !can_access_address(address, false))
+				if (address == NULL
+					|| !BreakpointManager::CanAccessAddress(address, false)) {
 					result = B_BAD_ADDRESS;
+				}
 
 				// set the breakpoint
 				if (result == B_OK)
-					result = arch_set_breakpoint(address);
+					result = breakpointManager->InstallBreakpoint(address);
 
 				if (result == B_OK)
 					update_threads_breakpoints_flag();
@@ -2059,12 +1914,14 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !can_access_address(address, false))
+				if (address == NULL
+					|| !BreakpointManager::CanAccessAddress(address, false)) {
 					result = B_BAD_ADDRESS;
+				}
 
 				// clear the breakpoint
 				if (result == B_OK)
-					result = arch_clear_breakpoint(address);
+					result = breakpointManager->UninstallBreakpoint(address);
 
 				if (result == B_OK)
 					update_threads_breakpoints_flag();
@@ -2086,14 +1943,18 @@ debug_nub_thread(void *)
 
 				// check the address and size
 				status_t result = B_OK;
-				if (address == NULL || !can_access_address(address, false))
+				if (address == NULL
+					|| !BreakpointManager::CanAccessAddress(address, false)) {
 					result = B_BAD_ADDRESS;
+				}
 				if (length < 0)
 					result = B_BAD_VALUE;
 
 				// set the watchpoint
-				if (result == B_OK)
-					result = arch_set_watchpoint(address, type, length);
+				if (result == B_OK) {
+					result = breakpointManager->InstallWatchpoint(address, type,
+						length);
+				}
 
 				if (result == B_OK)
 					update_threads_breakpoints_flag();
@@ -2116,12 +1977,14 @@ debug_nub_thread(void *)
 
 				// check the address
 				status_t result = B_OK;
-				if (address == NULL || !can_access_address(address, false))
+				if (address == NULL
+					|| !BreakpointManager::CanAccessAddress(address, false)) {
 					result = B_BAD_ADDRESS;
+				}
 
 				// clear the watchpoint
 				if (result == B_OK)
-					result = arch_clear_watchpoint(address);
+					result = breakpointManager->UninstallWatchpoint(address);
 
 				if (result == B_OK)
 					update_threads_breakpoints_flag();
@@ -2317,9 +2180,14 @@ debug_nub_thread(void *)
 
 					atomic_or(&team->debug_info.flags,
 						B_TEAM_DEBUG_DEBUGGER_HANDOVER);
+					BreakpointManager* breakpointManager
+						= team->debug_info.breakpoint_manager;
 
 					RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 					restore_interrupts(state);
+
+					// remove all installed breakpoints
+					breakpointManager->RemoveAllBreakpoints();
 
 					release_sem(writeLock);
 				} else {
@@ -2545,7 +2413,7 @@ debug_nub_thread(void *)
 
 	Interrupts must be disabled and the team debug info lock of the team to be
 	debugged must be held. The function will release the lock, but leave
-	interrupts disabled. The team lock must be held, too.
+	interrupts disabled.
 
 	The function also clears the arch specific team and thread debug infos
 	(including among other things formerly set break/watchpoints).
@@ -2655,13 +2523,6 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 				error = B_OK;
 				done = true;
 				result = team->debug_info.nub_port;
-			} else if (
-				teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) {
-				// Another debugger is in the process of installing itself
-				// as the team's debugger.
-				error = (dontReplace ? B_OK : B_BAD_VALUE);
-				done = true;
-				result = team->debug_info.nub_port;
 			} else {
 				// a handover to another debugger is requested
 				// Set the handing-over flag -- we'll clear both flags after
@@ -2735,16 +2596,9 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		state = disable_interrupts();
 		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		int32 teamDebugFlags = team->debug_info.flags;
-
-		if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) != 0
-			&& (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDING_OVER) != 0
-			&& team->debug_info.debugger_port == debuggerPort) {
-			// Everything is as we left it above, so just clear the flags.
-			atomic_and(&team->debug_info.flags,
-				~(B_TEAM_DEBUG_DEBUGGER_HANDOVER
-					| B_TEAM_DEBUG_DEBUGGER_HANDING_OVER));
-		}
+		atomic_and(&team->debug_info.flags,
+			~(B_TEAM_DEBUG_DEBUGGER_HANDOVER
+				| B_TEAM_DEBUG_DEBUGGER_HANDING_OVER));
 
 		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 		restore_interrupts(state);
@@ -2800,6 +2654,16 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	if (error == B_OK)
 		error = set_port_owner(nubPort, debuggerTeam);
 
+	// create the breakpoint manager
+	BreakpointManager* breakpointManager = NULL;
+	if (error == B_OK) {
+		breakpointManager = new(std::nothrow) BreakpointManager;
+		if (breakpointManager != NULL)
+			error = breakpointManager->Init();
+		else
+			error = B_NO_MEMORY;
+	}
+
 	// spawn the nub thread
 	thread_id nubThread = -1;
 	if (error == B_OK) {
@@ -2815,18 +2679,10 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		state = disable_interrupts();
 		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-			// there's already a debugger installed
-			error = (dontReplace ? B_OK : B_BAD_VALUE);
-			done = true;
-			result = team->debug_info.nub_port;
-
-			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-		} else {
-			install_team_debugger_init_debug_infos(team, debuggerTeam,
-				debuggerPort, nubPort, nubThread, debuggerWriteLock,
-				causingThread);
-		}
+		team->debug_info.breakpoint_manager = breakpointManager;
+		install_team_debugger_init_debug_infos(team, debuggerTeam,
+			debuggerPort, nubPort, nubThread, debuggerWriteLock,
+			causingThread);
 
 		restore_interrupts(state);
 	}
@@ -2834,7 +2690,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	finish_debugger_change(team);
 
 	// if everything went fine, resume the nub thread, otherwise clean up
-	if (error == B_OK && !done) {
+	if (error == B_OK) {
 		resume_thread(nubThread);
 	} else {
 		// delete port and terminate thread
@@ -2846,6 +2702,8 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 			int32 result;
 			wait_for_thread(nubThread, &result);
 		}
+
+		delete breakpointManager;
 	}
 
 	TRACE(("install_team_debugger() done2: %ld\n",
@@ -2961,11 +2819,13 @@ _user_remove_team_debugger(team_id teamID)
 
 	InterruptsSpinLocker debugInfoLocker(team->debug_info.lock);
 
-	struct team_debug_info info;
+	thread_id nubThread = -1;
+	port_id nubPort = -1;
+
 	if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
 		// there's a debugger installed
-		info = team->debug_info;
-		clear_team_debug_info(&team->debug_info, false);
+		nubThread = team->debug_info.nub_thread;
+		nubPort = team->debug_info.nub_port;
 	} else {
 		// no debugger installed
 		error = B_BAD_VALUE;
@@ -2973,11 +2833,16 @@ _user_remove_team_debugger(team_id teamID)
 
 	debugInfoLocker.Unlock();
 
+	// Delete the nub port -- this will cause the nub thread to terminate and
+	// remove the debugger.
+	if (nubPort >= 0)
+		delete_port(nubPort);
+
 	finish_debugger_change(team);
 
-	// clean up the info, if there was a debugger installed
-	if (error == B_OK)
-		destroy_team_debug_info(&info);
+	// wait for the nub thread
+	if (nubThread >= 0)
+		wait_for_thread(nubThread, NULL);
 
 	return error;
 }
@@ -3093,7 +2958,7 @@ _user_set_debugger_breakpoint(void *address, uint32 type, int32 length,
 	bool watchpoint)
 {
 	// check the address and size
-	if (address == NULL || !can_access_address(address, false))
+	if (address == NULL || !BreakpointManager::CanAccessAddress(address, false))
 		return B_BAD_ADDRESS;
 	if (watchpoint && length < 0)
 		return B_BAD_VALUE;
@@ -3126,7 +2991,7 @@ status_t
 _user_clear_debugger_breakpoint(void *address, bool watchpoint)
 {
 	// check the address
-	if (address == NULL || !can_access_address(address, false))
+	if (address == NULL || !BreakpointManager::CanAccessAddress(address, false))
 		return B_BAD_ADDRESS;
 
 	// check whether a debugger is installed already

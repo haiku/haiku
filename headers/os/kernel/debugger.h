@@ -455,9 +455,6 @@ typedef struct {
 typedef struct {
 	debug_origin		origin;
 	debug_cpu_state		cpu_state;	// cpu state
-	bool				software;	// true, if the is a software breakpoint
-									// (i.e. caused by a respective trap
-									// instruction)
 } debug_breakpoint_hit;
 
 // B_DEBUGGER_MESSAGE_WATCHPOINT_HIT

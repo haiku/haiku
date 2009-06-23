@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_X86_USER_DEBUGGER_H
@@ -9,9 +9,7 @@
 
 // number of breakpoints the CPU supports
 // Actually it supports 4, but DR3 is used to hold the struct thread*.
-enum {
-	X86_BREAKPOINT_COUNT = 3,
-};
+#define X86_BREAKPOINT_COUNT	3
 
 // debug status register DR6
 enum {
@@ -110,6 +108,9 @@ struct arch_thread_debug_info {
 	uint32	flags;
 };
 
+// The software breakpoint instruction (int3).
+extern const uint8 kX86SoftwareBreakpoint[1];
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -128,5 +129,12 @@ extern void x86_init_user_debug();
 #ifdef __cplusplus
 }
 #endif
+
+// Feature macros we're supposed to define.
+#define DEBUG_MAX_BREAKPOINTS				X86_BREAKPOINT_COUNT
+#define DEBUG_MAX_WATCHPOINTS				X86_BREAKPOINT_COUNT
+#define DEBUG_SOFTWARE_BREAKPOINT			kX86SoftwareBreakpoint
+#define DEBUG_SOFTWARE_BREAKPOINT_SIZE		1
+#define DEBUG_SHARED_BREAK_AND_WATCHPOINTS	1
 
 #endif	// _KERNEL_ARCH_X86_USER_DEBUGGER_H

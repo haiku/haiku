@@ -7,6 +7,7 @@ UsePrivateHeaders shared ;
 
 KernelMergeObject kernel_debug.o :
 	blue_screen.cpp
+	BreakpointManager.cpp
 	debug.cpp
 	debug_builtin_commands.cpp
 	debug_commands.cpp

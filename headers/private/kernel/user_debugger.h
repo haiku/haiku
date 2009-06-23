@@ -20,6 +20,7 @@
 #define	B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD	70			/* in % */
 
 
+struct BreakpointManager;
 struct ConditionVariable;
 struct function_profile_info;
 struct thread;
@@ -69,6 +70,9 @@ struct team_debug_info {
 		// be held when accessing this field. After setting to a condition
 		// variable the thread won't be deleted (until unsetting it) -- it might
 		// be removed from the team hash table, though.
+
+	struct BreakpointManager* breakpoint_manager;
+		// manages hard- and software breakpoints
 
 	struct arch_team_debug_info	arch_info;
 };

@@ -30,6 +30,9 @@
 #define B_WATCHPOINT_NOT_FOUND				B_NAME_NOT_FOUND
 	// ToDo: Make those real error codes.
 
+// The software breakpoint instruction (int3).
+const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
+
 // maps breakpoint slot index to LEN_i LSB number
 static const uint32 sDR7Len[4] = {
 	X86_DR7_LEN0_LSB, X86_DR7_LEN1_LSB, X86_DR7_LEN2_LSB, X86_DR7_LEN3_LSB
@@ -901,6 +904,9 @@ void
 x86_handle_breakpoint_exception(struct iframe *frame)
 {
 	TRACE(("i386_handle_breakpoint_exception()\n"));
+
+	// reset eip to the int3 instruction
+	frame->eip--;
 
 	if (!IFRAME_IS_USER(frame)) {
 		panic("breakpoint exception in kernel mode");
