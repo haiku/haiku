@@ -96,13 +96,22 @@ private:
 									MarkerList& markers);
 			BreakpointMarker*	_BreakpointMarkerAtLine(uint32 line);
 
-	template<typename MarkerType>
-	static	int					_CompareMarkers(const MarkerType* a,
-									const MarkerType* b);
+// TODO: "public" to workaround a GCC2 problem:
+public:
+	static	int					_CompareMarkers(const Marker* a,
+									const Marker* b);
+	static	int					_CompareBreakpointMarkers(
+									const BreakpointMarker* a,
+									const BreakpointMarker* b);
 
 	template<typename MarkerType>
-	static	int					_CompareLineMarker(const uint32* line,
+	static	int					_CompareLineMarkerTemplate(const uint32* line,
 									const MarkerType* marker);
+	static	int					_CompareLineMarker(const uint32* line,
+									const Marker* marker);
+	static	int					_CompareLineBreakpointMarker(
+									const uint32* line,
+									const BreakpointMarker* marker);
 
 private:
 			TeamDebugModel*		fDebugModel;
@@ -173,7 +182,7 @@ struct SourceView::MarkerView::MarkerByLinePredicate
 
 	virtual int operator()(const MarkerType* marker) const
 	{
-		return -_CompareLineMarker<MarkerType>(&fLine, marker);
+		return -_CompareLineMarkerTemplate<MarkerType>(&fLine, marker);
 	}
 
 private:
@@ -601,7 +610,7 @@ SourceView::MarkerView::_UpdateIPMarkers()
 		}
 
 		// sort by line
-		fIPMarkers.SortItems(&_CompareMarkers<Marker>);
+		fIPMarkers.SortItems(&_CompareMarkers);
 
 		// TODO: Filter duplicate IP markers (recursive functions)!
 	}
@@ -648,7 +657,7 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 		}
 
 		// sort by line
-		fBreakpointMarkers.SortItems(&_CompareMarkers<BreakpointMarker>);
+		fBreakpointMarkers.SortItems(&_CompareBreakpointMarkers);
 	}
 
 	fBreakpointMarkersValid = true;
@@ -697,14 +706,23 @@ SourceView::MarkerView::BreakpointMarker*
 SourceView::MarkerView::_BreakpointMarkerAtLine(uint32 line)
 {
 	return fBreakpointMarkers.BinarySearchByKey(line,
-		&_CompareLineMarker<BreakpointMarker>);
+		&_CompareLineBreakpointMarker);
 }
 
 
-template<typename MarkerType>
 /*static*/ int
-SourceView::MarkerView::_CompareMarkers(const MarkerType* a,
-	const MarkerType* b)
+SourceView::MarkerView::_CompareMarkers(const Marker* a,
+	const Marker* b)
+{
+	if (a->Line() < b->Line())
+		return -1;
+	return a->Line() == b->Line() ? 0 : 1;
+}
+
+
+/*static*/ int
+SourceView::MarkerView::_CompareBreakpointMarkers(const BreakpointMarker* a,
+	const BreakpointMarker* b)
 {
 	if (a->Line() < b->Line())
 		return -1;
@@ -714,12 +732,28 @@ SourceView::MarkerView::_CompareMarkers(const MarkerType* a,
 
 template<typename MarkerType>
 /*static*/ int
-SourceView::MarkerView::_CompareLineMarker(const uint32* line,
+SourceView::MarkerView::_CompareLineMarkerTemplate(const uint32* line,
 	const MarkerType* marker)
 {
 	if (*line < marker->Line())
 		return -1;
 	return *line == marker->Line() ? 0 : 1;
+}
+
+
+/*static*/ int
+SourceView::MarkerView::_CompareLineMarker(const uint32* line,
+	const Marker* marker)
+{
+	return _CompareLineMarkerTemplate<Marker>(line, marker);
+}
+
+
+/*static*/ int
+SourceView::MarkerView::_CompareLineBreakpointMarker(const uint32* line,
+	const BreakpointMarker* marker)
+{
+	return _CompareLineMarkerTemplate<BreakpointMarker>(line, marker);
 }
 
 
