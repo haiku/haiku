@@ -11,7 +11,7 @@
 
 
 #include <InterfaceDefs.h>
-#include <Entry.h>
+#include <TextView.h>
 
 #include <stdio.h>
 #include <regex.h>
@@ -47,7 +47,8 @@ public:
 	static	void			GetKey(char* chars, int32 offset, char* string);
 
 private:
-			void			_SaveSourceText(FILE* file);
+			void			_SaveSourceText(FILE* file,
+								text_run_array** _textRuns);
 			void			_ComputeChars(const char* buffer,
 								struct re_registers& regs, int i, int& offset);
 			void			_ComputeTables(const char* buffer,

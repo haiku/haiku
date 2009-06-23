@@ -15,10 +15,12 @@
 #include <string.h>
 
 #include <ByteOrder.h>
+#include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+#include <TextView.h>
 
 
 #define CHARS_TABLE_MAXSIZE  10000
@@ -618,7 +620,22 @@ Keymap::SaveAsSource(const char* name)
 	if (file == NULL)
 		return errno;
 
-	_SaveSourceText(file);
+	text_run_array* textRuns;
+	_SaveSourceText(file, &textRuns);
+
+	if (textRuns != NULL) {
+		ssize_t dataSize;
+		void* data = BTextView::FlattenRunArray(textRuns, &dataSize);
+		if (data != NULL) {
+			BNode node(name);
+			node.WriteAttr("styles", B_RAW_TYPE, 0, data, dataSize);
+
+			free(data);
+		}
+
+		BTextView::FreeRunArray(textRuns);
+	}
+
 	return B_OK;
 }
 
@@ -626,7 +643,7 @@ Keymap::SaveAsSource(const char* name)
 status_t
 Keymap::SaveAsSource(FILE* file)
 {
-	_SaveSourceText(file);
+	_SaveSourceText(file, NULL);
 	return B_OK;
 }
 
@@ -1061,8 +1078,8 @@ Keymap::RestoreSystemDefault()
 
 	path.Append("Key_map");
 
-	BEntry ref(path.Path());
-	ref.Remove();
+	BEntry entry(path.Path());
+	entry.Remove();
 
 	_restore_key_map_();
 #else	// ! __BEOS__
@@ -1112,12 +1129,36 @@ Keymap::GetKey(char* chars, int32 offset, char* string)
 
 
 void
-Keymap::_SaveSourceText(FILE* file)
+Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 {
-	fprintf(file, "#!/bin/keymap -l\n"
+	text_run_array* runs = NULL;
+	if (_textRuns != NULL) {
+		runs = BTextView::AllocRunArray(8);
+		*_textRuns = runs;
+	}
+
+	static const rgb_color kCommentColor = (rgb_color){200, 92, 92, 255};
+	static const rgb_color kTextColor = (rgb_color){0, 0, 0, 255};
+	BFont font = *be_fixed_font;
+
+	if (runs != NULL) {
+		runs->runs[0].offset = 0;
+		runs->runs[0].font = font;
+		runs->runs[0].color = kCommentColor;
+	}
+
+	int bytes = fprintf(file, "#!/bin/keymap -l\n"
 		"#\n"
-		"#\tRaw key numbering for 101 keyboard...\n"
-		"#                                                                                        [sys]       [brk]\n"
+		"#\tRaw key numbering for 101 keyboard...\n");
+
+	if (runs != NULL) {
+		runs->runs[1].offset = bytes;
+		runs->runs[1].font = font;
+		runs->runs[1].font.SetSize(9);
+		runs->runs[1].color = kCommentColor;
+	}
+
+	bytes += fprintf(file, "#                                                                                        [sys]       [brk]\n"
 		"#                                                                                         0x7e        0x7f\n"
 		"# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]\n"
 		"#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S\n"
@@ -1135,8 +1176,15 @@ Keymap::_SaveSourceText(FILE* file)
 		"#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b\n"
 		"#\n"
 		"# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
-		"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n"
-		"#\n"
+		"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n");
+
+	if (runs != NULL) {
+		runs->runs[2].offset = bytes;
+		runs->runs[2].font = font;
+		runs->runs[2].color = kCommentColor;
+	}
+
+	bytes += fprintf(file, "#\n"
 		"#\tNOTE: On a Microsoft Natural Keyboard:\n"
 		"#\t\t\tleft option  = 0x66\n"
 		"#\t\t\tright option = 0x67\n"
@@ -1147,20 +1195,37 @@ Keymap::_SaveSourceText(FILE* file)
 		"#\t\t\tkeypad '='   = 0x6a\n"
 		"#\t\t\tpower key    = 0x6b\n");
 
-	fprintf(file, "Version = %ld\n", fKeys.version);
-	fprintf(file, "CapsLock = 0x%02lx\n", fKeys.caps_key);
-	fprintf(file, "ScrollLock = 0x%02lx\n", fKeys.scroll_key);
-	fprintf(file, "NumLock = 0x%02lx\n", fKeys.num_key);
-	fprintf(file, "LShift = 0x%02lx\n", fKeys.left_shift_key);
-	fprintf(file, "RShift = 0x%02lx\n", fKeys.right_shift_key);
-	fprintf(file, "LCommand = 0x%02lx\n", fKeys.left_command_key);
-	fprintf(file, "RCommand = 0x%02lx\n", fKeys.right_command_key);
-	fprintf(file, "LControl = 0x%02lx\n", fKeys.left_control_key);
-	fprintf(file, "RControl = 0x%02lx\n", fKeys.right_control_key);
-	fprintf(file, "LOption = 0x%02lx\n", fKeys.left_option_key);
-	fprintf(file, "ROption = 0x%02lx\n", fKeys.right_option_key);
-	fprintf(file, "Menu = 0x%02lx\n", fKeys.menu_key);
-	fprintf(file, "#\n"
+	if (runs != NULL) {
+		runs->runs[3].offset = bytes;
+		runs->runs[3].font = *be_fixed_font;
+		runs->runs[3].color = kTextColor;
+	}
+
+	bytes += fprintf(file, "Version = %ld\n"
+		"CapsLock = 0x%02lx\n"
+		"ScrollLock = 0x%02lx\n"
+		"NumLock = 0x%02lx\n"
+		"LShift = 0x%02lx\n"
+		"RShift = 0x%02lx\n"
+		"LCommand = 0x%02lx\n"
+		"RCommand = 0x%02lx\n"
+		"LControl = 0x%02lx\n"
+		"RControl = 0x%02lx\n"
+		"LOption = 0x%02lx\n"
+		"ROption = 0x%02lx\n"
+		"Menu = 0x%02lx\n",
+		fKeys.version, fKeys.caps_key, fKeys.scroll_key, fKeys.num_key,
+		fKeys.left_shift_key, fKeys.right_shift_key, fKeys.left_command_key,
+		fKeys.right_command_key, fKeys.left_control_key, fKeys.right_control_key,
+		fKeys.left_option_key, fKeys.right_option_key, fKeys.menu_key);
+
+	if (runs != NULL) {
+		runs->runs[4].offset = bytes;
+		runs->runs[4].font = *be_fixed_font;
+		runs->runs[4].color = kCommentColor;
+	}
+
+	bytes += fprintf(file, "#\n"
 		"# Lock settings\n"
 		"# To set NumLock, do the following:\n"
 		"#   LockSettings = NumLock\n"
@@ -1168,21 +1233,41 @@ Keymap::_SaveSourceText(FILE* file)
 		"# To set everything, do the following:\n"
 		"#   LockSettings = CapsLock NumLock ScrollLock\n"
 		"#\n");
-	fprintf(file, "LockSettings = ");
-	if (fKeys.lock_settings & B_CAPS_LOCK)
-		fprintf(file, "CapsLock ");
-	if (fKeys.lock_settings & B_NUM_LOCK)
-		fprintf(file, "NumLock ");
-	if (fKeys.lock_settings & B_SCROLL_LOCK)
-		fprintf(file, "ScrollLock ");
-	fprintf(file, "\n");
-	fprintf(file, "# Legend:\n"
+
+	if (runs != NULL) {
+		runs->runs[5].offset = bytes;
+		runs->runs[5].font = *be_fixed_font;
+		runs->runs[5].color = kTextColor;
+	}
+
+	bytes += fprintf(file, "LockSettings = ");
+	if ((fKeys.lock_settings & B_CAPS_LOCK) != 0)
+		bytes += fprintf(file, "CapsLock ");
+	if ((fKeys.lock_settings & B_NUM_LOCK) != 0)
+		bytes += fprintf(file, "NumLock ");
+	if ((fKeys.lock_settings & B_SCROLL_LOCK) != 0)
+		bytes += fprintf(file, "ScrollLock ");
+	bytes += fprintf(file, "\n");
+
+	if (runs != NULL) {
+		runs->runs[6].offset = bytes;
+		runs->runs[6].font = *be_fixed_font;
+		runs->runs[6].color = kCommentColor;
+	}
+
+	bytes += fprintf(file, "# Legend:\n"
 		"#   n = Normal\n"
 		"#   s = Shift\n"
 		"#   c = Control\n"
 		"#   C = CapsLock\n"
 		"#   o = Option\n"
 		"# Key      n        s        c        o        os       C        Cs       Co       Cos     \n");
+
+	if (runs != NULL) {
+		runs->runs[7].offset = bytes;
+		runs->runs[7].font = *be_fixed_font;
+		runs->runs[7].color = kTextColor;
+	}
 
 	for (int idx = 0; idx < 128; idx++) {
 		char normalKey[32];
