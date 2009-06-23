@@ -177,6 +177,19 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
+			case MSG_DEBUGGER_QUIT_REQUESTED:
+			{
+				TeamDebugger* debugger = NULL;
+				if (message->FindPointer("debugger",
+					(void**)&debugger) == B_OK
+					&& fTeamDebuggers.HasItem(debugger)) {
+					fTeamDebuggers.RemoveItem(debugger);
+					debugger->DeleteSelf();
+					if (fTeamDebuggers.CountItems() == 0)
+						PostMessage(B_QUIT_REQUESTED);
+				}
+				break;
+			}
 			default:
 				BApplication::MessageReceived(message);
 				break;
@@ -257,7 +270,8 @@ printf("debugger for team %ld created and initialized successfully!\n", team);
 	virtual bool QuitRequested()
 	{
 		// TODO:...
-		return true;
+//		return true;
+return BApplication::QuitRequested();
 	}
 
 private:

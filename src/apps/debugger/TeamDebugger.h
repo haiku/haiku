@@ -19,6 +19,10 @@
 class DebuggerInterface;
 class TeamDebugModel;
 
+enum {
+	MSG_DEBUGGER_QUIT_REQUESTED = 'dbqt'
+};
+
 
 class TeamDebugger : private BLooper, private TeamWindow::Listener,
 	private JobListener, private Team::Listener {
@@ -30,6 +34,8 @@ public:
 									bool stopInMain);
 
 			team_id				TeamID() const	{ return fTeamID; }
+
+			void				DeleteSelf();
 
 private:
 	virtual	void				MessageReceived(BMessage* message);

@@ -11,6 +11,7 @@
 #include <new>
 
 #include <Alert.h>
+#include <Application.h>
 #include <Message.h>
 
 #include <AutoLocker.h>
@@ -184,6 +185,14 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 
 void
+TeamDebugger::DeleteSelf()
+{
+	Lock();
+	Quit();
+}
+
+
+void
 TeamDebugger::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -310,7 +319,50 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 bool
 TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
 {
-	// TODO:...
+	// TODO: Is this what shall happen?
+	if (!fTeam->Lock())
+		return true;
+
+	BString name(fTeam->Name());
+
+	fTeam->Unlock();
+
+	BString message;
+	message << "What shall be done about the debugged team '";
+	message << name;
+	message << "'?";
+
+	name.Remove(0, name.FindLast('/') + 1);
+
+	BString killLabel("Kill ");
+	killLabel << name;
+
+	BString resumeLabel("Resume ");
+	resumeLabel << name;
+
+	BAlert* alert = new BAlert("Quit Debugger", message.String(),
+		killLabel.String(), "Cancel", resumeLabel.String());
+
+	switch (alert->Go()) {
+		case 0:
+			// TODO: Implement killing the team.
+			alert = new BAlert("TODO", "That is not nice and I won't do it "
+				"either! Test failed. Nice to know how you think about these "
+				"matters.", "Ugh!");
+			alert->Go();
+			break;
+		case 1:
+			return false;
+		case 2:
+			// Detach from the team and resume and stopped threads. Seems to be
+			// the default action anyways.
+			break;
+	}
+
+	BMessage quitMessage(MSG_DEBUGGER_QUIT_REQUESTED);
+	quitMessage.AddPointer("debugger", this);
+	be_app->PostMessage(&quitMessage);
+
 	return true;
 }
 
