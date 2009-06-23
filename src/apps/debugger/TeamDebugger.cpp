@@ -36,7 +36,8 @@ TeamDebugger::TeamDebugger()
 	fWorker(NULL),
 	fDebugEventListener(-1),
 	fTeamWindow(NULL),
-	fTerminating(false)
+	fTerminating(false),
+	fKillTeamOnQuit(false)
 {
 }
 
@@ -54,6 +55,9 @@ TeamDebugger::~TeamDebugger()
 
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
+
+	if (fKillTeamOnQuit && fTeam != NULL)
+		kill_team(fTeam->ID());
 
 	delete fDebuggerInterface;
 	delete fWorker;
@@ -345,11 +349,7 @@ TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
 
 	switch (alert->Go()) {
 		case 0:
-			// TODO: Implement killing the team.
-			alert = new BAlert("TODO", "That is not nice and I won't do it "
-				"either! Test failed. Nice to know how you think about these "
-				"matters.", "Ugh!");
-			alert->Go();
+			fKillTeamOnQuit = true;
 			break;
 		case 1:
 			return false;

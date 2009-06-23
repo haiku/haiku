@@ -124,6 +124,7 @@ private:
 			thread_id			fDebugEventListener;
 			TeamWindow*			fTeamWindow;
 	volatile bool				fTerminating;
+			bool				fKillTeamOnQuit;
 };
 
 #endif	// TEAM_DEBUGGER_H
