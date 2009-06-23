@@ -19,10 +19,6 @@
 class DebuggerInterface;
 class TeamDebugModel;
 
-enum {
-	MSG_DEBUGGER_QUIT_REQUESTED = 'dbqt'
-};
-
 
 class TeamDebugger : private BLooper, private TeamWindow::Listener,
 	private JobListener, private Team::Listener {

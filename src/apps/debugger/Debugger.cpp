@@ -17,6 +17,7 @@
 
 #include "debug_utils.h"
 
+#include "MessageCodes.h"
 #include "TeamDebugger.h"
 
 
