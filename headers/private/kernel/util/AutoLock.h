@@ -132,15 +132,15 @@ typedef AutoLocker<spinlock, SpinLocking> SpinLocker;
 // InterruptsSpinLocking
 class InterruptsSpinLocking {
 public:
-	struct State {
-		State(spinlock* lock)
-			: lock(lock)
-		{
-		}
-
-		int			state;
-		spinlock*	lock;
-	};
+// NOTE: work-around for annoying GCC 4 "fState may be used uninitialized"
+// warning.
+#if __GNUC__ == 4
+	InterruptsSpinLocking()
+		:
+		fState(0)
+	{
+	}
+#endif
 
 	inline bool Lock(spinlock* lockable)
 	{
