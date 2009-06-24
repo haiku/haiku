@@ -59,6 +59,14 @@ TeamDebugger::~TeamDebugger()
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
+	// quit window
+	if (fTeamWindow != NULL) {
+		// TODO: This is not clean. If the window has been deleted we shouldn't
+		// try to access it!
+		if (fTeamWindow->Lock())
+			fTeamWindow->Quit();
+	}
+
 	ThreadHandler* threadHandler = fThreadHandlers.Clear(true);
 	while (threadHandler != NULL) {
 		ThreadHandler* next = threadHandler->fNext;
