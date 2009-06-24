@@ -74,14 +74,10 @@ TeamWindow::~TeamWindow()
 	fDebugModel->GetTeam()->RemoveListener(this);
 	fDebugModel->RemoveListener(this);
 
-	if (fActiveSourceCode != NULL)
-		fActiveSourceCode->RemoveReference();
-	if (fActiveStackFrame != NULL)
-		fActiveStackFrame->RemoveReference();
-	if (fActiveStackTrace != NULL)
-		fActiveStackTrace->RemoveReference();
-	if (fActiveThread != NULL)
-		fActiveThread->RemoveReference();
+	_SetActiveSourceCode(NULL);
+	_SetActiveStackFrame(NULL);
+	_SetActiveStackTrace(NULL);
+	_SetActiveThread(NULL);
 }
 
 
