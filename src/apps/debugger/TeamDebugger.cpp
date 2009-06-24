@@ -11,7 +11,6 @@
 #include <new>
 
 #include <Alert.h>
-#include <Application.h>
 #include <Message.h>
 
 #include <AutoLocker.h>
@@ -26,9 +25,10 @@
 #include "TeamDebugModel.h"
 
 
-TeamDebugger::TeamDebugger()
+TeamDebugger::TeamDebugger(Listener* listener)
 	:
 	BLooper("team debugger"),
+	fListener(listener),
 	fTeam(NULL),
 	fDebugModel(NULL),
 	fTeamID(-1),
@@ -63,6 +63,8 @@ TeamDebugger::~TeamDebugger()
 	delete fWorker;
 	delete fDebugModel;
 	delete fTeam;
+
+	fListener->TeamDebuggerQuit(this);
 }
 
 
@@ -185,14 +187,6 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	}
 
 	return B_OK;
-}
-
-
-void
-TeamDebugger::DeleteSelf()
-{
-	Lock();
-	Quit();
 }
 
 
@@ -323,13 +317,9 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 bool
 TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
 {
-	// TODO: Is this what shall happen?
-	if (!fTeam->Lock())
-		return true;
-
+	AutoLocker< ::Team> locker(fTeam);
 	BString name(fTeam->Name());
-
-	fTeam->Unlock();
+	locker.Unlock();
 
 	BString message;
 	message << "What shall be done about the debugged team '";
@@ -354,14 +344,11 @@ TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
 		case 1:
 			return false;
 		case 2:
-			// Detach from the team and resume and stopped threads. Seems to be
-			// the default action anyways.
+			// Detach from the team and resume and stopped threads.
 			break;
 	}
 
-	BMessage quitMessage(MSG_DEBUGGER_QUIT_REQUESTED);
-	quitMessage.AddPointer("debugger", this);
-	be_app->PostMessage(&quitMessage);
+	PostMessage(B_QUIT_REQUESTED);
 
 	return true;
 }
@@ -890,4 +877,12 @@ TeamDebugger::_NotifyUser(const char* title, const char* text,...)
 	// TODO: We need to let the alert run asynchronously, but we shouldn't just
 	// create it and don't care anymore. Maybe an error window, which can
 	// display a list of errors would be the better choice.
+}
+
+
+// #pragma mark - Listener
+
+
+TeamDebugger::Listener::~Listener()
+{
 }

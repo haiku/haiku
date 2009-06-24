@@ -13,6 +13,7 @@
 #include <Application.h>
 #include <Message.h>
 
+#include <AutoLocker.h>
 #include <ObjectList.h>
 
 #include "debug_utils.h"
@@ -163,11 +164,12 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 
-class Debugger : public BApplication {
+class Debugger : public BApplication, private TeamDebugger::Listener {
 public:
 	Debugger()
 		:
-		BApplication(kDebuggerSignature)
+		BApplication(kDebuggerSignature),
+		fRunningTeamDebuggers(0)
 	{
 	}
 
@@ -178,17 +180,14 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
-			case MSG_DEBUGGER_QUIT_REQUESTED:
+			case MSG_TEAM_DEBUGGER_QUIT:
 			{
-				TeamDebugger* debugger = NULL;
-				if (message->FindPointer("debugger",
-					(void**)&debugger) == B_OK
-					&& fTeamDebuggers.HasItem(debugger)) {
-					fTeamDebuggers.RemoveItem(debugger);
-					debugger->DeleteSelf();
-					if (fTeamDebuggers.CountItems() == 0)
-						PostMessage(B_QUIT_REQUESTED);
-				}
+				int32 threadID;
+				if (message->FindInt32("thread", &threadID) == B_OK)
+					wait_for_thread(threadID, NULL);
+
+				if (--fRunningTeamDebuggers == 0)
+					Quit();
 				break;
 			}
 			default:
@@ -255,23 +254,45 @@ printf("There's already a debugger for team: %ld\n", team);
 			return;
 		}
 
-		debugger = new(std::nothrow) TeamDebugger;
+		debugger = new(std::nothrow) TeamDebugger(this);
 		if (debugger == NULL) {
 			// TODO: Notify the user!
 			fprintf(stderr, "Error: Out of memory!\n");
 		}
 
-		if (debugger->Init(team, thread, stopInMain) == B_OK
-			&& fTeamDebuggers.AddItem(debugger)) {
+		status_t error = debugger->Init(team, thread, stopInMain);
+		if (debugger->Thread())
+			fRunningTeamDebuggers++;
+
+		if (error == B_OK && fTeamDebuggers.AddItem(debugger)) {
 printf("debugger for team %ld created and initialized successfully!\n", team);
 		} else
 			delete debugger;
 	}
 
+private:
+	typedef BObjectList<TeamDebugger>	TeamDebuggerList;
+
+private:
+	// TeamDebugger::Listener
+	virtual void TeamDebuggerQuit(TeamDebugger* debugger)
+	{
+		// Note: Locking here only works, since we're never locking the other
+		// way around. If we even need to do that, we'll have to introduce a
+		// separate lock to protect the list.
+		AutoLocker<Debugger> locker(this);
+		fTeamDebuggers.RemoveItem(debugger);
+		locker.Unlock();
+
+		if (debugger->Thread() >= 0) {
+			BMessage message(MSG_TEAM_DEBUGGER_QUIT);
+			message.AddInt32("thread", debugger->Thread());
+			PostMessage(&message);
+		}
+	}
+
 	virtual bool QuitRequested()
 	{
-		// TODO:...
-//		return true;
 		// NOTE: The default implementation will just ask all windows'
 		// QuitRequested() hooks. This in turn will ask the TeamWindows.
 		// For now, this is what we want. If we have more windows later,
@@ -282,12 +303,17 @@ printf("debugger for team %ld created and initialized successfully!\n", team);
 		// QuitReqested() hook or the TeamsWindow and other global windows
 		// could always return false in their QuitRequested().
 		return BApplication::QuitRequested();
+			// TODO: This is ugly. The team debuggers own the windows, not the
+			// other way around.
 	}
 
-private:
-	typedef BObjectList<TeamDebugger>	TeamDebuggerList;
+	virtual void Quit()
+	{
+		// don't quit before all team debuggers have been quit
+		if (fRunningTeamDebuggers <= 0)
+			BApplication::Quit();
+	}
 
-private:
 	TeamDebugger* _TeamDebuggerForTeam(team_id teamID) const
 	{
 		for (int32 i = 0; TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
@@ -301,6 +327,7 @@ private:
 
 private:
 	TeamDebuggerList	fTeamDebuggers;
+	int32				fRunningTeamDebuggers;
 };
 
 

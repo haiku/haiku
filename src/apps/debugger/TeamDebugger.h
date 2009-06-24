@@ -20,10 +20,13 @@ class DebuggerInterface;
 class TeamDebugModel;
 
 
-class TeamDebugger : private BLooper, private TeamWindow::Listener,
+class TeamDebugger : public BLooper, private TeamWindow::Listener,
 	private JobListener, private Team::Listener {
 public:
-								TeamDebugger();
+	class Listener;
+
+public:
+								TeamDebugger(Listener* listener);
 								~TeamDebugger();
 
 			status_t			Init(team_id teamID, thread_id threadID,
@@ -31,11 +34,9 @@ public:
 
 			team_id				TeamID() const	{ return fTeamID; }
 
-			void				DeleteSelf();
-
-private:
 	virtual	void				MessageReceived(BMessage* message);
 
+private:
 	// TeamWindow::Listener
 	virtual	void				StackFrameSourceCodeRequested(
 									TeamWindow* window, StackFrame* frame);
@@ -111,6 +112,7 @@ private:
 									const char* text,...);
 
 private:
+			Listener*			fListener;
 			::Team*				fTeam;
 			TeamDebugModel*		fDebugModel;
 			team_id				fTeamID;
@@ -122,5 +124,14 @@ private:
 	volatile bool				fTerminating;
 			bool				fKillTeamOnQuit;
 };
+
+
+class TeamDebugger::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger) = 0;
+};
+
 
 #endif	// TEAM_DEBUGGER_H
