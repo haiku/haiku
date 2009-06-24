@@ -13,6 +13,7 @@
 #include "DebugEvent.h"
 #include "Team.h"
 #include "TeamWindow.h"
+#include "ThreadHandler.h"
 #include "Worker.h"
 
 
@@ -66,21 +67,6 @@ private:
 
 			void				_HandleDebuggerMessage(DebugEvent* event);
 
-			bool				_HandleThreadStopped(thread_id threadID,
-									CpuState* cpuState);
-
-			bool				_HandleThreadDebugged(
-									ThreadDebuggedEvent* event);
-			bool				_HandleDebuggerCall(
-									DebuggerCallEvent* event);
-			bool				_HandleBreakpointHit(
-									BreakpointHitEvent* event);
-			bool				_HandleWatchpointHit(
-									WatchpointHitEvent* event);
-			bool				_HandleSingleStep(
-									SingleStepEvent* event);
-			bool				_HandleExceptionOccurred(
-									ExceptionOccurredEvent* event);
 			bool				_HandleThreadCreated(
 									ThreadCreatedEvent* event);
 			bool				_HandleThreadDeleted(
@@ -90,23 +76,17 @@ private:
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
 
-			void				_UpdateThreadState(::Thread* thread);
-			void				_SetThreadState(::Thread* thread, uint32 state,
-									CpuState* cpuState);
 
 			status_t			_SetUserBreakpoint(target_addr_t address,
 									bool enabled);
 
-			void				_HandleThreadAction(thread_id threadID,
-									uint32 action);
 			void				_HandleSetUserBreakpoint(target_addr_t address,
 									bool enabled);
 			void				_HandleClearUserBreakpoint(
 									target_addr_t address);
 
-			void				_HandleThreadStateChanged(thread_id threadID);
-			void				_HandleCpuStateChanged(thread_id threadID);
-			void				_HandleStackTraceChanged(thread_id threadID);
+
+			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
 			void				_NotifyUser(const char* title,
 									const char* text,...);
@@ -116,7 +96,8 @@ private:
 			::Team*				fTeam;
 			TeamDebugModel*		fDebugModel;
 			team_id				fTeamID;
-			port_id				fNubPort;
+			ThreadHandlerTable	fThreadHandlers;
+									// protected by the team lock
 			DebuggerInterface*	fDebuggerInterface;
 			Worker*				fWorker;
 			thread_id			fDebugEventListener;

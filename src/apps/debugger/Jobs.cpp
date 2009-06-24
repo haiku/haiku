@@ -22,6 +22,56 @@
 #include "Thread.h"
 
 
+// #pragma mark - GetThreadStateJob
+
+
+GetThreadStateJob::GetThreadStateJob(DebuggerInterface* debuggerInterface,
+	Thread* thread)
+	:
+	fDebuggerInterface(debuggerInterface),
+	fThread(thread)
+{
+	fThread->AddReference();
+}
+
+
+GetThreadStateJob::~GetThreadStateJob()
+{
+	fThread->RemoveReference();
+}
+
+
+JobKey
+GetThreadStateJob::Key() const
+{
+	return JobKey(fThread, JOB_TYPE_GET_THREAD_STATE);
+}
+
+
+status_t
+GetThreadStateJob::Do()
+{
+	CpuState* state = NULL;
+	status_t error = fDebuggerInterface->GetCpuState(fThread->ID(), state);
+	Reference<CpuState> reference(state, true);
+
+	AutoLocker<Team> locker(fThread->GetTeam());
+
+	if (fThread->State() != THREAD_STATE_UNKNOWN)
+		return B_OK;
+
+	if (error == B_OK) {
+		fThread->SetState(THREAD_STATE_STOPPED);
+		fThread->SetCpuState(state);
+	} else if (error == B_BAD_THREAD_STATE) {
+		fThread->SetState(THREAD_STATE_RUNNING);
+	} else
+		return error;
+
+	return B_OK;
+}
+
+
 // #pragma mark - GetCpuStateJob
 
 

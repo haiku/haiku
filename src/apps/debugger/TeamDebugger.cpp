@@ -59,6 +59,13 @@ TeamDebugger::~TeamDebugger()
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
+	ThreadHandler* threadHandler = fThreadHandlers.Clear(true);
+	while (threadHandler != NULL) {
+		ThreadHandler* next = threadHandler->fNext;
+		threadHandler->RemoveReference();
+		threadHandler = next;
+	}
+
 	delete fDebuggerInterface;
 	delete fWorker;
 	delete fDebugModel;
@@ -91,6 +98,11 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		// TODO: Set a better name!
 
 	fTeam->AddListener(this);
+
+	// init thread handler table
+	error = fThreadHandlers.Init();
+	if (error != B_OK)
+		return error;
 
 	// create our worker
 	fWorker = new(std::nothrow) Worker;
@@ -136,7 +148,14 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 			if (error != B_OK)
 				return error;
 
-			_UpdateThreadState(thread);
+			ThreadHandler* handler = new(std::nothrow) ThreadHandler(
+				fDebugModel, thread, fWorker, fDebuggerInterface);
+			if (handler == NULL)
+				return B_NO_MEMORY;
+
+			fThreadHandlers.Insert(handler);
+
+			handler->Init();
 		}
 	}
 
@@ -204,7 +223,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
-			_HandleThreadAction(threadID, message->what);
+			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
+				handler->HandleThreadAction(message->what);
+				handler->RemoveReference();
+			}
 			break;
 		}
 
@@ -232,7 +254,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
-			_HandleThreadStateChanged(threadID);
+			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
+				handler->HandleThreadStateChanged();
+				handler->RemoveReference();
+			}
 			break;
 		}
 		case MSG_THREAD_CPU_STATE_CHANGED:
@@ -241,7 +266,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
-			_HandleCpuStateChanged(threadID);
+			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
+				handler->HandleCpuStateChanged();
+				handler->RemoveReference();
+			}
 			break;
 		}
 		case MSG_THREAD_STACK_TRACE_CHANGED:
@@ -250,7 +278,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("thread", &threadID) != B_OK)
 				break;
 
-			_HandleStackTraceChanged(threadID);
+			if (ThreadHandler* handler = _GetThreadHandler(threadID)) {
+				handler->HandleStackTraceChanged();
+				handler->RemoveReference();
+			}
 			break;
 		}
 
@@ -448,35 +479,51 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 printf("TeamDebugger::_HandleDebuggerMessage(): %d\n", event->EventType());
 	bool handled = false;
 
+	ThreadHandler* handler = _GetThreadHandler(event->Thread());
+	Reference<ThreadHandler> handlerReference(handler);
+
 	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
 printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", event->Thread());
-			handled = _HandleThreadDebugged(
-				dynamic_cast<ThreadDebuggedEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleThreadDebugged(
+					dynamic_cast<ThreadDebuggedEvent*>(event));
+			}
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
 printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", event->Thread());
-			handled = _HandleDebuggerCall(
-				dynamic_cast<DebuggerCallEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleDebuggerCall(
+					dynamic_cast<DebuggerCallEvent*>(event));
+			}
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
 printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", event->Thread());
-			handled = _HandleBreakpointHit(
-				dynamic_cast<BreakpointHitEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleBreakpointHit(
+					dynamic_cast<BreakpointHitEvent*>(event));
+			}
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
 printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", event->Thread());
-			handled = _HandleWatchpointHit(
-				dynamic_cast<WatchpointHitEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleWatchpointHit(
+					dynamic_cast<WatchpointHitEvent*>(event));
+			}
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", event->Thread());
-			handled = _HandleSingleStep(dynamic_cast<SingleStepEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleSingleStep(
+					dynamic_cast<SingleStepEvent*>(event));
+			}
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", event->Thread());
-			handled = _HandleExceptionOccurred(
-				dynamic_cast<ExceptionOccurredEvent*>(event));
+			if (handler != NULL) {
+				handled = handler->HandleExceptionOccurred(
+					dynamic_cast<ExceptionOccurredEvent*>(event));
+			}
 			break;
 //		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 //printf("B_DEBUGGER_MESSAGE_TEAM_CREATED: team: %ld\n", message.team_created.new_team);
@@ -524,63 +571,6 @@ printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
 
 
 bool
-TeamDebugger::_HandleThreadStopped(thread_id threadID, CpuState* cpuState)
-{
-	// get the thread
-	AutoLocker< ::Team> locker(fTeam);
-	::Thread* thread = fTeam->ThreadByID(threadID);
-	if (thread == NULL)
-		return false;
-
-	_SetThreadState(thread, THREAD_STATE_STOPPED, cpuState);
-
-	return true;
-}
-
-
-bool
-TeamDebugger::_HandleThreadDebugged(ThreadDebuggedEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), NULL);
-}
-
-
-bool
-TeamDebugger::_HandleDebuggerCall(DebuggerCallEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), NULL);
-}
-
-
-bool
-TeamDebugger::_HandleBreakpointHit(BreakpointHitEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
-}
-
-
-bool
-TeamDebugger::_HandleWatchpointHit(WatchpointHitEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
-}
-
-
-bool
-TeamDebugger::_HandleSingleStep(SingleStepEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), event->GetCpuState());
-}
-
-
-bool
-TeamDebugger::_HandleExceptionOccurred(ExceptionOccurredEvent* event)
-{
-	return _HandleThreadStopped(event->Thread(), NULL);
-}
-
-
-bool
 TeamDebugger::_HandleThreadCreated(ThreadCreatedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
@@ -588,8 +578,17 @@ TeamDebugger::_HandleThreadCreated(ThreadCreatedEvent* event)
 	ThreadInfo info;
 	status_t error = fDebuggerInterface->GetThreadInfo(event->NewThread(),
 		info);
-	if (error == B_OK)
-		fTeam->AddThread(info);
+	if (error == B_OK) {
+		::Thread* thread;
+		fTeam->AddThread(info, &thread);
+
+		ThreadHandler* handler = new(std::nothrow) ThreadHandler(
+			fDebugModel, thread, fWorker, fDebuggerInterface);
+		if (handler != NULL) {
+			fThreadHandlers.Insert(handler);
+			handler->Init();
+		}
+	}
 
 	return false;
 }
@@ -599,6 +598,10 @@ bool
 TeamDebugger::_HandleThreadDeleted(ThreadDeletedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
+	if (ThreadHandler* handler = fThreadHandlers.Lookup(event->Thread())) {
+		fThreadHandlers.Remove(handler);
+		handler->RemoveReference();
+	}
 	fTeam->RemoveThread(event->Thread());
 	return false;
 }
@@ -619,32 +622,6 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 	AutoLocker< ::Team> locker(fTeam);
 	fTeam->RemoveImage(event->GetImageInfo().ImageID());
 	return false;
-}
-
-
-void
-TeamDebugger::_UpdateThreadState(::Thread* thread)
-{
-	CpuState* cpuState = NULL;
-	status_t error = fDebuggerInterface->GetCpuState(thread->ID(), cpuState);
-
-	uint32 newState = THREAD_STATE_UNKNOWN;
-	if (error == B_OK) {
-		newState = THREAD_STATE_STOPPED;
-		cpuState->RemoveReference();
-	} else if (error == B_BAD_THREAD_STATE)
-		newState = THREAD_STATE_RUNNING;
-
-	_SetThreadState(thread, newState, cpuState);
-}
-
-
-void
-TeamDebugger::_SetThreadState(::Thread* thread, uint32 state,
-	CpuState* cpuState)
-{
-	thread->SetState(state);
-	thread->SetCpuState(cpuState);
 }
 
 
@@ -716,56 +693,6 @@ printf("-> breakpoint %sinstalled successfully!\n", install ? "" : "un");
 
 
 void
-TeamDebugger::_HandleThreadAction(thread_id threadID, uint32 action)
-{
-	AutoLocker< ::Team> locker(fTeam);
-
-	::Thread* thread = fTeam->ThreadByID(threadID);
-	if (thread == NULL || thread->State() == THREAD_STATE_UNKNOWN)
-		return;
-
-	// When stop is requested, thread must be running, otherwise stopped.
-	if (action == MSG_THREAD_STOP
-			? thread->State() != THREAD_STATE_RUNNING
-			: thread->State() != THREAD_STATE_STOPPED) {
-		return;
-	}
-
-	// When continuing the thread update thread state before actually issuing
-	// the command, since we need to unlock.
-	if (action != MSG_THREAD_STOP)
-		_SetThreadState(thread, THREAD_STATE_RUNNING, NULL);
-
-	locker.Unlock();
-
-	switch (action) {
-		case MSG_THREAD_RUN:
-printf("MSG_THREAD_RUN\n");
-			fDebuggerInterface->ContinueThread(threadID);
-			break;
-		case MSG_THREAD_STOP:
-printf("MSG_THREAD_STOP\n");
-			fDebuggerInterface->StopThread(threadID);
-			break;
-		case MSG_THREAD_STEP_OVER:
-printf("MSG_THREAD_STEP_OVER\n");
-			fDebuggerInterface->SingleStepThread(threadID);
-			break;
-		case MSG_THREAD_STEP_INTO:
-printf("MSG_THREAD_STEP_INTO\n");
-			fDebuggerInterface->SingleStepThread(threadID);
-			break;
-		case MSG_THREAD_STEP_OUT:
-printf("MSG_THREAD_STEP_OUT\n");
-			fDebuggerInterface->SingleStepThread(threadID);
-			break;
-
-// TODO: Handle stepping correctly!
-	}
-}
-
-
-void
 TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 {
 printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
@@ -806,55 +733,15 @@ printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
 }
 
 
-void
-TeamDebugger::_HandleThreadStateChanged(thread_id threadID)
+ThreadHandler*
+TeamDebugger::_GetThreadHandler(thread_id threadID)
 {
-	AutoLocker< ::Team> teamLocker(fTeam);
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
-	::Thread* thread = fTeam->ThreadByID(threadID);
-	if (thread == NULL)
-		return;
-
-	// cancel jobs for this thread
-	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_CPU_STATE));
-	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_STACK_TRACE));
-
-	// If the thread is stopped and has no CPU state yet, schedule a job.
-	if (thread->State() == THREAD_STATE_STOPPED
-			&& thread->GetCpuState() == NULL) {
-		fWorker->ScheduleJob(
-			new(std::nothrow) GetCpuStateJob(fDebuggerInterface, thread),
-			this);
-	}
-}
-
-
-void
-TeamDebugger::_HandleCpuStateChanged(thread_id threadID)
-{
-	AutoLocker< ::Team> teamLocker(fTeam);
-
-	::Thread* thread = fTeam->ThreadByID(threadID);
-	if (thread == NULL)
-		return;
-
-	// cancel stack trace job for this thread
-	fWorker->AbortJob(JobKey(thread, JOB_TYPE_GET_STACK_TRACE));
-
-	// If the thread has a CPU state, but no stack trace yet, schedule a job.
-	if (thread->GetCpuState() != NULL && thread->GetStackTrace() == NULL) {
-		fWorker->ScheduleJob(
-			new(std::nothrow) GetStackTraceJob(fDebuggerInterface,
-				fDebuggerInterface->GetArchitecture(), thread),
-			this);
-	}
-}
-
-
-void
-TeamDebugger::_HandleStackTraceChanged(thread_id threadID)
-{
-printf("TeamDebugger::_HandleStackTraceChanged()\n");
+	ThreadHandler* handler = fThreadHandlers.Lookup(threadID);
+	if (handler != NULL)
+		handler->AddReference();
+	return handler;
 }
 
 

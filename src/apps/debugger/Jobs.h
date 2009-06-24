@@ -20,10 +20,27 @@ class Thread;
 
 // job types
 enum {
+	JOB_TYPE_GET_THREAD_STATE,
 	JOB_TYPE_GET_CPU_STATE,
 	JOB_TYPE_GET_STACK_TRACE,
 	JOB_TYPE_LOAD_IMAGE_DEBUG_INFO,
 	JOB_TYPE_LOAD_SOURCE_CODE
+};
+
+
+class GetThreadStateJob : public Job {
+public:
+								GetThreadStateJob(
+									DebuggerInterface* debuggerInterface,
+									Thread* thread);
+	virtual						~GetThreadStateJob();
+
+	virtual	JobKey				Key() const;
+	virtual	status_t			Do();
+
+private:
+			DebuggerInterface*	fDebuggerInterface;
+			Thread*				fThread;
 };
 
 

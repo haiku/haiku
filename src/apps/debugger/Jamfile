@@ -25,6 +25,7 @@ Application Debugger :
 #	ElfFile.cpp
 	Jobs.cpp
 	TeamDebugger.cpp
+	ThreadHandler.cpp
 	Worker.cpp
 
 	# arch
