@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku Inc. All rights reserved.
+ * Copyright 2003-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -296,7 +296,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 
 void*
-arch_debug_get_interrupt_pc()
+arch_debug_get_interrupt_pc(bool* _isSyscall)
 {
 	// TODO: Implement!
 	return NULL;

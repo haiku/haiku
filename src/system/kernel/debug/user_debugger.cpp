@@ -798,8 +798,10 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 	prepare_debugger_change(team, debugChangeCondition);
 
 	if (team->debug_info.breakpoint_manager != NULL) {
-		team->debug_info.breakpoint_manager->PrepareToContinue(
-			arch_debug_get_interrupt_pc());
+		bool isSyscall;
+		void* pc = arch_debug_get_interrupt_pc(&isSyscall);
+		if (pc != NULL && !isSyscall)
+			team->debug_info.breakpoint_manager->PrepareToContinue(pc);
 	}
 
 	finish_debugger_change(team);
@@ -1316,7 +1318,7 @@ profiling_do_sample(bool& flushBuffer)
 
 		if (debugInfo.profile.last_image_event < imageEvent
 			|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
-			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc())) {
+			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc(NULL))) {
 				flushBuffer = true;
 				return true;
 			}
@@ -1353,7 +1355,7 @@ profiling_do_sample(bool& flushBuffer)
 			for (int32 i = count; i < stackDepth; i++)
 				returnAddresses[i] = 0;
 		} else
-			*returnAddresses = (addr_t)arch_debug_get_interrupt_pc();
+			*returnAddresses = (addr_t)arch_debug_get_interrupt_pc(NULL);
 
 		debugInfo.profile.sample_count += stackDepth;
 	}

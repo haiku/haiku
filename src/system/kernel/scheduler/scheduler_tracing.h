@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -99,7 +99,7 @@ public:
 
 #if SCHEDULER_TRACING >= 2
 		if (fPreviousState == B_THREAD_READY)
-			fPreviousPC = arch_debug_get_interrupt_pc();
+			fPreviousPC = arch_debug_get_interrupt_pc(NULL);
 		else
 #endif
 			fPreviousWaitObject = previous->wait.object;

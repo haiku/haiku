@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -980,15 +981,20 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 
 /*!	Returns the program counter of the currently debugged (respectively this)
-	thread where the innermost interrupts happened. Returns \c NULL, if there's
-	none or a problem occurred retrieving it.
+	thread where the innermost interrupts happened. \a _isSyscall, if specified,
+	is set to whether this interrupt frame was created by a syscall. Returns
+	\c NULL, if there's no such frame or a problem occurred retrieving it;
+	\a _isSyscall won't be set in this case.
 */
 void*
-arch_debug_get_interrupt_pc()
+arch_debug_get_interrupt_pc(bool* _isSyscall)
 {
 	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
 	if (frame == NULL)
 		return NULL;
+
+	if (_isSyscall != NULL)
+		*_isSyscall = frame->vector == 99;
 
 	return (void*)(addr_t)frame->eip;
 }
