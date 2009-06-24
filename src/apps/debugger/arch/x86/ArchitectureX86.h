@@ -45,6 +45,9 @@ private:
 									const char* name, uint32 bitSize,
 									register_type type);
 
+			bool				_HasFunctionPrologue(
+									FunctionDebugInfo* function) const;
+
 private:
 			Array<Register>		fRegisters;
 };

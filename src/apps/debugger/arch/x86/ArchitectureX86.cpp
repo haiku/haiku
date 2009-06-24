@@ -119,16 +119,75 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 	uint32 framePointer = cpuState->IntRegisterValue(X86_REGISTER_EBP);
 	uint32 eip = cpuState->IntRegisterValue(X86_REGISTER_EIP);
 
+	bool readStandardFrame = true;
+	uint32 previousFramePointer = 0;
+	uint32 returnAddress = 0;
+
 	// check for syscall frames
 	stack_frame_type frameType;
+	bool hasPrologue = false;
 	if (isTopFrame && cpuState->InterruptVector() == 99) {
 		// The thread is performing a syscall. So this frame is not really the
 		// top-most frame and we need to adjust the eip.
 		frameType = STACK_FRAME_TYPE_SYSCALL;
 		eip -= 2;
 			// int 99, sysenter, and syscall all are 2 byte instructions
-	} else
-		frameType = STACK_FRAME_TYPE_STANDARD;
+
+		// The syscall stubs are frameless, the return address is on top of the
+		// stack.
+		uint32 esp = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+		uint32 address;
+		if (fDebuggerInterface->ReadMemory(esp, &address, 4) == 4) {
+			returnAddress = address;
+			previousFramePointer = framePointer;
+			framePointer = 0;
+			readStandardFrame = false;
+		}
+	} else {
+		hasPrologue = _HasFunctionPrologue(function);
+		if (hasPrologue)
+			frameType = STACK_FRAME_TYPE_STANDARD;
+		else
+			frameType = STACK_FRAME_TYPE_FRAMELESS;
+		// TODO: Handling for frameless functions. It's not trivial to find the
+		// return address on the stack, though.
+
+		// If the function is not frameless and we're at the top frame we need
+		// to check whether the prologue has not been executed (completely) or
+		// we're already after the epilogue.
+		if (hasPrologue && isTopFrame) {
+			uint32 stack = 0;
+			if (eip < function->Address() + 3) {
+				// The prologue has not been executed yet, i.e. there's no
+				// stack frame yet. Get the return address from the stack.
+				stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+				if (eip > function->Address()) {
+					// The "push %ebp" has already been executed.
+					stack += 4;
+				}
+			} else {
+				// Not in the function prologue, but maybe after the epilogue.
+				// The epilogue is a single "pop %ebp", so we check whether the
+				// current instruction is already a "ret".
+				uint8 code[1];
+				if (fDebuggerInterface->ReadMemory(eip, &code, 1) == 1
+					&& code[0] == 0xc3) {
+					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+				}
+			}
+
+			if (stack != 0) {
+				uint32 address;
+				if (fDebuggerInterface->ReadMemory(stack, &address, 4) == 4) {
+					returnAddress = address;
+					previousFramePointer = framePointer;
+					framePointer = 0;
+					readStandardFrame = false;
+					frameType = STACK_FRAME_TYPE_FRAMELESS;
+				}
+			}
+		}
+	}
 
 	// create the stack frame
 	StackFrame* frame = new(std::nothrow) StackFrame(frameType, cpuState,
@@ -137,20 +196,31 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		return B_NO_MEMORY;
 	Reference<StackFrame> frameReference(frame, true);
 
-	// read the previous frame and return address and create the CPU state
+	// read the previous frame and return address, if this is a standard frame
+	if (readStandardFrame) {
+		uint32 frameData[2];
+		if (framePointer != 0
+			&& fDebuggerInterface->ReadMemory(framePointer, frameData, 8)
+				== 8) {
+			previousFramePointer = frameData[0];
+			returnAddress = frameData[1];
+		}
+	}
+
+	// create the CPU state, if we have any info
 	CpuStateX86* previousCpuState = NULL;
-	uint32 frameData[2];
-	if (framePointer != 0
-		&& fDebuggerInterface->ReadMemory(framePointer, frameData, 8) == 8) {
+	if (returnAddress != 0) {
 		// prepare the previous CPU state
 		previousCpuState = new(std::nothrow) CpuStateX86;
 		if (previousCpuState == NULL)
 			return B_NO_MEMORY;
 
-		frame->SetReturnAddress(frameData[1]);
-		previousCpuState->SetIntRegister(X86_REGISTER_EBP, frameData[0]);
-		previousCpuState->SetIntRegister(X86_REGISTER_EIP, frameData[1]);
+		previousCpuState->SetIntRegister(X86_REGISTER_EBP,
+			previousFramePointer);
+		previousCpuState->SetIntRegister(X86_REGISTER_EIP, returnAddress);
 	}
+
+	frame->SetReturnAddress(returnAddress);
 
 	_previousFrame = frameReference.Detach();
 	_previousCpuState = previousCpuState;
@@ -171,17 +241,17 @@ ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
 	uint32 eip = cpuState->IntRegisterValue(X86_REGISTER_EIP);
 	if (previousFunction == NULL || eip <= previousFunction->Address())
 		return;
-	target_addr_t functionAddresss = previousFunction->Address();
+	target_addr_t functionAddress = previousFunction->Address();
 
 	// allocate a buffer for the function code to disassemble
-	size_t bufferSize = eip - functionAddresss;
+	size_t bufferSize = eip - functionAddress;
 	void* buffer = malloc(bufferSize);
 	if (buffer == NULL)
 		return;
 	MemoryDeleter bufferDeleter(buffer);
 
 	// read the code
-	ssize_t bytesRead = fDebuggerInterface->ReadMemory(functionAddresss, buffer,
+	ssize_t bytesRead = fDebuggerInterface->ReadMemory(functionAddress, buffer,
 		bufferSize);
 	if (bytesRead != (ssize_t)bufferSize)
 		return;
@@ -190,7 +260,7 @@ ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
 	DisassemblerX86 disassembler;
 	target_addr_t instructionAddress;
 	target_size_t instructionSize;
-	if (disassembler.Init(functionAddresss, buffer, bufferSize) == B_OK
+	if (disassembler.Init(functionAddress, buffer, bufferSize) == B_OK
 		&& disassembler.GetPreviousInstruction(eip, instructionAddress,
 			instructionSize) == B_OK) {
 		eip -= instructionSize;
@@ -251,4 +321,22 @@ ArchitectureX86::_AddIntegerRegister(int32 index, const char* name,
 	uint32 bitSize, register_type type)
 {
 	_AddRegister(index, name, REGISTER_FORMAT_INTEGER, bitSize, type);
+}
+
+
+bool
+ArchitectureX86::_HasFunctionPrologue(FunctionDebugInfo* function) const
+{
+	if (function == NULL)
+		return false;
+
+	// check whether the function has the typical prologue
+	if (function->Size() < 3)
+		return false;
+
+	uint8 buffer[3];
+	if (fDebuggerInterface->ReadMemory(function->Address(), buffer, 3) != 3)
+		return false;
+
+	return buffer[0] == 0x55 && buffer[1] == 0x89 && buffer[2] == 0xe5;
 }
