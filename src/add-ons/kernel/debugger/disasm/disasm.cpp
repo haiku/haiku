@@ -40,7 +40,7 @@ disasm_command(int argc, char **argv)
 		if (!evaluate_debug_expression(argv[argi++], &pc, false))
 			return 0;
 	} else {
-		pc = (addr_t)arch_debug_get_interrupt_pc();
+		pc = (addr_t)arch_debug_get_interrupt_pc(NULL);
 		if (pc == 0) {
 			kprintf("Failed to get current PC!\n");
 			return 0;
