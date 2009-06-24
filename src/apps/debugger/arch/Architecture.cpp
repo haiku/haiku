@@ -52,6 +52,7 @@ Architecture::CreateStackTrace(Team* team,
 		return B_NO_MEMORY;
 	ObjectDeleter<StackTrace> stackTraceDeleter(stackTrace);
 
+	bool architectureFrame = false;
 	StackFrame* frame = NULL;
 
 	while (cpuState != NULL) {
@@ -78,6 +79,11 @@ Architecture::CreateStackTrace(Team* team,
 			function = imageDebugInfo->FindFunction(instructionPointer);
 		Reference<FunctionDebugInfo> functionReference(function, true);
 
+		// If the last frame had been created by the architecture, we update the
+		// CPU state.
+		if (architectureFrame)
+			UpdateStackFrameCpuState(frame, image, function, cpuState);
+
 		// create the frame using the debug info
 		StackFrame* previousFrame = NULL;
 		CpuState* previousCpuState = NULL;
@@ -94,7 +100,9 @@ Architecture::CreateStackTrace(Team* team,
 				frame == NULL, previousFrame, previousCpuState);
 			if (error != B_OK)
 				break;
-		}
+			architectureFrame = true;
+		} else
+			architectureFrame = false;
 
 		cpuStateReference.SetTo(previousCpuState, true);
 

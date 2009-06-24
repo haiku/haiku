@@ -127,34 +127,8 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		frameType = STACK_FRAME_TYPE_SYSCALL;
 		eip -= 2;
 			// int 99, sysenter, and syscall all are 2 byte instructions
-	} else {
+	} else
 		frameType = STACK_FRAME_TYPE_STANDARD;
-
-		// If this is not a top-frame, we offset eip to the previous (calling)
-		// instruction.
-		if (!isTopFrame && function != NULL && eip > function->Address()) {
-			size_t bufferSize = eip - function->Address();
-			void* buffer = malloc(bufferSize);
-			if (buffer != NULL) {
-				ssize_t bytesRead = fDebuggerInterface->ReadMemory(
-					function->Address(), buffer, bufferSize);
-				if (bytesRead == (ssize_t)bufferSize) {
-					DisassemblerX86 disassembler;
-					target_addr_t instructionAddress;
-					target_size_t instructionSize;
-					if (disassembler.Init(function->Address(),
-							buffer, bufferSize) == B_OK
-						&& disassembler.GetPreviousInstruction(eip,
-							instructionAddress, instructionSize) == B_OK) {
-						eip -= instructionSize;
-						cpuState->SetIntRegister(X86_REGISTER_EIP, eip);
-					}
-				}
-
-				free(buffer);
-			}
-		}
-	}
 
 	// create the stack frame
 	StackFrame* frame = new(std::nothrow) StackFrame(frameType, cpuState,
@@ -176,16 +150,52 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		frame->SetReturnAddress(frameData[1]);
 		previousCpuState->SetIntRegister(X86_REGISTER_EBP, frameData[0]);
 		previousCpuState->SetIntRegister(X86_REGISTER_EIP, frameData[1]);
-			// TODO: Actually it's the instruction before! We're currently
-			// offsetting it at the beginning of this method, but that's not
-			// correct, since for the previous stack frame there could be more
-			// debug info. Problem is that we don't have the function for the
-			// previous stack frame available at this point.
 	}
 
 	_previousFrame = frameReference.Detach();
 	_previousCpuState = previousCpuState;
 	return B_OK;
+}
+
+
+void
+ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
+	Image* previousImage, FunctionDebugInfo* previousFunction,
+	CpuState* previousCpuState)
+{
+	// This is not a top frame, so we want to offset eip to the previous
+	// (calling) instruction.
+	CpuStateX86* cpuState = dynamic_cast<CpuStateX86*>(previousCpuState);
+
+	// get eip
+	uint32 eip = cpuState->IntRegisterValue(X86_REGISTER_EIP);
+	if (previousFunction == NULL || eip <= previousFunction->Address())
+		return;
+	target_addr_t functionAddresss = previousFunction->Address();
+
+	// allocate a buffer for the function code to disassemble
+	size_t bufferSize = eip - functionAddresss;
+	void* buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return;
+	MemoryDeleter bufferDeleter(buffer);
+
+	// read the code
+	ssize_t bytesRead = fDebuggerInterface->ReadMemory(functionAddresss, buffer,
+		bufferSize);
+	if (bytesRead != (ssize_t)bufferSize)
+		return;
+
+	// disassemble to get the previous instruction
+	DisassemblerX86 disassembler;
+	target_addr_t instructionAddress;
+	target_size_t instructionSize;
+	if (disassembler.Init(functionAddresss, buffer, bufferSize) == B_OK
+		&& disassembler.GetPreviousInstruction(eip, instructionAddress,
+			instructionSize) == B_OK) {
+		eip -= instructionSize;
+		cpuState->SetIntRegister(X86_REGISTER_EIP, eip);
+	}
 }
 
 

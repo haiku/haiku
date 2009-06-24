@@ -601,8 +601,11 @@ SourceView::MarkerView::_UpdateIPMarkers()
 			if (line >= (uint32)LineCount())
 				continue;
 
+			bool isTopFrame = i == 0
+				&& frame->Type() != STACK_FRAME_TYPE_SYSCALL;
+
 			Marker* marker = new(std::nothrow) InstructionPointerMarker(
-				line, i == 0, frame == fStackFrame);
+				line, isTopFrame, frame == fStackFrame);
 			if (marker == NULL || !fIPMarkers.AddItem(marker)) {
 				delete marker;
 				break;

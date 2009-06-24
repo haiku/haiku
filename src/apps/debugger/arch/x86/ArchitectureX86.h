@@ -28,6 +28,11 @@ public:
 									CpuState* cpuState, bool isTopFrame,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
+	virtual	void				UpdateStackFrameCpuState(
+									const StackFrame* frame,
+									Image* previousImage,
+									FunctionDebugInfo* previousFunction,
+									CpuState* previousCpuState);
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
 									SourceCode*& _sourceCode);

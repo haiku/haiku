@@ -15,11 +15,12 @@
 
 
 StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
-	target_addr_t frameAddress)
+	target_addr_t frameAddress, target_addr_t instructionPointer)
 	:
 	fType(type),
 	fCpuState(cpuState),
 	fFrameAddress(frameAddress),
+	fInstructionPointer(instructionPointer),
 	fReturnAddress(0),
 	fImage(NULL),
 	fFunction(NULL),
@@ -36,13 +37,6 @@ StackFrame::~StackFrame()
 	SetImage(NULL);
 	SetFunction(NULL);
 	fCpuState->RemoveReference();
-}
-
-
-target_addr_t
-StackFrame::InstructionPointer() const
-{
-	return fCpuState->InstructionPointer();
 }
 
 

@@ -43,6 +43,14 @@ public:
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
 										// can be NULL
+	virtual	void				UpdateStackFrameCpuState(
+									const StackFrame* frame,
+									Image* previousImage,
+									FunctionDebugInfo* previousFunction,
+									CpuState* previousCpuState) = 0;
+										// Called after a CreateStackFrame()
+										// with the image/function corresponding
+										// to the CPU state.
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
 									SourceCode*& _sourceCode) = 0;
