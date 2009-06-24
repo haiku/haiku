@@ -91,7 +91,7 @@ Architecture::CreateStackTrace(Team* team,
 		// If we have no frame yet, let the architecture create it.
 		if (previousFrame == NULL) {
 			status_t error = CreateStackFrame(image, function, cpuState,
-				previousFrame, previousCpuState);
+				frame == NULL, previousFrame, previousCpuState);
 			if (error != B_OK)
 				break;
 		}

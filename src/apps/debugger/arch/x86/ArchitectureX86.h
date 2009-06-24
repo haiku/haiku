@@ -25,7 +25,7 @@ public:
 									size_t size, CpuState*& _state);
 	virtual	status_t			CreateStackFrame(Image* image,
 									FunctionDebugInfo* function,
-									CpuState* cpuState,
+									CpuState* cpuState, bool isTopFrame,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,

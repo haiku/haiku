@@ -10,14 +10,16 @@
 
 CpuStateX86::CpuStateX86()
 	:
-	fSetRegisters()
+	fSetRegisters(),
+	fInterruptVector(0)
 {
 }
 
 
 CpuStateX86::CpuStateX86(const debug_cpu_state_x86& state)
 	:
-	fSetRegisters()
+	fSetRegisters(),
+	fInterruptVector(0)
 {
 	SetIntRegister(X86_REGISTER_EIP, state.eip);
 	SetIntRegister(X86_REGISTER_ESP, state.user_esp);
@@ -34,6 +36,8 @@ CpuStateX86::CpuStateX86(const debug_cpu_state_x86& state)
 	SetIntRegister(X86_REGISTER_FS, state.fs);
 	SetIntRegister(X86_REGISTER_GS, state.gs);
 	SetIntRegister(X86_REGISTER_SS, state.user_ss);
+
+	fInterruptVector = state.vector;
 }
 
 

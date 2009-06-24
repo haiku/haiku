@@ -22,6 +22,10 @@ public:
 									target_addr_t& _address,
 									target_size_t& _size,
 									bool& _breakpointAllowed);
+	virtual	status_t			GetPreviousInstruction(
+									target_addr_t nextAddress,
+									target_addr_t& _address,
+									target_size_t& _size);
 
 private:
 			struct UdisData;

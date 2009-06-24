@@ -86,3 +86,25 @@ DisassemblerX86::GetNextInstruction(BString& line, target_addr_t& _address,
 	return B_OK;
 }
 
+
+status_t
+DisassemblerX86::GetPreviousInstruction(target_addr_t nextAddress,
+	target_addr_t& _address, target_size_t& _size)
+{
+	if (nextAddress < fAddress || nextAddress > fAddress + fCodeSize)
+		return B_BAD_VALUE;
+
+	// loop until hitting the last instruction
+	while (true) {
+		unsigned int size = ud_disassemble(fUdisData);
+		if (size < 1)
+			return B_ENTRY_NOT_FOUND;
+
+		uint32 address = (uint32)ud_insn_off(fUdisData);
+		if (address + size == nextAddress) {
+			_address = address;
+			_size = size;
+			return B_OK;
+		}
+	}
+}

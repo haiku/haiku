@@ -37,7 +37,7 @@ public:
 									size_t size, CpuState*& _state) = 0;
 	virtual	status_t			CreateStackFrame(Image* image,
 									FunctionDebugInfo* function,
-									CpuState* cpuState,
+									CpuState* cpuState, bool isTopFrame,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame
