@@ -468,7 +468,7 @@ TeamWindow::_UpdateRunButtons()
 			fStepOutButton->SetEnabled(false);
 			break;
 		case THREAD_STATE_RUNNING:
-			fRunButton->SetLabel("Stop");
+			fRunButton->SetLabel("Debug");
 			fRunButton->SetMessage(new BMessage(MSG_THREAD_STOP));
 			fRunButton->SetEnabled(true);
 			fStepOverButton->SetEnabled(false);
