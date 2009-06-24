@@ -1092,42 +1092,40 @@ Keymap::RestoreSystemDefault()
 }
 
 
-/*static*/ void
-Keymap::GetKey(char* chars, int32 offset, char* string)
+/*static*/ bool
+Keymap::GetKey(const char* chars, int32 offset, char* buffer, size_t bufferSize)
 {
-	int size = chars[offset++];
-	char str[32];
-	memset(str, 0, 32);
-	memset(string, 0, 32);
+	uint8 size = (uint8)chars[offset++];
+	char string[1024];
 
 	switch (size) {
 		case 0:
 			// Not mapped
-			sprintf(str, "''");
-			break;
+			strlcpy(buffer, "''", bufferSize);
+			return false;
 
 		case 1:
 			// 1-byte UTF-8/ASCII character
-			if ((uint8)chars[offset] < 0x20
-				|| (uint8)chars[offset] > 0x7e)
-				sprintf(str, "0x%02x", (uint8)chars[offset]);
-			else
-				sprintf(str, "'%s%c'",
+			if ((uint8)chars[offset] < 0x20 || (uint8)chars[offset] > 0x7e)
+				sprintf(string, "0x%02x", (uint8)chars[offset]);
+			else {
+				sprintf(string, "'%s%c'",
 					(chars[offset] == '\\' || chars[offset] == '\'') ? "\\" : "",
 					chars[offset]);
+			}
 			break;
 
 		default:
-			// n-byte UTF-8/ASCII character
-			sprintf(str, "0x");
+			// multi-byte UTF-8 character
+			sprintf(string, "0x");
 			for (int i = 0; i < size; i++) {
-				sprintf(str + 2*(i+1), "%02x", (uint8)chars[offset+i]);
+				sprintf(string + 2 * (i + 1), "%02x", (uint8)chars[offset + i]);
 			}
 			break;
 	}
 
-	strncpy(string, str, strlen(str) < 12 ? strlen(str) : 12);
-		// TODO: Huh?
+	strlcpy(buffer, string, bufferSize);
+	return true;
 }
 
 
@@ -1295,7 +1293,7 @@ Keymap::_SaveSourceText(FILE* file)
 	}
 #endif
 
-	for (int idx = 0; idx < 128; idx++) {
+	for (int i = 0; i < 128; i++) {
 		char normalKey[32];
 		char shiftKey[32];
 		char controlKey[32];
@@ -1306,17 +1304,17 @@ Keymap::_SaveSourceText(FILE* file)
 		char optionCapsKey[32];
 		char optionCapsShiftKey[32];
 
-		GetKey(fChars, fKeys.normal_map[idx], normalKey);
-		GetKey(fChars, fKeys.shift_map[idx], shiftKey);
-		GetKey(fChars, fKeys.control_map[idx], controlKey);
-		GetKey(fChars, fKeys.option_map[idx], optionKey);
-		GetKey(fChars, fKeys.option_shift_map[idx], optionShiftKey);
-		GetKey(fChars, fKeys.caps_map[idx], capsKey);
-		GetKey(fChars, fKeys.caps_shift_map[idx], capsShiftKey);
-		GetKey(fChars, fKeys.option_caps_map[idx], optionCapsKey);
-		GetKey(fChars, fKeys.option_caps_shift_map[idx], optionCapsShiftKey);
+		GetKey(fChars, fKeys.normal_map[i], normalKey, 32);
+		GetKey(fChars, fKeys.shift_map[i], shiftKey, 32);
+		GetKey(fChars, fKeys.control_map[i], controlKey, 32);
+		GetKey(fChars, fKeys.option_map[i], optionKey, 32);
+		GetKey(fChars, fKeys.option_shift_map[i], optionShiftKey, 32);
+		GetKey(fChars, fKeys.caps_map[i], capsKey, 32);
+		GetKey(fChars, fKeys.caps_shift_map[i], capsShiftKey, 32);
+		GetKey(fChars, fKeys.option_caps_map[i], optionCapsKey, 32);
+		GetKey(fChars, fKeys.option_caps_shift_map[i], optionCapsShiftKey, 32);
 
-		fprintf(file, "Key 0x%02x = %-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s\n", idx,
+		fprintf(file, "Key 0x%02x = %-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s\n", i,
 			normalKey, shiftKey, controlKey, optionKey, optionShiftKey, capsKey,
 			capsShiftKey, optionCapsKey, optionCapsShiftKey);
 	}
@@ -1346,11 +1344,13 @@ Keymap::_SaveSourceText(FILE* file)
 	};
 
 	for (int i = 0; i < 5; i++) {
-		for (int idx = 0; idx < 32; idx++) {
+		for (int deadIndex = 0; deadIndex < 32; deadIndex++) {
 			char deadKey[32];
 			char secondKey[32];
-			GetKey(fChars, deadOffsets[i][idx++], deadKey);
-			GetKey(fChars, deadOffsets[i][idx], secondKey);
+			if (!GetKey(fChars, deadOffsets[i][deadIndex++], deadKey, 32))
+				break;
+
+			GetKey(fChars, deadOffsets[i][deadIndex], secondKey, 32);
 			fprintf(file, "%s %-9s = %-9s\n", labels[i], deadKey, secondKey);
 		}
 

@@ -47,7 +47,8 @@ public:
 								uint8 activeDeadKey, char** chars,
 								int32* numBytes);
 			void			RestoreSystemDefault();
-	static	void			GetKey(char* chars, int32 offset, char* string);
+	static	bool			GetKey(const char* chars, int32 offset,
+								char* buffer, size_t bufferSize);
 
 private:
 #if (defined(__BEOS__) || defined(__HAIKU__))
