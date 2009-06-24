@@ -249,6 +249,8 @@ main2(void *unused)
 
 	boot_splash_init(sKernelArgs.boot_splash);
 
+	commpage_init_post_cpus();
+
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
 	module_init_post_threads();

@@ -89,3 +89,9 @@ commpage_init(void)
 	return B_OK;
 }
 
+
+status_t
+commpage_init_post_cpus(void)
+{
+	return arch_commpage_init_post_cpus();
+}
