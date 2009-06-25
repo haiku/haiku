@@ -101,18 +101,18 @@ public:
 							~FragmentPacket();
 
 			status_t		AddFragment(uint16 start, uint16 end,
-								net_buffer *buffer, bool lastFragment);
-			status_t		Reassemble(net_buffer *to);
+								net_buffer* buffer, bool lastFragment);
+			status_t		Reassemble(net_buffer* to);
 
 			bool			IsComplete() const
 								{ return fReceivedLastFragment
 									&& fBytesLeft == 0; }
 
-	static	uint32			Hash(void *_packet, const void *_key, uint32 range);
-	static	int				Compare(void *_packet, const void *_key);
+	static	uint32			Hash(void* _packet, const void* _key, uint32 range);
+	static	int				Compare(void* _packet, const void* _key);
 	static	int32			NextOffset()
 								{ return offsetof(FragmentPacket, fNext); }
-	static	void			StaleTimer(struct net_timer *timer, void *data);
+	static	void			StaleTimer(struct net_timer* timer, void* data);
 
 private:
 			FragmentPacket	*fNext;
@@ -127,7 +127,7 @@ private:
 class RawSocket
 	: public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 public:
-							RawSocket(net_socket *socket);
+							RawSocket(net_socket* socket);
 };
 
 typedef DoublyLinkedList<RawSocket> RawSocketList;
@@ -136,21 +136,21 @@ typedef MulticastGroupInterface<IPv4Multicast> IPv4GroupInterface;
 typedef MulticastFilter<IPv4Multicast> IPv4MulticastFilter;
 
 struct MulticastStateHash {
-	typedef std::pair<const in_addr *, uint32> KeyType;
+	typedef std::pair<const in_addr* , uint32> KeyType;
 	typedef IPv4GroupInterface ValueType;
 
 	size_t HashKey(const KeyType &key) const
 		{ return key.first->s_addr ^ key.second; }
-	size_t Hash(ValueType *value) const
+	size_t Hash(ValueType* value) const
 		{ return HashKey(std::make_pair(&value->Address(),
 			value->Interface()->index)); }
-	bool Compare(const KeyType &key, ValueType *value) const
+	bool Compare(const KeyType &key, ValueType* value) const
 		{ return value->Interface()->index == key.second
 			&& value->Address().s_addr == key.first->s_addr; }
-	bool CompareValues(ValueType *value1, ValueType *value2) const
+	bool CompareValues(ValueType* value1, ValueType* value2) const
 		{ return value1->Interface()->index == value2->Interface()->index
 			&& value1->Address().s_addr == value2->Address().s_addr; }
-	HashTableLink<ValueType> *GetLink(ValueType *value) const { return value; }
+	HashTableLink<ValueType>* GetLink(ValueType* value) const { return value; }
 };
 
 
@@ -181,28 +181,28 @@ static const int kDefaultMulticastTTL = 1;
 extern net_protocol_module_info gIPv4Module;
 	// we need this in ipv4_std_ops() for registering the AF_INET domain
 
-net_stack_module_info *gStackModule;
-net_buffer_module_info *gBufferModule;
+net_stack_module_info* gStackModule;
+net_buffer_module_info* gBufferModule;
 
-static struct net_domain *sDomain;
-static net_datalink_module_info *sDatalinkModule;
-static net_socket_module_info *sSocketModule;
+static struct net_domain* sDomain;
+static net_datalink_module_info* sDatalinkModule;
+static net_socket_module_info* sSocketModule;
 static int32 sPacketID;
 static RawSocketList sRawSockets;
 static mutex sRawSocketsLock;
 static mutex sFragmentLock;
-static hash_table *sFragmentHash;
+static hash_table* sFragmentHash;
 static mutex sMulticastGroupsLock;
 
 typedef MultiHashTable<MulticastStateHash> MulticastState;
-static MulticastState *sMulticastState;
+static MulticastState* sMulticastState;
 
-static net_protocol_module_info *sReceivingProtocol[256];
+static net_protocol_module_info* sReceivingProtocol[256];
 static mutex sReceivingProtocolLock;
 
 
-static const char *
-print_address(const in_addr *address, char *buf, size_t bufLen)
+static const char*
+print_address(const in_addr* address, char* buf, size_t bufLen)
 {
 	unsigned int addr = ntohl(address->s_addr);
 
@@ -213,7 +213,7 @@ print_address(const in_addr *address, char *buf, size_t bufLen)
 }
 
 
-RawSocket::RawSocket(net_socket *socket)
+RawSocket::RawSocket(net_socket* socket)
 	: DatagramSocket<>("ipv4 raw socket", socket)
 {
 }
@@ -238,7 +238,7 @@ FragmentPacket::~FragmentPacket()
 	gStackModule->set_timer(&fTimer, -1);
 
 	// delete all fragments
-	net_buffer *buffer;
+	net_buffer* buffer;
 	while ((buffer = fFragments.RemoveHead()) != NULL) {
 		gBufferModule->free(buffer);
 	}
@@ -246,7 +246,7 @@ FragmentPacket::~FragmentPacket()
 
 
 status_t
-FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
+FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 	bool lastFragment)
 {
 	// restart the timer
@@ -260,8 +260,8 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	// Search for a position in the list to insert the fragment
 
 	FragmentList::ReverseIterator iterator = fFragments.GetReverseIterator();
-	net_buffer *previous = NULL;
-	net_buffer *next = NULL;
+	net_buffer* previous = NULL;
+	net_buffer* next = NULL;
 	while ((previous = iterator.Next()) != NULL) {
 		if (previous->fragment.start <= start) {
 			// The new fragment can be inserted after this one
@@ -335,11 +335,11 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 		status_t status = gBufferModule->merge(buffer, next, true);
 		TRACE("    merge next: %s", strerror(status));
 		if (status != B_OK) {
-			fFragments.Insert((net_buffer *)previous->link.next, next);
+			fFragments.Insert((net_buffer*)previous->link.next, next);
 			return status;
 		}
 
-		fFragments.Insert((net_buffer *)previous->link.next, buffer);
+		fFragments.Insert((net_buffer*)previous->link.next, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
@@ -380,14 +380,14 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 	This buffer must have been added via AddFragment() before.
 */
 status_t
-FragmentPacket::Reassemble(net_buffer *to)
+FragmentPacket::Reassemble(net_buffer* to)
 {
 	if (!IsComplete())
 		return B_ERROR;
 
-	net_buffer *buffer = NULL;
+	net_buffer* buffer = NULL;
 
-	net_buffer *fragment;
+	net_buffer* fragment;
 	while ((fragment = fFragments.RemoveHead()) != NULL) {
 		if (buffer != NULL) {
 			status_t status;
@@ -410,10 +410,10 @@ FragmentPacket::Reassemble(net_buffer *to)
 
 
 int
-FragmentPacket::Compare(void *_packet, const void *_key)
+FragmentPacket::Compare(void* _packet, const void* _key)
 {
-	const ipv4_packet_key *key = (ipv4_packet_key *)_key;
-	ipv4_packet_key *packetKey = &((FragmentPacket *)_packet)->fKey;
+	const ipv4_packet_key* key = (ipv4_packet_key*)_key;
+	ipv4_packet_key* packetKey = &((FragmentPacket*)_packet)->fKey;
 
 	if (packetKey->id == key->id
 		&& packetKey->source == key->source
@@ -426,10 +426,10 @@ FragmentPacket::Compare(void *_packet, const void *_key)
 
 
 uint32
-FragmentPacket::Hash(void *_packet, const void *_key, uint32 range)
+FragmentPacket::Hash(void* _packet, const void* _key, uint32 range)
 {
-	const struct ipv4_packet_key *key = (struct ipv4_packet_key *)_key;
-	FragmentPacket *packet = (FragmentPacket *)_packet;
+	const struct ipv4_packet_key* key = (struct ipv4_packet_key*)_key;
+	FragmentPacket* packet = (FragmentPacket*)_packet;
 	if (packet != NULL)
 		key = &packet->fKey;
 
@@ -438,9 +438,9 @@ FragmentPacket::Hash(void *_packet, const void *_key, uint32 range)
 
 
 /*static*/ void
-FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
+FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 {
-	FragmentPacket *packet = (FragmentPacket *)data;
+	FragmentPacket* packet = (FragmentPacket*)data;
 	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
 	MutexLocker locker(&sFragmentLock);
@@ -470,8 +470,8 @@ dump_ipv4_header(ipv4_header &header)
 		uint8 a;
 	#endif
 	};
-	struct pretty_ipv4 *src = (struct pretty_ipv4 *)&header.source;
-	struct pretty_ipv4 *dst = (struct pretty_ipv4 *)&header.destination;
+	struct pretty_ipv4* src = (struct pretty_ipv4*)&header.source;
+	struct pretty_ipv4* dst = (struct pretty_ipv4*)&header.destination;
 	dprintf("  version: %d\n", header.version);
 	dprintf("  header_length: 4 * %d\n", header.header_length);
 	dprintf("  service_type: %d\n", header.service_type);
@@ -492,12 +492,12 @@ dump_ipv4_header(ipv4_header &header)
 
 
 static int
-dump_ipv4_multicast(int argc, char *argv[])
+dump_ipv4_multicast(int argc, char** argv)
 {
 	MulticastState::Iterator it = sMulticastState->GetIterator();
 
 	while (it.HasNext()) {
-		IPv4GroupInterface *state = it.Next();
+		IPv4GroupInterface* state = it.Next();
 
 		char addressBuffer[64];
 
@@ -529,9 +529,9 @@ dump_ipv4_multicast(int argc, char *argv[])
 	\return various error codes if something went wrong (mostly B_NO_MEMORY)
 */
 static status_t
-reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
+reassemble_fragments(const ipv4_header &header, net_buffer** _buffer)
 {
-	net_buffer *buffer = *_buffer;
+	net_buffer* buffer = *_buffer;
 	status_t status;
 
 	struct ipv4_packet_key key;
@@ -543,7 +543,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 	// TODO: Make locking finer grained.
 	MutexLocker locker(&sFragmentLock);
 
-	FragmentPacket *packet = (FragmentPacket *)hash_lookup(sFragmentHash, &key);
+	FragmentPacket* packet = (FragmentPacket*)hash_lookup(sFragmentHash, &key);
 	if (packet == NULL) {
 		// New fragment packet
 		packet = new (std::nothrow) FragmentPacket(key);
@@ -596,8 +596,8 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 	\a route.
 */
 static status_t
-send_fragments(ipv4_protocol *protocol, struct net_route *route,
-	net_buffer *buffer, uint32 mtu)
+send_fragments(ipv4_protocol* protocol, struct net_route* route,
+	net_buffer* buffer, uint32 mtu)
 {
 	TRACE_SK(protocol, "SendFragments(%lu bytes, mtu %lu)", buffer->size, mtu);
 
@@ -610,14 +610,14 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	uint32 fragmentOffset = 0;
 	status_t status = B_OK;
 
-	net_buffer *headerBuffer = gBufferModule->split(buffer, headerLength);
+	net_buffer* headerBuffer = gBufferModule->split(buffer, headerLength);
 	if (headerBuffer == NULL)
 		return B_NO_MEMORY;
 
 	// TODO: we need to make sure ipv4_header is contiguous or
 	// use another construct.
 	NetBufferHeaderReader<ipv4_header> bufferHeader(headerBuffer);
-	ipv4_header *header = &bufferHeader.Data();
+	ipv4_header* header = &bufferHeader.Data();
 
 	// Adapt MTU to be a multiple of 8 (fragment offsets can only be specified
 	// this way)
@@ -635,13 +635,13 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		header->fragment_offset = htons((lastFragment ? 0 : IP_MORE_FRAGMENTS)
 			| (fragmentOffset >> 3));
 		header->checksum = 0;
-		header->checksum = gStackModule->checksum((uint8 *)header,
+		header->checksum = gStackModule->checksum((uint8*)header,
 			headerLength);
 			// TODO: compute the checksum only for those parts that changed?
 
 		TRACE("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
 
-		net_buffer *fragmentBuffer;
+		net_buffer* fragmentBuffer;
 		if (!lastFragment) {
 			fragmentBuffer = gBufferModule->split(buffer, fragmentLength);
 			fragmentOffset += fragmentLength;
@@ -677,7 +677,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 
 
 static status_t
-deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
+deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	bool deliverToRaw)
 {
 	if (module->deliver_data == NULL)
@@ -685,13 +685,13 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 
 	MutexLocker _(sMulticastGroupsLock);
 
-	sockaddr_in *multicastAddr = (sockaddr_in *)buffer->destination;
+	sockaddr_in* multicastAddr = (sockaddr_in*)buffer->destination;
 
 	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
 		&multicastAddr->sin_addr, buffer->interface->index));
 
 	while (it.HasNext()) {
-		IPv4GroupInterface *state = it.Next();
+		IPv4GroupInterface* state = it.Next();
 
 		if (deliverToRaw && state->Parent()->Socket()->raw == NULL)
 			continue;
@@ -700,7 +700,7 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 			// as Multicast filters are installed with an IPv4 protocol
 			// reference, we need to go and find the appropriate instance
 			// related to the 'receiving protocol' with module 'module'.
-			net_protocol *proto
+			net_protocol* proto
 				= state->Parent()->Socket()->socket->first_protocol;
 
 			while (proto && proto->module != module)
@@ -716,7 +716,7 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 
 
 static void
-raw_receive_data(net_buffer *buffer)
+raw_receive_data(net_buffer* buffer)
 {
 	MutexLocker locker(sRawSocketsLock);
 
@@ -736,7 +736,7 @@ raw_receive_data(net_buffer *buffer)
 		RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 
 		while (iterator.HasNext()) {
-			RawSocket *raw = iterator.Next();
+			RawSocket* raw = iterator.Next();
 
 			if (raw->Socket()->protocol == buffer->protocol)
 				raw->SocketEnqueue(buffer);
@@ -745,25 +745,26 @@ raw_receive_data(net_buffer *buffer)
 }
 
 
-static sockaddr *
-fill_sockaddr_in(sockaddr_in *destination, const in_addr &source)
+static sockaddr*
+fill_sockaddr_in(sockaddr_in* destination, const in_addr &source)
 {
 	memset(destination, 0, sizeof(sockaddr_in));
 	destination->sin_family = AF_INET;
 	destination->sin_addr = source;
-	return (sockaddr *)destination;
+	return (sockaddr*)destination;
 }
 
 
 status_t
-IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
+IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 {
 	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in groupAddr;
-	net_interface *intf = state->Interface();
+	net_interface* interface = state->Interface();
 
-	status_t status = intf->first_info->join_multicast(intf->first_protocol,
+	status_t status = interface->first_info->join_multicast(
+		interface->first_protocol,
 		fill_sockaddr_in(&groupAddr, state->Address()));
 	if (status != B_OK)
 		return status;
@@ -774,24 +775,25 @@ IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
 
 
 status_t
-IPv4Multicast::LeaveGroup(IPv4GroupInterface *state)
+IPv4Multicast::LeaveGroup(IPv4GroupInterface* state)
 {
 	MutexLocker _(sMulticastGroupsLock);
 
 	sMulticastState->Remove(state);
 
 	sockaddr_in groupAddr;
-	net_interface *intf = state->Interface();
+	net_interface* interface = state->Interface();
 
-	return intf->first_protocol->module->join_multicast(intf->first_protocol,
+	return interface->first_protocol->module->join_multicast(
+		interface->first_protocol,
 		fill_sockaddr_in(&groupAddr, state->Address()));
 }
 
 
-static net_protocol_module_info *
+static net_protocol_module_info*
 receiving_protocol(uint8 protocol)
 {
-	net_protocol_module_info *module = sReceivingProtocol[protocol];
+	net_protocol_module_info* module = sReceivingProtocol[protocol];
 	if (module != NULL)
 		return module;
 
@@ -809,20 +811,20 @@ receiving_protocol(uint8 protocol)
 }
 
 
-static inline sockaddr *
-fill_sockaddr_in(sockaddr_in *target, in_addr_t address)
+static inline sockaddr*
+fill_sockaddr_in(sockaddr_in* target, in_addr_t address)
 {
 	memset(target, 0, sizeof(sockaddr_in));
 	target->sin_family = AF_INET;
 	target->sin_len = sizeof(sockaddr_in);
 	target->sin_addr.s_addr = address;
-	return (sockaddr *)target;
+	return (sockaddr*)target;
 }
 
 
 static status_t
-ipv4_delta_group(IPv4GroupInterface *group, int option,
-	net_interface *interface, const in_addr *sourceAddr)
+ipv4_delta_group(IPv4GroupInterface* group, int option,
+	net_interface* interface, const in_addr* sourceAddr)
 {
 	switch (option) {
 		case IP_ADD_MEMBERSHIP:
@@ -844,12 +846,12 @@ ipv4_delta_group(IPv4GroupInterface *group, int option,
 
 
 static status_t
-ipv4_delta_membership(ipv4_protocol *protocol, int option,
-	net_interface *interface, const in_addr *groupAddr,
-	const in_addr *sourceAddr)
+ipv4_delta_membership(ipv4_protocol* protocol, int option,
+	net_interface* interface, const in_addr* groupAddr,
+	const in_addr* sourceAddr)
 {
 	IPv4MulticastFilter &filter = protocol->multicast_filter;
-	IPv4GroupInterface *state = NULL;
+	IPv4GroupInterface* state = NULL;
 	status_t status = B_OK;
 
 	switch (option) {
@@ -904,11 +906,11 @@ generic_to_ipv4(int option)
 }
 
 
-static net_interface *
-get_multicast_interface(ipv4_protocol *protocol, const in_addr *address)
+static net_interface*
+get_multicast_interface(ipv4_protocol* protocol, const in_addr* address)
 {
 	sockaddr_in groupAddr;
-	net_route *route = sDatalinkModule->get_route(sDomain,
+	net_route* route = sDatalinkModule->get_route(sDomain,
 		fill_sockaddr_in(&groupAddr, address ? address->s_addr : INADDR_ANY));
 	if (route == NULL)
 		return NULL;
@@ -918,10 +920,10 @@ get_multicast_interface(ipv4_protocol *protocol, const in_addr *address)
 
 
 static status_t
-ipv4_delta_membership(ipv4_protocol *protocol, int option,
-	in_addr *interfaceAddr, in_addr *groupAddr, in_addr *sourceAddr)
+ipv4_delta_membership(ipv4_protocol* protocol, int option,
+	in_addr* interfaceAddr, in_addr* groupAddr, in_addr* sourceAddr)
 {
-	net_interface *interface = NULL;
+	net_interface* interface = NULL;
 
 	if (interfaceAddr->s_addr == INADDR_ANY) {
 		interface = get_multicast_interface(protocol, groupAddr);
@@ -940,21 +942,19 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 
 
 static status_t
-ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
-	uint32 index, const sockaddr_storage *_groupAddr,
-	const sockaddr_storage *_sourceAddr)
+ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
+	uint32 index, const sockaddr_storage* _groupAddr,
+	const sockaddr_storage* _sourceAddr)
 {
 	if (_groupAddr->ss_family != AF_INET)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	if (_sourceAddr && _sourceAddr->ss_family != AF_INET)
-		return EINVAL;
+		return B_BAD_VALUE;
 
-	net_interface *interface;
-	const in_addr *groupAddr, *sourceAddr = NULL;
+	const in_addr* groupAddr = &((const sockaddr_in*)_groupAddr)->sin_addr;
 
-	groupAddr = &((const sockaddr_in *)_groupAddr)->sin_addr;
-
+	net_interface* interface;
 	if (index == 0)
 		interface = get_multicast_interface(protocol, groupAddr);
 	else
@@ -963,8 +963,9 @@ ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
 	if (interface == NULL)
 		return ENODEV;
 
+	const in_addr* sourceAddr = NULL;
 	if (_sourceAddr)
-		sourceAddr = &((const sockaddr_in *)_sourceAddr)->sin_addr;
+		sourceAddr = &((const sockaddr_in*)_sourceAddr)->sin_addr;
 
 	return ipv4_delta_membership(protocol, generic_to_ipv4(option), interface,
 		groupAddr, sourceAddr);
@@ -972,7 +973,7 @@ ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
 
 
 static status_t
-get_int_option(void *target, size_t length, int value)
+get_int_option(void* target, size_t length, int value)
 {
 	if (length != sizeof(int))
 		return B_BAD_VALUE;
@@ -982,7 +983,7 @@ get_int_option(void *target, size_t length, int value)
 
 
 template<typename Type> static status_t
-set_int_option(Type &target, const void *_value, size_t length)
+set_int_option(Type &target, const void* _value, size_t length)
 {
 	int value;
 
@@ -1000,10 +1001,10 @@ set_int_option(Type &target, const void *_value, size_t length)
 //	#pragma mark -
 
 
-net_protocol *
-ipv4_init_protocol(net_socket *socket)
+net_protocol*
+ipv4_init_protocol(net_socket* socket)
 {
-	ipv4_protocol *protocol = new (std::nothrow) ipv4_protocol();
+	ipv4_protocol* protocol = new (std::nothrow) ipv4_protocol();
 	if (protocol == NULL)
 		return NULL;
 
@@ -1017,9 +1018,9 @@ ipv4_init_protocol(net_socket *socket)
 
 
 status_t
-ipv4_uninit_protocol(net_protocol *_protocol)
+ipv4_uninit_protocol(net_protocol* _protocol)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	delete protocol->raw;
 	delete protocol;
@@ -1031,11 +1032,11 @@ ipv4_uninit_protocol(net_protocol *_protocol)
 	it means we are on a SOCK_RAW socket.
 */
 status_t
-ipv4_open(net_protocol *_protocol)
+ipv4_open(net_protocol* _protocol)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
-	RawSocket *raw = new (std::nothrow) RawSocket(protocol->socket);
+	RawSocket* raw = new (std::nothrow) RawSocket(protocol->socket);
 	if (raw == NULL)
 		return B_NO_MEMORY;
 
@@ -1056,10 +1057,10 @@ ipv4_open(net_protocol *_protocol)
 
 
 status_t
-ipv4_close(net_protocol *_protocol)
+ipv4_close(net_protocol* _protocol)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
-	RawSocket *raw = protocol->raw;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
+	RawSocket* raw = protocol->raw;
 	if (raw == NULL)
 		return B_ERROR;
 
@@ -1075,29 +1076,29 @@ ipv4_close(net_protocol *_protocol)
 
 
 status_t
-ipv4_free(net_protocol *protocol)
+ipv4_free(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
 status_t
-ipv4_connect(net_protocol *protocol, const struct sockaddr *address)
+ipv4_connect(net_protocol* protocol, const struct sockaddr* address)
 {
 	return B_ERROR;
 }
 
 
 status_t
-ipv4_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
+ipv4_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-ipv4_control(net_protocol *_protocol, int level, int option, void *value,
-	size_t *_length)
+ipv4_control(net_protocol* _protocol, int level, int option, void* value,
+	size_t* _length)
 {
 	if ((level & LEVEL_MASK) != IPPROTO_IP)
 		return sDatalinkModule->control(sDomain, option, value, _length);
@@ -1107,10 +1108,10 @@ ipv4_control(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
-ipv4_getsockopt(net_protocol *_protocol, int level, int option, void *value,
-	int *_length)
+ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
+	int* _length)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	if (level == IPPROTO_IP) {
 		if (option == IP_HDRINCL) {
@@ -1153,10 +1154,10 @@ ipv4_getsockopt(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
-ipv4_setsockopt(net_protocol *_protocol, int level, int option,
-	const void *value, int length)
+ipv4_setsockopt(net_protocol* _protocol, int level, int option,
+	const void* value, int length)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	if (level == IPPROTO_IP) {
 		if (option == IP_HDRINCL) {
@@ -1239,14 +1240,14 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 
 status_t
-ipv4_bind(net_protocol *protocol, const struct sockaddr *address)
+ipv4_bind(net_protocol* protocol, const struct sockaddr* address)
 {
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
 
 	// only INADDR_ANY and addresses of local interfaces are accepted:
-	if (((sockaddr_in *)address)->sin_addr.s_addr == INADDR_ANY
-		|| IN_MULTICAST(ntohl(((sockaddr_in *)address)->sin_addr.s_addr))
+	if (((sockaddr_in*)address)->sin_addr.s_addr == INADDR_ANY
+		|| IN_MULTICAST(ntohl(((sockaddr_in*)address)->sin_addr.s_addr))
 		|| sDatalinkModule->is_local_address(sDomain, address, NULL, NULL)) {
 		memcpy(&protocol->socket->address, address, sizeof(struct sockaddr_in));
 		protocol->socket->address.ss_len = sizeof(struct sockaddr_in);
@@ -1261,7 +1262,7 @@ ipv4_bind(net_protocol *protocol, const struct sockaddr *address)
 
 
 status_t
-ipv4_unbind(net_protocol *protocol, struct sockaddr *address)
+ipv4_unbind(net_protocol* protocol, struct sockaddr* address)
 {
 	// nothing to do here
 	return B_OK;
@@ -1269,35 +1270,35 @@ ipv4_unbind(net_protocol *protocol, struct sockaddr *address)
 
 
 status_t
-ipv4_listen(net_protocol *protocol, int count)
+ipv4_listen(net_protocol* protocol, int count)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-ipv4_shutdown(net_protocol *protocol, int direction)
+ipv4_shutdown(net_protocol* protocol, int direction)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
-	net_buffer *buffer)
+ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
+	net_buffer* buffer)
 {
 	if (route == NULL)
 		return B_BAD_VALUE;
 
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
-	net_interface *interface = route->interface;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
+	net_interface* interface = route->interface;
 
 	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
 		buffer->size);
 
-	sockaddr_in &source = *(sockaddr_in *)buffer->source;
-	sockaddr_in &destination = *(sockaddr_in *)buffer->destination;
-	sockaddr_in &broadcastAddress = *(sockaddr_in *)interface->destination;
+	sockaddr_in& source = *(sockaddr_in*)buffer->source;
+	sockaddr_in& destination = *(sockaddr_in*)buffer->destination;
+	sockaddr_in& broadcastAddress = *(sockaddr_in*)interface->destination;
 
 	bool headerIncluded = false, checksumNeeded = true;
 	if (protocol != NULL)
@@ -1332,10 +1333,10 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 		header->id = htons(atomic_add(&sPacketID, 1));
 		header->fragment_offset = 0;
 		if (protocol) {
-			header->time_to_live = (buffer->flags & MSG_MCAST)
+			header->time_to_live = (buffer->flags & MSG_MCAST) != 0
 				? protocol->multicast_time_to_live : protocol->time_to_live;
 		} else {
-			header->time_to_live = (buffer->flags & MSG_MCAST)
+			header->time_to_live = (buffer->flags & MSG_MCAST) != 0
 				? kDefaultMulticastTTL : kDefaultTTL;
 		}
 		header->protocol = protocol
@@ -1385,9 +1386,9 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 
 status_t
-ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
+ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
 
@@ -1395,8 +1396,8 @@ ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 		if (buffer->size < sizeof(ipv4_header))
 			return B_BAD_VALUE;
 
-		sockaddr_in *source = (sockaddr_in *)buffer->source;
-		sockaddr_in *destination = (sockaddr_in *)buffer->destination;
+		sockaddr_in* source = (sockaddr_in*)buffer->source;
+		sockaddr_in* destination = (sockaddr_in*)buffer->destination;
 
 		fill_sockaddr_in(source, *NetBufferField<in_addr_t,
 			offsetof(ipv4_header, source)>(buffer));
@@ -1409,18 +1410,18 @@ ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 
 
 ssize_t
-ipv4_send_avail(net_protocol *protocol)
+ipv4_send_avail(net_protocol* protocol)
 {
 	return B_ERROR;
 }
 
 
 status_t
-ipv4_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
-	net_buffer **_buffer)
+ipv4_read_data(net_protocol* _protocol, size_t numBytes, uint32 flags,
+	net_buffer** _buffer)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
-	RawSocket *raw = protocol->raw;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
+	RawSocket* raw = protocol->raw;
 	if (raw == NULL)
 		return B_ERROR;
 
@@ -1431,10 +1432,10 @@ ipv4_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
 
 
 ssize_t
-ipv4_read_avail(net_protocol *_protocol)
+ipv4_read_avail(net_protocol* _protocol)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
-	RawSocket *raw = protocol->raw;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
+	RawSocket* raw = protocol->raw;
 	if (raw == NULL)
 		return B_ERROR;
 
@@ -1442,17 +1443,17 @@ ipv4_read_avail(net_protocol *_protocol)
 }
 
 
-struct net_domain *
-ipv4_get_domain(net_protocol *protocol)
+struct net_domain*
+ipv4_get_domain(net_protocol* protocol)
 {
 	return sDomain;
 }
 
 
 size_t
-ipv4_get_mtu(net_protocol *protocol, const struct sockaddr *address)
+ipv4_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 {
-	net_route *route = sDatalinkModule->get_route(sDomain, address);
+	net_route* route = sDatalinkModule->get_route(sDomain, address);
 	if (route == NULL)
 		return 0;
 
@@ -1468,7 +1469,7 @@ ipv4_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 
 
 status_t
-ipv4_receive_data(net_buffer *buffer)
+ipv4_receive_data(net_buffer* buffer)
 {
 	TRACE("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
 
@@ -1492,9 +1493,8 @@ ipv4_receive_data(net_buffer *buffer)
 	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
 		return B_BAD_DATA;
 
-	struct sockaddr_in &source = *(struct sockaddr_in *)buffer->source;
-	struct sockaddr_in &destination
-		= *(struct sockaddr_in *)buffer->destination;
+	struct sockaddr_in& source = *(struct sockaddr_in*)buffer->source;
+	struct sockaddr_in& destination = *(struct sockaddr_in*)buffer->destination;
 
 	fill_sockaddr_in(&source, header.source);
 	fill_sockaddr_in(&destination, header.destination);
@@ -1555,7 +1555,7 @@ ipv4_receive_data(net_buffer *buffer)
 		// the header is of variable size and may include IP options
 		// (that we ignore for now)
 
-	net_protocol_module_info *module = receiving_protocol(protocol);
+	net_protocol_module_info* module = receiving_protocol(protocol);
 	if (module == NULL) {
 		// no handler for this packet
 		return EAFNOSUPPORT;
@@ -1574,9 +1574,9 @@ ipv4_receive_data(net_buffer *buffer)
 
 
 status_t
-ipv4_deliver_data(net_protocol *_protocol, net_buffer *buffer)
+ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 {
-	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	if (protocol->raw == NULL)
 		return B_ERROR;
@@ -1586,15 +1586,15 @@ ipv4_deliver_data(net_protocol *_protocol, net_buffer *buffer)
 
 
 status_t
-ipv4_error(uint32 code, net_buffer *data)
+ipv4_error(uint32 code, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-ipv4_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+ipv4_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
+	void* errorData)
 {
 	return B_ERROR;
 }
@@ -1746,14 +1746,14 @@ net_protocol_module_info gIPv4Module = {
 };
 
 module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
-	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
-	{NET_DATALINK_MODULE_NAME, (module_info **)&sDatalinkModule},
-	{NET_SOCKET_MODULE_NAME, (module_info **)&sSocketModule},
+	{NET_STACK_MODULE_NAME, (module_info**)&gStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule},
+	{NET_DATALINK_MODULE_NAME, (module_info**)&sDatalinkModule},
+	{NET_SOCKET_MODULE_NAME, (module_info**)&sSocketModule},
 	{}
 };
 
-module_info *modules[] = {
-	(module_info *)&gIPv4Module,
+module_info* modules[] = {
+	(module_info*)&gIPv4Module,
 	NULL
 };

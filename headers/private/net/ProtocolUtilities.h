@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,52 +26,58 @@ public:
 	typedef mutex Type;
 	typedef MutexLocker AutoLocker;
 
-	static status_t Init(mutex *lock, const char *name)
+	static status_t Init(mutex* lock, const char* name)
 		{ mutex_init_etc(lock, name, MUTEX_FLAG_CLONE_NAME); return B_OK; }
-	static void Destroy(mutex *lock) { mutex_destroy(lock); }
-	static status_t Lock(mutex *lock) { return mutex_lock(lock); }
-	static status_t Unlock(mutex *lock) { mutex_unlock(lock); return B_OK; }
+	static void Destroy(mutex* lock) { mutex_destroy(lock); }
+	static status_t Lock(mutex* lock) { return mutex_lock(lock); }
+	static status_t Unlock(mutex* lock) { mutex_unlock(lock); return B_OK; }
 };
 
 
-extern net_buffer_module_info *gBufferModule;
-extern net_stack_module_info *gStackModule;
+extern net_buffer_module_info* gBufferModule;
+extern net_stack_module_info* gStackModule;
 
 class NetModuleBundleGetter {
 public:
-	static net_stack_module_info *Stack() { return gStackModule; }
-	static net_buffer_module_info *Buffer() { return gBufferModule; }
+	static net_stack_module_info* Stack() { return gStackModule; }
+	static net_buffer_module_info* Buffer() { return gBufferModule; }
 };
 
 
 class ProtocolSocket {
 public:
-	ProtocolSocket(net_socket *socket);
+	ProtocolSocket(net_socket* socket);
 
 	status_t Open();
 
 	SocketAddress LocalAddress()
 		{ return SocketAddress(fDomain->address_module, &fSocket->address); }
 	ConstSocketAddress LocalAddress() const
-		{ return ConstSocketAddress(fDomain->address_module, &fSocket->address); }
+		{ return ConstSocketAddress(fDomain->address_module,
+			&fSocket->address); }
 
 	SocketAddress PeerAddress()
 		{ return SocketAddress(fDomain->address_module, &fSocket->peer); }
 	ConstSocketAddress PeerAddress() const
 		{ return ConstSocketAddress(fDomain->address_module, &fSocket->peer); }
 
-	net_domain *Domain() const { return fDomain; }
-	net_address_module_info *AddressModule() const
+	net_domain* Domain() const { return fDomain; }
+	net_address_module_info* AddressModule() const
 		{ return fDomain->address_module; }
 
 protected:
-	net_socket *fSocket;
-	net_domain *fDomain;
+	net_socket*	fSocket;
+	net_domain*	fDomain;
 };
 
 
-inline ProtocolSocket::ProtocolSocket(net_socket *socket)
-	: fSocket(socket), fDomain(NULL) {}
+inline
+ProtocolSocket::ProtocolSocket(net_socket* socket)
+	:
+	fSocket(socket),
+	fDomain(NULL)
+{
+}
 
 
 inline status_t
@@ -91,49 +97,49 @@ template<typename LockingBase = MutexLocking,
 	typename ModuleBundle = NetModuleBundleGetter>
 class DatagramSocket : public ProtocolSocket {
 public:
-	DatagramSocket(const char *name, net_socket *socket);
-	virtual ~DatagramSocket();
+							DatagramSocket(const char* name, net_socket* socket);
+	virtual					~DatagramSocket();
 
-	status_t InitCheck() const;
+			status_t		InitCheck() const;
 
-	status_t Enqueue(net_buffer *buffer);
-	net_buffer *Dequeue(bool clone);
-	status_t BlockingDequeue(bool clone, bigtime_t timeout,
-		net_buffer **_buffer);
-	void Clear();
+			status_t		Enqueue(net_buffer* buffer);
+			net_buffer*		Dequeue(bool clone);
+			status_t		BlockingDequeue(bool clone, bigtime_t timeout,
+								net_buffer** _buffer);
+			void			Clear();
 
-	status_t SocketEnqueue(net_buffer *buffer);
-	status_t SocketDequeue(uint32 flags, net_buffer **_buffer);
+			status_t		SocketEnqueue(net_buffer* buffer);
+			status_t		SocketDequeue(uint32 flags, net_buffer** _buffer);
 
-	ssize_t AvailableData() const;
+			ssize_t			AvailableData() const;
 
-	void WakeAll();
+			void			WakeAll();
 
-	net_socket *Socket() const { return fSocket; }
+			net_socket*		Socket() const { return fSocket; }
 
 protected:
-	virtual status_t _SocketStatus() const;
+	virtual	status_t		_SocketStatus() const;
 
-	status_t _Enqueue(net_buffer *buffer);
-	status_t _SocketEnqueue(net_buffer *buffer);
-	net_buffer *_Dequeue(bool clone);
-	void _Clear();
+			status_t		_Enqueue(net_buffer* buffer);
+			status_t		_SocketEnqueue(net_buffer* buffer);
+			net_buffer*		_Dequeue(bool clone);
+			void			_Clear();
 
-	status_t _Wait(bigtime_t timeout);
-	void _NotifyOneReader(bool notifySocket);
+			status_t		_Wait(bigtime_t timeout);
+			void			_NotifyOneReader(bool notifySocket);
 
-	bool _IsEmpty() const { return fBuffers.IsEmpty(); }
-	bigtime_t _SocketTimeout(uint32 flags) const;
+			bool			_IsEmpty() const { return fBuffers.IsEmpty(); }
+			bigtime_t		_SocketTimeout(uint32 flags) const;
 
 	typedef typename LockingBase::Type LockType;
 	typedef typename LockingBase::AutoLocker AutoLocker;
 	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
 	typedef DoublyLinkedList<net_buffer, NetBufferLink> BufferList;
 
-	sem_id fNotify;
-	BufferList fBuffers;
-	size_t fCurrentBytes;
-	mutable LockType fLock;
+			sem_id			fNotify;
+			BufferList		fBuffers;
+			size_t			fCurrentBytes;
+	mutable	LockType		fLock;
 };
 
 
@@ -142,12 +148,12 @@ protected:
 	DatagramSocket<LockingBase, ModuleBundle>
 
 
-DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char *name,
-	net_socket *socket)
+DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char* name,
+	net_socket* socket)
 	: ProtocolSocket(socket), fCurrentBytes(0)
 {
 	status_t status = LockingBase::Init(&fLock, name);
-	if (status < B_OK)
+	if (status != B_OK)
 		fNotify = status;
 	else
 		fNotify = create_sem(0, name);
@@ -164,18 +170,18 @@ DECL_DATAGRAM_SOCKET(inline)::~DatagramSocket()
 
 DECL_DATAGRAM_SOCKET(inline status_t)::InitCheck() const
 {
-	return fNotify;
+	return fNotify >= 0 ? B_OK : fNotify;
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::Enqueue(net_buffer *buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::Enqueue(net_buffer* buffer)
 {
 	AutoLocker _(fLock);
 	return _Enqueue(buffer);
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer *buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer* buffer)
 {
 	if (fSocket->receive.buffer_size > 0
 		&& (fCurrentBytes + buffer->size) > fSocket->receive.buffer_size)
@@ -190,16 +196,16 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer *buffer)
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer *_buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer* _buffer)
 {
 	AutoLocker _(fLock);
 	return _SocketEnqueue(_buffer);
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer *_buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer* _buffer)
 {
-	net_buffer *buffer = ModuleBundle::Buffer()->clone(_buffer, false);
+	net_buffer* buffer = ModuleBundle::Buffer()->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
@@ -211,14 +217,14 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer *_buffer)
 }
 
 
-DECL_DATAGRAM_SOCKET(inline net_buffer *)::Dequeue(bool clone)
+DECL_DATAGRAM_SOCKET(inline net_buffer*)::Dequeue(bool clone)
 {
 	AutoLocker _(fLock);
 	return _Dequeue(clone);
 }
 
 
-DECL_DATAGRAM_SOCKET(inline net_buffer *)::_Dequeue(bool clone)
+DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool clone)
 {
 	if (fBuffers.IsEmpty())
 		return NULL;
@@ -226,7 +232,7 @@ DECL_DATAGRAM_SOCKET(inline net_buffer *)::_Dequeue(bool clone)
 	if (clone)
 		return ModuleBundle::Buffer()->clone(fBuffers.Head(), false);
 
-	net_buffer *buffer = fBuffers.RemoveHead();
+	net_buffer* buffer = fBuffers.RemoveHead();
 	fCurrentBytes -= buffer->size;
 
 	return buffer;
@@ -234,7 +240,7 @@ DECL_DATAGRAM_SOCKET(inline net_buffer *)::_Dequeue(bool clone)
 
 
 DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool clone,
-	bigtime_t timeout, net_buffer **_buffer)
+	bigtime_t timeout, net_buffer** _buffer)
 {
 	AutoLocker _(fLock);
 
@@ -265,9 +271,10 @@ DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool clone,
 
 
 DECL_DATAGRAM_SOCKET(inline status_t)::SocketDequeue(uint32 flags,
-	net_buffer **_buffer)
+	net_buffer** _buffer)
 {
-	return BlockingDequeue(flags & MSG_PEEK, _SocketTimeout(flags), _buffer);
+	return BlockingDequeue((flags & MSG_PEEK) != 0, _SocketTimeout(flags),
+		_buffer);
 }
 
 
@@ -336,7 +343,7 @@ DECL_DATAGRAM_SOCKET(inline bigtime_t)::_SocketTimeout(uint32 flags) const
 {
 	bigtime_t timeout = fSocket->receive.timeout;
 
-	if (flags & MSG_DONTWAIT)
+	if ((flags & MSG_DONTWAIT) != 0)
 		timeout = 0;
 	else if (timeout != 0 && timeout != B_INFINITE_TIMEOUT)
 		timeout += system_time();
@@ -349,4 +356,4 @@ DECL_DATAGRAM_SOCKET(inline bigtime_t)::_SocketTimeout(uint32 flags) const
 	return timeout;
 }
 
-#endif
+#endif	// PROTOCOL_UTILITIES_H
