@@ -62,6 +62,7 @@ public:
 									const char* type, const char* name,
 									const char* parameters,
 									BMutablePartition** child);
+	virtual status_t			DeleteChild(BMutablePartition* child);
 
 private:
 			PartitionMap		fPartitionMap;

@@ -364,6 +364,7 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	PartitionType type;
 	if (!type.SetType(typeString) || type.IsEmpty())
 		return B_BAD_VALUE;
+
 	if (type.IsExtended() && fPartitionMap.ExtendedPartitionIndex() >= 0)
 		return B_BAD_VALUE;
 
@@ -556,3 +557,13 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 	return B_OK;
 }
 
+
+// DeleteChild
+status_t
+PartitionMapHandle::DeleteChild(BMutablePartition* child)
+{
+	BMutablePartition* parent = child->Parent();
+	status_t error = parent->DeleteChild(child);
+
+	return error;
+}
