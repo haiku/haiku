@@ -352,7 +352,6 @@ BMutablePartition::CreateChild(int32 index, BMutablePartition** _child)
 		return B_NO_MEMORY;
 	}
 	partition->fDelegate = delegate;
-// TODO: Any further initialization required?
 
 	// add the child
 	BMutablePartition* child = delegate->MutablePartition();
@@ -361,6 +360,20 @@ BMutablePartition::CreateChild(int32 index, BMutablePartition** _child)
 		return B_NO_MEMORY;
 	}
 	child->fParent = this;
+	child->fData = new(nothrow) user_partition_data;
+	if (!child->fData) {
+		fChildren.RemoveItem(child);
+		delete partition;
+		return B_NO_MEMORY;
+	}
+
+	memset(child->fData, 0, sizeof(user_partition_data));
+
+	child->fData->id = -1;
+	child->fData->status = B_PARTITION_UNINITIALIZED;
+	child->fData->volume = -1;
+	child->fData->index = -1;
+	child->fData->disk_system = -1;
 
 	*_child = child;
 
@@ -381,11 +394,11 @@ BMutablePartition::CreateChild(int32 index, const char* type, const char* name,
 		return error;
 
 	// set the name, type, and parameters
-	error = SetType(type);
+	error = child->SetType(type);
 	if (error == B_OK)
-		error = SetName(name);
+		error = child->SetName(name);
 	if (error == B_OK)
-		error = SetParameters(parameters);
+		error = child->SetParameters(parameters);
 
 	// cleanup on error
 	if (error != B_OK) {
