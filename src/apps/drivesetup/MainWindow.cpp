@@ -12,6 +12,7 @@
 #include "MainWindow.h"
 #include "DiskView.h"
 #include "InitParamsPanel.h"
+#include "CreateParamsPanel.h"
 #include "PartitionList.h"
 #include "Support.h"
 #include "tracker_private.h"
@@ -23,8 +24,10 @@
 #include <Application.h>
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
+#include <Debug.h>
 #include <DiskDevice.h>
 #include <DiskDeviceVisitor.h>
+#include <DiskDeviceTypes.h>
 #include <DiskSystem.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
@@ -36,33 +39,6 @@
 #include <Screen.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-
-
-//static void
-//print_partition_table_header()
-//{
-	//printf("   Index     Start      Size                Content Type      "
-		//"Content Name\n");
-	//printf("--------------------------------------------------------------"
-		//"------------\n");
-//}
-
-
-//static void
-//print_partition(BPartition* partition, int level, int index)
-//{
-	//BString offset, size;
-	//get_size_string(partition->Offset(), offset);
-	//get_size_string(partition->Size(), size);
-
-	//printf("%*s%02d%*s  %8s  %8s  %26.26s  %16.16s\n", 2 * level, "",
-		//index,
-		//2 * max_c(3 - level, 0), "",
-		//offset.String(), size.String(),
-		//(partition->ContentType() ? partition->ContentType() : "-"),
-		//(partition->ContentName() ? partition->ContentName() : ""));
-//}
-
 
 class ListPopulatorVisitor : public BDiskDeviceVisitor {
 public:
@@ -192,9 +168,7 @@ MainWindow::MainWindow(BRect frame)
 		new BMessage(MSG_SURFACE_TEST));
 	fRescanMI = new BMenuItem("Rescan", new BMessage(MSG_RESCAN));
 
-	fDeleteMI = new BMenuItem("Delete (not implemented)",
-		new BMessage(MSG_DELETE));
-	fDeleteMI->SetEnabled(false);
+	fDeleteMI = new BMenuItem("Delete",	new BMessage(MSG_DELETE), 'D');
 
 	fMountMI = new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M');
 	fUnmountMI = new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U');
@@ -214,7 +188,7 @@ MainWindow::MainWindow(BRect frame)
 
 	// Parition menu
 	fPartitionMenu = new BMenu("Partition");
-	fCreateMenu = new BMenu("Create (not implemented)");
+	fCreateMenu = new BMenu("Create");
 	fPartitionMenu->AddItem(fCreateMenu);
 
 	fInitMenu = new BMenu("Initialize");
@@ -288,9 +262,13 @@ MainWindow::MessageReceived(BMessage* message)
 			printf("MSG_FORMAT\n");
 			break;
 
-		case MSG_CREATE:
-			printf("MSG_CREATE\n");
+		case MSG_CREATE: {
+			BString diskSystemName;
+			//if (message->FindString("disk system", &diskSystemName) != B_OK)
+			//	break;
+			_Create(fCurrentDisk, fCurrentPartitionID, diskSystemName);
 			break;
+		}
 
 		case MSG_INITIALIZE: {
 			BString diskSystemName;
@@ -301,7 +279,7 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_DELETE:
-			printf("MSG_DELETE\n");
+			_Delete(fCurrentDisk, fCurrentPartitionID);
 			break;
 
 		case MSG_EJECT:
@@ -462,6 +440,7 @@ MainWindow::_SetToDiskAndPartition(partition_id disk, partition_id partition,
 {
 printf("MainWindow::_SetToDiskAndPartition(disk: %ld, partition: %ld, "
 	"parent: %ld)\n", disk, partition, parent);
+
 	BDiskDevice* oldDisk = NULL;
 	if (!fCurrentDisk || fCurrentDisk->ID() != disk) {
 		oldDisk = fCurrentDisk;
@@ -490,10 +469,6 @@ void
 MainWindow::_UpdateMenus(BDiskDevice* disk,
 	partition_id selectedPartition, partition_id parentID)
 {
-printf("MainWindow::_UpdateMenus(disk: %p, "
-	"selectedPartition: %ld, parentID: %ld)\n", disk, selectedPartition,
-	parentID);
-
 	// clean out Create and Init menu
 	while (BMenuItem* item = fCreateMenu->RemoveItem(0L))
 		delete item;
@@ -526,11 +501,10 @@ printf("MainWindow::_UpdateMenus(disk: %p, "
 			partition = disk;
 
 		bool prepared = disk->PrepareModifications() == B_OK;
-printf("  prepared: %d\n", prepared);
-//		fCreateMenu->SetEnabled(prepared);
-// TODO: Enable once _Create() is implemented...
-fCreateMenu->SetEnabled(false);
+		fCreateMenu->SetEnabled(prepared);
 		fInitMenu->SetEnabled(prepared);
+		fDeleteMI->SetEnabled(prepared);
+
 
 		BDiskSystem diskSystem;
 		fDDRoster.RewindDiskSystems();
@@ -559,7 +533,6 @@ fCreateMenu->SetEnabled(false);
 		}
 
 		if (parentPartition != NULL) {
-printf("  parent partition: %p\n", parentPartition);
 			BString supportedChildType;
 			int32 cookie = 0;
 			status_t ret;
@@ -577,7 +550,6 @@ printf("  parent partition: %p\n", parentPartition);
 				fprintf(stderr, "Failed to get supported child types: %s\n",
 					strerror(ret));
 		} else {
-printf("  no parent partition\n");
 			fCreateMenu->SetEnabled(false);
 		}
 
@@ -587,8 +559,7 @@ printf("  no parent partition\n");
 		// Mount items
 		if (partition) {
 			fInitMenu->SetEnabled(!partition->IsMounted());
-//			fDeleteMI->SetEnabled(!partition->IsMounted());
-			fDeleteMI->SetEnabled(false);
+			fDeleteMI->SetEnabled(!partition->IsMounted());
 			fMountMI->SetEnabled(!partition->IsMounted());
 
 			bool unMountable = false;
@@ -742,6 +713,7 @@ public:
 		status_t ret = fDisk->CommitModifications();
 		if (ret == B_OK)
 			fModificationStatus = B_ERROR;
+
 		return ret;
 	}
 
@@ -907,210 +879,150 @@ void
 MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	const BString& partitionType)
 {
-	printf("_Create(disk: %p, selectedPartition: %ld)\n", disk,
-		selectedPartition);
-
 	if (disk->IsReadOnly()) {
 		_DisplayPartitionError("The selected disk is read-only.");
 		return;
 	}
 
-	//BPartition* partition = disk->FindDescendant(selectedPartition);
-	//if (!partition) {
-		//_DisplayPartitionError("Unable to find the selected partition by id.");
-		//return;
-	//}
-
-
-#if 0
-	// get the parent partition
-	BPartition* partition = NULL;
-	int32 partitionIndex;
-	if (!_SelectPartition("parent partition index [-1 to abort]: ",
-			partition, partitionIndex)) {
+	BPartition* partition = disk->FindDescendant(selectedPartition);
+	if (partition) {
+		_DisplayPartitionError("The selected partition contains a file "
+			"system");
 		return;
 	}
 
-	printf("\nselected partition:\n\n");
-	print_partition_table_header();
-	print_partition(partition, 0, partitionIndex);
-
-	if (!partition->ContainsPartitioningSystem()) {
-		printf("The selected partition does not contain a partitioning "
-			"system.\n");
+	if (!disk->ContainsPartitioningSystem()) {
+		_DisplayPartitionError("The selected partition does not contain "
+			"a partitioning system.\n");
 		return;
 	}
 
-	// get supported types
-	BObjectList<BString> supportedTypes(20, true);
-	BString typeBuffer;
-	int32 cookie = 0;
-	while (partition->GetNextSupportedChildType(&cookie, &typeBuffer)
-			== B_OK) {
-		supportedTypes.AddItem(new BString(typeBuffer));
-	}
-
-	if (supportedTypes.IsEmpty()) {
-		printf("The partitioning system is not able to create any "
-			"child partition (no supported types).\n");
+	ModificationPreparer modificationPreparer(disk);
+	status_t ret = modificationPreparer.ModificationStatus();
+	if (ret != B_OK) {
+		_DisplayPartitionError("There was an error preparing the "
+			"disk for modifications.", NULL, ret);
 		return;
 	}
 
 	// get partitioning info
 	BPartitioningInfo partitioningInfo;
-	status_t error = partition->GetPartitioningInfo(&partitioningInfo);
+	status_t error = disk->GetPartitioningInfo(&partitioningInfo);
 	if (error != B_OK) {
-		printf("Failed to get partitioning info for partition: %s\n",
-			strerror(error));
+		_DisplayPartitionError("Could not aquire partitioning information.\n");
 		return;
 	}
 
+// TODO: Find out which partition is the currently selected partition and get
+// the information about the offset and how large of a partition we can create.
 	int32 spacesCount = partitioningInfo.CountPartitionableSpaces();
 	if (spacesCount == 0) {
-		printf("There's no space on the partition where a child partition "
-			"could be created\n");
+		_DisplayPartitionError("There's no space on the partition where a "
+			"child partition could be created\n");
 		return;
 	}
 
-	// let the user select the partition type, if there's more than one
-	int64 typeIndex = 0;
-	int32 supportedTypesCount = supportedTypes.CountItems();
-	if (supportedTypesCount > 1) {
-		// list them
-		printf("Possible partition types:\n");
-		for (int32 i = 0; i < supportedTypesCount; i++)
-			printf("%2ld  %s\n", i, supportedTypes.ItemAt(i)->String());
+	BString name, type, parameters;
+	off_t offset, size;
+	partitioningInfo.GetPartitionableSpaceAt(0, &offset, &size);
 
-		if (!_ReadNumber("supported type index [-1 to abort]: ", 0,
-				supportedTypesCount - 1, -1, "invalid index", typeIndex)) {
-			return;
-		}
+	CreateParamsPanel* panel = new CreateParamsPanel(this, offset, size);
+	if (panel->Go(offset, size, type) == GO_CANCELED)
+		return;
+
+	ret = disk->ValidateCreateChild(&offset, &size, type.String(),
+		NULL, NULL);
+
+	if (ret != B_OK) {
+		_DisplayPartitionError("Validation of the given creation "
+			"parameters failed.");
+		return;
 	}
 
-	const char* type = supportedTypes.ItemAt(typeIndex)->String();
+	// Warn the user one more time...
+	BString message = "Are you sure you want to write the changes back to "
+		"disk now?\n\n";
+	message << "All data on the partition";
+	message << " will be irrevertably lost if you do so!";
+	BAlert* alert = new BAlert("final notice", message.String(),
+		"Write Changes", "Cancel", NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	int32 choice = alert->Go();
 
-	// list partitionable spaces
-	printf("Unused regions where the new partition could be created:\n");
-	for (int32 i = 0; i < spacesCount; i++) {
-		off_t _offset;
-		off_t _size;
-		partitioningInfo.GetPartitionableSpaceAt(i, &_offset, &_size);
-		BString offset, size;
-		get_size_string(_offset, offset);
-		get_size_string(_size, size);
-		printf("%2ld  start: %8s,  size:  %8s\n", i, offset.String(),
-			size.String());
+	if (choice == 1)
+		return;
+
+	ret = disk->CreateChild(offset, size, type.String(),
+		NULL, parameters.String());
+
+	if (ret != B_OK) {
+		_DisplayPartitionError("Creation of the partition has failed\n");
+		return;
 	}
 
-	// let the user select the partitionable space, if there's more than one
-	int64 spaceIndex = 0;
-	if (spacesCount > 1) {
-		if (!_ReadNumber("unused region index [-1 to abort]: ", 0,
-				spacesCount - 1, -1, "invalid index", spaceIndex)) {
-			return;
-		}
+	// commit
+	ret = modificationPreparer.CommitModifications();
+
+	if (ret != B_OK) {
+		_DisplayPartitionError("Failed to initialize the partition. "
+			"This operation is exiting.\nNo changes have been made!\n");
+		return;
 	}
 
-	off_t spaceOffset;
-	off_t spaceSize;
-	partitioningInfo.GetPartitionableSpaceAt(spaceIndex, &spaceOffset,
-		&spaceSize);
+	// The disk layout has changed, update disk information
+	bool updated;
+	ret = disk->Update(&updated);
 
-	off_t start;
-	off_t size;
-	BString parameters;
-	while (true) {
-		// let the user enter start, size, and parameters
+	_ScanDrives();
+}
 
-		// start
-		while (true) {
-			BString spaceOffsetString;
-			get_size_string(spaceOffset, spaceOffsetString);
-			BString prompt("partition start [default: ");
-			prompt << spaceOffsetString << "]: ";
-			if (!_ReadSize(prompt.String(), spaceOffset, start))
-				return;
-
-			if (start >= spaceOffset && start <= spaceOffset + spaceSize)
-				break;
-
-			printf("invalid partition start\n");
-		}
-
-		// size
-		off_t maxSize = spaceOffset + spaceSize - start;
-		while (true) {
-			BString maxSizeString;
-			get_size_string(maxSize, maxSizeString);
-			BString prompt("partition size [default: ");
-			prompt << maxSizeString << "]: ";
-			if (!_ReadSize(prompt.String(), maxSize, size))
-				return;
-
-			if (size >= 0 && start + size <= spaceOffset + spaceSize)
-				break;
-
-			printf("invalid partition size\n");
-		}
-
-		// parameters
-		if (!_ReadLine("partition parameters: ", parameters))
-			return;
-
-		// validate parameters
-		off_t validatedStart = start;
-		off_t validatedSize = size;
-// TODO: Support the name parameter!
-		if (partition->ValidateCreateChild(&start, &size, type, NULL,
-				parameters.String()) != B_OK) {
-			printf("Validation of the given values failed. Sorry, can't "
-				"continue.\n");
-			return;
-		}
-
-		// did the disk system change offset or size?
-		if (validatedStart == start && validatedSize == size) {
-			printf("Everything looks dandy.\n");
-		} else {
-			BString startString, sizeString;
-			get_size_string(validatedStart, startString);
-			get_size_string(validatedSize, sizeString);
-			printf("The disk system adjusted the partition start and "
-				"size to %lld (%s) and %lld (%s).\n",
-				validatedStart, startString.String(), validatedSize,
-				sizeString.String());
-			start = validatedStart;
-			size = validatedSize;
-		}
-
-		// let the user decide whether to continue, change parameters, or
-		// abort
-		bool changeParameters = false;
-		while (true) {
-			BString line;
-			_ReadLine("[c]ontinue, change [p]arameters, or [a]bort? ", line);
-			if (line == "a")
-				return;
-			if (line == "p") {
-				changeParameters = true;
-				break;
-			}
-			if (line == "c")
-				break;
-
-			printf("invalid input\n");
-		}
-
-		if (!changeParameters)
-			break;
+void
+MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
+{
+	if (disk->IsReadOnly()) {
+		_DisplayPartitionError("The selected disk is read-only.");
+		return;
 	}
 
-	// create child
-	error = partition->CreateChild(start, size, type, NULL,
-		parameters.String());
-	if (error != B_OK)
-		printf("Creating the partition failed: %s\n", strerror(error));
-#endif // 0
+	BPartition* partition = disk->FindDescendant(selectedPartition);
+	if (!partition) {
+		_DisplayPartitionError("Unable to find the selected partition by id.");
+		return;
+	}
+
+	ModificationPreparer modificationPreparer(disk);
+	status_t ret = modificationPreparer.ModificationStatus();
+	if (ret != B_OK) {
+		_DisplayPartitionError("There was an error preparing the "
+			"disk for modifications.", NULL, ret);
+		return;
+	}
+
+	if (!disk->CanDeleteChild(partition->Index())) {
+		_DisplayPartitionError("Cannot delete the selected partition");
+		return;
+	}
+
+	// Warn the user one more time...
+	BString message = "Are you sure you want to delete the selected ";
+	message << "partition?\n\nAll data on the partition";
+	message << " will be irrevertably lost if you do so!";
+	BAlert* alert = new BAlert("final notice", message.String(),
+		"Delete Partition", "Cancel", NULL, B_WIDTH_FROM_WIDEST,
+		B_WARNING_ALERT);
+	int32 choice = alert->Go();
+
+	if (choice == 1)
+		return;
+
+	ret = disk->DeleteChild(partition->Index());
+	if (ret != B_OK) {
+		PRINT(("MainWindow::_Delete(): DeleteChild() failed: %s\n",
+			strerror(ret)));
+		_DisplayPartitionError("Could not delete the selected partition");
+		return;
+	}
+
+	modificationPreparer.CommitModifications();
 
 	_ScanDrives();
 }

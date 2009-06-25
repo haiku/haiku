@@ -69,6 +69,8 @@ private:
 			void				_Create(BDiskDevice* disk,
 									partition_id selectedPartition,
 									const BString& partitionType);
+			void				_Delete(BDiskDevice* disk, 
+									partition_id selectedPartition);
 
 
 			BDiskDeviceRoster	fDDRoster;

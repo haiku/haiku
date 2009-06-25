@@ -16,6 +16,9 @@
 #include <String.h>
 
 
+uint32 kMegaByte = 1048576;
+
+
 const char*
 string_for_size(off_t size, char *string)
 {
@@ -111,3 +114,33 @@ SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
 	return newID;
 }
 
+
+SizeSlider::SizeSlider(const char* name, const char* label,
+	BMessage* message, int32 minValue, int32 maxValue)
+	: BSlider(name, label, message, minValue, maxValue, B_HORIZONTAL,
+		B_TRIANGLE_THUMB),
+	fOffset(minValue),
+	fSize(maxValue)
+{
+	SetBarColor((rgb_color){ 0, 80, 255, 255 });
+	BString offset, size;
+	offset << fOffset / kMegaByte; offset << " MB";
+	size << fSize / kMegaByte; size << " MB";
+	SetLimitLabels(offset.String(), size.String());
+}
+
+
+SizeSlider::~SizeSlider()
+{
+}
+
+
+const char*
+SizeSlider::UpdateText() const
+{
+	fStatusLabel.Truncate(0);
+	fStatusLabel << (Value() / kMegaByte);
+	fStatusLabel << " MB";
+
+	return fStatusLabel.String();
+}

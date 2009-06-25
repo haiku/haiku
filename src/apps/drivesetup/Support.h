@@ -9,6 +9,8 @@
 #include <DiskDeviceDefs.h>
 #include <HashMap.h>
 #include <HashString.h>
+#include <Slider.h>
+#include <String.h>
 
 
 class BPartition;
@@ -20,6 +22,10 @@ void dump_partition_info(const BPartition* partition);
 
 bool is_valid_partitionable_space(size_t size);
 
+enum {
+	GO_CANCELED	= 0,
+	GO_SUCCESS
+};
 
 class SpaceIDMap : public HashMap<HashString, partition_id> {
 public:
@@ -33,5 +39,19 @@ private:
 			partition_id		fNextSpaceID;
 };
 
+class SizeSlider : public BSlider {
+public:
+								SizeSlider(const char* name, const char* label,
+        							BMessage* message, int32 minValue,
+        							int32 maxValue);
+	virtual						~SizeSlider();
+
+	virtual const char*			UpdateText() const;
+
+private:
+			off_t				fOffset;
+			off_t				fSize;
+	mutable	BString				fStatusLabel;
+};
 
 #endif // SUPPORT_H

@@ -8,15 +8,13 @@
 #ifndef INIT_PARAMS_PANEL_H
 #define INIT_PARAMS_PANEL_H
 
+#include "Support.h"
+
 #include <Window.h>
 
 class BMenuField;
 class BTextControl;
 
-enum {
-	GO_CANCELED	= 0,
-	GO_SUCCESS
-};
 
 class InitParamsPanel : public BWindow {
 public:
