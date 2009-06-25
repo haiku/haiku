@@ -13,5 +13,6 @@ MergeObject Debugger_demangler.o
 	:
 	Demangler.cpp
 
+	gcc2.cpp
 	gcc3+.cpp
 ;

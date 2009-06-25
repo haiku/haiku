@@ -12,14 +12,20 @@
 Demangler::Demangle(const BString& mangledName)
 {
 	char buffer[1024];
+	const char* demangled;
+
 	if (mangledName.Compare("_Z", 2) == 0) {
-		const char* demangled = demangle_name_gcc3(mangledName.String(), buffer,
+		demangled = demangle_name_gcc3(mangledName.String(), buffer,
 			sizeof(buffer));
 		if (demangled != NULL)
 			return demangled;
 	}
 
-	// TODO: gcc2 demangling!
+	// fallback is gcc2
+	demangled = demangle_symbol_gcc2(mangledName.String(), buffer, 
+		sizeof(buffer), NULL);
+	if (demangled != NULL)
+		return demangled;
 
 	return mangledName;
 }
