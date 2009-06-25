@@ -2247,7 +2247,7 @@ int btPreMount(bt_session_t *session, char *shareName)
 	return fileShares[shareId].security;
 }
 
-int btMount(bt_session_t *session, char *shareName, char *user, char *password)
+int btMount(bt_session_t *session, char *shareName, char *user, char *password, vnode_id *vnid)
 {
 	bt_user_rights *ur;
 	struct stat st;
@@ -2340,7 +2340,7 @@ int btGetFSInfo(fs_info *fsInfo, char *path)
 	return ENOTSUP;
 }
 
-int btLookup(char *fileName)
+int btLookup(char *pathBuf, vnode_id dir_vnid, char *fileName, vnode_id *file_vnid)
 {
 	struct _stat st;
 	if (_stat(fileName, &st) != 0)
