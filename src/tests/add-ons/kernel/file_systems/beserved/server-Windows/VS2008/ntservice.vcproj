@@ -335,6 +335,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\BeServed-MimeMap"
+			>
+		</File>
+		<File
+			RelativePath="..\BeServed-Settings"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
