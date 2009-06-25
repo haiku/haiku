@@ -8,21 +8,28 @@
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
 
+#include "Breakpoint.h"
 #include "DebugEvent.h"
+#include "ImageDebugInfoProvider.h"
 #include "Thread.h"
 
 
+class BreakpointManager;
 class DebuggerInterface;
+class StackFrame;
+class Statement;
 class TeamDebugModel;
 class Worker;
 
 
 class ThreadHandler : public Referenceable,
-	public HashTableLink<ThreadHandler> {
+	public HashTableLink<ThreadHandler>, private ImageDebugInfoProvider,
+	private BreakpointClient {
 public:
 								ThreadHandler(TeamDebugModel* debugModel,
 									Thread* thread, Worker* worker,
-									DebuggerInterface* debuggerInterface);
+									DebuggerInterface* debuggerInterface,
+									BreakpointManager* breakpointManager);
 								~ThreadHandler();
 
 			void				Init();
@@ -30,6 +37,8 @@ public:
 			thread_id			ThreadID() const	{ return fThread->ID(); }
 			Thread*				GetThread() const	{ return fThread; }
 
+			// All Handle*() methods are invoked in team debugger thread,
+			// looper lock held.
 			bool				HandleThreadDebugged(
 									ThreadDebuggedEvent* event);
 			bool				HandleDebuggerCall(
@@ -50,16 +59,44 @@ public:
 			void				HandleStackTraceChanged();
 
 private:
+	// ImageDebugInfoProvider
+	virtual	status_t			GetImageDebugInfo(Image* image,
+									ImageDebugInfo*& _info);
+
 			bool				_HandleThreadStopped(CpuState* cpuState);
 
 			void				_SetThreadState(uint32 state,
 									CpuState* cpuState);
+
+			Statement*			_GetStatementAtInstructionPointer(
+									StackFrame* frame);
+
+			void				_StepFallback();
+			bool				_DoStepOver(CpuState* cpuState);
+
+			status_t			_InstallTemporaryBreakpoint(
+									target_addr_t address);
+			void				_UninstallTemporaryBreakpoint();
+			void				_ClearContinuationState();
+			void				_RunThread(target_addr_t instructionPointer);
+			void				_SingleStepThread(
+									target_addr_t instructionPointer);
+
+
+			bool				_HandleBreakpointHitStep(CpuState* cpuState);
+			bool				_HandleSingleStepStep(CpuState* cpuState);
 
 private:
 			TeamDebugModel*		fDebugModel;
 			Thread*				fThread;
 			Worker*				fWorker;
 			DebuggerInterface*	fDebuggerInterface;
+			BreakpointManager*	fBreakpointManager;
+			uint32				fStepMode;
+			Statement*			fStepStatement;
+			target_addr_t		fBreakpointAddress;
+			target_addr_t		fPreviousInstructionPointer;
+			bool				fSingleStepping;
 };
 
 

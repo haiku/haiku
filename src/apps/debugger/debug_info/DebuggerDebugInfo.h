@@ -36,6 +36,9 @@ public:
 									CpuState*& _previousCpuState);
 	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
 									SourceCode*& _sourceCode);
+	virtual	status_t			GetStatement(FunctionDebugInfo* function,
+									target_addr_t address,
+									Statement*& _statement);
 
 private:
 			typedef BObjectList<SymbolInfo> SymbolList;

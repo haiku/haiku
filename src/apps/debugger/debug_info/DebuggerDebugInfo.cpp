@@ -95,6 +95,14 @@ DebuggerDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
 }
 
 
+status_t
+DebuggerDebugInfo::GetStatement(FunctionDebugInfo* function,
+	target_addr_t address, Statement*& _statement)
+{
+	return fArchitecture->GetStatement(function, address, _statement);
+}
+
+
 SymbolInfo*
 DebuggerDebugInfo::_FindSymbol(target_addr_t address)
 {

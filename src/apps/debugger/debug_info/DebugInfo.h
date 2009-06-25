@@ -17,6 +17,7 @@ class FunctionDebugInfo;
 class Image;
 class SourceCode;
 class StackFrame;
+class Statement;
 
 
 class DebugInfo : public Referenceable {
@@ -36,6 +37,10 @@ public:
 										// can be NULL; can return B_UNSUPPORTED
 	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
 									SourceCode*& _sourceCode) = 0;
+										// returns reference
+	virtual	status_t			GetStatement(FunctionDebugInfo* function,
+									target_addr_t address,
+									Statement*& _statement) = 0;
 										// returns reference
 };
 

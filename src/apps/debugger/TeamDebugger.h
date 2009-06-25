@@ -76,10 +76,6 @@ private:
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
 
-
-			status_t			_SetUserBreakpoint(target_addr_t address,
-									bool enabled);
-
 			void				_HandleSetUserBreakpoint(target_addr_t address,
 									bool enabled);
 			void				_HandleClearUserBreakpoint(
@@ -100,6 +96,7 @@ private:
 									// protected by the team lock
 			DebuggerInterface*	fDebuggerInterface;
 			Worker*				fWorker;
+			BreakpointManager*	fBreakpointManager;
 			thread_id			fDebugEventListener;
 			TeamWindow*			fTeamWindow;
 	volatile bool				fTerminating;

@@ -21,6 +21,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 
 Application Debugger :
+	BreakpointManager.cpp
 	Debugger.cpp
 #	ElfFile.cpp
 	Jobs.cpp
@@ -31,6 +32,7 @@ Application Debugger :
 	# arch
 	Architecture.cpp
 	CpuState.cpp
+	InstructionInfo.cpp
 	Register.cpp
 
 	# arch/x86

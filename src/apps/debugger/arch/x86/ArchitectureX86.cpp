@@ -15,6 +15,7 @@
 #include "DebuggerInterface.h"
 #include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
+#include "InstructionInfo.h"
 #include "StackFrame.h"
 #include "Statement.h"
 
@@ -303,6 +304,80 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	}
 
 	_sourceCode = sourceReference.Detach();
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetStatement(FunctionDebugInfo* function,
+	target_addr_t address, Statement*& _statement)
+{
+// TODO: This is not architecture dependent anymore!
+	// get the instruction info
+	InstructionInfo info;
+	status_t error = GetInstructionInfo(address, info);
+	if (error != B_OK)
+		return error;
+
+	// create a statement
+	ContiguousStatement* statement = new(std::nothrow) ContiguousStatement(
+		SourceLocation(0), SourceLocation(1),
+		TargetAddressRange(info.Address(), info.Size()),
+		info.IsBreakpointAllowed());
+	if (statement == NULL)
+		return B_NO_MEMORY;
+
+	_statement = statement;
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetInstructionInfo(target_addr_t address,
+	InstructionInfo& _info)
+{
+	// read the code
+	uint8 buffer[16];
+		// TODO: What's the maximum instruction size?
+	ssize_t bytesRead = fDebuggerInterface->ReadMemory(address, buffer,
+		sizeof(buffer));
+	if (bytesRead < 0)
+		return bytesRead;
+
+	// init disassembler
+	DisassemblerX86 disassembler;
+	status_t error = disassembler.Init(address, buffer, bytesRead);
+	if (error != B_OK)
+		return error;
+
+	// disassemble the instruction
+	BString line;
+	target_addr_t instructionAddress;
+	target_size_t instructionSize;
+	bool breakpointAllowed;
+	error = disassembler.GetNextInstruction(line, instructionAddress,
+		instructionSize, breakpointAllowed);
+	if (error != B_OK)
+		return error;
+
+	instruction_type instructionType = INSTRUCTION_TYPE_OTHER;
+	if (buffer[0] == 0xff) {
+		// absolute call with r/m32
+		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
+	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
+		// relative call with rel32 -- don't categorize the call with 0 as
+		// subroutine call, since it is only used to get the address of the GOT
+		if (buffer[1] != 0 || buffer[2] != 0 || buffer[3] != 0
+			|| buffer[4] != 0) {
+			instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
+		}
+	}
+
+	if (!_info.SetTo(instructionAddress, instructionSize, instructionType,
+			breakpointAllowed, line)) {
+		return B_NO_MEMORY;
+	}
+
 	return B_OK;
 }
 
