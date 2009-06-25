@@ -12,7 +12,8 @@ SEARCH_SOURCE
 MergeObject Debugger_demangler.o
 	:
 	Demangler.cpp
-
+	
+	demangle.cpp
 	gcc2.cpp
 	gcc3+.cpp
 ;

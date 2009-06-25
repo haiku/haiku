@@ -17,7 +17,7 @@ looks_like_gcc3_symbol(const char* symbol)
 }
 
 
-static const char*
+const char*
 demangle_symbol(const char* mangledName, char* buffer, size_t bufferSize,
 	bool* _isObjectMethod)
 {
@@ -36,7 +36,7 @@ demangle_symbol(const char* mangledName, char* buffer, size_t bufferSize,
 }
 
 
-static status_t
+status_t
 get_next_argument(uint32* _cookie, const char* mangledName, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength)
 {
@@ -53,6 +53,8 @@ get_next_argument(uint32* _cookie, const char* mangledName, char* name,
 		_argumentLength);
 }
 
+
+#ifdef _KERNEL_MODE
 
 static status_t
 std_ops(int32 op, ...)
@@ -82,3 +84,5 @@ module_info* modules[] = {
 	(module_info*)&sModuleInfo,
 	NULL
 };
+
+#endif // _KERNEL_MODE
