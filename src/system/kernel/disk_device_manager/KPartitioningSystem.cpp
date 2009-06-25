@@ -451,8 +451,20 @@ KPartitioningSystem::CreateChild(KPartition* partition, off_t offset,
 status_t
 KPartitioningSystem::DeleteChild(KPartition* child, disk_job_id job)
 {
-	// to be implemented
-	return B_ERROR;
+	if (!child || !child->Parent())
+		return B_BAD_VALUE;
+	if (!fModule->delete_child)
+		return B_NOT_SUPPORTED;
+
+	int fd = -1;
+	KPartition* parent = child->Parent();
+	status_t result = parent->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	result = fModule->delete_child(fd, parent->ID(), child->ID(), job);
+	close(fd);
+	return result;
 }
 
 
