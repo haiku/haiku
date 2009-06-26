@@ -3674,6 +3674,10 @@ const char*
 demangle_symbol_gcc3(const char* mangledName, char* buffer, size_t bufferSize,
 	bool* _isObjectMethod)
 {
+	bool isObjectMethod;
+	if (_isObjectMethod == NULL)
+		_isObjectMethod = &isObjectMethod;
+
 	Demangler demangler;
 	DemanglingInfo info(true);
 	if (demangler.Demangle(mangledName, buffer, bufferSize, info) != ERROR_OK)
