@@ -1585,6 +1585,10 @@ Inode::_AllocateBlockArray(Transaction& transaction, block_run& run)
 }
 
 
+/*!	Grows the stream to \a size, and fills the direct/indirect/double indirect
+	ranges with the runs.
+	This method will also determine the size of the preallocation, if any.
+*/
 status_t
 Inode::_GrowStream(Transaction& transaction, off_t size)
 {
@@ -1615,12 +1619,12 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		bytes = size - data->Size();
 
 	// do we have enough free blocks on the disk?
-	off_t blocksRequested = (bytes + fVolume->BlockSize() - 1)
+	off_t blocksNeeded = (bytes + fVolume->BlockSize() - 1)
 		>> fVolume->BlockShift();
-	if (blocksRequested > fVolume->FreeBlocks())
+	if (blocksNeeded > fVolume->FreeBlocks())
 		return B_DEVICE_FULL;
 
-	off_t blocksNeeded = blocksRequested;
+	off_t blocksRequested = blocksNeeded;
 		// because of preallocations and partial allocations, the number of
 		// blocks we need to allocate may be different from the one we request
 		// from the block allocator
@@ -1629,27 +1633,33 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 	// Attributes, attribute directories, and long symlinks usually won't get
 	// that big, and should stay close to the inode - preallocating could be
 	// counterproductive.
-	// Also, if free disk space is tight, we probably don't want to do this as
-	// well.
+	// Also, if free disk space is tight, don't preallocate.
 	if (!IsAttribute() && !IsAttributeDirectory() && !IsSymLink()
-		&& blocksRequested < (65536 >> fVolume->BlockShift())
 		&& fVolume->FreeBlocks() > 128) {
-		// preallocate 64 KB at minimum
+		off_t roundTo = 0;
 		if (IsFile()) {
-			// request preallocated blocks depending on the file size
-			if (size < 1 * 1024 * 1024) {
-				// preallocate 64 KB for file sizes < 1 MB
-				blocksRequested = 65536 >> fVolume->BlockShift();
-			} else if (size < 32 * 1024 * 1024) {
-				// preallocate 512 KB for file sizes between 1 MB and 32 MB
-				blocksRequested = (512 * 1024) >> fVolume->BlockShift();
+			// Request preallocated blocks depending on the file size and growth
+			if (size < 1 * 1024 * 1024 && bytes < 512 * 1024) {
+				// Preallocate 64 KB for file sizes <1 MB and grow rates <512 KB
+				roundTo = 65536 >> fVolume->BlockShift();
+			} else if (size < 32 * 1024 * 1024 && bytes <= 1 * 1024 * 1024) {
+				// Preallocate 512 KB for file sizes between 1 MB and 32 MB, and
+				// grow rates smaller than 1 MB
+				roundTo = (512 * 1024) >> fVolume->BlockShift();
 			} else {
-				// preallocate 1/16 of the file size (ie. 4 MB for 64 MB,
+				// Preallocate 1/16 of the file size (ie. 4 MB for 64 MB,
 				// 64 MB for 1 GB)
-				blocksRequested = size >> (fVolume->BlockShift() + 4);
+				roundTo = size >> (fVolume->BlockShift() + 4);
 			}
-		} else
-			blocksRequested = 65536 >> fVolume->BlockShift();
+		} else {
+			// Preallocate only 4 KB - directories only get trimmed when their
+			// vnode is flushed, which might not happen very often.
+			roundTo = 4096 >> fVolume->BlockShift();
+		}
+		if (roundTo > 1) {
+			// Round to next "roundTo" block count
+			blocksRequested = ((blocksNeeded + roundTo) / roundTo) * roundTo;
+		}
 	}
 
 	while (blocksNeeded > 0) {
