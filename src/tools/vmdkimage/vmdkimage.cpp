@@ -383,7 +383,7 @@ main(int argc, char *argv[])
 		goto write_err;
 
 	if (!headerOnly) {
-		if (clearImage && ftruncate(fd, headerSize) != 0
+		if ((clearImage && ftruncate(fd, headerSize) != 0)
 			|| ftruncate(fd, actualImageSize + headerSize) != 0) {
 			fprintf(stderr, "Error: resizing file %s failed (%s)\n", file,
 				strerror(errno));
