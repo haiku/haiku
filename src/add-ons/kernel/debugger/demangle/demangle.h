@@ -7,14 +7,12 @@
 
 #include <SupportDefs.h>
 
-const char*
-demangle_symbol(const char* mangledName, char* buffer, size_t bufferSize,
+
+const char* demangle_symbol(const char* mangledName, char* buffer, size_t bufferSize,
 	bool* _isObjectMethod);
 
-status_t
-get_next_argument(uint32* _cookie, const char* mangledName, char* name,
+status_t 	get_next_argument(uint32* _cookie, const char* mangledName, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength);
-
 
 // gcc 2
 const char*	demangle_symbol_gcc2(const char* name, char* buffer,

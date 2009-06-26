@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <TypeConstants.h>
-
 #include "Demangler.h"
+
+#include <TypeConstants.h>
 
 #include "demangle.h"
 
@@ -17,11 +17,17 @@ Demangler::Demangle(const BString& mangledName)
 	char buffer[1024];
 	const char* demangled;
 	
-	demangled = demangle_symbol(mangledName.String(), buffer,
+	if (mangledName.Compare("_Z", 2) == 0)
+		demangled = demangle_name_gcc3(mangledName.String(), buffer,
+			sizeof(buffer));
+	else
+		demangled = demangle_symbol_gcc2(mangledName.String(), buffer,
 			sizeof(buffer), NULL);
+
 	if (demangled == NULL)
-		return mangledName;
-		
+		// name not mangled
+		return mangledName;	
+
 	demangledName << demangled << "(";
 	
 	size_t length;
@@ -29,7 +35,7 @@ Demangler::Demangle(const BString& mangledName)
 	uint32 cookie = 0;
 	while (get_next_argument(&cookie, mangledName.String(), buffer,
 			sizeof(buffer), &type, &length) == B_OK) {	
-		
+
 		if (i++ > 0)
 			demangledName << ", ";
 			
