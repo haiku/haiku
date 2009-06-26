@@ -1651,6 +1651,9 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 				// 64 MB for 1 GB)
 				roundTo = size >> (fVolume->BlockShift() + 4);
 			}
+		} else if (IsIndex()) {
+			// Always preallocate 64 KB for index directories
+			roundTo = 65536 >> fVolume->BlockShift();
 		} else {
 			// Preallocate only 4 KB - directories only get trimmed when their
 			// vnode is flushed, which might not happen very often.
