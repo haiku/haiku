@@ -655,8 +655,9 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 
 	// since the allocator has not been initialized yet, we
 	// cannot use BlockAllocator::BitmapSize() here
-	fSuperBlock.log_blocks = ToBlockRun(AllocationGroups()
-		* fSuperBlock.BlocksPerAllocationGroup() + 1);
+	off_t bitmapBlocks = (numBlocks + blockSize * 8 - 1) / (blockSize * 8);
+
+	fSuperBlock.log_blocks = ToBlockRun(bitmapBlocks + 1);
 	fSuperBlock.log_blocks.length = HOST_ENDIAN_TO_BFS_INT16(logSize);
 	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(
 		ToBlock(Log()));

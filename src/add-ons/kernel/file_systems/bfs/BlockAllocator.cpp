@@ -533,6 +533,9 @@ BlockAllocator::Initialize(bool full)
 {
 	fNumGroups = fVolume->AllocationGroups();
 	fBlocksPerGroup = fVolume->SuperBlock().BlocksPerAllocationGroup();
+	fNumBlocks = (fVolume->NumBlocks() + fVolume->BlockSize() * 8 - 1)
+		/ (fVolume->BlockSize() * 8);
+
 	fGroups = new AllocationGroup[fNumGroups];
 	if (fGroups == NULL)
 		return B_NO_MEMORY;
@@ -558,11 +561,10 @@ status_t
 BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 {
 	status_t status = Initialize(false);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	uint32 blocks = fBlocksPerGroup;
-	uint32 numBits = 8 * blocks * fVolume->BlockSize();
+	uint32 numBits = 8 * fBlocksPerGroup * fVolume->BlockSize();
 	uint32 blockShift = fVolume->BlockShift();
 
 	uint32* buffer = (uint32*)malloc(numBits >> 3);
@@ -572,12 +574,13 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 	memset(buffer, 0, numBits >> 3);
 
 	off_t offset = 1;
+		// the bitmap starts directly after the super block
 
 	// initialize the AllocationGroup objects and clear the on-disk bitmap
 
 	for (int32 i = 0; i < fNumGroups; i++) {
 		if (write_pos(fVolume->Device(), offset << blockShift, buffer,
-				blocks << blockShift) < B_OK)
+				fBlocksPerGroup << blockShift) < B_OK)
 			return B_ERROR;
 
 		// the last allocation group may contain less blocks than the others
@@ -587,14 +590,14 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 				>> (blockShift + 3));
 		} else {
 			fGroups[i].fNumBits = numBits;
-			fGroups[i].fNumBlocks = blocks;
+			fGroups[i].fNumBlocks = fBlocksPerGroup;
 		}
 		fGroups[i].fStart = offset;
 		fGroups[i].fFirstFree = fGroups[i].fLargestStart = 0;
 		fGroups[i].fFreeBits = fGroups[i].fLargestLength = fGroups[i].fNumBits;
 		fGroups[i].fLargestValid = true;
 
-		offset += blocks;
+		offset += fBlocksPerGroup;
 	}
 	free(buffer);
 
@@ -679,16 +682,16 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 
 	// check if block bitmap and log area are reserved
 	uint32 reservedBlocks = volume->Log().Start() + volume->Log().Length();
-	if (allocator->CheckBlockRun(block_run::Run(0, 0, reservedBlocks)) < B_OK) {
+
+	if (allocator->CheckBlocks(0, reservedBlocks) != B_OK) {
 		Transaction transaction(volume, 0);
-		if (groups[0].Allocate(transaction, 0, reservedBlocks) < B_OK) {
+		if (groups[0].Allocate(transaction, 0, reservedBlocks) != B_OK) {
 			FATAL(("could not allocate reserved space for block "
 				"bitmap/log!\n"));
 			volume->Panic();
 		} else {
-			FATAL(("space for block bitmap or log area was not reserved!\n"));
-
 			transaction.Done();
+			FATAL(("space for block bitmap or log area was not reserved!\n"));
 		}
 	}
 
@@ -1011,19 +1014,19 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 		return B_BAD_VALUE;
 	}
 #ifdef DEBUG
-	if (CheckBlockRun(run) < B_OK)
+	if (CheckBlockRun(run) != B_OK)
 		return B_BAD_DATA;
 #endif
 
 	CHECK_ALLOCATION_GROUP(group);
 
-	if (fGroups[group].Free(transaction, start, length) < B_OK)
+	if (fGroups[group].Free(transaction, start, length) != B_OK)
 		RETURN_ERROR(B_IO_ERROR);
 
 	CHECK_ALLOCATION_GROUP(group);
 
 #ifdef DEBUG
-	if (CheckBlockRun(run, NULL, NULL, false) < B_OK) {
+	if (CheckBlockRun(run, NULL, NULL, false) != B_OK) {
 		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just "
 			"freed)\n"));
 	}
@@ -1038,7 +1041,7 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 size_t
 BlockAllocator::BitmapSize() const
 {
-	return fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+	return fVolume->BlockSize() * fNumBlocks;
 }
 
 
@@ -1498,6 +1501,42 @@ BlockAllocator::_SetCheckBitmapAt(off_t block)
 		return;
 
 	fCheckBitmap[index] |= HOST_ENDIAN_TO_BFS_INT32(1UL << (block & 0x1f));
+}
+
+
+/*!	Checks whether or not the specified block range is allocated or not,
+	depending on the \a allocated argument.
+*/
+status_t
+BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated)
+{
+	if (start < 0 || start + length > fVolume->NumBlocks())
+		return B_BAD_VALUE;
+
+	uint32 group = start >> fVolume->AllocationGroupShift();
+	uint32 groupBlock = start % (fVolume->BlockSize() << 3);
+	uint32 blockOffset = start % fVolume->BlockSize();
+
+	AllocationBlock cached(fVolume);
+
+	while (groupBlock < fGroups[group].NumBlocks() && length > 0) {
+		if (cached.SetTo(fGroups[group], groupBlock) != B_OK)
+			RETURN_ERROR(B_IO_ERROR);
+
+		for (; blockOffset < cached.NumBlockBits() && length > 0;
+				blockOffset++, length--) {
+			if (cached.IsUsed(blockOffset) != allocated) {
+				RETURN_ERROR(B_BAD_DATA);
+			}
+		}
+
+		if (++groupBlock >= fGroups[group].NumBlocks()) {
+			groupBlock = 0;
+			group++;
+		}
+	}
+
+	return B_OK;
 }
 
 

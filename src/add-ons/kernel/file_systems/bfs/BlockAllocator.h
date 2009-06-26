@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -48,6 +48,8 @@ public:
 			status_t		StopChecking(check_control* control);
 			status_t		CheckNextNode(check_control* control);
 
+			status_t		CheckBlocks(off_t start, off_t length,
+								bool allocated = true);
 			status_t		CheckBlockRun(block_run run,
 								const char* type = NULL,
 								check_control* control = NULL,
@@ -76,6 +78,7 @@ private:
 			AllocationGroup* fGroups;
 			int32			fNumGroups;
 			uint32			fBlocksPerGroup;
+			uint32			fNumBlocks;
 
 			uint32*			fCheckBitmap;
 			check_cookie*	fCheckCookie;
