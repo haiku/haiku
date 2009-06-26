@@ -124,7 +124,7 @@ namespace std
     }
 
     virtual streambuf*
-    setbuf(char_type* s, streamsize n)
+    setbuf(char_type* s, int n)
     {
       if (n != 0)
 	{
@@ -226,7 +226,7 @@ namespace std
     char_type*		stream;
     streamsize		stream_len;
   };
-
+
   class istringstream : public istream {
   public:
     typedef char	char_type;
@@ -263,7 +263,7 @@ namespace std
   private:
     stringbuf sb;
   };
-
+
   class ostringstream : public ostream {
   public:
     typedef char	char_type;
@@ -300,7 +300,7 @@ namespace std
   private:
     stringbuf sb;
   };
-
+
   class stringstream : public iostream {
   public:
     typedef char	char_type;
