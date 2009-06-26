@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,7 +28,8 @@ static const float kStopSize = 15.0f;
 
 ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char *name,
 		BMessage* message, uint32 resizingMode)
-	: BControl(frame, name, NULL, message, resizingMode, B_WILL_DRAW | B_NAVIGABLE),
+	: BControl(frame, name, NULL, message, resizingMode,
+		B_WILL_DRAW | B_NAVIGABLE),
 	fCurrentCorner(NO_CORNER),
 	fPreviousCorner(-1)
 {
@@ -47,7 +48,8 @@ ScreenCornerSelector::_MonitorFrame() const
 	else if (height * kAspectRatio > width)
 		height = width / kAspectRatio;
 
-	return BRect((Bounds().Width() - width) / 2, (Bounds().Height() - height) / 2, 
+	return BRect((Bounds().Width() - width) / 2,
+		(Bounds().Height() - height) / 2,
 		(Bounds().Width() + width) / 2, (Bounds().Height() + height) / 2);
 }
 
@@ -68,7 +70,7 @@ ScreenCornerSelector::_CenterFrame(BRect innerFrame) const
 
 
 void
-ScreenCornerSelector::Draw(BRect update) 
+ScreenCornerSelector::Draw(BRect update)
 {
 	rgb_color darkColor = {160, 160, 160, 255};
 	rgb_color blackColor = {0, 0, 0, 255};
@@ -82,36 +84,39 @@ ScreenCornerSelector::Draw(BRect update)
 
 	if (!_InnerFrame(outerRect).Contains(update)) {
 		// frame & background
-	
+
 		// if the focus is changing, we don't redraw the whole view, but only
 		// the part that's affected by the change
 		if (!IsFocusChanging()) {
 			SetHighColor(darkColor);
-			FillRoundRect(outerRect, kMonitorBorderSize * 3 / 2, kMonitorBorderSize * 3 / 2);
+			FillRoundRect(outerRect, kMonitorBorderSize * 3 / 2,
+				kMonitorBorderSize * 3 / 2);
 		}
-	
+
 		if (IsFocus() && Window()->IsActive())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		else
 			SetHighColor(blackColor);
-		StrokeRoundRect(outerRect, kMonitorBorderSize * 3 / 2, kMonitorBorderSize * 3 / 2);
-	
+
+		StrokeRoundRect(outerRect, kMonitorBorderSize * 3 / 2,
+			kMonitorBorderSize * 3 / 2);
+
 		if (!IsFocusChanging()) {
 			SetHighColor(210, 210, 255);
 			FillRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
 		}
-	
+
 		if (IsFocus() && Window()->IsActive())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		else
 			SetHighColor(blackColor);
 		StrokeRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
-	
+
 		if (IsFocusChanging())
 			return;
-	
+
 		// power light
-	
+
 		SetHighColor(redColor);
 		BPoint powerPos(outerRect.left + kMonitorBorderSize * 2, outerRect.bottom
 			- kMonitorBorderSize);
@@ -175,7 +180,7 @@ ScreenCornerSelector::SetCorner(screen_corner corner)
 
 
 void
-ScreenCornerSelector::_DrawStop(BRect innerFrame) 
+ScreenCornerSelector::_DrawStop(BRect innerFrame)
 {
 	BRect centerRect = _CenterFrame(innerFrame);
 	float size = kStopSize;
@@ -188,13 +193,13 @@ ScreenCornerSelector::_DrawStop(BRect innerFrame)
 		rect.left = centerRect.left + (centerRect.Width() - size) / 2;
 	}
 	rect.right = rect.left + size - 1;
-	rect.bottom = rect.top + size - 1; 
+	rect.bottom = rect.top + size - 1;
 
 	SetHighColor(255, 0, 0);
 	SetPenSize(2);
 	StrokeEllipse(rect);
 
-	size -= ceilf(sin(PI / 4) * size + 2);
+	size -= ceilf(sin(M_PI / 4) * size + 2);
 	rect.InsetBy(size, size);
 	StrokeLine(rect.RightTop(), rect.LeftBottom());
 
@@ -203,11 +208,13 @@ ScreenCornerSelector::_DrawStop(BRect innerFrame)
 
 
 void
-ScreenCornerSelector::_DrawArrow(BRect innerFrame) 
+ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 {
 	float size = kArrowSize;
-	float sizeX = fCurrentCorner == UP_LEFT_CORNER || fCurrentCorner == DOWN_LEFT_CORNER ? size : -size;
-	float sizeY = fCurrentCorner == UP_LEFT_CORNER || fCurrentCorner == UP_RIGHT_CORNER ? size : -size;
+	float sizeX = fCurrentCorner == UP_LEFT_CORNER
+		|| fCurrentCorner == DOWN_LEFT_CORNER ? size : -size;
+	float sizeY = fCurrentCorner == UP_LEFT_CORNER
+		|| fCurrentCorner == UP_RIGHT_CORNER ? size : -size;
 
 	innerFrame.InsetBy(2, 2);
 	BPoint origin(sizeX < 0 ? innerFrame.right : innerFrame.left,
@@ -220,7 +227,8 @@ ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 
 
 screen_corner
-ScreenCornerSelector::_ScreenCorner(BPoint point, screen_corner previousCorner) const
+ScreenCornerSelector::_ScreenCorner(BPoint point,
+	screen_corner previousCorner) const
 {
 	BRect innerFrame = _InnerFrame(_MonitorFrame());
 
@@ -240,7 +248,7 @@ ScreenCornerSelector::_ScreenCorner(BPoint point, screen_corner previousCorner) 
 
 
 void
-ScreenCornerSelector::MouseDown(BPoint where) 
+ScreenCornerSelector::MouseDown(BPoint where)
 {
 	fPreviousCorner = Value();
 
@@ -250,14 +258,15 @@ ScreenCornerSelector::MouseDown(BPoint where)
 
 
 void
-ScreenCornerSelector::MouseUp(BPoint where) 
+ScreenCornerSelector::MouseUp(BPoint where)
 {
 	fPreviousCorner = -1;
 }
 
 
 void
-ScreenCornerSelector::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+ScreenCornerSelector::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
 {
 	if (fPreviousCorner == -1)
 		return;

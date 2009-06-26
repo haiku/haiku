@@ -1,34 +1,12 @@
 /*
-
-PDF Writer printer driver.
-
-Copyright (c) 2001 OpenBeOS. 
-
-Authors: 
-	Philippe Houdoin
-	Simon Gauvin	
-	Michael Pfeiffer
-	
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin
+ *		Simon Gauvin
+ *		Michael Pfeiffer
+ */
 #ifndef PDFWRITER_H
 #define PDFWRITER_H
 
@@ -37,7 +15,7 @@ THE SOFTWARE.
 #include <String.h>
 #include <List.h>
 
-#include "math.h"
+#include <math.h>
 
 #include "PrinterDriver.h"
 #include "PictureIterator.h"
@@ -52,8 +30,8 @@ THE SOFTWARE.
 
 #define USE_IMAGE_CACHE 1
 
-#define RAD2DEGREE(r) (180.0 * r / PI)
-#define DEGREE2RAD(d) (PI * d / 180.0)
+#define RAD2DEGREE(r) (180.0 * r / M_PI)
+#define DEGREE2RAD(d) (M_PI * d / 180.0)
 
 class DrawShape;
 class WebLink;
@@ -61,9 +39,7 @@ class Bookmark;
 class XRefDefs;
 class XRefDests;
 
-class PDFWriter : public PrinterDriver, public PictureIterator
-{
-	
+class PDFWriter : public PrinterDriver, public PictureIterator {
 	friend class DrawShape;
 	friend class PDFLinePathBuilder;
 	friend class WebLink;
@@ -71,12 +47,12 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 	friend class Bookmark;
 	friend class LocalLink;
 	friend class TextLine;
-	
+
 	public:
 		// constructors / destructor
 		PDFWriter();
 		~PDFWriter();
-		
+
 		// public methods
 		status_t	BeginJob();
 		status_t 	PrintPage(int32 pageNumber, int32 pageCount);
@@ -89,11 +65,11 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		bool        LoadBookmarkDefinitions(const char* name);
 		bool        LoadXRefsDefinitions(const char* name);
 		void        RecordDests(const char* s);
-		
+
 		// PDFLib callbacks
 		size_t		WriteData(void *data, size_t size);
 		void		ErrorHandler(int type, const char *msg);
-		
+
 		// Image support
 		int32       BytesPerPixel(int32 pixelFormat);
 
@@ -198,19 +174,19 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		void		SetFontFlags(int32 flags);
 		void		SetFontShear(float shear);
 		void		SetFontFace(int32 flags);
-		
+
 		static inline bool IsSame(const pattern &p1, const pattern &p2);
 		static inline bool IsSame(const rgb_color &c1, const rgb_color &c2);
-		
+
 	private:
-	
+
 		enum PDFVersion {
 			kPDF13,
 			kPDF14,
 			kPDF15
 		};
-	
-		class State 
+
+		class State
 		{
 		public:
 			State			*prev;
@@ -229,9 +205,9 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 			float           penSize;
 			pattern         pattern0;
 			int32           fontSpacing;
-			
+
 			// initialize with defalt values
-			State(float h = a4_height, float x = 0, float y = 0) 
+			State(float h = a4_height, float x = 0, float y = 0)
 			{
 				static rgb_color white    = {255, 255, 255, 255};
 				static rgb_color black    = {0, 0, 0, 255};
@@ -241,26 +217,26 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 				pdfSystem.SetOrigin(x, y);
 				penX             = 0;
 				penY             = 0;
-				drawingMode      = B_OP_COPY; 
+				drawingMode      = B_OP_COPY;
 				foregroundColor  = white;
 				backgroundColor  = black;
 				currentColor     = black;
-				capMode          = B_BUTT_CAP; 
-				joinMode         = B_MITER_JOIN; 
-				miterLimit       = B_DEFAULT_MITER_LIMIT; 
-				penSize          = 1; 
-				pattern0         = B_SOLID_HIGH; 
-				fontSpacing      = B_STRING_SPACING; 
+				capMode          = B_BUTT_CAP;
+				joinMode         = B_MITER_JOIN;
+				miterLimit       = B_DEFAULT_MITER_LIMIT;
+				penSize          = 1;
+				pattern0         = B_SOLID_HIGH;
+				fontSpacing      = B_STRING_SPACING;
 			}
 
-			State(State *prev) 
+			State(State *prev)
 			{
 				*this = *prev;
 				this->prev = prev;
 			}
 		};
 
-		class Font 
+		class Font
 		{
 		public:
 			Font(char *n, int f, font_encoding e) : name(n), font(f), encoding(e) { }
@@ -275,14 +251,14 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 			pattern     pat;
 			rgb_color   lowColor, highColor;
 			int         patternId;
-			
+
 			Pattern(const pattern &p, rgb_color low, rgb_color high, int id)
 				: pat(p)
 				, lowColor(low)
 				, highColor(high)
 				, patternId(id)
 			{};
-			
+
 			inline bool Matches(const pattern &p, rgb_color low, rgb_color high) const {
 				return IsSame(pat, p) && IsSame(lowColor, low) && IsSame(highColor, high);
 			};
@@ -292,19 +268,19 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		{
 			uint8	alpha;
 			int		handle;
-		public:			
+		public:
 			Transparency(uint8 alpha, int handle)
 				: alpha(alpha)
 				, handle(handle)
 			{};
-			
+
 			inline bool Matches(uint8 alpha) const {
 				return this->alpha == alpha;
 			};
-			
+
 			inline int Handle() const { return handle; }
 		};
-	
+
 		PDFVersion      fPDFVersion;
 		FILE			*fLog;
 		PDF				*fPdf;
@@ -329,8 +305,8 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		TextLine        fTextLine;
 		TList<UsedFont> fUsedFonts;
 		UserDefinedEncodings fUserDefinedEncodings;
-		
-		enum 
+
+		enum
 		{
 			kDrawingMode,
 			kClippingMode
@@ -362,7 +338,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		inline cap_mode  LineCapMode() const    { return fState->capMode; }
 		inline join_mode LineJoinMode() const   { return fState->joinMode; }
 		inline float     LineMiterLimit() const { return fState->miterLimit; }
-		
+
 		bool StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 type);
 
 		void GetFontName(BFont *font, char *fontname);
@@ -383,7 +359,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		void CreatePattern();
 		int  FindPattern();
 		void SetPattern();
-		
+
 		void StrokeOrClip();
 		void FillOrClip();
 		void Paint(bool stroke);
@@ -394,9 +370,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 };
 
 
-
-// --------------------------------------------------
-inline bool 
+inline bool
 PDFWriter::IsSame(const pattern &p1, const pattern &p2)
 {
 	char *a = (char*)p1.data;
@@ -405,8 +379,7 @@ PDFWriter::IsSame(const pattern &p1, const pattern &p2)
 }
 
 
-// --------------------------------------------------
-inline bool 
+inline bool
 PDFWriter::IsSame(const rgb_color &c1, const rgb_color &c2)
 {
 	char *a = (char*)&c1;
@@ -419,4 +392,4 @@ PDFWriter::IsSame(const rgb_color &c1, const rgb_color &c2)
 size_t	_WriteData(PDF *p, void *data, size_t size);
 void	_ErrorHandler(PDF *p, int type, const char *msg);
 
-#endif	// #if PDFWRITER_H
+#endif	// PDFWRITER_H

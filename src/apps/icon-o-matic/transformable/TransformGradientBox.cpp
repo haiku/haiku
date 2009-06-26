@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,16 +20,17 @@
 
 using std::nothrow;
 
+
 // constructor
-TransformGradientBox::TransformGradientBox(CanvasView* view,
-										   Gradient* gradient,
-										   Shape* parentShape)
-	: TransformBox(view, BRect(0.0, 0.0, 1.0, 1.0)),
+TransformGradientBox::TransformGradientBox(CanvasView* view, Gradient* gradient,
+		Shape* parentShape)
+	:
+	TransformBox(view, BRect(0.0, 0.0, 1.0, 1.0)),
 
-	  fCanvasView(view),
+	fCanvasView(view),
 
-	  fShape(parentShape),
-	  fGradient(gradient)
+	fShape(parentShape),
+	fGradient(gradient)
 {
 	if (fShape) {
 		fShape->Acquire();
@@ -43,6 +44,7 @@ TransformGradientBox::TransformGradientBox(CanvasView* view,
 	}
 }
 
+
 // destructor
 TransformGradientBox::~TransformGradientBox()
 {
@@ -53,6 +55,7 @@ TransformGradientBox::~TransformGradientBox()
 	if (fGradient)
 		fGradient->RemoveObserver(this);
 }
+
 
 // Update
 void
@@ -87,6 +90,7 @@ TransformGradientBox::Update(bool deep)
 	fGradient->AddObserver(this);
 }
 
+
 // ObjectChanged
 void
 TransformGradientBox::ObjectChanged(const Observable* object)
@@ -112,12 +116,14 @@ TransformGradientBox::ObjectChanged(const Observable* object)
 	fView->UnlockLooper();
 }
 
+
 // Perform
 Command*
 TransformGradientBox::Perform()
 {
 	return NULL;
 }
+
 
 // Cancel
 Command*
@@ -128,6 +134,7 @@ TransformGradientBox::Cancel()
 	return NULL;
 }
 
+
 // TransformFromCanvas
 void
 TransformGradientBox::TransformFromCanvas(BPoint& point) const
@@ -136,6 +143,7 @@ TransformGradientBox::TransformFromCanvas(BPoint& point) const
 		fShape->InverseTransform(&point);
 	fCanvasView->ConvertFromCanvas(&point);
 }
+
 
 // TransformToCanvas
 void
@@ -146,12 +154,14 @@ TransformGradientBox::TransformToCanvas(BPoint& point) const
 		fShape->Transform(&point);
 }
 
+
 // ZoomLevel
 float
 TransformGradientBox::ZoomLevel() const
 {
 	return fCanvasView->ZoomLevel();
 }
+
 
 // ViewSpaceRotation
 double
@@ -160,8 +170,9 @@ TransformGradientBox::ViewSpaceRotation() const
 	Transformable t(*this);
 	if (fShape)
 		t.Multiply(*fShape);
-	return t.rotation() * 180.0 / PI;
+	return t.rotation() * 180.0 / M_PI;
 }
+
 
 // MakeCommand
 TransformCommand*
@@ -169,16 +180,9 @@ TransformGradientBox::MakeCommand(const char* commandName, uint32 nameIndex)
 {
 	Transformable* objects[1];
 	objects[0] = fGradient;
-	
-	return new TransformObjectsCommand(this, objects, fOriginals, 1,
 
-									   Pivot(),
-									   Translation(),
-									   LocalRotation(),
-									   LocalXScale(),
-									   LocalYScale(),
-
-									   commandName,
-									   nameIndex);
+	return new TransformObjectsCommand(this, objects, fOriginals, 1, Pivot(),
+	   Translation(), LocalRotation(), LocalXScale(), LocalYScale(), commandName,
+	   nameIndex);
 }
 

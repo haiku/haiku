@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -109,14 +109,15 @@ update_coefficients(int32 taps, double filterCutOff, bool horizontal, bool isY,
 	int32 num = taps * 16;
 	for (int32 i = 0; i < num * 2; i++) {
 		double sinc;
-		double value = (1.0 / filterCutOff) * taps * PI * (i - num) / (2 * num);
+		double value = (1.0 / filterCutOff) * taps * M_PI * (i - num)
+			/ (2 * num);
 		if (value == 0.0)
 			sinc = 1.0;
 		else
 			sinc = sin(value) / value;
 
 		// Hamming window
-		double window = (0.5 - 0.5 * cos(i * PI / num));
+		double window = (0.5 - 0.5 * cos(i * M_PI / num));
 		rawCoefficients[i] = sinc * window;
 	}
 
@@ -346,10 +347,10 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 			bytesPerPixel = 2;
 			break;
 		case B_RGB16:
-			bytesPerPixel = 2; 
+			bytesPerPixel = 2;
 			break;
 		case B_RGB32:
-			bytesPerPixel = 4; 
+			bytesPerPixel = 4;
 			break;
 		case B_YCbCr422:
 			bytesPerPixel = 2;

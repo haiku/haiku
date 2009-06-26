@@ -81,6 +81,7 @@ using std::nothrow;
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 #define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
 
+
 // constructor
 Painter::Painter()
 	:
@@ -1222,7 +1223,7 @@ Painter::DrawEllipse(BRect r, bool fill) const
 	float yRadius = r.Height() / 2.0;
 	BPoint center(r.left + xRadius, r.top + yRadius);
 
-	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * PI / 2);
+	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * M_PI / 2);
 	if (divisions < 12)
 		divisions = 12;
 	if (divisions > 4096)
@@ -1295,7 +1296,7 @@ Painter::FillEllipse(BRect r, const BGradient& gradient) const
 	float yRadius = r.Height() / 2.0;
 	BPoint center(r.left + xRadius, r.top + yRadius);
 
-	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * PI / 2);
+	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * M_PI / 2);
 	if (divisions < 12)
 		divisions = 12;
 	if (divisions > 4096)
@@ -1316,8 +1317,8 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	_Transform(&center);
 
-	double angleRad = (angle * PI) / 180.0;
-	double spanRad = (span * PI) / 180.0;
+	double angleRad = (angle * M_PI) / 180.0;
+	double spanRad = (span * M_PI) / 180.0;
 	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
 		-spanRad);
 
@@ -1337,8 +1338,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	_Transform(&center);
 
-	double angleRad = (angle * PI) / 180.0;
-	double spanRad = (span * PI) / 180.0;
+	double angleRad = (angle * M_PI) / 180.0;
+	double spanRad = (span * M_PI) / 180.0;
 	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
 		-spanRad);
 
@@ -1374,8 +1375,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 
 	_Transform(&center);
 
-	double angleRad = (angle * PI) / 180.0;
-	double spanRad = (span * PI) / 180.0;
+	double angleRad = (angle * M_PI) / 180.0;
+	double spanRad = (span * M_PI) / 180.0;
 	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius, -angleRad,
 		-spanRad);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,32 +11,37 @@
 #include <math.h>
 #include <stdio.h>
 
+
 // constructor
 ChannelTransform::ChannelTransform()
-	: Transformable(),
-	  fPivot(0.0, 0.0),
-	  fTranslation(0.0, 0.0),
-	  fRotation(0.0),
-	  fXScale(1.0),
-	  fYScale(1.0)
+	:
+	Transformable(),
+	fPivot(0.0, 0.0),
+	fTranslation(0.0, 0.0),
+	fRotation(0.0),
+	fXScale(1.0),
+	fYScale(1.0)
 {
 }
 
 // copy constructor
 ChannelTransform::ChannelTransform(const ChannelTransform& other)
-	: Transformable(other),
-	  fPivot(other.fPivot),
-	  fTranslation(other.fTranslation),
-	  fRotation(other.fRotation),
-	  fXScale(other.fXScale),
-	  fYScale(other.fYScale)
+	:
+	Transformable(other),
+	fPivot(other.fPivot),
+	fTranslation(other.fTranslation),
+	fRotation(other.fRotation),
+	fXScale(other.fXScale),
+	fYScale(other.fYScale)
 {
 }
+
 
 // destructor
 ChannelTransform::~ChannelTransform()
 {
 }
+
 
 // SetTransformation
 void
@@ -63,13 +68,11 @@ ChannelTransform::SetTransformation(const Transformable& other)
 	SetTransformation(B_ORIGIN, BPoint(tx, ty), rotation, scaleX, scaleY);
 }
 
+
 // SetTransformation
 void
-ChannelTransform::SetTransformation(BPoint pivot,
-									BPoint translation,
-									double rotation,
-									double xScale,
-									double yScale)
+ChannelTransform::SetTransformation(BPoint pivot, BPoint translation,
+	double rotation, double xScale, double yScale)
 {
 //printf("SetTransformation(BPoint(%.1f, %.1f), BPoint(%.1f, %.1f), "
 //"%.2f, %.2f, %.2f)\n", pivot.x, pivot.y, translation.x, translation.y,
@@ -86,10 +89,11 @@ ChannelTransform::SetTransformation(BPoint pivot,
 		fRotation = rotation;
 		fXScale = xScale;
 		fYScale = yScale;
-	
+
 		_UpdateMatrix();
 	}
 }
+
 
 // SetPivot
 void
@@ -103,6 +107,7 @@ ChannelTransform::SetPivot(BPoint pivot)
 	_UpdateMatrix();
 }
 
+
 // TranslateBy
 void
 ChannelTransform::TranslateBy(BPoint offset)
@@ -115,10 +120,11 @@ ChannelTransform::TranslateBy(BPoint offset)
 	_UpdateMatrix();
 }
 
+
 // RotateBy
-//
-// converts a rotation in world coordinates into
-// a combined local rotation and a translation
+/*!	Converts a rotation in world coordinates into
+	a combined local rotation and a translation.
+*/
 void
 ChannelTransform::RotateBy(BPoint origin, double degrees)
 {
@@ -133,7 +139,7 @@ ChannelTransform::RotateBy(BPoint origin, double degrees)
 	double xOffset = fTranslation.x - origin.x;
 	double yOffset = fTranslation.y - origin.y;
 
-	agg::trans_affine_rotation m(degrees * PI / 180.0);
+	agg::trans_affine_rotation m(degrees * M_PI / 180.0);
 	m.transform(&xOffset, &yOffset);
 
 	fTranslation.x = origin.x + xOffset;
@@ -154,6 +160,7 @@ ChannelTransform::RotateBy(double degrees)
 
 	_UpdateMatrix();
 }
+
 
 //// ScaleBy
 ////
@@ -191,10 +198,11 @@ ChannelTransform::ScaleBy(double xScale, double yScale)
 	_UpdateMatrix();
 }
 
+
 // SetTranslationAndScale
 void
-ChannelTransform::SetTranslationAndScale(BPoint offset,
-										  double xScale, double yScale)
+ChannelTransform::SetTranslationAndScale(BPoint offset, double xScale,
+	double yScale)
 {
 	if (fTranslation == offset && fXScale == xScale && fYScale == yScale)
 		return;
@@ -207,12 +215,14 @@ ChannelTransform::SetTranslationAndScale(BPoint offset,
 	_UpdateMatrix();
 }
 
+
 // Reset
 void
 ChannelTransform::Reset()
 {
 	SetTransformation(B_ORIGIN, B_ORIGIN, 0.0, 1.0, 1.0);
 }
+
 
 // =
 ChannelTransform&
@@ -227,6 +237,7 @@ ChannelTransform::operator=(const ChannelTransform& other)
 
 	return *this;
 }
+
 
 // _UpdateMatrix
 void
@@ -246,10 +257,10 @@ ChannelTransform::_UpdateMatrix()
 	// coordinate system and is the center for rotation and scale
 	multiply(agg::trans_affine_translation(-fPivot.x, -fPivot.y));
 	multiply(agg::trans_affine_scaling(xScale, yScale));
-	multiply(agg::trans_affine_rotation(fRotation * PI / 180.0));
+	multiply(agg::trans_affine_rotation(fRotation * M_PI / 180.0));
 
 	multiply(agg::trans_affine_translation(fPivot.x + fTranslation.x,
-										   fPivot.y + fTranslation.y));
+		fPivot.y + fTranslation.y));
 
 	// call hook function
 	Update();

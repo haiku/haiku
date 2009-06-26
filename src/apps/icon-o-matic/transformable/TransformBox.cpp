@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,54 +21,65 @@
 #include "StateView.h"
 #include "TransformCommand.h"
 
+
 #define INSET 8.0
 
-TransformBoxListener::TransformBoxListener() {}
-TransformBoxListener::~TransformBoxListener() {}
+
+TransformBoxListener::TransformBoxListener()
+{
+}
+
+
+TransformBoxListener::~TransformBoxListener()
+{
+}
+
 
 // #pragma mark -
 
+
 // constructor
 TransformBox::TransformBox(StateView* view, BRect box)
-	: ChannelTransform(),
-	  Manipulator(NULL),
-	  fOriginalBox(box),
+	:
+	ChannelTransform(),
+	Manipulator(NULL),
+	fOriginalBox(box),
 
-	  fLeftTop(box.LeftTop()),
-	  fRightTop(box.RightTop()),
-	  fLeftBottom(box.LeftBottom()),
-	  fRightBottom(box.RightBottom()),
+	fLeftTop(box.LeftTop()),
+	fRightTop(box.RightTop()),
+	fLeftBottom(box.LeftBottom()),
+	fRightBottom(box.RightBottom()),
 
-	  fPivot((fLeftTop.x + fRightBottom.x) / 2.0,
-	  		 (fLeftTop.y + fRightBottom.y) / 2.0),
-	  fPivotOffset(B_ORIGIN),
+	fPivot((fLeftTop.x + fRightBottom.x) / 2.0,
+		(fLeftTop.y + fRightBottom.y) / 2.0),
+	fPivotOffset(B_ORIGIN),
+	fCurrentCommand(NULL),
+	fCurrentState(NULL),
 
-	  fCurrentCommand(NULL),
-	  fCurrentState(NULL),
+	fDragging(false),
+	fMousePos(-10000.0, -10000.0),
+	fModifiers(0),
 
-	  fDragging(false),
-	  fMousePos(-10000.0, -10000.0),
-	  fModifiers(0),
+	fNudging(false),
 
-	  fNudging(false),
+	fView(view),
 
-	  fView(view),
+	fDragLTState(new DragCornerState(this, DragCornerState::LEFT_TOP_CORNER)),
+	fDragRTState(new DragCornerState(this, DragCornerState::RIGHT_TOP_CORNER)),
+	fDragLBState(new DragCornerState(this, DragCornerState::LEFT_BOTTOM_CORNER)),
+	fDragRBState(new DragCornerState(this, DragCornerState::RIGHT_BOTTOM_CORNER)),
 
-	  fDragLTState(new DragCornerState(this, DragCornerState::LEFT_TOP_CORNER)),
-	  fDragRTState(new DragCornerState(this, DragCornerState::RIGHT_TOP_CORNER)),
-	  fDragLBState(new DragCornerState(this, DragCornerState::LEFT_BOTTOM_CORNER)),
-	  fDragRBState(new DragCornerState(this, DragCornerState::RIGHT_BOTTOM_CORNER)),
+	fDragLState(new DragSideState(this, DragSideState::LEFT_SIDE)),
+	fDragRState(new DragSideState(this, DragSideState::RIGHT_SIDE)),
+	fDragTState(new DragSideState(this, DragSideState::TOP_SIDE)),
+	fDragBState(new DragSideState(this, DragSideState::BOTTOM_SIDE)),
 
-	  fDragLState(new DragSideState(this, DragSideState::LEFT_SIDE)),
-	  fDragRState(new DragSideState(this, DragSideState::RIGHT_SIDE)),
-	  fDragTState(new DragSideState(this, DragSideState::TOP_SIDE)),
-	  fDragBState(new DragSideState(this, DragSideState::BOTTOM_SIDE)),
-
-	  fRotateState(new RotateBoxState(this)),
-	  fTranslateState(new DragBoxState(this)),
-	  fOffsetCenterState(new OffsetCenterState(this))
+	fRotateState(new RotateBoxState(this)),
+	fTranslateState(new DragBoxState(this)),
+	fOffsetCenterState(new OffsetCenterState(this))
 {
 }
+
 
 // destructor
 TransformBox::~TransformBox()
@@ -91,6 +102,7 @@ TransformBox::~TransformBox()
 	delete fTranslateState;
 	delete fOffsetCenterState;
 }
+
 
 // Draw
 void
@@ -131,7 +143,9 @@ TransformBox::Draw(BView* into, BRect updateRect)
 	into->SetDrawingMode(B_OP_COPY);
 }
 
+
 // #pragma mark -
+
 
 // MouseDown
 bool
@@ -147,11 +161,12 @@ TransformBox::MouseDown(BPoint where)
 
 		delete fCurrentCommand;
 		fCurrentCommand = MakeCommand(fCurrentState->ActionName(),
-									  fCurrentState->ActionNameIndex());
+			fCurrentState->ActionNameIndex());
 	}
 
 	return true;
 }
+
 
 // MouseMoved
 void
@@ -170,6 +185,7 @@ TransformBox::MouseMoved(BPoint where)
 	}
 }
 
+
 // MouseUp
 Command*
 TransformBox::MouseUp()
@@ -177,6 +193,7 @@ TransformBox::MouseUp()
 	fDragging = false;
 	return FinishTransaction();
 }
+
 
 // MouseOver
 bool
@@ -193,6 +210,7 @@ TransformBox::MouseOver(BPoint where)
 	return false;
 }
 
+
 // DoubleClicked
 bool
 TransformBox::DoubleClicked(BPoint where)
@@ -200,7 +218,9 @@ TransformBox::DoubleClicked(BPoint where)
 	return false;
 }
 
+
 // #pragma mark -
+
 
 // Bounds
 BRect
@@ -227,6 +247,7 @@ TransformBox::Bounds()
 	return r;
 }
 
+
 // TrackingBounds
 BRect
 TransformBox::TrackingBounds(BView* withinView)
@@ -234,7 +255,9 @@ TransformBox::TrackingBounds(BView* withinView)
 	return withinView->Bounds();
 }
 
+
 // #pragma mark -
+
 
 // ModifiersChanged
 void
@@ -245,6 +268,7 @@ TransformBox::ModifiersChanged(uint32 modifiers)
 		fCurrentState->DragTo(fMousePos, fModifiers);
 	}
 }
+
 
 // HandleKeyDown
 bool
@@ -270,7 +294,7 @@ TransformBox::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 		case B_RIGHT_ARROW:
 			translation.x = offset;
 			break;
-	
+
 		default:
 			handled = false;
 			break;
@@ -288,6 +312,7 @@ TransformBox::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 	return true;
 }
 
+
 // HandleKeyUp
 bool
 TransformBox::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
@@ -298,6 +323,7 @@ TransformBox::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 	}
 	return false;
 }
+
 
 // UpdateCursor
 bool
@@ -310,7 +336,9 @@ TransformBox::UpdateCursor()
 	return false;
 }
 
+
 // #pragma mark -
+
 
 // AttachedToView
 void
@@ -319,6 +347,7 @@ TransformBox::AttachedToView(BView* view)
 	view->Invalidate(Bounds().InsetByCopy(-INSET, -INSET));
 }
 
+
 // DetachedFromView
 void
 TransformBox::DetachedFromView(BView* view)
@@ -326,7 +355,9 @@ TransformBox::DetachedFromView(BView* view)
 	view->Invalidate(Bounds().InsetByCopy(-INSET, -INSET));
 }
 
+
 // pragma mark -
+
 
 // Update
 void
@@ -352,6 +383,7 @@ TransformBox::Update(bool deep)
 	Transform(&fPivot);
 }
 
+
 // OffsetCenter
 void
 TransformBox::OffsetCenter(BPoint offset)
@@ -362,12 +394,14 @@ TransformBox::OffsetCenter(BPoint offset)
 	}
 }
 
+
 // Center
 BPoint
 TransformBox::Center() const
 {
 	return fPivot;
 }
+
 
 // SetBox
 void
@@ -379,21 +413,20 @@ TransformBox::SetBox(BRect box)
 	}
 }
 
+
 // FinishTransaction
 Command*
 TransformBox::FinishTransaction()
 {
 	Command* command = fCurrentCommand;
 	if (fCurrentCommand) {
-		fCurrentCommand->SetNewTransformation(Pivot(),
-											  Translation(),
-											  LocalRotation(),
-											  LocalXScale(),
-											  LocalYScale());
+		fCurrentCommand->SetNewTransformation(Pivot(), Translation(),
+			LocalRotation(), LocalXScale(), LocalYScale());
 		fCurrentCommand = NULL;
 	}
 	return command;
 }
+
 
 // NudgeBy
 void
@@ -408,6 +441,7 @@ TransformBox::NudgeBy(BPoint offset)
 	}
 }
 
+
 // FinishNudging
 Command*
 TransformBox::FinishNudging()
@@ -416,11 +450,13 @@ TransformBox::FinishNudging()
 	return FinishTransaction();
 }
 
+
 // TransformFromCanvas
 void
 TransformBox::TransformFromCanvas(BPoint& point) const
 {
 }
+
 
 // TransformToCanvas
 void
@@ -428,12 +464,14 @@ TransformBox::TransformToCanvas(BPoint& point) const
 {
 }
 
+
 // ZoomLevel
 float
 TransformBox::ZoomLevel() const
 {
 	return 1.0;
 }
+
 
 // ViewSpaceRotation
 double
@@ -443,7 +481,9 @@ TransformBox::ViewSpaceRotation() const
 	return LocalRotation();
 }
 
+
 // #pragma mark -
+
 
 // AddListener
 bool
@@ -454,6 +494,7 @@ TransformBox::AddListener(TransformBoxListener* listener)
 	return false;
 }
 
+
 // RemoveListener
 bool
 TransformBox::RemoveListener(TransformBoxListener* listener)
@@ -461,30 +502,29 @@ TransformBox::RemoveListener(TransformBoxListener* listener)
 	return fListeners.RemoveItem((void*)listener);
 }
 
+
 // #pragma mark -
+
 
 // TODO: why another version?
 // point_line_dist
 float
 point_line_dist(BPoint start, BPoint end, BPoint p, float radius)
 {
-	BRect r(min_c(start.x, end.x),
-			min_c(start.y, end.y),
-			max_c(start.x, end.x),
-			max_c(start.y, end.y));
+	BRect r(min_c(start.x, end.x), min_c(start.y, end.y), max_c(start.x, end.x),
+		max_c(start.y, end.y));
 	r.InsetBy(-radius, -radius);
 	if (r.Contains(p)) {
-		return fabs(agg::calc_line_point_distance(start.x, start.y,
-												  end.x, end.y,
-												  p.x, p.y));
+		return fabs(agg::calc_line_point_distance(start.x, start.y, end.x, end.y,
+			p.x, p.y));
 	}
-	return min_c(point_point_distance(start, p),
-				 point_point_distance(end, p));
+
+	return min_c(point_point_distance(start, p), point_point_distance(end, p));
 }
 
+
 // _DragStateFor
-//
-// where is expected in canvas view coordinates
+//! where is expected in canvas view coordinates
 DragState*
 TransformBox::_DragStateFor(BPoint where, float canvasZoom)
 {
@@ -586,6 +626,7 @@ TransformBox::_DragStateFor(BPoint where, float canvasZoom)
 	return state;
 }
 
+
 // _StrokeBWLine
 void
 TransformBox::_StrokeBWLine(BView* into, BPoint from, BPoint to) const
@@ -617,6 +658,7 @@ TransformBox::_StrokeBWLine(BView* into, BPoint from, BPoint to) const
 	into->StrokeLine(from, to, B_SOLID_HIGH);
 }
 
+
 // _StrokeBWPoint
 void
 TransformBox::_StrokeBWPoint(BView* into, BPoint point, double angle) const
@@ -638,7 +680,7 @@ TransformBox::_StrokeBWPoint(BView* into, BPoint point, double angle) const
 	double xOffset = -x;
 	double yOffset = -y;
 
-	agg::trans_affine_rotation r(angle * PI / 180.0);
+	agg::trans_affine_rotation r(angle * M_PI / 180.0);
 
 	r.transform(&xOffset, &yOffset);
 	xOffset = x + xOffset;
@@ -666,7 +708,9 @@ TransformBox::_StrokeBWPoint(BView* into, BPoint point, double angle) const
 	into->StrokeLine(p[3], p[0], B_SOLID_LOW);
 }
 
+
 // #pragma mark -
+
 
 // _NotifyDeleted
 void
@@ -681,7 +725,9 @@ TransformBox::_NotifyDeleted() const
 	}
 }
 
+
 // #pragma mark -
+
 
 // _SetState
 void

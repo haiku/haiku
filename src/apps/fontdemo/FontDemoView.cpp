@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,17 +8,18 @@
 
 
 #include "FontDemoView.h"
-#include "messages.h"
+
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <Font.h>
 #include <Message.h>
 #include <Shape.h>
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "messages.h"
 
 
 FontDemoView::FontDemoView(BRect rect)
@@ -54,7 +55,8 @@ FontDemoView::~FontDemoView()
 void
 FontDemoView::FrameResized(float width, float height)
 {
-	// TODO: We shouldnt invalidate the whole view when bounding boxes are working as wanted
+	// TODO: We shouldnt invalidate the whole view when bounding boxes are
+	// working as wanted
 	Invalidate(/*fBoxRegion.Frame()*/);
 	BView::FrameResized(width, height);
 }
@@ -78,9 +80,9 @@ FontDemoView::_DrawView(BView* view)
 {
 	if (!view)
 		return;
-		
+
 	view->SetDrawingMode(B_OP_COPY);
-			
+
 
 	BRect rect = view->Bounds();
 	view->SetHighColor(255, 255, 255);
@@ -114,18 +116,18 @@ FontDemoView::_DrawView(BView* view)
 	font_height fh;
 	fFont.GetHeight(&fh);
 
-	float xCoordArray[size];	
+	float xCoordArray[size];
 	float yCoordArray[size];
 
 	float yCoord = (rect.Height() + fh.ascent - fh.descent) / 2;
 	float xCoord = -rect.Width() / 2;
 	const float xCenter = xCoord * -1;
-	const float r = Rotation() * (PI/180.0);
+	const float r = Rotation() * (M_PI / 180.0);
 	const float cosinus = cos(r);
 	const float sinus = -sin(r);
 
 	// When the bounding boxes workes properly we will invalidate only the
-	// region area instead of the whole view.		
+	// region area instead of the whole view.
 
 	fBoxRegion.MakeEmpty();
 
@@ -135,7 +137,7 @@ FontDemoView::_DrawView(BView* view)
 
 		yCoordArray[i] = sinus * (xCoord - xCoordArray[i]);
 		xCoordArray[i] = cosinus * xCoord;
-		
+
 		xCoordArray[i] += xCenter;
 		yCoordArray[i] += yCoord;
 
@@ -234,7 +236,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 
 		case FONTSHEAR_MSG:
 		{
-			float shear = 90.0;			
+			float shear = 90.0;
 			if (msg->FindFloat("_shear", &shear) == B_OK) {
 				SetFontShear(shear);
 				Invalidate(/*&fBoxRegion*/);
@@ -244,7 +246,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 
 		case ROTATION_MSG:
 		{
-			float rotation = 0.0;			
+			float rotation = 0.0;
 			if (msg->FindFloat("_rotation", &rotation) == B_OK) {
 				SetFontRotation(rotation);
 				Invalidate(/*&fBoxRegion*/);
@@ -254,7 +256,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 
 		case SPACING_MSG:
 		{
-			float space = 0.0;			
+			float space = 0.0;
 			if (msg->FindFloat("_spacing", &space) == B_OK) {
 				SetSpacing(space);
 				Invalidate(/*&fBoxRegion*/);
@@ -264,13 +266,13 @@ FontDemoView::MessageReceived(BMessage* msg)
 
 		case OUTLINE_MSG:
 		{
-			int8 outline = 0;			
+			int8 outline = 0;
 			if (msg->FindInt8("_outline", &outline) == B_OK) {
 				SetOutlineLevel(outline);
 				Invalidate(/*&fBoxRegion*/);
 			 }
 			break;
-		}	
+		}
 
 		case ALIASING_MSG:
 		{
@@ -281,7 +283,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		
+
 		case DRAWINGMODE_CHANGED_MSG:
 		{
 			if (msg->FindInt32("_mode", (int32 *)&fDrawingMode) == B_OK) {
@@ -289,7 +291,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		
+
 		case BOUNDING_BOX_MSG:
 		{
 			bool boundingbox = false;
@@ -299,7 +301,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		
+
 		default:
 			BView::MessageReceived(msg);
 			break;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,73 +10,70 @@
  */
 
 #include "AnalogClock.h"
-#include "TimeMessages.h"
+
+#include <math.h>
+#include <stdio.h>
 
 #include <Bitmap.h>
 #include <Message.h>
 #include <Window.h>
 
-#include <cmath>
-#include <stdio.h>
+#include "TimeMessages.h"
+
 
 #define DRAG_DELTA_PHI 0.2
 
 
 class OffscreenClock : public BView {
-	public:
-				OffscreenClock(BRect frame, const char *name);
-				~OffscreenClock();
+public:
+							OffscreenClock(BRect frame, const char *name);
+	virtual					~OffscreenClock();
 
-		void 	SetTime(int32 hour, int32 minute, int32 second);
-		void 	GetTime(int32 *hour, int32 *minute, int32 *second);
-		bool	IsDirty() const	{	return fDirty;	}
-		void 	DrawClock();
+			void		 	SetTime(int32 hour, int32 minute, int32 second);
+			void 			GetTime(int32 *hour, int32 *minute, int32 *second);
+			bool			IsDirty() const	{	return fDirty;	}
+			void 			DrawClock();
 
-		bool	InHourHand(BPoint point);
-		bool	InMinuteHand(BPoint point);
-		
-		void	SetHourHand(BPoint point);
-		void	SetMinuteHand(BPoint point);
+			bool			InHourHand(BPoint point);
+			bool			InMinuteHand(BPoint point);
 
-		void	SetHourDragging(bool val) {	
-					fHourDragging = val;
-					fDirty = true;
-				}
-		void	SetMinuteDragging(bool val) {
-					fMinuteDragging = val;
-					fDirty = true;
-				}
-	private:
-		float	_GetPhi(BPoint point);
-		bool	_InHand(BPoint point, int32 ticks, float radius);
-		void	_DrawHands(float x, float y, float radius,
-					rgb_color hourHourColor,
-					rgb_color hourMinuteColor,
-					rgb_color secondsColor,
-					rgb_color knobColor);
+			void			SetHourHand(BPoint point);
+			void			SetMinuteHand(BPoint point);
 
-		int32	fHours;
-		int32	fMinutes;
-		int32	fSeconds;
-		bool	fDirty;
+			void			SetHourDragging(bool dragging);
+			void			SetMinuteDragging(bool dragging);
 
-		float	fCenterX;
-		float	fCenterY;
-		float	fRadius;
+private:
+			float			_GetPhi(BPoint point);
+			bool			_InHand(BPoint point, int32 ticks, float radius);
+			void			_DrawHands(float x, float y, float radius,
+								rgb_color hourHourColor,
+								rgb_color hourMinuteColor,
+								rgb_color secondsColor, rgb_color knobColor);
 
-		bool	fHourDragging;
-		bool	fMinuteDragging;
+			int32			fHours;
+			int32			fMinutes;
+			int32			fSeconds;
+			bool			fDirty;
+
+			float			fCenterX;
+			float			fCenterY;
+			float			fRadius;
+
+			bool			fHourDragging;
+			bool			fMinuteDragging;
 };
 
 
 OffscreenClock::OffscreenClock(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
-	  fHours(0),
-	  fMinutes(0),
-	  fSeconds(0),
-	  fDirty(true),
-	  fHourDragging(false),
-	  fMinuteDragging(false)
+	:
+	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	fHours(0),
+	fMinutes(0),
+	fSeconds(0),
+	fDirty(true),
+	fHourDragging(false),
+	fMinuteDragging(false)
 {
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 
@@ -131,9 +128,9 @@ OffscreenClock::DrawClock()
 	SetHighColor(background);
 	FillRect(bounds);
 
-	
+
 	bounds.Set(fCenterX - fRadius, fCenterY - fRadius,
-					fCenterX + fRadius, fCenterY + fRadius);
+		fCenterX + fRadius, fCenterY + fRadius);
 
 	SetPenSize(2.0);
 
@@ -148,7 +145,7 @@ OffscreenClock::DrawClock()
 
 	SetLowColor(255, 255, 255);
 	FillEllipse(bounds, B_SOLID_LOW);
-	
+
 	SetHighColor(tint_color(HighColor(), B_DARKEN_2_TINT));
 
 	// minutes
@@ -157,10 +154,10 @@ OffscreenClock::DrawClock()
 	for (int32 minute = 1; minute < 60; minute++) {
 		if (minute % 5 == 0)
 			continue;
-		float x1 = fCenterX + sinf(minute * PI / 30.0) * fRadius;
-		float y1 = fCenterY + cosf(minute * PI / 30.0) * fRadius;
-		float x2 = fCenterX + sinf(minute * PI / 30.0) * (fRadius * 0.95);
-		float y2 = fCenterY + cosf(minute * PI / 30.0) * (fRadius * 0.95);
+		float x1 = fCenterX + sinf(minute * M_PI / 30.0) * fRadius;
+		float y1 = fCenterY + cosf(minute * M_PI / 30.0) * fRadius;
+		float x2 = fCenterX + sinf(minute * M_PI / 30.0) * (fRadius * 0.95);
+		float y2 = fCenterY + cosf(minute * M_PI / 30.0) * (fRadius * 0.95);
 		StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 	}
 
@@ -170,10 +167,10 @@ OffscreenClock::DrawClock()
 	SetPenSize(2.0);
 	SetLineMode(B_ROUND_CAP, B_MITER_JOIN);
 	for (int32 hour = 0; hour < 12; hour++) {
-		float x1 = fCenterX + sinf(hour * PI / 6.0) * fRadius;
-		float y1 = fCenterY + cosf(hour * PI / 6.0) * fRadius;
-		float x2 = fCenterX + sinf(hour * PI / 6.0) * (fRadius * 0.9);
-		float y2 = fCenterY + cosf(hour * PI / 6.0) * (fRadius * 0.9);
+		float x1 = fCenterX + sinf(hour * M_PI / 6.0) * fRadius;
+		float y1 = fCenterY + cosf(hour * M_PI / 6.0) * fRadius;
+		float x2 = fCenterX + sinf(hour * M_PI / 6.0) * (fRadius * 0.9);
+		float y2 = fCenterY + cosf(hour * M_PI / 6.0) * (fRadius * 0.9);
 		StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 	}
 
@@ -183,19 +180,21 @@ OffscreenClock::DrawClock()
 		hourColor = (rgb_color){ 0, 0, 255, 255 };
 	else
 	 	hourColor = tint_color(HighColor(), B_DARKEN_2_TINT);
+
 	rgb_color minuteColor;
 	if (fMinuteDragging)
 		minuteColor = (rgb_color){ 0, 0, 255, 255 };
 	else
 	 	minuteColor = tint_color(HighColor(), B_DARKEN_2_TINT);
+
 	rgb_color secondsColor = (rgb_color){ 255, 0, 0, 255 };
 	rgb_color shadowColor = tint_color(LowColor(),
 		(B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2);
 
 	_DrawHands(fCenterX + 1.5, fCenterY + 1.5, fRadius,
-				shadowColor, shadowColor, shadowColor, shadowColor);
+		shadowColor, shadowColor, shadowColor, shadowColor);
 	_DrawHands(fCenterX, fCenterY, fRadius,
-				hourColor, minuteColor, secondsColor, knobColor);
+		hourColor, minuteColor, secondsColor, knobColor);
 
 	Sync();
 
@@ -231,7 +230,7 @@ OffscreenClock::SetHourHand(BPoint point)
 	point.y -= fCenterY;
 
 	float pointPhi = _GetPhi(point);
-	float hoursExact = 6.0 * pointPhi / PI;
+	float hoursExact = 6.0 * pointPhi / M_PI;
 	if (fHours >= 12)
 		fHours = 12;
 	else
@@ -249,10 +248,26 @@ OffscreenClock::SetMinuteHand(BPoint point)
 	point.y -= fCenterY;
 
 	float pointPhi = _GetPhi(point);
-	float minutesExact = 30.0 * pointPhi / PI;
+	float minutesExact = 30.0 * pointPhi / M_PI;
 	fMinutes = int32(ceilf(minutesExact));
 
 	SetTime(fHours, fMinutes, fSeconds);
+}
+
+
+void
+OffscreenClock::SetHourDragging(bool dragging)
+{
+	fHourDragging = dragging;
+	fDirty = true;
+}
+
+
+void
+OffscreenClock::SetMinuteDragging(bool dragging)
+{
+	fMinuteDragging = dragging;
+	fDirty = true;
 }
 
 
@@ -260,39 +275,40 @@ float
 OffscreenClock::_GetPhi(BPoint point)
 {
 	if (point.x == 0 && point.y < 0)
-		return 2 * PI;
+		return 2 * M_PI;
 	if (point.x == 0 && point.y > 0)
-		return PI;
+		return M_PI;
 	if (point.y == 0 && point.x < 0)
-		return PI * 3 / 2;
+		return M_PI * 3 / 2;
 	if (point.y == 0 && point.x > 0)
-		return PI / 2;
+		return M_PI / 2;
 
 	float pointPhi = atanf(-1. * point.y / point.x);
 	if (point.y < 0. && point.x > 0.)	// right upper corner
-		pointPhi = PI / 2. - pointPhi;
+		pointPhi = M_PI / 2. - pointPhi;
 	if (point.y > 0. && point.x > 0.)	// right lower corner
-		pointPhi = PI / 2 - pointPhi;
+		pointPhi = M_PI / 2 - pointPhi;
 	if (point.y > 0. && point.x < 0.)	// left lower corner
-		pointPhi = (PI * 3. / 2. - pointPhi);
+		pointPhi = (M_PI * 3. / 2. - pointPhi);
 	if (point.y < 0. && point.x < 0.)	// left upper corner
-		pointPhi = 3. / 2. * PI - pointPhi;
+		pointPhi = 3. / 2. * M_PI - pointPhi;
 	return pointPhi;
 }
+
 
 bool
 OffscreenClock::_InHand(BPoint point, int32 ticks, float radius)
 {
 	point.x -= fCenterX;
 	point.y -= fCenterY;
-	
+
 	float pRadius = sqrt(pow(point.x, 2) + pow(point.y, 2));
 
 	if (radius < pRadius)
 		return false;
-	
+
 	float pointPhi = _GetPhi(point);
-	float handPhi = PI / 30.0 * ticks;
+	float handPhi = M_PI / 30.0 * ticks;
 	float delta = pointPhi - handPhi;
 	if (fabs(delta) > DRAG_DELTA_PHI)
 		return false;
@@ -315,23 +331,23 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 	SetHighColor(hourColor);
 	SetPenSize(4.0);
 	float hours = fHours + float(fMinutes) / 60.0;
-	offsetX = (radius * 0.7) * sinf((hours * PI) / 6.0);
-	offsetY = (radius * 0.7) * cosf((hours * PI) / 6.0);
+	offsetX = (radius * 0.7) * sinf((hours * M_PI) / 6.0);
+	offsetY = (radius * 0.7) * cosf((hours * M_PI) / 6.0);
 	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
 
 	// calc, draw minute hand
 	SetHighColor(minuteColor);
 	SetPenSize(3.0);
 	float minutes = fMinutes + float(fSeconds) / 60.0;
-	offsetX = (radius * 0.9) * sinf((minutes * PI) / 30.0);
-	offsetY = (radius * 0.9) * cosf((minutes * PI) / 30.0);
+	offsetX = (radius * 0.9) * sinf((minutes * M_PI) / 30.0);
+	offsetY = (radius * 0.9) * cosf((minutes * M_PI) / 30.0);
 	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
 
 	// calc, draw second hand
 	SetHighColor(secondsColor);
 	SetPenSize(1.0);
-	offsetX = (radius * 0.95) * sinf((fSeconds * PI) / 30.0);
-	offsetY = (radius * 0.95) * cosf((fSeconds * PI) / 30.0);
+	offsetX = (radius * 0.95) * sinf((fSeconds * M_PI) / 30.0);
+	offsetY = (radius * 0.95) * cosf((fSeconds * M_PI) / 30.0);
 	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
 
 	// draw the center knob
@@ -344,7 +360,8 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 
 
 TAnalogClock::TAnalogClock(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
+	:
+	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
 	fBitmap(NULL),
 	fClock(NULL),
 	fDraggingHourHand(false),
@@ -429,6 +446,7 @@ TAnalogClock::MouseDown(BPoint point)
 	}
 }
 
+
 void
 TAnalogClock::MouseUp(BPoint point)
 {
@@ -452,7 +470,7 @@ TAnalogClock::MouseUp(BPoint point)
 void
 TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
-	
+
 	if (fDraggingMinuteHand)
 		fClock->SetMinuteHand(point);
 	if (fDraggingHourHand)
@@ -482,7 +500,7 @@ TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
 
 	if (fClock)
 		fClock->SetTime(hour, minute, second);
-	
+
 	Invalidate();
 }
 

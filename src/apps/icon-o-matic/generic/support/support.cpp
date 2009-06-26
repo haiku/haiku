@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,16 +16,17 @@
 #include <Point.h>
 #include <String.h>
 
+
 // point_line_distance
 double
-point_line_distance(double x1, double y1,
-					double x2, double y2,
-					double x,  double y)
+point_line_distance(double x1, double y1, double x2, double y2, double x,
+	double y)
 {
 	double dx = x2 - x1;
 	double dy = y2 - y1;
 	return ((x - x2) * dy - (y - y2) * dx) / sqrt(dx * dx + dy * dy);
 }
+
 
 // point_line_distance
 double
@@ -42,14 +43,15 @@ point_line_distance(BPoint point, BPoint pa, BPoint pb)
 		double alpha = acos((b*b + c*c - a*a) / (2*b*c));
 		double beta = acos((a*a + c*c - b*b) / (2*a*c));
 
-		if (alpha <= PI2 && beta <= PI2) {
+		if (alpha <= M_PI_2 && beta <= M_PI_2) {
 			currentDist = fabs(point_line_distance(pa.x, pa.y, pb.x, pb.y,
-												   point.x, point.y));
+				point.x, point.y));
 		}
 	}
 
 	return currentDist;
 }
+
 
 // calc_angle
 double
@@ -57,25 +59,25 @@ calc_angle(BPoint origin, BPoint from, BPoint to, bool degree)
 {
 	double angle = 0.0;
 
-	double d = point_line_distance(from.x, from.y,
-								   origin.x, origin.y,
-								   to.x, to.y);
+	double d = point_line_distance(from.x, from.y, origin.x, origin.y,
+		to.x, to.y);
 	if (d != 0.0) {
 		double a = point_point_distance(from, to);
 		double b = point_point_distance(from, origin);
 		double c = point_point_distance(to, origin);
 		if (a > 0.0 && b > 0.0 && c > 0.0) {
 			angle = acos((b*b + c*c - a*a) / (2.0*b*c));
-		
+
 			if (d < 0.0)
 				angle = -angle;
 
 			if (degree)
-				angle = angle * 180.0 / PI;
+				angle = angle * 180.0 / M_PI;
 		}
 	}
 	return angle;
 }
+
 
 // write_string
 status_t
@@ -90,6 +92,7 @@ write_string(BPositionIO* stream, BString& string)
 	string.SetTo("");
 	return written;
 }
+
 
 // append_float
 void
@@ -127,10 +130,11 @@ append_float(BString& string, float n, int32 maxDigits)
 	}
 }
 
+
 //// gauss
 //double
 //gauss(double f)
-//{ 
+//{
 //	// this aint' a real gauss function
 ///*	if (f >= -1.0 && f <= 1.0) {
 //		if (f < -0.5) {

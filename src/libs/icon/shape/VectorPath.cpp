@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,24 +19,25 @@
 #include <agg_math.h>
 
 #ifdef ICON_O_MATIC
-#include <debugger.h>
-#include <typeinfo>
+#	include <debugger.h>
+#	include <typeinfo>
 #endif // ICON_O_MATIC
 
 #include <Message.h>
 #include <TypeConstants.h>
 
 #ifdef ICON_O_MATIC
-# include "support.h"
+#	include "support.h"
 
-# include "CommonPropertyIDs.h"
-# include "IconProperty.h"
-# include "Icons.h"
-# include "Property.h"
-# include "PropertyObject.h"
+#	include "CommonPropertyIDs.h"
+#	include "IconProperty.h"
+#	include "Icons.h"
+#	include "Property.h"
+#	include "PropertyObject.h"
 #endif // ICON_O_MATIC
 
 #include "Transformable.h"
+
 
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
 #define obj_renew(p, type, n)	((type *)realloc (p, (n) * sizeof(type)))
@@ -44,31 +45,25 @@
 
 #define ALLOC_CHUNKS 20
 
-// get_path_storage
+
 bool
-get_path_storage(agg::path_storage& path,
-				 const control_point* points, int32 count, bool closed)
+get_path_storage(agg::path_storage& path, const control_point* points,
+	int32 count, bool closed)
 {
 	if (count > 1) {
-		path.move_to(points[0].point.x,
-					 points[0].point.y);
+		path.move_to(points[0].point.x, points[0].point.y);
 
 		for (int32 i = 1; i < count; i++) {
-			path.curve4(points[i - 1].point_out.x,
-						points[i - 1].point_out.y,
-						points[i].point_in.x,
-						points[i].point_in.y,
-						points[i].point.x,
-						points[i].point.y);
+			path.curve4(points[i - 1].point_out.x, points[i - 1].point_out.y,
+				points[i].point_in.x, points[i].point_in.y,
+				points[i].point.x, points[i].point.y);
 		}
 		if (closed) {
 			// curve from last to first control point
-			path.curve4(points[count - 1].point_out.x,
-						points[count - 1].point_out.y,
-						points[0].point_in.x,
-						points[0].point_in.y,
-						points[0].point.x,
-						points[0].point.y);
+			path.curve4(
+				points[count - 1].point_out.x, points[count - 1].point_out.y,
+				points[0].point_in.x, points[0].point_in.y,
+				points[0].point.x, points[0].point.y);
 			path.close_polygon();
 		}
 
@@ -77,64 +72,70 @@ get_path_storage(agg::path_storage& path,
 	return false;
 }
 
-// #pragma mark -
-
-#ifdef ICON_O_MATIC
-PathListener::PathListener() {}
-PathListener::~PathListener() {}
-#endif
 
 // #pragma mark -
 
-// constructor
-VectorPath::VectorPath()
+
 #ifdef ICON_O_MATIC
-	: BArchivable(),
-	  IconObject("<path>"),
-	  fListeners(20),
-#else
-	:
-#endif
-	  fPath(NULL),
-	  fClosed(false),
-	  fPointCount(0),
-	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+PathListener::PathListener()
 {
 }
 
-// constructor
-VectorPath::VectorPath(const VectorPath& from)
-#ifdef ICON_O_MATIC
-	: BArchivable(),
-	  IconObject(from),
-	  fListeners(20),
-#else
-	:
+
+PathListener::~PathListener()
+{
+}
 #endif
-	  fPath(NULL),
-	  fClosed(false),
-	  fPointCount(0),
-	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+
+
+// #pragma mark -
+
+
+VectorPath::VectorPath()
+	:
+#ifdef ICON_O_MATIC
+	BArchivable(),
+	IconObject("<path>"),
+	fListeners(20),
+#endif
+	fPath(NULL),
+	fClosed(false),
+	fPointCount(0),
+	fAllocCount(0),
+	fCachedBounds(0.0, 0.0, -1.0, -1.0)
+{
+}
+
+
+VectorPath::VectorPath(const VectorPath& from)
+	:
+#ifdef ICON_O_MATIC
+	BArchivable(),
+	IconObject(from),
+	fListeners(20),
+#endif
+	fPath(NULL),
+	fClosed(false),
+	fPointCount(0),
+	fAllocCount(0),
+	fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
 	*this = from;
 }
 
-// constructor
+
 VectorPath::VectorPath(BMessage* archive)
-#ifdef ICON_O_MATIC
-	: BArchivable(),
-	  IconObject(archive),
-	  fListeners(20),
-#else
 	:
+#ifdef ICON_O_MATIC
+	BArchivable(),
+	IconObject(archive),
+	fListeners(20),
 #endif
-	  fPath(NULL),
-	  fClosed(false),
-	  fPointCount(0),
-	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+	fPath(NULL),
+	fClosed(false),
+	fPointCount(0),
+	fAllocCount(0),
+	fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
 	if (!archive)
 		return;
@@ -144,7 +145,6 @@ VectorPath::VectorPath(BMessage* archive)
 	if (archive->GetInfo("point", &typeFound, &countFound) >= B_OK
 		&& typeFound == B_POINT_TYPE
 		&& _SetPointCount(countFound)) {
-
 		memset(fPath, 0, fAllocCount * sizeof(control_point));
 
 		BPoint point;
@@ -152,10 +152,10 @@ VectorPath::VectorPath(BMessage* archive)
 		BPoint pointOut;
 		bool connected;
 		for (int32 i = 0; i < fPointCount
-						  && archive->FindPoint("point", i, &point) >= B_OK
-						  && archive->FindPoint("point in", i, &pointIn) >= B_OK
-						  && archive->FindPoint("point out", i, &pointOut) >= B_OK
-						  && archive->FindBool("connected", i, &connected) >= B_OK; i++) {
+				&& archive->FindPoint("point", i, &point) >= B_OK
+				&& archive->FindPoint("point in", i, &pointIn) >= B_OK
+				&& archive->FindPoint("point out", i, &pointOut) >= B_OK
+				&& archive->FindBool("connected", i, &connected) >= B_OK; i++) {
 			fPath[i].point = point;
 			fPath[i].point_in = pointIn;
 			fPath[i].point_out = pointOut;
@@ -167,7 +167,7 @@ VectorPath::VectorPath(BMessage* archive)
 
 }
 
-// destructor
+
 VectorPath::~VectorPath()
 {
 	if (fPath)
@@ -185,11 +185,12 @@ VectorPath::~VectorPath()
 #endif
 }
 
+
 // #pragma mark -
+
 
 #ifdef ICON_O_MATIC
 
-// MakePropertyObject
 PropertyObject*
 VectorPath::MakePropertyObject() const
 {
@@ -204,27 +205,22 @@ VectorPath::MakePropertyObject() const
 	BMessage* archive = new BMessage();
 	if (Archive(archive) == B_OK) {
 		object->AddProperty(new IconProperty(PROPERTY_PATH,
-											 kPathPropertyIconBits,
-											 kPathPropertyIconWidth,
-											 kPathPropertyIconHeight,
-											 kPathPropertyIconFormat,
-											 archive));
+			kPathPropertyIconBits, kPathPropertyIconWidth,
+			kPathPropertyIconHeight, kPathPropertyIconFormat, archive));
 	}
 
 	return object;
 }
 
-// SetToPropertyObject
+
 bool
 VectorPath::SetToPropertyObject(const PropertyObject* object)
 {
 	AutoNotificationSuspender _(this);
 	IconObject::SetToPropertyObject(object);
 
-	// closed
 	SetClosed(object->Value(PROPERTY_CLOSED, fClosed));
 
-	// archived path
 	IconProperty* pathProperty = dynamic_cast<IconProperty*>(
 		object->FindProperty(PROPERTY_PATH));
 	if (pathProperty && pathProperty->Message()) {
@@ -235,61 +231,72 @@ VectorPath::SetToPropertyObject(const PropertyObject* object)
 	return HasPendingNotifications();
 }
 
-// Archive
+
 status_t
 VectorPath::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = IconObject::Archive(into, deep);
-	if (ret < B_OK)
+	if (ret != B_OK)
 		return ret;
 
 	if (fPointCount > 0) {
 		// improve BMessage efficency by preallocating storage for all points
 		// with the first call
 		ret = into->AddData("point", B_POINT_TYPE, &fPath[0].point,
-							sizeof(BPoint), true, fPointCount);
-		if (ret >= B_OK)
+			sizeof(BPoint), true, fPointCount);
+		if (ret >= B_OK) {
 			ret = into->AddData("point in", B_POINT_TYPE, &fPath[0].point_in,
-								sizeof(BPoint), true, fPointCount);
-		if (ret >= B_OK)
+				sizeof(BPoint), true, fPointCount);
+		}
+		if (ret >= B_OK) {
 			ret = into->AddData("point out", B_POINT_TYPE, &fPath[0].point_out,
-								sizeof(BPoint), true, fPointCount);
-		if (ret >= B_OK)
+				sizeof(BPoint), true, fPointCount);
+		}
+		if (ret >= B_OK) {
 			ret = into->AddData("connected", B_BOOL_TYPE, &fPath[0].connected,
-								sizeof(bool), true, fPointCount);
+				sizeof(bool), true, fPointCount);
+		}
+
 		// add the rest of the points
 		for (int32 i = 1; i < fPointCount && ret >= B_OK; i++) {
-			ret = into->AddData("point", B_POINT_TYPE, &fPath[i].point, sizeof(BPoint));
-			if (ret >= B_OK)
-				ret = into->AddData("point in", B_POINT_TYPE, &fPath[i].point_in, sizeof(BPoint));
-			if (ret >= B_OK)
-				ret = into->AddData("point out", B_POINT_TYPE, &fPath[i].point_out, sizeof(BPoint));
-			if (ret >= B_OK)
-				ret = into->AddData("connected", B_BOOL_TYPE, &fPath[i].connected, sizeof(bool));
+			ret = into->AddData("point", B_POINT_TYPE, &fPath[i].point,
+				sizeof(BPoint));
+			if (ret >= B_OK) {
+				ret = into->AddData("point in", B_POINT_TYPE, &fPath[i].point_in,
+					sizeof(BPoint));
+			}
+			if (ret >= B_OK) {
+				ret = into->AddData("point out", B_POINT_TYPE,
+					&fPath[i].point_out, sizeof(BPoint));
+			}
+			if (ret >= B_OK) {
+				ret = into->AddData("connected", B_BOOL_TYPE,
+					&fPath[i].connected, sizeof(bool));
+			}
 		}
 	}
-	
-	if (ret >= B_OK) {
+
+	if (ret >= B_OK)
 		ret = into->AddBool("path closed", fClosed);
-	} else {
+	else
 		fprintf(stderr, "failed adding points!\n");
-	}
-	if (ret < B_OK) {
+
+	if (ret < B_OK)
 		fprintf(stderr, "failed adding close!\n");
-	}
+
 	// finish off
-	if (ret < B_OK) {
+	if (ret < B_OK)
 		ret = into->AddString("class", "VectorPath");
-	}
 
 	return ret;
 }
 
 #endif // ICON_O_MATIC
 
+
 // #pragma mark -
 
-// operator=
+
 VectorPath&
 VectorPath::operator=(const VectorPath& from)
 {
@@ -305,20 +312,21 @@ VectorPath::operator=(const VectorPath& from)
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 	}
 	Notify();
-	
+
 	return *this;
 }
 
-// MakeEmpty
+
 void
 VectorPath::MakeEmpty()
 {
 	_SetPointCount(0);
 }
 
+
 // #pragma mark -
 
-// AddPoint
+
 bool
 VectorPath::AddPoint(BPoint point)
 {
@@ -333,12 +341,10 @@ VectorPath::AddPoint(BPoint point)
 	return false;
 }
 
-// AddPoint
+
 bool
-VectorPath::AddPoint(const BPoint& point,
-					 const BPoint& pointIn,
-					 const BPoint& pointOut,
-					 bool connected)
+VectorPath::AddPoint(const BPoint& point, const BPoint& pointIn,
+	const BPoint& pointOut, bool connected)
 {
 	int32 index = fPointCount;
 
@@ -351,7 +357,7 @@ VectorPath::AddPoint(const BPoint& point,
 	return false;
 }
 
-// AddPoint
+
 bool
 VectorPath::AddPoint(BPoint point, int32 index)
 {
@@ -377,12 +383,11 @@ VectorPath::AddPoint(BPoint point, int32 index)
 	return false;
 }
 
-// RemovePoint
+
 bool
 VectorPath::RemovePoint(int32 index)
 {
 	if (index >= 0 && index < fPointCount) {
-
 		if (index < fPointCount - 1) {
 			// move points
 			for (int32 i = index; i < fPointCount - 1; i++) {
@@ -402,7 +407,7 @@ VectorPath::RemovePoint(int32 index)
 	return false;
 }
 
-// SetPoint
+
 bool
 VectorPath::SetPoint(int32 index, BPoint point)
 {
@@ -422,11 +427,10 @@ VectorPath::SetPoint(int32 index, BPoint point)
 	return false;
 }
 
-// SetPoint
+
 bool
-VectorPath::SetPoint(int32 index, BPoint point,
-								  BPoint pointIn, BPoint pointOut,
-								  bool connected)
+VectorPath::SetPoint(int32 index, BPoint point, BPoint pointIn, BPoint pointOut,
+	bool connected)
 {
 	if (index == fPointCount)
 		index = 0;
@@ -444,7 +448,7 @@ VectorPath::SetPoint(int32 index, BPoint point,
 	return false;
 }
 
-// SetPointIn
+
 bool
 VectorPath::SetPointIn(int32 i, BPoint point)
 {
@@ -459,8 +463,9 @@ VectorPath::SetPointIn(int32 i, BPoint point)
 			BPoint v = fPath[i].point - fPath[i].point_in;
 			float distIn = sqrtf(v.x * v.x + v.y * v.y);
 			if (distIn > 0.0) {
-				float distOut = agg::calc_distance(fPath[i].point.x, fPath[i].point.y,
-										fPath[i].point_out.x, fPath[i].point_out.y);
+				float distOut = agg::calc_distance(
+					fPath[i].point.x, fPath[i].point.y,
+					fPath[i].point_out.x, fPath[i].point_out.y);
 				float scale = (distIn + distOut) / distIn;
 				v.x *= scale;
 				v.y *= scale;
@@ -476,7 +481,7 @@ VectorPath::SetPointIn(int32 i, BPoint point)
 	return false;
 }
 
-// SetPointOut
+
 bool
 VectorPath::SetPointOut(int32 i, BPoint point, bool mirrorDist)
 {
@@ -495,8 +500,9 @@ VectorPath::SetPointOut(int32 i, BPoint point, bool mirrorDist)
 			BPoint v = fPath[i].point - fPath[i].point_out;
 			float distOut = sqrtf(v.x * v.x + v.y * v.y);
 			if (distOut > 0.0) {
-				float distIn = agg::calc_distance(fPath[i].point.x, fPath[i].point.y,
-										fPath[i].point_in.x, fPath[i].point_in.y);
+				float distIn = agg::calc_distance(
+					fPath[i].point.x, fPath[i].point.y,
+					fPath[i].point_in.x, fPath[i].point_in.y);
 				float scale = (distIn + distOut) / distOut;
 				v.x *= scale;
 				v.y *= scale;
@@ -512,7 +518,7 @@ VectorPath::SetPointOut(int32 i, BPoint point, bool mirrorDist)
 	return false;
 }
 
-// SetInOutConnected
+
 bool
 VectorPath::SetInOutConnected(int32 index, bool connected)
 {
@@ -521,12 +527,13 @@ VectorPath::SetInOutConnected(int32 index, bool connected)
 		_NotifyPointChanged(index);
 		return true;
 	}
-	return false;	
+	return false;
 }
+
 
 // #pragma mark -
 
-// GetPointAt
+
 bool
 VectorPath::GetPointAt(int32 index, BPoint& point) const
 {
@@ -539,7 +546,7 @@ VectorPath::GetPointAt(int32 index, BPoint& point) const
 	return false;
 }
 
-// GetPointInAt
+
 bool
 VectorPath::GetPointInAt(int32 index, BPoint& point) const
 {
@@ -552,7 +559,7 @@ VectorPath::GetPointInAt(int32 index, BPoint& point) const
 	return false;
 }
 
-// GetPointOutAt
+
 bool
 VectorPath::GetPointOutAt(int32 index, BPoint& point) const
 {
@@ -565,10 +572,10 @@ VectorPath::GetPointOutAt(int32 index, BPoint& point) const
 	return false;
 }
 
-// GetPointsAt
+
 bool
-VectorPath::GetPointsAt(int32 index, BPoint& point,
-						BPoint& pointIn, BPoint& pointOut, bool* connected) const
+VectorPath::GetPointsAt(int32 index, BPoint& point, BPoint& pointIn,
+	BPoint& pointOut, bool* connected) const
 {
 	if (index >= 0 && index < fPointCount) {
 		point = fPath[index].point;
@@ -583,23 +590,24 @@ VectorPath::GetPointsAt(int32 index, BPoint& point,
 	return false;
 }
 
-// CountPoints
+
 int32
 VectorPath::CountPoints() const
 {
 	return fPointCount;
 }
 
+
 // #pragma mark -
+
 
 #ifdef ICON_O_MATIC
 
-// distance_to_curve
 static float
-distance_to_curve(const BPoint& p, const BPoint& a, const BPoint& aOut, const BPoint& bIn, const BPoint& b)
+distance_to_curve(const BPoint& p, const BPoint& a, const BPoint& aOut,
+	const BPoint& bIn, const BPoint& b)
 {
-	agg::curve4_inc curve(a.x, a.y, aOut.x, aOut.y,
-						  bIn.x, bIn.y, b.x, b.y);
+	agg::curve4_inc curve(a.x, a.y, aOut.x, aOut.y, bIn.x, bIn.y, b.x, b.y);
 
 	float segDist = FLT_MAX;
 	double x1, y1, x2, y2;
@@ -615,25 +623,25 @@ distance_to_curve(const BPoint& p, const BPoint& a, const BPoint& aOut, const BP
 		if (a > 0.0 && b > 0.0) {
 			double c = agg::calc_distance(x1, y1, x2, y2);
 
-			double alpha = acos((b*b + c*c - a*a) / (2*b*c));
-			double beta = acos((a*a + c*c - b*b) / (2*a*c));
-	
-			if (alpha <= PI2 && beta <= PI2) {
-				currentDist = fabs(agg::calc_line_point_distance(
-											x1, y1, x2, y2, p.x, p.y));
+			double alpha = acos((b * b + c * c - a * a) / (2 * b * c));
+			double beta = acos((a * a + c * c - b * b) / (2 * a * c));
+
+			if (alpha <= M_PI_2 && beta <= M_PI_2) {
+				currentDist = fabs(agg::calc_line_point_distance(x1, y1, x2, y2,
+					p.x, p.y));
 			}
 		}
 
-		if (currentDist < segDist) {
+		if (currentDist < segDist)
 			segDist = currentDist;
-		}
+
 		x1 = x2;
 		y1 = y2;
 	}
 	return segDist;
 }
 
-// GetDistance
+
 bool
 VectorPath::GetDistance(BPoint p, float* distance, int32* index) const
 {
@@ -643,22 +651,17 @@ VectorPath::GetDistance(BPoint p, float* distance, int32* index) const
 		*distance = FLT_MAX;
 
 		for (int32 i = 0; i < fPointCount - 1; i++) {
-			float segDist = distance_to_curve(p,
-											  fPath[i].point,
-											  fPath[i].point_out,
-											  fPath[i + 1].point_in,
-											  fPath[i + 1].point);
+			float segDist = distance_to_curve(p, fPath[i].point,
+				fPath[i].point_out, fPath[i + 1].point_in, fPath[i + 1].point);
 			if (segDist < *distance) {
 				*distance = segDist;
 				*index = i + 1;
 			}
 		}
 		if (fClosed) {
-			float segDist = distance_to_curve(p,
-											  fPath[fPointCount - 1].point,
-											  fPath[fPointCount - 1].point_out,
-											  fPath[0].point_in,
-											  fPath[0].point);
+			float segDist = distance_to_curve(p, fPath[fPointCount - 1].point,
+				fPath[fPointCount - 1].point_out, fPath[0].point_in,
+				fPath[0].point);
 			if (segDist < *distance) {
 				*distance = segDist;
 				*index = fPointCount;
@@ -669,14 +672,13 @@ VectorPath::GetDistance(BPoint p, float* distance, int32* index) const
 	return false;
 }
 
-// FindBezierScale
+
 bool
 VectorPath::FindBezierScale(int32 index, BPoint point, double* scale) const
 {
 	if (index >= 0 && index < fPointCount && scale) {
+		int maxStep = 1000;
 
-		int maxStep = 1000;  
-	
 		double t = 0.0;
 		double dt = 1.0 / maxStep;
 
@@ -689,7 +691,7 @@ VectorPath::FindBezierScale(int32 index, BPoint point, double* scale) const
 
 			GetPoint(index, t, curvePoint);
 			double d = agg::calc_distance(curvePoint.x, curvePoint.y,
-								point.x, point.y);
+				point.x, point.y);
 
 			if (d < min) {
 				min = d;
@@ -701,37 +703,32 @@ VectorPath::FindBezierScale(int32 index, BPoint point, double* scale) const
 	return false;
 }
 
-// GetPoint
+
 bool
 VectorPath::GetPoint(int32 index, double t, BPoint& point) const
 {
 	if (index >= 0 && index < fPointCount) {
-
 		double t1 = (1 - t) * (1 - t) * (1 - t);
 		double t2 = (1 - t) * (1 - t) * t * 3;
 		double t3 = (1 - t) * t * t * 3;
 		double t4 = t * t * t;
-   	
+
 		if (index < fPointCount - 1) {
-			point.x = fPath[index].point.x * t1 +
-	   				  fPath[index].point_out.x * t2 +
-	   				  fPath[index + 1].point_in.x * t3 +
-	   				  fPath[index + 1].point.x * t4;
-	
-			point.y = fPath[index].point.y * t1 +
-					  fPath[index].point_out.y * t2 +
-					  fPath[index + 1].point_in.y * t3 +
-					  fPath[index + 1].point.y * t4;
+			point.x = fPath[index].point.x * t1 + fPath[index].point_out.x * t2
+				+ fPath[index + 1].point_in.x * t3
+				+ fPath[index + 1].point.x * t4;
+
+			point.y = fPath[index].point.y * t1 + fPath[index].point_out.y * t2
+				+ fPath[index + 1].point_in.y * t3
+				+ fPath[index + 1].point.y * t4;
 		} else if (fClosed) {
-			point.x = fPath[fPointCount - 1].point.x * t1 +
-	   				  fPath[fPointCount - 1].point_out.x * t2 +
-	   				  fPath[0].point_in.x * t3 +
-	   				  fPath[0].point.x * t4;
-	
-			point.y = fPath[fPointCount - 1].point.y * t1 +
-					  fPath[fPointCount - 1].point_out.y * t2 +
-					  fPath[0].point_in.y * t3 +
-					  fPath[0].point.y * t4;
+			point.x = fPath[fPointCount - 1].point.x * t1
+				+ fPath[fPointCount - 1].point_out.x * t2
+				+ fPath[0].point_in.x * t3 + fPath[0].point.x * t4;
+
+			point.y = fPath[fPointCount - 1].point.y * t1
+				+ fPath[fPointCount - 1].point_out.y * t2
+				+ fPath[0].point_in.y * t3 + fPath[0].point.y * t4;
 		}
 
 		return true;
@@ -741,7 +738,7 @@ VectorPath::GetPoint(int32 index, double t, BPoint& point) const
 
 #endif // ICON_O_MATIC
 
-// SetClosed
+
 void
 VectorPath::SetClosed(bool closed)
 {
@@ -752,7 +749,7 @@ VectorPath::SetClosed(bool closed)
 	}
 }
 
-// Bounds
+
 BRect
 VectorPath::Bounds() const
 {
@@ -762,7 +759,7 @@ VectorPath::Bounds() const
 	return fCachedBounds;
 }
 
-// Bounds
+
 BRect
 VectorPath::_Bounds() const
 {
@@ -770,7 +767,6 @@ VectorPath::_Bounds() const
 
 	BRect b;
 	if (get_path_storage(path, fPath, fPointCount, fClosed)) {
-
 		agg::conv_curve<agg::path_storage> curve(path);
 
 		uint32 pathID[1];
@@ -781,14 +777,15 @@ VectorPath::_Bounds() const
 
 		b.Set(left, top, right, bottom);
 	} else if (fPointCount == 1) {
-		b.Set(fPath[0].point.x, fPath[0].point.y, fPath[0].point.x, fPath[0].point.y);
+		b.Set(fPath[0].point.x, fPath[0].point.y, fPath[0].point.x,
+			fPath[0].point.y);
 	} else {
 		b.Set(0.0, 0.0, -1.0, -1.0);
 	}
 	return b;
 }
 
-// ControlPointBounds
+
 BRect
 VectorPath::ControlPointBounds() const
 {
@@ -816,7 +813,7 @@ VectorPath::ControlPointBounds() const
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
-// Iterate
+
 void
 VectorPath::Iterate(Iterator* iterator, float smoothScale) const
 {
@@ -827,11 +824,11 @@ VectorPath::Iterate(Iterator* iterator, float smoothScale) const
 		curve.approximation_scale(smoothScale);
 
 		for (int32 i = 0; i < fPointCount - 1; i++) {
-iterator->MoveTo(fPath[i].point);
+			iterator->MoveTo(fPath[i].point);
 			curve.init(fPath[i].point.x, fPath[i].point.y,
-					   fPath[i].point_out.x, fPath[i].point_out.y,
-					   fPath[i + 1].point_in.x, fPath[i + 1].point_in.y,
-					   fPath[i + 1].point.x, fPath[i + 1].point.y);
+				fPath[i].point_out.x, fPath[i].point_out.y,
+				fPath[i + 1].point_in.x, fPath[i + 1].point_in.y,
+				fPath[i + 1].point.x, fPath[i + 1].point.y);
 
 			double x, y;
 			unsigned cmd = curve.vertex(&x, &y);
@@ -842,11 +839,13 @@ iterator->MoveTo(fPath[i].point);
 			}
 		}
 		if (fClosed) {
-iterator->MoveTo(fPath[fPointCount - 1].point);
-			curve.init(fPath[fPointCount - 1].point.x, fPath[fPointCount - 1].point.y,
-					   fPath[fPointCount - 1].point_out.x, fPath[fPointCount - 1].point_out.y,
-					   fPath[0].point_in.x, fPath[0].point_in.y,
-					   fPath[0].point.x, fPath[0].point.y);
+			iterator->MoveTo(fPath[fPointCount - 1].point);
+			curve.init(fPath[fPointCount - 1].point.x,
+				fPath[fPointCount - 1].point.y,
+				fPath[fPointCount - 1].point_out.x,
+				fPath[fPointCount - 1].point_out.y,
+				fPath[0].point_in.x, fPath[0].point_in.y,
+				fPath[0].point.x, fPath[0].point.y);
 
 			double x, y;
 			unsigned cmd = curve.vertex(&x, &y);
@@ -859,7 +858,7 @@ iterator->MoveTo(fPath[fPointCount - 1].point);
 	}
 }
 
-// CleanUp
+
 void
 VectorPath::CleanUp()
 {
@@ -880,9 +879,9 @@ VectorPath::CleanUp()
 	for (int32 i = 0; i < fPointCount; i++) {
 		// check for unnecessary, duplicate points
 		if (i > 0) {
-			if (fPath[i - 1].point == fPath[i].point &&
-				fPath[i - 1].point == fPath[i - 1].point_out &&
-				fPath[i].point == fPath[i].point_in) {
+			if (fPath[i - 1].point == fPath[i].point
+				&& fPath[i - 1].point == fPath[i - 1].point_out
+				&& fPath[i].point == fPath[i].point_in) {
 				// the previous point can be removed
 				BPoint in = fPath[i - 1].point_in;
 				if (RemovePoint(i - 1)) {
@@ -894,18 +893,15 @@ VectorPath::CleanUp()
 		}
 		// re-establish connections of in-out control points if
 		// they line up with the main control point
-		if (fPath[i].point_in == fPath[i].point_out ||
-			fPath[i].point == fPath[i].point_out ||
-			fPath[i].point == fPath[i].point_in ||
-			(fabs(agg::calc_line_point_distance(
-							fPath[i].point_in.x, fPath[i].point_in.y,
-							fPath[i].point.x, fPath[i].point.y,
-							fPath[i].point_out.x, fPath[i].point_out.y)) < 0.01 &&
-			 fabs(agg::calc_line_point_distance(
-			 				fPath[i].point_out.x, fPath[i].point_out.y,
-							fPath[i].point.x, fPath[i].point.y,
-							fPath[i].point_in.x, fPath[i].point_in.y)) < 0.01)) {
-
+		if (fPath[i].point_in == fPath[i].point_out
+			|| fPath[i].point == fPath[i].point_out
+			|| fPath[i].point == fPath[i].point_in
+			|| (fabs(agg::calc_line_point_distance(fPath[i].point_in.x,
+					fPath[i].point_in.y, fPath[i].point.x, fPath[i].point.y,
+					fPath[i].point_out.x, fPath[i].point_out.y)) < 0.01
+				&& fabs(agg::calc_line_point_distance(fPath[i].point_out.x,
+					fPath[i].point_out.y, fPath[i].point.x, fPath[i].point.y,
+					fPath[i].point_in.x, fPath[i].point_in.y)) < 0.01)) {
 			fPath[i].connected = true;
 			notify = true;
 		}
@@ -915,17 +911,15 @@ VectorPath::CleanUp()
 		_NotifyPathChanged();
 }
 
-// Reverse
+
 void
 VectorPath::Reverse()
 {
 	VectorPath temp(*this);
 	int32 index = 0;
 	for (int32 i = fPointCount - 1; i >= 0; i--) {
-		temp.SetPoint(index, fPath[i].point,
-							 fPath[i].point_out,
-							 fPath[i].point_in,
-							 fPath[i].connected);
+		temp.SetPoint(index, fPath[i].point, fPath[i].point_out,
+			fPath[i].point_in, fPath[i].connected);
 		index++;
 	}
 	*this = temp;
@@ -933,7 +927,7 @@ VectorPath::Reverse()
 	_NotifyPathReversed();
 }
 
-// ApplyTransform
+
 void
 VectorPath::ApplyTransform(const Transformable& transform)
 {
@@ -949,31 +943,31 @@ VectorPath::ApplyTransform(const Transformable& transform)
 	_NotifyPathChanged();
 }
 
-// PrintToStream
+
 void
 VectorPath::PrintToStream() const
 {
 	for (int32 i = 0; i < fPointCount; i++) {
 		printf("point %ld: (%f, %f) -> (%f, %f) -> (%f, %f) (%d)\n", i,
-				fPath[i].point_in.x, fPath[i].point_in.y,
-				fPath[i].point.x, fPath[i].point.y,
-				fPath[i].point_out.x, fPath[i].point_out.y,
-				fPath[i].connected);
+			fPath[i].point_in.x, fPath[i].point_in.y,
+			fPath[i].point.x, fPath[i].point.y,
+			fPath[i].point_out.x, fPath[i].point_out.y, fPath[i].connected);
 	}
 }
 
-// GetAGGPathStorage
+
 bool
 VectorPath::GetAGGPathStorage(agg::path_storage& path) const
 {
 	return get_path_storage(path, fPath, fPointCount, fClosed);
 }
 
+
 // #pragma mark -
+
 
 #ifdef ICON_O_MATIC
 
-// AddListener
 bool
 VectorPath::AddListener(PathListener* listener)
 {
@@ -982,21 +976,21 @@ VectorPath::AddListener(PathListener* listener)
 	return false;
 }
 
-// RemoveListener
+
 bool
 VectorPath::RemoveListener(PathListener* listener)
 {
 	return fListeners.RemoveItem((void*)listener);
 }
 
-// CountListeners
+
 int32
 VectorPath::CountListeners() const
 {
 	return fListeners.CountItems();
 }
 
-// ListenerAtFast
+
 PathListener*
 VectorPath::ListenerAtFast(int32 index) const
 {
@@ -1005,9 +999,10 @@ VectorPath::ListenerAtFast(int32 index) const
 
 #endif // ICON_O_MATIC
 
+
 // #pragma mark -
 
-// _SetPoint
+
 void
 VectorPath::_SetPoint(int32 index, BPoint point)
 {
@@ -1020,13 +1015,10 @@ VectorPath::_SetPoint(int32 index, BPoint point)
 	fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 }
 
-// _SetPoint
+
 void
-VectorPath::_SetPoint(int32 index,
-					  const BPoint& point,
-					  const BPoint& pointIn,
-					  const BPoint& pointOut,
-					  bool connected)
+VectorPath::_SetPoint(int32 index, const BPoint& point, const BPoint& pointIn,
+	const BPoint& pointOut, bool connected)
 {
 	fPath[index].point = point;
 	fPath[index].point_in = pointIn;
@@ -1037,22 +1029,27 @@ VectorPath::_SetPoint(int32 index,
 	fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 }
 
+
 // #pragma mark -
 
-// _SetPointCount
+
 bool
 VectorPath::_SetPointCount(int32 count)
 {
 	// handle reallocation if we run out of room
 	if (count >= fAllocCount) {
 		fAllocCount = ((count) / ALLOC_CHUNKS + 1) * ALLOC_CHUNKS;
-		if (fPath) {
+		if (fPath)
 			fPath = obj_renew(fPath, control_point, fAllocCount);
-		} else {
+		else
 			fPath = obj_new(control_point, fAllocCount);
+
+		if (fPath != NULL) {
+			memset(fPath + fPointCount, 0,
+				(fAllocCount - fPointCount) * sizeof(control_point));
 		}
-		memset(fPath + fPointCount, 0, (fAllocCount - fPointCount) * sizeof(control_point));
 	}
+
 	// update point count
 	if (fPath) {
 		fPointCount = count;
@@ -1060,7 +1057,8 @@ VectorPath::_SetPointCount(int32 count)
 		// reallocation might have failed
 		fPointCount = 0;
 		fAllocCount = 0;
-		fprintf(stderr, "VectorPath::_SetPointCount(%ld) - allocation failed!\n", count);
+		fprintf(stderr, "VectorPath::_SetPointCount(%ld) - allocation failed!\n",
+			count);
 	}
 
 	fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
@@ -1068,11 +1066,12 @@ VectorPath::_SetPointCount(int32 count)
 	return fPath != NULL;
 }
 
+
 // #pragma mark -
+
 
 #ifdef ICON_O_MATIC
 
-// _NotifyPointAdded
 void
 VectorPath::_NotifyPointAdded(int32 index) const
 {
@@ -1084,7 +1083,7 @@ VectorPath::_NotifyPointAdded(int32 index) const
 	}
 }
 
-// _NotifyPointChanged
+
 void
 VectorPath::_NotifyPointChanged(int32 index) const
 {
@@ -1096,7 +1095,7 @@ VectorPath::_NotifyPointChanged(int32 index) const
 	}
 }
 
-// _NotifyPointRemoved
+
 void
 VectorPath::_NotifyPointRemoved(int32 index) const
 {
@@ -1108,7 +1107,7 @@ VectorPath::_NotifyPointRemoved(int32 index) const
 	}
 }
 
-// _NotifyPathChanged
+
 void
 VectorPath::_NotifyPathChanged() const
 {
@@ -1120,7 +1119,7 @@ VectorPath::_NotifyPathChanged() const
 	}
 }
 
-// _NotifyClosedChanged
+
 void
 VectorPath::_NotifyClosedChanged() const
 {
@@ -1132,7 +1131,7 @@ VectorPath::_NotifyClosedChanged() const
 	}
 }
 
-// _NotifyPathReversed
+
 void
 VectorPath::_NotifyPathReversed() const
 {

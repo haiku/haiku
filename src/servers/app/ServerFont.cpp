@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -881,8 +881,8 @@ ServerFont::EmbeddedTransformation() const
 	// TODO: cache this?
 	Transformable transform;
 
-	transform.ShearBy(B_ORIGIN, (90.0 - fShear) * PI / 180.0, 0.0);
-	transform.RotateBy(B_ORIGIN, -fRotation * PI / 180.0);
+	transform.ShearBy(B_ORIGIN, (90.0 - fShear) * M_PI / 180.0, 0.0);
+	transform.RotateBy(B_ORIGIN, -fRotation * M_PI / 180.0);
 
 	return transform;
 }

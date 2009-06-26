@@ -1,49 +1,30 @@
 /*
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin
+ *		Simon Gauvin
+ *		Michael Pfeiffer
+ */
 
-	PDFWriter.cpp
-
-Copyright (c) 2001, 2002 OpenBeOS. 
-
-Authors: 
-	Philippe Houdoin
-	Simon Gauvin	
-	Michael Pfeiffer
-	
-Based on:
- - gdevbjc.c from Aladdin GhostScript
- - LMDriver.cpp from Ryan Lockhart Lexmark 5/7xxxx BeOS driver 
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
+/*!	Based on:
+	- gdevbjc.c from Aladdin GhostScript
+	- LMDriver.cpp from Ryan Lockhart Lexmark 5/7xxxx BeOS driver
 */
 
-#include <stdio.h>
-#include <string.h>			// for memset()
-#include <math.h>
+#include "PDFWriter.h"
+
 #include <ctype.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <Debug.h>
 #include <StorageKit.h>
 #include <TranslationKit.h>
 #include <support/UTF8.h>
 
-#include "PDFWriter.h"
 #include "Bezier.h"
 #include "LinePathBuilder.h"
 #include "DrawShape.h"
@@ -53,31 +34,29 @@ THE SOFTWARE.
 #include "XReferences.h"
 #include "Report.h"
 
-// Constructor & destructor
-// ------------------------
 
 PDFWriter::PDFWriter()
-	:	PrinterDriver()
-	,   fTextLine(this)
+	:
+	PrinterDriver(),
+	fTextLine(this)
 {
 	fFontSearchOrder[0] = japanese_encoding;
 	fFontSearchOrder[1] = chinese_cns1_encoding;
 	fFontSearchOrder[2]	= chinese_gb1_encoding;
 	fFontSearchOrder[3]	= korean_encoding;
-	
-	fPage             = 0;
+
+	fPage = 0;
 	fEmbedMaxFontSize = 250 * 1024;
-	fScreen           = new BScreen();
-	fFonts            = NULL;
-	fBookmark         = new Bookmark(this);
-	fXRefs            = new XRefDefs();
-	fXRefDests        = NULL;
+	fScreen = new BScreen();
+	fFonts = NULL;
+	fBookmark = new Bookmark(this);
+	fXRefs = new XRefDefs();
+	fXRefDests = NULL;
 }
 
 
-// --------------------------------------------------
 PDFWriter::~PDFWriter()
-{	
+{
 	delete fScreen;
 	delete fFonts;
 	delete fBookmark;
@@ -86,31 +65,26 @@ PDFWriter::~PDFWriter()
 }
 
 
-#ifdef CODEWARRIOR
-	#pragma mark [Public methods]
-#endif
+//	#pragma mark Public methods
 
-// Public methods
-// --------------
 
-// --------------------------------------------------
-status_t 
+status_t
 PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 {
-	status_t	status;
-	BRect		r;
-	uint32 		pictureCount;
-	BRect		paperRect;
-	BRect 		printRect;
-	BRect		*picRects;
-	BPoint		*picPoints;
-	BRegion		*picRegion;
-	BPicture	**pictures;
-	uint32		i;
-	int32       orientation;
-	
+	status_t status;
+	BRect r;
+	uint32 pictureCount;
+	BRect paperRect;
+	BRect printRect;
+	BRect *picRects;
+	BPoint *picPoints;
+	BRegion *picRegion;
+	BPicture **pictures;
+	uint32 i;
+	int32 orientation;
+
 	status = B_OK;
-	
+
 	fPage = pageNumber;
 
 	if (pageNumber == 1) {
@@ -121,21 +95,23 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 			fImageCache.NextPass();
 		}
 	}
-	
+
 	paperRect = JobMsg()->FindRect("paper_rect");
 	printRect = JobMsg()->FindRect("printable_rect");
 	if (B_OK != JobMsg()->FindInt32("orientation", &orientation)) orientation = 0;
-	if (orientation == 1) 
+	if (orientation == 1) {
 		printRect.Set(printRect.top, printRect.left,
 			printRect.bottom, printRect.right);
+	}
 
 	JobFile()->Read(&pictureCount, sizeof(uint32));
 
-	pictures = (BPicture **) 	malloc(pictureCount * sizeof(BPicture *));
-	picRects = (BRect *)		malloc(pictureCount * sizeof(BRect));
-	picPoints = (BPoint *)		malloc(pictureCount * sizeof(BPoint));
+	// TODO: error checking!
+	pictures = (BPicture **)malloc(pictureCount * sizeof(BPicture *));
+	picRects = (BRect *)malloc(pictureCount * sizeof(BRect));
+	picPoints = (BPoint *)malloc(pictureCount * sizeof(BPoint));
 	picRegion = new BRegion();
-	
+
 	for (i = 0; i < pictureCount; i++) {
 		JobFile()->Seek(40 + sizeof(off_t), SEEK_CUR);
 		JobFile()->Read(&picPoints[i], sizeof(BPoint));
@@ -144,7 +120,7 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 		pictures[i]->Unflatten(JobFile());
 		picRegion->Include(picRects[i]);
 	}
-	
+
 	r  = picRegion->Frame();
 	delete picRegion;
 
@@ -159,56 +135,55 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 	}
 	EndPage();
 	} PDF_CATCH(fPdf) {
-		REPORT(kError, 0, PDF_get_errmsg(fPdf));	
+		REPORT(kError, 0, PDF_get_errmsg(fPdf));
 	}
-	
+
 	free(pictures);
 	free(picRects);
 	free(picPoints);
-	
+
 	return status;
 }
 
 
-// --------------------------------------------------
-status_t 
-PDFWriter::BeginJob() 
+status_t
+PDFWriter::BeginJob()
 {
 	fLog = fopen("/tmp/pdf_writer.log", "w");
-	
+
 	PDF_boot();
 
-	fPdf = PDF_new2(_ErrorHandler, NULL, NULL, NULL, this);	// set *this* as pdf cookie
-	if ( fPdf == NULL )
+	fPdf = PDF_new2(_ErrorHandler, NULL, NULL, NULL, this);
+		// set *this* as pdf cookie
+	if (fPdf == NULL)
 		return B_ERROR;
 
 	// load font embedding settings
 	fFonts = new Fonts();
 	fFonts->CollectFonts();
 	BMessage fonts;
-	if (B_OK == JobMsg()->FindMessage("fonts", &fonts)) {
+	if (B_OK == JobMsg()->FindMessage("fonts", &fonts))
 		fFonts->SetTo(&fonts);
-	}
-	
+
 	// set font search order
-	int           j = 0; 
-	font_encoding enc; 
-	bool          active;
-	
-	for (int i = 0; j < no_of_cjk_encodings && fFonts->GetCJKOrder(i, enc, active); i ++) {
+	int j = 0;
+	font_encoding enc;
+	bool active;
+
+	for (int i = 0; j < no_of_cjk_encodings
+			&& fFonts->GetCJKOrder(i, enc, active); i ++) {
 		if (active) fFontSearchOrder[j++] = enc;
 	}
 	for (; j < no_of_cjk_encodings; j ++) {
 		fFontSearchOrder[j] = invalid_encoding;
 	}
-		
+
 	return InitWriter();
 }
 
 
-// --------------------------------------------------
-status_t 
-PDFWriter::EndJob() 
+status_t
+PDFWriter::EndJob()
 {
 #ifdef DEBUG
 	Report* r = Report::Instance();
@@ -228,48 +203,45 @@ PDFWriter::EndJob()
 		}
 		fprintf(fLog, " %s", rr->Label());
 		if (rr->Page() > 0) fprintf(fLog, " (Page %d)", (int)rr->Page());
-		fprintf(fLog, ": %s\n", rr->Desc()); 
+		fprintf(fLog, ": %s\n", rr->Desc());
 	}
 #endif
 	fImageCache.Flush();
-		
+
 	PDF_close(fPdf);
 	REPORT(kDebug, 0, ">>>> PDF_close");
 
 	PDF_delete(fPdf);
 	PDF_shutdown();
-	
+
 	fclose(fLog);
 	return B_OK;
 }
 
 
-// --------------------------------------------------
-void 
-PDFWriter::SetAttribute(const char* name, const char* value) {
-	
+void
+PDFWriter::SetAttribute(const char* name, const char* value)
+{
 	if (!name || !value)
 		return;
-	
-	BFile * file = dynamic_cast<BFile *>(Transport());
-	if (file) {
+
+	BFile *file = dynamic_cast<BFile *>(Transport());
+	if (file != NULL)
 		file->WriteAttr(name, B_STRING_TYPE, 0, value, strlen(value) + 1);
-	}
 }
 
 
-// --------------------------------------------------
-status_t 
+status_t
 PDFWriter::InitWriter()
 {
-	char	buffer[512];
+	char buffer[512];
 	BString s;
 
 	fState = NULL;
 	fStateDepth = 0;
 
 	// Set MIME type explicit as we *do* know it's a PDF document
-	BFile * file = dynamic_cast<BFile *>(Transport());
+	BFile *file = dynamic_cast<BFile *>(Transport());
 	if (file)
 		BNodeInfo(file).SetType("application/pdf");
 
@@ -284,7 +256,7 @@ PDFWriter::InitWriter()
 */
 
 	fPDFVersion = kPDF13;
-	const char * compatibility;
+	const char *compatibility;
 	if (JobMsg()->FindString("pdf_compatibility", &compatibility) == B_OK) {
 		PDF_set_parameter(fPdf, "compatibility", compatibility);
 		if (strcmp(compatibility, "1.3") == 0) fPDFVersion = kPDF13;
@@ -304,13 +276,13 @@ PDFWriter::InitWriter()
 
 	// set permissions
 	BString permissions;
-	if (JobMsg()->FindString("permissions", &permissions) == B_OK && 
+	if (JobMsg()->FindString("permissions", &permissions) == B_OK &&
 		permissions.Length() > 0) {
 		PDF_set_parameter(fPdf, "permissions", permissions.String());
 	}
 */
 
-	REPORT(kDebug, 0, ">>>> PDF_open_mem");	
+	REPORT(kDebug, 0, ">>>> PDF_open_mem");
 	PDF_open_mem(fPdf, _WriteData);	// use callback to stream PDF document data to printer transport
 
 	// pdflib scope:
@@ -322,14 +294,15 @@ PDFWriter::InitWriter()
 	bool setTitle = true;
 	bool setCreator = true;
 	if (JobMsg()->FindMessage("doc_info", &doc) == B_OK) {
-#ifndef B_BEOS_VERSION_DANO	
+#ifndef B_BEOS_VERSION_DANO
 		char *name;
 #else
 		const char *name;
-#endif		
+#endif
 		uint32 type;
 		int32 count;
-		for (int32 i = 0; doc.GetInfo(B_STRING_TYPE, i, &name, &type, &count) != B_BAD_INDEX; i++) {
+		for (int32 i = 0; doc.GetInfo(B_STRING_TYPE, i, &name, &type, &count)
+				!= B_BAD_INDEX; i++) {
 			if (type == B_STRING_TYPE) {
 				BString value;
 				if (doc.FindString(name, &value) == B_OK && value != "") {
@@ -341,22 +314,26 @@ PDFWriter::InitWriter()
 			}
 		}
 		BString s;
-		if (doc.FindString("Title", &s) == B_OK && s != "") setTitle = false;
-		if (doc.FindString("Creator", &s) == B_OK && s != "") setCreator = false;
+		if (doc.FindString("Title", &s) == B_OK && s != "")
+			setTitle = false;
+		if (doc.FindString("Creator", &s) == B_OK && s != "")
+			setCreator = false;
 	}
-		
-	// find job title 
-	if (setTitle && JobFile()->ReadAttr("_spool/Description", B_STRING_TYPE, 0, buffer, sizeof(buffer))) {
+
+	// find job title
+	if (setTitle && JobFile()->ReadAttr("_spool/Description", B_STRING_TYPE, 0,
+			buffer, sizeof(buffer))) {
 		SetAttribute("Title", buffer);
 	    ToPDFUnicode(buffer, s); PDF_set_info(fPdf, "Title", s.String());
 	}
-				
+
 	// find job creator
-	if (setCreator && JobFile()->ReadAttr("_spool/MimeType", B_STRING_TYPE, 0, buffer, sizeof(buffer))) {
+	if (setCreator && JobFile()->ReadAttr("_spool/MimeType", B_STRING_TYPE, 0,
+			buffer, sizeof(buffer))) {
 		SetAttribute("Creator", buffer);
 	    ToPDFUnicode(buffer, s); PDF_set_info(fPdf, "Creator", s.String());
 	}
-	
+
 	int32 compression;
 	if (JobMsg()->FindInt32("pdf_compression", &compression) == B_OK) {
 	    PDF_set_value(fPdf, "compress", compression);
@@ -367,23 +344,33 @@ PDFWriter::InitWriter()
 	PDF_set_parameter(fPdf, "fontwarning", "false");
 	// PDF_set_parameter(fPdf, "native-unicode", "true");
 
-	REPORT(kDebug, 0, "Start of fonts declaration:");	
+	REPORT(kDebug, 0, "Start of fonts declaration:");
 
-	PDF_set_parameter(fPdf, "Encoding", "t1enc0==/boot/home/config/settings/PDF Writer/t1enc0.enc");
-	PDF_set_parameter(fPdf, "Encoding", "t1enc1==/boot/home/config/settings/PDF Writer/t1enc1.enc");
-	PDF_set_parameter(fPdf, "Encoding", "t1enc2==/boot/home/config/settings/PDF Writer/t1enc2.enc");
-	PDF_set_parameter(fPdf, "Encoding", "t1enc3==/boot/home/config/settings/PDF Writer/t1enc3.enc");
-	PDF_set_parameter(fPdf, "Encoding", "t1enc4==/boot/home/config/settings/PDF Writer/t1enc4.enc");
+	PDF_set_parameter(fPdf, "Encoding",
+		"t1enc0==/boot/home/config/settings/PDF Writer/t1enc0.enc");
+	PDF_set_parameter(fPdf, "Encoding",
+		"t1enc1==/boot/home/config/settings/PDF Writer/t1enc1.enc");
+	PDF_set_parameter(fPdf, "Encoding",
+		"t1enc2==/boot/home/config/settings/PDF Writer/t1enc2.enc");
+	PDF_set_parameter(fPdf, "Encoding",
+		"t1enc3==/boot/home/config/settings/PDF Writer/t1enc3.enc");
+	PDF_set_parameter(fPdf, "Encoding",
+		"t1enc4==/boot/home/config/settings/PDF Writer/t1enc4.enc");
 
-	PDF_set_parameter(fPdf, "Encoding", "ttenc0==/boot/home/config/settings/PDF Writer/ttenc0.cpg");
-	PDF_set_parameter(fPdf, "Encoding", "ttenc1==/boot/home/config/settings/PDF Writer/ttenc1.cpg");
-	PDF_set_parameter(fPdf, "Encoding", "ttenc2==/boot/home/config/settings/PDF Writer/ttenc2.cpg");
-	PDF_set_parameter(fPdf, "Encoding", "ttenc3==/boot/home/config/settings/PDF Writer/ttenc3.cpg");
-	PDF_set_parameter(fPdf, "Encoding", "ttenc4==/boot/home/config/settings/PDF Writer/ttenc4.cpg");
+	PDF_set_parameter(fPdf, "Encoding",
+		"ttenc0==/boot/home/config/settings/PDF Writer/ttenc0.cpg");
+	PDF_set_parameter(fPdf, "Encoding",
+		"ttenc1==/boot/home/config/settings/PDF Writer/ttenc1.cpg");
+	PDF_set_parameter(fPdf, "Encoding",
+		"ttenc2==/boot/home/config/settings/PDF Writer/ttenc2.cpg");
+	PDF_set_parameter(fPdf, "Encoding",
+		"ttenc3==/boot/home/config/settings/PDF Writer/ttenc3.cpg");
+	PDF_set_parameter(fPdf, "Encoding",
+		"ttenc4==/boot/home/config/settings/PDF Writer/ttenc4.cpg");
 
 	DeclareFonts();
 
-	REPORT(kDebug, fPage, "End of fonts declaration.");	
+	REPORT(kDebug, fPage, "End of fonts declaration.");
 
 	// Links
 	float width;
@@ -391,23 +378,24 @@ PDFWriter::InitWriter()
 		width = 1;
 	}
 	PDF_set_border_style(fPdf, "solid", width);
-	
+
 	if (JobMsg()->FindBool("create_web_links", &fCreateWebLinks) != B_OK) {
 		fCreateWebLinks = false;
 	}
 
-	// Bookmarks	
+	// Bookmarks
 	if (JobMsg()->FindBool("create_bookmarks", &fCreateBookmarks) != B_OK) {
 		fCreateBookmarks = false;
 	}
 
 	if (fCreateBookmarks) {
 		BString name;
-		if (JobMsg()->FindString("bookmark_definition_file", &name) == B_OK && LoadBookmarkDefinitions(name.String())) {
+		if (JobMsg()->FindString("bookmark_definition_file", &name) == B_OK
+			&& LoadBookmarkDefinitions(name.String())) {
 		} else {
 			fCreateBookmarks = false;
 		}
-	}	
+	}
 
 	// Cross References
 	if (JobMsg()->FindBool("create_xrefs", &fCreateXRefs) != B_OK) {
@@ -416,18 +404,18 @@ PDFWriter::InitWriter()
 
 	if (fCreateXRefs) {
 		BString name;
-		if (JobMsg()->FindString("xrefs_file", &name) == B_OK && LoadXRefsDefinitions(name.String())) {
+		if (JobMsg()->FindString("xrefs_file", &name) == B_OK
+			&& LoadXRefsDefinitions(name.String())) {
 		} else {
 			REPORT(kError, 0, "Could not read xrefs file!");
 			fCreateXRefs = false;
 		}
-	}	
+	}
 
 	return B_OK;
 }
 
 
-// --------------------------------------------------
 status_t
 PDFWriter::DeclareFonts()
 {
@@ -443,10 +431,10 @@ PDFWriter::DeclareFonts()
 				parameter_name = "FontAFM";
 			else if (strstr(f->Path(), ".pfm"))
 				parameter_name = "FontPFM";
-			else // should not reach here! 
-				continue;		
+			else // should not reach here!
+				continue;
 		}
-#ifndef __POWERPC__						
+#ifndef __POWERPC__
 		snprintf(buffer, sizeof(buffer), "%s==%s", f->Name(), f->Path());
 #else
 		sprintf(buffer, "%s==%s", f->Name(), f->Path());
@@ -455,6 +443,7 @@ PDFWriter::DeclareFonts()
 	}
 	return B_OK;
 }
+
 
 bool
 PDFWriter::LoadBookmarkDefinitions(const char* name)
@@ -482,15 +471,14 @@ PDFWriter::LoadXRefsDefinitions(const char* name)
 }
 
 
-// --------------------------------------------------
-status_t 
+status_t
 PDFWriter::BeginPage(BRect paperRect, BRect printRect)
 {
 	float width = paperRect.Width() < 10 ? a4_width : paperRect.Width();
 	float height = paperRect.Height() < 10 ? a4_height : paperRect.Height();
-	
+
 	fMode = kDrawingMode;
-	
+
 	ASSERT(fState == NULL);
 	fState = new State(height, printRect.left, printRect.top);
 
@@ -498,14 +486,14 @@ PDFWriter::BeginPage(BRect paperRect, BRect printRect)
     	PDF_begin_page(fPdf, width, height);
 
 	REPORT(kDebug, fPage, ">>>> PDF_begin_page [%f, %f]", width, height);
-	
+
 	if (MakesPDF())
 		PDF_initgraphics(fPdf);
-	
+
 	fState->penX = 0;
 	fState->penY = 0;
 
-	// XXX should we clip to the printRect here?
+	// TODO: should we clip to the printRect here?
 
 	PushState(); // so that fState->prev != NULL
 
@@ -513,10 +501,9 @@ PDFWriter::BeginPage(BRect paperRect, BRect printRect)
 }
 
 
-// --------------------------------------------------
-status_t 
+status_t
 PDFWriter::EndPage()
-{		
+{
 	fTextLine.Flush();
 	if (fCreateBookmarks) fBookmark->CreateBookmarks();
 
@@ -527,17 +514,15 @@ PDFWriter::EndPage()
 	REPORT(kDebug, fPage, ">>>> PDF_end_page");
 
 	delete fState; fState = NULL;
-	
+
 	return B_OK;
 }
 
 
-#ifdef CODEWARRIOR
-	#pragma mark [PDFlib callbacks]
-#endif
+//	#pragma mark PDFlib callbacks
 
-// --------------------------------------------------
-size_t 
+
+size_t
 PDFWriter::WriteData(void *data, size_t	size)
 {
 	REPORT(kDebug, fPage, ">>>> WriteData %p, %ld", data, size);
@@ -546,30 +531,26 @@ PDFWriter::WriteData(void *data, size_t	size)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ErrorHandler(int	type, const char *msg)
 {
 	REPORT(kError, fPage, "PDFlib %d: %s", type, msg);
 }
 
-#ifdef CODEWARRIOR
-	#pragma mark [Generic drawing support routines]
-#endif
+
+//	#pragma mark Generic drawing support routines
 
 
-// --------------------------------------------------
 void
-PDFWriter::PushInternalState() 
+PDFWriter::PushInternalState()
 {
 	REPORT(kDebug, fPage, "PushInternalState");
 	fState = new State(fState); fStateDepth ++;
 }
 
 
-// --------------------------------------------------
 bool
-PDFWriter::PopInternalState() 
+PDFWriter::PopInternalState()
 {
 	REPORT(kDebug, fPage, "PopInternalState");
 	if (fStateDepth != 0) {
@@ -584,9 +565,8 @@ PDFWriter::PopInternalState()
 }
 
 
-// --------------------------------------------------
-PDFWriter::Transparency* 
-PDFWriter::FindTransparency(uint8 alpha) 
+PDFWriter::Transparency*
+PDFWriter::FindTransparency(uint8 alpha)
 {
 	const int n = fTransparencyCache.CountItems();
 	for (int i = 0; i < n; i ++) {
@@ -596,31 +576,31 @@ PDFWriter::FindTransparency(uint8 alpha)
 			return t;
 		}
 	}
-	
+
 	// create new handle for gstate
 	char trans[256];
 	float a = (float)alpha/255.0;
 	sprintf(trans, "opacitystroke=%f opacityfill=%f", a, a);
-	
+
 	volatile int handle = -1;
 	PDF_TRY(fPdf) {
 		handle = PDF_create_gstate(fPdf, trans);
 	} PDF_CATCH(fPdf) {
-		REPORT(kError, 0, PDF_get_errmsg(fPdf));	
+		REPORT(kError, 0, PDF_get_errmsg(fPdf));
 	}
 	REPORT(kDebug, fPage, trans);
-	
+
 	if (handle >= 0) {
 		// store in cache
 		Transparency* t = new Transparency(alpha, handle);
 		fTransparencyCache.AddItem(t);
 		return t;
 	}
-	
+
 	return NULL;
 }
 
-// --------------------------------------------------
+
 void
 PDFWriter::BeginTransparency()
 {
@@ -628,8 +608,9 @@ PDFWriter::BeginTransparency()
 		return;
 
 	REPORT(kDebug, fPage, ">>> BeginTransparency");
-	REPORT(kDebug, fPage, "current_color(%d, %d, %d, %d)", fState->currentColor.red,
-		fState->currentColor.green, fState->currentColor.blue, fState->currentColor.alpha);
+	REPORT(kDebug, fPage, "current_color(%d, %d, %d, %d)",
+		fState->currentColor.red, fState->currentColor.green,
+		fState->currentColor.blue, fState->currentColor.alpha);
 	REPORT(kDebug, fPage, "drawing_mode %d alpha %d", (int)fState->drawingMode,
 		(int)fState->currentColor.alpha);
 
@@ -651,60 +632,62 @@ PDFWriter::BeginTransparency()
 	fTransparencyStack.AddItem(NULL);
 }
 
-// --------------------------------------------------
-void 
-PDFWriter::EndTransparency() 
+
+void
+PDFWriter::EndTransparency()
 {
 	if (!SupportsOpacity() || !MakesPDF() || !IsDrawing()) return;
 	REPORT(kDebug, fPage, "<<< EndTransparency");
 	int lastItem = fTransparencyStack.CountItems()-1;
 	Transparency* t = fTransparencyStack.RemoveItem(lastItem);
-	
+
 	if (t != NULL) {
 		PDF_restore(fPdf);
 	}
 }
 
-// --------------------------------------------------
-void 
-PDFWriter::SetColor(rgb_color color) 
+
+void
+PDFWriter::SetColor(rgb_color color)
 {
 	if (!MakesPDF()) {
 		// create PDFlib gstate handles
-		if (SupportsOpacity() && fState->currentColor.alpha != color.alpha && color.alpha < 255) {
+		if (SupportsOpacity() && fState->currentColor.alpha != color.alpha
+			&& color.alpha < 255) {
 			FindTransparency(color.alpha);
 		}
-	} else if (fState->currentColor.red != color.red || 
-		fState->currentColor.blue != color.blue || 
-		fState->currentColor.green != color.green || 
+	} else if (fState->currentColor.red != color.red ||
+		fState->currentColor.blue != color.blue ||
+		fState->currentColor.green != color.green ||
 		fState->currentColor.alpha != color.alpha) {
 		fState->currentColor = color;
 		float red   = color.red / 255.0;
 		float green = color.green / 255.0;
 		float blue  = color.blue / 255.0;
 		PDF_setcolor(fPdf, "both", "rgb", red, green, blue, 0.0);
-		REPORT(kDebug, fPage, "set_color(%f, %f, %f, %f)", red, green, blue, color.alpha/255.0);
+		REPORT(kDebug, fPage, "set_color(%f, %f, %f, %f)", red, green, blue,
+			color.alpha / 255.0);
 	}
 }
 
 
-// --------------------------------------------------
 int
-PDFWriter::FindPattern() 
+PDFWriter::FindPattern()
 {
 	// TODO: use hashtable instead of BList for fPatterns
 	const int n = fPatterns.CountItems();
 	for (int i = 0; i < n; i ++) {
 		Pattern* p = fPatterns.ItemAt(i);
-		if (p->Matches(fState->pattern0, fState->backgroundColor, fState->foregroundColor)) return p->patternId;
+		if (p->Matches(fState->pattern0, fState->backgroundColor,
+				fState->foregroundColor))
+			return p->patternId;
 	}
 	return -1;
 }
 
 
-// --------------------------------------------------
 void
-PDFWriter::CreatePattern() 
+PDFWriter::CreatePattern()
 {
 	REPORT(kDebug, fPage, "CreatePattern");
 #if 1
@@ -712,20 +695,20 @@ PDFWriter::CreatePattern()
 	// pro: see con of bitmap pattern
 	// con: not rendered (correctly) in BePDF with small zoom factor
 	int pattern = PDF_begin_pattern(fPdf, 8, 8, 8, 8, 1);
-	
+
 	if (pattern == -1) {
 		REPORT(kError, fPage, "CreatePattern could not create pattern");
 		return;
 	}
-	
+
 	const int kPassForeground = 0;
 	const int kPassBackground = 1;
 	const int kNumPasses = 2;
-	
+
 	for (int pass = 0; pass < kNumPasses; pass ++) {
 		float r, g, b;
 		bool is_transparent;
-	
+
 		if (pass == kPassForeground) {
 			r =  fState->foregroundColor.red / 255.0;
 			g =  fState->foregroundColor.green / 255.0;
@@ -737,11 +720,11 @@ PDFWriter::CreatePattern()
 			b =  fState->backgroundColor.blue / 255.0;
 			is_transparent = fState->backgroundColor.alpha < 128;
 		}
-	
+
 		PDF_setcolor(fPdf, "fill", "rgb", r, g, b, 0);
-	
+
 		if (is_transparent) continue;
-		
+
 		uint8* data = (uint8*)fState->pattern0.data;
 		for (int8 y = 0; y <= 7; y ++, data ++) {
 			uint8  d = *data;
@@ -751,7 +734,7 @@ PDFWriter::CreatePattern()
 				} else { // background
 					if (pass != kPassBackground) continue;
 				}
-				
+
 				// create rectangle for pixel
 				float x1 = x + 1, y1 = y + 1;
 				PDF_moveto(fPdf, x, y);
@@ -760,10 +743,10 @@ PDFWriter::CreatePattern()
 				PDF_lineto(fPdf, x1, y);
 				PDF_closepath(fPdf);
 				PDF_fill(fPdf);
-			} 
+			}
 		}
 	}
-	
+
 	PDF_end_pattern(fPdf);
 
 #else
@@ -771,7 +754,7 @@ PDFWriter::CreatePattern()
 	// pro: BePDF renders pattern also with small zoom factor
 	// con: BePDF omits mask during rendering
 	BBitmap bm(BRect(0, 0, 7, 7), B_RGBA32);
-	
+
 	uint8* data = (uint8*)fState->pattern0.data;
 	rgb_color h = fState->foregroundColor;
 	rgb_color l = fState->backgroundColor;
@@ -798,12 +781,13 @@ PDFWriter::CreatePattern()
 				b[0] = l.blue;  //fState->backgroundColor.blue;
 				b[3] = l.alpha; //fState->backgroundColor.alpha;
 			}
-		} 
+		}
 	}
 
 	int mask, image;
-		
-	if (!GetImages(bm.Bounds(), 8, 8, bm.BytesPerRow(), bm.ColorSpace(), 0, bm.Bits(), &mask, &image)) {
+
+	if (!GetImages(bm.Bounds(), 8, 8, bm.BytesPerRow(), bm.ColorSpace(), 0,
+			bm.Bits(), &mask, &image)) {
 		return;
 	}
 
@@ -824,15 +808,15 @@ PDFWriter::CreatePattern()
 	if (mask != -1) PDF_close_image(fPdf, mask);
 #endif
 #endif
-	
-	Pattern* p = new Pattern(fState->pattern0, fState->backgroundColor, fState->foregroundColor, pattern);
+
+	Pattern* p = new Pattern(fState->pattern0, fState->backgroundColor,
+		fState->foregroundColor, pattern);
 	fPatterns.AddItem(p);
 }
 
 
-// --------------------------------------------------
 void
-PDFWriter::SetPattern() 
+PDFWriter::SetPattern()
 {
 	REPORT(kDebug, fPage, "SetPattern (bitmap version)");
 	if (MakesPattern()) {
@@ -849,9 +833,8 @@ PDFWriter::SetPattern()
 }
 
 
-// --------------------------------------------------
-void 
-PDFWriter::StrokeOrClip() 
+void
+PDFWriter::StrokeOrClip()
 {
 	if (IsDrawing()) {
 		PDF_stroke(fPdf);
@@ -862,9 +845,8 @@ PDFWriter::StrokeOrClip()
 }
 
 
-// --------------------------------------------------
-void 
-PDFWriter::FillOrClip() 
+void
+PDFWriter::FillOrClip()
 {
 	if (IsDrawing()) {
 		PDF_fill(fPdf);
@@ -874,9 +856,8 @@ PDFWriter::FillOrClip()
 }
 
 
-// --------------------------------------------------
 void
-PDFWriter::Paint(bool stroke) 
+PDFWriter::Paint(bool stroke)
 {
 	if (stroke) {
 		StrokeOrClip();
@@ -886,9 +867,8 @@ PDFWriter::Paint(bool stroke)
 }
 
 
-// --------------------------------------------------
-void 
-PDFWriter::SetColor() 
+void
+PDFWriter::SetColor()
 {
 	if (IsSame(fState->pattern0, B_SOLID_HIGH)) {
 		SetColor(fState->foregroundColor);
@@ -896,46 +876,47 @@ PDFWriter::SetColor()
 		SetColor(fState->backgroundColor);
 	} else {
 		SetPattern();
-	} 
+	}
 }
 
 
-#ifdef CODEWARRIOR
-	#pragma mark [Image drawing support routines]
-#endif
+//	#pragma mark Image drawing support routines
 
 
-// --------------------------------------------------
-int32 
-PDFWriter::BytesPerPixel(int32 pixelFormat) 
+int32
+PDFWriter::BytesPerPixel(int32 pixelFormat)
 {
 	switch (pixelFormat) {
 		case B_RGB32:      // fall through
 		case B_RGB32_BIG:  // fall through
 		case B_RGBA32:     // fall through
-		case B_RGBA32_BIG: return 4;
+		case B_RGBA32_BIG:
+			return 4;
 
 		case B_RGB24_BIG:  // fall through
-		case B_RGB24:      return 3;
+		case B_RGB24:
+			return 3;
 
 		case B_RGB16:      // fall through
 		case B_RGB16_BIG:  // fall through
 		case B_RGB15:      // fall through
 		case B_RGB15_BIG:  // fall through
 		case B_RGBA15:     // fall through
-		case B_RGBA15_BIG: return 2;
+		case B_RGBA15_BIG:
+			return 2;
 
 		case B_GRAY8:      // fall through
-		case B_CMAP8:      return 1;
-		case B_GRAY1:      return 0;
+		case B_CMAP8:
+			return 1;
+		case B_GRAY1:
+			return 0;
 		default: return -1;
 	}
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::HasAlphaChannel(int32 pixelFormat) 
+bool
+PDFWriter::HasAlphaChannel(int32 pixelFormat)
 {
 	switch (pixelFormat) {
 		case B_RGB32:      // fall through
@@ -950,14 +931,17 @@ PDFWriter::HasAlphaChannel(int32 pixelFormat)
 		case B_RGB15_BIG:  // fall through
 		case B_RGBA15:     // fall through
 		case B_RGBA15_BIG: // fall through
-		case B_CMAP8:      return true;
-		default: return false;
+		case B_CMAP8:
+			return true;
+		default:
+			return false;
 	}
 }
 
-// --------------------------------------------------
+
 bool
-PDFWriter::NeedsBPC1Mask(int32 pixelFormat) {
+PDFWriter::NeedsBPC1Mask(int32 pixelFormat)
+{
 	switch (pixelFormat) {
 //		case B_RGB32:      // fall through
 //		case B_RGB32_BIG:  // fall through
@@ -965,85 +949,51 @@ PDFWriter::NeedsBPC1Mask(int32 pixelFormat) {
 		case B_RGB15_BIG:  // fall through
 		case B_RGBA15:     // fall through
 		case B_RGBA15_BIG: // fall through
-		case B_CMAP8:      return true;
-		default: return false;
+		case B_CMAP8:
+			return true;
+		default:
+			return false;
 	};
 }
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB32(uint8* in) 
+
+bool
+PDFWriter::IsTransparentRGB32(uint8* in)
 {
 	return *((uint32*)in) == B_TRANSPARENT_MAGIC_RGBA32;
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB32_BIG(uint8* in) 
+bool
+PDFWriter::IsTransparentRGB32_BIG(uint8* in)
 {
 	return *(uint32*)in == B_TRANSPARENT_MAGIC_RGBA32_BIG;
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGBA32(uint8* in) 
+bool
+PDFWriter::IsTransparentRGBA32(uint8* in)
 {
 	return in[3] < 128 || IsTransparentRGB32(in);
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGBA32_BIG(uint8* in) 
+bool
+PDFWriter::IsTransparentRGBA32_BIG(uint8* in)
 {
 	return in[0] < 127 || IsTransparentRGB32_BIG(in);
 }
 
-/*
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB24(uint8* in) 
-{
-	return false;
-}
 
-
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB24_BIG(uint8* in) 
-{
-}
-
-
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB16(uint8* in) 
-{
-	return false;
-}
-
-
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB16_BIG(uint8* in) 
-{
-}
-*/
-
-
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB15(uint8* in) 
+bool
+PDFWriter::IsTransparentRGB15(uint8* in)
 {
 	return *((uint16*)in) == B_TRANSPARENT_MAGIC_RGBA15;
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGB15_BIG(uint8* in) 
+bool
+PDFWriter::IsTransparentRGB15_BIG(uint8* in)
 {
 	// 01234567 01234567
 	// 00123434 01201234
@@ -1052,9 +1002,8 @@ PDFWriter::IsTransparentRGB15_BIG(uint8* in)
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGBA15(uint8* in) 
+bool
+PDFWriter::IsTransparentRGBA15(uint8* in)
 {
 	// 01234567 01234567
 	// 01201234 00123434
@@ -1063,9 +1012,8 @@ PDFWriter::IsTransparentRGBA15(uint8* in)
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentRGBA15_BIG(uint8* in) 
+bool
+PDFWriter::IsTransparentRGBA15_BIG(uint8* in)
 {
 	// 01234567 01234567
 	// 00123434 01201234
@@ -1074,53 +1022,36 @@ PDFWriter::IsTransparentRGBA15_BIG(uint8* in)
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentCMAP8(uint8* in) 
+bool
+PDFWriter::IsTransparentCMAP8(uint8* in)
 {
 	return *in == B_TRANSPARENT_MAGIC_CMAP8;
 }
 
 
-/*
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentGRAY8(uint8* in)
-{
-}
-
-
-// --------------------------------------------------
-bool 
-PDFWriter::IsTransparentGRAY1(uint8* in, int8 bit)
-{
-}
-*/
-
-
-// --------------------------------------------------
 uint8 *
-PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
+PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat,
+	int32 flags, void *data)
 {
 	uint8	*in;
 	uint8   *inRow;
 	int32	x, y;
-	
+
 	uint8	*mask;
 	uint8	*maskRow;
 	uint8	*out;
 	int32	maskWidth;
 	uint8	shift;
 	bool	alpha;
-	int32   bpp; 
+	int32   bpp;
 
-	bpp = BytesPerPixel(pixelFormat);	
-	if (bpp < 0) 
+	bpp = BytesPerPixel(pixelFormat);
+	if (bpp < 0)
 		return NULL;
-	
+
 	int32	width = src.IntegerWidth() + 1;
 	int32	height = src.IntegerHeight() + 1;
-		
+
 	// Image Mask
 	inRow = (uint8 *) data;
 	inRow += bytesPerRow * (int) src.top + bpp * (int) src.left;
@@ -1129,13 +1060,13 @@ PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 fla
 	maskRow = mask = new uint8[maskWidth * height];
 	memset(mask, 0, maskWidth*height);
 	alpha = false;
-	
+
 	for (y = height; y > 0; y--) {
 		in = inRow;
 		out = maskRow;
 		shift = 7;
-		
-		bool a = false;			
+
+		bool a = false;
 
 		for (x = width; x > 0; x-- ) {
 			// For each pixel
@@ -1155,17 +1086,19 @@ PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 fla
 				case B_CMAP8:      a = IsTransparentCMAP8(in); break;
 				//case B_GRAY8:      a = IsTransparentGRAY8(in); break;
 				//case B_GRAY1:      a = false; break;
-				default: a = false; // should not reach here
-					REPORT(kDebug, fPage, "CreateMask: non transparentable pixelFormat");
+				default:
+					a = false; // should not reach here
+					REPORT(kDebug, fPage,
+						"CreateMask: non transparentable pixelFormat");
 			}
 
 			if (a) {
 				out[0] |= (1 << shift);
 				alpha = true;
 			}
-			// next pixel			
+			// next pixel
 			if (shift == 0) out ++;
-			shift = (shift + 7) & 0x07;		
+			shift = (shift + 7) & 0x07;
 			in += bpp;
 		}
 
@@ -1173,7 +1106,7 @@ PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 fla
 		inRow += bytesPerRow;
 		maskRow += maskWidth;
 	}
-	
+
 	if (!alpha) {
 		delete []mask;
 		mask = NULL;
@@ -1182,46 +1115,45 @@ PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 fla
 }
 
 
-// --------------------------------------------------
-uint8 
+uint8
 PDFWriter::AlphaFromRGBA32(uint8* in)
 {
 	return in[2];
 }
 
 
-// --------------------------------------------------
-uint8 
+uint8
 PDFWriter::AlphaFromRGBA32_BIG(uint8* in)
 {
 	return in[0];
 }
 
 
-// --------------------------------------------------
 uint8 *
-PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
+PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat,
+	int32 flags, void *data)
 {
 	static bool errorReported = false;
 	uint8	*in;
 	uint8   *inRow;
 	int32	x, y;
-	
+
 	uint8	*mask;
 	uint8	*maskRow;
 	uint8	*out;
 	bool	alpha;
-	int32   bpp; 
+	int32   bpp;
 
+// TODO: CreateSoftMask???
 	return NULL;
 
-	bpp = BytesPerPixel(pixelFormat);	
-	if (bpp < 0) 
+	bpp = BytesPerPixel(pixelFormat);
+	if (bpp < 0)
 		return NULL;
-	
-	int32	width = src.IntegerWidth() + 1;
-	int32	height = src.IntegerHeight() + 1;
-		
+
+	int32 width = src.IntegerWidth() + 1;
+	int32 height = src.IntegerHeight() + 1;
+
 	// Image Mask
 	inRow = (uint8 *) data;
 	inRow += bytesPerRow * (int) src.top + bpp * (int) src.left;
@@ -1230,27 +1162,31 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32
 	maskRow = mask = new uint8[width * height];
 	memset(mask, 0, width * height);
 	alpha = false;
-	
+
 	for (y = height; y > 0; y--) {
 		in = inRow;
 		out = maskRow;
-		
-		uint8 a;			
+
+		uint8 a;
 
 		for (x = width; x > 0; x-- ) {
 			// For each pixel
 			switch (pixelFormat) {
 				case B_RGB32:      // fall through
-				case B_RGBA32:     a = AlphaFromRGBA32(in); 
+				case B_RGBA32:
+					a = AlphaFromRGBA32(in);
 					break;
 
 				case B_RGB32_BIG:  // fall through
-				case B_RGBA32_BIG: a = AlphaFromRGBA32_BIG(in); 
+				case B_RGBA32_BIG:
+					a = AlphaFromRGBA32_BIG(in);
 					break;
 
-				default: a = 255; // should not reach here
+				default:
+					a = 255; // should not reach here
 					if (!errorReported) {
-						REPORT(kDebug, fPage, "CreateSoftMask: non transparentable pixelFormat");
+						REPORT(kDebug, fPage,
+							"CreateSoftMask: non transparentable pixelFormat");
 						errorReported = true;
 					}
 			}
@@ -1259,7 +1195,7 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32
 			if (a != 255) {
 				alpha = true;
 			}
-			// next pixel			
+			// next pixel
 			out ++;
 			in += bpp;
 		}
@@ -1268,7 +1204,7 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32
 		inRow += bytesPerRow;
 		maskRow += width;
 	}
-	
+
 	if (!alpha) {
 		delete []mask;
 		mask = NULL;
@@ -1277,24 +1213,21 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB32(uint8* in, uint8 *out)
 {
 	*((rgb_color*)out) = *((rgb_color*)in);
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGBA32(uint8* in, uint8 *out)
 {
 	*((rgb_color*)out) = *((rgb_color*)in);
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB24(uint8* in, uint8 *out)
 {
 	out[0] = in[0];
@@ -1304,8 +1237,7 @@ PDFWriter::ConvertFromRGB24(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB16(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1318,8 +1250,7 @@ PDFWriter::ConvertFromRGB16(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB15(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1332,8 +1263,7 @@ PDFWriter::ConvertFromRGB15(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGBA15(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1346,8 +1276,7 @@ PDFWriter::ConvertFromRGBA15(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromCMAP8(uint8* in, uint8 *out)
 {
 	rgb_color c = fScreen->ColorForIndex(in[0]);
@@ -1358,8 +1287,7 @@ PDFWriter::ConvertFromCMAP8(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromGRAY8(uint8* in, uint8 *out)
 {
 	out[0] = in[0];
@@ -1369,8 +1297,7 @@ PDFWriter::ConvertFromGRAY8(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromGRAY1(uint8* in, uint8 *out, int8 bit)
 {
 	uint8 gray = (in[0] & (1 << bit)) ? 255 : 0;
@@ -1381,8 +1308,7 @@ PDFWriter::ConvertFromGRAY1(uint8* in, uint8 *out, int8 bit)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB32_BIG(uint8* in, uint8 *out)
 {
 	out[0] = in[3];
@@ -1392,8 +1318,7 @@ PDFWriter::ConvertFromRGB32_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGBA32_BIG(uint8* in, uint8 *out)
 {
 	out[0] = in[3];
@@ -1403,8 +1328,7 @@ PDFWriter::ConvertFromRGBA32_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB24_BIG(uint8* in, uint8 *out)
 {
 	out[0] = in[2];
@@ -1414,8 +1338,7 @@ PDFWriter::ConvertFromRGB24_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB16_BIG(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1428,8 +1351,7 @@ PDFWriter::ConvertFromRGB16_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGB15_BIG(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1442,8 +1364,7 @@ PDFWriter::ConvertFromRGB15_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::ConvertFromRGBA15_BIG(uint8* in, uint8 *out)
 {
 	// 01234567 01234567
@@ -1456,10 +1377,10 @@ PDFWriter::ConvertFromRGBA15_BIG(uint8* in, uint8 *out)
 }
 
 
-// --------------------------------------------------
-// Convert and clip bits to colorspace B_RGBA32
+//! Convert and clip bits to colorspace B_RGBA32
 BBitmap *
-PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
+PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat,
+	int32 flags, void *data)
 {
 	uint8	*in;
 	uint8   *inLeft;
@@ -1467,15 +1388,15 @@ PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 
 	uint8   *outLeft;
 	int32	x, y;
 	int8    bit;
-	int32   bpp = 4; 
+	int32   bpp = 4;
 
-	bpp = BytesPerPixel(pixelFormat);	
-	if (bpp < 0) 
+	bpp = BytesPerPixel(pixelFormat);
+	if (bpp < 0)
 		return NULL;
 
 	int32 width  = src.IntegerWidth();
 	int32 height = src.IntegerHeight();
-	BBitmap *	bm = new BBitmap(BRect(0, 0, width, height), B_RGB32);
+	BBitmap *bm = new BBitmap(BRect(0, 0, width, height), B_RGB32);
 	if (!bm->IsValid()) {
 		delete bm;
 		REPORT(kError, fPage, "BBitmap constructor failed");
@@ -1483,9 +1404,9 @@ PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 
 	}
 
 	inLeft  = (uint8 *)data;
-	inLeft += bytesPerRow * (int)src.top + bpp * (int)src.left; 
+	inLeft += bytesPerRow * (int)src.top + bpp * (int)src.left;
 	outLeft	= (uint8*)bm->Bits();
-		
+
 	for (y = height; y >= 0; y--) {
 		in = inLeft;
 		out = outLeft;
@@ -1501,10 +1422,10 @@ PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 
 				case B_RGBA15:     ConvertFromRGBA15(in, out); break;
 				case B_CMAP8:      ConvertFromCMAP8(in, out); break;
 				case B_GRAY8:      ConvertFromGRAY8(in, out); break;
-				case B_GRAY1:      
+				case B_GRAY1:
 					bit = x & 7;
 					ConvertFromGRAY1(in, out, bit);
-					if (bit == 7) in ++; 
+					if (bit == 7) in ++;
 					break;
 				case B_RGB32_BIG:  ConvertFromRGB32_BIG(in, out); break;
 				case B_RGBA32_BIG: ConvertFromRGBA32_BIG(in, out); break;
@@ -1522,14 +1443,14 @@ PDFWriter::ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 
 		inLeft += bytesPerRow;
 		outLeft += bm->BytesPerRow();
 	}
-	
+
 	return bm;
 }
 
 
-// --------------------------------------------------
-bool 
-PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 type)
+bool
+PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename,
+	uint32 type)
 {
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	if (!roster) {
@@ -1550,10 +1471,10 @@ PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 t
 		LOG((fLog, "   name = %s\n", info.name));
 		LOG((fLog, "   MIME = %s\n", info.MIME));
 		#endif
-		
+
 		int32 numInfo;
 		translator_info *tInfo = NULL;
-		if (roster->GetTranslators(&stream, NULL, &tInfo, &numInfo, 
+		if (roster->GetTranslators(&stream, NULL, &tInfo, &numInfo,
 			info.type, NULL, type) == B_OK) {
 
 //			#ifdef DEBUG
@@ -1576,7 +1497,7 @@ PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 t
 			} else {
 				LOG((fLog, "ERROR: could not get configuration message %d\n", s));
 			}
-			
+
 			info = tInfo[0];
 			info.quality = quality;
 			delete []tInfo;
@@ -1587,19 +1508,20 @@ PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 t
 */
 	BFile file(filename, B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE);
 	bool res = roster->Translate(&stream, NULL /*i*/, NULL, &file, type) == B_OK;
-	BBitmap *bm = NULL; 
+	BBitmap *bm = NULL;
 	// detach bitmap so BBitmapStream destructor does not delete our bitmap!
-	stream.DetachBitmap(&bm); 
+	stream.DetachBitmap(&bm);
 	ASSERT(bm == bitmap);
 	return res;
 }
 
-// --------------------------------------------------
-bool	
-PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPerRow, int32 pixelFormat, 
-	int32 flags, void *data, int* maskId, int* image)
+
+bool
+PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/,
+	int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data, int* maskId,
+	int* image)
 {
-	uint8 	*mask = NULL;
+	uint8 *mask = NULL;
 	*maskId = -1;
 
 	int32 width = src.IntegerWidth() + 1;
@@ -1607,7 +1529,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 
 	int length = 0;
 	int bpc = 0;
-		
+
 	if (HasAlphaChannel(pixelFormat)) {
 		if (NeedsBPC1Mask(pixelFormat) || !SupportsSoftMask()) {
 			int32 w = (width+7)/8;
@@ -1622,7 +1544,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 			REPORT(kDebug, fPage, "SoftMask created mask = %p", mask);
 		}
 	}
-	
+
 	if (mask) {
 // PDFlib deprecated:
 //		*maskId = PDF_open_image(fPdf, "raw", "memory", (const char *) mask, length, width, height, 1, bpc, "mask");
@@ -1631,7 +1553,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 #else
 		BString options;
 		PDF_create_pvf(fPdf, "mask", 0, mask, length, NULL);
-		options << "width " << width << " height " << height << " components 1 bpc " << bpc;  
+		options << "width " << width << " height " << height << " components 1 bpc " << bpc;
 		*maskId = PDF_load_image(fPdf, "raw", "mask", 0, options.String());
 		PDF_delete_pvf(fPdf, "mask", 0);
 #endif
@@ -1652,7 +1574,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 	delete bm;
 #else
 	char *pdfLibFormat   = "png";
-	char *bitmapFileName = "/tmp/pdfwriter.png";	
+	char *bitmapFileName = "/tmp/pdfwriter.png";
 	const uint32 beosFormat    = B_PNG_FORMAT;
 
 	if (!StoreTranslatorBitmap(bm, bitmapFileName, beosFormat)) {
@@ -1665,7 +1587,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 	}
 	delete bm;
 
-	*image = PDF_open_image_file(fPdf, pdfLibFormat, bitmapFileName, 
+	*image = PDF_open_image_file(fPdf, pdfLibFormat, bitmapFileName,
 		*maskId == -1 ? "" : "masked", *maskId == -1 ? 0 : *maskId);
 #endif
 
@@ -1673,38 +1595,35 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 }
 
 
-#ifdef CODEWARRIOR
-	#pragma mark -- BPicture playback handlers
-#endif
+//	#pragma mark BPicture playback handlers
 
 
-// --------------------------------------------------
-void PDFWriter::Op(int number)
+void
+PDFWriter::Op(int number)
 {
 	REPORT(kError, fPage, "Unhandled operand %d", number);
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::MovePenBy(BPoint delta)
 {
-	REPORT(kDebug, fPage, "MovePenBy delta=[%f, %f]", \
-			delta.x, delta.y);
+	REPORT(kDebug, fPage, "MovePenBy delta=[%f, %f]", delta.x, delta.y);
 	fState->penX += delta.x;
 	fState->penY += delta.y;
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::StrokeLine(BPoint start,	BPoint end)
 {
-	REPORT(kDebug, fPage, "StrokeLine start=[%f, %f], end=[%f, %f]", \
-			start.x, start.y, end.x, end.y);
+	REPORT(kDebug, fPage, "StrokeLine start=[%f, %f], end=[%f, %f]",
+		start.x, start.y, end.x, end.y);
 
-	SetColor();			
-	if (!MakesPDF()) return;
+	SetColor();
+	if (!MakesPDF())
+		return;
+
 	if (IsClipping()) {
 		BShape shape;
 		shape.MoveTo(start);
@@ -1720,15 +1639,16 @@ PDFWriter::StrokeLine(BPoint start,	BPoint end)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::StrokeRect(BRect rect)
 {
-	REPORT(kDebug, fPage, "StrokeRect rect=[%f, %f, %f, %f]", \
-			rect.left, rect.top, rect.right, rect.bottom);
+	REPORT(kDebug, fPage, "StrokeRect rect=[%f, %f, %f, %f]",
+		rect.left, rect.top, rect.right, rect.bottom);
 
-	SetColor();			
-	if (!MakesPDF()) return;
+	SetColor();
+	if (!MakesPDF())
+		return;
+
 	if (IsClipping()) {
 		BShape shape;
 		shape.MoveTo(BPoint(rect.left, rect.top));
@@ -1739,47 +1659,52 @@ PDFWriter::StrokeRect(BRect rect)
 		StrokeShape(&shape);
 	} else {
 		BeginTransparency();
-		PDF_rect(fPdf, tx(rect.left), ty(rect.bottom), scale(rect.Width()), scale(rect.Height()));
+		PDF_rect(fPdf, tx(rect.left), ty(rect.bottom), scale(rect.Width()),
+			scale(rect.Height()));
 		StrokeOrClip();
 		EndTransparency();
 	}
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::FillRect(BRect rect)
 {
-	REPORT(kDebug, fPage, "FillRect rect=[%f, %f, %f, %f]", \
-			rect.left, rect.top, rect.right, rect.bottom);
+	REPORT(kDebug, fPage, "FillRect rect=[%f, %f, %f, %f]",
+		rect.left, rect.top, rect.right, rect.bottom);
 
-	SetColor();			
-	if (!MakesPDF()) return;
+	SetColor();
+	if (!MakesPDF())
+		return;
+
 	BeginTransparency();
-	PDF_rect(fPdf, tx(rect.left), ty(rect.bottom), scale(rect.Width()), scale(rect.Height()));
+	PDF_rect(fPdf, tx(rect.left), ty(rect.bottom), scale(rect.Width()),
+		scale(rect.Height()));
 	FillOrClip();
 	EndTransparency();
 }
 
 
-// --------------------------------------------------
-// The quarter ellipses in the corners of the rectangle are
-// approximated with bezier curves.
-// The constant 0.555... is taken from gobeProductive.
-void	
-PDFWriter::PaintRoundRect(BRect rect, BPoint radii, bool stroke) {
+/*!	The quarter ellipses in the corners of the rectangle are
+	approximated with bezier curves.
+	The constant 0.555... is taken from gobeProductive.
+*/
+void
+PDFWriter::PaintRoundRect(BRect rect, BPoint radii, bool stroke)
+{
 	SetColor();
-	if (!MakesPDF()) return;
-	
+	if (!MakesPDF())
+		return;
+
 	BPoint center;
-	
+
 	float sx = radii.x;
 	float sy = radii.y;
 
 	char str[256];
 	sprintf(str, "PaintRoundRect sx %f sy %f", sx, sy);
 	REPORT(kDebug, fPage, str);
-	
+
 	float ax = sx;
 	float bx = 0.5555555555555 * sx;
 	float ay = sy;
@@ -1795,7 +1720,7 @@ PDFWriter::PaintRoundRect(BRect rect, BPoint radii, bool stroke) {
 		BPoint(center.x - bx, center.y - ay),
 		BPoint(center.x     , center.y - ay)};
 	shape.BezierTo(a);
-	
+
 	center.x = rect.right - sx;
 	shape.LineTo(BPoint(center.x, center.y - ay));
 
@@ -1804,58 +1729,58 @@ PDFWriter::PaintRoundRect(BRect rect, BPoint radii, bool stroke) {
 		BPoint(center.x + ax, center.y - by),
 		BPoint(center.x + ax, center.y)};
 	shape.BezierTo(b);
-		
+
 	center.y = rect.bottom - sy;
-	shape.LineTo(BPoint(center.x + sx, center.y)); 
+	shape.LineTo(BPoint(center.x + sx, center.y));
 
 	BPoint c[3] = {
 		BPoint(center.x + ax, center.y + by),
 		BPoint(center.x + bx, center.y + ay),
 		BPoint(center.x     , center.y + ay)};
 	shape.BezierTo(c);
-	
-	center.x = rect.left + sx;	
+
+	center.x = rect.left + sx;
 	shape.LineTo(BPoint(center.x, center.y + ay));
 
 	BPoint d[3] = {
 		BPoint(center.x - bx, center.y + ay),
 		BPoint(center.x - ax, center.y + by),
 		BPoint(center.x - ax, center.y)};
-	shape.BezierTo(d); 
+	shape.BezierTo(d);
 
 	shape.Close();
-	
+
 	PaintShape(&shape, stroke);
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::StrokeRoundRect(BRect rect, BPoint radii)
 {
-	REPORT(kDebug, fPage, "StrokeRoundRect center=[%f, %f, %f, %f], radii=[%f, %f]", \
-			rect.left, rect.top, rect.right, rect.bottom, radii.x, radii.y);
+	REPORT(kDebug, fPage, "StrokeRoundRect center=[%f, %f, %f, %f], "
+		"radii=[%f, %f]", rect.left, rect.top, rect.right, rect.bottom, radii.x,
+		radii.y);
 	PaintRoundRect(rect, radii, kStroke);
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::FillRoundRect(BRect rect, BPoint	radii)
 {
-	REPORT(kDebug, fPage, "FillRoundRect rect=[%f, %f, %f, %f], radii=[%f, %f]", \
-			rect.left, rect.top, rect.right, rect.bottom, radii.x, radii.y);
+	REPORT(kDebug, fPage, "FillRoundRect rect=[%f, %f, %f, %f], radii=[%f, %f]",
+		rect.left, rect.top, rect.right, rect.bottom, radii.x, radii.y);
 	PaintRoundRect(rect, radii, kFill);
 }
 
 
-// --------------------------------------------------
-void	
-PDFWriter::StrokeBezier(BPoint	*control)
+void
+PDFWriter::StrokeBezier(BPoint *control)
 {
 	REPORT(kDebug, fPage, "StrokeBezier");
 	SetColor();
-	if (!MakesPDF()) return;
+	if (!MakesPDF())
+		return;
+
 	BShape shape;
 	shape.MoveTo(control[0]);
 	shape.BezierTo(&control[1]);
@@ -1863,8 +1788,7 @@ PDFWriter::StrokeBezier(BPoint	*control)
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::FillBezier(BPoint *control)
 {
 	REPORT(kDebug, fPage, "FillBezier");
@@ -1872,18 +1796,19 @@ PDFWriter::FillBezier(BPoint *control)
 	if (!MakesPDF()) return;
 	PDF_moveto(fPdf, tx(control[0].x), ty(control[0].y));
 	PDF_curveto(fPdf, tx(control[1].x), ty(control[1].y),
-	            tx(control[2].x), ty(control[2].y),
-	            tx(control[3].x), ty(control[3].y));
+		tx(control[2].x), ty(control[2].y), tx(control[3].x), ty(control[3].y));
 	PDF_closepath(fPdf);
 	FillOrClip();
 }
 
 
-// --------------------------------------------------
-// Note the pen size is also scaled!
-// We should approximate it with bezier curves too!
+/*!	Note the pen size is also scaled!
+	We should approximate it with bezier curves too!
+*/
 void
-PDFWriter::PaintArc(BPoint center, BPoint radii, float startTheta, float arcTheta, int stroke) {
+PDFWriter::PaintArc(BPoint center, BPoint radii, float startTheta,
+	float arcTheta, int stroke)
+{
 	float sx = scale(radii.x);
 	float sy = scale(radii.y);
 	float smax = sx > sy ? sx : sy;
@@ -1891,43 +1816,44 @@ PDFWriter::PaintArc(BPoint center, BPoint radii, float startTheta, float arcThet
 	SetColor();
 	if (!MakesPDF()) return;
 	if (IsClipping()); // TODO clip to line path
-	
+
 	PDF_save(fPdf);
 	PDF_scale(fPdf, sx, sy);
 	PDF_setlinewidth(fPdf, fState->penSize / smax);
-	PDF_arc(fPdf, tx(center.x) / sx, ty(center.y) / sy, 1, startTheta, startTheta + arcTheta);	
+	PDF_arc(fPdf, tx(center.x) / sx, ty(center.y) / sy, 1, startTheta,
+		startTheta + arcTheta);
 	Paint(stroke);
 	PDF_restore(fPdf);
 }
 
 
-// --------------------------------------------------
 void
-PDFWriter::StrokeArc(BPoint center, BPoint radii, float startTheta, float arcTheta)
+PDFWriter::StrokeArc(BPoint center, BPoint radii, float startTheta,
+	float arcTheta)
 {
-	REPORT(kDebug, fPage, "StrokeArc center=[%f, %f], radii=[%f, %f], startTheta=%f, arcTheta=%f", \
-			center.x, center.y, radii.x, radii.y, startTheta, arcTheta);
+	REPORT(kDebug, fPage, "StrokeArc center=[%f, %f], radii=[%f, %f], "
+		"startTheta=%f, arcTheta=%f", center.x, center.y, radii.x, radii.y,
+		startTheta, arcTheta);
 	PaintArc(center, radii, startTheta, arcTheta, true);
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::FillArc(BPoint center, BPoint radii, float startTheta, float arcTheta)
 {
-	REPORT(kDebug, fPage, "FillArc center=[%f, %f], radii=[%f, %f], startTheta=%f, arcTheta=%f", \
-			center.x, center.y, radii.x, radii.y, startTheta, arcTheta);
+	REPORT(kDebug, fPage, "FillArc center=[%f, %f], radii=[%f, %f], "
+		"startTheta=%f, arcTheta=%f", center.x, center.y, radii.x, radii.y,
+		startTheta, arcTheta);
 	PaintArc(center, radii, startTheta, arcTheta, false);
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::PaintEllipse(BPoint center, BPoint radii, bool stroke)
 {
 	float sx = radii.x;
 	float sy = radii.y;
-	
+
 	float ax = sx;
 	float bx = 0.5555555555555 * sx;
 	float ay = sy;
@@ -1940,7 +1866,7 @@ PDFWriter::PaintEllipse(BPoint center, BPoint radii, bool stroke)
 
 	shape.MoveTo(BPoint(center.x - ax, center.y));
 
-	BPoint a[3] = { 
+	BPoint a[3] = {
 		BPoint(center.x - ax, center.y - by),
 		BPoint(center.x - bx, center.y - ay),
 		BPoint(center.x     , center.y - ay) };
@@ -1950,7 +1876,7 @@ PDFWriter::PaintEllipse(BPoint center, BPoint radii, bool stroke)
 		BPoint(center.x + bx, center.y - ay),
 		BPoint(center.x + ax, center.y - by),
 		BPoint(center.x + ax, center.y)};
-	shape.BezierTo(b); 
+	shape.BezierTo(b);
 
 	BPoint c[3] = {
 		BPoint(center.x + ax, center.y + by),
@@ -1963,47 +1889,47 @@ PDFWriter::PaintEllipse(BPoint center, BPoint radii, bool stroke)
 		BPoint(center.x - ax, center.y + by),
 		BPoint(center.x - ax, center.y)};
 	shape.BezierTo(d);
-	
+
 	shape.Close();
 
-	PaintShape(&shape, stroke);	
+	PaintShape(&shape, stroke);
 }
 
-// --------------------------------------------------
+
 void
 PDFWriter::StrokeEllipse(BPoint center, BPoint radii)
 {
-	REPORT(kDebug, fPage, "StrokeEllipse center=[%f, %f], radii=[%f, %f]", \
-			center.x, center.y, radii.x, radii.y);
+	REPORT(kDebug, fPage, "StrokeEllipse center=[%f, %f], radii=[%f, %f]",
+		center.x, center.y, radii.x, radii.y);
 	PaintEllipse(center, radii, true);
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::FillEllipse(BPoint center, BPoint radii)
 {
-	REPORT(kDebug, fPage, "FillEllipse center=[%f, %f], radii=[%f, %f]", \
-			center.x, center.y, radii.x, radii.y);
+	REPORT(kDebug, fPage, "FillEllipse center=[%f, %f], radii=[%f, %f]",
+		center.x, center.y, radii.x, radii.y);
 	PaintEllipse(center, radii, false);
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed)
 {
-	int32	i;
-	float   x0, y0;
-	REPORT(kDebug, fPage, "StrokePolygon numPoints=%ld, isClosed=%d\npoints=", \
-			numPoints, isClosed);
+	int32 i;
+	float x0, y0;
+	REPORT(kDebug, fPage, "StrokePolygon numPoints=%ld, isClosed=%d\npoints=",
+		numPoints, isClosed);
 
-	if (numPoints <= 1) return;
-	
+	if (numPoints <= 1)
+		return;
+
 	x0 = y0 = 0.0;
-		
-	SetColor();		
-	if (!MakesPDF()) return;
+
+	SetColor();
+	if (!MakesPDF())
+		return;
 
 	if (IsClipping()) {
 		BShape shape;
@@ -2011,7 +1937,7 @@ PDFWriter::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed)
 		for (i = 1, points ++; i < numPoints; i++, points++) {
 			shape.LineTo(*points);
 		}
-		if (isClosed) 
+		if (isClosed)
 			shape.Close();
 		StrokeShape(&shape);
 	} else {
@@ -2026,7 +1952,7 @@ PDFWriter::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed)
 				PDF_moveto(fPdf, x0, y0);
 			}
 		}
-		if (isClosed) 
+		if (isClosed)
 			PDF_lineto(fPdf, x0, y0);
 		StrokeOrClip();
 		EndTransparency();
@@ -2034,20 +1960,18 @@ PDFWriter::StrokePolygon(int32 numPoints, BPoint *points, bool isClosed)
 }
 
 
-// --------------------------------------------------
-void 
+void
 PDFWriter::FillPolygon(int32 numPoints, BPoint *points, bool isClosed)
 {
-	int32	i;
-	
-	REPORT(kDebug, fPage, "FillPolygon numPoints=%ld, isClosed=%dpoints=", \
-			numPoints, isClosed);
-			
-	SetColor();		
-	if (!MakesPDF()) return;
+	REPORT(kDebug, fPage, "FillPolygon numPoints=%ld, isClosed=%dpoints=",
+		numPoints, isClosed);
+
+	SetColor();
+	if (!MakesPDF())
+		return;
 
 	BeginTransparency();
-	for ( i = 0; i < numPoints; i++, points++ ) {
+	for (int32 i = 0; i < numPoints; i++, points++ ) {
 		REPORT(kDebug, fPage, " [%f, %f]", points->x, points->y);
 		if (i != 0) {
 			PDF_lineto(fPdf, tx(points->x), ty(points->y));
@@ -2061,19 +1985,20 @@ PDFWriter::FillPolygon(int32 numPoints, BPoint *points, bool isClosed)
 }
 
 
-// --------------------------------------------------
-void PDFWriter::PaintShape(BShape *shape, bool stroke)
+void
+PDFWriter::PaintShape(BShape *shape, bool stroke)
 {
 	if (stroke) StrokeShape(shape); else FillShape(shape);
 }
 
 
-// --------------------------------------------------
-void PDFWriter::StrokeShape(BShape *shape)
+void
+PDFWriter::StrokeShape(BShape *shape)
 {
 	REPORT(kDebug, fPage, "StrokeShape");
-	SetColor();			
-	if (!MakesPDF()) return;
+	SetColor();
+	if (!MakesPDF())
+		return;
 	BeginTransparency();
 	DrawShape iterator(this, true);
 	iterator.Iterate(shape);
@@ -2081,11 +2006,11 @@ void PDFWriter::StrokeShape(BShape *shape)
 }
 
 
-// --------------------------------------------------
-void PDFWriter::FillShape(BShape *shape)
+void
+PDFWriter::FillShape(BShape *shape)
 {
 	REPORT(kDebug, fPage, "FillShape");
-	SetColor();			
+	SetColor();
 	if (!MakesPDF()) return;
 	BeginTransparency();
 	DrawShape iterator(this, false);
@@ -2094,20 +2019,23 @@ void PDFWriter::FillShape(BShape *shape)
 }
 
 
-// --------------------------------------------------
 void
-PDFWriter::ClipToPicture(BPicture *picture, BPoint point, bool clip_to_inverse_picture)
+PDFWriter::ClipToPicture(BPicture *picture, BPoint point,
+	bool clipToInversePicture)
 {
-	REPORT(kDebug, fPage, "ClipToPicture at (%f, %f) clip_to_inverse_picture = %s", point.x, point.y, clip_to_inverse_picture ? "true" : "false");
-	if (!MakesPDF()) return;
-	if (clip_to_inverse_picture) {
+	REPORT(kDebug, fPage, "ClipToPicture at (%f, %f) clip_to_inverse_picture "
+		"= %s", point.x, point.y, clipToInversePicture ? "true" : "false");
+
+	if (!MakesPDF())
+		return;
+	if (clipToInversePicture) {
 		REPORT(kError, fPage, "Clipping to inverse picture not implemented!");
 		return;
 	}
 	if (fMode == kDrawingMode) {
 		const bool set_origin = point.x != 0 || point.y != 0;
-		PushInternalState(); 
-		if (set_origin) { 
+		PushInternalState();
+		if (set_origin) {
 			SetOrigin(point); PushInternalState();
 		}
 
@@ -2117,40 +2045,41 @@ PDFWriter::ClipToPicture(BPicture *picture, BPoint point, bool clip_to_inverse_p
 		fMode = kDrawingMode;
 		// and clip to it/them
 		PDF_clip(fPdf);
-								
+
 		if (set_origin) {
 			PopInternalState();
 		}
-		PopInternalState(); 
-		
+		PopInternalState();
+
 		REPORT(kDebug, fPage, "Returning from ClipToPicture");
 	} else {
-		REPORT(kError, fPage, "Nested call of ClipToPicture not implemented yet!");
+		REPORT(kError, fPage,
+			"Nested call of ClipToPicture not implemented yet!");
 	}
 }
 
-// --------------------------------------------------
-void	
-PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 bytesPerRow, int32 pixelFormat, 
-	int32 flags, void *data)
+
+void
+PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height,
+	int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
-	REPORT(kDebug, fPage, "DrawPixels src=[%f, %f, %f, %f], dest=[%f, %f, %f, %f], " \
-					"width=%ld, height=%ld, bytesPerRow=%ld, pixelFormat=%ld, " \
-					"flags=%ld, data=%p", \
-					src.left, src.top, src.right, src.bottom, \
-					dest.left, dest.top, dest.right, dest.bottom, \
-					width, height, bytesPerRow, pixelFormat, flags, data);
+	REPORT(kDebug, fPage, "DrawPixels src=[%f, %f, %f, %f], dest=[%f, %f, %f, "
+		"%f], width=%ld, height=%ld, bytesPerRow=%ld, pixelFormat=%ld, "
+		"flags=%ld, data=%p", src.left, src.top, src.right, src.bottom,
+		dest.left, dest.top, dest.right, dest.bottom, width, height, bytesPerRow,
+		pixelFormat, flags, data);
 
 	SetColor();
-	
+
 	if (IsClipping()) {
 		REPORT(kError, fPage, "DrawPixels for clipping not implemented yet!");
 		return;
 	}
 
 	int maskId, image;
-	
-	if (!GetImages(src, width, height, bytesPerRow, pixelFormat, flags, data, &maskId, &image)) {
+
+	if (!GetImages(src, width, height, bytesPerRow, pixelFormat, flags, data,
+			&maskId, &image)) {
 		return;
 	}
 	if (!MakesPDF()) return;
@@ -2159,8 +2088,8 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 	const float scaleY = (dest.Height()+1) / (src.Height()+1);
 
 	const bool needs_scaling = scaleX != 1.0 || scaleY != 1.0;
-	
-	if (needs_scaling) {	
+
+	if (needs_scaling) {
 		PDF_save(fPdf);
 		PDF_scale(fPdf, scaleX, scaleY);
 	}
@@ -2169,7 +2098,7 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 	// Can use Begin/EndTransparency if the alpha value for each pixel
 	// is the same.
 	// Otherwise we need "SoftMasks". Don't know if PDFlib 5.x already
-	// supports them. 
+	// supports them.
 	BeginTransparency();
 
 	float x = tx(dest.left)   / scaleX;
@@ -2183,32 +2112,30 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 	} else {
 		REPORT(kError, fPage, "PDF_open_image_file failed!");
 	}
-	
+
 #if !USE_IMAGE_CACHE
 	if (maskId != -1) PDF_close_image(fPdf, maskId);
-#endif	
+#endif
 	EndTransparency();
-	
+
 	if (needs_scaling) PDF_restore(fPdf);
 }
 
 
-
-// --------------------------------------------------
-void	
+void
 PDFWriter::SetClippingRects(BRect *rects, uint32 numRects)
 {
 	uint32	i;
-	
+
 	REPORT(kDebug, fPage, "SetClippingRects numRects=%ld\nrects=", \
 			numRects);
 
 	if (!MakesPDF()) return;
-	
+
 	for ( i = 0; i < numRects; i++, rects++ ) {
 		REPORT(kDebug, fPage, " [%f, %f, %f, %f]", \
 				rects->left, rects->top, rects->right, rects->bottom);
-		PDF_moveto(fPdf, tx(rects->left),  ty(rects->top)); 
+		PDF_moveto(fPdf, tx(rects->left),  ty(rects->top));
 		PDF_lineto(fPdf, tx(rects->right), ty(rects->top));
 		PDF_lineto(fPdf, tx(rects->right), ty(rects->bottom));
 		PDF_lineto(fPdf, tx(rects->left),  ty(rects->bottom));
@@ -2218,7 +2145,6 @@ PDFWriter::SetClippingRects(BRect *rects, uint32 numRects)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::PushState()
 {
@@ -2230,7 +2156,6 @@ PDFWriter::PushState()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::PopState()
 {
@@ -2242,7 +2167,6 @@ PDFWriter::PopState()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::EnterStateChange()
 {
@@ -2251,7 +2175,6 @@ PDFWriter::EnterStateChange()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::ExitStateChange()
 {
@@ -2260,7 +2183,6 @@ PDFWriter::ExitStateChange()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::EnterFontState()
 {
@@ -2269,7 +2191,6 @@ PDFWriter::EnterFontState()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::ExitFontState()
 {
@@ -2278,15 +2199,13 @@ PDFWriter::ExitFontState()
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetOrigin(BPoint pt)
 {
-	REPORT(kDebug, fPage, "SetOrigin pt=[%f, %f]", \
-			pt.x, pt.y);
+	REPORT(kDebug, fPage, "SetOrigin pt=[%f, %f]", pt.x, pt.y);
 
 	// XXX scale pt with current scaling factor or with
-	//     scaling factor of previous state? (fState->prev->scale)			
+	//     scaling factor of previous state? (fState->prev->scale)
 	BPoint o = fState->prev->pdfSystem.Origin();
 	pdfSystem()->SetOrigin(
 		o.x + pdfSystem()->scale(pt.x),
@@ -2295,20 +2214,16 @@ PDFWriter::SetOrigin(BPoint pt)
 }
 
 
-// --------------------------------------------------
-void	
+void
 PDFWriter::SetPenLocation(BPoint pt)
 {
-	REPORT(kDebug, fPage, "SetPenLocation pt=[%f, %f]", \
-			pt.x, pt.y);
-		
+	REPORT(kDebug, fPage, "SetPenLocation pt=[%f, %f]", pt.x, pt.y);
+
 	fState->penX = pt.x;
 	fState->penY = pt.y;
 }
 
 
-
-// --------------------------------------------------
 void
 PDFWriter::SetDrawingMode(drawing_mode mode)
 {
@@ -2317,8 +2232,6 @@ PDFWriter::SetDrawingMode(drawing_mode mode)
 }
 
 
-
-// --------------------------------------------------
 void
 PDFWriter::SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit)
 {
@@ -2334,76 +2247,72 @@ PDFWriter::SetLineMode(cap_mode capMode, join_mode joinMode, float miterLimit)
 		case B_SQUARE_CAP: m = 2; break;
 	}
 	PDF_setlinecap(fPdf, m);
-	
+
 	m = 0;
 	switch (joinMode) {
 		case B_MITER_JOIN: m = 0; break;
 		case B_ROUND_JOIN: m = 1; break;
-		case B_BUTT_JOIN: // fall through XXX: check this; no equivalent in PDF?
-		case B_SQUARE_JOIN: // fall through XXX: check this too
+		case B_BUTT_JOIN: // fall through TODO: check this; no equivalent in PDF?
+		case B_SQUARE_JOIN: // fall through TODO: check this too
 		case B_BEVEL_JOIN: m = 2; break;
 	}
 	PDF_setlinejoin(fPdf, m);
 
 	PDF_setmiterlimit(fPdf, miterLimit);
-	
+
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetPenSize(float size)
 {
 	REPORT(kDebug, fPage, "SetPenSize size=%f", size);
-	if (size <= 0.00001) size = 1;
-	// XXX scaling required?
+	if (size <= 0.00001)
+		size = 1;
+
+	// TODO: scaling required?
 	fState->penSize = scale(size);
-	if (!MakesPDF()) return;
+	if (!MakesPDF())
+		return;
+
 	PDF_setlinewidth(fPdf, size);
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetForeColor(rgb_color color)
 {
 	//if (IsClipping()) return; // ignore
-	
-	float red, green, blue;
-	
-	red 	= color.red / 255.0;
-	green 	= color.green / 255.0;
-	blue 	= color.blue / 255.0;
 
-	REPORT(kDebug, fPage, "SetForColor color=[%d, %d, %d, %d] -> [%f, %f, %f]", \
-			color.red, color.green, color.blue, color.alpha, \
-			red, green, blue);
-			
+	float red = color.red / 255.0;
+	float green = color.green / 255.0;
+	float blue = color.blue / 255.0;
+
+	REPORT(kDebug, fPage, "SetForColor color=[%d, %d, %d, %d] -> [%f, %f, %f]",
+		color.red, color.green, color.blue, color.alpha, red, green, blue);
+
 	fState->foregroundColor = color;
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetBackColor(rgb_color color)
 {
 	//if (IsClipping()) return; // ignore
 
 	float red, green, blue;
-	
+
 	red 	= color.red / 255.0;
 	green 	= color.green / 255.0;
 	blue 	= color.blue / 255.0;
 
-	REPORT(kDebug, fPage, "SetBackColor color=[%d, %d, %d, %d] -> [%f, %f, %f]", \
-			color.red, color.green, color.blue, color.alpha, \
-			red, green, blue);
-			
+	REPORT(kDebug, fPage, "SetBackColor color=[%d, %d, %d, %d] -> [%f, %f, %f]",
+		color.red, color.green, color.blue, color.alpha, red, green, blue);
+
 	fState->backgroundColor = color;
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetStipplePattern(pattern pat)
 {
@@ -2412,7 +2321,6 @@ PDFWriter::SetStipplePattern(pattern pat)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetScale(float scale)
 {
@@ -2421,17 +2329,15 @@ PDFWriter::SetScale(float scale)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontFamily(char *family)
 {
 	REPORT(kDebug, fPage, "SetFontFamily family=\"%s\"", family);
-	
+
 	fState->beFont.SetFamilyAndStyle(family, NULL);
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontStyle(char *style)
 {
@@ -2441,7 +2347,6 @@ PDFWriter::SetFontStyle(char *style)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontSpacing(int32 spacing)
 {
@@ -2452,17 +2357,15 @@ PDFWriter::SetFontSpacing(int32 spacing)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontSize(float size)
 {
 	REPORT(kDebug, fPage, "SetFontSize size=%f", size);
-	
+
 	fState->beFont.SetSize(size);
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontRotate(float rotation)
 {
@@ -2471,7 +2374,6 @@ PDFWriter::SetFontRotate(float rotation)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontEncoding(int32 encoding)
 {
@@ -2480,7 +2382,6 @@ PDFWriter::SetFontEncoding(int32 encoding)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontFlags(int32 flags)
 {
@@ -2489,7 +2390,6 @@ PDFWriter::SetFontFlags(int32 flags)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontShear(float shear)
 {
@@ -2498,7 +2398,6 @@ PDFWriter::SetFontShear(float shear)
 }
 
 
-// --------------------------------------------------
 void
 PDFWriter::SetFontFace(int32 flags)
 {
@@ -2506,23 +2405,20 @@ PDFWriter::SetFontFace(int32 flags)
 //	fState->beFont.SetFace(flags);
 }
 
-#ifdef CODEWARRIOR
-	#pragma mark [Redirectors to instance callbacks/handlers]
-#endif
+
+//	#pragma mark Redirectors to instance callbacks/handlers
 
 
-// --------------------------------------------------
-size_t	
+size_t
 _WriteData(PDF *pdf, void *data, size_t size)
-{ 
-	return ((PDFWriter *) PDF_get_opaque(pdf))->WriteData(data, size); 
+{
+	return ((PDFWriter *)PDF_get_opaque(pdf))->WriteData(data, size);
 }
 
 
-// --------------------------------------------------
 void
 _ErrorHandler(PDF *pdf, int type, const char *msg)
 {
-	return ((PDFWriter *) PDF_get_opaque(pdf))->ErrorHandler(type, msg);
+	return ((PDFWriter *)PDF_get_opaque(pdf))->ErrorHandler(type, msg);
 }
 

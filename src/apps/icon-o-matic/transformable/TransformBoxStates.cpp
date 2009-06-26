@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,14 +19,16 @@
 #include "support.h"
 
 #include "TransformBox.h"
-//#include "Strings.h"
+
 
 // constructor
 DragState::DragState(TransformBox* parent)
-	: fOrigin(0.0, 0.0),
-	  fParent(parent)
+	:
+	fOrigin(0.0, 0.0),
+	fParent(parent)
 {
 }
+
 
 // SetOrigin
 void
@@ -35,6 +37,7 @@ DragState::SetOrigin(BPoint origin)
 	fOrigin = origin;
 }
 
+
 // ActionName
 const char*
 DragState::ActionName() const
@@ -42,12 +45,14 @@ DragState::ActionName() const
 	return "Transformation";
 }
 
+
 // ActionNameIndex
 uint32
 DragState::ActionNameIndex() const
 {
 	return TRANSFORMATION;
 }
+
 
 // _SetViewCursor
 void
@@ -57,14 +62,18 @@ DragState::_SetViewCursor(BView* view, const uchar* cursorData) const
 	view->SetViewCursor(&cursor);
 }
 
+
 // #pragma mark - DragCornerState
+
 
 // constructor
 DragCornerState::DragCornerState(TransformBox* parent, uint32 corner)
-	: DragState(parent),
-	  fCorner(corner)
+	:
+	DragState(parent),
+	fCorner(corner)
 {
 }
+
 
 // SetOrigin
 void
@@ -78,9 +87,10 @@ DragCornerState::SetOrigin(BPoint origin)
 	// copy the matrix at the start of the drag procedure
 	fMatrix.reset();
 	fMatrix.multiply(agg::trans_affine_scaling(fOldXScale, fOldYScale));
-	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation() * PI / 180.0));
+	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation()
+		* M_PI / 180.0));
 	fMatrix.multiply(agg::trans_affine_translation(fParent->Translation().x,
-												   fParent->Translation().y));
+		fParent->Translation().y));
 
 	double x = origin.x;
 	double y = origin.y;
@@ -125,6 +135,8 @@ DragCornerState::SetOrigin(BPoint origin)
 	}
 	DragState::SetOrigin(origin);
 }
+
+
 // DragTo
 void
 DragCornerState::DragTo(BPoint current, uint32 modifiers)
@@ -164,10 +176,10 @@ DragCornerState::DragTo(BPoint current, uint32 modifiers)
 	translation.x = x;
 	translation.y = y;
 
-	fParent->SetTranslationAndScale(translation,
-									xScale * fOldXScale,
-									yScale * fOldYScale);
+	fParent->SetTranslationAndScale(translation, xScale * fOldXScale,
+		yScale * fOldYScale);
 }
+
 
 // UpdateViewCursor
 void
@@ -180,90 +192,97 @@ DragCornerState::UpdateViewCursor(BView* view, BPoint current) const
 		switch (fCorner) {
 			case LEFT_TOP_CORNER:
 			case RIGHT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftTopRightBottomCursor
-											   : kLeftBottomRightTopCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftBottomRightTopCursor
-											   : kLeftTopRightBottomCursor);
+				if (flipX) {
+					_SetViewCursor(view, flipY
+						? kLeftTopRightBottomCursor : kLeftBottomRightTopCursor);
+				} else {
+					_SetViewCursor(view, flipY
+						? kLeftBottomRightTopCursor : kLeftTopRightBottomCursor);
+				}
 				break;
 			case RIGHT_TOP_CORNER:
 			case LEFT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftBottomRightTopCursor
-											   : kLeftTopRightBottomCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftTopRightBottomCursor
-											   : kLeftBottomRightTopCursor);
+				if (flipX) {
+					_SetViewCursor(view, flipY
+						? kLeftBottomRightTopCursor : kLeftTopRightBottomCursor);
+				} else {
+					_SetViewCursor(view, flipY
+						? kLeftTopRightBottomCursor : kLeftBottomRightTopCursor);
+				}
 				break;
 		}
 	} else if (rotation < 90.0) {
 		switch (fCorner) {
 			case LEFT_TOP_CORNER:
 			case RIGHT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftRightCursor
-											   : kUpDownCursor);
-				else
-					_SetViewCursor(view, flipY ? kUpDownCursor
-											   : kLeftRightCursor);
+				if (flipX) {
+					_SetViewCursor(view,
+						flipY ? kLeftRightCursor : kUpDownCursor);
+				} else {
+					_SetViewCursor(view,
+						flipY ? kUpDownCursor : kLeftRightCursor);
+				}
 				break;
 			case RIGHT_TOP_CORNER:
 			case LEFT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kUpDownCursor
-											   : kLeftRightCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftRightCursor
-											   : kUpDownCursor);
+				if (flipX) {
+					_SetViewCursor(view,
+						flipY ? kUpDownCursor : kLeftRightCursor);
+				} else {
+					_SetViewCursor(view,
+						flipY ? kLeftRightCursor : kUpDownCursor);
+				}
 				break;
 		}
 	} else if (rotation < 135.0) {
 		switch (fCorner) {
 			case LEFT_TOP_CORNER:
 			case RIGHT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftBottomRightTopCursor
-											   : kLeftTopRightBottomCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftTopRightBottomCursor
-											   : kLeftBottomRightTopCursor);
-				break;
+				if (flipX) {
+					_SetViewCursor(view, flipY
+						? kLeftBottomRightTopCursor : kLeftTopRightBottomCursor);
+				} else {
+					_SetViewCursor(view, flipY
+						? kLeftTopRightBottomCursor : kLeftBottomRightTopCursor);
+				}
 				break;
 			case RIGHT_TOP_CORNER:
 			case LEFT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftTopRightBottomCursor
-											   : kLeftBottomRightTopCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftBottomRightTopCursor
-											   : kLeftTopRightBottomCursor);
-				break;
+				if (flipX) {
+					_SetViewCursor(view, flipY
+						? kLeftTopRightBottomCursor : kLeftBottomRightTopCursor);
+				} else {
+					_SetViewCursor(view, flipY
+						? kLeftBottomRightTopCursor : kLeftTopRightBottomCursor);
+				}
 				break;
 		}
 	} else {
 		switch (fCorner) {
 			case LEFT_TOP_CORNER:
 			case RIGHT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kUpDownCursor
-											   : kLeftRightCursor);
-				else
-					_SetViewCursor(view, flipY ? kLeftRightCursor
-											   : kUpDownCursor);
+				if (flipX) {
+					_SetViewCursor(view,
+						flipY ? kUpDownCursor : kLeftRightCursor);
+				} else {
+					_SetViewCursor(view,
+						flipY ? kLeftRightCursor : kUpDownCursor);
+				}
 				break;
 			case RIGHT_TOP_CORNER:
 			case LEFT_BOTTOM_CORNER:
-				if (flipX)
-					_SetViewCursor(view, flipY ? kLeftRightCursor
-											   : kUpDownCursor);
-				else
-					_SetViewCursor(view, flipY ? kUpDownCursor
-											   : kLeftRightCursor);
+				if (flipX) {
+					_SetViewCursor(view,
+						flipY ? kLeftRightCursor : kUpDownCursor);
+				} else {
+					_SetViewCursor(view,
+						flipY ? kUpDownCursor : kLeftRightCursor);
+				}
 				break;
 		}
 	}
 }
+
 
 // ActionName
 const char*
@@ -271,6 +290,7 @@ DragCornerState::ActionName() const
 {
 	return "Scale";
 }
+
 
 // ActionNameIndex
 uint32
@@ -282,11 +302,14 @@ DragCornerState::ActionNameIndex() const
 
 // #pragma mark - DragSideState
 
+
 DragSideState::DragSideState(TransformBox* parent, uint32 side)
-	: DragState(parent),
-	  fSide(side)
+	:
+	DragState(parent),
+	fSide(side)
 {
 }
+
 
 // SetOrigin
 void
@@ -300,9 +323,10 @@ DragSideState::SetOrigin(BPoint origin)
 	// copy the matrix at the start of the drag procedure
 	fMatrix.reset();
 	fMatrix.multiply(agg::trans_affine_scaling(fOldXScale, fOldYScale));
-	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation() * PI / 180.0));
+	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation()
+		* M_PI / 180.0));
 	fMatrix.multiply(agg::trans_affine_translation(fParent->Translation().x,
-												   fParent->Translation().y));
+		fParent->Translation().y));
 
 	double x = origin.x;
 	double y = origin.y;
@@ -335,6 +359,7 @@ DragSideState::SetOrigin(BPoint origin)
 	}
 	DragState::SetOrigin(origin);
 }
+
 
 // DragTo
 void
@@ -369,10 +394,10 @@ DragSideState::DragTo(BPoint current, uint32 modifiers)
 	translation.x = x;
 	translation.y = y;
 
-	fParent->SetTranslationAndScale(translation,
-									xScale * fOldXScale,
-									yScale * fOldYScale);
+	fParent->SetTranslationAndScale(translation, xScale * fOldXScale,
+		yScale * fOldYScale);
 }
+
 
 // UpdateViewCursor
 void
@@ -426,12 +451,14 @@ DragSideState::UpdateViewCursor(BView* view, BPoint current) const
 	}
 }
 
+
 // ActionName
 const char*
 DragSideState::ActionName() const
 {
 	return "Scale";
 }
+
 
 // ActionNameIndex
 uint32
@@ -443,6 +470,7 @@ DragSideState::ActionNameIndex() const
 
 // #pragma mark - DragBoxState
 
+
 // SetOrigin
 void
 DragBoxState::SetOrigin(BPoint origin)
@@ -450,6 +478,7 @@ DragBoxState::SetOrigin(BPoint origin)
 	fOldTranslation = fParent->Translation();
 	DragState::SetOrigin(origin);
 }
+
 
 // DragTo
 void
@@ -466,6 +495,7 @@ DragBoxState::DragTo(BPoint current, uint32 modifiers)
 	fParent->TranslateBy(newTranslation - fParent->Translation());
 }
 
+
 // UpdateViewCursor
 void
 DragBoxState::UpdateViewCursor(BView* view, BPoint current) const
@@ -473,12 +503,14 @@ DragBoxState::UpdateViewCursor(BView* view, BPoint current) const
 	_SetViewCursor(view, kMoveCursor);
 }
 
+
 // ActionName
 const char*
 DragBoxState::ActionName() const
 {
 	return "Move";
 }
+
 
 // ActionNameIndex
 uint32
@@ -490,12 +522,15 @@ DragBoxState::ActionNameIndex() const
 
 // #pragma mark - RotateBoxState
 
+
 // constructor
 RotateBoxState::RotateBoxState(TransformBox* parent)
-	: DragState(parent),
-	  fOldAngle(0.0)
+	:
+	DragState(parent),
+	fOldAngle(0.0)
 {
 }
+
 
 // SetOrigin
 void
@@ -504,6 +539,7 @@ RotateBoxState::SetOrigin(BPoint origin)
 	DragState::SetOrigin(origin);
 	fOldAngle = fParent->LocalRotation();
 }
+
 
 // DragTo
 void
@@ -524,6 +560,7 @@ RotateBoxState::DragTo(BPoint current, uint32 modifiers)
 	fParent->RotateBy(fParent->Center(), newAngle - fParent->LocalRotation());
 }
 
+
 // UpdateViewCursor
 void
 RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
@@ -531,8 +568,8 @@ RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 	BPoint origin(fParent->Center());
 	fParent->TransformToCanvas(origin);
 	fParent->TransformToCanvas(current);
-	BPoint from = origin + BPoint(sinf(22.5 * 180.0 / PI) * 50.0,
-								  -cosf(22.5 * 180.0 / PI) * 50.0);
+	BPoint from = origin + BPoint(sinf(22.5 * 180.0 / M_PI) * 50.0,
+		-cosf(22.5 * 180.0 / M_PI) * 50.0);
 
 	float rotation = calc_angle(origin, from, current) + 180.0;
 
@@ -555,12 +592,14 @@ RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 	}
 }
 
+
 // ActionName
 const char*
 RotateBoxState::ActionName() const
 {
 	return "Rotate";
 }
+
 
 // ActionNameIndex
 uint32
@@ -570,8 +609,8 @@ RotateBoxState::ActionNameIndex() const
 }
 
 
-
 // #pragma mark - OffsetCenterState
+
 
 // SetOrigin
 void
@@ -591,12 +630,14 @@ OffsetCenterState::DragTo(BPoint current, uint32 modifiers)
 	fOrigin = current;
 }
 
+
 // UpdateViewCursor
 void
 OffsetCenterState::UpdateViewCursor(BView* view, BPoint current) const
 {
 	_SetViewCursor(view, kPathMoveCursor);
 }
+
 
 // ActionName
 const char*
@@ -605,11 +646,10 @@ OffsetCenterState::ActionName() const
 	return "Move Pivot";
 }
 
+
 // ActionNameIndex
 uint32
 OffsetCenterState::ActionNameIndex() const
 {
 	return MOVE_PIVOT;
 }
-
-

@@ -76,9 +76,9 @@ AGGTextRenderer::SetFont(const ServerFont& font)
 	// construct an embedded transformation (rotate & shear)
 	fEmbeddedTransformation.Reset();
 	fEmbeddedTransformation.ShearBy(B_ORIGIN,
-		(90.0 - font.Shear()) * PI / 180.0, 0.0);
+		(90.0 - font.Shear()) * M_PI / 180.0, 0.0);
 	fEmbeddedTransformation.RotateBy(B_ORIGIN,
-		-font.Rotation() * PI / 180.0);
+		-font.Rotation() * M_PI / 180.0);
 
 	fContour.width(font.FalseBoldWidth() * 2.0);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -185,7 +185,7 @@ Transformable::Transform(BPoint* point) const
 		double y = point->y;
 
 		transform(&x, &y);
-	
+
 		point->x = x;
 		point->y = y;
 	}
@@ -216,7 +216,7 @@ Transformable::InverseTransform(BPoint* point) const
 		double y = point->y;
 
 		inverse_transform(&x, &y);
-	
+
 		point->x = x;
 		point->y = y;
 	}
@@ -235,13 +235,13 @@ inline float
 min4(float a, float b, float c, float d)
 {
 	return min_c(a, min_c(b, min_c(c, d)));
-} 
+}
 
 inline float
 max4(float a, float b, float c, float d)
 {
 	return max_c(a, max_c(b, max_c(c, d)));
-} 
+}
 
 // TransformBounds
 BRect
@@ -252,12 +252,12 @@ Transformable::TransformBounds(BRect bounds) const
 		BPoint rt(bounds.right, bounds.top);
 		BPoint lb(bounds.left, bounds.bottom);
 		BPoint rb(bounds.right, bounds.bottom);
-	
+
 		Transform(&lt);
 		Transform(&rt);
 		Transform(&lb);
 		Transform(&rb);
-	
+
 		return BRect(floorf(min4(lt.x, rt.x, lb.x, rb.x)),
 					 floorf(min4(lt.y, rt.y, lb.y, rb.y)),
 					 ceilf(max4(lt.x, rt.x, lb.x, rb.x)),
@@ -282,7 +282,7 @@ Transformable::RotateBy(BPoint origin, double degrees)
 {
 	if (degrees != 0.0) {
 		multiply(agg::trans_affine_translation(-origin.x, -origin.y));
-		multiply(agg::trans_affine_rotation(degrees * (PI / 180.0)));
+		multiply(agg::trans_affine_rotation(degrees * (M_PI / 180.0)));
 		multiply(agg::trans_affine_translation(origin.x, origin.y));
 		TransformationChanged();
 	}
