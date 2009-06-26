@@ -78,6 +78,11 @@ CreateParamsPanel::CreateParamsPanel(BWindow* window, off_t offset, off_t size)
 	fReturnValue(GO_CANCELED)
 {
 	AddCommonFilter(fEscapeFilter);
+
+	// Scale offset, and size from bytes to megabytes (2^20)
+	// so that we do not run over a signed int32.
+	offset /= kMegaByte;
+	size /= kMegaByte;
 	_CreateViewControls(offset, size);
 }
 
@@ -156,7 +161,8 @@ CreateParamsPanel::Go(off_t& offset, off_t& size, BString& type)
 				_type = "BFS Filesystem";
 			type << _type;
 		}
-		size = fSizeSlider->Value();
+		// Return the value back as bytes.
+		size = (off_t)fSizeSlider->Value() * kMegaByte;
 	}
 
 	int32 value = fReturnValue;

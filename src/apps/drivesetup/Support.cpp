@@ -6,6 +6,7 @@
  *		Erik Jaesler <ejakowatz@users.sourceforge.net>
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Bryce Groff <bgroff@hawaii.edu>
  */
 
 #include "Support.h"
@@ -14,9 +15,6 @@
 
 #include <Partition.h>
 #include <String.h>
-
-
-uint32 kMegaByte = 1048576;
 
 
 const char*
@@ -124,8 +122,10 @@ SizeSlider::SizeSlider(const char* name, const char* label,
 {
 	SetBarColor((rgb_color){ 0, 80, 255, 255 });
 	BString offset, size;
-	offset << fOffset / kMegaByte; offset << " MB";
-	size << fSize / kMegaByte; size << " MB";
+	offset << fOffset;
+	offset << " MB";
+	size << fSize;
+	size << " MB";
 	SetLimitLabels(offset.String(), size.String());
 }
 
@@ -139,7 +139,7 @@ const char*
 SizeSlider::UpdateText() const
 {
 	fStatusLabel.Truncate(0);
-	fStatusLabel << (Value() / kMegaByte);
+	fStatusLabel << Value();
 	fStatusLabel << " MB";
 
 	return fStatusLabel.String();

@@ -27,6 +27,9 @@ enum {
 	GO_SUCCESS
 };
 
+
+static const uint32 kMegaByte = 1048576;
+
 class SpaceIDMap : public HashMap<HashString, partition_id> {
 public:
 								SpaceIDMap();
