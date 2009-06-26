@@ -8,7 +8,6 @@
 #include <OS.h>
 
 #include <Referenceable.h>
-#include <util/DoublyLinkedList.h>
 
 #include "ArchitectureTypes.h"
 
@@ -21,24 +20,12 @@ enum stack_frame_type {
 };
 
 
-enum stack_frame_source_state {
-	STACK_SOURCE_NOT_LOADED,
-	STACK_SOURCE_LOADING,
-	STACK_SOURCE_LOADED,
-	STACK_SOURCE_UNAVAILABLE
-};
-
-
 class CpuState;
 class Image;
 class FunctionDebugInfo;
-class SourceCode;
 
 
 class StackFrame : public Referenceable {
-public:
-	class Listener;
-
 public:
 								StackFrame(stack_frame_type type,
 									CpuState* cpuState,
@@ -62,19 +49,6 @@ public:
 			FunctionDebugInfo*	Function() const		{ return fFunction; }
 			void				SetFunction(FunctionDebugInfo* function);
 
-			// mutable attributes follow (locking required)
-			SourceCode*			GetSourceCode() const	{ return fSourceCode; }
-			stack_frame_source_state SourceCodeState() const
-										{ return fSourceCodeState; }
-			void				SetSourceCode(SourceCode* source,
-									stack_frame_source_state state);
-
-			void				AddListener(Listener* listener);
-			void				RemoveListener(Listener* listener);
-
-private:
-			typedef DoublyLinkedList<Listener> ListenerList;
-
 private:
 			stack_frame_type	fType;
 			CpuState*			fCpuState;
@@ -83,19 +57,6 @@ private:
 			target_addr_t		fReturnAddress;
 			Image*				fImage;
 			FunctionDebugInfo*	fFunction;
-			// mutable
-			SourceCode*			fSourceCode;
-			stack_frame_source_state fSourceCodeState;
-			ListenerList		fListeners;
-};
-
-
-class StackFrame::Listener : public DoublyLinkedListLinkImpl<Listener> {
-public:
-	virtual						~Listener();
-
-	virtual	void				StackFrameSourceCodeChanged(StackFrame* frame);
-									// called with lock held
 };
 
 

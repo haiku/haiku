@@ -9,7 +9,7 @@
 #include <Window.h>
 
 #include "SourceView.h"
-#include "StackFrame.h"
+#include "FunctionDebugInfo.h"
 #include "StackTraceView.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
@@ -18,14 +18,16 @@
 
 class BButton;
 class BTabView;
+class FunctionDebugInfo;
 class ImageListView;
 class RegisterView;
 class SourceCode;
+class StackFrame;
 
 
 class TeamWindow : public BWindow, private ThreadListView::Listener,
 	StackTraceView::Listener, SourceView::Listener, Team::Listener,
-	private TeamDebugModel::Listener, StackFrame::Listener {
+	private TeamDebugModel::Listener, FunctionDebugInfo::Listener {
 public:
 	class Listener;
 
@@ -66,14 +68,16 @@ private:
 									const TeamDebugModel::BreakpointEvent&
 										event);
 
-	// StackFrame::Listener
-	virtual	void				StackFrameSourceCodeChanged(StackFrame* frame);
+	// FunctionDebugInfo::Listener
+	virtual	void				FunctionSourceCodeChanged(
+									FunctionDebugInfo* function);
 
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
 			void				_SetActiveStackTrace(StackTrace* stackTrace);
 			void				_SetActiveStackFrame(StackFrame* frame);
+			void				_SetActiveFunction(FunctionDebugInfo* function);
 			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
@@ -90,6 +94,7 @@ private:
 			::Thread*			fActiveThread;
 			StackTrace*			fActiveStackTrace;
 			StackFrame*			fActiveStackFrame;
+			FunctionDebugInfo*	fActiveFunction;
 			SourceCode*			fActiveSourceCode;
 			Listener*			fListener;
 			BTabView*			fTabView;
@@ -110,8 +115,8 @@ class TeamWindow::Listener {
 public:
 	virtual						~Listener();
 
-	virtual	void				StackFrameSourceCodeRequested(
-									TeamWindow* window, StackFrame* frame) = 0;
+	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
+									FunctionDebugInfo* function) = 0;
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action) = 0;
 	virtual	void				SetBreakpointRequested(target_addr_t address,

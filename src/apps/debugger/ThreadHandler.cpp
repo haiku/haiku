@@ -362,9 +362,13 @@ ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 {
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
-	// If there's source code attached to the stack frame, we can just get the
+	FunctionDebugInfo* function = frame->Function();
+	if (function == NULL)
+		return NULL;
+
+	// If there's source code attached to the function, we can just get the
 	// statement.
-	SourceCode* sourceCode = frame->GetSourceCode();
+	SourceCode* sourceCode = function->GetSourceCode();
 	if (sourceCode != NULL) {
 		Statement* statement = sourceCode->StatementAtAddress(
 			frame->InstructionPointer());
@@ -375,12 +379,7 @@ ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 
 	locker.Unlock();
 
-	// We need to get the statement from the debug info of the function (if
-	// any).
-	FunctionDebugInfo* function = frame->Function();
-	if (function == NULL)
-		return NULL;
-
+	// We need to get the statement from the debug info of the function.
 	Statement* statement;
 	if (function->GetDebugInfo()->GetStatement(function,
 			frame->InstructionPointer(), statement) != B_OK) {
@@ -456,8 +455,10 @@ ThreadHandler::_ClearContinuationState()
 {
 	_UninstallTemporaryBreakpoint();
 
-	if (fStepStatement != NULL)
+	if (fStepStatement != NULL) {
 		fStepStatement->RemoveReference();
+		fStepStatement = NULL;
+	}
 
 	fStepMode = STEP_NONE;
 	fSingleStepping = false;

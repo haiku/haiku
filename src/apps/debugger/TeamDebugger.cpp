@@ -325,24 +325,24 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 
 void
-TeamDebugger::StackFrameSourceCodeRequested(TeamWindow* window,
-	StackFrame* frame)
+TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
+	FunctionDebugInfo* function)
 {
 	// mark loading
 	AutoLocker< ::Team> locker(fTeam);
-	if (frame->SourceCodeState() != STACK_SOURCE_NOT_LOADED)
+	if (function->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
 		return;
-	frame->SetSourceCode(NULL, STACK_SOURCE_LOADING);
+	function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 	locker.Unlock();
 
 	// schedule the job
 	if (fWorker->ScheduleJob(
 			new(std::nothrow) LoadSourceCodeJob(fDebuggerInterface,
-				fDebuggerInterface->GetArchitecture(), fTeam, frame),
+				fDebuggerInterface->GetArchitecture(), fTeam, function),
 			this) != B_OK) {
 		// scheduling failed -- mark unavailable
 		locker.Lock();
-		frame->SetSourceCode(NULL, STACK_SOURCE_UNAVAILABLE);
+		function->SetSourceCode(NULL, FUNCTION_SOURCE_UNAVAILABLE);
 		locker.Unlock();
 	}
 }

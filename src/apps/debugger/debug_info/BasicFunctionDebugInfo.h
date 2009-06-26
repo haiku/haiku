@@ -26,6 +26,10 @@ public:
 	virtual	const char*			Name() const;
 	virtual	const char*			PrettyName() const;
 
+	virtual	const char*			SourceFileName() const;
+	virtual	SourceLocation		SourceStartLocation() const;
+	virtual	SourceLocation		SourceEndLocation() const;
+
 private:
 			DebugInfo*			fDebugInfo;
 			target_addr_t		fAddress;

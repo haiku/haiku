@@ -284,27 +284,27 @@ LoadImageDebugInfoJob::Do()
 
 LoadSourceCodeJob::LoadSourceCodeJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	Team* team, StackFrame* stackFrame)
+	Team* team, FunctionDebugInfo* function)
 	:
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
 	fTeam(team),
-	fStackFrame(stackFrame)
+	fFunction(function)
 {
-	fStackFrame->AddReference();
+	fFunction->AddReference();
 }
 
 
 LoadSourceCodeJob::~LoadSourceCodeJob()
 {
-	fStackFrame->RemoveReference();
+	fFunction->RemoveReference();
 }
 
 
 JobKey
 LoadSourceCodeJob::Key() const
 {
-	return JobKey(fStackFrame, JOB_TYPE_LOAD_SOURCE_CODE);
+	return JobKey(fFunction, JOB_TYPE_LOAD_SOURCE_CODE);
 }
 
 
@@ -313,18 +313,16 @@ LoadSourceCodeJob::Do()
 {
 	// load the source code, if we can
 	SourceCode* sourceCode = NULL;
-	status_t error = B_BAD_VALUE;
-	FunctionDebugInfo* function = fStackFrame->Function();
-	if (function != NULL)
-		error = function->GetDebugInfo()->LoadSourceCode(function, sourceCode);
+	status_t error = fFunction->GetDebugInfo()->LoadSourceCode(fFunction,
+		sourceCode);
 
 	// set the result
 	AutoLocker<Team> locker(fTeam);
 	if (error == B_OK) {
-		fStackFrame->SetSourceCode(sourceCode, STACK_SOURCE_LOADED);
+		fFunction->SetSourceCode(sourceCode, FUNCTION_SOURCE_LOADED);
 		sourceCode->RemoveReference();
 	} else
-		fStackFrame->SetSourceCode(NULL, STACK_SOURCE_UNAVAILABLE);
+		fFunction->SetSourceCode(NULL, FUNCTION_SOURCE_UNAVAILABLE);
 
 	return error;
 }

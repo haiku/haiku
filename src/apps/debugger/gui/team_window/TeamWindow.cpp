@@ -37,6 +37,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fActiveThread(NULL),
 	fActiveStackTrace(NULL),
 	fActiveStackFrame(NULL),
+	fActiveFunction(NULL),
 	fActiveSourceCode(NULL),
 	fListener(listener),
 	fTabView(NULL),
@@ -75,6 +76,7 @@ TeamWindow::~TeamWindow()
 	fDebugModel->RemoveListener(this);
 
 	_SetActiveSourceCode(NULL);
+	_SetActiveFunction(NULL);
 	_SetActiveStackFrame(NULL);
 	_SetActiveStackTrace(NULL);
 	_SetActiveThread(NULL);
@@ -151,7 +153,7 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_STACK_FRAME_SOURCE_CODE_CHANGED:
+		case MSG_FUNCTION_SOURCE_CODE_CHANGED:
 		{
 			_HandleSourceCodeChanged();
 			break;
@@ -236,11 +238,11 @@ TeamWindow::UserBreakpointChanged(const TeamDebugModel::BreakpointEvent& event)
 
 
 void
-TeamWindow::StackFrameSourceCodeChanged(StackFrame* frame)
+TeamWindow::FunctionSourceCodeChanged(FunctionDebugInfo* function)
 {
-printf("TeamWindow::StackFrameSourceCodeChanged(%p): source: %p, state: %d\n",
-frame, frame->GetSourceCode(), frame->SourceCodeState());
-	PostMessage(MSG_STACK_FRAME_SOURCE_CODE_CHANGED);
+printf("TeamWindow::FunctionSourceCodeChanged(%p): source: %p, state: %d\n",
+function, function->GetSourceCode(), function->SourceCodeState());
+	PostMessage(MSG_FUNCTION_SOURCE_CODE_CHANGED);
 }
 
 
@@ -371,41 +373,56 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 	if (frame == fActiveStackFrame)
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
-
-	if (fActiveStackFrame != NULL) {
-		fActiveStackFrame->RemoveListener(this);
+	if (fActiveStackFrame != NULL)
 		fActiveStackFrame->RemoveReference();
-	}
 
 	fActiveStackFrame = frame;
 
-	SourceCode* sourceCode = NULL;
-	Reference<SourceCode> sourceCodeReference;
-	bool setSourceCode = false;
-
 	if (fActiveStackFrame != NULL) {
 		fActiveStackFrame->AddReference();
-		fActiveStackFrame->AddListener(this);
-
-		sourceCode = fActiveStackFrame->GetSourceCode();
-		sourceCodeReference.SetTo(sourceCode);
-		setSourceCode = true;
-
-		// If the source code is not loaded yet, request it.
-		if (fActiveStackFrame->SourceCodeState() == STACK_SOURCE_NOT_LOADED)
-			fListener->StackFrameSourceCodeRequested(this, fActiveStackFrame);
+		_SetActiveFunction(fActiveStackFrame->Function());
 	}
 
 	_UpdateCpuState();
 
-	locker.Unlock();
-
-	if (setSourceCode)
-		_SetActiveSourceCode(sourceCode);
-
 	fStackTraceView->SetStackFrame(fActiveStackFrame);
 	fSourceView->SetStackFrame(fActiveStackFrame);
+}
+
+
+void
+TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
+{
+	if (function == fActiveFunction)
+		return;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	if (fActiveFunction != NULL) {
+		fActiveFunction->RemoveListener(this);
+		fActiveFunction->RemoveReference();
+	}
+
+	fActiveFunction = function;
+
+	SourceCode* sourceCode = NULL;
+	Reference<SourceCode> sourceCodeReference;
+
+	if (fActiveFunction != NULL) {
+		fActiveFunction->AddReference();
+		fActiveFunction->AddListener(this);
+
+		sourceCode = fActiveFunction->GetSourceCode();
+		sourceCodeReference.SetTo(sourceCode);
+
+		// If the source code is not loaded yet, request it.
+		if (fActiveFunction->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED)
+			fListener->FunctionSourceCodeRequested(this, fActiveFunction);
+	}
+
+	locker.Unlock();
+
+	_SetActiveSourceCode(sourceCode);
 }
 
 
@@ -529,14 +546,14 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 void
 TeamWindow::_HandleSourceCodeChanged()
 {
-	// If we don't have an active stack frame anymore, the message is obsolete.
-	if (fActiveStackFrame == NULL)
+	// If we don't have an active function anymore, the message is obsolete.
+	if (fActiveFunction == NULL)
 		return;
 
 	// get a reference to the source code
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
-	SourceCode* sourceCode = fActiveStackFrame->GetSourceCode();
+	SourceCode* sourceCode = fActiveFunction->GetSourceCode();
 	Reference<SourceCode> sourceCodeReference(sourceCode);
 
 	locker.Unlock();

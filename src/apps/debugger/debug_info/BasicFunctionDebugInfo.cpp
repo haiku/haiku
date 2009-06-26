@@ -61,3 +61,24 @@ BasicFunctionDebugInfo::PrettyName() const
 {
 	return fPrettyName.String();
 }
+
+
+const char*
+BasicFunctionDebugInfo::SourceFileName() const
+{
+	return NULL;
+}
+
+
+SourceLocation
+BasicFunctionDebugInfo::SourceStartLocation() const
+{
+	return SourceLocation();
+}
+
+
+SourceLocation
+BasicFunctionDebugInfo::SourceEndLocation() const
+{
+	return SourceLocation();
+}
