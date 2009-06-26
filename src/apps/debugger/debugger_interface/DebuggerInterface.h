@@ -10,7 +10,7 @@
 #include <debug_support.h>
 #include <ObjectList.h>
 
-#include "ArchitectureTypes.h"
+#include "TeamMemory.h"
 
 
 class Architecture;
@@ -21,7 +21,7 @@ class SymbolInfo;
 class ThreadInfo;
 
 
-class DebuggerInterface {
+class DebuggerInterface : public TeamMemory {
 public:
 								DebuggerInterface(team_id teamID);
 	virtual						~DebuggerInterface();
@@ -54,7 +54,8 @@ public:
 									CpuState*& _state);
 										// returns a reference to the caller
 
-	ssize_t						ReadMemory(target_addr_t address, void* buffer,
+	// TeamMemory
+	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
 									size_t size);
 
 private:

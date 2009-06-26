@@ -12,8 +12,7 @@
 
 class ArchitectureX86 : public Architecture {
 public:
-								ArchitectureX86(
-									DebuggerInterface* debuggerInterface);
+								ArchitectureX86(TeamMemory* teamMemory);
 	virtual						~ArchitectureX86();
 
 	virtual	status_t			Init();

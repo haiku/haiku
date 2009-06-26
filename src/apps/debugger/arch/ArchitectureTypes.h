@@ -5,6 +5,8 @@
 #ifndef ARCHITECTURE_TYPES_H
 #define ARCHITECTURE_TYPES_H
 
+#include <SupportDefs.h>
+
 
 typedef uint64 target_addr_t;
 typedef uint64 target_size_t;

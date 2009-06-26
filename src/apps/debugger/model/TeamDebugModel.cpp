@@ -37,11 +37,11 @@ private:
 // #pragma mark - TeamDebugModel
 
 
-TeamDebugModel::TeamDebugModel(Team* team, DebuggerInterface* debuggerInterface,
+TeamDebugModel::TeamDebugModel(Team* team, TeamMemory* teamMemory,
 	Architecture* architecture)
 	:
 	fTeam(team),
-	fDebuggerInterface(debuggerInterface),
+	fTeamMemory(teamMemory),
 	fArchitecture(architecture)
 {
 }

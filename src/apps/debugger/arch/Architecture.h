@@ -13,7 +13,6 @@
 
 
 class CpuState;
-class DebuggerInterface;
 class FunctionDebugInfo;
 class Image;
 class ImageDebugInfoProvider;
@@ -24,12 +23,12 @@ class StackFrame;
 class StackTrace;
 class Statement;
 class Team;
+class TeamMemory;
 
 
 class Architecture : public Referenceable {
 public:
-								Architecture(
-									DebuggerInterface* debuggerInterface);
+								Architecture(TeamMemory* teamMemory);
 	virtual						~Architecture();
 
 	virtual	status_t			Init();
@@ -72,7 +71,7 @@ public:
 										// team is not locked
 
 protected:
-			DebuggerInterface*	fDebuggerInterface;
+			TeamMemory*			fTeamMemory;
 };
 
 

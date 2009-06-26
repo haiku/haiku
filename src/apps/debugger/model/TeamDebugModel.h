@@ -22,7 +22,7 @@ enum {
 
 class Architecture;
 class Breakpoint;
-class DebuggerInterface;
+class TeamMemory;
 
 
 class TeamDebugModel {
@@ -33,7 +33,7 @@ public:
 
 public:
 								TeamDebugModel(Team* team,
-									DebuggerInterface* debuggerInterface,
+									TeamMemory* teamMemory,
 									Architecture* architecture);
 								~TeamDebugModel();
 
@@ -43,8 +43,8 @@ public:
 			void				Unlock()	{ fTeam->Unlock(); }
 
 			Team*				GetTeam() const	{ return fTeam; }
-			DebuggerInterface*	GetDebuggerInterface() const
-									{ return fDebuggerInterface; }
+			TeamMemory*			GetTeamMemory() const
+									{ return fTeamMemory; }
 			Architecture*		GetArchitecture() const
 									{ return fArchitecture; }
 
@@ -79,7 +79,7 @@ private:
 
 private:
 			Team*				fTeam;
-			DebuggerInterface*	fDebuggerInterface;
+			TeamMemory*			fTeamMemory;
 			Architecture*		fArchitecture;
 			BreakpointList		fBreakpoints;
 			ListenerList		fListeners;

@@ -20,9 +20,9 @@
 #include "Team.h"
 
 
-Architecture::Architecture(DebuggerInterface* debuggerInterface)
+Architecture::Architecture(TeamMemory* teamMemory)
 	:
-	fDebuggerInterface(debuggerInterface)
+	fTeamMemory(teamMemory)
 {
 }
 

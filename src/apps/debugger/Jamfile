@@ -71,6 +71,7 @@ Application Debugger :
 	SymbolInfo.cpp
 	Team.cpp
 	TeamDebugModel.cpp
+	TeamMemory.cpp
 	Thread.cpp
 	ThreadInfo.cpp
 

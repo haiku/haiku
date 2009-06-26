@@ -12,19 +12,19 @@
 #include <AutoDeleter.h>
 
 #include "CpuStateX86.h"
-#include "DebuggerInterface.h"
 #include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
 #include "InstructionInfo.h"
 #include "StackFrame.h"
 #include "Statement.h"
+#include "TeamMemory.h"
 
 #include "disasm/DisassemblerX86.h"
 
 
-ArchitectureX86::ArchitectureX86(DebuggerInterface* debuggerInterface)
+ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
-	Architecture(debuggerInterface)
+	Architecture(teamMemory)
 {
 }
 
@@ -138,7 +138,7 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		// stack.
 		uint32 esp = cpuState->IntRegisterValue(X86_REGISTER_ESP);
 		uint32 address;
-		if (fDebuggerInterface->ReadMemory(esp, &address, 4) == 4) {
+		if (fTeamMemory->ReadMemory(esp, &address, 4) == 4) {
 			returnAddress = address;
 			previousFramePointer = framePointer;
 			framePointer = 0;
@@ -171,7 +171,7 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 				// The epilogue is a single "pop %ebp", so we check whether the
 				// current instruction is already a "ret".
 				uint8 code[1];
-				if (fDebuggerInterface->ReadMemory(eip, &code, 1) == 1
+				if (fTeamMemory->ReadMemory(eip, &code, 1) == 1
 					&& code[0] == 0xc3) {
 					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
 				}
@@ -179,7 +179,7 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 
 			if (stack != 0) {
 				uint32 address;
-				if (fDebuggerInterface->ReadMemory(stack, &address, 4) == 4) {
+				if (fTeamMemory->ReadMemory(stack, &address, 4) == 4) {
 					returnAddress = address;
 					previousFramePointer = framePointer;
 					framePointer = 0;
@@ -201,8 +201,7 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 	if (readStandardFrame) {
 		uint32 frameData[2];
 		if (framePointer != 0
-			&& fDebuggerInterface->ReadMemory(framePointer, frameData, 8)
-				== 8) {
+			&& fTeamMemory->ReadMemory(framePointer, frameData, 8) == 8) {
 			previousFramePointer = frameData[0];
 			returnAddress = frameData[1];
 		}
@@ -252,7 +251,7 @@ ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
 	MemoryDeleter bufferDeleter(buffer);
 
 	// read the code
-	ssize_t bytesRead = fDebuggerInterface->ReadMemory(functionAddress, buffer,
+	ssize_t bytesRead = fTeamMemory->ReadMemory(functionAddress, buffer,
 		bufferSize);
 	if (bytesRead != (ssize_t)bufferSize)
 		return;
@@ -339,7 +338,7 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	// read the code
 	uint8 buffer[16];
 		// TODO: What's the maximum instruction size?
-	ssize_t bytesRead = fDebuggerInterface->ReadMemory(address, buffer,
+	ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer,
 		sizeof(buffer));
 	if (bytesRead < 0)
 		return bytesRead;
@@ -410,7 +409,7 @@ ArchitectureX86::_HasFunctionPrologue(FunctionDebugInfo* function) const
 		return false;
 
 	uint8 buffer[3];
-	if (fDebuggerInterface->ReadMemory(function->Address(), buffer, 3) != 3)
+	if (fTeamMemory->ReadMemory(function->Address(), buffer, 3) != 3)
 		return false;
 
 	return buffer[0] == 0x55 && buffer[1] == 0x89 && buffer[2] == 0xe5;
