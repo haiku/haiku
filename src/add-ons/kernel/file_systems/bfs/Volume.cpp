@@ -344,7 +344,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
-	if (opener.GetSize(&diskSize) < B_OK)
+	if (opener.GetSize(&diskSize) != B_OK)
 		RETURN_ERROR(B_ERROR);
 	if (diskSize < (NumBlocks() << BlockShift()))
 		RETURN_ERROR(B_BAD_VALUE);
@@ -368,7 +368,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// replaying the log is the first thing we will do on this disk
 	status = fJournal->ReplayLog();
-	if (status < B_OK) {
+	if (status != B_OK) {
 		FATAL(("Replaying log failed, data may be corrupted, volume "
 			"read-only.\n"));
 		fFlags |= VOLUME_READ_ONLY;
@@ -379,7 +379,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	}
 
 	status = fBlockAllocator.Initialize();
-	if (status < B_OK) {
+	if (status != B_OK) {
 		FATAL(("could not initialize block bitmap allocator!\n"));
 		return status;
 	}

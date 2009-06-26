@@ -559,8 +559,13 @@ Journal::ReplayLog()
 
 	INFORM(("Replay log, disk was not correctly unmounted...\n"));
 
-	if (fVolume->SuperBlock().flags != SUPER_BLOCK_DISK_DIRTY)
-		INFORM(("log_start and log_end differ, but disk is marked clean - trying to replay log...\n"));
+	if (fVolume->SuperBlock().flags != SUPER_BLOCK_DISK_DIRTY) {
+		INFORM(("log_start and log_end differ, but disk is marked clean - "
+			"trying to replay log...\n"));
+	}
+
+	if (fVolume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	int32 start = fVolume->LogStart();
 	int32 lastStart = -1;
@@ -576,8 +581,9 @@ Journal::ReplayLog()
 		lastStart = start;
 
 		status_t status = _ReplayRunArray(&start);
-		if (status < B_OK) {
-			FATAL(("replaying log entry from %d failed: %s\n", (int)start, strerror(status)));
+		if (status != B_OK) {
+			FATAL(("replaying log entry from %d failed: %s\n", (int)start,
+				strerror(status)));
 			return B_ERROR;
 		}
 		start = start % fLogSize;
