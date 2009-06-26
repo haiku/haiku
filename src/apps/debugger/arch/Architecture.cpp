@@ -74,10 +74,12 @@ Architecture::CreateStackTrace(Team* team,
 		Reference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo, true);
 
 		// get the function
+		teamLocker.Lock();
 		FunctionDebugInfo* function = NULL;
 		if (imageDebugInfo != NULL)
-			function = imageDebugInfo->FindFunction(instructionPointer);
-		Reference<FunctionDebugInfo> functionReference(function, true);
+			function = imageDebugInfo->FunctionAtAddress(instructionPointer);
+		Reference<FunctionDebugInfo> functionReference(function);
+		teamLocker.Unlock();
 
 		// If the last frame had been created by the architecture, we update the
 		// CPU state.

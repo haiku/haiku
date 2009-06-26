@@ -7,8 +7,6 @@
 
 #include <String.h>
 
-#include <ObjectList.h>
-
 #include "DebugInfo.h"
 #include "ImageInfo.h"
 
@@ -28,7 +26,8 @@ public:
 
 			status_t			Init();
 
-	virtual	FunctionDebugInfo*	FindFunction(target_addr_t address);
+	virtual	status_t			GetFunctions(
+									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionDebugInfo* function,
 									CpuState* cpuState,
@@ -41,23 +40,13 @@ public:
 									Statement*& _statement);
 
 private:
-			typedef BObjectList<SymbolInfo> SymbolList;
-
-			struct FindByAddressPredicate;
-
-private:
-			SymbolInfo*			_FindSymbol(target_addr_t address);
 	static	int					_CompareSymbols(const SymbolInfo* a,
 									const SymbolInfo* b);
-	static	int					_CompareAddressSymbol(
-									const target_addr_t* address,
-									const SymbolInfo* info);
 
 private:
 			ImageInfo			fImageInfo;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
-			SymbolList			fSymbols;
 };
 
 

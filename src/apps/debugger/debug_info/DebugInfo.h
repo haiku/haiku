@@ -5,6 +5,7 @@
 #ifndef DEBUG_INFO_H
 #define DEBUG_INFO_H
 
+#include <ObjectList.h>
 #include <Referenceable.h>
 
 #include "ArchitectureTypes.h"
@@ -24,8 +25,10 @@ class DebugInfo : public Referenceable {
 public:
 	virtual						~DebugInfo();
 
-	virtual	FunctionDebugInfo*	FindFunction(target_addr_t address) = 0;
-									// returns a reference
+	virtual	status_t			GetFunctions(
+									BObjectList<FunctionDebugInfo>& functions)
+										= 0;
+									// returns references
 
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionDebugInfo* function,

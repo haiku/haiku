@@ -29,17 +29,27 @@ public:
 
 			status_t			Init();
 
-			FunctionDebugInfo*	FindFunction(target_addr_t address);
-									// returns a reference
+			int32				CountFunctions() const;
+			FunctionDebugInfo*	FunctionAt(int32 index) const;
+			FunctionDebugInfo*	FunctionAtAddress(target_addr_t address) const;
 
 private:
 			typedef BObjectList<DebugInfo> DebugInfoList;
+			typedef BObjectList<FunctionDebugInfo> FunctionList;
+
+private:
+	static	int					_CompareFunctions(const FunctionDebugInfo* a,
+									const FunctionDebugInfo* b);
+	static	int					_CompareAddressFunction(
+									const target_addr_t* address,
+									const FunctionDebugInfo* function);
 
 private:
 			ImageInfo			fImageInfo;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			DebugInfoList		fDebugInfos;
+			FunctionList		fFunctions;
 };
 
 

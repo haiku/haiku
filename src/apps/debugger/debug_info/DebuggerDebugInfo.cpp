@@ -22,8 +22,7 @@ DebuggerDebugInfo::DebuggerDebugInfo(const ImageInfo& imageInfo,
 	:
 	fImageInfo(imageInfo),
 	fDebuggerInterface(debuggerInterface),
-	fArchitecture(architecture),
-	fSymbols(20, true)
+	fArchitecture(architecture)
 {
 }
 
@@ -36,30 +35,40 @@ DebuggerDebugInfo::~DebuggerDebugInfo()
 status_t
 DebuggerDebugInfo::Init()
 {
-	// TODO: Extend DebuggerInterface to find a symbol on demand!
-
-	status_t error = fDebuggerInterface->GetSymbolInfos(fImageInfo.TeamID(),
-		fImageInfo.ImageID(), fSymbols);
-	if (error != B_OK)
-		return error;
-
-	// sort the symbols
-	fSymbols.SortItems(&_CompareSymbols);
-
 	return B_OK;
 }
 
 
-FunctionDebugInfo*
-DebuggerDebugInfo::FindFunction(target_addr_t address)
+status_t
+DebuggerDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 {
-	SymbolInfo* symbolInfo = _FindSymbol(address);
-	if (symbolInfo == NULL || symbolInfo->Type() != B_SYMBOL_TYPE_TEXT)
-		return NULL;
+	BObjectList<SymbolInfo> symbols(20, true);
+	status_t error = fDebuggerInterface->GetSymbolInfos(fImageInfo.TeamID(),
+		fImageInfo.ImageID(), symbols);
+	if (error != B_OK)
+		return error;
 
-	return new(std::nothrow) BasicFunctionDebugInfo(this, symbolInfo->Address(),
-		symbolInfo->Size(), symbolInfo->Name(),
-		Demangler::Demangle(symbolInfo->Name()));
+	// sort the symbols -- not necessary, but a courtesy to ImageDebugInfo which
+	// will peform better when inserting functions at the end of a list
+	symbols.SortItems(&_CompareSymbols);
+
+	// create the function infos
+	for (int32 i = 0; SymbolInfo* symbol = symbols.ItemAt(i); i++) {
+		FunctionDebugInfo* function = new(std::nothrow) BasicFunctionDebugInfo(
+			this, symbol->Address(), symbol->Size(), symbol->Name(),
+			Demangler::Demangle(symbol->Name()));
+		if (function == NULL || !functions.AddItem(function)) {
+			delete function;
+			int32 index = functions.CountItems() - 1;
+			for (i--; i >= 0; i--, index--) {
+				function = functions.RemoveItemAt(index);
+				delete function;
+			}
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -103,26 +112,9 @@ DebuggerDebugInfo::GetStatement(FunctionDebugInfo* function,
 }
 
 
-SymbolInfo*
-DebuggerDebugInfo::_FindSymbol(target_addr_t address)
-{
-	return fSymbols.BinarySearchByKey(address, &_CompareAddressSymbol);
-}
-
-
 /*static*/ int
 DebuggerDebugInfo::_CompareSymbols(const SymbolInfo* a, const SymbolInfo* b)
 {
 	return a->Address() < b->Address()
 		? -1 : (a->Address() == b->Address() ? 0 : 1);
-}
-
-
-/*static*/ int
-DebuggerDebugInfo::_CompareAddressSymbol(const target_addr_t* address,
-	const SymbolInfo* info)
-{
-	if (*address < info->Address())
-		return -1;
-	return *address < info->Address() + info->Size() ? 0 : 1;
 }
