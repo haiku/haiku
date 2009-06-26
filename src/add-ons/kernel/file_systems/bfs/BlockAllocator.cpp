@@ -1514,7 +1514,7 @@ BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated)
 		return B_BAD_VALUE;
 
 	uint32 group = start >> fVolume->AllocationGroupShift();
-	uint32 groupBlock = start % (fVolume->BlockSize() << 3);
+	uint32 groupBlock = start / (fVolume->BlockSize() << 3);
 	uint32 blockOffset = start % fVolume->BlockSize();
 
 	AllocationBlock cached(fVolume);
@@ -1529,6 +1529,8 @@ BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated)
 				RETURN_ERROR(B_BAD_DATA);
 			}
 		}
+
+		blockOffset = 0;
 
 		if (++groupBlock >= fGroups[group].NumBlocks()) {
 			groupBlock = 0;
