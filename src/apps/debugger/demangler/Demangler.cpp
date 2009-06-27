@@ -13,38 +13,42 @@
 /*static*/ BString
 Demangler::Demangle(const BString& mangledName)
 {
-	BString demangledName;
 	char buffer[1024];
-	const char* demangled;
-	
+
 	if (mangledName.Compare("_Z", 2) == 0) {
-		demangled = demangle_name_gcc3(mangledName.String(), buffer,
+		// probably a gcc3+ mangled symbol
+		const char* demangled = demangle_name_gcc3(mangledName.String(), buffer,
 			sizeof(buffer));
-	} else {
-		demangled = demangle_symbol_gcc2(mangledName.String(), buffer,
-			sizeof(buffer), NULL);
+		if (demangled != NULL)
+			return demangled;
 	}
 
-	if (demangled == NULL)
-		// name not mangled
-		return mangledName;	
+	// try gcc 2 demangling
+	const char* demangled = demangle_symbol_gcc2(mangledName.String(), buffer,
+		sizeof(buffer), NULL);
 
+	if (demangled == NULL) {
+		// name not mangled
+		return mangledName;
+	}
+
+	BString demangledName(demangled);
 	demangledName << demangled << "(";
-	
+
 	size_t length;
-	int32 type, i = 0;
+	int32 type;
+	int32 i = 0;
 	uint32 cookie = 0;
 	while (get_next_argument(&cookie, mangledName.String(), buffer,
-			sizeof(buffer), &type, &length) == B_OK) {	
-
+			sizeof(buffer), &type, &length) == B_OK) {
 		if (i++ > 0)
 			demangledName << ", ";
-			
+
 		if (buffer[0]) {
 			demangledName << buffer;
 			continue;
 		}
-			
+
 		// unnamed argument: fallback to known type
 		switch (type) {
 			case B_ANY_TYPE:
@@ -102,6 +106,6 @@ Demangler::Demangle(const BString& mangledName)
 		}
 	}
 
-	demangledName << ")";			
+	demangledName << ")";
 	return demangledName;
 }
