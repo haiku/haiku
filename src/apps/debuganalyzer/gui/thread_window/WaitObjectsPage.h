@@ -24,9 +24,9 @@ private:
 			class WaitObjectsTreeModel;
 
 private:
-	// TableListener
+	// TreeTableListener
 	virtual	void				TreeTableNodeInvoked(TreeTable* table,
-									void* node);
+									const TreeTablePath& path);
 
 private:
 			TreeTable*			fWaitObjectsTree;

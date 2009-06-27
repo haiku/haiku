@@ -332,7 +332,7 @@ ThreadWindow::WaitObjectsPage::SetModel(ThreadModel* model)
 
 void
 ThreadWindow::WaitObjectsPage::TreeTableNodeInvoked(TreeTable* table,
-	void* node)
+	const TreeTablePath& path)
 {
 //	Model::Thread* thread = fModel->ThreadAt(rowIndex);
 //	if (thread != NULL)
