@@ -1204,7 +1204,7 @@ BMediaRoster::StartTimeSource(const media_node& node, bigtime_t atRealTime)
 	}
 
 	TRACE("BMediaRoster::StartTimeSource, node %ld, at real %Ld\n", node.node,
-		at_real_time);
+		atRealTime);
 
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_START;
