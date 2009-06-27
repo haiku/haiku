@@ -181,14 +181,14 @@ BBuffer::Size()
  *************************************************************/
 
 /* explicit */
-BBuffer::BBuffer(const buffer_clone_info & info) : 
+BBuffer::BBuffer(const buffer_clone_info & info) :
 	fBufferList(0), // must be 0 if not correct initialized
 	fData(0), // must be 0 if not correct initialized
 	fSize(0), // should be 0 if not correct initialized
 	fBufferID(0) // must be 0 if not registered
 {
 	CALLED();
-	
+
 	// special case for BSmallBuffer
 	if (info.area == 0 && info.buffer == 0)
 		return;
@@ -200,9 +200,9 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 		ERROR("BBuffer::BBuffer: SERVER_GET_SHARED_BUFFER_AREA failed\n");
 		return;
 	}
-	
+
 	ASSERT(area_reply.area > 0);
-	
+
 	fBufferList = _shared_buffer_list::Clone(area_reply.area);
 	if (fBufferList == NULL) {
 		ERROR("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
@@ -211,11 +211,11 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 
 	server_register_buffer_request request;
 	server_register_buffer_reply reply;
-	
+
 	request.team = team;
 	request.info = info;
 
-	// ask media_server to register this buffer, 
+	// ask media_server to register this buffer,
 	// either identified by "buffer" or by area information.
 	// media_server either has a copy of the area identified
 	// by "buffer", or creates a new area.
@@ -238,8 +238,9 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	fSize = reply.info.size;
 	fFlags = reply.info.flags;
 	fOffset = reply.info.offset;
-	
-	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, reply.info.area);
+
+	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, reply.info.area);
 	if (fArea <= B_OK) {
 		// XXX should unregister buffer here
 		ERROR("BBuffer::BBuffer: buffer cloning failed\n");
@@ -281,7 +282,7 @@ BBuffer::SetHeader(const media_header *header)
 {
 	CALLED();
 	fMediaHeader = *header;
-	
+
 //  XXX why can't we do this without crash? what's wrong?
 //	fMediaHeader.buffer = fBufferID;
 }
