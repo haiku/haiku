@@ -17,12 +17,13 @@ Demangler::Demangle(const BString& mangledName)
 	char buffer[1024];
 	const char* demangled;
 	
-	if (mangledName.Compare("_Z", 2) == 0)
+	if (mangledName.Compare("_Z", 2) == 0) {
 		demangled = demangle_name_gcc3(mangledName.String(), buffer,
 			sizeof(buffer));
-	else
+	} else {
 		demangled = demangle_symbol_gcc2(mangledName.String(), buffer,
 			sizeof(buffer), NULL);
+	}
 
 	if (demangled == NULL)
 		// name not mangled
