@@ -142,6 +142,10 @@ public:
 
 	virtual	const char*			Name() const;
 
+			const DebugInfoEntryList& Types() const	{ return fTypes; }
+			const DebugInfoEntryList& OtherChildren() const
+										{ return fOtherChildren; }
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
@@ -359,6 +363,10 @@ public:
 
 	virtual	const char*			Name() const;
 	virtual	const char*			Description() const;
+
+			uint8				Accessibility() const { return fAccessibility; }
+			uint8				Visibility() const	{ return fVisibility; }
+			bool				IsDeclaration() const { return fDeclaration; }
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
 									const AttributeValue& value);
