@@ -7,16 +7,13 @@
 
 #include <new>
 
-#include "DebuggerDebugInfo.h"
 #include "FunctionDebugInfo.h"
+#include "SpecificImageDebugInfo.h"
 
 
-ImageDebugInfo::ImageDebugInfo(const ImageInfo& imageInfo,
-	DebuggerInterface* debuggerInterface, Architecture* architecture)
+ImageDebugInfo::ImageDebugInfo(const ImageInfo& imageInfo)
 	:
-	fImageInfo(imageInfo),
-	fDebuggerInterface(debuggerInterface),
-	fArchitecture(architecture)
+	fImageInfo(imageInfo)
 {
 }
 
@@ -28,36 +25,22 @@ ImageDebugInfo::~ImageDebugInfo()
 }
 
 
-status_t
-ImageDebugInfo::Init()
+bool
+ImageDebugInfo::AddSpecificInfo(SpecificImageDebugInfo* info)
 {
-	// Create debug infos for every kind debug info available, sorted
-	// descendingly by expressiveness.
+	return fSpecificInfos.AddItem(info);
+}
 
-	// TODO: DWARF, etc.
 
-	// debugger based info
-	DebuggerDebugInfo* debuggerDebugInfo = new(std::nothrow) DebuggerDebugInfo(
-		fImageInfo, fDebuggerInterface, fArchitecture);
-	if (debuggerDebugInfo == NULL)
-		return B_NO_MEMORY;
-
-	status_t error = debuggerDebugInfo->Init();
-	if (error == B_OK && !fDebugInfos.AddItem(debuggerDebugInfo))
-		error = B_NO_MEMORY;
-
-	if (error != B_OK) {
-		delete debuggerDebugInfo;
-		if (error == B_NO_MEMORY)
-			return error;
-				// only "no memory" is fatal
-	}
-
+status_t
+ImageDebugInfo::FinishInit()
+{
 	// get functions -- get them from most expressive debug info first and add
 	// missing functions from less expressive debug infos
-	for (int32 i = 0; DebugInfo* debugInfo = fDebugInfos.ItemAt(i); i++) {
+	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
+			= fSpecificInfos.ItemAt(i); i++) {
 		FunctionList functions;
-		status_t error = debugInfo->GetFunctions(functions);
+		status_t error = specificInfo->GetFunctions(functions);
 		if (error != B_OK)
 			return error;
 

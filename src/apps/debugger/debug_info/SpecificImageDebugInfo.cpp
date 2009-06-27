@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "DebugInfo.h"
+#include "SpecificImageDebugInfo.h"
 
 
-DebugInfo::~DebugInfo()
+SpecificImageDebugInfo::~SpecificImageDebugInfo()
 {
 }

@@ -16,25 +16,24 @@
 
 class Architecture;
 class DebuggerInterface;
-class DebugInfo;
 class FunctionDebugInfo;
+class SpecificImageDebugInfo;
 
 
 class ImageDebugInfo : public Referenceable {
 public:
-								ImageDebugInfo(const ImageInfo& imageInfo,
-									DebuggerInterface* debuggerInterface,
-									Architecture* architecture);
+								ImageDebugInfo(const ImageInfo& imageInfo),
 								~ImageDebugInfo();
 
-			status_t			Init();
+			bool				AddSpecificInfo(SpecificImageDebugInfo* info);
+			status_t			FinishInit();
 
 			int32				CountFunctions() const;
 			FunctionDebugInfo*	FunctionAt(int32 index) const;
 			FunctionDebugInfo*	FunctionAtAddress(target_addr_t address) const;
 
 private:
-			typedef BObjectList<DebugInfo> DebugInfoList;
+			typedef BObjectList<SpecificImageDebugInfo> SpecificInfoList;
 			typedef BObjectList<FunctionDebugInfo> FunctionList;
 
 private:
@@ -46,9 +45,7 @@ private:
 
 private:
 			ImageInfo			fImageInfo;
-			DebuggerInterface*	fDebuggerInterface;
-			Architecture*		fArchitecture;
-			DebugInfoList		fDebugInfos;
+			SpecificInfoList	fSpecificInfos;
 			FunctionList		fFunctions;
 };
 

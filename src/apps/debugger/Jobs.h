@@ -86,18 +86,13 @@ private:
 
 class LoadImageDebugInfoJob : public Job {
 public:
-								LoadImageDebugInfoJob(
-									DebuggerInterface* debuggerInterface,
-									Architecture* architecture,
-									Image* image);
+								LoadImageDebugInfoJob(Image* image);
 	virtual						~LoadImageDebugInfoJob();
 
 	virtual	JobKey				Key() const;
 	virtual	status_t			Do();
 
-	static	status_t			ScheduleIfNecessary(
-									DebuggerInterface* debuggerInterface,
-									Architecture* architecture, Worker* worker,
+	static	status_t			ScheduleIfNecessary(Worker* worker,
 									Image* image,
 									ImageDebugInfo** _imageDebugInfo = NULL);
 										// If already loaded returns a
@@ -109,8 +104,6 @@ public:
 										// earlier.
 
 private:
-			DebuggerInterface*	fDebuggerInterface;
-			Architecture*		fArchitecture;
 			Image*				fImage;
 };
 

@@ -28,6 +28,9 @@ enum {
 };
 
 
+class TeamDebugInfo;
+
+
 class Team : public BLocker {
 public:
 			class Event;
@@ -36,12 +39,13 @@ public:
 			class Listener;
 
 public:
-								Team(team_id teamID);
+								Team(team_id teamID, TeamDebugInfo* debugInfo);
 								~Team();
 
 			status_t			Init();
 
-			team_id				ID() const		{ return fID; }
+			team_id				ID() const			{ return fID; }
+			TeamDebugInfo*		DebugInfo() const	{ return fDebugInfo; }
 
 			const char*			Name() const	{ return fName.String(); }
 			void				SetName(const BString& name);
@@ -85,6 +89,7 @@ private:
 
 private:
 			team_id				fID;
+			TeamDebugInfo*		fDebugInfo;
 			BString				fName;
 			ThreadList			fThreads;
 			ImageList			fImages;

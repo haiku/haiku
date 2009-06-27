@@ -20,8 +20,8 @@ enum function_source_state {
 };
 
 
-class DebugInfo;
 class SourceCode;
+class SpecificImageDebugInfo;
 
 
 class FunctionDebugInfo : public Referenceable {
@@ -32,7 +32,7 @@ public:
 								FunctionDebugInfo();
 	virtual						~FunctionDebugInfo();
 
-	virtual	DebugInfo*			GetDebugInfo() const = 0;
+	virtual	SpecificImageDebugInfo*	GetSpecificImageDebugInfo() const = 0;
 	virtual	target_addr_t		Address() const = 0;
 	virtual	target_size_t		Size() const = 0;
 	virtual	const char*			Name() const = 0;

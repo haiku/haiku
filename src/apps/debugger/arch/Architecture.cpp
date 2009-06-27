@@ -11,11 +11,11 @@
 #include <AutoLocker.h>
 
 #include "CpuState.h"
-#include "DebugInfo.h"
 #include "FunctionDebugInfo.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "ImageDebugInfoProvider.h"
+#include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Team.h"
 
@@ -90,8 +90,8 @@ Architecture::CreateStackTrace(Team* team,
 		StackFrame* previousFrame = NULL;
 		CpuState* previousCpuState = NULL;
 		if (function != NULL) {
-			status_t error = function->GetDebugInfo()->CreateFrame(image,
-				function, cpuState, previousFrame, previousCpuState);
+			status_t error = function->GetSpecificImageDebugInfo()->CreateFrame(
+				image, function, cpuState, previousFrame, previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;
 		}

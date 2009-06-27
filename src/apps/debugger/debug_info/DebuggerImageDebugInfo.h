@@ -2,13 +2,13 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef DEBUGGER_DEBUG_INFO_H
-#define DEBUGGER_DEBUG_INFO_H
+#ifndef DEBUGGER_IMAGE_DEBUG_INFO_H
+#define DEBUGGER_IMAGE_DEBUG_INFO_H
 
 #include <String.h>
 
-#include "DebugInfo.h"
 #include "ImageInfo.h"
+#include "SpecificImageDebugInfo.h"
 
 
 class Architecture;
@@ -17,12 +17,13 @@ class FunctionDebugInfo;
 class SymbolInfo;
 
 
-class DebuggerDebugInfo : public DebugInfo {
+class DebuggerImageDebugInfo : public SpecificImageDebugInfo {
 public:
-								DebuggerDebugInfo(const ImageInfo& imageInfo,
+								DebuggerImageDebugInfo(
+									const ImageInfo& imageInfo,
 									DebuggerInterface* debuggerInterface,
 									Architecture* architecture);
-	virtual						~DebuggerDebugInfo();
+	virtual						~DebuggerImageDebugInfo();
 
 			status_t			Init();
 
@@ -50,4 +51,4 @@ private:
 };
 
 
-#endif	// DEBUGGER_DEBUG_INFO_H
+#endif	// DEBUGGER_IMAGE_DEBUG_INFO_H

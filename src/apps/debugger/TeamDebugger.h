@@ -18,6 +18,7 @@
 
 
 class DebuggerInterface;
+class TeamDebugInfo;
 class TeamDebugModel;
 
 
@@ -97,6 +98,7 @@ private:
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock
 			DebuggerInterface*	fDebuggerInterface;
+			TeamDebugInfo*		fTeamDebugInfo;
 			Worker*				fWorker;
 			BreakpointManager*	fBreakpointManager;
 			thread_id			fDebugEventListener;

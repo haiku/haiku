@@ -13,14 +13,14 @@
 class BasicFunctionDebugInfo : public FunctionDebugInfo {
 public:
 								BasicFunctionDebugInfo(
-									DebugInfo* debugInfo,
+									SpecificImageDebugInfo* imageDebugInfo,
 									target_addr_t address,
 									target_size_t size,
 									const BString& name,
 									const BString& prettyName);
 	virtual						~BasicFunctionDebugInfo();
 
-	virtual	DebugInfo*			GetDebugInfo() const;
+	virtual	SpecificImageDebugInfo* GetSpecificImageDebugInfo() const;
 	virtual	target_addr_t		Address() const;
 	virtual	target_size_t		Size() const;
 	virtual	const char*			Name() const;
@@ -31,7 +31,7 @@ public:
 	virtual	SourceLocation		SourceEndLocation() const;
 
 private:
-			DebugInfo*			fDebugInfo;
+			SpecificImageDebugInfo* fImageDebugInfo;
 			target_addr_t		fAddress;
 			target_size_t		fSize;
 			const BString		fName;

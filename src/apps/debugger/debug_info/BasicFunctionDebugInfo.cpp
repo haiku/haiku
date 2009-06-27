@@ -5,33 +5,33 @@
 
 #include "BasicFunctionDebugInfo.h"
 
-#include "DebugInfo.h"
+#include "SpecificImageDebugInfo.h"
 
 
-BasicFunctionDebugInfo::BasicFunctionDebugInfo(DebugInfo* debugInfo,
-	target_addr_t address, target_size_t size, const BString& name,
-	const BString& prettyName)
+BasicFunctionDebugInfo::BasicFunctionDebugInfo(
+	SpecificImageDebugInfo* debugInfo, target_addr_t address,
+	target_size_t size, const BString& name, const BString& prettyName)
 	:
-	fDebugInfo(debugInfo),
+	fImageDebugInfo(debugInfo),
 	fAddress(address),
 	fSize(size),
 	fName(name),
 	fPrettyName(prettyName)
 {
-	fDebugInfo->AddReference();
+	fImageDebugInfo->AddReference();
 }
 
 
 BasicFunctionDebugInfo::~BasicFunctionDebugInfo()
 {
-	fDebugInfo->RemoveReference();
+	fImageDebugInfo->RemoveReference();
 }
 
 
-DebugInfo*
-BasicFunctionDebugInfo::GetDebugInfo() const
+SpecificImageDebugInfo*
+BasicFunctionDebugInfo::GetSpecificImageDebugInfo() const
 {
-	return fDebugInfo;
+	return fImageDebugInfo;
 }
 
 

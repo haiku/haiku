@@ -15,13 +15,13 @@
 #include "BreakpointManager.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
-#include "DebugInfo.h"
 #include "FunctionDebugInfo.h"
 #include "ImageDebugInfo.h"
 #include "InstructionInfo.h"
 #include "Jobs.h"
 #include "MessageCodes.h"
 #include "SourceCode.h"
+#include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
@@ -381,7 +381,7 @@ ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 
 	// We need to get the statement from the debug info of the function.
 	Statement* statement;
-	if (function->GetDebugInfo()->GetStatement(function,
+	if (function->GetSpecificImageDebugInfo()->GetStatement(function,
 			frame->InstructionPointer(), statement) != B_OK) {
 		return NULL;
 	}

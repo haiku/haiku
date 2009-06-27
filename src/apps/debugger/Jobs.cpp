@@ -12,13 +12,14 @@
 #include "Architecture.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
-#include "DebugInfo.h"
 #include "FunctionDebugInfo.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "SourceCode.h"
+#include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "Thread.h"
 
 
@@ -182,8 +183,8 @@ GetStackTraceJob::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 	while (image->GetImageDebugInfo() == NULL) {
 		// schedule a job, if not loaded
 		ImageDebugInfo* info;
-		status_t error = LoadImageDebugInfoJob::ScheduleIfNecessary(
-			fDebuggerInterface, fArchitecture, GetWorker(), image, &info);
+		status_t error = LoadImageDebugInfoJob::ScheduleIfNecessary(GetWorker(),
+			image, &info);
 		if (error != B_OK)
 			return error;
 
@@ -220,12 +221,8 @@ GetStackTraceJob::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 // #pragma mark - LoadImageDebugInfoJob
 
 
-LoadImageDebugInfoJob::LoadImageDebugInfoJob(
-	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	Image* image)
+LoadImageDebugInfoJob::LoadImageDebugInfoJob(Image* image)
 	:
-	fDebuggerInterface(debuggerInterface),
-	fArchitecture(architecture),
 	fImage(image)
 {
 	fImage->AddReference();
@@ -254,14 +251,9 @@ LoadImageDebugInfoJob::Do()
 	locker.Unlock();
 
 	// create the debug info
-	ImageDebugInfo* debugInfo = new(std::nothrow) ImageDebugInfo(imageInfo,
-		fDebuggerInterface, fArchitecture);
-
-	status_t error;;
-	if (debugInfo != NULL)
-		error = debugInfo->Init();
-	else
-		error = B_NO_MEMORY;
+	ImageDebugInfo* debugInfo;
+	status_t error = fImage->GetTeam()->DebugInfo()->LoadImageDebugInfo(
+		imageInfo, debugInfo);
 
 	// set the result
 	locker.Lock();
@@ -278,8 +270,7 @@ LoadImageDebugInfoJob::Do()
 
 
 /*static*/ status_t
-LoadImageDebugInfoJob::ScheduleIfNecessary(DebuggerInterface* debuggerInterface,
-	Architecture* architecture, Worker* worker, Image* image,
+LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
 	ImageDebugInfo** _imageDebugInfo)
 {
 	AutoLocker<Team> teamLocker(image->GetTeam());
@@ -305,8 +296,7 @@ LoadImageDebugInfoJob::ScheduleIfNecessary(DebuggerInterface* debuggerInterface,
 		return B_ERROR;
 
 	// schedule a job
-	LoadImageDebugInfoJob* job = new(std::nothrow) LoadImageDebugInfoJob(
-			debuggerInterface, architecture, image);
+	LoadImageDebugInfoJob* job = new(std::nothrow) LoadImageDebugInfoJob(image);
 	if (job == NULL)
 		return B_NO_MEMORY;
 
@@ -358,8 +348,8 @@ LoadSourceCodeJob::Do()
 {
 	// load the source code, if we can
 	SourceCode* sourceCode = NULL;
-	status_t error = fFunction->GetDebugInfo()->LoadSourceCode(fFunction,
-		sourceCode);
+	status_t error = fFunction->GetSpecificImageDebugInfo()->LoadSourceCode(
+		fFunction, sourceCode);
 
 	// set the result
 	AutoLocker<Team> locker(fTeam);

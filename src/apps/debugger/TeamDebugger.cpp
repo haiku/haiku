@@ -23,6 +23,7 @@
 #include "Jobs.h"
 #include "MessageCodes.h"
 #include "Statement.h"
+#include "TeamDebugInfo.h"
 #include "TeamDebugModel.h"
 
 
@@ -91,14 +92,35 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 {
 	fTeamID = teamID;
 
+	// create debugger interface
+	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
+	if (fDebuggerInterface == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fDebuggerInterface->Init();
+	if (error != B_OK)
+		return error;
+
+	// create team debug info
+	TeamDebugInfo* teamDebugInfo = new(std::nothrow) TeamDebugInfo(
+		fDebuggerInterface, fDebuggerInterface->GetArchitecture());
+	if (teamDebugInfo == NULL)
+		return B_NO_MEMORY;
+	Reference<TeamDebugInfo> teamDebugInfoReference(teamDebugInfo);
+
+	error = teamDebugInfo->Init();
+	if (error != B_OK)
+		return error;
+
 	// check whether the team exists at all
+	// TODO: That should be done in the debugger interface!
 	team_info teamInfo;
-	status_t error = get_team_info(fTeamID, &teamInfo);
+	error = get_team_info(fTeamID, &teamInfo);
 	if (error != B_OK)
 		return error;
 
 	// create a team object
-	fTeam = new(std::nothrow) ::Team(fTeamID);
+	fTeam = new(std::nothrow) ::Team(fTeamID, teamDebugInfo);
 	if (fTeam == NULL)
 		return B_NO_MEMORY;
 
@@ -121,15 +143,6 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fWorker->Init();
-	if (error != B_OK)
-		return error;
-
-	// create debugger interface
-	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
-	if (fDebuggerInterface == NULL)
-		return B_NO_MEMORY;
-
-	error = fDebuggerInterface->Init();
 	if (error != B_OK)
 		return error;
 
@@ -351,8 +364,7 @@ TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
 void
 TeamDebugger::ImageDebugInfoRequested(TeamWindow* window, Image* image)
 {
-	LoadImageDebugInfoJob::ScheduleIfNecessary(fDebuggerInterface,
-		fDebuggerInterface->GetArchitecture(), fWorker, image);
+	LoadImageDebugInfoJob::ScheduleIfNecessary(fWorker, image);
 }
 
 

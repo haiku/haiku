@@ -9,14 +9,18 @@
 
 #include <AutoLocker.h>
 
+#include "TeamDebugInfo.h"
+
 
 // #pragma mark - Team
 
 
-Team::Team(team_id teamID)
+Team::Team(team_id teamID, TeamDebugInfo* debugInfo)
 	:
-	fID(teamID)
+	fID(teamID),
+	fDebugInfo(debugInfo)
 {
+	fDebugInfo->AddReference();
 }
 
 
@@ -27,6 +31,8 @@ Team::~Team()
 
 	while (Thread* thread = fThreads.RemoveHead())
 		thread->RemoveReference();
+
+	fDebugInfo->RemoveReference();
 }
 
 

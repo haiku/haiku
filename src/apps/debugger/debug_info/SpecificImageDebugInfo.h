@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef DEBUG_INFO_H
-#define DEBUG_INFO_H
+#ifndef SPECIFIC_IMAGE_DEBUG_INFO_H
+#define SPECIFIC_IMAGE_DEBUG_INFO_H
 
 #include <ObjectList.h>
 #include <Referenceable.h>
@@ -21,9 +21,9 @@ class StackFrame;
 class Statement;
 
 
-class DebugInfo : public Referenceable {
+class SpecificImageDebugInfo : public Referenceable {
 public:
-	virtual						~DebugInfo();
+	virtual						~SpecificImageDebugInfo();
 
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions)
@@ -48,4 +48,4 @@ public:
 };
 
 
-#endif	// DEBUG_INFO_H
+#endif	// SPECIFIC_IMAGE_DEBUG_INFO_H

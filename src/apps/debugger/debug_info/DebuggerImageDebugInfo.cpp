@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "DebuggerDebugInfo.h"
+#include "DebuggerImageDebugInfo.h"
 
 #include <algorithm>
 #include <new>
@@ -17,7 +17,7 @@
 #include "SymbolInfo.h"
 
 
-DebuggerDebugInfo::DebuggerDebugInfo(const ImageInfo& imageInfo,
+DebuggerImageDebugInfo::DebuggerImageDebugInfo(const ImageInfo& imageInfo,
 	DebuggerInterface* debuggerInterface, Architecture* architecture)
 	:
 	fImageInfo(imageInfo),
@@ -27,20 +27,20 @@ DebuggerDebugInfo::DebuggerDebugInfo(const ImageInfo& imageInfo,
 }
 
 
-DebuggerDebugInfo::~DebuggerDebugInfo()
+DebuggerImageDebugInfo::~DebuggerImageDebugInfo()
 {
 }
 
 
 status_t
-DebuggerDebugInfo::Init()
+DebuggerImageDebugInfo::Init()
 {
 	return B_OK;
 }
 
 
 status_t
-DebuggerDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
+DebuggerImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 {
 	BObjectList<SymbolInfo> symbols(20, true);
 	status_t error = fDebuggerInterface->GetSymbolInfos(fImageInfo.TeamID(),
@@ -79,7 +79,7 @@ DebuggerDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 
 status_t
-DebuggerDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
+DebuggerImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 	CpuState* cpuState, StackFrame*& _previousFrame,
 	CpuState*& _previousCpuState)
 {
@@ -88,7 +88,7 @@ DebuggerDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 
 
 status_t
-DebuggerDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
+DebuggerImageDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
 	SourceCode*& _sourceCode)
 {
 	// allocate a buffer for the function code
@@ -111,7 +111,7 @@ DebuggerDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
 
 
 status_t
-DebuggerDebugInfo::GetStatement(FunctionDebugInfo* function,
+DebuggerImageDebugInfo::GetStatement(FunctionDebugInfo* function,
 	target_addr_t address, Statement*& _statement)
 {
 	return fArchitecture->GetStatement(function, address, _statement);
@@ -119,7 +119,8 @@ DebuggerDebugInfo::GetStatement(FunctionDebugInfo* function,
 
 
 /*static*/ int
-DebuggerDebugInfo::_CompareSymbols(const SymbolInfo* a, const SymbolInfo* b)
+DebuggerImageDebugInfo::_CompareSymbols(const SymbolInfo* a,
+	const SymbolInfo* b)
 {
 	return a->Address() < b->Address()
 		? -1 : (a->Address() == b->Address() ? 0 : 1);
