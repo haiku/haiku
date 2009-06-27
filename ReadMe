@@ -75,42 +75,21 @@ but it is not yet supported under Linux and other non-BeOS platforms.
 Bootable CD-ROM Image
 ---------------------
 
-* UNSUPPORTED yet *
-
 This _requires_ having the mkisofs tool installed.
 On Debian GNU/Linux for example you can install it with:
   apt-get install mkisofs
 On BeOS you can get it from http://bebits.com/app/3964 along with cdrecord.
 
-Creating a bootable CD requires burning 2 tracks on a single CD.
-The first track is an El-Torito bootable ISO file-system containing a boot 
-floppy image, and is created with:
+This creates a bootable 'haiku-cd.iso' in your 'generated/' folder:
 
-  jam -q haiku-boot-cd
-
-This generates an image file named 'haiku-boot-cd.iso' in your output directory
-under 'generated/'.
-The second track is the raw BFS image 'haiku.image' in 'generated/' created 
-with:
-
-  jam -q haiku-image
+  jam -q haiku-cd
 
 Under Unix/Linux, and BeOS you can use cdrecord to create a CD with:
 
-  cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-boot-cd.iso generated/haiku.image
+  cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-cd.iso
 
 Here x,y,z is the device number as found with cdrecord -scanbus, it can also 
 be a device path on Linux.
-
-Windows users will find '3rdparty/nero/haiku-cd.cue' useful.
-
-Since the CD has two tracks it is not easy to test it from an emulator.
-Instead it is simpler to use the 'haiku.image' as CD image and the floppy
-image 'haiku-boot-floppy.image' to boot from it.
-
-For Qemu:
-
-qemu -cdrom generated/haiku.image -fda generated/haiku-boot-floppy.image -boot a
 
 Building Components
 -------------------
