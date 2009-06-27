@@ -14,7 +14,8 @@ CompilationUnit::CompilationUnit(dwarf_off_t headerOffset,
 	fContentOffset(contentOffset),
 	fTotalSize(totalSize),
 	fAbbreviationOffset(abbreviationOffset),
-	fAbbreviationTable(NULL)
+	fAbbreviationTable(NULL),
+	fUnitEntry(NULL)
 {
 }
 
@@ -42,6 +43,13 @@ CompilationUnit::AddDebugInfoEntry(DebugInfoEntry* entry, dwarf_off_t offset)
 	}
 
 	return B_OK;
+}
+
+
+void
+CompilationUnit::SetUnitEntry(DIECompileUnitBase* entry)
+{
+	fUnitEntry = entry;
 }
 
 

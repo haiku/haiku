@@ -5,7 +5,7 @@
 #ifndef COMPILATION_UNIT_H
 #define COMPILATION_UNIT_H
 
-#include <util/DoublyLinkedList.h>
+#include <ObjectList.h>
 
 #include "Array.h"
 #include "DwarfTypes.h"
@@ -13,9 +13,10 @@
 
 class AbbreviationTable;
 class DebugInfoEntry;
+class DIECompileUnitBase;
 
 
-class CompilationUnit : public DoublyLinkedListLinkImpl<CompilationUnit> {
+class CompilationUnit {
 public:
 								CompilationUnit(dwarf_off_t headerOffset,
 									dwarf_off_t contentOffset,
@@ -39,6 +40,8 @@ public:
 			void				SetAbbreviationTable(
 									AbbreviationTable* abbreviationTable);
 
+			DIECompileUnitBase*	UnitEntry() const	{ return fUnitEntry; }
+			void				SetUnitEntry(DIECompileUnitBase* entry);
 
 			status_t			AddDebugInfoEntry(DebugInfoEntry* entry,
 									dwarf_off_t offset);
@@ -53,6 +56,7 @@ private:
 			dwarf_off_t			fTotalSize;
 			dwarf_off_t			fAbbreviationOffset;
 			AbbreviationTable*	fAbbreviationTable;
+			DIECompileUnitBase*	fUnitEntry;
 			Array<DebugInfoEntry*> fEntries;
 			Array<dwarf_off_t>	fEntryOffsets;
 };

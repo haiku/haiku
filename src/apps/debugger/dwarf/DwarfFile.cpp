@@ -25,6 +25,7 @@ DwarfFile::DwarfFile()
 	fDebugInfoSection(NULL),
 	fDebugAbbrevSection(NULL),
 	fDebugStringSection(NULL),
+	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
 	fFinished(false),
 	fFinishError(B_OK)
@@ -34,9 +35,6 @@ DwarfFile::DwarfFile()
 
 DwarfFile::~DwarfFile()
 {
-	while (CompilationUnit* unit = fCompilationUnits.RemoveHead())
-		delete unit;
-
 	while (AbbreviationTable* table = fAbbreviationTables.RemoveHead())
 		delete table;
 
@@ -133,10 +131,10 @@ DwarfFile::Load(const char* fileName)
 			unitHeaderOffset, unitContentOffset,
 			unitLength + (unitLengthOffset - unitHeaderOffset),
 			abbrevOffset);
-		if (unit == NULL)
+		if (unit == NULL || !fCompilationUnits.AddItem(unit)) {
+			delete unit;
 			return B_NO_MEMORY;
-
-		fCompilationUnits.Add(unit);
+		}
 
 		// parse the debug info for the unit
 		fCurrentCompilationUnit = unit;
@@ -159,8 +157,8 @@ DwarfFile::FinishLoading()
 	if (fFinishError != B_OK)
 		return fFinishError;
 
-	for (CompilationUnitList::Iterator it = fCompilationUnits.GetIterator();
-			CompilationUnit* unit = it.Next();) {
+	for (int32 i = 0; CompilationUnit* unit = fCompilationUnits.ItemAt(i);
+			i++) {
 		fCurrentCompilationUnit = unit;
 		status_t error = _FinishCompilationUnit(unit);
 		if (error != B_OK)
@@ -169,6 +167,20 @@ DwarfFile::FinishLoading()
 
 	fFinished = true;
 	return B_OK;
+}
+
+
+int32
+DwarfFile::CountCompilationUnits() const
+{
+	return fCompilationUnits.CountItems();
+}
+
+
+CompilationUnit*
+DwarfFile::CompilationUnitAt(int32 index) const
+{
+	return fCompilationUnits.ItemAt(index);
 }
 
 
@@ -194,11 +206,14 @@ DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 	if (error != B_OK)
 		return error;
 
-	if (dynamic_cast<DIECompileUnitBase*>(entry) == NULL) {
+	DIECompileUnitBase* unitEntry = dynamic_cast<DIECompileUnitBase*>(entry);
+	if (unitEntry == NULL) {
 		fprintf(stderr, "No compilation unit entry in .debug_info "
 			"section.\n");
 		return B_BAD_DATA;
 	}
+
+	unit->SetUnitEntry(unitEntry);
 
 printf("remaining bytes in unit: %lld\n", dataReader.BytesRemaining());
 if (dataReader.HasData()) {

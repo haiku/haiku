@@ -5,6 +5,7 @@
 #ifndef DWARF_FILE_H
 #define DWARF_FILE_H
 
+#include <ObjectList.h>
 #include <util/DoublyLinkedList.h>
 
 #include "DebugInfoEntries.h"
@@ -28,9 +29,12 @@ public:
 
 			const char*			Name() const	{ return fName; }
 
+			int32				CountCompilationUnits() const;
+			CompilationUnit*	CompilationUnitAt(int32 index) const;
+
 private:
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
-			typedef DoublyLinkedList<CompilationUnit> CompilationUnitList;
+			typedef BObjectList<CompilationUnit> CompilationUnitList;
 
 private:
 			status_t			_ParseCompilationUnit(CompilationUnit* unit);
