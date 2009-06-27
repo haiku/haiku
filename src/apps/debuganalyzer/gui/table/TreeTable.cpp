@@ -29,11 +29,188 @@ private:
 };
 
 
+// #pragma mark - TreeTablePath
+
+
+TreeTablePath::TreeTablePath()
+{
+}
+
+
+TreeTablePath::TreeTablePath(const TreeTablePath& other)
+{
+	*this = other;
+}
+
+
+TreeTablePath::TreeTablePath(const TreeTablePath& other, int32 childIndex)
+{
+	*this = other;
+	AddComponent(childIndex);
+}
+
+
+TreeTablePath::~TreeTablePath()
+{
+}
+
+
+bool
+TreeTablePath::AddComponent(int32 childIndex)
+{
+	try {
+		fComponents.push_back(childIndex);
+		return true;
+	} catch (...) {
+		return false;
+	}
+}
+
+void
+TreeTablePath::Clear()
+{
+	fComponents.clear();
+}
+
+
+int32
+TreeTablePath::CountComponents() const
+{
+	return fComponents.size();
+}
+
+
+int32
+TreeTablePath::ComponentAt(int32 index) const
+{
+	if (index < 0 || (size_t)index >= fComponents.size())
+		return -1;
+	return fComponents[index];
+}
+
+
+TreeTablePath&
+TreeTablePath::operator=(const TreeTablePath& other)
+{
+	try {
+		fComponents = other.fComponents;
+	} catch (...) {
+	}
+	return *this;
+}
+
+
+bool
+TreeTablePath::operator==(const TreeTablePath& other) const
+{
+	return fComponents == other.fComponents;
+}
+
+
+bool
+TreeTablePath::operator!=(const TreeTablePath& other) const
+{
+	return fComponents != other.fComponents;
+}
+
+
+// #pragma mark - TreeTableModelListener
+
+
+TreeTableModelListener::~TreeTableModelListener()
+{
+}
+
+
+void
+TreeTableModelListener::TableNodesAdded(TreeTableModel* model,
+	const TreeTablePath& path, int32 childIndex, int32 count)
+{
+}
+
+
+void
+TreeTableModelListener::TableNodesRemoved(TreeTableModel* model,
+	const TreeTablePath& path, int32 childIndex, int32 count)
+{
+}
+
+
+void
+TreeTableModelListener::TableNodesChanged(TreeTableModel* model,
+	const TreeTablePath& path, int32 childIndex, int32 count)
+{
+}
+
+
 // #pragma mark - TreeTableModel
 
 
 TreeTableModel::~TreeTableModel()
 {
+}
+
+
+void*
+TreeTableModel::NodeForPath(const TreeTablePath& path) const
+{
+	void* node = Root();
+
+	int32 count = path.CountComponents();
+	for (int32 i = 0; node != NULL && i < count; i++)
+		node = ChildAt(node, path.ComponentAt(i));
+
+	return node;
+}
+
+
+bool
+TreeTableModel::AddListener(TreeTableModelListener* listener)
+{
+	return fListeners.AddItem(listener);
+}
+
+
+void
+TreeTableModel::RemoveListener(TreeTableModelListener* listener)
+{
+	fListeners.RemoveItem(listener);
+}
+
+
+void
+TreeTableModel::NotifyNodesAdded(const TreeTablePath& path, int32 childIndex,
+	int32 count)
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TreeTableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableNodesAdded(this, path, childIndex, count);
+	}
+}
+
+
+void
+TreeTableModel::NotifyNodesRemoved(const TreeTablePath& path, int32 childIndex,
+	int32 count)
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TreeTableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableNodesRemoved(this, path, childIndex, count);
+	}
+}
+
+
+void
+TreeTableModel::NotifyNodesChanged(const TreeTablePath& path, int32 childIndex,
+	int32 count)
+{
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--) {
+		TreeTableModelListener* listener = fListeners.ItemAt(i);
+		listener->TableNodesChanged(this, path, childIndex, count);
+	}
 }
 
 
@@ -46,7 +223,14 @@ TreeTableListener::~TreeTableListener()
 
 
 void
-TreeTableListener::TreeTableNodeInvoked(TreeTable* table, void* node)
+TreeTableListener::TreeTableSelectionChanged(TreeTable* table)
+{
+}
+
+
+void
+TreeTableListener::TreeTableNodeInvoked(TreeTable* table,
+	const TreeTablePath& path)
 {
 }
 
@@ -170,6 +354,259 @@ TreeTable::Column::GetPreferredWidth(BField* _field, BView* parent) const
 }
 
 
+// #pragma mark - TreeTableRow
+
+
+class TreeTableRow : public BRow {
+public:
+	TreeTableRow(TreeTableNode* node)
+		:
+		fNode(node)
+	{
+	}
+
+	TreeTableNode* Node()
+	{
+		return fNode;
+	}
+
+private:
+	TreeTableNode*	fNode;
+};
+
+
+// #pragma mark - TreeTableNode
+
+
+class TreeTableNode {
+public:
+								TreeTableNode(TreeTableNode* parent);
+								~TreeTableNode();
+
+			status_t			Init(void* modelObject, int32 columnCount);
+			void				DetachRow();
+
+			TreeTableNode*		Parent() const	{ return fParent; }
+			TreeTableRow*		Row() const		{ return fRow; }
+			void*				ModelObject() const;
+
+			bool				AddChild(TreeTableNode* child, int32 index);
+			TreeTableNode*		RemoveChild(int32 index);
+
+			int32				CountChildren() const;
+			TreeTableNode*		ChildAt(int32 index);
+			int32				IndexOf(TreeTableNode* child);
+
+private:
+			typedef BObjectList<TreeTableNode> NodeList;
+
+private:
+			TreeTableNode*		fParent;
+			TreeTableRow*		fRow;
+			NodeList*			fChildren;
+};
+
+
+TreeTableNode::TreeTableNode(TreeTableNode* parent)
+	:
+	fParent(parent),
+	fRow(NULL),
+	fChildren(NULL)
+{
+}
+
+
+TreeTableNode::~TreeTableNode()
+{
+	delete fChildren;
+	delete fRow;
+}
+
+
+status_t
+TreeTableNode::Init(void* modelObject, int32 columnCount)
+{
+	// create row
+	fRow = new(std::nothrow) TreeTableRow(this);
+	if (fRow == NULL)
+		return B_NO_MEMORY;
+
+	// add dummy fields to row
+	for (int32 columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+		// It would be nice to create only a single field and set it for all
+		// columns, but the row takes ultimate ownership, so it have to be
+		// individual objects.
+		TreeTableField* field = new(std::nothrow) TreeTableField(modelObject);
+		if (field == NULL)
+			return B_NO_MEMORY;
+
+		fRow->SetField(field, columnIndex);
+	}
+
+	return B_OK;
+}
+
+
+void
+TreeTableNode::DetachRow()
+{
+
+	fRow = NULL;
+
+	if (fChildren != NULL) {
+		for (int32 i = 0; TreeTableNode* child = fChildren->ItemAt(i); i++)
+			child->DetachRow();
+	}
+}
+
+
+void*
+TreeTableNode::ModelObject() const
+{
+	TreeTableField* field = dynamic_cast<TreeTableField*>(fRow->GetField(0));
+	return field->Object();
+}
+
+
+bool
+TreeTableNode::AddChild(TreeTableNode* child, int32 index)
+{
+	if (fChildren == NULL) {
+		fChildren = new(std::nothrow) NodeList(10, true);
+		if (fChildren == NULL)
+			return false;
+	}
+
+	return fChildren->AddItem(child, index);
+}
+
+
+TreeTableNode*
+TreeTableNode::RemoveChild(int32 index)
+{
+	return fChildren != NULL ? fChildren->RemoveItemAt(index) : NULL;
+}
+
+
+int32
+TreeTableNode::CountChildren() const
+{
+	return fChildren != NULL ? fChildren->CountItems() : 0;
+}
+
+
+TreeTableNode*
+TreeTableNode::ChildAt(int32 index)
+{
+	return fChildren != NULL ? fChildren->ItemAt(index) : NULL;
+}
+
+
+int32
+TreeTableNode::IndexOf(TreeTableNode* child)
+{
+	return fChildren != NULL ? fChildren->IndexOf(child) : -1;
+}
+
+
+// #pragma mark - TreeTableSelectionModel
+
+
+TreeTableSelectionModel::TreeTableSelectionModel(TreeTable* table)
+	:
+	fTreeTable(table),
+	fNodes(NULL),
+	fNodeCount(-1)
+{
+}
+
+
+TreeTableSelectionModel::~TreeTableSelectionModel()
+{
+	delete[] fNodes;
+}
+
+
+int32
+TreeTableSelectionModel::CountNodes()
+{
+	_Update();
+
+	return fNodeCount;
+}
+
+
+void*
+TreeTableSelectionModel::NodeAt(int32 index)
+{
+	if (TreeTableNode* node = _NodeAt(index))
+		return node->ModelObject();
+	return NULL;
+}
+
+
+bool
+TreeTableSelectionModel::GetPathAt(int32 index, TreeTablePath& _path)
+{
+	if (TreeTableNode* node = _NodeAt(index)) {
+		fTreeTable->_GetPathForNode(node, _path);
+		return true;
+	}
+
+	return false;
+}
+
+
+void
+TreeTableSelectionModel::_SelectionChanged()
+{
+	if (fNodeCount >= 0) {
+		fNodeCount = -1;
+		delete[] fNodes;
+		fNodes = NULL;
+	}
+}
+
+
+void
+TreeTableSelectionModel::_Update()
+{
+	if (fNodeCount >= 0)
+		return;
+
+	// count the nodes
+	fNodeCount = 0;
+	BRow* row = NULL;
+	while ((row = fTreeTable->CurrentSelection(row)) != NULL)
+		fNodeCount++;
+
+	if (fNodeCount == 0)
+		return;
+
+	// allocate node array
+	fNodes = new(std::nothrow) TreeTableNode*[fNodeCount];
+	if (fNodes == NULL) {
+		fNodeCount = 0;
+		return;
+	}
+
+	// get the nodes
+	row = NULL;
+	int32 index = 0;
+	while ((row = fTreeTable->CurrentSelection(row)) != NULL)
+		fNodes[index++] = dynamic_cast<TreeTableRow*>(row)->Node();
+}
+
+
+TreeTableNode*
+TreeTableSelectionModel::_NodeAt(int32 index)
+{
+	_Update();
+
+	return index >= 0 && index < fNodeCount ? fNodes[index] : NULL;
+}
+
+
 // #pragma mark - Table
 
 
@@ -177,7 +614,10 @@ TreeTable::TreeTable(const char* name, uint32 flags, border_style borderStyle,
 	bool showHorizontalScrollbar)
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL)
+	fModel(NULL),
+	fRootNode(NULL),
+	fSelectionModel(this),
+	fIgnoreSelectionChange(0)
 {
 }
 
@@ -186,7 +626,10 @@ TreeTable::TreeTable(TreeTableModel* model, const char* name, uint32 flags,
 	border_style borderStyle, bool showHorizontalScrollbar)
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
-	fModel(NULL)
+	fModel(NULL),
+	fRootNode(NULL),
+	fSelectionModel(this),
+	fIgnoreSelectionChange(0)
 {
 	SetTreeTableModel(model);
 }
@@ -194,18 +637,28 @@ TreeTable::TreeTable(TreeTableModel* model, const char* name, uint32 flags,
 
 TreeTable::~TreeTable()
 {
+	SetTreeTableModel(NULL);
+
 	for (int32 i = CountColumns() - 1; i >= 0; i--)
 		RemoveColumn(ColumnAt(i));
 }
 
 
-void
+bool
 TreeTable::SetTreeTableModel(TreeTableModel* model)
 {
 	if (model == fModel)
-		return;
+		return true;
 
 	if (fModel != NULL) {
+		fModel->RemoveListener(this);
+
+		if (fRootNode != NULL) {
+			fRootNode->DetachRow();
+			delete fRootNode;
+			fRootNode = NULL;
+		}
+
 		Clear();
 
 		for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
@@ -215,50 +668,96 @@ TreeTable::SetTreeTableModel(TreeTableModel* model)
 	fModel = model;
 
 	if (fModel == NULL)
-		return;
+		return true;
+
+	fRootNode = new(std::nothrow) TreeTableNode(NULL);
+	if (fRootNode == NULL)
+		return false;
+
+	if (fRootNode->Init(fModel->Root(), fModel->CountColumns()) != B_OK) {
+		delete fRootNode;
+		fRootNode = NULL;
+		return false;
+	}
+
+	fModel->AddListener(this);
 
 	for (int32 i = 0; AbstractColumn* column = fColumns.ItemAt(i); i++)
 		column->SetModel(fModel);
 
 	// recursively create the rows
-	_AddChildRows(fModel->Root(), NULL, fModel->CountColumns());
+	if (!_AddChildRows(fRootNode, 0, fModel->CountChildren(fModel->Root()),
+			fModel->CountColumns())) {
+		SetTreeTableModel(NULL);
+		return false;
+	}
+
+	return true;
+}
+
+
+TreeTableSelectionModel*
+TreeTable::SelectionModel()
+{
+	return &fSelectionModel;
 }
 
 
 void
-TreeTable::_AddChildRows(void* parent, BRow* parentRow, int32 columnCount)
+TreeTable::SelectNode(const TreeTablePath& path, bool extendSelection)
 {
-	int32 childCount = fModel->CountChildren(parent);
-	for (int32 i = 0; i < childCount; i++) {
-		void* child = fModel->ChildAt(parent, i);
+	TreeTableNode* node = _NodeForPath(path);
+	if (node == NULL)
+		return;
 
-		// create row
-		BRow* row = new(std::nothrow) BRow();
-		if (row == NULL) {
-			// TODO: Report error!
-			return;
-		}
-
-		// add dummy fields to row
-		for (int32 columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-			// It would be nice to create only a single field and set it for all
-			// columns, but the row takes ultimate ownership, so it have to be
-			// individual objects.
-			TreeTableField* field = new(std::nothrow) TreeTableField(child);
-			if (field == NULL) {
-				// TODO: Report error!
-				return;
-			}
-
-			row->SetField(field, columnIndex);
-		}
-
-		// add row
-		AddRow(row, parentRow);
-
-		// recursively create children
-		_AddChildRows(child, row, columnCount);
+	if (!extendSelection) {
+		fIgnoreSelectionChange++;
+		DeselectAll();
+		fIgnoreSelectionChange--;
 	}
+
+	AddToSelection(node->Row());
+}
+
+
+void
+TreeTable::DeselectNode(const TreeTablePath& path)
+{
+	if (TreeTableNode* node = _NodeForPath(path))
+		Deselect(node->Row());
+}
+
+
+void
+TreeTable::DeselectAllNodes()
+{
+	DeselectAll();
+}
+
+
+bool
+TreeTable::IsNodeExpanded(const TreeTablePath& path) const
+{
+	if (TreeTableNode* node = _NodeForPath(path))
+		node->Row()->IsExpanded();
+	return false;
+}
+
+
+void
+TreeTable::SetNodeExpanded(const TreeTablePath& path, bool expanded,
+	bool expandAncestors)
+{
+	if (TreeTableNode* node = _NodeForPath(path))
+		_SetNodeExpanded(node, expanded, expandAncestors);
+}
+
+
+void
+TreeTable::ScrollToNode(const TreeTablePath& path)
+{
+	if (TreeTableNode* node = _NodeForPath(path))
+		BColumnListView::ScrollTo(node->Row());
 }
 
 
@@ -276,10 +775,66 @@ TreeTable::RemoveTreeTableListener(TreeTableListener* listener)
 }
 
 
+void
+TreeTable::SelectionChanged()
+{
+	if (fIgnoreSelectionChange > 0)
+		return;
+
+	fSelectionModel._SelectionChanged();
+
+	if (!fListeners.IsEmpty()) {
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--)
+			fListeners.ItemAt(i)->TreeTableSelectionChanged(this);
+	}
+}
+
+
 AbstractTable::AbstractColumn*
 TreeTable::CreateColumn(TableColumn* column)
 {
 	return new Column(fModel, column);
+}
+
+
+void
+TreeTable::TableNodesAdded(TreeTableModel* model, const TreeTablePath& path,
+	int32 childIndex, int32 count)
+{
+	TreeTableNode* node = _NodeForPath(path);
+	if (node == NULL)
+		return;
+
+	_AddChildRows(node, childIndex, count, fModel->CountColumns());
+}
+
+
+void
+TreeTable::TableNodesRemoved(TreeTableModel* model, const TreeTablePath& path,
+	int32 childIndex, int32 count)
+{
+	TreeTableNode* node = _NodeForPath(path);
+	if (node == NULL)
+		return;
+
+	_RemoveChildRows(node, childIndex, count);
+}
+
+
+void
+TreeTable::TableNodesChanged(TreeTableModel* model, const TreeTablePath& path,
+	int32 childIndex, int32 count)
+{
+	TreeTableNode* node = _NodeForPath(path);
+	if (node == NULL)
+		return;
+
+	int32 endIndex = childIndex + count;
+	for (int32 i = childIndex; i < endIndex; i++) {
+		if (TreeTableNode* child = node->ChildAt(i))
+			UpdateRow(child->Row());
+	}
 }
 
 
@@ -289,15 +844,97 @@ TreeTable::ItemInvoked()
 	if (fListeners.IsEmpty())
 		return;
 
-	BRow* row = CurrentSelection();
+	TreeTableRow* row = dynamic_cast<TreeTableRow*>(CurrentSelection());
 	if (row == NULL)
 		return;
 
-	TreeTableField* field = dynamic_cast<TreeTableField*>(row->GetField(0));
-	if (field == NULL)
-		return;
+	TreeTablePath path;
+	_GetPathForNode(row->Node(), path);
 
 	int32 listenerCount = fListeners.CountItems();
 	for (int32 i = listenerCount - 1; i >= 0; i--)
-		fListeners.ItemAt(i)->TreeTableNodeInvoked(this, field->Object());
+		fListeners.ItemAt(i)->TreeTableNodeInvoked(this, path);
+}
+
+
+bool
+TreeTable::_AddChildRows(TreeTableNode* parentNode, int32 childIndex,
+	int32 count, int32 columnCount)
+{
+	int32 childEndIndex = childIndex + count;
+	for (int32 i = childIndex; i < childEndIndex; i++) {
+		void* child = fModel->ChildAt(parentNode->ModelObject(), i);
+
+		// create node
+		TreeTableNode* node = new(std::nothrow) TreeTableNode(parentNode);
+		if (node == NULL || node->Init(child, columnCount) != B_OK
+			|| !parentNode->AddChild(node, i)) {
+			delete node;
+			return false;
+		}
+
+		// add row
+		AddRow(node->Row(), i,
+			parentNode != fRootNode ? parentNode->Row() : NULL);
+
+		// recursively create children
+		if (!_AddChildRows(node, 0, fModel->CountChildren(child), columnCount))
+			return false;
+	}
+
+	return true;
+}
+
+
+void
+TreeTable::_RemoveChildRows(TreeTableNode* parentNode, int32 childIndex,
+	int32 count)
+{
+	for (int32 i = childIndex + count - 1; i >= childIndex; i--) {
+		if (TreeTableNode* child = parentNode->RemoveChild(i)) {
+			int32 childCount = child->CountChildren();
+			if (childCount > 0)
+				_RemoveChildRows(child, 0, childCount);
+
+			RemoveRow(child->Row());
+			delete child;
+		}
+	}
+}
+
+
+void
+TreeTable::_SetNodeExpanded(TreeTableNode* node, bool expanded,
+	bool expandAncestors)
+{
+	if (expanded && expandAncestors && node != fRootNode)
+		_SetNodeExpanded(node->Parent(), true, true);
+
+	BColumnListView::ExpandOrCollapse(node->Row(), expanded);
+}
+
+
+TreeTableNode*
+TreeTable::_NodeForPath(const TreeTablePath& path) const
+{
+	TreeTableNode* node = fRootNode;
+
+	int32 count = path.CountComponents();
+	for (int32 i = 0; node != NULL && i < count; i++)
+		node = node->ChildAt(path.ComponentAt(i));
+
+	return node;
+}
+
+
+void
+TreeTable::_GetPathForNode(TreeTableNode* node, TreeTablePath& _path) const
+{
+	if (node == fRootNode) {
+		_path.Clear();
+		return;
+	}
+
+	_GetPathForNode(node->Parent(), _path);
+	_path.AddComponent(node->Parent()->IndexOf(node));
 }
