@@ -33,7 +33,7 @@ DwarfManager::Init()
 
 
 status_t
-DwarfManager::LoadFile(const char* fileName)
+DwarfManager::LoadFile(const char* fileName, DwarfFile*& _file)
 {
 	AutoLocker<DwarfManager> locker(this);
 
@@ -49,6 +49,7 @@ DwarfManager::LoadFile(const char* fileName)
 
 	fFiles.Add(file);
 
+	_file = file;
 	return B_OK;
 }
 

@@ -23,7 +23,8 @@ public:
 			bool				Lock()		{ return fLock.Lock(); }
 			void				Unlock()	{ fLock.Unlock(); }
 
-			status_t			LoadFile(const char* fileName);
+			status_t			LoadFile(const char* fileName,
+									DwarfFile*& _file);
 			status_t			FinishLoading();
 
 private:
