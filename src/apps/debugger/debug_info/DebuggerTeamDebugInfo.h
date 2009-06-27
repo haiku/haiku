@@ -10,7 +10,6 @@
 
 class Architecture;
 class DebuggerInterface;
-class FunctionDebugInfo;
 class ImageInfo;
 
 
@@ -25,7 +24,6 @@ public:
 
 	virtual	status_t			CreateImageDebugInfo(const ImageInfo& imageInfo,
 									SpecificImageDebugInfo*& _imageDebugInfo);
-
 
 private:
 			DebuggerInterface*	fDebuggerInterface;

@@ -5,15 +5,12 @@
 #ifndef DEBUGGER_IMAGE_DEBUG_INFO_H
 #define DEBUGGER_IMAGE_DEBUG_INFO_H
 
-#include <String.h>
-
 #include "ImageInfo.h"
 #include "SpecificImageDebugInfo.h"
 
 
 class Architecture;
 class DebuggerInterface;
-class FunctionDebugInfo;
 class SymbolInfo;
 
 
