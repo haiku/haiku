@@ -10,7 +10,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) dwarf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
@@ -55,15 +54,6 @@ Application Debugger :
 	DebugEvent.cpp
 	DebuggerInterface.cpp
 
-	# dwarf
-	attribute_classes.cpp
-	AttributeValue.cpp
-	DebugInfoEntries.cpp
-	DebugInfoEntry.cpp
-	DwarfManager.cpp
-	SourceLanguageInfo.cpp
-	tag_names.cpp
-
 	# elf
 	ElfFile.cpp
 
@@ -95,6 +85,7 @@ Application Debugger :
 	:
 	<nogrist>Debugger_demangler.o
 	<nogrist>Debugger_disasm_x86.o
+	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
 	libudis86.a
@@ -110,4 +101,5 @@ Application Debugger :
 
 HaikuSubInclude arch x86 disasm ;
 HaikuSubInclude demangler ;
+HaikuSubInclude dwarf ;
 HaikuSubInclude gui running_teams_window ;

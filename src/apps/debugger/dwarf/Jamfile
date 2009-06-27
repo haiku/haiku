@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src apps debugger dwarf ;
+
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
+
+UsePrivateHeaders kernel shared ;
+UsePrivateSystemHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) elf ] ;
+
+
+MergeObject Debugger_dwarf.o
+	:
+	AbbreviationTable.cpp
+	AttributeClasses.cpp
+	AttributeValue.cpp
+	CompilationUnit.cpp
+	DebugInfoEntries.cpp
+	DebugInfoEntry.cpp
+	DwarfFile.cpp
+	DwarfManager.cpp
+	SourceLanguageInfo.cpp
+	TagNames.cpp
+;

@@ -5,8 +5,8 @@
 #ifndef ATTRIBUTE_VALUE_H
 #define ATTRIBUTE_VALUE_H
 
-#include "attribute_classes.h"
-#include "types.h"
+#include "AttributeClasses.h"
+#include "DwarfTypes.h"
 
 
 class DebugInfoEntry;

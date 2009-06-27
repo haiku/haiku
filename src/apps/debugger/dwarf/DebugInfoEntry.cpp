@@ -8,7 +8,7 @@
 #include <new>
 
 #include "AttributeValue.h"
-#include "dwarf.h"
+#include "Dwarf.h"
 
 
 #define DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(name)				\

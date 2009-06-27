@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef DWARF_TYPES_H
+#define DWARF_TYPES_H
 
 #include <SupportDefs.h>
 
@@ -19,4 +19,4 @@ typedef uint32 dwarf_size_t;
 #define DWARF_ADDRESS_MAX	0xffffffff
 
 
-#endif	// TYPES_H
+#endif	// DWARF_TYPES_H

@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "attribute_classes.h"
-#include "dwarf.h"
+#include "AttributeClasses.h"
+#include "Dwarf.h"
 
 
 enum {

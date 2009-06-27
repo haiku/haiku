@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "tag_names.h"
+#include "TagNames.h"
 
-#include "dwarf.h"
+#include "Dwarf.h"
 
 
 struct tag_name_info {

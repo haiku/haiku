@@ -5,11 +5,12 @@
 #ifndef DWARF_MANAGER_H
 #define DWARF_MANAGER_H
 
-#include <sys/types.h>
-
-#include <SupportDefs.h>
+#include <Locker.h>
 
 #include <util/DoublyLinkedList.h>
+
+
+class DwarfFile;
 
 
 class DwarfManager {
@@ -19,15 +20,17 @@ public:
 
 			status_t			Init();
 
+			bool				Lock()		{ return fLock.Lock(); }
+			void				Unlock()	{ fLock.Unlock(); }
+
 			status_t			LoadFile(const char* fileName);
 			status_t			FinishLoading();
 
 private:
-			struct CompilationUnit;
-			struct File;
-			typedef DoublyLinkedList<File> FileList;
+			typedef DoublyLinkedList<DwarfFile> FileList;
 
 private:
+			BLocker				fLock;
 			FileList			fFiles;
 };
 
