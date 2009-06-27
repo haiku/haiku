@@ -10,6 +10,7 @@
 #include <AutoDeleter.h>
 
 #include "DebuggerTeamDebugInfo.h"
+#include "DwarfTeamDebugInfo.h"
 #include "ImageDebugInfo.h"
 #include "SpecificImageDebugInfo.h"
 
@@ -32,10 +33,20 @@ TeamDebugInfo::~TeamDebugInfo()
 status_t
 TeamDebugInfo::Init()
 {
-	// create specific infos for all types of debug info we support
+	// Create specific infos for all types of debug info we support, in
+	// descending order of expressiveness.
 
 	// DWARF
-	// TODO:...
+	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
+		fArchitecture);
+	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
+		delete dwarfInfo;
+		return B_NO_MEMORY;
+	}
+
+	status_t error = dwarfInfo->Init();
+	if (error != B_OK)
+		return error;
 
 	// debugger based info
 	DebuggerTeamDebugInfo* debuggerInfo
@@ -46,7 +57,7 @@ TeamDebugInfo::Init()
 		return B_NO_MEMORY;
 	}
 
-	status_t error = debuggerInfo->Init();
+	error = debuggerInfo->Init();
 	if (error != B_OK)
 		return error;
 

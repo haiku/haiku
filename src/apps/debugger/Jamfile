@@ -21,6 +21,12 @@ SubDirHdrs [ FDirName $(SUBDIR) demangler ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 
+SourceHdrs
+	DwarfImageDebugInfo.cpp
+	DwarfTeamDebugInfo.cpp
+	: [ FDirName $(SUBDIR) dwarf ]
+;
+
 Application Debugger :
 	BreakpointManager.cpp
 	Debugger.cpp
@@ -43,6 +49,8 @@ Application Debugger :
 	BasicFunctionDebugInfo.cpp
 	DebuggerImageDebugInfo.cpp
 	DebuggerTeamDebugInfo.cpp
+	DwarfImageDebugInfo.cpp
+	DwarfTeamDebugInfo.cpp
 	FunctionDebugInfo.cpp
 	ImageDebugInfo.cpp
 	ImageDebugInfoProvider.cpp
