@@ -648,7 +648,7 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 		}
 
 		TRACE("ContinuousMessageFilter::Filter: update view %s, %ld "
-			"channels\n", control->Name(), fParameter.CountChannels());
+			"channels\n", fControl->Name(), fParameter.CountChannels());
 
 		if (fParameter.SetValue((void *)value, sizeof(value),
 				system_time()) < B_OK) {
