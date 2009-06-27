@@ -108,6 +108,8 @@ struct path_entry : DoublyLinkedListLinkImpl<path_entry> {
 	char			path[B_PATH_NAME_LENGTH];
 };
 
+typedef DoublyLinkedList<path_entry> EntryList;
+
 struct driver_entry : public DoublyLinkedListLinkImpl<driver_entry> {
 	char*				path;
 	dev_t				device;
@@ -191,8 +193,8 @@ static status_t load_driver(legacy_driver *driver);
 static hash_table* sDriverHash;
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEvents;
-static DoublyLinkedList<path_entry> sDriversToAdd;
-static DoublyLinkedList<path_entry> sDriversToRemove;
+static EntryList sDriversToAdd;
+static EntryList sDriversToRemove;
 static mutex sDriversListLock = MUTEX_INITIALIZER("driversList");
 static DirectoryWatcher sDirectoryWatcher;
 static DirectoryNodeHash sDirectoryNodeHash;
@@ -581,7 +583,7 @@ add_driver(const char *path, image_id image)
 
 	hash_insert(sDriverHash, driver);
 	if (stat.st_dev > 0) {
-		add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_STAT,
+		add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_STAT | B_WATCH_NAME,
 			sDriverWatcher);
 	}
 
@@ -612,8 +614,19 @@ reload_driver(legacy_driver *driver)
 
 	unload_driver(driver);
 
+	struct stat stat;
+	if (::stat(driver->path, &stat) == 0
+		&& (stat.st_dev != driver->device || stat.st_ino != driver->node)) {
+		// The driver file has been changed, so we need to update its listener
+		if (driver->device != -1)
+			remove_node_listener(driver->device, driver->node, sDriverWatcher);
+
+		add_node_listener(driver->device, driver->node,
+			B_WATCH_STAT | B_WATCH_NAME, sDriverWatcher);
+	}
+
 	status_t status = load_driver(driver);
-	if (status < B_OK)
+	if (status != B_OK)
 		unpublish_driver(driver);
 
 	return status;
@@ -691,8 +704,10 @@ void
 DriverWatcher::EventOccured(NotificationService& service,
 	const KMessage* event)
 {
-	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
-		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
+	int32 opcode = event->GetInt32("opcode", -1);
+	if ((opcode == B_STAT_CHANGED
+			&& (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
+		|| opcode != B_ENTRY_REMOVED)
 		return;
 
 	RecursiveLocker locker(sLock);
