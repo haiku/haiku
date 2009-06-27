@@ -4428,8 +4428,13 @@ void
 OutlineView::ScrollTo(const BRow* row)
 {
 	BRect rect;
-	if (FindRect(row, &rect))
-		ScrollTo(BPoint(rect.left, rect.top));
+	if (FindRect(row, &rect)) {
+		BRect bounds = Bounds();
+		if (rect.top < bounds.top)
+			ScrollTo(BPoint(bounds.left, rect.top));
+		else if (rect.bottom > bounds.bottom)
+			ScrollBy(0, rect.bottom - bounds.bottom);
+	}
 }
 
 
