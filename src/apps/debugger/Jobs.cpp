@@ -180,28 +180,22 @@ GetStackTraceJob::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 	AutoLocker<Team> teamLocker(fThread->GetTeam());
 
 	while (image->GetImageDebugInfo() == NULL) {
-		// The info has not yet been loaded -- check whether a job has already
-		// been scheduled.
-		AutoLocker<Worker> workerLocker(GetWorker());
-		JobKey key(image, JOB_TYPE_LOAD_IMAGE_DEBUG_INFO);
-		Job* loadImageDebugInfoJob = GetWorker()->GetJob(key);
-		if (loadImageDebugInfoJob == NULL) {
-			// no job yet -- schedule one
-			loadImageDebugInfoJob = new(std::nothrow) LoadImageDebugInfoJob(
-				fDebuggerInterface, fArchitecture, image);
-			if (loadImageDebugInfoJob == NULL)
-				return B_NO_MEMORY;
+		// schedule a job, if not loaded
+		ImageDebugInfo* info;
+		status_t error = LoadImageDebugInfoJob::ScheduleIfNecessary(
+			fDebuggerInterface, fArchitecture, GetWorker(), image, &info);
+		if (error != B_OK)
+			return error;
 
-			status_t error = GetWorker()->ScheduleJob(loadImageDebugInfoJob);
-			if (error != B_OK)
-				return error;
+		if (info != NULL) {
+			_info = info;
+			return B_OK;
 		}
 
-		workerLocker.Unlock();
 		teamLocker.Unlock();
 
 		// wait for the job to finish
-		switch (WaitFor(key)) {
+		switch (WaitFor(JobKey(image, JOB_TYPE_LOAD_IMAGE_DEBUG_INFO))) {
 			case JOB_DEPENDENCY_SUCCEEDED:
 			case JOB_DEPENDENCY_NOT_FOUND:
 				// "Not found" can happen due to a race condition between
@@ -262,19 +256,70 @@ LoadImageDebugInfoJob::Do()
 	// create the debug info
 	ImageDebugInfo* debugInfo = new(std::nothrow) ImageDebugInfo(imageInfo,
 		fDebuggerInterface, fArchitecture);
-	if (debugInfo == NULL)
+
+	status_t error;;
+	if (debugInfo != NULL)
+		error = debugInfo->Init();
+	else
+		error = B_NO_MEMORY;
+
+	// set the result
+	locker.Lock();
+	if (error == B_OK) {
+		fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
+		debugInfo->RemoveReference();
+	} else {
+		fImage->SetImageDebugInfo(NULL, IMAGE_DEBUG_INFO_UNAVAILABLE);
+		delete debugInfo;
+	}
+
+	return error;
+}
+
+
+/*static*/ status_t
+LoadImageDebugInfoJob::ScheduleIfNecessary(DebuggerInterface* debuggerInterface,
+	Architecture* architecture, Worker* worker, Image* image,
+	ImageDebugInfo** _imageDebugInfo)
+{
+	AutoLocker<Team> teamLocker(image->GetTeam());
+
+	// If already loaded, we're done.
+	if (image->GetImageDebugInfo() != NULL) {
+		if (_imageDebugInfo != NULL) {
+			*_imageDebugInfo = image->GetImageDebugInfo();
+			(*_imageDebugInfo)->AddReference();
+		}
+		return B_OK;
+	}
+
+	// If already loading, the caller has to wait, if desired.
+	if (image->ImageDebugInfoState() == IMAGE_DEBUG_INFO_LOADING) {
+		if (_imageDebugInfo != NULL)
+			*_imageDebugInfo = NULL;
+		return B_OK;
+	}
+
+	// If an earlier load attempt failed, bail out.
+	if (image->ImageDebugInfoState() != IMAGE_DEBUG_INFO_NOT_LOADED)
+		return B_ERROR;
+
+	// schedule a job
+	LoadImageDebugInfoJob* job = new(std::nothrow) LoadImageDebugInfoJob(
+			debuggerInterface, architecture, image);
+	if (job == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = debugInfo->Init();
+	status_t error = worker->ScheduleJob(job);
 	if (error != B_OK) {
-		delete debugInfo;
+		image->SetImageDebugInfo(NULL, IMAGE_DEBUG_INFO_UNAVAILABLE);
 		return error;
 	}
 
-	// set the info
-	locker.Lock();
-	fImage->SetImageDebugInfo(debugInfo);
+	image->SetImageDebugInfo(NULL, IMAGE_DEBUG_INFO_LOADING);
 
+	if (_imageDebugInfo != NULL)
+		*_imageDebugInfo = NULL;
 	return B_OK;
 }
 

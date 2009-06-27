@@ -52,6 +52,7 @@ Application Debugger :
 	DebuggerInterface.cpp
 
 	# gui/team_window
+	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegisterView.cpp
 	SourceView.cpp

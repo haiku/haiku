@@ -14,13 +14,18 @@
 class ImageListView : public BGroupView, private Team::Listener,
 	private TableListener {
 public:
-								ImageListView();
+	class Listener;
+
+public:
+								ImageListView(Team* team, Listener* listener);
 								~ImageListView();
 
-	static	ImageListView*		Create();
+	static	ImageListView*		Create(Team* team, Listener* listener);
 									// throws
 
-			void				SetTeam(Team* team);
+			void				UnsetListener();
+
+			void				SetImage(Image* image);
 
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -33,14 +38,24 @@ private:
 	virtual	void				ImageRemoved(const Team::ImageEvent& event);
 
 	// TableListener
-	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
+	virtual	void				TableSelectionChanged(Table* table);
 
 			void				_Init();
 
 private:
 			Team*				fTeam;
+			Image*				fImage;
 			Table*				fImagesTable;
 			ImagesTableModel*	fImagesTableModel;
+			Listener*			fListener;
+};
+
+
+class ImageListView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				ImageSelectionChanged(Image* image) = 0;
 };
 
 

@@ -6,13 +6,15 @@
 #include "Image.h"
 
 #include "ImageDebugInfo.h"
+#include "Team.h"
 
 
 Image::Image(Team* team,const ImageInfo& imageInfo)
 	:
 	fTeam(team),
 	fInfo(imageInfo),
-	fDebugInfo(NULL)
+	fDebugInfo(NULL),
+	fDebugInfoState(IMAGE_DEBUG_INFO_NOT_LOADED)
 {
 }
 
@@ -31,22 +33,6 @@ Image::Init()
 }
 
 
-void
-Image::SetImageDebugInfo(ImageDebugInfo* debugInfo)
-{
-	if (debugInfo == fDebugInfo)
-		return;
-
-	if (fDebugInfo != NULL)
-		fDebugInfo->RemoveReference();
-
-	fDebugInfo = debugInfo;
-
-	if (fDebugInfo != NULL)
-		fDebugInfo->AddReference();
-}
-
-
 bool
 Image::ContainsAddress(target_addr_t address) const
 {
@@ -54,4 +40,25 @@ Image::ContainsAddress(target_addr_t address) const
 			&& address < fInfo.TextBase() + fInfo.TextSize())
 		|| (address >= fInfo.DataBase()
 			&& address < fInfo.DataBase() + fInfo.DataSize());
+}
+
+
+void
+Image::SetImageDebugInfo(ImageDebugInfo* debugInfo,
+	image_debug_info_state state)
+{
+	if (debugInfo == fDebugInfo && state == fDebugInfoState)
+		return;
+
+	if (fDebugInfo != NULL)
+		fDebugInfo->RemoveReference();
+
+	fDebugInfo = debugInfo;
+	fDebugInfoState = state;
+
+	if (fDebugInfo != NULL)
+		fDebugInfo->AddReference();
+
+	// notify listeners
+	fTeam->NotifyImageDebugInfoChanged(this);
 }

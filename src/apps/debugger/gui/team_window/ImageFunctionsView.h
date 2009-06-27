@@ -1,0 +1,60 @@
+/*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef IMAGE_FUNCTIONS_VIEW_H
+#define IMAGE_FUNCTIONS_VIEW_H
+
+#include <GroupView.h>
+
+#include "table/TreeTable.h"
+#include "Team.h"
+
+
+class FunctionDebugInfo;
+
+
+class ImageFunctionsView : public BGroupView, private TreeTableListener {
+public:
+	class Listener;
+
+public:
+								ImageFunctionsView(Listener* listener);
+								~ImageFunctionsView();
+
+	static	ImageFunctionsView*	Create(Listener* listener);
+									// throws
+
+			void				UnsetListener();
+
+			void				SetImageDebugInfo(
+									ImageDebugInfo* imageDebugInfo);
+			void				SetFunction(FunctionDebugInfo* function);
+
+private:
+			class FunctionsTableModel;
+
+private:
+	// TreeTableListener
+	virtual	void				TreeTableSelectionChanged(TreeTable* table);
+
+			void				_Init();
+
+private:
+			ImageDebugInfo*		fImageDebugInfo;
+			TreeTable*			fFunctionsTable;
+			FunctionsTableModel* fFunctionsTableModel;
+			Listener*			fListener;
+};
+
+
+class ImageFunctionsView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				FunctionSelectionChanged(
+									FunctionDebugInfo* function) = 0;
+};
+
+
+#endif	// IMAGE_FUNCTIONS_VIEW_H

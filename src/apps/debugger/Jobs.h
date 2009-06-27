@@ -95,6 +95,19 @@ public:
 	virtual	JobKey				Key() const;
 	virtual	status_t			Do();
 
+	static	status_t			ScheduleIfNecessary(
+									DebuggerInterface* debuggerInterface,
+									Architecture* architecture, Worker* worker,
+									Image* image,
+									ImageDebugInfo** _imageDebugInfo = NULL);
+										// If already loaded returns a
+										// reference, if desired. If not loaded
+										// schedules a job, but does not wait;
+										// returns B_OK and NULL. An error,
+										// if scheduling the job failed, or the
+										// debug info already failed to load
+										// earlier.
+
 private:
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;

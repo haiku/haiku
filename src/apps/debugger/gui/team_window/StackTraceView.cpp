@@ -241,7 +241,7 @@ StackTraceView::TableSelectionChanged(Table* table)
 void
 StackTraceView::_Init()
 {
-	fFramesTable = new Table("register list", 0, B_FANCY_BORDER);
+	fFramesTable = new Table("stack trace", 0, B_FANCY_BORDER);
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
 

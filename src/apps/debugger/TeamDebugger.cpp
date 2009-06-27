@@ -349,6 +349,14 @@ TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
 
 
 void
+TeamDebugger::ImageDebugInfoRequested(TeamWindow* window, Image* image)
+{
+	LoadImageDebugInfoJob::ScheduleIfNecessary(fDebuggerInterface,
+		fDebuggerInterface->GetArchitecture(), fWorker, image);
+}
+
+
+void
 TeamDebugger::ThreadActionRequested(TeamWindow* window, thread_id threadID,
 	uint32 action)
 {

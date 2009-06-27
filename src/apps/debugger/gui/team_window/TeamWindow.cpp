@@ -18,7 +18,8 @@
 #include <AutoLocker.h>
 
 #include "CpuState.h"
-#include "ImageListView.h"
+#include "Image.h"
+#include "ImageDebugInfo.h"
 #include "MessageCodes.h"
 #include "RegisterView.h"
 #include "SourceCode.h"
@@ -35,6 +36,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fDebugModel(debugModel),
 	fActiveThread(NULL),
+	fActiveImage(NULL),
 	fActiveStackTrace(NULL),
 	fActiveStackFrame(NULL),
 	fActiveFunction(NULL),
@@ -44,6 +46,7 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fLocalsTabView(NULL),
 	fThreadListView(NULL),
 	fImageListView(NULL),
+	fImageFunctionsView(NULL),
 	fRegisterView(NULL),
 	fStackTraceView(NULL),
 	fSourceView(NULL),
@@ -79,6 +82,7 @@ TeamWindow::~TeamWindow()
 	_SetActiveFunction(NULL);
 	_SetActiveStackFrame(NULL);
 	_SetActiveStackTrace(NULL);
+	_SetActiveImage(NULL);
 	_SetActiveThread(NULL);
 }
 
@@ -143,6 +147,16 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_IMAGE_DEBUG_INFO_CHANGED:
+		{
+			int32 imageID;
+			if (message->FindInt32("image", &imageID) != B_OK)
+				break;
+
+			_HandleImageDebugInfoChanged(imageID);
+			break;
+		}
+
 		case MSG_USER_BREAKPOINT_CHANGED:
 		{
 			uint64 address;
@@ -181,9 +195,23 @@ TeamWindow::ThreadSelectionChanged(::Thread* thread)
 
 
 void
+TeamWindow::ImageSelectionChanged(Image* image)
+{
+	_SetActiveImage(image);
+}
+
+
+void
 TeamWindow::StackFrameSelectionChanged(StackFrame* frame)
 {
 	_SetActiveStackFrame(frame);
+}
+
+
+void
+TeamWindow::FunctionSelectionChanged(FunctionDebugInfo* function)
+{
+	_SetActiveFunction(function);
 }
 
 
@@ -224,6 +252,15 @@ TeamWindow::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
 	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+TeamWindow::ImageDebugInfoChanged(const Team::ImageEvent& event)
+{
+	BMessage message(MSG_IMAGE_DEBUG_INFO_CHANGED);
+	message.AddInt32("image", event.GetImage()->ID());
 	PostMessage(&message);
 }
 
@@ -288,8 +325,9 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
-		.Add(fImageListView = ImageListView::Create())
-		.Add(new BTextView("source files"));
+		.Add(fImageListView = ImageListView::Create(fDebugModel->GetTeam(),
+				this))
+		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add local variables tab
 	BView* tab = new BTextView("Variables");
@@ -300,7 +338,6 @@ TeamWindow::_Init()
 	fLocalsTabView->AddTab(tab);
 
 	fThreadListView->SetTeam(fDebugModel->GetTeam());
-	fImageListView->SetTeam(fDebugModel->GetTeam());
 
 	fRunButton->SetMessage(new BMessage(MSG_THREAD_RUN));
 	fStepOverButton->SetMessage(new BMessage(MSG_THREAD_STEP_OVER));
@@ -336,12 +373,46 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 	StackTrace* stackTrace = fActiveThread != NULL
 		? fActiveThread->GetStackTrace() : NULL;
 	Reference<StackTrace> stackTraceReference(stackTrace);
-		// hold a reference until the register view has one
+		// hold a reference until we've set it
 
 	locker.Unlock();
 
 	_SetActiveStackTrace(stackTrace);
 	_UpdateCpuState();
+}
+
+
+void
+TeamWindow::_SetActiveImage(Image* image)
+{
+	if (image == fActiveImage)
+		return;
+
+	if (fActiveImage != NULL)
+		fActiveImage->RemoveReference();
+
+	fActiveImage = image;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	ImageDebugInfo* imageDebugInfo = NULL;
+	Reference<ImageDebugInfo> imageDebugInfoReference;
+
+	if (fActiveImage != NULL) {
+		fActiveImage->AddReference();
+
+		imageDebugInfo = fActiveImage->GetImageDebugInfo();
+		imageDebugInfoReference.SetTo(imageDebugInfo);
+
+		// If the debug info is not loaded yet, request it.
+		if (fActiveImage->ImageDebugInfoState() == IMAGE_DEBUG_INFO_NOT_LOADED)
+			fListener->ImageDebugInfoRequested(this, fActiveImage);
+	}
+
+	locker.Unlock();
+
+	fImageListView->SetImage(fActiveImage);
+	fImageFunctionsView->SetImageDebugInfo(imageDebugInfo);
 }
 
 
@@ -403,7 +474,20 @@ TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
 		fActiveFunction->RemoveReference();
 	}
 
+	// to avoid listener feedback problems, first unset the active function and
+	// set the new image, if any
+	locker.Unlock();
+
+	fActiveFunction = NULL;
+
+	if (function != NULL) {
+		_SetActiveImage(fDebugModel->GetTeam()->ImageByAddress(
+			function->Address()));
+	}
+
 	fActiveFunction = function;
+
+	locker.Lock();
 
 	SourceCode* sourceCode = NULL;
 	Reference<SourceCode> sourceCodeReference;
@@ -423,6 +507,8 @@ TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
 	locker.Unlock();
 
 	_SetActiveSourceCode(sourceCode);
+
+	fImageFunctionsView->SetFunction(fActiveFunction);
 }
 
 
@@ -540,6 +626,28 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 	locker.Unlock();
 
 	_SetActiveStackTrace(stackTrace);
+}
+
+
+void
+TeamWindow::_HandleImageDebugInfoChanged(image_id imageID)
+{
+printf("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
+	// We're only interested in the currently selected thread
+	if (fActiveImage == NULL || imageID != fActiveImage->ID())
+		return;
+
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	ImageDebugInfo* imageDebugInfo = fActiveImage != NULL
+		? fActiveImage->GetImageDebugInfo() : NULL;
+printf("  image debug info: %p\n", imageDebugInfo);
+	Reference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo);
+		// hold a reference until we've set it
+
+	locker.Unlock();
+
+	fImageFunctionsView->SetImageDebugInfo(imageDebugInfo);
 }
 
 

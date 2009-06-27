@@ -10,6 +10,8 @@
 
 #include "SourceView.h"
 #include "FunctionDebugInfo.h"
+#include "ImageFunctionsView.h"
+#include "ImageListView.h"
 #include "StackTraceView.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
@@ -19,15 +21,16 @@
 class BButton;
 class BTabView;
 class FunctionDebugInfo;
-class ImageListView;
+class Image;
 class RegisterView;
 class SourceCode;
 class StackFrame;
 
 
-class TeamWindow : public BWindow, private ThreadListView::Listener,
-	StackTraceView::Listener, SourceView::Listener, Team::Listener,
-	private TeamDebugModel::Listener, FunctionDebugInfo::Listener {
+class TeamWindow : public BWindow, ThreadListView::Listener,
+	ImageListView::Listener, StackTraceView::Listener,
+	ImageFunctionsView::Listener, SourceView::Listener, Team::Listener,
+	TeamDebugModel::Listener, FunctionDebugInfo::Listener {
 public:
 	class Listener;
 
@@ -47,8 +50,15 @@ private:
 	// ThreadListView::Listener
 	virtual	void				ThreadSelectionChanged(::Thread* thread);
 
+	// ImageListView::Listener
+	virtual	void				ImageSelectionChanged(Image* image);
+
 	// StackTraceView::Listener
 	virtual	void				StackFrameSelectionChanged(StackFrame* frame);
+
+	// ImageFunctionsView::Listener
+	virtual	void				FunctionSelectionChanged(
+									FunctionDebugInfo* function);
 
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
@@ -62,6 +72,8 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+	virtual	void				ImageDebugInfoChanged(
+									const Team::ImageEvent& event);
 
 	// TeamDebugModel::Listener
 	virtual	void				UserBreakpointChanged(
@@ -75,6 +87,7 @@ private:
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
+			void				_SetActiveImage(Image* image);
 			void				_SetActiveStackTrace(StackTrace* stackTrace);
 			void				_SetActiveStackFrame(StackFrame* frame);
 			void				_SetActiveFunction(FunctionDebugInfo* function);
@@ -85,6 +98,7 @@ private:
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
+			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
 									target_addr_t address);
@@ -92,6 +106,7 @@ private:
 private:
 			TeamDebugModel*		fDebugModel;
 			::Thread*			fActiveThread;
+			Image*				fActiveImage;
 			StackTrace*			fActiveStackTrace;
 			StackFrame*			fActiveStackFrame;
 			FunctionDebugInfo*	fActiveFunction;
@@ -101,6 +116,7 @@ private:
 			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
+			ImageFunctionsView*	fImageFunctionsView;
 			RegisterView*		fRegisterView;
 			StackTraceView*		fStackTraceView;
 			SourceView*			fSourceView;
@@ -117,6 +133,8 @@ public:
 
 	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
 									FunctionDebugInfo* function) = 0;
+	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
+									Image* image) = 0;
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action) = 0;
 	virtual	void				SetBreakpointRequested(target_addr_t address,

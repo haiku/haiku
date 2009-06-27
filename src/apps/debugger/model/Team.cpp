@@ -251,6 +251,17 @@ Team::NotifyThreadStackTraceChanged(Thread* thread)
 
 
 void
+Team::NotifyImageDebugInfoChanged(Image* image)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ImageDebugInfoChanged(
+			ImageEvent(TEAM_EVENT_IMAGE_DEBUG_INFO_CHANGED, image));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -369,5 +380,11 @@ Team::Listener::ThreadCpuStateChanged(const Team::ThreadEvent& event)
 
 void
 Team::Listener::ThreadStackTraceChanged(const Team::ThreadEvent& event)
+{
+}
+
+
+void
+Team::Listener::ImageDebugInfoChanged(const Team::ImageEvent& event)
 {
 }

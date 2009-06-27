@@ -129,29 +129,34 @@ private:
 // #pragma mark - ImageListView
 
 
-ImageListView::ImageListView()
+ImageListView::ImageListView(Team* team, Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
-	fTeam(NULL),
+	fTeam(team),
+	fImage(NULL),
 	fImagesTable(NULL),
-	fImagesTableModel(NULL)
+	fImagesTableModel(NULL),
+	fListener(listener)
 {
 	SetName("Images");
+
+	fTeam->AddListener(this);
 }
 
 
 ImageListView::~ImageListView()
 {
-	SetTeam(NULL);
+	SetImage(NULL);
+	fTeam->RemoveListener(this);
 	fImagesTable->SetTableModel(NULL);
 	delete fImagesTableModel;
 }
 
 
 /*static*/ ImageListView*
-ImageListView::Create()
+ImageListView::Create(Team* team, Listener* listener)
 {
-	ImageListView* self = new ImageListView;
+	ImageListView* self = new ImageListView(team, listener);
 
 	try {
 		self->_Init();
@@ -165,26 +170,38 @@ ImageListView::Create()
 
 
 void
-ImageListView::SetTeam(Team* team)
+ImageListView::UnsetListener()
 {
-	if (team == fTeam)
+	fListener = NULL;
+}
+
+
+void
+ImageListView::SetImage(Image* image)
+{
+	if (image == fImage)
 		return;
+printf("ImageListView::SetImage(%p)\n", image);
 
-	if (fTeam != NULL) {
-		fTeam->RemoveListener(this);
-		fImagesTable->SetTableModel(NULL);
-		delete fImagesTableModel;
-		fImagesTableModel = NULL;
+	if (fImage != NULL)
+		fImage->RemoveReference();
+
+	fImage = image;
+
+	if (fImage != NULL) {
+		fImage->AddReference();
+
+		for (int32 i = 0; Image* other = fImagesTableModel->ImageAt(i); i++) {
+			if (fImage == other) {
+				fImagesTable->SelectRow(i, false);
+printf("ImageListView::SetImage() done\n");
+				return;
+			}
+		}
 	}
 
-	fTeam = team;
-
-	if (fTeam != NULL) {
-		fImagesTableModel = new(std::nothrow) ImagesTableModel(fTeam);
-		fImagesTable->SetTableModel(fImagesTableModel);
-		fImagesTable->ResizeAllColumnsToPreferred();
-		fTeam->AddListener(this);
-	}
+	fImagesTable->DeselectAllRows();
+printf("ImageListView::SetImage() done\n");
 }
 
 
@@ -218,13 +235,18 @@ ImageListView::ImageRemoved(const Team::ImageEvent& event)
 
 
 void
-ImageListView::TableRowInvoked(Table* table, int32 rowIndex)
+ImageListView::TableSelectionChanged(Table* table)
 {
-//	if (fImagesTableModel != NULL) {
-//		Image* image = fImagesTableModel->ImageAt(rowIndex);
-//		if (image != NULL)
-//			fParent->OpenImageWindow(image);
-//	}
+	if (fListener == NULL)
+		return;
+
+	Image* image = NULL;
+	if (fImagesTableModel != NULL) {
+		TableSelectionModel* selectionModel = table->SelectionModel();
+		image = fImagesTableModel->ImageAt(selectionModel->RowAt(0));
+	}
+
+	fListener->ImageSelectionChanged(image);
 }
 
 
@@ -241,4 +263,16 @@ ImageListView::_Init()
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fImagesTable->AddTableListener(this);
+
+	fImagesTableModel = new ImagesTableModel(fTeam);
+	fImagesTable->SetTableModel(fImagesTableModel);
+	fImagesTable->ResizeAllColumnsToPreferred();
+}
+
+
+// #pragma mark - Listener
+
+
+ImageListView::Listener::~Listener()
+{
 }

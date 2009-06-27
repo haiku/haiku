@@ -13,6 +13,14 @@
 #include "ImageInfo.h"
 
 
+enum image_debug_info_state {
+	IMAGE_DEBUG_INFO_NOT_LOADED,
+	IMAGE_DEBUG_INFO_LOADING,
+	IMAGE_DEBUG_INFO_LOADED,
+	IMAGE_DEBUG_INFO_UNAVAILABLE
+};
+
+
 class ImageDebugInfo;
 class Team;
 
@@ -30,15 +38,21 @@ public:
 			const char*			Name() const		{ return fInfo.Name(); }
 			const ImageInfo&	Info() const		{ return fInfo; }
 
-			ImageDebugInfo*		GetImageDebugInfo() const { return fDebugInfo; }
-			void				SetImageDebugInfo(ImageDebugInfo* debugInfo);
-
 			bool				ContainsAddress(target_addr_t address) const;
+
+			// mutable attributes follow (locking required)
+			ImageDebugInfo*		GetImageDebugInfo() const { return fDebugInfo; }
+			image_debug_info_state ImageDebugInfoState() const
+									{ return fDebugInfoState; }
+			void				SetImageDebugInfo(ImageDebugInfo* debugInfo,
+									image_debug_info_state state);
 
 private:
 			Team*				fTeam;
 			ImageInfo			fInfo;
+			// mutable
 			ImageDebugInfo*		fDebugInfo;
+			image_debug_info_state fDebugInfoState;
 };
 
 

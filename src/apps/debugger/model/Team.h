@@ -22,7 +22,9 @@ enum {
 
 	TEAM_EVENT_THREAD_STATE_CHANGED,
 	TEAM_EVENT_THREAD_CPU_STATE_CHANGED,
-	TEAM_EVENT_THREAD_STACK_TRACE_CHANGED
+	TEAM_EVENT_THREAD_STACK_TRACE_CHANGED,
+
+	TEAM_EVENT_IMAGE_DEBUG_INFO_CHANGED
 };
 
 
@@ -68,6 +70,9 @@ public:
 			void				NotifyThreadStateChanged(Thread* thread);
 			void				NotifyThreadCpuStateChanged(Thread* thread);
 			void				NotifyThreadStackTraceChanged(Thread* thread);
+
+			// service methods for Image
+			void				NotifyImageDebugInfoChanged(Image* image);
 
 private:
 			typedef DoublyLinkedList<Listener> ListenerList;
@@ -138,6 +143,9 @@ public:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+
+	virtual	void				ImageDebugInfoChanged(
+									const Team::ImageEvent& event);
 };
 
 

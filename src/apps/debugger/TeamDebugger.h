@@ -41,6 +41,8 @@ private:
 	// TeamWindow::Listener
 	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
 									FunctionDebugInfo* function);
+	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
+									Image* image);
 	virtual	void				ThreadActionRequested(TeamWindow* window,
 									thread_id threadID, uint32 action);
 	virtual	void				SetBreakpointRequested(target_addr_t address,
