@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -281,7 +281,7 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 				== LVDS_CLKB_POWER_UP)
 			divisors.post2 = LVDS_POST2_RATE_FAST;
 		else
-			divisors.post2 = LVDS_POST2_RATE_SLOW;	
+			divisors.post2 = LVDS_POST2_RATE_SLOW;
 	} else {
 		if (current.timing.pixel_clock < limits.min_post2_frequency) {
 			// slow DAC timing
@@ -341,7 +341,7 @@ save_lvds_mode(void)
 {
 	// dump currently programmed mode.
 	display_mode biosMode;
-	
+
 	uint32 pll = read32(INTEL_DISPLAY_B_PLL);
 	uint32 pllDivisor = read32(INTEL_DISPLAY_B_PLL_DIVISOR_0);
 
@@ -475,6 +475,11 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 	}
 
 	bytesPerRow = mode.virtual_width * bytesPerPixel;
+
+	// Make sure bytesPerRow is a multiple of 64
+	// TODO: check if the older chips have the same restriction!
+	if ((bytesPerRow & 63) != 0)
+		bytesPerRow = (bytesPerRow + 63) & ~63;
 }
 
 
@@ -702,7 +707,7 @@ if (first) {
 			read32(INTEL_DISPLAY_B_PIPE_CONTROL) | DISPLAY_PIPE_ENABLED);
 		read32(INTEL_DISPLAY_B_PIPE_CONTROL);
 	}
-	
+
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors,false);
