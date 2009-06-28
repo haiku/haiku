@@ -186,39 +186,21 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		}
 	}
 
-	/* check if screen(s) can display the requested resolution (if connected) */
-	if (si->ps.monitors & CRTC1_TMDS) {
-		if (target->timing.h_display > si->ps.p1_timing.h_display
-			|| target->timing.v_display > si->ps.p1_timing.v_display) {
-			LOG(4, ("PROPOSEMODE: panel at crtc11 can't display requested resolution, aborted.\n"));
-			return B_ERROR;
-		}
-	}
-	if (si->ps.monitors & CRTC2_TMDS) {
-		if (target->timing.h_display > si->ps.p2_timing.h_display
-			|| target->timing.v_display > si->ps.p2_timing.v_display) {
-			LOG(4, ("PROPOSEMODE: panel at crtc2 can't display requested resolution, aborted.\n"));
-			return B_ERROR;
-		}
-	}
-//still expand/update concerning edid, among others.. (setup accounting for cross-connected vga screens...):
-/*
-	if (si->ps.monitors & CRTC1_VGA) {
+	/* check if screen(s) can display the requested resolution (if we have it's EDID info) */
+	if (si->ps.crtc1_screen.have_edid) {
 		if (target->timing.h_display > si->ps.crtc1_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
-			LOG(4, ("PROPOSEMODE: analog screen at crtc1 can't display requested resolution, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: screen at crtc1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
-	if (si->ps.monitors & CRTC2_VGA) {
+	if (si->ps.crtc2_screen.have_edid) {
 		if (target->timing.h_display > si->ps.crtc2_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
-			LOG(4, ("PROPOSEMODE: analog screen at crtc2 can't display requested resolution, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: screen at crtc2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
-*/
-//end still update.
 
 	/* validate display vs. virtual */
 	if (target->timing.h_display > target->virtual_width || want_same_width)
