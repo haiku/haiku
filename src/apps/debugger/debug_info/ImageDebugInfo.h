@@ -22,7 +22,7 @@ class SpecificImageDebugInfo;
 
 class ImageDebugInfo : public Referenceable {
 public:
-								ImageDebugInfo(const ImageInfo& imageInfo),
+								ImageDebugInfo(const ImageInfo& imageInfo);
 								~ImageDebugInfo();
 
 			bool				AddSpecificInfo(SpecificImageDebugInfo* info);
