@@ -1,8 +1,9 @@
 /*
  * Mesa 3-D graphics library
- * Version:  7.1
+ * Version:  7.5
  *
  * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
+ * Copyright (C) 2009  VMware, Inc.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -738,12 +739,20 @@ _mesa_image_image_stride( const struct gl_pixelstore_attrib *packing,
                           GLint width, GLint height,
                           GLenum format, GLenum type )
 {
-   ASSERT(packing);
-   ASSERT(type != GL_BITMAP);
+   GLint bytesPerRow, bytesPerImage, remainder;
 
-   {
+   ASSERT(packing);
+
+   if (type == GL_BITMAP) {
+      if (packing->RowLength == 0) {
+         bytesPerRow = (width + 7) / 8;
+      }
+      else {
+         bytesPerRow = (packing->RowLength + 7) / 8;
+      }
+   }
+   else {
       const GLint bytesPerPixel = _mesa_bytes_per_pixel(format, type);
-      GLint bytesPerRow, bytesPerImage, remainder;
 
       if (bytesPerPixel <= 0)
          return -1;  /* error */
@@ -753,17 +762,18 @@ _mesa_image_image_stride( const struct gl_pixelstore_attrib *packing,
       else {
          bytesPerRow = bytesPerPixel * packing->RowLength;
       }
-      remainder = bytesPerRow % packing->Alignment;
-      if (remainder > 0)
-         bytesPerRow += (packing->Alignment - remainder);
-
-      if (packing->ImageHeight == 0)
-         bytesPerImage = bytesPerRow * height;
-      else
-         bytesPerImage = bytesPerRow * packing->ImageHeight;
-
-      return bytesPerImage;
    }
+
+   remainder = bytesPerRow % packing->Alignment;
+   if (remainder > 0)
+      bytesPerRow += (packing->Alignment - remainder);
+
+   if (packing->ImageHeight == 0)
+      bytesPerImage = bytesPerRow * height;
+   else
+      bytesPerImage = bytesPerRow * packing->ImageHeight;
+
+   return bytesPerImage;
 }
 
 

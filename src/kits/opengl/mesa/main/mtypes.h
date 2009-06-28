@@ -3063,6 +3063,8 @@ struct __GLcontextRec
    GLenum RenderMode;        /**< either GL_RENDER, GL_SELECT, GL_FEEDBACK */
    GLbitfield NewState;      /**< bitwise-or of _NEW_* flags */
 
+   GLboolean ViewportInitialized;  /**< has viewport size been initialized? */
+
    /** \name Derived state */
    /*@{*/
    /** Bitwise-or of DD_* flags.  Note that this bitfield may be used before

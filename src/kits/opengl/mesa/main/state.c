@@ -157,7 +157,7 @@ update_arrays( GLcontext *ctx )
 
    /* 16..31 */
    if (ctx->VertexProgram._Current) {
-      for (i = VERT_ATTRIB_GENERIC0; i < VERT_ATTRIB_MAX; i++) {
+      for (i = 0; i < Elements(ctx->Array.ArrayObj->VertexAttrib); i++) {
          if (ctx->Array.ArrayObj->VertexAttrib[i].Enabled) {
             min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[i]._MaxElement);
          }

@@ -184,6 +184,7 @@ static void vbo_exec_bind_arrays( GLcontext *ctx )
           (ctx->VertexProgram._Current->Base.InputsRead & VERT_BIT_GENERIC0)) {
          exec->vtx.inputs[16] = exec->vtx.inputs[0];
          exec->vtx.attrsz[16] = exec->vtx.attrsz[0];
+         exec->vtx.attrptr[16] = exec->vtx.attrptr[0];
          exec->vtx.attrsz[0] = 0;
       }
       break;

@@ -132,6 +132,9 @@ extern void
 _mesa_make_current( GLcontext *ctx, GLframebuffer *drawBuffer,
                     GLframebuffer *readBuffer );
 
+extern void
+_mesa_check_init_viewport(GLcontext *ctx, GLuint width, GLuint height);
+
 extern GLboolean
 _mesa_share_state(GLcontext *ctx, GLcontext *ctxToShare);
 

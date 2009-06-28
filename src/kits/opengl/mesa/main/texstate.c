@@ -429,7 +429,7 @@ texture_override(GLcontext *ctx,
       }
       if (texObj->_Complete) {
          texUnit->_ReallyEnabled = textureBit;
-         texUnit->_Current = texObj;
+         _mesa_reference_texobj(&texUnit->_Current, texObj);
          update_texture_compare_function(ctx, texObj);
       }
    }
@@ -485,7 +485,6 @@ update_texture_state( GLcontext *ctx )
       GLbitfield enableBits;
       GLuint tex;
 
-      texUnit->_Current = NULL;
       texUnit->_ReallyEnabled = 0;
       texUnit->_GenFlags = 0;
 

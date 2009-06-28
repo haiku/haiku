@@ -507,6 +507,7 @@ update_wrapper(GLcontext *ctx, const struct gl_renderbuffer_attachment *att)
    trb->Base.BlueBits = trb->TexImage->TexFormat->BlueBits;
    trb->Base.AlphaBits = trb->TexImage->TexFormat->AlphaBits;
    trb->Base.DepthBits = trb->TexImage->TexFormat->DepthBits;
+   trb->Base.StencilBits = trb->TexImage->TexFormat->StencilBits;
 }
 
 

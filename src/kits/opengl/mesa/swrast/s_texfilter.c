@@ -226,7 +226,7 @@ lerp_rgba_3d(GLchan result[4], GLfloat a, GLfloat b, GLfloat c,
  * If A is a signed integer, A % B doesn't give the right value for A < 0
  * (in terms of texture repeat).  Just casting to unsigned fixes that.
  */
-#define REMAINDER(A, B) ((unsigned) (A) % (unsigned) (B))
+#define REMAINDER(A, B) (((A) + (B) * 1024) % (B))
 
 
 /**

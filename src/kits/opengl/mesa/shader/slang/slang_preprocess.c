@@ -1041,11 +1041,11 @@ preprocess_source (slang_string *output, const char *source,
 
                /* Parse optional macro parameters. */
                while (prod[i++] != PARAM_END) {
-                  if (state.cond.top->effective) {
-                     pp_symbol *param;
+                  pp_symbol *param;
 
-                     id = (const char *) (&prod[i]);
-                     idlen = _mesa_strlen (id);
+                  id = (const char *) (&prod[i]);
+                  idlen = _mesa_strlen (id);
+                  if (state.cond.top->effective) {
                      pp_annotate (output, "%s, ", id);
                      param = pp_symbols_push (&symbol->parameters);
                      if (param == NULL)
@@ -1059,8 +1059,23 @@ preprocess_source (slang_string *output, const char *source,
                id = (const char *) (&prod[i]);
                idlen = _mesa_strlen (id);
                if (state.cond.top->effective) {
+                  slang_string replacement;
+                  expand_state es;
+
                   pp_annotate (output, ") %s", id);
-                  slang_string_pushs (&symbol->replacement, id, idlen);
+
+                  slang_string_init(&replacement);
+                  slang_string_pushs(&replacement, id, idlen);
+
+                  /* Expand macro replacement. */
+                  es.output = &symbol->replacement;
+                  es.input = slang_string_cstr(&replacement);
+                  es.state = &state;
+                  if (!expand(&es, &state.symbols)) {
+                     slang_string_free(&replacement);
+                     goto error;
+                  }
+                  slang_string_free(&replacement);
                }
                i += idlen + 1;
             }
@@ -1292,6 +1307,45 @@ error:
 
 
 /**
+ * Remove the continuation characters from the input string.
+ * This is the very first step in preprocessing and is effective
+ * even inside comment blocks.
+ * If there is a whitespace between a backslash and a newline,
+ * this is not considered as a line continuation.
+ * \return GL_TRUE for success, GL_FALSE otherwise.
+ */
+static GLboolean
+_slang_preprocess_backslashes(slang_string *output,
+                              const char *input)
+{
+   while (*input) {
+      if (input[0] == '\\') {
+         /* If a newline follows, eat the backslash and the newline. */
+         if (input[1] == '\r') {
+            if (input[2] == '\n') {
+               input += 3;
+            } else {
+               input += 2;
+            }
+         } else if (input[1] == '\n') {
+            if (input[2] == '\r') {
+               input += 3;
+            } else {
+               input += 2;
+            }
+         } else {
+            /* Leave the backslash alone. */
+            slang_string_pushc(output, *input++);
+         }
+      } else {
+         slang_string_pushc(output, *input++);
+      }
+   }
+   return GL_TRUE;
+}
+
+
+/**
  * Run preprocessor on source code.
  * \param extensions  indicates which GL extensions are enabled
  * \param output  the post-process results
@@ -1308,6 +1362,7 @@ _slang_preprocess_directives(slang_string *output,
 {
    grammar pid, eid;
    GLboolean success;
+   slang_string without_backslashes;
 
    pid = grammar_load_from_text ((const byte *) (slang_pp_directives_syn));
    if (pid == 0) {
@@ -1320,9 +1375,36 @@ _slang_preprocess_directives(slang_string *output,
       grammar_destroy (pid);
       return GL_FALSE;
    }
-   success = preprocess_source (output, input, pid, eid, elog, extensions, pragmas);
+
+   slang_string_init(&without_backslashes);
+   success = _slang_preprocess_backslashes(&without_backslashes, input);
+
+   if (0) {
+      _mesa_printf("Pre-processed shader:\n");
+      _mesa_printf("%s", slang_string_cstr(&without_backslashes));
+      _mesa_printf("----------------------\n");
+   }
+
+   if (success) {
+      success = preprocess_source(output,
+                                  slang_string_cstr(&without_backslashes),
+                                  pid,
+                                  eid,
+                                  elog,
+                                  extensions,
+                                  pragmas);
+   }
+
+   slang_string_free(&without_backslashes);
    grammar_destroy (eid);
    grammar_destroy (pid);
+
+   if (0) {
+      _mesa_printf("Post-processed shader:\n");
+      _mesa_printf("%s", slang_string_cstr(output));
+      _mesa_printf("----------------------\n");
+   }
+
    return success;
 }
 
