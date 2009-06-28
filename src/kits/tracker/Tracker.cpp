@@ -1349,7 +1349,7 @@ TTracker::ReadyToRun()
 		// create desktop
 		BEntry entry;
 		deskDir.GetEntry(&entry);
-		Model *model = new Model(&entry);
+		Model *model = new Model(&entry, true);
 		if (model->InitCheck() == B_OK) {
 			AutoLock<WindowList> lock(&fWindowList);
 			deskWindow = new BDeskWindow(&fWindowList);
