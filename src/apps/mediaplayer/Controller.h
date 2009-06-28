@@ -85,7 +85,8 @@ public:
 									{ return fItem.Get(); }
 			void				PlayerActivated(bool active);
 
-			void				GetSize(int *width, int *height);
+			void				GetSize(int *width, int *height,
+									float* widthToHeightRatio = NULL);
 
 			int					AudioTrackCount();
 			int					VideoTrackCount();

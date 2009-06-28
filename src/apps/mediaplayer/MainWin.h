@@ -59,14 +59,16 @@ public:
 			void				ShowSettingsWindow();
 
 			void				VideoFormatChange(int width, int height,
-									float widthScale, float heightScale);
+									float widthToHeightRatio);
 
 private:
 			void				_RefsReceived(BMessage* message);
 
 			void				_SetupWindow();
 			void				_CreateMenu();
-			void				_SetupTrackMenus();
+			void				_SetupVideoAspectItems(BMenu* menu);
+			void				_SetupTrackMenus(BMenu* audioTrackMenu,
+									BMenu* videoTrackMenu);
 			void				_SetWindowSizeLimits();
 			void				_ResizeWindow(int percent);
 			void				_ResizeVideoView(int x, int y, int width,
@@ -94,7 +96,8 @@ private:
 									int32 index);
 			void				_RemovePlaylistItem(int32 index);
 			void				_MarkPlaylistItem(int32 index);
-			void				_MarkSettingsItem(uint32 command, bool mark);
+			void				_MarkItem(BMenu* menu, uint32 command,
+									bool mark);
 
 			void				_AdoptGlobalSettings();
 
@@ -108,11 +111,11 @@ private:
 			BMenu*				fFileMenu;
 			BMenu*				fAudioMenu;
 			BMenu*				fVideoMenu;
+			BMenu*				fVideoAspectMenu;
 			BMenu*				fAudioTrackMenu;
 			BMenu*				fVideoTrackMenu;
 			BMenu*				fSettingsMenu;
 			BMenu*				fPlaylistMenu;
-			BMenu*				fDebugMenu;
 
 			bool				fHasFile;
 			bool				fHasVideo;

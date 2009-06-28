@@ -359,7 +359,7 @@ Controller::PlayerActivated(bool active)
 
 
 void
-Controller::GetSize(int *width, int *height)
+Controller::GetSize(int *width, int *height, float* widthToHeightRatio)
 {
 	BAutolock _(this);
 
@@ -368,9 +368,17 @@ Controller::GetSize(int *width, int *height)
 		// TODO: take aspect ratio into account!
 		*height = format.u.raw_video.display.line_count;
 		*width = format.u.raw_video.display.line_width;
+		if (widthToHeightRatio != NULL) {
+printf("pixel_width_aspect: %d\n", format.u.raw_video.pixel_width_aspect);
+printf("pixel_height_aspect: %d\n", format.u.raw_video.pixel_height_aspect);
+			*widthToHeightRatio = (float)format.u.raw_video.pixel_width_aspect
+				/ format.u.raw_video.pixel_height_aspect;
+		}
 	} else {
 		*height = 0;
 		*width = 0;
+		if (widthToHeightRatio != NULL)
+			*widthToHeightRatio = 0.0f;
 	}
 }
 

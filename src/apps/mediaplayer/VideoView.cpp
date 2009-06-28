@@ -103,9 +103,11 @@ VideoView::Pulse()
 		BPoint where;
 		uint32 buttons;
 		GetMouse(&where, &buttons, false);
-		set_mouse_position((int32)where.x, (int32)where.y);
-		// hide the mouse cursor until the user moves it
-		be_app->ObscureCursor();
+		if (buttons == 0) {
+			set_mouse_position((int32)where.x, (int32)where.y);
+			// hide the mouse cursor until the user moves it
+			be_app->ObscureCursor();
+		}
 	}
 }
 
