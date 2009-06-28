@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,7 +42,11 @@ class ExpressionParser {
 								ExpressionParser();
 								~ExpressionParser();
 
+			void				SetSupportHexInput(bool enabled);
+
 			BString				Evaluate(const char* expressionString);
+			int64				EvaluateToInt64(const char* expressionString);
+			double				EvaluateToDouble(const char* expressionString);
 
  private:
 

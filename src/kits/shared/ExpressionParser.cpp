@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,14 +7,16 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include <ExpressionParser.h>
+
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "m_apm.h"
+#include <m_apm.h>
 
-#include "ExpressionParser.h"
 
 static const int32 kMaxDigits = 64;
 
@@ -91,8 +93,14 @@ class Tokenizer {
 		: fString(""),
 		  fCurrentChar(NULL),
 		  fCurrentToken(),
-		  fReuseToken(false)
+		  fReuseToken(false),
+		  fHexSupport(false)
 	{
+	}
+
+	void SetSupportHexInput(bool enabled)
+	{
+		fHexSupport = enabled;
 	}
 
 	void SetTo(const char* string)
@@ -123,6 +131,8 @@ class Tokenizer {
 		bool decimal = *fCurrentChar == '.' || *fCurrentChar == ',';
 
 		if (decimal || isdigit(*fCurrentChar)) {
+			if (fHexSupport && *fCurrentChar == '0' && fCurrentChar[1] == 'x')
+				return _ParseHexNumber();
 
 			BString temp;
 
@@ -155,7 +165,6 @@ class Tokenizer {
 			fCurrentToken.value = temp.String();
 
 		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
-
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
 				|| isdigit(*fCurrentChar))) {
@@ -166,7 +175,6 @@ class Tokenizer {
 				TOKEN_IDENTIFIER);
 
 		} else {
-
 			int32 type = TOKEN_NONE;
 
 			switch (*fCurrentChar) {
@@ -177,7 +185,6 @@ class Tokenizer {
 					type = TOKEN_MINUS;
 					break;
 				case '*':
-				case 'x':
 					type = TOKEN_STAR;
 					break;
 				case '/':
@@ -214,6 +221,13 @@ class Tokenizer {
 					type = TOKEN_END_OF_LINE;
 					break;
 
+				case 'x':
+					if (!fHexSupport) {
+						type = TOKEN_STAR;
+						break;
+					}
+					// fall through
+
 				default:
 					throw ParseException("unexpected character", _CurrentPos());
 			}
@@ -231,6 +245,43 @@ class Tokenizer {
 	}
 
  private:
+	static bool _IsHexDigit(char c)
+	{
+		return isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+	}
+
+	Token& _ParseHexNumber()
+	{
+		const char* begin = fCurrentChar;
+		fCurrentChar += 2;
+			// skip "0x"
+
+		if (!_IsHexDigit(*fCurrentChar))
+			throw ParseException("expected hex digit", _CurrentPos());
+
+		fCurrentChar++;
+		while (_IsHexDigit(*fCurrentChar))
+			fCurrentChar++;
+
+		int32 length = fCurrentChar - begin;
+		fCurrentToken = Token(begin, length, _CurrentPos() - length,
+			TOKEN_CONSTANT);
+
+		// MAPM has no conversion from long long, so we need to improvise.
+		uint64 value = strtoll(fCurrentToken.string.String(), NULL, 0);
+		if (value <= 0x7fffffff) {
+			fCurrentToken.value = (long)value;
+		} else {
+			fCurrentToken.value = (int)(value >> 60);
+			fCurrentToken.value *= 1 << 30;
+			fCurrentToken.value += (int)((value >> 30) & 0x3fffffff);
+			fCurrentToken.value *= 1 << 30;
+			fCurrentToken.value += (int)(value& 0x3fffffff);
+		}
+
+		return fCurrentToken;
+	}
+
 	int32 _CurrentPos() const
 	{
 		return fCurrentChar - fString.String();
@@ -240,6 +291,7 @@ class Tokenizer {
 	const char*	fCurrentChar;
 	Token		fCurrentToken;
 	bool		fReuseToken;
+	bool		fHexSupport;
 };
 
 
@@ -252,6 +304,13 @@ ExpressionParser::ExpressionParser()
 ExpressionParser::~ExpressionParser()
 {
 	delete fTokenizer;
+}
+
+
+void
+ExpressionParser::SetSupportHexInput(bool enabled)
+{
+	fTokenizer->SetSupportHexInput(enabled);
 }
 
 
@@ -287,6 +346,40 @@ ExpressionParser::Evaluate(const char* expressionString)
 	result.UnlockBuffer(lastChar + 1);
 
 	return result;
+}
+
+
+int64
+ExpressionParser::EvaluateToInt64(const char* expressionString)
+{
+	fTokenizer->SetTo(expressionString);
+
+	MAPM value = _ParseBinary();
+	Token token = fTokenizer->NextToken();
+	if (token.type != TOKEN_END_OF_LINE)
+		throw ParseException("parse error", token.position);
+
+	char buffer[128];
+	value.toIntegerString(buffer);
+
+	return strtoll(buffer, NULL, 0);
+}
+
+
+double
+ExpressionParser::EvaluateToDouble(const char* expressionString)
+{
+	fTokenizer->SetTo(expressionString);
+
+	MAPM value = _ParseBinary();
+	Token token = fTokenizer->NextToken();
+	if (token.type != TOKEN_END_OF_LINE)
+		throw ParseException("parse error", token.position);
+
+	char buffer[1024];
+	value.toString(buffer, sizeof(buffer) - 4);
+
+	return strtod(buffer, NULL);
 }
 
 

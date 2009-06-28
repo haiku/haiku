@@ -22,3 +22,10 @@ StaticLibrary libshared.a :
 	RWLockManager.cpp
 	Variant.cpp
 ;
+
+
+UseLibraryHeaders mapm ;
+
+StaticLibrary libexpression_parser.a :
+	ExpressionParser.cpp
+;

@@ -35,9 +35,10 @@
 #include <Region.h>
 #include <Roster.h>
 
+#include <ExpressionParser.h>
+
 #include "CalcApplication.h"
 #include "CalcOptions.h"
-#include "ExpressionParser.h"
 #include "ExpressionTextView.h"
 
 
