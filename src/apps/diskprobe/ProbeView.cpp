@@ -37,6 +37,8 @@
 #include <PrintJob.h>
 #include <Beep.h>
 
+#include <ExpressionParser.h>
+
 #include "DataView.h"
 #include "DiskProbe.h"
 #include "TypeEditors.h"
@@ -849,7 +851,7 @@ HeaderView::MessageReceived(BMessage *message)
 
 		case kMsgPositionUpdate:
 		{
-			fLastPosition = fPosition;
+			off_t lastPosition = fPosition;
 
 			off_t position;
 			int32 delta;
@@ -862,10 +864,18 @@ HeaderView::MessageReceived(BMessage *message)
 			} else if (message->FindInt32("delta", &delta) == B_OK) {
 				fPosition += delta * off_t(fBlockSize);
 			} else {
-				fPosition = strtoll(fPositionControl->Text(), NULL, 0)
-					* fBlockSize;
+				try {
+					ExpressionParser parser;
+					parser.SetSupportHexInput(true);
+					fPosition = parser.EvaluateToInt64(
+						fPositionControl->Text()) * fBlockSize;
+				} catch (...) {
+					beep();
+					break;
+				}
 			}
 
+			fLastPosition = lastPosition;
 			fPosition = (fPosition / fBlockSize) * fBlockSize;
 				// round to block size
 
