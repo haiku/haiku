@@ -92,6 +92,7 @@ class PositionSlider : public BSlider {
 		off_t Size() const { return fSize; }
 		uint32 BlockSize() const { return fBlockSize; }
 
+		virtual void SetPosition(float position);
 		void SetPosition(off_t position);
 		void SetSize(off_t size);
 		void SetBlockSize(uint32 blockSize);
@@ -411,6 +412,13 @@ PositionSlider::Position() const
 	//	1024 GB - and that's not really that far away these days.
 
 	return (off_t(1.0 * (fSize - 1) * Value() / kMaxSliderLimit + 0.5) / fBlockSize) * fBlockSize;
+}
+
+
+void
+PositionSlider::SetPosition(float position)
+{
+	BSlider::SetPosition(position);
 }
 
 

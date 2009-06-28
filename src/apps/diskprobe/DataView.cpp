@@ -561,7 +561,7 @@ DataView::DrawSelectionFrame(view_focus which)
 	// *********
 
 	BRect rect;
-	if (start == 0 || !drawBlock && !drawLastLine)
+	if (start == 0 || (!drawBlock && !drawLastLine))
 		rect = firstLine;
 	else if (drawBlock)
 		rect = block;
