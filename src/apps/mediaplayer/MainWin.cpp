@@ -442,9 +442,11 @@ MainWin::MessageReceived(BMessage *msg)
 		{
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
-				BMenuItem* item = fVideoTrackMenu->ItemAt(index);
-				if (item)
-					item->SetMarked(true);
+				int32 i = 0;
+				while (BMenuItem* item = fVideoTrackMenu->ItemAt(i)) {
+					item->SetMarked(i == index);
+					i++;
+				}
 			}
 			break;
 		}
@@ -452,9 +454,11 @@ MainWin::MessageReceived(BMessage *msg)
 		{
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
-				BMenuItem* item = fAudioTrackMenu->ItemAt(index);
-				if (item)
-					item->SetMarked(true);
+				int32 i = 0;
+				while (BMenuItem* item = fAudioTrackMenu->ItemAt(i)) {
+					item->SetMarked(i == index);
+					i++;
+				}
 			}
 			break;
 		}
@@ -664,19 +668,6 @@ MainWin::MessageReceived(BMessage *msg)
 			VideoFormatChange(544, 576, 1.41176, 1.0);
 			break;
 
-/*
-		default:
-			if (msg->what >= M_SELECT_CHANNEL
-				&& msg->what <= M_SELECT_CHANNEL_END) {
-				SelectChannel(msg->what - M_SELECT_CHANNEL);
-				break;
-			}
-			if (msg->what >= M_SELECT_INTERFACE
-				&& msg->what <= M_SELECT_INTERFACE_END) {
-				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
-				break;
-			}
-*/
 		case M_SET_PLAYLIST_POSITION:
 		{
 			BAutolock _(fPlaylist);
@@ -695,6 +686,16 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		default:
+			if (msg->what >= M_SELECT_AUDIO_TRACK
+				&& msg->what <= M_SELECT_AUDIO_TRACK_END) {
+				fController->SelectAudioTrack(msg->what - M_SELECT_AUDIO_TRACK);
+				break;
+			}
+			if (msg->what >= M_SELECT_VIDEO_TRACK
+				&& msg->what <= M_SELECT_VIDEO_TRACK_END) {
+				fController->SelectVideoTrack(msg->what - M_SELECT_VIDEO_TRACK);
+				break;
+			}
 			// let BWindow handle the rest
 			BWindow::MessageReceived(msg);
 	}
@@ -1003,9 +1004,6 @@ MainWin::_CreateMenu()
 //		new BMessage(M_ASPECT_704_576)));
 //	fDebugMenu->AddItem(new BMenuItem("force 544 x 576, display aspect 4:3",
 //		new BMessage(M_ASPECT_544_576)));
-
-	fAudioTrackMenu->SetRadioMode(true);
-	fVideoTrackMenu->SetRadioMode(true);
 }
 
 
