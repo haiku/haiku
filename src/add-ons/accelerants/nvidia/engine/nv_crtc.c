@@ -485,7 +485,7 @@ status_t nv_crtc_set_timing(display_mode target)
 			 * 1400 x 1050 (1.33). */
 			/* NOTE:
 			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
-			if ((iscale_x != (1 << 12)) && (si->ps.crtc1_aspect > (dm_aspect + 0.10)))
+			if ((iscale_x != (1 << 12)) && (si->ps.crtc1_screen.aspect > (dm_aspect + 0.10)))
 			{
 				uint16 diff;
 
@@ -505,7 +505,7 @@ status_t nv_crtc_set_timing(display_mode target)
 			/* correct for portrait panels... */
 			/* NOTE:
 			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
-			if ((iscale_y != (1 << 12)) && (si->ps.crtc1_aspect < (dm_aspect - 0.10)))
+			if ((iscale_y != (1 << 12)) && (si->ps.crtc1_screen.aspect < (dm_aspect - 0.10)))
 			{
 				LOG(2,("CRTC: (relative) portrait panel: should tune vertical scaling\n"));
 				/* fixme: implement if this kind of portrait panels exist on nVidia... */

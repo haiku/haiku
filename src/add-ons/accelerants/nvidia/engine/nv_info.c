@@ -2176,6 +2176,7 @@ void fake_panel_start(void)
 	si->ps.tvout = false;
 	si->ps.tv_encoder.type = NONE;
 	si->ps.tv_encoder.version = 0;
+	/* I2C init currently also fetches DDC EDID info from all connected screens */
 	i2c_init();
 	//fixme: add support for more encoders...
 	BT_probe();
@@ -2280,10 +2281,10 @@ static void detect_panels()
 	/* do some presets */
 	si->ps.p1_timing.h_display = 0;
 	si->ps.p1_timing.v_display = 0;
-	si->ps.crtc1_aspect = 0;
+	si->ps.crtc1_screen.aspect = 0;
 	si->ps.p2_timing.h_display = 0;
 	si->ps.p2_timing.v_display = 0;
-	si->ps.crtc2_aspect = 0;
+	si->ps.crtc2_screen.aspect = 0;
 	si->ps.slaved_tmds1 = false;
 	si->ps.slaved_tmds2 = false;
 	si->ps.master_tmds1 = false;
@@ -2415,10 +2416,8 @@ static void detect_panels()
 	if (si->ps.monitors & CRTC1_TMDS)
 	{
 		/* determine panel aspect ratio */
-		si->ps.crtc1_aspect =
+		si->ps.crtc1_screen.aspect =
 			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
-		/* force widescreen type if requested */
-		if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p1_timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p1_timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2441,10 +2440,8 @@ static void detect_panels()
 	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		/* determine panel aspect ratio */
-		si->ps.crtc2_aspect =
+		si->ps.crtc2_screen.aspect =
 			(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
-		/* force widescreen type if requested */
-		if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p2_timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p2_timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2525,35 +2522,40 @@ static void detect_panels()
 		LOG(2,("DAC2: PANEL_PWR: $%08x\n", NV_REG32(NV32_2PANEL_PWR)));
 	}
 
-	/* determine flatpanel type(s) */
-	/* note:
-	 * - on NV11 accessing registerset(s) hangs card.
-	 * - the same applies for NV34.
-	 *   Confirmed for DAC2 access on ID 0x0322,
-	 *   but only after a failed VESA modeswitch by the HAIKU kernel
-	 *   at boot time caused by a BIOS fault inside the gfx card: it says
-	 *   it can do VESA 1280x1024x32 on CRTC1/DAC1 but it fails: no signal. */
-	if ((si->ps.monitors & CRTC1_TMDS) && (si->ps.card_type != NV11))
-	{
-		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
-		 * b0-7 = adress, b16 = 1 = write_enable */
-		DACW(FP_TMDS_CTRL, ((1 << 16) | 0x04));
-		/* (b0-7 = data) */
-		if (DACR(FP_TMDS_DATA) & 0x01)
-			LOG(2,("INFO: Flatpanel on head 1 is LVDS type\n"));
-		else
-			LOG(2,("INFO: Flatpanel on head 1 is TMDS type\n"));
-	}
-	if ((si->ps.monitors & CRTC2_TMDS) && (si->ps.card_type != NV11))
-	{
-		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
-		 * b0-7 = adress, b16 = 1 = write_enable */
-		DAC2W(FP_TMDS_CTRL, ((1 << 16) | 0x04));
-		/* (b0-7 = data) */
-		if (DAC2R(FP_TMDS_DATA) & 0x01)
-			LOG(2,("INFO: Flatpanel on head 2 is LVDS type\n"));
-		else
-			LOG(2,("INFO: Flatpanel on head 2 is TMDS type\n"));
+	/* if something goes wrong during driver init reading those registers below might
+	 * result in a hanging system. Without reading them at least a blind (or KDL)
+	 * restart becomes possible. Leaving the code here for debugging purposes. */
+	if (0) {
+		/* determine flatpanel type(s) */
+		/* note:
+		 * - on NV11 accessing registerset(s) hangs card.
+		 * - the same applies for NV34.
+		 *   Confirmed for DAC2 access on ID 0x0322,
+		 *   but only after a failed VESA modeswitch by the HAIKU kernel
+		 *   at boot time caused by a BIOS fault inside the gfx card: it says
+		 *   it can do VESA 1280x1024x32 on CRTC1/DAC1 but it fails: no signal. */
+		if ((si->ps.monitors & CRTC1_TMDS) && (si->ps.card_type != NV11))
+		{
+			/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
+			 * b0-7 = adress, b16 = 1 = write_enable */
+			DACW(FP_TMDS_CTRL, ((1 << 16) | 0x04));
+			/* (b0-7 = data) */
+			if (DACR(FP_TMDS_DATA) & 0x01)
+				LOG(2,("INFO: Flatpanel on head 1 is LVDS type\n"));
+			else
+				LOG(2,("INFO: Flatpanel on head 1 is TMDS type\n"));
+		}
+		if ((si->ps.monitors & CRTC2_TMDS) && (si->ps.card_type != NV11))
+		{
+			/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
+			 * b0-7 = adress, b16 = 1 = write_enable */
+			DAC2W(FP_TMDS_CTRL, ((1 << 16) | 0x04));
+			/* (b0-7 = data) */
+			if (DAC2R(FP_TMDS_DATA) & 0x01)
+				LOG(2,("INFO: Flatpanel on head 2 is LVDS type\n"));
+			else
+				LOG(2,("INFO: Flatpanel on head 2 is TMDS type\n"));
+		}
 	}
 
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
@@ -2564,55 +2566,112 @@ static void setup_output_matrix()
 	/* setup defaults: */
 	/* head 1 will be the primary head */
 	si->ps.crtc2_prim = false;
+	/* no screens usable */
+	si->ps.crtc1_screen.have_edid = false;
+	si->ps.crtc1_screen.timing.h_display = 0;
+	si->ps.crtc1_screen.timing.v_display = 0;
+	si->ps.crtc2_screen.have_edid = false;
+	si->ps.crtc2_screen.timing.h_display = 0;
+	si->ps.crtc2_screen.timing.v_display = 0;
+
+	/* connect analog outputs straight through if possible */
+	if ((si->ps.secondary_head) && (si->ps.card_type != NV11))
+		nv_general_output_select(false);
+
+	/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
+	 * we can't change this (lack of info) */
+
+	/* detect analog monitors. First try EDID, else use load sensing. */
+	/* (load sensing is confirmed working OK on NV04, NV05, NV11, NV18, NV28 and NV34.) */
+	/* primary connector: */
+	if (si->ps.con1_screen.have_edid) {
+		if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
+	} else {
+		if (nv_dac_crt_connected()) {
+			si->ps.monitors |= CRTC1_VGA;
+			/* assume 4:3 monitor on con1 */
+			si->ps.con1_screen.aspect = 1.33;
+		}
+	}
+
+	/* Note: digitally connected panels take precedence over analog connected screens. */
+
+	/* fill-out crtc1_screen from panel info gathered from BIOS programming since
+	 * we don't know which connector connects to crtc1 (so EDID use not possible).
+	 * Also the BIOS might have programmed for a lower mode than EDID reports:
+	 * which limits our use of the panel (LVDS link setup too slow). */
+	if(si->ps.monitors & CRTC1_TMDS) {
+		si->ps.crtc1_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
+		si->ps.crtc1_screen.timing.h_display = si->ps.p1_timing.h_display;
+		si->ps.crtc1_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
+		si->ps.crtc1_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
+		si->ps.crtc1_screen.timing.h_total = si->ps.p1_timing.h_total;
+		si->ps.crtc1_screen.timing.v_display = si->ps.p1_timing.h_display;
+		si->ps.crtc1_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
+		si->ps.crtc1_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
+		si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
+		si->ps.crtc1_screen.timing.flags = si->ps.p1_timing.flags;
+		si->ps.crtc1_screen.have_edid = true;
+		//note: crtc1_screen.aspect was already filled in...
+		//si->ps.crtc1_screen.aspect = si->ps.p1_aspect;
+		si->ps.crtc1_screen.digital = true;
+	} else if(si->ps.monitors & CRTC1_VGA) {
+		/* fill-out crtc1_screen from EDID info, or faked info if EDID failed. */
+		memcpy(&(si->ps.crtc1_screen), &(si->ps.con1_screen), sizeof(si->ps.crtc1_screen));
+	}
+
+	/* force widescreen types if requested */
+	if (si->settings.force_ws) si->ps.crtc1_screen.aspect = 1.60;
 
 	/* setup output devices and heads */
 	if (si->ps.secondary_head)
 	{
 		if (si->ps.card_type != NV11)
 		{
-			/* setup defaults: */
-			/* connect analog outputs straight through */
-			nv_general_output_select(false);
-
 			/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
 			 * we can't change this (lack of info) */
 
 			/* detect analog monitors. First try EDID, else use load sensing. */
 			/* (load sensing is confirmed working OK on NV18, NV28 and NV34.) */
-			/* primary connector: */
-			if (si->ps.con1_screen.have_edid) {
-				if (!si->ps.con1_screen.digital) {
-					si->ps.monitors |= CRTC1_VGA;
-					si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-				}
-			} else {
-				if (nv_dac_crt_connected()) {
-					si->ps.monitors |= CRTC1_VGA;
-					/* assume 4:3 monitor */
-					si->ps.crtc1_aspect = 1.33;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-				}
-			}
+
 			/* secondary connector */
 			if (si->ps.con2_screen.have_edid) {
-				if (!si->ps.con2_screen.digital) {
-					si->ps.monitors |= CRTC2_VGA;
-					si->ps.crtc2_aspect = si->ps.con2_screen.aspect;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
-				}
+				if (!si->ps.con2_screen.digital) si->ps.monitors |= CRTC2_VGA;
 			} else {
 				if (nv_dac2_crt_connected()) {
 					si->ps.monitors |= CRTC2_VGA;
-					/* assume 4:3 monitor */
-					si->ps.crtc2_aspect = 1.33;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc2_aspect = 1.60;
+					/* assume 4:3 monitor on con2 */
+					si->ps.con2_screen.aspect = 1.33;
 				}
 			}
+
+			/* Note: digitally connected panels take precedence over analog connected screens. */
+
+			/* fill-out crtc2_screen from panel info gathered from BIOS programming since
+			 * we don't know which connector connects to crtc2 (so EDID use not possible).
+			 * Also the BIOS might have programmed for a lower mode than EDID reports:
+			 * which limits our use of the panel (LVDS link setup too slow). */
+			if(si->ps.monitors & CRTC2_TMDS) {
+				si->ps.crtc2_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
+				si->ps.crtc2_screen.timing.h_display = si->ps.p1_timing.h_display;
+				si->ps.crtc2_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
+				si->ps.crtc2_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
+				si->ps.crtc2_screen.timing.h_total = si->ps.p1_timing.h_total;
+				si->ps.crtc2_screen.timing.v_display = si->ps.p1_timing.h_display;
+				si->ps.crtc2_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
+				si->ps.crtc2_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
+				si->ps.crtc2_screen.timing.v_total = si->ps.p1_timing.v_total;
+				si->ps.crtc2_screen.timing.flags = si->ps.p1_timing.flags;
+				si->ps.crtc2_screen.have_edid = true;
+				//note: crtc2_screen.aspect was already filled in...
+				//si->ps.crtc2_screen.aspect = si->ps.p2_aspect;
+				si->ps.crtc2_screen.digital = true;
+			} else if(si->ps.monitors & CRTC2_VGA) {
+				/* fill-out crtc2_screen from EDID info, or faked info if EDID failed. */
+				memcpy(&(si->ps.crtc2_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc2_screen));
+			}
+			/* force widescreen types if requested */
+			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.60;
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
@@ -2640,8 +2699,8 @@ static void setup_output_matrix()
 				/* cross connect analog outputs so analog panel or CRT gets head 2 */
 				nv_general_output_select(true);
 				si->ps.monitors = 0x21;
-				si->ps.crtc1_aspect = si->ps.con2_screen.aspect;
-				si->ps.crtc2_aspect = si->ps.con1_screen.aspect;
+				/* tell head 2 it now has a screen (connected at connector 1) */
+				memcpy(&(si->ps.crtc2_screen), &(si->ps.con1_screen), sizeof(si->ps.crtc2_screen));
 				LOG(2,("INFO: head 1 has a digital panel;\n"));
 				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
@@ -2665,8 +2724,8 @@ static void setup_output_matrix()
 				/* cross connect analog outputs so analog panel or CRT gets head 1 */
 				nv_general_output_select(true);
 				si->ps.monitors = 0x12;
-				si->ps.crtc1_aspect = si->ps.con2_screen.aspect;
-				si->ps.crtc2_aspect = si->ps.con1_screen.aspect;
+				/* tell head 1 it now has a screen (connected at connector 2) */
+				memcpy(&(si->ps.crtc1_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc1_screen));
 				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
 				LOG(2,("INFO: head 2 has a digital panel:\n"));
 				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
@@ -2722,29 +2781,7 @@ static void setup_output_matrix()
 			/* confirmed no analog output switch-options for NV11 */
 			LOG(2,("INFO: NV11 outputs are hardwired to be straight-through\n"));
 
-			/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
-			 * we can't change this (lack of info) */
-
-			/* detect analog monitors. First try EDID, else use load sensing. */
-			/* (load sensing is confirmed working OK on NV11.) */
-			/* primary connector: */
-			if (si->ps.con1_screen.have_edid) {
-				if (!si->ps.con1_screen.digital) {
-					si->ps.monitors |= CRTC1_VGA;
-					si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-				}
-			} else {
-				if (nv_dac_crt_connected()) {
-					si->ps.monitors |= CRTC1_VGA;
-					/* assume 4:3 monitor */
-					si->ps.crtc1_aspect = 1.33;
-					/* force widescreen type if requested */
-					if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-				}
-			}
-			/* (sense analog monitor on secondary connector is impossible on NV11) */
+			/* (DDC or load sense analog monitor on secondary connector is impossible on NV11) */
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
@@ -2797,29 +2834,6 @@ static void setup_output_matrix()
 	}
 	else /* singlehead cards */
 	{
-		/* panels are pre-setup by the card's BIOS,
-		 * we can't change this (lack of info) */
-
-		/* detect analog monitors. First try EDID, else use load sensing. */
-		/* (load sensing is confirmed working OK on all cards.) */
-		/* primary connector: */
-		if (si->ps.con1_screen.have_edid) {
-			if (!si->ps.con1_screen.digital) {
-				si->ps.monitors |= CRTC1_VGA;
-				si->ps.crtc1_aspect = si->ps.con1_screen.aspect;
-				/* force widescreen type if requested */
-				if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-			}
-		} else {
-			if (nv_dac_crt_connected()) {
-				si->ps.monitors |= CRTC1_VGA;
-				/* assume 4:3 monitor */
-				si->ps.crtc1_aspect = 1.33;
-				/* force widescreen type if requested */
-				if (si->settings.force_ws) si->ps.crtc1_aspect = 1.60;
-			}
-		}
-
 		//fixme? add TVout (only, so no CRT connected) support...
 	}
 }
@@ -3354,14 +3368,14 @@ void dump_pins(void)
 		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is %s\n",
 			si->ps.slaved_tmds1 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.crtc1_aspect));
+			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.crtc1_screen.aspect));
 	}
 	if (si->ps.monitors & CRTC2_TMDS)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is %s\n",
 			si->ps.slaved_tmds2 ? "slaved" : "master"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.crtc2_aspect));
+			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.crtc2_screen.aspect));
 	}
 	LOG(2,("monitor (output devices) setup matrix: $%02x\n", si->ps.monitors));
 	LOG(2,("INFO: end pinsdump.\n"));

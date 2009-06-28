@@ -350,12 +350,12 @@ typedef struct {
 		bool slaved_tmds2;			/* external TMDS encoder active on CRTC2 */
 		bool master_tmds1;			/* on die TMDS encoder active on CRTC1 */
 		bool master_tmds2;			/* on die TMDS encoder active on CRTC2 */
-		display_timing p1_timing;	/* 'modeline' fetched for panel 1 */
-		display_timing p2_timing;	/* 'modeline' fetched for panel 2 */
-		float crtc1_aspect;			/* screen's aspect ratio */
-		float crtc2_aspect;			/* screen's aspect ratio */
+		display_timing p1_timing;	/* 'modeline' fetched for panel at CRTC1 */
+		display_timing p2_timing;	/* 'modeline' fetched for panel at CRTC2 */
 		edid_specs con1_screen;		/* EDID properties of the screen connected to connector 1 */
 		edid_specs con2_screen;		/* EDID properties of the screen connected to connector 2 */
+		edid_specs crtc1_screen;	/* EDID properties of the screen connected to CRTC1 */
+		edid_specs crtc2_screen;	/* EDID properties of the screen connected to CRTC2 */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		bool i2c_bus0;				/* we have a wired I2C bus 0 on board */
 		bool i2c_bus1;				/* we have a wired I2C bus 1 on board */

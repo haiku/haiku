@@ -160,14 +160,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 				break;
 			case CRTC1_TMDS:	/* digital panel on head 1, nothing on head 2 */
 			case CRTC1_VGA:		/* analog connected screen on head 1, nothing on head 2 */
-				if (si->ps.crtc1_aspect < (target_aspect - 0.10)) {
+				if (si->ps.crtc1_screen.aspect < (target_aspect - 0.10)) {
 					LOG(4, ("PROPOSEMODE: screen at crtc1 is not widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
 			case CRTC2_TMDS:	/* nothing on head 1, digital panel on head 2 */
 			case CRTC2_VGA:		/* analog connected screen on head 2, nothing on head 1 */
-				if (si->ps.crtc2_aspect < (target_aspect - 0.10)) {
+				if (si->ps.crtc2_screen.aspect < (target_aspect - 0.10)) {
 					LOG(4, ("PROPOSEMODE: screen at crtc2 is not widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
@@ -177,8 +177,8 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 			case CRTC1_TMDS | CRTC2_VGA:	/* digital panel on head 1, analog connected screen on head 2 */
 			case CRTC1_VGA | CRTC2_TMDS:	/* analog connected screen on head 1, digital panel on head 2 */
 			default:						/* more than two screens connected (illegal setup) */
-				if ((si->ps.crtc1_aspect < (target_aspect - 0.10)) ||
-					(si->ps.crtc2_aspect < (target_aspect - 0.10))) {
+				if ((si->ps.crtc1_screen.aspect < (target_aspect - 0.10)) ||
+					(si->ps.crtc2_screen.aspect < (target_aspect - 0.10))) {
 					LOG(4, ("PROPOSEMODE: not all connected screens are widescreen type, aborted.\n"));
 					return B_ERROR;
 				}
@@ -204,15 +204,15 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 //still expand/update concerning edid, among others.. (setup accounting for cross-connected vga screens...):
 /*
 	if (si->ps.monitors & CRTC1_VGA) {
-		if (target->timing.h_display > si->ps.xxx_timing.h_display
-			|| target->timing.v_display > si->ps.xxx_timing.v_display) {
+		if (target->timing.h_display > si->ps.crtc1_screen.timing.h_display
+			|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: analog screen at crtc1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
 	if (si->ps.monitors & CRTC2_VGA) {
-		if (target->timing.h_display > si->ps.yyy_timing.h_display
-			|| target->timing.v_display > si->ps.yyy_timing.v_display) {
+		if (target->timing.h_display > si->ps.crtc2_screen.timing.h_display
+			|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: analog screen at crtc2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
