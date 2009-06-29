@@ -6,7 +6,7 @@
  *
  */
 #ifndef __FIREWIRE_CARD_GLUE_H
-#define __FIREWIRE_CRAD_GLUE_H
+#define __FIREWIRE_CARD_GLUE_H
 
 #ifdef __cplusplus
 extern "C" {
