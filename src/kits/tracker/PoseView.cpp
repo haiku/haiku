@@ -1631,9 +1631,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 	for (int32 modelIndex = 0; modelIndex < count; modelIndex++) {
 		Model *model = models[modelIndex];
 
-
 		// pose adopts model and deletes it when done
-
 		if (fInsertedNodes.find(*(model->NodeRef())) != fInsertedNodes.end()
 			|| FindZombie(model->NodeRef())) {
 			watch_node(model->NodeRef(), B_STOP_WATCHING, this);
@@ -1641,9 +1639,8 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			if (resultingPoses)
 				resultingPoses[modelIndex] = NULL;
 			continue;
-		} else {
+		} else 
 			fInsertedNodes.insert(*(model->NodeRef()));
-		}
 
 		if ((clipboardMode = FSClipboardFindNodeMode(model, false, true)) != 0
 			&& !HasPosesInClipboard()) {
@@ -5103,17 +5100,14 @@ BPoseView::EntryCreated(const node_ref *dirNode, const node_ref *itemNode,
 	// get saved pose info out of attribute
 	PoseInfo poseInfo;
 	ReadPoseInfo(model, &poseInfo);
-
 	if (!ShouldShowPose(model, &poseInfo)
 		// filter out undesired poses
 		|| (model->IsSymLink() && !CreateSymlinkPoseTarget(model))) {
 		// model is a symlink, cache up the symlink target or scrap
 		// everything if target is invisible
-		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
-		delete model;
+		fZombieList->AddItem(model);
 		return NULL;
 	}
-
 	return CreatePose(model, &poseInfo, true, indexPtr);
 }
 
@@ -5266,8 +5260,9 @@ BPoseView::AttributeChanged(const BMessage *message)
 
 	int32 index;
 	BPose *pose = fPoseList->DeepFindPose(&itemNode, &index);
+	attr_info info;
+	memset(&info, 0, sizeof(attr_info));
 	if (pose) {
-		attr_info info;
 		BPoint loc(0, index * fListElemHeight);
 
 		Model *model = pose->TargetModel();
@@ -5290,7 +5285,6 @@ BPoseView::AttributeChanged(const BMessage *message)
 
 		if (result == B_OK) {
 			if (attrName && model->Node()) {
-				info.type = 0;
 					// the call below might fail if the attribute has been removed
 				model->Node()->GetAttrInfo(attrName, &info);
 				pose->UpdateWidgetAndModel(model, attrName, info.type, index, loc, this);
@@ -5319,8 +5313,21 @@ BPoseView::AttributeChanged(const BMessage *message)
 		// pose might be in zombie state if we're copying...
 		Model *zombie = FindZombie(&itemNode, &index);
 		if (zombie) {
-			PRINT(("converting model %s from a zombie\n", zombie->Name()));
-			ConvertZombieToPose(zombie, index);
+			if (attrName) {
+				zombie->AttrChanged(attrName);
+				if (strcmp(attrName, kAttrMIMEType) == 0) {
+					zombie->Node()->GetAttrInfo(attrName, &info);
+					struct stat_beos statBeOS;
+					convert_to_stat_beos(zombie->StatBuf(), &statBeOS);
+					if (fRefFilter->Filter(zombie->EntryRef(), zombie->Node(), &statBeOS,
+						zombie->MimeType())) {
+					PRINT(("converting model %s from a zombie\n", zombie->Name()));
+						ConvertZombieToPose(zombie, index);
+					}
+				} 
+			} else {
+				zombie->StatChanged();
+			}
 		} else {
 			// did not find a pose, probably not entered yet
 			// PRINT(("failed to deliver attr change node monitor - pose not found\n"));
@@ -7732,6 +7739,7 @@ BPoseView::Refresh()
 		return;
 
 	StopWatching();
+	fInsertedNodes.clear();
 	ClearPoses();
 	StartWatching();
 
