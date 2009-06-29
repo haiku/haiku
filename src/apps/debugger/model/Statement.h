@@ -7,9 +7,9 @@
 
 #include <Referenceable.h>
 
-#include "ArchitectureTypes.h"
 #include "SourceLocation.h"
 #include "TargetAddressRange.h"
+#include "Types.h"
 
 
 class Statement : public Referenceable {

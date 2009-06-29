@@ -13,6 +13,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
@@ -22,6 +23,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 
 SourceHdrs
+	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
@@ -49,6 +51,7 @@ Application Debugger :
 	BasicFunctionDebugInfo.cpp
 	DebuggerImageDebugInfo.cpp
 	DebuggerTeamDebugInfo.cpp
+	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
 	FunctionDebugInfo.cpp
@@ -89,6 +92,9 @@ Application Debugger :
 	TeamMemory.cpp
 	Thread.cpp
 	ThreadInfo.cpp
+
+	# types
+	TargetAddressRangeList.cpp
 
 	:
 	<nogrist>Debugger_demangler.o

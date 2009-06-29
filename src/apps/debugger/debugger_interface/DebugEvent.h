@@ -7,8 +7,8 @@
 
 #include <debugger.h>
 
-#include "ArchitectureTypes.h"
 #include "ImageInfo.h"
+#include "Types.h"
 
 
 class CpuState;

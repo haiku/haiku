@@ -10,7 +10,7 @@
 #include <Referenceable.h>
 #include <Variant.h>
 
-#include "ArchitectureTypes.h"
+#include "Types.h"
 
 
 class Register;

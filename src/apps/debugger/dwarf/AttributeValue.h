@@ -7,6 +7,7 @@
 
 #include "AttributeClasses.h"
 #include "DwarfTypes.h"
+#include "TargetAddressRangeList.h"
 
 
 class DebugInfoEntry;
@@ -21,6 +22,7 @@ struct AttributeValue {
 		}					block;
 		uint64				constant;
 		bool				flag;
+		TargetAddressRangeList*	rangeList;
 		dwarf_off_t			pointer;
 		DebugInfoEntry*		reference;
 		const char*			string;
@@ -29,6 +31,100 @@ struct AttributeValue {
 	uint16				attributeForm;
 	uint8				attributeClass;
 	bool				isSigned;
+
+	AttributeValue()
+		:
+		attributeClass(ATTRIBUTE_CLASS_UNKNOWN)
+	{
+	}
+
+	~AttributeValue()
+	{
+		Unset();
+	}
+
+	void SetToAddress(dwarf_addr_t address)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_ADDRESS;
+		this->address = address;
+	}
+
+	void SetToBlock(const void* data, dwarf_size_t length)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_BLOCK;
+		block.data = data;
+		block.length = length;
+	}
+
+	void SetToConstant(uint64 value, bool isSigned)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_CONSTANT;
+		this->constant = value;
+		this->isSigned = isSigned;
+	}
+
+	void SetToFlag(bool value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_FLAG;
+		this->flag = value;
+	}
+
+	void SetToLinePointer(dwarf_off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_LINEPTR;
+		this->pointer = value;
+	}
+
+	void SetToLocationListPointer(dwarf_off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
+		this->pointer = value;
+	}
+
+	void SetToMacroPointer(dwarf_off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_MACPTR;
+		this->pointer = value;
+	}
+
+	void SetToRangeList(TargetAddressRangeList* rangeList)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_RANGELISTPTR;
+		this->rangeList = rangeList;
+		if (rangeList != NULL)
+			rangeList->AddReference();
+	}
+
+	void SetToReference(DebugInfoEntry* entry)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_REFERENCE;
+		this->reference = entry;
+	}
+
+	void SetToString(const char* string)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_STRING;
+		this->string = string;
+	}
+
+	void Unset()
+	{
+		if (attributeClass == ATTRIBUTE_CLASS_RANGELISTPTR
+			&& rangeList != NULL) {
+			rangeList->RemoveReference();
+		}
+		attributeClass = ATTRIBUTE_CLASS_UNKNOWN;
+	}
 
 	const char* ToString(char* buffer, size_t size);
 };

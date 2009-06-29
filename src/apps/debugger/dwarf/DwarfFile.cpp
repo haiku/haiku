@@ -16,6 +16,7 @@
 #include "DataReader.h"
 #include "ElfFile.h"
 #include "TagNames.h"
+#include "TargetAddressRangeList.h"
 
 
 DwarfFile::DwarfFile()
@@ -25,6 +26,7 @@ DwarfFile::DwarfFile()
 	fDebugInfoSection(NULL),
 	fDebugAbbrevSection(NULL),
 	fDebugStringSection(NULL),
+	fDebugRangesSection(NULL),
 	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
 	fFinished(false),
@@ -42,6 +44,7 @@ DwarfFile::~DwarfFile()
 		fElfFile->PutSection(fDebugInfoSection);
 		fElfFile->PutSection(fDebugAbbrevSection);
 		fElfFile->PutSection(fDebugStringSection);
+		fElfFile->PutSection(fDebugRangesSection);
 		delete fElfFile;
 	}
 
@@ -69,6 +72,8 @@ DwarfFile::Load(const char* fileName)
 	fDebugInfoSection = fElfFile->GetSection(".debug_info");
 	fDebugAbbrevSection = fElfFile->GetSection(".debug_abbrev");
 	fDebugStringSection = fElfFile->GetSection(".debug_str");
+	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
+		// not mandatory
 	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL
 		|| fDebugStringSection == NULL) {
 		fprintf(stderr, "DwarfManager::File::Load(\"%s\"): no "
@@ -286,7 +291,9 @@ abbreviationEntry.Tag(), abbreviationEntry.HasChildren());
 			if (childEntry != NULL) {
 				if (entry != NULL) {
 					error = entry->AddChild(childEntry);
-					if (error == ENTRY_NOT_HANDLED) {
+					if (error == B_OK) {
+						childEntry->SetParent(entry);
+					} else if (error == ENTRY_NOT_HANDLED) {
 						error = B_OK;
 printf("%*s  -> child unhandled\n", level * 2, "");
 					}
@@ -384,7 +391,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 		// prepare an AttributeValue
 		AttributeValue attributeValue;
 		attributeValue.attributeForm = attributeForm;
-		attributeValue.isSigned = false;
+		bool isSigned = false;
 
 		// Read the attribute value according to the attribute's form. For
 		// the forms that don't map to a single attribute class only or
@@ -414,7 +421,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.Read<uint64>(0);
 				break;
 			case DW_FORM_string:
-				attributeValue.string = dataReader.ReadString();
+				attributeValue.SetToString(dataReader.ReadString());
 				break;
 			case DW_FORM_block:
 				blockLength = dataReader.ReadUnsignedLEB128(0);
@@ -426,11 +433,11 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.Read<uint8>(0);
 				break;
 			case DW_FORM_flag:
-				attributeValue.flag = dataReader.Read<uint8>(0) != 0;
+				attributeValue.SetToFlag(dataReader.Read<uint8>(0) != 0);
 				break;
 			case DW_FORM_sdata:
 				value = dataReader.ReadSignedLEB128(0);
-				attributeValue.isSigned = true;
+				isSigned = true;
 				break;
 			case DW_FORM_strp:
 			{
@@ -440,8 +447,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 						offset);
 					return B_BAD_DATA;
 				}
-				attributeValue.string
-					= (const char*)fDebugStringSection->Data() + offset;
+				attributeValue.SetToString(
+					(const char*)fDebugStringSection->Data() + offset);
 				break;
 			}
 			case DW_FORM_udata:
@@ -484,31 +491,43 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				attributeForm);
 			continue;
 		}
-		attributeValue.attributeClass = attributeClass;
+//		attributeValue.attributeClass = attributeClass;
 
 		// set the attribute value according to the attribute's class
 		switch (attributeClass) {
 			case ATTRIBUTE_CLASS_ADDRESS:
-				attributeValue.address = value;
+				attributeValue.SetToAddress(value);
 				break;
 			case ATTRIBUTE_CLASS_BLOCK:
-				attributeValue.block.data = dataReader.Data();
-				attributeValue.block.length = blockLength;
+				attributeValue.SetToBlock(dataReader.Data(), blockLength);
 				dataReader.Skip(blockLength);
 				break;
 			case ATTRIBUTE_CLASS_CONSTANT:
-				attributeValue.constant = value;
+				attributeValue.SetToConstant(value, isSigned);
 				break;
 			case ATTRIBUTE_CLASS_LINEPTR:
-			case ATTRIBUTE_CLASS_LOCLISTPTR:
-			case ATTRIBUTE_CLASS_MACPTR:
-			case ATTRIBUTE_CLASS_RANGELISTPTR:
-				attributeValue.pointer = value;
+				attributeValue.SetToLinePointer(value);
 				break;
+			case ATTRIBUTE_CLASS_LOCLISTPTR:
+				attributeValue.SetToLocationListPointer(value);
+				break;
+			case ATTRIBUTE_CLASS_MACPTR:
+				attributeValue.SetToMacroPointer(value);
+				break;
+			case ATTRIBUTE_CLASS_RANGELISTPTR:
+			{
+				if (entry != NULL) {
+					TargetAddressRangeList* rangeList
+						= _ResolveRangeList(value);
+					Reference<TargetAddressRangeList> reference(rangeList);
+					attributeValue.SetToRangeList(rangeList);
+				}
+				break;
+			}
 			case ATTRIBUTE_CLASS_REFERENCE:
 				if (entry != NULL) {
-					attributeValue.reference = _ResolveReference(value,
-						localReference);
+					attributeValue.SetToReference(_ResolveReference(value,
+						localReference));
 					if (attributeValue.reference == NULL) {
 						fprintf(stderr, "Failed to resolve reference: "
 						"%s (%#lx) %s (%#lx): value: %llu\n",
@@ -539,7 +558,7 @@ get_attribute_form_name(attributeForm), attributeClass, attributeValue.ToString(
 
 			DebugInfoEntrySetter attributeSetter
 				= get_attribute_name_setter(attributeName);
-			if (attributeSetter != NULL) {
+			if (attributeSetter != 0) {
 				status_t error = (entry->*attributeSetter)(attributeName,
 					attributeValue);
 
@@ -604,4 +623,50 @@ DwarfFile::_ResolveReference(uint64 offset, bool localReference) const
 
 	// TODO: Implement program-global references!
 	return NULL;
+}
+
+
+TargetAddressRangeList*
+DwarfFile::_ResolveRangeList(uint64 offset)
+{
+	if (fDebugRangesSection == NULL)
+		return NULL;
+
+	if (offset >= (uint64)fDebugRangesSection->Size())
+		return NULL;
+
+	TargetAddressRangeList* ranges = new(std::nothrow) TargetAddressRangeList;
+	if (ranges == NULL) {
+		fprintf(stderr, "Out of memory.\n");
+		return NULL;
+	}
+	Reference<TargetAddressRangeList> rangesReference(ranges);
+
+	dwarf_addr_t baseAddress
+		= fCurrentCompilationUnit->UnitEntry()->AddressRangeBase();
+
+	DataReader dataReader((uint8*)fDebugRangesSection->Data() + offset,
+		fDebugRangesSection->Size() - offset);
+	while (true) {
+		dwarf_addr_t start = dataReader.Read<dwarf_addr_t>(0);
+		dwarf_addr_t end = dataReader.Read<dwarf_addr_t>(0);
+		if (dataReader.HasOverflow())
+			return NULL;
+
+		if (start == 0 && end == 0)
+			break;
+		if (start == DWARF_ADDRESS_MAX) {
+			baseAddress = end;
+			continue;
+		}
+		if (start == end)
+			continue;
+
+		if (!ranges->AddRange(baseAddress + start, end - start)) {
+			fprintf(stderr, "Out of memory.\n");
+			return NULL;
+		}
+	}
+
+	return rangesReference.Detach();
 }

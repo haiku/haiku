@@ -9,7 +9,7 @@
 
 #include <Referenceable.h>
 
-#include "ArchitectureTypes.h"
+#include "Types.h"
 
 
 enum stack_frame_type {

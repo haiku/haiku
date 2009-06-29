@@ -5,6 +5,8 @@
 #ifndef DEBUG_INFO_ENTRY_H
 #define DEBUG_INFO_ENTRY_H
 
+#include <String.h>
+
 #include <util/DoublyLinkedList.h>
 
 #include "DwarfTypes.h"
@@ -44,10 +46,18 @@ public:
 
 	virtual	uint16				Tag() const = 0;
 
+			DebugInfoEntry*		Parent() const	{ return fParent; }
+			void				SetParent(DebugInfoEntry* parent);
+
 	virtual	bool				IsType() const;
+	virtual	bool				IsNamespace() const;
+									// a namespace-like thingy (namespace,
+									// class, ...)
 
 	virtual	const char*			Name() const;
 	virtual	const char*			Description() const;
+	virtual	DebugInfoEntry*		Specification() const;
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -154,6 +164,9 @@ protected:
 			status_t	 		SetConstantAttributeValue(
 									ConstantAttributeValue& toSet,
 									const AttributeValue& value);
+
+protected:
+			DebugInfoEntry*		fParent;
 };
 
 

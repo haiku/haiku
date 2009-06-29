@@ -8,7 +8,7 @@
 #include <ObjectList.h>
 #include <Referenceable.h>
 
-#include "ArchitectureTypes.h"
+#include "Types.h"
 
 
 enum user_breakpoint_state {

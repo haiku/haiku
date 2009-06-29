@@ -7,7 +7,7 @@
 
 #include <String.h>
 
-#include "ArchitectureTypes.h"
+#include "Types.h"
 
 
 class DisassemblerX86 {

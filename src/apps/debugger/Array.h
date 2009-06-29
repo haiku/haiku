@@ -14,6 +14,7 @@ template<typename Element>
 class Array {
 public:
 	inline						Array();
+								Array(const Array<Element>& other);
 								~Array();
 
 	inline	int					Size() const		{ return fSize; }
@@ -34,6 +35,8 @@ public:
 	inline	Element&			operator[](int index);
 	inline	const Element&		operator[](int index) const;
 
+			Array<Element>&		operator=(const Array<Element>& other);
+
 private:
 	static	const int			kMinCapacity = 8;
 
@@ -53,6 +56,17 @@ Array<Element>::Array()
 	fSize(0),
 	fCapacity(0)
 {
+}
+
+
+template<typename Element>
+Array<Element>::Array(const Array<Element>& other)
+	:
+	fElements(NULL),
+	fSize(0),
+	fCapacity(0)
+{
+	*this = other;
 }
 
 
@@ -174,6 +188,21 @@ const Element&
 Array<Element>::operator[](int index) const
 {
 	return fElements[index];
+}
+
+
+template<typename Element>
+Array<Element>&
+Array<Element>::operator=(const Array<Element>& other)
+{
+	Clear();
+
+	if (other.fSize > 0 && _Resize(0, other.fSize)) {
+		fSize = other.fSize;
+		memcpy(fElements, other.fElements, fSize * sizeof(Element));
+	}
+
+	return *this;
 }
 
 

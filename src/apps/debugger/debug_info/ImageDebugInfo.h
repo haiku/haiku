@@ -10,8 +10,8 @@
 #include <ObjectList.h>
 #include <Referenceable.h>
 
-#include "ArchitectureTypes.h"
 #include "ImageInfo.h"
+#include "Types.h"
 
 
 class Architecture;

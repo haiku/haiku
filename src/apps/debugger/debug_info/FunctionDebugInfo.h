@@ -8,8 +8,8 @@
 #include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
-#include "ArchitectureTypes.h"
 #include "SourceLocation.h"
+#include "Types.h"
 
 
 enum function_source_state {

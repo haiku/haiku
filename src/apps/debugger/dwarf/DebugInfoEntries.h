@@ -136,6 +136,7 @@
 class DIECompileUnitBase : public DebugInfoEntry {
 public:
 								DIECompileUnitBase();
+								~DIECompileUnitBase();
 
 	virtual	status_t			InitAfterAttributes(
 									DebugInfoEntryInitInfo& info);
@@ -145,6 +146,12 @@ public:
 			const DebugInfoEntryList& Types() const	{ return fTypes; }
 			const DebugInfoEntryList& OtherChildren() const
 										{ return fOtherChildren; }
+			TargetAddressRangeList* AddressRanges() const
+										{ return fAddressRanges; }
+
+			dwarf_addr_t		LowPC() const	{ return fLowPC; }
+			dwarf_addr_t		HighPC() const	{ return fHighPC; }
+			dwarf_addr_t		AddressRangeBase() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -171,10 +178,10 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_use_UTF8(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_ranges(uint16 attributeName,
+									const AttributeValue& value);
 
 //TODO:
-//	virtual	status_t			AddAttribute_ranges(uint16 attributeName,
-//									const AttributeValue& value);
 //	virtual	status_t			AddAttribute_segment(uint16 attributeName,
 //									const AttributeValue& value);
 
@@ -187,6 +194,7 @@ protected:
 			dwarf_addr_t		fHighPC;
 			dwarf_off_t			fStatementListOffset;
 			dwarf_off_t			fMacroInfoOffset;
+			TargetAddressRangeList*	fAddressRanges;
 			DIECompileUnitBase*	fBaseTypesUnit;
 			DebugInfoEntryList	fTypes;
 			DebugInfoEntryList	fOtherChildren;
@@ -251,6 +259,7 @@ public:
 								DIEDeclaredType();
 
 	virtual	const char*			Description() const;
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
 
 	virtual	status_t			AddAttribute_accessibility(uint16 attributeName,
 									const AttributeValue& value);
@@ -296,6 +305,10 @@ protected:
 class DIECompoundType : public DIEDeclaredType {
 public:
 								DIECompoundType();
+
+	virtual	bool				IsNamespace() const;
+
+	virtual	DebugInfoEntry*		Specification() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -398,6 +411,8 @@ public:
 	virtual	status_t			InitAfterHierarchy(
 									DebugInfoEntryInitInfo& info);
 
+	virtual	DebugInfoEntry*		Specification() const;
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_ordering(uint16 attributeName,
@@ -452,6 +467,8 @@ public:
 								DIEEnumerationType();
 
 	virtual	uint16				Tag() const;
+
+	virtual	DebugInfoEntry*		Specification() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -556,6 +573,8 @@ public:
 								DIEPointerType();
 
 	virtual	uint16				Tag() const;
+
+	virtual	DebugInfoEntry*		Specification() const;
 
 	virtual	status_t			AddAttribute_specification(uint16 attributeName,
 									const AttributeValue& value);
@@ -990,12 +1009,55 @@ public:
 class DIESubprogram : public DIEDeclaredNamedBase {
 public:
 								DIESubprogram();
+								~DIESubprogram();
 
 	virtual	uint16				Tag() const;
 
+	virtual	DebugInfoEntry*		Specification() const;
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
+
+			TargetAddressRangeList* AddressRanges() const
+										{ return fAddressRanges; }
+
+			dwarf_addr_t		LowPC() const	{ return fLowPC; }
+			dwarf_addr_t		HighPC() const	{ return fHighPC; }
+
+			bool				IsPrototyped() const	{ return fPrototyped; }
+			uint8				Inline() const			{ return fInline; }
+
+	virtual	status_t			AddAttribute_low_pc(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_high_pc(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_ranges(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_address_class(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_prototyped(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_inline(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_abstract_origin(
+									uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			dwarf_addr_t		fLowPC;
+			dwarf_addr_t		fHighPC;
+			TargetAddressRangeList*	fAddressRanges;
+			DIESubprogram*		fSpecification;
+			DIESubprogram*		fAbstractOrigin;
+			DIEType*			fReturnType;
+			uint8				fAddressClass;
+			bool				fPrototyped;
+			uint8				fInline;
+
 // TODO:
 // DW_AT_abstract_origin
-// DW_AT_address_class
 // DW_AT_artificial
 // DW_AT_calling_convention
 // DW_AT_elemental
@@ -1003,13 +1065,8 @@ public:
 // DW_AT_explicit
 // DW_AT_external
 // DW_AT_frame_base
-// DW_AT_high_pc
-// DW_AT_inline
-// DW_AT_low_pc
 // DW_AT_object_pointer
-// DW_AT_prototyped
 // DW_AT_pure
-// DW_AT_ranges
 // DW_AT_recursive
 // DW_AT_return_addr
 // DW_AT_segment
@@ -1017,7 +1074,6 @@ public:
 // DW_AT_start_scope
 // DW_AT_static_link
 // DW_AT_trampoline
-// DW_AT_type
 // DW_AT_virtuality
 // DW_AT_vtable_elem_location
 };
@@ -1159,6 +1215,16 @@ public:
 								DIENamespace();
 
 	virtual	uint16				Tag() const;
+
+	virtual	bool				IsNamespace() const;
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			DebugInfoEntryList	fChildren;
 
 // TODO:
 // DW_AT_extension

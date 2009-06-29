@@ -11,6 +11,7 @@
 
 class Architecture;
 class DwarfFile;
+class ElfSegment;
 
 
 class DwarfImageDebugInfo : public SpecificImageDebugInfo {
@@ -21,6 +22,9 @@ public:
 	virtual						~DwarfImageDebugInfo();
 
 			status_t			Init();
+
+			target_addr_t		RelocationDelta() const
+									{ return fRelocationDelta; }
 
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
@@ -39,6 +43,8 @@ private:
 			ImageInfo			fImageInfo;
 			Architecture*		fArchitecture;
 			DwarfFile*			fFile;
+			ElfSegment*			fTextSegment;
+			target_addr_t		fRelocationDelta;
 };
 
 

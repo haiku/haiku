@@ -17,6 +17,7 @@ class CompilationUnit;
 class DataReader;
 class ElfFile;
 class ElfSection;
+class TargetAddressRangeList;
 
 
 class DwarfFile : public DoublyLinkedListLinkImpl<DwarfFile> {
@@ -27,7 +28,8 @@ public:
 			status_t			Load(const char* fileName);
 			status_t			FinishLoading();
 
-			const char*			Name() const	{ return fName; }
+			const char*			Name() const		{ return fName; }
+			ElfFile*			GetElfFile() const	{ return fElfFile; }
 
 			int32				CountCompilationUnits() const;
 			CompilationUnit*	CompilationUnitAt(int32 index) const;
@@ -52,6 +54,8 @@ private:
 
 			DebugInfoEntry*		_ResolveReference(uint64 offset,
 									bool localReference) const;
+			TargetAddressRangeList* _ResolveRangeList(uint64 offset);
+									// returns reference
 
 private:
 			char*				fName;
@@ -59,6 +63,7 @@ private:
 			ElfSection*			fDebugInfoSection;
 			ElfSection*			fDebugAbbrevSection;
 			ElfSection*			fDebugStringSection;
+			ElfSection*			fDebugRangesSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;

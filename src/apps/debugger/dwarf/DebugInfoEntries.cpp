@@ -24,11 +24,19 @@ DIECompileUnitBase::DIECompileUnitBase()
 	fStatementListOffset(0),
 	fMacroInfoOffset(0),
 		// TODO: Is 0 a good invalid offset?
+	fAddressRanges(NULL),
 	fBaseTypesUnit(NULL),
 	fLanguage(0),
 	fIdentifierCase(0),
 	fUseUTF8(true)
 {
+}
+
+
+DIECompileUnitBase::~DIECompileUnitBase()
+{
+	if (fAddressRanges != NULL)
+		fAddressRanges->RemoveReference();
 }
 
 
@@ -62,6 +70,16 @@ const char*
 DIECompileUnitBase::Name() const
 {
 	return fName;
+}
+
+
+dwarf_addr_t
+DIECompileUnitBase::AddressRangeBase() const
+{
+	if (fAddressRanges != NULL)
+		return fAddressRanges->LowestAddress();
+
+	return fLowPC;
 }
 
 
@@ -171,6 +189,22 @@ DIECompileUnitBase::AddAttribute_use_UTF8(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fUseUTF8 = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIECompileUnitBase::AddAttribute_ranges(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (fAddressRanges != NULL)
+		fAddressRanges->RemoveReference();
+
+	fAddressRanges = value.rangeList;
+
+	if (fAddressRanges != NULL)
+		fAddressRanges->AddReference();
+
 	return B_OK;
 }
 
@@ -285,6 +319,13 @@ DIEDeclaredType::Description() const
 }
 
 
+DebugInfoEntry*
+DIEDeclaredType::AbstractOrigin() const
+{
+	return fAbstractOrigin;
+}
+
+
 status_t
 DIEDeclaredType::AddAttribute_accessibility(uint16 attributeName,
 	const AttributeValue& value)
@@ -356,6 +397,20 @@ DIECompoundType::DIECompoundType()
 	:
 	fSpecification(NULL)
 {
+}
+
+
+bool
+DIECompoundType::IsNamespace() const
+{
+	return true;
+}
+
+
+DebugInfoEntry*
+DIECompoundType::Specification() const
+{
+	return fSpecification;
 }
 
 
@@ -569,6 +624,13 @@ DIEArrayType::InitAfterHierarchy(DebugInfoEntryInitInfo& info)
 }
 
 
+DebugInfoEntry*
+DIEArrayType::Specification() const
+{
+	return fSpecification;
+}
+
+
 status_t
 DIEArrayType::AddChild(DebugInfoEntry* child)
 {
@@ -669,6 +731,13 @@ uint16
 DIEEnumerationType::Tag() const
 {
 	return DW_TAG_enumeration_type;
+}
+
+
+DebugInfoEntry*
+DIEEnumerationType::Specification() const
+{
+	return fSpecification;
 }
 
 
@@ -806,6 +875,13 @@ uint16
 DIEPointerType::Tag() const
 {
 	return DW_TAG_pointer_type;
+}
+
+
+DebugInfoEntry*
+DIEPointerType::Specification() const
+{
+	return fSpecification;
 }
 
 
@@ -1461,7 +1537,24 @@ DIEPackedType::Tag() const
 
 
 DIESubprogram::DIESubprogram()
+	:
+	fLowPC(0),
+	fHighPC(0),
+	fAddressRanges(NULL),
+	fSpecification(NULL),
+	fAbstractOrigin(NULL),
+	fReturnType(NULL),
+	fAddressClass(0),
+	fPrototyped(false),
+	fInline(DW_INL_not_inlined)
 {
+}
+
+
+DIESubprogram::~DIESubprogram()
+{
+	if (fAddressRanges != NULL)
+		fAddressRanges->RemoveReference();
 }
 
 
@@ -1469,6 +1562,111 @@ uint16
 DIESubprogram::Tag() const
 {
 	return DW_TAG_subprogram;
+}
+
+
+DebugInfoEntry*
+DIESubprogram::Specification() const
+{
+	return fSpecification;
+}
+
+
+
+DebugInfoEntry*
+DIESubprogram::AbstractOrigin() const
+{
+	return fAbstractOrigin;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_low_pc(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fLowPC = value.address;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_high_pc(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fHighPC = value.address;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_ranges(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (fAddressRanges != NULL)
+		fAddressRanges->RemoveReference();
+
+	fAddressRanges = value.rangeList;
+
+	if (fAddressRanges != NULL)
+		fAddressRanges->AddReference();
+
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIESubprogram*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_address_class(uint16 attributeName,
+	const AttributeValue& value)
+{
+// TODO: How is the address class handled?
+	fAddressClass = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_prototyped(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fPrototyped = value.flag;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fReturnType = dynamic_cast<DIEType*>(value.reference);
+	return fReturnType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_inline(uint16 attributeName,
+	const AttributeValue& value)
+{
+// TODO: How is the address class handled?
+	fInline = value.constant;
+	return B_OK;
+}
+
+
+status_t
+DIESubprogram::AddAttribute_abstract_origin(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAbstractOrigin = dynamic_cast<DIESubprogram*>(value.reference);
+	return fAbstractOrigin != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1661,6 +1859,21 @@ uint16
 DIENamespace::Tag() const
 {
 	return DW_TAG_namespace;
+}
+
+
+bool
+DIENamespace::IsNamespace() const
+{
+	return true;
+}
+
+
+status_t
+DIENamespace::AddChild(DebugInfoEntry* child)
+{
+	fChildren.Add(child);
+	return B_OK;
 }
 
 

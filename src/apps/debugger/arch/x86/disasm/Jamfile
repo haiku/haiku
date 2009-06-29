@@ -7,6 +7,7 @@ UseHeaders [ LibraryHeaders udis86 ] ;
 UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) types ] ;
 
 
 MergeObject Debugger_disasm_x86.o

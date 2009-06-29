@@ -5,7 +5,9 @@
 #ifndef TARGET_ADDRESS_RANGE_H
 #define TARGET_ADDRESS_RANGE_H
 
-#include "ArchitectureTypes.h"
+#include <algorithm>
+
+#include "Types.h"
 
 
 class TargetAddressRange {
@@ -76,6 +78,20 @@ public:
 	bool IntersectsWith(const TargetAddressRange& other) const
 	{
 		return Contains(other.Start()) || other.Contains(Start());
+	}
+
+	TargetAddressRange& operator|=(const TargetAddressRange& other)
+	{
+		if (fSize == 0)
+			return *this = other;
+
+		if (other.fSize > 0) {
+			target_addr_t end = std::max(End(), other.End());
+			fStart = std::min(fStart, other.fStart);
+			fSize = end - fStart;
+		}
+
+		return *this;
 	}
 
 private:

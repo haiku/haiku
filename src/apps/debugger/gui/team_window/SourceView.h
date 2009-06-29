@@ -8,7 +8,7 @@
 #include <Font.h>
 #include <View.h>
 
-#include "ArchitectureTypes.h"
+#include "Types.h"
 
 
 class Breakpoint;

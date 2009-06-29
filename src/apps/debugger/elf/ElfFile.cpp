@@ -76,6 +76,26 @@ ElfSection::Unload()
 }
 
 
+// #pragma mark - ElfSegment
+
+
+ElfSegment::ElfSegment(off_t fileOffset, off_t fileSize,
+	target_addr_t loadAddress, target_size_t loadSize, bool writable)
+	:
+	fFileOffset(fileOffset),
+	fFileSize(fileSize),
+	fLoadAddress(loadAddress),
+	fLoadSize(loadSize),
+	fWritable(writable)
+{
+}
+
+
+ElfSegment::~ElfSegment()
+{
+}
+
+
 // #pragma mark - ElfFile
 
 
@@ -90,6 +110,9 @@ ElfFile::ElfFile()
 
 ElfFile::~ElfFile()
 {
+	while (ElfSegment* segment = fSegments.RemoveHead())
+		delete segment;
+
 	while (ElfSection* section = fSections.RemoveHead())
 		delete section;
 
@@ -148,8 +171,7 @@ printf("fFileSize: %lld\n", fFileSize);
 printf("sectionHeaderTable: %lld\n", sectionHeadersOffset);
 
 	// read the section header table
-	uint8* sectionHeaderTable
-		= (uint8*)malloc(sectionHeaderTableSize);
+	uint8* sectionHeaderTable = (uint8*)malloc(sectionHeaderTableSize);
 	if (sectionHeaderTable == NULL)
 		return B_NO_MEMORY;
 	MemoryDeleter sectionHeaderTableDeleter(sectionHeaderTable);
@@ -202,6 +224,49 @@ printf("sectionStrings: %ld\n", stringSectionHeader->sh_offset);
 		fSections.Add(section);
 	}
 
+	// check program header table values
+	off_t programHeadersOffset = fElfHeader->e_phoff;
+	size_t programHeaderSize = fElfHeader->e_phentsize;
+	int segmentCount = fElfHeader->e_phnum;
+	size_t programHeaderTableSize = programHeaderSize * segmentCount;
+	if (!_CheckRange(programHeadersOffset, programHeaderTableSize)) {
+		fprintf(stderr, "\"%s\": Invalid ELF header\n", fileName);
+		return B_BAD_DATA;
+	}
+printf("programHeaderTable: %lld\n", programHeadersOffset);
+
+	// read the program header table
+	uint8* programHeaderTable = (uint8*)malloc(programHeaderTableSize);
+	if (programHeaderTable == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter programHeaderTableDeleter(programHeaderTable);
+
+	bytesRead = pread(fFD, programHeaderTable, programHeaderTableSize,
+		programHeadersOffset);
+	if (bytesRead != (ssize_t)programHeaderTableSize)
+		return bytesRead < 0 ? errno : B_ERROR;
+
+	// read the program headers and create ElfSegment objects
+	for (int i = 0; i < segmentCount; i++) {
+		Elf32_Phdr* programHeader = (Elf32_Phdr*)(programHeaderTable
+			+ i * programHeaderSize);
+		// skip program headers we aren't interested in or that are invalid
+		if (programHeader->p_type != PT_LOAD || programHeader->p_filesz == 0
+			|| programHeader->p_memsz == 0
+			|| !_CheckRange(programHeader->p_offset, programHeader->p_filesz)) {
+			continue;
+		}
+
+		// create an ElfSegment
+		ElfSegment* segment = new(std::nothrow) ElfSegment(
+			programHeader->p_offset, programHeader->p_filesz,
+			programHeader->p_vaddr, programHeader->p_memsz,
+			(programHeader->p_flags & PF_WRITE) != 0);
+		if (segment == NULL)
+			return B_NO_MEMORY;
+		fSegments.Add(segment);
+	}
+
 	return B_OK;
 }
 
@@ -227,6 +292,32 @@ ElfFile::PutSection(ElfSection* section)
 }
 
 
+ElfSegment*
+ElfFile::TextSegment() const
+{
+	for (SegmentList::ConstIterator it = fSegments.GetIterator();
+			ElfSegment* segment = it.Next();) {
+		if (!segment->IsWritable())
+			return segment;
+	}
+
+	return NULL;
+}
+
+
+ElfSegment*
+ElfFile::DataSegment() const
+{
+	for (SegmentList::ConstIterator it = fSegments.GetIterator();
+			ElfSegment* segment = it.Next();) {
+		if (segment->IsWritable())
+			return segment;
+	}
+
+	return NULL;
+}
+
+
 bool
 ElfFile::_CheckRange(off_t offset, off_t size) const
 {
@@ -243,5 +334,8 @@ ElfFile::_CheckElfHeader() const
 		&& fElfHeader->e_shnum > 0
 		&& fElfHeader->e_shentsize >= sizeof(struct Elf32_Shdr)
 		&& fElfHeader->e_shstrndx != SHN_UNDEF
-		&& fElfHeader->e_shstrndx < fElfHeader->e_shnum;
+		&& fElfHeader->e_shstrndx < fElfHeader->e_shnum
+		&& fElfHeader->e_phoff > 0
+		&& fElfHeader->e_phnum > 0
+		&& fElfHeader->e_phentsize >= sizeof(struct Elf32_Phdr);
 }

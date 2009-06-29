@@ -8,6 +8,7 @@ UsePrivateSystemHeaders ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) elf ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) types ] ;
 
 
 MergeObject Debugger_dwarf.o
@@ -20,6 +21,7 @@ MergeObject Debugger_dwarf.o
 	DebugInfoEntry.cpp
 	DwarfFile.cpp
 	DwarfManager.cpp
+	DwarfUtils.cpp
 	SourceLanguageInfo.cpp
 	TagNames.cpp
 ;

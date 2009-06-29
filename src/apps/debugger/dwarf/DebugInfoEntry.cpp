@@ -21,6 +21,8 @@
 
 
 DebugInfoEntry::DebugInfoEntry()
+	:
+	fParent(NULL)
 {
 }
 
@@ -44,8 +46,22 @@ DebugInfoEntry::InitAfterAttributes(DebugInfoEntryInitInfo& info)
 }
 
 
+void
+DebugInfoEntry::SetParent(DebugInfoEntry* parent)
+{
+	fParent = parent;
+}
+
+
 bool
 DebugInfoEntry::IsType() const
+{
+	return false;
+}
+
+
+bool
+DebugInfoEntry::IsNamespace() const
 {
 	return false;
 }
@@ -57,9 +73,22 @@ DebugInfoEntry::Name() const
 	return NULL;
 }
 
-
 const char*
 DebugInfoEntry::Description() const
+{
+	return NULL;
+}
+
+
+DebugInfoEntry*
+DebugInfoEntry::Specification() const
+{
+	return NULL;
+}
+
+
+DebugInfoEntry*
+DebugInfoEntry::AbstractOrigin() const
 {
 	return NULL;
 }
