@@ -51,11 +51,35 @@ ssize_t
 fs_write_attr(int fd, const char *attribute, uint32 type,
 	off_t pos, const void *buffer, size_t writeBytes)
 {
-	ssize_t bytes;
+	// NOTE: This call is deprecated in Haiku and has a number of problems:
+	// On BeOS, it was documented that the "pos" argument is ignored.
+	// However, a number of programs tried to use this call to write large
+	// attributes in a loop anyways. These programs all relied on the broken
+	// or at least inconsistent behaviour to truncate/clobber an existing
+	// attribute. In another words, writing 5 bytes at position 0 into an
+	// attribute that was already 10 bytes long resulted in an attribute of
+	// only 5 bytes length.
+	// The implementation of this function tries to stay compatible with
+	// BeOS in that it clobbers the existing attribute when you write at offset
+	// 0, but it also tries to support programs which continue to write more
+	// chunks.
+	// The new Haiku way is to use fs_open_attr() to get a regular file handle
+	// and use that for writing, then use fs_close_attr() when done. As you
+	// see from this implementation, it saves 2 syscalls per writing a chunk
+	// of data.
 
-	int attr = _kern_create_attr(fd, attribute, type, O_WRONLY | O_TRUNC);
-	if (attr < 0)
-		RETURN_AND_SET_ERRNO(attr);
+	ssize_t bytes;
+	int attr = -1;
+
+	// If pos is 0, we try to avoid one syscall that with good chances
+	// will fail anyways and take the shortcut to creating the attr directly.
+	if (pos > 0)
+		attr = _kern_open_attr(fd, attribute, O_WRONLY);
+	if (attr < 0) {
+		attr = _kern_create_attr(fd, attribute, type, O_WRONLY | O_TRUNC);
+		if (attr < 0)
+			RETURN_AND_SET_ERRNO(attr);
+	}
 
 	bytes = _kern_write(attr, pos, buffer, writeBytes);
 	_kern_close(attr);
