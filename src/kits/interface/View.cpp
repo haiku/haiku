@@ -6,7 +6,7 @@
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 #include <View.h>
@@ -323,7 +323,8 @@ struct BView::LayoutData {
 		fLayoutInvalidationDisabled(0),
 		fLayout(NULL),
 		fLayoutContext(NULL),
-		fLayoutValid(true),		// <- TODO: Rethink this!
+		fLayoutValid(true),		// TODO: Rethink these initial values!
+		fMinMaxValid(true),		//
 		fLayoutInProgress(false),
 		fNeedsRelayout(true)
 	{
@@ -337,6 +338,7 @@ struct BView::LayoutData {
 	BLayout*		fLayout;
 	BLayoutContext*	fLayoutContext;
 	bool			fLayoutValid;
+	bool			fMinMaxValid;
 	bool			fLayoutInProgress;
 	bool			fNeedsRelayout;
 };
@@ -4489,12 +4491,13 @@ BView::GetLayout() const
 void
 BView::InvalidateLayout(bool descendants)
 {
-	if (fLayoutData->fLayoutValid && !fLayoutData->fLayoutInProgress
+	if (fLayoutData->fMinMaxValid && !fLayoutData->fLayoutInProgress
 		&& fLayoutData->fLayoutInvalidationDisabled == 0) {
-		if (fParent && fParent->fLayoutData->fLayoutValid)
+		if (fParent && fParent->fLayoutData->fMinMaxValid)
 			fParent->InvalidateLayout(false);
 
 		fLayoutData->fLayoutValid = false;
+		fLayoutData->fMinMaxValid = false;
 
 		if (fLayoutData->fLayout)
 			fLayoutData->fLayout->InvalidateLayout();
@@ -4533,6 +4536,25 @@ bool
 BView::IsLayoutValid() const
 {
 	return fLayoutData->fLayoutValid;
+}
+
+
+/*!	\brief Service call for BLayout derived classes reenabling
+	InvalidateLayout() notifications.
+	BView::InvalidateLayout() invokes InvalidateLayout() on its layout the first
+	time, but suppresses further calls until Layout()/Relayout() has been
+	invoked. This method will reenable the notification for the next call of
+	BView::InvalidateLayout().
+
+	If the layout caches internal layout information and updates those
+	information also in methods other than LayoutView(), it has to invoke this
+	method, when it has done so, since otherwise the information might become
+	obsolete without the layout noticing.
+*/
+void
+BView::ResetLayoutInvalidation()
+{
+	fLayoutData->fMinMaxValid = true;
 }
 
 
@@ -4594,6 +4616,7 @@ BView::_Layout(bool force, BLayoutContext* context)
 		fLayoutData->fLayoutInProgress = false;
 
 		fLayoutData->fLayoutValid = true;
+		fLayoutData->fMinMaxValid = true;
 		fLayoutData->fNeedsRelayout = false;
 
 		// layout children

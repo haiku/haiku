@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -532,6 +532,7 @@ public:
 			void			EnableLayoutInvalidation();
 			void			DisableLayoutInvalidation();
 			bool			IsLayoutValid() const;
+			void			ResetLayoutInvalidation();
 
 			BLayoutContext*	LayoutContext() const;
 

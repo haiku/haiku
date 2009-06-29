@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -54,7 +54,7 @@ BCardLayout::SetVisibleItem(BLayoutItem* item)
 
 	if (item != NULL && IndexOfItem(item) < 0)
 		return;
-	
+
 	if (fVisibleItem != NULL)
 		fVisibleItem->SetVisible(false);
 
@@ -107,7 +107,7 @@ BCardLayout::HasHeightForWidth()
 		if (ItemAt(i)->HasHeightForWidth())
 			return true;
 	}
-	
+
 	return false;
 }
 
@@ -157,7 +157,7 @@ void
 BCardLayout::InvalidateLayout()
 {
 	BLayout::InvalidateLayout();
-	
+
 	fMinMaxValid = false;
 }
 
@@ -231,6 +231,9 @@ BCardLayout::_ValidateMinMax()
 	fPreferred.height = max_c(fPreferred.height, fMin.height);
 	fPreferred.width = min_c(fPreferred.width, fMax.width);
 	fPreferred.height = min_c(fPreferred.height, fMax.height);
-	
+
 	fMinMaxValid = true;
+
+	if (BView* view = View())
+		view->ResetLayoutInvalidation();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -1147,6 +1147,9 @@ BSplitLayout::_ValidateMinMax()
 	fHorizontalLayoutInfo = fHorizontalLayouter->CreateLayoutInfo();
 	if (fHeightForWidthItems.IsEmpty())
 		fVerticalLayoutInfo = fVerticalLayouter->CreateLayoutInfo();
+
+	if (BView* view = View())
+		view->ResetLayoutInvalidation();
 }
 
 // _InternalGetHeightForWidth
