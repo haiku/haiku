@@ -153,21 +153,28 @@ copy_attributes(int fromFd, int toFd)
 		if (fs_stat_attr(fromFd, dirent->d_name, &info) != 0)
 			continue;
 
-		while (info.size >= 0) {
+		while (true) {
 			ssize_t bytesRead, bytesWritten;
 
 			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos,
 				buffer, sizeof(buffer));
-			if (bytesRead < 0)
+			if (bytesRead < 0) {
+				fprintf(stderr, "error reading attribute '%s'", dirent->d_name);
 				break;
+			}
 
 			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos,
 				buffer, bytesRead);
-			if (bytesWritten != bytesRead || bytesRead == 0)
+			if (bytesWritten != bytesRead) {
+				fprintf(stderr, "error writing attribute '%s'", dirent->d_name);
 				break;
+			}
 
 			pos += bytesWritten;
 			info.size -= bytesWritten;
+
+			if (info.size <= 0)
+				break;
 		}
 	}
 
