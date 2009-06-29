@@ -81,7 +81,7 @@ environment variables:
   HAIKU_CXXFLAGS              The C++ flags. Defaults to "".
   HAIKU_LDFLAGS               The linker flags. Defaults to "".
   HAIKU_ARFLAGS               The flags passed to HAIKU_AR for archiving.
-                              Defaults to "ru".
+                              Defaults to "cru".
   HAIKU_UNARFLAGS             The flags passed to HAIKU_AR for unarchiving.
                               Defaults to "x".
 
@@ -286,7 +286,7 @@ set_default_value HAIKU_CPPFLAGS	""
 set_default_value HAIKU_CCFLAGS		""
 set_default_value HAIKU_CXXFLAGS	""
 set_default_value HAIKU_LDFLAGS		""
-set_default_value HAIKU_ARFLAGS		ru
+set_default_value HAIKU_ARFLAGS		cru
 set_default_value HAIKU_UNARFLAGS	x
 
 # parse parameters
