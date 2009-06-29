@@ -18,6 +18,7 @@
 
 #include <config.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <assert.h>
 #include <sys/types.h>
 #include <selinux/selinux.h>
@@ -147,35 +148,49 @@ copy_attributes(int fromFd, int toFd)
 		return -1;
 
 	while ((dirent = fs_read_attr_dir(attributes)) != NULL) {
-		attr_info info;
+		struct stat stat;
 		off_t pos = 0;
+		int attrFromFD = fs_open_attr(fromFd, dirent->d_name, 0, O_RDONLY);
+		int attrToFD;
 
-		if (fs_stat_attr(fromFd, dirent->d_name, &info) != 0)
+		if (attrFromFD < 0)
 			continue;
+
+		if (fstat(attrFromFD, &stat) != 0) {
+			close(attrFromFD);
+			continue;
+		}
+
+		attrToFD = fs_open_attr(toFd, dirent->d_name, stat.st_type,
+			O_WRONLY | O_TRUNC | O_CREAT);
+		if (attrToFD < 0) {
+			close(attrFromFD);
+			continue;
+		}
 
 		while (true) {
 			ssize_t bytesRead, bytesWritten;
 
-			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos,
-				buffer, sizeof(buffer));
+			bytesRead = read_pos(attrFromFD, pos, buffer, sizeof(buffer));
 			if (bytesRead < 0) {
 				fprintf(stderr, "error reading attribute '%s'", dirent->d_name);
 				break;
 			}
 
-			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos,
-				buffer, bytesRead);
+			bytesWritten = write_pos(attrToFD, pos, buffer, bytesRead);
 			if (bytesWritten != bytesRead) {
 				fprintf(stderr, "error writing attribute '%s'", dirent->d_name);
 				break;
 			}
 
 			pos += bytesWritten;
-			info.size -= bytesWritten;
+			stat.st_size -= bytesWritten;
 
-			if (info.size <= 0)
+			if (stat.st_size <= 0)
 				break;
 		}
+		close(attrToFD);
+		close(attrFromFD);
 	}
 
 	fs_close_attr_dir(attributes);
