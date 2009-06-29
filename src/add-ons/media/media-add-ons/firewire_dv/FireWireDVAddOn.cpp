@@ -166,8 +166,8 @@ FireWireDVAddOn::AddDevice(FireWireCard* card, const char* path)
 	// setup supported formats (the lazy way)
 	memset(dev->in_formats, 0, sizeof(dev->in_formats));
 	memset(dev->out_formats, 0, sizeof(dev->out_formats));
-	dev->in_formats[1].type = B_MEDIA_ENCODED_VIDEO;
-	dev->out_formats[1].type = B_MEDIA_ENCODED_VIDEO;
+	dev->in_formats[0].type = B_MEDIA_ENCODED_VIDEO;
+	dev->out_formats[0].type = B_MEDIA_ENCODED_VIDEO;
 	
 	// setup flavor info
 	dev->flavor.name = dev->name;
