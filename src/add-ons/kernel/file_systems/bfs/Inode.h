@@ -196,7 +196,7 @@ private:
 								NodeGetter& node, const char* name);
 			status_t		_AddSmallData(Transaction& transaction,
 								NodeGetter& node, const char* name, uint32 type,
-								const uint8* data, size_t length,
+								off_t pos, const uint8* data, size_t length,
 								bool force = false);
 			status_t		_GetNextSmallData(bfs_inode* node,
 								small_data** _smallData) const;

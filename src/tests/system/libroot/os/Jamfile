@@ -1,21 +1,22 @@
 SubDir HAIKU_TOP src tests system libroot os ;
 
-SetSubDirSupportedPlatforms libbe_test ;
-
-#SubDirCcFlags -fcheck-memory-usage -O0 -D_NO_INLINE_ASM ;
-
-SimpleTest DriverSettingsTest
-	: DriverSettingsTest.cpp driver_settings.c
+SimpleTest DriverSettingsTest :
+	DriverSettingsTest.cpp
+	driver_settings.c
 	: be
-	;
+;
 
-SimpleTest ParseDateTest
-	: ParseDateTest.cpp parsedate.cpp
-	;
+SimpleTest ParseDateTest :
+	ParseDateTest.cpp parsedate.cpp
+;
 
-SimpleTest FindDirectoryTest
-	: FindDirectoryTest.cpp
-	;
+SimpleTest FindDirectoryTest :
+	FindDirectoryTest.cpp
+;
+
+SimpleTest fs_attr_test :
+	fs_attr_test.cpp
+;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles

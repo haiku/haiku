@@ -663,9 +663,9 @@ Inode::_RemoveSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 */
 status_t
 Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
-	const char* name, uint32 type, const uint8* data, size_t length, bool force)
+	const char* name, uint32 type, off_t pos, const uint8* data, size_t length,
+	bool force)
 {
-	// TODO: support new write attr semantics and write offset!
 	bfs_inode* node = nodeGetter.WritableNode();
 
 	if (node == NULL || name == NULL || data == NULL)
@@ -673,7 +673,7 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 
 	// reject any requests that can't fit into the small_data section
 	uint32 nameLength = strlen(name);
-	uint32 spaceNeeded = sizeof(small_data) + nameLength + 3 + length + 1;
+	uint32 spaceNeeded = sizeof(small_data) + nameLength + 3 + pos + length + 1;
 	if (spaceNeeded > fVolume->InodeSize() - sizeof(bfs_inode))
 		return B_DEVICE_FULL;
 
@@ -697,22 +697,22 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 			last = last->Next();
 
 		// try to change the attributes value
-		if (item->data_size > length
+		if (item->data_size > pos + length
 			|| force
-			|| ((uint8*)last + length - item->DataSize())
+			|| ((uint8*)last + pos + length - item->DataSize())
 					<= ((uint8*)node + fVolume->InodeSize())) {
 			// Make room for the new attribute if needed (and we are forced
 			// to do so)
-			if (force && ((uint8*)last + length - item->DataSize())
+			if (force && ((uint8*)last + pos + length - item->DataSize())
 					> ((uint8*)node + fVolume->InodeSize())) {
 				// We also take the free space at the end of the small_data
 				// section into account, and request only what's really needed
-				uint32 needed = length - item->DataSize() -
+				uint32 needed = pos + length - item->DataSize() -
 					(uint32)((uint8*)node + fVolume->InodeSize()
 						- (uint8*)last);
 
 				if (_MakeSpaceForSmallData(transaction, node, name, needed)
-						< B_OK)
+						!= B_OK)
 					return B_ERROR;
 
 				// reset our pointers
@@ -728,9 +728,11 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 					last = last->Next();
 			}
 
+			size_t oldDataSize = item->DataSize();
+
 			// Normally, we can just overwrite the attribute data as the size
 			// is specified by the type and does not change that often
-			if (length != item->DataSize()) {
+			if (pos + length != item->DataSize()) {
 				// move the attributes after the current one
 				small_data* next = item->Next();
 				if (!next->IsLast(node)) {
@@ -747,12 +749,17 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 						- (uint8*)last);
 				}
 
-				item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
+				item->data_size = HOST_ENDIAN_TO_BFS_INT16(pos + length);
 			}
 
 			item->type = HOST_ENDIAN_TO_BFS_INT32(type);
-			memcpy(item->Data(), data, length);
-			item->Data()[length] = '\0';
+
+			if (oldDataSize < pos) {
+				// Fill gap with zeros
+				memset(item->Data() + oldDataSize, 0, pos - oldDataSize);
+			}
+			memcpy(item->Data() + pos, data, length);
+			item->Data()[pos + length] = '\0';
 
 			return B_OK;
 		}
@@ -785,7 +792,7 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 	item->name_size = HOST_ENDIAN_TO_BFS_INT16(nameLength);
 	item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
 	strcpy(item->Name(), name);
-	memcpy(item->Data(), data, length);
+	memcpy(item->Data() + pos, data, length);
 
 	// correctly terminate the small_data section
 	item = item->Next();
@@ -911,7 +918,7 @@ Inode::SetName(Transaction& transaction, const char* name)
 	NodeGetter node(fVolume, transaction, this);
 	const char nameTag[2] = {FILE_NAME_NAME, 0};
 
-	return _AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE,
+	return _AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE, 0,
 		(uint8*)name, strlen(name), true);
 }
 
@@ -1021,8 +1028,12 @@ status_t
 Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	off_t pos, const uint8* buffer, size_t* _length)
 {
+	if (pos < 0)
+		return B_BAD_VALUE;
+
 	// needed to maintain the index
-	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
+	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH];
+	uint8* oldData = NULL;
 	size_t oldLength = 0;
 
 	// TODO: we actually depend on that the contents of "buffer" are constant.
@@ -1038,7 +1049,9 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	Inode* attribute = NULL;
 	status_t status = B_OK;
 
-	if (GetAttribute(name, &attribute) < B_OK) {
+	if (GetAttribute(name, &attribute) != B_OK) {
+		// No attribute inode exists yet
+
 		// save the old attribute data
 		NodeGetter node(fVolume, transaction, this);
 		recursive_lock_lock(&fSmallDataLock);
@@ -1057,7 +1070,8 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 		// if the attribute doesn't exist yet (as a file), try to put it in the
 		// small_data section first - if that fails (due to insufficent space),
 		// create a real attribute file
-		status = _AddSmallData(transaction, node, name, type, buffer, *_length);
+		status = _AddSmallData(transaction, node, name, type, pos, buffer,
+			*_length);
 		if (status == B_DEVICE_FULL) {
 			if (smallData != NULL) {
 				// remove the old attribute from the small data section - there
@@ -1068,7 +1082,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 
 			if (status == B_OK)
 				status = CreateAttribute(transaction, name, type, &attribute);
-			if (status < B_OK)
+			if (status != B_OK)
 				RETURN_ERROR(status);
 		} else if (status == B_OK)
 			status = WriteBack(transaction);
@@ -1087,7 +1101,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 
 			// check if the data fits into the small_data section again
 			NodeGetter node(fVolume, transaction, this);
-			status = _AddSmallData(transaction, node, name, type, buffer,
+			status = _AddSmallData(transaction, node, name, type, pos, buffer,
 				*_length);
 
 			if (status == B_OK) {
@@ -1166,6 +1180,10 @@ Inode::RemoveAttribute(Transaction& transaction, const char* name)
 }
 
 
+/*!	Returns the attribute inode with the specified \a name, in case it exists.
+	This method can only return real attribute files; the attributes in the
+	small data section are ignored.
+*/
 status_t
 Inode::GetAttribute(const char* name, Inode** _attribute)
 {
