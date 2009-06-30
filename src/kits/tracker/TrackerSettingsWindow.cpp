@@ -90,7 +90,6 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	fDefaultsButton->ResizeToPreferred();
 	fDefaultsButton->SetEnabled(false);
 	fDefaultsButton->MoveBy(0, -fDefaultsButton->Bounds().Height());
-	topView->AddChild(fDefaultsButton);
 
 	rect = fDefaultsButton->Frame();
 	rect.left = rect.right + 10;
@@ -98,7 +97,6 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 		new BMessage(kRevertButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fRevertButton->SetEnabled(false);
 	fRevertButton->ResizeToPreferred();
-	topView->AddChild(fRevertButton);
 
 	rect = scrollView->Frame();
 	rect.left = rect.right + 10;
@@ -106,6 +104,8 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	rect.bottom = fDefaultsButton->Frame().top - 10;
 	fSettingsContainerBox = new BBox(rect, NULL, B_FOLLOW_ALL);
 	topView->AddChild(fSettingsContainerBox);
+	topView->AddChild(fDefaultsButton);
+	topView->AddChild(fRevertButton);
 
 	rect = _SettingsFrame();
 
