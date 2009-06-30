@@ -68,12 +68,9 @@ enum {
 	M_FILE_QUIT,
 	M_VIEW_SIZE,
 	M_TOGGLE_FULLSCREEN,
-	M_TOGGLE_NO_BORDER,
-	M_TOGGLE_NO_MENU,
-	M_TOGGLE_NO_CONTROLS,
-	M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS,
-	M_TOGGLE_ALWAYS_ON_TOP,
 	M_TOGGLE_KEEP_ASPECT_RATIO,
+	M_TOGGLE_ALWAYS_ON_TOP,
+	M_TOGGLE_NO_INTERFACE,
 	M_VOLUME_UP,
 	M_VOLUME_DOWN,
 	M_SKIP_NEXT,
@@ -116,9 +113,7 @@ MainWin::MainWin()
 	  fIsFullscreen(false),
 	  fKeepAspectRatio(true),
 	  fAlwaysOnTop(false),
-	  fNoMenu(false),
-	  fNoBorder(false),
-	  fNoControls(false),
+	  fNoInterface(false),
 	  fSourceWidth(-1),
 	  fSourceHeight(-1),
 	  fWidthScale(1.0),
@@ -241,8 +236,8 @@ MainWin::FrameResized(float newWidth, float newHeight)
 		debugger("size wrong\n");
 	}
 
-	bool noMenu = fNoMenu || fIsFullscreen;
-	bool noControls = fNoControls || fIsFullscreen;
+	bool noMenu = fNoInterface || fIsFullscreen;
+	bool noControls = fNoInterface || fIsFullscreen;
 
 //	printf("FrameResized enter: newWidth %.0f, newHeight %.0f\n",
 //		newWidth, newHeight);
@@ -260,7 +255,7 @@ MainWin::FrameResized(float newWidth, float newHeight)
 		if (!fMenuBar->IsHidden())
 			fMenuBar->Hide();
 	} else {
-//		fMenuBar->MoveTo(0, y);
+		fMenuBar->MoveTo(0, y);
 		fMenuBar->ResizeTo(newWidth, fMenuBarHeight - 1);
 		if (fMenuBar->IsHidden())
 			fMenuBar->Show();
@@ -268,9 +263,7 @@ MainWin::FrameResized(float newWidth, float newHeight)
 	}
 
 	if (maxVideoHeight == 0) {
-		bool hidden = fVideoView->IsHidden();
-//		printf("  video view hidden: %d\n", hidden);
-		if (!hidden)
+		if (!fVideoView->IsHidden())
 			fVideoView->Hide();
 	} else {
 		_ResizeVideoView(0, y, maxVideoWidth, maxVideoHeight);
@@ -534,28 +527,16 @@ MainWin::MessageReceived(BMessage *msg)
 			_ToggleFullscreen();
 			break;
 
-		case M_TOGGLE_NO_MENU:
-			_ToggleNoMenu();
-			break;
-
-		case M_TOGGLE_NO_CONTROLS:
-			_ToggleNoControls();
-			break;
-
-		case M_TOGGLE_NO_BORDER:
-			_ToggleNoBorder();
+		case M_TOGGLE_KEEP_ASPECT_RATIO:
+			_ToggleKeepAspectRatio();
 			break;
 
 		case M_TOGGLE_ALWAYS_ON_TOP:
 			_ToggleAlwaysOnTop();
 			break;
 
-		case M_TOGGLE_KEEP_ASPECT_RATIO:
-			_ToggleKeepAspectRatio();
-			break;
-
-		case M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS:
-			_ToggleNoBorderNoMenu();
+		case M_TOGGLE_NO_INTERFACE:
+			_ToggleNoInterface();
 			break;
 
 		case M_VIEW_SIZE:
@@ -952,12 +933,9 @@ MainWin::_CreateMenu()
 	item->SetMarked(fKeepAspectRatio);
 	fVideoMenu->AddItem(item);
 
-	fSettingsMenu->AddItem(new BMenuItem("No Menu",
-		new BMessage(M_TOGGLE_NO_MENU), 'M'));
-	fSettingsMenu->AddItem(new BMenuItem("No Border",
-		new BMessage(M_TOGGLE_NO_BORDER), 'B'));
-	fSettingsMenu->AddItem(new BMenuItem("No Controls",
-		new BMessage(M_TOGGLE_NO_CONTROLS), 'C'));
+	fNoInterfaceMenuItem = new BMenuItem("No Interface",
+		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
+	fSettingsMenu->AddItem(fNoInterfaceMenuItem);
 	fSettingsMenu->AddItem(new BMenuItem("Always on Top",
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T'));
 	fSettingsMenu->AddSeparatorItem();
@@ -1028,14 +1006,24 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 
 
 void
+MainWin::_GetMinimumWindowSize(int& width, int& height) const
+{
+	width = MIN_WIDTH;
+	height = 0;
+	if (!fNoInterface) {
+		width = max_c(width, fMenuBarWidth);
+		width = max_c(width, fControlsWidth);
+		height = fMenuBarHeight + fControlsHeight;
+	}
+}
+
+
+void
 MainWin::_SetWindowSizeLimits()
 {
-	int minWidth = fNoControls  ? MIN_WIDTH : fControlsWidth;
-	if (!fNoMenu)
-		minWidth = max_c(minWidth, fMenuBarWidth);
-	int minHeight = (fNoMenu ? 0 : fMenuBarHeight)
-		+ (fNoControls ? 0 : fControlsHeight);
-
+	int minWidth;
+	int minHeight;
+	_GetMinimumWindowSize(minWidth, minHeight);
 	SetSizeLimits(minWidth - 1, 32000, minHeight - 1, fHasVideo ?
 		32000 : minHeight - 1);
 }
@@ -1052,13 +1040,13 @@ MainWin::_ResizeWindow(int percent)
 	videoHeight = (videoHeight * percent) / 100;
 
 	// Calculate and set the initial window size
-	int width = max_c(fControlsWidth, videoWidth);
-	int height = (fNoControls ? 0 : fControlsHeight) + videoHeight;
-	if (!fNoMenu) {
-		width = max_c(width, fMenuBarWidth);
-		height += fMenuBarHeight;
-	}
-	_SetWindowSizeLimits();
+	int width;
+	int height;
+	_GetMinimumWindowSize(width, height);
+
+	width = max_c(width, videoWidth);
+	height = height + videoHeight;
+//	_SetWindowSizeLimits();
 	ResizeTo(width - 1, height - 1);
 }
 
@@ -1130,7 +1118,7 @@ MainWin::_MouseDown(BMessage *msg, BView* originalHandler)
 		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1,
 			screen_where.y + 1);
 		if (r.Contains(fMouseDownMousePos)) {
-			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS);
+			PostMessage(M_TOGGLE_NO_INTERFACE);
 			return;
 		}
 	}
@@ -1231,6 +1219,11 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	menu->AddItem(item = new BMenuItem("Keep Aspect Ratio",
 		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K'));
 	item->SetMarked(fKeepAspectRatio);
+	item->SetEnabled(fHasVideo);
+
+	menu->AddItem(item = new BMenuItem("No Interface",
+		new BMessage(M_TOGGLE_NO_INTERFACE), 'B'));
+	item->SetMarked(fNoInterface);
 	item->SetEnabled(fHasVideo);
 
 	menu->AddSeparatorItem();
@@ -1403,24 +1396,6 @@ MainWin::_KeyDown(BMessage *msg)
 
 
 void
-MainWin::_ToggleNoBorderNoMenu()
-{
-	if (!fNoMenu && !fNoBorder && !fNoControls) {
-		PostMessage(M_TOGGLE_NO_MENU);
-		PostMessage(M_TOGGLE_NO_BORDER);
-		PostMessage(M_TOGGLE_NO_CONTROLS);
-	} else {
-		if (!fNoMenu)
-			PostMessage(M_TOGGLE_NO_MENU);
-		if (!fNoBorder)
-			PostMessage(M_TOGGLE_NO_BORDER);
-		if (!fNoControls)
-			PostMessage(M_TOGGLE_NO_CONTROLS);
-	}
-}
-
-
-void
 MainWin::_ToggleFullscreen()
 {
 	printf("_ToggleFullscreen enter\n");
@@ -1464,65 +1439,12 @@ MainWin::_ToggleFullscreen()
 }
 
 void
-MainWin::_ToggleNoControls()
+MainWin::_ToggleKeepAspectRatio()
 {
-	printf("_ToggleNoControls enter\n");
+	fKeepAspectRatio = !fKeepAspectRatio;
+	FrameResized(Bounds().Width(), Bounds().Height());
 
-	if (fIsFullscreen) {
-		// fullscreen is always without menu
-		printf("_ToggleNoControls leave, doing nothing, we are fullscreen\n");
-		return;
-	}
-
-	fNoControls = !fNoControls;
-	_SetWindowSizeLimits();
-
-	if (fNoControls) {
-		ResizeBy(0, - fControlsHeight);
-	} else {
-		ResizeBy(0, fControlsHeight);
-	}
-
-	_MarkItem(fSettingsMenu, M_TOGGLE_NO_CONTROLS, fNoControls);
-
-	printf("_ToggleNoControls leave\n");
-}
-
-void
-MainWin::_ToggleNoMenu()
-{
-	printf("_ToggleNoMenu enter\n");
-
-	if (fIsFullscreen) {
-		// fullscreen is always without menu
-		printf("_ToggleNoMenu leave, doing nothing, we are fullscreen\n");
-		return;
-	}
-
-	fNoMenu = !fNoMenu;
-	_SetWindowSizeLimits();
-
-	if (fNoMenu) {
-		MoveBy(0, fMenuBarHeight);
-		ResizeBy(0, - fMenuBarHeight);
-	} else {
-		MoveBy(0, - fMenuBarHeight);
-		ResizeBy(0, fMenuBarHeight);
-	}
-
-	_MarkItem(fSettingsMenu, M_TOGGLE_NO_MENU, fNoMenu);
-
-	printf("_ToggleNoMenu leave\n");
-}
-
-
-void
-MainWin::_ToggleNoBorder()
-{
-	fNoBorder = !fNoBorder;
-	SetLook(fNoBorder ? B_BORDERED_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
-
-	_MarkItem(fSettingsMenu, M_TOGGLE_NO_BORDER, fNoBorder);
+	_MarkItem(fVideoMenu, M_TOGGLE_KEEP_ASPECT_RATIO, fKeepAspectRatio);
 }
 
 
@@ -1537,12 +1459,34 @@ MainWin::_ToggleAlwaysOnTop()
 
 
 void
-MainWin::_ToggleKeepAspectRatio()
+MainWin::_ToggleNoInterface()
 {
-	fKeepAspectRatio = !fKeepAspectRatio;
-	FrameResized(Bounds().Width(), Bounds().Height());
+	printf("_ToggleNoInterface enter\n");
 
-	_MarkItem(fVideoMenu, M_TOGGLE_KEEP_ASPECT_RATIO, fKeepAspectRatio);
+	if (fIsFullscreen || !fHasVideo) {
+		// Fullscreen playback is always without interface and
+		// audio playback is always with interface. So we ignore these
+		// two states here.
+		printf("_ToggleNoControls leave, doing nothing, we are fullscreen\n");
+		return;
+	}
+
+	fNoInterface = !fNoInterface;
+	_SetWindowSizeLimits();
+
+	if (fNoInterface) {
+		MoveBy(0, fMenuBarHeight);
+		ResizeBy(0, -(fControlsHeight + fMenuBarHeight));
+		SetLook(B_BORDERED_WINDOW_LOOK);
+	} else {
+		MoveBy(0, -fMenuBarHeight);
+		ResizeBy(0, fControlsHeight + fMenuBarHeight);
+		SetLook(B_TITLED_WINDOW_LOOK);
+	}
+
+	_MarkItem(fSettingsMenu, M_TOGGLE_NO_INTERFACE, fNoInterface);
+
+	printf("_ToggleNoInterface leave\n");
 }
 
 
@@ -1569,6 +1513,8 @@ MainWin::_UpdateControlsEnabledStatus()
 		enabledButtons |= SKIP_FORWARD_ENABLED;
 
 	fControls->SetEnabled(enabledButtons);
+
+	fNoInterfaceMenuItem->SetEnabled(fHasVideo);
 }
 
 

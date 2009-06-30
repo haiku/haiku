@@ -69,6 +69,9 @@ private:
 			void				_SetupVideoAspectItems(BMenu* menu);
 			void				_SetupTrackMenus(BMenu* audioTrackMenu,
 									BMenu* videoTrackMenu);
+
+			void				_GetMinimumWindowSize(int& width,
+										int& height) const;
 			void				_SetWindowSizeLimits();
 			void				_ResizeWindow(int percent);
 			void				_ResizeVideoView(int x, int y, int width,
@@ -85,10 +88,7 @@ private:
 			void				_ToggleFullscreen();
 			void				_ToggleKeepAspectRatio();
 			void				_ToggleAlwaysOnTop();
-			void				_ToggleNoBorder();
-			void				_ToggleNoMenu();
-			void				_ToggleNoControls();
-			void				_ToggleNoBorderNoMenu();
+			void				_ToggleNoInterface();
 
 			void				_UpdateControlsEnabledStatus();
 			void				_UpdatePlaylistMenu();
@@ -115,6 +115,7 @@ private:
 			BMenu*				fAudioTrackMenu;
 			BMenu*				fVideoTrackMenu;
 			BMenu*				fSettingsMenu;
+			BMenuItem*			fNoInterfaceMenuItem;
 			BMenu*				fPlaylistMenu;
 
 			bool				fHasFile;
@@ -128,9 +129,7 @@ private:
 			volatile bool		fIsFullscreen;
 			volatile bool		fKeepAspectRatio;
 			volatile bool		fAlwaysOnTop;
-			volatile bool		fNoMenu;
-			volatile bool		fNoBorder;
-			volatile bool		fNoControls;
+			volatile bool		fNoInterface;
 			int					fSourceWidth;
 			int					fSourceHeight;
 			float				fWidthScale;
