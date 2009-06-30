@@ -195,17 +195,17 @@ fssh_ioctl(int fd, unsigned long op, ...)
 						geometry->sectors_per_track = hdGeometry.sectors;
 						error = B_OK;
 					}
-
-					if (error == B_OK) {
-						// TODO: Get the real values...
-						geometry->bytes_per_sector = blockSize;
-						geometry->device_type = FSSH_B_DISK;
-						geometry->removable = false;
-						geometry->read_only = false;
-						geometry->write_once = false;
-					}
 				} else
 					error = errno;
+
+				if (error == B_OK) {
+					// TODO: Get the real values...
+					geometry->bytes_per_sector = blockSize;
+					geometry->device_type = FSSH_B_DISK;
+					geometry->removable = false;
+					geometry->read_only = false;
+					geometry->write_once = false;
+				}
 
 			#elif HAIKU_HOST_PLATFORM_FREEBSD
 			{
