@@ -2281,10 +2281,8 @@ static void detect_panels()
 	/* do some presets */
 	si->ps.p1_timing.h_display = 0;
 	si->ps.p1_timing.v_display = 0;
-	si->ps.crtc1_screen.aspect = 0;
 	si->ps.p2_timing.h_display = 0;
 	si->ps.p2_timing.v_display = 0;
-	si->ps.crtc2_screen.aspect = 0;
 	si->ps.slaved_tmds1 = false;
 	si->ps.slaved_tmds2 = false;
 	si->ps.master_tmds1 = false;
@@ -2415,9 +2413,6 @@ static void detect_panels()
 	/* fetch panel(s) modeline(s) */
 	if (si->ps.monitors & CRTC1_TMDS)
 	{
-		/* determine panel aspect ratio */
-		si->ps.crtc1_screen.aspect =
-			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
 		/* horizontal timing */
 		si->ps.p1_timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p1_timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2439,9 +2434,6 @@ static void detect_panels()
 	}
 	if (si->ps.monitors & CRTC2_TMDS)
 	{
-		/* determine panel aspect ratio */
-		si->ps.crtc2_screen.aspect =
-			(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
 		/* horizontal timing */
 		si->ps.p2_timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p2_timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2612,8 +2604,8 @@ static void setup_output_matrix()
 		si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
 		si->ps.crtc1_screen.timing.flags = si->ps.p1_timing.flags;
 		si->ps.crtc1_screen.have_edid = true;
-		//note: crtc1_screen.aspect was already filled in...
-		//si->ps.crtc1_screen.aspect = si->ps.p1_aspect;
+		si->ps.crtc1_screen.aspect =
+			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
 		si->ps.crtc1_screen.digital = true;
 	} else if(si->ps.monitors & CRTC1_VGA) {
 		/* fill-out crtc1_screen from EDID info, or faked info if EDID failed. */
@@ -2663,8 +2655,8 @@ static void setup_output_matrix()
 				si->ps.crtc2_screen.timing.v_total = si->ps.p1_timing.v_total;
 				si->ps.crtc2_screen.timing.flags = si->ps.p1_timing.flags;
 				si->ps.crtc2_screen.have_edid = true;
-				//note: crtc2_screen.aspect was already filled in...
-				//si->ps.crtc2_screen.aspect = si->ps.p2_aspect;
+				si->ps.crtc2_screen.aspect =
+					(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
 				si->ps.crtc2_screen.digital = true;
 			} else if(si->ps.monitors & CRTC2_VGA) {
 				/* fill-out crtc2_screen from EDID info, or faked info if EDID failed. */
