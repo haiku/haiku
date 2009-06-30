@@ -95,7 +95,7 @@ public:
 		for (int32 i = 1; i < functionCount; i++) {
 			if (_CompareSourceFileNames(functions[i - 1]->SourceFileName(),
 					functions[i]->SourceFileName()) != 0) {
-				fSourceFileIndices[sourceFileIndex++] = 1;
+				fSourceFileIndices[sourceFileIndex++] = i;
 			}
 		}
 
@@ -123,14 +123,7 @@ public:
 		if (parent >= fSourceFileIndices
 			&& parent < fSourceFileIndices + fSourceFileCount) {
 			int32 sourceIndex = (int32*)parent - fSourceFileIndices;
-			int32 count;
-			if (sourceIndex + 1 < fSourceFileCount) {
-				count = fSourceFileIndices[sourceIndex + 1]
-					- fSourceFileIndices[sourceIndex];
-			} else
-				count = fFunctionCount - fSourceFileIndices[sourceIndex];
-
-			return count;
+			return _CountSourceFileFunctions(sourceIndex);
 		}
 
 		return 0;
@@ -146,14 +139,10 @@ public:
 		if (parent >= fSourceFileIndices
 			&& parent < fSourceFileIndices + fSourceFileCount) {
 			int32 sourceIndex = (int32*)parent - fSourceFileIndices;
-			int32 count;
-			if (sourceIndex + 1 < fSourceFileCount) {
-				count = fSourceFileIndices[sourceIndex + 1]
-					- fSourceFileIndices[sourceIndex];
-			} else
-				count = fFunctionCount - fSourceFileIndices[sourceIndex];
-
-			return index >= 0 && index < count ? fFunctions[index] : NULL;
+			int32 count = _CountSourceFileFunctions(sourceIndex);
+			int32 firstFunctionIndex = fSourceFileIndices[sourceIndex];
+			return index >= 0 && index < count
+				? fFunctions[firstFunctionIndex + index] : NULL;
 		}
 
 		return NULL;
@@ -199,7 +188,7 @@ public:
 
 		_path.Clear();
 		return _path.AddComponent(sourceIndex)
-			&& _path.AddComponent(index);
+			&& _path.AddComponent(index - fSourceFileIndices[sourceIndex]);
 	}
 
 	bool GetObjectForPath(const TreeTablePath& path, const char*& _sourceFile,
@@ -220,8 +209,8 @@ public:
 
 		if (componentCount == 2) {
 			int32 index = path.ComponentAt(1);
-			if (index >= 0 && index < fFunctionCount)
-				_function = fFunctions[index];
+			if (index >= 0 && index < _CountSourceFileFunctions(sourceIndex))
+				_function = fFunctions[fSourceFileIndices[sourceIndex] + index];
 		}
 
 		return true;
@@ -233,15 +222,25 @@ public:
 	}
 
 private:
+	int32 _CountSourceFileFunctions(int32 sourceIndex) const
+	{
+		if (sourceIndex < 0 || sourceIndex >= fSourceFileCount)
+			return 0;
+
+		int32 nextFunctionIndex = sourceIndex + 1 < fSourceFileCount
+			? fSourceFileIndices[sourceIndex + 1] : fFunctionCount;
+		return nextFunctionIndex - fSourceFileIndices[sourceIndex];
+	}
+
 	static int _CompareSourceFileNames(const char* a, const char* b)
 	{
 		if (a == b)
 			return 0;
 
 		if (a == NULL)
-			return false;
+			return 1;
 		if (b == NULL)
-			return true;
+			return -1;
 
 		return strcmp(a, b);
 	}
