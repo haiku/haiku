@@ -398,6 +398,12 @@ printf("entry %p at %lu\n", entry, offset);
 		}
 	}
 
+	// add compilation dir to directory list
+	const char* compilationDir = unit->UnitEntry()->CompilationDir();
+	if (!unit->AddDirectory(compilationDir != NULL ? compilationDir : "."))
+		return B_NO_MEMORY;
+
+	// parse line info header
 	if (fDebugLineSection != NULL)
 		_ParseLineInfo(unit);
 
@@ -692,7 +698,7 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 		printf("    \"%s\", dir index: %llu, mtime: %llu, length: %llu\n", file,
 			dirIndex, modificationTime, fileLength);
 
-		if (!unit->AddFile(file, dirIndex - 1))
+		if (!unit->AddFile(file, dirIndex))
 			return B_NO_MEMORY;
 	}
 
