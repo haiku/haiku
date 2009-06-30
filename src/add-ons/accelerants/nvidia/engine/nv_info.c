@@ -2618,6 +2618,27 @@ static void setup_output_matrix()
 	/* setup output devices and heads */
 	if (si->ps.secondary_head)
 	{
+		/* fill-out crtc2_screen from panel info gathered from BIOS programming since
+		 * we don't know which connector connects to crtc2 (so EDID use not possible).
+		 * Also the BIOS might have programmed for a lower mode than EDID reports:
+		 * which limits our use of the panel (LVDS link setup too slow). */
+		if(si->ps.monitors & CRTC2_TMDS) {
+			si->ps.crtc2_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
+			si->ps.crtc2_screen.timing.h_display = si->ps.p1_timing.h_display;
+			si->ps.crtc2_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
+			si->ps.crtc2_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
+			si->ps.crtc2_screen.timing.h_total = si->ps.p1_timing.h_total;
+			si->ps.crtc2_screen.timing.v_display = si->ps.p1_timing.h_display;
+			si->ps.crtc2_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
+			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
+			si->ps.crtc2_screen.timing.v_total = si->ps.p1_timing.v_total;
+			si->ps.crtc2_screen.timing.flags = si->ps.p1_timing.flags;
+			si->ps.crtc2_screen.have_edid = true;
+			si->ps.crtc2_screen.aspect =
+				(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
+			si->ps.crtc2_screen.digital = true;
+		}
+
 		if (si->ps.card_type != NV11)
 		{
 			/* panels are pre-connected to a CRTC (1 or 2) by the card's BIOS,
@@ -2638,27 +2659,8 @@ static void setup_output_matrix()
 			}
 
 			/* Note: digitally connected panels take precedence over analog connected screens. */
-
-			/* fill-out crtc2_screen from panel info gathered from BIOS programming since
-			 * we don't know which connector connects to crtc2 (so EDID use not possible).
-			 * Also the BIOS might have programmed for a lower mode than EDID reports:
-			 * which limits our use of the panel (LVDS link setup too slow). */
-			if(si->ps.monitors & CRTC2_TMDS) {
-				si->ps.crtc2_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
-				si->ps.crtc2_screen.timing.h_display = si->ps.p1_timing.h_display;
-				si->ps.crtc2_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
-				si->ps.crtc2_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
-				si->ps.crtc2_screen.timing.h_total = si->ps.p1_timing.h_total;
-				si->ps.crtc2_screen.timing.v_display = si->ps.p1_timing.h_display;
-				si->ps.crtc2_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
-				si->ps.crtc2_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
-				si->ps.crtc2_screen.timing.v_total = si->ps.p1_timing.v_total;
-				si->ps.crtc2_screen.timing.flags = si->ps.p1_timing.flags;
-				si->ps.crtc2_screen.have_edid = true;
-				si->ps.crtc2_screen.aspect =
-					(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
-				si->ps.crtc2_screen.digital = true;
-			} else if(si->ps.monitors & CRTC2_VGA) {
+			/* fill-out crtc2_screen if not already filled in by TMDS */
+			if ((si->ps.monitors & (CRTC2_TMDS | CRTC2_VGA)) == CRTC2_VGA) {
 				/* fill-out crtc2_screen from EDID info, or faked info if EDID failed. */
 				memcpy(&(si->ps.crtc2_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc2_screen));
 			}
@@ -2774,6 +2776,9 @@ static void setup_output_matrix()
 			LOG(2,("INFO: NV11 outputs are hardwired to be straight-through\n"));
 
 			/* (DDC or load sense analog monitor on secondary connector is impossible on NV11) */
+
+			/* force widescreen types if requested */
+			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.60;
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
