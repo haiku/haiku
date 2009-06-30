@@ -33,6 +33,8 @@ public:
 
 			int32				CountCompilationUnits() const;
 			CompilationUnit*	CompilationUnitAt(int32 index) const;
+			CompilationUnit*	CompilationUnitForDIE(
+									const DebugInfoEntry* entry) const;
 
 private:
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
@@ -49,6 +51,8 @@ private:
 									DebugInfoEntry* entry,
 									AbbreviationEntry& abbreviationEntry);
 
+			status_t			_ParseLineInfo(CompilationUnit* unit);
+
 			status_t			_GetAbbreviationTable(off_t offset,
 									AbbreviationTable*& _table);
 
@@ -64,6 +68,7 @@ private:
 			ElfSection*			fDebugAbbrevSection;
 			ElfSection*			fDebugStringSection;
 			ElfSection*			fDebugRangesSection;
+			ElfSection*			fDebugLineSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;

@@ -59,6 +59,9 @@ public:
 	virtual	DebugInfoEntry*		Specification() const;
 	virtual	DebugInfoEntry*		AbstractOrigin() const;
 
+			bool				GetDeclarationLocation(uint32& _file,
+									uint32& _line, uint32& _column) const;
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_decl_file(uint16 attributeName,

@@ -94,6 +94,22 @@ DebugInfoEntry::AbstractOrigin() const
 }
 
 
+bool
+DebugInfoEntry::GetDeclarationLocation(uint32& _file, uint32& _line,
+	uint32& _column) const
+{
+	DeclarationLocation* location = const_cast<DebugInfoEntry*>(this)
+		->GetDeclarationLocation();
+	if (location == NULL)
+		return false;
+
+	_file = location->file;
+	_line = location->line;
+	_column = location->column;
+	return true;
+}
+
+
 status_t
 DebugInfoEntry::AddChild(DebugInfoEntry* child)
 {

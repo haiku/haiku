@@ -5,6 +5,8 @@
 #ifndef COMPILATION_UNIT_H
 #define COMPILATION_UNIT_H
 
+#include <String.h>
+
 #include <ObjectList.h>
 
 #include "Array.h"
@@ -50,6 +52,20 @@ public:
 									dwarf_off_t& offset) const;
 			DebugInfoEntry*		EntryForOffset(dwarf_off_t offset) const;
 
+			bool				AddDirectory(const char* directory);
+			int32				CountDirectories() const;
+			const char*			DirectoryAt(int32 index) const;
+
+			bool				AddFile(const char* fileName, int32 dirIndex);
+			int32				CountFiles() const;
+			const char*			FileAt(int32 index,
+									const char** _directory = NULL) const;
+
+private:
+			struct File;
+			typedef BObjectList<BString> DirectoryList;
+			typedef BObjectList<File> FileList;
+
 private:
 			dwarf_off_t			fHeaderOffset;
 			dwarf_off_t			fContentOffset;
@@ -59,6 +75,8 @@ private:
 			DIECompileUnitBase*	fUnitEntry;
 			Array<DebugInfoEntry*> fEntries;
 			Array<dwarf_off_t>	fEntryOffsets;
+			DirectoryList		fDirectories;
+			FileList			fFiles;
 };
 
 

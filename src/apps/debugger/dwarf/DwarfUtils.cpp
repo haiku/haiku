@@ -7,6 +7,9 @@
 
 #include <String.h>
 
+#include "CompilationUnit.h"
+#include "DwarfFile.h"
+
 
 /*static*/ void
 DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
@@ -76,4 +79,56 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 		_name << "::" << name;
 	} else
 		_name = name;
+}
+
+
+/*static*/ bool
+DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
+	const DebugInfoEntry* entry, const char*& _directory, const char*& _file,
+	uint32& _line, uint32& _column)
+{
+	uint32 file;
+	uint32 line;
+	uint32 column;
+	if (!entry->GetDeclarationLocation(file, line, column))
+		return false;
+
+	// if no info yet, try the abstract origin (if any)
+	if (file == 0) {
+		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin()) {
+			if (abstractOrigin->GetDeclarationLocation(file, line, column)
+					&& file != 0) {
+				entry = abstractOrigin;
+			}
+		}
+	}
+
+	// if no info yet, try the specification (if any)
+	if (file == 0) {
+		if (DebugInfoEntry* specification = entry->Specification()) {
+			if (specification->GetDeclarationLocation(file, line, column)
+					&& file != 0) {
+				entry = specification;
+			}
+		}
+	}
+
+	if (file == 0)
+		return false;
+
+	// get the compilation unit
+	CompilationUnit* unit = dwarfFile->CompilationUnitForDIE(entry);
+	if (unit == NULL)
+		return false;
+
+	const char* directoryName;
+	const char* fileName = unit->FileAt(file - 1, &directoryName);
+	if (fileName == NULL)
+		return false;
+
+	_directory = directoryName;
+	_file = fileName;
+	_line = line;
+	_column = column;
+	return true;
 }

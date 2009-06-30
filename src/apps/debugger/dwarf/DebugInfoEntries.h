@@ -153,6 +153,9 @@ public:
 			dwarf_addr_t		HighPC() const	{ return fHighPC; }
 			dwarf_addr_t		AddressRangeBase() const;
 
+			dwarf_off_t			StatementListOffset() const
+									{ return fStatementListOffset; }
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,

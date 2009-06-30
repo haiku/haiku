@@ -135,6 +135,15 @@ public:
 		return NULL;
 	}
 
+	uint64 ReadInitialLength(bool& _dwarf64)
+	{
+		uint64 length = Read<uint32>(0);
+		_dwarf64 = (length == 0xffffffff);
+		if (_dwarf64)
+			length = Read<uint64>(0);
+		return length;
+	}
+
 	bool Skip(off_t bytes)
 	{
 		if (bytes < 0)

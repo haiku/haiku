@@ -27,6 +27,7 @@ DwarfFile::DwarfFile()
 	fDebugAbbrevSection(NULL),
 	fDebugStringSection(NULL),
 	fDebugRangesSection(NULL),
+	fDebugLineSection(NULL),
 	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
 	fFinished(false),
@@ -45,6 +46,7 @@ DwarfFile::~DwarfFile()
 		fElfFile->PutSection(fDebugAbbrevSection);
 		fElfFile->PutSection(fDebugStringSection);
 		fElfFile->PutSection(fDebugRangesSection);
+		fElfFile->PutSection(fDebugLineSection);
 		delete fElfFile;
 	}
 
@@ -72,8 +74,6 @@ DwarfFile::Load(const char* fileName)
 	fDebugInfoSection = fElfFile->GetSection(".debug_info");
 	fDebugAbbrevSection = fElfFile->GetSection(".debug_abbrev");
 	fDebugStringSection = fElfFile->GetSection(".debug_str");
-	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
-		// not mandatory
 	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL
 		|| fDebugStringSection == NULL) {
 		fprintf(stderr, "DwarfManager::File::Load(\"%s\"): no "
@@ -82,15 +82,17 @@ DwarfFile::Load(const char* fileName)
 		return B_ERROR;
 	}
 
+	// not mandatory sections
+	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
+	fDebugLineSection = fElfFile->GetSection(".debug_line");
+
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
 		fDebugInfoSection->Size());
 	while (dataReader.HasData()) {
 		dwarf_off_t unitHeaderOffset = dataReader.Offset();
-		uint64 unitLength = dataReader.Read<uint32>(0);
-		bool dwarf64 = (unitLength == 0xffffffff);
-		if (dwarf64)
-			unitLength = dataReader.Read<uint64>(0);
+		bool dwarf64;
+		uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
 
 		dwarf_off_t unitLengthOffset = dataReader.Offset();
 			// the unitLength starts here
@@ -186,6 +188,30 @@ CompilationUnit*
 DwarfFile::CompilationUnitAt(int32 index) const
 {
 	return fCompilationUnits.ItemAt(index);
+}
+
+
+CompilationUnit*
+DwarfFile::CompilationUnitForDIE(const DebugInfoEntry* entry) const
+{
+	// find the root of the tree the entry lives in
+	while (entry != NULL && entry->Parent() != NULL)
+		entry = entry->Parent();
+
+	// that should be the compilation unit entry
+	const DIECompileUnitBase* unitEntry
+		= dynamic_cast<const DIECompileUnitBase*>(entry);
+	if (unitEntry == NULL)
+		return NULL;
+
+	// find the compilation unit
+	for (int32 i = 0; CompilationUnit* unit = fCompilationUnits.ItemAt(i);
+			i++) {
+		if (unit->UnitEntry() == unitEntry)
+			return unit;
+	}
+
+	return NULL;
 }
 
 
@@ -371,6 +397,9 @@ printf("entry %p at %lu\n", entry, offset);
 			return error;
 		}
 	}
+
+	if (fDebugLineSection != NULL)
+		_ParseLineInfo(unit);
 
 	return B_OK;
 }
@@ -578,6 +607,93 @@ printf("    -> unhandled\n");
 else
 printf("    -> no attribute setter!\n");
 		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfFile::_ParseLineInfo(CompilationUnit* unit)
+{
+	dwarf_off_t offset = unit->UnitEntry()->StatementListOffset();
+printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
+
+	DataReader dataReader((uint8*)fDebugLineSection->Data() + offset,
+		fDebugLineSection->Size() - offset);
+
+	// unit length
+	bool dwarf64;
+	uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
+
+	// version (uhalf)
+	uint16 version = dataReader.Read<uint16>(0);
+
+	// header_length (4/8)
+	uint64 headerLength = dwarf64
+		? dataReader.Read<uint64>(0) : (uint64)dataReader.Read<uint32>(0);
+
+	// minimum instruction length
+	uint8 minInstructionLength = dataReader.Read<uint8>(0);
+
+	// default is statement
+	bool defaultIsStatement = dataReader.Read<uint8>(0) != 0;
+
+	// line_base (sbyte)
+	int8 lineBase = (int8)dataReader.Read<uint8>(0);
+
+	// line_range (ubyte)
+	uint8 lineRange = dataReader.Read<uint8>(0);
+
+	// opcode_base (ubyte)
+	uint8 opcodeBase = dataReader.Read<uint8>(0);
+
+	// standard_opcode_lengths (ubyte[])
+	dataReader.Skip(opcodeBase - 1);
+
+	if (dataReader.HasOverflow())
+		return B_BAD_DATA;
+
+	if (version != 2 && version != 3)
+		return B_UNSUPPORTED;
+
+	printf("  unitLength:           %llu\n", unitLength);
+	printf("  version:              %u\n", version);
+	printf("  headerLength:         %llu\n", headerLength);
+	printf("  minInstructionLength: %u\n", minInstructionLength);
+	printf("  defaultIsStatement:   %d\n", defaultIsStatement);
+	printf("  lineBase:             %d\n", lineBase);
+	printf("  lineRange:            %u\n", lineRange);
+	printf("  opcodeBase:           %u\n", opcodeBase);
+
+	// include directories
+	printf("  include directories:\n");
+	while (const char* directory = dataReader.ReadString()) {
+		if (*directory == '\0')
+			break;
+		printf("    \"%s\"\n", directory);
+
+		if (!unit->AddDirectory(directory))
+			return B_NO_MEMORY;
+	}
+
+	// file names
+	printf("  files:\n");
+	while (const char* file = dataReader.ReadString()) {
+		if (*file == '\0')
+			break;
+		uint64 dirIndex = dataReader.ReadUnsignedLEB128(0);
+		uint64 modificationTime = dataReader.ReadUnsignedLEB128(0);
+		uint64 fileLength = dataReader.ReadUnsignedLEB128(0);
+
+		if (dataReader.HasOverflow())
+			return B_BAD_DATA;
+
+		printf("    \"%s\", dir index: %llu, mtime: %llu, length: %llu\n", file,
+			dirIndex, modificationTime, fileLength);
+
+		if (!unit->AddFile(file, dirIndex - 1))
+			return B_NO_MEMORY;
 	}
 
 	return B_OK;

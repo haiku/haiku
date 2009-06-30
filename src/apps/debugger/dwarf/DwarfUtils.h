@@ -10,6 +10,7 @@
 
 class BString;
 class DebugInfoEntry;
+class DwarfFile;
 
 
 class DwarfUtils {
@@ -21,6 +22,12 @@ public:
 	static	void				GetFullyQualifiedDIEName(
 									const DebugInfoEntry* entry,
 									BString& _name);
+
+	static	bool				GetDeclarationLocation(DwarfFile* dwarfFile,
+									const DebugInfoEntry* entry,
+									const char*& _directory,
+									const char*& _file,
+									uint32& _line, uint32& _column);
 };
 
 
