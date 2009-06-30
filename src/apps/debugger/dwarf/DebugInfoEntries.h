@@ -143,6 +143,9 @@ public:
 
 	virtual	const char*			Name() const;
 
+			const char*			CompilationDir() const
+									{ return fCompilationDir; }
+
 			const DebugInfoEntryList& Types() const	{ return fTypes; }
 			const DebugInfoEntryList& OtherChildren() const
 										{ return fOtherChildren; }
