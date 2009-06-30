@@ -146,8 +146,8 @@ interpret_midi_buffer(my_device_info *my_dev)
 */
 
 static void 
-midi_usb_callback(void *cookie, uint32 status, 
-	void *data, uint32 actual_len)
+midi_usb_callback(void *cookie, status_t status, 
+	void *data, size_t actual_len)
 {
 	status_t st;
 	my_device_info *my_dev = cookie;
