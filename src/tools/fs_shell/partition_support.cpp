@@ -26,11 +26,12 @@ namespace FSShell {
 
 struct FileRestriction {
 	FileRestriction(fssh_dev_t device, fssh_ino_t node, fssh_off_t startOffset,
-		fssh_off_t endOffset)
-		: device(device),
-		  node(node),
-		  startOffset(startOffset),
-		  endOffset(endOffset)
+			fssh_off_t endOffset)
+		:
+		device(device),
+		node(node),
+		startOffset(startOffset),
+		endOffset(endOffset)
 	{
 	}
 
@@ -50,8 +51,7 @@ static FileRestriction*
 find_file_restriction(fssh_dev_t device, fssh_ino_t node)
 {
 	for (FileRestrictionList::iterator it = sFileRestrictions.begin();
-		it != sFileRestrictions.end();
-		++it) {
+			it != sFileRestrictions.end(); ++it) {
 		FileRestriction* restriction = *it;
 		if (restriction->device == device && restriction->node == node)
 			return restriction;

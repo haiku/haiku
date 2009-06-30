@@ -164,28 +164,26 @@ fssh_ioctl(int fd, unsigned long op, ...)
 					error = errno;
 
 			#elif defined(HAIKU_HOST_PLATFORM_LINUX)
-				struct hd_geometry hdGeometry;
-				// BLKGETSIZE and BLKGETSIZE64 don't seem to work for
-				// partitions. So we get the device geometry (there only seems
-				// to be HDIO_GETGEO, which is kind of obsolete, BTW), and
+				// If BLKGETSIZE64 don't work for us, we will fall back to
+				// HDIO_GETGEO (which is kind of obsolete, BTW), and
 				// get the partition size via binary search.
-				if (ioctl(fd, HDIO_GETGEO, &hdGeometry) == 0) {
-					int blockSize = 512;
-					if (hdGeometry.heads == 0) {
-						off_t size;
-						if (ioctl(fd, BLKGETSIZE64, &size) == 0) {
-							off_t blocks = size / blockSize;
-							uint32_t heads = (blocks + ULONG_MAX - 1)
-								/ ULONG_MAX;
-							if (heads == 0)
-								heads = 1;
+				struct hd_geometry hdGeometry;
+				int blockSize = 512;
+				off_t size;
+				if (ioctl(fd, BLKGETSIZE64, &size) == 0 && size > 0) {
+					off_t blocks = size / blockSize;
+					uint32_t heads = (blocks + ULONG_MAX - 1)
+						/ ULONG_MAX;
+					if (heads == 0)
+						heads = 1;
 
-							geometry->head_count = heads;
-							geometry->cylinder_count = blocks / heads;
-							geometry->sectors_per_track = 1;
-							error = B_OK;
-						} else
-							error = errno;
+					geometry->head_count = heads;
+					geometry->cylinder_count = blocks / heads;
+					geometry->sectors_per_track = 1;
+					error = B_OK;
+				} else if (ioctl(fd, HDIO_GETGEO, &hdGeometry) == 0) {
+					if (hdGeometry.heads == 0) {
+						error = B_ERROR;
 					} else {
 						off_t bytesPerCylinder = (off_t)hdGeometry.heads
 							* hdGeometry.sectors * 512;
@@ -240,8 +238,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 
 					disklabel.d_secperunit = mediaSize / disklabel.d_secsize;
 					disklabel.d_ncylinders = mediaSize / disklabel.d_secsize
-												/ disklabel.d_nsectors
-												/ disklabel.d_ntracks;
+						/ disklabel.d_nsectors / disklabel.d_ntracks;
 
 					geometry->head_count = disklabel.d_ntracks;
 					geometry->cylinder_count = disklabel.d_ncylinders;
