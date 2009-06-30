@@ -42,7 +42,8 @@ protected:
 	virtual const char*		UpdateText() const;
 
 private:
-			void			_InitVolume(int32 volumeWhich);
+			void			_DisconnectVolume();
+			void			_ConnectVolume();
 			bool			_IsReplicant() const;
 			float			_PointForValue(int32 value) const;
 
@@ -54,6 +55,10 @@ private:
 			bool			fSnapping;
 			float			fMinSnap;
 			float			fMaxSnap;
+
+			int32			fConnectRetries;
+			bool			fMediaServerRunning;
+			bool			fAddOnServerRunning;
 };
 
 #endif	// VOLUME_SLIDER_H

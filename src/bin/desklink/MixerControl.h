@@ -23,10 +23,12 @@ class BContinuousParameter;
 
 class MixerControl {
 public:
-							MixerControl(int32 volumeWhich,
-								float* _value = NULL,
-								const char** _error = NULL);
+							MixerControl(int32 volumeWhich);
 							~MixerControl();
+
+			bool			Connect(int32 volumeWhich, float* _value = NULL,
+								const char** _error = NULL);
+			bool			Connected();
 
 			int32			VolumeWhich() const;
 			float			Volume() const;
@@ -40,6 +42,8 @@ public:
 			media_node		GainNode() { return fGainMediaNode; }
 
 private:
+			void			_Disconnect();
+
 			int32			fVolumeWhich;
 			media_node		fGainMediaNode;
 			BParameterWeb*	fParameterWeb;

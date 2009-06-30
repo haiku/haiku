@@ -19,6 +19,7 @@
 #include <Beep.h>
 #include <ControlLook.h>
 #include <Dragger.h>
+#include <MessageRunner.h>
 #include <Roster.h>
 
 #include <AppMisc.h>
@@ -28,16 +29,22 @@
 #include "VolumeWindow.h"
 
 
+static const char* kMediaServerSignature = "application/x-vnd.Be.media-server";
+static const char* kAddOnServerSignature = "application/x-vnd.Be.addon-host";
+
+static const uint32 kMsgReconnectVolume = 'rcms';
+
+
 VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 	: BSlider("VolumeControl", "Volume", message, 0, 1, B_HORIZONTAL),
+	fMixerControl(new MixerControl(volumeWhich)),
 	fBeep(beep),
-	fSnapping(false)
+	fSnapping(false),
+	fConnectRetries(0)
 {
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	SetBarThickness(ceilf((fontHeight.ascent + fontHeight.descent) * 0.7));
-
-	_InitVolume(volumeWhich);
 
 	BRect rect(Bounds());
 	rect.top = rect.bottom - 7;
@@ -49,7 +56,10 @@ VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 
 
 VolumeControl::VolumeControl(BMessage* archive)
-	: BSlider(archive)
+	: BSlider(archive),
+	fMixerControl(NULL),
+	fSnapping(false),
+	fConnectRetries(0)
 {
 	if (archive->FindBool("beep", &fBeep) != B_OK)
 		fBeep = false;
@@ -58,7 +68,7 @@ VolumeControl::VolumeControl(BMessage* archive)
 	if (archive->FindInt32("volume which", &volumeWhich) != B_OK)
 		volumeWhich = VOLUME_USE_MIXER;
 
-	_InitVolume(volumeWhich);
+	fMixerControl = new MixerControl(volumeWhich);
 }
 
 
@@ -109,10 +119,16 @@ VolumeControl::AttachedToWindow()
 	else
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
-		roster->StartWatching(this, fMixerControl->GainNode(),
-			B_MEDIA_NEW_PARAMETER_VALUE);
+	be_roster->StartWatching(this, B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
+
+	_ConnectVolume();
+
+	if (!fMixerControl->Connected()) {
+		// Wait a bit, and try again - the media server might not have been
+		// ready yet
+		BMessage reconnect(kMsgReconnectVolume);
+		BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
+		fConnectRetries = 3;
 	}
 }
 
@@ -120,11 +136,9 @@ VolumeControl::AttachedToWindow()
 void
 VolumeControl::DetachedFromWindow()
 {
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
-		roster->StopWatching(this, fMixerControl->GainNode(),
-			B_MEDIA_NEW_PARAMETER_VALUE);
-	}
+	_DisconnectVolume();
+
+	be_roster->StopWatching(this);
 }
 
 
@@ -267,6 +281,53 @@ VolumeControl::MessageReceived(BMessage* msg)
 				"OK"))->Go(NULL);
 			break;
 
+		case B_SOME_APP_LAUNCHED:
+		case B_SOME_APP_QUIT:
+		{
+			const char* signature;
+			if (msg->FindString("be:signature", &signature) != B_OK)
+				break;
+
+            bool isMediaServer = !strcmp(signature, kMediaServerSignature);
+            bool isAddOnServer = !strcmp(signature, kAddOnServerSignature);
+            if (isMediaServer)
+                fMediaServerRunning = msg->what == B_SOME_APP_LAUNCHED;
+            if (isAddOnServer)
+                fAddOnServerRunning = msg->what == B_SOME_APP_LAUNCHED;
+
+           if (isMediaServer || isAddOnServer) {
+                if (!fMediaServerRunning && !fAddOnServerRunning) {
+					// No media server around
+					SetLabel("No media server running");
+					SetEnabled(false);
+                } else if (fMediaServerRunning && fAddOnServerRunning) {
+                    // HACK!
+                    // quit our now invalid instance of the media roster
+                    // so that before new nodes are created,
+                    // we get a new roster
+                    BMediaRoster* roster = BMediaRoster::CurrentRoster();
+                    if (roster != NULL) {
+                        roster->Lock();
+                        roster->Quit();
+                    }
+
+					BMessage reconnect(kMsgReconnectVolume);
+					BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
+					fConnectRetries = 3;
+                }
+			}
+			break;
+		}
+
+		case kMsgReconnectVolume:
+			_ConnectVolume();
+			if (!fMixerControl->Connected() && --fConnectRetries > 1) {
+				BMessage reconnect(kMsgReconnectVolume);
+				BMessageRunner::StartSending(this, &reconnect,
+					6000000LL / fConnectRetries, 1);
+			}
+			break;
+
 		default:
 			return BView::MessageReceived(msg);
 	}
@@ -324,11 +385,24 @@ VolumeControl::UpdateText() const
 
 
 void
-VolumeControl::_InitVolume(int32 volumeWhich)
+VolumeControl::_DisconnectVolume()
 {
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
+		roster->StopWatching(this, fMixerControl->GainNode(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
+}
+
+
+void
+VolumeControl::_ConnectVolume()
+{
+	_DisconnectVolume();
+
 	const char* errorString = NULL;
 	float volume = 0.0;
-	fMixerControl = new MixerControl(volumeWhich, &volume, &errorString);
+	fMixerControl->Connect(fMixerControl->VolumeWhich(), &volume, &errorString);
 
 	if (errorString != NULL) {
 		SetLabel(errorString);
@@ -337,6 +411,12 @@ VolumeControl::_InitVolume(int32 volumeWhich)
 		SetLabel("Volume");
 		SetLimits((int32)floorf(fMixerControl->Minimum()),
 			(int32)ceilf(fMixerControl->Maximum()));
+
+		BMediaRoster* roster = BMediaRoster::CurrentRoster();
+		if (roster != NULL && fMixerControl->GainNode() != media_node::null) {
+			roster->StartWatching(this, fMixerControl->GainNode(),
+				B_MEDIA_NEW_PARAMETER_VALUE);
+		}
 	}
 
 	SetEnabled(errorString == NULL);
@@ -355,10 +435,10 @@ VolumeControl::_PointForValue(int32 value) const
 	if (Orientation() == B_HORIZONTAL) {
 		return ceilf(1.0f * (value - min) / (max - min)
 			* (BarFrame().Width() - 2) + BarFrame().left + 1);
-	} else {
-		return ceilf(BarFrame().top - 1.0f * (value - min) / (max - min)
-			* BarFrame().Height());
 	}
+
+	return ceilf(BarFrame().top - 1.0f * (value - min) / (max - min)
+		* BarFrame().Height());
 }
 
 

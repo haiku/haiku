@@ -17,8 +17,7 @@
 #include <ParameterWeb.h>
 
 
-MixerControl::MixerControl(int32 volumeWhich, float* _value,
-		const char** _error)
+MixerControl::MixerControl(int32 volumeWhich)
 	:
 	fVolumeWhich(volumeWhich),
 	fGainMediaNode(media_node::null),
@@ -28,12 +27,28 @@ MixerControl::MixerControl(int32 volumeWhich, float* _value,
 	fMax(0.0f),
 	fStep(0.0f)
 {
+}
+
+
+MixerControl::~MixerControl()
+{
+	_Disconnect();
+}
+
+
+bool
+MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
+{
+	fVolumeWhich = volumeWhich;
+
+	_Disconnect();
+
 	bool retrying = false;
 
-	status_t err = B_OK;
-		/* BMediaRoster::Roster() doesn't set it if all is ok */
+	status_t status = B_OK;
+		// BMediaRoster::Roster() doesn't set it if all is ok
 	const char* errorString = NULL;
-	BMediaRoster* roster = BMediaRoster::Roster(&err);
+	BMediaRoster* roster = BMediaRoster::Roster(&status);
 
 retry:
 	// Here we release the BMediaRoster once if we can't access the system
@@ -49,22 +64,22 @@ retry:
 			roster->Quit();
 		}
 		snooze(10000);
-		roster = BMediaRoster::Roster(&err);
+		roster = BMediaRoster::Roster(&status);
 	}
-	
-	if (roster && err == B_OK) {
+
+	if (roster != NULL && status == B_OK) {
 		switch (volumeWhich) {
 			case VOLUME_USE_MIXER:
-				err = roster->GetAudioMixer(&fGainMediaNode);
+				status = roster->GetAudioMixer(&fGainMediaNode);
 				break;
 			case VOLUME_USE_PHYS_OUTPUT:
-				err = roster->GetAudioOutput(&fGainMediaNode);
+				status = roster->GetAudioOutput(&fGainMediaNode);
 				break;
 		}
-		if (err == B_OK) {
-			err = roster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
-			if (err == B_OK) {
-				// Finding the Mixer slider in the audio output ParameterWeb 
+		if (status == B_OK) {
+			status = roster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
+			if (status == B_OK) {
+				// Finding the Mixer slider in the audio output ParameterWeb
 				int32 numParams = fParameterWeb->CountParameters();
 				BParameter* p = NULL;
 				bool foundMixerLabel = false;
@@ -102,11 +117,14 @@ retry:
 					if (!strcmp(p->Kind(), B_MASTER_GAIN)) {
 						for (; i < numParams; i++) {
 							p = fParamWeb->ParameterAt(i);
-							if (strcmp(p->Kind(), B_MASTER_GAIN)) p=NULL;
-							else break;
+							if (strcmp(p->Kind(), B_MASTER_GAIN))
+								p = NULL;
+							else
+								break;
 						}
 						break;
-					} else p = NULL;
+					} else
+						p = NULL;
 #endif
 					p = NULL;
 				}
@@ -149,7 +167,7 @@ retry:
 		errorString = "No Media Roster";
 	}
 
-	if (err != B_OK)
+	if (status != B_OK)
 		fGainMediaNode = media_node::null;
 
 	if (errorString) {
@@ -159,16 +177,15 @@ retry:
 	}
 	if (fMixerParameter == NULL && _value != NULL)
 		*_value = 0;
+
+	return errorString == NULL;
 }
 
 
-MixerControl::~MixerControl()
+bool
+MixerControl::Connected()
 {
-	delete fParameterWeb;
-
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL && fGainMediaNode != media_node::null)
-		roster->ReleaseNode(fGainMediaNode);
+	return fGainMediaNode != media_node::null;
 }
 
 
@@ -220,3 +237,17 @@ MixerControl::ChangeVolumeBy(float value)
 	SetVolume(volume + value);
 }
 
+
+void
+MixerControl::_Disconnect()
+{
+	delete fParameterWeb;
+	fParameterWeb = NULL;
+	fMixerParameter = NULL;
+
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL && fGainMediaNode != media_node::null)
+		roster->ReleaseNode(fGainMediaNode);
+
+	fGainMediaNode = media_node::null;
+}
