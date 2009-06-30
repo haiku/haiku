@@ -12,11 +12,14 @@
 
 DwarfFunctionDebugInfo::DwarfFunctionDebugInfo(
 	DwarfImageDebugInfo* imageDebugInfo, DIESubprogram* subprogramEntry,
-	TargetAddressRangeList* addressRanges, const BString& name)
+	TargetAddressRangeList* addressRanges, const BString& name,
+	const BString& sourceFile, const SourceLocation& sourceLocation)
 	:
 	fImageDebugInfo(imageDebugInfo),
 	fAddressRanges(addressRanges),
-	fName(name)
+	fName(name),
+	fSourceFile(sourceFile),
+	fSourceLocation(sourceLocation)
 {
 	fImageDebugInfo->AddReference();
 	fAddressRanges->AddReference();
@@ -68,19 +71,19 @@ DwarfFunctionDebugInfo::PrettyName() const
 const char*
 DwarfFunctionDebugInfo::SourceFileName() const
 {
-	return NULL;
+	return fSourceFile.Length() > 0 ? fSourceFile.String() : NULL;
 }
 
 
 SourceLocation
 DwarfFunctionDebugInfo::SourceStartLocation() const
 {
-	return SourceLocation();
+	return fSourceLocation;
 }
 
 
 SourceLocation
 DwarfFunctionDebugInfo::SourceEndLocation() const
 {
-	return SourceLocation();
+	return fSourceLocation;
 }

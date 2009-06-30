@@ -8,6 +8,7 @@
 #include <String.h>
 
 #include "FunctionDebugInfo.h"
+#include "SourceLocation.h"
 
 
 class DIESubprogram;
@@ -21,7 +22,9 @@ public:
 									DwarfImageDebugInfo* imageDebugInfo,
 									DIESubprogram* subprogramEntry,
 									TargetAddressRangeList* addressRanges,
-									const BString& name);
+									const BString& name,
+									const BString& sourceFile,
+									const SourceLocation& sourceLocation);
 	virtual						~DwarfFunctionDebugInfo();
 
 	virtual	SpecificImageDebugInfo* GetSpecificImageDebugInfo() const;
@@ -37,7 +40,9 @@ public:
 private:
 			DwarfImageDebugInfo* fImageDebugInfo;
 			TargetAddressRangeList* fAddressRanges;
-			const BString		fName;
+			BString				fName;
+			BString				fSourceFile;
+			SourceLocation		fSourceLocation;
 };
 
 

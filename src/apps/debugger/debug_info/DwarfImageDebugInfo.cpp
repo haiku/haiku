@@ -117,10 +117,29 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 				rangeListReference.SetTo(rangeList, true);
 			}
 
+			// get the source location
+			const char* directory = NULL;
+			const char* file = NULL;
+			uint32 line = 0;
+			uint32 column = 0;
+			DwarfUtils::GetDeclarationLocation(fFile, subprogramEntry,
+				directory, file, line, column);
+			BString fileName;
+			if (file != NULL) {
+				if (directory != NULL)
+					fileName << directory << '/' << file;
+				else
+					fileName << file;
+			}
+			// TODO: Avoid unnessecary string allocation! The source file name
+			// is the same for all contained functions, so they could share the
+			// string.
+
 			// create and add the functions
 			DwarfFunctionDebugInfo* function
 				= new(std::nothrow) DwarfFunctionDebugInfo(this,
-					subprogramEntry, rangeList, name);
+					subprogramEntry, rangeList, name, fileName,
+					SourceLocation(line, column));
 			if (function == NULL || !functions.AddItem(function)) {
 				delete function;
 				return B_NO_MEMORY;
