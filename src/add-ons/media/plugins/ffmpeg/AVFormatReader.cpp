@@ -77,7 +77,7 @@ position_io_close(URLContext *h)
 }
 
 
-static URLProtocol position_io_protocol = {
+URLProtocol sPositionIOProtocol = {
 	"position_io",
 	position_io_open,
 	position_io_read,
@@ -85,14 +85,6 @@ static URLProtocol position_io_protocol = {
 	position_io_seek,
 	position_io_close
 };
-
-
-static int
-init_libavformat()
-{
-	av_register_all();
-	return av_register_protocol(&position_io_protocol);
-}
 
 
 // #pragma mark - AVFormatReader

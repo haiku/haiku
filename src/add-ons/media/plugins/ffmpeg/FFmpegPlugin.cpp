@@ -12,11 +12,39 @@
 
 #include "FFmpegPlugin.h"
 
+#include <stdio.h>
+
 #include <new>
+
+extern "C" {
+	#include "avformat.h"
+}
 
 #include "AVCodecDecoder.h"
 #include "AVFormatReader.h"
 #include "CodecTable.h"
+
+
+FFmpegPlugin::GlobalInitilizer::GlobalInitilizer()
+{
+	av_register_all();
+		// This will also call av_codec_init() by registering codecs.
+
+	extern URLProtocol sPositionIOProtocol;
+	av_register_protocol(&sPositionIOProtocol);
+}
+
+
+FFmpegPlugin::GlobalInitilizer::~GlobalInitilizer()
+{
+	// TODO: uninit anything here?
+}
+
+
+FFmpegPlugin::GlobalInitilizer FFmpegPlugin::sInitilizer;
+
+
+// #pragma mark -
 
 
 Decoder*

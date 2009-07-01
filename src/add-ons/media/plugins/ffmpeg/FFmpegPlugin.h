@@ -24,6 +24,15 @@ public:
 	virtual	Decoder*			NewDecoder(uint index);
 	virtual	status_t			GetSupportedFormats(media_format** formats,
 									size_t* count);
+
+private:
+	class GlobalInitilizer {
+		public:
+								GlobalInitilizer();
+								~GlobalInitilizer();
+	};
+
+	static	GlobalInitilizer	sInitilizer;
 };
 
 

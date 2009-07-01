@@ -20,7 +20,7 @@
 #define DO_PROFILING 0
 
 #undef TRACE
-#define TRACE_AV_CODEC
+//#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
@@ -63,20 +63,6 @@ AVCodecDecoder::AVCodecDecoder()
 		fOutputBuffer(0)
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
-
-	// prevent multiple inits
-	static volatile vint32 ff_init_count = 0;
-	static bool ff_init_done = false;
-	if (atomic_add(&ff_init_count, 1) > 1) {
-		atomic_add(&ff_init_count, -1);
-		// spin until the thread that is initing is done
-		while (!ff_init_done)
-			snooze(20000);
-	} else {
-		avcodec_init();
-		avcodec_register_all();
-		ff_init_done = true;
-	}
 
 	ffc = avcodec_alloc_context();
 	ffpicture = avcodec_alloc_frame();
