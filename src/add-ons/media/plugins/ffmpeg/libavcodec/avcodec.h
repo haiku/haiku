@@ -3344,6 +3344,4 @@ void av_register_hwaccel(AVHWAccel *hwaccel);
  */
 AVHWAccel *av_hwaccel_next(AVHWAccel *hwaccel);
 
-#include "internal.h"
-
 #endif /* AVCODEC_AVCODEC_H */
