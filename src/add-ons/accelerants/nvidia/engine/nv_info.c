@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-6/2009
+   Rudolf Cornelissen 7/2003-7/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2623,16 +2623,16 @@ static void setup_output_matrix()
 		 * Also the BIOS might have programmed for a lower mode than EDID reports:
 		 * which limits our use of the panel (LVDS link setup too slow). */
 		if(si->ps.monitors & CRTC2_TMDS) {
-			si->ps.crtc2_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
-			si->ps.crtc2_screen.timing.h_display = si->ps.p1_timing.h_display;
-			si->ps.crtc2_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
-			si->ps.crtc2_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
-			si->ps.crtc2_screen.timing.h_total = si->ps.p1_timing.h_total;
-			si->ps.crtc2_screen.timing.v_display = si->ps.p1_timing.h_display;
-			si->ps.crtc2_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
-			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
-			si->ps.crtc2_screen.timing.v_total = si->ps.p1_timing.v_total;
-			si->ps.crtc2_screen.timing.flags = si->ps.p1_timing.flags;
+			si->ps.crtc2_screen.timing.pixel_clock = si->ps.p2_timing.pixel_clock;
+			si->ps.crtc2_screen.timing.h_display = si->ps.p2_timing.h_display;
+			si->ps.crtc2_screen.timing.h_sync_start = si->ps.p2_timing.h_sync_start;
+			si->ps.crtc2_screen.timing.h_sync_end = si->ps.p2_timing.h_sync_end;
+			si->ps.crtc2_screen.timing.h_total = si->ps.p2_timing.h_total;
+			si->ps.crtc2_screen.timing.v_display = si->ps.p2_timing.h_display;
+			si->ps.crtc2_screen.timing.v_sync_start = si->ps.p2_timing.v_sync_start;
+			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p2_timing.v_sync_end;
+			si->ps.crtc2_screen.timing.v_total = si->ps.p2_timing.v_total;
+			si->ps.crtc2_screen.timing.flags = si->ps.p2_timing.flags;
 			si->ps.crtc2_screen.have_edid = true;
 			si->ps.crtc2_screen.aspect =
 				(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
