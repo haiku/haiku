@@ -113,6 +113,8 @@ public:
 			bool			operator>(const char* string) const;
 			bool			operator!=(const char* string) const;
 
+							operator const char*() const;
+
 			// strcmp()-style compare functions
 			int				Compare(const BString& string) const;
 			int				Compare(const char* string) const;
@@ -420,6 +422,13 @@ inline bool
 BString::operator!=(const char* string) const
 {
 	return !operator==(string);
+}
+
+
+inline
+BString::operator const char*() const
+{
+	return String();
 }
 
 
