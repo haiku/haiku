@@ -87,23 +87,12 @@ static URLProtocol position_io_protocol = {
 };
 
 
-void
-avcodec_register_all()
-{
-	// av_register_all() will call libavcodec's avcodec_register_all(),
-	// but we do not link against libavcodec in this plugin.
-}
-
-
 static int
 init_libavformat()
 {
 	av_register_all();
 	return av_register_protocol(&position_io_protocol);
 }
-
-
-static int dummy = init_libavformat();
 
 
 // #pragma mark - AVFormatReader
@@ -218,18 +207,3 @@ AVFormatReader::GetNextChunk(void* _cookie, const void** chunkBuffer,
 }
 
 
-// #pragma mark -
-
-
-Reader*
-AVFormatPlugin::NewReader()
-{
-	return new(std::nothrow) AVFormatReader;
-}
-
-
-MediaPlugin*
-instantiate_plugin()
-{
-	return new(std::nothrow) AVFormatPlugin;
-}

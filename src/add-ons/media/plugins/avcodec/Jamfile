@@ -9,28 +9,23 @@ SubDirHdrs [ FDirName $(SUBDIR) libavformat ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libavutil ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libswscale ] ;
 
-Addon avcodec :
- 	avcodec.cpp
- 	codectbl.cpp
+Addon ffmpeg :
+ 	AVCodecDecoder.cpp
+ 	AVFormatReader.cpp
+ 	CodecTable.cpp
+
+	FFmpegPlugin.cpp
+
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
 #	gfx_conv_mmx.cpp
  	gfx_util.cpp
 	:  
+	libavformat.a
 	libavcodec.a
 	libavcodec_$(TARGET_ARCH).a
 	libavutil.a
 	libswscale.a
-	be
-	libmedia.so
-	libz.a
-;
-
-Addon avformat :
-	AVFormatReader.cpp
-	:
-	libavformat.a
-	libavutil.a
 	be
 	libmedia.so
 	libz.a

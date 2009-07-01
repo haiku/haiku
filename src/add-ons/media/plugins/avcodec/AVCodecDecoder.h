@@ -1,42 +1,30 @@
 /*
- * Copyright (C) 2001 Carlos Hasan. All Rights Reserved.
- * Copyright (C) 2001 François Revol. All Rights Reserved.
- * Copyright (C) 2001 Axel Dörfler. All Rights Reserved.
- * Copyright (C) 2004 Marcus Overhagen. All Rights Reserved.
+ * Copyright (C) 2001 Carlos Hasan.
+ * Copyright (C) 2001 François Revol.
+ * Copyright (C) 2001 Axel Dörfler.
+ * Copyright (C) 2004 Marcus Overhagen.
+ * Copyright (C) 2009 Stephan Aßmus <superstippi@gmx.de>.
  *
- * Distributed under the terms of the MIT License.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+#ifndef AVCODEC_DECODER_H
+#define AVCODEC_DECODER_H
 
 //! libavcodec based decoder for Haiku
 
-#ifndef __AVCODEC_PLUGIN_H__
-#define __AVCODEC_PLUGIN_H__
-
 #include <MediaFormats.h>
-#include "ReaderPlugin.h"
+
 #include "DecoderPlugin.h"
+#include "ReaderPlugin.h"
 
-//#define DO_PROFILING
+#include "CodecTable.h"
 
-#include "gfx_util.h"
 
-struct codec_table {
-	CodecID					id;
-	media_type				type;
-	media_format_family		family;
-	uint64					fourcc;
-	const char*				prettyname;
-};
-
-extern const struct codec_table gCodecTable[];
-extern const int num_codecs;
-extern media_format avcodec_formats[];
-
-class avCodec : public Decoder {
+class AVCodecDecoder : public Decoder {
 public:
-								avCodec();
+								AVCodecDecoder();
 		
-	virtual						~avCodec();
+	virtual						~AVCodecDecoder();
 		
 	virtual	void				GetCodecInfo(media_codec_info* mci);
 	
@@ -59,7 +47,7 @@ protected:
 			media_header		fHeader;
 			media_decode_info	fInfo;
 	
-	friend class avCodecInputStream;
+//	friend class avCodecInputStream;
 		
 private:
 			media_format		fInputFormat;
@@ -100,12 +88,4 @@ private:
 
 };
 
-class avCodecPlugin : public DecoderPlugin {
-public:
-			Decoder*			NewDecoder(uint index);
-			status_t			GetSupportedFormats(media_format** formats,
-									size_t* count);
-};
-
-
-#endif
+#endif // AVCODEC_DECODER_H

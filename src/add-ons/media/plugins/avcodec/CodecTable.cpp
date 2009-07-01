@@ -1,23 +1,12 @@
-/******************************************************************************
-/
-/	File:			codectbl.cpp
-/
-/	Description:	FFMpeg Generic Decoder for BeOS Release 5.
-/
-/	Disclaimer:		This decoder is based on undocumented APIs.
-/					Therefore it is likely, if not certain, to break in future
-/					versions of BeOS. This piece of software is in no way
-/					connected to or even supported by Be, Inc.
-/
-/	Copyright (C) 2001 François Revol. All Rights Reserved.
-/   Some code from MPEG I Decoder from Carlos Hasan.
-/   Had some help from Axeld
-/
-******************************************************************************/
+/*
+ * Copyright (C) 2001 Carlos Hasan. All Rights Reserved.
+ * Copyright (C) 2001 François Revol. All Rights Reserved.
+ * Copyright (C) 2001 Axel Dörfler. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <MediaDefs.h>
-
-#include "avcodecplugin.h"
+#include "CodecTable.h"
 
 #define HAS_WMA_AUDIO
 //#define HAS_MACE_AUDIO
@@ -214,8 +203,8 @@ const struct codec_table gCodecTable[] = {
 	{CODEC_ID_NONE,		B_MEDIA_UNKNOWN_TYPE,	B_ANY_FORMAT_FAMILY,	0, "null codec !!!"}
 };
 
-const int num_codecs = (sizeof(gCodecTable) / sizeof(codec_table) - 1);
+const int gCodecCount = (sizeof(gCodecTable) / sizeof(codec_table) - 1);
 
 
-media_format avcodec_formats[sizeof(gCodecTable)];
+media_format gAVCodecFormats[sizeof(gCodecTable)];
 

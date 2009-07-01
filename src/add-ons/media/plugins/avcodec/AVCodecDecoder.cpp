@@ -3,23 +3,24 @@
  * Copyright (C) 2001 François Revol
  * Copyright (C) 2001 Axel Dörfler
  * Copyright (C) 2004 Marcus Overhagen
+ * Copyright (C) 2009 Stephan Amßus <superstippi@gmx.de>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 //! libavcodec based decoder for Haiku
 
+#include "AVCodecDecoder.h"
+
 #include <Debug.h>
 #include <OS.h>
 #include <Bitmap.h>
 #include <string.h>
 
-#include "avcodecplugin.h"
-
 #define DO_PROFILING 0
 
 #undef TRACE
-//#define TRACE_AV_CODEC
+#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
@@ -45,7 +46,7 @@ static long prof_cnt = 0;
 // with CD Manager)
 //#define UNREAL
  
-avCodec::avCodec()
+AVCodecDecoder::AVCodecDecoder()
 	:	fHeader(),
 		fInfo(),
 		fInputFormat(),
@@ -61,7 +62,7 @@ avCodec::avCodec()
 		fBlockAlign(0),
 		fOutputBuffer(0)
 {
-	TRACE("avCodec::avCodec()\n");
+	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
 
 	// prevent multiple inits
 	static volatile vint32 ff_init_count = 0;
@@ -83,9 +84,9 @@ avCodec::avCodec()
 }
 
 
-avCodec::~avCodec()
+AVCodecDecoder::~AVCodecDecoder()
 {
-	TRACE("[%c] avCodec::~avCodec()\n", isAudio?('a'):('v'));
+	TRACE("[%c] AVCodecDecoder::~AVCodecDecoder()\n", isAudio?('a'):('v'));
 
 #ifdef DO_PROFILING
 	if (prof_cnt > 0) {
@@ -95,7 +96,7 @@ avCodec::~avCodec()
 	}
 #endif
 
-	if(fCodecInitDone)
+	if (fCodecInitDone)
 		avcodec_close(ffc);
 
 	free(opicture);
@@ -108,7 +109,7 @@ avCodec::~avCodec()
 
 
 void
-avCodec::GetCodecInfo(media_codec_info *mci)
+AVCodecDecoder::GetCodecInfo(media_codec_info *mci)
 {
 	sprintf(mci->short_name, "ff:%s", fCodec->name);
 	sprintf(mci->pretty_name, "%s (libavcodec %s)",
@@ -117,7 +118,7 @@ avCodec::GetCodecInfo(media_codec_info *mci)
 
 
 status_t
-avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
+AVCodecDecoder::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 	size_t infoSize)
 {
 	if (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO
@@ -125,7 +126,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 		return B_ERROR;
 		
 	isAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
-	TRACE("[%c] avCodec::Setup()\n", isAudio?('a'):('v'));
+	TRACE("[%c] AVCodecDecoder::Setup()\n", isAudio?('a'):('v'));
 
 	if (isAudio && !fOutputBuffer)
 		fOutputBuffer = new char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
@@ -180,11 +181,11 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 				&& gCodecTable[i].fourcc == cid) {
 				fCodec = avcodec_find_decoder(gCodecTable[i].id);
 				if (!fCodec) {
-					TRACE("avCodec: unable to find the correct ffmpeg decoder "
+					TRACE("AVCodecDecoder: unable to find the correct ffmpeg decoder "
 						"(id = %d)!!!\n",gCodecTable[i].id);
 					return B_ERROR;
 				}
-				TRACE("avCodec: found decoder %s\n",fCodec->name);
+				TRACE("AVCodecDecoder: found decoder %s\n",fCodec->name);
 				
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY && infoSize >= sizeof(wave_format_ex)) {
 					const wave_format_ex *wfmt_data
@@ -200,7 +201,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 					}
 				} else {
 					fBlockAlign = ioEncodedFormat->u.encoded_audio.output.buffer_size;
-					TRACE("avCodec: extra data size %ld\n",infoSize);
+					TRACE("AVCodecDecoder: extra data size %ld\n",infoSize);
 					fExtraDataSize = infoSize;
 					if (fExtraDataSize) {
 						fExtraData = new char [fExtraDataSize];
@@ -213,13 +214,13 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 			}
 		}
 	}
-	printf("avCodec::Setup failed!\n");
+	printf("AVCodecDecoder::Setup failed!\n");
 	return B_ERROR;
 }
 
 
 status_t
-avCodec::Seek(uint32 seekTo,
+AVCodecDecoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
@@ -232,13 +233,13 @@ avCodec::Seek(uint32 seekTo,
 	}
 	
 	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
-		TRACE("avCodec::Seek by time ");
+		TRACE("AVCodecDecoder::Seek by time ");
 		TRACE("from frame %Ld and time %.6f TO Required Time %.6f. ", fFrame, fStartTime / 1000000.0, seekTime / 1000000.0);
 
 		*frame = (int64)(seekTime * fOutputFrameRate / 1000000LL);
 		*time = seekTime;
 	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
-		TRACE("avCodec::Seek by Frame ");
+		TRACE("AVCodecDecoder::Seek by Frame ");
 		TRACE("from time %.6f and frame %Ld TO Required Frame %Ld. ", fStartTime / 1000000.0, fFrame, seekFrame);
 
 		*time = (bigtime_t)(seekFrame * 1000000LL / fOutputFrameRate);
@@ -254,9 +255,9 @@ avCodec::Seek(uint32 seekTo,
 
 
 status_t
-avCodec::NegotiateOutputFormat(media_format *inout_format)
+AVCodecDecoder::NegotiateOutputFormat(media_format *inout_format)
 {
-	TRACE("[%c] avCodec::NegotiateOutputFormat()\n", isAudio?('a'):('v'));
+	TRACE("[%c] AVCodecDecoder::NegotiateOutputFormat()\n", isAudio?('a'):('v'));
 
 	int result;
 	
@@ -413,7 +414,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 
 
 status_t
-avCodec::Decode(void *out_buffer, int64 *out_frameCount,
+AVCodecDecoder::Decode(void *out_buffer, int64 *out_frameCount,
 				media_header *mh, media_decode_info *info)
 {
 	const void *data;
@@ -429,7 +430,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 	set_thread_priority(find_thread(NULL), B_NORMAL_PRIORITY);
 #endif
 
-//	TRACE("[%c] avCodec::Decode() for time %Ld\n", isAudio?('a'):('v'), fStartTime);
+//	TRACE("[%c] AVCodecDecoder::Decode() for time %Ld\n", isAudio?('a'):('v'), fStartTime);
 
 	mh->start_time = fStartTime;
 
@@ -518,7 +519,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 		err = GetNextChunk(&data, &size, &chunk_mh);
 		if (err != B_OK) {
-			TRACE("avCodec::Decode(): error 0x%08lx from GetNextChunk()\n",	err);
+			TRACE("AVCodecDecoder::Decode(): error 0x%08lx from GetNextChunk()\n",	err);
 			return err;
 		}
 
@@ -559,7 +560,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 //	(int)(ffpicture->pts % 1000000), ffc->frame_number, ffc->frame_rate);
 
 		if (len < 0) {
-			printf("[%c] avCodec: error in decoding frame %lld\n",
+			printf("[%c] AVCodecDecoder: error in decoding frame %lld\n",
 				isAudio?('a'):('v'), *out_frameCount);
 		}
 
@@ -612,66 +613,5 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 	fStartTime = (bigtime_t) (1000000LL * fFrame / fOutputFrameRate);
 
 	return B_OK;
-}
-
-status_t
-avCodecPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
-{
-	BMediaFormats mediaFormats;
-	if (B_OK != mediaFormats.InitCheck())
-		return B_ERROR;
-
-	for (int i = 0; i < num_codecs; i++) {
-		media_format_description description;
-		description.family = gCodecTable[i].family;
-		switch(description.family) {
-			case B_WAV_FORMAT_FAMILY:
-				description.u.wav.codec = gCodecTable[i].fourcc;
-				break;
-			case B_AIFF_FORMAT_FAMILY:
-				description.u.aiff.codec = gCodecTable[i].fourcc;
-				break;
-			case B_AVI_FORMAT_FAMILY:
-				description.u.avi.codec = gCodecTable[i].fourcc;
-				break;
-			case B_MPEG_FORMAT_FAMILY:
-				description.u.mpeg.id = gCodecTable[i].fourcc;
-				break;
-			case B_QUICKTIME_FORMAT_FAMILY:
-				description.u.quicktime.codec = gCodecTable[i].fourcc;
-				break;
-			case B_MISC_FORMAT_FAMILY:
-				description.u.misc.file_format =
-					(uint32)(gCodecTable[i].fourcc >> 32);
-				description.u.misc.codec = (uint32) gCodecTable[i].fourcc;
-				break;
-			default:
-				break;
-		}
-		media_format format;
-		format.type = gCodecTable[i].type;
-		format.require_flags = 0;
-		format.deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-		if (B_OK != mediaFormats.MakeFormatFor(&description, 1, &format))
-			return B_ERROR;
-		avcodec_formats[i] = format;
-	}
-
-	*formats = avcodec_formats;
-	*count = num_codecs;
-	return B_OK;
-}
-
-
-Decoder *
-avCodecPlugin::NewDecoder(uint index)
-{
-	return new avCodec();
-}
-
-
-MediaPlugin *instantiate_plugin()
-{
-	return new avCodecPlugin;
 }
 

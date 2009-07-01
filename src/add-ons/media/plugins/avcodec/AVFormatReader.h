@@ -46,11 +46,4 @@ private:
 };
 
 
-class AVFormatPlugin : public ReaderPlugin {
-public:
-			Reader*				NewReader();
-};
-
-MediaPlugin *instantiate_plugin();
-
 #endif // AV_FORMAT_READER_H
