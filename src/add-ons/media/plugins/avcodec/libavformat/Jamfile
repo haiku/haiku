@@ -1,0 +1,191 @@
+SubDir HAIKU_TOP src add-ons media plugins avcodec libavformat ;
+
+SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
+SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;
+
+UseLibraryHeaders zlib ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
+
+if $(HAIKU_GCC_VERSION[1]) >= 3 {
+	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
+} else {
+	SubDirCcFlags -fomit-frame-pointer -DPIC ;
+}
+
+local defines ;
+defines = HAVE_AV_CONFIG_H=1 ;
+
+if $(TARGET_ARCH) = x86 {
+    defines += ARCH_X86=1 ARCH_X86_32=1 ARCH_PPC=0 ARCH_SPARC=0 ;
+    defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
+    defines += HAVE_MMX=1 HAVE_MMX2=1 HAVE_SSE=0 HAVE_SSE3=1 ; 
+    defines += HAVE_ALTIVEC=0 ;
+	defines += HAVE_VIS=0 ;
+} else if $(TARGET_ARCH) = ppc {
+    defines += ARCH_X86=0 ARCH_X86_32=0 ARCH_PPC=1 ARCH_SPARC=0 ;
+    defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
+    defines += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSE3=0 ; 
+    defines += HAVE_ALTIVEC=1 ;
+	defines += HAVE_VIS=0 ;
+} else if $(TARGET_ARCH) = sparc {
+    defines += ARCH_X86=0 ARCH_X86_32=0 ARCH_PPC=0 ARCH_SPARC=1 ;
+    defines += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
+    defines += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSE3=0 ; 
+    defines += HAVE_ALTIVEC=0 ;
+	defines += HAVE_VIS=1 ;
+}
+
+defines = [ FDefines $(defines) ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+StaticLibrary libavformat.a :
+	4xm.c
+	adtsenc.c
+	aiff.c
+	allformats.c
+	amr.c
+	apc.c
+	ape.c
+	asf.c
+	asfcrypt.c
+	asfdec.c
+	asfenc.c
+	assdec.c
+	assenc.c
+	au.c
+	audiointerleave.c
+	avc.c
+	avidec.c
+	avienc.c
+	avio.c
+	aviobuf.c
+#	avisynth.c # No AVISynth support.
+	avs.c
+	bethsoftvid.c
+	bfi.c
+	c93.c
+	crcenc.c
+	cutils.c
+	daud.c
+	dsicin.c
+	dv.c
+	dvenc.c
+	dxa.c
+	eacdata.c
+	electronicarts.c
+	ffmdec.c
+	ffmenc.c
+	file.c # TODO: Remove? (I/O protocol)
+	flacdec.c
+	flacenc.c
+	flic.c
+	flvdec.c
+	flvenc.c
+	framecrcenc.c
+#	framehook.c # No "vhook" frame filter support
+	gif.c
+#	gopher.c # (I/O protocol)
+	gxf.c
+	gxfenc.c
+#	http.c # (I/O protocol)
+	id3v2.c
+	idcin.c
+	idroq.c
+	iff.c
+	img2.c
+	ipmovie.c
+	isom.c
+	iss.c
+#	libnut.c // No libnut.so support
+#	lmlm4.c
+	matroska.c
+	matroskadec.c
+	matroskaenc.c
+	metadata.c
+	metadata_compat.c
+	mm.c
+	mmf.c
+	mov.c
+	movenc.c
+	mp3.c
+	mpc8.c
+	mpc.c
+	mpeg.c
+	mpegenc.c
+	mpegts.c
+	mpegtsenc.c
+	mpjpeg.c
+	msnwc_tcp.c
+	mtv.c
+	mvi.c
+	mxf.c
+	mxfdec.c
+	mxfenc.c
+	ncdec.c
+	nsvdec.c
+	nut.c
+	nutdec.c
+	nutenc.c
+	nuv.c
+	oggdec.c
+	oggenc.c
+	oggparseflac.c
+	oggparseogm.c
+	oggparsespeex.c
+	oggparsetheora.c
+	oggparsevorbis.c
+	oma.c
+	options.c
+	os_support.c # TODO: Contains network and polling stuff, remove?
+	psxstr.c
+	pva.c
+	r3d.c
+	raw.c
+	rdt.c
+	riff.c
+	rl2.c
+	rm.c
+	rmdec.c
+	rmenc.c
+	rpl.c
+	rtp.c
+	rtp_aac.c
+	rtp_h264.c
+	rtp_mpv.c
+	rtpdec.c
+	rtpenc.c
+	rtpenc_h264.c
+#	rtpproto.c # (I/O protocol)
+	rtsp.c
+	sdp.c
+	segafilm.c
+	sierravmd.c
+	siff.c
+	smacker.c
+	sol.c
+	swfdec.c
+	swfenc.c
+#	tcp.c # (I/O protocol)
+	thp.c
+	tiertexseq.c
+	tta.c
+	txd.c
+#	udp.c # (I/O protocol)
+	utils.c
+	vc1test.c
+	vc1testenc.c
+	voc.c
+	vocdec.c
+	vocenc.c
+	wav.c
+	wc3movie.c
+	westwood.c
+	wv.c
+	xa.c
+	yuv4mpeg.c
+;
+

@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(SUBDIR) libavcodec ] ;
+SubDirHdrs [ FDirName $(SUBDIR) libavformat ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libavutil ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libswscale ] ;
 
@@ -25,6 +26,17 @@ Addon avcodec :
 	libz.a
 ;
 
+Addon avformat :
+	AVFormatReader.cpp
+	:
+	libavformat.a
+	libavutil.a
+	be
+	libmedia.so
+	libz.a
+;
+
 SubInclude HAIKU_TOP src add-ons media plugins avcodec libavcodec ;
+SubInclude HAIKU_TOP src add-ons media plugins avcodec libavformat ;
 SubInclude HAIKU_TOP src add-ons media plugins avcodec libavutil ;
 SubInclude HAIKU_TOP src add-ons media plugins avcodec libswscale ;

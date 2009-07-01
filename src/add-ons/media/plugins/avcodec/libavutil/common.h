@@ -279,7 +279,7 @@ static inline av_const float av_clipf(float a, float amin, float amax)
 #include "mem.h"
 
 #ifdef HAVE_AV_CONFIG_H
-#    include "libavcodec/config.h"
+#    include "config.h"
 #    include "libavutil/internal.h"
 #endif /* HAVE_AV_CONFIG_H */
 
