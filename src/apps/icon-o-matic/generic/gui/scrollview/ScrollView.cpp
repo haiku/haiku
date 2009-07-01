@@ -37,6 +37,9 @@ class InternalScrollBar : public BScrollBar {
 
 	virtual	void				ValueChanged(float value);
 
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+
  private:
 	ScrollView*					fScrollView;
 };
@@ -63,6 +66,26 @@ InternalScrollBar::ValueChanged(float value)
 	if (fScrollView)
 		fScrollView->_ScrollValueChanged(this, value);
 }
+
+// MouseDown
+void
+InternalScrollBar::MouseDown(BPoint where)
+{
+	if (fScrollView)
+		fScrollView->_SetScrolling(true);
+	BScrollBar::MouseDown(where);
+}
+
+// MouseUp
+void
+InternalScrollBar::MouseUp(BPoint where)
+{
+	BScrollBar::MouseUp(where);
+	if (fScrollView)
+		fScrollView->_SetScrolling(false);
+}
+
+
 
 // #pragma mark -ScrollCorner
 
@@ -124,7 +147,7 @@ ScrollCorner::ScrollCorner(ScrollView* scrollView)
 	int32 bpr = fBitmaps[0]->BytesPerRow();
 	for (int i = 0; i <= sBitmapHeight; i++, bits += bpr)
 		memcpy(bits, &sScrollCornerNormalBits[i * sBitmapHeight * 4], sBitmapWidth * 4);
-	
+
 //printf("setting up bitmap 1\n");
 	fBitmaps[1] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth, sBitmapHeight), sColorSpace);
 //	fBitmaps[1]->SetBits((void *)sScrollCornerPushedBits, fBitmaps[1]->BitsLength(), 0L, sColorSpace);
@@ -257,62 +280,34 @@ ScrollCorner::SetDragging(bool dragging)
 	}
 }
 
+
 // #pragma mark - ScrollView
+
 
 // constructor
 ScrollView::ScrollView(BView* child, uint32 scrollingFlags, BRect frame,
-				const char *name, uint32 resizingMode, uint32 viewFlags,
-				uint32 borderStyle, uint32 borderFlags)
-	: BView(frame, name, resizingMode, viewFlags | B_FRAME_EVENTS | B_WILL_DRAW
-				| B_FULL_UPDATE_ON_RESIZE),
-	  Scroller(),
-	  fChild(NULL),
-	  fScrollingFlags(scrollingFlags),
-
-	  fHScrollBar(NULL),
-	  fVScrollBar(NULL),
-	  fScrollCorner(NULL),
-
-	  fHVisible(true),
-	  fVVisible(true),
-	  fCornerVisible(true),
-
-	  fWindowActive(false),
-	  fChildFocused(false),
-
-	  fHSmallStep(1),
-	  fVSmallStep(1),
-
-	  fBorderStyle(borderStyle),
-	  fBorderFlags(borderFlags)
+		const char* name, uint32 resizingMode, uint32 viewFlags,
+		uint32 borderStyle, uint32 borderFlags)
+	: BView(frame, name, resizingMode,
+		viewFlags | B_FRAME_EVENTS | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	Scroller()
 {
-	// Set transparent view color -- our area is completely covered by
-	// our children.
-	SetViewColor(B_TRANSPARENT_32_BIT);
-	// create scroll bars
-	if (fScrollingFlags & (SCROLL_HORIZONTAL | SCROLL_HORIZONTAL_MAGIC)) {
-		fHScrollBar = new InternalScrollBar(this,
-				BRect(0.0, 0.0, 100.0, B_H_SCROLL_BAR_HEIGHT), B_HORIZONTAL);
-		AddChild(fHScrollBar);
-	}
-	if (fScrollingFlags & (SCROLL_VERTICAL | SCROLL_VERTICAL_MAGIC)) {
-		fVScrollBar = new InternalScrollBar(this,
-				BRect(0.0, 0.0, B_V_SCROLL_BAR_WIDTH, 100.0), B_VERTICAL);
-		AddChild(fVScrollBar);
-	}
-	// Create a scroll corner, if we can scroll into both direction.
-	if (fHScrollBar && fVScrollBar) {
-		fScrollCorner = new ScrollCorner(this);
-		AddChild(fScrollCorner);
-	}
-	// add child
-	if (child) {
-		fChild = child;
-		AddChild(child);
-		if (Scrollable* scrollable = dynamic_cast<Scrollable*>(child))
-			SetScrollTarget(scrollable);
-	}
+	_Init(child, scrollingFlags, borderStyle, borderFlags);
 }
+
+#ifdef __HAIKU__
+
+// constructor
+ScrollView::ScrollView(BView* child, uint32 scrollingFlags, const char* name,
+		uint32 viewFlags, uint32 borderStyle, uint32 borderFlags)
+	: BView(name, viewFlags | B_FRAME_EVENTS | B_WILL_DRAW
+		| B_FULL_UPDATE_ON_RESIZE),
+	Scroller()
+{
+	_Init(child, scrollingFlags, borderStyle, borderFlags);
+}
+
+#endif // __HAIKU__
 
 // destructor
 ScrollView::~ScrollView()
@@ -528,6 +523,21 @@ ScrollView::VSmallStep() const
 	return fVSmallStep;
 }
 
+// IsScrolling
+bool
+ScrollView::IsScrolling() const
+{
+	return fScrolling;
+}
+
+void
+ScrollView::SetScrollingEnabled(bool enabled)
+{
+	Scroller::SetScrollingEnabled(enabled);
+	if (IsScrollingEnabled())
+		SetScrollOffset(ScrollOffset());
+}
+
 // #pragma mark -
 
 // DataRectChanged
@@ -583,10 +593,69 @@ ScrollView::ScrollTargetChanged(Scrollable* /*oldTarget*/,
 */
 }
 
+// _Init
+void
+ScrollView::_Init(BView* child, uint32 scrollingFlags, uint32 borderStyle,
+	uint32 borderFlags)
+{
+	fChild = NULL;
+	fScrollingFlags = scrollingFlags;
+
+	fHScrollBar = NULL;
+	fVScrollBar = NULL;
+	fScrollCorner = NULL;
+
+	fHVisible = true;
+	fVVisible = true;
+	fCornerVisible = true;
+
+	fWindowActive = false;
+	fChildFocused = false;
+
+	fScrolling = false;
+
+	fHSmallStep = 1;
+	fVSmallStep = 1;
+
+	fBorderStyle = borderStyle;
+	fBorderFlags = borderFlags;
+
+	// Set transparent view color -- our area is completely covered by
+	// our children.
+	SetViewColor(B_TRANSPARENT_32_BIT);
+	// create scroll bars
+	if (fScrollingFlags & (SCROLL_HORIZONTAL | SCROLL_HORIZONTAL_MAGIC)) {
+		fHScrollBar = new InternalScrollBar(this,
+				BRect(0.0, 0.0, 100.0, B_H_SCROLL_BAR_HEIGHT), B_HORIZONTAL);
+		AddChild(fHScrollBar);
+	}
+	if (fScrollingFlags & (SCROLL_VERTICAL | SCROLL_VERTICAL_MAGIC)) {
+		fVScrollBar = new InternalScrollBar(this,
+				BRect(0.0, 0.0, B_V_SCROLL_BAR_WIDTH, 100.0), B_VERTICAL);
+		AddChild(fVScrollBar);
+	}
+	// Create a scroll corner, if we can scroll into both direction.
+	if (fHScrollBar && fVScrollBar) {
+		fScrollCorner = new ScrollCorner(this);
+		AddChild(fScrollCorner);
+	}
+	// add child
+	if (child) {
+		fChild = child;
+		AddChild(child);
+		if (Scrollable* scrollable = dynamic_cast<Scrollable*>(child))
+			SetScrollTarget(scrollable);
+	}
+}
+
+
 // _ScrollValueChanged
 void
 ScrollView::_ScrollValueChanged(InternalScrollBar* scrollBar, float value)
 {
+	if (!IsScrollingEnabled())
+		return;
+
 	switch (scrollBar->Orientation()) {
 		case B_HORIZONTAL:
 			if (fHScrollBar)
@@ -682,14 +751,14 @@ ScrollView::_UpdateScrollBars()
 		dataRect.Set(0.0, 0.0, 0.0, 0.0);
 		visibleBounds.Set(0.0, 0.0, 0.0, 0.0);
 	}
-	float hProportion = min(1.0f, (visibleBounds.Width() + 1.0f) /
-								  (dataRect.Width() + 1.0f));
-	float hMaxValue = max(dataRect.left,
-						  dataRect.right - visibleBounds.Width());
-	float vProportion = min(1.0f, (visibleBounds.Height() + 1.0f) /
-								  (dataRect.Height() + 1.0f));
-	float vMaxValue = max(dataRect.top,
-						  dataRect.bottom - visibleBounds.Height());
+	float hProportion = min_c(1.0f, (visibleBounds.Width() + 1.0f)
+		/ (dataRect.Width() + 1.0f));
+	float hMaxValue = max_c(dataRect.left,
+		dataRect.right - visibleBounds.Width());
+	float vProportion = min_c(1.0f, (visibleBounds.Height() + 1.0f)
+		/ (dataRect.Height() + 1.0f));
+	float vMaxValue = max_c(dataRect.top,
+		dataRect.bottom - visibleBounds.Height());
 	// update horizontal scroll bar
 	if (fHScrollBar) {
 		fHScrollBar->SetProportion(hProportion);
@@ -894,6 +963,7 @@ ScrollView::_MaxVisibleRect() const
 }
 
 #ifdef __HAIKU__
+
 BSize
 ScrollView::_Size(BSize size)
 {
@@ -939,5 +1009,12 @@ ScrollView::_Size(BSize size)
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
+
 #endif // __HAIKU__
 
+// _SetScrolling
+void
+ScrollView::_SetScrolling(bool scrolling)
+{
+	fScrolling = scrolling;
+}

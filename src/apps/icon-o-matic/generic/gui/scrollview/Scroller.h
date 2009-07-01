@@ -5,7 +5,6 @@
  * Authors:
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
-
 #ifndef SCROLLER_H
 #define SCROLLER_H
 
@@ -31,6 +30,12 @@ class Scroller {
 			BRect				VisibleBounds() const;
 			BRect				VisibleRect() const;
 
+	virtual	void				SetScrollingEnabled(bool enabled);
+			bool				IsScrollingEnabled() const
+									{ return fScrollingEnabled; }
+
+	virtual	bool				IsScrolling() const;
+
 protected:
 	virtual	void				DataRectChanged(BRect oldDataRect,
 												BRect newDataRect);
@@ -45,6 +50,7 @@ protected:
 
  protected:
 			Scrollable*			fScrollTarget;
+			bool				fScrollingEnabled;
 
 	friend class Scrollable;
 };

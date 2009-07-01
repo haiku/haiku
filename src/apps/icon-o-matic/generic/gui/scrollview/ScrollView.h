@@ -1,11 +1,4 @@
-/*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
- */
+// ScrollView.h
 
 #ifndef SCROLL_VIEW_H
 #define SCROLL_VIEW_H
@@ -23,7 +16,9 @@ enum {
 	SCROLL_VERTICAL							= 0x02,
 	SCROLL_HORIZONTAL_MAGIC					= 0x04,
 	SCROLL_VERTICAL_MAGIC					= 0x08,
-	SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS		= 0x10
+	SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS		= 0x10,
+	SCROLL_NO_FRAME							= 0x20,
+	SCROLL_LIST_FRAME						= 0x40,
 };
 
 enum {
@@ -36,12 +31,18 @@ enum {
 
 
 class ScrollView : public BView, public Scroller {
- public:
+public:
 								ScrollView(BView* child, uint32 scrollingFlags,
 									BRect frame, const char *name,
 									uint32 resizingMode, uint32 viewFlags,
 									uint32 borderStyle = B_FANCY_BORDER,
 									uint32 borderFlags = BORDER_ALL);
+#ifdef __HAIKU__
+								ScrollView(BView* child, uint32 scrollingFlags,
+									const char *name, uint32 viewFlags,
+									uint32 borderStyle = B_FANCY_BORDER,
+									uint32 borderFlags = BORDER_ALL);
+#endif // __HAIKU__
 	virtual						~ScrollView();
 
 	virtual	void				AllAttached();
@@ -50,10 +51,11 @@ class ScrollView : public BView, public Scroller {
 	virtual	void				WindowActivated(bool activated);
 
 #ifdef __HAIKU__
+
 	virtual	BSize				MinSize();
 	virtual	BSize				PreferredSize();
-#endif
 
+#endif // __HAIKU__
 
 			uint32				ScrollingFlags() const;
 			void				SetVisibleRectIsChildBounds(bool flag);
@@ -73,6 +75,9 @@ class ScrollView : public BView, public Scroller {
 											  float* vStep) const;
 			float				HSmallStep() const;
 			float				VSmallStep() const;
+
+	virtual	bool				IsScrolling() const;
+	virtual	void				SetScrollingEnabled(bool enabled);
 
  protected:
 	virtual	void				DataRectChanged(BRect oldDataRect,
@@ -97,11 +102,15 @@ class ScrollView : public BView, public Scroller {
 			bool				fCornerVisible;	// scroll corner visible flag
 			bool				fWindowActive;
 			bool				fChildFocused;
+			bool				fScrolling;
 			float				fHSmallStep;
 			float				fVSmallStep;
 
 			uint32				fBorderStyle;
 			uint32				fBorderFlags;
+
+			void				_Init(BView* child, uint32 scrollingFlags,
+									uint32 borderStyle, uint32 borderFlags);
 
 			void				_ScrollValueChanged(
 										InternalScrollBar* scrollBar,
@@ -123,6 +132,8 @@ private:
 #ifdef __HAIKU__
 	virtual	BSize				_Size(BSize childSize);
 #endif
+
+			void				_SetScrolling(bool scrolling);
 
 	friend class InternalScrollBar;
 	friend class ScrollCorner;

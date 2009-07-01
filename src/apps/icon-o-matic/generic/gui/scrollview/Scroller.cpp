@@ -17,7 +17,8 @@
 
 // constructor
 Scroller::Scroller()
-	: fScrollTarget(NULL)
+	: fScrollTarget(NULL),
+	  fScrollingEnabled(true)
 {
 }
 
@@ -135,6 +136,19 @@ Scroller::VisibleRect() const
 	return BRect();
 }
 
+// SetScrollingEnabled
+void
+Scroller::SetScrollingEnabled(bool enabled)
+{
+	fScrollingEnabled = enabled;
+}
+
+// IsScrolling
+bool
+Scroller::IsScrolling() const
+{
+	return false;
+}
 
 // hooks
 
