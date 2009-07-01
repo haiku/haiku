@@ -1,30 +1,50 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-
 
 #include <Referenceable.h>
 
 
-// constructor
 Referenceable::Referenceable(bool deleteWhenUnreferenced)
 	: fReferenceCount(1),
 	  fDeleteWhenUnreferenced(deleteWhenUnreferenced)
 {
 }
 
-// destructor
+
 Referenceable::~Referenceable()
 {
 }
 
-// RemoveReference
+
+void
+Referenceable::AcquireReference()
+{
+	if (atomic_add(&fReferenceCount, 1) == 0)
+		FirstReferenceAcquired();
+}
+
+
 bool
-Referenceable::RemoveReference()
+Referenceable::ReleaseReference()
 {
 	bool unreferenced = (atomic_add(&fReferenceCount, -1) == 1);
-	if (fDeleteWhenUnreferenced && unreferenced)
-		delete this;
+	if (unreferenced)
+		LastReferenceReleased();
 	return unreferenced;
+}
+
+
+void
+Referenceable::FirstReferenceAcquired()
+{
+}
+
+
+void
+Referenceable::LastReferenceReleased()
+{
+	if (fDeleteWhenUnreferenced)
+		delete this;
 }

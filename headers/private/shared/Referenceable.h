@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _REFERENCEABLE_H
@@ -15,20 +15,45 @@ class Referenceable {
 public:
 								Referenceable(
 									bool deleteWhenUnreferenced = true);
+										// TODO: The parameter is deprecated.
+										// Override LastReferenceReleased()
+										// instead!
 	virtual						~Referenceable();
 
-			void				AddReference()
-									{ atomic_add(&fReferenceCount, 1); }
-
-			bool				RemoveReference();	// returns true after last
+			void				AcquireReference();
+			bool				ReleaseReference();
+									// returns true after last
 
 			int32				CountReferences() const
 									{ return fReferenceCount; }
+
+			// deprecate aliases
+	inline	void				AddReference();
+	inline	bool				RemoveReference();
+
+protected:
+	virtual	void				FirstReferenceAcquired();
+	virtual	void				LastReferenceReleased();
 
 protected:
 			vint32				fReferenceCount;
 			bool				fDeleteWhenUnreferenced;
 };
+
+
+void
+Referenceable::AddReference()
+{
+	AcquireReference();
+}
+
+
+bool
+Referenceable::RemoveReference()
+{
+	return ReleaseReference();
+}
+
 
 // Reference
 template<typename Type = BPrivate::Referenceable>
