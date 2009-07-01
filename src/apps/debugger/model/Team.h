@@ -28,6 +28,7 @@ enum {
 };
 
 
+class LocatableFile;
 class TeamDebugInfo;
 
 
@@ -58,8 +59,8 @@ public:
 			Thread*				ThreadByID(thread_id threadID) const;
 			const ThreadList&	Threads() const;
 
-			void				AddImage(Image* image);
 			status_t			AddImage(const ImageInfo& imageInfo,
+									LocatableFile* imageFile,
 									Image** _image = NULL);
 			void				RemoveImage(Image* image);
 			bool				RemoveImage(image_id imageID);

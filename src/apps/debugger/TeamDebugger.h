@@ -18,6 +18,7 @@
 
 
 class DebuggerInterface;
+class FileManager;
 class TeamDebugInfo;
 class TeamDebugModel;
 
@@ -65,6 +66,11 @@ private:
 									const ::Team::ThreadEvent& event);
 
 private:
+	struct ImageHandler;
+	struct ImageHandlerHashDefinition;
+	typedef OpenHashTable<ImageHandlerHashDefinition> ImageHandlerTable;
+
+private:
 	static	status_t			_DebugEventListenerEntry(void* data);
 			status_t			_DebugEventListener();
 
@@ -79,13 +85,16 @@ private:
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
 
+			void				_HandleImageFileChanged(image_id imageID);
+
 			void				_HandleSetUserBreakpoint(target_addr_t address,
 									bool enabled);
 			void				_HandleClearUserBreakpoint(
 									target_addr_t address);
 
-
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
+
+			status_t			_AddImage(const ImageInfo& imageInfo);
 
 			void				_NotifyUser(const char* title,
 									const char* text,...);
@@ -97,8 +106,10 @@ private:
 			team_id				fTeamID;
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock
+			ImageHandlerTable*	fImageHandlers;
 			DebuggerInterface*	fDebuggerInterface;
 			TeamDebugInfo*		fTeamDebugInfo;
+			FileManager*		fFileManager;
 			Worker*				fWorker;
 			BreakpointManager*	fBreakpointManager;
 			thread_id			fDebugEventListener;

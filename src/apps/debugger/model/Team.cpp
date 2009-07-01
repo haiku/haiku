@@ -123,18 +123,11 @@ Team::Threads() const
 }
 
 
-void
-Team::AddImage(Image* image)
-{
-	fImages.Add(image);
-	_NotifyImageAdded(image);
-}
-
-
 status_t
-Team::AddImage(const ImageInfo& imageInfo, Image** _image)
+Team::AddImage(const ImageInfo& imageInfo, LocatableFile* imageFile,
+	Image** _image)
 {
-	Image* image = new(std::nothrow) Image(this, imageInfo);
+	Image* image = new(std::nothrow) Image(this, imageInfo, imageFile);
 	if (image == NULL)
 		return B_NO_MEMORY;
 
@@ -144,7 +137,8 @@ Team::AddImage(const ImageInfo& imageInfo, Image** _image)
 		return error;
 	}
 
-	AddImage(image);
+	fImages.Add(image);
+	_NotifyImageAdded(image);
 
 	if (_image != NULL)
 		*_image = image;

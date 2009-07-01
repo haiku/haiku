@@ -11,9 +11,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
@@ -68,6 +70,12 @@ Application Debugger :
 	# elf
 	ElfFile.cpp
 
+	# files
+	FileManager.cpp
+	LocatableDirectory.cpp
+	LocatableEntry.cpp
+	LocatableFile.cpp
+
 	# gui/team_window
 	ImageFunctionsView.cpp
 	ImageListView.cpp
@@ -95,6 +103,9 @@ Application Debugger :
 
 	# types
 	TargetAddressRangeList.cpp
+
+	# util
+	StringUtils.cpp
 
 	:
 	<nogrist>Debugger_demangler.o

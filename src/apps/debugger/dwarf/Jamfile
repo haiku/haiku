@@ -9,6 +9,7 @@ UsePrivateSystemHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) elf ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) types ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) util ] ;
 
 
 MergeObject Debugger_dwarf.o

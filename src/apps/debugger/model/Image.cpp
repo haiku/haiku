@@ -6,23 +6,29 @@
 #include "Image.h"
 
 #include "ImageDebugInfo.h"
+#include "LocatableFile.h"
 #include "Team.h"
 
 
-Image::Image(Team* team,const ImageInfo& imageInfo)
+Image::Image(Team* team,const ImageInfo& imageInfo, LocatableFile* imageFile)
 	:
 	fTeam(team),
 	fInfo(imageInfo),
+	fImageFile(imageFile),
 	fDebugInfo(NULL),
 	fDebugInfoState(IMAGE_DEBUG_INFO_NOT_LOADED)
 {
+	if (fImageFile != NULL)
+		fImageFile->AcquireReference();
 }
 
 
 Image::~Image()
 {
 	if (fDebugInfo != NULL)
-		fDebugInfo->RemoveReference();
+		fDebugInfo->ReleaseReference();
+	if (fImageFile != NULL)
+		fImageFile->ReleaseReference();
 }
 
 

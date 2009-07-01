@@ -253,7 +253,7 @@ LoadImageDebugInfoJob::Do()
 	// create the debug info
 	ImageDebugInfo* debugInfo;
 	status_t error = fImage->GetTeam()->DebugInfo()->LoadImageDebugInfo(
-		imageInfo, debugInfo);
+		imageInfo, fImage->ImageFile(), debugInfo);
 
 	// set the result
 	locker.Lock();

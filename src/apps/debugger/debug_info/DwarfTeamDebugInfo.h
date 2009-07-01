@@ -21,6 +21,7 @@ public:
 			status_t			Init();
 
 	virtual	status_t			CreateImageDebugInfo(const ImageInfo& imageInfo,
+									LocatableFile* imageFile,
 									SpecificImageDebugInfo*& _imageDebugInfo);
 
 private:

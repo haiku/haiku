@@ -22,12 +22,14 @@ enum image_debug_info_state {
 
 
 class ImageDebugInfo;
+class LocatableFile;
 class Team;
 
 
 class Image : public Referenceable, public DoublyLinkedListLinkImpl<Image> {
 public:
-								Image(Team* team, const ImageInfo& imageInfo);
+								Image(Team* team, const ImageInfo& imageInfo,
+									LocatableFile* imageFile);
 								~Image();
 
 			status_t			Init();
@@ -37,6 +39,7 @@ public:
 			image_id			ID() const			{ return fInfo.ImageID(); }
 			const char*			Name() const		{ return fInfo.Name(); }
 			const ImageInfo&	Info() const		{ return fInfo; }
+			LocatableFile*		ImageFile() const	{ return fImageFile; }
 
 			bool				ContainsAddress(target_addr_t address) const;
 
@@ -50,6 +53,7 @@ public:
 private:
 			Team*				fTeam;
 			ImageInfo			fInfo;
+			LocatableFile*		fImageFile;
 			// mutable
 			ImageDebugInfo*		fDebugInfo;
 			image_debug_info_state fDebugInfoState;

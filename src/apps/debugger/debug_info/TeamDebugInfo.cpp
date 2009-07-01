@@ -67,7 +67,7 @@ TeamDebugInfo::Init()
 
 status_t
 TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
-	ImageDebugInfo*& _imageDebugInfo)
+	LocatableFile* imageFile, ImageDebugInfo*& _imageDebugInfo)
 {
 	ImageDebugInfo* imageDebugInfo = new(std::nothrow) ImageDebugInfo(
 		imageInfo);
@@ -79,7 +79,7 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 			= fSpecificInfos.ItemAt(i); i++) {
 		SpecificImageDebugInfo* specificImageInfo;
 		status_t error = specificTeamInfo->CreateImageDebugInfo(imageInfo,
-			specificImageInfo);
+			imageFile, specificImageInfo);
 		if (error == B_OK) {
 			if (!imageDebugInfo->AddSpecificInfo(specificImageInfo)) {
 				delete specificImageInfo;

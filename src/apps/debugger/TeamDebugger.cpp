@@ -20,11 +20,92 @@
 #include "BreakpointManager.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "FileManager.h"
 #include "Jobs.h"
+#include "LocatableFile.h"
 #include "MessageCodes.h"
 #include "Statement.h"
 #include "TeamDebugInfo.h"
 #include "TeamDebugModel.h"
+
+// #pragma mark - ImageHandler
+
+
+struct TeamDebugger::ImageHandler : public Referenceable,
+		public HashTableLink<ImageHandler>, private LocatableFile::Listener {
+public:
+	ImageHandler(TeamDebugger* teamDebugger, Image* image)
+		:
+		fTeamDebugger(teamDebugger),
+		fImage(image)
+	{
+		fImage->AcquireReference();
+		if (fImage->ImageFile() != NULL)
+			fImage->ImageFile()->AddListener(this);
+	}
+
+	~ImageHandler()
+	{
+		if (fImage->ImageFile() != NULL)
+			fImage->ImageFile()->RemoveListener(this);
+		fImage->ReleaseReference();
+	}
+
+	Image* GetImage() const
+	{
+		return fImage;
+	}
+
+	image_id ImageID() const
+	{
+		return fImage->ID();
+	}
+
+private:
+	// LocatableFile::Listener
+	virtual void LocatableFileChanged(LocatableFile* file)
+	{
+		BMessage message(MSG_IMAGE_FILE_CHANGED);
+		message.AddInt32("image", fImage->ID());
+		fTeamDebugger->PostMessage(&message);
+	}
+
+private:
+	TeamDebugger*	fTeamDebugger;
+	Image*			fImage;
+};
+
+
+// #pragma mark - ImageHandlerHashDefinition
+
+
+struct TeamDebugger::ImageHandlerHashDefinition {
+	typedef image_id		KeyType;
+	typedef	ImageHandler	ValueType;
+
+	size_t HashKey(image_id key) const
+	{
+		return (size_t)key;
+	}
+
+	size_t Hash(const ImageHandler* value) const
+	{
+		return HashKey(value->ImageID());
+	}
+
+	bool Compare(image_id key, const ImageHandler* value) const
+	{
+		return value->ImageID() == key;
+	}
+
+	HashTableLink<ImageHandler>* GetLink(ImageHandler* value) const
+	{
+		return value;
+	}
+};
+
+
+// #pragma mark - TeamDebugger
 
 
 TeamDebugger::TeamDebugger(Listener* listener)
@@ -34,7 +115,9 @@ TeamDebugger::TeamDebugger(Listener* listener)
 	fTeam(NULL),
 	fDebugModel(NULL),
 	fTeamID(-1),
+	fImageHandlers(NULL),
 	fDebuggerInterface(NULL),
+	fFileManager(NULL),
 	fWorker(NULL),
 	fBreakpointManager(NULL),
 	fDebugEventListener(-1),
@@ -73,15 +156,25 @@ TeamDebugger::~TeamDebugger()
 	ThreadHandler* threadHandler = fThreadHandlers.Clear(true);
 	while (threadHandler != NULL) {
 		ThreadHandler* next = threadHandler->fNext;
-		threadHandler->RemoveReference();
+		threadHandler->ReleaseReference();
 		threadHandler = next;
 	}
+
+	ImageHandler* imageHandler = fImageHandlers->Clear(true);
+	while (imageHandler != NULL) {
+		ImageHandler* next = imageHandler->fNext;
+		imageHandler->ReleaseReference();
+		imageHandler = next;
+	}
+
+	delete fImageHandlers;
 
 	delete fBreakpointManager;
 	delete fDebuggerInterface;
 	delete fWorker;
 	delete fDebugModel;
 	delete fTeam;
+	delete fFileManager;
 
 	fListener->TeamDebuggerQuit(this);
 }
@@ -90,6 +183,9 @@ TeamDebugger::~TeamDebugger()
 status_t
 TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 {
+	bool targetIsLocal = true;
+		// TODO: Support non-local targets!
+
 	fTeamID = teamID;
 
 	// create debugger interface
@@ -98,6 +194,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	status_t error = fDebuggerInterface->Init();
+	if (error != B_OK)
+		return error;
+
+	// create file manager
+	fFileManager = new(std::nothrow) FileManager;
+	if (fFileManager == NULL)
+		return B_NO_MEMORY;
+
+	error = fFileManager->Init(targetIsLocal);
 	if (error != B_OK)
 		return error;
 
@@ -134,6 +239,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// init thread handler table
 	error = fThreadHandlers.Init();
+	if (error != B_OK)
+		return error;
+
+	// create image handler table
+	fImageHandlers = new(std::nothrow) ImageHandlerTable;
+	if (fImageHandlers == NULL)
+		return B_NO_MEMORY;
+
+	error = fImageHandlers->Init();
 	if (error != B_OK)
 		return error;
 
@@ -198,7 +312,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		BObjectList<ImageInfo> imageInfos(20, true);
 		status_t error = fDebuggerInterface->GetImageInfos(imageInfos);
 		for (int32 i = 0; ImageInfo* info = imageInfos.ItemAt(i); i++) {
-			error = fTeam->AddImage(*info);
+			error = _AddImage(*info);
 			if (error != B_OK)
 				return error;
 		}
@@ -317,6 +431,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 				handler->HandleStackTraceChanged();
 				handler->RemoveReference();
 			}
+			break;
+		}
+
+		case MSG_IMAGE_FILE_CHANGED:
+		{
+			int32 imageID;
+			if (message->FindInt32("image", &imageID) != B_OK)
+				break;
+
+			_HandleImageFileChanged(imageID);
 			break;
 		}
 
@@ -663,7 +787,7 @@ bool
 TeamDebugger::_HandleImageCreated(ImageCreatedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
-	fTeam->AddImage(event->GetImageInfo());
+	_AddImage(event->GetImageInfo());
 	return false;
 }
 
@@ -673,7 +797,23 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
 	fTeam->RemoveImage(event->GetImageInfo().ImageID());
+
+	ImageHandler* imageHandler = fImageHandlers->Lookup(
+		event->GetImageInfo().ImageID());
+	if (imageHandler != NULL) {
+		fImageHandlers->Remove(imageHandler);
+		imageHandler->ReleaseReference();
+	}
+
 	return false;
+}
+
+
+void
+TeamDebugger::_HandleImageFileChanged(image_id imageID)
+{
+printf("TeamDebugger::_HandleImageFileChanged(%ld)\n", imageID);
+// TODO: Reload the debug info!
 }
 
 
@@ -707,6 +847,27 @@ TeamDebugger::_GetThreadHandler(thread_id threadID)
 	if (handler != NULL)
 		handler->AddReference();
 	return handler;
+}
+
+
+status_t
+TeamDebugger::_AddImage(const ImageInfo& imageInfo)
+{
+	LocatableFile* file = NULL;
+	if (strchr(imageInfo.Name(), '/') != NULL)
+		file = fFileManager->GetTargetFile(imageInfo.Name());
+	Reference<LocatableFile> imageFileReference(file, true);
+
+	Image* image;
+	status_t error = fTeam->AddImage(imageInfo, file, &image);
+	if (error != B_OK)
+		return error;
+
+	ImageHandler* imageHandler = new(std::nothrow) ImageHandler(this, image);
+	if (imageHandler != NULL)
+		fImageHandlers->Insert(imageHandler);
+
+	return B_OK;
 }
 
 

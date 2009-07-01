@@ -9,6 +9,7 @@
 
 
 class ImageInfo;
+class LocatableFile;
 class SpecificImageDebugInfo;
 
 
@@ -17,6 +18,7 @@ public:
 	virtual						~SpecificTeamDebugInfo();
 
 	virtual	status_t			CreateImageDebugInfo(const ImageInfo& imageInfo,
+									LocatableFile* imageFile,
 									SpecificImageDebugInfo*& _imageDebugInfo)
 										= 0;
 };

@@ -15,6 +15,7 @@ class Architecture;
 class DebuggerInterface;
 class ImageDebugInfo;
 class ImageInfo;
+class LocatableFile;
 class SpecificTeamDebugInfo;
 
 
@@ -28,6 +29,7 @@ public:
 			status_t			Init();
 
 			status_t			LoadImageDebugInfo(const ImageInfo& imageInfo,
+									LocatableFile* imageFile,
 									ImageDebugInfo*& _imageDebugInfo);
 
 private:

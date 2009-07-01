@@ -11,6 +11,7 @@
 
 #include "DwarfImageDebugInfo.h"
 #include "DwarfManager.h"
+#include "LocatableFile.h"
 
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture)
@@ -44,15 +45,16 @@ DwarfTeamDebugInfo::Init()
 
 status_t
 DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
-	SpecificImageDebugInfo*& _imageDebugInfo)
+	LocatableFile* imageFile, SpecificImageDebugInfo*& _imageDebugInfo)
 {
-	// We only want images that belong to shared objects.
-	if (strchr(imageInfo.Name(), '/') == NULL)
+	// We only like images whose file we can play with.
+	BString filePath;
+	if (imageFile == NULL || !imageFile->GetLocatedPath(filePath))
 		return B_ENTRY_NOT_FOUND;
 
 	// try to load the DWARF file
 	DwarfFile* file;
-	status_t error = fManager->LoadFile(imageInfo.Name(), file);
+	status_t error = fManager->LoadFile(filePath, file);
 	if (error == B_OK)
 		error = fManager->FinishLoading();
 	if (error != B_OK)
