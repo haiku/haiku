@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons media plugins avcodec ;
+SubDir HAIKU_TOP src add-ons media plugins ffmpeg ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -31,7 +31,7 @@ Addon ffmpeg :
 	libz.a
 ;
 
-SubInclude HAIKU_TOP src add-ons media plugins avcodec libavcodec ;
-SubInclude HAIKU_TOP src add-ons media plugins avcodec libavformat ;
-SubInclude HAIKU_TOP src add-ons media plugins avcodec libavutil ;
-SubInclude HAIKU_TOP src add-ons media plugins avcodec libswscale ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavformat ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libswscale ;

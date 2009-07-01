@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons media plugins avcodec libavutil ;
+SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)

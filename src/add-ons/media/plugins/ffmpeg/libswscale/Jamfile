@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons media plugins avcodec libswscale ;
+SubDir HAIKU_TOP src add-ons media plugins ffmpeg libswscale ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;

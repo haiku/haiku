@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons media plugins avcodec libavcodec x86 ;
+SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavcodec x86 ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ../.. ] ;

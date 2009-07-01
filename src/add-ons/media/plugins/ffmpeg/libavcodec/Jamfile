@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons media plugins avcodec libavcodec ;
+SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
@@ -310,5 +310,6 @@ StaticLibrary libavcodec.a :
 	zmbv.c
 ;
 
-SubInclude HAIKU_TOP src add-ons media plugins avcodec libavcodec $(TARGET_ARCH) ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec
+	$(TARGET_ARCH) ;
 
