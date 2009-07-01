@@ -1,6 +1,6 @@
 /* program the secondary DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-6/2009
+   Rudolf Cornelissen 12/2003-7/2009
 */
 
 #define MODULE_BIT 0x00001000
@@ -225,7 +225,7 @@ static void nv_dac2_dump_pix_pll(void)
 
 	if (si->ps.ext_pll) {
 		dividers2 = DAC2R(PIXPLLC2);
-		if (dividers2 & 0x8000000) {
+		if (dividers2 & 0x80000000) {
 			/* the extended PLL part is enabled */
 			m2 = (dividers2 & 0x000000ff);
 			n2 = (dividers2 & 0x0000ff00) >> 8;
