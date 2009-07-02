@@ -1,11 +1,11 @@
-/* Kernel specific structures and functions
- *
- * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OS_H
 #define _OS_H
 
+//! Kernel specific structures and functions
 
 #include <stdarg.h>
 
@@ -17,7 +17,6 @@
 extern "C" {
 #endif
 
-/*-------------------------------------------------------------*/
 /* System constants */
 
 #define B_OS_NAME_LENGTH	32
@@ -37,7 +36,7 @@ enum {
 										| B_TIMEOUT_REAL_TIME_BASE
 };
 
-/*-------------------------------------------------------------*/
+
 /* Types */
 
 typedef int32 area_id;
@@ -47,7 +46,6 @@ typedef int32 team_id;
 typedef int32 thread_id;
 
 
-/*-------------------------------------------------------------*/
 /* Areas */
 
 typedef struct area_info {
@@ -82,28 +80,28 @@ typedef struct area_info {
 #define B_READ_AREA				1
 #define B_WRITE_AREA			2
 
-extern area_id	create_area(const char *name, void **startAddress, uint32 addressSpec,
-					size_t size, uint32 lock, uint32 protection);
-extern area_id	clone_area(const char *name, void **destAddress, uint32 addressSpec,
-					uint32 protection, area_id source);
-extern area_id	find_area(const char *name);
-extern area_id	area_for(void *address);
-extern status_t	delete_area(area_id id);
-extern status_t	resize_area(area_id id, size_t newSize);
-extern status_t	set_area_protection(area_id id, uint32 newProtection);
+extern area_id		create_area(const char *name, void **startAddress,
+						uint32 addressSpec, size_t size, uint32 lock,
+						uint32 protection);
+extern area_id		clone_area(const char *name, void **destAddress,
+						uint32 addressSpec, uint32 protection, area_id source);
+extern area_id		find_area(const char *name);
+extern area_id		area_for(void *address);
+extern status_t		delete_area(area_id id);
+extern status_t		resize_area(area_id id, size_t newSize);
+extern status_t		set_area_protection(area_id id, uint32 newProtection);
 
 /* system private, use macros instead */
-extern status_t	_get_area_info(area_id id, area_info *areaInfo, size_t size);
-extern status_t	_get_next_area_info(team_id team, int32 *cookie,
-					area_info *areaInfo, size_t size);
+extern status_t		_get_area_info(area_id id, area_info *areaInfo, size_t size);
+extern status_t		_get_next_area_info(team_id team, int32 *cookie,
+						area_info *areaInfo, size_t size);
 
 #define get_area_info(id, areaInfo) \
-			_get_area_info((id), (areaInfo),sizeof(*(areaInfo)))
+	_get_area_info((id), (areaInfo),sizeof(*(areaInfo)))
 #define get_next_area_info(team, cookie, areaInfo) \
-			_get_next_area_info((team), (cookie), (areaInfo), sizeof(*(areaInfo)))
+	_get_next_area_info((team), (cookie), (areaInfo), sizeof(*(areaInfo)))
 
 
-/*-------------------------------------------------------------*/
 /* Ports */
 
 typedef struct port_info {
@@ -115,31 +113,35 @@ typedef struct port_info {
 	int32		total_count;	/* total # msgs read so far */
 } port_info;
 
-extern port_id	create_port(int32 capacity, const char *name);
-extern port_id	find_port(const char *name);
-extern ssize_t	read_port(port_id port, int32 *code, void *buffer, size_t bufferSize);
-extern ssize_t	read_port_etc(port_id port, int32 *code, void *buffer, size_t bufferSize,
-					uint32 flags, bigtime_t timeout);
-extern status_t write_port(port_id port, int32 code, const void *buffer, size_t bufferSize);
-extern status_t write_port_etc(port_id port, int32 code, const void *buffer,
-					size_t bufferSize, uint32 flags, bigtime_t timeout);
-extern status_t close_port(port_id port);
-extern status_t delete_port(port_id port);
+extern port_id		create_port(int32 capacity, const char *name);
+extern port_id		find_port(const char *name);
+extern ssize_t		read_port(port_id port, int32 *code, void *buffer,
+						size_t bufferSize);
+extern ssize_t		read_port_etc(port_id port, int32 *code, void *buffer,
+						size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		write_port(port_id port, int32 code, const void *buffer,
+						size_t bufferSize);
+extern status_t		write_port_etc(port_id port, int32 code, const void *buffer,
+						size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		close_port(port_id port);
+extern status_t		delete_port(port_id port);
 
-extern ssize_t	port_buffer_size(port_id port);
-extern ssize_t	port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout);
-extern ssize_t	port_count(port_id port);
-extern status_t set_port_owner(port_id port, team_id team);
+extern ssize_t		port_buffer_size(port_id port);
+extern ssize_t		port_buffer_size_etc(port_id port, uint32 flags,
+						bigtime_t timeout);
+extern ssize_t		port_count(port_id port);
+extern status_t		set_port_owner(port_id port, team_id team);
 
 /* system private, use the macros instead */
-extern status_t _get_port_info(port_id port, port_info *portInfo, size_t portInfoSize);
-extern status_t _get_next_port_info(team_id team, int32 *cookie, port_info *portInfo,
-					size_t portInfoSize);
+extern status_t		_get_port_info(port_id port, port_info *portInfo,
+						size_t portInfoSize);
+extern status_t		_get_next_port_info(team_id team, int32 *cookie,
+						port_info *portInfo, size_t portInfoSize);
 
 #define get_port_info(port, info) \
-			_get_port_info((port), (info), sizeof(*(info)))
+	_get_port_info((port), (info), sizeof(*(info)))
 #define get_next_port_info(team, cookie, info) \
-			_get_next_port_info((team), (cookie), (info), sizeof(*(info)))
+	_get_next_port_info((team), (cookie), (info), sizeof(*(info)))
 
 
 /* WARNING: The following is Haiku experimental API. It might be removed or
@@ -153,15 +155,14 @@ typedef struct port_message_info {
 } port_message_info;
 
 /* similar to port_buffer_size_etc(), but returns (more) info */
-extern status_t _get_port_message_info_etc(port_id port,
-					port_message_info *info, size_t infoSize, uint32 flags,
-					bigtime_t timeout);
+extern status_t		_get_port_message_info_etc(port_id port,
+						port_message_info *info, size_t infoSize, uint32 flags,
+						bigtime_t timeout);
 
 #define get_port_message_info_etc(port, info, flags, timeout) \
-			_get_port_message_info_etc((port), (info), sizeof(*(info)), flags, \
-					timeout)
+	_get_port_message_info_etc((port), (info), sizeof(*(info)), flags, timeout)
 
-/*-------------------------------------------------------------*/
+
 /* Semaphores */
 
 typedef struct sem_info {
@@ -191,33 +192,34 @@ enum {
 										   threads waiting */
 };
 
-extern sem_id	create_sem(int32 count, const char *name);
-extern status_t	delete_sem(sem_id id);
-extern status_t	acquire_sem(sem_id id);
-extern status_t	acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
-extern status_t	release_sem(sem_id id);
-extern status_t	release_sem_etc(sem_id id, int32 count, uint32 flags);
-/* ToDo: the following two calls are not part of the BeOS API, and might be
+extern sem_id		create_sem(int32 count, const char *name);
+extern status_t		delete_sem(sem_id id);
+extern status_t		acquire_sem(sem_id id);
+extern status_t		acquire_sem_etc(sem_id id, int32 count, uint32 flags,
+						bigtime_t timeout);
+extern status_t		release_sem(sem_id id);
+extern status_t		release_sem_etc(sem_id id, int32 count, uint32 flags);
+/* TODO: the following two calls are not part of the BeOS API, and might be
    changed or even removed for the final release of Haiku R1 */
-extern status_t	switch_sem(sem_id semToBeReleased, sem_id id);
-extern status_t	switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
-					uint32 flags, bigtime_t timeout);
-extern status_t	get_sem_count(sem_id id, int32 *threadCount);
-extern status_t	set_sem_owner(sem_id id, team_id team);
+extern status_t		switch_sem(sem_id semToBeReleased, sem_id id);
+extern status_t		switch_sem_etc(sem_id semToBeReleased, sem_id id,
+						int32 count, uint32 flags, bigtime_t timeout);
+extern status_t		get_sem_count(sem_id id, int32 *threadCount);
+extern status_t		set_sem_owner(sem_id id, team_id team);
 
 /* system private, use the macros instead */
-extern status_t	_get_sem_info(sem_id id, struct sem_info *info, size_t infoSize);
-extern status_t	_get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info,
-					size_t infoSize);
+extern status_t		_get_sem_info(sem_id id, struct sem_info *info,
+						size_t infoSize);
+extern status_t		_get_next_sem_info(team_id team, int32 *cookie,
+						struct sem_info *info, size_t infoSize);
 
 #define get_sem_info(sem, info) \
-			_get_sem_info((sem), (info), sizeof(*(info)))
+	_get_sem_info((sem), (info), sizeof(*(info)))
 
 #define get_next_sem_info(team, cookie, info) \
-			_get_next_sem_info((team), (cookie), (info), sizeof(*(info)))
+	_get_next_sem_info((team), (cookie), (info), sizeof(*(info)))
 
 
-/*-------------------------------------------------------------*/
 /* Teams */
 
 typedef struct {
@@ -236,18 +238,19 @@ typedef struct {
 #define B_CURRENT_TEAM	0
 #define B_SYSTEM_TEAM	1
 
-extern status_t kill_team(team_id team);
+extern status_t		kill_team(team_id team);
 	/* see also: send_signal() */
 
 /* system private, use macros instead */
-extern status_t _get_team_info(team_id id, team_info *info, size_t size);
-extern status_t _get_next_team_info(int32 *cookie, team_info *info, size_t size);
+extern status_t		_get_team_info(team_id id, team_info *info, size_t size);
+extern status_t		_get_next_team_info(int32 *cookie, team_info *info,
+						size_t size);
 
 #define get_team_info(id, info) \
-			_get_team_info((id), (info), sizeof(*(info)))
+	_get_team_info((id), (info), sizeof(*(info)))
 
 #define get_next_team_info(cookie, info) \
-			_get_next_team_info((cookie), (info), sizeof(*(info)))
+	_get_next_team_info((cookie), (info), sizeof(*(info)))
 
 /* team usage info */
 
@@ -263,12 +266,13 @@ enum {
 };
 
 /* system private, use macros instead */
-extern status_t	_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
+extern status_t		_get_team_usage_info(team_id team, int32 who,
+						team_usage_info *info, size_t size);
 
 #define get_team_usage_info(team, who, info) \
-			_get_team_usage_info((team), (who), (info), sizeof(*(info)))
+	_get_team_usage_info((team), (who), (info), sizeof(*(info)))
 
-/*-------------------------------------------------------------*/
+
 /* Threads */
 
 typedef enum {
@@ -311,7 +315,8 @@ typedef status_t (*thread_func)(void *);
 #define thread_entry thread_func
 	/* thread_entry is for backward compatibility only! Use thread_func */
 
-extern thread_id	spawn_thread(thread_func, const char *name, int32 priority, void *data);
+extern thread_id	spawn_thread(thread_func, const char *name, int32 priority,
+						void *data);
 extern status_t		kill_thread(thread_id thread);
 extern status_t		resume_thread(thread_id thread);
 extern status_t		suspend_thread(thread_id thread);
@@ -319,14 +324,16 @@ extern status_t		suspend_thread(thread_id thread);
 extern status_t		rename_thread(thread_id thread, const char *newName);
 extern status_t		set_thread_priority (thread_id thread, int32 newPriority);
 extern void			exit_thread(status_t status);
-extern status_t		wait_for_thread (thread_id thread, status_t *threadReturnValue);
+extern status_t		wait_for_thread (thread_id thread,
+						status_t *threadReturnValue);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
 extern thread_id 	find_thread(const char *name);
 
 extern status_t		send_data(thread_id thread, int32 code, const void *buffer,
 						size_t bufferSize);
-extern int32		receive_data(thread_id *sender, void *buffer, size_t bufferSize);
+extern int32		receive_data(thread_id *sender, void *buffer,
+						size_t bufferSize);
 extern bool			has_data(thread_id thread);
 
 extern status_t		snooze(bigtime_t amount);
@@ -339,23 +346,22 @@ extern status_t		_get_next_thread_info(team_id team, int32 *cookie,
 						thread_info *info, size_t size);
 
 #define get_thread_info(id, info) \
-			_get_thread_info((id), (info), sizeof(*(info)))
+	_get_thread_info((id), (info), sizeof(*(info)))
 
 #define get_next_thread_info(team, cookie, info) \
-			_get_next_thread_info((team), (cookie), (info), sizeof(*(info)))
+	_get_next_thread_info((team), (cookie), (info), sizeof(*(info)))
 
 
-/*-------------------------------------------------------------*/
 /* Time */
 
 extern uint32		real_time_clock(void);
-extern void			set_real_time_clock(uint32 secs_since_jan1_1970);
+extern void			set_real_time_clock(uint32 secsSinceJan1st1970);
 extern bigtime_t	real_time_clock_usecs(void);
-extern status_t		set_timezone(char *timezone);
-extern bigtime_t	system_time(void);     /* time since booting in microseconds */
+extern status_t		set_timezone(const char *timezone);
+extern bigtime_t	system_time(void);
+						/* time since booting in microseconds */
 
 
-/*-------------------------------------------------------------*/
 /* Alarm */
 
 enum {
@@ -364,13 +370,12 @@ enum {
 	B_PERIODIC_ALARM			/* "when" specifies the period */
 };
 
-extern bigtime_t set_alarm(bigtime_t when, uint32 flags);
+extern bigtime_t	set_alarm(bigtime_t when, uint32 flags);
 
 
-/*-------------------------------------------------------------*/
 /* Debugger */
 
-extern void	debugger(const char *message);
+extern void			debugger(const char *message);
 
 /*
    calling this function with a non-zero value will cause your thread
@@ -380,18 +385,17 @@ extern void	debugger(const char *message);
 
    to re-enable the default debugger pass a zero.
 */
-extern int disable_debugger(int state);
+extern int			disable_debugger(int state);
 
 /* TODO: Remove. Temporary debug helper. */
-extern void debug_printf(const char *format, ...)
-	__attribute__ ((format (__printf__, 1, 2)));
-extern void debug_vprintf(const char *format, va_list args);
-extern void ktrace_printf(const char *format, ...)
-	__attribute__ ((format (__printf__, 1, 2)));
-extern void ktrace_vprintf(const char *format, va_list args);
+extern void			debug_printf(const char *format, ...)
+						__attribute__ ((format (__printf__, 1, 2)));
+extern void			debug_vprintf(const char *format, va_list args);
+extern void			ktrace_printf(const char *format, ...)
+						__attribute__ ((format (__printf__, 1, 2)));
+extern void			ktrace_vprintf(const char *format, va_list args);
 
 
-/*-------------------------------------------------------------*/
 /* System information */
 
 #if __INTEL__
@@ -409,10 +413,8 @@ extern void ktrace_vprintf(const char *format, va_list args);
 #	define B_MAX_CPU_COUNT	1
 #endif
 
-#define OBOS_CPU_TYPES
-
 typedef enum cpu_types {
-	/* ToDo: add latest models */
+	/* TODO: add latest models */
 
 	/* Motorola/IBM */
 	B_CPU_PPC_UNKNOWN					= 0,
@@ -641,7 +643,8 @@ typedef union {
 	} regs;
 } cpuid_info;
 
-extern status_t get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 cpuNum);
+extern status_t		get_cpuid(cpuid_info *info, uint32 eaxRegister,
+						uint32 cpuNum);
 #endif
 
 
@@ -672,20 +675,20 @@ typedef struct {
 typedef int32 machine_id[2];	/* unique machine ID */
 
 typedef struct {
-	machine_id		id;							/* unique machine ID */
-	bigtime_t		boot_time;					/* time of boot (usecs since 1/1/1970) */
+	machine_id		id;					/* unique machine ID */
+	bigtime_t		boot_time;			/* time of boot (usecs since 1/1/1970) */
 
-	int32			cpu_count;					/* number of cpus */
-	enum cpu_types	cpu_type;					/* type of cpu */
-	int32			cpu_revision;				/* revision # of cpu */
+	int32			cpu_count;			/* number of cpus */
+	enum cpu_types	cpu_type;			/* type of cpu */
+	int32			cpu_revision;		/* revision # of cpu */
 	cpu_info		cpu_infos[B_MAX_CPU_COUNT];	/* info about individual cpus */
-	int64			cpu_clock_speed;	 		/* processor clock speed (Hz) */
-	int64			bus_clock_speed;			/* bus clock speed (Hz) */
-	enum platform_types platform_type;          /* type of machine we're on */
+	int64			cpu_clock_speed;	/* processor clock speed (Hz) */
+	int64			bus_clock_speed;	/* bus clock speed (Hz) */
+	enum platform_types platform_type;	/* type of machine we're on */
 
-	int32			max_pages;					/* total # physical pages */
-	int32			used_pages;					/* # physical pages in use */
-	int32			page_faults;				/* # of page faults */
+	int32			max_pages;			/* total # physical pages */
+	int32			used_pages;			/* # physical pages in use */
+	int32			page_faults;		/* # of page faults */
 	int32			max_sems;
 	int32			used_sems;
 	int32			max_ports;
@@ -695,27 +698,27 @@ typedef struct {
 	int32			max_teams;
 	int32			used_teams;
 
-	char			kernel_name[B_FILE_NAME_LENGTH];		/* name of kernel */
-	char			kernel_build_date[B_OS_NAME_LENGTH];	/* date kernel built */
-	char			kernel_build_time[B_OS_NAME_LENGTH];	/* time kernel built */
-	int64			kernel_version;             			/* version of this kernel */
+	char			kernel_name[B_FILE_NAME_LENGTH];
+	char			kernel_build_date[B_OS_NAME_LENGTH];
+	char			kernel_build_time[B_OS_NAME_LENGTH];
+	int64			kernel_version;
 
-	bigtime_t		_busy_wait_time;			/* reserved for whatever */
+	bigtime_t		_busy_wait_time;	/* reserved for whatever */
 	int32			cached_pages;
 
-	uint32			abi;						/* the system API */
+	uint32			abi;				/* the system API */
 
-	int32			pad[2];   	               	/* just in case... */
+	int32			pad[2];
 } system_info;
 
 /* system private, use macro instead */
-extern status_t _get_system_info(system_info *info, size_t size);
+extern status_t		_get_system_info(system_info *info, size_t size);
 
 #define get_system_info(info) \
-			_get_system_info((info), sizeof(*(info)))
+	_get_system_info((info), sizeof(*(info)))
 
-extern int32	is_computer_on(void);
-extern double	is_computer_on_fire(void);
+extern int32		is_computer_on(void);
+extern double		is_computer_on_fire(void);
 
 
 /* WARNING: Experimental API! */
@@ -758,9 +761,9 @@ typedef struct object_wait_info {
    and B_EVENT_DISCONNECTED don't need to be specified. They will always be
    reported, when they occur. */
 
-extern ssize_t 	wait_for_objects(object_wait_info* infos, int numInfos);
-extern ssize_t 	wait_for_objects_etc(object_wait_info* infos, int numInfos,
-					uint32 flags, bigtime_t timeout);
+extern ssize_t		wait_for_objects(object_wait_info* infos, int numInfos);
+extern ssize_t		wait_for_objects_etc(object_wait_info* infos, int numInfos,
+						uint32 flags, bigtime_t timeout);
 
 
 #ifdef __cplusplus

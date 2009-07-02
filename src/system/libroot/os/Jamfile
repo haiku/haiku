@@ -24,7 +24,7 @@ MergeObject os_main.o :
 	system_info.c
 	team.c
 	thread.c
-	time.c
+	time.cpp
 	syscalls.S
 	wait_for_objects.cpp
 
