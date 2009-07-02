@@ -85,31 +85,31 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 	printf("### \n");
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"Incomming %s event\n", 
-		GetEvent(event->ecode));
+		BluetoothEvent(event->ecode));
 
 	// Events here might have not been initated by us
 	// TODO: ML mark as handled pass a reply by parameter and reply in common
 	switch (event->ecode) {
 		case HCI_EVENT_HARDWARE_ERROR:
-			//HardwareError(event);
+			HardwareError((struct hci_ev_hardware_error*)(event+1));
 			return;
-		break;
+
 		case HCI_EVENT_CONN_REQUEST:
 			ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL);
 			return;
-		break;
+
 		case HCI_EVENT_CONN_COMPLETE:
-			// should belong to a request?  can be sporadic or initiated by us¿?...
+			// should belong to a request? can be sporadic or initiated by us¿?...
 			ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL);
 			return;
-		break;
+
 		case HCI_EVENT_PIN_CODE_REQ:
 			PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
 			return;
-		break;
+
 		default:
 			// lets go on
-		break;
+			break;
 	}
 
 	BMessage*	request = NULL;
@@ -272,7 +272,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) for %s\n",__FUNCTION__,
-		event->ncmd,GetCommand(opcodeExpected));
+		event->ncmd, BluetoothCommandOpcode(opcodeExpected));
 
 	switch ((uint16)opcodeExpected) {
 
@@ -455,7 +455,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 			reply.AddInt8("status", *(uint8*)(event+1));
 
 			Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s status %x\n",
-						__FUNCTION__,GetCommand(opcodeExpected), *(uint8*)(event+1));
+				__FUNCTION__, BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event+1));
 
 			request->SendReply(&reply);
 
@@ -482,7 +482,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 	request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s(%d) %x for %s\n",__FUNCTION__,
-		event->ncmd, event->status, GetCommand(event->opcode));
+		event->ncmd, event->status, BluetoothCommandOpcode(event->opcode));
 
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
@@ -584,14 +584,15 @@ LocalDeviceImpl::RemoteNameRequestComplete(
 	BMessage reply;
 
 	if (remotename->status == BT_OK) {
-
 		reply.AddString("friendlyname", (const char*)remotename->remote_name );
-		Output::Instance()->Post("Positive reply for remote friendly name\n", BLACKBOARD_KIT);
-	} else {
-		Output::Instance()->Post("Negative reply for remote friendly name\n", BLACKBOARD_KIT);
 	}
 
 	reply.AddInt8("status", remotename->status);
+
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s with status %s\n",
+		BluetoothEvent(HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE), 
+		bdaddrUtils::ToString(remotename->bdaddr), BluetoothError(remotename->status));
+
 	printf("Sending reply ... %ld\n", request->SendReply(&reply));
 	reply.PrintToStream();
 
@@ -721,6 +722,16 @@ LocalDeviceImpl::MaxSlotChange(struct hci_ev_max_slot_change *event,
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: Handle=%#x, max slots=%d\n",
 		 __FUNCTION__, event->handle, event->lmp_max_slots);
+}
+
+
+void
+LocalDeviceImpl::HardwareError(struct hci_ev_hardware_error *event)
+{
+
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: hardware code=%#x\n",
+		 __FUNCTION__, event->hardware_code);
+
 }
 
 

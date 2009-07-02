@@ -596,7 +596,7 @@ const char* bluetoothEvents[] = {
 	"Synchronous Connection Changed",
 	"Reserved",
 	"Extended Inquiry Result",
-	"Encryption Key Refersh Complete",
+	"Encryption Key Refresh Complete",
 	"Io Capability Request",
 	"Io Capability Response",
 	"User Confirmation Request",
@@ -678,51 +678,51 @@ const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 
 
 const char* 
-GetHciVersion(uint16 ver)
+BluetoothHciVersion(uint16 ver)
 {
 	return hciVersion[ver];
 }
 
 
 const char* 
-GetLmpVersion(uint16 ver)
+BluetoothLmpVersion(uint16 ver)
 {
 	return lmpVersion[ver];
 }
 
 
 const char* 
-GetCommand(uint16 command)
+BluetoothCommandOpcode(uint16 opcode)
 {
 	
-	// TODO: BT implementations beyond 2.1
+	// NOTE: BT implementations beyond 2.1
 	// could specify new commands with OCF numbers
 	// beyond the boundaries of the arrays and crash.
 	// But only our stack could issue them so its under
 	// our control.
-	switch (GET_OPCODE_OGF(command)) {
+	switch (GET_OPCODE_OGF(opcode)) {
 		case OGF_LINK_CONTROL:
-			return linkControlCommands[GET_OPCODE_OCF(command)-1];
+			return linkControlCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 
 		case OGF_LINK_POLICY:
-			return linkPolicyCommands[GET_OPCODE_OCF(command)-1];
+			return linkPolicyCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 
 		case OGF_CONTROL_BASEBAND:
-			return controllerBasebandCommands[GET_OPCODE_OCF(command)-1];
+			return controllerBasebandCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 
 		case OGF_INFORMATIONAL_PARAM:
-			return informationalParametersCommands[GET_OPCODE_OCF(command)-1];
+			return informationalParametersCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 
 		case OGF_STATUS_PARAM:
-			return statusParametersCommands[GET_OPCODE_OCF(command)-1];
+			return statusParametersCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 
 		case OGF_TESTING_CMD:
-			return testingCommands[GET_OPCODE_OCF(command)-1];
+			return testingCommands[GET_OPCODE_OCF(opcode)-1];
 			break;
 		case OGF_VENDOR_CMD:
 			return "Vendor specific command";
@@ -736,8 +736,9 @@ GetCommand(uint16 command)
 
 
 const char* 
-GetEvent(uint8 event) {
-	if (event < sizeof(bluetoothEvents)/sizeof(const char*)) {
+BluetoothEvent(uint8 event) {
+	
+	if (event < sizeof(bluetoothEvents) / sizeof(const char*)) {
 		return bluetoothEvents[event-1];
 	} else {
 		return "Event out of Range!";
@@ -746,8 +747,9 @@ GetEvent(uint8 event) {
 
 
 const char* 
-GetManufacturer(uint16 manufacturer) {
-	if (manufacturer < sizeof(bluetoothManufacturers)/sizeof(const char*)) {
+BluetoothManufacturer(uint16 manufacturer) {
+	
+	if (manufacturer < sizeof(bluetoothManufacturers) / sizeof(const char*)) {
 		return bluetoothManufacturers[manufacturer];
 	} else if (manufacturer == 0xFFFF) {
 		return "internal use";
@@ -758,8 +760,9 @@ GetManufacturer(uint16 manufacturer) {
 
 
 const char*
-GetError(uint8 error) {
-	if (error < sizeof(bluetoothErrors)/sizeof(const char*)) {
+BluetoothError(uint8 error) {
+	
+	if (error < sizeof(bluetoothErrors) / sizeof(const char*)) {
 		return bluetoothErrors[error];
 	} else {
 		return "not specified";

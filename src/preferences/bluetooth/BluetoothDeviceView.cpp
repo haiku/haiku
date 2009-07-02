@@ -105,7 +105,7 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		
 		str = "";
 		if (bDevice->GetProperty("hci_version", &value) == B_OK)		
-			str << "HCI ver: " << GetHciVersion(value);
+			str << "HCI ver: " << BluetoothHciVersion(value);
 		if (bDevice->GetProperty("hci_revision", &value) == B_OK)		
 			str << " HCI rev: " << value ;
 		
@@ -113,14 +113,14 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		
 		str = "";
 		if (bDevice->GetProperty("lmp_version", &value) == B_OK)		
-			str << "LMP ver: " << GetLmpVersion(value);
+			str << "LMP ver: " << BluetoothLmpVersion(value);
 		if (bDevice->GetProperty("lmp_subversion", &value) == B_OK)		
 			str << " LMP subver: " << value;
 		fLMPVersionProperties->SetText(str.String());		
 		
 		str = "";	
 		if (bDevice->GetProperty("manufacturer", &value) == B_OK)		
-			str << "Manufacturer: " << GetManufacturer(value);
+			str << "Manufacturer: " << BluetoothManufacturer(value);
 		fManufacturerProperties->SetText(str.String());
 
 		str = "";

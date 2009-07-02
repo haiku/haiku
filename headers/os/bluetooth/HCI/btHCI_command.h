@@ -10,12 +10,6 @@
 
 #define HCI_COMMAND_HDR_SIZE 3
 
-const char* GetCommand(uint16 command);
-const char* GetEvent(uint8 event);
-const char* GetManufacturer(uint16 manufacturer);
-const char* GetHciVersion(uint16 ver);
-const char* GetLmpVersion(uint16 ver);
-
 struct hci_command_header {
 	uint16	opcode;		/* OCF & OGF */
 	uint8	clen;

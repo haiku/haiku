@@ -20,6 +20,13 @@ typedef enum { 	BT_COMMAND = 0,
 				HCI_NUM_PACKET_TYPES
 } bt_packet_t;
 
+const char* BluetoothCommandOpcode(uint16 opcode);
+const char* BluetoothEvent(uint8 event);
+const char* BluetoothManufacturer(uint16 manufacturer);
+const char* BluetoothHciVersion(uint16 ver);
+const char* BluetoothLmpVersion(uint16 ver);
+const char* BluetoothError(uint8 error);
+
 /* packets sizes */
 #define HCI_MAX_ACL_SIZE		1024
 #define HCI_MAX_SCO_SIZE		255

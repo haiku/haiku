@@ -292,7 +292,7 @@ struct hci_ev_sychronous_connection_changed {
 // TODO: Define remaining Bluetooth 2.1 events structures
 #define HCI_EVENT_EXTENDED_INQUIRY_RESULT			0x2F
 
-#define HCI_EVENT_ENCRYPTION_KEY_REFERSH_COMPLETE	0x30
+#define HCI_EVENT_ENCRYPTION_KEY_REFRESH_COMPLETE	0x30
 
 #define HCI_EVENT_IO_CAPABILITY_REQUEST				0x31
 

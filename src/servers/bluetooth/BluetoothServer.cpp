@@ -121,9 +121,8 @@ void BluetoothServer::AppActivated(bool act)
 void BluetoothServer::MessageReceived(BMessage *message)
 {
 	BMessage reply;
-	status_t status = B_WOULD_BLOCK;
-		// mark somehow.. do not reply anything
-	
+	status_t status = B_WOULD_BLOCK; // mark somehow to do not reply anything
+
 	switch(message->what)
 	{
 		case BT_MSG_ADD_DEVICE:
@@ -132,38 +131,50 @@ void BluetoothServer::MessageReceived(BMessage *message)
 			message->FindString("name", &str);
 			BPath path(str.String());
 			Output::Instance()->Postf(BLACKBOARD_GENERAL,
-							"Requested LocalDevice %s\n", str.String());
+				"Requested LocalDevice %s\n", str.String());
 			LocalDeviceImpl* ldi = LocalDeviceImpl::CreateTransportAccessor(&path);
 
 			if (ldi->GetID() >= 0) {
 				fLocalDevicesList.AddItem(ldi);
 				Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
 				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()),
-						"LocalDevice %s id=%x added\n",
-						str.String(), ldi->GetID());
+					"LocalDevice %s id=%x added\n", str.String(), ldi->GetID());
+
 			} else {
 				Output::Instance()->Post("Adding LocalDevice failed\n",
-								 BLACKBOARD_GENERAL);
+					BLACKBOARD_GENERAL);
 			}
 
 			status = B_WOULD_BLOCK;
 			/* TODO: This should be by user request only! */
 			ldi->Launch();
+			break;
 		}
-		break;	
+		
+		case BT_MSG_REMOVE_DEVICE:
+		{
+			LocalDeviceImpl* ldi;
+			message->FindPointer("device", (void**)&ldi);
+			fLocalDevicesList.RemoveItem(ldi);
+			delete ldi;
+			break;
+		}
+		
 		case BT_MSG_COUNT_LOCAL_DEVICES: 
 			status = HandleLocalDevicesCount(message, &reply);
-		break;
+			break;
+
 		case BT_MSG_ACQUIRE_LOCAL_DEVICE:
 			status = HandleAcquireLocalDevice(message, &reply);
-		break;
+			break;
 
 		case BT_MSG_HANDLE_SIMPLE_REQUEST:
 			status = HandleSimpleRequest(message, &reply);
-		break;
+			break;
+
 		case BT_MSG_GET_PROPERTY:
 			status = HandleGetProperty(message, &reply);
-		break;
+			break;
 		
 		/* Handle if the bluetooth preferences is running?? */
 		case B_SOME_APP_LAUNCHED:
@@ -181,7 +192,7 @@ void BluetoothServer::MessageReceived(BMessage *message)
 
 		default:
 			BApplication::MessageReceived(message);
-		break;
+			break;
 	}
 	
 	// Can we reply right now?

@@ -56,6 +56,8 @@ public:
 	void LinkKeyNotify(struct hci_ev_link_key_notify* event, BMessage* request, int32 index);
 	void PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request, int32 index);
 	void MaxSlotChange(struct hci_ev_max_slot_change *event, BMessage *request, int32 index);
+	
+	void HardwareError(struct hci_ev_hardware_error *event);
 
 };
 
