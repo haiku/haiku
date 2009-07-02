@@ -24,9 +24,10 @@
 using BPrivate::B_LOCAL_TIME;
 
 
-TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
-	:	TSectionEdit(frame, name, sections),
-		fLastKeyDownTime(0)
+TTimeEdit::TTimeEdit(BRect frame, const char* name, uint32 sections)
+	:
+	TSectionEdit(frame, name, sections),
+	fLastKeyDownTime(0)
 {
 	InitView();
 	fTime = BTime::CurrentTime(B_LOCAL_TIME);
@@ -51,7 +52,7 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 	int32 section = FocusIndex();
 	if (section < 0 || section > 2)
 		return;
-	
+
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
 		int32 doubleDigi = number + fLastKeyDownInt * 10;
@@ -63,12 +64,12 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 		fLastKeyDownTime = currentTime;
 		fLastKeyDownInt = number;
 	}
-		
+
 	// update display value
 	fHoldValue = number;
-	
+
 	_CheckRange();
-	
+
 	// send message to change time
 	DispatchMessage();
 }
@@ -105,8 +106,8 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 
 	BString text;
 	switch (index) {
-		case 0: 
-		{	// hour
+		case 0:
+			// hour
 			if (value > 12) {
 				if (value < 22)
 					text << "0";
@@ -117,67 +118,65 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 				if (value < 10)
 					text << "0";
 				text << value;
-			}			
-		}	break;
+			}
+			break;
 
 		case 1:
 		case 2:
-		{	// minute
+			// minute
 			// second
 			if (value < 10)
 				text << "0";
 			text << value;
-		}	break;
+			break;
 
 		case 3:
-		{	// am/pm
+			// am/pm
 			value = fTime.Hour();
 			if (value >= 12)
 				text << "PM";
-			else 
+			else
 				text << "AM";
-		}	break;
-		
+			break;
+
 		default:
 			return;
-			break;
 	}
 
 	// calc and center text in section rect
 	float width = be_plain_font->StringWidth(text.String());
-	
-	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0
-		, bounds.Height() / 2.0 -6.0);
-	
+
+	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0,
+		bounds.Height() / 2.0 -6.0);
+
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(text.String(), bounds.LeftBottom() - offset);	
+	DrawString(text.String(), bounds.LeftBottom() - offset);
 }
 
 
 void
-TTimeEdit::DrawSeperator(uint32 index)
+TTimeEdit::DrawSeparator(uint32 index)
 {
 	if (index == 3)
-		return;  
+		return;
 
 	TSection *section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
-	
+
 	if (!section)
 		return;
 
 	BRect bounds = section->Frame();
-	float sepWidth = SeperatorWidth();	
+	float sepWidth = SeparatorWidth();
 
 	char* sep = ":";
 	if (index == 2)
 		sep = "-";
 
 	float width = be_plain_font->StringWidth(sep);
-	BPoint offset(-((sepWidth - width) / 2.0) -1.0
-		, bounds.Height() / 2.0 -6.0);
-	DrawString(sep, bounds.RightBottom() - offset);	
+	BPoint offset(-((sepWidth - width) / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
+	DrawString(sep, bounds.RightBottom() - offset);
 }
 
 
@@ -186,16 +185,16 @@ TTimeEdit::SetSections(BRect area)
 {
 	// by default divide up the sections evenly
 	BRect bounds(area);
-	
-	float sepWidth = SeperatorWidth();
-	
+
+	float sepWidth = SeparatorWidth();
+
 	float sep_2 = ceil(sepWidth / fSectionCount +1);
 	float width = bounds.Width() / fSectionCount -sep_2;
 	bounds.right = bounds.left + (width -sepWidth / fSectionCount);
-		
+
 	for (uint32 idx = 0; idx < fSectionCount; idx++) {
 		fSectionList->AddItem(new TSection(bounds));
-		
+
 		bounds.left = bounds.right + sepWidth;
 		if (idx == fSectionCount -2)
 			bounds.right = area.right -1;
@@ -206,7 +205,7 @@ TTimeEdit::SetSections(BRect area)
 
 
 float
-TTimeEdit::SeperatorWidth() const
+TTimeEdit::SeparatorWidth() const
 {
 	return 10.0f;
 }
@@ -225,7 +224,7 @@ TTimeEdit::SectionFocus(uint32 index)
 void
 TTimeEdit::SetTime(int32 hour, int32 minute, int32 second)
 {
-	if (fTime.Hour() == hour && fTime.Minute() == minute 
+	if (fTime.Hour() == hour && fTime.Minute() == minute
 		&& fTime.Second() == second)
 		return;
 
@@ -239,17 +238,17 @@ TTimeEdit::DoUpPress()
 {
 	if (fFocus == -1)
 		SectionFocus(0);
-	
+
 	// update displayed value
 	fHoldValue += 1;
-	
+
 	_CheckRange();
-	
+
 	// send message to change time
 	DispatchMessage();
 }
 
-		
+
 void
 TTimeEdit::DoDownPress()
 {
@@ -258,27 +257,27 @@ TTimeEdit::DoDownPress()
 
 	// update display value
 	fHoldValue -= 1;
-	
+
 	_CheckRange();
-	
+
 	// send message to change time
 	DispatchMessage();
 }
-		
-		
+
+
 void
 TTimeEdit::BuildDispatch(BMessage *message)
 {
 	const char *fields[3] = { "hour", "minute", "second" };
-	
+
 	message->AddBool("time", true);
-	
+
 	for (int32 index = 0; index < fSectionList->CountItems() -1; ++index) {
 		uint32 data = _SectionValue(index);
-		
+
 		if (fFocus == index)
 			data = fHoldValue;
-		
+
 		message->AddInt32(fields[index], data);
 	}
 }
@@ -290,37 +289,37 @@ TTimeEdit::_CheckRange()
 	int32 value = fHoldValue;
 	switch (fFocus) {
 		case 0:
-		{	// hour
-			if (value > 23) 
+			// hour
+			if (value > 23)
 				value = 0;
-			else if (value < 0) 
+			else if (value < 0)
 				value = 23;
 
 			fTime.SetTime(value, fTime.Minute(), fTime.Second());
-		}	break;
+			break;
 
 		case 1:
-		{	// minute
+			// minute
 			if (value> 59)
 				value = 0;
 			else if (value < 0)
 				value = 59;
 
 			fTime.SetTime(fTime.Hour(), value, fTime.Second());
-		}	break;
+			break;
 
 		case 2:
-		{	// second
+			// second
 			if (value > 59)
 				value = 0;
 			else if (value < 0)
 				value = 59;
 
 			fTime.SetTime(fTime.Hour(), fTime.Minute(), value);
-		}	break;
+			break;
 
 		case 3:
-		{
+			// AM/PM
 			value = fTime.Hour();
 			if (value < 13)
 				value += 12;
@@ -331,7 +330,7 @@ TTimeEdit::_CheckRange()
 
 			// modify hour value to reflect change in am/ pm
 			fTime.SetTime(value, fTime.Minute(), fTime.Second());
-		}	break;
+			break;
 
 		default:
 			return;
@@ -348,22 +347,22 @@ TTimeEdit::_IsValidDoubleDigi(int32 value)
 	bool isInRange = false;
 	switch (fFocus) {
 		case 0:
-		{	// hour
-			if (value <= 23) 
+			// hour
+			if (value <= 23)
 				isInRange = true;
-		}	break;
+			break;
 
 		case 1:
-		{	// minute
+			// minute
 			if (value <= 59)
 				isInRange = true;
-		}	break;
+			break;
 
 		case 2:
-		{	// second
+			// second
 			if (value <= 59)
 				isInRange = true;
-		}	break;
+			break;
 
 		default:
 			return isInRange;
@@ -381,7 +380,7 @@ TTimeEdit::_SectionValue(int32 index) const
 		case 0:
 			value = fTime.Hour();
 			break;
-		
+
 		case 1:
 			value = fTime.Minute();
 			break;
@@ -428,7 +427,7 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 	int32 section = FocusIndex();
 	if (section < 1 || section > 2)
 		return;
-	
+
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
 		int32 doubleDigi = number + fLastKeyDownInt * 10;
@@ -440,7 +439,7 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 		fLastKeyDownTime = currentTime;
 		fLastKeyDownInt = number;
 	}
-	
+
 	// if year add 2000
 	if (section == 2) {
 		int32 oldCentury = int32(fHoldValue / 100) * 100;
@@ -450,9 +449,9 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 	}
 	// update display value
 	fHoldValue = number;
-	
+
 	_CheckRange();
-	
+
 	// send message to change time
 	DispatchMessage();
 }
@@ -496,17 +495,17 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 
 	// calc and center text in section rect
 	float width = StringWidth(text.String());
-	BPoint offset(-(bounds.Width() - width) / 2.0 - 1.0
-		, (bounds.Height() / 2.0 - 6.0));
+	BPoint offset(-(bounds.Width() - width) / 2.0 - 1.0,
+		(bounds.Height() / 2.0 - 6.0));
 
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(text.String(), bounds.LeftBottom() - offset);	
+	DrawString(text.String(), bounds.LeftBottom() - offset);
 }
 
 
 void
-TDateEdit::DrawSeperator(uint32 index)
+TDateEdit::DrawSeparator(uint32 index)
 {
 	if (index == 3)
 		return;
@@ -515,14 +514,14 @@ TDateEdit::DrawSeperator(uint32 index)
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 	BRect bounds = section->Frame();
 
-	float sepWidth = SeperatorWidth();
+	float sepWidth = SeparatorWidth();
 	float width = be_plain_font->StringWidth("/");
 
-	BPoint offset(-(sepWidth / 2.0 - width / 2.0) -1.0
-		, bounds.Height() / 2.0 -6.0);
+	BPoint offset(-(sepWidth / 2.0 - width / 2.0) -1.0,
+		bounds.Height() / 2.0 -6.0);
 
 	SetHighColor(0, 0, 0, 255);
-	DrawString("/", bounds.RightBottom() - offset);	
+	DrawString("/", bounds.RightBottom() - offset);
 }
 
 
@@ -534,7 +533,7 @@ TDateEdit::SetSections(BRect area)
 		fSectionList->AddItem(new TSection(area));
 
 	BRect bounds(area);
-	float sepWidth = SeperatorWidth();
+	float sepWidth = SeparatorWidth();
 
 	// year
 	TSection *section = NULL;
@@ -560,7 +559,7 @@ TDateEdit::SetSections(BRect area)
 
 
 float
-TDateEdit::SeperatorWidth() const
+TDateEdit::SeparatorWidth() const
 {
 	return 10.0f;
 }
@@ -602,7 +601,7 @@ TDateEdit::DoUpPress()
 	DispatchMessage();
 }
 
-		
+
 void
 TDateEdit::DoDownPress()
 {
@@ -617,8 +616,8 @@ TDateEdit::DoDownPress()
 	// send message to change Date
 	DispatchMessage();
 }
-		
-		
+
+
 void
 TDateEdit::BuildDispatch(BMessage *message)
 {
@@ -642,22 +641,21 @@ void
 TDateEdit::_CheckRange()
 {
 	int32 value = fHoldValue;
-	
+
 	switch (fFocus) {
 		case 0:
-		{
-			 // month
+			// month
 			if (value > 12)
 				value = 1;
 			else if (value < 1)
 				value = 12;
 
 			fDate.SetDate(fDate.Year(), value, fDate.Day());
-		}	break;
+			break;
 
 		case 1:
 		{
-			//day
+			// day
 			int32 days = fDate.DaysInMonth();
 			if (value > days)
 				value = 1;
@@ -665,18 +663,18 @@ TDateEdit::_CheckRange()
 				value = days;
 
 			fDate.SetDate(fDate.Year(), fDate.Month(), value);
-		}	break;
+			break;
+		}
 
 		case 2:
-		{
-			//year
+			// year
 			if (value > 2037)
 				value = 2037;
 			else if (value < 1970)
 				value = 1970;
 
 			fDate.SetDate(value, fDate.Month(), fDate.Day());
-		}	break;
+			break;
 
 		default:
 			return;
@@ -694,19 +692,22 @@ TDateEdit::_IsValidDoubleDigi(int32 value)
 	int32 year = 0;
 	switch (fFocus) {
 		case 1:
-		{	// day
-			//day
+		{
+			// day
 			int32 days = fDate.DaysInMonth();
 			if (value <= days)
 				isInRange = true;
-		}	break;
+			break;
+		}
 
 		case 2:
-		{	//year
+		{
+			// year
 			year = int32(fHoldValue / 100) * 100 + value;
 			if (year <= 2037 && year >= 1970)
 				isInRange = true;
-		}	break;
+			break;
+		}
 
 		default:
 			return isInRange;

@@ -30,11 +30,11 @@ class TTimeEdit : public TSectionEdit {
 
 		virtual void	InitView();
 		virtual void	DrawSection(uint32 index, bool isfocus);
-		virtual void	DrawSeperator(uint32 index);
+		virtual void	DrawSeparator(uint32 index);
 
 		virtual void	SetSections(BRect area);
 		virtual void	SectionFocus(uint32 index);
-		virtual float	SeperatorWidth() const;
+		virtual float	SeparatorWidth() const;
 
 		virtual void	DoUpPress();
 		virtual void	DoDownPress();
@@ -63,11 +63,11 @@ class TDateEdit : public TSectionEdit {
 
 		virtual void	InitView();
 		virtual void	DrawSection(uint32 index, bool isfocus);
-		virtual void	DrawSeperator(uint32 index);
+		virtual void	DrawSeparator(uint32 index);
 
 		virtual void	SetSections(BRect area);
 		virtual void	SectionFocus(uint32 index);
-		virtual float	SeperatorWidth() const;
+		virtual float	SeparatorWidth() const;
 
 		virtual void	DoUpPress();
 		virtual void	DoDownPress();
