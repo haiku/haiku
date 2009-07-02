@@ -1,52 +1,53 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Julun <host.haiku@gmx.de>
  */
 
+
 #include "CalendarView.h"
 
+#include <stdlib.h>
 
 #include <Window.h>
 
 
-#include <stdlib.h>
-
-
 namespace BPrivate {
 
-
 namespace {
-	float
-	FontHeight(const BView *view)
-	{
-		if (!view)
-			return 0.0;
 
-		BFont font;
-		view->GetFont(&font);
-		font_height fheight;
-		font.GetHeight(&fheight);
-		return ceilf(fheight.ascent + fheight.descent + fheight.leading);
-	}
+float
+FontHeight(const BView *view)
+{
+	if (!view)
+		return 0.0;
+
+	BFont font;
+	view->GetFont(&font);
+	font_height fheight;
+	font.GetHeight(&fheight);
+	return ceilf(fheight.ascent + fheight.descent + fheight.leading);
 }
+
+}	// private namespace
 
 
 BCalendarView::BCalendarView(BRect frame, const char *name,
 		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags),
-	  BInvoker(),
-	  fSelectionMessage(NULL),
-	  fDay(0),
-	  fYear(0),
-	  fMonth(0),
-	  fFocusChanged(false),
-	  fSelectionChanged(false),
-	  fWeekStart(B_WEEK_START_SUNDAY),
-	  fDayNameHeaderVisible(true),
-	  fWeekNumberHeaderVisible(true)
+	:
+	BView(frame, name, resizeMask, flags),
+	BInvoker(),
+	fSelectionMessage(NULL),
+	fDay(0),
+	fYear(0),
+	fMonth(0),
+	fFocusChanged(false),
+	fSelectionChanged(false),
+	fWeekStart(B_WEEK_START_SUNDAY),
+	fDayNameHeaderVisible(true),
+	fWeekNumberHeaderVisible(true)
 {
 	_InitObject();
 }
@@ -54,17 +55,18 @@ BCalendarView::BCalendarView(BRect frame, const char *name,
 
 BCalendarView::BCalendarView(BRect frame, const char *name, week_start start,
 		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags),
-	  BInvoker(),
-	  fSelectionMessage(NULL),
-	  fDay(0),
-	  fYear(0),
-	  fMonth(0),
-	  fFocusChanged(false),
-	  fSelectionChanged(false),
-	  fWeekStart(start),
-	  fDayNameHeaderVisible(true),
-	  fWeekNumberHeaderVisible(true)
+	:
+	BView(frame, name, resizeMask, flags),
+	BInvoker(),
+	fSelectionMessage(NULL),
+	fDay(0),
+	fYear(0),
+	fMonth(0),
+	fFocusChanged(false),
+	fSelectionChanged(false),
+	fWeekStart(start),
+	fDayNameHeaderVisible(true),
+	fWeekNumberHeaderVisible(true)
 {
 	_InitObject();
 }
@@ -77,17 +79,18 @@ BCalendarView::~BCalendarView()
 
 
 BCalendarView::BCalendarView(BMessage *archive)
-	: BView(archive),
-	  BInvoker(),
-	  fSelectionMessage(NULL),
-	  fDay(0),
-	  fYear(0),
-	  fMonth(0),
-	  fFocusChanged(false),
-	  fSelectionChanged(false),
-	  fWeekStart(B_WEEK_START_SUNDAY),
-	  fDayNameHeaderVisible(true),
-	  fWeekNumberHeaderVisible(true)
+	:
+	BView(archive),
+	BInvoker(),
+	fSelectionMessage(NULL),
+	fDay(0),
+	fYear(0),
+	fMonth(0),
+	fFocusChanged(false),
+	fSelectionChanged(false),
+	fWeekStart(B_WEEK_START_SUNDAY),
+	fDayNameHeaderVisible(true),
+	fWeekNumberHeaderVisible(true)
 {
 	if (archive->HasMessage("_invokeMsg")) {
 		BMessage *invokationMessage = new BMessage;
@@ -104,8 +107,8 @@ BCalendarView::BCalendarView(BMessage *archive)
 	if (archive->FindInt32("_day", &fDay) != B_OK
 		|| archive->FindInt32("_month", &fMonth) != B_OK
 		|| archive->FindInt32("_year", &fYear) != B_OK) {
-			BDate date = BDate::CurrentDate(B_LOCAL_TIME);
-			date.GetDate(&fYear, &fMonth, &fDay);
+		BDate date = BDate::CurrentDate(B_LOCAL_TIME);
+		date.GetDate(&fYear, &fMonth, &fDay);
 	}
 
 	int32 start;
@@ -335,6 +338,7 @@ BCalendarView::MakeFocus(bool state)
 
 	BView::MakeFocus(state);
 
+	// TODO: solve this better
 	fFocusChanged = true;
 	Draw(_RectOfDay(fFocusedDay));
 	fFocusChanged = false;
