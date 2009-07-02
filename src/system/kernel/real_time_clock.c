@@ -297,18 +297,18 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	if (!IS_USER_ADDRESS(filename)
-		|| filename == NULL
-		|| user_strlcpy(sTimezoneFilename, filename,
-				B_PATH_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	if (filename != NULL && length > 0) {
+		if (!IS_USER_ADDRESS(filename)
+			|| user_strlcpy(sTimezoneFilename, filename, B_PATH_NAME_LENGTH) < 0)
+			return B_BAD_ADDRESS;
+	}
 
 	sIsGMT = isGMT;
 
 	if (wasGMT != sIsGMT) {
 		arch_rtc_set_system_time_offset(sRealTimeData,
-			arch_rtc_get_system_time_offset(sRealTimeData) + (((sIsGMT) ? 1 : -1)
-				* sTimezoneOffset));
+			arch_rtc_get_system_time_offset(sRealTimeData)
+				+ (sIsGMT ? 1 : -1) * sTimezoneOffset);
 	}
 
 	return B_OK;
@@ -316,12 +316,19 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 
 
 status_t
-_user_get_tzfilename(char *filename, size_t length, bool *_isGMT)
+_user_get_tzfilename(char *userFilename, size_t length, bool *_userIsGMT)
 {
-	if (filename == NULL || _isGMT == NULL
-		|| !IS_USER_ADDRESS(filename) || !IS_USER_ADDRESS(_isGMT)
-		|| user_strlcpy(filename, sTimezoneFilename, length) < B_OK
-		|| user_memcpy(_isGMT, &sIsGMT, sizeof(bool)) < B_OK)
+	if ((userFilename == NULL || length == 0) && _userIsGMT == NULL)
+		return B_BAD_VALUE;
+
+	if (userFilename != NULL
+		&& (!IS_USER_ADDRESS(userFilename)
+			|| user_strlcpy(userFilename, sTimezoneFilename, length) < 0))
+		return B_BAD_ADDRESS;
+
+	if (_userIsGMT != NULL
+		&& (!IS_USER_ADDRESS(_userIsGMT)
+			|| user_memcpy(_userIsGMT, &sIsGMT, sizeof(bool)) != B_OK))
 		return B_BAD_ADDRESS;
 
 	return B_OK;
