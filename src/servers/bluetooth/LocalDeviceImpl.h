@@ -39,12 +39,12 @@ public:
     /* Events handling */	
     void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index);
 	void CommandStatus(struct hci_ev_cmd_status* event, BMessage* request, int32 index);
-	
+
 	// Inquiry
 	void InquiryResult(uint8* numberOfResponses, BMessage* request);
 	void InquiryComplete(uint8* status, BMessage* request);
 	void RemoteNameRequestComplete(struct hci_ev_remote_name_request_complete_reply* remotename, BMessage* request);
-	
+
 	// Connection
 	void ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request);
 	void ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request);	
@@ -55,9 +55,9 @@ public:
 	void RoleChange(struct hci_ev_role_change* event, BMessage* request, int32 index);
 	void LinkKeyNotify(struct hci_ev_link_key_notify* event, BMessage* request, int32 index);
 	void PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request, int32 index);
-	void MaxSlotChange(struct hci_ev_max_slot_change *event, BMessage *request, int32 index);
-	
-	void HardwareError(struct hci_ev_hardware_error *event);
+	void MaxSlotChange(struct hci_ev_max_slot_change* event, BMessage* request, int32 index);
+
+	void HardwareError(struct hci_ev_hardware_error* event);
 
 };
 

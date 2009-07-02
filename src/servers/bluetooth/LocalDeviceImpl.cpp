@@ -690,7 +690,7 @@ LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* req
 
 
 void
-LocalDeviceImpl::RoleChange(hci_ev_role_change *event, BMessage* request, int32 index)
+LocalDeviceImpl::RoleChange(hci_ev_role_change* event, BMessage* request, int32 index)
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: Address %s role=%d status=%d\n",
 		 __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->role, event->status);
@@ -726,7 +726,7 @@ LocalDeviceImpl::MaxSlotChange(struct hci_ev_max_slot_change *event,
 
 
 void
-LocalDeviceImpl::HardwareError(struct hci_ev_hardware_error *event)
+LocalDeviceImpl::HardwareError(struct hci_ev_hardware_error* event)
 {
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: hardware code=%#x\n",
