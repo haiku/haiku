@@ -168,9 +168,6 @@ TimeZoneView::MessageReceived(BMessage *message)
 		case H_SET_TIME_ZONE:
 		{
 			SetTimeZone();
-			BMessage msg(*message);
-			msg.what = kRTCUpdate;
-			Window()->PostMessage(&msg);
 			((TTimeWindow*)Window())->SetRevertStatus();
 			break;
 		}
@@ -437,12 +434,13 @@ TimeZoneView::SetPreview()
 		SetTimeZone(item->Path());
 
 		// calc preview time
-		time_t current = time(0);
-		struct tm *ltime = localtime(&current);
+		time_t current = time(NULL);
+		struct tm localTime;
+		localtime_r(&current, &localTime);
 
 		// update prview
 		fPreview->SetText(item->Text());
-		fPreview->SetTime(ltime->tm_hour, ltime->tm_min);
+		fPreview->SetTime(localTime.tm_hour, localTime.tm_min);
 
 		// set timezone back to current
 		SetTimeZone(fCurrentZone.Path());
@@ -457,11 +455,12 @@ TimeZoneView::SetCurrent(const char *text)
 {
 	SetTimeZone(fCurrentZone.Path());
 
-	time_t current = time(0);
-	struct tm *ltime = localtime(&current);
+	time_t current = time(NULL);
+	struct tm localTime;
+	localtime_r(&current, &localTime);
 
 	fCurrent->SetText(text);
-	fCurrent->SetTime(ltime->tm_hour, ltime->tm_min);
+	fCurrent->SetTime(localTime.tm_hour, localTime.tm_min);
 }
 
 
@@ -504,22 +503,21 @@ TimeZoneView::SetTimeZone()
 	SetTimeZone(target.Path());
 
 	// update display
-	time_t current = time(0);
-	struct tm *ltime = localtime(&current);
+	time_t current = time(NULL);
+	struct tm localTime;
+	localtime_r(&current, &localTime);
 
-	char tza[B_PATH_NAME_LENGTH];
-	sprintf(tza, "%s", target.Path());
-	set_timezone(tza);
+	set_timezone(target.Path());
 
 	// disable button
 	fSetZone->SetEnabled(false);
 
-	time_t newtime = mktime(ltime);
-	ltime = localtime(&newtime);
-	stime(&newtime);
+	time_t newTime = mktime(&localTime);
+	localtime_r(&newTime, &localTime);
+	stime(&newTime);
 
-	fHour = ltime->tm_hour;
-	fMinute = ltime->tm_min;
+	fHour = localTime.tm_hour;
+	fMinute = localTime.tm_min;
 	fCurrentZone.SetTo(target.Path());
 	SetCurrent(((TZoneItem *)fCityList->ItemAt(selection))->Text());
 }

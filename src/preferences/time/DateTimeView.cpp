@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -107,10 +107,10 @@ void
 DateTimeView::MessageReceived(BMessage *message)
 {
 	int32 change;
-	switch(message->what) {
+	switch (message->what) {
 		case B_OBSERVER_NOTICE_CHANGE:
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
-			switch(change) {
+			switch (change) {
 				case H_TM_CHANGED:
 					_UpdateDateTime(message);
 					break;
@@ -119,7 +119,7 @@ DateTimeView::MessageReceived(BMessage *message)
 					BView::MessageReceived(message);
 					break;
 			}
-		break;
+			break;
 
 		case kDayChanged:
 		{
@@ -144,6 +144,7 @@ DateTimeView::MessageReceived(BMessage *message)
 				fTimeEdit->MakeFocus(false);
 			fClock->ChangeTimeFinished();
 			break;
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -170,7 +171,7 @@ void
 DateTimeView::_Revert()
 {
 	// Set the clock and calendar as they were at launch time +
-	// time ellapsed since application launch.
+	// time elapsed since application launch.
 
 	fUseGmtTime = fOldUseGmtTime;
 	_UpdateGmtSettings();
@@ -293,8 +294,7 @@ DateTimeView::_ReadRTCSettings()
 			if (strncmp(buffer, "gmt", 3) == 0)
 				fUseGmtTime = true;
 		}
-	} else
-		_UpdateGmtSettings();
+	}
 }
 
 
@@ -302,7 +302,7 @@ void
 DateTimeView::_WriteRTCSettings()
 {
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return;
 
 	path.Append("RTC_time_settings");
@@ -323,19 +323,20 @@ DateTimeView::_UpdateGmtSettings()
 	_WriteRTCSettings();
 
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append("timezone");
+		BEntry entry(path.Path(), true);
+		if (entry.Exists()) {
+			entry.GetPath(&path);
 
-	path.Append("timezone");
-	BEntry entry(path.Path(), true);
+			// take the existing timezone and set it's gmt use
+			_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH, fUseGmtTime);
+			return;
+		}
+	}
 
-	if (!entry.Exists())
-		return;
-
-	entry.GetPath(&path);
-
-	// take the existing timezone and set it's gmt use
-	_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH, fUseGmtTime);
+	// Only update GMT
+	_kern_set_tzfilename(NULL, 0, fUseGmtTime);
 }
 
 
@@ -347,8 +348,7 @@ DateTimeView::_UpdateDateTime(BMessage *message)
 	int32 year;
 	if (message->FindInt32("month", &month) == B_OK
 		&& message->FindInt32("day", &day) == B_OK
-		&& message->FindInt32("year", &year) == B_OK)
-	{
+		&& message->FindInt32("year", &year) == B_OK) {
 		fDateEdit->SetDate(year, month, day);
 		fCalendarView->SetDate(year, month, day);
 	}
@@ -358,8 +358,7 @@ DateTimeView::_UpdateDateTime(BMessage *message)
 	int32 second;
 	if (message->FindInt32("hour", &hour) == B_OK
 		&& message->FindInt32("minute", &minute) == B_OK
-		&& message->FindInt32("second", &second) == B_OK)
-	{
+		&& message->FindInt32("second", &second) == B_OK) {
 		fClock->SetTime(hour, minute, second);
 		fTimeEdit->SetTime(hour, minute, second);
 	}
