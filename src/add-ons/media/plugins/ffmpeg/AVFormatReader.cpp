@@ -13,13 +13,10 @@
 
 #include <ByteOrder.h>
 #include <DataIO.h>
-//#include <InterfaceDefs.h>
+#include <MediaDefs.h>
 #include <MediaFormats.h>
 
-extern "C" {
-	#include "avformat.h"
-	#include "libavutil/avstring.h"
-}
+#include "gfx_util.h"
 
 //#include "RawFormats.h"
 
@@ -36,11 +33,18 @@ extern "C" {
 #define ERROR(a...) fprintf(stderr, a)
 
 
+static const size_t kIOBufferSize = 64 * 1024;
+	// TODO: This could depend on the BMediaFile creation flags, IIRC,
+	// the allow to specify a buffering mode.
+
+
 AVFormatReader::AVFormatReader()
 	:
-	fContext(NULL)
+	fContext(NULL),
+	fIOBuffer(NULL)
 {
 	TRACE("AVFormatReader::AVFormatReader\n");
+	memset(&fFormatParameters, 0, sizeof(fFormatParameters));
 }
 
 
@@ -48,7 +52,8 @@ AVFormatReader::~AVFormatReader()
 {
 	TRACE("AVFormatReader::~AVFormatReader\n");
 
-	// TODO: Deallocate fContext
+	av_free(fContext);
+	free(fIOBuffer);
 }
 
 
@@ -68,16 +73,17 @@ AVFormatReader::Sniff(int32* streamCount)
 {
 	TRACE("AVFormatReader::Sniff\n");
 
-	size_t bufferSize = 64 * 1024;
+	free(fIOBuffer);
+	fIOBuffer = (uint8*)malloc(kIOBufferSize);
+
 	size_t probeSize = 1024;
-	uint8 buffer[bufferSize];
 	AVProbeData probeData;
 	probeData.filename = "";
-	probeData.buf = buffer;
+	probeData.buf = fIOBuffer;
 	probeData.buf_size = probeSize;
 
 	// Read a bit of the input...
-	if (_ReadPacket(Source(), buffer, probeSize) != (ssize_t)probeSize)
+	if (_ReadPacket(Source(), fIOBuffer, probeSize) != (ssize_t)probeSize)
 		return B_IO_ERROR;
 	// ...and seek back to the beginning of the file.
 	_Seek(Source(), 0, SEEK_SET);
@@ -93,20 +99,15 @@ AVFormatReader::Sniff(int32* streamCount)
 	TRACE("AVFormatReader::Sniff() - av_probe_input_format(): %s\n",
 		inputFormat->name);
 
-	ByteIOContext ioContext;
-
-	// Init io module for input
-	if (init_put_byte(&ioContext, buffer, bufferSize, 0, Source(),
+	// Init I/O context with buffer and hook functions
+	if (init_put_byte(&fIOContext, fIOBuffer, kIOBufferSize, 0, Source(),
 		_ReadPacket, 0, _Seek) != 0) {
 		TRACE("AVFormatReader::Sniff() - init_put_byte() failed!\n");
 		return B_ERROR;
 	}
 
-	AVFormatParameters formatParameters;
-	memset(&formatParameters, 0, sizeof(formatParameters));
-
-	if (av_open_input_stream(&fContext, &ioContext, "", inputFormat,
-		&formatParameters) < 0) {
+	if (av_open_input_stream(&fContext, &fIOContext, "", inputFormat,
+		&fFormatParameters) < 0) {
 		TRACE("AVFormatReader::Sniff() - av_open_input_stream() failed!\n");
 		return B_ERROR;
 	}
@@ -122,7 +123,11 @@ AVFormatReader::Sniff(int32* streamCount)
 	// Dump information about stream onto standard error
 	dump_format(fContext, 0, "", 0);
 
-	return B_ERROR;
+	if (streamCount != NULL)
+		*streamCount = fContext->nb_streams;
+
+//	return B_OK;
+return B_ERROR; // For now...
 }
 
 
@@ -131,16 +136,41 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 {
 	TRACE("AVFormatReader::GetFileFormatInfo\n");
 
+	if (fContext == NULL || fContext->iformat == NULL) {
+		TRACE("  no context or AVInputFormat!\n");
+		return;
+	}
+
 	mff->capabilities = media_file_format::B_READABLE
 		| media_file_format::B_KNOWS_ENCODED_VIDEO
 		| media_file_format::B_KNOWS_ENCODED_AUDIO
 		| media_file_format::B_IMPERFECTLY_SEEKABLE;
 	mff->family = B_MISC_FORMAT_FAMILY;
 	mff->version = 100;
-	strcpy(mff->mime_type, "video/mpg");
-	strcpy(mff->file_extension, "mpg");
-	strcpy(mff->short_name,  "MPEG");
-	strcpy(mff->pretty_name, "MPEG (Motion Picture Experts Group)");
+	strcpy(mff->mime_type, "");
+		// TODO: Would be nice to be able to provide this, maybe by extending
+		// the FFmpeg code itself (all demuxers, see AVInputFormat struct).
+
+	if (fContext->iformat->extensions != NULL)
+		strcpy(mff->file_extension, fContext->iformat->extensions);
+	else {
+		TRACE("  no file extensions for AVInputFormat.\n");
+		strcpy(mff->file_extension, "");
+	}
+
+	if (fContext->iformat->name != NULL)
+		strcpy(mff->short_name,  fContext->iformat->name);
+	else {
+		TRACE("  no short name for AVInputFormat.\n");
+		strcpy(mff->short_name,  "");
+	}
+
+	if (fContext->iformat->long_name != NULL)
+		strcpy(mff->pretty_name, fContext->iformat->long_name);
+	else {
+		TRACE("  no long name for AVInputFormat.\n");
+		strcpy(mff->pretty_name, "");
+	}
 }
 
 
@@ -148,18 +178,132 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 
 
 status_t
-AVFormatReader::AllocateCookie(int32 streamNumber, void** _cookie)
+AVFormatReader::AllocateCookie(int32 streamIndex, void** _cookie)
 {
-	TRACE("AVFormatReader::AllocateCookie(%ld)\n", streamNumber);
+	TRACE("AVFormatReader::AllocateCookie(%ld)\n", streamIndex);
 
-	return B_ERROR;
+	if (fContext == NULL)
+		return B_NO_INIT;
+
+	if (streamIndex < 0 || streamIndex >= (int32)fContext->nb_streams)
+		return B_BAD_INDEX;
+
+	if (_cookie == NULL)
+		return B_BAD_VALUE;
+
+	StreamCookie* cookie = new(std::nothrow) StreamCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	// Get a pointer to the codec context for the stream at sreamIndex.
+	AVCodecContext* codecContext = fContext->streams[streamIndex]->codec;
+	AVCodec* codec = avcodec_find_decoder(codecContext->codec_id);
+	if (codec == NULL || avcodec_open(codecContext, codec) < 0) {
+		delete cookie;
+		return B_ERROR;
+	}
+
+//    codecContext->get_buffer = _GetBuffer;
+//    codecContext->release_buffer = _ReleaseBuffer;
+
+	AVStream* stream = fContext->streams[streamIndex];
+
+	cookie->stream = stream;
+	cookie->codecContext = codecContext;
+	cookie->codec = codec;
+
+	media_format* format = &cookie->format;
+	memset(format, 0, sizeof(media_format));
+
+	BMediaFormats formats;
+	media_format_description description;
+
+	if (stream->codec->codec_type == CODEC_TYPE_VIDEO) {
+		// TODO: Fix this up! Maybe do this for AVI demuxer and MOV
+		// demuxer and use B_MISC_FORMAT_FAMILY for all the others?
+		description.family = B_AVI_FORMAT_FAMILY;
+		description.u.avi.codec = codecContext->codec_tag;
+		TRACE("  fourcc '%.4s'\n", (char*)&codecContext->codec_tag);
+
+		if (formats.GetFormatFor(description, format) < B_OK)
+			format->type = B_MEDIA_ENCODED_VIDEO;
+
+//		format->require_flags = 
+//		format->deny_flags = 
+
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		*(uint32*)format->user_data = codecContext->codec_tag;
+		format->user_data[4] = 0;
+
+		// TODO: We don't actually know the bitrate for this stream,
+		// only the total bitrate!
+		format->u.encoded_video.avg_bit_rate = codecContext->bit_rate; 
+		format->u.encoded_video.max_bit_rate = codecContext->bit_rate
+			+ codecContext->bit_rate_tolerance;
+
+		format->u.encoded_video.encoding = media_encoded_video_format::B_ANY;
+
+		format->u.encoded_video.frame_size = 1;
+//		format->u.encoded_video.forward_history = 0;
+//		format->u.encoded_video.backward_history = 0;
+
+		format->u.encoded_video.output.field_rate
+			= av_q2d(stream->r_frame_rate);
+		format->u.encoded_video.output.interlace = 1;
+			// TODO: Fix up for interlaced video
+		format->u.encoded_video.output.first_active = 0;
+		format->u.encoded_video.output.last_active = 0;
+			// TODO: Maybe libavformat actually provides that info somewhere...
+		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+
+		// TODO: Implement aspect ratio for real
+		format->u.encoded_video.output.pixel_width_aspect
+			= 1;//stream->sample_aspect_ratio.num;
+		format->u.encoded_video.output.pixel_height_aspect
+			= 1;//stream->sample_aspect_ratio.den;
+
+		TRACE("  pixel width/height aspect: %d/%d or %.4f\n",
+			stream->sample_aspect_ratio.num,
+			stream->sample_aspect_ratio.den,
+			av_q2d(stream->sample_aspect_ratio));
+
+		format->u.encoded_video.output.display.format
+			= pixfmt_to_colorspace(codecContext->pix_fmt);
+		format->u.encoded_video.output.display.line_width = codecContext->width;
+		format->u.encoded_video.output.display.line_count = codecContext->height;
+		format->u.encoded_video.output.display.bytes_per_row = 0;
+		format->u.encoded_video.output.display.pixel_offset = 0;
+		format->u.encoded_video.output.display.line_offset = 0;
+		format->u.encoded_video.output.display.flags = 0; // TODO
+
+		uint32 encoding = format->Encoding();
+		TRACE("  encoding '%.4s'\n", (char*)&encoding);
+
+	} else if (stream->codec->codec_type == CODEC_TYPE_AUDIO) {
+		format->type = B_MEDIA_ENCODED_AUDIO;
+//		format->require_flags = 
+//		format->deny_flags = 
+
+//		format->u.encoded_audio.
+	} else {
+		return B_NOT_SUPPORTED;
+	}
+
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
 status_t
 AVFormatReader::FreeCookie(void *_cookie)
 {
-	return B_ERROR;
+	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
+
+	avcodec_close(cookie->codecContext);
+	delete cookie;
+
+	return B_OK;
 }
 
 
@@ -171,7 +315,35 @@ AVFormatReader::GetStreamInfo(void* _cookie, int64* frameCount,
 	bigtime_t* duration, media_format* format, const void** infoBuffer,
 	size_t* infoSize)
 {
-	return B_ERROR;
+	TRACE("AVFormatReader::GetStreamInfo()\n");
+
+	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
+	AVStream* stream = cookie->stream;
+
+	double frameRate = av_q2d(stream->r_frame_rate);
+
+	TRACE("  frameRate: %.4f\n", frameRate);
+
+	*duration = (bigtime_t)(1000000LL * stream->duration
+		* av_q2d(stream->time_base));
+
+	TRACE("  duration: %lld\n", *duration);
+
+	*frameCount = stream->nb_frames;
+	if (*frameCount == 0) {
+		// TODO: Calculate from duration and frame rate!
+		*frameCount = (int64)(*duration * frameRate / 1000000);
+	}
+
+	TRACE("  frameCount: %lld\n", *frameCount);
+
+	*format = cookie->format;
+
+	// TODO: Possibly use stream->metadata for this:
+	*infoBuffer = 0;
+	*infoSize = 0;
+
+	return B_OK;
 }
 
 

@@ -36,6 +36,8 @@ gfx_convert_func resolve_colorspace(color_space cs, PixelFormat pixelFormat);
 
 const char *pixfmt_to_string(int p);
 
+color_space pixfmt_to_colorspace(int p);
+
 void dump_ffframe(AVFrame *frame, const char *name);
 
 #endif

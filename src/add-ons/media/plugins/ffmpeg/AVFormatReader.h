@@ -8,8 +8,9 @@
 
 #include "ReaderPlugin.h"
 
-
-struct AVFormatContext;
+extern "C" {
+	#include "avformat.h"
+}
 
 
 class AVFormatReader : public Reader {
@@ -49,6 +50,20 @@ private:
 									off_t offset, int whence);
 
 			AVFormatContext*	fContext;
+			AVFormatParameters	fFormatParameters;
+			ByteIOContext		fIOContext;
+			uint8*				fIOBuffer;
+
+	struct StreamCookie {
+		AVStream*			stream;
+		AVCodecContext*		codecContext;
+		AVCodec*			codec;
+		media_format		format;
+		// TODO: Maybe we don't need the codec after all, maybe we do
+		// for getting stream information...
+		// TODO: Some form of packet queue
+	};
+
 };
 
 
