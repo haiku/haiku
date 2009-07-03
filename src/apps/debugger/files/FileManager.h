@@ -26,7 +26,7 @@ public:
 			void				Unlock()	{ fLock.Unlock(); }
 
 			LocatableFile*		GetTargetFile(const BString& directory,
-									const BString& name);
+									const BString& relativePath);
 										// returns a reference
 			LocatableFile*		GetTargetFile(const BString& path);
 										// returns a reference
@@ -34,7 +34,7 @@ public:
 									const BString& locatedPath);
 
 			LocatableFile*		GetSourceFile(const BString& directory,
-									const BString& name);
+									const BString& relativePath);
 										// returns a reference
 			LocatableFile*		GetSourceFile(const BString& path);
 										// returns a reference

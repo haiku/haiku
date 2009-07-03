@@ -124,11 +124,20 @@ public:
 		return B_OK;
 	}
 
-	LocatableFile* GetFile(const BString& directoryPath, const BString& name)
+	LocatableFile* GetFile(const BString& directoryPath,
+		const BString& relativePath)
 	{
-		BString normalizedDirectoryPath;
-		_NormalizePath(directoryPath, normalizedDirectoryPath);
-		LocatableFile* file = _GetFile(normalizedDirectoryPath, name);
+		if (directoryPath.Length() == 0)
+			return GetFile(relativePath);
+		return GetFile(BString(directoryPath) << '/' << relativePath);
+	}
+
+	LocatableFile* GetFile(const BString& path)
+	{
+		BString directoryPath;
+		BString name;
+		_SplitPath(path, directoryPath, name);
+		LocatableFile* file = _GetFile(directoryPath, name);
 		if (file == NULL)
 			return NULL;
 
@@ -148,14 +157,6 @@ public:
 		}
 
 		return file;
-	}
-
-	LocatableFile* GetFile(const BString& path)
-	{
-		BString directoryPath;
-		BString name;
-		_SplitPath(path, directoryPath, name);
-		return _GetFile(directoryPath, name);
 	}
 
 	void EntryLocated(const BString& path, const BString& locatedPath)
@@ -580,10 +581,11 @@ FileManager::Init(bool targetIsLocal)
 
 
 LocatableFile*
-FileManager::GetTargetFile(const BString& directory, const BString& name)
+FileManager::GetTargetFile(const BString& directory,
+	const BString& relativePath)
 {
 	AutoLocker<FileManager> locker(this);
-	return fTargetDomain->GetFile(directory, name);
+	return fTargetDomain->GetFile(directory, relativePath);
 }
 
 
@@ -604,10 +606,11 @@ FileManager::TargetEntryLocated(const BString& path, const BString& locatedPath)
 
 
 LocatableFile*
-FileManager::GetSourceFile(const BString& directory, const BString& name)
+FileManager::GetSourceFile(const BString& directory,
+	const BString& relativePath)
 {
 	AutoLocker<FileManager> locker(this);
-	return fSourceDomain->GetFile(directory, name);
+	return fSourceDomain->GetFile(directory, relativePath);
 }
 
 
