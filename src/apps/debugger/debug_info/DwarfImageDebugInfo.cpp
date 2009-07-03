@@ -197,8 +197,7 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 			if (subprogramEntry->IsDeclaration()
 				|| subprogramEntry->IsPrototyped()
 				|| subprogramEntry->Inline() == DW_INL_inlined
-				|| subprogramEntry->Inline() == DW_INL_declared_inlined
-				|| subprogramEntry->AbstractOrigin() != NULL) {
+				|| subprogramEntry->Inline() == DW_INL_declared_inlined) {
 				continue;
 			}
 
