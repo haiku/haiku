@@ -17,6 +17,7 @@
 #include "FunctionDebugInfo.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
+#include "LocatableFile.h"
 
 
 // #pragma mark - FunctionsTableModel
@@ -77,8 +78,8 @@ public:
 		// count the different source files
 		int32 sourceFileCount = 1;
 		for (int32 i = 1; i < functionCount; i++) {
-			if (_CompareSourceFileNames(functions[i - 1]->SourceFileName(),
-					functions[i]->SourceFileName()) != 0) {
+			if (_CompareSourceFileNames(functions[i - 1]->SourceFile(),
+					functions[i]->SourceFile()) != 0) {
 				sourceFileCount++;
 			}
 		}
@@ -93,8 +94,8 @@ public:
 
 		int32 sourceFileIndex = 1;
 		for (int32 i = 1; i < functionCount; i++) {
-			if (_CompareSourceFileNames(functions[i - 1]->SourceFileName(),
-					functions[i]->SourceFileName()) != 0) {
+			if (_CompareSourceFileNames(functions[i - 1]->SourceFile(),
+					functions[i]->SourceFile()) != 0) {
 				fSourceFileIndices[sourceFileIndex++] = i;
 			}
 		}
@@ -158,9 +159,14 @@ public:
 
 		if (object >= fSourceFileIndices
 			&& object < fSourceFileIndices + fSourceFileCount) {
-			const char* name = fFunctions[*(int32*)object]->SourceFileName();
-			value.SetTo(name != NULL ? name : "<no source file>",
-				B_VARIANT_DONT_COPY_DATA);
+			int32 index = *(int32*)object;
+			if (LocatableFile* file = fFunctions[index]->SourceFile()) {
+				BString path;
+				file->GetPath(path);
+				value.SetTo(path);
+			} else
+				value.SetTo("<no source file>", B_VARIANT_DONT_COPY_DATA);
+
 			return true;
 		}
 
@@ -191,8 +197,8 @@ public:
 			&& _path.AddComponent(index - fSourceFileIndices[sourceIndex]);
 	}
 
-	bool GetObjectForPath(const TreeTablePath& path, const char*& _sourceFile,
-		FunctionDebugInfo*& _function)
+	bool GetObjectForPath(const TreeTablePath& path,
+		LocatableFile*& _sourceFile, FunctionDebugInfo*& _function)
 	{
 		int32 componentCount = path.CountComponents();
 		if (componentCount == 0 || componentCount > 2)
@@ -202,8 +208,7 @@ public:
 		if (sourceIndex < 0 || sourceIndex >= fSourceFileCount)
 			return false;
 
-		_sourceFile = fFunctions[fSourceFileIndices[sourceIndex]]
-			->SourceFileName();
+		_sourceFile = fFunctions[fSourceFileIndices[sourceIndex]]->SourceFile();
 
 		_function = NULL;
 
@@ -232,7 +237,7 @@ private:
 		return nextFunctionIndex - fSourceFileIndices[sourceIndex];
 	}
 
-	static int _CompareSourceFileNames(const char* a, const char* b)
+	static int _CompareSourceFileNames(LocatableFile* a, LocatableFile* b)
 	{
 		if (a == b)
 			return 0;
@@ -242,15 +247,21 @@ private:
 		if (b == NULL)
 			return -1;
 
-		return strcmp(a, b);
+		BString pathA;
+		a->GetPath(pathA);
+
+		BString pathB;
+		b->GetPath(pathB);
+
+		return pathA.Compare(pathB);
 	}
 
 	static bool _FunctionLess(const FunctionDebugInfo* a,
 		const FunctionDebugInfo* b)
 	{
 		// compare source file name first
-		int compared = _CompareSourceFileNames(a->SourceFileName(),
-			b->SourceFileName());
+		int compared = _CompareSourceFileNames(a->SourceFile(),
+			b->SourceFile());
 		if (compared != 0)
 			return compared < 0;
 
@@ -338,6 +349,9 @@ printf("ImageFunctionsView::SetImageDebugInfo(%p)\n", imageDebugInfo);
 		fFunctionsTable->SetNodeExpanded(path, true, false);
 	}
 
+	if (fImageDebugInfo != NULL)
+		fFunctionsTable->ResizeAllColumnsToPreferred();
+
 printf("ImageFunctionsView::SetImageDebugInfo(%p) done\n", imageDebugInfo);
 }
 
@@ -362,7 +376,7 @@ ImageFunctionsView::TreeTableSelectionChanged(TreeTable* table)
 	if (fListener == NULL)
 		return;
 
-	const char* sourceFile = NULL;
+	LocatableFile* sourceFile = NULL;
 	FunctionDebugInfo* function = NULL;
 	TreeTablePath path;
 	if (table->SelectionModel()->GetPathAt(0, path))

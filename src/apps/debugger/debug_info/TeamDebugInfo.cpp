@@ -16,10 +16,11 @@
 
 
 TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
-	Architecture* architecture)
+	Architecture* architecture, FileManager* fileManager)
 	:
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
+	fFileManager(fileManager),
 	fSpecificInfos(10, true)
 {
 }
@@ -38,7 +39,7 @@ TeamDebugInfo::Init()
 
 	// DWARF
 	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
-		fArchitecture);
+		fArchitecture, fFileManager);
 	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
 		delete dwarfInfo;
 		return B_NO_MEMORY;

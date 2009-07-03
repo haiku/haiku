@@ -63,8 +63,8 @@ BasicFunctionDebugInfo::PrettyName() const
 }
 
 
-const char*
-BasicFunctionDebugInfo::SourceFileName() const
+LocatableFile*
+BasicFunctionDebugInfo::SourceFile() const
 {
 	return NULL;
 }

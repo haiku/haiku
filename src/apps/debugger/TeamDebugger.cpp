@@ -208,7 +208,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// create team debug info
 	TeamDebugInfo* teamDebugInfo = new(std::nothrow) TeamDebugInfo(
-		fDebuggerInterface, fDebuggerInterface->GetArchitecture());
+		fDebuggerInterface, fDebuggerInterface->GetArchitecture(),
+		fFileManager);
 	if (teamDebugInfo == NULL)
 		return B_NO_MEMORY;
 	Reference<TeamDebugInfo> teamDebugInfoReference(teamDebugInfo);

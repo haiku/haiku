@@ -10,12 +10,14 @@
 
 class Architecture;
 class DwarfManager;
+class FileManager;
 class ImageInfo;
 
 
 class DwarfTeamDebugInfo : public SpecificTeamDebugInfo {
 public:
-								DwarfTeamDebugInfo(Architecture* architecture);
+								DwarfTeamDebugInfo(Architecture* architecture,
+									FileManager* fileManager);
 	virtual						~DwarfTeamDebugInfo();
 
 			status_t			Init();
@@ -26,6 +28,7 @@ public:
 
 private:
 			Architecture*		fArchitecture;
+			FileManager*		fFileManager;
 			DwarfManager*		fManager;
 };
 

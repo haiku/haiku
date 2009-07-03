@@ -13,6 +13,7 @@
 
 class Architecture;
 class DebuggerInterface;
+class FileManager;
 class ImageDebugInfo;
 class ImageInfo;
 class LocatableFile;
@@ -23,7 +24,8 @@ class TeamDebugInfo : public Referenceable {
 public:
 								TeamDebugInfo(
 									DebuggerInterface* debuggerInterface,
-									Architecture* architecture);
+									Architecture* architecture,
+									FileManager* fileManager);
 								~TeamDebugInfo();
 
 			status_t			Init();
@@ -38,6 +40,7 @@ private:
 private:
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
+			FileManager*		fFileManager;
 			SpecificInfoList	fSpecificInfos;
 };
 

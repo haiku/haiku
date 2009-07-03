@@ -5,6 +5,7 @@
 
 #include "DwarfFile.h"
 
+#include <algorithm>
 #include <new>
 
 #include <AutoDeleter.h>
@@ -631,6 +632,9 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 	// unit length
 	bool dwarf64;
 	uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
+	if (unitLength > (uint64)dataReader.BytesRemaining())
+		return B_BAD_DATA;
+	off_t unitOffset = dataReader.Offset();
 
 	// version (uhalf)
 	uint16 version = dataReader.Read<uint16>(0);
@@ -638,6 +642,10 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 	// header_length (4/8)
 	uint64 headerLength = dwarf64
 		? dataReader.Read<uint64>(0) : (uint64)dataReader.Read<uint32>(0);
+	off_t headerOffset = dataReader.Offset();
+
+	if ((uint64)dataReader.BytesRemaining() < headerLength)
+		return B_BAD_DATA;
 
 	// minimum instruction length
 	uint8 minInstructionLength = dataReader.Read<uint8>(0);
@@ -655,6 +663,7 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 	uint8 opcodeBase = dataReader.Read<uint8>(0);
 
 	// standard_opcode_lengths (ubyte[])
+	const uint8* standardOpcodeLengths = (const uint8*)dataReader.Data();
 	dataReader.Skip(opcodeBase - 1);
 
 	if (dataReader.HasOverflow())
@@ -702,7 +711,17 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 			return B_NO_MEMORY;
 	}
 
-	return B_OK;
+	off_t readerOffset = dataReader.Offset();
+	if ((uint64)readerOffset > readerOffset + headerLength)
+		return B_BAD_DATA;
+	off_t offsetToProgram = headerOffset + headerLength - readerOffset;
+
+	const uint8* program = (uint8*)dataReader.Data() + offsetToProgram;
+	size_t programSize = unitLength - (readerOffset - unitOffset);
+
+	return unit->GetLineNumberProgram().Init(program, programSize,
+		minInstructionLength, defaultIsStatement, lineBase, lineRange,
+			opcodeBase, standardOpcodeLengths);
 }
 
 

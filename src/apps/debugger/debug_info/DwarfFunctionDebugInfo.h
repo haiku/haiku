@@ -11,6 +11,7 @@
 #include "SourceLocation.h"
 
 
+class CompilationUnit;
 class DIESubprogram;
 class DwarfImageDebugInfo;
 class TargetAddressRangeList;
@@ -20,10 +21,11 @@ class DwarfFunctionDebugInfo : public FunctionDebugInfo {
 public:
 								DwarfFunctionDebugInfo(
 									DwarfImageDebugInfo* imageDebugInfo,
+									CompilationUnit* compilationUnit,
 									DIESubprogram* subprogramEntry,
 									TargetAddressRangeList* addressRanges,
 									const BString& name,
-									const BString& sourceFile,
+									LocatableFile* sourceFile,
 									const SourceLocation& sourceLocation);
 	virtual						~DwarfFunctionDebugInfo();
 
@@ -33,15 +35,19 @@ public:
 	virtual	const char*			Name() const;
 	virtual	const char*			PrettyName() const;
 
-	virtual	const char*			SourceFileName() const;
+	virtual	LocatableFile*		SourceFile() const;
 	virtual	SourceLocation		SourceStartLocation() const;
 	virtual	SourceLocation		SourceEndLocation() const;
 
+			CompilationUnit*	GetCompilationUnit() const
+									{ return fCompilationUnit; }
+
 private:
 			DwarfImageDebugInfo* fImageDebugInfo;
+			CompilationUnit*	fCompilationUnit;
 			TargetAddressRangeList* fAddressRanges;
 			BString				fName;
-			BString				fSourceFile;
+			LocatableFile*		fSourceFile;
 			SourceLocation		fSourceLocation;
 };
 

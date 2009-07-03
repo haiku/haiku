@@ -14,9 +14,11 @@
 #include "LocatableFile.h"
 
 
-DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture)
+DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
+	FileManager* fileManager)
 	:
 	fArchitecture(architecture),
+	fFileManager(fileManager),
 	fManager(NULL)
 {
 }
@@ -62,7 +64,7 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 
 	// create the image debug info
 	DwarfImageDebugInfo* debuggerInfo = new(std::nothrow) DwarfImageDebugInfo(
-		imageInfo, fArchitecture, file);
+		imageInfo, fArchitecture, fFileManager, file);
 	if (debuggerInfo == NULL)
 		return B_NO_MEMORY;
 

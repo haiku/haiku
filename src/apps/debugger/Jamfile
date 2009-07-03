@@ -75,6 +75,7 @@ Application Debugger :
 	LocatableDirectory.cpp
 	LocatableEntry.cpp
 	LocatableFile.cpp
+	SourceFile.cpp
 
 	# gui/team_window
 	ImageFunctionsView.cpp
@@ -88,6 +89,7 @@ Application Debugger :
 	# model
 	Breakpoint.cpp
 	DisassembledCode.cpp
+	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
 	SourceCode.cpp

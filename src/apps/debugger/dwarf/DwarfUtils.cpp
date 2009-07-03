@@ -128,7 +128,7 @@ DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
 
 	_directory = directoryName;
 	_file = fileName;
-	_line = line;
-	_column = column;
+	_line = line - 1;
+	_column = column - 1;
 	return true;
 }

@@ -30,7 +30,7 @@ public:
 	virtual	bool				Lock() = 0;
 	virtual	void				Unlock() = 0;
 
-	virtual	bool				LocatableEntryUnused(LocatableEntry* entry) = 0;
+	virtual	void				LocatableEntryUnused(LocatableEntry* entry) = 0;
 };
 
 

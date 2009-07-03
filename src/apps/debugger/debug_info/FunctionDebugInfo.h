@@ -20,6 +20,7 @@ enum function_source_state {
 };
 
 
+class LocatableFile;
 class SourceCode;
 class SpecificImageDebugInfo;
 
@@ -38,7 +39,7 @@ public:
 	virtual	const char*			Name() const = 0;
 	virtual	const char*			PrettyName() const = 0;
 
-	virtual	const char*			SourceFileName() const = 0;
+	virtual	LocatableFile*		SourceFile() const = 0;
 	virtual	SourceLocation		SourceStartLocation() const = 0;
 	virtual	SourceLocation		SourceEndLocation() const = 0;
 

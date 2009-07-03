@@ -43,7 +43,5 @@ LocatableEntry::~LocatableEntry()
 void
 LocatableEntry::LastReferenceReleased()
 {
-	AutoLocker<LocatableEntryOwner> locker(fOwner);
-	if (CountReferences() == 0 && fOwner->LocatableEntryUnused(this))
-		delete this;
+	fOwner->LocatableEntryUnused(this);
 }

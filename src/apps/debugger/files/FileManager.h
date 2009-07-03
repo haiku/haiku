@@ -12,6 +12,7 @@
 
 
 class LocatableFile;
+class SourceFile;
 
 
 class FileManager {
@@ -40,17 +41,32 @@ public:
 			void				SourceEntryLocated(const BString& path,
 									const BString& locatedPath);
 
+			status_t			LoadSourceFile(LocatableFile* file,
+									SourceFile*& _sourceFile);
+										// returns a reference
+
 private:
 			struct EntryPath;
 			struct EntryHashDefinition;
 			class Domain;
+			struct SourceFileEntry;
+			struct SourceFileHashDefinition;
 
 			typedef OpenHashTable<EntryHashDefinition> LocatableEntryTable;
+			typedef OpenHashTable<SourceFileHashDefinition> SourceFileTable;
+
+			friend struct SourceFileEntry;
+				// for gcc 2
+
+private:
+			SourceFileEntry*	_LookupSourceFile(const BString& path);
+			void				_SourceFileUnused(SourceFileEntry* entry);
 
 private:
 			BLocker				fLock;
 			Domain*				fTargetDomain;
 			Domain*				fSourceDomain;
+			SourceFileTable*	fSourceFiles;
 };
 
 

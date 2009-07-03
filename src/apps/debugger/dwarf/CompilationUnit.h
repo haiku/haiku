@@ -11,6 +11,7 @@
 
 #include "Array.h"
 #include "DwarfTypes.h"
+#include "LineNumberProgram.h"
 
 
 class AbbreviationTable;
@@ -45,6 +46,9 @@ public:
 			DIECompileUnitBase*	UnitEntry() const	{ return fUnitEntry; }
 			void				SetUnitEntry(DIECompileUnitBase* entry);
 
+			LineNumberProgram&	GetLineNumberProgram()
+									{ return fLineNumberProgram; }
+
 			status_t			AddDebugInfoEntry(DebugInfoEntry* entry,
 									dwarf_off_t offset);
 			int					CountEntries() const;
@@ -77,6 +81,7 @@ private:
 			Array<dwarf_off_t>	fEntryOffsets;
 			DirectoryList		fDirectories;
 			FileList			fFiles;
+			LineNumberProgram	fLineNumberProgram;
 };
 
 

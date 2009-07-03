@@ -7,29 +7,38 @@
 
 #include "DebugInfoEntries.h"
 #include "DwarfImageDebugInfo.h"
+#include "LocatableFile.h"
 #include "TargetAddressRangeList.h"
 
 
 DwarfFunctionDebugInfo::DwarfFunctionDebugInfo(
-	DwarfImageDebugInfo* imageDebugInfo, DIESubprogram* subprogramEntry,
-	TargetAddressRangeList* addressRanges, const BString& name,
-	const BString& sourceFile, const SourceLocation& sourceLocation)
+	DwarfImageDebugInfo* imageDebugInfo, CompilationUnit* compilationUnit,
+	DIESubprogram* subprogramEntry, TargetAddressRangeList* addressRanges,
+	const BString& name, LocatableFile* sourceFile,
+	const SourceLocation& sourceLocation)
 	:
 	fImageDebugInfo(imageDebugInfo),
+	fCompilationUnit(compilationUnit),
 	fAddressRanges(addressRanges),
 	fName(name),
 	fSourceFile(sourceFile),
 	fSourceLocation(sourceLocation)
 {
-	fImageDebugInfo->AddReference();
-	fAddressRanges->AddReference();
+	fImageDebugInfo->AcquireReference();
+	fAddressRanges->AcquireReference();
+
+	if (fSourceFile != NULL)
+		fSourceFile->AcquireReference();
 }
 
 
 DwarfFunctionDebugInfo::~DwarfFunctionDebugInfo()
 {
-	fAddressRanges->RemoveReference();
-	fImageDebugInfo->RemoveReference();
+	if (fSourceFile != NULL)
+		fSourceFile->ReleaseReference();
+
+	fAddressRanges->ReleaseReference();
+	fImageDebugInfo->ReleaseReference();
 }
 
 
@@ -68,10 +77,10 @@ DwarfFunctionDebugInfo::PrettyName() const
 }
 
 
-const char*
-DwarfFunctionDebugInfo::SourceFileName() const
+LocatableFile*
+DwarfFunctionDebugInfo::SourceFile() const
 {
-	return fSourceFile.Length() > 0 ? fSourceFile.String() : NULL;
+	return fSourceFile;
 }
 
 

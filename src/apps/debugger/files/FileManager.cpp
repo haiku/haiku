@@ -7,10 +7,12 @@
 
 #include <new>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "LocatableDirectory.h"
 #include "LocatableFile.h"
+#include "SourceFile.h"
 #include "StringUtils.h"
 
 
@@ -111,12 +113,6 @@ public:
 
 	~Domain()
 	{
-		LocatableEntry* entry = fEntries.Clear(true);
-		while (entry != NULL) {
-			LocatableEntry* next = entry->fNext;
-			entry->RemoveReference();
-			entry = next;
-		}
 	}
 
 	status_t Init()
@@ -168,7 +164,7 @@ public:
 		BString name;
 		_SplitPath(path, directory, name);
 
-		LocatableEntry* entry = fEntries.Lookup(EntryPath(directory, name));
+		LocatableEntry* entry = _LookupEntry(EntryPath(directory, name));
 		if (entry == NULL)
 			return;
 
@@ -186,10 +182,12 @@ private:
 		fManager->Unlock();
 	}
 
-	virtual bool LocatableEntryUnused(LocatableEntry* entry)
+	virtual void LocatableEntryUnused(LocatableEntry* entry)
 	{
-		fEntries.Remove(entry);
-		return true;
+		fManager->Lock();
+		if (fEntries.Lookup(EntryPath(entry)) == entry)
+			fEntries.Remove(entry);
+		fManager->Unlock();
 	}
 
 	bool _LocateDirectory(LocatableDirectory* directory,
@@ -285,7 +283,7 @@ private:
 	LocatableFile* _GetFile(const BString& directoryPath, const BString& name)
 	{
 		// if already know return the file
-		LocatableEntry* entry = fEntries.Lookup(EntryPath(directoryPath, name));
+		LocatableEntry* entry = _LookupEntry(EntryPath(directoryPath, name));
 		if (entry != NULL) {
 			LocatableFile* file = dynamic_cast<LocatableFile*>(entry);
 			if (file == NULL)
@@ -321,7 +319,7 @@ private:
 
 		// if already know return the directory
 		LocatableEntry* entry
-			= fEntries.Lookup(EntryPath(directoryPath, fileName));
+			= _LookupEntry(EntryPath(directoryPath, fileName));
 		if (entry != NULL) {
 			LocatableDirectory* directory
 				= dynamic_cast<LocatableDirectory*>(entry);
@@ -354,11 +352,28 @@ private:
 			directory->SetLocatedPath(dirPath, false);
 		} else if (parentDirectory != NULL
 			&& parentDirectory->State() != LOCATABLE_ENTRY_UNLOCATED) {
-// TODO:...
+			BString locatedDirectoryPath;
+			if (parentDirectory->GetLocatedPath(locatedDirectoryPath))
+				_LocateEntryInParentDir(directory, locatedDirectoryPath);
 		}
 
 		fEntries.Insert(directory);
 		return directory;
+	}
+
+	LocatableEntry* _LookupEntry(const EntryPath& entryPath)
+	{
+		LocatableEntry* entry = fEntries.Lookup(entryPath);
+		if (entry == NULL)
+			return NULL;
+
+		// if already unreferenced, remove it
+		if (entry->CountReferences() == 0) {
+			fEntries.Remove(entry);
+			return NULL;
+		}
+
+		return entry;
 	}
 
 	void _NormalizePath(const BString& path, BString& _normalizedPath)
@@ -445,6 +460,66 @@ private:
 };
 
 
+// #pragma mark - SourceFileEntry
+
+
+struct FileManager::SourceFileEntry : public SourceFileOwner,
+	public HashTableLink<SourceFileEntry> {
+
+	FileManager*	manager;
+	BString			path;
+	SourceFile*		file;
+
+	SourceFileEntry(FileManager* manager, const BString& path)
+		:
+		manager(manager),
+		path(path),
+		file(NULL)
+	{
+	}
+
+	virtual void SourceFileUnused(SourceFile* sourceFile)
+	{
+		manager->_SourceFileUnused(this);
+	}
+
+	virtual void SourceFileDeleted(SourceFile* sourceFile)
+	{
+		// We have already been removed from the table, so commit suicide.
+		delete this;
+	}
+};
+
+
+// #pragma mark - SourceFileHashDefinition
+
+
+struct FileManager::SourceFileHashDefinition {
+	typedef BString			KeyType;
+	typedef	SourceFileEntry	ValueType;
+
+	size_t HashKey(const BString& key) const
+	{
+		return StringUtils::HashValue(key);
+	}
+
+	size_t Hash(const SourceFileEntry* value) const
+	{
+		return HashKey(value->path);
+	}
+
+	bool Compare(const BString& key, const SourceFileEntry* value) const
+	{
+		return value->path == key;
+	}
+
+	HashTableLink<SourceFileEntry>* GetLink(SourceFileEntry* value) const
+	{
+		return value;
+	}
+};
+
+
 // #pragma mark - FileManager
 
 
@@ -452,7 +527,8 @@ FileManager::FileManager()
 	:
 	fLock("file manager"),
 	fTargetDomain(NULL),
-	fSourceDomain(NULL)
+	fSourceDomain(NULL),
+	fSourceFiles(NULL)
 {
 }
 
@@ -461,6 +537,7 @@ FileManager::~FileManager()
 {
 	delete fTargetDomain;
 	delete fSourceDomain;
+	delete fSourceFiles;
 }
 
 
@@ -486,6 +563,15 @@ FileManager::Init(bool targetIsLocal)
 		return B_NO_MEMORY;
 
 	error = fSourceDomain->Init();
+	if (error != B_OK)
+		return error;
+
+	// create source file table
+	fSourceFiles = new(std::nothrow) SourceFileTable;
+	if (fSourceFiles == NULL)
+		return B_NO_MEMORY;
+
+	error = fSourceFiles->Init();
 	if (error != B_OK)
 		return error;
 
@@ -538,4 +624,76 @@ FileManager::SourceEntryLocated(const BString& path, const BString& locatedPath)
 {
 	AutoLocker<FileManager> locker(this);
 	fSourceDomain->EntryLocated(path, locatedPath);
+}
+
+
+status_t
+FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
+{
+	AutoLocker<FileManager> locker(this);
+
+	// get the path
+	BString path;
+	if (!file->GetLocatedPath(path))
+		return B_ENTRY_NOT_FOUND;
+
+	// we might already know the source file
+	SourceFileEntry* entry = _LookupSourceFile(path);
+	if (entry != NULL) {
+		entry->file->AcquireReference();
+		_sourceFile = entry->file;
+		return B_OK;
+	}
+
+	// create the hash table entry
+	entry = new(std::nothrow) SourceFileEntry(this, path);
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	// load the file
+	SourceFile* sourceFile = new(std::nothrow) SourceFile(entry);
+	if (sourceFile == NULL) {
+		delete entry;
+		return B_NO_MEMORY;
+	}
+	ObjectDeleter<SourceFile> sourceFileDeleter(sourceFile);
+
+	entry->file = sourceFile;
+
+	status_t error = sourceFile->Init(path);
+	if (error != B_OK)
+		return error;
+
+	fSourceFiles->Insert(entry);
+
+	_sourceFile = sourceFileDeleter.Detach();
+	return B_OK;
+}
+
+
+FileManager::SourceFileEntry*
+FileManager::_LookupSourceFile(const BString& path)
+{
+	SourceFileEntry* entry = fSourceFiles->Lookup(path);
+	if (entry == NULL)
+		return NULL;
+
+	// the entry might be unused already -- in that case remove it
+	if (entry->file->CountReferences() == 0) {
+		fSourceFiles->Remove(entry);
+		return NULL;
+	}
+
+	return entry;
+}
+
+
+void
+FileManager::_SourceFileUnused(SourceFileEntry* entry)
+{
+	AutoLocker<FileManager> locker(this);
+
+	SourceFileEntry* otherEntry = fSourceFiles->Lookup(entry->path);
+	if (otherEntry == entry)
+		fSourceFiles->Remove(entry);
 }

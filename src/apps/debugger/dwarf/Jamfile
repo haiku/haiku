@@ -23,6 +23,7 @@ MergeObject Debugger_dwarf.o
 	DwarfFile.cpp
 	DwarfManager.cpp
 	DwarfUtils.cpp
+	LineNumberProgram.cpp
 	SourceLanguageInfo.cpp
 	TagNames.cpp
 ;

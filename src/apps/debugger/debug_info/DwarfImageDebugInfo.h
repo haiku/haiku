@@ -5,20 +5,29 @@
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
 #define DWARF_IMAGE_DEBUG_INFO_H
 
+#include <Locker.h>
+
+#include <util/OpenHashTable.h>
+
 #include "ImageInfo.h"
 #include "SpecificImageDebugInfo.h"
 
 
 class Architecture;
+class CompilationUnit;
 class DwarfFile;
 class ElfSegment;
+class FileManager;
+class FileSourceCode;
+class LocatableFile;
+class SourceCode;
 
 
 class DwarfImageDebugInfo : public SpecificImageDebugInfo {
 public:
 								DwarfImageDebugInfo(const ImageInfo& imageInfo,
 									Architecture* architecture,
-									DwarfFile* file);
+									FileManager* fileManager, DwarfFile* file);
 	virtual						~DwarfImageDebugInfo();
 
 			status_t			Init();
@@ -40,11 +49,27 @@ public:
 									Statement*& _statement);
 
 private:
+			struct SourceCodeKey;
+			struct SourceCodeEntry;
+			struct SourceCodeHashDefinition;
+
+			typedef OpenHashTable<SourceCodeHashDefinition> SourceCodeTable;
+
+private:
+			status_t			_LoadSourceCode(FunctionDebugInfo* function,
+									SourceCode*& _sourceCode);
+			FileSourceCode*		_LookupSourceCode(CompilationUnit* unit,
+									LocatableFile* file);
+
+private:
+			BLocker				fLock;
 			ImageInfo			fImageInfo;
 			Architecture*		fArchitecture;
+			FileManager*		fFileManager;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;
+			SourceCodeTable*	fSourceCodes;
 };
 
 
