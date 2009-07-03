@@ -570,8 +570,14 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 					attributeValue.SetToReference(_ResolveReference(value,
 						localReference));
 					if (attributeValue.reference == NULL) {
+						// gcc 2 apparently somtimes produces DW_AT_sibling
+						// attributes pointing to the end of the sibling list.
+						// Just ignore those.
+						if (attributeName == DW_AT_sibling)
+							continue;
+
 						fprintf(stderr, "Failed to resolve reference: "
-						"%s (%#lx) %s (%#lx): value: %llu\n",
+							"%s (%#lx) %s (%#lx): value: %llu\n",
 						get_attribute_name_name(attributeName),
 						attributeName,
 						get_attribute_form_name(attributeForm),
