@@ -7662,10 +7662,10 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 		viewStateRestored = (fViewState != previousState);
 	}
 
-	if (viewStateRestored) {
-		// Make sure the title view reset its items
-		fTitleView->Reset();
+	// Make sure fTitleView is rebuilt, as fColumnList might have changed
+	fTitleView->Reset();
 
+	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
 
 			MoveBy(0, kTitleViewHeight + 1);
@@ -7720,7 +7720,8 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 
 	if (ContainerWindow()->IsTrash())
 		AddTrashPoses();
-	else AddPoses(TargetModel());
+	else
+		AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
 	Invalidate();

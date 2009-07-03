@@ -153,6 +153,7 @@ BTitleView::Reset()
 			break;
 		fTitleList.AddItem(new BColumnTitle(this, column));
 	}
+	Invalidate();
 }
 
 
