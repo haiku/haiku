@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2004-2008, Haiku. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright 2004-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
- * Authors:	
+ * Authors:
  *		Jérôme Duval
  */
+
 
 #include "MethodReplicant.h"
 
@@ -26,28 +27,32 @@
 #include "InputServerTypes.h"
 
 #ifdef DEBUG
-	#define CALLED() PRINT(("CALLED %s \n", __PRETTY_FUNCTION__));
+#	define CALLED() PRINT(("CALLED %s \n", __PRETTY_FUNCTION__));
 #else
-	#define CALLED()
+#	define CALLED()
 #endif
 
 
 MethodReplicant::MethodReplicant(const char* signature)
-	:	BView(BRect(0, 0, 15, 15), REPLICANT_CTL_NAME, B_FOLLOW_ALL, B_WILL_DRAW),
+	:
+	BView(BRect(0, 0, 15, 15), REPLICANT_CTL_NAME, B_FOLLOW_ALL, B_WILL_DRAW),
 	fMenu("", false, false)
 {
 	// Background Bitmap
-	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1), kRemoteColorSpace);
-	fSegments->SetBits(kRemoteBits, kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
+	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1),
+		kRemoteColorSpace);
+	fSegments->SetBits(kRemoteBits, kRemoteWidth * kRemoteHeight, 0,
+		kRemoteColorSpace);
 	// Background Color
 
-	//add dragger
+	// add dragger
 	BRect rect(Bounds());
 	rect.left = rect.right - 7.0;
 	rect.top = rect.bottom - 7.0;
-	BDragger *dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(dragger);
+	BDragger* dragger = new BDragger(rect, this,
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
+	AddChild(dragger);
 
 	ASSERT(signature != NULL);
 	fSignature = strdup(signature);
@@ -57,15 +62,18 @@ MethodReplicant::MethodReplicant(const char* signature)
 }
 
 
-MethodReplicant::MethodReplicant(BMessage *message)
-	:	BView(message),
+MethodReplicant::MethodReplicant(BMessage* message)
+	:
+	BView(message),
 	fMenu("", false, false)
 {
 	// Background Bitmap
-	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1), kRemoteColorSpace);
-	fSegments->SetBits(kRemoteBits, kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
+	fSegments = new BBitmap(BRect(0, 0, kRemoteWidth - 1, kRemoteHeight - 1),
+		kRemoteColorSpace);
+	fSegments->SetBits(kRemoteBits, kRemoteWidth * kRemoteHeight, 0,
+		kRemoteColorSpace);
 
-	const char *signature = NULL;
+	const char* signature = NULL;
 	message->FindString("add_on", &signature);
 	ASSERT(signature != NULL);
 	fSignature = strdup(signature);
@@ -83,8 +91,8 @@ MethodReplicant::~MethodReplicant()
 
 
 // archiving overrides
-MethodReplicant *
-MethodReplicant::Instantiate(BMessage *data)
+MethodReplicant*
+MethodReplicant::Instantiate(BMessage* data)
 {
 	CALLED();
 	if (!validate_instantiation(data, REPLICANT_CTL_NAME))
@@ -94,7 +102,7 @@ MethodReplicant::Instantiate(BMessage *data)
 
 
 status_t
-MethodReplicant::Archive(BMessage *data, bool deep) const
+MethodReplicant::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
 
@@ -115,22 +123,24 @@ MethodReplicant::AttachedToWindow()
 	msg.AddMessenger("address", messenger);
 
 	BMessenger inputMessenger(fSignature);
-	if (inputMessenger.SendMessage(&msg) != B_OK) {
+	if (inputMessenger.SendMessage(&msg) != B_OK)
 		printf("error when contacting input_server\n");
-	}
 }
 
 
 void
-MethodReplicant::MessageReceived(BMessage *message)
+MethodReplicant::MessageReceived(BMessage* message)
 {
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24, message->what >> 16, message->what >> 8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
+		message->what >> 16, message->what >> 8, message->what));
 	PRINT_OBJECT(*message);
+
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			(new BAlert("About Method Replicant", "Method Replicant (Replicant)\n"
+			(new BAlert("About Method Replicant",
+				"Method Replicant (Replicant)\n"
 				"  Brought to you by Jérôme DUVAL.\n\n"
-				"Haiku, 2004", "OK"))->Go();
+				"Haiku, 2004-2009", "OK"))->Go();
 			break;
 		case IS_UPDATE_NAME:
 			UpdateMethodName(message);
@@ -179,10 +189,10 @@ MethodReplicant::MouseDown(BPoint point)
 	where = ConvertToScreen(point);
 
 	fMenu.SetTargetForItems(this);
-	BMenuItem *item = fMenu.Go(where, true, true,
+	BMenuItem* item = fMenu.Go(where, true, true,
 		BRect(where - BPoint(4, 4), where + BPoint(4, 4)));
 
-	if (item && dynamic_cast<MethodMenuItem *>(item)) {
+	if (dynamic_cast<MethodMenuItem*>(item) != NULL) {
 		BMessage msg(IS_SET_METHOD);
 		msg.AddInt32("cookie", ((MethodMenuItem*)item)->Cookie());
 		BMessenger messenger(fSignature);
@@ -199,7 +209,7 @@ MethodReplicant::MouseUp(BPoint point)
 
 
 void
-MethodReplicant::UpdateMethod(BMessage *message)
+MethodReplicant::UpdateMethod(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -208,20 +218,21 @@ MethodReplicant::UpdateMethod(BMessage *message)
 		return;
 	}
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item == NULL) {
 		fprintf(stderr, "can't find item with cookie %lx\n", cookie);
 		return;
 	}
 	item->SetMarked(true);
 
-	fSegments->SetBits(item->Icon(), kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
+	fSegments->SetBits(item->Icon(), kRemoteWidth * kRemoteHeight, 0,
+		kRemoteColorSpace);
 	Invalidate();
 }
 
 
 void
-MethodReplicant::UpdateMethodIcon(BMessage *message)
+MethodReplicant::UpdateMethodIcon(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -230,14 +241,15 @@ MethodReplicant::UpdateMethodIcon(BMessage *message)
 		return;
 	}
 
-	const uchar *data;
+	const uchar* data;
 	ssize_t numBytes;
-	if (message->FindData("icon", B_ANY_TYPE, (const void**)&data, &numBytes) != B_OK) {
+	if (message->FindData("icon", B_ANY_TYPE, (const void**)&data, &numBytes)
+			!= B_OK) {
 		fprintf(stderr, "can't find icon in message\n");
 		return;
 	}
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item == NULL) {
 		fprintf(stderr, "can't find item with cookie 0x%lx\n", cookie);
 		return;
@@ -248,7 +260,7 @@ MethodReplicant::UpdateMethodIcon(BMessage *message)
 
 
 void
-MethodReplicant::UpdateMethodMenu(BMessage *message)
+MethodReplicant::UpdateMethodMenu(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -270,25 +282,26 @@ MethodReplicant::UpdateMethodMenu(BMessage *message)
 		return;
 	}
 
-	BMenu *menu = (BMenu *)BMenu::Instantiate(&msg);
+	BMenu* menu = (BMenu*)BMenu::Instantiate(&msg);
 	if (menu == NULL) {
 		PRINT(("can't instantiate menu\n"));
 	} else
 		menu->SetTargetForItems(messenger);
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item == NULL) {
 		fprintf(stderr, "can't find item with cookie 0x%lx\n", cookie);
 		return;
 	}
 	int32 index = fMenu.IndexOf(item);
 
-	MethodMenuItem *item2 = NULL;
-	if (menu)
+	MethodMenuItem* item2 = NULL;
+	if (menu) {
 		item2 = new MethodMenuItem(cookie, item->Label(), item->Icon(),
 			menu, messenger);
-	else
+	} else
 		item2 = new MethodMenuItem(cookie, item->Label(), item->Icon());
+
 	item = (MethodMenuItem*)fMenu.RemoveItem(index);
 	fMenu.AddItem(item2, index);
 	item2->SetMarked(item->IsMarked());
@@ -297,7 +310,7 @@ MethodReplicant::UpdateMethodMenu(BMessage *message)
 
 
 void
-MethodReplicant::UpdateMethodName(BMessage *message)
+MethodReplicant::UpdateMethodName(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -306,13 +319,13 @@ MethodReplicant::UpdateMethodName(BMessage *message)
 		return;
 	}
 
-	const char *name;
+	const char* name;
 	if (message->FindString("name", &name) != B_OK) {
 		fprintf(stderr, "can't find name in message\n");
 		return;
 	}
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item == NULL) {
 		fprintf(stderr, "can't find item with cookie 0x%lx\n", cookie);
 		return;
@@ -322,11 +335,11 @@ MethodReplicant::UpdateMethodName(BMessage *message)
 }
 
 
-MethodMenuItem *
+MethodMenuItem*
 MethodReplicant::FindItemByCookie(int32 cookie)
 {
 	for (int32 i = 0; i < fMenu.CountItems(); i++) {
-		MethodMenuItem *item = (MethodMenuItem *)fMenu.ItemAt(i);
+		MethodMenuItem* item = (MethodMenuItem*)fMenu.ItemAt(i);
 		PRINT(("cookie : 0x%lx\n", item->Cookie()));
 		if (item->Cookie() == cookie)
 			return item;
@@ -337,7 +350,7 @@ MethodReplicant::FindItemByCookie(int32 cookie)
 
 
 void
-MethodReplicant::AddMethod(BMessage *message)
+MethodReplicant::AddMethod(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -346,20 +359,21 @@ MethodReplicant::AddMethod(BMessage *message)
 		return;
 	}
 
-	const char *name;
+	const char* name;
 	if (message->FindString("name", &name) != B_OK) {
 		fprintf(stderr, "can't find name in message\n");
 		return;
 	}
 
-	const uchar *icon;
+	const uchar* icon;
 	ssize_t numBytes;
-	if (message->FindData("icon", B_ANY_TYPE, (const void**)&icon, &numBytes) != B_OK) {
+	if (message->FindData("icon", B_ANY_TYPE, (const void**)&icon, &numBytes)
+			!= B_OK) {
 		fprintf(stderr, "can't find icon in message\n");
 		return;
 	}
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item != NULL) {
 		fprintf(stderr, "item with cookie %lx already exists\n", cookie);
 		return;
@@ -375,7 +389,7 @@ MethodReplicant::AddMethod(BMessage *message)
 
 
 void
-MethodReplicant::RemoveMethod(BMessage *message)
+MethodReplicant::RemoveMethod(BMessage* message)
 {
 	CALLED();
 	int32 cookie;
@@ -384,7 +398,7 @@ MethodReplicant::RemoveMethod(BMessage *message)
 		return;
 	}
 
-	MethodMenuItem *item = FindItemByCookie(cookie);
+	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item == NULL) {
 		fprintf(stderr, "can't find item with cookie %lx\n", cookie);
 		return;
