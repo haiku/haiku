@@ -14,12 +14,23 @@
 /*static*/ void
 DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 {
-	// If we don't seem to have a name but a specification, return the
-	// specification's name.
+	// If we don't seem to have a name but an abstract origin, return the
+	// origin's name.
 	const char* name = entry->Name();
 	if (name == NULL) {
-		if (DebugInfoEntry* specification = entry->Specification())
-			name = specification->Name();
+		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin()) {
+			entry = abstractOrigin;
+			name = entry->Name();
+		}
+	}
+
+	// If we still don't have a name but a specification, return the
+	// specification's name.
+	if (name == NULL) {
+		if (DebugInfoEntry* specification = entry->Specification()) {
+			entry = specification;
+			name = entry->Name();
+		}
 	}
 
 	_name = name;
@@ -29,13 +40,22 @@ DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 /*static*/ void
 DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 {
-	// If we don't seem to have a name but a specification, return the
-	// specification's name.
+	// If we don't seem to have a name but an abstract origin, return the
+	// origin's name.
 	const char* name = entry->Name();
+	if (name == NULL) {
+		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin()) {
+			entry = abstractOrigin;
+			name = entry->Name();
+		}
+	}
+
+	// If we still don't have a name but a specification, return the
+	// specification's name.
 	if (name == NULL) {
 		if (DebugInfoEntry* specification = entry->Specification()) {
 			entry = specification;
-			name = specification->Name();
+			name = entry->Name();
 		}
 	}
 
@@ -49,7 +69,14 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 	BString& _name)
 {
-	// If we don't seem to have a name but a specification, return the
+	// If we don't seem to have a name but an abstract origin, return the
+	// origin's name.
+	if (entry->Name() == NULL) {
+		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin())
+			entry = abstractOrigin;
+	}
+
+	// If we don't still don't have a name but a specification, get the
 	// specification's name.
 	if (entry->Name() == NULL) {
 		if (DebugInfoEntry* specification = entry->Specification())
@@ -87,29 +114,24 @@ DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
 	const DebugInfoEntry* entry, const char*& _directory, const char*& _file,
 	int32& _line, int32& _column)
 {
-	uint32 file;
-	uint32 line;
-	uint32 column;
-	if (!entry->GetDeclarationLocation(file, line, column))
-		return false;
+	uint32 file = 0;
+	uint32 line = 0;
+	uint32 column = 0;
+	entry->GetDeclarationLocation(file, line, column);
 
 	// if no info yet, try the abstract origin (if any)
 	if (file == 0) {
 		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin()) {
-			if (abstractOrigin->GetDeclarationLocation(file, line, column)
-					&& file != 0) {
-				entry = abstractOrigin;
-			}
+			entry = abstractOrigin;
+			entry->GetDeclarationLocation(file, line, column);
 		}
 	}
 
 	// if no info yet, try the specification (if any)
 	if (file == 0) {
 		if (DebugInfoEntry* specification = entry->Specification()) {
-			if (specification->GetDeclarationLocation(file, line, column)
-					&& file != 0) {
-				entry = specification;
-			}
+			entry = specification;
+			entry->GetDeclarationLocation(file, line, column);
 		}
 	}
 
