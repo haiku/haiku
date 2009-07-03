@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,8 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Rene Gollent (anevilyak@gmail.com)
  */
+
+#include <Menu.h>
 
 #include <new>
 #include <ctype.h>
@@ -18,13 +20,13 @@
 #include <FindDirectory.h>
 #include <Layout.h>
 #include <LayoutUtils.h>
-#include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <Screen.h>
+#include <ScrollBar.h>
 #include <Window.h>
 
 #include <AppServerLink.h>
@@ -819,9 +821,7 @@ BMenu::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			//float deltaX = 0
 			float deltaY = 0;
-			//msg->FindFloat("be:wheel_delta_x", &deltaX);
 			msg->FindFloat("be:wheel_delta_y", &deltaY);
 			if (deltaY == 0)
 				return;
@@ -830,7 +830,9 @@ BMenu::MessageReceived(BMessage *msg)
 			if (window == NULL)
 				return;
 
-			window->TryScrollBy(deltaY);
+			float smallStep;
+			window->GetSteps(&smallStep, NULL);
+			window->TryScrollBy(deltaY * smallStep);
 			break;
 		}
 		default:
@@ -889,6 +891,21 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 				}
 			}
 			break;
+
+		case B_PAGE_UP:
+		case B_PAGE_DOWN:
+		{
+			BMenuWindow *window = dynamic_cast<BMenuWindow *>(Window());
+			if (window == NULL || !window->HasScrollers())
+				break;
+
+			int32 deltaY = bytes[0] == B_PAGE_UP ? -1 : 1;
+
+			float largeStep;
+			window->GetSteps(NULL, &largeStep);
+			window->TryScrollBy(deltaY * largeStep);
+			break;
+		}
 
 		case B_ENTER:
 		case B_SPACE:
@@ -1425,6 +1442,13 @@ BMenu::_Show(bool selectFirstItem)
 	if (window->Lock()) {
 		fAttachAborted = false;
 		window->AttachMenu(this);
+
+		if (ItemAt(0) != NULL) {
+			float width, height;
+			ItemAt(0)->GetContentSize(&width, &height);
+
+			window->SetSmallStep(ceilf(height));
+		}
 
 		// Menu didn't have the time to add its items: aborting...
 		if (fAttachAborted) {
@@ -2213,7 +2237,7 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
 	}
-	
+
 	if (!scroll) {
 		// basically, if this returns false, it means
 		// that the menu frame won't fit completely inside the screen
@@ -2221,10 +2245,10 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 		// not left/right
 		scroll = screenFrame.Height() < frame.Height();
 	}
-	
+
 	if (scrollOn != NULL)
 		*scrollOn = scroll;
-		
+
 	return frame;
 }
 
@@ -2286,7 +2310,7 @@ BMenu::_InvokeItem(BMenuItem *item, bool now)
 		rootMenu = parent;
 		parent = rootMenu->Supermenu();
 	} while (parent != NULL);
-		
+
 	if (rootMenu->LockLooper()) {
 		item->Invoke();
 		rootMenu->UnlockLooper();
