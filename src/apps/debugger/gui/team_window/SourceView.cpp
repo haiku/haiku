@@ -28,6 +28,8 @@
 
 static const int32 kLeftTextMargin = 3;
 static const float kMinViewHeight = 80.0f;
+static const int32 kSpacesPerTab = 4;
+	// TODO: Should be settable!
 
 
 class SourceView::BaseView : public BView {
@@ -204,6 +206,8 @@ public:
 
 private:
 			float				_MaxLineWidth();
+			void				_FormatLine(const char* line,
+									BString& formattedLine);
 
 private:
 			float				fMaxLineWidth;
@@ -811,7 +815,9 @@ SourceView::TextView::Draw(BRect updateRect)
 	for (int32 i = minLine; i <= maxLine; i++) {
 		float y = (float)(i + 1) * fFontInfo->lineHeight
 			- fFontInfo->fontHeight.descent;
-		DrawString(fSourceCode->LineAt(i), BPoint(kLeftTextMargin, y));
+		BString lineString;
+		_FormatLine(fSourceCode->LineAt(i), lineString);
+		DrawString(lineString, BPoint(kLeftTextMargin, y));
 	}
 }
 
@@ -831,6 +837,24 @@ SourceView::TextView::_MaxLineWidth()
 	}
 
 	return fMaxLineWidth;
+}
+
+
+void
+SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
+{
+	int32 column = 0;
+	for (; *line != '\0'; line++) {
+		// TODO: That's probably not very efficient!
+		if (*line == '\t') {
+			int32 nextTabStop = (column / kSpacesPerTab + 1) * kSpacesPerTab;
+			for (; column < nextTabStop; column++)
+				formattedLine << ' ';
+		} else {
+			formattedLine << *line;
+			column++;
+		}
+	}
 }
 
 
