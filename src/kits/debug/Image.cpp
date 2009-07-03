@@ -34,6 +34,35 @@ Image::~Image()
 }
 
 
+status_t
+Image::GetSymbol(const char* name, int32 symbolType, void** _symbolLocation,
+	size_t* _symbolSize, int32* _symbolType) const
+{
+	// TODO: At least for ImageFile we could do hash lookups!
+	int32 iterator = 0;
+	const char* foundName;
+	size_t foundNameLen;
+	addr_t foundAddress;
+	size_t foundSize;
+	int32 foundType;
+	while (NextSymbol(iterator, &foundName, &foundNameLen, &foundAddress,
+			&foundSize, &foundType) == B_OK) {
+		if ((symbolType == B_SYMBOL_TYPE_ANY || symbolType == foundType)
+			&& strcmp(name, foundName) == 0) {
+			if (_symbolLocation != NULL)
+				*_symbolLocation = (void*)foundAddress;
+			if (_symbolSize != NULL)
+				*_symbolSize = foundSize;
+			if (_symbolType != NULL)
+				*_symbolType = foundType;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 // #pragma mark - SymbolTableBasedImage
 
 

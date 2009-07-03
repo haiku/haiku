@@ -426,6 +426,20 @@ SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
 }
 
 
+// GetSymbol
+status_t
+SymbolLookup::GetSymbol(image_id imageID, const char* name, int32 symbolType,
+	void** _symbolLocation, size_t* _symbolSize, int32* _symbolType) const
+{
+	Image* image = _FindImageByID(imageID);
+	if (image == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return image->GetSymbol(name, symbolType, _symbolLocation, _symbolSize,
+		_symbolType);
+}
+
+
 // _FindLoadedImageAtAddress
 const image_t *
 SymbolLookup::_FindLoadedImageAtAddress(addr_t address) const

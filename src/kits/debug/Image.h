@@ -46,6 +46,10 @@ public:
 									addr_t* _symbolAddress, size_t* _symbolSize,
 									int32* _symbolType) const = 0;
 
+	virtual	status_t			GetSymbol(const char* name, int32 symbolType,
+									void** _symbolLocation, size_t* _symbolSize,
+									int32* _symbolType) const;
+
 protected:
 			image_info			fInfo;
 };

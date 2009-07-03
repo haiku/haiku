@@ -154,6 +154,9 @@ public:
 		size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
 		int32* _symbolType) const;
 
+	status_t GetSymbol(image_id imageID, const char* name, int32 symbolType,
+		void** _symbolLocation, size_t* _symbolSize, int32* _symbolType) const;
+
 private:
 	class LoadedImage;
 	friend class LoadedImage;

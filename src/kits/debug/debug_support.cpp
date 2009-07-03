@@ -318,6 +318,22 @@ debug_delete_symbol_lookup_context(debug_symbol_lookup_context *lookupContext)
 	}
 }
 
+
+// debug_get_symbol
+status_t
+debug_get_symbol(debug_symbol_lookup_context* lookupContext, image_id image,
+	const char* name, int32 symbolType, void** _symbolLocation,
+	size_t* _symbolSize, int32* _symbolType)
+{
+	if (!lookupContext || !lookupContext->lookup)
+		return B_BAD_VALUE;
+	SymbolLookup* lookup = lookupContext->lookup;
+
+	return lookup->GetSymbol(image, name, symbolType, _symbolLocation,
+		_symbolSize, _symbolType);
+}
+
+
 // debug_lookup_symbol_address
 status_t
 debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,

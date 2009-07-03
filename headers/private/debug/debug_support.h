@@ -62,6 +62,9 @@ status_t debug_create_symbol_lookup_context(team_id team,
 void debug_delete_symbol_lookup_context(
 			debug_symbol_lookup_context *lookupContext);
 
+status_t debug_get_symbol(debug_symbol_lookup_context* lookupContext,
+			image_id image, const char* name, int32 symbolType,
+			void** _symbolLocation, size_t* _symbolSize, int32* _symbolType);
 status_t debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 			const void *address, void **baseAddress, char *symbolName,
 			int32 symbolNameSize, char *imageName, int32 imageNameSize,
