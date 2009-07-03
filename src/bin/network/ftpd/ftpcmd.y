@@ -76,10 +76,6 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/ftpcmd.y,v 1.66 2007/04/18 22:43:39 yar Exp
 #include "extern.h"
 #include "pathnames.h"
 
-#ifdef YYPULL
-#include "ftpcmd.h"
-#endif
-
 extern	union sockunion data_dest, his_addr;
 extern	int hostinfo;
 extern	int logged_in;
@@ -129,6 +125,49 @@ extern int epsvall;
 #define	MAXGLOBARGS	1000
 
 #define	MAXASIZE	10240	/* Deny ASCII SIZE on files larger than that */
+
+%}
+
+%union {
+	struct {
+		off_t	o;
+		int	i;
+	} u;
+	char   *s;
+}
+
+%token
+	A	B	C	E	F	I
+	L	N	P	R	S	T
+	ALL
+
+	SP	CRLF	COMMA
+
+	USER	PASS	ACCT	REIN	QUIT	PORT
+	PASV	TYPE	STRU	MODE	RETR	STOR
+	APPE	MLFL	MAIL	MSND	MSOM	MSAM
+	MRSQ	MRCP	ALLO	REST	RNFR	RNTO
+	ABOR	DELE	CWD	LIST	NLST	SITE
+	STAT	HELP	NOOP	MKD	RMD	PWD
+	CDUP	STOU	SMNT	SYST	SIZE	MDTM
+	LPRT	LPSV	EPRT	EPSV	FEAT
+
+	UMASK	IDLE	CHMOD	MDFIVE
+
+	LEXERR	NOTIMPL
+
+%token	<s> STRING
+%token	<u> NUMBER
+
+%type	<u.i> check_login octal_number byte_size
+%type	<u.i> check_login_ro check_login_epsv
+%type	<u.i> struct_code mode_code type_code form_code
+%type	<s> pathstring pathname password username
+%type	<s> ALL NOTIMPL
+
+%start	cmd_list
+
+%{
 
 struct tab {
 	char	*name;
@@ -222,45 +261,6 @@ static void	 v4map_data_dest(void);
 static int	 yylex(void);
 
 %}
-
-%union {
-	struct {
-		off_t	o;
-		int	i;
-	} u;
-	char   *s;
-}
-
-%token
-	A	B	C	E	F	I
-	L	N	P	R	S	T
-	ALL
-
-	SP	CRLF	COMMA
-
-	USER	PASS	ACCT	REIN	QUIT	PORT
-	PASV	TYPE	STRU	MODE	RETR	STOR
-	APPE	MLFL	MAIL	MSND	MSOM	MSAM
-	MRSQ	MRCP	ALLO	REST	RNFR	RNTO
-	ABOR	DELE	CWD	LIST	NLST	SITE
-	STAT	HELP	NOOP	MKD	RMD	PWD
-	CDUP	STOU	SMNT	SYST	SIZE	MDTM
-	LPRT	LPSV	EPRT	EPSV	FEAT
-
-	UMASK	IDLE	CHMOD	MDFIVE
-
-	LEXERR	NOTIMPL
-
-%token	<s> STRING
-%token	<u> NUMBER
-
-%type	<u.i> check_login octal_number byte_size
-%type	<u.i> check_login_ro check_login_epsv
-%type	<u.i> struct_code mode_code type_code form_code
-%type	<s> pathstring pathname password username
-%type	<s> ALL NOTIMPL
-
-%start	cmd_list
 
 %%
 
