@@ -129,10 +129,11 @@ private:
 // #pragma mark - ThreadListView
 
 
-ThreadListView::ThreadListView(Listener* listener)
+ThreadListView::ThreadListView(Team* team, Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
-	fTeam(NULL),
+	fTeam(team),
+	fThread(NULL),
 	fThreadsTable(NULL),
 	fThreadsTableModel(NULL),
 	fListener(listener)
@@ -143,16 +144,16 @@ ThreadListView::ThreadListView(Listener* listener)
 
 ThreadListView::~ThreadListView()
 {
-	SetTeam(NULL);
+	fTeam->RemoveListener(this);
 	fThreadsTable->SetTableModel(NULL);
 	delete fThreadsTableModel;
 }
 
 
 /*static*/ ThreadListView*
-ThreadListView::Create(Listener* listener)
+ThreadListView::Create(Team* team, Listener* listener)
 {
-	ThreadListView* self = new ThreadListView(listener);
+	ThreadListView* self = new ThreadListView(team, listener);
 
 	try {
 		self->_Init();
@@ -173,26 +174,29 @@ ThreadListView::UnsetListener()
 
 
 void
-ThreadListView::SetTeam(Team* team)
+ThreadListView::SetThread(Thread* thread)
 {
-	if (team == fTeam)
+	if (thread == fThread)
 		return;
 
-	if (fTeam != NULL) {
-		fTeam->RemoveListener(this);
-		fThreadsTable->SetTableModel(NULL);
-		delete fThreadsTableModel;
-		fThreadsTableModel = NULL;
+	if (fThread != NULL)
+		fThread->ReleaseReference();
+
+	fThread = thread;
+
+	if (fThread != NULL) {
+		fThread->AcquireReference();
+
+		for (int32 i = 0; Thread* other = fThreadsTableModel->ThreadAt(i);
+				i++) {
+			if (fThread == other) {
+				fThreadsTable->SelectRow(i, false);
+				return;
+			}
+		}
 	}
 
-	fTeam = team;
-
-	if (fTeam != NULL) {
-		fThreadsTableModel = new(std::nothrow) ThreadsTableModel(fTeam);
-		fThreadsTable->SetTableModel(fThreadsTableModel);
-		fThreadsTable->ResizeAllColumnsToPreferred();
-		fTeam->AddListener(this);
-	}
+	fThreadsTable->DeselectAllRows();
 }
 
 
@@ -256,6 +260,11 @@ ThreadListView::_Init()
 
 	fThreadsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fThreadsTable->AddTableListener(this);
+
+	fThreadsTableModel = new(std::nothrow) ThreadsTableModel(fTeam);
+	fThreadsTable->SetTableModel(fThreadsTableModel);
+	fThreadsTable->ResizeAllColumnsToPreferred();
+	fTeam->AddListener(this);
 }
 
 

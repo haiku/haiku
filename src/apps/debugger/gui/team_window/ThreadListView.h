@@ -20,15 +20,15 @@ public:
 	class Listener;
 
 public:
-								ThreadListView(Listener* listener);
+								ThreadListView(Team* team, Listener* listener);
 								~ThreadListView();
 
-	static	ThreadListView*		Create(Listener* listener);
+	static	ThreadListView*		Create(Team* team, Listener* listener);
 									// throws
 
 			void				UnsetListener();
 
-			void				SetTeam(Team* team);
+			void				SetThread(Thread* thread);
 
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -47,6 +47,7 @@ private:
 
 private:
 			Team*				fTeam;
+			Thread*				fThread;
 			Table*				fThreadsTable;
 			ThreadsTableModel*	fThreadsTableModel;
 			Listener*			fListener;

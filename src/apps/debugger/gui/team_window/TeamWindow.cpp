@@ -27,6 +27,12 @@
 #include "StackTraceView.h"
 
 
+enum {
+	MAIN_TAB_INDEX_THREADS	= 0,
+	MAIN_TAB_INDEX_IMAGES	= 1
+};
+
+
 // #pragma mark - TeamWindow
 
 
@@ -286,6 +292,8 @@ function, function->GetSourceCode(), function->SourceCodeState());
 void
 TeamWindow::_Init()
 {
+	::Team* team = fDebugModel->GetTeam();
+
 	BScrollView* sourceScrollView;
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -317,7 +325,7 @@ TeamWindow::_Init()
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
-		.Add(fThreadListView = ThreadListView::Create(this))
+		.Add(fThreadListView = ThreadListView::Create(team, this))
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
 	// add images tab
@@ -325,8 +333,7 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
-		.Add(fImageListView = ImageListView::Create(fDebugModel->GetTeam(),
-				this))
+		.Add(fImageListView = ImageListView::Create(team, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add local variables tab
@@ -336,8 +343,6 @@ TeamWindow::_Init()
 	// add registers tab
 	tab = fRegisterView = RegisterView::Create(fDebugModel->GetArchitecture());
 	fLocalsTabView->AddTab(tab);
-
-	fThreadListView->SetTeam(fDebugModel->GetTeam());
 
 	fRunButton->SetMessage(new BMessage(MSG_THREAD_RUN));
 	fStepOverButton->SetMessage(new BMessage(MSG_THREAD_STEP_OVER));
@@ -376,6 +381,8 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 		// hold a reference until we've set it
 
 	locker.Unlock();
+
+	fThreadListView->SetThread(fActiveThread);
 
 	_SetActiveStackTrace(stackTrace);
 	_UpdateCpuState();
@@ -597,11 +604,28 @@ TeamWindow::_UpdateRunButtons()
 void
 TeamWindow::_HandleThreadStateChanged(thread_id threadID)
 {
-	// ATM we're only interested in the currently selected thread
-	if (fActiveThread == NULL || threadID != fActiveThread->ID())
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	::Thread* thread = fDebugModel->GetTeam()->ThreadByID(threadID);
+	if (thread == NULL)
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	// If the thread has been stopped and we don't have an active thread yet
+	// (or it isn't stopped), switch to this thread. Otherwise ignore the event.
+	if (thread->State() == THREAD_STATE_STOPPED
+		&& (fActiveThread == NULL
+			|| (thread != fActiveThread
+				&& fActiveThread->State() != THREAD_STATE_STOPPED))) {
+		_SetActiveThread(thread);
+	} else if (thread != fActiveThread) {
+		// otherwise ignore the event, if the thread is not the active one
+		return;
+	}
+
+	// Switch to the threads tab view when the thread has stopped.
+	if (thread->State() == THREAD_STATE_STOPPED)
+		fTabView->Select(MAIN_TAB_INDEX_THREADS);
+
 	_UpdateRunButtons();
 }
 
