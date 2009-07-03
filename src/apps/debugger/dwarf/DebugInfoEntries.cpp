@@ -471,7 +471,14 @@ DIEClassBaseType::AddChild(DebugInfoEntry* child)
 // TODO: Templates!
 // TODO: Variants!
 		default:
+		{
+			if (child->IsType()) {
+				fInnerTypes.Add(child);
+				return B_OK;
+			}
+
 			return DIECompoundType::AddChild(child);
+		}
 	}
 }
 

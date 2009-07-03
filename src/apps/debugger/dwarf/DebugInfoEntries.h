@@ -343,6 +343,7 @@ protected:
 			DebugInfoEntryList	fFriends;
 			DebugInfoEntryList	fAccessDeclarations;
 			DebugInfoEntryList	fMemberFunctions;
+			DebugInfoEntryList	fInnerTypes;
 };
 
 
