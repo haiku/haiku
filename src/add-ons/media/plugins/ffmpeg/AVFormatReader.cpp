@@ -27,104 +27,13 @@ extern "C" {
 #define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
+#	define TRACE_IO(a...)
 #else
 #	define TRACE(a...)
+#	define TRACE_IO(a...)
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
-
-
-
-// #pragma mark - BPositionIO protocol
-
-
-static int
-position_io_open(URLContext* h, const char* filename, int flags)
-{
-	TRACE("position_io_open(%s)\n", filename);
-
-	// Strip the URL prefix
-	av_strstart(filename, "position_io:", &filename);
-
-	void* pointer;
-	if (sscanf(filename, "%p", &pointer) != 1) {
-		TRACE("position_io_open(%s) - unable to scan BPositionIO pointer\n",
-			filename);
-		return AVERROR(ENOENT);
-	}
-
-	// When the pointer was placed, it was a BDataIO*. Try to convert that
-	// into a BPositionIO.
-	// TODO: Later we may implement two different protocols, one which
-	// supports seeking (BPositionIO) and one that does not (BDataIO).
-	BDataIO* dataIO = reinterpret_cast<BDataIO*>(pointer);
-	BPositionIO* positionIO = dynamic_cast<BPositionIO*>(dataIO);
-	if (positionIO == NULL) {
-		TRACE("position_io_open(%s) - unable to cast BDataIO pointer %p\n",
-			filename, dataIO);
-		return AVERROR(ENOENT);
-	}
-
-	TRACE("position_io_open(%s) - success: BPositionIO: %p\n",
-		filename, positionIO);
-
-	h->priv_data = reinterpret_cast<void*>(positionIO);
-
-	return 0;
-}
-
-
-static int
-position_io_read(URLContext* h, unsigned char* buffer, int size)
-{
-	TRACE("position_io_read(%d)\n", size);
-
-	BPositionIO* source = reinterpret_cast<BPositionIO*>(h->priv_data);
-	return source->Read(buffer, size);
-}
-
-
-static int
-position_io_write(URLContext* h, unsigned char* buffer, int size)
-{
-	TRACE("position_io_write(%d)\n", size);
-
-	BPositionIO* source = reinterpret_cast<BPositionIO*>(h->priv_data);
-	return source->Write(buffer, size);
-}
-
-
-static int64_t
-position_io_seek(URLContext* h, int64_t position, int whence)
-{
-	TRACE("position_io_seek(%lld, %d)\n", position, whence);
-
-	BPositionIO* source = reinterpret_cast<BPositionIO*>(h->priv_data);
-	return source->Seek(position, whence);
-}
-
-
-static int
-position_io_close(URLContext* h)
-{
-	TRACE("position_io_close()\n");
-
-	// We do not close ourselves here.
-	return 0;
-}
-
-
-URLProtocol sPositionIOProtocol = {
-	"position_io",
-	position_io_open,
-	position_io_read,
-	position_io_write,
-	position_io_seek,
-	position_io_close
-};
-
-
-// #pragma mark - AVFormatReader
 
 
 AVFormatReader::AVFormatReader()
@@ -159,28 +68,19 @@ AVFormatReader::Sniff(int32* streamCount)
 {
 	TRACE("AVFormatReader::Sniff\n");
 
-#if 0
-	// Construct an URL string that allows us to get the Source()
-	// BPositionIO pointer and try to open the stream.
-	char urlString[64];
-	snprintf(urlString, sizeof(urlString), "position_io:%p", (void*)Source());
-
-	if (av_open_input_file(&fContext, urlString, NULL, 0, NULL) < 0) {
-		TRACE("AVFormatReader::Sniff() - av_open_input_file(%s) failed!\n",
-			urlString);
-		return B_ERROR;
-	}
-
-#else
 	size_t bufferSize = 64 * 1024;
+	size_t probeSize = 1024;
 	uint8 buffer[bufferSize];
 	AVProbeData probeData;
 	probeData.filename = "";
 	probeData.buf = buffer;
-	probeData.buf_size = bufferSize;
+	probeData.buf_size = probeSize;
 
-	// Read a bit of the input
-	_ReadPacket(Source(), buffer, bufferSize);
+	// Read a bit of the input...
+	if (_ReadPacket(Source(), buffer, probeSize) != (ssize_t)probeSize)
+		return B_IO_ERROR;
+	// ...and seek back to the beginning of the file.
+	_Seek(Source(), 0, SEEK_SET);
 
 	// Probe the input format
 	AVInputFormat* inputFormat = av_probe_input_format(&probeData, 1);
@@ -202,17 +102,14 @@ AVFormatReader::Sniff(int32* streamCount)
 		return B_ERROR;
 	}
 
-	AVFormatParameters params;
-	memset(&params, 0, sizeof(params));
+	AVFormatParameters formatParameters;
+	memset(&formatParameters, 0, sizeof(formatParameters));
 
 	if (av_open_input_stream(&fContext, &ioContext, "", inputFormat,
-		&params) < 0) {
-		TRACE("AVFormatReader::Sniff() - av_open_input_file() failed!\n");
+		&formatParameters) < 0) {
+		TRACE("AVFormatReader::Sniff() - av_open_input_stream() failed!\n");
 		return B_ERROR;
 	}
-#endif
-
-	TRACE("AVFormatReader::Sniff() - av_open_input_file() success!\n");
 
 	// Retrieve stream information
 	if (av_find_stream_info(fContext) < 0) {
@@ -308,21 +205,21 @@ AVFormatReader::GetNextChunk(void* _cookie, const void** chunkBuffer,
 /*static*/ int
 AVFormatReader::_ReadPacket(void* cookie, uint8* buffer, int bufferSize)
 {
-	TRACE("AVFormatReader::_ReadPacket(%p, %p, %d)\n", cookie, buffer,
+	TRACE_IO("AVFormatReader::_ReadPacket(%p, %p, %d)\n", cookie, buffer,
 		bufferSize);
 
 	BDataIO* dataIO = reinterpret_cast<BDataIO*>(cookie);
 	ssize_t read = dataIO->Read(buffer, bufferSize);
 
-	TRACE("  read: %ld\n", read);
-	return read;
+	TRACE_IO("  read: %ld\n", read);
+	return (int)read;
 }
 
 
 /*static*/ off_t
 AVFormatReader::_Seek(void* cookie, off_t offset, int whence)
 {
-	TRACE("AVFormatReader::_Seek(%p, %lld, %d)\n", cookie, offset, whence);
+	TRACE_IO("AVFormatReader::_Seek(%p, %lld, %d)\n", cookie, offset, whence);
 
 	BDataIO* dataIO = reinterpret_cast<BDataIO*>(cookie);
 	BPositionIO* positionIO = dynamic_cast<BPositionIO*>(dataIO);
@@ -331,9 +228,17 @@ AVFormatReader::_Seek(void* cookie, off_t offset, int whence)
 		return -1;
 	}
 
+	// Support for special file size retrieval API without seeking anywhere:
+	if (whence == AVSEEK_SIZE) {
+		off_t size;
+		if (positionIO->GetSize(&size) == B_OK)
+			return size;
+		return -1;
+	}
+
 	off_t position = positionIO->Seek(offset, whence);
 
-	TRACE("  position: %lld\n", position);
+	TRACE_IO("  position: %lld\n", position);
 	return position;
 }
 

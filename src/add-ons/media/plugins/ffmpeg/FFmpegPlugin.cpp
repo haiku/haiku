@@ -29,15 +29,6 @@ FFmpegPlugin::GlobalInitilizer::GlobalInitilizer()
 {
 	av_register_all();
 		// This will also call av_codec_init() by registering codecs.
-
-	extern URLProtocol sPositionIOProtocol;
-	av_register_protocol(&sPositionIOProtocol);
-
-//	// Dump the supported protocols to stdout.
-//	URLProtocol* p = NULL;
-//	while ((p = av_protocol_next(p)) != NULL) {
-//		printf("supported protocol: %s\n", p->name);
-//	}
 }
 
 

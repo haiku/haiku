@@ -161,8 +161,8 @@ StaticLibrary libavformat.a :
 	rtpenc.c
 	rtpenc_h264.c
 #	rtpproto.c # (I/O protocol)
-	rtsp.c
-	sdp.c
+#	rtsp.c
+#	sdp.c
 	segafilm.c
 	sierravmd.c
 	siff.c

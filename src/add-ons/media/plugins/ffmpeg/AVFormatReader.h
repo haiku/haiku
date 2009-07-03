@@ -42,7 +42,7 @@ public:
 									media_header* mediaHeader);
 
 private:
-	static	int					_ReadPacket(void* cookie,
+	static	int				_ReadPacket(void* cookie,
 									uint8* buffer, int bufferSize);
 
 	static	off_t				_Seek(void* cookie,
