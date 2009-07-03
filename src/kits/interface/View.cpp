@@ -4219,13 +4219,13 @@ BView::MessageReceived(BMessage* msg)
 	int32 index;
 	BMessage specifier;
 	int32 what;
-	const char *prop;
+	const char* property;
 
-	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &property) != B_OK)
 		return BHandler::MessageReceived(msg);
 
 	BPropertyInfo propertyInfo(sViewPropInfo);
-	switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
+	switch (propertyInfo.FindMatch(msg, index, &specifier, what, property)) {
 		case 0:
 			if (msg->what == B_GET_PROPERTY) {
 				err = replyMsg.AddRect("result", Frame());
@@ -4234,7 +4234,7 @@ BView::MessageReceived(BMessage* msg)
 				err = msg->FindRect("data", &newFrame);
 				if (err == B_OK) {
 					MoveTo(newFrame.LeftTop());
-					ResizeTo(newFrame.right, newFrame.bottom);
+					ResizeTo(newFrame.Width(), newFrame.Height());
 				}
 			}
 			break;
@@ -4259,16 +4259,17 @@ BView::MessageReceived(BMessage* msg)
 			return BHandler::MessageReceived(msg);
 	}
 
-	if (err < B_OK) {
+	if (err != B_OK) {
 		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
 
 		if (err == B_BAD_SCRIPT_SYNTAX)
 			replyMsg.AddString("message", "Didn't understand the specifier(s)");
 		else
 			replyMsg.AddString("message", strerror(err));
+
+		replyMsg.AddInt32("error", err);
 	}
 
-	replyMsg.AddInt32("error", err);
 	msg->SendReply(&replyMsg);
 }
 
