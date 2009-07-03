@@ -423,8 +423,8 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 	int32 cookie = 0;
 	while (get_next_image_info(fTeamID, &cookie, &imageInfo) == B_OK) {
 		ImageInfo* info = new(std::nothrow) ImageInfo(fTeamID, imageInfo.id,
-			imageInfo.name, (addr_t)imageInfo.text, imageInfo.text_size,
-			(addr_t)imageInfo.data, imageInfo.data_size);
+			imageInfo.name, imageInfo.type, (addr_t)imageInfo.text,
+			imageInfo.text_size, (addr_t)imageInfo.data, imageInfo.data_size);
 		if (info == NULL || !infos.AddItem(info)) {
 			delete info;
 			return B_NO_MEMORY;
@@ -438,9 +438,9 @@ DebuggerInterface::GetImageInfos(BObjectList<ImageInfo>& infos)
 		if ((addr_t)imageInfo.text >= USER_COMMPAGE_ADDR
 			&& (addr_t)imageInfo.text < USER_COMMPAGE_ADDR + COMMPAGE_SIZE) {
 			ImageInfo* info = new(std::nothrow) ImageInfo(B_SYSTEM_TEAM,
-				imageInfo.id, imageInfo.name, (addr_t)imageInfo.text,
-				imageInfo.text_size, (addr_t)imageInfo.data,
-				imageInfo.data_size);
+				imageInfo.id, imageInfo.name, imageInfo.type,
+				(addr_t)imageInfo.text, imageInfo.text_size,
+				(addr_t)imageInfo.data, imageInfo.data_size);
 			if (info == NULL || !infos.AddItem(info)) {
 				delete info;
 				return B_NO_MEMORY;
@@ -495,6 +495,36 @@ DebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	debug_delete_symbol_lookup_context(lookupContext);
 
 	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::GetSymbolInfo(team_id team, image_id image, const char* name,
+	int32 symbolType, SymbolInfo& info)
+{
+	// create a lookup context
+	// TODO: It's a bit expensive to create a lookup context just for one
+	// symbol!
+	debug_symbol_lookup_context* lookupContext;
+	status_t error = debug_create_symbol_lookup_context(team, &lookupContext);
+	if (error != B_OK)
+		return error;
+
+	// try to get the symbol
+	void* foundAddress;
+	size_t foundSize;
+	int32 foundType;
+	error = debug_get_symbol(lookupContext, image, name, symbolType,
+		&foundAddress, &foundSize, &foundType);
+	if (error == B_OK) {
+		info.SetTo((target_addr_t)(addr_t)foundAddress, foundSize, foundType,
+			name);
+	}
+
+	// delete the lookup context
+	debug_delete_symbol_lookup_context(lookupContext);
+
+	return error;
 }
 
 
@@ -638,8 +668,9 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 			const image_info& info = message.image_created.info;
 			event = new(std::nothrow) ImageCreatedEvent(message.origin.team,
 				message.origin.thread,
-				ImageInfo(fTeamID, info.id, info.name, (addr_t)info.text,
-					info.text_size, (addr_t)info.data, info.data_size));
+				ImageInfo(fTeamID, info.id, info.name, info.type,
+					(addr_t)info.text, info.text_size, (addr_t)info.data,
+					info.data_size));
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
@@ -647,8 +678,9 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 			const image_info& info = message.image_deleted.info;
 			event = new(std::nothrow) ImageDeletedEvent(message.origin.team,
 				message.origin.thread,
-				ImageInfo(fTeamID, info.id, info.name, (addr_t)info.text,
-					info.text_size, (addr_t)info.data, info.data_size));
+				ImageInfo(fTeamID, info.id, info.name, info.type,
+					(addr_t)info.text, info.text_size, (addr_t)info.data,
+					info.data_size));
 			break;
 		}
 		default:

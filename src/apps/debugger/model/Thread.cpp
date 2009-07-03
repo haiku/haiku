@@ -37,6 +37,13 @@ Thread::Init()
 }
 
 
+bool
+Thread::IsMainThread() const
+{
+	return fID == fTeam->ID();
+}
+
+
 void
 Thread::SetName(const BString& name)
 {

@@ -23,6 +23,7 @@ ImageInfo::ImageInfo(const ImageInfo& other)
 	fTeam(other.fTeam),
 	fImage(other.fImage),
 	fName(other.fName),
+	fType(other.fType),
 	fTextBase(other.fTextBase),
 	fTextSize(other.fTextSize),
 	fDataBase(other.fDataBase),
@@ -32,12 +33,13 @@ ImageInfo::ImageInfo(const ImageInfo& other)
 
 
 ImageInfo::ImageInfo(team_id team, image_id image, const BString& name,
-	target_addr_t textBase, target_size_t textSize, target_addr_t dataBase,
-	target_size_t dataSize)
+	image_type type, target_addr_t textBase, target_size_t textSize,
+	target_addr_t dataBase, target_size_t dataSize)
 	:
 	fTeam(team),
 	fImage(image),
 	fName(name),
+	fType(type),
 	fTextBase(textBase),
 	fTextSize(textSize),
 	fDataBase(dataBase),
@@ -48,12 +50,13 @@ ImageInfo::ImageInfo(team_id team, image_id image, const BString& name,
 
 void
 ImageInfo::SetTo(team_id team, image_id image, const BString& name,
-	target_addr_t textBase, target_size_t textSize, target_addr_t dataBase,
-	target_size_t dataSize)
+	image_type type, target_addr_t textBase, target_size_t textSize,
+	target_addr_t dataBase, target_size_t dataSize)
 {
 	fTeam = team;
 	fImage = image;
 	fName = name;
+	fType = type;
 	fTextBase = textBase;
 	fTextSize = textSize;
 	fDataBase = dataBase;

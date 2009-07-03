@@ -94,7 +94,8 @@ private:
 
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
-			status_t			_AddImage(const ImageInfo& imageInfo);
+			status_t			_AddImage(const ImageInfo& imageInfo,
+									Image** _image = NULL);
 
 			void				_NotifyUser(const char* title,
 									const char* text,...);

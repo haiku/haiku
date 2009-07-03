@@ -47,6 +47,9 @@ public:
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
 									BObjectList<SymbolInfo>& infos);
+	virtual	status_t			GetSymbolInfo(team_id team, image_id image,
+									const char* name, int32 symbolType,
+									SymbolInfo& info);
 
 	virtual	status_t			GetThreadInfo(thread_id thread,
 									ThreadInfo& info);

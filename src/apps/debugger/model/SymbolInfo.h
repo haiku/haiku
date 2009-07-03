@@ -12,10 +12,14 @@
 
 class SymbolInfo {
 public:
+								SymbolInfo();
 								SymbolInfo(target_addr_t address,
 									target_size_t size, uint32 type,
 									const BString& name);
 								~SymbolInfo();
+
+			void				SetTo(target_addr_t address, target_size_t size,
+									uint32 type, const BString& name);
 
 			target_addr_t		Address() const		{ return fAddress; }
 			target_size_t		Size() const		{ return fSize; }

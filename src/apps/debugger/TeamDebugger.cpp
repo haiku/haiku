@@ -24,6 +24,7 @@
 #include "Jobs.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
+#include "SymbolInfo.h"
 #include "Statement.h"
 #include "TeamDebugInfo.h"
 #include "TeamDebugModel.h"
@@ -288,6 +289,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
 
+	ThreadHandler* mainThreadHandler = NULL;
 	{
 		BObjectList<ThreadInfo> threadInfos(20, true);
 		status_t error = fDebuggerInterface->GetThreadInfos(threadInfos);
@@ -305,17 +307,24 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 			fThreadHandlers.Insert(handler);
 
+			if (thread->IsMainThread())
+				mainThreadHandler = handler;
+
 			handler->Init();
 		}
 	}
 
+	Image* appImage = NULL;
 	{
 		BObjectList<ImageInfo> imageInfos(20, true);
 		status_t error = fDebuggerInterface->GetImageInfos(imageInfos);
 		for (int32 i = 0; ImageInfo* info = imageInfos.ItemAt(i); i++) {
-			error = _AddImage(*info);
+			Image* image;
+			error = _AddImage(*info, &image);
 			if (error != B_OK)
 				return error;
+			if (image->Type() == B_APP_IMAGE)
+				appImage = image;
 		}
 	}
 
@@ -348,7 +357,13 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	// if requested, stop the given thread
 	if (threadID >= 0) {
 		if (stopInMain) {
-			// TODO: Set a temporary breakpoint in main and run the thread.
+			SymbolInfo symbolInfo;
+			if (appImage != NULL && mainThreadHandler != NULL
+				&& fDebuggerInterface->GetSymbolInfo(
+					fTeam->ID(), appImage->ID(), "main", B_SYMBOL_TYPE_TEXT,
+					symbolInfo) == B_OK) {
+				mainThreadHandler->SetBreakpointAndRun(symbolInfo.Address());
+			}
 		} else {
 			debug_thread(threadID);
 				// TODO: Superfluous, if the thread is already stopped.
@@ -852,7 +867,7 @@ TeamDebugger::_GetThreadHandler(thread_id threadID)
 
 
 status_t
-TeamDebugger::_AddImage(const ImageInfo& imageInfo)
+TeamDebugger::_AddImage(const ImageInfo& imageInfo, Image** _image)
 {
 	LocatableFile* file = NULL;
 	if (strchr(imageInfo.Name(), '/') != NULL)
@@ -867,6 +882,9 @@ TeamDebugger::_AddImage(const ImageInfo& imageInfo)
 	ImageHandler* imageHandler = new(std::nothrow) ImageHandler(this, image);
 	if (imageHandler != NULL)
 		fImageHandlers->Insert(imageHandler);
+
+	if (_image != NULL)
+		*_image = image;
 
 	return B_OK;
 }

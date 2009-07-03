@@ -39,6 +39,7 @@ public:
 			image_id			ID() const			{ return fInfo.ImageID(); }
 			const char*			Name() const		{ return fInfo.Name(); }
 			const ImageInfo&	Info() const		{ return fInfo; }
+			image_type			Type() const		{ return fInfo.Type(); }
 			LocatableFile*		ImageFile() const	{ return fImageFile; }
 
 			bool				ContainsAddress(target_addr_t address) const;

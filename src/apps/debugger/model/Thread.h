@@ -34,6 +34,8 @@ public:
 			Team*				GetTeam() const	{ return fTeam; }
 			thread_id			ID() const		{ return fID; }
 
+			bool				IsMainThread() const;
+
 			const char*			Name() const	{ return fName.String(); }
 			void				SetName(const BString& name);
 
