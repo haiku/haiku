@@ -1122,7 +1122,7 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return get_int_option(value, *_length, protocol->time_to_live);
 		if (option == IP_TOS)
 			return get_int_option(value, *_length, protocol->service_type);
-		if (IP_MULTICAST_TTL) {
+		if (option == IP_MULTICAST_TTL) {
 			return get_int_option(value, *_length,
 				protocol->multicast_time_to_live);
 		}
