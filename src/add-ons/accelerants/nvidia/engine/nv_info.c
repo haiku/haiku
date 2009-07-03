@@ -2598,7 +2598,7 @@ static void setup_output_matrix()
 		si->ps.crtc1_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
 		si->ps.crtc1_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
 		si->ps.crtc1_screen.timing.h_total = si->ps.p1_timing.h_total;
-		si->ps.crtc1_screen.timing.v_display = si->ps.p1_timing.h_display;
+		si->ps.crtc1_screen.timing.v_display = si->ps.p1_timing.v_display;
 		si->ps.crtc1_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
 		si->ps.crtc1_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
 		si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
@@ -2628,7 +2628,7 @@ static void setup_output_matrix()
 			si->ps.crtc2_screen.timing.h_sync_start = si->ps.p2_timing.h_sync_start;
 			si->ps.crtc2_screen.timing.h_sync_end = si->ps.p2_timing.h_sync_end;
 			si->ps.crtc2_screen.timing.h_total = si->ps.p2_timing.h_total;
-			si->ps.crtc2_screen.timing.v_display = si->ps.p2_timing.h_display;
+			si->ps.crtc2_screen.timing.v_display = si->ps.p2_timing.v_display;
 			si->ps.crtc2_screen.timing.v_sync_start = si->ps.p2_timing.v_sync_start;
 			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p2_timing.v_sync_end;
 			si->ps.crtc2_screen.timing.v_total = si->ps.p2_timing.v_total;
