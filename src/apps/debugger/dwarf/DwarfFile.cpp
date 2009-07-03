@@ -74,9 +74,7 @@ DwarfFile::Load(const char* fileName)
 	// get the interesting sections
 	fDebugInfoSection = fElfFile->GetSection(".debug_info");
 	fDebugAbbrevSection = fElfFile->GetSection(".debug_abbrev");
-	fDebugStringSection = fElfFile->GetSection(".debug_str");
-	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL
-		|| fDebugStringSection == NULL) {
+	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL) {
 		fprintf(stderr, "DwarfManager::File::Load(\"%s\"): no "
 			".debug_info, .debug_abbrev, or .debug_str section.\n",
 			fileName);
@@ -84,6 +82,7 @@ DwarfFile::Load(const char* fileName)
 	}
 
 	// not mandatory sections
+	fDebugStringSection = fElfFile->GetSection(".debug_str");
 	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
 	fDebugLineSection = fElfFile->GetSection(".debug_line");
 
@@ -477,14 +476,20 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				break;
 			case DW_FORM_strp:
 			{
-				dwarf_off_t offset = dataReader.Read<dwarf_off_t>(0);
-				if (offset >= fDebugStringSection->Size()) {
-					fprintf(stderr, "Invalid DW_FORM_strp offset: %lu\n",
-						offset);
+				if (fDebugStringSection != NULL) {
+					dwarf_off_t offset = dataReader.Read<dwarf_off_t>(0);
+					if (offset >= fDebugStringSection->Size()) {
+						fprintf(stderr, "Invalid DW_FORM_strp offset: %lu\n",
+							offset);
+						return B_BAD_DATA;
+					}
+					attributeValue.SetToString(
+						(const char*)fDebugStringSection->Data() + offset);
+				} else {
+					fprintf(stderr, "Invalid DW_FORM_strp: no string "
+						"section!\n");
 					return B_BAD_DATA;
 				}
-				attributeValue.SetToString(
-					(const char*)fDebugStringSection->Data() + offset);
 				break;
 			}
 			case DW_FORM_udata:
