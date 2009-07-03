@@ -527,6 +527,14 @@ TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
 		fActiveSourceCode->AddReference();
 
 	fSourceView->SetSourceCode(fActiveSourceCode);
+
+	// Scroll to the active function, if it doesn't match the stack frame (i.e.
+	// has been selected manually).
+	if (fActiveFunction != NULL && fActiveSourceCode != NULL
+		&& (fActiveStackFrame == NULL
+			|| fActiveStackFrame->Function() != fActiveFunction)) {
+		fSourceView->ScrollToAddress(fActiveFunction->Address());
+	}
 }
 
 
