@@ -85,7 +85,7 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 /*static*/ bool
 DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
 	const DebugInfoEntry* entry, const char*& _directory, const char*& _file,
-	uint32& _line, uint32& _column)
+	int32& _line, int32& _column)
 {
 	uint32 file;
 	uint32 line;
@@ -128,7 +128,7 @@ DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
 
 	_directory = directoryName;
 	_file = fileName;
-	_line = line - 1;
-	_column = column - 1;
+	_line = (int32)line - 1;
+	_column = (int32)column - 1;
 	return true;
 }

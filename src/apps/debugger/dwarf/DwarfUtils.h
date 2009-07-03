@@ -27,7 +27,7 @@ public:
 									const DebugInfoEntry* entry,
 									const char*& _directory,
 									const char*& _file,
-									uint32& _line, uint32& _column);
+									int32& _line, int32& _column);
 };
 
 

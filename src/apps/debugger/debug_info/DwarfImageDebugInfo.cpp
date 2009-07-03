@@ -229,8 +229,8 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 			// get the source location
 			const char* directoryPath = NULL;
 			const char* fileName = NULL;
-			uint32 line = ~0U;
-			uint32 column = ~0U;
+			int32 line = -1;
+			int32 column = -1;
 			DwarfUtils::GetDeclarationLocation(fFile, subprogramEntry,
 				directoryPath, fileName, line, column);
 
