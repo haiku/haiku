@@ -70,9 +70,17 @@ bool PSDriver::endPage(int)
 void PSDriver::setupCTM() {
 	const float leftMargin = getJobData()->getPrintableRect().left;
 	const float topMargin = getJobData()->getPrintableRect().top;
-	// move origin from bottom left to top left
-	// and set margin
-	writeSpoolString("%f %f translate\n", leftMargin, getJobData()->getPaperRect().Height()-topMargin);
+	if (getJobData()->getOrientation() == JobData::kPortrait) {
+		// move origin from bottom left to top left
+		// and set margin
+		writeSpoolString("%f %f translate\n", leftMargin, getJobData()->getPaperRect().Height()-topMargin);
+	} else {
+		// landscape:
+		// move origin from bottom left to margin top and left 
+		// and rotate page contents
+		writeSpoolString("%f %f translate\n", topMargin, leftMargin);
+		writeSpoolString("90 rotate\n");
+	}
 	// y values increase from top to bottom
 	// units of measure is dpi
 	writeSpoolString("72 %d div 72 -%d div scale\n", getJobData()->getXres(), getJobData()->getYres());
