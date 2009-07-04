@@ -63,11 +63,11 @@ When you're done you can save the result from the menu <span class="menu">File |
 <h1><a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h1>
 <p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
 <p>You can dump the current keymap with a command in Terminal:<p>
-<pre class="terminal">keymap -d > MyKeymap</pre>
+<pre class="terminal">keymap -d MyKeymap</pre>
 <p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
 At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system use the modified keymap with this command:</p>
-<pre class="terminal">keymap -l &lt; MyKeymap</pre>
+<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<pre class="terminal">keymap -l MyKeymap</pre>
 <p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
 
 <pre>#!/bin/keymap -l
