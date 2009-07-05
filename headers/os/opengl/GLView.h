@@ -95,6 +95,7 @@ private:
 		void		_DitherFront();
 		bool		_ConfirmDither();
 		void		_Draw(BRect rect);
+		void		_CallDirectConnected();
 		
 		void *		fGc;
 		uint32		fOptions;

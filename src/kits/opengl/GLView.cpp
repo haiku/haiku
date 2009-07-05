@@ -262,6 +262,7 @@ BGLView::FrameResized(float width, float height)
 	if (fRenderer) {
 		LockGL();
 		_LockDraw();
+		_CallDirectConnected();
 		fRenderer->FrameResized(width, height);
 		_UnlockDraw();
 		UnlockGL();
@@ -345,34 +346,8 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			_UnlockDraw();
 		case B_DIRECT_MODIFY:
 		{
-			_LockDraw();
-			localInfo->buffer_state = info->buffer_state;
-			localInfo->driver_state = info->driver_state;
-			localInfo->bits = info->bits;
-			localInfo->pci_bits = info->pci_bits;
-			localInfo->bytes_per_row = info->bytes_per_row;
-			localInfo->bits_per_pixel = info->bits_per_pixel;
-			localInfo->pixel_format = info->pixel_format;
-			localInfo->layout = info->layout;
-			localInfo->orientation = info->orientation;
-			//memcpy(&localInfo->_reserved, info->_reserved, sizeof(info->_reserved));
-			//localInfo->_dd_type_ = info->_dd_type_;
-			//localInfo->_dd_token_ = info->_dd_token_;
-
-			// Collect the rects into a BRegion, then clip to the view's bounds
-			BRegion region;
-			for (uint32 c = 0; c < info->clip_list_count; c++)
-				region.Include(info->clip_list[c]);
-			BRegion boundsRegion = fBounds.OffsetByCopy(info->window_bounds.left, info->window_bounds.top);
-			localInfo->window_bounds = boundsRegion.RectAtInt(0); // window_bounds are now view bounds
-			region.IntersectWith(&boundsRegion);
-				
-			localInfo->clip_list_count = region.CountRects();
-			localInfo->clip_bounds = region.FrameInt();
-			
-			for (uint32 c = 0; c < localInfo->clip_list_count; c++)
-				localInfo->clip_list[c] = region.RectAtInt(c);
-			
+			_LockDraw();			
+			memcpy(localInfo, info, DIRECT_BUFFER_INFO_AREA_SIZE);
 			_UnlockDraw();
 			break; 
 		}		
@@ -381,9 +356,9 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			_LockDraw();
 			break; 
 	} 
-	
+
 	if (fRenderer)
-		fRenderer->DirectConnected(localInfo);
+		_CallDirectConnected();
 }
 
 
@@ -420,6 +395,32 @@ BGLView::_UnlockDraw()
 		return;
 	
 	fDrawLock.Unlock();
+}
+
+
+void
+BGLView::_CallDirectConnected()
+{
+	glview_direct_info *glviewDirectInfo = (glview_direct_info *)fClipInfo;
+	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
+	direct_buffer_info *info = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
+	memcpy(info, localInfo, DIRECT_BUFFER_INFO_AREA_SIZE);
+
+	// Collect the rects into a BRegion, then clip to the view's bounds
+	BRegion region;
+	for (uint32 c = 0; c < localInfo->clip_list_count; c++)
+		region.Include(localInfo->clip_list[c]);
+	BRegion boundsRegion = fBounds.OffsetByCopy(localInfo->window_bounds.left, localInfo->window_bounds.top);
+	info->window_bounds = boundsRegion.RectAtInt(0); // window_bounds are now view bounds
+	region.IntersectWith(&boundsRegion);
+				
+	info->clip_list_count = region.CountRects();
+	info->clip_bounds = region.FrameInt();
+			
+	for (uint32 c = 0; c < info->clip_list_count; c++)
+		info->clip_list[c] = region.RectAtInt(c);
+	fRenderer->DirectConnected(info);
+	free(info);
 }
 
 
