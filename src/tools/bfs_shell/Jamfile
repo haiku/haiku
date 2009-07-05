@@ -32,8 +32,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 UsePrivateHeaders fs_shell ;
 
-BuildPlatformMain <build>bfs_shell
-	:
+local bfsSource =
 	bfs_disk_system.cpp
 	BlockAllocator.cpp
 	BPlusTree.cpp
@@ -47,7 +46,20 @@ BuildPlatformMain <build>bfs_shell
 	Volume.cpp
 
 	kernel_interface.cpp
+;
+
+BuildPlatformMain <build>bfs_shell
+	:
+	$(bfsSource)
 
 	: <build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	  $(HOST_LIBROOT) $(fsShellCommandLibs)
+;
+
+BuildPlatformMain <build>bfs_fuse
+	:
+	$(bfsSource)
+
+	: <build>fuse_module.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	  $(HOST_LIBROOT) $(fsShellCommandLibs) fuse
 ;

@@ -13,7 +13,7 @@
 void*
 fssh_memchr(const void *source, int value, fssh_size_t length)
 {
-	return memchr(source, value, length);
+	return memchr((void*)source, value, length);
 }
 
 
@@ -106,21 +106,21 @@ fssh_strncmp(const char *string1, const char *string2, fssh_size_t length)
 char*
 fssh_strchr(const char *string, int character)
 {
-	return strchr(string, character);
+	return strchr((char*)string, character);
 }
 
 
 char*
 fssh_strrchr(const char *string, int character)
 {
-	return strrchr(string, character);
+	return strrchr((char*)string, character);
 }
 
 
 char*
 fssh_strstr(const char *string, const char *searchString)
 {
-	return strstr(string, searchString);
+	return strstr((char*)string, searchString);
 }
 
 
@@ -135,7 +135,7 @@ fssh_strchrnul(const char *string, int character)
 char*
 fssh_strpbrk(const char *string, const char *set)
 {
-	return strpbrk(string, set);
+	return strpbrk((char*)string, set);
 }
 
 

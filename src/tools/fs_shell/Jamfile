@@ -31,7 +31,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
-BuildPlatformStaticLibrary <build>fs_shell.a :
+local kernelEmulationSources =
 	atomic.cpp
 	block_cache.cpp
 	byte_order.cpp
@@ -63,7 +63,17 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 	uio.cpp
 	unistd.cpp
 	vfs.cpp
+;
 
+BuildPlatformStaticLibrary <build>fuse_module.a :
+	$(kernelEmulationSources)
+	$(externalCommandsSources)
+
+	fuse.cpp
+;
+
+BuildPlatformStaticLibrary <build>fs_shell.a :
+	$(kernelEmulationSources)
 	$(externalCommandsSources)
 
 	fssh.cpp
