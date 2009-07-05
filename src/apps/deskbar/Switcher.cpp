@@ -658,14 +658,10 @@ TSwitchManager::_SortApps()
 void
 TSwitchManager::MainEntry(BMessage* message)
 {
-	bigtime_t keyRepeatRate;
-	get_key_repeat_delay(&keyRepeatRate);
-
-	if (keyRepeatRate < 200000)
-		keyRepeatRate = 200000;
-
 	bigtime_t now = system_time();
-	bigtime_t timeout = now + keyRepeatRate;
+	bigtime_t timeout = now + 180000;
+		// The delay above was arrived at by trial and error and
+		// has a good "feel"
 
 	app_info appInfo;
 	be_roster->GetActiveAppInfo(&appInfo);
@@ -702,7 +698,8 @@ TSwitchManager::MainEntry(BMessage* message)
 			QuickSwitch(message);
 			return;
 		}
-		snooze(50000);
+		snooze(20000);
+			// Must be a multiple of the delay used above
 	}
 
 	Process((modifierKeys & B_SHIFT_KEY) == 0,
