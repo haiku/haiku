@@ -110,6 +110,32 @@ div.bottomnav p {
 	font-size: 0.8em;
 }
 
+/* contents box */
+
+table.index {
+	margin-left: 30px;
+	padding: 1px;
+	border-width: 1px;
+	border-style: dotted;
+	border-color: #e0e0e0;
+}
+
+table.index tr.heading {
+	background-color: #e0e0e0;
+	text-align: center;
+	font-weight: bold;
+	font-style: italic; 
+	font-size: 1.1em;
+}
+
+table.index tr.index {
+	background-color: #efefef;
+}
+
+table.index td {
+	padding: 5px 20px;
+}
+
 
 /* Haiku User Guide styles and layout */
 

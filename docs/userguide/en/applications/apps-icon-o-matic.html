@@ -37,9 +37,9 @@
 <div class="content">
 
 
-<table id="contents" name="contents" align="right" summary="contents" cellspacing="2" cellpadding="6" style="font-size:0.8em; margin-left:30px; border-width:1px; border-style:dotted; border-color:#e0e0e0; text-align:justify">
-<tr align="center" style="background-color:#F0F0F0"><td><b><i>Contents</i></b></td></tr>
-<tr style="background-color:#F3F3F3"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
+<table class="index" id="index" name="index" summary="index" align="right">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
                 <a href="#icons-attributes">Icons are attributes</a><br />
                 <a href="#i-o-m">Creating icons with Icon-O-Matic</a><br />
                 &#160;&#160;<a href="#i-o-m-path">Path</a><br/>
@@ -60,7 +60,7 @@
 
 <p><br/></p>
 
-<p>Before we come to the actual creating of icons in Icon-O-Matic, a few words to Haiku's icons in general.</p>
+<p>Before we come to the actual creating of icons in Icon-O-Matic, a few words on Haiku's icons in general.</p>
 
 <h1>
 <a href="#contents"><img src="../../images/up.png" align="right" alt="contents" border="0" width="16" height="16" /></a>
@@ -161,6 +161,14 @@ width="16" height="16" /></td>
                 <td>Select points<br /><span class="key">SHIFT</span></td>
         </tr>
 </table>
+<p>You can invoke a context menu by right-clicking a point or a selection of points:</p>
+<table summary="Path context" border="0" cellspacing="0" cellpadding="2">
+<tr><td class="onelinetop"><span class="menu">Select all</span></td><td width="70"><span class="key">ALT</span>&#160;<span class="key">A</span></td><td>Selects all points of the current path.</td></tr>
+<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Puts all selected points in a transformation box, so you can move, resize and rotate them together. It works just like with shapes, described a bit further down.</td></tr>
+<tr><td><span class="menu">Split</span></td><td></td><td>Splits selected points into two, one sitting on top of the other.</td></tr>
+<tr><td><span class="menu">Flip</span></td><td></td><td>Rotates selected points by 180°. Only has an effect on Bezier points.</td></tr>
+<tr><td><span class="menu">Remove</span></td><td><span class="key">DEL</span></td><td>Deletes selected points.</td></tr>
+</table>
 
 <h3><a id="i-o-m-path-menu" name="i-o-m-path-menu">Path Menu</a></h3>
 <p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add Rectangle</span> and <span class="menu">Add Circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
@@ -184,7 +192,7 @@ width="16" height="16" /></td>
 <img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape"
 width="177" height="145" />
 
-<p>When a shape is selected from the list, a rectangle is drawn around it. Depending on where exactly you grab it, the shape is moved, resized or rotated around a point in its center, which itself can be moved. Holding <span class="key">SHIFT</span> will lock direction when moving, limit resizing to 45Â° angles and restrict the aspect ratio while resizing. The mouse pointer again indicates the current mode:</p>
+<p>When a shape is selected from the list, a rectangle is drawn around it. Depending on where exactly you grab it, the shape is moved, resized or rotated around a point in its center, which itself can be moved. Holding <span class="key">SHIFT</span> will lock direction when moving, limit resizing to 45° angles and restrict the aspect ratio while resizing. The mouse pointer again indicates the current mode:</p>
 <table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape"
@@ -323,7 +331,6 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <li><p>You should always try to minimize your use of paths, those are the most expensive, file size wise. Re-use paths wherever possible and work with manipulated shapes and their transformers instead. Smart use of gradients can also save space.</p></li>
 <li><p>Wherever possible, you should activate Snap-to-Grid from the <span class="menu">Options</span> menu when editing paths. Path points that align with the 64x64 pixel grid use less storage space. You'll also get the crispest look if points are set on exact pixel borders. For example, it is important to align the most prominent outlines with the 16x16 grid.</p></li>
 <li><p>Check the preview to see if your icon still looks good in 16x16. You may want to use the <a href="#i-o-m-shape-lod">Level Of Detail</a> settings described in the Shapes section.</p></li>
-<li><p>It is possible to transform the selected path points by pressing <span class="key">T</span> or invoking the context menu by right-clicking on selected points. From the context menu, you will also have access to a few more helpful path editing features.</p></li>
 <li><p>There's an easy way to produce letters, even if Icon-O-Matic doesn't provide such a tool. Just enter the text in a text editor such as StyledEdit, adjust font type and style, and drag&drop or copy&paste the selected text into Icon-O-Matic. This will create the according paths and shapes.</p></li>
 <li><p>If you assign more than one path to a shape, their overlapping areas will cancel each other out. When one path is completely inside another, it practically creates a hole in the resulting shape.</p></li>
 <li><p>You can zoom in and out of the canvas with the mouse wheel. Panning is done either by click&drag with the middle mouse button or with a normal left-click&drag while holding <span class="key">SPACE</span>.</p></li>
