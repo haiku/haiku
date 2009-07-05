@@ -106,7 +106,9 @@ init_kernel()
 	return FSSH_B_OK;
 }
 
-static void fromFsshStatToStat (struct fssh_stat *f_stbuf, struct stat *stbuf)
+
+static void
+fromFsshStatToStat(struct fssh_stat* f_stbuf, struct stat* stbuf)
 {
 	stbuf->st_dev = f_stbuf->fssh_st_dev;
 	stbuf->st_ino = f_stbuf->fssh_st_ino;
