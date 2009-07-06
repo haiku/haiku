@@ -87,7 +87,7 @@ This is also how you update the code in the future.</p></li>
 
 <p>Now you could already start to build RAW or VMWare images. Before we come to that, however, let's have a look at the <span class="cli">UserBuildConfig</span> that can be used to customize and automate some things.</p>
 
-<p>In <span class="path">trunk/haiku/build/jam/</span> there's a <span class="cli">UserBuildConfig.ReadMe</span> that explains various options.  <b>Don't</b> simply rename it and use it as <span class="cli">UserBuildConfig</span>!</p>
+<p>In <span class="path">haiku/trunk/build/jam/</span> there's a <span class="cli">UserBuildConfig.ReadMe</span> that explains various options.  <b>Don't</b> simply rename it and use it as <span class="cli">UserBuildConfig</span>!</p>
 <p>You start by duplicating the <span class="cli">UserBuildConfig.sample</span> and removing the <span class="cli">.sample</span> suffix to get your <span class="cli">UserBuildConfig</span>. From the <span class="cli">.ReadMe</span> you can copy interesting parts into your config and customize them there.</p>
 
 <ol>
@@ -112,7 +112,7 @@ AddOptionalHaikuImagePackages WonderBrush ;</pre>
 <pre># Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
 	: /boot/system/etc/timezones/Europe/Paris : timezone ;
-AddFilesToHaikuImage home config settings : German 
+AddFilesToHaikuImage home config settings : <keymap>German 
 	: Key_map ;</pre></li> 
 <li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files and their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
 For example:</p>
