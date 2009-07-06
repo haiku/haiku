@@ -113,7 +113,7 @@ div.bottomnav p {
 /* contents box */
 
 table.index {
-	margin-left: 30px;
+	margin: 0px 0px 30px 30px;
 	padding: 1px;
 	border-width: 1px;
 	border-style: dotted;

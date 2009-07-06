@@ -36,6 +36,18 @@
 
 <div class="content">
 
+
+<table class="index" id="index" name="index" summary="index" align="right">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#creating">Creating a new e-mail account</a><br />
+	<a href="#incoming">Setting up incoming e-mail</a><br />
+	<a href="#outgoing">Setting up outgoing e-mail</a><br />
+	<a href="#filters">Setting up e-mail filters</a><br />
+	<a href="#settings">Setting up the mail_daemon</a>
+</td></tr>
+</table>
+
 <h1><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png"
 width="64" height="64" />E-mail</h1>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -46,12 +58,16 @@ width="64" height="64" />E-mail</h1>
 <p>Haiku provides a system that retrieves e-mail regularly via a mail_daemon and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
 The configuration is done in the E-Mail preference panel.</p>
 
-<h1><a id="creating" name="creating">Creating a new e-mail account</a></h1>
+<h1>
+<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a id="creating" name="creating">Creating a new e-mail account</a></h1>
 <p>Let's go through the process of setting up an e-mail account.<br />
 You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. Then you declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>.</p>
 <p>Now you enter an <i>Account Name</i>, your <i>Real Name</i> and the <i>Return Address</i> where replies will be sent to.</p>
 
-<h1><a id="incoming" name="incoming">Setting up incoming e-mail</a></h1>
+<h1>
+<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a id="incoming" name="incoming">Setting up incoming e-mail</a></h1>
 <p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
 <img src="../../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" width="491" height="472" />
 <p>From the drop-down menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
@@ -62,14 +78,18 @@ You start by clicking the <span class="button">Add</span> button to create a new
 <p>You can change the <i>Location</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
 <p>Last on this page, you can opt to only <span class="menu">Partially download messages</span> that are larger than a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
 
-<h1><a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h1>
+<h1>
+<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h1>
 <p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
 <img src="../../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" width="491" height="472" />
 <p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
 <p>Next is the <i>SMTP Server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
 <p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
 
-<h1><a id="filters" name="filters">Setting up e-mail filters</a></h1>
+<h1>
+<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a id="filters" name="filters">Setting up e-mail filters</a></h1>
 <p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
 Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
 
@@ -119,7 +139,9 @@ With the first text field you specify which header to check against. These are a
 <p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
 <br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
 
-<h1><a id="settings" name="settings">Setting up the mail_daemon</a></h1>
+<h1>
+<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a id="settings" name="settings">Setting up the mail_daemon</a></h1>
 <p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the mail_server that does all the actual mail checking and fetching how to do its job.</p>
 <img src="../../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" width="491" height="472" />
 <p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
