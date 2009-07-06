@@ -805,7 +805,10 @@ AVFormatReader::AVFormatReader()
 AVFormatReader::~AVFormatReader()
 {
 	TRACE("AVFormatReader::~AVFormatReader\n");
-	delete[] fStreams;
+	if (fStreams != NULL) {
+		delete fStreams[0];
+		delete[] fStreams;
+	}
 }
 
 
@@ -815,6 +818,9 @@ AVFormatReader::~AVFormatReader()
 const char*
 AVFormatReader::Copyright()
 {
+// TODO: Could not find the equivalent in libavformat >= version 53.
+//	if (fStreams != NULL && fStreams[0] != NULL)
+//		return fStreams[0]->Context()->copyright;
 	// TODO: Return copyright of the file instead!
 	return "Copyright 2009, Stephan Aßmus";
 }
