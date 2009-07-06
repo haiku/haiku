@@ -31,10 +31,12 @@ extern "C" {
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
+#	define TRACE_SEEK(a...)
 #	define TRACE_PACKET(a...)
 #else
 #	define TRACE(a...)
 #	define TRACE_IO(a...)
+#	define TRACE_SEEK(a...)
 #	define TRACE_PACKET(a...)
 #endif
 
@@ -547,12 +549,12 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 		return B_NO_INIT;
 
 	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0) {
-		TRACE("  AVFormatReader::Seek() - B_MEDIA_SEEK_CLOSEST_FORWARD "
+		TRACE_SEEK("  AVFormatReader::Seek() - B_MEDIA_SEEK_CLOSEST_FORWARD "
 			"not supported.\n");
 		return B_NOT_SUPPORTED;
 	}
 
-	TRACE("AVFormatReader::StreamCookie::Seek(%ld, %s %s %s %s, %lld, "
+	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld, %s %s %s %s, %lld, "
 		"%lld)\n", Index(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
@@ -572,11 +574,11 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	} else
 		timeStamp = (int64_t)(*time / timeBase / 1000000.0);
 
-	TRACE("  time: %.2fs -> %lld, current DTS: %lld (time_base: %f)\n",
+	TRACE_SEEK("  time: %.2fs -> %lld, current DTS: %lld (time_base: %f)\n",
 		*time / 1000000.0, timeStamp, fStream->cur_dts, timeBase);
 
 	if (av_seek_frame(fContext, Index(), timeStamp, 0) < 0) {
-		TRACE("  av_seek_frame() failed.\n");
+		TRACE_SEEK("  av_seek_frame() failed.\n");
 		return B_ERROR;
 	}
 
@@ -595,8 +597,8 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	if (fContext == NULL || fStream == NULL)
 		return B_NO_INIT;
 
-	TRACE("AVFormatReader::StreamCookie::FindKeyFrame(%ld, %s %s %s %s, %lld, "
-		"%lld)\n", Index(),
+	TRACE_SEEK("AVFormatReader::StreamCookie::FindKeyFrame(%ld, %s %s %s %s, "
+		"%lld, %lld)\n", Index(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? "B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
@@ -616,7 +618,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	} else
 		timeStamp = (int64_t)(*time / timeBase / 1000000.0);
 
-	TRACE("  time: %.2fs -> %lld (time_base: %f)\n", *time / 1000000.0,
+	TRACE_SEEK("  time: %.2fs -> %lld (time_base: %f)\n", *time / 1000000.0,
 		timeStamp, timeBase);
 
 	int searchFlags = AVSEEK_FLAG_BACKWARD;
@@ -625,7 +627,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	int index = av_index_search_timestamp(fStream, timeStamp, searchFlags);
 	if (index < 0) {
-		TRACE("  av_index_search_timestamp() failed.\n");
+		TRACE_SEEK("  av_index_search_timestamp() failed.\n");
 		// Just seek to the beginning of the stream and assume it is a
 		// keyframe...
 		*frame = 0;
@@ -637,10 +639,10 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	timeStamp = entry.timestamp;
 	*time = (bigtime_t)(timeStamp * 1000000.0 * timeBase);
 
-	TRACE("  seeked time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
+	TRACE_SEEK("  seeked time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
 		*frame = timeStamp;//*time * frameRate / 1000000LL;
-		TRACE("  seeked frame: %lld\n", *frame);
+		TRACE_SEEK("  seeked frame: %lld\n", *frame);
 	}
 
 	return B_OK;
@@ -871,6 +873,10 @@ AVFormatReader::Sniff(int32* _streamCount)
 	fStreams[0] = stream;
 	streamDeleter.Detach();
 
+	#ifdef TRACE_AVFORMAT_READER
+	dump_format(const_cast<AVFormatContext*>(stream->Context()), 0, "", 0);
+	#endif
+
 	if (_streamCount != NULL)
 		*_streamCount = streamCount;
 
@@ -1046,7 +1052,7 @@ status_t
 AVFormatReader::Seek(void* _cookie, uint32 seekTo, int64* frame,
 	bigtime_t* time)
 {
-	TRACE("AVFormatReader::Seek()\n");
+	TRACE_SEEK("AVFormatReader::Seek()\n");
 
 	BAutolock _(fStreamLock);
 
@@ -1059,7 +1065,7 @@ status_t
 AVFormatReader::FindKeyFrame(void* _cookie, uint32 flags, int64* frame,
 	bigtime_t* time)
 {
-	TRACE("AVFormatReader::FindKeyFrame()\n");
+	TRACE_SEEK("AVFormatReader::FindKeyFrame()\n");
 
 	BAutolock _(fStreamLock);
 
