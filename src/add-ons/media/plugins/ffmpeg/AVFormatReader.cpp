@@ -765,6 +765,7 @@ AVFormatReader::StreamCookie::_NextPacket(bool reuse)
 	if (fReusePacket) {
 		// The last packet was marked for reuse, so we keep using it.
 		TRACE_PACKET("  re-using last packet\n");
+		fReusePacket = reuse;
 		return B_OK;
 	}
 
