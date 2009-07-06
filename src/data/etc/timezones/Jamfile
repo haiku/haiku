@@ -9,18 +9,18 @@ rule MkZicComp
 	local binaries = [ FTimeZoneBinaries $(source) : true ] ;
 
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
-	
+
 	local targetDir = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 	targetDir = $(targetDir:G=dir) ;
-	
+
 	# introduce a pseudo target all binaries depend on
 	local pseudoBinary = $(source:G=timezone-binary) ;
 	NotFile $(pseudoBinary) ;
 	Depends $(pseudoBinary) : $(binaries) ;
 	LocalDepends timezone_files : $(pseudoBinary) ;
-	
+
 	Depends $(binaries) : $(source) zic $(targetDir) ;
-	
+
 	MkZicComp1 $(binaries) : zic $(source) $(targetDir) ;
 	LocalClean clean : $(binaries) ;
 }
@@ -48,3 +48,7 @@ local nonBackwardBinaries = [ FFilter $(HAIKU_TIME_ZONE_SOURCES) : backward ] ;
 nonBackwardBinaries = $(nonBackwardBinaries:G=timezone-binary) ;
 Depends [ FTimeZoneBinaries [ FGristFiles backward ] ]
 	: $(nonBackwardBinaries) ;
+
+# "pacificnew" links to a file from "northamerica".
+Depends [ FTimeZoneBinaries [ FGristFiles pacificnew ] ]
+	: <timezone-binary>pacificnew ;
