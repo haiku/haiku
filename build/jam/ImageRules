@@ -392,6 +392,12 @@ rule CreateContainerMakeDirectoriesScript container : script
 		Depends $(scriptBody) : $(dirsToCreate) ;
 		CreateContainerMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
 
+		local serializationDependency = $(scriptBody) ;
+			# Used to create a dependency chain between the dummy targets.
+			# This forces jam to build them one after the other, thus preventing
+			# concurrent writes to the script file when building with multiple
+			# jobs.
+
 		# For directories with attributes, we convert those the specified
 		# resource files to files with attributes and add commands to the script
 		# adding the attributes to the directories.
@@ -410,8 +416,10 @@ rule CreateContainerMakeDirectoriesScript container : script
 				NotFile $(dummyTarget) ;
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 
-				Depends $(dummyTarget) : $(initScript) $(attributeFile) ;
+				Depends $(dummyTarget) : $(initScript) $(attributeFile)
+					$(serializationDependency) ;
 				Depends $(script) : $(dummyTarget) ;
+				serializationDependency = $(dummyTarget) ;
 
 				AppendToContainerMakeDirectoriesScriptAttributes $(dummyTarget)
 					: $(initScript) $(attributeFile) ;
@@ -444,6 +452,12 @@ rule CreateContainerCopyFilesScript container : script
 	Depends $(scriptBody) : $(initScript) ;
 	Depends $(script) : $(scriptBody) ;
 
+	local serializationDependency = $(scriptBody) ;
+		# Used to create a dependency chain between the dummy targets.
+		# This forces jam to build them one after the other, thus preventing
+		# concurrent writes to the script file when building with multiple
+		# jobs.
+
 	local dir ;
 	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
 		# filter the targets that shall be renamed; they have to be copied
@@ -462,8 +476,10 @@ rule CreateContainerCopyFilesScript container : script
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 				INSTALL_TARGET_NAME on $(dummyTarget) = $(name) ;
 
-				Depends $(dummyTarget) : $(initScript) $(target) ;
+				Depends $(dummyTarget) : $(initScript) $(target)
+					$(serializationDependency) ;
 				Depends $(script) : $(dummyTarget) ;
+				serializationDependency = $(dummyTarget) ;
 
 				AppendToContainerCopyFilesScriptSingleFile $(dummyTarget)
 					: $(initScript) $(target) ;
@@ -480,8 +496,10 @@ rule CreateContainerCopyFilesScript container : script
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 
-			Depends $(dummyTarget) : $(initScript) $(targets) ;
+			Depends $(dummyTarget) : $(initScript) $(targets)
+				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
+			serializationDependency = $(dummyTarget) ;
 
 			OUTPUT_SCRIPT on $(dummyTarget) = $(initScript) ;
 			AppendToContainerCopyFilesScript $(dummyTarget) : $(targets) ;
@@ -493,7 +511,8 @@ rule CreateContainerCopyFilesScript container : script
 			NotFile $(symlink) ;
 
 			Depends $(script) : $(symlink) ;
-			Depends $(symlink) : $(initScript) ;
+			Depends $(symlink) : $(initScript) $(serializationDependency) ;
+			serializationDependency = $(symlink) ;
 
 			AddSymlinkToContainerCopyFilesScript $(symlink) : $(initScript) ;
 		}
@@ -504,9 +523,11 @@ rule CreateContainerCopyFilesScript container : script
 			NotFile $(targetDir) ;
 
 			Depends $(script) : $(targetDir) ;
-			Depends $(targetDir) : $(initScript) ;
+			Depends $(targetDir) : $(initScript) $(serializationDependency) ;
+			serializationDependency = $(targetDir) ;
 
-			AddDirectoryToContainerCopyFilesScript $(targetDir) : $(initScript) ;
+			AddDirectoryToContainerCopyFilesScript $(targetDir)
+				: $(initScript) ;
 		}
 	}
 }
@@ -514,7 +535,8 @@ rule CreateContainerCopyFilesScript container : script
 
 actions piecemeal AppendToContainerCopyFilesScript bind OUTPUT_SCRIPT
 {
-	echo \$cp "\"\${sPrefix}$(2)\"" "\"\${tPrefix}$(TARGET_DIR)\"" >> $(OUTPUT_SCRIPT)
+	echo \$cp "\"\${sPrefix}$(2)\"" "\"\${tPrefix}$(TARGET_DIR)\"" \
+		>> $(OUTPUT_SCRIPT)
 }
 
 
@@ -551,6 +573,12 @@ rule CreateContainerUnzipFilesScript container : script
 	Depends $(scriptBody) : $(initScript) ;
 	Depends $(script) : $(scriptBody) ;
 
+	local serializationDependency = $(scriptBody) ;
+		# Used to create a dependency chain between the dummy targets.
+		# This forces jam to build them one after the other, thus preventing
+		# concurrent writes to the script file when building with multiple
+		# jobs.
+
 	local dir ;
 	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
 		local zipFiles = [ on $(dir) return $(ZIP_FILES_TO_INSTALL) ] ;
@@ -562,8 +590,10 @@ rule CreateContainerUnzipFilesScript container : script
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 
-			Depends $(dummyTarget) : $(initScript) $(zipFile) ;
+			Depends $(dummyTarget) : $(initScript) $(zipFile)
+				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
+			serializationDependency = $(dummyTarget) ;
 
 			AddUnzipFileToContainerUnzipFilesScript $(dummyTarget)
 				: $(initScript) $(zipFile) ;
