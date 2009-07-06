@@ -51,4 +51,4 @@ Depends [ FTimeZoneBinaries [ FGristFiles backward ] ]
 
 # "pacificnew" links to a file from "northamerica".
 Depends [ FTimeZoneBinaries [ FGristFiles pacificnew ] ]
-	: <timezone-binary>pacificnew ;
+	: <timezone-binary>northamerica ;
