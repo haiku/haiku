@@ -94,7 +94,8 @@ BinCommand bash :
 Includes [ FGristFiles trap.c ] : <bash>signames.h ;
 
 # some sources include the generated builtext.h
-Includes [ FGristFiles execute_cmd.c jobs.c parse.c ] : <bash>builtext.h ;
+Includes [ FGristFiles execute_cmd.c jobs.c parse.c trap.c ]
+	: <bash>builtext.h ;
 
 SubInclude HAIKU_TOP src bin bash lib ;
 SubInclude HAIKU_TOP src bin bash builtins ;

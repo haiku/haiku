@@ -39,7 +39,7 @@ rule MkBuiltinsExt
 
 	MakeLocateArch $(sources) ;
 	SEARCH on $(defFiles) = $(SEARCH_SOURCE) ;
-	
+
 	Depends $(sources) : $(defFiles) mkbuiltins ;
 	MkBuiltinsExt1 $(sources) : mkbuiltins $(defFiles) ;
 	LocalClean clean : $(sources) ;
@@ -59,7 +59,7 @@ local bashDefFiles =
 	shopt.def printf.def complete.def
 ;
 
-# generate the source file for the .def files
+# generate the source files for the .def files
 local bashDefFile ;
 for bashDefFile in [ FGristFiles $(bashDefFiles) ] {
 	local source = $(bashDefFile:S=.c) ;
@@ -77,5 +77,5 @@ StaticLibrary libbuiltins.a
 	  [ FGristFiles $(bashDefFiles:S=.c) ]
 ;
 
-# common.c includes builtext.h
-Includes [ FGristFiles common.c ] : <bash>builtext.h ;
+# common.c and mkbuiltins.c include builtext.h
+Includes [ FGristFiles common.c mkbuiltins.c ] : <bash>builtext.h ;
