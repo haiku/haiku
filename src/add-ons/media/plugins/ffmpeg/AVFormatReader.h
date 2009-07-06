@@ -6,11 +6,9 @@
 #define AV_FORMAT_READER_H
 
 
-#include "ReaderPlugin.h"
+#include <Locker.h>
 
-extern "C" {
-	#include "avformat.h"
-}
+#include "ReaderPlugin.h"
 
 
 class AVFormatReader : public Reader {
@@ -39,31 +37,15 @@ public:
 									int64* frame, bigtime_t* time);
 
 	virtual	status_t			GetNextChunk(void* cookie,
-									const void** chunkBuffer, size_t* chunkSize,
+									const void** chunkBuffer,
+									size_t* chunkSize,
 									media_header* mediaHeader);
 
 private:
-	static	int				_ReadPacket(void* cookie,
-									uint8* buffer, int bufferSize);
+	class StreamCookie;
 
-	static	off_t				_Seek(void* cookie,
-									off_t offset, int whence);
-
-			AVFormatContext*	fContext;
-			AVFormatParameters	fFormatParameters;
-			ByteIOContext		fIOContext;
-			uint8*				fIOBuffer;
-
-	struct StreamCookie {
-		AVStream*			stream;
-		AVCodecContext*		codecContext;
-		AVCodec*			codec;
-		media_format		format;
-		// TODO: Maybe we don't need the codec after all, maybe we do
-		// for getting stream information...
-		// TODO: Some form of packet queue
-	};
-
+			StreamCookie**		fStreams;
+			BLocker				fStreamLock;
 };
 
 
