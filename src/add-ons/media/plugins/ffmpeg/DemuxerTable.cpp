@@ -16,11 +16,11 @@ extern "C" {
 
 
 static const DemuxerFormat gDemuxerTable[] = {
-	{
-		// TODO: untested!
-		"asf", "ASF Movie", "video/x-asf",
-		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
-	},
+//	{
+//		// TODO: untested!
+//		"asf", "ASF Movie", "video/x-asf",
+//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+//	},
 //	{
 //		// Tested with a limited amount of streams and works ok, keep using
 //		// the avi_reader implementation by Marcus Overhagen.
