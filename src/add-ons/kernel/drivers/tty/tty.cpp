@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -1808,7 +1808,7 @@ tty_write_to_tty_slave_unsafe(tty_cookie *sourceCookie, const char *data,
 
 		// write the bytes
 		for (size_t i = 0; i < bytesNeeded; i++)
-			tty_input_putc_locked(target, buffer[i]);
+			line_buffer_putc(target->input_buffer, buffer[i]);
 
 		writable -= bytesNeeded;
 		data++;
