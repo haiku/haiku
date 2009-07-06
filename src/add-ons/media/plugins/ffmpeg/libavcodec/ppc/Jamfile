@@ -18,8 +18,8 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 # Enable altivec support
 SubDirCcFlags -maltivec -mabi=altivec ;
 
-SubDirCcFlags $(FFMPEG_PLATFORM_DEFINES) ;
-SubDirC++Flags $(FFMPEG_PLATFORM_DEFINES) ;
+SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
+SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 
 StaticLibrary libavcodec_ppc.a :
 	check_altivec.c
