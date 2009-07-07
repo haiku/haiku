@@ -47,6 +47,8 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 
 				// Fall through
 			}
+			case B_MODIFIERS_CHANGED:
+			case B_UNMAPPED_KEY_DOWN:
 			case B_MOUSE_DOWN:
 				fEnabled = false;
 				be_app->PostMessage(B_QUIT_REQUESTED);
@@ -86,7 +88,7 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 
 	fFilter = new ScreenSaverFilter();
 	fTopView->AddFilter(fFilter);
-	
+
 	AddChild(fTopView);
 
 	// Ensure that this view receives keyboard input
