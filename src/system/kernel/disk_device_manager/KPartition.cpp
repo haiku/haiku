@@ -243,7 +243,7 @@ void
 KPartition::SetBusy(bool busy)
 {
 	if (busy)
-		SetFlags(B_PARTITION_BUSY);
+		AddFlags(B_PARTITION_BUSY);
 	else
 		ClearFlags(B_PARTITION_BUSY);
 }
@@ -771,6 +771,10 @@ KPartition::AddChild(KPartition *partition, int32 index)
 		fPartitionData.child_count++;
 		partition->SetParent(this);
 		partition->SetDevice(Device());
+		// publish to devfs
+		error = PublishDevice();
+		if (error != B_OK)
+			return error;
 		// notify listeners
 		FireChildAdded(partition, index);
 		return B_OK;
@@ -896,7 +900,7 @@ KPartition::VisitEachDescendant(KPartitionVisitor *visitor)
 	}
 	if (visitor->VisitPost(this))
 		return this;
-	return NULL;	
+	return NULL;
 }
 
 
