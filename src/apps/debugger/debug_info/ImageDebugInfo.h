@@ -17,6 +17,7 @@
 class Architecture;
 class DebuggerInterface;
 class FunctionDebugInfo;
+class FunctionInstance;
 class SpecificImageDebugInfo;
 
 
@@ -29,19 +30,19 @@ public:
 			status_t			FinishInit();
 
 			int32				CountFunctions() const;
-			FunctionDebugInfo*	FunctionAt(int32 index) const;
-			FunctionDebugInfo*	FunctionAtAddress(target_addr_t address) const;
+			FunctionInstance*	FunctionAt(int32 index) const;
+			FunctionInstance*	FunctionAtAddress(target_addr_t address) const;
 
 private:
 			typedef BObjectList<SpecificImageDebugInfo> SpecificInfoList;
-			typedef BObjectList<FunctionDebugInfo> FunctionList;
+			typedef BObjectList<FunctionInstance> FunctionList;
 
 private:
-	static	int					_CompareFunctions(const FunctionDebugInfo* a,
-									const FunctionDebugInfo* b);
+	static	int					_CompareFunctions(const FunctionInstance* a,
+									const FunctionInstance* b);
 	static	int					_CompareAddressFunction(
 									const target_addr_t* address,
-									const FunctionDebugInfo* function);
+									const FunctionInstance* function);
 
 private:
 			ImageInfo			fImageInfo;

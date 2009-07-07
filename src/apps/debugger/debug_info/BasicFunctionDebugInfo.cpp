@@ -49,17 +49,17 @@ BasicFunctionDebugInfo::Size() const
 }
 
 
-const char*
+const BString&
 BasicFunctionDebugInfo::Name() const
 {
-	return fName.String();
+	return fName;
 }
 
 
-const char*
+const BString&
 BasicFunctionDebugInfo::PrettyName() const
 {
-	return fPrettyName.String();
+	return fPrettyName;
 }
 
 

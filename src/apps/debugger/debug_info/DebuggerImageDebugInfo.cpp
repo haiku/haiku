@@ -118,6 +118,15 @@ DebuggerImageDebugInfo::GetStatement(FunctionDebugInfo* function,
 }
 
 
+status_t
+DebuggerImageDebugInfo::GetStatementForSourceLocation(
+	FunctionDebugInfo* function, const SourceLocation& sourceLocation,
+	Statement*& _statement)
+{
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 /*static*/ int
 DebuggerImageDebugInfo::_CompareSymbols(const SymbolInfo* a,
 	const SymbolInfo* b)

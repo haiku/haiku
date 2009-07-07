@@ -34,7 +34,6 @@ public:
 
 			status_t			Init();
 
-
 			Team*				GetTeam() const		{ return fTeam; }
 			image_id			ID() const			{ return fInfo.ImageID(); }
 			const char*			Name() const		{ return fInfo.Name(); }
@@ -48,7 +47,7 @@ public:
 			ImageDebugInfo*		GetImageDebugInfo() const { return fDebugInfo; }
 			image_debug_info_state ImageDebugInfoState() const
 									{ return fDebugInfoState; }
-			void				SetImageDebugInfo(ImageDebugInfo* debugInfo,
+			status_t			SetImageDebugInfo(ImageDebugInfo* debugInfo,
 									image_debug_info_state state);
 
 private:

@@ -22,18 +22,15 @@ public:
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
-	virtual	int32				CountStatements() const;
-	virtual	Statement*			StatementAt(int32 index) const;
 	virtual	Statement*			StatementAtLine(int32 index) const;
-	virtual	Statement*			StatementAtAddress(target_addr_t address) const;
+//			Statement*			StatementAtAddress(target_addr_t address) const;
 
-	virtual	TargetAddressRange	StatementAddressRange() const;
+//			TargetAddressRange	StatementAddressRange() const;
 
 public:
 			bool				AddCommentLine(const BString& line);
 			bool				AddInstructionLine(const BString& line,
-									target_addr_t address, target_size_t size,
-									bool breakpointAllowed);
+									target_addr_t address, target_size_t size);
 										// instructions must be added in
 										// ascending address order
 

@@ -6,7 +6,7 @@
 #include "StackFrame.h"
 
 #include "CpuState.h"
-#include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "Image.h"
 
 
@@ -57,7 +57,7 @@ StackFrame::SetImage(Image* image)
 
 
 void
-StackFrame::SetFunction(FunctionDebugInfo* function)
+StackFrame::SetFunction(FunctionInstance* function)
 {
 	if (fFunction != NULL)
 		fFunction->RemoveReference();

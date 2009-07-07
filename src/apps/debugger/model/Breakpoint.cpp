@@ -21,7 +21,6 @@ Breakpoint::Breakpoint(Image* image, target_addr_t address)
 	:
 	fAddress(address),
 	fImage(image),
-	fUserState(USER_BREAKPOINT_NONE),
 	fInstalled(false)
 {
 }
@@ -29,13 +28,6 @@ Breakpoint::Breakpoint(Image* image, target_addr_t address)
 
 Breakpoint::~Breakpoint()
 {
-}
-
-
-void
-Breakpoint::SetUserState(user_breakpoint_state state)
-{
-	fUserState = state;
 }
 
 
@@ -49,14 +41,45 @@ Breakpoint::SetInstalled(bool installed)
 bool
 Breakpoint::ShouldBeInstalled() const
 {
-	return fUserState == USER_BREAKPOINT_ENABLED || !fClients.IsEmpty();
+	if (!fClients.IsEmpty())
+		return true;
+
+	return !fClients.IsEmpty() || HasEnabledUserBreakpoint();
 }
 
 
 bool
 Breakpoint::IsUnused() const
 {
-	return fUserState == USER_BREAKPOINT_NONE && fClients.IsEmpty();
+	return fClients.IsEmpty() && fUserBreakpoints.IsEmpty();
+}
+
+
+bool
+Breakpoint::HasEnabledUserBreakpoint() const
+{
+	for (UserBreakpointInstanceList::ConstIterator it
+				= fUserBreakpoints.GetIterator();
+			UserBreakpointInstance* instance = it.Next();) {
+		if (instance->GetUserBreakpoint()->IsEnabled())
+			return true;
+	}
+
+	return false;
+}
+
+
+void
+Breakpoint::AddUserBreakpoint(UserBreakpointInstance* instance)
+{
+	fUserBreakpoints.Add(instance);
+}
+
+
+void
+Breakpoint::RemoveUserBreakpoint(UserBreakpointInstance* instance)
+{
+	fUserBreakpoints.Remove(instance);
 }
 
 

@@ -56,7 +56,9 @@ Application Debugger :
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
+	Function.cpp
 	FunctionDebugInfo.cpp
+	FunctionInstance.cpp
 	ImageDebugInfo.cpp
 	ImageDebugInfoProvider.cpp
 	SpecificImageDebugInfo.cpp
@@ -97,6 +99,7 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
+	UserBreakpoint.cpp
 	Team.cpp
 	TeamDebugModel.cpp
 	TeamMemory.cpp

@@ -11,7 +11,7 @@
 #include <AutoLocker.h>
 
 #include "CpuState.h"
-#include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "ImageDebugInfoProvider.h"
@@ -75,31 +75,38 @@ Architecture::CreateStackTrace(Team* team,
 
 		// get the function
 		teamLocker.Lock();
-		FunctionDebugInfo* function = NULL;
-		if (imageDebugInfo != NULL)
+		FunctionInstance* function = NULL;
+		FunctionDebugInfo* functionDebugInfo = NULL;
+		if (imageDebugInfo != NULL) {
 			function = imageDebugInfo->FunctionAtAddress(instructionPointer);
-		Reference<FunctionDebugInfo> functionReference(function);
+			if (function != NULL)
+				functionDebugInfo = function->GetFunctionDebugInfo();
+		}
+		Reference<FunctionInstance> functionReference(function);
 		teamLocker.Unlock();
 
 		// If the last frame had been created by the architecture, we update the
 		// CPU state.
-		if (architectureFrame)
-			UpdateStackFrameCpuState(frame, image, function, cpuState);
+		if (architectureFrame) {
+			UpdateStackFrameCpuState(frame, image,
+				functionDebugInfo, cpuState);
+		}
 
 		// create the frame using the debug info
 		StackFrame* previousFrame = NULL;
 		CpuState* previousCpuState = NULL;
 		if (function != NULL) {
-			status_t error = function->GetSpecificImageDebugInfo()->CreateFrame(
-				image, function, cpuState, previousFrame, previousCpuState);
+			status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
+				->CreateFrame(image, functionDebugInfo, cpuState, previousFrame,
+					previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;
 		}
 
 		// If we have no frame yet, let the architecture create it.
 		if (previousFrame == NULL) {
-			status_t error = CreateStackFrame(image, function, cpuState,
-				frame == NULL, previousFrame, previousCpuState);
+			status_t error = CreateStackFrame(image, functionDebugInfo,
+				cpuState, frame == NULL, previousFrame, previousCpuState);
 			if (error != B_OK)
 				break;
 			architectureFrame = true;

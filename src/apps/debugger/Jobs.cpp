@@ -12,7 +12,7 @@
 #include "Architecture.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
-#include "FunctionDebugInfo.h"
+#include "Function.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "SourceCode.h"
@@ -258,7 +258,7 @@ LoadImageDebugInfoJob::Do()
 	// set the result
 	locker.Lock();
 	if (error == B_OK) {
-		fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
+		error = fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
 		debugInfo->RemoveReference();
 	} else {
 		fImage->SetImageDebugInfo(NULL, IMAGE_DEBUG_INFO_UNAVAILABLE);
@@ -319,7 +319,7 @@ LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
 
 LoadSourceCodeJob::LoadSourceCodeJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	Team* team, FunctionDebugInfo* function)
+	Team* team, Function* function)
 	:
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
@@ -346,13 +346,29 @@ LoadSourceCodeJob::Key() const
 status_t
 LoadSourceCodeJob::Do()
 {
+	// Get the function debug info for an instance which we can use to load the
+	// source code.
+	AutoLocker<Team> locker(fTeam);
+
+	status_t error = B_OK;
+	FunctionDebugInfo* functionDebugInfo = NULL;
+	if (FunctionInstance* instance = fFunction->FirstInstance()) {
+		functionDebugInfo = instance->GetFunctionDebugInfo();
+	} else
+		error = B_ENTRY_NOT_FOUND;
+	Reference<FunctionDebugInfo> functionDebugInfoReference(functionDebugInfo);
+
+	locker.Unlock();
+
 	// load the source code, if we can
 	SourceCode* sourceCode = NULL;
-	status_t error = fFunction->GetSpecificImageDebugInfo()->LoadSourceCode(
-		fFunction, sourceCode);
+	if (error == B_OK) {
+		error = functionDebugInfo->GetSpecificImageDebugInfo()->LoadSourceCode(
+			functionDebugInfo, sourceCode);
+	}
 
 	// set the result
-	AutoLocker<Team> locker(fTeam);
+	locker.Lock();
 	if (error == B_OK) {
 		fFunction->SetSourceCode(sourceCode, FUNCTION_SOURCE_LOADED);
 		sourceCode->RemoveReference();

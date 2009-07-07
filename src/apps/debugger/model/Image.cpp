@@ -8,6 +8,7 @@
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 
 
 Image::Image(Team* team,const ImageInfo& imageInfo, LocatableFile* imageFile)
@@ -49,22 +50,34 @@ Image::ContainsAddress(target_addr_t address) const
 }
 
 
-void
+status_t
 Image::SetImageDebugInfo(ImageDebugInfo* debugInfo,
 	image_debug_info_state state)
 {
 	if (debugInfo == fDebugInfo && state == fDebugInfoState)
-		return;
+		return B_OK;
 
-	if (fDebugInfo != NULL)
+	if (fDebugInfo != NULL) {
+		fTeam->DebugInfo()->RemoveImageDebugInfo(fDebugInfo);
 		fDebugInfo->RemoveReference();
+	}
 
 	fDebugInfo = debugInfo;
 	fDebugInfoState = state;
 
-	if (fDebugInfo != NULL)
-		fDebugInfo->AddReference();
+	status_t error = B_OK;
+	if (fDebugInfo != NULL) {
+		error = fTeam->DebugInfo()->AddImageDebugInfo(fDebugInfo);
+		if (error == B_OK) {
+			fDebugInfo->AddReference();
+		} else {
+			fDebugInfo = NULL;
+			fDebugInfoState = IMAGE_DEBUG_INFO_UNAVAILABLE;
+		}
+	}
 
 	// notify listeners
 	fTeam->NotifyImageDebugInfoChanged(this);
+
+	return error;
 }

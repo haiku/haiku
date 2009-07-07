@@ -8,6 +8,7 @@
 #include <new>
 
 #include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "SpecificImageDebugInfo.h"
 
 
@@ -20,8 +21,8 @@ ImageDebugInfo::ImageDebugInfo(const ImageInfo& imageInfo)
 
 ImageDebugInfo::~ImageDebugInfo()
 {
-	for (int32 i = 0; FunctionDebugInfo* function = fFunctions.ItemAt(i); i++)
-		function->RemoveReference();
+	for (int32 i = 0; FunctionInstance* function = fFunctions.ItemAt(i); i++)
+		function->ReleaseReference();
 }
 
 
@@ -39,23 +40,35 @@ ImageDebugInfo::FinishInit()
 	// missing functions from less expressive debug infos
 	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
 			= fSpecificInfos.ItemAt(i); i++) {
-		FunctionList functions;
+		BObjectList<FunctionDebugInfo> functions;
 		status_t error = specificInfo->GetFunctions(functions);
 		if (error != B_OK)
 			return error;
 
 		for (int32 k = 0; FunctionDebugInfo* function = functions.ItemAt(k);
 				k++) {
-			if (FunctionAtAddress(function->Address()) == NULL) {
-				if (!fFunctions.BinaryInsert(function, &_CompareFunctions)) {
-					for (; (function = functions.ItemAt(k)); k++) {
-						function->RemoveReference();
-						return B_NO_MEMORY;
-					}
-				}
-			} else
-				function->RemoveReference();
+			if (FunctionAtAddress(function->Address()) != NULL)
+				continue;
+
+			FunctionInstance* instance = new(std::nothrow) FunctionInstance(
+				this, function);
+			if (instance == NULL
+				|| !fFunctions.BinaryInsert(instance, &_CompareFunctions)) {
+				delete instance;
+				error = B_NO_MEMORY;
+				break;
+			}
 		}
+
+		// Remove references returned by the specific debug info -- the
+		// FunctionInstance objects have references, now.
+		for (int32 k = 0; FunctionDebugInfo* function = functions.ItemAt(k);
+				k++) {
+			function->RemoveReference();
+		}
+
+		if (error != B_OK)
+			return error;
 	}
 
 	return B_OK;
@@ -69,14 +82,14 @@ ImageDebugInfo::CountFunctions() const
 }
 
 
-FunctionDebugInfo*
+FunctionInstance*
 ImageDebugInfo::FunctionAt(int32 index) const
 {
 	return fFunctions.ItemAt(index);
 }
 
 
-FunctionDebugInfo*
+FunctionInstance*
 ImageDebugInfo::FunctionAtAddress(target_addr_t address) const
 {
 	return fFunctions.BinarySearchByKey(address, &_CompareAddressFunction);
@@ -84,8 +97,8 @@ ImageDebugInfo::FunctionAtAddress(target_addr_t address) const
 
 
 /*static*/ int
-ImageDebugInfo::_CompareFunctions(const FunctionDebugInfo* a,
-	const FunctionDebugInfo* b)
+ImageDebugInfo::_CompareFunctions(const FunctionInstance* a,
+	const FunctionInstance* b)
 {
 	return a->Address() < b->Address()
 		? -1 : (a->Address() == b->Address() ? 0 : 1);
@@ -94,7 +107,7 @@ ImageDebugInfo::_CompareFunctions(const FunctionDebugInfo* a,
 
 /*static*/ int
 ImageDebugInfo::_CompareAddressFunction(const target_addr_t* address,
-	const FunctionDebugInfo* function)
+	const FunctionInstance* function)
 {
 	if (*address < function->Address())
 		return -1;

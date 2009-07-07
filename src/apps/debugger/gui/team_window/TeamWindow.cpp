@@ -215,7 +215,7 @@ TeamWindow::StackFrameSelectionChanged(StackFrame* frame)
 
 
 void
-TeamWindow::FunctionSelectionChanged(FunctionDebugInfo* function)
+TeamWindow::FunctionSelectionChanged(FunctionInstance* function)
 {
 	_SetActiveFunction(function);
 }
@@ -281,7 +281,7 @@ TeamWindow::UserBreakpointChanged(const TeamDebugModel::BreakpointEvent& event)
 
 
 void
-TeamWindow::FunctionSourceCodeChanged(FunctionDebugInfo* function)
+TeamWindow::FunctionSourceCodeChanged(Function* function)
 {
 printf("TeamWindow::FunctionSourceCodeChanged(%p): source: %p, state: %d\n",
 function, function->GetSourceCode(), function->SourceCodeState());
@@ -469,15 +469,15 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 
 
 void
-TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
+TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 {
-	if (function == fActiveFunction)
+	if (functionInstance == fActiveFunction)
 		return;
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 	if (fActiveFunction != NULL) {
-		fActiveFunction->RemoveListener(this);
+		fActiveFunction->GetFunction()->RemoveListener(this);
 		fActiveFunction->RemoveReference();
 	}
 
@@ -487,12 +487,12 @@ TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
 
 	fActiveFunction = NULL;
 
-	if (function != NULL) {
+	if (functionInstance != NULL) {
 		_SetActiveImage(fDebugModel->GetTeam()->ImageByAddress(
-			function->Address()));
+			functionInstance->Address()));
 	}
 
-	fActiveFunction = function;
+	fActiveFunction = functionInstance;
 
 	locker.Lock();
 
@@ -501,13 +501,14 @@ TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
 
 	if (fActiveFunction != NULL) {
 		fActiveFunction->AddReference();
-		fActiveFunction->AddListener(this);
+		fActiveFunction->GetFunction()->AddListener(this);
 
-		sourceCode = fActiveFunction->GetSourceCode();
+		Function* function = fActiveFunction->GetFunction();
+		sourceCode = function->GetSourceCode();
 		sourceCodeReference.SetTo(sourceCode);
 
 		// If the source code is not loaded yet, request it.
-		if (fActiveFunction->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED)
+		if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED)
 			fListener->FunctionSourceCodeRequested(this, fActiveFunction);
 	}
 
@@ -522,8 +523,10 @@ TeamWindow::_SetActiveFunction(FunctionDebugInfo* function)
 void
 TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
 {
-	if (sourceCode == fActiveSourceCode)
+	if (sourceCode == fActiveSourceCode) {
+		_ScrollToActiveFunction();
 		return;
+	}
 
 	if (fActiveSourceCode != NULL)
 		fActiveSourceCode->RemoveReference();
@@ -535,15 +538,8 @@ TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
 
 	fSourceView->SetSourceCode(fActiveSourceCode);
 
-	// Scroll to the active function, if it doesn't match the stack frame (i.e.
-	// has been selected manually).
-	if (fActiveFunction != NULL && fActiveSourceCode != NULL
-		&& (fActiveStackFrame == NULL
-			|| fActiveStackFrame->Function() != fActiveFunction)) {
-		fSourceView->ScrollToAddress(fActiveFunction->Address());
-	}
+	_ScrollToActiveFunction();
 }
-
 
 void
 TeamWindow::_UpdateCpuState()
@@ -597,6 +593,19 @@ TeamWindow::_UpdateRunButtons()
 			fStepIntoButton->SetEnabled(true);
 			fStepOutButton->SetEnabled(true);
 			break;
+	}
+}
+
+
+void
+TeamWindow::_ScrollToActiveFunction()
+{
+	// Scroll to the active function, if it doesn't match the stack frame (i.e.
+	// has been selected manually).
+	if (fActiveFunction != NULL && fActiveSourceCode != NULL
+		&& (fActiveStackFrame == NULL
+			|| fActiveStackFrame->Function() != fActiveFunction)) {
+		fSourceView->ScrollToAddress(fActiveFunction->Address());
 	}
 }
 
@@ -693,7 +702,7 @@ TeamWindow::_HandleSourceCodeChanged()
 	// get a reference to the source code
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
-	SourceCode* sourceCode = fActiveFunction->GetSourceCode();
+	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
 	Reference<SourceCode> sourceCodeReference(sourceCode);
 
 	locker.Unlock();

@@ -296,8 +296,9 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	bool breakpointAllowed;
 	while (disassembler.GetNextInstruction(line, instructionAddress,
 				instructionSize, breakpointAllowed) == B_OK) {
+// TODO: Respect breakpointAllowed!
 		if (!source->AddInstructionLine(line, instructionAddress,
-				instructionSize, breakpointAllowed)) {
+				instructionSize)) {
 			return B_NO_MEMORY;
 		}
 	}
@@ -320,9 +321,7 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 
 	// create a statement
 	ContiguousStatement* statement = new(std::nothrow) ContiguousStatement(
-		SourceLocation(0), SourceLocation(1),
-		TargetAddressRange(info.Address(), info.Size()),
-		info.IsBreakpointAllowed());
+		SourceLocation(0), TargetAddressRange(info.Address(), info.Size()));
 	if (statement == NULL)
 		return B_NO_MEMORY;
 

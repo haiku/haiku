@@ -20,6 +20,7 @@
 #include <ObjectList.h>
 
 #include "Breakpoint.h"
+#include "Function.h"
 #include "SourceCode.h"
 #include "StackTrace.h"
 #include "Statement.h"
@@ -519,8 +520,7 @@ SourceView::MarkerView::Draw(BRect updateRect)
 
 		Statement* statement = fSourceCode->StatementAtLine(line);
 		if (statement == NULL
-				|| statement->StartSourceLocation().Line() != (uint32)line
-				|| !statement->BreakpointAllowed()) {
+				|| statement->StartSourceLocation().Line() != (uint32)line) {
 			continue;
 		}
 
@@ -543,8 +543,7 @@ SourceView::MarkerView::MouseDown(BPoint where)
 
 	Statement* statement = fSourceCode->StatementAtLine(line);
 	if (statement == NULL
-			|| statement->StartSourceLocation().Line() != (uint32)line
-			|| !statement->BreakpointAllowed()) {
+			|| statement->StartSourceLocation().Line() != (uint32)line) {
 		return;
 	}
 
@@ -595,15 +594,24 @@ SourceView::MarkerView::_UpdateIPMarkers()
 	fIPMarkers.MakeEmpty();
 
 	if (fSourceCode != NULL && fStackTrace != NULL) {
+		AutoLocker<TeamDebugModel> locker(fDebugModel);
+
 		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
 				i++) {
 			target_addr_t ip = frame->InstructionPointer();
-			Statement* statement = fSourceCode->StatementAtAddress(ip);
-			if (statement == NULL)
+			FunctionInstance* functionInstance;
+			Statement* statement;
+			if (fDebugModel->GetTeam()->GetStatementAtAddress(ip,
+					functionInstance, statement) != B_OK) {
 				continue;
+			}
+			Reference<Statement> statementReference(statement, true);
+
 			uint32 line = statement->StartSourceLocation().Line();
-			if (line >= (uint32)LineCount())
+			if (functionInstance->GetFunction()->GetSourceCode() != fSourceCode
+				|| line < 0 || line >= (uint32)LineCount()) {
 				continue;
+			}
 
 			bool isTopFrame = i == 0
 				&& frame->Type() != STACK_FRAME_TYPE_SYSCALL;
@@ -638,25 +646,30 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 		AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 		// get the breakpoints in our source code range
-		BObjectList<Breakpoint> breakpoints;
-		fDebugModel->GetBreakpointsInAddressRange(
-			fSourceCode->StatementAddressRange(), breakpoints);
+		BObjectList<UserBreakpoint> breakpoints;
+		fDebugModel->GetBreakpointsForSourceCode(fSourceCode, breakpoints);
 
-		for (int32 i = 0; Breakpoint* breakpoint = breakpoints.ItemAt(i); i++) {
-			if (breakpoint->UserState() == USER_BREAKPOINT_NONE)
+		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
+				i++) {
+			UserBreakpointInstance* breakpointInstance
+				= breakpoint->InstanceAt(0);
+			FunctionInstance* functionInstance;
+			Statement* statement;
+			if (fDebugModel->GetTeam()->GetStatementAtAddress(
+					breakpointInstance->Address(), functionInstance,
+					statement) != B_OK) {
 				continue;
+			}
+			Reference<Statement> statementReference(statement, true);
 
-			Statement* statement = fSourceCode->StatementAtAddress(
-				breakpoint->Address());
-			if (statement == NULL)
-				continue;
 			uint32 line = statement->StartSourceLocation().Line();
-			if (line >= (uint32)LineCount())
+			if (functionInstance->GetFunction()->GetSourceCode() != fSourceCode
+				|| line < 0 || line >= (uint32)LineCount()) {
 				continue;
+			}
 
 			BreakpointMarker* marker = new(std::nothrow) BreakpointMarker(
-				line, breakpoint->Address(),
-				breakpoint->UserState() == USER_BREAKPOINT_ENABLED);
+				line, breakpointInstance->Address(), breakpoint->IsEnabled());
 			if (marker == NULL || !fBreakpointMarkers.AddItem(marker)) {
 				delete marker;
 				break;
@@ -995,9 +1008,15 @@ SourceView::ScrollToAddress(target_addr_t address)
 	if (fSourceCode == NULL)
 		return false;
 
-	Statement* statement = fSourceCode->StatementAtAddress(address);
-	if (statement == NULL)
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+
+	FunctionInstance* functionInstance;
+	Statement* statement;
+	if (fDebugModel->GetTeam()->GetStatementAtAddress(address, functionInstance,
+			statement) != B_OK) {
 		return false;
+	}
+	Reference<Statement> statementReference(statement, true);
 
 	return ScrollToLine(statement->StartSourceLocation().Line());
 }
@@ -1013,11 +1032,16 @@ SourceView::ScrollToLine(uint32 line)
 	float bottom = top + fFontInfo.lineHeight - 1;
 
 	BRect visible = _VisibleRect();
+printf("SourceView::ScrollToLine(%ld)\n", line);
+printf("  visible: (%f, %f) - (%f, %f), line: %f - %f\n", visible.left, visible.top, visible.right, visible.bottom, top, bottom);
 
 	// If not visible at all, scroll to the center, otherwise scroll so that at
 	// least one more line is visible.
 	if (top >= visible.bottom || bottom <= visible.top)
+{
+printf("  -> scrolling to (%f, %f)\n", visible.left, top - (visible.Height() + 1) / 2);
 		ScrollTo(visible.left, top - (visible.Height() + 1) / 2);
+}
 	else if (top - fFontInfo.lineHeight < visible.top)
 		ScrollBy(0, top - fFontInfo.lineHeight - visible.top);
 	else if (bottom + fFontInfo.lineHeight > visible.bottom)

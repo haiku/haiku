@@ -25,12 +25,10 @@ public:
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
-	virtual	int32				CountStatements() const;
-	virtual	Statement*			StatementAt(int32 index) const;
 	virtual	Statement*			StatementAtLine(int32 index) const;
-	virtual	Statement*			StatementAtAddress(target_addr_t address) const;
+//			Statement*			StatementAtAddress(target_addr_t address) const;
 
-	virtual	TargetAddressRange	StatementAddressRange() const;
+//	virtual	TargetAddressRange	StatementAddressRange() const;
 
 private:
 			typedef BObjectList<ContiguousStatement> StatementList;

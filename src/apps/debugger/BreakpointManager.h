@@ -22,9 +22,15 @@ public:
 
 			status_t			Init();
 
-			status_t			InstallUserBreakpoint(target_addr_t address,
+//			status_t			InstallUserBreakpoint(target_addr_t address,
+//									bool enabled);
+//			void				UninstallUserBreakpoint(target_addr_t address);
+
+			status_t			InstallUserBreakpoint(
+									UserBreakpoint* userBreakpoint,
 									bool enabled);
-			void				UninstallUserBreakpoint(target_addr_t address);
+			void				UninstallUserBreakpoint(
+									UserBreakpoint* userBreakpoint);
 
 			status_t			InstallTemporaryBreakpoint(
 									target_addr_t address,
@@ -32,6 +38,11 @@ public:
 			void				UninstallTemporaryBreakpoint(
 									target_addr_t address,
 									BreakpointClient* client);
+
+private:
+			status_t			_UpdateBreakpointInstallation(
+									Breakpoint* breakpoint);
+										// fLock must be held
 
 private:
 			BLocker				fLock;	// used to synchronize un-/installing

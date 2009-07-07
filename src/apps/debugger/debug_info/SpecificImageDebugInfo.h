@@ -17,6 +17,7 @@ class DebuggerInterface;
 class FunctionDebugInfo;
 class Image;
 class SourceCode;
+class SourceLocation;
 class StackFrame;
 class Statement;
 
@@ -43,6 +44,11 @@ public:
 										// returns reference
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
+									Statement*& _statement) = 0;
+										// returns reference
+	virtual	status_t			GetStatementForSourceLocation(
+									FunctionDebugInfo* function,
+									const SourceLocation& sourceLocation,
 									Statement*& _statement) = 0;
 										// returns reference
 };

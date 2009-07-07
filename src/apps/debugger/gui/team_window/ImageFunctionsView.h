@@ -11,7 +11,7 @@
 #include "Team.h"
 
 
-class FunctionDebugInfo;
+class FunctionInstance;
 
 
 class ImageFunctionsView : public BGroupView, private TreeTableListener {
@@ -29,7 +29,7 @@ public:
 
 			void				SetImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
-			void				SetFunction(FunctionDebugInfo* function);
+			void				SetFunction(FunctionInstance* function);
 
 private:
 			class FunctionsTableModel;
@@ -53,7 +53,7 @@ public:
 	virtual						~Listener();
 
 	virtual	void				FunctionSelectionChanged(
-									FunctionDebugInfo* function) = 0;
+									FunctionInstance* function) = 0;
 };
 
 

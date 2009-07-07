@@ -9,7 +9,7 @@
 #include <Window.h>
 
 #include "SourceView.h"
-#include "FunctionDebugInfo.h"
+#include "Function.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "StackTraceView.h"
@@ -20,7 +20,6 @@
 
 class BButton;
 class BTabView;
-class FunctionDebugInfo;
 class Image;
 class RegisterView;
 class SourceCode;
@@ -30,7 +29,7 @@ class StackFrame;
 class TeamWindow : public BWindow, ThreadListView::Listener,
 	ImageListView::Listener, StackTraceView::Listener,
 	ImageFunctionsView::Listener, SourceView::Listener, Team::Listener,
-	TeamDebugModel::Listener, FunctionDebugInfo::Listener {
+	TeamDebugModel::Listener, Function::Listener {
 public:
 	class Listener;
 
@@ -58,7 +57,7 @@ private:
 
 	// ImageFunctionsView::Listener
 	virtual	void				FunctionSelectionChanged(
-									FunctionDebugInfo* function);
+									FunctionInstance* function);
 
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
@@ -80,9 +79,8 @@ private:
 									const TeamDebugModel::BreakpointEvent&
 										event);
 
-	// FunctionDebugInfo::Listener
-	virtual	void				FunctionSourceCodeChanged(
-									FunctionDebugInfo* function);
+	// Function::Listener
+	virtual	void				FunctionSourceCodeChanged(Function* function);
 
 			void				_Init();
 
@@ -90,10 +88,11 @@ private:
 			void				_SetActiveImage(Image* image);
 			void				_SetActiveStackTrace(StackTrace* stackTrace);
 			void				_SetActiveStackFrame(StackFrame* frame);
-			void				_SetActiveFunction(FunctionDebugInfo* function);
+			void				_SetActiveFunction(FunctionInstance* function);
 			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
 			void				_UpdateRunButtons();
+			void				_ScrollToActiveFunction();
 
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
@@ -109,7 +108,7 @@ private:
 			Image*				fActiveImage;
 			StackTrace*			fActiveStackTrace;
 			StackFrame*			fActiveStackFrame;
-			FunctionDebugInfo*	fActiveFunction;
+			FunctionInstance*	fActiveFunction;
 			SourceCode*			fActiveSourceCode;
 			Listener*			fListener;
 			BTabView*			fTabView;
@@ -132,7 +131,7 @@ public:
 	virtual						~Listener();
 
 	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
-									FunctionDebugInfo* function) = 0;
+									FunctionInstance* function) = 0;
 	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
 									Image* image) = 0;
 	virtual	void				ThreadActionRequested(TeamWindow* window,

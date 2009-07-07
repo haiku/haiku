@@ -23,8 +23,8 @@ public:
 	virtual	SpecificImageDebugInfo* GetSpecificImageDebugInfo() const;
 	virtual	target_addr_t		Address() const;
 	virtual	target_size_t		Size() const;
-	virtual	const char*			Name() const;
-	virtual	const char*			PrettyName() const;
+	virtual	const BString&		Name() const;
+	virtual	const BString&		PrettyName() const;
 
 	virtual	LocatableFile*		SourceFile() const;
 	virtual	SourceLocation		SourceStartLocation() const;

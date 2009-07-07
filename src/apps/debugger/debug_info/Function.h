@@ -1,0 +1,85 @@
+/*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef FUNCTION_H
+#define FUNCTION_H
+
+#include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
+
+#include "FunctionInstance.h"
+
+
+enum function_source_state {
+	FUNCTION_SOURCE_NOT_LOADED,
+	FUNCTION_SOURCE_LOADING,
+	FUNCTION_SOURCE_LOADED,
+	FUNCTION_SOURCE_UNAVAILABLE
+};
+
+
+class SourceCode;
+
+
+class Function : public Referenceable, public HashTableLink<Function> {
+public:
+	class Listener;
+
+public:
+								Function();
+								~Function();
+
+			// team must be locked ot access the instances
+			FunctionInstance*	FirstInstance() const
+									{ return fInstances.Head(); }
+			FunctionInstance*	LastInstance() const
+									{ return fInstances.Tail(); }
+			const FunctionInstanceList& Instances() const
+									{ return fInstances; }
+
+			const BString&		Name() const
+									{ return FirstInstance()->Name(); }
+			const BString&		PrettyName() const
+									{ return FirstInstance()->PrettyName(); }
+			LocatableFile*		SourceFile() const
+									{ return FirstInstance()->SourceFile(); }
+			SourceLocation		GetSourceLocation() const
+									{ return FirstInstance()
+										->GetSourceLocation(); }
+
+			// mutable attributes follow (locking required)
+			SourceCode*			GetSourceCode() const	{ return fSourceCode; }
+			function_source_state SourceCodeState() const
+									{ return fSourceCodeState; }
+			void				SetSourceCode(SourceCode* source,
+									function_source_state state);
+
+			void				AddListener(Listener* listener);
+			void				RemoveListener(Listener* listener);
+
+			// package private
+			void				AddInstance(FunctionInstance* instance);
+			void				RemoveInstance(FunctionInstance* instance);
+
+private:
+			typedef DoublyLinkedList<Listener> ListenerList;
+
+private:
+			FunctionInstanceList fInstances;
+			SourceCode*			fSourceCode;
+			function_source_state fSourceCodeState;
+			ListenerList		fListeners;
+};
+
+
+class Function::Listener : public DoublyLinkedListLinkImpl<Listener> {
+public:
+	virtual						~Listener();
+
+	virtual	void				FunctionSourceCodeChanged(Function* function);
+									// called with lock held
+};
+
+
+#endif	// FUNCTION_H

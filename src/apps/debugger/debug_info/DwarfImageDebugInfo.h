@@ -47,6 +47,10 @@ public:
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement);
+	virtual	status_t			GetStatementForSourceLocation(
+									FunctionDebugInfo* function,
+									const SourceLocation& sourceLocation,
+									Statement*& _statement);
 
 private:
 			struct SourceCodeKey;
@@ -60,6 +64,8 @@ private:
 									SourceCode*& _sourceCode);
 			FileSourceCode*		_LookupSourceCode(CompilationUnit* unit,
 									LocatableFile* file);
+			int32				_GetSourceFileIndex(CompilationUnit* unit,
+									LocatableFile* sourceFile) const;
 
 private:
 			BLocker				fLock;

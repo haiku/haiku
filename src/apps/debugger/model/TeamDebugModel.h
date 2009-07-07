@@ -22,7 +22,9 @@ enum {
 
 class Architecture;
 class Breakpoint;
+class SourceCode;
 class TeamMemory;
+class UserBreakpoint;
 
 
 class TeamDebugModel {
@@ -56,9 +58,13 @@ public:
 			Breakpoint*			BreakpointAt(int32 index) const;
 			Breakpoint*			BreakpointAtAddress(
 									target_addr_t address) const;
-			void				GetBreakpointsInAddressRange(
-									TargetAddressRange range,
-									BObjectList<Breakpoint>& breakpoints) const;
+//			void				GetBreakpointsInAddressRange(
+//									TargetAddressRange range,
+//									BObjectList<Breakpoint>& breakpoints) const;
+			void				GetBreakpointsForSourceCode(
+									SourceCode* sourceCode,
+									BObjectList<UserBreakpoint>& breakpoints)
+										const;
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);

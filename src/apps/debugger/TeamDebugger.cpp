@@ -21,11 +21,15 @@
 #include "CpuState.h"
 #include "DebuggerInterface.h"
 #include "FileManager.h"
+#include "Function.h"
+#include "ImageDebugInfo.h"
 #include "Jobs.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
-#include "SymbolInfo.h"
+#include "SourceCode.h"
+#include "SpecificImageDebugInfo.h"
 #include "Statement.h"
+#include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
 #include "TeamDebugModel.h"
 
@@ -479,8 +483,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 void
 TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
-	FunctionDebugInfo* function)
+	FunctionInstance* functionInstance)
 {
+	Function* function = functionInstance->GetFunction();
+
 	// mark loading
 	AutoLocker< ::Team> locker(fTeam);
 	if (function->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
@@ -821,6 +827,8 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 		imageHandler->ReleaseReference();
 	}
 
+// TODO: Remove breakpoints in the image!
+
 	return false;
 }
 
@@ -837,7 +845,114 @@ void
 TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 {
 printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
-	status_t error = fBreakpointManager->InstallUserBreakpoint(address,
+	// check whether there already is a breakpoint
+	AutoLocker< ::Team> locker(fTeam);
+
+	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	UserBreakpoint* userBreakpoint = NULL;
+	if (breakpoint != NULL && breakpoint->FirstUserBreakpoint() != NULL)
+		userBreakpoint = breakpoint->FirstUserBreakpoint()->GetUserBreakpoint();
+	Reference<UserBreakpoint> userBreakpointReference(userBreakpoint);
+
+	if (userBreakpoint == NULL) {
+printf("  no breakpoint yet\n");
+		// get the function at the address
+		Image* image = fTeam->ImageByAddress(address);
+printf("  image: %p\n", image);
+		if (image == NULL)
+			return;
+		ImageDebugInfo* imageDebugInfo = image->GetImageDebugInfo();
+printf("  image debug info: %p\n", imageDebugInfo);
+		if (imageDebugInfo == NULL)
+			return;
+			// TODO: Handle this case by loading the debug info, if possible!
+		FunctionInstance* functionInstance
+			= imageDebugInfo->FunctionAtAddress(address);
+printf("  function instance: %p\n", functionInstance);
+		if (functionInstance == NULL)
+			return;
+		Function* function = functionInstance->GetFunction();
+printf("  function: %p\n", function);
+
+		// get the source location for the address
+		FunctionDebugInfo* functionDebugInfo
+			= functionInstance->GetFunctionDebugInfo();
+		SourceLocation sourceLocation;
+		Statement* breakpointStatement = NULL;
+//		if (SourceCode* sourceCode = functionDebugInfo->GetSourceCode()) {
+//			breakpointStatement = sourceCode->StatementAtAddress(address);
+//			if (breakpointStatement != NULL)
+//				sourceLocation = breakpointStatement->StartSourceLocation();
+//		}
+
+		if (breakpointStatement == NULL
+			&& functionDebugInfo->GetSpecificImageDebugInfo()->GetStatement(
+				functionDebugInfo, address, breakpointStatement) != B_OK) {
+			return;
+		}
+
+		sourceLocation = breakpointStatement->StartSourceLocation();
+		breakpointStatement->ReleaseReference();
+
+		target_addr_t relativeAddress = address - functionInstance->Address();
+printf("  relative address: %#llx, source location: (%ld, %ld)\n", relativeAddress, sourceLocation.Line(), sourceLocation.Column());
+
+		// create the user breakpoint
+		userBreakpoint = new(std::nothrow) UserBreakpoint(function);
+		if (userBreakpoint == NULL)
+			return;
+		userBreakpointReference.SetTo(userBreakpoint, true);
+printf("  created user breakpoint: %p\n", userBreakpoint);
+
+		// iterate through all function instances and create
+		// UserBreakpointInstances
+		for (FunctionInstanceList::ConstIterator it
+					= function->Instances().GetIterator();
+				FunctionInstance* instance = it.Next();) {
+printf("  function instance %p: range: %#llx - %#llx\n", instance, instance->Address(), instance->Address() + instance->Size());
+			// get the breakpoint address for the instance
+			target_addr_t instanceAddress = 0;
+			if (instance == functionInstance) {
+				instanceAddress = address;
+			} else if (functionInstance->SourceFile() != NULL) {
+				// We have a source file, so get the address for the source
+				// location.
+				Statement* statement = NULL;
+				functionDebugInfo = instance->GetFunctionDebugInfo();
+				functionDebugInfo->GetSpecificImageDebugInfo()
+					->GetStatementForSourceLocation(functionDebugInfo,
+						sourceLocation, statement);
+				if (statement != NULL) {
+					instanceAddress = statement->CoveringAddressRange().Start();
+						// TODO: What about BreakpointAllowed()?
+					statement->ReleaseReference();
+				}
+			}
+printf("    breakpoint address using source info: %llx\n", instanceAddress);
+
+			if (instanceAddress == 0) {
+				// No source file (or we failed getting the statement), so try
+				// to use the same relative address.
+				if (relativeAddress > instance->Size())
+					continue;
+				instanceAddress = instance->Address() + relativeAddress;
+			}
+printf("    final breakpoint address: %llx\n", instanceAddress);
+
+			UserBreakpointInstance* breakpointInstance = new(std::nothrow)
+				UserBreakpointInstance(userBreakpoint, instanceAddress);
+			if (breakpointInstance == NULL
+				|| !userBreakpoint->AddInstance(breakpointInstance)) {
+				delete breakpointInstance;
+				return;
+			}
+printf("  breakpoint instance: %p\n", breakpointInstance);
+		}
+	}
+
+	locker.Unlock();
+
+	status_t error = fBreakpointManager->InstallUserBreakpoint(userBreakpoint,
 		enabled);
 	if (error != B_OK) {
 		_NotifyUser("Install Breakpoint", "Failed to install breakpoint: %s",
@@ -850,7 +965,19 @@ void
 TeamDebugger::_HandleClearUserBreakpoint(target_addr_t address)
 {
 printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
-	fBreakpointManager->UninstallUserBreakpoint(address);
+
+	AutoLocker< ::Team> locker(fTeam);
+
+	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	if (breakpoint == NULL || breakpoint->FirstUserBreakpoint() == NULL)
+		return;
+	UserBreakpoint* userBreakpoint
+		= breakpoint->FirstUserBreakpoint()->GetUserBreakpoint();
+	Reference<UserBreakpoint> userBreakpointReference(userBreakpoint);
+
+	locker.Unlock();
+
+	fBreakpointManager->UninstallUserBreakpoint(userBreakpoint);
 }
 
 

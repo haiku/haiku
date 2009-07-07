@@ -22,7 +22,7 @@ enum stack_frame_type {
 
 class CpuState;
 class Image;
-class FunctionDebugInfo;
+class FunctionInstance;
 
 
 class StackFrame : public Referenceable {
@@ -46,8 +46,8 @@ public:
 			Image*				GetImage() const		{ return fImage; }
 			void				SetImage(Image* image);
 
-			FunctionDebugInfo*	Function() const		{ return fFunction; }
-			void				SetFunction(FunctionDebugInfo* function);
+			FunctionInstance*	Function() const		{ return fFunction; }
+			void				SetFunction(FunctionInstance* function);
 
 private:
 			stack_frame_type	fType;
@@ -56,7 +56,7 @@ private:
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fReturnAddress;
 			Image*				fImage;
-			FunctionDebugInfo*	fFunction;
+			FunctionInstance*	fFunction;
 };
 
 

@@ -63,17 +63,17 @@ DwarfFunctionDebugInfo::Size() const
 }
 
 
-const char*
+const BString&
 DwarfFunctionDebugInfo::Name() const
 {
-	return fName.String();
+	return fName;
 }
 
 
-const char*
+const BString&
 DwarfFunctionDebugInfo::PrettyName() const
 {
-	return fName.String();
+	return fName;
 }
 
 

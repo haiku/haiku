@@ -15,7 +15,7 @@
 #include "BreakpointManager.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
-#include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "ImageDebugInfo.h"
 #include "InstructionInfo.h"
 #include "Jobs.h"
@@ -126,7 +126,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 			// spurious breakpoint -- might be a temporary breakpoint, that has
 			// already been uninstalled
 			continueThread = true;
-		} else if (breakpoint->UserState() != USER_BREAKPOINT_ENABLED) {
+		} else if (breakpoint->HasEnabledUserBreakpoint()) {
 			// breakpoint of another thread or one that has been disabled in
 			// the meantime
 			continueThread = true;
@@ -382,20 +382,21 @@ ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 {
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
-	FunctionDebugInfo* function = frame->Function();
-	if (function == NULL)
+	FunctionInstance* functionInstance = frame->Function();
+	if (functionInstance == NULL)
 		return NULL;
+	FunctionDebugInfo* function = functionInstance->GetFunctionDebugInfo();
 
 	// If there's source code attached to the function, we can just get the
 	// statement.
-	SourceCode* sourceCode = function->GetSourceCode();
-	if (sourceCode != NULL) {
-		Statement* statement = sourceCode->StatementAtAddress(
-			frame->InstructionPointer());
-		if (statement != NULL)
-			statement->AddReference();
-		return statement;
-	}
+//	SourceCode* sourceCode = function->GetSourceCode();
+//	if (sourceCode != NULL) {
+//		Statement* statement = sourceCode->StatementAtAddress(
+//			frame->InstructionPointer());
+//		if (statement != NULL)
+//			statement->AddReference();
+//		return statement;
+//	}
 
 	locker.Unlock();
 

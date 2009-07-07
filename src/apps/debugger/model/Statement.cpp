@@ -17,12 +17,9 @@ Statement::~Statement()
 // #pragma mark - AbstractStatement
 
 
-AbstractStatement::AbstractStatement(const SourceLocation& start,
-	const SourceLocation& end, bool breakpointAllowed)
+AbstractStatement::AbstractStatement(const SourceLocation& start)
 	:
-	fStart(start),
-	fEnd(end),
-	fBreakpointAllowed(breakpointAllowed)
+	fStart(start)
 {
 }
 
@@ -34,28 +31,13 @@ AbstractStatement::StartSourceLocation() const
 }
 
 
-SourceLocation
-AbstractStatement::EndSourceLocation() const
-{
-	return fEnd;
-}
-
-
-bool
-AbstractStatement::BreakpointAllowed() const
-{
-	return fBreakpointAllowed;
-}
-
-
 // #pragma mark - ContiguousStatement
 
 
 ContiguousStatement::ContiguousStatement(const SourceLocation& start,
-	const SourceLocation& end, const TargetAddressRange& range,
-	bool breakpointAllowed)
+	const TargetAddressRange& range)
 	:
-	AbstractStatement(start, end, breakpointAllowed),
+	AbstractStatement(start),
 	fRange(range)
 {
 }

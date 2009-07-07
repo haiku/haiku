@@ -11,7 +11,7 @@
 
 #include "table/TableColumns.h"
 
-#include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "Image.h"
 #include "StackTrace.h"
 
@@ -105,7 +105,7 @@ public:
 			case 2:
 			{
 				Image* image = frame->GetImage();
-				FunctionDebugInfo* function = frame->Function();
+				FunctionInstance* function = frame->Function();
 				if (image == NULL && function == NULL) {
 					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
 					return true;

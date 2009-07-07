@@ -10,6 +10,8 @@
 #include <AutoLocker.h>
 
 #include "Breakpoint.h"
+#include "Function.h"
+#include "UserBreakpoint.h"
 
 
 // #pragma mark - BreakpointByAddressPredicate
@@ -107,16 +109,36 @@ TeamDebugModel::BreakpointAtAddress(target_addr_t address) const
 }
 
 
+//void
+//TeamDebugModel::GetBreakpointsInAddressRange(TargetAddressRange range,
+//	BObjectList<Breakpoint>& breakpoints) const
+//{
+//	int32 index = fBreakpoints.FindBinaryInsertionIndex(
+//		BreakpointByAddressPredicate(range.Start()));
+//	for (; Breakpoint* breakpoint = fBreakpoints.ItemAt(index); index++) {
+//		if (breakpoint->Address() > range.End())
+//			break;
+//		breakpoints.AddItem(breakpoint);
+//	}
+//}
+
+
 void
-TeamDebugModel::GetBreakpointsInAddressRange(TargetAddressRange range,
-	BObjectList<Breakpoint>& breakpoints) const
+TeamDebugModel::GetBreakpointsForSourceCode(SourceCode* sourceCode,
+	BObjectList<UserBreakpoint>& breakpoints) const
 {
-	int32 index = fBreakpoints.FindBinaryInsertionIndex(
-		BreakpointByAddressPredicate(range.Start()));
-	for (; Breakpoint* breakpoint = fBreakpoints.ItemAt(index); index++) {
-		if (breakpoint->Address() > range.End())
-			break;
-		breakpoints.AddItem(breakpoint);
+	// TODO: This can probably be optimized. Maybe by registering the user
+	// breakpoints with the team debug model and sorting them by source code.
+	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++) {
+		UserBreakpointInstance* userBreakpointInstance
+			= breakpoint->FirstUserBreakpoint();
+		if (userBreakpointInstance == NULL)
+			continue;
+
+		UserBreakpoint* userBreakpoint
+			= userBreakpointInstance->GetUserBreakpoint();
+		if (userBreakpoint->GetFunction()->GetSourceCode() == sourceCode)
+			breakpoints.AddItem(userBreakpoint);
 	}
 }
 

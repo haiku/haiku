@@ -9,6 +9,9 @@
 
 #include <AutoLocker.h>
 
+#include "FunctionInstance.h"
+#include "ImageDebugInfo.h"
+#include "SpecificImageDebugInfo.h"
 #include "TeamDebugInfo.h"
 
 
@@ -198,6 +201,39 @@ const ImageList&
 Team::Images() const
 {
 	return fImages;
+}
+
+
+status_t
+Team::GetStatementAtAddress(target_addr_t address, FunctionInstance*& _function,
+	Statement*& _statement)
+{
+	// get the image at the address
+	Image* image = ImageByAddress(address);
+	if (image == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	ImageDebugInfo* imageDebugInfo = image->GetImageDebugInfo();
+	if (imageDebugInfo == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the function
+	FunctionInstance* functionInstance
+		= imageDebugInfo->FunctionAtAddress(address);
+	if (functionInstance == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the statement from the image debug info
+	FunctionDebugInfo* functionDebugInfo
+		= functionInstance->GetFunctionDebugInfo();
+	status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
+		->GetStatement(functionDebugInfo, address, _statement);
+		// TODO: Provide the corresponding SourceCode, if available!
+	if (error != B_OK)
+		return error;
+
+	_function = functionInstance;
+	return B_OK;
 }
 
 

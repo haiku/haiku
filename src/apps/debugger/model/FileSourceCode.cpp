@@ -78,20 +78,6 @@ FileSourceCode::LineAt(int32 index) const
 }
 
 
-int32
-FileSourceCode::CountStatements() const
-{
-	return fStatements.CountItems();
-}
-
-
-Statement*
-FileSourceCode::StatementAt(int32 index) const
-{
-	return fStatements.ItemAt(index);
-}
-
-
 Statement*
 FileSourceCode::StatementAtLine(int32 index) const
 {
@@ -99,25 +85,25 @@ FileSourceCode::StatementAtLine(int32 index) const
 }
 
 
-Statement*
-FileSourceCode::StatementAtAddress(target_addr_t address) const
-{
-	return fStatements.BinarySearchByKey(address, &_CompareAddressStatement);
-}
+//Statement*
+//FileSourceCode::StatementAtAddress(target_addr_t address) const
+//{
+//	return fStatements.BinarySearchByKey(address, &_CompareAddressStatement);
+//}
 
 
-TargetAddressRange
-FileSourceCode::StatementAddressRange() const
-{
-	if (fStatements.IsEmpty())
-		return TargetAddressRange();
-
-	ContiguousStatement* first = fStatements.ItemAt(0);
-	ContiguousStatement* last
-		= fStatements.ItemAt(fStatements.CountItems() - 1);
-	return TargetAddressRange(first->AddressRange().Start(),
-		last->AddressRange().End());
-}
+//TargetAddressRange
+//FileSourceCode::StatementAddressRange() const
+//{
+//	if (fStatements.IsEmpty())
+//		return TargetAddressRange();
+//
+//	ContiguousStatement* first = fStatements.ItemAt(0);
+//	ContiguousStatement* last
+//		= fStatements.ItemAt(fStatements.CountItems() - 1);
+//	return TargetAddressRange(first->AddressRange().Start(),
+//		last->AddressRange().End());
+//}
 
 
 /*static*/ int

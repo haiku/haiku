@@ -320,11 +320,179 @@ DwarfImageDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
 
 
 status_t
-DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* function,
+DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	target_addr_t address, Statement*& _statement)
 {
-	// TODO:...
-	return fArchitecture->GetStatement(function, address, _statement);
+	DwarfFunctionDebugInfo* function
+		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
+	if (function == NULL)
+		return B_BAD_VALUE;
+
+	AutoLocker<BLocker> locker(fLock);
+
+	// get the source file
+	LocatableFile* file = function->SourceFile();
+	if (file == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// maybe the source code is already loaded -- this will simplify things
+	CompilationUnit* unit = function->GetCompilationUnit();
+//	FileSourceCode* sourceCode = _LookupSourceCode(unit, file);
+//	if (sourceCode) {
+//		Statement* statement = sourceCode->StatementAtAddress(address);
+//		if (statement == NULL)
+//			return B_ENTRY_NOT_FOUND;
+//
+//		statement->AcquireReference();
+//		_statement = statement;
+//		return B_OK;
+//	}
+
+	// get the index of the source file in the compilation unit for cheaper
+	// comparison below
+	int32 fileIndex = _GetSourceFileIndex(unit, file);
+
+	// Get the statement by executing the line number program for the
+	// compilation unit.
+	LineNumberProgram& program = unit->GetLineNumberProgram();
+	if (!program.IsValid())
+		return B_BAD_DATA;
+
+	LineNumberProgram::State state;
+	program.GetInitialState(state);
+
+	target_addr_t statementAddress = 0;
+	int32 statementLine = -1;
+	int32 statementColumn = -1;
+	while (program.GetNextRow(state)) {
+		bool isOurFile = state.file == fileIndex;
+
+		if (statementAddress != 0
+			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
+			target_addr_t endAddress = state.address;
+			if (address >= statementAddress && address < endAddress) {
+				ContiguousStatement* statement = new(std::nothrow)
+					ContiguousStatement(
+						SourceLocation(statementLine, statementColumn),
+						TargetAddressRange(fRelocationDelta + statementAddress,
+							endAddress - statementAddress));
+				if (statement == NULL)
+					return B_NO_MEMORY;
+
+				_statement = statement;
+				return B_OK;
+			}
+
+			statementAddress = 0;
+		}
+
+		// skip statements of other files
+		if (!isOurFile)
+			continue;
+
+		if (state.isStatement) {
+			statementAddress = state.address;
+			statementLine = state.line - 1;
+			statementColumn = state.column - 1;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+DwarfImageDebugInfo::GetStatementForSourceLocation(FunctionDebugInfo* _function,
+	const SourceLocation& sourceLocation, Statement*& _statement)
+{
+	DwarfFunctionDebugInfo* function
+		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
+	if (function == NULL)
+		return B_BAD_VALUE;
+target_addr_t functionStartAddress = function->Address();
+target_addr_t functionEndAddress = functionStartAddress + function->Size();
+printf("DwarfImageDebugInfo::GetStatementForSourceLocation(%p): function range: %#llx - %#llx\n",
+function, functionStartAddress, functionEndAddress);
+
+	AutoLocker<BLocker> locker(fLock);
+
+	// get the source file
+	LocatableFile* file = function->SourceFile();
+	if (file == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// maybe the source code is already loaded -- this will simplify things
+	CompilationUnit* unit = function->GetCompilationUnit();
+	FileSourceCode* sourceCode = _LookupSourceCode(unit, file);
+	if (sourceCode) {
+// TODO: This is not precise enough -- columns are ignored!
+		Statement* statement = sourceCode->StatementAtLine(
+			sourceLocation.Line());
+		if (statement == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		statement->AcquireReference();
+		_statement = statement;
+		return B_OK;
+	}
+
+	// get the index of the source file in the compilation unit for cheaper
+	// comparison below
+	int32 fileIndex = _GetSourceFileIndex(unit, file);
+
+//	target_addr_t functionStartAddress = function->Address();
+//	target_addr_t functionEndAddress = functionStartAddress + function->Size();
+
+	// Get the statement by executing the line number program for the
+	// compilation unit.
+	LineNumberProgram& program = unit->GetLineNumberProgram();
+	if (!program.IsValid())
+		return B_BAD_DATA;
+
+	LineNumberProgram::State state;
+	program.GetInitialState(state);
+
+	target_addr_t statementAddress = 0;
+	int32 statementLine = -1;
+	int32 statementColumn = -1;
+	while (program.GetNextRow(state)) {
+		bool isOurFile = state.file == fileIndex;
+
+		if (statementAddress != 0
+			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
+			target_addr_t endAddress = state.address;
+			if (statementAddress < endAddress
+				&& statementAddress >= functionStartAddress
+				&& statementAddress < functionEndAddress
+				&& statementLine == (int32)sourceLocation.Line()
+				&& statementColumn == (int32)sourceLocation.Column()) {
+				ContiguousStatement* statement = new(std::nothrow)
+					ContiguousStatement(
+						SourceLocation(statementLine, statementColumn),
+						TargetAddressRange(fRelocationDelta + statementAddress,
+							endAddress - statementAddress));
+				if (statement == NULL)
+					return B_NO_MEMORY;
+
+				_statement = statement;
+				return B_OK;
+			}
+
+			statementAddress = 0;
+		}
+
+		// skip statements of other files
+		if (!isOurFile)
+			continue;
+
+		if (state.isStatement) {
+			statementAddress = state.address;
+			statementLine = state.line - 1;
+			statementColumn = state.column - 1;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -353,25 +521,12 @@ DwarfImageDebugInfo::_LoadSourceCode(FunctionDebugInfo* _function,
 
 	// get the index of the source file in the compilation unit for cheaper
 	// comparison below
-	const char* directory;
-	int32 fileIndex = -1;
-	for (int32 i = 0; const char* fileName = unit->FileAt(i, &directory); i++) {
-		LocatableFile* file = fFileManager->GetSourceFile(directory, fileName);
-		if (file != NULL) {
-			file->ReleaseReference();
-			if (file == function->SourceFile()) {
-				fileIndex = i + 1;
-					// indices are one-based
-				break;
-			}
-		}
-	}
+	int32 fileIndex = _GetSourceFileIndex(unit, function->SourceFile());
 printf("DwarfImageDebugInfo::_LoadSourceCode(), file: %ld, function at: %#llx\n", fileIndex, function->Address());
 
-for (int32 i = 0; const char* fileName = unit->FileAt(i, &directory); i++) {
+for (int32 i = 0; const char* fileName = unit->FileAt(i, NULL); i++) {
 printf("  file %ld: %s\n", i, fileName);
 }
-
 
 	// not loaded yet -- get the source file
 	SourceFile* sourceFile;
@@ -414,9 +569,8 @@ printf("  %#lx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, s
 				ContiguousStatement* statement = new(std::nothrow)
 					ContiguousStatement(
 						SourceLocation(statementLine, statementColumn),
-						SourceLocation(statementLine, statementColumn),
 						TargetAddressRange(fRelocationDelta + statementAddress,
-							endAddress - statementAddress), true);
+							endAddress - statementAddress));
 				if (statement == NULL)
 					return B_NO_MEMORY;
 
@@ -462,4 +616,26 @@ DwarfImageDebugInfo::_LookupSourceCode(CompilationUnit* unit,
 {
 	SourceCodeEntry* entry = fSourceCodes->Lookup(SourceCodeKey(unit, file));
 	return entry != NULL ? entry->sourceCode : NULL;
+}
+
+
+int32
+DwarfImageDebugInfo::_GetSourceFileIndex(CompilationUnit* unit,
+	LocatableFile* sourceFile) const
+{
+	// get the index of the source file in the compilation unit for cheaper
+	// comparison below
+	const char* directory;
+	for (int32 i = 0; const char* fileName = unit->FileAt(i, &directory); i++) {
+		LocatableFile* file = fFileManager->GetSourceFile(directory, fileName);
+		if (file != NULL) {
+			file->ReleaseReference();
+			if (file == sourceFile) {
+				return i + 1;
+					// indices are one-based
+			}
+		}
+	}
+
+	return -1;
 }

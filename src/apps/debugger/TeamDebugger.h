@@ -42,7 +42,7 @@ public:
 private:
 	// TeamWindow::Listener
 	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
-									FunctionDebugInfo* function);
+									FunctionInstance* function);
 	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
 									Image* image);
 	virtual	void				ThreadActionRequested(TeamWindow* window,

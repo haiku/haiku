@@ -28,7 +28,9 @@ enum {
 };
 
 
+class FunctionInstance;
 class LocatableFile;
+class Statement;
 class TeamDebugInfo;
 
 
@@ -67,6 +69,13 @@ public:
 			Image*				ImageByID(image_id imageID) const;
 			Image*				ImageByAddress(target_addr_t address) const;
 			const ImageList&	Images() const;
+
+			status_t			GetStatementAtAddress(target_addr_t address,
+									FunctionInstance*& _function,
+									Statement*& _statement);
+									// returns a reference to the statement,
+									// not to the functions instance, though,
+									// caller must lock
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);

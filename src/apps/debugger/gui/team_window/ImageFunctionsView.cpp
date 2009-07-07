@@ -14,7 +14,7 @@
 
 #include "table/TableColumns.h"
 
-#include "FunctionDebugInfo.h"
+#include "FunctionInstance.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
@@ -63,11 +63,11 @@ public:
 
 		// create an array with the functions
 		int32 functionCount = fImageDebugInfo->CountFunctions();
-		FunctionDebugInfo** functions
-			= new(std::nothrow) FunctionDebugInfo*[functionCount];
+		FunctionInstance** functions
+			= new(std::nothrow) FunctionInstance*[functionCount];
 		if (functions == NULL)
 			return;
-		ArrayDeleter<FunctionDebugInfo*> functionsDeleter(functions);
+		ArrayDeleter<FunctionInstance*> functionsDeleter(functions);
 
 		for (int32 i = 0; i < functionCount; i++)
 			functions[i] = fImageDebugInfo->FunctionAt(i);
@@ -170,12 +170,12 @@ public:
 			return true;
 		}
 
-		FunctionDebugInfo* function = (FunctionDebugInfo*)object;
+		FunctionInstance* function = (FunctionInstance*)object;
 		value.SetTo(function->PrettyName(), B_VARIANT_DONT_COPY_DATA);
 		return true;
 	}
 
-	bool GetFunctionPath(FunctionDebugInfo* function, TreeTablePath& _path)
+	bool GetFunctionPath(FunctionInstance* function, TreeTablePath& _path)
 	{
 		int32 index = -1;
 		for (int32 i = 0; i < fFunctionCount; i++) {
@@ -198,7 +198,7 @@ public:
 	}
 
 	bool GetObjectForPath(const TreeTablePath& path,
-		LocatableFile*& _sourceFile, FunctionDebugInfo*& _function)
+		LocatableFile*& _sourceFile, FunctionInstance*& _function)
 	{
 		int32 componentCount = path.CountComponents();
 		if (componentCount == 0 || componentCount > 2)
@@ -256,8 +256,8 @@ private:
 		return pathA.Compare(pathB);
 	}
 
-	static bool _FunctionLess(const FunctionDebugInfo* a,
-		const FunctionDebugInfo* b)
+	static bool _FunctionLess(const FunctionInstance* a,
+		const FunctionInstance* b)
 	{
 		// compare source file name first
 		int compared = _CompareSourceFileNames(a->SourceFile(),
@@ -271,7 +271,7 @@ private:
 
 private:
 	ImageDebugInfo*		fImageDebugInfo;
-	FunctionDebugInfo**	fFunctions;
+	FunctionInstance**	fFunctions;
 	int32				fFunctionCount;
 	int32*				fSourceFileIndices;
 	int32				fSourceFileCount;
@@ -357,7 +357,7 @@ printf("ImageFunctionsView::SetImageDebugInfo(%p) done\n", imageDebugInfo);
 
 
 void
-ImageFunctionsView::SetFunction(FunctionDebugInfo* function)
+ImageFunctionsView::SetFunction(FunctionInstance* function)
 {
 printf("ImageFunctionsView::SetFunction(%p)\n", function);
 	TreeTablePath path;
@@ -377,7 +377,7 @@ ImageFunctionsView::TreeTableSelectionChanged(TreeTable* table)
 		return;
 
 	LocatableFile* sourceFile = NULL;
-	FunctionDebugInfo* function = NULL;
+	FunctionInstance* function = NULL;
 	TreeTablePath path;
 	if (table->SelectionModel()->GetPathAt(0, path))
 		fFunctionsTableModel->GetObjectForPath(path, sourceFile, function);
