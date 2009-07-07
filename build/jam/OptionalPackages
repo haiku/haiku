@@ -251,8 +251,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage gcc-4.3.3-x86-gcc4-2009-06-29
-			: $(baseURL)/gcc-4.3.3-x86-gcc4-2009-06-29.zip ;
+		InstallOptionalHaikuImagePackage gcc-4.3.3-x86-gcc4-2009-06-29-1
+			: $(baseURL)/gcc-4.3.3-x86-gcc4-2009-06-29-1.zip ;
 
 		# symlink cpp to g++'s headers
 		AddSymlinkToHaikuImage develop abi x86 gcc4 headers
@@ -426,8 +426,8 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libiconv-1.13-x86-gcc2-2009-07-05
-			: $(baseURL)/libiconv-1.13-x86-gcc2-2009-07-05.zip
+		InstallOptionalHaikuImagePackage libiconv-1.13.1-x86-gcc2-2009-07-07
+			: $(baseURL)/libiconv-1.13.1-x86-gcc2-2009-07-07.zip
 			:
 		;
 	}
