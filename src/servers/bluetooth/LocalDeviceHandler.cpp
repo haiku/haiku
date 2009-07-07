@@ -16,6 +16,7 @@ LocalDeviceHandler::LocalDeviceHandler(HCIDelegate* hd)
 
 LocalDeviceHandler::~LocalDeviceHandler() 
 {
+	delete fHCIDelegate;
 	delete fProperties;	
 }
 
@@ -23,7 +24,7 @@ LocalDeviceHandler::~LocalDeviceHandler()
 hci_id
 LocalDeviceHandler::GetID()
 {
-    return fHCIDelegate->GetID();
+    return fHCIDelegate->Id();
 }
 
 
@@ -101,8 +102,8 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 			if (opcode != 0) {
 
 				// The opcode matches
-				if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) 
-					&& ((uint16)opcodeFound == opcode) ) {
+				if ((msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) 
+					&& ((uint16)opcodeFound == opcode)) {
 
 					// this should remove only the entry
 					printf("Removed event %#x and opcode %d from request %p\n",
@@ -122,7 +123,7 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 		}
 		eventIndex++;
 	}
-	printf("%s:Nothing Found/Removed\n",__FUNCTION__); 
+	printf("%s:Nothing Found/Removed\n", __FUNCTION__);
 
 finish:
 	fEventsWanted.Unlock();

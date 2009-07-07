@@ -70,6 +70,25 @@ LocalDeviceImpl::LocalDeviceImpl(HCIDelegate* hd) : LocalDeviceHandler(hd)
 
 }
 
+
+LocalDeviceImpl::~LocalDeviceImpl()
+{
+
+}
+
+void
+LocalDeviceImpl::Unregister()
+{
+	BMessage* msg =	new	BMessage(BT_MSG_REMOVE_DEVICE);
+	
+	msg->AddInt32("hci_id", fHCIDelegate->Id());
+
+	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, "Unregistering %x\n", fHCIDelegate->Id());
+	
+	be_app_messenger.SendMessage(msg);
+}
+
+
 #if 0
 #pragma mark - Event handling methods -
 #endif
@@ -751,11 +770,13 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 
 		AddWantedEvent(request);
 		// LEAK: is command buffer freed within the Message?
-		if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size)
+		if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) 
 			== B_ERROR) {
 			// TODO: - Reply the request with error!
 			//       - Remove the just added request
-			(Output::Instance()->Post("Command issue error\n", BLACKBOARD_KIT));
+			(Output::Instance()->Post("## ERROR Command issue, REMOVING!\n", BLACKBOARD_KIT));
+			ClearWantedEvent(request);
+			
 		} else {
 			return B_OK;
 		}

@@ -77,10 +77,10 @@ bool BluetoothServer::QuitRequested(void)
 	Output::Instance()->Lock();
 	Output::Instance()->Quit();
 
-	LocalDeviceImpl* ldi = NULL;
-	while ((ldi = (LocalDeviceImpl *)fLocalDevicesList.RemoveItem((int32)0))
+	LocalDeviceImpl* lDeviceImpl = NULL;
+	while ((lDeviceImpl = (LocalDeviceImpl *)fLocalDevicesList.RemoveItem((int32)0))
 		!= NULL)
-		delete ldi;
+		delete lDeviceImpl;
  
 	printf("Accepting quitting of the application\n");
 	return BApplication::QuitRequested();
@@ -132,13 +132,13 @@ void BluetoothServer::MessageReceived(BMessage *message)
 			BPath path(str.String());
 			Output::Instance()->Postf(BLACKBOARD_GENERAL,
 				"Requested LocalDevice %s\n", str.String());
-			LocalDeviceImpl* ldi = LocalDeviceImpl::CreateTransportAccessor(&path);
+			LocalDeviceImpl* lDeviceImpl = LocalDeviceImpl::CreateTransportAccessor(&path);
 
-			if (ldi->GetID() >= 0) {
-				fLocalDevicesList.AddItem(ldi);
-				Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
-				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()),
-					"LocalDevice %s id=%x added\n", str.String(), ldi->GetID());
+			if (lDeviceImpl->GetID() >= 0) {
+				fLocalDevicesList.AddItem(lDeviceImpl);
+				Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(lDeviceImpl->GetID()));
+				Output::Instance()->Postf(BLACKBOARD_LD(lDeviceImpl->GetID()),
+					"LocalDevice %s id=%x added\n", str.String(), lDeviceImpl->GetID());
 
 			} else {
 				Output::Instance()->Post("Adding LocalDevice failed\n",
@@ -147,16 +147,16 @@ void BluetoothServer::MessageReceived(BMessage *message)
 
 			status = B_WOULD_BLOCK;
 			/* TODO: This should be by user request only! */
-			ldi->Launch();
+			lDeviceImpl->Launch();
 			break;
 		}
 		
 		case BT_MSG_REMOVE_DEVICE:
 		{
-			LocalDeviceImpl* ldi;
-			message->FindPointer("device", (void**)&ldi);
-			fLocalDevicesList.RemoveItem(ldi);
-			delete ldi;
+			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+			if (lDeviceImpl != NULL)
+				fLocalDevicesList.RemoveItem(lDeviceImpl);
+				delete lDeviceImpl;
 			break;
 		}
 		
@@ -212,20 +212,20 @@ void BluetoothServer::MessageReceived(BMessage *message)
 LocalDeviceImpl* 
 BluetoothServer::LocateDelegateFromMessage(BMessage* message)
 {
-	LocalDeviceImpl* ldi = NULL;
+	LocalDeviceImpl* lDeviceImpl = NULL;
 	hci_id hid;
 
 	if (message->FindInt32("hci_id", &hid) == B_OK) {
 		/* Try to find out when a ID was specified */
 		int index;
 		for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
-		    ldi = fLocalDevicesList.ItemAt(index);
-		    if (ldi->GetID() == hid)
+		    lDeviceImpl = fLocalDevicesList.ItemAt(index);
+		    if (lDeviceImpl->GetID() == hid)
 		        break;
 		}
 	}
 
-	return ldi;
+	return lDeviceImpl;
 
 }
 
@@ -236,9 +236,9 @@ BluetoothServer::LocateLocalDeviceImpl(hci_id hid)
 	int index;
 
 	for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
-		LocalDeviceImpl* ldi = fLocalDevicesList.ItemAt(index);
-		if (ldi->GetID() == hid) 
-			return ldi;
+		LocalDeviceImpl* lDeviceImpl = fLocalDevicesList.ItemAt(index);
+		if (lDeviceImpl->GetID() == hid) 
+			return lDeviceImpl;
 	}
 
 	return NULL;
@@ -262,14 +262,14 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 	hci_id hid;
 	ssize_t size;
 	bdaddr_t bdaddr;
-	LocalDeviceImpl* ldi = NULL;
+	LocalDeviceImpl* lDeviceImpl = NULL;
 	static int32 lastIndex = 0;
 	
 	if (message->FindInt32("hci_id", &hid) == B_OK)
 	{
 		Output::Instance()->Post("GetLocalDevice requested with id\n", 
 						BLACKBOARD_KIT);
-		ldi = LocateDelegateFromMessage(message);
+		lDeviceImpl = LocateDelegateFromMessage(message);
 
 	} else if (message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size ) 
 			== B_OK) {
@@ -279,8 +279,8 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		for (lastIndex = 0; lastIndex < fLocalDevicesList.CountItems(); lastIndex ++) {
 			//TODO: Only possible if the property is available
 			//bdaddr_t local;
-			//ldi = fLocalDevicesList.ItemAt(lastIndex);
-			//if ((ldi->GetAddress(&local, message) == B_OK) 
+			//lDeviceImpl = fLocalDevicesList.ItemAt(lastIndex);
+			//if ((lDeviceImpl->GetAddress(&local, message) == B_OK) 
 			//	&& bacmp(&local, &bdaddr))  {
 			//    break;
 			//}
@@ -291,24 +291,24 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		Output::Instance()->Post("GetLocalDevice plain request\n", BLACKBOARD_KIT);
 		// from last assigned till end
 		for ( int index  = lastIndex + 1; index < fLocalDevicesList.CountItems(); index ++) {
-			ldi = fLocalDevicesList.ItemAt(index);
-			printf("Requesting local device %ld\n", ldi->GetID());
-			if (ldi != NULL && ldi->Available())
+			lDeviceImpl = fLocalDevicesList.ItemAt(index);
+			printf("Requesting local device %ld\n", lDeviceImpl->GetID());
+			if (lDeviceImpl != NULL && lDeviceImpl->Available())
 			{
-				Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", ldi->GetID());
+				Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", lDeviceImpl->GetID());
 				lastIndex = index;
 				break;
 			}
 		}	
 
 		// from starting till last assigned if not yet found
-		if (ldi == NULL) {
+		if (lDeviceImpl == NULL) {
 			for ( int index = 0; index <= lastIndex ; index ++) {
-				ldi = fLocalDevicesList.ItemAt(index);
-				printf("Requesting local device %ld\n", ldi->GetID());
-				if (ldi != NULL && ldi->Available())
+				lDeviceImpl = fLocalDevicesList.ItemAt(index);
+				printf("Requesting local device %ld\n", lDeviceImpl->GetID());
+				if (lDeviceImpl != NULL && lDeviceImpl->Available())
 				{
-					Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", ldi->GetID());
+					Output::Instance()->Postf(BLACKBOARD_KIT, "Device available: %lx\n", lDeviceImpl->GetID());
 					lastIndex = index;
 					break;
 				}
@@ -316,9 +316,9 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		}
 	}
 	
-	if (lastIndex <= fLocalDevicesList.CountItems() && ldi != NULL && ldi->Available()) {
-		hid = ldi->GetID();
-		ldi->Acquire();
+	if (lastIndex <= fLocalDevicesList.CountItems() && lDeviceImpl != NULL && lDeviceImpl->Available()) {
+		hid = lDeviceImpl->GetID();
+		lDeviceImpl->Acquire();
 		
 		Output::Instance()->Postf(BLACKBOARD_KIT, "Device acquired %lx\n", hid);
 		return reply->AddInt32("hci_id", hid);
@@ -332,24 +332,26 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 status_t
 BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 {
-	LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
+	LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
 	const char* propertyRequested;
 
 	// Find out if there is a property being requested,
 	if (message->FindString("property", &propertyRequested) == B_OK) {
 		// Check if the property has been already retrieved
-		if (ldi->IsPropertyAvailable(propertyRequested)) {
+		if (lDeviceImpl->IsPropertyAvailable(propertyRequested)) {
 			// Dump everything
-			reply->AddMessage("properties",ldi->GetPropertiesMessage());
+			reply->AddMessage("properties", lDeviceImpl->GetPropertiesMessage());
 			return B_OK;
 		}
 	}
 	
 	// we are gonna need issue the command ...
-	if (ldi->ProcessSimpleRequest(DetachCurrentMessage()) == B_OK)
+	if (lDeviceImpl->ProcessSimpleRequest(DetachCurrentMessage()) == B_OK)
 		return B_WOULD_BLOCK;
-	else
+	else {
+		lDeviceImpl->Unregister();
 		return B_ERROR;
+	}
 
 }
 
@@ -361,22 +363,22 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 	 * and will not care about status fields, therefore we return OK in all cases
 	 */
 	
-	LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
+	LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
 	const char* propertyRequested;
 
 	// Find out if there is a property being requested,
 	if (message->FindString("property", &propertyRequested) == B_OK) {
 		
-		Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "Searching %s property...\n",
+		Output::Instance()->Postf(BLACKBOARD_LD(lDeviceImpl->GetID()), "Searching %s property...\n",
 					propertyRequested);
 
 		// Check if the property has been already retrieved
-		if (ldi->IsPropertyAvailable(propertyRequested)) {
+		if (lDeviceImpl->IsPropertyAvailable(propertyRequested)) {
 			if (strcmp(propertyRequested, "hci_version") == 0
 				|| strcmp(propertyRequested, "lmp_version") == 0
 			    || strcmp(propertyRequested, "sco_mtu") == 0) {
 			    	
-				uint8 result = ldi->GetPropertiesMessage()->FindInt8(propertyRequested);
+				uint8 result = lDeviceImpl->GetPropertiesMessage()->FindInt8(propertyRequested);
 				reply->AddInt32("result", result);
 				
 			} else if (strcmp(propertyRequested, "hci_revision") == 0
@@ -386,11 +388,11 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 					   || strcmp(propertyRequested, "acl_max_pkt") == 0
 					   || strcmp(propertyRequested, "sco_max_pkt") == 0 ) {
 					   	
-				uint16 result = ldi->GetPropertiesMessage()->FindInt16(propertyRequested);
+				uint16 result = lDeviceImpl->GetPropertiesMessage()->FindInt16(propertyRequested);
 				reply->AddInt32("result", result);
 				
 			} else {
-				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "Property %s could not be satisfied\n",
+				Output::Instance()->Postf(BLACKBOARD_LD(lDeviceImpl->GetID()), "Property %s could not be satisfied\n",
 						propertyRequested);
 			}
 		}

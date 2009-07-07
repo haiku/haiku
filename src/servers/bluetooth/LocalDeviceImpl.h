@@ -25,19 +25,21 @@ private:
 
 public:
 
-    // Factory methods
-    static LocalDeviceImpl* CreateControllerAccessor(BPath* path);
-    static LocalDeviceImpl* CreateTransportAccessor(BPath* path);		    
+	// Factory methods
+	static LocalDeviceImpl* CreateControllerAccessor(BPath* path);
+	static LocalDeviceImpl* CreateTransportAccessor(BPath* path);
+	~LocalDeviceImpl();
+	void Unregister();
 
 	void HandleEvent(struct hci_event_header* event);
-    
-    /* Request handling */	
-	status_t GetAddress(bdaddr_t* bdaddr, BMessage* request);	
+
+	// Request handling
+	status_t GetAddress(bdaddr_t* bdaddr, BMessage* request);
 	status_t GetFriendlyName(BString str, BMessage* request);
 	status_t ProcessSimpleRequest(BMessage* request);
 
-    /* Events handling */	
-    void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index);
+	// Events handling
+	void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index);
 	void CommandStatus(struct hci_ev_cmd_status* event, BMessage* request, int32 index);
 
 	// Inquiry
@@ -47,11 +49,11 @@ public:
 
 	// Connection
 	void ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request);
-	void ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request);	
-	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event, BMessage* request);	
+	void ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request);
+	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event, BMessage* request);
 
 	// Pairing
-	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);	
+	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);
 	void RoleChange(struct hci_ev_role_change* event, BMessage* request, int32 index);
 	void LinkKeyNotify(struct hci_ev_link_key_notify* event, BMessage* request, int32 index);
 	void PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request, int32 index);

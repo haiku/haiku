@@ -16,9 +16,11 @@ class HCITransportAccessor : public HCIDelegate {
 
 	public:
 		HCITransportAccessor(BPath* path);
+		~HCITransportAccessor();
 		status_t IssueCommand(raw_command rc, size_t size);
 		status_t Launch();
-		
+	private:
+		int fDescriptor;		
 };
 
 #endif

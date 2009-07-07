@@ -13,7 +13,6 @@
 
 #include <bluetooth/HCI/btHCI_transport.h>
 
-
 typedef void* raw_command;
 
 
@@ -22,39 +21,20 @@ class HCIDelegate {
 	public:
 		HCIDelegate(BPath* path)
 		{
-			status_t status;
-				
-			fFD = open (path->Path(), O_RDWR);
-			if (fFD > 0) {
-				// find out which ID was assigned
-				status = ioctl(fFD, GET_HCI_ID, &fHID, 0);
-				printf("%s: hid retrieved %lx status=%ld\n", __FUNCTION__, 
-					fHID, status);
-			} else {
-				printf("%s: Device driver could not be opened %ld\n", __FUNCTION__, 
-					fHID);
-				fHID = B_ERROR;
-			}
-
 			//TODO create such queue
-
+			fIdentifier = -1;
 		}
 
-		
-		hci_id GetID(void)
+
+		hci_id Id(void) const
 		{
-			return fHID;
+			return fIdentifier;
 		}
 
 
 		virtual ~HCIDelegate()
  		{
-			if (fFD  > 0)
-			{
-				close (fFD);
-				fFD = -1;
-				fHID = B_ERROR;
-			}
+
 		}
 
 		virtual status_t IssueCommand(raw_command rc, size_t size)=0; 
@@ -71,17 +51,15 @@ class HCIDelegate {
 		status_t QueueCommand(raw_command rc, size_t size) 
 		{
 			// TODO: this is suposed to queue the command in a queue so all
-			//  are actually send to HW to implement HCI FlowControl requeriments
+			// are actually send to HW to implement HCI FlowControl requeriments
 			return IssueCommand(rc, size);
 		}
 
 	protected:
 
-		hci_id fHID;
-		int fFD;
+		hci_id fIdentifier;
 
 	private:
-
 
 };
 
