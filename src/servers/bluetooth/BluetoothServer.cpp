@@ -154,9 +154,10 @@ void BluetoothServer::MessageReceived(BMessage *message)
 		case BT_MSG_REMOVE_DEVICE:
 		{
 			LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
-			if (lDeviceImpl != NULL)
+			if (lDeviceImpl != NULL) {
 				fLocalDevicesList.RemoveItem(lDeviceImpl);
 				delete lDeviceImpl;
+			}
 			break;
 		}
 		
@@ -200,7 +201,8 @@ void BluetoothServer::MessageReceived(BMessage *message)
 	if (status != B_WOULD_BLOCK) {
 		reply.AddInt32("status", status);
 		message->SendReply(&reply);
-		printf("Sending reply message\n");
+		printf("Sending reply message for->\n");
+		message->PrintToStream();
 	}
 }
 
@@ -333,6 +335,10 @@ status_t
 BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 {
 	LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+	if (lDeviceImpl == NULL) {
+		return B_ERROR;
+	}
+	
 	const char* propertyRequested;
 
 	// Find out if there is a property being requested,
@@ -362,8 +368,11 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 	/* User side will look for the reply in a result field
 	 * and will not care about status fields, therefore we return OK in all cases
 	 */
-	
 	LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
+	if (lDeviceImpl == NULL) {
+		return B_ERROR;
+	}
+	
 	const char* propertyRequested;
 
 	// Find out if there is a property being requested,
