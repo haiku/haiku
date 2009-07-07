@@ -761,7 +761,7 @@ init_driver(void)
 		debugf("cannot get module \"%s\"\n", BT_CORE_DATA_MODULE_NAME);
 		return B_ERROR;
 	} else
-		debugf("BT_CORE_DATA_MODULE_NAME module at %p\n", btDevices);
+		debugf("btCoreData module at %p\n", btCoreData);
 
 	// BT devices MODULE INITS
 	if (get_module(btDevices_name,(module_info**)&btDevices) != B_OK) {
