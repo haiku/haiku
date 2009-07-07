@@ -23,6 +23,6 @@ Application Pulse :
 	PulseView.cpp
 	PulseWindow.cpp
 
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Pulse.rdef
 ;

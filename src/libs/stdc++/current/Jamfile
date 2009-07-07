@@ -1,0 +1,49 @@
+SubDir HAIKU_TOP src libs stdc++ current ;
+
+
+
+# create libstdc++.so from the libstdc++.a build with the compiler
+rule CreateLibStdC++FromArchive
+{
+	local _lib = $(1) ;
+	local neededLibs ;
+	
+	if ! [ IsPlatformSupportedForTarget $(1) ] {
+		return ;
+	}
+
+	MainFromObjects $(_lib) : $(2) ;
+	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
+		-nostart -Xlinker -soname=\"$(_lib:G=)\" 
+		-Xlinker --strip-debug
+		-Xlinker --whole-archive ;
+	LinkAgainst $(_lib) : $(3) ;
+
+	AddSharedObjectGlueCode $(_lib) : false ;
+}
+
+CreateLibStdC++FromArchive $(HAIKU_SHARED_LIBSTDC++) 
+	: $(HAIKU_STATIC_LIBSTDC++) ;
+
+# create libsupc++.so from the libsupc++.a build with the compiler
+rule CreateLibSupC++FromArchive
+{
+	local _lib = $(1) ;
+	local neededLibs ;
+	
+	if ! [ IsPlatformSupportedForTarget $(1) ] {
+		return ;
+	}
+
+	MainFromObjects $(_lib) : $(2) ;
+	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
+		-nostart -Xlinker -soname=\"$(_lib:G=)\" 
+		-Xlinker --strip-debug
+		-Xlinker --whole-archive ;
+	LinkAgainst $(_lib) : $(3) ;
+
+	AddSharedObjectGlueCode $(_lib) : false ;
+}
+
+CreateLibSupC++FromArchive $(HAIKU_SHARED_LIBSUPC++) 
+	: $(HAIKU_STATIC_LIBSUPC++) ;

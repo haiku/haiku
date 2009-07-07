@@ -13,6 +13,6 @@ Preference Bluetooth :
 	ExtendedLocalDeviceView.cpp
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
-	: be libbluetooth.so
+	: be libbluetooth.so $(TARGET_LIBSUPC++)
 	;
 

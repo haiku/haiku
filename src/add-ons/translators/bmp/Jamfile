@@ -9,7 +9,7 @@ Translator BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 
-	: be translation libtranslatorsutils.a
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

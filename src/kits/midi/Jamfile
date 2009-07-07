@@ -27,4 +27,5 @@ SharedLibrary libmidi.so :
 	libmidi2.so
 	media
 	libfluidsynth.so
+	$(TARGET_LIBSUPC++)
 ;

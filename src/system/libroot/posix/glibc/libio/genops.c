@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifdef _IO_MTSAFE_IO
 static _IO_lock_t list_all_lock = _IO_lock_initializer;
 #endif
@@ -400,7 +399,7 @@ _IO_setb (f, b, eb, a)
      int a;
 {
   if (f->_IO_buf_base && !(f->_flags & _IO_USER_BUF))
-    FREE_BUF (f->_IO_buf_base, _IO_blen (f));
+	  FREE_BUF (f->_IO_buf_base, _IO_blen (f));
   f->_IO_buf_base = b;
   f->_IO_buf_end = eb;
   if (a)
@@ -678,7 +677,8 @@ _IO_default_finish (fp, dummy)
      int dummy;
 {
   struct _IO_marker *mark;
-  if (fp->_IO_buf_base && !(fp->_flags & _IO_USER_BUF))
+  if (fp->_IO_buf_base && fp->_IO_buf_base != fp->_shortbuf
+	  && !(fp->_flags & _IO_USER_BUF))
     {
       FREE_BUF (fp->_IO_buf_base, _IO_blen (fp));
       fp->_IO_buf_base = fp->_IO_buf_end = NULL;

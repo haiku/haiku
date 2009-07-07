@@ -10,7 +10,7 @@ Translator PNGTranslator :
 	PNGTranslator.cpp
 	PNGView.cpp
 
-	: be translation libpng.a z libtranslatorsutils.a
+	: be translation libpng.a z libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

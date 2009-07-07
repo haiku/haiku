@@ -11,5 +11,5 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest GLInfo :
 	GLInfo.cpp
-	: be libGL.so
+	: be libGL.so $(TARGET_LIBSUPC++)
 ;

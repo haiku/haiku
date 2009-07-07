@@ -16,6 +16,7 @@ Application DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
-	: be tracker translation libexpression_parser.a libmapm.a
+	: be tracker translation libexpression_parser.a libmapm.a 
+		$(TARGET_LIBSUPC++)
 	: DiskProbe.rdef
 	;

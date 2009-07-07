@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 BinCommand keymap :
 	main.cpp
 	Keymap.cpp
-	: be ;
+	: be $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
         keymap :

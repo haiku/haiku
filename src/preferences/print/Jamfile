@@ -16,6 +16,7 @@ Preference Printers :
 	be 
 	translation 
 	libprintutils.a
+	$(TARGET_LIBSUPC++)
 	: 
 	Printers.rdef
 	;

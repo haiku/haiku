@@ -12,5 +12,5 @@ Application hdb :
 	TeamsListView.cpp 
 	TeamWindow.cpp
 
-	: be tracker translation libdebug.so
+	: be tracker translation libdebug.so $(TARGET_LIBSUPC++)
 ;

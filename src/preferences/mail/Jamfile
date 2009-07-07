@@ -46,7 +46,7 @@ if $(HAIKU_OPENSSL_ENABLED) {
 Preference E-mail
 	: $(sources)
 	: be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB)
-		$(HAIKU_OPENSSL_LIBS)
+		$(HAIKU_OPENSSL_LIBS) $(TARGET_LIBSUPC++)
 	: e-mail.rdef
 ;
 

@@ -6,5 +6,5 @@ UsePrivateHeaders media ;
 
 Addon wav_reader :
 	WavReaderPlugin.cpp
-	: be libmedia.so
+	: be libmedia.so $(TARGET_LIBSUPC++)
 ;

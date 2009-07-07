@@ -5,7 +5,7 @@ Application People : main.cpp
 	PeopleView.cpp
 	PeopleWindow.cpp 
 	TTextControl.cpp
-	: libbe.so libtracker.so
+	: libbe.so libtracker.so $(TARGET_LIBSUPC++)
 	: People.rdef
 	;
 

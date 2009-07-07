@@ -42,7 +42,6 @@
 # include <shlib-compat.h>
 #endif
 
-#if 0
 /* Prototypes of libio's codecvt functions.  */
 static enum __codecvt_result do_out (struct _IO_codecvt *codecvt,
 				     __mbstate_t *statep,
@@ -87,7 +86,6 @@ struct __gconv_trans_data __libio_translit attribute_hidden =
   .__trans_fct = __gconv_transliterate
 };
 #endif
-#endif
 
 /* Return orientation of stream.  If mode is nonzero try to change
  * the orientation first.
@@ -119,12 +117,7 @@ _IO_fwide(_IO_FILE *fp, int mode)
 		return fp->_mode;
 	}
 
-	/* Set the orientation appropriately. */
-	if (mode > 0) {
-		// wide-orientation is currently disabled!
-		return -1;
-	}
-#if 0
+	{
 		struct _IO_codecvt *cc = fp->_codecvt = &fp->_wide_data->_codecvt;
 
 		fp->_wide_data->_IO_read_ptr = fp->_wide_data->_IO_read_end;
@@ -215,15 +208,12 @@ _IO_fwide(_IO_FILE *fp, int mode)
 	 which allows the functions without knowing the position.  */
       fp->_offset = _IO_SYSSEEK (fp, 0, _IO_seek_cur);
     }
-#endif
-
 	/* Set the mode now.  */
 	fp->_mode = mode;
 
 	return mode;
 }
 
-#if 0
 static enum __codecvt_result
 do_out (struct _IO_codecvt *codecvt, __mbstate_t *statep,
 	const wchar_t *from_start, const wchar_t *from_end,
@@ -504,4 +494,3 @@ do_max_length (struct _IO_codecvt *codecvt)
   return MB_CUR_MAX;
 #endif
 }
-#endif

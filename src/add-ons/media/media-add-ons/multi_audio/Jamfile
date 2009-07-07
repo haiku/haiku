@@ -13,7 +13,7 @@ Addon hmulti_audio.media_addon :
 	MultiAudioDevice.cpp
 	MultiAudioNode.cpp
 	MultiAudioUtility.cpp
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-multi_audio-cvs

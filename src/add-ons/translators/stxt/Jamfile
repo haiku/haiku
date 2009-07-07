@@ -12,7 +12,8 @@ Translator STXTTranslator :
 	STXTMain.cpp
 	STXTTranslator.cpp
 	STXTView.cpp
-	: be translation libtextencoding.so libtranslatorsutils.a
+	: be translation libtextencoding.so libtranslatorsutils.a 
+		$(TARGET_LIBSUPC++)
 	: true
 ;
 

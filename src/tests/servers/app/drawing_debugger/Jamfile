@@ -8,5 +8,5 @@ UseHeaders [ FDirName os interface ] ;
 
 Application DrawingDebugger :
 	DrawingDebugger.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;

@@ -9,6 +9,6 @@ Application PowerStatus :
 	PowerStatusWindow.cpp
 	PowerStatusView.cpp
 	PowerStatus.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: PowerStatus.rdef
 	;

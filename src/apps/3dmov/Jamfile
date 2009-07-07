@@ -7,6 +7,6 @@ Application 3DMov :
 	GLMovApp.cpp
 	GLMovView.cpp
 	GLMovWindow.cpp
-	: be GL game
+	: be GL game $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
 ;

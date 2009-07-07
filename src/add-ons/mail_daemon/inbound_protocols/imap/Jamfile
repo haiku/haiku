@@ -31,7 +31,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 
 Addon IMAP
 	: $(sources)
-	: be libmail.so $(TARGET_NETWORK_LIBS) $(HAIKU_OPENSSL_LIBS)
+	: be libmail.so $(TARGET_NETWORK_LIBS) $(HAIKU_OPENSSL_LIBS) 
+		$(TARGET_LIBSUPC++)
 ;
 
 Package haiku-maildaemon-cvs :

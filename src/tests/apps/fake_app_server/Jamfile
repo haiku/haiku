@@ -12,5 +12,5 @@ UseFreeTypeHeaders ;
 Server fake_app_server :
 	AppServer.cpp
 	ServerApp.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;

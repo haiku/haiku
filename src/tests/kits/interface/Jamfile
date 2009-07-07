@@ -58,26 +58,26 @@ ObjectDefines
 
 SimpleTest ScrollViewTest_r5 :
 	ScrollViewTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest ScrollViewTest :
 	ScrollViewTest.cpp
 	ScrollView.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest ChannelSliderTest :
 	ChannelSliderTest.cpp
 	ChannelSlider.cpp
 	ChannelControl.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest CheckBoxTest :
 	CheckBoxTest.cpp
 	CheckBox.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest ScreenTest :
@@ -87,40 +87,40 @@ SimpleTest ScreenTest :
 
 SimpleTest StatusBarTest :
 	StatusBarTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest GetMouseTest :
 	GetMouseTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest PulseTest :
 	PulseTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest SliderTest_r5 :
 	SliderTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest SliderTest :
 	SliderTest.cpp
 	Slider.cpp
 	Control.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SimpleTest MenuBeginningTest :
 	MenuBeginningTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 
 Application MenuTriggerTest :
 	MenuTriggerTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 
@@ -132,24 +132,24 @@ SimpleTest WidthBufferTest :
 
 SimpleTest ClippingPlusRedraw :
 	ClippingPlusRedraw.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 
 SimpleTest SetDiskModeTest :
 	SetDiskModeTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 SimpleTest SetBorderScrollViewTest :
 	ScrollViewSetBorderTest.cpp
 	ScrollView.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 SimpleTest TextViewTest :
 	TextViewTest.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	;
 
 SEARCH on [ FGristFiles

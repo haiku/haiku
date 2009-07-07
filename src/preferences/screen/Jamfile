@@ -18,7 +18,7 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Screen.rdef
 	;
 

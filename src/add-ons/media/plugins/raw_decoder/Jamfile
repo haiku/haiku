@@ -7,6 +7,6 @@ UsePrivateHeaders media ;
 Addon raw_decoder :
 	AudioConversion.cpp
 	RawDecoderPlugin.cpp
-	: be libmedia.so
+	: be libmedia.so $(TARGET_LIBSUPC++)
 ;
 

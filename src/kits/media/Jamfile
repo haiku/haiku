@@ -82,5 +82,5 @@ SharedLibrary libmedia.so :
 	PluginManager.cpp
 	ReaderPlugin.cpp
 	:
-	be
+	be $(TARGET_LIBSUPC++)
 ;

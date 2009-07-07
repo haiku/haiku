@@ -64,7 +64,7 @@ Preference Devices :
 	cm_wrapper.c
 	DevicesInfo.cpp
 	ConfigurationWindow.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Devices.rdef
 ;
 

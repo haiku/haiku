@@ -18,6 +18,6 @@ Application bootman :
 	WizardController.cpp
 	WizardPageView.cpp
 	WizardView.cpp
-	: be tracker
+	: be tracker $(TARGET_LIBSUPC++)
 	: bootman.rdef
 ;

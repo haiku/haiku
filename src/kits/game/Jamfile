@@ -28,7 +28,7 @@ if $(TARGET_PLATFORM) = haiku {
 		GameSoundBuffer.cpp
 		GameSoundDevice.cpp
 		GSUtility.cpp
-		: be media
+		: be media $(TARGET_LIBSUPC++)
 	;
 } else if $(TARGET_PLATFORM) = libbe_test {
 

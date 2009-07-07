@@ -10,7 +10,7 @@ Translator RAWTranslator :
 	RAWTranslator.cpp
 	ConfigView.cpp
 	RAW.cpp
-	: be translation libtranslatorsutils.a
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

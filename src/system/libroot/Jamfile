@@ -49,8 +49,8 @@ SharedLibrary libroot.so
 	libroot_init.c
 	:
 	$(TARGET_GCC_LIBGCC_OBJECTS)
-
 	$(librootObjects:G=nogrist)
+	$(TARGET_STATIC_LIBSUPC++)
 ;
 
 

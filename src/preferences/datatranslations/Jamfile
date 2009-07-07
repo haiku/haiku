@@ -7,6 +7,6 @@ Preference DataTranslations :
 	IconView.cpp 
 	TranslatorListView.cpp
 
-	: be translation
+	: be translation $(TARGET_LIBSUPC++)
 	: DataTranslations.rdef
 	;

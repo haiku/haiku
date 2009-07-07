@@ -10,6 +10,6 @@ Application ZipOMatic-Z :
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
 
-	: be tracker
+	: be tracker $(TARGET_LIBSUPC++)
 	: ZipOMatic.rdef
 ;

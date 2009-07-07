@@ -17,7 +17,7 @@ Translator RTF-Translator :
 	ConfigView.cpp
 	RTF.cpp
 	convert.cpp
-	: be translation libtranslatorsutils.a
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

@@ -3,6 +3,6 @@ SubDir HAIKU_TOP src preferences locale ;
 Preference Locale :
 	Locale.cpp
 	LocaleWindow.cpp
-	: be liblocale.so
+	: be liblocale.so $(TARGET_LIBSUPC++)
 	: Locale.rdef 
 	;

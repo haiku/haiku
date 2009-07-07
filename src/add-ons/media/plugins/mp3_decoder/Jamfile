@@ -12,6 +12,7 @@ Addon mp3_decoder :
 	libmpglib.a
 	be
 	libmedia.so
+	$(TARGET_LIBSUPC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mp3_decoder mpglib ;

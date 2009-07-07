@@ -51,6 +51,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	:
 	<nogrist>userlandfs_server
 	be	# for BLocker only
+	$(TARGET_LIBSUPC++)
 ;
 
 SEARCH on [ FGristFiles

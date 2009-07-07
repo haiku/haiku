@@ -8,7 +8,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 Addon Print\ To\ File : 
 	print_transport.cpp
 	FileSelector.cpp
-	: be tracker
+	: be tracker $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-printingkit-cvs :

@@ -144,7 +144,7 @@ struct obstack *_obstack;
   } while (0)
 # endif
 
-
+
 /* Initialize an obstack H for use.  Specify chunk size SIZE (0 means default).
    Objects start on multiples of ALIGNMENT (0 means use default).
    CHUNKFUN is the function to use to allocate chunks,
@@ -375,7 +375,7 @@ _obstack_allocated_p (h, obj)
     }
   return lp != 0;
 }
-
+
 /* Free objects in obstack H, including OBJ and everything allocate
    more recently than OBJ.  If OBJ is zero, free everything in H.  */
 
@@ -454,7 +454,7 @@ obstack_free (h, obj)
     abort ();
 }
 #endif
-
+
 int
 _obstack_memory_used (h)
      struct obstack *h;
@@ -468,7 +468,7 @@ _obstack_memory_used (h)
     }
   return nbytes;
 }
-
+
 /* Define the error handler.  */
 # ifndef _
 #  if (HAVE_LIBINTL_H && ENABLE_NLS) /*|| defined _LIBC*/
@@ -500,17 +500,15 @@ print_and_abort ()
      happen because the "memory exhausted" message appears in other places
      like this and the translation should be reused instead of creating
      a very similar string which requires a separate translation.  */
-#if 0
 # if defined _LIBC && defined USE_IN_LIBIO
   if (_IO_fwide (stderr, 0) > 0)
     __fwprintf (stderr, L"%s\n", _("memory exhausted"));
   else
 # endif
-#endif
     fprintf (stderr, "%s\n", _("memory exhausted"));
   exit (obstack_exit_failure);
 }
-
+
 # if 0
 /* These are now turned off because the applications do not use it
    and it uses bcopy via obstack_grow, which causes trouble on sysV.  */

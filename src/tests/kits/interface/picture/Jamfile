@@ -21,5 +21,5 @@ UseLibraryHeaders agg expat ;
 SimpleTest PictureTest :
 	PictureTest.cpp
 	SVGViewView.cpp
-	: be translation libexpat.a
+	: be translation libexpat.a $(TARGET_LIBSUPC++)
 	;	

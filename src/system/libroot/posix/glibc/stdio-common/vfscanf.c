@@ -1996,7 +1996,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			    {
 			      /* The current character is not in the
                                  scanset.  */
-			      ungetwc (c, s);
+			      ungetc (c, s);
 			      goto out;
 			    }
 
@@ -2008,7 +2008,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			    break;
 			  if (*runp == c && not_in)
 			    {
-			      ungetwc (c, s);
+				  ungetc (c, s);
 			      goto out;
 			    }
 
@@ -2018,7 +2018,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  if (runp == wp && !not_in)
 		    {
-		      ungetwc (c, s);
+		      ungetc (c, s);
 		      goto out;
 		    }
 
@@ -2213,7 +2213,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			    {
 			      /* The current character is not in the
                                  scanset.  */
-			      ungetwc (c, s);
+			      ungetc (c, s);
 			      goto out2;
 			    }
 
@@ -2225,7 +2225,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 			    break;
 			  if (*runp == c && not_in)
 			    {
-			      ungetwc (c, s);
+			      ungetc (c, s);
 			      goto out2;
 			    }
 
@@ -2235,7 +2235,7 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 
 		  if (runp == wp && !not_in)
 		    {
-		      ungetwc (c, s);
+		      ungetc (c, s);
 		      goto out2;
 		    }
 

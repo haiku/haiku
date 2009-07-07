@@ -11,6 +11,6 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest GLDirectMode :
 	GLDirectMode.cpp
-	: be game libGL.so
+	: be game libGL.so $(TARGET_LIBSUPC++)
 	: GLDirectMode.rdef
 ;

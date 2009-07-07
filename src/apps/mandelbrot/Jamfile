@@ -6,5 +6,5 @@ AddSubDirSupportedPlatforms libbe_test ;
 Application Mandelbrot : 
 	Mandelbrot.cpp
 	tsb.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Mandelbrot.rdef ;

@@ -7,7 +7,7 @@ UsePrivateHeaders app interface ;
 
 Application Workspaces :
 	Workspaces.cpp 
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Workspaces.rdef 
 	;
 

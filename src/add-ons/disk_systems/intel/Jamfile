@@ -20,5 +20,5 @@ Addon <disk_system>intel :
 	# kernel sources
 	PartitionMap.cpp
 
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;

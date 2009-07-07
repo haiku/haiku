@@ -43,6 +43,7 @@ Application userlandfs_server
 
 	:
 	be
+	$(TARGET_LIBSUPC++)
 ;
 
 HaikuSubInclude beos ;

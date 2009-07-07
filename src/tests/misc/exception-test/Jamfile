@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SharedLibrary libexceptiontest.so
 	: exceptions.cpp
+	: $(TARGET_LIBSUPC++)
 ;
 
 SimpleTest exception-test

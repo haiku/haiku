@@ -11,6 +11,6 @@ SharedLibrary liblinprog.so :
 	PenaltyFunction.cpp
 	Variable.cpp
 	:
-	be liblpsolve55.so
+	be liblpsolve55.so $(TARGET_LIBSUPC++)
 ;
 

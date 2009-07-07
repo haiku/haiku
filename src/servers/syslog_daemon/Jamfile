@@ -13,7 +13,7 @@ Server syslog_daemon :
 	# ToDo: this can be removed for the Haiku build
 	strlcpy.c
 	:
-	be
+	be $(TARGET_LIBSUPC++)
 ;
 
 SEARCH on [ FGristFiles

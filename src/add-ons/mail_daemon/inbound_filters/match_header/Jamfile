@@ -17,7 +17,7 @@ Addon Match\ Header :
 	StringMatcher.cpp ;
 
 LinkAgainst Match\ Header :
-	 be libmail.so ;
+	 be libmail.so $(TARGET_LIBSUPC++) ;
 
 Package haiku-maildaemon-cvs :
 	Match\ Header :

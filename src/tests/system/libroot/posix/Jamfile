@@ -92,13 +92,13 @@ SimpleTest tst-swprintf
 	: tst-swprintf.c
 ;
 
-#SimpleTest tst-swcanf
-#	: tst-swscanf.c
-#;
+SimpleTest tst-swscanf
+	: tst-swscanf.c
+;
 
-#SimpleTest tst-swscanf2
-#	: tst-swscanf2.c
-#;
+SimpleTest tst-swscanf2
+	: tst-swscanf2.c
+;
 
 SimpleTest tst-ungetwc1
 	: tst-ungetwc1.c
@@ -128,9 +128,9 @@ SimpleTest tst-wprintf2
 	: tst-wprintf2.c
 ;
 
-#SimpleTest tst-wscanf
-#	: tst-wscanf.c
-#;
+SimpleTest tst-wscanf
+	: tst-wscanf.c
+;
 
 SimpleTest test_wcfuncs
 	: test_wcfuncs.c

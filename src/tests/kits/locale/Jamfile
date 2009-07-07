@@ -20,7 +20,7 @@ rule LocaleTest
 	# LocaleTest <sources> ;
 	local sources = $(1) ;
 	local name = $(sources[1]:B) ;
-	Application $(name) : $(sources) : be liblocale.so ;
+	Application $(name) : $(sources) : be liblocale.so $(TARGET_LIBSUPC++) ;
 }
 
 LocaleTest catalogSpeed.cpp ;
@@ -32,7 +32,7 @@ LocaleTest localeTest.cpp ;
 
 Addon catalogTestAddOn 
 	: catalogTestAddOn.cpp 
-	: be liblocale.so 
+	: be liblocale.so
 	;
 
 SubInclude HAIKU_TOP src tests kits locale number_format ;

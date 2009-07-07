@@ -394,8 +394,6 @@ HAIKU_LIBRARY_BEGIN_GLUE_CODE =
 	<src!system!glue>init_term_dyn.o
 ;
 HAIKU_LIBRARY_END_GLUE_CODE =
-	# TODO: For the time being always link against libsupc++.a.
-	$(HAIKU_STATIC_LIBSUPC++)
 	crtend.o
 	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
 ;
@@ -434,6 +432,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
+	HAIKU_LIBRARY_NAME_MAP_libsupc++ = $(HAIKU_LIBSUPC++) ;
 	HAIKU_LIBRARY_NAME_MAP_input_server = <nogrist>input_server ;
 }
 

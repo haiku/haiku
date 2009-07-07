@@ -10,7 +10,7 @@ Translator ICOTranslator :
 	ICOTranslator.cpp
 	ConfigView.cpp
 	ICO.cpp
-	: be translation libtranslatorsutils.a
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

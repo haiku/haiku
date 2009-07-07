@@ -14,7 +14,7 @@ BinCommand screenmode :
 	ScreenMode.cpp
 	multimon.cpp
 
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 #SEARCH on [ FGristFiles

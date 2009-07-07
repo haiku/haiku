@@ -12,7 +12,7 @@ Addon mixer.media_addon :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-mixer-cvs

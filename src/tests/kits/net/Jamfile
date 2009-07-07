@@ -20,7 +20,7 @@ SimpleTest NetAddressTest : NetAddressTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) ;
 
 SimpleTest NetEndpointTest : NetEndpointTest.cpp
-	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be ;
+	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be $(TARGET_LIBSUPC++) ;
 
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net multicast ;

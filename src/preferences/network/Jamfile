@@ -8,7 +8,7 @@ Preference Network :
 	NetworkWindow.cpp
 	EthernetSettingsView.cpp
 	settings.cpp
-	: be root $(HAIKU_NETWORK_LIBS)
+	: be root $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++)
 	: Network.rdef
 	;
 

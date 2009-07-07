@@ -12,6 +12,6 @@ SharedLibrary libalm.so :
 	XTab.cpp
 	YTab.cpp
 	:
-	be liblpsolve55.so liblinprog.so
+	be liblpsolve55.so liblinprog.so $(TARGET_LIBSUPC++)
 ;
 

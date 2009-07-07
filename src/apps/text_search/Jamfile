@@ -24,6 +24,6 @@ Application TextSearch :
 
 	$(additionalBeOSSources)
 
-	: be tracker textencoding libshared.a
+	: be tracker textencoding libshared.a $(TARGET_LIBSUPC++)
 	: TextSearch.rdef
 ;

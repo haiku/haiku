@@ -10,7 +10,7 @@ Addon <input>wacom :
 	PointingDevice.cpp
 	PointingDeviceFactory.cpp
 	TabletDevice.cpp
-	: be input_server ;
+	: be input_server $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
         <input>tablet :

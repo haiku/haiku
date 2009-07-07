@@ -6,5 +6,5 @@ SimpleTest NetworkSetup :
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
 	BoneyardAddOn.cpp
-	: be root
+	: be root $(TARGET_LIBSUPC++)
 ;

@@ -7,4 +7,4 @@ Server power_daemon :
 	power_button_monitor.cpp
 	;
 
-LinkAgainst power_daemon : be ;
+LinkAgainst power_daemon : be $(TARGET_LIBSUPC++) ;

@@ -18,7 +18,7 @@ Application ShowImage :
 	ProgressWindow.cpp
 	ResizerWindow.cpp
 	: libshared.a
-	be tracker translation
+	be tracker translation $(TARGET_LIBSUPC++)
 	: ShowImage.rdef
 	;
 

@@ -9,7 +9,7 @@ Application Screenshot :
 	PreviewView.cpp
 	Screenshot.cpp
 	ScreenshotWindow.cpp
-	: be tracker translation libpng.so libz.so
+	: be tracker translation libpng.so libz.so $(TARGET_LIBSUPC++)
 	: Screenshot.rdef
 ;
 

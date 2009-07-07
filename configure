@@ -180,15 +180,17 @@ standard_gcc_settings()
 			if [ $haikuStaticLibStdCxx = libstdc++.a ]; then
 				haikuStaticLibStdCxx=
 			fi
-			if [ $haikuSharedLibStdCxx = libstdc++.so ]; then
-				haikuSharedLibStdCxx=
-			fi
+			# we build libstdc++.so ourselves, so we can leave it as is
+			# if [ $haikuSharedLibStdCxx = libstdc++.so ]; then
+			#	haikuSharedLibStdCxx=
+			# fi
 			if [ $haikuStaticLibSupCxx = libsupc++.a ]; then
 				haikuStaticLibSupCxx=
 			fi
-			if [ $haikuSharedLibSupCxx = libsupc++.so ]; then
-				haikuSharedLibSupCxx=
-			fi
+			# we build libsupc++.so ourselves, so we can leave it as is
+			# if [ $haikuSharedLibSupCxx = libsupc++.so ]; then
+			# 	haikuSharedLibSupCxx=
+			# fi
 		;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
@@ -272,7 +274,7 @@ buildCrossToolsMachine=
 alternativeGCCOutputDir=
 addAlternativeGCCLibs=
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-081024"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-090629"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 

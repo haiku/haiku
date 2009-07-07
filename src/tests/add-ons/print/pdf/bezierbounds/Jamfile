@@ -13,7 +13,7 @@ local sources =
 
 SimpleTest BezierBounds
 	: $(sources)
-	: be root
+	: be $(TARGET_LIBSUPC++) root
 ;
 
 # Tell Jam where to find these sources:

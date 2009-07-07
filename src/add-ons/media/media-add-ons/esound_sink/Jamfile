@@ -10,7 +10,7 @@ Addon ESDSink.media_addon :
 	ESDEndpoint.cpp
 	ESDSinkAddOn.cpp
 	ESDSinkNode.cpp
-	: be media network
+	: be media network $(TARGET_LIBSUPC++)
 ;
 
 #Package haiku-multi_audio-cvs

@@ -12,5 +12,5 @@ Addon dvb.media_addon :
 	PacketQueue.cpp
 	pes.cpp
 	TransportStreamDemux.cpp
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 ;

@@ -8,6 +8,6 @@ Preference CPUFrequency :
 	DriverInterface.cpp
 	main.cpp
 	StatusView.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: cpufrequency.rdef
 	;

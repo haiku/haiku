@@ -9,9 +9,13 @@ SimpleTest bonnie++ :
 	bon_suid.cpp
 
 	bonnie++.cpp
+	:
+	$(TARGET_LIBSUPC++)
 ;
 
 SimpleTest zcav :
 	bon_suid.cpp
 	zcav.cpp
+	:
+	$(TARGET_LIBSUPC++)
 ;

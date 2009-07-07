@@ -7,7 +7,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon Parallel\ Port :
 	ParallelTransport.cpp
-	: be libprintutils.a
+	: be libprintutils.a $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-printingkit-cvs :

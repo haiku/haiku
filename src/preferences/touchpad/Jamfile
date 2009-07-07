@@ -6,6 +6,6 @@ Preference Touchpad :
 	TouchpadPref.cpp
 	TouchpadPrefView.cpp
 	main.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Touchpad.rdef
 	;

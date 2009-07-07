@@ -18,8 +18,11 @@
 
 #define	__NO_CTYPE
 #include <ctype.h>
+#include <xlocale.h>
 
 /* Provide real-function versions of all the ctype macros.  */
+
+int __isctype_l(int c, unsigned short int t, __locale_t l);
 
 #define	func(name, type) \
   int __##name (int c, __locale_t l) { return __isctype_l (c, type, l); } \
@@ -50,3 +53,11 @@ int
   return l->__ctype_toupper[c];
 }
 weak_alias (__toupper_l, toupper_l)
+
+int
+(__isctype_l) (int c, unsigned short int t, __locale_t l)
+{
+  return (l->__ctype_b[c] & t);
+}
+weak_alias (__isctype_l, isctype_l)
+

@@ -32,6 +32,7 @@ Addon <userland>reiserfs
 
 	: libuserlandfs_haiku_kernel.so
 	  be	# for BLocker only
+	  $(TARGET_LIBSUPC++)
 ;
 
 HaikuSubInclude beos_interface ;

@@ -32,7 +32,7 @@ Application StyledEdit :
 	# Haiku String
 	String.cpp
 	strcasestr.c
-        : be translation tracker libtextencoding.so
+        : be translation tracker libtextencoding.so $(TARGET_LIBSUPC++)
 	: $(styled_edit_rsrc)
 	;
 

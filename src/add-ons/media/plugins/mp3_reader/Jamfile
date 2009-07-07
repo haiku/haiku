@@ -6,5 +6,5 @@ UsePrivateHeaders media ;
 
 Addon mp3_reader :
 	MP3ReaderPlugin.cpp
-	: be libmedia.so
+	: be libmedia.so $(TARGET_LIBSUPC++)
 ;

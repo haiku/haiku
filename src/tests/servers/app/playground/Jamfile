@@ -11,7 +11,7 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Playground.rdef
 ;
 

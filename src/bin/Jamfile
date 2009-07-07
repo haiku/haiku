@@ -74,17 +74,14 @@ StdBinCommands
 
 # standard commands that need libbe.so
 StdBinCommands
-	alert.cpp
 	beep.cpp
 	checkfs.cpp
 	clipboard.cpp
 	df.cpp
 	dpms.cpp
 	draggers.cpp
-	dstcheck.cpp
 #	factor.cpp
 	ffm.cpp
-	hey.cpp
 	iroster.cpp
 	listattr.cpp
 	listfont.cpp
@@ -96,18 +93,25 @@ StdBinCommands
 	play.cpp
 	query.cpp
 	quit.cpp
-	reindex.cpp
 	roster.cpp
 	setdecor.cpp
-	settype.cpp
 	setversion.cpp
-	spybmessage.cpp
 	trash.cpp
-	urlwrapper.cpp
 	version.cpp
 	WindowShade.cpp
 #	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
+
+# standard commands that need libbe.so and libsupc++.so
+StdBinCommands
+	alert.cpp
+	dstcheck.cpp
+	hey.cpp
+	reindex.cpp
+	settype.cpp
+	spybmessage.cpp
+	urlwrapper.cpp
+	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {
@@ -135,16 +139,20 @@ StdBinCommands
 	diff_zip.cpp
 	: $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
-# standard commands that need libbe.so, libtranslation.so
+# standard commands that need libbe.so, libtranslation.so, libsupc++.so
 StdBinCommands
 	translate.cpp
-	: be translation : $(haiku-utils_rsrc) ;
+	: be translation $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmedia.so
 StdBinCommands
 	installsound.cpp
-	setvolume.cpp
 	: be libmedia.so : $(haiku-utils_rsrc) ;
+
+# standard commands that need libbe.so, libmedia.so, libsupc++.so
+StdBinCommands
+	setvolume.cpp
+	: be libmedia.so $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmail.so
 StdBinCommands
@@ -163,13 +171,13 @@ StdBinCommands
 
 StdBinCommands
 	bt_discovery.cpp
-	: be libbluetooth.so : $(haiku-utils_rsrc) ;
+	: be libbluetooth.so $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 
 # standard commands that need libbe.so, libtracker.so
 StdBinCommands
 	filepanel.cpp
-	: be tracker : $(haiku-utils_rsrc) ;
+	: be tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libncurses.a
 StdBinCommands

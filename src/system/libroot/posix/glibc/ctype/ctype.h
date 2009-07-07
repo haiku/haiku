@@ -238,7 +238,7 @@ __exctype_l (__isblank_l);
 /* Return the lowercase version of C in locale L.  */
 extern int __tolower_l (int __c, __locale_t __l) __THROW;
 
-/* Return the uppercase version of C.  */
+/* Return the uppercase version of C in locale L.  */
 extern int __toupper_l (int __c, __locale_t __l) __THROW;
 
 # if __GNUC__ >= 2 && defined __OPTIMIZE__ && !defined __cplusplus

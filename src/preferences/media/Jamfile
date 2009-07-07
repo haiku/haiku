@@ -15,7 +15,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: media be 
+	: media be $(TARGET_LIBSUPC++)
 	: media.rdef 
 	;
 

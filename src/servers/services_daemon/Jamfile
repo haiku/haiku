@@ -4,6 +4,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application services_daemon : 
 	ServicesDaemon.cpp 
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 	: ServicesDaemon.rdef
 	;

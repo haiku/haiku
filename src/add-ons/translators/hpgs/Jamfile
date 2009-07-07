@@ -45,6 +45,7 @@ Translator HPGSTranslator :
 	HPGSTranslator.cpp
 	$(sources)
 	: be translation libpng.so libtextencoding.so libz.so libtranslatorsutils.a
+		$(TARGET_LIBSUPC++)
 	: true
 ;
 

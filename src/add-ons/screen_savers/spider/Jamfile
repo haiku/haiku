@@ -7,6 +7,6 @@ ScreenSaver Spider :
 	PolygonQueue.cpp
 	SpiderSaver.cpp
 
-	: be libscreensaver.so
+	: be libscreensaver.so $(TARGET_LIBSUPC++)
 ;
 

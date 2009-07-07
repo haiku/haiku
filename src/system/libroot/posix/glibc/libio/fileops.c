@@ -180,7 +180,6 @@ _IO_new_file_close_it (fp)
       _IO_setg (fp, NULL, NULL, NULL);
       _IO_setp (fp, NULL, NULL);
     }
-#if 0
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
   else
     {
@@ -190,7 +189,6 @@ _IO_new_file_close_it (fp)
       _IO_wsetg (fp, NULL, NULL, NULL);
       _IO_wsetp (fp, NULL, NULL);
     }
-#endif
 #endif
 
   INTUSE(_IO_un_link) ((struct _IO_FILE_plus *) fp);

@@ -30,7 +30,7 @@ MergeObject posix_gnu_stdio.o : #_common.o :
 	printf.c
 	printf_fp.c
 	printf_fphex.c
-#	printf_size.c
+	printf_size.c
 	putw.c
 	reg-printf.c
 	scanf.c
@@ -47,6 +47,6 @@ MergeObject posix_gnu_stdio.o : #_common.o :
 #	vfscanf_stub.c
 	vfscanf.c
 	vfwprintf.c
-#	vfwscanf.c
+	vfwscanf.c
 	vprintf.c
 ;

@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Translator PPMTranslator
 	: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
-	: be translation
+	: be translation $(TARGET_LIBSUPC++)
 	: true
 ;
 

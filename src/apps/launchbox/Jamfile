@@ -12,7 +12,7 @@ Application LaunchBox :
 	PadView.cpp
 	Panel.cpp
 	support.cpp
-	: be translation libshared.a
+	: be translation libshared.a $(TARGET_LIBSUPC++)
 	: LaunchBox.rdef
 ;
 

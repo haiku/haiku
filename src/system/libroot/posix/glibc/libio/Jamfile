@@ -95,7 +95,7 @@ MergeObject posix_gnu_libio.o :
 	fputwc.c
 	fputwc_u.c
 	fwprintf.c
-#	fwscanf.c
+	fwscanf.c
 	getwc.c
 	getwc_u.c
 	getwchar.c
@@ -104,22 +104,22 @@ MergeObject posix_gnu_libio.o :
 	iofputws_u.c
 	iogetwline.c
 	ioungetwc.c
-#	iovswscanf.c
+	iovswscanf.c
 	iowpadn.c
 	putwc.c
 	putwc_u.c
 	putwchar.c
 	putwchar_u.c
 	swprintf.c
-#	swscanf.c
+	swscanf.c
 	vswprintf.c
 	vwprintf.c
-#	vwscanf.c
+	vwscanf.c
 	wfiledoalloc.c
 	wfileops.c
 	wgenops.c
 	wprintf.c
-#	wscanf.c
+	wscanf.c
 	wstrops.c
 ;
 

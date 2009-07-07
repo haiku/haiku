@@ -8,7 +8,7 @@ Application Chart :
 	ChartRender.cpp
 	ChartView.cpp
 	ChartWindow.cpp
-	: be game
+	: be game $(TARGET_LIBSUPC++)
 	: Chart.rdef
 	;
 

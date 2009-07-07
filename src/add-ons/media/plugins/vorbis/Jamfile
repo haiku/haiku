@@ -10,7 +10,7 @@ SubDirHdrs $(SUBDIR) libvorbis vorbis ;
 
 Addon vorbis :
 	vorbisCodecPlugin.cpp
-	: libvorbis.a libogg.a be libmedia.so
+	: libvorbis.a libogg.a be libmedia.so $(TARGET_LIBSUPC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins vorbis libvorbis ;

@@ -6,7 +6,7 @@ UsePrivateHeaders input shared ;
 
 Addon <input>mouse :
 	MouseInputDevice.cpp
-	: be input_server ;
+	: be input_server $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
         <input>mouse :

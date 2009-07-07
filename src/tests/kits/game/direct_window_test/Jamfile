@@ -5,7 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest DirectWindowStars
 	: Stars.cpp StarWindow.cpp
-	: game be
+	: game be $(TARGET_LIBSUPC++)
 ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

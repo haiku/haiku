@@ -18,6 +18,7 @@ SharedLibrary libnetwork.so :
 	<libnetwork_dns>dns_nameser.o
 	<libnetwork_dns>dns_resolv.o
 	<libnetwork_dns>dns_private.o
+	$(TARGET_LIBSUPC++)
 ;
 
 local services = [ FGristFiles services ] ;

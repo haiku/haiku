@@ -13,6 +13,7 @@ LinkAgainst TestPictureApp :
 	be
 	root
 	libprintutils.a
+	$(TARGET_LIBSUPC++)
 	;
 
 SimpleTest DumpPrintJob :

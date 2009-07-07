@@ -26,7 +26,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 	SharedLibrary libnetapi.so :
 		$(netapi_sources)
-		: be $(TARGET_NETWORK_LIBS)
+		: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
 	;
 
 	# Installation -- in the test directory for the time being
@@ -47,6 +47,6 @@ if $(TARGET_PLATFORM) != haiku {
 } else {
 	SharedLibrary libbnetapi.so :
 		$(netapi_sources)
-		: be $(TARGET_NETWORK_LIBS)
+		: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
 	;
 }

@@ -20,6 +20,6 @@ Application ProcessController :
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
 	Utilities.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: ProcessController.rdef
 	;

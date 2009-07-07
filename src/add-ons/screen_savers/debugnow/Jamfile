@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 ScreenSaver DebugNow :
 	DebugNow.cpp : 
-	be libscreensaver.so ;
+	be libscreensaver.so $(TARGET_LIBSUPC++) ;
 
 Package haiku-screensaverkit-cvs :
 	DebugNow :

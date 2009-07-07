@@ -42,10 +42,8 @@ _IO_seekpos_unlocked(_IO_FILE *fp, _IO_off64_t pos, int mode)
 		if (_IO_have_backup(fp))
 			INTUSE(_IO_free_backup_area)(fp);
 	} else {
-#if 0
 		if (_IO_have_wbackup(fp))
 			INTUSE(_IO_free_wbackup_area)(fp);
-#endif
 	}
 
 	return _IO_SEEKPOS(fp, pos, mode);

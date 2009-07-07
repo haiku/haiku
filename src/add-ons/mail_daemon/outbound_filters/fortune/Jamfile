@@ -16,7 +16,7 @@ Addon Fortune :
 	filter.cpp ;
 
 LinkAgainst Fortune :
-	 be libmail.so  ;
+	 be libmail.so $(TARGET_LIBSUPC++) ;
 
 Package haiku-maildaemon-cvs :
 	Fortune :

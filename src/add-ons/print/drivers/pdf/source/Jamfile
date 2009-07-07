@@ -49,6 +49,7 @@ Addon PDF\ Writer :
 	libpdf.a
 	libprint.a 
 	libprintutils.a 
+	$(TARGET_LIBSUPC++)
 ;
 
 Package haiku-pdf_writer-cvs :

@@ -19,5 +19,5 @@ SharedLibrary libdebug.so :
 	# architecture specific
 	arch_debug_support.cpp
 
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;

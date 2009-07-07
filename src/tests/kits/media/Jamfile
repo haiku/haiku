@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src tests kits media ;
 
-SimpleTest AreaTest : AreaTest.cpp : be ;
+SimpleTest AreaTest : AreaTest.cpp : be $(TARGET_LIBSUPC++) ;
 
-SimpleTest BufferTest : BufferTest.cpp : libmedia.so be ;
+SimpleTest BufferTest : BufferTest.cpp : libmedia.so be $(TARGET_LIBSUPC++) ;
 
 SimpleTest SizeofTest : SizeofTest.cpp : be ;
 

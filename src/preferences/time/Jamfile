@@ -17,7 +17,7 @@ Preference Time :
 	TimeWindow.cpp
 	TZDisplay.cpp 
 	ZoneView.cpp 
-	: be libshared.a
+	: be libshared.a $(TARGET_LIBSUPC++)
 	: Time.rdef
 	;
 

@@ -12,7 +12,7 @@ SharedLibrary libscreensaver.so :
 	ScreenSaverSettings.cpp
 	ScreenSaverRunner.cpp
 	:
-	be game
+	be game $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-screensaverkit-cvs :

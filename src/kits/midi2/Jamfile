@@ -18,6 +18,6 @@ SharedLibrary libmidi2.so :
 	MidiRoster.cpp
 	MidiRosterLooper.cpp
 	:
-	be 
+	be $(TARGET_LIBSUPC++)
 ;
 

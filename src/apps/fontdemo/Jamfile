@@ -6,6 +6,6 @@ Application FontDemo :
 	ControlView.cpp
 	FontDemo.cpp
 	FontDemoView.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: FontDemo.rdef
 	;

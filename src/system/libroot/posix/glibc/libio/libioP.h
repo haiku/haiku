@@ -482,7 +482,6 @@ extern int _IO_new_fsetpos64 __P ((_IO_FILE *, const _IO_fpos64_t *));
 extern int _IO_old_fsetpos64 __P ((_IO_FILE *, const _IO_fpos64_t *));
 
 
-#if 0
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
 # define _IO_do_flush(_f) \
   ((_f)->_mode <= 0							      \
@@ -491,12 +490,11 @@ extern int _IO_old_fsetpos64 __P ((_IO_FILE *, const _IO_fpos64_t *));
    : INTUSE(_IO_wdo_write)(_f, (_f)->_wide_data->_IO_write_base,	      \
 			   ((_f)->_wide_data->_IO_write_ptr		      \
 			    - (_f)->_wide_data->_IO_write_base)))
-#endif	// was #else
-#endif
-
+#else
 # define _IO_do_flush(_f) \
    INTUSE(_IO_do_write)(_f, (_f)->_IO_write_base,			      \
 			(_f)->_IO_write_ptr-(_f)->_IO_write_base)
+#endif
 
 #define _IO_old_do_flush(_f) \
   _IO_old_do_write(_f, (_f)->_IO_write_base, \

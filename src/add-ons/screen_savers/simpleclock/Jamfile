@@ -5,6 +5,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 ScreenSaver SimpleClock :
 	SimpleClock.cpp
 
-	: be libscreensaver.so
+	: be libscreensaver.so $(TARGET_LIBSUPC++)
 ;
 

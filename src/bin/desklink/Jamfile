@@ -12,6 +12,6 @@ BinCommand desklink :
 	VolumeControl.cpp
 	VolumeWindow.cpp
 
-	: be libmedia.so
+	: be libmedia.so $(TARGET_LIBSUPC++)
 	: desklink.rdef
 ;

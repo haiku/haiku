@@ -13,5 +13,5 @@ Application InstalledPackages :
 	main.cpp
 	UninstallWindow.cpp
 	UninstallView.cpp
-	: be tracker
+	: be tracker $(TARGET_LIBSUPC++)
 ;

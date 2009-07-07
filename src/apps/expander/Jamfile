@@ -11,7 +11,7 @@ Application Expander :
 	ExpanderPreferences.cpp
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
-	: be tracker	
+	: be tracker $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;
 

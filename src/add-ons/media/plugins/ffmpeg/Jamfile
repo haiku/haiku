@@ -29,6 +29,7 @@ Addon ffmpeg :
 	be
 	libmedia.so
 	libz.a
+	$(TARGET_LIBSUPC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;

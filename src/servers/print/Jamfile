@@ -28,6 +28,7 @@ LinkAgainst print_server :
 	translation
 	libprint.a
 	libprintutils.a
+	$(TARGET_LIBSUPC++)
 ;
 
 Package haiku-printingkit-cvs :

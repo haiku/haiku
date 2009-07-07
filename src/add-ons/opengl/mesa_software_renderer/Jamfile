@@ -36,7 +36,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa sparc ] ;
 
 Addon Mesa\ Software\ Renderer :
 	MesaSoftwareRenderer.cpp
-	: libGL.so libmesa.a be
+	: libGL.so libmesa.a be $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-opengl-cvs : 

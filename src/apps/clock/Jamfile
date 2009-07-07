@@ -6,6 +6,6 @@ Application Clock :
 	cl_view.cpp 
 	cl_wind.cpp 
 	clock.cpp 
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Clock.rdef
 	;

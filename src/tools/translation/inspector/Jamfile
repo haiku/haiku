@@ -11,5 +11,5 @@ Application Inspector :
 	ImageWindow.cpp
 	InspectorApp.cpp ;
 
-LinkAgainst Inspector : be tracker translation ;
+LinkAgainst Inspector : be tracker translation $(TARGET_LIBSUPC++) ;
 

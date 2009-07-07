@@ -9,7 +9,7 @@ Preference Backgrounds :
 	Backgrounds.cpp
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
-	: be tracker translation
+	: be tracker translation $(TARGET_LIBSUPC++)
 	: Backgrounds.rdef
 	;
 

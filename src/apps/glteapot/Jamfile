@@ -9,6 +9,6 @@ Application GLTeapot :
 	error.cpp
 	TeapotWindow.cpp
 	TeapotApp.cpp
-	: be GL game
+	: be GL game $(TARGET_LIBSUPC++)
 	: GLTeapot.rdef
 ;

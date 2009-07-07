@@ -16,7 +16,7 @@ Translator GIFTranslator :
 	SavePalette.cpp
 	SFHash.cpp
 	:
-	be translation
+	be translation $(TARGET_LIBSUPC++)
 	: true
 ;
 

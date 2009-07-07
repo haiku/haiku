@@ -9,7 +9,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 SimpleTest RosterShell

@@ -7,24 +7,24 @@ UseLibraryHeaders lp_solve linprog alm ;
 Application ALMTableTest :
 	TableTest.cpp
 	:
-	be liblpsolve55.so liblinprog.so libalm.so
+	be liblpsolve55.so liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMTest1 :
 	Test1.cpp
 	:
-	be liblpsolve55.so be liblinprog.so libalm.so
+	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMTest2 :
 	Test2.cpp
 	:
-	be liblpsolve55.so be liblinprog.so libalm.so
+	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
 Application ALMSimpleTest :
 	SimpleTest.cpp
 	:
-	be liblpsolve55.so be liblinprog.so libalm.so
+	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 

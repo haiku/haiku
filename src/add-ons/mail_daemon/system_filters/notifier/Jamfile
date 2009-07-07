@@ -15,7 +15,7 @@ Addon New\ Mail\ Notification :
 	filter.cpp ConfigView.cpp ;
 
 LinkAgainst New\ Mail\ Notification :
-	 be libmail.so ;
+	 be libmail.so $(TARGET_LIBSUPC++) ;
 
 Package haiku-maildaemon-cvs :
 	New\ Mail\ Notification :

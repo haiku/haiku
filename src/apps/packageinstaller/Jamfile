@@ -15,7 +15,7 @@ Application PackageInstaller :
 	PackageTextViewer.cpp
 	PackageImageViewer.cpp
 	InstalledPackageInfo.cpp
-	: be tracker translation z
+	: be tracker translation z $(TARGET_LIBSUPC++)
 	: PackageInstaller.rdef
 ;
 

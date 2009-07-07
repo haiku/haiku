@@ -43,5 +43,5 @@ BinCommand unrar :
 	filestr.cpp
 	recvol.cpp
 	rs.cpp
-	: be : unrar.rdef
+	: be $(TARGET_LIBSUPC++) : unrar.rdef
 ;

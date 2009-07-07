@@ -11,7 +11,7 @@ SubDirHdrs $(SUBDIR) libspeex ;
 Addon speex :
 	speexCodecPlugin.cpp
 	speexCodecDefaults.cpp
-	: libspeex.a be libmedia.so
+	: libspeex.a be libmedia.so $(TARGET_LIBSUPC++)
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins speex libspeex ;

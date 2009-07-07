@@ -6,6 +6,6 @@ Application BSnow :
 	Flakes.cpp
 	SnowView.cpp
 	SnowApp.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: BSnow.rdef
 	;

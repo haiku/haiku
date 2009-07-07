@@ -21,7 +21,7 @@ Translator WonderBrushTranslator :
 	blending.cpp
 	lab_convert.cpp
 
-	: be translation z libtranslatorsutils.a
+	: be translation z libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

@@ -13,7 +13,7 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be libcolumnlistview.a libshared.a
+	: be libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
 	: DriveSetup.rdef
 ;
 

@@ -6,7 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 Application Magnify : 
 	Magnify.cpp 
-	: be tracker game 
+	: be tracker game $(TARGET_LIBSUPC++)
 	: Magnify.rdef
 ;
 

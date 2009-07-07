@@ -8,6 +8,6 @@ Application TV :
 	MainWin.cpp
 	VideoNode.cpp
 	VideoView.cpp
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 	: tv.rdef
 ;

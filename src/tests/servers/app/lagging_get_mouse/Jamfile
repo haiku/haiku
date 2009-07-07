@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests servers app statusbar ;
+SubDir HAIKU_TOP src tests servers app lagging_get_mouse ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest LaggingGetMouse :
 	main.cpp
-	: be ;
+	: be $(TARGET_LIBSUPC++) ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : LaggingGetMouse

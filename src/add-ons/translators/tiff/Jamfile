@@ -54,7 +54,7 @@ Translator TIFFTranslator :
 	TIFFTranslator.cpp
 	TIFFView.cpp
 
-	: be translation z libtranslatorsutils.a
+	: be translation z libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 

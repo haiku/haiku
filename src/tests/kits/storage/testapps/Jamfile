@@ -14,7 +14,7 @@ SimpleTest dump_mime_types
 	: dump_mime_types.cpp : be ;
 
 SimpleTest NodeMonitorTest
-	: NodeMonitorTest.cpp : be ;
+	: NodeMonitorTest.cpp : be $(TARGET_LIBSUPC++) ;
 
 SimpleTest PathMonitorTest
 	: PathMonitorTest.cpp PathMonitor.cpp

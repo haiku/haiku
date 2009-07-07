@@ -10,7 +10,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 Application WebWatch :
 	WatchApp.cpp
 	WatchView.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: WebWatch.rdef
 ;
 

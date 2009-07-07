@@ -14,7 +14,7 @@ Addon opensound.media_addon :
 	OpenSoundDeviceEngine.cpp
 	OpenSoundDeviceMixer.cpp
 	OpenSoundNode.cpp
-	: be media
+	: be media $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-opensound-cvs
