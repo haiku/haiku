@@ -29,7 +29,7 @@
 #define BITSIZEOF_SIZE_T 32
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 16
+#define BITSIZEOF_WCHAR_T 32
 
 /* Define to the number of bits in type 'wint_t'. */
 #define BITSIZEOF_WINT_T 32
@@ -955,7 +955,7 @@
 #define HAVE_SIGNED_SIG_ATOMIC_T 1
 
 /* Define to 1 if 'wchar_t' is a signed integer type. */
-/* #undef HAVE_SIGNED_WCHAR_T */
+#define HAVE_SIGNED_WCHAR_T 1
 
 /* Define to 1 if 'wint_t' is a signed integer type. */
 /* #undef HAVE_SIGNED_WINT_T */
