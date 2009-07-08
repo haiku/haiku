@@ -345,10 +345,14 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				case CODEC_ID_H264:
 					codecTag = 'h264';
 					break;
+				case CODEC_ID_DVVIDEO:
+					codecTag = 'pcvd';
+					break;
 //				case CODEC_ID_AC3:
 //					codecTag = 0x2000;
 //					break;
 				default:
+					fprintf(stderr, "ffmpeg codecTag is null, codec_id unknown 0x%lx\n", codecContext->codec_id);
 					// TODO: Add more...
 					break;
 			}
@@ -403,6 +407,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				break;
 		}
 		TRACE("  codecTag '%.4s' or %ld\n", (char*)&codecTag, codecTag);
+		TRACE("  fourcc '%.4s'\n", (char*)&codecContext->codec_id);
 
 		BMediaFormats formats;
 		status_t status = formats.GetFormatFor(description, format);
