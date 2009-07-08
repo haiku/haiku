@@ -162,7 +162,8 @@ CreateParamsPanel::Go(off_t& offset, off_t& size, BString& type)
 			type << _type;
 		}
 		// Return the value back as bytes.
-		size = (off_t)fSizeSlider->Value() * kMegaByte;
+		size = (off_t)fSizeSlider->Size() * kMegaByte;
+		offset = (off_t)fSizeSlider->Offset() * kMegaByte;
 	}
 
 	int32 value = fReturnValue;
@@ -196,7 +197,7 @@ CreateParamsPanel::_CreateViewControls(off_t offset, off_t size)
 	fTypeMenuField = new BMenuField("Partition Type", fTypePopUpMenu, NULL);
 
 	fSizeSlider = new SizeSlider("Slider", "Partition Size", NULL, offset,
-		size);
+		offset + size);
 	fSizeSlider->SetPosition(1.0);
 
 	fOKButton = new BButton("Create", new BMessage(MSG_OK));

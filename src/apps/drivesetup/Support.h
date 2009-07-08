@@ -28,7 +28,7 @@ enum {
 };
 
 
-static const uint32 kMegaByte = 1048576;
+static const uint32 kMegaByte = 0x100000;
 
 class SpaceIDMap : public HashMap<HashString, partition_id> {
 public:
@@ -50,10 +50,12 @@ public:
 	virtual						~SizeSlider();
 
 	virtual const char*			UpdateText() const;
+			int32				Size();
+			int32				Offset();
 
 private:
-			off_t				fOffset;
-			off_t				fSize;
+			off_t				fStartOffset;
+			off_t				fEndOffset;
 	mutable	BString				fStatusLabel;
 };
 

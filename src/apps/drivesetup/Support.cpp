@@ -115,18 +115,16 @@ SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
 
 SizeSlider::SizeSlider(const char* name, const char* label,
 	BMessage* message, int32 minValue, int32 maxValue)
-	: BSlider(name, label, message, minValue, maxValue, B_HORIZONTAL,
-		B_TRIANGLE_THUMB),
-	fOffset(minValue),
-	fSize(maxValue)
+	: BSlider(name, label, message, minValue, maxValue,
+	B_HORIZONTAL, B_TRIANGLE_THUMB),
+	fStartOffset(minValue),
+	fEndOffset(maxValue)
 {
 	SetBarColor((rgb_color){ 0, 80, 255, 255 });
-	BString offset, size;
-	offset << fOffset;
-	offset << " MB";
-	size << fSize;
-	size << " MB";
-	SetLimitLabels(offset.String(), size.String());
+	BString startOffset, endOffset;
+	startOffset << "Offset: " << fStartOffset << " MB";
+	endOffset << "End: " << fEndOffset << " MB";
+	SetLimitLabels(startOffset.String(), endOffset.String());
 }
 
 
@@ -139,8 +137,24 @@ const char*
 SizeSlider::UpdateText() const
 {
 	fStatusLabel.Truncate(0);
-	fStatusLabel << Value();
+	fStatusLabel << Value() - fStartOffset;
 	fStatusLabel << " MB";
 
 	return fStatusLabel.String();
+}
+
+
+int32
+SizeSlider::Size()
+{
+	return Value() - fStartOffset;
+}
+
+
+int32
+SizeSlider::Offset()
+{
+	// TODO: This should be the changed offset once a double
+	// headed slider is implemented.
+	return fStartOffset;
 }
