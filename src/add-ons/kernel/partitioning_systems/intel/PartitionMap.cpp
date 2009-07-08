@@ -49,6 +49,9 @@ struct partition_type {
 	const char	*name;
 };
 
+static const char* const kUnrecognizedTypeString = "Unrecognized Type ";
+static const size_t kUnrecognizedTypeStringLength = 18;
+
 static const struct partition_type kPartitionTypes[] = {
 	// these entries must be sorted by type (currently not)
 // TODO: Standardize naming.
@@ -120,7 +123,7 @@ get_partition_type_string(uint8 type, char* buffer)
 		if (const char* typeString = partition_type_string(type))
 			strcpy(buffer, typeString);
 		else
-			sprintf(buffer, "Unrecognized Type 0x%x", type);
+			sprintf(buffer, "%s0x%x", kUnrecognizedTypeString, type);
 	}
 }
 
@@ -215,6 +218,18 @@ PartitionType::SetType(const char *typeName)
 			return fValid;
 		}
 	}
+
+	// If this is an unrecognized type, parse the type number.
+	if (strncmp(typeName, kUnrecognizedTypeString,
+			kUnrecognizedTypeStringLength) == 0) {
+		long type = strtol(typeName + kUnrecognizedTypeStringLength, NULL, 0);
+		if (type != 0 && type <= 255) {
+			fType = type;
+			fValid = true;
+			return fValid;
+		}
+	}
+
 	fValid = false;
 	return fValid;
 }
