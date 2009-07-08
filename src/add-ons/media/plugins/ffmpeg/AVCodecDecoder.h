@@ -32,42 +32,55 @@ public:
 								   const void* infoBuffer, size_t infoSize);
    
 	virtual	status_t			NegotiateOutputFormat(
-									media_format* outputFormat);
+									media_format* inOutFormat);
 	
 	virtual	status_t			Decode(void* outBuffer, int64* outFrameCount,
-						    		media_header* mediaHeader,
-						    		media_decode_info* info);
+									media_header* mediaHeader,
+									media_decode_info* info);
 
 	virtual	status_t			Seek(uint32 seekTo, int64 seekFrame,
 									int64* frame, bigtime_t seekTime,
 									bigtime_t* time);
 	
 	
-protected:
+private:
+			status_t			_NegotiateAudioOutputFormat(
+									media_format* inOutFormat);
+
+			status_t			_NegotiateVideoOutputFormat(
+									media_format* inOutFormat);
+
+			status_t			_DecodeAudio(void* outBuffer,
+									int64* outFrameCount,
+									media_header* mediaHeader,
+									media_decode_info* info);
+
+			status_t			_DecodeVideo(void* outBuffer,
+									int64* outFrameCount,
+									media_header* mediaHeader,
+									media_decode_info* info);
+
+			
 			media_header		fHeader;
 			media_decode_info	fInfo;
-	
-//	friend class avCodecInputStream;
-		
-private:
 			media_format		fInputFormat;
 			media_raw_video_format fOutputVideoFormat;
 
 			int64				fFrame;
-			bool				isAudio;
+			bool				fIsAudio;
 	
-			int					ffcodec_index_in_table;
+			int					fCodecIndexInTable;
 									// helps to find codecpretty
 		
-			// ffmpeg related datas
+			// FFmpeg related members
 			AVCodec*			fCodec;
-			AVCodecContext*		ffc;
-			AVFrame*			ffpicture;
-			AVFrame*			opicture;
+			AVCodecContext*		fContext;
+			AVFrame*			fInputPicture;
+			AVFrame*			fOutputPicture;
 		
 			bool 				fCodecInitDone;
 
-			gfx_convert_func	conv_func; // colorspace convert func
+			gfx_convert_func	fFormatConversionFunc;
 
 			char*				fExtraData;
 			int					fExtraDataSize;
@@ -76,7 +89,8 @@ private:
 			bigtime_t			fStartTime;
 			int32				fOutputFrameCount;
 			float				fOutputFrameRate;
-			int					fOutputFrameSize; // sample size * channel count
+			int					fOutputFrameSize;
+									// sample size * channel count
 		
 			const void*			fChunkBuffer;
 			int32				fChunkBufferOffset;
