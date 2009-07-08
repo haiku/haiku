@@ -253,7 +253,7 @@ private:
 		// construct the located entry path
 		BString locatedEntryPath(locatedDirectoryPath);
 		int32 pathLength = locatedEntryPath.Length();
-		if (pathLength >= 1 && locatedEntryPath.ByteAt(pathLength - 1) != '/')
+		if (pathLength >= 1 && locatedEntryPath[pathLength - 1] != '/')
 			locatedEntryPath << '/';
 		locatedEntryPath << entry->Name();
 
