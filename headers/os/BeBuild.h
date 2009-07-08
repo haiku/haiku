@@ -33,7 +33,7 @@
 #define B_HAIKU_ABI_GCC_2_HAIKU			0x00020002
 
 #if __GNUC__ == 2
-#	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2
+#	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2_HAIKU
 #elif __GNUC__ == 4
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_4
 #else
