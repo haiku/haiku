@@ -237,6 +237,8 @@ find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
 		image = queue[index++];
 
 		if (find_symbol(image, lookupInfo, _location) == B_OK) {
+			if (_foundInImage != NULL)
+				*_foundInImage = image;
 			found = true;
 			break;
 		}
@@ -311,15 +313,45 @@ Elf32_Sym*
 find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
 	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
-// TODO: How do we want to implement this one? Using global scope resolution
-// might be undesired as it is now, since libraries could refer to symbols in
-// the add-on, which would result in add-on symbols implicitely becoming used
-// outside of the add-on. So the options would be to use the global scope but
-// skip the add-on, or to do breadth-first resolution in the add-on dependency
-// scope, also skipping the add-on itself. BeOS style resolution is safe, too,
-// but we miss out features like undefined symbols and preloading.
-	return find_undefined_symbol_beos(rootImage, image, lookupInfo,
-		foundInImage);
+	// Do a breadth-first resolution in the add-on dependency scope,
+	// skipping the add-on itself.
+	Elf32_Sym* foundSymbol = NULL;
+
+	image_t* queue[count_loaded_images()];
+	uint32 count = 0;
+	uint32 index = 0;
+	queue[count++] = image;
+	image->flags |= RFLAG_VISITED;
+
+	image_t* currentImage;
+	while (index < count) {
+		// pop next image
+		currentImage = queue[index++];
+
+		if (currentImage != image) {
+			foundSymbol = find_symbol(currentImage, lookupInfo);
+			if (foundSymbol != NULL) {
+				if (foundInImage != NULL)
+					*foundInImage = currentImage;
+				break;
+			}
+		}
+
+		// push needed images
+		for (uint32 i = 0; i < currentImage->num_needed; i++) {
+			image_t* needed = currentImage->needed[i];
+			if ((needed->flags & RFLAG_VISITED) == 0) {
+				queue[count++] = needed;
+				needed->flags |= RFLAG_VISITED;
+			}
+		}
+	}
+
+	// clear visited flags
+	for (uint32 i = 0; i < count; i++)
+		queue[i]->flags &= ~RFLAG_VISITED;
+
+	return foundSymbol;
 }
 
 
