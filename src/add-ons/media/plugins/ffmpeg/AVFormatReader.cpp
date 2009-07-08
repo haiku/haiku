@@ -248,8 +248,20 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 	// Make us point to the AVStream at streamIndex
 	fStream = fContext->streams[streamIndex];
 
+	// Discard all other streams
+	for (unsigned i = 0; i < fContext->nb_streams; i++) {
+		if (i != (unsigned)streamIndex)
+			fContext->streams[i]->discard = AVDISCARD_ALL;
+	}
+
 	// Get a pointer to the AVCodecContext for the stream at streamIndex.
 	AVCodecContext* codecContext = fStream->codec;
+// NOTE: Experimenting with opening the AVCodec to see if I get more
+// AVCodecContext fields filled out. Doesn't seem to make a difference
+// for extradata for example.
+//	AVCodec* codec = avcodec_find_decoder(codecContext->codec_id);
+//	bool codecOpened = avcodec_open(codecContext, codec) == 0;
+//	TRACE("  codec opened: %d\n", codecOpened);
 	AVStream* stream = fStream;
 
 	// initialize the media_format for this stream
@@ -493,6 +505,15 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 			codecContext->extradata_size);
 	}
 
+	TRACE("  extradata_size: %d\n", codecContext->extradata_size);
+	TRACE("  intra_matrix: %p\n", codecContext->intra_matrix);
+	TRACE("  inter_matrix: %p\n", codecContext->inter_matrix);
+	TRACE("  get_buffer(): %p\n", codecContext->get_buffer);
+	TRACE("  release_buffer(): %p\n", codecContext->release_buffer);
+
+//	if (codecOpened)
+//		avcodec_close(codecContext);
+
 #ifdef TRACE_AVFORMAT_READER
 	char formatString[512];
 	if (string_for_format(*format, formatString, sizeof(formatString)))
@@ -576,7 +597,8 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	bigtime_t* duration, media_format* format, const void** infoBuffer,
 	size_t* infoSize) const
 {
-	TRACE("AVFormatReader::StreamCookie::GetStreamInfo()\n");
+	TRACE("AVFormatReader::StreamCookie::GetStreamInfo(%ld)\n",
+		VirtualIndex());
 
 	double frameRate = FrameRate();
 	TRACE("  frameRate: %.4f\n", frameRate);
@@ -621,13 +643,13 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 		return B_NO_INIT;
 
 	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0) {
-		TRACE_SEEK("  AVFormatReader::Seek() - B_MEDIA_SEEK_CLOSEST_FORWARD "
-			"not supported.\n");
+		TRACE_SEEK("AVFormatReader::StreamCookie::Seek() - "
+			"B_MEDIA_SEEK_CLOSEST_FORWARD not supported.\n");
 		return B_NOT_SUPPORTED;
 	}
 
 	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld, %s %s %s %s, %lld, "
-		"%lld)\n", Index(),
+		"%lld)\n", VirtualIndex(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? "B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
@@ -670,7 +692,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		return B_NO_INIT;
 
 	TRACE_SEEK("AVFormatReader::StreamCookie::FindKeyFrame(%ld, %s %s %s %s, "
-		"%lld, %lld)\n", Index(),
+		"%lld, %lld)\n", VirtualIndex(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? "B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
