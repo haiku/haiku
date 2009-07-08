@@ -771,10 +771,10 @@ KPartition::AddChild(KPartition *partition, int32 index)
 		fPartitionData.child_count++;
 		partition->SetParent(this);
 		partition->SetDevice(Device());
+
 		// publish to devfs
-		error = PublishDevice();
-		if (error != B_OK)
-			return error;
+		partition->PublishDevice();
+
 		// notify listeners
 		FireChildAdded(partition, index);
 		return B_OK;
