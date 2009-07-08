@@ -64,6 +64,10 @@ public:
 	inline	const AVFormatContext* Context() const
 									{ return fContext; }
 			int32				Index() const;
+			int32				CountStreams() const;
+			int32				StreamIndexFor(int32 virtualIndex) const;
+	inline	int32				VirtualIndex() const
+									{ return fVirtualIndex; }
 
 	inline	const media_format&	Format() const
 									{ return fFormat; }
@@ -105,6 +109,7 @@ private:
 
 			AVFormatContext*	fContext;
 			AVStream*			fStream;
+			int32				fVirtualIndex;
 
 			ByteIOContext		fIOContext;
 			uint8				fIOBuffer[kIOBufferSize];
@@ -126,6 +131,7 @@ AVFormatReader::StreamCookie::StreamCookie(BPositionIO* source,
 
 	fContext(NULL),
 	fStream(NULL),
+	fVirtualIndex(-1),
 
 	fReusePacket(false)
 {
@@ -146,7 +152,7 @@ status_t
 AVFormatReader::StreamCookie::Open()
 {
 	// Init probing data
-	size_t probeSize = 1024;
+	size_t probeSize = kIOBufferSize / 2; //1024;
 	AVProbeData probeData;
 	probeData.filename = "";
 	probeData.buf = fIOBuffer;
@@ -167,18 +173,18 @@ AVFormatReader::StreamCookie::Open()
 	AVInputFormat* inputFormat = av_probe_input_format(&probeData, 1);
 
 	if (inputFormat == NULL) {
-		TRACE("AVFormatReader::StreamCookie::Init() - "
+		TRACE("AVFormatReader::StreamCookie::Open() - "
 			"av_probe_input_format() failed!\n");
 		return B_NOT_SUPPORTED;
 	}
 
-	TRACE("AVFormatReader::StreamCookie::Init() - "
+	TRACE("AVFormatReader::StreamCookie::Open() - "
 		"av_probe_input_format(): %s\n", inputFormat->name);
 
 	const DemuxerFormat* demuxerFormat = demuxer_format_for(inputFormat);
 	if (demuxerFormat == NULL) {
 		// We could support this format, but we don't want to. Bail out.
-		ERROR("AVFormatReader::StreamCookie::Init() - "
+		ERROR("AVFormatReader::StreamCookie::Open() - "
 			"support for demuxer '%s' is not enabled. "
 			"See DemuxerTable.cpp\n", inputFormat->name);
 		return B_NOT_SUPPORTED;
@@ -188,7 +194,7 @@ AVFormatReader::StreamCookie::Open()
 	// cookie.
 	if (init_put_byte(&fIOContext, fIOBuffer, kIOBufferSize, 0, this,
 			_Read, 0, _Seek) != 0) {
-		TRACE("AVFormatReader::StreamCookie::Init() - "
+		TRACE("AVFormatReader::StreamCookie::Open() - "
 			"init_put_byte() failed!\n");
 		return B_ERROR;
 	}
@@ -196,19 +202,19 @@ AVFormatReader::StreamCookie::Open()
 	// Initialize our context.
 	if (av_open_input_stream(&fContext, &fIOContext, "", inputFormat,
 			NULL) < 0) {
-		TRACE("AVFormatReader::StreamCookie::Init() - "
+		TRACE("AVFormatReader::StreamCookie::Open() - "
 			"av_open_input_stream() failed!\n");
 		return B_NOT_SUPPORTED;
 	}
 
 	// Retrieve stream information
 	if (av_find_stream_info(fContext) < 0) {
-		TRACE("AVFormatReader::StreamCookie::Init() - "
+		TRACE("AVFormatReader::StreamCookie::Open() - "
 			"av_find_stream_info() failed!\n");
 		return B_NOT_SUPPORTED;
 	}
 
-	TRACE("AVFormatReader::StreamCookie::Init() - "
+	TRACE("AVFormatReader::StreamCookie::Open() - "
 		"av_find_stream_info() success!\n");
 
 	return B_OK;
@@ -216,21 +222,28 @@ AVFormatReader::StreamCookie::Open()
 
 
 status_t
-AVFormatReader::StreamCookie::Init(int32 streamIndex)
+AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 {
-	TRACE("AVFormatReader::StreamCookie::Init(%ld)\n", streamIndex);
+	TRACE("AVFormatReader::StreamCookie::Init(%ld)\n", virtualIndex);
 
 	if (fContext == NULL)
 		return B_NO_INIT;
 
-	if (streamIndex < 0 || streamIndex >= (int32)fContext->nb_streams)
+	int32 streamIndex = StreamIndexFor(virtualIndex);
+	if (streamIndex < 0) {
+		TRACE("  Bad stream index!\n");
 		return B_BAD_INDEX;
+	}
 
 	const DemuxerFormat* demuxerFormat = demuxer_format_for(fContext->iformat);
 	if (demuxerFormat == NULL) {
 		TRACE("  unknown AVInputFormat!\n");
 		return B_NOT_SUPPORTED;
 	}
+
+	// We need to remember the virtual index so that
+	// AVFormatReader::FreeCookie() can clear the correct stream entry.
+	fVirtualIndex = virtualIndex;
 
 	// Make us point to the AVStream at streamIndex
 	fStream = fContext->streams[streamIndex];
@@ -311,23 +324,40 @@ AVFormatReader::StreamCookie::Init(int32 streamIndex)
 				break;
 		}
 	} else {
+		uint32 codecTag = codecContext->codec_tag;
+		if (codecTag == 0) {
+			// Ugh, no codec_tag. Let's try to fake some known codecs.
+			// Such a situation seems to occur for the "mpegts" demuxer for
+			// example. These are some tags I could test with.
+			switch (codecContext->codec_id) {
+				case CODEC_ID_H264:
+					codecTag = 'h264';
+					break;
+//				case CODEC_ID_AC3:
+//					codecTag = 0x2000;
+//					break;
+				default:
+					// TODO: Add more...
+					break;
+			}
+		}
 		switch (description.family) {
 			case B_AIFF_FORMAT_FAMILY:
 				TRACE("  B_AIFF_FORMAT_FAMILY\n");
-				description.u.aiff.codec = codecContext->codec_tag;
+				description.u.aiff.codec = codecTag;
 				break;
 			case B_ASF_FORMAT_FAMILY:
 				TRACE("  B_ASF_FORMAT_FAMILY\n");
-//				description.u.asf.guid = GUID(codecContext->codec_tag);
+//				description.u.asf.guid = GUID(codecTag);
 				return B_NOT_SUPPORTED;
 				break;
 			case B_AVI_FORMAT_FAMILY:
 				TRACE("  B_AVI_FORMAT_FAMILY\n");
-				description.u.avi.codec = codecContext->codec_tag;
+				description.u.avi.codec = codecTag;
 				break;
 			case B_AVR_FORMAT_FAMILY:
 				TRACE("  B_AVR_FORMAT_FAMILY\n");
-				description.u.avr.id = codecContext->codec_tag;
+				description.u.avr.id = codecTag;
 				break;
 			case B_MPEG_FORMAT_FAMILY:
 				TRACE("  B_MPEG_FORMAT_FAMILY\n");
@@ -346,21 +376,21 @@ AVFormatReader::StreamCookie::Init(int32 streamIndex)
 			case B_QUICKTIME_FORMAT_FAMILY:
 				TRACE("  B_QUICKTIME_FORMAT_FAMILY\n");
 				description.u.quicktime.codec
-					= B_HOST_TO_BENDIAN_INT32(codecContext->codec_tag);
+					= B_HOST_TO_BENDIAN_INT32(codecTag);
 				break;
 			case B_WAV_FORMAT_FAMILY:
 				TRACE("  B_WAV_FORMAT_FAMILY\n");
-				description.u.wav.codec = codecContext->codec_tag;
+				description.u.wav.codec = codecTag;
 				break;
 			case B_MISC_FORMAT_FAMILY:
 				TRACE("  B_MISC_FORMAT_FAMILY\n");
-				description.u.misc.codec = codecContext->codec_tag;
+				description.u.misc.codec = codecTag;
 				break;
 
 			default:
 				break;
 		}
-		TRACE("  fourcc '%.4s'\n", (char*)&codecContext->codec_tag);
+		TRACE("  codecTag '%.4s' or %ld\n", (char*)&codecTag, codecTag);
 
 		BMediaFormats formats;
 		status_t status = formats.GetFormatFor(description, format);
@@ -368,7 +398,7 @@ AVFormatReader::StreamCookie::Init(int32 streamIndex)
 			TRACE("  formats.GetFormatFor() error: %s\n", strerror(status));
 
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32*)format->user_data = codecContext->codec_tag;
+		*(uint32*)format->user_data = codecTag;
 		format->user_data[4] = 0;
 	}
 
@@ -485,17 +515,59 @@ AVFormatReader::StreamCookie::Index() const
 }
 
 
+int32
+AVFormatReader::StreamCookie::CountStreams() const
+{
+	// Figure out the stream count. If the context has "AVPrograms", use
+	// the first program (for now).
+	// TODO: To support "programs" properly, the BMediaFile/Track API should
+	// be extended accordingly. I guess programs are like TV channels in the
+	// same satilite transport stream. Maybe call them "TrackGroups".
+	if (fContext->nb_programs > 0) {
+		// See libavformat/utils.c:dump_format()
+		return fContext->programs[0]->nb_stream_indexes;
+	}
+	return fContext->nb_streams;
+}
+
+
+int32
+AVFormatReader::StreamCookie::StreamIndexFor(int32 virtualIndex) const
+{
+	// NOTE: See CountStreams()
+	if (fContext->nb_programs > 0) {
+		const AVProgram* program = fContext->programs[0];
+		if (virtualIndex >= 0
+			&& virtualIndex < (int32)program->nb_stream_indexes) {
+			return program->stream_index[virtualIndex];
+		}
+	} else {
+		if (virtualIndex >= 0 && virtualIndex < (int32)fContext->nb_streams)
+			return virtualIndex;
+	}
+	return -1;
+}
+
+
 double
 AVFormatReader::StreamCookie::FrameRate() const
 {
+	// TODO: Find a way to always calculate a correct frame rate...
+	double frameRate;
 	switch (fStream->codec->codec_type) {
 		case CODEC_TYPE_AUDIO:
-			return (double)fStream->codec->sample_rate;
+			frameRate = (double)fStream->codec->sample_rate;
+			break;
 		case CODEC_TYPE_VIDEO:
-			return av_q2d(fStream->r_frame_rate);
+			frameRate = av_q2d(fStream->r_frame_rate);
+			break;
 		default:
-			return 0.0;
+			frameRate = 1.0;
+			break;
 	}
+	if (frameRate <= 0.0)
+		frameRate = 1.0;
+	return frameRate;
 }
 
 
@@ -656,8 +728,11 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 	TRACE_PACKET("AVFormatReader::StreamCookie::GetNextChunk()\n");
 
 	status_t ret = _NextPacket(false);
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		*chunkBuffer = NULL;
+		*chunkSize = 0;
 		return ret;
+	}
 
 	// According to libavformat documentation, fPacket is valid until the
 	// next call to av_read_frame(). This is what we want and we can share
@@ -857,7 +932,7 @@ AVFormatReader::Sniff(int32* _streamCount)
 	delete[] fStreams;
 	fStreams = NULL;
 
-	int32 streamCount = stream->Context()->nb_streams;
+	int32 streamCount = stream->CountStreams();
 	if (streamCount == 0) {
 		TRACE("  failed to detect any streams: %s\n", strerror(ret));
 		return B_ERROR;
@@ -964,9 +1039,7 @@ AVFormatReader::AllocateCookie(int32 streamIndex, void** _cookie)
 	if (fStreams == NULL)
 		return B_NO_INIT;
 
-	const AVFormatContext* context = fStreams[0]->Context();
-
-	if (streamIndex < 0 || streamIndex >= (int32)context->nb_streams)
+	if (streamIndex < 0 || streamIndex >= fStreams[0]->CountStreams())
 		return B_BAD_INDEX;
 
 	if (_cookie == NULL)
@@ -1020,9 +1093,9 @@ AVFormatReader::FreeCookie(void *_cookie)
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 
 	// NOTE: Never delete the first cookie!
-	if (cookie != NULL && cookie->Index() != 0) {
+	if (cookie != NULL && cookie->VirtualIndex() != 0) {
 		if (fStreams != NULL)
-			fStreams[cookie->Index()] = NULL;
+			fStreams[cookie->VirtualIndex()] = NULL;
 		delete cookie;
 	}
 
@@ -1040,7 +1113,7 @@ AVFormatReader::GetStreamInfo(void* _cookie, int64* frameCount,
 {
 	TRACE("AVFormatReader::GetStreamInfo()\n");
 
-	BAutolock _(fStreamLock);
+//	BAutolock _(fStreamLock);
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->GetStreamInfo(frameCount, duration, format, infoBuffer,
@@ -1054,7 +1127,7 @@ AVFormatReader::Seek(void* _cookie, uint32 seekTo, int64* frame,
 {
 	TRACE_SEEK("AVFormatReader::Seek()\n");
 
-	BAutolock _(fStreamLock);
+//	BAutolock _(fStreamLock);
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->Seek(seekTo, frame, time);
@@ -1067,7 +1140,7 @@ AVFormatReader::FindKeyFrame(void* _cookie, uint32 flags, int64* frame,
 {
 	TRACE_SEEK("AVFormatReader::FindKeyFrame()\n");
 
-	BAutolock _(fStreamLock);
+//	BAutolock _(fStreamLock);
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->FindKeyFrame(flags, frame, time);
@@ -1080,7 +1153,7 @@ AVFormatReader::GetNextChunk(void* _cookie, const void** chunkBuffer,
 {
 	TRACE_PACKET("AVFormatReader::GetNextChunk()\n");
 
-	BAutolock _(fStreamLock);
+//	BAutolock _(fStreamLock);
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
