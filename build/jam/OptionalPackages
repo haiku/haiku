@@ -643,19 +643,6 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 }
 
 
-# SQLite
-if [ IsOptionalHaikuImagePackageAdded SQLite ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package SQLite available for $(TARGET_ARCH)" ;
-	} else {
-		InstallOptionalHaikuImagePackage sqlite-3.6.16-x86-gcc2-2009-07-06
-			: $(baseURL)/sqlite-3.6.16-x86-gcc2-2009-07-06.zip
-			:
-		;
-	}
-}
-
-
 # Rsync
 if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 	if $(TARGET_ARCH) != x86 {
@@ -669,13 +656,26 @@ if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 }
 
 
+# SQLite
+if [ IsOptionalHaikuImagePackageAdded SQLite ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package SQLite available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage sqlite-3.6.16-x86-gcc2-2009-07-06
+			: $(baseURL)/sqlite-3.6.16-x86-gcc2-2009-07-06.zip
+			:
+		;
+	}
+}
+
+
 # Subversion
 if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage subversion-1.6.2-x86-gcc2-2009-05-20
-			: $(baseURL)/subversion-1.6.2-x86-gcc2-2009-05-20.zip
+		InstallOptionalHaikuImagePackage subversion-1.6.3-x86-gcc2-2009-07-07
+			: $(baseURL)/subversion-1.6.3-x86-gcc2-2009-07-07.zip
 			:
 		;
 	}
