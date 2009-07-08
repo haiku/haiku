@@ -83,7 +83,7 @@ SYSTEM_LIBS = libbe.so $(HAIKU_SHARED_LIBSTDC++) libmedia.so libtracker.so
 	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
 	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
 	libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
-	libilmimf.so libiconv.so liblocale.so $(HAIKU_SHARED_LIBSUPC++)
+	libilmimf.so $(HAIKU_SHARED_LIBSUPC++)
 ;
 SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	net_server media_addon_server input_server app_server fake_app_server

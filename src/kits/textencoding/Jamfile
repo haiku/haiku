@@ -11,7 +11,7 @@ SharedLibrary libtextencoding.so :
 	CharacterSetRoster.cpp
 	character_sets.cpp
 	utf8_conversions.cpp
-	: be libiconv.so $(TARGET_LIBSUPC++) ;
+	: be libiconv.a $(TARGET_LIBSUPC++) ;
 
 Package haiku-maildaemon-cvs :
 	libtextencoding.so :

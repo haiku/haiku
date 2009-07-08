@@ -14,7 +14,7 @@ SubDirCcFlags
 	-DICONV_CONST=""
 	;
 
-SharedLibrary libiconv.so :	
+StaticLibrary libiconv.a :	
 	iconv.c
 	localcharset.c
 	;
