@@ -1571,9 +1571,11 @@ TFilePanel::WindowActivated(bool active)
 
 
 BFilePanelPoseView::BFilePanelPoseView(Model *model, BRect frame, uint32 resizeMask)
-	: BPoseView(model, frame, kListMode, resizeMask),
-	fIsDesktop(false)
+	: BPoseView(model, frame, kListMode, resizeMask)
 {
+	BEntry entry;
+	model->GetEntry(&entry);
+	fIsDesktop = FSIsDeskDir(&entry);
 }
 
 
