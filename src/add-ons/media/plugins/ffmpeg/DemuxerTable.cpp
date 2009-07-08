@@ -41,12 +41,17 @@ static const DemuxerFormat gDemuxerTable[] = {
 		// NOTE: Tested with a couple of files and only audio works ok.
 		// On some files, the duration and time_base is detected incorrectly
 		// by libavformat and those streams don't play at all.
-		"mpg", "MPEG (Motion Picture Experts Group)", "video/mpg",
+		"mpg", "MPEG (Motion Picture Experts Group)", "video/mpeg",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{
+		// NOTE: keep this before "mpeg" so it detects "mpegts" first.
+		"mpegts", "MPEG (Motion Picture Experts Group)", "video/mpeg",
+		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+	},
+	{
 		// TODO: Also covers "mpegvideo", plus see above.
-		"mpeg", "MPEG (Motion Picture Experts Group)", "video/mpg",
+		"mpeg", "MPEG (Motion Picture Experts Group)", "video/mpeg",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{
