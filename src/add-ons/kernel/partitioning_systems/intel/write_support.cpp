@@ -1329,7 +1329,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	// creating partition
 	update_disk_device_job_progress(job, 0.0);
 	partition_data *child = create_child_partition(partition->id, index,
-		*childID);
+		validatedOffset, validatedSize, *childID);
 	if (!child)
 		return B_ERROR;
 
@@ -1357,8 +1357,6 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 
 	*childID = child->id;
 
-	child->offset = partition->offset + primary->Offset();
-	child->size = primary->Size();
 	child->block_size = SECTOR_SIZE;
 	// (no name)
 	child->type = strdup(type);
@@ -2088,7 +2086,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	// creating partition
 	update_disk_device_job_progress(job, 0.0);
 	partition_data *child = create_child_partition(partition->id, index,
-		*childID);
+		validatedOffset, validatedSize, *childID);
 	if (!child) {
 		delete logical;
 		return B_ERROR;
@@ -2136,8 +2134,6 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 
 	*childID = child->id;
 
-	child->offset = partition->offset + logical->Offset();
-	child->size = logical->Size();
 	child->block_size = SECTOR_SIZE;
 	// (no name)
 	child->type = strdup(type);

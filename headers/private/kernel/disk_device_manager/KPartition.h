@@ -75,7 +75,7 @@ public:
 	void SetStatus(uint32 status);
 	uint32 Status() const;
 	bool IsUninitialized() const;
-	
+
 	void SetFlags(uint32 flags);	// comprises the ones below
 	void AddFlags(uint32 flags);
 	void ClearFlags(uint32 flags);
@@ -135,7 +135,7 @@ public:
 	KPartition *Parent() const;
 
 	status_t AddChild(KPartition *partition, int32 index = -1);
-	virtual status_t CreateChild(partition_id id, int32 index,
+	status_t CreateChild(partition_id id, int32 index, off_t offset, off_t size,
 		KPartition **child = NULL);
 	bool RemoveChild(int32 index);
 	bool RemoveChild(KPartition *child);

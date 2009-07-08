@@ -96,10 +96,10 @@ atari_identify_partition(int fd, partition_data *partition, void **_cookie)
 	/* hope so */
 	if (arb->MaxPartitionSize() < 10)
 		weight -= 20;
-	
+
 	if ((arb->BadSectorsStart()+arb->BadSectorsCount())*(off_t)SECTSZ > partition->size)
 		return B_ERROR;
-	
+
 	/* check each partition */
 	for (i = 0; i < 4; i++) {
 		struct atari_partition_entry *p = &arb->partitions[i];
@@ -136,12 +136,12 @@ atari_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	if (weight > 1.0)
 		weight = 1.0;
-	
+
 	if (weight > 0.0) {
 		// copy the root block to a new piece of memory
 		arb = new atari_root_block();
 		memcpy(arb, buffer, sizeof(atari_root_block));
-		
+
 		*_cookie = (void *)arb;
 		return weight;
 	}
@@ -182,8 +182,10 @@ atari_scan_partition(int fd, partition_data *partition, void *_cookie)
 			continue;
 		if (!isalnum(p->id[2]))
 			continue;
-		
-		partition_data *child = create_child_partition(partition->id, index, -1);
+
+		partition_data *child = create_child_partition(partition->id, index,
+			partition->offset + p->Start() * (uint64)SECTSZ,
+			p->Size() * (uint64)SECTSZ, -1);
 		if (child == NULL) {
 			TRACE(("atari: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
@@ -192,8 +194,6 @@ atari_scan_partition(int fd, partition_data *partition, void *_cookie)
 		char type[] = "??? Partition";
 		memcpy(type, p->id, 3);
 		child->type = strdup(type);
-		child->offset = partition->offset + p->Start() * (uint64)SECTSZ;
-		child->size = p->Size() * (uint64)SECTSZ;
 		child->block_size = SECTSZ;
 		status = B_OK;
 	}

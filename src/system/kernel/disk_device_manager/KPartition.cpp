@@ -185,8 +185,11 @@ KPartition::PublishDevice()
 	// get the path
 	KPath path;
 	status_t error = GetPath(&path);
-	if (error != B_OK)
+	if (error != B_OK) {
+		dprintf("KPartition::PublishDevice(): Failed to get path for partition "
+			"%ld: %s\n", ID(), strerror(error));
 		return error;
+	}
 
 	// prepare a partition_info
 	partition_info info;
@@ -202,8 +205,11 @@ KPartition::PublishDevice()
 
 	error = devfs_publish_partition(path.Path() + 5, &info);
 		// we need to remove the "/dev/" part from the path
-	if (error != B_OK)
+	if (error != B_OK) {
+		dprintf("KPartition::PublishDevice(): Failed to publish partition "
+			"%ld: %s\n", ID(), strerror(error));
 		return error;
+	}
 
 	fPublished = true;
 
@@ -220,13 +226,21 @@ KPartition::UnpublishDevice()
 	// get the path
 	KPath path;
 	status_t error = GetPath(&path);
-	if (error != B_OK)
+	if (error != B_OK) {
+		dprintf("KPartition::UnpublishDevice(): Failed to get path for "
+			"partition %ld: %s\n", ID(), strerror(error));
 		return error;
+	}
 
 	fPublished = false;
 
-	return devfs_unpublish_partition(path.Path() + 5);
+	error = devfs_unpublish_partition(path.Path() + 5);
 		// we need to remove the "/dev/" part from the path
+	if (error != B_OK) {
+		dprintf("KPartition::UnpublishDevice(): Failed to unpublish "
+			"partition %ld: %s\n", ID(), strerror(error));
+	}
+	return error;
 }
 
 
@@ -785,7 +799,8 @@ KPartition::AddChild(KPartition *partition, int32 index)
 
 // CreateChild
 status_t
-KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
+KPartition::CreateChild(partition_id id, int32 index, off_t offset, off_t size,
+	KPartition **_child)
 {
 	// check parameters
 	int32 count = fPartitionData.child_count;
@@ -798,6 +813,9 @@ KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
 	KPartition *child = new(nothrow) KPartition(id);
 	if (!child)
 		return B_NO_MEMORY;
+
+	child->SetOffset(offset);
+	child->SetSize(size);
 
 	status_t error = AddChild(child, index);
 

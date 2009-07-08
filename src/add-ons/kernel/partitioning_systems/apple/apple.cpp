@@ -67,7 +67,7 @@ get_next_partition(int fd, apple_driver_descriptor &descriptor, uint32 &cookie,
 		if (bytesRead < (ssize_t)sizeof(apple_partition_map))
 			return B_ERROR;
 
-		block++;	
+		block++;
 	} while (cookie == 0 && block < 64 && !partition.HasValidSignature());
 
 	if (!partition.HasValidSignature()) {
@@ -168,14 +168,14 @@ apple_scan_partition(int fd, partition_data *partition, void *_cookie)
 			continue;
 		}
 
-		partition_data *child = create_child_partition(partition->id, index++, -1);
+		partition_data *child = create_child_partition(partition->id, index++,
+			partition->offset + partitionMap.Start(descriptor),
+			partitionMap.Size(descriptor), -1);
 		if (child == NULL) {
 			TRACE(("apple: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
 		}
 
-		child->offset = partition->offset + partitionMap.Start(descriptor);
-		child->size = partitionMap.Size(descriptor);
 		child->block_size = partition->block_size;
 	}
 

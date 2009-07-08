@@ -483,7 +483,8 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 		}
 
 		partition_data *child = create_child_partition(partition->id, index++,
-			-1);
+			partition->offset + entry.StartBlock() * partition->block_size,
+			entry.BlockCount() * partition->block_size, -1);
 		if (child == NULL) {
 			TRACE(("efi_gpt: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
@@ -493,10 +494,6 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 		to_utf8(entry.name, EFI_PARTITION_NAME_LENGTH, name, sizeof(name));
 		child->name = strdup(name);
 		child->type = strdup(get_partition_type(entry.partition_type));
-
-		child->offset = partition->offset + entry.StartBlock()
-			* partition->block_size;
-		child->size = entry.BlockCount() * partition->block_size;
 		child->block_size = partition->block_size;
 		child->cookie = (void *)i;
 	}
@@ -1119,7 +1116,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	update_disk_device_job_progress(job, 0.0);
 
 	partition_data *child = create_child_partition(partition->id, entryIndex,
-		*childID);
+		validatedOffset, validatedSize, *childID);
 	if (child == NULL)
 		return B_ERROR;
 
@@ -1137,8 +1134,6 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	}
 
 	*childID = child->id;
-	child->offset = validatedOffset;
-	child->size = validatedSize;
 	child->block_size = partition->block_size;
 	child->type = strdup(type);
 	child->parameters = strdup(parameters);

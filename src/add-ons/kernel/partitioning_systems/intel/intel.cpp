@@ -202,7 +202,8 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 		PrimaryPartition *primary = map->PrimaryPartitionAt(i);
 		if (!primary->IsEmpty()) {
 			partition_data *child = create_child_partition(partition->id,
-				index, -1);
+				index, partition->offset + primary->Offset(), primary->Size(),
+				-1);
 			index++;
 			if (!child) {
 				// something went wrong
@@ -210,8 +211,6 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 				break;
 			}
 
-			child->offset = partition->offset + primary->Offset();
-			child->size = primary->Size();
 			child->block_size = partition->block_size;
 
 			// (no name)
@@ -354,7 +353,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	int32 index = 0;
 	for (int32 i = 0; i < primary->CountLogicalPartitions(); i++) {
 		LogicalPartition *logical = primary->LogicalPartitionAt(i);
-		partition_data *child = create_child_partition(partition->id, index, -1);
+		partition_data *child = create_child_partition(partition->id, index,
+			parent->offset + logical->Offset(), logical->Size(), -1);
 		index++;
 		if (!child) {
 			// something went wrong
@@ -363,8 +363,6 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 			error = B_ERROR;
 			break;
 		}
-		child->offset = parent->offset + logical->Offset();
-		child->size = logical->Size();
 		child->block_size = partition->block_size;
 
 		// (no name)

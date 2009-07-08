@@ -30,7 +30,7 @@ typedef struct partition_data {
 	uint32			status;
 	uint32			flags;
 	dev_t			volume;			// [sys]
-	void			*mount_cookie;	// [sys] 
+	void			*mount_cookie;	// [sys]
 	char			*name;			// max: B_OS_NAME_LENGTH
 	char			*content_name;	//
 	char			*type;			//
@@ -104,7 +104,7 @@ partition_data *get_child_partition(partition_id partitionID, int32 index);
 // partition write access
 // (write lock required)
 partition_data *create_child_partition(partition_id partitionID, int32 index,
-		partition_id childID);
+		off_t offset, off_t size, partition_id childID);
 	// childID is an optional input parameter -- -1 to be ignored
 bool delete_partition(partition_id partitionID);
 void partition_modified(partition_id partitionID);

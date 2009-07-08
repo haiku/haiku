@@ -76,17 +76,15 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 
 	Session *session = NULL;
 	status_t error = B_OK;
-	for (int i = 0; (session = disc->GetSession(i)); i++) {	
+	for (int i = 0; (session = disc->GetSession(i)); i++) {
 		partition_data *child = create_child_partition(partition->id,
-			i, -1);
+			i, partition->offset + session->Offset(), session->Size(), -1);
 		if (!child) {
 			PRINT(("Unable to create child at index %d.\n", i));
 			// something went wrong
 			error = B_ERROR;
 			break;
 		}
-		child->offset = partition->offset + session->Offset();
-		child->size = session->Size();
 		child->block_size = session->BlockSize();
 		child->flags |= session->Flags();
 		child->type = strdup(session->Type());

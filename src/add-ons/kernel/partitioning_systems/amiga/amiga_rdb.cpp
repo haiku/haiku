@@ -183,14 +183,13 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 			continue;
 		}
 
-		partition_data *child = create_child_partition(partition->id, index++, -1);
+		partition_data *child = create_child_partition(partition->id, index++,
+			partition->offset + environment.Start(), environment.Size(), -1);
 		if (child == NULL) {
 			TRACE(("amiga_rdb: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
 		}
 
-		child->offset = partition->offset + environment.Start();
-		child->size = environment.Size();			
 		child->block_size = environment.BlockSize();
 	}
 

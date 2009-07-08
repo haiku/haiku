@@ -156,19 +156,22 @@ get_child_partition(partition_id partitionID, int32 index)
 
 // create_child_partition
 partition_data *
-create_child_partition(partition_id partitionID, int32 index,
-					   partition_id childID)
+create_child_partition(partition_id partitionID, int32 index, off_t offset,
+	off_t size, partition_id childID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (KPartition *partition = manager->FindPartition(partitionID)) {
 		KPartition *child = NULL;
-		if (partition->CreateChild(childID, index, &child) == B_OK)
+		if (partition->CreateChild(childID, index, offset, size, &child)
+				== B_OK) {
 			return child->PartitionData();
-else
-DBG(OUT("  creating child (%ld, %ld) failed\n", partitionID, index));
-	}
-else
-DBG(OUT("  partition %ld not found\n", partitionID));
+		} else {
+			DBG(OUT("  creating child (%ld, %ld) failed\n", partitionID,
+			index));
+		}
+	} else
+		DBG(OUT("  partition %ld not found\n", partitionID));
+
 	return NULL;
 }
 

@@ -150,7 +150,7 @@ Partition::Parent() const
 }
 
 
-ssize_t 
+ssize_t
 Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 {
 	if (position > this->size)
@@ -165,7 +165,7 @@ Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
+ssize_t
 Partition::WriteAt(void *cookie, off_t position, const void *buffer,
 	size_t bufferSize)
 {
@@ -192,7 +192,7 @@ Partition::Size() const
 }
 
 
-int32 
+int32
 Partition::Type() const
 {
 	struct stat stat;
@@ -223,7 +223,7 @@ status_t
 Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 {
 	static int fileMapDiskDepth = 0;
-	TRACE(("%p Partition::_Mount check for file_system: %s\n", 
+	TRACE(("%p Partition::_Mount check for file_system: %s\n",
 		this, module->pretty_name));
 
 	Directory *fileSystem;
@@ -274,7 +274,7 @@ Partition::Mount(Directory **_fileSystem, bool isBootDevice)
 }
 
 
-status_t 
+status_t
 Partition::Scan(bool mountFileSystems, bool isBootDevice)
 {
 	// scan for partitions first (recursively all eventual children as well)
@@ -398,7 +398,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		return Mount();
 	}
 
-	return B_ENTRY_NOT_FOUND; 
+	return B_ENTRY_NOT_FOUND;
 }
 
 }	// namespace boot
@@ -458,7 +458,8 @@ add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice)
 
 
 partition_data *
-create_child_partition(partition_id id, int32 index, partition_id childID)
+create_child_partition(partition_id id, int32 index, off_t offset, off_t size,
+	partition_id childID)
 {
 	Partition &partition = *(Partition *)id;
 	Partition *child = partition.AddChild();
@@ -466,6 +467,9 @@ create_child_partition(partition_id id, int32 index, partition_id childID)
 		dprintf("creating partition failed: no memory\n");
 		return NULL;
 	}
+
+	child->offset = offset;
+	child->size = size;
 
 	// we cannot do anything with the child here, because it was not
 	// yet initialized by the partition module.
