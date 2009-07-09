@@ -473,9 +473,6 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 			// Calculate the display aspect ratio
 			AVRational displayAspectRatio;
 		    if (codecContext->sample_aspect_ratio.num != 0) {
-				// TODO: Maybe it would be more useful to change the meaning
-				// of pixel_width/height_aspect to mean the pixel width
-				// scale...
 				av_reduce(&displayAspectRatio.num, &displayAspectRatio.den,
 					codecContext->width
 						* codecContext->sample_aspect_ratio.num,
