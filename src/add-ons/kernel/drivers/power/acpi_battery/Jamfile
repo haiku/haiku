@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers power acpi_battery ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon acpi_battery :
+	acpi_battery.cpp
+	;
+
+Depends acpi_battery : acpi ;
