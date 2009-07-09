@@ -256,12 +256,6 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 
 	// Get a pointer to the AVCodecContext for the stream at streamIndex.
 	AVCodecContext* codecContext = fStream->codec;
-// NOTE: Experimenting with opening the AVCodec to see if I get more
-// AVCodecContext fields filled out. Doesn't seem to make a difference
-// for extradata for example.
-//	AVCodec* codec = avcodec_find_decoder(codecContext->codec_id);
-//	bool codecOpened = avcodec_open(codecContext, codec) == 0;
-//	TRACE("  codec opened: %d\n", codecOpened);
 	AVStream* stream = fStream;
 
 	// initialize the media_format for this stream
@@ -352,7 +346,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 //					codecTag = 0x2000;
 //					break;
 				default:
-					fprintf(stderr, "ffmpeg codecTag is null, codec_id unknown 0x%lx\n", codecContext->codec_id);
+					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
+						"unknown 0x%x\n", codecContext->codec_id);
 					// TODO: Add more...
 					break;
 			}
@@ -430,7 +425,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 
 			// Read one packet and mark it for later re-use. (So our first
 			// GetNextChunk() call does not read another packet.)
-			if ( _NextPacket(true) == B_OK) {
+			if (_NextPacket(true) == B_OK) {
 				TRACE("  successfully determined audio buffer size: %d\n",
 					fPacket.size);
 				format->u.raw_audio.buffer_size = fPacket.size;
@@ -474,17 +469,34 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				// somewhere...
 			format->u.encoded_video.output.orientation
 				= B_VIDEO_TOP_LEFT_RIGHT;
-	
-			// TODO: Implement aspect ratio for real
+
+			// Calculate the display aspect ratio
+			AVRational displayAspectRatio;
+		    if (codecContext->sample_aspect_ratio.num != 0) {
+				// TODO: Maybe it would be more useful to change the meaning
+				// of pixel_width/height_aspect to mean the pixel width
+				// scale...
+				av_reduce(&displayAspectRatio.num, &displayAspectRatio.den,
+					codecContext->width
+						* codecContext->sample_aspect_ratio.num,
+					codecContext->height
+						* codecContext->sample_aspect_ratio.den,
+					1024 * 1024);
+				TRACE("  pixel aspect ratio: %d/%d, "
+					"display aspect ratio: %d/%d\n",
+					codecContext->sample_aspect_ratio.num,
+					codecContext->sample_aspect_ratio.den,
+					displayAspectRatio.num, displayAspectRatio.den);
+		    } else {
+				av_reduce(&displayAspectRatio.num, &displayAspectRatio.den,
+					codecContext->width, codecContext->height, 1024 * 1024);
+				TRACE("  no display aspect ratio (%d/%d)\n",
+					displayAspectRatio.num, displayAspectRatio.den);
+		    }
 			format->u.encoded_video.output.pixel_width_aspect
-				= 1;//stream->sample_aspect_ratio.num;
+				= displayAspectRatio.num;
 			format->u.encoded_video.output.pixel_height_aspect
-				= 1;//stream->sample_aspect_ratio.den;
-	
-			TRACE("  pixel width/height aspect: %d/%d or %.4f\n",
-				stream->sample_aspect_ratio.num,
-				stream->sample_aspect_ratio.den,
-				av_q2d(stream->sample_aspect_ratio));
+				= displayAspectRatio.den;
 
 			format->u.encoded_video.output.display.format
 				= pixfmt_to_colorspace(codecContext->pix_fmt);
@@ -515,9 +527,6 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 	TRACE("  inter_matrix: %p\n", codecContext->inter_matrix);
 	TRACE("  get_buffer(): %p\n", codecContext->get_buffer);
 	TRACE("  release_buffer(): %p\n", codecContext->release_buffer);
-
-//	if (codecOpened)
-//		avcodec_close(codecContext);
 
 #ifdef TRACE_AVFORMAT_READER
 	char formatString[512];
