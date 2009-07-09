@@ -61,5 +61,5 @@ BuildPlatformMain <build>bfs_fuse
 	$(bfsSource)
 
 	: <build>fuse_module.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
-	  $(HOST_LIBROOT) $(fsShellCommandLibs) fuse
+	  $(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
 ;
