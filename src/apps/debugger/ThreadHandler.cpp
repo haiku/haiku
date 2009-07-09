@@ -126,7 +126,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 			// spurious breakpoint -- might be a temporary breakpoint, that has
 			// already been uninstalled
 			continueThread = true;
-		} else if (breakpoint->HasEnabledUserBreakpoint()) {
+		} else if (!breakpoint->HasEnabledUserBreakpoint()) {
 			// breakpoint of another thread or one that has been disabled in
 			// the meantime
 			continueThread = true;
