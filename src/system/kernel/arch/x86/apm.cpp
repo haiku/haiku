@@ -204,7 +204,7 @@ apm_daemon(void *arg, int iteration)
 
 
 static status_t
-get_battery_info(battery_info *info)
+get_apm_battery_info(apm_battery_info *info)
 {
 	bios_regs regs;
 	regs.eax = BIOS_APM_GET_POWER_STATUS;
@@ -236,17 +236,17 @@ static status_t
 apm_control(const char *subsystem, uint32 function,
 	void *buffer, size_t bufferSize)
 {
-	struct battery_info info;
-	if (bufferSize != sizeof(struct battery_info))
+	struct apm_battery_info info;
+	if (bufferSize != sizeof(struct apm_battery_info))
 		return B_BAD_VALUE;
 
 	switch (function) {
 		case APM_GET_BATTERY_INFO:
-			status_t status = get_battery_info(&info);
+			status_t status = get_apm_battery_info(&info);
 			if (status < B_OK)
 				return status;
 
-			return user_memcpy(buffer, &info, sizeof(struct battery_info));
+			return user_memcpy(buffer, &info, sizeof(struct apm_battery_info));
 	}
 
 	return B_BAD_VALUE;
