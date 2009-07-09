@@ -21,7 +21,7 @@ PowerStatusWindow::PowerStatusWindow()
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	topView->AddChild(new PowerStatusView(Bounds(), B_FOLLOW_ALL));
+	topView->AddChild(new PowerStatusReplicant(Bounds(), B_FOLLOW_ALL));
 }
 
 

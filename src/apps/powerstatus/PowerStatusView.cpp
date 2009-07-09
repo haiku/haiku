@@ -4,18 +4,12 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  */
 
 
 #include "PowerStatusView.h"
 #include "PowerStatus.h"
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <arch/x86/apm_defs.h>
-#	include <generic_syscall_defs.h>
-#	include <syscalls.h>
-	// temporary, as long as there is no real power state API
-#endif
 
 #include <Alert.h>
 #include <Application.h>
@@ -32,52 +26,34 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "ACPIDriverInterface.h"
+#include "APMDriverInterface.h"
+#include "ExtendedInfoWindow.h"
+
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
-
-const uint32 kMsgUpdate = 'updt';
 const uint32 kMsgToggleLabel = 'tglb';
 const uint32 kMsgToggleTime = 'tgtm';
 const uint32 kMsgToggleStatusIcon = 'tgsi';
+const uint32 kMsgToggleExtInfo = 'texi';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
-const bigtime_t kUpdateInterval = 2000000;
-		// every two seconds
 
-
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-// definitions for the APM driver available for BeOS
-enum {
-	APM_CONTROL = B_DEVICE_OP_CODES_END + 1,
-	APM_DUMP_POWER_STATUS,
-	APM_BIOS_CALL,
-	APM_SET_SAFETY
-};
-
-#define BIOS_APM_GET_POWER_STATUS 0x530a
-#endif
-
-
-PowerStatusView::PowerStatusView(BRect frame, int32 resizingMode, bool inDeskbar)
-	: BView(frame, kDeskbarItemName, resizingMode,
+PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
+	BRect frame, int32 resizingMode,  int batteryId, bool inDeskbar)
+	:
+	BView(frame, kDeskbarItemName, resizingMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fDriverInterface(interface),
+	fBatteryId(batteryId),
 	fInDeskbar(inDeskbar)
 {
+	fPreferredSize.width = frame.Width();
+	fPreferredSize.height = frame.Height();
 	_Init();
-
-	if (!inDeskbar) {
-		// we were obviously added to a standard window - let's add a dragger
-		frame.OffsetTo(B_ORIGIN);
-		frame.top = frame.bottom - 7;
-		frame.left = frame.right - 7;
-		BDragger* dragger = new BDragger(frame, this,
-			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		AddChild(dragger);
-	} else
-		_Update();
 }
 
 
@@ -93,14 +69,33 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 		fShowStatusIcon = value;
 	if (archive->FindBool("show time", &value) == B_OK)
 		fShowTime = value;
+	int32 intValue;
+	if (archive->FindInt32("battery id", &intValue) == B_OK)
+		fBatteryId = intValue;
+	
 }
 
 
 PowerStatusView::~PowerStatusView()
 {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	close(fDevice);
-#endif
+
+}
+
+
+status_t
+PowerStatusView::Archive(BMessage* archive, bool deep) const
+{
+	status_t status = BView::Archive(archive, deep);
+	if (status == B_OK)
+		status = archive->AddBool("show label", fShowLabel);
+	if (status == B_OK)
+		status = archive->AddBool("show icon", fShowStatusIcon);
+	if (status == B_OK)
+		status = archive->AddBool("show time", fShowTime);
+	if (status == B_OK)
+		status = archive->AddInt32("battery id", fBatteryId);
+
+	return status;
 }
 
 
@@ -111,72 +106,10 @@ PowerStatusView::_Init()
 	fShowTime = false;
 	fShowStatusIcon = true;
 
-	fMessageRunner = NULL;
 	fPercent = -1;
 	fOnline = true;
 	fTimeLeft = 0;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	uint32 version = 0;
-	status_t status = _kern_generic_syscall(APM_SYSCALLS, B_SYSCALL_INFO,
-		&version, sizeof(version));
-	if (status == B_OK) {
-		battery_info info;
-		status = _kern_generic_syscall(APM_SYSCALLS, APM_GET_BATTERY_INFO, &info,
-			sizeof(battery_info));
-	}
-
-	if (status != B_OK) {
-		fprintf(stderr, "No power interface found.\n");
-		_Quit();
-	}
-#else
-	fDevice = open("/dev/misc/apm", O_RDONLY);
-	if (fDevice < 0) {
-		fprintf(stderr, "No power interface found.\n");
-		_Quit();
-	}
-#endif
-}
-
-
-void
-PowerStatusView::_Quit()
-{
-	if (fInDeskbar) {
-		BDeskbar deskbar;
-		deskbar.RemoveItem(kDeskbarItemName);
-	} else
-		be_app->PostMessage(B_QUIT_REQUESTED);
-}
-
-
-PowerStatusView *
-PowerStatusView::Instantiate(BMessage* archive)
-{
-	if (!validate_instantiation(archive, "PowerStatusView"))
-		return NULL;
-
-	return new PowerStatusView(archive);
-}
-
-
-status_t
-PowerStatusView::Archive(BMessage* archive, bool deep) const
-{
-	status_t status = BView::Archive(archive, deep);
-	if (status == B_OK)
-		status = archive->AddString("add_on", kSignature);
-	if (status == B_OK)
-		status = archive->AddString("class", "PowerStatusView");
-	if (status == B_OK)
-		status = archive->AddBool("show label", fShowLabel);
-	if (status == B_OK)
-		status = archive->AddBool("show icon", fShowStatusIcon);
-	if (status == B_OK)
-		status = archive->AddBool("show time", fShowTime);
-
-	return status;
 }
 
 
@@ -191,9 +124,6 @@ PowerStatusView::AttachedToWindow()
 
 	SetLowColor(ViewColor());
 
-	BMessage update(kMsgUpdate);
-	fMessageRunner = new BMessageRunner(this, &update, kUpdateInterval);
-
 	_Update();
 }
 
@@ -201,7 +131,7 @@ PowerStatusView::AttachedToWindow()
 void
 PowerStatusView::DetachedFromWindow()
 {
-	delete fMessageRunner;
+
 }
 
 
@@ -213,32 +143,17 @@ PowerStatusView::MessageReceived(BMessage *message)
 			_Update();
 			break;
 
-		case kMsgToggleLabel:
-			fShowLabel = !fShowLabel;
-			_Update(true);
-			break;
-
-		case kMsgToggleTime:
-			fShowTime = !fShowTime;
-			_Update(true);
-			break;
-
-		case kMsgToggleStatusIcon:
-			fShowStatusIcon = !fShowStatusIcon;
-			_Update(true);
-			break;
-
-		case B_ABOUT_REQUESTED:
-			_AboutRequested();
-			break;
-
-		case B_QUIT_REQUESTED:
-			_Quit();
-			break;
-
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+PowerStatusView::GetPreferredSize(float *width, float *height)
+{
+	*width = fPreferredSize.width;
+	*height = fPreferredSize.height;
 }
 
 
@@ -261,8 +176,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 		gap = 2;
 	}
 
-	if (fOnline)
-		SetHighColor(92, 92, 92);
+	SetHighColor(92, 92, 92);
 
 	StrokeRect(rect);
 
@@ -277,6 +191,8 @@ PowerStatusView::_DrawBattery(BRect rect)
 	if (percent > 0) {
 		if (percent < 16)
 			SetHighColor(180, 0, 0);
+		else
+			SetHighColor(20, 180, 0);
 
 		rect.InsetBy(gap + 1, gap + 1);
 		if (gap > 1) {
@@ -359,53 +275,6 @@ PowerStatusView::Draw(BRect updateRect)
 
 
 void
-PowerStatusView::MouseDown(BPoint point)
-{
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	menu->SetFont(be_plain_font);
-
-	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Show Text Label", new BMessage(kMsgToggleLabel)));
-	if (fShowLabel)
-		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem("Show Status Icon",
-		new BMessage(kMsgToggleStatusIcon)));
-	if (fShowStatusIcon)
-		item->SetMarked(true);
-	menu->AddItem(new BMenuItem(!fShowTime ? "Show Time" : "Show Percent",
-		new BMessage(kMsgToggleTime)));
-
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
-	menu->SetTargetForItems(this);
-
-	ConvertToScreen(&point);
-	menu->Go(point, true, false, true);
-}
-
-
-void
-PowerStatusView::_AboutRequested()
-{
-	BAlert *alert = new BAlert("about", "PowerStatus\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2006, Haiku, Inc.\n", "Ok");
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 11, &font);
-
-	alert->Go();
-}
-
-
-void
 PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 {
 	if (bufferLength < 1)
@@ -432,6 +301,7 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 }
 
 
+
 void
 PowerStatusView::_Update(bool force)
 {
@@ -439,36 +309,15 @@ PowerStatusView::_Update(bool force)
 	bool previousTimeLeft = fTimeLeft;
 	bool wasOnline = fOnline;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	// TODO: retrieve data from APM/ACPI kernel interface
-	battery_info info;
-	status_t status = _kern_generic_syscall(APM_SYSCALLS, APM_GET_BATTERY_INFO, &info,
-		sizeof(battery_info));
-	if (status == B_OK) {
-		fPercent = info.percent;
-		fTimeLeft = info.time_left;
-		fOnline = info.online;
-	}
-#else
-	if (fDevice < 0)
-		return;
+	_GetBatteryInfo(&fBatteryInfo, fBatteryId);
 
-	uint16 regs[6] = {0, 0, 0, 0, 0, 0};
-	regs[0] = BIOS_APM_GET_POWER_STATUS;
-	regs[1] = 0x1;
-	if (ioctl(fDevice, APM_BIOS_CALL, regs) == 0) {
-		fOnline = (regs[1] >> 8) != 0 && (regs[1] >> 8) != 2;
-		fPercent = regs[2] & 255;
-		if (fPercent > 100)
-			fPercent = -1;
-		fTimeLeft = fPercent >= 0 ? regs[3] : -1;
-		if (fTimeLeft > 0xffff)
-			fTimeLeft = -1;
-		else if (fTimeLeft & 0x8000)
-			fTimeLeft = (fTimeLeft & 0x7fff) * 60;
-	}
-#endif
-
+	fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
+	fTimeLeft = fBatteryInfo.time_left;
+	if (fBatteryInfo.state & BATTERY_CHARGING)
+		fOnline = true;
+	else
+		fOnline = false;
+	
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
 		float width = fShowStatusIcon ? kMinIconWidth + 2 : 0;
@@ -496,12 +345,242 @@ PowerStatusView::_Update(bool force)
 }
 
 
+void
+PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryId)
+{
+	if (batteryId >= 0) {
+		fDriverInterface->GetBatteryInfo(batteryInfo, batteryId);
+	}
+	else for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
+		battery_info tmpInfo;
+		fDriverInterface->GetBatteryInfo(&tmpInfo, i);
+		
+		if (i == 0)
+			*batteryInfo = tmpInfo;
+		else {
+			batteryInfo->state &= tmpInfo.state;
+			batteryInfo->capacity += tmpInfo.capacity;
+			batteryInfo->full_capacity += tmpInfo.full_capacity;
+			batteryInfo->time_left += tmpInfo.time_left;			
+		}	
+	}
+}
+
+
+//	#pragma mark -
+
+
+PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
+	bool inDeskbar)
+	:
+	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar)
+{
+	_Init();
+
+	if (!inDeskbar) {
+		// we were obviously added to a standard window - let's add a dragger
+		frame.OffsetTo(B_ORIGIN);
+		frame.top = frame.bottom - 7;
+		frame.left = frame.right - 7;
+		BDragger* dragger = new BDragger(frame, this,
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		AddChild(dragger);
+	} else
+		_Update();
+}
+
+
+PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
+	:
+	PowerStatusView(archive)
+{
+	_Init();
+}
+
+
+PowerStatusReplicant::~PowerStatusReplicant()
+{
+	if (fExtWindowMessenger)
+		delete fExtWindowMessenger;
+
+	fDriverInterface->StopWatching(this);
+	fDriverInterface->Disconnect();
+	delete fDriverInterface;
+}
+
+
+PowerStatusReplicant*
+PowerStatusReplicant::Instantiate(BMessage* archive)
+{
+	if (!validate_instantiation(archive, "PowerStatusReplicant"))
+		return NULL;
+
+	return new PowerStatusReplicant(archive);
+}
+
+
+status_t
+PowerStatusReplicant::Archive(BMessage* archive, bool deep) const
+{
+	status_t status = PowerStatusView::Archive(archive, deep);
+	if (status == B_OK)
+		status = archive->AddString("add_on", kSignature);
+	if (status == B_OK)
+		status = archive->AddString("class", "PowerStatusReplicant");
+
+	return status;
+}
+
+
+void
+PowerStatusReplicant::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgToggleLabel:
+			fShowLabel = !fShowLabel;
+			_Update(true);
+			break;
+
+		case kMsgToggleTime:
+			fShowTime = !fShowTime;
+			_Update(true);
+			break;
+
+		case kMsgToggleStatusIcon:
+			fShowStatusIcon = !fShowStatusIcon;
+			_Update(true);
+			break;
+
+		case kMsgToggleExtInfo:
+			_OpenExtendedWindow();
+			break;
+
+		case B_ABOUT_REQUESTED:
+			_AboutRequested();
+			break;
+
+		case B_QUIT_REQUESTED:
+			_Quit();
+			break;
+
+		default:
+			PowerStatusView::MessageReceived(message);
+	}
+}
+
+
+void
+PowerStatusReplicant::MouseDown(BPoint point)
+{
+	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	menu->SetFont(be_plain_font);
+
+	BMenuItem* item;
+	menu->AddItem(item = new BMenuItem("Show Text Label",
+		new BMessage(kMsgToggleLabel)));
+	if (fShowLabel)
+		item->SetMarked(true);
+	menu->AddItem(item = new BMenuItem("Show Status Icon",
+		new BMessage(kMsgToggleStatusIcon)));
+	if (fShowStatusIcon)
+		item->SetMarked(true);
+	menu->AddItem(new BMenuItem(!fShowTime ? "Show Time" : "Show Percent",
+		new BMessage(kMsgToggleTime)));
+
+	menu->AddItem(new BMenuItem("Battery Info",
+		new BMessage(kMsgToggleExtInfo)));
+	
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
+	menu->SetTargetForItems(this);
+
+	ConvertToScreen(&point);
+	menu->Go(point, true, false, true);
+}
+
+
+void
+PowerStatusReplicant::_AboutRequested()
+{
+	BAlert *alert = new BAlert("about", "PowerStatus\n"
+		"written by Axel Dörfler,\n"
+		"\tClemens Zeidler\n"
+		"\tCopyright 2006, Haiku, Inc.\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE);
+	view->SetFontAndColor(0, 11, &font);
+
+	alert->Go();
+}
+
+
+void
+PowerStatusReplicant::_Init()
+{
+	fDriverInterface = new ACPIDriverInterface;
+	if (fDriverInterface->Connect() != B_OK) {
+		delete fDriverInterface;
+		fDriverInterface = new APMDriverInterface;
+		if (fDriverInterface->Connect() != B_OK) {
+			fprintf(stderr, "No power interface found.\n");
+			_Quit();
+		}
+	}
+	
+	fExtendedWindow = NULL;
+	fExtWindowMessenger = NULL;
+
+	fDriverInterface->StartWatching(this);
+}
+
+
+void
+PowerStatusReplicant::_Quit()
+{
+	if (fInDeskbar) {
+		BDeskbar deskbar;
+		deskbar.RemoveItem(kDeskbarItemName);
+	} else
+		be_app->PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void
+PowerStatusReplicant::_OpenExtendedWindow()
+{
+	if (!fExtendedWindow) {
+		fExtendedWindow = new ExtendedInfoWindow(fDriverInterface);
+		fExtWindowMessenger = new BMessenger(NULL, fExtendedWindow);
+		fExtendedWindow->Show();
+		return;
+	}
+	BMessage msg(B_SET_PROPERTY);
+	msg.AddSpecifier("Hidden", int32(0));
+	if (fExtWindowMessenger->SendMessage(&msg) == B_BAD_PORT_ID) {
+		fExtendedWindow = new ExtendedInfoWindow(fDriverInterface);
+		fExtWindowMessenger = new BMessenger(NULL, fExtendedWindow);
+		fExtendedWindow->Show();
+	}
+	else
+		fExtendedWindow->Activate();
+
+}
+
+
 //	#pragma mark -
 
 
 extern "C" _EXPORT BView *
 instantiate_deskbar_item(void)
 {
-	return new PowerStatusView(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
+	return new PowerStatusReplicant(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
 }
 

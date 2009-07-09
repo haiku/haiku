@@ -6,6 +6,10 @@ UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
 
 Application PowerStatus :
+	ACPIDriverInterface.cpp
+	APMDriverInterface.cpp
+	DriverInterface.cpp
+	ExtendedInfoWindow.cpp
 	PowerStatusWindow.cpp
 	PowerStatusView.cpp
 	PowerStatus.cpp
