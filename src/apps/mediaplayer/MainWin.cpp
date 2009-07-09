@@ -116,8 +116,8 @@ MainWin::MainWin()
 	  fNoInterface(false),
 	  fSourceWidth(-1),
 	  fSourceHeight(-1),
-	  fWidthScale(1.0),
-	  fHeightScale(1.0),
+	  fWidthAspect(0),
+	  fHeightAspect(0),
 	  fMouseDownTracking(false),
 	  fGlobalSettingsListener(this)
 {
@@ -592,31 +592,38 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		case M_ASPECT_100000_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.0);
+			VideoFormatChange(fSourceWidth, fSourceHeight,
+				fSourceWidth, fSourceHeight);
 			break;
 
 		case M_ASPECT_106666_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.06666);
+			VideoFormatChange(fSourceWidth, fSourceHeight,
+				lround(1.06666 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_ASPECT_109091_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.09091);
+			VideoFormatChange(fSourceWidth, fSourceHeight,
+				lround(1.09091 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_ASPECT_141176_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.41176);
+			VideoFormatChange(fSourceWidth, fSourceHeight,
+				lround(1.41176 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_ASPECT_720_576:
-			VideoFormatChange(720, 576, 1.06666);
+			VideoFormatChange(720, 576,
+				lround(1.06666 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_ASPECT_704_576:
-			VideoFormatChange(704, 576, 1.09091);
+			VideoFormatChange(704, 576,
+				lround(1.09091 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_ASPECT_544_576:
-			VideoFormatChange(544, 576, 1.41176);
+			VideoFormatChange(544, 576,
+				lround(1.41176 * fSourceWidth), fSourceHeight);
 			break;
 
 		case M_SET_PLAYLIST_POSITION:
@@ -776,17 +783,18 @@ MainWin::ShowPlaylistWindow()
 
 
 void
-MainWin::VideoFormatChange(int width, int height, float widthToHeightRatio)
+MainWin::VideoFormatChange(int width, int height, int widthAspect,
+	int heightAspect)
 {
 	// called when video format or aspect ratio changes
 
 	printf("VideoFormatChange enter: width %d, height %d, "
-		"widthToHeightRatio %.6f\n", width, height, widthToHeightRatio);
+		"aspect ratio: %d:%d\n", width, height, widthAspect, heightAspect);
 
  	fSourceWidth  = width;
  	fSourceHeight = height;
- 	fWidthScale   = widthToHeightRatio;
- 	fHeightScale  = 1.0f;
+ 	fWidthAspect   = widthAspect;
+ 	fHeightAspect  = heightAspect;
 
  	FrameResized(Bounds().Width(), Bounds().Height());
 
@@ -829,13 +837,13 @@ MainWin::_SetupWindow()
 	int previousSourceWidth = fSourceWidth;
 	int previousSourceHeight = fSourceHeight;
 	if (fHasVideo) {
-		fController->GetSize(&fSourceWidth, &fSourceHeight, &fWidthScale);
-		fHeightScale = 1.0;
+		fController->GetSize(&fSourceWidth, &fSourceHeight,
+			&fWidthAspect, &fHeightAspect);
 	} else {
 		fSourceWidth = 0;
 		fSourceHeight = 0;
-		fWidthScale = 1.0;
-		fHeightScale = 1.0;
+		fWidthAspect = 1;
+		fHeightAspect = 1;
 	}
 	_UpdateControlsEnabledStatus();
 
@@ -1019,6 +1027,26 @@ MainWin::_GetMinimumWindowSize(int& width, int& height) const
 
 
 void
+MainWin::_GetUnscaledVideoSize(int& videoWidth, int& videoHeight) const
+{
+	if (fWidthAspect != 0 && fHeightAspect != 0) {
+		videoWidth = fSourceHeight / fHeightAspect * fWidthAspect;
+		videoHeight = fSourceWidth / fWidthAspect * fHeightAspect;
+		// Use the scaling which produces an enlarged view.
+		if (videoWidth > fSourceWidth) {
+			// Enlarge width
+			videoHeight = fSourceHeight;
+		} else {
+			// Enlarge height
+			videoWidth = fSourceWidth;
+		}
+	} else {
+		videoWidth = fSourceWidth;
+		videoHeight = fSourceHeight;
+	}
+}
+
+void
 MainWin::_SetWindowSizeLimits()
 {
 	int minWidth;
@@ -1033,13 +1061,14 @@ void
 MainWin::_ResizeWindow(int percent)
 {
 	// Get required window size
-	int videoWidth = lround(fSourceWidth * fWidthScale);
-	int videoHeight = lround(fSourceHeight * fHeightScale);
+	int videoWidth;
+	int videoHeight;
+	_GetUnscaledVideoSize(videoWidth, videoHeight);
 
 	videoWidth = (videoWidth * percent) / 100;
 	videoHeight = (videoHeight * percent) / 100;
 
-	// Calculate and set the initial window size
+	// Calculate and set the minimum window size
 	int width;
 	int height;
 	_GetMinimumWindowSize(width, height);
@@ -1060,8 +1089,11 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 	if (fKeepAspectRatio) {
 		// Keep aspect ratio, place video view inside
 		// the background area (may create black bars).
-		float scaledWidth  = fSourceWidth * fWidthScale;
-		float scaledHeight = fSourceHeight * fHeightScale;
+		int videoWidth;
+		int videoHeight;
+		_GetUnscaledVideoSize(videoWidth, videoHeight);
+		float scaledWidth  = videoWidth;
+		float scaledHeight = videoHeight;
 		float factor = min_c(width / scaledWidth, height / scaledHeight);
 		int renderWidth = lround(scaledWidth * factor);
 		int renderHeight = lround(scaledHeight * factor);

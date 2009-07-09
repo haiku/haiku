@@ -359,26 +359,26 @@ Controller::PlayerActivated(bool active)
 
 
 void
-Controller::GetSize(int *width, int *height, float* widthToHeightRatio)
+Controller::GetSize(int *width, int *height, int* widthAspect,
+	int* heightAspect)
 {
 	BAutolock _(this);
 
 	if (fVideoTrackSupplier) {
 		media_format format = fVideoTrackSupplier->Format();
-		// TODO: take aspect ratio into account!
 		*height = format.u.raw_video.display.line_count;
 		*width = format.u.raw_video.display.line_width;
-		if (widthToHeightRatio != NULL) {
-printf("pixel_width_aspect: %d\n", format.u.raw_video.pixel_width_aspect);
-printf("pixel_height_aspect: %d\n", format.u.raw_video.pixel_height_aspect);
-			*widthToHeightRatio = (float)format.u.raw_video.pixel_width_aspect
-				/ format.u.raw_video.pixel_height_aspect;
-		}
+		if (widthAspect != NULL)
+			*widthAspect = format.u.raw_video.pixel_width_aspect;
+		if (heightAspect != NULL)
+			*heightAspect = format.u.raw_video.pixel_height_aspect;
 	} else {
 		*height = 0;
 		*width = 0;
-		if (widthToHeightRatio != NULL)
-			*widthToHeightRatio = 0.0f;
+		if (widthAspect != NULL)
+			*widthAspect = 1;
+		if (heightAspect != NULL)
+			*heightAspect = 1;
 	}
 }
 

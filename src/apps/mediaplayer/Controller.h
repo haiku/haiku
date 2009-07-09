@@ -86,7 +86,8 @@ public:
 			void				PlayerActivated(bool active);
 
 			void				GetSize(int *width, int *height,
-									float* widthToHeightRatio = NULL);
+									int* widthAspect = NULL,
+									int* heightAspect = NULL);
 
 			int					AudioTrackCount();
 			int					VideoTrackCount();

@@ -59,7 +59,7 @@ public:
 			void				ShowSettingsWindow();
 
 			void				VideoFormatChange(int width, int height,
-									float widthToHeightRatio);
+									int widthAspect, int heightAspect);
 
 private:
 			void				_RefsReceived(BMessage* message);
@@ -73,6 +73,8 @@ private:
 			void				_GetMinimumWindowSize(int& width,
 										int& height) const;
 			void				_SetWindowSizeLimits();
+			void				_GetUnscaledVideoSize(int& videoWidth,
+									int& videoHeight) const;
 			void				_ResizeWindow(int percent);
 			void				_ResizeVideoView(int x, int y, int width,
 									int height);
@@ -132,8 +134,8 @@ private:
 			volatile bool		fNoInterface;
 			int					fSourceWidth;
 			int					fSourceHeight;
-			float				fWidthScale;
-			float				fHeightScale;
+			int					fWidthAspect;
+			int					fHeightAspect;
 			int					fMenuBarWidth;
 			int					fMenuBarHeight;
 			int					fControlsHeight;
