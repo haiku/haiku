@@ -207,6 +207,10 @@ public:
 	int32 BinarySearchIndex(const T &item, CompareFunctionWithState compare,
 		void *state) const;
 
+	template<typename Key>
+	int32 BinarySearchIndexByKey(const Key &key,
+		int (*compare)(const Key *, const T *)) const;
+
 	// Binary insertion - list must be sorted with CompareFunction for
 	// these to work
 
@@ -690,6 +694,17 @@ BObjectList<T>::BinarySearchIndex(const T &item,
 {
 	return _PointerList_::BinarySearchIndex(&item,
 		(GenericCompareFunctionWithState)compare, state);
+}
+
+
+template<class T>
+template<typename Key>
+int32
+BObjectList<T>::BinarySearchIndexByKey(const Key &key,
+	int (*compare)(const Key *, const T *)) const
+{
+	return _PointerList_::BinarySearchIndex(&key,
+		(GenericCompareFunction)compare);
 }
 
 
