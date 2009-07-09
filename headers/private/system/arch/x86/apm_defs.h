@@ -13,7 +13,7 @@
 #define APM_SYSCALLS "apm"
 #define APM_GET_BATTERY_INFO	1
 
-struct battery_info {
+struct apm_battery_info {
 	bool	online;
 	int32	percent;
 	time_t	time_left;
