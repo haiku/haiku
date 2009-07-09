@@ -215,9 +215,9 @@ struct DeclarationLocation {
 
 	DeclarationLocation()
 		:
-		file(0),
-		line(0),
-		column(0)
+		file(0xffffffff),
+		line(0xffffffff),
+		column(0xffffffff)
 	{
 	}
 
@@ -234,6 +234,21 @@ struct DeclarationLocation {
 	void SetColumn(uint32 column)
 	{
 		this->column = column;
+	}
+
+	bool IsFileSet() const
+	{
+		return file != 0xffffffff;
+	}
+
+	bool IsLineSet() const
+	{
+		return line != 0xffffffff;
+	}
+
+	bool IsColumnSet() const
+	{
+		return column != 0xffffffff;
 	}
 };
 

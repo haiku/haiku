@@ -117,21 +117,33 @@ DwarfUtils::GetDeclarationLocation(DwarfFile* dwarfFile,
 	uint32 file = 0;
 	uint32 line = 0;
 	uint32 column = 0;
-	entry->GetDeclarationLocation(file, line, column);
+	bool fileSet = entry->GetDeclarationFile(file);
+	bool lineSet = entry->GetDeclarationLine(line);
+	bool columnSet = entry->GetDeclarationColumn(column);
 
-	// if no info yet, try the abstract origin (if any)
-	if (file == 0) {
+	// if something is not set yet, try the abstract origin (if any)
+	if (!fileSet || !lineSet || !columnSet) {
 		if (DebugInfoEntry* abstractOrigin = entry->AbstractOrigin()) {
 			entry = abstractOrigin;
-			entry->GetDeclarationLocation(file, line, column);
+			if (!fileSet)
+				fileSet = entry->GetDeclarationFile(file);
+			if (!lineSet)
+				lineSet = entry->GetDeclarationLine(line);
+			if (!columnSet)
+				columnSet = entry->GetDeclarationColumn(column);
 		}
 	}
 
-	// if no info yet, try the specification (if any)
-	if (file == 0) {
+	// something is not set yet, try the specification (if any)
+	if (!fileSet || !lineSet || !columnSet) {
 		if (DebugInfoEntry* specification = entry->Specification()) {
 			entry = specification;
-			entry->GetDeclarationLocation(file, line, column);
+			if (!fileSet)
+				fileSet = entry->GetDeclarationFile(file);
+			if (!lineSet)
+				lineSet = entry->GetDeclarationLine(line);
+			if (!columnSet)
+				columnSet = entry->GetDeclarationColumn(column);
 		}
 	}
 

@@ -95,16 +95,39 @@ DebugInfoEntry::AbstractOrigin() const
 
 
 bool
-DebugInfoEntry::GetDeclarationLocation(uint32& _file, uint32& _line,
-	uint32& _column) const
+DebugInfoEntry::GetDeclarationFile(uint32& _file) const
 {
 	DeclarationLocation* location = const_cast<DebugInfoEntry*>(this)
 		->GetDeclarationLocation();
-	if (location == NULL)
+	if (location == NULL || !location->IsFileSet())
 		return false;
 
 	_file = location->file;
+	return true;
+}
+
+
+bool
+DebugInfoEntry::GetDeclarationLine(uint32& _line) const
+{
+	DeclarationLocation* location = const_cast<DebugInfoEntry*>(this)
+		->GetDeclarationLocation();
+	if (location == NULL || !location->IsLineSet())
+		return false;
+
 	_line = location->line;
+	return true;
+}
+
+
+bool
+DebugInfoEntry::GetDeclarationColumn(uint32& _column) const
+{
+	DeclarationLocation* location = const_cast<DebugInfoEntry*>(this)
+		->GetDeclarationLocation();
+	if (location == NULL || !location->IsColumnSet())
+		return false;
+
 	_column = location->column;
 	return true;
 }
