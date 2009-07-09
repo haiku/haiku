@@ -109,7 +109,7 @@ Array<Element>::Insert(const Element& element, int index)
 
 	fElements[index] = element;
 	fSize++;
-	return false;
+	return true;
 }
 
 
