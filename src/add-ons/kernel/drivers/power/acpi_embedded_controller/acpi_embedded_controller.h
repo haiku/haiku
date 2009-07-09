@@ -199,30 +199,27 @@ static int      ec_timeout = EC_TIMEOUT;
 int32 acpi_get_type(device_node* dev);
 
 /*
- * Driver softc.
+ * Driver cookie.
  */
-struct acpi_ec_softc {
-    device_node*        ec_dev;
-    acpi_module_info*	ec_acpi_module;
-    acpi_device_module_info* ec_acpi;
-    acpi_device			ec_handle;
-    int                 ec_uid;
-    acpi_handle         ec_gpehandle;
-    uint8               ec_gpebit;
+struct acpi_ec_cookie {
+    device_node*        		ec_dev;
+    acpi_module_info*			ec_acpi_module;
+    acpi_device_module_info* 	ec_acpi;
+    acpi_device					ec_handle;
+    int							ec_uid;
+    acpi_handle         		ec_gpehandle;
+    uint8               		ec_gpebit;
 
-    int                 ec_data_rid;
-    int					ec_data_pci_address;
-    
-    int                 ec_csr_rid;
- 	int					ec_csr_pci_address;
+	int							ec_data_pci_address; 
+ 	int							ec_csr_pci_address;
 
-    int                 ec_glk;
-    uint32				ec_glkhandle;
-    int                 ec_burstactive;
-    int                 ec_sci_pend;
-    vint32				ec_gencount;
-    ConditionVariable	ec_condition_var;
-    int                 ec_suspending;
+    int                 		ec_glk;
+    uint32						ec_glkhandle;
+    int                 		ec_burstactive;
+    int                 		ec_sci_pending;
+    vint32						ec_gencount;
+    ConditionVariable			ec_condition_var;
+    int							ec_suspending;
 };
 
 
@@ -248,7 +245,7 @@ struct acpi_ec_softc {
 
 
 static status_t
-EcLock(struct acpi_ec_softc *sc)
+EcLock(struct acpi_ec_cookie *sc)
 {
     status_t status;
 
@@ -266,7 +263,7 @@ EcLock(struct acpi_ec_softc *sc)
 
 
 static void
-EcUnlock(struct acpi_ec_softc *sc)
+EcUnlock(struct acpi_ec_cookie *sc)
 {
     if (sc->ec_glk)
         sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
@@ -282,12 +279,12 @@ static status_t			EcSpaceHandler(uint32 function,
                                 acpi_physical_address address,
                                 uint32 width, int *value,
                                 void *context, void *regionContext);
-static status_t			EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event,
+static status_t			EcWaitEvent(struct acpi_ec_cookie *sc, EC_EVENT event,
                                 	int32 gen_count);
-static status_t			EcCommand(struct acpi_ec_softc *sc, EC_COMMAND cmd);
-static status_t			EcRead(struct acpi_ec_softc *sc, uint8 address,
+static status_t			EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd);
+static status_t			EcRead(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *readData);
-static status_t			EcWrite(struct acpi_ec_softc *sc, uint8 address,
+static status_t			EcWrite(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *writeData);
                                 
                                 

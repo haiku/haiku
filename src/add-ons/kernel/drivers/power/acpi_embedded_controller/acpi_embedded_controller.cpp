@@ -54,7 +54,7 @@
 device_manager_info *gDeviceManager = NULL;
 pci_module_info *gPCIManager = NULL;
 
-// cpu frequency
+// cpu frequency in Hz
 int64 gHz;
 
 
@@ -161,7 +161,7 @@ acpi_PkgInt32(acpi_object_type *res, int idx, uint32 *dst)
 static status_t
 embedded_controller_open(void *initCookie, const char *path, int flags, void** cookie)
 {
-	acpi_ec_softc *device = (acpi_ec_softc*)initCookie;
+	acpi_ec_cookie *device = (acpi_ec_cookie*)initCookie;
 	*cookie = device;
 
 	return B_OK;
@@ -268,9 +268,9 @@ embedded_controller_init_driver(device_node *dev, void **_driverCookie)
 		return B_ERROR;
 	gHz = systemInfo.cpu_clock_speed;
 	
-	acpi_ec_softc  *sc;
-	sc = (acpi_ec_softc*)malloc(sizeof(acpi_ec_softc));
-    memset(sc, 0, sizeof(acpi_ec_softc));
+	acpi_ec_cookie  *sc;
+	sc = (acpi_ec_cookie*)malloc(sizeof(acpi_ec_cookie));
+    memset(sc, 0, sizeof(acpi_ec_cookie));
 	
 	*_driverCookie = sc;
 	sc->ec_dev = dev;
@@ -366,14 +366,12 @@ embedded_controller_init_driver(device_node *dev, void **_driverCookie)
 	sc->ec_suspending = FALSE;
 	
     /* Attach bus resources for data and command/status ports. */
-    sc->ec_data_rid = 0;
-    if (resourceData.ReadIOPort(&portData) != B_OK)
+	if (resourceData.ReadIOPort(&portData) != B_OK)
 		goto error;
 		
     sc->ec_data_pci_address = portData.minimumBase;
 
-    sc->ec_csr_rid = 1; 
-    if (resourceData.ReadIOPort(&portData) != B_OK)
+	if (resourceData.ReadIOPort(&portData) != B_OK)
 		goto error;
 	
 	sc->ec_csr_pci_address = portData.minimumBase;
@@ -433,7 +431,7 @@ error:
 static void
 embedded_controller_uninit_driver(void *driverCookie)
 {
-	acpi_ec_softc* sc = (struct acpi_ec_softc *)driverCookie;
+	acpi_ec_cookie* sc = (struct acpi_ec_cookie *)driverCookie;
 	free(sc);
 	put_module(B_ACPI_MODULE_NAME);
 	put_module(B_DPC_MODULE_NAME);
@@ -445,7 +443,7 @@ embedded_controller_uninit_driver(void *driverCookie)
 static status_t
 embedded_controller_register_child_devices(void *_cookie)
 {
-	device_node *node = ((acpi_ec_softc*)_cookie)->ec_dev;
+	device_node *node = ((acpi_ec_cookie*)_cookie)->ec_dev;
 
 	int pathID = gDeviceManager->create_id(ACPI_EC_PATHID_GENERATOR);
 	if (pathID < 0) {
@@ -470,7 +468,7 @@ embedded_controller_init_device(void *driverCookie, void **cookie)
 static void
 embedded_controller_uninit_device(void *_cookie)
 {
-	acpi_ec_softc *device = (acpi_ec_softc*)_cookie;
+	acpi_ec_cookie *device = (acpi_ec_cookie*)_cookie;
 	free(device);
 }
 
@@ -533,7 +531,7 @@ module_info *modules[] = {
 static void
 EcGpeQueryHandler(void *context)
 {
-    struct acpi_ec_softc *sc = (struct acpi_ec_softc *)context;
+    struct acpi_ec_cookie *sc = (struct acpi_ec_cookie *)context;
     uint8 data;
     status_t status;
     char qxx[5];
@@ -555,7 +553,7 @@ EcGpeQueryHandler(void *context)
      * to be queued, we clear the pending flag only after running it.
      */
     status = EcCommand(sc, EC_COMMAND_QUERY);
-    sc->ec_sci_pend = FALSE;
+    sc->ec_sci_pending = FALSE;
     if (status != B_OK) {
         EcUnlock(sc);
         TRACE("GPE query failed.\n");
@@ -571,7 +569,7 @@ EcGpeQueryHandler(void *context)
     EcUnlock(sc);
 
     /* Ignore the value for "no outstanding event". (13.3.5) */
-    TRACE("ec query ok,%s running _Q%02X\n", data ? "" : " not", data);
+    TRACE("query ok,%s running _Q%02X\n", data ? "" : " not", data);
     if (data == 0)
         return;
 
@@ -591,12 +589,12 @@ EcGpeQueryHandler(void *context)
 static uint32
 EcGpeHandler(void *context)
 {
-	struct acpi_ec_softc *sc = (acpi_ec_softc*)context;
+	struct acpi_ec_cookie *sc = (acpi_ec_cookie*)context;
     status_t status;
     EC_STATUS EcStatus;
 
     ASSERT(context != NULL);//, ("EcGpeHandler called with NULL"));
-    TRACE("ec gpe handler start\n");
+    TRACE("gpe handler start\n");
 
     /*
      * Notify EcWaitEvent() that the status register is now fresh.  If we
@@ -611,11 +609,11 @@ EcGpeHandler(void *context)
      * It will run the query and _Qxx method later, under the lock.
      */
     EcStatus = EC_GET_CSR(sc);
-    if ((EcStatus & EC_EVENT_SCI) && !sc->ec_sci_pend) {
-        TRACE("ec gpe queueing query handler\n");
+    if ((EcStatus & EC_EVENT_SCI) && !sc->ec_sci_pending) {
+        TRACE("gpe queueing query handler\n");
         status = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler, context);
         if (status == B_OK)
-            sc->ec_sci_pend = TRUE;
+            sc->ec_sci_pending = TRUE;
         else
             dprintf("EcGpeHandler: queuing GPE query handler failed\n");
     }
@@ -645,7 +643,7 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	int *value, void *context, void *regionContext)
 {
 	TRACE("enter EcSpaceHandler\n");
-    struct acpi_ec_softc *sc = (struct acpi_ec_softc *)context;
+    struct acpi_ec_cookie *sc = (struct acpi_ec_cookie *)context;
     status_t status;
     uint8 ecAddr, ecData;
     uint32 i;
@@ -702,25 +700,25 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 }
 
 static status_t
-EcCheckStatus(struct acpi_ec_softc *sc, const char *msg, EC_EVENT event)
+EcCheckStatus(struct acpi_ec_cookie *sc, const char *msg, EC_EVENT event)
 {
     status_t status = B_ERROR;
     EC_STATUS ec_status;
 
     ec_status = EC_GET_CSR(sc);
     if (sc->ec_burstactive && !(ec_status & EC_FLAG_BURST_MODE)) {
-        TRACE("ec burst disabled in waitevent (%s)\n", msg);
+        TRACE("burst disabled in waitevent (%s)\n", msg);
         sc->ec_burstactive = false;
     }
     if (EVENT_READY(event, ec_status)) {
-        TRACE("ec %s wait ready, status %#x\n", msg, ec_status);
+        TRACE("%s wait ready, status %#x\n", msg, ec_status);
         status = B_OK;
     }
     return (status);
 }
 
 static status_t
-EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
+EcWaitEvent(struct acpi_ec_cookie *sc, EC_EVENT event, int32 gen_count)
 {
     status_t status = B_ERROR;
     int32 count, i;
@@ -754,7 +752,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
 
     /* Wait for event by polling or GPE (interrupt). */
     if (need_poll) {
-        count = (ec_timeout * 1000) / EC_POLL_DELAY;
+        count = ec_timeout / EC_POLL_DELAY;
         if (count == 0)
             count = 1;
         for (i = 0; i < count; i++) {
@@ -764,7 +762,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
             spin(EC_POLL_DELAY);
         }
     } else {
-    	bigtime_t slp_ival = gHz / 1000;
+    	bigtime_t slp_ival = gHz / 1000000;
         if (slp_ival != 0) {
             count = ec_timeout;
         } else {
@@ -794,7 +792,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
                 if (status == B_OK)
                     break;
             }
-            sc->ec_condition_var.Wait(0, slp_ival);
+            sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, slp_ival);
         }
 
         /*
@@ -817,7 +815,7 @@ EcWaitEvent(struct acpi_ec_softc *sc, EC_EVENT event, int32 gen_count)
 }
 
 static status_t
-EcCommand(struct acpi_ec_softc *sc, EC_COMMAND cmd)
+EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd)
 {
     status_t status;
     EC_EVENT event;
@@ -845,7 +843,7 @@ EcCommand(struct acpi_ec_softc *sc, EC_COMMAND cmd)
     }
 
     /* Run the command and wait for the chosen event. */
-    TRACE("ec running command %#x\n", cmd);
+    TRACE("running command %#x\n", cmd);
     gen_count = sc->ec_gencount;
     EC_SET_CSR(sc, cmd);
     status = EcWaitEvent(sc, event, gen_count);
@@ -863,20 +861,20 @@ EcCommand(struct acpi_ec_softc *sc, EC_COMMAND cmd)
 }
 
 static status_t
-EcRead(struct acpi_ec_softc *sc, uint8 address, uint8 *readData)
+EcRead(struct acpi_ec_cookie *sc, uint8 address, uint8 *readData)
 {
     status_t status;
     uint8 data;
     u_int gen_count;
 
-	TRACE("ec read from %#x\n", address);
+	TRACE("read from %#x\n", address);
 
     /* If we can't start burst mode, continue anyway. */
     status = EcCommand(sc, EC_COMMAND_BURST_ENABLE);
     if (status == B_OK) {
         data = EC_GET_DATA(sc);
         if (data == EC_BURST_ACK) {
-			TRACE("ec burst enabled\n");
+			TRACE("burst enabled\n");
             sc->ec_burstactive = TRUE;
         }
     }
@@ -900,14 +898,14 @@ EcRead(struct acpi_ec_softc *sc, uint8 address, uint8 *readData)
         status = EcCommand(sc, EC_COMMAND_BURST_DISABLE);
         if (status != B_OK)
             return (status);
-        TRACE("ec disabled burst ok\n");
+        TRACE("disabled burst ok\n");
     }
 
     return (B_OK);
 }
 
 static status_t
-EcWrite(struct acpi_ec_softc *sc, uint8 address, uint8 *writeData)
+EcWrite(struct acpi_ec_cookie *sc, uint8 address, uint8 *writeData)
 {
     status_t status;
     uint8 data;
@@ -918,7 +916,7 @@ EcWrite(struct acpi_ec_softc *sc, uint8 address, uint8 *writeData)
     if (status == B_OK) {
         data = EC_GET_DATA(sc);
         if (data == EC_BURST_ACK) {
-            TRACE("ec burst enabled\n");
+            TRACE("burst enabled\n");
             sc->ec_burstactive = TRUE;
         }
     }
@@ -948,7 +946,7 @@ EcWrite(struct acpi_ec_softc *sc, uint8 address, uint8 *writeData)
         status = EcCommand(sc, EC_COMMAND_BURST_DISABLE);
         if (status != B_OK)
             return (status);
-        TRACE("ec disabled burst ok");
+        TRACE("disabled burst ok\n");
     }
 
     return (B_OK);
