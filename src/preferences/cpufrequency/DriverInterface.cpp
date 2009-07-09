@@ -212,6 +212,8 @@ CPUFreqDriverInterface::_FindSpeedStepDriver(const char* path)
 								sizeof(uint32));
 				if (ret == B_OK && magicId == kMagicFreqID)
 					return B_OK;
+				else
+					close(fDriverHandler);
 			}
 		}
 		
