@@ -280,8 +280,15 @@ VideoProducer::FormatProposal(const media_source& output, media_format* format)
 
 	status_t ret = format_is_compatible(*format, fOutput.format) ?
 		B_OK : B_MEDIA_BAD_FORMAT;
-	if (ret != B_OK)
-		ERROR("FormatProposal() error\n");
+	if (ret != B_OK) {
+		ERROR("FormatProposal() error: %s\n", strerror(ret));
+		char string[512];
+		string_for_format(*format, string, sizeof(string));
+		ERROR("  requested: %s\n", string);
+		string_for_format(fOutput.format, string, sizeof(string));
+		ERROR("  output:    %s\n", string);
+	}
+
 	// change any wild cards to specific values
 
 	return ret;

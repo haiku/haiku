@@ -267,12 +267,16 @@ VideoConsumer::CreateBuffers(const media_format& format)
 
 			BBuffer *buffer = NULL;
 			if ((status = fBuffers->AddBuffer(info, &buffer)) != B_OK) {
-				ERROR("VideoConsumer::CreateBuffers - ERROR ADDING BUFFER TO GROUP\n");
+				ERROR("VideoConsumer::CreateBuffers - ERROR ADDING BUFFER "
+					"TO GROUP (%ld): %s\n", i, strerror(status));
 				return status;
-			} else
-				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD BUFFER TO GROUP\n");
+			} else {
+				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD "
+					"BUFFER TO GROUP\n");
+			}
 		} else {
-			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING BUFFER: %s\n", strerror(status));
+			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
+				"BUFFER (%ld): %s\n", i, strerror(status));
 			return status;
 		}	
 	}
