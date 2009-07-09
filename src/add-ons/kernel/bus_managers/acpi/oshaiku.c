@@ -132,7 +132,7 @@
 #include <PCI.h>
 extern pci_module_info *gPCIManager;
 #include <dpc.h>
-dpc_module_info *gDPC = NULL;
+extern dpc_module_info *gDPC;
 extern void *gDPCHandle;
 #endif
 
@@ -820,20 +820,6 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE Type, ACPI_OSD_EXEC_CALLBACK Function,
 		case OSL_EC_POLL_HANDLER:
 		case OSL_EC_BURST_HANDLER:
 			break;
-	}
-
-	if (gDPC == NULL && get_module(B_DPC_MODULE_NAME,
-			(module_info **)&gDPC) != B_OK) {
-		dprintf("failed to get dpc module for os execution\n");
-		return AE_ERROR;
-	}
-
-	if (gDPCHandle == NULL) {
-		if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-				B_NORMAL_PRIORITY) != B_OK) {
-			dprintf("failed to create os execution queue\n");
-			return AE_ERROR;
-		}
 	}
 
 	if (gDPC->queue_dpc(gDPCHandle, Function, Context) != B_OK)

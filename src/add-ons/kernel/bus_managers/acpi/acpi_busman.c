@@ -13,7 +13,6 @@
 #include <string.h>
 
 #include <ACPI.h>
-#include <dpc.h>
 #include <KernelExport.h>
 #include <PCI.h>
 
@@ -32,9 +31,6 @@
 
 #define ERROR(x...) dprintf("acpi: " x)
 
-
-extern dpc_module_info* gDPC;
-void* gDPCHandle = NULL;
 
 extern pci_module_info* gPCIManager;
 
@@ -138,7 +134,7 @@ acpi_std_ops(int32 op,...)
 					AcpiFormatException(status));
 				goto err;
 			}
-
+	
 			/* Phew. Now in ACPI mode */
 			TRACE("ACPI initialized\n");
 			return B_OK;
@@ -151,17 +147,6 @@ acpi_std_ops(int32 op,...)
 		{
 			if (AcpiTerminate() != AE_OK)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
-
-				/* This isn't so terrible. We'll just fail silently */
-			if (gDPC != NULL) {
-				if (gDPCHandle != NULL) {
-					gDPC->delete_dpc_queue(gDPCHandle);
-					gDPCHandle = NULL;
-				}
-
-				put_module(B_DPC_MODULE_NAME);
-			}
-
 			break;
 		}
 
