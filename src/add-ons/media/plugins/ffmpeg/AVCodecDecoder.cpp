@@ -28,6 +28,14 @@
 #	define TRACE(x...)
 #endif
 
+//#define LOG_STREAM_TO_FILE
+#ifdef LOG_STREAM_TO_FILE
+#	include <File.h>
+	static BFile sStreamLogFile("/boot/home/Desktop/AVCodecDebugStream.raw",
+		B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	static int sDumpedPackets = 0;
+#endif
+
 
 struct wave_format_ex {
 	uint16 format_tag;
@@ -103,8 +111,8 @@ AVCodecDecoder::~AVCodecDecoder()
 	free(fInputPicture);
 	free(fContext);
 	
-	delete [] fExtraData;
-	delete [] fOutputBuffer;
+	delete[] fExtraData;
+	delete[] fOutputBuffer;
 }
 
 
@@ -182,38 +190,40 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 			if (gCodecTable[i].family == descr.family
 				&& gCodecTable[i].fourcc == cid) {
 				fCodec = avcodec_find_decoder(gCodecTable[i].id);
-				if (!fCodec) {
-					TRACE("AVCodecDecoder: unable to find the correct ffmpeg "
-						"decoder (id = %d)!!!\n",gCodecTable[i].id);
+				if (fCodec == NULL) {
+					TRACE("AVCodecDecoder: unable to find the correct FFmpeg "
+						"decoder (id = %d)\n", gCodecTable[i].id);
 					return B_ERROR;
 				}
 				TRACE("AVCodecDecoder: found decoder %s\n",fCodec->name);
-				
+
+				const void* extraData = infoBuffer;
+				fExtraDataSize = infoSize;
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY
 						&& infoSize >= sizeof(wave_format_ex)) {
-					const wave_format_ex *wfmt_data
-						= (const wave_format_ex *)infoBuffer;
-					size_t wfmt_size = infoSize;
-					if (wfmt_data && wfmt_size) {
-						fBlockAlign = wfmt_data->block_align;
-						fExtraDataSize = wfmt_data->extra_size;
-						if (fExtraDataSize) {
-							fExtraData = new char [fExtraDataSize];
-							memcpy(fExtraData, wfmt_data + 1, fExtraDataSize);
-						}
+					// Special case extra data in B_WAV_FORMAT_FAMILY
+					const wave_format_ex* waveFormatData
+						= (const wave_format_ex*)infoBuffer;
+					
+					size_t waveFormatSize = infoSize;
+					if (waveFormatData != NULL && waveFormatSize > 0) {
+						fBlockAlign = waveFormatData->block_align;
+						fExtraDataSize = waveFormatData->extra_size;
+						// skip the wave_format_ex from the extra data.
+						extraData = waveFormatData + 1;
 					}
 				} else {
 					fBlockAlign
 						= ioEncodedFormat->u.encoded_audio.output.buffer_size;
+				}
+printf("XXX extra data size %ld\n", infoSize);
+				if (extraData != NULL && fExtraDataSize > 0) {
 					TRACE("AVCodecDecoder: extra data size %ld\n", infoSize);
-					fExtraDataSize = infoSize;
-					if (fExtraDataSize) {
-						fExtraData = new(std::nothrow) char[fExtraDataSize];
-						if (fExtraData != NULL)
-							memcpy(fExtraData, infoBuffer, fExtraDataSize);
-						else
-							fExtraDataSize = 0;
-					}
+					fExtraData = new(std::nothrow) char[fExtraDataSize];
+					if (fExtraData != NULL)
+						memcpy(fExtraData, infoBuffer, fExtraDataSize);
+					else
+						fExtraDataSize = 0;
 				}
 
 				fInputFormat = *ioEncodedFormat;
@@ -231,13 +241,18 @@ AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
 	bigtime_t seekTime, bigtime_t* time)
 {
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
-	// TODO: Maybe that should be done for video codecs, too?
-	if (fIsAudio && fCodecInitDone) {
+#if 1
+	if (fCodecInitDone) {
 		fCodecInitDone = false;
 		avcodec_close(fContext);
 		fCodecInitDone = (avcodec_open(fContext, fCodec) >= 0);
 	}
-	
+#else
+	// For example, this doesn't work on the H.264 codec. :-/
+	if (fCodecInitDone)
+		avcodec_flush_buffers(fContext);
+#endif
+
 	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
 		TRACE("AVCodecDecoder::Seek by time ");
 		TRACE("from frame %Ld and time %.6f TO Required Time %.6f. ",
@@ -388,11 +403,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	
 	fOutputFrameRate = fOutputVideoFormat.field_rate;
 	
-	fContext->extradata = (uint8_t *)fExtraData;
+	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
 
 //	if (fInputFormat.MetaDataSize() > 0) {
-//		fContext->extradata = (uint8_t *)fInputFormat.MetaData();
+//		fContext->extradata = (uint8_t*)fInputFormat.MetaData();
 //		fContext->extradata_size = fInputFormat.MetaDataSize();
 //	}
 
@@ -564,6 +579,15 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 				"GetNextChunk(): %s\n", strerror(err));
 			return err;
 		}
+#ifdef LOG_STREAM_TO_FILE
+		if (sDumpedPackets < 100) {
+			sStreamLogFile.Write(data, size);
+			printf("wrote %ld bytes\n", size);
+			sDumpedPackets++;
+		} else if (sDumpedPackets == 100)
+			sStreamLogFile.Unset();
+#endif
+
 		if (firstRun) {
 			firstRun = false;
 
