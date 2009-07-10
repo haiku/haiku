@@ -879,14 +879,7 @@ printf("  function: %p\n", function);
 			= functionInstance->GetFunctionDebugInfo();
 		SourceLocation sourceLocation;
 		Statement* breakpointStatement = NULL;
-//		if (SourceCode* sourceCode = functionDebugInfo->GetSourceCode()) {
-//			breakpointStatement = sourceCode->StatementAtAddress(address);
-//			if (breakpointStatement != NULL)
-//				sourceLocation = breakpointStatement->StartSourceLocation();
-//		}
-
-		if (breakpointStatement == NULL
-			&& functionDebugInfo->GetSpecificImageDebugInfo()->GetStatement(
+		if (functionDebugInfo->GetSpecificImageDebugInfo()->GetStatement(
 				functionDebugInfo, address, breakpointStatement) != B_OK) {
 			return;
 		}
@@ -920,7 +913,7 @@ printf("  function instance %p: range: %#llx - %#llx\n", instance, instance->Add
 				Statement* statement = NULL;
 				functionDebugInfo = instance->GetFunctionDebugInfo();
 				functionDebugInfo->GetSpecificImageDebugInfo()
-					->GetStatementForSourceLocation(functionDebugInfo,
+					->GetStatementAtSourceLocation(functionDebugInfo,
 						sourceLocation, statement);
 				if (statement != NULL) {
 					instanceAddress = statement->CoveringAddressRange().Start();

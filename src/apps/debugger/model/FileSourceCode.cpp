@@ -3,33 +3,29 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "FileSourceCode.h"
 
 #include <string.h>
 
+#include "LocatableFile.h"
 #include "SourceFile.h"
-#include "Statement.h"
+#include "SourceLocation.h"
 
 
-// TODO: Lot's of code duplication from DissassembledCode!
-
-
-FileSourceCode::FileSourceCode(SourceFile* file)
+FileSourceCode::FileSourceCode(LocatableFile* file, SourceFile* sourceFile)
 	:
 	fFile(file),
-	fLineStatements(NULL)
+	fSourceFile(sourceFile)
 {
 	fFile->AcquireReference();
+	fSourceFile->AcquireReference();
 }
 
 
 FileSourceCode::~FileSourceCode()
 {
-	for (int32 i = 0; Statement* statement = fStatements.ItemAt(i); i++)
-		statement->RemoveReference();
-
-	delete[] fLineStatements;
-
+	fSourceFile->ReleaseReference();
 	fFile->ReleaseReference();
 }
 
@@ -37,94 +33,91 @@ FileSourceCode::~FileSourceCode()
 status_t
 FileSourceCode::Init()
 {
-	fLineStatements = new(std::nothrow) Statement*[fFile->CountLines()];
-	if (fLineStatements == NULL)
-		return B_NO_MEMORY;
-
-	memset(fLineStatements, 0, fFile->CountLines() * sizeof(Statement*));
-
 	return B_OK;
 }
 
 
 status_t
-FileSourceCode::AddStatement(ContiguousStatement* statement)
+FileSourceCode::AddSourceLocation(const SourceLocation& location)
 {
-	if (!fStatements.BinaryInsert(statement, &_CompareStatements))
-		return B_NO_MEMORY;
+	// Find the insertion index; don't insert twice.
+	bool foundMatch;
+	int32 index = _FindSourceLocationIndex(location, foundMatch);
+	if (foundMatch)
+		return B_OK;
 
-	int32 line = statement->StartSourceLocation().Line();
-	if (line >= 0 && line < fFile->CountLines()
-		&& fLineStatements[line] == NULL) {
-		fLineStatements[line] = statement;
-	}
-
-	statement->AcquireReference();
-	return B_OK;
+	return fSourceLocations.Insert(location, index) ? B_OK : B_NO_MEMORY;
 }
 
 
 int32
 FileSourceCode::CountLines() const
 {
-	return fFile->CountLines();
+	return fSourceFile->CountLines();
 }
 
 
 const char*
 FileSourceCode::LineAt(int32 index) const
 {
-	return fFile->LineAt(index);
+	return fSourceFile->LineAt(index);
 }
 
 
-Statement*
-FileSourceCode::StatementAtLine(int32 index) const
+bool
+FileSourceCode::GetStatementLocationRange(const SourceLocation& location,
+	SourceLocation& _start, SourceLocation& _end) const
 {
-	return index >= 0 && index < CountLines() ? fLineStatements[index] : NULL;
+	int32 lineCount = CountLines();
+	if (location.Line() >= lineCount)
+		return false;
+
+	bool foundMatch;
+	int32 index = _FindSourceLocationIndex(location, foundMatch);
+
+	if (!foundMatch) {
+		if (index == 0)
+			return false;
+		index--;
+	}
+
+	_start = fSourceLocations[index];
+	_end = index + 1 < lineCount
+		? fSourceLocations[index + 1] : SourceLocation(lineCount);
+	return true;
 }
 
 
-//Statement*
-//FileSourceCode::StatementAtAddress(target_addr_t address) const
-//{
-//	return fStatements.BinarySearchByKey(address, &_CompareAddressStatement);
-//}
-
-
-//TargetAddressRange
-//FileSourceCode::StatementAddressRange() const
-//{
-//	if (fStatements.IsEmpty())
-//		return TargetAddressRange();
-//
-//	ContiguousStatement* first = fStatements.ItemAt(0);
-//	ContiguousStatement* last
-//		= fStatements.ItemAt(fStatements.CountItems() - 1);
-//	return TargetAddressRange(first->AddressRange().Start(),
-//		last->AddressRange().End());
-//}
-
-
-/*static*/ int
-FileSourceCode::_CompareStatements(const ContiguousStatement* a,
-	const ContiguousStatement* b)
+LocatableFile*
+FileSourceCode::GetSourceFile() const
 {
-	target_addr_t addressA = a->AddressRange().Start();
-	target_addr_t addressB = b->AddressRange().Start();
-	if (addressA < addressB)
-		return -1;
-	return addressA == addressB ? 0 : 1;
+	return fFile;
 }
 
 
-/*static*/ int
-FileSourceCode::_CompareAddressStatement(const target_addr_t* address,
-	const ContiguousStatement* statement)
+status_t
+FileSourceCode::GetStatementAtLocation(const SourceLocation& location,
+	Statement*& _statement)
 {
-	const TargetAddressRange& range = statement->AddressRange();
+	return B_UNSUPPORTED;
+}
 
-	if (*address < range.Start())
-		return -1;
-	return *address < range.End() ? 0 : 1;
+
+int32
+FileSourceCode::_FindSourceLocationIndex(const SourceLocation& location,
+	bool& _foundMatch) const
+{
+	int32 lower = 0;
+	int32 upper = fSourceLocations.Size();
+	while (lower < upper) {
+		int32 mid = (lower + upper) / 2;
+		if (location <= fSourceLocations[mid])
+			upper = mid;
+		else
+			lower = mid + 1;
+	}
+
+	_foundMatch = lower < fSourceLocations.Size()
+		&& location == fSourceLocations[lower];
+	return lower;
 }

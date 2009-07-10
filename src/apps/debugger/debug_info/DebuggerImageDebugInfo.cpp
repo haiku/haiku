@@ -119,7 +119,7 @@ DebuggerImageDebugInfo::GetStatement(FunctionDebugInfo* function,
 
 
 status_t
-DebuggerImageDebugInfo::GetStatementForSourceLocation(
+DebuggerImageDebugInfo::GetStatementAtSourceLocation(
 	FunctionDebugInfo* function, const SourceLocation& sourceLocation,
 	Statement*& _statement)
 {

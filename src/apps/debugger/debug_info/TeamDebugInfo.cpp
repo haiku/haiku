@@ -3,7 +3,10 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "TeamDebugInfo.h"
+
+#include <stdio.h>
 
 #include <new>
 
@@ -13,6 +16,7 @@
 #include "DwarfTeamDebugInfo.h"
 #include "Function.h"
 #include "ImageDebugInfo.h"
+#include "LocatableFile.h"
 #include "SpecificImageDebugInfo.h"
 #include "StringUtils.h"
 
@@ -66,6 +70,131 @@ struct TeamDebugInfo::FunctionHashDefinition {
 };
 
 
+// #pragma mark - SourceFileEntry
+
+
+struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
+	SourceFileEntry(LocatableFile* sourceFile)
+		:
+		fSourceFile(sourceFile)
+	{
+		fSourceFile->AcquireReference();
+	}
+
+	~SourceFileEntry()
+	{
+		fSourceFile->ReleaseReference();
+	}
+
+	status_t Init()
+	{
+		return B_OK;
+	}
+
+	LocatableFile* SourceFile() const
+	{
+		return fSourceFile;
+	}
+
+	bool IsUnused() const
+	{
+		return fFunctions.IsEmpty();
+	}
+
+	status_t AddFunction(Function* function)
+	{
+		if (!fFunctions.BinaryInsert(function, &_CompareFunctions))
+			return B_NO_MEMORY;
+
+		return B_OK;
+	}
+
+	void RemoveFunction(Function* function)
+	{
+		int32 index = fFunctions.BinarySearchIndex(*function,
+			&_CompareFunctions);
+		if (index >= 0)
+			fFunctions.RemoveItemAt(index);
+	}
+
+	Function* FunctionAtLocation(const SourceLocation& location) const
+	{
+		int32 index = fFunctions.BinarySearchIndexByKey(location,
+			&_CompareLocationFunction);
+		if (index >= 0)
+			return fFunctions.ItemAt(index);
+
+		// No exact match, so we return the previous function which might still
+		// contain the location.
+		index = -index - 1;
+
+		if (index == 0)
+			return NULL;
+
+		return fFunctions.ItemAt(index - 1);
+	}
+
+private:
+	typedef BObjectList<Function> FunctionList;
+
+private:
+	static int _CompareFunctions(const Function* a, const Function* b)
+	{
+		SourceLocation locationA = a->GetSourceLocation();
+		SourceLocation locationB = b->GetSourceLocation();
+
+		if (locationA < locationB)
+			return -1;
+
+		return locationA == locationB ? 0 : 1;
+	}
+
+	static int _CompareLocationFunction(const SourceLocation* location,
+		const Function* function)
+	{
+		SourceLocation functionLocation = function->GetSourceLocation();
+
+		if (*location < functionLocation)
+			return -1;
+
+		return *location == functionLocation ? 0 : 1;
+	}
+
+private:
+	LocatableFile*	fSourceFile;
+	FunctionList	fFunctions;
+};
+
+
+// #pragma mark - SourceFileHashDefinition
+
+
+struct TeamDebugInfo::SourceFileHashDefinition {
+	typedef const LocatableFile*	KeyType;
+	typedef	SourceFileEntry			ValueType;
+
+	size_t HashKey(const LocatableFile* key) const
+	{
+		return (size_t)(addr_t)key;
+	}
+
+	size_t Hash(const SourceFileEntry* value) const
+	{
+		return HashKey(value->SourceFile());
+	}
+
+	bool Compare(const LocatableFile* key, const SourceFileEntry* value) const
+	{
+		return key == value->SourceFile();
+	}
+
+	HashTableLink<SourceFileEntry>* GetLink(SourceFileEntry* value) const
+	{
+		return value;
+	}
+};
+
+
 // #pragma mark - TeamDebugInfo
 
 
@@ -76,13 +205,25 @@ TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
 	fArchitecture(architecture),
 	fFileManager(fileManager),
 	fSpecificInfos(10, true),
-	fFunctions(NULL)
+	fFunctions(NULL),
+	fSourceFiles(NULL)
 {
 }
 
 
 TeamDebugInfo::~TeamDebugInfo()
 {
+	if (fSourceFiles != NULL) {
+		SourceFileEntry* entry = fSourceFiles->Clear(true);
+		while (entry != NULL) {
+			SourceFileEntry* next = entry->fNext;
+			delete entry;
+			entry = next;
+		}
+
+		delete fSourceFiles;
+	}
+
 	if (fFunctions != NULL) {
 		Function* function = fFunctions->Clear(true);
 		while (function != NULL) {
@@ -105,6 +246,15 @@ TeamDebugInfo::Init()
 		return B_NO_MEMORY;
 
 	status_t error = fFunctions->Init();
+	if (error != B_OK)
+		return error;
+
+	// create source file hash table
+	fSourceFiles = new(std::nothrow) SourceFileTable;
+	if (fSourceFiles == NULL)
+		return B_NO_MEMORY;
+
+	error = fSourceFiles->Init();
 	if (error != B_OK)
 		return error;
 
@@ -198,9 +348,16 @@ printf("  adding instance %p to existing function %p\n", instance, function);
 printf("  adding instance %p to new function %p\n", instance, function);
 			function->AddInstance(instance);
 			instance->SetFunction(function);
-			fFunctions->Insert(function);
+
+			status_t error = _AddFunction(function);
 				// Insert after adding the instance. Otherwise the function
 				// wouldn't be hashable/comparable.
+			if (error != B_OK) {
+				function->RemoveInstance(instance);
+				instance->SetFunction(NULL);
+				RemoveImageDebugInfo(imageDebugInfo);
+				return error;
+			}
 		}
 	}
 
@@ -222,7 +379,7 @@ TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 				// Note, that we have to remove it from the hash before removing
 				// the instance, since otherwise the function cannot be compared
 				// anymore.
-				fFunctions->Remove(function);
+				_RemoveFunction(function);
 				function->ReleaseReference();
 					// The instance still has a reference.
 			}
@@ -232,5 +389,67 @@ TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 				// If this was the last instance, it will remove the last
 				// reference to the function.
 		}
+	}
+}
+
+
+Function*
+TeamDebugInfo::FunctionAtSourceLocation(LocatableFile* file,
+	const SourceLocation& location)
+{
+	if (SourceFileEntry* entry = fSourceFiles->Lookup(file))
+		return entry->FunctionAtLocation(location);
+	return NULL;
+}
+
+
+status_t
+TeamDebugInfo::_AddFunction(Function* function)
+{
+	// If the function refers to a source file, add it to the respective entry.
+	if (LocatableFile* sourceFile = function->SourceFile()) {
+		SourceFileEntry* entry = fSourceFiles->Lookup(sourceFile);
+		if (entry == NULL) {
+			// no entry for the source file yet -- create on
+			entry = new(std::nothrow) SourceFileEntry(sourceFile);
+			if (entry == NULL)
+				return B_NO_MEMORY;
+
+			status_t error = entry->Init();
+			if (error != B_OK) {
+				delete entry;
+				return error;
+			}
+
+			fSourceFiles->Insert(entry);
+		}
+
+		// add the function
+		status_t error = entry->AddFunction(function);
+		if (error != B_OK) {
+			if (entry->IsUnused()) {
+				fSourceFiles->Remove(entry);
+				delete entry;
+			}
+			return error;
+		}
+	}
+
+	fFunctions->Insert(function);
+
+	return B_OK;
+}
+
+
+void
+TeamDebugInfo::_RemoveFunction(Function* function)
+{
+	fFunctions->Remove(function);
+
+	// If the function refers to a source file, remove it from the respective
+	// entry.
+	if (LocatableFile* sourceFile = function->SourceFile()) {
+		if (SourceFileEntry* entry = fSourceFiles->Lookup(sourceFile))
+			entry->RemoveFunction(function);
 	}
 }

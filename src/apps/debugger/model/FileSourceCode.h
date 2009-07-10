@@ -5,46 +5,48 @@
 #ifndef FILE_SOURCE_CODE_H
 #define FILE_SOURCE_CODE_H
 
-#include <ObjectList.h>
 
+#include "Array.h"
 #include "SourceCode.h"
 
 
-class ContiguousStatement;
+class LocatableFile;
 class SourceFile;
 
 
 class FileSourceCode : public SourceCode {
 public:
-								FileSourceCode(SourceFile* file);
+								FileSourceCode(LocatableFile* file,
+									SourceFile* sourceFile);
 	virtual						~FileSourceCode();
 
 			status_t			Init();
-			status_t			AddStatement(ContiguousStatement* statement);
+			status_t			AddSourceLocation(
+									const SourceLocation& location);
 
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
-	virtual	Statement*			StatementAtLine(int32 index) const;
-//			Statement*			StatementAtAddress(target_addr_t address) const;
+	virtual	bool				GetStatementLocationRange(
+									const SourceLocation& location,
+									SourceLocation& _start,
+									SourceLocation& _end) const;
 
-//	virtual	TargetAddressRange	StatementAddressRange() const;
+	virtual	LocatableFile*		GetSourceFile() const;
 
-private:
-			typedef BObjectList<ContiguousStatement> StatementList;
-
-private:
-	static	int					_CompareStatements(
-									const ContiguousStatement* a,
-									const ContiguousStatement* b);
-	static	int					_CompareAddressStatement(
-									const target_addr_t* address,
-									const ContiguousStatement* statement);
+	virtual	status_t			GetStatementAtLocation(
+									const SourceLocation& location,
+									Statement*& _statement);
 
 private:
-			SourceFile*			fFile;
-			Statement**			fLineStatements;
-			StatementList		fStatements;
+			int32				_FindSourceLocationIndex(
+									const SourceLocation& location,
+									bool& _foundMatch) const;
+
+private:
+			LocatableFile*		fFile;
+			SourceFile*			fSourceFile;
+			Array<SourceLocation> fSourceLocations;
 };
 
 

@@ -5,12 +5,15 @@
 
 #include "Team.h"
 
+#include <stdio.h>
+
 #include <new>
 
 #include <AutoLocker.h>
 
-#include "FunctionInstance.h"
+#include "Function.h"
 #include "ImageDebugInfo.h"
+#include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
 #include "TeamDebugInfo.h"
 
@@ -208,20 +211,30 @@ status_t
 Team::GetStatementAtAddress(target_addr_t address, FunctionInstance*& _function,
 	Statement*& _statement)
 {
+printf("Team::GetStatementAtAddress(%#llx)\n", address);
 	// get the image at the address
 	Image* image = ImageByAddress(address);
 	if (image == NULL)
+{
+printf("  -> no image\n");
 		return B_ENTRY_NOT_FOUND;
+}
 
 	ImageDebugInfo* imageDebugInfo = image->GetImageDebugInfo();
 	if (imageDebugInfo == NULL)
+{
+printf("  -> no image debug info\n");
 		return B_ENTRY_NOT_FOUND;
+}
 
 	// get the function
 	FunctionInstance* functionInstance
 		= imageDebugInfo->FunctionAtAddress(address);
 	if (functionInstance == NULL)
+{
+printf("  -> no function instance\n");
 		return B_ENTRY_NOT_FOUND;
+}
 
 	// get the statement from the image debug info
 	FunctionDebugInfo* functionDebugInfo
@@ -230,10 +243,49 @@ Team::GetStatementAtAddress(target_addr_t address, FunctionInstance*& _function,
 		->GetStatement(functionDebugInfo, address, _statement);
 		// TODO: Provide the corresponding SourceCode, if available!
 	if (error != B_OK)
+{
+printf("  -> no statement from the specific image debug info\n");
 		return error;
+}
 
 	_function = functionInstance;
 	return B_OK;
+}
+
+
+status_t
+Team::GetStatementAtSourceLocation(SourceCode* sourceCode,
+	const SourceLocation& location, Statement*& _statement)
+{
+printf("Team::GetStatementAtSourceLocation(%p, (%ld, %ld))\n", sourceCode, location.Line(), location.Column());
+	// If we're lucky the source code can provide us with a statement.
+	status_t error = sourceCode->GetStatementAtLocation(location, _statement);
+	if (error == B_OK)
+		return error;
+
+	// Go the long and stony way over the source file and the team debug info.
+	// get the source file for the source code
+	LocatableFile* sourceFile = sourceCode->GetSourceFile();
+	if (sourceFile == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the function at the source location
+	Function* function = fDebugInfo->FunctionAtSourceLocation(sourceFile,
+		location);
+	if (function == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// Get some function instance and ask its image debug info to provide us
+	// with a statement.
+	FunctionInstance* functionInstance = function->FirstInstance();
+	if (functionInstance == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	FunctionDebugInfo* functionDebugInfo
+		= functionInstance->GetFunctionDebugInfo();
+	return functionDebugInfo->GetSpecificImageDebugInfo()
+		->GetStatementAtSourceLocation(functionDebugInfo, location, _statement);
+
 }
 
 

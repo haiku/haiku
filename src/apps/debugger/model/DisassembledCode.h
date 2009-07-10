@@ -5,6 +5,7 @@
 #ifndef DISASSEMBLED_CODE_H
 #define DISASSEMBLED_CODE_H
 
+
 #include <ObjectList.h>
 
 #include "SourceCode.h"
@@ -22,10 +23,16 @@ public:
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
-	virtual	Statement*			StatementAtLine(int32 index) const;
-//			Statement*			StatementAtAddress(target_addr_t address) const;
+	virtual	bool				GetStatementLocationRange(
+									const SourceLocation& location,
+									SourceLocation& _start,
+									SourceLocation& _end) const;
 
-//			TargetAddressRange	StatementAddressRange() const;
+	virtual	LocatableFile*		GetSourceFile() const;
+
+	virtual	status_t			GetStatementAtLocation(
+									const SourceLocation& location,
+									Statement*& _statement);
 
 public:
 			bool				AddCommentLine(const BString& line);

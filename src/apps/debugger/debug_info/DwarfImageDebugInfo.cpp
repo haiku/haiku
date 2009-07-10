@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <new>
 
 #include <AutoDeleter.h>
@@ -34,30 +35,29 @@
 
 struct DwarfImageDebugInfo::SourceCodeKey {
 	CompilationUnit*	unit;
-	BString				filePath;
-
-	SourceCodeKey(CompilationUnit* unit, const BString& filePath)
-		:
-		unit(unit),
-		filePath(filePath)
-	{
-	}
+	LocatableFile*		file;
 
 	SourceCodeKey(CompilationUnit* unit, LocatableFile* file)
 		:
-		unit(unit)
+		unit(unit),
+		file(file)
 	{
-		file->GetLocatedPath(filePath);
+		file->AcquireReference();
+	}
+
+	~SourceCodeKey()
+	{
+		file->ReleaseReference();
 	}
 
 	uint32 HashValue() const
 	{
-		return (uint32)(addr_t)unit ^ StringUtils::HashValue(filePath);
+		return (uint32)((addr_t)unit ^ (addr_t)file);
 	}
 
 	bool operator==(const SourceCodeKey& other) const
 	{
-		return unit == other.unit && filePath == other.filePath;
+		return unit == other.unit && file == other.file;
 	}
 };
 
@@ -244,7 +244,7 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 			DwarfFunctionDebugInfo* function
 				= new(std::nothrow) DwarfFunctionDebugInfo(this, unit,
 					subprogramEntry, rangeList, name, file,
-					SourceLocation(line, column));
+					SourceLocation(line, std::max(column, 0L)));
 			if (function == NULL || !functions.AddItem(function)) {
 				delete function;
 				return B_NO_MEMORY;
@@ -292,7 +292,6 @@ DwarfImageDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
 {
 	AutoLocker<BLocker> locker(fLock);
 
-	// TODO: Load the actual source code!
 	status_t error = _LoadSourceCode(function, _sourceCode);
 	if (error == B_OK)
 		return B_OK;
@@ -323,30 +322,26 @@ status_t
 DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	target_addr_t address, Statement*& _statement)
 {
+printf("DwarfImageDebugInfo::GetStatement(function: %p, address: %#llx)\n",
+_function, address);
 	DwarfFunctionDebugInfo* function
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
 	if (function == NULL)
+{
+printf("  -> no dwarf function\n");
 		return B_BAD_VALUE;
+}
 
 	AutoLocker<BLocker> locker(fLock);
 
-	// get the source file
-	LocatableFile* file = function->SourceFile();
-	if (file == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// maybe the source code is already loaded -- this will simplify things
+	// check whether we have the source code
 	CompilationUnit* unit = function->GetCompilationUnit();
-//	FileSourceCode* sourceCode = _LookupSourceCode(unit, file);
-//	if (sourceCode) {
-//		Statement* statement = sourceCode->StatementAtAddress(address);
-//		if (statement == NULL)
-//			return B_ENTRY_NOT_FOUND;
-//
-//		statement->AcquireReference();
-//		_statement = statement;
-//		return B_OK;
-//	}
+	LocatableFile* file = function->SourceFile();
+	if (file == NULL) {
+printf("  -> no source file\n");
+		// no source code -- rather return the assembly statement
+		return fArchitecture->GetStatement(function, address, _statement);
+	}
 
 	// get the index of the source file in the compilation unit for cheaper
 	// comparison below
@@ -356,7 +351,13 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	// compilation unit.
 	LineNumberProgram& program = unit->GetLineNumberProgram();
 	if (!program.IsValid())
+{
+printf("  -> no line number program\n");
 		return B_BAD_DATA;
+}
+
+	// adjust address
+	address -= fRelocationDelta;
 
 	LineNumberProgram::State state;
 	program.GetInitialState(state);
@@ -393,26 +394,27 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = state.column - 1;
+			statementColumn = std::max(state.column - 1, 0L);
 		}
 	}
 
+printf("  -> no line number program match\n");
 	return B_ENTRY_NOT_FOUND;
 }
 
 
 status_t
-DwarfImageDebugInfo::GetStatementForSourceLocation(FunctionDebugInfo* _function,
+DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 	const SourceLocation& sourceLocation, Statement*& _statement)
 {
 	DwarfFunctionDebugInfo* function
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
 	if (function == NULL)
 		return B_BAD_VALUE;
-target_addr_t functionStartAddress = function->Address();
+target_addr_t functionStartAddress = function->Address() - fRelocationDelta;
 target_addr_t functionEndAddress = functionStartAddress + function->Size();
-printf("DwarfImageDebugInfo::GetStatementForSourceLocation(%p): function range: %#llx - %#llx\n",
-function, functionStartAddress, functionEndAddress);
+printf("DwarfImageDebugInfo::GetStatementAtSourceLocation(%p, (%ld, %ld)): function range: %#llx - %#llx\n",
+function, sourceLocation.Line(), sourceLocation.Column(), functionStartAddress, functionEndAddress);
 
 	AutoLocker<BLocker> locker(fLock);
 
@@ -421,26 +423,13 @@ function, functionStartAddress, functionEndAddress);
 	if (file == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	// maybe the source code is already loaded -- this will simplify things
 	CompilationUnit* unit = function->GetCompilationUnit();
-	FileSourceCode* sourceCode = _LookupSourceCode(unit, file);
-	if (sourceCode) {
-// TODO: This is not precise enough -- columns are ignored!
-		Statement* statement = sourceCode->StatementAtLine(
-			sourceLocation.Line());
-		if (statement == NULL)
-			return B_ENTRY_NOT_FOUND;
-
-		statement->AcquireReference();
-		_statement = statement;
-		return B_OK;
-	}
 
 	// get the index of the source file in the compilation unit for cheaper
 	// comparison below
 	int32 fileIndex = _GetSourceFileIndex(unit, file);
 
-//	target_addr_t functionStartAddress = function->Address();
+//	target_addr_t functionStartAddress = function->Address() - fRelocationDelta;
 //	target_addr_t functionEndAddress = functionStartAddress + function->Size();
 
 	// Get the statement by executing the line number program for the
@@ -461,11 +450,15 @@ function, functionStartAddress, functionEndAddress);
 		if (statementAddress != 0
 			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
 			target_addr_t endAddress = state.address;
+if (statementAddress < endAddress) {
+printf("  statement: %#llx - %#llx, location: (%ld, %ld)\n", statementAddress, endAddress, statementLine, statementColumn);
+}
 			if (statementAddress < endAddress
 				&& statementAddress >= functionStartAddress
 				&& statementAddress < functionEndAddress
 				&& statementLine == (int32)sourceLocation.Line()
 				&& statementColumn == (int32)sourceLocation.Column()) {
+printf("  -> found statement!\n");
 				ContiguousStatement* statement = new(std::nothrow)
 					ContiguousStatement(
 						SourceLocation(statementLine, statementColumn),
@@ -488,7 +481,7 @@ function, functionStartAddress, functionEndAddress);
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = state.column - 1;
+			statementColumn = std::max(state.column - 1, 0L);
 		}
 	}
 
@@ -535,7 +528,7 @@ printf("  file %ld: %s\n", i, fileName);
 		return error;
 
 	// create the source code
-	sourceCode = new(std::nothrow) FileSourceCode(sourceFile);
+	sourceCode = new(std::nothrow) FileSourceCode(file, sourceFile);
 	sourceFile->ReleaseReference();
 	if (sourceCode == NULL)
 		return B_NO_MEMORY;
@@ -564,23 +557,13 @@ printf("  %#lx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, s
 		if (statementAddress != 0
 			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
 			target_addr_t endAddress = state.address;
-			if (endAddress >  statementAddress) {
+			if (endAddress > statementAddress) {
 				// add the statement
-				ContiguousStatement* statement = new(std::nothrow)
-					ContiguousStatement(
-						SourceLocation(statementLine, statementColumn),
-						TargetAddressRange(fRelocationDelta + statementAddress,
-							endAddress - statementAddress));
-				if (statement == NULL)
-					return B_NO_MEMORY;
-
-				error = sourceCode->AddStatement(statement);
-				if (error != B_OK) {
-					delete statement;
+				error = sourceCode->AddSourceLocation(
+					SourceLocation(statementLine, statementColumn));
+				if (error != B_OK)
 					return error;
-				}
-printf("  -> statement: %#llx - %#llx, line: %ld\n", statement->AddressRange().Start(),
-statement->AddressRange().End(), statementLine);
+printf("  -> statement: %#llx - %#llx, source location: (%ld, %ld)\n", statementAddress, endAddress, statementLine, statementColumn);
 			}
 
 			statementAddress = 0;
@@ -593,7 +576,7 @@ statement->AddressRange().End(), statementLine);
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = state.column - 1;
+			statementColumn = std::max(state.column - 1, 0L);
 		}
 	}
 

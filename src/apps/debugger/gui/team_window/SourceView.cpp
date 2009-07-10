@@ -518,9 +518,11 @@ SourceView::MarkerView::Draw(BRect updateRect)
 		if (!drawBreakpointOptionMarker)
 			continue;
 
-		Statement* statement = fSourceCode->StatementAtLine(line);
-		if (statement == NULL
-				|| statement->StartSourceLocation().Line() != (uint32)line) {
+
+		SourceLocation statementStart, statementEnd;
+		if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
+				statementStart, statementEnd)
+			|| statementStart.Line() != line) {
 			continue;
 		}
 
@@ -541,11 +543,15 @@ SourceView::MarkerView::MouseDown(BPoint where)
 	if (line < 0)
 		return;
 
-	Statement* statement = fSourceCode->StatementAtLine(line);
-	if (statement == NULL
-			|| statement->StartSourceLocation().Line() != (uint32)line) {
+	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	Statement* statement;
+	if (fDebugModel->GetTeam()->GetStatementAtSourceLocation(fSourceCode,
+			SourceLocation(line), statement) != B_OK) {
 		return;
 	}
+	Reference<Statement> statementReference(statement, true);
+	if (statement->StartSourceLocation().Line() != line)
+		return;
 
 	int32 modifiers;
 	if (Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
@@ -1005,6 +1011,7 @@ SourceView::UserBreakpointChanged(target_addr_t address)
 bool
 SourceView::ScrollToAddress(target_addr_t address)
 {
+printf("SourceView::ScrollToAddress(%#llx)\n", address);
 	if (fSourceCode == NULL)
 		return false;
 
@@ -1025,6 +1032,7 @@ SourceView::ScrollToAddress(target_addr_t address)
 bool
 SourceView::ScrollToLine(uint32 line)
 {
+printf("SourceView::ScrollToLine(%lu)\n", line);
 	if (fSourceCode == NULL || line >= (uint32)fSourceCode->CountLines())
 		return false;
 

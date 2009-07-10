@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DisassembledCode.h"
 
 #include <stdlib.h>
@@ -57,33 +58,40 @@ DisassembledCode::LineAt(int32 index) const
 }
 
 
-Statement*
-DisassembledCode::StatementAtLine(int32 index) const
+bool
+DisassembledCode::GetStatementLocationRange(const SourceLocation& location,
+	SourceLocation& _start, SourceLocation& _end) const
 {
-	Line* line = fLines.ItemAt(index);
-	return line != NULL ? line->statement : NULL;
+	Line* line = fLines.ItemAt(location.Line());
+	if (line == NULL || line->statement == NULL)
+		return false;
+
+	_start = line->statement->StartSourceLocation();
+	_end = SourceLocation(_start.Line() + 1);
+		// TODO: Multi-line instructions!
+	return true;
 }
 
 
-//Statement*
-//DisassembledCode::StatementAtAddress(target_addr_t address) const
-//{
-//	return fStatements.BinarySearchByKey(address, &_CompareAddressStatement);
-//}
+LocatableFile*
+DisassembledCode::GetSourceFile() const
+{
+	return NULL;
+}
 
 
-//TargetAddressRange
-//DisassembledCode::StatementAddressRange() const
-//{
-//	if (fStatements.IsEmpty())
-//		return TargetAddressRange();
-//
-//	ContiguousStatement* first = fStatements.ItemAt(0);
-//	ContiguousStatement* last
-//		= fStatements.ItemAt(fStatements.CountItems() - 1);
-//	return TargetAddressRange(first->AddressRange().Start(),
-//		last->AddressRange().End());
-//}
+status_t
+DisassembledCode::GetStatementAtLocation(const SourceLocation& location,
+	Statement*& _statement)
+{
+	Line* line = fLines.ItemAt(location.Line());
+	if (line == NULL || line->statement == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_statement = line->statement;
+	_statement->AcquireReference();
+	return B_OK;
+}
 
 
 bool

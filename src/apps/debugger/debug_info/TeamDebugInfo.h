@@ -5,6 +5,7 @@
 #ifndef TEAM_DEBUG_INFO_H
 #define TEAM_DEBUG_INFO_H
 
+
 #include <ObjectList.h>
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
@@ -20,6 +21,7 @@ class FunctionInstance;
 class ImageDebugInfo;
 class ImageInfo;
 class LocatableFile;
+class SourceLocation;
 class SpecificTeamDebugInfo;
 
 
@@ -43,11 +45,21 @@ public:
 			void				RemoveImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
 
+			Function*			FunctionAtSourceLocation(LocatableFile* file,
+									const SourceLocation& location);
+
 private:
 			struct FunctionHashDefinition;
+			struct SourceFileEntry;
+			struct SourceFileHashDefinition;
 
 			typedef BObjectList<SpecificTeamDebugInfo> SpecificInfoList;
 			typedef OpenHashTable<FunctionHashDefinition> FunctionTable;
+			typedef OpenHashTable<SourceFileHashDefinition> SourceFileTable;
+
+private:
+			status_t			_AddFunction(Function* function);
+			void				_RemoveFunction(Function* function);
 
 private:
 			DebuggerInterface*	fDebuggerInterface;
@@ -55,6 +67,7 @@ private:
 			FileManager*		fFileManager;
 			SpecificInfoList	fSpecificInfos;
 			FunctionTable*		fFunctions;
+			SourceFileTable*	fSourceFiles;
 };
 
 

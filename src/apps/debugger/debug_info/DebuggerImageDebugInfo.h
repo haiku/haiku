@@ -36,7 +36,7 @@ public:
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement);
-	virtual	status_t			GetStatementForSourceLocation(
+	virtual	status_t			GetStatementAtSourceLocation(
 									FunctionDebugInfo* function,
 									const SourceLocation& sourceLocation,
 									Statement*& _statement);

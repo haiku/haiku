@@ -46,7 +46,7 @@ public:
 									target_addr_t address,
 									Statement*& _statement) = 0;
 										// returns reference
-	virtual	status_t			GetStatementForSourceLocation(
+	virtual	status_t			GetStatementAtSourceLocation(
 									FunctionDebugInfo* function,
 									const SourceLocation& sourceLocation,
 									Statement*& _statement) = 0;

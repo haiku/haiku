@@ -30,6 +30,8 @@ enum {
 
 class FunctionInstance;
 class LocatableFile;
+class SourceCode;
+class SourceLocation;
 class Statement;
 class TeamDebugInfo;
 
@@ -76,6 +78,13 @@ public:
 									// returns a reference to the statement,
 									// not to the functions instance, though,
 									// caller must lock
+			status_t			GetStatementAtSourceLocation(
+									SourceCode* sourceCode,
+									const SourceLocation& location,
+									Statement*& _statement);
+									// returns a reference to the statement
+									// (any matching statement!),
+									// caller must lock,
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);

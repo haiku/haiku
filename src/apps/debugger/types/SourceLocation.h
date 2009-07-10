@@ -10,7 +10,7 @@
 
 class SourceLocation {
 public:
-	SourceLocation(uint32 line = 0, uint32 column = 0)
+	SourceLocation(int32 line = 0, int32 column = 0)
 		:
 		fLine(line),
 		fColumn(column)
@@ -41,19 +41,31 @@ public:
 		return !(*this == other);
 	}
 
-	uint32 Line() const
+	bool operator<(const SourceLocation& other) const
+	{
+		return fLine < other.fLine
+			|| (fLine == other.fLine && fColumn < other.fColumn);
+	}
+
+	bool operator<=(const SourceLocation& other) const
+	{
+		return fLine < other.fLine
+			|| (fLine == other.fLine && fColumn <= other.fColumn);
+	}
+
+	int32 Line() const
 	{
 		return fLine;
 	}
 
-	uint32 Column() const
+	int32 Column() const
 	{
 		return fColumn;
 	}
 
 private:
-	uint32	fLine;
-	uint32	fColumn;
+	int32	fLine;
+	int32	fColumn;
 };
 
 
