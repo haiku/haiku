@@ -348,9 +348,11 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 				if (!IsPropertyAvailable("sco_max_pkt"))
 					fProperties->AddInt16("sco_max_pkt", buffer->sco_max_pkt);
 
-				Output::Instance()->Postf(BLACKBOARD_KIT,
-					"Reply for Read Buffer Size %x\n", buffer->status);
 			}
+
+			Output::Instance()->Postf(BLACKBOARD_KIT, "Reply for Read Buffer Size %x\n",
+				buffer->status);
+
 
 			reply.AddInt8("status", buffer->status);
 			printf("Sending reply ... %ld\n", request->SendReply(&reply));
@@ -388,11 +390,12 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 			if (classDev->status == BT_OK) {
 				reply.AddData("devclass", B_ANY_TYPE, &classDev->dev_class, sizeof(classDev->dev_class));
-				Output::Instance()->Post("Positive reply for getDeviceClass\n", BLACKBOARD_KIT);
-
-			} else {
-				Output::Instance()->Post("Negative reply for getDeviceClass\n", BLACKBOARD_KIT);
 			}
+
+			Output::Instance()->Postf(BLACKBOARD_KIT, 
+				"Read DeviceClass status = %x DeviceClass = [%x][%x][%x]\n", classDev->status,
+				classDev->dev_class[0], classDev->dev_class[1], classDev->dev_class[2]);
+
 
 			reply.AddInt8("status", classDev->status);
 			printf("Sending reply ... %ld\n", request->SendReply(&reply));
@@ -468,8 +471,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		// place here all CC that just replies a uint8 status
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET):
-		case PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR):
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):
+		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_CLASS_OF_DEV):
+		case PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR):
 		{
 			reply.AddInt8("status", *(uint8*)(event+1));
 
