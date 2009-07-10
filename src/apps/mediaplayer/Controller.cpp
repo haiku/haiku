@@ -359,8 +359,8 @@ Controller::PlayerActivated(bool active)
 
 
 void
-Controller::GetSize(int *width, int *height, int* widthAspect,
-	int* heightAspect)
+Controller::GetSize(int *width, int *height, int* _widthAspect,
+	int* _heightAspect)
 {
 	BAutolock _(this);
 
@@ -368,17 +368,29 @@ Controller::GetSize(int *width, int *height, int* widthAspect,
 		media_format format = fVideoTrackSupplier->Format();
 		*height = format.u.raw_video.display.line_count;
 		*width = format.u.raw_video.display.line_width;
-		if (widthAspect != NULL)
-			*widthAspect = format.u.raw_video.pixel_width_aspect;
-		if (heightAspect != NULL)
-			*heightAspect = format.u.raw_video.pixel_height_aspect;
+		int widthAspect = 0;
+		int heightAspect = 0;
+		// Inore format aspect when both values are 1. If they have been
+		// intentionally at 1:1 then no harm is done for quadratic videos,
+		// only if the video is indeed encoded anamorphotic, but supposed
+		// to be displayed quadratic... extremely unlikely.
+		if (format.u.raw_video.pixel_width_aspect
+			!= format.u.raw_video.pixel_height_aspect
+			&& format.u.raw_video.pixel_width_aspect != 1) {
+			widthAspect = format.u.raw_video.pixel_width_aspect;
+			heightAspect = format.u.raw_video.pixel_height_aspect;
+		}
+		if (_widthAspect != NULL)
+			*_widthAspect = widthAspect;
+		if (_heightAspect != NULL)
+			*_heightAspect = heightAspect;
 	} else {
 		*height = 0;
 		*width = 0;
-		if (widthAspect != NULL)
-			*widthAspect = 1;
-		if (heightAspect != NULL)
-			*heightAspect = 1;
+		if (_widthAspect != NULL)
+			*_widthAspect = 1;
+		if (_heightAspect != NULL)
+			*_heightAspect = 1;
 	}
 }
 
