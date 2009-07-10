@@ -794,6 +794,7 @@ static void h264_h_loop_filter_chroma_intra_mmx2(uint8_t *pix, int stride, int a
 
 static void h264_loop_filter_strength_mmx2( int16_t bS[2][4][4], uint8_t nnz[40], int8_t ref[2][40], int16_t mv[2][40][2],
                                             int bidir, int edges, int step, int mask_mv0, int mask_mv1, int field ) {
+#if __GNUC__ >= 3
     int dir;
     __asm__ volatile(
         "pxor %%mm7, %%mm7 \n\t"
@@ -893,6 +894,7 @@ static void h264_loop_filter_strength_mmx2( int16_t bS[2][4][4], uint8_t nnz[40]
         ::"r"(bS[0])
         :"memory"
     );
+#endif // #if __GNUC__ >= 3
 }
 
 
