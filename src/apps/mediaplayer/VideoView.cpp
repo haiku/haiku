@@ -104,6 +104,7 @@ VideoView::Pulse()
 		uint32 buttons;
 		GetMouse(&where, &buttons, false);
 		if (buttons == 0) {
+			ConvertToScreen(&where);
 			set_mouse_position((int32)where.x, (int32)where.y);
 			// hide the mouse cursor until the user moves it
 			be_app->ObscureCursor();
