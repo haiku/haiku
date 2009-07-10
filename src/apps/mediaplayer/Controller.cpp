@@ -370,7 +370,7 @@ Controller::GetSize(int *width, int *height, int* _widthAspect,
 		*width = format.u.raw_video.display.line_width;
 		int widthAspect = 0;
 		int heightAspect = 0;
-		// Inore format aspect when both values are 1. If they have been
+		// Ignore format aspect when both values are 1. If they have been
 		// intentionally at 1:1 then no harm is done for quadratic videos,
 		// only if the video is indeed encoded anamorphotic, but supposed
 		// to be displayed quadratic... extremely unlikely.
