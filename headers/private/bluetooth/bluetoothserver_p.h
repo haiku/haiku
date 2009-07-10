@@ -3,6 +3,7 @@
 
 
 #define BLUETOOTH_SIGNATURE "application/x-vnd.Be-bluetooth_server"
+#define BLUETOOTH_APP_SIGNATURE "application/x-vnd.haiku-BluetoothPrefs"
 
 /* Kit Comunication */
 
@@ -21,5 +22,7 @@
 #define BT_MSG_INQUIRY_ERROR      'IqER'
 #define BT_MSG_INQUIRY_DEVICE     'IqDE'
 
+// Server
+#define BT_MSG_SERVER_SHOW_CONSOLE		'btsc'
 
 #endif

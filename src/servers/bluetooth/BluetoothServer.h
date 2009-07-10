@@ -72,6 +72,9 @@ private:
 
 	void 				ShowWindow(BWindow* pWindow);
 
+	void				_InstallDeskbarIcon();
+	void				_RemoveDeskbarIcon();
+
 	LocalDevicesList   	fLocalDevicesList;
 
 

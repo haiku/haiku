@@ -3,12 +3,14 @@ SubDir HAIKU_TOP src servers bluetooth ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared bluetooth net kernel ;
+UseLibraryHeaders icon ;
 
 AddResources bluetooth_server : server-bluetooth.rdef ;
 
 Server bluetooth_server
  	:
 	BluetoothServer.cpp
+	DeskbarReplicant.cpp
 	DeviceManager.cpp
 	HCIControllerAccessor.cpp
 	HCITransportAccessor.cpp

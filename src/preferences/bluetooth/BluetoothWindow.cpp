@@ -110,16 +110,16 @@ BluetoothWindow::MessageReceived(BMessage *message)
 */			break;
 		case kMsgStartServices:
 			printf("kMsgStartServices\n");
-			if (!be_roster->IsRunning("application/x-vnd.Be-bluetooth_server"))
+			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE))
 			{
-				printf("kMsgStopServices: %s\n", strerror(be_roster->Launch("application/x-vnd.Be-bluetooth_server")));
+				printf("kMsgStopServices: %s\n", strerror(be_roster->Launch(BLUETOOTH_SIGNATURE)));
 			}
 			break;
 		case kMsgStopServices:
 			printf("kMsgStopServices\n");
-			if (be_roster->IsRunning("application/x-vnd.Be-bluetooth_server"))
+			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE))
 			{
-				printf("kMsgStopServices: %s\n", strerror(BMessenger("application/x-vnd.Be-bluetooth_server").SendMessage(B_QUIT_REQUESTED)));
+				printf("kMsgStopServices: %s\n", strerror(BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED)));
 			}
 			break;
 		

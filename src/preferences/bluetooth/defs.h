@@ -3,7 +3,8 @@
 
 #include <bluetooth/LocalDevice.h>
 
-#define BLUETOOTH_APP_SIGNATURE "application/x-vnd.haiku-BluetoothPrefs"
+#include <bluetoothserver_p.h>
+
 
 #define APPLY_SETTINGS 'aply'
 #define REVERT_SETTINGS 'rvrt'

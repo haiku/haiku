@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include <Entry.h>
+#include <Deskbar.h>
 #include <Directory.h>
 #include <Message.h>
 #include <Path.h>
@@ -22,8 +23,9 @@
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/bluetooth_util.h>
 
-#include "LocalDeviceImpl.h"
 #include "BluetoothServer.h"
+#include "DeskbarReplicant.h"
+#include "LocalDeviceImpl.h"
 #include "Output.h"
 
 
@@ -60,15 +62,11 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 	Output::Instance()->AddTab("Device Manager", BLACKBOARD_DEVICEMANAGER);
 	Output::Instance()->AddTab("Kit", BLACKBOARD_KIT);
 
-	ShowWindow(Output::Instance());
-
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
 	fEventListener2 = new BluetoothPortListener(BT_USERLAND_PORT_NAME,
 		(BluetoothPortListener::port_listener_func)&DispatchEvent);
-	
-
 }
 
 bool BluetoothServer::QuitRequested(void)
@@ -81,6 +79,8 @@ bool BluetoothServer::QuitRequested(void)
 	while ((lDeviceImpl = (LocalDeviceImpl *)fLocalDevicesList.RemoveItem((int32)0))
 		!= NULL)
 		delete lDeviceImpl;
+ 
+ 	_RemoveDeskbarIcon();
  
 	printf("Accepting quitting of the application\n");
 	return BApplication::QuitRequested();
@@ -109,6 +109,9 @@ void BluetoothServer::ReadyToRun(void)
 	else
 		Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
 
+	ShowWindow(Output::Instance());
+
+	_InstallDeskbarIcon();
 }
 
 
@@ -190,6 +193,10 @@ void BluetoothServer::MessageReceived(BMessage *message)
 			}
 			return;
 		}
+		
+		case BT_MSG_SERVER_SHOW_CONSOLE:
+			ShowWindow(Output::Instance());
+			break;
 
 		default:
 			BApplication::MessageReceived(message);
@@ -433,6 +440,35 @@ BluetoothServer::ShowWindow(BWindow* pWindow)
 	pWindow->Unlock();
 }
 
+
+void
+BluetoothServer::_InstallDeskbarIcon()
+{
+	app_info appInfo;
+	be_app->GetAppInfo(&appInfo);
+	
+	BDeskbar deskbar;
+	
+	if (deskbar.HasItem(kDeskbarItemName)) {
+		_RemoveDeskbarIcon();
+	}
+	
+	status_t res = deskbar.AddItem(&appInfo.ref);
+	if (res != B_OK) {
+		printf("Failed adding deskbar icon: %ld\n", res);
+	}
+}
+
+
+void
+BluetoothServer::_RemoveDeskbarIcon()
+{
+	BDeskbar deskbar;
+	status_t res = deskbar.RemoveItem(kDeskbarItemName);
+	if (res != B_OK) {
+		printf("Failed removing Deskbar icon: %ld: \n", res);
+	}
+}
 
 #if 0
 #pragma mark -
