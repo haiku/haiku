@@ -9,12 +9,7 @@ SubDirHdrs [ FDirName $(SUBDIR) ../../libswscale ] ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
-} else {
-	SubDirCcFlags -fomit-frame-pointer -DPIC ;
-}
-
+SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
 SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 

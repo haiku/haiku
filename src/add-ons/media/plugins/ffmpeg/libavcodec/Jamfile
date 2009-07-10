@@ -11,43 +11,7 @@ UseLibraryHeaders zlib ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
-} else {
-	SubDirCcFlags -fomit-frame-pointer -DPIC ;
-}
-
-# NOTE: This is intentionally a global variable, so we can re-use it in
-# sub-folders.
-HAIKU_FFMPEG_DEFINES = HAVE_AV_CONFIG_H=1 ;
-
-if $(TARGET_ARCH) = x86 {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=1 ARCH_X86_32=1 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=1 HAVE_MMX2=1 HAVE_SSE=0 HAVE_SSSE3=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=0 ;
-} else if $(TARGET_ARCH) = ppc {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=0 ARCH_X86_32=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=1 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSSE3=0 ; 
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=0 ;
-} else if $(TARGET_ARCH) = sparc {
-	HAIKU_FFMPEG_DEFINES += ARCH_X86=0 ARCH_X86_32=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_PPC=0 ;
-	HAIKU_FFMPEG_DEFINES += ARCH_SPARC=1 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_AMD3DNOW=0 HAVE_AMD3DNOWEXT=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_MMX=0 HAVE_MMX2=0 HAVE_SSE=0 HAVE_SSSE3=0 ; 
-	HAIKU_FFMPEG_DEFINES += HAVE_ALTIVEC=0 ;
-	HAIKU_FFMPEG_DEFINES += HAVE_VIS=1 ;
-}
-
-HAIKU_FFMPEG_DEFINES = [ FDefines $(HAIKU_FFMPEG_DEFINES) ] ;
+SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
 SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 
@@ -100,6 +64,7 @@ StaticLibrary libavcodec.a :
 	dca.c
 	dca_parser.c
 	dirac_parser.c
+	dnxhd_parser.c
 	dnxhddata.c
 	dnxhddec.c
 	dpcm.c
@@ -126,7 +91,7 @@ StaticLibrary libavcodec.a :
 	faandct.c
 	faanidct.c
 	faxcompr.c
-	fdctref.c
+#	fdctref.c
 	fft.c
 	ffv1.c
 	flacdec.c
@@ -147,7 +112,7 @@ StaticLibrary libavcodec.a :
 	h264.c
 	h264_mp4toannexb_bsf.c
 	h264_parser.c
-	h264dspenc.c
+#	h264dspenc.c
 	h264idct.c
 	h264pred.c
 	huffman.c
@@ -155,6 +120,7 @@ StaticLibrary libavcodec.a :
 	idcinvideo.c
 	imc.c
 	imgconvert.c
+	imgresample.c
 	imx_dump_header_bsf.c
 	indeo2.c
 	indeo3.c
@@ -172,9 +138,9 @@ StaticLibrary libavcodec.a :
 #	ljpegenc.c
 	loco.c
 	lpc.c
-	lsp.c
+#	lsp.c
 	lzw.c
-	lzwenc.c
+#	lzwenc.c
 	mace.c
 	mdct.c
 	mdec.c
@@ -246,7 +212,7 @@ StaticLibrary libavcodec.a :
 	resample2.c
 	rl2.c
 	rle.c
-	roqaudioenc.c
+#	roqaudioenc.c
 	roqvideo.c
 	roqvideodec.c
 #	roqvideoenc.c

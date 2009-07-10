@@ -9,39 +9,60 @@ SubDirHdrs [ FDirName $(SUBDIR) ../../libswscale ] ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	SubDirCcFlags -fomit-frame-pointer -fno-pic ;
-} else {
-	SubDirCcFlags -fomit-frame-pointer -DPIC ;
-}
-
+SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
 SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 
-StaticLibrary libavcodec_x86.a :
-	cpuid.c
-	cavsdsp_mmx.c
-	idct_mmx.c
-	idct_mmx_xvid.c
-	idct_sse2_xvid.c
-	dsputil_mmx.c
-#   dsputilenc_mmx.c
-    fft_3dn.c
-    fft_3dn2.c
-	fft_sse.c
-	h264_idct_sse2.nasm
-	h264_deblock_sse2.nasm
-	fft_mmx.nasm
-	dsputil_yasm.nasm
-	simple_idct_mmx.c
-	motion_est_mmx.c
-	mpegvideo_mmx.c
-	rv40dsp_mmx.c
-	vc1dsp_mmx.c
-	vp3dsp_mmx.c
-	vp3dsp_sse2.c
-	vp6dsp_mmx.c
-	vp6dsp_sse2.c
-	fdct_mmx.c
-;
+local mmxSources = ;
+if $(HAIKU_FFMPEG_USE_MMX) = 1 {
+	mmxSources =
+		cpuid.c
+		cavsdsp_mmx.c
+		dsputil_mmx.c
+#		dsputilenc_mmx.c # For when we enable encoders.
+		fdct_mmx.c
+#		idct_mmx.c # GPL
+		idct_mmx_xvid.c
+		motion_est_mmx.c
+		mpegvideo_mmx.c
+		rv40dsp_mmx.c
+		simple_idct_mmx.c
+		vc1dsp_mmx.c
+		vp3dsp_mmx.c
+		vp6dsp_mmx.c
 
+		fft_mmx.nasm
+		dsputil_yasm.nasm
+	;
+}
+
+local sseSources = ;
+#if $(HAIKU_FFMPEG_USE_SSE) = 1 {
+if $(HAIKU_FFMPEG_USE_SSSE3) = 1 {
+	sseSources =
+		fft_sse.c
+		idct_sse2_xvid.c
+		vp3dsp_sse2.c
+		vp6dsp_sse2.c
+		h264_idct_sse2.nasm
+		h264_deblock_sse2.nasm
+	;
+}
+
+local amdSources = ;
+if $(HAIKU_FFMPEG_USE_AMD3DNOW) = 1 {
+	amdSources =
+		fft_3dn.c
+	;
+}
+if $(HAIKU_FFMPEG_USE_AMD3DNOWEXT) = 1 {
+	amdSources +=
+		fft_3dn2.c
+	;
+}
+
+StaticLibrary libavcodec_x86.a :
+	$(mmxSources)
+	$(sseSources)
+	$(amdSources)
+;

@@ -26,7 +26,6 @@
 
 #include <stdint.h>
 #include "avcodec.h"
-#include "libavutil/pixfmt.h"
 
 /**
  * Logs a generic warning message about a missing feature.
