@@ -303,8 +303,11 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		format->u.encoded_video.output.first_active = 0;
 		format->u.encoded_video.output.last_active = cookie->line_count - 1;
 		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-		format->u.encoded_video.output.pixel_width_aspect = 1;
-		format->u.encoded_video.output.pixel_height_aspect = 1;
+		// TODO: Properly set the display aspect ratio. It is supposed to be
+		// the ratio of the final image. For example 16:9 actually has
+		// 16 and 9 as values.
+		format->u.encoded_video.output.pixel_width_aspect = 0;
+		format->u.encoded_video.output.pixel_height_aspect = 0;
 		// format->u.encoded_video.output.display.format = 0;
 		format->u.encoded_video.output.display.line_width = fFile->AviMainHeader()->width;
 		format->u.encoded_video.output.display.line_count = cookie->line_count;
