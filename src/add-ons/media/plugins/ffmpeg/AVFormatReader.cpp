@@ -48,6 +48,9 @@ static const size_t kIOBufferSize = 64 * 1024;
 	// the allow to specify a buffering mode.
 
 
+// #pragma mark - AVFormatReader::StreamCookie
+
+
 class AVFormatReader::StreamCookie {
 public:
 								StreamCookie(BPositionIO* source,
@@ -98,8 +101,8 @@ private:
 									int bufferSize);
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);
 
-
 			status_t			_NextPacket(bool reuse);
+
 private:
 			BPositionIO*		fSource;
 			off_t				fPosition;
@@ -152,7 +155,7 @@ status_t
 AVFormatReader::StreamCookie::Open()
 {
 	// Init probing data
-	size_t probeSize = kIOBufferSize / 2; //1024;
+	size_t probeSize = 2048;
 	AVProbeData probeData;
 	probeData.filename = "";
 	probeData.buf = fIOBuffer;
@@ -234,6 +237,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 		TRACE("  Bad stream index!\n");
 		return B_BAD_INDEX;
 	}
+
+	TRACE("  context stream index: %ld\n", streamIndex);
 
 	const DemuxerFormat* demuxerFormat = demuxer_format_for(fContext->iformat);
 	if (demuxerFormat == NULL) {
@@ -817,7 +822,7 @@ AVFormatReader::StreamCookie::_Read(void* cookie, uint8* buffer,
 	int bufferSize)
 {
 	TRACE_IO("AVFormatReader::StreamCookie::_Read(%p, %p, %d)\n",
-		cookie, buffer, whence);
+		cookie, buffer, bufferSize);
 
 	StreamCookie* stream = reinterpret_cast<StreamCookie*>(cookie);
 
@@ -859,10 +864,24 @@ AVFormatReader::StreamCookie::_Seek(void* cookie, off_t offset, int whence)
 		return -1;
 	}
 
+	// If not requested to seek to an absolute position, we need to
+	// confirm that the stream is currently at the position that we
+	// think it is.
+	if (whence != SEEK_SET
+		&& stream->fPosition != stream->fSource->Position()) {
+		off_t position
+			= stream->fSource->Seek(stream->fPosition, SEEK_SET);
+		if (position != stream->fPosition)
+			return -1;
+	}
+
 	off_t position = stream->fSource->Seek(offset, whence);
+	TRACE_IO("  position: %lld\n", position);
+	if (position < 0)
+		return -1;
+
 	stream->fPosition = position;
 
-	TRACE_IO("  position: %lld\n", position);
 	return position;
 }
 
