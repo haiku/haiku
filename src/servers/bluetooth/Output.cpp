@@ -47,7 +47,7 @@ OutputView::FrameResized(float width, float height)
 Output* Output::m_instance = 0;
 
 Output::Output() :
-	BWindow(BRect(200,200,600,600), "Output", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	BWindow(BRect(200,200,800,800), "Output", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	BRect b = Bounds();
 
