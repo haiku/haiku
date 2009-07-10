@@ -33,7 +33,7 @@ Demangler::Demangle(const BString& mangledName)
 	}
 
 	BString demangledName(demangled);
-	demangledName << demangled << "(";
+	demangledName << "(";
 
 	size_t length;
 	int32 type;
