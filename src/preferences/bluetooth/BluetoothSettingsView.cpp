@@ -25,7 +25,12 @@
 #include "BluetoothWindow.h"
 	
 static const int32 kMsgSetAntialiasing = 'anti';
-static const int32 kMsgSetHinting = 'hint';
+static const int32 kMsgSetDeviceClassDesktop = 'sDCd';
+static const int32 kMsgSetDeviceClassServer = 'sDCs';
+static const int32 kMsgSetDeviceClassLaptop = 'sDCl';
+static const int32 kMsgSetDeviceClassNetbook = 'sDCn';
+static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
+
 static const int32 kMsgSetAverageWeight = 'afEa';
 static const int32 kMsgLocalSwitched = 'lDsW';
 
@@ -34,8 +39,10 @@ static const char* kTrustedLabel = "Only from Trusted devices";
 static const char* kAlwaysLabel = "Always ask";
 
 static const char* kDesktopLabel = "Desktop";
+static const char* kServerLabel = "Server";
 static const char* kLaptopLabel = "Laptop";
-static const char* kPhoneLabel = "Haiku Phone";
+static const char* kNetBookLabel = "NetBook";
+static const char* kPhoneLabel = "Smart Phone";
 
 
 //	#pragma mark -
@@ -119,6 +126,9 @@ BluetoothSettingsView::AttachedToWindow()
 void
 BluetoothSettingsView::MessageReceived(BMessage *msg)
 {
+	
+	DeviceClass devClass;
+	
 	switch (msg->what) {
 		case kMsgLocalSwitched:
 		{
@@ -131,6 +141,42 @@ BluetoothSettingsView::MessageReceived(BMessage *msg)
 			}
 		}
 		break;
+		
+		case kMsgSetDeviceClassDesktop:
+		{	
+			devClass.SetRecord(1, 1, 0x72);
+			ActiveLocalDevice->SetDeviceClass(devClass);
+			break;
+		}
+		
+		case kMsgSetDeviceClassServer:
+		{	
+			devClass.SetRecord(1, 2, 0x72);
+			ActiveLocalDevice->SetDeviceClass(devClass);
+			break;
+		}
+			
+		case kMsgSetDeviceClassLaptop:
+		{	
+			devClass.SetRecord(1, 3, 0x72);
+			ActiveLocalDevice->SetDeviceClass(devClass);
+			break;
+		}
+
+		case kMsgSetDeviceClassNetbook:
+		{	
+			devClass.SetRecord(1, 4, 0x72);
+			ActiveLocalDevice->SetDeviceClass(devClass);
+			break;
+		}
+		
+		case kMsgSetDeviceClassSmartPhone:
+		{	
+			devClass.SetRecord(2, 3, 0x72);
+			ActiveLocalDevice->SetDeviceClass(devClass);
+			break;
+		}	
+
 		case kMsgRefresh:
 			_BuildLocalDevicesMenu();
 			fLocalDevicesMenu->SetTargetForItems(this);
@@ -169,25 +215,31 @@ BluetoothSettingsView::_BuildConnectionPolicy()
 
 void
 BluetoothSettingsView::_BuildHintingMenu()
-{
+{	
+
 	fHintingMenu = new BPopUpMenu("Identify us as...");
-
-	BMessage* message = new BMessage(kMsgSetHinting);
-	message->AddBool("hinting", false);
-
+	BMessage* message;
+	
+	message = new BMessage(kMsgSetDeviceClassDesktop);
 	BMenuItem* item = new BMenuItem(kDesktopLabel, message);
-
 	fHintingMenu->AddItem(item);
 	
-	message = new BMessage(kMsgSetAverageWeight);
-	message->AddBool("hinting", true);
-
-	item = new BMenuItem(kLaptopLabel, message);
-
+	message = new BMessage(kMsgSetDeviceClassServer);
+	item = new BMenuItem(kServerLabel, message);
 	fHintingMenu->AddItem(item);
 
-	BMenuItem* item2 = new BMenuItem(kPhoneLabel, NULL);
-	fHintingMenu->AddItem(item2);
+	message = new BMessage(kMsgSetDeviceClassLaptop);
+	item = new BMenuItem(kLaptopLabel, message);
+	fHintingMenu->AddItem(item);
+
+	message = new BMessage(kMsgSetDeviceClassNetbook);
+	item = new BMenuItem(kNetBookLabel, message);
+	fHintingMenu->AddItem(item);
+	
+	message = new BMessage(kMsgSetDeviceClassSmartPhone);
+	item = new BMenuItem(kPhoneLabel, message);
+	fHintingMenu->AddItem(item);
+
 
 }
 

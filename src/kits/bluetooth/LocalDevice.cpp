@@ -211,7 +211,6 @@ LocalDevice::GetBluetoothAddress()
 	BMessage reply;
 	ssize_t	ssize;
 	
-	/* ADD ID */
 	request.AddInt32("hci_id", fHid);
 	request.AddData("raw command", B_ANY_TYPE, command, size);
 	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
@@ -270,7 +269,7 @@ DeviceClass
 LocalDevice::GetDeviceClass()
 {
 
-	if (fDeviceClass.IsUnknownDeviceClass()) {
+//	if (fDeviceClass.IsUnknownDeviceClass()) {
 
 		if (fMessenger == NULL)
 			return fDeviceClass;
@@ -282,7 +281,7 @@ LocalDevice::GetDeviceClass()
 	
 		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 		BMessage reply;
-		const uint8*	record;
+		const uint8* bufferRecord;
 		ssize_t	ssize;
 	
 		request.AddInt32("hci_id", fHid);
@@ -292,25 +291,56 @@ LocalDevice::GetDeviceClass()
 	    	OCF_READ_CLASS_OF_DEV));
 	
 		if (fMessenger->SendMessage(&request, &reply) == B_OK
-			&& reply.FindData("devclass", B_ANY_TYPE, 0, (const void**)&record,
+			&& reply.FindData("devclass", B_ANY_TYPE, 0, (const void**)&bufferRecord,
 			&ssize) == B_OK) {
-
-			fDeviceClass.SetRecord(*record);
+			uint8 record[3] = { bufferRecord[0], bufferRecord[1], bufferRecord[2] };
+			fDeviceClass.SetRecord(record);
 		}
-	}
+//	}
 
 	return fDeviceClass;
 
 }
 
 
+status_t
+LocalDevice::SetDeviceClass(DeviceClass deviceClass)
+{
+	int8 bt_status = BT_ERROR;
+
+	if (fMessenger == NULL)
+		return bt_status;
+
+	BluetoothCommand<typed_command(hci_write_dev_class)> 
+		setDeviceClass(OGF_CONTROL_BASEBAND, OCF_WRITE_CLASS_OF_DEV);
+	
+	setDeviceClass->dev_class[0] = deviceClass.Record() & 0xFF;
+	setDeviceClass->dev_class[1] = (deviceClass.Record() & 0xFF00) >> 8;
+	setDeviceClass->dev_class[2] = (deviceClass.Record() & 0xFF0000) >> 16;
+	
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+	
+	request.AddInt32("hci_id", fHid);
+	request.AddData("raw command", B_ANY_TYPE, setDeviceClass.Data(), setDeviceClass.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+		OCF_WRITE_CLASS_OF_DEV));
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+	
+}
+
+
 status_t 
 LocalDevice::ReadLocalVersion()
 {
-	int8	 bt_status = BT_ERROR;
+	int8 bt_status = BT_ERROR;
 	
 	BluetoothCommand<> localVersion(OGF_INFORMATIONAL_PARAM,OCF_READ_LOCAL_VERSION);
-	
 	
 	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;

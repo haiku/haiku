@@ -14,18 +14,23 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 				"Rendering", "Capturing", "Object Transfer",
 				"Audio", "Telephony", "Information" };
 
-	if (GetServiceClass() != 0) {
+	if (ServiceClass() != 0) {
+		bool first = true;
 
 		for (uint s = 0; s < (sizeof(services) / sizeof(*services)); s++) {
-			if (GetServiceClass() & (1 << s)) {
-				serviceClass << services[s];
-				if (s != 0)
-					serviceClass << ", ";
+			if (ServiceClass() & (1 << s)) {
+				if (first) {
+					first = false;
+					serviceClass << services[s];
+				} else {
+					serviceClass << ", " << services[s];
+				}
+					
 			}
 		}
 
 	} else
-		serviceClass <<  "Unspecified";
+		serviceClass << "Unspecified";
 
 }
 
@@ -36,10 +41,10 @@ DeviceClass::GetMajorDeviceClass(BString& majorClass)
 	static const char *major_devices[] = { "Miscellaneous", "Computer", "Phone",
 				"LAN Access", "Audio/Video", "Peripheral", "Imaging", "Uncategorized" };
 
-	if (GetMajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
+	if (MajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
 		majorClass << "Invalid Device Class!\n";
 	else
-		majorClass << major_devices[GetMajorDeviceClass()];
+		majorClass << major_devices[MajorDeviceClass()];
 
 }
 
@@ -47,8 +52,8 @@ DeviceClass::GetMajorDeviceClass(BString& majorClass)
 void
 DeviceClass::GetMinorDeviceClass(BString& minorClass)
 {
-	uint major = GetMajorDeviceClass();
-	uint minor = GetMinorDeviceClass();
+	uint major = MajorDeviceClass();
+	uint minor = MinorDeviceClass();
 	
 	switch (major) {
 		case 0:	/* misc */
@@ -327,7 +332,7 @@ DeviceClass::Draw(BView* view, const BPoint& point)
 
 	view->SetHighColor(kWhite);
 
-	switch (GetMajorDeviceClass()) {
+	switch (MajorDeviceClass()) {
 
 		case 2: // phone
 			view->StrokeRoundRect(BRect(point.x + IconInsets + uint(PixelsForIcon/4),

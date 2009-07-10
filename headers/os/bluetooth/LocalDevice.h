@@ -34,6 +34,8 @@ public:
 			DiscoveryAgent*	GetDiscoveryAgent();
 			BString			GetFriendlyName();
 			DeviceClass		GetDeviceClass();
+			status_t		SetDeviceClass(DeviceClass deviceClass);
+			
 	/* Possible throwing */
 			status_t		SetDiscoverable(int mode);
 

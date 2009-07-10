@@ -10,8 +10,7 @@
 
 namespace Bluetooth {
 
-#define UNKNOWN_CLASS_OF_DEVICE 0x00
-
+#define UNKNOWN_CLASS_OF_DEVICE 0x000000
 
 class DeviceClass {
 
@@ -26,45 +25,53 @@ public:
 	}
 
 
-	DeviceClass(uint32 record)
+	DeviceClass(uint8 major, uint8 minor, uint16 service)
 	{
-		SetRecord(record);
+		SetRecord(major, minor, service);
 	}
 
 
 	DeviceClass(void)
 	{
-		this->record = UNKNOWN_CLASS_OF_DEVICE;
+		fRecord = UNKNOWN_CLASS_OF_DEVICE;
 	}
 
 	void SetRecord(uint8 record[3])
 	{
-		this->record = record[0]|record[1]<<8|record[2]<<16;
+		fRecord = record[0]|record[1]<<8|record[2]<<16;
 	}
 
-	void SetRecord(uint32 record)
+	void SetRecord(uint8 major, uint8 minor, uint16 service)
 	{
-		this->record = record;
+		fRecord = (minor & 0x3F) << 2;
+		fRecord |= (major & 0x1F) << 8;
+		fRecord |= (service & 0x7FF) << 13;
 	}
 
-	uint GetServiceClass()
+
+	uint16 ServiceClass()
 	{
-		return (record & 0x00FFE000) >> 13;
+		return (fRecord & 0x00FFE000) >> 13;
 	}
 
-	uint GetMajorDeviceClass()
+	uint8 MajorDeviceClass()
 	{				
-		return (record & 0x00001F00) >> 8;
+		return (fRecord & 0x00001F00) >> 8;
 	}
 
-	uint GetMinorDeviceClass()
+	uint8 MinorDeviceClass()
 	{
-		return (record & 0x000000FF) >> 2;
+		return (fRecord & 0x000000FF) >> 2;
+	}
+	
+	uint32 Record()
+	{
+		return fRecord;
 	}
 
 	bool IsUnknownDeviceClass()
 	{
-		return (record == UNKNOWN_CLASS_OF_DEVICE);
+		return (fRecord == UNKNOWN_CLASS_OF_DEVICE);
 	}
 
 	void GetServiceClass(BString&);
@@ -76,7 +83,7 @@ public:
 	void Draw(BView* view, const BPoint& point);
 
 private:
-	uint32 record;
+	uint32 fRecord;
 
 };
 
