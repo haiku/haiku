@@ -20,7 +20,7 @@ MergeObject posix_stdlib.o :
 	radixsort.c
 	rand.c
 	random.c
-	realpath.c
+	realpath.cpp
 	strtod.c
 	strtol.c
 	strtoll.c
