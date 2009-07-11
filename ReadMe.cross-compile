@@ -24,6 +24,7 @@ Haiku's build system itself:
  * makeinfo (part of texinfo, needed for building gcc 4 only)
  * autoheader (part of autoconf, needed for building gcc)
  * gawk
+ * yasm (http://www.tortall.net/projects/yasm/wiki/Download)
 
 Whether they are installed can be tested for instance by running them in the
 shell with the "--version" parameter.
@@ -36,7 +37,7 @@ On Mac OS X a case-sensitive file system is required for the Haiku tree
  * gettext
  * libiconv
  * gnuregex
-
+ * cdrtools (for mkisofs used to create the bootable CD-ROM image)
 
 Building Jam
 ============
