@@ -63,8 +63,7 @@ local bashDefFiles =
 local bashDefFile ;
 for bashDefFile in [ FGristFiles $(bashDefFiles) ] {
 	local source = $(bashDefFile:S=.c) ;
-	Includes $(cFile) : <bash>builtext.h ;
-	Depends $(cFile:S=$(SUFOBJ)) : <bash>builtext.h ;
+	Includes $(source) : <bash>builtext.h ;
 	MkBuiltinsComp $(source) : $(bashDefFile) ;
 }
 
