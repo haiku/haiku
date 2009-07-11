@@ -75,6 +75,23 @@ public:
 		// sort them
 		std::sort(functions, functions + functionCount, &_FunctionLess);
 
+		// eliminate duplicate function instances
+		if (functionCount > 0) {
+			Function* previousFunction = functions[0]->GetFunction();
+			int32 removed = 0;
+			for (int32 i = 1; i < functionCount; i++) {
+				if (functions[i]->GetFunction() == previousFunction) {
+					removed++;
+				} else {
+					functions[i - removed] = functions[i];
+					previousFunction = functions[i]->GetFunction();
+				}
+			}
+
+			functionCount -= removed;
+				// The array might now be too large, but we can live with that.
+		}
+
 		// count the different source files
 		int32 sourceFileCount = 1;
 		for (int32 i = 1; i < functionCount; i++) {
