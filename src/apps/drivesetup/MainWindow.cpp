@@ -582,6 +582,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		}
 		fMountAllMI->SetEnabled(true);
 	}
+	if (selectedPartition < 0) {
+		fDeleteMI->SetEnabled(false);
+		fMountMI->SetEnabled(false);
+	}
 }
 
 
@@ -879,19 +883,33 @@ void
 MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	const BString& partitionType)
 {
+	if (!disk || selectedPartition > -2) {
+		_DisplayPartitionError("The currently selected partition is not"
+			" empty");
+		return;
+	}
+
 	if (disk->IsReadOnly()) {
 		_DisplayPartitionError("The selected disk is read-only.");
 		return;
 	}
 
-	BPartition* partition = disk->FindDescendant(selectedPartition);
-	if (partition) {
-		_DisplayPartitionError("The selected partition contains a file "
-			"system");
+	PartitionListRow* currentSelection = dynamic_cast<PartitionListRow*>(
+		fListView->CurrentSelection());
+	if (!currentSelection) {
+		_DisplayPartitionError("There was an error acquiring the partition "
+			"row");
 		return;
 	}
 
-	if (!disk->ContainsPartitioningSystem()) {
+	BPartition* parent = disk->FindDescendant(currentSelection->ParentID());
+	if (!parent) {
+		_DisplayPartitionError("The currently selected partition does not "
+			"have a parent partition");
+		return;
+	}
+
+	if (!parent->ContainsPartitioningSystem()) {
 		_DisplayPartitionError("The selected partition does not contain "
 			"a partitioning system.\n");
 		return;
@@ -907,14 +925,12 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 
 	// get partitioning info
 	BPartitioningInfo partitioningInfo;
-	status_t error = disk->GetPartitioningInfo(&partitioningInfo);
+	status_t error = parent->GetPartitioningInfo(&partitioningInfo);
 	if (error != B_OK) {
 		_DisplayPartitionError("Could not aquire partitioning information.\n");
 		return;
 	}
 
-// TODO: Find out which partition is the currently selected partition and get
-// the information about the offset and how large of a partition we can create.
 	int32 spacesCount = partitioningInfo.CountPartitionableSpaces();
 	if (spacesCount == 0) {
 		_DisplayPartitionError("There's no space on the partition where a "
@@ -923,14 +939,14 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	BString name, type, parameters;
-	off_t offset, size;
-	partitioningInfo.GetPartitionableSpaceAt(0, &offset, &size);
+	off_t offset = currentSelection->Offset();
+	off_t size = currentSelection->Size();
 
 	CreateParamsPanel* panel = new CreateParamsPanel(this, offset, size);
 	if (panel->Go(offset, size, type) == GO_CANCELED)
 		return;
 
-	ret = disk->ValidateCreateChild(&offset, &size, type.String(),
+	ret = parent->ValidateCreateChild(&offset, &size, type.String(),
 		NULL, NULL);
 
 	if (ret != B_OK) {
@@ -951,7 +967,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	if (choice == 1)
 		return;
 
-	ret = disk->CreateChild(offset, size, type.String(),
+	ret = parent->CreateChild(offset, size, type.String(),
 		NULL, parameters.String());
 
 	if (ret != B_OK) {
@@ -973,11 +989,18 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	ret = disk->Update(&updated);
 
 	_ScanDrives();
+	fDiskView->ForceUpdate();
 }
 
 void
 MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 {
+	if (!disk || selectedPartition < 0) {
+		_DisplayPartitionError("You need to select a partition "
+			"entry from the list.");
+		return;
+	}
+
 	if (disk->IsReadOnly()) {
 		_DisplayPartitionError("The selected disk is read-only.");
 		return;
@@ -989,6 +1012,13 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 		return;
 	}
 
+	BPartition* parent = partition->Parent();
+	if (!parent) {
+		_DisplayPartitionError("The currently selected partition does not "
+			"have a parent partition");
+		return;
+	}
+
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
@@ -997,7 +1027,7 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 		return;
 	}
 
-	if (!disk->CanDeleteChild(partition->Index())) {
+	if (!parent->CanDeleteChild(partition->Index())) {
 		_DisplayPartitionError("Cannot delete the selected partition");
 		return;
 	}
@@ -1014,10 +1044,8 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	if (choice == 1)
 		return;
 
-	ret = disk->DeleteChild(partition->Index());
+	ret = parent->DeleteChild(partition->Index());
 	if (ret != B_OK) {
-		PRINT(("MainWindow::_Delete(): DeleteChild() failed: %s\n",
-			strerror(ret)));
 		_DisplayPartitionError("Could not delete the selected partition");
 		return;
 	}
@@ -1025,4 +1053,5 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	modificationPreparer.CommitModifications();
 
 	_ScanDrives();
+	fDiskView->ForceUpdate();
 }
