@@ -143,10 +143,12 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 	fGraphicsDriver = InstantiateGraphicsDriver(settings, fPrinterData, fPrinterCap);
 	const JobData* jobData = fGraphicsDriver->getJobData(printJob);
 	if (jobData != NULL && jobData->getShowPreview()) {
+		off_t offset = printJob->Position();
 		PreviewWindow *preview = new PreviewWindow(printJob, true);
 		if (preview->Go() != B_OK) {
 			return new BMessage('okok');
 		}
+		printJob->Seek(offset, SEEK_SET);
 	}	
 	BMessage *result = fGraphicsDriver->takeJob(printJob);
 
