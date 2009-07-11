@@ -10,6 +10,15 @@
 #include "FunctionDebugInfo.h"
 
 
+enum function_source_state {
+	FUNCTION_SOURCE_NOT_LOADED,
+	FUNCTION_SOURCE_LOADING,
+	FUNCTION_SOURCE_LOADED,
+	FUNCTION_SOURCE_UNAVAILABLE
+};
+
+
+class DisassembledCode;
 class Function;
 class FunctionDebugInfo;
 class ImageDebugInfo;
@@ -45,10 +54,21 @@ public:
 
 			void				SetFunction(Function* function);
 									// package private
+
+			// mutable attributes follow (locking required)
+			DisassembledCode*	GetSourceCode() const
+									{ return fSourceCode; }
+			function_source_state SourceCodeState() const
+									{ return fSourceCodeState; }
+			void				SetSourceCode(DisassembledCode* source,
+									function_source_state state);
+
 private:
 			ImageDebugInfo*		fImageDebugInfo;
 			Function*			fFunction;
 			FunctionDebugInfo*	fFunctionDebugInfo;
+			DisassembledCode*	fSourceCode;
+			function_source_state fSourceCodeState;
 };
 
 

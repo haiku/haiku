@@ -13,12 +13,12 @@
 
 
 class CpuState;
+class DisassembledCode;
 class FunctionDebugInfo;
 class Image;
 class ImageDebugInfoProvider;
 class InstructionInfo;
 class Register;
-class SourceCode;
 class StackFrame;
 class StackTrace;
 class Statement;
@@ -57,7 +57,7 @@ public:
 
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
-									SourceCode*& _sourceCode) = 0;
+									DisassembledCode*& _sourceCode) = 0;
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement) = 0;

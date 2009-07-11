@@ -14,9 +14,10 @@
 class Architecture;
 class CpuState;
 class DebuggerInterface;
+class FileSourceCode;
 class FunctionDebugInfo;
 class Image;
-class SourceCode;
+class LocatableFile;
 class SourceLocation;
 class StackFrame;
 class Statement;
@@ -39,9 +40,6 @@ public:
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
 										// can be NULL; can return B_UNSUPPORTED
-	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
-									SourceCode*& _sourceCode) = 0;
-										// returns reference
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement) = 0;
@@ -51,6 +49,12 @@ public:
 									const SourceLocation& sourceLocation,
 									Statement*& _statement) = 0;
 										// returns reference
+
+	virtual	ssize_t				ReadCode(target_addr_t address, void* buffer,
+									size_t size) = 0;
+
+	virtual	status_t			AddSourceCodeInfo(LocatableFile* file,
+									FileSourceCode* sourceCode) = 0;
 };
 
 

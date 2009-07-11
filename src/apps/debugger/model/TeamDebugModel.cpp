@@ -10,6 +10,8 @@
 #include <AutoLocker.h>
 
 #include "Breakpoint.h"
+#include "DisassembledCode.h"
+#include "FileSourceCode.h"
 #include "Function.h"
 #include "UserBreakpoint.h"
 
@@ -109,24 +111,42 @@ TeamDebugModel::BreakpointAtAddress(target_addr_t address) const
 }
 
 
-//void
-//TeamDebugModel::GetBreakpointsInAddressRange(TargetAddressRange range,
-//	BObjectList<Breakpoint>& breakpoints) const
-//{
-//	int32 index = fBreakpoints.FindBinaryInsertionIndex(
-//		BreakpointByAddressPredicate(range.Start()));
-//	for (; Breakpoint* breakpoint = fBreakpoints.ItemAt(index); index++) {
-//		if (breakpoint->Address() > range.End())
-//			break;
-//		breakpoints.AddItem(breakpoint);
-//	}
-//}
+void
+TeamDebugModel::GetBreakpointsInAddressRange(TargetAddressRange range,
+	BObjectList<UserBreakpoint>& breakpoints) const
+{
+	int32 index = fBreakpoints.FindBinaryInsertionIndex(
+		BreakpointByAddressPredicate(range.Start()));
+	for (; Breakpoint* breakpoint = fBreakpoints.ItemAt(index); index++) {
+		if (breakpoint->Address() > range.End())
+			break;
+
+		for (UserBreakpointInstanceList::ConstIterator it
+				= breakpoint->UserBreakpoints().GetIterator();
+			UserBreakpointInstance* instance = it.Next();) {
+			breakpoints.AddItem(instance->GetUserBreakpoint());
+		}
+	}
+
+	// TODO: Avoid duplicates!
+}
 
 
 void
 TeamDebugModel::GetBreakpointsForSourceCode(SourceCode* sourceCode,
 	BObjectList<UserBreakpoint>& breakpoints) const
 {
+	if (DisassembledCode* disassembledCode
+			= dynamic_cast<DisassembledCode*>(sourceCode)) {
+		GetBreakpointsInAddressRange(disassembledCode->StatementAddressRange(),
+			breakpoints);
+		return;
+	}
+
+	LocatableFile* sourceFile = sourceCode->GetSourceFile();
+	if (sourceFile == NULL)
+		return;
+
 	// TODO: This can probably be optimized. Maybe by registering the user
 	// breakpoints with the team debug model and sorting them by source code.
 	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++) {
@@ -137,7 +157,7 @@ TeamDebugModel::GetBreakpointsForSourceCode(SourceCode* sourceCode,
 
 		UserBreakpoint* userBreakpoint
 			= userBreakpointInstance->GetUserBreakpoint();
-		if (userBreakpoint->GetFunction()->GetSourceCode() == sourceCode)
+		if (userBreakpoint->GetFunction()->SourceFile() == sourceFile)
 			breakpoints.AddItem(userBreakpoint);
 	}
 }

@@ -20,8 +20,9 @@
 #include <ObjectList.h>
 
 #include "Breakpoint.h"
+#include "DisassembledCode.h"
 #include "Function.h"
-#include "SourceCode.h"
+#include "FileSourceCode.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "TeamDebugModel.h"
@@ -503,6 +504,8 @@ SourceView::MarkerView::Draw(BRect updateRect)
 
 	float width = Bounds().Width();
 
+	AutoLocker<SourceCode> sourceLocker(fSourceCode);
+
 	int32 markerIndex = 0;
 	for (int32 line = minLine; line <= maxLine; line++) {
 		bool drawBreakpointOptionMarker = true;
@@ -517,7 +520,6 @@ SourceView::MarkerView::Draw(BRect updateRect)
 
 		if (!drawBreakpointOptionMarker)
 			continue;
-
 
 		SourceLocation statementStart, statementEnd;
 		if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
@@ -600,6 +602,8 @@ SourceView::MarkerView::_UpdateIPMarkers()
 	fIPMarkers.MakeEmpty();
 
 	if (fSourceCode != NULL && fStackTrace != NULL) {
+		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
+
 		AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
@@ -614,7 +618,9 @@ SourceView::MarkerView::_UpdateIPMarkers()
 			Reference<Statement> statementReference(statement, true);
 
 			uint32 line = statement->StartSourceLocation().Line();
-			if (functionInstance->GetFunction()->GetSourceCode() != fSourceCode
+			if ((functionInstance->GetSourceCode() != fSourceCode
+					&& functionInstance->GetFunction()->SourceFile()
+						!= sourceFile)
 				|| line < 0 || line >= (uint32)LineCount()) {
 				continue;
 			}
@@ -649,6 +655,8 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 	fBreakpointMarkers.MakeEmpty();
 
 	if (fSourceCode != NULL) {
+		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
+
 		AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 		// get the breakpoints in our source code range
@@ -669,7 +677,9 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 			Reference<Statement> statementReference(statement, true);
 
 			uint32 line = statement->StartSourceLocation().Line();
-			if (functionInstance->GetFunction()->GetSourceCode() != fSourceCode
+			if ((functionInstance->GetSourceCode() != fSourceCode
+					&& functionInstance->GetFunction()->SourceFile()
+						!= sourceFile)
 				|| line < 0 || line >= (uint32)LineCount()) {
 				continue;
 			}

@@ -5,6 +5,7 @@
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
 #define DWARF_IMAGE_DEBUG_INFO_H
 
+
 #include <Locker.h>
 
 #include <util/OpenHashTable.h>
@@ -42,8 +43,6 @@ public:
 									CpuState* cpuState,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
-	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
-									SourceCode*& _sourceCode);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement);
@@ -52,18 +51,16 @@ public:
 									const SourceLocation& sourceLocation,
 									Statement*& _statement);
 
-private:
-			struct SourceCodeKey;
-			struct SourceCodeEntry;
-			struct SourceCodeHashDefinition;
+	virtual	ssize_t				ReadCode(target_addr_t address, void* buffer,
+									size_t size);
 
-			typedef OpenHashTable<SourceCodeHashDefinition> SourceCodeTable;
+	virtual	status_t			AddSourceCodeInfo(LocatableFile* file,
+									FileSourceCode* sourceCode);
 
 private:
-			status_t			_LoadSourceCode(FunctionDebugInfo* function,
-									SourceCode*& _sourceCode);
-			FileSourceCode*		_LookupSourceCode(CompilationUnit* unit,
-									LocatableFile* file);
+			status_t 			_AddSourceCodeInfo(CompilationUnit* unit,
+									FileSourceCode* sourceCode,
+									int32 fileIndex);
 			int32				_GetSourceFileIndex(CompilationUnit* unit,
 									LocatableFile* sourceFile) const;
 
@@ -75,7 +72,6 @@ private:
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;
-			SourceCodeTable*	fSourceCodes;
 };
 
 

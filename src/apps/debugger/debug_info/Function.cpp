@@ -5,13 +5,14 @@
 
 #include "Function.h"
 
-#include "SourceCode.h"
+#include "FileSourceCode.h"
 
 
 Function::Function()
 	:
 	fSourceCode(NULL),
-	fSourceCodeState(FUNCTION_SOURCE_NOT_LOADED)
+	fSourceCodeState(FUNCTION_SOURCE_NOT_LOADED),
+	fNotificationsDisabled(0)
 {
 }
 
@@ -23,7 +24,7 @@ Function::~Function()
 
 
 void
-Function::SetSourceCode(SourceCode* source, function_source_state state)
+Function::SetSourceCode(FileSourceCode* source, function_source_state state)
 {
 	if (source == fSourceCode && state == fSourceCodeState)
 		return;
@@ -34,14 +35,20 @@ Function::SetSourceCode(SourceCode* source, function_source_state state)
 	fSourceCode = source;
 	fSourceCodeState = state;
 
-	if (fSourceCode != NULL)
+	if (fSourceCode != NULL) {
 		fSourceCode->AddReference();
 
-	// notify listeners
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			Listener* listener = it.Next();) {
-		listener->FunctionSourceCodeChanged(this);
+		// unset all instances' source codes
+		fNotificationsDisabled++;
+		for (FunctionInstanceList::Iterator it = fInstances.GetIterator();
+				FunctionInstance* instance = it.Next();) {
+			instance->SetSourceCode(NULL, FUNCTION_SOURCE_NOT_LOADED);
+		}
+		fNotificationsDisabled--;
 	}
+
+	// notify listeners
+	NotifySourceCodeChanged();
 }
 
 
@@ -59,11 +66,9 @@ Function::RemoveListener(Listener* listener)
 }
 
 
-#include <stdio.h>
 void
 Function::AddInstance(FunctionInstance* instance)
 {
-printf("    %p: added %p\n", this, instance);
 	fInstances.Add(instance);
 }
 
@@ -71,8 +76,20 @@ printf("    %p: added %p\n", this, instance);
 void
 Function::RemoveInstance(FunctionInstance* instance)
 {
-printf("    %p: removed %p\n", this, instance);
 	fInstances.Remove(instance);
+}
+
+
+void
+Function::NotifySourceCodeChanged()
+{
+	if (fNotificationsDisabled > 0)
+		return;
+
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->FunctionSourceCodeChanged(this);
+	}
 }
 
 

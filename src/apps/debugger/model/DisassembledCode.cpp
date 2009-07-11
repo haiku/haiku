@@ -43,6 +43,20 @@ DisassembledCode::~DisassembledCode()
 }
 
 
+bool
+DisassembledCode::Lock()
+{
+	// We're immutable, so no locking required.
+	return true;
+}
+
+
+void
+DisassembledCode::Unlock()
+{
+}
+
+
 int32
 DisassembledCode::CountLines() const
 {
@@ -80,17 +94,32 @@ DisassembledCode::GetSourceFile() const
 }
 
 
-status_t
-DisassembledCode::GetStatementAtLocation(const SourceLocation& location,
-	Statement*& _statement)
+Statement*
+DisassembledCode::StatementAtLocation(const SourceLocation& location) const
 {
 	Line* line = fLines.ItemAt(location.Line());
-	if (line == NULL || line->statement == NULL)
-		return B_ENTRY_NOT_FOUND;
+	return line != NULL ? line->statement : NULL;
+}
 
-	_statement = line->statement;
-	_statement->AcquireReference();
-	return B_OK;
+
+Statement*
+DisassembledCode::StatementAtAddress(target_addr_t address) const
+{
+	return fStatements.BinarySearchByKey(address, &_CompareAddressStatement);
+}
+
+
+TargetAddressRange
+DisassembledCode::StatementAddressRange() const
+{
+	if (fStatements.IsEmpty())
+		return TargetAddressRange();
+
+	ContiguousStatement* first = fStatements.ItemAt(0);
+	ContiguousStatement* last
+		= fStatements.ItemAt(fStatements.CountItems() - 1);
+	return TargetAddressRange(first->AddressRange().Start(),
+		last->AddressRange().End());
 }
 
 

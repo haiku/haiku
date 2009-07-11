@@ -11,15 +11,7 @@
 #include "FunctionInstance.h"
 
 
-enum function_source_state {
-	FUNCTION_SOURCE_NOT_LOADED,
-	FUNCTION_SOURCE_LOADING,
-	FUNCTION_SOURCE_LOADED,
-	FUNCTION_SOURCE_UNAVAILABLE
-};
-
-
-class SourceCode;
+class FileSourceCode;
 
 
 class Function : public Referenceable, public HashTableLink<Function> {
@@ -49,10 +41,10 @@ public:
 										->GetSourceLocation(); }
 
 			// mutable attributes follow (locking required)
-			SourceCode*			GetSourceCode() const	{ return fSourceCode; }
+			FileSourceCode*		GetSourceCode() const	{ return fSourceCode; }
 			function_source_state SourceCodeState() const
 									{ return fSourceCodeState; }
-			void				SetSourceCode(SourceCode* source,
+			void				SetSourceCode(FileSourceCode* source,
 									function_source_state state);
 
 			void				AddListener(Listener* listener);
@@ -62,14 +54,17 @@ public:
 			void				AddInstance(FunctionInstance* instance);
 			void				RemoveInstance(FunctionInstance* instance);
 
+			void				NotifySourceCodeChanged();
+
 private:
 			typedef DoublyLinkedList<Listener> ListenerList;
 
 private:
 			FunctionInstanceList fInstances;
-			SourceCode*			fSourceCode;
+			FileSourceCode*		fSourceCode;
 			function_source_state fSourceCodeState;
 			ListenerList		fListeners;
+			int32				fNotificationsDisabled;
 };
 
 

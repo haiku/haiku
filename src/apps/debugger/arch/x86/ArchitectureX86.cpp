@@ -271,7 +271,7 @@ ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
 
 status_t
 ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
-	const void* buffer, size_t bufferSize, SourceCode*& _sourceCode)
+	const void* buffer, size_t bufferSize, DisassembledCode*& _sourceCode)
 {
 	DisassembledCode* source = new(std::nothrow) DisassembledCode;
 	if (source == NULL)

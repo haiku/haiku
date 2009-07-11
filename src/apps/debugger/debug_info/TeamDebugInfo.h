@@ -6,6 +6,8 @@
 #define TEAM_DEBUG_INFO_H
 
 
+#include <Locker.h>
+
 #include <ObjectList.h>
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
@@ -15,12 +17,15 @@
 
 class Architecture;
 class DebuggerInterface;
+class DisassembledCode;
 class FileManager;
+class FileSourceCode;
 class Function;
 class FunctionInstance;
 class ImageDebugInfo;
 class ImageInfo;
 class LocatableFile;
+class SourceCode;
 class SourceLocation;
 class SpecificTeamDebugInfo;
 
@@ -39,6 +44,15 @@ public:
 									LocatableFile* imageFile,
 									ImageDebugInfo*& _imageDebugInfo);
 
+			status_t			LoadSourceCode(LocatableFile* file,
+									FileSourceCode*& _sourceCode);
+										// returns reference
+			status_t			DisassembleFunction(
+									FunctionInstance* functionInstance,
+									DisassembledCode*& _sourceCode);
+										// returns reference
+
+
 			// team is locked
 			status_t			AddImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
@@ -54,6 +68,7 @@ private:
 			struct SourceFileHashDefinition;
 
 			typedef BObjectList<SpecificTeamDebugInfo> SpecificInfoList;
+			typedef BObjectList<ImageDebugInfo> ImageList;
 			typedef OpenHashTable<FunctionHashDefinition> FunctionTable;
 			typedef OpenHashTable<SourceFileHashDefinition> SourceFileTable;
 
@@ -62,10 +77,12 @@ private:
 			void				_RemoveFunction(Function* function);
 
 private:
+			BLocker				fLock;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			FileManager*		fFileManager;
 			SpecificInfoList	fSpecificInfos;
+			ImageList			fImages;
 			FunctionTable*		fFunctions;
 			SourceFileTable*	fSourceFiles;
 };

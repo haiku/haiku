@@ -6,6 +6,9 @@
 #define FILE_SOURCE_CODE_H
 
 
+#include <Locker.h>
+
+
 #include "Array.h"
 #include "SourceCode.h"
 
@@ -24,6 +27,9 @@ public:
 			status_t			AddSourceLocation(
 									const SourceLocation& location);
 
+	virtual	bool				Lock();
+	virtual	void				Unlock();
+
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
@@ -34,16 +40,13 @@ public:
 
 	virtual	LocatableFile*		GetSourceFile() const;
 
-	virtual	status_t			GetStatementAtLocation(
-									const SourceLocation& location,
-									Statement*& _statement);
-
 private:
 			int32				_FindSourceLocationIndex(
 									const SourceLocation& location,
 									bool& _foundMatch) const;
 
 private:
+			BLocker				fLock;
 			LocatableFile*		fFile;
 			SourceFile*			fSourceFile;
 			Array<SourceLocation> fSourceLocations;

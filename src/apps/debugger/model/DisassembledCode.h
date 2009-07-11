@@ -20,6 +20,9 @@ public:
 								DisassembledCode();
 								~DisassembledCode();
 
+	virtual	bool				Lock();
+	virtual	void				Unlock();
+
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
 
@@ -30,9 +33,10 @@ public:
 
 	virtual	LocatableFile*		GetSourceFile() const;
 
-	virtual	status_t			GetStatementAtLocation(
-									const SourceLocation& location,
-									Statement*& _statement);
+			Statement*			StatementAtAddress(target_addr_t address) const;
+			Statement*			StatementAtLocation(
+									const SourceLocation& location) const;
+			TargetAddressRange	StatementAddressRange() const;
 
 public:
 			bool				AddCommentLine(const BString& line);

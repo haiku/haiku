@@ -18,11 +18,12 @@
 #include <AutoLocker.h>
 
 #include "CpuState.h"
+#include "DisassembledCode.h"
+#include "FileSourceCode.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "MessageCodes.h"
 #include "RegisterView.h"
-#include "SourceCode.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
 
@@ -505,6 +506,8 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 
 		Function* function = fActiveFunction->GetFunction();
 		sourceCode = function->GetSourceCode();
+		if (sourceCode == NULL)
+			sourceCode = fActiveFunction->GetSourceCode();
 		sourceCodeReference.SetTo(sourceCode);
 
 		// If the source code is not loaded yet, request it.
@@ -703,6 +706,8 @@ TeamWindow::_HandleSourceCodeChanged()
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
+	if (sourceCode == NULL)
+		sourceCode = fActiveFunction->GetSourceCode();
 	Reference<SourceCode> sourceCodeReference(sourceCode);
 
 	locker.Unlock();

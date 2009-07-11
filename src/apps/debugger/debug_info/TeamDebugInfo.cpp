@@ -11,12 +11,18 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 
+#include "Architecture.h"
 #include "DebuggerTeamDebugInfo.h"
+#include "DisassembledCode.h"
 #include "DwarfTeamDebugInfo.h"
+#include "FileManager.h"
+#include "FileSourceCode.h"
 #include "Function.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
+#include "SourceFile.h"
 #include "SpecificImageDebugInfo.h"
 #include "StringUtils.h"
 
@@ -76,13 +82,15 @@ struct TeamDebugInfo::FunctionHashDefinition {
 struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
 	SourceFileEntry(LocatableFile* sourceFile)
 		:
-		fSourceFile(sourceFile)
+		fSourceFile(sourceFile),
+		fSourceCode(NULL)
 	{
 		fSourceFile->AcquireReference();
 	}
 
 	~SourceFileEntry()
 	{
+		SetSourceCode(NULL);
 		fSourceFile->ReleaseReference();
 	}
 
@@ -95,6 +103,26 @@ struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
 	{
 		return fSourceFile;
 	}
+
+	FileSourceCode* GetSourceCode() const
+	{
+		return fSourceCode;
+	}
+
+	void SetSourceCode(FileSourceCode* sourceCode)
+	{
+		if (sourceCode == fSourceCode)
+			return;
+
+		if (fSourceCode != NULL)
+			fSourceCode->ReleaseReference();
+
+		fSourceCode = sourceCode;
+
+		if (fSourceCode != NULL)
+			fSourceCode->AcquireReference();
+	}
+
 
 	bool IsUnused() const
 	{
@@ -162,6 +190,7 @@ private:
 
 private:
 	LocatableFile*	fSourceFile;
+	FileSourceCode*	fSourceCode;
 	FunctionList	fFunctions;
 };
 
@@ -201,6 +230,7 @@ struct TeamDebugInfo::SourceFileHashDefinition {
 TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
 	Architecture* architecture, FileManager* fileManager)
 	:
+	fLock("team debug info"),
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
 	fFileManager(fileManager),
@@ -240,12 +270,17 @@ TeamDebugInfo::~TeamDebugInfo()
 status_t
 TeamDebugInfo::Init()
 {
+	// check the lock
+	status_t error = fLock.InitCheck();
+	if (error != B_OK)
+		return error;
+
 	// create function hash table
 	fFunctions = new(std::nothrow) FunctionTable;
 	if (fFunctions == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fFunctions->Init();
+	error = fFunctions->Init();
 	if (error != B_OK)
 		return error;
 
@@ -324,12 +359,103 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 }
 
 
-#include <stdio.h>
+status_t
+TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
+{
+	AutoLocker<BLocker> locker(fLock);
+
+	// If we don't know the source file, there's nothing we can do.
+	SourceFileEntry* entry = fSourceFiles->Lookup(file);
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// the source might already be loaded
+	FileSourceCode* sourceCode = entry->GetSourceCode();
+	if (sourceCode != NULL) {
+		sourceCode->AcquireReference();
+		_sourceCode = sourceCode;
+		return B_OK;
+	}
+
+	// no source code yet
+//	locker.Unlock();
+	// TODO: It would be nice to unlock here, but we need to iterate through
+	// the images below. We could clone the list, acquire references, and
+	// unlock. Then we have to compare the list with the then current list when
+	// we're done loading.
+
+	// load the source file
+	SourceFile* sourceFile;
+	status_t error = fFileManager->LoadSourceFile(file, sourceFile);
+	if (error != B_OK)
+		return error;
+
+	// create the source code
+	sourceCode = new(std::nothrow) FileSourceCode(file, sourceFile);
+	sourceFile->ReleaseReference();
+	if (sourceCode == NULL)
+		return B_NO_MEMORY;
+	Reference<FileSourceCode> sourceCodeReference(sourceCode, true);
+
+	error = sourceCode->Init();
+	if (error != B_OK)
+		return error;
+
+	// Iterate through all images that know the source file and ask them to add
+	// information.
+	bool anyInfo = false;
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = fImages.ItemAt(i); i++)
+		anyInfo |= imageDebugInfo->AddSourceCodeInfo(file, sourceCode) == B_OK;
+
+	if (!anyInfo)
+		return B_ENTRY_NOT_FOUND;
+
+	entry->SetSourceCode(sourceCode);
+
+	_sourceCode = sourceCodeReference.Detach();
+	return B_OK;
+}
+
+
+status_t
+TeamDebugInfo::DisassembleFunction(FunctionInstance* functionInstance,
+	DisassembledCode*& _sourceCode)
+{
+	// allocate a buffer for the function code
+	static const target_size_t kMaxBufferSize = 64 * 1024;
+	target_size_t bufferSize = std::min(functionInstance->Size(),
+		kMaxBufferSize);
+	void* buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+
+	// read the function code
+	FunctionDebugInfo* functionDebugInfo
+		= functionInstance->GetFunctionDebugInfo();
+	ssize_t bytesRead = functionDebugInfo->GetSpecificImageDebugInfo()
+		->ReadCode(functionInstance->Address(), buffer, bufferSize);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	return fArchitecture->DisassembleCode(functionDebugInfo, buffer, bytesRead,
+		_sourceCode);
+}
+
+
 status_t
 TeamDebugInfo::AddImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 {
 printf("TeamDebugInfo::AddImageDebugInfo(%p)\n", imageDebugInfo);
+	AutoLocker<BLocker> locker(fLock);
+		// We have both locks now, so that for read-only access either lock
+		// suffices.
+
+	if (!fImages.AddItem(imageDebugInfo))
+		return B_NO_MEMORY;
+
 	// Match all of the image debug info's functions instances with functions.
+	BObjectList<SourceFileEntry> sourceFileEntries;
 	for (int32 i = 0;
 		FunctionInstance* instance = imageDebugInfo->FunctionAt(i); i++) {
 		// lookup the function or create it, if it doesn't exist yet
@@ -339,6 +465,15 @@ printf("TeamDebugInfo::AddImageDebugInfo(%p)\n", imageDebugInfo);
 printf("  adding instance %p to existing function %p\n", instance, function);
 			function->AddInstance(instance);
 			instance->SetFunction(function);
+
+			// The new image debug info might have additional information about
+			// the source file of the function, so remember the source file
+			// entry.
+			if (LocatableFile* sourceFile = function->SourceFile()) {
+				SourceFileEntry* entry = fSourceFiles->Lookup(sourceFile);
+				if (entry != NULL && entry->GetSourceCode() != NULL)
+					sourceFileEntries.AddItem(entry);
+			}
 		} else {
 			function = new(std::nothrow) Function;
 			if (function == NULL) {
@@ -361,6 +496,19 @@ printf("  adding instance %p to new function %p\n", instance, function);
 		}
 	}
 
+	// update the source files the image debug info knows about
+	for (int32 i = 0; SourceFileEntry* entry = sourceFileEntries.ItemAt(i);
+			i++) {
+		FileSourceCode* sourceCode = entry->GetSourceCode();
+		sourceCode->Lock();
+		if (imageDebugInfo->AddSourceCodeInfo(entry->SourceFile(),
+				sourceCode) == B_OK) {
+			// TODO: Notify interesting parties! Iterate through all functions
+			// for this source file?
+		}
+		sourceCode->Unlock();
+	}
+
 	return B_OK;
 }
 
@@ -368,6 +516,10 @@ printf("  adding instance %p to new function %p\n", instance, function);
 void
 TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 {
+	AutoLocker<BLocker> locker(fLock);
+		// We have both locks now, so that for read-only access either lock
+		// suffices.
+
 	// Remove the functions from all of the image debug info's functions
 	// instances.
 	for (int32 i = 0;
@@ -390,6 +542,8 @@ TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 				// reference to the function.
 		}
 	}
+
+	fImages.RemoveItem(imageDebugInfo);
 }
 
 

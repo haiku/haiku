@@ -36,6 +36,8 @@ public:
 									{ return fUserBreakpoints.Head(); }
 			UserBreakpointInstance* LastUserBreakpoint() const
 									{ return fUserBreakpoints.Tail(); }
+			const UserBreakpointInstanceList& UserBreakpoints() const
+									{ return fUserBreakpoints; }
 
 			void				AddUserBreakpoint(
 									UserBreakpointInstance* instance);

@@ -15,6 +15,7 @@
 
 FileSourceCode::FileSourceCode(LocatableFile* file, SourceFile* sourceFile)
 	:
+	fLock("source code"),
 	fFile(file),
 	fSourceFile(sourceFile)
 {
@@ -33,7 +34,7 @@ FileSourceCode::~FileSourceCode()
 status_t
 FileSourceCode::Init()
 {
-	return B_OK;
+	return fLock.InitCheck();
 }
 
 
@@ -47,6 +48,20 @@ FileSourceCode::AddSourceLocation(const SourceLocation& location)
 		return B_OK;
 
 	return fSourceLocations.Insert(location, index) ? B_OK : B_NO_MEMORY;
+}
+
+
+bool
+FileSourceCode::Lock()
+{
+	return fLock.Lock();
+}
+
+
+void
+FileSourceCode::Unlock()
+{
+	fLock.Unlock();
 }
 
 
@@ -92,14 +107,6 @@ LocatableFile*
 FileSourceCode::GetSourceFile() const
 {
 	return fFile;
-}
-
-
-status_t
-FileSourceCode::GetStatementAtLocation(const SourceLocation& location,
-	Statement*& _statement)
-{
-	return B_UNSUPPORTED;
 }
 
 

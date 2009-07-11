@@ -31,8 +31,6 @@ public:
 									CpuState* cpuState,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
-	virtual	status_t			LoadSourceCode(FunctionDebugInfo* function,
-									SourceCode*& _sourceCode);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement);
@@ -40,6 +38,12 @@ public:
 									FunctionDebugInfo* function,
 									const SourceLocation& sourceLocation,
 									Statement*& _statement);
+
+	virtual	ssize_t				ReadCode(target_addr_t address, void* buffer,
+									size_t size);
+
+	virtual	status_t			AddSourceCodeInfo(LocatableFile* file,
+									FileSourceCode* sourceCode);
 
 private:
 	static	int					_CompareSymbols(const SymbolInfo* a,

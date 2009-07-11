@@ -35,7 +35,7 @@ public:
 
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
-									SourceCode*& _sourceCode);
+									DisassembledCode*& _sourceCode);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement);

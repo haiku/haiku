@@ -489,15 +489,27 @@ TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
 
 	// mark loading
 	AutoLocker< ::Team> locker(fTeam);
-	if (function->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
+
+	if (functionInstance->SourceCodeState() != FUNCTION_SOURCE_NOT_LOADED)
 		return;
-	function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
+	if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED)
+		return;
+
+	functionInstance->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
+
+	bool loadForFunction = false;
+	if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED) {
+		loadForFunction = true;
+		function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
+	}
+
 	locker.Unlock();
 
 	// schedule the job
 	if (fWorker->ScheduleJob(
 			new(std::nothrow) LoadSourceCodeJob(fDebuggerInterface,
-				fDebuggerInterface->GetArchitecture(), fTeam, function),
+				fDebuggerInterface->GetArchitecture(), fTeam, functionInstance,
+					loadForFunction),
 			this) != B_OK) {
 		// scheduling failed -- mark unavailable
 		locker.Lock();

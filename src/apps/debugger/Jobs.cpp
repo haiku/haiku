@@ -12,6 +12,8 @@
 #include "Architecture.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "DisassembledCode.h"
+#include "FileSourceCode.h"
 #include "Function.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
@@ -319,61 +321,73 @@ LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
 
 LoadSourceCodeJob::LoadSourceCodeJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	Team* team, Function* function)
+	Team* team, FunctionInstance* functionInstance, bool loadForFunction)
 	:
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
 	fTeam(team),
-	fFunction(function)
+	fFunctionInstance(functionInstance),
+	fLoadForFunction(loadForFunction)
 {
-	fFunction->AddReference();
+	fFunctionInstance->AddReference();
 }
 
 
 LoadSourceCodeJob::~LoadSourceCodeJob()
 {
-	fFunction->RemoveReference();
+	fFunctionInstance->RemoveReference();
 }
 
 
 JobKey
 LoadSourceCodeJob::Key() const
 {
-	return JobKey(fFunction, JOB_TYPE_LOAD_SOURCE_CODE);
+	return JobKey(fFunctionInstance, JOB_TYPE_LOAD_SOURCE_CODE);
 }
 
 
 status_t
 LoadSourceCodeJob::Do()
 {
-	// Get the function debug info for an instance which we can use to load the
-	// source code.
+	// if requested, try loading the source code for the function
+	Function* function = fFunctionInstance->GetFunction();
+	if (fLoadForFunction) {
+		FileSourceCode* sourceCode;
+		status_t error = fTeam->DebugInfo()->LoadSourceCode(
+			function->SourceFile(), sourceCode);
+
+		AutoLocker<Team> locker(fTeam);
+
+		if (error == B_OK) {
+			function->SetSourceCode(sourceCode, FUNCTION_SOURCE_LOADED);
+			sourceCode->RemoveReference();
+			return B_OK;
+		}
+
+		function->SetSourceCode(NULL, FUNCTION_SOURCE_UNAVAILABLE);
+	}
+
+	// Only try to load the function instance code, if it's not overridden yet.
 	AutoLocker<Team> locker(fTeam);
-
-	status_t error = B_OK;
-	FunctionDebugInfo* functionDebugInfo = NULL;
-	if (FunctionInstance* instance = fFunction->FirstInstance()) {
-		functionDebugInfo = instance->GetFunctionDebugInfo();
-	} else
-		error = B_ENTRY_NOT_FOUND;
-	Reference<FunctionDebugInfo> functionDebugInfoReference(functionDebugInfo);
-
+	if (fFunctionInstance->SourceCodeState() != FUNCTION_SOURCE_LOADING)
+		return B_OK;
 	locker.Unlock();
 
-	// load the source code, if we can
-	SourceCode* sourceCode = NULL;
-	if (error == B_OK) {
-		error = functionDebugInfo->GetSpecificImageDebugInfo()->LoadSourceCode(
-			functionDebugInfo, sourceCode);
-	}
+	// disassemble the function
+	DisassembledCode* sourceCode = NULL;
+	status_t error = fTeam->DebugInfo()->DisassembleFunction(fFunctionInstance,
+		sourceCode);
 
 	// set the result
 	locker.Lock();
 	if (error == B_OK) {
-		fFunction->SetSourceCode(sourceCode, FUNCTION_SOURCE_LOADED);
-		sourceCode->RemoveReference();
+		if (fFunctionInstance->SourceCodeState() == FUNCTION_SOURCE_LOADING) {
+			fFunctionInstance->SetSourceCode(sourceCode,
+				FUNCTION_SOURCE_LOADED);
+			sourceCode->RemoveReference();
+		}
 	} else
-		fFunction->SetSourceCode(NULL, FUNCTION_SOURCE_UNAVAILABLE);
+		fFunctionInstance->SetSourceCode(NULL, FUNCTION_SOURCE_UNAVAILABLE);
 
 	return error;
 }

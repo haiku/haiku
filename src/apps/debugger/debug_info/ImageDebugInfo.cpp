@@ -96,6 +96,23 @@ ImageDebugInfo::FunctionAtAddress(target_addr_t address) const
 }
 
 
+status_t
+ImageDebugInfo::AddSourceCodeInfo(LocatableFile* file,
+	FileSourceCode* sourceCode) const
+{
+	bool addedAny = false;
+	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
+			= fSpecificInfos.ItemAt(i); i++) {
+		status_t error = specificInfo->AddSourceCodeInfo(file, sourceCode);
+		if (error == B_NO_MEMORY)
+			return error;
+		addedAny |= error == B_OK;
+	}
+
+	return addedAny ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
 /*static*/ int
 ImageDebugInfo::_CompareFunctions(const FunctionInstance* a,
 	const FunctionInstance* b)

@@ -13,6 +13,7 @@ class Architecture;
 class CpuState;
 class DebuggerInterface;
 class Function;
+class FunctionInstance;
 class Image;
 class StackFrame;
 class Team;
@@ -113,7 +114,8 @@ public:
 								LoadSourceCodeJob(
 									DebuggerInterface* debuggerInterface,
 									Architecture* architecture, Team* team,
-									Function* function);
+									FunctionInstance* functionInstance,
+									bool loadForFunction);
 	virtual						~LoadSourceCodeJob();
 
 	virtual	JobKey				Key() const;
@@ -123,7 +125,8 @@ private:
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			Team*				fTeam;
-			Function*			fFunction;
+			FunctionInstance*	fFunctionInstance;
+			bool				fLoadForFunction;
 };
 
 

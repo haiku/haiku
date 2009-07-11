@@ -88,29 +88,6 @@ DebuggerImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 
 
 status_t
-DebuggerImageDebugInfo::LoadSourceCode(FunctionDebugInfo* function,
-	SourceCode*& _sourceCode)
-{
-	// allocate a buffer for the function code
-	static const target_size_t kMaxBufferSize = 64 * 1024;
-	target_size_t bufferSize = std::min(function->Size(), kMaxBufferSize);
-	void* buffer = malloc(bufferSize);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-	MemoryDeleter bufferDeleter(buffer);
-
-	// read the function code
-	ssize_t bytesRead = fDebuggerInterface->ReadMemory(function->Address(),
-		buffer, bufferSize);
-	if (bytesRead < 0)
-		return bytesRead;
-
-	return fArchitecture->DisassembleCode(function, buffer, bytesRead,
-		_sourceCode);
-}
-
-
-status_t
 DebuggerImageDebugInfo::GetStatement(FunctionDebugInfo* function,
 	target_addr_t address, Statement*& _statement)
 {
@@ -124,6 +101,22 @@ DebuggerImageDebugInfo::GetStatementAtSourceLocation(
 	Statement*& _statement)
 {
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+ssize_t
+DebuggerImageDebugInfo::ReadCode(target_addr_t address, void* buffer,
+	size_t size)
+{
+	return fDebuggerInterface->ReadMemory(address, buffer, size);
+}
+
+
+status_t
+DebuggerImageDebugInfo::AddSourceCodeInfo(LocatableFile* file,
+	FileSourceCode* sourceCode)
+{
+	return B_UNSUPPORTED;
 }
 
 

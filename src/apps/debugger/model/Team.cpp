@@ -11,10 +11,12 @@
 
 #include <AutoLocker.h>
 
+#include "DisassembledCode.h"
 #include "Function.h"
 #include "ImageDebugInfo.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
+#include "Statement.h"
 #include "TeamDebugInfo.h"
 
 
@@ -236,12 +238,23 @@ printf("  -> no function instance\n");
 		return B_ENTRY_NOT_FOUND;
 }
 
+	// If the function instance has disassembled code attached, we can get the
+	// statement directly.
+	if (DisassembledCode* code = functionInstance->GetSourceCode()) {
+		Statement* statement = code->StatementAtAddress(address);
+		if (statement != NULL) {
+			statement->AcquireReference();
+			_statement = statement;
+			_function = functionInstance;
+			return B_OK;
+		}
+	}
+
 	// get the statement from the image debug info
 	FunctionDebugInfo* functionDebugInfo
 		= functionInstance->GetFunctionDebugInfo();
 	status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
 		->GetStatement(functionDebugInfo, address, _statement);
-		// TODO: Provide the corresponding SourceCode, if available!
 	if (error != B_OK)
 {
 printf("  -> no statement from the specific image debug info\n");
@@ -259,9 +272,15 @@ Team::GetStatementAtSourceLocation(SourceCode* sourceCode,
 {
 printf("Team::GetStatementAtSourceLocation(%p, (%ld, %ld))\n", sourceCode, location.Line(), location.Column());
 	// If we're lucky the source code can provide us with a statement.
-	status_t error = sourceCode->GetStatementAtLocation(location, _statement);
-	if (error == B_OK)
-		return error;
+	if (DisassembledCode* code = dynamic_cast<DisassembledCode*>(sourceCode)) {
+		Statement* statement = code->StatementAtLocation(location);
+		if (statement == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		statement->AcquireReference();
+		_statement = statement;
+		return B_OK;
+	}
 
 	// Go the long and stony way over the source file and the team debug info.
 	// get the source file for the source code
