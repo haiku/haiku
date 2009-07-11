@@ -1,6 +1,7 @@
 /*
+ * Copyright 2009, Bryce Groff, bgroff@hawaii.edu.
  * Copyright 2004-2008, Haiku, Inc. All rights reserved.
- * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -57,7 +58,7 @@ KPartition::KPartition(partition_id id)
 	  fAlgorithmData(0),
 	  fReferenceCount(0),
 	  fObsolete(false),
-	  fPublished(false)
+	  fPublishedName(NULL)
 {
 	fPartitionData.id = id >= 0 ? id : _NextID();
 	fPartitionData.offset = 0;
@@ -179,17 +180,14 @@ KPartition::Open(int flags, int *fd)
 status_t
 KPartition::PublishDevice()
 {
-	if (fPublished)
+	if (fPublishedName)
 		return B_OK;
 
-	// get the path
-	KPath path;
-	status_t error = GetPath(&path);
-	if (error != B_OK) {
-		dprintf("KPartition::PublishDevice(): Failed to get path for partition "
-			"%ld: %s\n", ID(), strerror(error));
+	// get the name to publish
+	char buffer[B_FILE_NAME_LENGTH];
+	status_t error = GetFileName(buffer, B_FILE_NAME_LENGTH);
+	if (error != B_OK)
 		return error;
-	}
 
 	// prepare a partition_info
 	partition_info info;
@@ -198,20 +196,23 @@ KPartition::PublishDevice()
 	info.logical_block_size = BlockSize();
 	info.session = 0;
 	info.partition = ID();
-	if (strlcpy(info.device, Device()->Path(), B_PATH_NAME_LENGTH)
-		>= B_PATH_NAME_LENGTH) {
+	if (strlcpy(info.device, Device()->Path(), sizeof(info.device))
+			>= sizeof(info.device)) {
 		return B_NAME_TOO_LONG;
 	}
 
-	error = devfs_publish_partition(path.Path() + 5, &info);
-		// we need to remove the "/dev/" part from the path
+	fPublishedName = strdup(buffer);
+	if (!fPublishedName)
+		return B_NO_MEMORY;
+
+	error = devfs_publish_partition(buffer, &info);
 	if (error != B_OK) {
 		dprintf("KPartition::PublishDevice(): Failed to publish partition "
 			"%ld: %s\n", ID(), strerror(error));
+		free(fPublishedName);
+		fPublishedName = NULL;
 		return error;
 	}
-
-	fPublished = true;
 
 	return B_OK;
 }
@@ -220,27 +221,63 @@ KPartition::PublishDevice()
 status_t
 KPartition::UnpublishDevice()
 {
-	if (!fPublished)
+	if (!fPublishedName)
 		return B_OK;
 
-	// get the path
-	KPath path;
-	status_t error = GetPath(&path);
+	status_t error = devfs_unpublish_partition(Device()->Path(),
+		fPublishedName);
 	if (error != B_OK) {
-		dprintf("KPartition::UnpublishDevice(): Failed to get path for "
-			"partition %ld: %s\n", ID(), strerror(error));
+		dprintf("KPartition::UnpublishDevice(): Failed to unpublish partition "
+			"%ld: %s\n", ID(), strerror(error));
+	}
+
+	free(fPublishedName);
+	fPublishedName = NULL;
+
+	return error;
+}
+
+
+// RepublishDevice
+status_t
+KPartition::RepublishDevice()
+{
+	if (!fPublishedName)
+		return B_OK;
+
+	char newNameBuffer[B_FILE_NAME_LENGTH];
+	status_t error = GetFileName(newNameBuffer, B_FILE_NAME_LENGTH);
+	if (error != B_OK) {
+		UnpublishDevice();
 		return error;
 	}
 
-	fPublished = false;
+	if (strcmp(fPublishedName, newNameBuffer) == 0)
+		return B_OK;
 
-	error = devfs_unpublish_partition(path.Path() + 5);
-		// we need to remove the "/dev/" part from the path
-	if (error != B_OK) {
-		dprintf("KPartition::UnpublishDevice(): Failed to unpublish "
-			"partition %ld: %s\n", ID(), strerror(error));
+	for (int i = 0; i < CountChildren(); i++)
+		ChildAt(i)->RepublishDevice();
+
+	char* newName = strdup(newNameBuffer);
+	if (!newName) {
+		UnpublishDevice();
+		return B_NO_MEMORY;
 	}
-	return error;
+
+	error = devfs_rename_partition(Device()->Path(), fPublishedName, newName);
+
+	if (error != B_OK) {
+		free(newName);
+		UnpublishDevice();
+		dprintf("KPartition::RepublishDevice(): Failed to republish partition "
+			"%ld: %s\n", ID(), strerror(error));
+		return error;
+	}
+
+	free(fPublishedName);
+	fPublishedName = newName;
+
+	return B_OK;
 }
 
 
@@ -248,7 +285,7 @@ KPartition::UnpublishDevice()
 bool
 KPartition::IsPublished() const
 {
-	return fPublished;
+	return fPublishedName != NULL;
 }
 
 
@@ -607,7 +644,30 @@ KPartition::ID() const
 	return fPartitionData.id;
 }
 
-// GetPath
+
+status_t
+KPartition::GetFileName(char *buffer, size_t size) const
+{
+	// If the parent is the device, the name is the index of the partition.
+	if (Parent() == NULL || Parent()->IsDevice()) {
+		if (snprintf(buffer, size, "%ld", Index()) >= (int)size)
+			return B_NAME_TOO_LONG;
+		return B_OK;
+	}
+
+	// The partition has a non-device parent, so we append the index to the
+	// parent partition's name.
+	status_t error = Parent()->GetFileName(buffer, size);
+	if (error != B_OK)
+		return error;
+
+	size_t len = strlen(buffer);
+	if (snprintf(buffer + len, size - len, "_%ld", Index()) >= int(size - len))
+		return B_NAME_TOO_LONG;
+	return B_OK;
+}
+
+
 status_t
 KPartition::GetPath(KPath *path) const
 {
@@ -615,33 +675,21 @@ KPartition::GetPath(KPath *path) const
 	// Parent() is correct.
 	if (!path || path->InitCheck() != B_OK || !Parent() || Index() < 0)
 		return B_BAD_VALUE;
-	// get the parent's path
-	status_t error = Parent()->GetPath(path);
+
+	// init the path with the device path
+	status_t error = path->SetPath(Device()->Path());
 	if (error != B_OK)
 		return error;
-	if (Parent()->IsDevice()) {
-		// Our parent is a device, so we replace `raw' by our index.
-		const char *leaf = path->Leaf();
-		if (!leaf || strcmp(leaf, "raw") != B_OK)
-			return B_ERROR;
-		#ifdef _KERNEL_MODE
-			char indexBuffer[12];
-			snprintf(indexBuffer, sizeof(indexBuffer), "%ld", Index());
-		#else
-			const char *prefix = "haiku_";
-			char indexBuffer[strlen(prefix) + 12];
-			snprintf(indexBuffer, sizeof(indexBuffer), "%s%ld", prefix,
-				Index());
-		#endif
-		error = path->ReplaceLeaf(indexBuffer);
-	} else {
-		// Our parent is a normal partition, no device: Append our index.
-		char indexBuffer[13];
-		snprintf(indexBuffer, sizeof(indexBuffer), "_%ld", Index());
-		error = path->Append(indexBuffer, false);
-	}
+
+	// replace the leaf name with the partition's file name
+	char name[B_FILE_NAME_LENGTH];
+	error = GetFileName(name, sizeof(name));
+	if (error == B_OK)
+		error = path->ReplaceLeaf(name);
+
 	return error;
 }
+
 
 // SetVolumeID
 void
@@ -780,9 +828,11 @@ KPartition::AddChild(KPartition *partition, int32 index)
 			fChildren.Erase(index);
 			return B_NO_MEMORY;
 		}
+		// update siblings index's
 		partition->SetIndex(index);
-		_UpdateChildIndices(index);
+		_UpdateChildIndices(count, index);
 		fPartitionData.child_count++;
+
 		partition->SetParent(this);
 		partition->SetDevice(Device());
 
@@ -843,7 +893,7 @@ KPartition::RemoveChild(int32 index)
 			|| !fChildren.Erase(index)) {
 			return false;
 		}
-		_UpdateChildIndices(index + 1);
+		_UpdateChildIndices(index, fChildren.Count());
 		partition->SetIndex(-1);
 		fPartitionData.child_count--;
 		partition->SetParent(NULL);
@@ -1489,11 +1539,21 @@ KPartition::FireContentCookieChanged(void *cookie)
 
 // _UpdateChildIndices
 void
-KPartition::_UpdateChildIndices(int32 index)
+KPartition::_UpdateChildIndices(int32 start, int32 end)
 {
-	for (int32 i = index; i < fChildren.Count(); i++)
-		fChildren.ElementAt(i)->SetIndex(i);
+	if (start < end) {
+		for (int32 i = start; i < end; i++) {
+			fChildren.ElementAt(i)->SetIndex(i);
+			fChildren.ElementAt(i)->RepublishDevice();
+		}
+	} else {
+		for (int32 i = start; i > end; i--) {
+			fChildren.ElementAt(i)->SetIndex(i);
+			fChildren.ElementAt(i)->RepublishDevice();
+		}
+	}
 }
+
 
 // _NextID
 int32

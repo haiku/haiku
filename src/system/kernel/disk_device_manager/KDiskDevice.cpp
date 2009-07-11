@@ -1,4 +1,8 @@
-// KDiskDevice.cpp
+/*
+ * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <errno.h>
 #include <fcntl.h>
@@ -29,7 +33,7 @@ KDiskDevice::KDiskDevice(partition_id id)
 {
 	Unset();
 	fDevice = this;
-	fPublished = true;
+	fPublishedName = (char*)"raw";
 }
 
 // destructor
@@ -160,8 +164,8 @@ KDiskDevice::SetID(partition_id id)
 status_t
 KDiskDevice::PublishDevice()
 {
-	// PublishDevice() and UnpublishDevice() are no-ops for KDiskDevices,
-	// since they are always published.
+	// PublishDevice(), UnpublishDevice() and Republish are no-ops
+	// for KDiskDevices, since they are always published.
 	return B_OK;
 }
 
@@ -169,11 +173,19 @@ KDiskDevice::PublishDevice()
 status_t
 KDiskDevice::UnpublishDevice()
 {
-	// PublishDevice() and UnpublishDevice() are no-ops for KDiskDevices,
-	// since they are always published.
+	// PublishDevice(), UnpublishDevice() and Republish are no-ops
+	// for KDiskDevices, since they are always published.
 	return B_OK;
 }
 
+// RepublishDevice
+status_t
+KDiskDevice::RepublishDevice()
+{
+	// PublishDevice(), UnpublishDevice() and Republish are no-ops
+	// for KDiskDevices, since they are always published.
+	return B_OK;
+}
 
 // SetDeviceFlags
 void
@@ -268,6 +280,16 @@ KDiskDevice::Path() const
 {
 	return fDeviceData.path;
 }
+
+
+status_t
+KDiskDevice::GetFileName(char *buffer, size_t size) const
+{
+	if (strlcpy(buffer, "raw", size) >= size)
+		return B_NAME_TOO_LONG;
+	return B_OK;
+}
+
 
 // GetPath
 status_t

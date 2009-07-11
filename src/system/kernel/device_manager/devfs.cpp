@@ -321,7 +321,8 @@ devfs_find_in_dir(struct devfs_vnode* dir, const char* path)
 
 
 static status_t
-devfs_insert_in_dir(struct devfs_vnode* dir, struct devfs_vnode* vnode)
+devfs_insert_in_dir(struct devfs_vnode* dir, struct devfs_vnode* vnode,
+	bool notify = true)
 {
 	if (!S_ISDIR(dir->stream.type))
 		return B_BAD_VALUE;
@@ -347,17 +348,19 @@ devfs_insert_in_dir(struct devfs_vnode* dir, struct devfs_vnode* vnode)
 	vnode->parent = dir;
 	dir->modification_time = current_timespec();
 
-	notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name,
-		vnode->id);
-	notify_stat_changed(sDeviceFileSystem->id, dir->id,
-		B_STAT_MODIFICATION_TIME);
-
+	if (notify) {
+		notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name,
+			vnode->id);
+		notify_stat_changed(sDeviceFileSystem->id, dir->id,
+			B_STAT_MODIFICATION_TIME);
+	}
 	return B_OK;
 }
 
 
 static status_t
-devfs_remove_from_dir(struct devfs_vnode* dir, struct devfs_vnode* removeNode)
+devfs_remove_from_dir(struct devfs_vnode* dir, struct devfs_vnode* removeNode,
+	bool notify = true)
 {
 	struct devfs_vnode *vnode = dir->stream.u.dir.dir_head;
 	struct devfs_vnode *lastNode = NULL;
@@ -374,10 +377,12 @@ devfs_remove_from_dir(struct devfs_vnode* dir, struct devfs_vnode* removeNode)
 			vnode->dir_next = NULL;
 			dir->modification_time = current_timespec();
 
-			notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name,
-				vnode->id);
-			notify_stat_changed(sDeviceFileSystem->id, dir->id,
-				B_STAT_MODIFICATION_TIME);
+			if (notify) {
+				notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name,
+					vnode->id);
+				notify_stat_changed(sDeviceFileSystem->id, dir->id,
+					B_STAT_MODIFICATION_TIME);
+			}
 			return B_OK;
 		}
 	}
@@ -2026,30 +2031,43 @@ devfs_publish_file_device(const char *path, const char *filePath)
 
 
 extern "C" status_t
-devfs_unpublish_partition(const char *path)
+devfs_unpublish_partition(const char *devicePath, const char *name)
 {
-	return unpublish_node(sDeviceFileSystem, path, S_IFCHR);
+	// get the device node
+	devfs_vnode* deviceNode;
+	status_t status = get_node_for_path(sDeviceFileSystem, devicePath,
+		&deviceNode);
+	if (status != B_OK)
+		return status;
+
+	// get the partition node and temporarily increment its ref count
+	RecursiveLocker locker(sDeviceFileSystem->lock);
+	devfs_vnode* node = devfs_find_in_dir(deviceNode->parent, name);
+	if (node != NULL)
+		status = get_vnode(sDeviceFileSystem->volume, node->id, (void**)&node);
+	else
+		status = B_ENTRY_NOT_FOUND;
+	locker.Unlock();
+
+	// unpublish the partition node
+	if (status == B_OK) {
+		status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
+		put_vnode(sDeviceFileSystem->volume, node->id);
+	}
+
+	put_vnode(sDeviceFileSystem->volume, deviceNode->id);
+
+	return status;
 }
 
 
 extern "C" status_t
-devfs_publish_partition(const char* path, const partition_info* info)
+devfs_publish_partition(const char* name, const partition_info* info)
 {
-	if (path == NULL || info == NULL)
+	if (name == NULL || info == NULL)
 		return B_BAD_VALUE;
-
 	TRACE(("publish partition: %s (device \"%s\", offset %Ld, size %Ld)\n",
-		path, info->device, info->offset, info->size));
-
-	// the partition and device paths must be the same until the leaves
-	const char* lastPath = strrchr(path, '/');
-	const char* lastDevice = strrchr(info->device, '/');
-	if (lastPath == NULL || lastDevice == NULL)
-		return B_BAD_VALUE;
-
-	size_t length = lastDevice - (lastPath - path) - info->device;
-	if (strncmp(path, info->device + length, lastPath - path))
-		return B_BAD_VALUE;
+		name, info->device, info->offset, info->size));
 
 	devfs_vnode* device;
 	status_t status = get_node_for_path(sDeviceFileSystem, info->device,
@@ -2057,10 +2075,52 @@ devfs_publish_partition(const char* path, const partition_info* info)
 	if (status != B_OK)
 		return status;
 
-	status = add_partition(sDeviceFileSystem, device, lastPath + 1, *info);
+	status = add_partition(sDeviceFileSystem, device, name, *info);
 
 	put_vnode(sDeviceFileSystem->volume, device->id);
 	return status;
+}
+
+
+extern "C" status_t
+devfs_rename_partition(const char *devicePath, const char* oldName,
+	const char *newName)
+{
+	status_t status;
+	devfs_vnode *device, *node;
+	if (oldName == NULL || newName == NULL)
+		return B_BAD_VALUE;
+
+	status = get_node_for_path(sDeviceFileSystem, devicePath, &device);
+	if (status != B_OK)
+		return status;
+
+	RecursiveLocker locker(sDeviceFileSystem->lock);
+	node = devfs_find_in_dir(device->parent, oldName);
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// check if the new path already exists
+	if (devfs_find_in_dir(device->parent, newName))
+		return B_BAD_VALUE;
+
+	char *name = strdup(newName);
+	if (name == NULL)
+		return B_NO_MEMORY;
+
+	devfs_remove_from_dir(device->parent, node, false);
+
+	free(node->name);
+	node->name = name;
+
+	devfs_insert_in_dir(device->parent, node, false);
+
+	notify_entry_moved(sDeviceFileSystem->id, device->parent->id, oldName,
+		device->parent->id, newName, node->id);
+	notify_stat_changed(sDeviceFileSystem->id, device->parent->id,
+		B_STAT_MODIFICATION_TIME);
+
+	return B_OK;
 }
 
 

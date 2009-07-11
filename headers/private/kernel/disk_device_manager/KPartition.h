@@ -48,6 +48,7 @@ public:
 	virtual status_t Open(int flags, int *fd);
 	virtual status_t PublishDevice();
 	virtual status_t UnpublishDevice();
+	virtual status_t RepublishDevice();
 	bool IsPublished() const;
 
 	void SetBusy(bool busy);
@@ -106,6 +107,7 @@ public:
 	virtual void SetID(partition_id id);
 	partition_id ID() const;
 
+	virtual	status_t GetFileName(char* buffer, size_t size) const;
 	virtual status_t GetPath(KPath *path) const;
 		// no setter (see BDiskDevice) -- built on the fly
 
@@ -207,7 +209,7 @@ protected:
 	void FireContentCookieChanged(void *cookie);
 
 private:
-	void _UpdateChildIndices(int32 index);
+	void _UpdateChildIndices(int32 start, int32 end);
 	static int32 _NextID();
 
 protected:
@@ -226,7 +228,7 @@ protected:
 	uint32				fAlgorithmData;
 	int32				fReferenceCount;
 	bool				fObsolete;
-	bool				fPublished;
+	char				*fPublishedName;
 	static int32		fNextID;
 };
 

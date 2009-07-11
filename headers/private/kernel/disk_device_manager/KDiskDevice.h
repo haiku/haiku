@@ -45,6 +45,7 @@ public:
 
 	virtual status_t PublishDevice();
 	virtual status_t UnpublishDevice();
+	virtual status_t RepublishDevice();
 
 	void SetDeviceFlags(uint32 flags);	// comprises the ones below
 	uint32 DeviceFlags() const;
@@ -63,6 +64,7 @@ public:
 		// TODO: Remove this method or make it private. Once initialized the
 		// path must not be changed.
 	const char *Path() const;
+	virtual	status_t GetFileName(char* buffer, size_t size) const;
 	virtual status_t GetPath(KPath *path) const;
 
 	// File descriptor: Set only from a kernel thread, valid only for
