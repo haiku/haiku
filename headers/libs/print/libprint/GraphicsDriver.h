@@ -28,7 +28,7 @@ public:
 	GraphicsDriver(BMessage *, PrinterData *, const PrinterCap *);
 	virtual ~GraphicsDriver();
 	const JobData *getJobData(BFile *spoolFile);
-	BMessage *takeJob(BFile *spool, uint32 flags = 0);
+	BMessage *takeJob(BFile *spoolFile, uint32 flags = 0);
 	static BPoint getScale(int32 nup, BRect physicalRect, float scaling);
 	static BPoint getOffset(int32 nup, int index, JobData::Orientation orientation, const BPoint *scale, 
 		BRect scaledPhysicalRect, BRect scaledPrintableRect, BRect physicalRect);

@@ -67,7 +67,7 @@ static BRect RotateRect(BRect rect)
 }
 
 bool 
-GraphicsDriver::setupData(BFile *spool_file)
+GraphicsDriver::setupData(BFile *spoolFile)
 {
 	if (fOrgJobData != NULL) {
 		// already initialized
@@ -79,8 +79,8 @@ GraphicsDriver::setupData(BFile *spool_file)
 #else			
 	BPrintJob::print_file_header pfh;
 #endif
-	spool_file->Seek(0, SEEK_SET);
-	spool_file->Read(&pfh, sizeof(pfh));
+	spoolFile->Seek(0, SEEK_SET);
+	spoolFile->Read(&pfh, sizeof(pfh));
 
 	DBGMSG(("print_file_header::version = 0x%x\n",  pfh.version));
 	DBGMSG(("print_file_header::page_count = %d\n", pfh.page_count));
@@ -93,7 +93,7 @@ GraphicsDriver::setupData(BFile *spool_file)
 
 	fPageCount = (uint32) pfh.page_count;
 	BMessage *msg = new BMessage();
-	msg->Unflatten(spool_file);
+	msg->Unflatten(spoolFile);
 	fOrgJobData = new JobData(msg, fPrinterCap, JobData::kJobSettings);
 	DUMP_BMESSAGE(msg);
 	delete msg;
@@ -123,7 +123,7 @@ GraphicsDriver::setupData(BFile *spool_file)
 		fInternalCopies = 1;
 	}
 	
-	fSpoolMetaData = new SpoolMetaData(spool_file);
+	fSpoolMetaData = new SpoolMetaData(spoolFile);
 	return true;
 }
 
@@ -548,10 +548,10 @@ GraphicsDriver::getJobData(BFile *spoolFile)
 }
 
 bool 
-GraphicsDriver::printJob(BFile *spool_file)
+GraphicsDriver::printJob(BFile *spoolFile)
 {
 	bool success = true;
-	if (!setupData(spool_file)) {
+	if (!setupData(spoolFile)) {
 		// silently exit if there is nothing to print
 		return true;
 	}
@@ -563,7 +563,7 @@ GraphicsDriver::printJob(BFile *spool_file)
 	} else if (!fTransport->is_print_to_file_canceled()) {
 		BStopWatch stopWatch("printJob", !MEASURE_PRINT_JOB_TIME);
 		setupBitmap();
-		SpoolData spool_data(spool_file, fPageCount, fOrgJobData->getNup(), fOrgJobData->getReverse());
+		SpoolData spool_data(spoolFile, fPageCount, fOrgJobData->getNup(), fOrgJobData->getReverse());
 		success = startDoc();
 		if (success) {
 			fStatusWindow = new StatusWindow(
@@ -604,11 +604,11 @@ GraphicsDriver::printJob(BFile *spool_file)
 }
 
 BMessage *
-GraphicsDriver::takeJob(BFile* spool_file, uint32 flags)
+GraphicsDriver::takeJob(BFile* spoolFile, uint32 flags)
 {
 	fFlags = flags;
 	BMessage *msg;
-	if (printJob(spool_file)) {
+	if (printJob(spoolFile)) {
 		msg = new BMessage('okok');
 	} else {
 		msg = new BMessage('baad');
