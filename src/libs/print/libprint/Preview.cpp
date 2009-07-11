@@ -784,32 +784,38 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 	, fButtonBarHeight(0.0)
 {
 	BRect bounds(Bounds());
+
+	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL,
+					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+					B_PLAIN_BORDER);
+	AddChild(panel);
+
 	bounds.OffsetBy(10.0, 10.0);
 
 	fFirst = new BButton(bounds, "first", "First Page", new BMessage(MSG_FIRST_PAGE));
-	AddChild(fFirst);
+	panel->AddChild(fFirst);
 	fFirst->ResizeToPreferred();
 
 	bounds.OffsetBy(fFirst->Bounds().Width() + 10.0, 0.0);
 	fPrev = new BButton(bounds, "previous", "Previous Page", new BMessage(MSG_PREV_PAGE));
-	AddChild(fPrev);
+	panel->AddChild(fPrev);
 	fPrev->ResizeToPreferred();
 
 	bounds.OffsetBy(fPrev->Bounds().Width() + 10.0, 0.0);
 	fNext = new BButton(bounds, "next", "Next Page", new BMessage(MSG_NEXT_PAGE));
-	AddChild(fNext);
+	panel->AddChild(fNext);
 	fNext->ResizeToPreferred();
 
 	bounds.OffsetBy(fNext->Bounds().Width() + 10.0, 0.0);
 	fLast = new BButton(bounds, "last", "Last Page", new BMessage(MSG_LAST_PAGE));
-	AddChild(fLast);
+	panel->AddChild(fLast);
 	fLast->ResizeToPreferred();
 
 	bounds = fLast->Frame();
 	bounds.OffsetBy(fLast->Bounds().Width() + 10.0, 0.0);
 	fPageNumber = new BTextControl(bounds, "numOfPage", "99", "",
 		new BMessage(MSG_FIND_PAGE));
-	AddChild(fPageNumber);
+	panel->AddChild(fPageNumber);
 	fPageNumber->ResizeToPreferred();
 	fPageNumber->SetDivider(0.0);
 	fPageNumber->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
@@ -825,18 +831,18 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 
 	bounds.OffsetBy(fPageNumber->Bounds().Width() + 5.0, 0.0);
 	fPageText = new BStringView(bounds, "pageText", "");
-	AddChild(fPageText);
+	panel->AddChild(fPageText);
 	fPageText->ResizeTo(fPageText->StringWidth("of 99999 Pages"),
 		fFirst->Bounds().Height());
 
 	bounds.OffsetBy(fPageText->Bounds().Width() + 10.0, 0.0);
 	fZoomIn = new BButton(bounds, "zoomIn", "Zoom In", new BMessage(MSG_ZOOM_IN));
-	AddChild(fZoomIn);
+	panel->AddChild(fZoomIn);
 	fZoomIn->ResizeToPreferred();
 
 	bounds.OffsetBy(fZoomIn->Bounds().Width() + 10.0, 0.0);
 	fZoomOut = new BButton(bounds, "ZoomOut", "Zoom Out", new BMessage(MSG_ZOOM_OUT));
-	AddChild(fZoomOut);
+	panel->AddChild(fZoomOut);
 	fZoomOut->ResizeToPreferred();
 
 	fButtonBarHeight = fZoomOut->Frame().bottom + 10.0;
@@ -855,14 +861,14 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 
 		BButton *printJob = new BButton(BRect(), "printJob", "Print",
 			new BMessage(MSG_PRINT_JOB), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		AddChild(printJob);
+		panel->AddChild(printJob);
 		printJob->ResizeToPreferred();
 		printJob->MoveTo(bounds.right - (printJob->Bounds().Width() + 10.0),
 			bounds.bottom + 10.0);
 
 		BButton *cancelJob = new BButton(BRect(), "cancelJob", "Cancel",
 			new BMessage(MSG_CANCEL_JOB), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		AddChild(cancelJob);
+		panel->AddChild(cancelJob);
 		cancelJob->ResizeToPreferred();
 		cancelJob->MoveTo(printJob->Frame().left - (10.0 + cancelJob->Bounds().Width()),
 			bounds.bottom + 10.0);
@@ -877,7 +883,7 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 	fPreviewScroller = new BScrollView("PreviewScroller", fPreview, B_FOLLOW_ALL,
 		B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	fPreviewScroller->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fPreviewScroller);
+	panel->AddChild(fPreviewScroller);
 
 	if (fPreview->InitCheck() == B_OK) {
 		_ResizeToPage();
