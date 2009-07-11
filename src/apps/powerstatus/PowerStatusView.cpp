@@ -295,7 +295,7 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 	if (!fShowTime && fPercent >= 0)
 		snprintf(buffer, bufferLength, "%s%ld%%%s", open, fPercent, close);
 	else if (fShowTime && fTimeLeft >= 0) {
-		snprintf(buffer, bufferLength, "%s%ld:%ld%s",
+		snprintf(buffer, bufferLength, "%s%ld:%02ld%s",
 			open, fTimeLeft / 3600, (fTimeLeft / 60) % 60, close);
 	}
 }

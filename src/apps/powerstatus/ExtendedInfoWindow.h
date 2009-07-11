@@ -10,7 +10,7 @@
 #define EXTENDED_INFO_WINDOW_H
 
 #include <ObjectList.h>
-#include <StringView.h>
+#include <String.h>
 #include <View.h>
 #include <Window.h>
 
@@ -18,18 +18,40 @@
 #include "PowerStatusView.h"
 
 
+class FontString
+{
+public:
+					FontString();
+
+	const BFont*	font;
+	BString			string;	
+};
+
+
 class BatteryInfoView : public BView
 {
 	public:
-						BatteryInfoView(BRect frame, int32 resizingMode);
+						BatteryInfoView();
+						~BatteryInfoView();
 
 		virtual void	Update(battery_info& info,
 							acpi_extended_battery_info& extInfo);
 		virtual	void	Draw(BRect updateRect);
-	
+		virtual void	GetPreferredSize(float *width, float *height);
+		
 	private:
-		battery_info	fBatteryInfo;
-		acpi_extended_battery_info fBatteryExtendedInfo;
+		BSize			_MeasureString(const BString& string);
+		void			_FillStringList();
+		void			_AddToStringList(FontString* fontString);
+		void			_ClearStringList();
+
+		battery_info				fBatteryInfo;
+		acpi_extended_battery_info	fBatteryExtendedInfo;
+		
+		BSize						fPreferredSize;
+		
+		BObjectList<FontString>		fStringList;
+		BSize						fMaxStringSize;
 };
 
 
@@ -44,7 +66,7 @@ class ExtPowerStatusView : public PowerStatusView
 			
 		virtual	void	Draw(BRect updateRect);
 		virtual	void	MouseDown(BPoint where);
-	
+
 		virtual void	Select(bool select = true);
 		
 		// return true if it battery is in a none critical state

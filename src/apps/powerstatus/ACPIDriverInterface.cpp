@@ -76,26 +76,33 @@ Battery::InitCheck()
 
 
 status_t
-Battery::GetBatteryInfo(battery_info* info)
+Battery::ReadBatteryInfo()
 {
-	acpi_battery_info acpiInfo;
 	status_t status;
-	status = ioctl(fDriverHandler, GET_BATTERY_INFO, &acpiInfo,
+	status = ioctl(fDriverHandler, GET_BATTERY_INFO, &fCachedAcpiInfo,
 		sizeof(acpi_battery_info));
 	
 	if (status != B_OK)
 		return status;
 		
-	info->state = acpiInfo.state;
-	info->current_rate = acpiInfo.current_rate;
-	info->capacity = acpiInfo.capacity;
+	return B_OK;
+}
+
+
+status_t
+Battery::GetBatteryInfoCached(battery_info* info)
+{
+	info->state = fCachedAcpiInfo.state;
+	info->current_rate = fCachedAcpiInfo.current_rate;
+	info->capacity = fCachedAcpiInfo.capacity;
 	info->full_capacity = fExtendedBatteryInfo.last_full_charge;
-	fRateBuffer.AddRate(acpiInfo.current_rate);
-	if (acpiInfo.current_rate > 0)
-		info->time_left = 3600 * acpiInfo.capacity / fRateBuffer.GetMeanRate();
+	fRateBuffer.AddRate(fCachedAcpiInfo.current_rate);
+	if (fCachedAcpiInfo.current_rate > 0)
+		info->time_left = 3600 * fCachedAcpiInfo.capacity
+			/ fRateBuffer.GetMeanRate();
 	else
 		info->time_left = -1;
-	
+
 	return B_OK;
 }
 
@@ -125,8 +132,7 @@ Battery::_Init()
 	if (fInitStatus != B_OK)
 		return;
 	
-	acpi_battery_info info;
-	fInitStatus = ioctl(fDriverHandler, GET_BATTERY_INFO, &info,
+	fInitStatus = ioctl(fDriverHandler, GET_BATTERY_INFO, &fCachedAcpiInfo,
 		sizeof(acpi_battery_info));
 	if (fInitStatus != B_OK)
 		return;
@@ -158,12 +164,12 @@ ACPIDriverInterface::Connect()
 status_t
 ACPIDriverInterface::GetBatteryInfo(battery_info* info, int32 index)
 {
-	BAutolock autolock(fBatteryStatusLock);
+	BAutolock autolock(fInterfaceLocker);
 	if (index < 0 || index >= fDriverList.CountItems())
 		return B_ERROR;
 		
 	status_t status;
-	status = fDriverList.ItemAt(index)->GetBatteryInfo(info);
+	status = fDriverList.ItemAt(index)->GetBatteryInfoCached(info);
 	return status;
 }
 
@@ -172,7 +178,7 @@ status_t
 ACPIDriverInterface::GetExtendedBatteryInfo(acpi_extended_battery_info* info,
 	int32 index)
 {
-	BAutolock autolock(fBatteryStatusLock);
+	BAutolock autolock(fInterfaceLocker);
 	if (index < 0 || index >= fDriverList.CountItems())
 		return B_ERROR;
 		
@@ -190,6 +196,16 @@ ACPIDriverInterface::GetBatteryCount()
 }
 
 
+status_t
+ACPIDriverInterface::_ReadBatteryInfo()
+{
+	for (int i = 0; i < fDriverList.CountItems(); i++)
+		fDriverList.ItemAt(i)->ReadBatteryInfo();
+	
+	return B_OK;
+}
+
+
 void
 ACPIDriverInterface::_WatchPowerStatus()
 {
@@ -197,6 +213,7 @@ ACPIDriverInterface::_WatchPowerStatus()
 		// every two seconds
 
 	while (atomic_get(&fIsWatching) > 0) {
+		_ReadBatteryInfo();
 		Broadcast(kMsgUpdate);
 		snooze(kUpdateInterval);
 	}

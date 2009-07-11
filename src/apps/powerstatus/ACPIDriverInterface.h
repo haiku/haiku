@@ -14,6 +14,7 @@
 #include <Locker.h>
 #include <ObjectList.h>
 
+
 const int8 kRateBufferSize = 10;
 
 class RateBuffer
@@ -39,7 +40,9 @@ public:
 
 	status_t					InitCheck();
 
-	status_t 					GetBatteryInfo(battery_info* info);
+	// Read battery info and update the cache.
+	status_t 					ReadBatteryInfo();
+	status_t 					GetBatteryInfoCached(battery_info* info);
 	status_t 					GetExtendedBatteryInfo(
 									acpi_extended_battery_info* info);
 
@@ -53,6 +56,7 @@ private:
 	acpi_extended_battery_info	fExtendedBatteryInfo;
 	
 	RateBuffer					fRateBuffer;
+	acpi_battery_info			fCachedAcpiInfo;
 };
 
 
@@ -69,12 +73,15 @@ public:
 	virtual int32			GetBatteryCount();
 
 protected:
+	// Read the battery info from the hardware.
+	virtual status_t 		_ReadBatteryInfo();
+	
 	virtual void			_WatchPowerStatus();
 	virtual status_t		_FindDrivers(const char* path);
 
 	BObjectList<Battery>	fDriverList;
 	
-	BLocker					fBatteryStatusLock;
+	BLocker					fInterfaceLocker;
 };
 
 #endif

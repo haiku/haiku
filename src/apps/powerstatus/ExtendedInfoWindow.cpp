@@ -15,12 +15,28 @@
 #include <String.h>
 
 
-BatteryInfoView::BatteryInfoView(BRect frame, int32 resizingMode)
+FontString::FontString()
+{
+	font = be_plain_font;
+}
+
+
+const int kLineSpacing = 5;
+
+BatteryInfoView::BatteryInfoView()
 	:
-	BView(frame, "battery info view", resizingMode, B_WILL_DRAW |
-		B_FULL_UPDATE_ON_RESIZE)
+	BView("battery info view", B_WILL_DRAW |
+		B_FULL_UPDATE_ON_RESIZE),
+	fPreferredSize(200, 200),
+	fMaxStringSize(0, 0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+BatteryInfoView::~BatteryInfoView()
+{
+	_ClearStringList();
 }
 
 
@@ -29,6 +45,8 @@ BatteryInfoView::Update(battery_info& info, acpi_extended_battery_info& extInfo)
 {
 	fBatteryInfo = info;
 	fBatteryExtendedInfo = extInfo;
+	
+	_FillStringList();
 }
 
 
@@ -37,6 +55,50 @@ BatteryInfoView::Draw(BRect updateRect)
 {
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
+	BPoint point(10, 10);
+	
+	float space = _MeasureString("").height + kLineSpacing;
+
+	for (int i = 0; i < fStringList.CountItems(); i ++)
+	{
+		FontString* fontString = fStringList.ItemAt(i);
+		SetFont(fontString->font);
+		DrawString(fontString->string.String(), point);
+		point.y += space;
+	}	
+}		
+
+
+void
+BatteryInfoView::GetPreferredSize(float *width, float *height)
+{
+	*width = fPreferredSize.width;
+	*height = fPreferredSize.height;
+}
+
+
+BSize
+BatteryInfoView::_MeasureString(const BString& string)
+{
+	BFont font;
+	GetFont(&font);
+	BSize size;
+	
+	size.width = font.StringWidth(string);
+
+	font_height height;
+	font.GetHeight(&height);
+	size.height = height.ascent + height.descent;
+
+	return size;
+}
+
+
+void
+BatteryInfoView::_FillStringList()
+{
+	_ClearStringList();
+
 	BString powerUnit;
 	BString rateUnit;
 	switch (fBatteryExtendedInfo.power_unit) {
@@ -51,102 +113,127 @@ BatteryInfoView::Draw(BRect updateRect)
 			break;
 	}
 
-	BString text;
+	FontString* fontString;
+
+	fontString = new FontString;
+	fStringList.AddItem(fontString);
+	fontString->font = be_bold_font;
+	
 	if (fBatteryInfo.state & BATTERY_CHARGING)
-		text = "Battery charging";
+		fontString->string = "Battery charging";
 	else if (fBatteryInfo.state & BATTERY_DISCHARGING)
-		text = "Battery discharging";
+		fontString->string = "Battery discharging";
 	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE)
-		text = "Empty Battery Slot";
+		fontString->string = "Empty Battery Slot";
 	else
-		text = "Battery unused";
-	BPoint point(10, 10);
-	int textHeight = 15;
-	int space = textHeight + 5;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Capacity: ";
-	text << fBatteryInfo.capacity;
-	text << powerUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Last full Charge: ";
-	text << fBatteryInfo.full_capacity;
-	text << powerUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-
-	text = "Current Rate: ";
-	text << fBatteryInfo.current_rate;
-	text << rateUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	point.y += space;
-
-	text = "Design Capacity: ";
-	text << fBatteryExtendedInfo.design_capacity;
-	text << powerUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Technology: ";
-	text << fBatteryExtendedInfo.technology;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Design Voltage: ";
-	text << fBatteryExtendedInfo.design_voltage;
-	text << " mV";
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Design Capacity Warning: ";
-	text << fBatteryExtendedInfo.design_capacity_warning;
-	text << powerUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Design Capacity low Warning: ";
-	text << fBatteryExtendedInfo.design_capacity_low;
-	text << powerUnit;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Capacity Granularity 1: ";
-	text << fBatteryExtendedInfo.capacity_granularity_1;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Capacity Granularity 2: ";
-	text << fBatteryExtendedInfo.capacity_granularity_2;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Model Number: ";
-	text << fBatteryExtendedInfo.model_number;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Serial number: ";
-	text << fBatteryExtendedInfo.serial_number;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "Type: ";
-	text += fBatteryExtendedInfo.type;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-	text = "OEM Info: ";
-	text += fBatteryExtendedInfo.oem_info;
-	DrawString(text.String(), point);
-	point.y += space;
-	
-}		
+		fontString->string = "Battery unused";
 		
+	fontString = new FontString;
+	fontString->string = "Capacity: ";
+	fontString->string << fBatteryInfo.capacity;
+	fontString->string << powerUnit;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Last full Charge: ";
+	fontString->string << fBatteryInfo.full_capacity;
+	fontString->string << powerUnit;
+	_AddToStringList(fontString);
+	
+	fontString = new FontString;
+	fontString->string = "Current Rate: ";
+	fontString->string << fBatteryInfo.current_rate;
+	fontString->string << rateUnit;
+	_AddToStringList(fontString);
+	
+	// empty line
+	fontString = new FontString;
+	_AddToStringList(fontString);
+	
+	fontString = new FontString;
+	fontString->string = "Design Capacity: ";
+	fontString->string << fBatteryExtendedInfo.design_capacity;
+	fontString->string << powerUnit;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Technology: ";
+	fontString->string << fBatteryExtendedInfo.technology;
+	_AddToStringList(fontString);
+	
+	fontString = new FontString;
+	fontString->string = "Design Voltage: ";
+	fontString->string << fBatteryExtendedInfo.design_voltage;
+	fontString->string << " mV";
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Design Capacity Warning: ";
+	fontString->string << fBatteryExtendedInfo.design_capacity_warning;
+	fontString->string << powerUnit;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Design Capacity low Warning: ";
+	fontString->string << fBatteryExtendedInfo.design_capacity_low;
+	fontString->string << powerUnit;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Capacity Granularity 1: ";
+	fontString->string << fBatteryExtendedInfo.capacity_granularity_1;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Capacity Granularity 2: ";
+	fontString->string << fBatteryExtendedInfo.capacity_granularity_2;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Model Number: ";
+	fontString->string << fBatteryExtendedInfo.model_number;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Serial number: ";
+	fontString->string << fBatteryExtendedInfo.serial_number;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "Type: ";
+	fontString->string += fBatteryExtendedInfo.type;
+	_AddToStringList(fontString);
+		
+	fontString = new FontString;
+	fontString->string = "OEM Info: ";
+	fontString->string += fBatteryExtendedInfo.oem_info;
+	_AddToStringList(fontString);
+	
+	fPreferredSize.width = fMaxStringSize.width + 10;
+	fPreferredSize.height = (fMaxStringSize.height + kLineSpacing) *
+		fStringList.CountItems();
+}
+
+
+void
+BatteryInfoView::_AddToStringList(FontString* fontString)
+{
+	fStringList.AddItem(fontString);
+	BSize stringSize = _MeasureString(fontString->string);
+	if (fMaxStringSize.width < stringSize.width)
+		fMaxStringSize = stringSize;
+}
+
+
+void
+BatteryInfoView::_ClearStringList()
+{
+	for (int i = 0; i < fStringList.CountItems(); i ++)
+		delete fStringList.ItemAt(i);
+	fStringList.MakeEmpty();
+	fMaxStringSize = BSize(0, 0);
+}
+
 
 ExtPowerStatusView::ExtPowerStatusView(PowerStatusDriverInterface* interface,
 			BRect frame, int32 resizingMode, int batteryId,
@@ -157,7 +244,7 @@ ExtPowerStatusView::ExtPowerStatusView(PowerStatusDriverInterface* interface,
 	fBatteryInfoView(window->GetExtendedBatteryInfoView()),
 	fSelected(false)
 {
-	
+			
 }
 
 
@@ -225,7 +312,8 @@ ExtPowerStatusView::_Update(bool force)
 ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	:
 	BWindow(BRect(100, 150, 500, 500), "Extended Battery Info", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT |
+		B_ASYNCHRONOUS_CONTROLS),
 	fDriverInterface(interface),
 	fSelectedView(NULL)
 {
@@ -252,13 +340,17 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	batteryView->GroupLayout()->SetSpacing(10);
 	infoLayout->AddView(batteryView);
 
-	fBatteryInfoView = new BatteryInfoView(BRect(0, 0, 270, 310), B_FOLLOW_ALL);
+	// create before the battery views
+	fBatteryInfoView = new BatteryInfoView();
 	
 	BGroupLayout* batteryLayout = batteryView->GroupLayout();
 	BRect batteryRect(0, 0, 50, 30);
 	for (int i = 0; i < interface->GetBatteryCount(); i++) {
 		ExtPowerStatusView* view = new ExtPowerStatusView(interface,
-			batteryRect, B_FOLLOW_ALL, i, this);
+			batteryRect, B_FOLLOW_NONE, i, this);
+		view->SetExplicitMaxSize(BSize(70, 80));
+		view->SetExplicitMinSize(BSize(70, 80));
+
 		batteryLayout->AddView(view);
 		fBatteryViewList.AddItem(view);
 		fDriverInterface->StartWatching(view);
@@ -268,7 +360,7 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 
 	batteryLayout->AddItem(BSpaceLayoutItem::CreateGlue());	
 	
-	infoLayout->AddView(fBatteryInfoView, 20);
+	infoLayout->AddView(fBatteryInfoView);
 	
 	if (!fSelectedView && fBatteryViewList.CountItems() > 0)
 		fSelectedView = fBatteryViewList.ItemAt(0);	
