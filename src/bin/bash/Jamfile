@@ -97,5 +97,8 @@ Includes [ FGristFiles trap.c ] : <bash>signames.h ;
 Includes [ FGristFiles execute_cmd.c jobs.c parse.c trap.c ]
 	: <bash>builtext.h ;
 
+# y.tab.h includes parse.h
+Includes [ FGristFiles y.tab.h ] : [ FGristFiles parse.h ] ;
+
 SubInclude HAIKU_TOP src bin bash lib ;
 SubInclude HAIKU_TOP src bin bash builtins ;
