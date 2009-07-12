@@ -635,8 +635,8 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Python available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage python-2.6.2-x86-gcc2-2009-05-27
-			: $(baseURL)/python-2.6.2-x86-gcc2-2009-05-27.zip
+		InstallOptionalHaikuImagePackage python-2.6.2-x86-gcc2-2009-07-12
+			: $(baseURL)/python-2.6.2-x86-gcc2-2009-07-12.zip
 			:
 		;
 	}
