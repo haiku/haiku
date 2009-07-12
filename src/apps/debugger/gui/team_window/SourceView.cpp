@@ -205,6 +205,12 @@ public:
 	virtual	BSize				MaxSize();
 
 	virtual	void				Draw(BRect updateRect);
+	
+	virtual void				KeyDown(const char* bytes, int32 numBytes);
+	
+	virtual void				MouseDown(BPoint where);
+	virtual void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
 
 private:
 			float				_MaxLineWidth();
@@ -803,6 +809,7 @@ SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	SetFlags(Flags() | B_NAVIGABLE);
 }
 
 
@@ -848,6 +855,63 @@ SourceView::TextView::Draw(BRect updateRect)
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 		DrawString(lineString, BPoint(kLeftTextMargin, y));
 	}
+}
+
+
+void
+SourceView::TextView::KeyDown(const char* bytes, int32 numBytes)
+{
+	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
+	if (!vertical)
+		return;
+
+	float value = vertical->Value();
+	switch(bytes[0]) {
+		case B_UP_ARROW:
+			vertical->SetValue(value - fFontInfo->lineHeight);
+			break;
+			
+		case B_DOWN_ARROW:
+			vertical->SetValue(value + fFontInfo->lineHeight);
+			break;
+		
+		case B_PAGE_UP:
+			vertical->SetValue(value - fSourceView->Frame().Size().height);
+			break;
+			
+		case B_PAGE_DOWN:
+			vertical->SetValue(value + fSourceView->Frame().Size().height);
+			break;
+		
+		case B_HOME:
+			vertical->SetValue(0.0);
+			break;
+			
+		case B_END:
+			float min, max;
+			vertical->GetRange(&min, &max);
+			vertical->SetValue(max);
+			break;
+	}
+	
+	SourceView::BaseView::KeyDown(bytes, numBytes);
+}
+
+
+void
+SourceView::TextView::MouseDown(BPoint where)
+{
+	MakeFocus(true);
+	SourceView::BaseView::MouseDown(where);
+}
+
+
+void
+SourceView::TextView::MouseMoved(BPoint where, uint32 transit, 
+	const BMessage* dragMessage)
+
+{
+	SourceView::BaseView::MouseMoved(where, transit, dragMessage);
 }
 
 
