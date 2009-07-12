@@ -87,20 +87,17 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fDestButton = new BButton(rect, "destButton", "Destination",
 		new BMessage(MSG_DEST), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fDestButton->ResizeToPreferred();
-	topView->AddChild(fDestButton);
 
 	rect = fDestButton->Frame();
 	fDestButton->MoveBy(0, rect.Height() + 4);
 
 	fSourceButton = new BButton(rect, "sourceButton", "Source",
 		new BMessage(MSG_SOURCE), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	topView->AddChild(fSourceButton);
 
 	rect = fDestButton->Frame();
 	rect.OffsetBy(0, rect.Height() + 4);
 	fExpandButton = new BButton(rect, "expandButton", "Expand",
 		new BMessage(MSG_EXPAND), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	topView->AddChild(fExpandButton);
 	fExpandButton->SetEnabled(false);
 
 	// TextControls
@@ -116,6 +113,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fSourceText->ResizeTo(rect.Width(), height);
 	float offset = (rect.Height() - fSourceText->Bounds().Height()) / 2;
 	fSourceText->MoveBy(0, offset);
+	topView->AddChild(fSourceButton);
 	topView->AddChild(fSourceText);
 
 	rect = fSourceText->Frame();
@@ -123,6 +121,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fDestText = new BTextControl(rect, "destText", "", NULL,
 		new BMessage(MSG_DESTTEXT), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fDestText->SetDivider(0);
+	topView->AddChild(fDestButton);
 	topView->AddChild(fDestText);
 
 	rect.OffsetBy(0, fSourceButton->Bounds().Height() + 4 + offset);
@@ -131,6 +130,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fShowContents->ResizeToPreferred();
 	fShowContents->MoveTo(Bounds().right - 8 - fShowContents->Bounds().Width(),
 		rect.top);
+	topView->AddChild(fExpandButton);
 	topView->AddChild(fShowContents);
 	fShowContents->SetEnabled(false);
 
